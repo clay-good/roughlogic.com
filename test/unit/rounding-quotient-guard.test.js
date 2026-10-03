@@ -30,7 +30,11 @@ function unguarded(src) {
       else if (c === ")" || c === "]") d--;
       else if (c === "/" && d === 0 && inner[k + 1] !== "/" && inner[k + 1] !== "*" && inner[k - 1] !== "*") topDiv = true;
     }
-    if (topDiv && !/1e-9|1e-6|1e-12|EPS/.test(inner)) found.push(inner.slice(0, 80));
+    // 2026-10-02: a PRODUCT rounds the same way (50 x 1.1 = 55.00000000000001
+    // ordered 56 pieces), and a division nested in parentheses -- n x (1 + w/100)
+    // -- hid from the top-level check. Any * or / inside now needs the guard.
+    const arithmetic = topDiv || /[*/]/.test(inner.replace(/\/\/.*$/gm, ""));
+    if (arithmetic && !/1e-9|1e-6|1e-12|EPS/.test(inner)) found.push(inner.slice(0, 80));
   }
   return found;
 }

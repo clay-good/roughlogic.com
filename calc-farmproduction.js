@@ -845,7 +845,7 @@ export function computeReferenceEt0({ latitude_deg = 0, month = "jul", tmax_f = 
   if (!Number.isFinite(lat) || lat < -66.5 || lat > 66.5) return { error: "Latitude must be between -66.5 and 66.5 degrees (+ north, - south); the polar circles are outside this method." };
   if (!Number.isFinite(tmaxF) || !Number.isFinite(tminF)) return { error: "Both temperatures must be numbers (F)." };
   if (!(tmaxF >= tminF)) return { error: "The daily high (Tmax) must be at or above the daily low (Tmin)." };
-  const J = Math.floor(30.4 * (mi + 1) - 15); // FAO-56 mid-month day of year
+  const J = Math.floor(30.4 * (mi + 1) - 15 + 1e-9); // FAO-56 mid-month day of year
   const tmaxC = (tmaxF - 32) * 5 / 9;
   const tminC = (tminF - 32) * 5 / 9;
   const tmeanC = (tmaxC + tminC) / 2;

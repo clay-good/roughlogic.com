@@ -10,6 +10,10 @@ import { computeLaundryWasherTurns } from "../../calc-steamplant.js";
 import { computeAirDryerSizing } from "../../calc-millwright.js";
 import { computeDuctLeakageCfm25 } from "../../calc-hvacservice.js";
 import { computeRelativeCompaction } from "../../calc-soilproperties.js";
+import { computePaverPatio, computeStepFlashingCount } from "../../calc-finish.js";
+import { computeErosionBlanketCoverage } from "../../calc-earthwork.js";
+import { computeLightingUniformityRatio } from "../../calc-elecdesign.js";
+import { computeAlternatorChargingLoad } from "../../calc-mechanic.js";
 
 test("premix bags: a 6 x 6 ft, 4 in pad at 10% waste is exactly 22 bags of 0.60 cu ft, not 23", () => {
   assert.equal(computeConcretePremixBags({ length_ft: 6, width_ft: 6, thickness_in: 4, bag_yield_ft3: 0.6, waste_pct: 10 }).bags, 22);
@@ -42,4 +46,20 @@ test("duct leakage: 64.2 CFM25 on 2,140 ft2 is exactly 3.0 per 100 ft2 and passe
 
 test("relative compaction: 133.0 pcf wet at 12% on a 125 pcf Proctor is exactly 95% and passes a 95% spec", () => {
   assert.equal(computeRelativeCompaction({ wet_pcf: 133, w_pct: 12, max_pcf: 125, spec_pct: 95 }).pass, true);
+});
+
+test("a rounded PRODUCT: 99, 55, and 55 whole units, not one more (2026-10-02)", () => {
+  // 20 sf x 4.5 pavers/sf x 1.10 = 99.00000000000001
+  assert.equal(computePaverPatio({ area_sqft: 20, paver_length_in: 8, paver_width_in: 4, base_depth_in: 6, sand_depth_in: 1, waste_pct: 10 }).pavers, 99);
+  // 50 step flashings x 1.10 = 55.00000000000001
+  const sf = computeStepFlashingCount({ wall_run_ft: 24.5, shingle_exposure_in: 6, waste_pct: 10 });
+  assert.equal(sf.step_flashing_pieces, 50);
+  assert.equal(sf.order_pieces, 55);
+  // 50 sy x 1.1 staples/sy = 55.00000000000001
+  assert.equal(computeErosionBlanketCoverage({ area_sf: 450, overlap_pct: 0, roll_width_ft: 8, roll_length_ft: 112.5, staples_per_sy: 1.1 }).staples, 55);
+});
+
+test("uniformity 2.1 / 0.7 fc is exactly 3:1 and passes a 3:1 target; an alternator exactly at the load balances", () => {
+  assert.equal(computeLightingUniformityRatio({ readings: [2.1, 0.7, 1.4], target_maxmin: 3 }).pass, true);
+  assert.equal(computeAlternatorChargingLoad({ total_load_a: 63, alternator_a: 90, idle_frac: 0.7 }).idle_ok, true);
 });

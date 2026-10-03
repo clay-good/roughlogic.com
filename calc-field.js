@@ -346,7 +346,7 @@ export function computeSolarTimes({ lat_deg = 0, lon_deg = 0, date_iso = "", tz_
     if (utcMinutes === null) return null;
     const local = ((utcMinutes + tz_offset_hours * 60) % 1440 + 1440) % 1440;
     const h = Math.floor(local / 60 + 1e-9);
-    const m = Math.floor(local - h * 60);
+    const m = Math.floor(local - h * 60 + 1e-9);
     return String(h).padStart(2, "0") + ":" + String(m).padStart(2, "0");
   }
   const sunrise = utcMinutesFor(90.833, true);   // standard solar zenith with refraction

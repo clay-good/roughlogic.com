@@ -13465,26 +13465,26 @@ export const CITATIONS = {
     ],
   },
   "ceiling-speaker-coverage": {
-    formula: "diameter = 2 x (ceiling - ear) x tan(coverage_deg / 2); spacing = diameter (edge-to-edge) or 0.7 x diameter (minimum overlap); count = ceil(area / spacing^2).",
+    formula: "diameter = 2 x (ceiling - ear) x tan(coverage_deg / 2); spacing = diameter (edge-to-edge) or diameter / sqrt 2 (minimum overlap); count = ceil(area / spacing^2).",
     edition: "Distributed ceiling-loudspeaker coverage geometry, standard commercial-audio design practice (manufacturer design guides, e.g. Bose / JBL / Atlas) by name; first-principles cone geometry.",
     freeAccess: "The coverage-cone geometry is first-principles; the spacing conventions are published in loudspeaker-manufacturer design guides.",
     governance: GOVERNANCE.electrical,
-    editionNote: "A ceiling loudspeaker projects a coverage cone whose diameter at the listener plane is 2 x (ceiling height - ear height) x tan(coverage angle / 2). Edge-to-edge spacing (spacing = diameter) is the minimum count but the level dips between speakers; minimum-overlap spacing (0.7 x diameter, each speaker reaching where its neighbor is 6 dB down) gives even coverage at the cost of more speakers; a partial-overlap (square or hex) layout sits between. Count = ceil(area / spacing^2). The rated coverage angle narrows at high frequency, so the density needed for intelligible speech is usually set by the coverage at 2-4 kHz, not the nominal angle; verify against the speaker's directivity data and the target SPL.",
+    editionNote: "A ceiling loudspeaker projects a coverage cone whose diameter at the listener plane is 2 x (ceiling height - ear height) x tan(coverage angle / 2). Edge-to-edge spacing (spacing = diameter) is the minimum count but the level dips between speakers; minimum-overlap spacing (diameter / sqrt 2 = 0.707 x diameter, so the coverage circles of four neighbors just close the gap at the center of the square; JBL's MAXIMUM overlap is the tighter spacing where one speaker reaches its neighbor's on-axis point) gives even coverage at the cost of more speakers; a partial-overlap (square or hex) layout sits between. Count = ceil(area / spacing^2). The rated coverage angle narrows at high frequency, so the density needed for intelligible speech is usually set by the coverage at 2-4 kHz, not the nominal angle; verify against the speaker's directivity data and the target SPL.",
     assumptions: [
       { name: "Coverage cone", value: "diameter = 2 x (ceiling - ear) x tan(angle / 2) at the listener plane", source: "cone geometry" },
-      { name: "Spacing convention", value: "edge-to-edge = diameter; minimum overlap = 0.7 x diameter (-6 dB overlap)", source: "commercial-audio design practice" },
+      { name: "Spacing convention", value: "edge-to-edge = diameter; minimum overlap = D / sqrt 2 = 0.707 x diameter", source: "commercial-audio design practice; Bose In-ceiling Loudspeakers Design Guide multipliers" },
       { name: "Angle narrows with frequency", value: "the rated angle is broadest at low frequency; use the 2-4 kHz coverage for speech", source: "loudspeaker directivity data" },
     ],
   },
   "structured-cabling-channel": {
-    formula: "max_pl = 90 x (1 - max(temp - 20, 0) x derate); channel = permanent_link + cords; pl_ok = permanent_link <= max_pl; chan_ok = channel <= 100 m.",
+    formula: "max_pl = TIA-568-C.2 Table G.2 (unscreened 90.0/89.0/87.0/85.5/84.0/81.7/79.5/77.2/75.0 m, screened 90.0/89.5/88.5/87.7/87.0/86.5/85.5/84.7/83.0 m at 20-60 deg C in 5 deg steps), interpolated; a custom rate uses 90 x (1 - max(temp - 20, 0) x rate); channel = permanent_link + cords; pl_ok = permanent_link <= max_pl; chan_ok = channel <= 100 m.",
     edition: "ANSI/TIA-568 (Balanced Twisted-Pair Telecommunications Cabling) 100 m channel model and the temperature de-rating of the permanent link, by name.",
     freeAccess: "The 100 m channel / 90 m permanent-link model and the temperature de-rating are published in ANSI/TIA-568; the arithmetic is public.",
     governance: GOVERNANCE.electrical,
     editionNote: "ANSI/TIA-568 limits a balanced twisted-pair horizontal channel to 100 m total: a 90 m permanent link (the fixed in-wall horizontal cable, wall plate to patch panel) plus up to 10 m of patch and equipment cords combined. Above 20 deg C the maximum permanent-link length de-rates because warmer copper has higher insertion loss - about 0.4% per deg C for unscreened (UTP) cable from 20 to 40 deg C (0.6% above 40) and about 0.2% per deg C for screened cable - so a hot ceiling or plenum shortens the allowed run. The channel is compliant only if the permanent link is within its de-rated maximum AND the total channel is within 100 m. The de-rate factor and the cable's specifics are user inputs; the adopted TIA-568 edition and the cable manufacturer's data govern.",
     assumptions: [
       { name: "100 m channel", value: "channel = permanent link + cords <= 100 m, with the permanent link <= 90 m at 20 deg C", source: "ANSI/TIA-568" },
-      { name: "Temperature de-rate", value: "max permanent link = 90 x (1 - (temp - 20) x derate); ~0.4%/deg C UTP, ~0.2%/deg C screened (UTP 0.6%/deg C above 40 deg C)", source: "ANSI/TIA-568" },
+      { name: "Temperature de-rate", value: "max permanent link from Table G.2 (84.0 m UTP / 87.0 m screened at 40 deg C; 75.0 / 83.0 at 60); the 0.4%/deg C UTP figure is the insertion-loss rise behind the table, not a length cut", source: "ANSI/TIA-568-C.2 Annex G" },
       { name: "Manufacturer governs", value: "the adopted TIA-568 edition and the cable's published de-rating govern", source: "scope of this tile" },
     ],
   },
@@ -13874,7 +13874,7 @@ export const CITATIONS = {
     edition: "The sensible water-heating relation (1 Btu raises 1 lb of water 1 F), by name.",
     freeAccess: "The water-heating energy relation and the 8.34 lb/gal constant are standard published values. The equipment ratings and site conditions govern.",
     governance: GOVERNANCE.general,
-    editionNote: "The pool heat-up: energy Btu = gallons x 8.34 lb/gal x temperature rise, and the heat-up time = energy / (heater nameplate input x efficiency). A gas heater at ~80% warms fast; a heat pump (entered as its COP-equivalent Btu/h) is far slower but cheaper to run, so it is left on to hold temperature rather than for a quick warm-up. This returns the sensible heat-up only: it ignores the cover, evaporation, and standby losses, so real heat-up takes longer, and it does not size the gas line or verify the electrical service. A sizing estimate; the equipment ratings and site conditions govern.",
+    editionNote: "The pool heat-up: energy Btu = gallons x 8.34 lb/gal x temperature rise, and the heat-up time = energy / (heater nameplate input x efficiency). A gas heater at ~80% warms fast; a heat pump (entered as its heat output with efficiency 1.0) is far slower but cheaper to run, so it is left on to hold temperature rather than for a quick warm-up. This returns the sensible heat-up only: it ignores the cover, evaporation, and standby losses, so real heat-up takes longer, and it does not size the gas line or verify the electrical service. A sizing estimate; the equipment ratings and site conditions govern.",
     assumptions: [
       { name: "Sensible heat", value: "Btu = gallons x 8.34 x dT; 1 Btu raises 1 lb water 1 F", source: "thermodynamics" },
       { name: "Heat-up time", value: "hours = energy / (output x efficiency); enter COP-equiv Btu/h for a heat pump", source: "equipment ratings" },
@@ -13886,7 +13886,7 @@ export const CITATIONS = {
     edition: "The sensible water-heating relation (1 Btu raises 1 lb of water 1 F) solved for the heater input rating, by name.",
     freeAccess: "The water-heating energy relation and the 8.34 lb/gal constant are standard published values. The equipment ratings and site conditions govern.",
     governance: GOVERNANCE.general,
-    editionNote: "The heater input rating (the nameplate Btu/h) needed to warm a pool by a temperature rise in a target time, the inverse of pool-heater-btu: input = (gallons x 8.34 x rise) / (target_hours x efficiency). At about 80% a gas heater is sized off this directly; for a heat pump enter its COP-equivalent Btu/h (the required output looks large because a heat pump is left on to hold temperature, not for a quick warm-up). This is the raw sensible heat-up size and ignores the cover, evaporation, and standby losses, so add margin, and it does not size the gas line or verify the electrical service. A sizing estimate; the equipment ratings and site conditions govern.",
+    editionNote: "The heater input rating (the nameplate Btu/h) needed to warm a pool by a temperature rise in a target time, the inverse of pool-heater-btu: input = (gallons x 8.34 x rise) / (target_hours x efficiency). At about 80% a gas heater is sized off this directly; for a heat pump set efficiency to 1.0 and read the result as the heat OUTPUT it must deliver, not a COP-scaled input (the required output looks large because a heat pump is left on to hold temperature, not for a quick warm-up). This is the raw sensible heat-up size and ignores the cover, evaporation, and standby losses, so add margin, and it does not size the gas line or verify the electrical service. A sizing estimate; the equipment ratings and site conditions govern.",
     assumptions: [
       { name: "Sensible heat", value: "Btu = gallons x 8.34 x dT; 1 Btu raises 1 lb water 1 F", source: "thermodynamics" },
       { name: "Input-rating inverse", value: "input = energy / (target_hours x efficiency), delivered output = input x efficiency; enter COP-equiv Btu/h for a heat pump", source: "equipment ratings" },
@@ -16234,7 +16234,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.rigging,
     editionNote: "Single-edition (the MBS = factor x d^2 rule-of-thumb does not roll; the manufacturer's certified breaking strength governs - this is an estimate only).",
     assumptions: [
-      { name: "Construction factor", value: "the default 46 is the rule-of-thumb tons/in^2 for IPS 6x19; bright IPS, EIPS, and other constructions/grades differ - edit it", source: "Wire Rope Users Manual" },
+      { name: "Construction factor", value: "the default 46 is the rule-of-thumb tons/in^2 for IPS 6x19 IWRC (steel core) near 1/2 in -- fiber-core rope runs about 7% lower (1/2 in: 10.7 tons, not 11.5) and the d^2 rule reads up to ~10% high at large diameters, both on the unsafe side; bright IPS, EIPS, and other constructions/grades differ - edit it", source: "Wire Rope Users Manual" },
       { name: "Design factor", value: "5:1 is typical for general rigging; the application and the AHJ set the required factor", source: "ASME B30.9" },
       { name: "Estimate only", value: "use the certified breaking strength for any real lift; never use unmarked or uncertified rope", source: "manufacturer certification" },
     ],
@@ -16246,7 +16246,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.rigging,
     editionNote: "The inverse of wire-rope-strength: the rope diameter that meets a required working load limit, then rounded up to the next standard size (a smaller rope is under-rated). Single-edition (the MBS = factor x d^2 rule-of-thumb does not roll; the manufacturer's certified breaking strength governs - this is an estimate only).",
     assumptions: [
-      { name: "Construction factor", value: "the default 46 is the rule-of-thumb tons/in^2 for IPS 6x19; bright IPS, EIPS, and other constructions/grades differ - edit it", source: "Wire Rope Users Manual" },
+      { name: "Construction factor", value: "the default 46 is the rule-of-thumb tons/in^2 for IPS 6x19 IWRC (steel core) near 1/2 in -- fiber-core rope runs about 7% lower (1/2 in: 10.7 tons, not 11.5) and the d^2 rule reads up to ~10% high at large diameters, both on the unsafe side; bright IPS, EIPS, and other constructions/grades differ - edit it", source: "Wire Rope Users Manual" },
       { name: "Design factor", value: "5:1 is typical for general rigging; the application and the AHJ set the required factor", source: "ASME B30.9" },
       { name: "Estimate only", value: "round up to a standard size and use the certified breaking strength for any real lift; never use unmarked or uncertified rope", source: "manufacturer certification" },
     ],
@@ -20849,11 +20849,11 @@ export const CITATIONS = {
     ],
   },
   "masonry-lintel-loading": {
-    formula: "tri_h = span/2; if wall_above >= tri_h: W = 0.5 x span x tri_h x wall_psf (arching); else W = span x wall_above x wall_psf (full rectangle); UDL = W/span.",
+    formula: "tri_h = span/2; arching when wall_above >= tri_h + 8 in: W = 0.5 x span x tri_h x wall_psf and the moment-equivalent UDL = 4 W / (3 x span); otherwise W = span x wall_above x wall_psf (full rectangle) and UDL = W/span.",
     edition: "The masonry arching-action lintel-load method (TMS 402 commentary / masonry design references), by name.",
     freeAccess: "The 45-degree arching triangle for masonry lintel loads is a standard masonry-design method (TMS 402 commentary / masonry design references). The engineer of record governs.",
     governance: GOVERNANCE.general,
-    editionNote: "Masonry lintel arching load: for masonry above an opening, the lintel carries only the triangular dead load within a 45-degree triangle (height = span/2) IF enough wall is above (wall above >= span/2 + 8 in, NCMA TEK 17-1), W = 0.5 x span x (span/2) x wall psf, an equivalent UDL of W/span. If the wall above is shorter than the triangle (a lintel near the top of the wall or under a beam bearing), arching is not developed and the lintel carries the full rectangle span x height x psf - MORE load than the arched case. This returns the dead load only: add the floor/roof/superimposed loads within the triangle separately, and confirm the arching assumptions (bond, no control joint in the triangle). A design aid; the engineer of record governs.",
+    editionNote: "Masonry lintel arching load: for masonry above an opening, the lintel carries only the triangular dead load within a 45-degree triangle (height = span/2) IF enough wall is above (wall above >= span/2 + 8 in, NCMA TEK 17-1), W = 0.5 x span x (span/2) x wall psf, a moment-equivalent UDL of 4W/(3 x span) (W/span matches the end shear but understates the moment 25%). NCMA TEK 17-01D's own worked example loads the triangle to 3.5 ft (half span plus the 8 in), which reads about 25% more moment than its text's half-span triangle; this follows the text and BIA Technical Note 31B. If the wall above is shorter than the triangle (a lintel near the top of the wall or under a beam bearing), arching is not developed and the lintel carries the full rectangle span x height x psf - MORE load than the arched case. This returns the dead load only: add the floor/roof/superimposed loads within the triangle separately, and confirm the arching assumptions (bond, no control joint in the triangle). A design aid; the engineer of record governs.",
     assumptions: [
       { name: "Arching triangle", value: "45-degree triangle, height span/2; arches only when wall above >= span/2 + 8 in (TEK 17-1: 8 in of wall above the apex)", source: "masonry design method" },
       { name: "No arching case", value: "insufficient wall above -> the full rectangle span x height x psf (more load)", source: "masonry design method" },

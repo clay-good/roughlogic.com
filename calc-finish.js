@@ -200,7 +200,7 @@ export function computePaverPatio({ area_sqft = 0, paver_length_in = 0, paver_wi
   if (!(area_sqft > 0)) return { error: "Patio area must be positive." };
   if (!(paver_length_in > 0) || !(paver_width_in > 0)) return { error: "Paver dimensions must be positive." };
   const pavers_per_sqft = 144 / (paver_length_in * paver_width_in);
-  const pavers = Math.ceil(area_sqft * pavers_per_sqft * (1 + waste_pct / 100));
+  const pavers = Math.ceil(area_sqft * pavers_per_sqft * (1 + waste_pct / 100) - 1e-9);
   return {
     pavers_per_sqft, pavers,
     base_cuyd: area_sqft * base_depth_in / 324,
@@ -592,7 +592,7 @@ export function computeStepFlashingCount({ wall_run_ft = 20, shingle_exposure_in
   if (!(waste_pct >= 0)) return { error: "Waste percent cannot be negative." };
   // One step-flashing piece per shingle course along a roof-to-wall intersection, plus one to start.
   const step_flashing_pieces = Math.ceil(wall_run_ft * 12 / shingle_exposure_in - 1e-9) + 1;
-  const order_pieces = Math.ceil(step_flashing_pieces * (1 + waste_pct / 100));
+  const order_pieces = Math.ceil(step_flashing_pieces * (1 + waste_pct / 100) - 1e-9);
   if (![step_flashing_pieces, order_pieces].every(Number.isFinite)) return { error: "Step-flashing count math is not a finite value." };
   return {
     step_flashing_pieces,

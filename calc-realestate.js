@@ -2780,7 +2780,7 @@ export function computeBrrrrRefi({ arv_usd = 0, total_invested_usd = 0, refi_ltv
   if (!(arv > 0)) return { error: "After-repair value must be positive (USD)." };
   if (!(invested > 0)) return { error: "Total invested must be positive (USD)." };
   if (!(ltv > 0 && ltv <= 100)) return { error: "Refinance LTV must be between 0 and 100%." };
-  if (ltv < 1) return { error: "Enter the refinance LTV as a percent (75 for 75%), not a fraction." };
+  if (ltv <= 1) return { error: "Enter the refinance LTV as a percent (75 for 75%), not a fraction (1 would be a 1% loan)." };
   if (payoff < 0) return { error: "Existing payoff must be non-negative (USD)." };
   const new_loan_usd = arv * ltv / 100;
   const cash_returned_usd = new_loan_usd - payoff;

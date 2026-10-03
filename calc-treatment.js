@@ -376,12 +376,12 @@ export function computePoolHeaterBtu({ gallons = 0, dT_F = 0, output = 0, eff = 
   const hours = Q_btu / delivered;
   return {
     Q_btu, delivered, hours,
-    note: "Pool heat-up: energy Btu = gallons x 8.34 lb/gal x temperature rise (1 Btu warms 1 lb of water 1 F), and the heat-up time = energy / (heater nameplate input x efficiency). A gas heater at ~80% warms fast; a heat pump (enter its COP-equivalent Btu/h) is far slower but cheaper to run, which is why a heat pump is left on to hold temperature rather than for a quick warm-up. Ignores cover, evaporation, and standby losses, so real heat-up runs longer. A sizing estimate; the equipment ratings and site conditions govern.",
+    note: "Pool heat-up: energy Btu = gallons x 8.34 lb/gal x temperature rise (1 Btu warms 1 lb of water 1 F), and the heat-up time = energy / (heater nameplate input x efficiency). A gas heater at ~80% warms fast; a heat pump (enter its heat OUTPUT in Btu/h with efficiency 1.0, not its COP) is far slower but cheaper to run, which is why a heat pump is left on to hold temperature rather than for a quick warm-up. Ignores cover, evaporation, and standby losses, so real heat-up runs longer. A sizing estimate; the equipment ratings and site conditions govern.",
   };
 }
 export const poolHeaterBtuExample = { inputs: { gallons: 20000, dT_F: 10, output: 400000, eff: 0.80 } };
 TREATMENT_RENDERERS["pool-heater-btu"] = _rPool({
-  citation: "Citation: pool heat-up energy Btu = gallons x 8.34 x temperature rise; time = energy / (nameplate input x efficiency). Gas ~80%; enter a heat pump's COP-equivalent Btu/h. Ignores cover/evaporation/standby losses. A sizing estimate; the equipment ratings govern.",
+  citation: "Citation: pool heat-up energy Btu = gallons x 8.34 x temperature rise; time = energy / (nameplate input x efficiency). Gas ~80%; for a heat pump enter its heat output with efficiency 1.0, not its COP. Ignores cover/evaporation/standby losses. A sizing estimate; the equipment ratings govern.",
   example: poolHeaterBtuExample.inputs,
   fields: [
     { key: "gallons", label: "Pool volume (gallons)" },
@@ -416,12 +416,12 @@ export function computePoolHeaterSize({ gallons = 0, dT_F = 0, target_hours = 0,
   if (!(required_output_btu > 0) || !Number.isFinite(required_output_btu)) return { error: "Heater-size math is not a finite positive value." };
   return {
     required_output_btu, Q_btu,
-    note: "The heater INPUT rating (the Btu/h on a gas heater's nameplate) needed to warm a pool by a temperature rise in a target time, the inverse of the pool-heater-btu tile: input = (gallons x 8.34 x rise) / (target_hours x efficiency); the delivered output is input x efficiency. At about 80% a gas heater is sized off this directly; for a heat pump enter its COP-equivalent Btu/h (the output required will look large because a heat pump is left on to hold temperature, not for a quick warm-up). This is the raw heat-up size and ignores cover, evaporation, and standby losses, so add margin. A sizing estimate; the equipment ratings and site conditions govern."
+    note: "The heater INPUT rating (the Btu/h on a gas heater's nameplate) needed to warm a pool by a temperature rise in a target time, the inverse of the pool-heater-btu tile: input = (gallons x 8.34 x rise) / (target_hours x efficiency); the delivered output is input x efficiency. At about 80% a gas heater is sized off this directly; for a heat pump set efficiency to 1.0 and read the result as the heat OUTPUT it must deliver, not a COP-scaled input (the output required will look large because a heat pump is left on to hold temperature, not for a quick warm-up). This is the raw heat-up size and ignores cover, evaporation, and standby losses, so add margin. A sizing estimate; the equipment ratings and site conditions govern."
   };
 }
 export const poolHeaterSizeExample = { inputs: { gallons: 20000, dT_F: 10, target_hours: 5.2125, eff: 0.80 } };
 TREATMENT_RENDERERS["pool-heater-size"] = _rPool({
-  citation: "Citation: pool heater sizing solved for the input rating: input = (gallons x 8.34 x rise) / (target_hours x efficiency), from time = energy / (input x efficiency); delivered output = input x efficiency. Gas ~80%; enter a heat pump's COP-equivalent Btu/h. Ignores cover/evaporation/standby losses. A sizing estimate; the equipment ratings govern.",
+  citation: "Citation: pool heater sizing solved for the input rating: input = (gallons x 8.34 x rise) / (target_hours x efficiency), from time = energy / (input x efficiency); delivered output = input x efficiency. Gas ~80%; for a heat pump enter its heat output with efficiency 1.0, not its COP. Ignores cover/evaporation/standby losses. A sizing estimate; the equipment ratings govern.",
   example: poolHeaterSizeExample.inputs,
   fields: [
     { key: "gallons", label: "Pool volume (gallons)" },

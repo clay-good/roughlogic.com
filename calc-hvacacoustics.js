@@ -461,7 +461,7 @@ export function computeRooftopCurbUplift({
   const capacity_ok = has_capacity && per_windward_lb <= fastener_capacity_lb + 1e-9;
   // How many windward fasteners the couple plus the direct share needs.
   const fasteners_required = has_capacity && per_windward_lb > 0 && windward_fastener_count > 0
-    ? Math.ceil(windward_fastener_count * demand_ratio) : 0;
+    ? Math.ceil(windward_fastener_count * demand_ratio - 1e-9) : 0;
 
   const upliftVerdict = "a " + fmt(unit_length_ft, 1) + " by " + fmt(unit_width_ft, 1) + " ft unit is " + fmt(plan_area_ft2, 0) + " sq ft, so " + fmt(uplift_psf, 0) + " psf of net uplift is " + fmt(uplift_lb, 0) + " lb -- " + fmt(uplift_pct_of_weight, 0) + "% of the unit's " + fmt(unit_weight_lb, 0) + " lb weight";
   const directionVerdict = weight_governs

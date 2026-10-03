@@ -871,16 +871,18 @@ export function computeCeilingSpeakerCoverage({ ceiling_ft = 0, ear_ft = 0, cove
   if (!(cov > 0 && cov < 180)) return { error: "Coverage angle must be between 0 and 180 deg." };
   if (!(area > 0)) return { error: "Room area must be positive (ft^2)." };
   const diameter_ft = 2 * (ceiling - ear) * Math.tan((cov / 2) * Math.PI / 180);
-  const spacing_ft = layout === "minimum_overlap" ? 0.7 * diameter_ft : diameter_ft;
+  // D / sqrt 2 exactly (Bose In-ceiling Design Guide multipliers 2.45 / 1.84 = 3.46 / 2.61 over sqrt 2);
+  // 0.7 until 2026-10-02 read 1,200 ft^2 at a 12 ft circle as 18 speakers where 17 cover it.
+  const spacing_ft = layout === "minimum_overlap" ? Math.SQRT1_2 * diameter_ft : diameter_ft;
   const count = Math.ceil(area / (spacing_ft * spacing_ft) - 1e-9);
   return {
     diameter_ft, spacing_ft, count, overlap: layout === "minimum_overlap",
-    note: "Ceiling speaker coverage and spacing: a ceiling speaker covers a cone whose diameter at the listener plane = 2 x (ceiling - ear height) x tan(coverage angle / 2). Spacing edge-to-edge (speakers just touching, spacing = diameter) gives minimum count but the level dips between speakers; minimum-overlap spacing = 0.7 x diameter (D / sqrt 2: the -6 dB circles just leave no uncovered spot on a square grid, JBL) gives even coverage for more speakers. Count = ceil(room area / spacing^2). A layout aid; verify with the speaker's coverage-angle spec at the design frequency (angle narrows at high frequency) and the target SPL.",
+    note: "Ceiling speaker coverage and spacing: a ceiling speaker covers a cone whose diameter at the listener plane = 2 x (ceiling - ear height) x tan(coverage angle / 2). Spacing edge-to-edge (speakers just touching, spacing = diameter) gives minimum count but the level dips between speakers; minimum-overlap spacing = 0.707 x diameter (D / sqrt 2: the -6 dB circles just leave no uncovered spot on a square grid, JBL) gives even coverage for more speakers. Count = ceil(room area / spacing^2). A layout aid; verify with the speaker's coverage-angle spec at the design frequency (angle narrows at high frequency) and the target SPL.",
   };
 }
 export const ceilingSpeakerCoverageExample = { inputs: { ceiling_ft: 10, ear_ft: 4, coverage_deg: 90, room_area_ft2: 1200, layout: "edge_to_edge" } };
 function _renderCeilingSpeakerCoverage(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Ceiling speaker coverage: diameter = 2 x (ceiling - ear) x tan(angle/2); spacing = diameter (edge-to-edge) or 0.7 x diameter (minimum overlap, -6 dB); count = ceil(area / spacing^2). A layout aid; verify with the speaker's coverage angle at the design frequency and the target SPL.";
+  citationEl.textContent = "Citation: Ceiling speaker coverage: diameter = 2 x (ceiling - ear) x tan(angle/2); spacing = diameter (edge-to-edge) or D / sqrt 2 = 0.707 x diameter (minimum overlap); count = ceil(area / spacing^2). A layout aid; verify with the speaker's coverage angle at the design frequency and the target SPL.";
   const ch = makeNumber("Ceiling height (ft)", "csc-ch", { step: "any", min: "0" });
   const ea = makeNumber("Listener ear height (ft, seated ~4)", "csc-ea", { step: "any", min: "0" });
   const co = makeNumber("Speaker coverage angle (deg, ~90)", "csc-co", { step: "any", min: "0" });
@@ -949,6 +951,20 @@ function _renderCeilingSpeakerCoverageAngle(inputRegion, outputRegion, citationE
 LOWVOLTAGE_RENDERERS["ceiling-speaker-coverage-angle"] = _renderCeilingSpeakerCoverageAngle;
 
 // ===================== spec-v458: structured cabling channel length (TIA-568) =====================
+// ANSI/TIA-568-C.2 Annex G Table G.2, maximum horizontal cable length (m) by temperature, 20-60 C in
+// 5 C steps (10 m of cords at 20 C assumed). Until 2026-10-02 the tile took 90 x (1 - 0.004 x dT): the
+// 0.4%/C is an insertion-loss rise, not a length cut, and the extra term above 40 C was never applied,
+// so it read 82.8 m at 40 C (table 84.0) and 75.6 m at 60 C (table 75.0, the unsafe side).
+const _TIA_G2_TEMPS = [20, 25, 30, 35, 40, 45, 50, 55, 60];
+const _TIA_G2_UTP = [90.0, 89.0, 87.0, 85.5, 84.0, 81.7, 79.5, 77.2, 75.0];
+const _TIA_G2_SCREENED = [90.0, 89.5, 88.5, 87.7, 87.0, 86.5, 85.5, 84.7, 83.0];
+function _tiaG2(table, t) {
+  if (t <= 20) return table[0];
+  if (t >= 60) return table[table.length - 1];
+  const i = Math.min(Math.floor((t - 20) / 5 + 1e-9), table.length - 2);
+  const f = (t - _TIA_G2_TEMPS[i]) / 5;
+  return table[i] + f * (table[i + 1] - table[i]);
+}
 // dims: in { permanent_link_m: L, cords_m: L, temp_c: dimensionless, derate_per_c: dimensionless } out: { max_pl_m: L, channel_m: L }
 export function computeStructuredCablingChannel({ permanent_link_m = 0, cords_m = 0, temp_c = 20, derate_per_c = 0.004 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
@@ -959,7 +975,9 @@ export function computeStructuredCablingChannel({ permanent_link_m = 0, cords_m 
   if (!(pl > 0)) return { error: "Permanent-link length must be positive (m)." };
   if (cords < 0) return { error: "Cord length must be non-negative (m)." };
   if (derate < 0) return { error: "De-rate factor must be non-negative." };
-  const max_pl_m = Math.max(0, 90 * (1 - Math.max(temp - 20, 0) * derate));
+  // 0.004 (UTP) and 0.002 (screened) select the TIA table; any other entry is a custom linear de-rate.
+  const table = derate === 0.004 ? _TIA_G2_UTP : derate === 0.002 ? _TIA_G2_SCREENED : null;
+  const max_pl_m = table ? _tiaG2(table, temp) : Math.max(0, 90 * (1 - Math.max(temp - 20, 0) * derate));
   const channel_m = pl + cords;
   const pl_ok = pl <= max_pl_m;
   const chan_ok = channel_m <= 100;
@@ -968,7 +986,7 @@ export function computeStructuredCablingChannel({ permanent_link_m = 0, cords_m 
   const cords_ok = cords <= 10;
   return {
     max_pl_m, channel_m, pl_ok, chan_ok, cords_ok, ok: pl_ok && chan_ok && cords_ok,
-    note: "Structured cabling channel length (TIA-568): a horizontal channel is limited to 100 m total = a 90 m permanent link (the fixed horizontal cable) plus up to 10 m of patch and equipment cords. Above 20 deg C the maximum permanent-link length de-rates (about 0.4% per deg C for UTP from 20 to 40 deg C and 0.6% above 40, about 0.2% for screened cable; Fluke Networks prints 90 m falling to about 84 m at 40 deg C) because warmer copper has higher resistance and insertion loss, so a hot ceiling or plenum shortens the allowed run. The channel passes only if the permanent link is within its de-rated maximum, the cords total no more than 10 m, AND the total channel is within 100 m (longer cords need the TIA zone-cabling formula, not checked here). A design aid; the specific cable's published de-rating and the TIA-568 edition adopted govern.",
+    note: "Structured cabling channel length (TIA-568): a horizontal channel is limited to 100 m total = a 90 m permanent link (the fixed horizontal cable) plus up to 10 m of patch and equipment cords. Above 20 deg C the maximum permanent-link length de-rates by TIA-568-C.2 Table G.2 (unscreened 90.0 m at 20 deg C, 84.0 at 40, 75.0 at 60; screened 87.0 at 40 and 83.0 at 60), interpolated between its 5 deg C rows; a de-rate entry other than 0.004 (UTP) or 0.002 (screened) is applied as a straight 90 x (1 - rate x (T - 20)), and the table stops at 60 deg C because warmer copper has higher resistance and insertion loss, so a hot ceiling or plenum shortens the allowed run. The channel passes only if the permanent link is within its de-rated maximum, the cords total no more than 10 m, AND the total channel is within 100 m (longer cords need the TIA zone-cabling formula, not checked here). A design aid; the specific cable's published de-rating and the TIA-568 edition adopted govern.",
   };
 }
 export const structuredCablingChannelExample = { inputs: { permanent_link_m: 85, cords_m: 8, temp_c: 20, derate_per_c: 0.004 } };
@@ -977,7 +995,7 @@ function _renderStructuredCablingChannel(inputRegion, outputRegion, citationEl) 
   const pl = makeNumber("Permanent-link length (m)", "scc-pl", { step: "any", min: "0" });
   const cd = makeNumber("Total patch + equipment cords (m)", "scc-cd", { step: "any", min: "0" });
   const tc = makeNumber("Installed cable temperature (°C)", "scc-tc", { step: "any" });
-  const dr = makeNumber("De-rate per °C above 20 (0.004 UTP)", "scc-dr", { step: "any", min: "0" });
+  const dr = makeNumber("Cable: 0.004 = UTP, 0.002 = screened (TIA Table G.2); other = custom linear de-rate per °C", "scc-dr", { step: "any", min: "0" });
   for (const f of [pl, cd, tc, dr]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { pl.input.value = "85"; cd.input.value = "8"; tc.input.value = "20"; dr.input.value = "0.004"; update(); });
   const oPl = makeOutputLine(outputRegion, "Permanent link vs de-rated max", "scc-out-pl");

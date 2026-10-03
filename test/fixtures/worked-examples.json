@@ -86861,7 +86861,7 @@
    "source_publisher": "commercial-audio design practice",
    "source_title": "minimum-overlap spacing 0.7x12 = 8.4 ft -> 18 speakers (exact ceil(1200/70.56))",
    "source_edition_or_year": "spec-v457 cross-check (machine-verified; spec prose 17 used rounded 70.6, exact is 18)",
-   "source_section_or_page": "spec-v457 section 2.1 cross-check",
+   "source_section_or_page": "spec-v457 section 2.1 cross-check; recomputed 2026-10-02 at D / sqrt 2 (8.485 ft, 17 speakers; 0.7 D read 8.4 ft and 18)",
    "verified_by": "rl",
    "verified_on": "2026-07-04",
    "inputs": {
@@ -86873,13 +86873,13 @@
    },
    "outputs": {
     "spacing_ft": {
-     "value": 8.4,
+     "value": 8.485,
      "tolerance": {
       "pct": 0.5
      }
     },
     "count": {
-     "value": 18,
+     "value": 17,
      "tolerance": {
       "pct": 0.5
      }
@@ -86920,7 +86920,7 @@
    "source_publisher": "ANSI/TIA-568",
    "source_title": "40 deg C de-rates max link to 82.8 m, so 85 m link now fails",
    "source_edition_or_year": "spec-v458 cross-check (machine-verified)",
-   "source_section_or_page": "spec-v458 section 2.1 cross-check",
+   "source_section_or_page": "spec-v458 section 2.1 cross-check; recomputed 2026-10-02 on TIA-568-C.2 Table G.2 (84.0 m at 40 C; the linear 0.4%/C form read 82.8)",
    "verified_by": "rl",
    "verified_on": "2026-07-04",
    "inputs": {
@@ -86931,7 +86931,7 @@
    },
    "outputs": {
     "max_pl_m": {
-     "value": 82.8,
+     "value": 84.0,
      "tolerance": {
       "pct": 0.5
      }
@@ -150907,6 +150907,968 @@
      "value": 2,
      "tolerance": {
       "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rebar-weight-takeoff",
+   "source_publisher": "Florida Department of Transportation",
+   "source_title": "Final Estimates Level 1 CBT, Module 6 - Weight Measurements (transcript)",
+   "source_edition_or_year": "FDOT Final Estimates Level 1 course transcript (current web edition)",
+   "source_section_or_page": "Slide 24 table (https://wbt.dot.state.fl.us/ois/FinalEstimatesLevel1CBT/transcripts/FE-Level1-Chapter6-Transcript.pdf): \"(#4) W 401\" unit weight printed with 66 bars at 4'-2\" (4.1667 ft) and weight 183.7 lb. total_len_ft = printed count 66 x printed length 4'-2\" (4.1667 ft); the slide prints weights to 0.1 lb, so abs 0.06 covers its rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "bar_size": "4",
+    "total_len_ft": 275,
+    "price_per_lb": 0
+   },
+   "outputs": {
+    "weight_lb": {
+     "value": 183.7,
+     "tolerance": {
+      "abs": 0.06
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rebar-weight-takeoff",
+   "source_publisher": "Florida Department of Transportation",
+   "source_title": "Final Estimates Level 1 CBT, Module 6 - Weight Measurements (transcript)",
+   "source_edition_or_year": "FDOT Final Estimates Level 1 course transcript (current web edition)",
+   "source_section_or_page": "Slide 24 table (https://wbt.dot.state.fl.us/ois/FinalEstimatesLevel1CBT/transcripts/FE-Level1-Chapter6-Transcript.pdf): \"(#4) W 402\" unit weight printed with 10 bars at 32'-6\" (32.50 ft) and weight 217.1 lb. total_len_ft = printed count 10 x printed length 32'-6\" (32.50 ft); the slide prints weights to 0.1 lb, so abs 0.06 covers its rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "bar_size": "4",
+    "total_len_ft": 325,
+    "price_per_lb": 0
+   },
+   "outputs": {
+    "weight_lb": {
+     "value": 217.1,
+     "tolerance": {
+      "abs": 0.06
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rebar-weight-takeoff",
+   "source_publisher": "Florida Department of Transportation",
+   "source_title": "Final Estimates Level 1 CBT, Module 6 - Weight Measurements (transcript)",
+   "source_edition_or_year": "FDOT Final Estimates Level 1 course transcript (current web edition)",
+   "source_section_or_page": "Slide 24 table (https://wbt.dot.state.fl.us/ois/FinalEstimatesLevel1CBT/transcripts/FE-Level1-Chapter6-Transcript.pdf): \"(#5) W 403\" unit weight printed with 6 bars at 6'-10\" (6.8333 ft) and weight 42.8 lb. total_len_ft = printed count 6 x printed length 6'-10\" (6.8333 ft); the slide prints weights to 0.1 lb, so abs 0.06 covers its rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "bar_size": "5",
+    "total_len_ft": 41,
+    "price_per_lb": 0
+   },
+   "outputs": {
+    "weight_lb": {
+     "value": 42.8,
+     "tolerance": {
+      "abs": 0.06
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rebar-weight-takeoff",
+   "source_publisher": "Florida Department of Transportation",
+   "source_title": "Final Estimates Level 1 CBT, Module 6 - Weight Measurements (transcript)",
+   "source_edition_or_year": "FDOT Final Estimates Level 1 course transcript (current web edition)",
+   "source_section_or_page": "Slide 24 table (https://wbt.dot.state.fl.us/ois/FinalEstimatesLevel1CBT/transcripts/FE-Level1-Chapter6-Transcript.pdf): \"(#6) W 404\" unit weight printed with 19 bars at 1'-6\" (1.50 ft) and weight 42.8 lb. total_len_ft = printed count 19 x printed length 1'-6\" (1.50 ft); the slide prints weights to 0.1 lb, so abs 0.06 covers its rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "bar_size": "6",
+    "total_len_ft": 28.5,
+    "price_per_lb": 0
+   },
+   "outputs": {
+    "weight_lb": {
+     "value": 42.8,
+     "tolerance": {
+      "abs": 0.06
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rebar-weight-takeoff",
+   "source_publisher": "Florida Department of Transportation",
+   "source_title": "Final Estimates Level 1 CBT, Module 6 - Weight Measurements (transcript)",
+   "source_edition_or_year": "FDOT Final Estimates Level 1 course transcript (current web edition)",
+   "source_section_or_page": "Slide 24 table (https://wbt.dot.state.fl.us/ois/FinalEstimatesLevel1CBT/transcripts/FE-Level1-Chapter6-Transcript.pdf): \"(#8) W 405\" unit weight printed with 5 bars at 13'-8\" (13.6667 ft) and weight 182.4 lb. total_len_ft = printed count 5 x printed length 13'-8\" (13.6667 ft); the slide prints weights to 0.1 lb, so abs 0.1 covers its rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "bar_size": "8",
+    "total_len_ft": 68.33333333333333,
+    "price_per_lb": 0
+   },
+   "outputs": {
+    "weight_lb": {
+     "value": 182.4,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rebar-weight-takeoff",
+   "source_publisher": "Florida Department of Transportation",
+   "source_title": "Final Estimates Level 1 CBT, Module 6 - Weight Measurements (transcript)",
+   "source_edition_or_year": "FDOT Final Estimates Level 1 course transcript (current web edition)",
+   "source_section_or_page": "Slide 24 table (https://wbt.dot.state.fl.us/ois/FinalEstimatesLevel1CBT/transcripts/FE-Level1-Chapter6-Transcript.pdf): \"(#9) W 406\" unit weight printed with 2 bars at 10'-8\" (10.6667 ft) and weight 72.5 lb. total_len_ft = printed count 2 x printed length 10'-8\" (10.6667 ft); the slide prints weights to 0.1 lb, so abs 0.06 covers its rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "bar_size": "9",
+    "total_len_ft": 21.333333333333332,
+    "price_per_lb": 0
+   },
+   "outputs": {
+    "weight_lb": {
+     "value": 72.5,
+     "tolerance": {
+      "abs": 0.06
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "blown-insulation-coverage",
+   "source_publisher": "CertainTeed Corporation",
+   "source_title": "InsulSafe SP Premium Blowing Insulation product data sheet (Attic Application Coverage Chart)",
+   "source_edition_or_year": "Code No. 30-24-311, 3/11",
+   "source_section_or_page": "Page 2, Attic Application Coverage Chart, R-60 row: \"No. of Bags\" per 1,000 sq ft net area 31.4, \"Content of bag should not cover more than\" 31.9 sq ft. The chart's bag count is printed to 0.1 bag, so 1000/31.4 can differ from the printed coverage by up to ~0.3%; pct 0.5 covers it. r_per_inch and target_r do not enter coverage_per_bag (tile defaults for blown fiberglass shown). URL: https://www.amddistribution.com/wp-content/uploads/2022/05/CT-Insulsafe-SP.pdf",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "area_sqft": 1000,
+    "bags_per_1000": 31.4,
+    "r_per_inch": 2.5,
+    "target_r": 60
+   },
+   "outputs": {
+    "coverage_per_bag": {
+     "value": 31.9,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "blown-insulation-coverage",
+   "source_publisher": "CertainTeed Corporation",
+   "source_title": "InsulSafe SP Premium Blowing Insulation product data sheet (Attic Application Coverage Chart)",
+   "source_edition_or_year": "Code No. 30-24-311, 3/11",
+   "source_section_or_page": "Page 2, Attic Application Coverage Chart, R-38 row: \"No. of Bags\" per 1,000 sq ft net area 19.1, \"Content of bag should not cover more than\" 52.5 sq ft. The chart's bag count is printed to 0.1 bag, so 1000/19.1 can differ from the printed coverage by up to ~0.3%; pct 0.5 covers it. r_per_inch and target_r do not enter coverage_per_bag (tile defaults for blown fiberglass shown). URL: https://www.amddistribution.com/wp-content/uploads/2022/05/CT-Insulsafe-SP.pdf",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "area_sqft": 1000,
+    "bags_per_1000": 19.1,
+    "r_per_inch": 2.5,
+    "target_r": 38
+   },
+   "outputs": {
+    "coverage_per_bag": {
+     "value": 52.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "blown-insulation-coverage",
+   "source_publisher": "CertainTeed Corporation",
+   "source_title": "InsulSafe SP Premium Blowing Insulation product data sheet (Attic Application Coverage Chart)",
+   "source_edition_or_year": "Code No. 30-24-311, 3/11",
+   "source_section_or_page": "Page 2, Attic Application Coverage Chart, R-30 row: \"No. of Bags\" per 1,000 sq ft net area 14.9, \"Content of bag should not cover more than\" 67.1 sq ft. The chart's bag count is printed to 0.1 bag, so 1000/14.9 can differ from the printed coverage by up to ~0.3%; pct 0.5 covers it. r_per_inch and target_r do not enter coverage_per_bag (tile defaults for blown fiberglass shown). URL: https://www.amddistribution.com/wp-content/uploads/2022/05/CT-Insulsafe-SP.pdf",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "area_sqft": 1000,
+    "bags_per_1000": 14.9,
+    "r_per_inch": 2.5,
+    "target_r": 30
+   },
+   "outputs": {
+    "coverage_per_bag": {
+     "value": 67.1,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "silt-fence-drainage",
+   "source_publisher": "Franklin Soil and Water Conservation District (Ohio)",
+   "source_title": "Chapter 6 Sediment Controls, 6.3 Silt Fence",
+   "source_edition_or_year": "Ohio Rainwater and Land Development manual chapter as posted by Franklin SWCD (web edition)",
+   "source_section_or_page": "Section 6.3, Description: \"the area draining to the silt fence should be no larger that one quarter acre per 100 feet of fence length, the slope length no longer than 100 feet\". Inputs 0.25 ac, 100 ft fence, 100 ft slope at the 100 ft limit; outputs are the printed 100 ft and 0.25 ac exactly. URL: https://www.franklinswcd.org/data/doc_lib/1272/Silt%20Fence.pdf",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "tributary_area_ac": 0.25,
+    "fence_length_ft": 100,
+    "slope_length_ft": 100,
+    "max_slope_length_ft": 100
+   },
+   "outputs": {
+    "required_fence_len_ft": {
+     "value": 100,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "max_area_ac": {
+     "value": 0.25,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "silt-fence-drainage",
+   "source_publisher": "Metro Water Services, Nashville and Davidson County",
+   "source_title": "Stormwater Management Manual Volume 4, TCP-13 Silt Fence",
+   "source_edition_or_year": "April 2020",
+   "source_section_or_page": "TCP-13-1, Applications: \"Across swales with catchments less than 1 acre (0.4 ha) (per 400-feet (125.7 m) of fence)\". Inputs 1 ac and 400 ft; outputs are the printed 400 ft and 1 ac exactly. Slope length is not printed on this line; 100/100 entered (affects only the slope_ok boolean). URL: https://filetransfer.nashville.gov/portals/0/sitecontent/WaterServices/Stormwater/docs/SWMM/2020/Volume04/Volume03Section03_TCP13.pdf",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "tributary_area_ac": 1,
+    "fence_length_ft": 400,
+    "slope_length_ft": 100,
+    "max_slope_length_ft": 100
+   },
+   "outputs": {
+    "required_fence_len_ft": {
+     "value": 400,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "max_area_ac": {
+     "value": 1,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "erosion-blanket-coverage",
+   "source_publisher": "North American Green (Western Green)",
+   "source_title": "Material Property Data Sheet EroNet S150 Erosion Control Blanket",
+   "source_edition_or_year": "WG_MPDS_S150 5.23 (May 2023)",
+   "source_section_or_page": "Standard Roll Sizes table: Width 8 ft, Length 112 ft, Area 100 sy (printed rounded; 8 x 112 / 9 = 99.56 sy, 0.44% / 0.09% off the printed area); pct 0.5 covers the printed rounding of the length. URL: https://nagreen.com/sites/default/files/2023-06/WG_MPDS_S150_5.23.pdf",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "area_sf": 900,
+    "overlap_pct": 10,
+    "roll_width_ft": 8,
+    "roll_length_ft": 112,
+    "staples_per_sy": 1.5
+   },
+   "outputs": {
+    "roll_sy": {
+     "value": 100,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "erosion-blanket-coverage",
+   "source_publisher": "North American Green (Western Green)",
+   "source_title": "Material Property Data Sheet EroNet S150 Erosion Control Blanket",
+   "source_edition_or_year": "WG_MPDS_S150 5.23 (May 2023)",
+   "source_section_or_page": "Standard Roll Sizes table: Width 16 ft, Length 563 ft, Area 1000 sy (printed rounded; 16 x 563 / 9 = 1000.89 sy, 0.44% / 0.09% off the printed area); pct 0.5 covers the printed rounding of the length. URL: https://nagreen.com/sites/default/files/2023-06/WG_MPDS_S150_5.23.pdf",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "area_sf": 9000,
+    "overlap_pct": 10,
+    "roll_width_ft": 16,
+    "roll_length_ft": 563,
+    "staples_per_sy": 1.5
+   },
+   "outputs": {
+    "roll_sy": {
+     "value": 1000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "retaining-wall-block",
+   "source_publisher": "VERSA-LOK Retaining Wall Systems",
+   "source_title": "VERSA-LOK Standard Design & Installation Guidelines",
+   "source_edition_or_year": "D_IGuideEnglish (current web PDF)",
+   "source_section_or_page": "Embedment, p.7: \"a wall with 10 feet of height exposed above grade would have a minimum of 1 foot buried below grade-making a total wall height of 11 feet\"; Standard unit p.3: \"Height: 6 inches\", \"Width (face): 16 inches\". 11 ft total / 6 in unit = 22 courses (exact). wall_length_ft is NOT printed and does not affect courses (16 ft entered). URL: https://www.versa-lok.com/assets/sites/versalok2016/uploads/assets/uploads/D_IGuideEnglish.pdf",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "wall_length_ft": 16,
+    "exposed_height_ft": 10,
+    "block_length_in": 16,
+    "block_height_in": 6
+   },
+   "outputs": {
+    "courses": {
+     "value": 22,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "workers-comp-emr-premium",
+   "source_publisher": "National Council on Compensation Insurance (NCCI)",
+   "source_title": "ABCs of Experience Rating",
+   "source_edition_or_year": "2025 (copyright 1981-2025)",
+   "source_section_or_page": "Page 10, Exhibit F (Application of Experience Rating), Roofer row: 'Roofer $200,000 2,000 $63.171 $126,342' with 'Mod Factor = 1.25'. Single-class row; the printed $126,342 is the manual premium (payroll/100 x rate) before the mod, so only manual_premium is asserted. Tolerance abs 0.5 covers rounding to whole dollars. https://www.ncci.com/articles/documents/uw_abc_exp_rating.pdf",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "payroll_usd": 200000,
+    "class_rate": 63.171,
+    "emr": 1.25
+   },
+   "outputs": {
+    "manual_premium": {
+     "value": 126342,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "workers-comp-emr-premium",
+   "source_publisher": "National Council on Compensation Insurance (NCCI)",
+   "source_title": "ABCs of Experience Rating",
+   "source_edition_or_year": "2025 (copyright 1981-2025)",
+   "source_section_or_page": "Page 10, Exhibit F, Clerical row: 'Clerical $ 70,000 700 $ 0.750 $ 525' (mod factor 1.25 printed for the risk). Only the printed class premium $525 (manual premium) is asserted; tolerance abs 0.5 covers whole-dollar rounding. https://www.ncci.com/articles/documents/uw_abc_exp_rating.pdf",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "payroll_usd": 70000,
+    "class_rate": 0.75,
+    "emr": 1.25
+   },
+   "outputs": {
+    "manual_premium": {
+     "value": 525,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "structured-cabling-channel",
+   "source_publisher": "Telecommunications Industry Association (TIA), ANSI/TIA-568-C.2 Annex G, as posted to the IEEE 802.3 4PPOE reflector by Wayne Larsen (CommScope), 2014-04-29",
+   "source_title": "ANSI/TIA-568-C.2 Table G.2 - Maximum horizontal cable length de-rating factor for different temperatures",
+   "source_edition_or_year": "ANSI/TIA-568-C.2 (2009); reflector post 2014",
+   "source_section_or_page": "Table G.2, row '20 (68) 90.0 90.0 0 0' (unscreened max 90.0 m at 20 C); NOTE 'This table assumes that the channel includes 10 meters of patch and equipment cords at 20 C.' Image at https://www.ieee802.org/3/4PPOE/email/pngGqfItBliPx.png (message msg00297.html). Permanent link 80 m is a required non-asserted input. Tolerance abs 0.05 covers the table's 0.1 m printing.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "permanent_link_m": 80,
+    "cords_m": 10,
+    "temp_c": 20,
+    "derate_per_c": 0.004
+   },
+   "outputs": {
+    "max_pl_m": {
+     "value": 90.0,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "structured-cabling-channel",
+   "source_publisher": "Telecommunications Industry Association (TIA), ANSI/TIA-568-C.2 Annex G, as posted to the IEEE 802.3 4PPOE reflector by Wayne Larsen (CommScope), 2014-04-29",
+   "source_title": "ANSI/TIA-568-C.2 Table G.2 - Maximum horizontal cable length de-rating factor for different temperatures",
+   "source_edition_or_year": "ANSI/TIA-568-C.2 (2009); reflector post 2014",
+   "source_section_or_page": "REPRODUCES ONLY AFTER THE REPORTED FIX (tile prints 82.8). Table G.2 row '40 (104) 84.0 87.0 6.0 3.0': unscreened max horizontal length 84.0 m at 40 C; corroborated by Fluke Networks KB 'Temperature and its affect on cabling' (2014-01-29): 'reduced from 90 meters to 84 meters'. Image https://www.ieee802.org/3/4PPOE/email/pngGqfItBliPx.png. Tolerance abs 0.05 covers the 0.1 m printing.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "permanent_link_m": 80,
+    "cords_m": 10,
+    "temp_c": 40,
+    "derate_per_c": 0.004
+   },
+   "outputs": {
+    "max_pl_m": {
+     "value": 84.0,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "structured-cabling-channel",
+   "source_publisher": "Telecommunications Industry Association (TIA), ANSI/TIA-568-C.2 Annex G, as posted to the IEEE 802.3 4PPOE reflector by Wayne Larsen (CommScope), 2014-04-29",
+   "source_title": "ANSI/TIA-568-C.2 Table G.2 - Maximum horizontal cable length de-rating factor for different temperatures",
+   "source_edition_or_year": "ANSI/TIA-568-C.2 (2009); reflector post 2014",
+   "source_section_or_page": "REPRODUCES ONLY AFTER THE REPORTED FIX (tile prints 75.6, longer than allowed). Table G.2 row '60 (140) 75.0 83.0 15.0 6.0': unscreened max 75.0 m at 60 C (Table G.1: UTP delta1 0.004, delta2 0.00248 above 40 C). Tolerance abs 0.05 covers the 0.1 m printing.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "permanent_link_m": 70,
+    "cords_m": 10,
+    "temp_c": 60,
+    "derate_per_c": 0.004
+   },
+   "outputs": {
+    "max_pl_m": {
+     "value": 75.0,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "ceiling-speaker-coverage",
+   "source_publisher": "Bose Professional (Transom Post OpCo LLC)",
+   "source_title": "In-ceiling Loudspeakers Design Guide",
+   "source_edition_or_year": "Rev. 01, 08/2023",
+   "source_section_or_page": "Design Worksheet p.6, step A: 'LSD = (H - L) x M'; 2-4 in small woofer (CA 120 deg) 'Edge-to-edge 3.46'. Inputs set H - L = 1 ft (ceiling 6, ear 5) so the spacing equals the printed multiplier M; room area 100 is a required non-asserted input. Tile 3.4641; tolerance abs 0.005 covers 2-decimal printing. https://assets.bose.com/content/dam/Bose_DAM/Web/pro/global/products/loudspeakers/fs_fs_4_ce/downloads/design_guide/dg_in-ceiling_loudspeakers.pdf",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "ceiling_ft": 6,
+    "ear_ft": 5,
+    "coverage_deg": 120,
+    "room_area_ft2": 100,
+    "layout": "edge_to_edge"
+   },
+   "outputs": {
+    "spacing_ft": {
+     "value": 3.46,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "ceiling-speaker-coverage",
+   "source_publisher": "Bose Professional (Transom Post OpCo LLC)",
+   "source_title": "In-ceiling Loudspeakers Design Guide",
+   "source_edition_or_year": "Rev. 01, 08/2023",
+   "source_section_or_page": "REPRODUCES ONLY AFTER THE REPORTED FIX (tile 0.7 x D = 2.4249). Design Worksheet p.6: small woofer (CA 120 deg) 'Minimum Overlap 2.45' = 3.46/sqrt2 = 2.449. Inputs set H - L = 1 ft so spacing = M. Tolerance abs 0.005 covers 2-decimal printing.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "ceiling_ft": 6,
+    "ear_ft": 5,
+    "coverage_deg": 120,
+    "room_area_ft2": 100,
+    "layout": "minimum_overlap"
+   },
+   "outputs": {
+    "spacing_ft": {
+     "value": 2.45,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "ceiling-speaker-coverage",
+   "source_publisher": "Bose Professional (Transom Post OpCo LLC)",
+   "source_title": "In-ceiling Loudspeakers Design Guide",
+   "source_edition_or_year": "Rev. 01, 08/2023",
+   "source_section_or_page": "Design Worksheet p.6: 5-8 in large woofer (CA 105 deg) 'Edge-to-edge 2.61'. H - L = 1 ft so spacing = M; tile 2.6065; tolerance abs 0.005 covers 2-decimal printing.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "ceiling_ft": 6,
+    "ear_ft": 5,
+    "coverage_deg": 105,
+    "room_area_ft2": 100,
+    "layout": "edge_to_edge"
+   },
+   "outputs": {
+    "spacing_ft": {
+     "value": 2.61,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "ceiling-speaker-coverage",
+   "source_publisher": "Bose Professional (Transom Post OpCo LLC)",
+   "source_title": "In-ceiling Loudspeakers Design Guide",
+   "source_edition_or_year": "Rev. 01, 08/2023",
+   "source_section_or_page": "REPRODUCES ONLY AFTER THE REPORTED FIX (tile 0.7 x D = 1.8245). Design Worksheet p.6: large woofer (CA 105 deg) 'Minimum Overlap 1.84' = 2.606/sqrt2 = 1.843. H - L = 1 ft so spacing = M. Tolerance abs 0.005 covers 2-decimal printing.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "ceiling_ft": 6,
+    "ear_ft": 5,
+    "coverage_deg": 105,
+    "room_area_ft2": 100,
+    "layout": "minimum_overlap"
+   },
+   "outputs": {
+    "spacing_ft": {
+     "value": 1.84,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "trim-linear-footage",
+   "source_publisher": "DeWalt Industrial Tool Co.",
+   "source_title": "DW705 12 in Compound Miter Saw Instruction Manual",
+   "source_edition_or_year": "DW705 manual (as hosted on manualslib.com, manual 39491)",
+   "source_section_or_page": "Page 16, Cutting Crown Molding: 'The settings below are for All Standard (U.S.) crown molding with 52 and 38 angles' -- 'BEVEL SETTING 33.85' and 'Miter table set right 31.62'. Spring 38 deg in the tile's convention. Tile 31.619 / 33.863; tolerance abs 0.02 covers the manual's 2-decimal detent values (33.85 vs exact 33.863). https://www.manualslib.com/manual/39491/Dewalt-Compound-Miter-Saw.html?page=16",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "perimeter_ft": 70,
+    "openings_ft": 6,
+    "waste_pct": 10,
+    "stock_len_ft": 16,
+    "spring_deg": 38
+   },
+   "outputs": {
+    "miter_deg": {
+     "value": 31.62,
+     "tolerance": {
+      "abs": 0.02
+     }
+    },
+    "bevel_deg": {
+     "value": 33.85,
+     "tolerance": {
+      "abs": 0.02
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "prevailing-wage-fringe",
+   "source_publisher": "U.S. Department of Labor, Wage and Hour Division",
+   "source_title": "Fact Sheet #66E: The Davis-Bacon and Related Acts -- Compliance with Fringe Benefit Requirements",
+   "source_edition_or_year": "Revised October 2023",
+   "source_section_or_page": "Worked example: 'Basic hourly rate $27.00', 'Fringe benefits $14.00', 'Total prevailing wage obligation $41.00'; may be met with '$41.00 in cash wages'. payroll_tax 0 (not printed; it does not enter package_hr). Tolerance abs 0.005 covers cents. https://www.dol.gov/agencies/whd/fact-sheets/66E-DBRA-compliance-fringe-benefit-requirements",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "base_wage_hr": 27,
+    "fringe_hr": 14,
+    "payroll_tax": 0
+   },
+   "outputs": {
+    "package_hr": {
+     "value": 41,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "cash_cost_hr": {
+     "value": 41,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rental-total-return",
+   "source_publisher": "Denver Investment Real Estate (Chris Lopez)",
+   "source_title": "The Four Returns in Real Estate Investing: Cash Flow is NOT everything",
+   "source_edition_or_year": "2019-11-27",
+   "source_section_or_page": "Example: Aurora Rental Property: 'Total Initial Investment' $52,540; 'The appreciation percent return calculation is $9,500/$52,540 = 18.1%'. Only appr_pct asserted (the printed 8.2% cash-flow return does not equal the printed $4,822/$52,540 = 9.18%, so cash flow is not used; other components 0). Tile 18.081; tolerance abs 0.05 covers 1-decimal printing. https://denverinvestmentrealestate.com/the-four-returns-real-estate-cash-flow-not-everything/",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "cash_invested_usd": 52540,
+    "annual_cash_flow_usd": 0,
+    "principal_paydown_usd": 0,
+    "appreciation_usd": 9500,
+    "tax_savings_usd": 0
+   },
+   "outputs": {
+    "appr_pct": {
+     "value": 18.1,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "led-video-wall",
+   "source_publisher": "Shenzhen Absen Optoelectronic Co., Ltd.",
+   "source_title": "PL V2 Series Specifications (PL2.5 Pro V2, Brompton) and PL V2 Series Cutsheet NA",
+   "source_edition_or_year": "Specifications V20241206 (file dated 2025-04-30); Cutsheet NA 2025-03-18",
+   "source_section_or_page": "PL2.5 Pro V2 spec table: 'Pixel Pitch (mm) 2.5', 'Panel Dimensions (WxHxD)/(mm) 500x500x78', 'Pixel Per Panel 200x200'; NA cutsheet 'Panel weight (kg) 7.8 (17.20lbs)'. One panel (1x1): tile cab_w_mm 200 x 2.5 = 500 exactly, weight 17.20 lb; abs 0.5 mm / 0.01 lb cover print rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "cab_w_px": 200,
+    "cab_h_px": 200,
+    "pixel_pitch_mm": 2.5,
+    "cols": 1,
+    "rows": 1,
+    "cab_weight_lb": 17.2,
+    "cab_max_watts": 0,
+    "avg_power_factor": 0.35
+   },
+   "outputs": {
+    "cab_w_mm": {
+     "value": 500,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "cab_h_mm": {
+     "value": 500,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "total_weight": {
+     "value": 17.2,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "led-video-wall",
+   "source_publisher": "Shenzhen Absen Optoelectronic Co., Ltd.",
+   "source_title": "PL V2 Series Specifications (PL3.9 Pro V2, NovaStar) and PL V2 Series Cutsheet NA",
+   "source_edition_or_year": "Specifications V20240517 (file dated 2025-04-30); Cutsheet NA 2025-03-18",
+   "source_section_or_page": "PL3.9 Pro V2 spec table: 'Pixel Pitch (mm) 3.9', 'Panel Dimensions (WxHxD)/(mm) 500x500x78', 'Pixel Per Panel 128x128'; cutsheet '8 (17.64lbs)'. Tile 128 x 3.9 = 499.2 mm vs printed 500: the sheet rounds the true pitch (500/128 = 3.906 mm) to 3.9, so abs 1.0 mm covers the printed pitch rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "cab_w_px": 128,
+    "cab_h_px": 128,
+    "pixel_pitch_mm": 3.9,
+    "cols": 1,
+    "rows": 1,
+    "cab_weight_lb": 17.64,
+    "cab_max_watts": 0,
+    "avg_power_factor": 0.35
+   },
+   "outputs": {
+    "cab_w_mm": {
+     "value": 500,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "total_weight": {
+     "value": 17.64,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "wire-rope-strength",
+   "source_publisher": "Anchor Marine & Industrial Supply (Houston)",
+   "source_title": "Wire Rope catalog section 6, 'Nominal Strengths of Wire Rope', 6x19 Classification Bright or Drawn-Galvanized, IWRC",
+   "source_edition_or_year": "2019 catalog (uploaded 2019-03)",
+   "source_section_or_page": "Catalog p. 149 table, IWRC, Improved Plow Steel column: '1/2  13.0  11.50' tons. Tile rule 46 x 0.5^2 = 11.50 tons; abs 0.01 covers the two-decimal print. (The same table prints Fiber Core IPS 1/2 = 10.70; the 46 default is the IWRC value.)",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "diameter_in": 0.5,
+    "construction_factor": 46,
+    "design_factor": 5
+   },
+   "outputs": {
+    "mbs_tons": {
+     "value": 11.5,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "wire-rope-strength",
+   "source_publisher": "Anchor Marine & Industrial Supply (Houston)",
+   "source_title": "Wire Rope catalog section 6, 'Nominal Strengths of Wire Rope', 6x19 Classification Bright or Drawn-Galvanized, IWRC",
+   "source_edition_or_year": "2019 catalog (uploaded 2019-03)",
+   "source_section_or_page": "Catalog p. 149 table, IWRC, Improved Plow Steel column: '3/4  19.0  25.60' tons. Tile rule-of-thumb 46 x 0.75^2 = 25.875 tons (+1.07%); pct 1.2 covers the rule-of-thumb vs catalog-table difference at this size (it grows to +7% at 2 in).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "diameter_in": 0.75,
+    "construction_factor": 46,
+    "design_factor": 5
+   },
+   "outputs": {
+    "mbs_tons": {
+     "value": 25.6,
+     "tolerance": {
+      "pct": 1.2
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "dehumidifier-derate",
+   "source_publisher": "Restoration & Remediation Magazine (BNP Media); Jim Holland",
+   "source_title": "The IICRC S500 Approach to Determining Initial Equipment Usage",
+   "source_edition_or_year": "August 23, 2007",
+   "source_section_or_page": "Worked example: '30' x 50' = 1500 sf x 8' = 12,000 cf / 50 (LGR/Class 2) = 240 pints at AHAM'; with LGRs rated at 65 pints = 4 dehumidifiers. Source sizes on the nameplate (no derate), so derate_factor 1; tile ceil(240/65 = 3.69) = 4 exactly; abs 0.1.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "aham_pints_per_day": 65,
+    "derate_factor": 1,
+    "required_pints_per_day": 240
+   },
+   "outputs": {
+    "units_by_nameplate": {
+     "value": 4,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "dehumidifier-derate",
+   "source_publisher": "Restoration & Remediation Magazine (BNP Media); Jim Holland",
+   "source_title": "The IICRC S500 Approach to Determining Initial Equipment Usage",
+   "source_edition_or_year": "August 23, 2007",
+   "source_section_or_page": "Same worked example: '240 pints at AHAM'; with LGRs rated at 140 pints = 2 dehumidifiers. Tile ceil(240/140 = 1.71) = 2 exactly; abs 0.1.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "aham_pints_per_day": 140,
+    "derate_factor": 1,
+    "required_pints_per_day": 240
+   },
+   "outputs": {
+    "units_by_nameplate": {
+     "value": 2,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "desiccant-airflow-sizing",
+   "source_publisher": "Munters Corporation (Lewis G. Harriman III, ed.)",
+   "source_title": "The Dehumidification Handbook, Second Edition (ISBN 0-9717887-0-7)",
+   "source_edition_or_year": "2002",
+   "source_section_or_page": "Ch. 8, System 4, p. 168: 'Estimated process airflow = 379,800 / [4.5 x (37 - 11.5)] = 3310 scfm'. Printed load 379,800 gr/hr converted to the tile's pints/day input: 379800/7000 x 24/1.043 = 1248.4865 (the 1.043 lb/pint cancels inside the tile, so process_cfm is independent of it). Tile 3309.8; abs 1 covers the integer print.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "required_pints_per_day": 1248.4865086974387,
+    "design_grain_depression": 25.5,
+    "nameplate_process_cfm": 4500
+   },
+   "outputs": {
+    "process_cfm": {
+     "value": 3310,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "desiccant-airflow-sizing",
+   "source_publisher": "Munters Corporation (Lewis G. Harriman III, ed.)",
+   "source_title": "The Dehumidification Handbook, Second Edition (ISBN 0-9717887-0-7)",
+   "source_edition_or_year": "2002",
+   "source_section_or_page": "Ch. 8, System 2, p. 166: 'Inlet conditions: 2250 scfm @ 69F, 32 gr/lb ... Outlet moisture content = 6.2 gr/lb ... Moisture removal = 4.5 x 2250 x (32 - 6.2) = 261,225 gr/hr'. Inverse: removal converted to pints/day 261225/7000 x 24/1.043 = 858.7043 (1.043 cancels); depression 32 - 6.2 = 25.8 -> tile process_cfm 2250.0 exactly; abs 1.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "required_pints_per_day": 858.7042870839612,
+    "design_grain_depression": 25.8,
+    "nameplate_process_cfm": 2250
+   },
+   "outputs": {
+    "process_cfm": {
+     "value": 2250,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "wire-pulling-lubricant",
+   "source_publisher": "American Polywater Corporation",
+   "source_title": "Installation Guide: Cable Lubricant Application Guide for Electrical Cable (LIT-LUBRICANTINSTALLTIONELEC/REV000)",
+   "source_edition_or_year": "2022",
+   "source_section_or_page": "Table A 'Recommended Quantity in Gallons/Liters' (from Q = k x L x D, k = 0.0015): row 500 ft, 3 in conduit ID = '2.25'. Tile 0.0015 x 500 x 3 = 2.25 exactly; abs 0.01.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "length_ft": 500,
+    "conduit_id_in": 3,
+    "k_factor": 0.0015,
+    "bend_factor": 1
+   },
+   "outputs": {
+    "gallons": {
+     "value": 2.25,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "wire-pulling-lubricant",
+   "source_publisher": "American Polywater Corporation",
+   "source_title": "Installation Guide: Cable Lubricant Application Guide for Electrical Cable (LIT-LUBRICANTINSTALLTIONELEC/REV000)",
+   "source_edition_or_year": "2022",
+   "source_section_or_page": "Table A: row 1000 ft, 4 in conduit ID = '6.0'. Tile 6.0 exactly; abs 0.05 covers the one-decimal print.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "length_ft": 1000,
+    "conduit_id_in": 4,
+    "k_factor": 0.0015,
+    "bend_factor": 1
+   },
+   "outputs": {
+    "gallons": {
+     "value": 6,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "wire-pulling-lubricant",
+   "source_publisher": "American Polywater Corporation",
+   "source_title": "Installation Guide: Cable Lubricant Application Guide for Electrical Cable (LIT-LUBRICANTINSTALLTIONELEC/REV000)",
+   "source_edition_or_year": "2022",
+   "source_section_or_page": "Table A: row 2500 ft, 5 in conduit ID = '18.8'. Tile 18.75; abs 0.06 covers the one-decimal print rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "length_ft": 2500,
+    "conduit_id_in": 5,
+    "k_factor": 0.0015,
+    "bend_factor": 1
+   },
+   "outputs": {
+    "gallons": {
+     "value": 18.8,
+     "tolerance": {
+      "abs": 0.06
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "wire-pulling-lubricant",
+   "source_publisher": "American Polywater Corporation",
+   "source_title": "Installation Guide: Cable Lubricant Application Guide for Electrical Cable (LIT-LUBRICANTINSTALLTIONELEC/REV000)",
+   "source_edition_or_year": "2022",
+   "source_section_or_page": "Table A: row 1500 ft, 3 in conduit ID = '6.8'. Tile 6.75; abs 0.06 covers the one-decimal print rounding.",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "length_ft": 1500,
+    "conduit_id_in": 3,
+    "k_factor": 0.0015,
+    "bend_factor": 1
+   },
+   "outputs": {
+    "gallons": {
+     "value": 6.8,
+     "tolerance": {
+      "abs": 0.06
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pool-heater-size",
+   "source_publisher": "The Pool Class (CPO certification training)",
+   "source_title": "CPO Math Tutorial: Heater Sizing (thepoolclass.com/support/math/tutorials/heater-sizing.htm)",
+   "source_edition_or_year": "web tutorial, accessed 2026-10-02",
+   "source_section_or_page": "Worked example: 1,100-gallon spa from 94F to 102F: '8.33 x 1,100 gallons x 8 F = 73,304 BTU's'. Tile Q_btu uses 8.34 lb/gal -> 73,392 (+0.12%); pct 0.2 covers the 8.33 vs 8.34 constant. Q_btu is independent of target_hours/eff (set 1, 1).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "gallons": 1100,
+    "dT_F": 8,
+    "target_hours": 1,
+    "eff": 1
+   },
+   "outputs": {
+    "Q_btu": {
+     "value": 73304,
+     "tolerance": {
+      "pct": 0.2
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "masonry-lintel-loading",
+   "source_publisher": "Concrete Masonry & Hardscapes Association (formerly NCMA)",
+   "source_title": "TEK 17-01D, Allowable Stress Design of Concrete Masonry Lintels",
+   "source_edition_or_year": "TEK 17-1D (2011)",
+   "source_section_or_page": "Design Example, Check for Arching Action: 'L = 5.33 + 0.33 = 5.67 ft'; 'h + 8 in. = L/2 + 8 in. = 3.5 ft'; '18.0 - 7.33 = 10.67 ft of masonry above the lintel, arching is assumed'; wall 63 lb/ft2. Tile arch_h_ft 5.67/2 + 8/12 = 3.5017; abs 0.01 covers the one-decimal print. W_lb/w_udl_plf NOT asserted (the TEK example loads the triangle to 3.5 ft, see r60a report).",
+   "verified_by": "rl",
+   "verified_on": "2026-10-02",
+   "inputs": {
+    "span_ft": 5.67,
+    "wall_psf": 63,
+    "wall_h_above": 10.67
+   },
+   "outputs": {
+    "arch_h_ft": {
+     "value": 3.5,
+     "tolerance": {
+      "abs": 0.01
      }
     }
    }

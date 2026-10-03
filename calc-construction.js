@@ -433,7 +433,7 @@ export function computeMaterialQuantity({ assembly, area_ft2 }) {
   const a = ASSEMBLY_DEFAULTS[assembly];
   if (!a) return { error: "Unknown assembly." };
   const units_raw = area_ft2 / a.coverage_ft2_per_unit;
-  const units_with_waste = Math.ceil(units_raw * (1 + a.waste));
+  const units_with_waste = (Math.ceil(units_raw * (1 + a.waste) - 1e-9) || 0);
   return {
     units_raw,
     units_with_waste,
@@ -906,7 +906,7 @@ export function computeTileCount({ area_ft2, tile_width_in, tile_height_in, grou
   const area_in2 = a * 144;
   const base_count_raw = area_in2 / tile_face_in2;
   const base_count = Math.ceil(base_count_raw - 1e-9);
-  const tile_count = base_count + Math.ceil(base_count * waste_factor);
+  const tile_count = base_count + Math.ceil(base_count * waste_factor - 1e-9);
   // Grout volume estimate: linear feet of joint = (W + H) per tile / 2 to
   // avoid double-counting; use perimeter / 2.
   const linear_in_per_tile = (tw + th);
@@ -1004,7 +1004,7 @@ export function computeMasonryCount({ wall_area_ft2, unit_type, mortar_joint_in 
   const face_ft2 = face_in2 / 144;
   const base_raw = a / face_ft2;
   const base = Math.ceil(base_raw - 1e-9);
-  const count = base + Math.ceil(base * waste_factor);
+  const count = base + Math.ceil(base * waste_factor - 1e-9);
   return { unit_count: count, base_count: base, face_ft2 };
 }
 
@@ -1491,7 +1491,7 @@ export function computeDrywall({ wall_area_ft2 = 0, ceiling_area_ft2 = 0, sheet_
   // spans more studs and joists, so it takes more screws, not the same 28.
   // Until 2026-09-25 this divided by the chosen sheet's area, so 4x12 board
   // counted a third fewer screws than 4x8 on the same wall.
-  const screws = Math.ceil((wall_area_ft2 / 32) * 28 + (ceiling_area_ft2 / 32) * 32);
+  const screws = Math.ceil((wall_area_ft2 / 32) * 28 + (ceiling_area_ft2 / 32) * 32 - 1e-9);
   return { sheets, mud_gal, tape_lf, screws, total_ft2 };
 }
 
@@ -1517,7 +1517,7 @@ export function computeRoofingSquares({ roof_area_ft2 = 0, pitch_rise = 0, shing
   else if (pitch_rise >= 9 && pitch_rise < 12) waste = 0.15;
   else if (pitch_rise >= 12) waste = 0.18;
   const squares = (roof_area_ft2 / 100) * (1 + waste);
-  const bundles = Math.ceil(squares * bundlesPerSquare);
+  const bundles = Math.ceil(squares * bundlesPerSquare - 1e-9);
   // Underlayment: 4 squares per roll (typical 15 lb felt or synthetic).
   const underlayment_rolls = Math.ceil(squares / 4 - 1e-9);
   return {
@@ -1632,8 +1632,8 @@ export function computeMortarMix({ unit_count = 0, unit_kind = "brick", joint_in
   // Joint thickness adjustment vs 3/8 baseline.
   const joint_factor = joint_in / 0.375;
   let bags;
-  if (unit_kind === "brick") bags = Math.ceil((unit_count / 30) * joint_factor);
-  else if (unit_kind === "cmu_8") bags = Math.ceil((unit_count / 10) * joint_factor);
+  if (unit_kind === "brick") bags = Math.ceil((unit_count / 30) * joint_factor - 1e-9);
+  else if (unit_kind === "cmu_8") bags = Math.ceil((unit_count / 10) * joint_factor - 1e-9);
   else return { error: "Unknown unit kind." };
   return { bags, mortar_type, joint_factor };
 }
@@ -2889,7 +2889,7 @@ export function computeResidentialFraming({
   const stud_oc_ft = stud_oc_in / 12;
   const stud_count = Math.ceil(perimeter_ft / stud_oc_ft - 1e-9) + 2 * 4; // approx 8 corner / T allowance for a simple rectangle
   // Plates: 1 sole + 2 top = 3 lengths × perimeter + ~ 10% waste.
-  const plate_lf = Math.ceil(perimeter_ft * 3 * 1.10);
+  const plate_lf = Math.ceil(perimeter_ft * 3 * 1.10 - 1e-9);
   // Joists: count = ceil(footprint span_ft / oc_ft) + 1.
   const joist_oc_ft = joist_oc_in / 12;
   // Approximate joist count: 2 × footprint area / (joist_span × joist_oc).
@@ -4178,7 +4178,7 @@ export function computeLayoutSquaring({ mode, side_a, side_b, diag1, diag2, tole
   // find-diagonal (default)
   const shortSide = Math.min(a, b);
   const longSide = Math.max(a, b);
-  const n = Math.max(1, Math.floor(Math.min(shortSide / 3, longSide / 4)));
+  const n = Math.max(1, Math.floor(Math.min(shortSide / 3, longSide / 4) + 1e-9));
   return {
     mode: "find-diagonal",
     ideal_diagonal: Number.isFinite(ideal) ? ideal : null,
@@ -4624,7 +4624,7 @@ export function computePostHoleConcrete({ num_posts = 0, hole_diameter_in = 0, h
     total_cuft,
     total_cuyd: total_cuft / 27,
     bags: Math.ceil(total_cuft / bag_yield_cuft - 1e-9),
-    note: "The concrete per hole is the cylinder volume less what the post displaces, so set the post side to net it out. A 60-lb bag yields about 0.45 cu ft and an 80-lb bag about 0.60 cu ft of mixed concrete - match the yield to the bag you buy. The rule of thumb sets the hole depth at about a third of the post's above-grade height and below the frost line, with the diameter about three times the post width. Round bags up and add a bag or two for spillage.",
+    note: "The concrete per hole is the cylinder volume less what the post displaces, so set the post side to net it out. A 60-lb bag yields about 0.45 cu ft and an 80-lb bag about 0.60 cu ft of mixed concrete - match the yield to the bag you buy. The rule of thumb (Quikrete) sets the hole depth at a third of the post's OVERALL length -- half its above-grade height, so 36 in for a 6 ft fence -- plus 6 in for a gravel base, and below the frost line, with the diameter about three times the post width. Round bags up and add a bag or two for spillage.",
   };
 }
 export const postHoleConcreteExample = { inputs: { num_posts: 16, hole_diameter_in: 10, hole_depth_in: 30, post_side_in: 3.5, bag_yield_cuft: 0.45 } };
@@ -5053,7 +5053,7 @@ export function computeMetalRoofPanels({ eave_width_ft = 0, panel_length_ft = 0,
   // panel_length is the on-slope length, so width x length is slope (plane) area.
   const plane_area_ft2 = eave_width_ft * panel_length_ft;
   const squares = plane_area_ft2 / 100;
-  const fasteners = Math.ceil(squares * fasteners_per_sq);
+  const fasteners = Math.ceil(squares * fasteners_per_sq - 1e-9);
   return { panels, total_panel_lf, plane_area_ft2, squares, fasteners };
 }
 
@@ -9627,7 +9627,7 @@ export function computeSelfLevelerBags({ area_sf = 500, avg_thickness_in = 0.25,
   if (!(bag_yield_sf_in > 0)) return { error: "Bag yield must be positive (sf-in)." };
   if (waste_pct < 0) return { error: "Waste cannot be negative (percent)." };
   const neat_bags = (area_sf * avg_thickness_in) / bag_yield_sf_in;
-  const bags = Math.ceil(neat_bags * (1 + waste_pct / 100));
+  const bags = Math.ceil(neat_bags * (1 + waste_pct / 100) - 1e-9);
   if (![neat_bags, bags].every(Number.isFinite)) return { error: "Bag-count math is not a finite value." };
   return {
     neat_bags,
@@ -9715,7 +9715,7 @@ export function computeSfrmTakeoff({ area_sf = 5000, thickness_in = 1.5, density
   if (waste_pct < 0) return { error: "Waste cannot be negative (percent)." };
   const volume_ft3 = (area_sf * thickness_in) / 12;
   const weight_lb = volume_ft3 * density_pcf;
-  const bags = Math.ceil((weight_lb / bag_lb) * (1 + waste_pct / 100));
+  const bags = Math.ceil((weight_lb / bag_lb) * (1 + waste_pct / 100) - 1e-9);
   if (![volume_ft3, weight_lb, bags].every(Number.isFinite)) return { error: "SFRM-takeoff math is not a finite value." };
   return {
     volume_ft3,
@@ -10508,7 +10508,7 @@ export function computeHousewrapRolls({ wall_area_sf = 4000, roll_coverage_sf = 
   if (!(roll_width_ft > 0)) return { error: "Roll width must be positive (ft)." };
   if (overlap_waste_pct < 0) return { error: "Overlap / waste cannot be negative (percent)." };
   const rolls = Math.ceil(wall_area_sf * (1 + overlap_waste_pct / 100) / roll_coverage_sf - 1e-9);
-  const cap_fasteners = Math.ceil(wall_area_sf * fasteners_per_sf);
+  const cap_fasteners = Math.ceil(wall_area_sf * fasteners_per_sf - 1e-9);
   const seam_tape_lf = wall_area_sf / roll_width_ft;
   if (![rolls, cap_fasteners, seam_tape_lf].every(Number.isFinite)) return { error: "Housewrap math is not a finite value." };
   return {
@@ -11109,7 +11109,7 @@ export function computeSnowGuardLayout({ roof_snow_psf = 0, pitch_rise_per_12 = 
   const required_plf = per_row_plf * sf;
   const guards_per_ft = required_plf / cap;
   const spacing_in = 12 / guards_per_ft;
-  const guards_per_row = Math.ceil(el * guards_per_ft);
+  const guards_per_row = Math.ceil(el * guards_per_ft - 1e-9);
   const guards_total = guards_per_row * n;
   if (![vector_psf, force_plf, guards_per_ft, spacing_in, guards_total].every(Number.isFinite)) return { error: "Snow-guard layout math did not produce a finite value." };
   return {
@@ -11618,10 +11618,10 @@ export function computeMembraneFastenerTakeoff({ roof_area_sf = 8000, roll_width
   const field_fasteners = Math.ceil(field_lf * 12 / sf - 1e-9);
   const perimeter_fasteners = Math.ceil(perimeter_lf * 12 / sp - 1e-9);
   const base_fasteners = field_fasteners + perimeter_fasteners;
-  const total_fasteners = Math.ceil(base_fasteners * (1 + waste / 100));
+  const total_fasteners = Math.ceil(base_fasteners * (1 + waste / 100) - 1e-9);
   const plates = total_fasteners;
   const covered = field_seam_covered === "yes";
-  const cover_tape_lf = covered ? Math.ceil(seam_lf * (1 + waste / 100)) : 0;
+  const cover_tape_lf = covered ? Math.ceil(seam_lf * (1 + waste / 100) - 1e-9) : 0;
   const fasteners_per_square = total_fasteners / (area / 100);
   const avg_spacing_in = seam_lf > 0 ? seam_lf * 12 / base_fasteners : null;
 

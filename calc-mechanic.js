@@ -2653,7 +2653,8 @@ export function computeAlternatorChargingLoad({ total_load_a = 0, alternator_a =
   const cruise_balance_a = cruise_out_a - load;
   return {
     idle_out_a, cruise_out_a, idle_balance_a, cruise_balance_a,
-    idle_ok: idle_balance_a >= 0, cruise_ok: cruise_balance_a >= 0,
+    // -1e-9 x load: 90 A x 0.7 against 63 A leaves -7e-15, which read as a deficit.
+    idle_ok: idle_balance_a >= -1e-9 * load, cruise_ok: cruise_balance_a >= -1e-9 * load,
     note: "Alternator charging load balance: an alternator makes only a fraction of its rated output at engine idle (roughly 50% for a stock unit; it depends on the model and pulley ratio -- Balmar rates its XT-170 / 250 at about 75% at idle) and most of it at cruise (roughly 90%). The balance = output - total continuous load: a negative idle balance means the battery drains at idle or a stoplight (accessories, lights, blower, and the charging deficit come from the battery), while a positive cruise balance means it recharges on the road. If the idle balance is negative and matters (lots of idling, a stereo, a winch), step up the alternator or reduce the load. A screening aid; the alternator's actual output curve and the real duty cycle govern.",
   };
 }

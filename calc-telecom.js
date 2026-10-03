@@ -314,13 +314,13 @@ export function computeFiberStrandCountPlanning({ living_units = 0, split_ratio 
   if (standards.length === 0) return { error: "Enter at least one positive standard cable count." };
   const roundUp = (required) => standards.find((count) => count >= required) ?? null;
   const feeder_fibers_required = Math.ceil(living_units / split_ratio - 1e-9);
-  const feeder_with_spare = Math.ceil(feeder_fibers_required * (1 + spare_pct / 100));
+  const feeder_with_spare = Math.ceil(feeder_fibers_required * (1 + spare_pct / 100) - 1e-9);
   const standard_without_spare = roundUp(feeder_fibers_required);
   const selected_standard_count = roundUp(feeder_with_spare);
   if (standard_without_spare === null || selected_standard_count === null) return { error: "The available standard cable counts do not reach the required fiber count." };
   const drop_terminals = Math.ceil(living_units / terminal_ports - 1e-9);
   const distribution_fibers_required = drop_terminals;
-  const distribution_with_spare = Math.ceil(distribution_fibers_required * (1 + spare_pct / 100));
+  const distribution_with_spare = Math.ceil(distribution_fibers_required * (1 + spare_pct / 100) - 1e-9);
   const lower_installed_cost = route_length_ft * (lower_material_cost_per_ft + placement_cost_per_ft);
   const selected_installed_cost = route_length_ft * (selected_material_cost_per_ft + placement_cost_per_ft);
   const installed_cost_delta = selected_installed_cost - lower_installed_cost;

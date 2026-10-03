@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "a9839cc3aa58928d",
+      "sha": "91e783a5ad5ef186",
       "date": "2026-10-03"
     },
     "/tools/": {
@@ -1046,8 +1046,8 @@
       "date": "2026-09-29"
     },
     "/tools/ceiling-speaker-coverage/": {
-      "sha": "ee906b03762943b2",
-      "date": "2026-09-29"
+      "sha": "6c41443b962d74c1",
+      "date": "2026-10-03"
     },
     "/tools/ceiling-speaker-coverage-angle/": {
       "sha": "ae8cf0b231018220",
@@ -4570,8 +4570,8 @@
       "date": "2026-09-29"
     },
     "/tools/masonry-lintel-loading/": {
-      "sha": "6cdac87a1e4d04dc",
-      "date": "2026-09-29"
+      "sha": "722a940990123eab",
+      "date": "2026-10-03"
     },
     "/tools/masonry-prism-fm/": {
       "sha": "39a7119da28d3866",
@@ -7698,8 +7698,8 @@
       "date": "2026-10-01"
     },
     "/tools/structured-cabling-channel/": {
-      "sha": "a3d3edaf4938f617",
-      "date": "2026-09-29"
+      "sha": "79067009f11b07a5",
+      "date": "2026-10-03"
     },
     "/tools/stub-acme-thread-depth/": {
       "sha": "f2f50505cd234935",
@@ -8906,12 +8906,12 @@
       "date": "2026-09-29"
     },
     "/tools/wire-rope-diameter-for-wll/": {
-      "sha": "0bc907bb63f71542",
-      "date": "2026-09-29"
+      "sha": "8788a68cbfa1e675",
+      "date": "2026-10-03"
     },
     "/tools/wire-rope-strength/": {
-      "sha": "ee46eefb8b04774f",
-      "date": "2026-09-29"
+      "sha": "dda2b33903cee977",
+      "date": "2026-10-03"
     },
     "/tools/wire-rope-stretch/": {
       "sha": "fd04aadc7e7c5853",

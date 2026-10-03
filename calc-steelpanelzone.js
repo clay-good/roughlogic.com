@@ -155,7 +155,7 @@ export function computeSteelDoublerPlate({ required_shear_kip = 0, fy_ksi = 50, 
   const t_stability_in = (dz + wz) / 90;
   const needs_doubler = shortfall_kip > 0;
   const t_required_in = needs_doubler ? Math.max(t_strength_in, t_stability_in) : 0;
-  const t_plate_in = needs_doubler ? Math.ceil(t_required_in * 16) / 16 : 0;
+  const t_plate_in = needs_doubler ? Math.ceil(t_required_in * 16 - 1e-9) / 16 : 0;
   const governed_by = !needs_doubler ? "none" : (t_stability_in > t_strength_in ? "stability (AISC 341, (dz + wz) / 90)" : "strength (J10-9 shortfall)");
   return {
     phi_rn_bare_kip, shortfall_kip, t_strength_in, t_stability_in, t_required_in, t_plate_in, needs_doubler, governed_by,

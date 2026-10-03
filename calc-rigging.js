@@ -1029,7 +1029,7 @@ export function computeWireRopeStrength({ diameter_in = 0, construction_factor =
   const wll_tons = mbs_tons / design_factor;
   return {
     mbs_tons, wll_tons,
-    note: "ESTIMATE only. Minimum breaking strength MBS = construction factor x diameter^2 (the default 46 is the rule-of-thumb tons/in^2 for IPS 6x19; bright IPS, EIPS, and other constructions/grades differ - edit it). Working load limit = MBS / design factor (5:1 is typical for general rigging). Use the manufacturer's certified breaking strength for any real lift; do not place unmarked or uncertified rope in service. The certified rating and the qualified rigger govern.",
+    note: "ESTIMATE only. Minimum breaking strength MBS = construction factor x diameter^2 (the default 46 is the rule-of-thumb tons/in^2 for IPS 6x19 IWRC (steel core) near 1/2 in -- fiber-core rope runs about 7% lower (1/2 in: 10.7 tons, not 11.5) and the d^2 rule reads up to ~10% high at large diameters, both on the unsafe side; bright IPS, EIPS, and other constructions/grades differ - edit it). Working load limit = MBS / design factor (5:1 is typical for general rigging). Use the manufacturer's certified breaking strength for any real lift; do not place unmarked or uncertified rope in service. The certified rating and the qualified rigger govern.",
   };
 }
 export const wireRopeStrengthExample = { inputs: { diameter_in: 0.5, construction_factor: 46, design_factor: 5 } };

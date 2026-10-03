@@ -891,7 +891,7 @@ export const BESPOKE_LABELS = {
   "stormwater-max-drainage-area": {"allowable_flow_cfs":"Allowable outlet/inlet flow (cfs)","surface":"Surface","rainfall_in_per_hr":"Rainfall intensity (in/hr)"},
   "stormwater-rational": {"area_ft2":"Catchment area (ft²)","surface":"Surface","rainfall_in_per_hr":"Rainfall intensity (in/hr)"},
   "straight-line-depreciation": {"cost":"Asset cost (USD)","salvage":"Salvage value (USD)","life_years":"Useful life (years)","year_of_interest":"Year of interest"},
-  "structured-cabling-channel": {"permanent_link_m":"Permanent-link length (m)","cords_m":"Total patch + equipment cords (m)","temp_c":"Installed cable temperature (°C)","derate_per_c":"De-rate per °C above 20 (0.004 UTP)"},
+  "structured-cabling-channel": {"permanent_link_m":"Permanent-link length (m)","cords_m":"Total patch + equipment cords (m)","temp_c":"Installed cable temperature (°C)","derate_per_c":"Cable: 0.004 = UTP, 0.002 = screened (TIA Table G.2); other = custom linear de-rate per °C"},
   "stub-acme-thread-depth": {"major_dia_in":"Major (nominal) diameter (in)","tpi":"Threads per inch (TPI)"},
   "substrate-for-velocity": {"km":"Km (substrate at half Vmax)","target_percent":"Target velocity (% of Vmax)"},
   "sum-of-years-digits-depreciation": {"cost":"Cost ($)","salvage":"Salvage ($)","life_yr":"Useful life (yr)","year":"Year of interest"},

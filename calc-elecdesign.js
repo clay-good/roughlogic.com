@@ -350,7 +350,8 @@ export function computeLightingUniformityRatio({ readings = [], target_avgmin = 
   const tm = Number(target_maxmin) || 0;
   let pass = null;
   if (ta > 0 || tm > 0) {
-    pass = (ta <= 0 || avg_min <= ta) && (tm <= 0 || max_min <= tm);
+    // 1e-9: 2.1 / 0.7 fc is 3.0000000000000004, which failed a 3:1 target it meets.
+    pass = (ta <= 0 || avg_min <= ta * (1 + 1e-9)) && (tm <= 0 || max_min <= tm * (1 + 1e-9));
   }
   return {
     avg, min, max, avg_min, max_min, U0, pass, n: vals.length,

@@ -41,7 +41,8 @@ export function computeLaborBurdenRate({ wage = 0, payroll_pct = 9.15, wc_pct = 
   if (!(w > 0)) return { error: "Base wage must be positive ($/hr)." };
   if (!(prod > 0 && prod <= 100)) return { error: "Productivity must be over 0 and up to 100 percent." };
   // A fraction typed into the percent field (0.85) used to divide by 0.0085: a $25 wage read $3,975/hr.
-  if (prod < 1) return { error: "Enter productivity as a percent (85 for 85%), not a fraction." };
+  // <= 1: a 1 typed for "100%" read as 1% and multiplied the cost 100x ($25 -> $2,728.75/hr).
+  if (prod <= 1) return { error: "Enter productivity as a percent (85 for 85%, 100 for 100%), not a fraction." };
   if (pr < 0 || wc < 0 || li < 0 || ben < 0) return { error: "Payroll tax, workers' comp, liability and benefits cannot be negative." };
   const burden_hr = w * (pr + wc + li) / 100 + ben;
   const burdened_hr = (w + burden_hr) / (prod / 100);

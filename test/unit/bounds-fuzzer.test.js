@@ -22038,7 +22038,7 @@ test("bounds: spec-v457 computeCeilingSpeakerCoverage pins diameter, count, layo
   assert.ok(Math.abs(r.diameter_ft - 12) < 1e-9 && Math.abs(r.spacing_ft - 12) < 1e-9 && r.count === 9);
   // Minimum-overlap spacing (0.7 x diameter = 8.4) needs 18 -- exact ceil(1200/70.56), spec prose 17 used rounded 70.6.
   const ov = _v457({ ceiling_ft: 10, ear_ft: 4, coverage_deg: 90, room_area_ft2: 1200, layout: "minimum_overlap" });
-  assert.ok(Math.abs(ov.spacing_ft - 8.4) < 1e-9 && ov.count === 18 && ov.count > r.count);
+  assert.ok(Math.abs(ov.spacing_ft - 12 * Math.SQRT1_2) < 1e-9 && ov.count === 17 && ov.count > r.count); // D / sqrt 2 (Bose); 0.7 D read 18
   // Error seams: ceiling at/below ear, non-positive area, out-of-range angle, non-finite.
   assert.ok("error" in _v457({ ceiling_ft: 4, ear_ft: 4, coverage_deg: 90, room_area_ft2: 1200 }));
   assert.ok("error" in _v457({ ceiling_ft: 10, ear_ft: 4, coverage_deg: 90, room_area_ft2: 0 }));
@@ -22074,7 +22074,11 @@ test("bounds: spec-v458 computeStructuredCablingChannel pins de-rated max, chann
   assert.ok(r.pl_ok === true && r.chan_ok === true && r.ok === true);
   // A hot plenum de-rates the max link below the 85 m link, so it fails.
   const hot = _v458({ permanent_link_m: 85, cords_m: 8, temp_c: 40, derate_per_c: 0.004 });
-  assert.ok(Math.abs(hot.max_pl_m - 82.8) < 1e-9 && hot.pl_ok === false && hot.ok === false);
+  assert.ok(Math.abs(hot.max_pl_m - 84.0) < 1e-9 && hot.pl_ok === false && hot.ok === false);
+  // TIA-568-C.2 Table G.2: 83.5 m at 40 C passes (84.0), 75.3 m at 60 C fails (75.0), screened 87.0 at 40 C.
+  assert.equal(_v458({ permanent_link_m: 83.5, cords_m: 5, temp_c: 40, derate_per_c: 0.004 }).pl_ok, true);
+  assert.equal(_v458({ permanent_link_m: 75.3, cords_m: 5, temp_c: 60, derate_per_c: 0.004 }).pl_ok, false);
+  assert.ok(Math.abs(_v458({ permanent_link_m: 80, cords_m: 5, temp_c: 40, derate_per_c: 0.002 }).max_pl_m - 87.0) < 1e-9);
   // Error seams: non-positive link, negative cords, negative derate, non-finite.
   assert.ok("error" in _v458({ permanent_link_m: 0, cords_m: 8 }));
   assert.ok("error" in _v458({ permanent_link_m: 85, cords_m: -1 }));

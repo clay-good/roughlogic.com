@@ -286,7 +286,7 @@ export function computeAirBrakePushrodStroke({ readjustment_limit_in = 2.0, meas
   const this_brake_defective = measured_stroke_in >= readjustment_limit_in;
   const defective_fraction_pct = defective_brakes / total_brakes * 100;
   const out_of_service = defective_fraction_pct >= 20;
-  const brakes_to_oos = Math.max(0, Math.ceil(0.2 * total_brakes) - defective_brakes);
+  const brakes_to_oos = Math.max(0, Math.ceil(0.2 * total_brakes - 1e-9) - defective_brakes);
   const verdict = out_of_service
     ? "OUT OF SERVICE: " + fmt(defective_fraction_pct, 1) + "% of the brakes are defective, at or past the 20% threshold"
     : "not out of service at " + fmt(defective_fraction_pct, 1) + "%, but " + String(brakes_to_oos) + " more defective brake(s) reaches the threshold";

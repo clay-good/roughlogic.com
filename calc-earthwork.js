@@ -810,7 +810,7 @@ export function computeErosionBlanketCoverage({ area_sf = 0, overlap_pct = 10, r
   const coverage_sy = area_sf / 9;
   const roll_sy = (roll_width_ft * roll_length_ft) / 9;
   const rolls = Math.ceil((coverage_sy * (1 + overlap_pct / 100)) / roll_sy - 1e-9);
-  const staples = Math.ceil(coverage_sy * staples_per_sy);
+  const staples = Math.ceil(coverage_sy * staples_per_sy - 1e-9);
   if (![coverage_sy, roll_sy, rolls, staples].every(Number.isFinite)) return { error: "Blanket-takeoff math is not a finite value." };
   return {
     coverage_sy,
