@@ -94,6 +94,7 @@ export function computeGalvanizeCoatingWeight({ coating_grade_um = 0, steel_tons
   if (!(coating_grade_um > 0)) return { error: "Coating grade (thickness) must be positive (microns)." };
   if (!(steel_tons > 0)) return { error: "Steel tonnage must be positive (tons)." };
   if (!(area_per_ton_ft2 > 0)) return { error: "Surface area per ton must be positive (sq ft per ton)." };
+  if (alt_area_per_ton_ft2 < 0) return { error: "The compared surface area per ton cannot be negative (sq ft per ton)." };
   const thickness_mils = coating_grade_um / _UM_PER_MIL;
   const coating_oz_ft2 = thickness_mils * _OZ_PER_MIL_FT2;
   const total_area_ft2 = steel_tons * area_per_ton_ft2;

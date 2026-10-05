@@ -1248,6 +1248,7 @@ export function computeExpansionTank({ system_volume_gal = 0, fill_temperature_F
   if (!(system_volume_gal > 0)) return { error: "System volume must be positive." };
   if (!(max_temperature_F > fill_temperature_F)) return { error: "Max temperature must exceed fill temperature." };
   if (Number(max_temperature_F) > 300) return { error: "Maximum temperature above 300 F is past the bundled water-density table; size the tank from the manufacturer's high-temperature data." };
+  if (fill_pressure_psi < 0) return { error: "Fill pressure cannot be negative (psi)." };
   if (!(relief_pressure_psi > fill_pressure_psi)) return { error: "Relief pressure must exceed fill pressure." };
   const rho_cold = rhoAt(fill_temperature_F);
   const rho_hot = rhoAt(max_temperature_F);
@@ -3673,6 +3674,7 @@ export function computeSupplyPressureBudget({ street_pressure, fixture_height = 
   if (!(street > 0)) return { error: "Street pressure must be positive (psi)." };
   if (height < 0) return { error: "Fixture height cannot be negative (ft)." };
   if (!Number.isFinite(fixtureMin)) return { error: "Fixture minimum must be a finite number." };
+  if (fixtureMin < 0) return { error: "Fixture minimum cannot be negative (psi)." };
   const elevationLoss = height * 0.433;
   const available = street - elevationLoss - meter - bfp - friction;
   const headroom = available - fixtureMin;

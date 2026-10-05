@@ -351,6 +351,7 @@ export function computeAirDensityCorrection({ elev_ft = 0, T_F = 70, acfm = 0, r
   const temp_factor = 530 / (460 + T);
   const DF = alt_factor * temp_factor;
   const acfm_v = Number(acfm) || 0;
+  if (acfm_v < 0) return { error: "Actual airflow cannot be negative (acfm)." };
   const SCFM = acfm_v > 0 ? acfm_v * DF : null;
   const const_corr = 1.08 * DF;
   const sp_v = Number(rated_sp) || 0;
@@ -516,6 +517,9 @@ export function computeFanAffinityLaws({ q1_cfm = 0, sp1_inwg = 0, bhp1_hp = 0, 
   const N1 = Number(n1) || 0, N2 = Number(n2) || 0;
   if (!(N1 > 0)) return { error: "Baseline speed N1 must be positive (rpm)." };
   if (!(N2 > 0)) return { error: "New speed N2 must be positive (rpm)." };
+  if (Number(q1_cfm) < 0) return { error: "Baseline airflow Q1 cannot be negative (cfm)." };
+  if (Number(sp1_inwg) < 0) return { error: "Baseline static pressure SP1 cannot be negative (in wg)." };
+  if (Number(bhp1_hp) < 0) return { error: "Baseline brake horsepower BHP1 cannot be negative (hp)." };
   const r = N2 / N1;
   const q2_cfm = (Number(q1_cfm) || 0) * r;
   const sp2_inwg = (Number(sp1_inwg) || 0) * r * r;

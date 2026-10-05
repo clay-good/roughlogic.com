@@ -240,6 +240,7 @@ export function computePonSplitLossBudget({ class_budget_db = 0, split_ratio = 0
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   if (!(class_budget_db > 0) || !(split_ratio > 0) || !(attenuation_db_km > 0)) return { error: "Class budget, split ratio, and fiber attenuation must be positive." };
   if (![splitter_excess_db, connector_count, connector_loss_db, splice_count, splice_loss_db, design_margin_db].every((v) => v >= 0)) return { error: "Component counts and losses cannot be negative." };
+  if (alternative_split_ratio < 0) return { error: "The alternative split ratio cannot be negative." };
   const solve = (ratio) => {
     const ideal_splitter_loss_db = 10 * Math.log10(ratio);
     const splitter_loss_db = ideal_splitter_loss_db + splitter_excess_db;

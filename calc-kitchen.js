@@ -994,6 +994,7 @@ export function computeMenuEngineering({ units_sold = 0, menu_price = 0, food_co
   if (!(total > 0)) return { error: "Total units sold must be positive." };
   if (!(items > 0)) return { error: "Item count must be positive." };
   if (units < 0) return { error: "Units sold must be non-negative." };
+  if (fcost < 0) return { error: "Food cost must be non-negative." };
   if (price < fcost) return { error: "Menu price cannot be below the food cost (negative margin)." };
   const contribution_margin = price - fcost;
   const popularity_share = units / total;

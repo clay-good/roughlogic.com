@@ -89,6 +89,8 @@ export function computeSteelPanelZoneShear({ fy_ksi = 50, col_depth_dc_in = 0, c
   if (!(Fy > 0)) return { error: "Yield strength must be positive (ksi)." };
   if (!(dc > 0)) return { error: "Column depth must be positive (in)." };
   if (!(tw > 0)) return { error: "Column web thickness must be positive (in)." };
+  if (bcf < 0) return { error: "Column flange width cannot be negative (in)." };
+  if (tf < 0) return { error: "Beam flange thickness cannot be negative (in)." };
   if (!(db > tf)) return { error: "Beam depth must exceed the flange thickness (in)." };
   if (Mf < 0) return { error: "Demand moment cannot be negative (kip-in)." };
   const rn_basic_kip = 0.60 * Fy * dc * tw;

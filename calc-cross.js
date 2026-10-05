@@ -1300,6 +1300,7 @@ export const heatStressExample = { inputs: { T_F: 95, RH_percent: 60, solar: fal
 export function computeWindChill({ T_F = 0, wind_mph = 0 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (T_F > 50) return { error: "Wind chill formula valid for T <= 50 F." };
+  if (wind_mph < 0) return { error: "Wind speed cannot be negative (mph)." };
   if (wind_mph < 3) return { wind_chill_F: T_F, frostbite_minutes: null, note: "Wind below 3 mph; ambient temperature applies." };
   // NWS 2001 formula:
   const WC = 35.74 + 0.6215 * T_F - 35.75 * Math.pow(wind_mph, 0.16) + 0.4275 * T_F * Math.pow(wind_mph, 0.16);

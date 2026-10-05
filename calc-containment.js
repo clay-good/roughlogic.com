@@ -313,6 +313,7 @@ export function computeAcidWasteNeutralization({
   if (!(peak_flow_gpm > 0)) return { error: "Peak drainage flow must be positive (gpm)." };
   if (!(retention_minutes > 0)) return { error: "Required retention time must be positive (minutes)." };
   if (slug_volume_gal < 0 || tank_volume_gal < 0 || measured_ph < 0) return { error: "Slug volume, tank volume and measured pH cannot be negative." };
+  if (discharge_ph_min < 0) return { error: "The minimum discharge pH cannot be negative." };
   if (!(discharge_ph_max > discharge_ph_min)) return { error: "The discharge pH window must have a maximum above its minimum." };
   if (measured_ph > 14) return { error: "pH cannot exceed 14." };
   const required_volume_gal = peak_flow_gpm * retention_minutes;

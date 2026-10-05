@@ -2314,6 +2314,7 @@ export function computeDepreciationRecapture({ asset_class = "1250", accumulated
   if (!(accum >= 0 && Number.isFinite(accum))) return { error: "Accumulated depreciation must be zero or positive ($)." };
   if (!(gain >= 0 && Number.isFinite(gain))) return { error: "Total gain must be zero or positive ($)." };
   if (!(ord >= 0 && ord <= 100 && Number.isFinite(ord))) return { error: "Ordinary rate must be in [0, 100]%." };
+  if (sl < 0) return { error: "Straight-line depreciation must be zero or positive ($)." };
   if (asset_class === "1245") {
     const recaptured = Math.min(gain, accum);
     const recapture_tax = recaptured * (ord / 100);

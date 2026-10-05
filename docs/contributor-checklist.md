@@ -74,6 +74,12 @@ phase docs ([edition-rollover.md](edition-rollover.md),
   function; the older
   [../test/unit/first-principles.test.js](../test/unit/first-principles.test.js)
   still runs but recent tiles pin in the bounds-fuzzer).
+- [ ] A length, count, price, or capacity input rejects a negative value
+  with `{ error }` (or its field declares `min: "0"`).
+  [../test/unit/sign-typo-guard.test.js](../test/unit/sign-typo-guard.test.js)
+  negates each positive worked-example input and fails on a silent
+  answer; a truly signed input (a temperature, an elevation) goes in
+  [../test/fixtures/signed-inputs.js](../test/fixtures/signed-inputs.js).
 - [ ] Citation source-stamp string added to
   [citation-discipline.md](citation-discipline.md) and
   [../citations.js](../citations.js); both agree.

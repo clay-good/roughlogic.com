@@ -358,6 +358,7 @@ export function computeBoltShearBearing({ d_in = 0.75, ab_in2 = 0.4418, fnv_ksi 
   if (!(t_in > 0)) return { error: "Ply thickness t must be positive (in)." };
   if (!(fu_ksi > 0)) return { error: "Tensile strength Fu must be positive (ksi)." };
   if (le_in < 0) return { error: "Edge distance cannot be negative (in)." };
+  if (s_in < 0) return { error: "Bolt spacing cannot be negative (in)." };
   const dh = dh_in > 0 ? dh_in : d_in + 0.0625;
   if (dh <= d_in) return { error: "Hole diameter dh must exceed the bolt diameter d." };
   const rn_shear = nplanes * fnv_ksi * ab_in2;
@@ -1195,6 +1196,7 @@ export function computeShearStudStrength({ asc_in2 = 0, fc_psi = 4000, ec_psi = 
   if (!(fu > 0)) return { error: "Stud tensile strength Fu must be positive (ksi)." };
   if (!(Rg > 0)) return { error: "Group factor Rg must be positive." };
   if (!(Rp > 0)) return { error: "Position factor Rp must be positive." };
+  if (vprime < 0) return { error: "Stud demand V' cannot be negative (kip)." };
   const qn_calc_kip = 0.5 * asc * Math.sqrt(fc * ec) / 1000;
   const qn_cap_kip = Rg * Rp * asc * fu;
   const qn_kip = Math.min(qn_calc_kip, qn_cap_kip);

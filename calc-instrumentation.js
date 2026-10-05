@@ -89,6 +89,7 @@ export function computeDpFlowSignalScaling({ signal_ma = 12, flow_low = 0, flow_
   const qHi = Number(flow_high) || 0;
   const cutoff = Number(low_flow_cutoff_pct) || 0;
   if (!Number.isFinite(I)) return { error: "Loop signal must be a number (mA)." };
+  if (!(qHi > 0)) return { error: "Flow at 20 mA must be positive." };
   if (qHi === qLo) return { error: "Flow at 20 mA and at 4 mA must differ (the span cannot be zero)." };
   if (!(cutoff >= 0 && cutoff < 100)) return { error: "Low-flow cutoff must be between 0 and 100% (exclusive of 100)." };
   const fraction = (I - 4) / 16; // linear DP fraction of span

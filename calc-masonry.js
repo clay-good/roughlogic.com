@@ -254,6 +254,8 @@ export function computeMasonryWallWeight({ hollow_psf = 0, grout_adder = 0, cell
   if (!(hollow > 0)) return { error: "Hollow wall weight must be positive (psf)." };
   if (!(cell > 0)) return { error: "Grouted-cell spacing must be positive (in)." };
   if (adder < 0) return { error: "Grout adder cannot be negative (psf)." };
+  if (gs < 0) return { error: "Grout spacing cannot be negative (in)." };
+  if (h < 0) return { error: "Wall height cannot be negative (ft)." };
   // Ungrouted when grout spacing is 0/blank; capped at full grout (spacing <= cell).
   let grout_term = 0;
   if (gs > 0) grout_term = adder * Math.min(cell / gs, 1);

@@ -127,6 +127,7 @@ export function computeGeneratorAltitudeTempDerate({ rated_kw = 0, site_elevatio
   if (!(rated_kw > 0)) return { error: "Rated kW must be positive." };
   if (!(altitude_step_ft > 0) || !(temp_step_f > 0)) return { error: "The altitude and temperature derate steps must be positive." };
   if (!(altitude_rate_pct > 0) || !(temp_rate_pct > 0)) return { error: "The altitude and temperature derate rates must be positive." };
+  if (altitude_threshold_ft < 0) return { error: "The altitude derate threshold cannot be negative (ft)." };
   const altitude_derate_pct = altitude_rate_pct * Math.max(0, site_elevation_ft - altitude_threshold_ft) / altitude_step_ft;
   const temperature_derate_pct = temp_rate_pct * Math.max(0, site_ambient_f - temp_threshold_f) / temp_step_f;
   // The tile uses the ADDED combination (conservative) and shows the multiplied one.

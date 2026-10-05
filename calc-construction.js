@@ -79,6 +79,7 @@ export function computeRoofPitch({ rise = null, run = 12, mode = "rise_run" }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (mode === "rise_run") {
     if (run === 0) return { error: "Run cannot be zero." };
+    if (run < 0) return { error: "Run cannot be negative." };
     const ratio = rise / run;
     return {
       pitch_in_per_ft: (ratio * 12),
@@ -1500,6 +1501,7 @@ export function computeDrywall({ wall_area_ft2 = 0, ceiling_area_ft2 = 0, sheet_
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   wall_area_ft2 = Number(wall_area_ft2); ceiling_area_ft2 = Number(ceiling_area_ft2);
   if (!(wall_area_ft2 >= 0 && ceiling_area_ft2 >= 0)) return { error: "Areas must be non-negative." };
+  if (waste_percent < 0) return { error: "Waste cannot be negative (%)." };
   const sheetA = SHEET_AREAS_FT2[sheet_size];
   if (!sheetA) return { error: "Unknown sheet size." };
   const total_ft2 = wall_area_ft2 + ceiling_area_ft2;
@@ -1533,6 +1535,7 @@ export function computeRoofingSquares({ roof_area_ft2 = 0, pitch_rise = 0, shing
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   perimeter_ft = Number(perimeter_ft);
   if (!(roof_area_ft2 > 0)) return { error: "Roof area must be positive." };
+  if (perimeter_ft < 0) return { error: "Perimeter cannot be negative." };
   if (!(pitch_rise >= 0 && pitch_rise <= 24)) return { error: "Pitch rise must be 0-24 inches per 12." };
   const bundlesPerSquare = SHINGLE_BUNDLES_PER_SQUARE[shingle_product];
   if (!Number.isFinite(bundlesPerSquare)) return { error: "Unknown shingle product." };
@@ -1687,6 +1690,7 @@ export function computeConcreteMixDesign({ strength_psi = 3000, exposure = "inte
   const tbl = ACI_211_W_C[exposure];
   if (!tbl) return { error: "Unknown exposure class." };
   if (!(strength_psi >= 1500)) return { error: "Strength must be at least 1500 psi." };
+  if (!(max_aggregate_in > 0)) return { error: "Max aggregate size must be positive." };
   // Find bracketing strengths.
   const strengths = Object.keys(tbl).map((k) => Number(k)).sort((a, b) => a - b);
   let wc;
@@ -1785,6 +1789,8 @@ export function computeBendAllowance({ thickness_in = 0, bend_angle_deg = 0, ins
   if (!(bend_angle_deg > 0 && bend_angle_deg < 180)) return { error: "Bend angle must be 0-180 deg." };
   if (!(inside_radius_in >= 0)) return { error: "Inside radius cannot be negative." };
   if (!(k_factor > 0 && k_factor <= 0.5)) return { error: "K-factor must be above 0 and at most 0.5 (the neutral axis lies inside the inner half of the sheet)." };
+  if (leg_a_in < 0) return { error: "Leg A cannot be negative." };
+  if (leg_b_in < 0) return { error: "Leg B cannot be negative." };
   const ba = (Math.PI / 180) * bend_angle_deg * (inside_radius_in + k_factor * thickness_in);
   // Outside setback (OSSB) for the flat-pattern formula.
   const setback = (inside_radius_in + thickness_in) * Math.tan((bend_angle_deg / 2) * Math.PI / 180);
@@ -1930,6 +1936,7 @@ export function computeFormworkPressure({
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(pour_rate_ft_per_hr > 0)) return { error: "Pour rate must be positive." };
   if (!(concrete_temp_F > 0)) return { error: "Concrete temperature must be positive." };
+  if (!(wall_height_ft > 0)) return { error: "Wall height must be positive." };
   // The option names the density, so take it from there when nothing is supplied: a
   // lightweight_115 pour capped at a 150 pcf head is a head the concrete cannot produce.
   if (unit_weight_pcf === undefined || unit_weight_pcf === null) unit_weight_pcf = { lightweight_115: 115, lightweight_135: 135 }[weight_factor] ?? 150;
@@ -3664,6 +3671,7 @@ export function computeWallBracingLength({ wall_line_length_ft = 0, bracing_perc
   if (!(L > 0 && Number.isFinite(L))) return { error: "Wall-line length must be positive (ft)." };
   if (!(pct > 0 && pct <= 100 && Number.isFinite(pct))) return { error: "Required bracing percent must be in (0, 100]." };
   let provided = Number(provided_length_ft);
+  if (provided < 0) return { error: "Provided braced length cannot be negative (ft)." };
   if (!Number.isFinite(provided) || provided < 0) provided = 0;
   const required_length_ft = (pct / 100) * L;
   const pass = provided > 0 ? provided >= required_length_ft - 1e-9 * Math.abs(required_length_ft) : null;
@@ -4607,6 +4615,7 @@ CONSTRUCTION_RENDERERS["abrasive-blast"] = _v69renderAbrasiveBlast;
 export function computeFenceEstimate({ length_ft = 0, post_spacing_ft = 8, rails_per_section = 2, picket_width_in = 0, picket_gap_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (picket_gap_in < 0) return { error: "Picket gap must be non-negative." };
+  if (picket_width_in < 0) return { error: "Picket width must be non-negative." };
   if (!(length_ft > 0)) return { error: "Fence run must be positive." };
   if (!(post_spacing_ft > 0)) return { error: "Post spacing must be positive." };
   if (!(rails_per_section > 0)) return { error: "Rails per section must be positive." };
@@ -5272,6 +5281,7 @@ export function computeSeismicBaseShear({ weight_kip = 0, sds = 0, sd1 = 0, r_fa
   if (!(sds > 0)) return { error: "SDS must be positive (g)." };
   if (!(r_factor > 0)) return { error: "Response-modification factor R must be positive." };
   if (!(period_s > 0)) return { error: "Fundamental period must be positive (s)." };
+  if (sd1 < 0) return { error: "SD1 cannot be negative (g)." };
   if (!(ie >= 1.0 && ie <= 1.5)) return { error: "Importance factor Ie must be 1.0 to 1.5." };
   const r_over_ie = r_factor / ie;
   const cs_basic = sds / r_over_ie;
@@ -6337,6 +6347,7 @@ export function computeConcreteStrengthGain({ fc28 = 0, age_days = 0, a = 4.0, b
   if (!(fc28 > 0)) return { error: "Specified 28-day strength must be positive (psi)." };
   if (!(age_days > 0)) return { error: "Age must be positive (days)." };
   if (!(a > 0) || !(b > 0)) return { error: "ACI 209 constants a and b must be positive." };
+  if (target_pct < 0) return { error: "Target percent cannot be negative." };
   const fraction = age_days / (a + b * age_days);
   const fc_t = fraction * fc28;
   let target_age = null;
@@ -7477,6 +7488,8 @@ export function computeShaftTorsion({ T_lbin = 0, d_in = 0, di_in = 0, L_in = 0,
   if (!(T > 0)) return { error: "Torque must be positive (lb-in)." };
   if (!(d > 0)) return { error: "Outer diameter must be positive (in)." };
   if (!(di >= 0 && di < d)) return { error: "Inner diameter must be zero or positive and less than the outer." };
+  if (L < 0) return { error: "Length cannot be negative (in)." };
+  if (G_psi !== null && G_psi !== "" && !(G > 0)) return { error: "Shear modulus must be positive (psi)." };
   const J = Math.PI * (Math.pow(d, 4) - Math.pow(di, 4)) / 32;
   if (!(J > 0)) return { error: "Polar moment is not valid." };
   const tau_psi = T * (d / 2) / J;
@@ -7566,6 +7579,8 @@ export function computeThermalStressRestrained({ E_psi = 0, alpha = 0, dT_F = 0,
   if (!(a > 0)) return { error: "Thermal expansion coefficient must be positive (/F)." };
   if (dT === 0) return { error: "Temperature change must be non-zero (F)." };
   if (!(r >= 0 && r <= 1)) return { error: "Restraint factor must be from 0 (unrestrained) to 1 (fully restrained)." };
+  if (A < 0) return { error: "Cross-section area cannot be negative (in^2)." };
+  if (L < 0) return { error: "Length cannot be negative (in)." };
   const sigma_psi = E * a * dT * r;
   const F_lb = A > 0 ? sigma_psi * A : null;
   const free_delta_in = L > 0 ? a * L * dT : null;
@@ -7647,6 +7662,7 @@ export function computeHoopStressThinWall({ P_psi = 0, D_in = 0, t_in = 0, S_all
   if (!(P > 0)) return { error: "Internal pressure must be positive (psi)." };
   if (!(D > 0)) return { error: "Diameter must be positive (in)." };
   if (!(t > 0)) return { error: "Wall thickness must be positive (in)." };
+  if (S < 0) return { error: "Allowable stress cannot be negative (psi)." };
   const sigma_h_psi = P * D / (2 * t);
   const sigma_l_psi = P * D / (4 * t);
   const Dt = D / t;
@@ -8177,6 +8193,8 @@ export function computeWeldedWireMesh({ slab_area_sf = 0, sheet_width_ft = 5, sh
   if (!(sheet_width_ft > 0)) return { error: "Sheet width must be positive (ft)." };
   if (!(sheet_length_ft > 0)) return { error: "Sheet length must be positive (ft)." };
   if (!(waste_pct >= 0)) return { error: "Waste must be non-negative (%)." };
+  if (side_lap_in < 0) return { error: "Side lap cannot be negative (in)." };
+  if (end_lap_in < 0) return { error: "End lap cannot be negative (in)." };
   const eff_w = sheet_width_ft - side_lap_in / 12;
   const eff_l = sheet_length_ft - end_lap_in / 12;
   if (!(eff_w > 0) || !(eff_l > 0)) return { error: "Lap must be smaller than the sheet dimension (a positive effective sheet)." };
@@ -8269,6 +8287,7 @@ export function computeInsulationBattCoverage({ area_ft2 = 0, coverage_per_batt 
   const waste = Number(waste_pct) || 0;
   if (!(area > 0)) return { error: "Cavity area must be positive (ft^2)." };
   if (waste < 0) return { error: "Waste allowance must be non-negative (%)." };
+  if (covBatt < 0 || covBag < 0) return { error: "Coverage per batt and per bag cannot be negative (ft^2)." };
   if (!(covBatt > 0) && !(covBag > 0)) return { error: "Enter the coverage per batt and/or per bag (ft^2)." };
   const net_ft2 = area * (1 + waste / 100);
   const batts = covBatt > 0 ? Math.ceil(net_ft2 / covBatt - 1e-9) : null;
@@ -9229,6 +9248,7 @@ export function computeMembraneRoofTakeoff({ roof_area_sf = 8000, roll_width_ft 
   if (!(roll_width_ft > 0)) return { error: "Roll width must be positive (ft)." };
   if (!(roll_length_ft > 0)) return { error: "Roll length must be positive (ft)." };
   if (waste_pct < 0) return { error: "Waste cannot be negative (percent)." };
+  if (sidelap_in < 0) return { error: "Side lap cannot be negative (in)." };
   const usable_w_ft = roll_width_ft - sidelap_in / 12;
   if (!(usable_w_ft > 0)) return { error: "Side lap exceeds the roll width (no usable width)." };
   const rolls = Math.ceil((roof_area_sf * (1 + waste_pct / 100)) / (usable_w_ft * roll_length_ft) - 1e-9);
@@ -11675,6 +11695,7 @@ export function computeMembraneFastenerTakeoff({ roof_area_sf = 8000, roll_width
   if (!(sp > 0)) return { error: "Perimeter fastener spacing must be positive (in)." };
   if (pf < 0 || pf > 100) return { error: "Perimeter and corner share must be between 0 and 100 percent." };
   if (waste < 0 || waste > 50) return { error: "Waste allowance must be between 0 and 50 percent." };
+  if (lap < 0) return { error: "Side lap cannot be negative (in)." };
 
   // Seam geometry delegated so the row layout matches the sheet takeoff exactly.
   const sheet = computeMembraneRoofTakeoff({ roof_area_sf: area, roll_width_ft: rw, roll_length_ft: 100, sidelap_in: lap, waste_pct: 0 });

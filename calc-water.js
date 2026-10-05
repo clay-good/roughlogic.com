@@ -173,6 +173,7 @@ export function computeDetentionTime({ tank_volume_gal = 0, flow_gpm = 0, target
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(tank_volume_gal >= 0)) return { error: "Tank volume must be non-negative." };
   if (!(flow_gpm > 0)) return { error: "Flow must be positive." };
+  if (target_minutes < 0) return { error: "Target detention time must be non-negative." };
   const minutes = tank_volume_gal / flow_gpm;
   const hours = minutes / 60;
   const days = hours / 24;
@@ -2290,6 +2291,7 @@ export function computeStepDrawdownEfficiency({
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // An efficiency is a percent; 0 < value < 1 is a fraction typed into a percent field (added 2026-09-26).
   if (["efficiency_threshold_pct", "previous_efficiency_pct"].some((k) => { const v = Number(arguments[0]?.[k]); return v > 0 && v < 1; })) return { error: "Enter efficiencies as a percent (85 for 85%), not a fraction." };
+  if ([q1_gpm, s1_ft, q2_gpm, s2_ft, q3_gpm, s3_ft].some((v) => v < 0)) return { error: "Step pumping rates and drawdowns cannot be negative." };
   const steps = [[q1_gpm, s1_ft], [q2_gpm, s2_ft], [q3_gpm, s3_ft]].filter(([q, s]) => q > 0 && s > 0);
   if (steps.length < 2) return { error: "At least two steps with a positive rate and drawdown are needed to separate aquifer loss from well loss." };
   if (!(operating_gpm > 0)) return { error: "The operating rate must be positive (gpm)." };

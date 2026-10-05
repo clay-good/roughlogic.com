@@ -1878,6 +1878,7 @@ export function computeDefConsumption({ diesel_gal = 0, trip_miles = 0, mpg = 0,
   // Percent, 1-10: a fraction (0.025) used to report a 338,000 mile range; 250% passed; a negative diesel fell back silently.
   if (dose < 0.5 || dose > 15) return { error: "Enter the DEF dose as a percent of diesel (2-5), not a fraction." };
   if (Number(diesel_gal) < 0) return { error: "Diesel gallons cannot be negative." };
+  if (mpgv < 0) return { error: "Fuel economy cannot be negative (mpg)." };
   if (!(tank > 0)) return { error: "DEF tank size must be positive (gal)." };
   let diesel_gal_used;
   if (dsl > 0) {

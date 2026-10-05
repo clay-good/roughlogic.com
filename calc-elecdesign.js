@@ -304,6 +304,7 @@ export function computeLightingLightLossFactor({ LLD = 0, LDD = 0, BF = 0, LBO =
   }
   if (!anyEntered) return { error: "Enter at least one light-loss factor (0 to 1)." };
   const init = Number(initial_lm) || 0;
+  if (init < 0) return { error: "Initial lumens cannot be negative." };
   const maintained_lm = init > 0 ? init * LLF : null;
   return {
     LLF, maintained_lm,

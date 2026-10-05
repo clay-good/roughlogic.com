@@ -84,6 +84,7 @@ export function computeSoilConsolidationSettlement({ cc = 0, h_ft = 0, e0 = 0, s
   if (!(cc > 0)) return { error: "The compression index Cc must be positive." };
   if (!(h_ft > 0)) return { error: "Layer thickness must be positive (ft)." };
   if (!(1 + e0 > 0)) return { error: "The void ratio e0 must give a positive (1 + e0)." };
+  if (!(e0 > 0)) return { error: "The initial void ratio e0 must be positive." };
   if (!(sig0_psf > 0)) return { error: "The initial effective stress must be positive (psf)." };
   if (dsig_psf < 0) return { error: "The stress increase cannot be negative (psf)." };
   const sc_ft = (cc * h_ft / (1 + e0)) * Math.log10((sig0_psf + dsig_psf) / sig0_psf);
@@ -126,6 +127,7 @@ export function computeOverconsolidatedSettlement({ cc = 0, cr = 0, h_ft = 0, e0
   if (cr > cc) return { error: "The recompression index Cr cannot exceed the compression index Cc." };
   if (!(h_ft > 0)) return { error: "Layer thickness must be positive (ft)." };
   if (!(1 + e0 > 0)) return { error: "The void ratio e0 must give a positive (1 + e0)." };
+  if (!(e0 > 0)) return { error: "The initial void ratio e0 must be positive." };
   if (!(sig0_psf > 0)) return { error: "The initial effective stress must be positive (psf)." };
   if (!(sigp_psf >= sig0_psf)) return { error: "The preconsolidation stress cannot be less than the current effective stress (that soil is under-consolidated, a different case)." };
   if (dsig_psf < 0) return { error: "The stress increase cannot be negative (psf)." };
@@ -177,6 +179,7 @@ export function computeSecondaryCompression({ c_alpha = 0, h_ft = 0, ep = 0, t1_
   if (!(c_alpha > 0)) return { error: "The secondary compression index C-alpha must be positive." };
   if (!(h_ft > 0)) return { error: "Layer thickness must be positive (ft)." };
   if (!(1 + ep > 0)) return { error: "The void ratio at end of primary must give a positive (1 + ep)." };
+  if (!(ep > 0)) return { error: "The void ratio at end of primary ep must be positive." };
   if (!(t1_yr > 0)) return { error: "The time to end of primary consolidation must be positive (yr)." };
   if (!(t2_yr > t1_yr)) return { error: "The time of interest must be later than the end of primary consolidation (t2 > t1)." };
   const c_alpha_eps = c_alpha / (1 + ep);                       // modified secondary compression index
@@ -214,6 +217,7 @@ export function computeSettlementLimitLoad({ sc_allow_in = 0, cc = 0, h_ft = 0, 
   if (!(cc > 0)) return { error: "The compression index Cc must be positive." };
   if (!(h_ft > 0)) return { error: "Layer thickness must be positive (ft)." };
   if (!(1 + e0 > 0)) return { error: "The void ratio e0 must give a positive (1 + e0)." };
+  if (!(e0 > 0)) return { error: "The initial void ratio e0 must be positive." };
   if (!(sig0_psf > 0)) return { error: "The initial effective stress must be positive (psf)." };
   const sc_ft = sc_allow_in / 12;
   const stress_ratio = Math.pow(10, sc_ft * (1 + e0) / (cc * h_ft));

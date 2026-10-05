@@ -67,6 +67,7 @@ export function computeDisplacementCR({
 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(bore_in > 0 && stroke_in > 0 && cylinders > 0)) return { error: "Bore / stroke / cylinder count must be positive." };
+  if (gasket_bore_in < 0 || gasket_thickness_in < 0) return { error: "Gasket bore and thickness cannot be negative (in)." };
   // Per-cylinder swept volume (in^3): pi/4 * bore^2 * stroke
   const cyl_vol_in3 = Math.PI * 0.25 * bore_in * bore_in * stroke_in;
   const total_in3 = cyl_vol_in3 * cylinders;
@@ -112,6 +113,7 @@ export function computeChamberCcForCr({
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(bore_in > 0 && stroke_in > 0)) return { error: "Bore and stroke must be positive (in)." };
   if (!(target_cr > 1)) return { error: "Target compression ratio must be greater than 1." };
+  if (gasket_bore_in < 0 || gasket_thickness_in < 0) return { error: "Gasket bore and thickness cannot be negative (in)." };
   // Per-cylinder swept volume in cc (1 in^3 = 16.387 cc), matching displacement-cr.
   const cyl_cc = Math.PI * 0.25 * bore_in * bore_in * stroke_in * 16.387;
   const gasket_cc = gasket_bore_in > 0 && gasket_thickness_in > 0
@@ -404,6 +406,7 @@ export function computeBrakePadLife({ vehicle_weight_lb = 0, speed_delta_mph = 0
   if (!(speed_delta_mph > 0)) return { error: "Speed delta must be positive." };
   if (!(stops_per_mile >= 0)) return { error: "Stops per mile must be non-negative." };
   if (!(pad_thickness_mm > 0)) return { error: "Pad thickness must be positive." };
+  if (rotor_mass_lb < 0) return { error: "Rotor mass cannot be negative." };
   // v23 EN.14: optional shop wear-rate override and a front/rear bias split.
   // wear_rate defaults to the material table; front_bias defaults to 50
   // (an even split, which reproduces the single-axle estimate exactly).
@@ -780,6 +783,7 @@ export function computeScrewConveyor({ screw_diameter_in = 0, shaft_diameter_in 
   if (!(pitch > 0 && Number.isFinite(pitch))) return { error: "Pitch must be positive (in)." };
   if (!(N > 0 && Number.isFinite(N))) return { error: "RPM must be positive." };
   if (!(load > 0 && load <= 1 && Number.isFinite(load))) return { error: "Loading fraction must be in (0, 1]." };
+  if (rho < 0) return { error: "Bulk density cannot be negative (lb/ft^3)." };
   // Convert inches to feet: area (ft^2) * pitch (ft) per rev * rev/hr * loading.
   const area_ft2 = (Math.PI / 4) * (((D / 12) ** 2) - ((d / 12) ** 2));
   const capacity_ft3_hr = area_ft2 * (pitch / 12) * (N * 60) * load;

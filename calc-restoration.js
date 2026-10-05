@@ -1315,6 +1315,7 @@ export function computeDryingChamberCO2({ containment_volume_ft3 = 0, co2_genera
   const Co = Number(outdoor_ppm) || 0;
   if (!(V > 0 && Number.isFinite(V))) return { error: "Containment volume must be positive (ft^3)." };
   if (!(gen > 0 && Number.isFinite(gen))) return { error: "CO2 generation must be positive (cfm of CO2)." };
+  if (Co < 0) return { error: "Outdoor CO2 cannot be negative (ppm)." };
   if (!(Number.isFinite(Ci) && Number.isFinite(Co) && Ci > Co)) return { error: "Target indoor CO2 must exceed outdoor CO2 (no driving gradient otherwise)." };
   const fresh_air_cfm = (gen * 1e6) / (Ci - Co);
   const ach = (fresh_air_cfm * 60) / V;

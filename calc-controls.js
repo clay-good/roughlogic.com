@@ -155,6 +155,8 @@ export function computeDeadbandCyclingRate({ capacitance_btu_f = 0, ua_btu_hr_f 
   if (!(capacity_btu_hr > 0)) return { error: "Equipment capacity must be positive (Btu/hr)." };
   if (!(deadband_f > 0)) return { error: "Deadband must be positive (degF)." };
   if (!(outdoor_f < setpoint_f)) return { error: "Outdoor temperature must be below the setpoint." };
+  if (alt_deadband_f < 0) return { error: "Comparison deadband cannot be negative (degF)." };
+  if (alt_capacity_btu_hr < 0) return { error: "Comparison equipment capacity cannot be negative (Btu/hr)." };
   const load_btu_hr = ua_btu_hr_f * (setpoint_f - outdoor_f);
   if (!(capacity_btu_hr > load_btu_hr)) return { error: "Equipment capacity must exceed the load, or it never cycles off." };
   const cycleAt = (Q, db) => {
@@ -227,6 +229,10 @@ export function computeTrendLogStorage({ point_count = 0, interval_min = 0, rete
   if (!(bytes_per_sample > 0)) return { error: "Bytes per sample must be positive." };
   // The buffer only matters when a controller is entered ("0 to skip" used to error on a blank buffer).
   if (controller_points > 0 && !(controller_buffer_samples > 0)) return { error: "Controller buffer depth must be positive (samples)." };
+  if (controller_points < 0) return { error: "Controller point count cannot be negative." };
+  if (controller_points > 0 && !(poll_interval_min > 0)) return { error: "Archive poll interval must be positive (min)." };
+  if (cov_changes_per_point_day < 0) return { error: "Change-of-value rate cannot be negative (changes per point per day)." };
+  if (alt_interval_min < 0) return { error: "Comparison interval cannot be negative (min)." };
   const samples_per_point_year = (60 / interval_min) * 24 * 365;
   const total_samples = point_count * samples_per_point_year * retention_years;
   const storage_gb = total_samples * bytes_per_sample / 1e9;
@@ -299,6 +305,7 @@ export function computeMstpSegmentLoading({ baud = 76800, device_count = 0, toke
   if (!(frame_octets > 0)) return { error: "Data frame length must be positive (octets)." };
   if (!(turnaround_bits >= 0)) return { error: "Turnaround delay cannot be negative (bit times)." };
   if (!(transmitting_share >= 0 && transmitting_share <= 1)) return { error: "Transmitting share must be in [0, 1]." };
+  if (alt_baud < 0) return { error: "Comparison baud rate cannot be negative." };
   const at = (b, n) => {
     const token_frame_ms = token_octets * 10 / b * 1000;
     const turnaround_ms = turnaround_bits / b * 1000;
@@ -365,6 +372,7 @@ export function computeDamperActuatorTorque({ damper_width_in = 0, damper_height
   if (!(damper_height_in > 0)) return { error: "Damper height must be positive (in)." };
   if (!(torque_factor_in_lb_ft2 > 0)) return { error: "Torque factor must be positive (in-lb per sq ft)." };
   if (!(safety_factor > 0)) return { error: "Safety factor must be positive." };
+  if (sealed_torque_factor_in_lb_ft2 < 0) return { error: "Sealed torque factor cannot be negative (in-lb per sq ft)." };
   const damper_area_ft2 = damper_width_in * damper_height_in / 144;
   const largest = _ACTUATOR_SIZES_IN_LB[_ACTUATOR_SIZES_IN_LB.length - 1];
   const select = (design) => {

@@ -303,6 +303,7 @@ export function computeRefrigeratedCaseLoad({
   if (!(case_length_ft > 0)) return { error: "Case length must be positive (ft)." };
   if (infiltration_btuh_per_ft < 0 || transmission_btuh_per_ft < 0 || product_btuh < 0) return { error: "Loads cannot be negative." };
   if (lights_w < 0 || fan_w < 0 || antisweat_w < 0 || defrost_w < 0) return { error: "Electric loads cannot be negative (W)." };
+  if (retrofit_lights_w < 0) return { error: "Retrofit lighting load cannot be negative (W)." };
   if (antisweat_run_fraction < 0 || antisweat_run_fraction > 1) return { error: "Anti-sweat run fraction must be between 0 and 1." };
   if (defrost_run_fraction < 0 || defrost_run_fraction > 1) return { error: "Defrost run fraction must be between 0 and 1." };
   if (retrofit_antisweat_run_fraction < 0 || retrofit_antisweat_run_fraction > 1) return { error: "Retrofit anti-sweat run fraction must be between 0 and 1." };

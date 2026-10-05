@@ -145,6 +145,7 @@ export function computeFlooringTakeoff({ room_length_ft = 0, room_width_ft = 0, 
   const order_area = field_area * (1 + waste / 100);
   const boxes = Math.ceil(order_area / box_coverage_sqft - 1e-9);
   if (expansion_gap_in < 0) return { error: "Expansion gap cannot be negative." };
+  if (plank_width_in < 0) return { error: "Plank width cannot be negative." };
   let full_rows = null, remainder = null, rip_needed = null, start_width = null, usable_width_in = null;
   if (plank_width_in > 0) {
     // spec-v1449 follow-up: a floating floor is not fastened down and needs a

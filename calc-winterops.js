@@ -92,6 +92,7 @@ export function computeSaltApplicationRate({ rate_lb_per_lane_mile = 0, route_la
   if (!(route_lane_miles > 0)) return { error: "Route length must be positive (lane-miles)." };
   if (!(hopper_capacity_tons > 0)) return { error: "Spreader hopper capacity must be positive (tons)." };
   if (lot_area_ft2 < 0) return { error: "Lot area cannot be negative (sq ft)." };
+  if (alt_rate_lb_per_lane_mile < 0) return { error: "Comparison application rate cannot be negative (lb per lane-mile)." };
   const material_lb_per_pass = rate_lb_per_lane_mile * route_lane_miles;
   const material_tons_per_pass = material_lb_per_pass / _LB_PER_TON;
   const hopper_lb = hopper_capacity_tons * _LB_PER_TON;
@@ -169,6 +170,7 @@ export function computeBrineBatchSalinity({ batch_gal = 0, target_pct = 23.3, br
   if (!(brine_density_lb_gal > 0)) return { error: "Brine density must be positive (lb per gal)." };
   if (!(saturation_pct > 0 && saturation_pct <= 100)) return { error: "Saturation concentration must be in (0, 100] percent." };
   if (!(target_pct > 0 && target_pct <= saturation_pct)) return { error: "Target concentration must be above 0 and no more than the saturation concentration." };
+  if (alt_pct < 0) return { error: "Comparison concentration cannot be negative (percent)." };
   const batch_weight_lb = batch_gal * brine_density_lb_gal;
   const salt_lb = batch_weight_lb * (target_pct / 100);
   const salt_tons = salt_lb / _LB_PER_TON;
@@ -233,6 +235,7 @@ export function computePlowRouteCycleTime({ route_lane_miles = 0, plow_speed_mph
   if (!(system_lane_miles > 0)) return { error: "System length must be positive (lane-miles)." };
   if (!(cycle_target_hr > 0)) return { error: "Cycle time target must be positive (hours)." };
   if (snowfall_in_hr < 0) return { error: "Snowfall rate cannot be negative (in per hour)." };
+  if (alt_cycle_target_hr < 0) return { error: "Comparison cycle time target cannot be negative (hours)." };
   const effective_speed_lane_miles_hr = plow_speed_mph / overhead_factor;
   const cycle_time_hr = route_lane_miles / effective_speed_lane_miles_hr;
   const cycle_time_min = cycle_time_hr * 60;
@@ -365,6 +368,7 @@ export function computeIceMeltWorkingTemperature({ area_ft2 = 0, ice_thickness_i
   if (!(ice_thickness_in > 0)) return { error: "Ice thickness must be positive (in)." };
   if (!(ice_density_lb_ft3 > 0)) return { error: "Ice density must be positive (lb per cu ft)." };
   if (!(capacity_lb_ice_per_lb > 0)) return { error: "Melting capacity must be positive (lb of ice per lb of product)." };
+  if (alt_capacity_lb_ice_per_lb < 0) return { error: "Comparison melting capacity cannot be negative (lb of ice per lb of product)." };
   const ice_volume_ft3 = area_ft2 * (ice_thickness_in / 12);
   const ice_mass_lb = ice_volume_ft3 * ice_density_lb_ft3;
   const product_lb = ice_mass_lb / capacity_lb_ice_per_lb;

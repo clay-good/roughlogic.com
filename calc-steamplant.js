@@ -516,6 +516,8 @@ export function computeSafetyValveCapacity({ rated_steaming_capacity_lb_hr = 0, 
   if (!(accumulation_limit_pct > 0)) return { error: "The accumulation limit must be positive (percent)." };
   if (!(valve1_capacity_lb_hr > 0)) return { error: "At least one valve must have a positive stamped capacity (lb/hr)." };
   if (!(valve1_set_psig > 0)) return { error: "The first valve's set pressure must be positive (psig)." };
+  if (valve2_capacity_lb_hr < 0) return { error: "The second valve's stamped capacity cannot be negative (lb/hr)." };
+  if (valve3_capacity_lb_hr < 0) return { error: "The third valve's stamped capacity cannot be negative (lb/hr)." };
   const valves = [
     { set_psig: valve1_set_psig, capacity_lb_hr: valve1_capacity_lb_hr },
     { set_psig: valve2_set_psig, capacity_lb_hr: valve2_capacity_lb_hr },

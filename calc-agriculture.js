@@ -43,6 +43,7 @@ export function computeGPA({ gpm = 0, spacing_in = 0, speed_mph = 0, target_gpa 
   if (!(gpm >= 0)) return { error: "GPM must be non-negative." };
   if (!(spacing_in > 0)) return { error: "Nozzle spacing must be positive." };
   if (!(speed_mph > 0)) return { error: "Speed must be positive." };
+  if (target_gpa < 0) return { error: "Target GPA cannot be negative." };
   const gpa = (5940 * gpm) / (speed_mph * spacing_in);
   let required_gpm = null;
   if (target_gpa > 0) required_gpm = (target_gpa * speed_mph * spacing_in) / 5940;
@@ -169,6 +170,7 @@ export function computeSeedRate({ row_width_in = 0, in_row_spacing_in = 0, targe
   if (!(row_width_in > 0)) return { error: "Row width must be positive." };
   if (!(seeds_per_lb > 0)) return { error: "Seeds per lb must be positive." };
   if (!(germination_pct > 0 && germination_pct <= 100)) return { error: "Germination must be 1-100%." };
+  if (seed_price_per_lb < 0) return { error: "Seed price cannot be negative ($/lb)." };
   // 1 acre = 43560 ft^2 = 6,272,640 in^2.
   const acre_in2 = 6272640;
   let seeds_per_acre;
@@ -1820,6 +1822,8 @@ function _v23SimpleRenderer(spec) {
 export function computePesticideReiPhi({ rei_hours = 0, phi_days = 0, hours_since_application = 0, days_since_application = 0 } = {}) {
   const rei = Number(rei_hours) || 0;
   const phi = Number(phi_days) || 0;
+  if (Number(hours_since_application) < 0) return { error: "Hours since application cannot be negative." };
+  if (Number(days_since_application) < 0) return { error: "Days since application cannot be negative." };
   let he = Number(hours_since_application); if (!Number.isFinite(he) || he < 0) he = 0;
   let de = Number(days_since_application); if (!Number.isFinite(de) || de < 0) de = 0;
   if (!(rei >= 0 && Number.isFinite(rei))) return { error: "REI hours must be zero or positive." };
