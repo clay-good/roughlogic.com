@@ -340,7 +340,9 @@ function validateSelects(schema, inputs) {
 // A field is numeric when its schema says so, or, for a tile with no schema
 // (or a schema field with no kind), when its worked example passes a number
 // there. Selects are never touched: a select value like AWG "12" is a string
-// on purpose.
+// on purpose. The same goes for a checkbox sent as "false", which is a truthy
+// string: 17 tiles read it as true, and 2 that test `=== true` read "true" as
+// false.
 function coerceNumericStrings(schema, inputs, exampleRows) {
   if (!inputs || typeof inputs !== "object") return inputs;
   const kinds = new Map(schema ? schema.inputs.map((f) => [f.key, f.kind]) : []);
@@ -349,6 +351,13 @@ function coerceNumericStrings(schema, inputs, exampleRows) {
   for (const [key, value] of Object.entries(inputs)) {
     if (typeof value !== "string" || value.trim() === "") continue;
     const kind = kinds.get(key);
+    const flag = /^(true|false)$/i.test(value.trim());
+    const boolean = kind ? kind === "checkbox" : typeof example[key] === "boolean";
+    if (boolean && flag) {
+      if (out === inputs) out = { ...inputs };
+      out[key] = value.trim().toLowerCase() === "true";
+      continue;
+    }
     const numeric = kind ? kind === "number" : typeof example[key] === "number";
     if (!numeric) continue;
     const n = Number(value);

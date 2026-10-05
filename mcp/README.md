@@ -131,7 +131,9 @@ accepted keys are not a fixed list.
 A number sent as a string (`"150"`) is converted to a number before the
 compute runs, for any numeric field, the same as the page does. A compute
 handed `"150"` would concatenate it or compare it as text. Select values
-stay strings, so AWG `"12"` is still the select option `"12"`.
+stay strings, so AWG `"12"` is still the select option `"12"`. A checkbox
+sent as `"true"` or `"false"` becomes the boolean; `"false"` would otherwise
+be a truthy string and read as checked.
 
 The key a calculator's own page shows is never one of those misses. Four
 calculators sit on a correlation published in metric while facing the US user

@@ -539,10 +539,12 @@ test("the reference path does not loosen either corroboration guard", async () =
 // JSON callers often send "12" for 12. The page always hands a compute
 // numbers, so the door must too: before coerceNumericStrings, 289 tiles
 // concatenated or text-compared a stringified worked example into a different
-// answer, and 222 more refused it. Every tile's first worked example, sent with
-// each number as a string, must answer exactly as it does with numbers.
+// answer, and 222 more refused it. A checkbox sent as "false" is a truthy
+// string; 17 tiles read it as true. Every tile's first worked example, sent
+// with each number and boolean as a string, must answer exactly as it does
+// with real numbers and booleans.
 
-test("run_calculator: numeric strings answer the same as numbers, catalog-wide", async () => {
+test("run_calculator: numeric and boolean strings answer the same as typed values, catalog-wide", async () => {
   const { run } = await import("../../mcp/catalog.mjs");
   const { readFile } = await import("node:fs/promises");
   const { COMPUTE_MAP } = await import("../fixtures/compute-map.js");
@@ -552,7 +554,7 @@ test("run_calculator: numeric strings answer the same as numbers, catalog-wide",
   const stable = (o) => JSON.stringify(o, (k, v) => (typeof v === "number" ? Math.round(v * 1e6) / 1e6 : v));
   const differ = [];
   for (const [id, inputs] of first) {
-    const asText = Object.fromEntries(Object.entries(inputs).map(([k, v]) => [k, typeof v === "number" ? String(v) : v]));
+    const asText = Object.fromEntries(Object.entries(inputs).map(([k, v]) => [k, typeof v === "number" || typeof v === "boolean" ? String(v) : v]));
     let a, b;
     try { a = (await run({ id, inputs })).result; b = (await run({ id, inputs: asText })).result; } catch { continue; }
     if (stable(a) !== stable(b)) differ.push(id);
