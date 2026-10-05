@@ -981,8 +981,8 @@ MASONRY_RENDERERS["mortar-batch-c270"] = _simpleRenderer({
     { key: "lime_volumes", label: "Hydrated lime (volumes)", kind: "number", default: 0.5 },
     { key: "sand_ratio", label: "Sand, times the cementitious total", kind: "number", default: 2.5 },
     { key: "cement_bags", label: "Batch size (bags of cement)", kind: "number", default: 1 },
-    { key: "unit_strength_psi", label: "Masonry unit compressive strength (psi, 0 to skip)", kind: "number", default: 3000 },
-    { key: "mortar_strength_psi", label: "Mortar compressive strength (psi, 0 to skip)", kind: "number", default: 1800 },
+    { key: "unit_strength_psi", label: "Masonry unit compressive strength (psi, 0 to skip)", kind: "number" },
+    { key: "mortar_strength_psi", label: "Mortar compressive strength (psi, 0 to skip)", kind: "number" },
   ],
   outputs: [
     { key: "c", id: "mbc-out-c", label: "Cementitious", value: (r) => fmt(r.cement_cuft, 2) + " cu ft of cement (" + fmt(r.cement_bags, 0) + " bag" + (r.cement_bags === 1 ? "" : "s") + ", " + fmt(r.cement_weight_lb, 0) + " lb) and " + fmt(r.lime_cuft, 2) + " cu ft of lime (" + fmt(r.lime_bags, 2) + " bag equivalent, " + fmt(r.lime_weight_lb, 0) + " lb)" },
@@ -1048,8 +1048,8 @@ MASONRY_RENDERERS["grout-lift-pour-height"] = _simpleRenderer({
   citation: "Citation: the TMS 602 grout placement limits by name -- the LIFT limit governs consolidation and the POUR limit governs the wall's resistance to fluid grout pressure, with a pour made up of one or more lifts and cleanouts required at the base of every grouted cell above a threshold pour height. The fluid pressure at the base is unit weight x pour height, about 140 pcf for grout. NO LIMIT TABLE IS SHIPPED: the maximum lift and pour heights depend on the grout space least dimension, the unit type, fine or coarse grout, and whether cleanouts are provided, and come from the adopted edition. TMS 602 as adopted, the project specification, and the inspector govern.",
   example: groutLiftPourHeightExample.inputs,
   fields: [
-    { key: "pour_height_ft", label: "Proposed pour height (ft)", kind: "number", default: 5 },
-    { key: "lift_height_ft", label: "Proposed lift height (ft)", kind: "number", default: 5 },
+    { key: "pour_height_ft", label: "Proposed pour height (ft)", kind: "number" },
+    { key: "lift_height_ft", label: "Proposed lift height (ft)", kind: "number" },
     { key: "max_pour_height_ft", label: "Code maximum pour height (ft)", kind: "number", default: 5.333 },
     { key: "max_lift_height_ft", label: "Code maximum lift height (ft)", kind: "number", default: 5.333 },
     { key: "grout_unit_weight_pcf", label: "Fluid grout unit weight (pcf)", kind: "number", default: 140 },
@@ -1102,11 +1102,11 @@ MASONRY_RENDERERS["masonry-cleaning-dilution"] = _simpleRenderer({
   citation: "Citation: the dilution and coverage identities by name -- diluted solution = area / coverage; one part concentrate to N parts water is one part in N+1, so concentrate = diluted / (N+1) -- with the prewet and rinse water counted at their own rates per 100 sq ft. NO CLEANER, DILUTION OR COVERAGE IS SHIPPED: all three come from the manufacturer for the specific unit, and a test panel is required rather than advisable. The prefilled dilution and coverage are the worked example's, not a recommendation. Acid attacks polished stone, limestone, marble, many coloured and glazed units, and metal the runoff reaches. The cleaner manufacturer's instructions, the project specification, a test panel, and the applicable environmental rules govern.",
   example: masonryCleaningDilutionExample.inputs,
   fields: [
-    { key: "area_ft2", label: "Area to clean (sq ft)", kind: "number", default: 2400 },
-    { key: "dilution_parts_water", label: "Parts water to 1 part concentrate", kind: "number", default: 5 },
-    { key: "coverage_ft2_per_gal", label: "Coverage (sq ft per gal of diluted solution)", kind: "number", default: 150 },
-    { key: "prewet_gal_per_100ft2", label: "Prewet water (gal per 100 sq ft)", kind: "number", default: 5 },
-    { key: "rinse_gal_per_100ft2", label: "Rinse water (gal per 100 sq ft)", kind: "number", default: 12 },
+    { key: "area_ft2", label: "Area to clean (sq ft)", kind: "number" },
+    { key: "dilution_parts_water", label: "Parts water to 1 part concentrate", kind: "number" },
+    { key: "coverage_ft2_per_gal", label: "Coverage (sq ft per gal of diluted solution)", kind: "number" },
+    { key: "prewet_gal_per_100ft2", label: "Prewet water (gal per 100 sq ft)", kind: "number" },
+    { key: "rinse_gal_per_100ft2", label: "Rinse water (gal per 100 sq ft)", kind: "number" },
     { key: "acid_safe_unit", label: "Unit tolerates acid (1 yes, 0 no)", kind: "number", default: 1, attrs: { step: "1", min: "0", max: "1" } },
   ],
   outputs: [

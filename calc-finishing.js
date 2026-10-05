@@ -118,10 +118,10 @@ FINISHING_RENDERERS["galvanize-coating-weight"] = _simpleRenderer({
   citation: "Citation: ASTM A123 Zinc (Hot-Dip Galvanized) Coatings on Iron and Steel Products (by name) - coating grades in microns by material category and steel thickness. The A123 / AGA conversion oz/sq ft = um x 0.02316 (1 mil over 1 sq ft = 0.5883 oz), 25.4 microns per mil, 16 oz per lb, 2,000 lb per ton. Surface area per ton is ENTERED from the fabricator's own takeoff; ASTM A123 and the galvanizer govern.",
   example: galvanizeCoatingWeightExample.inputs,
   fields: [
-    { key: "coating_grade_um", label: "Specified coating grade (microns)", kind: "number", default: 85 },
+    { key: "coating_grade_um", label: "Specified coating grade (microns)", kind: "number" },
     { key: "steel_tons", label: "Steel weight (tons)", kind: "number" },
     { key: "area_per_ton_ft2", label: "Surface area per ton (sq ft/ton)", kind: "number" },
-    { key: "alt_area_per_ton_ft2", label: "Compare against area per ton (sq ft/ton, 0 to skip)", kind: "number", default: 120 },
+    { key: "alt_area_per_ton_ft2", label: "Compare against area per ton (sq ft/ton, 0 to skip)", kind: "number" },
   ],
   outputs: [
     { key: "t", id: "gcw-out-t", label: "Coating thickness", value: (r) => fmt(r.thickness_mils, 2) + " mils" },
@@ -238,16 +238,16 @@ FINISHING_RENDERERS["galvanize-kettle-throughput"] = _simpleRenderer({
   citation: "Citation: the kettle cycle throughput relation (60 / cycle time x load per lift) and the sensible heat demand of the steel (lb/h x specific heat x temperature rise), with ASTM A123 named for the coating the immersion time is chosen to produce. Immersion time and burner output are ENTERED; the galvanizer's own cycle and coating records govern.",
   example: galvanizeKettleThroughputExample.inputs,
   fields: [
-    { key: "lower_min", label: "Lowering time (min)", kind: "number", default: 1 },
+    { key: "lower_min", label: "Lowering time (min)", kind: "number" },
     { key: "immerse_min", label: "Immersion time (min)", kind: "number" },
-    { key: "withdraw_min", label: "Withdrawal and drain time (min)", kind: "number", default: 2 },
-    { key: "travel_min", label: "Return travel time (min)", kind: "number", default: 2 },
+    { key: "withdraw_min", label: "Withdrawal and drain time (min)", kind: "number" },
+    { key: "travel_min", label: "Return travel time (min)", kind: "number" },
     { key: "load_lb_per_lift", label: "Load per lift (lb)", kind: "number" },
     { key: "area_per_ton_ft2", label: "Surface area per ton (sq ft/ton)", kind: "number" },
     { key: "steel_specific_heat_btu_lb_f", label: "Steel specific heat (Btu/lb-degF)", kind: "number", default: 0.12 },
     { key: "bath_temp_f", label: "Bath temperature (degF)", kind: "number", default: 830 },
     { key: "ambient_temp_f", label: "Ambient steel temperature (degF)", kind: "number", default: 70 },
-    { key: "burner_btu_hr", label: "Burner heat delivered to the steel (Btu/hr)", kind: "number", default: 1500000 },
+    { key: "burner_btu_hr", label: "Burner heat delivered to the steel (Btu/hr)", kind: "number" },
   ],
   outputs: [
     { key: "c", id: "gkt-out-c", label: "Cycle time", value: (r) => fmt(r.cycle_min, 1) + " min, " + fmt(r.lifts_per_hour, 2) + " lifts/hr" },

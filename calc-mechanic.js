@@ -3294,7 +3294,7 @@ MECHANIC_RENDERERS["dyno-correction-sae"] = _simpleRenderer({
   citation: "Citation: SAE J1349 dyno correction factor (STD per SAE J607): P_dry = baro - vapor(temp, RH); CF = 1.176 x (990 / P_dry_mbar) x sqrt((temp_C + 273)/298) - 0.176 (J1349 AUG2004); corrected = observed x CF. Corrects to a standard dry day; the pressure must be dry (vapor removed); valid ~15-35 C, 900-1050 mbar; STD (J607) runs ~4% higher. A comparison aid; the dyno and correction basis govern.",
   example: { observed_hp: 400, baro_inhg: 28.94, air_temp_f: 86, humidity_pct: 0 },
   fields: [
-    { key: "observed_hp", label: "Observed power (hp)", kind: "number", default: 400 },
+    { key: "observed_hp", label: "Observed power (hp)", kind: "number" },
     { key: "baro_inhg", label: "Barometric pressure (in Hg, absolute)", kind: "number", default: 28.94 },
     { key: "air_temp_f", label: "Inlet air temperature (°F)", kind: "number", default: 86 },
     { key: "humidity_pct", label: "Relative humidity (%)", kind: "number", default: 0 },

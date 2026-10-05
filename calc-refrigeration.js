@@ -663,8 +663,8 @@ REFRIGERATION_RENDERERS["secondary-glycol-loop"] = _simpleRenderer({
   fields: [
     { key: "load_btuh", label: "Load (BTU/h)", kind: "number" },
     { key: "delta_t_f", label: "Loop delta-T (°F)", kind: "number" },
-    { key: "glycol_cp", label: "Solution specific heat (BTU/lb-°F)", kind: "number", default: 0.85 },
-    { key: "glycol_sg", label: "Solution specific gravity", kind: "number", default: 1.04 },
+    { key: "glycol_cp", label: "Solution specific heat (BTU/lb-°F)", kind: "number", default: 1 },
+    { key: "glycol_sg", label: "Solution specific gravity", kind: "number", default: 1 },
     { key: "head_ft", label: "Loop head (ft, 0 to skip the pump)", kind: "number" },
     { key: "pump_efficiency", label: "Pump efficiency (0-1)", kind: "number", default: 0.7 },
     { key: "chiller_approach_f", label: "Chiller approach (°F)", kind: "number" },

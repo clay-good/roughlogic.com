@@ -236,7 +236,7 @@ OUTAGE_RENDERERS["refrigeration-outage-holdover"] = _simpleRenderer({
     { key: "box_degf", label: "Box air temperature (degF)", default: 38, attrs: _SIGNED },
     { key: "infiltration_pct", label: "Closed-door infiltration allowance (%)", default: 10 },
     { key: "product_lb", label: "Product mass in the box (lb)" },
-    { key: "product_cp_btu_per_lb_degf", label: "Product specific heat above freezing (Btu/lb-degF)", default: 0.9 },
+    { key: "product_cp_btu_per_lb_degf", label: "Product specific heat above freezing (Btu/lb-degF)" },
     { key: "product_start_degf", label: "Product starting temperature (degF)", default: 35, attrs: _SIGNED },
     { key: "allowable_degf", label: "Allowable product temperature (degF; Food Code 41)", default: 41, attrs: _SIGNED },
     { key: "outage_hours", label: "Expected outage duration (h)" },

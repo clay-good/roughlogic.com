@@ -162,7 +162,7 @@ USAR_RENDERERS["collapse-floor-load"] = _simpleRenderer({
     ], default: "concrete" },
     { key: "slab_thickness_in", label: "Concrete slab thickness (in)", default: 6 },
     { key: "floor_self_weight_psf", label: "Entered floor self-weight (psf, if chosen)", default: 0 },
-    { key: "rubble_depth_in", label: "Rubble depth on the floor (in)", default: 18 },
+    { key: "rubble_depth_in", label: "Rubble depth on the floor (in)" },
     { key: "contents_psf", label: "Contents allowance (psf; 10 for home or office furniture)", default: 0 },
     { key: "partitions_psf", label: "Partition allowance (psf; 10 to 15 per floor)", default: 0 },
     { key: "rescuer_psf", label: "Rescuer live load (psf; 10 to 15)", default: 15 },

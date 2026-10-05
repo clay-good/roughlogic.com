@@ -250,3 +250,70 @@ test("a spec-renderer field whose label states a default is prefilled with that 
   }
   assert.deepEqual(bad, []);
 });
+
+// A prefill is the compute's own default, measured, not read. A calculator
+// opens empty (README; 543e0972), and a box that opens filled must hold what
+// the compute assumes when the box is absent -- otherwise the page and the
+// agent door (which omits the key) answer the same question differently, and
+// a sample number passes for the reader's data. 2026-10-05: 827 fields across
+// the trade expansions had been prefilled with their tile's worked example
+// (levee 3 ft x 500 ft, 13 boxes of a blast design); 797 now open blank and 30
+// show the compute's own default instead.
+//
+// Checked by behavior: the first worked example with the field omitted must
+// answer exactly as with the field set to its prefill. The reviewed entries are
+// standing published values the page shows and the compute does not encode
+// (the door requires them), and two defaults that are named constants.
+const PREFILL_REVIEWED = new Map([
+  ["duct-sizing::roughness_ft", "named constant DUCT_ROUGHNESS_FT on both sides"],
+  ["timesheet::irs_rate_per_mile", "named constant IRS_STANDARD_MILEAGE_RATE on both sides"],
+  ["time-alignment::ambient_F", "68 F standard; the compute's null means ask"],
+  ["flocculation-g-value::water_temp_f", "59 F design water; null means use mu directly"],
+  ["dyno-correction-sae::baro_inhg", "SAE J1349 standard dry-air pressure"],
+  ["brake-pad-life::stops_per_mile", "typical urban stop rate shown as a starting point"],
+  ["pallet-loadout::cases_per_pallet", "standard GMA-pallet case count"],
+  ["tire-gearing::top_gear_ratio", "common overdrive ratio"],
+  ["crop-yield::rows_per_pass", "six-row head"],
+  ["wallpaper-rolls::roll_width_in", "standard American single roll, 27 in"],
+  ["wallpaper-rolls::roll_len_in", "standard American single roll, 27 ft"],
+  ["pool-heater-size::target_hours", "the published heat-up planning time"],
+  ["seismic-design-spectral-acceleration::fa", "Site Class B, Fa = 1.0"],
+  ["seismic-design-spectral-acceleration::fv", "Site Class B, Fv = 1.0"],
+  ["srw-geogrid-spacing::base_course_buried_in", "6 in buried base course"],
+  ["grout-lift-pour-height::max_pour_height_ft", "TMS 602 5 ft 4 in lift"],
+  ["grout-lift-pour-height::max_lift_height_ft", "TMS 602 5 ft 4 in lift"],
+  ["kitchen-makeup-air-deficit::door_closer_force_lbf", "8 lbf closer"],
+  ["lead-dust-clearance::clearance_limit_ug_ft2", "EPA floor clearance 5 ug/ft2 (2024 rule)"],
+]);
+
+test("a prefilled default answers the same as the compute's own default", async () => {
+  const { describe } = await import("../../mcp/catalog.mjs");
+  const { rows } = JSON.parse(readFileSync(resolve(ROOT, "test/fixtures/worked-examples.json"), "utf8"));
+  const first = new Map();
+  for (const r of rows) if (!first.has(r.tile_id)) first.set(r.tile_id, r.inputs);
+  const stable = (o) => JSON.stringify(o, (k, v) => (typeof v === "number" ? Math.round(v * 1e6) / 1e6 : v));
+  const bad = [];
+  const seen = new Set();
+  for (const [id, inputs] of first) {
+    const reg = COMPUTE_MAP[id];
+    if (!reg) continue;
+    const fn = (await importCalc(reg.module))[reg.fn];
+    const d = await describe({ id });
+    if (!d || !d.inputs) continue;
+    for (const f of d.inputs) {
+      if (f.default == null || f.default === "") continue;
+      const k = id + "::" + f.key;
+      const omitted = { ...inputs };
+      delete omitted[f.key];
+      const value = f.kind === "number" ? Number(f.default) : f.default;
+      let a, b;
+      try { a = fn(omitted); b = fn({ ...inputs, [f.key]: value }); } catch { continue; }
+      if (stable(a) === stable(b)) continue;
+      seen.add(k);
+      if (!PREFILL_REVIEWED.has(k)) bad.push(`${k} prefills ${JSON.stringify(f.default)}${a && a.error ? " but the compute has no default" : ", which is not the compute's default"}`);
+    }
+  }
+  assert.deepEqual(bad, []);
+  const stale = [...PREFILL_REVIEWED.keys()].filter((k) => !seen.has(k));
+  assert.deepEqual(stale, [], "reviewed but now in parity; remove from PREFILL_REVIEWED");
+});

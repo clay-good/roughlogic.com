@@ -158,7 +158,7 @@ RELIEFWATER_RENDERERS["emergency-water-bleach-dose"] = _simpleRenderer({
   citation: "Citation: EPA \"Emergency Disinfection of Drinking Water\" bleach table (8 drops of 6% or 6 drops of 8.25% bleach per gallon, doubled for cloudy, colored, or very cold water after settling and filtering; stand 30 minutes, check the odor, redose and stand 15 minutes) and CDC \"How to Make Water Safe in an Emergency\"; 1 drop = 1/96 tsp as the table's rows imply; dose mg/L = mL x strength% x 10 / litres. The local health department and the utility's public notice govern.",
   example: emergencyWaterBleachDoseExample.inputs,
   fields: [
-    { key: "water_volume", label: "Water volume", default: 55 },
+    { key: "water_volume", label: "Water volume" },
     { key: "volume_unit", label: "Volume unit", kind: "select", options: [{ value: "gal", label: "Gallons" }, { value: "qt", label: "Quarts" }, { value: "L", label: "Litres" }], default: "gal" },
     { key: "bleach_strength_pct", label: "Bleach strength (% sodium hypochlorite, 6 or 8.25 on most labels)", default: 8.25, attrs: { step: "any", min: "0", max: "15" } },
     { key: "water_condition", label: "Water condition", kind: "select", options: [{ value: "clear", label: "Clear" }, { value: "cloudy", label: "Cloudy, colored, or very cold (settle and filter first)" }], default: "clear" },
@@ -214,7 +214,7 @@ RELIEFWATER_RENDERERS["boil-water-altitude"] = _simpleRenderer({
   citation: "Citation: EPA \"Emergency Disinfection of Drinking Water\" (rolling boil 1 minute, 3 minutes above 5,000 ft) and CDC \"How to Make Water Safe in an Emergency\" (3 minutes above 6,500 ft); pressure from the U.S. Standard Atmosphere (1976), P = 101.325 x (1 - 6.87535e-6 h)^5.25588 kPa; boiling point from the NIST Chemistry WebBook Antoine constants for water. The local health department and the utility's boil-water notice govern.",
   example: boilWaterAltitudeExample.inputs,
   fields: [
-    { key: "elevation", label: "Site elevation", default: 6000, attrs: { step: "any", min: "-1500" } },
+    { key: "elevation", label: "Site elevation", attrs: { step: "any", min: "-1500" } },
     { key: "elevation_unit", label: "Elevation unit", kind: "select", options: [{ value: "ft", label: "Feet" }, { value: "m", label: "Metres" }], default: "ft" },
   ],
   outputs: [
