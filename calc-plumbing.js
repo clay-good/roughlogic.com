@@ -3745,6 +3745,8 @@ export function computeWaterHeaterStorageSizing({ tank_gal = 0, input_btuh = 0, 
   if (!(efficiency_pct > 0)) return { error: "Recovery efficiency must be positive (%)." };
   if (!(rise_F > 0)) return { error: "Temperature rise must be positive (set point above inlet, F)." };
   if (!(usable_fraction > 0)) return { error: "Usable-storage fraction must be positive." };
+  if (efficiency_pct > 100) return { error: "Recovery efficiency cannot exceed 100%." };
+  if (usable_fraction > 1) return { error: "Usable-storage fraction cannot exceed 1." };
   const recovery_gph = (input_btuh * (efficiency_pct / 100)) / (8.33 * rise_F);
   const fhr_gph = tank_gal * usable_fraction + recovery_gph;
   let verdict, short_by_gph = 0;
@@ -3971,6 +3973,7 @@ export function computeOrificeFlow({ d_in = 0, h_ft = 0, cd = 0.60 } = {}) {
   if (!(d_in > 0)) return { error: "Orifice diameter must be positive (in)." };
   if (!(h_ft > 0)) return { error: "Head must be positive (ft)." };
   if (!(cd > 0)) return { error: "The discharge coefficient must be positive (~0.6 sharp-edged)." };
+  if (cd > 1) return { error: "The discharge coefficient cannot exceed 1." };
   const a_ft2 = (Math.PI / 4) * Math.pow(d_in / 12, 2);
   const q_cfs = cd * a_ft2 * Math.sqrt(2 * 32.2 * h_ft);
   const q_gpm = q_cfs * (60 * 1728 / 231);
@@ -4009,6 +4012,7 @@ export function computeOrificeDiameterForFlow({ q_cfs = 0, h_ft = 0, cd = 0.60 }
   if (!(q_cfs > 0)) return { error: "Target discharge must be positive (cfs)." };
   if (!(h_ft > 0)) return { error: "Head must be positive (ft)." };
   if (!(cd > 0)) return { error: "The discharge coefficient must be positive (~0.6 sharp-edged)." };
+  if (cd > 1) return { error: "The discharge coefficient cannot exceed 1." };
   const a_ft2 = q_cfs / (cd * Math.sqrt(2 * 32.2 * h_ft));
   const d_in = 12 * Math.sqrt(4 * a_ft2 / Math.PI);
   return {
@@ -4046,6 +4050,7 @@ export function computeTankDrainTime({ tank_area_ft2 = 0, d_in = 0, cd = 0.60, h
   if (!(tank_area_ft2 > 0)) return { error: "Tank cross-section area must be positive (ft^2)." };
   if (!(d_in > 0)) return { error: "Orifice diameter must be positive (in)." };
   if (!(cd > 0)) return { error: "The discharge coefficient must be positive (~0.6 sharp-edged)." };
+  if (cd > 1) return { error: "The discharge coefficient cannot exceed 1." };
   if (h2_ft < 0) return { error: "Ending head cannot be negative (ft)." };
   if (!(h1_ft > h2_ft)) return { error: "Starting head must be greater than the ending head (ft)." };
   const a_o_ft2 = (Math.PI / 4) * Math.pow(d_in / 12, 2);
@@ -4502,6 +4507,7 @@ export function computeStormwaterDetentionVolume({ runoff_c = 0, intensity_in_hr
   const qa = Number(q_allow_cfs) || 0;
   const dur = Number(duration_min) || 0;
   if (!(c > 0)) return { error: "Runoff coefficient must be positive." };
+  if (c > 1) return { error: "Runoff coefficient C cannot exceed 1." };
   if (!(i > 0)) return { error: "Rainfall intensity must be positive (in/hr)." };
   if (!(area > 0)) return { error: "Drainage area must be positive (acres)." };
   if (qa < 0) return { error: "Allowable release must be non-negative (cfs)." };

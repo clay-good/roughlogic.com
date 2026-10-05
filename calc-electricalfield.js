@@ -35,6 +35,7 @@ export function computeCableReelCapacity({ flange_dia_in = 30, drum_dia_in = 12,
   if (!(traverse_width_in > 0)) return { error: "Traverse width must be positive (in)." };
   if (!(cable_od_in > 0)) return { error: "Cable OD must be positive (in)." };
   if (!(fill_factor > 0)) return { error: "Fill factor must be positive." };
+  if (fill_factor > 1) return { error: "Fill factor cannot exceed 1." };
   if (!(flange_dia_in > drum_dia_in)) return { error: "Flange diameter must exceed the drum diameter (no winding annulus)." };
   const length_ft = (fill_factor * Math.PI * (flange_dia_in * flange_dia_in - drum_dia_in * drum_dia_in) * traverse_width_in) / (48 * cable_od_in * cable_od_in);
   if (!Number.isFinite(length_ft)) return { error: "Reel-capacity math is not a finite value." };

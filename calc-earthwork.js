@@ -524,6 +524,7 @@ export function computeRusleSoilLoss({ r_factor, k_factor, ls_factor, c_factor, 
     if (!Number.isFinite(v) || v < 0) return { error: n + " must be a non-negative finite number." };
   }
   if (!Number.isFinite(ac) || ac <= 0) return { error: "Disturbed area must be a positive finite number (acres)." };
+  if (C > 1 || P > 1) return { error: "The C and P factors cannot exceed 1 (1 is bare fallow / no support practice)." };
   const aTonsAcYr = R * K * LS * C * P;
   const siteTonsYr = aTonsAcYr * ac;
   if (![aTonsAcYr, siteTonsYr].every(Number.isFinite)) return { error: "Soil-loss math is not a finite value." };

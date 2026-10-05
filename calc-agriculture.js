@@ -2216,6 +2216,7 @@ export function computeSprayerFieldCapacity({ boom_width_ft, speed_mph, field_ef
   if (!(boom > 0)) return { error: "Boom width must be positive (ft)." };
   if (!(speed > 0)) return { error: "Ground speed must be positive (mph)." };
   if (!(eff > 0)) return { error: "Field efficiency must be positive (%)." };
+  if (eff > 100) return { error: "Field efficiency cannot exceed 100%." };
   if (!(acres > 0)) return { error: "Field area must be positive (acres)." };
   if (!(tank > 0)) return { error: "Tank capacity must be positive (gal)." };
   if (!(gpaVal > 0)) return { error: "GPA must be positive." };
@@ -2343,6 +2344,7 @@ export function computeHayDryMatter({ bale_weight_lb = 0, moisture_pct = 0, targ
   if (moisture_pct < 0 || moisture_pct >= 100) return { error: "Moisture must be between 0 and 100 percent." };
   if (target_moisture_pct < 0 || target_moisture_pct >= 100) return { error: "Target moisture must be between 0 and 100 percent." };
   if (!(safe_threshold_pct > 0)) return { error: "Safe-storage threshold must be positive (percent)." };
+  if (safe_threshold_pct > 100) return { error: "Safe-storage threshold cannot exceed 100 percent." };
   const dry_matter_lb = bale_weight_lb * (1 - moisture_pct / 100);
   const weight_at_target_lb = dry_matter_lb / (1 - target_moisture_pct / 100);
   const over_threshold = moisture_pct > safe_threshold_pct + 1e-9 * Math.abs(safe_threshold_pct);

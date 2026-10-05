@@ -80,6 +80,8 @@ phase docs ([edition-rollover.md](edition-rollover.md),
   negates each positive worked-example input and fails on a silent
   answer; a truly signed input (a temperature, an elevation) goes in
   [../test/fixtures/signed-inputs.js](../test/fixtures/signed-inputs.js).
+  The same file checks the ceiling: an efficiency, lambda, Cd, or 0-1
+  fraction past 1 (or 100%) must error or declare a `max`.
 - [ ] Citation source-stamp string added to
   [citation-discipline.md](citation-discipline.md) and
   [../citations.js](../citations.js); both agree.

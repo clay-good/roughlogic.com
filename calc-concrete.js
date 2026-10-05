@@ -153,6 +153,7 @@ export function computeRcBeamShear({ fc = 4000, fyt = 60000, bw = 0, d = 0, av_i
   if (!(d > 0)) return { error: "Effective depth d must be positive (in)." };
   if (!(av_in2 > 0)) return { error: "Stirrup area Av must be positive (in^2)." };
   if (!(lambda > 0)) return { error: "Lightweight factor lambda must be positive." };
+  if (lambda > 1) return { error: "Lightweight factor lambda cannot exceed 1.0 (ACI 318-19 19.2.4)." };
   const vc_kip = 2 * lambda * Math.sqrt(fc) * bw * d / 1000;
   const phi_vc = 0.75 * vc_kip;
   const vs_req_kip = vu > 0 ? Math.max(0, vu / 0.75 - vc_kip) : 0;
@@ -204,6 +205,7 @@ export function computeRcDevelopmentLength({ fc = 4000, fy = 60000, db = 0, psi_
   if (!(conf > 0)) return { error: "Confinement term (cb + Ktr)/db must be positive." };
   if (!(psi_t > 0) || !(psi_e > 0) || !(psi_s > 0) || !(psi_g > 0)) return { error: "The psi factors must be positive." };
   if (!(lambda > 0)) return { error: "Lightweight factor lambda must be positive." };
+  if (lambda > 1) return { error: "Lightweight factor lambda cannot exceed 1.0 (ACI 318-19 19.2.4)." };
   const te = Math.min(psi_t * psi_e, 1.7);
   const conf_eff = Math.min(conf, 2.5);
   // 25.4.1.4 caps sqrt(f'c) at 100 psi in development-length calculations
@@ -864,6 +866,7 @@ export function computeConcreteModulusOfRupture({ fc_psi = 4000, lambda = 1.0 } 
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(fc_psi > 0)) return { error: "Concrete strength f'c must be positive (psi)." };
   if (!(lambda > 0)) return { error: "Lightweight factor lambda must be positive." };
+  if (lambda > 1) return { error: "Lightweight factor lambda cannot exceed 1.0 (ACI 318-19 19.2.4)." };
   const fr_psi = 7.5 * lambda * Math.sqrt(fc_psi);
   const fr_fraction = fr_psi / fc_psi;
   const out_of_band = lambda < 0.75 || lambda > 1.0;
@@ -900,6 +903,7 @@ export function computeConcreteStrengthFromRupture({ fr_psi = 0, lambda = 1.0 } 
   const lam = Number(lambda) > 0 ? Number(lambda) : 1.0;
   if (!(fr > 0)) return { error: "Modulus of rupture fr must be positive (psi)." };
   if (!(lam > 0)) return { error: "Lightweight factor lambda must be positive." };
+  if (lam > 1) return { error: "Lightweight factor lambda cannot exceed 1.0 (ACI 318-19 19.2.4)." };
   const root = fr / (7.5 * lam);
   const fc_psi = root * root;
   const out_of_band = lam < 0.75 || lam > 1.0;
@@ -931,6 +935,7 @@ export function computeConcreteCrackingMoment({ b_in = 0, h_in = 0, fc_psi = 400
   if (!(h_in > 0)) return { error: "Section depth h must be positive (in)." };
   if (!(fc_psi > 0)) return { error: "Concrete strength f'c must be positive (psi)." };
   if (!(lambda > 0)) return { error: "Lightweight factor lambda must be positive." };
+  if (lambda > 1) return { error: "Lightweight factor lambda cannot exceed 1.0 (ACI 318-19 19.2.4)." };
   const fr_psi = 7.5 * lambda * Math.sqrt(fc_psi);
   const sm_in3 = b_in * h_in * h_in / 6;
   const mcr_lbin = fr_psi * sm_in3;
@@ -975,6 +980,7 @@ export function computeConcreteDepthForCrackingMoment({ target_mcr_kipft = 0, b_
   if (!(b > 0)) return { error: "Section width b must be positive (in)." };
   if (!(fc > 0)) return { error: "Concrete strength f'c must be positive (psi)." };
   if (!(lam > 0)) return { error: "Lightweight factor lambda must be positive." };
+  if (lam > 1) return { error: "Lightweight factor lambda cannot exceed 1.0 (ACI 318-19 19.2.4)." };
   const fr_psi = 7.5 * lam * Math.sqrt(fc);
   const mcr_lbin = mcr * 12000;
   const h_in = Math.sqrt(6 * mcr_lbin / (fr_psi * b));
@@ -1181,6 +1187,7 @@ export function computeConcreteTorsionThreshold({ fc_psi = 4000, b_in = 0, h_in 
   if (!(b > 0)) return { error: "Section width must be positive (in)." };
   if (!(h > 0)) return { error: "Section height must be positive (in)." };
   if (!(lam > 0)) return { error: "Lightweight factor lambda must be positive." };
+  if (lam > 1) return { error: "Lightweight factor lambda cannot exceed 1.0 (ACI 318-19 19.2.4)." };
   const acp_in2 = b * h;
   const pcp_in = 2 * (b + h);
   // 22.7 caps sqrt(f'c) at 100 psi for Tth and Tcr; uncapped, a higher
@@ -1322,6 +1329,7 @@ export function computeConcreteEffectiveInertia({ b_in = 0, h_in = 0, d_in = 0, 
   if (!(fc > 0)) return { error: "Concrete strength f'c must be positive (psi)." };
   if (!(Ma_kipft > 0)) return { error: "Service moment Ma must be positive (kip-ft)." };
   if (!(lam > 0)) return { error: "Lightweight factor lambda must be positive." };
+  if (lam > 1) return { error: "Lightweight factor lambda cannot exceed 1.0 (ACI 318-19 19.2.4)." };
   const Es = 29000000; // psi
   const Ec = 57000 * Math.sqrt(fc); // ACI 19.2.2.1(b) normalweight
   const n = Es / Ec;
@@ -1603,6 +1611,7 @@ export function computeConcreteAnchorBreakout({ embedment_in = 0, fc_psi = 0, ed
   if (!(fc > 0)) return { error: "Concrete strength f'c must be positive (psi)." };
   if (ca1 < 0) return { error: "Edge distance cannot be negative (in)." };
   if (!(lam > 0)) return { error: "Lightweight factor lambda must be positive (1.0 normalweight)." };
+  if (lam > 1) return { error: "Lightweight factor lambda cannot exceed 1.0 (ACI 318-19 19.2.4)." };
   // ACI 318-19 Table 17.5.3, tension concrete breakout, Condition B: phi 0.70 cast-in; post-installed
   // by its ACI 355.2 / 355.4 category, 0.65 / 0.55 / 0.45 for Category 1 / 2 / 3.
   const _anchor = { "cast-in": [24, 0.70], "post-installed": [17, 0.65], "post-installed-cat2": [17, 0.55], "post-installed-cat3": [17, 0.45] }[anchor_type];

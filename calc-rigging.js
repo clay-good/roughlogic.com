@@ -475,6 +475,7 @@ export function computeTandemLiftShare({ total_weight_lb, span_in, cg_from_c1_in
   // A CG outside the two picks puts one crane in negative load: the load tips, and no share is valid.
   if (cg < 0 || cg > span) return { error: "The CG must lie between the two pick points (0 to the span); outside them the load tips." };
   if (!Number.isFinite(derate) || derate <= 0) return { error: "Derate must be a positive finite number (percent)." };
+  if (derate > 100) return { error: "Derate cannot exceed 100 percent of the chart capacity." };
   if (!Number.isFinite(c1) || c1 <= 0) return { error: "Crane 1 capacity must be a positive finite number (lb)." };
   if (!Number.isFinite(c2) || c2 <= 0) return { error: "Crane 2 capacity must be a positive finite number (lb)." };
   const shareC1 = w * (span - cg) / span;

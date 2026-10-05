@@ -1051,6 +1051,7 @@ export function computeKitchenSanitizerPpm({ sanitizer_type = "chlorine", active
   const band = SANITIZER_BANDS[sanitizer_type];
   if (!band) return { error: "Sanitizer type must be chlorine, quat, or iodine." };
   if (!(active > 0)) return { error: "Active-ingredient percent must be positive." };
+  if (active > 100) return { error: "Active-ingredient percent cannot exceed 100." };
   if (!(ppm > 0)) return { error: "Target ppm must be positive." };
   if (!(gal > 0)) return { error: "Batch volume must be positive (gallons)." };
   const oz_per_gal = 128 * ppm / (active * 10000);

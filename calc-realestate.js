@@ -2083,6 +2083,7 @@ export function computeRentVsBuy({
   if (!Number.isFinite(rent) || rent <= 0) return { error: "Enter a positive monthly rent." };
   if (!Number.isFinite(ret) || ret < 0 || ret > 30) return { error: "Enter an investment return 0 to 30 percent." };
   if (!Number.isFinite(hold) || hold <= 0) return { error: "Enter a positive holding period in years." };
+  if (sellPct > 100) return { error: "Selling cost cannot exceed 100 percent of the sale price." };
   if (hold > 30) return { error: "Holding period over 30 years is outside this tile's scope." };
 
   const N = Math.round(hold);
@@ -2518,6 +2519,7 @@ export function computeSellerNetSheet({ price = 0, payoff = 0, commission_pct = 
   if (![payoffN, commPct, ttPct, feesN, conc, annualTax, days, otherN].every(Number.isFinite)) return { error: "All inputs must be finite numbers." };
   // "other" may be a credit; the rest are charges. Until 2026-09-26 a negative commission returned a negative cost of sale.
   if ([payoffN, commPct, ttPct, feesN, conc, annualTax, days].some((v) => v < 0)) return { error: "Payoff, commission, transfer tax, fees, concessions, property tax, and days cannot be negative." };
+  if (commPct > 100) return { error: "Commission cannot exceed 100 percent of the sale price." };
   const commission = P * commPct / 100;
   const transferTax = P * ttPct / 100;
   const taxProration = annualTax * days / 365; // seller owes this share (debit)
@@ -2737,6 +2739,7 @@ export function computeFixFlipProfit({ arv_usd = 0, purchase_usd = 0, rehab_usd 
   if (!(cash > 0)) return { error: "Cash invested must be positive (USD)." };
   if (!(months > 0)) return { error: "Hold period must be positive (months)." };
   if ([purchase_usd, rehab_usd, holding_usd, financing_usd, selling_pct].some((v) => Number(v) < 0)) return { error: "Costs and the selling percent cannot be negative." };
+  if (Number(selling_pct) > 100) return { error: "Selling cost cannot exceed 100% of the ARV." };
   const selling_usd = arv * (Number(selling_pct) || 0) / 100;
   const all_in_usd = (Number(purchase_usd) || 0) + (Number(rehab_usd) || 0) + (Number(holding_usd) || 0) + (Number(financing_usd) || 0) + selling_usd;
   const profit_usd = arv - all_in_usd;

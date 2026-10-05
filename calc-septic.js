@@ -227,6 +227,7 @@ export function computeSepticLppOrifice({ orifice_dia_in, squirt_ft, cd = 0.6, o
   if (!(dia > 0)) return { error: "Orifice diameter must be positive (in)." };
   if (!(squirt > 0)) return { error: "Squirt height must be positive (ft)." };
   if (!(c > 0)) return { error: "Discharge coefficient must be positive." };
+  if (c > 1) return { error: "Discharge coefficient cannot exceed 1." };
   if (!(perLateral > 0)) return { error: "Orifices per lateral must be positive." };
   if (!(laterals > 0)) return { error: "Number of laterals must be positive." };
   // Orifice discharge: Q(gpm) = 19.63 * Cd * d_in^2 * sqrt(h_ft); Cd = 0.6 gives the familiar 11.79 coefficient.
@@ -458,6 +459,7 @@ export function computeSepticLppSquirtHead({ per_orifice_gpm, orifice_dia_in, cd
   if (!(q > 0)) return { error: "Per-orifice discharge must be positive (gpm)." };
   if (!(dia > 0)) return { error: "Orifice diameter must be positive (in)." };
   if (!(c > 0)) return { error: "Discharge coefficient must be positive." };
+  if (c > 1) return { error: "Discharge coefficient cannot exceed 1." };
   const root = q / (19.63 * c * dia * dia);
   const squirt_ft = root * root;
   const squirt_psi = squirt_ft * 0.433;

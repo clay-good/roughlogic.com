@@ -589,6 +589,7 @@ export function computeVfdReflectedWave({ rise_time_us = 0, velocity_pct = 50, s
   const run = Number(run_length_ft) || 0;
   if (!(rt > 0)) return { error: "Rise time must be positive (us)." };
   if (!(vp > 0)) return { error: "Cable velocity percent must be positive." };
+  if (vp > 100) return { error: "Cable velocity cannot exceed 100% of the speed of light." };
   if (!(Vll > 0)) return { error: "System voltage must be positive (V)." };
   if (!(run > 0)) return { error: "Run length must be positive (ft)." };
   const cable_velocity_ft_us = 0.01 * vp * 984;

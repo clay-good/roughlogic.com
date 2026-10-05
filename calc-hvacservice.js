@@ -468,6 +468,7 @@ export function computeFurnaceTempRise({ return_air_F = 0, supply_air_F = 0, inp
   if (["efficiency_pct"].some((k) => { const v = Number(arguments[0]?.[k]); return v > 0 && v < 1; })) return { error: "Enter efficiencies as a percent (85 for 85%), not a fraction." };
   if (!(input_btuh > 0)) return { error: "Furnace input must be positive (BTU/hr)." };
   if (!(efficiency_pct > 0)) return { error: "Efficiency must be positive (percent)." };
+  if (efficiency_pct > 100) return { error: "Efficiency cannot exceed 100 percent." };
   if (rise_min_F < 0 || rise_max_F < 0) return { error: "Rating-plate rise limits must be non-negative." };
   const delta_T_F = supply_air_F - return_air_F;
   if (!(delta_T_F > 0)) return { error: "Supply air must be warmer than return air (positive temperature rise)." };
@@ -515,6 +516,7 @@ export function computeFurnaceAirflowToRise({ input_btuh = 0, efficiency_pct = 8
   return_air_F = Number(return_air_F);
   if (!(input_btuh > 0)) return { error: "Furnace input must be positive (BTU/hr)." };
   if (!(efficiency_pct > 0)) return { error: "Efficiency must be positive (percent)." };
+  if (efficiency_pct > 100) return { error: "Efficiency cannot exceed 100 percent." };
   if (!(cfm > 0)) return { error: "Blower airflow must be positive (CFM)." };
   if (rise_min_F < 0 || rise_max_F < 0) return { error: "Rating-plate rise limits must be non-negative." };
   const output_btuh = input_btuh * efficiency_pct / 100;

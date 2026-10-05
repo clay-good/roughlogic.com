@@ -37,11 +37,15 @@ function noteOf(result) {
 // multiplier is deliberately awkward (1.37x + 0.11) rather than a round
 // factor: a tile that snaps its inputs to a standard size would return the
 // same note for 10 and 20, but not for 10 and 13.81.
-function perturb(inputs) {
+//
+// A tile whose worked example sits at a ceiling (lambda 1.0, an 80%
+// efficiency near 100%) errors when pushed up, so the downward twin
+// (0.73x + 0.01) is tried before giving up on it.
+function perturb(inputs, m = 1.37, c = 0.11) {
   const out = {};
   for (const [k, v] of Object.entries(inputs || {})) {
-    if (typeof v === "number") out[k] = v * 1.37 + 0.11;
-    else if (Array.isArray(v)) out[k] = v.map((n) => (typeof n === "number" ? n * 1.37 + 0.11 : n));
+    if (typeof v === "number") out[k] = v * m + c;
+    else if (Array.isArray(v)) out[k] = v.map((n) => (typeof n === "number" ? n * m + c : n));
     else out[k] = v;
   }
   return out;
@@ -62,7 +66,11 @@ async function collect() {
     let a, b;
     // A compute that throws on the perturbed inputs tells us nothing about
     // constancy, so it stays where it is.
-    try { a = fn(inputs); b = fn(perturb(inputs)); } catch { continue; }
+    try {
+      a = fn(inputs);
+      b = fn(perturb(inputs));
+      if (b && b.error) b = fn(perturb(inputs, 0.73, 0.01));
+    } catch { continue; }
     const na = noteOf(a);
     const nb = noteOf(b);
     // An error branch returns no note; two errors would compare equal and

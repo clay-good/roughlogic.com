@@ -681,6 +681,7 @@ export function computeWeldPreheatFuel({ steel_lb, start_temp_F, preheat_temp_F,
   const propaneBtuLb = Number(propane_btu_lb);
   if (!(steel > 0)) return { error: "Steel mass must be positive (lb)." };
   if (!(eff > 0)) return { error: "Efficiency must be positive (%)." };
+  if (eff > 100) return { error: "Efficiency cannot exceed 100%." };
   if (!(c > 0)) return { error: "Specific heat must be positive (Btu/lb-degF)." };
   if (!(propaneBtuLb > 0)) return { error: "Propane heating value must be positive (Btu/lb)." };
   if (!(preheat > start)) return { error: "Preheat temperature must be above the start temperature." };
@@ -713,6 +714,7 @@ export function computeWeldCostPerFoot({ deposit_lb_per_ft, deposition_eff_pct =
   if (!(eff > 0)) return { error: "Deposition efficiency must be positive (%)." };
   if (!(depRate > 0)) return { error: "Deposition rate must be positive (lb/hr)." };
   if (!(opFactor > 0)) return { error: "Operating factor must be positive (%)." };
+  if (eff > 100 || opFactor > 100) return { error: "Deposition efficiency and operating factor cannot exceed 100%." };
   const consumablePerFt = deposit / (eff / 100);
   const fillerCostFt = consumablePerFt * fillerCost;
   const arcHrPerFt = deposit / depRate;

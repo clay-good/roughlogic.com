@@ -381,6 +381,7 @@ export function computeRtRestrictedArea({
   if (!(gamma_constant_r_h_ci_ft > 0)) return { error: "The gamma constant must be positive (R/h per curie at 1 ft)." };
   if (!(boundary_limit_mr_h > 0)) return { error: "The boundary dose-rate limit must be positive (mR/h)." };
   if (collimator_attenuation_factor < 0) return { error: "The collimator attenuation factor cannot be negative." };
+  if (collimator_attenuation_factor > 1) return { error: "The collimator transmission factor cannot exceed 1." };
   if (public_limit_mr_h < 0) return { error: "The public-area limit cannot be negative." };
   if (!(shielding_factor > 0) || shielding_factor > 1) return { error: "The shielding transmission factor must be above 0 and no more than 1." };
   // The constant is per curie at one FOOT. Published constants are usually per

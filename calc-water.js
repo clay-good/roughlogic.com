@@ -1286,6 +1286,7 @@ export function computeCoolingWaterMakeup({
   // legitimate error message carrying that word would flake the gate red.
   if (!(cycles > 1)) return { error: "Cycles of concentration must be greater than 1 (blowdown is not defined at COC <= 1)." };
   if (!Number.isFinite(drift) || drift < 0) return { error: "Drift fraction must be non-negative." };
+  if (drift > 1) return { error: "Drift fraction cannot exceed 1 (enter 0.002 for 0.2%)." };
 
   // Industry rule of thumb: ~1% of recirculation evaporates per ~10 F of
   // range, i.e. evaporation = recirc * delta_T / 1000.

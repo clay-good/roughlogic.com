@@ -9607,6 +9607,7 @@ export function computeDumpsterCount({ debris_cy = 60, debris_tons = 45, contain
   if (!(debris_tons > 0)) return { error: "Debris weight must be positive (tons)." };
   if (!(container_cy > 0)) return { error: "Container volume must be positive (cy)." };
   if (!(fill_efficiency > 0)) return { error: "Fill efficiency must be positive." };
+  if (fill_efficiency > 1) return { error: "Fill efficiency cannot exceed 1 (a box holds no more than its volume)." };
   if (!(weight_cap_tons > 0)) return { error: "Weight cap must be positive (tons)." };
   const by_vol = Math.ceil(debris_cy / (container_cy * fill_efficiency) - 1e-9);
   const by_wt = Math.ceil(debris_tons / weight_cap_tons - 1e-9);
