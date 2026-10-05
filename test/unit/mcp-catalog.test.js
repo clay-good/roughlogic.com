@@ -533,3 +533,37 @@ test("the reference path does not loosen either corroboration guard", async () =
   // And nonsense still matches nothing, rather than falling into a reference.
   assert.equal((await answerQuery({ query: "asdfqwer zzz" })).status, "NO_MATCH");
 });
+
+// --- run_calculator: numbers sent as strings ---------------------------------
+//
+// JSON callers often send "12" for 12. The page always hands a compute
+// numbers, so the door must too: before coerceNumericStrings, 289 tiles
+// concatenated or text-compared a stringified worked example into a different
+// answer, and 222 more refused it. Every tile's first worked example, sent with
+// each number as a string, must answer exactly as it does with numbers.
+
+test("run_calculator: numeric strings answer the same as numbers, catalog-wide", async () => {
+  const { run } = await import("../../mcp/catalog.mjs");
+  const { readFile } = await import("node:fs/promises");
+  const { COMPUTE_MAP } = await import("../fixtures/compute-map.js");
+  const { rows } = JSON.parse(await readFile(new URL("../fixtures/worked-examples.json", import.meta.url), "utf8"));
+  const first = new Map();
+  for (const r of rows) if (!first.has(r.tile_id) && COMPUTE_MAP[r.tile_id]) first.set(r.tile_id, r.inputs);
+  const stable = (o) => JSON.stringify(o, (k, v) => (typeof v === "number" ? Math.round(v * 1e6) / 1e6 : v));
+  const differ = [];
+  for (const [id, inputs] of first) {
+    const asText = Object.fromEntries(Object.entries(inputs).map(([k, v]) => [k, typeof v === "number" ? String(v) : v]));
+    let a, b;
+    try { a = (await run({ id, inputs })).result; b = (await run({ id, inputs: asText })).result; } catch { continue; }
+    if (stable(a) !== stable(b)) differ.push(id);
+  }
+  assert.deepEqual(differ, [], "stringified numbers changed the answer:\n  " + differ.join("\n  "));
+});
+
+test("run_calculator: a select value that looks numeric stays a string", async () => {
+  const { run } = await import("../../mcp/catalog.mjs");
+  const out = await run({ id: "voltage-drop", inputs: { voltage: "120", length_ft: "150", awg: "12", current_A: "20", material: "copper", phase: "single" } });
+  assert.equal(out.inputs.awg, "12");
+  assert.equal(out.inputs.length_ft, 150);
+  assert.ok(Math.abs(out.result.drop_V - 11.853) < 0.01, `drop_V ${out.result.drop_V}`);
+});

@@ -332,6 +332,33 @@ function validateSelects(schema, inputs) {
   return normalized;
 }
 
+// A caller's "12" for a numeric field becomes 12 before the compute sees it.
+// The page always hands a compute numbers (its renderers read Number(input));
+// JSON callers often send numbers as strings, and a compute that adds or
+// compares them then concatenates ("12" + 3 = "123") or orders them as text
+// ("10" < "9"). 289 tiles answered differently on stringified worked examples.
+// A field is numeric when its schema says so, or, for a tile with no schema
+// (or a schema field with no kind), when its worked example passes a number
+// there. Selects are never touched: a select value like AWG "12" is a string
+// on purpose.
+function coerceNumericStrings(schema, inputs, exampleRows) {
+  if (!inputs || typeof inputs !== "object") return inputs;
+  const kinds = new Map(schema ? schema.inputs.map((f) => [f.key, f.kind]) : []);
+  const example = exampleRows && exampleRows[0] ? exampleRows[0].inputs || {} : {};
+  let out = inputs;
+  for (const [key, value] of Object.entries(inputs)) {
+    if (typeof value !== "string" || value.trim() === "") continue;
+    const kind = kinds.get(key);
+    const numeric = kind ? kind === "number" : typeof example[key] === "number";
+    if (!numeric) continue;
+    const n = Number(value);
+    if (!Number.isFinite(n)) continue;
+    if (out === inputs) out = { ...inputs };
+    out[key] = n;
+  }
+  return out;
+}
+
 // ---------------------------------------------------------------------------
 // Shard-backed computes: the one place a wiring stub reaches this door.
 //
@@ -1081,6 +1108,7 @@ export async function run({ id, inputs } = {}) {
   // where the tile's renderer exposes a schema.
   const schema = schemaIfConsistent(await readSchema(id, RENDERER_MAP, modCache), fn);
   if (!usedExample) args = validateSelects(schema, args);
+  if (!usedExample) args = coerceNumericStrings(schema, args, examples.get(id));
   const result = fn({ ...(args || {}) });
   const out = { id, inputs: args || {}, usedExample, result };
   // spec-v1189: alongside the raw result, the rendered outputs a person sees —
