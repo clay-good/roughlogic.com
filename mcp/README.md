@@ -133,7 +133,8 @@ compute runs, for any numeric field, the same as the page does. A compute
 handed `"150"` would concatenate it or compare it as text. Select values
 stay strings, so AWG `"12"` is still the select option `"12"`. A checkbox
 sent as `"true"` or `"false"` becomes the boolean; `"false"` would otherwise
-be a truthy string and read as checked.
+be a truthy string and read as checked. List inputs get the same treatment,
+element by element and field by field, following the worked example's shape.
 
 The key a calculator's own page shows is never one of those misses. Four
 calculators sit on a correlation published in metric while facing the US user

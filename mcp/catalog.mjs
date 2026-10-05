@@ -349,6 +349,14 @@ function coerceNumericStrings(schema, inputs, exampleRows) {
   const example = exampleRows && exampleRows[0] ? exampleRows[0].inputs || {} : {};
   let out = inputs;
   for (const [key, value] of Object.entries(inputs)) {
+    if (Array.isArray(value) && Array.isArray(example[key])) {
+      const shaped = coerceListLike(value, example[key]);
+      if (shaped !== value) {
+        if (out === inputs) out = { ...inputs };
+        out[key] = shaped;
+      }
+      continue;
+    }
     if (typeof value !== "string" || value.trim() === "") continue;
     const kind = kinds.get(key);
     const flag = /^(true|false)$/i.test(value.trim());
@@ -365,6 +373,34 @@ function coerceNumericStrings(schema, inputs, exampleRows) {
     if (out === inputs) out = { ...inputs };
     out[key] = n;
   }
+  return out;
+}
+
+// A list input follows its worked example's shape: a list of numbers takes
+// "3.42" as 3.42, and a list of rows converts each field the example row holds
+// as a number or boolean. Without it 10 list tiles (leveling backsights, pitot
+// readings, conduit-fill and panel-rebalance rows...) summed text.
+function asTyped(value, like) {
+  if (typeof value !== "string" || value.trim() === "") return value;
+  if (typeof like === "number") { const n = Number(value); return Number.isFinite(n) ? n : value; }
+  if (typeof like === "boolean" && /^(true|false)$/i.test(value.trim())) return value.trim().toLowerCase() === "true";
+  return value;
+}
+function coerceListLike(list, exampleList) {
+  const like = exampleList[0];
+  let out = list;
+  list.forEach((item, i) => {
+    let next = item;
+    if (like && typeof like === "object" && item && typeof item === "object" && !Array.isArray(item)) {
+      for (const [k, v] of Object.entries(item)) {
+        const t = asTyped(v, like[k]);
+        if (t !== v) { if (next === item) next = { ...item }; next[k] = t; }
+      }
+    } else {
+      next = asTyped(item, like);
+    }
+    if (next !== item) { if (out === list) out = [...list]; out[i] = next; }
+  });
   return out;
 }
 
