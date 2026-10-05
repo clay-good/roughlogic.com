@@ -1,6 +1,11 @@
 # roughlogic.com Specification v108 -- The FREEZE / SALVAGE Program: Off-Brand Groups Off the Trades Index Without Deleting Working Tools (O, P, T, X, Y -- Design Only)
 
-> **Status: DESIGN DECISION 2026-06-20, future work, not executed.** v108 is the **FREEZE /
+> **Status: CUT 2026-10-05 (superseded; design 2026-06-20, never executed).** The owner chose to
+> leave the five groups where they are: since this design the catalog kept investing in them
+> (Kitchen alone grew to 49 tiles), so freezing them off the index no longer matches the product,
+> and no URL is retired. The design below is kept as the record of what was considered.
+>
+> v108 is the **FREEZE /
 > SALVAGE** counterpart to spec-v107's **CUT** pass. Where v107 deletes the four
 > liability-bearing groups, v108 designs how the five off-brand-but-not-liable groups (Kitchen
 > O, Field / Backcountry / SAR P, Bench Science T, Real Estate X, Educators Y) leave the

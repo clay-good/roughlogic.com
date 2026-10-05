@@ -299,6 +299,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **spec-v108 (FREEZE / SALVAGE of the Kitchen, Field / SAR, Bench Science, Real Estate, and Educators groups) is cut as superseded.** The catalog kept investing in those groups after the June design, so they stay on the index and no URL is retired. Every spec is now LANDED, CUT, or ADOPTED except spec-v1347, which stays BLOCKED BY DESIGN until its Search Console conditions are met.
+
 - **`calc-agriculture.js` size cap raised from 64,000 to 66,000 bytes gzipped.** The irrigation and livestock corrections took it to 64,110 B (100.2%).
 - **`calc-electrical.js` size cap raised from 104,000 to 106,000 bytes gzipped.** The battery-vent and capacitor corrections took it to 104,063 B (100.1%). Splitting the module per bench is still the preferred fix.
 - **Twenty-six more tiles now carry a publisher's printed example.**

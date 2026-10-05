@@ -190,6 +190,8 @@ The groups that sat near the scope edge have been reviewed against the inclusion
 4) and resolved per the three dispositions (section 5.1). The detailed tile-level plan -- which
 tiles salvage, where they re-home, and what the annex looks like -- is designed in
 **spec-v108.md**. This section records the decisions; v108 is the design; a later pass executes.
+*2026-10-05: that pass will not run. v108 was cut as superseded; the five groups stay on the
+index, and no URL is retired.*
 
 - **R -- Accounting / Tax / Small-Business: KEEP.** A tradesperson is the small-business owner;
   markup-vs-margin, breakeven, loan amortization, mileage, payroll, and prime cost are shop math
