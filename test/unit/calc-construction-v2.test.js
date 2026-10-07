@@ -377,6 +377,14 @@ test("Masonry: smaller units (modular brick) -> more count", () => {
   assert.ok(b.unit_count > a.unit_count);
 });
 
+test("Masonry: an 8x16x16 CMU is 16 in tall, so it takes half the units of an 8x8x16", () => {
+  // Width x height x length (NCMA TEK 2-1): a 15-5/8 in square face plus a 3/8 in joint is 16 x 16 in = 1.778 ft^2.
+  const tall = computeMasonryCount({ wall_area_ft2: 100, unit_type: "cmu_8x16x16" });
+  assert.ok(Math.abs(tall.face_ft2 - 256 / 144) < 1e-12);
+  assert.strictEqual(tall.base_count, 57);
+  assert.strictEqual(computeMasonryCount({ wall_area_ft2: 100, unit_type: "cmu_8x8x16" }).base_count, 113);
+});
+
 test("Masonry: zero area returns error", () => {
   const r = computeMasonryCount({ wall_area_ft2: 0, unit_type: "cmu_8x8x16" });
   assert.ok(r.error);

@@ -1012,7 +1012,10 @@ export const MASONRY_UNIT_FACE_IN = {
   modular_brick: { w: 7.625, h: 8 / 3 - 0.375 },
   standard_brick: { w: 8, h: 2.25 },
   cmu_8x8x16: { w: 15.625, h: 7.625 },
-  cmu_8x16x16: { w: 15.625, h: 7.625 },
+  // Nominal CMU sizes read width x height x length (NCMA TEK 2-1), so 8x16x16
+  // is a 16 in tall unit with a 15-5/8 in square face. Until 2026-10-07 it
+  // carried the 8x16 face of the 8x8x16 and counted twice the units.
+  cmu_8x16x16: { w: 15.625, h: 15.625 },
 };
 
 // dims: in { wall_area_ft2: L^2, unit_type: dimensionless, mortar_joint_in: L, waste_factor: dimensionless } out: { units: dimensionless, mortar_ft3: L^3 }
