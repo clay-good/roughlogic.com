@@ -979,6 +979,9 @@ export function computeStructuredCablingChannel({ permanent_link_m = 0, cords_m 
   if (!(pl > 0)) return { error: "Permanent-link length must be positive (m)." };
   if (cords < 0) return { error: "Cord length must be non-negative (m)." };
   if (derate < 0) return { error: "De-rate factor must be non-negative." };
+  // Table G.2 stops at 60 C. Until 2026-10-07 a hotter space held the 60 C row (75.0 m) and passed a
+  // 75 m link at 80 C, where the custom linear path at nearly the same rate fails it.
+  if (temp > 60 && (derate === 0.004 || derate === 0.002)) return { error: "TIA-568-C.2 Table G.2 stops at 60 deg C; above that the cable's own derating data governs." };
   // 0.004 (UTP) and 0.002 (screened) select the TIA table; any other entry is a custom linear de-rate.
   const table = derate === 0.004 ? _TIA_G2_UTP : derate === 0.002 ? _TIA_G2_SCREENED : null;
   const max_pl_m = table ? _tiaG2(table, temp) : Math.max(0, 90 * (1 - Math.max(temp - 20, 0) * derate));

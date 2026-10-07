@@ -174,7 +174,10 @@ export function computeBlastBurdenSpacing({ hole_diameter_in = 0, burden_ratio =
   const burden_ft = burden_ratio * hole_diameter_in / 12;
   const spacing_ft = spacing_ratio * burden_ft;
   const subdrill_ft = subdrill_ratio * burden_ft;
-  const stemming_ft = stemming_ratio * burden_ft;
+  // Stemming is the larger of the ratio x burden and 20 hole diameters, the rule blast-stemming-length
+  // applies. Until 2026-10-07 this took the ratio alone, so a 6 in hole at a 25 ratio was handed 8.75 ft
+  // of stemming that the sibling tile calls 1.25 ft short.
+  const stemming_ft = Math.max(stemming_ratio * burden_ft, 20 * hole_diameter_in / 12);
   const stiffness_ratio = bench_height_ft / burden_ft;
   const stiff_ok = stiffness_ratio >= 2 - 1e-9 * Math.abs(2);
   const pattern_area_sqft = burden_ft * spacing_ft;
@@ -193,7 +196,7 @@ export function computeBlastBurdenSpacing({ hole_diameter_in = 0, burden_ratio =
 }
 const burdenSpacingExample = { inputs: { hole_diameter_in: 3.5, burden_ratio: 25, bench_height_ft: 30, spacing_ratio: 1.15, subdrill_ratio: 0.3, stemming_ratio: 0.7 } };
 MINING_RENDERERS["blast-burden-spacing"] = _simpleRenderer({
-  citation: "Citation: the published pattern ratios by name -- burden = burden ratio x hole diameter / 12 (ratio typically 20 to 35), spacing 1.15 to 1.4 x burden staggered, subdrill 0.2 to 0.5 x burden, stemming 0.7 to 1.0 x burden -- with the stiffness check bench height / burden >= 2. Starting-point geometry; the blaster in charge and the site's blast plan govern.",
+  citation: "Citation: the published pattern ratios by name -- burden = burden ratio x hole diameter / 12 (ratio typically 20 to 35), spacing 1.15 to 1.4 x burden staggered, subdrill 0.2 to 0.5 x burden, stemming 0.7 to 1.0 x burden and never under 20 hole diameters -- with the stiffness check bench height / burden >= 2. Starting-point geometry; the blaster in charge and the site's blast plan govern.",
   example: burdenSpacingExample.inputs,
   fields: [
     { key: "hole_diameter_in", label: "Hole diameter (in)", kind: "number" },
@@ -895,10 +898,12 @@ export function computeRockBoltSupportPressure({ bolt_capacity_lb = 0, spacing_1
     : span_ft <= 60 ? 10 + (span_ft - 20) * 5 / 40
       : span_ft / 4;
   const bolt_length_ft = Math.max(length_from_spacing_ft, length_from_span_ft);
+  // The table stops at a 100 ft span; past it span/4 is an extrapolation (flagged since 2026-10-07).
+  const span_beyond_table = span_ft > 100;
   return {
     area_per_bolt_sqft, support_psf, support_psi, dead_weight_required_psf,
     dead_weight_ratio, dead_weight_ok, spacing_for_target_ft, spacing_for_dead_weight_ft,
-    length_from_spacing_ft, length_from_span_ft, bolt_length_ft,
+    length_from_spacing_ft, length_from_span_ft, bolt_length_ft, span_beyond_table,
     verdict: dead_weight_ok
       ? "the pattern carries the entered loosened zone, with a ratio of " + fmt(dead_weight_ratio, 2)
       : "FAILS the dead-weight check at a ratio of " + fmt(dead_weight_ratio, 2) + " -- this pattern does not hold the loose ground it is there to hold",
@@ -923,7 +928,7 @@ MINING_RENDERERS["rock-bolt-support-pressure"] = _simpleRenderer({
     { key: "p", id: "rbs-out-p", label: "Support pressure", value: (r) => fmt(r.support_psf, 0) + " psf (" + fmt(r.support_psi, 2) + " psi)" },
     { key: "d", id: "rbs-out-d", label: "Dead-weight check", value: (r) => fmt(r.dead_weight_required_psf, 0) + " psf required -- " + r.verdict },
     { key: "s", id: "rbs-out-s", label: "Spacing for the target pressure", value: (r) => fmt(r.spacing_for_target_ft, 2) + " ft square (" + fmt(r.spacing_for_dead_weight_ft, 2) + " ft to carry the loosened zone)" },
-    { key: "l", id: "rbs-out-l", label: "Bolt length the geometry implies", value: (r) => fmt(r.bolt_length_ft, 1) + " ft (" + fmt(r.length_from_spacing_ft, 1) + " ft from spacing, " + fmt(r.length_from_span_ft, 1) + " ft from span)" },
+    { key: "l", id: "rbs-out-l", label: "Bolt length the geometry implies", value: (r) => fmt(r.bolt_length_ft, 1) + " ft (" + fmt(r.length_from_spacing_ft, 1) + " ft from spacing, " + fmt(r.length_from_span_ft, 1) + " ft from span" + (r.span_beyond_table ? ", extrapolated past the 100 ft span the USACE table reaches" : "") + ")" },
     { key: "n", id: "rbs-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeRockBoltSupportPressure,

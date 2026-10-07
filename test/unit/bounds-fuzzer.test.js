@@ -43645,7 +43645,7 @@ test("bounds: spec-v1508 computeBlastBurdenSpacing pins the stiffness check", ()
   assert.ok(Math.abs(r.burden_ft - 7.29167) < 1e-4);
   assert.ok(Math.abs(r.spacing_ft - 8.38542) < 1e-4);
   assert.ok(Math.abs(r.subdrill_ft - 2.1875) < 1e-4);
-  assert.ok(Math.abs(r.stemming_ft - 5.10417) < 1e-4);
+  assert.ok(Math.abs(r.stemming_ft - 70 / 12) < 1e-9); // 20 diameters (5.83 ft) governs 0.7B (5.10 ft)
   assert.ok(Math.abs(r.stiffness_ratio - 4.11429) < 1e-4);
   assert.strictEqual(r.stiff_ok, true);
   // A shallow bench with the same holes vents rather than breaks, and the
@@ -56237,7 +56237,9 @@ test("bounds: computeStructuredCablingChannel enforces the TIA 10 m cord total a
   assert.equal(r.cords_ok, false);
   assert.equal(r.ok, false);
   assert.equal(_b36scc({ permanent_link_m: 85, cords_m: 8, temp_c: 20 }).ok, true);
-  assert.ok(_b36scc({ permanent_link_m: 10, cords_m: 2, temp_c: 300 }).max_pl_m >= 0);
+  // The custom linear de-rate floors at zero; the Table G.2 path stops at 60 C (2026-10-07).
+  assert.ok(_b36scc({ permanent_link_m: 10, cords_m: 2, temp_c: 300, derate_per_c: 0.0041 }).max_pl_m >= 0);
+  assert.ok("error" in _b36scc({ permanent_link_m: 10, cords_m: 2, temp_c: 300 }));
 });
 
 import { computeProductPullDownLoad as _b36ppd, computeWalkInCoolerLoad as _b36wic } from "../../calc-refrigerant.js";

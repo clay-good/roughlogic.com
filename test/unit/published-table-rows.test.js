@@ -81,3 +81,21 @@ test("range-demand-220-55: one range under 8.75 kW takes Column A/B's 80%, never
   assert.equal(computeRangeDemand22055({ num_ranges: 1, nameplate_kw: 12 }).demand_kw, 8);
   assert.ok(computeRangeDemand22055({ num_ranges: 2, nameplate_kw: 7 }).error);
 });
+
+test("structured-cabling-channel: Table G.2 ends at 60 C; a hotter space is not given the 60 C row", async () => {
+  const { computeStructuredCablingChannel } = await import("../../calc-lowvoltage.js");
+  assert.equal(computeStructuredCablingChannel({ permanent_link_m: 75, cords_m: 5, temp_c: 60 }).max_pl_m, 75);
+  assert.ok(computeStructuredCablingChannel({ permanent_link_m: 75, cords_m: 5, temp_c: 65 }).error);
+  assert.ok(computeStructuredCablingChannel({ permanent_link_m: 75, cords_m: 5, temp_c: 80, derate_per_c: 0.002 }).error);
+});
+
+test("blast-burden-spacing stemming meets blast-stemming-length's 20-diameter floor; rock-bolt flags spans past the table", async () => {
+  const m = await import("../../calc-mining.js");
+  const b = m.computeBlastBurdenSpacing({ hole_diameter_in: 6, bench_height_ft: 40 });
+  assert.equal(b.stemming_ft, 10);
+  const s = m.computeBlastStemmingLength({ hole_diameter_in: 6, burden_ft: b.burden_ft, proposed_stemming_ft: b.stemming_ft });
+  assert.equal(s.meets_governing, true);
+  const bolt = { bolt_capacity_lb: 12000, spacing_1_ft: 4, spacing_2_ft: 4, rock_unit_weight_pcf: 165, loosened_zone_ft: 6, target_support_psf: 990 };
+  assert.equal(m.computeRockBoltSupportPressure({ ...bolt, span_ft: 100 }).span_beyond_table, false);
+  assert.equal(m.computeRockBoltSupportPressure({ ...bolt, span_ft: 150 }).span_beyond_table, true);
+});
