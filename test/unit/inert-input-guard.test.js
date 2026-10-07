@@ -10,6 +10,7 @@
 // at a time across every example row -- each other select option, a flipped
 // checkbox, a number scaled by 1.37, 0.73, +1 or -1 (1 and 0.5 from zero) --
 // and records the inputs that never change any output (note text excluded).
+// A select the examples never set is run through all of its options.
 // That set must equal test/fixtures/inert-inputs.js, where each entry carries
 // the reason it is legitimate (read only in another mode, a step the examples
 // do not cross, text-only). A new inert input fails until it is fixed or
@@ -68,6 +69,24 @@ test("inert inputs: every input that never moves an output is reviewed in inert-
           if (r.error || answer(r) !== answer(base)) { moved = true; break; }
         }
         if (moved) break;
+      }
+      if (tried && !moved) inert.add(id + "::" + k);
+    }
+    // A select the worked examples never set (its default applies) is probed
+    // through all of its options on each example row. Added 2026-10-07: the
+    // stirrup-type select added that day would otherwise go unchecked.
+    const exKeys = new Set(ex.flatMap((r) => Object.keys(r.inputs)));
+    for (const [k, vals] of opts) {
+      if (exKeys.has(k) || vals.length < 2) continue;
+      let moved = false, tried = 0;
+      for (const row of ex) {
+        const res = vals.map((v) => { try { return fn({ ...row.inputs, [k]: v }); } catch { return null; } });
+        const ok = res.filter((r) => r && !r.error);
+        if (ok.length && res.some((r) => r && r.error)) { moved = true; break; }
+        if (ok.length >= 2) {
+          tried++;
+          if (new Set(ok.map(answer)).size > 1) { moved = true; break; }
+        }
       }
       if (tried && !moved) inert.add(id + "::" + k);
     }
