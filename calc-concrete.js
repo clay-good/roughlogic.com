@@ -144,8 +144,8 @@ CONCRETE_RENDERERS["rc-beam-flexure"] = _simpleRenderer({
 // 24 in (d/4 <= 12 in when Vs > 4 sqrt(f'c) bw d) and the spacing at which Av
 // still meets 9.6.3.4's Av,min = max(0.75 sqrt(f'c), 50) bw s / fyt. Until
 // 2026-09-25 these were listed as separate checks and s_max was a bare d/2.
-// dims: in { fc: M L^-1 T^-2, fyt: M L^-1 T^-2, bw: L, d: L, av_in2: L^2, vu: M L T^-2, lambda: dimensionless } out: { vc_kip: M L T^-2, phi_vc: M L T^-2, vs_req_kip: M L T^-2, s_req_in: L, s_max_in: L, s_avmin_in: L }
-export function computeRcBeamShear({ fc = 4000, fyt = 60000, bw = 0, d = 0, av_in2 = 0, vu = 0, lambda = 1.0 } = {}) {
+// dims: in { fc: M L^-1 T^-2, fyt: M L^-1 T^-2, bw: L, d: L, av_in2: L^2, vu: M L T^-2, lambda: dimensionless, stirrup_type: dimensionless } out: { vc_kip: M L T^-2, phi_vc: M L T^-2, vs_req_kip: M L T^-2, s_req_in: L, s_max_in: L, s_avmin_in: L }
+export function computeRcBeamShear({ fc = 4000, fyt = 60000, bw = 0, d = 0, av_in2 = 0, vu = 0, lambda = 1.0, stirrup_type = "bar" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(fc > 0)) return { error: "Concrete strength f'c must be positive (psi)." };
   if (!(fyt > 0)) return { error: "Stirrup yield fyt must be positive (psi)." };
@@ -154,19 +154,24 @@ export function computeRcBeamShear({ fc = 4000, fyt = 60000, bw = 0, d = 0, av_i
   if (!(av_in2 > 0)) return { error: "Stirrup area Av must be positive (in^2)." };
   if (!(lambda > 0)) return { error: "Lightweight factor lambda must be positive." };
   if (lambda > 1) return { error: "Lightweight factor lambda cannot exceed 1.0 (ACI 318-19 19.2.4)." };
+  // ACI 318-19 Table 20.2.2.4(a) caps fyt for shear at 60,000 psi for deformed bars and 80,000 psi
+  // for welded deformed wire; the shear-friction and corbel tiles already apply the same table.
+  // Until 2026-10-07 a Grade 80 or 100 stirrup spread its spacing in proportion to the grade.
+  if (stirrup_type !== "bar" && stirrup_type !== "wwr") return { error: "Stirrup type must be bar (deformed bar) or wwr (welded deformed wire)." };
+  const fyt_used_psi = Math.min(fyt, stirrup_type === "wwr" ? 80000 : 60000);
   const vc_kip = 2 * lambda * Math.sqrt(fc) * bw * d / 1000;
   const phi_vc = 0.75 * vc_kip;
   const vs_req_kip = vu > 0 ? Math.max(0, vu / 0.75 - vc_kip) : 0;
-  const s_req_in = vs_req_kip > 0 ? av_in2 * fyt * d / (vs_req_kip * 1000) : null;
+  const s_req_in = vs_req_kip > 0 ? av_in2 * fyt_used_psi * d / (vs_req_kip * 1000) : null;
   const sqfc_bwd_kip = Math.sqrt(fc) * bw * d / 1000;
   const min_required = vu > 0.75 * lambda * sqfc_bwd_kip;
-  const s_avmin_in = av_in2 * fyt / (Math.max(0.75 * Math.sqrt(fc), 50) * bw);
+  const s_avmin_in = av_in2 * fyt_used_psi / (Math.max(0.75 * Math.sqrt(fc), 50) * bw);
   const tight = vs_req_kip > 4 * sqfc_bwd_kip;
   const s_geom_in = tight ? Math.min(d / 4, 12) : Math.min(d / 2, 24);
   const s_max_in = Math.min(s_geom_in, s_avmin_in);
   const section_ok = vs_req_kip <= (8 * sqfc_bwd_kip) + 1e-9 * Math.abs(8 * sqfc_bwd_kip);
   const stirrups = vu > phi_vc;
-  return { vc_kip, phi_vc, vs_req_kip, s_req_in, s_max_in, s_avmin_in, s_max_rule: s_avmin_in < s_geom_in ? "Av,min" : tight ? "d/4" : "d/2", min_required, section_ok, stirrups };
+  return { vc_kip, phi_vc, vs_req_kip, s_req_in, s_max_in, s_avmin_in, fyt_used_psi, s_max_rule: s_avmin_in < s_geom_in ? "Av,min" : tight ? "d/4" : "d/2", min_required, section_ok, stirrups };
 }
 
 export const rcBeamShearExample = { inputs: { fc: 4000, fyt: 60000, bw: 12, d: 21.5, av_in2: 0.22, vu: 40, lambda: 1.0 } };
@@ -177,6 +182,7 @@ CONCRETE_RENDERERS["rc-beam-shear"] = _simpleRenderer({
   fields: [
     { key: "fc", label: "Concrete strength f'c (psi)", kind: "number" },
     { key: "fyt", label: "Stirrup yield fyt (psi)", kind: "number" },
+    { key: "stirrup_type", label: "Stirrup type (sets the 20.2.2.4(a) fyt cap)", kind: "select", options: [{ value: "bar", label: "Deformed bar (fyt up to 60,000 psi)", selected: true }, { value: "wwr", label: "Welded deformed wire (up to 80,000 psi)" }] },
     { key: "bw", label: "Web width bw (in)", kind: "number" },
     { key: "d", label: "Effective depth d (in)", kind: "number" },
     { key: "av_in2", label: "Stirrup area Av, both legs (in²)", kind: "number" },
@@ -457,8 +463,8 @@ CONCRETE_RENDERERS["rc-one-way-shear"] = _simpleRenderer({
   compute: computeRcOneWayShear,
 });
 
-// dims: in { fc_psi: M L^-1 T^-2, fyt_psi: M L^-1 T^-2, bw_in: L, d_in: L, av_in2: L^2, vu_kip: M L T^-2, lambda: dimensionless } out: { av_min_per_s: L, s_max_av_min_in: L, trigger_kip: M L T^-2, vc_kip: M L T^-2, vs_req_kip: M L T^-2, vs_max_kip: M L T^-2, phi_vn_max_kip: M L T^-2, s_max_code_in: L, s_max_in: L }
-export function computeRcMinShearReinforcement({ fc_psi = 4000, fyt_psi = 60000, bw_in = 0, d_in = 0, av_in2 = 0, vu_kip = 0, lambda = 1.0 } = {}) {
+// dims: in { fc_psi: M L^-1 T^-2, fyt_psi: M L^-1 T^-2, bw_in: L, d_in: L, av_in2: L^2, vu_kip: M L T^-2, lambda: dimensionless, stirrup_type: dimensionless } out: { av_min_per_s: L, s_max_av_min_in: L, trigger_kip: M L T^-2, vc_kip: M L T^-2, vs_req_kip: M L T^-2, vs_max_kip: M L T^-2, phi_vn_max_kip: M L T^-2, s_max_code_in: L, s_max_in: L }
+export function computeRcMinShearReinforcement({ fc_psi = 4000, fyt_psi = 60000, bw_in = 0, d_in = 0, av_in2 = 0, vu_kip = 0, lambda = 1.0, stirrup_type = "bar" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(fc_psi > 0)) return { error: "Concrete strength f'c must be positive (psi)." };
   if (!(fyt_psi > 0)) return { error: "Stirrup yield fyt must be positive (psi)." };
@@ -466,6 +472,11 @@ export function computeRcMinShearReinforcement({ fc_psi = 4000, fyt_psi = 60000,
   if (!(d_in > 0)) return { error: "Effective depth d must be positive (in)." };
   if (!(av_in2 > 0)) return { error: "Stirrup area Av must be positive (in^2)." };
   if (!(lambda > 0 && lambda <= 1)) return { error: "The lightweight factor lambda is over 0 and up to 1.0." };
+  // ACI 318-19 Table 20.2.2.4(a) caps fyt for shear at 60,000 psi for deformed bars and 80,000 psi
+  // for welded deformed wire; the shear-friction and corbel tiles already apply the same table.
+  // Until 2026-10-07 a Grade 80 or 100 stirrup spread its spacing in proportion to the grade.
+  if (stirrup_type !== "bar" && stirrup_type !== "wwr") return { error: "Stirrup type must be bar (deformed bar) or wwr (welded deformed wire)." };
+  const fyt_used_psi = Math.min(fyt_psi, stirrup_type === "wwr" ? 80000 : 60000);
   const PHI = 0.75;
   // 22.5.3.1 caps sqrt(f'c) at 100 psi for the shear-STRENGTH terms (Vc, the
   // 9.6.3.1 trigger, and the Vs limits). The 9.6.3.4 Av,min detailing minimum
@@ -474,8 +485,8 @@ export function computeRcMinShearReinforcement({ fc_psi = 4000, fyt_psi = 60000,
   const sqrt_fc_raw = Math.sqrt(fc_psi);
   const sqrt_fc = Math.min(sqrt_fc_raw, 100);
   // 9.6.3.4: Av,min/s = greater of 0.75 sqrt(f'c) bw/fyt and 50 bw/fyt.
-  const av_min_a = 0.75 * sqrt_fc_raw * bw_in / fyt_psi;
-  const av_min_b = 50 * bw_in / fyt_psi;
+  const av_min_a = 0.75 * sqrt_fc_raw * bw_in / fyt_used_psi;
+  const av_min_b = 50 * bw_in / fyt_used_psi;
   const av_min_per_s = Math.max(av_min_a, av_min_b);
   const av_min_governs = av_min_a >= av_min_b ? "the 0.75 sqrt(f'c) bw/fyt term (f'c above ~4,444 psi)" : "the 50 bw/fyt floor (f'c below ~4,444 psi)";
   const s_max_av_min_in = av_in2 / av_min_per_s;
@@ -495,7 +506,7 @@ export function computeRcMinShearReinforcement({ fc_psi = 4000, fyt_psi = 60000,
   const s_max_in = Math.min(s_max_code_in, s_max_av_min_in);
   const section_adequate = vu_kip > 0 ? vu_kip <= phi_vn_max_kip + 1e-9 * Math.abs(phi_vn_max_kip) : null;
   return {
-    av_min_per_s, av_min_governs, s_max_av_min_in, trigger_kip, av_min_required,
+    av_min_per_s, av_min_governs, s_max_av_min_in, trigger_kip, av_min_required, fyt_used_psi,
     vc_kip, vs_req_kip, vs_max_kip, phi_vn_max_kip, tightened, s_max_code_in, s_max_in, section_adequate,
     note: "The detailing and section-size checks that sit BESIDE the rc-beam-shear strength calculation, all ACI 318-19. (1) 9.6.3.4 minimum shear reinforcement Av,min/s = greater of 0.75 sqrt(f'c) bw/fyt and 50 bw/fyt; the 50 bw/fyt floor governs below about 4,444 psi and the sqrt(f'c) term above it. Dividing the stirrup area by Av,min/s gives the widest spacing that still satisfies the minimum. (2) 9.6.3.1 requires Av,min wherever Vu exceeds phi lambda sqrt(f'c) bw d -- the 2019 edition REPLACED the old 318-14 'Vu > 0.5 phi Vc' trigger with this one, and Table 9.6.3.1 exempts shallow beams (h <= 10 in), joists, and certain slab-integral members, which are not modeled here. (3) 22.5.1.2 caps the stirrup contribution at Vs <= 8 sqrt(f'c) bw d, so the section itself can never carry more than phi (Vc + 8 sqrt(f'c) bw d) no matter how much steel is added -- past that the beam must get deeper or wider. (4) 9.7.6.2.2 caps stirrup spacing at the lesser of d/2 and 24 in, halved to d/4 and 12 in once Vs exceeds 4 sqrt(f'c) bw d. Vc uses the simplified Table 22.5.5.1(a) expression appropriate to a member with at least Av,min. A design aid, not a substitute for the structural engineer of record's stamped design.",
   };
@@ -508,6 +519,7 @@ CONCRETE_RENDERERS["rc-min-shear-reinforcement"] = _simpleRenderer({
   fields: [
     { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number" },
     { key: "fyt_psi", label: "Stirrup yield fyt (psi)", kind: "number" },
+    { key: "stirrup_type", label: "Stirrup type (sets the 20.2.2.4(a) fyt cap)", kind: "select", options: [{ value: "bar", label: "Deformed bar (fyt up to 60,000 psi)", selected: true }, { value: "wwr", label: "Welded deformed wire (up to 80,000 psi)" }] },
     { key: "bw_in", label: "Web width bw (in)", kind: "number" },
     { key: "d_in", label: "Effective depth d (in)", kind: "number" },
     { key: "av_in2", label: "Stirrup area Av, both legs (in²)", kind: "number" },

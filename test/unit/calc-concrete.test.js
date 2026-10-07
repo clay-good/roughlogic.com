@@ -13,3 +13,15 @@ test("ACI 318-19 caps: f'c in breakout and pullout (17.3.1), fy in shear frictio
   assert.strictEqual(sf(100000), sf(60000));
   assert.strictEqual(sf(60000), 90);
 });
+
+test("ACI 318-19 Table 20.2.2.4(a): stirrup fyt is capped at 60 ksi for bars and 80 ksi for welded deformed wire", async () => {
+  const c = await import("../../calc-concrete.js");
+  const beam = { fc: 4000, bw: 12, d: 21.5, av_in2: 0.22, vu: 40 };
+  const s = (fyt, stirrup_type) => c.computeRcBeamShear({ ...beam, fyt, stirrup_type }).s_req_in;
+  assert.strictEqual(s(80000, "bar"), s(60000, "bar"));
+  assert.ok(s(80000, "wwr") > s(60000, "bar"));
+  assert.strictEqual(s(100000, "wwr"), s(80000, "wwr"));
+  assert.ok(c.computeRcBeamShear({ ...beam, fyt: 60000, stirrup_type: "rod" }).error);
+  const m = (fyt_psi, stirrup_type) => c.computeRcMinShearReinforcement({ fc_psi: 4000, fyt_psi, bw_in: 12, d_in: 21.5, av_in2: 0.22, vu_kip: 40, stirrup_type }).av_min_per_s;
+  assert.strictEqual(m(100000, "bar"), m(60000, "bar"));
+});

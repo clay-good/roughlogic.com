@@ -1580,7 +1580,7 @@ cross-check.
 | calc-concrete.js | `computeCuringCompoundCoverage` | `{ slab_area_sf = 2500, coats = 1, coverage_sf_per_gal = 200, waste_pct = 0 } ...` | _ | _ | _ |
 | calc-concrete.js | `computeFreshConcreteTemp` | `{ agg_weight_lb = 0, agg_temp_f = 0, cement_weight_lb = 0, cement_temp_f = 0,...` | _ | _ | _ |
 | calc-concrete.js | `computeRcBeamFlexure` | `{ fc = 4000, fy = 60000, as_in2 = 0, b = 0, d = 0, mu = 0 } = {}` | _ | _ | _ |
-| calc-concrete.js | `computeRcBeamShear` | `{ fc = 4000, fyt = 60000, bw = 0, d = 0, av_in2 = 0, vu = 0, lambda = 1.0 } = {}` | _ | _ | _ |
+| calc-concrete.js | `computeRcBeamShear` | `{ fc = 4000, fyt = 60000, bw = 0, d = 0, av_in2 = 0, vu = 0, lambda = 1.0, st...` | _ | _ | _ |
 | calc-concrete.js | `computeRcColumnAxial` | `{ b_in = 0, h_in = 0, fc_psi = 4000, fy_psi = 60000, ast_in2 = 0 } = {}` | _ | _ | _ |
 | calc-concrete.js | `computeRcColumnSteelForLoad` | `{ target_load_kip = 0, b_in = 0, h_in = 0, fc_psi = 4000, fy_psi = 60000 } = {}` | _ | _ | _ |
 | calc-concrete.js | `computeRcCompressionDevLength` | `{ bar_diameter_in = 0, fy_psi = 60000, fc_psi = 4000, lambda = 1.0, psi_r = 1...` | _ | _ | _ |
