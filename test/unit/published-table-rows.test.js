@@ -99,3 +99,13 @@ test("blast-burden-spacing stemming meets blast-stemming-length's 20-diameter fl
   assert.equal(m.computeRockBoltSupportPressure({ ...bolt, span_ft: 100 }).span_beyond_table, false);
   assert.equal(m.computeRockBoltSupportPressure({ ...bolt, span_ft: 150 }).span_beyond_table, true);
 });
+
+test("greenhouse-vent-area reports the floor-area rule beside one air change per minute; they meet at 8 ft", async () => {
+  const { computeGreenhouseVentArea } = await import("../../calc-greenhouse.js");
+  const base = { house_width_ft: 30, house_length_ft: 96, roof_vent_pct: 15, side_vent_pct: 15, design_temp_difference_f: 10, mild_temp_difference_f: 5, discharge_coefficient: 0.6 };
+  const flat = computeGreenhouseVentArea({ ...base, gutter_height_ft: 6, ridge_height_ft: 10 });
+  assert.equal(flat.floor_rule_cfm, 8 * 2880);
+  assert.ok(Math.abs(flat.target_airflow_cfm - flat.floor_rule_cfm) < 1e-9);
+  const tall = computeGreenhouseVentArea({ ...base, gutter_height_ft: 12, ridge_height_ft: 18 });
+  assert.ok(tall.target_airflow_cfm > tall.floor_rule_cfm);
+});

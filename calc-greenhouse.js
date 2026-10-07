@@ -132,6 +132,11 @@ export function computeGreenhouseVentArea({ house_width_ft = 0, house_length_ft 
     air_changes_per_minute: airflow_cfm / house_volume_ft3,
     target_airflow_cfm: house_volume_ft3,
     target_share_pct: 100 * airflow_cfm / house_volume_ft3,
+    // The floor-area rule fan-pad-evaporative-cooling uses (8 cfm per sq ft, NGMA) agrees with one
+    // air change per minute only at an 8 ft average height; a taller house reads a higher target
+    // here. Both are published; reported side by side since 2026-10-07.
+    floor_rule_cfm: 8 * floor_area_sqft,
+    floor_rule_share_pct: 100 * airflow_cfm / (8 * floor_area_sqft),
     mild_airflow_cfm,
     mild_share_pct: 100 * mild_airflow_cfm / airflow_cfm,
     mild_temp_share_pct: 100 * mild_temp_difference_f / design_temp_difference_f,
@@ -159,7 +164,7 @@ GREENHOUSE_RENDERERS["greenhouse-vent-area"] = _simpleRenderer({
     { key: "roof_vent_area_sqft", id: "gva-vents", label: "Vent areas", value: (r) => fmt(r.roof_vent_area_sqft, 1) + " sq ft roof, " + fmt(r.side_vent_area_sqft, 1) + " sq ft side" },
     { key: "effective_area_sqft", id: "gva-eff", label: "Effective area in series", unit: "sq ft", value: (r) => fmt(r.effective_area_sqft, 1) + " sq ft -- " + fmt(r.series_share_pct, 0) + "% of one opening, not the sum of " + fmt(r.total_vent_area_sqft, 0) },
     { key: "airflow_cfm", id: "gva-flow", label: "Buoyancy airflow", unit: "cfm", value: (r) => fmt(r.airflow_cfm, 0) + " cfm over a " + fmt(r.stack_height_ft, 1) + " ft stack" },
-    { key: "air_changes_per_minute", id: "gva-ach", label: "Air changes per minute", value: (r) => fmt(r.air_changes_per_minute, 2) + " per minute -- " + fmt(r.target_share_pct, 0) + "% of the one-per-minute summer target" },
+    { key: "air_changes_per_minute", id: "gva-ach", label: "Air changes per minute", value: (r) => fmt(r.air_changes_per_minute, 2) + " per minute -- " + fmt(r.target_share_pct, 0) + "% of the one-per-minute summer target (" + fmt(r.floor_rule_share_pct, 0) + "% of the 8 cfm per sq ft floor rule, which matches it only at an 8 ft average height)" },
     { key: "mild_airflow_cfm", id: "gva-mild", label: "On a mild morning", unit: "cfm", value: (r) => fmt(r.mild_airflow_cfm, 0) + " cfm -- " + fmt(r.mild_share_pct, 0) + "% of design, from a difference " + fmt(r.mild_temp_share_pct, 0) + "% of design" },
     { key: "note", id: "gva-note", label: "Use", value: (r) => r.note },
   ],
@@ -211,7 +216,7 @@ export function computeFanPadEvaporativeCooling({ floor_area_sqft = 0, airflow_p
 
 const fanPadExample = { floor_area_sqft: 2880, airflow_per_sqft_cfm: 8, pad_face_velocity_fpm: 250, pad_height_ft: 5, outdoor_dry_bulb_f: 95, outdoor_wet_bulb_f: 75, pad_efficiency_pct: 85, solar_gain_btuh_per_sqft: 188, latent_fraction: 0.5 };
 GREENHOUSE_RENDERERS["fan-pad-evaporative-cooling"] = _simpleRenderer({
-  citation: "Citation: pad outlet temperature = dry bulb - saturation efficiency x (dry bulb - wet bulb); pad area = airflow / face velocity, with 250 fpm the customary cellulose-pad figure and 8 cfm per square foot of floor the summer greenhouse rule; the pad-to-fan rise = sensible gain / (1.08 x airflow). Pad manufacturer saturation data and the design wet bulb for the site govern.",
+  citation: "Citation: pad outlet temperature = dry bulb - saturation efficiency x (dry bulb - wet bulb); pad area = airflow / face velocity, with 250 fpm the customary cellulose-pad figure and 8 cfm per square foot of floor the summer greenhouse rule (one air change per minute of the house volume, the other published form, matches it only at an 8 ft average height); the pad-to-fan rise = sensible gain / (1.08 x airflow). Pad manufacturer saturation data and the design wet bulb for the site govern.",
   example: fanPadExample,
   fields: [
     { key: "floor_area_sqft", label: "Floor area (sq ft)" },
