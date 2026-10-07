@@ -89,6 +89,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **`sharp` is pinned to 0.35.5 for the high-severity librsvg advisory (GHSA-wq5f-xc86-pv6w).** It reaches the dev tree through wrangler -> miniflare, which pins exactly 0.35.4. Dependabot's security update failed for that reason ("the available update path still resolves it"), and `npm audit fix --force` would have downgraded wrangler. An `overrides` entry moves it; `npm audit` reports 0 vulnerabilities, and `check-dependency-overrides` will report the pin as dead once miniflare catches up. Dev-only: nothing in the shipped site loads sharp.
+
 - **The inert-input test now also runs every select the worked examples never set** through all of its options. The six that never move an answer from the examples are each gated by another input: breaker phase in amps mode, UTM hemisphere in one direction, decibel reference outside its mode, ISO vertical openings outside classes 5-6, and the new stirrup type below 60 ksi. They are listed with reasons (147 entries in all). Seeded: dropping the ISO entry fails the test.
 
 - **`pounds-formula` now says it applies product purity as a weight fraction**, the operator-exam convention. 12.5% liquid hypochlorite sold at trade strength weighs about 20% more per pound of chlorine, and the citation now names the two tiles that work it by the gallon (`pool-chlorine-dose`, `main-disinfection-chlorine`). The math is unchanged: it is the convention the tile teaches.

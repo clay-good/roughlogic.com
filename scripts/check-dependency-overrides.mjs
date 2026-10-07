@@ -9,7 +9,11 @@
 // it to an exact `0.35.2`, so upgrading wrangler did not move it off a
 // high-severity libheif advisory; a pin to `0.35.4` was the only lever. (That
 // pin was deleted on 2026-09-24, when wrangler 4.135.0's miniflare asked for
-// 0.35.4 itself and this gate reported it inert -- the case rule B exists for.)
+// 0.35.4 itself and this gate reported it inert -- the case rule B exists for.
+// It came back on 2026-10-07 as `0.35.5`, for the high-severity librsvg advisory
+// GHSA-wq5f-xc86-pv6w: miniflare pins exactly 0.35.4, Dependabot's security
+// update could not move it, and `npm audit fix --force` would have downgraded
+// wrangler. Delete it when miniflare asks for 0.35.5 or later; rule B will say so.)
 //
 // It is also the kind of entry nobody deletes. When miniflare finally asks for
 // the patched version itself, the override stops changing anything and becomes

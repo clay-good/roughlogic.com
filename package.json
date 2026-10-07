@@ -55,5 +55,8 @@
     "data:refresh": "node scripts/build-data.mjs",
     "data:verify": "node scripts/verify-integrity.mjs",
     "clean": "node -e \"import('node:fs').then(f => f.rmSync('dist', { recursive: true, force: true }))\""
+  },
+  "overrides": {
+    "sharp": "0.35.5"
   }
 }
