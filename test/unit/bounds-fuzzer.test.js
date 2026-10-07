@@ -7894,17 +7894,23 @@ test("bounds: calc-plumbing recommendedSupplySize pins the gpm ladder boundaries
   assert.strictEqual(recommendedSupplySize(100), "2 or larger");
 });
 
-test("bounds: calc-plumbing recommendedDrainageSize pins the dfu ladder under both slope branches", () => {
-  // 1/4-in/ft branch.
-  assert.strictEqual(recommendedDrainageSize(5), "2");
-  assert.strictEqual(recommendedDrainageSize(16), "3");
-  assert.strictEqual(recommendedDrainageSize(50), "4");
-  assert.strictEqual(recommendedDrainageSize(200), "6 or larger");
-  // >= 1/2-in/ft branch.
-  assert.strictEqual(recommendedDrainageSize(5, 0.5), "2");
-  assert.strictEqual(recommendedDrainageSize(21, 0.5), "3");
-  assert.strictEqual(recommendedDrainageSize(96, 0.5), "4");
-  assert.strictEqual(recommendedDrainageSize(200, 0.5), "6 or larger");
+test("bounds: calc-plumbing recommendedDrainageSize reads IPC Table 710.1(1) at the slope, 3 in with a water closet", () => {
+  // 1/4 in/ft: 2 in carries 21 DFU, 2-1/2 in 24, 3 in 42, 4 in 216.
+  assert.strictEqual(recommendedDrainageSize(21), "2");
+  assert.strictEqual(recommendedDrainageSize(22), "2-1/2");
+  assert.strictEqual(recommendedDrainageSize(42), "3");
+  assert.strictEqual(recommendedDrainageSize(43), "4");
+  assert.strictEqual(recommendedDrainageSize(217), "5");
+  // 1/2 in/ft: 3 in carries 50, 4 in 250.
+  assert.strictEqual(recommendedDrainageSize(50, 0.5), "3");
+  assert.strictEqual(recommendedDrainageSize(51, 0.5), "4");
+  // 1/8 in/ft has no row under 3 in.
+  assert.strictEqual(recommendedDrainageSize(5, 0.125), "3");
+  // A water closet and a lavatory (4 DFU): the load allows 2 in, the 3 in outlet does not.
+  assert.strictEqual(recommendedDrainageSize(4, 0.25, false), "2");
+  assert.strictEqual(recommendedDrainageSize(4, 0.25, true), "3");
+  assert.strictEqual(recommendedDrainageSize(0), "n/a (no drainage fixtures)");
+  assert.strictEqual(recommendedDrainageSize(5, 0.3), null);
 });
 
 test("bounds: calc-plumbing computePipeSizing pins WSFU/DFU totals + ladder picks on the spec four-fixture example", () => {

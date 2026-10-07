@@ -146,6 +146,15 @@ test("PF correction: example yields kVAR in expected range", () => {
   assert.ok(r.kVAR > 50 && r.kVAR < 60);
 });
 
+test("PF correction: three phase reports the delta leg at one third of the wye leg; single phase has none", () => {
+  // 55.32 kVAR at 480 V: a delta leg carries 18.44 kVAR across 480 V, C = 18,441 / (377 x 480^2) = 212.3 uF.
+  const three = computePFCorrection({ kW: 100, pf1: 0.75, pf2: 0.95, system_V: 480, phase: "three" });
+  assert.ok(Math.abs(three.capacitance_delta_uF - 212.31) < 0.01);
+  assert.ok(Math.abs(three.capacitance_delta_uF * 3 - three.capacitance_uF) < 1e-9);
+  assert.strictEqual(computePFCorrection({ kW: 100, pf1: 0.75, pf2: 0.95, system_V: 480, phase: "single" }).capacitance_delta_uF, null);
+  assert.ok(computePFCorrection({ kW: 100, pf1: 0.75, pf2: 0.95, system_V: 480, phase: "two" }).error);
+});
+
 test("PF correction: PF1 already at target -> reject (PF2 must exceed)", () => {
   const r = computePFCorrection({ kW: 100, pf1: 0.95, pf2: 0.95, system_V: 480, phase: "three" });
   assert.ok(r.error);

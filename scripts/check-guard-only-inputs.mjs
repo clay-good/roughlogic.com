@@ -28,6 +28,7 @@
 import { readFile, readdir } from "node:fs/promises";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import { stripStringsAndComments } from "./check-dead-inputs.mjs";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -142,7 +143,8 @@ for (const file of files) {
   }
   for (const { fn, params, body } of extractFunctions(src)) {
     fnsChecked++;
-    const lines = body.split("\n");
+    // A name inside a note string or a comment is not a use (see check-dead-inputs).
+    const lines = stripStringsAndComments(body).split("\n");
     const guardIdx = guardLineIndexes(lines);
     for (const param of params) {
       checked++;

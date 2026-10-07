@@ -5270,8 +5270,8 @@
       "date": "2026-09-29"
     },
     "/tools/pf-correction/": {
-      "sha": "bb38a166ab1cd0fa",
-      "date": "2026-09-29"
+      "sha": "5f4fd0f02b25f32c",
+      "date": "2026-10-07"
     },
     "/tools/phase-balance/": {
       "sha": "a76c3df4ae1fdcac",
@@ -5386,8 +5386,8 @@
       "date": "2026-09-29"
     },
     "/tools/pipe-sizing/": {
-      "sha": "4ccaffd2c796036a",
-      "date": "2026-10-03"
+      "sha": "9e2fecf30127e625",
+      "date": "2026-10-07"
     },
     "/tools/pipe-spacing-rack/": {
       "sha": "459d59dcdd85e963",
@@ -8518,8 +8518,8 @@
       "date": "2026-09-29"
     },
     "/tools/velocity-head/": {
-      "sha": "74f2d3589f378e55",
-      "date": "2026-09-29"
+      "sha": "b6615db2772cb062",
+      "date": "2026-10-07"
     },
     "/tools/vent-sizing-stack/": {
       "sha": "7a425a68d827124a",

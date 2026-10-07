@@ -83740,7 +83740,6 @@
    "verified_on": "2026-07-03",
    "inputs": {
     "V_fps": 10,
-    "gamma": 62.4,
     "rho": 1.94
    },
    "outputs": {
@@ -83768,7 +83767,6 @@
    "verified_on": "2026-07-03",
    "inputs": {
     "V_fps": 20,
-    "gamma": 62.4,
     "rho": 1.94
    },
    "outputs": {
@@ -83796,7 +83794,6 @@
    "verified_on": "2026-09-25",
    "inputs": {
     "V_fps": 8.02,
-    "gamma": 62.4,
     "rho": 1.94
    },
    "outputs": {
@@ -83818,7 +83815,6 @@
    "verified_on": "2026-09-25",
    "inputs": {
     "V_fps": 22.7,
-    "gamma": 62.4,
     "rho": 1.94
    },
    "outputs": {

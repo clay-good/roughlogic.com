@@ -71,6 +71,16 @@ test("weld-heat-input: kJ/mm conversion and WPS range flag", () => {
   assert.ok("error" in computeWeldHeatInput({ process: "SMAW", voltage_V: 25, current_A: 200, travel_in_min: 8, efficiency: 1.5 }));
 });
 
+test("weld-heat-input: a blank efficiency takes the process k-factor; a typed one wins", () => {
+  // GTAW k = 0.6 (EN 1011-1): 60 x 12 x 150 / 4 = 27,000 J/in arc energy, 16.2 kJ/in heat input.
+  const gtaw = computeWeldHeatInput({ process: "GTAW", voltage_V: 12, current_A: 150, travel_in_min: 4 });
+  assert.strictEqual(gtaw.efficiency_used, 0.6);
+  assert.ok(near(gtaw.heat_input_kj_in, 16.2, 1e-9));
+  assert.strictEqual(computeWeldHeatInput({ process: "SAW", voltage_V: 12, current_A: 150, travel_in_min: 4, efficiency: "" }).efficiency_used, 1);
+  assert.strictEqual(computeWeldHeatInput({ process: "GTAW", voltage_V: 12, current_A: 150, travel_in_min: 4, efficiency: 0.7 }).efficiency_used, 0.7);
+  assert.ok("error" in computeWeldHeatInput({ voltage_V: 12, current_A: 150, travel_in_min: 4 }));
+});
+
 // --- E.2 metal-weight: tube area, hex area, lb<->kg ---
 test("metal-weight: tube and hex cross sections, kg round-trip", () => {
   assert.ok(near(computeMetalWeight({ shape: "round-tube", dia_in: 2, id_in: 1.5, length_in: 10, quantity: 1, density_lb_in3: 0.2836 }).cross_section_area_in2, 1.37445, 1e-4));

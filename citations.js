@@ -1892,7 +1892,7 @@ export const CITATIONS = {
     ],
   },
   "pf-correction": {
-    formula: "kVAR = kW × (tan(acos(pf₁)) − tan(acos(pf₂))); μF from Q = V² × 2π f × C at 60 Hz with three-phase Y per-leg form.",
+    formula: "kVAR = kW × (tan(acos(pf₁)) − tan(acos(pf₂))); μF from Q = V² × 2π f × C at 60 Hz; three-phase per leg, wye C = kVAR / (3 × 2π f × V_LN²) and delta C = kVAR / (3 × 2π f × V_LL²), one third of wye.",
     edition: "Classical AC theory; IEEE 141 by name.",
     freeAccess: "Principles free at IEEE-USA outreach.",
     governance: GOVERNANCE.electrical,
@@ -3822,8 +3822,8 @@ export const CITATIONS = {
   // every constant the tile applies that the user does not supply.
 
   "pipe-sizing": {
-    formula: "WSFU from UPC-style private-use fixture-unit values (above IPC Appendix E Table E103.3(2)); Hunter's Curve converts total WSFU to gpm; DFU per IPC 2021 Table 709.1; supply and drain sizes from the bundled gpm and DFU thresholds.",
-    edition: IPC_2021 + " Table 709.1 and Appendix E by name; Hunter's Curve (NBS BMS65).",
+    formula: "WSFU from UPC-style private-use fixture-unit values (above IPC Appendix E Table E103.3(2)); Hunter's Curve converts total WSFU to gpm; DFU per IPC 2021 Table 709.1; supply size from the bundled gpm thresholds; drain size is the smallest IPC 2021 Table 710.1(1) building drain that carries the DFU at the chosen slope, and 3 in minimum with a water closet (Table 709.1 outlet, 704.2).",
+    edition: IPC_2021 + " Tables 709.1 and 710.1(1) and Appendix E by name; Hunter's Curve (NBS BMS65).",
     freeAccess: ICC_FREE,
     governance: GOVERNANCE.plumbing,
     editionNote: IPC_DISCLOSURE,

@@ -93,20 +93,22 @@ export function recommendedSupplySize(gpm) {
   return "2 or larger";
 }
 
-// Drainage minimum size by total DFU (consensus engineering values).
-// dims: in { dfu: dimensionless, slope_in_per_ft: dimensionless } out: { size_in: L }
-export function recommendedDrainageSize(dfu, slope_in_per_ft = 0.25) {
-  // Slope-aware approximation; consensus values for 1/4-in/ft slope.
-  if (slope_in_per_ft >= 0.5) {
-    if (dfu <= 6) return "2";
-    if (dfu <= 21) return "3";
-    if (dfu <= 96) return "4";
-    return "6 or larger";
-  }
-  if (dfu <= 6) return "2";
-  if (dfu <= 16) return "3";
-  if (dfu <= 84) return "4";
-  return "6 or larger";
+// Drainage minimum size by total DFU: the smallest building drain in IPC 2021
+// Table 710.1(1) (SANITARY_BUILDING_DRAIN_MAX_DFU, below) that carries the load
+// at the slope, and never under 3 in when a water closet drains into it (its
+// 3 in outlet, IPC Table 709.1; no reduction in the direction of flow, 704.2).
+// Until 2026-10-07 this was an unsourced ladder (2 in to 6 DFU, 3 in to 16, 4
+// in to 84) that the sanitary-dfu tile's table contradicted, and it sized a
+// water closet and a lavatory (4 DFU) to a 2 in drain.
+// dims: in { dfu: dimensionless, slope_in_per_ft: dimensionless, has_water_closet: dimensionless } out: { size_in: L }
+export function recommendedDrainageSize(dfu, slope_in_per_ft = 0.25, has_water_closet = false) {
+  const table = SANITARY_BUILDING_DRAIN_MAX_DFU[String(Number(slope_in_per_ft))];
+  if (!table) return null;
+  if (!(dfu > 0)) return "n/a (no drainage fixtures)";
+  const sizes = Object.keys(table).map(Number).sort((a, b) => a - b);
+  const fits = sizes.find((s) => table[s] >= dfu && (!has_water_closet || s >= 3));
+  if (fits === undefined) return "larger than " + sizes[sizes.length - 1] + " (engineered)";
+  return { 1.25: "1-1/4", 1.5: "1-1/2", 2.5: "2-1/2" }[fits] || String(fits);
 }
 
 // v8 §C.2: residential fixture-list presets. Lets the renderer offer
@@ -173,12 +175,15 @@ export function computePipeSizing({ fixtures, slope_in_per_ft = 0.25 }) {
     dfu += (v.dfu || 0) * c;
   }
   const gpm = huntersFlowFromWSFU(wsfu);
+  const hasWc = (fixtures || []).some((f) => /^water_closet/.test(f.fixture) && (f.count || 1) > 0);
+  const drain = recommendedDrainageSize(dfu, slope_in_per_ft, hasWc);
+  if (drain === null) return { error: "Drain slope must be 1/8 (0.125), 1/4 (0.25), or 1/2 (0.5) in per ft." };
   return {
     total_wsfu: wsfu,
     total_dfu: dfu,
     estimated_demand_gpm: gpm,
     recommended_supply_size: recommendedSupplySize(gpm),
-    recommended_drainage_size: recommendedDrainageSize(dfu, slope_in_per_ft),
+    recommended_drainage_size: drain,
   };
 }
 
@@ -404,6 +409,7 @@ export function renderPipeSizing(inputRegion, outputRegion, citationEl) {
     rows.push({ key: f, input: inp });
   }
   const slope = makeSelect("Drain slope", "ps-slope", [
+    { value: "0.125", label: "1/8 in per ft" },
     { value: "0.25", label: "1/4 in per ft", selected: true },
     { value: "0.5", label: "1/2 in per ft" },
   ]);
@@ -427,7 +433,7 @@ export function renderPipeSizing(inputRegion, outputRegion, citationEl) {
     oGPM.textContent = fmt(r.estimated_demand_gpm, 1) + " gpm";
     oSup.textContent = r.recommended_supply_size + "\"";
     oDFU.textContent = fmt(r.total_dfu, 1);
-    oDr.textContent = r.recommended_drainage_size + "\"";
+    oDr.textContent = /^[\d/-]+$/.test(r.recommended_drainage_size) ? r.recommended_drainage_size + "\"" : r.recommended_drainage_size;
   }, DEBOUNCE_MS);
   for (const r of rows) r.input.addEventListener("input", update);
   slope.select.addEventListener("input", update);
@@ -4284,8 +4290,8 @@ PLUMBING_RENDERERS["specific-energy"] = _v637renderSpecificEnergy;
 // expose: the velocity head and dynamic pressure (v371), the continuity velocity
 // at a pipe size change (v372), and the Bernoulli total head (v373).
 
-// dims: in { V_fps: L T^-1, gamma: M L^-2 T^-2, rho: M L^-3 } out: { h_v_ft: L, q_psf: M L^-1 T^-2, q_psi: M L^-1 T^-2 }
-export function computeVelocityHead({ V_fps = 0, gamma = 62.4, rho = 1.94 } = {}) {
+// dims: in { V_fps: L T^-1, rho: M L^-3 } out: { h_v_ft: L, q_psf: M L^-1 T^-2, q_psi: M L^-1 T^-2 }
+export function computeVelocityHead({ V_fps = 0, rho = 1.94 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const V = Number(V_fps) || 0;
   const r = Number(rho) > 0 ? Number(rho) : 1.94;
@@ -4295,10 +4301,10 @@ export function computeVelocityHead({ V_fps = 0, gamma = 62.4, rho = 1.94 } = {}
   const q_psi = q_psf / 144;
   return {
     h_v_ft, q_psf, q_psi,
-    note: "Velocity head h_v = V^2 / (2g) is the kinetic energy of the flow expressed as feet of fluid, and the dynamic pressure q = 1/2 rho V^2 is that energy as a pressure. Both scale with the square of velocity, so doubling the velocity quadruples the head and pressure - the reason a small velocity increase drives large minor (fitting) losses and erosion, and why plumbing codes cap water velocity around 5-8 ft/s. Water defaults: rho 1.94 slug/ft^3, gamma 62.4 lb/ft^3. A design aid; the code velocity limits and the engineer of record govern.",
+    note: "Velocity head h_v = V^2 / (2g) is the kinetic energy of the flow expressed as feet of fluid, and the dynamic pressure q = 1/2 rho V^2 is that energy as a pressure. Both scale with the square of velocity, so doubling the velocity quadruples the head and pressure - the reason a small velocity increase drives large minor (fitting) losses and erosion, and why plumbing codes cap water velocity around 5-8 ft/s. Water default: rho 1.94 slug/ft^3. A design aid; the code velocity limits and the engineer of record govern.",
   };
 }
-export const velocityHeadExample = { inputs: { V_fps: 10, gamma: 62.4, rho: 1.94 } };
+export const velocityHeadExample = { inputs: { V_fps: 10, rho: 1.94 } };
 function _v371renderVelocityHead(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: velocity head h_v = V^2/(2g) (g = 32.2 ft/s^2) and dynamic pressure q = 1/2 rho V^2, first-principles fluid mechanics. Both scale with V^2. The code velocity limits (~5-8 ft/s water) and the engineer of record govern.";
   const V = makeNumber("Flow velocity (ft/s)", "vh-v", { step: "any", min: "0" });

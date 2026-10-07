@@ -3941,7 +3941,12 @@ CONSTRUCTION_RENDERERS["beam-reactions"] = renderBeamReactions;
 // efficiency factor; the optional WPS range (kJ/in) is checked against it.
 // The EN 1011-1 heat input multiplies by the process k-factor eta (default
 // by process, user-editable) and is reported separately.
-// dims: in { voltage_V: M L^2 T^-3 I^-1, current_A: I, travel_in_min: L T^-1, efficiency: dimensionless, wps_min_kj_in: M L T^-2, wps_max_kj_in: M L T^-2 } out: { arc_energy_j_in: M L T^-2, arc_energy_kj_in: M L T^-2, heat_input_kj_in: M L T^-2, heat_input_kj_mm: M L T^-2 }
+// EN 1011-1 / ISO/TR 17671 thermal efficiency (k) by process; a blank efficiency
+// takes the process value. Until 2026-10-07 the process was read only by the
+// page, which copied it into the efficiency box, so a caller that named a
+// process and left efficiency out got an error instead of the k-factor.
+export const WELD_ETA_BY_PROCESS = { SMAW: 0.8, GMAW: 0.8, FCAW: 0.8, GTAW: 0.6, SAW: 1.0 };
+// dims: in { voltage_V: M L^2 T^-3 I^-1, current_A: I, travel_in_min: L T^-1, efficiency: dimensionless, wps_min_kj_in: M L T^-2, wps_max_kj_in: M L T^-2 } out: { arc_energy_j_in: M L T^-2, arc_energy_kj_in: M L T^-2, heat_input_kj_in: M L T^-2, heat_input_kj_mm: M L T^-2, efficiency_used: dimensionless }
 export function computeWeldHeatInput({ process, voltage_V, current_A, travel_in_min, efficiency, wps_min_kj_in, wps_max_kj_in } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const V = Number(voltage_V) || 0;
@@ -3950,7 +3955,10 @@ export function computeWeldHeatInput({ process, voltage_V, current_A, travel_in_
   if (!(V > 0)) return { error: "Voltage must be greater than zero." };
   if (!(I > 0)) return { error: "Current must be greater than zero." };
   if (!(TS > 0)) return { error: "Travel speed must be greater than zero." };
-  const eta = efficiency > 0 && efficiency <= 1 ? efficiency : null;
+  const blankEta = efficiency == null || efficiency === "";
+  if (blankEta && !(process in WELD_ETA_BY_PROCESS)) return { error: "Enter an arc efficiency, or a process (SMAW, GMAW, FCAW, GTAW, SAW) to take its EN 1011-1 k-factor." };
+  const etaIn = blankEta ? WELD_ETA_BY_PROCESS[process] : Number(efficiency);
+  const eta = etaIn > 0 && etaIn <= 1 ? etaIn : null;
   if (eta === null) return { error: "Efficiency must be between 0 and 1." };
   const arc_energy_j_in = (60 * V * I) / TS;
   const arc_energy_kj_in = arc_energy_j_in / 1000;
@@ -3970,6 +3978,7 @@ export function computeWeldHeatInput({ process, voltage_V, current_A, travel_in_
     heat_input_kj_in: Number.isFinite(heat_input_kj_in) ? heat_input_kj_in : null,
     heat_input_kj_mm: Number.isFinite(heat_input_kj_mm) ? heat_input_kj_mm : null,
     pass,
+    efficiency_used: eta,
     note: "The WPS check uses the arc energy 60VI/S with no efficiency factor, the heat input as ASME IX QW-409.1 and AWS D1.1 define it. The efficiency-reduced figure is the EN 1011-1 heat input (process k-factor, user-editable) and is not the basis of an AWS/ASME WPS range. WPS/PQR ranges are user-supplied; the adopted code edition and the qualified WPS govern.",
   };
 }
@@ -3977,7 +3986,6 @@ export const weldHeatInputExample = { inputs: { process: "SMAW", voltage_V: 25, 
 
 function renderWeldHeatInput(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Per AWS D1.1 Structural Welding Code and ASME BPVC Section IX QW-409.1, the heat-input definition HI = (60 * V * I) / TS with no efficiency factor, by name; the WPS range is checked against that arc energy. The arc-efficiency (k) factor by process is EN 1011-1 / ISO/TR 17671 and applies only to the separate EN 1011-1 heat-input figure. WPS/PQR ranges are user-supplied; the adopted code edition and the qualified WPS govern. Free overviews at aws.org.";
-  const ETA_BY_PROCESS = { SMAW: 0.8, GMAW: 0.8, FCAW: 0.8, GTAW: 0.6, SAW: 1.0 };
   const proc = makeSelect("Process", "whi-proc", [
     { value: "SMAW", label: "SMAW" }, { value: "GMAW", label: "GMAW" },
     { value: "FCAW", label: "FCAW" }, { value: "GTAW", label: "GTAW" }, { value: "SAW", label: "SAW" },
@@ -3990,7 +3998,7 @@ function renderWeldHeatInput(inputRegion, outputRegion, citationEl) {
   const wmin = makeNumber("WPS min (kJ/in, optional)", "whi-min", { step: "any", min: "0" });
   const wmax = makeNumber("WPS max (kJ/in, optional)", "whi-max", { step: "any", min: "0" });
   for (const f of [proc, volt, cur, ts, eff, wmin, wmax]) inputRegion.appendChild(f.wrap);
-  proc.select.addEventListener("input", () => { eff.input.value = String(ETA_BY_PROCESS[proc.select.value]); update(); });
+  proc.select.addEventListener("input", () => { eff.input.value = String(WELD_ETA_BY_PROCESS[proc.select.value]); update(); });
   attachExampleButton(inputRegion, () => { proc.select.value = "SMAW"; volt.input.value = "25"; cur.input.value = "200"; ts.input.value = "8"; eff.input.value = "0.8"; wmin.input.value = ""; wmax.input.value = ""; update(); });
   const oArc = makeOutputLine(outputRegion, "Arc energy (ASME IX / AWS D1.1 heat input)", "whi-out-arc");
   const oHi = makeOutputLine(outputRegion, "EN 1011-1 heat input (k-factor)", "whi-out-hi");
@@ -4002,7 +4010,7 @@ function renderWeldHeatInput(inputRegion, outputRegion, citationEl) {
       voltage_V: readNum(volt.input),
       current_A: readNum(cur.input),
       travel_in_min: readNum(ts.input),
-      efficiency: readNum(eff.input),
+      efficiency: eff.input.value === "" ? null : readNum(eff.input),
       wps_min_kj_in: wmin.input.value === "" ? null : readNum(wmin.input),
       wps_max_kj_in: wmax.input.value === "" ? null : readNum(wmax.input),
     });

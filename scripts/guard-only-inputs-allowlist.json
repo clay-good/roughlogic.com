@@ -17,7 +17,7 @@
       "module": "calc-kitchen.js",
       "fn": "computeSousVidePasteurization",
       "param": "initial_temperature_F",
-      "justification": "Validates the start is below the bath temperature (a real physical constraint). Come-up time uses the cited Fo~0.4 fixed-fractional-approach model calibrated to a refrigerated start, so the value does not drive come-up; label clarified 2026-07-18 to state the refrigerated-start assumption. Changing the food-safety model requires authoritative validation, not a code tweak."
+      "justification": "Validates the start is below the bath temperature (a real physical constraint). Come-up time is the one-term slab solution to a fixed 99.5% approach of the start-to-bath gap (Fo = 2.245, since 2026-09-19; this entry cited the retired Fo~0.4 model until 2026-10-07), and a fractional approach is independent of the start temperature by construction; the label states the refrigerated-start assumption. A fixed-degree approach would make the start live, but changing the food-safety model requires authoritative validation, not a code tweak."
     },
     {
       "module": "calc-masonry.js",

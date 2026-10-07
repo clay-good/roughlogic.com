@@ -1521,7 +1521,7 @@ export const bendRadiusExample = {
 
 // --- Utility 127: Power Factor Correction Capacitor ---
 
-// dims: in { kW: M L^2 T^-3, pf1: dimensionless, pf2: dimensionless, system_V: M L^2 T^-3 I^-1, phase: dimensionless } out: { kvar: M L^2 T^-3, capacitor_uF: T^4 I^2 M^-1 L^-2 }
+// dims: in { kW: M L^2 T^-3, pf1: dimensionless, pf2: dimensionless, system_V: M L^2 T^-3 I^-1, phase: dimensionless } out: { kvar: M L^2 T^-3, capacitor_uF: T^4 I^2 M^-1 L^-2, capacitance_delta_uF: T^4 I^2 M^-1 L^-2 }
 export function computePFCorrection({ kW, pf1, pf2, system_V, phase = "single" }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(kW > 0)) return { error: "Real power must be positive." };
@@ -1531,18 +1531,25 @@ export function computePFCorrection({ kW, pf1, pf2, system_V, phase = "single" }
   const tan1 = Math.tan(Math.acos(pf1));
   const tan2 = Math.tan(Math.acos(pf2));
   const kVAR = kW * (tan1 - tan2);
-  // Capacitance from Q = V^2 * 2*pi*f*C; for three-phase use line-to-line and
-  // factor of three across legs (per-leg C = kVAR_total / (3 * 2*pi*f * V_LN^2)).
+  // Capacitance from Q = V^2 * 2*pi*f*C. A wye leg sees V_LN and carries a
+  // third of the kVAR: C = kVAR / (3 * 2*pi*f * V_LN^2), which is algebraically
+  // the single-phase C = kVAR / (2*pi*f * V^2) at V_LL. A delta leg sees the
+  // full V_LL and also carries a third: C = kVAR / (3 * 2*pi*f * V_LL^2), one
+  // third of the wye figure. Until 2026-10-07 the three-phase choice returned
+  // only the wye value, so the Phase select changed nothing, and a delta bank
+  // (the usual 480 V construction) read three times the capacitance it needs.
   const f = 60;
   const omega = 2 * Math.PI * f;
-  let C_uF;
+  if (phase !== "single" && phase !== "three") return { error: "Phase must be single or three." };
+  let C_uF, C_delta_uF = null;
   if (phase === "three") {
     const V_LN = system_V / Math.sqrt(3);
     C_uF = (kVAR * 1000) / (3 * omega * V_LN * V_LN) * 1e6;
+    C_delta_uF = (kVAR * 1000) / (3 * omega * system_V * system_V) * 1e6;
   } else {
     C_uF = (kVAR * 1000) / (omega * system_V * system_V) * 1e6;
   }
-  return { kVAR, capacitance_uF: C_uF };
+  return { kVAR, capacitance_uF: C_uF, capacitance_delta_uF: C_delta_uF };
 }
 
 export const pfCorrectionExample = {
@@ -1890,6 +1897,7 @@ function renderPFCorrection(inputRegion, outputRegion, citationEl, params) {
 
   const oQ = makeOutputLine(outputRegion, "Required kVAR", "pfc-out-q");
   const oC = makeOutputLine(outputRegion, "Capacitance per leg", "pfc-out-c");
+  const oCd = makeOutputLine(outputRegion, "Capacitance per leg, delta-connected", "pfc-out-cd");
 
   function fillExample(x) { kW.input.value = x.kW; pf1.input.value = x.pf1; pf2.input.value = x.pf2; v.input.value = x.system_V; phase.select.value = x.phase; update(); }
   const update = debounce(() => {
@@ -1900,9 +1908,10 @@ function renderPFCorrection(inputRegion, outputRegion, citationEl, params) {
       system_V: Number(v.input.value) || 0,
       phase: phase.select.value,
     });
-    if (r.error) { oQ.textContent = r.error; oC.textContent = "-"; return; }
+    if (r.error) { oQ.textContent = r.error; oC.textContent = "-"; oCd.textContent = "-"; return; }
     oQ.textContent = fmt(r.kVAR, 2) + " kVAR";
-    oC.textContent = fmt(r.capacitance_uF, 2) + " uF";
+    oC.textContent = fmt(r.capacitance_uF, 2) + " uF" + (r.capacitance_delta_uF == null ? "" : " (wye)");
+    oCd.textContent = r.capacitance_delta_uF == null ? "n/a (single phase)" : fmt(r.capacitance_delta_uF, 2) + " uF (delta)";
   }, DEBOUNCE_MS);
   for (const el of [kW.input, pf1.input, pf2.input, v.input, phase.select]) el.addEventListener("input", update);
 }

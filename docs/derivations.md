@@ -3094,7 +3094,7 @@ cross-check.
 | calc-plumbing.js | `computeTrapPrimer` | `{ floor_drain_count = 0, zone = "occupied", prime_method = "electronic", prim...` | _ | _ | _ |
 | calc-plumbing.js | `computeTrapSealLoss` | `{ developed_distance_ft = 0, table_max_ft = 0, trap_seal_in = 2 } = {}` | _ | _ | _ |
 | calc-plumbing.js | `computeTrapezoidalChannelFlow` | `{ bottom_width_ft = 0, side_slope_z = 2, depth_ft = 0, n = 0.03, s_slope = 0 ...` | _ | _ | _ |
-| calc-plumbing.js | `computeVelocityHead` | `{ V_fps = 0, gamma = 62.4, rho = 1.94 } = {}` | _ | _ | _ |
+| calc-plumbing.js | `computeVelocityHead` | `{ V_fps = 0, rho = 1.94 } = {}` | _ | _ | _ |
 | calc-plumbing.js | `computeVentSizingStack` | `{ vent_dia_in = 0, connected_dfu = 0, developed_length_ft = 0, table_dfu = 0,...` | _ | _ | _ |
 | calc-plumbing.js | `computeWaterHammerArrestor` | `{ wsfu, length_ft = 0, internal_diameter_in = 0, system_pressure_psi = 0 }` | _ | _ | _ |
 | calc-plumbing.js | `computeWaterHammerSurge` | `{ material = "copper", pipe_size = "1", velocity_fps = 0, closure_time_s = 0,...` | _ | _ | _ |
@@ -3105,7 +3105,7 @@ cross-check.
 | calc-plumbing.js | `computeWhExpansionTank` | `{ water_heater_vol_gal = 0, incoming_psi = 60, relief_psi = 150, incoming_F =...` | _ | _ | _ |
 | calc-plumbing.js | `computeWsfuDemand` | `{ wsfu, system_type = "flush_tank", curve = null } = {}` | _ | _ | _ |
 | calc-plumbing.js | `pressureConvert` | `{ value, from, to }` | _ | _ | _ |
-| calc-plumbing.js | `recommendedDrainageSize` | `dfu, slope_in_per_ft = 0.25` | _ | _ | _ |
+| calc-plumbing.js | `recommendedDrainageSize` | `dfu, slope_in_per_ft = 0.25, has_water_closet = false` | _ | _ | _ |
 | calc-plumbing.js | `recommendedSupplySize` | `gpm` | _ | _ | _ |
 | calc-plumbing.js | `renderBackflow` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-plumbing.js | `renderBackflowLoss` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |

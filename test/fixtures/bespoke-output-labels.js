@@ -628,7 +628,7 @@ export const BESPOKE_OUTPUT_LABELS = {
   "per-diem-interest": {"daily_interest":"Daily interest","days_to_eom":"Days to end of month","prepaid_interest":"Prepaid interest at closing"},
   "periodic-element": {"electronegativity_pauling":"Electronegativity (Pauling)","electron_configuration":"Electron configuration","oxidation_states":"Common oxidation states"},
   "pex-homerun-takeoff": {"total_ports":"Manifold ports","tubing_lf":"PEX tubing"},
-  "pf-correction": {"kVAR":"Required kVAR","capacitance_uF":"Capacitance per leg"},
+  "pf-correction": {"kVAR":"Required kVAR","capacitance_uF":"Capacitance per leg","capacitance_delta_uF":"Capacitance per leg, delta-connected"},
   "phase-balance": {"totals":"Per-phase totals (A/B/C)","imbalance_percent":"Initial imbalance","final_imbalance_percent":"After swaps","swaps":"Suggested swaps"},
   "pid-tuning-ziegler-nichols": {"proportional_band_pct":"Proportional band"},
   "pipe-bedding-backfill": {"bedding_cy":"Bedding stone","embedment_cy":"Embedment (pipe-zone) aggregate","backfill_cy":"Backfill above pipe"},

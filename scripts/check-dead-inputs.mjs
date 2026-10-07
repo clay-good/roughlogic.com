@@ -67,7 +67,43 @@ function destructuredNames(paramBlock) {
   return names;
 }
 
-function findings(source) {
+// Blank out comments and the text of string literals (a template literal's
+// `${...}` expressions are kept, since they are code). A parameter named only
+// inside a note string is still a control the math ignores: on 2026-10-07
+// velocity-head's `gamma` and weld-heat-input's `process` both passed this
+// gate because their notes said "gamma 62.4 lb/ft^3" and "process k-factor".
+export function stripStringsAndComments(src) {
+  let out = "", i = 0;
+  const n = src.length;
+  while (i < n) {
+    const c = src[i], d = src[i + 1];
+    if (c === "/" && d === "/") { while (i < n && src[i] !== "\n") i++; continue; }
+    if (c === "/" && d === "*") { i += 2; while (i < n && !(src[i] === "*" && src[i + 1] === "/")) i++; i += 2; continue; }
+    if (c === '"' || c === "'") {
+      out += c; i++;
+      while (i < n && src[i] !== c && src[i] !== "\n") { if (src[i] === "\\") i++; i++; }
+      out += c; i++; continue;
+    }
+    if (c === "`") {
+      out += "`"; i++;
+      while (i < n && src[i] !== "`") {
+        if (src[i] === "\\") { i += 2; continue; }
+        if (src[i] === "$" && src[i + 1] === "{") {
+          out += "$"; i++;
+          let depth = 0;
+          do { if (src[i] === "{") depth++; else if (src[i] === "}") depth--; out += src[i]; i++; } while (i < n && depth > 0);
+          continue;
+        }
+        i++;
+      }
+      out += "`"; i++; continue;
+    }
+    out += c; i++;
+  }
+  return out;
+}
+
+export function findings(source) {
   const out = [];
   // `export function NAME ( { ...params } )` -- the destructured first param
   // may span lines; capture up to the closing brace of the pattern.
@@ -86,7 +122,7 @@ function findings(source) {
       else if (c === "}") { depth--; if (depth === 0) { end = i; break; } }
     }
     if (end < 0) continue;
-    const body = source.slice(bodyStart + 1, end);
+    const body = stripStringsAndComments(source.slice(bodyStart + 1, end));
     for (const name of params) {
       const wre = new RegExp("\\b" + name.replace(/\$/g, "\\$") + "\\b", "g");
       if (!(body.match(wre) || []).length) out.push({ fnName, name });
@@ -181,7 +217,9 @@ async function main() {
     `(budget ${UNCHECKED_WITH_INPUTS}) -- ${namedParamComputes.join(", ")}.`);
 }
 
-main().catch((e) => {
-  console.error("check-dead-inputs: unexpected error", e);
-  process.exit(1);
-});
+if (resolve(process.argv[1] || "") === fileURLToPath(import.meta.url)) {
+  main().catch((e) => {
+    console.error("check-dead-inputs: unexpected error", e);
+    process.exit(1);
+  });
+}
