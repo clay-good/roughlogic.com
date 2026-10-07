@@ -143,3 +143,15 @@ test("C.6 air-mover placement_note guidance is non-empty", () => {
   const r = computeAirMovers({ affected_area_ft2: 200, water_class: "2" });
   assert.ok(r.placement_note && r.placement_note.length > 20);
 });
+
+test("refrigerant-pt and superheat-subcool read the charging tile's psia table past their own rows, and never extrapolate", async () => {
+  const m = await import("../../calc-refrigerant.js");
+  for (const [ref, psig] of [["R-22", 300], ["R-410A", 450], ["R-410A", 20], ["R-32", 400], ["R-134a", 200]]) {
+    const pt = m.computeRefrigerantPT({ refrigerant: ref, pressure_psig: psig }).saturated_temperature_F;
+    const chg = m.computeRefrigerantCharging({ refrigerant: ref.replace("-", "_"), suction_pressure: psig, suction_unit: "psig", suction_line_temp_F: 200, liquid_pressure: psig, liquid_unit: "psig", liquid_line_temp_F: 0 });
+    assert.ok(Math.abs(pt - chg.T_sat_liquid_F) < 1e-9, `${ref} ${psig} psig: ${pt} vs ${chg.T_sat_liquid_F}`);
+  }
+  assert.ok(m.computeRefrigerantPT({ refrigerant: "R-134a", pressure_psig: 450 }).error);
+  assert.ok(m.computeSuperheatSubcool({ refrigerant: "R-404A", system_pressure_psig: 400, line_temperature_F: 100, mode: "subcool" }).error);
+  assert.equal(m.computeRefrigerantPT({ refrigerant: "R-410A", pressure_psig: 118 }).saturated_temperature_F, 40);
+});

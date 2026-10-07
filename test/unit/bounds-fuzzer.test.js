@@ -35983,17 +35983,18 @@ import { computePortableLadderSetup as _v1156 } from "../../calc-safety.js";
 test("bounds: spec-v1156 computePortableLadderSetup pins the rail budget, the extension alternative, the rung window, and error seams", () => {
   const base = { ladder_length_ft: 24, landing_height_ft: 22, extension_above_landing_ft: 3, rung_spacing_in: 12, clear_width_in: 12, secured_with_grasping_device: "no", base_ratio: 4 };
   const r = _v1156(base);
-  assert.ok(r.extension_ok && !r.extension_by_alternative && r.base_setback_ft === 5.5);
-  assert.ok(Math.abs(r.rail_used_total_ft - 25.769410) < 1e-5 && !r.length_ok);
-  assert.ok(Math.abs(r.length_short_ft - 1.769410) < 1e-5 && !r.passes);
+  // OSHA 1926.1053(b)(5)(i): the foot is out a quarter of the working length, so W = H / sqrt(1 - 1/16).
+  assert.ok(r.extension_ok && !r.extension_by_alternative && Math.abs(r.base_setback_ft - 22 / Math.sqrt(15)) < 1e-12);
+  assert.ok(Math.abs(r.rail_used_total_ft - 25.819889) < 1e-5 && !r.length_ok);
+  assert.ok(Math.abs(r.length_short_ft - 1.819889) < 1e-5 && !r.passes);
   // THE LABEL LIE: the reachable landing depends only on the ladder and the ratio.
-  assert.ok(Math.abs(r.max_landing_served_ft - 20.283420) < 1e-5);
+  assert.ok(Math.abs(r.max_landing_served_ft - 20.237900) < 1e-5);
   for (const H of [10, 18, 22, 30]) {
     const t = _v1156({ ...base, landing_height_ft: H });
     assert.ok(Math.abs(t.max_landing_served_ft - r.max_landing_served_ft) < 1e-9, "the ceiling does not move with the attempt");
     // Geometry identities.
-    const f = Math.sqrt(1 + 1 / 16);
-    assert.ok(Math.abs(t.base_setback_ft - H / 4) < 1e-12);
+    const f = 1 / Math.sqrt(1 - 1 / 16);
+    assert.ok(Math.abs(t.base_setback_ft - H * f / 4) < 1e-12);
     assert.ok(Math.abs(t.rail_used_to_landing_ft - H * f) < 1e-9);
     assert.ok(Math.abs(t.rail_used_total_ft - (H + 3) * f) < 1e-9);
     assert.ok(t.length_ok === (t.rail_used_total_ft <= 24 + 1e-12));
@@ -58265,4 +58266,16 @@ test("bounds: spec-v1925 computePipeFreezeTime pins onset and solid freeze, insu
   assert.ok("error" in _v1925({ ...base, water_start_degf: 32 }));
   assert.ok("error" in _v1925({ ...base, water_start_degf: 20 }));
   assert.ok("error" in _v1925({ ...base, space_degf: -Infinity }));
+});
+
+test("multi-motor-feeder: a largest branch device on a smaller motor leaves the largest motor among the others (430.62(A))", async () => {
+  const { computeMultiMotorFeeder } = await import("../../calc-motor.js");
+  const { computeMotorFeederMultiple } = await import("../../calc-feeder.js");
+  const r = computeMultiMotorFeeder({ largest_flc_a: 28, sum_other_flc_a: 16, largest_branch_ocpd_a: 60, ocpd_motor_flc_a: 16 });
+  const twin = computeMotorFeederMultiple({ motors: [{ flc_A: 28, branch_device_A: 40 }, { flc_A: 16, branch_device_A: 60 }] });
+  assert.equal(r.max_feeder_ocpd_a, 88);
+  assert.equal(r.max_feeder_ocpd_a, twin.feeder_ocpd_raw_A);
+  assert.equal(r.standard_feeder_ocpd_a, twin.feeder_ocpd_max_A);
+  assert.equal(computeMultiMotorFeeder({ largest_flc_a: 28, sum_other_flc_a: 26, largest_branch_ocpd_a: 70 }).max_feeder_ocpd_a, 96);
+  assert.ok(computeMultiMotorFeeder({ largest_flc_a: 28, sum_other_flc_a: 16, largest_branch_ocpd_a: 60, ocpd_motor_flc_a: 40 }).error);
 });

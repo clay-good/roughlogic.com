@@ -97385,9 +97385,9 @@
    "source_publisher": "Occupational Safety and Health Administration",
    "source_title": "29 CFR 1926.1053 -- a 24 ft ladder does not reach a 22 ft roof (spec-v1156)",
    "source_edition_or_year": "29 CFR 1926.1053",
-   "source_section_or_page": "'When portable ladders are used for access to an upper landing surface, the ladder side rails shall extend at least 3 feet above the upper landing surface.' At a 4:1 setup the rail consumed per foot of height is sqrt(1 + 1/16) = 1.030776 ft, so a 22 ft landing takes 22.677 ft of rail and the required 3 ft extension takes 3.092 more -- 25.769 ft against a 24 ft ladder, short by 1.769 ft. The highest landing that ladder serves with the extension still above it is 20.283 ft. The number on the side of a ladder is rail length, not working height.",
+   "source_section_or_page": "'When portable ladders are used for access to an upper landing surface, the ladder side rails shall extend at least 3 feet above the upper landing surface.' At the 4:1 setup (the foot out a quarter of the working length, 1926.1053(b)(5)(i)) the rail consumed per foot of height is 1/sqrt(1 - 1/16) = 1.032796 ft, so a 22 ft landing takes 22.722 ft of rail and the required 3 ft extension takes 3.098 more -- 25.820 ft against a 24 ft ladder, short by 1.820 ft. The highest landing that ladder serves with the extension still above it is 20.238 ft. The number on the side of a ladder is rail length, not working height.",
    "verified_by": "rl",
-   "verified_on": "2026-07-28",
+   "verified_on": "2026-10-07",
    "inputs": {
     "ladder_length_ft": 24,
     "landing_height_ft": 22,
@@ -97399,31 +97399,31 @@
    },
    "outputs": {
     "base_setback_ft": {
-     "value": 5.5,
+     "value": 5.680376,
      "tolerance": {
       "abs": 0.0001
      }
     },
     "rail_used_to_landing_ft": {
-     "value": 22.677081,
+     "value": 22.721502,
      "tolerance": {
       "abs": 0.0001
      }
     },
     "rail_used_total_ft": {
-     "value": 25.76941,
+     "value": 25.819889,
      "tolerance": {
       "abs": 0.0001
      }
     },
     "length_short_ft": {
-     "value": 1.76941,
+     "value": 1.819889,
      "tolerance": {
       "abs": 0.0001
      }
     },
     "max_landing_served_ft": {
-     "value": 20.28342,
+     "value": 20.2379,
      "tolerance": {
       "abs": 0.0001
      }
@@ -97435,9 +97435,9 @@
    "source_publisher": "Occupational Safety and Health Administration",
    "source_title": "cross-check: the same ladder reaches an 18 ft landing with rail to spare",
    "source_edition_or_year": "29 CFR 1926.1053",
-   "source_section_or_page": "Dropping the landing to 18 ft takes 18.554 ft of rail plus the same 3.092 ft of extension, 21.646 ft total against the 24 ft ladder -- it reaches. The highest landing served is unchanged at 20.283 ft, because that figure depends only on the ladder and the setup ratio, not on the landing being attempted. The four-foot gap between the label and the working height is entirely setback and extension.",
+   "source_section_or_page": "Dropping the landing to 18 ft takes 18.590 ft of rail plus the same 3.098 ft of extension, 21.689 ft total against the 24 ft ladder -- it reaches. The highest landing served is unchanged at 20.238 ft, because that figure depends only on the ladder and the setup ratio, not on the landing being attempted. The four-foot gap between the label and the working height is entirely setback and extension.",
    "verified_by": "rl",
-   "verified_on": "2026-07-28",
+   "verified_on": "2026-10-07",
    "inputs": {
     "ladder_length_ft": 24,
     "landing_height_ft": 18,
@@ -97449,13 +97449,13 @@
    },
    "outputs": {
     "base_setback_ft": {
-     "value": 4.5,
+     "value": 4.64758,
      "tolerance": {
       "abs": 0.0001
      }
     },
     "rail_used_total_ft": {
-     "value": 21.646305,
+     "value": 21.688707,
      "tolerance": {
       "abs": 0.0001
      }
@@ -97467,7 +97467,7 @@
      }
     },
     "max_landing_served_ft": {
-     "value": 20.28342,
+     "value": 20.2379,
      "tolerance": {
       "abs": 0.0001
      }

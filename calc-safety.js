@@ -101,7 +101,7 @@ export function computePortableLadderSetup({ ladder_length_ft = 0, landing_heigh
   if (ext < 0) return { error: "Extension above the landing cannot be negative (ft)." };
   if (!(rs > 0)) return { error: "Rung spacing must be positive (in)." };
   if (!(cw > 0)) return { error: "Clear width between side rails must be positive (in)." };
-  if (!(ratio > 0)) return { error: "The base ratio must be positive (4 for the 4:1 rule)." };
+  if (!(ratio > 1)) return { error: "The base ratio must be greater than 1 (4 for the 4:1 rule)." };
 
   const REQ_EXT = 3, RUNG_MIN = 10, RUNG_MAX = 14, WIDTH_MIN = 11.5;
   // Extension: required unless secured at the top with a grasping device.
@@ -110,10 +110,12 @@ export function computePortableLadderSetup({ ladder_length_ft = 0, landing_heigh
   const extension_shortfall_ft = Math.max(0, REQ_EXT - ext);
 
   // The reach arithmetic nobody does: setback and extension both eat the ladder.
-  // A ladder at a b:1 ratio has its top at H, so its length along the rail is
-  // sqrt(H^2 + (H/ratio)^2) = H sqrt(1 + 1/ratio^2).
-  const railPerFootOfHeight = Math.sqrt(1 + 1 / (ratio * ratio));
-  const base_setback_ft = H / ratio;
+  // OSHA 1926.1053(b)(5)(i) sets the foot out one quarter of the WORKING LENGTH (along the rail),
+  // as ladder-angle has read it since 2026-09-19. With rail length W to the landing, W^2 = H^2 +
+  // (W/ratio)^2, so W = H / sqrt(1 - 1/ratio^2). Until 2026-10-07 this took a quarter of the
+  // HEIGHT (rise:run 4:1), 5.50 ft for a 22 ft landing where the rule gives 5.68.
+  const railPerFootOfHeight = 1 / Math.sqrt(1 - 1 / (ratio * ratio));
+  const base_setback_ft = H * railPerFootOfHeight / ratio;
   const rail_used_to_landing_ft = H * railPerFootOfHeight;
   const rail_used_total_ft = rail_used_to_landing_ft + REQ_EXT * railPerFootOfHeight;
   const length_ok = rail_used_total_ft <= L + 1e-9 * Math.abs(L);

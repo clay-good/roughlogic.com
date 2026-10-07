@@ -252,3 +252,15 @@ test("pipe-sizing: a flush-valve water closet takes the flush-valve column, and 
   assert.equal(tank.estimated_demand_gpm, 43.5);
   assert.equal(tank.estimated_demand_gpm, m.computeWsfuDemand({ wsfu: 100 }).gpm);
 });
+
+test("friction-loss: a nominal size takes the chosen material's bore, as pipe-velocity does", async () => {
+  const m = await import("../../calc-plumbing.js");
+  const run = (material) => m.computeFrictionLoss({ method: "hazen-williams", material, nominal_size: "1", length_ft: 100, flow_gpm: 10 });
+  assert.equal(run("PVC").internal_diameter_in, 1.049);
+  assert.equal(run("copper").internal_diameter_in, 1.025);
+  const pex = run("pex");
+  assert.equal(pex.internal_diameter_in, 0.863);
+  assert.ok(Math.abs(pex.velocity_ft_s - 10 * 0.4085 / 0.863 ** 2) < 1e-12);
+  assert.match(pex.velocity_flag, /noise/);
+  assert.ok(run("pex").error === undefined && m.computeFrictionLoss({ method: "hazen-williams", material: "pex", nominal_size: "3", length_ft: 100, flow_gpm: 10 }).error);
+});

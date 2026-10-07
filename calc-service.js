@@ -375,6 +375,19 @@ export function computeRangeDemand22055({ num_ranges = 1, nameplate_kw = 0, supp
   if (!(n >= 1)) return { error: "Number of ranges must be at least 1." };
   if (!(v > 0)) return { error: "Service voltage must be positive (V)." };
 
+  // Column C covers 8.75-27 kW. Under 8.75 kW Note 3 sends the rating to Columns A/B, where one
+  // appliance is 80% of nameplate. Until 2026-10-07 a 3 kW range read Column C's 8 kW, more than
+  // its own nameplate. Several small ranges take a count-dependent percentage this tile does not carry.
+  if (kw < 8.75) {
+    if (n === 1 && kw >= 1.75) {
+      const demand_kw = 0.8 * kw;
+      return {
+        col_c_kw: null, increase_pct: 0, demand_kw, demand_a: demand_kw * 1000 / v,
+        note: "Under 8.75 kW, NEC Table 220.55 Note 3 applies Column A (1.75-3.5 kW) or Column B (3.5-8.75 kW): one appliance is 80% of its nameplate. Column C, which this tile otherwise reads, starts at 8.75 kW. The adopted NEC edition and the AHJ govern.",
+      };
+    }
+    return { error: "Under 8.75 kW, Table 220.55 sends the ranges to Columns A/B (by count); this tile computes one such range or Column C. Use the column percentage for " + n + " appliances." };
+  }
   const col_c_kw = _rangeColCkW(n);
   // Note 1: ranges over 12 kW add 5% to Column C per kW (or major fraction) over 12.
   // "Major fraction thereof" counts >= 0.5 kW as a full step; < 0.5 kW is dropped -- round-half-up, not ceil.
@@ -405,7 +418,7 @@ function _v167renderRangeDemand(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const r = computeRangeDemand22055({ num_ranges: Number(n.input.value) || 0, nameplate_kw: Number(kw.input.value) || 0, supply_v: Number(v.input.value) || 0 });
     if (r.error) { oCol.textContent = r.error; oDemand.textContent = "-"; oNote.textContent = ""; return; }
-    oCol.textContent = fmt(r.col_c_kw, 0) + " kW" + (r.increase_pct > 0 ? " (+" + fmt(r.increase_pct, 0) + "% over-12 kW adder)" : "");
+    oCol.textContent = r.col_c_kw === null ? "n/a (under 8.75 kW: Column A/B, 80% of nameplate)" : fmt(r.col_c_kw, 0) + " kW" + (r.increase_pct > 0 ? " (+" + fmt(r.increase_pct, 0) + "% over-12 kW adder)" : "");
     oDemand.textContent = fmt(r.demand_kw, 2) + " kW = " + fmt(r.demand_a, 1) + " A";
     oNote.textContent = r.note;
   }, DEBOUNCE_MS);

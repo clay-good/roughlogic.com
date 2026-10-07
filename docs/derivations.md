@@ -2999,7 +2999,7 @@ cross-check.
 | calc-motor.js | `computeMotorRunHoursForBudget` | `{ hp = 0, efficiency_pct = 93, load_factor_pct = 100, rate_usd_per_kwh = 0.12...` | _ | _ | _ |
 | calc-motor.js | `computeMotorShaftTorque` | `{ rpm = 0, hp = null, torque_lbft = null } = {}` | _ | _ | _ |
 | calc-motor.js | `computeMotorSyncSlip` | `{ line_freq_hz = 60, poles = 4, rated_rpm = 0 } = {}` | _ | _ | _ |
-| calc-motor.js | `computeMultiMotorFeeder` | `{ largest_flc_a = 0, sum_other_flc_a = 0, largest_branch_ocpd_a = 0 } = {}` | _ | _ | _ |
+| calc-motor.js | `computeMultiMotorFeeder` | `{ largest_flc_a = 0, sum_other_flc_a = 0, largest_branch_ocpd_a = 0, ocpd_mot...` | _ | _ | _ |
 | calc-motor.js | `computeReducedVoltageStarter` | `{ across_line_lra_a = 0, across_line_lrt_pct = 100, starter_type = "autotrans...` | _ | _ | _ |
 | calc-motor.js | `computeRotaryPhaseConverter` | `{ largest_motor_hp = 10, total_running_hp = 15, start_factor = 2 } = {}` | _ | _ | _ |
 | calc-motor.js | `computeVfdReflectedWave` | `{ rise_time_us = 0, velocity_pct = 50, system_voltage_v = 0, run_length_ft = ...` | _ | _ | _ |

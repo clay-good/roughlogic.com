@@ -150,6 +150,35 @@ export const REFRIGERANTS = {
   },
 };
 
+// Saturation lookup for the psig P-T tiles. Inside a refrigerant's psig rows this is the
+// interpolation it always was; outside them it reads the denser psia table the charging tile
+// uses (psig + 14.696), and returns null where neither table reaches. Until 2026-10-07
+// interpLinear extrapolated the end segments with no flag: R-22 at 300 psig read 138.8 F
+// (the chart prints about 131), R-134a at 450 psig read 249 F, past its 214 F critical point.
+function _satLookup(refrigerant, pairs, { pressure_psig = null, temperature_F = null }, bubble = false) {
+  const ps = pairs.map((p) => p.pressure_psig), ts = pairs.map((p) => p.temperature_F);
+  const key = String(refrigerant).replace("-", "_");
+  const tbl = (!bubble && REFRIGERANT_DEW_TABLES_v7[key]) || REFRIGERANT_PT_TABLES_v7[key];
+  if (pressure_psig !== null) {
+    const p = Number(pressure_psig);
+    if (p >= Math.min(...ps) && p <= Math.max(...ps)) return interpolateRefrigerant({ pairs, pressure_psig: p });
+    if (!tbl) return null;
+    const v = _interpRefSatT(key, p + 14.696, !bubble);
+    return Number.isFinite(v) ? v : null;
+  }
+  const t = Number(temperature_F);
+  if (t >= Math.min(...ts) && t <= Math.max(...ts)) return interpolateRefrigerant({ pairs, temperature_F: t });
+  if (!tbl) return null;
+  for (let i = 1; i < tbl.length; i++) {
+    if (t >= tbl[i - 1].T_F && t <= tbl[i].T_F) {
+      const lo = tbl[i - 1], hi = tbl[i];
+      return lo.psia + (t - lo.T_F) / (hi.T_F - lo.T_F) * (hi.psia - lo.psia) - 14.696;
+    }
+  }
+  return null;
+}
+const _OUT_OF_TABLE = (refrigerant) => "Outside the bundled saturation tables for " + refrigerant + "; read the manufacturer's P-T chart.";
+
 // --- Utility 25: Refrigerant P-T Lookup ---
 
 // dims: in { refrigerant: dimensionless, pressure_psig: M L^-1 T^-2, temperature_F: T, outdoor_F: T, indoor_wb_F: T } out: { saturation_temp_F: T, pressure_psig: M L^-1 T^-2, target_superheat_F: T, target_subcool_F: T }
@@ -158,7 +187,8 @@ export function computeRefrigerantPT({ refrigerant, pressure_psig = null, temper
   const r = REFRIGERANTS[refrigerant];
   if (!r) return { error: "Unknown refrigerant." };
   if (pressure_psig === null && temperature_F === null) return { error: "Provide pressure or temperature." };
-  const value = interpolateRefrigerant({ pairs: r.pt_pairs, pressure_psig, temperature_F });
+  const value = _satLookup(refrigerant, r.pt_pairs, { pressure_psig, temperature_F });
+  if (value === null) return { error: _OUT_OF_TABLE(refrigerant) };
   // v8 §C.3: target-superheat lookup for outdoor temp + indoor wet-bulb.
   // The published fixed-orifice charging-chart approximation is
   // target_SH = (3 × IWB − 80 − ODB) / 2 (superheat falls as outdoor temp
@@ -211,7 +241,8 @@ export function computeSuperheatSubcool({ refrigerant, system_pressure_psig, lin
   if (!r) return { error: "Unknown refrigerant." };
   // Subcooling reads the bubble point; superheat, the dew point.
   const pairs = mode === "subcool" && r.bubble_pairs ? r.bubble_pairs : r.pt_pairs;
-  const sat_T = interpolateRefrigerant({ pairs, pressure_psig: system_pressure_psig });
+  const sat_T = _satLookup(refrigerant, pairs, { pressure_psig: system_pressure_psig }, mode === "subcool");
+  if (sat_T === null) return { error: _OUT_OF_TABLE(refrigerant) };
   if (mode === "superheat") {
     const value = line_temperature_F - sat_T;
     const d = _v8shScDiagnostic(value, "superheat");
@@ -276,7 +307,8 @@ export function computeCompareRefrigerants({ refrigerant_a, refrigerant_b, press
   if (!b) return { error: "Unknown refrigerant B." };
   if (pressure_psig === null && temperature_F === null) return { error: "Provide pressure or temperature." };
   const lookup = (r) => {
-    const v = interpolateRefrigerant({ pairs: r.pt_pairs, pressure_psig, temperature_F });
+    const v = _satLookup(r === a ? refrigerant_a : refrigerant_b, r.pt_pairs, { pressure_psig, temperature_F });
+    if (v === null) return { error: _OUT_OF_TABLE(r === a ? refrigerant_a : refrigerant_b) };
     if (pressure_psig !== null) return { saturated_temperature_F: v, manufacturer: r.manufacturer };
     return { saturated_pressure_psig: v, manufacturer: r.manufacturer };
   };

@@ -276,19 +276,27 @@ function _standardOcpdAtOrBelow(a) {
   return chosen; // null if below the smallest standard size
 }
 
-// dims: in { largest_flc_a: I, sum_other_flc_a: I, largest_branch_ocpd_a: I } out: { min_feeder_ampacity_a: I, max_feeder_ocpd_a: I, standard_feeder_ocpd_a: I }
-export function computeMultiMotorFeeder({ largest_flc_a = 0, sum_other_flc_a = 0, largest_branch_ocpd_a = 0 } = {}) {
+// dims: in { largest_flc_a: I, sum_other_flc_a: I, largest_branch_ocpd_a: I, ocpd_motor_flc_a: I } out: { min_feeder_ampacity_a: I, max_feeder_ocpd_a: I, standard_feeder_ocpd_a: I }
+export function computeMultiMotorFeeder({ largest_flc_a = 0, sum_other_flc_a = 0, largest_branch_ocpd_a = 0, ocpd_motor_flc_a = null } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   sum_other_flc_a = Number(sum_other_flc_a); largest_branch_ocpd_a = Number(largest_branch_ocpd_a);
   if (!(largest_flc_a >= 0)) return { error: "Largest motor full-load current cannot be negative (A)." };
   if (!(sum_other_flc_a >= 0)) return { error: "Sum of other motor full-load currents cannot be negative (A)." };
   if (!(largest_branch_ocpd_a >= 0)) return { error: "Largest branch overcurrent device rating cannot be negative (A)." };
   const min_feeder_ampacity_a = 1.25 * largest_flc_a + sum_other_flc_a; // 430.24
-  const max_feeder_ocpd_a = largest_branch_ocpd_a + sum_other_flc_a; // 430.62 ceiling
+  // 430.62(A) takes the largest branch device on ANY motor plus the FLCs of the OTHER motors. When
+  // that device sits on a smaller motor, the largest motor's FLC is one of the "others". Until
+  // 2026-10-07 this always subtracted the largest motor, so 28 A (40 A device) + 16 A (60 A device)
+  // read 76 A where motor-feeder-multiple and the code give 88 A. Blank means the largest motor.
+  const blankOcpdMotor = ocpd_motor_flc_a === null || ocpd_motor_flc_a === undefined || ocpd_motor_flc_a === "";
+  const ocpdMotorFlc = blankOcpdMotor ? largest_flc_a : Number(ocpd_motor_flc_a);
+  if (!(ocpdMotorFlc > 0 && ocpdMotorFlc <= largest_flc_a + 1e-9 && ocpdMotorFlc <= largest_flc_a + sum_other_flc_a))
+    return { error: "The FLC of the motor with the largest branch device must be positive and no more than the largest motor's FLC." };
+  const max_feeder_ocpd_a = largest_branch_ocpd_a + (largest_flc_a + sum_other_flc_a - ocpdMotorFlc); // 430.62 ceiling
   const standard_feeder_ocpd_a = _standardOcpdAtOrBelow(max_feeder_ocpd_a); // round DOWN, cannot exceed
   return {
     min_feeder_ampacity_a, max_feeder_ocpd_a, standard_feeder_ocpd_a,
-    note: "430.24: feeder conductors >= 125% of the largest motor FLC + the sum of the other motor FLCs. 430.62: feeder OCPD <= the largest motor's branch OCPD + the sum of the other FLCs, then the NEXT STANDARD SIZE DOWN (it may not exceed the limit). Use the NEC FLC table value (430.248/430.250), not the nameplate amps. The AHJ governs.",
+    note: "430.24: feeder conductors >= 125% of the largest motor FLC + the sum of the other motor FLCs. 430.62: feeder OCPD <= the largest branch OCPD on any motor + the FLCs of all the OTHER motors (if that device is on a smaller motor, the largest motor's FLC counts among the others), then the NEXT STANDARD SIZE DOWN (it may not exceed the limit). Use the NEC FLC table value (430.248/430.250), not the nameplate amps. The AHJ governs.",
   };
 }
 export const multiMotorFeederExample = { inputs: { largest_flc_a: 28, sum_other_flc_a: 26, largest_branch_ocpd_a: 70 } };
@@ -298,22 +306,23 @@ function renderMultiMotorFeeder(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: NEC 2023 430.24 (feeder conductor = 1.25 x largest FLC + sum of others) and 430.62 (feeder OCPD <= largest branch OCPD + sum of others, next standard size down). Full-load currents are the NEC table values (430.248/430.250), user-supplied; the tile bundles no FLC table. The AHJ governs. Free read-only at nfpa.org/freeaccess.";
   const largest = makeNumber("Largest motor FLC (A, table value)", "mmf-largest", { step: "any", min: "0" });
   const others = makeNumber("Sum of other motor FLCs (A)", "mmf-others", { step: "any", min: "0" });
-  const ocpd = makeNumber("Largest motor branch OCPD (A)", "mmf-ocpd", { step: "any", min: "0" });
-  for (const f of [largest, others, ocpd]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { largest.input.value = "28"; others.input.value = "26"; ocpd.input.value = "70"; update(); });
+  const ocpd = makeNumber("Largest branch OCPD on any motor (A)", "mmf-ocpd", { step: "any", min: "0" });
+  const ocpdFlc = makeNumber("FLC of the motor with that OCPD (A, blank = largest motor)", "mmf-ocpd-flc", { step: "any", min: "0" });
+  for (const f of [largest, others, ocpd, ocpdFlc]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { largest.input.value = "28"; others.input.value = "26"; ocpd.input.value = "70"; ocpdFlc.input.value = ""; update(); });
   const oAmp = makeOutputLine(outputRegion, "Min feeder ampacity (430.24)", "mmf-out-amp");
   const oMax = makeOutputLine(outputRegion, "Max feeder OCPD (430.62)", "mmf-out-max");
   const oStd = makeOutputLine(outputRegion, "Standard OCPD (round down)", "mmf-out-std");
   const oNote = makeOutputLine(outputRegion, "Note", "mmf-out-note");
   const update = debounce(() => {
-    const r = computeMultiMotorFeeder({ largest_flc_a: Number(largest.input.value) || 0, sum_other_flc_a: Number(others.input.value) || 0, largest_branch_ocpd_a: Number(ocpd.input.value) || 0 });
+    const r = computeMultiMotorFeeder({ largest_flc_a: Number(largest.input.value) || 0, sum_other_flc_a: Number(others.input.value) || 0, largest_branch_ocpd_a: Number(ocpd.input.value) || 0, ocpd_motor_flc_a: ocpdFlc.input.value === "" ? null : Number(ocpdFlc.input.value) });
     if (r.error) { oAmp.textContent = r.error; oMax.textContent = "-"; oStd.textContent = "-"; oNote.textContent = "-"; return; }
     oAmp.textContent = fmt(r.min_feeder_ampacity_a, 1) + " A (size conductors at 75 C >= this)";
     oMax.textContent = fmt(r.max_feeder_ocpd_a, 1) + " A ceiling";
     oStd.textContent = r.standard_feeder_ocpd_a === null ? "(below the smallest standard size; review)" : r.standard_feeder_ocpd_a + " A standard";
     oNote.textContent = r.note;
   }, DEBOUNCE_MS);
-  for (const el of [largest.input, others.input, ocpd.input]) el.addEventListener("input", update);
+  for (const el of [largest.input, others.input, ocpd.input, ocpdFlc.input]) el.addEventListener("input", update);
 }
 MOTOR_RENDERERS["multi-motor-feeder"] = renderMultiMotorFeeder;
 

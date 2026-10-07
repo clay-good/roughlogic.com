@@ -3170,8 +3170,8 @@
       "date": "2026-10-03"
     },
     "/tools/friction-loss/": {
-      "sha": "e2ebf067dc16367a",
-      "date": "2026-10-03"
+      "sha": "3616cc982eb6c972",
+      "date": "2026-10-07"
     },
     "/tools/frost-depth-berggren/": {
       "sha": "6810cd7f6c7ee382",
@@ -3274,12 +3274,12 @@
       "date": "2026-09-29"
     },
     "/tools/gas-pipe-max-flow/": {
-      "sha": "4bc292175418d546",
-      "date": "2026-09-29"
+      "sha": "7b0cbd933fa25156",
+      "date": "2026-10-07"
     },
     "/tools/gas-pipe-pressure-drop/": {
-      "sha": "c4fbd372279c6399",
-      "date": "2026-09-29"
+      "sha": "a5eb7a215e196ff2",
+      "date": "2026-10-07"
     },
     "/tools/gas-pipe-sizing/": {
       "sha": "86c1c24cedd95261",
@@ -4910,8 +4910,8 @@
       "date": "2026-10-03"
     },
     "/tools/multi-motor-feeder/": {
-      "sha": "86828f0084035087",
-      "date": "2026-09-29"
+      "sha": "e0be8e0b2ae10d90",
+      "date": "2026-10-07"
     },
     "/tools/mwbc-voltage-drop/": {
       "sha": "0f178f26ad8e213e",
@@ -5610,8 +5610,8 @@
       "date": "2026-09-29"
     },
     "/tools/portable-ladder-setup/": {
-      "sha": "3f2efd6d45267de2",
-      "date": "2026-09-29"
+      "sha": "1d4a5f1fbf2d6cbd",
+      "date": "2026-10-07"
     },
     "/tools/post-hole-concrete/": {
       "sha": "6300739cbb168b21",

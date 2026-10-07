@@ -205,6 +205,19 @@ export const SCH40_ID_IN = {
   "2": 2.067, "2.5": 2.469, "3": 3.068, "4": 4.026,
 };
 
+// Actual inside diameters by material for the nominal-size picker: PVC and steel
+// are Schedule 40; copper is Type L (ASTM B88); CPVC is CTS SDR 11 (ASTM D2846);
+// PEX is CTS SDR 9 (ASTM F876). The same bores pipe-velocity uses. Until
+// 2026-10-07 every material took the steel Schedule 40 bore, so 1 in PEX at
+// 10 gpm read 3.71 ft/s and 2.4 psi per 100 ft where its 0.863 in bore gives
+// 5.48 ft/s and 6.2 psi, and the >5 ft/s noise flag never fired.
+export const FRICTION_ID_BY_MATERIAL = {
+  PVC: SCH40_ID_IN, steel_new: SCH40_ID_IN, steel_old: SCH40_ID_IN,
+  copper: { "0.5": 0.545, "0.75": 0.785, "1": 1.025, "1.25": 1.265, "1.5": 1.505, "2": 1.985 },
+  CPVC: { "0.5": 0.469, "0.75": 0.695, "1": 0.901, "1.25": 1.232, "1.5": 1.469, "2": 1.913 },
+  pex: { "0.5": 0.475, "0.75": 0.671, "1": 0.863, "1.25": 1.053, "1.5": 1.243, "2": 1.629 },
+};
+
 export const HAZEN_C = {
   PVC: 150, CPVC: 150, copper: 140, steel_new: 120, steel_old: 100, pex: 150,
 };
@@ -222,8 +235,8 @@ function _v8frictionVelocityFlag(v_ft_s) {
 // dims: in { method: dimensionless, material: dimensionless, nominal_size: L, length_ft: L, flow_gpm: L^3 T^-1, internal_diameter_in: L } out: { head_loss_ft: L, pressure_loss_psi: M L^-1 T^-2 }
 export function computeFrictionLoss({ method, material, nominal_size, length_ft, flow_gpm, internal_diameter_in }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
-  const d = internal_diameter_in || SCH40_ID_IN[String(nominal_size)];
-  if (!d) return { error: "Unknown nominal size; provide internal diameter directly." };
+  const d = internal_diameter_in || (FRICTION_ID_BY_MATERIAL[material] || SCH40_ID_IN)[String(nominal_size)];
+  if (!d) return { error: "No bundled bore for " + nominal_size + " in " + material + "; provide the internal diameter directly." };
   // Compute velocity once (independent of method): V (ft/s) = (Q gpm × 0.4085) / d² (in²).
   const velocity_ft_s = (Number(flow_gpm) || 0) * 0.4085 / (d * d);
   const velocity_flag = _v8frictionVelocityFlag(velocity_ft_s);
@@ -232,7 +245,7 @@ export function computeFrictionLoss({ method, material, nominal_size, length_ft,
     const C = HAZEN_C[material];
     if (!C) return { error: "Unknown material for Hazen-Williams." };
     const headLoss_ft = hazenWilliamsFrictionLoss({ flow_gpm, internal_diameter_in: d, length_ft, C });
-    return { headLoss_ft, pressureLoss_psi: feetOfHeadToPsi(headLoss_ft), velocity_ft_s, velocity_flag };
+    return { headLoss_ft, pressureLoss_psi: feetOfHeadToPsi(headLoss_ft), velocity_ft_s, velocity_flag, internal_diameter_in: d };
   }
 
   if (method === "darcy-weisbach") {
@@ -254,7 +267,7 @@ export function computeFrictionLoss({ method, material, nominal_size, length_ft,
     // analytic shortcut at the second decimal; both are correct, so we keep the
     // Darcy-Weisbach value for consistency with that branch's other outputs.
     const v_dw = v_m_s / 0.3048;
-    return { headLoss_ft, pressureLoss_psi: feetOfHeadToPsi(headLoss_ft), velocity_ft_s: v_dw, velocity_flag: _v8frictionVelocityFlag(v_dw) };
+    return { headLoss_ft, pressureLoss_psi: feetOfHeadToPsi(headLoss_ft), velocity_ft_s: v_dw, velocity_flag: _v8frictionVelocityFlag(v_dw), internal_diameter_in: d };
   }
 
   return { error: "Unknown method." };
@@ -447,7 +460,7 @@ export function renderFrictionLoss(inputRegion, outputRegion, citationEl) {
     { value: "darcy-weisbach", label: "Darcy-Weisbach (water)" },
   ]);
   const material = makeSelect("Material", "fl-mat", Object.keys(HAZEN_C).map((m) => ({ value: m, label: m })));
-  const size = makeSelect("Nominal Sch 40 size", "fl-size", Object.keys(SCH40_ID_IN).map((s) => ({ value: s, label: s + "\""})));
+  const size = makeSelect("Nominal size (Sch 40 PVC/steel, Type L copper, CTS CPVC/PEX)", "fl-size", Object.keys(SCH40_ID_IN).map((s) => ({ value: s, label: s + "\""})));
   const length = makeNumber("Length (ft)", "fl-len", { step: "any", min: "0" });
   const flow = makeNumber("Flow (gpm)", "fl-flow", { step: "any", min: "0" });
   for (const f of [method, material, size, length, flow]) inputRegion.appendChild(f.wrap);

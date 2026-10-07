@@ -73,3 +73,11 @@ test("OSHA 1926.1053(b)(5)(i): the foot sits a quarter of the working length out
   assert.equal(computeLadderAngle({ ladder_length_ft: 16, working_height_ft: 12 }).base_distance_ft, 4);
   assert.equal(computeLadderAngle({ ladder_length_ft: 28, working_height_ft: 27 }).base_distance_ft, 7);
 });
+
+test("range-demand-220-55: one range under 8.75 kW takes Column A/B's 80%, never Column C's 8 kW", async () => {
+  const { computeRangeDemand22055 } = await import("../../calc-service.js");
+  assert.ok(Math.abs(computeRangeDemand22055({ num_ranges: 1, nameplate_kw: 3 }).demand_kw - 2.4) < 1e-9);
+  assert.ok(Math.abs(computeRangeDemand22055({ num_ranges: 1, nameplate_kw: 7 }).demand_kw - 5.6) < 1e-9);
+  assert.equal(computeRangeDemand22055({ num_ranges: 1, nameplate_kw: 12 }).demand_kw, 8);
+  assert.ok(computeRangeDemand22055({ num_ranges: 2, nameplate_kw: 7 }).error);
+});
