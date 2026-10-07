@@ -238,3 +238,17 @@ test("cross-tile: pipe-velocity and friction-loss agree on flow velocity for the
     }
   }
 });
+
+// pipe-sizing reads the same IPC Table E103.3(3) rows as wsfu-demand, and the
+// flush-valve column when a flush-valve water closet is in the list.
+test("pipe-sizing: a flush-valve water closet takes the flush-valve column, and both tiles agree", async () => {
+  const m = await import("../../calc-plumbing.js");
+  const valve = m.computePipeSizing({ fixtures: [{ fixture: "water_closet_flush_valve", count: 2 }, { fixture: "lavatory", count: 2 }] });
+  assert.equal(valve.demand_curve, "flush valve");
+  assert.ok(Math.abs(valve.estimated_demand_gpm - m.computeWsfuDemand({ wsfu: 14, system_type: "flush_valve" }).gpm) < 1e-9);
+  assert.equal(valve.recommended_supply_size, "1-1/4");
+  // 100 WSFU of flush tanks is a printed row (43.5 gpm); the old nine-row copy interpolated 80-140.
+  const tank = m.computePipeSizing({ fixtures: [{ fixture: "lavatory", count: 100 }] });
+  assert.equal(tank.estimated_demand_gpm, 43.5);
+  assert.equal(tank.estimated_demand_gpm, m.computeWsfuDemand({ wsfu: 100 }).gpm);
+});

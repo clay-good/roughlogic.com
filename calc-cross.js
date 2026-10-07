@@ -1383,7 +1383,12 @@ export function computePulleyMA({ rig = "block_2", efficiency = 0.95 }) {
   const r = PULLEY_RIGS[rig];
   if (!r) return { error: "Unknown rig." };
   if (!(efficiency > 0 && efficiency <= 1)) return { error: "Efficiency must be 0..1." };
-  const actual = r.ma * Math.pow(efficiency, r.pulleys);
+  // Tension tracking, as rope-ma has since 2026-10-02: each sheave passes on efficiency x the
+  // tension, so the supporting parts carry p, p^2, ... p^n of the haul force, plus the haul part
+  // itself when it rises from the moving block (ma = pulleys + 1). Until 2026-10-07 this was
+  // ma x p^n: a 6-part block at p 0.95 read 4.41 (5.03 by tracking), and 0.09 at p 0.5.
+  let actual = 0;
+  for (let k = r.ma === r.pulleys ? 1 : 0; k <= r.pulleys; k++) actual += Math.pow(efficiency, k);
   return { theoretical_ma: r.ma, actual_ma: actual, pulleys: r.pulleys };
 }
 

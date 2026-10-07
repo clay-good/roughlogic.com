@@ -747,7 +747,9 @@ export function computeRcShearFriction({ avf_in2 = 0, fy_psi = 60000, ac_in2 = 0
   const base_mu = mus[iface];
   if (!base_mu) return { error: "The interface must be monolithic, roughened, unroughened, or steel." };
   const mu_f = base_mu * lambda;
-  const vn0_kip = (mu_f * avf_in2 * fy_psi) / 1000;
+  // Table 20.2.2.4(a) caps fy at 60,000 psi for shear friction, as the corbel tile has since
+  // 2026-10-03. Until 2026-10-07 this tile let Grade 80 and 100 bars raise Vn in proportion.
+  const vn0_kip = (mu_f * avf_in2 * Math.min(fy_psi, 60000)) / 1000;
   // ACI 318-19 Table 22.9.4.4 caps Vn for EVERY interface, not just the
   // monolithic/roughened case: (a) monolithic or roughened to 1/4 in is the
   // least of 0.2 f'c, 480 + 0.08 f'c, and 1600 (x Ac); (b) all other cases
@@ -1617,7 +1619,10 @@ export function computeConcreteAnchorBreakout({ embedment_in = 0, fc_psi = 0, ed
   const _anchor = { "cast-in": [24, 0.70], "post-installed": [17, 0.65], "post-installed-cat2": [17, 0.55], "post-installed-cat3": [17, 0.45] }[anchor_type];
   if (!_anchor) return { error: "Anchor type must be cast-in or post-installed (Category 1, 2 or 3)." };
   const [kc, phi_tension] = _anchor;
-  const nb_lb = kc * lam * Math.sqrt(fc) * Math.pow(hef, 1.5);
+  // ACI 318-19 17.3.1 caps f'c in the anchor equations at 10,000 psi cast-in and 8,000 psi
+  // post-installed. Added 2026-10-07, after the shear-breakout and blowout tiles (2026-10-03):
+  // until then a 12,000 psi mix read 9.5% stronger here, and pryout inherits this Nb.
+  const nb_lb = kc * lam * Math.sqrt(Math.min(fc, anchor_type === "cast-in" ? 10000 : 8000)) * Math.pow(hef, 1.5);
   const ANco = 9 * hef * hef;
   const psi_ed = ca1 < 1.5 * hef ? 0.7 + 0.3 * ca1 / (1.5 * hef) : 1.0;
   const ANc = Math.min(ca1 + 1.5 * hef, 3 * hef) * (2 * 1.5 * hef);
@@ -1801,7 +1806,9 @@ export function computeConcreteAnchorPullout({ head_bearing_area_in2 = 0, fc_psi
   const uncracked = cracking === "uncracked";
   if (cracking !== "cracked" && cracking !== "uncracked") return { error: "Cracking must be cracked or uncracked." };
   const psi_cP = uncracked ? 1.4 : 1.0;
-  const np_lb = 8 * abrg * fc;
+  // ACI 318-19 17.3.1 caps f'c at 10,000 psi for a cast-in (headed) anchor. Until 2026-10-07 a
+  // 12,000 psi mix read 20% more pullout.
+  const np_lb = 8 * abrg * Math.min(fc, 10000);
   const npn_lb = psi_cP * np_lb;
   const phi_npn_lb = 0.70 * npn_lb;
   return {

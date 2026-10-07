@@ -5471,16 +5471,16 @@
    "source_publisher": "NFPA",
    "source_title": "no OCPD: EGC sized from PV Isc, 14 AWG floor, no VD upsize (690.45)",
    "source_edition_or_year": "NEC 2023",
-   "source_section_or_page": "No OCPD, 10 A Isc, conductors upsized for VD -> 14 AWG (stays; 690.45 waives 250.122(B))",
+   "source_section_or_page": "No OCPD, 10 A Isc: the assumed device is rated per 690.9(B), 1.25 x 1.25 x 10 = 15.6 A, so Table 250.122's 20 A row, 12 AWG; conductors upsized for VD do not upsize it further (690.45 waives 250.122(B))",
    "verified_by": "rl",
-   "verified_on": "2026-07-10",
+   "verified_on": "2026-10-07",
    "inputs": {
     "pv_isc_a": 10,
     "vd_upsized": "yes"
    },
    "outputs": {
     "egc_awg": {
-     "value": "14",
+     "value": "12",
      "tolerance": {
       "abs": 0
      }
@@ -6685,11 +6685,11 @@
   {
    "tile_id": "pulley-ma-gen",
    "source_publisher": "Project (first-principles)",
-   "source_title": "Block-and-tackle MA: actual_ma = theoretical_ma * efficiency^pulleys",
+   "source_title": "Block-and-tackle MA by tension tracking: the supporting parts carry p, p^2, ..., p^n of the haul pull",
    "source_edition_or_year": "n/a; standard block-and-tackle identity",
-   "source_section_or_page": "Triple block (block_3, 3 pulleys), efficiency 0.95 -> theoretical MA 3 / actual MA 2.572",
+   "source_section_or_page": "Triple block (block_3, 3 sheaves, haul off the fixed block), efficiency 0.95 -> theoretical MA 3 / actual MA 0.95 + 0.9025 + 0.857375 = 2.709875",
    "verified_by": "rl",
-   "verified_on": "2026-05-11",
+   "verified_on": "2026-10-07",
    "inputs": {
     "rig": "block_3",
     "efficiency": 0.95
@@ -6702,7 +6702,7 @@
      }
     },
     "actual_ma": {
-     "value": 2.572,
+     "value": 2.709875,
      "tolerance": {
       "pct": 0.5
      }
@@ -47213,18 +47213,18 @@
   {
    "tile_id": "welder-arc-circuit-conductor",
    "source_publisher": "arc-welder circuit sizing (NEC 630.11 / 630.12)",
-   "source_title": "40 A primary, 50% duty -> 28.28 A effective, 80 A max OCPD",
+   "source_title": "40 A primary, 50% duty -> 28.4 A effective, 80 A max OCPD",
    "source_edition_or_year": "spec-v932 worked example (machine-verified)",
-   "source_section_or_page": "mult = sqrt(0.50) = 0.7071; I_eff = 40*0.7071 = 28.28; OCPD = 2.0*40 = 80",
+   "source_section_or_page": "Table 630.11(A) prints 0.71 at 50% duty (sqrt(0.50) = 0.7071 rounded); I_eff = 40*0.71 = 28.4; OCPD = 2.0*40 = 80",
    "verified_by": "rl",
-   "verified_on": "2026-07-18",
+   "verified_on": "2026-10-07",
    "inputs": {
     "primary_current_a": 40,
     "duty_pct": 50
    },
    "outputs": {
     "effective_current_a": {
-     "value": 28.284,
+     "value": 28.4,
      "tolerance": {
       "abs": 0.01
      }

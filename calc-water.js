@@ -1031,7 +1031,13 @@ export function computePoolTurnover({
   // lbs of available (pure) chlorine to dose the volume by ppm:
   // lb = gal * ppm * 8.34 / 1,000,000.
   const dose_pure_lb = (vol * ppm * 8.34) / 1e6;
-  const chlorine_product_lb = type.frac > 0 ? dose_pure_lb / type.frac : dose_pure_lb;
+  // Liquid bleach is sold by TRADE percent (g available chlorine per 100 mL), and a gallon of 12.5%
+  // weighs about 10 lb, so its pounds come from the gallons (as pool-chlorine-dose has since
+  // 2026-09-26). Until 2026-10-07 this divided by 0.125 as a weight fraction, 17% light.
+  const liquid = chlorine_type === "liquid_bleach";
+  const chlorine_product_gal = liquid ? dose_pure_lb / (type.frac * 8.34) : null;
+  const chlorine_product_lb = liquid ? chlorine_product_gal * 8.34 * (1 + 0.0158 * type.frac * 100)
+    : type.frac > 0 ? dose_pure_lb / type.frac : dose_pure_lb;
 
   const warnings = [];
   if (hr > 24) warnings.push("Turnover above 24 hr is outside the typical 6-8 hr range; confirm the design.");
@@ -1041,6 +1047,7 @@ export function computePoolTurnover({
     turnover_gpm,
     dose_pure_lb,
     chlorine_product_lb,
+    chlorine_product_gal,
     chlorine_label: type.label,
     chlorine_pct: type.frac * 100,
     warnings,

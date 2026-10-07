@@ -181,8 +181,12 @@ export function computeSprinklerProtectionAreaForSupply({ available_supply_gpm =
   const sprinkler_gpm = supply - hose;
   if (!(sprinkler_gpm > 0)) return { error: "The hose allowance (" + hose.toFixed(0) + " gpm) meets or exceeds the supply; no flow is left for sprinklers." };
   const max_design_area_ft2 = sprinkler_gpm / dens;
+  // NFPA 13 density/area curves start at 1,500 ft^2 (light and ordinary hazard; 2,500 for extra
+  // hazard), as sprinkler-density has checked since 2026-10-03. A smaller area is not a design the
+  // supply serves: it cannot meet even the smallest curve area at this density.
+  const below_curve_minimum = max_design_area_ft2 < 1500 * (1 - 1e-9);
   return {
-    max_design_area_ft2, sprinkler_gpm,
+    max_design_area_ft2, sprinkler_gpm, below_curve_minimum,
     note: "NFPA 13 area/density demand solved for the area: with the hose-stream allowance taken off the top, the remaining supply divided by the design density is the largest hydraulic design area the water supply can serve. A lower density (a lighter hazard) or a smaller hose allowance lets the same supply cover more area. This is the area/density screen (not the NFPA 13 pipe-schedule method, which has its own supply table) -- a full hydraulic calculation to the most-remote area including friction and elevation, at the flowing pressure the supply can deliver, is the governing analysis and is separate. A design aid, not a stamped hydraulic submittal; a qualified fire-protection engineer and the AHJ govern.",
   };
 }
@@ -196,7 +200,7 @@ FIRESPRINKLER_RENDERERS["sprinkler-protection-area-for-supply"] = _simpleRendere
     { key: "hose_gpm", label: "Hose-stream allowance (gpm)", kind: "number", default: 250 },
   ],
   outputs: [
-    { key: "area", id: "spa-out-area", label: "Max hydraulic design area", value: (r) => fmt(r.max_design_area_ft2, 0) + " ft^2" },
+    { key: "area", id: "spa-out-area", label: "Max hydraulic design area", value: (r) => fmt(r.max_design_area_ft2, 0) + " ft^2" + (r.below_curve_minimum ? " - BELOW the 1,500 ft^2 smallest NFPA 13 curve area: this supply serves no design at this density" : "") },
     { key: "sg", id: "spa-out-sg", label: "Sprinkler flow available", value: (r) => fmt(r.sprinkler_gpm, 0) + " gpm" },
     { key: "n", id: "spa-out-n", label: "Note", value: (r) => r.note },
   ],

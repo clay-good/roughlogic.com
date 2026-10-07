@@ -52,32 +52,30 @@ export const FIXTURE_UNITS = {
 // Rows of IPC Appendix E Table E103.3(3), flush-tank column. Until 2026-09-18
 // these were eyeballed points up to 18% low (10 WSFU read 12 gpm; the table
 // prints 14.6).
-export const HUNTERS_CURVE = [
-  { wsfu: 1, gpm: 3.0 },
-  { wsfu: 5, gpm: 9.4 },
-  { wsfu: 10, gpm: 14.6 },
-  { wsfu: 20, gpm: 19.6 },
-  { wsfu: 40, gpm: 26.3 },
-  { wsfu: 80, gpm: 38.0 },
-  { wsfu: 140, gpm: 52.5 },
-  { wsfu: 160, gpm: 57.0 },
-  { wsfu: 300, gpm: 85.0 },
-];
+export const WSFU_FLUSH_TANK = [[1, 3.0], [5, 9.4], [10, 14.6], [20, 19.6], [30, 23.3], [40, 26.3], [50, 29.1], [60, 32.0], [80, 38.0], [100, 43.5], [120, 48.0], [140, 52.5], [160, 57.0], [200, 65.0], [250, 75.0], [300, 85.0]];
+export const WSFU_FLUSH_VALVE = [[5, 15.0], [10, 27.0], [20, 35.0], [30, 42.0], [40, 46.0], [50, 50.0], [60, 54.0], [80, 61.2], [100, 67.5], [120, 73.0], [140, 77.0], [160, 81.0], [200, 90.0], [250, 101.0], [300, 108.0]];
+// The pipe-sizing tile reads the same printed rows as wsfu-demand. Until
+// 2026-10-07 it carried its own nine-row flush-tank copy (missing the 30, 50,
+// 60, 100... rows) and used it even with a flush-valve water closet in the
+// list: two flush valves and two lavatories (14 WSFU) read 16.6 gpm and a 1 in
+// supply, where the flush-valve column gives 30.2 gpm.
+export const HUNTERS_CURVE = WSFU_FLUSH_TANK.map(([wsfu, gpm]) => ({ wsfu, gpm }));
+const HUNTERS_CURVE_FLUSH_VALVE = WSFU_FLUSH_VALVE.map(([wsfu, gpm]) => ({ wsfu, gpm }));
 
-function huntersFlowFromWSFU(wsfu) {
+function huntersFlowFromWSFU(wsfu, curve = HUNTERS_CURVE) {
   if (wsfu <= 0) return 0;
-  if (wsfu <= HUNTERS_CURVE[0].wsfu) return HUNTERS_CURVE[0].gpm * (wsfu / HUNTERS_CURVE[0].wsfu);
-  for (let i = 1; i < HUNTERS_CURVE.length; i++) {
-    if (wsfu <= HUNTERS_CURVE[i].wsfu) {
-      const a = HUNTERS_CURVE[i - 1];
-      const b = HUNTERS_CURVE[i];
+  if (wsfu <= curve[0].wsfu) return curve[0].gpm * (wsfu / curve[0].wsfu);
+  for (let i = 1; i < curve.length; i++) {
+    if (wsfu <= curve[i].wsfu) {
+      const a = curve[i - 1];
+      const b = curve[i];
       const t = (wsfu - a.wsfu) / (b.wsfu - a.wsfu);
       return a.gpm + t * (b.gpm - a.gpm);
     }
   }
   // Above table: extend linearly using last slope.
-  const a = HUNTERS_CURVE[HUNTERS_CURVE.length - 2];
-  const b = HUNTERS_CURVE[HUNTERS_CURVE.length - 1];
+  const a = curve[curve.length - 2];
+  const b = curve[curve.length - 1];
   const slope = (b.gpm - a.gpm) / (b.wsfu - a.wsfu);
   return b.gpm + slope * (wsfu - b.wsfu);
 }
@@ -174,7 +172,8 @@ export function computePipeSizing({ fixtures, slope_in_per_ft = 0.25 }) {
     wsfu += (v.wsfu_total || 0) * c;
     dfu += (v.dfu || 0) * c;
   }
-  const gpm = huntersFlowFromWSFU(wsfu);
+  const flushValve = (fixtures || []).some((f) => f.fixture === "water_closet_flush_valve");
+  const gpm = huntersFlowFromWSFU(wsfu, flushValve ? HUNTERS_CURVE_FLUSH_VALVE : HUNTERS_CURVE);
   const hasWc = (fixtures || []).some((f) => /^water_closet/.test(f.fixture) && (f.count || 1) > 0);
   const drain = recommendedDrainageSize(dfu, slope_in_per_ft, hasWc);
   if (drain === null) return { error: "Drain slope must be 1/8 (0.125), 1/4 (0.25), or 1/2 (0.5) in per ft." };
@@ -182,6 +181,7 @@ export function computePipeSizing({ fixtures, slope_in_per_ft = 0.25 }) {
     total_wsfu: wsfu,
     total_dfu: dfu,
     estimated_demand_gpm: gpm,
+    demand_curve: flushValve ? "flush valve" : "flush tank",
     recommended_supply_size: recommendedSupplySize(gpm),
     recommended_drainage_size: drain,
   };
@@ -3600,8 +3600,7 @@ PLUMBING_RENDERERS["pipe-velocity"] = _v26renderPipeVelocity;
 // Table E103.3(3) (NBS BMS65). Until 2026-09-18 these were approximations up
 // to 45% off the table: flush tank 10 WSFU read 8 gpm (the table's 4-WSFU
 // row; 10 prints 14.6), flush valve 100 read 55 (67.5).
-const WSFU_FLUSH_TANK = [[1, 3.0], [5, 9.4], [10, 14.6], [20, 19.6], [30, 23.3], [40, 26.3], [50, 29.1], [60, 32.0], [80, 38.0], [100, 43.5], [120, 48.0], [140, 52.5], [160, 57.0], [200, 65.0], [250, 75.0], [300, 85.0]];
-const WSFU_FLUSH_VALVE = [[5, 15.0], [10, 27.0], [20, 35.0], [30, 42.0], [40, 46.0], [50, 50.0], [60, 54.0], [80, 61.2], [100, 67.5], [120, 73.0], [140, 77.0], [160, 81.0], [200, 90.0], [250, 101.0], [300, 108.0]];
+// The rows (WSFU_FLUSH_TANK, WSFU_FLUSH_VALVE) are defined with Hunter's curve near the top.
 
 // dims: in { wsfu: dimensionless, system_type: dimensionless, curve: dimensionless } out: { gpm: L^3 T^-1, bracket_low_wsfu: dimensionless, bracket_high_wsfu: dimensionless }
 // (Fixture units are dimensionless; the probable peak demand is a volumetric

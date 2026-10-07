@@ -5786,8 +5786,8 @@
       "date": "2026-09-29"
     },
     "/tools/pulley-ma-gen/": {
-      "sha": "1cef5579cd2b23d2",
-      "date": "2026-10-03"
+      "sha": "a1c168198cc80535",
+      "date": "2026-10-07"
     },
     "/tools/pulling-tension/": {
       "sha": "c61245624430a221",
@@ -8762,8 +8762,8 @@
       "date": "2026-09-29"
     },
     "/tools/welder-arc-circuit-conductor/": {
-      "sha": "98d4f37dddc5931d",
-      "date": "2026-09-29"
+      "sha": "807e44f7e29cf42a",
+      "date": "2026-10-07"
     },
     "/tools/welder-resistance-circuit-conductor/": {
       "sha": "aab4ced169e470ae",

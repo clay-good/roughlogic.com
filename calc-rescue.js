@@ -138,7 +138,11 @@ export function computeSlingAngle({ load_lb = 0, sling_config = "vertical", incl
     tension_per_leg = load_lb / n_legs;
     factor = 1;
   } else if (sling_config === "basket" || sling_config === "bridle") {
-    tension_per_leg = load_lb / (n_legs * Math.cos(theta_rad));
+    // A bridle of three or more legs is not assumed to share the load evenly: legs of unequal
+    // length or a rigid load leave two carrying it (rigging-check and multi-leg-sling). Until
+    // 2026-10-07 all n legs shared here, half the per-leg tension on a 4-leg bridle.
+    const bearing_legs = sling_config === "bridle" ? Math.min(n_legs, 2) : n_legs;
+    tension_per_leg = load_lb / (bearing_legs * Math.cos(theta_rad));
     factor = 1;
   } else if (sling_config === "choker") {
     tension_per_leg = load_lb / (n_legs * Math.cos(theta_rad));

@@ -10723,7 +10723,7 @@ test("monotonicity: computeLumberSpan allowable_span_ft strictly decreasing in t
   assert.ok(badSize.error, `expected error for unknown size, got ${JSON.stringify(badSize)}`);
 });
 
-test("monotonicity: computePulleyMA actual_ma = theoretical_ma * efficiency^pulleys strictly increasing in efficiency at fixed rig (base > 0); theoretical_ma ordering fixed_1 1 < block_2 2 < block_3 3 < block_4 4 < block_5 5 < block_6 6; actual_ma <= theoretical_ma always; efficiency=1 -> actual = theoretical exactly; block_3 @ 0.95 -> 3*0.95^3 closed-form pin", () => {
+test("monotonicity: computePulleyMA actual_ma (tension tracking, p + p^2 + ... + p^n) strictly increasing in efficiency at fixed rig (base > 0); theoretical_ma ordering fixed_1 1 < block_2 2 < block_3 3 < block_4 4 < block_5 5 < block_6 6; actual_ma <= theoretical_ma always; efficiency=1 -> actual = theoretical exactly; block_3 @ 0.95 -> 0.95 + 0.95^2 + 0.95^3 closed-form pin", () => {
   // Group G. actual_ma strictly increasing in efficiency at fixed rig.
   let prev = -Infinity;
   for (const efficiency of [0.80, 0.85, 0.90, 0.95, 1.0]) {
@@ -10760,8 +10760,8 @@ test("monotonicity: computePulleyMA actual_ma = theoretical_ma * efficiency^pull
   // Closed-form pin: actual = theoretical * efficiency^pulleys.
   const ref = computePulleyMA({ rig: "block_3", efficiency: 0.95 });
   assert.equal(ref.pulleys, 3);
-  assert.ok(Math.abs(ref.actual_ma - 3 * Math.pow(0.95, 3)) < 1e-12,
-    `actual_ma = ${ref.actual_ma}, expected ${3 * Math.pow(0.95, 3)}`);
+  assert.ok(Math.abs(ref.actual_ma - (0.95 + 0.95 ** 2 + 0.95 ** 3)) < 1e-12,
+    `actual_ma = ${ref.actual_ma}, expected ${(0.95 + 0.95 ** 2 + 0.95 ** 3)}`);
   // fixed_1 single-pulley pin: actual = 1 * efficiency^1 = efficiency.
   const single = computePulleyMA({ rig: "fixed_1", efficiency: 0.9 });
   assert.ok(Math.abs(single.actual_ma - 0.9) < 1e-12,
@@ -12617,7 +12617,9 @@ test("physical: rescue sling tension uses cos(theta/2) and rises as legs open (g
   assert.ok(sa({ included_angle_deg: 120 }).tension_per_leg_lb > sa({ included_angle_deg: 60 }).tension_per_leg_lb, "tension must RISE as the included angle opens (legs flatten) -- the cos direction, not sin");
   assert.ok(sa({ included_angle_deg: 1 }).tension_per_leg_lb < sa({ included_angle_deg: 90 }).tension_per_leg_lb, "near-vertical legs must carry the least tension");
   assert.ok(sa({ load_lb: 2000 }).tension_per_leg_lb > sa({}).tension_per_leg_lb, "tension must rise with load");
-  assert.ok(sa({ n_legs: 4 }).tension_per_leg_lb < sa({}).tension_per_leg_lb, "more legs share the load, lowering per-leg tension");
+  // Past two legs a bridle is not assumed to share evenly: two carry the load (2026-10-07).
+  assert.ok(Math.abs(sa({ n_legs: 4 }).tension_per_leg_lb - sa({}).tension_per_leg_lb) < 1e-9, "a 4-leg bridle is rated on two legs");
+  assert.ok(r.computeSlingAngle({ load_lb: 1000, sling_config: "basket", included_angle_deg: 60, n_legs: 4 }).tension_per_leg_lb < sa({}).tension_per_leg_lb, "basket legs do share the load");
 });
 
 // Forward/inverse AGREEMENT round-trips. Two of this session's formula bugs

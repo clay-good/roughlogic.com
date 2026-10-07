@@ -7076,7 +7076,9 @@ test("bounds: calc-cross computePulleyMA pins actual_MA = theoretical * efficien
   const r = computePulleyMA({ rig: "block_3", efficiency: 0.95 });
   assert.strictEqual(r.theoretical_ma, 3);
   assert.strictEqual(r.pulleys, 3);
-  assert.ok(Math.abs(r.actual_ma - 3 * Math.pow(0.95, 3)) < 1e-9);
+  assert.ok(Math.abs(r.actual_ma - (0.95 + 0.95 ** 2 + 0.95 ** 3)) < 1e-9); // tension tracking
+  // A single movable pulley: the haul part also lifts, 1 + p.
+  assert.ok(Math.abs(computePulleyMA({ rig: "movable_2", efficiency: 0.95 }).actual_ma - 1.95) < 1e-12);
   // fixed_1: ma=1.
   assert.strictEqual(computePulleyMA({ rig: "fixed_1", efficiency: 1 }).theoretical_ma, 1);
   // Rejections.
@@ -9423,7 +9425,7 @@ test("bounds: calc-construction computeCraneLiftCheck pins gross_load, per-leg s
   const r = computeCraneLiftCheck({ load_lb: 8000, rigging_lb: 600, block_lb: 250, jib_deduct_lb: 0, sling_legs: 4, sling_angle_deg: 60, chart_capacity_lb: 12000 });
   assert.strictEqual(r.gross_load_lb, 8850);
   // per_leg = load / (legs * sin(theta)), theta measured from horizontal.
-  const per_leg_expected = 8000 / (4 * Math.sin(60 * Math.PI / 180));
+  const per_leg_expected = 8000 / (2 * Math.sin(60 * Math.PI / 180)); // 4 legs: two carry the load
   assert.ok(Math.abs(r.per_leg_lb - per_leg_expected) < 1e-9);
   assert.strictEqual(r.percent_of_chart, (8850 / 12000) * 100);
   assert.strictEqual(r.flag, "GREEN"); // 73.75% < 75.
@@ -26220,8 +26222,9 @@ test("bounds: spec-v559 computeSolarEgc69045 pins the OCPD-vs-Isc basis, the 14 
   assert.equal(r.has_ocpd, true);
   // No OCPD: the EGC is sized from an assumed device at the PV maximum current, 1.25 x Isc, floored at 14 AWG.
   const noOcpd = _v559({ ocpd_rating_a: 0, pv_isc_a: 10, vd_upsized: "yes" });
-  assert.equal(noOcpd.basis_current_a, 12.5);
-  assert.equal(noOcpd.egc_awg, "14"); // 12.5 A -> 14 AWG (the minimum)
+  assert.equal(noOcpd.basis_current_a, 15.625); // 690.45(A) assumed device per 690.9(B): 1.25 x 1.25 x Isc
+  assert.equal(noOcpd.egc_awg, "12"); // 15.6 A is past the 15 A row: Table 250.122's 20 A row
+  assert.equal(_v559({ ocpd_rating_a: 0, pv_isc_a: 11, vd_upsized: "no" }).egc_awg, "12"); // 17.2 A
   assert.equal(noOcpd.has_ocpd, false);
   // 690.45 waives the 250.122(B) upsize even when the conductors are upsized for voltage drop.
   assert.equal(noOcpd.egc_upsize_required, false);
@@ -29394,8 +29397,8 @@ import { computeWelderArcCircuitConductor as _v932 } from "../../calc-electrical
 
 test("bounds: spec-v932 computeWelderArcCircuitConductor pins the duty multiplier, effective current, OCPD, and error seams", () => {
   const r = _v932({ primary_current_a: 40, duty_pct: 50 });
-  assert.ok(Math.abs(r.duty_multiplier - Math.SQRT1_2) < 1e-9); // sqrt(0.5)
-  assert.ok(Math.abs(r.effective_current_a - 28.2843) < 1e-3); // 40 * sqrt(0.5)
+  assert.strictEqual(r.duty_multiplier, 0.71); // Table 630.11(A) prints 0.71 at 50%
+  assert.ok(Math.abs(r.effective_current_a - 28.4) < 1e-9); // 40 * 0.71
   assert.equal(r.ocpd_max_a, 80); // 2.0 * 40
   // 100% duty -> full nameplate current.
   const full = _v932({ primary_current_a: 60, duty_pct: 100 });
@@ -32003,11 +32006,12 @@ test("bounds: welder tile scopes to the transformer/rectifier column and rounds 
   // note previously also claimed motor-generator coverage (a different, higher
   // column) and an OCPD rounding the code never performed.
   // The table's last row is "20 or less 0.45", so the multiplier holds at 0.45 at and below 20%.
-  for (const [duty, mult] of [[50, 0.7071], [30, 0.5477], [20, 0.45], [10, 0.45], [100, 1.0]]) {
+  // At the listed rows the printed value is used; between rows, the square root the table rounds.
+  for (const [duty, mult] of [[50, 0.71], [30, 0.55], [60, 0.78], [55, Math.sqrt(0.55)], [20, 0.45], [10, 0.45], [100, 1.0]]) {
     assert.ok(Math.abs(_necWeld({ primary_current_a: 40, duty_pct: duty }).duty_multiplier - mult) < 1e-4);
   }
   const r = _necWeld({ primary_current_a: 40, duty_pct: 50 });
-  assert.ok(Math.abs(r.effective_current_a - 28.284) < 1e-3);
+  assert.ok(Math.abs(r.effective_current_a - 28.4) < 1e-9);
   // 630.12(A) hard 200% ceiling; the reported standard OCPD is the largest
   // 240.6 size at or below it -- rounding DOWN, not up (no welder round-up).
   assert.strictEqual(r.ocpd_max_a, 80);

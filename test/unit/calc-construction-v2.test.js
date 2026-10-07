@@ -560,9 +560,15 @@ test("Anchor: concrete breakout does not depend on the bolt diameter", () => {
 });
 
 test("Anchor: 4x fc shortens embedment by 2^(-2/3) (sqrt fc, hef^1.5)", () => {
-  const a = computeAnchorEmbedment({ uplift_lb: 5000, bolt_diameter_in: 0.625, fc_psi: 3000 });
-  const b = computeAnchorEmbedment({ uplift_lb: 5000, bolt_diameter_in: 0.625, fc_psi: 12000 });
+  const a = computeAnchorEmbedment({ uplift_lb: 5000, bolt_diameter_in: 0.625, fc_psi: 2500 });
+  const b = computeAnchorEmbedment({ uplift_lb: 5000, bolt_diameter_in: 0.625, fc_psi: 10000 });
   assert.ok(close(b.embedment_in, a.embedment_in * Math.pow(2, -2 / 3)));
+});
+
+test("Anchor: f'c above 10,000 psi earns no shallower embedment (ACI 318-19 17.3.1)", () => {
+  const capped = computeAnchorEmbedment({ uplift_lb: 20000, bolt_diameter_in: 0.75, fc_psi: 10000 });
+  const strong = computeAnchorEmbedment({ uplift_lb: 20000, bolt_diameter_in: 0.75, fc_psi: 12000 });
+  assert.strictEqual(strong.embedment_in, capped.embedment_in);
 });
 
 test("Anchor: zero load returns error", () => {

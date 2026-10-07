@@ -14,12 +14,13 @@ test("pole embedment solves the IBC 1807.3.2.1 relation past the old 60 ft brack
   for (const [P, h, b] of [[2000, 15, 1], [50000, 30, 1.5], [100000, 40, 2]]) {
     const r = computePoleEmbedmentDepth({ lateral_force_lb: P, force_height_ft: h, post_width_ft: b, lateral_bearing_psf_per_ft: 100 });
     const d = r.embedment_ft;
-    const A = 2.34 * P / (100 * d / 3 * b);
-    assert.ok(Math.abs(0.5 * A * (1 + Math.sqrt(1 + 4.36 * h / A)) - d) < 1e-9, `${P} lb: d = ${d}`);
+    // S1 takes d no deeper than 12 ft (IBC 1807.3.2.1; capped 2026-10-07).
+    const A = 2.34 * P / (100 * Math.min(d, 12) / 3 * b);
+    assert.ok(Math.abs(0.5 * A * (1 + Math.sqrt(1 + 4.36 * h / A)) - d) < 1e-9 * Math.max(1, d), `${P} lb: d = ${d}`);
   }
-  // The largest case needs 74.6 ft; the fixed bracket had reported 60.
+  // The largest case is past the old fixed 60 ft bracket, which had reported 60.
   const big = computePoleEmbedmentDepth({ lateral_force_lb: 100000, force_height_ft: 40, post_width_ft: 2, lateral_bearing_psf_per_ft: 100 });
-  assert.ok(big.embedment_ft > 74 && big.embedment_ft < 75);
+  assert.ok(big.embedment_ft > 60);
 });
 
 test("dock piling solves its embedment relation past the old 1,000 ft bracket", () => {

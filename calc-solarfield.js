@@ -36,8 +36,10 @@ export function computeSolarEgc69045({ ocpd_rating_a = 0, pv_isc_a = 0, vd_upsiz
   const isc = Number(pv_isc_a) || 0;
   const vdUp = vd_upsized === true || vd_upsized === "yes";
   if (!(ocpd > 0) && !(isc > 0)) return { error: "Provide the OCPD rating, or the PV short-circuit current when there is no overcurrent device." };
-  // 690.45(A): with no OCPD, an assumed device rated at the PV maximum circuit current, 1.25 x Isc (690.8(A)(1)).
-  const basis_current_a = ocpd > 0 ? ocpd : 1.25 * isc;
+  // 690.45(A): with no OCPD, an assumed device "rated in accordance with 690.9(B)", which is 125% of
+  // the 690.8(A) maximum current (itself 1.25 x Isc): 1.5625 x Isc, as pv-circuit-ampacity has checked the OCPD
+  // since 2026-10-03. Until 2026-10-07 this took 1.25 x Isc, an 11 A module reading 14 AWG for 12.
+  const basis_current_a = ocpd > 0 ? ocpd : 1.25 * 1.25 * isc;
   const has_ocpd = ocpd > 0;
   const row = _PV_EGC_TABLE_CU.find((r) => basis_current_a <= r.ocpd_max_A);
   if (!row) return { error: "Basis current exceeds the bundled Table 250.122 range; consult engineering analysis." };
@@ -46,7 +48,7 @@ export function computeSolarEgc69045({ ocpd_rating_a = 0, pv_isc_a = 0, vd_upsiz
     basis_current_a, egc_awg, has_ocpd, egc_upsize_required: false, vd_upsized: vdUp,
     note: (has_ocpd
       ? "The EGC is sized from the overcurrent device rating via Table 250.122."
-      : "This PV source circuit has no overcurrent device (two or fewer source circuits cannot deliver enough fault current), so the EGC is sized from an assumed device rated at the PV maximum circuit current, 1.25 x Isc (690.8(A)(1)), not an OCPD rating.")
+      : "This PV source circuit has no overcurrent device (two or fewer source circuits cannot deliver enough fault current), so the EGC is sized from an assumed device rated per 690.9(B), 125% of the PV maximum circuit current, so 1.25 x 1.25 x Isc = 1.56 x Isc (690.8(A)(1)), not an OCPD rating.")
       + " The EGC is never smaller than 14 AWG. NEC 690.45 waives the 250.122(B) proportional-upsize rule, so enlarging the circuit conductors for voltage drop does NOT require enlarging the EGC" + (vdUp ? " - the conductors were upsized here, but the EGC stays as sized." : ".") + " The NEC and the AHJ govern.",
   };
 }

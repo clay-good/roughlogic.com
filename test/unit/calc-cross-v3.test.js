@@ -79,7 +79,7 @@ test("Ladder: shallow placement fails (working far below ladder length)", () => 
 test("Ladder: 16/24 leaned at ~41.8 deg fails", () => { const r = computeLadderAngle({ ladder_length_ft: 24, working_height_ft: 16 }); assert.equal(r.pass, false); });
 
 // 167 Pulley MA
-test("Pulley: example block_3 ~ 2.71", () => { const r = computePulleyMA(pulleyMAExample.inputs); assert.ok(close(r.actual_ma, 3 * Math.pow(0.95, 3), 0.001)); });
+test("Pulley: example block_3 ~ 2.71", () => { const r = computePulleyMA(pulleyMAExample.inputs); assert.ok(close(r.actual_ma, 2.7099, 0.001)); }); // 0.95 + 0.95^2 + 0.95^3, tension tracking
 test("Pulley: fixed_1 has no losses", () => { const r = computePulleyMA({ rig: "fixed_1", efficiency: 0.5 }); assert.ok(close(r.actual_ma, 0.5, 0.001)); });
 test("Pulley: unknown rig errors", () => { const r = computePulleyMA({ rig: "x", efficiency: 0.95 }); assert.ok(r.error); });
 test("Pulley: bad efficiency errors", () => { const r = computePulleyMA({ rig: "block_2", efficiency: 1.2 }); assert.ok(r.error); });

@@ -1206,7 +1206,11 @@ GEOTECH_RENDERERS["cohesive-earth-pressure"] = _simpleRenderer({
 // allowable lateral bearing at ONE-THIRD the embedment (S1 = rate x mult x d/3), so d appears on
 // both sides -- solved by bisection, verified by back-substitution. Constrained Eq. 18-2:
 // d^2 = 4.25 P h/(S3 b) with S3 = rate x mult x d -> closed form d = cbrt(4.25 P h/(rate mult b)).
-// mult = 2.0 for isolated poles per 1806.3.4 (1/2-in motion acceptable). Formula capped at 12 ft.
+// mult = 2.0 for isolated poles per 1806.3.4 (1/2-in motion acceptable). IBC 1807.3.2.1 takes d
+// "not over 12 feet for purpose of computing lateral pressure": past 12 ft, S1 and S3 hold their
+// 12 ft values and the depth keeps growing. Until 2026-10-07 the pressure kept growing with d, so a
+// pole needing more than 12 ft read short (17.7 ft where the capped relation asks 22.9), the error
+// the marine pile tile's 2026-10-01 fix removed from the same equation.
 // dims: in { lateral_force_lb: M L T^-2, force_height_ft: L, post_width_ft: L, lateral_bearing_psf_per_ft: M L^-2 T^-2, constraint: dimensionless, isolated: dimensionless } out: { embedment_ft: L, embedment_in: L, s_pressure_psf: M L^-1 T^-2 }
 export function computePoleEmbedmentDepth({ lateral_force_lb = 0, force_height_ft = 0, post_width_ft = 0, lateral_bearing_psf_per_ft = 150, constraint = "nonconstrained", isolated = "no" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
@@ -1224,10 +1228,11 @@ export function computePoleEmbedmentDepth({ lateral_force_lb = 0, force_height_f
   let embedment_ft, s_pressure_psf;
   if (constraint === "constrained") {
     embedment_ft = Math.cbrt(4.25 * P * h / (rate * mult * b));
-    s_pressure_psf = rate * mult * embedment_ft;
+    if (embedment_ft > 12) embedment_ft = Math.sqrt(4.25 * P * h / (rate * mult * 12 * b));
+    s_pressure_psf = rate * mult * Math.min(embedment_ft, 12);
   } else {
     const req = (d) => {
-      const S1 = rate * mult * d / 3;
+      const S1 = rate * mult * Math.min(d, 12) / 3;
       const A = 2.34 * P / (S1 * b);
       return 0.5 * A * (1 + Math.sqrt(1 + 4.36 * h / A));
     };
@@ -1242,14 +1247,14 @@ export function computePoleEmbedmentDepth({ lateral_force_lb = 0, force_height_f
       if (req(mid) > mid) lo = mid; else hi = mid;
     }
     embedment_ft = (lo + hi) / 2;
-    s_pressure_psf = rate * mult * embedment_ft / 3;
+    s_pressure_psf = rate * mult * Math.min(embedment_ft, 12) / 3;
   }
   const embedment_in = embedment_ft * 12;
   const over_12ft = embedment_ft > 12;
   if (![embedment_ft, embedment_in, s_pressure_psf].every(Number.isFinite)) return { error: "Embedment math did not produce a finite value." };
   return {
     embedment_ft, embedment_in, s_pressure_psf, over_12ft, mult,
-    note: (over_12ft ? "OVER THE 12-FT LIMIT: the code formula's embedment definition stops at 12 ft - this pole needs an engineered foundation, not the 1807.3 formula. " : "")
+    note: (over_12ft ? "DEEPER THAN 12 FT: IBC 1807.3.2.1 holds the lateral pressure at its 12 ft value past that depth, which this depth reflects; a pole this deep is usually given an engineered foundation. " : "")
       + "Nonconstrained is a post in soil alone; constrained means grade-level restraint by a rigid slab or pavement, which cuts the required depth by roughly a third. The isolated-pole increase (2x lateral bearing, IBC 1806.3.4) applies only where 1/2 in of movement at grade is acceptable - flagpoles, signs, fences - never where the pole supports a building that cracks. The lateral-bearing rate comes from the LOCAL code table or the geotech report, per foot of depth; poles carrying masonry or concrete need bracing per 1807.3.1, and wood posts need AWPA U1 UC4B treatment. Lateral load only - vertical capacity and concrete volume are separate tiles. The adopted code edition and the AHJ govern - a design aid, not the engineer of record.",
   };
 }
@@ -1266,7 +1271,7 @@ GEOTECH_RENDERERS["pole-embedment-depth"] = _simpleRenderer({
     { key: "isolated", label: "Isolated pole (1/2-in movement OK, 2x bearing)", kind: "select", options: [{ value: "yes", label: "Yes (flagpole/sign/fence, 1806.3.4)", selected: true }, { value: "no", label: "No (movement-sensitive)" }] },
   ],
   outputs: [
-    { key: "d", id: "ped-out-d", label: "Required embedment d", value: (r) => fmt(r.embedment_ft, 2) + " ft (" + fmt(r.embedment_in, 0) + " in)" + (r.over_12ft ? " - OVER the 12-ft formula limit" : "") },
+    { key: "d", id: "ped-out-d", label: "Required embedment d", value: (r) => fmt(r.embedment_ft, 2) + " ft (" + fmt(r.embedment_in, 0) + " in)" + (r.over_12ft ? " - deeper than 12 ft, pressure held at its 12 ft value" : "") },
     { key: "s", id: "ped-out-s", label: "Lateral bearing used", value: (r) => fmt(r.s_pressure_psf, 0) + " psf (x" + fmt(r.mult, 0) + " isolated factor)" },
     { key: "n", id: "ped-out-n", label: "Note", value: (r) => r.note },
   ],

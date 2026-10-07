@@ -207,7 +207,11 @@ export function computeWelderArcCircuitConductor({ primary_current_a = 40, duty_
   // NEC 630.11(A) / Table 630.11(A), nonmotor-generator column: the rows from 30 to 100% duty track
   // sqrt(duty), but the table's last row is "20 or less 0.45". Until 2026-09-25 sqrt ran all the way
   // down (0.32 at 10% duty), undersizing the conductor by up to half.
-  const duty_multiplier = duty_pct <= 20 ? 0.45 : Math.sqrt(duty_pct / 100);
+  // At the listed rows the multiplier is the printed two-place value (0.78 at 60%, not sqrt(0.6) =
+  // 0.7746), as the resistance-welder tile has read Table 630.31(A)(2) since 2026-09-25; between rows the
+  // square root the table rounds is used. Until 2026-10-07 every listed row read low here.
+  const WELDER_630_11_A = { 100: 1.00, 90: 0.95, 80: 0.89, 70: 0.84, 60: 0.78, 50: 0.71, 40: 0.63, 30: 0.55 };
+  const duty_multiplier = duty_pct <= 20 ? 0.45 : (WELDER_630_11_A[duty_pct] ?? Math.sqrt(duty_pct / 100));
   const effective_current_a = primary_current_a * duty_multiplier;
   // NEC 630.12(A): the overcurrent device for an arc welder may not exceed 200% of the rated primary current.
   const ocpd_max_a = 2.0 * primary_current_a;

@@ -1187,7 +1187,9 @@ export function computeAnchorEmbedment({ uplift_lb, bolt_diameter_in, fc_psi, cr
   const d = Number(bolt_diameter_in) || 0;
   const fc = Number(fc_psi) || 0;
   if (T <= 0 || d <= 0 || fc <= 0) return { error: "Provide positive uplift, diameter, fc." };
-  const hefFor = (psi) => Math.pow(T / (0.70 * psi * 24 * Math.sqrt(fc)), 2 / 3);
+  // ACI 318-19 17.3.1: f'c is capped at 10,000 psi for a cast-in anchor (as concrete-anchor-breakout
+  // does). Until 2026-10-07 a 12,000 psi mix asked 6% less embedment.
+  const hefFor = (psi) => Math.pow(T / (0.70 * psi * 24 * Math.sqrt(Math.min(fc, 10000))), 2 / 3);
   const ld_in = hefFor(1.25);
   // Cracked concrete drops psi_c,N from 1.25 to 1.0 (ACI 17.6.2.5), so the
   // required embedment grows by 1.25^(2/3) = 1.16. The edge flag checks the
@@ -2643,7 +2645,9 @@ export function computeCraneLiftCheck({
   // diverges as the sling flattens toward horizontal. (A prior sin(angle/2) form
   // gave 1.41*W/n at the vertical default instead of W/n.)
   const theta = sling_angle_deg * Math.PI / 180;
-  const per_leg_lb = (Number(load_lb) || 0) / (sling_legs * Math.sin(theta));
+  // Three or more legs are not assumed to share evenly; two carry the load (the rigging-check
+  // and multi-leg-sling rule). Until 2026-10-07 a 4-leg pick showed half the per-leg tension.
+  const per_leg_lb = (Number(load_lb) || 0) / (Math.min(sling_legs, 2) * Math.sin(theta));
   if (!(chart_capacity_lb > 0)) {
     return {
       gross_load_lb, per_leg_lb, input_complete: false,

@@ -2541,8 +2541,8 @@ function renderEquipmentHeatLoad(inputRegion, outputRegion, citationEl) {
 RESTORATION_RENDERERS["equipment-heat-load"] = renderEquipmentHeatLoad;
 
 // --- spec-v146: Fire-exposed wood char depth + residual bending capacity (`char-depth-capacity`) ---
-// AWC/NDS one-dimensional char model: char_depth = rate x hours; an effective
-// char adds the heat-degraded zero-strength layer; the residual section drives
+// AWC/NDS one-dimensional char model: char_depth = rate x hours^0.813 (NDS 16.2.1);
+// the effective char is 1.2 x that plus any added zero-strength layer; the residual section drives
 // the bending-capacity (section-modulus) fraction. A residual dimension at or
 // below zero reports `consumed` with zero capacity, never a negative number.
 // dims: in { exposure_min: T, nominal_width_in: L, nominal_depth_in: L, faces_across_width: dimensionless, faces_across_depth: dimensionless, char_rate_in_hr: L T^-1, zero_strength_in: L } out: { char_depth_in: L, effective_char_in: L, residual_width_in: L, residual_depth_in: L, residual_area_in2: L^2, section_modulus_ratio: dimensionless }
