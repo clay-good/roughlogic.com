@@ -389,7 +389,7 @@ function _r(spec) {
 }
 
 const renderPounds = _r({
-  citation: "Citation: Pounds formula by name. lb/day = flow MGD * dose mg/L * 8.34. Adjusted product dose at the selected purity.",
+  citation: "Citation: Pounds formula by name. lb/day = flow MGD * dose mg/L * 8.34. Adjusted product dose at the selected purity, applied as a weight fraction (the operator-exam convention). Liquid hypochlorite sold at 12.5% trade strength (g per 100 mL) weighs about 20% more per pound of chlorine; pool-chlorine-dose and main-disinfection-chlorine work it by the gallon.",
   example: poundsFormulaExample.inputs,
   fields: [
     { key: "flow_mgd",   label: "Flow (MGD)", kind: "number" },

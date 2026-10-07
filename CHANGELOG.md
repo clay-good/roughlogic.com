@@ -81,6 +81,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **`pounds-formula` now says it applies product purity as a weight fraction**, the operator-exam convention. 12.5% liquid hypochlorite sold at trade strength weighs about 20% more per pound of chlorine, and the citation now names the two tiles that work it by the gallon (`pool-chlorine-dose`, `main-disinfection-chlorine`). The math is unchanged: it is the convention the tile teaches.
+
 - **`rc-beam-shear` and `rc-min-shear-reinforcement` cap stirrup fyt per ACI 318-19 Table 20.2.2.4(a)**: 60,000 psi for deformed bars, 80,000 psi for welded deformed wire. That is the same table the shear-friction and corbel tiles already apply. A new stirrup-type select picks the row; it defaults to bar. A Grade 80 or 100 bar stirrup used to stretch the required spacing in proportion to its grade. This was the open "stirrup fyt" item from the earlier sweep: the welded-wire allowance is why it needed a choice rather than a flat cap.
 
 - **A standing test now catches an input that cannot change the answer.** `test/unit/inert-input-guard.test.js` changes each input of every worked example, one at a time, through its other select options, a flipped checkbox, or a scaled number. Every input that never moves an output must appear in `test/fixtures/inert-inputs.js` with the reason it is legitimate: 141 do today, such as a field read only in another mode or a step the examples do not cross. The source-reading dead-input gates cannot see this case. It is how pf-correction's identical Phase branches and masonry-count's duplicate CMU face were found. Seeded: making velocity-head's density inert fails the test.
