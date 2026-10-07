@@ -89,6 +89,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **wrangler 4.145.0 -> 4.147.0** (Dependabot #26, applied by hand because the `sharp` override changed the lockfile under it). Its miniflare still pins `sharp` 0.35.4, so the override stays live; `npm audit` is clean and a `wrangler deploy --dry-run` bundles the report Worker.
+
 - **`sharp` is pinned to 0.35.5 for the high-severity librsvg advisory (GHSA-wq5f-xc86-pv6w).** It reaches the dev tree through wrangler -> miniflare, which pins exactly 0.35.4. Dependabot's security update failed for that reason ("the available update path still resolves it"), and `npm audit fix --force` would have downgraded wrangler. An `overrides` entry moves it; `npm audit` reports 0 vulnerabilities, and `check-dependency-overrides` will report the pin as dead once miniflare catches up. Dev-only: nothing in the shipped site loads sharp.
 
 - **The inert-input test now also runs every select the worked examples never set** through all of its options. The six that never move an answer from the examples are each gated by another input: breaker phase in amps mode, UTM hemisphere in one direction, decibel reference outside its mode, ISO vertical openings outside classes 5-6, and the new stirrup type below 60 ksi. They are listed with reasons (147 entries in all). Seeded: dropping the ISO entry fails the test.
