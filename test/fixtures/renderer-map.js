@@ -925,6 +925,7 @@ export const RENDERER_MAP = {
   "vacuum-excavation-spoil": { module: "../../calc-trenchless.js", exportName: "TRENCHLESS_RENDERERS" },
   "pipe-bursting-pull-load": { module: "../../calc-trenchless.js", exportName: "TRENCHLESS_RENDERERS" },
   "cipp-liner-thickness": { module: "../../calc-trenchless.js", exportName: "TRENCHLESS_RENDERERS" },
+  "cipp-fully-deteriorated": { module: "../../calc-trenchless.js", exportName: "TRENCHLESS_RENDERERS" },
   "lumber-recovery-overrun": { module: "../../calc-sawmill.js", exportName: "SAWMILL_RENDERERS" },
   "kiln-drying-time": { module: "../../calc-sawmill.js", exportName: "SAWMILL_RENDERERS" },
   "kiln-charge-water": { module: "../../calc-sawmill.js", exportName: "SAWMILL_RENDERERS" },

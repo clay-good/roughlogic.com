@@ -3718,6 +3718,7 @@ cross-check.
 | calc-treatment.js | `computeTaperedFlocculationG` | `{ stage1_g_per_s = 0, stage2_g_per_s = 0, stage3_g_per_s = 0, stage_volume_m3...` | _ | _ | _ |
 | calc-treatment.js | `computeTdsFromConductivity` | `{ conductivity_us_cm = 0, k_factor = 0.65 } = {}` | _ | _ | _ |
 | calc-treatment.js | `computeVaAlkalinityRatio` | `{ volatile_acids_mgl = 0, alkalinity_mgl = 0 } = {}` | _ | _ | _ |
+| calc-trenchless.js | `computeCippFullyDeteriorated` | `{ host_id_in = 0, ovality_pct = 0, soil_cover_ft = 0, groundwater_head_ft = 0...` | _ | _ | _ |
 | calc-trenchless.js | `computeCippLinerThickness` | `{ host_id_in = 0, ovality_pct = 0, groundwater_head_ft = 0, long_term_modulus...` | _ | _ | _ |
 | calc-trenchless.js | `computeHddAnnularPressure` | `{ cover_depth_ft = 0, shallow_cover_ft = 0, soil_unit_weight_pcf = 0, soil_co...` | _ | _ | _ |
 | calc-trenchless.js | `computeHddBendRadius` | `{ pipe_diameter_in = 0, radius_per_inch_ft = 100, rod_min_radius_ft = 0, entr...` | _ | _ | _ |
@@ -3899,7 +3900,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2483.
+Row count: 2484.
 
 <!-- END function-corpus-v14 -->
 
@@ -4675,7 +4676,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-extraction-rate` | Water Extraction Volume, Time, and Waste-Tank Dumps | Project (first-principles); standing + absorbed; wand time = total / gpm | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+4 more) |
 
-### Group E Construction (615 tiles)
+### Group E Construction (616 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4743,6 +4744,7 @@ per spec-v14 §13.1 second paragraph.
 | `chain-link-fence-takeoff` | Chain-Link Fabric, Post, and Tension-Band Takeoff | Chain-link takeoff identity (first-pr...; fabric=200-4=196; terminals=4+2=6; posts=ceil(200/10)=20;... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `check-dam-spacing` | Rock Check Dam Spacing | Crest-to-toe check-dam spacing identi...; spacing = 2 / 0.04 = 50 ft; dams = ceil(300/50) = 6 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `chip-seal-mcleod` | Chip Seal Design by the McLeod Method | McLeod method (state DOT test procedure); M 0.375 in, FI 18, W 95 pcf, G 2.65, E 1.05, T 0.75, S 0.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `cipp-fully-deteriorated` | CIPP Liner Thickness, Fully Deteriorated Host (ASTM F1216) | Iowa Statewide Urban Design and Speci...; Steps 1-5: 12 in VCP, 5 ft of 120 pcf clay cover, water t... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `cipp-liner-thickness` | CIPP Liner Thickness for Groundwater Buckling (ASTM F1216) | Project (first-principles); the fully deteriorated case is a different relation and i... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+4 more) |
 | `close-interval-survey-readings` | Close Interval Survey Planning | Project (first-principles); NACE SP0207 governs | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `closet-shelf-takeoff` | Closet Rod and Shelf Takeoff | takeoff arithmetic; 6-ft single + 4-ft double + 3-ft linen (4 shelves), 32-in... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -6302,6 +6304,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 
-Tile count: 2230. Fixture-covered or reference-cadence: 2230 / 2230.
+Tile count: 2231. Fixture-covered or reference-cadence: 2231 / 2231.
 
 <!-- END tile-index-v14 -->

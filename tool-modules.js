@@ -745,7 +745,7 @@ export const TOOL_MODULES = (() => {
   declare("./calc-trenchless.js", "TRENCHLESS_RENDERERS", [
     "hdd-bend-radius", "hdd-fluid-volume", "hdd-annular-pressure",
     "locate-depth-offset", "vacuum-excavation-spoil", "pipe-bursting-pull-load",
-    "cipp-liner-thickness",
+    "cipp-liner-thickness", "cipp-fully-deteriorated",
   ]);
   // spec-v1582..v1587: the sawmill and forest-products bench. The catalog
   // followed a log to the stump and stopped; these six follow it into the

@@ -167869,6 +167869,55 @@
      }
     }
    }
+  },
+ {
+  "tile_id": "cipp-fully-deteriorated",
+  "source_publisher": "Iowa Statewide Urban Design and Specifications (SUDAS)",
+  "source_title": "Design Manual Chapter 14, Section 14C-2 Pipeline Rehabilitation -- Fully Deteriorated Design Example (Figure 14C-2.03)",
+  "source_edition_or_year": "2021 Edition (example pages revised 2013)",
+  "source_section_or_page": "Steps 1-5: 12 in VCP, 5 ft of 120 pcf clay cover, water table 3 ft below grade (H_w 2 ft), HS-20 live load 2 psi at 5 ft, 5% ovality (C 0.64), E 300,000 psi, E_L 150,000 psi, E's 1,000 psi, N 2. Pw 0.87, R_w 0.87, Ps 3.63, Pt 6.5 psi, B' 0.26; t = 0.199 in (Eq. 14C-2.09); minimum t = 0.186 in (Eq. 14C-2.11). The tile carries B' unrounded (0.2571), giving 0.1996.",
+  "verified_by": "rl",
+  "verified_on": "2026-10-07",
+  "inputs": {
+   "host_id_in": 12,
+   "ovality_pct": 5,
+   "soil_cover_ft": 5,
+   "groundwater_head_ft": 2,
+   "soil_unit_weight_pcf": 120,
+   "live_load_psi": 2,
+   "soil_modulus_psi": 1000,
+   "long_term_modulus_psi": 150000,
+   "initial_modulus_psi": 300000,
+   "long_term_flexural_strength_psi": 2500,
+   "enhancement_factor": 7,
+   "safety_factor": 2
+  },
+  "outputs": {
+   "total_load_psi": {
+    "value": 6.5,
+    "tolerance": {
+     "abs": 0.02
+    }
+   },
+   "load_thickness_in": {
+    "value": 0.199,
+    "tolerance": {
+     "pct": 0.5
+    }
+   },
+   "stiffness_thickness_in": {
+    "value": 0.186,
+    "tolerance": {
+     "abs": 0.0005
+    }
+   },
+   "thickness_in": {
+    "value": 0.199,
+    "tolerance": {
+     "pct": 0.5
+    }
+   }
   }
+ }
  ]
 }

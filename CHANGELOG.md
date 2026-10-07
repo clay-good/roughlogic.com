@@ -6,6 +6,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Added
 
+- **`cipp-fully-deteriorated`: CIPP liner thickness when the host pipe is no longer structural (spec-v1927, Group E, `calc-trenchless.js`), 2,230 -> 2,231, v0.420.0.** `cipp-liner-thickness` computes only the partially deteriorated case and said the fully deteriorated one "is not approximated here". This is that case. Following ASTM F1216 Appendix X1, the liner is the greatest of four checks, each reported:
+  - X1.3, soil, water, and live load with the buoyancy factor R_w and the elastic support B'.
+  - X1.4, minimum stiffness, EI/D^3 of at least 0.093 on the initial modulus.
+  - X1.1, groundwater buckling.
+  - X1.2, ovality bending against the long-term flexural strength.
+
+  It reproduces the Iowa SUDAS Design Manual 14C-2 example: a 12 in VCP under 5 ft of cover, 2 ft of water, and HS-20 traffic at 5% ovality needs 0.199 in (0.1996 with B' unrounded), against 0.186 in for stiffness alone. The manual's bending step carries 0.4 psi of water where its own Step 1 computes 0.87. The tile uses 0.87 and says so.
+
 - **Disaster response: buildings in an outage (spec-v1923..v1925, 3 tiles, `calc-outage.js`).** Part of [scope-disaster-response](specs/scope-disaster-response.md); each tile is listed on `/collections/disaster-response/`. This completes the program: all 47 tiles of scope-disaster-response are live and every one is listed on /collections/disaster-response/. Spec correction: v1925's insulated line at 20 degF takes about 20 h to freeze solid (1.9 h to cool to 32 degF, then 18.0 h freezing), not 18 h.
   - **`building-outage-cooldown`** -- hours until a building without heat reaches a habitability or pipe-screening temperature, by the lumped-capacitance (Newton cooling) model with occupant gains (LBNL hours-of-safety metric, OSTI 1984644; ASHRAE Fundamentals specific heats). The small house from `building-ua` (UA 309.7, 10,000 Btu/degF, 68 degF in, 10 degF out) reaches 50 degF in 12.0 h and 40 degF in 21.3 h; four people at home push 40 degF to 23.1 h.
   - **`refrigeration-outage-holdover`** -- how long a walk-in holds product with the power out and how much dry ice covers the rest, by an energy balance (FDA Food Code 3-501.16 41 degF limit; USDA FSIS outage guidance as the check; 246 Btu/lb sublimation). An 8 x 10 x 8 ft box with 3,000 lb of produce holds about 15.8 h; a 72-hour outage needs 234 lb of dry ice.

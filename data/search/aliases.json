@@ -108369,6 +108369,31 @@
    "kind": "industry"
   },
   {
+   "term": "fully deteriorated cipp",
+   "target": "cipp-fully-deteriorated",
+   "kind": "industry"
+  },
+  {
+   "term": "cipp fully deteriorated design",
+   "target": "cipp-fully-deteriorated",
+   "kind": "industry"
+  },
+  {
+   "term": "astm f1216 fully deteriorated",
+   "target": "cipp-fully-deteriorated",
+   "kind": "industry"
+  },
+  {
+   "term": "cipp liner soil load",
+   "target": "cipp-fully-deteriorated",
+   "kind": "industry"
+  },
+  {
+   "term": "host pipe not structural liner",
+   "target": "cipp-fully-deteriorated",
+   "kind": "industry"
+  },
+  {
    "term": "astm f1216 buckling",
    "target": "cipp-liner-thickness",
    "kind": "industry"

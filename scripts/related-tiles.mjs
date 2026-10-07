@@ -1519,7 +1519,8 @@ const RELATED = {
   "locate-depth-offset": ["vacuum-excavation-spoil","spoil-setback","excavation"],
   "vacuum-excavation-spoil": ["locate-depth-offset","excavation","spoil-setback"],
   "pipe-bursting-pull-load": ["hdd-pullback","cipp-liner-thickness","manning-slope"],
-  "cipp-liner-thickness": ["pipe-bursting-pull-load","manning-slope","pipe-partial-flow-depth"],
+  "cipp-liner-thickness": ["cipp-fully-deteriorated","pipe-bursting-pull-load","manning-slope"],
+  "cipp-fully-deteriorated": ["cipp-liner-thickness","pipe-bursting-pull-load","pipe-partial-flow-depth"],
   // spec-v1582..v1587: the 2026-09-05 trade-expansion sawmill band.
   "lumber-recovery-overrun": ["timber-cruise","sawmill-residue-yield","board-footage"],
   "kiln-drying-time": ["kiln-charge-water","wood-emc","lumber-recovery-overrun"],

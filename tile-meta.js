@@ -876,6 +876,7 @@ const _TILES = [
   ["vacuum-excavation-spoil", "E"],
   ["pipe-bursting-pull-load", "E"],
   ["cipp-liner-thickness", "E"],
+  ["cipp-fully-deteriorated", "E"],
   // spec-v1582..v1587 sawmill and forest-products band (Group L)
   ["lumber-recovery-overrun", "L"],
   ["kiln-drying-time", "L"],

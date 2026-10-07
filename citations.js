@@ -15586,14 +15586,26 @@ export const CITATIONS = {
   },
   "cipp-liner-thickness": {
     formula: "ASTM F1216 X1.1, partially deteriorated: external pressure = 2 K E C / (1 - nu squared) x (1 / (DR - 1)) cubed / N, with the ovality reduction C = ((1 - q) / (1 + q) squared) cubed and Poisson's ratio 0.3; thickness = host diameter / DR.",
-    edition: "The ASTM F1216 X1.1 groundwater-buckling relation by name, for the partially deteriorated design case only. The fully deteriorated case is a different relation requiring the soil modulus, the live load, and the water buoyancy factor, and is not approximated here. For the partially deteriorated case the standard also requires the X1.2 bending check where the host pipe is out of round and holds the dimension ratio to 100 or less, and the design thickness is the greatest of those (Iowa SUDAS 14C-2; NCDOT Pipe Liner Manual) -- this computes X1.1 alone. ASTM F1216, the liner manufacturer's tested properties, and the design engineer govern.",
+    edition: "The ASTM F1216 X1.1 groundwater-buckling relation by name, for the partially deteriorated design case only. The fully deteriorated case is a different relation requiring the soil modulus, the live load, and the water buoyancy factor; the cipp-fully-deteriorated tile computes it. For the partially deteriorated case the standard also requires the X1.2 bending check where the host pipe is out of round and holds the dimension ratio to 100 or less, and the design thickness is the greatest of those (Iowa SUDAS 14C-2; NCDOT Pipe Liner Manual) -- this computes X1.1 alone. ASTM F1216, the liner manufacturer's tested properties, and the design engineer govern.",
     freeAccess: "The buckling relation is published engineering; the modulus, ovality, and enhancement factor are the user's own measured and manufacturer-supplied values, and no F1216 table is reproduced.",
     governance: GOVERNANCE.general,
     editionNote: "The two design cases are not variations on a theme. In the partially deteriorated case the host pipe is still structurally sound and the liner's only job is to resist external groundwater pressure trying to buckle it inward, so the thickness comes out modest. In the fully deteriorated case the host is assumed gone and the liner is the pipe, carrying soil load, live load, and groundwater as a standalone structure -- a much thicker section. Choosing the case is an engineering judgment about the host pipe's condition, made from a CCTV survey and the pipe's history rather than from a preference. Two inputs dominate the buckling case. Ovality is the first, and it bites steeply because the reduction factor goes as a cube of a term that falls with out-of-roundness, so a few percent costs real thickness -- and ovality is measured rather than assumed. The second is the modulus, and the trap there is TIME: CIPP creeps, so the fifty-year modulus is roughly half the short-term value, and a design run on the short-term number is unconservative by a large margin. Both are computed here so the penalty is visible rather than argued. Groundwater head is the load, and it is taken at the highest credible level rather than at the level on the day of the survey.",
     assumptions: [
       { name: "Ovality goes as a cube", value: "a few percent of out-of-roundness is real thickness, and it is measured not assumed", source: "ASTM F1216" },
       { name: "Use the LONG-TERM modulus", value: "creep halves it over fifty years, and the short-term number is unconservative", source: "ASTM F1216" },
-      { name: "The fully deteriorated case is a different relation", value: "it needs the soil modulus, live load, and buoyancy factor and is not approximated", source: "ASTM F1216" },
+      { name: "The fully deteriorated case is a different relation", value: "it needs the soil modulus, live load, and buoyancy factor; cipp-fully-deteriorated computes it", source: "ASTM F1216" },
+    ],
+  },
+  "cipp-fully-deteriorated": {
+    formula: "ASTM F1216 Appendix X1, fully deteriorated gravity pipe: thickness = the greatest of X1.3 t = [0.375 (N q_t / C) squared D cubed / (E_L R_w B' E's)]^(1/3) with q_t = 0.433 H_w + w H_s R_w / 144 + W_s, R_w = 1 - 0.33 H_w / H_s (not under 0.67), B' = 1 / (1 + 4 e^(-0.065 H_s)); X1.4 t = D (1.116 / E)^(1/3) (E I / D cubed at least 0.093 on the initial modulus); X1.1 groundwater buckling; X1.2 ovality bending against the long-term flexural strength. C = ((1 - q) / (1 + q) squared) cubed.",
+    edition: "ASTM F1216 Appendix X1 design relations by name, worked as in the Iowa SUDAS Design Manual Section 14C-2 (Equations 14C-2.02 to 14C-2.11 and the fully deteriorated design example).",
+    freeAccess: "The Iowa SUDAS Design Manual Section 14C-2 is free at iowasudas.org; ASTM F1216 itself is licensed and no table from it is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "Checked against the SUDAS fully deteriorated example: a 12 in VCP under 5 ft of clay at 120 pcf, 2 ft of groundwater, HS-20 traffic (2 psi), 5% ovality, E's 1,000 psi, E 300,000 / E_L 150,000 psi. The manual gives 0.199 in from X1.3 (this computes 0.1996 with B' unrounded) against 0.186 in for stiffness. The manual's bending check carries 0.4 psi of water where its own Step 1 computes 0.87 psi; this uses the 0.87.",
+    assumptions: [
+      { name: "Soil modulus E's", value: "500 psi for badly cracked pipe with voids to 2,000 psi for fair pipe", source: "Iowa SUDAS 14C-2" },
+      { name: "Water buoyancy factor floor", value: "0.67", source: "ASTM F1216 X1.3" },
+      { name: "Poisson's ratio (X1.1)", value: "0.3", source: "ASTM F1216" },
     ],
   },
   "main-disinfection-chlorine": {

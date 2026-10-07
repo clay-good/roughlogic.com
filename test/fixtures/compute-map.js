@@ -1636,6 +1636,7 @@ export const COMPUTE_MAP = {
   "vacuum-excavation-spoil": { module: "../../calc-trenchless.js", fn: "computeVacuumExcavationSpoil" },
   "pipe-bursting-pull-load": { module: "../../calc-trenchless.js", fn: "computePipeBurstingPullLoad" },
   "cipp-liner-thickness": { module: "../../calc-trenchless.js", fn: "computeCippLinerThickness" },
+  "cipp-fully-deteriorated": { module: "../../calc-trenchless.js", fn: "computeCippFullyDeteriorated" },
   // spec-v1582..v1587 sawmill and forest-products band
   "lumber-recovery-overrun": { module: "../../calc-sawmill.js", fn: "computeLumberRecoveryOverrun" },
   "kiln-drying-time": { module: "../../calc-sawmill.js", fn: "computeKilnDryingTime" },

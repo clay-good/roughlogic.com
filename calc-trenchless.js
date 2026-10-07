@@ -519,12 +519,12 @@ export function computeCippLinerThickness({ host_id_in = 0, ovality_pct = 0, gro
     external_pressure_psi, ovality_factor, dimension_ratio, thickness_in,
     short_term_thickness_in, alternative_thickness_in, round_thickness_in,
     creep_penalty_pct, ovality_penalty_pct,
-    note: "The two design cases are not variations on a theme. In the PARTIALLY DETERIORATED case, which is what this computes, the host pipe is still structurally sound and the liner's only job is to resist external groundwater pressure trying to buckle it inward, so the thickness comes out modest. In the FULLY DETERIORATED case the host is assumed gone and the liner is the pipe, carrying soil load, live load and groundwater as a standalone structure -- a much thicker section, a different relation, and one that needs the soil modulus, the live load and the water buoyancy factor as inputs; it is deliberately not computed here rather than approximated. Choosing the case is an engineering judgment about the host pipe's condition, made from a CCTV survey and the pipe's history rather than from a preference. Two inputs dominate the buckling case. OVALITY is the first: an out-of-round host reduces the liner's buckling resistance steeply, because the reduction factor goes as the cube of a term that falls with out-of-roundness, so a few percent of ovality costs real thickness -- and ovality is measured rather than assumed. The second is the MODULUS, and the trap there is time. CIPP creeps, so the fifty-year modulus is roughly half the short-term value, and a design run on the short-term number is unconservative by a large margin; both are computed here so the penalty is visible rather than argued. Groundwater head is the load, and it is taken at the highest credible level rather than at the level on the day of the survey. This is one equation from one design case. It does not select a resin or liner system, address the wet-out, cure, and cool-down that determine whether the installed liner has the modulus the design assumed, evaluate the host pipe's condition, handle bends, laterals, or changes in section, or address the field testing and sampling that verify the finished product. ASTM F1216, the liner manufacturer's tested properties, and the design engineer govern.",
+    note: "The two design cases are not variations on a theme. In the PARTIALLY DETERIORATED case, which is what this computes, the host pipe is still structurally sound and the liner's only job is to resist external groundwater pressure trying to buckle it inward, so the thickness comes out modest. In the FULLY DETERIORATED case the host is assumed gone and the liner is the pipe, carrying soil load, live load and groundwater as a standalone structure -- a much thicker section, a different relation, and one that needs the soil modulus, the live load and the water buoyancy factor as inputs; the cipp-fully-deteriorated tile computes it. Choosing the case is an engineering judgment about the host pipe's condition, made from a CCTV survey and the pipe's history rather than from a preference. Two inputs dominate the buckling case. OVALITY is the first: an out-of-round host reduces the liner's buckling resistance steeply, because the reduction factor goes as the cube of a term that falls with out-of-roundness, so a few percent of ovality costs real thickness -- and ovality is measured rather than assumed. The second is the MODULUS, and the trap there is time. CIPP creeps, so the fifty-year modulus is roughly half the short-term value, and a design run on the short-term number is unconservative by a large margin; both are computed here so the penalty is visible rather than argued. Groundwater head is the load, and it is taken at the highest credible level rather than at the level on the day of the survey. This is one equation from one design case. It does not select a resin or liner system, address the wet-out, cure, and cool-down that determine whether the installed liner has the modulus the design assumed, evaluate the host pipe's condition, handle bends, laterals, or changes in section, or address the field testing and sampling that verify the finished product. ASTM F1216, the liner manufacturer's tested properties, and the design engineer govern.",
   };
 }
 const cippExample = { inputs: { host_id_in: 24, ovality_pct: 3, groundwater_head_ft: 12, long_term_modulus_psi: 125000, short_term_modulus_psi: 250000, enhancement_factor: 7, safety_factor: 2, alternative_ovality_pct: 5 } };
 TRENCHLESS_RENDERERS["cipp-liner-thickness"] = _simpleRenderer({
-  citation: "Citation: the ASTM F1216 X1.1 partially deteriorated (groundwater buckling) relation by name -- external pressure resisted by 2 K E C / (1 - nu squared) x (1 / (DR - 1)) cubed, divided by the safety factor, with the ovality reduction factor C = ((1 - q) / (1 + q) squared) cubed and Poisson's ratio 0.3. The fully deteriorated case is a different relation and is not computed here. For the partially deteriorated case the standard also requires the X1.2 bending check where the host pipe is out of round and holds the dimension ratio to 100 or less, and the design thickness is the greatest of those (Iowa SUDAS 14C-2; NCDOT Pipe Liner Manual) -- this computes X1.1 alone. ASTM F1216, the liner manufacturer's tested properties, and the design engineer govern.",
+  citation: "Citation: the ASTM F1216 X1.1 partially deteriorated (groundwater buckling) relation by name -- external pressure resisted by 2 K E C / (1 - nu squared) x (1 / (DR - 1)) cubed, divided by the safety factor, with the ovality reduction factor C = ((1 - q) / (1 + q) squared) cubed and Poisson's ratio 0.3. The fully deteriorated case is a different relation, computed by the cipp-fully-deteriorated tile. For the partially deteriorated case the standard also requires the X1.2 bending check where the host pipe is out of round and holds the dimension ratio to 100 or less, and the design thickness is the greatest of those (Iowa SUDAS 14C-2; NCDOT Pipe Liner Manual) -- this computes X1.1 alone. ASTM F1216, the liner manufacturer's tested properties, and the design engineer govern.",
   example: cippExample.inputs,
   fields: [
     { key: "host_id_in", label: "Host pipe inside diameter (in)", kind: "number" },
@@ -545,4 +545,100 @@ TRENCHLESS_RENDERERS["cipp-liner-thickness"] = _simpleRenderer({
     { key: "n", id: "clt-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeCippLinerThickness,
+});
+
+// ===================== spec-v1927: CIPP liner, fully deteriorated host (ASTM F1216 X1.2.2) =====================
+// The case cipp-liner-thickness names and leaves out: the host pipe is gone and the liner carries the
+// soil, the live load and the groundwater as a pipe of its own. F1216 asks for the thickest of four:
+//   X1.3 load    q_t = (C / N) sqrt(32 R_w B' E's E_L I / D^3), I = t^3 / 12, solved for t:
+//                t = [0.375 (N q_t / C)^2 D^3 / (E_L R_w B' E's)]^(1/3)
+//                q_t = 0.433 H_w + w H_s R_w / 144 + W_s, R_w = 1 - 0.33 H_w / H_s (>= 0.67),
+//                B' = 1 / (1 + 4 e^(-0.065 H_s))
+//   X1.4 stiffness  E I / D^3 >= 0.093 on the INITIAL modulus: t >= D (1.116 / E)^(1/3)
+//   X1.1 groundwater buckling, the partially deteriorated relation (needs groundwater above the pipe)
+//   X1.2 ovality bending  [1.5 (q/100)(1 + q/100) DR^2 - 0.5 (1 + q/100) DR] P_w N <= the long-term
+//                flexural strength, solved for DR (needs ovality and groundwater)
+// Checked against the Iowa SUDAS Design Manual 14C-2 fully deteriorated example (12 in VCP, 5 ft of
+// cover, 2 ft of water, HS-20, 5% ovality): 0.199 in from X1.3 against 0.186 in for stiffness.
+// dims: in { host_id_in: L, ovality_pct: dimensionless, soil_cover_ft: L, groundwater_head_ft: L, soil_unit_weight_pcf: M L^-3, live_load_psi: M L^-1 T^-2, soil_modulus_psi: M L^-1 T^-2, long_term_modulus_psi: M L^-1 T^-2, initial_modulus_psi: M L^-1 T^-2, long_term_flexural_strength_psi: M L^-1 T^-2, enhancement_factor: dimensionless, safety_factor: dimensionless } out: { total_load_psi: M L^-1 T^-2, thickness_in: L, load_thickness_in: L, stiffness_thickness_in: L, buckling_thickness_in: L, bending_thickness_in: L, dimension_ratio: dimensionless, bending_stress_psi: M L^-1 T^-2 }
+export function computeCippFullyDeteriorated({ host_id_in = 0, ovality_pct = 0, soil_cover_ft = 0, groundwater_head_ft = 0, soil_unit_weight_pcf = 120, live_load_psi = 0, soil_modulus_psi = 0, long_term_modulus_psi = 0, initial_modulus_psi = 0, long_term_flexural_strength_psi = 0, enhancement_factor = 7, safety_factor = 2 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const D = host_id_in, q = ovality_pct, Hs = soil_cover_ft, Hw = groundwater_head_ft;
+  if (!(D > 0)) return { error: "Host pipe inside diameter must be positive (in)." };
+  if (!(q >= 0 && q < 100)) return { error: "Ovality must be in [0, 100) percent." };
+  if (!(Hs > 0)) return { error: "Soil cover above the pipe must be positive (ft)." };
+  if (!(Hw >= 0)) return { error: "Groundwater head above the pipe cannot be negative (ft)." };
+  if (Hw > Hs) return { error: "Groundwater above the ground surface is outside F1216's buoyancy factor; the head is at most the soil cover." };
+  if (!(soil_unit_weight_pcf > 0)) return { error: "Soil unit weight must be positive (pcf)." };
+  if (!(live_load_psi >= 0)) return { error: "Live load cannot be negative (psi)." };
+  if (!(soil_modulus_psi > 0)) return { error: "Modulus of soil reaction E's must be positive (psi)." };
+  if (!(long_term_modulus_psi > 0)) return { error: "Long-term flexural modulus must be positive (psi)." };
+  if (!(initial_modulus_psi >= long_term_modulus_psi)) return { error: "The initial modulus cannot be below the long-term one -- creep reduces it." };
+  if (!(long_term_flexural_strength_psi > 0)) return { error: "Long-term flexural strength must be positive (psi)." };
+  if (!(enhancement_factor > 0)) return { error: "Soil support enhancement factor must be positive." };
+  if (!(safety_factor > 0)) return { error: "Safety factor must be positive." };
+  const N = safety_factor, EL = long_term_modulus_psi;
+  const C = Math.pow((1 - q / 100) / Math.pow(1 + q / 100, 2), 3);
+  const water_psi = Hw * _WATER_PCF / _SQIN_PER_SQFT;
+  const buoyancy_factor = Math.max(0.67, 1 - 0.33 * Hw / Hs);
+  const soil_psi = soil_unit_weight_pcf * Hs * buoyancy_factor / _SQIN_PER_SQFT;
+  const total_load_psi = water_psi + soil_psi + live_load_psi;
+  const elastic_support = 1 / (1 + 4 * Math.exp(-0.065 * Hs));
+  const load_thickness_in = Math.cbrt(0.375 * Math.pow(N * total_load_psi / C, 2) * D * D * D / (EL * buoyancy_factor * elastic_support * soil_modulus_psi));
+  const stiffness_thickness_in = D * Math.cbrt(1.116 / initial_modulus_psi);
+  // X1.1 and X1.2 act on groundwater; with none above the pipe they do not apply.
+  const buckling_thickness_in = water_psi > 0
+    ? D / (1 + Math.cbrt(2 * enhancement_factor * EL * C / ((1 - 0.09) * N * water_psi)))
+    : null;
+  let bending_thickness_in = null;
+  if (water_psi > 0 && q > 0) {
+    const a = 1.5 * (q / 100) * (1 + q / 100), b = 0.5 * (1 + q / 100), c = long_term_flexural_strength_psi / (water_psi * N);
+    bending_thickness_in = D / ((b + Math.sqrt(b * b + 4 * a * c)) / (2 * a));
+  }
+  const candidates = [
+    ["X1.3 soil, water and live load", load_thickness_in],
+    ["X1.4 minimum stiffness", stiffness_thickness_in],
+    ["X1.1 groundwater buckling", buckling_thickness_in],
+    ["X1.2 ovality bending", bending_thickness_in],
+  ].filter(([, t]) => t !== null);
+  const [governs, thickness_in] = candidates.reduce((m, c) => (c[1] > m[1] ? c : m));
+  const dimension_ratio = D / thickness_in;
+  const bending_stress_psi = water_psi > 0
+    ? (1.5 * (q / 100) * (1 + q / 100) * dimension_ratio * dimension_ratio - 0.5 * (1 + q / 100) * dimension_ratio) * water_psi * N
+    : null;
+  const outs = [total_load_psi, load_thickness_in, stiffness_thickness_in, thickness_in, dimension_ratio];
+  if (!outs.every(Number.isFinite)) return { error: "Liner thickness math is not a finite value." };
+  return {
+    water_psi, buoyancy_factor, soil_psi, total_load_psi, elastic_support, ovality_factor: C,
+    load_thickness_in, stiffness_thickness_in, buckling_thickness_in, bending_thickness_in,
+    thickness_in, governs, dimension_ratio, bending_stress_psi,
+    note: "This is the case cipp-liner-thickness leaves out: the host pipe is no longer structural, so the liner is designed as a pipe of its own carrying the soil prism (reduced by the water buoyancy factor), the live load, and the groundwater. ASTM F1216 asks for the thickest of four checks and the answer names the one that governs. The soil term is usually it on a shallow line under traffic; the minimum-stiffness check governs a shallow line with little load, and groundwater buckling or ovality bending can take over on a deep, wet, or out-of-round host. Two inputs carry the judgment: the modulus of soil reaction (500 psi for badly cracked pipe with voids to about 2,000 psi for fair pipe, per the Iowa SUDAS manual) and the live load at the cover depth (HS-20 is about 2 psi at 5 ft). The stiffness check uses the INITIAL modulus and the others the long-term one. A design aid; the liner manufacturer's tested properties and the engineer of record govern.",
+  };
+}
+const cippFullyDeterioratedExample = { inputs: { host_id_in: 12, ovality_pct: 5, soil_cover_ft: 5, groundwater_head_ft: 2, soil_unit_weight_pcf: 120, live_load_psi: 2, soil_modulus_psi: 1000, long_term_modulus_psi: 150000, initial_modulus_psi: 300000, long_term_flexural_strength_psi: 2500, enhancement_factor: 7, safety_factor: 2 } };
+TRENCHLESS_RENDERERS["cipp-fully-deteriorated"] = _simpleRenderer({
+  citation: "Citation: ASTM F1216 Appendix X1, fully deteriorated gravity pipe, by name -- the liner thickness is the greatest of X1.3 (q_t = C / N x sqrt(32 R_w B' E's E_L I / D cubed), with q_t = 0.433 H_w + w H_s R_w / 144 + W_s, R_w = 1 - 0.33 H_w / H_s not under 0.67, and B' = 1 / (1 + 4 e^(-0.065 H_s))), X1.4 (E I / D cubed at least 0.093 on the initial modulus), X1.1 groundwater buckling, and X1.2 ovality bending; as worked in the Iowa SUDAS Design Manual Section 14C-2. Soil modulus, live load, and the liner's moduli and flexural strength are the user's own values. The liner manufacturer's data and the engineer of record govern.",
+  example: cippFullyDeterioratedExample.inputs,
+  fields: [
+    { key: "host_id_in", label: "Host pipe inside diameter (in)", kind: "number" },
+    { key: "ovality_pct", label: "Measured host ovality (%)", kind: "number" },
+    { key: "soil_cover_ft", label: "Soil cover above the pipe H_s (ft)", kind: "number" },
+    { key: "groundwater_head_ft", label: "Groundwater above the pipe H_w (ft, 0 if below it)", kind: "number" },
+    { key: "soil_unit_weight_pcf", label: "Soil unit weight (pcf)", kind: "number", default: 120 },
+    { key: "live_load_psi", label: "Live load at the pipe (psi; HS-20 about 2 at 5 ft)", kind: "number" },
+    { key: "soil_modulus_psi", label: "Modulus of soil reaction E's (psi, 500 poor to 2,000 fair host)", kind: "number" },
+    { key: "long_term_modulus_psi", label: "Long-term flexural modulus E_L (psi)", kind: "number" },
+    { key: "initial_modulus_psi", label: "Initial (short-term) flexural modulus E (psi)", kind: "number" },
+    { key: "long_term_flexural_strength_psi", label: "Long-term flexural strength (psi)", kind: "number" },
+    { key: "enhancement_factor", label: "Soil support enhancement factor K", kind: "number", default: 7 },
+    { key: "safety_factor", label: "Safety factor N", kind: "number", default: 2 },
+  ],
+  outputs: [
+    { key: "q", id: "cfd-out-q", label: "Total external load q_t", value: (r) => fmt(r.total_load_psi, 2) + " psi (" + fmt(r.water_psi, 2) + " water + " + fmt(r.soil_psi, 2) + " soil at R_w " + fmt(r.buoyancy_factor, 2) + " + live)" },
+    { key: "t", id: "cfd-out-t", label: "Required liner thickness", value: (r) => fmt(r.thickness_in, 3) + " in (DR " + fmt(r.dimension_ratio, 1) + "), governed by " + r.governs },
+    { key: "c", id: "cfd-out-c", label: "Each F1216 check", value: (r) => "load " + fmt(r.load_thickness_in, 3) + " in, stiffness " + fmt(r.stiffness_thickness_in, 3) + " in, buckling " + (r.buckling_thickness_in === null ? "n/a (no groundwater)" : fmt(r.buckling_thickness_in, 3) + " in") + ", bending " + (r.bending_thickness_in === null ? "n/a" : fmt(r.bending_thickness_in, 3) + " in") },
+    { key: "b", id: "cfd-out-b", label: "Ovality bending stress at that thickness", value: (r) => r.bending_stress_psi === null ? "n/a (no groundwater above the pipe)" : fmt(r.bending_stress_psi, 0) + " psi" },
+    { key: "n", id: "cfd-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeCippFullyDeteriorated,
 });

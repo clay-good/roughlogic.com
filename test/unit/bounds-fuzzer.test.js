@@ -58281,3 +58281,32 @@ test("multi-motor-feeder: a largest branch device on a smaller motor leaves the 
   assert.equal(computeMultiMotorFeeder({ largest_flc_a: 28, sum_other_flc_a: 26, largest_branch_ocpd_a: 70 }).max_feeder_ocpd_a, 96);
   assert.ok(computeMultiMotorFeeder({ largest_flc_a: 28, sum_other_flc_a: 16, largest_branch_ocpd_a: 60, ocpd_motor_flc_a: 40 }).error);
 });
+
+import { computeCippFullyDeteriorated as _v1927 } from "../../calc-trenchless.js";
+test("bounds: spec-v1927 computeCippFullyDeteriorated takes the thickest of the four F1216 checks", () => {
+  // Iowa SUDAS 14C-2 fully deteriorated example.
+  const base = { host_id_in: 12, ovality_pct: 5, soil_cover_ft: 5, groundwater_head_ft: 2, soil_unit_weight_pcf: 120, live_load_psi: 2, soil_modulus_psi: 1000, long_term_modulus_psi: 150000, initial_modulus_psi: 300000, long_term_flexural_strength_psi: 2500, enhancement_factor: 7, safety_factor: 2 };
+  const r = _v1927(base);
+  assert.ok(Math.abs(r.buoyancy_factor - 0.868) < 1e-12);
+  assert.ok(Math.abs(r.total_load_psi - 6.48333) < 1e-4);
+  assert.ok(Math.abs(r.load_thickness_in - 0.19960) < 1e-4);
+  assert.ok(Math.abs(r.stiffness_thickness_in - 0.18594) < 1e-4);
+  assert.equal(r.thickness_in, r.load_thickness_in);
+  assert.match(r.governs, /X1\.3/);
+  // Back-substituting t into X1.3 returns the load.
+  const I = r.thickness_in ** 3 / 12;
+  const qt = r.ovality_factor / 2 * Math.sqrt(32 * r.buoyancy_factor * r.elastic_support * 1000 * 150000 * I / 12 ** 3);
+  assert.ok(Math.abs(qt - r.total_load_psi) < 1e-9);
+  // A light, dry line is governed by stiffness; no groundwater means no buckling or bending check.
+  const dry = _v1927({ ...base, groundwater_head_ft: 0, live_load_psi: 0, soil_cover_ft: 2 });
+  assert.equal(dry.buckling_thickness_in, null);
+  assert.equal(dry.bending_thickness_in, null);
+  assert.equal(dry.thickness_in, dry.stiffness_thickness_in);
+  // The buoyancy factor floors at 0.67.
+  assert.equal(_v1927({ ...base, groundwater_head_ft: 5 }).buoyancy_factor, 0.67);
+  // Error seams.
+  assert.ok("error" in _v1927({ ...base, groundwater_head_ft: 6 }));
+  assert.ok("error" in _v1927({ ...base, initial_modulus_psi: 100000 }));
+  assert.ok("error" in _v1927({ ...base, host_id_in: 0 }));
+  assert.ok("error" in _v1927({ ...base, ovality_pct: 100 }));
+});

@@ -2,100 +2,100 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "eef6e99a95e63f4f",
-      "date": "2026-10-03"
+      "sha": "4375f03ed7592f79",
+      "date": "2026-10-07"
     },
     "/tools/": {
-      "sha": "e3e038ca0f1801e6",
-      "date": "2026-10-03"
+      "sha": "6ef144b7535edad8",
+      "date": "2026-10-07"
     },
     "/collections/disaster-response/": {
-      "sha": "ca98638f92a7f960",
-      "date": "2026-10-03"
+      "sha": "0581c40ab10c6fbe",
+      "date": "2026-10-07"
     },
     "/groups/accounting/": {
-      "sha": "f450aee33ef44007",
-      "date": "2026-10-03"
+      "sha": "01f0f4bb68aac4b7",
+      "date": "2026-10-07"
     },
     "/groups/agriculture/": {
-      "sha": "44eac48117ee4d70",
-      "date": "2026-10-03"
+      "sha": "019ce810521f9a9d",
+      "date": "2026-10-07"
     },
     "/groups/construction/": {
-      "sha": "8a684dddcf6a03ab",
-      "date": "2026-10-03"
+      "sha": "c2a684ff246eae27",
+      "date": "2026-10-07"
     },
     "/groups/cross-trade/": {
-      "sha": "8133d3bdcaa5de32",
-      "date": "2026-10-03"
+      "sha": "c9724fdb8f240771",
+      "date": "2026-10-07"
     },
     "/groups/educators/": {
-      "sha": "be079c92efc8d09b",
-      "date": "2026-10-01"
+      "sha": "0510c3e1417feadb",
+      "date": "2026-10-07"
     },
     "/groups/electrical/": {
-      "sha": "64d54c6ffd28e808",
-      "date": "2026-10-03"
+      "sha": "6d2014cc0b7ffa12",
+      "date": "2026-10-07"
     },
     "/groups/field/": {
-      "sha": "a62fdc03b995d59c",
-      "date": "2026-10-01"
+      "sha": "0e3983589eac2287",
+      "date": "2026-10-07"
     },
     "/groups/fire-ground/": {
-      "sha": "fce8dbc7fb1d7801",
-      "date": "2026-10-03"
+      "sha": "62e062214581189a",
+      "date": "2026-10-07"
     },
     "/groups/historical/": {
-      "sha": "584a6c8aeca1d70b",
-      "date": "2026-10-01"
+      "sha": "69f0cd82cf492f43",
+      "date": "2026-10-07"
     },
     "/groups/hvac/": {
-      "sha": "5219b12957ebcae5",
-      "date": "2026-10-03"
+      "sha": "09b678a062b80004",
+      "date": "2026-10-07"
     },
     "/groups/kitchen/": {
-      "sha": "acc6d4f561cc2d92",
-      "date": "2026-10-03"
+      "sha": "6631768e2e0be502",
+      "date": "2026-10-07"
     },
     "/groups/lab/": {
-      "sha": "357f8e1532812b3d",
-      "date": "2026-10-01"
+      "sha": "55bb8063ed8a885d",
+      "date": "2026-10-07"
     },
     "/groups/mechanic/": {
-      "sha": "647cd7c4ffca99c6",
-      "date": "2026-10-03"
+      "sha": "1ac663cb763cfe4b",
+      "date": "2026-10-07"
     },
     "/groups/plumbing/": {
-      "sha": "a36e7c610e422610",
-      "date": "2026-10-03"
+      "sha": "fba8026b73ffaf83",
+      "date": "2026-10-07"
     },
     "/groups/real-estate/": {
-      "sha": "95ff08b9acdbcb67",
-      "date": "2026-10-03"
+      "sha": "204f8c819e94dc5d",
+      "date": "2026-10-07"
     },
     "/groups/references/": {
-      "sha": "4becd90caa83849d",
-      "date": "2026-10-01"
+      "sha": "59ad905f843c3de5",
+      "date": "2026-10-07"
     },
     "/groups/restoration/": {
-      "sha": "acb18a80ce66aab0",
-      "date": "2026-10-03"
+      "sha": "caca85aa47e50431",
+      "date": "2026-10-07"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "deb9a899dd84efc0",
-      "date": "2026-10-03"
+      "sha": "0b3cdcb36c49bb2f",
+      "date": "2026-10-07"
     },
     "/groups/stage/": {
-      "sha": "be1140b0ed2611bf",
-      "date": "2026-10-01"
+      "sha": "3ced71a4cf9a878d",
+      "date": "2026-10-07"
     },
     "/groups/trucking/": {
-      "sha": "f405d67f2f09c226",
-      "date": "2026-10-01"
+      "sha": "447bfb867048ed8d",
+      "date": "2026-10-07"
     },
     "/groups/water/": {
-      "sha": "4211a0f28952b918",
-      "date": "2026-10-01"
+      "sha": "421fd44de75170f4",
+      "date": "2026-10-07"
     },
     "/tools/aav-install-check/": {
       "sha": "6124c721c9aa5eea",
@@ -1197,9 +1197,13 @@
       "sha": "6bf198840fb56a5d",
       "date": "2026-09-29"
     },
+    "/tools/cipp-fully-deteriorated/": {
+      "sha": "5158beba524f4076",
+      "date": "2026-10-07"
+    },
     "/tools/cipp-liner-thickness/": {
-      "sha": "65c8e35b1ecef4b7",
-      "date": "2026-10-03"
+      "sha": "a35bbcb469b73598",
+      "date": "2026-10-07"
     },
     "/tools/circle-from-3-points/": {
       "sha": "bbb46680f5c6ea56",
