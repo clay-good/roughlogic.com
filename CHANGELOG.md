@@ -81,6 +81,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **A standing test now catches an input that cannot change the answer.** `test/unit/inert-input-guard.test.js` changes each input of every worked example, one at a time, through its other select options, a flipped checkbox, or a scaled number. Every input that never moves an output must appear in `test/fixtures/inert-inputs.js` with the reason it is legitimate: 141 do today, such as a field read only in another mode or a step the examples do not cross. The source-reading dead-input gates cannot see this case. It is how pf-correction's identical Phase branches and masonry-count's duplicate CMU face were found. Seeded: making velocity-head's density inert fails the test.
+
 - **The rest of the catalog checked for twins that disagree (greenhouse, process, inspection, mining, arboriculture, containment, plumbing code, finish, low voltage; 117 tiles).**
   - **`blast-burden-spacing`** set stemming at the ratio times the burden alone. `blast-stemming-length` takes the larger of that and 20 hole diameters, so a 6 in hole at the default 25 ratio was given 8.75 ft of stemming that the sibling tile calls 1.25 ft short. It now applies the same floor; its 3.5 in worked example rises from 5.10 to 5.83 ft.
   - **`structured-cabling-channel`** held the 60 C row of TIA-568-C.2 Table G.2 (75.0 m) for any hotter space and passed a 75 m link at 80 C. Above 60 C the table path now returns an error; the custom linear path is unchanged.
