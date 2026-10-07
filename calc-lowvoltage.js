@@ -68,8 +68,11 @@ export const fiberLossBudgetExample = { inputs: { length_m: 300, attenuation_db_
 // 0.4 / 0.3, typical cable-spec values in no TIA row; TIA-568 caps premises
 // (inside plant) single-mode at 1.0 and outside plant at 0.5, so a 2 km inside
 // link was budgeted 0.8 dB where TIA allows for 2.0.
+// OM3, OM4 and OM5 are all 50/125 um laser-optimized fiber with one cable limit at 850 nm: 3.0 dB/km
+// (TIA-568.3-D; TIA-492AAAD). 3.5 was the TIA-568-B.3 / C.3 multimode figure, and until 2026-10-07 OM3
+// alone still carried it, so an OM3 link was budgeted 0.5 dB/km more loss than the same OM4 link.
 const _FIBER_DEFAULT_ATT = {
-  "om3-850": 3.5, "om4-850": 3.0, "om5-850": 3.0, "om4-1300": 1.5,
+  "om3-850": 3.0, "om4-850": 3.0, "om5-850": 3.0, "om4-1300": 1.5,
   "smf-1310": 1.0, "smf-1550": 1.0, "smf-osp-1310": 0.5, "smf-osp-1550": 0.5,
 };
 function _renderFiberLossBudget(inputRegion, outputRegion, citationEl) {
