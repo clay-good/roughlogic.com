@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### Tests
+
+- **A timing-free guard on printed output lines.** `test/unit/formatted-output-guard.test.js` runs every declarative renderer's formatter on each worked example, and on each example with one input blanked or zeroed (about 82,000 lines in half a second), and fails on `undefined`, `NaN`, `Infinity`, or a bare `null`. The browser check that covers the same leak reads the page after a debounce, and it passed twice over the inventory-turnover leak fixed today. Seeding a misspelled result key into one formatter turns it red. No current tile fails it. Bespoke renderers are not covered; those still rely on the browser check.
+
 ### Fixed
 
 - **`inventory-turnover` printed "median undefinedx" in its industry comparison.** The Sep 9 fix renamed the benchmark to `industry_aggregate` (Census publishes aggregates, not medians across firms), but the page still read the old `median` field and still called it a median. It now prints, for example, "retail_general: industry aggregate 7.0x (2022); delta +0.69x". The render-no-nan browser check caught it only when the page's debounce landed inside the check's stability window, so earlier runs passed.
