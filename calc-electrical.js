@@ -2484,6 +2484,10 @@ function _v7renderGeneratorMotorStarting(inputRegion, outputRegion, citationEl) 
   const codeOpts = Object.keys(NEMA_MG1_CODE_LETTERS).map((k) => ({ value: k, label: "Code " + k + " (" + NEMA_MG1_CODE_LETTERS[k] + " kVA/HP)" }));
   const code = _v7makeSelect("Code letter", "gm-code", codeOpts);
   code.select.value = "G";
+  // Until 2026-10-08 the page took one motor only, so the worked example's 10 hp
+  // and 5 hp motors dropped out and the page showed 33.6 running kW against 44.84.
+  const others = _v7makeNumber("Other motors already running (total HP)", "gm-oth", { step: "any", min: "0" });
+  others.input.value = "0";
   const nonMotor = _v7makeNumber("Non-motor steady kW", "gm-nm", { step: "any", min: "0" });
   const dip = _v7makeNumber("Allowable voltage dip (0-1, default 0.30)", "gm-dip", { step: "any", min: "0", max: "1" });
   dip.input.value = "0.30";
@@ -2494,20 +2498,25 @@ function _v7renderGeneratorMotorStarting(inputRegion, outputRegion, citationEl) 
     { value: "frequent", label: "Frequent (4-10 / hr)" },
     { value: "continuous", label: "Continuous (> 10 / hr)" },
   ]);
-  for (const f of [hp, code, nonMotor, dip, xdIn, starts]) inputRegion.appendChild(f.wrap);
+  for (const f of [hp, code, others, nonMotor, dip, xdIn, starts]) inputRegion.appendChild(f.wrap);
   const oR = _v7makeOut(outputRegion, "Steady running kW", "gm-out-r");
   const oS = _v7makeOut(outputRegion, "Worst starting kVA", "gm-out-s");
   const oReq = _v7makeOut(outputRegion, "Required gen kW", "gm-out-req");
   const oRec = _v7makeOut(outputRegion, "Recommended generator", "gm-out-rec");
   function fillExample(v) {
-    const m = v.motors[0]; hp.input.value = m.hp; code.select.value = m.code_letter;
+    // The hardest start goes in the motor fields; the rest are running when it starts.
+    const kva = (m) => m.hp * (NEMA_MG1_CODE_LETTERS[m.code_letter] || 0);
+    const m = v.motors.reduce((a, b) => (kva(b) > kva(a) ? b : a));
+    hp.input.value = m.hp; code.select.value = m.code_letter;
+    others.input.value = v.motors.filter((x) => x !== m).reduce((t, x) => t + Number(x.hp), 0);
     nonMotor.input.value = v.non_motor_kW; dip.input.value = v.dip_factor; starts.select.value = v.starts_per_hour;
     update();
   }
   const update = _v7debounce(() => {
     const r = computeGeneratorMotorStarting({
       motors: [{ hp: Number(hp.input.value) || 0, code_letter: code.select.value }],
-      non_motor_kW: Number(nonMotor.input.value) || 0,
+      // Running motors add load at the compute's 0.746 kW/hp; they do not set the start.
+      non_motor_kW: (Number(nonMotor.input.value) || 0) + Math.max(0, Number(others.input.value) || 0) * 0.746,
       dip_factor: Number(dip.input.value) || 0.30,
       generator_xd: Number(xdIn.input.value) || 0.25,
       starts_per_hour: starts.select.value,
@@ -2518,7 +2527,7 @@ function _v7renderGeneratorMotorStarting(inputRegion, outputRegion, citationEl) 
     oReq.textContent = _v7fmt(r.required_kW, 1) + " kW";
     oRec.textContent = r.recommended_kW + " kW (typical step series)" + (r.exceeds_standard ? " -- EXCEEDS the largest standard size; this is the ceiling, NOT a sufficient size. Engineered design required." : "");
   }, _V7_DEB);
-  for (const f of [hp.input, code.select, nonMotor.input, dip.input, xdIn.input, starts.select]) f.addEventListener("input", update);
+  for (const f of [hp.input, code.select, others.input, nonMotor.input, dip.input, xdIn.input, starts.select]) f.addEventListener("input", update);
 }
 
 function _v7renderServiceLoadStandard(inputRegion, outputRegion, citationEl) {

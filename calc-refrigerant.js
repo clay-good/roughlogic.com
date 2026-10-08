@@ -357,8 +357,9 @@ export function computeRefrigerantCharge({ refrigerant, sections = [] }) {
 }
 
 export const refrigerantChargeExample = {
-  inputs: { refrigerant: "R-410A", sections: [{ diameter: "3/8", length_ft: 25 }, { diameter: "3/4", length_ft: 25 }] },
-  expected: { total_oz: 25 * 0.60 + 25 * 1.65 },
+  // The worked-example registry's row (Chemours / Honeywell oz-per-ft tables): 19.75 oz.
+  inputs: { refrigerant: "R-410A", sections: [{ diameter: "3/8", length_ft: 25 }, { diameter: "1/2", length_ft: 5 }] },
+  expected: { total_oz: 25 * 0.60 + 5 * 0.95 },
 };
 
 // --- 243: Refrigerant Charging (suction/liquid superheat + subcool) ---
@@ -610,20 +611,30 @@ export function renderRefrigerantCharge(inputRegion, outputRegion, citationEl) {
   const ref = makeSelect("Refrigerant", "rc-r", Object.keys(CHARGE_OZ_PER_FT).map((k) => ({ value: k, label: k })));
   const dia = makeSelect("Line diameter (in)", "rc-d", ["1/4", "3/8", "1/2", "5/8", "3/4"].map((d) => ({ value: d, label: d })));
   const len = makeNumber("Total line length (ft)", "rc-l", { step: "any", min: "0" });
-  for (const f of [ref, dia, len]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { ref.select.value = "R-410A"; dia.select.value = "3/8"; len.input.value = "50"; update(); });
+  // A second section for a line set that changes size. Until 2026-10-08 the page took
+  // one section and its example (50 ft of 3/8) was not the documented two-section one.
+  const dia2 = makeSelect("Second section diameter (in, optional)", "rc-d2", [{ value: "", label: "(none)" }].concat(["1/4", "3/8", "1/2", "5/8", "3/4"].map((d) => ({ value: d, label: d }))));
+  const len2 = makeNumber("Second section length (ft)", "rc-l2", { step: "any", min: "0" });
+  for (const f of [ref, dia, len, dia2, len2]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    const x = refrigerantChargeExample.inputs;
+    ref.select.value = x.refrigerant; dia.select.value = x.sections[0].diameter; len.input.value = x.sections[0].length_ft;
+    dia2.select.value = x.sections[1] ? x.sections[1].diameter : ""; len2.input.value = x.sections[1] ? x.sections[1].length_ft : "";
+    update();
+  });
   const oOz = makeOutputLine(outputRegion, "Total charge", "rc-out-oz");
   const oLb = makeOutputLine(outputRegion, "Total charge (lb)", "rc-out-lb");
   const update = debounce(() => {
     const r = computeRefrigerantCharge({
       refrigerant: ref.select.value,
-      sections: [{ diameter: dia.select.value, length_ft: Number(len.input.value) || 0 }],
+      sections: [{ diameter: dia.select.value, length_ft: Number(len.input.value) || 0 }]
+        .concat(dia2.select.value && Number(len2.input.value) > 0 ? [{ diameter: dia2.select.value, length_ft: Number(len2.input.value) }] : []),
     });
     if (r.error) { oOz.textContent = r.error; oLb.textContent = "-"; return; }
     oOz.textContent = fmt(r.total_oz, 2) + " oz";
     oLb.textContent = fmt(r.total_lb, 3) + " lb";
   }, DEBOUNCE_MS);
-  for (const el of [ref.select, dia.select, len.input]) el.addEventListener("input", update);
+  for (const el of [ref.select, dia.select, len.input, dia2.select, len2.input]) el.addEventListener("input", update);
 }
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }

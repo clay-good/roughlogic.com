@@ -12,6 +12,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **Three pages could not reproduce their own documented example, because they took one row of a list input.**
+  - `generator-motor-starting` took one motor. The documented example has three (25, 10, and 5 hp) plus 15 kW of other load, and the page showed 33.6 running kW against the documented 44.84 kW. A new "Other motors already running (total HP)" field adds their running load at the calculator's 0.746 kW/hp; the hardest-starting motor stays in the motor fields, as it sets the start. The example now shows 44.8 kW, 148.8 kVA, and an 80 kW set.
+  - `refrigerant-charge` took one line section and its button loaded 50 ft of 3/8 in (30 oz), not the documented 25 ft of 3/8 plus 5 ft of 1/2 (19.75 oz). An optional second section is added, and the module's example export now matches the registry row.
+  - `equivalent-length` took one fitting group and its button loaded four elbows (6.8 ft), leaving out the documented example's tee (12.8 ft). An optional second fitting group is added.
+
+  Found by rendering every tile's example against the fake-DOM harness and looking for each verified output value on the page.
+
 - **`conduit-fill` offered sizes it could not compute.** Its AWG list offered 18 and 16 AWG, which no bundled insulation tabulates, and THWN stopped at #2 while the list ran to 4/0, so those choices printed "Unknown size for insulation". NEC Chapter 9 Table 5 lists THHN, THWN, and THWN-2 in one row, and the bundled THWN areas already equaled THHN's through #2, so THWN now carries the THHN areas through 4/0. The list drops 18 and 16, and a size outside an insulation's bundled range says which range it carries (XHHW: 14 to 6 AWG). Found by cycling every select option from each worked example against the new fake-DOM harness.
 - **`flange-bolt-torque` with the 8UN series below 1 in** now says the series is tabulated from 1 to 2 in, rather than "not found".
 

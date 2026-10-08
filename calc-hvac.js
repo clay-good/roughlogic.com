@@ -873,19 +873,30 @@ export function renderEquivalentLength(inputRegion, outputRegion, citationEl) {
   const dia = makeSelect("Diameter (in)", "el-d", ["0.5", "0.75", "1", "1.25", "1.5", "2"].map((s) => ({ value: s, label: s })));
   const cnt = makeNumber("Count", "el-c", { step: "1", min: "0", value: "1" });
   cnt.input.value = "1";
-  for (const f of [type, dia, cnt]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { type.select.value = "elbow_90_long"; dia.select.value = "1"; cnt.input.value = "4"; update(); });
+  // A second fitting group. Until 2026-10-08 the page took one group and its example
+  // (four elbows) left out the documented example's tee.
+  const type2 = makeSelect("Second fitting type (optional)", "el-t2", [{ value: "", label: "(none)" }].concat(Object.keys(FITTING_EQUIVALENT_LENGTH_FT).map((k) => ({ value: k, label: k.replace(/_/g, " ") }))));
+  const dia2 = makeSelect("Second fitting diameter (in)", "el-d2", ["0.5", "0.75", "1", "1.25", "1.5", "2"].map((s) => ({ value: s, label: s })));
+  const cnt2 = makeNumber("Second fitting count", "el-c2", { step: "1", min: "0" });
+  for (const f of [type, dia, cnt, type2, dia2, cnt2]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    const [a, b] = equivalentLengthExample.inputs.items;
+    type.select.value = a.type; dia.select.value = String(a.diameter); cnt.input.value = a.count;
+    type2.select.value = b ? b.type : ""; dia2.select.value = b ? String(b.diameter) : "1"; cnt2.input.value = b ? b.count : "";
+    update();
+  });
   const oT = makeOutputLine(outputRegion, "Total equivalent length", "el-out-t");
   const oE = makeOutputLine(outputRegion, "Per fitting", "el-out-e");
   const update = debounce(() => {
     const r = computeEquivalentLength({
-      items: [{ type: type.select.value, diameter: dia.select.value, count: Number(cnt.input.value) || 0 }],
+      items: [{ type: type.select.value, diameter: dia.select.value, count: Number(cnt.input.value) || 0 }]
+        .concat(type2.select.value && Number(cnt2.input.value) > 0 ? [{ type: type2.select.value, diameter: dia2.select.value, count: Number(cnt2.input.value) }] : []),
     });
     if (r.error) { oT.textContent = r.error; oE.textContent = "-"; return; }
     oT.textContent = fmt(r.total_equivalent_ft, 2) + " ft";
     oE.textContent = r.items.length ? fmt(r.items[0].equivalent_ft_each, 2) + " ft" : "-";
   }, DEBOUNCE_MS);
-  for (const el of [type.select, dia.select, cnt.input]) el.addEventListener("input", update);
+  for (const el of [type.select, dia.select, cnt.input, type2.select, dia2.select, cnt2.input]) el.addEventListener("input", update);
 }
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
