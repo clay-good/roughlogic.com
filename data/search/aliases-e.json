@@ -6389,6 +6389,9 @@
     {"term":"toenail lateral capacity","target":"wood-nail-lateral","kind":"industry"},
     {"term":"16d nail shear capacity","target":"wood-nail-lateral","kind":"question"},
     {"term":"nail yield limit z","target":"wood-nail-lateral","kind":"industry"},
-    {"term":"how much load does a nail hold sideways","target":"wood-nail-lateral","kind":"question"}
+    {"term":"how much load does a nail hold sideways","target":"wood-nail-lateral","kind":"question"},
+    {"term":"lag screw lateral design value","target":"wood-bolt-connection","kind":"industry"},
+    {"term":"lag bolt shear capacity","target":"wood-bolt-connection","kind":"question"},
+    {"term":"nds lag screw z","target":"wood-bolt-connection","kind":"industry"}
   ]
 }

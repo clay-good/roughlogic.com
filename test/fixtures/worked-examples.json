@@ -168177,6 +168177,62 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "wood-bolt-connection",
+  "source_publisher": "American Wood Council (AWC)",
+  "source_title": "Design Aid No. 1, Application of Technical Report 12 for Lag Screw Connections, Example 1 Case A",
+  "source_edition_or_year": "2007 (NDS 2005 yield limit equations)",
+  "source_section_or_page": "Table 1: 3/8 in reduced-body lag screw, Dr = 0.265 in, ts = 1-1/2 in, lm = 3 in, G = 0.5 (Fe|| 5,600 psi), Fyb 45,000 psi, load parallel to grain: Im 1,113 / Is 557 / II 420 / IIIm 478 / IIIs 260 / IV 201 lb; Z|| = 201 lb.",
+  "verified_by": "rl",
+  "verified_on": "2026-10-08",
+  "inputs": {
+   "d_in": 0.265,
+   "lm_in": 3,
+   "ls_in": 1.5,
+   "gm": 0.5,
+   "gs": 0.5,
+   "fyb_psi": 45000,
+   "theta_deg": 0
+  },
+  "outputs": {
+   "z_lb": {
+    "value": 201,
+    "tolerance": {
+     "pct": 0.5
+    }
+   },
+   "z_im": {
+    "value": 1113,
+    "tolerance": {
+     "pct": 0.5
+    }
+   },
+   "z_is": {
+    "value": 557,
+    "tolerance": {
+     "pct": 0.5
+    }
+   },
+   "z_ii": {
+    "value": 420,
+    "tolerance": {
+     "pct": 0.5
+    }
+   },
+   "z_iiim": {
+    "value": 478,
+    "tolerance": {
+     "pct": 0.5
+    }
+   },
+   "z_iiis": {
+    "value": 260,
+    "tolerance": {
+     "pct": 0.5
+    }
+   }
+  }
  }
  ]
 }

@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "96ce9edb9e60b46f",
+      "sha": "cddb8d6fdf0d9ca8",
       "date": "2026-10-08"
     },
     "/tools/": {
@@ -22,7 +22,7 @@
       "date": "2026-10-08"
     },
     "/groups/construction/": {
-      "sha": "c0cc3a5b50898107",
+      "sha": "76d69209150c2b4f",
       "date": "2026-10-08"
     },
     "/groups/cross-trade/": {
@@ -8966,7 +8966,7 @@
       "date": "2026-09-30"
     },
     "/tools/wood-bolt-connection/": {
-      "sha": "7b10c950c5115957",
+      "sha": "185199b5725e200e",
       "date": "2026-10-08"
     },
     "/tools/wood-combined-bending-axial/": {

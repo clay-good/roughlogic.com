@@ -116432,6 +116432,21 @@
    "term": "how much load does a nail hold sideways",
    "target": "wood-nail-lateral",
    "kind": "question"
+  },
+  {
+   "term": "lag screw lateral design value",
+   "target": "wood-bolt-connection",
+   "kind": "industry"
+  },
+  {
+   "term": "lag bolt shear capacity",
+   "target": "wood-bolt-connection",
+   "kind": "question"
+  },
+  {
+   "term": "nds lag screw z",
+   "target": "wood-bolt-connection",
+   "kind": "industry"
   }
  ]
 }
