@@ -991,7 +991,7 @@ function renderFatigueSafetyFactor(inputRegion, outputRegion, citationEl) {
     if (r.error) { oN.textContent = r.error; oNy.textContent = "-"; oGov.textContent = "-"; oNote.textContent = ""; return; }
     oN.textContent = fmt(r.fatigue_n, 2);
     oNy.textContent = fmt(r.langer_ny, 2);
-    oGov.textContent = "n = " + fmt(r.governing_n, 2) + " (" + r.governs + (r.governing_n < 1 ? "; UNSAFE, n < 1" : "") + ")";
+    oGov.textContent = "n = " + fmt(r.governing_n, Math.abs(r.governing_n - 1) < 0.005 && r.governing_n !== 1 ? 4 : 2) + " (" + r.governs + (r.governing_n < 1 ? "; UNSAFE, n < 1" : "") + ")";
     oNote.textContent = r.note;
   }, DEBOUNCE_MS);
   for (const f of [sa, sm, se, sut, sy]) f.input.addEventListener("input", update);
@@ -1346,7 +1346,7 @@ function renderThickWallCylinderStress(inputRegion, outputRegion, citationEl) {
     if (r.error) { oH.textContent = r.error; oL.textContent = "-"; oT.textContent = "-"; oNote.textContent = ""; return; }
     oH.textContent = fmt(r.hoop_bore_psi, 0) + " / " + fmt(r.hoop_outer_psi, 0) + " psi (max at the bore)";
     oL.textContent = fmt(r.longitudinal_psi, 0) + " psi longitudinal, " + fmt(r.radial_bore_psi, 0) + " psi radial";
-    oT.textContent = fmt(r.thin_wall_estimate_psi, 0) + " psi (D/t = " + fmt(r.d_over_t, 1) + (r.d_over_t < 20 ? ", thick-wall: thin-wall runs low" : ", thin-wall OK") + ")";
+    oT.textContent = fmt(r.thin_wall_estimate_psi, 0) + " psi (D/t = " + fmt(r.d_over_t, Math.abs(r.d_over_t - 20) < 0.05 && r.d_over_t !== 20 ? 3 : 1) + (r.d_over_t < 20 ? ", thick-wall: thin-wall runs low" : ", thin-wall OK") + ")";
     oNote.textContent = r.note;
   }, DEBOUNCE_MS);
   for (const f of [P, ri, t]) f.input.addEventListener("input", update);

@@ -240,7 +240,7 @@ function _renderAdpiSelection(inputRegion, outputRegion, citationEl) {
     if (r.error) { oRatio.textContent = r.error; oOpt.textContent = "-"; oAdpi.textContent = "-"; oBand.textContent = "-"; oTarget.textContent = "-"; oNote.textContent = ""; return; }
     oRatio.textContent = fmt(r.ratio, 2);
     oOpt.textContent = fmt(r.opt_ratio, 2);
-    oAdpi.textContent = "up to ADPI " + fmt(r.max_adpi, 0) + (r.max_adpi < 80 ? " (load caps comfort below 80)" : "");
+    oAdpi.textContent = "up to ADPI " + fmt(r.max_adpi, Math.abs(r.max_adpi - 80) < 0.5 && r.max_adpi !== 80 ? 2 : 0) + (r.max_adpi < 80 ? " (load caps comfort below 80)" : "");
     oBand.textContent = r.has_band
       ? (r.in_band ? "in the band" : "OUTSIDE the band") + " (ADPI > " + fmt(r.threshold, 0) + " for T/L " + fmt(r.band_lo, 1) + " to " + fmt(r.band_hi, 1) + ")"
       : "no band above threshold at this load (optimum only)";

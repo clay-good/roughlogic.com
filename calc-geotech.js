@@ -412,8 +412,8 @@ GEOTECH_RENDERERS["retaining-wall-stability"] = _simpleRenderer({
   outputs: [
     { key: "sv", id: "rws-out-sv", label: "Vertical resultant / resisting moment", value: (r) => fmt(r.sum_v, 0) + " lb/ft, Mr " + fmt(r.mr, 0) + " ft-lb/ft" },
     { key: "mo", id: "rws-out-mo", label: "Active thrust / overturning moment", value: (r) => fmt(r.pa_tot, 0) + " lb/ft, Mo " + fmt(r.mo, 0) + " ft-lb/ft" },
-    { key: "ot", id: "rws-out-ot", label: "Overturning FS (target 2.0)", value: (r) => fmt(r.fs_ot, 2) + (r.fs_ot >= 2.0 ? " (pass)" : r.fs_ot >= 1.5 ? " (below 2.0 target; IBC min 1.5)" : " (FAIL, below IBC 1.5)") },
-    { key: "sl", id: "rws-out-sl", label: "Sliding FS (min 1.5)", value: (r) => fmt(r.fs_sl, 2) + (r.fs_sl >= 1.5 ? " (pass)" : " (FAIL, below IBC 1.5)") },
+    { key: "ot", id: "rws-out-ot", label: "Overturning FS (target 2.0)", value: (r) => fmt(r.fs_ot, Math.abs(r.fs_ot - 2.0) < 0.005 && r.fs_ot !== 2.0 ? 4 : 2) + (r.fs_ot >= 2.0 ? " (pass)" : r.fs_ot >= 1.5 ? " (below 2.0 target; IBC min 1.5)" : " (FAIL, below IBC 1.5)") },
+    { key: "sl", id: "rws-out-sl", label: "Sliding FS (min 1.5)", value: (r) => fmt(r.fs_sl, Math.abs(r.fs_sl - 1.5) < 0.005 && r.fs_sl !== 1.5 ? 4 : 2) + (r.fs_sl >= 1.5 ? " (pass)" : " (FAIL, below IBC 1.5)") },
     { key: "ec", id: "rws-out-ec", label: "Eccentricity e (middle third = B/6)", value: (r) => fmt(r.ecc, 2) + " ft" + (r.middle_third ? " (in middle third)" : " (OUTSIDE middle third, heel uplift)") },
     { key: "qp", id: "rws-out-qp", label: "Toe / heel pressure", value: (r) => fmt(r.q_max, 0) + " / " + fmt(r.q_min, 0) + " psf (compare toe to allowable bearing)" },
   ],

@@ -4490,7 +4490,7 @@ function renderEgcUpsizeProportional(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const r = computeEgcUpsizeProportional({ base_egc_cmil: Number(egc.input.value) || 0, base_phase_cmil: Number(basep.input.value) || 0, installed_phase_cmil: Number(inst.input.value) || 0 });
     if (r.error) { oRatio.textContent = r.error; oEgc.textContent = "-"; oNote.textContent = "-"; return; }
-    oRatio.textContent = fmt(r.ratio, 3) + (r.ratio <= 1 + 1e-9 ? " (no upsize -- EGC stays at table size)" : "");
+    oRatio.textContent = fmt(r.ratio, Math.abs(r.ratio - 1) < 0.0005 && r.ratio !== 1 ? 5 : 3) + (r.ratio <= 1 + 1e-9 ? " (no upsize -- EGC stays at table size)" : "");
     oEgc.textContent = fmt(r.upsized_egc_cmil, 0) + " cmil (select the next standard size up)";
     oNote.textContent = r.note;
   }, DEBOUNCE_MS);

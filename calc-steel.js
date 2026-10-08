@@ -120,7 +120,7 @@ STEEL_RENDERERS["steel-beam-flexure"] = _simpleRenderer({
     { key: "mn", id: "sbf-out-mn", label: "Nominal Mn", value: (r) => fmt(r.mn_kipft, 1) + " kip-ft" },
     { key: "ma", id: "sbf-out-ma", label: "ASD allowable Mn/Omega", value: (r) => fmt(r.ma_kipft, 1) + " kip-ft" },
     { key: "pm", id: "sbf-out-pm", label: "LRFD design phi_b*Mn", value: (r) => fmt(r.phi_mn, 1) + " kip-ft" },
-    { key: "ut", id: "sbf-out-ut", label: "Demand / capacity (ASD)", value: (r) => r.util_asd === null ? "-" : fmt(r.util_asd, 2) + (r.util_asd > 1 + 1e-9 ? " (OVER)" : "") },
+    { key: "ut", id: "sbf-out-ut", label: "Demand / capacity (ASD)", value: (r) => r.util_asd === null ? "-" : fmt(r.util_asd, Math.abs(r.util_asd - 1) < 0.005 && r.util_asd !== 1 ? 4 : 2) + (r.util_asd > 1 + 1e-9 ? " (OVER)" : "") },
   ],
   compute: computeSteelBeamFlexure,
 });
@@ -242,7 +242,7 @@ STEEL_RENDERERS["steel-beam-shear"] = _simpleRenderer({
     { key: "vn", id: "sbs-out-vn", label: "Nominal Vn", value: (r) => fmt(r.vn, 1) + " kips" },
     { key: "va", id: "sbs-out-va", label: "ASD allowable Vn/Omega", value: (r) => fmt(r.va, 1) + " kips" },
     { key: "pv", id: "sbs-out-pv", label: "LRFD design phi_v*Vn", value: (r) => fmt(r.phi_vn, 1) + " kips" },
-    { key: "ut", id: "sbs-out-ut", label: "Demand / capacity (ASD)", value: (r) => r.util_asd === null ? "-" : fmt(r.util_asd, 2) + (r.util_asd > 1 + 1e-9 ? " (OVER)" : "") },
+    { key: "ut", id: "sbs-out-ut", label: "Demand / capacity (ASD)", value: (r) => r.util_asd === null ? "-" : fmt(r.util_asd, Math.abs(r.util_asd - 1) < 0.005 && r.util_asd !== 1 ? 4 : 2) + (r.util_asd > 1 + 1e-9 ? " (OVER)" : "") },
   ],
   compute: computeSteelBeamShear,
 });
@@ -290,7 +290,7 @@ STEEL_RENDERERS["steel-column-capacity"] = _simpleRenderer({
     { key: "pn", id: "scc-out-pn", label: "Nominal Pn", value: (r) => fmt(r.pn, 0) + " kips" },
     { key: "pa", id: "scc-out-pa", label: "ASD allowable Pn/Omega", value: (r) => fmt(r.pa, 0) + " kips" },
     { key: "pp", id: "scc-out-pp", label: "LRFD design phi_c*Pn", value: (r) => fmt(r.phi_pn, 0) + " kips" },
-    { key: "ut", id: "scc-out-ut", label: "Demand / capacity (ASD)", value: (r) => r.util_asd === null ? "-" : fmt(r.util_asd, 2) + (r.util_asd > 1 + 1e-9 ? " (OVER)" : "") },
+    { key: "ut", id: "scc-out-ut", label: "Demand / capacity (ASD)", value: (r) => r.util_asd === null ? "-" : fmt(r.util_asd, Math.abs(r.util_asd - 1) < 0.005 && r.util_asd !== 1 ? 4 : 2) + (r.util_asd > 1 + 1e-9 ? " (OVER)" : "") },
   ],
   compute: computeSteelColumnCapacity,
 });

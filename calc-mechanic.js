@@ -3619,7 +3619,7 @@ MECHANIC_RENDERERS["turn-radius-bank"] = _simpleRenderer({
   outputs: [
     { key: "r", id: "trb-out-r", label: "Turn radius", value: (r) => fmt(r.turn_radius_ft, 0) + " ft (" + fmt(r.turn_radius_ft / 6076.12, 2) + " nm)" },
     { key: "d", id: "trb-out-d", label: "Turn diameter", value: (r) => fmt(r.turn_diameter_ft, 0) + " ft" },
-    { key: "t", id: "trb-out-t", label: "Rate of turn", value: (r) => fmt(r.rate_of_turn_deg_s, 2) + " deg/s" + (r.rate_of_turn_deg_s >= 3 ? " (>= standard rate)" : " (below standard rate)") },
+    { key: "t", id: "trb-out-t", label: "Rate of turn", value: (r) => fmt(r.rate_of_turn_deg_s, Math.abs(r.rate_of_turn_deg_s - 3) < 0.005 && r.rate_of_turn_deg_s !== 3 ? 4 : 2) + " deg/s" + (r.rate_of_turn_deg_s >= 3 ? " (>= standard rate)" : " (below standard rate)") },
     { key: "n", id: "trb-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeTurnRadiusBank,

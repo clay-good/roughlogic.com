@@ -271,7 +271,7 @@ SAFETY_RENDERERS["hearing-protector-nrr"] = _simpleRendererG({
     { key: "a", id: "hpn-out-a", label: "Effective attenuation", value: (r) => fmt(r.effective_attenuation_db, 1) + " dB" + (r.dual_bonus_applied_db > 0 ? " (including " + fmt(r.dual_bonus_applied_db, 1) + " dB for dual protection)" : "") },
     { key: "p", id: "hpn-out-p", label: "Exposure at the ear", value: (r) => fmt(r.protected_twa_db, 1) + " dB - " + (r.meets_target ? "meets the target with " + fmt(r.margin_db, 1) + " dB to spare" : "OVER by " + fmt(-r.margin_db, 1) + " dB") },
     { key: "g", id: "hpn-out-g", label: "Label versus reality", value: (r) => "package " + fmt(r.label_vs_real_db + r.effective_attenuation_db, 0) + " dB, credited " + fmt(r.effective_attenuation_db, 1) + " dB - a gap of " + fmt(r.label_vs_real_db, 1) + " dB" },
-    { key: "n2", id: "hpn-out-n2", label: "NRR that would reach the target", value: (r) => r.meets_target ? "already met" : fmt(r.nrr_needed_db, 1) + " dB by this method" + (r.nrr_needed_db > 33 ? " - beyond anything on the market" : "") },
+    { key: "n2", id: "hpn-out-n2", label: "NRR that would reach the target", value: (r) => r.meets_target ? "already met" : fmt(r.nrr_needed_db, Math.abs(r.nrr_needed_db - 33) < 0.05 && r.nrr_needed_db !== 33 ? 3 : 1) + " dB by this method" + (r.nrr_needed_db > 33 ? " - beyond anything on the market" : "") },
     { key: "n", id: "hpn-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeHearingProtectorNrr,

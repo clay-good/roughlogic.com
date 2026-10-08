@@ -1189,7 +1189,7 @@ function renderCulvertInletControl(inputRegion, outputRegion, citationEl) {
       return;
     }
     oHW.textContent = fmt(r.hw_ft, 2) + " ft above the inlet invert";
-    oHWD.textContent = fmt(r.hw_over_d, 3) + (r.hw_over_d > 1.5 ? " -- over 1.5; check the allowable headwater and outlet control" : "");
+    oHWD.textContent = fmt(r.hw_over_d, Math.abs(r.hw_over_d - 1.5) < 0.0005 && r.hw_over_d !== 1.5 ? 5 : 3) + (r.hw_over_d > 1.5 ? " -- over 1.5; check the allowable headwater and outlet control" : "");
     oReg.textContent = r.regime + " (flow factor Q/(A sqrt D) = " + fmt(r.flow_factor, 2) + ")";
     oDc.textContent = fmt(r.dc_ft, 2) + " ft (d/D " + fmt(r.dc_ft / r.d_ft, 2) + "), specific head Hc " + fmt(r.hc_ft, 2) + " ft";
     oNote.textContent = r.note;
@@ -1286,7 +1286,7 @@ function renderBoxCulvertInletControl(inputRegion, outputRegion, citationEl) {
       return;
     }
     oHW.textContent = fmt(r.hw_ft, 2) + " ft above the inlet invert";
-    oHWD.textContent = fmt(r.hw_over_d, 3) + (r.hw_over_d > 1.5 ? " -- over 1.5; check the allowable headwater and outlet control" : "");
+    oHWD.textContent = fmt(r.hw_over_d, Math.abs(r.hw_over_d - 1.5) < 0.0005 && r.hw_over_d !== 1.5 ? 5 : 3) + (r.hw_over_d > 1.5 ? " -- over 1.5; check the allowable headwater and outlet control" : "");
     oReg.textContent = r.regime + " (Form " + r.form + ", flow factor Q/(A sqrt D) = " + fmt(r.flow_factor, 2) + ")";
     oDc.textContent = r.form === 1 ? fmt(r.dc_ft, 2) + " ft (specific head Hc " + fmt(r.hc_ft, 2) + " ft)" : "not used (Form 2 headwall)";
     oNote.textContent = r.note;
@@ -1573,7 +1573,7 @@ function renderCulvertHeadwater(inputRegion, outputRegion, citationEl) {
       for (const o of [oCtl, oIn, oOut, oNote]) o.textContent = "-";
       return;
     }
-    oGov.textContent = fmt(r.governing_hw_ft, 2) + " ft above the inlet invert (HW/D " + fmt(r.hw_over_d, 2) + (r.hw_over_d > 1.5 ? "; over 1.5 -- check the allowable headwater" : "") + ")";
+    oGov.textContent = fmt(r.governing_hw_ft, 2) + " ft above the inlet invert (HW/D " + fmt(r.hw_over_d, Math.abs(r.hw_over_d - 1.5) < 0.005 && r.hw_over_d !== 1.5 ? 4 : 2) + (r.hw_over_d > 1.5 ? "; over 1.5 -- check the allowable headwater" : "") + ")";
     oCtl.textContent = r.control === "inlet" ? "INLET control governs (" + r.inlet_regime + ")" : "OUTLET control governs (barrel velocity " + fmt(r.outlet_velocity_fps, 1) + " fps)";
     oIn.textContent = fmt(r.inlet_hw_ft, 2) + " ft" + (r.control === "inlet" ? " (governs)" : "");
     oOut.textContent = fmt(r.outlet_hw_ft, 2) + " ft" + (r.control === "outlet" ? " (governs)" : "");
@@ -1656,7 +1656,7 @@ function renderBoxCulvertHeadwater(inputRegion, outputRegion, citationEl) {
       for (const o of [oCtl, oIn, oOut, oNote]) o.textContent = "-";
       return;
     }
-    oGov.textContent = fmt(r.governing_hw_ft, 2) + " ft above the inlet invert (HW/D " + fmt(r.hw_over_d, 2) + (r.hw_over_d > 1.5 ? "; over 1.5 -- check the allowable headwater" : "") + ")";
+    oGov.textContent = fmt(r.governing_hw_ft, 2) + " ft above the inlet invert (HW/D " + fmt(r.hw_over_d, Math.abs(r.hw_over_d - 1.5) < 0.005 && r.hw_over_d !== 1.5 ? 4 : 2) + (r.hw_over_d > 1.5 ? "; over 1.5 -- check the allowable headwater" : "") + ")";
     oCtl.textContent = r.control === "inlet" ? "INLET control governs" : "OUTLET control governs (barrel velocity " + fmt(r.outlet_velocity_fps, 1) + " fps)";
     oIn.textContent = fmt(r.inlet_hw_ft, 2) + " ft" + (r.control === "inlet" ? " (governs)" : "");
     oOut.textContent = fmt(r.outlet_hw_ft, 2) + " ft" + (r.control === "outlet" ? " (governs)" : "");

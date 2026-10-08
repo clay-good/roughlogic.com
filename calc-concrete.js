@@ -131,7 +131,7 @@ CONCRETE_RENDERERS["rc-beam-flexure"] = _simpleRenderer({
     { key: "a", id: "rbf-out-a", label: "Stress-block depth a", value: (r) => fmt(r.a_in, 2) + " in" },
     { key: "mn", id: "rbf-out-mn", label: "Nominal moment Mn", value: (r) => fmt(r.mn_kipft, 1) + " kip-ft" },
     { key: "pm", id: "rbf-out-pm", label: "Design moment phi Mn (phi = 0.90)", value: (r) => fmt(r.phi_mn, 1) + " kip-ft" },
-    { key: "ut", id: "rbf-out-ut", label: "Demand / capacity", value: (r) => r.util === null ? "- (no Mu entered)" : fmt(r.util, 2) + (r.util <= 1 + 1e-9 ? (r.tension_controlled ? " (OK)" : " (NOT tension-controlled - fails ACI 318-19 9.3.3.1)") : " (OVER)") },
+    { key: "ut", id: "rbf-out-ut", label: "Demand / capacity", value: (r) => r.util === null ? "- (no Mu entered)" : fmt(r.util, Math.abs(r.util - 1) < 0.005 && r.util !== 1 ? 4 : 2) + (r.util <= 1 + 1e-9 ? (r.tension_controlled ? " (OK)" : " (NOT tension-controlled - fails ACI 318-19 9.3.3.1)") : " (OVER)") },
   ],
   compute: computeRcBeamFlexure,
 });
@@ -1341,10 +1341,10 @@ CONCRETE_RENDERERS["concrete-bearing-strength"] = _simpleRenderer({
     { key: "factored_load_kip", label: "Factored load Pu (kip, 0 = capacity only)", kind: "number", default: 0 },
   ],
   outputs: [
-    { key: "sr", id: "cbs-out-sr", label: "Confinement factor sqrt(A2/A1), capped at 2.0", value: (r) => fmt(r.sqrt_ratio, 3) + (r.sqrt_ratio >= 2 ? " (at the 2.0 cap)" : "") },
+    { key: "sr", id: "cbs-out-sr", label: "Confinement factor sqrt(A2/A1), capped at 2.0", value: (r) => fmt(r.sqrt_ratio, Math.abs(r.sqrt_ratio - 2) < 0.0005 && r.sqrt_ratio !== 2 ? 5 : 3) + (r.sqrt_ratio >= 2 ? " (at the 2.0 cap)" : "") },
     { key: "bn", id: "cbs-out-bn", label: "Nominal bearing strength Bn", value: (r) => fmt(r.bn_lb, 0) + " lb (" + fmt(r.bn_lb / 1000, 1) + " kip)" },
     { key: "pb", id: "cbs-out-pb", label: "Design bearing strength phiBn (phi = 0.65)", value: (r) => fmt(r.phibn_kip, 1) + " kip" },
-    { key: "dcr", id: "cbs-out-dcr", label: "Demand / capacity", value: (r) => r.dcr === null ? "- (no Pu entered)" : fmt(r.dcr, 2) + (r.dcr <= 1 + 1e-9 ? " (OK)" : " (OVER)") },
+    { key: "dcr", id: "cbs-out-dcr", label: "Demand / capacity", value: (r) => r.dcr === null ? "- (no Pu entered)" : fmt(r.dcr, Math.abs(r.dcr - 1) < 0.005 && r.dcr !== 1 ? 4 : 2) + (r.dcr <= 1 + 1e-9 ? " (OK)" : " (OVER)") },
   ],
   compute: computeConcreteBearingStrength,
 });
@@ -2587,7 +2587,7 @@ CONCRETE_RENDERERS["rc-tbeam-flexure"] = _simpleRenderer({
     { key: "mn", id: "rtb-out-mn", label: "Nominal moment Mn", value: (r) => fmt(r.mn_kipft, 1) + " kip-ft" },
     { key: "pm", id: "rtb-out-pm", label: "Design moment phi Mn", value: (r) => fmt(r.phi_mn_kipft, 1) + " kip-ft at phi = " + fmt(r.phi, 3) },
     { key: "et", id: "rtb-out-et", label: "Net tensile strain", value: (r) => fmt(r.eps_t, 5) + " vs a " + fmt(r.tc_limit, 5) + " tension-controlled limit - " + (r.tension_controlled ? "tension-controlled" : r.compression_controlled ? "COMPRESSION-CONTROLLED" : "transition zone") },
-    { key: "ut", id: "rtb-out-ut", label: "Demand / capacity", value: (r) => r.util === null ? "- (no Mu entered)" : fmt(r.util, 2) + (r.util <= 1 + 1e-9 ? (r.tension_controlled ? " (OK)" : " (NOT tension-controlled - fails ACI 318-19 9.3.3.1)") : " (OVER)") },
+    { key: "ut", id: "rtb-out-ut", label: "Demand / capacity", value: (r) => r.util === null ? "- (no Mu entered)" : fmt(r.util, Math.abs(r.util - 1) < 0.005 && r.util !== 1 ? 4 : 2) + (r.util <= 1 + 1e-9 ? (r.tension_controlled ? " (OK)" : " (NOT tension-controlled - fails ACI 318-19 9.3.3.1)") : " (OVER)") },
     { key: "n", id: "rtb-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeRcTBeamFlexure,

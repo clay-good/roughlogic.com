@@ -5838,7 +5838,7 @@ const _renderShorePostLoad = _simpleRenderer({
     { key: "sl", id: "spl-out-sl", label: "Slab dead load", value: (r) => _fmtC(r.slab_load, 1) + " psf" },
     { key: "dp", id: "spl-out-dp", label: "Design pressure", value: (r) => _fmtC(r.design_psf, 1) + " psf" },
     { key: "sh", id: "spl-out-sh", label: "Load per shore", value: (r) => _fmtC(r.shore_load, 0) + " lb" },
-    { key: "ut", id: "spl-out-ut", label: "Utilization", value: (r) => _fmtC(r.utilization, 2) + (r.utilization > 1 + 1e-9 ? " (OVER capacity)" : "") },
+    { key: "ut", id: "spl-out-ut", label: "Utilization", value: (r) => _fmtC(r.utilization, Math.abs(r.utilization - 1) < 0.005 && r.utilization !== 1 ? 4 : 2) + (r.utilization > 1 + 1e-9 ? " (OVER capacity)" : "") },
   ],
   compute: computeShorePostLoad,
 });
@@ -6700,7 +6700,7 @@ const _renderWoodBeamShear = _simpleRenderer({
     { key: "ra", id: "wbs-out-ra", label: "Depth ratio dn/d", value: (r) => _fmtC(r.ratio, 3) },
     { key: "vn", id: "wbs-out-vn", label: "Notched allowable Vr'", value: (r) => _fmtC(r.vr_notch_lb, 0) + " lb" },
     { key: "fv", id: "wbs-out-fv", label: "Actual stress fv", value: (r) => r.fv_psi === null ? "-" : _fmtC(r.fv_psi, 1) + " psi" },
-    { key: "dc", id: "wbs-out-dc", label: "Demand / capacity", value: (r) => r.dcr === null ? "-" : _fmtC(r.dcr, 2) + (r.dcr > 1 + 1e-9 ? " (OVERSTRESS)" : "") },
+    { key: "dc", id: "wbs-out-dc", label: "Demand / capacity", value: (r) => r.dcr === null ? "-" : _fmtC(r.dcr, Math.abs(r.dcr - 1) < 0.005 && r.dcr !== 1 ? 4 : 2) + (r.dcr > 1 + 1e-9 ? " (OVERSTRESS)" : "") },
   ],
   compute: computeWoodBeamShear,
 });
@@ -6761,7 +6761,7 @@ const _renderWoodBeamCompressionNotch = _simpleRenderer({
     { key: "vt", id: "wcn-out-vt", label: "Same notch, tension side (for contrast)", value: (r) => _fmtC(r.vr_tension_lb, 0) + " lb" },
     { key: "rf", id: "wcn-out-rf", label: "Compression keeps this much more", value: (r) => r.relief_factor === null ? "-" : _fmtC(r.relief_factor, 2) + "x the tension-side allowable" },
     { key: "fv", id: "wcn-out-fv", label: "Actual stress fv", value: (r) => r.fv_psi === null ? "-" : _fmtC(r.fv_psi, 1) + " psi" },
-    { key: "dc", id: "wcn-out-dc", label: "Demand / capacity", value: (r) => r.dcr === null ? "-" : _fmtC(r.dcr, 2) + (r.dcr > 1 + 1e-9 ? " (OVERSTRESS)" : "") },
+    { key: "dc", id: "wcn-out-dc", label: "Demand / capacity", value: (r) => r.dcr === null ? "-" : _fmtC(r.dcr, Math.abs(r.dcr - 1) < 0.005 && r.dcr !== 1 ? 4 : 2) + (r.dcr > 1 + 1e-9 ? " (OVERSTRESS)" : "") },
   ],
   compute: computeWoodBeamCompressionNotch,
 });
@@ -6878,7 +6878,7 @@ const _renderWoodBearingPerpendicular = _simpleRenderer({
     { key: "cb", id: "wbp-out-cb", label: "Bearing-area factor Cb", value: (r) => fmt(r.cb_f, 3) + " (" + r.cb_flag + ")" },
     { key: "fa", id: "wbp-out-fa", label: "Adjusted Fc-perp'", value: (r) => fmt(r.fcperp_adj_psi, 0) + " psi" },
     { key: "fs", id: "wbp-out-fs", label: "Applied bearing stress", value: (r) => fmt(r.fc_perp_psi, 0) + " psi" },
-    { key: "dcr", id: "wbp-out-dcr", label: "Demand / capacity", value: (r) => fmt(r.dcr, 2) + (r.dcr > 1 + 1e-9 ? " (OVER - add bearing length or a plate)" : "") },
+    { key: "dcr", id: "wbp-out-dcr", label: "Demand / capacity", value: (r) => fmt(r.dcr, Math.abs(r.dcr - 1) < 0.005 && r.dcr !== 1 ? 4 : 2) + (r.dcr > 1 + 1e-9 ? " (OVER - add bearing length or a plate)" : "") },
     { key: "req", id: "wbp-out-req", label: "Required bearing length (Cb = 1)", value: (r) => fmt(r.lb_req_in, 2) + " in" },
     { key: "n", id: "wbp-out-n", label: "Note", value: (r) => r.note },
   ],
@@ -6925,7 +6925,7 @@ const _renderWoodTensionMember = _simpleRenderer({
     { key: "an", id: "wtm-out-an", label: "Gross / net area", value: (r) => fmt(r.ag_in2, 3) + " / " + fmt(r.an_in2, 3) + " in^2" },
     { key: "fa", id: "wtm-out-fa", label: "Adjusted Ft'", value: (r) => fmt(r.ft_adj_psi, 0) + " psi" },
     { key: "ft", id: "wtm-out-ft", label: "Applied tension stress", value: (r) => fmt(r.ft_applied_psi, 0) + " psi" },
-    { key: "dcr", id: "wtm-out-dcr", label: "Demand / capacity", value: (r) => fmt(r.dcr, 2) + (r.dcr > 1 + 1e-9 ? " (OVER)" : "") },
+    { key: "dcr", id: "wtm-out-dcr", label: "Demand / capacity", value: (r) => fmt(r.dcr, Math.abs(r.dcr - 1) < 0.005 && r.dcr !== 1 ? 4 : 2) + (r.dcr > 1 + 1e-9 ? " (OVER)" : "") },
     { key: "n", id: "wtm-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeWoodTensionMember,
@@ -7298,7 +7298,7 @@ const _renderWindGustEffectFactor = _simpleRenderer({
     { key: "b_ft", label: "Building width B, normal to wind (ft)", kind: "number" },
   ],
   outputs: [
-    { key: "g", id: "wgef-out-g", label: "Gust-effect factor G", value: (r) => fmt(r.g_factor, 3) + (r.g_factor > 0.85 ? " (above the 0.85 default)" : " (at or below 0.85)") },
+    { key: "g", id: "wgef-out-g", label: "Gust-effect factor G", value: (r) => fmt(r.g_factor, Math.abs(r.g_factor - 0.85) < 0.0005 && r.g_factor !== 0.85 ? 5 : 3) + (r.g_factor > 0.85 ? " (above the 0.85 default)" : " (at or below 0.85)") },
     { key: "izq", id: "wgef-out-izq", label: "Turbulence Iz / background Q", value: (r) => fmt(r.iz, 3) + " / " + fmt(r.q, 3) },
     { key: "lz", id: "wgef-out-lz", label: "Length scale Lz / zbar", value: (r) => fmt(r.lz_ft, 0) + " ft / " + fmt(r.zbar_ft, 1) + " ft" + (r.zbar_clamped ? " (zbar held at zmin)" : "") },
     { key: "n", id: "wgef-out-n", label: "Note", value: (r) => r.note },
@@ -9054,7 +9054,7 @@ const _v797renderConcreteYield = _simpleRenderer({
   ],
   outputs: [
     { key: "y", id: "cyld-out-y", label: "Yield produced", value: (r) => fmt(r.yield_yd3, 3) + " yd^3 (" + fmt(r.yield_ft3, 2) + " ft^3)" },
-    { key: "r", id: "cyld-out-r", label: "Relative yield", value: (r) => fmt(r.relative_yield, 3) + (r.relative_yield < 0.99 ? " -- SHORT load (denser than designed)" : (r.relative_yield > 1.01 ? " -- over-yield (light / high air)" : " -- on target (within 1%)") ) },
+    { key: "r", id: "cyld-out-r", label: "Relative yield", value: (r) => fmt(r.relative_yield, Math.abs(r.relative_yield - 0.99) < 0.0005 && r.relative_yield !== 0.99 ? 5 : 3) + (r.relative_yield < 0.99 ? " -- SHORT load (denser than designed)" : (r.relative_yield > 1.01 ? " -- over-yield (light / high air)" : " -- on target (within 1%)") ) },
     { key: "c", id: "cyld-out-c", label: "Actual cement content", value: (r) => r.cement_content_lb_yd3 === null ? "(enter cementitious mass)" : fmt(r.cement_content_lb_yd3, 1) + " lb/yd^3" },
     { key: "n", id: "cyld-out-n", label: "Note", value: (r) => r.note },
   ],
@@ -10332,7 +10332,7 @@ const _v881renderBalusterPicketCount = _simpleRenderer({
   ],
   outputs: [
     { key: "p", id: "bpc-out-p", label: "Balusters / pickets", value: (r) => _fmtC(r.pickets, 0) + " pickets (" + _fmtC(r.gaps, 0) + " gaps)" },
-    { key: "g", id: "bpc-out-g", label: "Actual clear gap", value: (r) => _fmtC(r.actual_gap_in, 2) + " in" + (r.actual_gap_in <= 4 + 1e-9 ? " (meets the IRC 4 in sphere rule)" : r.actual_gap_in <= 4.375 + 1e-9 ? " (over 4 in: meets only the 4-3/8 in rule for a guard on the open side of a stair)" : " (over the IRC 4 in guard limit - fine only where the guard rule does not apply)") },
+    { key: "g", id: "bpc-out-g", label: "Actual clear gap", value: (r) => _fmtC(r.actual_gap_in, Math.abs(r.actual_gap_in - 4) < 0.005 && r.actual_gap_in !== 4 ? 4 : 2) + " in" + (r.actual_gap_in <= 4 + 1e-9 ? " (meets the IRC 4 in sphere rule)" : r.actual_gap_in <= 4.375 + 1e-9 ? " (over 4 in: meets only the 4-3/8 in rule for a guard on the open side of a stair)" : " (over the IRC 4 in guard limit - fine only where the guard rule does not apply)") },
     { key: "note", id: "bpc-out-note", label: "Note", value: (r) => r.note },
   ],
   compute: computeBalusterPicketCount,

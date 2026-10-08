@@ -55,3 +55,13 @@ test("formatted outputs: no declarative renderer prints undefined, NaN, Infinity
   assert.ok(checked > 50000, "the sweep formatted only " + checked + " lines; the registry or renderer map did not load");
   assert.deepEqual([...new Set(leaks)], []);
 });
+
+// A ratio printed beside a verdict on that same ratio gets two more digits only
+// within display rounding of the limit, so 1.003 never prints as "1.00 (OVER)".
+test("formatted outputs: a borderline ratio shows the digits its verdict turns on", async () => {
+  const { CONSTRUCTION_RENDERERS } = await import("../../calc-construction.js");
+  const line = CONSTRUCTION_RENDERERS["wood-bearing-perpendicular"].schema.outputs.find((o) => o.key === "dcr").format;
+  assert.match(line({ dcr: 1.003 }), /^1\.0030 \(OVER/);
+  assert.equal(line({ dcr: 1 }), "1.00");
+  assert.equal(line({ dcr: 0.731 }), "0.73");
+});
