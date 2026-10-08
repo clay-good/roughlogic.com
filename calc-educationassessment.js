@@ -138,7 +138,8 @@ function renderCategoryWeightedGrade(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const r = computeCategoryWeightedGrade({ categories: parse(data.input.value) });
     if (r.error) { oOverall.textContent = r.error; oCheck.textContent = ""; oNote.textContent = ""; return; }
-    oOverall.textContent = fmt(r.overall_pct, 2) + "% (" + r.letter + ")";
+    // Truncated, not rounded: until 2026-10-08 an 89.996% overall printed as "90.00% (B)".
+    oOverall.textContent = fmt(r.overall_pct === null ? null : Math.floor(r.overall_pct * 100 + 1e-9) / 100, 2) + "% (" + r.letter + ")";
     oCheck.textContent = fmt(r.weight_sum, 0) + (r.weight_normalized ? " (normalized - does not sum to 100)" : "");
     oNote.textContent = r.note;
   }, DEBOUNCE_MS);
