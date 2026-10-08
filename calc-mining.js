@@ -1043,8 +1043,9 @@ MINING_RENDERERS["hoist-rope-safety-factor"] = _simpleRenderer({
     { key: "t", id: "hrs-out-t", label: "Total suspended load", value: (r) => fmt(r.total_load_lb, 0) + " lb" },
     { key: "f", id: "hrs-out-f", label: "Factor of safety", value: (r) => fmt(r.factor_of_safety, 2) + " -- " + r.verdict + ", margin " + fmt(r.margin, 2) },
     { key: "o", id: "hrs-out-o", label: "Leaving the rope out would read", value: (r) => fmt(r.fs_without_rope, 2) + " (" + fmt(r.overstatement, 2) + " better than the truth, in the unsafe direction)" },
-    { key: "m", id: "hrs-out-m", label: "Payload at the statutory minimum", value: (r) => fmt(r.max_payload_lb, 0) + " lb" },
-    { key: "d", id: "hrs-out-d", label: "Depth at which the factor reaches the minimum", value: (r) => fmt(r.depth_at_limit_ft, 0) + " ft of rope" },
+    // Both are clamped at zero; until 2026-10-08 an unreachable minimum printed as "0 lb" and "0 ft".
+    { key: "m", id: "hrs-out-m", label: "Payload at the statutory minimum", value: (r) => r.max_payload_lb > 0 ? fmt(r.max_payload_lb, 0) + " lb" : "none -- the empty conveyance and the rope already take the whole allowable load" },
+    { key: "d", id: "hrs-out-d", label: "Depth at which the factor reaches the minimum", value: (r) => r.depth_at_limit_ft > 0 ? fmt(r.depth_at_limit_ft, 0) + " ft of rope" : "none -- this load is below the minimum factor at any depth" },
     { key: "n", id: "hrs-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeHoistRopeSafetyFactor,
