@@ -1657,7 +1657,7 @@ cross-check.
 | calc-construction.js | `computeCurbGutterVolume` | `{ cross_section_ft2 = 2.0, length_ft = 300, waste_pct = 8 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeCurtainWallMullionDeflection` | `{ span_in = 0, tributary_width_ft = 0, wind_pressure_psf = 0, modulus_psi = 1...` | _ | _ | _ |
 | calc-construction.js | `computeDeckBeamPost` | `{ joist_span_ft = 0, beam_span_ft = 0, post_height_ft = 8, live_load_psf = 40...` | _ | _ | _ |
-| calc-construction.js | `computeDeckLedgerFasteners` | `{ joist_span_ft = 0, spacing_in = 0, ledger_length_ft = 0, fastener = "lag" }...` | _ | _ | _ |
+| calc-construction.js | `computeDeckLedgerFasteners` | `{ joist_span_ft = 0, spacing_in, ledger_length_ft = 0, fastener = "lag" } = {}` | _ | _ | _ |
 | calc-construction.js | `computeDemoDebris` | `{ structure_type = "wood_frame", volume_yd3 = 0 }` | _ | _ | _ |
 | calc-construction.js | `computeDoorClearWidth` | `{ leaf_width_in = 0, door_thickness_in = 1.75, measured_clear_width_in = 0, o...` | _ | _ | _ |
 | calc-construction.js | `computeDoorManeuveringClearance` | `{ clear_perpendicular_in = 0, clear_latch_side_in = 0, door_clear_width_in = ...` | _ | _ | _ |
@@ -4832,7 +4832,7 @@ per spec-v14 §13.1 second paragraph.
 | `debris-management-site-sizing` | Debris Management Site Acreage and Volume Reduction | FEMA / USACE; Appendix B, USACE model Step 2 example: 7,000,000 cy / 16... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `deck-beam-post` | Deck Beam and Post Sizing (IRC R507) | IRC / AWC NDS; trib = 6 ft; w = 50 x 6 = 300 plf; M = 28,800 lb-in; doub... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `deck-board-takeoff` | Deck Board and Fastener Takeoff | First-principles deck-surface takeoff; 12 x 16 ft deck, 5.5 in boards, 0.25 in gap, 16 in OC, 10... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
-| `deck-ledger-fasteners` | Deck Ledger Fastener Spacing (IRC R507.9) | IRC R507.9 (deck ledger connection); 16 ft ledger at 16 in OC -> floor(192/16)+1 = 13 fasteners | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `deck-ledger-fasteners` | Deck Ledger Fastener Spacing (IRC R507.9) | Journal of Light Construction (JLC), ...; Worked case: a 15 ft joist span takes 1/2 in lag screws a... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `degree-of-curve` | Railroad Degree of Curve, Radius, and Middle Ordinate | Project (first-principles); 49 CFR 213 named for the alignment limits not evaluated | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `demo-debris` | Demolition Debris Weight | Project (industry debris-density rules); Wood-frame demo / 25 yd^3 -> 675 ft^3 / 6.075 tons / 30 y... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `dewatering-rate` | Excavation Dewatering Pump Rate | First-principles volume / pumping rate; 20 x 12 pit, draw 3 ft in 30 min, inflow 40 gpm, 25% marg... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |

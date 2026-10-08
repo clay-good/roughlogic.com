@@ -18012,29 +18012,28 @@
   },
   {
    "tile_id": "deck-ledger-fasteners",
-   "source_publisher": "IRC R507.9 (deck ledger connection)",
-   "source_title": "Fastener count = ceil(ledger_ft x 12 / spacing) + 1 (no gap exceeds the spacing)",
-   "source_edition_or_year": "IRC R507.9 (spacing user-supplied from the adopted table)",
-   "source_section_or_page": "16 ft ledger at 16 in OC -> floor(192/16)+1 = 13 fasteners",
+   "source_publisher": "Journal of Light Construction (JLC), Deck Builder",
+   "source_title": "Installing a Deck Ledger",
+   "source_edition_or_year": "IRC Table R507.9.1.3(1)",
+   "source_section_or_page": "Worked case: a 15 ft joist span takes 1/2 in lag screws at 11 in on center (the 14 ft 1 in to 16 ft column); corroborated by ICC's deck article (14 ft span -> 13 in). A 16 ft ledger at 11 in takes ceil(192/11) + 1 = 19 fasteners in the staggered top-and-bottom pattern.",
    "verified_by": "rl",
-   "verified_on": "2026-06-06",
+   "verified_on": "2026-10-08",
    "inputs": {
-    "joist_span_ft": 12,
-    "spacing_in": 16,
+    "joist_span_ft": 15,
     "ledger_length_ft": 16,
     "fastener": "lag"
    },
    "outputs": {
-    "fastener_count": {
-     "value": 13,
+    "spacing_in": {
+     "value": 11,
      "tolerance": {
-      "abs": 0.5
+      "abs": 0
      }
     },
-    "spacing_in": {
-     "value": 16,
+    "fastener_count": {
+     "value": 19,
      "tolerance": {
-      "abs": 0.01
+      "abs": 0
      }
     }
    }

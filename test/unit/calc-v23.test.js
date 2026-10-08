@@ -185,15 +185,25 @@ test("wall-bracing-length: non-positive line and out-of-range percent rejected; 
 });
 
 // E.2 deck-ledger-fasteners
-test("deck-ledger-fasteners: 16 ft ledger at 16 in OC -> 13 fasteners, within table", () => {
-  const r = computeDeckLedgerFasteners({ joist_span_ft: 12, spacing_in: 16, ledger_length_ft: 16 });
+test("deck-ledger-fasteners: 16 ft ledger at 16 in OC -> 13 fasteners; a proprietary screw at its own spacing passes", () => {
+  const r = computeDeckLedgerFasteners({ joist_span_ft: 12, spacing_in: 16, ledger_length_ft: 16, fastener: "sds" });
   assert.strictEqual(r.fastener_count, 13);
   assert.strictEqual(r.pass, true);
+});
+test("deck-ledger-fasteners: IRC Table R507.9.1.3(1) caps lag and bolt spacing by joist span", () => {
+  // Until 2026-10-08, 16 in lags at a 12 ft span passed; the table allows 15.
+  assert.strictEqual(computeDeckLedgerFasteners({ joist_span_ft: 12, spacing_in: 16, ledger_length_ft: 16 }).pass, false);
+  // Blank spacing takes the table: ICC's article (14 ft -> 13 in lags) and JLC's (15 ft -> 11 in).
+  assert.strictEqual(computeDeckLedgerFasteners({ joist_span_ft: 14, ledger_length_ft: 16 }).spacing_in, 13);
+  assert.strictEqual(computeDeckLedgerFasteners({ joist_span_ft: 15, ledger_length_ft: 16 }).spacing_in, 11);
+  assert.strictEqual(computeDeckLedgerFasteners({ joist_span_ft: 6, ledger_length_ft: 16, fastener: "bolt" }).spacing_in, 36);
+  assert.strictEqual(computeDeckLedgerFasteners({ joist_span_ft: 18, ledger_length_ft: 16, fastener: "bolt" }).spacing_in, 19);
+  assert.ok("error" in computeDeckLedgerFasteners({ joist_span_ft: 12, ledger_length_ft: 16, fastener: "sds" }));
 });
 test("deck-ledger-fasteners: NON-even 15 ft ledger at 16 in OC -> 13 (ceil), not 12 (floor undercount)", () => {
   // 180 in / 16 in = 11.25 bays -> ceil 12 bays -> 13 fasteners (gaps 15 in <= 16).
   // The prior floor formula gave 12 fasteners = 11 bays -> 16.4 in gap, over the IRC max.
-  const r = computeDeckLedgerFasteners({ joist_span_ft: 12, spacing_in: 16, ledger_length_ft: 15 });
+  const r = computeDeckLedgerFasteners({ joist_span_ft: 12, spacing_in: 16, ledger_length_ft: 15, fastener: "sds" });
   assert.strictEqual(r.fastener_count, 13);
 });
 test("deck-ledger-fasteners: span over 18 ft flags out-of-table; non-positive inputs rejected", () => {

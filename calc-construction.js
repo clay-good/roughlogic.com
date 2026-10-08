@@ -3721,15 +3721,29 @@ CONSTRUCTION_RENDERERS["wall-bracing-length"] = renderWallBracingLength;
 // count along the ledger follows; spans beyond the table (18 ft) need an
 // engineered connection.
 //
-// dims: in { joist_span_ft: L, spacing_in: L, ledger_length_ft: L, fastener: dimensionless } out: { spacing_in: L, fastener_count: dimensionless, joist_span_ft: L, pass: dimensionless }
-export function computeDeckLedgerFasteners({ joist_span_ft = 0, spacing_in = 0, ledger_length_ft = 0, fastener = "lag" } = {}) {
+// IRC Table R507.9.1.3(1), maximum on-center spacing (in) by joist span column (<= 6, 8, 10, 12, 14, 16, 18 ft),
+// 40 psf live, 10 psf dead, 40 psf snow: 1/2 in lag screws with up to 1/2 in sheathing, and 1/2 in bolts with
+// up to 3/8 in sheathing. Corroborated by ICC's own deck article (14 ft span -> 13 in lags) and JLC (15 ft -> 11 in).
+const _R507_LEDGER_SPANS = [6, 8, 10, 12, 14, 16, 18];
+const _R507_LEDGER_MAX_OC = { lag: [30, 23, 18, 15, 13, 11, 10], bolt: [36, 36, 34, 29, 24, 21, 19] };
+// dims: in { joist_span_ft: L, spacing_in: L, ledger_length_ft: L, fastener: dimensionless } out: { spacing_in: L, fastener_count: dimensionless, joist_span_ft: L, pass: dimensionless, table_max_in: L }
+export function computeDeckLedgerFasteners({ joist_span_ft = 0, spacing_in, ledger_length_ft = 0, fastener = "lag" } = {}) {
   const span = Number(joist_span_ft) || 0;
-  const spacing = Number(spacing_in) || 0;
   const len = Number(ledger_length_ft) || 0;
   if (!(span > 0 && Number.isFinite(span))) return { error: "Joist span must be positive (ft)." };
-  if (!(spacing > 0 && Number.isFinite(spacing))) return { error: "On-center spacing must be positive (in)." };
   if (!(len > 0 && Number.isFinite(len))) return { error: "Ledger length must be positive (ft)." };
+  const f = String(fastener || "lag");
+  if (!["lag", "bolt", "sds"].includes(f)) return { error: "Fastener must be lag, bolt, or sds." };
   const within_table = span <= 18 + 1e-9 * Math.abs(18);
+  const col = _R507_LEDGER_SPANS.findIndex((x) => span <= x + 1e-9);
+  // Until 2026-10-08 the spacing was always the user's and never checked against the table, so 16 in lags
+  // at a 12 ft span (the table allows 15) read as passing. Blank now takes the table value for lag or bolt.
+  const table_max_in = f === "sds" || col < 0 ? null : _R507_LEDGER_MAX_OC[f][col];
+  const entered = spacing_in === undefined || spacing_in === null || spacing_in === "" ? null : Number(spacing_in);
+  if (entered === null && table_max_in === null) return { error: f === "sds" ? "Enter the on-center spacing from the screw manufacturer's evaluation report (proprietary screws are not in the IRC table)." : "The IRC table stops at an 18 ft joist span; enter an engineered spacing." };
+  const spacing = entered === null ? table_max_in : entered;
+  if (!(spacing > 0 && Number.isFinite(spacing))) return { error: "On-center spacing must be positive (in)." };
+  const spacing_ok = table_max_in === null || spacing <= table_max_in + 1e-9;
   // Fasteners at both ends with no gap exceeding the on-center spacing:
   // bays = ceil(length / spacing), fasteners = bays + 1 (the fence-post count,
   // matching the sibling joist-hanger / metal-stud / sill-plate tiles). `floor`
@@ -3737,13 +3751,13 @@ export function computeDeckLedgerFasteners({ joist_span_ft = 0, spacing_in = 0, 
   // give 12, implying a 16.4 in gap that exceeds the IRC max) -- it only matched
   // when the length was an even multiple of the spacing.
   const fastener_count = Math.ceil((len * 12) / spacing - 1e-9) + 1;
-  return { spacing_in: spacing, fastener_count, joist_span_ft: span, within_table, pass: within_table, fastener: String(fastener || "") };
+  return { spacing_in: spacing, spacing_from_table: entered === null, table_max_in, spacing_ok, fastener_count, joist_span_ft: span, within_table, pass: within_table && spacing_ok, fastener: f };
 }
 
-export const deckLedgerFastenersExample = { inputs: { joist_span_ft: 12, spacing_in: 16, ledger_length_ft: 16, fastener: "lag" } };
+export const deckLedgerFastenersExample = { inputs: { joist_span_ft: 15, ledger_length_ft: 16, fastener: "lag" } };
 
 const renderDeckLedgerFasteners = _simpleRenderer({
-  citation: "Citation: Per the IRC R507.9 deck ledger connection provisions; the on-center spacing is user-supplied from the adopted IRC table for the fastener type / joist-span row. Bolt edge-distance and stagger apply; bottom-of-ledger spacing excluded. The AHJ-adopted edition governs. Free read-only at codes.iccsafe.org.",
+  citation: "Citation: Per the IRC R507.9 deck ledger connection provisions; Table R507.9.1.3(1) maximum on-center spacing for 1/2 in lag screws (up to 1/2 in sheathing) and 1/2 in bolts (up to 3/8 in sheathing) at 40 psf live, 10 psf dead, 40 psf snow, by joist span; a proprietary screw takes the spacing from its evaluation report. Bolt edge-distance and stagger apply; bottom-of-ledger spacing excluded. The AHJ-adopted edition governs. Free read-only at codes.iccsafe.org.",
   example: deckLedgerFastenersExample.inputs,
   fields: [
     { key: "fastener", label: "Fastener type", kind: "select", options: [
@@ -3752,13 +3766,13 @@ const renderDeckLedgerFasteners = _simpleRenderer({
       { value: "sds", label: "Proprietary structural screw" },
     ] },
     { key: "joist_span_ft", label: "Joist span (ft)", kind: "number" },
-    { key: "spacing_in", label: "On-center spacing (in, from IRC table)", kind: "number" },
+    { key: "spacing_in", label: "On-center spacing (in, blank = the IRC table maximum)", kind: "number", blankUndefined: true },
     { key: "ledger_length_ft", label: "Ledger length (ft)", kind: "number" },
   ],
   outputs: [
-    { key: "oc", id: "dlf-out-oc", label: "On-center spacing", value: (r) => _fmtC(r.spacing_in, 0) + " in OC" },
-    { key: "count", id: "dlf-out-count", label: "Fasteners for ledger", value: (r) => String(r.fastener_count) },
-    { key: "pass", id: "dlf-out-pass", label: "Span / table check", value: (r) => r.pass ? "Within IRC R507.9 table range (span <= 18 ft)" : "Span exceeds the IRC table - engineered connection required" },
+    { key: "oc", id: "dlf-out-oc", label: "On-center spacing", value: (r) => _fmtC(r.spacing_in, 0) + " in OC" + (r.spacing_from_table ? " (IRC Table R507.9.1.3(1) maximum)" : r.table_max_in !== null ? " (table maximum " + r.table_max_in + " in)" : " (manufacturer's spacing)") },
+    { key: "count", id: "dlf-out-count", label: "Fasteners for ledger", value: (r) => String(r.fastener_count) + " (staggered top and bottom rows)" },
+    { key: "pass", id: "dlf-out-pass", label: "Span / table check", value: (r) => !r.within_table ? "Span exceeds the IRC table - engineered connection required" : !r.spacing_ok ? "FAILS: " + _fmtC(r.spacing_in, 0) + " in is wider than the " + r.table_max_in + " in the IRC table allows at this joist span" : "Within IRC R507.9 table range (span <= 18 ft)" },
   ],
   compute: computeDeckLedgerFasteners,
 });
