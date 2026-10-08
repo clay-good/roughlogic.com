@@ -300,8 +300,8 @@ STEAMPRESSURE_RENDERERS["asme-shell-thickness"] = _v1113renderAsmeShellThickness
 // D is the INSIDE diameter, E the joint efficiency, corrosion allowance added AFTER. All three
 // forms and the standard-F&D 0.885 coefficient were confirmed against two independent sources
 // (CASTI Guidebook to ASME Section VIII Div 1, Eq 8.1 and worked Example 8.1; ASME UG-32).
-// dims: in { design_pressure_psi: M L^-1 T^-2, inside_diameter_in: L, allowable_stress_psi: M L^-1 T^-2, joint_efficiency: dimensionless, corrosion_allowance_in: L, head_type: dimensionless } out: { t_required_in: L, t_with_allowance_in: L, mawp_psi: M L^-1 T^-2 }
-export function computeAsmeHeadThickness({ design_pressure_psi = 0, inside_diameter_in = 0, allowable_stress_psi = 0, joint_efficiency = 0.85, corrosion_allowance_in = 0.0625, head_type = "ellipsoidal" } = {}) {
+// dims: in { design_pressure_psi: M L^-1 T^-2, inside_diameter_in: L, allowable_stress_psi: M L^-1 T^-2, joint_efficiency: dimensionless, corrosion_allowance_in: L, head_type: dimensionless, ellipse_ratio: dimensionless, crown_ratio: dimensionless, knuckle_ratio: dimensionless } out: { t_required_in: L, t_with_allowance_in: L, mawp_psi: M L^-1 T^-2 }
+export function computeAsmeHeadThickness({ design_pressure_psi = 0, inside_diameter_in = 0, allowable_stress_psi = 0, joint_efficiency = 0.85, corrosion_allowance_in = 0.0625, head_type = "ellipsoidal", ellipse_ratio = null, crown_ratio = null, knuckle_ratio = null } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const P = Number(design_pressure_psi) || 0;
   const D = Number(inside_diameter_in) || 0;
@@ -314,22 +314,41 @@ export function computeAsmeHeadThickness({ design_pressure_psi = 0, inside_diame
   if (!(S > 0)) return { error: "Allowable stress must be positive (psi) at the DESIGN temperature, from the code's material tables." };
   if (!(E > 0 && E <= 1)) return { error: "Joint efficiency must be over 0 and up to 1.0." };
   if (!Number.isFinite(CA) || CA < 0) return { error: "Corrosion allowance cannot be negative (in)." };
+  // Appendix 1-4 (added 2026-10-07; until then a non-standard head was "outside this tile"):
+  // ellipsoidal t = P D K / (2SE - 0.2P), K = (2 + (D/2h)^2) / 6, D/2h from 1 to 3; torispherical
+  // t = P L M / (2SE - 0.2P), M = (3 + sqrt(L/r)) / 4, with L no more than the outside diameter
+  // (taken here as L/D <= 1) and r at least 6% of L. Blank ratios are the standard heads, which keep
+  // the UG-32(d) and UG-32(e) forms exactly (K = 1; M / 2 = 0.885 at r = 0.06 L).
+  const blank = (v) => v === null || v === undefined || v === "";
+  const ar = blank(ellipse_ratio) ? 2 : Number(ellipse_ratio);
+  const lr = blank(crown_ratio) ? 1 : Number(crown_ratio);
+  const kr = blank(knuckle_ratio) ? 0.06 : Number(knuckle_ratio);
+  if (!(ar >= 1 && ar <= 3)) return { error: "Ellipsoidal D/2h must be from 1.0 to 3.0 (Appendix 1-4 Table 1-4.1); 2 is the 2:1 head." };
+  if (!(lr > 0 && lr <= 1)) return { error: "Crown radius L must be positive and no more than the head diameter (L/D up to 1.0, UG-32(j))." };
+  if (!(kr >= 0.06 && kr < 0.5)) return { error: "Knuckle radius r must be at least 6% of the crown radius L (UG-32(j)) and below half of it." };
+  const standard = ar === 2 && lr === 1 && kr === 0.06;
+  const K = (2 + ar * ar) / 6;
+  const M = (3 + Math.sqrt(1 / kr)) / 4;
   const se = S * E;
   // denominator per head type
-  const denom = head_type === "torispherical" ? se - 0.1 * P : 2 * se - 0.2 * P;
+  const denom = head_type === "torispherical" && standard ? se - 0.1 * P : 2 * se - 0.2 * P;
   if (!(denom > 0)) return { error: "The design pressure is too high for this material and joint efficiency - the formula's denominator has gone to zero or negative, outside the UG-32 thin-head range." };
   let t_required_in, mawp_psi;
   if (head_type === "ellipsoidal") {
-    t_required_in = P * D / denom;
-    mawp_psi = 2 * se * t_required_in / (D + 0.2 * t_required_in);
+    t_required_in = P * D * K / denom;
+    mawp_psi = 2 * se * t_required_in / (K * D + 0.2 * t_required_in);
   } else if (head_type === "hemispherical") {
     const R = D / 2;
     t_required_in = P * R / denom;
     mawp_psi = 2 * se * t_required_in / (R + 0.2 * t_required_in);
-  } else {
+  } else if (standard) {
     const L = D; // standard flanged-and-dished: crown radius = inside diameter
     t_required_in = 0.885 * P * L / denom;
     mawp_psi = se * t_required_in / (0.885 * L + 0.1 * t_required_in);
+  } else {
+    const L = lr * D;
+    t_required_in = P * L * M / denom;
+    mawp_psi = 2 * se * t_required_in / (L * M + 0.2 * t_required_in);
   }
   const t_with_allowance_in = t_required_in + CA;
   if (![t_required_in, t_with_allowance_in, mawp_psi].every(Number.isFinite)) return { error: "Head-thickness math did not produce a finite value." };
@@ -338,22 +357,26 @@ export function computeAsmeHeadThickness({ design_pressure_psi = 0, inside_diame
   const outside_ug32 = head_type === "hemispherical" && (t_required_in > 0.356 * D / 2 || P > 0.665 * se);
   return {
     t_required_in, t_with_allowance_in, mawp_psi, se, head_type, outside_ug32,
-    note: "ASME BPVC Section VIII Division 1, UG-32 minimum thickness for a formed head under internal pressure: a 2:1 ellipsoidal head t = P D / (2 S E - 0.2 P), a hemispherical head t = P R / (2 S E - 0.2 P) with R = D/2, and a standard flanged-and-dished (torispherical) head t = 0.885 P L / (S E - 0.1 P) with the crown radius L equal to the inside diameter and a 6% knuckle. For the same vessel the hemispherical head is thinnest (the strongest shape), the 2:1 ellipsoidal about twice that, and the torispherical the thickest - which is why a cheap dished head trades material for a shallower profile. D is the INSIDE diameter in the corroded condition and E the joint efficiency; the corrosion allowance (" + (Number.isFinite(CA) ? CA.toFixed(4) : "0") + " in here) is ADDED after the strength calculation. The 0.885 torispherical coefficient is for the standard L = D, r = 0.06 L head; other L/r ratios use the M factor of Appendix 1-4, and ellipsoidal ratios other than 2:1 use the K factor - both outside this tile. Knuckle thinning during forming, the minimum-thickness-after-forming rule, staying-and-stiffening, and external pressure are separate. The allowable stress must come from the code's table at the design TEMPERATURE. ASME BPVC Section VIII and the vessel engineer govern - this is a check, not a stamped design.",
+    shape_factor: head_type === "ellipsoidal" ? K : head_type === "torispherical" ? (standard ? 1.77 : M) : null,
+    note: "ASME BPVC Section VIII Division 1, UG-32 minimum thickness for a formed head under internal pressure: a 2:1 ellipsoidal head t = P D / (2 S E - 0.2 P), a hemispherical head t = P R / (2 S E - 0.2 P) with R = D/2, and a standard flanged-and-dished (torispherical) head t = 0.885 P L / (S E - 0.1 P) with the crown radius L equal to the inside diameter and a 6% knuckle. For the same vessel the hemispherical head is thinnest (the strongest shape), the 2:1 ellipsoidal about twice that, and the torispherical the thickest - which is why a cheap dished head trades material for a shallower profile. D is the INSIDE diameter in the corroded condition and E the joint efficiency; the corrosion allowance (" + (Number.isFinite(CA) ? CA.toFixed(4) : "0") + " in here) is ADDED after the strength calculation. The 0.885 torispherical coefficient is for the standard L = D, r = 0.06 L head; other heads use Appendix 1-4, t = P L M / (2 S E - 0.2 P) with M = (3 + sqrt(L/r)) / 4 for a torispherical head and t = P D K / (2 S E - 0.2 P) with K = (2 + (D/2h)^2) / 6 for an ellipsoidal one; enter the ratios to use them. Knuckle thinning during forming, the minimum-thickness-after-forming rule, staying-and-stiffening, and external pressure are separate. The allowable stress must come from the code's table at the design TEMPERATURE. ASME BPVC Section VIII and the vessel engineer govern - this is a check, not a stamped design.",
   };
 }
 export const asmeHeadThicknessExample = { inputs: { design_pressure_psi: 150, inside_diameter_in: 48, allowable_stress_psi: 17500, joint_efficiency: 0.85, corrosion_allowance_in: 0.0625, head_type: "ellipsoidal" } };
 
 function _renderAsmeHeadThickness(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: ASME BPVC Section VIII Division 1, UG-32 formed-head thickness under internal pressure, by section number. 2:1 ellipsoidal (UG-32(d)): t = P D / (2 S E - 0.2 P). Hemispherical (UG-32(f)): t = P R / (2 S E - 0.2 P), R = D/2. Standard flanged-and-dished torispherical (UG-32(e), crown radius L = D, 6% knuckle): t = 0.885 P L / (S E - 0.1 P). D is the INSIDE diameter in the corroded condition, S the allowable stress at the design temperature, E the joint efficiency; the corrosion allowance is added after. All three forms and the 0.885 coefficient were confirmed against two independent sources (CASTI Guidebook Eq 8.1 and worked Example 8.1; ASME UG-32). Non-2:1 ellipsoidal (K factor) and non-standard torispherical (M factor) are outside this tile. No allowable-stress or joint-efficiency table is reproduced. ASME BPVC Section VIII and the vessel engineer govern.";
+  citationEl.textContent = "Citation: ASME BPVC Section VIII Division 1, UG-32 formed-head thickness under internal pressure, by section number. 2:1 ellipsoidal (UG-32(d)): t = P D / (2 S E - 0.2 P). Hemispherical (UG-32(f)): t = P R / (2 S E - 0.2 P), R = D/2. Standard flanged-and-dished torispherical (UG-32(e), crown radius L = D, 6% knuckle): t = 0.885 P L / (S E - 0.1 P). D is the INSIDE diameter in the corroded condition, S the allowable stress at the design temperature, E the joint efficiency; the corrosion allowance is added after. All three forms and the 0.885 coefficient were confirmed against two independent sources (CASTI Guidebook Eq 8.1 and worked Example 8.1; ASME UG-32). Other ellipsoidal ratios (K = (2 + (D/2h)^2) / 6, D/2h 1 to 3) and torispherical proportions (M = (3 + sqrt(L/r)) / 4, r at least 0.06 L) follow Appendix 1-4. No allowable-stress or joint-efficiency table is reproduced. ASME BPVC Section VIII and the vessel engineer govern.";
   const p = makeNumber("Design pressure (psig)", "aht-p", { step: "any", min: "0" });
   const d = makeNumber("Inside diameter, corroded (in)", "aht-d", { step: "any", min: "0" });
   const s = makeNumber("Allowable stress at design temp (psi)", "aht-s", { step: "any", min: "0", value: "17500" }); s.input.value = "17500";
   const e = makeNumber("Joint efficiency E (1.00 full RT, 0.85 spot, 0.70 none)", "aht-e", { step: "any", min: "0", max: "1", value: "0.85" }); e.input.value = "0.85";
   const c = makeNumber("Corrosion allowance (in)", "aht-c", { step: "any", min: "0", value: "0.0625" }); c.input.value = "0.0625";
-  const g = makeSelect("Head type", "aht-g", [{ value: "ellipsoidal", label: "2:1 ellipsoidal" }, { value: "hemispherical", label: "Hemispherical" }, { value: "torispherical", label: "Torispherical (standard F&D)" }]);
+  const g = makeSelect("Head type", "aht-g", [{ value: "ellipsoidal", label: "2:1 ellipsoidal" }, { value: "hemispherical", label: "Hemispherical" }, { value: "torispherical", label: "Torispherical (F&D)" }]);
   g.select.value = "ellipsoidal";
-  for (const f of [p, d, s, e, c, g]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { p.input.value = "150"; d.input.value = "48"; s.input.value = "17500"; e.input.value = "0.85"; c.input.value = "0.0625"; g.select.value = "ellipsoidal"; update(); });
+  const ar = makeNumber("Ellipsoidal D/2h (blank = 2:1)", "aht-ar", { step: "any", min: "1", max: "3" });
+  const lr = makeNumber("Torispherical crown radius L / D (blank = 1.0)", "aht-lr", { step: "any", min: "0", max: "1" });
+  const kr = makeNumber("Torispherical knuckle radius r / L (blank = 0.06)", "aht-kr", { step: "any", min: "0.06" });
+  for (const f of [p, d, s, e, c, g, ar, lr, kr]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { p.input.value = "150"; d.input.value = "48"; s.input.value = "17500"; e.input.value = "0.85"; c.input.value = "0.0625"; g.select.value = "ellipsoidal"; ar.input.value = ""; lr.input.value = ""; kr.input.value = ""; update(); });
   const oT = makeOutputLine(outputRegion, "Required thickness", "aht-out-t");
   const oM = makeOutputLine(outputRegion, "MAWP at the required thickness", "aht-out-m");
   const oN = makeOutputLine(outputRegion, "Note", "aht-out-n");
@@ -362,13 +385,16 @@ function _renderAsmeHeadThickness(inputRegion, outputRegion, citationEl) {
       design_pressure_psi: Number(p.input.value), inside_diameter_in: Number(d.input.value),
       allowable_stress_psi: Number(s.input.value), joint_efficiency: Number(e.input.value),
       corrosion_allowance_in: Number(c.input.value), head_type: g.select.value,
+      ellipse_ratio: ar.input.value === "" ? null : Number(ar.input.value),
+      crown_ratio: lr.input.value === "" ? null : Number(lr.input.value),
+      knuckle_ratio: kr.input.value === "" ? null : Number(kr.input.value),
     });
     if (res.error) { oT.textContent = res.error; oM.textContent = "-"; oN.textContent = "-"; return; }
     oT.textContent = fmt(res.t_required_in, 4) + " in by strength, " + fmt(res.t_with_allowance_in, 4) + " in with the corrosion allowance";
     oM.textContent = fmt(res.mawp_psi, 1) + " psi (S x E = " + fmt(res.se, 0) + " psi)";
     oN.textContent = (res.outside_ug32 ? "OUTSIDE THE UG-32(f) RANGE: the thickness exceeds 0.356 of the inside radius or the pressure exceeds 0.665 S E, so the thin-head formula does not apply and Appendix 1 governs. " : "") + res.note;
   }, DEBOUNCE_MS);
-  for (const f of [p, d, s, e, c]) f.input.addEventListener("input", update);
+  for (const f of [p, d, s, e, c, ar, lr, kr]) f.input.addEventListener("input", update);
   g.select.addEventListener("change", update);
   update();
 }

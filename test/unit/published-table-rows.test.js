@@ -119,3 +119,19 @@ test("welder-arc-circuit-conductor: NEC Table 630.11(A) motor-generator column, 
   assert.ok(Math.abs(w({ primary_current_a: 40, duty_pct: 50 }).effective_current_a - 28.4) < 1e-9);
   assert.ok(w({ primary_current_a: 40, duty_pct: 50, welder_type: "engine" }).error);
 });
+
+test("asme-head-thickness: Appendix 1-4 K and M factors for non-standard heads; standard heads keep UG-32", async () => {
+  const { computeAsmeHeadThickness: h } = await import("../../calc-steampressure.js");
+  const b = { design_pressure_psi: 150, inside_diameter_in: 48, allowable_stress_psi: 17500, joint_efficiency: 0.85, corrosion_allowance_in: 0.0625 };
+  const std = h({ ...b, head_type: "ellipsoidal" }).t_required_in;
+  assert.equal(h({ ...b, head_type: "ellipsoidal", ellipse_ratio: 2 }).t_required_in, std);
+  // Table 1-4.1 lists K = 1.37 at D/2h = 2.5; the formula gives 1.375.
+  assert.ok(Math.abs(h({ ...b, head_type: "ellipsoidal", ellipse_ratio: 2.5 }).t_required_in / std - 1.375) < 1e-12);
+  // The standard F&D 0.885 form and Appendix 1-4 at r = 0.06 L agree to within 0.05%.
+  const fd = h({ ...b, head_type: "torispherical" }).t_required_in;
+  assert.ok(Math.abs(h({ ...b, head_type: "torispherical", knuckle_ratio: 0.06000001 }).t_required_in / fd - 1) < 5e-4);
+  // A larger knuckle thins the head; the 6% floor and the 1-to-3 ellipse range are enforced.
+  assert.ok(h({ ...b, head_type: "torispherical", knuckle_ratio: 0.1 }).t_required_in < fd);
+  assert.ok(h({ ...b, head_type: "torispherical", knuckle_ratio: 0.03 }).error);
+  assert.ok(h({ ...b, head_type: "ellipsoidal", ellipse_ratio: 3.5 }).error);
+});
