@@ -19224,12 +19224,12 @@ export const CITATIONS = {
     edition: "The ACI 318-19 Section 17.7.2 concrete breakout strength in shear (17.7.2.2.1 basic strength, 17.7.2.4.1 edge factor, 17.7.2.5.1 cracking factor, 17.7.2.6.1 thin-member factor, Table 17.5.3 phi), by name.",
     freeAccess: "ACI 318 is readable free through the ACI online reading room at concrete.org; the Chapter 17 anchoring provisions are in the published code.",
     governance: GOVERNANCE.general,
-    editionNote: "Shear breakout scales with the EDGE DISTANCE to the 1.5 power, not the embedment (that is the tension mode) - moving the anchor away from the edge is the strongest knob. Shear toward the edge, single cast-in anchor, one loaded edge: shear parallel to an edge is checked with twice this strength per 17.7.2.1(c), anchor groups, eccentricity (psi_ecV), the supplementary-reinforcement psi_cV credits (1.2/1.4), and the seismic 0.75 factor are not modeled. Steel shear and pryout are separate checks. phi = 0.70 is Condition B (no supplementary reinforcement). ACI 318 Chapter 17 and the engineer of record govern - a design check, not a stamped anchor design.",
+    editionNote: "Shear breakout scales with the EDGE DISTANCE to the 1.5 power, not the embedment (that is the tension mode) - moving the anchor away from the edge is the strongest knob. Shear toward the edge, or parallel to it at twice the toward-edge strength with psi_edV = 1.0 (17.7.2.1(c), added 2026-10-08); single cast-in anchor, one loaded edge: anchor groups, eccentricity (psi_ecV), the supplementary-reinforcement psi_cV credits (1.2/1.4), and the seismic 0.75 factor are not modeled. Steel shear and pryout are separate checks. phi = 0.70 is Condition B (no supplementary reinforcement). ACI 318 Chapter 17 and the engineer of record govern - a design check, not a stamped anchor design.",
     assumptions: [
       { name: "Basic-strength pair", value: "the lesser of the 7 (le/da)^0.2 sqrt(da) stiffness form and the 9-cap governs; the 9-form carries no sqrt(da); le = min(hef, 8 da)", source: "ACI 318-19 17.7.2.2.1" },
       { name: "Projected area", value: "AVco = 4.5 c_a1^2 (a full half-pyramid needs 1.5 c_a1 each way along the edge and 1.5 c_a1 of depth); a corner or thin member truncates AVc", source: "ACI 318-19 17.7.2.1.3" },
       { name: "psi_cV cracking factor", value: "1.0 cracked without supplementary reinforcement, 1.4 uncracked; the 1.2/1.4 edge-reinforcement credits are not offered", source: "ACI 318-19 17.7.2.5.1" },
-      { name: "Scope", value: "single anchor, shear toward one edge; steel shear (0.6 Ase futa) and pryout (kcp Ncp) are separate checks", source: "ACI 318-19 17.7.1, 17.7.3" },
+      { name: "Scope", value: "single anchor, shear toward or parallel to one edge; steel shear (0.6 Ase futa) and pryout (kcp Ncp) are separate checks", source: "ACI 318-19 17.7.1, 17.7.3" },
     ],
   },
   "concrete-anchor-pryout": {
@@ -19245,7 +19245,7 @@ export const CITATIONS = {
     ],
   },
   "concrete-anchor-steel-strength": {
-    formula: "Ase = (pi/4)(da - 0.9743/n)^2; futa <= min(1.9 fya, 125,000 psi); Nsa = Ase futa, phiNsa = 0.75 Nsa (ductile, tension); Vsa = 0.6 Ase futa, phiVsa = 0.65 Vsa (ductile, shear, cast-in headed/hooked bolts).",
+    formula: "Ase = (pi/4)(da - 0.9743/n)^2; futa <= min(1.9 fya, 125,000 psi); Nsa = Ase futa, phiNsa = 0.75 Nsa (ductile, tension); Vsa = 0.6 Ase futa, phiVsa = 0.65 Vsa (ductile, shear, cast-in headed/hooked bolts); a cast-in headed stud takes Ase = (pi/4) da^2 on its shank and Vsa = Ase futa (17.7.1.2(a)).",
     edition: "The ACI 318-19 Sections 17.6.1 (steel strength in tension) and 17.7.1 (steel strength in shear, Eq. 17.7.1.2b) with Table 17.5.3 phi factors, by name; the Ase expression is the R17.6.1.2 commentary formula (also AISC Manual Table 7-18).",
     freeAccess: "ACI 318 is readable free through the ACI online reading room at concrete.org; the Chapter 17 anchoring provisions are in the published code.",
     governance: GOVERNANCE.general,
@@ -19253,7 +19253,7 @@ export const CITATIONS = {
     assumptions: [
       { name: "Effective area", value: "Ase = (pi/4)(da - 0.9743/n)^2 from the thread callout (5/8-11 -> n = 11)", source: "ACI 318-19 R17.6.1.2" },
       { name: "futa cap", value: "no more than the lesser of 1.9 fya and 125,000 psi", source: "ACI 318-19 17.6.1.2" },
-      { name: "Shear factor", value: "0.6 Ase futa for cast-in headed and hooked bolts; a welded stud develops the full Ase futa (not modeled)", source: "ACI 318-19 17.7.1.2" },
+      { name: "Shear factor", value: "0.6 Ase futa for cast-in headed and hooked bolts; a welded headed stud develops the full Ase futa on its unthreaded shank (anchor type select, added 2026-10-08)", source: "ACI 318-19 17.7.1.2" },
       { name: "phi (ductile)", value: "0.75 tension / 0.65 shear; brittle elements take lower values (not offered)", source: "ACI 318-19 Table 17.5.3" },
     ],
   },

@@ -1958,8 +1958,8 @@ CONCRETE_RENDERERS["concrete-anchor-blowout"] = _simpleRenderer({
 // edge: AVc = min(1.5 ca1, ha) x (1.5 ca1 + min(1.5 ca1, ca2)). psi_edV = 0.7 + 0.3 ca2/(1.5 ca1)
 // when ca2 < 1.5 ca1; psi_cV 1.0 cracked / 1.4 uncracked; psi_hV = sqrt(1.5 ca1/ha) >= 1.0 when
 // ha < 1.5 ca1. phi = 0.70 Condition B.
-// dims: in { anchor_dia_in: L, embedment_in: L, fc_psi: M L^-1 T^-2, edge_distance_in: L, perp_edge_in: L, member_thickness_in: L, cracking: dimensionless, lambda: dimensionless } out: { vb_lb: M L T^-2, vcb_lb: M L T^-2, phi_vcb_lb: M L T^-2 }
-export function computeConcreteAnchorShearBreakout({ anchor_dia_in = 0, embedment_in = 0, fc_psi = 4000, edge_distance_in = 0, perp_edge_in = 0, member_thickness_in = 0, cracking = "cracked", lambda = 1.0 } = {}) {
+// dims: in { anchor_dia_in: L, embedment_in: L, fc_psi: M L^-1 T^-2, edge_distance_in: L, perp_edge_in: L, member_thickness_in: L, cracking: dimensionless, lambda: dimensionless, direction: dimensionless } out: { vb_lb: M L T^-2, vcb_lb: M L T^-2, phi_vcb_lb: M L T^-2 }
+export function computeConcreteAnchorShearBreakout({ anchor_dia_in = 0, embedment_in = 0, fc_psi = 4000, edge_distance_in = 0, perp_edge_in = 0, member_thickness_in = 0, cracking = "cracked", lambda = 1.0, direction = "toward" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const da = Number(anchor_dia_in) || 0;
   const hef = Number(embedment_in) || 0;
@@ -1983,6 +1983,8 @@ export function computeConcreteAnchorShearBreakout({ anchor_dia_in = 0, embedmen
   if (!(lam > 0 && lam <= 1)) return { error: "Lambda must be in (0, 1] (1.0 normal weight)." };
   const uncracked = cracking === "uncracked";
   if (cracking !== "cracked" && cracking !== "uncracked") return { error: "Cracking must be cracked or uncracked." };
+  if (direction !== "toward" && direction !== "parallel") return { error: "Shear direction must be toward the edge or parallel to it." };
+  const parallel = direction === "parallel";
   const le_in = Math.min(hef, 8 * da);
   const coef7 = 7 * Math.pow(le_in / da, 0.2) * Math.sqrt(da);
   const governing_form = coef7 <= 9 ? "7-form (stiffness)" : "9-cap (stiff anchor)";
@@ -1994,21 +1996,23 @@ export function computeConcreteAnchorShearBreakout({ anchor_dia_in = 0, embedmen
   const width_in = 1.5 * ca1 + (ca2 > 0 ? Math.min(1.5 * ca1, ca2) : 1.5 * ca1);
   const AVc = depth_in * width_in;
   const area_ratio = Math.min(AVc / AVco, 1.0);
-  const psi_edV = ca2 > 0 && ca2 < 1.5 * ca1 ? 0.7 + 0.3 * ca2 / (1.5 * ca1) : 1.0;
+  // ACI 318-19 17.7.2.1(c): shear parallel to an edge may take twice the breakout computed as if the
+  // shear acted toward that edge, with psi_edV = 1.0. Until 2026-10-08 the note named this as not modeled.
+  const psi_edV = !parallel && ca2 > 0 && ca2 < 1.5 * ca1 ? 0.7 + 0.3 * ca2 / (1.5 * ca1) : 1.0;
   const psi_cV = uncracked ? 1.4 : 1.0;
   const psi_hV = ha > 0 && ha < 1.5 * ca1 ? Math.sqrt(1.5 * ca1 / ha) : 1.0;
-  const vcb_lb = area_ratio * psi_edV * psi_cV * psi_hV * vb_lb;
+  const vcb_lb = (parallel ? 2 : 1) * area_ratio * psi_edV * psi_cV * psi_hV * vb_lb;
   const phi_vcb_lb = 0.70 * vcb_lb;
   if (![vb_lb, vcb_lb, phi_vcb_lb].every(Number.isFinite)) return { error: "Shear-breakout math did not produce a finite value." };
   return {
     vb_lb, governing_form, le_in, AVco, AVc, area_ratio, psi_edV, psi_cV, psi_hV, vcb_lb, phi_vcb_lb,
-    ca1_used_in: ca1, narrow_member_limit: narrow,
-    note: "The strength scales with the EDGE DISTANCE to the 1.5 power (not the embedment - that is the tension mode): moving the anchor away from the edge is the strongest knob. A second edge closer than 1.5 c_a1 (corner) and a member thinner than 1.5 c_a1 both truncate the breakout half-pyramid; psi_hV partially compensates for the thin-member area loss. Shear toward the edge only - shear parallel to an edge is checked with twice this strength per 17.7.2.1(c) (not modeled). Single anchor; groups, eccentricity, and the seismic 0.75 factor are separate. Steel shear and pryout are separate checks. phi = 0.70 is Condition B (no supplementary reinforcement). ACI 318 Chapter 17 and the engineer of record govern - a design check, not a stamped anchor design.",
+    ca1_used_in: ca1, narrow_member_limit: narrow, parallel_doubled: parallel,
+    note: "The strength scales with the EDGE DISTANCE to the 1.5 power (not the embedment - that is the tension mode): moving the anchor away from the edge is the strongest knob. A second edge closer than 1.5 c_a1 (corner) and a member thinner than 1.5 c_a1 both truncate the breakout half-pyramid; psi_hV partially compensates for the thin-member area loss. Shear parallel to an edge (direction select) takes twice the strength computed as if the shear acted toward that edge, with psi_edV = 1.0 (17.7.2.1(c)); c_a1 is then the distance to that edge. Single anchor; groups, eccentricity, and the seismic 0.75 factor are separate. Steel shear and pryout are separate checks. phi = 0.70 is Condition B (no supplementary reinforcement). ACI 318 Chapter 17 and the engineer of record govern - a design check, not a stamped anchor design.",
   };
 }
 export const concreteAnchorShearBreakoutExample = { inputs: { anchor_dia_in: 0.75, embedment_in: 6, fc_psi: 4000, edge_distance_in: 6, perp_edge_in: 0, member_thickness_in: 0, cracking: "cracked", lambda: 1.0 } };
 CONCRETE_RENDERERS["concrete-anchor-shear-breakout"] = _simpleRenderer({
-  citation: "Citation: ACI 318-19 Section 17.7.2 concrete breakout in shear: Vb = lesser of 7 (le/da)^0.2 sqrt(da) lambda_a sqrt(f'c) c_a1^1.5 and 9 lambda_a sqrt(f'c) c_a1^1.5 (17.7.2.2.1), le = min(hef, 8 da); AVco = 4.5 c_a1^2; Vcb = (AVc/AVco) psi_edV psi_cV psi_hV Vb with psi_edV = 0.7 + 0.3 c_a2/(1.5 c_a1) when c_a2 < 1.5 c_a1 (17.7.2.4.1), psi_cV = 1.0 cracked / 1.4 uncracked (17.7.2.5.1), psi_hV = sqrt(1.5 c_a1/ha) when ha < 1.5 c_a1 (17.7.2.6.1); phiVcb = 0.70 Vcb (Condition B, Table 17.5.3). The capacity scales with the edge distance to the 1.5 power, not the embedment. Shear toward the edge, single cast-in anchor. ACI 318 Chapter 17 and the engineer of record govern.",
+  citation: "Citation: ACI 318-19 Section 17.7.2 concrete breakout in shear: Vb = lesser of 7 (le/da)^0.2 sqrt(da) lambda_a sqrt(f'c) c_a1^1.5 and 9 lambda_a sqrt(f'c) c_a1^1.5 (17.7.2.2.1), le = min(hef, 8 da); AVco = 4.5 c_a1^2; Vcb = (AVc/AVco) psi_edV psi_cV psi_hV Vb with psi_edV = 0.7 + 0.3 c_a2/(1.5 c_a1) when c_a2 < 1.5 c_a1 (17.7.2.4.1), psi_cV = 1.0 cracked / 1.4 uncracked (17.7.2.5.1), psi_hV = sqrt(1.5 c_a1/ha) when ha < 1.5 c_a1 (17.7.2.6.1); phiVcb = 0.70 Vcb (Condition B, Table 17.5.3). The capacity scales with the edge distance to the 1.5 power, not the embedment. Shear toward the edge (or parallel to it, doubled with psi_edV = 1.0 per 17.7.2.1(c)), single cast-in anchor. ACI 318 Chapter 17 and the engineer of record govern.",
   example: concreteAnchorShearBreakoutExample.inputs,
   fields: [
     { key: "anchor_dia_in", label: "Anchor diameter da (in)", kind: "number" },
@@ -2019,12 +2023,13 @@ CONCRETE_RENDERERS["concrete-anchor-shear-breakout"] = _simpleRenderer({
     { key: "member_thickness_in", label: "Member thickness ha (in, 0 = thick)", kind: "number" },
     { key: "cracking", label: "Concrete condition at service", kind: "select", options: [{ value: "cracked", label: "Cracked (psi_cV = 1.0)", selected: true }, { value: "uncracked", label: "Uncracked (psi_cV = 1.4)" }] },
     { key: "lambda", label: "Lightweight factor lambda_a (1.0 normal weight)", kind: "number" },
+    { key: "direction", label: "Shear direction", kind: "select", options: [{ value: "toward", label: "Toward the edge", selected: true }, { value: "parallel", label: "Parallel to the edge (x2, psi_edV = 1.0)" }] },
   ],
   outputs: [
     { key: "vb", id: "casb-out-vb", label: "Basic breakout Vb", value: (r) => fmt(r.vb_lb, 0) + " lb (" + r.governing_form + ", le " + fmt(r.le_in, 2) + " in)" },
     { key: "geom", id: "casb-out-geom", label: "Projected area AVc / AVco", value: (r) => fmt(r.AVc, 1) + " / " + fmt(r.AVco, 1) + " in^2 (ratio " + fmt(r.area_ratio, 3) + ")" },
     { key: "psi", id: "casb-out-psi", label: "Factors psi_edV / psi_cV / psi_hV", value: (r) => fmt(r.psi_edV, 3) + " / " + fmt(r.psi_cV, 1) + " / " + fmt(r.psi_hV, 3) },
-    { key: "vcb", id: "casb-out-vcb", label: "Nominal breakout Vcb", value: (r) => fmt(r.vcb_lb, 0) + " lb (" + fmt(r.vcb_lb / 1000, 1) + " kip)" },
+    { key: "vcb", id: "casb-out-vcb", label: "Nominal breakout Vcb", value: (r) => fmt(r.vcb_lb, 0) + " lb (" + fmt(r.vcb_lb / 1000, 1) + " kip)" + (r.parallel_doubled ? ", doubled for shear parallel to the edge" : "") },
     { key: "phi", id: "casb-out-phi", label: "Design capacity phiVcb", value: (r) => fmt(r.phi_vcb_lb, 0) + " lb (" + fmt(r.phi_vcb_lb / 1000, 1) + " kip)" },
     { key: "n", id: "casb-out-n", label: "Note", value: (r) => r.note },
   ],
@@ -2074,31 +2079,35 @@ CONCRETE_RENDERERS["concrete-anchor-pryout"] = _simpleRenderer({
 // --- spec-v1021 E: Concrete anchor steel strength (ACI 318-19 17.6.1 / 17.7.1) ---
 // Ase = (pi/4)(da - 0.9743/n)^2 (R17.6.1.2 commentary formula); futa capped at min(1.9 fya, 125 ksi);
 // Nsa = Ase futa (17.6.1.2), phi 0.75 ductile tension; Vsa = 0.6 Ase futa (17.7.1.2b, cast-in
-// headed/hooked BOLT - a welded stud uses the full Ase futa and is not modeled), phi 0.65 ductile shear.
-// dims: in { anchor_dia_in: L, threads_per_in: L^-1, fya_psi: M L^-1 T^-2, futa_psi: M L^-1 T^-2 } out: { ase_in2: L^2, nsa_lb: M L T^-2, phi_nsa_lb: M L T^-2, vsa_lb: M L T^-2, phi_vsa_lb: M L T^-2 }
-export function computeConcreteAnchorSteelStrength({ anchor_dia_in = 0, threads_per_in = 0, fya_psi = 36000, futa_psi = 58000 } = {}) {
+// headed/hooked BOLT; a cast-in headed STUD takes Vsa = Ase futa on its unthreaded shank, 17.7.1.2a,
+// added 2026-10-08), phi 0.65 ductile shear.
+// dims: in { anchor_dia_in: L, threads_per_in: L^-1, fya_psi: M L^-1 T^-2, futa_psi: M L^-1 T^-2, anchor_type: dimensionless } out: { ase_in2: L^2, nsa_lb: M L T^-2, phi_nsa_lb: M L T^-2, vsa_lb: M L T^-2, phi_vsa_lb: M L T^-2 }
+export function computeConcreteAnchorSteelStrength({ anchor_dia_in = 0, threads_per_in = 0, fya_psi = 36000, futa_psi = 58000, anchor_type = "bolt" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const da = Number(anchor_dia_in) || 0;
   const n = Number(threads_per_in) || 0;
   const fya = Number(fya_psi) || 0;
   const futa = Number(futa_psi) || 0;
+  if (anchor_type !== "bolt" && anchor_type !== "stud") return { error: "Anchor type must be a headed or hooked bolt, or a headed stud." };
+  const stud = anchor_type === "stud";
   if (!(da > 0)) return { error: "Anchor diameter must be positive (in)." };
-  if (!(n > 0)) return { error: "Threads per inch must be positive (from the bolt callout, e.g. 5/8-11 has 11)." };
+  if (!stud && !(n > 0)) return { error: "Threads per inch must be positive (from the bolt callout, e.g. 5/8-11 has 11)." };
   if (!(fya > 0)) return { error: "Yield strength fya must be positive (psi)." };
   if (!(futa > 0)) return { error: "Tensile strength futa must be positive (psi)." };
-  const root = da - 0.9743 / n;
+  // A headed stud has no threads: Ase is the shank area.
+  const root = stud ? da : da - 0.9743 / n;
   if (!(root > 0)) return { error: "Thread pitch is larger than the diameter allows - check the threads-per-inch callout." };
   const ase_in2 = Math.PI / 4 * root * root;
   const futa_used_psi = Math.min(futa, 1.9 * fya, 125000);
   const capped = futa_used_psi < futa;
   const nsa_lb = ase_in2 * futa_used_psi;
   const phi_nsa_lb = 0.75 * nsa_lb;
-  const vsa_lb = 0.6 * ase_in2 * futa_used_psi;
+  const vsa_lb = (stud ? 1.0 : 0.6) * ase_in2 * futa_used_psi;
   const phi_vsa_lb = 0.65 * vsa_lb;
   if (![ase_in2, nsa_lb, phi_nsa_lb, vsa_lb, phi_vsa_lb].every(Number.isFinite)) return { error: "Steel-strength math did not produce a finite value." };
   return {
     ase_in2, futa_used_psi, capped, nsa_lb, phi_nsa_lb, vsa_lb, phi_vsa_lb,
-    note: "The steel number every anchor-family tile's 'takes the least of steel and ...' note refers to. Ase is the effective (threaded) area, smaller than the nominal shank; futa is capped at the lesser of 1.9 fya and 125,000 psi so a high-strength rod cannot claim more than the code allows. The 0.6 shear factor is for cast-in headed and hooked BOLTS - a stud welded to a plate develops the full Ase futa per 17.7.1.2(a) and is not modeled; ductile steel phi (0.75 tension / 0.65 shear) is used, and a brittle element takes lower phi. The anchor design takes the LEAST of this and the concrete modes (breakout, pullout, blowout, shear breakout, pryout). ACI 318 Chapter 17 and the engineer of record govern - a design check, not a stamped anchor design.",
+    note: "The steel number every anchor-family tile's 'takes the least of steel and ...' note refers to. Ase is the effective (threaded) area, smaller than the nominal shank; futa is capped at the lesser of 1.9 fya and 125,000 psi so a high-strength rod cannot claim more than the code allows. The 0.6 shear factor is for cast-in headed and hooked BOLTS; a headed stud welded to a plate (anchor type select) develops the full Ase futa on its unthreaded shank per 17.7.1.2(a), and threads per inch are then not used (AWS D1.1 Type B studs: fya 51,000, futa 65,000 psi); ductile steel phi (0.75 tension / 0.65 shear) is used, and a brittle element takes lower phi. The anchor design takes the LEAST of this and the concrete modes (breakout, pullout, blowout, shear breakout, pryout). ACI 318 Chapter 17 and the engineer of record govern - a design check, not a stamped anchor design.",
   };
 }
 export const concreteAnchorSteelStrengthExample = { inputs: { anchor_dia_in: 0.625, threads_per_in: 11, fya_psi: 36000, futa_psi: 58000 } };
@@ -2110,6 +2119,7 @@ CONCRETE_RENDERERS["concrete-anchor-steel-strength"] = _simpleRenderer({
     { key: "threads_per_in", label: "Threads per inch n (5/8-11 -> 11)", kind: "number" },
     { key: "fya_psi", label: "Steel yield fya (psi)", kind: "number" },
     { key: "futa_psi", label: "Steel tensile futa (psi)", kind: "number" },
+    { key: "anchor_type", label: "Anchor type", kind: "select", options: [{ value: "bolt", label: "Headed or hooked bolt (Vsa = 0.6 Ase futa)", selected: true }, { value: "stud", label: "Welded headed stud (Vsa = Ase futa, shank area)" }] },
   ],
   outputs: [
     { key: "ase", id: "cass-out-ase", label: "Effective thread area Ase", value: (r) => fmt(r.ase_in2, 4) + " in^2" },

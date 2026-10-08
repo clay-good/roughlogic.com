@@ -1556,7 +1556,7 @@ cross-check.
 | calc-concrete.js | `computeConcreteAnchorPryout` | `{ embedment_in = 0, fc_psi = 4000, edge_distance_in = 0, anchor_type = "cast-...` | _ | _ | _ |
 | calc-concrete.js | `computeConcreteAnchorPullout` | `{ head_bearing_area_in2 = 0, fc_psi = 0, cracking = "cracked" } = {}` | _ | _ | _ |
 | calc-concrete.js | `computeConcreteAnchorShearBreakout` | `{ anchor_dia_in = 0, embedment_in = 0, fc_psi = 4000, edge_distance_in = 0, p...` | _ | _ | _ |
-| calc-concrete.js | `computeConcreteAnchorSteelStrength` | `{ anchor_dia_in = 0, threads_per_in = 0, fya_psi = 36000, futa_psi = 58000 } ...` | _ | _ | _ |
+| calc-concrete.js | `computeConcreteAnchorSteelStrength` | `{ anchor_dia_in = 0, threads_per_in = 0, fya_psi = 36000, futa_psi = 58000, a...` | _ | _ | _ |
 | calc-concrete.js | `computeConcreteBeamMinFlexuralSteel` | `{ fc_psi = 4000, fy_psi = 60000, bw_in = 0, d_in = 0 } = {}` | _ | _ | _ |
 | calc-concrete.js | `computeConcreteBearingStrength` | `{ loaded_area_in2 = 0, support_area_in2 = 0, fc_psi = 4000, factored_load_kip...` | _ | _ | _ |
 | calc-concrete.js | `computeConcreteCorbelBracket` | `{ factored_shear_lb = 0, horiz_tension_lb = 0, shear_span_av_in = 0, eff_dept...` | _ | _ | _ |

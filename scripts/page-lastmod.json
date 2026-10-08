@@ -1502,12 +1502,12 @@
       "date": "2026-09-29"
     },
     "/tools/concrete-anchor-shear-breakout/": {
-      "sha": "a3baa09cc1df5e14",
-      "date": "2026-10-03"
+      "sha": "71f3a80ad322d279",
+      "date": "2026-10-08"
     },
     "/tools/concrete-anchor-steel-strength/": {
-      "sha": "5a499f37066c05c0",
-      "date": "2026-09-29"
+      "sha": "1688c7cdc79f2d56",
+      "date": "2026-10-08"
     },
     "/tools/concrete-beam-min-flexural-steel/": {
       "sha": "e95ac59dcef50627",

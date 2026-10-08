@@ -58396,3 +58396,29 @@ test("bounds: spec-v1931 computeWoodTensionBending reproduces the Missouri S&T b
   assert.ok("error" in _v1931({ ...base, m_inlb: -3000 }));
   assert.ok("error" in _v1931({ ...base, s_in3: 0 }));
 });
+
+import { computeConcreteAnchorShearBreakout as _casbParallel } from "../../calc-concrete.js";
+test("bounds: concrete-anchor-shear-breakout doubles shear parallel to an edge with psi_edV = 1.0 (ACI 318-19 17.7.2.1(c))", () => {
+  const base = { anchor_dia_in: 0.75, embedment_in: 6, fc_psi: 4000, edge_distance_in: 6, perp_edge_in: 0, member_thickness_in: 0, cracking: "cracked", lambda: 1.0 };
+  const toward = _casbParallel(base);
+  assert.ok(Math.abs(_casbParallel({ ...base, direction: "parallel" }).vcb_lb - 2 * toward.vcb_lb) < 1e-9);
+  // With a corner, psi_edV drops to 1.0 for the parallel case before doubling.
+  const corner = _casbParallel({ ...base, perp_edge_in: 4 });
+  const cornerPar = _casbParallel({ ...base, perp_edge_in: 4, direction: "parallel" });
+  assert.ok(corner.psi_edV < 1 && cornerPar.psi_edV === 1);
+  assert.ok(Math.abs(cornerPar.vcb_lb - 2 * corner.vcb_lb / corner.psi_edV) < 1e-9);
+  assert.ok("error" in _casbParallel({ ...base, direction: "sideways" }));
+});
+
+import { computeConcreteAnchorSteelStrength as _cassStud } from "../../calc-concrete.js";
+test("bounds: concrete-anchor-steel-strength gives a welded headed stud the full shank Ase futa in shear (ACI 318-19 17.7.1.2(a))", () => {
+  const stud = _cassStud({ anchor_dia_in: 0.75, threads_per_in: 0, fya_psi: 51000, futa_psi: 65000, anchor_type: "stud" });
+  const ase = Math.PI / 4 * 0.75 * 0.75;
+  assert.ok(Math.abs(stud.ase_in2 - ase) < 1e-12);
+  assert.ok(Math.abs(stud.vsa_lb - ase * 65000) < 1e-6 && Math.abs(stud.nsa_lb - ase * 65000) < 1e-6);
+  // A bolt of the same size keeps the threaded area and the 0.6 factor.
+  const bolt = _cassStud({ anchor_dia_in: 0.75, threads_per_in: 10, fya_psi: 51000, futa_psi: 65000 });
+  assert.ok(bolt.vsa_lb < 0.6 * stud.vsa_lb && Math.abs(bolt.vsa_lb / bolt.nsa_lb - 0.6) < 1e-12);
+  assert.ok("error" in _cassStud({ anchor_dia_in: 0.75, threads_per_in: 0, fya_psi: 36000, futa_psi: 58000 }));
+  assert.ok("error" in _cassStud({ anchor_dia_in: 0.75, threads_per_in: 10, anchor_type: "rivet" }));
+});

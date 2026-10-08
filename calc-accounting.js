@@ -1124,7 +1124,7 @@ function renderInventoryTurnover(inputRegion, outputRegion, citationEl) {
     tn.textContent = fmt(r.turnover, 2) + "x";
     dsi.textContent = r.days_sales_of_inventory === null ? "n/a (no COGS in period)" : fmt(r.days_sales_of_inventory, 1) + " days";
     cmp.textContent = r.comparison
-      ? r.comparison.industry + ": median " + r.comparison.median + "x; delta " + (r.comparison.delta >= 0 ? "+" : "") + fmt(r.comparison.delta, 2) + "x"
+      ? r.comparison.industry + ": industry aggregate " + fmt(r.comparison.industry_aggregate, 1) + "x (" + r.comparison.year + "); delta " + (r.comparison.delta >= 0 ? "+" : "") + fmt(r.comparison.delta, 2) + "x"
       : "-";
   }, DEBOUNCE_MS);
   for (const el of [cogs.input, bi.input, ei.input, days.input, ind.select]) el.addEventListener("input", update);

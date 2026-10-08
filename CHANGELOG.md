@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### Fixed
+
+- **`inventory-turnover` printed "median undefinedx" in its industry comparison.** The Sep 9 fix renamed the benchmark to `industry_aggregate` (Census publishes aggregates, not medians across firms), but the page still read the old `median` field and still called it a median. It now prints, for example, "retail_general: industry aggregate 7.0x (2022); delta +0.69x". The render-no-nan browser check caught it only when the page's debounce landed inside the check's stability window, so earlier runs passed.
+
+### Changed
+
+- **`concrete-anchor-steel-strength` covers welded headed studs (ACI 318-19 17.7.1.2(a)).** It modeled only cast-in headed and hooked bolts (Vsa = 0.6 Ase futa on the threaded area) and said a welded stud was "not modeled". An anchor-type select now gives a stud its unthreaded shank area and Vsa = Ase futa: a 3/4 in AWS D1.1 Type B stud (futa 65,000 psi) carries 28,716 lb nominal in shear, where a 3/4-10 bolt of the same steel carries 0.6 x 0.3345 x 65,000 = 13,044 lb.
+
+- **`concrete-anchor-shear-breakout` covers shear parallel to an edge (ACI 318-19 17.7.2.1(c)).** The note said this case was "not modeled". A direction select now applies it: twice the breakout computed as if the shear acted toward that edge, with psi_edV = 1.0. The 3/4 in anchor 6 in from an edge goes from 8,366 lb toward the edge to 16,731 lb parallel to it; with a 4 in corner distance, psi_edV drops out before doubling (5,035 -> 12,084 lb).
+
 ### Added
 
 - **`wood-tension-bending`: bending plus axial tension in a wood member (spec-v1931, Group E, `calc-construction.js`), 2,234 -> 2,235, v0.424.0.** `wood-combined-bending-axial` covers compression plus bending and said tension plus bending was separate, so a truss bottom chord carrying a ceiling had no check. The tile gives NDS 3.9.1 on both faces:
