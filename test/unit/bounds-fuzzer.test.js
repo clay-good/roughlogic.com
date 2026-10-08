@@ -58422,3 +58422,13 @@ test("bounds: concrete-anchor-steel-strength gives a welded headed stud the full
   assert.ok("error" in _cassStud({ anchor_dia_in: 0.75, threads_per_in: 0, fya_psi: 36000, futa_psi: 58000 }));
   assert.ok("error" in _cassStud({ anchor_dia_in: 0.75, threads_per_in: 10, anchor_type: "rivet" }));
 });
+
+import { computeConduitFill as _cfThwn } from "../../calc-electrical.js";
+test("bounds: conduit-fill gives THWN the THHN Chapter 9 Table 5 areas (one row in the table)", () => {
+  for (const awg of ["12", "2", "1", "1/0", "4/0"]) {
+    const thwn = _cfThwn({ conduit: "EMT", trade_size: "2", conductors: [{ insulation: "THWN", awg, count: 3 }] });
+    const thhn = _cfThwn({ conduit: "EMT", trade_size: "2", conductors: [{ insulation: "THHN", awg, count: 3 }] });
+    assert.equal(thwn.fill_in2, thhn.fill_in2);
+  }
+  assert.match(_cfThwn({ conduit: "EMT", trade_size: "1", conductors: [{ insulation: "XHHW", awg: "4", count: 3 }] }).error, /from 14 to 6 AWG/);
+});

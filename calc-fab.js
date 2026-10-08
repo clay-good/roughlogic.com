@@ -291,7 +291,7 @@ export function computeFlangeBoltTorque({ bolt_diameter_in = 0, thread_series = 
     const tbl = String(thread_series) === "8UN" ? _V26_8UN_TENSILE_AREA : _V26_UNC_TENSILE_AREA;
     if (tbl[key] !== undefined) A_t = tbl[key];
   }
-  if (!(A_t > 0)) return { error: "Tensile stress area not found for this diameter/series; enter it directly (in^2)." };
+  if (!(A_t > 0)) return { error: String(thread_series) === "8UN" ? "The 8UN series is tabulated here from 1 to 2 in; below 1 in use UNC, or enter the tensile stress area directly (in^2)." : "Tensile stress area not found for this diameter/series; enter it directly (in^2)." };
 
   // Target stress: explicit ksi if given, else percent of yield.
   let stress_ksi;

@@ -160,9 +160,12 @@ export const voltageDropExample = {
 // These are dimensional facts from manufacturer cable catalogs and ASTM
 // dimensions. Threshold percentages (40, 31, 53) are referenced from code
 // general practice, not reproduced as table text.
+// Chapter 9 Table 5 lists THHN, THWN, and THWN-2 in one row, so THWN takes the
+// THHN areas. Until 2026-10-08 THWN stopped at #2 and the select offered #1 to 4/0.
+const _THHN_AREAS_IN2 = { "14": 0.0097, "12": 0.0133, "10": 0.0211, "8": 0.0366, "6": 0.0507, "4": 0.0824, "2": 0.1158, "1": 0.1562, "1/0": 0.1855, "2/0": 0.2223, "3/0": 0.2679, "4/0": 0.3237 };
 export const CONDUCTOR_AREAS_IN2 = {
-  THHN: { "14": 0.0097, "12": 0.0133, "10": 0.0211, "8": 0.0366, "6": 0.0507, "4": 0.0824, "2": 0.1158, "1": 0.1562, "1/0": 0.1855, "2/0": 0.2223, "3/0": 0.2679, "4/0": 0.3237 },
-  THWN: { "14": 0.0097, "12": 0.0133, "10": 0.0211, "8": 0.0366, "6": 0.0507, "4": 0.0824, "2": 0.1158 },
+  THHN: _THHN_AREAS_IN2,
+  THWN: _THHN_AREAS_IN2,
   XHHW: { "14": 0.0139, "12": 0.0181, "10": 0.0243, "8": 0.0437, "6": 0.0590 },
 };
 
@@ -214,7 +217,7 @@ export function computeConduitFill({ conduit, trade_size, conductors }) {
     const ins = CONDUCTOR_AREAS_IN2[c.insulation];
     if (!ins) return { error: "Unknown insulation: " + c.insulation };
     const a = ins[c.awg];
-    if (a === undefined) return { error: "Unknown size for insulation: " + c.awg };
+    if (a === undefined) return { error: "No Chapter 9 Table 5 area is bundled for " + c.awg + " AWG " + c.insulation + "; this calculator carries " + c.insulation + " from " + Object.keys(ins).sort((x, y) => ins[x] - ins[y])[0] + " to " + Object.keys(ins).sort((x, y) => ins[x] - ins[y]).slice(-1)[0] + " AWG." };
     if (Number(c.count) < 0) return { error: "Conductor counts cannot be negative." };
     total += a * (c.count || 1);
     count += (c.count || 1);
@@ -668,7 +671,8 @@ export function renderConduitFill(inputRegion, outputRegion, citationEl, params)
   const insulation = makeSelect("Insulation", "cf-ins", [
     { value: "THHN", label: "THHN" }, { value: "THWN", label: "THWN" }, { value: "XHHW", label: "XHHW" },
   ]);
-  const awg = makeSelect("AWG", "cf-awg", awgOptions());
+  // The bundled Table 5 areas start at 14 AWG; 18 and 16 are fixture wire, not THHN/THWN/XHHW.
+  const awg = makeSelect("AWG", "cf-awg", awgOptions().filter((o) => o.value !== "18" && o.value !== "16"));
   const count = makeNumber("Conductor count", "cf-count", { step: "1", min: "1", value: "1" });
   count.input.value = "1";
   for (const f of [conduit, trade, insulation, awg, count]) inputRegion.appendChild(f.wrap);

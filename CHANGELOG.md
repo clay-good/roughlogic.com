@@ -12,6 +12,9 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **`conduit-fill` offered sizes it could not compute.** Its AWG list offered 18 and 16 AWG, which no bundled insulation tabulates, and THWN stopped at #2 while the list ran to 4/0, so those choices printed "Unknown size for insulation". NEC Chapter 9 Table 5 lists THHN, THWN, and THWN-2 in one row, and the bundled THWN areas already equaled THHN's through #2, so THWN now carries the THHN areas through 4/0. The list drops 18 and 16, and a size outside an insulation's bundled range says which range it carries (XHHW: 14 to 6 AWG). Found by cycling every select option from each worked example against the new fake-DOM harness.
+- **`flange-bolt-torque` with the 8UN series below 1 in** now says the series is tabulated from 1 to 2 in, rather than "not found".
+
 - **Four HVAC tiles showed an error instead of an answer, and offered no way to choose their main option.** The declarative renderer in `calc-hvacservice.js` built every field as a number box, so the select each of these tiles declares never appeared, "Test with example" wrote its value into a number field, and the page printed the tile's own validation error:
   - `condensate-trap-depth` ("Configuration must be draw-through or blow-through"), broken since it shipped on July 27;
   - `condensate-overflow-pan` ("Method must be ..."), since July 27;
