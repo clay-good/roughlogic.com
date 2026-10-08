@@ -291,7 +291,7 @@ TRENCHLESS_RENDERERS["hdd-annular-pressure"] = _simpleRenderer({
     { key: "d", id: "hap-out-d", label: "At the deep station", value: (r) => fmt(r.annular_pressure_psi, 1) + " psi against " + fmt(r.limiting_psi, 1) + " psi resisting, FS " + fmt(r.factor_of_safety, 2) },
     { key: "s", id: "hap-out-s", label: "At the shallow station", value: (r) => fmt(r.shallow_annular_pressure_psi, 1) + " psi against " + fmt(r.shallow_limiting_psi, 1) + " psi, FS " + fmt(r.shallow_factor_of_safety, 2) },
     { key: "v", id: "hap-out-v", label: "Where a frac-out starts", value: (r) => r.verdict },
-    { key: "m", id: "hap-out-m", label: "Fluid density the shallow station allows", value: (r) => fmt(r.max_fluid_density_ppg, 2) + " lb per gal at the entered friction" },
+    { key: "m", id: "hap-out-m", label: "Fluid density the shallow station allows", value: (r) => r.max_fluid_density_ppg > 0 ? fmt(r.max_fluid_density_ppg, 2) + " lb per gal at the entered friction" : "NONE -- the annular friction alone exceeds what the shallow station allows at the required factor of safety; cut the friction (flow rate, gel strength) or deepen the bore" },
     { key: "f", id: "hap-out-f", label: "Annular friction the shallow station allows", value: (r) => fmt(r.max_friction_psi, 1) + " psi -- this is the term that rises when reaming" },
     { key: "n", id: "hap-out-n", label: "Note", value: (r) => r.note },
   ],

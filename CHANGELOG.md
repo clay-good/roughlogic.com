@@ -12,6 +12,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **`hdd-annular-pressure` printed "0.00 lb per gal" as the fluid density the shallow station allows** when the annular friction alone already exceeds that station's allowable pressure, as it does in the documented example (8 ft of cover, factor of safety 0.57). The compute clamps the result at zero, and the page showed it as if it were a density to mix. The line now says no fluid density works and points at friction and bore depth. Found by flagging output lines that never change across a tile's input sweep.
+
 - **Eleven fields changed nothing when edited, because their pages never listened to them.** The answer stayed stale until some other field changed:
   - `battery-runtime`: inverter efficiency;
   - `phase-balance`: imbalance threshold;
