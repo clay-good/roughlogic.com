@@ -58432,3 +58432,17 @@ test("bounds: conduit-fill gives THWN the THHN Chapter 9 Table 5 areas (one row 
   }
   assert.match(_cfThwn({ conduit: "EMT", trade_size: "1", conductors: [{ insulation: "XHHW", awg: "4", count: 3 }] }).error, /from 14 to 6 AWG/);
 });
+
+import { computeRcHookDevelopment as _hookSmf } from "../../calc-concrete.js";
+test("bounds: rc-hook-development special moment frame mode follows ACI 318-19 18.8.5.1 and 18.8.5.3", () => {
+  const r = _hookSmf({ db_in: 1, fy_psi: 60000, fc_psi: 4000, joint: "smf" });
+  assert.ok(Math.abs(r.ldh_in - 60000 / (65 * Math.sqrt(4000))) < 1e-9);
+  assert.ok(Math.abs(r.ld_straight_bottom_in - 2.5 * r.ldh_in) < 1e-12 && Math.abs(r.ld_straight_top_in - 3.25 * r.ldh_in) < 1e-12);
+  // psi factors do not apply in the joint; the lightweight floor is 10 db and 7.5 in.
+  assert.equal(_hookSmf({ db_in: 1, fy_psi: 60000, fc_psi: 4000, psi_e: 1.2, joint: "smf" }).ldh_in, r.ldh_in);
+  assert.equal(_hookSmf({ db_in: 0.375, fy_psi: 60000, fc_psi: 8000, lambda: 0.75, joint: "smf" }).ldh_in, 7.5);
+  // The general mode is unchanged.
+  assert.equal(_hookSmf({ db_in: 1, fy_psi: 60000, fc_psi: 4000 }).ld_straight_bottom_in, null);
+  assert.ok("error" in _hookSmf({ db_in: 1.693, joint: "smf" }));
+  assert.ok("error" in _hookSmf({ db_in: 1, joint: "imf" }));
+});

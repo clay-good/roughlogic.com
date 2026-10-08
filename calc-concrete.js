@@ -541,23 +541,40 @@ CONCRETE_RENDERERS["rc-min-shear-reinforcement"] = _simpleRenderer({
   compute: computeRcMinShearReinforcement,
 });
 
-// dims: in { db_in: L, fy_psi: M L^-1 T^-2, fc_psi: M L^-1 T^-2, psi_e: dimensionless, psi_r: dimensionless, psi_o: dimensionless, lambda: dimensionless } out: { psi_c: dimensionless, ldh_eq_in: L, ldh_in: L }
-export function computeRcHookDevelopment({ db_in = 0, fy_psi = 60000, fc_psi = 4000, psi_e = 1.0, psi_r = 1.0, psi_o = 1.0, lambda = 1.0 } = {}) {
+// dims: in { db_in: L, fy_psi: M L^-1 T^-2, fc_psi: M L^-1 T^-2, psi_e: dimensionless, psi_r: dimensionless, psi_o: dimensionless, lambda: dimensionless, joint: dimensionless } out: { psi_c: dimensionless, ldh_eq_in: L, ldh_in: L, ld_straight_bottom_in: L, ld_straight_top_in: L }
+export function computeRcHookDevelopment({ db_in = 0, fy_psi = 60000, fc_psi = 4000, psi_e = 1.0, psi_r = 1.0, psi_o = 1.0, lambda = 1.0, joint = "general" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(db_in > 0)) return { error: "Bar diameter must be positive (in)." };
   if (!(fy_psi > 0) || !(fc_psi > 0)) return { error: "Steel and concrete strengths must be positive (psi)." };
   if (!(psi_e > 0) || !(psi_r > 0) || !(psi_o > 0)) return { error: "Modification factors must be positive (1.0 is the base)." };
   if (!(lambda > 0 && lambda <= 1)) return { error: "The lightweight factor lambda is over 0 and up to 1.0." };
-  const psi_c = fc_psi < 6000 ? fc_psi / 15000 + 0.6 : 1.0;
+  if (joint !== "general" && joint !== "smf") return { error: "Joint must be general (25.4.3) or a special moment frame joint (18.8.5)." };
   // 25.4.1.4 caps sqrt(f'c) at 100 psi in development-length calculations; in
   // the denominator, the cap lengthens ldh above f'c = 10,000 psi (conservative).
   const sqrt_fc = Math.min(Math.sqrt(fc_psi), 100);
+  if (joint === "smf") {
+    // ACI 318-19 18.8.5.1: a No. 3-11 hooked bar in a special moment frame beam-column
+    // joint takes ldh = fy db / (65 lambda sqrt(f'c)), at least 8 db and 6 in (10 db and
+    // 7.5 in in lightweight concrete); the 25.4.3 psi factors do not apply, the hook sits
+    // in the confined core. 18.8.5.3: a straight bar needs 2.5 ldh, or 3.25 ldh with
+    // more than 12 in of fresh concrete cast below it. Added 2026-10-08.
+    if (db_in > 1.41 + 1e-9) return { error: "ACI 18.8.5.1 covers No. 3 to No. 11 bars (db up to 1.41 in)." };
+    const ldh_eq_in = fy_psi * db_in / (65 * lambda * sqrt_fc);
+    const floor_in = lambda < 1 ? Math.max(10 * db_in, 7.5) : Math.max(8 * db_in, 6);
+    const ldh_in = Math.max(ldh_eq_in, floor_in);
+    return {
+      psi_c: null, ldh_eq_in, floor_in, floor_governs: floor_in >= ldh_eq_in, ldh_in, joint,
+      ld_straight_bottom_in: 2.5 * ldh_in, ld_straight_top_in: 3.25 * ldh_in,
+      note: "ACI 318-19 18.8.5.1 hooked-bar development in a special moment frame beam-column joint: ldh = fy db / (65 lambda sqrt(f'c)), at least 8 db and 6 in (10 db and 7.5 in for lightweight concrete), with the hook inside the confined core of the column or boundary element and bent into the joint. The constant already folds in the cover and tie confinement the joint provides, so the 25.4.3 psi factors are not applied. 18.8.5.3: a straight bar through the joint needs 2.5 ldh, or 3.25 ldh when more than 12 in of fresh concrete is cast below it. Headed bars are the rc-headed-bar-development tile. A design aid, not a substitute for the structural engineer of record's stamped detailing.",
+    };
+  }
+  const psi_c = fc_psi < 6000 ? fc_psi / 15000 + 0.6 : 1.0;
   const ldh_eq_in = (fy_psi * psi_e * psi_r * psi_o * psi_c / (55 * lambda * sqrt_fc)) * Math.pow(db_in, 1.5);
   const floor_in = Math.max(8 * db_in, 6);
   const ldh_in = Math.max(ldh_eq_in, floor_in);
   const floor_governs = floor_in >= ldh_eq_in;
   return {
-    psi_c, ldh_eq_in, floor_in, floor_governs, ldh_in,
+    psi_c, ldh_eq_in, floor_in, floor_governs, ldh_in, joint, ld_straight_bottom_in: null, ld_straight_top_in: null,
     note: "ACI 318-19 Eq. 25.4.3.1a standard-hook tension development: ldh = (fy psi_e psi_r psi_o psi_c / (55 lambda sqrt(f'c))) db^1.5, not less than max(8 db, 6 in), with the 25.4.3.2 factors (psi_e 1.0 uncoated / 1.2-1.3 coated; psi_r confinement; psi_o location/cover; psi_c = f'c/15,000 + 0.6 below 6,000 psi, 1.0 at or above). The db^1.5 scaling is why a hook multiple-of-db rule of thumb misleads. Standard 90/180 degree hooks on deformed bars only - headed bars (25.4.4), compression development, and the bend-diameter/geometry detailing are separate. A design aid, not a substitute for the structural engineer of record's stamped detailing.",
   };
 }
@@ -574,11 +591,13 @@ CONCRETE_RENDERERS["rc-hook-development"] = _simpleRenderer({
     { key: "psi_r", label: "Confinement factor psi_r", kind: "number" },
     { key: "psi_o", label: "Location/cover factor psi_o", kind: "number" },
     { key: "lambda", label: "Lightweight factor lambda", kind: "number" },
+    { key: "joint", label: "Where the hook is", kind: "select", options: [{ value: "general", label: "General (ACI 25.4.3)", selected: true }, { value: "smf", label: "Special moment frame joint (ACI 18.8.5)" }] },
   ],
   outputs: [
-    { key: "pc", id: "rhd-out-pc", label: "Strength factor psi_c", value: (r) => fmt(r.psi_c, 3) },
+    { key: "pc", id: "rhd-out-pc", label: "Strength factor psi_c", value: (r) => r.psi_c === null ? "not used in a special moment frame joint (18.8.5.1)" : fmt(r.psi_c, 3) },
     { key: "eq", id: "rhd-out-eq", label: "Equation ldh (before floor)", value: (r) => fmt(r.ldh_eq_in, 1) + " in" },
-    { key: "ldh", id: "rhd-out-ldh", label: "Hook development ldh", value: (r) => fmt(r.ldh_in, 1) + " in" + (r.floor_governs ? " (the max(8db, 6 in) floor governs)" : "") },
+    { key: "ldh", id: "rhd-out-ldh", label: "Hook development ldh", value: (r) => fmt(r.ldh_in, 1) + " in" + (r.floor_governs ? (r.joint === "smf" ? " (the 18.8.5.1 minimum governs)" : " (the max(8db, 6 in) floor governs)") : "") },
+    { key: "st", id: "rhd-out-st", label: "Straight bar through the joint instead", value: (r) => r.ld_straight_bottom_in === null ? "(special moment frame joints only)" : fmt(r.ld_straight_bottom_in, 1) + " in, or " + fmt(r.ld_straight_top_in, 1) + " in with more than 12 in of concrete cast below (18.8.5.3)" },
     { key: "n", id: "rhd-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeRcHookDevelopment,

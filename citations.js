@@ -19770,6 +19770,7 @@ export const CITATIONS = {
       { name: "Hook equation", value: "ldh scales with db^1.5 - not linearly - through Eq. 25.4.3.1a", source: "ACI 318-19 25.4.3.1" },
       { name: "Modification factors", value: "psi_e epoxy, psi_r confinement, psi_o location/cover, psi_c strength (f'c/15,000 + 0.6 under 6,000 psi)", source: "ACI 318-19 25.4.3.2" },
       { name: "Floor", value: "never less than 8 bar diameters nor 6 in", source: "ACI 318-19 25.4.3.1(b)/(c)" },
+      { name: "Special moment frame joint (option, added 2026-10-08)", value: "ldh = fy db / (65 lambda sqrt(f'c)), at least 8 db and 6 in (10 db and 7.5 in lightweight), No. 3-11, no psi factors; a straight bar needs 2.5 ldh, or 3.25 ldh with over 12 in of concrete below. Equation as quoted in PCI Journal, March-April 2024 (Ghosh).", source: "ACI 318-19 18.8.5.1 / 18.8.5.3" },
     ],
   },
   "steel-beam-ltb": {

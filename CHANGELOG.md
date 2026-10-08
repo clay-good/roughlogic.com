@@ -52,6 +52,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **`rc-hook-development` covers special moment frame joints (ACI 318-19 18.8.5).** Its note said seismic joint development was separate. A "Where the hook is" select now applies 18.8.5.1, ldh = fy db / (65 lambda sqrt(f'c)) with floors of 8 db and 6 in (10 db and 7.5 in in lightweight concrete) and no psi factors, and reports the 18.8.5.3 straight-bar alternative of 2.5 ldh (3.25 ldh with more than 12 in of concrete cast below). A #8 Grade 60 bar in 4,000 psi concrete hooks in 14.6 in, against 14.9 in under 25.4.3, and needs 36.5 in straight. The general mode is unchanged.
+
 - **`/llms.txt` names the curated collections.** An agent reading the site guide learned about the MCP server but not about `/collections/disaster-response/`, the 137-calculator page that gathers flood, storm, and collapse work from every trade (spec-v1926 listed this as a follow-up). The build now adds a Collections section with each collection's URL, title, and count of landed calculators.
 
 - **`concrete-anchor-steel-strength` covers welded headed studs (ACI 318-19 17.7.1.2(a)).** It modeled only cast-in headed and hooked bolts (Vsa = 0.6 Ase futa on the threaded area) and said a welded stud was "not modeled". An anchor-type select now gives a stud its unthreaded shank area and Vsa = Ase futa: a 3/4 in AWS D1.1 Type B stud (futa 65,000 psi) carries 28,716 lb nominal in shear, where a 3/4-10 bolt of the same steel carries 0.6 x 0.3345 x 65,000 = 13,044 lb.
