@@ -461,6 +461,8 @@ function renderTrussCapacity(inputRegion, outputRegion, citationEl) {
     oP.textContent = r.pass ? "PASS" : "FAIL";
     oA.textContent = r.attribution;
   }
+  // Until 2026-10-08 the truss model and span had no listener: only the point-load rows recomputed.
+  for (const el of [model.select, span.input]) el.addEventListener("input", update);
 }
 
 const renderTimeAlignment = _r({

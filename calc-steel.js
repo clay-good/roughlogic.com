@@ -393,6 +393,8 @@ STEEL_RENDERERS["bolt-shear-bearing"] = _simpleRenderer({
   outputs: [
     { key: "sh", id: "bsb-out-sh", label: "Bolt shear Rn", value: (r) => fmt(r.rn_shear, 1) + " kip" },
     { key: "ed", id: "bsb-out-ed", label: "Edge bearing/tearout Rn", value: (r) => fmt(r.rn_edge, 1) + " kip" },
+    // Until 2026-10-08 the pitch s fed rn_int but no line showed it, so the field changed nothing on the page.
+    { key: "in", id: "bsb-out-in", label: "Interior bearing/tearout Rn", value: (r) => r.rn_int === null ? "(enter the pitch s for a bolt behind the edge bolt)" : fmt(r.rn_int, 1) + " kip (lc " + fmt(r.lc_int, 3) + " in)" },
     { key: "gv", id: "bsb-out-gv", label: "Governing per-bolt Rn", value: (r) => fmt(r.rn_gov, 1) + " kip (" + r.governed_by + ")" },
     { key: "ph", id: "bsb-out-ph", label: "LRFD design phi*Rn", value: (r) => fmt(r.phi_rn, 1) + " kip" },
     { key: "as", id: "bsb-out-as", label: "ASD allowable Rn/Omega", value: (r) => fmt(r.rn_asd, 1) + " kip" },

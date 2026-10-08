@@ -1810,6 +1810,8 @@ function renderAirReceiver(inputRegion, outputRegion, citationEl) {
     oG.textContent = fmt(r.receiver_gal, 1) + " gal";
     oC.textContent = String(r.concurrent);
   }
+  // Until 2026-10-08 only the tool rows were listened to; pump, pressures, and drawdown were not.
+  for (const el of [ps.input, ph.input, pl.input, dr.input]) el.addEventListener("input", update);
 }
 
 function renderGeothermalLoop(inputRegion, outputRegion, citationEl) {

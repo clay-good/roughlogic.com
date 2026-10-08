@@ -1981,6 +1981,8 @@ function renderPhaseBalance(inputRegion, outputRegion, citationEl, params) {
     oFinal.textContent = fmt(r.final_imbalance_percent, 2) + " %";
     oSwaps.textContent = r.swaps.length === 0 ? "none" : r.swaps.map((s) => "circuit " + circuits[s.circuit].row + " " + s.from + "->" + s.to).join("; ");
   }, DEBOUNCE_MS);
+  // Until 2026-10-08 the threshold had no listener: editing it changed nothing until a row changed.
+  thr.input.addEventListener("input", update);
 }
 
 function renderMultiLoadVD(inputRegion, outputRegion, citationEl, params) {
@@ -2031,6 +2033,8 @@ function renderMultiLoadVD(inputRegion, outputRegion, citationEl, params) {
     oV.textContent = fmt(r.worst_voltage_V, 2) + " V";
     oP.textContent = fmt(r.worst_percent, 2) + " %";
   }
+  // Until 2026-10-08 only the run rows were listened to; material, AWG, and source voltage were not.
+  for (const el of [mat.select, aw.select, sv.input]) el.addEventListener("input", update);
 }
 
 function renderLVDCDrop(inputRegion, outputRegion, citationEl, params) {

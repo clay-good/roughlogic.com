@@ -385,6 +385,9 @@ function renderRecipeScale(inputRegion, outputRegion, citationEl) {
       return s;
     }).join("; ");
   }
+  // Until 2026-10-08 the original and target yields had no listener: the scale factor
+  // only refreshed when an ingredient row changed.
+  for (const el of [orig.input, targ.input]) el.addEventListener("input", update);
 }
 
 const renderYieldEP = _r({
@@ -462,6 +465,8 @@ function renderPlateCost(inputRegion, outputRegion, citationEl) {
     oM.textContent = "$" + fmt(r.contribution_margin, 2);
     oF.textContent = r.sanity_flag;
   }
+  // Until 2026-10-08 the target food cost had no listener.
+  fc.input.addEventListener("input", update);
 }
 
 const renderPanConversion = _r({

@@ -911,7 +911,8 @@ function renderSprayerCalibration(inputRegion, outputRegion, citationEl) {
     }
     oW.textContent = r.warnings.length > 0 ? r.warnings.join(" ") : "USDA public-domain method; pesticide label governs.";
   }, DEBOUNCE_MS);
-  for (const f of [w.input, oz.input, t.input, tg.input]) f.addEventListener("input", update);
+  // Until 2026-10-08 field acres and tank size had no listener.
+  for (const f of [w.input, oz.input, t.input, tg.input, fa.input, tk.input]) f.addEventListener("input", update);
 }
 
 // --- spec-v17 L.1 Acre-foot irrigation requirement (ET-based) --------

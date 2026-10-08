@@ -14,7 +14,7 @@ const BAD = /\bnull\b|\bundefined|\bNaN|\bInfinity/;
 // fraction the tile explains is mathematically undefined.
 const ALLOWED = /\b(?:a|no|that|the|first|each|left|right) null\b|\bfraction is undefined\b/gi;
 
-const report = { rendered: 0, withExample: 0, leaks: [], crashes: [], exampleErrors: [] };
+const report = { rendered: 0, withExample: 0, leaks: [], crashes: [], exampleErrors: [], unlistened: [] };
 for (const { id } of TOOLS) {
   const reg = RENDERER_MAP[id];
   if (!reg) continue;
@@ -37,6 +37,12 @@ for (const { id } of TOOLS) {
     await render(inputs, outputs, cite);
     flushTimers();
     report.rendered++;
+    // A control nobody listens to: typing in it changes nothing until another field does.
+    const delegated = inputs.listeners.some((l) => (l.t === "input" || l.t === "change") && !l.capture);
+    const heard = (el) => { for (let n = el; n && n !== inputs; n = n.parentNode) if (n.listeners.some((l) => ["input", "change", "click", "keyup"].includes(l.t))) return true; return false; };
+    if (!delegated) for (const el of [...inputs.querySelectorAll("input"), ...inputs.querySelectorAll("select"), ...inputs.querySelectorAll("textarea")]) {
+      if (el.type !== "button" && el.type !== "file" && !heard(el)) report.unlistened.push(`${id}: ${el.tagName.toLowerCase()}#${el.id}`);
+    }
     const btn = view.querySelectorAll("button").find((b) => b.classList.contains("example-btn"));
     if (!btn) continue;
     btn.click();

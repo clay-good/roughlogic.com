@@ -12,6 +12,21 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **Eleven fields changed nothing when edited, because their pages never listened to them.** The answer stayed stale until some other field changed:
+  - `battery-runtime`: inverter efficiency;
+  - `phase-balance`: imbalance threshold;
+  - `multi-load-vd`: conductor material, AWG, and source voltage;
+  - `air-receiver`: pump SCFM, high and low pressure, and drawdown minutes;
+  - `timesheet`: hourly rate;
+  - `hos-math`: duty profile and weekly on-duty hours;
+  - `sprayer-calibration`: field acres and tank size;
+  - `truss-capacity`: truss model and span;
+  - `recipe-scale`: original and target yield;
+  - `plate-cost`: target food cost.
+
+  `render-text-guard` now fails on any rendered input, select, or textarea with no listener, and fails on `plate-cost` when its fix is removed.
+- **`bolt-shear-bearing`'s bolt pitch changed nothing on the page.** The calculator computed the interior bolt's bearing/tearout strength from it but no line showed it. A new line does: the example's 3 in pitch gives 52.2 kip, capped by bearing at 2.4 d t Fu.
+
 - **Three pages could not reproduce their own documented example, because they took one row of a list input.**
   - `generator-motor-starting` took one motor. The documented example has three (25, 10, and 5 hp) plus 15 kW of other load, and the page showed 33.6 running kW against the documented 44.84 kW. A new "Other motors already running (total HP)" field adds their running load at the calculator's 0.746 kW/hp; the hardest-starting motor stays in the motor fields, as it sets the start. The example now shows 44.8 kW, 148.8 kVA, and an 80 kW set.
   - `refrigerant-charge` took one line section and its button loaded 50 ft of 3/8 in (30 oz), not the documented 25 ft of 3/8 plus 5 ft of 1/2 (19.75 oz). An optional second section is added, and the module's example export now matches the registry row.

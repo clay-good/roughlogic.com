@@ -1812,6 +1812,8 @@ function renderTimesheet(inputRegion, outputRegion, citationEl) {
     oP.textContent = "$" + _fmtG(r.gross_pay, 2);
     oM.textContent = _fmtG(r.total_miles, 1) + " mi ($" + _fmtG(r.reimbursable, 2) + ")";
   }
+  // Until 2026-10-08 the rate had no listener: a new rate showed no new pay until a day row changed.
+  rate.input.addEventListener("input", update);
 }
 
 const renderVehicleLoad = _simpleRendererG({

@@ -28,3 +28,13 @@ test("render text: every worked example renders an answer, not the error layout"
   const report = JSON.parse(execFileSync(process.execPath, [sweep], { encoding: "utf8", maxBuffer: 1 << 24, stdio: ["ignore", "pipe", "ignore"] }));
   assert.deepEqual(report.exampleErrors, []);
 });
+
+// Until 2026-10-08 ten bespoke renderers built a field and never listened to it
+// (battery-runtime's inverter efficiency, timesheet's hourly rate, the truss model
+// and span, the HOS duty profile, ...): editing it left the answer stale until some
+// other field changed.
+test("render text: every input, select, and textarea a tile renders is listened to", () => {
+  const sweep = fileURLToPath(new URL("../fixtures/render-text-sweep.js", import.meta.url));
+  const report = JSON.parse(execFileSync(process.execPath, [sweep], { encoding: "utf8", maxBuffer: 1 << 24, stdio: ["ignore", "pipe", "ignore"] }));
+  assert.deepEqual(report.unlistened, []);
+});

@@ -219,7 +219,7 @@ export function renderBatteryRuntime(inputRegion, outputRegion, citationEl, para
     oWh.textContent = fmt(r.usable_Wh, 0) + " Wh";
   }, DEBOUNCE_MS);
 
-  for (const el of [ah.input, v.input, dod.input, load.input, k.input, rh.input]) el.addEventListener("input", update);
+  for (const el of [ah.input, v.input, dod.input, load.input, k.input, rh.input, eff.input]) el.addEventListener("input", update);
 }
 
 // --- v15 A.8: PV interconnection 120% busbar rule (NEC 705.12) ---

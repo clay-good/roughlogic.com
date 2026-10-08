@@ -751,6 +751,8 @@ function renderHOS(inputRegion, outputRegion, citationEl) {
     oB.textContent = r.needs_break ? "REQUIRED (8+ hr drive without 30-min)" : "ok";
     oNT.textContent = r.next_drive_start_iso === null ? "-" : (r.next_drive_start_iso + " - " + r.next_drive_reason);
   }
+  // Until 2026-10-08 the duty profile and the weekly hours had no listener.
+  for (const el of [profile.select, weekly.input]) el.addEventListener("input", update);
 }
 
 function renderBridgeFormula(inputRegion, outputRegion, citationEl) {
