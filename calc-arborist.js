@@ -858,7 +858,7 @@ function renderTreeHeightClinometer(inputRegion, outputRegion, citationEl) {
     if (r.error) { oH.textContent = r.error; oA.textContent = "-"; oB.textContent = "-"; oNote.textContent = ""; return; }
     oH.textContent = fmt(r.tree_height_ft, 1) + " ft";
     oA.textContent = fmt(r.above_eye_ft, 1) + " ft";
-    oB.textContent = fmt(r.below_eye_ft, 1) + " ft" + (r.below_eye_ft < 0 ? " (base below eye)" : r.below_eye_ft > 0 ? " (base above eye)" : "");
+    oB.textContent = fmt(r.below_eye_ft, Math.abs(r.below_eye_ft - 0) < 0.05 && r.below_eye_ft !== 0 ? 3 : 1) + " ft" + (r.below_eye_ft < 0 ? " (base below eye)" : r.below_eye_ft > 0 ? " (base above eye)" : "");
     oNote.textContent = r.note;
   }, DEBOUNCE_MS);
   attachExampleButton(inputRegion, () => { d.input.value = "100"; top.input.value = "58"; base.input.value = "-4"; update(); });

@@ -1155,7 +1155,7 @@ function renderPowerScrewTorque(inputRegion, outputRegion, citationEl) {
     const r = computePowerScrewTorque({ axial_load_lbf: readNum(F.input), mean_diameter_in: readNum(dm.input), lead_in: readNum(l.input), thread_friction: readNum(mu.input), collar_friction: readNum(muc.input), collar_diameter_in: readNum(dc.input), thread_form: form.select.value });
     if (r.error) { oR.textContent = r.error; oL.textContent = "-"; oE.textContent = "-"; oS.textContent = "-"; oNote.textContent = ""; return; }
     oR.textContent = fmt(r.raise_torque_in_lbf, 1) + " in-lbf";
-    oL.textContent = fmt(r.lower_torque_in_lbf, 1) + " in-lbf" + (r.lower_torque_in_lbf < 0 ? " (negative: the load back-drives the screw)" : "");
+    oL.textContent = fmt(r.lower_torque_in_lbf, Math.abs(r.lower_torque_in_lbf - 0) < 0.05 && r.lower_torque_in_lbf !== 0 ? 3 : 1) + " in-lbf" + (r.lower_torque_in_lbf < 0 ? " (negative: the load back-drives the screw)" : "");
     oE.textContent = fmt(r.efficiency_pct, 1) + "% (lead angle " + fmt(r.lead_angle_deg, 2) + " deg)";
     oS.textContent = r.self_locking ? "Yes - holds the load with no brake" : "No - the load runs the screw back down";
     oNote.textContent = r.note;

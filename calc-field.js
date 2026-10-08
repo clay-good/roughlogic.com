@@ -1104,7 +1104,7 @@ function renderMagneticDeclination(inputRegion, outputRegion, citationEl) {
     if (!Number.isFinite(decimal_year)) { clearOuts("Date must be YYYY-MM-DD."); return; }
     const r = computeWMM({ lat_deg, lon_deg, alt_km, decimal_year, coefficients });
     if (r.error) { clearOuts(r.error); return; }
-    outs.d.textContent = fmt(r.D, 2) + " deg " + (r.D >= 0 ? "(east)" : "(west)");
+    outs.d.textContent = fmt(r.D, Math.abs(r.D - 0) < 0.005 && r.D !== 0 ? 4 : 2) + " deg " + (r.D >= 0 ? "(east)" : "(west)");
     outs.i.textContent = fmt(r.I, 2) + " deg";
     outs.h.textContent = fmt(r.H, 1) + " nT";
     outs.f.textContent = fmt(r.F, 1) + " nT";

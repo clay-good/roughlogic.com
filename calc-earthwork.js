@@ -1273,7 +1273,7 @@ function _v844renderHaulRoadResistance(inputRegion, outputRegion, citationEl) {
       rolling_resistance_pct: rr.input.value === "" ? 4 : Number(rr.input.value),
     });
     if (r.error) { oRimpull.textContent = r.error; oTotal.textContent = "-"; return; }
-    oRimpull.textContent = fmt(r.required_rimpull_lb, 0) + " lb (" + fmt(r.rimpull_per_ton_lb, 0) + " lb/ton)" + (r.required_rimpull_lb < 0 ? " - downhill, on the retarder" : "");
+    oRimpull.textContent = fmt(r.required_rimpull_lb, Math.abs(r.required_rimpull_lb - 0) < 0.5 && r.required_rimpull_lb !== 0 ? 2 : 0) + " lb (" + fmt(r.rimpull_per_ton_lb, 0) + " lb/ton)" + (r.required_rimpull_lb < 0 ? " - downhill, on the retarder" : "");
     oTotal.textContent = fmt(r.total_resistance_pct, 1) + "% (grade + rolling)";
   }, DEBOUNCE_MS);
   for (const f of [g, gr, rr]) f.input.addEventListener("input", update);

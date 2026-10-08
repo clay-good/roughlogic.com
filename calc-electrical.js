@@ -5351,7 +5351,7 @@ function _v494renderTransformerVoltageRegulation(inputRegion, outputRegion, cita
   const update = debounce(() => {
     const r = computeTransformerVoltageRegulation({ percent_r: readNum(pr.input), percent_x: readNum(px.input), power_factor: pf.input.value === "" ? 0.85 : readNum(pf.input), leading: lead.select.value === "leading", load_fraction: ld.input.value === "" ? 1.0 : readNum(ld.input) });
     if (r.error) { oVr.textContent = r.error; oMain.textContent = "-"; oNote.textContent = ""; return; }
-    oVr.textContent = (r.vr_percent >= 0 ? "+" : "") + fmt(r.vr_percent, 2) + "%" + (r.vr_percent < 0 ? " (voltage RISES above nominal)" : " (voltage sags)");
+    oVr.textContent = (r.vr_percent >= 0 ? "+" : "") + fmt(r.vr_percent, Math.abs(r.vr_percent - 0) < 0.005 && r.vr_percent !== 0 ? 4 : 2) + "%" + (r.vr_percent < 0 ? " (voltage RISES above nominal)" : " (voltage sags)");
     oMain.textContent = fmt(r.main_term, 3) + "% + " + fmt(r.quad_term, 3) + "%";
     oNote.textContent = r.note;
   }, DEBOUNCE_MS);

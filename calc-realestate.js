@@ -2673,7 +2673,7 @@ function renderBreakEvenOccupancy(inputRegion, outputRegion, citationEl) {
     if (r.error) { oBEO.textContent = r.error; oCush.textContent = "-"; return; }
     oBEO.textContent = fmt(r.beo_pct, 1) + "%";
     oCush.textContent = r.cushion_pts == null ? "(enter a market occupancy for the cushion)"
-      : fmt(r.cushion_pts, 1) + " points" + (r.cushion_pts < 0 ? " (break-even is ABOVE market -- the deal loses money at market occupancy)" : "");
+      : fmt(r.cushion_pts, Math.abs(r.cushion_pts - 0) < 0.05 && r.cushion_pts !== 0 ? 3 : 1) + " points" + (r.cushion_pts < 0 ? " (break-even is ABOVE market -- the deal loses money at market occupancy)" : "");
   }, DEBOUNCE_MS);
   attachExampleButton(inputRegion, () => { opex.input.value = "60000"; debt.input.value = "90000"; pgi.input.value = "200000"; occ.input.value = "92"; update(); });
   for (const el of [opex.input, debt.input, pgi.input, occ.input]) el.addEventListener("input", update);

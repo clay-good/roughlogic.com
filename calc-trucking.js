@@ -1996,7 +1996,7 @@ TRUCKING_RENDERERS["truck-startability"] = _simpleRenderer({
     { key: "rolling_resistance_coeff", label: "Rolling resistance coefficient (~0.012 pavement)", kind: "number", default: 0.012 },
   ],
   outputs: [
-    { key: "grade", id: "tsg-out-grade", label: "Max startable grade", value: (r) => fmt(r.max_grade_pct, 1) + "%" + (r.max_grade_pct <= 0 ? " (cannot start on any upgrade)" : "") },
+    { key: "grade", id: "tsg-out-grade", label: "Max startable grade", value: (r) => fmt(r.max_grade_pct, Math.abs(r.max_grade_pct - 0) < 0.05 && r.max_grade_pct !== 0 ? 3 : 1) + "%" + (r.max_grade_pct <= 0 ? " (cannot start on any upgrade)" : "") },
     { key: "te", id: "tsg-out-te", label: "Available tractive effort", value: (r) => fmt(r.tractive_effort_lb, 0) + " lb (drive fraction " + fmt(r.drive_fraction_pct, 1) + "%)" },
     { key: "n", id: "tsg-out-n", label: "Note", value: (r) => r.note },
   ],
