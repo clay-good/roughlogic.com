@@ -19,3 +19,12 @@ test("render text: no tile prints undefined, NaN, Infinity, or null after its ex
   assert.deepEqual(report.crashes, []);
   assert.deepEqual(report.leaks, []);
 });
+
+// Until 2026-10-08 calc-hvacservice.js built every declared field as a number box,
+// so four tiles with a select showed their own "must be X or Y" error after the
+// example (condensate-trap-depth since 2026-07-27) and gave no way to choose.
+test("render text: every worked example renders an answer, not the error layout", () => {
+  const sweep = fileURLToPath(new URL("../fixtures/render-text-sweep.js", import.meta.url));
+  const report = JSON.parse(execFileSync(process.execPath, [sweep], { encoding: "utf8", maxBuffer: 1 << 24, stdio: ["ignore", "pipe", "ignore"] }));
+  assert.deepEqual(report.exampleErrors, []);
+});

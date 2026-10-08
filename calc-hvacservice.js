@@ -41,10 +41,19 @@ function _simpleRenderer(spec) {
     citationEl.textContent = spec.citation;
     attachExampleButton(inputRegion, () => fillExample(spec.example));
     const fields = {};
+    // Until 2026-10-08 every field was built as a number box, so the four
+    // tiles here with a select (ashrae-622-ventilation, damper-authority,
+    // condensate-trap-depth, condensate-overflow-pan) showed their own
+    // "must be X or Y" error after the example and offered no way to choose.
     for (const f of spec.fields) {
-      const field = makeNumber(f.label, f.id || f.key, f.attrs || { step: "any", min: "0" });
+      const field = f.kind === "select"
+        ? makeSelect(f.label, f.id || f.key, f.options)
+        : makeNumber(f.label, f.id || f.key, f.attrs || { step: "any", min: "0" });
       fields[f.key] = field;
-      if (f.default !== undefined) field.input.value = String(f.default);
+      if (f.default !== undefined) {
+        if (f.kind === "select") field.select.value = f.default;
+        else field.input.value = String(f.default);
+      }
       inputRegion.appendChild(field.wrap);
     }
     const outs = {};
@@ -52,18 +61,24 @@ function _simpleRenderer(spec) {
     function fillExample(v) {
       for (const f of spec.fields) {
         if (v[f.key] === undefined) continue;
-        fields[f.key].input.value = v[f.key];
+        if (f.kind === "select") fields[f.key].select.value = v[f.key];
+        else fields[f.key].input.value = v[f.key];
       }
       update();
     }
     const update = debounce(() => {
       const params = {};
-      for (const f of spec.fields) params[f.key] = Number(fields[f.key].input.value) || 0;
+      for (const f of spec.fields) {
+        params[f.key] = f.kind === "select" ? fields[f.key].select.value : Number(fields[f.key].input.value) || 0;
+      }
       const r = spec.compute(params);
       if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }
       for (const o of spec.outputs) outs[o.key].textContent = o.value(r);
     }, DEBOUNCE_MS);
-    for (const f of spec.fields) fields[f.key].input.addEventListener("input", update);
+    for (const f of spec.fields) {
+      const el = f.kind === "select" ? fields[f.key].select : fields[f.key].input;
+      el.addEventListener(f.kind === "select" ? "change" : "input", update);
+    }
   };
 
   _rlRender.schema = {

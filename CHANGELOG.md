@@ -12,6 +12,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **Four HVAC tiles showed an error instead of an answer, and offered no way to choose their main option.** The declarative renderer in `calc-hvacservice.js` built every field as a number box, so the select each of these tiles declares never appeared, "Test with example" wrote its value into a number field, and the page printed the tile's own validation error:
+  - `condensate-trap-depth` ("Configuration must be draw-through or blow-through"), broken since it shipped on July 27;
+  - `condensate-overflow-pan` ("Method must be ..."), since July 27;
+  - `ashrae-622-ventilation` ("System type must be balanced or unbalanced"), since its September 19 infiltration-credit update;
+  - `damper-authority` ("Blade type must be parallel or opposed"), since October 1.
+
+  The factory now builds selects like every other module's. The calculator door (MCP) called the computes directly and was not affected. A new check in `render-text-guard` fails when any worked example renders the error layout, and it fails on all four with the old factory.
+
 - **`inventory-turnover` printed "median undefinedx" in its industry comparison.** The Sep 9 fix renamed the benchmark to `industry_aggregate` (Census publishes aggregates, not medians across firms), but the page still read the old `median` field and still called it a median. It now prints, for example, "retail_general: industry aggregate 7.0x (2022); delta +0.69x". The render-no-nan browser check caught it only when the page's debounce landed inside the check's stability window, so earlier runs passed.
 
 ### Changed
