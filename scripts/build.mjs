@@ -265,7 +265,11 @@ async function emitAgentDiscovery() {
   const modules = files.filter((f) => /^calc-.*\.js$/.test(f)).length;
   const version = JSON.parse(await readFile(resolve(ROOT, "package.json"), "utf8")).version;
 
-  await writeFile(resolve(DIST, "llms.txt"), renderLlmsTxt({ tiles, modules }), "utf8");
+  // spec-v1926 follow-up: name the curated collections, counting only landed tiles.
+  const { COLLECTIONS } = await import("../collections.js");
+  const live = new Set([...toolsData.matchAll(/^\s*\{ id: "([^"]+)"/gm)].map((m) => m[1]));
+  const collections = COLLECTIONS.map((c) => ({ slug: c.slug, title: c.title, count: c.sections.flatMap((x) => x.ids).filter((id) => live.has(id)).length }));
+  await writeFile(resolve(DIST, "llms.txt"), renderLlmsTxt({ tiles, modules, collections }), "utf8");
   await mkdir(resolve(DIST, ".well-known"), { recursive: true });
   await writeFile(resolve(DIST, ".well-known", "mcp.json"), renderMcpManifest({ version, tiles }), "utf8");
   if (existsSync(resolve(ROOT, "AGENTS.md"))) {

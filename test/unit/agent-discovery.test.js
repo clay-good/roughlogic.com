@@ -19,6 +19,13 @@ test("llms.txt states the live tile count and every MCP tool", () => {
   assert.ok(txt.includes("/AGENTS.md"), "links AGENTS.md");
 });
 
+test("llms.txt names every curated collection with its landed count", async () => {
+  const { COLLECTIONS } = await import("../../collections.js");
+  const txt = renderLlmsTxt({ tiles: 10, modules: 1, collections: COLLECTIONS.map((c) => ({ slug: c.slug, title: c.title, count: 47 })) });
+  for (const c of COLLECTIONS) assert.ok(txt.includes(`/collections/${c.slug}/ — ${c.title} (47 calculators`), "lists " + c.slug);
+  assert.ok(!renderLlmsTxt({ tiles: 10, modules: 1 }).includes("## Collections"), "no empty section");
+});
+
 test(".well-known/mcp.json parses and lists the current tool set", () => {
   const tiles = liveTiles();
   const manifest = JSON.parse(renderMcpManifest({ version: "9.9.9", tiles }));

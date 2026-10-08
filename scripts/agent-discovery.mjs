@@ -13,7 +13,12 @@ export const MCP_PROMPTS = ["find-calculator", "run-with-inputs", "size-and-chec
 const INSTALL = "claude mcp add roughlogic -- node /absolute/path/to/roughlogic.com/mcp/server.mjs";
 
 // /llms.txt — the emerging convention for an agent-readable site guide.
-export function renderLlmsTxt({ tiles, modules }) {
+// `collections` is [{ slug, title, count }]: the curated cross-trade pages
+// (collections.js), each with the number of its tiles that have landed.
+export function renderLlmsTxt({ tiles, modules, collections = [] }) {
+  const coll = collections.length
+    ? "\n## Collections\n\n" + collections.map((c) => `- /collections/${c.slug}/ — ${c.title} (${c.count.toLocaleString("en-US")} calculators from many trades, in the order the work happens)`).join("\n") + "\n"
+    : "";
   return `# roughlogic.com
 
 > Field math for the trades: ${tiles.toLocaleString("en-US")} free calculators across ${modules} modules (electrical, plumbing, HVAC, construction, restoration, and more), US standards only. A local, zero-cost Model Context Protocol (MCP) server exposes every one to an AI agent. No hosting — the server runs on your machine over stdio.
@@ -25,7 +30,7 @@ export function renderLlmsTxt({ tiles, modules }) {
 - Resources: ${MCP_RESOURCES.join(", ")}
 - Prompts: ${MCP_PROMPTS.join(", ")}
 - Transport: local stdio (Node 18+, zero dependencies). No network, no hosted endpoint.
-
+${coll}
 ## Docs
 
 - /AGENTS.md — how an AI agent works in this repository.
