@@ -11,7 +11,7 @@ import { readFile } from "node:fs/promises";
 import { COMPUTE_MAP } from "../fixtures/compute-map.js";
 import { RENDERER_MAP } from "../fixtures/renderer-map.js";
 
-const BAD = /\bnull\b|\bundefined\b|\bNaN\b|\bInfinity\b/;
+const BAD = /\bnull\b|\bundefined|\bNaN|\bInfinity/;
 // Lines where the word is the subject matter, not a leak.
 const ALLOWED = /\b(?:a|no|that|the|first|each) null\b/g;
 
