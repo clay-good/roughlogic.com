@@ -12,6 +12,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **`formwork-pressure`'s lightweight weight factors did nothing on the page.** The unit-weight field turned a blank into 0 (an error), and any entered weight overrode the weight-factor select, so choosing "lightweight 115" never changed the answer. A blank unit weight now takes the class's 115, 135, or 150 pcf, as the calculator already did through the MCP door: the 5 ft/hr, 70 F, 12 ft example drops from 793 to 711 psf at 115 pcf (C_w 0.897). Found by flagging select options whose every choice prints the same page.
+
 - **`hdd-annular-pressure` printed "0.00 lb per gal" as the fluid density the shallow station allows** when the annular friction alone already exceeds that station's allowable pressure, as it does in the documented example (8 ft of cover, factor of safety 0.57). The compute clamps the result at zero, and the page showed it as if it were a density to mix. The line now says no fluid density works and points at friction and bore depth. Found by flagging output lines that never change across a tile's input sweep.
 - **The same clamp in the mine hoist-rope tile.** When the minimum factor of safety cannot be reached, its payload and depth lines printed "0 lb" and "0 ft of rope"; they now say none, as the elevator rope tile already did. A scan of every result clamped with `Math.max(0, ...)` found no other maximum-allowed value printed as a bare zero.
 
@@ -52,7 +54,7 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
-- **`motor-overload-sizing` covers thermal protectors integral with the motor (NEC 430.32(A)(2)).** It said thermally protected motors were out of scope. A protection select now gives the protector's ultimate-trip ceiling: 170% of the table full-load current at 9 A or less, 156% from 9.1 to 20 A, and 140% above 20 A (a 28 A motor: 39.2 A), with no 430.32(C) step-up. The separate-device mode is unchanged.
+- **`motor-overload-sizing` covers thermal protectors integral with the motor (NEC 430.32(A)(2)).** It said thermally protected motors were out of scope. A protection select now gives the protector's ultimate-trip ceiling: 170% of the table full-load current at 9 A or less, 156% from 9.1 to 20 A, and 140% above 20 A (a 28 A motor: 39.2 A), with no 430.32(C) step-up. The separate-device mode is unchanged. `calc-motor.js`'s gzip cap rises from 16,500 to 18,500 B: the option took it to 16,599 B, which the size gate caught only on the next build because that commit's lint ran before its build.
 
 - **`rc-hook-development` covers special moment frame joints (ACI 318-19 18.8.5).** Its note said seismic joint development was separate. A "Where the hook is" select now applies 18.8.5.1, ldh = fy db / (65 lambda sqrt(f'c)) with floors of 8 db and 6 in (10 db and 7.5 in in lightweight concrete) and no psi factors, and reports the 18.8.5.3 straight-bar alternative of 2.5 ldh (3.25 ldh with more than 12 in of concrete cast below). A #8 Grade 60 bar in 4,000 psi concrete hooks in 14.6 in, against 14.9 in under 25.4.3, and needs 36.5 in straight. The general mode is unchanged.
 

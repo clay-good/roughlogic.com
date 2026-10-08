@@ -58459,3 +58459,11 @@ test("bounds: motor-overload-sizing thermal protector bands follow NEC 430.32(A)
   assert.equal(_olThermal({ fla_A: 26, sf: 1.15, rise_C: 40 }).mult, 1.25);
   assert.ok("error" in _olThermal({ fla_A: 26, protection: "fuse" }));
 });
+
+import { computeFormworkPressure as _fwBlank } from "../../calc-construction.js";
+test("bounds: formwork-pressure takes the unit weight from the weight factor when the weight is blank", () => {
+  const base = { pour_rate_ft_per_hr: 5, concrete_temp_F: 70, wall_height_ft: 12 };
+  const normal = _fwBlank({ ...base, weight_factor: "normal" });
+  const light = _fwBlank({ ...base, weight_factor: "lightweight_115", unit_weight_pcf: undefined });
+  assert.ok(Math.abs(light.pressure_psf / normal.pressure_psf - 0.5 * (1 + 115 / 145)) < 1e-9);
+});

@@ -2305,7 +2305,9 @@ const renderFormworkPressure = _simpleRenderer({
     { key: "pour_rate_ft_per_hr", label: "Pour rate (ft/hr)", kind: "number" },
     { key: "concrete_temp_F", label: "Concrete temperature (°F)", kind: "number" },
     { key: "weight_factor", label: "Weight factor", kind: "select", options: Object.keys(ACI_C_W).map((k) => ({ value: k, label: k.replace(/_/g, " ") })) },
-    { key: "unit_weight_pcf", label: "Unit weight (pcf)", kind: "number" },
+    // Until 2026-10-08 a blank read as 0 (an error) and any entry overrode the weight class, so the
+    // lightweight choices did nothing on the page; blank now takes the class's 115 / 135 / 150 pcf.
+    { key: "unit_weight_pcf", label: "Unit weight (pcf, blank = from the weight factor)", kind: "number", blankUndefined: true },
     { key: "wall_height_ft", label: "Wall height (ft)", kind: "number" },
     { key: "chemistry", label: "Concrete chemistry C_c (ACI 347R Table 4.2.2.1a(b))", kind: "select", options: [
       { value: "auto", label: "From the weight class (1.0; 1.2 if plasticized)" },
