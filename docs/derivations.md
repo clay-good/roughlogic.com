@@ -2216,7 +2216,7 @@ cross-check.
 | calc-electricalfield.js | `computeOpenDeltaTransformer` | `{ transformer_kva_each = 25, required_load_kva = 40 } = {}` | _ | _ | _ |
 | calc-electricalfield.js | `computePvAcOutputCircuit` | `{ ac_power_w = 9600, ac_voltage_v = 240, phases = 1 } = {}` | _ | _ | _ |
 | calc-electricalfield.js | `computeSoilResistivityWenner` | `{ probe_spacing_ft = 10, meter_resistance_ohm = 5 } = {}` | _ | _ | _ |
-| calc-electricalfield.js | `computeWelderArcCircuitConductor` | `{ primary_current_a = 40, duty_pct = 50 } = {}` | _ | _ | _ |
+| calc-electricalfield.js | `computeWelderArcCircuitConductor` | `{ primary_current_a = 40, duty_pct = 50, welder_type = "transformer" } = {}` | _ | _ | _ |
 | calc-electricalfield.js | `computeWelderResistanceCircuitConductor` | `{ primary_current_a = 100, duty_pct = 50 } = {}` | _ | _ | _ |
 | calc-electricalfield.js | `computeWirePullingLubricant` | `{ length_ft = 400, conduit_id_in = 3, k_factor = 0.0015, bend_factor = 1.0 } ...` | _ | _ | _ |
 | calc-electricalreferences.js | `computeBurialDepth3005` | `{ wiring_method = "direct burial cable/conductors", location = "general earth...` | _ | _ | _ |

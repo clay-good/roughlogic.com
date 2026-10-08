@@ -1031,7 +1031,7 @@ export const BESPOKE_LABELS = {
   "weld-preheat-fuel": {"steel_lb":"Steel mass to preheat (lb)","start_temp_F":"Start temperature (°F)","preheat_temp_F":"Preheat temperature (°F)","efficiency_pct":"Torch-to-part efficiency (%)"},
   "weld-transverse-shrinkage": {"weld_area_in2":"Weld cross-section (in2)","thickness_in":"Plate thickness (in)","weld_count":"Parallel welds pulling the dimension","root_opening_in":"Root opening (in, 0 = closed root)"},
   "weld-travel-speed": {"V_volts":"Arc voltage (V)","I_amps":"Welding current (A)","eta":"Arc efficiency (1 for AWS/ASME limits; EN 1011-1: 0.8 GMAW, 0.6 GTAW, 1.0 SAW)","HI_kjin":"Target heat input (kJ/in)"},
-  "welder-arc-circuit-conductor": {"primary_current_a":"Nameplate primary current (A)","duty_pct":"Duty cycle (%)"},
+  "welder-arc-circuit-conductor": {"primary_current_a":"Nameplate primary current (A)","duty_pct":"Duty cycle (%)","welder_type":"Welder type (Table 630.11(A) column)"},
   "welder-resistance-circuit-conductor": {"primary_current_a":"Nameplate primary current (A)","duty_pct":"Duty cycle (%)"},
   "well-drawdown": {"static_level_ft":"Static water level (ft below ground)","pumping_level_ft":"Pumping water level (ft below ground)","discharge_gpm":"Discharge rate (GPM)","pump_offset_ft":"Pump-setting offset below pumping level (ft)","delta_s_per_log_ft":"Drawdown per log cycle (ft, optional)","recovery_level_ft":"Recovery water level (ft, optional)"},
   "well-max-yield": {"specific_capacity_gpm_ft":"Specific capacity (GPM per ft of drawdown)","allowable_drawdown_ft":"Allowable drawdown (ft, static to safe level)"},

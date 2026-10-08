@@ -199,11 +199,12 @@ function _v924renderMicroinverterBranchCount(inputRegion, outputRegion, citation
 ELECTRICALFIELD_RENDERERS["microinverter-branch-count"] = _v924renderMicroinverterBranchCount;
 
 // ===================== spec-v932: arc-welder branch-circuit conductor and OCPD =====================
-// dims: in { primary_current_a: I, duty_pct: dimensionless } out: { duty_multiplier: dimensionless, effective_current_a: I, ocpd_max_a: I }
-export function computeWelderArcCircuitConductor({ primary_current_a = 40, duty_pct = 50 } = {}) {
+// dims: in { primary_current_a: I, duty_pct: dimensionless, welder_type: dimensionless } out: { duty_multiplier: dimensionless, effective_current_a: I, ocpd_max_a: I }
+export function computeWelderArcCircuitConductor({ primary_current_a = 40, duty_pct = 50, welder_type = "transformer" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(primary_current_a > 0)) return { error: "Nameplate primary current must be positive (A)." };
   if (!(duty_pct > 0 && duty_pct <= 100)) return { error: "Duty cycle must be between 0 and 100 percent." };
+  if (welder_type !== "transformer" && welder_type !== "motor_generator") return { error: "Welder type must be transformer/rectifier or motor-generator." };
   // NEC 630.11(A) / Table 630.11(A), nonmotor-generator column: the rows from 30 to 100% duty track
   // sqrt(duty), but the table's last row is "20 or less 0.45". Until 2026-09-25 sqrt ran all the way
   // down (0.32 at 10% duty), undersizing the conductor by up to half.
@@ -211,7 +212,19 @@ export function computeWelderArcCircuitConductor({ primary_current_a = 40, duty_
   // 0.7746), as the resistance-welder tile has read Table 630.31(A)(2) since 2026-09-25; between rows the
   // square root the table rounds is used. Until 2026-10-07 every listed row read low here.
   const WELDER_630_11_A = { 100: 1.00, 90: 0.95, 80: 0.89, 70: 0.84, 60: 0.78, 50: 0.71, 40: 0.63, 30: 0.55 };
-  const duty_multiplier = duty_pct <= 20 ? 0.45 : (WELDER_630_11_A[duty_pct] ?? Math.sqrt(duty_pct / 100));
+  // The motor-generator column (added 2026-10-07; until then the tile told those users to read the
+  // table) runs higher and does not follow sqrt(duty): 1.00 / 0.96 / 0.91 / 0.86 / 0.81 / 0.75 / 0.69 /
+  // 0.62 at 100 to 30% and 0.55 at 20% or less, interpolated linearly between rows.
+  const MG = [[20, 0.55], [30, 0.62], [40, 0.69], [50, 0.75], [60, 0.81], [70, 0.86], [80, 0.91], [90, 0.96], [100, 1.00]];
+  let duty_multiplier;
+  if (welder_type === "motor_generator") {
+    if (duty_pct <= 20) duty_multiplier = 0.55;
+    else {
+      const i = MG.findIndex(([dc]) => dc >= duty_pct);
+      const [d0, m0] = MG[i - 1], [d1, m1] = MG[i];
+      duty_multiplier = m0 + (duty_pct - d0) / (d1 - d0) * (m1 - m0);
+    }
+  } else duty_multiplier = duty_pct <= 20 ? 0.45 : (WELDER_630_11_A[duty_pct] ?? Math.sqrt(duty_pct / 100));
   const effective_current_a = primary_current_a * duty_multiplier;
   // NEC 630.12(A): the overcurrent device for an arc welder may not exceed 200% of the rated primary current.
   const ocpd_max_a = 2.0 * primary_current_a;
@@ -225,29 +238,35 @@ export function computeWelderArcCircuitConductor({ primary_current_a = 40, duty_
     effective_current_a,
     ocpd_max_a,
     ocpd_std_a,
-    note: "Arc-welder branch circuit per NEC 630.11 and 630.12, for an AC/DC TRANSFORMER or DC-RECTIFIER welder. The conductor is sized on an EFFECTIVE current, not the nameplate primary: I_eff = I_primary x the Table 630.11(A) duty-cycle multiplier. This tile uses the transformer/rectifier column, which is the square root of the duty cycle, held at 0.45 at 20% duty or less (verified against the table's published values: 0.71 at 50%, 0.55 at 30%, 0.45 at 20%). A MOTOR-GENERATOR welder uses a DIFFERENT, HIGHER column of Table 630.11(A) that is not modeled here -- size those from the table, or the conductor will be undersized. Pick a conductor whose ampacity is at least I_eff. The overcurrent device may not exceed 200% of the rated primary current (630.12(A)); the largest standard 240.6 size at or below that ceiling is reported. A 40 A primary, 50%-duty transformer welder needs conductors rated for 28.3 A (a #10 Cu at 60 C) and an OCPD no larger than 80 A. Use the nameplate rated primary current and duty; the AHJ, the welder nameplate, and the adopted NEC edition govern.",
+    note: "Arc-welder branch circuit per NEC 630.11 and 630.12, for a TRANSFORMER/RECTIFIER or a MOTOR-GENERATOR arc welder. The conductor is sized on an EFFECTIVE current, not the nameplate primary: I_eff = I_primary x the Table 630.11(A) duty-cycle multiplier. The two columns differ: the transformer/rectifier column is the printed rounding of the square root of the duty cycle, held at 0.45 at 20% duty or less (0.71 at 50%, 0.55 at 30%); the MOTOR-GENERATOR column runs higher (0.75 at 50%, 0.62 at 30%, 0.55 at 20% or less), so pick the type from the nameplate or the conductor will be undersized. Pick a conductor whose ampacity is at least I_eff. The overcurrent device may not exceed 200% of the rated primary current (630.12(A)); the largest standard 240.6 size at or below that ceiling is reported. A 40 A primary, 50%-duty transformer welder needs conductors rated for 28.4 A (a #10 Cu at 60 C) and a motor-generator welder of the same rating 30 A; either takes an OCPD no larger than 80 A. Use the nameplate rated primary current and duty; the AHJ, the welder nameplate, and the adopted NEC edition govern.",
   };
 }
 
 export const welderArcCircuitConductorExample = { inputs: { primary_current_a: 40, duty_pct: 50 } };
 
 function _v932renderWelderArcCircuitConductor(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: arc-welder branch-circuit conductor and OCPD by name (NEC 630.11 / 630.12) for a TRANSFORMER or DC-RECTIFIER welder. I_eff = I_primary x sqrt(duty) above 20% duty, x 0.45 at 20% or less, the transformer/rectifier column of Table 630.11(A); a MOTOR-GENERATOR welder uses a different, higher column not modeled here. Conductor ampacity >= I_eff; OCPD <= 200% of the rated primary. The welder nameplate and the adopted NEC edition govern.";
+  citationEl.textContent = "Citation: arc-welder branch-circuit conductor and OCPD by name (NEC 630.11 / 630.12) for a transformer/rectifier or a motor-generator arc welder. I_eff = I_primary x the Table 630.11(A) multiplier: the transformer/rectifier column (the printed rounding of sqrt(duty), 0.45 at 20% or less) or the higher motor-generator column (0.75 at 50%, 0.55 at 20% or less), interpolated between rows. Conductor ampacity >= I_eff; OCPD <= 200% of the rated primary. The welder nameplate and the adopted NEC edition govern.";
   const ip = makeNumber("Nameplate primary current (A)", "wac-ip", { step: "any", min: "0" });
   const dc = makeNumber("Duty cycle (%)", "wac-dc", { step: "any", min: "0" });
-  for (const f of [ip, dc]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { ip.input.value = "40"; dc.input.value = "50"; update(); });
+  const wt = makeSelect("Welder type (Table 630.11(A) column)", "wac-wt", [
+    { value: "transformer", label: "Transformer or DC rectifier (nonmotor)", selected: true },
+    { value: "motor_generator", label: "Motor-generator" },
+  ]);
+  for (const f of [ip, dc, wt]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { ip.input.value = "40"; dc.input.value = "50"; wt.select.value = "transformer"; update(); });
   const oEff = makeOutputLine(outputRegion, "Effective current (size conductor to)", "wac-out-eff");
   const oOcpd = makeOutputLine(outputRegion, "Max overcurrent device", "wac-out-ocpd");
   const update = debounce(() => {
     const r = computeWelderArcCircuitConductor({
       primary_current_a: ip.input.value === "" ? 40 : Number(ip.input.value), duty_pct: dc.input.value === "" ? 50 : Number(dc.input.value),
+      welder_type: wt.select.value,
     });
     if (r.error) { oEff.textContent = r.error; oOcpd.textContent = "-"; return; }
     oEff.textContent = fmt(r.effective_current_a, 1) + " A (" + fmt(r.duty_multiplier, 2) + "x nameplate)";
     oOcpd.textContent = fmt(r.ocpd_max_a, 0) + " A max (200% of " + fmt(Number(ip.input.value) || 40, 0) + " A)" + (r.ocpd_std_a ? "; largest standard size <= that: " + fmt(r.ocpd_std_a, 0) + " A" : "");
   }, DEBOUNCE_MS);
   for (const f of [ip, dc]) f.input.addEventListener("input", update);
+  wt.select.addEventListener("change", update);
 }
 ELECTRICALFIELD_RENDERERS["welder-arc-circuit-conductor"] = _v932renderWelderArcCircuitConductor;
 

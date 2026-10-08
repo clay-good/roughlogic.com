@@ -109,3 +109,13 @@ test("greenhouse-vent-area reports the floor-area rule beside one air change per
   const tall = computeGreenhouseVentArea({ ...base, gutter_height_ft: 12, ridge_height_ft: 18 });
   assert.ok(tall.target_airflow_cfm > tall.floor_rule_cfm);
 });
+
+test("welder-arc-circuit-conductor: NEC Table 630.11(A) motor-generator column, higher than the nonmotor one", async () => {
+  const { computeWelderArcCircuitConductor: w } = await import("../../calc-electricalfield.js");
+  const mg = (d) => w({ primary_current_a: 40, duty_pct: d, welder_type: "motor_generator" }).duty_multiplier;
+  for (const [d, m] of [[100, 1.0], [90, 0.96], [80, 0.91], [70, 0.86], [60, 0.81], [50, 0.75], [40, 0.69], [30, 0.62], [20, 0.55], [10, 0.55]]) assert.ok(Math.abs(mg(d) - m) < 1e-12, `${d}%`);
+  assert.ok(Math.abs(mg(55) - 0.78) < 1e-12);
+  assert.equal(w({ primary_current_a: 40, duty_pct: 50, welder_type: "motor_generator" }).effective_current_a, 30);
+  assert.ok(Math.abs(w({ primary_current_a: 40, duty_pct: 50 }).effective_current_a - 28.4) < 1e-9);
+  assert.ok(w({ primary_current_a: 40, duty_pct: 50, welder_type: "engine" }).error);
+});

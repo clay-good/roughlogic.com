@@ -32020,10 +32020,9 @@ test("bounds: welder tile scopes to the transformer/rectifier column and rounds 
   assert.ok(Math.abs(odd.ocpd_max_a - 74) < 1e-9);
   assert.strictEqual(odd.ocpd_std_a, 70); // 74 rounds DOWN to 70
   assert.ok(odd.ocpd_std_a <= odd.ocpd_max_a); // never exceeds the 200% ceiling
-  // The note must no longer claim motor-generator coverage, and must name the
-  // transformer/rectifier scope.
   assert.match(r.note, /transformer/i);
-  assert.match(r.note, /motor-generator[^.]*not modeled|different, higher column/i);
+  // Since 2026-10-07 the motor-generator column is modeled; the note names both and says which runs higher.
+  assert.match(r.note, /MOTOR-GENERATOR column runs higher/);
 });
 
 import { computeSeismicEarthPressure as _v1016 } from "../../calc-geotech.js";

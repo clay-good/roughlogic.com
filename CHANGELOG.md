@@ -6,6 +6,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Added
 
+- **`welder-arc-circuit-conductor` now covers motor-generator arc welders.** It carried only the transformer/rectifier column of NEC Table 630.11(A) and told motor-generator users to read the table. A welder-type select now picks the column; the motor-generator column (1.00 / 0.96 / 0.91 / 0.86 / 0.81 / 0.75 / 0.69 / 0.62, then 0.55 at 20% or less) is interpolated linearly between rows. A 40 A, 50%-duty motor-generator welder needs conductors rated 30 A, against 28.4 A for a transformer welder. The note's worked figure, which still said 28.3 A after this morning's switch to the printed 0.71, now says 28.4.
+
 - **`bolt-prying-action`: prying action in tee and angle flanges (spec-v1928, Group E, `calc-steelpanelzone.js`), 2,231 -> 2,232, v0.421.0.** The bolt-tension tiles took the tension per bolt at face value; the slip-critical note said prying "is not modeled here and matters most on thin end plates and tees", and nothing computed it. From the AISC Manual Part 9 relations, the tile reports:
   - the flange thickness that works with prying counted,
   - the thicker flange that makes prying negligible,
