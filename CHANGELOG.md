@@ -6,6 +6,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Added
 
+- **`rc-headed-bar-development`: headed deformed bar development length in tension (spec-v1930, Group E, `calc-concrete.js`), 2,233 -> 2,234, v0.423.0.** `rc-hook-development` covers standard hooks and said headed bars were separate; nothing computed them. The tile gives ACI 318-19 Eq. 25.4.4.2, ldt = (fy psi_e psi_p psi_o psi_c / (75 sqrt(f'c))) db^1.5 with the 8 db and 6 in floors, the Table 25.4.4.3 factors as selects, and the 25.4.4.1 cover, spacing, and head-area conditions. An ACI 318-25 mode uses the 90 coefficient that edition prints.
+
+  It reproduces Dextra's ACI 318-25 headed bar calculation (#8, fy 70,000 psi, f'c 5,800 psi, epoxy coated): 12.092 in. No free 318-19 numeric example was found, so the 318-19 arithmetic is pinned by unit test: an uncoated #8 at 60 ksi in 4,000 psi concrete needs 10.96 in, against 14.9 in for a standard hook.
+
 - **`wood-row-group-tearout`: row and group tear-out of a bolted wood member (spec-v1929, Group E, `calc-construction.js`), 2,232 -> 2,233, v0.422.0.** `wood-bolt-connection` gives a bolt's yield value and `wood-tension-member` the net section; that tile's note said "row/group tear-out is separate", and nothing computed it. From NDS Appendix E the tile reports:
   - net section tension Z'NT = Ft' t (d - n_row Dh),
   - row tear-out Z'RT, each row n Fv' t s_critical with s_critical the lesser of the end distance and the in-row spacing,

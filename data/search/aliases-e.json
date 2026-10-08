@@ -6374,6 +6374,11 @@
     {"term":"group tear-out","target":"wood-row-group-tearout","kind":"industry"},
     {"term":"nds appendix e","target":"wood-row-group-tearout","kind":"redirect"},
     {"term":"bolt group tear out wood","target":"wood-row-group-tearout","kind":"industry"},
-    {"term":"wood connection block shear","target":"wood-row-group-tearout","kind":"adjacent"}
+    {"term":"wood connection block shear","target":"wood-row-group-tearout","kind":"adjacent"},
+    {"term":"headed bar development length","target":"rc-headed-bar-development","kind":"industry"},
+    {"term":"headed rebar ldt","target":"rc-headed-bar-development","kind":"industry"},
+    {"term":"aci 25.4.4","target":"rc-headed-bar-development","kind":"redirect"},
+    {"term":"headed deformed bar anchorage","target":"rc-headed-bar-development","kind":"industry"},
+    {"term":"rebar with head development","target":"rc-headed-bar-development","kind":"question"}
   ]
 }

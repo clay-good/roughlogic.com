@@ -685,7 +685,7 @@ const _TILES = [
   // spec-v281..v283 steel members-and-connections depth batch
   ["steel-beam-ltb", "E"], ["steel-cb", "E"], ["steel-block-shear", "E"], ["steel-tension-member", "E"], ["staggered-net-width", "E"],
   // spec-v284..v286 reinforced-concrete member depth batch
-  ["rc-column-axial", "E"], ["rc-column-steel-for-load", "E"], ["rc-punching-shear", "E"], ["rc-hook-development", "E"],
+  ["rc-column-axial", "E"], ["rc-column-steel-for-load", "E"], ["rc-punching-shear", "E"], ["rc-hook-development", "E"], ["rc-headed-bar-development", "E"],
   // spec-v1008 ACI 318-19 one-way shear without stirrups (detailed size-effect method)
   ["rc-one-way-shear", "E"],
   // spec-v1009 ACI 318-19 minimum shear reinforcement + section-size limit

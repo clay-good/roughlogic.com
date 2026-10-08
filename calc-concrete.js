@@ -564,7 +564,7 @@ export function computeRcHookDevelopment({ db_in = 0, fy_psi = 60000, fc_psi = 4
 export const rcHookDevelopmentExample = { inputs: { db_in: 1.0, fy_psi: 60000, fc_psi: 4000, psi_e: 1.0, psi_r: 1.0, psi_o: 1.0, lambda: 1.0 } };
 
 CONCRETE_RENDERERS["rc-hook-development"] = _simpleRenderer({
-  citation: "Citation: ACI 318-19 Eq. 25.4.3.1a hooked-bar development ldh = (fy psi_e psi_r psi_o psi_c / (55 lambda sqrt(f'c))) db^1.5 with the 25.4.3.2 modification factors (psi_c = f'c/15,000 + 0.6 under 6,000 psi), the 25.4.1.4 sqrt(f'c) <= 100 psi cap (f'c above 10,000 psi does not further shorten ldh), and the max(8 db, 6 in) floor, by name. Standard 90/180 hooks; headed bars are separate. A design aid, not a substitute for the engineer of record.",
+  citation: "Citation: ACI 318-19 Eq. 25.4.3.1a hooked-bar development ldh = (fy psi_e psi_r psi_o psi_c / (55 lambda sqrt(f'c))) db^1.5 with the 25.4.3.2 modification factors (psi_c = f'c/15,000 + 0.6 under 6,000 psi), the 25.4.1.4 sqrt(f'c) <= 100 psi cap (f'c above 10,000 psi does not further shorten ldh), and the max(8 db, 6 in) floor, by name. Standard 90/180 hooks; headed bars are the rc-headed-bar-development tile. A design aid, not a substitute for the engineer of record.",
   example: rcHookDevelopmentExample.inputs,
   fields: [
     { key: "db_in", label: "Bar diameter db (in; #8 = 1.0)", kind: "number" },
@@ -582,6 +582,59 @@ CONCRETE_RENDERERS["rc-hook-development"] = _simpleRenderer({
     { key: "n", id: "rhd-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeRcHookDevelopment,
+});
+
+// ===================== spec-v1930: headed deformed bar development in tension (ACI 318-19 25.4.4) =====================
+// The hook tile says "headed bars (25.4.4) ... are separate". ACI 318-19 Eq. 25.4.4.2(a):
+// ldt = (fy psi_e psi_p psi_o psi_c / (75 sqrt(f'c))) db^1.5, not less than 8 db or 6 in, with
+// psi_p 1.0 (Att >= 0.3 Ahs or s >= 6 db) / 1.6, psi_o 1.0 (inside a column core with 2.5 in side cover,
+// or side cover >= 6 db) / 1.25, psi_e 1.0 / 1.2 epoxy, psi_c = f'c/15,000 + 0.6 below 6,000 psi.
+// ACI 318-25 prints 90 in place of 75 (Dextra's 318-25 calculation: #8, fy 70,000, f'c 5,800, epoxy -> 12.09 in).
+// dims: in { db_in: L, fy_psi: M L^-1 T^-2, fc_psi: M L^-1 T^-2, psi_e: dimensionless, psi_p: dimensionless, psi_o: dimensionless, edition: dimensionless } out: { psi_c: dimensionless, ldt_eq_in: L, floor_in: L, ldt_in: L, min_clear_cover_in: L, min_spacing_in: L }
+export function computeRcHeadedBarDevelopment({ db_in = 0, fy_psi = 60000, fc_psi = 4000, psi_e = 1.0, psi_p = 1.0, psi_o = 1.0, edition = "318-19" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(db_in > 0)) return { error: "Bar diameter must be positive (in)." };
+  if (db_in > 1.41 + 1e-9) return { error: "ACI 25.4.4.1(b) permits a head on No. 11 bars and smaller (db up to 1.41 in); use a hook or the anchor provisions." };
+  if (!(fy_psi > 0) || !(fc_psi > 0)) return { error: "Steel and concrete strengths must be positive (psi)." };
+  const pe = Number(psi_e), pp = Number(psi_p), po = Number(psi_o);
+  if (![1.0, 1.2].includes(pe)) return { error: "psi_e is 1.0 (uncoated or galvanized) or 1.2 (epoxy coated)." };
+  if (![1.0, 1.6].includes(pp)) return { error: "psi_p is 1.0 or 1.6." };
+  if (![1.0, 1.25].includes(po)) return { error: "psi_o is 1.0 or 1.25." };
+  if (edition !== "318-19" && edition !== "318-25") return { error: "Edition must be ACI 318-19 or 318-25." };
+  const psi_c = fc_psi < 6000 ? fc_psi / 15000 + 0.6 : 1.0;
+  const sqrt_fc = Math.min(Math.sqrt(fc_psi), 100);
+  const coef = edition === "318-25" ? 90 : 75;
+  const ldt_eq_in = (fy_psi * pe * pp * po * psi_c / (coef * sqrt_fc)) * Math.pow(db_in, 1.5);
+  const floor_in = Math.max(8 * db_in, 6);
+  const ldt_in = Math.max(ldt_eq_in, floor_in);
+  return {
+    psi_c, coef, ldt_eq_in, floor_in, floor_governs: floor_in >= ldt_eq_in, ldt_in,
+    min_clear_cover_in: 2 * db_in, min_spacing_in: 3 * db_in, min_bearing_area_ratio: edition === "318-25" && fy_psi > 60000 ? 6 : 4,
+    note: "A head lets a bar develop in a fraction of a straight bar's length and with less congestion than a hook: the head bears on the concrete, and the bond along ldt does the rest. ldt runs from the critical section to the bearing face of the head and grows with db^1.5, so a No. 11 needs about twice the length of a No. 7 at the same stress. psi_p rewards ties parallel to the bar (Att at least 0.3 Ahs) or wide bar spacing; psi_o rewards a head inside a column core or with generous side cover. A head is permitted only on No. 11 and smaller bars in normalweight concrete, with the bearing area, cover, and spacing shown; a bar into a beam-column joint should still run to the far face of the confined core. Special moment frame joints (18.8.5) and compression development are separate. A design aid; the engineer of record governs.",
+  };
+}
+export const rcHeadedBarDevelopmentExample = { inputs: { db_in: 1.0, fy_psi: 70000, fc_psi: 5800, psi_e: 1.2, psi_p: 1.0, psi_o: 1.0, edition: "318-25" } };
+
+CONCRETE_RENDERERS["rc-headed-bar-development"] = _simpleRenderer({
+  citation: "Citation: ACI 318-19 Eq. 25.4.4.2(a) headed deformed bar development in tension ldt = (fy psi_e psi_p psi_o psi_c / (75 sqrt(f'c))) db^1.5, not less than 8 db or 6 in, with the Table 25.4.4.3 factors and the 25.4.1.4 sqrt(f'c) <= 100 psi cap, by name; 25.4.4.1 limits heads to No. 11 bars and smaller in normalweight concrete with Abrg >= 4 Ab, clear cover >= 2 db, and spacing >= 3 db. ACI 318-25 prints 90 in place of 75, as worked in Dextra's ACI 318-25 headed bar calculation. The engineer of record governs.",
+  example: rcHeadedBarDevelopmentExample.inputs,
+  fields: [
+    { key: "db_in", label: "Bar diameter db (in; #8 = 1.0, No. 11 maximum)", kind: "number" },
+    { key: "fy_psi", label: "Steel yield fy (psi)", kind: "number" },
+    { key: "fc_psi", label: "Concrete strength f'c (psi, normalweight)", kind: "number" },
+    { key: "psi_e", label: "Coating psi_e", kind: "select", options: [{ value: "1", label: "1.0 uncoated or galvanized", selected: true }, { value: "1.2", label: "1.2 epoxy or dual coated" }] },
+    { key: "psi_p", label: "Parallel ties psi_p", kind: "select", options: [{ value: "1", label: "1.0 Att >= 0.3 Ahs, or wide bar spacing (6 db in 318-19)", selected: true }, { value: "1.6", label: "1.6 other" }] },
+    { key: "psi_o", label: "Location psi_o", kind: "select", options: [{ value: "1", label: "1.0 inside a column core with 2.5 in side cover, or side cover >= 6 db", selected: true }, { value: "1.25", label: "1.25 other" }] },
+    { key: "edition", label: "Code edition", kind: "select", options: [{ value: "318-19", label: "ACI 318-19 (75 sqrt(f'c))", selected: true }, { value: "318-25", label: "ACI 318-25 (90 sqrt(f'c))" }] },
+  ],
+  outputs: [
+    { key: "pc", id: "rhb-out-pc", label: "Strength factor psi_c", value: (r) => fmt(r.psi_c, 3) },
+    { key: "eq", id: "rhb-out-eq", label: "Equation ldt (before floor)", value: (r) => fmt(r.ldt_eq_in, 1) + " in" },
+    { key: "ldt", id: "rhb-out-ldt", label: "Headed bar development ldt", value: (r) => fmt(r.ldt_in, 1) + " in" + (r.floor_governs ? " (the max(8 db, 6 in) floor governs)" : "") },
+    { key: "lim", id: "rhb-out-lim", label: "Head use requires", value: (r) => "clear cover >= " + fmt(r.min_clear_cover_in, 2) + " in, spacing >= " + fmt(r.min_spacing_in, 2) + " in, head bearing area >= " + r.min_bearing_area_ratio + " Ab" },
+    { key: "n", id: "rhb-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeRcHeadedBarDevelopment,
 });
 
 // ===================== spec-v299..v301: reinforced-concrete depth-2 batch =====================

@@ -19736,6 +19736,18 @@ export const CITATIONS = {
       { name: "Spacing maxima", value: "lesser of d/2 and 24 in, halved to d/4 and 12 in once Vs exceeds 4 sqrt(f'c) bw d", source: "ACI 318-19 9.7.6.2.2" },
     ],
   },
+  "rc-headed-bar-development": {
+    formula: "ldt = max[(fy psi_e psi_p psi_o psi_c / (75 sqrt(f'c))) db^1.5, 8 db, 6 in]; psi_c = f'c/15,000 + 0.6 below 6,000 psi, else 1.0; sqrt(f'c) <= 100 psi; ACI 318-25 uses 90 in place of 75.",
+    edition: "ACI 318-19 Eq. 25.4.4.2(a)-(c) with the Table 25.4.4.3 modification factors and the 25.4.4.1 conditions, by name; the ACI 318-25 coefficient as printed in Dextra's ACI 318-25 headed bar calculation (free PDF at dextragroup.com).",
+    freeAccess: "ACI 318 is free to view in ACI's read-only online edition; the 318-19 equation and the psi_p table are reproduced in PCI Journal, March-April 2024 (Ghosh), and the Dextra calculation is a free PDF.",
+    governance: GOVERNANCE.general,
+    editionNote: "Checked against Dextra's ACI 318-25 Rolltec calculation: #8 bar (db 1.0 in), fy 70,000 psi, f'c 5,800 psi, epoxy coated (psi_e 1.2), psi_p 1.0, psi_o 1.0, psi_c 0.99: ldt 12.092 in; this computes 12.092 in the 318-25 mode. The 318-19 mode differs only in the 75 coefficient (PCI Journal March-April 2024 quotes the 318-19 Eq. 25.4.4.2(a)); no free 318-19 numeric example was found, so its arithmetic is pinned by unit test. psi_o 1.25 for a head outside a column core with side cover under 2.5 in and 6 db is the 318-19 value (Kansas headed-bar studies). Between editions the psi_p bar-spacing alternative moved from 6 db to 8 db and the bearing area for Grade 80 and 100 bars rose to 6 Ab; this computes length only.",
+    assumptions: [
+      { name: "Concrete", value: "normalweight; heads are not permitted in lightweight concrete", source: "ACI 318-19 25.4.4.1(d)" },
+      { name: "Bar size", value: "No. 11 and smaller", source: "ACI 318-19 25.4.4.1(b)" },
+      { name: "sqrt(f'c) cap", value: "100 psi", source: "ACI 318-19 25.4.1.4" },
+    ],
+  },
   "rc-hook-development": {
     formula: "psi_c = f'c/15,000 + 0.6 (f'c < 6,000 psi, else 1.0); ldh = (fy psi_e psi_r psi_o psi_c / (55 lambda sqrt(f'c))) db^1.5; ldh = max(ldh, 8 db, 6 in).",
     edition: "The ACI 318-19 Eq. 25.4.3.1a hooked-bar tension development length with the 25.4.3.2 modification factors and the max(8 db, 6 in) minimum, by name.",

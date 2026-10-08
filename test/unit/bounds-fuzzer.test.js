@@ -58359,3 +58359,23 @@ test("bounds: spec-v1929 computeWoodRowGroupTearout reproduces the AWC Appendix 
   assert.ok("error" in _v1929({ ...base, fv_adj_psi: -240 }));
   assert.ok("error" in _v1929({ ...base, fastener_capacity_lb: -1 }));
 });
+
+import { computeRcHeadedBarDevelopment as _v1930 } from "../../calc-concrete.js";
+test("bounds: spec-v1930 computeRcHeadedBarDevelopment reproduces the Dextra ACI 318-25 calculation and its error seams", () => {
+  const base = { db_in: 1.0, fy_psi: 70000, fc_psi: 5800, psi_e: 1.2, psi_p: 1.0, psi_o: 1.0, edition: "318-25" };
+  const r = _v1930(base);
+  assert.ok(Math.abs(r.ldt_in - 12.0919) < 1e-3);
+  // 318-19 differs only in the coefficient: 75 in place of 90.
+  const r19 = _v1930({ ...base, edition: "318-19" });
+  assert.ok(Math.abs(r19.ldt_in / r.ldt_in - 90 / 75) < 1e-12);
+  assert.ok(Math.abs(_v1930({ db_in: 1, fy_psi: 60000, fc_psi: 4000 }).ldt_in - 10.9626) < 1e-3);
+  // Select strings coerce; psi_p and psi_o multiply.
+  assert.ok(Math.abs(_v1930({ ...base, psi_p: "1.6", psi_o: "1.25" }).ldt_in / r.ldt_in - 2) < 1e-12);
+  // The 8 db / 6 in floor governs a small bar in strong concrete; f'c past 10,000 does not shorten it further.
+  assert.equal(_v1930({ db_in: 0.5, fy_psi: 60000, fc_psi: 8000 }).floor_governs, true);
+  assert.equal(_v1930({ db_in: 1, fc_psi: 12000 }).ldt_in, _v1930({ db_in: 1, fc_psi: 10000 }).ldt_in);
+  assert.ok("error" in _v1930({ ...base, db_in: 1.693 }));
+  assert.ok("error" in _v1930({ ...base, psi_p: 1.3 }));
+  assert.ok("error" in _v1930({ ...base, edition: "318-14" }));
+  assert.ok("error" in _v1930({ ...base, fc_psi: -4000 }));
+});

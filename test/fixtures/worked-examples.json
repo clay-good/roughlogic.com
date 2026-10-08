@@ -168056,6 +168056,38 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "rc-headed-bar-development",
+  "source_publisher": "Dextra Group",
+  "source_title": "Headed Bars Calculation Tool in accordance with ACI 318-25 (Rolltec, imperial)",
+  "source_edition_or_year": "ACI 318-25, tool published 2026-04",
+  "source_section_or_page": "pp. 2-4: #8 bar, fy 70,000 psi, f'c 5,800 psi, epoxy coated (psi_e 1.2), psi_p 1.0 (Att >= 0.3 Ahs), psi_o 1.0 (beam-column joint), psi_c 0.99 -> 25.4.4.2(a) 12.092 in, (b) 8 in, (c) 6 in; ldt >= 12.092 in.",
+  "verified_by": "rl",
+  "verified_on": "2026-10-08",
+  "inputs": {
+   "db_in": 1.0,
+   "fy_psi": 70000,
+   "fc_psi": 5800,
+   "psi_e": 1.2,
+   "psi_p": 1.0,
+   "psi_o": 1.0,
+   "edition": "318-25"
+  },
+  "outputs": {
+   "ldt_in": {
+    "value": 12.092,
+    "tolerance": {
+     "pct": 0.05
+    }
+   },
+   "psi_c": {
+    "value": 0.99,
+    "tolerance": {
+     "abs": 0.005
+    }
+   }
+  }
  }
  ]
 }

@@ -1363,6 +1363,7 @@ export const COMPUTE_MAP = {
   "rc-one-way-shear": { module: "../../calc-concrete.js", fn: "computeRcOneWayShear" },
   "rc-min-shear-reinforcement": { module: "../../calc-concrete.js", fn: "computeRcMinShearReinforcement" },
   "rc-hook-development": { module: "../../calc-concrete.js", fn: "computeRcHookDevelopment" },
+  "rc-headed-bar-development": { module: "../../calc-concrete.js", fn: "computeRcHeadedBarDevelopment" },
   // spec-v287..v289 geotechnical foundation depth batch (3 tiles)
   "soil-settlement-elastic": { module: "../../calc-geotech.js", fn: "computeSoilSettlementElastic" },
   "elastic-settlement-allowable-pressure": { module: "../../calc-geotech.js", fn: "computeElasticSettlementAllowablePressure" },

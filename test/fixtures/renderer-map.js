@@ -1049,6 +1049,7 @@ export const RENDERER_MAP = {
   "rc-column-steel-for-load": { module: "../../calc-concrete.js", exportName: "CONCRETE_RENDERERS" },
   "rc-punching-shear": { module: "../../calc-concrete.js", exportName: "CONCRETE_RENDERERS" },
   "rc-hook-development": { module: "../../calc-concrete.js", exportName: "CONCRETE_RENDERERS" },
+  "rc-headed-bar-development": { module: "../../calc-concrete.js", exportName: "CONCRETE_RENDERERS" },
   "rc-one-way-shear": { module: "../../calc-concrete.js", exportName: "CONCRETE_RENDERERS" },
   "rc-min-shear-reinforcement": { module: "../../calc-concrete.js", exportName: "CONCRETE_RENDERERS" },
   "rc-slab-min-thickness": { module: "../../calc-concrete.js", exportName: "CONCRETE_RENDERERS" },

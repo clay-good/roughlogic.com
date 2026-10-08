@@ -1586,6 +1586,7 @@ cross-check.
 | calc-concrete.js | `computeRcCompressionDevLength` | `{ bar_diameter_in = 0, fy_psi = 60000, fc_psi = 4000, lambda = 1.0, psi_r = 1...` | _ | _ | _ |
 | calc-concrete.js | `computeRcDevelopmentLength` | `{ fc = 4000, fy = 60000, db = 0, psi_t = 1.0, psi_e = 1.0, psi_s = 1.0, psi_g...` | _ | _ | _ |
 | calc-concrete.js | `computeRcDoublyReinforced` | `{ b_in = 0, d_in = 0, dp_in = 0, as_in2 = 0, asp_in2 = 0, fc_psi = 4000, fy_p...` | _ | _ | _ |
+| calc-concrete.js | `computeRcHeadedBarDevelopment` | `{ db_in = 0, fy_psi = 60000, fc_psi = 4000, psi_e = 1.0, psi_p = 1.0, psi_o =...` | _ | _ | _ |
 | calc-concrete.js | `computeRcHookDevelopment` | `{ db_in = 0, fy_psi = 60000, fc_psi = 4000, psi_e = 1.0, psi_r = 1.0, psi_o =...` | _ | _ | _ |
 | calc-concrete.js | `computeRcMinShearReinforcement` | `{ fc_psi = 4000, fyt_psi = 60000, bw_in = 0, d_in = 0, av_in2 = 0, vu_kip = 0...` | _ | _ | _ |
 | calc-concrete.js | `computeRcOneWayShear` | `{ fc_psi = 4000, bw_in = 0, d_in = 0, as_in2 = 0, vu_kip = 0, lambda = 1.0 } ...` | _ | _ | _ |
@@ -3902,7 +3903,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2486.
+Row count: 2487.
 
 <!-- END function-corpus-v14 -->
 
@@ -4678,7 +4679,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-extraction-rate` | Water Extraction Volume, Time, and Waste-Tank Dumps | Project (first-principles); standing + absorbed; wand time = total / gpm | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+4 more) |
 
-### Group E Construction (618 tiles)
+### Group E Construction (619 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -5049,6 +5050,7 @@ per spec-v14 §13.1 second paragraph.
 | `rc-compression-dev-length` | Rebar Compression Development Length (ACI 318-19 25.4.9) | ACI 318-19 25.4.9.2; spec-v491 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `rc-development-length` | Rebar Tension Development Length (ACI 318-19) | ACI 318-19 (Building Code Requirement...; spec-v259 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+4 more) |
 | `rc-doubly-reinforced` | Doubly-Reinforced Concrete Beam Flexural Capacity (ACI 318-19) | ACI 318-19 doubly-reinforced flexure; spec-v300 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
+| `rc-headed-bar-development` | Headed Bar Development Length (ACI 318-19 25.4.4) | Dextra Group; pp. 2-4: #8 bar, fy 70,000 psi, f'c 5,800 psi, epoxy coat... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `rc-hook-development` | Standard Hook Development Length (ACI 318-19 25.4.3) | ACI 318-19 Eq. 25.4.3.1a; spec-v286 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `rc-min-shear-reinforcement` | Minimum Stirrups and the Section-Size Limit (ACI 318-19 9.6.3) | ACI 318-19 9.6.3.4 / 9.6.3.1 / 22.5.1...; spec-v1009 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `rc-one-way-shear` | One-Way Concrete Shear Without Stirrups (ACI 318-19 22.5.5.1) | ACI 318-19 Table 22.5.5.1(c); spec-v1008 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
@@ -6308,6 +6310,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 
-Tile count: 2233. Fixture-covered or reference-cadence: 2233 / 2233.
+Tile count: 2234. Fixture-covered or reference-cadence: 2234 / 2234.
 
 <!-- END tile-index-v14 -->

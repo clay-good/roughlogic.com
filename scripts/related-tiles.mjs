@@ -2088,6 +2088,7 @@ const RELATED = {
   "rc-one-way-shear": ["rc-beam-shear","rc-punching-shear","footing-area"],
   "rc-min-shear-reinforcement": ["rc-beam-shear","rc-one-way-shear","concrete-torsion-threshold"],
   "rc-hook-development": ["rc-development-length","rebar-lap-splice","rebar"],
+  "rc-headed-bar-development": ["rc-hook-development","rc-development-length","concrete-anchor-pullout"],
   // spec-v287..v289 geotechnical foundation depth batch (Group E)
   "soil-settlement-elastic": ["soil-bearing-capacity","footing-area","pile-axial-capacity"],
   "elastic-settlement-allowable-pressure": ["soil-settlement-elastic","soil-bearing-capacity","footing-area","soil-consolidation-settlement"],

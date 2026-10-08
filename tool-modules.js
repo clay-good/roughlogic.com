@@ -855,7 +855,7 @@ export const TOOL_MODULES = (() => {
     "rc-beam-flexure", "rc-tbeam-flexure", "rc-beam-shear", "rc-development-length",
     "concrete-torsion-threshold",
     // spec-v284..v286 member depth batch
-    "rc-column-axial", "rc-column-steel-for-load", "rc-punching-shear", "rc-hook-development",
+    "rc-column-axial", "rc-column-steel-for-load", "rc-punching-shear", "rc-hook-development", "rc-headed-bar-development",
     // spec-v1008 one-way shear without stirrups (ACI 318-19 22.5.5.1 detailed method)
     "rc-one-way-shear",
     // spec-v1009 minimum stirrups + the 22.5.1.2 section-size ceiling
