@@ -2217,6 +2217,7 @@ const RELATED = {
   "wall-condensation-gradient": ["surface-condensation-risk","assembly-r-value","building-ua"],
   // spec-v332..v334 wood-fastener withdrawal batch (Group E)
   "wood-nail-withdrawal": ["fastener-pullout","wood-lag-withdrawal","wood-screw-withdrawal"],
+  "wood-nail-lateral": ["wood-nail-withdrawal","wood-bolt-connection","wood-row-group-tearout"],
   "wood-lag-withdrawal": ["wood-nail-withdrawal","wood-screw-withdrawal","fastener-pullout"],
   "wood-screw-withdrawal": ["wood-nail-withdrawal","wood-lag-withdrawal","fastener-pullout"],
   // spec-v119 equilibrium moisture content of wood (Group D)

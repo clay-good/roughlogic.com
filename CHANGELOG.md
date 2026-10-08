@@ -66,6 +66,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Added
 
+- **`wood-nail-lateral`: lateral design value of a nail, face- or toe-nailed (spec-v1932, Group E, `calc-construction.js`), 2,235 -> 2,236, v0.425.0.** The withdrawal tiles covered pulling a nail out and `wood-bolt-connection` covered bolts from 1/4 in up; nothing gave a nail's lateral value Z. The tile runs the six NDS 12.3.1 yield modes with Rd = 2.2, Fe = 16,600 G^1.84, Fyb by diameter, and the 12.5.4 toe-nail geometry and Ctn = 0.83.
+
+  It reproduces AWC Design Aid No. 2: a 16d common toe-nailed into Douglas fir-larch lists 117 lb and computes 116.8 (mode IV); all nine species columns of that row agree within 1 lb, and an 8d common lists 80 against 79.6. Face-nailed through 1-1/2 in, the same 16d carries 140.7 lb.
+
 - **`wood-tension-bending`: bending plus axial tension in a wood member (spec-v1931, Group E, `calc-construction.js`), 2,234 -> 2,235, v0.424.0.** `wood-combined-bending-axial` covers compression plus bending and said tension plus bending was separate, so a truss bottom chord carrying a ceiling had no check. The tile gives NDS 3.9.1 on both faces:
   - the tension face, ft/Ft' + fb/Fb*, with Fb* taken without the beam stability factor CL;
   - the compression face, (fb - ft)/Fb**, with Fb** taken without the volume factor CV.

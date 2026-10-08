@@ -610,7 +610,7 @@ export const TOOL_MODULES = (() => {
     // trade expansion v1411
     "curtain-wall-mullion-deflection",
     // spec-v332..v334 wood-fastener withdrawal batch.
-    "wood-nail-withdrawal", "wood-lag-withdrawal", "wood-screw-withdrawal",
+    "wood-nail-withdrawal", "wood-nail-lateral", "wood-lag-withdrawal", "wood-screw-withdrawal",
     "cantilever-beam", "section-properties", "combined-stress-axial-bending",
     "shaft-torsion", "shaft-diameter-for-torsion", "thermal-stress-restrained", "thermal-stress-max-deltat", "hoop-stress-thin-wall", "hoop-stress-mawp",
     "seismic-design-spectral-acceleration", "seismic-story-drift", "seismic-pdelta-stability",

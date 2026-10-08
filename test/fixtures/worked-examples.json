@@ -168120,6 +168120,64 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "wood-nail-lateral",
+  "source_publisher": "American Wood Council (AWC)",
+  "source_title": "Design Aid No. 2, Toe-Nail Connections: Reference Lateral Design Values (Z) for Toe-Nailed Connections",
+  "source_edition_or_year": "2007 (NDS 2001 and later provisions)",
+  "source_section_or_page": "Table, common nail 0.162 in x 3.5 in (Ls 1.17, Lm 1.86 in), both members G = 0.50 (Douglas fir-larch): 117 lb, Ctn = 0.83 included.",
+  "verified_by": "rl",
+  "verified_on": "2026-10-08",
+  "inputs": {
+   "d_in": 0.162,
+   "length_in": 3.5,
+   "side_in": 1.5,
+   "gm": 0.5,
+   "gs": 0.5,
+   "toenail": "yes",
+   "cd": 1.0
+  },
+  "outputs": {
+   "z_adj_lb": {
+    "value": 117,
+    "tolerance": {
+     "pct": 1.0
+    }
+   },
+   "p_in": {
+    "value": 1.86,
+    "tolerance": {
+     "abs": 0.01
+    }
+   }
+  }
+ },
+ {
+  "tile_id": "wood-nail-lateral",
+  "source_publisher": "American Wood Council (AWC)",
+  "source_title": "Design Aid No. 2, Toe-Nail Connections: Reference Lateral Design Values (Z) for Toe-Nailed Connections",
+  "source_edition_or_year": "2007 (NDS 2001 and later provisions)",
+  "source_section_or_page": "Table, common nail 0.131 in x 2.5 in (Ls 0.83, Lm 1.33 in), both members G = 0.50: 80 lb, Ctn = 0.83 included.",
+  "verified_by": "rl",
+  "verified_on": "2026-10-08",
+  "inputs": {
+   "d_in": 0.131,
+   "length_in": 2.5,
+   "side_in": 1.5,
+   "gm": 0.5,
+   "gs": 0.5,
+   "toenail": "yes",
+   "cd": 1.0
+  },
+  "outputs": {
+   "z_adj_lb": {
+    "value": 80,
+    "tolerance": {
+     "pct": 1.0
+    }
+   }
+  }
  }
  ]
 }

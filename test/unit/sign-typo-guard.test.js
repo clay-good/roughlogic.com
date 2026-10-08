@@ -86,6 +86,7 @@ const CEILING_EXEMPT = [
   "wood-nail-withdrawal::cd", // NDS load-duration factor CD, 1.6 for wind
   "wood-lag-withdrawal::cd",
   "wood-screw-withdrawal::cd",
+  "wood-nail-lateral::cd",
   "hose-lay-section-count::slack_fraction", // a slack allowance, not a share
   "screen-deck-capacity::efficiency_factor", // sizing factor, ~2 at low efficiency
   "blast-fume-clearance-time::target_fraction_pct", // a percent; the compute caps it at 100

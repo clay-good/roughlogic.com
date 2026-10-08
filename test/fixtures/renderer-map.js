@@ -772,6 +772,7 @@ export const RENDERER_MAP = {
   "ramp-detail-check": { module: "../../calc-construction.js", exportName: "CONSTRUCTION_RENDERERS" },
   "curtain-wall-mullion-deflection": { module: "../../calc-construction.js", exportName: "CONSTRUCTION_RENDERERS" },
   "wood-nail-withdrawal": { module: "../../calc-construction.js", exportName: "CONSTRUCTION_RENDERERS" },
+  "wood-nail-lateral": { module: "../../calc-construction.js", exportName: "CONSTRUCTION_RENDERERS" },
   "wood-lag-withdrawal": { module: "../../calc-construction.js", exportName: "CONSTRUCTION_RENDERERS" },
   "wood-screw-withdrawal": { module: "../../calc-construction.js", exportName: "CONSTRUCTION_RENDERERS" },
   "cantilever-beam": { module: "../../calc-construction.js", exportName: "CONSTRUCTION_RENDERERS" },

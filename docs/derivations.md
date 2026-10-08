@@ -1837,6 +1837,7 @@ cross-check.
 | calc-construction.js | `computeWoodBoltConnection` | `{ d_in = 0, lm_in = 0, ls_in = 0, gm = 0.50, gs = 0.50, fyb_psi = 45000, thet...` | _ | _ | _ |
 | calc-construction.js | `computeWoodCombinedBendingAxial` | `{ p_lb = 0, m_inlb = 0, a_in2 = 0, s_in3 = 0, fc_adj_psi = 0, fb_adj_psi = 0,...` | _ | _ | _ |
 | calc-construction.js | `computeWoodLagWithdrawal` | `{ g = 0, d_in = 0, p_thread_in = 0, cd = 1.0, end_grain = "no" } = {}` | _ | _ | _ |
+| calc-construction.js | `computeWoodNailLateral` | `{ d_in = 0, length_in = 0, side_in = 0, gm = 0.5, gs = 0.5, fyb_psi, toenail ...` | _ | _ | _ |
 | calc-construction.js | `computeWoodNailWithdrawal` | `{ g = 0, d_in = 0, p_in = 0, cd = 1.0, toenail = "no", cm = 1.0 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeWoodRowGroupTearout` | `{ t_in = 0, d_in = 0, dh_in = 0, n_rows = 1, bolts_outer_row = 0, bolts_inner...` | _ | _ | _ |
 | calc-construction.js | `computeWoodScrewWithdrawal` | `{ g = 0, d_in = 0, p_in = 0, cd = 1.0 } = {}` | _ | _ | _ |
@@ -3904,7 +3905,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2488.
+Row count: 2489.
 
 <!-- END function-corpus-v14 -->
 
@@ -4680,7 +4681,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-extraction-rate` | Water Extraction Volume, Time, and Waste-Tank Dumps | Project (first-principles); standing + absorbed; wand time = total / gpm | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+4 more) |
 
-### Group E Construction (620 tiles)
+### Group E Construction (621 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -5299,6 +5300,7 @@ per spec-v14 §13.1 second paragraph.
 | `wood-bolt-connection` | Single-Shear Bolted / Dowel Lateral Design Value (NDS Yield-Limit Z) | NDS Table 12.3.1A (National Design Sp...; spec-v265 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `wood-combined-bending-axial` | Wood Beam-Column Interaction (NDS 3.9.2) | NDS 2018 3.9.2 (Eq. 3.9-3); spec-v292 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wood-lag-withdrawal` | Lag Screw Withdrawal Design Value (NDS 12.2.1) | NDS 2018 12.2.1; spec-v333 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
+| `wood-nail-lateral` | Nail Lateral Design Value (NDS Yield Limit, Face- or Toe-Nailed) | American Wood Council (AWC); Table, common nail 0.162 in x 3.5 in (Ls 1.17, Lm 1.86 in... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wood-nail-withdrawal` | Nail Withdrawal Design Value (NDS 12.2.3) | NDS 2018 12.2.3; spec-v332 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `wood-row-group-tearout` | Wood Connection Row and Group Tear-Out (NDS Appendix E) | American Wood Council (AWC); pp. 10-11: 3-1/8 x 12 Comb. 3 DF glulam, Fv' 240 psi, Ft'... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wood-screw-withdrawal` | Wood Screw Withdrawal Design Value (NDS 12.2.2) | NDS 2018 12.2.2; spec-v334 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
@@ -6312,6 +6314,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 
-Tile count: 2235. Fixture-covered or reference-cadence: 2235 / 2235.
+Tile count: 2236. Fixture-covered or reference-cadence: 2236 / 2236.
 
 <!-- END tile-index-v14 -->

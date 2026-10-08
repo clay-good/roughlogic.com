@@ -58467,3 +58467,23 @@ test("bounds: formwork-pressure takes the unit weight from the weight factor whe
   const light = _fwBlank({ ...base, weight_factor: "lightweight_115", unit_weight_pcf: undefined });
   assert.ok(Math.abs(light.pressure_psf / normal.pressure_psf - 0.5 * (1 + 115 / 145)) < 1e-9);
 });
+
+import { computeWoodNailLateral as _v1932 } from "../../calc-construction.js";
+test("bounds: spec-v1932 computeWoodNailLateral reproduces AWC Design Aid No. 2 and its error seams", () => {
+  const toe = (d, L, g) => _v1932({ d_in: d, length_in: L, gm: g, gs: g, toenail: "yes" });
+  const r = toe(0.162, 3.5, 0.5);
+  assert.equal(r.governing_mode, "IV");
+  assert.ok(Math.abs(r.z_adj_lb - 117) < 0.5 && Math.abs(r.p_in - 1.8644) < 1e-3);
+  assert.ok(Math.abs(toe(0.162, 3.5, 0.55).z_adj_lb - 128) < 0.6);
+  assert.ok(Math.abs(toe(0.131, 2.5, 0.5).z_adj_lb - 80) < 0.6);
+  assert.ok(Math.abs(toe(0.099, 2, 0.5).z_adj_lb - 46) < 0.5);
+  // Face-nailed, the same nail through 1-1/2 in is the mode IV value without Ctn.
+  const face = _v1932({ d_in: 0.162, length_in: 3.5, side_in: 1.5 });
+  assert.ok(Math.abs(face.z_lb - r.z_lb) < 1e-9 && face.ctn === 1);
+  // Fyb by diameter; CD scales the adjusted value.
+  assert.equal(face.fyb_psi, 90000);
+  assert.ok(Math.abs(_v1932({ d_in: 0.162, length_in: 3.5, side_in: 1.5, cd: 1.6 }).z_adj_lb - 1.6 * face.z_lb) < 1e-9);
+  assert.ok("error" in _v1932({ d_in: 0.162, length_in: 2, side_in: 1.5 }));
+  assert.ok("error" in _v1932({ d_in: 0.25, length_in: 4, side_in: 1.5 }));
+  assert.ok("error" in _v1932({ d_in: 0.162, length_in: 3.5, side_in: 1.5, gm: 1.2 }));
+});

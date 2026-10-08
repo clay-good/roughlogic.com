@@ -766,7 +766,7 @@ const _TILES = [
   ["tanker-fleet-size", "F"],
   ["foam-eductor-limit", "F"], ["extinguisher-coverage", "F"],
   // spec-v332..v334 wood-fastener withdrawal batch (calc-construction.js Group E)
-  ["wood-nail-withdrawal", "E"], ["wood-lag-withdrawal", "E"], ["wood-screw-withdrawal", "E"],
+  ["wood-nail-withdrawal", "E"], ["wood-nail-lateral", "E"], ["wood-lag-withdrawal", "E"], ["wood-screw-withdrawal", "E"],
   ["cantilever-beam", "E"], ["section-properties", "E"], ["combined-stress-axial-bending", "E"],
   ["shaft-torsion", "E"], ["shaft-diameter-for-torsion", "E"], ["thermal-stress-restrained", "E"], ["thermal-stress-max-deltat", "E"], ["hoop-stress-thin-wall", "E"], ["hoop-stress-mawp", "E"],
   ["seismic-design-spectral-acceleration", "E"], ["seismic-story-drift", "E"], ["seismic-pdelta-stability", "E"],

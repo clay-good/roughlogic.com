@@ -116407,6 +116407,31 @@
    "term": "bottom chord ceiling load check",
    "target": "wood-tension-bending",
    "kind": "question"
+  },
+  {
+   "term": "nail lateral design value",
+   "target": "wood-nail-lateral",
+   "kind": "industry"
+  },
+  {
+   "term": "toenail lateral capacity",
+   "target": "wood-nail-lateral",
+   "kind": "industry"
+  },
+  {
+   "term": "16d nail shear capacity",
+   "target": "wood-nail-lateral",
+   "kind": "question"
+  },
+  {
+   "term": "nail yield limit z",
+   "target": "wood-nail-lateral",
+   "kind": "industry"
+  },
+  {
+   "term": "how much load does a nail hold sideways",
+   "target": "wood-nail-lateral",
+   "kind": "question"
   }
  ]
 }

@@ -1773,7 +1773,7 @@ review during the v0.11 release window._
   `npk-blend` (lb/acre, bag-count, kg/ha), EN.19 `sprayer-calibration`
   (tank-batches + refill points); X +1 EN.20 `cap-rate-dscr` (loan-derived
   debt service + break-even occupancy).
-- **Gate results**: `npm run lint` green; `npm run test:unit` **5,086 pass /
+- **Gate results**: `npm run lint` green; `npm run test:unit` **5,088 pass /
   0 fail** (+20 enhancement tests in
   [../test/unit/calc-v23-enhancements.test.js](../test/unit/calc-v23-enhancements.test.js));
   the tile-contract sweep **improved** — the new RC-1 guards cleared 3

@@ -17425,6 +17425,19 @@ export const CITATIONS = {
       { name: "Short member", value: "no P-delta amplification; not a slender-column beam-column check", source: "scope of this tile" },
     ],
   },
+  "wood-nail-lateral": {
+    formula: "Fe = 16,600 G^1.84; Re = Fem/Fes; Rt = p/ls; Rd = 2.2 (D <= 0.17 in) or 10 D + 0.5; Im = D p Fem/Rd; Is = D ls Fes/Rd; II = k1 D ls Fes/Rd; IIIm = k2 D p Fem/((1 + 2Re) Rd); IIIs = k3 D ls Fem/((2 + Re) Rd); IV = (D^2/Rd) sqrt(2 Fem Fyb/(3(1 + Re))); Z = least; toenailed ls = L/3, p = L cos 30 - L/3, Ctn = 0.83; adjusted = Z Ctn CD.",
+    edition: "ANSI/AWC NDS (2018) 12.3.1 yield-limit equations, Table 12.3.3 dowel bearing strength, Appendix I bending yield strengths, and 12.5.4 toe-nail provisions, by name; as tabulated in AWC Design Aid No. 2, Toe-Nail Connections (free at awc.org).",
+    freeAccess: "The NDS is free to view at awc.org; AWC Design Aid No. 2 is a free PDF; the yield model is also in the USDA Forest Products Laboratory Wood Handbook, chapter 8.",
+    governance: GOVERNANCE.general,
+    editionNote: "Checked against AWC Design Aid No. 2 (toe-nailed, both members of the same G, Ctn 0.83 included): a 16d common (0.162 x 3.5 in) lists 153 / 128 / 117 / 114 / 108 / 101 / 99 / 82 / 80 lb at G 0.67 / 0.55 / 0.50 / 0.49 / 0.46 / 0.43 / 0.42 / 0.37 / 0.36; this computes 152.9 / 127.5 / 116.8 / 114.6 / 108.2 / 101.6 / 99.4 / 82.5 / 79.3. An 8d common (0.131 x 2.5 in) at G 0.50 lists 80 lb; this computes 79.6. The design aid appears to use the NDS table's dowel bearing strengths, which round Fe to 50 psi.",
+    assumptions: [
+      { name: "Reduction term", value: "Rd = KD = 2.2 for D <= 0.17 in, 10 D + 0.5 to 0.25 in", source: "NDS 2018 Table 12.3.1B" },
+      { name: "Fyb", value: "100,000 psi to 0.142 in, 90,000 to 0.177, 80,000 to 0.236, 70,000 to 0.273 unless entered", source: "NDS 2018 Appendix I, Table I1" },
+      { name: "Penetration", value: "at least 6 D into the main member", source: "NDS 2018 12.3" },
+      { name: "Toe-nail", value: "side length L/3, penetration L cos 30 - L/3, Ctn = 0.83", source: "NDS 2018 12.5.4" },
+    ],
+  },
   "wood-nail-withdrawal": {
     formula: "W = 1,380 G^(5/2) D (lb/in); Ctn = toenailed ? 0.67 : 1.0; CM = 1.0, or 0.25 when the wood's moisture changes after nailing (NDS Table 11.3.3); Z_w = W x p x CD x CM x Ctn.",
     edition: "The NDS 2018 12.2.3 reference nail/spike withdrawal design value and the toenail factor, by name; the 1,380 empirical constant is named.",

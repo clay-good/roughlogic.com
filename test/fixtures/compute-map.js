@@ -1531,6 +1531,7 @@ export const COMPUTE_MAP = {
   "extinguisher-coverage": { module: "../../calc-fire.js", fn: "computeExtinguisherCoverage" },
   // spec-v332..v334 wood-fastener withdrawal batch (3 tiles)
   "wood-nail-withdrawal": { module: "../../calc-construction.js", fn: "computeWoodNailWithdrawal" },
+  "wood-nail-lateral": { module: "../../calc-construction.js", fn: "computeWoodNailLateral" },
   "wood-lag-withdrawal": { module: "../../calc-construction.js", fn: "computeWoodLagWithdrawal" },
   "wood-screw-withdrawal": { module: "../../calc-construction.js", fn: "computeWoodScrewWithdrawal" },
   "cantilever-beam": { module: "../../calc-construction.js", fn: "computeCantileverBeam" },

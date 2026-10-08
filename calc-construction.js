@@ -7385,6 +7385,81 @@ const _renderWoodNailWithdrawal = _simpleRenderer({
 });
 CONSTRUCTION_RENDERERS["wood-nail-withdrawal"] = _renderWoodNailWithdrawal;
 
+// ===================== spec-v1932: nail lateral design value (NDS 12.3.1 yield limit) =====================
+// The withdrawal tiles cover pulling a nail out; wood-bolt-connection covers bolts from 1/4 in up. This is
+// the single-shear lateral value Z of a nail, wood to wood: the six NDS yield modes with Rd = KD (2.2 for
+// D <= 0.17 in, 10 D + 0.5 to 0.25 in), dowel bearing Fe = 16,600 G^1.84, Fyb by diameter (NDS Table I1),
+// and the main-member length the penetration p. Toe-nailed: side length L/3, p = L cos 30 - L/3, Ctn 0.83.
+// Checked against AWC Design Aid No. 2 (toe-nails): a 16d common (0.162 x 3.5 in) at G 0.50 lists 117 lb.
+const _NAIL_FE = (g) => 16600 * Math.pow(g, 1.84);
+const _nailFyb = (d) => (d <= 0.142 ? 100000 : d <= 0.177 ? 90000 : d <= 0.236 ? 80000 : 70000);
+// dims: in { d_in: L, length_in: L, side_in: L, gm: dimensionless, gs: dimensionless, fyb_psi: M L^-1 T^-2, toenail: dimensionless, cd: dimensionless } out: { p_in: L, z_lb: M L T^-2, z_adj_lb: M L T^-2 }
+export function computeWoodNailLateral({ d_in = 0, length_in = 0, side_in = 0, gm = 0.5, gs = 0.5, fyb_psi, toenail = "no", cd = 1.0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(d_in > 0) || d_in >= 0.25) return { error: "Nail diameter must be over 0 and under 1/4 in (larger dowels are the bolt calculation)." };
+  if (!(length_in > 0)) return { error: "Nail length must be positive (in)." };
+  if (!(gm > 0 && gm < 1) || !(gs > 0 && gs < 1)) return { error: "Specific gravities must be between 0 and 1 (0.50 Douglas fir-larch, 0.55 southern pine)." };
+  if (toenail !== "no" && toenail !== "yes") return { error: "Toenailed must be yes or no." };
+  if (!(cd > 0)) return { error: "The load-duration factor CD must be positive." };
+  const toe = toenail === "yes";
+  if (!toe && !(side_in > 0)) return { error: "Side member thickness must be positive (in)." };
+  const ls = toe ? length_in / 3 : side_in;
+  const p = toe ? length_in * Math.cos(Math.PI / 6) - length_in / 3 : length_in - side_in;
+  if (!(p >= 6 * d_in - 1e-9)) return { error: "Penetration into the main member is " + p.toFixed(2) + " in; the NDS yield model needs at least 6 D (" + (6 * d_in).toFixed(2) + " in) -- use a longer nail." };
+  const D = d_in;
+  const fyb = fyb_psi === undefined || fyb_psi === null || fyb_psi === 0 ? _nailFyb(D) : Number(fyb_psi);
+  if (!(fyb > 0)) return { error: "Bending yield strength Fyb must be positive (psi)." };
+  const Fem = _NAIL_FE(gm), Fes = _NAIL_FE(gs);
+  const Re = Fem / Fes, Rt = p / ls;
+  const Rd = D <= 0.17 ? 2.2 : 10 * D + 0.5;
+  const k1 = (Math.sqrt(Re + 2 * Re * Re * (1 + Rt + Rt * Rt) + Rt * Rt * Re * Re * Re) - Re * (1 + Rt)) / (1 + Re);
+  const k2 = -1 + Math.sqrt(2 * (1 + Re) + 2 * fyb * (1 + 2 * Re) * D * D / (3 * Fem * p * p));
+  const k3 = -1 + Math.sqrt(2 * (1 + Re) / Re + 2 * fyb * (2 + Re) * D * D / (3 * Fem * ls * ls));
+  const modes = {
+    Im: D * p * Fem / Rd,
+    Is: D * ls * Fes / Rd,
+    II: k1 * D * ls * Fes / Rd,
+    IIIm: k2 * D * p * Fem / ((1 + 2 * Re) * Rd),
+    IIIs: k3 * D * ls * Fem / ((2 + Re) * Rd),
+    IV: D * D / Rd * Math.sqrt(2 * Fem * fyb / (3 * (1 + Re))),
+  };
+  let governing_mode = "Im";
+  for (const k of Object.keys(modes)) if (modes[k] < modes[governing_mode] - 1e-12) governing_mode = k;
+  const z_lb = modes[governing_mode];
+  const ctn = toe ? 0.83 : 1.0;
+  const z_adj_lb = z_lb * ctn * cd;
+  if (![z_lb, z_adj_lb, p, ls].every(Number.isFinite)) return { error: "Nail yield math is not a finite value." };
+  return {
+    p_in: p, side_len_in: ls, fyb_psi: fyb, fem_psi: Fem, fes_psi: Fes, rd: Rd, modes, governing_mode, z_lb, ctn, z_adj_lb,
+    note: "NDS 12.3.1 yield-limit lateral design value for one nail in single shear, wood to wood: the smallest of the six yield modes, with dowel bearing Fe = 16,600 G^1.84 for each member, the nail's bending yield strength Fyb (NDS Appendix I: 100,000 psi to 0.142 in, 90,000 to 0.177, 80,000 to 0.236, 70,000 to 0.273), and Rd = 2.2 for a nail up to 0.17 in. The main-member length is the penetration p, which must be at least 6 D. Toenailed, NDS 12.5.4 takes the side length as L/3 and the penetration as L cos 30 - L/3, and multiplies by Ctn = 0.83. The adjusted value here applies CD and Ctn only; apply CM, Ct, Cg, the geometry and end-grain factors, and the diaphragm factor where they govern. A design aid; the engineer of record governs.",
+  };
+}
+export const woodNailLateralExample = { inputs: { d_in: 0.162, length_in: 3.5, side_in: 1.5, gm: 0.5, gs: 0.5, toenail: "yes", cd: 1.0 } };
+
+const _renderWoodNailLateral = _simpleRenderer({
+  citation: "Citation: NDS 2018 12.3.1 yield-limit equations (modes Im, Is, II, IIIm, IIIs, IV) with Rd = KD = 2.2 for D <= 0.17 in, dowel bearing strength Fe = 16,600 G^1.84 (NDS Table 12.3.3), Fyb by diameter (NDS Appendix I), and the toe-nail geometry and Ctn = 0.83 of 12.5.4, by name; as tabulated in AWC Design Aid No. 2, Toe-Nail Connections (free at awc.org). The engineer of record governs.",
+  example: woodNailLateralExample.inputs,
+  fields: [
+    { key: "d_in", label: "Nail diameter D (in; 16d common 0.162, 8d common 0.131)", kind: "number" },
+    { key: "length_in", label: "Nail length L (in)", kind: "number" },
+    { key: "side_in", label: "Side member thickness (in; not used when toenailed)", kind: "number" },
+    { key: "gm", label: "Main member specific gravity G (0.50 DF-L)", kind: "number", default: 0.5 },
+    { key: "gs", label: "Side member specific gravity G", kind: "number", default: 0.5 },
+    { key: "fyb_psi", label: "Nail bending yield Fyb (psi, blank = by diameter)", kind: "number", blankUndefined: true },
+    { key: "toenail", label: "Toenailed?", kind: "select", options: [{ value: "no", label: "No (face-nailed through the side member)" }, { value: "yes", label: "Yes (toenailed, Ctn = 0.83)" }], default: "no" },
+    { key: "cd", label: "Load-duration factor CD (1.6 wind/seismic)", kind: "number", default: 1 },
+  ],
+  outputs: [
+    { key: "z", id: "wnl-out-z", label: "Reference lateral value Z", value: (r) => fmt(r.z_lb, 0) + " lb (mode " + r.governing_mode + ")" },
+    { key: "a", id: "wnl-out-a", label: "Adjusted for CD and toe-nailing", value: (r) => fmt(r.z_adj_lb, 0) + " lb" + (r.ctn < 1 ? " (x 0.83 toe-nail)" : "") },
+    { key: "p", id: "wnl-out-p", label: "Penetration p / side length", value: (r) => fmt(r.p_in, 2) + " in / " + fmt(r.side_len_in, 2) + " in" },
+    { key: "m", id: "wnl-out-m", label: "All six yield modes", value: (r) => Object.entries(r.modes).map(([k, v]) => k + " " + fmt(v, 0)).join(", ") + " lb" },
+    { key: "n", id: "wnl-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeWoodNailLateral,
+});
+CONSTRUCTION_RENDERERS["wood-nail-lateral"] = _renderWoodNailLateral;
+
 // dims: in { g: dimensionless, d_in: L, p_thread_in: L, cd: dimensionless, end_grain: dimensionless } out: { w_lbin: M T^-2, z_w: M L T^-2 }
 export function computeWoodLagWithdrawal({ g = 0, d_in = 0, p_thread_in = 0, cd = 1.0, end_grain = "no" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
