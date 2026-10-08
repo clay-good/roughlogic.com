@@ -3658,6 +3658,7 @@ cross-check.
 | calc-steel.js | `computeSteelTauBStiffnessReduction` | `{ pr_kip = 0, fy_ksi = 50, ag_in2 = 0, method = "LRFD" } = {}` | _ | _ | _ |
 | calc-steel.js | `computeSteelTensionMember` | `{ ag_in2 = 0, fy = 36, fu = 58, t_in = 0, dh_in = 0.875, nh = 0, xbar_in = 0,...` | _ | _ | _ |
 | calc-steel.js | `computeSteelWebLocalStrength` | `{ fy = 50, tw = 0, tf = 0, k_in = 0, d_in = 0, lb_in = 0, location = "interio...` | _ | _ | _ |
+| calc-steelpanelzone.js | `computeBoltPryingAction` | `{ tension_per_bolt_kip = 0, bolt_available_kip = 0, bolt_dia_in = 0, hole_dia...` | _ | _ | _ |
 | calc-steelpanelzone.js | `computeSteelDoublerPlate` | `{ required_shear_kip = 0, fy_ksi = 50, col_depth_dc_in = 0, col_web_tw_in = 0...` | _ | _ | _ |
 | calc-steelpanelzone.js | `computeSteelPanelZoneAxial` | `{ fy_ksi = 50, col_depth_dc_in = 0, col_web_tw_in = 0, col_area_ag_in2 = 0, p...` | _ | _ | _ |
 | calc-steelpanelzone.js | `computeSteelPanelZoneShear` | `{ fy_ksi = 50, col_depth_dc_in = 0, col_web_tw_in = 0, col_flange_bcf_in = 0,...` | _ | _ | _ |
@@ -3900,7 +3901,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2484.
+Row count: 2485.
 
 <!-- END function-corpus-v14 -->
 
@@ -4676,7 +4677,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-extraction-rate` | Water Extraction Volume, Time, and Waste-Tank Dumps | Project (first-principles); standing + absorbed; wand time = total / gpm | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+4 more) |
 
-### Group E Construction (616 tiles)
+### Group E Construction (617 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4725,6 +4726,7 @@ per spec-v14 §13.1 second paragraph.
 | `blast-stemming-length` | Blast Hole Stemming Length and Flyrock Screen | Project (first-principles); flyrock is a fatality mechanism; the blaster in charge go... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+4 more) |
 | `board-footage` | Lumber Board Footage | Project (first-principles); Standard lumber-yard board-foot identity | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `bolt-group-eccentric` | Eccentric Bolt Group in Shear (Elastic Vector Method) | AISC Manual Part 7 (elastic vector me...; spec-v266 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
+| `bolt-prying-action` | Prying Action in Tee and Angle Flanges (AISC Manual Part 9) | American Institute of Steel Construct...; pp. IID-4 to IID-6, LRFD: WT8x28.5, b = 1.79 in, a = 1.56... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `bolt-shear-bearing` | Bolt Shear + Bearing / Tearout Strength (AISC 360 J3) | AISC 360-22 J3.7 / J3.11; spec-v267 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `bolt-torque` | Bolt Torque to Clamp Load | Project (first-principles); F = 85000 * 0.1419 * 0.75 = 9046 lb; T_in_lb = 0.20 * 0.5... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+10 more) |
 | `boom-pump-reach` | Concrete Boom Pump Reach and Setup Radius | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -6304,6 +6306,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 
-Tile count: 2231. Fixture-covered or reference-cadence: 2231 / 2231.
+Tile count: 2232. Fixture-covered or reference-cadence: 2232 / 2232.
 
 <!-- END tile-index-v14 -->

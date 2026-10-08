@@ -20488,6 +20488,17 @@ export const CITATIONS = {
       { name: "Low-axial case", value: "Pr <= 0.4 Pc; a higher axial load applies a further reduction not included here", source: "AISC 360-16 J10.6" },
     ],
   },
+  "bolt-prying-action": {
+    formula: "AISC Manual Part 9 prying: b' = b - d/2; a' = min(a, 1.25 b) + d/2; rho = b'/a'; delta = 1 - d'/p; beta = (B/T - 1)/rho; alpha' = 1 if beta >= 1 else min(1, beta/(delta(1 - beta))); t_min = sqrt(k T b'/(p Fu (1 + delta alpha'))); prying negligible at t = sqrt(k T b'/(p Fu)); t_c = sqrt(k B b'/(p Fu)); available tension = B (t/t_c)^2 (1 + delta alpha) with alpha = ((t_c/t)^2 - 1)/(delta(1 + rho)) held to [0, 1]; k = 4/0.90 (LRFD) or 4 x 1.67 (ASD).",
+    edition: "AISC Steel Construction Manual Part 9 prying-action relations by name, as worked in AISC Design Example II.D-1 (Prying Action in Tees and in Single Angles).",
+    freeAccess: "The AISC Design Examples are free at aisc.org; the Manual itself is licensed and no table from it is reproduced.",
+    governance: GOVERNANCE.general,
+    editionNote: "Checked against Design Example II.D-1: WT8x28.5 (tf 0.715 in, bf 7.12 in) on a 4 in gage, 3/4 in A325 bolts (13/16 in holes) at p = 4 in, T = 20 kip and B = 29.8 kip per bolt (LRFD), Fu 65 ksi: b' 1.42, a' 1.94, rho 0.732, delta 0.797, alpha' 1.0, t_min 0.521 in; 0.696 in for negligible prying. This computes 0.519 and 0.696 carrying b' unrounded (1.415) and 4/0.90 rather than 4.44; ASD reproduces 0.521 and 0.698.",
+    assumptions: [
+      { name: "Edge distance a", value: "taken no more than 1.25 b", source: "AISC Manual Part 9" },
+      { name: "Hole diameter default", value: "bolt diameter + 1/16 in (standard hole)", source: "AISC 360 Table J3.3" },
+    ],
+  },
   "steel-panel-zone-axial": {
     formula: "Py = Fy Ag; ratio = Pr/Py; not modeled: ratio <= 0.40 -> Rn = 0.60 Fy dc tw (J10-9), else x (1.4 - ratio) (J10-10); modeled: ratio <= 0.75 -> Rn = 0.60 Fy dc tw [1 + 3 bcf tcf^2/(db dc tw)] (J10-11), else x (1.9 - 1.2 ratio) (J10-12); phiRn = 0.90 Rn.",
     edition: "The AISC 360-16 Section J10.6 panel-zone shear strength with column axial load, Eq. J10-10 and J10-12, by name.",

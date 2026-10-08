@@ -99434,6 +99434,31 @@
    "kind": "industry"
   },
   {
+   "term": "prying action",
+   "target": "bolt-prying-action",
+   "kind": "industry"
+  },
+  {
+   "term": "bolt prying force",
+   "target": "bolt-prying-action",
+   "kind": "industry"
+  },
+  {
+   "term": "tee flange prying",
+   "target": "bolt-prying-action",
+   "kind": "industry"
+  },
+  {
+   "term": "wt hanger flange thickness",
+   "target": "bolt-prying-action",
+   "kind": "industry"
+  },
+  {
+   "term": "angle prying tension",
+   "target": "bolt-prying-action",
+   "kind": "industry"
+  },
+  {
    "term": "high axial panel zone",
    "target": "steel-panel-zone-axial",
    "kind": "industry"

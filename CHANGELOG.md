@@ -6,6 +6,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Added
 
+- **`bolt-prying-action`: prying action in tee and angle flanges (spec-v1928, Group E, `calc-steelpanelzone.js`), 2,231 -> 2,232, v0.421.0.** The bolt-tension tiles took the tension per bolt at face value; the slip-critical note said prying "is not modeled here and matters most on thin end plates and tees", and nothing computed it. From the AISC Manual Part 9 relations, the tile reports:
+  - the flange thickness that works with prying counted,
+  - the thicker flange that makes prying negligible,
+  - the tension each bolt delivers at the actual thickness.
+
+  It reproduces AISC Design Example II.D-1 (WT8x28.5, 3/4 in bolts at 4 in, 20 kip per bolt LRFD): t_min 0.519 in against the printed 0.521 (b' and 4/0.90 unrounded), and 0.696 in for negligible prying. The ASD case gives 0.521 and 0.698 exactly. `calc-steelpanelzone.js` takes it, and its gzip cap rises from 6,500 to 8,000 B.
+
 - **`cipp-fully-deteriorated`: CIPP liner thickness when the host pipe is no longer structural (spec-v1927, Group E, `calc-trenchless.js`), 2,230 -> 2,231, v0.420.0.** `cipp-liner-thickness` computes only the partially deteriorated case and said the fully deteriorated one "is not approximated here". This is that case. Following ASTM F1216 Appendix X1, the liner is the greatest of four checks, each reported:
   - X1.3, soil, water, and live load with the buoyancy factor R_w and the elastic support B'.
   - X1.4, minimum stiffness, EI/D^3 of at least 0.093 on the initial modulus.

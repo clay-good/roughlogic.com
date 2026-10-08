@@ -1038,6 +1038,7 @@ export const RENDERER_MAP = {
   "steel-panel-zone-shear": { module: "../../calc-steelpanelzone.js", exportName: "STEELPANELZONE_RENDERERS" },
   "steel-doubler-plate": { module: "../../calc-steelpanelzone.js", exportName: "STEELPANELZONE_RENDERERS" },
   "steel-panel-zone-axial": { module: "../../calc-steelpanelzone.js", exportName: "STEELPANELZONE_RENDERERS" },
+  "bolt-prying-action": { module: "../../calc-steelpanelzone.js", exportName: "STEELPANELZONE_RENDERERS" },
   "rc-beam-flexure": { module: "../../calc-concrete.js", exportName: "CONCRETE_RENDERERS" },
   "rc-tbeam-flexure": { module: "../../calc-concrete.js", exportName: "CONCRETE_RENDERERS" },
   "rc-beam-shear": { module: "../../calc-concrete.js", exportName: "CONCRETE_RENDERERS" },

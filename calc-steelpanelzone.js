@@ -1,4 +1,5 @@
-// Group E (cont.): AISC 360 steel panel-zone checks and doubler-plate sizing.
+// Group E (cont.): AISC 360 steel panel-zone checks and doubler-plate sizing,
+// and (spec-v1928) prying action on tee and angle flanges in tension.
 // spec-v1861 moves these existing calculators out of calc-steel.js so the
 // structural-steel module stays below its gzip cap. Calculator behavior, IDs,
 // citations, examples, and Group E assignments are unchanged.
@@ -252,4 +253,78 @@ STEELPANELZONE_RENDERERS["steel-panel-zone-axial"] = _simpleRenderer({
     { key: "n", id: "pza-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeSteelPanelZoneAxial,
+});
+
+// ===================== spec-v1928: prying action in tees and angles (AISC Manual Part 9) =====================
+// The bolt-tension tiles take the applied tension per bolt at face value; a flexible flange levers
+// it up. AISC Manual Part 9: b' = b - d/2, a' = min(a, 1.25 b) + d/2, rho = b'/a', delta = 1 - d'/p.
+// Minimum flange thickness with prying: t_min = sqrt(k T b' / (p Fu (1 + delta alpha'))), alpha' = 1
+// if beta >= 1, else min(1, beta / (delta (1 - beta))), beta = (B/T - 1) / rho; to eliminate prying,
+// t = sqrt(k T b' / (p Fu)); k = 4/0.90 (LRFD) or 4 x 1.67 (ASD). Available tension per bolt at the
+// actual t: t_c = sqrt(k B b' / (p Fu)), alpha = (1 / (delta (1 + rho))) ((t_c/t)^2 - 1), and
+// T_avail = B when alpha < 0, B (t/t_c)^2 (1 + delta alpha) up to alpha = 1, B (t/t_c)^2 (1 + delta)
+// beyond. Checked against AISC Design Example II.D-1 (WT8x28.5, 3/4 in bolts at 4 in): t_min 0.521 in.
+// dims: in { tension_per_bolt_kip: M L T^-2, bolt_available_kip: M L T^-2, bolt_dia_in: L, hole_dia_in: L, tributary_p_in: L, b_in: L, a_in: L, flange_t_in: L, fu_ksi: M L^-1 T^-2, method: dimensionless } out: { t_min_in: L, t_no_prying_in: L, t_c_in: L, available_tension_kip: M L T^-2, prying_force_kip: M L T^-2 }
+export function computeBoltPryingAction({ tension_per_bolt_kip = 0, bolt_available_kip = 0, bolt_dia_in = 0, hole_dia_in = 0, tributary_p_in = 0, b_in = 0, a_in = 0, flange_t_in = 0, fu_ksi = 65, method = "LRFD" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const T = tension_per_bolt_kip, B = bolt_available_kip, d = bolt_dia_in, p = tributary_p_in, t = flange_t_in;
+  if (!(T > 0)) return { error: "Required tension per bolt must be positive (kip)." };
+  if (!(B > 0)) return { error: "Available bolt tension B must be positive (kip per bolt)." };
+  if (!(d > 0)) return { error: "Bolt diameter must be positive (in)." };
+  const dh = hole_dia_in > 0 ? hole_dia_in : d + 1 / 16;
+  if (!(dh >= d)) return { error: "The hole cannot be smaller than the bolt." };
+  if (!(p > dh)) return { error: "Tributary length per bolt p must exceed the hole diameter (in)." };
+  if (!(b_in > d / 2)) return { error: "Distance b from the bolt line to the stem face must exceed half the bolt diameter (in)." };
+  if (!(a_in > 0)) return { error: "Edge distance a must be positive (in)." };
+  if (!(t > 0)) return { error: "Flange thickness must be positive (in)." };
+  if (!(fu_ksi > 0)) return { error: "Flange tensile strength Fu must be positive (ksi)." };
+  if (method !== "LRFD" && method !== "ASD") return { error: "Method must be LRFD or ASD." };
+  const k = method === "LRFD" ? 4 / 0.9 : 4 * 1.67;
+  const b_prime = b_in - d / 2;
+  const a_used = Math.min(a_in, 1.25 * b_in);
+  const a_prime = a_used + d / 2;
+  const rho = b_prime / a_prime;
+  const delta = 1 - dh / p;
+  const beta = (B / T - 1) / rho;
+  const alpha_prime_min = beta >= 1 ? 1 : Math.min(1, Math.max(0, beta / (delta * (1 - beta))));
+  const t_min_in = Math.sqrt(k * T * b_prime / (p * fu_ksi * (1 + delta * alpha_prime_min)));
+  const t_no_prying_in = Math.sqrt(k * T * b_prime / (p * fu_ksi));
+  const t_c_in = Math.sqrt(k * B * b_prime / (p * fu_ksi));
+  const alpha_prime = (1 / (delta * (1 + rho))) * (Math.pow(t_c_in / t, 2) - 1);
+  const ratio = Math.pow(t / t_c_in, 2);
+  const available_tension_kip = alpha_prime < 1e-9 ? B : alpha_prime <= 1 ? B * ratio * (1 + delta * alpha_prime) : B * ratio * (1 + delta);
+  const passes = T <= available_tension_kip * (1 + 1e-9) && t >= t_min_in * (1 - 1e-9);
+  const prying_free = t >= t_no_prying_in * (1 - 1e-9);
+  const outs = [b_prime, a_prime, rho, delta, t_min_in, t_no_prying_in, t_c_in, available_tension_kip];
+  if (!outs.every(Number.isFinite)) return { error: "Prying math is not a finite value." };
+  return {
+    b_prime_in: b_prime, a_prime_in: a_prime, a_capped: a_used < a_in, rho, delta, beta, alpha_prime_min,
+    t_min_in, t_no_prying_in, t_c_in, alpha_prime, available_tension_kip, passes, prying_free,
+    note: "A tee or angle flange bolted in tension bends, and as it bends its tips bear on the support and lever extra tension into the bolts: prying. The bolt that looks adequate for the applied load can be overloaded by the prying force, or the flange can yield first. AISC Manual Part 9 gives the flange thickness that makes the connection work with prying counted, the thicker flange that makes prying negligible, and the tension a bolt can deliver at the actual thickness. b is measured from the bolt line to the face of the stem (or angle leg), a from the bolt line to the flange tip, taken no more than 1.25 b; p is the flange length tributary to one bolt. B is the bolt's available tension (LRFD phi rn, or ASD rn / Omega) and T the required tension per bolt on the same basis. Fu is the flange's, 65 ksi for A992. A check of the flange and bolts in prying; the stem, welds, and the supporting member are separate checks, and the engineer of record governs.",
+  };
+}
+const boltPryingExample = { inputs: { tension_per_bolt_kip: 20, bolt_available_kip: 29.8, bolt_dia_in: 0.75, hole_dia_in: 0.8125, tributary_p_in: 4, b_in: 1.79, a_in: 1.56, flange_t_in: 0.715, fu_ksi: 65, method: "LRFD" } };
+STEELPANELZONE_RENDERERS["bolt-prying-action"] = _simpleRenderer({
+  citation: "Citation: AISC Steel Construction Manual Part 9, prying action in tees and angles, by name: b' = b - d/2, a' = a + d/2 with a no more than 1.25 b, rho = b'/a', delta = 1 - d'/p; t_min = sqrt(4 T b' / (phi p Fu (1 + delta alpha'))), with 4/phi = 4.44 (LRFD) or 4 Omega = 6.66 (ASD); prying negligible at sqrt(4 T b' / (phi p Fu)); available tension from t_c = sqrt(4 B b' / (phi p Fu)). As worked in AISC Design Example II.D-1. Bolt available tension, flange Fu, and geometry are the user's. The engineer of record governs.",
+  example: boltPryingExample.inputs,
+  fields: [
+    { key: "tension_per_bolt_kip", label: "Required tension per bolt T (kip)", kind: "number" },
+    { key: "bolt_available_kip", label: "Bolt available tension B (kip, phi rn or rn/Omega)", kind: "number" },
+    { key: "bolt_dia_in", label: "Bolt diameter d (in)", kind: "number" },
+    { key: "hole_dia_in", label: "Hole diameter d' (in, blank = d + 1/16)", kind: "number" },
+    { key: "tributary_p_in", label: "Flange length per bolt p (in)", kind: "number" },
+    { key: "b_in", label: "Bolt line to stem face b (in)", kind: "number" },
+    { key: "a_in", label: "Bolt line to flange tip a (in)", kind: "number" },
+    { key: "flange_t_in", label: "Flange thickness t (in)", kind: "number" },
+    { key: "fu_ksi", label: "Flange Fu (ksi, 65 for A992)", kind: "number", default: 65 },
+    { key: "method", label: "Design basis", kind: "select", options: [{ value: "LRFD", label: "LRFD (phi 0.90)", selected: true }, { value: "ASD", label: "ASD (Omega 1.67)" }] },
+  ],
+  outputs: [
+    { key: "g", id: "bpa-out-g", label: "Geometry", value: (r) => "b' " + fmt(r.b_prime_in, 3) + " in, a' " + fmt(r.a_prime_in, 3) + " in" + (r.a_capped ? " (a capped at 1.25 b)" : "") + ", rho " + fmt(r.rho, 3) + ", delta " + fmt(r.delta, 3) },
+    { key: "m", id: "bpa-out-m", label: "Minimum flange thickness with prying", value: (r) => fmt(r.t_min_in, 3) + " in (alpha' " + fmt(r.alpha_prime_min, 2) + ")" },
+    { key: "z", id: "bpa-out-z", label: "Thickness for negligible prying at T", value: (r) => fmt(r.t_no_prying_in, 3) + " in" + (r.prying_free ? " -- the flange is this thick" : "") },
+    { key: "a", id: "bpa-out-a", label: "Available tension per bolt at this flange", value: (r) => fmt(r.available_tension_kip, 1) + " kip -- " + (r.passes ? "OK for the required tension" : "LESS THAN THE REQUIRED TENSION: thicken the flange or add bolts") },
+    { key: "n", id: "bpa-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeBoltPryingAction,
 });

@@ -1805,6 +1805,7 @@ export const COMPUTE_MAP = {
   "steel-floor-vibration": { module: "../../calc-steel.js", fn: "computeSteelFloorVibration" },
   "steel-panel-zone-shear": { module: "../../calc-steelpanelzone.js", fn: "computeSteelPanelZoneShear" },
   "steel-panel-zone-axial": { module: "../../calc-steelpanelzone.js", fn: "computeSteelPanelZoneAxial" },
+  "bolt-prying-action": { module: "../../calc-steelpanelzone.js", fn: "computeBoltPryingAction" },
   "steel-doubler-plate": { module: "../../calc-steelpanelzone.js", fn: "computeSteelDoublerPlate" },
   // spec-v257..v259 ACI 318-19 reinforced-concrete member trio (3 tiles, new calc-concrete.js)
   "rc-beam-flexure": { module: "../../calc-concrete.js", fn: "computeRcBeamFlexure" },

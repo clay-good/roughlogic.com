@@ -96,6 +96,9 @@ export const CURATED_INPUT_LABELS = {
 };
 
 export const CURATED_OUTPUT_LABELS = {
+  // spec-v1928: rho prints inside the combined "Geometry" output line, so the
+  // renderer gives it no caption of its own.
+  "bolt-prying-action": { rho: "Ratio rho = b'/a'" },
   // spec-v1461..v1467, the second overhead line and distribution band. These
   // keys carry a unit letter the key-label reader does not treat as a unit
   // (a lower-case `v` for volts, `a` for amperes) or an instrument-transformer

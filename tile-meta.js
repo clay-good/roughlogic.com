@@ -1000,6 +1000,7 @@ const _TILES = [
   ["steel-floor-vibration", "E"],
   ["steel-panel-zone-shear", "E"],
   ["steel-panel-zone-axial", "E"],
+  ["bolt-prying-action", "E"],
   ["steel-doubler-plate", "E"],
   // spec-v257..v259 ACI 318-19 reinforced-concrete member trio (calc-concrete.js)
   ["rc-beam-flexure", "E"], ["rc-tbeam-flexure", "E"], ["rc-beam-shear", "E"], ["rc-development-length", "E"],

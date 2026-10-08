@@ -2,100 +2,100 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "4375f03ed7592f79",
-      "date": "2026-10-07"
+      "sha": "90736f578f2380d3",
+      "date": "2026-10-08"
     },
     "/tools/": {
-      "sha": "6ef144b7535edad8",
-      "date": "2026-10-07"
+      "sha": "86cd71c6ed258c3c",
+      "date": "2026-10-08"
     },
     "/collections/disaster-response/": {
-      "sha": "0581c40ab10c6fbe",
-      "date": "2026-10-07"
+      "sha": "26643a9c3f91e876",
+      "date": "2026-10-08"
     },
     "/groups/accounting/": {
-      "sha": "01f0f4bb68aac4b7",
-      "date": "2026-10-07"
+      "sha": "e9bcd8422c9324b2",
+      "date": "2026-10-08"
     },
     "/groups/agriculture/": {
-      "sha": "019ce810521f9a9d",
-      "date": "2026-10-07"
+      "sha": "155a6d9be5a270b9",
+      "date": "2026-10-08"
     },
     "/groups/construction/": {
-      "sha": "c2a684ff246eae27",
-      "date": "2026-10-07"
+      "sha": "be0ff21c0cdb1672",
+      "date": "2026-10-08"
     },
     "/groups/cross-trade/": {
-      "sha": "c9724fdb8f240771",
-      "date": "2026-10-07"
+      "sha": "4b3d19df2e8a22ad",
+      "date": "2026-10-08"
     },
     "/groups/educators/": {
-      "sha": "0510c3e1417feadb",
-      "date": "2026-10-07"
+      "sha": "73cd1b59f1d2e099",
+      "date": "2026-10-08"
     },
     "/groups/electrical/": {
-      "sha": "6d2014cc0b7ffa12",
-      "date": "2026-10-07"
+      "sha": "86c3759be7f6736b",
+      "date": "2026-10-08"
     },
     "/groups/field/": {
-      "sha": "0e3983589eac2287",
-      "date": "2026-10-07"
+      "sha": "b5fd96abecb1c5b5",
+      "date": "2026-10-08"
     },
     "/groups/fire-ground/": {
-      "sha": "62e062214581189a",
-      "date": "2026-10-07"
+      "sha": "5e7483553459bf87",
+      "date": "2026-10-08"
     },
     "/groups/historical/": {
-      "sha": "69f0cd82cf492f43",
-      "date": "2026-10-07"
+      "sha": "580b92c0ee04046d",
+      "date": "2026-10-08"
     },
     "/groups/hvac/": {
-      "sha": "09b678a062b80004",
-      "date": "2026-10-07"
+      "sha": "0d004372721ba764",
+      "date": "2026-10-08"
     },
     "/groups/kitchen/": {
-      "sha": "6631768e2e0be502",
-      "date": "2026-10-07"
+      "sha": "49fa1974c2271076",
+      "date": "2026-10-08"
     },
     "/groups/lab/": {
-      "sha": "55bb8063ed8a885d",
-      "date": "2026-10-07"
+      "sha": "056e99f6651aa461",
+      "date": "2026-10-08"
     },
     "/groups/mechanic/": {
-      "sha": "1ac663cb763cfe4b",
-      "date": "2026-10-07"
+      "sha": "3976eda566726e73",
+      "date": "2026-10-08"
     },
     "/groups/plumbing/": {
-      "sha": "fba8026b73ffaf83",
-      "date": "2026-10-07"
+      "sha": "25b619ac07cfeaf5",
+      "date": "2026-10-08"
     },
     "/groups/real-estate/": {
-      "sha": "204f8c819e94dc5d",
-      "date": "2026-10-07"
+      "sha": "32358cdc4f25bfd5",
+      "date": "2026-10-08"
     },
     "/groups/references/": {
-      "sha": "59ad905f843c3de5",
-      "date": "2026-10-07"
+      "sha": "19b3621ba6053197",
+      "date": "2026-10-08"
     },
     "/groups/restoration/": {
-      "sha": "caca85aa47e50431",
-      "date": "2026-10-07"
+      "sha": "424b4082fe85f8b5",
+      "date": "2026-10-08"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "0b3cdcb36c49bb2f",
-      "date": "2026-10-07"
+      "sha": "0cb8fb7177a581a2",
+      "date": "2026-10-08"
     },
     "/groups/stage/": {
-      "sha": "3ced71a4cf9a878d",
-      "date": "2026-10-07"
+      "sha": "debf676776db1baa",
+      "date": "2026-10-08"
     },
     "/groups/trucking/": {
-      "sha": "447bfb867048ed8d",
-      "date": "2026-10-07"
+      "sha": "47e0a8e8c99d13a6",
+      "date": "2026-10-08"
     },
     "/groups/water/": {
-      "sha": "421fd44de75170f4",
-      "date": "2026-10-07"
+      "sha": "bf0e42e9fabd38b3",
+      "date": "2026-10-08"
     },
     "/tools/aav-install-check/": {
       "sha": "6124c721c9aa5eea",
@@ -728,6 +728,10 @@
     "/tools/bolt-proof-load/": {
       "sha": "f3a5085c9d728725",
       "date": "2026-10-03"
+    },
+    "/tools/bolt-prying-action/": {
+      "sha": "e2bde359e91e0ee2",
+      "date": "2026-10-08"
     },
     "/tools/bolt-shear-bearing/": {
       "sha": "77a5f8db6f7d16b2",
@@ -1526,8 +1530,8 @@
       "date": "2026-09-29"
     },
     "/tools/concrete-cracked-inertia-tee/": {
-      "sha": "76e713f5ec240be7",
-      "date": "2026-10-03"
+      "sha": "1bb2873fcde59d8f",
+      "date": "2026-10-08"
     },
     "/tools/concrete-cracking-moment/": {
       "sha": "6eb339d851b07a44",

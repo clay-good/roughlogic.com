@@ -846,6 +846,7 @@ export const TOOL_MODULES = (() => {
   // from calc-steel.js before that module reached its gzip cap.
   declare("./calc-steelpanelzone.js", "STEELPANELZONE_RENDERERS", [
     "steel-panel-zone-shear", "steel-doubler-plate", "steel-panel-zone-axial",
+    "bolt-prying-action",
   ]);
   // spec-v257..v259 ACI 318-19 reinforced-concrete member trio: a new lazy
   // Group E cluster, the RC companion to calc-steel.js one material over.

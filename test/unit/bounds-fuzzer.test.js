@@ -58310,3 +58310,27 @@ test("bounds: spec-v1927 computeCippFullyDeteriorated takes the thickest of the 
   assert.ok("error" in _v1927({ ...base, host_id_in: 0 }));
   assert.ok("error" in _v1927({ ...base, ovality_pct: 100 }));
 });
+
+import { computeBoltPryingAction as _v1928 } from "../../calc-steelpanelzone.js";
+test("bounds: spec-v1928 computeBoltPryingAction reproduces AISC Example II.D-1 and its error seams", () => {
+  const base = { tension_per_bolt_kip: 20, bolt_available_kip: 29.8, bolt_dia_in: 0.75, hole_dia_in: 0.8125, tributary_p_in: 4, b_in: 1.79, a_in: 1.56, flange_t_in: 0.715, fu_ksi: 65, method: "LRFD" };
+  const r = _v1928(base);
+  assert.ok(Math.abs(r.b_prime_in - 1.415) < 1e-12 && Math.abs(r.a_prime_in - 1.935) < 1e-12);
+  assert.ok(Math.abs(r.delta - 0.796875) < 1e-12);
+  assert.equal(r.alpha_prime_min, 1);
+  assert.ok(Math.abs(r.t_min_in - 0.51887) < 1e-4);
+  assert.ok(Math.abs(r.t_no_prying_in - 0.69553) < 1e-4);
+  assert.ok(r.passes && r.available_tension_kip > 20 && r.available_tension_kip < 29.8);
+  // ASD prints 6.66: 0.521 and 0.698.
+  const asd = _v1928({ ...base, tension_per_bolt_kip: 13.4, bolt_available_kip: 19.9, method: "ASD" });
+  assert.ok(Math.abs(asd.t_min_in - 0.5207) < 1e-3 && Math.abs(asd.t_no_prying_in - 0.698) < 1e-3);
+  // A flange at least t_c develops the full bolt; a thin one cannot carry the required tension.
+  assert.equal(_v1928({ ...base, flange_t_in: 1.0 }).available_tension_kip, 29.8);
+  assert.equal(_v1928({ ...base, flange_t_in: 0.4 }).passes, false);
+  // a is capped at 1.25 b; a blank hole means d + 1/16.
+  assert.equal(_v1928({ ...base, a_in: 5 }).a_capped, true);
+  assert.ok(Math.abs(_v1928({ ...base, hole_dia_in: 0 }).delta - 0.796875) < 1e-12);
+  assert.ok("error" in _v1928({ ...base, method: "WSD" }));
+  assert.ok("error" in _v1928({ ...base, flange_t_in: 0 }));
+  assert.ok("error" in _v1928({ ...base, b_in: 0.3 }));
+});
