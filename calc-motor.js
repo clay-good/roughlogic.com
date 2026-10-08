@@ -334,12 +334,23 @@ MOTOR_RENDERERS["multi-motor-feeder"] = renderMultiMotorFeeder;
 // 115%/130% otherwise.
 // =====================================================================
 
-// dims: in { fla_A: I, sf: dimensionless, rise_C: T } out: { ol_A: I, ol_max_A: I, mult: dimensionless, mult_max: dimensionless }
-export function computeMotorOverloadSizing({ fla_A = 0, sf = 0, rise_C = 0 } = {}) {
+// dims: in { fla_A: I, sf: dimensionless, rise_C: T, protection: dimensionless } out: { ol_A: I, ol_max_A: I, mult: dimensionless, mult_max: dimensionless }
+export function computeMotorOverloadSizing({ fla_A = 0, sf = 0, rise_C = 0, protection = "separate" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(fla_A > 0)) return { error: "Nameplate full-load current must be positive (A)." };
   if (sf < 0) return { error: "Service factor cannot be negative." };
   if (rise_C < 0) return { error: "Temperature rise cannot be negative (degC)." };
+  if (protection !== "separate" && protection !== "thermal") return { error: "Protection must be a separate overload device or a thermal protector integral with the motor." };
+  if (protection === "thermal") {
+    // 430.32(A)(2), added 2026-10-08: a thermal protector integral with the motor may not have
+    // an ultimate trip current above 170% of the TABLE full-load current up to 9 A, 156% from
+    // 9.1 to 20 A, and 140% above 20 A. There is no 430.32(C) step-up for it.
+    const mult = fla_A <= 9 ? 1.70 : fla_A <= 20 ? 1.56 : 1.40;
+    return {
+      hi_class: null, mult, mult_max: mult, ol_A: fla_A * mult, ol_max_A: fla_A * mult, protection,
+      note: "NEC 430.32(A)(2) thermal protector integral with the motor: its ultimate trip current may not exceed 170% of the motor's full-load current from Table 430.248, 430.249, or 430.250 at 9 A or less, 156% from 9.1 to 20 A, and 140% above 20 A -- the TABLE current, not the nameplate, so enter the table value in this mode. The motor manufacturer sets and lists the protector; this checks the ceiling it must sit under. A protector that does not open the supply circuit needs a control device that does. The AHJ governs.",
+    };
+  }
   // 430.32(A)(1): the higher class needs a MARKED SF >= 1.15 or a MARKED
   // rise <= 40 degC; a blank (zero) entry means unmarked and does not qualify.
   const hi_class = sf >= 1.15 || (rise_C > 0 && rise_C <= 40);
@@ -348,8 +359,8 @@ export function computeMotorOverloadSizing({ fla_A = 0, sf = 0, rise_C = 0 } = {
   const ol_A = fla_A * mult;
   const ol_max_A = fla_A * mult_max;
   return {
-    hi_class, mult, mult_max, ol_A, ol_max_A,
-    note: "NEC 430.32(A)(1) running overload on the motor NAMEPLATE FLA (not the table FLC the 430.52 branch device uses): 125% of FLA for a continuous-duty motor over 1 hp with a marked service factor of 1.15 or more or a marked temperature rise of 40 degC or less, 115% otherwise. Where the motor will not start or carry its load at that setting, 430.32(C) permits up to 140% (130% for the lower class). Leave an unmarked service factor or rise blank - an unmarked motor takes the lower class. Small-motor (430.32(B)), fuse-as-overload (430.36), and thermally protected cases are separate. A design aid; the AHJ governs.",
+    hi_class, mult, mult_max, ol_A, ol_max_A, protection,
+    note: "NEC 430.32(A)(1) running overload on the motor NAMEPLATE FLA (not the table FLC the 430.52 branch device uses): 125% of FLA for a continuous-duty motor over 1 hp with a marked service factor of 1.15 or more or a marked temperature rise of 40 degC or less, 115% otherwise. Where the motor will not start or carry its load at that setting, 430.32(C) permits up to 140% (130% for the lower class). Leave an unmarked service factor or rise blank - an unmarked motor takes the lower class. Small-motor (430.32(B)) and fuse-as-overload (430.36) cases are separate; a thermal protector is the protection select. A design aid; the AHJ governs.",
   };
 }
 export const motorOverloadSizingExample = { inputs: { fla_A: 26, sf: 1.15, rise_C: 40 } };
@@ -359,21 +370,33 @@ function renderMotorOverloadSizing(inputRegion, outputRegion, citationEl) {
   const fla = makeNumber("Nameplate full-load current FLA (A)", "mos-fla", { step: "any", min: "0" });
   const sf = makeNumber("Marked service factor (blank if unmarked)", "mos-sf", { step: "any", min: "0" });
   const rise = makeNumber("Marked temperature rise (°C, blank if unmarked)", "mos-rise", { step: "any", min: "0" });
-  for (const f of [fla, sf, rise]) inputRegion.appendChild(f.wrap);
+  const prot = makeSelect("Protection", "mos-prot", [
+    { value: "separate", label: "Separate overload device (430.32(A)(1))", selected: true },
+    { value: "thermal", label: "Thermal protector in the motor (430.32(A)(2); enter the TABLE FLC)" },
+  ]);
+  for (const f of [fla, sf, rise, prot]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { fla.input.value = "26"; sf.input.value = "1.15"; rise.input.value = "40"; update(); });
   const oClass = makeOutputLine(outputRegion, "430.32(A)(1) class", "mos-out-class");
   const oOl = makeOutputLine(outputRegion, "Overload setting", "mos-out-ol");
   const oMax = makeOutputLine(outputRegion, "430.32(C) maximum (will not start)", "mos-out-max");
   const oNote = makeOutputLine(outputRegion, "Note", "mos-out-note");
   const update = debounce(() => {
-    const r = computeMotorOverloadSizing({ fla_A: Number(fla.input.value) || 0, sf: Number(sf.input.value) || 0, rise_C: Number(rise.input.value) || 0 });
+    const r = computeMotorOverloadSizing({ fla_A: Number(fla.input.value) || 0, sf: Number(sf.input.value) || 0, rise_C: Number(rise.input.value) || 0, protection: prot.select.value });
     if (r.error) { oClass.textContent = r.error; oOl.textContent = "-"; oMax.textContent = "-"; oNote.textContent = "-"; return; }
+    if (r.protection === "thermal") {
+      oClass.textContent = "thermal protector: " + fmt(r.mult * 100, 0) + "% band (" + (r.mult === 1.7 ? "9 A or less" : r.mult === 1.56 ? "9.1 to 20 A" : "over 20 A") + ")";
+      oOl.textContent = "ultimate trip no more than " + fmt(r.ol_A, 1) + " A (" + fmt(r.mult * 100, 0) + "% of table FLC)";
+      oMax.textContent = "no 430.32(C) step-up for an integral protector";
+      oNote.textContent = r.note;
+      return;
+    }
     oClass.textContent = r.hi_class ? "higher (SF >= 1.15 or rise <= 40 degC): 125% base" : "lower (unmarked or outside): 115% base";
     oOl.textContent = fmt(r.ol_A, 1) + " A (" + fmt(r.mult * 100, 0) + "% of FLA)";
     oMax.textContent = fmt(r.ol_max_A, 1) + " A (" + fmt(r.mult_max * 100, 0) + "% of FLA)";
     oNote.textContent = r.note;
   }, DEBOUNCE_MS);
   for (const f of [fla, sf, rise]) f.input.addEventListener("input", update);
+  prot.select.addEventListener("input", update);
 }
 MOTOR_RENDERERS["motor-overload-sizing"] = renderMotorOverloadSizing;
 

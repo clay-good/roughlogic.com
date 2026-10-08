@@ -567,7 +567,7 @@ export const BESPOKE_OUTPUT_LABELS = {
   "motor-locked-rotor-kva": {"locked_rotor_kva":"Locked-rotor kVA","lra_a":"Locked-rotor amps (LRA)","note":"Note"},
   "motor-max-hp-for-starting-current": {"max_horsepower":"Max motor horsepower","lra_per_hp_a":"Starting current per hp","note":"Note"},
   "motor-operating-cost": {"input_kw":"Input power","annual_kwh":"Annual energy","annual_cost":"Annual energy cost","note":"Note"},
-  "motor-overload-sizing": {"hi_class":"430.32(A)(1) class","ol_A":"Overload setting","ol_max_A":"430.32(C) maximum (will not start)","note":"Note"},
+  "motor-overload-sizing": {"ol_A":"Overload setting","note":"Note","ol_max_A":"430.32(C) maximum (will not start)"},
   "motor-pole-identification": {"at_or_above_sync":"Full-load slip","note":"Note"},
   "motor-rms-hp": {"rms_hp":"RMS horsepower"},
   "motor-run-hours-for-budget": {"max_hours_per_year":"Max run hours per year","input_kw":"Input power","annual_kwh":"Energy at that budget","note":"Note"},

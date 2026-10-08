@@ -2996,7 +2996,7 @@ cross-check.
 | calc-motor.js | `computeMotorLockedRotorKva` | `{ horsepower = 0, code_letter = "G", voltage_v = 0, phase = 3 } = {}` | _ | _ | _ |
 | calc-motor.js | `computeMotorMaxHpForStartingCurrent` | `{ max_starting_current_a = 0, code_letter = "G", voltage_v = 0, phase = 3 } = {}` | _ | _ | _ |
 | calc-motor.js | `computeMotorOperatingCost` | `{ hp = 0, efficiency_pct = 93, load_factor_pct = 100, hours_per_year = 0, rat...` | _ | _ | _ |
-| calc-motor.js | `computeMotorOverloadSizing` | `{ fla_A = 0, sf = 0, rise_C = 0 } = {}` | _ | _ | _ |
+| calc-motor.js | `computeMotorOverloadSizing` | `{ fla_A = 0, sf = 0, rise_C = 0, protection = "separate" } = {}` | _ | _ | _ |
 | calc-motor.js | `computeMotorPoleIdentification` | `{ rated_rpm = 0, line_freq_hz = 60 } = {}` | _ | _ | _ |
 | calc-motor.js | `computeMotorRmsHp` | `{ hp_run = 20, run_time_s = 10, hp_idle = 0, idle_time_s = 20, cooling_factor...` | _ | _ | _ |
 | calc-motor.js | `computeMotorRunHoursForBudget` | `{ hp = 0, efficiency_pct = 93, load_factor_pct = 100, rate_usd_per_kwh = 0.12...` | _ | _ | _ |

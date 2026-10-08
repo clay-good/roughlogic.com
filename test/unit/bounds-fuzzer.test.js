@@ -58446,3 +58446,16 @@ test("bounds: rc-hook-development special moment frame mode follows ACI 318-19 1
   assert.ok("error" in _hookSmf({ db_in: 1.693, joint: "smf" }));
   assert.ok("error" in _hookSmf({ db_in: 1, joint: "imf" }));
 });
+
+import { computeMotorOverloadSizing as _olThermal } from "../../calc-motor.js";
+test("bounds: motor-overload-sizing thermal protector bands follow NEC 430.32(A)(2)", () => {
+  const t = (a) => _olThermal({ fla_A: a, protection: "thermal" });
+  assert.equal(t(9).mult, 1.70);
+  assert.equal(t(9.1).mult, 1.56);
+  assert.equal(t(20).mult, 1.56);
+  assert.equal(t(20.5).mult, 1.40);
+  assert.ok(Math.abs(t(28).ol_A - 39.2) < 1e-9);
+  // The separate-device mode is unchanged.
+  assert.equal(_olThermal({ fla_A: 26, sf: 1.15, rise_C: 40 }).mult, 1.25);
+  assert.ok("error" in _olThermal({ fla_A: 26, protection: "fuse" }));
+});

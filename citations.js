@@ -16981,13 +16981,14 @@ export const CITATIONS = {
   "motor-overload-sizing": {
     formula: "hi_class = (sf >= 1.15) or (marked rise <= 40 degC); mult = hi_class ? 1.25 : 1.15; mult_max = hi_class ? 1.40 : 1.30; ol_A = fla_A x mult; ol_max_A = fla_A x mult_max.",
     edition: "Motor running-overload sizing on the nameplate full-load current under NEC 2023 430.32(A)(1) (125% for a marked service factor of 1.15 or more or a marked temperature rise of 40 degC or less, 115% otherwise) with the 430.32(C) will-not-start ceiling (140%/130%), by name. A computational aid; the AHJ-adopted NEC edition governs.",
-    freeAccess: "NEC is free to read at nfpa.org/freeaccess. The 430.32(B) small-motor rules, 430.36 fuse-as-overload, and thermally protected cases are stated as out of scope, not modeled.",
+    freeAccess: "NEC is free to read at nfpa.org/freeaccess. The 430.32(B) small-motor rules and 430.36 fuse-as-overload are stated as out of scope, not modeled; a thermal protector integral with the motor is the 430.32(A)(2) option (added 2026-10-08).",
     governance: GOVERNANCE.electrical,
     editionNote: NEC_DISCLOSURE,
     assumptions: [
       { name: "Basis current", value: "the motor NAMEPLATE FLA, not the 430.6 table FLC the 430.52 branch device uses", source: "NEC 430.32 / 430.6(A)" },
       { name: "Class selection", value: "125%/140% for marked SF >= 1.15 or marked rise <= 40 degC; 115%/130% otherwise; an unmarked (blank) value does not qualify", source: "NEC 430.32(A)(1) and (C)" },
       { name: "Scope", value: "a continuous-duty motor over 1 hp with a separate overload device", source: "NEC 430.32(A)" },
+      { name: "Thermal protector option", value: "ultimate trip no more than 170% (9 A or less), 156% (9.1-20 A), or 140% (over 20 A) of the TABLE full-load current", source: "NEC 430.32(A)(2)" },
     ],
   },
   "insulation-resistance-pi": {
