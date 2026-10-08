@@ -6379,6 +6379,11 @@
     {"term":"headed rebar ldt","target":"rc-headed-bar-development","kind":"industry"},
     {"term":"aci 25.4.4","target":"rc-headed-bar-development","kind":"redirect"},
     {"term":"headed deformed bar anchorage","target":"rc-headed-bar-development","kind":"industry"},
-    {"term":"rebar with head development","target":"rc-headed-bar-development","kind":"question"}
+    {"term":"rebar with head development","target":"rc-headed-bar-development","kind":"question"},
+    {"term":"bending and axial tension wood","target":"wood-tension-bending","kind":"industry"},
+    {"term":"nds 3.9.1","target":"wood-tension-bending","kind":"redirect"},
+    {"term":"truss bottom chord bending","target":"wood-tension-bending","kind":"industry"},
+    {"term":"tension plus bending lumber","target":"wood-tension-bending","kind":"industry"},
+    {"term":"bottom chord ceiling load check","target":"wood-tension-bending","kind":"question"}
   ]
 }

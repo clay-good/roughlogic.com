@@ -6,6 +6,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Added
 
+- **`wood-tension-bending`: bending plus axial tension in a wood member (spec-v1931, Group E, `calc-construction.js`), 2,234 -> 2,235, v0.424.0.** `wood-combined-bending-axial` covers compression plus bending and said tension plus bending was separate, so a truss bottom chord carrying a ceiling had no check. The tile gives NDS 3.9.1 on both faces:
+  - the tension face, ft/Ft' + fb/Fb*, with Fb* taken without the beam stability factor CL;
+  - the compression face, (fb - ft)/Fb**, with Fb** taken without the volume factor CV.
+
+  It reproduces the Missouri S&T CE 5260 bottom-chord solution (2x6 No. 1 DF-L, 5,640 lb, 3,000 in-lb): 0.943 and -0.192.
+
 - **`rc-headed-bar-development`: headed deformed bar development length in tension (spec-v1930, Group E, `calc-concrete.js`), 2,233 -> 2,234, v0.423.0.** `rc-hook-development` covers standard hooks and said headed bars were separate; nothing computed them. The tile gives ACI 318-19 Eq. 25.4.4.2, ldt = (fy psi_e psi_p psi_o psi_c / (75 sqrt(f'c))) db^1.5 with the 8 db and 6 in floors, the Table 25.4.4.3 factors as selects, and the 25.4.4.1 cover, spacing, and head-area conditions. An ACI 318-25 mode uses the 90 coefficient that edition prints.
 
   It reproduces Dextra's ACI 318-25 headed bar calculation (#8, fy 70,000 psi, f'c 5,800 psi, epoxy coated): 12.092 in. No free 318-19 numeric example was found, so the 318-19 arithmetic is pinned by unit test: an uncoated #8 at 60 ksi in 4,000 psi concrete needs 10.96 in, against 14.9 in for a standard hook.

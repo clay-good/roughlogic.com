@@ -58379,3 +58379,20 @@ test("bounds: spec-v1930 computeRcHeadedBarDevelopment reproduces the Dextra ACI
   assert.ok("error" in _v1930({ ...base, edition: "318-14" }));
   assert.ok("error" in _v1930({ ...base, fc_psi: -4000 }));
 });
+
+import { computeWoodTensionBending as _v1931 } from "../../calc-construction.js";
+test("bounds: spec-v1931 computeWoodTensionBending reproduces the Missouri S&T bottom-chord check and its error seams", () => {
+  const base = { t_lb: 5640, m_inlb: 3000, a_in2: 8.25, s_in3: 7.563, ft_adj_psi: 1009, fb_star_psi: 1495, fb_dstar_psi: 1495 };
+  const r = _v1931(base);
+  assert.ok(Math.abs(r.tension_interaction - 0.94287) < 1e-4);
+  assert.ok(Math.abs(r.compression_side_ratio + 0.19195) < 1e-4);
+  assert.equal(r.passes, true);
+  // Blank Fb** takes Fb*; a lightly tensioned, heavily bent member fails on the compression face.
+  assert.equal(_v1931({ ...base, fb_dstar_psi: undefined }).fb_dstar_used_psi, 1495);
+  const c = _v1931({ ...base, t_lb: 500, m_inlb: 12000, fb_star_psi: 3000, fb_dstar_psi: 1400 });
+  assert.ok(c.compression_side_ratio > 1 && c.verdict.includes("3.9-2"));
+  assert.equal(_v1931({ ...base, t_lb: 8000 }).passes, false);
+  assert.ok("error" in _v1931({ ...base, t_lb: 0 }));
+  assert.ok("error" in _v1931({ ...base, m_inlb: -3000 }));
+  assert.ok("error" in _v1931({ ...base, s_in3: 0 }));
+});

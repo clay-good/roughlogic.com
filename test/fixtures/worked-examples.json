@@ -168088,6 +168088,38 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "wood-tension-bending",
+  "source_publisher": "Missouri University of Science and Technology (J. Thomas, CE 5260 Wood Design)",
+  "source_title": "Problem 7-5 solution: truss lower chord in combined bending and axial tension",
+  "source_edition_or_year": "course solution to the NDS (3.9.1)",
+  "source_section_or_page": "D+S case: 2x6 No. 1 DF-L, A 8.250 sq in, S 7.563 cu in, T 5.64 kip, M 3,000 lb-in (20 lb/ft over 10 ft), Ft' 1,009 psi, Fb' 1,495 psi (CL 1.0) -> 684/1,009 + 397/1,495 = 0.943; (397 - 684)/1,495 = -0.192.",
+  "verified_by": "rl",
+  "verified_on": "2026-10-08",
+  "inputs": {
+   "t_lb": 5640,
+   "m_inlb": 3000,
+   "a_in2": 8.25,
+   "s_in3": 7.563,
+   "ft_adj_psi": 1009,
+   "fb_star_psi": 1495,
+   "fb_dstar_psi": 1495
+  },
+  "outputs": {
+   "tension_interaction": {
+    "value": 0.943,
+    "tolerance": {
+     "abs": 0.002
+    }
+   },
+   "compression_side_ratio": {
+    "value": -0.192,
+    "tolerance": {
+     "abs": 0.002
+    }
+   }
+  }
  }
  ]
 }

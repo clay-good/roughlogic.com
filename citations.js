@@ -17496,6 +17496,18 @@ export const CITATIONS = {
       { name: "Design values", value: "Fv' and Ft' entered already adjusted (CD, CM, Ct, and member-specific reductions)", source: "NDS 2018 Table 4.3.1 / 5.3.1" },
     ],
   },
+  "wood-tension-bending": {
+    formula: "ft = T/A; fb = M/S; Eq. 3.9-1 ft/Ft' + fb/Fb* <= 1.0 (Fb* = Fb' excluding CL); Eq. 3.9-2 (fb - ft)/Fb** <= 1.0 (Fb** = Fb' excluding CV).",
+    edition: "The NDS 2018 3.9.1 bending-and-axial-tension interaction, Eq. 3.9-1 and 3.9-2, by name.",
+    freeAccess: "The NDS is free to view at awc.org (ANSI/AWC NDS); the worked check is a free Missouri S&T course solution (CE 5260, Problem 7-5).",
+    governance: GOVERNANCE.general,
+    editionNote: "Checked against the Missouri S&T CE 5260 Problem 7-5 solution: a 2x6 No. 1 DF-L truss bottom chord (A 8.25 sq in, S 7.563 cu in), D+S case, T 5,640 lb, M 3,000 in-lb, Ft' 1,009 psi, Fb' 1,495 psi (CD 1.15, CF 1.3, CL 1.0): 684/1,009 + 397/1,495 = 0.943 and (397 - 684)/1,495 = -0.192. This computes 0.9429 and -0.1920.",
+    assumptions: [
+      { name: "Fb*", value: "Fb' with every applicable factor except the beam stability factor CL", source: "NDS 2018 3.9.1" },
+      { name: "Fb**", value: "Fb' with every applicable factor except the volume factor CV; blank uses Fb*", source: "NDS 2018 3.9.1" },
+      { name: "Area", value: "the user enters the net area where fastener holes reduce the section", source: "NDS 2018 3.1.2" },
+    ],
+  },
   "wood-combined-bending-axial": {
     formula: "fc = P/A; fb = M/S; FcE = 0.822 Emin'/(le/d)^2; interaction = (fc/Fc')^2 + fb/[Fb'(1 - fc/FcE)] <= 1.0.",
     edition: "The NDS 2018 3.9.2 combined bending and axial compression interaction with the Euler stress FcE = 0.822 Emin'/(le/d)^2 and the 1 - fc/FcE P-delta moment magnifier, by name.",

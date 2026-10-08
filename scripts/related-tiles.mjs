@@ -2105,6 +2105,7 @@ const RELATED = {
   "wood-tension-member": ["wood-bolt-connection","column-buckling-wood","truss-capacity"],
   "wood-row-group-tearout": ["wood-bolt-connection","wood-tension-member","glulam-volume-factor"],
   "wood-combined-bending-axial": ["column-buckling-wood","wood-beam-bending","wall-bracing-length"],
+  "wood-tension-bending": ["wood-tension-member","wood-combined-bending-axial","wood-beam-bending"],
   // spec-v293..v295 steel connection/detailing depth batch (Group E)
   "steel-web-local-strength": ["steel-beam-shear","steel-beam-ltb","column-base-plate"],
   "slip-critical-with-tension": ["steel-bolt-slip-critical","steel-bolt-tension-shear","bolt-shear-bearing"],

@@ -2,99 +2,99 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "c5a5bacd0c472fe1",
+      "sha": "00406a17e483a971",
       "date": "2026-10-08"
     },
     "/tools/": {
-      "sha": "5982564a2c77a0dc",
+      "sha": "3a20ea47ddb45508",
       "date": "2026-10-08"
     },
     "/collections/disaster-response/": {
-      "sha": "003e2cca5dfe3d97",
+      "sha": "98e4c1ee9417ab48",
       "date": "2026-10-08"
     },
     "/groups/accounting/": {
-      "sha": "14aad6efe1901772",
+      "sha": "dbd616d724995a68",
       "date": "2026-10-08"
     },
     "/groups/agriculture/": {
-      "sha": "f921c5704d4be2d5",
+      "sha": "b853b12e886a8a58",
       "date": "2026-10-08"
     },
     "/groups/construction/": {
-      "sha": "48ea468ea2a75948",
+      "sha": "17086531ee60b6da",
       "date": "2026-10-08"
     },
     "/groups/cross-trade/": {
-      "sha": "3b43cbd497497c53",
+      "sha": "e99fce6faf70b3dc",
       "date": "2026-10-08"
     },
     "/groups/educators/": {
-      "sha": "ee7cd9269f35cebf",
+      "sha": "63f97146d7d5707b",
       "date": "2026-10-08"
     },
     "/groups/electrical/": {
-      "sha": "24b2dbd61171a1fd",
+      "sha": "fb41e9a4dbf02479",
       "date": "2026-10-08"
     },
     "/groups/field/": {
-      "sha": "041b530dc07db6b5",
+      "sha": "820918e98a2fab74",
       "date": "2026-10-08"
     },
     "/groups/fire-ground/": {
-      "sha": "df3e02547f6f1fb5",
+      "sha": "d806e98f7117e08a",
       "date": "2026-10-08"
     },
     "/groups/historical/": {
-      "sha": "18c6f9c511ad9eb0",
+      "sha": "da36572b9681638d",
       "date": "2026-10-08"
     },
     "/groups/hvac/": {
-      "sha": "50a6ac9042e5f5ff",
+      "sha": "6687795961666cc8",
       "date": "2026-10-08"
     },
     "/groups/kitchen/": {
-      "sha": "a7d24a873410e382",
+      "sha": "4c8011c5d0bc907d",
       "date": "2026-10-08"
     },
     "/groups/lab/": {
-      "sha": "7de11bc07536482e",
+      "sha": "39245e6ef0a3b582",
       "date": "2026-10-08"
     },
     "/groups/mechanic/": {
-      "sha": "d32c7cc46deb1d8f",
+      "sha": "3e5fcad3a61a7fb1",
       "date": "2026-10-08"
     },
     "/groups/plumbing/": {
-      "sha": "8affbb0da72d62cd",
+      "sha": "575330e56ca5af17",
       "date": "2026-10-08"
     },
     "/groups/real-estate/": {
-      "sha": "189d121fc62bfd46",
+      "sha": "ed5b0c8aa3fd7360",
       "date": "2026-10-08"
     },
     "/groups/references/": {
-      "sha": "269af123168f93d0",
+      "sha": "e7f40248b910591f",
       "date": "2026-10-08"
     },
     "/groups/restoration/": {
-      "sha": "fb301cc7e540b1fb",
+      "sha": "c800f94691d9463f",
       "date": "2026-10-08"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "5d89c70b16f4355f",
+      "sha": "67fe93546b2920dd",
       "date": "2026-10-08"
     },
     "/groups/stage/": {
-      "sha": "99c181f9d5af0f33",
+      "sha": "bdf043924bc46a8a",
       "date": "2026-10-08"
     },
     "/groups/trucking/": {
-      "sha": "2e44f88bed0e46d3",
+      "sha": "756f6e612180ef8b",
       "date": "2026-10-08"
     },
     "/groups/water/": {
-      "sha": "d766e99ab94421c1",
+      "sha": "7b7d62f4a885c69f",
       "date": "2026-10-08"
     },
     "/tools/aav-install-check/": {
@@ -8970,8 +8970,8 @@
       "date": "2026-10-08"
     },
     "/tools/wood-combined-bending-axial/": {
-      "sha": "939b52a29d42d48b",
-      "date": "2026-10-03"
+      "sha": "32e5dc1b64be0e9f",
+      "date": "2026-10-08"
     },
     "/tools/wood-emc/": {
       "sha": "e57a3933826426b5",
@@ -8992,6 +8992,10 @@
     "/tools/wood-screw-withdrawal/": {
       "sha": "2ac1b9a2e0461d04",
       "date": "2026-10-03"
+    },
+    "/tools/wood-tension-bending/": {
+      "sha": "0c527c17d774e394",
+      "date": "2026-10-08"
     },
     "/tools/wood-tension-member/": {
       "sha": "51e19d6108cbaaed",

@@ -1378,6 +1378,7 @@ export const COMPUTE_MAP = {
   "wood-tension-member": { module: "../../calc-construction.js", fn: "computeWoodTensionMember" },
   "wood-row-group-tearout": { module: "../../calc-construction.js", fn: "computeWoodRowGroupTearout" },
   "wood-combined-bending-axial": { module: "../../calc-construction.js", fn: "computeWoodCombinedBendingAxial" },
+  "wood-tension-bending": { module: "../../calc-construction.js", fn: "computeWoodTensionBending" },
   // spec-v293..v295 steel connection/detailing depth batch (3 tiles)
   "steel-web-local-strength": { module: "../../calc-steel.js", fn: "computeSteelWebLocalStrength" },
   "steel-bolt-slip-critical": { module: "../../calc-steel.js", fn: "computeSteelBoltSlipCritical" },

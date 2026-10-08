@@ -7010,7 +7010,7 @@ export function computeWoodCombinedBendingAxial({ p_lb = 0, m_inlb = 0, a_in2 = 
   const verdict = interaction <= 1 + 1e-9 ? "passes (at or under 1.0)" : "FAILS the NDS 3.9.2 interaction (over 1.0)";
   return {
     fc_psi, fb_psi, fce_psi, amplifier, interaction, verdict,
-    note: "NDS 3.9.2 beam-column interaction (fc/Fc')^2 + fb/[Fb'(1 - fc/FcE)] <= 1.0 with the Euler stress FcE = 0.822 Emin'/(le/d)^2; the 1 - fc/FcE term is the P-delta moment magnifier that grows without bound as the axial stress approaches FcE. Uniaxial bending plus concentric compression; enter Fc' already carrying Cp (column-buckling-wood) and Fb' already carrying CL (wood-beam-bending). Biaxial bending, the eccentric 6e/d term, and tension-plus-bending (3.9.1) are separate. A design aid, not a substitute for the engineer of record.",
+    note: "NDS 3.9.2 beam-column interaction (fc/Fc')^2 + fb/[Fb'(1 - fc/FcE)] <= 1.0 with the Euler stress FcE = 0.822 Emin'/(le/d)^2; the 1 - fc/FcE term is the P-delta moment magnifier that grows without bound as the axial stress approaches FcE. Uniaxial bending plus concentric compression; enter Fc' already carrying Cp (column-buckling-wood) and Fb' already carrying CL (wood-beam-bending). Biaxial bending and the eccentric 6e/d term are separate; tension-plus-bending (3.9.1) is the wood-tension-bending tile. A design aid, not a substitute for the engineer of record.",
   };
 }
 export const woodCombinedBendingAxialExample = { inputs: { p_lb: 3000, m_inlb: 3000, a_in2: 12.25, s_in3: 7.15, fc_adj_psi: 538.8, fb_adj_psi: 1350, emin_adj_psi: 580000, le_in: 96, d_in: 3.5 } };
@@ -7039,6 +7039,57 @@ const _renderWoodCombinedBendingAxial = _simpleRenderer({
   compute: computeWoodCombinedBendingAxial,
 });
 CONSTRUCTION_RENDERERS["wood-combined-bending-axial"] = _renderWoodCombinedBendingAxial;
+
+// ===================== spec-v1931: combined bending and axial tension (NDS 3.9.1) =====================
+// The beam-column tile covers compression plus bending (3.9.2) and said tension-plus-bending (3.9.1) was
+// separate. NDS 3.9.1: ft/Ft' + fb/Fb* <= 1.0 (Eq. 3.9-1) and (fb - ft)/Fb** <= 1.0 (Eq. 3.9-2), where
+// Fb* is Fb' without CL and Fb** is Fb' without CV. Checked against a Missouri S&T (CE 5260) truss
+// bottom-chord solution: 684/1,009 + 397/1,495 = 0.943.
+// dims: in { t_lb: M L T^-2, m_inlb: M L^2 T^-2, a_in2: L^2, s_in3: L^3, ft_adj_psi: M L^-1 T^-2, fb_star_psi: M L^-1 T^-2, fb_dstar_psi: M L^-1 T^-2 } out: { ft_psi: M L^-1 T^-2, fb_psi: M L^-1 T^-2, tension_interaction: dimensionless, compression_side_ratio: dimensionless }
+export function computeWoodTensionBending({ t_lb = 0, m_inlb = 0, a_in2 = 0, s_in3 = 0, ft_adj_psi = 0, fb_star_psi = 0, fb_dstar_psi } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(t_lb > 0)) return { error: "Axial tension must be positive (lb)." };
+  if (!(m_inlb >= 0)) return { error: "Bending moment cannot be negative (in-lb; enter its magnitude)." };
+  if (!(a_in2 > 0) || !(s_in3 > 0)) return { error: "Area and section modulus must be positive." };
+  if (!(ft_adj_psi > 0) || !(fb_star_psi > 0)) return { error: "Adjusted Ft' and Fb* must be positive (psi)." };
+  const fbss = fb_dstar_psi === undefined || fb_dstar_psi === 0 ? fb_star_psi : fb_dstar_psi;
+  if (!(fbss > 0)) return { error: "Fb** must be positive (psi; blank = Fb*)." };
+  const ft_psi = t_lb / a_in2;
+  const fb_psi = m_inlb / s_in3;
+  const tension_interaction = ft_psi / ft_adj_psi + fb_psi / fb_star_psi;
+  const compression_side_ratio = (fb_psi - ft_psi) / fbss;
+  const governing = Math.max(tension_interaction, compression_side_ratio);
+  const passes = governing <= 1 + 1e-9;
+  return {
+    ft_psi, fb_psi, fb_dstar_used_psi: fbss, tension_interaction, compression_side_ratio, governing, passes,
+    verdict: passes ? "passes both NDS 3.9.1 checks (at or under 1.0)" : (tension_interaction > compression_side_ratio ? "FAILS Eq. 3.9-1, the tension face" : "FAILS Eq. 3.9-2, the compression face"),
+    note: "A truss bottom chord carrying a ceiling, or a tie with an eccentric connection, is in tension and bending at once. NDS 3.9.1 checks the tension face, ft/Ft' + fb/Fb* <= 1.0, where Fb* is the adjusted bending value WITHOUT the beam stability factor CL, because the tension face cannot buckle; and the compression face, (fb - ft)/Fb** <= 1.0, where Fb** keeps CL but drops the volume factor CV, because the axial tension only partly relieves the compression from bending and a slender, unbraced member can still buckle laterally. For sawn lumber with no CV, Fb** is simply Fb' (leave it blank to use Fb*). Use the net area at a bolt hole for ft (the wood-tension-member calculation shows the deduction). Uniaxial bending; biaxial bending is a separate check. A design aid; the engineer of record governs.",
+  };
+}
+export const woodTensionBendingExample = { inputs: { t_lb: 5640, m_inlb: 3000, a_in2: 8.25, s_in3: 7.563, ft_adj_psi: 1009, fb_star_psi: 1495, fb_dstar_psi: 1495 } };
+
+const _renderWoodTensionBending = _simpleRenderer({
+  citation: "Citation: NDS 2018 3.9.1 bending and axial tension: ft/Ft' + fb/Fb* <= 1.0 (Eq. 3.9-1) and (fb - ft)/Fb** <= 1.0 (Eq. 3.9-2), Fb* = Fb' excluding CL, Fb** = Fb' excluding CV, by name. Uniaxial, adjusted values entered. A design aid, not a substitute for the engineer of record.",
+  example: woodTensionBendingExample.inputs,
+  fields: [
+    { key: "t_lb", label: "Axial tension T (lb)", kind: "number" },
+    { key: "m_inlb", label: "Bending moment M (in-lb)", kind: "number" },
+    { key: "a_in2", label: "Area A (in², net at holes)", kind: "number" },
+    { key: "s_in3", label: "Section modulus S (in³)", kind: "number" },
+    { key: "ft_adj_psi", label: "Adjusted Ft' (psi)", kind: "number" },
+    { key: "fb_star_psi", label: "Fb* = Fb' without CL (psi)", kind: "number" },
+    { key: "fb_dstar_psi", label: "Fb** = Fb' without CV (psi, blank = Fb*)", kind: "number", blankUndefined: true },
+  ],
+  outputs: [
+    { key: "st", id: "wtb-out-st", label: "Applied ft / fb", value: (r) => fmt(r.ft_psi, 0) + " / " + fmt(r.fb_psi, 0) + " psi" },
+    { key: "t", id: "wtb-out-t", label: "Tension face ft/Ft' + fb/Fb*", value: (r) => fmt(r.tension_interaction, 3) },
+    { key: "c", id: "wtb-out-c", label: "Compression face (fb - ft)/Fb**", value: (r) => fmt(r.compression_side_ratio, 3) },
+    { key: "v", id: "wtb-out-v", label: "Result", value: (r) => r.verdict },
+    { key: "n", id: "wtb-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeWoodTensionBending,
+});
+CONSTRUCTION_RENDERERS["wood-tension-bending"] = _renderWoodTensionBending;
 
 // ===================== spec-v296..v298: ASCE 7 wind-and-snow load depth batch =====================
 // The load cases the single velocity-pressure and flat-snow tiles never build:

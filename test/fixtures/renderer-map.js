@@ -738,6 +738,7 @@ export const RENDERER_MAP = {
   "wood-bearing-perpendicular": { module: "../../calc-construction.js", exportName: "CONSTRUCTION_RENDERERS" },
   "wood-tension-member": { module: "../../calc-construction.js", exportName: "CONSTRUCTION_RENDERERS" },
   "wood-combined-bending-axial": { module: "../../calc-construction.js", exportName: "CONSTRUCTION_RENDERERS" },
+  "wood-tension-bending": { module: "../../calc-construction.js", exportName: "CONSTRUCTION_RENDERERS" },
   "wood-row-group-tearout": { module: "../../calc-construction.js", exportName: "CONSTRUCTION_RENDERERS" },
   "wind-cc-pressure": { module: "../../calc-construction.js", exportName: "CONSTRUCTION_RENDERERS" },
   "snow-drift-load": { module: "../../calc-construction.js", exportName: "CONSTRUCTION_RENDERERS" },
