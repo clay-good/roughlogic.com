@@ -58333,3 +58333,29 @@ test("bounds: spec-v1928 computeBoltPryingAction reproduces AISC Example II.D-1 
   assert.ok("error" in _v1928({ ...base, flange_t_in: 0 }));
   assert.ok("error" in _v1928({ ...base, b_in: 0.3 }));
 });
+
+import { computeWoodRowGroupTearout as _v1929 } from "../../calc-construction.js";
+test("bounds: spec-v1929 computeWoodRowGroupTearout reproduces the AWC Appendix E example and its error seams", () => {
+  const base = { t_in: 3.125, d_in: 12, dh_in: 1.0625, n_rows: 3, bolts_outer_row: 3, bolts_inner_row: 2, end_dist_in: 7, bolt_spacing_in: 4, row_spacing_in: 2.5, fv_adj_psi: 240, ft_adj_psi: 1450, fastener_capacity_lb: 35040 };
+  const r = _v1929(base);
+  assert.equal(r.z_rt_outer_lb, 9000);
+  assert.equal(r.z_rt_lb, 24000);
+  assert.ok(Math.abs(r.z_nt_lb - 39931.640625) < 1e-6);
+  assert.ok(Math.abs(r.z_gt_lb - 22027.34375) < 1e-6);
+  assert.equal(r.governs, "group tear-out");
+  // Blank interior rows take the outer count; a single row has no group tear-out.
+  assert.equal(_v1929({ ...base, bolts_inner_row: undefined }).z_rt_lb, 27000);
+  const one = _v1929({ ...base, n_rows: 1, row_spacing_in: 0 });
+  assert.equal(one.z_gt_lb, null);
+  assert.equal(one.z_rt_lb, 9000);
+  // A short end distance sets s_critical; a one-bolt row uses the end distance alone.
+  assert.equal(_v1929({ ...base, end_dist_in: 3 }).s_crit_in, 3);
+  assert.equal(_v1929({ ...base, bolts_outer_row: 1, bolts_inner_row: 1, bolt_spacing_in: 0 }).s_crit_in, 7);
+  // Weak bolts govern over the wood.
+  assert.equal(_v1929({ ...base, fastener_capacity_lb: 10000 }).governs, "the fasteners");
+  assert.ok("error" in _v1929({ ...base, n_rows: 2.5 }));
+  assert.ok("error" in _v1929({ ...base, row_spacing_in: 1 }));
+  assert.ok("error" in _v1929({ ...base, row_spacing_in: 6 }));
+  assert.ok("error" in _v1929({ ...base, fv_adj_psi: -240 }));
+  assert.ok("error" in _v1929({ ...base, fastener_capacity_lb: -1 }));
+});

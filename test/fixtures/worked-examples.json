@@ -167965,6 +167965,97 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "wood-row-group-tearout",
+  "source_publisher": "American Wood Council (AWC)",
+  "source_title": "Is Your Wood Connection All Stressed Out? It Needn't Be: Appendix E Provisions, Example 1 Staggered Bolts",
+  "source_edition_or_year": "Wood Design Focus, Winter 2002 (2001 NDS Appendix E)",
+  "source_section_or_page": "pp. 10-11: 3-1/8 x 12 Comb. 3 DF glulam, Fv' 240 psi, Ft' 1,450 psi, eight 1 in bolts (1.0625 in holes) in rows of 3, 2, 3 at 2.5 in, end 7 in, spacing 4 in, n Z' 35,040 lb -> Z'NT 39,930 lb, Z'RT 24,000 lb, Z'GT 22,030 lb (governs).",
+  "verified_by": "rl",
+  "verified_on": "2026-10-08",
+  "inputs": {
+   "t_in": 3.125,
+   "d_in": 12,
+   "dh_in": 1.0625,
+   "n_rows": 3,
+   "bolts_outer_row": 3,
+   "bolts_inner_row": 2,
+   "end_dist_in": 7,
+   "bolt_spacing_in": 4,
+   "row_spacing_in": 2.5,
+   "fv_adj_psi": 240,
+   "ft_adj_psi": 1450,
+   "fastener_capacity_lb": 35040
+  },
+  "outputs": {
+   "z_nt_lb": {
+    "value": 39930,
+    "tolerance": {
+     "pct": 0.1
+    }
+   },
+   "z_rt_lb": {
+    "value": 24000,
+    "tolerance": {
+     "pct": 0.01
+    }
+   },
+   "z_gt_lb": {
+    "value": 22030,
+    "tolerance": {
+     "pct": 0.1
+    }
+   },
+   "connection_capacity_lb": {
+    "value": 22030,
+    "tolerance": {
+     "pct": 0.1
+    }
+   }
+  }
+ },
+ {
+  "tile_id": "wood-row-group-tearout",
+  "source_publisher": "STRUCTURE magazine (NCSEA / CASE / SEI), authored by AWC staff",
+  "source_title": "Design of Bolted Connections per the 2015 NDS",
+  "source_edition_or_year": "2015 NDS (ASD)",
+  "source_section_or_page": "Worked splice: 2x12 No. 2 Southern Pine, two rows of three 1 in bolts (1.0625 in holes), Fv' = 175 x 1.25, Ft' = 450 x 1.25, s_critical 4 in -> Z'RT 7,875 lb, Z'GT 6,418 lb (governs), Z'NT 7,706 lb, n Z' 9,562 lb. The article prints only s_critical; the 7 in end distance is the NDS full-value minimum, and the 4 in row spacing is back-solved from its A_group-net 4.41 sq in. Its 13.7 and 4.41 sq in are rounded, so the tile gives 7,699 and 6,416 lb.",
+  "verified_by": "rl",
+  "verified_on": "2026-10-08",
+  "inputs": {
+   "t_in": 1.5,
+   "d_in": 11.25,
+   "dh_in": 1.0625,
+   "n_rows": 2,
+   "bolts_outer_row": 3,
+   "end_dist_in": 7,
+   "bolt_spacing_in": 4,
+   "row_spacing_in": 4,
+   "fv_adj_psi": 218.75,
+   "ft_adj_psi": 562.5,
+   "fastener_capacity_lb": 9562
+  },
+  "outputs": {
+   "z_rt_lb": {
+    "value": 7875,
+    "tolerance": {
+     "pct": 0.1
+    }
+   },
+   "z_gt_lb": {
+    "value": 6418,
+    "tolerance": {
+     "pct": 0.1
+    }
+   },
+   "z_nt_lb": {
+    "value": 7706,
+    "tolerance": {
+     "pct": 0.2
+    }
+   }
+  }
  }
  ]
 }

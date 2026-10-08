@@ -6,6 +6,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Added
 
+- **`wood-row-group-tearout`: row and group tear-out of a bolted wood member (spec-v1929, Group E, `calc-construction.js`), 2,232 -> 2,233, v0.422.0.** `wood-bolt-connection` gives a bolt's yield value and `wood-tension-member` the net section; that tile's note said "row/group tear-out is separate", and nothing computed it. From NDS Appendix E the tile reports:
+  - net section tension Z'NT = Ft' t (d - n_row Dh),
+  - row tear-out Z'RT, each row n Fv' t s_critical with s_critical the lesser of the end distance and the in-row spacing,
+  - group tear-out Z'GT = Z'RT-1/2 + Z'RT-n/2 + Ft' t (n_row - 1)(s_row - Dh),
+  - which of these, or the bolt group capacity n Z' when entered, limits the connection.
+
+  It reproduces AWC Wood Design Focus (Winter 2002) Example 1, a 3-1/8 x 12 glulam with eight 1 in bolts in staggered rows of 3, 2, 3: 39,932 / 24,000 / 22,027 lb against the printed 39,930 / 24,000 / 22,030, group tear-out governing over 35,040 lb of bolt capacity. The STRUCTURE magazine 2015 NDS splice gives 6,416 lb of group tear-out against the printed 6,418 (the article rounds its areas).
+
 - **`asme-head-thickness` handles non-standard formed heads (ASME VIII-1 Appendix 1-4).** It covered only the 2:1 ellipsoidal and the standard flanged-and-dished head (L = D, r = 0.06 L), and named every other proportion "outside this tile". Optional ratios now apply Appendix 1-4:
   - ellipsoidal, any D/2h from 1 to 3, with K = (2 + (D/2h)^2) / 6, so 2.5 gives 1.375 (the table prints 1.37);
   - torispherical, with M = (3 + sqrt(L/r)) / 4, knuckle at least 6% of L and L no more than D.

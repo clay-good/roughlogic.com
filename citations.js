@@ -17484,6 +17484,18 @@ export const CITATIONS = {
       { name: "Scope", value: "parallel-to-grain tension only; connection yield and tear-out are separate checks", source: "NDS 2018 3.8" },
     ],
   },
+  "wood-row-group-tearout": {
+    formula: "Z'NT = Ft' t (d - nrow Dh); Z'RTi = ni Fv' t scrit, scrit = min(end distance, in-row spacing) (end distance alone for a one-bolt row); Z'RT = sum of Z'RTi; Z'GT = Z'RT-1/2 + Z'RT-n/2 + Ft' t (nrow - 1)(srow - Dh); the connection takes the least of these and the bolt group capacity n Z' when entered.",
+    edition: "ANSI/AWC NDS (2018) Appendix E, local stresses in fastener groups (Eq. E.2-1, E.3-2, E.3-3, E.4-1), by name, as worked in AWC Wood Design Focus, Winter 2002, \"Is Your Wood Connection All Stressed Out? It Needn't Be: Appendix E Provisions\".",
+    freeAccess: "The NDS is free to view at awc.org; the Wood Design Focus article with its worked examples is a free PDF at awc.org.",
+    governance: GOVERNANCE.general,
+    editionNote: "Checked against Wood Design Focus Example 1: a 3-1/8 x 12 in Combination 3 Douglas fir glulam, Fv' 240 psi, Ft' 1,450 psi, eight 1 in bolts in 1-1/16 in holes in three staggered rows (3, 2, 3) at 2.5 in row spacing, 7 in end distance and 4 in spacing, n Z' 35,040 lb: Z'NT 39,930 lb, Z'RT 24,000 lb, Z'GT 22,030 lb, group tear-out governs; this computes 39,932, 24,000 and 22,027 lb. Also reproduces the 2015 NDS splice in STRUCTURE magazine (Design of Bolted Connections per the 2015 NDS): 2x12 No. 2 Southern Pine, two rows of three 1 in bolts, Fv' 218.75 psi, Ft' 562.5 psi, s_critical 4 in: Z'RT 7,875 lb and Z'GT 6,416 lb against the printed 6,418 (the article rounds A_group-net to 4.41 sq in).",
+    assumptions: [
+      { name: "Shear lines", value: "two per row at an apparent stress of Fv'/2 over the shortest clear length", source: "NDS Appendix E.3" },
+      { name: "Net section", value: "one hole deducted per row, conservative for a staggered pattern", source: "NDS Appendix E.2" },
+      { name: "Design values", value: "Fv' and Ft' entered already adjusted (CD, CM, Ct, and member-specific reductions)", source: "NDS 2018 Table 4.3.1 / 5.3.1" },
+    ],
+  },
   "wood-combined-bending-axial": {
     formula: "fc = P/A; fb = M/S; FcE = 0.822 Emin'/(le/d)^2; interaction = (fc/Fc')^2 + fb/[Fb'(1 - fc/FcE)] <= 1.0.",
     edition: "The NDS 2018 3.9.2 combined bending and axial compression interaction with the Euler stress FcE = 0.822 Emin'/(le/d)^2 and the 1 - fc/FcE P-delta moment magnifier, by name.",

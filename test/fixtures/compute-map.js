@@ -1375,6 +1375,7 @@ export const COMPUTE_MAP = {
   // spec-v290..v292 NDS wood-member depth batch (3 tiles)
   "wood-bearing-perpendicular": { module: "../../calc-construction.js", fn: "computeWoodBearingPerpendicular" },
   "wood-tension-member": { module: "../../calc-construction.js", fn: "computeWoodTensionMember" },
+  "wood-row-group-tearout": { module: "../../calc-construction.js", fn: "computeWoodRowGroupTearout" },
   "wood-combined-bending-axial": { module: "../../calc-construction.js", fn: "computeWoodCombinedBendingAxial" },
   // spec-v293..v295 steel connection/detailing depth batch (3 tiles)
   "steel-web-local-strength": { module: "../../calc-steel.js", fn: "computeSteelWebLocalStrength" },

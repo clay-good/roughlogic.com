@@ -693,7 +693,7 @@ const _TILES = [
   // spec-v287..v289 geotechnical foundation depth batch
   ["soil-settlement-elastic", "E"], ["elastic-settlement-allowable-pressure", "E"], ["pile-axial-capacity", "E"], ["pile-length-for-capacity", "E"], ["slope-stability-infinite", "E"], ["slope-failure-depth-for-fs", "E"], ["frost-depth-berggren", "E"],
   // spec-v290..v292 NDS wood-member depth batch
-  ["wood-bearing-perpendicular", "E"], ["wood-tension-member", "E"], ["wood-combined-bending-axial", "E"],
+  ["wood-bearing-perpendicular", "E"], ["wood-tension-member", "E"], ["wood-row-group-tearout", "E"], ["wood-combined-bending-axial", "E"],
   // spec-v293..v295 steel connection/detailing depth batch
   ["steel-web-local-strength", "E"], ["steel-bolt-slip-critical", "E"], ["slip-critical-with-tension", "E"], ["steel-fillet-weld-size", "E"],
   // spec-v296..v298 ASCE 7 wind-and-snow load depth batch

@@ -6369,6 +6369,11 @@
     {"term":"safe room square feet per person","target":"safe-room-capacity","kind":"industry"},
     {"term":"fema p-361 occupant density","target":"safe-room-capacity","kind":"industry"},
     {"term":"hurricane shelter capacity","target":"safe-room-capacity","kind":"industry"},
-    {"term":"storm shelter how many people","target":"safe-room-capacity","kind":"industry"}
+    {"term":"storm shelter how many people","target":"safe-room-capacity","kind":"industry"},
+    {"term":"row tear-out","target":"wood-row-group-tearout","kind":"industry"},
+    {"term":"group tear-out","target":"wood-row-group-tearout","kind":"industry"},
+    {"term":"nds appendix e","target":"wood-row-group-tearout","kind":"redirect"},
+    {"term":"bolt group tear out wood","target":"wood-row-group-tearout","kind":"industry"},
+    {"term":"wood connection block shear","target":"wood-row-group-tearout","kind":"adjacent"}
   ]
 }

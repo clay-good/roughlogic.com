@@ -148,4 +148,6 @@ export const INERT_INPUTS = {
   "weld-heat-input::process": "sets the efficiency only when the efficiency is left blank",
   "weld-visual-acceptance::allowed_undersize_in": "moves the answer once another input changes (1,500 randomized settings)",
   "wire-ampacity::bundle_count": "a step at more than 3 conductors (NEC 310.15(C)(1))",
+  "wood-row-group-tearout::end_dist_in": "read only when the end distance is shorter than the in-row spacing (both examples space bolts closer)",
+  "wood-row-group-tearout::fastener_capacity_lb": "governs only below the wood's capacity (both examples' bolts are stronger than the wood)",
 };

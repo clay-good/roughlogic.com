@@ -2,99 +2,99 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "a8b7e796bb6c51c8",
+      "sha": "27933b2afe0c02de",
       "date": "2026-10-08"
     },
     "/tools/": {
-      "sha": "86cd71c6ed258c3c",
+      "sha": "e428e0e1be199a3a",
       "date": "2026-10-08"
     },
     "/collections/disaster-response/": {
-      "sha": "26643a9c3f91e876",
+      "sha": "20a6c14db7b3482a",
       "date": "2026-10-08"
     },
     "/groups/accounting/": {
-      "sha": "e9bcd8422c9324b2",
+      "sha": "ae66277839e21056",
       "date": "2026-10-08"
     },
     "/groups/agriculture/": {
-      "sha": "155a6d9be5a270b9",
+      "sha": "cab47ddce856698e",
       "date": "2026-10-08"
     },
     "/groups/construction/": {
-      "sha": "be0ff21c0cdb1672",
+      "sha": "f010d5e2b2d47cd7",
       "date": "2026-10-08"
     },
     "/groups/cross-trade/": {
-      "sha": "4b3d19df2e8a22ad",
+      "sha": "d4bfbd46fc2097dd",
       "date": "2026-10-08"
     },
     "/groups/educators/": {
-      "sha": "73cd1b59f1d2e099",
+      "sha": "b7c5905274b5fc44",
       "date": "2026-10-08"
     },
     "/groups/electrical/": {
-      "sha": "86c3759be7f6736b",
+      "sha": "5f44e3badcf07ecd",
       "date": "2026-10-08"
     },
     "/groups/field/": {
-      "sha": "b5fd96abecb1c5b5",
+      "sha": "3cf907098f6475d9",
       "date": "2026-10-08"
     },
     "/groups/fire-ground/": {
-      "sha": "5e7483553459bf87",
+      "sha": "28f8855589030fca",
       "date": "2026-10-08"
     },
     "/groups/historical/": {
-      "sha": "580b92c0ee04046d",
+      "sha": "9e8ef5c3422d2723",
       "date": "2026-10-08"
     },
     "/groups/hvac/": {
-      "sha": "0d004372721ba764",
+      "sha": "c5ce1ec8f32420e5",
       "date": "2026-10-08"
     },
     "/groups/kitchen/": {
-      "sha": "49fa1974c2271076",
+      "sha": "4f9247293a6d3678",
       "date": "2026-10-08"
     },
     "/groups/lab/": {
-      "sha": "056e99f6651aa461",
+      "sha": "3e9b45288847bad4",
       "date": "2026-10-08"
     },
     "/groups/mechanic/": {
-      "sha": "3976eda566726e73",
+      "sha": "686cbd0d0884991e",
       "date": "2026-10-08"
     },
     "/groups/plumbing/": {
-      "sha": "25b619ac07cfeaf5",
+      "sha": "093314c56c0f212c",
       "date": "2026-10-08"
     },
     "/groups/real-estate/": {
-      "sha": "32358cdc4f25bfd5",
+      "sha": "4fe0a650a6e4f11f",
       "date": "2026-10-08"
     },
     "/groups/references/": {
-      "sha": "19b3621ba6053197",
+      "sha": "83cd0c84fe550519",
       "date": "2026-10-08"
     },
     "/groups/restoration/": {
-      "sha": "424b4082fe85f8b5",
+      "sha": "9011f339206f8971",
       "date": "2026-10-08"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "0cb8fb7177a581a2",
+      "sha": "69b66612331d82ef",
       "date": "2026-10-08"
     },
     "/groups/stage/": {
-      "sha": "debf676776db1baa",
+      "sha": "23ff42036c47724f",
       "date": "2026-10-08"
     },
     "/groups/trucking/": {
-      "sha": "47e0a8e8c99d13a6",
+      "sha": "2bef485f8a2f43fe",
       "date": "2026-10-08"
     },
     "/groups/water/": {
-      "sha": "bf0e42e9fabd38b3",
+      "sha": "97a92cf7bcb5ee13",
       "date": "2026-10-08"
     },
     "/tools/aav-install-check/": {
@@ -8946,24 +8946,24 @@
       "date": "2026-09-29"
     },
     "/tools/wood-beam-bending/": {
-      "sha": "76a564a1c199b796",
-      "date": "2026-09-29"
+      "sha": "dc59bc7e3d4ba9c5",
+      "date": "2026-10-08"
     },
     "/tools/wood-beam-compression-notch/": {
       "sha": "7515b9752af8ffcc",
       "date": "2026-09-29"
     },
     "/tools/wood-beam-shear/": {
-      "sha": "e78da7ce80ced54d",
-      "date": "2026-09-29"
+      "sha": "7bd4f6248bee81a5",
+      "date": "2026-10-08"
     },
     "/tools/wood-bearing-perpendicular/": {
       "sha": "c6a695fd92d472eb",
       "date": "2026-09-30"
     },
     "/tools/wood-bolt-connection/": {
-      "sha": "96a14f4a8f63d7ce",
-      "date": "2026-09-29"
+      "sha": "1f4b4153a6ce24a2",
+      "date": "2026-10-08"
     },
     "/tools/wood-combined-bending-axial/": {
       "sha": "939b52a29d42d48b",
@@ -8980,6 +8980,10 @@
     "/tools/wood-nail-withdrawal/": {
       "sha": "3a7704219a317d5b",
       "date": "2026-09-29"
+    },
+    "/tools/wood-row-group-tearout/": {
+      "sha": "b0242fef6c8fdd23",
+      "date": "2026-10-08"
     },
     "/tools/wood-screw-withdrawal/": {
       "sha": "2ac1b9a2e0461d04",

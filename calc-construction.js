@@ -6887,7 +6887,7 @@ export function computeWoodTensionMember({ t_lb = 0, b_in = 0, d_in = 0, dh_in =
   const dcr = ft_applied_psi / ft_adj_psi;
   return {
     ag_in2, an_in2, ft_adj_psi, ft_applied_psi, dcr,
-    note: "NDS 3.8.1 tension parallel to grain: ft = T / An against Ft' = Ft x CD x CF (supply the remaining CM / Ct / Ci inside the entered factors if they apply), with the net area An = b d - nh dh b deducting fastener holes in a single transverse line (no staggered-row chain). Perpendicular-to-grain tension is avoided, not checked; the fastener yield is the wood-bolt-connection tile; row/group tear-out is separate. A design aid, not a substitute for the engineer of record.",
+    note: "NDS 3.8.1 tension parallel to grain: ft = T / An against Ft' = Ft x CD x CF (supply the remaining CM / Ct / Ci inside the entered factors if they apply), with the net area An = b d - nh dh b deducting fastener holes in a single transverse line (no staggered-row chain). Perpendicular-to-grain tension is avoided, not checked; the fastener yield is the wood-bolt-connection tile; row and group tear-out is the wood-row-group-tearout tile. A design aid, not a substitute for the engineer of record.",
   };
 }
 export const woodTensionMemberExample = { inputs: { t_lb: 3000, b_in: 1.5, d_in: 5.5, dh_in: 0.75, nh: 1, ft_psi: 575, cd_f: 1.0, cf_f: 1.3 } };
@@ -6915,6 +6915,79 @@ const _renderWoodTensionMember = _simpleRenderer({
   compute: computeWoodTensionMember,
 });
 CONSTRUCTION_RENDERERS["wood-tension-member"] = _renderWoodTensionMember;
+
+// ===================== spec-v1929: row and group tear-out of a bolted wood member (NDS Appendix E) =====================
+// The bolt yield (wood-bolt-connection) and the net section (wood-tension-member) leave the wood around a
+// closely spaced bolt group unchecked. NDS Appendix E: net section Z'NT = Ft' t (d - nrow Dh); row tear-out
+// Z'RTi = ni Fv' t scrit, scrit = the lesser of the end distance and the in-row spacing, Z'RT = sum over rows;
+// group tear-out Z'GT = Z'RT-1/2 + Z'RT-n/2 + Ft' t (nrow - 1)(srow - Dh). Checked against the AWC Wood Design
+// Focus (Winter 2002) Appendix E Example 1: 39,930 / 24,000 / 22,030 lb, group tear-out governs.
+// dims: in { t_in: L, d_in: L, dh_in: L, n_rows: dimensionless, bolts_outer_row: dimensionless, bolts_inner_row: dimensionless, end_dist_in: L, bolt_spacing_in: L, row_spacing_in: L, fv_adj_psi: M L^-1 T^-2, ft_adj_psi: M L^-1 T^-2, fastener_capacity_lb: M L T^-2 } out: { s_crit_in: L, z_nt_lb: M L T^-2, z_rt_lb: M L T^-2, z_gt_lb: M L T^-2, member_capacity_lb: M L T^-2, connection_capacity_lb: M L T^-2 }
+export function computeWoodRowGroupTearout({ t_in = 0, d_in = 0, dh_in = 0, n_rows = 1, bolts_outer_row = 0, bolts_inner_row, end_dist_in = 0, bolt_spacing_in = 0, row_spacing_in = 0, fv_adj_psi = 0, ft_adj_psi = 0, fastener_capacity_lb = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(t_in > 0) || !(d_in > 0)) return { error: "Member thickness and depth must be positive (in)." };
+  if (!(dh_in > 0)) return { error: "Bolt-hole diameter must be positive (in)." };
+  if (!(n_rows >= 1) || !Number.isInteger(n_rows)) return { error: "Number of rows must be a whole number of at least 1." };
+  if (!(bolts_outer_row >= 1) || !Number.isInteger(bolts_outer_row)) return { error: "Bolts per outer row must be a whole number of at least 1." };
+  const inner = bolts_inner_row === undefined || bolts_inner_row === 0 ? bolts_outer_row : bolts_inner_row;
+  if (!(inner >= 1) || !Number.isInteger(inner)) return { error: "Bolts per interior row must be a whole number (blank = same as the outer rows)." };
+  if (!(end_dist_in > 0)) return { error: "End distance must be positive (in)." };
+  const anySpacing = bolts_outer_row > 1 || (n_rows > 2 && inner > 1);
+  if (anySpacing && !(bolt_spacing_in > dh_in)) return { error: "Bolt spacing in a row must exceed the hole diameter (in)." };
+  if (n_rows > 1 && !(row_spacing_in > dh_in)) return { error: "Row spacing must exceed the hole diameter (in)." };
+  if (!((n_rows - 1) * (n_rows > 1 ? row_spacing_in : 0) + dh_in < d_in)) return { error: "The bolt group does not fit in the member depth." };
+  if (!(fv_adj_psi > 0) || !(ft_adj_psi > 0)) return { error: "Adjusted Fv' and Ft' must be positive (psi)." };
+  if (fastener_capacity_lb < 0) return { error: "Fastener capacity cannot be negative (lb; 0 to skip)." };
+  // A one-bolt row has no in-row spacing, so only the end distance bounds its shear lines.
+  const scritFor = (n) => (n > 1 ? Math.min(end_dist_in, bolt_spacing_in) : end_dist_in);
+  const rowRt = (n) => n * fv_adj_psi * t_in * scritFor(n);
+  const z_rt_outer_lb = rowRt(bolts_outer_row);
+  const z_rt_lb = n_rows === 1 ? z_rt_outer_lb : 2 * z_rt_outer_lb + (n_rows - 2) * rowRt(inner);
+  const z_nt_lb = ft_adj_psi * t_in * (d_in - n_rows * dh_in);
+  const z_gt_lb = n_rows > 1 ? z_rt_outer_lb + ft_adj_psi * t_in * (n_rows - 1) * (row_spacing_in - dh_in) : null;
+  const modes = [["net section tension", z_nt_lb], ["row tear-out", z_rt_lb]];
+  if (z_gt_lb != null) modes.push(["group tear-out", z_gt_lb]);
+  let gov = modes[0];
+  for (const m of modes) if (m[1] < gov[1] - 1e-9) gov = m;
+  const member_capacity_lb = gov[1];
+  const hasFastener = fastener_capacity_lb > 0;
+  const connection_capacity_lb = hasFastener ? Math.min(member_capacity_lb, fastener_capacity_lb) : member_capacity_lb;
+  const governs = hasFastener && fastener_capacity_lb < member_capacity_lb - 1e-9 ? "the fasteners" : gov[0];
+  return {
+    s_crit_in: scritFor(bolts_outer_row), bolts_inner_row_used: inner, z_nt_lb, z_rt_outer_lb, z_rt_lb, z_gt_lb,
+    member_capacity_lb, member_governs: gov[0], connection_capacity_lb, governs,
+    note: "A closely spaced bolt group loaded parallel to grain can fail in the wood before any bolt yields: a row shears out through the member end (row tear-out), or the whole block bounded by the outer rows pulls out (group tear-out). NDS Appendix E takes each row's shear lines at the shortest clear length, the lesser of the end distance and the in-row spacing, at an apparent stress of Fv'/2 on two lines; the group adds Ft' on the net width between the outer rows. Enter Fv' and Ft' already adjusted (CD, CM, Ct, and for a notched or non-prismatic member the NDS reductions). Net section deducts one hole per row, conservative for a staggered pattern. Enter the multiple-bolt capacity n Z' (with Cg and the geometry factor) to see whether the bolts or the wood governs; the bolt yield value is the wood-bolt-connection calculation. A design aid; the engineer of record governs.",
+  };
+}
+export const woodRowGroupTearoutExample = { inputs: { t_in: 3.125, d_in: 12, dh_in: 1.0625, n_rows: 3, bolts_outer_row: 3, bolts_inner_row: 2, end_dist_in: 7, bolt_spacing_in: 4, row_spacing_in: 2.5, fv_adj_psi: 240, ft_adj_psi: 1450, fastener_capacity_lb: 35040 } };
+
+const _renderWoodRowGroupTearout = _simpleRenderer({
+  citation: "Citation: NDS (2018) Appendix E, local stresses in fastener groups, by name: net section Z'NT = Ft' A_net (E.2-1); row tear-out Z'RTi = ni Fv' t s_critical (E.3-2), s_critical the lesser of the end distance and the in-row spacing, Z'RT the sum over rows (E.3-3); group tear-out Z'GT = Z'RT-1/2 + Z'RT-n/2 + Ft' A_group-net (E.4-1). As worked in AWC Wood Design Focus, Winter 2002, Appendix E Example 1 (free at awc.org). Adjusted design values and geometry are the user's. The engineer of record governs.",
+  example: woodRowGroupTearoutExample.inputs,
+  fields: [
+    { key: "t_in", label: "Member thickness t (in)", kind: "number" },
+    { key: "d_in", label: "Member depth d (in)", kind: "number" },
+    { key: "dh_in", label: "Bolt-hole diameter Dh (in)", kind: "number" },
+    { key: "n_rows", label: "Rows of bolts (parallel to the load)", kind: "number", attrs: { step: "1", min: "1" }, default: 1 },
+    { key: "bolts_outer_row", label: "Bolts in each outer row", kind: "number", attrs: { step: "1", min: "1" } },
+    { key: "bolts_inner_row", label: "Bolts in each interior row (blank = same)", kind: "number", attrs: { step: "1", min: "1" }, blankUndefined: true },
+    { key: "end_dist_in", label: "End distance to the first bolt (in)", kind: "number" },
+    { key: "bolt_spacing_in", label: "Bolt spacing in a row (in)", kind: "number" },
+    { key: "row_spacing_in", label: "Spacing between rows (in)", kind: "number" },
+    { key: "fv_adj_psi", label: "Adjusted shear Fv' (psi)", kind: "number" },
+    { key: "ft_adj_psi", label: "Adjusted tension Ft' (psi)", kind: "number" },
+    { key: "fastener_capacity_lb", label: "Bolt group capacity n Z' (lb, 0 to skip)", kind: "number", default: 0 },
+  ],
+  outputs: [
+    { key: "nt", id: "wrg-out-nt", label: "Net section tension Z'NT", value: (r) => fmt(r.z_nt_lb, 0) + " lb" },
+    { key: "rt", id: "wrg-out-rt", label: "Row tear-out Z'RT (all rows)", value: (r) => fmt(r.z_rt_lb, 0) + " lb (s_critical " + fmt(r.s_crit_in, 2) + " in)" },
+    { key: "gt", id: "wrg-out-gt", label: "Group tear-out Z'GT", value: (r) => r.z_gt_lb == null ? "Not applicable to a single row" : fmt(r.z_gt_lb, 0) + " lb" },
+    { key: "c", id: "wrg-out-c", label: "Connection capacity", value: (r) => fmt(r.connection_capacity_lb, 0) + " lb, limited by " + r.governs },
+    { key: "n", id: "wrg-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeWoodRowGroupTearout,
+});
+CONSTRUCTION_RENDERERS["wood-row-group-tearout"] = _renderWoodRowGroupTearout;
 
 // dims: in { p_lb: M L T^-2, m_inlb: M L^2 T^-2, a_in2: L^2, s_in3: L^3, fc_adj_psi: M L^-1 T^-2, fb_adj_psi: M L^-1 T^-2, emin_adj_psi: M L^-1 T^-2, le_in: L, d_in: L } out: { fc_psi: M L^-1 T^-2, fb_psi: M L^-1 T^-2, fce_psi: M L^-1 T^-2, amplifier: dimensionless, interaction: dimensionless }
 export function computeWoodCombinedBendingAxial({ p_lb = 0, m_inlb = 0, a_in2 = 0, s_in3 = 0, fc_adj_psi = 0, fb_adj_psi = 0, emin_adj_psi = 580000, le_in = 0, d_in = 0 } = {}) {
