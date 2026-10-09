@@ -889,12 +889,17 @@ AIRQUALITY_RENDERERS["carbon-bed-life"] = _simpleRenderer({
 // effective height. Briggs on those inputs gives 185 ft of rise and 305 ft
 // effective -- and the spec's "factor of about four" on concentration follows
 // from the asserted height, not the computed one. It is 6.5.
-// dims: in { stack_height_ft: L, stack_diameter_ft: L, exit_velocity_fps: L T^-1, exit_temp_f: T, ambient_temp_f: T, wind_mph: L T^-1 } out: { buoyancy_flux: L^4 T^-3, plume_rise_ft: L, effective_height_ft: L, height_ratio: dimensionless, concentration_factor: dimensionless }
+// Stable-air rise added 2026-10-09 (the note said stability was not modelled): for Pasquill classes E and F the
+// final rise is Briggs' stable form dh = 2.6 (F/(u s))^(1/3), s = (g/Ta)(dtheta/dz), dtheta/dz 0.020 K/m (E) and
+// 0.035 K/m (F), as EPA's ISC3 applies it; A-D keep the neutral-unstable forms.
+// dims: in { stack_height_ft: L, stack_diameter_ft: L, exit_velocity_fps: L T^-1, exit_temp_f: T, ambient_temp_f: T, wind_mph: L T^-1, stability_class: dimensionless } out: { buoyancy_flux: L^4 T^-3, plume_rise_ft: L, effective_height_ft: L, height_ratio: dimensionless, concentration_factor: dimensionless }
 export function computePlumeRiseBriggs({
   stack_height_ft = 0, stack_diameter_ft = 0, exit_velocity_fps = 0,
-  exit_temp_f = 0, ambient_temp_f = 0, wind_mph = 0,
+  exit_temp_f = 0, ambient_temp_f = 0, wind_mph = 0, stability_class = "D",
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const stab = String(stability_class || "D").toUpperCase();
+  if (!["A", "B", "C", "D", "E", "F"].includes(stab)) return { error: "Stability class must be one of A through F." };
   if (!(stack_height_ft > 0)) return { error: "Stack height must be positive (ft)." };
   if (!(stack_diameter_ft > 0)) return { error: "Stack diameter must be positive (ft)." };
   if (!(exit_velocity_fps > 0)) return { error: "Exit velocity must be positive (ft/s)." };
@@ -909,9 +914,13 @@ export function computePlumeRiseBriggs({
   const wind_ms = wind_mph * _AQ_MPS_PER_MPH;
   const buoyancy_flux = _AQ_G_SI * velocity_ms * diameter_m * diameter_m * (exit_k - ambient_k) / (4 * exit_k);
   const is_low_flux = buoyancy_flux < _AQ_BRIGGS_F_BREAK;
-  const plume_rise_m = is_low_flux
+  const neutral_rise_m = is_low_flux
     ? _AQ_BRIGGS_COEFF_LOW * Math.pow(buoyancy_flux, _AQ_BRIGGS_EXP_LOW) / wind_ms
     : _AQ_BRIGGS_COEFF_HIGH * Math.pow(buoyancy_flux, _AQ_BRIGGS_EXP_HIGH) / wind_ms;
+  const is_stable = stab === "E" || stab === "F";
+  const stability_s = is_stable ? (_AQ_G_SI / ambient_k) * (stab === "E" ? 0.020 : 0.035) : 0;
+  const plume_rise_m = is_stable ? 2.6 * Math.cbrt(buoyancy_flux / (wind_ms * stability_s)) : neutral_rise_m;
+  const neutral_rise_ft = neutral_rise_m / _AQ_M_PER_FT;
   const plume_rise_ft = plume_rise_m / _AQ_M_PER_FT;
   const effective_height_ft = stack_height_ft + plume_rise_ft;
   const height_ratio = effective_height_ft / stack_height_ft;
@@ -922,18 +931,20 @@ export function computePlumeRiseBriggs({
   const rise_verdict = rise_exceeds_stack
     ? "the plume rises " + fmt(plume_rise_ft, 0) + " ft, MORE than the " + fmt(stack_height_ft, 0) + " ft stack itself, for an effective height of " + fmt(effective_height_ft, 0) + " ft"
     : "the plume rises " + fmt(plume_rise_ft, 0) + " ft above the " + fmt(stack_height_ft, 0) + " ft stack, for an effective height of " + fmt(effective_height_ft, 0) + " ft";
-  const branch_verdict = "buoyancy flux " + fmt(buoyancy_flux, 1) + " m^4/s^3, " + (is_low_flux ? "BELOW" : "at or above") + " the 55 m^4/s^3 break, so the rise follows F^" + (is_low_flux ? "0.75" : "0.6") + " over the wind speed";
+  const branch_verdict = is_stable
+    ? "buoyancy flux " + fmt(buoyancy_flux, 1) + " m^4/s^3 in STABLE class " + stab + " air (stability parameter s = " + fmt(stability_s, 5) + " per s^2), so the rise follows 2.6 (F/(u s))^(1/3): " + fmt(plume_rise_m / _AQ_M_PER_FT, 0) + " ft against " + fmt(neutral_rise_ft, 0) + " ft in neutral air"
+    : "buoyancy flux " + fmt(buoyancy_flux, 1) + " m^4/s^3, " + (is_low_flux ? "BELOW" : "at or above") + " the 55 m^4/s^3 break, so the rise follows F^" + (is_low_flux ? "0.75" : "0.6") + " over the wind speed";
   const concentration_verdict = "ground-level concentration falls roughly with the SQUARE of effective height, so ignoring plume rise entirely would overstate it by a factor of about " + fmt(concentration_factor, 1) + " -- which is why a dispersion estimate without plume rise is not a useful estimate";
   // Wind is the term that trades against itself: rise is exactly inverse in it.
-  const double_wind_rise_ft = plume_rise_ft / 2;
+  const double_wind_rise_ft = plume_rise_ft / (is_stable ? Math.cbrt(2) : 2);
   const double_wind_effective_ft = stack_height_ft + double_wind_rise_ft;
-  const wind_verdict = "rise is exactly inverse in wind speed, so at " + fmt(2 * wind_mph, 1) + " mph it halves to " + fmt(double_wind_rise_ft, 0) + " ft and the effective height falls to " + fmt(double_wind_effective_ft, 0) + " ft -- a strong wind dilutes the plume more AND holds it down, and the two effects trade against each other";
+  const wind_verdict = (is_stable ? "in stable air rise goes as the cube root of 1/wind, so at " + fmt(2 * wind_mph, 1) + " mph it only drops to " : "rise is exactly inverse in wind speed, so at " + fmt(2 * wind_mph, 1) + " mph it halves to ") + fmt(double_wind_rise_ft, 0) + " ft and the effective height falls to " + fmt(double_wind_effective_ft, 0) + " ft -- a strong wind dilutes the plume more AND holds it down, and the two effects trade against each other";
   if (![buoyancy_flux, plume_rise_ft, effective_height_ft, height_ratio, concentration_factor].every(Number.isFinite)) return { error: "Plume rise math is not a finite value." };
   return {
-    buoyancy_flux, is_low_flux, plume_rise_ft, effective_height_ft, height_ratio,
+    buoyancy_flux, is_low_flux, plume_rise_ft, effective_height_ft, height_ratio, stability_class: stab, neutral_rise_ft,
     concentration_factor, rise_exceeds_stack, rise_verdict, branch_verdict,
     concentration_verdict, double_wind_rise_ft, double_wind_effective_ft, wind_verdict,
-    note: "The height a buoyant plume actually reaches, which is what governs ground-level concentration rather than the height of the stack. Briggs computes a buoyancy flux from the stack gas velocity, the stack diameter and the temperature difference, and the final rise in neutral conditions follows that flux to a fractional power divided by the wind speed. The rise is frequently LARGER than the stack itself: a hot plume from a modest stack can rise well over a hundred feet on a light wind, so the effective release height can be double the physical one. Ignoring plume rise makes a dispersion estimate wildly conservative; assuming too much makes it dangerously optimistic, and since ground-level concentration falls roughly with the square of effective height, the error compounds. Wind is the term that trades against itself, and that is the counterintuitive part. A strong wind dilutes the plume more, but it also bends it over and reduces the rise, lowering the effective height -- and the rise is exactly inverse in wind speed, so doubling the wind halves it. The two effects work in opposite directions and the worst-case wind for ground-level concentration is neither the calmest nor the strongest, which is why a real dispersion analysis runs a full year of hourly meteorology rather than a design condition. Two limits bound this hard. Stability is not modelled: the neutral-condition relations used here are suppressed by stable air, where a plume can be trapped, and enhanced by unstable air. And DOWNWASH is not modelled at all -- a stack too short relative to nearby buildings has its plume pulled down into the building wake, which can eliminate the rise entirely and is why the good engineering practice stack height rules exist. A plume that downwashes has an effective height at or below the stack, and no buoyancy calculation will say so. This is a screening estimate of FINAL rise in neutral conditions on a buoyant plume; it does not compute momentum rise for a cool high-velocity plume, transitional rise close to the stack, stability effects, downwash, or any ground-level concentration. A regulatory dispersion model, the applicable modelling guideline, and a qualified meteorologist or air quality professional govern.",
+    note: "The height a buoyant plume actually reaches, which is what governs ground-level concentration rather than the height of the stack. Briggs computes a buoyancy flux from the stack gas velocity, the stack diameter and the temperature difference, and the final rise in neutral conditions follows that flux to a fractional power divided by the wind speed. The rise is frequently LARGER than the stack itself: a hot plume from a modest stack can rise well over a hundred feet on a light wind, so the effective release height can be double the physical one. Ignoring plume rise makes a dispersion estimate wildly conservative; assuming too much makes it dangerously optimistic, and since ground-level concentration falls roughly with the square of effective height, the error compounds. Wind is the term that trades against itself, and that is the counterintuitive part. A strong wind dilutes the plume more, but it also bends it over and reduces the rise, lowering the effective height -- and the rise is exactly inverse in wind speed, so doubling the wind halves it. The two effects work in opposite directions and the worst-case wind for ground-level concentration is neither the calmest nor the strongest, which is why a real dispersion analysis runs a full year of hourly meteorology rather than a design condition. Two limits bound this hard. Stability changes the rise: classes A through D use the neutral-condition relations, while stable classes E and F use Briggs' stable form 2.6 (F/(u s))^(1/3) with s = (g/Ta) dtheta/dz (0.020 and 0.035 K/m), which caps a plume well below its neutral rise; unstable air lofts it further than the neutral formula says, which this does not credit. And DOWNWASH is not modelled at all -- a stack too short relative to nearby buildings has its plume pulled down into the building wake, which can eliminate the rise entirely and is why the good engineering practice stack height rules exist. A plume that downwashes has an effective height at or below the stack, and no buoyancy calculation will say so. This is a screening estimate of FINAL rise in neutral conditions on a buoyant plume; it does not compute momentum rise for a cool high-velocity plume, transitional rise close to the stack, stability effects, downwash, or any ground-level concentration. A regulatory dispersion model, the applicable modelling guideline, and a qualified meteorologist or air quality professional govern.",
   };
 }
 export const plumeRiseBriggsExample = { inputs: { stack_height_ft: 120, stack_diameter_ft: 5, exit_velocity_fps: 55, exit_temp_f: 350, ambient_temp_f: 60, wind_mph: 12 } };
@@ -947,6 +958,7 @@ AIRQUALITY_RENDERERS["plume-rise-briggs"] = _simpleRenderer({
     { key: "exit_temp_f", label: "Exit gas temperature (°F)", kind: "number", attrs: { step: "any" } },
     { key: "ambient_temp_f", label: "Ambient temperature (°F)", kind: "number", attrs: { step: "any" } },
     { key: "wind_mph", label: "Wind speed at stack top (mph)", kind: "number", attrs: { step: "any" } },
+    { key: "stability_class", label: "Pasquill stability class", kind: "select", default: "D", options: [{ value: "A", label: "A (very unstable; neutral formula)" }, { value: "B", label: "B (unstable; neutral formula)" }, { value: "C", label: "C (slightly unstable; neutral formula)" }, { value: "D", label: "D (neutral)" }, { value: "E", label: "E (slightly stable; stable-air rise)" }, { value: "F", label: "F (stable; stable-air rise)" }] },
   ],
   outputs: [
     { key: "f", id: "prb-out-f", label: "Buoyancy flux", value: (r) => r.branch_verdict },

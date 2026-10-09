@@ -58892,3 +58892,15 @@ test("bounds: anchor group breakout projected area follows ACI 318-19 17.6.2.1",
   assert.ok("error" in _cabG({ ...b, rows_toward_edge: 2 }));
   assert.ok("error" in _cabG({ ...b, anchors_along_edge: 1.5 }));
 });
+
+import { computePlumeRiseBriggs as _prbS } from "../../calc-airquality.js";
+test("bounds: plume-rise-briggs stable classes use 2.6 (F/(u s))^(1/3)", () => {
+  const b = { stack_height_ft: 120, stack_diameter_ft: 5, exit_velocity_fps: 55, exit_temp_f: 350, ambient_temp_f: 60, wind_mph: 12 };
+  const d = _prbS(b), f = _prbS({ ...b, stability_class: "F" });
+  const Ta = (60 - 32) * 5 / 9 + 273.15, u = 12 * 1609.344 / 3600, s = 9.80665 / Ta * 0.035;
+  assert.ok(Math.abs(f.plume_rise_ft - 2.6 * Math.cbrt(f.buoyancy_flux / (u * s)) / 0.3048) < 1e-6);
+  assert.equal(_prbS({ ...b, stability_class: "A" }).plume_rise_ft, d.plume_rise_ft);
+  // Stable rise scales as wind^(-1/3).
+  assert.ok(Math.abs(_prbS({ ...b, wind_mph: 24, stability_class: "F" }).plume_rise_ft * Math.cbrt(2) - f.plume_rise_ft) < 1e-6);
+  assert.ok("error" in _prbS({ ...b, stability_class: "G" }));
+});

@@ -60,6 +60,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **`plume-rise-briggs` takes the stability class.** Its note said stability was not modelled. A Pasquill class select now keeps the neutral-unstable relations for A through D and applies Briggs' stable form for E and F, 2.6 (F/(u s))^(1/3) with s = (g/Ta) dtheta/dz at 0.020 and 0.035 K/m, as EPA's ISC3 does; in stable air rise goes as the cube root of 1/wind, so doubling the wind cuts it by 21%, not half. The example stack rises 185 ft neutral, 180 ft in class E, and 149 ft in class F. Class D (the default) is unchanged.
+
 - **`concrete-anchor-breakout` and `concrete-anchor-pryout` take anchor groups (ACI 318-19 17.6.2.1).** They covered a single anchor and the pryout note said the group form was not modeled. Rows toward the edge and anchors per row, with their spacings, now set the group projected area ANc = [min(ca1, 1.5 hef) + (n1 - 1) min(s1, 3 hef) + 1.5 hef] x [3 hef + (n2 - 1) min(s2, 3 hef)], capped at n ANco, for a concentric load; pryout becomes Vcpg = kcp Ncbg. Four anchors at 6 in on a 6 in embedment carry 39,659 lb, 1.78 single-anchor breakouts rather than 4. Single-anchor results are unchanged.
 
 - **`calc-mining.js` gzip cap raised 35,000 -> 42,000 B.** The four mineral-processing calculators added 2026-10-09 (Bond work index, circulating load, screen efficiency, pulp density) take it past the old cap. It is lazy-loaded and outside the home-view payload.
