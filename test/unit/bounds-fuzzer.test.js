@@ -58960,3 +58960,16 @@ test("bounds: density-altitude humidity raises DA through the virtual temperatur
   assert.ok(Math.abs(half.humidity_add_ft - 120 * (half.virtual_temp_c - dry.oat_c)) < 1e-9);
   assert.ok("error" in _daH({ ...b, relative_humidity_pct: 120 }));
 });
+
+import { computeWeirFlow as _wfA } from "../../calc-openchannel.js";
+test("bounds: weir-flow approach-velocity correction is a converged Francis fixed point", () => {
+  const r = _wfA({ weir_type: "rect_suppressed", head_ft: 1, crest_length_ft: 4, approach_width_ft: 4, weir_height_ft: 1 });
+  const V = r.flow_cfs / (4 * 2), hv = (V * V) / (2 * 32.174);
+  assert.ok(Math.abs(r.flow_cfs - 3.33 * 4 * ((1 + hv) ** 1.5 - hv ** 1.5)) < 1e-9);
+  // A deep pool makes the correction vanish.
+  const deep = _wfA({ weir_type: "rect_suppressed", head_ft: 1, crest_length_ft: 4, approach_width_ft: 4, weir_height_ft: 100 });
+  assert.ok(Math.abs(deep.flow_cfs - 13.32) < 0.01);
+  assert.equal(_wfA({ weir_type: "rect_suppressed", head_ft: 1, crest_length_ft: 4 }).flow_cfs, 13.32);
+  assert.ok("error" in _wfA({ weir_type: "rect_suppressed", head_ft: 1, crest_length_ft: 4, approach_width_ft: 4 }));
+  assert.ok("error" in _wfA({ weir_type: "rect_suppressed", head_ft: 1, crest_length_ft: 4, approach_width_ft: 3, weir_height_ft: 1 }));
+});

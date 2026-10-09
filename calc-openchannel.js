@@ -24,12 +24,16 @@ export const OPENCHANNEL_RENDERERS = {};
 // --- v20 M.1: Weir / flume open-channel flow (`weir-flow`) ---
 // 90deg V-notch Q = 2.49*H^2.48; rectangular Francis Q = 3.33*(L-0.2H)*H^1.5
 // (contracted) or 3.33*L*H^1.5 (suppressed). 1 cfs = 448.831 GPM.
-// dims: in { weir_type: dimensionless, head_ft: L, crest_length_ft: L, coeff: dimensionless } out: { flow_cfs: L^3*T^-1, flow_gpm: L^3 T^-1 }
-export function computeWeirFlow({ weir_type = "vnotch90", head_ft = 0, crest_length_ft = 0, coeff = 0 } = {}) {
+// Approach velocity added 2026-10-09 for the rectangular weirs (the note said it was ignored): with the approach
+// channel width B and the weir height P entered, the Francis form Q = C L [(H + hv)^1.5 - hv^1.5] is iterated with
+// hv = V^2/(2 g), V = Q/(B (P + H)). A V-notch is fully contracted and keeps the plain rating.
+// dims: in { weir_type: dimensionless, head_ft: L, crest_length_ft: L, coeff: dimensionless, approach_width_ft: L, weir_height_ft: L } out: { flow_cfs: L^3*T^-1, flow_gpm: L^3 T^-1, approach_velocity_fps: L T^-1 }
+export function computeWeirFlow({ weir_type = "vnotch90", head_ft = 0, crest_length_ft = 0, coeff = 0, approach_width_ft = 0, weir_height_ft = 0 } = {}) {
+  const _g = _finiteGuardPool(arguments[0]); if (_g) return _g;
   const H = Number(head_ft) || 0;
   const L = Number(crest_length_ft) || 0;
   if (!(H > 0 && Number.isFinite(H))) return { error: "Head over crest must be positive (ft)." };
-  let cfs;
+  let cfs, approach_velocity_fps = 0, plain_cfs = 0;
   if (weir_type === "vnotch90") {
     const C = coeff > 0 ? coeff : 2.49;
     cfs = C * Math.pow(H, 2.48);
@@ -39,6 +43,19 @@ export function computeWeirFlow({ weir_type = "vnotch90", head_ft = 0, crest_len
     const effL = weir_type === "rect_contracted" ? (L - 0.2 * H) : L;
     if (effL <= 0) return { error: "Effective crest length is non-positive - head too large for this crest." };
     cfs = C * effL * Math.pow(H, 1.5);
+    const B = Number(approach_width_ft) || 0, P = Number(weir_height_ft) || 0;
+    if (B < 0 || P < 0) return { error: "Approach width and weir height cannot be negative (ft; blank to skip)." };
+    if ((B > 0) !== (P > 0)) return { error: "Enter both the approach channel width and the weir height, or neither." };
+    if (B > 0) {
+      if (B < L) return { error: "The approach channel cannot be narrower than the crest." };
+      for (let i = 0; i < 60; i++) {
+        const v = cfs / (B * (P + H));
+        const hv = (v * v) / (2 * 32.174);
+        cfs = C * effL * (Math.pow(H + hv, 1.5) - Math.pow(hv, 1.5));
+      }
+      approach_velocity_fps = cfs / (B * (P + H));
+      plain_cfs = C * effL * Math.pow(H, 1.5);
+    }
   }
   const gpm = cfs * (60 * 1728 / 231);
   const mgd = gpm * 1440 / 1e6;
@@ -46,12 +63,16 @@ export function computeWeirFlow({ weir_type = "vnotch90", head_ft = 0, crest_len
     flow_cfs: Number.isFinite(cfs) ? cfs : null,
     flow_gpm: Number.isFinite(gpm) ? gpm : null,
     flow_mgd: Number.isFinite(mgd) ? mgd : null,
+    approach_velocity_fps, approach_gain_pct: plain_cfs > 0 ? (cfs / plain_cfs - 1) * 100 : 0,
     low_accuracy: H < 0.2,
     note: (H < 0.2 ? "Head below ~0.2 ft - low-accuracy reading, flagged. " : "")
       + (weir_type === "rect_suppressed"
         ? "Requires a ventilated, sharp-crested weir with end contractions suppressed (crest spanning the channel) and free flow; "
         : "Requires a fully-contracted, ventilated, sharp-crested weir with free flow; ")
-      + "a submerged/drowned condition is invalid. Approach-velocity correction ignored.",
+      + "a submerged/drowned condition is invalid. "
+      + (approach_velocity_fps > 0
+        ? "Approach velocity " + approach_velocity_fps.toFixed(2) + " ft/s raises the flow " + ((cfs / plain_cfs - 1) * 100).toFixed(1) + "% over the still-pool rating (Francis velocity-head form, iterated)."
+        : (weir_type === "vnotch90" ? "A V-notch is taken as fully contracted with negligible approach velocity." : "Approach-velocity correction not applied; enter the approach channel width and the weir height to apply it.")),
   };
 }
 export const weirFlowExample = { inputs: { weir_type: "vnotch90", head_ft: 0.5, crest_length_ft: 0, coeff: 0 } };
@@ -66,20 +87,22 @@ function renderWeirFlow(inputRegion, outputRegion, citationEl) {
   const H = makeNumber("Head over crest H (ft)", "wf-h", { step: "any", min: "0" });
   const L = makeNumber("Crest length L (ft, rectangular)", "wf-l", { step: "any", min: "0" });
   const coeff = makeNumber("Weir coefficient (0 = default)", "wf-c", { step: "any", min: "0" });
-  for (const f of [type, H, L, coeff]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { type.select.value = "vnotch90"; H.input.value = "0.5"; L.input.value = ""; coeff.input.value = ""; update(); });
+  const B = makeNumber("Approach channel width (ft, rectangular; blank to skip)", "wf-b", { step: "any", min: "0" });
+  const P = makeNumber("Weir height above the channel floor (ft; blank to skip)", "wf-p", { step: "any", min: "0" });
+  for (const f of [type, H, L, coeff, B, P]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { type.select.value = "vnotch90"; H.input.value = "0.5"; L.input.value = ""; coeff.input.value = ""; B.input.value = ""; P.input.value = ""; update(); });
   const oCfs = makeOutputLine(outputRegion, "Flow (cfs)", "wf-out-cfs");
   const oGpm = makeOutputLine(outputRegion, "Flow (GPM / MGD)", "wf-out-gpm");
   const oNote = makeOutputLine(outputRegion, "Note", "wf-out-note");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeWeirFlow({ weir_type: type.select.value, head_ft: readNum(H.input), crest_length_ft: readNum(L.input), coeff: readNum(coeff.input) });
+    const r = computeWeirFlow({ weir_type: type.select.value, head_ft: readNum(H.input), crest_length_ft: readNum(L.input), coeff: readNum(coeff.input), approach_width_ft: readNum(B.input), weir_height_ft: readNum(P.input) });
     if (r.error) { oCfs.textContent = r.error; oGpm.textContent = ""; oNote.textContent = ""; return; }
     oCfs.textContent = fmt(r.flow_cfs, 3) + " cfs";
     oGpm.textContent = fmt(r.flow_gpm, 1) + " GPM (" + fmt(r.flow_mgd, 3) + " MGD)";
     oNote.textContent = r.note;
   }, DEBOUNCE_MS);
-  for (const f of [type.select, H.input, L.input, coeff.input]) f.addEventListener("input", update);
+  for (const f of [type.select, H.input, L.input, coeff.input, B.input, P.input]) f.addEventListener("input", update);
 }
 OPENCHANNEL_RENDERERS["weir-flow"] = renderWeirFlow;
 

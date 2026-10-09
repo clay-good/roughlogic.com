@@ -60,6 +60,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **`weir-flow` applies the approach-velocity correction for rectangular weirs.** It ignored it. With the approach channel width and the weir height entered, the Francis form Q = C L [(H + hv)^1.5 - hv^1.5] is iterated with hv from the approach velocity Q/(B (P + H)): a 1 ft high suppressed weir with 1 ft of head in a 4 ft channel carries 14.16 cfs, 6.3% over the still-pool 13.32. Blank keeps the plain rating; a V-notch is unchanged.
+
 - **`density-altitude` takes relative humidity.** Its dry-air model said humidity was ignored. An optional relative humidity now replaces the OAT with the virtual temperature, Tv = T/(1 - 0.378 e/p) with e from the humidity and the saturation pressure at the OAT and p the station pressure, in the same FAA relation: 90 F at 80% at sea level adds about 535 ft, and the 5,000 ft example at 95 F and 50% adds 473 ft. Blank keeps the dry-air answer.
 
 - **`pipe-heat-loss-radial` takes the outer air film.** It computed conduction only and took the jacket at ambient, which overstates the loss. An optional outer film coefficient now adds 1/(2 pi r2 h) in series and reports the jacket surface temperature: the 2 in example pipe with 1 in of insulation loses 22.1 BTU/hr-ft instead of 24.6, with the jacket at 82.8 F, using a still-air film of 1.65. Blank keeps the old conduction-only answer. Also: the MWBC voltage-drop note now names `voltage-drop-reactance` for the AC reactance it ignores.

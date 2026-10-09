@@ -701,11 +701,11 @@ export const CITATIONS = {
   },
 
   "weir-flow": {
-    formula: "90-degree V-notch: Q = 2.49*H^2.48. Rectangular Francis: Q = 3.33*(L-0.2H)*H^1.5 (contracted) or 3.33*L*H^1.5 (suppressed). 1 cfs = 448.831 GPM.",
+    formula: "90-degree V-notch: Q = 2.49*H^2.48. Rectangular Francis: Q = 3.33*(L-0.2H)*H^1.5 (contracted) or 3.33*L*H^1.5 (suppressed); with the approach width B and weir height P entered, Q = C L [(H + hv)^1.5 - hv^1.5], hv = V^2/(2g), V = Q/(B (P + H)), iterated. 1 cfs = 448.831 GPM.",
     edition: "Per the USBR Water Measurement Manual (public domain) - V-notch and Francis rectangular-weir equations and Kindsvater-Carter / Francis coefficients, by name.",
     freeAccess: "Free at usbr.gov/tsc/techreferences/mands/wmm; the user confirms the calibrated weir coefficient.",
     governance: GOVERNANCE.general,
-    editionNote: "Requires a sharp-crested, ventilated, free-flow weir; a submerged/drowned condition is invalid. Head below ~0.2 ft is low-accuracy.",
+    editionNote: "Requires a sharp-crested, ventilated, free-flow weir; a submerged/drowned condition is invalid. Head below ~0.2 ft is low-accuracy. The optional approach-velocity correction (rectangular weirs, Francis velocity-head form, added 2026-10-09) matters for a low weir in a narrow channel; a V-notch is taken as fully contracted.",
     assumptions: [
       { name: "Weir condition", value: "ventilated, sharp-crested, free-flow (fully contracted for the V-notch and contracted rectangular; end contractions suppressed for the suppressed rectangular)", source: "USBR Water Measurement Manual" },
     ],

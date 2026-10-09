@@ -3040,7 +3040,7 @@ cross-check.
 | calc-openchannel.js | `computeBroadCrestedWeir` | `{ crest_length_ft = 0, head_ft = 0, discharge_coeff = 0 } = {}` | _ | _ | _ |
 | calc-openchannel.js | `computeCipollettiWeir` | `{ crest_length_ft = 0, head_ft = 0, coeff = 0 } = {}` | _ | _ | _ |
 | calc-openchannel.js | `computeSluiceGateFlow` | `{ gate_opening_ft = 0, gate_width_ft = 0, upstream_depth_ft = 0, contraction_...` | _ | _ | _ |
-| calc-openchannel.js | `computeWeirFlow` | `{ weir_type = "vnotch90", head_ft = 0, crest_length_ft = 0, coeff = 0 } = {}` | _ | _ | _ |
+| calc-openchannel.js | `computeWeirFlow` | `{ weir_type = "vnotch90", head_ft = 0, crest_length_ft = 0, coeff = 0, approa...` | _ | _ | _ |
 | calc-openchannel.js | `computeWeirHeadFromFlow` | `{ weir_type = "vnotch90", target_flow_cfs = 0, crest_length_ft = 0, coeff = 0...` | _ | _ | _ |
 | calc-operations-finance.js | `computeEoqOrderQuantity` | `{ annual_demand = 0, order_cost = 0, holding_cost = 0 } = {}` | _ | _ | _ |
 | calc-operations-finance.js | `computeReorderPoint` | `{ avg_daily_demand = 0, lead_time_days = 0, demand_sd = 0, service_level_pct ...` | _ | _ | _ |
@@ -6010,7 +6010,7 @@ per spec-v14 §13.1 second paragraph.
 | `uv-required-exposure` | UV Required Intensity or Contact Time | USEPA UV Disinfection Guidance Manual...; spec-v659 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `va-alkalinity-ratio` | Digester Volatile-Acid to Alkalinity Ratio | WEF Manual of Practice / EPA operator...; VA 180 mg/L, alkalinity 2,400 mg/L -> ratio 0.075 (stable... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `was-srt-control` | WAS Rate to Hold Target SRT (Sludge Age) | MCRT/SRT control; WEF operator training; 2 MG, 3000 MLSS, SRT 10 d, WAS 8000, eff 5 MGD/15 mg/L ->... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
-| `weir-flow` | Weir / Flume Open-Channel Flow | USBR Water Measurement Manual (V-notc...; 90-degree V-notch, H 0.5 ft -> ~0.446 cfs ~200 GPM | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `weir-flow` | Weir / Flume Open-Channel Flow | USBR Water Measurement Manual (V-notc...; 90-degree V-notch, H 0.5 ft -> ~0.446 cfs ~200 GPM | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `weir-head-from-flow` | Weir Head from a Target Flow | USBR Water Measurement Manual (invers...; spec-v658 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `well-casing-purge-volume` | Well Casing Storage, Purge Volume, and Disinfection | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+5 more) |
 | `well-drawdown` | Well Drawdown and Specific Capacity | AWWA / USGS; drawdown = 80 - 50 = 30 ft; specific capacity = 30/30 = 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |

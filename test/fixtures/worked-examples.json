@@ -169474,6 +169474,37 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "weir-flow",
+  "source_publisher": "Project (first-principles)",
+  "source_title": "Suppressed rectangular weir, 4 ft crest, 1 ft head, 1 ft high in a 4 ft channel",
+  "source_edition_or_year": "Francis velocity-of-approach form",
+  "source_section_or_page": "plain 3.33 x 4 x 1 = 13.32 cfs; iterated V = Q/(4 x 2) = 1.770 ft/s, hv = 0.0487 ft; Q = 13.32 [(1.0487)^1.5 - 0.0487^1.5] = 14.16 cfs (+6.3%)",
+  "verified_by": "rl",
+  "verified_on": "2026-10-09",
+  "inputs": {
+   "weir_type": "rect_suppressed",
+   "head_ft": 1,
+   "crest_length_ft": 4,
+   "coeff": 0,
+   "approach_width_ft": 4,
+   "weir_height_ft": 1
+  },
+  "outputs": {
+   "flow_cfs": {
+    "value": 14.162,
+    "tolerance": {
+     "pct": 0.5
+    }
+   },
+   "approach_velocity_fps": {
+    "value": 1.77,
+    "tolerance": {
+     "pct": 0.5
+    }
+   }
+  }
  }
  ]
 }
