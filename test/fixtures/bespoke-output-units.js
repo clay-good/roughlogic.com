@@ -227,6 +227,7 @@ export const BESPOKE_OUTPUT_UNITS = {
   "fall-protection-clearance": {"remaining_clearance_ft":{"prefix":"","suffix":" ft","digits":1}},
   "fan-motor-bhp": {"ahp":{"prefix":"","suffix":" HP","digits":3},"bhp":{"prefix":"","suffix":" BHP","digits":3}},
   "fastener-pullout": {"withdrawal_per_inch_lb":{"prefix":"","suffix":" lb/in","digits":1},"total_withdrawal_lb":{"prefix":"","suffix":" lb","digits":1}},
+  "fatigue-notch-sensitivity": {"neuber_constant":{"prefix":"","suffix":" sqrt(in)","digits":4}},
   "feed-conversion-ratio": {"average_daily_gain_lb":{"prefix":"","suffix":" lb/day","digits":2},"total_gain_lb":{"prefix":"","suffix":" lb","digits":0}},
   "feed-for-surface-finish": {"max_feed_ipr":{"prefix":"","suffix":" IPR","digits":4}},
   "felling-notch-hinge": {"notch_depth_in":{"prefix":"","suffix":" in","digits":2},"hinge_thick_in":{"prefix":"","suffix":" in","digits":2},"hinge_width_in":{"prefix":"","suffix":" in","digits":2},"open_face_deg":{"prefix":"","suffix":" deg or more","digits":0}},

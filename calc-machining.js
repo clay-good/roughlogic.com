@@ -963,7 +963,7 @@ export function computeFatigueSafetyFactor({ alternating_stress_psi = 0, mean_st
   const governs = governing_n === langer_ny && langer_ny < fatigue_n ? "first-cycle yield (Langer)" : "fatigue";
   return {
     fatigue_n, langer_ny, governing_n, governs,
-    note: "Infinite-life fatigue safety factor for a uniaxial fluctuating stress, with the alternating amplitude sigma_a and the mean (midrange) sigma_m. Modified Goodman 1/n = sa/Se + sm/Sut is the standard design line; Soderberg 1/n = sa/Se + sm/Sy is the most conservative (it never yields); Gerber n sa/Se + (n sm/Sut)^2 = 1 is the least conservative and the best fit to test data. Se is the CORRECTED endurance limit (Se' ~= 0.5 Sut for steel with Sut < 200 ksi, times the Marin surface/size/load/temperature/reliability factors) and is an input here so the tile needs no material tables. The Langer line ny = Sy/(sa + sm) catches first-cycle yielding, which can govern at high mean stress; the reported governing factor is the smaller of the two. With sigma_m = 0 (fully reversed) every criterion gives n = Se/sigma_a. Uniaxial stress, infinite life; Se from the Marin factors is endurance-limit-marin and finite life is fatigue-finite-life; notch sensitivity (Kf) and multiaxial combination are separate. A design aid; Shigley / Juvinall and the engineer of record govern.",
+    note: "Infinite-life fatigue safety factor for a uniaxial fluctuating stress, with the alternating amplitude sigma_a and the mean (midrange) sigma_m. Modified Goodman 1/n = sa/Se + sm/Sut is the standard design line; Soderberg 1/n = sa/Se + sm/Sy is the most conservative (it never yields); Gerber n sa/Se + (n sm/Sut)^2 = 1 is the least conservative and the best fit to test data. Se is the CORRECTED endurance limit (Se' ~= 0.5 Sut for steel with Sut < 200 ksi, times the Marin surface/size/load/temperature/reliability factors) and is an input here so the tile needs no material tables. The Langer line ny = Sy/(sa + sm) catches first-cycle yielding, which can govern at high mean stress; the reported governing factor is the smaller of the two. With sigma_m = 0 (fully reversed) every criterion gives n = Se/sigma_a. Uniaxial stress, infinite life; Se from the Marin factors is endurance-limit-marin and finite life is fatigue-finite-life, and notch Kf is fatigue-notch-sensitivity; multiaxial combination is separate. A design aid; Shigley / Juvinall and the engineer of record govern.",
   };
 }
 export const fatigueSafetyFactorExample = { inputs: { alternating_stress_psi: 25000, mean_stress_psi: 30000, endurance_limit_psi: 40000, ultimate_strength_psi: 100000, yield_strength_psi: 80000, criterion: "goodman" } };
@@ -1045,7 +1045,7 @@ export function computeEnduranceLimitMarin({ ultimate_strength_psi = 0, surface_
   if (![ka, kb, kc, ke, endurance_limit_psi].every(Number.isFinite) || !(endurance_limit_psi > 0)) return { error: "Endurance-limit math is not a finite value; check the inputs." };
   return {
     endurance_limit_psi, uncorrected_se_psi, ka, kb, kc, kd, ke,
-    note: "The corrected endurance limit Se = ka kb kc kd ke Se' (Shigley Ch. 6 Marin equation), the input the fatigue-safety-factor tile needs. Se' is the rotating-beam limit, 0.5 Sut for steel with Sut <= 200 ksi (capped at 100 ksi above that). ka = a (Sut in kpsi)^b corrects for surface finish (Shigley 11th ed. Table 6-2: ground 1.21/-0.067, machined 2.00/-0.217, hot-rolled 11.0/-0.650, as-forged 12.7/-0.758); kb is the size factor 0.879 d^-0.107 (0.11-2 in) or 0.91 d^-0.157 (2-10 in) for rotating bending/torsion, and 1 for axial loading; kc is the load factor (1 bending, 0.85 axial, 0.59 torsion); kd the temperature factor (1 at room temperature); ke the reliability factor (0.897 at 90%, 0.814 at 99%). The five factors typically cut the raw 0.5 Sut roughly in half, which is why a part sized on Se' alone can be fatigue-unsafe. Feed Se into fatigue-safety-factor. Steel; finite-life strength is fatigue-finite-life, and non-steel materials and stress concentration (Kf) are separate. A design aid; Shigley and the engineer of record govern.",
+    note: "The corrected endurance limit Se = ka kb kc kd ke Se' (Shigley Ch. 6 Marin equation), the input the fatigue-safety-factor tile needs. Se' is the rotating-beam limit, 0.5 Sut for steel with Sut <= 200 ksi (capped at 100 ksi above that). ka = a (Sut in kpsi)^b corrects for surface finish (Shigley 11th ed. Table 6-2: ground 1.21/-0.067, machined 2.00/-0.217, hot-rolled 11.0/-0.650, as-forged 12.7/-0.758); kb is the size factor 0.879 d^-0.107 (0.11-2 in) or 0.91 d^-0.157 (2-10 in) for rotating bending/torsion, and 1 for axial loading; kc is the load factor (1 bending, 0.85 axial, 0.59 torsion); kd the temperature factor (1 at room temperature); ke the reliability factor (0.897 at 90%, 0.814 at 99%). The five factors typically cut the raw 0.5 Sut roughly in half, which is why a part sized on Se' alone can be fatigue-unsafe. Feed Se into fatigue-safety-factor. Steel; finite-life strength is fatigue-finite-life and notch Kf is fatigue-notch-sensitivity; non-steel materials are separate. A design aid; Shigley and the engineer of record govern.",
   };
 }
 export const enduranceLimitMarinExample = { inputs: { ultimate_strength_psi: 105000, surface_finish: "machined", diameter_in: 1, load_type: "bending", reliability_pct: "99", temperature_factor_kd: 1 } };
@@ -1147,6 +1147,61 @@ function renderFatigueFiniteLife(inputRegion, outputRegion, citationEl) {
   for (const x of [sut, se, f, n, sa]) x.input.addEventListener("input", update);
 }
 MACHINING_RENDERERS["fatigue-finite-life"] = renderFatigueFiniteLife;
+
+// spec-v1937: fatigue stress-concentration factor from the notch sensitivity (Shigley Eqs. 6-32 to 6-35,
+// Neuber). Kf = 1 + q (Kt - 1), q = 1/(1 + sqrt(a)/sqrt(r)); Neuber constant for steel, Sut in kpsi, sqrt(in):
+// bending/axial sqrt(a) = 0.246 - 3.08e-3 Sut + 1.51e-5 Sut^2 - 2.67e-8 Sut^3; torsion 0.190 - 2.51e-3 Sut
+// + 1.35e-5 Sut^2 - 2.67e-8 Sut^3. The fatigue tiles named notch Kf as separate.
+// dims: in { kt: dimensionless, notch_radius_in: L, ultimate_strength_psi: M L^-1 T^-2, load_type: dimensionless } out: { neuber_constant: dimensionless, notch_sensitivity_q: dimensionless, kf: dimensionless }
+export function computeFatigueNotchSensitivity({ kt = 0, notch_radius_in = 0, ultimate_strength_psi = 0, load_type = "bending" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const Kt = Number(kt) || 0, r = Number(notch_radius_in) || 0, Sut = Number(ultimate_strength_psi) || 0;
+  if (Sut > 0 && Sut < 1000) return { error: "Enter the ultimate strength in psi (100,000 for 100 kpsi), not kpsi." };
+  if (!(Kt >= 1)) return { error: "The theoretical stress-concentration factor Kt must be 1 or more (from a Kt chart)." };
+  if (!(r > 0)) return { error: "Notch radius must be positive (in)." };
+  if (!(Sut >= 50000 && Sut <= 250000)) return { error: "The Neuber constants are fit for steel with Sut from 50,000 to 250,000 psi." };
+  if (load_type !== "bending" && load_type !== "torsion") return { error: "Load type must be bending/axial or torsion." };
+  const k = Sut / 1000;
+  const neuber_constant = load_type === "torsion"
+    ? 0.190 - 2.51e-3 * k + 1.35e-5 * k * k - 2.67e-8 * k ** 3
+    : 0.246 - 3.08e-3 * k + 1.51e-5 * k * k - 2.67e-8 * k ** 3;
+  const notch_sensitivity_q = 1 / (1 + neuber_constant / Math.sqrt(r));
+  const kf = 1 + notch_sensitivity_q * (Kt - 1);
+  if (![neuber_constant, notch_sensitivity_q, kf].every(Number.isFinite)) return { error: "Notch-sensitivity math is not a finite value; check the inputs." };
+  return {
+    neuber_constant, notch_sensitivity_q, kf, load_type,
+    note: "A notch raises the local stress by Kt in a static, brittle sense, but in fatigue a steel part feels less than the full Kt: Kf = 1 + q (Kt - 1), where the notch sensitivity q runs from 0 (the notch does not matter) to 1 (the full Kt). Neuber's q = 1/(1 + sqrt(a)/sqrt(r)) rises with the notch radius r and with the strength, so a sharp notch in soft steel is forgiving and the same notch in hard steel is not. Kt comes from a stress-concentration chart (Peterson; Shigley Table A-15) for the geometry; this does not compute it. Multiply the nominal alternating stress by Kf (Kfs in torsion) before the fatigue-safety-factor or the finite-life S-N line, or divide Se by it. Steel, Sut 50 to 250 kpsi. A design aid; Shigley and test data govern.",
+  };
+}
+export const fatigueNotchSensitivityExample = { inputs: { kt: 1.65, notch_radius_in: 0.1181, ultimate_strength_psi: 100000, load_type: "bending" } };
+function renderFatigueNotchSensitivity(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: fatigue stress-concentration factor Kf = 1 + q (Kt - 1) with Neuber's notch sensitivity q = 1/(1 + sqrt(a)/sqrt(r)) and the steel Neuber constants (Shigley, Mechanical Engineering Design, Ch. 6, Eqs. 6-32 to 6-35): bending/axial sqrt(a) = 0.246 - 3.08e-3 Sut + 1.51e-5 Sut^2 - 2.67e-8 Sut^3, torsion 0.190 - 2.51e-3 Sut + 1.35e-5 Sut^2 - 2.67e-8 Sut^3 (Sut in kpsi, sqrt(a) in sqrt(in)). Kt from a chart. A design aid; Shigley and test data govern.";
+  const kt = makeNumber("Theoretical stress-concentration factor Kt (from a chart)", "fns-kt", { step: "any", min: "1" });
+  const rad = makeNumber("Notch (fillet) radius r (in)", "fns-r", { step: "any", min: "0" });
+  const sut = makeNumber("Ultimate strength Sut (psi)", "fns-sut", { step: "any", min: "0" });
+  const lt = makeSelect("Load type", "fns-lt", [
+    { value: "bending", label: "Bending or axial (Kf)", selected: true },
+    { value: "torsion", label: "Torsion (Kfs)" },
+  ]);
+  for (const x of [kt, rad, sut, lt]) inputRegion.appendChild(x.wrap);
+  attachExampleButton(inputRegion, () => { kt.input.value = "1.65"; rad.input.value = "0.1181"; sut.input.value = "100000"; lt.select.value = "bending"; update(); });
+  const oK = makeOutputLine(outputRegion, "Fatigue stress-concentration factor", "fns-out-kf");
+  const oQ = makeOutputLine(outputRegion, "Notch sensitivity q", "fns-out-q");
+  const oA = makeOutputLine(outputRegion, "Neuber constant", "fns-out-a");
+  const oNote = makeOutputLine(outputRegion, "Note", "fns-out-note");
+  function readNum(i) { if (i.value === "") return 0; const v = Number(i.value); return Number.isFinite(v) ? v : 0; }
+  const update = debounce(() => {
+    const r = computeFatigueNotchSensitivity({ kt: readNum(kt.input), notch_radius_in: readNum(rad.input), ultimate_strength_psi: readNum(sut.input), load_type: lt.select.value });
+    if (r.error) { oK.textContent = r.error; oQ.textContent = "-"; oA.textContent = "-"; oNote.textContent = ""; return; }
+    oK.textContent = fmt(r.kf, 3) + (r.load_type === "torsion" ? " (Kfs, torsion)" : " (Kf, bending or axial)");
+    oQ.textContent = fmt(r.notch_sensitivity_q, 3);
+    oA.textContent = "sqrt(a) = " + fmt(r.neuber_constant, 4) + " sqrt(in)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const x of [kt, rad, sut]) x.input.addEventListener("input", update);
+  lt.select.addEventListener("change", update);
+}
+MACHINING_RENDERERS["fatigue-notch-sensitivity"] = renderFatigueNotchSensitivity;
 
 // ===================== spec-v1288: power-screw torque, efficiency, and self-locking (Shigley Ch. 8) =====================
 // acme-thread-depth / stub-acme-thread-depth give lead-screw GEOMETRY and name the use ("vises, presses, lead

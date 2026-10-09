@@ -24,6 +24,7 @@
 // better match".
 
 const RELATED = {
+  "fatigue-notch-sensitivity": ["fatigue-safety-factor","fatigue-finite-life","endurance-limit-marin"],
   "fatigue-finite-life": ["endurance-limit-marin","fatigue-safety-factor","shaft-torsion"],
   "column-secant-formula": ["euler-johnson-column","combined-stress-axial-bending","section-properties"],
   "conduit-jam-ratio": ["conduit-fill", "pulling-tension", "cable-bend-radius", "min-bend-radius"],

@@ -116547,6 +116547,31 @@
    "term": "how many cycles will this part last",
    "target": "fatigue-finite-life",
    "kind": "question"
+  },
+  {
+   "term": "notch sensitivity",
+   "target": "fatigue-notch-sensitivity",
+   "kind": "industry"
+  },
+  {
+   "term": "fatigue stress concentration factor kf",
+   "target": "fatigue-notch-sensitivity",
+   "kind": "industry"
+  },
+  {
+   "term": "kt to kf",
+   "target": "fatigue-notch-sensitivity",
+   "kind": "industry"
+  },
+  {
+   "term": "neuber notch sensitivity",
+   "target": "fatigue-notch-sensitivity",
+   "kind": "industry"
+  },
+  {
+   "term": "how much does a fillet radius help fatigue",
+   "target": "fatigue-notch-sensitivity",
+   "kind": "question"
   }
  ]
 }

@@ -168527,6 +168527,35 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "fatigue-notch-sensitivity",
+  "source_publisher": "McGraw-Hill (Shigley, Mischke, Budynas)",
+  "source_title": "Mechanical Engineering Design, Example 6-6 (shaft shoulder in bending)",
+  "source_edition_or_year": "Ch. 6",
+  "source_section_or_page": "Example 6-6(b): Sut 690 MPa (100 kpsi), fillet r = 3 mm (0.1181 in), Kt = 1.65; sqrt(a) = 0.0622 sqrt(in), Kf = 1.55",
+  "verified_by": "rl",
+  "verified_on": "2026-10-09",
+  "inputs": {
+   "kt": 1.65,
+   "notch_radius_in": 0.1181,
+   "ultimate_strength_psi": 100000,
+   "load_type": "bending"
+  },
+  "outputs": {
+   "kf": {
+    "value": 1.55,
+    "tolerance": {
+     "pct": 0.5
+    }
+   },
+   "neuber_constant": {
+    "value": 0.0622,
+    "tolerance": {
+     "pct": 0.5
+    }
+   }
+  }
  }
  ]
 }

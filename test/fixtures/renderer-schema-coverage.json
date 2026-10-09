@@ -669,6 +669,7 @@
     "fan-system-effect",
     "fastener-pullout",
     "fatigue-finite-life",
+    "fatigue-notch-sensitivity",
     "fatigue-safety-factor",
     "fdc-supply-check",
     "feed-conversion-ratio",

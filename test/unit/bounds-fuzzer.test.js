@@ -58595,3 +58595,20 @@ test("bounds: fatigue-finite-life reproduces Shigley Example 6-2 and meets Se at
   assert.ok("error" in _ffl({ ultimate_strength_psi: 90000, endurance_limit_psi: 45000, cycles: 500 }));
   assert.ok("error" in _ffl({ ultimate_strength_psi: 90000, endurance_limit_psi: 45000 }));
 });
+
+import { computeFatigueNotchSensitivity as _fns } from "../../calc-machining.js";
+test("bounds: fatigue-notch-sensitivity reproduces Shigley Example 6-6 and stays between 1 and Kt", () => {
+  const r = _fns({ kt: 1.65, notch_radius_in: 0.1181, ultimate_strength_psi: 100000 });
+  assert.ok(Math.abs(r.kf - 1.55) < 0.005);
+  assert.ok(Math.abs(r.neuber_constant - 0.0622) < 0.0002);
+  for (const rad of [0.001, 0.05, 0.5, 5]) {
+    const x = _fns({ kt: 3, notch_radius_in: rad, ultimate_strength_psi: 150000, load_type: "torsion" });
+    assert.ok(x.kf >= 1 && x.kf <= 3);
+  }
+  // Larger radius, more sensitive (q rises toward 1).
+  assert.ok(_fns({ kt: 2, notch_radius_in: 0.5, ultimate_strength_psi: 100000 }).notch_sensitivity_q > r.notch_sensitivity_q);
+  assert.equal(_fns({ kt: 1, notch_radius_in: 0.1, ultimate_strength_psi: 100000 }).kf, 1);
+  assert.ok("error" in _fns({ kt: 0.9, notch_radius_in: 0.1, ultimate_strength_psi: 100000 }));
+  assert.ok("error" in _fns({ kt: 2, notch_radius_in: 0.1, ultimate_strength_psi: 40000 }));
+  assert.ok("error" in _fns({ kt: 2, notch_radius_in: 0.1, ultimate_strength_psi: 100 }));
+});
