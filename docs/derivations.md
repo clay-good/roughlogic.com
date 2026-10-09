@@ -2746,6 +2746,7 @@ cross-check.
 | calc-layout.js | `computeThreadPitch` | `{ thread_standard = "inch", tpi = 0, pitch_mm = 0, starts = 1 } = {}` | _ | _ | _ |
 | calc-layout.js | `computeTriangleAsa` | `{ angle_a_deg = 0, angle_b_deg = 0, included_side_c = 0 } = {}` | _ | _ | _ |
 | calc-layout.js | `computeTriangleSas` | `{ side_a = 0, side_b = 0, included_angle_deg = 0 } = {}` | _ | _ | _ |
+| calc-layout.js | `computeTriangleSsa` | `{ angle_a_deg = 0, side_a = 0, side_b = 0 } = {}` | _ | _ | _ |
 | calc-layout.js | `computeTriangleSss` | `{ side_a = 0, side_b = 0, side_c = 0 } = {}` | _ | _ | _ |
 | calc-lineworker.js | `computeCapacitorBankVoltageRise` | `{ bank_kvar = 0, line_voltage_kv = 0, reactance_to_source_ohm = 0, peak_load_...` | _ | _ | _ |
 | calc-lineworker.js | `computeConductorBlowout` | `{ conductor_diameter_in = 0, weight_lb_per_ft = 0, wind_pressure_psf = 0, win...` | _ | _ | _ |
@@ -3905,7 +3906,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2489.
+Row count: 2490.
 
 <!-- END function-corpus-v14 -->
 
@@ -5370,7 +5371,7 @@ per spec-v14 §13.1 second paragraph.
 | `vacuum-lift-reading` | Vacuum Gauge to Drafting Lift Readout | IFSTA / NWCG fire-pump drafting practice; 10 in Hg at sea level -> 11.3 ft of head, 50% of the ~22.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `water-supply-duration` | Water-Supply Duration | Volume/flow continuity + NFPA 1142 co...; 3000 gal, 250 GPM, no resupply -> 12 min | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group G Cross-trade (165 tiles)
+### Group G Cross-trade (166 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -5530,6 +5531,7 @@ per spec-v14 §13.1 second paragraph.
 | `trench-slope` | OSHA Trench Sloping | OSHA; Type A 0.75:1; Type B 1:1; Type C 1.5:1 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `triangle-asa` | Triangle Solver (Two Angles and the Included Side) | Project (first-principles); law of sines | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+5 more) |
 | `triangle-sas` | Triangle Solver (Two Sides and the Included Angle) | Project (first-principles); law of cosines | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+8 more) |
+| `triangle-ssa` | Triangle Solver (Two Sides and a Non-Included Angle, the Ambiguous Case) | Project (first-principles); law of sines, ambiguous case | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `triangle-sss` | Triangle Solver (Three Sides) | Project (first-principles); law of cosines / Heron | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+6 more) |
 | `umbilical-air-supply` | Surface-Supplied Diver Air Supply Rate and Reserve | Project (first-principles); the applicable commercial diving regulations and the supe... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `unit-converter` | Unit Converter | NIST SI/customary unit conversion fac...; 100 ft -> meters: 30.48 m; pure unit conversion identity | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -6314,6 +6316,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 
-Tile count: 2236. Fixture-covered or reference-cadence: 2236 / 2236.
+Tile count: 2237. Fixture-covered or reference-cadence: 2237 / 2237.
 
 <!-- END tile-index-v14 -->

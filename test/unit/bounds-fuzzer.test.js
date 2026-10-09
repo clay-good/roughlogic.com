@@ -58522,3 +58522,24 @@ test("bounds: anchor breakout and pryout apply the ACI 318-19 17.6.2.5.1 / 17.6.
   assert.ok(Math.abs(_capyCrack({ ...base, cracking: "uncracked" }).vcp_lb - 2 * 27885.48) < 0.1);
   assert.ok("error" in _cabCrack({ ...base, cracking: "partly" }));
 });
+
+import { computeTriangleSsa as _tssa, computeTriangleSas as _tsasX } from "../../calc-layout.js";
+test("bounds: triangle-ssa counts the ambiguous-case triangles and agrees with triangle-sas", () => {
+  const two = _tssa({ angle_a_deg: 49.11, side_a: 8, side_b: 10 });
+  assert.equal(two.solutions, 2);
+  // Both triangles close: rebuild each third side from (b, c, included A) with the SAS solver.
+  for (const c of [two.side_c, two.side_c2]) {
+    const back = _tsasX({ side_a: 10, side_b: c, included_angle_deg: 49.11 });
+    assert.ok(Math.abs(back.side_c - 8) < 1e-6);
+  }
+  assert.ok(Math.abs(two.angle_b_deg + two.angle_b2_deg - 180) < 1e-9);
+  const right = _tssa({ angle_a_deg: 30, side_a: 5, side_b: 10 });
+  assert.equal(right.solutions, 1);
+  assert.equal(right.angle_b_deg, 90);
+  assert.equal(_tssa({ angle_a_deg: 40, side_a: 12, side_b: 10 }).solutions, 1);
+  assert.equal(_tssa({ angle_a_deg: 40, side_a: 10, side_b: 10 }).solutions, 1); // isosceles, a = b
+  assert.ok("error" in _tssa({ angle_a_deg: 30, side_a: 4, side_b: 10 }));
+  assert.ok("error" in _tssa({ angle_a_deg: 120, side_a: 10, side_b: 12 }));
+  assert.ok("error" in _tssa({ angle_a_deg: 180, side_a: 10, side_b: 1 }));
+  assert.equal(_tssa({ angle_a_deg: 120, side_a: 12, side_b: 10 }).solutions, 1);
+});

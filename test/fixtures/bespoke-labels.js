@@ -974,6 +974,7 @@ export const BESPOKE_LABELS = {
   "tree-rigging-shock": {"static_weight_lb":"Static weight of the piece (lb)","drop_ft":"Free-fall before the line tightens (ft)","rope_length_ft":"Rope in the system (ft)","elong_pct":"Rope elongation at load (%, dynamic ~5-20)"},
   "triangle-asa": {"angle_a_deg":"Angle A (deg)","angle_b_deg":"Angle B (deg)","included_side_c":"Included side (baseline) c"},
   "triangle-sas": {"side_a":"Side a","side_b":"Side b","included_angle_deg":"Included angle C (deg)"},
+  "triangle-ssa": {"angle_a_deg":"Angle A (deg)","side_a":"Side a (opposite angle A)","side_b":"Side b (from angle A's vertex)"},
   "triangle-sss": {"side_a":"Side a","side_b":"Side b","side_c":"Side c"},
   "truck-off-tracking": {"turn_radius_ft":"Turn radius R (ft)","wheelbase1_ft":"Tractor / unit wheelbase (ft)","wheelbase2_ft":"Trailer kingpin-to-axle (ft; 0 if single unit)"},
   "truck-swept-path-width": {"turn_radius_ft":"Turn radius R (ft)","wheelbase1_ft":"Tractor / unit wheelbase (ft)","wheelbase2_ft":"Trailer kingpin-to-axle (ft; 0 if single unit)","vehicle_width_ft":"Vehicle width (ft; ~8.5 legal max)","front_swingout_ft":"Front swing-out (ft; 0, or from the turning template)"},

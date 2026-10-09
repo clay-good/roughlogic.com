@@ -168233,6 +168233,114 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "triangle-ssa",
+  "source_publisher": "Project (first-principles)",
+  "source_title": "Ambiguous case: two triangles (the 10-8-9.165 triangle and its short twin)",
+  "source_edition_or_year": "plane trigonometry",
+  "source_section_or_page": "law of sines, ambiguous case",
+  "verified_by": "rl",
+  "verified_on": "2026-10-09",
+  "inputs": {
+   "angle_a_deg": 49.11,
+   "side_a": 8,
+   "side_b": 10
+  },
+  "outputs": {
+   "solutions": {
+    "value": 2,
+    "tolerance": {
+     "pct": 0.5
+    }
+   },
+   "angle_b_deg": {
+    "value": 70.9,
+    "tolerance": {
+     "pct": 0.5
+    }
+   },
+   "side_c": {
+    "value": 9.165,
+    "tolerance": {
+     "pct": 0.5
+    }
+   },
+   "angle_b2_deg": {
+    "value": 109.1,
+    "tolerance": {
+     "pct": 0.5
+    }
+   },
+   "side_c2": {
+    "value": 3.929,
+    "tolerance": {
+     "pct": 0.5
+    }
+   }
+  }
+ },
+ {
+  "tile_id": "triangle-ssa",
+  "source_publisher": "Project (first-principles)",
+  "source_title": "One right triangle at a = b sin A (30 degrees, 5 and 10)",
+  "source_edition_or_year": "plane trigonometry",
+  "source_section_or_page": "law of sines, ambiguous case",
+  "verified_by": "rl",
+  "verified_on": "2026-10-09",
+  "inputs": {
+   "angle_a_deg": 30,
+   "side_a": 5,
+   "side_b": 10
+  },
+  "outputs": {
+   "solutions": {
+    "value": 1,
+    "tolerance": {
+     "pct": 0.5
+    }
+   },
+   "angle_b_deg": {
+    "value": 90.0,
+    "tolerance": {
+     "pct": 0.5
+    }
+   },
+   "side_c": {
+    "value": 8.66,
+    "tolerance": {
+     "pct": 0.5
+    }
+   }
+  }
+ },
+ {
+  "tile_id": "triangle-ssa",
+  "source_publisher": "Project (first-principles)",
+  "source_title": "One triangle when a >= b (40 degrees, 12 and 10)",
+  "source_edition_or_year": "plane trigonometry",
+  "source_section_or_page": "law of sines, ambiguous case",
+  "verified_by": "rl",
+  "verified_on": "2026-10-09",
+  "inputs": {
+   "angle_a_deg": 40,
+   "side_a": 12,
+   "side_b": 10
+  },
+  "outputs": {
+   "solutions": {
+    "value": 1,
+    "tolerance": {
+     "pct": 0.5
+    }
+   },
+   "angle_b_deg": {
+    "value": 32.39,
+    "tolerance": {
+     "pct": 0.5
+    }
+   }
+  }
  }
  ]
 }

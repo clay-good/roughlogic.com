@@ -138,7 +138,7 @@ export function computeTriangleSas({ side_a = 0, side_b = 0, included_angle_deg 
   if (![side_c, angle_a_deg, angle_b_deg, area].every(Number.isFinite) || !(side_c > 0)) return { error: "Triangle math is not a finite value; check the inputs." };
   return {
     side_c, angle_a_deg, angle_b_deg, area, is_right: Math.abs(C - 90) < 1e-9,
-    note: "Oblique-triangle solve from two sides and the INCLUDED angle (SAS). The third side is the law of cosines c = sqrt(a^2 + b^2 - 2ab cos C); the angle opposite a is A = acos((b^2 + c^2 - a^2)/(2bc)), the angle opposite b is B = 180 - C - A, and the area is (1/2) ab sin C. When C = 90 degrees this reduces to the Pythagorean theorem c = sqrt(a^2 + b^2). The sides carry whatever length unit you enter and the result is in the same unit; use it for a corner brace, a hip or valley rafter, a guy from a known spread, or a survey leg. The other cases - SSS (three sides, for the angles), ASA/AAS (a side and two angles), and the ambiguous SSA - are separate. Plane triangles only. A layout aid; verify critical dimensions on the work.",
+    note: "Oblique-triangle solve from two sides and the INCLUDED angle (SAS). The third side is the law of cosines c = sqrt(a^2 + b^2 - 2ab cos C); the angle opposite a is A = acos((b^2 + c^2 - a^2)/(2bc)), the angle opposite b is B = 180 - C - A, and the area is (1/2) ab sin C. When C = 90 degrees this reduces to the Pythagorean theorem c = sqrt(a^2 + b^2). The sides carry whatever length unit you enter and the result is in the same unit; use it for a corner brace, a hip or valley rafter, a guy from a known spread, or a survey leg. The other cases are triangle-sss (three sides, for the angles), triangle-asa (a side and two angles), and triangle-ssa (the ambiguous two sides and a non-included angle). Plane triangles only. A layout aid; verify critical dimensions on the work.",
   };
 }
 export const triangleSasExample = { inputs: { side_a: 10, side_b: 8, included_angle_deg: 60 } };
@@ -191,7 +191,7 @@ export function computeTriangleSss({ side_a = 0, side_b = 0, side_c = 0 } = {}) 
   const is_right = Math.abs(largest - 90) < 1e-6;
   return {
     angle_a_deg, angle_b_deg, angle_c_deg, area, is_right,
-    note: "Oblique-triangle solve from three measured sides (SSS). Each angle is the law of cosines, A = acos((b^2 + c^2 - a^2)/(2bc)) opposite side a and likewise for B and C, and the area is Heron's formula sqrt(s(s-a)(s-b)(s-c)) with the semiperimeter s = (a+b+c)/2. A right angle (90 degrees) opposite the longest side means the corner is square - the framer's 3-4-5 tape check made general. The three sides must satisfy the triangle inequality (each less than the sum of the other two) or no triangle exists. Use it to check square, read a brace or lot-line angle from three lengths, or area a triangular patch. The SAS case is triangle-sas; ASA/AAS and the ambiguous SSA are separate. Plane triangles only. A layout aid; verify critical dimensions on the work.",
+    note: "Oblique-triangle solve from three measured sides (SSS). Each angle is the law of cosines, A = acos((b^2 + c^2 - a^2)/(2bc)) opposite side a and likewise for B and C, and the area is Heron's formula sqrt(s(s-a)(s-b)(s-c)) with the semiperimeter s = (a+b+c)/2. A right angle (90 degrees) opposite the longest side means the corner is square - the framer's 3-4-5 tape check made general. The three sides must satisfy the triangle inequality (each less than the sum of the other two) or no triangle exists. Use it to check square, read a brace or lot-line angle from three lengths, or area a triangular patch. The SAS case is triangle-sas, ASA is triangle-asa, and the ambiguous SSA is triangle-ssa. Plane triangles only. A layout aid; verify critical dimensions on the work.",
   };
 }
 export const triangleSssExample = { inputs: { side_a: 10, side_b: 8, side_c: 9.165 } };
@@ -239,7 +239,7 @@ export function computeTriangleAsa({ angle_a_deg = 0, angle_b_deg = 0, included_
   if (![angle_c_deg, side_a, side_b, area].every(Number.isFinite) || !(side_a > 0)) return { error: "Triangle math is not a finite value; check the inputs." };
   return {
     angle_c_deg, side_a, side_b, area,
-    note: "Oblique-triangle solve from two angles and the INCLUDED side (ASA) - the plane-triangulation case. The two angles A and B are turned at the ends of the known baseline c (the side between them), the third (far) angle is C = 180 - A - B, and the distances to the far point are the law of sines a = c sin A/sin C (opposite A) and b = c sin B/sin C (opposite B), with the area (1/2) a b sin C. The two angles must sum to less than 180 degrees or the sight lines never meet. This is how a surveyor or layout hand reaches a distance to an inaccessible corner, tower, or bank - two angles off a measured baseline, no tape to the point. The SAS and SSS cases are triangle-sas and triangle-sss; the ambiguous SSA (two sides and a non-included angle) is separate. Plane triangles only. A layout aid; verify critical dimensions on the work.",
+    note: "Oblique-triangle solve from two angles and the INCLUDED side (ASA) - the plane-triangulation case. The two angles A and B are turned at the ends of the known baseline c (the side between them), the third (far) angle is C = 180 - A - B, and the distances to the far point are the law of sines a = c sin A/sin C (opposite A) and b = c sin B/sin C (opposite B), with the area (1/2) a b sin C. The two angles must sum to less than 180 degrees or the sight lines never meet. This is how a surveyor or layout hand reaches a distance to an inaccessible corner, tower, or bank - two angles off a measured baseline, no tape to the point. The SAS and SSS cases are triangle-sas and triangle-sss; the ambiguous SSA (two sides and a non-included angle) is triangle-ssa. Plane triangles only. A layout aid; verify critical dimensions on the work.",
   };
 }
 export const triangleAsaExample = { inputs: { angle_a_deg: 70.89, angle_b_deg: 49.11, included_side_c: 9.165 } };
@@ -265,6 +265,66 @@ function renderTriangleAsa(inputRegion, outputRegion, citationEl) {
   for (const f of [A, B, c]) f.input.addEventListener("input", update);
 }
 LAYOUT_RENDERERS["triangle-asa"] = renderTriangleAsa;
+
+// spec-v1933: oblique-triangle solver, SSA (two sides and a NON-included angle) - the ambiguous case.
+// Angle A, the side a opposite it, and a second side b: law of sines sin B = b sin A / a. With A acute,
+// h = b sin A: a < h gives no triangle, a = h one (right), h < a < b TWO (B and 180 - B), a >= b one.
+// With A right or obtuse there is one triangle when a > b, none otherwise. Completes the family.
+// dims: in { angle_a_deg: dimensionless, side_a: L, side_b: L } out: { solutions: dimensionless, height: L, angle_b_deg: dimensionless, angle_c_deg: dimensionless, side_c: L, area: L^2, angle_b2_deg: dimensionless, angle_c2_deg: dimensionless, side_c2: L, area2: L^2 }
+export function computeTriangleSsa({ angle_a_deg = 0, side_a = 0, side_b = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const A = Number(angle_a_deg) || 0;
+  const a = Number(side_a) || 0;
+  const b = Number(side_b) || 0;
+  if (!(A > 0)) return { error: "Angle A must be positive (deg)." };
+  if (!(A < 180)) return { error: "Angle A must be less than 180 degrees." };
+  if (!(a > 0)) return { error: "Side a (opposite angle A) must be positive." };
+  if (!(b > 0)) return { error: "Side b must be positive." };
+  const rad = Math.PI / 180;
+  const sinA = Math.sin(A * rad);
+  const h = b * sinA;
+  if (A >= 90 && !(a > b)) return { error: "No triangle: with angle A at 90 degrees or more, side a must be longer than side b." };
+  if (A < 90 && a < h * (1 - 1e-9)) return { error: "No triangle: side a is shorter than the height b sin A (" + h.toFixed(4) + "), so it cannot reach the third side." };
+  const solve = (B) => {
+    const C = 180 - A - B;
+    const c = (a * Math.sin(C * rad)) / sinA;
+    return { B, C, c, area: 0.5 * a * b * Math.sin(C * rad) };
+  };
+  // At a = h within the tolerance, B is exactly 90 (one right triangle).
+  const B1 = Math.abs(a - h) <= h * 1e-9 ? 90 : Math.asin(Math.min(1, h / a)) / rad;
+  const one = solve(B1);
+  const two = A < 90 && a < b && B1 < 90 ? solve(180 - B1) : null;
+  if (![one.B, one.C, one.c, one.area].every(Number.isFinite) || !(one.c > 0)) return { error: "Triangle math is not a finite value; check the inputs." };
+  const out = { solutions: two ? 2 : 1, height: h, angle_b_deg: one.B, angle_c_deg: one.C, side_c: one.c, area: one.area };
+  if (two) Object.assign(out, { angle_b2_deg: two.B, angle_c2_deg: two.C, side_c2: two.c, area2: two.area });
+  out.note = "Oblique-triangle solve from two sides and a NON-included angle (SSA) - the ambiguous case. Angle A is opposite side a, and side b runs from A's vertex: the law of sines gives sin B = b sin A / a. With A acute, compare a with the height h = b sin A: shorter than h, side a cannot reach and there is no triangle; equal to h, one right triangle; between h and b, TWO triangles fit (B and 180 - B, a long and a short third side) and only a field measurement of one more part tells which one you have; b or longer, one triangle. With A at 90 degrees or more there is one triangle only when a is longer than b. The SAS, SSS, and ASA cases are triangle-sas, triangle-sss, and triangle-asa. Plane triangles only. A layout aid; verify critical dimensions on the work.";
+  return out;
+}
+export const triangleSsaExample = { inputs: { angle_a_deg: 49.11, side_a: 8, side_b: 10 } };
+function renderTriangleSsa(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: law of sines sin B = b sin A / a with the ambiguous-case test against the height h = b sin A (standard trigonometry) - zero, one, or two triangles from two sides and a non-included angle. A layout aid; verify critical dimensions on the work.";
+  const A = makeNumber("Angle A (deg)", "tssa-a", { step: "any", min: "0" });
+  const a = makeNumber("Side a (opposite angle A)", "tssa-sa", { step: "any", min: "0" });
+  const b = makeNumber("Side b (from angle A's vertex)", "tssa-sb", { step: "any", min: "0" });
+  for (const f of [A, a, b]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { A.input.value = "49.11"; a.input.value = "8"; b.input.value = "10"; update(); });
+  const oN = makeOutputLine(outputRegion, "Triangles that fit", "tssa-out-n");
+  const o1 = makeOutputLine(outputRegion, "Triangle 1 (angles B and C, third side)", "tssa-out-1");
+  const o2 = makeOutputLine(outputRegion, "Triangle 2 (angles B and C, third side)", "tssa-out-2");
+  const oR = makeOutputLine(outputRegion, "Area", "tssa-out-r");
+  const oNote = makeOutputLine(outputRegion, "Note", "tssa-out-note");
+  const update = debounce(() => {
+    const r = computeTriangleSsa({ angle_a_deg: Number(A.input.value) || 0, side_a: Number(a.input.value) || 0, side_b: Number(b.input.value) || 0 });
+    if (r.error) { oN.textContent = r.error; o1.textContent = "-"; o2.textContent = "-"; oR.textContent = "-"; oNote.textContent = ""; return; }
+    oN.textContent = r.solutions === 2 ? "2 (ambiguous: height " + fmt(r.height, 4) + " < a < b)" : "1";
+    o1.textContent = fmt(r.angle_b_deg, 2) + " / " + fmt(r.angle_c_deg, 2) + " deg, third side " + fmt(r.side_c, 4);
+    o2.textContent = r.solutions === 2 ? fmt(r.angle_b2_deg, 2) + " / " + fmt(r.angle_c2_deg, 2) + " deg, third side " + fmt(r.side_c2, 4) : "none (only one triangle fits)";
+    oR.textContent = fmt(r.area, 4) + (r.solutions === 2 ? " / " + fmt(r.area2, 4) : "") + " (square units)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [A, a, b]) f.input.addEventListener("input", update);
+}
+LAYOUT_RENDERERS["triangle-ssa"] = renderTriangleSsa;
 
 // --- v32 G: Bolt circle / circle-of-holes layout (`bolt-circle`) ---
 // R = dia/2; hole i at angle start + i*(360/N): x = cx + R*cos, y = cy + R*sin;

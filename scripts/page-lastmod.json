@@ -2,100 +2,100 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "cddb8d6fdf0d9ca8",
-      "date": "2026-10-08"
+      "sha": "d400773ba9509693",
+      "date": "2026-10-09"
     },
     "/tools/": {
-      "sha": "a3495f4fd84285fa",
-      "date": "2026-10-08"
+      "sha": "15516d955a663026",
+      "date": "2026-10-09"
     },
     "/collections/disaster-response/": {
-      "sha": "a52930bc12d1fc89",
-      "date": "2026-10-08"
+      "sha": "f96b718afe0ded04",
+      "date": "2026-10-09"
     },
     "/groups/accounting/": {
-      "sha": "cdcb6063c2427f35",
-      "date": "2026-10-08"
+      "sha": "7aa33fbf62259b72",
+      "date": "2026-10-09"
     },
     "/groups/agriculture/": {
-      "sha": "3f3be1a8cdd70324",
-      "date": "2026-10-08"
+      "sha": "15f25061db164649",
+      "date": "2026-10-09"
     },
     "/groups/construction/": {
-      "sha": "76d69209150c2b4f",
-      "date": "2026-10-08"
+      "sha": "edc50b7c2e892fe7",
+      "date": "2026-10-09"
     },
     "/groups/cross-trade/": {
-      "sha": "54b084b47311d716",
-      "date": "2026-10-08"
+      "sha": "58d0aad945061059",
+      "date": "2026-10-09"
     },
     "/groups/educators/": {
-      "sha": "0225f7ec40a8d55b",
-      "date": "2026-10-08"
+      "sha": "54eccfe35ac795b4",
+      "date": "2026-10-09"
     },
     "/groups/electrical/": {
-      "sha": "854e4e8c8e244f5c",
-      "date": "2026-10-08"
+      "sha": "a2f5266a3ae945ae",
+      "date": "2026-10-09"
     },
     "/groups/field/": {
-      "sha": "93ee85ab6e9c059a",
-      "date": "2026-10-08"
+      "sha": "7f7a536980239993",
+      "date": "2026-10-09"
     },
     "/groups/fire-ground/": {
-      "sha": "6176a80b7b12f708",
-      "date": "2026-10-08"
+      "sha": "688bce6f6e41197e",
+      "date": "2026-10-09"
     },
     "/groups/historical/": {
-      "sha": "6118ce60ca32a51c",
-      "date": "2026-10-08"
+      "sha": "8a9625a6b6df5815",
+      "date": "2026-10-09"
     },
     "/groups/hvac/": {
-      "sha": "a2a9e6a63585c75c",
-      "date": "2026-10-08"
+      "sha": "bf5339690f048095",
+      "date": "2026-10-09"
     },
     "/groups/kitchen/": {
-      "sha": "0ddc026eb57d24b1",
-      "date": "2026-10-08"
+      "sha": "0044e2ec6351c9e6",
+      "date": "2026-10-09"
     },
     "/groups/lab/": {
-      "sha": "dd84adf0ffada82d",
-      "date": "2026-10-08"
+      "sha": "5773f7e9da581c4e",
+      "date": "2026-10-09"
     },
     "/groups/mechanic/": {
-      "sha": "b510e71098cf66e4",
-      "date": "2026-10-08"
+      "sha": "bff37192b9a03df8",
+      "date": "2026-10-09"
     },
     "/groups/plumbing/": {
-      "sha": "1079fdc01899bb75",
-      "date": "2026-10-08"
+      "sha": "2ffec45447d30e3d",
+      "date": "2026-10-09"
     },
     "/groups/real-estate/": {
-      "sha": "6aefcc3e1e96e2d3",
-      "date": "2026-10-08"
+      "sha": "875f1cc60b9de6aa",
+      "date": "2026-10-09"
     },
     "/groups/references/": {
-      "sha": "9329e2351b7a54cf",
-      "date": "2026-10-08"
+      "sha": "937ea68650ff4e3f",
+      "date": "2026-10-09"
     },
     "/groups/restoration/": {
-      "sha": "669df5dd57447bb9",
-      "date": "2026-10-08"
+      "sha": "bf806144420e0844",
+      "date": "2026-10-09"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "3ea81444101865b5",
-      "date": "2026-10-08"
+      "sha": "9516c46ec940946f",
+      "date": "2026-10-09"
     },
     "/groups/stage/": {
-      "sha": "faf1fda9004ff299",
-      "date": "2026-10-08"
+      "sha": "7838ee945ebd7e6a",
+      "date": "2026-10-09"
     },
     "/groups/trucking/": {
-      "sha": "94b21708d8c27a09",
-      "date": "2026-10-08"
+      "sha": "a4cb80bcf5e8fc50",
+      "date": "2026-10-09"
     },
     "/groups/water/": {
-      "sha": "b640c752196d7723",
-      "date": "2026-10-08"
+      "sha": "5f681b29d21ceffc",
+      "date": "2026-10-09"
     },
     "/tools/aav-install-check/": {
       "sha": "6124c721c9aa5eea",
@@ -482,8 +482,8 @@
       "date": "2026-10-01"
     },
     "/tools/barrel-volume/": {
-      "sha": "09c06573e7e0c984",
-      "date": "2026-10-03"
+      "sha": "176a87d8661f7924",
+      "date": "2026-10-09"
     },
     "/tools/barstock-cutlist/": {
       "sha": "90aed9e23c98ee4f",
@@ -1066,8 +1066,8 @@
       "date": "2026-09-29"
     },
     "/tools/center-of-gravity-2point/": {
-      "sha": "53baf20bc47db5ea",
-      "date": "2026-09-29"
+      "sha": "067ddb4c361343dc",
+      "date": "2026-10-09"
     },
     "/tools/center-pivot-runtime/": {
       "sha": "3b4e3e4d994ea6fc",
@@ -8298,16 +8298,20 @@
       "date": "2026-09-29"
     },
     "/tools/triangle-asa/": {
-      "sha": "15a0593462d4f28d",
-      "date": "2026-09-29"
+      "sha": "2bb6517c87c18322",
+      "date": "2026-10-09"
     },
     "/tools/triangle-sas/": {
-      "sha": "f880a532fc993a6c",
-      "date": "2026-09-29"
+      "sha": "b6beb726a53fb018",
+      "date": "2026-10-09"
+    },
+    "/tools/triangle-ssa/": {
+      "sha": "d5e8a058fc8a0468",
+      "date": "2026-10-09"
     },
     "/tools/triangle-sss/": {
-      "sha": "76f9143601a477bd",
-      "date": "2026-09-29"
+      "sha": "44a1aec2bfb7601e",
+      "date": "2026-10-09"
     },
     "/tools/trim-linear-footage/": {
       "sha": "e657fb1876c6376e",

@@ -319,6 +319,7 @@ const UNIT_TAIL_EXEMPT = new Set([
   "calc-layout.js:computeTriangleSas:side_a",                // a triangle SIDE
   "calc-layout.js:computeTriangleSss:side_a",                // a triangle SIDE
   "calc-layout.js:computeTriangleAsa:side_a",                // a triangle SIDE
+  "calc-layout.js:computeTriangleSsa:side_a",                // a triangle SIDE
   "calc-lab.js:computeArrheniusEquation:pre_exponential_a",  // Arrhenius A, a rate prefactor
   "calc-instrumentation.js:computeThermistorSteinhartHart:coeff_a", // Steinhart-Hart's A
   "calc-refrigerant.js:computeCompareRefrigerants:refrigerant_a", // an A-or-B LABEL

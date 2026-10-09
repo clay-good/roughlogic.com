@@ -116447,6 +116447,31 @@
    "term": "nds lag screw z",
    "target": "wood-bolt-connection",
    "kind": "industry"
+  },
+  {
+   "term": "ambiguous case triangle",
+   "target": "triangle-ssa",
+   "kind": "industry"
+  },
+  {
+   "term": "ssa triangle solver",
+   "target": "triangle-ssa",
+   "kind": "industry"
+  },
+  {
+   "term": "law of sines ambiguous case",
+   "target": "triangle-ssa",
+   "kind": "industry"
+  },
+  {
+   "term": "two sides and a non included angle",
+   "target": "triangle-ssa",
+   "kind": "question"
+  },
+  {
+   "term": "why does my triangle have two answers",
+   "target": "triangle-ssa",
+   "kind": "question"
   }
  ]
 }

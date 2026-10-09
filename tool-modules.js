@@ -1108,7 +1108,7 @@ export const TOOL_MODULES = (() => {
     // v38 thread pitch / lead
     "thread-pitch",
     // v44 circular-arc layout from chord & rise
-    "circular-arc", "circular-arc-rise-from-radius", "circular-segment-area", "triangle-sas", "triangle-sss", "triangle-asa",
+    "circular-arc", "circular-arc-rise-from-radius", "circular-segment-area", "triangle-sas", "triangle-sss", "triangle-asa", "triangle-ssa",
     // v47 circle through three points
     "circle-from-3-points",
     // v55 regular polygon miter & layout

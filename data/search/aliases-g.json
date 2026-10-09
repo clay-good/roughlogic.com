@@ -1311,6 +1311,11 @@
     {"term":"emergency shelter toilets","target":"shelter-capacity-sanitation","kind":"industry"},
     {"term":"red cross shelter standards","target":"shelter-capacity-sanitation","kind":"industry"},
     {"term":"gym shelter cots","target":"shelter-capacity-sanitation","kind":"industry"},
-    {"term":"evacuation shelter planning","target":"shelter-capacity-sanitation","kind":"industry"}
+    {"term":"evacuation shelter planning","target":"shelter-capacity-sanitation","kind":"industry"},
+    {"term":"ambiguous case triangle","target":"triangle-ssa","kind":"industry"},
+    {"term":"ssa triangle solver","target":"triangle-ssa","kind":"industry"},
+    {"term":"law of sines ambiguous case","target":"triangle-ssa","kind":"industry"},
+    {"term":"two sides and a non included angle","target":"triangle-ssa","kind":"question"},
+    {"term":"why does my triangle have two answers","target":"triangle-ssa","kind":"question"}
   ]
 }

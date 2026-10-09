@@ -78,6 +78,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Added
 
+- **`triangle-ssa`: triangle solver for two sides and a non-included angle, the ambiguous case (spec-v1933, Group G, `calc-layout.js`), 2,236 -> 2,237, v0.426.0.** The two-sides, three-sides, and two-angles solvers all said the ambiguous SSA case was separate, and nothing solved it. This one applies the law of sines, sin B = b sin A / a, and counts the triangles that fit by comparing side a with the height b sin A and with side b: none, one right triangle, two (B and 180 - B), or one. A 49.11 degree angle with 8 opposite and 10 beside it gives the 10-8-9.165 triangle the other solvers build and a 3.929 short twin, so the page says one more measurement is needed. The three sibling solvers now name it.
+
 - **`wood-nail-lateral`: lateral design value of a nail, face- or toe-nailed (spec-v1932, Group E, `calc-construction.js`), 2,235 -> 2,236, v0.425.0.** The withdrawal tiles covered pulling a nail out and `wood-bolt-connection` covered bolts from 1/4 in up; nothing gave a nail's lateral value Z. The tile runs the six NDS 12.3.1 yield modes with Rd = 2.2, Fe = 16,600 G^1.84, Fyb by diameter, and the 12.5.4 toe-nail geometry and Ctn = 0.83.
 
   It reproduces AWC Design Aid No. 2: a 16d common toe-nailed into Douglas fir-larch lists 117 lb and computes 116.8 (mode IV); all nine species columns of that row agree within 1 lb, and an 8d common lists 80 against 79.6. Face-nailed through 1-1/2 in, the same 16d carries 140.7 lb.

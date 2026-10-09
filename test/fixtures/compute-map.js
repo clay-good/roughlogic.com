@@ -899,6 +899,7 @@ export const COMPUTE_MAP = {
   "triangle-sas": { module: "../../calc-layout.js", fn: "computeTriangleSas" },
   "triangle-sss": { module: "../../calc-layout.js", fn: "computeTriangleSss" },
   "triangle-asa": { module: "../../calc-layout.js", fn: "computeTriangleAsa" },
+  "triangle-ssa": { module: "../../calc-layout.js", fn: "computeTriangleSsa" },
   "circular-segment-area": { module: "../../calc-layout.js", fn: "computeCircularSegmentArea" },
   "circular-arc-rise-from-radius": { module: "../../calc-layout.js", fn: "computeCircularArcRiseFromRadius" },
   "circle-from-3-points": { module: "../../calc-layout.js", fn: "computeCircleFrom3Points" },

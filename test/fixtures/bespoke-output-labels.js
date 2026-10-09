@@ -974,6 +974,7 @@ export const BESPOKE_OUTPUT_LABELS = {
   "tree-rigging-shock": {"peak_load_lb":"Estimated peak load","multiplier":"Dynamic multiplier over static"},
   "triangle-asa": {"angle_c_deg":"Third angle C","area":"Area","note":"Note"},
   "triangle-sas": {"side_c":"Third side c","area":"Area","note":"Note"},
+  "triangle-ssa": {"angle_b_deg":"Triangle 1 (angles B and C, third side)","area":"Area","note":"Note"},
   "triangle-sss": {"area":"Area","is_right":"Square corner?","note":"Note"},
   "truck-off-tracking": {"off_tracking_ft":"Off-tracking (rear inside front)","effective_wheelbase_ft":"Effective wheelbase","note":"Note"},
   "truck-swept-path-width": {"swept_path_width_ft":"Swept-path width","off_tracking_ft":"Off-tracking (rear inside front)","note":"Note"},
