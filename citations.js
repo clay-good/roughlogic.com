@@ -22750,7 +22750,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.general,
     editionNote: "Evaporation is the largest heat loss on most outdoor pools and it is the one nobody sees -- radiation, convection and conduction to the ground are all real and all smaller, while an owner reasoning about pool heat loss reasons about the air temperature. That is why the most effective single measure is a cover and the second is a windbreak. A COVER ONLY WORKS WHILE IT IS ON: effectiveness and hours MULTIPLY, so a 90% cover on for two thirds of the day saves 60% of the loss, not 90%. The hours that matter most are overnight, when the air is coldest and driest. And the FUEL saving is larger than the heat saving by the heater's efficiency -- heat not lost is fuel not bought. The gallons are a second saving the heat figure hides: they are treated, balanced water, replaced with cold make-up that must then be heated and re-balanced.",
     assumptions: [
-      { name: "Evaporation rate is entered", value: "it depends on wind, humidity and the temperature difference", source: "a site measurement or ASHRAE Applications" },
+      { name: "Evaporation rate is entered", value: "it depends on wind, humidity and the temperature difference; pool-evaporation-rate estimates it from those conditions", source: "a site measurement, ASHRAE Applications, or pool-evaporation-rate" },
       { name: "Cover effectiveness times hours", value: "a cover off the pool saves nothing", source: "the cover manufacturer's data" },
       { name: "Make-up water is not all evaporation", value: "splash-out, backwash and leaks read the same", source: "the pool professional" },
     ],
