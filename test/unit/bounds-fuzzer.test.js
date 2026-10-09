@@ -58700,3 +58700,15 @@ test("bounds: terminal-velocity time and distance to 95% follow v = Vt tanh(g t 
   // Heavier object, longer approach.
   assert.ok(_tvT({ weight_lb: 360, frontal_area_ft2: 7, drag_coefficient: 0.7 }).time_to_95_s > r.time_to_95_s);
 });
+
+import { computeHydraulicAccumulatorVolume as _havT } from "../../calc-mechanic.js";
+test("bounds: hydraulic-accumulator-volume scales the precharge by absolute temperature", () => {
+  const b = { accumulator_size_gal: 1, precharge_psig: 1300, min_pressure_psig: 1600, max_pressure_psig: 3000 };
+  assert.equal(_havT(b).precharge_op_psig, 1300);
+  const hot = _havT({ ...b, charge_temp_f: 70, operating_temp_f: 140 });
+  assert.ok(Math.abs(hot.precharge_op_psig - (1314.7 * 599.67 / 529.67 - 14.7)) < 1e-9);
+  // A warmer (higher) precharge, still under P1, delivers MORE oil between the same pressures.
+  assert.ok(hot.usable_volume_gal > _havT(b).usable_volume_gal);
+  assert.ok("error" in _havT({ ...b, precharge_psig: 1550, operating_temp_f: 140 }));
+  assert.ok("error" in _havT({ ...b, charge_temp_f: -500 }));
+});

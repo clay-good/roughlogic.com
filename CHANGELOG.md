@@ -60,6 +60,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **`hydraulic-accumulator-volume` corrects the precharge for temperature.** It said temperature correction was separate. Optional charging and operating temperatures (both default 70 F, so earlier results are unchanged) now scale the precharge by the absolute-temperature ratio before the gas-law volume, and the page reports the precharge at operating temperature: 1,300 psig charged at 70 F reads 1,474 psig at 140 F. A precharge that warms above the minimum working pressure is now an error that says so.
+
 - **`terminal-velocity` gives the time and distance to reach terminal.** It said they were separate. With quadratic drag from rest the speed follows v = Vt tanh(g t/Vt), so the page now reports 95% of terminal after (Vt/g) atanh(0.95) seconds and (Vt^2/g) ln(1/sqrt(1 - 0.95^2)) feet: a 180 lb skydiver at 176 ft/s gets there in 10.0 s and 1,118 ft.
 
 - **`slider-crank-piston-position` gives piston velocity and acceleration.** Its note said they were separate. An optional crank speed now returns the exact velocity and acceleration at the entered angle for a constant crank speed, and the peak acceleration at TDC, r omega^2 (1 + r/L). A 3.48 in stroke on a 5.7 in rod at 6,000 rpm pulls 2,322 g at TDC; at 73 degrees the piston moves at 95.3 ft/s. Position-only use is unchanged.

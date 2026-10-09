@@ -1817,8 +1817,10 @@ MECHANIC_RENDERERS["impact-load-factor"] = _simpleRenderer({
 // The catalog sizes a compressed-AIR receiver but not a hydraulic accumulator, which sizes on the gas law
 // between precharge and working pressures: dV = V0[(P0/P1)^(1/n) - (P0/P2)^(1/n)], absolute pressures,
 // n = 1 isothermal (slow) / 1.4 adiabatic (fast). Precharge must sit at or below the minimum working pressure.
-// dims: in { accumulator_size_gal: L^3, precharge_psig: M L^-1 T^-2, min_pressure_psig: M L^-1 T^-2, max_pressure_psig: M L^-1 T^-2, gas_process: dimensionless } out: { usable_volume_gal: L^3, utilization_pct: dimensionless }
-export function computeHydraulicAccumulatorVolume({ accumulator_size_gal = 0, precharge_psig = 0, min_pressure_psig = 0, max_pressure_psig = 0, gas_process = "isothermal" } = {}) {
+// Precharge temperature correction added 2026-10-09 (the note named it as separate): nitrogen charged at
+// T_charge and run at T_op holds P0_op = P0_abs x (T_op + 459.67)/(T_charge + 459.67) before the volume math.
+// dims: in { accumulator_size_gal: L^3, precharge_psig: M L^-1 T^-2, min_pressure_psig: M L^-1 T^-2, max_pressure_psig: M L^-1 T^-2, gas_process: dimensionless, charge_temp_f: T, operating_temp_f: T } out: { usable_volume_gal: L^3, utilization_pct: dimensionless, precharge_op_psig: M L^-1 T^-2 }
+export function computeHydraulicAccumulatorVolume({ accumulator_size_gal = 0, precharge_psig = 0, min_pressure_psig = 0, max_pressure_psig = 0, gas_process = "isothermal", charge_temp_f = 70, operating_temp_f = 70 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const V0 = Number(accumulator_size_gal) || 0;
   const P0g = Number(precharge_psig) || 0;
@@ -1828,16 +1830,19 @@ export function computeHydraulicAccumulatorVolume({ accumulator_size_gal = 0, pr
   if (!(P0g > 0)) return { error: "Precharge pressure must be positive (psig)." };
   if (!(P1g > 0)) return { error: "Minimum working pressure must be positive (psig)." };
   if (!(P2g > P1g)) return { error: "Maximum working pressure must be greater than the minimum (psig)." };
-  if (P0g > P1g) return { error: "Precharge must be at or below the minimum working pressure (psig)." };
   if (gas_process !== "isothermal" && gas_process !== "adiabatic") return { error: "Gas process must be isothermal or adiabatic." };
+  const Tc = Number(charge_temp_f) + 459.67, To = Number(operating_temp_f) + 459.67;
+  if (!(Tc > 0 && To > 0)) return { error: "Temperatures must be above absolute zero (F)." };
   const n = gas_process === "adiabatic" ? 1.4 : 1;
-  const P0 = P0g + 14.7, P1 = P1g + 14.7, P2 = P2g + 14.7;
+  const P0 = (P0g + 14.7) * (To / Tc), P1 = P1g + 14.7, P2 = P2g + 14.7;
+  const precharge_op_psig = P0 - 14.7;
+  if (precharge_op_psig > P1g) return { error: Tc === To ? "Precharge must be at or below the minimum working pressure (psig)." : "At the operating temperature the precharge rises to " + Math.round(precharge_op_psig) + " psig, above the minimum working pressure; charge lower or raise the minimum." };
   const usable_volume_gal = V0 * (Math.pow(P0 / P1, 1 / n) - Math.pow(P0 / P2, 1 / n));
   const utilization_pct = (usable_volume_gal / V0) * 100;
   if (![usable_volume_gal, utilization_pct].every(Number.isFinite) || !(usable_volume_gal > 0)) return { error: "Accumulator math is not a finite value; check the inputs." };
   return {
-    usable_volume_gal, utilization_pct, polytropic_n: n,
-    note: "Usable (deliverable) oil volume of a gas-charged bladder or piston hydraulic accumulator, dV = V0[(P0/P1)^(1/n) - (P0/P2)^(1/n)] with ABSOLUTE pressures (gauge + 14.7): V0 the accumulator (nominal gas) size, P0 the precharge, P1 the minimum working pressure, and P2 the maximum. Below the precharge the accumulator holds no oil, so the precharge must sit at or just below P1 (a common rule is P0 = 0.9 P1). The gas process sets the exponent: a slow cycle is isothermal (n = 1) and stores the most oil; a fast cycle is adiabatic (n = 1.4), where the heated gas stores less; the truth is between. Widen the pressure band or precharge closer to the minimum to get more usable oil, or step up to a bigger accumulator. Temperature correction of the precharge, real-gas effects at very high pressure, response time, and the shock/pulsation duty are separate. Keep the precharge and pressures within the accumulator's rating. A design aid; Machinery's Handbook / NFPA fluid-power practice and the accumulator maker govern.",
+    usable_volume_gal, utilization_pct, polytropic_n: n, precharge_op_psig, temp_corrected: Tc !== To,
+    note: "Usable (deliverable) oil volume of a gas-charged bladder or piston hydraulic accumulator, dV = V0[(P0/P1)^(1/n) - (P0/P2)^(1/n)] with ABSOLUTE pressures (gauge + 14.7): V0 the accumulator (nominal gas) size, P0 the precharge, P1 the minimum working pressure, and P2 the maximum. Below the precharge the accumulator holds no oil, so the precharge must sit at or just below P1 (a common rule is P0 = 0.9 P1). The gas process sets the exponent: a slow cycle is isothermal (n = 1) and stores the most oil; a fast cycle is adiabatic (n = 1.4), where the heated gas stores less; the truth is between. Widen the pressure band or precharge closer to the minimum to get more usable oil, or step up to a bigger accumulator. A precharge set cold rises with the gas temperature in proportion to the absolute temperature, so enter both temperatures when they differ; real-gas effects at very high pressure, response time, and the shock/pulsation duty are separate. Keep the precharge and pressures within the accumulator's rating. A design aid; Machinery's Handbook / NFPA fluid-power practice and the accumulator maker govern.",
   };
 }
 export const hydraulicAccumulatorVolumeExample = { inputs: { accumulator_size_gal: 1, precharge_psig: 1500, min_pressure_psig: 1600, max_pressure_psig: 3000, gas_process: "isothermal" } };
@@ -1854,9 +1859,12 @@ MECHANIC_RENDERERS["hydraulic-accumulator-volume"] = _simpleRenderer({
       { value: "isothermal", label: "Isothermal (slow cycle, n = 1)" },
       { value: "adiabatic", label: "Adiabatic (fast cycle, n = 1.4)" },
     ] },
+    { key: "charge_temp_f", label: "Temperature when precharged (°F)", kind: "number", default: 70, attrs: { step: "any", value: "70" } },
+    { key: "operating_temp_f", label: "Operating gas temperature (°F)", kind: "number", default: 70, attrs: { step: "any", value: "70" } },
   ],
   outputs: [
     { key: "v", id: "hav-out-v", label: "Usable oil volume", value: (r) => fmt(r.usable_volume_gal, 4) + " gal (" + fmt(r.usable_volume_gal * 231, 1) + " in^3)" },
+    { key: "p", id: "hav-out-p", label: "Precharge at operating temperature", value: (r) => fmt(r.precharge_op_psig, 0) + " psig" + (r.temp_corrected ? " (charged at a different temperature)" : " (same temperature as charged)") },
     { key: "u", id: "hav-out-u", label: "Utilization", value: (r) => fmt(r.utilization_pct, 1) + "% of the nominal size (n = " + fmt(r.polytropic_n, 1) + ")" },
     { key: "n", id: "hav-out-n", label: "Note", value: (r) => r.note },
   ],

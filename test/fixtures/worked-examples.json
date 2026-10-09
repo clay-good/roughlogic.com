@@ -168824,6 +168824,38 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "hydraulic-accumulator-volume",
+  "source_publisher": "Project (first-principles)",
+  "source_title": "Precharge charged at 70 F, run at 140 F",
+  "source_edition_or_year": "ideal gas, constant volume",
+  "source_section_or_page": "P0 = 1,314.7 psia x 599.67/529.67 = 1,488.4 psia = 1,473.7 psig; dV = 1 x (1488.4/1614.7 - 1488.4/3014.7) = 0.4281 gal",
+  "verified_by": "rl",
+  "verified_on": "2026-10-09",
+  "inputs": {
+   "accumulator_size_gal": 1,
+   "precharge_psig": 1300,
+   "min_pressure_psig": 1600,
+   "max_pressure_psig": 3000,
+   "gas_process": "isothermal",
+   "charge_temp_f": 70,
+   "operating_temp_f": 140
+  },
+  "outputs": {
+   "precharge_op_psig": {
+    "value": 1473.7,
+    "tolerance": {
+     "pct": 0.5
+    }
+   },
+   "usable_volume_gal": {
+    "value": 0.4281,
+    "tolerance": {
+     "pct": 0.5
+    }
+   }
+  }
  }
  ]
 }
