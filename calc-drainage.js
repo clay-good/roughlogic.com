@@ -191,11 +191,14 @@ DRAINAGE_RENDERERS["roof-drain-sizing"] = renderRoofDrainSizing;
 // x 60; fill_time_s = drawdown_gal / inflow_gpm x 60; cycles_per_hr = 3600 /
 // (run + fill); ok = run_time_s >= min_run_s. The pump must out-pace the
 // inflow or the basin never empties (errors).
-// dims: in { basin_dia: L, drawdown_in: L, inflow_gpm: L^3 T^-1, pump_gpm: L^3 T^-1, min_run_s: T } out: { drawdown_gal: L^3, run_time_s: T, fill_time_s: T, cycles_per_hr: T^-1 }
+const _IPC_712_4_2_MIN_GPM = { 2: 21, 2.5: 30, 3: 46 };
+// IPC Table 712.4.2 minimum sewage pump/ejector capacity by discharge size, added 2026-10-09: 2 in 21 gpm,
+// 2-1/2 in 30 gpm, 3 in 46 gpm -- each is 2 ft/s scouring velocity in that pipe, reported alongside.
+// dims: in { basin_dia: L, drawdown_in: L, inflow_gpm: L^3 T^-1, pump_gpm: L^3 T^-1, min_run_s: T, discharge_in: L } out: { drawdown_gal: L^3, run_time_s: T, fill_time_s: T, cycles_per_hr: T^-1, discharge_velocity_fps: L T^-1 }
 // (Basin diameter and float spread are lengths L; the 7.48 gal/ft^3 constant
 //  turns the L^3 band into a volume; inflow and pump rates are L^3 T^-1, so
 //  volume over rate gives the run and fill times T and cycles per hour T^-1.)
-export function computeSumpBasinSizing({ basin_dia, drawdown_in, inflow_gpm, pump_gpm, min_run_s = 60 } = {}) {
+export function computeSumpBasinSizing({ basin_dia, drawdown_in, inflow_gpm, pump_gpm, min_run_s = 60, discharge_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const dia = Number(basin_dia);
   const band = Number(drawdown_in);
@@ -208,20 +211,25 @@ export function computeSumpBasinSizing({ basin_dia, drawdown_in, inflow_gpm, pum
   if (!Number.isFinite(inflow) || inflow <= 0) return { error: "Inflow must be a positive finite number (GPM)." };
   if (inflow >= pump) return { error: "Inflow must be less than the pump rate, or the pump never empties the basin." };
   if (!Number.isFinite(minRun) || minRun < 0) return { error: "Minimum run time must be a non-negative finite number (s)." };
+  const dis = Number(discharge_in) || 0;
+  if (dis !== 0 && !(dis in _IPC_712_4_2_MIN_GPM)) return { error: "Discharge size must be 2, 2-1/2, or 3 in (IPC Table 712.4.2), or none." };
   const areaFt2 = Math.PI / 4 * Math.pow(dia / 12, 2);
   const drawdownGal = areaFt2 * (band / 12) * (1728 / 231);
   const runTimeS = drawdownGal / (pump - inflow) * 60;
   const fillTimeS = drawdownGal / inflow * 60;
   const cyclesPerHr = 3600 / (runTimeS + fillTimeS);
-  if (![drawdownGal, runTimeS, fillTimeS, cyclesPerHr].every(Number.isFinite)) return { error: "Cycle math is not a finite value." };
+  const ipc_min_gpm = dis ? _IPC_712_4_2_MIN_GPM[dis] : 0;
+  const discharge_velocity_fps = dis ? pump / ((60 * 1728 / 231) * Math.PI / 4 * Math.pow(dis / 12, 2)) : 0; // gpm per cfs, exact
+  if (![drawdownGal, runTimeS, fillTimeS, cyclesPerHr, discharge_velocity_fps].every(Number.isFinite)) return { error: "Cycle math is not a finite value." };
   return {
     drawdown_gal: drawdownGal,
     run_time_s: runTimeS,
     fill_time_s: fillTimeS,
     cycles_per_hr: cyclesPerHr,
+    discharge_in: dis, ipc_min_gpm, meets_ipc_min: dis ? pump >= ipc_min_gpm : null, discharge_velocity_fps,
     adequate: runTimeS >= minRun - 1e-9 * Math.abs(minRun),
     verdict: runTimeS >= minRun ? "adequate" : "short-cycling",
-    note: "The pump must out-pace the inflow (this tile errors if it does not - an undersized pump or an overwhelmed basin). A longer run time per cycle is gentler on the motor; raise the float spread or the basin size to lengthen it. A sewage ejector must pass 2 in solids and carries a vent, neither of which this tile sizes (IPC 712.3-712.4).",
+    note: "The pump must out-pace the inflow (this tile errors if it does not - an undersized pump or an overwhelmed basin). A longer run time per cycle is gentler on the motor; raise the float spread or the basin size to lengthen it. A sewage ejector must pass 2 in solids and carries a vent, neither of which this tile sizes (IPC 712.3-712.4); select its discharge size to check the pump against the IPC Table 712.4.2 minimum capacity (21, 30, or 46 gpm for 2, 2-1/2, or 3 in, each about 2 ft/s of scouring velocity).",
   };
 }
 
@@ -238,13 +246,20 @@ function renderSumpBasinSizing(inputRegion, outputRegion, citationEl) {
   const pump = makeNumber("Pump discharge at system head (GPM)", "sb-pump", { step: "any", min: "0" });
   const minRun = makeNumber("Minimum acceptable run time (s)", "sb-minrun", { step: "any", min: "0", value: "60" });
   minRun.input.value = "60";
-  for (const f of [dia, band, inflow, pump, minRun]) inputRegion.appendChild(f.wrap);
+  const dis = makeSelect("Sewage discharge pipe (IPC Table 712.4.2 check)", "sb-dis", [
+    { value: "0", label: "None / clear-water sump", selected: true },
+    { value: "2", label: "2 in (21 gpm minimum)" },
+    { value: "2.5", label: "2-1/2 in (30 gpm minimum)" },
+    { value: "3", label: "3 in (46 gpm minimum)" },
+  ]);
+  for (const f of [dia, band, inflow, pump, minRun, dis]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { dia.input.value = "24"; band.input.value = "12"; inflow.input.value = "10"; pump.input.value = "30"; minRun.input.value = "60"; update(); });
   const oVol = makeOutputLine(outputRegion, "Drawdown volume per cycle", "sb-out-vol");
   const oRun = makeOutputLine(outputRegion, "Run time per cycle", "sb-out-run");
   const oFill = makeOutputLine(outputRegion, "Fill time per cycle", "sb-out-fill");
   const oCycles = makeOutputLine(outputRegion, "Cycles per hour", "sb-out-cycles");
   const oVerdict = makeOutputLine(outputRegion, "Verdict", "sb-out-verdict");
+  const oIpc = makeOutputLine(outputRegion, "Ejector capacity (IPC 712.4.2)", "sb-out-ipc");
   const update = debounce(() => {
     const r = computeSumpBasinSizing({
       basin_dia: Number(dia.input.value) || 0,
@@ -252,15 +267,18 @@ function renderSumpBasinSizing(inputRegion, outputRegion, citationEl) {
       inflow_gpm: Number(inflow.input.value) || 0,
       pump_gpm: Number(pump.input.value) || 0,
       min_run_s: minRun.input.value === "" ? 60 : Number(minRun.input.value),
+      discharge_in: Number(dis.select.value) || 0,
     });
-    if (r.error) { oVol.textContent = r.error; for (const o of [oRun, oFill, oCycles, oVerdict]) o.textContent = "-"; return; }
+    if (r.error) { oVol.textContent = r.error; for (const o of [oRun, oFill, oCycles, oVerdict, oIpc]) o.textContent = "-"; return; }
     oVol.textContent = fmt(r.drawdown_gal, 1) + " gal";
     oRun.textContent = fmt(r.run_time_s, 1) + " s";
     oFill.textContent = fmt(r.fill_time_s, 1) + " s";
     oCycles.textContent = fmt(r.cycles_per_hr, 1);
     oVerdict.textContent = r.verdict;
+    oIpc.textContent = r.discharge_in ? fmt(r.discharge_velocity_fps, 2) + " ft/s in the " + r.discharge_in + " in discharge; " + (r.meets_ipc_min ? "meets" : "BELOW") + " the " + r.ipc_min_gpm + " gpm IPC minimum" : "select a sewage discharge size to check it";
   }, DEBOUNCE_MS);
   for (const el of [dia.input, band.input, inflow.input, pump.input, minRun.input]) el.addEventListener("input", update);
+  dis.select.addEventListener("change", update);
 }
 DRAINAGE_RENDERERS["sump-basin-sizing"] = renderSumpBasinSizing;
 

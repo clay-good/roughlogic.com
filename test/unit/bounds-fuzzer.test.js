@@ -58780,3 +58780,17 @@ test("bounds: mud-hydrostatic-pressure ECD adds APL/(0.052 TVD)", () => {
   assert.equal(_mhpE(b).ecd_ppg, 12.5);
   assert.ok("error" in _mhpE({ ...b, annular_pressure_loss_psi: -1 }));
 });
+
+import { computeSumpBasinSizing as _sbIpc } from "../../calc-drainage.js";
+test("bounds: sump-basin-sizing IPC 712.4.2 minimums are about 2 ft/s in each discharge size", () => {
+  const b = { basin_dia: 24, drawdown_in: 12, inflow_gpm: 10, pump_gpm: 30 };
+  for (const [d, q] of [[2, 21], [2.5, 30], [3, 46]]) {
+    const r = _sbIpc({ ...b, pump_gpm: q, discharge_in: d });
+    assert.equal(r.ipc_min_gpm, q);
+    assert.equal(r.meets_ipc_min, true);
+    assert.ok(r.discharge_velocity_fps > 1.9 && r.discharge_velocity_fps < 2.2, `${d} in: ${r.discharge_velocity_fps}`);
+  }
+  assert.equal(_sbIpc({ ...b, discharge_in: 3 }).meets_ipc_min, false);
+  assert.equal(_sbIpc(b).meets_ipc_min, null);
+  assert.ok("error" in _sbIpc({ ...b, discharge_in: 4 }));
+});

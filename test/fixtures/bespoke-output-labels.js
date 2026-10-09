@@ -903,7 +903,7 @@ export const BESPOKE_OUTPUT_LABELS = {
   "stub-acme-thread-depth": {"crest_flat_in":"Crest flat width","note":"Note"},
   "substrate-for-velocity": {"substrate":"Required substrate [S]","fold_km":"As a multiple of Km","note":"Note"},
   "sum-of-years-digits-depreciation": {"year_depreciation":"Year depreciation","note":"Note"},
-  "sump-basin-sizing": {"drawdown_gal":"Drawdown volume per cycle","run_time_s":"Run time per cycle","fill_time_s":"Fill time per cycle","cycles_per_hr":"Cycles per hour","verdict":"Verdict"},
+  "sump-basin-sizing": {"drawdown_gal":"Drawdown volume per cycle","run_time_s":"Run time per cycle","fill_time_s":"Fill time per cycle","cycles_per_hr":"Cycles per hour","verdict":"Verdict","discharge_in":"Ejector capacity (IPC 712.4.2)"},
   "superelevation-safe-curve-speed": {"v_mph":"Maximum safe speed","note":"Note"},
   "superheat-subcool": {"saturated_temperature_F":"Saturated temperature","superheat_F":"Result","diagnostic":"Diagnostic"},
   "supply-pressure-budget": {"elevation_loss":"Elevation loss","available":"Available at fixture","headroom":"Headroom above minimum","verdict":"Verdict"},

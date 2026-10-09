@@ -900,7 +900,7 @@ export const BESPOKE_LABELS = {
   "stub-acme-thread-depth": {"major_dia_in":"Major (nominal) diameter (in)","tpi":"Threads per inch (TPI)"},
   "substrate-for-velocity": {"km":"Km (substrate at half Vmax)","target_percent":"Target velocity (% of Vmax)"},
   "sum-of-years-digits-depreciation": {"cost":"Cost ($)","salvage":"Salvage ($)","life_yr":"Useful life (yr)","year":"Year of interest"},
-  "sump-basin-sizing": {"basin_dia":"Basin inside diameter (in)","drawdown_in":"Drawdown band, pump-off to pump-on (in)","inflow_gpm":"Design inflow (GPM)","pump_gpm":"Pump discharge at system head (GPM)","min_run_s":"Minimum acceptable run time (s)"},
+  "sump-basin-sizing": {"basin_dia":"Basin inside diameter (in)","drawdown_in":"Drawdown band, pump-off to pump-on (in)","inflow_gpm":"Design inflow (GPM)","pump_gpm":"Pump discharge at system head (GPM)","min_run_s":"Minimum acceptable run time (s)","discharge_in":"Sewage discharge pipe (IPC Table 712.4.2 check)"},
   "superelevation": {"mode":"Solve for","V_mph":"Design speed V (mph)","R_ft":"Curve radius R (ft)","e_max":"Max superelevation e_max (e.g. 0.08)","f":"Side-friction factor f"},
   "superelevation-safe-curve-speed": {"R_ft":"Curve radius R (ft)","e":"Superelevation e (e.g. 0.08)","f":"Side-friction factor f"},
   "superheat-subcool": {"refrigerant":"Refrigerant","system_pressure_psig":"System pressure (psig)","line_temperature_F":"Line temperature (°F)","mode":"Mode","indoor_wet_bulb_F":"Indoor wet-bulb (F, fixed-orifice target)","outdoor_dry_bulb_F":"Outdoor dry-bulb (°F)","target_subcool_F":"Target subcool (F, TXV/EEV)"},

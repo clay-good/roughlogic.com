@@ -60,6 +60,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **`sump-basin-sizing` checks a sewage ejector against IPC Table 712.4.2.** An optional discharge-size select (2, 2-1/2, or 3 in) now compares the pump rate with the table's minimum capacity (21, 30, 46 gpm, each about 2 ft/s of scouring velocity in that pipe) and reports the velocity: the 30 gpm example pump meets a 2 or 2-1/2 in discharge but falls below the 46 gpm a 3 in line needs. Clear-water sumps (the default) are unchanged.
+
 - **`mud-hydrostatic-pressure` gives the equivalent circulating density.** It said the annular friction while circulating was separate. An optional annular pressure loss now returns the circulating bottom-hole pressure and ECD = MW + APL/(0.052 TVD): 12.5 ppg mud at 9,800 ft TVD with 250 psi of annular loss circulates at 12.99 ppg equivalent, 6,620 psi on bottom. Static results are unchanged.
 
 - **`projectile-range` takes a launch height.** It assumed level ground and said launch height was separate. A launch height above the landing plane (negative if the landing is higher) now sets the flight time (v sin(theta) + sqrt((v sin(theta))^2 + 2 g h))/g and the range, and every case reports the angle for the longest reach, atan(v/sqrt(v^2 + 2 g h)): 80 ft/s at 30 degrees from 20 ft up carries 201.8 ft, and 42.4 degrees would carry it farthest. Level-ground results are unchanged.

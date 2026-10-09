@@ -2012,7 +2012,7 @@ cross-check.
 | calc-drainage.js | `computeScupperWidthForFlow` | `{ required_gpm = 0, head_in = 0 } = {}` | _ | _ | _ |
 | calc-drainage.js | `computeSeepageTravelTime` | `{ hydraulic_conductivity_ft_day = 0, head_difference_ft = 0, flow_path_ft = 0...` | _ | _ | _ |
 | calc-drainage.js | `computeSewageForceMainVelocity` | `{ gpm = 0, id_in = 0 } = {}` | _ | _ | _ |
-| calc-drainage.js | `computeSumpBasinSizing` | `{ basin_dia, drawdown_in, inflow_gpm, pump_gpm, min_run_s = 60 } = {}` | _ | _ | _ |
+| calc-drainage.js | `computeSumpBasinSizing` | `{ basin_dia, drawdown_in, inflow_gpm, pump_gpm, min_run_s = 60, discharge_in ...` | _ | _ | _ |
 | calc-drainage.js | `computeTr55DetentionStorage` | `{ qi_cfs = 0, qo_cfs = 0, runoff_in = 0, area_mi2 = 0, rainfall_type = "II" }...` | _ | _ | _ |
 | calc-drainage.js | `computeTr55GraphicalPeakDischarge` | `{ tc_hr = 0, curve_number = 0, rainfall_in = 0, area_mi2 = 0, rainfall_type =...` | _ | _ | _ |
 | calc-drainage.js | `computeTr55TimeOfConcentration` | `{ sheet_n = 0, sheet_length_ft = 0, p2_in = 0, sheet_slope = 0, shallow_surfa...` | _ | _ | _ |
@@ -4372,7 +4372,7 @@ per spec-v14 §13.1 second paragraph.
 | `stormwater-max-drainage-area` | Max Tributary Drainage Area for an Allowable Flow | USEPA / NRCS; 2 cfs allowable, asphalt (C=0.95), 2 in/hr -> 1.053 acres... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `stormwater-rational` | Stormwater Rational Method | USEPA / NRCS; 5000 ft^2 asphalt (C=0.95), 2 in/hr -> 0.218 cfs / 97.9 g... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `sub-slab-suction-field` | Radon Sub-Slab Suction Points From a Communication Test | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `sump-basin-sizing` | Sump / Ejector Basin Drawdown and Cycle Check | IPC 2021 Section 712 / Hydraulic Inst...; 24 in basin, 12 in float spread, 10 GPM inflow, 30 GPM pu... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `sump-basin-sizing` | Sump / Ejector Basin Drawdown and Cycle Check | IPC 2021 Section 712 / Hydraulic Inst...; 24 in basin, 12 in float spread, 10 GPM inflow, 30 GPM pu... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `supply-pressure-budget` | Water-Supply Pressure Budget | IPC 2021 Section 604 / ASPE PEDH Vol. 2; street 60, 30 ft up, meter 8, friction 12, min 8 -> 12.99... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `tank-drain-time` | Tank Drain Time (Falling-Head Orifice) | Falling-head (Torricelli) orifice dra...; spec-v630 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `tank-strapping-volume` | Vertical Tank Strapping and Gauge Conversion | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |

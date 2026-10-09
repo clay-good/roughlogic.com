@@ -9625,14 +9625,15 @@ export const CITATIONS = {
     ],
   },
   "sump-basin-sizing": {
-    formula: "area_ft2 = (PI/4)(basin_dia/12)^2; drawdown_gal = area_ft2 x (drawdown_in/12) x 7.48; run_time_s = drawdown_gal / (pump_gpm - inflow_gpm) x 60; fill_time_s = drawdown_gal / inflow_gpm x 60; cycles_per_hr = 3600 / (run + fill); adequate = run_time_s >= min_run_s.",
+    formula: "area_ft2 = (PI/4)(basin_dia/12)^2; drawdown_gal = area_ft2 x (drawdown_in/12) x 7.48; run_time_s = drawdown_gal / (pump_gpm - inflow_gpm) x 60; fill_time_s = drawdown_gal / inflow_gpm x 60; cycles_per_hr = 3600 / (run + fill); adequate = run_time_s >= min_run_s; optional sewage discharge check against IPC Table 712.4.2 (2 in 21 gpm, 2-1/2 in 30 gpm, 3 in 46 gpm) with velocity = gpm / (448.83 x (PI/4)(d/12)^2), 448.83 = 60 x 1728/231.",
     edition: "IPC 2021 Section 712 (Sumps and Ejectors) and the Hydraulic Institute pump-cycling guidance by name; first-principles basin geometry and cycle math.",
     freeAccess: "IPC 2021 free read-only at codes.iccsafe.org; the 7.48 gal/ft^3 constant is public.",
     governance: GOVERNANCE.general,
-    editionNote: "The pump must out-pace the inflow (the tile errors if it does not). A longer run time per cycle is gentler on the motor. A sewage ejector must pass 2 in solids and carries a vent, neither of which this tile sizes (IPC 712.3-712.4).",
+    editionNote: "The pump must out-pace the inflow (the tile errors if it does not). A longer run time per cycle is gentler on the motor. A sewage ejector must pass 2 in solids and carries a vent, neither of which this tile sizes (IPC 712.3-712.4); the optional discharge-size select checks the IPC Table 712.4.2 minimum capacity.",
     assumptions: [
       { name: "Volume constant", value: "7.48 gal per ft^3", source: "physical fact" },
       { name: "Minimum run default", value: "60 s per cycle (Hydraulic Institute cycling guidance)", source: "Hydraulic Institute / pump manufacturer" },
+      { name: "Ejector minimum capacity", value: "21 / 30 / 46 gpm for a 2 / 2-1/2 / 3 in discharge, each about 2 ft/s in that pipe (added 2026-10-09)", source: "IPC 2021 Table 712.4.2" },
     ],
   },
   "gas-appliance-demand": {

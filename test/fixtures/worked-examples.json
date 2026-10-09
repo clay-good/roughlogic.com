@@ -169000,6 +169000,37 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "sump-basin-sizing",
+  "source_publisher": "ICC (IPC 2021)",
+  "source_title": "Table 712.4.2 minimum capacity of sewage pump or ejector",
+  "source_edition_or_year": "2021",
+  "source_section_or_page": "3 in discharge requires 46 gpm; a 30 gpm pump is below it (1.36 ft/s in the 3 in pipe)",
+  "verified_by": "rl",
+  "verified_on": "2026-10-09",
+  "inputs": {
+   "basin_dia": 24,
+   "drawdown_in": 12,
+   "inflow_gpm": 10,
+   "pump_gpm": 30,
+   "min_run_s": 60,
+   "discharge_in": 3
+  },
+  "outputs": {
+   "ipc_min_gpm": {
+    "value": 46,
+    "tolerance": {
+     "abs": 0
+    }
+   },
+   "discharge_velocity_fps": {
+    "value": 1.362,
+    "tolerance": {
+     "pct": 0.5
+    }
+   }
+  }
  }
  ]
 }
