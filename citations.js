@@ -23279,6 +23279,19 @@ export const CITATIONS = {
       { name: "Uniform elevation", value: "elevation change, two-phase flow and line pack are not modelled", source: "the operator's hydraulic model" },
     ],
   },
+  "gas-z-factor": {
+    formula: "Tpc = 169.2 + 349.5 G - 74.0 G^2 degR; Ppc = 756.8 - 131.0 G - 3.6 G^2 psia (Sutton); epsilon = 120 (A^0.9 - A^1.6) + 15 (B^0.5 - B^4), T'pc = Tpc - epsilon, P'pc = Ppc T'pc / (Tpc + B (1 - B) epsilon) (Wichert-Aziz, A = CO2 + H2S, B = H2S mole fractions); Tpr = T/T'pc, Ppr = P/P'pc; Z from the Dranchuk-Abou-Kassem equation with rho_r = 0.27 Ppr / (Z Tpr), A1..A11 = 0.3265, -1.0700, -0.5339, 0.01569, -0.05165, 0.5475, -0.7361, 0.1844, 0.1056, 0.6134, 0.7210; density = P (28.964 G) / (Z 10.7316 T); Bg = Z T 14.696 / (P 519.67).",
+    edition: "Sutton, R.P., Compressibility Factors for High-Molecular-Weight Reservoir Gases, SPE 14265 (1985); Wichert, E. and Aziz, K., Calculate Z's for Sour Gases, Hydrocarbon Processing (May 1972); Dranchuk, P.M. and Abou-Kassem, J.H., Calculation of Z Factors for Natural Gases Using Equations of State, J. Canadian Petroleum Technology (1975), by name.",
+    freeAccess: "The DAK coefficients and a computed Z table using Sutton's pseudo-criticals are printed in Mahmud, Elmabrouk and Sbiga, Sensitivity Analysis of the Gas Compressibility Factor, IEOM 2018 Proceedings (free at ieomsociety.org/ieom2018/papers/363.pdf); this reproduces its Table 8 to 5 decimals at all nine pressures.",
+    governance: GOVERNANCE.general,
+    editionNote: "Z from gas gravity alone, for the calculators that take it as an input. The DAK fit duplicates the Standing-Katz chart with about 0.6% average error for pseudo-reduced temperature 1.0 to 3.0 and pseudo-reduced pressure up to 30; outside that range the tile returns an error rather than extrapolate. Sutton's correlation was fit to hydrocarbon gases; CO2 and H2S are corrected by Wichert-Aziz, while large nitrogen or water-vapor fractions are not modeled. A lab analysis's pseudo-criticals can be entered instead of Sutton's. A screen; a lab PVT report governs.",
+    assumptions: [
+      { name: "Pseudo-criticals", value: "Sutton (1985) from gas gravity unless both are entered", source: "SPE 14265" },
+      { name: "Sour-gas correction", value: "Wichert-Aziz epsilon on the CO2 and H2S mole fractions", source: "Wichert and Aziz (1972)" },
+      { name: "Z equation", value: "Dranchuk-Abou-Kassem eleven-constant fit to the Standing-Katz chart, 1.0 < Tpr <= 3.0, Ppr <= 30", source: "Dranchuk and Abou-Kassem (1975)" },
+      { name: "Gauge to absolute", value: "pressure entered in psig plus 14.7 psi", source: "the sibling oil and gas calculators" },
+    ],
+  },
   "liquid-pipeline-station-spacing": {
     formula: "available head = MAOP head - minimum suction head; elevation gradient = net elevation change / length; combined gradient = friction + elevation; maximum spacing = available head / combined gradient; stations = ceiling of length over spacing; and at another throughput the friction gradient scales as the SQUARE of the flow ratio.",
     edition: "The steady-state liquid pipeline head balance as ASME B31.4 and 49 CFR 195 practice writes it. The friction gradient is ENTERED, from a Darcy-Weisbach or Hazen-Williams calculation at the design flow, viscosity and roughness. It does not compute that gradient, size pumps or drivers, model batching and the different gradients each product produces, or analyse SURGE.",

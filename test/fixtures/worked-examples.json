@@ -168341,6 +168341,116 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "gas-z-factor",
+  "source_publisher": "IEOM Society (Mahmud, Elmabrouk, Sbiga)",
+  "source_title": "Sensitivity Analysis of the Gas Compressibility Factor",
+  "source_edition_or_year": "Proceedings IEOM 2018, Bandung",
+  "source_section_or_page": "Table 8, Dranchuk & Abu-Kassem, Sutton column, 3,500 psia (Tpc 396.60 degR, Ppc 677.48 psia from Table 5; the paper prints no temperature, and 742.1 degR = 282.44 F reproduces its closed-form Papay column to 6 digits)",
+  "verified_by": "rl",
+  "verified_on": "2026-10-09",
+  "inputs": {
+   "gas_gravity": 0.887,
+   "co2_pct": 0,
+   "h2s_pct": 0,
+   "tpc_r": 396.6,
+   "ppc_psia": 677.48,
+   "pressure_psig": 3485.3,
+   "temperature_f": 282.44
+  },
+  "outputs": {
+   "z": {
+    "value": 0.9363404,
+    "tolerance": {
+     "pct": 0.5
+    }
+   }
+  }
+ },
+ {
+  "tile_id": "gas-z-factor",
+  "source_publisher": "IEOM Society (Mahmud, Elmabrouk, Sbiga)",
+  "source_title": "Sensitivity Analysis of the Gas Compressibility Factor",
+  "source_edition_or_year": "Proceedings IEOM 2018, Bandung",
+  "source_section_or_page": "Table 8, Sutton column, 2,123.3 psia",
+  "verified_by": "rl",
+  "verified_on": "2026-10-09",
+  "inputs": {
+   "gas_gravity": 0.887,
+   "co2_pct": 0,
+   "h2s_pct": 0,
+   "tpc_r": 396.6,
+   "ppc_psia": 677.48,
+   "pressure_psig": 2108.6,
+   "temperature_f": 282.44
+  },
+  "outputs": {
+   "z": {
+    "value": 0.9120737,
+    "tolerance": {
+     "pct": 0.5
+    }
+   }
+  }
+ },
+ {
+  "tile_id": "gas-z-factor",
+  "source_publisher": "IEOM Society (Mahmud, Elmabrouk, Sbiga)",
+  "source_title": "Sensitivity Analysis of the Gas Compressibility Factor",
+  "source_edition_or_year": "Proceedings IEOM 2018, Bandung",
+  "source_section_or_page": "Table 8, Sutton column, 716.48 psia",
+  "verified_by": "rl",
+  "verified_on": "2026-10-09",
+  "inputs": {
+   "gas_gravity": 0.887,
+   "co2_pct": 0,
+   "h2s_pct": 0,
+   "tpc_r": 396.6,
+   "ppc_psia": 677.48,
+   "pressure_psig": 701.78,
+   "temperature_f": 282.44
+  },
+  "outputs": {
+   "z": {
+    "value": 0.9553044,
+    "tolerance": {
+     "pct": 0.5
+    }
+   }
+  }
+ },
+ {
+  "tile_id": "gas-z-factor",
+  "source_publisher": "Project (first-principles)",
+  "source_title": "Sour gas: Wichert-Aziz epsilon for 5% CO2 and 10% H2S",
+  "source_edition_or_year": "Wichert and Aziz (1972)",
+  "source_section_or_page": "epsilon = 120 (0.15^0.9 - 0.15^1.6) + 15 (0.1^0.5 - 0.1^4) = 20.735 degR",
+  "verified_by": "rl",
+  "verified_on": "2026-10-09",
+  "inputs": {
+   "gas_gravity": 0.7,
+   "pressure_psig": 3485.3,
+   "temperature_f": 160,
+   "co2_pct": 5,
+   "h2s_pct": 10,
+   "tpc_r": 0,
+   "ppc_psia": 0
+  },
+  "outputs": {
+   "epsilon_r": {
+    "value": 20.735,
+    "tolerance": {
+     "pct": 0.5
+    }
+   },
+   "tpc_used_r": {
+    "value": 356.85,
+    "tolerance": {
+     "pct": 0.5
+    }
+   }
+  }
  }
  ]
 }

@@ -6392,6 +6392,11 @@
     {"term":"how much load does a nail hold sideways","target":"wood-nail-lateral","kind":"question"},
     {"term":"lag screw lateral design value","target":"wood-bolt-connection","kind":"industry"},
     {"term":"lag bolt shear capacity","target":"wood-bolt-connection","kind":"question"},
-    {"term":"nds lag screw z","target":"wood-bolt-connection","kind":"industry"}
+    {"term":"nds lag screw z","target":"wood-bolt-connection","kind":"industry"},
+    {"term":"gas z factor","target":"gas-z-factor","kind":"industry"},
+    {"term":"natural gas compressibility factor","target":"gas-z-factor","kind":"industry"},
+    {"term":"dranchuk abou-kassem","target":"gas-z-factor","kind":"industry"},
+    {"term":"standing katz z factor","target":"gas-z-factor","kind":"industry"},
+    {"term":"what z factor do i use for natural gas","target":"gas-z-factor","kind":"question"}
   ]
 }

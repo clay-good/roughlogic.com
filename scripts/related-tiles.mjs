@@ -1708,6 +1708,7 @@ const RELATED = {
   // spec-v1524..v1533: oil, gas and pipeline band.
   "pipeline-mao-barlow": ["hoop-stress-thin-wall","corroded-pipe-b31g","pipe-pressure-rating"],
   "gas-pipeline-flow": ["gas-pipe-max-flow","pipeline-mao-barlow","liquid-pipeline-station-spacing"],
+  "gas-z-factor": ["gas-pipeline-flow","separator-retention-sizing","van-der-waals"],
   "liquid-pipeline-station-spacing": ["pump-tdh","elevation-pressure-loss","gas-pipeline-flow"],
   "pig-batch-volume": ["pipe-volume","liquid-pipeline-station-spacing","corroded-pipe-b31g"],
   "cathodic-anode-count-life": ["sacrificial-anode-life","corroded-pipe-b31g","pipeline-mao-barlow"],

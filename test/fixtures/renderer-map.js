@@ -1818,6 +1818,7 @@ export const RENDERER_MAP = {
   "well-decline-reserves": { module: "../../calc-oilgas.js", exportName: "OILGAS_RENDERERS" },
   "pipeline-mao-barlow": { module: "../../calc-oilgas.js", exportName: "OILGAS_RENDERERS" },
   "gas-pipeline-flow": { module: "../../calc-oilgas.js", exportName: "OILGAS_RENDERERS" },
+  "gas-z-factor": { module: "../../calc-oilgas.js", exportName: "OILGAS_RENDERERS" },
   "liquid-pipeline-station-spacing": { module: "../../calc-oilgas.js", exportName: "OILGAS_RENDERERS" },
   "pig-batch-volume": { module: "../../calc-oilgas.js", exportName: "OILGAS_RENDERERS" },
   "cathodic-anode-count-life": { module: "../../calc-oilgas.js", exportName: "OILGAS_RENDERERS" },

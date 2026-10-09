@@ -1526,7 +1526,7 @@ export const TOOL_MODULES = (() => {
   declare("./calc-oilgas.js", "OILGAS_RENDERERS", [
     "tank-strapping-volume", "tank-vent-api-2000", "separator-retention-sizing",
     "flare-radiation-distance", "well-decline-reserves",
-    "pipeline-mao-barlow", "gas-pipeline-flow", "liquid-pipeline-station-spacing",
+    "pipeline-mao-barlow", "gas-pipeline-flow", "gas-z-factor", "liquid-pipeline-station-spacing",
     "pig-batch-volume", "cathodic-anode-count-life", "corroded-pipe-b31g",
     "casing-cement-volume", "mud-hydrostatic-pressure", "kill-mud-weight",
     "annular-velocity-cleaning",

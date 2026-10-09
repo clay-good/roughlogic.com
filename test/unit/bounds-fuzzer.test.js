@@ -58543,3 +58543,22 @@ test("bounds: triangle-ssa counts the ambiguous-case triangles and agrees with t
   assert.ok("error" in _tssa({ angle_a_deg: 180, side_a: 10, side_b: 1 }));
   assert.equal(_tssa({ angle_a_deg: 120, side_a: 12, side_b: 10 }).solutions, 1);
 });
+
+import { computeGasZFactor as _gzf } from "../../calc-oilgas.js";
+test("bounds: gas-z-factor reproduces the IEOM 2018 DAK table and the Wichert-Aziz epsilon", () => {
+  const ieom = (psia) => _gzf({ gas_gravity: 0.887, pressure_psig: psia - 14.7, temperature_f: 282.44, tpc_r: 396.60391, ppc_psia: 677.47989 }).z;
+  const table8 = [[716.48, 0.9553044], [2123.3, 0.9120737], [3021.1, 0.9213237], [3500, 0.9363404], [4000, 0.9578121]];
+  for (const [p, z] of table8) assert.ok(Math.abs(ieom(p) - z) < 5e-5, `${p} psia`);
+  const sour = _gzf({ gas_gravity: 0.7, pressure_psig: 3485.3, temperature_f: 160, co2_pct: 5, h2s_pct: 10 });
+  assert.ok(Math.abs(sour.epsilon_r - 20.735) < 1e-3);
+  // Sweet gas: no correction, Sutton pseudo-criticals.
+  const sweet = _gzf({ gas_gravity: 0.65, pressure_psig: 2000, temperature_f: 150 });
+  assert.equal(sweet.epsilon_r, 0);
+  assert.ok(Math.abs(sweet.tpc_used_r - (169.2 + 349.5 * 0.65 - 74 * 0.65 * 0.65)) < 1e-9);
+  assert.ok(sweet.z > 0.8 && sweet.z < 0.9);
+  // Low pressure tends to ideal.
+  assert.ok(Math.abs(_gzf({ gas_gravity: 0.6, pressure_psig: 0, temperature_f: 60 }).z - 1) < 0.01);
+  assert.ok("error" in _gzf({ gas_gravity: 0.65, pressure_psig: 2000, temperature_f: 150, tpc_r: 380 }));
+  assert.ok("error" in _gzf({ gas_gravity: 0.65, pressure_psig: 2000, temperature_f: -200 }));
+  assert.ok("error" in _gzf({ gas_gravity: 0.5, pressure_psig: 2000, temperature_f: 150 }));
+});

@@ -278,7 +278,7 @@ export function computeGasPipelineFlow({
     q_scfd, q_mscfd, q_mmscfd, equation_label,
     alternate_q_scfd, alternate_label,
     has_alternate, diameter_capacity_ratio, diameter_verdict,
-    note: "Steady-state gas transmission flow by the two equations the trade actually uses, reported side by side because the choice between them is a judgment. Both say the same physical thing: flow is driven by the difference of the SQUARES of the absolute pressures, not by the pressure difference. That squared form is the part worth carrying in the field, because it means dropping the outlet pressure buys much more additional flow on a high-pressure line than the same drop does on a low-pressure one. Weymouth suits short, smaller-diameter, high-friction and rough pipe and is generally conservative on large lines; Panhandle A suits long large-diameter transmission at higher flow. They can differ substantially on the same segment, which is why both are shown and neither is presented as the answer. Diameter dominates everything else: capacity goes as diameter to roughly the 2.6 to 2.67 power, so a modest increase in size is a large increase in capacity while doubling the length costs only about 30 percent of the flow. That exponent is why looping a line -- laying a parallel segment -- is such an effective way to add capacity, and why a small restriction anywhere in a run costs more than intuition suggests. Efficiency is where a real line differs from a calculated one: a factor near 0.92 is a clean dry line, and liquid holdup, internal corrosion product, or a partially closed valve show up here and are the usual reason measured flow falls short of predicted. Compressibility is ENTERED because it depends on pressure, temperature and composition, and assuming 1.0 at transmission pressure, where Z runs below 1, UNDERSTATES the flow -- the equations go as about Z^-0.5 (0.85 gives 8% more than 1.0). This is a steady-state, isothermal, single-phase screen at one uniform elevation: it does not handle elevation change, two-phase or liquid-bearing flow, transients and line pack, or compressor station hydraulics, and it does not select the equation for you. The operator's own hydraulic model and the pipeline engineer of record govern.",
+    note: "Steady-state gas transmission flow by the two equations the trade actually uses, reported side by side because the choice between them is a judgment. Both say the same physical thing: flow is driven by the difference of the SQUARES of the absolute pressures, not by the pressure difference. That squared form is the part worth carrying in the field, because it means dropping the outlet pressure buys much more additional flow on a high-pressure line than the same drop does on a low-pressure one. Weymouth suits short, smaller-diameter, high-friction and rough pipe and is generally conservative on large lines; Panhandle A suits long large-diameter transmission at higher flow. They can differ substantially on the same segment, which is why both are shown and neither is presented as the answer. Diameter dominates everything else: capacity goes as diameter to roughly the 2.6 to 2.67 power, so a modest increase in size is a large increase in capacity while doubling the length costs only about 30 percent of the flow. That exponent is why looping a line -- laying a parallel segment -- is such an effective way to add capacity, and why a small restriction anywhere in a run costs more than intuition suggests. Efficiency is where a real line differs from a calculated one: a factor near 0.92 is a clean dry line, and liquid holdup, internal corrosion product, or a partially closed valve show up here and are the usual reason measured flow falls short of predicted. Compressibility is ENTERED because it depends on pressure, temperature and composition (gas-z-factor computes it from the gas gravity), and assuming 1.0 at transmission pressure, where Z runs below 1, UNDERSTATES the flow -- the equations go as about Z^-0.5 (0.85 gives 8% more than 1.0). This is a steady-state, isothermal, single-phase screen at one uniform elevation: it does not handle elevation change, two-phase or liquid-bearing flow, transients and line pack, or compressor station hydraulics, and it does not select the equation for you. The operator's own hydraulic model and the pipeline engineer of record govern.",
   };
 }
 export const gasPipelineFlowExample = { inputs: { equation: "panhandle_a", id_in: 15.5, length_mi: 42, inlet_psig: 850, outlet_psig: 600, gravity: 0.60, flowing_temp_f: 60, z_factor: 1.0, efficiency: 0.92, alternate_id_in: 19.25 } };
@@ -1176,6 +1176,88 @@ export function computeSeparatorRetentionSizing({
   };
 }
 export const separatorRetentionSizingExample = { inputs: { vessel_diameter_ft: 4, seam_to_seam_ft: 12, liquid_fraction: 0.5, liquid_rate_bpd: 1200, required_retention_min: 3, gas_rate_mmscfd: 3.5, pressure_psig: 400, temperature_f: 100, z_factor: 0.92, gas_gravity: 0.7, liquid_density_lb_ft3: 52, k_factor: 0.35 } };
+
+// =====================================================================
+// spec-v1934: natural gas compressibility factor Z. gas-pipeline-flow and
+// separator-retention-sizing take Z as an ENTERED input; nothing computed it.
+// Sutton (1985) pseudo-criticals from gas gravity, the Wichert-Aziz (1972)
+// sour-gas correction for CO2 and H2S, and the Dranchuk-Abou-Kassem (1975)
+// eleven-constant fit to the Standing-Katz chart, solved for reduced density.
+// =====================================================================
+const _DAK = [0, 0.3265, -1.0700, -0.5339, 0.01569, -0.05165, 0.5475, -0.7361, 0.1844, 0.1056, 0.6134, 0.7210];
+function _dakZ(tpr, ppr) {
+  const A = _DAK;
+  const c1 = A[1] + A[2] / tpr + A[3] / tpr ** 3 + A[4] / tpr ** 4 + A[5] / tpr ** 5;
+  const c2 = A[6] + A[7] / tpr + A[8] / tpr ** 2;
+  const c3 = A[9] * (A[7] / tpr + A[8] / tpr ** 2);
+  const zOf = (r) => 1 + c1 * r + c2 * r * r - c3 * r ** 5 + A[10] * (1 + A[11] * r * r) * (r * r / tpr ** 3) * Math.exp(-A[11] * r * r);
+  // f(rho_r) = 0.27 Ppr / (Z Tpr) - rho_r falls through zero once; bisect it.
+  const f = (r) => 0.27 * ppr / (zOf(r) * tpr) - r;
+  let lo = 0, hi = 1;
+  while (f(hi) > 0 && hi < 64) hi *= 2;
+  for (let i = 0; i < 200; i++) { const m = (lo + hi) / 2; if (f(m) > 0) lo = m; else hi = m; }
+  const rho_r = (lo + hi) / 2;
+  return { z: zOf(rho_r), rho_r };
+}
+// dims: in { gas_gravity: dimensionless, pressure_psig: M L^-1 T^-2, temperature_f: T, co2_pct: dimensionless, h2s_pct: dimensionless, tpc_r: T, ppc_psia: M L^-1 T^-2 } out: { pressure_psia: M L^-1 T^-2, temperature_r: T, tpc_used_r: T, ppc_used_psia: M L^-1 T^-2, epsilon_r: T, tpr: dimensionless, ppr: dimensionless, z: dimensionless, density_lb_ft3: M L^-3, bg_ft3_scf: dimensionless }
+export function computeGasZFactor({ gas_gravity = 0.65, pressure_psig = 0, temperature_f = 0, co2_pct = 0, h2s_pct = 0, tpc_r = 0, ppc_psia = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(gas_gravity > 0.55 && gas_gravity < 2)) return { error: "Gas specific gravity must be above 0.55 (methane) and below 2 (air = 1)." };
+  if (co2_pct < 0 || h2s_pct < 0) return { error: "CO2 and H2S cannot be negative (mole %)." };
+  if (!(co2_pct + h2s_pct < 100)) return { error: "CO2 plus H2S must be under 100 mole %." };
+  if (tpc_r < 0 || ppc_psia < 0) return { error: "Pseudo-critical temperature and pressure cannot be negative (leave blank to use Sutton)." };
+  if ((tpc_r > 0) !== (ppc_psia > 0)) return { error: "Enter both pseudo-critical temperature and pressure, or leave both blank to use Sutton." };
+  const pressure_psia = pressure_psig + _OG_ATM_PSIA;
+  if (!(pressure_psia > 0)) return { error: "Pressure must be above a full vacuum." };
+  const temperature_r = temperature_f + _OG_RANKINE_OFFSET;
+  if (!(temperature_r > 0)) return { error: "Temperature must be above absolute zero." };
+  const entered = tpc_r > 0;
+  // Sutton (1985), SPE 14265: hydrocarbon gas pseudo-criticals from gravity.
+  const tpc = entered ? tpc_r : 169.2 + 349.5 * gas_gravity - 74.0 * gas_gravity * gas_gravity;
+  const ppc = entered ? ppc_psia : 756.8 - 131.0 * gas_gravity - 3.6 * gas_gravity * gas_gravity;
+  // Wichert-Aziz: A = CO2 + H2S, B = H2S (mole fractions).
+  const Am = (co2_pct + h2s_pct) / 100;
+  const Bm = h2s_pct / 100;
+  const epsilon_r = 120 * (Am ** 0.9 - Am ** 1.6) + 15 * (Bm ** 0.5 - Bm ** 4);
+  const tpc_used_r = tpc - epsilon_r;
+  const ppc_used_psia = ppc * tpc_used_r / (tpc + Bm * (1 - Bm) * epsilon_r);
+  const tpr = temperature_r / tpc_used_r;
+  const ppr = pressure_psia / ppc_used_psia;
+  if (!(tpr > 1.0 && tpr <= 3.0)) return { error: "Pseudo-reduced temperature " + tpr.toFixed(3) + " is outside the 1.0 to 3.0 range the Dranchuk-Abou-Kassem fit covers (near or below the pseudo-critical temperature the gas can condense)." };
+  if (!(ppr <= 30)) return { error: "Pseudo-reduced pressure " + ppr.toFixed(2) + " is above the 30 the Dranchuk-Abou-Kassem fit covers." };
+  const { z } = _dakZ(tpr, ppr);
+  const density_lb_ft3 = pressure_psia * gas_gravity * _OG_AIR_MW / (z * _OG_R_GAS * temperature_r);
+  // Bg in reservoir ft3 per standard ft3, at 14.696 psia and 60 degF.
+  const bg_ft3_scf = z * temperature_r * _OG_STD_P_PSIA / (pressure_psia * _OG_STD_T_R);
+  if (![z, density_lb_ft3, bg_ft3_scf].every(Number.isFinite) || !(z > 0)) return { error: "Compressibility math is not a finite value; check the inputs." };
+  return {
+    pressure_psia, temperature_r, tpc_used_r, ppc_used_psia, epsilon_r, tpr, ppr, z, density_lb_ft3, bg_ft3_scf, entered,
+    note: "The compressibility factor Z that the gas pipeline flow and separator sizing calculators ask for, from the gas gravity alone. Sutton's 1985 correlation gives the pseudo-critical temperature and pressure (Tpc = 169.2 + 349.5 G - 74.0 G^2 degR, Ppc = 756.8 - 131.0 G - 3.6 G^2 psia); a lab analysis's own pseudo-criticals can be entered instead. CO2 and H2S pull the critical point down and are corrected by Wichert-Aziz; leaving them at zero on a sour gas misreads Z. Z then comes from the Dranchuk-Abou-Kassem equation, the eleven-constant fit to the Standing-Katz chart (about 0.6% average error), valid for pseudo-reduced temperature 1.0 to 3.0 and pressure up to 30. Z dips below 1 at moderate pressure (the gas packs tighter than ideal) and rises above 1 at high pressure; assuming 1.0 at line pressure understates pipeline flow and overstates gas velocity in a separator. Not for gas near its dew point, liquids, or gases with much nitrogen or water vapor. A screen; a lab PVT report governs.",
+  };
+}
+export const gasZFactorExample = { inputs: { gas_gravity: 0.887, pressure_psig: 3485.3, temperature_f: 282.44, co2_pct: 0, h2s_pct: 0, tpc_r: 396.6, ppc_psia: 677.48 } };
+OILGAS_RENDERERS["gas-z-factor"] = _simpleRenderer({
+  citation: "Citation: Sutton (1985, SPE 14265) pseudo-critical properties from gas gravity, the Wichert-Aziz (1972) correction for CO2 and H2S (epsilon = 120 (A^0.9 - A^1.6) + 15 (B^0.5 - B^4) degR), and the Dranchuk-Abou-Kassem (1975) eleven-constant equation fit to the Standing-Katz Z chart, solved for reduced density rho_r = 0.27 Ppr / (Z Tpr); valid 1.0 < Tpr <= 3.0, Ppr <= 30. Gas density = P M / (Z R T), Bg = Z T Psc / (P Tsc) at 14.696 psia and 60 degF. A screen; a lab PVT report governs.",
+  example: gasZFactorExample.inputs,
+  fields: [
+    { key: "gas_gravity", label: "Gas specific gravity (air = 1)", kind: "number", default: 0.65 },
+    { key: "pressure_psig", label: "Pressure (psig)", kind: "number" },
+    { key: "temperature_f", label: "Temperature (°F)", kind: "number", attrs: { step: "any" } },
+    { key: "co2_pct", label: "CO2 (mole %, 0 if sweet)", kind: "number" },
+    { key: "h2s_pct", label: "H2S (mole %, 0 if sweet)", kind: "number" },
+    { key: "tpc_r", label: "Pseudo-critical temperature (°R, blank for Sutton)", kind: "number" },
+    { key: "ppc_psia", label: "Pseudo-critical pressure (psia, blank for Sutton)", kind: "number" },
+  ],
+  outputs: [
+    { key: "z", id: "gzf-out-z", label: "Compressibility factor Z", value: (r) => fmt(r.z, 4) },
+    { key: "pc", id: "gzf-out-pc", label: "Pseudo-critical point used", value: (r) => fmt(r.tpc_used_r, 1) + " °R, " + fmt(r.ppc_used_psia, 1) + " psia (" + (r.entered ? "entered" : "Sutton") + (r.epsilon_r > 0 ? ", Wichert-Aziz " + fmt(r.epsilon_r, 2) + " °R" : "") + ")" },
+    { key: "pr", id: "gzf-out-pr", label: "Pseudo-reduced Tpr / Ppr", value: (r) => fmt(r.tpr, 3) + " / " + fmt(r.ppr, 3) },
+    { key: "rho", id: "gzf-out-rho", label: "Gas density", value: (r) => fmt(r.density_lb_ft3, 3) + " lb/ft³" },
+    { key: "bg", id: "gzf-out-bg", label: "Formation volume factor Bg", value: (r) => fmt(r.bg_ft3_scf, 5) + " ft³ per standard ft³" },
+    { key: "n", id: "gzf-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeGasZFactor,
+});
 
 // =====================================================================
 // spec-v1537: flare thermal radiation distance (API 521).

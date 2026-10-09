@@ -116472,6 +116472,31 @@
    "term": "why does my triangle have two answers",
    "target": "triangle-ssa",
    "kind": "question"
+  },
+  {
+   "term": "gas z factor",
+   "target": "gas-z-factor",
+   "kind": "industry"
+  },
+  {
+   "term": "natural gas compressibility factor",
+   "target": "gas-z-factor",
+   "kind": "industry"
+  },
+  {
+   "term": "dranchuk abou-kassem",
+   "target": "gas-z-factor",
+   "kind": "industry"
+  },
+  {
+   "term": "standing katz z factor",
+   "target": "gas-z-factor",
+   "kind": "industry"
+  },
+  {
+   "term": "what z factor do i use for natural gas",
+   "target": "gas-z-factor",
+   "kind": "question"
   }
  ]
 }

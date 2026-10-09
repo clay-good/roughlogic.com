@@ -2247,6 +2247,7 @@ export const COMPUTE_MAP = {
   "plenum-return-drop": { module: "../../calc-hvacsystems.js", fn: "computePlenumReturnDrop" },
   "pipeline-mao-barlow": { module: "../../calc-oilgas.js", fn: "computePipelineMaoBarlow" },
   "gas-pipeline-flow": { module: "../../calc-oilgas.js", fn: "computeGasPipelineFlow" },
+  "gas-z-factor": { module: "../../calc-oilgas.js", fn: "computeGasZFactor" },
   "liquid-pipeline-station-spacing": { module: "../../calc-oilgas.js", fn: "computeLiquidPipelineStationSpacing" },
   "pig-batch-volume": { module: "../../calc-oilgas.js", fn: "computePigBatchVolume" },
   "cathodic-anode-count-life": { module: "../../calc-oilgas.js", fn: "computeCathodicAnodeCountLife" },

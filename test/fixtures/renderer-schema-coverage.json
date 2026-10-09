@@ -778,6 +778,7 @@
     "gas-pipe-sizing",
     "gas-pipeline-flow",
     "gas-strut-force",
+    "gas-z-factor",
     "gate-operator-duty-cycle",
     "gaussian-dispersion-screen",
     "gcwr-check",

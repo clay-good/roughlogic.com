@@ -1227,6 +1227,7 @@ const _TILES = [
   // spec-v1524..v1533 oil, gas and pipeline band (new calc-oilgas.js)
   ["pipeline-mao-barlow", "E"],
   ["gas-pipeline-flow", "E"],
+  ["gas-z-factor", "E"],
   ["liquid-pipeline-station-spacing", "E"],
   ["pig-batch-volume", "E"],
   ["cathodic-anode-count-life", "E"],

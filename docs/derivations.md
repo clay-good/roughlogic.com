@@ -3014,6 +3014,7 @@ cross-check.
 | calc-oilgas.js | `computeCorrodedPipeB31g` | `{ od_in = 0, wall_in = 0, smys_psi = 0, defect_depth_in = 0, defect_length_in...` | _ | _ | _ |
 | calc-oilgas.js | `computeFlareRadiationDistance` | `{ heat_release_btuh = 0, radiant_fraction = 0, allowable_btuh_ft2 = 0, solar_...` | _ | _ | _ |
 | calc-oilgas.js | `computeGasPipelineFlow` | `{ equation = "panhandle_a", id_in = 0, length_mi = 0, inlet_psig = 0, outlet_...` | _ | _ | _ |
+| calc-oilgas.js | `computeGasZFactor` | `{ gas_gravity = 0.65, pressure_psig = 0, temperature_f = 0, co2_pct = 0, h2s_...` | _ | _ | _ |
 | calc-oilgas.js | `computeKillMudWeight` | `{ original_mw_ppg = 0, tvd_ft = 0, sidpp_psi = 0, scr_pressure_psi = 0, safet...` | _ | _ | _ |
 | calc-oilgas.js | `computeLiquidPipelineStationSpacing` | `{ total_length_mi = 0, friction_gradient_ft_per_mi = 0, elevation_change_ft =...` | _ | _ | _ |
 | calc-oilgas.js | `computeMudHydrostaticPressure` | `{ mud_weight_ppg = 0, tvd_ft = 0, measured_depth_ft = 0, formation_pressure_p...` | _ | _ | _ |
@@ -3906,7 +3907,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2490.
+Row count: 2491.
 
 <!-- END function-corpus-v14 -->
 
@@ -4682,7 +4683,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-extraction-rate` | Water Extraction Volume, Time, and Waste-Tank Dumps | Project (first-principles); standing + absorbed; wand time = total / gpm | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+4 more) |
 
-### Group E Construction (621 tiles)
+### Group E Construction (622 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4902,6 +4903,7 @@ per spec-v14 §13.1 second paragraph.
 | `frost-depth-berggren` | Frost Penetration Depth (Stefan / Modified Berggren) | Stefan / modified-Berggren frost pene...; L = 144*100*0.15 = 2160; X = sqrt(48*1.0*2000/2160) = 6.6... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `garage-door-torsion-spring` | Garage Door Torsion Spring Torque, Turns, and Rate | Project (first-principles); torque = weight x drum radius; rate = torque / turns; rec... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `gas-pipeline-flow` | Gas Pipeline Flow (Weymouth and Panhandle A) | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
+| `gas-z-factor` | Natural Gas Compressibility Factor Z (Sutton, Wichert-Aziz, Dranchuk-Abou-Kassem) | IEOM Society (Mahmud, Elmabrouk, Sbiga); Table 8, Dranchuk & Abu-Kassem, Sutton column, 3,500 psia... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `gate-operator-duty-cycle` | Slide Gate Operator Force, Grade, and Duty Cycle | Project (first-principles); UL 325 governs entrapment protection separately | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `glass-thickness-wind` | Glass Lite Wind Load, Deflection Limit, and Weight | ASTM; equivalent annealed pressure = design pressure / type factor | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `glass-vacuum-lift` | Glass Weight and Suction-Cup Lifter Count | Suction-cup lifter identity (first-pr...; weight = 32*0.5*13 = 208; cups = ceil(208*4/150) = ceil(5... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -6316,6 +6318,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 
-Tile count: 2237. Fixture-covered or reference-cadence: 2237 / 2237.
+Tile count: 2238. Fixture-covered or reference-cadence: 2238 / 2238.
 
 <!-- END tile-index-v14 -->
