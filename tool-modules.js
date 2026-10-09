@@ -810,7 +810,7 @@ export const TOOL_MODULES = (() => {
     "single-plane-field-balance",
     "roller-chain-wear-elongation", "gear-reducer-service-factor",
     "air-compressor-cfm-sizing", "air-dryer-sizing",
-    "receiver-pump-up-time", "vacuum-evacuation-time",
+    "receiver-pump-up-time", "vacuum-evacuation-time", "shaft-critical-speed-rayleigh",
   ]);
   // spec-v80 cap-relief split: the spec-v25 site-civil / roadway-geometry
   // quartet moved out of calc-construction.js (it sat at 95.0% of its size

@@ -1624,6 +1624,11 @@
     {"term":"clutch heat per engagement","target":"clutch-engagement-energy","kind":"industry"},
     {"term":"brake heat dissipation","target":"clutch-engagement-energy","kind":"industry"},
     {"term":"clutch slip time","target":"clutch-engagement-energy","kind":"industry"},
-    {"term":"how hot does a clutch get","target":"clutch-engagement-energy","kind":"question"}
+    {"term":"how hot does a clutch get","target":"clutch-engagement-energy","kind":"question"},
+    {"term":"shaft critical speed","target":"shaft-critical-speed-rayleigh","kind":"industry"},
+    {"term":"rayleigh critical speed","target":"shaft-critical-speed-rayleigh","kind":"industry"},
+    {"term":"whirl speed","target":"shaft-critical-speed-rayleigh","kind":"industry"},
+    {"term":"rotor critical speed","target":"shaft-critical-speed-rayleigh","kind":"industry"},
+    {"term":"is my shaft running near critical","target":"shaft-critical-speed-rayleigh","kind":"question"}
   ]
 }

@@ -169505,6 +169505,38 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "shaft-critical-speed-rayleigh",
+  "source_publisher": "Project (first-principles)",
+  "source_title": "100 lb at 0.002 in and 60 lb at 0.0015 in, 3,600 rpm",
+  "source_edition_or_year": "Rayleigh's method",
+  "source_section_or_page": "sum(wy) = 0.29; sum(wy^2) = 5.35e-4; omega = sqrt(386.09 x 0.29/5.35e-4) = 457.47 rad/s; N = 4,368.5 rpm; 3,600/4,368.5 = 0.824",
+  "verified_by": "rl",
+  "verified_on": "2026-10-09",
+  "inputs": {
+   "weight_1_lb": 100,
+   "deflection_1_in": 0.002,
+   "weight_2_lb": 60,
+   "deflection_2_in": 0.0015,
+   "weight_3_lb": 0,
+   "deflection_3_in": 0,
+   "operating_rpm": 3600
+  },
+  "outputs": {
+   "critical_rpm": {
+    "value": 4368.5,
+    "tolerance": {
+     "pct": 0.5
+    }
+   },
+   "speed_ratio": {
+    "value": 0.824,
+    "tolerance": {
+     "pct": 0.5
+    }
+   }
+  }
  }
  ]
 }

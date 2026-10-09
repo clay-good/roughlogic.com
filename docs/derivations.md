@@ -2981,6 +2981,7 @@ cross-check.
 | calc-millwright.js | `computeRollerChainWearElongation` | `{ chain_pitch_in = 0, pitches_measured = 0, measured_length_in = 0, elongatio...` | _ | _ | _ |
 | calc-millwright.js | `computeShaftAlignmentReverseDial` | `{ tir_a_in = 0, tir_b_in = 0, plane_spacing_in = 0, front_foot_distance_in = ...` | _ | _ | _ |
 | calc-millwright.js | `computeShaftAlignmentRimFace` | `{ rim_tir_in = 0, face_tir_in = 0, face_diameter_in = 0, front_foot_distance_...` | _ | _ | _ |
+| calc-millwright.js | `computeShaftCriticalSpeedRayleigh` | `{ weight_1_lb = 0, deflection_1_in = 0, weight_2_lb = 0, deflection_2_in = 0,...` | _ | _ | _ |
 | calc-millwright.js | `computeSinglePlaneFieldBalance` | `{ original_amplitude = 0, original_phase_deg = 0, trial_weight_g = 0, trial_w...` | _ | _ | _ |
 | calc-millwright.js | `computeSoftFootCorrection` | `{ foot_lf_in = 0, foot_rf_in = 0, foot_lr_in = 0, foot_rr_in = 0, threshold_i...` | _ | _ | _ |
 | calc-millwright.js | `computeVacuumEvacuationTime` | `{ chamber_volume_ft3 = 0, pump_speed_cfm = 0, start_pressure_torr = 760, targ...` | _ | _ | _ |
@@ -3920,7 +3921,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2504.
+Row count: 2505.
 
 <!-- END function-corpus-v14 -->
 
@@ -5645,7 +5646,7 @@ per spec-v14 §13.1 second paragraph.
 | `truck-swept-path-width` | Swept-Path Width (Turn Lane Occupancy) | AASHTO Green Book (swept-path width =...; OT = 50 - sqrt(2500 - (400 + 1600)) = 50 - sqrt(500) = 50... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `warehouse-cube-utilization` | Storage Position Count and Cube Utilisation | Project (first-principles); layout drawings and the slotting policy govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group K Mechanic (172 tiles)
+### Group K Mechanic (173 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -5778,6 +5779,7 @@ per spec-v14 §13.1 second paragraph.
 | `screw-conveyor-rpm` | Screw Conveyor Speed for a Target Capacity | CEMA Screw Conveyor standard (Book No...; 220.157 ft^3/hr, 9 in screw, 2.5 in shaft, 9 in pitch, 0.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `shaft-alignment-reverse-dial` | Reverse-Dial Shaft Alignment Shim and Move | Project (first-principles); the machine manufacturer alignment specification governs | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `shaft-alignment-rim-face` | Shaft Alignment Offset and Angularity (Rim-and-Face) | Project (first-principles); the machine manufacturer alignment specification governs | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `shaft-critical-speed-rayleigh` | Shaft Critical Speed (Rayleigh Method) | Project (first-principles); sum(wy) = 0.29; sum(wy^2) = 5.35e-4; omega = sqrt(386.09 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `single-plane-field-balance` | Single-Plane Field Balance Trial Weight | Project (first-principles); the machine manufacturer balancing instructions and a qua... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `slider-crank-piston-position` | Slider-Crank Piston Position | Project (first-principles); slider-crank displacement | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `soft-foot-correction` | Soft-Foot Measurement and Correction Shim | Project (first-principles); the machine manufacturer mounting requirements govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -6344,6 +6346,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 
-Tile count: 2251. Fixture-covered or reference-cadence: 2251 / 2251.
+Tile count: 2252. Fixture-covered or reference-cadence: 2252 / 2252.
 
 <!-- END tile-index-v14 -->

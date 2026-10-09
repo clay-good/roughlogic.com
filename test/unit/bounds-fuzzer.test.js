@@ -58973,3 +58973,15 @@ test("bounds: weir-flow approach-velocity correction is a converged Francis fixe
   assert.ok("error" in _wfA({ weir_type: "rect_suppressed", head_ft: 1, crest_length_ft: 4, approach_width_ft: 4 }));
   assert.ok("error" in _wfA({ weir_type: "rect_suppressed", head_ft: 1, crest_length_ft: 4, approach_width_ft: 3, weir_height_ft: 1 }));
 });
+
+import { computeShaftCriticalSpeedRayleigh as _scr } from "../../calc-millwright.js";
+test("bounds: shaft-critical-speed-rayleigh reduces to sqrt(g/y) for one mass", () => {
+  const one = _scr({ weight_1_lb: 50, deflection_1_in: 0.01 });
+  assert.ok(Math.abs(one.critical_rpm - (60 / (2 * Math.PI)) * Math.sqrt(386.0886 / 0.01)) < 1e-9);
+  // Two identical masses at the same deflection behave as one.
+  assert.ok(Math.abs(_scr({ weight_1_lb: 50, deflection_1_in: 0.01, weight_2_lb: 50, deflection_2_in: 0.01 }).critical_rpm - one.critical_rpm) < 1e-9);
+  const r = _scr({ weight_1_lb: 100, deflection_1_in: 0.002, weight_2_lb: 60, deflection_2_in: 0.0015, operating_rpm: 3600 });
+  assert.ok(Math.abs(r.critical_rpm - 4368.5) < 0.5 && /RESONANCE/.test(r.verdict));
+  assert.ok("error" in _scr({ weight_1_lb: 100 }));
+  assert.ok("error" in _scr({}));
+});

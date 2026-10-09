@@ -13125,7 +13125,7 @@ export const CITATIONS = {
     edition: "The centrifugal (centripetal) force F = (W/g) omega^2 r and rim speed v = omega r (standard dynamics; Machinery's Handbook), by name.",
     freeAccess: "The centrifugal-force relation is a standard published dynamics result; the weight, radius, and speed are the user's inputs.",
     governance: GOVERNANCE.general,
-    editionNote: "The centrifugal (centripetal) force of a concentrated mass at a radius, F = (W/g) omega^2 r, with omega = 2 pi N/60 the angular velocity, g = 32.174 ft/s^2, and r the radius to the mass center. The acceleration in g's is a = omega^2 r/g and the rim (tangential) speed is v = omega r. The force climbs with the SQUARE of speed, so doubling the rpm quadruples the force - which is why a small imbalance is harmless at idle and violent at speed, and why a chipped grinding wheel that is safe by hand can burst at operating rpm. Use the mass and the radius of the center of gravity for a distributed rotor. The burst stress of a rim or disk, the bearing reaction from an imbalance couple, and the critical (whirl) speed are separate. A design aid; Machinery's Handbook and the equipment maker govern.",
+    editionNote: "The centrifugal (centripetal) force of a concentrated mass at a radius, F = (W/g) omega^2 r, with omega = 2 pi N/60 the angular velocity, g = 32.174 ft/s^2, and r the radius to the mass center. The acceleration in g's is a = omega^2 r/g and the rim (tangential) speed is v = omega r. The force climbs with the SQUARE of speed, so doubling the rpm quadruples the force - which is why a small imbalance is harmless at idle and violent at speed, and why a chipped grinding wheel that is safe by hand can burst at operating rpm. Use the mass and the radius of the center of gravity for a distributed rotor. The burst stress of a rim or disk and the bearing reaction from an imbalance couple are separate, and the critical (whirl) speed is shaft-critical-speed-rayleigh. A design aid; Machinery's Handbook and the equipment maker govern.",
     assumptions: [
       { name: "Centrifugal force", value: "F = (W/g) omega^2 r for a concentrated mass at radius r", source: "dynamics" },
       { name: "Speed square", value: "force grows with the square of rpm; a_g = omega^2 r/g", source: "dynamics" },
@@ -22095,6 +22095,17 @@ export const CITATIONS = {
       { name: "Constant temperature assumed", value: "real filling heats the air and the pressure falls back as it cools", source: "compressed air practice" },
       { name: "An air receiver is a pressure vessel", value: "with drain, relief and inspection obligations not addressed here", source: "the applicable pressure vessel code" },
       { name: "Piping storage is not counted", value: "on a large system it is real and sometimes substantial", source: "compressed air practice" },
+    ],
+  },
+  "shaft-critical-speed-rayleigh": {
+    formula: "omega = sqrt(g sum(w_i y_i) / sum(w_i y_i^2)), g = 386.0886 in/s^2, w in lb and y the static deflection (in) at each mass under all the loads; N_c = 60 omega / (2 pi) rpm; one mass: N_c = 187.7/sqrt(y); ratio = operating / N_c.",
+    edition: "Rayleigh's method for the first critical speed of a shaft (Shigley, Mischke and Budynas, Mechanical Engineering Design, Ch. 7), by name.",
+    freeAccess: "A published energy method; the weights and static deflections are the user's inputs (from a beam calculation or a measurement).",
+    governance: GOVERNANCE.general,
+    editionNote: "First bending critical from lumped masses and their static deflections; Rayleigh overestimates the true critical slightly, and bearing and support flexibility lower it further. The 80%-120% resonance band in the verdict is a common machinery guide, not a code limit. A screen; a rotor-dynamics analysis and the machine maker govern.",
+    assumptions: [
+      { name: "Rayleigh's method", value: "lumped masses at the static deflected shape", source: "Shigley Ch. 7" },
+      { name: "Resonance band", value: "within 20% of the first critical", source: "common machinery practice" },
     ],
   },
   "vacuum-evacuation-time": {

@@ -1814,6 +1814,7 @@ const RELATED = {
   "air-dryer-sizing": ["air-compressor-cfm-sizing","receiver-pump-up-time","air-receiver"],
   "receiver-pump-up-time": ["air-receiver","air-compressor-cfm-sizing","air-dryer-sizing"],
   "vacuum-evacuation-time": ["vacuum-decay-test","air-compressor-cfm-sizing","receiver-pump-up-time"],
+  "shaft-critical-speed-rayleigh": ["driveshaft-crit","vibration-forcing-frequencies","single-plane-field-balance"],
   // spec-v109 service grounding / bonding / inverse voltage-drop (Group A)
   "grounding-electrode-conductor": ["bonding-jumper","egc-sizing","grounding-electrode"],
   "bonding-jumper": ["grounding-electrode-conductor","egc-sizing","service-load-standard"],

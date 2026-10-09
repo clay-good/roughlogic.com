@@ -2,99 +2,99 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "588f7c10c6af4c2c",
+      "sha": "e4a1f95e52cf0ae3",
       "date": "2026-10-09"
     },
     "/tools/": {
-      "sha": "0313dd37d831635b",
+      "sha": "4644b78ffc6bf6b7",
       "date": "2026-10-09"
     },
     "/collections/disaster-response/": {
-      "sha": "46496ce24182a464",
+      "sha": "c5b15218e3a7e6f0",
       "date": "2026-10-09"
     },
     "/groups/accounting/": {
-      "sha": "8533f4d6a08e4e5b",
+      "sha": "40d6b1bbc703a5c9",
       "date": "2026-10-09"
     },
     "/groups/agriculture/": {
-      "sha": "a194149a263d47a9",
+      "sha": "73c078d8e6a5b642",
       "date": "2026-10-09"
     },
     "/groups/construction/": {
-      "sha": "5792fb212ab4b4c8",
+      "sha": "b67a09c326cdfa71",
       "date": "2026-10-09"
     },
     "/groups/cross-trade/": {
-      "sha": "b5194e26a0cf93fc",
+      "sha": "d5a6146a83b77796",
       "date": "2026-10-09"
     },
     "/groups/educators/": {
-      "sha": "3963fcf9592553ab",
+      "sha": "50a0a72559e80749",
       "date": "2026-10-09"
     },
     "/groups/electrical/": {
-      "sha": "1426d9d9c3d1c299",
+      "sha": "3078b2bea7d76388",
       "date": "2026-10-09"
     },
     "/groups/field/": {
-      "sha": "56d183d5b08e9a5c",
+      "sha": "6441bb722b66d7a0",
       "date": "2026-10-09"
     },
     "/groups/fire-ground/": {
-      "sha": "69bd82e07d5c3b6f",
+      "sha": "a0f516708ff33801",
       "date": "2026-10-09"
     },
     "/groups/historical/": {
-      "sha": "ad4e6af143b923a3",
+      "sha": "7a5bb447a567fb1e",
       "date": "2026-10-09"
     },
     "/groups/hvac/": {
-      "sha": "c36c6d4edf62ef6b",
+      "sha": "11b7956c1e15b892",
       "date": "2026-10-09"
     },
     "/groups/kitchen/": {
-      "sha": "46e20ee097be287e",
+      "sha": "c40d2a3e7e5a099f",
       "date": "2026-10-09"
     },
     "/groups/lab/": {
-      "sha": "be34cebeaa080bd0",
+      "sha": "80081239c46946ee",
       "date": "2026-10-09"
     },
     "/groups/mechanic/": {
-      "sha": "2f76101f7ee235d9",
+      "sha": "82cd80d6e5938430",
       "date": "2026-10-09"
     },
     "/groups/plumbing/": {
-      "sha": "6bb9372a7c47e3a3",
+      "sha": "1a7ce7cbaf237876",
       "date": "2026-10-09"
     },
     "/groups/real-estate/": {
-      "sha": "6c22677f83bd4fdc",
+      "sha": "326cb453470c0a27",
       "date": "2026-10-09"
     },
     "/groups/references/": {
-      "sha": "c31e8702a65fbb5e",
+      "sha": "70e1788679e2f86f",
       "date": "2026-10-09"
     },
     "/groups/restoration/": {
-      "sha": "8f273de368931835",
+      "sha": "ceb42b844172f723",
       "date": "2026-10-09"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "c00f0cf42dd1f79d",
+      "sha": "44f18a7f76a31941",
       "date": "2026-10-09"
     },
     "/groups/stage/": {
-      "sha": "92879851ad95357c",
+      "sha": "3ddd0dc4134621f2",
       "date": "2026-10-09"
     },
     "/groups/trucking/": {
-      "sha": "34b9a6732fc06ebc",
+      "sha": "4994f323c3a70e2e",
       "date": "2026-10-09"
     },
     "/groups/water/": {
-      "sha": "654be1b50e9ac855",
+      "sha": "5361251ea8199ba0",
       "date": "2026-10-09"
     },
     "/tools/aav-install-check/": {
@@ -2390,8 +2390,8 @@
       "date": "2026-09-29"
     },
     "/tools/driveshaft-crit/": {
-      "sha": "093573418cba4b90",
-      "date": "2026-10-03"
+      "sha": "e8779fcf632eeaf5",
+      "date": "2026-10-09"
     },
     "/tools/driveshaft-max-length/": {
       "sha": "2e4f3d20d640a93c",
@@ -6920,6 +6920,10 @@
     "/tools/shaft-alignment-rim-face/": {
       "sha": "b5527ccaaa0aa7db",
       "date": "2026-10-01"
+    },
+    "/tools/shaft-critical-speed-rayleigh/": {
+      "sha": "0c4e23dc54171eee",
+      "date": "2026-10-09"
     },
     "/tools/shaft-diameter-for-torsion/": {
       "sha": "28f37eaf9993a2cb",

@@ -1092,3 +1092,50 @@ MILLWRIGHT_RENDERERS["vacuum-evacuation-time"] = _simpleRenderer({
   ],
   compute: computeVacuumEvacuationTime,
 });
+
+// spec-v1948: first critical (whirl) speed of a shaft carrying up to three masses, by Rayleigh's method
+// (Shigley, Mechanical Engineering Design, Ch. 7): with each mass's static deflection y_i under the actual loads,
+// omega = sqrt(g sum(w_i y_i) / sum(w_i y_i^2)), N = 60 omega / (2 pi). One mass reduces to N = 187.7/sqrt(y in).
+// Rayleigh slightly OVERestimates the true first critical, so the margin is on the generous side.
+// dims: in { weight_1_lb: M L T^-2, deflection_1_in: L, weight_2_lb: M L T^-2, deflection_2_in: L, weight_3_lb: M L T^-2, deflection_3_in: L, operating_rpm: T^-1 } out: { critical_rpm: T^-1, speed_ratio: dimensionless }
+export function computeShaftCriticalSpeedRayleigh({ weight_1_lb = 0, deflection_1_in = 0, weight_2_lb = 0, deflection_2_in = 0, weight_3_lb = 0, deflection_3_in = 0, operating_rpm = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const pairs = [[weight_1_lb, deflection_1_in], [weight_2_lb, deflection_2_in], [weight_3_lb, deflection_3_in]].map(([w, y]) => [Number(w) || 0, Number(y) || 0]);
+  if (pairs.some(([w, y]) => w < 0 || y < 0)) return { error: "Weights and deflections cannot be negative." };
+  if (pairs.some(([w, y]) => (w > 0) !== (y > 0))) return { error: "Each mass needs both its weight and its static deflection (leave both blank to skip it)." };
+  if (!pairs.some(([w]) => w > 0)) return { error: "Enter at least one mass: its weight (lb) and the shaft's static deflection there (in)." };
+  const N = Number(operating_rpm) || 0;
+  if (N < 0) return { error: "Operating speed cannot be negative (rpm; blank to skip)." };
+  const g = 386.0886; // in/s^2
+  const sumWY = pairs.reduce((t, [w, y]) => t + w * y, 0);
+  const sumWY2 = pairs.reduce((t, [w, y]) => t + w * y * y, 0);
+  const omega = Math.sqrt((g * sumWY) / sumWY2);
+  const critical_rpm = (60 * omega) / (2 * Math.PI);
+  const speed_ratio = N > 0 ? N / critical_rpm : 0;
+  if (![omega, critical_rpm, speed_ratio].every(Number.isFinite)) return { error: "Critical-speed math is not a finite value; check the inputs." };
+  const verdict = N <= 0 ? "" : speed_ratio < 0.8 ? "below the first critical with margin (under 80%)" : speed_ratio <= 1.2 ? "IN THE RESONANCE BAND (within 20% of the critical): expect high vibration; change the stiffness, the masses, or the speed" : "above the first critical (supercritical); it must pass through resonance on every start and stop";
+  return {
+    critical_rpm, speed_ratio, has_speed: N > 0, verdict,
+    note: "The first critical (whirl) speed is where a shaft's rotation matches its own first bending natural frequency and a small unbalance drives large whirl. Rayleigh's method estimates it from the masses the shaft carries and the static deflection the shaft has under them at each mass: omega = sqrt(g sum(w y)/sum(w y^2)), which for a single mass is the shop rule N = 187.7/sqrt(deflection in inches). Get the deflections from a beam calculation or a measurement with the shaft horizontal and the parts mounted; include the shaft's own weight as lumped masses for a long or heavy shaft. Rayleigh slightly overestimates the true critical. Machines usually run below about 70-80% of the first critical (or well above it with a quick pass through); bearing and support flexibility lower the critical further. A screen; the machine maker and a rotor-dynamics analysis govern.",
+  };
+}
+export const shaftCriticalSpeedRayleighExample = { inputs: { weight_1_lb: 100, deflection_1_in: 0.002, weight_2_lb: 60, deflection_2_in: 0.0015, weight_3_lb: 0, deflection_3_in: 0, operating_rpm: 3600 } };
+MILLWRIGHT_RENDERERS["shaft-critical-speed-rayleigh"] = _simpleRenderer({
+  citation: "Citation: Rayleigh's method for the first critical speed of a shaft (Shigley, Mechanical Engineering Design, Ch. 7), by name: omega = sqrt(g sum(w y)/sum(w y^2)), g = 386.09 in/s^2, y the static deflection at each mass under the actual loads; N = 60 omega/(2 pi); one mass gives 187.7/sqrt(y). Rayleigh overestimates slightly. A screen; rotor dynamics governs.",
+  example: shaftCriticalSpeedRayleighExample.inputs,
+  fields: [
+    { key: "weight_1_lb", label: "Mass 1 weight (lb)", kind: "number" },
+    { key: "deflection_1_in", label: "Static deflection at mass 1 (in)", kind: "number" },
+    { key: "weight_2_lb", label: "Mass 2 weight (lb, optional)", kind: "number" },
+    { key: "deflection_2_in", label: "Static deflection at mass 2 (in)", kind: "number" },
+    { key: "weight_3_lb", label: "Mass 3 weight (lb, optional)", kind: "number" },
+    { key: "deflection_3_in", label: "Static deflection at mass 3 (in)", kind: "number" },
+    { key: "operating_rpm", label: "Operating speed (rpm, blank to skip)", kind: "number" },
+  ],
+  outputs: [
+    { key: "c", id: "scr-out-c", label: "First critical speed", value: (r) => fmt(r.critical_rpm, 0) + " rpm" },
+    { key: "r", id: "scr-out-r", label: "Operating speed vs critical", value: (r) => (r.has_speed ? fmt(r.speed_ratio * 100, 0) + "% of the critical: " + r.verdict : "enter the operating speed") },
+    { key: "n", id: "scr-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeShaftCriticalSpeedRayleigh,
+});

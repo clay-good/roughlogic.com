@@ -116822,6 +116822,31 @@
    "term": "how big a lift bag do i need",
    "target": "lift-bag-sizing",
    "kind": "question"
+  },
+  {
+   "term": "shaft critical speed",
+   "target": "shaft-critical-speed-rayleigh",
+   "kind": "industry"
+  },
+  {
+   "term": "rayleigh critical speed",
+   "target": "shaft-critical-speed-rayleigh",
+   "kind": "industry"
+  },
+  {
+   "term": "whirl speed",
+   "target": "shaft-critical-speed-rayleigh",
+   "kind": "industry"
+  },
+  {
+   "term": "rotor critical speed",
+   "target": "shaft-critical-speed-rayleigh",
+   "kind": "industry"
+  },
+  {
+   "term": "is my shaft running near critical",
+   "target": "shaft-critical-speed-rayleigh",
+   "kind": "question"
   }
  ]
 }

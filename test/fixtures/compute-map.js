@@ -2311,6 +2311,7 @@ export const COMPUTE_MAP = {
   "air-dryer-sizing": { module: "../../calc-millwright.js", fn: "computeAirDryerSizing" },
   "receiver-pump-up-time": { module: "../../calc-millwright.js", fn: "computeReceiverPumpUpTime" },
   "vacuum-evacuation-time": { module: "../../calc-millwright.js", fn: "computeVacuumEvacuationTime" },
+  "shaft-critical-speed-rayleigh": { module: "../../calc-millwright.js", fn: "computeShaftCriticalSpeedRayleigh" },
   "emergency-water-bleach-dose": { module: "../../calc-reliefwater.js", fn: "computeEmergencyWaterBleachDose" },
   "boil-water-altitude": { module: "../../calc-reliefwater.js", fn: "computeBoilWaterAltitude" },
   "contact-time-baffling": { module: "../../calc-reliefwater.js", fn: "computeContactTimeBaffling" },

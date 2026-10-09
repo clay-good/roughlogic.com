@@ -995,6 +995,7 @@ export const RENDERER_MAP = {
   "air-dryer-sizing": { module: "../../calc-millwright.js", exportName: "MILLWRIGHT_RENDERERS" },
   "receiver-pump-up-time": { module: "../../calc-millwright.js", exportName: "MILLWRIGHT_RENDERERS" },
   "vacuum-evacuation-time": { module: "../../calc-millwright.js", exportName: "MILLWRIGHT_RENDERERS" },
+  "shaft-critical-speed-rayleigh": { module: "../../calc-millwright.js", exportName: "MILLWRIGHT_RENDERERS" },
   "horizontal-curve": { module: "../../calc-civil.js", exportName: "CIVIL_RENDERERS" },
   "spiral-curve": { module: "../../calc-civil.js", exportName: "CIVIL_RENDERERS" },
   "compound-curve": { module: "../../calc-civil.js", exportName: "CIVIL_RENDERERS" },
