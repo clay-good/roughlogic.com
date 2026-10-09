@@ -4120,7 +4120,7 @@ export function computeChannelFroudeNumber({ b_ft = 0, q_cfs = 0, y_ft = 0 } = {
   const yc_consistent = (y_ft > yc_ft && fr < 1) || (y_ft < yc_ft && fr > 1) || Math.abs(fr - 1) < 0.01;
   return {
     v_fps, fr, regime, q_unit, yc_ft, yc_consistent,
-    note: "Open-channel Froude number Fr = V/sqrt(g D) (g = 32.2 ft/s^2, D = A/T the hydraulic depth, equal to y for a rectangular section) classifies the regime: Fr < 1 subcritical (tranquil, downstream-controlled), Fr = 1 critical, Fr > 1 supercritical (rapid, upstream-controlled); the rectangular critical depth is yc = (q^2/g)^(1/3) with q = Q/b, and the flow is subcritical when y > yc. Prismatic rectangular channel with D = y - it does not compute the normal depth (that is Manning), the hydraulic-jump conjugate depth, or a trapezoidal/irregular section's critical depth. A design aid; the engineer of record governs.",
+    note: "Open-channel Froude number Fr = V/sqrt(g D) (g = 32.2 ft/s^2, D = A/T the hydraulic depth, equal to y for a rectangular section) classifies the regime: Fr < 1 subcritical (tranquil, downstream-controlled), Fr = 1 critical, Fr > 1 supercritical (rapid, upstream-controlled); the rectangular critical depth is yc = (q^2/g)^(1/3) with q = Q/b, and the flow is subcritical when y > yc. Prismatic rectangular channel with D = y - the normal depth is channel-normal-depth and the hydraulic-jump conjugate depth is hydraulic-jump; a trapezoidal or irregular section's critical depth is not computed. A design aid; the engineer of record governs.",
   };
 }
 export const channelFroudeNumberExample = { inputs: { b_ft: 4, q_cfs: 50, y_ft: 2 } };
@@ -4171,7 +4171,7 @@ export function computeChannelNormalDepth({ b_ft = 0, q_cfs = 0, n = 0, s_slope 
   const yc_ft = Math.cbrt(Math.pow(q_cfs / b_ft, 2) / 32.2);
   return {
     yn_ft, a_ft2, v_fps, fr, regime, yc_ft,
-    note: "Rectangular-channel normal (uniform-flow) depth: the depth yn at which Manning's Q = (1.486/n) A R^(2/3) sqrt(S) is satisfied for a rectangular section (A = b yn, R = A/(b + 2 yn)), solved by bisection. This is the Manning normal depth the Froude tile leaves out; comparing it to the critical depth yc = (q^2/g)^(1/3) gives the slope class - yn > yc is a mild slope (subcritical normal flow), yn < yc is steep (supercritical). The velocity and Froude number are reported at the normal depth. Steady uniform flow in a prismatic rectangular channel with Manning roughness n; it does not compute a trapezoidal or irregular section, a gradually-varied (backwater) profile, or the partial-flow depth of a closed conduit. A design aid; the engineer of record governs.",
+    note: "Rectangular-channel normal (uniform-flow) depth: the depth yn at which Manning's Q = (1.486/n) A R^(2/3) sqrt(S) is satisfied for a rectangular section (A = b yn, R = A/(b + 2 yn)), solved by bisection. This is the Manning normal depth the Froude tile leaves out; comparing it to the critical depth yc = (q^2/g)^(1/3) gives the slope class - yn > yc is a mild slope (subcritical normal flow), yn < yc is steep (supercritical). The velocity and Froude number are reported at the normal depth. Steady uniform flow in a prismatic rectangular channel with Manning roughness n; a trapezoidal section is trapezoidal-channel-flow and a closed conduit's partial-flow depth is pipe-partial-flow-depth; irregular sections and gradually-varied (backwater) profiles are not computed. A design aid; the engineer of record governs.",
   };
 }
 export const channelNormalDepthExample = { inputs: { b_ft: 10, q_cfs: 200, n: 0.015, s_slope: 0.001 } };
