@@ -24419,6 +24419,18 @@ export const CITATIONS = {
       { name: "The rate per diver is regulatory", value: "it depends on jurisdiction, mode of diving, and depth", source: "the applicable regulation" },
     ],
   },
+  "lift-bag-sizing": {
+    formula: "in-water weight = W (1 - rho_w / rho_obj); required lift = in-water weight + breakout; bag volume = required lift / rho_w (64 lb/cu ft seawater, 62.4 fresh); free air = bag volume x (D + Dw)/Dw, Dw = 2,116.2/rho_w ft per atmosphere (33.07 ft seawater, 33.9 ft fresh); bags = ceil(required lift / bag rating).",
+    edition: "Buoyancy (Archimedes) and Boyle's law as the U.S. Navy Salvage Manual applies them to lift bags and pontoons, by name.",
+    freeAccess: "The U.S. Navy Salvage Manual is published free by NAVSEA; the relations are first-principles physics on the user's weight, density, depth, and bag rating.",
+    governance: GOVERNANCE.general,
+    editionNote: "Static lift only: the bag must displace the in-water weight plus any breakout force from bottom suction, which can equal or exceed the object's weight. Air expands as a bag rises, so a bag that just lifts at depth accelerates toward the surface; open-bottom bags, dump valves, and rigging govern control. Not a lift plan; the dive supervisor governs.",
+    assumptions: [
+      { name: "Water density", value: "64 lb/cu ft seawater, 62.4 lb/cu ft fresh", source: "physical constants" },
+      { name: "Depth per atmosphere", value: "2,116.2 lb/sq ft over the water density: 33.07 ft seawater, 33.9 ft fresh (the Navy rounds to 33 and 34)", source: "U.S. Navy Diving Manual" },
+      { name: "Breakout", value: "entered; bottom suction is site-specific", source: "U.S. Navy Salvage Manual" },
+    ],
+  },
   "chamber-gas-volume": {
     formula: "free air to pressurize = the chamber's internal volume x the gauge pressure / 14.7 (one atmosphere is already inside); ventilation air = the rate per occupant x the occupants x the absolute pressure (gauge psi + 14.7) / 14.7 x the treatment duration; the longest supportable treatment = (inventory - pressurization) / the free-air ventilation rate.",
     edition: "The chamber gas relations by name. The applicable treatment tables, a diving medical officer, the chamber manufacturer, the operation's diving safety manual, and the applicable regulations govern.",

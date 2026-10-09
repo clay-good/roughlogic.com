@@ -768,7 +768,7 @@ export const TOOL_MODULES = (() => {
   // turns on. All six keep group "G".
   declare("./calc-diving.js", "DIVING_RENDERERS", [
     "no-decompression-limit", "surface-air-consumption", "nitrox-mod",
-    "nitrox-ead", "umbilical-air-supply", "chamber-gas-volume",
+    "nitrox-ead", "umbilical-air-supply", "chamber-gas-volume", "lift-bag-sizing",
   ]);
   // spec-v1563..v1570: the steam plant and commercial laundry bench. The
   // catalog had a blowdown RATE and a Napier orifice pair and nothing that

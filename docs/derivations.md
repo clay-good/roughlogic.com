@@ -1979,6 +1979,7 @@ cross-check.
 | calc-disinfect.js | `computeMainDisinfectionChlorine` | `{ diameter_in = 0, length_ft = 0, dose_mg_l = 25, product_pct = 65 } = {}` | _ | _ | _ |
 | calc-disinfect.js | `computeWellShockChlorination` | `{ casing_diameter_in = 0, water_column_ft = 0, target_ppm = 100, bleach_pct =...` | _ | _ | _ |
 | calc-diving.js | `computeChamberGasVolume` | `{ chamber_volume_cuft = 0, treatment_pressure_psig = 0, ventilation_acfm_per_...` | _ | _ | _ |
+| calc-diving.js | `computeLiftBagSizing` | `{ object_weight_lb = 0, object_density_lb_ft3 = 490, water_density_lb_ft3 = 6...` | _ | _ | _ |
 | calc-diving.js | `computeNitroxEad` | `{ oxygen_fraction = 0.36, depth_ft = 0, target_ead_ft = 0, ppo2_limit = 1.4, ...` | _ | _ | _ |
 | calc-diving.js | `computeNitroxMod` | `{ oxygen_fraction = 0.32, ppo2_limit = 1.4, contingency_ppo2_limit = 1.6, pla...` | _ | _ | _ |
 | calc-diving.js | `computeNoDecompressionLimit` | `{ planned_depth_ft = 0, table_ndl_min = 0, residual_nitrogen_time_min = 0, pl...` | _ | _ | _ |
@@ -3919,7 +3920,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2503.
+Row count: 2504.
 
 <!-- END function-corpus-v14 -->
 
@@ -5391,7 +5392,7 @@ per spec-v14 §13.1 second paragraph.
 | `vacuum-lift-reading` | Vacuum Gauge to Drafting Lift Readout | IFSTA / NWCG fire-pump drafting practice; 10 in Hg at sea level -> 11.3 ft of head, 50% of the ~22.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `water-supply-duration` | Water-Supply Duration | Volume/flow continuity + NFPA 1142 co...; 3000 gal, 250 GPM, no resupply -> 12 min | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group G Cross-trade (166 tiles)
+### Group G Cross-trade (167 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -5461,6 +5462,7 @@ per spec-v14 §13.1 second paragraph.
 | `laundry-washer-turns` | Commercial Laundry Washer Capacity and Turns per Day | Project (first-principles); the equipment manufacturer and the applicable laundry sta... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `lfg-flare-capacity` | Landfill Gas Flare Capacity and Destruction | Project (first-principles); the air permit and manufacturer govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `lifeline-tension` | Horizontal Lifeline Tension and Anchorage (OSHA 1926.502) | roughlogic; At midspan, 2 T sin(theta) = W with sin(theta) = s / sqrt... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `lift-bag-sizing` | Underwater Lift Bag Sizing | Project (first-principles); in-water weight = 1,000 (1 - 64/490) = 869.4 lb; bag volu... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `linear-interpolation` | Linear Interpolation | First-principles linear interpolation; (0,10) and (10,30), x = 4 -> y = 18, slope 2 (within range) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `loan-payment` | Loan Payment | Project (first-principles); Closed-form annuity-immediate at monthly rate r = APR/12/100 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `markup` | Markup and Margin | Project (first-principles); selling_price = cost * (1 + markup); margin = profit / price | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+7 more) |
@@ -6342,6 +6344,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 
-Tile count: 2250. Fixture-covered or reference-cadence: 2250 / 2250.
+Tile count: 2251. Fixture-covered or reference-cadence: 2251 / 2251.
 
 <!-- END tile-index-v14 -->

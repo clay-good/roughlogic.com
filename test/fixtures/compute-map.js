@@ -1676,6 +1676,7 @@ export const COMPUTE_MAP = {
   "nitrox-ead": { module: "../../calc-diving.js", fn: "computeNitroxEad" },
   "umbilical-air-supply": { module: "../../calc-diving.js", fn: "computeUmbilicalAirSupply" },
   "chamber-gas-volume": { module: "../../calc-diving.js", fn: "computeChamberGasVolume" },
+  "lift-bag-sizing": { module: "../../calc-diving.js", fn: "computeLiftBagSizing" },
   "grounding-electrode-conductor": { module: "../../calc-electrical.js", fn: "computeGroundingElectrodeConductor" },
   "bonding-jumper": { module: "../../calc-electrical.js", fn: "computeBondingJumper" },
   "min-conductor-for-vd": { module: "../../calc-electrical.js", fn: "computeMinConductorForVd" },

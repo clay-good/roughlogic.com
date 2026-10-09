@@ -112,6 +112,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Added
 
+- **`lift-bag-sizing`: underwater lift bag sizing (spec-v1947, Group G, `calc-diving.js`), 2,250 -> 2,251, v0.440.0.** The diving bench had gas supply and decompression tiles but nothing for a recovery lift. This one takes the object's weight and density, the water, and the depth and returns the in-water weight, the lift needed with any breakout force, the bag displacement, the free air to fill it at depth, and the bag count: a 1,000 lb steel object at 66 ft in seawater needs 869 lb of lift, 13.6 cu ft of bag, and 40.7 cu ft of surface air.
+
 - **`weld-preheat-cet`: minimum weld preheat by the CET method (spec-v1946, Group E, `calc-fab.js`), 2,249 -> 2,250, v0.439.0.** `carbon-equivalent` gives a weldability band but no temperature. This one applies the EN 1011-2 Method B equation as Dillinger publishes it: CET = C + (Mn + Mo)/10 + (Cr + Cu)/20 + Ni/40 and Tp = 697 CET + 160 tanh(d/35) + 62 HD^0.35 + (53 CET - 32) Q - 328 degC, with US inputs (inches, kJ/in) and the EN 1011-1 arc efficiency. A 0.18 C, 1.4 Mn plate 1-1/4 in thick at 40 kJ/in SMAW needs about 229 F. Outside the method's ranges it returns an error.
 
 - **`pulp-density-solids`: pulp density and percent solids, either way (spec-v1945, Group E, `calc-mining.js`), 2,248 -> 2,249, v0.438.0.** Nothing converted between percent solids by weight and the slurry specific gravity a Marcy scale reads. This one does both ways from the solids SG (1/SG_p = w/SG_s + (1 - w)/SG_l), adds the percent by volume, and from a dry rate the water to add and the slurry gpm: 40% solids of 2.7 SG rock is a 1.337 SG pulp, 19.8% by volume, 747 gpm at 100 st/h.

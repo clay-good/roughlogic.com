@@ -953,6 +953,7 @@ export const RENDERER_MAP = {
   "nitrox-ead": { module: "../../calc-diving.js", exportName: "DIVING_RENDERERS" },
   "umbilical-air-supply": { module: "../../calc-diving.js", exportName: "DIVING_RENDERERS" },
   "chamber-gas-volume": { module: "../../calc-diving.js", exportName: "DIVING_RENDERERS" },
+  "lift-bag-sizing": { module: "../../calc-diving.js", exportName: "DIVING_RENDERERS" },
   "laundry-washer-turns": { module: "../../calc-steamplant.js", exportName: "STEAMPLANT_RENDERERS" },
   "laundry-cost-per-pound": { module: "../../calc-steamplant.js", exportName: "STEAMPLANT_RENDERERS" },
   "laundry-dryer-evaporation": { module: "../../calc-steamplant.js", exportName: "STEAMPLANT_RENDERERS" },

@@ -116797,6 +116797,31 @@
    "term": "what preheat do i need for this steel",
    "target": "weld-preheat-cet",
    "kind": "question"
+  },
+  {
+   "term": "lift bag",
+   "target": "lift-bag-sizing",
+   "kind": "industry"
+  },
+  {
+   "term": "lift bag size",
+   "target": "lift-bag-sizing",
+   "kind": "industry"
+  },
+  {
+   "term": "underwater lifting buoyancy",
+   "target": "lift-bag-sizing",
+   "kind": "industry"
+  },
+  {
+   "term": "salvage lift air volume",
+   "target": "lift-bag-sizing",
+   "kind": "industry"
+  },
+  {
+   "term": "how big a lift bag do i need",
+   "target": "lift-bag-sizing",
+   "kind": "question"
   }
  ]
 }

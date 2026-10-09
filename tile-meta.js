@@ -905,6 +905,7 @@ const _TILES = [
   ["nitrox-ead", "G"],
   ["umbilical-air-supply", "G"],
   ["chamber-gas-volume", "G"],
+  ["lift-bag-sizing", "G"],
   // spec-v109 service grounding / bonding / inverse voltage-drop (Group A)
   ["grounding-electrode-conductor", "A"],
   ["bonding-jumper", "A"],

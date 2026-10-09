@@ -1555,6 +1555,7 @@ const RELATED = {
   "nitrox-ead": ["nitrox-mod","no-decompression-limit","surface-air-consumption"],
   "umbilical-air-supply": ["surface-air-consumption","chamber-gas-volume","scba-cylinder-time"],
   "chamber-gas-volume": ["umbilical-air-supply","ideal-gas-law","surface-air-consumption"],
+  "lift-bag-sizing": ["umbilical-air-supply","barge-draft-displacement","surface-air-consumption"],
   // spec-v1563..v1570: the 2026-09-07 steam plant and commercial laundry band.
   "laundry-washer-turns": ["laundry-dryer-evaporation","laundry-cost-per-pound","warewasher-hot-water"],
   "laundry-cost-per-pound": ["laundry-dryer-evaporation","laundry-washer-turns","warewasher-hot-water"],

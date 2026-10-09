@@ -169330,6 +169330,43 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "lift-bag-sizing",
+  "source_publisher": "Project (first-principles)",
+  "source_title": "1,000 lb steel object at 66 ft in seawater, 500 lb bags",
+  "source_edition_or_year": "Archimedes and Boyle",
+  "source_section_or_page": "in-water weight = 1,000 (1 - 64/490) = 869.4 lb; bag volume = 869.4/64 = 13.58 cu ft; free air = 13.58 x (66 + 33.066)/33.066 = 40.70 cu ft (Dw = 2,116.2/64); 2 bags",
+  "verified_by": "rl",
+  "verified_on": "2026-10-09",
+  "inputs": {
+   "object_weight_lb": 1000,
+   "object_density_lb_ft3": 490,
+   "water_density_lb_ft3": 64,
+   "depth_ft": 66,
+   "bag_rating_lb": 500,
+   "breakout_lb": 0
+  },
+  "outputs": {
+   "in_water_weight_lb": {
+    "value": 869.39,
+    "tolerance": {
+     "pct": 0.5
+    }
+   },
+   "surface_air_cuft": {
+    "value": 40.70,
+    "tolerance": {
+     "pct": 0.5
+    }
+   },
+   "bags_needed": {
+    "value": 2,
+    "tolerance": {
+     "abs": 0
+    }
+   }
+  }
  }
  ]
 }

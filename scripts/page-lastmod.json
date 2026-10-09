@@ -2,99 +2,99 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "eb95bcd385e4320d",
+      "sha": "588f7c10c6af4c2c",
       "date": "2026-10-09"
     },
     "/tools/": {
-      "sha": "c49e56e83f3eb082",
+      "sha": "0313dd37d831635b",
       "date": "2026-10-09"
     },
     "/collections/disaster-response/": {
-      "sha": "ff8cd5d40ef28d41",
+      "sha": "46496ce24182a464",
       "date": "2026-10-09"
     },
     "/groups/accounting/": {
-      "sha": "d15987704cbbb862",
+      "sha": "8533f4d6a08e4e5b",
       "date": "2026-10-09"
     },
     "/groups/agriculture/": {
-      "sha": "717a076a41baf789",
+      "sha": "a194149a263d47a9",
       "date": "2026-10-09"
     },
     "/groups/construction/": {
-      "sha": "dad87db6e02b802d",
+      "sha": "5792fb212ab4b4c8",
       "date": "2026-10-09"
     },
     "/groups/cross-trade/": {
-      "sha": "d472cce000146bba",
+      "sha": "b5194e26a0cf93fc",
       "date": "2026-10-09"
     },
     "/groups/educators/": {
-      "sha": "72dddc8048df8ff3",
+      "sha": "3963fcf9592553ab",
       "date": "2026-10-09"
     },
     "/groups/electrical/": {
-      "sha": "57b70b8cd84a964f",
+      "sha": "1426d9d9c3d1c299",
       "date": "2026-10-09"
     },
     "/groups/field/": {
-      "sha": "292c02b975b2cf2c",
+      "sha": "56d183d5b08e9a5c",
       "date": "2026-10-09"
     },
     "/groups/fire-ground/": {
-      "sha": "04625bb824544fcf",
+      "sha": "69bd82e07d5c3b6f",
       "date": "2026-10-09"
     },
     "/groups/historical/": {
-      "sha": "20ad4b5f78ca778e",
+      "sha": "ad4e6af143b923a3",
       "date": "2026-10-09"
     },
     "/groups/hvac/": {
-      "sha": "206f69cc93f8945e",
+      "sha": "c36c6d4edf62ef6b",
       "date": "2026-10-09"
     },
     "/groups/kitchen/": {
-      "sha": "3c7c9bb68dd3436d",
+      "sha": "46e20ee097be287e",
       "date": "2026-10-09"
     },
     "/groups/lab/": {
-      "sha": "8de67aa59c114d88",
+      "sha": "be34cebeaa080bd0",
       "date": "2026-10-09"
     },
     "/groups/mechanic/": {
-      "sha": "8e37b9f72b066b7e",
+      "sha": "2f76101f7ee235d9",
       "date": "2026-10-09"
     },
     "/groups/plumbing/": {
-      "sha": "a3af53ac1ba19057",
+      "sha": "6bb9372a7c47e3a3",
       "date": "2026-10-09"
     },
     "/groups/real-estate/": {
-      "sha": "e392b5b1c1c3d459",
+      "sha": "6c22677f83bd4fdc",
       "date": "2026-10-09"
     },
     "/groups/references/": {
-      "sha": "bb3c3a5c5a1945a5",
+      "sha": "c31e8702a65fbb5e",
       "date": "2026-10-09"
     },
     "/groups/restoration/": {
-      "sha": "8bc525bc0a092854",
+      "sha": "8f273de368931835",
       "date": "2026-10-09"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "8f59b28dd99046d2",
+      "sha": "c00f0cf42dd1f79d",
       "date": "2026-10-09"
     },
     "/groups/stage/": {
-      "sha": "152a697b7c07cf76",
+      "sha": "92879851ad95357c",
       "date": "2026-10-09"
     },
     "/groups/trucking/": {
-      "sha": "3b964023727afdcf",
+      "sha": "34b9a6732fc06ebc",
       "date": "2026-10-09"
     },
     "/groups/water/": {
-      "sha": "d2c7d7b73c6722ec",
+      "sha": "654be1b50e9ac855",
       "date": "2026-10-09"
     },
     "/tools/aav-install-check/": {
@@ -4297,6 +4297,10 @@
       "sha": "ab6f705309461992",
       "date": "2026-09-29"
     },
+    "/tools/lift-bag-sizing/": {
+      "sha": "e1e0a1b7f63192cb",
+      "date": "2026-10-09"
+    },
     "/tools/lift-station-outage-storage/": {
       "sha": "15b407716f2c883e",
       "date": "2026-10-01"
@@ -5006,8 +5010,8 @@
       "date": "2026-10-03"
     },
     "/tools/niosh-lifting/": {
-      "sha": "d3763de81945e2db",
-      "date": "2026-09-29"
+      "sha": "1e702258b4d4d07f",
+      "date": "2026-10-09"
     },
     "/tools/nitrogen-pressure-test/": {
       "sha": "f096402417c47c5f",

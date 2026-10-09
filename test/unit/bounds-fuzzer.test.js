@@ -58904,3 +58904,14 @@ test("bounds: plume-rise-briggs stable classes use 2.6 (F/(u s))^(1/3)", () => {
   assert.ok(Math.abs(_prbS({ ...b, wind_mph: 24, stability_class: "F" }).plume_rise_ft * Math.cbrt(2) - f.plume_rise_ft) < 1e-6);
   assert.ok("error" in _prbS({ ...b, stability_class: "G" }));
 });
+
+import { computeLiftBagSizing as _lbs } from "../../calc-diving.js";
+test("bounds: lift-bag-sizing displaces the in-water weight and scales air with absolute pressure", () => {
+  const r = _lbs({ object_weight_lb: 1000, object_density_lb_ft3: 490, water_density_lb_ft3: 64, depth_ft: 2 * 2116.2 / 64, bag_rating_lb: 500 });
+  assert.ok(Math.abs(r.bag_volume_cuft * 64 - r.in_water_weight_lb) < 1e-9);
+  assert.ok(Math.abs(r.surface_air_cuft - 3 * r.bag_volume_cuft) < 1e-9); // two atmospheres of seawater = 3 ata
+  assert.equal(_lbs({ object_weight_lb: 1000, object_density_lb_ft3: 490, depth_ft: 0 }).surface_air_cuft, _lbs({ object_weight_lb: 1000, object_density_lb_ft3: 490, depth_ft: 0 }).bag_volume_cuft);
+  assert.ok(_lbs({ object_weight_lb: 1000, breakout_lb: 1000, depth_ft: 33 }).bag_volume_cuft > r.bag_volume_cuft);
+  assert.ok("error" in _lbs({ object_weight_lb: 1000, object_density_lb_ft3: 40, depth_ft: 10 }));
+  assert.ok("error" in _lbs({ object_weight_lb: 1000, water_density_lb_ft3: 8.34, depth_ft: 10 }));
+});

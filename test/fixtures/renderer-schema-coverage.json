@@ -1,7 +1,7 @@
 {
   "note": "spec-v1184 coverage ratchet. Tiles whose renderer exposes a render.schema consistent with the compute function. Grow with `node scripts/check-renderer-schema.mjs --write`; regeneration is intentional.",
-  "total_tiles": 2250,
-  "covered_count": 2171,
+  "total_tiles": 2251,
+  "covered_count": 2172,
   "covered": [
     "aav-install-check",
     "abatement-containment",
@@ -1010,6 +1010,7 @@
     "lfg-flare-capacity",
     "lidar-point-density",
     "lifeline-tension",
+    "lift-bag-sizing",
     "lift-station-outage-storage",
     "lifting-lug-design",
     "ligation-molar-ratio",

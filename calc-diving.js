@@ -485,3 +485,53 @@ DIVING_RENDERERS["chamber-gas-volume"] = _simpleRenderer({
   ],
   compute: computeChamberGasVolume,
 });
+
+// spec-v1947: lift bag sizing for underwater recovery (Archimedes plus Boyle's law, as in the U.S. Navy Salvage
+// Manual's buoyancy method). In-water weight = weight in air x (1 - water density / object density); the bag must
+// displace that weight of water; the air to fill it at depth, as surface (free) air, is the volume x (D + Dw)/Dw with
+// Dw = 2,116.2 / rho_water ft per atmosphere (33.07 ft of seawater, 33.9 ft of fresh).
+// dims: in { object_weight_lb: M L T^-2, object_density_lb_ft3: M L^-3, water_density_lb_ft3: M L^-3, depth_ft: L, bag_rating_lb: M L T^-2, breakout_lb: M L T^-2 } out: { in_water_weight_lb: M L T^-2, required_lift_lb: M L T^-2, bag_volume_cuft: L^3, surface_air_cuft: L^3, bags_needed: dimensionless }
+export function computeLiftBagSizing({ object_weight_lb = 0, object_density_lb_ft3 = 490, water_density_lb_ft3 = 64, depth_ft = 0, bag_rating_lb = 0, breakout_lb = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const W = Number(object_weight_lb) || 0, rhoObj = Number(object_density_lb_ft3) || 0, D = Number(depth_ft) || 0;
+  const rating = Number(bag_rating_lb) || 0, breakout = Number(breakout_lb) || 0;
+  const rhoW = Number(water_density_lb_ft3) || 0;
+  if (!(rhoW >= 60 && rhoW <= 66)) return { error: "Water density must be about 62.4 (fresh) to 64 (sea) lb/cu ft." };
+  // One atmosphere (14.696 psi = 2,116.2 lb/sq ft) of water column.
+  const dw = 2116.2 / rhoW;
+  if (!(W > 0)) return { error: "Object weight in air must be positive (lb)." };
+  if (!(rhoObj > rhoW)) return { error: "The object must be denser than the water (" + rhoW + " lb/cu ft) to need lifting; steel is about 490, aluminum 169, concrete 150." };
+  if (D < 0) return { error: "Depth cannot be negative (ft)." };
+  if (rating < 0 || breakout < 0) return { error: "Bag rating and breakout force cannot be negative (lb; blank to skip)." };
+  const in_water_weight_lb = W * (1 - rhoW / rhoObj);
+  const required_lift_lb = in_water_weight_lb + breakout;
+  const bag_volume_cuft = required_lift_lb / rhoW;
+  const surface_air_cuft = bag_volume_cuft * (D + dw) / dw;
+  const bags_needed = rating > 0 ? Math.ceil(required_lift_lb / rating - 1e-9) : 0;
+  if (![in_water_weight_lb, bag_volume_cuft, surface_air_cuft].every(Number.isFinite)) return { error: "Lift-bag math is not a finite value; check the inputs." };
+  return {
+    in_water_weight_lb, required_lift_lb, bag_volume_cuft, surface_air_cuft, bags_needed, water_density: rhoW, has_rating: rating > 0,
+    note: "Lifting an object off the bottom with air bags. Underwater the object weighs less by the water it displaces: its in-water weight is the weight in air times (1 - water density / object density), about 87% for steel in seawater and only a third for concrete. The bags must displace that weight of water (64 lb per cu ft of seawater, 62.4 fresh), plus any breakout force to free the object from mud suction, which can equal or exceed its weight and is the usual reason a lift fails or lets go suddenly. Filling the bags at depth takes the bag volume times the absolute pressure in atmospheres as free air. The air expands as the bag rises: a bag that just lifts at depth gains buoyancy all the way up and can run away to the surface, so lift on open-bottom bags that vent, use dump valves, and rig the load so it cannot capsize. Not a lift plan; the dive supervisor and the U.S. Navy Salvage Manual govern.",
+  };
+}
+export const liftBagSizingExample = { inputs: { object_weight_lb: 1000, object_density_lb_ft3: 490, water_density_lb_ft3: 64, depth_ft: 66, bag_rating_lb: 500, breakout_lb: 0 } };
+DIVING_RENDERERS["lift-bag-sizing"] = _simpleRenderer({
+  citation: "Citation: buoyancy (Archimedes) and Boyle's law as the U.S. Navy Salvage Manual applies them, by name: in-water weight = W (1 - rho_water / rho_object); bag displacement = (in-water weight + breakout) / rho_water, 64 lb/cu ft seawater, 62.4 fresh; free air to fill at depth = volume x (D + Dw)/Dw with Dw = 2,116.2/rho_water ft per atmosphere (33.07 ft seawater). Not a lift plan; the dive supervisor governs.",
+  example: liftBagSizingExample.inputs,
+  fields: [
+    { key: "object_weight_lb", label: "Object weight in air (lb)", kind: "number" },
+    { key: "object_density_lb_ft3", label: "Object density (lb/cu ft; steel 490, aluminum 169, concrete 150)", kind: "number", default: 490, attrs: { step: "any", value: "490" } },
+    { key: "water_density_lb_ft3", label: "Water density (lb/cu ft; 64 sea, 62.4 fresh)", kind: "number", default: 64, attrs: { step: "any", value: "64" } },
+    { key: "depth_ft", label: "Depth of the bags (ft)", kind: "number" },
+    { key: "bag_rating_lb", label: "Rated lift of one bag (lb, blank to skip)", kind: "number" },
+    { key: "breakout_lb", label: "Breakout force for bottom suction (lb, 0 if free)", kind: "number" },
+  ],
+  outputs: [
+    { key: "w", id: "lbs-out-w", label: "Lift needed", value: (r) => fmt(r.required_lift_lb, 0) + " lb (in-water weight " + fmt(r.in_water_weight_lb, 0) + " lb)" },
+    { key: "v", id: "lbs-out-v", label: "Bag displacement", value: (r) => fmt(r.bag_volume_cuft, 1) + " cu ft of water displaced" },
+    { key: "a", id: "lbs-out-a", label: "Air to fill at depth", value: (r) => fmt(r.surface_air_cuft, 1) + " cu ft of free (surface) air" },
+    { key: "b", id: "lbs-out-b", label: "Bags", value: (r) => (r.has_rating ? r.bags_needed + " bags at that rating" : "enter a bag rating") },
+    { key: "n", id: "lbs-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeLiftBagSizing,
+});
