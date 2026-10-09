@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "d893f67a55c389f3",
+      "sha": "4a27af3823cc7682",
       "date": "2026-10-09"
     },
     "/tools/": {
@@ -958,8 +958,8 @@
       "date": "2026-09-29"
     },
     "/tools/capacitor-bank-voltage-rise/": {
-      "sha": "a22500bf6ca66ba5",
-      "date": "2026-09-29"
+      "sha": "ef30437414c65b1e",
+      "date": "2026-10-09"
     },
     "/tools/capacitor-discharge-time/": {
       "sha": "6d9c1dffc7318f39",
@@ -1866,8 +1866,8 @@
       "date": "2026-09-29"
     },
     "/tools/counterpoise-resistance/": {
-      "sha": "9b53cc4cedd0fce0",
-      "date": "2026-10-03"
+      "sha": "8d9742f8242d1b91",
+      "date": "2026-10-09"
     },
     "/tools/countersink-depth/": {
       "sha": "32fc50cd68587fe3",
@@ -2262,8 +2262,8 @@
       "date": "2026-10-03"
     },
     "/tools/dock-piling-lateral/": {
-      "sha": "678f73b70838527e",
-      "date": "2026-10-03"
+      "sha": "7ea760e259f85595",
+      "date": "2026-10-09"
     },
     "/tools/door-clear-width/": {
       "sha": "1fcf310266555eb4",
