@@ -2128,6 +2128,7 @@ export const COMPUTE_MAP = {
   "pool-pump-speed-savings": { module: "../../calc-pool.js", fn: "computePoolPumpSpeedSavings" },
   "pool-heat-pump-capacity": { module: "../../calc-pool.js", fn: "computePoolHeatPumpCapacity" },
   "spa-drain-interval": { module: "../../calc-pool.js", fn: "computeSpaDrainInterval" },
+  "pool-evaporation-rate": { module: "../../calc-pool.js", fn: "computePoolEvaporationRate" },
   "transmitter-span-scaling": { module: "../../calc-controls.js", fn: "computeTransmitterSpanScaling" },
   "deadband-cycling-rate": { module: "../../calc-controls.js", fn: "computeDeadbandCyclingRate" },
   "trend-log-storage": { module: "../../calc-controls.js", fn: "computeTrendLogStorage" },

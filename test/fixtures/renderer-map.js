@@ -1821,6 +1821,7 @@ export const RENDERER_MAP = {
   "pool-pump-speed-savings": { module: "../../calc-pool.js", exportName: "POOL_RENDERERS" },
   "pool-heat-pump-capacity": { module: "../../calc-pool.js", exportName: "POOL_RENDERERS" },
   "spa-drain-interval": { module: "../../calc-pool.js", exportName: "POOL_RENDERERS" },
+  "pool-evaporation-rate": { module: "../../calc-pool.js", exportName: "POOL_RENDERERS" },
   "dilution-ventilation-solvent": { module: "../../calc-hygiene.js", exportName: "HYGIENE_RENDERERS" },
   "respirator-cartridge-life": { module: "../../calc-hygiene.js", exportName: "HYGIENE_RENDERERS" },
   "arc-rated-clothing-selection": { module: "../../calc-hygiene.js", exportName: "HYGIENE_RENDERERS" },

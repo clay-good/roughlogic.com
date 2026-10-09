@@ -293,7 +293,7 @@ export function computeGasPipelineFlow({
 }
 export const gasPipelineFlowExample = { inputs: { equation: "panhandle_a", id_in: 15.5, length_mi: 42, inlet_psig: 850, outlet_psig: 600, gravity: 0.60, flowing_temp_f: 60, z_factor: 1.0, efficiency: 0.92, alternate_id_in: 19.25 } };
 OILGAS_RENDERERS["gas-pipeline-flow"] = _simpleRenderer({
-  citation: "Citation: the Weymouth and Panhandle A gas transmission equations as published for SCF/day -- Weymouth Q = 433.5 (Tb/Pb) [(P1^2 - P2^2)/(G T L Z)]^0.5 d^2.667 E, Panhandle A Q = 435.87 (Tb/Pb)^1.0788 [(P1^2 - P2^2)/(G^0.8539 T L Z)]^0.5394 d^2.6182 E, with diameter in inches, length in miles, temperature in degrees Rankine and pressure in psia at a 14.73 psia and 520 degR base. Gauge pressures convert at 14.7 psi. Compressibility and efficiency are ENTERED. A steady-state, isothermal, single-phase screen at uniform elevation: it does not handle elevation change, two-phase flow, transients and line pack, or compressor hydraulics. The operator's own hydraulic model governs.",
+  citation: "Citation: the Weymouth and Panhandle A gas transmission equations as published for SCF/day -- Weymouth Q = 433.5 (Tb/Pb) [(P1^2 - P2^2)/(G T L Z)]^0.5 d^2.667 E, Panhandle A Q = 435.87 (Tb/Pb)^1.0788 [(P1^2 - P2^2)/(G^0.8539 T L Z)]^0.5394 d^2.6182 E, with diameter in inches, length in miles, temperature in degrees Rankine and pressure in psia at a 14.73 psia and 520 degR base. Gauge pressures convert at 14.7 psi. Efficiency is ENTERED; compressibility is entered or computed from the gas gravity at the average line pressure (gas-z-factor). A steady-state, isothermal, single-phase screen at uniform elevation: it does not handle elevation change, two-phase flow, transients and line pack, or compressor hydraulics. The operator's own hydraulic model governs.",
   example: gasPipelineFlowExample.inputs,
   fields: [
     { key: "equation", label: "Equation", kind: "select", default: "panhandle_a", options: [{ value: "panhandle_a", label: "Panhandle A (long, large-diameter transmission)" }, { value: "weymouth", label: "Weymouth (short, smaller diameter, rough pipe)" }] },
@@ -1481,7 +1481,7 @@ OILGAS_RENDERERS["tank-vent-api-2000"] = _simpleRenderer({
 OILGAS_RENDERERS["separator-retention-sizing"] = _simpleRenderer({
   compute: computeSeparatorRetentionSizing,
   example: separatorRetentionSizingExample.inputs,
-  citation: "Citation: liquid retention = liquid volume / flow rate; the gas limit is the Souders-Brown settling velocity v = K sqrt((rho_L - rho_G)/rho_G) with the gas density from PM/(ZRT), compared against the actual velocity across the vapour space. The K factor, the retention time and the compressibility factor are ENTERED. API 12J and the design engineer govern.",
+  citation: "Citation: liquid retention = liquid volume / flow rate; the gas limit is the Souders-Brown settling velocity v = K sqrt((rho_L - rho_G)/rho_G) with the gas density from PM/(ZRT), compared against the actual velocity across the vapour space. The K factor and the retention time are ENTERED; the compressibility factor is entered or computed from the gas gravity at the operating pressure and temperature (gas-z-factor). API 12J and the design engineer govern.",
   fields: [
     { key: "vessel_diameter_ft", label: "Vessel diameter (ft)" },
     { key: "seam_to_seam_ft", label: "Seam-to-seam length (ft)" },

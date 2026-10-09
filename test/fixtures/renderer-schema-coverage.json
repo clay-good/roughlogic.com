@@ -1,7 +1,7 @@
 {
   "note": "spec-v1184 coverage ratchet. Tiles whose renderer exposes a render.schema consistent with the compute function. Grow with `node scripts/check-renderer-schema.mjs --write`; regeneration is intentional.",
-  "total_tiles": 2253,
-  "covered_count": 2177,
+  "total_tiles": 2254,
+  "covered_count": 2178,
   "covered": [
     "aav-install-check",
     "abatement-containment",
@@ -1328,6 +1328,7 @@
     "pool-chlorine-dose",
     "pool-cover-evaporation",
     "pool-cya-dose",
+    "pool-evaporation-rate",
     "pool-heat-pump-capacity",
     "pool-heater-btu",
     "pool-heater-size",

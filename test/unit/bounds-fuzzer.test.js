@@ -59146,3 +59146,22 @@ test("bounds: pipe-insulation-for-condensation computed film is the bare-pipe va
   assert.ok(_pifcF({ ...b, film_mode: "computed", jacket_emissivity: 0.1 }).thickness_in > _pifcF({ ...b, film_mode: "computed", jacket_emissivity: 0.9 }).thickness_in);
   assert.ok("error" in _pifcF({ ...b, film_mode: "computed", jacket_emissivity: 0 }));
 });
+
+import { computePoolEvaporationRate as _perE } from "../../calc-pool.js";
+test("bounds: pool-evaporation-rate follows the ASHRAE and Carrier forms", () => {
+  const b = { surface_area_ft2: 1000, water_temp_f: 82, air_temp_f: 84, rh_pct: 50, setting: "indoor", activity_factor: "0.8", wind_mph: 0 };
+  const r = _perE(b);
+  assert.ok(Math.abs(r.evaporation_lb_hr - 0.1 * 1000 * (r.pw_inhg - r.pa_inhg) * 0.8) < 1e-9);
+  // Outdoors at no wind the Carrier form is 95/1046 = 0.0908 of the same difference.
+  const o = _perE({ ...b, setting: "outdoor" });
+  assert.ok(Math.abs(o.evaporation_lb_hr - 1000 * (r.pw_inhg - r.pa_inhg) * 95 / 1046) < 1e-9);
+  assert.ok(_perE({ ...b, setting: "outdoor", wind_mph: 10 }).evaporation_lb_hr > o.evaporation_lb_hr);
+  // Drier air and warmer water evaporate more; saturated warmer air condenses (0, not negative).
+  assert.ok(_perE({ ...b, rh_pct: 30 }).evaporation_lb_hr > r.evaporation_lb_hr);
+  const c = _perE({ ...b, water_temp_f: 80, rh_pct: 100 });
+  assert.equal(c.evaporation_lb_hr, 0);
+  assert.equal(c.condensing, true);
+  for (const bad of [{ surface_area_ft2: 0 }, { water_temp_f: 30 }, { rh_pct: 120 }, { activity_factor: "2" }, { setting: "roof" }, { wind_mph: -1 }]) {
+    assert.ok("error" in _perE({ ...b, ...bad }));
+  }
+});

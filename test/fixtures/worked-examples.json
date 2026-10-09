@@ -169979,6 +169979,76 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "pool-evaporation-rate",
+  "source_publisher": "ASHRAE Handbook -- HVAC Applications, Ch. 6 (Carrier equation)",
+  "source_title": "1,000 sq ft hotel pool, 82 F water, 84 F 50% RH air",
+  "source_edition_or_year": "natatorium evaporation, Fa 0.8",
+  "source_section_or_page": "pw(82 F) = 1.100 in. Hg, pa = 0.5 x 1.173 = 0.587 in. Hg (Magnus); W = 0.1 x 1000 x 0.513 x 0.8 = 41.06 lb/h; 118.2 gal/day; 0.1896 in/day; 42,950 BTU/h",
+  "verified_by": "rl",
+  "verified_on": "2026-10-09",
+  "inputs": {
+   "surface_area_ft2": 1000,
+   "water_temp_f": 82,
+   "air_temp_f": 84,
+   "rh_pct": 50,
+   "setting": "indoor",
+   "activity_factor": "0.8",
+   "wind_mph": 0
+  },
+  "outputs": {
+   "evaporation_lb_hr": {
+    "value": 41.06,
+    "tolerance": {
+     "pct": 1
+    }
+   },
+   "evaporation_gal_day": {
+    "value": 118.2,
+    "tolerance": {
+     "pct": 1
+    }
+   },
+   "evaporation_in_day": {
+    "value": 0.1896,
+    "tolerance": {
+     "pct": 1
+    }
+   }
+  }
+ },
+ {
+  "tile_id": "pool-evaporation-rate",
+  "source_publisher": "Carrier outdoor pool evaporation (as given in ASHRAE chapter presentations)",
+  "source_title": "Same pool outdoors in a 5 mph wind",
+  "source_edition_or_year": "W = A (pw - pa)(95 + 0.425 V)/Y",
+  "source_section_or_page": "V = 440 fpm; W = 1000 x 0.5133 x (95 + 187)/1046 = 138.4 lb/h; 0.639 in/day",
+  "verified_by": "rl",
+  "verified_on": "2026-10-09",
+  "inputs": {
+   "surface_area_ft2": 1000,
+   "water_temp_f": 82,
+   "air_temp_f": 84,
+   "rh_pct": 50,
+   "setting": "outdoor",
+   "activity_factor": "1.0",
+   "wind_mph": 5
+  },
+  "outputs": {
+   "evaporation_lb_hr": {
+    "value": 138.4,
+    "tolerance": {
+     "pct": 1
+    }
+   },
+   "evaporation_in_day": {
+    "value": 0.6388,
+    "tolerance": {
+     "pct": 1
+    }
+   }
+  }
  }
  ]
 }

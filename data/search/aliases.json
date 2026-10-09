@@ -116872,6 +116872,31 @@
    "term": "what discharge coefficient does my orifice plate have",
    "target": "orifice-discharge-coefficient",
    "kind": "question"
+  },
+  {
+   "term": "pool evaporation rate",
+   "target": "pool-evaporation-rate",
+   "kind": "industry"
+  },
+  {
+   "term": "natatorium evaporation",
+   "target": "pool-evaporation-rate",
+   "kind": "industry"
+  },
+  {
+   "term": "pool water loss from evaporation",
+   "target": "pool-evaporation-rate",
+   "kind": "industry"
+  },
+  {
+   "term": "how much water does my pool evaporate",
+   "target": "pool-evaporation-rate",
+   "kind": "question"
+  },
+  {
+   "term": "pool dehumidification load",
+   "target": "pool-evaporation-rate",
+   "kind": "industry"
   }
  ]
 }

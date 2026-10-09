@@ -21,6 +21,7 @@ import {
   DEBOUNCE_MS, debounce, makeNumber, makeSelect,
   makeOutputLine, attachExampleButton, fmt,
 } from "./ui-fields.js";
+import { saturationVaporPressure_hPa, dewPointFromVaporPressure_C } from "./pure-math.js";
 const _finiteGuard = (o) => {
   if (o && typeof o === "object" && !Array.isArray(o)) {
     for (const v of Object.values(o)) {
@@ -421,4 +422,77 @@ POOL_RENDERERS["spa-drain-interval"] = _simpleRenderer({
     { key: "n", id: "sdi-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeSpaDrainInterval,
+});
+
+// =====================================================================
+// spec-v1950: pool evaporation rate from water and air conditions.
+// =====================================================================
+// pool-cover-evaporation takes the evaporation rate as ENTERED; this estimates it.
+// Indoor (natatorium): ASHRAE HVAC Applications Ch. 6 (Carrier), W = 0.1 A (pw - pa) Fa lb/h, with pw the
+// saturation pressure at the water temperature and pa the room vapor pressure (in. Hg), Fa the activity factor.
+// Outdoor: the Carrier form with the air velocity, W = A (pw - pa)(95 + 0.425 V)/Y, V in fpm and Y the latent
+// heat (BTU/lb); at V = 0 it is the 0.1 coefficient. Vapor pressures from the catalog's Magnus functions.
+const _POOL_HPA_PER_INHG = 33.86389;
+// dims: in { surface_area_ft2: L^2, water_temp_f: T, air_temp_f: T, rh_pct: dimensionless, setting: dimensionless, activity_factor: dimensionless, wind_mph: L T^-1 } out: { evaporation_lb_hr: M T^-1, evaporation_gal_day: L^3 T^-1, evaporation_in_day: L T^-1, latent_load_btuh: M L^2 T^-3, pw_inhg: M L^-1 T^-2, pa_inhg: M L^-1 T^-2 }
+export function computePoolEvaporationRate({
+  surface_area_ft2 = 0, water_temp_f = 0, air_temp_f = 0, rh_pct = 50,
+  setting = "indoor", activity_factor = "1.0", wind_mph = 0,
+} = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const A = Number(surface_area_ft2), tw = Number(water_temp_f), ta = Number(air_temp_f), rh = Number(rh_pct), v = Number(wind_mph) || 0;
+  const fa = Number(activity_factor);
+  if (!(A > 0)) return { error: "Pool surface area must be greater than zero (sq ft)." };
+  if (!(tw > 32 && tw < 140)) return { error: "Water temperature must be above 32 F and below 140 F." };
+  if (!(ta > -40 && ta < 140)) return { error: "Air temperature must be between -40 F and 140 F." };
+  if (!(rh >= 0 && rh <= 100)) return { error: "Relative humidity must be 0 to 100 percent." };
+  if (setting !== "indoor" && setting !== "outdoor") return { error: "Setting must be indoor or outdoor." };
+  if (setting === "indoor" && !(fa > 0 && fa <= 1.5)) return { error: "Activity factor must be above 0 and at most 1.5." };
+  if (v < 0) return { error: "Wind speed cannot be negative (mph)." };
+  const toC = (f) => (f - 32) * 5 / 9;
+  const pw_inhg = saturationVaporPressure_hPa(toC(tw)) / _POOL_HPA_PER_INHG;
+  const pa_inhg = saturationVaporPressure_hPa(toC(ta)) * rh / 100 / _POOL_HPA_PER_INHG;
+  const dp = pw_inhg - pa_inhg;
+  const wind_fpm = v * 88;
+  const raw = setting === "indoor"
+    ? 0.1 * A * dp * fa
+    : A * dp * (95 + 0.425 * wind_fpm) / _POOL_LATENT_BTU_PER_LB;
+  const condensing = dp <= 1e-12; // round-off: equal water and saturated-air temperatures land within 1e-15
+  const evaporation_lb_hr = condensing ? 0 : raw;
+  const evaporation_gal_day = evaporation_lb_hr * 24 / _POOL_LB_PER_GAL;
+  const evaporation_in_day = evaporation_gal_day / _POOL_GAL_PER_CU_FT / A * 12;
+  const latent_load_btuh = evaporation_lb_hr * _POOL_LATENT_BTU_PER_LB;
+  if (![pw_inhg, pa_inhg, evaporation_lb_hr, evaporation_gal_day, evaporation_in_day, latent_load_btuh].every(Number.isFinite)) return { error: "Evaporation math is not a finite value." };
+  const dew_f = dewPointFromVaporPressure_C(Math.max(1e-6, saturationVaporPressure_hPa(toC(ta)) * rh / 100)) * 9 / 5 + 32;
+  const rate_verdict = condensing
+    ? "NO EVAPORATION: the air's vapor pressure (" + fmt(pa_inhg, 3) + " in. Hg) is at or above the water's (" + fmt(pw_inhg, 3) + "), so moisture condenses onto the water instead (the air dew point, " + fmt(dew_f, 0) + " F, is at or above the water)"
+    : fmt(evaporation_lb_hr, 1) + " lb/h, " + fmt(evaporation_gal_day, 0) + " gal/day, " + fmt(evaporation_in_day, 3) + " in of water a day off " + fmt(A, 0) + " sq ft (vapor pressures " + fmt(pw_inhg, 3) + " in. Hg at the water and " + fmt(pa_inhg, 3) + " in the air)";
+  const load_verdict = condensing
+    ? "no latent load from the pool"
+    : fmt(latent_load_btuh, 0) + " BTU/h of latent heat leaves the water; " + (setting === "indoor" ? "that moisture is what a natatorium dehumidifier must remove, and the heat comes out of the pool" : "that heat comes out of the pool and is usually its largest loss");
+  return {
+    evaporation_lb_hr, evaporation_gal_day, evaporation_in_day, latent_load_btuh, pw_inhg, pa_inhg, condensing,
+    rate_verdict, load_verdict,
+    note: "Evaporation from a pool surface from the vapor-pressure difference between the water and the air. Indoors this is the ASHRAE (Carrier) natatorium equation W = 0.1 A (pw - pa) Fa, with an activity factor for how the pool is used: 0.5 residential or unoccupied, 0.65 condominium or therapy, 0.8 hotel, 1.0 public, school or whirlpool, 1.5 wave pool or water slides. Outdoors the Carrier form adds the air velocity over the water, W = A (pw - pa)(95 + 0.425 V)/Y, which at no wind is the same 0.1 coefficient, so wind is what makes an outdoor pool lose several times an indoor one. The difference is the water's saturation pressure against the air's actual vapor pressure, so warm water under dry air evaporates fastest, and raising the room temperature or humidity of a natatorium cuts evaporation. The in/day figure is the rate pool-cover-evaporation asks for. These are design estimates: ASHRAE notes the equation can deviate substantially from measurements (a mean deviation over 30% has been reported), the activity factors are judgment, and an outdoor pool also loses heat to radiation and convection, which this does not compute. The mechanical engineer and measured make-up water govern.",
+  };
+}
+export const poolEvaporationRateExample = { inputs: { surface_area_ft2: 1000, water_temp_f: 82, air_temp_f: 84, rh_pct: 50, setting: "indoor", activity_factor: "0.8", wind_mph: 0 } };
+
+POOL_RENDERERS["pool-evaporation-rate"] = _simpleRenderer({
+  citation: "Citation: ASHRAE Handbook -- HVAC Applications, Ch. 6 (Natatoriums), evaporation W = 0.1 A (pw - pa) Fa lb/h (the Carrier equation), and the Carrier outdoor form W = A (pw - pa)(95 + 0.425 V)/Y with V in fpm, by name; pw and pa in in. Hg from the Magnus saturation curve. A design estimate; measured make-up water governs.",
+  example: poolEvaporationRateExample.inputs,
+  fields: [
+    { key: "surface_area_ft2", label: "Pool surface area (ft²)", kind: "number", attrs: { step: "any" } },
+    { key: "water_temp_f", label: "Water temperature (°F)", kind: "number", attrs: { step: "any" } },
+    { key: "air_temp_f", label: "Air temperature (°F)", kind: "number", attrs: { step: "any" } },
+    { key: "rh_pct", label: "Relative humidity (%)", kind: "number", default: 50, attrs: { step: "any" } },
+    { key: "setting", label: "Setting", kind: "select", default: "indoor", options: [{ value: "indoor", label: "Indoor (ASHRAE natatorium equation)" }, { value: "outdoor", label: "Outdoor (Carrier, with wind)" }] },
+    { key: "activity_factor", label: "Activity factor (indoor)", kind: "select", default: "1.0", options: [{ value: "0.5", label: "0.5 residential or unoccupied" }, { value: "0.65", label: "0.65 condominium or therapy" }, { value: "0.8", label: "0.8 hotel" }, { value: "1.0", label: "1.0 public, school, or whirlpool" }, { value: "1.5", label: "1.5 wave pool or water slides" }] },
+    { key: "wind_mph", label: "Wind over the water (mph, outdoor)", kind: "number", attrs: { step: "any" } },
+  ],
+  outputs: [
+    { key: "evaporation_lb_hr", id: "per-out-r", label: "Evaporation", unit: "lb/h", value: (r) => r.rate_verdict },
+    { key: "latent_load_btuh", id: "per-out-l", label: "Latent load", unit: "BTU/h", value: (r) => r.load_verdict },
+    { key: "note", id: "per-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computePoolEvaporationRate,
 });

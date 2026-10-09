@@ -1511,7 +1511,7 @@ export const TOOL_MODULES = (() => {
   ]);
   declare("./calc-pool.js", "POOL_RENDERERS", [
     "pool-cover-evaporation", "pool-pump-speed-savings",
-    "pool-heat-pump-capacity", "spa-drain-interval",
+    "pool-heat-pump-capacity", "spa-drain-interval", "pool-evaporation-rate",
   ]);
   declare("./calc-hygiene.js", "HYGIENE_RENDERERS", [
     "dilution-ventilation-solvent", "respirator-cartridge-life",

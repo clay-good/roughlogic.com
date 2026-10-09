@@ -22732,6 +22732,17 @@ export const CITATIONS = {
   },
   // spec-v1701..v1704: the 2026-09-09 trade-expansion pool and spa service
   // band. Four tiles, nothing cut.
+  "pool-evaporation-rate": {
+    formula: "Indoor: W = 0.1 A (pw - pa) Fa lb/h; outdoor: W = A (pw - pa)(95 + 0.425 V)/Y lb/h, V = 88 x mph (fpm), Y = 1,046 BTU/lb; pw = e_s(T_water), pa = RH x e_s(T_air) in in. Hg (Magnus e_s in hPa / 33.86389); gal/day = 24 W/8.34; in/day = gal/day / 7.481 / A x 12; latent = W x 1,046 BTU/h.",
+    edition: "ASHRAE Handbook -- HVAC Applications, Chapter 6 (Places of Assembly, Natatoriums), the Carrier pool-evaporation equation and its activity factors, cited by name.",
+    freeAccess: "The equation and activity factors are reproduced in free ASHRAE chapter presentations and design guides (for example the Rocky Mountain ASHRAE natatorium presentation, which gives the Carrier wind form); the temperatures, humidity and area are the user's inputs.",
+    governance: GOVERNANCE.general,
+    editionNote: "A design estimate: published comparisons with measured data show the ASHRAE method can deviate substantially (a mean deviation over 30% has been reported), and the activity factors are judgment values. Indoor activity factors: 0.5 residential/unoccupied, 0.65 condominium/therapy, 0.8 hotel, 1.0 public/school/whirlpool, 1.5 wave pool/slides. The outdoor form omits radiation and convection heat loss.",
+    assumptions: [
+      { name: "Vapor pressures", value: "Magnus saturation curve (catalog pure-math), within about 0.5% of steam tables at pool temperatures", source: "pure-math.js" },
+      { name: "Condensing", value: "air vapor pressure at or above the water's: no evaporation, reported as 0", source: "physics" },
+    ],
+  },
   "pool-cover-evaporation": {
     formula: "evaporative loss = surface area x evaporation depth x 7.481 gal/ft^3 x 8.34 lb/gal x 1,046 BTU/lb of latent heat; a cover's saving is that loss times its effectiveness times the fraction of the day it is on, and the FUEL saving divides by the heater efficiency.",
     edition: "Pool evaporative heat loss on the latent heat of vaporisation. The evaporation RATE is ENTERED because it depends on wind speed, humidity and the water-to-air temperature difference together, and is by far the largest uncertainty in the result.",

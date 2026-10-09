@@ -847,6 +847,11 @@
     {"term":"time to overflow wet well","target":"lift-station-outage-storage","kind":"industry"},
     {"term":"sewage pump station storage","target":"lift-station-outage-storage","kind":"industry"},
     {"term":"vac truck pump and haul","target":"lift-station-outage-storage","kind":"industry"},
-    {"term":"lift station generator response time","target":"lift-station-outage-storage","kind":"industry"}
+    {"term":"lift station generator response time","target":"lift-station-outage-storage","kind":"industry"},
+    {"term":"pool evaporation rate","target":"pool-evaporation-rate","kind":"industry"},
+    {"term":"natatorium evaporation","target":"pool-evaporation-rate","kind":"industry"},
+    {"term":"pool water loss from evaporation","target":"pool-evaporation-rate","kind":"industry"},
+    {"term":"how much water does my pool evaporate","target":"pool-evaporation-rate","kind":"question"},
+    {"term":"pool dehumidification load","target":"pool-evaporation-rate","kind":"industry"}
   ]
 }

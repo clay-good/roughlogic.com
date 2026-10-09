@@ -1212,6 +1212,7 @@ const _TILES = [
   ["pool-pump-speed-savings", "M"],
   ["pool-heat-pump-capacity", "M"],
   ["spa-drain-interval", "M"],
+  ["pool-evaporation-rate", "M"],
   // spec-v1745..v1749 containment band
   ["radon-fan-static", "B"],
   ["sub-slab-suction-field", "B"],

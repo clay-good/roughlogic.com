@@ -3163,6 +3163,7 @@ cross-check.
 | calc-plumbingtakeoff.js | `computeSolarThermalCollector` | `{ optical_efficiency = 0.70, loss_coeff = 0.85, inlet_temp_f = 120, ambient_t...` | _ | _ | _ |
 | calc-plumbingtakeoff.js | `computeSolderJointQuantity` | `{ joints = 200, wire_in_per_joint = 0.75, wire_dia_in = 0.125, solder_density...` | _ | _ | _ |
 | calc-pool.js | `computePoolCoverEvaporation` | `{ surface_area_ft2 = 0, evaporation_in_day = 0, cover_effectiveness_pct = 90,...` | _ | _ | _ |
+| calc-pool.js | `computePoolEvaporationRate` | `{ surface_area_ft2 = 0, water_temp_f = 0, air_temp_f = 0, rh_pct = 50, settin...` | _ | _ | _ |
 | calc-pool.js | `computePoolHeatPumpCapacity` | `{ rated_capacity_btuh = 0, air_derate_factor = 1, humidity_derate_factor = 1,...` | _ | _ | _ |
 | calc-pool.js | `computePoolPumpSpeedSavings` | `{ pump_hp = 0, full_speed_hours = 0, speed_fraction = 0.5, electricity_rate_p...` | _ | _ | _ |
 | calc-pool.js | `computeSpaDrainInterval` | `{ spa_gallons = 0, daily_bathers = 0, days_since_drain = 0, alternative_bathe...` | _ | _ | _ |
@@ -3923,7 +3924,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2507.
+Row count: 2508.
 
 <!-- END function-corpus-v14 -->
 
@@ -5928,7 +5929,7 @@ per spec-v14 §13.1 second paragraph.
 | `two-stroke-mix-ratio-check` | Two-Stroke Mix Ratio Check | First-principles volume arithmetic (i...; spec-v653 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+5 more) |
 | `vapor-pressure-deficit` | Vapor Pressure Deficit at the Leaf | Project (first-principles); the crop's published VPD band governs | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group M Water and wastewater (90 tiles)
+### Group M Water and wastewater (91 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -5985,6 +5986,7 @@ per spec-v14 §13.1 second paragraph.
 | `pool-chlorine-dose` | Pool Free-Chlorine Dose by Product | pool-care practice; spec-v353 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `pool-cover-evaporation` | Pool Cover Evaporation and Heat Loss Savings | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `pool-cya-dose` | Pool Cyanuric Acid Dose | NSPF CPO Handbook / ANSI-APSP-ICC; spec-v93 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `pool-evaporation-rate` | Pool Evaporation Rate (ASHRAE / Carrier) | ASHRAE Handbook -- HVAC Applications,...; pw(82 F) = 1.100 in. Hg, pa = 0.5 x 1.173 = 0.587 in. Hg ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `pool-heat-pump-capacity` | Pool Heat Pump Capacity vs Air, Water, and Humidity | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `pool-heater-btu` | Pool Heater Sizing and Heat-Up Time | thermodynamics; spec-v354 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+4 more) |
 | `pool-heater-size` | Pool Heater Output for a Target Heat-Up Time | thermodynamics (inverse); spec-v677 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
@@ -6349,6 +6351,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 
-Tile count: 2253. Fixture-covered or reference-cadence: 2253 / 2253.
+Tile count: 2254. Fixture-covered or reference-cadence: 2254 / 2254.
 
 <!-- END tile-index-v14 -->
