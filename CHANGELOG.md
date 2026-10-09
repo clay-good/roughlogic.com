@@ -60,6 +60,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **`dp-flow-meter` can compute the orifice discharge coefficient.** A "Discharge coefficient" select now offers a square-edge orifice with flange, corner, or D and D/2 taps: Cd comes from the ISO 5167-2 Reader-Harris/Gallagher equation (`orifice-discharge-coefficient`), iterated with the Reynolds number the flow and a kinematic viscosity give. On the example 4 in line with a 2 in bore at 1 psi of water, flange taps give Cd = 0.6076 at Re 59,202 and 74.9 gpm, against 75.2 gpm at the entered 0.61. Entered Cd (the default) is unchanged. The `calc-velocity.js` gzip cap rises from 13,000 to 15,000 B for it.
+
 - **`separator-retention-sizing` can compute its own Z.** A "Compressibility Z" select now offers computed, which takes Z from the gas gravity at the operating pressure and temperature by the `gas-z-factor` method (Sutton + Dranchuk-Abou-Kassem). On the example 400 psig, 100 degF, 0.7-gravity gas it is Z = 0.936 against the 0.92 entered, so the gas density falls from 1.522 to 1.495 lb/cu ft. Entered Z (the default) is unchanged.
 
 - **`gas-pipeline-flow` can compute its own Z.** A "Compressibility Z" select now offers computed, which takes Z from the gas gravity at the standard average line pressure (2/3)(P1 + P2 - P1 P2/(P1 + P2)) and the flowing temperature by the `gas-z-factor` method (Sutton + Dranchuk-Abou-Kassem). On the example 850/600 psig line it is Z = 0.887 at 747 psia, and the Panhandle A flow rises from 142.7 to 152.3 MMSCFD over the Z = 1 entry. Entered Z (the default) is unchanged.

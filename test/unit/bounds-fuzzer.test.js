@@ -59057,3 +59057,19 @@ test("bounds: orifice-discharge-coefficient matches the fluids RHG value and fla
     assert.ok("error" in _odc({ ...b, ...bad }));
   }
 });
+
+import { computeDpFlowMeter as _dpfC } from "../../calc-velocity.js";
+test("bounds: dp-flow-meter computed Cd is the RHG value at the Reynolds number of its own flow", () => {
+  const b = { pipe_id_in: 4, bore_in: 2, dp_psi: 1, fluid_density_lb_ft3: 62.4, viscosity_cst: 1 };
+  for (const taps of ["flange", "corner", "d_d2"]) {
+    const r = _dpfC({ ...b, cd_mode: taps });
+    const c = _odc({ pipe_id_in: 4, bore_in: 2, taps, reynolds_number: r.reynolds_number });
+    assert.ok(Math.abs(c.discharge_coefficient - r.cd_used) < 1e-10);
+    // Entering that Cd reproduces the flow.
+    assert.ok(Math.abs(_dpfC({ ...b, cd: r.cd_used }).flow_gpm - r.flow_gpm) < 1e-9);
+  }
+  // A thicker liquid lowers Re and raises C.
+  assert.ok(_dpfC({ ...b, cd_mode: "flange", viscosity_cst: 20 }).cd_used > _dpfC({ ...b, cd_mode: "flange" }).cd_used);
+  assert.ok("error" in _dpfC({ ...b, cd_mode: "flange", viscosity_cst: -1 }));
+  assert.ok("error" in _dpfC({ ...b, cd_mode: "venturi" }));
+});

@@ -285,15 +285,21 @@ VELOCITY_RENDERERS["pitot-traverse-average"] = renderPitotTraverseAverage;
 // (incompressible) liquid, Q = Cd A2 sqrt( 2 dP / (rho (1 - beta^4)) ), with A2 the throat area, beta = d/D the
 // diameter ratio (the 1 - beta^4 term is the velocity-of-approach correction). Cd ~ 0.61 square-edge orifice,
 // ~0.98 venturi, ~0.97 flow nozzle (editable). Liquid only (an expansion factor Y is separate for gases).
-// dims: in { pipe_id_in: L, bore_in: L, dp_psi: M L^-1 T^-2, cd: dimensionless, fluid_density_lb_ft3: M L^-3 } out: { flow_gpm: L^3 T^-1, throat_velocity_fps: L T^-1, pipe_velocity_fps: L T^-1, beta_ratio: dimensionless }
-export function computeDpFlowMeter({ pipe_id_in = 0, bore_in = 0, dp_psi = 0, cd = 0.61, fluid_density_lb_ft3 = 62.4 } = {}) {
-  const D = Number(pipe_id_in), d = Number(bore_in), dp = Number(dp_psi), Cd = Number(cd), rhoUS = Number(fluid_density_lb_ft3);
-  if (![D, d, dp, Cd, rhoUS].every(Number.isFinite)) return { error: "All inputs must be finite numbers." };
+// Computed C added 2026-10-09: cd_mode "flange" / "corner" / "d_d2" takes C for a square-edge orifice from
+// orifice-discharge-coefficient (ISO 5167-2 Reader-Harris/Gallagher), iterated with Re = 4Q/(pi D nu) until it settles.
+// dims: in { pipe_id_in: L, bore_in: L, dp_psi: M L^-1 T^-2, cd: dimensionless, fluid_density_lb_ft3: M L^-3, cd_mode: dimensionless, viscosity_cst: L^2 T^-1 } out: { flow_gpm: L^3 T^-1, throat_velocity_fps: L T^-1, pipe_velocity_fps: L T^-1, beta_ratio: dimensionless, cd_used: dimensionless, reynolds_number: dimensionless }
+export function computeDpFlowMeter({ pipe_id_in = 0, bore_in = 0, dp_psi = 0, cd = 0.61, fluid_density_lb_ft3 = 62.4, cd_mode = "entered", viscosity_cst = 1 } = {}) {
+  const D = Number(pipe_id_in), d = Number(bore_in), dp = Number(dp_psi), rhoUS = Number(fluid_density_lb_ft3), nu = Number(viscosity_cst);
+  let Cd = Number(cd);
+  if (![D, d, dp, Cd, rhoUS, nu].every(Number.isFinite)) return { error: "All inputs must be finite numbers." };
+  if (!["entered", "flange", "corner", "d_d2"].includes(cd_mode)) return { error: "Discharge coefficient must be entered or computed for flange, corner, or D and D/2 taps." };
+  const computed = cd_mode !== "entered";
+  if (computed && !(nu > 0)) return { error: "Kinematic viscosity must be positive (cSt; water at 68 F is about 1.0)." };
   if (!(D > 0)) return { error: "Pipe inside diameter must be positive (in)." };
   if (!(d > 0)) return { error: "Bore / throat diameter must be positive (in)." };
   if (!(d < D)) return { error: "The bore diameter must be smaller than the pipe inside diameter." };
   if (!(dp > 0)) return { error: "Differential pressure must be positive (psi)." };
-  if (!(Cd > 0) || Cd > 1.2) return { error: "Discharge coefficient must be between 0 and 1.2 (orifice ~0.61, venturi ~0.98)." };
+  if (!computed && (!(Cd > 0) || Cd > 1.2)) return { error: "Discharge coefficient must be between 0 and 1.2 (orifice ~0.61, venturi ~0.98)." };
   if (!(rhoUS > 0)) return { error: "Fluid density must be positive (lb/ft^3)." };
   const D_m = D * 0.0254, d_m = d * 0.0254;
   const A2 = Math.PI / 4 * d_m * d_m; // throat area, m^2
@@ -301,14 +307,29 @@ export function computeDpFlowMeter({ pipe_id_in = 0, bore_in = 0, dp_psi = 0, cd
   const beta = d / D;
   const dp_pa = dp * 6894.757293168361;
   const rho = rhoUS * (0.45359237 / (0.3048 * 0.3048 * 0.3048)); // kg/m^3
-  const q_m3s = Cd * A2 * Math.sqrt(2 * dp_pa / (rho * (1 - Math.pow(beta, 4))));
+  const q_per_cd = A2 * Math.sqrt(2 * dp_pa / (rho * (1 - Math.pow(beta, 4))));
+  let reynolds_number = null;
+  if (computed) {
+    // C depends on Re, which depends on the flow C gives: start at 0.6 and repeat; C moves a few parts in 10^4.
+    Cd = 0.6;
+    for (let i = 0; i < 50; i++) {
+      const re = 4 * Cd * q_per_cd / (Math.PI * D_m * nu * 1e-6);
+      const c = computeOrificeDischargeCoefficient({ pipe_id_in: D, bore_in: d, taps: cd_mode, reynolds_number: re });
+      if (c.error) return { error: "Computed discharge coefficient: " + c.error };
+      const settled = Math.abs(c.discharge_coefficient - Cd) < 1e-12;
+      Cd = c.discharge_coefficient;
+      reynolds_number = re;
+      if (settled) break;
+    }
+  }
+  const q_m3s = Cd * q_per_cd;
   const flow_gpm = q_m3s * 15850.323;
   const throat_velocity_fps = (q_m3s / A2) * 3.2808399;
   const pipe_velocity_fps = (q_m3s / Apipe) * 3.2808399;
   if (![flow_gpm, throat_velocity_fps, pipe_velocity_fps, beta].every(Number.isFinite)) return { error: "DP-flow math is not a finite value." };
   return {
-    flow_gpm, throat_velocity_fps, pipe_velocity_fps, beta_ratio: beta,
-    note: "The liquid flow through an orifice plate, venturi, or flow nozzle from the differential pressure across it, the physical primary-element equation the DP-loop scaling tile leaves to the transmitter's calibration: Q = Cd A2 sqrt( 2 dP / (rho (1 - beta^4)) ). The restriction speeds the fluid up and drops its pressure; measuring that drop backs out the flow, which is why flow tracks the SQUARE ROOT of dP (four times the flow reads as sixteen times the dP). beta = bore / pipe ID sets the range and the permanent pressure loss; the 1 - beta^4 term corrects for the velocity the fluid already has approaching the plate. The discharge coefficient Cd accounts for the vena contracta and friction: about 0.61 for a square-edge orifice, 0.98 for a classical venturi, 0.97 for a flow nozzle -- a venturi passes far more flow at the same dP and recovers most of the pressure. Enter dP in psi (1 psi = 27.7 in w.c.) and the fluid density (water 62.4 lb/ft^3). This is the incompressible-liquid form; a gas needs a separate expansion factor Y, and a precise Cd comes from ISO 5167 / the meter's calibration. A field/sizing estimate; the calibrated meter governs.",
+    flow_gpm, throat_velocity_fps, pipe_velocity_fps, beta_ratio: beta, cd_used: Cd, cd_computed: computed, reynolds_number,
+    note: "The liquid flow through an orifice plate, venturi, or flow nozzle from the differential pressure across it, the physical primary-element equation the DP-loop scaling tile leaves to the transmitter's calibration: Q = Cd A2 sqrt( 2 dP / (rho (1 - beta^4)) ). The restriction speeds the fluid up and drops its pressure; measuring that drop backs out the flow, which is why flow tracks the SQUARE ROOT of dP (four times the flow reads as sixteen times the dP). beta = bore / pipe ID sets the range and the permanent pressure loss; the 1 - beta^4 term corrects for the velocity the fluid already has approaching the plate. The discharge coefficient Cd accounts for the vena contracta and friction: about 0.61 for a square-edge orifice, 0.98 for a classical venturi, 0.97 for a flow nozzle -- a venturi passes far more flow at the same dP and recovers most of the pressure. For a square-edge orifice, choose the tap position and Cd is computed by the ISO 5167-2 Reader-Harris/Gallagher equation (orifice-discharge-coefficient), iterated with the Reynolds number the flow and the kinematic viscosity give. Enter dP in psi (1 psi = 27.7 in w.c.) and the fluid density (water 62.4 lb/ft^3). This is the incompressible-liquid form; a gas needs a separate expansion factor Y, and a precise Cd comes from ISO 5167 / the meter's calibration. A field/sizing estimate; the calibrated meter governs.",
   };
 }
 export const dpFlowMeterExample = { inputs: { pipe_id_in: 4, bore_in: 2, dp_psi: 1, cd: 0.61, fluid_density_lb_ft3: 62.4 } };
@@ -318,24 +339,34 @@ export function renderDpFlowMeter(inputRegion, outputRegion, citationEl) {
   const D = _v23h_makeNumber("Pipe inside diameter (in)", "dpf-D", { step: "any", min: "0" });
   const d = _v23h_makeNumber("Bore / throat diameter (in)", "dpf-d", { step: "any", min: "0" });
   const dp = _v23h_makeNumber("Differential pressure (psi)", "dpf-dp", { step: "any", min: "0" });
-  const cd = _v23h_makeNumber("Discharge coefficient Cd (orifice 0.61, venturi 0.98)", "dpf-cd", { step: "any", min: "0" }); cd.input.value = "0.61";
+  const mode = _v23h_makeSelect("Discharge coefficient", "dpf-mode", [
+    { value: "entered", label: "Entered below", selected: true },
+    { value: "flange", label: "Square-edge orifice, flange taps (ISO 5167-2)" },
+    { value: "corner", label: "Square-edge orifice, corner taps (ISO 5167-2)" },
+    { value: "d_d2", label: "Square-edge orifice, D and D/2 taps (ISO 5167-2)" },
+  ]);
+  const cd = _v23h_makeNumber("Discharge coefficient Cd (when entered; orifice 0.61, venturi 0.98)", "dpf-cd", { step: "any", min: "0" }); cd.input.value = "0.61";
   const rho = _v23h_makeNumber("Fluid density (lb/ft3, water 62.4)", "dpf-rho", { step: "any", min: "0" }); rho.input.value = "62.4";
-  for (const f of [D, d, dp, cd, rho]) inputRegion.appendChild(f.wrap);
+  const nu = _v23h_makeNumber("Kinematic viscosity (cSt, for a computed Cd; water about 1.0)", "dpf-nu", { step: "any", min: "0" }); nu.input.value = "1";
+  for (const f of [D, d, dp, mode, cd, rho, nu]) inputRegion.appendChild(f.wrap);
   const oQ = _v23h_makeOut(outputRegion, "Flow rate", "dpf-out-q");
   const oV = _v23h_makeOut(outputRegion, "Throat / pipe velocity", "dpf-out-v");
   const oB = _v23h_makeOut(outputRegion, "Beta ratio (d/D)", "dpf-out-b");
+  const oC = _v23h_makeOut(outputRegion, "Discharge coefficient used", "dpf-out-c");
   const oNote = _v23h_makeOut(outputRegion, "Note", "dpf-out-n");
   function readNum(i) { if (i.value === "") return NaN; const n = Number(i.value); return Number.isFinite(n) ? n : NaN; }
   const update = _v23h_debounce(() => {
-    const r = computeDpFlowMeter({ pipe_id_in: readNum(D.input), bore_in: readNum(d.input), dp_psi: readNum(dp.input), cd: readNum(cd.input), fluid_density_lb_ft3: readNum(rho.input) });
-    if (r.error) { oQ.textContent = r.error; oV.textContent = "-"; oB.textContent = "-"; oNote.textContent = ""; return; }
+    const r = computeDpFlowMeter({ pipe_id_in: readNum(D.input), bore_in: readNum(d.input), dp_psi: readNum(dp.input), cd: readNum(cd.input), fluid_density_lb_ft3: readNum(rho.input), cd_mode: mode.select.value, viscosity_cst: readNum(nu.input) });
+    if (r.error) { oQ.textContent = r.error; oV.textContent = "-"; oB.textContent = "-"; oC.textContent = "-"; oNote.textContent = ""; return; }
+    oC.textContent = _v23h_fmt(r.cd_used, 4) + (r.cd_computed ? " (computed at Re " + _v23h_fmt(r.reynolds_number, 0) + ")" : " (entered)");
     oQ.textContent = _v23h_fmt(r.flow_gpm, 1) + " gpm";
     oV.textContent = _v23h_fmt(r.throat_velocity_fps, 2) + " / " + _v23h_fmt(r.pipe_velocity_fps, 2) + " ft/s";
     oB.textContent = _v23h_fmt(r.beta_ratio, 3);
     oNote.textContent = r.note;
   }, _V23H_DEB);
-  _v23h_attachEx(inputRegion, () => { D.input.value = "4"; d.input.value = "2"; dp.input.value = "1"; cd.input.value = "0.61"; rho.input.value = "62.4"; update(); });
-  for (const f of [D, d, dp, cd, rho]) f.input.addEventListener("input", update);
+  _v23h_attachEx(inputRegion, () => { D.input.value = "4"; d.input.value = "2"; dp.input.value = "1"; mode.select.value = "entered"; cd.input.value = "0.61"; rho.input.value = "62.4"; nu.input.value = "1"; update(); });
+  for (const f of [D, d, dp, cd, rho, nu]) f.input.addEventListener("input", update);
+  mode.select.addEventListener("change", update);
 }
 VELOCITY_RENDERERS["dp-flow-meter"] = renderDpFlowMeter;
 

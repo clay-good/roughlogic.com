@@ -266,7 +266,7 @@ export const BESPOKE_OUTPUT_LABELS = {
   "doubling-time": {"doubling_time":"Doubling time","note":"Note"},
   "dovetail-over-pins": {"offset_in":"Offset k = D(1 + cot(a/2))","note":"Note"},
   "dozer-production": {"cycle_min":"Cycle time","production_lcy_hr":"Production"},
-  "dp-flow-meter": {"flow_gpm":"Flow rate","beta_ratio":"Beta ratio (d/D)","note":"Note"},
+  "dp-flow-meter": {"cd_used":"Discharge coefficient used","flow_gpm":"Flow rate","beta_ratio":"Beta ratio (d/D)","note":"Note"},
   "dp-flow-signal-scaling": {"flow_value":"Flow value","flow_percent":"Flow % (vs linear %)","status":"Signal status","note":"Note"},
   "dp-level-hydrostatic": {"level_ft":"Level","level_pct":"Percent of span","span_psi":"Full-span pressure (URV)"},
   "draft-hood-dilution": {"dilution_ratio":"Dilution ratio","note":"Note"},
