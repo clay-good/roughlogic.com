@@ -859,6 +859,7 @@ const _TILES = [
   ["crusher-reduction-ratio", "E"],
   ["bond-work-index-power", "E"],
   ["circulating-load-ratio", "E"],
+  ["screen-efficiency", "E"],
   ["screen-deck-capacity", "E"],
   ["belt-feeder-capacity", "E"],
   ["dust-collector-air-to-cloth", "E"],

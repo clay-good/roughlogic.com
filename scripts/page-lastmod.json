@@ -2,99 +2,99 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "ec2b05b8a8e0b050",
+      "sha": "28706a6837281aac",
       "date": "2026-10-09"
     },
     "/tools/": {
-      "sha": "74b5450be26a8a84",
+      "sha": "1c1b57bd834eb8db",
       "date": "2026-10-09"
     },
     "/collections/disaster-response/": {
-      "sha": "f822321ebb8fc2b4",
+      "sha": "018466adffc1e803",
       "date": "2026-10-09"
     },
     "/groups/accounting/": {
-      "sha": "6f433101f5237958",
+      "sha": "eadccad3c5f02696",
       "date": "2026-10-09"
     },
     "/groups/agriculture/": {
-      "sha": "6732fcb58067a03f",
+      "sha": "fe53c3979b5c6eb5",
       "date": "2026-10-09"
     },
     "/groups/construction/": {
-      "sha": "f16d1bda8a3db731",
+      "sha": "7ef5d0830260bd49",
       "date": "2026-10-09"
     },
     "/groups/cross-trade/": {
-      "sha": "9f9b98e884643582",
+      "sha": "4f1614789c39786e",
       "date": "2026-10-09"
     },
     "/groups/educators/": {
-      "sha": "cbee44b6c66ff33d",
+      "sha": "3ee253af30174a5a",
       "date": "2026-10-09"
     },
     "/groups/electrical/": {
-      "sha": "942ba16cbe590cf3",
+      "sha": "f0df48d6d1df5f0b",
       "date": "2026-10-09"
     },
     "/groups/field/": {
-      "sha": "469d1a71060b6065",
+      "sha": "285e7025d41124c4",
       "date": "2026-10-09"
     },
     "/groups/fire-ground/": {
-      "sha": "47d307a06c2b8945",
+      "sha": "2b6b39dbad68d9c4",
       "date": "2026-10-09"
     },
     "/groups/historical/": {
-      "sha": "338c208ff6a1a60c",
+      "sha": "cec66e49d5b78400",
       "date": "2026-10-09"
     },
     "/groups/hvac/": {
-      "sha": "dd2efff7481dcaa0",
+      "sha": "fb3955d0fc1be517",
       "date": "2026-10-09"
     },
     "/groups/kitchen/": {
-      "sha": "53ff3832161f4a9e",
+      "sha": "4700557e133aa10b",
       "date": "2026-10-09"
     },
     "/groups/lab/": {
-      "sha": "1f0ee0aaf0ac46ad",
+      "sha": "a2ad6bfb92224064",
       "date": "2026-10-09"
     },
     "/groups/mechanic/": {
-      "sha": "db687c48d6745171",
+      "sha": "73d7e1d6f6a8ca32",
       "date": "2026-10-09"
     },
     "/groups/plumbing/": {
-      "sha": "b15a9f1abf7bd4f9",
+      "sha": "14821e6dec57a8fc",
       "date": "2026-10-09"
     },
     "/groups/real-estate/": {
-      "sha": "9518366165c6feab",
+      "sha": "d633d89105b5397a",
       "date": "2026-10-09"
     },
     "/groups/references/": {
-      "sha": "aa190ad0ab6c6b8d",
+      "sha": "5b37da6e6e941b07",
       "date": "2026-10-09"
     },
     "/groups/restoration/": {
-      "sha": "5abe7dbbcf36a017",
+      "sha": "5d4610da4290d13f",
       "date": "2026-10-09"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "fcfc6899a1d298f5",
+      "sha": "87cc2eadd259b5c8",
       "date": "2026-10-09"
     },
     "/groups/stage/": {
-      "sha": "c205be7d615f8aab",
+      "sha": "f50426f9961316eb",
       "date": "2026-10-09"
     },
     "/groups/trucking/": {
-      "sha": "e84b21196b8d1cc6",
+      "sha": "e0b206bc3544d4b1",
       "date": "2026-10-09"
     },
     "/groups/water/": {
-      "sha": "b9cf15272aa60dd5",
+      "sha": "9bfcbafd9d65c3e1",
       "date": "2026-10-09"
     },
     "/tools/aav-install-check/": {
@@ -1238,7 +1238,7 @@
       "date": "2026-09-29"
     },
     "/tools/circulating-load-ratio/": {
-      "sha": "8844d4f5c31ad59d",
+      "sha": "8ad2ff5b43189049",
       "date": "2026-10-09"
     },
     "/tools/cistern-storage-days/": {
@@ -4382,7 +4382,7 @@
       "date": "2026-09-29"
     },
     "/tools/loader-production/": {
-      "sha": "5ae29a62baabe962",
+      "sha": "a8564f32ab2c9a7b",
       "date": "2026-10-09"
     },
     "/tools/loan-amortization/": {
@@ -6690,7 +6690,11 @@
       "date": "2026-10-01"
     },
     "/tools/screen-deck-capacity/": {
-      "sha": "b3e4a4b447ac569e",
+      "sha": "455bc9b88466af37",
+      "date": "2026-10-09"
+    },
+    "/tools/screen-efficiency/": {
+      "sha": "00a02aefb8b83ccc",
       "date": "2026-10-09"
     },
     "/tools/screw-conveyor/": {

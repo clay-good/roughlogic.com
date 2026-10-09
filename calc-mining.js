@@ -547,6 +547,47 @@ MINING_RENDERERS["circulating-load-ratio"] = _simpleRenderer({
   compute: computeCirculatingLoadRatio,
 });
 
+// spec-v1944: screen efficiency from three assays (two-product formula, as in Wills). With f, o, u the fraction of
+// undersize (finer than the aperture) in the feed, the oversize product, and the undersize product, the undersize
+// split is U/F = (f - o)/(u - o); recovery of fines to the undersize Eu = u (f - o)/(f (u - o)); rejection of coarse
+// to the oversize Eo = (1 - o)(u - f)/((1 - f)(u - o)); overall efficiency E = Eu x Eo.
+// dims: in { feed_undersize_pct: dimensionless, oversize_undersize_pct: dimensionless, undersize_undersize_pct: dimensionless, feed_stph: M T^-1 } out: { undersize_split_pct: dimensionless, undersize_recovery_pct: dimensionless, oversize_efficiency_pct: dimensionless, overall_efficiency_pct: dimensionless, undersize_stph: M T^-1 }
+export function computeScreenEfficiency({ feed_undersize_pct = 0, oversize_undersize_pct = 0, undersize_undersize_pct = 100, feed_stph = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const f = Number(feed_undersize_pct) / 100, o = Number(oversize_undersize_pct) / 100, u = Number(undersize_undersize_pct) / 100, Q = Number(feed_stph) || 0;
+  if (![f, o, u].every((x) => x >= 0 && x <= 1)) return { error: "Each percentage must be from 0 to 100." };
+  if (Q < 0) return { error: "Feed rate cannot be negative (short tons per hour; blank to skip)." };
+  if (!(u > f && f > o)) return { error: "The feed's fines content must sit between the oversize product's (lower) and the undersize product's (higher)." };
+  const split = (f - o) / (u - o);
+  const undersize_recovery_pct = (u * (f - o)) / (f * (u - o)) * 100;
+  const oversize_efficiency_pct = f < 1 ? ((1 - o) * (u - f)) / ((1 - f) * (u - o)) * 100 : 100;
+  const overall_efficiency_pct = (undersize_recovery_pct * oversize_efficiency_pct) / 100;
+  const undersize_split_pct = split * 100;
+  const undersize_stph = split * Q;
+  if (![undersize_recovery_pct, oversize_efficiency_pct, overall_efficiency_pct, undersize_stph].every(Number.isFinite)) return { error: "Screen-efficiency math is not a finite value; check the assays." };
+  return {
+    undersize_split_pct, undersize_recovery_pct, oversize_efficiency_pct, overall_efficiency_pct, undersize_stph, has_rate: Q > 0,
+    note: "How well a screen separates at its aperture, from three sieve assays: the percent finer than the aperture in the feed, in the oversize (retained) product, and in the undersize (passing) product. A mass balance gives the fraction of the feed that passes, (f - o)/(u - o); the recovery of fines is the share of the feed's fines that reached the undersize; the oversize efficiency is the share of the coarse that stayed on the deck; overall efficiency multiplies the two. Fines carried over in the oversize (o above zero) are the usual loss, from a short or overloaded deck, near-size particles, or blinding. A production screen typically recovers 85 to 95% of its fines. Dry solids basis. A screen; plant sampling governs.",
+  };
+}
+export const screenEfficiencyExample = { inputs: { feed_undersize_pct: 40, oversize_undersize_pct: 8, undersize_undersize_pct: 98, feed_stph: 200 } };
+MINING_RENDERERS["screen-efficiency"] = _simpleRenderer({
+  citation: "Citation: screen efficiency by the two-product formula (as in Wills' Mineral Processing Technology), by name: undersize split U/F = (f - o)/(u - o), fines recovery u (f - o)/(f (u - o)), oversize efficiency (1 - o)(u - f)/((1 - f)(u - o)), overall efficiency their product, with f, o, u the fraction finer than the aperture in the feed, oversize, and undersize. Dry solids. A screen; plant sampling governs.",
+  example: screenEfficiencyExample.inputs,
+  fields: [
+    { key: "feed_undersize_pct", label: "Feed: % finer than the aperture", kind: "number" },
+    { key: "oversize_undersize_pct", label: "Oversize product: % finer than the aperture", kind: "number" },
+    { key: "undersize_undersize_pct", label: "Undersize product: % finer than the aperture", kind: "number", default: 100, attrs: { step: "any", value: "100" } },
+    { key: "feed_stph", label: "Feed rate (short tons per hour, blank to skip)", kind: "number" },
+  ],
+  outputs: [
+    { key: "e", id: "sef-out-e", label: "Overall efficiency", value: (r) => fmt(r.overall_efficiency_pct, 1) + "% (fines recovery " + fmt(r.undersize_recovery_pct, 1) + "%, oversize efficiency " + fmt(r.oversize_efficiency_pct, 1) + "%)" },
+    { key: "s", id: "sef-out-s", label: "Feed passing the deck", value: (r) => fmt(r.undersize_split_pct, 1) + "%" + (r.has_rate ? " (" + fmt(r.undersize_stph, 0) + " st/h)" : "") },
+    { key: "n", id: "sef-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeScreenEfficiency,
+});
+
 // ===================== spec-v1513: vibrating screen deck capacity =====================
 
 // dims: in { deck_width_ft: L, deck_length_ft: L, base_capacity_tph_per_sqft: M T^-1 L^-2, oversize_factor: dimensionless, halfsize_factor: dimensionless, deck_factor: dimensionless, wet_factor: dimensionless, efficiency_factor: dimensionless, actual_feed_tph: M T^-1 } out: { screen_area_sqft: L^2, combined_multiplier: dimensionless, capacity_tph: M T^-1, percent_of_capacity: dimensionless, area_required_sqft: L^2 }
@@ -572,7 +613,7 @@ export function computeScreenDeckCapacity({ deck_width_ft = 0, deck_length_ft = 
     verdict: over_capacity
       ? "OVER capacity -- the bed is too deep for particles to reach the wire, and oversize in the product is an AREA problem with no mechanical fault anywhere"
       : "inside capacity at the entered feed rate",
-    note: "Every factor in the chain is a departure from a reference condition, and the chain is multiplicative, so the errors compound rather than average. The two that dominate are the halfsize and oversize factors: a feed with a lot of material smaller than half the opening screens far faster than the base rate, and a feed sitting right at the opening size screens far slower. That is why a screen comfortable on one gradation blinds and floods on another from the same pit, and why tightening a crusher upstream can cost a deck a third of its capacity without anyone touching the screen. For field use the important output is not the capacity number, it is the comparison against what the deck is actually being fed. A deck running above its calculated capacity carries a bed too deep for particles to reach the wire, and the symptom is oversize in the product with no mechanical fault anywhere -- the screen is working correctly and is simply out of area. Knowing that stops a crew from chasing stroke, slope, and wire tension for a problem none of them can fix. The base capacity and every factor come from the screen manufacturer's published tables and differ between manufacturers and between media types; this does not ship them and the result is only as good as the values entered. It does not size the drive, select stroke, speed, or slope, choose screen media, or evaluate blinding and pegging, which are material-property problems -- clay, moisture, flaky particles, near-size material -- that no capacity formula predicts. It does not compute screening efficiency or the recirculating load in a closed circuit (circulating-load-ratio does), both of which change the tonnage the deck actually sees, and structural capacity and the deck's rated load are separate limits. The screen manufacturer's selection data and the plant designer govern.",
+    note: "Every factor in the chain is a departure from a reference condition, and the chain is multiplicative, so the errors compound rather than average. The two that dominate are the halfsize and oversize factors: a feed with a lot of material smaller than half the opening screens far faster than the base rate, and a feed sitting right at the opening size screens far slower. That is why a screen comfortable on one gradation blinds and floods on another from the same pit, and why tightening a crusher upstream can cost a deck a third of its capacity without anyone touching the screen. For field use the important output is not the capacity number, it is the comparison against what the deck is actually being fed. A deck running above its calculated capacity carries a bed too deep for particles to reach the wire, and the symptom is oversize in the product with no mechanical fault anywhere -- the screen is working correctly and is simply out of area. Knowing that stops a crew from chasing stroke, slope, and wire tension for a problem none of them can fix. The base capacity and every factor come from the screen manufacturer's published tables and differ between manufacturers and between media types; this does not ship them and the result is only as good as the values entered. It does not size the drive, select stroke, speed, or slope, choose screen media, or evaluate blinding and pegging, which are material-property problems -- clay, moisture, flaky particles, near-size material -- that no capacity formula predicts. It does not compute screening efficiency (screen-efficiency does) or the recirculating load in a closed circuit (circulating-load-ratio does), both of which change the tonnage the deck actually sees, and structural capacity and the deck's rated load are separate limits. The screen manufacturer's selection data and the plant designer govern.",
   };
 }
 const screenDeckExample = { inputs: { deck_width_ft: 8, deck_length_ft: 20, base_capacity_tph_per_sqft: 3.5, oversize_factor: 1.1, halfsize_factor: 1.15, deck_factor: 0.9, wet_factor: 1.25, efficiency_factor: 0.95, actual_feed_tph: 400 } };

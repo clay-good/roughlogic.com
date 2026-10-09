@@ -15495,6 +15495,17 @@ export const CITATIONS = {
       { name: "Steady state", value: "overflow = new feed; no accumulation in the mill or sump", source: "scope of this tile" },
     ],
   },
+  "screen-efficiency": {
+    formula: "With f, o, u the fraction finer than the aperture in feed, oversize, undersize: U/F = (f - o)/(u - o); fines recovery Eu = u (f - o)/(f (u - o)); oversize efficiency Eo = (1 - o)(u - f)/((1 - f)(u - o)); overall E = Eu x Eo.",
+    edition: "Screen efficiency by the two-product formula, a steady-state mass balance on the fraction finer than the aperture (as in Wills' Mineral Processing Technology), by name.",
+    freeAccess: "A mass balance on the user's own sieve assays; no published data is bundled.",
+    governance: GOVERNANCE.general,
+    editionNote: "Recovery of fines to the undersize, rejection of coarse to the oversize, and their product, from three assays at the screen aperture; steady state, dry solids basis. Sensitive to assay error when the feed is close to either product. A screen; plant sampling governs.",
+    assumptions: [
+      { name: "Undersize split", value: "U/F = (f - o)/(u - o)", source: "mass balance; Wills" },
+      { name: "Efficiency", value: "fines recovery x oversize efficiency", source: "Wills" },
+    ],
+  },
   "crusher-reduction-ratio": {
     formula: "reduction ratio = feed size / product size on 80% passing sizes; circuit ratios MULTIPLY, so an even split is the total raised to one over the stage count; stages needed = ceil(log of the total over log of the machine's high ratio).",
     edition: "The reduction ratio relation and the multiplicative circuit rule by name, with typical machine ranges (Metso Crushing and Screening Handbook, 7th ed.: jaw 3 to 5, primary gyratory 6 to 8, secondary cone 3 to 4, tertiary cone 2 to 3.5; impactors run higher) entered rather than shipped. The crusher manufacturer's selection data and the plant designer govern.",

@@ -106,6 +106,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Added
 
+- **`screen-efficiency`: screen efficiency by the two-product formula (spec-v1944, Group E, `calc-mining.js`), 2,247 -> 2,248, v0.437.0.** `screen-deck-capacity` said screening efficiency was not computed. From three assays of the percent finer than the aperture (feed, oversize, undersize) this returns the share of feed passing, the fines recovery, the oversize efficiency, and the overall efficiency: 40 / 8 / 98 % gives 35.6% passing, 87.1% fines recovery, and 86.1% overall.
+
 - **`circulating-load-ratio`: grinding circuit circulating load by the two-product formula (spec-v1943, Group E, `calc-mining.js`), 2,246 -> 2,247, v0.436.0.** `screen-deck-capacity` said the recirculating load of a closed circuit was not computed. This one takes one size-class assay of the classifier feed, overflow, and underflow and returns U/O = (o - f)/(f - u) and the tonnages: 40 / 70 / 25 % passing 75 microns is a 200% circulating load, 200 st/h back to the mill on 100 st/h of new feed.
 
 - **`bond-work-index-power`: grinding and crushing energy by Bond's law (spec-v1942, Group E, `calc-mining.js`), 2,245 -> 2,246, v0.435.0.** `crusher-reduction-ratio` gives the ratio of a reduction but not the energy behind it. This one applies W = 10 Wi (1/sqrt(P80) - 1/sqrt(F80)) kWh per short ton (sizes in microns at 80% passing) and multiplies by the feed rate for the power at the pinion: a 13 kWh/st ore ground from 1,000 to 75 microns takes 10.9 kWh/st, 1,090 kW at 100 st/h. Rowland's efficiency factors are noted, not applied.

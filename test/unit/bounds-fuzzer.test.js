@@ -58839,3 +58839,15 @@ test("bounds: circulating-load-ratio closes the size-class mass balance", () => 
   assert.ok("error" in _clr({ feed_pct: 80, overflow_pct: 70, underflow_pct: 25 }));
   assert.ok("error" in _clr({ feed_pct: 40, overflow_pct: 140, underflow_pct: 25 }));
 });
+
+import { computeScreenEfficiency as _sef } from "../../calc-mining.js";
+test("bounds: screen-efficiency recoveries close the fines and coarse balances", () => {
+  const r = _sef({ feed_undersize_pct: 40, oversize_undersize_pct: 8, undersize_undersize_pct: 98, feed_stph: 200 });
+  const U = r.undersize_stph, O = 200 - U;
+  assert.ok(Math.abs(U * 0.98 + O * 0.08 - 200 * 0.40) < 1e-9);
+  assert.ok(Math.abs(r.undersize_recovery_pct / 100 - (U * 0.98) / (200 * 0.4)) < 1e-12);
+  assert.ok(Math.abs(r.oversize_efficiency_pct / 100 - (O * 0.92) / (200 * 0.6)) < 1e-12);
+  // A perfect screen is 100%.
+  assert.ok(Math.abs(_sef({ feed_undersize_pct: 40, oversize_undersize_pct: 0, undersize_undersize_pct: 100 }).overall_efficiency_pct - 100) < 1e-9);
+  assert.ok("error" in _sef({ feed_undersize_pct: 5, oversize_undersize_pct: 8, undersize_undersize_pct: 98 }));
+});

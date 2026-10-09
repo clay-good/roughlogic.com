@@ -3002,6 +3002,7 @@ cross-check.
 | calc-mining.js | `computePitDewateringStaging` | `{ static_lift_ft = 0, friction_head_ft = 0, discharge_pressure_ft = 0, head_p...` | _ | _ | _ |
 | calc-mining.js | `computeRockBoltSupportPressure` | `{ bolt_capacity_lb = 0, spacing_1_ft = 0, spacing_2_ft = 0, span_ft = 0, rock...` | _ | _ | _ |
 | calc-mining.js | `computeScreenDeckCapacity` | `{ deck_width_ft = 0, deck_length_ft = 0, base_capacity_tph_per_sqft = 0, over...` | _ | _ | _ |
+| calc-mining.js | `computeScreenEfficiency` | `{ feed_undersize_pct = 0, oversize_undersize_pct = 0, undersize_undersize_pct...` | _ | _ | _ |
 | calc-motor.js | `computeMotorAccelerationTime` | `{ inertia_lbft2 = 100, speed_change_rpm = 1750, net_accel_torque_lbft = 50 } ...` | _ | _ | _ |
 | calc-motor.js | `computeMotorFaultContribution` | `{ motor_fla_a = 0, x_subtransient_pu = 0.167, utility_fault_a = 0 } = {}` | _ | _ | _ |
 | calc-motor.js | `computeMotorLockedRotorKva` | `{ horsepower = 0, code_letter = "G", voltage_v = 0, phase = 3 } = {}` | _ | _ | _ |
@@ -3916,7 +3917,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2500.
+Row count: 2501.
 
 <!-- END function-corpus-v14 -->
 
@@ -4693,7 +4694,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-extraction-rate` | Water Extraction Volume, Time, and Waste-Tank Dumps | Project (first-principles); standing + absorbed; wand time = total / gpm | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+4 more) |
 
-### Group E Construction (624 tiles)
+### Group E Construction (625 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -5122,6 +5123,7 @@ per spec-v14 §13.1 second paragraph.
 | `scaffold-takeoff` | Frame Scaffold Material Takeoff | Frame-scaffold takeoff geometry (firs...; bays = ceil(40/7) = 6; frames = 7*3 = 21; braces = 2*6*3 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `scaffold-tie-spacing` | Scaffold Tie Spacing and Height-to-Base Ratio | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+5 more) |
 | `screen-deck-capacity` | Vibrating Screen Deck Capacity and Feed Check | Project (first-principles); every factor comes from the screen manufacturer's tables | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `screen-efficiency` | Screen Efficiency (Two-Product Formula) | Project (first-principles); U/F = 0.32/0.90 = 0.3556; Eu = 0.98 x 0.32/(0.40 x 0.90) ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `sealant-joint-yield` | Caulk / Sealant Cartridge Yield from Joint Size | Sealant cartridge-yield identity (fir...; cross = 0.375*0.25 = 0.09375 in^2; lf/cart = 18.23/0.0937... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+6 more) |
 | `secondary-compression-settlement` | Secondary Compression (Creep) Settlement | Das, Principles of Geotechnical Engin...; C-alpha-eps = C-alpha/(1+ep) = 0.02/1.85 = 0.010811. Ss =... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `section-properties` | Cross-Section Properties (A, I, S, r) | mechanics of materials; spec-v342 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
@@ -6336,6 +6338,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 
-Tile count: 2247. Fixture-covered or reference-cadence: 2247 / 2247.
+Tile count: 2248. Fixture-covered or reference-cadence: 2248 / 2248.
 
 <!-- END tile-index-v14 -->

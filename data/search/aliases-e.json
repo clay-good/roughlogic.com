@@ -6407,6 +6407,11 @@
     {"term":"cyclone circulating load","target":"circulating-load-ratio","kind":"industry"},
     {"term":"two product formula","target":"circulating-load-ratio","kind":"industry"},
     {"term":"recirculating load ball mill","target":"circulating-load-ratio","kind":"industry"},
-    {"term":"how much goes back to the mill","target":"circulating-load-ratio","kind":"question"}
+    {"term":"how much goes back to the mill","target":"circulating-load-ratio","kind":"question"},
+    {"term":"screen efficiency","target":"screen-efficiency","kind":"industry"},
+    {"term":"screening efficiency calculation","target":"screen-efficiency","kind":"industry"},
+    {"term":"fines carryover screen","target":"screen-efficiency","kind":"industry"},
+    {"term":"undersize recovery","target":"screen-efficiency","kind":"industry"},
+    {"term":"how well is my screen working","target":"screen-efficiency","kind":"question"}
   ]
 }
