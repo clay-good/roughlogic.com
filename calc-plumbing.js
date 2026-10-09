@@ -3968,7 +3968,7 @@ export function computeTimeOfConcentration({ l_ft = 0, s_slope = 0 } = {}) {
 export const timeOfConcentrationExample = { inputs: { l_ft: 1000, s_slope: 0.02 } };
 
 function _v302renderTimeOfConcentration(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Kirpich (1940) time of concentration tc = 0.0078 L^0.77 S^(-0.385) (tc min, L ft, S ft/ft), as compiled in TR-55 / NRCS, by name. Single-segment estimate for the design storm duration; the paved/overland factor and the TR-55 three-segment sum are separate. A design aid; the engineer of record governs.";
+  citationEl.textContent = "Citation: Kirpich (1940) time of concentration tc = 0.0078 L^0.77 S^(-0.385) (tc min, L ft, S ft/ft), as compiled in TR-55 / NRCS, by name. Single-segment estimate for the design storm duration; the paved/overland factor is separate and the TR-55 three-segment sum is tr55-time-of-concentration. A design aid; the engineer of record governs.";
   attachExampleButton(inputRegion, () => { l.input.value = "1000"; s.input.value = "0.02"; update(); });
   const l = makeNumber("Flow-path length L (ft)", "toc-l", { step: "any", min: "0" });
   const s = makeNumber("Average slope S (ft/ft)", "toc-s", { step: "any", min: "0" });
@@ -4649,7 +4649,7 @@ export function computeTrapezoidalChannelFlow({ bottom_width_ft = 0, side_slope_
 export const trapezoidalChannelFlowExample = { inputs: { bottom_width_ft: 10, side_slope_z: 2, depth_ft: 3, n: 0.03, s_slope: 0.001 } };
 
 function _v1031renderTrapezoidalChannelFlow(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Manning uniform flow in a trapezoidal section - A = (b + z y) y, P = b + 2 y sqrt(1 + z^2), R = A/P, V = (1.486/n) R^(2/3) S^(1/2), Q = A V, with top width T = b + 2 z y, hydraulic depth D = A/T, and Fr = V / sqrt(g D) - as compiled in Chow, by name. Side slope z is horizontal per 1 vertical; a zero bottom width is a V-ditch. Prismatic channel, uniform flow, no freeboard allowance; backwater profiles and the inverse depth-for-a-flow problem are separate. A design aid; the engineer of record and the local drainage manual govern.";
+  citationEl.textContent = "Citation: Manning uniform flow in a trapezoidal section - A = (b + z y) y, P = b + 2 y sqrt(1 + z^2), R = A/P, V = (1.486/n) R^(2/3) S^(1/2), Q = A V, with top width T = b + 2 z y, hydraulic depth D = A/T, and Fr = V / sqrt(g D) - as compiled in Chow, by name. Side slope z is horizontal per 1 vertical; a zero bottom width is a V-ditch. Prismatic channel, uniform flow, no freeboard allowance; backwater profiles and the trapezoidal depth-for-a-flow inverse are separate (channel-normal-depth solves it for a rectangular section). A design aid; the engineer of record and the local drainage manual govern.";
   attachExampleButton(inputRegion, () => { b.input.value = "10"; z.input.value = "2"; y.input.value = "3"; nn.input.value = "0.03"; s.input.value = "0.001"; update(); });
   const b = makeNumber("Bottom width b (ft, 0 = V-ditch)", "tcf-b", { step: "any", min: "0" });
   const z = makeNumber("Side slope z (z horizontal : 1 vertical)", "tcf-z", { step: "any", min: "0" });

@@ -732,7 +732,7 @@ export function computeEvaporativeCoolerEffectiveness({ dry_bulb_F, wet_bulb_F, 
   const leaving_db_F = db - temp_drop_F;
   return {
     leaving_db_F, wet_bulb_depression_F, temp_drop_F,
-    note: "Direct-evaporative (swamp) cooler leaving dry-bulb: T_out = T_db - saturation_effectiveness x (T_db - T_wb). The wet-bulb depression (T_db - T_wb) is the maximum possible drop - a 100%-effective pad would cool the air all the way to the wet-bulb; a real rigid-media pad runs about 80-90% (eff 0.80-0.90), an aspen pad less. Cooling is limited by the wet-bulb, so a dry climate (large depression) cools far more than a humid one. This is a sensible-cooling process that ADDS moisture: the leaving air rides up the constant-wet-bulb line, so the leaving relative humidity is high. Direct (single-stage) only; an indirect or indirect/direct stage is separate. The pad effectiveness is a manufacturer rating; a shop estimate, and the equipment data govern.",
+    note: "Direct-evaporative (swamp) cooler leaving dry-bulb: T_out = T_db - saturation_effectiveness x (T_db - T_wb). The wet-bulb depression (T_db - T_wb) is the maximum possible drop - a 100%-effective pad would cool the air all the way to the wet-bulb; a real rigid-media pad runs about 80-90% (eff 0.80-0.90), an aspen pad less. Cooling is limited by the wet-bulb, so a dry climate (large depression) cools far more than a humid one. This is a sensible-cooling process that ADDS moisture: the leaving air rides up the constant-wet-bulb line, so the leaving relative humidity is high. Direct (single-stage) only; an indirect or indirect/direct stage is indirect-evaporative-cooling. The pad effectiveness is a manufacturer rating; a shop estimate, and the equipment data govern.",
   };
 }
 export const evaporativeCoolerEffectivenessExample = { inputs: { dry_bulb_F: 95, wet_bulb_F: 65, effectiveness: 0.85 } };
@@ -3987,7 +3987,7 @@ export function computeReynoldsNumberPipe({ v_fps = 0, d_in = 0, nu = 1.21e-5 } 
 }
 export const reynoldsNumberPipeExample = { inputs: { v_fps: 6, d_in: 2, nu: 1.21e-5 } };
 HVAC_RENDERERS["reynolds-number-pipe"] = _rEnv({
-  citation: "Citation: Reynolds number Re = V D / nu, the pipe-flow transition bands (laminar below ~2,300, turbulent above ~4,000), and a 60 degF water kinematic viscosity of about 1.21e-5 ft^2/s, by name. Full circular pipe; the friction factor is separate. An engineering aid; the fluid property data govern.",
+  citation: "Citation: Reynolds number Re = V D / nu, the pipe-flow transition bands (laminar below ~2,300, turbulent above ~4,000), and a 60 degF water kinematic viscosity of about 1.21e-5 ft^2/s, by name. Full circular pipe; the friction factor is colebrook-friction-factor. An engineering aid; the fluid property data govern.",
   example: reynoldsNumberPipeExample.inputs,
   fields: [
     { key: "v_fps", label: "Mean flow velocity (ft/s)", kind: "number" },
@@ -4018,7 +4018,7 @@ export function computeHydronicGpmDeltat({ load = 0, unit_tons = 0, dt_f = 0, fa
 }
 export const hydronicGpmDeltatExample = { inputs: { load: 10, unit_tons: 1, dt_f: 10, factor: 500 } };
 HVAC_RENDERERS["hydronic-gpm-deltat"] = _rEnv({
-  citation: "Citation: hydronic flow GPM = Q / (500 dT) from Q = 500 GPM dT (500 = 8.33 x 60 x 1.0 for water), the chilled-water form GPM = 24 tons/dT, and the glycol-lowered factor, by name. Pure water, full load on the delta-T; the pump head is separate. A design aid; the mechanical engineer of record governs.",
+  citation: "Citation: hydronic flow GPM = Q / (500 dT) from Q = 500 GPM dT (500 = 8.33 x 60 x 1.0 for water), the chilled-water form GPM = 24 tons/dT, and the glycol-lowered factor, by name. Pure water, full load on the delta-T; the pump head is pump-tdh. A design aid; the mechanical engineer of record governs.",
   example: hydronicGpmDeltatExample.inputs,
   fields: [
     { key: "load", label: "Load (Btu/h, or tons if unit set to 1)", kind: "number" },

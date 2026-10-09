@@ -138,7 +138,7 @@ export function computeWirelessFspl({ distance_km = 0, frequency_mhz = 0, tx_pow
 }
 export const wirelessFsplExample = { inputs: { distance_km: 1, frequency_mhz: 2400, tx_power_dbm: 20, tx_gain_dbi: 12, rx_gain_dbi: 12 } };
 function _renderWirelessFspl(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: free-space path loss FSPL(dB) = 32.44 + 20 log10(d_km) + 20 log10(f_MHz) and received power Pr = Pt + Gt + Gr - FSPL, from the Friis transmission equation / ITU-R P.525 (free); the 32.44 constant is for km and MHz. Ideal free space only - cable/connector loss, rain and atmospheric attenuation, obstruction/Fresnel diffraction, and multipath are separate; a real link carries a fade margin over this. The path survey and radio spec govern.";
+  citationEl.textContent = "Citation: free-space path loss FSPL(dB) = 32.44 + 20 log10(d_km) + 20 log10(f_MHz) and received power Pr = Pt + Gt + Gr - FSPL, from the Friis transmission equation / ITU-R P.525 (free); the 32.44 constant is for km and MHz. Ideal free space only - cable/connector loss, rain and atmospheric attenuation, and multipath are separate, and the Fresnel-zone clearance for obstruction is fresnel-zone-clearance; a real link carries a fade margin over this. The path survey and radio spec govern.";
   const d = makeNumber("Link distance (km)", "fspl-d", { step: "any", min: "0" });
   const f = makeNumber("Frequency (MHz)", "fspl-f", { step: "any", min: "0" });
   const pt = makeNumber("Transmit power (dBm)", "fspl-pt", { step: "any" });
@@ -239,7 +239,7 @@ export function computeWirelessLinkBudget({ tx_power_dbm = 20, tx_gain_dbi = 0, 
 }
 export const wirelessLinkBudgetExample = { inputs: { tx_power_dbm: 20, tx_gain_dbi: 12, tx_cable_loss_db: 1, distance_km: 1, frequency_mhz: 2400, rx_gain_dbi: 12, rx_cable_loss_db: 1, rx_sensitivity_dbm: -80 } };
 function _renderWirelessLinkBudget(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: wireless link budget - EIRP = Pt + Gt - Lcable(tx); Prx = EIRP - FSPL + Gr - Lcable(rx); fade margin = Prx - Rx sensitivity; FSPL = 32.44 + 20 log10(d_km) + 20 log10(f_MHz) (Friis / ITU-R P.525). Aim for >= 10 dB fade margin (20+ for carrier-class). Free space only - rain/atmospheric attenuation, obstruction/Fresnel diffraction, and interference are separate. The path survey and a commissioning test govern.";
+  citationEl.textContent = "Citation: wireless link budget - EIRP = Pt + Gt - Lcable(tx); Prx = EIRP - FSPL + Gr - Lcable(rx); fade margin = Prx - Rx sensitivity; FSPL = 32.44 + 20 log10(d_km) + 20 log10(f_MHz) (Friis / ITU-R P.525). Aim for >= 10 dB fade margin (20+ for carrier-class). Free space only - rain/atmospheric attenuation and interference are separate, and the Fresnel-zone clearance for obstruction is fresnel-zone-clearance. The path survey and a commissioning test govern.";
   const pt = makeNumber("Transmit power (dBm)", "wlb-pt", { step: "any" });
   const gt = makeNumber("Transmit antenna gain (dBi)", "wlb-gt", { step: "any" });
   const ltx = makeNumber("Transmit cable/connector loss (dB)", "wlb-ltx", { step: "any", min: "0" });
