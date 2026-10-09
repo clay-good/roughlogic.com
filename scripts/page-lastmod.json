@@ -2262,7 +2262,7 @@
       "date": "2026-10-03"
     },
     "/tools/dock-piling-lateral/": {
-      "sha": "7ea760e259f85595",
+      "sha": "0723d564c4de2ed9",
       "date": "2026-10-09"
     },
     "/tools/door-clear-width/": {
@@ -4562,8 +4562,8 @@
       "date": "2026-09-29"
     },
     "/tools/marine-shaft-diameter/": {
-      "sha": "92c4081748a77421",
-      "date": "2026-10-03"
+      "sha": "86fc4f970e6f3240",
+      "date": "2026-10-09"
     },
     "/tools/markup/": {
       "sha": "7daf482a37a52103",

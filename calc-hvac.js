@@ -4099,7 +4099,7 @@ export function computeHydronicGpmDeltat({ load = 0, unit_tons = 0, dt_f = 0, fa
   const gpm = q_btuh / (factor * dt_f);
   return {
     q_btuh, gpm,
-    note: "Water-side heat transport Q = 500 x GPM x dT (500 = 8.33 lb/gal x 60 min/h x 1.0 Btu/lb-degF for water), rearranged to the design flow GPM = Q / (500 dT); for chilled water the shortcut is GPM = 24 tons/dT (12,000/500 = 24). The delta-T is the lever: a wide design delta-T shrinks the flow, pump, and pipe for the same load. Pure water at the sea-level factor (adjust for glycol via the fluid factor, about 485 at 30% propylene glycol); assumes the full load is carried by the entered delta-T (no bypass or primary/secondary decoupling), and does not size the pump head, the pipe, or the coil. A design aid; the mechanical engineer of record's design governs.",
+    note: "Water-side heat transport Q = 500 x GPM x dT (500 = 8.33 lb/gal x 60 min/h x 1.0 Btu/lb-degF for water), rearranged to the design flow GPM = Q / (500 dT); for chilled water the shortcut is GPM = 24 tons/dT (12,000/500 = 24). The delta-T is the lever: a wide design delta-T shrinks the flow, pump, and pipe for the same load. Pure water at the sea-level factor (adjust for glycol via the fluid factor, about 485 at 30% propylene glycol); assumes the full load is carried by the entered delta-T (no bypass or primary/secondary decoupling), and does not size the pump head (pump-tdh does), the pipe, or the coil. A design aid; the mechanical engineer of record's design governs.",
   };
 }
 export const hydronicGpmDeltatExample = { inputs: { load: 10, unit_tons: 1, dt_f: 10, factor: 500 } };
