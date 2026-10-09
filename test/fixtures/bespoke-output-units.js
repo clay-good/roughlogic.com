@@ -315,7 +315,6 @@ export const BESPOKE_OUTPUT_UNITS = {
   "indirect-evaporative-cooling": {"leaving_db_F":{"prefix":"","suffix":" F","digits":1},"temp_drop_F":{"prefix":"","suffix":" F","digits":1},"wet_bulb_depression_F":{"prefix":"","suffix":" F","digits":1}},
   "injector-size": {"total_lbh":{"prefix":"","suffix":" lb/h","digits":1}},
   "insulation-heat-loss": {"Q_bare_BTU_hr_ft":{"prefix":"","suffix":" BTU/hr·ft","digits":1},"Q_insulated_BTU_hr_ft":{"prefix":"","suffix":" BTU/hr·ft","digits":1},"outer_surface_T_F":{"prefix":"","suffix":" °F","digits":1},"effectiveness_pct":{"prefix":"","suffix":" %","digits":1}},
-  "insulation-thickness": {"thickness_in":{"prefix":"","suffix":" in","digits":3}},
   "insulation-thickness-for-heat-loss": {"thickness_in":{"prefix":"","suffix":" in","digits":3}},
   "internal-heat-gains": {"q_sensible":{"prefix":"","suffix":" Btu/h","digits":0},"q_latent":{"prefix":"","suffix":" Btu/h","digits":0},"q_total":{"prefix":"","suffix":" Btu/h","digits":0}},
   "inventory-turnover": {"turnover":{"prefix":"","suffix":"x","digits":2}},

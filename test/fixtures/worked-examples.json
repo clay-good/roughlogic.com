@@ -169879,6 +169879,39 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "insulation-thickness",
+  "source_publisher": "Project (first-principles)",
+  "source_title": "Example line with the outer film computed (painted jacket, still air)",
+  "source_edition_or_year": "Churchill-Chu + gray-body radiation at the jacket",
+  "source_section_or_page": "jacket OD 1.605 in at 120 F in 75 F air, emissivity 0.9: h = 2.054 BTU/hr ft2 F; conduction 2 pi (0.27/12)(130)/ln(0.8025/0.5) = h (2 pi 0.8025/12)(45) at t = 0.3026 in",
+  "verified_by": "rl",
+  "verified_on": "2026-10-09",
+  "inputs": {
+   "pipe_od_in": 1,
+   "surface_temp_F": 250,
+   "ambient_F": 75,
+   "surface_limit_F": 120,
+   "k_btu_in_per_hr_ft2_F": 0.27,
+   "film_mode": "computed",
+   "jacket_emissivity": 0.9,
+   "wind_mph": 0
+  },
+  "outputs": {
+   "thickness_in": {
+    "value": 0.3026,
+    "tolerance": {
+     "pct": 0.5
+    }
+   },
+   "film_used_btu_hr_ft2_F": {
+    "value": 2.054,
+    "tolerance": {
+     "pct": 0.5
+    }
+   }
+  }
  }
  ]
 }

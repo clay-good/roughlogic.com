@@ -4640,7 +4640,7 @@ export const CITATIONS = {
     editionNote: "Single-edition (engineering practice).",
     assumptions: [
       { name: "Insulation k-value", value: "entered from the insulation data sheet (about 0.27 for mineral fiber at mean temperature)", source: "manufacturer + public engineering reference" },
-      { name: "Outside-film coefficient", value: "1.65 BTU/(hr × ft² × °F) horizontal pipe", source: "engineering practice" },
+      { name: "Outside-film coefficient", value: "1.65 BTU/(hr × ft² × °F) horizontal pipe, entered; or computed (added 2026-10-09) at the jacket OD and target surface temperature from Churchill-Chu natural convection, gray-body radiation at the jacket emissivity and Churchill-Bernstein wind convection", source: "engineering practice; bare-pipe-heat-loss" },
     ],
   },
   "evaporative-cooling": {

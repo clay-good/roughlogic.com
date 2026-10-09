@@ -59102,3 +59102,19 @@ test("bounds: bare-pipe-heat-loss wind adds Churchill-Bernstein forced convectio
   assert.ok(_bphW({ ...b, wind_mph: 20 }).q_per_ft_btuh > windy.q_per_ft_btuh);
   assert.ok("error" in _bphW({ ...b, wind_mph: -5 }));
 });
+
+import { computeInsulationThickness as _itF, computeBarePipeHeatLoss as _bphF } from "../../calc-hvac.js";
+test("bounds: insulation-thickness computed film is the bare-pipe coefficient at the jacket", () => {
+  const b = { pipe_od_in: 1, surface_temp_F: 250, ambient_F: 75, surface_limit_F: 120, k_btu_in_per_hr_ft2_F: 0.27 };
+  const c = _itF({ ...b, film_mode: "computed", jacket_emissivity: 0.9 });
+  const bp = _bphF({ od_in: 2 * c.r2_in, surface_f: 120, amb_f: 75, emissivity: 0.9 });
+  assert.ok(Math.abs(c.film_used_btu_hr_ft2_F - (bp.conv_coefficient + bp.rad_coefficient)) < 1e-12);
+  // Entering that coefficient reproduces the thickness, and the stated-thickness check lands on the limit.
+  assert.ok(Math.abs(_itF({ ...b, outside_film_coeff_btu_hr_ft2_F: c.film_used_btu_hr_ft2_F }).thickness_in - c.thickness_in) < 1e-9);
+  assert.ok(Math.abs(_itF({ ...b, film_mode: "computed", jacket_emissivity: 0.9, at_thickness_in: c.thickness_in }).surface_at_thickness_F - 120) < 1e-6);
+  // A bright jacket radiates less, so it needs more insulation; wind needs less.
+  assert.ok(_itF({ ...b, film_mode: "computed", jacket_emissivity: 0.1 }).thickness_in > c.thickness_in);
+  assert.ok(_itF({ ...b, film_mode: "computed", jacket_emissivity: 0.9, wind_mph: 10 }).thickness_in < c.thickness_in);
+  assert.ok("error" in _itF({ ...b, film_mode: "computed", jacket_emissivity: 1.5 }));
+  assert.ok("error" in _itF({ ...b, film_mode: "guess" }));
+});

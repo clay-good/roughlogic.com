@@ -584,18 +584,26 @@ export const wetBulbPsychrometerExample = {
 // 1.65 BTU/hr/ft^2/F (still air on a horizontal pipe, public engineering
 // reference value).
 
-// dims: in { pipe_od_in: L, surface_temp_F: T, ambient_F: T, surface_limit_F: T, k_btu_in_per_hr_ft2_F: M L^2 T^-3, outside_film_coeff_btu_hr_ft2_F: M T^-3, at_thickness_in: L, alt_film_coeff_btu_hr_ft2_F: M T^-3 } out: { thickness_in: L, r_value: dimensionless }
+// Computed film added 2026-10-09: film_mode "computed" takes the outer coefficient from bare-pipe-heat-loss
+// (Churchill-Chu natural convection + gray-body radiation + optional Churchill-Bernstein wind) at the jacket OD
+// and the target surface temperature, inside the thickness bisection.
+// dims: in { pipe_od_in: L, surface_temp_F: T, ambient_F: T, surface_limit_F: T, k_btu_in_per_hr_ft2_F: M L^2 T^-3, outside_film_coeff_btu_hr_ft2_F: M T^-3, at_thickness_in: L, alt_film_coeff_btu_hr_ft2_F: M T^-3, film_mode: dimensionless, jacket_emissivity: dimensionless, wind_mph: L T^-1 } out: { thickness_in: L, r_value: dimensionless, film_used_btu_hr_ft2_F: M T^-3 }
 export function computeInsulationThickness({
   pipe_od_in, surface_temp_F, ambient_F, surface_limit_F, k_btu_in_per_hr_ft2_F,
   outside_film_coeff_btu_hr_ft2_F = 1.65,
   at_thickness_in = 0, alt_film_coeff_btu_hr_ft2_F = 0,
+  film_mode = "entered", jacket_emissivity = 0.9, wind_mph = 0,
 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (film_mode !== "entered" && film_mode !== "computed") return { error: "The film coefficient must be entered or computed." };
+  const computedFilm = film_mode === "computed";
+  if (computedFilm && !(jacket_emissivity > 0 && jacket_emissivity <= 1)) return { error: "Jacket emissivity must be above 0 and at most 1 (0.9 painted or PVC, 0.1 bright aluminum)." };
+  if (!(wind_mph >= 0)) return { error: "Wind speed cannot be negative (mph)." };
   // A non-positive pipe diameter has no geometry: the log-ratio the radial forms
   // use goes non-finite rather than merely wrong.
   if (!(pipe_od_in > 0)) return { error: "Pipe outside diameter must be positive." };
   if (!(k_btu_in_per_hr_ft2_F > 0)) return { error: "Insulation conductivity must be positive." };
-  if (!(outside_film_coeff_btu_hr_ft2_F > 0)) return { error: "The outer film coefficient must be positive." };
+  if (!computedFilm && !(outside_film_coeff_btu_hr_ft2_F > 0)) return { error: "The outer film coefficient must be positive." };
   const r1 = pipe_od_in / 2;
   const dT = surface_temp_F - ambient_F;
   if (dT <= 0) return { error: "Pipe surface must exceed ambient." };
@@ -619,19 +627,27 @@ export function computeInsulationThickness({
   // Bisection on r2 in inches. Conduction falls and film loss rises with r2,
   // so the root is unique; if conduction still wins at 12 in, it lies beyond
   // the bracket and bisection would return the bracket edge as an answer.
+  // The outer coefficient at a jacket radius (in) and surface temperature (F): entered, or computed.
+  const filmAt = (rOut, tSurf) => {
+    if (!computedFilm) return outside_film_coeff_btu_hr_ft2_F;
+    const bp = computeBarePipeHeatLoss({ od_in: 2 * rOut, surface_f: tSurf, amb_f: ambient_F, emissivity: jacket_emissivity, wind_mph });
+    return bp.error ? NaN : bp.conv_coefficient + bp.rad_coefficient;
+  };
   let lo = r1 + 1e-3;
   let hi = r1 + 12;
-  if ((2 * Math.PI * k * Td_minus_Ts) / Math.log(hi / r1) > outside_film_coeff_btu_hr_ft2_F * (Math.PI * 2 * hi / 12) * allowable_outer_dT) {
+  if (!(filmAt(hi, surface_limit_F) > 0)) return { error: "The computed film coefficient is not a finite value; check the temperatures." };
+  if ((2 * Math.PI * k * Td_minus_Ts) / Math.log(hi / r1) > filmAt(hi, surface_limit_F) * (Math.PI * 2 * hi / 12) * allowable_outer_dT) {
     return { error: "More than 12 in of insulation would be needed to hold that surface limit; check the inputs or raise the limit." };
   }
   for (let i = 0; i < 80; i++) {
     const mid = (lo + hi) / 2;
     const q_through = (2 * Math.PI * k * Td_minus_Ts) / Math.log(mid / r1);
-    const q_out = outside_film_coeff_btu_hr_ft2_F * (Math.PI * 2 * mid / 12) * allowable_outer_dT;
+    const q_out = filmAt(mid, surface_limit_F) * (Math.PI * 2 * mid / 12) * allowable_outer_dT;
     if (q_through > q_out) lo = mid; else hi = mid;
   }
   const r2 = (lo + hi) / 2;
   const thickness_in = r2 - r1;
+  const film_used_btu_hr_ft2_F = filmAt(r2, surface_limit_F);
   // spec-v1675 (cut into this tile): the FORWARD direction -- the surface
   // temperature AT a stated thickness -- and the same question at a second film
   // condition. Both optional; zero leaves every figure above untouched.
@@ -647,7 +663,19 @@ export function computeInsulationThickness({
     return (A * surface_temp_F + B * ambient_F) / (A + B);
   };
   const has_at_thickness = at_thickness_in > 0;
-  const surface_at_thickness_F = has_at_thickness ? surfaceAt(at_thickness_in, outside_film_coeff_btu_hr_ft2_F) : null;
+  // With a computed film the coefficient depends on the surface temperature it sets, so iterate.
+  let surface_at_thickness_F = null;
+  if (has_at_thickness) {
+    surface_at_thickness_F = surfaceAt(at_thickness_in, filmAt(r1 + at_thickness_in, surface_limit_F));
+    if (computedFilm) {
+      for (let i = 0; i < 60 && surface_at_thickness_F !== null; i++) {
+        const next = surfaceAt(at_thickness_in, filmAt(r1 + at_thickness_in, surface_at_thickness_F));
+        const settled = next !== null && Math.abs(next - surface_at_thickness_F) < 1e-10;
+        surface_at_thickness_F = next;
+        if (settled) break;
+      }
+    }
+  }
   const at_thickness_meets = has_at_thickness && surface_at_thickness_F !== null && surface_at_thickness_F <= surface_limit_F + 1e-9; // round-off: the solved thickness fed back lands within 1e-14 F
   const at_thickness_verdict = !has_at_thickness
     ? "(no stated thickness entered)"
@@ -683,10 +711,10 @@ export function computeInsulationThickness({
         : "")
       + ". A HIGHER film coefficient carries heat off the jacket faster, so the surface runs COOLER for the same insulation -- which is why the same line outdoors in wind is cooler to touch than indoors in still air, and why a thickness taken from an outdoor calculation can leave an indoor surface above the target. That is the reverse of what most people expect.";
   return {
-    thickness_in, r2_in: r2, r1_in: r1,
+    thickness_in, r2_in: r2, r1_in: r1, film_used_btu_hr_ft2_F, film_computed: computedFilm,
     has_at_thickness, surface_at_thickness_F, at_thickness_meets, at_thickness_verdict,
     has_alt_film, alt_thickness_in, alt_surface_at_thickness_F, alt_film_verdict,
-    note: "The insulation thickness that holds a hot pipe's outer surface at or below a target, from cylindrical conduction balanced against the outer film. Two things about this calculation are worth stating plainly. The first is that the PERSONNEL case and the ENERGY case are independent, and the personnel case is usually the lighter one: a line insulated to an economic heat-loss target already satisfies touch protection, but a line insulated only for touch protection is not insulated for energy. That asymmetry is the one that gets used backwards, when someone proposes stripping insulation from a line 'that is only there for touch safety' -- see `insulation-thickness-for-heat-loss` and `economic-insulation-thickness` for the other case. The second is that the surface film coefficient is what makes the answer sensitive to installation, and it runs against intuition: a higher film coefficient carries heat off the jacket faster, so a line OUTDOORS in wind runs COOLER at the surface than the same line indoors in still air. A thickness calculated for outdoor conditions can therefore be inadequate indoors, which is why the coefficient is an entered value rather than a constant. The default 1.65 BTU/hr/sq ft/degF is a still-air horizontal-pipe reference value. The jacket is the part this arithmetic does not capture at all. Skin contact temperature depends on how fast the surface can deliver heat INTO skin, so a metal jacket at 140 degF burns faster than a mastic or PVC finish at the same temperature, and standards set different acceptable surface temperatures for different jacket materials. Specifying a maximum surface temperature without specifying the jacket leaves the criterion unstated, and a metal-jacketed line meeting a number written for mastic is not protected. Conduction and the outer film only: it does not address the insulation's k varying with mean temperature, joints, hangers, supports and the thermal bridges they make, moisture in the insulation, or the alternative of guarding where insulation is impractical. The insulation manufacturer's data and the applicable personnel-protection standard govern.",
+    note: "The insulation thickness that holds a hot pipe's outer surface at or below a target, from cylindrical conduction balanced against the outer film. Two things about this calculation are worth stating plainly. The first is that the PERSONNEL case and the ENERGY case are independent, and the personnel case is usually the lighter one: a line insulated to an economic heat-loss target already satisfies touch protection, but a line insulated only for touch protection is not insulated for energy. That asymmetry is the one that gets used backwards, when someone proposes stripping insulation from a line 'that is only there for touch safety' -- see `insulation-thickness-for-heat-loss` and `economic-insulation-thickness` for the other case. The second is that the surface film coefficient is what makes the answer sensitive to installation, and it runs against intuition: a higher film coefficient carries heat off the jacket faster, so a line OUTDOORS in wind runs COOLER at the surface than the same line indoors in still air. A thickness calculated for outdoor conditions can therefore be inadequate indoors, which is why the coefficient is an entered value rather than a constant. The default 1.65 BTU/hr/sq ft/degF is a still-air horizontal-pipe reference value; choose computed and the coefficient comes from natural convection, radiation at the jacket emissivity and any wind across the jacket (the bare-pipe-heat-loss model) at the jacket diameter and the target surface temperature, so a bright aluminum jacket (low emissivity) needs more insulation than a painted one. The jacket is the part this arithmetic does not capture at all. Skin contact temperature depends on how fast the surface can deliver heat INTO skin, so a metal jacket at 140 degF burns faster than a mastic or PVC finish at the same temperature, and standards set different acceptable surface temperatures for different jacket materials. Specifying a maximum surface temperature without specifying the jacket leaves the criterion unstated, and a metal-jacketed line meeting a number written for mastic is not protected. Conduction and the outer film only: it does not address the insulation's k varying with mean temperature, joints, hangers, supports and the thermal bridges they make, moisture in the insulation, or the alternative of guarding where insulation is impractical. The insulation manufacturer's data and the applicable personnel-protection standard govern.",
   };
 }
 
@@ -937,11 +965,19 @@ export function renderInsulationThickness(inputRegion, outputRegion, citationEl)
   // not on the page until 2026-10-01; the note said the film was entered.
   const h = makeNumber("Outside film coefficient (BTU/hr*ft²*F; 1.65 still air)", "it-h", { step: "any", min: "0", value: "1.65" });
   h.input.value = "1.65";
+  const fm = makeSelect("Outside film coefficient", "it-fm", [
+    { value: "entered", label: "Entered below" },
+    { value: "computed", label: "Computed: natural convection + radiation (+ wind) at the jacket" },
+  ]);
+  const je = makeNumber("Jacket emissivity (computed film; 0.9 painted or PVC, 0.1 aluminum)", "it-je", { step: "any", min: "0", max: "1", value: "0.9" });
+  je.input.value = "0.9";
+  const wind = makeNumber("Wind speed (mph, computed film; 0 for still air)", "it-wind", { step: "any", min: "0", value: "0" });
+  wind.input.value = "0";
   const at = makeNumber("Stated thickness to check (in, 0 to skip)", "it-at", { step: "any", min: "0" });
   const alt = makeNumber("Alternative film coefficient (0 to skip)", "it-alt", { step: "any", min: "0" });
-  for (const f of [od, ts, amb, lim, k, h, at, alt]) inputRegion.appendChild(f.wrap);
+  for (const f of [od, ts, amb, lim, k, fm, h, je, wind, at, alt]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => {
-    od.input.value = "1"; ts.input.value = "250"; amb.input.value = "75"; lim.input.value = "120"; k.input.value = "0.27"; h.input.value = "1.65"; at.input.value = ""; alt.input.value = ""; update();
+    od.input.value = "1"; ts.input.value = "250"; amb.input.value = "75"; lim.input.value = "120"; k.input.value = "0.27"; fm.select.value = "entered"; h.input.value = "1.65"; je.input.value = "0.9"; wind.input.value = "0"; at.input.value = ""; alt.input.value = ""; update();
   });
   const oT = makeOutputLine(outputRegion, "Required thickness", "it-out-t");
   const oA = makeOutputLine(outputRegion, "At the stated thickness", "it-out-a");
@@ -957,14 +993,18 @@ export function renderInsulationThickness(inputRegion, outputRegion, citationEl)
       outside_film_coeff_btu_hr_ft2_F: h.input.value === "" ? 1.65 : Number(h.input.value) || 0,
       at_thickness_in: Number(at.input.value) || 0,
       alt_film_coeff_btu_hr_ft2_F: Number(alt.input.value) || 0,
+      film_mode: fm.select.value,
+      jacket_emissivity: Number(je.input.value) || 0,
+      wind_mph: Number(wind.input.value) || 0,
     });
     if (r.error) { oT.textContent = r.error; oA.textContent = ""; oF.textContent = ""; oN.textContent = ""; return; }
-    oT.textContent = fmt(r.thickness_in, 3) + " in";
+    oT.textContent = fmt(r.thickness_in, 3) + " in" + (r.film_computed ? " (computed film " + fmt(r.film_used_btu_hr_ft2_F, 2) + " BTU/hr-ft2-F at the jacket)" : "");
     oA.textContent = r.at_thickness_verdict;
     oF.textContent = r.alt_film_verdict;
     oN.textContent = r.note;
   }, DEBOUNCE_MS);
-  for (const el of [od.input, ts.input, amb.input, lim.input, k.input, h.input, at.input, alt.input]) el.addEventListener("input", update);
+  for (const el of [od.input, ts.input, amb.input, lim.input, k.input, h.input, je.input, wind.input, at.input, alt.input]) el.addEventListener("input", update);
+  fm.select.addEventListener("change", update);
 }
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
