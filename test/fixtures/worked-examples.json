@@ -169031,6 +169031,37 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "band-brake-torque",
+  "source_publisher": "Project (first-principles)",
+  "source_title": "Peak lining pressure and band stress, 2 in x 1/16 in band",
+  "source_edition_or_year": "band brake (Shigley Ch. 16)",
+  "source_section_or_page": "T1 = 50 e^(0.3 x 4.712) = 205.56 lbf; p_max = 205.56/(2 x 6) = 17.13 psi; sigma = 205.56/(2 x 0.0625) = 1,644.5 psi",
+  "verified_by": "rl",
+  "verified_on": "2026-10-09",
+  "inputs": {
+   "slack_tension_lbf": 50,
+   "wrap_angle_deg": 270,
+   "friction_coefficient": 0.3,
+   "drum_radius_in": 6,
+   "band_width_in": 2,
+   "band_thickness_in": 0.0625
+  },
+  "outputs": {
+   "max_lining_pressure_psi": {
+    "value": 17.13,
+    "tolerance": {
+     "pct": 0.5
+    }
+   },
+   "band_stress_psi": {
+    "value": 1644.5,
+    "tolerance": {
+     "pct": 0.5
+    }
+   }
+  }
  }
  ]
 }

@@ -58794,3 +58794,15 @@ test("bounds: sump-basin-sizing IPC 712.4.2 minimums are about 2 ft/s in each di
   assert.equal(_sbIpc(b).meets_ipc_min, null);
   assert.ok("error" in _sbIpc({ ...b, discharge_in: 4 }));
 });
+
+import { computeBandBrakeTorque as _bbtP } from "../../calc-mechanic.js";
+test("bounds: band-brake-torque lining pressure T1/(b r) balances the tight-side tension", () => {
+  const b = { slack_tension_lbf: 50, wrap_angle_deg: 270, friction_coefficient: 0.3, drum_radius_in: 6 };
+  const r = _bbtP({ ...b, band_width_in: 2, band_thickness_in: 0.0625 });
+  // Equilibrium at the tight end: T1 = p_max x b x r.
+  assert.ok(Math.abs(r.max_lining_pressure_psi * 2 * 6 - r.tight_tension_lbf) < 1e-9);
+  assert.ok(Math.abs(r.band_stress_psi * 2 * 0.0625 - r.tight_tension_lbf) < 1e-9);
+  assert.equal(_bbtP(b).has_width, false);
+  assert.ok("error" in _bbtP({ ...b, band_thickness_in: 0.0625 }));
+  assert.ok("error" in _bbtP({ ...b, band_width_in: -1 }));
+});

@@ -1331,8 +1331,10 @@ MECHANIC_RENDERERS["planetary-gear-ratio"] = _simpleRenderer({
 // disk-clutch-torque names "band brakes are separate." The Eytelwein/capstan relation
 // T1 = T2 e^(mu theta) is the physics behind a band brake, a rope around a bollard, and a capstan.
 // Braking torque T = (T1 - T2) r. The tension ratio climbs fast with wrap angle.
-// dims: in { slack_tension_lbf: M L T^-2, wrap_angle_deg: dimensionless, friction_coefficient: dimensionless, drum_radius_in: L } out: { tight_tension_lbf: M L T^-2, tension_ratio: dimensionless, brake_torque_in_lbf: M L^2 T^-2, brake_torque_ft_lbf: M L^2 T^-2 }
-export function computeBandBrakeTorque({ slack_tension_lbf = 0, wrap_angle_deg = 0, friction_coefficient = 0, drum_radius_in = 0 } = {}) {
+// Lining pressure and band stress added 2026-10-09 (the note named them as separate): the pressure peaks at the
+// tight end, p_max = 2 T1/(b D) = T1/(b r) (Shigley Ch. 16), and the band carries T1 over b t.
+// dims: in { slack_tension_lbf: M L T^-2, wrap_angle_deg: dimensionless, friction_coefficient: dimensionless, drum_radius_in: L, band_width_in: L, band_thickness_in: L } out: { tight_tension_lbf: M L T^-2, tension_ratio: dimensionless, brake_torque_in_lbf: M L^2 T^-2, brake_torque_ft_lbf: M L^2 T^-2 , max_lining_pressure_psi: M L^-1 T^-2, band_stress_psi: M L^-1 T^-2 }
+export function computeBandBrakeTorque({ slack_tension_lbf = 0, wrap_angle_deg = 0, friction_coefficient = 0, drum_radius_in = 0, band_width_in = 0, band_thickness_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const T2 = Number(slack_tension_lbf) || 0;
   const wrap = Number(wrap_angle_deg) || 0;
@@ -1342,15 +1344,21 @@ export function computeBandBrakeTorque({ slack_tension_lbf = 0, wrap_angle_deg =
   if (!(wrap > 0)) return { error: "Wrap angle must be positive (deg)." };
   if (mu < 0) return { error: "Friction coefficient cannot be negative." };
   if (!(r > 0)) return { error: "Drum radius must be positive (in)." };
+  const b = Number(band_width_in) || 0, tb = Number(band_thickness_in) || 0;
+  if (b < 0 || tb < 0) return { error: "Band width and thickness cannot be negative (in; blank to skip)." };
+  if (tb > 0 && !(b > 0)) return { error: "Enter the band width with its thickness." };
   const theta = (wrap * Math.PI) / 180;
   const tension_ratio = Math.exp(mu * theta);
   const tight_tension_lbf = T2 * tension_ratio;
   const brake_torque_in_lbf = (tight_tension_lbf - T2) * r;
   const brake_torque_ft_lbf = brake_torque_in_lbf / 12;
-  if (![tension_ratio, tight_tension_lbf, brake_torque_in_lbf].every(Number.isFinite) || !(brake_torque_in_lbf >= 0)) return { error: "Band-brake math is not a finite value; check the inputs." };
+  const max_lining_pressure_psi = b > 0 ? tight_tension_lbf / (b * r) : 0;
+  const band_stress_psi = b > 0 && tb > 0 ? tight_tension_lbf / (b * tb) : 0;
+  if (![tension_ratio, tight_tension_lbf, brake_torque_in_lbf, max_lining_pressure_psi, band_stress_psi].every(Number.isFinite) || !(brake_torque_in_lbf >= 0)) return { error: "Band-brake math is not a finite value; check the inputs." };
   return {
     tight_tension_lbf, tension_ratio, brake_torque_in_lbf, brake_torque_ft_lbf, wrap_angle_deg: wrap,
-    note: "Band brake / capstan torque from the Eytelwein (belt-friction) relation T1 = T2 e^(mu theta): the tight-side tension T1 grows exponentially from the applied slack-side tension T2 with the friction mu and the wrap angle theta (radians), and the braking torque on the drum is T = (T1 - T2) r. The ratio e^(mu theta) climbs fast with wrap - a 270-degree wrap at mu 0.3 multiplies the pull by 4.1, a full turn by 6.6 - which is why a couple of turns of rope on a bollard hold a boat and a light lever pull stops a heavy drum. A band brake whose anchored end is the tight side is self-energizing (rotation tightens it). The lever geometry that sets the actuating force, the self-energizing sign, the band stress and width, and the heat of braking are separate; the friction coefficient is the user's (band lining on the drum). A design aid; Shigley and the brake maker govern.",
+    max_lining_pressure_psi, band_stress_psi, has_width: b > 0, has_thickness: tb > 0,
+    note: "Band brake / capstan torque from the Eytelwein (belt-friction) relation T1 = T2 e^(mu theta): the tight-side tension T1 grows exponentially from the applied slack-side tension T2 with the friction mu and the wrap angle theta (radians), and the braking torque on the drum is T = (T1 - T2) r. The ratio e^(mu theta) climbs fast with wrap - a 270-degree wrap at mu 0.3 multiplies the pull by 4.1, a full turn by 6.6 - which is why a couple of turns of rope on a bollard hold a boat and a light lever pull stops a heavy drum. A band brake whose anchored end is the tight side is self-energizing (rotation tightens it). With the band width it gives the peak lining pressure at the tight end, p_max = T1/(b r) (compare with the lining maker's allowable), and with the thickness the band tension stress T1/(b t); the lever geometry that sets the actuating force, the self-energizing sign, and the heat of braking are separate; the friction coefficient is the user's (band lining on the drum). A design aid; Shigley and the brake maker govern.",
   };
 }
 export const bandBrakeTorqueExample = { inputs: { slack_tension_lbf: 50, wrap_angle_deg: 270, friction_coefficient: 0.3, drum_radius_in: 6 } };
@@ -1363,10 +1371,13 @@ MECHANIC_RENDERERS["band-brake-torque"] = _simpleRenderer({
     { key: "wrap_angle_deg", label: "Wrap angle (deg)", kind: "number" },
     { key: "friction_coefficient", label: "Band-to-drum friction coefficient", kind: "number" },
     { key: "drum_radius_in", label: "Drum radius (in)", kind: "number" },
+    { key: "band_width_in", label: "Band width (in, blank to skip)", kind: "number" },
+    { key: "band_thickness_in", label: "Band thickness (in, blank to skip)", kind: "number" },
   ],
   outputs: [
     { key: "t", id: "bbt-out-t", label: "Braking torque", value: (r) => fmt(r.brake_torque_in_lbf, 0) + " in-lbf (" + fmt(r.brake_torque_ft_lbf, 1) + " ft-lbf)" },
     { key: "t1", id: "bbt-out-t1", label: "Tight-side tension T1", value: (r) => fmt(r.tight_tension_lbf, 1) + " lbf (ratio e^(mu*theta) = " + fmt(r.tension_ratio, 3) + ")" },
+    { key: "p", id: "bbt-out-p", label: "Peak lining pressure and band stress", value: (r) => (r.has_width ? fmt(r.max_lining_pressure_psi, 1) + " psi at the tight end" + (r.has_thickness ? "; band tension stress " + fmt(r.band_stress_psi, 0) + " psi" : "") : "enter the band width") },
     { key: "n", id: "bbt-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeBandBrakeTorque,

@@ -60,6 +60,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **`band-brake-torque` gives the peak lining pressure and band stress.** It said band stress and width were separate. An optional band width now returns the peak lining pressure at the tight end, p_max = T1/(b r), and a thickness adds the band tension stress T1/(b t): the example's 205.6 lbf tight side on a 2 in by 1/16 in band over a 6 in radius is 17.1 psi and 1,645 psi. Torque results are unchanged.
+
 - **`sump-basin-sizing` checks a sewage ejector against IPC Table 712.4.2.** An optional discharge-size select (2, 2-1/2, or 3 in) now compares the pump rate with the table's minimum capacity (21, 30, 46 gpm, each about 2 ft/s of scouring velocity in that pipe) and reports the velocity: the 30 gpm example pump meets a 2 or 2-1/2 in discharge but falls below the 46 gpm a 3 in line needs. Clear-water sumps (the default) are unchanged.
 
 - **`mud-hydrostatic-pressure` gives the equivalent circulating density.** It said the annular friction while circulating was separate. An optional annular pressure loss now returns the circulating bottom-hole pressure and ECD = MW + APL/(0.052 TVD): 12.5 ppg mud at 9,800 ft TVD with 250 psi of annular loss circulates at 12.99 ppg equivalent, 6,620 psi on bottom. Static results are unchanged.
