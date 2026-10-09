@@ -1127,12 +1127,14 @@ export const tankVentApi2000Example = { inputs: { pump_in_bph: 3000, pump_out_bp
 // has 16 minutes of retention against the 2 to 3 a light oil needs. So
 // this computes both and names the governing one from the numbers.
 // =====================================================================
-// dims: in { vessel_diameter_ft: L, seam_to_seam_ft: L, liquid_fraction: dimensionless, liquid_rate_bpd: L^3 T^-1, required_retention_min: T, gas_rate_mmscfd: L^3 T^-1, pressure_psig: M L^-1 T^-2, temperature_f: T, z_factor: dimensionless, gas_gravity: dimensionless, liquid_density_lb_ft3: M L^-3, k_factor: L T^-1 } out: { liquid_volume_bbl: L^3, actual_retention_min: T, required_liquid_bbl: L^3, gas_density_lb_ft3: M L^-3, max_velocity_fps: L T^-1, actual_velocity_fps: L T^-1, gas_pct_of_max: dimensionless, liquid_pct_of_required: dimensionless }
+// Computed Z added 2026-10-09: z_mode "computed" takes Z from gas-z-factor (Sutton + Dranchuk-Abou-Kassem) at the
+// operating pressure and temperature.
+// dims: in { vessel_diameter_ft: L, seam_to_seam_ft: L, liquid_fraction: dimensionless, liquid_rate_bpd: L^3 T^-1, required_retention_min: T, gas_rate_mmscfd: L^3 T^-1, pressure_psig: M L^-1 T^-2, temperature_f: T, z_factor: dimensionless, gas_gravity: dimensionless, liquid_density_lb_ft3: M L^-3, k_factor: L T^-1, z_mode: dimensionless } out: { liquid_volume_bbl: L^3, actual_retention_min: T, required_liquid_bbl: L^3, gas_density_lb_ft3: M L^-3, max_velocity_fps: L T^-1, actual_velocity_fps: L T^-1, gas_pct_of_max: dimensionless, liquid_pct_of_required: dimensionless, z_used: dimensionless }
 export function computeSeparatorRetentionSizing({
   vessel_diameter_ft = 0, seam_to_seam_ft = 0, liquid_fraction = 0.5,
   liquid_rate_bpd = 0, required_retention_min = 0, gas_rate_mmscfd = 0,
   pressure_psig = 0, temperature_f = 0, z_factor = 0.9, gas_gravity = 0.7,
-  liquid_density_lb_ft3 = 0, k_factor = 0.35,
+  liquid_density_lb_ft3 = 0, k_factor = 0.35, z_mode = "entered",
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(vessel_diameter_ft > 0) || !(seam_to_seam_ft > 0)) return { error: "Vessel diameter and seam-to-seam length must be greater than zero." };
@@ -1140,13 +1142,20 @@ export function computeSeparatorRetentionSizing({
   if (!(liquid_rate_bpd > 0)) return { error: "Liquid rate must be greater than zero." };
   if (!(required_retention_min > 0)) return { error: "Required retention time must be greater than zero." };
   if (!(gas_rate_mmscfd > 0)) return { error: "Gas rate must be greater than zero." };
-  if (!(z_factor > 0)) return { error: "The compressibility factor must be greater than zero." };
+  if (z_mode !== "entered" && z_mode !== "computed") return { error: "Compressibility must be entered or computed." };
+  if (z_mode === "entered" && !(z_factor > 0)) return { error: "The compressibility factor must be greater than zero." };
   if (!(gas_gravity > 0)) return { error: "Gas gravity must be greater than zero." };
   if (!(liquid_density_lb_ft3 > 0)) return { error: "Liquid density must be greater than zero." };
   if (!(k_factor > 0)) return { error: "The K factor must be greater than zero." };
   const pressure_psia = pressure_psig + _OG_STD_P_PSIA;
   const temperature_r = temperature_f + 459.67;
   if (!(temperature_r > 0)) return { error: "Temperature must be above absolute zero." };
+  let z_used = z_factor;
+  if (z_mode === "computed") {
+    const zr = computeGasZFactor({ gas_gravity, pressure_psig, temperature_f });
+    if (zr.error) return { error: "Computed Z: " + zr.error };
+    z_used = zr.z;
+  }
 
   // The liquid side: pure residence time.
   const shell_area_ft2 = (Math.PI / 4) * vessel_diameter_ft * vessel_diameter_ft;
@@ -1160,11 +1169,11 @@ export function computeSeparatorRetentionSizing({
 
   // The gas side: a velocity limit, not a volume.
   const gas_mw = gas_gravity * _OG_AIR_MW;
-  const gas_density_lb_ft3 = pressure_psia * gas_mw / (z_factor * _OG_R_GAS * temperature_r);
+  const gas_density_lb_ft3 = pressure_psia * gas_mw / (z_used * _OG_R_GAS * temperature_r);
   if (!(gas_density_lb_ft3 > 0) || gas_density_lb_ft3 >= liquid_density_lb_ft3) return { error: "Gas density came out at or above the liquid density; check the pressure, temperature and gravity entered." };
   const max_velocity_fps = k_factor * Math.sqrt((liquid_density_lb_ft3 - gas_density_lb_ft3) / gas_density_lb_ft3);
   const vapour_area_ft2 = shell_area_ft2 * (1 - liquid_fraction);
-  const actual_ft3s = gas_rate_mmscfd * 1e6 / 86400 * (_OG_STD_P_PSIA / pressure_psia) * (temperature_r / _OG_STD_T_R) * z_factor;
+  const actual_ft3s = gas_rate_mmscfd * 1e6 / 86400 * (_OG_STD_P_PSIA / pressure_psia) * (temperature_r / _OG_STD_T_R) * z_used;
   const actual_velocity_fps = actual_ft3s / vapour_area_ft2;
   const gas_ok = actual_velocity_fps <= max_velocity_fps + 1e-12;
   const gas_pct_of_max = 100 * actual_velocity_fps / max_velocity_fps;
@@ -1188,10 +1197,10 @@ export function computeSeparatorRetentionSizing({
   return {
     liquid_volume_bbl, liquid_rate_bpm, actual_retention_min, required_liquid_bbl,
     liquid_ok, liquid_pct_of_required,
-    gas_density_lb_ft3, max_velocity_fps, vapour_area_ft2, actual_velocity_fps,
+    gas_density_lb_ft3, max_velocity_fps, vapour_area_ft2, actual_velocity_fps, z_used, z_computed: z_mode === "computed",
     gas_ok, gas_pct_of_max, gas_governs, both_ample,
     liquidVerdict, gasVerdict, governsVerdict, carryoverVerdict, asymmetryVerdict, foamVerdict,
-    note: "Whether a two-phase separator is big enough, which is two independent questions in one vessel. The liquid side is pure residence time: flow rate times the minutes needed, which sets the liquid volume below the interface. The gas side is a velocity limit: gas moving faster than the settling velocity of a droplet re-entrains liquid and carries it out of the gas line, which sets the vessel's cross-sectional area. EITHER CAN GOVERN AND THE TWO FAILURES LOOK NOTHING ALIKE. A vessel sized only on liquid retention can be far too small in diameter for its gas rate, and the symptom is liquid carryover into the gas line and eventually a damaged compressor. A vessel sized only on gas can be too short for the liquid to degas, and the symptom is gas breaking out downstream in the oil line and upsetting the tank battery. Both are computed here and the governing one is named from the numbers, because a vessel can look generous on the side that was checked and be marginal on the side that was not. RETENTION DOES NOT FIX RE-ENTRAINMENT. If the gas velocity is over the settling limit the separator carries liquid regardless of how many minutes the liquid side shows, and the fix is a larger diameter or a mist extractor rather than a longer vessel. FOAM IS THE WILD CARD AND NO DIAMETER FIXES IT: a foaming crude can need several times the nominal retention, which is why a separator that worked on one well can fail on another from the same field, and why the answer there is a defoamer, an internal or a much larger vessel. This screens an entered geometry against entered rates and properties. It does not select the K factor, the retention time, or the compressibility factor -- all three depend on the service and the internals and are entered -- predict foaming or a foam-corrected retention, design internals, inlet devices or mist extractors, address three-phase separation and the oil-water interface, size relief or level control, or determine the vessel's pressure rating. API 12J, the operator's facility standards, and the design engineer govern.",
+    note: "Whether a two-phase separator is big enough, which is two independent questions in one vessel. The liquid side is pure residence time: flow rate times the minutes needed, which sets the liquid volume below the interface. The gas side is a velocity limit: gas moving faster than the settling velocity of a droplet re-entrains liquid and carries it out of the gas line, which sets the vessel's cross-sectional area. EITHER CAN GOVERN AND THE TWO FAILURES LOOK NOTHING ALIKE. A vessel sized only on liquid retention can be far too small in diameter for its gas rate, and the symptom is liquid carryover into the gas line and eventually a damaged compressor. A vessel sized only on gas can be too short for the liquid to degas, and the symptom is gas breaking out downstream in the oil line and upsetting the tank battery. Both are computed here and the governing one is named from the numbers, because a vessel can look generous on the side that was checked and be marginal on the side that was not. RETENTION DOES NOT FIX RE-ENTRAINMENT. If the gas velocity is over the settling limit the separator carries liquid regardless of how many minutes the liquid side shows, and the fix is a larger diameter or a mist extractor rather than a longer vessel. FOAM IS THE WILD CARD AND NO DIAMETER FIXES IT: a foaming crude can need several times the nominal retention, which is why a separator that worked on one well can fail on another from the same field, and why the answer there is a defoamer, an internal or a much larger vessel. This screens an entered geometry against entered rates and properties. It does not select the K factor or the retention time -- both depend on the service and the internals and are entered; the compressibility factor is entered, or chosen as computed to come from the gas gravity at the operating pressure and temperature by the gas-z-factor method -- predict foaming or a foam-corrected retention, design internals, inlet devices or mist extractors, address three-phase separation and the oil-water interface, size relief or level control, or determine the vessel's pressure rating. API 12J, the operator's facility standards, and the design engineer govern.",
   };
 }
 export const separatorRetentionSizingExample = { inputs: { vessel_diameter_ft: 4, seam_to_seam_ft: 12, liquid_fraction: 0.5, liquid_rate_bpd: 1200, required_retention_min: 3, gas_rate_mmscfd: 3.5, pressure_psig: 400, temperature_f: 100, z_factor: 0.92, gas_gravity: 0.7, liquid_density_lb_ft3: 52, k_factor: 0.35 } };
@@ -1478,7 +1487,8 @@ OILGAS_RENDERERS["separator-retention-sizing"] = _simpleRenderer({
     { key: "gas_rate_mmscfd", label: "Gas rate (MMSCFD)" },
     { key: "pressure_psig", label: "Operating pressure (psig)" },
     { key: "temperature_f", label: "Operating temperature (degF)", attrs: { step: "any" } },
-    { key: "z_factor", label: "Compressibility factor Z" },
+    { key: "z_mode", label: "Compressibility Z", kind: "select", default: "entered", options: [{ value: "entered", label: "Entered below" }, { value: "computed", label: "Computed from gravity at the operating pressure (Sutton + DAK)" }] },
+    { key: "z_factor", label: "Compressibility factor Z (when entered)" },
     { key: "gas_gravity", label: "Gas specific gravity (air = 1)" },
     { key: "liquid_density_lb_ft3", label: "Liquid density (lb/cu ft)" },
     { key: "k_factor", label: "Souders-Brown K factor" },
@@ -1488,6 +1498,7 @@ OILGAS_RENDERERS["separator-retention-sizing"] = _simpleRenderer({
     { key: "liquid_volume_bbl", label: "Liquid volume", unit: "bbl", value: (r) => fmt(r.liquid_volume_bbl, 2) + " bbl (needs " + fmt(r.required_liquid_bbl, 2) + ")" },
     { key: "max_velocity_fps", label: "Souders-Brown limit", unit: "ft/s", value: (r) => fmt(r.max_velocity_fps, 2) + " ft/s" },
     { key: "actual_velocity_fps", label: "Actual gas velocity", unit: "ft/s", value: (r) => fmt(r.actual_velocity_fps, 3) + " ft/s (" + fmt(r.gas_pct_of_max, 0) + "% of the limit)" },
+    { key: "z_used", label: "Compressibility used", value: (r) => "Z = " + fmt(r.z_used, 4) + (r.z_computed ? " (computed)" : " (entered)") },
     { key: "gas_density_lb_ft3", label: "Gas density", unit: "lb/cu ft", value: (r) => fmt(r.gas_density_lb_ft3, 3) + " lb/cu ft" },
     { key: "gas_governs", label: "Which governs", value: (r) => r.both_ample ? "neither, tightly" : r.gas_governs ? "gas" : "liquid" },
     { key: "liquidVerdict", label: "Liquid side", value: (r) => r.liquidVerdict },

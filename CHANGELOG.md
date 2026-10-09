@@ -60,6 +60,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **`separator-retention-sizing` can compute its own Z.** A "Compressibility Z" select now offers computed, which takes Z from the gas gravity at the operating pressure and temperature by the `gas-z-factor` method (Sutton + Dranchuk-Abou-Kassem). On the example 400 psig, 100 degF, 0.7-gravity gas it is Z = 0.936 against the 0.92 entered, so the gas density falls from 1.522 to 1.495 lb/cu ft. Entered Z (the default) is unchanged.
+
 - **`gas-pipeline-flow` can compute its own Z.** A "Compressibility Z" select now offers computed, which takes Z from the gas gravity at the standard average line pressure (2/3)(P1 + P2 - P1 P2/(P1 + P2)) and the flowing temperature by the `gas-z-factor` method (Sutton + Dranchuk-Abou-Kassem). On the example 850/600 psig line it is Z = 0.887 at 747 psia, and the Panhandle A flow rises from 142.7 to 152.3 MMSCFD over the Z = 1 entry. Entered Z (the default) is unchanged.
 
 - **`clutch-engagement-energy` gives the average heat at a duty cycle.** Engagements per hour now turn the per-engagement energy into the heat the clutch must shed: the example engagement 60 times an hour is 284 BTU/hr, the figure to hold against the maker's thermal rating.

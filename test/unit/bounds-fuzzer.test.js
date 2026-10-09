@@ -59025,3 +59025,15 @@ test("bounds: gas-pipeline-flow computed Z equals gas-z-factor at the average pr
   assert.ok(Math.abs(_gpfZ({ ...b, z_factor: c.z_used }).q_scfd - c.q_scfd) < 1e-6);
   assert.ok("error" in _gpfZ({ ...b, z_mode: "guess" }));
 });
+
+import { computeSeparatorRetentionSizing as _srsZ } from "../../calc-oilgas.js";
+test("bounds: separator-retention-sizing computed Z equals gas-z-factor at the operating conditions", () => {
+  const b = { vessel_diameter_ft: 4, seam_to_seam_ft: 12, liquid_fraction: 0.5, liquid_rate_bpd: 1200, required_retention_min: 3, gas_rate_mmscfd: 3.5, pressure_psig: 400, temperature_f: 100, z_factor: 0.92, gas_gravity: 0.7, liquid_density_lb_ft3: 52, k_factor: 0.35 };
+  const c = _srsZ({ ...b, z_mode: "computed" });
+  assert.ok(Math.abs(c.z_used - _gzfP({ gas_gravity: 0.7, pressure_psig: 400, temperature_f: 100 }).z) < 1e-12);
+  // Entering that same Z reproduces the gas side.
+  const e = _srsZ({ ...b, z_factor: c.z_used });
+  assert.ok(Math.abs(e.gas_density_lb_ft3 - c.gas_density_lb_ft3) < 1e-12);
+  assert.ok(Math.abs(e.actual_velocity_fps - c.actual_velocity_fps) < 1e-12);
+  assert.ok("error" in _srsZ({ ...b, z_mode: "guess" }));
+});

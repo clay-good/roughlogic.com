@@ -169647,6 +169647,44 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "separator-retention-sizing",
+  "source_publisher": "Project (first-principles)",
+  "source_title": "Example separator with Z computed at the operating conditions",
+  "source_edition_or_year": "Souders-Brown with Sutton + DAK Z",
+  "source_section_or_page": "Z(0.7 SG, 414.7 psia, 100 F) = 0.9363; rho_g = 0.92/0.9363 x 1.5216 = 1.4952 lb/cu ft (density goes as 1/Z)",
+  "verified_by": "rl",
+  "verified_on": "2026-10-09",
+  "inputs": {
+   "vessel_diameter_ft": 4,
+   "seam_to_seam_ft": 12,
+   "liquid_fraction": 0.5,
+   "liquid_rate_bpd": 1200,
+   "required_retention_min": 3,
+   "gas_rate_mmscfd": 3.5,
+   "pressure_psig": 400,
+   "temperature_f": 100,
+   "z_factor": 0.92,
+   "gas_gravity": 0.7,
+   "liquid_density_lb_ft3": 52,
+   "k_factor": 0.35,
+   "z_mode": "computed"
+  },
+  "outputs": {
+   "z_used": {
+    "value": 0.9363,
+    "tolerance": {
+     "pct": 0.5
+    }
+   },
+   "gas_density_lb_ft3": {
+    "value": 1.4952,
+    "tolerance": {
+     "pct": 0.5
+    }
+   }
+  }
  }
  ]
 }
