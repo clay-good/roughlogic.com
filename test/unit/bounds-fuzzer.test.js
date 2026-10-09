@@ -58672,3 +58672,21 @@ test("bounds: bare-pipe-heat-loss reproduces the bare steel pipe table within 1.
   assert.ok("error" in _bphl({ od_in: 2, surface_f: 80, amb_f: 80 }));
   assert.ok("error" in _bphl({ od_in: 2, surface_f: 200, emissivity: 1.2 }));
 });
+
+import { computeSliderCrankPistonPosition as _scpV } from "../../calc-mechanic.js";
+test("bounds: slider-crank velocity and acceleration match numeric derivatives of the position", () => {
+  const g = { stroke_in: 3.48, rod_length_in: 5.7 };
+  const x = (t) => _scpV({ ...g, crank_angle_deg: t }).position_from_tdc_in;
+  const w = (2 * Math.PI * 6000) / 60, d = Math.PI / 180, h = 0.01;
+  for (const t of [30, 73, 150, 300]) {
+    const r = _scpV({ ...g, crank_angle_deg: t, crank_rpm: 6000 });
+    const v = ((x(t + h) - x(t - h)) / (2 * h * d)) * w / 12;
+    const a = ((x(t + h) - 2 * x(t) + x(t - h)) / ((h * d) ** 2)) * w * w / 386.0886;
+    assert.ok(Math.abs(r.velocity_fps - v) < 1e-3, `v at ${t}`);
+    assert.ok(Math.abs(r.accel_g - a) < 0.01, `a at ${t}`);
+  }
+  const tdc = _scpV({ ...g, crank_angle_deg: 0, crank_rpm: 6000 });
+  assert.ok(Math.abs(tdc.accel_g - tdc.tdc_accel_g) < 1e-9);
+  assert.equal(_scpV({ ...g, crank_angle_deg: 90 }).has_speed, false);
+  assert.ok("error" in _scpV({ ...g, crank_angle_deg: 90, crank_rpm: -1 }));
+});

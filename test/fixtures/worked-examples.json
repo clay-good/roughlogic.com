@@ -168766,6 +168766,35 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "slider-crank-piston-position",
+  "source_publisher": "Project (first-principles)",
+  "source_title": "Piston acceleration at TDC, 3.48 in stroke, 5.7 in rod, 6,000 rpm",
+  "source_edition_or_year": "slider-crank kinematics",
+  "source_section_or_page": "a_TDC = r omega^2 (1 + r/L) = 1.74 x 628.32^2 x (1 + 0.30526) / 386.09 = 2,322 g",
+  "verified_by": "rl",
+  "verified_on": "2026-10-09",
+  "inputs": {
+   "stroke_in": 3.48,
+   "rod_length_in": 5.7,
+   "crank_angle_deg": 0,
+   "crank_rpm": 6000
+  },
+  "outputs": {
+   "accel_g": {
+    "value": 2322.3,
+    "tolerance": {
+     "pct": 0.5
+    }
+   },
+   "position_from_tdc_in": {
+    "value": 0,
+    "tolerance": {
+     "abs": 1e-09
+    }
+   }
+  }
  }
  ]
 }

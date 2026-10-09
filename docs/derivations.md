@@ -2935,7 +2935,7 @@ cross-check.
 | calc-mechanic.js | `computeScotchYokeMotion` | `{ crank_radius_in = 0, crank_rpm = 0, crank_angle_deg = 0 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeScrewConveyor` | `{ screw_diameter_in = 0, shaft_diameter_in = 0, pitch_in = 0, rpm = 0, loadin...` | _ | _ | _ |
 | calc-mechanic.js | `computeScrewConveyorRpm` | `{ target_ft3_hr = 0, screw_diameter_in = 0, shaft_diameter_in = 0, pitch_in =...` | _ | _ | _ |
-| calc-mechanic.js | `computeSliderCrankPistonPosition` | `{ stroke_in = 0, rod_length_in = 0, crank_angle_deg = 0 } = {}` | _ | _ | _ |
+| calc-mechanic.js | `computeSliderCrankPistonPosition` | `{ stroke_in = 0, rod_length_in = 0, crank_angle_deg = 0, crank_rpm = 0 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeSprayTransferEfficiency` | `{ applied_material_qt = 0, transfer_efficiency = 0, alt_transfer_efficiency =...` | _ | _ | _ |
 | calc-mechanic.js | `computeSpringNaturalFrequency` | `{ wire_diameter_in = 0, mean_coil_diameter_in = 0, active_coils = 0, material...` | _ | _ | _ |
 | calc-mechanic.js | `computeSpringWireStress` | `{ wire_diameter_in = 0, mean_coil_diameter_in = 0, force_lb = 0, total_coils ...` | _ | _ | _ |
@@ -5765,7 +5765,7 @@ per spec-v14 §13.1 second paragraph.
 | `shaft-alignment-reverse-dial` | Reverse-Dial Shaft Alignment Shim and Move | Project (first-principles); the machine manufacturer alignment specification governs | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `shaft-alignment-rim-face` | Shaft Alignment Offset and Angularity (Rim-and-Face) | Project (first-principles); the machine manufacturer alignment specification governs | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `single-plane-field-balance` | Single-Plane Field Balance Trial Weight | Project (first-principles); the machine manufacturer balancing instructions and a qua... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
-| `slider-crank-piston-position` | Slider-Crank Piston Position | Project (first-principles); slider-crank displacement | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `slider-crank-piston-position` | Slider-Crank Piston Position | Project (first-principles); slider-crank displacement | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `soft-foot-correction` | Soft-Foot Measurement and Correction Shim | Project (first-principles); the machine manufacturer mounting requirements govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `spindle-max-mrr` | Max Material Removal Rate from Spindle Power | first-principles specific-cutting-ene...; 5 hp motor, 80% eff, unit power 1.0 (carbon steel) -> 4.0... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `spindle-power-torque` | Cutting Power and Spindle Torque | first-principles specific-cutting-ene...; 3.0 in3/min steel, 80% eff, 800 rpm -> 3.0 cutting hp, 3.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |

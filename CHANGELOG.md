@@ -60,6 +60,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **`slider-crank-piston-position` gives piston velocity and acceleration.** Its note said they were separate. An optional crank speed now returns the exact velocity and acceleration at the entered angle for a constant crank speed, and the peak acceleration at TDC, r omega^2 (1 + r/L). A 3.48 in stroke on a 5.7 in rod at 6,000 rpm pulls 2,322 g at TDC; at 73 degrees the piston moves at 95.3 ft/s. Position-only use is unchanged.
+
 - **`range-demand-220-55` covers several cooking appliances under 8.75 kW (NEC Table 220.55 Columns A and B).** It carried one such appliance and returned an error for more. Under 3.5 kW it now applies Column A and from 3.5 to 8.75 kW Column B, the percentage for the count times the summed nameplates (Note 3), down to 30% and 16% at 61 and over. Ten 6 kW cooktops: 34%, 20.4 kW. Column C above 8.75 kW is unchanged.
 
 - **`calc-machining.js` gzip cap raised 58,000 -> 66,000 B.** The five column and fatigue calculators added 2026-10-09 (secant formula, finite-life S-N, notch Kf, Miner damage, combined loading) take the module to about 58.9 KB gzipped. It is lazy-loaded and outside the home-view payload; the new cap leaves about 12% headroom.

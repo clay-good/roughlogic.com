@@ -1513,8 +1513,11 @@ MECHANIC_RENDERERS["universal-joint-speed"] = _simpleRenderer({
 // The engine bench has mean-piston-speed (average) but not the instantaneous piston position at a crank
 // angle - the slider-crank geometry for degreeing a cam, port timing, or piston-to-valve clearance.
 // x = r + L - (r cos(theta) + sqrt(L^2 - r^2 sin^2(theta))), r = stroke/2. The rod swing puts the piston
-// PAST mid-stroke at 90 deg. dims: in { stroke_in: L, rod_length_in: L, crank_angle_deg: dimensionless } out: { position_from_tdc_in: L, percent_of_stroke: dimensionless, rod_angularity_shift_in: L }
-export function computeSliderCrankPistonPosition({ stroke_in = 0, rod_length_in = 0, crank_angle_deg = 0 } = {}) {
+// PAST mid-stroke at 90 deg. Velocity and acceleration at a crank speed added 2026-10-09 (the note named them
+// as separate): v = omega dx/dtheta, a = omega^2 d2x/dtheta2 at constant omega, s = sqrt(L^2 - r^2 sin^2):
+// dx/dtheta = r sin + r^2 sin cos / s; d2x/dtheta2 = r cos + r^2 (cos^2 - sin^2)/s + r^4 sin^2 cos^2 / s^3.
+// dims: in { stroke_in: L, rod_length_in: L, crank_angle_deg: dimensionless, crank_rpm: T^-1 } out: { position_from_tdc_in: L, percent_of_stroke: dimensionless, rod_angularity_shift_in: L, velocity_fps: L T^-1, accel_g: dimensionless, tdc_accel_g: dimensionless }
+export function computeSliderCrankPistonPosition({ stroke_in = 0, rod_length_in = 0, crank_angle_deg = 0, crank_rpm = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const stroke = Number(stroke_in) || 0;
   const L = Number(rod_length_in) || 0;
@@ -1523,16 +1526,27 @@ export function computeSliderCrankPistonPosition({ stroke_in = 0, rod_length_in 
   const r = stroke / 2;
   if (!(L > r)) return { error: "Rod length must be greater than the crank radius (stroke/2) (in)." };
   if (!(theta_deg >= 0 && theta_deg <= 360)) return { error: "Crank angle must be between 0 and 360 degrees." };
+  const rpm = Number(crank_rpm) || 0;
+  if (rpm < 0) return { error: "Crank speed cannot be negative (rpm; blank to skip)." };
   const th = (theta_deg * Math.PI) / 180;
   const position_from_tdc_in = r + L - (r * Math.cos(th) + Math.sqrt(L * L - r * r * Math.sin(th) * Math.sin(th)));
   const simple = r * (1 - Math.cos(th));
   const rod_angularity_shift_in = position_from_tdc_in - simple;
   const percent_of_stroke = (position_from_tdc_in / stroke) * 100;
   const rod_stroke_ratio = L / stroke;
-  if (![position_from_tdc_in, percent_of_stroke, rod_angularity_shift_in].every(Number.isFinite)) return { error: "Slider-crank math is not a finite value; check the inputs." };
+  // Kinematics at a constant crank speed (positive velocity = moving away from TDC; acceleration in g).
+  const w = (2 * Math.PI * rpm) / 60;
+  const sn = Math.sin(th), cs = Math.cos(th), sq = Math.sqrt(L * L - r * r * sn * sn);
+  const dx = r * sn + (r * r * sn * cs) / sq;
+  const d2x = r * cs + (r * r * (cs * cs - sn * sn)) / sq + (Math.pow(r, 4) * sn * sn * cs * cs) / Math.pow(sq, 3);
+  const velocity_fps = (w * dx) / 12;
+  const accel_g = (w * w * d2x) / 386.0886;
+  const tdc_accel_g = (w * w * r * (1 + r / L)) / 386.0886;
+  if (![position_from_tdc_in, percent_of_stroke, rod_angularity_shift_in, velocity_fps, accel_g].every(Number.isFinite)) return { error: "Slider-crank math is not a finite value; check the inputs." };
   return {
     position_from_tdc_in, percent_of_stroke, rod_angularity_shift_in, rod_stroke_ratio, simple_position_in: simple,
-    note: "Exact piston position of a centered slider-crank at a crank angle theta after top dead center: x = r + L - (r cos(theta) + sqrt(L^2 - r^2 sin^2(theta))), with the crank radius r = stroke/2 and the connecting-rod length L. At TDC (theta 0) x = 0; at BDC (theta 180) x = stroke. Because the rod swings, the piston moves faster leaving TDC and is already PAST mid-stroke at 90 degrees - the pure-sinusoid position r(1 - cos theta) misses this, and the shorter the rod (smaller rod/stroke ratio) the bigger the shift. Use it to degree a cam, set port timing, or check piston-to-valve and deck clearance against crank angle. Centered (non-offset) slider-crank; piston velocity and acceleration, a wrist-pin offset, rod stretch, and the gas/inertia loads are separate. A design aid; Machinery's Handbook and the engine builder govern.",
+    velocity_fps, accel_g, tdc_accel_g, has_speed: rpm > 0,
+    note: "Exact piston position of a centered slider-crank at a crank angle theta after top dead center: x = r + L - (r cos(theta) + sqrt(L^2 - r^2 sin^2(theta))), with the crank radius r = stroke/2 and the connecting-rod length L. At TDC (theta 0) x = 0; at BDC (theta 180) x = stroke. Because the rod swings, the piston moves faster leaving TDC and is already PAST mid-stroke at 90 degrees - the pure-sinusoid position r(1 - cos theta) misses this, and the shorter the rod (smaller rod/stroke ratio) the bigger the shift. Use it to degree a cam, set port timing, or check piston-to-valve and deck clearance against crank angle. Centered (non-offset) slider-crank; with a crank speed entered it also gives the exact piston velocity and acceleration at constant speed (peak acceleration r omega^2 (1 + r/L) at TDC); a wrist-pin offset, rod stretch, and the gas/inertia loads are separate. A design aid; Machinery's Handbook and the engine builder govern.",
   };
 }
 export const sliderCrankPistonPositionExample = { inputs: { stroke_in: 3.48, rod_length_in: 5.7, crank_angle_deg: 90 } };
@@ -1544,11 +1558,13 @@ MECHANIC_RENDERERS["slider-crank-piston-position"] = _simpleRenderer({
     { key: "stroke_in", label: "Stroke (in)", kind: "number" },
     { key: "rod_length_in", label: "Connecting-rod length center-to-center (in)", kind: "number" },
     { key: "crank_angle_deg", label: "Crank angle after TDC (deg)", kind: "number" },
+    { key: "crank_rpm", label: "Crank speed (rpm, blank for position only)", kind: "number" },
   ],
   outputs: [
     { key: "x", id: "scp-out-x", label: "Piston position below TDC", value: (r) => fmt(r.position_from_tdc_in, 4) + " in (" + fmt(r.percent_of_stroke, 1) + "% of stroke)" },
     { key: "d", id: "scp-out-d", label: "Rod-angularity shift", value: (r) => (r.rod_angularity_shift_in >= 0 ? "+" : "") + fmt(r.rod_angularity_shift_in, 4) + " in vs the simple sinusoid (" + fmt(r.simple_position_in, 4) + " in)" },
     { key: "r", id: "scp-out-r", label: "Rod / stroke ratio", value: (r) => fmt(r.rod_stroke_ratio, 2) },
+    { key: "v", id: "scp-out-v", label: "Piston velocity and acceleration", value: (r) => (r.has_speed ? fmt(r.velocity_fps, 1) + " ft/s, " + fmt(r.accel_g, 0) + " g at this angle (" + fmt(r.tdc_accel_g, 0) + " g at TDC, the peak)" : "enter a crank speed") },
     { key: "n", id: "scp-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeSliderCrankPistonPosition,
