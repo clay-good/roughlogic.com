@@ -58728,3 +58728,16 @@ test("bounds: concrete-immediate-deflection adds a concentrated load by superpos
   assert.ok("error" in _cidP({ ...b, w_klf: 0 }));
   assert.ok("error" in _cidP({ ...b, point_load_kip: -1 }));
 });
+
+import { computeRcOneWayShear as _rowsN } from "../../calc-concrete.js";
+test("bounds: rc-one-way-shear adds Nu/(6 Ag) with the 0.05 f'c limit, zero floor, and 5 sqrt(f'c) cap", () => {
+  const b = { fc_psi: 4000, bw_in: 12, d_in: 16, as_in2: 1.0 };
+  const base = _rowsN(b).vc_psi;
+  assert.ok(Math.abs(_rowsN({ ...b, nu_kip: 50, ag_in2: 216 }).vc_psi - (base + 50000 / 1296)) < 1e-9);
+  assert.equal(_rowsN({ ...b, nu_kip: -100, ag_in2: 216 }).vc_psi, 0);
+  // Huge compression: the axial term stops at 0.05 f'c = 200 psi, then the 5 sqrt(f'c) cap (316 psi) holds.
+  assert.equal(_rowsN({ ...b, nu_kip: 5000, ag_in2: 216 }).axial_term_psi, 200);
+  const heavy = _rowsN({ ...b, as_in2: 12, nu_kip: 5000, ag_in2: 216 });
+  assert.ok(Math.abs(heavy.vc_psi - 5 * Math.sqrt(4000)) < 1e-9 && heavy.vc_capped);
+  assert.ok("error" in _rowsN({ ...b, nu_kip: 10 }));
+});

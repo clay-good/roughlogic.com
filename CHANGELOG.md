@@ -60,6 +60,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **`calc-concrete.js` gzip cap raised 54,000 -> 58,000 B.** The 2026-10-09 anchor cracking factors, concentrated-load deflection, and axial one-way shear took the module to about 54.3 KB gzipped. It is lazy-loaded and outside the home-view payload.
+
+- **`rc-one-way-shear` takes an axial load (ACI 318-19 Table 22.5.5.1(c)).** It assumed none. A factored axial load Nu and the gross area Ag now add Nu/(6 Ag) to the concrete shear stress, compression positive and no more than 0.05 f'c (22.5.5.1.2), with Vc floored at zero and capped at 5 lambda sqrt(f'c) bw d (22.5.5.1.1; the cap was missing before). 50 kip of compression on the 12 by 18 in example lifts Vc from 14.8 to 22.2 kip; 100 kip of tension takes it to zero.
+
 - **`concrete-immediate-deflection` takes a concentrated load.** It covered uniform load only and said a point load was separate. An optional midspan load (tip load on a cantilever) now adds K_p P L^3/(Ec Ie) by superposition, with 1/48 simply supported, 1/192 fixed, 1/(48 sqrt 5) propped, and 1/3 cantilever: a 10 kip midspan load on the 24 ft example beam adds 0.296 in to its 0.355 in. Uniform-only results are unchanged.
 
 - **`hydraulic-accumulator-volume` corrects the precharge for temperature.** It said temperature correction was separate. Optional charging and operating temperatures (both default 70 F, so earlier results are unchanged) now scale the precharge by the absolute-temperature ratio before the gas-law volume, and the page reports the precharge at operating temperature: 1,300 psig charged at 70 F reads 1,474 psig at 140 F. A precharge that warms above the minimum working pressure is now an error that says so.

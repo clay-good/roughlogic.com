@@ -1589,7 +1589,7 @@ cross-check.
 | calc-concrete.js | `computeRcHeadedBarDevelopment` | `{ db_in = 0, fy_psi = 60000, fc_psi = 4000, psi_e = 1.0, psi_p = 1.0, psi_o =...` | _ | _ | _ |
 | calc-concrete.js | `computeRcHookDevelopment` | `{ db_in = 0, fy_psi = 60000, fc_psi = 4000, psi_e = 1.0, psi_r = 1.0, psi_o =...` | _ | _ | _ |
 | calc-concrete.js | `computeRcMinShearReinforcement` | `{ fc_psi = 4000, fyt_psi = 60000, bw_in = 0, d_in = 0, av_in2 = 0, vu_kip = 0...` | _ | _ | _ |
-| calc-concrete.js | `computeRcOneWayShear` | `{ fc_psi = 4000, bw_in = 0, d_in = 0, as_in2 = 0, vu_kip = 0, lambda = 1.0 } ...` | _ | _ | _ |
+| calc-concrete.js | `computeRcOneWayShear` | `{ fc_psi = 4000, bw_in = 0, d_in = 0, as_in2 = 0, vu_kip = 0, lambda = 1.0, n...` | _ | _ | _ |
 | calc-concrete.js | `computeRcPunchingShear` | `{ c1_in = 0, c2_in = 0, d_in = 0, fc_psi = 4000, position = "interior", lambd...` | _ | _ | _ |
 | calc-concrete.js | `computeRcShearFriction` | `{ avf_in2 = 0, fy_psi = 60000, ac_in2 = 0, fc_psi = 4000, iface = "roughened"...` | _ | _ | _ |
 | calc-concrete.js | `computeRcSlabMaxSpanForThickness` | `{ available_thickness_in = 0, support = "simply", member = "slab", fy_psi = 6...` | _ | _ | _ |
@@ -5065,7 +5065,7 @@ per spec-v14 §13.1 second paragraph.
 | `rc-headed-bar-development` | Headed Bar Development Length (ACI 318-19 25.4.4) | Dextra Group; pp. 2-4: #8 bar, fy 70,000 psi, f'c 5,800 psi, epoxy coat... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `rc-hook-development` | Standard Hook Development Length (ACI 318-19 25.4.3) | ACI 318-19 Eq. 25.4.3.1a; spec-v286 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `rc-min-shear-reinforcement` | Minimum Stirrups and the Section-Size Limit (ACI 318-19 9.6.3) | ACI 318-19 9.6.3.4 / 9.6.3.1 / 22.5.1...; spec-v1009 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
-| `rc-one-way-shear` | One-Way Concrete Shear Without Stirrups (ACI 318-19 22.5.5.1) | ACI 318-19 Table 22.5.5.1(c); spec-v1008 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
+| `rc-one-way-shear` | One-Way Concrete Shear Without Stirrups (ACI 318-19 22.5.5.1) | ACI 318-19 Table 22.5.5.1(c); spec-v1008 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `rc-punching-shear` | Two-Way Slab Punching Shear at a Column (ACI 318-19 22.6) | ACI 318-19 Table 22.6.5.2; spec-v285 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+5 more) |
 | `rc-shear-friction` | Shear Friction Across an Interface (ACI 318-19 22.9) | ACI 318-19 22.9; spec-v301 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `rc-slab-max-span-for-thickness` | Max One-Way Slab / Beam Span for a Given Depth (ACI 318-19) | ACI 318-19 Table 7.3.1.1 / 9.3.1.1; 10 in, both ends continuous (l/28), Grade 60 normalweight... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |

@@ -417,25 +417,32 @@ CONCRETE_RENDERERS["rc-punching-shear"] = _simpleRenderer({
   compute: computeRcPunchingShear,
 });
 
-// dims: in { fc_psi: M L^-1 T^-2, bw_in: L, d_in: L, as_in2: L^2, vu_kip: M L T^-2, lambda: dimensionless } out: { rho_w: dimensionless, lambda_s: dimensionless, vc_psi: M L^-1 T^-2, vc_kip: M L T^-2, phi_vc_kip: M L T^-2, vc_simplified_kip: M L T^-2 }
-export function computeRcOneWayShear({ fc_psi = 4000, bw_in = 0, d_in = 0, as_in2 = 0, vu_kip = 0, lambda = 1.0 } = {}) {
+// Axial load added 2026-10-09: Table 22.5.5.1(c) carries + Nu/(6 Ag), Nu positive in compression, with
+// Nu/(6 Ag) <= 0.05 f'c (22.5.5.1.2), Vc >= 0 and Vc <= 5 lambda sqrt(f'c) bw d (22.5.5.1.1).
+// dims: in { fc_psi: M L^-1 T^-2, bw_in: L, d_in: L, as_in2: L^2, vu_kip: M L T^-2, lambda: dimensionless, nu_kip: M L T^-2, ag_in2: L^2 } out: { rho_w: dimensionless, lambda_s: dimensionless, vc_psi: M L^-1 T^-2, vc_kip: M L T^-2, phi_vc_kip: M L T^-2, vc_simplified_kip: M L T^-2, axial_term_psi: M L^-1 T^-2 }
+export function computeRcOneWayShear({ fc_psi = 4000, bw_in = 0, d_in = 0, as_in2 = 0, vu_kip = 0, lambda = 1.0, nu_kip = 0, ag_in2 = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(fc_psi > 0)) return { error: "Concrete strength f'c must be positive (psi)." };
   if (!(bw_in > 0)) return { error: "Section width bw must be positive (in)." };
   if (!(d_in > 0)) return { error: "Effective depth d must be positive (in)." };
   if (!(as_in2 > 0)) return { error: "Tension reinforcement As must be positive (in^2)." };
   if (!(lambda > 0 && lambda <= 1)) return { error: "The lightweight factor lambda is over 0 and up to 1.0." };
+  if (nu_kip !== 0 && !(ag_in2 > 0)) return { error: "With an axial load, enter the gross section area Ag (in^2)." };
+  if (ag_in2 < 0) return { error: "Gross area Ag cannot be negative (in^2)." };
   const sqrt_fc = Math.min(Math.sqrt(fc_psi), 100); // 22.5.3.1 caps sqrt(f'c) at 100 psi
   const rho_w = as_in2 / (bw_in * d_in);
   const lambda_s = Math.min(Math.sqrt(2 / (1 + d_in / 10)), 1.0);
-  const vc_psi = 8 * lambda_s * lambda * Math.cbrt(rho_w) * sqrt_fc;
+  const axial_term_psi = nu_kip !== 0 ? Math.min((nu_kip * 1000) / (6 * ag_in2), 0.05 * fc_psi) : 0;
+  const vc_cap_psi = 5 * lambda * sqrt_fc;
+  const vc_raw_psi = 8 * lambda_s * lambda * Math.cbrt(rho_w) * sqrt_fc + axial_term_psi;
+  const vc_psi = Math.min(Math.max(vc_raw_psi, 0), vc_cap_psi);
   const vc_kip = (vc_psi * bw_in * d_in) / 1000;
   const phi_vc_kip = 0.75 * vc_kip;
   const vc_simplified_kip = (2 * lambda * sqrt_fc * bw_in * d_in) / 1000;
   const adequate = vu_kip > 0 ? vu_kip <= phi_vc_kip + 1e-9 * Math.abs(phi_vc_kip) : null;
   return {
-    rho_w, lambda_s, vc_psi, vc_kip, phi_vc_kip, vc_simplified_kip, adequate,
-    note: "ACI 318-19 Table 22.5.5.1(c) one-way (beam-action) shear for a member WITHOUT at least minimum shear reinforcement and no axial load: Vc = 8 lambda_s lambda (rho_w)^(1/3) sqrt(f'c) bw d, where rho_w = As/(bw d) is the longitudinal tension-steel ratio and lambda_s = sqrt(2 / (1 + d/10)) capped at 1.0 is the 22.5.5.1.3 size-effect factor (new in the 2019 edition), phi = 0.75. This is the check that governs footings, one-way slabs, and shallow beams with no stirrups; the size-effect penalty and the (rho_w)^(1/3) term make a deep, lightly reinforced section carry noticeably less than the old 2 sqrt(f'c) rule of thumb (shown for comparison). sqrt(f'c) is capped at 100 psi per 22.5.3.1. If the member has at least Av,min stirrups, lambda_s = 1.0 and the simplified 2 lambda sqrt(f'c) (or the (a) expressions) applies instead - see rc-beam-shear. Normalweight unless lambda is set. A design aid, not a substitute for the structural engineer of record's stamped design.",
+    rho_w, lambda_s, vc_psi, vc_kip, phi_vc_kip, vc_simplified_kip, adequate, axial_term_psi, vc_capped: vc_raw_psi > vc_cap_psi, vc_floored: vc_raw_psi < 0,
+    note: "ACI 318-19 Table 22.5.5.1(c) one-way (beam-action) shear for a member WITHOUT at least minimum shear reinforcement: Vc = [8 lambda_s lambda (rho_w)^(1/3) sqrt(f'c) + Nu/(6 Ag)] bw d, with Nu positive in compression and Nu/(6 Ag) no more than 0.05 f'c; Vc is not less than zero (axial tension can erase it) or more than 5 lambda sqrt(f'c) bw d; where rho_w = As/(bw d) is the longitudinal tension-steel ratio and lambda_s = sqrt(2 / (1 + d/10)) capped at 1.0 is the 22.5.5.1.3 size-effect factor (new in the 2019 edition), phi = 0.75. This is the check that governs footings, one-way slabs, and shallow beams with no stirrups; the size-effect penalty and the (rho_w)^(1/3) term make a deep, lightly reinforced section carry noticeably less than the old 2 sqrt(f'c) rule of thumb (shown for comparison). sqrt(f'c) is capped at 100 psi per 22.5.3.1. If the member has at least Av,min stirrups, lambda_s = 1.0 and the simplified 2 lambda sqrt(f'c) (or the (a) expressions) applies instead - see rc-beam-shear. Normalweight unless lambda is set. A design aid, not a substitute for the structural engineer of record's stamped design.",
   };
 }
 export const rcOneWayShearExample = { inputs: { fc_psi: 4000, bw_in: 12, d_in: 16, as_in2: 1.0, vu_kip: 0, lambda: 1.0 } };
@@ -450,11 +457,13 @@ CONCRETE_RENDERERS["rc-one-way-shear"] = _simpleRenderer({
     { key: "as_in2", label: "Tension steel As (in²)", kind: "number" },
     { key: "vu_kip", label: "Factored shear Vu (kip, 0 = capacity only)", kind: "number" },
     { key: "lambda", label: "Lightweight factor lambda (1.0 normalweight)", kind: "number" },
+    { key: "nu_kip", label: "Factored axial load Nu (kip, + compression, - tension; 0 if none)", kind: "number", attrs: { step: "any" } },
+    { key: "ag_in2", label: "Gross section area Ag (in², needed with Nu)", kind: "number" },
   ],
   outputs: [
     { key: "rw", id: "rows-out-rw", label: "Reinforcement ratio rho_w = As/(bw d)", value: (r) => fmt(r.rho_w, 4) },
     { key: "ls", id: "rows-out-ls", label: "Size-effect factor lambda_s", value: (r) => fmt(r.lambda_s, 3) },
-    { key: "vc", id: "rows-out-vc", label: "Concrete shear stress vc", value: (r) => fmt(r.vc_psi, 0) + " psi" },
+    { key: "vc", id: "rows-out-vc", label: "Concrete shear stress vc", value: (r) => fmt(r.vc_psi, 0) + " psi" + (r.axial_term_psi !== 0 ? " (axial term " + (r.axial_term_psi > 0 ? "+" : "") + fmt(r.axial_term_psi, 0) + " psi)" : "") + (r.vc_capped ? ", capped at 5 lambda sqrt(f'c)" : "") + (r.vc_floored ? ", floored at zero by the tension" : "") },
     { key: "pvc", id: "rows-out-pvc", label: "Design capacity phi Vc (phi = 0.75)", value: (r) => fmt(r.phi_vc_kip, 1) + " kip" },
     { key: "cmp", id: "rows-out-cmp", label: "vs. simplified 2 sqrt(f'c) bw d", value: (r) => fmt(r.vc_simplified_kip, 1) + " kip (before phi)" },
     { key: "ok", id: "rows-out-ok", label: "Adequate for Vu", value: (r) => r.adequate === null ? "- (enter Vu to check)" : (r.adequate ? "YES (Vu <= phi Vc)" : "NO (Vu > phi Vc; needs stirrups or a deeper section)") },

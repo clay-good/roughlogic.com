@@ -168881,6 +168881,39 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "rc-one-way-shear",
+  "source_publisher": "Project (first-principles)",
+  "source_title": "Example strip with 50 kip axial compression on a 12 x 18 in section",
+  "source_edition_or_year": "ACI 318-19 Table 22.5.5.1(c)",
+  "source_section_or_page": "8 x 0.8165 x (1/192)^(1/3) x sqrt(4000) = 76.92 psi; + 50,000/(6 x 216) = 38.58 psi; Vc = 115.50 x 12 x 16 / 1000 = 22.18 kip",
+  "verified_by": "rl",
+  "verified_on": "2026-10-09",
+  "inputs": {
+   "fc_psi": 4000,
+   "bw_in": 12,
+   "d_in": 16,
+   "as_in2": 1.0,
+   "vu_kip": 0,
+   "lambda": 1.0,
+   "nu_kip": 50,
+   "ag_in2": 216
+  },
+  "outputs": {
+   "vc_kip": {
+    "value": 22.18,
+    "tolerance": {
+     "pct": 0.5
+    }
+   },
+   "axial_term_psi": {
+    "value": 38.58,
+    "tolerance": {
+     "pct": 0.5
+    }
+   }
+  }
  }
  ]
 }
