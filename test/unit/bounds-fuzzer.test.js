@@ -58937,3 +58937,15 @@ test("bounds: spanline-sag-for-tension with a point load round-trips through spa
   }
   assert.ok("error" in _ssftP({ span_ft: 100, load_lb_per_ft: 0.1, allowable_tension_lb: 150, point_load_lb: 300 }));
 });
+
+import { computePipeHeatLossRadial as _phlrF } from "../../calc-hvac.js";
+test("bounds: pipe-heat-loss-radial outer film adds in series and sets the jacket temperature", () => {
+  const b = { od_in: 2, thickness_in: 1, k_value: 0.25, hot_f: 200, amb_f: 70, length_ft: 1 };
+  const bare = _phlrF(b), film = _phlrF({ ...b, film_coeff_btu_hr_ft2_f: 1.65 });
+  assert.ok(film.q_per_ft_btuh < bare.q_per_ft_btuh);
+  const rIns = Math.log(2) / (2 * Math.PI * (0.25 / 12)), rFilm = 1 / (2 * Math.PI * (2 / 12) * 1.65);
+  assert.ok(Math.abs(film.q_per_ft_btuh - 130 / (rIns + rFilm)) < 1e-9);
+  // The same heat crosses both layers: (T_hot - T_s)/R_ins = (T_s - T_amb)/R_film.
+  assert.ok(Math.abs((200 - film.surface_temp_f) / rIns - (film.surface_temp_f - 70) / rFilm) < 1e-9);
+  assert.ok("error" in _phlrF({ ...b, film_coeff_btu_hr_ft2_f: -1 }));
+});

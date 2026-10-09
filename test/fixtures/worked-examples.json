@@ -169419,6 +169419,38 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "pipe-heat-loss-radial",
+  "source_publisher": "Project (first-principles)",
+  "source_title": "2 in OD, 1 in insulation k 0.25, 200/70 F, outer film 1.65",
+  "source_edition_or_year": "series thermal resistance",
+  "source_section_or_page": "R_ins = ln(2)/(2 pi x 0.020833) = 5.2952; R_film = 1/(2 pi x 0.16667 x 1.65) = 0.5787; Q/L = 130/5.8739 = 22.13 BTU/hr-ft; jacket = 70 + 22.13 x 0.5787 = 82.8 F",
+  "verified_by": "rl",
+  "verified_on": "2026-10-09",
+  "inputs": {
+   "od_in": 2,
+   "thickness_in": 1,
+   "k_value": 0.25,
+   "hot_f": 200,
+   "amb_f": 70,
+   "length_ft": 1,
+   "film_coeff_btu_hr_ft2_f": 1.65
+  },
+  "outputs": {
+   "q_per_ft_btuh": {
+    "value": 22.131,
+    "tolerance": {
+     "pct": 0.5
+    }
+   },
+   "surface_temp_f": {
+    "value": 82.81,
+    "tolerance": {
+     "pct": 0.5
+    }
+   }
+  }
  }
  ]
 }

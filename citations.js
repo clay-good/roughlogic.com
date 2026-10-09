@@ -1416,13 +1416,14 @@ export const CITATIONS = {
     ],
   },
   "pipe-heat-loss-radial": {
-    formula: "Q/L = 2*pi*k'*(T_hot - T_amb) / ln(r2/r1), where r1 = OD/2, r2 = r1 + thickness, and k' = k_value / 12 converts BTU-in/(hr.ft2.F) to BTU/(hr.ft.F).",
+    formula: "Q/L = (T_hot - T_amb) / (ln(r2/r1)/(2 pi k') + 1/(2 pi r2 h)), where r1 = OD/2, r2 = r1 + thickness, k' = k_value / 12 converts BTU-in/(hr.ft2.F) to BTU/(hr.ft.F), and the film term is dropped when no outer film coefficient h is entered (Q/L = 2 pi k' dT / ln(r2/r1)); jacket temperature = T_amb + (Q/L)/(2 pi r2 h).",
     edition: "Fourier conduction through a cylindrical shell (public heat-transfer formula); insulation k-values per ASHRAE Fundamentals / ASTM C335, by name.",
     freeAccess: "Free principles in published HVAC texts; k-values user-supplied.",
     governance: GOVERNANCE.mechanical,
     editionNote: "Single-formula (radial log-mean conduction); distinct from the flat-wall insulation tiles. k is at the mean insulation temperature.",
     assumptions: [
       { name: "k at mean temperature", value: "insulation conductivity rises with temperature; the value entered is at the mean insulation temperature", source: "ASTM C335" },
+      { name: "Outer film", value: "optional; without it the jacket is taken at ambient (conservative). About 1.5-2.5 BTU/hr-sq ft-F in still air for a painted or canvas jacket (added 2026-10-09)", source: "ASHRAE Fundamentals" },
     ],
   },
 
