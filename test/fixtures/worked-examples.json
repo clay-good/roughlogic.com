@@ -169062,6 +169062,50 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "clutch-engagement-energy",
+  "source_publisher": "Project (first-principles)",
+  "source_title": "Picking up a 10 lb ft2 load from rest with a 20 lb ft2 drive at 1,800 rpm",
+  "source_edition_or_year": "Shigley Ch. 16 energy relation",
+  "source_section_or_page": "I1 = 0.62162, I2 = 0.31081 slug ft2; dw = 188.50 rad/s; E = 0.20721 x 188.50^2 / 2 = 3,681 ft lb = 4.730 BTU; t = 0.20721 x 188.50/100 = 0.391 s; dT = 4.730/(0.12 x 15) = 2.63 F; common speed 1,200 rpm",
+  "verified_by": "rl",
+  "verified_on": "2026-10-09",
+  "inputs": {
+   "driver_wr2_lbft2": 20,
+   "driven_wr2_lbft2": 10,
+   "driver_rpm": 1800,
+   "driven_rpm": 0,
+   "slip_torque_lbft": 100,
+   "absorbing_weight_lb": 15,
+   "specific_heat_btu_lbf": 0.12
+  },
+  "outputs": {
+   "energy_ftlb": {
+    "value": 3681.1,
+    "tolerance": {
+     "pct": 0.5
+    }
+   },
+   "slip_time_s": {
+    "value": 0.3906,
+    "tolerance": {
+     "pct": 0.5
+    }
+   },
+   "final_rpm": {
+    "value": 1200,
+    "tolerance": {
+     "pct": 0.5
+    }
+   },
+   "temp_rise_f": {
+    "value": 2.628,
+    "tolerance": {
+     "pct": 0.5
+    }
+   }
+  }
  }
  ]
 }

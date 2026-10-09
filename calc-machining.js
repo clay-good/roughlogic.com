@@ -1430,7 +1430,7 @@ export function computeDiskClutchTorque({ clamp_force_lbf = 0, friction_coeffici
   if (![uniform_wear_torque_in_lbf, uniform_pressure_torque_in_lbf, max_pressure_psi].every(Number.isFinite) || !(uniform_wear_torque_in_lbf > 0)) return { error: "Clutch-torque math is not a finite value; check the inputs." };
   return {
     uniform_wear_torque_in_lbf, uniform_pressure_torque_in_lbf, max_pressure_psi, friction_surfaces: N,
-    note: "The friction torque a disk clutch or plate (disk) brake can transmit before slipping, from the axial clamp force F, facing friction mu, outer/inner friction radii ro/ri, and the number of friction interfaces N (a single-plate clutch clamps both faces, N = 2). Uniform WEAR T = F mu N (ro + ri)/2 is the design standard: a facing wears fastest where pressure x velocity is highest, so p x r drives to a constant and the pressure peaks at the inner radius, p_max = F/(2 pi ri (ro - ri)); this gives the lower, conservative torque. Uniform PRESSURE T = (2/3) F mu N (ro^3 - ri^3)/(ro^2 - ri^2) applies to a fresh, rigid facing and runs a little higher. The two converge as the friction ring narrows. The actuating force F is an input (spring or hydraulic cylinder); heat and energy of engagement, facing wear life, cone and band brakes, and self-energizing effects are separate. A design aid; Shigley and the facing maker govern.",
+    note: "The friction torque a disk clutch or plate (disk) brake can transmit before slipping, from the axial clamp force F, facing friction mu, outer/inner friction radii ro/ri, and the number of friction interfaces N (a single-plate clutch clamps both faces, N = 2). Uniform WEAR T = F mu N (ro + ri)/2 is the design standard: a facing wears fastest where pressure x velocity is highest, so p x r drives to a constant and the pressure peaks at the inner radius, p_max = F/(2 pi ri (ro - ri)); this gives the lower, conservative torque. Uniform PRESSURE T = (2/3) F mu N (ro^3 - ri^3)/(ro^2 - ri^2) applies to a fresh, rigid facing and runs a little higher. The two converge as the friction ring narrows. The actuating force F is an input (spring or hydraulic cylinder); the heat of engagement is clutch-engagement-energy, the band brake is band-brake-torque, and facing wear life, cone brakes, and self-energizing effects are separate. A design aid; Shigley and the facing maker govern.",
   };
 }
 export const diskClutchTorqueExample = { inputs: { clamp_force_lbf: 1000, friction_coefficient: 0.3, outer_radius_in: 3, inner_radius_in: 2, friction_surfaces: 1 } };
@@ -1459,6 +1459,69 @@ function renderDiskClutchTorque(inputRegion, outputRegion, citationEl) {
   for (const f of [F, mu, ro, ri, N]) f.input.addEventListener("input", update);
 }
 MACHINING_RENDERERS["disk-clutch-torque"] = renderDiskClutchTorque;
+
+// spec-v1941: energy a clutch or brake turns into heat during engagement (Shigley Ch. 16, energy considerations).
+// Two inertias at different speeds lock together at a common speed; the kinetic energy lost is
+// E = I1 I2 (w1 - w2)^2 / (2 (I1 + I2)), and at a constant slip torque T the slip lasts t = I1 I2 (w1 - w2)/(T (I1 + I2)).
+// I from WR^2 (lb ft^2) as WR^2 / g; temperature rise dT = E / (C m), C in BTU/lb F.
+// dims: in { driver_wr2_lbft2: M L^2, driven_wr2_lbft2: M L^2, driver_rpm: T^-1, driven_rpm: T^-1, slip_torque_lbft: M L^2 T^-2, absorbing_weight_lb: M L T^-2, specific_heat_btu_lbf: dimensionless } out: { energy_ftlb: M L^2 T^-2, energy_btu: M L^2 T^-2, slip_time_s: T, final_rpm: T^-1, temp_rise_f: T }
+export function computeClutchEngagementEnergy({ driver_wr2_lbft2 = 0, driven_wr2_lbft2 = 0, driver_rpm = 0, driven_rpm = 0, slip_torque_lbft = 0, absorbing_weight_lb = 0, specific_heat_btu_lbf = 0.12 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const wr1 = Number(driver_wr2_lbft2) || 0, wr2 = Number(driven_wr2_lbft2) || 0;
+  const n1 = Number(driver_rpm) || 0, n2 = Number(driven_rpm) || 0;
+  const T = Number(slip_torque_lbft) || 0, m = Number(absorbing_weight_lb) || 0, C = Number(specific_heat_btu_lbf) || 0;
+  if (!(wr1 > 0) || !(wr2 > 0)) return { error: "Both inertias (WR^2, lb ft^2) must be positive." };
+  if (n1 < 0 || n2 < 0) return { error: "Speeds cannot be negative (rpm); enter the driven side at 0 for a start from rest." };
+  if (n1 === n2) return { error: "The two sides already turn at the same speed; nothing slips." };
+  if (T < 0 || m < 0) return { error: "Slip torque and absorbing weight cannot be negative (blank to skip)." };
+  if (m > 0 && !(C > 0)) return { error: "Specific heat must be positive (0.12 BTU/lb F for steel or cast iron)." };
+  const g = 32.174;
+  const I1 = wr1 / g, I2 = wr2 / g; // slug ft^2
+  const dw = Math.abs(n1 - n2) * 2 * Math.PI / 60;
+  const energy_ftlb = (I1 * I2 * dw * dw) / (2 * (I1 + I2));
+  const energy_btu = energy_ftlb / 778.169;
+  const slip_time_s = T > 0 ? (I1 * I2 * dw) / (T * (I1 + I2)) : 0;
+  const final_rpm = (wr1 * n1 + wr2 * n2) / (wr1 + wr2);
+  const temp_rise_f = m > 0 ? energy_btu / (C * m) : 0;
+  if (![energy_ftlb, slip_time_s, final_rpm, temp_rise_f].every(Number.isFinite)) return { error: "Engagement math is not a finite value; check the inputs." };
+  return {
+    energy_ftlb, energy_btu, slip_time_s, final_rpm, temp_rise_f, has_torque: T > 0, has_mass: m > 0,
+    note: "When a clutch engages (or a brake stops a load), the two sides slip until they turn together, and the kinetic energy they lose becomes heat in the friction faces: E = I1 I2 (w1 - w2)^2 / (2 (I1 + I2)), with each inertia I = WR^2 / g and the speeds in rad/s. Momentum is conserved, so the common speed is the WR^2-weighted average. At a constant slip torque the slip lasts t = I1 I2 (w1 - w2)/(T (I1 + I2)); longer slips spread the same energy over more time but do not reduce it. With the weight and specific heat of the metal that soaks up the heat (0.12 BTU/lb F for steel or cast iron), the temperature rise is E/(C m) for one engagement, before any cooling; repeated engagements stack. A brake stopping a load is the case with the driven side at 0 rpm and a huge WR^2 for the frame. A design aid; Shigley and the clutch maker's energy rating govern.",
+  };
+}
+export const clutchEngagementEnergyExample = { inputs: { driver_wr2_lbft2: 20, driven_wr2_lbft2: 10, driver_rpm: 1800, driven_rpm: 0, slip_torque_lbft: 100, absorbing_weight_lb: 15, specific_heat_btu_lbf: 0.12 } };
+function renderClutchEngagementEnergy(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: clutch and brake energy considerations (Shigley, Mechanical Engineering Design, Ch. 16): E = I1 I2 (w1 - w2)^2/(2 (I1 + I2)), slip time t = I1 I2 (w1 - w2)/(T (I1 + I2)), I = WR^2/g, temperature rise dT = E/(C m) with E in BTU (778.169 ft lb per BTU). One engagement, no cooling. A design aid; the clutch maker's energy rating governs.";
+  const f = [
+    makeNumber("Driving-side inertia WR² (lb ft²)", "cee-wr1", { step: "any", min: "0" }),
+    makeNumber("Driven-side inertia WR² (lb ft²)", "cee-wr2", { step: "any", min: "0" }),
+    makeNumber("Driving-side speed (rpm)", "cee-n1", { step: "any", min: "0" }),
+    makeNumber("Driven-side speed (rpm, 0 from rest)", "cee-n2", { step: "any", min: "0" }),
+    makeNumber("Slip torque of the clutch (lb ft, blank to skip)", "cee-t", { step: "any", min: "0" }),
+    makeNumber("Weight of metal absorbing the heat (lb, blank to skip)", "cee-m", { step: "any", min: "0" }),
+    makeNumber("Specific heat (BTU/lb °F; 0.12 steel or cast iron)", "cee-c", { step: "any", min: "0", value: "0.12" }),
+  ];
+  for (const x of f) inputRegion.appendChild(x.wrap);
+  const ex = [20, 10, 1800, 0, 100, 15, 0.12];
+  attachExampleButton(inputRegion, () => { f.forEach((x, i) => { x.input.value = String(ex[i]); }); update(); });
+  const oE = makeOutputLine(outputRegion, "Energy turned into heat", "cee-out-e");
+  const oN = makeOutputLine(outputRegion, "Common speed after engagement", "cee-out-n");
+  const oT = makeOutputLine(outputRegion, "Slip time", "cee-out-t");
+  const oD = makeOutputLine(outputRegion, "Temperature rise per engagement", "cee-out-d");
+  const oNote = makeOutputLine(outputRegion, "Note", "cee-out-note");
+  function readNum(i, d) { if (i.value === "") return d; const v = Number(i.value); return Number.isFinite(v) ? v : d; }
+  const update = debounce(() => {
+    const r = computeClutchEngagementEnergy({ driver_wr2_lbft2: readNum(f[0].input, 0), driven_wr2_lbft2: readNum(f[1].input, 0), driver_rpm: readNum(f[2].input, 0), driven_rpm: readNum(f[3].input, 0), slip_torque_lbft: readNum(f[4].input, 0), absorbing_weight_lb: readNum(f[5].input, 0), specific_heat_btu_lbf: readNum(f[6].input, 0.12) });
+    if (r.error) { oE.textContent = r.error; oN.textContent = "-"; oT.textContent = "-"; oD.textContent = "-"; oNote.textContent = ""; return; }
+    oE.textContent = fmt(r.energy_ftlb, 0) + " ft-lb (" + fmt(r.energy_btu, 2) + " BTU)";
+    oN.textContent = fmt(r.final_rpm, 0) + " rpm";
+    oT.textContent = r.has_torque ? fmt(r.slip_time_s, 2) + " s at that torque" : "enter the slip torque";
+    oD.textContent = r.has_mass ? fmt(r.temp_rise_f, 1) + " °F, before any cooling" : "enter the absorbing weight";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const x of f) x.input.addEventListener("input", update);
+}
+MACHINING_RENDERERS["clutch-engagement-energy"] = renderClutchEngagementEnergy;
 
 // ===================== spec-v1290: Euler-Johnson column critical buckling load (Shigley Ch. 4) =====================
 // The catalog buckles wood (NDS), concrete (ACI), and AISC steel columns, but has no general Euler-Johnson check for

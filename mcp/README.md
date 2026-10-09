@@ -1,7 +1,7 @@
 # roughlogic MCP server
 
 A local, zero-dependency [Model Context Protocol](https://modelcontextprotocol.io)
-server that exposes the roughlogic catalog of **2,244 trades calculators**
+server that exposes the roughlogic catalog of **2,245 trades calculators**
 (electrical, plumbing, HVAC, construction, restoration, and more) to any MCP
 client — Claude Code, Claude Desktop, Cursor, and the like.
 
@@ -117,7 +117,7 @@ element — the keys of the publisher-verified worked example fill the gap, so
 returning an empty list. `scripts/check-both-doors.mjs` holds the door to that
 contract: every advertised name must be a key a caller can actually send, every
 key the tile's own example sets must be advertised, and that example must run
-clean through `run_calculator`. All three are checked for all 2,244 tiles on
+clean through `run_calculator`. All three are checked for all 2,245 tiles on
 every build.
 
 `run_calculator` also warns when it is handed a key the calculator cannot
@@ -157,7 +157,7 @@ each number**, keyed by the compute's own result key: `outputs_source` is
 way, a key is named only where the calculator is observed to produce it -- the
 worked example's result for `describe_calculator`, the caller's own result for
 `run_calculator` -- so the door never names an answer that is not there.
-`check-both-doors.mjs` holds that. **2,244 of 2,244 calculators name their
+`check-both-doors.mjs` holds that. **2,245 of 2,245 calculators name their
 answers.** The remaining 0 return them unlabelled.
 
 That was 1,768 until 2026-09-02, and the 36 were a gap between the two doors
@@ -185,7 +185,7 @@ also `"eta^2 = "` -- and calling that a unit would be a guess. `outputUnits(id)`
 in `catalog.mjs` exposes them as what they are.
 
 `answer_query` reads the `data/fields/` descriptors the website reads, which
-exist for 2,207 calculators. For the other 37 it projects the descriptors from
+exist for 2,207 calculators. For the other 38 it projects the descriptors from
 `describe_calculator` instead, naming each input with the caption the
 calculator itself prints. A field whose verified
 example holds something a numeric extractor must not guess at -- a list, a
@@ -278,7 +278,7 @@ tiles named a *different* tile when handed their own id -- and `backflow-sizing`
 a sizing screen, came back `status: OK` carrying the `backflow` **reference
 table**, because "sizing" is a noise word and what remained matched the
 reference tile's name exactly. A literal id now resolves to its tile ahead of
-every other kind of evidence, and counts as its own corroboration. All 2,244
+every other kind of evidence, and counts as its own corroboration. All 2,245
 answer to their own id, and none to another's.
 
 Literal only: `backflow sizing` with a space is a human phrasing and genuinely

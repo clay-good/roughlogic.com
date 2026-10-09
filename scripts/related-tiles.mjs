@@ -24,6 +24,7 @@
 // better match".
 
 const RELATED = {
+  "clutch-engagement-energy": ["disk-clutch-torque","band-brake-torque","flywheel-energy"],
   "fatigue-combined-loading": ["fatigue-safety-factor","fatigue-notch-sensitivity","shaft-torsion"],
   "fatigue-miner-damage": ["fatigue-finite-life","endurance-limit-marin","fatigue-notch-sensitivity"],
   "fatigue-notch-sensitivity": ["fatigue-safety-factor","fatigue-finite-life","endurance-limit-marin"],

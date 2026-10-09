@@ -1619,6 +1619,11 @@
     {"term":"von mises alternating stress","target":"fatigue-combined-loading","kind":"industry"},
     {"term":"bending and torsion fatigue","target":"fatigue-combined-loading","kind":"industry"},
     {"term":"multiaxial fatigue stress","target":"fatigue-combined-loading","kind":"industry"},
-    {"term":"shaft fatigue with bending and twisting","target":"fatigue-combined-loading","kind":"question"}
+    {"term":"shaft fatigue with bending and twisting","target":"fatigue-combined-loading","kind":"question"},
+    {"term":"clutch engagement energy","target":"clutch-engagement-energy","kind":"industry"},
+    {"term":"clutch heat per engagement","target":"clutch-engagement-energy","kind":"industry"},
+    {"term":"brake heat dissipation","target":"clutch-engagement-energy","kind":"industry"},
+    {"term":"clutch slip time","target":"clutch-engagement-energy","kind":"industry"},
+    {"term":"how hot does a clutch get","target":"clutch-engagement-energy","kind":"question"}
   ]
 }

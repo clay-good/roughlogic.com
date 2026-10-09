@@ -2,99 +2,99 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "ec802734e4852c25",
+      "sha": "38a9770d7f02a453",
       "date": "2026-10-09"
     },
     "/tools/": {
-      "sha": "26770eea96491af7",
+      "sha": "e0173fce2c3d2475",
       "date": "2026-10-09"
     },
     "/collections/disaster-response/": {
-      "sha": "39c8cb937aa861a9",
+      "sha": "6a476911c24c616c",
       "date": "2026-10-09"
     },
     "/groups/accounting/": {
-      "sha": "c7080518ef26183d",
+      "sha": "1eb5e7c4e260f5d3",
       "date": "2026-10-09"
     },
     "/groups/agriculture/": {
-      "sha": "af409e494d8c8967",
+      "sha": "c7f1e624777f84ee",
       "date": "2026-10-09"
     },
     "/groups/construction/": {
-      "sha": "4f50450a57c5d28a",
+      "sha": "894f3d96edde76fd",
       "date": "2026-10-09"
     },
     "/groups/cross-trade/": {
-      "sha": "1b1b5e63bb19c460",
+      "sha": "84ce09402b263114",
       "date": "2026-10-09"
     },
     "/groups/educators/": {
-      "sha": "5c535b1a3052a2a2",
+      "sha": "8e1d48c1b33d2543",
       "date": "2026-10-09"
     },
     "/groups/electrical/": {
-      "sha": "53697cc97463081d",
+      "sha": "319e863b977c43e9",
       "date": "2026-10-09"
     },
     "/groups/field/": {
-      "sha": "a06e48cf53d9a296",
+      "sha": "5830898d003f3b20",
       "date": "2026-10-09"
     },
     "/groups/fire-ground/": {
-      "sha": "cea261bd0b28a6c2",
+      "sha": "97051d7acfed47fe",
       "date": "2026-10-09"
     },
     "/groups/historical/": {
-      "sha": "8983664f0575e881",
+      "sha": "ad684b9883e5ffbc",
       "date": "2026-10-09"
     },
     "/groups/hvac/": {
-      "sha": "eb1159b9b1e1ccf4",
+      "sha": "3302987a87131c6f",
       "date": "2026-10-09"
     },
     "/groups/kitchen/": {
-      "sha": "dab3249df6327a39",
+      "sha": "75d5d530cfcdd3be",
       "date": "2026-10-09"
     },
     "/groups/lab/": {
-      "sha": "dae301a4b9dc2202",
+      "sha": "a2cdb308a2db54a1",
       "date": "2026-10-09"
     },
     "/groups/mechanic/": {
-      "sha": "61aebca1b37dbc92",
+      "sha": "962db80f7bc1560b",
       "date": "2026-10-09"
     },
     "/groups/plumbing/": {
-      "sha": "1b8554d687e7f359",
+      "sha": "8007f44c13d4bb7e",
       "date": "2026-10-09"
     },
     "/groups/real-estate/": {
-      "sha": "166e662f6504cac2",
+      "sha": "24b977f4ffbe6e6a",
       "date": "2026-10-09"
     },
     "/groups/references/": {
-      "sha": "debc9354157aa618",
+      "sha": "d05134a86210c380",
       "date": "2026-10-09"
     },
     "/groups/restoration/": {
-      "sha": "c1d63b3b48ee45c6",
+      "sha": "5b483b68e64875c7",
       "date": "2026-10-09"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "2d7ac0f15de39c7b",
+      "sha": "846ee2a4f051879e",
       "date": "2026-10-09"
     },
     "/groups/stage/": {
-      "sha": "9f6eb7b5bb0dd178",
+      "sha": "ee50a72a337a2e9e",
       "date": "2026-10-09"
     },
     "/groups/trucking/": {
-      "sha": "9f65ed7be52d5b5f",
+      "sha": "d63636ab479b2441",
       "date": "2026-10-09"
     },
     "/groups/water/": {
-      "sha": "04fad1b33737f1fc",
+      "sha": "2ac3790b3818a57b",
       "date": "2026-10-09"
     },
     "/tools/aav-install-check/": {
@@ -462,7 +462,7 @@
       "date": "2026-10-03"
     },
     "/tools/band-brake-torque/": {
-      "sha": "c7e690a719853f3f",
+      "sha": "12c233663823c3d2",
       "date": "2026-10-09"
     },
     "/tools/band-saw-blade-pitch/": {
@@ -790,8 +790,8 @@
       "date": "2026-09-29"
     },
     "/tools/brake-pad-life/": {
-      "sha": "01dac7ce43f5742c",
-      "date": "2026-09-29"
+      "sha": "3fe7e85746c8f71b",
+      "date": "2026-10-09"
     },
     "/tools/brake-pedal-hydraulic/": {
       "sha": "bccb14294c7fc367",
@@ -1276,6 +1276,10 @@
     "/tools/closing-costs/": {
       "sha": "ae8ef509434e19ae",
       "date": "2026-09-29"
+    },
+    "/tools/clutch-engagement-energy/": {
+      "sha": "2ebd12a4b528cb15",
+      "date": "2026-10-09"
     },
     "/tools/cmu-grout-volume/": {
       "sha": "e6824d94d71d60e4",
@@ -2218,8 +2222,8 @@
       "date": "2026-09-30"
     },
     "/tools/disk-clutch-torque/": {
-      "sha": "b381ead8f3c38395",
-      "date": "2026-09-29"
+      "sha": "cad3445675dd9231",
+      "date": "2026-10-09"
     },
     "/tools/displacement-cr/": {
       "sha": "feada53eaa585e22",
@@ -3178,8 +3182,8 @@
       "date": "2026-10-03"
     },
     "/tools/free-fall-drop/": {
-      "sha": "78c0f5ecc14f5092",
-      "date": "2026-09-29"
+      "sha": "f43954a84180037e",
+      "date": "2026-10-09"
     },
     "/tools/freezer-underfloor-heat/": {
       "sha": "b0fd6ad5e292bad3",
@@ -3222,8 +3226,8 @@
       "date": "2026-09-29"
     },
     "/tools/fuel-range/": {
-      "sha": "35146dd3887a75c3",
-      "date": "2026-10-03"
+      "sha": "5492ff71eb658c29",
+      "date": "2026-10-09"
     },
     "/tools/fuel-surcharge/": {
       "sha": "d9f967d3d45144a7",

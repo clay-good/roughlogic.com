@@ -165,6 +165,7 @@ export const BESPOKE_OUTPUT_LABELS = {
   "clausius-clapeyron": {"enthalpy_kj_mol":"Enthalpy of vaporization dHvap","slope_k":"ln(P) vs 1/T slope","note":"Note"},
   "cleanout-layout": {"total_cleanouts":"Total cleanouts","spacing_cleanouts":"From spacing","change_cleanouts":"From changes of direction","stack_cleanouts":"Stack bases (practice, not in the code total)","clear_ok":"Access","note":"Note"},
   "closing-costs": {"total_mid":"Estimated closing costs (mid)","total_pct_of_price_mid":"Mid as % of purchase price","items":"Line items (mid)"},
+  "clutch-engagement-energy": {"energy_ftlb":"Energy turned into heat","final_rpm":"Common speed after engagement","has_torque":"Slip time","has_mass":"Temperature rise per engagement","note":"Note"},
   "co-air-free": {"co_air_free_ppm":"Air-free CO","over_ansi":"Against the limits","note":"Note"},
   "coagulant-dose": {"pure_lb_day":"Pure equivalent"},
   "coating-coverage-dft": {"theoretical_cov_ft2_gal":"Theoretical coverage","practical_cov_ft2_gal":"Practical coverage (after loss)","gallons":"Gallons required","wft_mils":"Wet-film thickness to read","reduction_verdict":"After reduction","wet_reading_verdict":"Dry build from the gauge reading"},

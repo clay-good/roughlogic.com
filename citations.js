@@ -11977,12 +11977,24 @@ export const CITATIONS = {
       { name: "Scope", value: "single screw; buckling, thread stress, and wear are separate; half-angle taken directly", source: "scope of this tile" },
     ],
   },
+  "clutch-engagement-energy": {
+    formula: "I = WR^2/g (g = 32.174 ft/s^2); dw = |n1 - n2| x 2 pi/60; E = I1 I2 dw^2/(2 (I1 + I2)) ft lb; E_btu = E/778.169; t_slip = I1 I2 dw/(T (I1 + I2)); n_final = (WR1^2 n1 + WR2^2 n2)/(WR1^2 + WR2^2); dT = E_btu/(C m).",
+    edition: "Clutch and brake energy considerations (Shigley, Mischke and Budynas, Mechanical Engineering Design, Ch. 16), by name: the kinetic energy lost when two inertias lock together by friction, the slip time at a constant torque, and the temperature rise of the absorbing mass.",
+    freeAccess: "Conservation of angular momentum and energy; the inertias, speeds, torque, mass, and specific heat are the user's inputs.",
+    governance: GOVERNANCE.general,
+    editionNote: "The energy a clutch or brake dissipates per engagement, from the two inertias and their speed difference; momentum is conserved so the common speed is the WR^2-weighted average. The slip time assumes a constant slip torque; the temperature rise is one engagement with no cooling, and repeated engagements stack. The clutch maker's energy and heat-dissipation ratings govern.",
+    assumptions: [
+      { name: "Energy lost", value: "E = I1 I2 (w1 - w2)^2 / (2 (I1 + I2))", source: "Shigley Ch. 16" },
+      { name: "Slip time", value: "t = I1 I2 (w1 - w2)/(T (I1 + I2)) at constant slip torque", source: "Shigley Ch. 16" },
+      { name: "Temperature rise", value: "dT = E/(C m), C = 0.12 BTU/lb F steel or cast iron, no cooling", source: "Shigley Ch. 16" },
+    ],
+  },
   "disk-clutch-torque": {
     formula: "Uniform wear: T = F mu N (ro + ri)/2. Uniform pressure: T = (2/3) F mu N (ro^3 - ri^3)/(ro^2 - ri^2). Max pressure (uniform wear): p_max = F/(2 pi ri (ro - ri)). N = friction interfaces (single plate = 2).",
     edition: "The disk-clutch friction torque under the uniform-wear and uniform-pressure assumptions (Shigley, Mechanical Engineering Design, Ch. 16 -- clutches and brakes), by name.",
     freeAccess: "The clutch-torque equations are standard published machine-design results; the clamp force, friction coefficient, radii, and surface count are the user's inputs.",
     governance: GOVERNANCE.general,
-    editionNote: "The friction torque a disk clutch or plate (disk) brake can transmit before slipping, from the axial clamp force F, facing friction mu, outer/inner friction radii ro/ri, and the number of friction interfaces N (a single-plate clutch clamps both faces, N = 2). Uniform WEAR T = F mu N (ro + ri)/2 is the design standard: a facing wears fastest where pressure x velocity is highest, so p x r drives to a constant and the pressure peaks at the inner radius, p_max = F/(2 pi ri (ro - ri)); this gives the lower, conservative torque. Uniform PRESSURE T = (2/3) F mu N (ro^3 - ri^3)/(ro^2 - ri^2) applies to a fresh, rigid facing and runs a little higher. The two converge as the friction ring narrows. The actuating force F is an input (spring or hydraulic cylinder); heat and energy of engagement, facing wear life, cone and band brakes, and self-energizing effects are separate. A design aid; Shigley and the facing maker govern.",
+    editionNote: "The friction torque a disk clutch or plate (disk) brake can transmit before slipping, from the axial clamp force F, facing friction mu, outer/inner friction radii ro/ri, and the number of friction interfaces N (a single-plate clutch clamps both faces, N = 2). Uniform WEAR T = F mu N (ro + ri)/2 is the design standard: a facing wears fastest where pressure x velocity is highest, so p x r drives to a constant and the pressure peaks at the inner radius, p_max = F/(2 pi ri (ro - ri)); this gives the lower, conservative torque. Uniform PRESSURE T = (2/3) F mu N (ro^3 - ri^3)/(ro^2 - ri^2) applies to a fresh, rigid facing and runs a little higher. The two converge as the friction ring narrows. The actuating force F is an input (spring or hydraulic cylinder); the heat of engagement is clutch-engagement-energy, the band brake is band-brake-torque, and facing wear life, cone brakes, and self-energizing effects are separate. A design aid; Shigley and the facing maker govern.",
     assumptions: [
       { name: "Uniform wear", value: "T = F mu N (ro + ri)/2, the conservative design value; p max at ri", source: "Shigley Ch. 16" },
       { name: "Uniform pressure", value: "T = (2/3) F mu N (ro^3 - ri^3)/(ro^2 - ri^2), fresh rigid facing", source: "Shigley Ch. 16" },

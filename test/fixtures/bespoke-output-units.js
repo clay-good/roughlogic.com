@@ -113,6 +113,7 @@ export const BESPOKE_OUTPUT_UNITS = {
   "class-of-loss-screen": {"water_class":{"prefix":"Class ","suffix":""},"evap_factor_gal_ft2":{"prefix":"","suffix":" gal/ft^2"}},
   "clausius-clapeyron": {"slope_k":{"prefix":"","suffix":" K","digits":1}},
   "closing-costs": {"total_mid":{"prefix":"$","suffix":"","digits":2},"total_pct_of_price_mid":{"prefix":"","suffix":" %","digits":2}},
+  "clutch-engagement-energy": {"final_rpm":{"prefix":"","suffix":" rpm","digits":0}},
   "co-air-free": {"co_air_free_ppm":{"prefix":"","suffix":" ppm (air-free)","digits":0}},
   "coagulant-dose": {"pure_lb_day":{"prefix":"","suffix":" lb/day","digits":1}},
   "coating-coverage-dft": {"theoretical_cov_ft2_gal":{"prefix":"","suffix":" ft^2/gal","digits":1},"practical_cov_ft2_gal":{"prefix":"","suffix":" ft^2/gal","digits":1},"gallons":{"prefix":"","suffix":" gal","digits":1},"wft_mils":{"prefix":"","suffix":" mils","digits":2}},

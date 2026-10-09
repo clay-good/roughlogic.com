@@ -58806,3 +58806,16 @@ test("bounds: band-brake-torque lining pressure T1/(b r) balances the tight-side
   assert.ok("error" in _bbtP({ ...b, band_thickness_in: 0.0625 }));
   assert.ok("error" in _bbtP({ ...b, band_width_in: -1 }));
 });
+
+import { computeClutchEngagementEnergy as _cee } from "../../calc-machining.js";
+test("bounds: clutch-engagement-energy equals the kinetic energy lost at the momentum-conserving speed", () => {
+  const r = _cee({ driver_wr2_lbft2: 20, driven_wr2_lbft2: 10, driver_rpm: 1800, driven_rpm: 0, slip_torque_lbft: 100, absorbing_weight_lb: 15 });
+  const g = 32.174, I1 = 20 / g, I2 = 10 / g, w = (n) => (n * 2 * Math.PI) / 60;
+  const before = 0.5 * I1 * w(1800) ** 2, after = 0.5 * (I1 + I2) * w(r.final_rpm) ** 2;
+  assert.ok(Math.abs(before - after - r.energy_ftlb) < 1e-6);
+  // Torque x slip time = angular impulse = I2 x its speed change.
+  assert.ok(Math.abs(100 * r.slip_time_s - I2 * w(r.final_rpm)) < 1e-9);
+  assert.ok(Math.abs(r.temp_rise_f - r.energy_btu / (0.12 * 15)) < 1e-12);
+  assert.ok("error" in _cee({ driver_wr2_lbft2: 20, driven_wr2_lbft2: 10, driver_rpm: 900, driven_rpm: 900 }));
+  assert.ok("error" in _cee({ driver_wr2_lbft2: 0, driven_wr2_lbft2: 10, driver_rpm: 900 }));
+});

@@ -1593,6 +1593,7 @@ export const RENDERER_MAP = {
   "fatigue-combined-loading": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },
   "power-screw-torque": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },
   "disk-clutch-torque": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },
+  "clutch-engagement-energy": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },
   "euler-johnson-column": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },
   "column-secant-formula": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },
   "thick-wall-cylinder-stress": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },

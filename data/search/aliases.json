@@ -116647,6 +116647,31 @@
    "term": "how much heat does a bare pipe lose",
    "target": "bare-pipe-heat-loss",
    "kind": "question"
+  },
+  {
+   "term": "clutch engagement energy",
+   "target": "clutch-engagement-energy",
+   "kind": "industry"
+  },
+  {
+   "term": "clutch heat per engagement",
+   "target": "clutch-engagement-energy",
+   "kind": "industry"
+  },
+  {
+   "term": "brake heat dissipation",
+   "target": "clutch-engagement-energy",
+   "kind": "industry"
+  },
+  {
+   "term": "clutch slip time",
+   "target": "clutch-engagement-energy",
+   "kind": "industry"
+  },
+  {
+   "term": "how hot does a clutch get",
+   "target": "clutch-engagement-energy",
+   "kind": "question"
   }
  ]
 }
