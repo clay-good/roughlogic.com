@@ -263,10 +263,8 @@ test("a spec-renderer field whose label states a default is prefilled with that 
 // Checked by behavior: the first worked example with the field omitted must
 // answer exactly as with the field set to its prefill. The reviewed entries are
 // standing published values the page shows and the compute does not encode
-// (the door requires them), and two defaults that are named constants.
+// (the door requires them).
 const PREFILL_REVIEWED = new Map([
-  ["duct-sizing::roughness_ft", "named constant DUCT_ROUGHNESS_FT on both sides"],
-  ["timesheet::irs_rate_per_mile", "named constant IRS_STANDARD_MILEAGE_RATE on both sides"],
   ["time-alignment::ambient_F", "68 F standard; the compute's null means ask"],
   ["flocculation-g-value::water_temp_f", "59 F design water; null means use mu directly"],
   ["dyno-correction-sae::baro_inhg", "SAE J1349 standard dry-air pressure"],

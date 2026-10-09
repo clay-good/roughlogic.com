@@ -629,7 +629,15 @@ async function main() {
     //   - 36 key/label pairs read by hand, all correct.
     //
     // skip_no_call falls from 188 to 32.
-    const effectiveCallMap = (callMap && callMap.size) ? callMap : parseComputeCallLoose(body);
+    //
+    // The two maps are MERGED, strict winning per key (2026-10-09). Taking the
+    // loose map only when the strict one was empty dropped every
+    // `readNum(x.input)` number in a renderer whose selects matched strictly
+    // (`mode: x.select.value`): gas-dp-flow-meter, duct-velocity-pressure and
+    // others advertised their numbers with no kind, so the sign-typo guard
+    // skipped them.
+    const effectiveCallMap = new Map(parseComputeCallLoose(body) || []);
+    if (callMap) for (const [k, v] of callMap) effectiveCallMap.set(k, v);
     if (!effectiveCallMap || effectiveCallMap.size === 0) { stats.skip_no_call++; continue; }
     if (!params) { stats.skip_no_call++; continue; }
 

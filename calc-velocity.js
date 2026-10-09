@@ -378,10 +378,16 @@ VELOCITY_RENDERERS["dp-flow-meter"] = renderDpFlowMeter;
 //   qm = (Cd / sqrt(1 - beta^4)) eps (pi/4) d^2 sqrt(2 gc dP rho1)
 // with rho1 the upstream density from the ideal-gas law rho = p1 MW / (R Tabs). Reported as mass, actual (acfm),
 // and standard (scfm) flow. Valid for p2/p1 >= 0.75 (the tile flags below that).
-// dims: in { pipe_id_in: L, bore_in: L, p1_psia: M L^-1 T^-2, dp_psi: M L^-1 T^-2, temp_f: T, gas_sg: dimensionless, kappa: dimensionless, cd: dimensionless } out: { expansion_factor: dimensionless, mass_flow_lb_min: M T^-1, scfm: L^3 T^-1, acfm: L^3 T^-1, beta_ratio: dimensionless }
-export function computeGasDpFlowMeter({ pipe_id_in = 0, bore_in = 0, p1_psia = 0, dp_psi = 0, temp_f = 60, gas_sg = 1.0, kappa = 1.4, cd = 0.61 } = {}) {
-  const D = Number(pipe_id_in), d = Number(bore_in), p1 = Number(p1_psia), dp = Number(dp_psi), tF = Number(temp_f), sg = Number(gas_sg), k = Number(kappa), Cd = Number(cd);
-  if (![D, d, p1, dp, tF, sg, k, Cd].every(Number.isFinite)) return { error: "All inputs must be finite numbers." };
+// Computed C added 2026-10-09: cd_mode "flange" / "corner" / "d_d2" takes C from orifice-discharge-coefficient
+// (ISO 5167-2 Reader-Harris/Gallagher), iterated with Re = 4 qm/(pi D mu) from the mass flow and the gas viscosity.
+// dims: in { pipe_id_in: L, bore_in: L, p1_psia: M L^-1 T^-2, dp_psi: M L^-1 T^-2, temp_f: T, gas_sg: dimensionless, kappa: dimensionless, cd: dimensionless, cd_mode: dimensionless, viscosity_cp: M L^-1 T^-1 } out: { expansion_factor: dimensionless, mass_flow_lb_min: M T^-1, scfm: L^3 T^-1, acfm: L^3 T^-1, beta_ratio: dimensionless, cd_used: dimensionless, reynolds_number: dimensionless }
+export function computeGasDpFlowMeter({ pipe_id_in = 0, bore_in = 0, p1_psia = 0, dp_psi = 0, temp_f = 60, gas_sg = 1.0, kappa = 1.4, cd = 0.61, cd_mode = "entered", viscosity_cp = 0.018 } = {}) {
+  const D = Number(pipe_id_in), d = Number(bore_in), p1 = Number(p1_psia), dp = Number(dp_psi), tF = Number(temp_f), sg = Number(gas_sg), k = Number(kappa), mu = Number(viscosity_cp);
+  let Cd = Number(cd);
+  if (![D, d, p1, dp, tF, sg, k, Cd, mu].every(Number.isFinite)) return { error: "All inputs must be finite numbers." };
+  if (!["entered", "flange", "corner", "d_d2"].includes(cd_mode)) return { error: "Discharge coefficient must be entered or computed for flange, corner, or D and D/2 taps." };
+  const computed = cd_mode !== "entered";
+  if (computed && !(mu > 0)) return { error: "Gas viscosity must be positive (cP; air and natural gas are about 0.011 to 0.018)." };
   if (!(D > 0)) return { error: "Pipe inside diameter must be positive (in)." };
   if (!(d > 0)) return { error: "Bore / throat diameter must be positive (in)." };
   if (!(d < D)) return { error: "The bore diameter must be smaller than the pipe inside diameter." };
@@ -391,7 +397,7 @@ export function computeGasDpFlowMeter({ pipe_id_in = 0, bore_in = 0, p1_psia = 0
   if (!(tF > -459.67)) return { error: "Temperature must be above absolute zero (F)." };
   if (!(sg > 0)) return { error: "Gas specific gravity (relative to air) must be positive." };
   if (!(k > 1)) return { error: "Isentropic exponent (ratio of specific heats) must be greater than 1 (air ~1.4, natural gas ~1.3)." };
-  if (!(Cd > 0) || Cd > 1.2) return { error: "Discharge coefficient must be between 0 and 1.2 (orifice ~0.61, venturi ~0.98)." };
+  if (!computed && (!(Cd > 0) || Cd > 1.2)) return { error: "Discharge coefficient must be between 0 and 1.2 (orifice ~0.61, venturi ~0.98)." };
   const beta = d / D;
   const b4 = Math.pow(beta, 4), b8 = Math.pow(beta, 8);
   const p2 = p1 - dp;
@@ -405,15 +411,31 @@ export function computeGasDpFlowMeter({ pipe_id_in = 0, bore_in = 0, p1_psia = 0
   const A = Math.PI / 4 * Math.pow(d / 12, 2); // bore area, ft^2
   const gc = 32.174;                     // lbm ft / (lbf s^2)
   const dp_psf = dp * 144;
-  const qm = (Cd / Math.sqrt(1 - b4)) * expansion_factor * A * Math.sqrt(2 * gc * dp_psf * rho1); // lbm/s
+  const qm_per_cd = (1 / Math.sqrt(1 - b4)) * expansion_factor * A * Math.sqrt(2 * gc * dp_psf * rho1); // lbm/s per unit C
+  let reynolds_number = null;
+  if (computed) {
+    // C depends on Re, which depends on the flow C gives: start at 0.6 and repeat. 1 cP = 0.001 kg/(m s) in lbm/(ft s).
+    const mu_lb_ft_s = mu * 0.001 * 0.3048 / 0.45359237;
+    Cd = 0.6;
+    for (let i = 0; i < 50; i++) {
+      const re = 4 * Cd * qm_per_cd / (Math.PI * (D / 12) * mu_lb_ft_s);
+      const c = computeOrificeDischargeCoefficient({ pipe_id_in: D, bore_in: d, taps: cd_mode, reynolds_number: re });
+      if (c.error) return { error: "Computed discharge coefficient: " + c.error };
+      const settled = Math.abs(c.discharge_coefficient - Cd) < 1e-12;
+      Cd = c.discharge_coefficient;
+      reynolds_number = re;
+      if (settled) break;
+    }
+  }
+  const qm = Cd * qm_per_cd;
   const mass_flow_lb_min = qm * 60;
   const acfm = qm / rho1 * 60;
   const scfm = qm / rhoStd * 60;
   if (![expansion_factor, mass_flow_lb_min, scfm, acfm, rho1, beta].every(Number.isFinite)) return { error: "Gas DP-flow math is not a finite value." };
   const lowRatio = tau < 0.75;
   return {
-    expansion_factor, mass_flow_lb_min, scfm, acfm, upstream_density_lb_ft3: rho1, pressure_ratio: tau, beta_ratio: beta, low_pressure_ratio: lowRatio,
-    note: "The compressible-GAS flow through an orifice plate from the differential pressure across it -- the case the dp-flow-meter tile (liquid only) names as separate. A gas expands and thins as it drops through the restriction, so the incompressible equation is multiplied by the ISO 5167 expansibility factor eps = 1 - (0.351 + 0.256 beta^4 + 0.93 beta^8)(1 - (p2/p1)^(1/kappa)), which falls below 1 as the pressure ratio drops (a bigger dp relative to line pressure = more expansion). The mass flow is qm = (Cd / sqrt(1 - beta^4)) eps (pi/4) d^2 sqrt(2 gc dP rho1), with the upstream density rho1 from the ideal-gas law (rho = p1 MW / (R T), MW = 28.97 x specific gravity). Air (SG 1, kappa 1.4) in a 2 in orifice in a 4 in line at 100 psia and 60 F with 1 psi dP reads eps 0.997 and about 748 scfm; raise the dP to 10 psi and eps falls to 0.973. Enter the UPSTREAM ABSOLUTE pressure (psia = psig + 14.7) and dP in psi (1 psi = 27.68 in w.c.); kappa is about 1.4 for air and diatomic gases, 1.3 for natural gas, 1.13 for propane. Results are the mass flow, the actual (acfm) and standard (scfm, at 14.696 psia and 60 F) volumetric flow. The eps correlation is for orifice plates and holds for p2/p1 >= 0.75 (the tile flags below that); a precise Cd and the venturi/nozzle expansion form come from ISO 5167 and the meter's calibration. A field/sizing estimate; the calibrated meter governs.",
+    expansion_factor, mass_flow_lb_min, scfm, acfm, upstream_density_lb_ft3: rho1, pressure_ratio: tau, beta_ratio: beta, low_pressure_ratio: lowRatio, cd_used: Cd, cd_computed: computed, reynolds_number,
+    note: "The compressible-GAS flow through an orifice plate from the differential pressure across it -- the case the dp-flow-meter tile (liquid only) names as separate. A gas expands and thins as it drops through the restriction, so the incompressible equation is multiplied by the ISO 5167 expansibility factor eps = 1 - (0.351 + 0.256 beta^4 + 0.93 beta^8)(1 - (p2/p1)^(1/kappa)), which falls below 1 as the pressure ratio drops (a bigger dp relative to line pressure = more expansion). The mass flow is qm = (Cd / sqrt(1 - beta^4)) eps (pi/4) d^2 sqrt(2 gc dP rho1), with the upstream density rho1 from the ideal-gas law (rho = p1 MW / (R T), MW = 28.97 x specific gravity). Air (SG 1, kappa 1.4) in a 2 in orifice in a 4 in line at 100 psia and 60 F with 1 psi dP reads eps 0.997 and about 748 scfm; raise the dP to 10 psi and eps falls to 0.973. Enter the UPSTREAM ABSOLUTE pressure (psia = psig + 14.7) and dP in psi (1 psi = 27.68 in w.c.); kappa is about 1.4 for air and diatomic gases, 1.3 for natural gas, 1.13 for propane. Results are the mass flow, the actual (acfm) and standard (scfm, at 14.696 psia and 60 F) volumetric flow. The eps correlation is for orifice plates and holds for p2/p1 >= 0.75 (the tile flags below that); for a square-edge orifice, choose the tap position and Cd is computed by the ISO 5167-2 Reader-Harris/Gallagher equation (orifice-discharge-coefficient), iterated with the Reynolds number 4 qm/(pi D mu) from the mass flow and the gas viscosity; the venturi/nozzle expansion form comes from ISO 5167 and the meter's calibration. A field/sizing estimate; the calibrated meter governs.",
   };
 }
 export const gasDpFlowMeterExample = { inputs: { pipe_id_in: 4, bore_in: 2, p1_psia: 100, dp_psi: 1, temp_f: 60, gas_sg: 1.0, kappa: 1.4, cd: 0.61 } };
@@ -427,25 +449,35 @@ export function renderGasDpFlowMeter(inputRegion, outputRegion, citationEl) {
   const tF = _v23h_makeNumber("Upstream temperature (F)", "gdpf-t", { step: "any" });
   const sg = _v23h_makeNumber("Gas specific gravity (air 1.0, nat gas ~0.6)", "gdpf-sg", { step: "any", min: "0" }); sg.input.value = "1.0";
   const kap = _v23h_makeNumber("Isentropic exponent kappa (air 1.4, nat gas 1.3)", "gdpf-k", { step: "any", min: "0" }); kap.input.value = "1.4";
-  const cd = _v23h_makeNumber("Discharge coefficient Cd (orifice 0.61)", "gdpf-cd", { step: "any", min: "0" }); cd.input.value = "0.61";
-  for (const f of [D, d, p1, dp, tF, sg, kap, cd]) inputRegion.appendChild(f.wrap);
+  const mode = _v23h_makeSelect("Discharge coefficient", "gdpf-mode", [
+    { value: "entered", label: "Entered below", selected: true },
+    { value: "flange", label: "Square-edge orifice, flange taps (ISO 5167-2)" },
+    { value: "corner", label: "Square-edge orifice, corner taps (ISO 5167-2)" },
+    { value: "d_d2", label: "Square-edge orifice, D and D/2 taps (ISO 5167-2)" },
+  ]);
+  const cd = _v23h_makeNumber("Discharge coefficient Cd (when entered; orifice 0.61)", "gdpf-cd", { step: "any", min: "0" }); cd.input.value = "0.61";
+  const mu = _v23h_makeNumber("Gas viscosity (cP, for a computed Cd; air about 0.018)", "gdpf-mu", { step: "any", min: "0" }); mu.input.value = "0.018";
+  for (const f of [D, d, p1, dp, tF, sg, kap, mode, cd, mu]) inputRegion.appendChild(f.wrap);
   const oE = _v23h_makeOut(outputRegion, "Expansion factor Y (eps)", "gdpf-out-e");
   const oS = _v23h_makeOut(outputRegion, "Standard flow", "gdpf-out-s");
   const oM = _v23h_makeOut(outputRegion, "Mass / actual flow", "gdpf-out-m");
   const oB = _v23h_makeOut(outputRegion, "Beta ratio / pressure ratio", "gdpf-out-b");
+  const oC = _v23h_makeOut(outputRegion, "Discharge coefficient used", "gdpf-out-c");
   const oNote = _v23h_makeOut(outputRegion, "Note", "gdpf-out-n");
   function readNum(i) { if (i.value === "") return NaN; const n = Number(i.value); return Number.isFinite(n) ? n : NaN; }
   const update = _v23h_debounce(() => {
-    const r = computeGasDpFlowMeter({ pipe_id_in: readNum(D.input), bore_in: readNum(d.input), p1_psia: readNum(p1.input), dp_psi: readNum(dp.input), temp_f: readNum(tF.input), gas_sg: readNum(sg.input), kappa: readNum(kap.input), cd: readNum(cd.input) });
-    if (r.error) { oE.textContent = r.error; oS.textContent = "-"; oM.textContent = "-"; oB.textContent = "-"; oNote.textContent = ""; return; }
+    const r = computeGasDpFlowMeter({ pipe_id_in: readNum(D.input), bore_in: readNum(d.input), p1_psia: readNum(p1.input), dp_psi: readNum(dp.input), temp_f: readNum(tF.input), gas_sg: readNum(sg.input), kappa: readNum(kap.input), cd: readNum(cd.input), cd_mode: mode.select.value, viscosity_cp: readNum(mu.input) });
+    if (r.error) { oE.textContent = r.error; oS.textContent = "-"; oM.textContent = "-"; oB.textContent = "-"; oC.textContent = "-"; oNote.textContent = ""; return; }
+    oC.textContent = _v23h_fmt(r.cd_used, 4) + (r.cd_computed ? " (computed at Re " + _v23h_fmt(r.reynolds_number, 0) + ")" : " (entered)");
     oE.textContent = _v23h_fmt(r.expansion_factor, 4);
     oS.textContent = _v23h_fmt(r.scfm, 1) + " scfm";
     oM.textContent = _v23h_fmt(r.mass_flow_lb_min, 2) + " lb/min / " + _v23h_fmt(r.acfm, 1) + " acfm";
     oB.textContent = _v23h_fmt(r.beta_ratio, 3) + " / " + _v23h_fmt(r.pressure_ratio, 3) + (r.low_pressure_ratio ? " (below 0.75: eps out of range)" : "");
     oNote.textContent = r.note;
   }, _V23H_DEB);
-  _v23h_attachEx(inputRegion, () => { D.input.value = "4"; d.input.value = "2"; p1.input.value = "100"; dp.input.value = "1"; tF.input.value = "60"; sg.input.value = "1.0"; kap.input.value = "1.4"; cd.input.value = "0.61"; update(); });
-  for (const f of [D, d, p1, dp, tF, sg, kap, cd]) f.input.addEventListener("input", update);
+  _v23h_attachEx(inputRegion, () => { D.input.value = "4"; d.input.value = "2"; p1.input.value = "100"; dp.input.value = "1"; tF.input.value = "60"; sg.input.value = "1.0"; kap.input.value = "1.4"; mode.select.value = "entered"; cd.input.value = "0.61"; mu.input.value = "0.018"; update(); });
+  for (const f of [D, d, p1, dp, tF, sg, kap, cd, mu]) f.input.addEventListener("input", update);
+  mode.select.addEventListener("change", update);
 }
 VELOCITY_RENDERERS["gas-dp-flow-meter"] = renderGasDpFlowMeter;
 

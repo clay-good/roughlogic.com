@@ -824,7 +824,7 @@ function _v55renderPolygonMiter(inputRegion, outputRegion, citationEl) {
     { value: "flats", label: "Across flats (face-to-face width)" },
     { value: "corners", label: "Across corners (point-to-point)" },
   ]);
-  const size = makeNumber("Size (in)", "pm-size", { step: "any", min: "0" });
+  const size = makeNumber("Size measurement (in)", "pm-size", { step: "any", min: "0" });
   for (const f of [n, mode, size]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { n.input.value = "6"; mode.select.value = "side"; size.input.value = "12"; update(); });
   const oMiter = makeOutputLine(outputRegion, "Miter / interior angle", "pm-out-miter");

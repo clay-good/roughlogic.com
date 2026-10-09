@@ -394,7 +394,7 @@ export const BESPOKE_OUTPUT_LABELS = {
   "gas-altitude-derate": {"derated_input_btuh":"Derated input","factor":"Derate factor","flag":"High-altitude kit","note":"Note"},
   "gas-appliance-connection": {"passes":"Verdict","shutoff_ok":"Shutoff (409.5)","trap_exempt":"Sediment trap (408.4)","connector_ok":"Connector (411.1.3.1)","note":"Note"},
   "gas-appliance-demand": {"total_btuh":"Total connected load","cfh":"Demand"},
-  "gas-dp-flow-meter": {"expansion_factor":"Expansion factor Y (eps)","scfm":"Standard flow","note":"Note"},
+  "gas-dp-flow-meter": {"cd_used":"Discharge coefficient used","expansion_factor":"Expansion factor Y (eps)","scfm":"Standard flow","note":"Note"},
   "gas-fuel-conversion": {"cfh_from":"From-fuel flow","cfh_to":"To-fuel flow","area_ratio":"Orifice area ratio (to / from)","direction":"Direction","note":"Note"},
   "gas-leak-hole-diameter": {"orifice_diameter_in":"Equivalent orifice diameter","orifice_area_in2":"Orifice area","note":"Note"},
   "gas-leak-rate": {"leak_rate_cfh":"Leak rate","orifice_area_in2":"Orifice area"},

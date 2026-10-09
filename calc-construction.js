@@ -3877,7 +3877,7 @@ function renderColumnBucklingWood(inputRegion, outputRegion, citationEl) {
   const b = makeNumber("Column width b (in)", "cbw-b", { step: "any", min: "0" });
   const d = makeNumber("Column depth d (in)", "cbw-d", { step: "any", min: "0" });
   const le = makeNumber("Unbraced length lu (in) - Ke is applied below", "cbw-le", { step: "any", min: "0" });
-  const fc = makeNumber("Fc* (psi)", "cbw-fc", { step: "any", min: "0" });
+  const fc = makeNumber("Compression parallel to grain Fc* (psi)", "cbw-fc", { step: "any", min: "0" });
   const emin = makeNumber("Emin (psi)", "cbw-emin", { step: "any", min: "0" });
   const ke = makeNumber("Effective-length factor Ke", "cbw-ke", { step: "any", min: "0" });
   for (const f of [b, d, le, fc, emin, ke]) inputRegion.appendChild(f.wrap);

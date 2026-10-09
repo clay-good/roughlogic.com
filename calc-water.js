@@ -928,7 +928,7 @@ function renderDisinfectionCT(inputRegion, outputRegion, citationEl) {
   const t10 = makeNumber("Contact time t10 (min; basin 10-percentile)", "ct-t10", { step: "any", min: "0" });
   const t = makeNumber("Water temperature (°C; 0.5 - 25)", "ct-t", { step: "any", value: "5" });
   t.input.value = "5";
-  const p = makeNumber("pH (6.0 - 9.0)", "ct-p", { step: "any", value: "7.0" });
+  const p = makeNumber("Water pH (6.0 - 9.0)", "ct-p", { step: "any", value: "7.0" });
   p.input.value = "7.0";
   // v23 EN.15: log-target selector for the required-CT / required-t10 inverse.
   const lt = makeSelect("Log target (Giardia)", "ct-lt", [{ value: "2", label: "2-log" }, { value: "3", label: "3-log", selected: true }, { value: "4", label: "4-log" }]);

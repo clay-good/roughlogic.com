@@ -1930,6 +1930,7 @@ export function computePearsonSquareRation({ feed_a_pct = 0, feed_b_pct = 0, tar
   let batch = Number(batch_lb) || 0;
   if (!Number.isFinite(batch) || batch < 0) batch = 0;
   if (!Number.isFinite(A) || !Number.isFinite(B) || !Number.isFinite(T)) return { error: "Nutrient percentages must be finite." };
+  if (A < 0 || B < 0 || T < 0) return { error: "Nutrient percentages cannot be negative." };
   if (A === B) return { error: "Feed A and feed B nutrient percent are equal - blend is degenerate." };
   const lo = Math.min(A, B), hi = Math.max(A, B);
   if (!(T > lo && T < hi)) return { error: "Target must lie strictly between the two feed values - blend impossible otherwise." };

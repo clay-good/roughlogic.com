@@ -59073,3 +59073,18 @@ test("bounds: dp-flow-meter computed Cd is the RHG value at the Reynolds number 
   assert.ok("error" in _dpfC({ ...b, cd_mode: "flange", viscosity_cst: -1 }));
   assert.ok("error" in _dpfC({ ...b, cd_mode: "venturi" }));
 });
+
+import { computeGasDpFlowMeter as _gdpfC } from "../../calc-velocity.js";
+test("bounds: gas-dp-flow-meter computed Cd is the RHG value at the Reynolds number of its own mass flow", () => {
+  const b = { pipe_id_in: 4, bore_in: 2, p1_psia: 100, dp_psi: 1, temp_f: 60, gas_sg: 1.0, kappa: 1.4, viscosity_cp: 0.018 };
+  for (const taps of ["flange", "corner", "d_d2"]) {
+    const r = _gdpfC({ ...b, cd_mode: taps });
+    assert.ok(Math.abs(_odc({ pipe_id_in: 4, bore_in: 2, taps, reynolds_number: r.reynolds_number }).discharge_coefficient - r.cd_used) < 1e-10);
+    assert.ok(Math.abs(_gdpfC({ ...b, cd: r.cd_used }).scfm - r.scfm) < 1e-9);
+  }
+  const mu_lb_ft_s = 0.018 * 0.001 * 0.3048 / 0.45359237;
+  const r = _gdpfC({ ...b, cd_mode: "flange" });
+  assert.ok(Math.abs(r.reynolds_number - 4 * (r.mass_flow_lb_min / 60) / (Math.PI * (4 / 12) * mu_lb_ft_s)) < 1e-6);
+  assert.ok("error" in _gdpfC({ ...b, cd_mode: "flange", viscosity_cp: -1 }));
+  assert.ok("error" in _gdpfC({ ...b, cd_mode: "nozzle" }));
+});

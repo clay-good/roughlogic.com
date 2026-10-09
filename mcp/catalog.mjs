@@ -709,7 +709,10 @@ function introspectInputs(fn) {
       let def;
       if (eq !== -1) {
         const raw = part.slice(eq + 1).trim();
-        try { def = JSON.parse(raw.replace(/'/g, '"')); } catch { def = raw; }
+        // A default that is not a literal (`NPK_DEFAULT_SOURCES.urea_n_pct`)
+        // is source text, not a value; advertising it handed an agent a string
+        // the compute would read as NaN, so it is left undefined.
+        try { def = JSON.parse(raw.replace(/'/g, '"')); } catch { def = undefined; }
       }
       return { name, default: def };
     })

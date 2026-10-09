@@ -1410,8 +1410,8 @@
       "date": "2026-09-29"
     },
     "/tools/column-buckling-wood/": {
-      "sha": "f8584f2ccd4a1d1b",
-      "date": "2026-09-30"
+      "sha": "49e0dcedb331e509",
+      "date": "2026-10-09"
     },
     "/tools/column-secant-formula/": {
       "sha": "c45678e1443a2653",
@@ -2226,8 +2226,8 @@
       "date": "2026-10-03"
     },
     "/tools/disinfection-ct/": {
-      "sha": "1643f7b487fee6ed",
-      "date": "2026-09-30"
+      "sha": "346ea2e95dda5772",
+      "date": "2026-10-09"
     },
     "/tools/disk-clutch-torque/": {
       "sha": "cad3445675dd9231",
@@ -3294,8 +3294,8 @@
       "date": "2026-09-29"
     },
     "/tools/gas-dp-flow-meter/": {
-      "sha": "d8eb017692a6f437",
-      "date": "2026-09-29"
+      "sha": "6811ec72eaf665f2",
+      "date": "2026-10-09"
     },
     "/tools/gas-fuel-conversion/": {
       "sha": "b10ddbec4daf7066",
@@ -5586,8 +5586,8 @@
       "date": "2026-09-29"
     },
     "/tools/polygon-miter/": {
-      "sha": "3305114db8bf467c",
-      "date": "2026-09-29"
+      "sha": "15c42ee599d85e27",
+      "date": "2026-10-09"
     },
     "/tools/polymeric-sand-bags/": {
       "sha": "13ce3e4423c81e5b",

@@ -1,7 +1,7 @@
 {
   "note": "spec-v1184 coverage ratchet. Tiles whose renderer exposes a render.schema consistent with the compute function. Grow with `node scripts/check-renderer-schema.mjs --write`; regeneration is intentional.",
   "total_tiles": 2253,
-  "covered_count": 2174,
+  "covered_count": 2177,
   "covered": [
     "aav-install-check",
     "abatement-containment",
@@ -319,6 +319,7 @@
     "collection-vehicle-payload",
     "column-base-plate",
     "column-buckling-wood",
+    "column-secant-formula",
     "combined-stress-axial-bending",
     "combustion-air",
     "combustion-air-max-input",
@@ -642,6 +643,7 @@
     "esp-deutsch-efficiency",
     "estimated-tax",
     "et-horsepower",
+    "euler-johnson-column",
     "ev-charge-cost",
     "ev-charge-time",
     "ev-charger-load",
@@ -1189,6 +1191,7 @@
     "noise-barrier-insertion-loss",
     "noncoincident-load",
     "nozzle-flow-pressure",
+    "npk-blend",
     "npsh-a",
     "nucleic-acid-a260",
     "od600-cell-count",
