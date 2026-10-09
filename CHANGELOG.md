@@ -60,6 +60,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **`density-altitude` takes relative humidity.** Its dry-air model said humidity was ignored. An optional relative humidity now replaces the OAT with the virtual temperature, Tv = T/(1 - 0.378 e/p) with e from the humidity and the saturation pressure at the OAT and p the station pressure, in the same FAA relation: 90 F at 80% at sea level adds about 535 ft, and the 5,000 ft example at 95 F and 50% adds 473 ft. Blank keeps the dry-air answer.
+
 - **`pipe-heat-loss-radial` takes the outer air film.** It computed conduction only and took the jacket at ambient, which overstates the loss. An optional outer film coefficient now adds 1/(2 pi r2 h) in series and reports the jacket surface temperature: the 2 in example pipe with 1 in of insulation loses 22.1 BTU/hr-ft instead of 24.6, with the jacket at 82.8 F, using a still-air film of 1.65. Blank keeps the old conduction-only answer. Also: the MWBC voltage-drop note now names `voltage-drop-reactance` for the AC reactance it ignores.
 
 - **`spanline-sag-tension` takes a point load at midspan.** It covered a uniform load only (a litter on a rescue highline or a block on a tramline was sent elsewhere). An optional midspan point load now adds by superposition: H = (w L^2/8 + P L/4)/d, anchor tension sqrt(H^2 + (w L/2 + P/2)^2), and the matching slack. A 300 lb litter on a 100 ft highline sagging 10 ft puts 778 lb on each anchor; the inverse, `spanline-sag-for-tension`, takes the same point load (a 1,000 lb anchor limit needs at least 7.7 ft of sag). Uniform-load results are unchanged.

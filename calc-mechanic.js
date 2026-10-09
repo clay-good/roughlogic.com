@@ -2793,14 +2793,20 @@ MECHANIC_RENDERERS["torque-adapter-correction"] = _simpleRenderer({
 
 // ===================== spec-v500: density altitude and pressure altitude =====================
 
-// dims: in { field_elevation_ft: L, altimeter_in_hg: dimensionless, oat_f: T } out: { oat_c: T, pa_ft: L, isa_c: T, da_ft: L }
-export function computeDensityAltitude({ field_elevation_ft = 0, altimeter_in_hg = 29.92, oat_f = 59 } = {}) {
+// Humidity added 2026-10-09 (the note said the dry-air model ignored it): with relative humidity entered, the
+// vapor pressure e = RH x 6.112 exp(17.67 T/(T + 243.5)) hPa (Bolton) at the OAT, the station pressure from the
+// altimeter and elevation, and the virtual temperature Tv = T / (1 - 0.378 e/p) replaces the OAT in the same
+// FAA relation. Moist air is lighter, so humidity raises density altitude.
+// dims: in { field_elevation_ft: L, altimeter_in_hg: dimensionless, oat_f: T, relative_humidity_pct: dimensionless } out: { oat_c: T, pa_ft: L, isa_c: T, da_ft: L, humidity_add_ft: L }
+export function computeDensityAltitude({ field_elevation_ft = 0, altimeter_in_hg = 29.92, oat_f = 59, relative_humidity_pct = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const elev = Number(field_elevation_ft) || 0;
   const alt = Number(altimeter_in_hg) || 0;
   const oatf = Number(oat_f);
   if (!(alt > 0)) return { error: "Altimeter setting must be positive (in Hg)." };
   if (!Number.isFinite(oatf) || oatf < -459.67) return { error: "Outside air temperature must be above absolute zero (-459.67 F)." };
+  const rh = Number(relative_humidity_pct) || 0;
+  if (rh < 0 || rh > 100) return { error: "Relative humidity must be from 0 to 100 percent (0 or blank for dry air)." };
   const oat_c = (oatf - 32) * 5 / 9;
   // The standard-atmosphere pressure/height relation, which the FAA PHAK's
   // altimeter-setting conversion table prints (30.10 -> -165 ft, 28.0 -> +1,824).
@@ -2808,11 +2814,18 @@ export function computeDensityAltitude({ field_elevation_ft = 0, altimeter_in_hg
   // gave -180 and +1,920: 15 ft off FAA's own density-altitude example, 96 ft at 28.0.
   const pa_ft = elev + 145366.45 * (1 - Math.pow(alt / 29.92, 0.190284));
   const isa_c = 15 - 2 * (pa_ft / 1000);
-  const da_ft = pa_ft + 120 * (oat_c - isa_c);
-  if (![oat_c, pa_ft, isa_c, da_ft].every(Number.isFinite)) return { error: "Density-altitude math is not a finite value." };
+  const dry_da_ft = pa_ft + 120 * (oat_c - isa_c);
+  // Station pressure (in Hg) from the altimeter setting (standard-atmosphere reduction), then e/p.
+  const station_in_hg = alt * Math.pow(1 - 6.8756e-6 * elev, 5.2559);
+  const e_hpa = (rh / 100) * 6.112 * Math.exp((17.67 * oat_c) / (oat_c + 243.5));
+  const p_hpa = station_in_hg * 33.8639;
+  const tv_c = (oat_c + 273.15) / (1 - 0.378 * e_hpa / p_hpa) - 273.15;
+  const da_ft = pa_ft + 120 * (tv_c - isa_c);
+  const humidity_add_ft = da_ft - dry_da_ft;
+  if (![oat_c, pa_ft, isa_c, da_ft, tv_c].every(Number.isFinite)) return { error: "Density-altitude math is not a finite value." };
   return {
-    oat_c, pa_ft, isa_c, da_ft,
-    note: "FAA density-altitude method (ISA lapse correction): PA = elevation + 145,366 x (1 - (altimeter/29.92)^0.190284), the standard-atmosphere conversion the FAA PHAK tabulates (the 1,000 ft per in Hg rule of thumb drifts to about 100 ft off by 28 in Hg), ISA temp = 15 - 2 x (PA/1000) degrees C, and DA = PA + 120 x (OAT - ISA). Density altitude is the pressure altitude corrected for the temperature departure from standard -- hot and high robs lift, engine power, and prop thrust even when the field elevation looks benign, so a warm day flies like a much higher field. Humidity lowers air density further; this dry-air model ignores it, so it slightly under-predicts DA on a humid day. A planning estimate; the aircraft flight manual performance charts and the pilot in command govern.",
+    oat_c, pa_ft, isa_c, da_ft, humidity_add_ft, virtual_temp_c: tv_c, has_humidity: rh > 0,
+    note: "FAA density-altitude method (ISA lapse correction): PA = elevation + 145,366 x (1 - (altimeter/29.92)^0.190284), the standard-atmosphere conversion the FAA PHAK tabulates (the 1,000 ft per in Hg rule of thumb drifts to about 100 ft off by 28 in Hg), ISA temp = 15 - 2 x (PA/1000) degrees C, and DA = PA + 120 x (OAT - ISA). Density altitude is the pressure altitude corrected for the temperature departure from standard -- hot and high robs lift, engine power, and prop thrust even when the field elevation looks benign, so a warm day flies like a much higher field. Humidity lowers air density further: enter the relative humidity and the OAT is replaced by the virtual temperature Tv = T/(1 - 0.378 e/p), with e from the humidity and the saturation pressure at the OAT (Bolton) and p the station pressure; blank is the dry-air answer, which under-predicts DA on a humid day. A planning estimate; the aircraft flight manual performance charts and the pilot in command govern.",
   };
 }
 export const densityAltitudeExample = { inputs: { field_elevation_ft: 5000, altimeter_in_hg: 29.92, oat_f: 95 } };
@@ -2824,11 +2837,12 @@ MECHANIC_RENDERERS["density-altitude"] = _simpleRenderer({
     { key: "field_elevation_ft", label: "Field / station elevation (ft)", kind: "number" },
     { key: "altimeter_in_hg", label: "Altimeter setting (in Hg)", kind: "number" },
     { key: "oat_f", label: "Outside air temperature (°F)", kind: "number", default: 59 },
+    { key: "relative_humidity_pct", label: "Relative humidity (%, blank for dry air)", kind: "number", attrs: { step: "any", min: "0", max: "100" } },
   ],
   outputs: [
     { key: "pa", id: "da-out-pa", label: "Pressure altitude", value: (r) => fmt(r.pa_ft, 0) + " ft" },
     { key: "isa", id: "da-out-isa", label: "Standard (ISA) temp at that altitude", value: (r) => fmt(r.isa_c, 1) + " C (OAT " + fmt(r.oat_c, 1) + " C)" },
-    { key: "da", id: "da-out-da", label: "Density altitude", value: (r) => fmt(r.da_ft, 0) + " ft (" + (r.da_ft >= r.pa_ft ? "+" : "") + fmt(r.da_ft - r.pa_ft, 0) + " ft vs pressure altitude)" },
+    { key: "da", id: "da-out-da", label: "Density altitude", value: (r) => fmt(r.da_ft, 0) + " ft (" + (r.da_ft >= r.pa_ft ? "+" : "") + fmt(r.da_ft - r.pa_ft, 0) + " ft vs pressure altitude" + (r.has_humidity ? "; humidity adds " + fmt(r.humidity_add_ft, 0) + " ft" : "") + ")" },
     { key: "n", id: "da-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeDensityAltitude,

@@ -58949,3 +58949,14 @@ test("bounds: pipe-heat-loss-radial outer film adds in series and sets the jacke
   assert.ok(Math.abs((200 - film.surface_temp_f) / rIns - (film.surface_temp_f - 70) / rFilm) < 1e-9);
   assert.ok("error" in _phlrF({ ...b, film_coeff_btu_hr_ft2_f: -1 }));
 });
+
+import { computeDensityAltitude as _daH } from "../../calc-mechanic.js";
+test("bounds: density-altitude humidity raises DA through the virtual temperature", () => {
+  const b = { field_elevation_ft: 5000, altimeter_in_hg: 29.92, oat_f: 95 };
+  const dry = _daH(b), half = _daH({ ...b, relative_humidity_pct: 50 }), sat = _daH({ ...b, relative_humidity_pct: 100 });
+  assert.equal(dry.da_ft, 8600);
+  assert.equal(dry.humidity_add_ft, 0);
+  assert.ok(half.da_ft > dry.da_ft && sat.da_ft > half.da_ft);
+  assert.ok(Math.abs(half.humidity_add_ft - 120 * (half.virtual_temp_c - dry.oat_c)) < 1e-9);
+  assert.ok("error" in _daH({ ...b, relative_humidity_pct: 120 }));
+});

@@ -169451,6 +169451,29 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "density-altitude",
+  "source_publisher": "Project (first-principles)",
+  "source_title": "Sea level, 29.92, 90 F, 80% relative humidity",
+  "source_edition_or_year": "virtual temperature in the FAA relation",
+  "source_section_or_page": "es(32.22 C) = 48.17 hPa; e = 38.54; p = 1013.2 hPa; Tv = 305.37/(1 - 0.378 x 0.03804) = 309.83 K (+4.46 C); humidity adds 120 x 4.46 = 535 ft",
+  "verified_by": "rl",
+  "verified_on": "2026-10-09",
+  "inputs": {
+   "field_elevation_ft": 0,
+   "altimeter_in_hg": 29.92,
+   "oat_f": 90,
+   "relative_humidity_pct": 80
+  },
+  "outputs": {
+   "humidity_add_ft": {
+    "value": 534.8,
+    "tolerance": {
+     "pct": 1
+    }
+   }
+  }
  }
  ]
 }

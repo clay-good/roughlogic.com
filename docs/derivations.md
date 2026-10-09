@@ -2893,7 +2893,7 @@ cross-check.
 | calc-mechanic.js | `computeCrosswindComponent` | `{ runway_heading_deg = 0, wind_dir_deg = 0, wind_speed_kt = 0, gust_kt = 0, m...` | _ | _ | _ |
 | calc-mechanic.js | `computeCrouchHpForSpeed` | `{ target_speed_mph = 0, displacement_lb = 0, hull_constant = 190 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeCrouchPlaningSpeed` | `{ displacement_lb = 0, shaft_hp = 0, hull_constant = 190 } = {}` | _ | _ | _ |
-| calc-mechanic.js | `computeDensityAltitude` | `{ field_elevation_ft = 0, altimeter_in_hg = 29.92, oat_f = 59 } = {}` | _ | _ | _ |
+| calc-mechanic.js | `computeDensityAltitude` | `{ field_elevation_ft = 0, altimeter_in_hg = 29.92, oat_f = 59, relative_humid...` | _ | _ | _ |
 | calc-mechanic.js | `computeDisplacementCR` | `{ bore_in = 0, stroke_in = 0, cylinders = 0, chamber_cc = 0, gasket_bore_in =...` | _ | _ | _ |
 | calc-mechanic.js | `computeDriveshaftCritical` | `{ od_in = 0, wall_in = 0, length_in = 0, material = "steel" }` | _ | _ | _ |
 | calc-mechanic.js | `computeDriveshaftMaxLength` | `{ target_rpm = 0, od_in = 0, wall_in = 0, material = "steel" } = {}` | _ | _ | _ |
@@ -5693,7 +5693,7 @@ per spec-v14 §13.1 second paragraph.
 | `cutting-diameter-for-rpm` | Cutter Diameter for a Spindle RPM | First-principles cutting geometry + M...; 100 SFM at 1000 RPM -> 0.382 in diameter | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `cutting-fluid-concentration` | Cutting-Fluid Concentration | Metalworking-fluid refractometer method; spec-v100 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `cutting-speed-rpm` | Machining Speed and Feed | First-principles cutting geometry + M...; 100 SFM, 0.5-in cutter, 2 flutes, 0.002 in/tooth -> 763.9... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
-| `density-altitude` | Density Altitude and Pressure Altitude | FAA density-altitude method (ISA laps...; spec-v500 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
+| `density-altitude` | Density Altitude and Pressure Altitude | FAA density-altitude method (ISA laps...; spec-v500 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `disk-clutch-torque` | Disk Clutch / Brake Friction Torque | Project (first-principles); disk clutch torque | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `displacement-cr` | Engine Displacement and Compression Ratio | Project (first-principles) over stand...; 4.0 bore / 3.48 stroke / 8 cyl / 64 cc chamber / 4.1 gask... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `dividing-head` | Dividing-Head Simple Indexing | First-principles indexing arithmetic ...; N 9 on a 40:1 head -> 4 turns + 4/9; on a 54-hole circle ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+7 more) |
