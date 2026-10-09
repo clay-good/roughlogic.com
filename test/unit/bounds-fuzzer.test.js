@@ -58741,3 +58741,18 @@ test("bounds: rc-one-way-shear adds Nu/(6 Ag) with the 0.05 f'c limit, zero floo
   assert.ok(Math.abs(heavy.vc_psi - 5 * Math.sqrt(4000)) < 1e-9 && heavy.vc_capped);
   assert.ok("error" in _rowsN({ ...b, nu_kip: 10 }));
 });
+
+import { computeUniversalJointSpeed as _ujT } from "../../calc-mechanic.js";
+test("bounds: universal-joint torque pulsation conserves power and the peak acceleration matches a numeric derivative", () => {
+  const r = _ujT({ joint_angle_deg: 10, input_speed_rpm: 1000, input_torque_lbft: 200 });
+  assert.ok(Math.abs(r.max_output_torque_lbft * r.min_output_rpm - 200 * 1000) < 1e-6);
+  assert.ok(Math.abs(r.min_output_torque_lbft * r.max_output_rpm - 200 * 1000) < 1e-6);
+  // Numeric: output speed w2(theta) = w cos b / (1 - sin^2 b sin^2 theta); d(w2)/dt = w d(w2)/dtheta.
+  const w = (2 * Math.PI * 1000) / 60, b = (10 * Math.PI) / 180;
+  const w2 = (t) => (w * Math.cos(b)) / (1 - Math.sin(b) ** 2 * Math.sin(t) ** 2);
+  let peak = 0;
+  for (let i = 0; i <= 20000; i++) { const t = (i / 20000) * Math.PI, h = 1e-6; peak = Math.max(peak, Math.abs(w * (w2(t + h) - w2(t - h)) / (2 * h))); }
+  assert.ok(Math.abs(r.peak_output_accel_rad_s2 / peak - 1) < 1e-4);
+  assert.equal(_ujT({ joint_angle_deg: 10, input_speed_rpm: 1000 }).has_torque, false);
+  assert.ok("error" in _ujT({ joint_angle_deg: 10, input_speed_rpm: 1000, input_torque_lbft: -5 }));
+});

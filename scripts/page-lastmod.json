@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "25f2f2c0660a1f7c",
+      "sha": "e57095cd2755942c",
       "date": "2026-10-09"
     },
     "/tools/": {
@@ -8454,8 +8454,8 @@
       "date": "2026-09-29"
     },
     "/tools/universal-joint-speed/": {
-      "sha": "47ca142ffc7526aa",
-      "date": "2026-09-29"
+      "sha": "41fe878e1ab0fd0c",
+      "date": "2026-10-09"
     },
     "/tools/upgrade-roi/": {
       "sha": "215171529a83a133",

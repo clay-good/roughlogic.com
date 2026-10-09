@@ -168914,6 +168914,34 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "universal-joint-speed",
+  "source_publisher": "Project (first-principles)",
+  "source_title": "Torque pulsation, 200 lb-ft at 10 degrees and 1,000 rpm",
+  "source_edition_or_year": "Cardan joint, power conserved",
+  "source_section_or_page": "T cos(10) = 196.96 lb-ft; T/cos(10) = 203.09 lb-ft",
+  "verified_by": "rl",
+  "verified_on": "2026-10-09",
+  "inputs": {
+   "joint_angle_deg": 10,
+   "input_speed_rpm": 1000,
+   "input_torque_lbft": 200
+  },
+  "outputs": {
+   "min_output_torque_lbft": {
+    "value": 196.96,
+    "tolerance": {
+     "pct": 0.5
+    }
+   },
+   "max_output_torque_lbft": {
+    "value": 203.09,
+    "tolerance": {
+     "pct": 0.5
+    }
+   }
+  }
  }
  ]
 }

@@ -2951,7 +2951,7 @@ cross-check.
 | calc-mechanic.js | `computeTurboPressureRatio` | `{ boost_psi = 0, ambient_psia = 14.7, inlet_temp_f = 0, compressor_eff_pct = ...` | _ | _ | _ |
 | calc-mechanic.js | `computeTurnRadiusBank` | `{ airspeed_kt = 0, bank_angle_deg = 0 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeUjointOperatingAngle` | `{ input_angle_deg = 10, output_angle_deg = 10 } = {}` | _ | _ | _ |
-| calc-mechanic.js | `computeUniversalJointSpeed` | `{ joint_angle_deg = 0, input_speed_rpm = 0 } = {}` | _ | _ | _ |
+| calc-mechanic.js | `computeUniversalJointSpeed` | `{ joint_angle_deg = 0, input_speed_rpm = 0, input_torque_lbft = 0 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeValveFlowCoefficient` | `{ solve_for = "flow", fluid = "liquid", specific_gravity = 1, cv = 0, flow_gp...` | _ | _ | _ |
 | calc-mechanic.js | `computeVehicleRoadLoadPower` | `{ speed_mph = 0, vehicle_weight_lb = 0, frontal_area_ft2 = 0, drag_coefficien...` | _ | _ | _ |
 | calc-mechanic.js | `computeVolumetricEfficiency` | `{ displacement_ci = 0, rpm = 0, cycle = "four", actual_cfm = 0, ve_pct = 0 } ...` | _ | _ | _ |
@@ -5796,7 +5796,7 @@ per spec-v14 §13.1 second paragraph.
 | `turn-radius-bank` | Coordinated Turn Radius and Rate | FAA Airplane Flying Handbook (coordin...; 120 kt at 30 deg bank -> 2208 ft radius, 5.25 deg/s rate ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `turning-surface-finish` | Theoretical Surface Finish | First-principles scallop geometry + M...; f 0.005 IPR, r 1/32 in -> Rt 100 uin, Ra 25 uin | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `ujoint-operating-angle` | Driveline U-Joint Operating Angle and Cancellation | Cardan (Hooke) U-joint kinematics + c...; variation = 1/cos(10) - cos(10) = 1.01543 - 0.98481 = 0.0... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
-| `universal-joint-speed` | Universal Joint (Cardan) Speed Variation | Project (first-principles); Cardan velocity | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
+| `universal-joint-speed` | Universal Joint (Cardan) Speed Variation | Project (first-principles); Cardan velocity | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+4 more) |
 | `vacuum-evacuation-time` | Vacuum Pump Evacuation (Pump-Down) Time | Project (first-principles); the pump manufacturer speed curve and the system designer... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+7 more) |
 | `valve-flow-coefficient` | Valve Flow Coefficient (Cv) | ISA-75.01 / Crane TP-410 (control-val...; Cv 10, dP 25 psi, SG 1 -> Q = 10 * sqrt(25) = 50 gpm | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `vehicle-road-load-power` | Vehicle Road-Load Force and Power | Project (first-principles); F_total = aero + rolling + grade | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |

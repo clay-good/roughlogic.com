@@ -60,6 +60,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **`universal-joint-speed` gives the torque pulsation and peak output acceleration.** It said torque pulsation was separate. An optional input torque now returns the output torque range, T cos(beta) to T/cos(beta) (power is conserved), and every case reports the peak output angular acceleration, omega^2 cos(beta) sin^2(beta) sin(2 theta)/(1 - sin^2(beta) sin^2(theta))^2 at its worst angle: 200 lb-ft through 10 degrees at 1,000 rpm swings 197 to 203 lb-ft and peaks at 336 rad/s^2.
+
 - **`calc-concrete.js` gzip cap raised 54,000 -> 58,000 B.** The 2026-10-09 anchor cracking factors, concentrated-load deflection, and axial one-way shear took the module to about 54.3 KB gzipped. It is lazy-loaded and outside the home-view payload.
 
 - **`rc-one-way-shear` takes an axial load (ACI 318-19 Table 22.5.5.1(c)).** It assumed none. A factored axial load Nu and the gross area Ag now add Nu/(6 Ag) to the concrete shear stress, compression positive and no more than 0.05 f'c (22.5.5.1.2), with Vc floored at zero and capped at 5 lambda sqrt(f'c) bw d (22.5.5.1.1; the cap was missing before). 50 kip of compression on the 12 by 18 in example lifts Vc from 14.8 to 22.2 kip; 100 kip of tension takes it to zero.
