@@ -857,6 +857,7 @@ const _TILES = [
   ["blast-airblast-overpressure", "E"],
   ["blast-stemming-length", "E"],
   ["crusher-reduction-ratio", "E"],
+  ["bond-work-index-power", "E"],
   ["screen-deck-capacity", "E"],
   ["belt-feeder-capacity", "E"],
   ["dust-collector-air-to-cloth", "E"],

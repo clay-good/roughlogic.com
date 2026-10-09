@@ -6397,6 +6397,11 @@
     {"term":"natural gas compressibility factor","target":"gas-z-factor","kind":"industry"},
     {"term":"dranchuk abou-kassem","target":"gas-z-factor","kind":"industry"},
     {"term":"standing katz z factor","target":"gas-z-factor","kind":"industry"},
-    {"term":"what z factor do i use for natural gas","target":"gas-z-factor","kind":"question"}
+    {"term":"what z factor do i use for natural gas","target":"gas-z-factor","kind":"question"},
+    {"term":"bond work index","target":"bond-work-index-power","kind":"industry"},
+    {"term":"ball mill power","target":"bond-work-index-power","kind":"industry"},
+    {"term":"grinding energy kwh per ton","target":"bond-work-index-power","kind":"industry"},
+    {"term":"bonds law comminution","target":"bond-work-index-power","kind":"industry"},
+    {"term":"how much power to grind ore","target":"bond-work-index-power","kind":"question"}
   ]
 }

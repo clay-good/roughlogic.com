@@ -1508,6 +1508,7 @@ const RELATED = {
   "blast-airblast-overpressure": ["blast-scaled-distance-ppv","blast-stemming-length","blast-powder-factor"],
   "blast-stemming-length": ["blast-burden-spacing","blast-airblast-overpressure","blast-powder-factor"],
   "crusher-reduction-ratio": ["screen-deck-capacity","belt-feeder-capacity","aggregate"],
+  "bond-work-index-power": ["crusher-reduction-ratio","screen-deck-capacity","belt-feeder-capacity"],
   "screen-deck-capacity": ["crusher-reduction-ratio","belt-feeder-capacity","fine-aggregate-grading"],
   "belt-feeder-capacity": ["belt-conveyor-tension-power","screen-deck-capacity","crusher-reduction-ratio"],
   "dust-collector-air-to-cloth": ["dust-deflagration-vent-area","dust-collection-duct","hood-exhaust"],

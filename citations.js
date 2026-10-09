@@ -15472,6 +15472,18 @@ export const CITATIONS = {
       { name: "Check the SHORTEST hole", value: "one short hole is enough, so an average tells you nothing", source: "blasting practice" },
     ],
   },
+  "bond-work-index-power": {
+    formula: "W = 10 Wi (1/sqrt(P80) - 1/sqrt(F80)) kWh per short ton (F80, P80 in microns); power_kW = W x feed rate (short tons per hour); hp = kW / 0.7457.",
+    edition: "Bond's third theory of comminution (F. C. Bond, 'The Third Theory of Comminution,' Trans. AIME 193, 1952; 'Crushing and Grinding Calculations,' Allis-Chalmers, 1961), by name.",
+    freeAccess: "A published empirical law; the work index (from a Bond lab test), the sizes, and the feed rate are the user's inputs.",
+    governance: GOVERNANCE.general,
+    editionNote: "Energy at the mill pinion for a wet overflow ball mill in closed circuit, the condition Bond's work index is defined for; Rowland's efficiency factors for dry grinding, open circuit, fineness, mill diameter, oversize feed, and reduction ratio adjust it and are not applied. Wi is in kWh per short ton, Bond's original unit. A screen; the mill vendor's sizing governs.",
+    assumptions: [
+      { name: "Bond's law", value: "W = 10 Wi (1/sqrt(P80) - 1/sqrt(F80)), sizes in microns at 80% passing", source: "Bond (1952, 1961)" },
+      { name: "Work index unit", value: "kWh per short ton; Wi is the energy from infinite size to 80% passing 100 microns", source: "Bond (1961)" },
+      { name: "Efficiency factors", value: "Rowland EF1-EF8 not applied", source: "scope of this tile" },
+    ],
+  },
   "crusher-reduction-ratio": {
     formula: "reduction ratio = feed size / product size on 80% passing sizes; circuit ratios MULTIPLY, so an even split is the total raised to one over the stage count; stages needed = ceil(log of the total over log of the machine's high ratio).",
     edition: "The reduction ratio relation and the multiplicative circuit rule by name, with typical machine ranges (Metso Crushing and Screening Handbook, 7th ed.: jaw 3 to 5, primary gyratory 6 to 8, secondary cone 3 to 4, tertiary cone 2 to 3.5; impactors run higher) entered rather than shipped. The crusher manufacturer's selection data and the plant designer govern.",

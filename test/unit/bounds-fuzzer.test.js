@@ -58819,3 +58819,13 @@ test("bounds: clutch-engagement-energy equals the kinetic energy lost at the mom
   assert.ok("error" in _cee({ driver_wr2_lbft2: 20, driven_wr2_lbft2: 10, driver_rpm: 900, driven_rpm: 900 }));
   assert.ok("error" in _cee({ driver_wr2_lbft2: 0, driven_wr2_lbft2: 10, driver_rpm: 900 }));
 });
+
+import { computeBondWorkIndexPower as _bwi } from "../../calc-mining.js";
+test("bounds: bond-work-index-power returns Wi itself for infinite feed to 100 microns", () => {
+  // Bond's definition: Wi is the energy from infinite size to 80% passing 100 microns.
+  assert.ok(Math.abs(_bwi({ work_index_kwh_st: 13, feed_f80_um: 1e15, product_p80_um: 100 }).specific_energy_kwh_st - 13) < 1e-4);
+  const r = _bwi({ work_index_kwh_st: 13, feed_f80_um: 1000, product_p80_um: 75, feed_rate_stph: 100 });
+  assert.ok(Math.abs(r.power_kw - 100 * r.specific_energy_kwh_st) < 1e-9);
+  assert.ok("error" in _bwi({ work_index_kwh_st: 13, feed_f80_um: 75, product_p80_um: 1000 }));
+  assert.ok("error" in _bwi({ work_index_kwh_st: 0, feed_f80_um: 1000, product_p80_um: 75 }));
+});

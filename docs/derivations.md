@@ -2991,6 +2991,7 @@ cross-check.
 | calc-mining.js | `computeBlastPowderFactor` | `{ burden_ft = 0, spacing_ft = 0, bench_height_ft = 0, hole_diameter_in = 0, s...` | _ | _ | _ |
 | calc-mining.js | `computeBlastScaledDistancePPV` | `{ distance_ft = 0, charge_per_delay_lb = 0, site_k = 242, site_b = 1.6, ppv_l...` | _ | _ | _ |
 | calc-mining.js | `computeBlastStemmingLength` | `{ burden_ft = 0, hole_diameter_in = 0, proposed_stemming_ft = 0, burden_ratio...` | _ | _ | _ |
+| calc-mining.js | `computeBondWorkIndexPower` | `{ work_index_kwh_st = 0, feed_f80_um = 0, product_p80_um = 0, feed_rate_stph ...` | _ | _ | _ |
 | calc-mining.js | `computeCrusherReductionRatio` | `{ feed_size_in = 0, product_size_in = 0, stages = 2, machine_ratio_low = 3, m...` | _ | _ | _ |
 | calc-mining.js | `computeDustCollectorAirToCloth` | `{ airflow_cfm = 0, bag_count = 0, bag_diameter_in = 0, bag_length_ft = 0, ran...` | _ | _ | _ |
 | calc-mining.js | `computeDustDeflagrationVentArea` | `{ volume_cuft = 0, kst_bar_m_s = 0, pmax_bar = 8, p_red_psig = 0, p_stat_psig...` | _ | _ | _ |
@@ -3914,7 +3915,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2498.
+Row count: 2499.
 
 <!-- END function-corpus-v14 -->
 
@@ -4691,7 +4692,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-extraction-rate` | Water Extraction Volume, Time, and Waste-Tank Dumps | Project (first-principles); standing + absorbed; wand time = total / gpm | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+4 more) |
 
-### Group E Construction (622 tiles)
+### Group E Construction (623 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4743,6 +4744,7 @@ per spec-v14 §13.1 second paragraph.
 | `bolt-prying-action` | Prying Action in Tee and Angle Flanges (AISC Manual Part 9) | American Institute of Steel Construct...; pp. IID-4 to IID-6, LRFD: WT8x28.5, b = 1.79 in, a = 1.56... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `bolt-shear-bearing` | Bolt Shear + Bearing / Tearout Strength (AISC 360 J3) | AISC 360-22 J3.7 / J3.11; spec-v267 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `bolt-torque` | Bolt Torque to Clamp Load | Project (first-principles); F = 85000 * 0.1419 * 0.75 = 9046 lb; T_in_lb = 0.20 * 0.5... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+10 more) |
+| `bond-work-index-power` | Grinding and Crushing Energy (Bond Work Index) | Project (first-principles); W = 130 (1/sqrt(75) - 1/sqrt(1000)) = 130 (0.115470 - 0.0... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `boom-pump-reach` | Concrete Boom Pump Reach and Setup Radius | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `boussinesq-surcharge-wall` | Surcharge Lateral Pressure on a Wall from a Line Load (Boussinesq) | NAVFAC DM-7.2 modified Boussinesq; spec-v310 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+4 more) |
 | `brick-veneer-anchor-spacing` | Brick Veneer Anchor Spacing and Count (TMS 402 / IBC 1405) | TMS 402 / IBC 1405; spec-v369 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -6332,6 +6334,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 
-Tile count: 2245. Fixture-covered or reference-cadence: 2245 / 2245.
+Tile count: 2246. Fixture-covered or reference-cadence: 2246 / 2246.
 
 <!-- END tile-index-v14 -->

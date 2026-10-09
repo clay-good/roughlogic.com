@@ -116672,6 +116672,31 @@
    "term": "how hot does a clutch get",
    "target": "clutch-engagement-energy",
    "kind": "question"
+  },
+  {
+   "term": "bond work index",
+   "target": "bond-work-index-power",
+   "kind": "industry"
+  },
+  {
+   "term": "ball mill power",
+   "target": "bond-work-index-power",
+   "kind": "industry"
+  },
+  {
+   "term": "grinding energy kwh per ton",
+   "target": "bond-work-index-power",
+   "kind": "industry"
+  },
+  {
+   "term": "bonds law comminution",
+   "target": "bond-work-index-power",
+   "kind": "industry"
+  },
+  {
+   "term": "how much power to grind ore",
+   "target": "bond-work-index-power",
+   "kind": "question"
   }
  ]
 }

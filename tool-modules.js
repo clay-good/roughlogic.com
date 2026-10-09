@@ -732,7 +732,7 @@ export const TOOL_MODULES = (() => {
   // the catalog served with zero tiles. All ten keep group "E".
   declare("./calc-mining.js", "MINING_RENDERERS", [
     "blast-powder-factor", "blast-burden-spacing", "blast-scaled-distance-ppv",
-    "blast-airblast-overpressure", "blast-stemming-length", "crusher-reduction-ratio",
+    "blast-airblast-overpressure", "blast-stemming-length", "crusher-reduction-ratio", "bond-work-index-power",
     "screen-deck-capacity", "belt-feeder-capacity", "dust-collector-air-to-cloth",
     "dust-deflagration-vent-area",
     // spec-v1517..v1523, part 2 of the same module.

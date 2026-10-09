@@ -2,99 +2,99 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "38a9770d7f02a453",
+      "sha": "1a33ed4908b8e155",
       "date": "2026-10-09"
     },
     "/tools/": {
-      "sha": "e0173fce2c3d2475",
+      "sha": "a299f4be30723bd4",
       "date": "2026-10-09"
     },
     "/collections/disaster-response/": {
-      "sha": "6a476911c24c616c",
+      "sha": "6e67ff179486c873",
       "date": "2026-10-09"
     },
     "/groups/accounting/": {
-      "sha": "1eb5e7c4e260f5d3",
+      "sha": "0da2d8c086a45ea1",
       "date": "2026-10-09"
     },
     "/groups/agriculture/": {
-      "sha": "c7f1e624777f84ee",
+      "sha": "88d7164759353696",
       "date": "2026-10-09"
     },
     "/groups/construction/": {
-      "sha": "894f3d96edde76fd",
+      "sha": "70aa822ad8074b5b",
       "date": "2026-10-09"
     },
     "/groups/cross-trade/": {
-      "sha": "84ce09402b263114",
+      "sha": "1446b88e5db15470",
       "date": "2026-10-09"
     },
     "/groups/educators/": {
-      "sha": "8e1d48c1b33d2543",
+      "sha": "d47f26e95b87c12e",
       "date": "2026-10-09"
     },
     "/groups/electrical/": {
-      "sha": "319e863b977c43e9",
+      "sha": "1bc7405d71a7f627",
       "date": "2026-10-09"
     },
     "/groups/field/": {
-      "sha": "5830898d003f3b20",
+      "sha": "7c43edd3e1e15a90",
       "date": "2026-10-09"
     },
     "/groups/fire-ground/": {
-      "sha": "97051d7acfed47fe",
+      "sha": "b8485db2af267a48",
       "date": "2026-10-09"
     },
     "/groups/historical/": {
-      "sha": "ad684b9883e5ffbc",
+      "sha": "0063c9cce4e4c785",
       "date": "2026-10-09"
     },
     "/groups/hvac/": {
-      "sha": "3302987a87131c6f",
+      "sha": "fbbcd12f57521809",
       "date": "2026-10-09"
     },
     "/groups/kitchen/": {
-      "sha": "75d5d530cfcdd3be",
+      "sha": "a2718515b62f9dcc",
       "date": "2026-10-09"
     },
     "/groups/lab/": {
-      "sha": "a2cdb308a2db54a1",
+      "sha": "c400a463f673e2cf",
       "date": "2026-10-09"
     },
     "/groups/mechanic/": {
-      "sha": "962db80f7bc1560b",
+      "sha": "8cd419f704be2e75",
       "date": "2026-10-09"
     },
     "/groups/plumbing/": {
-      "sha": "8007f44c13d4bb7e",
+      "sha": "e2ca2eeb86c03453",
       "date": "2026-10-09"
     },
     "/groups/real-estate/": {
-      "sha": "24b977f4ffbe6e6a",
+      "sha": "64e7fe66478cc959",
       "date": "2026-10-09"
     },
     "/groups/references/": {
-      "sha": "d05134a86210c380",
+      "sha": "32ae99b5f6637b4b",
       "date": "2026-10-09"
     },
     "/groups/restoration/": {
-      "sha": "5b483b68e64875c7",
+      "sha": "d2e97400748b6a00",
       "date": "2026-10-09"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "846ee2a4f051879e",
+      "sha": "9da54d3f84cc197c",
       "date": "2026-10-09"
     },
     "/groups/stage/": {
-      "sha": "ee50a72a337a2e9e",
+      "sha": "103e2636db1201ae",
       "date": "2026-10-09"
     },
     "/groups/trucking/": {
-      "sha": "d63636ab479b2441",
+      "sha": "fcffaf7bae370915",
       "date": "2026-10-09"
     },
     "/groups/water/": {
-      "sha": "2ac3790b3818a57b",
+      "sha": "52c2089a979b8f20",
       "date": "2026-10-09"
     },
     "/tools/aav-install-check/": {
@@ -638,8 +638,8 @@
       "date": "2026-09-29"
     },
     "/tools/berthing-fender-energy/": {
-      "sha": "cff6cfb7b8e69047",
-      "date": "2026-10-01"
+      "sha": "c16fecb8cd4f4fb7",
+      "date": "2026-10-09"
     },
     "/tools/beverage-co2-duration/": {
       "sha": "a23bb32286f86f52",
@@ -748,6 +748,10 @@
     "/tools/bolt-torque/": {
       "sha": "0bb3e88baf85bf7b",
       "date": "2026-10-03"
+    },
+    "/tools/bond-work-index-power/": {
+      "sha": "4ba55de65b222461",
+      "date": "2026-10-09"
     },
     "/tools/bonding-jumper/": {
       "sha": "ea448c01e536a020",
