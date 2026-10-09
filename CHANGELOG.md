@@ -60,6 +60,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **`concrete-immediate-deflection` takes a concentrated load.** It covered uniform load only and said a point load was separate. An optional midspan load (tip load on a cantilever) now adds K_p P L^3/(Ec Ie) by superposition, with 1/48 simply supported, 1/192 fixed, 1/(48 sqrt 5) propped, and 1/3 cantilever: a 10 kip midspan load on the 24 ft example beam adds 0.296 in to its 0.355 in. Uniform-only results are unchanged.
+
 - **`hydraulic-accumulator-volume` corrects the precharge for temperature.** It said temperature correction was separate. Optional charging and operating temperatures (both default 70 F, so earlier results are unchanged) now scale the precharge by the absolute-temperature ratio before the gas-law volume, and the page reports the precharge at operating temperature: 1,300 psig charged at 70 F reads 1,474 psig at 140 F. A precharge that warms above the minimum working pressure is now an error that says so.
 
 - **`terminal-velocity` gives the time and distance to reach terminal.** It said they were separate. With quadratic drag from rest the speed follows v = Vt tanh(g t/Vt), so the page now reports 95% of terminal after (Vt/g) atanh(0.95) seconds and (Vt^2/g) ln(1/sqrt(1 - 0.95^2)) feet: a 180 lb skydiver at 176 ft/s gets there in 10.0 s and 1,118 ft.

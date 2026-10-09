@@ -58712,3 +58712,19 @@ test("bounds: hydraulic-accumulator-volume scales the precharge by absolute temp
   assert.ok("error" in _havT({ ...b, precharge_psig: 1550, operating_temp_f: 140 }));
   assert.ok("error" in _havT({ ...b, charge_temp_f: -500 }));
 });
+
+import { computeConcreteImmediateDeflection as _cidP } from "../../calc-concrete.js";
+test("bounds: concrete-immediate-deflection adds a concentrated load by superposition", () => {
+  const b = { ie_in4: 4662, fc_psi: 4000, w_klf: 0.8, span_ft: 24, support: "simple_udl" };
+  const u = _cidP(b).immediate_defl_in;
+  const both = _cidP({ ...b, point_load_kip: 10 });
+  const Ec = 57 * Math.sqrt(4000);
+  assert.ok(Math.abs(both.point_defl_in - 10 * 288 ** 3 / (48 * Ec * 4662)) < 1e-12);
+  assert.ok(Math.abs(both.immediate_defl_in - (u + both.point_defl_in)) < 1e-12);
+  // Point load alone is allowed; a cantilever tip load (1/3) deflects 64 times a fixed-fixed midspan load (1/192).
+  const cant = _cidP({ ...b, w_klf: 0, point_load_kip: 1, support: "cantilever_udl" }).immediate_defl_in;
+  const fixed = _cidP({ ...b, w_klf: 0, point_load_kip: 1, support: "fixed_udl" }).immediate_defl_in;
+  assert.ok(Math.abs(cant / fixed - 64) < 1e-9);
+  assert.ok("error" in _cidP({ ...b, w_klf: 0 }));
+  assert.ok("error" in _cidP({ ...b, point_load_kip: -1 }));
+});

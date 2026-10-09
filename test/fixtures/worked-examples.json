@@ -168856,6 +168856,31 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "concrete-immediate-deflection",
+  "source_publisher": "Project (first-principles)",
+  "source_title": "Simply supported beam, 0.8 klf plus a 10 kip midspan load",
+  "source_edition_or_year": "elastic beam superposition",
+  "source_section_or_page": "Ec = 3,605 ksi; uniform 5 w L^4/(384 Ec Ie) = 0.3553 in; point P L^3/(48 Ec Ie) = 10 x 288^3/(48 x 3605 x 4662) = 0.2961 in; total 0.6515 in",
+  "verified_by": "rl",
+  "verified_on": "2026-10-09",
+  "inputs": {
+   "ie_in4": 4662,
+   "fc_psi": 4000,
+   "w_klf": 0.8,
+   "span_ft": 24,
+   "support": "simple_udl",
+   "point_load_kip": 10
+  },
+  "outputs": {
+   "point_defl_in": {
+    "value": 0.2961,
+    "tolerance": {
+     "pct": 0.5
+    }
+   }
+  }
  }
  ]
 }
