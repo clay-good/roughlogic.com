@@ -60,6 +60,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **`concrete-anchor-breakout` and `concrete-anchor-pryout` take anchor groups (ACI 318-19 17.6.2.1).** They covered a single anchor and the pryout note said the group form was not modeled. Rows toward the edge and anchors per row, with their spacings, now set the group projected area ANc = [min(ca1, 1.5 hef) + (n1 - 1) min(s1, 3 hef) + 1.5 hef] x [3 hef + (n2 - 1) min(s2, 3 hef)], capped at n ANco, for a concentric load; pryout becomes Vcpg = kcp Ncbg. Four anchors at 6 in on a 6 in embedment carry 39,659 lb, 1.78 single-anchor breakouts rather than 4. Single-anchor results are unchanged.
+
 - **`calc-mining.js` gzip cap raised 35,000 -> 42,000 B.** The four mineral-processing calculators added 2026-10-09 (Bond work index, circulating load, screen efficiency, pulp density) take it past the old cap. It is lazy-loaded and outside the home-view payload.
 
 - **`band-brake-torque` gives the peak lining pressure and band stress.** It said band stress and width were separate. An optional band width now returns the peak lining pressure at the tight end, p_max = T1/(b r), and a thickness adds the band tension stress T1/(b t): the example's 205.6 lbf tight side on a 2 in by 1/16 in band over a 6 in radius is 17.1 psi and 1,645 psi. Torque results are unchanged.

@@ -169270,6 +169270,40 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "concrete-anchor-breakout",
+  "source_publisher": "Project (first-principles)",
+  "source_title": "Four cast-in anchors at 6 in, hef 6 in, away from edges",
+  "source_edition_or_year": "ACI 318-19 17.6.2.1 projected area",
+  "source_section_or_page": "ANc = (9 + 6 + 9)^2 = 576 in^2; ANco = 324; Ncbg = 1.778 x 22,308 = 39,659 lb",
+  "verified_by": "rl",
+  "verified_on": "2026-10-09",
+  "inputs": {
+   "embedment_in": 6,
+   "fc_psi": 4000,
+   "edge_distance_in": 100,
+   "anchor_type": "cast-in",
+   "lambda": 1.0,
+   "rows_toward_edge": 2,
+   "spacing_toward_edge_in": 6,
+   "anchors_along_edge": 2,
+   "spacing_along_edge_in": 6
+  },
+  "outputs": {
+   "ncb_lb": {
+    "value": 39659,
+    "tolerance": {
+     "pct": 0.5
+    }
+   },
+   "area_ratio": {
+    "value": 1.7778,
+    "tolerance": {
+     "pct": 0.5
+    }
+   }
+  }
  }
  ]
 }

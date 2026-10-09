@@ -1701,8 +1701,11 @@ CONCRETE_RENDERERS["concrete-cracked-inertia-tee"] = _simpleRenderer({
 
 // ===================== spec-v548: cast-in anchor tension concrete breakout (ACI 318-19 Ch. 17) =====================
 
-// dims: in { embedment_in: L, fc_psi: M L^-1 T^-2, edge_distance_in: L, anchor_type: dimensionless, lambda: dimensionless, cracking: dimensionless } out: { nb_lb: M L T^-2, ncb_lb: M L T^-2, phi_ncb_lb: M L T^-2, phi_tension: dimensionless }
-export function computeConcreteAnchorBreakout({ embedment_in = 0, fc_psi = 0, edge_distance_in = 0, anchor_type = "cast-in", lambda = 1.0, cracking = "cracked" } = {}) {
+// Anchor groups added 2026-10-09 (the pryout note said the group form was not modeled): ACI 318-19 17.6.2.1, a
+// concentrically loaded rectangular group of n1 rows (spacing s1, toward the edge) by n2 anchors (spacing s2, along
+// it), ANc = [min(ca1, 1.5 hef) + (n1 - 1) min(s1, 3 hef) + 1.5 hef] x [3 hef + (n2 - 1) min(s2, 3 hef)] <= n ANco.
+// dims: in { embedment_in: L, fc_psi: M L^-1 T^-2, edge_distance_in: L, anchor_type: dimensionless, lambda: dimensionless, cracking: dimensionless, rows_toward_edge: dimensionless, spacing_toward_edge_in: L, anchors_along_edge: dimensionless, spacing_along_edge_in: L } out: { nb_lb: M L T^-2, ncb_lb: M L T^-2, phi_ncb_lb: M L T^-2, phi_tension: dimensionless }
+export function computeConcreteAnchorBreakout({ embedment_in = 0, fc_psi = 0, edge_distance_in = 0, anchor_type = "cast-in", lambda = 1.0, cracking = "cracked", rows_toward_edge = 1, spacing_toward_edge_in = 0, anchors_along_edge = 1, spacing_along_edge_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const hef = Number(embedment_in) || 0;
   const fc = Number(fc_psi) || 0;
@@ -1718,6 +1721,10 @@ export function computeConcreteAnchorBreakout({ embedment_in = 0, fc_psi = 0, ed
   const _anchor = { "cast-in": [24, 0.70], "post-installed": [17, 0.65], "post-installed-cat2": [17, 0.55], "post-installed-cat3": [17, 0.45] }[anchor_type];
   if (!_anchor) return { error: "Anchor type must be cast-in or post-installed (Category 1, 2 or 3)." };
   if (cracking !== "cracked" && cracking !== "uncracked") return { error: "Cracking must be cracked or uncracked." };
+  const n1 = Number(rows_toward_edge) || 1, n2 = Number(anchors_along_edge) || 1;
+  const s1 = Number(spacing_toward_edge_in) || 0, s2 = Number(spacing_along_edge_in) || 0;
+  if (!(Number.isInteger(n1) && n1 >= 1 && Number.isInteger(n2) && n2 >= 1)) return { error: "Anchor counts must be whole numbers of 1 or more." };
+  if ((n1 > 1 && !(s1 > 0)) || (n2 > 1 && !(s2 > 0))) return { error: "Enter the spacing (in) for each direction that has more than one anchor." };
   const [kc, phi_tension] = _anchor;
   // ACI 318-19 17.3.1 caps f'c in the anchor equations at 10,000 psi cast-in and 8,000 psi
   // post-installed. Added 2026-10-07, after the shear-breakout and blowout tiles (2026-10-03):
@@ -1725,8 +1732,11 @@ export function computeConcreteAnchorBreakout({ embedment_in = 0, fc_psi = 0, ed
   const nb_lb = kc * lam * Math.sqrt(Math.min(fc, anchor_type === "cast-in" ? 10000 : 8000)) * Math.pow(hef, 1.5);
   const ANco = 9 * hef * hef;
   const psi_ed = ca1 < 1.5 * hef ? 0.7 + 0.3 * ca1 / (1.5 * hef) : 1.0;
-  const ANc = Math.min(ca1 + 1.5 * hef, 3 * hef) * (2 * 1.5 * hef);
-  const area_ratio = Math.min(ANc / ANco, 1.0);
+  const n_anchors = n1 * n2;
+  const len1 = Math.min(ca1, 1.5 * hef) + (n1 - 1) * Math.min(s1, 3 * hef) + 1.5 * hef;
+  const len2 = 3 * hef + (n2 - 1) * Math.min(s2, 3 * hef);
+  const ANc = len1 * len2;
+  const area_ratio = Math.min(ANc / ANco, n_anchors);
   // ACI 318-19 17.6.2.5.1, added 2026-10-09: psi_c,N = 1.25 cast-in and 1.4 post-installed (kc = 17)
   // where analysis shows no cracking at service loads, 1.0 cracked. An uncracked post-installed anchor
   // without splitting reinforcement also takes psi_cp,N (17.6.2.6.1) with the 17.9.5 default critical
@@ -1739,7 +1749,8 @@ export function computeConcreteAnchorBreakout({ embedment_in = 0, fc_psi = 0, ed
   const phi_ncb_lb = phi_tension * ncb_lb;
   return {
     nb_lb, ANco, psi_ed, ANc, area_ratio, psi_c, psi_cp, ncb_lb, phi_ncb_lb, kc, phi_tension,
-    note: "The basic strength scales with the embedment to the 1.5 power (a deeper anchor gains fast); a near-edge anchor loses capacity to the edge factor psi_ed and a truncated projected area (a full cone needs 1.5 hef of edge on all sides). Cast-in (kc = 24) and post-installed (kc = 17) anchors differ. Concrete shown by analysis to stay uncracked at service loads takes psi_c,N = 1.25 cast-in or 1.4 post-installed (17.6.2.5.1); an uncracked post-installed anchor without splitting reinforcement closer to an edge than cac also takes psi_cp,N = max(ca,min, 1.5 hef)/cac (17.6.2.6.1), with the 17.9.5 default cac = 4 hef for expansion anchors (an undercut anchor's 2.5 hef or the product report's value would be less conservative). phi is Condition B (no supplementary reinforcement): 0.70 cast-in, and 0.65 / 0.55 / 0.45 for a post-installed anchor qualified in Category 1 / 2 / 3. ACI 318-19 Chapter 17 and the engineer of record govern.",
+    n_anchors,
+    note: "The basic strength scales with the embedment to the 1.5 power (a deeper anchor gains fast); a near-edge anchor loses capacity to the edge factor psi_ed and a truncated projected area (a full cone needs 1.5 hef of edge on all sides). A group of anchors closer than 3 hef shares one breakout cone: enter the rows toward the edge and the anchors per row with their spacings, and the projected area becomes ANc = [min(ca1, 1.5 hef) + (n1 - 1) min(s1, 3 hef) + 1.5 hef] x [3 hef + (n2 - 1) min(s2, 3 hef)] for the whole group (17.6.2.1, concentric load, psi_ec = 1), so four anchors at 6 in on a 6 in embedment carry 1.78 single-anchor breakouts, not 4. Cast-in (kc = 24) and post-installed (kc = 17) anchors differ. Concrete shown by analysis to stay uncracked at service loads takes psi_c,N = 1.25 cast-in or 1.4 post-installed (17.6.2.5.1); an uncracked post-installed anchor without splitting reinforcement closer to an edge than cac also takes psi_cp,N = max(ca,min, 1.5 hef)/cac (17.6.2.6.1), with the 17.9.5 default cac = 4 hef for expansion anchors (an undercut anchor's 2.5 hef or the product report's value would be less conservative). phi is Condition B (no supplementary reinforcement): 0.70 cast-in, and 0.65 / 0.55 / 0.45 for a post-installed anchor qualified in Category 1 / 2 / 3. ACI 318-19 Chapter 17 and the engineer of record govern.",
   };
 }
 
@@ -1893,11 +1904,15 @@ CONCRETE_RENDERERS["concrete-anchor-breakout"] = _simpleRenderer({
     { key: "anchor_type", label: "Anchor type", kind: "select", options: [{ value: "cast-in", label: "Cast-in (kc = 24)" }, { value: "post-installed", label: "Post-installed, Category 1 (kc = 17)" }, { value: "post-installed-cat2", label: "Post-installed, Category 2 (kc = 17)" }, { value: "post-installed-cat3", label: "Post-installed, Category 3 (kc = 17)" }] },
     { key: "lambda", label: "Lightweight factor lambda", kind: "number" },
     { key: "cracking", label: "Concrete at service loads", kind: "select", options: [{ value: "cracked", label: "Cracked (psi_c,N 1.0)" }, { value: "uncracked", label: "Uncracked by analysis (psi_c,N 1.25 cast-in, 1.4 post-installed)" }] },
+    { key: "rows_toward_edge", label: "Group: anchor rows toward the edge (1 for a single anchor)", kind: "number", default: 1, attrs: { step: "1", min: "1", value: "1" } },
+    { key: "spacing_toward_edge_in", label: "Group: spacing between those rows (in)", kind: "number" },
+    { key: "anchors_along_edge", label: "Group: anchors per row, along the edge", kind: "number", default: 1, attrs: { step: "1", min: "1", value: "1" } },
+    { key: "spacing_along_edge_in", label: "Group: spacing along the edge (in)", kind: "number" },
   ],
   outputs: [
     { key: "nb", id: "cab-out-nb", label: "Basic breakout Nb", value: (r) => fmt(r.nb_lb, 0) + " lb" },
     { key: "ncb", id: "cab-out-ncb", label: "Nominal breakout Ncb (edge-modified)", value: (r) => fmt(r.ncb_lb, 0) + " lb (psi_ed " + fmt(r.psi_ed, 2) + ", area " + fmt(r.area_ratio, 3) + (r.psi_c !== 1 ? ", psi_c,N " + fmt(r.psi_c, 2) : "") + (r.psi_cp !== 1 ? ", psi_cp,N " + fmt(r.psi_cp, 3) : "") + ")" },
-    { key: "phi", id: "cab-out-phi", label: "Design capacity phiNcb", value: (r) => fmt(r.phi_ncb_lb, 0) + " lb" },
+    { key: "phi", id: "cab-out-phi", label: "Design capacity phiNcb", value: (r) => fmt(r.phi_ncb_lb, 0) + " lb" + (r.n_anchors > 1 ? " for the group of " + r.n_anchors + " (ANc/ANco " + fmt(r.area_ratio, 2) + ", not " + r.n_anchors + ")" : "") },
     { key: "n", id: "cab-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeConcreteAnchorBreakout,
@@ -2084,10 +2099,10 @@ CONCRETE_RENDERERS["concrete-anchor-shear-breakout"] = _simpleRenderer({
 // Vcp = kcp x Ncp, Ncp = Ncb (the tension-breakout strength, computed by CALLING the landed
 // computeConcreteAnchorBreakout so the two tiles can never drift); kcp = 1.0 for hef < 2.5 in,
 // 2.0 for hef >= 2.5 in; phi = 0.70 Condition B. Governs short stiff anchors AWAY from an edge.
-// dims: in { embedment_in: L, fc_psi: M L^-1 T^-2, edge_distance_in: L, anchor_type: dimensionless, lambda: dimensionless, cracking: dimensionless } out: { ncb_lb: M L T^-2, vcp_lb: M L T^-2, phi_vcp_lb: M L T^-2 }
-export function computeConcreteAnchorPryout({ embedment_in = 0, fc_psi = 4000, edge_distance_in = 0, anchor_type = "cast-in", lambda = 1.0, cracking = "cracked" } = {}) {
+// dims: in { embedment_in: L, fc_psi: M L^-1 T^-2, edge_distance_in: L, anchor_type: dimensionless, lambda: dimensionless, cracking: dimensionless, rows_toward_edge: dimensionless, spacing_toward_edge_in: L, anchors_along_edge: dimensionless, spacing_along_edge_in: L } out: { ncb_lb: M L T^-2, vcp_lb: M L T^-2, phi_vcp_lb: M L T^-2 }
+export function computeConcreteAnchorPryout({ embedment_in = 0, fc_psi = 4000, edge_distance_in = 0, anchor_type = "cast-in", lambda = 1.0, cracking = "cracked", rows_toward_edge = 1, spacing_toward_edge_in = 0, anchors_along_edge = 1, spacing_along_edge_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
-  const base = computeConcreteAnchorBreakout({ embedment_in, fc_psi, edge_distance_in, anchor_type, lambda, cracking });
+  const base = computeConcreteAnchorBreakout({ embedment_in, fc_psi, edge_distance_in, anchor_type, lambda, cracking, rows_toward_edge, spacing_toward_edge_in, anchors_along_edge, spacing_along_edge_in });
   if (base.error) return { error: base.error };
   const hef = Number(embedment_in) || 0;
   const kcp = hef < 2.5 ? 1.0 : 2.0;
@@ -2096,7 +2111,7 @@ export function computeConcreteAnchorPryout({ embedment_in = 0, fc_psi = 4000, e
   if (![vcp_lb, phi_vcp_lb].every(Number.isFinite)) return { error: "Pryout math did not produce a finite value." };
   return {
     ncb_lb: base.ncb_lb, psi_c: base.psi_c, psi_cp: base.psi_cp, kcp, vcp_lb, phi_vcp_lb,
-    note: "Pryout is the shear mode that governs SHORT, STIFF anchors AWAY from an edge - the anchor rotates and pries a breakout body out of the surface BEHIND it, so the capacity is proportional to the tension-breakout strength (Vcp = kcp Ncb), not to any edge distance in the shear direction. Near an edge, concrete-anchor-shear-breakout applies instead, and a shear design takes the LEAST of steel, edge breakout, and pryout. kcp jumps from 1.0 to 2.0 at hef = 2.5 in. Single anchor; the group form is not modeled. Uncracked concrete raises Ncb, and so the pryout, by psi_c,N (17.6.2.5.1; the cracking select). phi = 0.70 is Condition B (no supplementary reinforcement). ACI 318 Chapter 17 and the engineer of record govern - a design check, not a stamped anchor design.",
+    note: "Pryout is the shear mode that governs SHORT, STIFF anchors AWAY from an edge - the anchor rotates and pries a breakout body out of the surface BEHIND it, so the capacity is proportional to the tension-breakout strength (Vcp = kcp Ncb), not to any edge distance in the shear direction. Near an edge, concrete-anchor-shear-breakout applies instead, and a shear design takes the LEAST of steel, edge breakout, and pryout. kcp jumps from 1.0 to 2.0 at hef = 2.5 in. A group (rows and spacing) uses the group breakout Ncbg, so this is the group pryout Vcpg = kcp Ncbg (17.7.3.1b). Uncracked concrete raises Ncb, and so the pryout, by psi_c,N (17.6.2.5.1; the cracking select). phi = 0.70 is Condition B (no supplementary reinforcement). ACI 318 Chapter 17 and the engineer of record govern - a design check, not a stamped anchor design.",
   };
 }
 export const concreteAnchorPryoutExample = { inputs: { embedment_in: 6, fc_psi: 4000, edge_distance_in: 100, anchor_type: "cast-in", lambda: 1.0 } };
@@ -2110,6 +2125,10 @@ CONCRETE_RENDERERS["concrete-anchor-pryout"] = _simpleRenderer({
     { key: "anchor_type", label: "Anchor type", kind: "select", options: [{ value: "cast-in", label: "Cast-in (kc = 24)" }, { value: "post-installed", label: "Post-installed, Category 1 (kc = 17)" }, { value: "post-installed-cat2", label: "Post-installed, Category 2 (kc = 17)" }, { value: "post-installed-cat3", label: "Post-installed, Category 3 (kc = 17)" }] },
     { key: "lambda", label: "Lightweight factor lambda_a (1.0 normal weight)", kind: "number" },
     { key: "cracking", label: "Concrete at service loads", kind: "select", options: [{ value: "cracked", label: "Cracked (psi_c,N 1.0)" }, { value: "uncracked", label: "Uncracked by analysis (psi_c,N 1.25 cast-in, 1.4 post-installed)" }] },
+    { key: "rows_toward_edge", label: "Group: anchor rows toward the edge (1 for a single anchor)", kind: "number", default: 1, attrs: { step: "1", min: "1", value: "1" } },
+    { key: "spacing_toward_edge_in", label: "Group: spacing between those rows (in)", kind: "number" },
+    { key: "anchors_along_edge", label: "Group: anchors per row, along the edge", kind: "number", default: 1, attrs: { step: "1", min: "1", value: "1" } },
+    { key: "spacing_along_edge_in", label: "Group: spacing along the edge (in)", kind: "number" },
   ],
   outputs: [
     { key: "ncb", id: "capy-out-ncb", label: "Tension breakout Ncb (the base)", value: (r) => fmt(r.ncb_lb, 0) + " lb (" + fmt(r.ncb_lb / 1000, 1) + " kip)" },

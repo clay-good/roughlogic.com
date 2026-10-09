@@ -58878,3 +58878,17 @@ test("bounds: weld-preheat-cet follows the CET preheat equation and its trends",
   assert.ok("error" in _wpc({ ...base, c: 0.05, mn: 0.3 }));
   assert.ok("error" in _wpc({ ...base, thickness_in: 0.25 }));
 });
+
+import { computeConcreteAnchorBreakout as _cabG } from "../../calc-concrete.js";
+test("bounds: anchor group breakout projected area follows ACI 318-19 17.6.2.1", () => {
+  const b = { embedment_in: 6, fc_psi: 4000, edge_distance_in: 100 };
+  const one = _cabG(b), g = _cabG({ ...b, rows_toward_edge: 2, spacing_toward_edge_in: 6, anchors_along_edge: 2, spacing_along_edge_in: 6 });
+  assert.equal(g.ANc, 576);
+  assert.ok(Math.abs(g.ncb_lb - one.ncb_lb * 576 / 324) < 1e-6);
+  // Spacing at or beyond 3 hef: no overlap, n separate cones.
+  assert.equal(_cabG({ ...b, rows_toward_edge: 2, spacing_toward_edge_in: 18, anchors_along_edge: 2, spacing_along_edge_in: 40 }).area_ratio, 4);
+  // A single anchor is unchanged by the new defaults.
+  assert.equal(_cabG({ ...b, rows_toward_edge: 1, anchors_along_edge: 1 }).ncb_lb, one.ncb_lb);
+  assert.ok("error" in _cabG({ ...b, rows_toward_edge: 2 }));
+  assert.ok("error" in _cabG({ ...b, anchors_along_edge: 1.5 }));
+});
