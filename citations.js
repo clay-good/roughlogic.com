@@ -8818,12 +8818,13 @@ export const CITATIONS = {
   "range-demand-220-55": {
     formula: "demand_kw = ColumnC(num_ranges) x (1 + increase); increase = 0.05 x round(nameplate_kw - 12) for ranges over 12 kW, else 0 (Note 1 counts a kW 'or major fraction thereof' -- round-half-up, not ceil); demand_a = demand_kw x 1000 / supply_v. Column C: 1->8, 2->11, 3->14, 4->17, 5->20 kW.",
     edition: "Household electric ranges, wall ovens, and counter-mounted cooking units, NEC 2023 Table 220.55 Column C and Note 1, by name.",
-    freeAccess: "NEC is free to read at nfpa.org/freeaccess. This is the common equal-rating Column C path with the Note 1 over-12 kW increase; Notes 2-4 (Columns A/B and unequal-rating averaging) govern the other cases.",
+    freeAccess: "NEC is free to read at nfpa.org/freeaccess. Equal-rating Column C with the Note 1 over-12 kW increase, and under 8.75 kW the Note 3 Columns A/B percentages by count (added 2026-10-09; spot values A 10 = 49%, B 10 = 34%, B 9 = 35%, B 4 = 50% agree with EC&M worked examples); Note 2 unequal-rating averaging is not modeled.",
     governance: GOVERNANCE.electrical,
     editionNote: NEC_DISCLOSURE,
     assumptions: [
       { name: "Column C series", value: "8 / 11 / 14 / 17 / 20 kW for 1-5 ranges, 15 kW + 1 kW per range for 6-40, 25 kW + 0.75 kW per range for 41 and over", source: "NEC Table 220.55 Column C" },
       { name: "Note 1 increase", value: "a range over 12 kW adds 5% of Column C per kW (or major fraction) above 12 kW", source: "NEC Table 220.55 Note 1" },
+      { name: "Columns A and B", value: "under 3.5 kW Column A, 3.5 to 8.75 kW Column B: the column percentage for the count times the summed nameplates (80/75/70... and 80/65/55... down to 30% and 16% at 61 and over)", source: "NEC Table 220.55 Columns A and B, Note 3" },
     ],
   },
   "dryer-demand-220-54": {

@@ -74,12 +74,21 @@ test("OSHA 1926.1053(b)(5)(i): the foot sits a quarter of the working length out
   assert.equal(computeLadderAngle({ ladder_length_ft: 28, working_height_ft: 27 }).base_distance_ft, 7);
 });
 
-test("range-demand-220-55: one range under 8.75 kW takes Column A/B's 80%, never Column C's 8 kW", async () => {
+test("range-demand-220-55: under 8.75 kW takes Column A/B (80% for one), never Column C's 8 kW", async () => {
   const { computeRangeDemand22055 } = await import("../../calc-service.js");
   assert.ok(Math.abs(computeRangeDemand22055({ num_ranges: 1, nameplate_kw: 3 }).demand_kw - 2.4) < 1e-9);
   assert.ok(Math.abs(computeRangeDemand22055({ num_ranges: 1, nameplate_kw: 7 }).demand_kw - 5.6) < 1e-9);
   assert.equal(computeRangeDemand22055({ num_ranges: 1, nameplate_kw: 12 }).demand_kw, 8);
-  assert.ok(computeRangeDemand22055({ num_ranges: 2, nameplate_kw: 7 }).error);
+  // Several appliances under 8.75 kW take Column A/B's percentage for the count (added 2026-10-09):
+  // 2 x 7 kW in Column B at 65% = 9.1 kW; 10 x 3 kW in Column A at 49% = 14.7 kW.
+  assert.ok(Math.abs(computeRangeDemand22055({ num_ranges: 2, nameplate_kw: 7 }).demand_kw - 9.1) < 1e-9);
+  assert.ok(Math.abs(computeRangeDemand22055({ num_ranges: 10, nameplate_kw: 3 }).demand_kw - 14.7) < 1e-9);
+  assert.equal(computeRangeDemand22055({ num_ranges: 10, nameplate_kw: 6 }).column_pct, 34);
+  assert.equal(computeRangeDemand22055({ num_ranges: 9, nameplate_kw: 8 }).column_pct, 35);
+  assert.equal(computeRangeDemand22055({ num_ranges: 4, nameplate_kw: 6 }).column_pct, 50);
+  assert.equal(computeRangeDemand22055({ num_ranges: 61, nameplate_kw: 6 }).column_pct, 16);
+  assert.equal(computeRangeDemand22055({ num_ranges: 61, nameplate_kw: 3 }).column_pct, 30);
+  assert.ok(computeRangeDemand22055({ num_ranges: 2, nameplate_kw: 1 }).error);
 });
 
 test("structured-cabling-channel: Table G.2 ends at 60 C; a hotter space is not given the 60 C row", async () => {

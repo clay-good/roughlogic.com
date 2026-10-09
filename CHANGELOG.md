@@ -60,6 +60,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **`range-demand-220-55` covers several cooking appliances under 8.75 kW (NEC Table 220.55 Columns A and B).** It carried one such appliance and returned an error for more. Under 3.5 kW it now applies Column A and from 3.5 to 8.75 kW Column B, the percentage for the count times the summed nameplates (Note 3), down to 30% and 16% at 61 and over. Ten 6 kW cooktops: 34%, 20.4 kW. Column C above 8.75 kW is unchanged.
+
 - **`calc-machining.js` gzip cap raised 58,000 -> 66,000 B.** The five column and fatigue calculators added 2026-10-09 (secant formula, finite-life S-N, notch Kf, Miner damage, combined loading) take the module to about 58.9 KB gzipped. It is lazy-loaded and outside the home-view payload; the new cap leaves about 12% headroom.
 
 - **`dividing-head` covers angular indexing.** It said angular and differential indexing were out of scope. An "Index by" select now takes an angle in degrees: one crank turn moves the work 360/ratio degrees (9 on a 40:1 head), so 13 degrees 20 minutes is 1 turn plus 13 holes on the 27-hole circle (one hole there is 20 minutes). Indexing by equal divisions is unchanged; differential indexing remains out of scope.

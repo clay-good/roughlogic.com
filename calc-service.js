@@ -365,6 +365,17 @@ function _rangeColCkW(n) {
   return 25 + 0.75 * n;
 }
 
+// NEC Table 220.55 Columns A (under 3.5 kW) and B (3.5 to 8.75 kW), percent of the summed
+// nameplates, by number of appliances; added 2026-10-09 (the tile carried only one appliance).
+// Index n-1 for 1-25, then the 26-30, 31-40, 41-50, 51-60, and 61-and-over rows.
+const _COL_A_PCT = [80, 75, 70, 66, 62, 59, 56, 53, 51, 49, 47, 45, 43, 41, 40, 39, 38, 37, 36, 35, 34, 33, 32, 31, 30];
+const _COL_B_PCT = [80, 65, 55, 50, 45, 43, 40, 36, 35, 34, 32, 32, 32, 32, 32, 28, 28, 28, 28, 28, 26, 26, 26, 26, 26];
+function _rangeColABPct(n, colA) {
+  if (n <= 25) return (colA ? _COL_A_PCT : _COL_B_PCT)[n - 1];
+  if (colA) return 30;
+  return n <= 30 ? 24 : n <= 40 ? 22 : n <= 50 ? 20 : n <= 60 ? 18 : 16;
+}
+
 // dims: in { num_ranges: dimensionless, nameplate_kw: M L^2 T^-3, supply_v: M L^2 T^-3 I^-1 } out: { col_c_kw: M L^2 T^-3, demand_kw: M L^2 T^-3, demand_a: I }
 export function computeRangeDemand22055({ num_ranges = 1, nameplate_kw = 0, supply_v = 240 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
@@ -375,18 +386,18 @@ export function computeRangeDemand22055({ num_ranges = 1, nameplate_kw = 0, supp
   if (!(n >= 1)) return { error: "Number of ranges must be at least 1." };
   if (!(v > 0)) return { error: "Service voltage must be positive (V)." };
 
-  // Column C covers 8.75-27 kW. Under 8.75 kW Note 3 sends the rating to Columns A/B, where one
-  // appliance is 80% of nameplate. Until 2026-10-07 a 3 kW range read Column C's 8 kW, more than
-  // its own nameplate. Several small ranges take a count-dependent percentage this tile does not carry.
+  // Column C covers 8.75-27 kW. Under 8.75 kW Note 3 sends the rating to Columns A/B: the summed
+  // nameplates times the column's percentage for the count. Until 2026-10-07 a 3 kW range read
+  // Column C's 8 kW, more than its own nameplate; until 2026-10-09 only one such appliance was carried.
   if (kw < 8.75) {
-    if (n === 1 && kw >= 1.75) {
-      const demand_kw = 0.8 * kw;
-      return {
-        col_c_kw: null, increase_pct: 0, demand_kw, demand_a: demand_kw * 1000 / v,
-        note: "Under 8.75 kW, NEC Table 220.55 Note 3 applies Column A (1.75-3.5 kW) or Column B (3.5-8.75 kW): one appliance is 80% of its nameplate. Column C, which this tile otherwise reads, starts at 8.75 kW. The adopted NEC edition and the AHJ govern.",
-      };
-    }
-    return { error: "Under 8.75 kW, Table 220.55 sends the ranges to Columns A/B (by count); this tile computes one such range or Column C. Use the column percentage for " + n + " appliances." };
+    if (kw < 1.75) return { error: "Table 220.55 covers household cooking appliances rated over 1-3/4 kW; a smaller one is calculated at its nameplate." };
+    const colA = kw < 3.5;
+    const pct = _rangeColABPct(n, colA);
+    const demand_kw = n * kw * pct / 100;
+    return {
+      col_c_kw: null, increase_pct: 0, column: colA ? "A" : "B", column_pct: pct, demand_kw, demand_a: demand_kw * 1000 / v,
+      note: "Under 8.75 kW, NEC Table 220.55 Note 3 applies Column A (under 3.5 kW) or Column B (3.5 to 8.75 kW): the summed nameplates of " + n + " appliance" + (n === 1 ? "" : "s") + " times " + pct + "%. Column C, which this tile otherwise reads, starts at 8.75 kW. Appliances in both columns are figured per column and added. The adopted NEC edition and the AHJ govern.",
+    };
   }
   const col_c_kw = _rangeColCkW(n);
   // Note 1: ranges over 12 kW add 5% to Column C per kW (or major fraction) over 12.
@@ -399,13 +410,13 @@ export function computeRangeDemand22055({ num_ranges = 1, nameplate_kw = 0, supp
     increase_pct: increase * 100,
     demand_kw: Number.isFinite(demand_kw) ? demand_kw : null,
     demand_a: Number.isFinite(demand_a) ? demand_a : null,
-    note: "NEC Table 220.55 Column C (equal-rating ranges 8.75-27 kW). Note 1: a range over 12 kW adds 5% to Column C per kW (or major fraction) above 12 kW. This is the common equal-rating Column C path; Notes 2-4 (the under-3.5 kW and 3.5-8.75 kW Columns A/B, and unequal-rating averaging) and the AHJ govern the other cases.",
+    note: "NEC Table 220.55 Column C (equal-rating ranges 8.75-27 kW). Note 1: a range over 12 kW adds 5% to Column C per kW (or major fraction) above 12 kW. This is the equal-rating Column C path; under 8.75 kW the tile applies Columns A/B (Note 3), and Note 2 unequal-rating averaging and the AHJ govern the other cases.",
   };
 }
 export const rangeDemand22055Example = { inputs: { num_ranges: 1, nameplate_kw: 12, supply_v: 240 } };
 
 function _v167renderRangeDemand(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: NEC 2023 Table 220.55 Column C and its Notes (household electric ranges, wall ovens, counter cooktops). One 12 kW range demands 8 kW, not 12; a range over 12 kW gets a 5%-per-kW Column C increase (Note 1). The AHJ-adopted edition governs. Free at nfpa.org/freeaccess.";
+  citationEl.textContent = "Citation: NEC 2023 Table 220.55 Column C and its Notes (household electric ranges, wall ovens, counter cooktops). One 12 kW range demands 8 kW, not 12; a range over 12 kW gets a 5%-per-kW Column C increase (Note 1); under 8.75 kW, Columns A (under 3.5 kW) and B (3.5-8.75 kW) apply their percentage for the count to the summed nameplates (Note 3). The AHJ-adopted edition governs. Free at nfpa.org/freeaccess.";
   const n = makeNumber("Number of ranges (equal rating)", "rd-n", { step: "1", min: "1" });
   const kw = makeNumber("Each range nameplate (kW)", "rd-kw", { step: "any", min: "0" });
   const v = makeNumber("Service voltage (V)", "rd-v", { step: "any", min: "0" });
@@ -418,7 +429,7 @@ function _v167renderRangeDemand(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const r = computeRangeDemand22055({ num_ranges: Number(n.input.value) || 0, nameplate_kw: Number(kw.input.value) || 0, supply_v: Number(v.input.value) || 0 });
     if (r.error) { oCol.textContent = r.error; oDemand.textContent = "-"; oNote.textContent = ""; return; }
-    oCol.textContent = r.col_c_kw === null ? "n/a (under 8.75 kW: Column A/B, 80% of nameplate)" : fmt(r.col_c_kw, 0) + " kW" + (r.increase_pct > 0 ? " (+" + fmt(r.increase_pct, 0) + "% over-12 kW adder)" : "");
+    oCol.textContent = r.col_c_kw === null ? "n/a (under 8.75 kW: Column " + r.column + ", " + r.column_pct + "% of the summed nameplates)" : fmt(r.col_c_kw, 0) + " kW" + (r.increase_pct > 0 ? " (+" + fmt(r.increase_pct, 0) + "% over-12 kW adder)" : "");
     oDemand.textContent = fmt(r.demand_kw, 2) + " kW = " + fmt(r.demand_a, 1) + " A";
     oNote.textContent = r.note;
   }, DEBOUNCE_MS);

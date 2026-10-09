@@ -168666,6 +168666,34 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "range-demand-220-55",
+  "source_publisher": "NFPA (NEC 2023)",
+  "source_title": "Table 220.55 Column B, ten 6 kW cooktops",
+  "source_edition_or_year": "2023",
+  "source_section_or_page": "Table 220.55 Column B, 10 appliances = 34% (the percentage EC&M's worked example quotes); 10 x 6 kW x 0.34 = 20.4 kW",
+  "verified_by": "rl",
+  "verified_on": "2026-10-09",
+  "inputs": {
+   "num_ranges": 10,
+   "nameplate_kw": 6,
+   "supply_v": 240
+  },
+  "outputs": {
+   "demand_kw": {
+    "value": 20.4,
+    "tolerance": {
+     "pct": 0.5
+    }
+   },
+   "demand_a": {
+    "value": 85,
+    "tolerance": {
+     "pct": 0.5
+    }
+   }
+  }
  }
  ]
 }
