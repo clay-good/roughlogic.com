@@ -334,13 +334,23 @@ MOTOR_RENDERERS["multi-motor-feeder"] = renderMultiMotorFeeder;
 // 115%/130% otherwise.
 // =====================================================================
 
-// dims: in { fla_A: I, sf: dimensionless, rise_C: T, protection: dimensionless } out: { ol_A: I, ol_max_A: I, mult: dimensionless, mult_max: dimensionless }
-export function computeMotorOverloadSizing({ fla_A = 0, sf = 0, rise_C = 0, protection = "separate" } = {}) {
+// dims: in { fla_A: I, sf: dimensionless, rise_C: T, protection: dimensionless, motor_size: dimensionless } out: { ol_A: I, ol_max_A: I, mult: dimensionless, mult_max: dimensionless }
+export function computeMotorOverloadSizing({ fla_A = 0, sf = 0, rise_C = 0, protection = "separate", motor_size = "over_1hp" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(fla_A > 0)) return { error: "Nameplate full-load current must be positive (A)." };
   if (sf < 0) return { error: "Service factor cannot be negative." };
   if (rise_C < 0) return { error: "Temperature rise cannot be negative (degC)." };
   if (protection !== "separate" && protection !== "thermal") return { error: "Protection must be a separate overload device or a thermal protector integral with the motor." };
+  if (motor_size !== "over_1hp" && motor_size !== "small_auto") return { error: "Motor size must be over 1 hp or 1 hp or less, automatically started." };
+  const small = motor_size === "small_auto";
+  if (protection === "thermal" && small) {
+    // 430.32(B)(2), added 2026-10-09: a 1 hp or smaller automatically started motor may rely on an
+    // integral thermal protector approved for that motor; the code sets no percentage ceiling.
+    return {
+      hi_class: null, mult: null, mult_max: null, ol_A: null, ol_max_A: null, protection, motor_size, no_ceiling: true,
+      note: "NEC 430.32(B)(2) thermal protector integral with a motor of 1 hp or less, automatically started: the code sets no percentage ceiling. The protector must be approved for use with the motor it protects, on the basis that it prevents dangerous overheating from overload and failure to start; the 430.32(A)(2) 170%/156%/140% bands apply only to motors over 1 hp. Where a separate current-interrupting device is controlled by the protector, opening the control circuit must interrupt the motor current. A 1 hp or smaller motor started by hand (430.32(D)) and fuse-as-overload (430.36) are separate. The AHJ governs.",
+    };
+  }
   if (protection === "thermal") {
     // 430.32(A)(2), added 2026-10-08: a thermal protector integral with the motor may not have
     // an ultimate trip current above 170% of the TABLE full-load current up to 9 A, 156% from
@@ -359,14 +369,17 @@ export function computeMotorOverloadSizing({ fla_A = 0, sf = 0, rise_C = 0, prot
   const ol_A = fla_A * mult;
   const ol_max_A = fla_A * mult_max;
   return {
-    hi_class, mult, mult_max, ol_A, ol_max_A, protection,
-    note: "NEC 430.32(A)(1) running overload on the motor NAMEPLATE FLA (not the table FLC the 430.52 branch device uses): 125% of FLA for a continuous-duty motor over 1 hp with a marked service factor of 1.15 or more or a marked temperature rise of 40 degC or less, 115% otherwise. Where the motor will not start or carry its load at that setting, 430.32(C) permits up to 140% (130% for the lower class). Leave an unmarked service factor or rise blank - an unmarked motor takes the lower class. Small-motor (430.32(B)) and fuse-as-overload (430.36) cases are separate; a thermal protector is the protection select. A design aid; the AHJ governs.",
+    hi_class, mult, mult_max, ol_A, ol_max_A, protection, motor_size,
+    note: (small
+      ? "NEC 430.32(B)(1) separate overload device on a motor of 1 hp or less, automatically started: the same rule as 430.32(A)(1), on the motor NAMEPLATE FLA - 125% of FLA with a marked service factor of 1.15 or more or a marked temperature rise of 40 degC or less, 115% otherwise. "
+      : "NEC 430.32(A)(1) running overload on the motor NAMEPLATE FLA (not the table FLC the 430.52 branch device uses): 125% of FLA for a continuous-duty motor over 1 hp with a marked service factor of 1.15 or more or a marked temperature rise of 40 degC or less, 115% otherwise. ")
+      + "Where the motor will not start or carry its load at that setting, 430.32(C) permits up to 140% (130% for the lower class). Leave an unmarked service factor or rise blank - an unmarked motor takes the lower class. A 1 hp or smaller motor started by hand (430.32(D)) and fuse-as-overload (430.36) are separate; a thermal protector is the protection select. A design aid; the AHJ governs.",
   };
 }
 export const motorOverloadSizingExample = { inputs: { fla_A: 26, sf: 1.15, rise_C: 40 } };
 
 function renderMotorOverloadSizing(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: NEC 2023 430.32(A)(1) running-overload sizing on the nameplate FLA (125% for marked SF >= 1.15 or rise <= 40 degC, else 115%) with the 430.32(C) 140%/130% will-not-start ceiling, by name. The separate device from the 430.52 branch protection. The AHJ governs.";
+  citationEl.textContent = "Citation: NEC 2023 430.32(A)(1) and (B)(1) running-overload sizing on the nameplate FLA (125% for marked SF >= 1.15 or rise <= 40 degC, else 115%) with the 430.32(C) 140%/130% will-not-start ceiling; integral thermal protectors under 430.32(A)(2) and (B)(2), by name. The separate device from the 430.52 branch protection. The AHJ governs.";
   const fla = makeNumber("Nameplate full-load current FLA (A)", "mos-fla", { step: "any", min: "0" });
   const sf = makeNumber("Marked service factor (blank if unmarked)", "mos-sf", { step: "any", min: "0" });
   const rise = makeNumber("Marked temperature rise (°C, blank if unmarked)", "mos-rise", { step: "any", min: "0" });
@@ -374,15 +387,26 @@ function renderMotorOverloadSizing(inputRegion, outputRegion, citationEl) {
     { value: "separate", label: "Separate overload device (430.32(A)(1))", selected: true },
     { value: "thermal", label: "Thermal protector in the motor (430.32(A)(2); enter the TABLE FLC)" },
   ]);
-  for (const f of [fla, sf, rise, prot]) inputRegion.appendChild(f.wrap);
+  const size = makeSelect("Motor size", "mos-size", [
+    { value: "over_1hp", label: "Over 1 hp (430.32(A))", selected: true },
+    { value: "small_auto", label: "1 hp or less, automatically started (430.32(B))" },
+  ]);
+  for (const f of [fla, sf, rise, prot, size]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { fla.input.value = "26"; sf.input.value = "1.15"; rise.input.value = "40"; update(); });
   const oClass = makeOutputLine(outputRegion, "430.32(A)(1) class", "mos-out-class");
   const oOl = makeOutputLine(outputRegion, "Overload setting", "mos-out-ol");
   const oMax = makeOutputLine(outputRegion, "430.32(C) maximum (will not start)", "mos-out-max");
   const oNote = makeOutputLine(outputRegion, "Note", "mos-out-note");
   const update = debounce(() => {
-    const r = computeMotorOverloadSizing({ fla_A: Number(fla.input.value) || 0, sf: Number(sf.input.value) || 0, rise_C: Number(rise.input.value) || 0, protection: prot.select.value });
+    const r = computeMotorOverloadSizing({ fla_A: Number(fla.input.value) || 0, sf: Number(sf.input.value) || 0, rise_C: Number(rise.input.value) || 0, protection: prot.select.value, motor_size: size.select.value });
     if (r.error) { oClass.textContent = r.error; oOl.textContent = "-"; oMax.textContent = "-"; oNote.textContent = "-"; return; }
+    if (r.no_ceiling) {
+      oClass.textContent = "430.32(B)(2) thermal protector: no percentage ceiling";
+      oOl.textContent = "a protector approved for this motor (no code percentage for 1 hp or less)";
+      oMax.textContent = "no 430.32(C) step-up for an integral protector";
+      oNote.textContent = r.note;
+      return;
+    }
     if (r.protection === "thermal") {
       oClass.textContent = "thermal protector: " + fmt(r.mult * 100, 0) + "% band (" + (r.mult === 1.7 ? "9 A or less" : r.mult === 1.56 ? "9.1 to 20 A" : "over 20 A") + ")";
       oOl.textContent = "ultimate trip no more than " + fmt(r.ol_A, 1) + " A (" + fmt(r.mult * 100, 0) + "% of table FLC)";
@@ -391,12 +415,13 @@ function renderMotorOverloadSizing(inputRegion, outputRegion, citationEl) {
       return;
     }
     oClass.textContent = r.hi_class ? "higher (SF >= 1.15 or rise <= 40 degC): 125% base" : "lower (unmarked or outside): 115% base";
+    if (r.motor_size === "small_auto") oClass.textContent = "430.32(B)(1), " + oClass.textContent;
     oOl.textContent = fmt(r.ol_A, 1) + " A (" + fmt(r.mult * 100, 0) + "% of FLA)";
     oMax.textContent = fmt(r.ol_max_A, 1) + " A (" + fmt(r.mult_max * 100, 0) + "% of FLA)";
     oNote.textContent = r.note;
   }, DEBOUNCE_MS);
   for (const f of [fla, sf, rise]) f.input.addEventListener("input", update);
-  prot.select.addEventListener("input", update);
+  for (const f of [prot, size]) f.select.addEventListener("input", update);
 }
 MOTOR_RENDERERS["motor-overload-sizing"] = renderMotorOverloadSizing;
 

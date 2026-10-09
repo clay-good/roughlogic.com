@@ -58487,3 +58487,16 @@ test("bounds: spec-v1932 computeWoodNailLateral reproduces AWC Design Aid No. 2 
   assert.ok("error" in _v1932({ d_in: 0.25, length_in: 4, side_in: 1.5 }));
   assert.ok("error" in _v1932({ d_in: 0.162, length_in: 3.5, side_in: 1.5, gm: 1.2 }));
 });
+
+test("bounds: motor-overload-sizing 1 hp or less, automatically started, follows NEC 430.32(B)", () => {
+  const sep = _olThermal({ fla_A: 4, sf: 1.15, motor_size: "small_auto" });
+  assert.equal(sep.mult, 1.25);
+  assert.ok(Math.abs(sep.ol_max_A - 5.6) < 1e-9);
+  assert.equal(_olThermal({ fla_A: 4, motor_size: "small_auto" }).mult, 1.15);
+  const th = _olThermal({ fla_A: 4, protection: "thermal", motor_size: "small_auto" });
+  assert.equal(th.no_ceiling, true);
+  assert.equal(th.ol_A, null);
+  // Over 1 hp keeps the 430.32(A)(2) bands.
+  assert.equal(_olThermal({ fla_A: 4, protection: "thermal" }).mult, 1.70);
+  assert.ok("error" in _olThermal({ fla_A: 4, motor_size: "tiny" }));
+});
