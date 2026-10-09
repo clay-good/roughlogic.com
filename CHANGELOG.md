@@ -60,6 +60,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **`terminal-velocity` gives the time and distance to reach terminal.** It said they were separate. With quadratic drag from rest the speed follows v = Vt tanh(g t/Vt), so the page now reports 95% of terminal after (Vt/g) atanh(0.95) seconds and (Vt^2/g) ln(1/sqrt(1 - 0.95^2)) feet: a 180 lb skydiver at 176 ft/s gets there in 10.0 s and 1,118 ft.
+
 - **`slider-crank-piston-position` gives piston velocity and acceleration.** Its note said they were separate. An optional crank speed now returns the exact velocity and acceleration at the entered angle for a constant crank speed, and the peak acceleration at TDC, r omega^2 (1 + r/L). A 3.48 in stroke on a 5.7 in rod at 6,000 rpm pulls 2,322 g at TDC; at 73 degrees the piston moves at 95.3 ft/s. Position-only use is unchanged.
 
 - **`range-demand-220-55` covers several cooking appliances under 8.75 kW (NEC Table 220.55 Columns A and B).** It carried one such appliance and returned an error for more. Under 3.5 kW it now applies Column A and from 3.5 to 8.75 kW Column B, the percentage for the count times the summed nameplates (Note 3), down to 30% and 16% at 61 and over. Ten 6 kW cooktops: 34%, 20.4 kW. Column C above 8.75 kW is unchanged.

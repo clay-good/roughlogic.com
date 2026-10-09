@@ -58690,3 +58690,13 @@ test("bounds: slider-crank velocity and acceleration match numeric derivatives o
   assert.equal(_scpV({ ...g, crank_angle_deg: 90 }).has_speed, false);
   assert.ok("error" in _scpV({ ...g, crank_angle_deg: 90, crank_rpm: -1 }));
 });
+
+import { computeTerminalVelocity as _tvT } from "../../calc-mechanic.js";
+test("bounds: terminal-velocity time and distance to 95% follow v = Vt tanh(g t / Vt)", () => {
+  const r = _tvT({ weight_lb: 180, frontal_area_ft2: 7, drag_coefficient: 0.7 });
+  const g = 32.174, Vt = r.terminal_velocity_fps;
+  assert.ok(Math.abs(Vt * Math.tanh((g * r.time_to_95_s) / Vt) - 0.95 * Vt) < 1e-9);
+  assert.ok(Math.abs((Vt * Vt / g) * Math.log(Math.cosh((g * r.time_to_95_s) / Vt)) - r.distance_to_95_ft) < 1e-6);
+  // Heavier object, longer approach.
+  assert.ok(_tvT({ weight_lb: 360, frontal_area_ft2: 7, drag_coefficient: 0.7 }).time_to_95_s > r.time_to_95_s);
+});

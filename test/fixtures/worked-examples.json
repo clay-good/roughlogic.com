@@ -168795,6 +168795,35 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "terminal-velocity",
+  "source_publisher": "Project (first-principles)",
+  "source_title": "Time and distance to 95% of terminal, 180 lb, 7 ft2, Cd 0.7",
+  "source_edition_or_year": "quadratic drag from rest",
+  "source_section_or_page": "Vt = 175.78 ft/s; t95 = (Vt/g) atanh(0.95) = 10.01 s; y95 = (Vt^2/g) ln(1/sqrt(1 - 0.9025)) = 1,118 ft",
+  "verified_by": "rl",
+  "verified_on": "2026-10-09",
+  "inputs": {
+   "weight_lb": 180,
+   "frontal_area_ft2": 7,
+   "drag_coefficient": 0.7,
+   "air_density_lb_ft3": 0.0765
+  },
+  "outputs": {
+   "time_to_95_s": {
+    "value": 10.008,
+    "tolerance": {
+     "pct": 0.5
+    }
+   },
+   "distance_to_95_ft": {
+    "value": 1117.8,
+    "tolerance": {
+     "pct": 0.5
+    }
+   }
+  }
  }
  ]
 }
