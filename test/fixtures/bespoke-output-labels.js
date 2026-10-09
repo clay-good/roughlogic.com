@@ -44,6 +44,7 @@ export const BESPOKE_OUTPUT_LABELS = {
   "ballnose-feed-cusp": {"stepover_cusp_in":"Cusp across the passes (stepover)","feed_cusp_in":"Cusp along the feed","governing_cusp_in":"What you actually get","feed_governs":"To balance the two","feedrate_ipm":"Feedrate","note":"Note"},
   "ballnose-scallop-height": {"out_in":"Result","note":"Note"},
   "bar-nesting": {"sticks":"Sticks required","yield_pct":"Yield","total_piece_in":"Where the material goes","longest_drop_in":"Longest single drop","patterns":"Cutting patterns","note":"Note"},
+  "bare-pipe-heat-loss": {"q_per_ft_btuh":"Heat loss per linear foot","q_total_btuh":"Total heat loss","conv_coefficient":"Surface coefficients","note":"Note"},
   "barrel-volume": {"parabolic_gal":"Volume (parabolic staves, exact)","circular_gal":"Volume (circular-arc estimate)","note":"Note"},
   "barstock-cutlist": {"pieces_per_stick":"Pieces per stick","sticks_needed":"Sticks to buy","drop_per_stick_in":"Drop per stick","yield_pct":"Material yield"},
   "basal-area-prism": {"basal_area_per_acre":"Basal area per acre","per_tree_ba":"Per-tree basal area","trees_per_acre":"Trees per acre (one in-tree)","note":"Note"},

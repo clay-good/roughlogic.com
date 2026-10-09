@@ -147,6 +147,7 @@ export const COMPUTE_MAP = {
   "evaporation-load": { module: "../../calc-restoration.js", fn: "computeEvaporationLoad" },
   "economizer-savings-hours": { module: "../../calc-hvac.js", fn: "computeEconomizerSavingsHours" },
   "pipe-heat-loss-radial": { module: "../../calc-hvac.js", fn: "computePipeHeatLossRadial" },
+  "bare-pipe-heat-loss": { module: "../../calc-hvac.js", fn: "computeBarePipeHeatLoss" },
   "insulation-thickness-for-heat-loss": { module: "../../calc-hvac.js", fn: "computeInsulationThicknessForHeatLoss" },
   "fan-motor-bhp": { module: "../../calc-hvac.js", fn: "computeFanMotorBhp" },
   "fan-motor-max-airflow": { module: "../../calc-hvac.js", fn: "computeFanMotorMaxAirflow" },

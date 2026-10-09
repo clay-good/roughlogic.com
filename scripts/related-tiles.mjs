@@ -266,6 +266,7 @@ const RELATED = {
   "evaporation-load": ["dehumidifier", "grains-removed", "air-movers"],
   "economizer-savings-hours": ["cfm-per-ton", "outdoor-air-mix", "shr-latent"],
   "pipe-heat-loss-radial": ["insulation-thickness", "insulation-heat-loss", "duct-sizing"],
+  "bare-pipe-heat-loss": ["pipe-heat-loss-radial", "radiant-heat-exchange", "insulation-thickness-for-heat-loss"],
   "insulation-thickness-for-heat-loss": ["pipe-heat-loss-radial", "insulation-thickness", "insulation-heat-loss"],
   "pipe-insulation-for-condensation": ["insulation-thickness", "surface-condensation-risk", "wet-bulb-psychrometer"],
   "economic-insulation-thickness": ["insulation-thickness", "insulation-heat-loss", "pipe-insulation-for-condensation"],

@@ -384,6 +384,7 @@ export const RENDERER_MAP = {
   "shr-latent": { module: "../../calc-hvac.js", exportName: "HVAC_RENDERERS" },
   "economizer-savings-hours": { module: "../../calc-hvac.js", exportName: "HVAC_RENDERERS" },
   "pipe-heat-loss-radial": { module: "../../calc-hvac.js", exportName: "HVAC_RENDERERS" },
+  "bare-pipe-heat-loss": { module: "../../calc-hvac.js", exportName: "HVAC_RENDERERS" },
   "insulation-thickness-for-heat-loss": { module: "../../calc-hvac.js", exportName: "HVAC_RENDERERS" },
   "fan-motor-bhp": { module: "../../calc-hvac.js", exportName: "HVAC_RENDERERS" },
   "fan-motor-max-airflow": { module: "../../calc-hvac.js", exportName: "HVAC_RENDERERS" },

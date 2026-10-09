@@ -168694,6 +168694,78 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "bare-pipe-heat-loss",
+  "source_publisher": "Engineers Edge",
+  "source_title": "Heat Loss from Bare Steel Pipe to Still Air at 80 F, Btu/h-ft",
+  "source_edition_or_year": "engineersedge.com heat-transfer table",
+  "source_section_or_page": "2 in nominal pipe (OD 2.375 in) at 280 F; emissivity 0.8 assumed (the table does not print one)",
+  "verified_by": "rl",
+  "verified_on": "2026-10-09",
+  "inputs": {
+   "od_in": 2.375,
+   "surface_f": 280,
+   "amb_f": 80,
+   "emissivity": 0.8,
+   "length_ft": 1
+  },
+  "outputs": {
+   "q_per_ft_btuh": {
+    "value": 350,
+    "tolerance": {
+     "pct": 2
+    }
+   }
+  }
+ },
+ {
+  "tile_id": "bare-pipe-heat-loss",
+  "source_publisher": "Engineers Edge",
+  "source_title": "Heat Loss from Bare Steel Pipe to Still Air at 80 F, Btu/h-ft",
+  "source_edition_or_year": "engineersedge.com heat-transfer table",
+  "source_section_or_page": "1 in nominal pipe (OD 1.315 in) at 180 F; emissivity 0.8 assumed (the table does not print one)",
+  "verified_by": "rl",
+  "verified_on": "2026-10-09",
+  "inputs": {
+   "od_in": 1.315,
+   "surface_f": 180,
+   "amb_f": 80,
+   "emissivity": 0.8,
+   "length_ft": 1
+  },
+  "outputs": {
+   "q_per_ft_btuh": {
+    "value": 82.5,
+    "tolerance": {
+     "pct": 2
+    }
+   }
+  }
+ },
+ {
+  "tile_id": "bare-pipe-heat-loss",
+  "source_publisher": "Engineers Edge",
+  "source_title": "Heat Loss from Bare Steel Pipe to Still Air at 80 F, Btu/h-ft",
+  "source_edition_or_year": "engineersedge.com heat-transfer table",
+  "source_section_or_page": "4 in nominal pipe (OD 4.500 in) at 380 F; emissivity 0.8 assumed (the table does not print one)",
+  "verified_by": "rl",
+  "verified_on": "2026-10-09",
+  "inputs": {
+   "od_in": 4.5,
+   "surface_f": 380,
+   "amb_f": 80,
+   "emissivity": 0.8,
+   "length_ft": 1
+  },
+  "outputs": {
+   "q_per_ft_btuh": {
+    "value": 1130,
+    "tolerance": {
+     "pct": 2
+    }
+   }
+  }
  }
  ]
 }

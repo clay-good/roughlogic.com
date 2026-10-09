@@ -2408,6 +2408,11 @@
     {"term":"dry ice for walk in cooler","target":"refrigeration-outage-holdover","kind":"industry"},
     {"term":"refrigerator outage holdover time","target":"refrigeration-outage-holdover","kind":"industry"},
     {"term":"how much dry ice power outage","target":"refrigeration-outage-holdover","kind":"industry"},
-    {"term":"cooler temperature rise without power","target":"refrigeration-outage-holdover","kind":"industry"}
+    {"term":"cooler temperature rise without power","target":"refrigeration-outage-holdover","kind":"industry"},
+    {"term":"bare pipe heat loss","target":"bare-pipe-heat-loss","kind":"industry"},
+    {"term":"uninsulated steam pipe heat loss","target":"bare-pipe-heat-loss","kind":"industry"},
+    {"term":"heat loss from hot pipe to room","target":"bare-pipe-heat-loss","kind":"question"},
+    {"term":"natural convection horizontal pipe","target":"bare-pipe-heat-loss","kind":"industry"},
+    {"term":"how much heat does a bare pipe lose","target":"bare-pipe-heat-loss","kind":"question"}
   ]
 }

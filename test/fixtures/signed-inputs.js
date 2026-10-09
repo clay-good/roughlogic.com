@@ -99,6 +99,8 @@ export const SIGNED_INPUTS = [
   "economizer-savings-hours::delta_t_f",
   "pipe-heat-loss-radial::hot_f",
   "pipe-heat-loss-radial::amb_f",
+  "bare-pipe-heat-loss::surface_f",
+  "bare-pipe-heat-loss::amb_f",
   "insulation-thickness-for-heat-loss::amb_f",
   "linear-interpolation::y1",
   "linear-interpolation::x2",

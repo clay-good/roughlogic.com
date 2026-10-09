@@ -46,6 +46,7 @@ export const BESPOKE_LABELS = {
   "ballnose-feed-cusp": {"r_in":"Ballnose radius R (in = cutter dia / 2)","stepover_in":"Stepover (in)","feed_per_tooth_in":"Feed per tooth (in)","rpm":"Spindle speed (rpm; 0 to skip the feedrate)","flutes":"Flutes"},
   "ballnose-scallop-height": {"r_in":"Ballnose radius R (in = cutter dia / 2)","mode":"Mode","s_in":"Stepover s (in, for scallop mode)","h_in":"Target scallop h (in, for stepover mode)"},
   "bar-nesting": {"cut_list":"Cut list, one line per size as length,quantity","stock_length_in":"Stock length (in)","kerf_in":"Saw kerf (in)","end_trim_in":"End trim per stick (in)"},
+  "bare-pipe-heat-loss": {"od_in":"Pipe outside diameter (in; 2-in pipe is 2.375)","surface_f":"Pipe surface temperature (°F)","amb_f":"Still-air temperature (°F)","emissivity":"Surface emissivity (0.8 oxidized steel, 0.1 aluminum jacket)","length_ft":"Pipe length (ft)"},
   "barrel-volume": {"bung_diameter_in":"Bung (middle) diameter (in)","head_diameter_in":"Head (end) diameter (in)","length_in":"Length (in)"},
   "barstock-cutlist": {"stock_length_in":"Stock length (in)","piece_length_in":"Cut piece length (in)","kerf_in":"Saw kerf (in)","pieces_needed":"Pieces needed"},
   "basal-area-prism": {"baf":"Basal-area factor (BAF, ft²/ac)","in_tree_count":"Trees counted 'in'","dbh_in":"Tree DBH (in, for the expansion)"},

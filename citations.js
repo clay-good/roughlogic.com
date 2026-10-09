@@ -1403,6 +1403,18 @@ export const CITATIONS = {
       { name: "Conduction only", value: "ignores the outer-surface air film, so the required thickness is slightly conservative", source: "scope of this tile" },
     ],
   },
+  "bare-pipe-heat-loss": {
+    formula: "Air at the film temperature Tf = (Ts + Ta)/2: mu = 1.716e-5 (Tf/273.15)^1.5 (383.55)/(Tf + 110.4), k = 0.0241 (Tf/273.15)^1.5 (467.15)/(Tf + 194), rho = 101325/(287.05 Tf), Pr = 1006 mu/k; Ra = g (1/Tf) |Ts - Ta| D^3/(nu alpha); Nu = {0.60 + 0.387 Ra^(1/6)/[1 + (0.559/Pr)^(9/16)]^(8/27)}^2 (Ra <= 1e12); hc = Nu k/D; hr = eps sigma (Ts^4 - Ta^4)/(Ts - Ta), sigma = 0.1714e-8 BTU/hr ft2 R4; q/L = pi D (hc + hr)(Ts - Ta).",
+    edition: "Natural convection from a long horizontal cylinder (Churchill and Chu, Int. J. Heat Mass Transfer 18, 1975) and gray-body radiation to large surroundings, standard heat transfer as in Incropera and ASHRAE Fundamentals, by name.",
+    freeAccess: "Checked against the free Engineers Edge table 'Heat Loss from Bare Steel Pipe to Still Air at 80 F' (1, 2, and 4 in pipe at 180, 280, and 380 F): with emissivity 0.8 all nine values agree within 1.5%.",
+    governance: GOVERNANCE.general,
+    editionNote: "Heat loss from the outside surface of a bare (or jacketed) horizontal pipe to still air, convection plus radiation, with the surface taken at the fluid temperature (close for thin steel walls). Radiation is often about half the loss on bare steel, so emissivity matters: 0.8 for oxidized or painted steel, about 0.1 for bright aluminum jacketing. Still air only; drafts and wind raise convection. A screen; ASTM C680 and the engineer govern.",
+    assumptions: [
+      { name: "Convection", value: "Churchill-Chu horizontal-cylinder correlation, air properties at the film temperature, 1 atm", source: "Churchill and Chu (1975)" },
+      { name: "Radiation", value: "gray surface to large surroundings at the air temperature", source: "Stefan-Boltzmann" },
+      { name: "Surface temperature", value: "taken as the fluid temperature (thin metal wall)", source: "scope of this tile" },
+    ],
+  },
   "pipe-heat-loss-radial": {
     formula: "Q/L = 2*pi*k'*(T_hot - T_amb) / ln(r2/r1), where r1 = OD/2, r2 = r1 + thickness, and k' = k_value / 12 converts BTU-in/(hr.ft2.F) to BTU/(hr.ft.F).",
     edition: "Fourier conduction through a cylindrical shell (public heat-transfer formula); insulation k-values per ASHRAE Fundamentals / ASTM C335, by name.",

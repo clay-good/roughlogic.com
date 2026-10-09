@@ -58654,3 +58654,21 @@ test("bounds: fatigue-combined-loading combines modes by von Mises with the 0.85
   assert.ok("error" in _fcl({ bending_alt_psi: 1000, kf_bending: 0.5 }));
   assert.ok("error" in _fcl({ torsion_alt_psi: -10 }));
 });
+
+import { computeBarePipeHeatLoss as _bphl } from "../../calc-hvac.js";
+test("bounds: bare-pipe-heat-loss reproduces the bare steel pipe table within 1.5% and signs a heat gain", () => {
+  const od = { 1: 1.315, 2: 2.375, 4: 4.5 };
+  const tab = { 1: [82.5, 203, 360], 2: [141, 350, 623], 4: [254, 631, 1130] };
+  for (const n of [1, 2, 4]) [180, 280, 380].forEach((t, i) => {
+    const q = _bphl({ od_in: od[n], surface_f: t, amb_f: 80, emissivity: 0.8 }).q_per_ft_btuh;
+    assert.ok(Math.abs(q / tab[n][i] - 1) < 0.015, `${n} in at ${t} F: ${q}`);
+  });
+  assert.ok(_bphl({ od_in: 2.375, surface_f: 40, amb_f: 80 }).q_per_ft_btuh < 0);
+  // Lower emissivity cuts only the radiation.
+  const lo = _bphl({ od_in: 2.375, surface_f: 280, amb_f: 80, emissivity: 0.1 });
+  const hi = _bphl({ od_in: 2.375, surface_f: 280, amb_f: 80, emissivity: 0.8 });
+  assert.equal(lo.conv_coefficient, hi.conv_coefficient);
+  assert.ok(Math.abs(hi.rad_coefficient / lo.rad_coefficient - 8) < 1e-9);
+  assert.ok("error" in _bphl({ od_in: 2, surface_f: 80, amb_f: 80 }));
+  assert.ok("error" in _bphl({ od_in: 2, surface_f: 200, emissivity: 1.2 }));
+});

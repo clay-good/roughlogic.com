@@ -2,99 +2,99 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "68bed3c67b48dc03",
+      "sha": "70a7b4092905396f",
       "date": "2026-10-09"
     },
     "/tools/": {
-      "sha": "7313408e7ece4ff1",
+      "sha": "26770eea96491af7",
       "date": "2026-10-09"
     },
     "/collections/disaster-response/": {
-      "sha": "fc8bad81ac98a098",
+      "sha": "39c8cb937aa861a9",
       "date": "2026-10-09"
     },
     "/groups/accounting/": {
-      "sha": "46432772647aa48b",
+      "sha": "c7080518ef26183d",
       "date": "2026-10-09"
     },
     "/groups/agriculture/": {
-      "sha": "25f4b78962ec7548",
+      "sha": "af409e494d8c8967",
       "date": "2026-10-09"
     },
     "/groups/construction/": {
-      "sha": "1c6cd076aa466fca",
+      "sha": "4f50450a57c5d28a",
       "date": "2026-10-09"
     },
     "/groups/cross-trade/": {
-      "sha": "f8c60d040e1dfadb",
+      "sha": "1b1b5e63bb19c460",
       "date": "2026-10-09"
     },
     "/groups/educators/": {
-      "sha": "c2199aa5f2ef626b",
+      "sha": "5c535b1a3052a2a2",
       "date": "2026-10-09"
     },
     "/groups/electrical/": {
-      "sha": "89025a8889429952",
+      "sha": "53697cc97463081d",
       "date": "2026-10-09"
     },
     "/groups/field/": {
-      "sha": "ff05d148aa0db86e",
+      "sha": "a06e48cf53d9a296",
       "date": "2026-10-09"
     },
     "/groups/fire-ground/": {
-      "sha": "54951a01359ebba3",
+      "sha": "cea261bd0b28a6c2",
       "date": "2026-10-09"
     },
     "/groups/historical/": {
-      "sha": "73ff65758caacc66",
+      "sha": "8983664f0575e881",
       "date": "2026-10-09"
     },
     "/groups/hvac/": {
-      "sha": "873fd38c91bf8d38",
+      "sha": "eb1159b9b1e1ccf4",
       "date": "2026-10-09"
     },
     "/groups/kitchen/": {
-      "sha": "f5ac65a2d41cef21",
+      "sha": "dab3249df6327a39",
       "date": "2026-10-09"
     },
     "/groups/lab/": {
-      "sha": "1cabde839de97611",
+      "sha": "dae301a4b9dc2202",
       "date": "2026-10-09"
     },
     "/groups/mechanic/": {
-      "sha": "11a68056318a73a2",
+      "sha": "61aebca1b37dbc92",
       "date": "2026-10-09"
     },
     "/groups/plumbing/": {
-      "sha": "9e772acd0075c0d3",
+      "sha": "1b8554d687e7f359",
       "date": "2026-10-09"
     },
     "/groups/real-estate/": {
-      "sha": "59af08b3a148240d",
+      "sha": "166e662f6504cac2",
       "date": "2026-10-09"
     },
     "/groups/references/": {
-      "sha": "4d414fc0402c54d0",
+      "sha": "debc9354157aa618",
       "date": "2026-10-09"
     },
     "/groups/restoration/": {
-      "sha": "ab97e325ee35416f",
+      "sha": "c1d63b3b48ee45c6",
       "date": "2026-10-09"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "de22f8bae8e518f8",
+      "sha": "2d7ac0f15de39c7b",
       "date": "2026-10-09"
     },
     "/groups/stage/": {
-      "sha": "3ce56d06e2590a86",
+      "sha": "9f6eb7b5bb0dd178",
       "date": "2026-10-09"
     },
     "/groups/trucking/": {
-      "sha": "c30e27ec3d32fa75",
+      "sha": "9f65ed7be52d5b5f",
       "date": "2026-10-09"
     },
     "/groups/water/": {
-      "sha": "6c59385fad5fd445",
+      "sha": "04fad1b33737f1fc",
       "date": "2026-10-09"
     },
     "/tools/aav-install-check/": {
@@ -476,6 +476,10 @@
     "/tools/bar-nesting/": {
       "sha": "c8f1807972a9d470",
       "date": "2026-09-29"
+    },
+    "/tools/bare-pipe-heat-loss/": {
+      "sha": "e4d5d3146cb4edb0",
+      "date": "2026-10-09"
     },
     "/tools/barge-draft-displacement/": {
       "sha": "96d9d9e7e043498d",
@@ -4014,8 +4018,8 @@
       "date": "2026-09-29"
     },
     "/tools/insulation-heat-loss/": {
-      "sha": "2f7e8a04d37fa0d2",
-      "date": "2026-09-29"
+      "sha": "037f2c3425167fb9",
+      "date": "2026-10-09"
     },
     "/tools/insulation-resistance-pi/": {
       "sha": "9517ed35397b5ad8",

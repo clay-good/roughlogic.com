@@ -28,6 +28,7 @@ export const BESPOKE_OUTPUT_UNITS = {
   "balance-point": {"balance_point_F":{"prefix":"","suffix":" F","digits":1}},
   "ballnose-feed-cusp": {"stepover_cusp_in":{"prefix":"","suffix":" in","digits":6},"feed_cusp_in":{"prefix":"","suffix":" in","digits":6}},
   "bar-nesting": {"yield_pct":{"prefix":"","suffix":"%","digits":1},"longest_drop_in":{"prefix":"","suffix":" in","digits":2}},
+  "bare-pipe-heat-loss": {"q_total_btuh":{"prefix":"","suffix":" BTU/hr","digits":0}},
   "barrel-volume": {"circular_gal":{"prefix":"","suffix":" gal","digits":2}},
   "barstock-cutlist": {"pieces_per_stick":{"prefix":"","suffix":" per stick","digits":0},"sticks_needed":{"prefix":"","suffix":" sticks","digits":0},"drop_per_stick_in":{"prefix":"","suffix":" in","digits":2},"yield_pct":{"prefix":"","suffix":"%","digits":1}},
   "basal-area-prism": {"basal_area_per_acre":{"prefix":"","suffix":" ft^2/ac","digits":0},"per_tree_ba":{"prefix":"","suffix":" ft^2","digits":3},"trees_per_acre":{"prefix":"","suffix":" trees/ac","digits":1}},
