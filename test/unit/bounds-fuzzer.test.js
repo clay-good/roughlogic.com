@@ -58640,3 +58640,17 @@ test("bounds: fatigue-miner-damage sums n/N on the finite-life line", () => {
   assert.ok("error" in _fmd({ ...base, stress_1_psi: 95000, cycles_1: 10 }));
   assert.ok("error" in _fmd(base));
 });
+
+import { computeFatigueCombinedLoading as _fcl } from "../../calc-machining.js";
+test("bounds: fatigue-combined-loading combines modes by von Mises with the 0.85 axial factor", () => {
+  const r = _fcl({ bending_alt_psi: 10000, torsion_mean_psi: 5000, kf_bending: 2, kfs_torsion: 1.5 });
+  assert.equal(r.vm_alt_psi, 20000);
+  assert.ok(Math.abs(r.vm_mean_psi - Math.sqrt(3) * 7500) < 1e-9);
+  // Pure axial alternating stress is lifted by 1/0.85.
+  assert.ok(Math.abs(_fcl({ axial_alt_psi: 8500 }).vm_alt_psi - 10000) < 1e-9);
+  // Pure bending is unchanged.
+  assert.equal(_fcl({ bending_alt_psi: 7000, bending_mean_psi: 3000 }).vm_max_psi, 10000);
+  assert.ok("error" in _fcl({}));
+  assert.ok("error" in _fcl({ bending_alt_psi: 1000, kf_bending: 0.5 }));
+  assert.ok("error" in _fcl({ torsion_alt_psi: -10 }));
+});

@@ -60,6 +60,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **`calc-machining.js` gzip cap raised 58,000 -> 66,000 B.** The five column and fatigue calculators added 2026-10-09 (secant formula, finite-life S-N, notch Kf, Miner damage, combined loading) take the module to about 58.9 KB gzipped. It is lazy-loaded and outside the home-view payload; the new cap leaves about 12% headroom.
+
 - **`dividing-head` covers angular indexing.** It said angular and differential indexing were out of scope. An "Index by" select now takes an angle in degrees: one crank turn moves the work 360/ratio degrees (9 on a 40:1 head), so 13 degrees 20 minutes is 1 turn plus 13 holes on the 27-hole circle (one hole there is 20 minutes). Indexing by equal divisions is unchanged; differential indexing remains out of scope.
 
 - **`concrete-anchor-breakout` and `concrete-anchor-pryout` take uncracked concrete (ACI 318-19 17.6.2.5.1 and 17.6.2.6.1).** Both fixed the cracking factor at 1.0, the cracked value, and said the uncracked credit was not modeled. A "Concrete at service loads" select now applies psi_c,N = 1.25 cast-in or 1.4 post-installed where analysis shows no cracking, and for an uncracked post-installed anchor nearer an edge than cac = 4 hef, the splitting factor psi_cp,N = max(ca,min, 1.5 hef)/cac. A cast-in anchor at 6 in embedment in 4,000 psi concrete goes from 22,308 lb to 27,885 lb nominal breakout, and its pryout from 44,617 lb to 55,771 lb. Cracked (the default) is unchanged.
@@ -79,6 +81,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 - **`concrete-anchor-shear-breakout` covers shear parallel to an edge (ACI 318-19 17.7.2.1(c)).** The note said this case was "not modeled". A direction select now applies it: twice the breakout computed as if the shear acted toward that edge, with psi_edV = 1.0. The 3/4 in anchor 6 in from an edge goes from 8,366 lb toward the edge to 16,731 lb parallel to it; with a 4 in corner distance, psi_edV drops out before doubling (5,035 -> 12,084 lb).
 
 ### Added
+
+- **`fatigue-combined-loading`: von Mises alternating and mean stress for combined bending, axial, and torsion (spec-v1939, Group K, `calc-machining.js`), 2,242 -> 2,243, v0.432.0.** `fatigue-safety-factor` takes one alternating and one mean stress and said multiaxial combination was separate. This one applies each mode's notch factor, combines the alternating and the mean components by von Mises (axial alternating divided by 0.85 so a bending Se applies), and adds the peak for the first-cycle yield check. Reversed 10,000 psi bending with Kf 2 and steady 5,000 psi torsion with Kfs 1.5 gives 20,000 / 12,990 psi and a 23,848 psi peak.
 
 - **`fatigue-miner-damage`: cumulative fatigue damage by Miner's rule (spec-v1938, Group K, `calc-machining.js`), 2,241 -> 2,242, v0.431.0.** The fatigue bench handled one stress level at a time. This one takes up to three blocks of reversed stress and cycles, finds each life on the same S-N line as `fatigue-finite-life` (called, so the two cannot drift), sums D = n/N with no damage at or below Se, and reports the repetitions and cycles to failure. 20% at 70 kpsi, 50% at 55 kpsi, and 30% at 40 kpsi on a 100 kpsi steel with Se 50 kpsi gives 83,583 cycles.
 

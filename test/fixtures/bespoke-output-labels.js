@@ -341,6 +341,7 @@ export const BESPOKE_OUTPUT_LABELS = {
   "fan-motor-max-airflow": {"max_cfm":"Max airflow","note":"Note"},
   "fan-sheave-for-target-cfm": {"new_drive_sheave_in":"New drive sheave (pitch dia)","new_bhp":"Power and static pressure","note":"Note"},
   "fastener-pullout": {"withdrawal_per_inch_lb":"Withdrawal per inch","total_withdrawal_lb":"Total withdrawal"},
+  "fatigue-combined-loading": {"vm_alt_psi":"Von Mises alternating stress","vm_mean_psi":"Von Mises mean stress","vm_max_psi":"Peak von Mises (first-cycle yield)","note":"Note"},
   "fatigue-finite-life": {"coefficient_a_psi":"S-N line","has_cycles":"Fatigue strength at N","has_stress":"Life at the stress","note":"Note"},
   "fatigue-miner-damage": {"blocks_to_failure":"Repetitions of the block to failure","life_1_cycles":"Life at each block's stress","cycles_to_failure":"Total cycles to failure","note":"Note"},
   "fatigue-notch-sensitivity": {"kf":"Fatigue stress-concentration factor","notch_sensitivity_q":"Notch sensitivity q","neuber_constant":"Neuber constant","note":"Note"},

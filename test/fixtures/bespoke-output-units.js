@@ -227,6 +227,7 @@ export const BESPOKE_OUTPUT_UNITS = {
   "fall-protection-clearance": {"remaining_clearance_ft":{"prefix":"","suffix":" ft","digits":1}},
   "fan-motor-bhp": {"ahp":{"prefix":"","suffix":" HP","digits":3},"bhp":{"prefix":"","suffix":" BHP","digits":3}},
   "fastener-pullout": {"withdrawal_per_inch_lb":{"prefix":"","suffix":" lb/in","digits":1},"total_withdrawal_lb":{"prefix":"","suffix":" lb","digits":1}},
+  "fatigue-combined-loading": {"vm_mean_psi":{"prefix":"","suffix":" psi (sigma_m)","digits":0}},
   "fatigue-miner-damage": {"cycles_to_failure":{"prefix":"","suffix":" cycles","digits":0}},
   "fatigue-notch-sensitivity": {"neuber_constant":{"prefix":"","suffix":" sqrt(in)","digits":4}},
   "feed-conversion-ratio": {"average_daily_gain_lb":{"prefix":"","suffix":" lb/day","digits":2},"total_gain_lb":{"prefix":"","suffix":" lb","digits":0}},

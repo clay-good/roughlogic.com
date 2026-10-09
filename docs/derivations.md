@@ -2810,6 +2810,7 @@ cross-check.
 | calc-machining.js | `computeDrillPointDepth` | `{ diameter_in = 0, point_angle_deg = 118, full_depth_in = 0 } = {}` | _ | _ | _ |
 | calc-machining.js | `computeEnduranceLimitMarin` | `{ ultimate_strength_psi = 0, surface_finish = "machined", diameter_in = 1, lo...` | _ | _ | _ |
 | calc-machining.js | `computeEulerJohnsonColumn` | `{ modulus_psi = 30000000, yield_strength_psi = 0, moment_of_inertia_in4 = 0, ...` | _ | _ | _ |
+| calc-machining.js | `computeFatigueCombinedLoading` | `{ bending_alt_psi = 0, bending_mean_psi = 0, axial_alt_psi = 0, axial_mean_ps...` | _ | _ | _ |
 | calc-machining.js | `computeFatigueFiniteLife` | `{ ultimate_strength_psi = 0, endurance_limit_psi = 0, fatigue_fraction = 0, c...` | _ | _ | _ |
 | calc-machining.js | `computeFatigueMinerDamage` | `{ ultimate_strength_psi = 0, endurance_limit_psi = 0, fatigue_fraction = 0, s...` | _ | _ | _ |
 | calc-machining.js | `computeFatigueNotchSensitivity` | `{ kt = 0, notch_radius_in = 0, ultimate_strength_psi = 0, load_type = "bendin...` | _ | _ | _ |
@@ -3911,7 +3912,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2495.
+Row count: 2496.
 
 <!-- END function-corpus-v14 -->
 
@@ -5629,7 +5630,7 @@ per spec-v14 §13.1 second paragraph.
 | `truck-swept-path-width` | Swept-Path Width (Turn Lane Occupancy) | AASHTO Green Book (swept-path width =...; OT = 50 - sqrt(2500 - (400 + 1600)) = 50 - sqrt(500) = 50... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `warehouse-cube-utilization` | Storage Position Count and Cube Utilisation | Project (first-principles); layout drawings and the slotting policy govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group K Mechanic (170 tiles)
+### Group K Mechanic (171 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -5694,6 +5695,7 @@ per spec-v14 §13.1 second paragraph.
 | `engine-fuel-burn-gph` | Engine Fuel Burn from Horsepower (BSFC) | BSFC engine-performance practice; spec-v463 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `et-horsepower` | Horsepower from Quarter-Mile ET | Hale quarter-mile ET relation (invers...; spec-v662 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `euler-johnson-column` | Euler-Johnson Column Buckling | Project (first-principles); Euler / J.B. Johnson | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
+| `fatigue-combined-loading` | Combined Fatigue Loading (Von Mises Alternating and Mean) | Project (first-principles); sigma'a = 2 x 10,000 = 20,000 psi; sigma'm = sqrt(3) x 1.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `fatigue-finite-life` | Finite-Life Fatigue Strength and Life (S-N Line) | McGraw-Hill (Shigley, Mischke, Budynas); Example 6-2(b),(c): Sut 90 kpsi, Se' 45 kpsi, f 0.86 from... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `fatigue-miner-damage` | Cumulative Fatigue Damage (Miner's Rule) | Project (first-principles); a = 162 kpsi, b = -0.08509; N1 = 19,173, N2 = 326,247, 40... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `fatigue-notch-sensitivity` | Fatigue Notch Factor Kf (Notch Sensitivity) | McGraw-Hill (Shigley, Mischke, Budynas); Example 6-6(b): Sut 690 MPa (100 kpsi), fillet r = 3 mm (... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -6326,6 +6328,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 
-Tile count: 2242. Fixture-covered or reference-cadence: 2242 / 2242.
+Tile count: 2243. Fixture-covered or reference-cadence: 2243 / 2243.
 
 <!-- END tile-index-v14 -->

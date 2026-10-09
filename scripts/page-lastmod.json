@@ -2,99 +2,99 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "8e9143a2df9a24d7",
+      "sha": "68bed3c67b48dc03",
       "date": "2026-10-09"
     },
     "/tools/": {
-      "sha": "e0ae062583a27e82",
+      "sha": "7313408e7ece4ff1",
       "date": "2026-10-09"
     },
     "/collections/disaster-response/": {
-      "sha": "2cc5bf24949b3111",
+      "sha": "fc8bad81ac98a098",
       "date": "2026-10-09"
     },
     "/groups/accounting/": {
-      "sha": "60c8fe3814d2a8b4",
+      "sha": "46432772647aa48b",
       "date": "2026-10-09"
     },
     "/groups/agriculture/": {
-      "sha": "cdf584fbbbab9433",
+      "sha": "25f4b78962ec7548",
       "date": "2026-10-09"
     },
     "/groups/construction/": {
-      "sha": "99065576903b9013",
+      "sha": "1c6cd076aa466fca",
       "date": "2026-10-09"
     },
     "/groups/cross-trade/": {
-      "sha": "ac067a12a1c1d0b8",
+      "sha": "f8c60d040e1dfadb",
       "date": "2026-10-09"
     },
     "/groups/educators/": {
-      "sha": "51bb07c22c7820a3",
+      "sha": "c2199aa5f2ef626b",
       "date": "2026-10-09"
     },
     "/groups/electrical/": {
-      "sha": "d52970e588825d39",
+      "sha": "89025a8889429952",
       "date": "2026-10-09"
     },
     "/groups/field/": {
-      "sha": "04a043b90cb04027",
+      "sha": "ff05d148aa0db86e",
       "date": "2026-10-09"
     },
     "/groups/fire-ground/": {
-      "sha": "598074f9c678dca5",
+      "sha": "54951a01359ebba3",
       "date": "2026-10-09"
     },
     "/groups/historical/": {
-      "sha": "e2c6b39aa3565cbb",
+      "sha": "73ff65758caacc66",
       "date": "2026-10-09"
     },
     "/groups/hvac/": {
-      "sha": "df8cd3d3a1140ef7",
+      "sha": "873fd38c91bf8d38",
       "date": "2026-10-09"
     },
     "/groups/kitchen/": {
-      "sha": "6644d2e8e6cc6ea9",
+      "sha": "f5ac65a2d41cef21",
       "date": "2026-10-09"
     },
     "/groups/lab/": {
-      "sha": "cbe84e34ffb7ba25",
+      "sha": "1cabde839de97611",
       "date": "2026-10-09"
     },
     "/groups/mechanic/": {
-      "sha": "723fa7e99889132d",
+      "sha": "11a68056318a73a2",
       "date": "2026-10-09"
     },
     "/groups/plumbing/": {
-      "sha": "1f8eea36b7b4d8fa",
+      "sha": "9e772acd0075c0d3",
       "date": "2026-10-09"
     },
     "/groups/real-estate/": {
-      "sha": "2a4d492ca38c8069",
+      "sha": "59af08b3a148240d",
       "date": "2026-10-09"
     },
     "/groups/references/": {
-      "sha": "9ba3703708f1ea30",
+      "sha": "4d414fc0402c54d0",
       "date": "2026-10-09"
     },
     "/groups/restoration/": {
-      "sha": "19a240c1c4112912",
+      "sha": "ab97e325ee35416f",
       "date": "2026-10-09"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "23a642049addfec3",
+      "sha": "de22f8bae8e518f8",
       "date": "2026-10-09"
     },
     "/groups/stage/": {
-      "sha": "647dfd1c1d8cfe40",
+      "sha": "3ce56d06e2590a86",
       "date": "2026-10-09"
     },
     "/groups/trucking/": {
-      "sha": "97870d816b96d7f4",
+      "sha": "c30e27ec3d32fa75",
       "date": "2026-10-09"
     },
     "/groups/water/": {
-      "sha": "7858b7e35e615886",
+      "sha": "6c59385fad5fd445",
       "date": "2026-10-09"
     },
     "/tools/aav-install-check/": {
@@ -2857,6 +2857,10 @@
       "sha": "260e3c2d2b4d8bd8",
       "date": "2026-09-29"
     },
+    "/tools/fatigue-combined-loading/": {
+      "sha": "653e59aef52dd1d3",
+      "date": "2026-10-09"
+    },
     "/tools/fatigue-finite-life/": {
       "sha": "351d663f1a04b9f2",
       "date": "2026-10-09"
@@ -2870,7 +2874,7 @@
       "date": "2026-10-09"
     },
     "/tools/fatigue-safety-factor/": {
-      "sha": "4692e9993aa87d98",
+      "sha": "a14bedf0273393b6",
       "date": "2026-10-09"
     },
     "/tools/fdc-supply-check/": {
@@ -3958,7 +3962,7 @@
       "date": "2026-09-29"
     },
     "/tools/impact-load-factor/": {
-      "sha": "44177ffc9eff7d0d",
+      "sha": "b89963908d95e0f0",
       "date": "2026-10-09"
     },
     "/tools/inclined-plane-force/": {

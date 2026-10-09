@@ -963,7 +963,7 @@ export function computeFatigueSafetyFactor({ alternating_stress_psi = 0, mean_st
   const governs = governing_n === langer_ny && langer_ny < fatigue_n ? "first-cycle yield (Langer)" : "fatigue";
   return {
     fatigue_n, langer_ny, governing_n, governs,
-    note: "Infinite-life fatigue safety factor for a uniaxial fluctuating stress, with the alternating amplitude sigma_a and the mean (midrange) sigma_m. Modified Goodman 1/n = sa/Se + sm/Sut is the standard design line; Soderberg 1/n = sa/Se + sm/Sy is the most conservative (it never yields); Gerber n sa/Se + (n sm/Sut)^2 = 1 is the least conservative and the best fit to test data. Se is the CORRECTED endurance limit (Se' ~= 0.5 Sut for steel with Sut < 200 ksi, times the Marin surface/size/load/temperature/reliability factors) and is an input here so the tile needs no material tables. The Langer line ny = Sy/(sa + sm) catches first-cycle yielding, which can govern at high mean stress; the reported governing factor is the smaller of the two. With sigma_m = 0 (fully reversed) every criterion gives n = Se/sigma_a. Uniaxial stress, infinite life; Se from the Marin factors is endurance-limit-marin and finite life is fatigue-finite-life, and notch Kf is fatigue-notch-sensitivity; multiaxial combination is separate. A design aid; Shigley / Juvinall and the engineer of record govern.",
+    note: "Infinite-life fatigue safety factor for a uniaxial fluctuating stress, with the alternating amplitude sigma_a and the mean (midrange) sigma_m. Modified Goodman 1/n = sa/Se + sm/Sut is the standard design line; Soderberg 1/n = sa/Se + sm/Sy is the most conservative (it never yields); Gerber n sa/Se + (n sm/Sut)^2 = 1 is the least conservative and the best fit to test data. Se is the CORRECTED endurance limit (Se' ~= 0.5 Sut for steel with Sut < 200 ksi, times the Marin surface/size/load/temperature/reliability factors) and is an input here so the tile needs no material tables. The Langer line ny = Sy/(sa + sm) catches first-cycle yielding, which can govern at high mean stress; the reported governing factor is the smaller of the two. With sigma_m = 0 (fully reversed) every criterion gives n = Se/sigma_a. Uniaxial stress, infinite life; Se from the Marin factors is endurance-limit-marin and finite life is fatigue-finite-life, notch Kf is fatigue-notch-sensitivity, and combined bending, axial, and torsion is fatigue-combined-loading. A design aid; Shigley / Juvinall and the engineer of record govern.",
   };
 }
 export const fatigueSafetyFactorExample = { inputs: { alternating_stress_psi: 25000, mean_stress_psi: 30000, endurance_limit_psi: 40000, ultimate_strength_psi: 100000, yield_strength_psi: 80000, criterion: "goodman" } };
@@ -1264,6 +1264,63 @@ function renderFatigueMinerDamage(inputRegion, outputRegion, citationEl) {
   for (const x of all) x.input.addEventListener("input", update);
 }
 MACHINING_RENDERERS["fatigue-miner-damage"] = renderFatigueMinerDamage;
+
+// spec-v1939: combined loading modes for fatigue (Shigley, Combinations of Loading Modes). Bending, axial,
+// and torsion, each with its own notch factor, combine by von Mises into one alternating and one mean stress:
+// sigma'a = sqrt((Kf_b sa_b + Kf_ax sa_ax / 0.85)^2 + 3 (Kfs ta)^2), sigma'm = sqrt((Kf_b sm_b + Kf_ax sm_ax)^2
+// + 3 (Kfs tm)^2). The 0.85 carries the axial load factor kc into the alternating stress so a bending Se applies.
+// dims: in { bending_alt_psi: M L^-1 T^-2, bending_mean_psi: M L^-1 T^-2, axial_alt_psi: M L^-1 T^-2, axial_mean_psi: M L^-1 T^-2, torsion_alt_psi: M L^-1 T^-2, torsion_mean_psi: M L^-1 T^-2, kf_bending: dimensionless, kf_axial: dimensionless, kfs_torsion: dimensionless } out: { vm_alt_psi: M L^-1 T^-2, vm_mean_psi: M L^-1 T^-2, vm_max_psi: M L^-1 T^-2 }
+export function computeFatigueCombinedLoading({ bending_alt_psi = 0, bending_mean_psi = 0, axial_alt_psi = 0, axial_mean_psi = 0, torsion_alt_psi = 0, torsion_mean_psi = 0, kf_bending = 1, kf_axial = 1, kfs_torsion = 1 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const v = [bending_alt_psi, bending_mean_psi, axial_alt_psi, axial_mean_psi, torsion_alt_psi, torsion_mean_psi].map((x) => Number(x) || 0);
+  const [sab, smb, saa, sma, ta, tm] = v;
+  const kb = Number(kf_bending) || 0, ka = Number(kf_axial) || 0, kt = Number(kfs_torsion) || 0;
+  if (sab < 0 || saa < 0 || ta < 0) return { error: "Alternating stresses are amplitudes and cannot be negative (psi)." };
+  if (!(kb >= 1 && ka >= 1 && kt >= 1)) return { error: "Each fatigue notch factor must be 1 or more (1 for no notch)." };
+  if (v.every((x) => x === 0)) return { error: "Enter at least one bending, axial, or torsional stress (psi)." };
+  const vm_alt_psi = Math.sqrt(Math.pow(kb * sab + ka * saa / 0.85, 2) + 3 * Math.pow(kt * ta, 2));
+  const vm_mean_psi = Math.sqrt(Math.pow(kb * smb + ka * sma, 2) + 3 * Math.pow(kt * tm, 2));
+  // First-cycle yield check: the peak von Mises stress (with the notch factors kept).
+  const vm_max_psi = Math.sqrt(Math.pow(kb * (sab + smb) + ka * (saa + sma), 2) + 3 * Math.pow(kt * (ta + tm), 2));
+  if (![vm_alt_psi, vm_mean_psi, vm_max_psi].every(Number.isFinite)) return { error: "Combined-loading math is not a finite value; check the inputs." };
+  return {
+    vm_alt_psi, vm_mean_psi, vm_max_psi,
+    note: "Shigley's method for a part that sees more than one kind of load: apply each mode's fatigue notch factor (Kf in bending, Kf in axial, Kfs in torsion), combine the alternating parts and the mean parts separately by von Mises, and divide the axial ALTERNATING stress by 0.85 so a rotating-bending endurance limit (Marin load factor kc = 1) can be used for the whole thing. The two results are the sigma_a and sigma_m to enter in the fatigue safety factor (Goodman) or the finite-life line; the peak von Mises stress is for the first-cycle yield check against Sy. It assumes the modes are in phase and share a frequency; out-of-phase loading needs a critical-plane method. A design aid; Shigley and test data govern.",
+  };
+}
+export const fatigueCombinedLoadingExample = { inputs: { bending_alt_psi: 10000, bending_mean_psi: 0, axial_alt_psi: 0, axial_mean_psi: 0, torsion_alt_psi: 0, torsion_mean_psi: 5000, kf_bending: 2, kf_axial: 1, kfs_torsion: 1.5 } };
+function renderFatigueCombinedLoading(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: combinations of loading modes (Shigley, Mechanical Engineering Design, Ch. 6): sigma'a = sqrt((Kf sa_bend + Kf sa_axial/0.85)^2 + 3 (Kfs ta)^2), sigma'm = sqrt((Kf sm_bend + Kf sm_axial)^2 + 3 (Kfs tm)^2), used with a rotating-bending Se; peak von Mises for first-cycle yield. In-phase loading. A design aid; Shigley and test data govern.";
+  const f = [
+    makeNumber("Bending alternating stress (psi)", "fcl-sab", { step: "any", min: "0" }),
+    makeNumber("Bending mean stress (psi)", "fcl-smb", { step: "any" }),
+    makeNumber("Axial alternating stress (psi)", "fcl-saa", { step: "any", min: "0" }),
+    makeNumber("Axial mean stress (psi)", "fcl-sma", { step: "any" }),
+    makeNumber("Torsional alternating stress (psi)", "fcl-ta", { step: "any", min: "0" }),
+    makeNumber("Torsional mean stress (psi)", "fcl-tm", { step: "any" }),
+    makeNumber("Kf, bending (1 if no notch)", "fcl-kb", { step: "any", min: "1", value: "1" }),
+    makeNumber("Kf, axial (1 if no notch)", "fcl-ka", { step: "any", min: "1", value: "1" }),
+    makeNumber("Kfs, torsion (1 if no notch)", "fcl-kt", { step: "any", min: "1", value: "1" }),
+  ];
+  for (const x of f) inputRegion.appendChild(x.wrap);
+  const ex = [10000, 0, 0, 0, 0, 5000, 2, 1, 1.5];
+  attachExampleButton(inputRegion, () => { f.forEach((x, i) => { x.input.value = String(ex[i]); }); update(); });
+  const oA = makeOutputLine(outputRegion, "Von Mises alternating stress", "fcl-out-a");
+  const oM = makeOutputLine(outputRegion, "Von Mises mean stress", "fcl-out-m");
+  const oX = makeOutputLine(outputRegion, "Peak von Mises (first-cycle yield)", "fcl-out-x");
+  const oNote = makeOutputLine(outputRegion, "Note", "fcl-out-note");
+  function readNum(i, d) { if (i.value === "") return d; const v = Number(i.value); return Number.isFinite(v) ? v : d; }
+  const update = debounce(() => {
+    const r = computeFatigueCombinedLoading({ bending_alt_psi: readNum(f[0].input, 0), bending_mean_psi: readNum(f[1].input, 0), axial_alt_psi: readNum(f[2].input, 0), axial_mean_psi: readNum(f[3].input, 0), torsion_alt_psi: readNum(f[4].input, 0), torsion_mean_psi: readNum(f[5].input, 0), kf_bending: readNum(f[6].input, 1), kf_axial: readNum(f[7].input, 1), kfs_torsion: readNum(f[8].input, 1) });
+    if (r.error) { oA.textContent = r.error; oM.textContent = "-"; oX.textContent = "-"; oNote.textContent = ""; return; }
+    oA.textContent = fmt(r.vm_alt_psi, 0) + " psi (sigma_a for the Goodman check)";
+    oM.textContent = fmt(r.vm_mean_psi, 0) + " psi (sigma_m)";
+    oX.textContent = fmt(r.vm_max_psi, 0) + " psi (compare with Sy)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const x of f) x.input.addEventListener("input", update);
+}
+MACHINING_RENDERERS["fatigue-combined-loading"] = renderFatigueCombinedLoading;
 
 // ===================== spec-v1288: power-screw torque, efficiency, and self-locking (Shigley Ch. 8) =====================
 // acme-thread-depth / stub-acme-thread-depth give lead-screw GEOMETRY and name the use ("vises, presses, lead

@@ -11884,11 +11884,23 @@ export const CITATIONS = {
     edition: "The modified-Goodman, Soderberg, and Gerber fluctuating-stress fatigue criteria with the Langer first-cycle-yield line (Shigley, Mechanical Engineering Design; Juvinall, Engineering Considerations of Stress, Strain, and Strength), by name.",
     freeAccess: "The three fatigue criteria and the Langer line are standard published machine-design results; the corrected endurance limit Se, the strengths, and the stresses are the designer's inputs.",
     governance: GOVERNANCE.general,
-    editionNote: "The infinite-life fatigue safety factor for a uniaxial fluctuating stress with alternating amplitude sigma_a and mean sigma_m. Modified Goodman 1/n = sa/Se + sm/Sut is the standard design line; Soderberg 1/n = sa/Se + sm/Sy is the most conservative (it never yields); Gerber n sa/Se + (n sm/Sut)^2 = 1 is the least conservative and the best fit to test data. Se is the CORRECTED endurance limit (Se' ~= 0.5 Sut for steel with Sut < 200 ksi, times the Marin surface/size/load/temperature/reliability factors) and is taken as an input so the tile needs no material tables. The Langer line ny = Sy/(sa + sm) catches first-cycle yielding, which can govern at high mean stress; the reported governing factor is the smaller of the two. With sigma_m = 0 (fully reversed) every criterion gives n = Se/sigma_a. Uniaxial stress, infinite life; Se from the Marin factors is endurance-limit-marin and finite life is fatigue-finite-life, and notch Kf is fatigue-notch-sensitivity; multiaxial combination is separate. A design aid; Shigley / Juvinall and the engineer of record govern.",
+    editionNote: "The infinite-life fatigue safety factor for a uniaxial fluctuating stress with alternating amplitude sigma_a and mean sigma_m. Modified Goodman 1/n = sa/Se + sm/Sut is the standard design line; Soderberg 1/n = sa/Se + sm/Sy is the most conservative (it never yields); Gerber n sa/Se + (n sm/Sut)^2 = 1 is the least conservative and the best fit to test data. Se is the CORRECTED endurance limit (Se' ~= 0.5 Sut for steel with Sut < 200 ksi, times the Marin surface/size/load/temperature/reliability factors) and is taken as an input so the tile needs no material tables. The Langer line ny = Sy/(sa + sm) catches first-cycle yielding, which can govern at high mean stress; the reported governing factor is the smaller of the two. With sigma_m = 0 (fully reversed) every criterion gives n = Se/sigma_a. Uniaxial stress, infinite life; Se from the Marin factors is endurance-limit-marin and finite life is fatigue-finite-life, notch Kf is fatigue-notch-sensitivity, and combined bending, axial, and torsion is fatigue-combined-loading. A design aid; Shigley / Juvinall and the engineer of record govern.",
     assumptions: [
       { name: "Criteria", value: "Goodman/Soderberg/Gerber fatigue lines + Langer first-cycle yield", source: "Shigley / Juvinall" },
       { name: "Endurance limit", value: "Se is the corrected (Marin-factored) endurance limit, taken as an input", source: "scope of this tile" },
       { name: "Scope", value: "uniaxial, infinite life; notch Kf, finite-life S-N, and multiaxial combination are separate", source: "scope of this tile" },
+    ],
+  },
+  "fatigue-combined-loading": {
+    formula: "sigma'a = sqrt((Kf_b sa_b + Kf_ax sa_ax/0.85)^2 + 3 (Kfs ta)^2); sigma'm = sqrt((Kf_b sm_b + Kf_ax sm_ax)^2 + 3 (Kfs tm)^2); sigma'max = sqrt((Kf_b (sa_b + sm_b) + Kf_ax (sa_ax + sm_ax))^2 + 3 (Kfs (ta + tm))^2).",
+    edition: "Combinations of loading modes for fatigue (Shigley, Mischke and Budynas, Mechanical Engineering Design, Ch. 6), by name: von Mises combination of the notch-corrected alternating and mean components, with the axial alternating stress divided by the axial load factor 0.85 so a rotating-bending endurance limit applies.",
+    freeAccess: "Standard published fatigue relations; the stress components and notch factors are the user's inputs.",
+    governance: GOVERNANCE.general,
+    editionNote: "One alternating and one mean von Mises stress for a part under bending, axial, and torsional load at once, for the Goodman (fatigue-safety-factor) or finite-life check, plus the peak for first-cycle yield. Each mode carries its own notch factor (fatigue-notch-sensitivity). Assumes in-phase loading at one frequency; out-of-phase loading needs a critical-plane method. A design aid; test data govern.",
+    assumptions: [
+      { name: "Combination", value: "von Mises on the alternating and the mean components separately", source: "Shigley Ch. 6, combinations of loading modes" },
+      { name: "Axial load factor", value: "axial alternating stress divided by 0.85 (kc) so the bending Se applies", source: "Shigley Ch. 6" },
+      { name: "Phase", value: "all modes in phase at one frequency", source: "scope of this tile" },
     ],
   },
   "fatigue-miner-damage": {

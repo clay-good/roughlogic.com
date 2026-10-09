@@ -24,6 +24,7 @@
 // better match".
 
 const RELATED = {
+  "fatigue-combined-loading": ["fatigue-safety-factor","fatigue-notch-sensitivity","shaft-torsion"],
   "fatigue-miner-damage": ["fatigue-finite-life","endurance-limit-marin","fatigue-notch-sensitivity"],
   "fatigue-notch-sensitivity": ["fatigue-safety-factor","fatigue-finite-life","endurance-limit-marin"],
   "fatigue-finite-life": ["endurance-limit-marin","fatigue-safety-factor","shaft-torsion"],

@@ -168626,6 +168626,46 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "fatigue-combined-loading",
+  "source_publisher": "Project (first-principles)",
+  "source_title": "Reversed bending with a notch plus steady torsion",
+  "source_edition_or_year": "von Mises combination of loading modes",
+  "source_section_or_page": "sigma'a = 2 x 10,000 = 20,000 psi; sigma'm = sqrt(3) x 1.5 x 5,000 = 12,990 psi; peak = sqrt(20,000^2 + 3 x 7,500^2) = 23,848 psi",
+  "verified_by": "rl",
+  "verified_on": "2026-10-09",
+  "inputs": {
+   "bending_alt_psi": 10000,
+   "bending_mean_psi": 0,
+   "axial_alt_psi": 0,
+   "axial_mean_psi": 0,
+   "torsion_alt_psi": 0,
+   "torsion_mean_psi": 5000,
+   "kf_bending": 2,
+   "kf_axial": 1,
+   "kfs_torsion": 1.5
+  },
+  "outputs": {
+   "vm_alt_psi": {
+    "value": 20000,
+    "tolerance": {
+     "pct": 0.5
+    }
+   },
+   "vm_mean_psi": {
+    "value": 12990,
+    "tolerance": {
+     "pct": 0.5
+    }
+   },
+   "vm_max_psi": {
+    "value": 23848,
+    "tolerance": {
+     "pct": 0.5
+    }
+   }
+  }
  }
  ]
 }

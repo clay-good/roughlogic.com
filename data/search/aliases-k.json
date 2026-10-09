@@ -1614,6 +1614,11 @@
     {"term":"palmgren miner","target":"fatigue-miner-damage","kind":"industry"},
     {"term":"cumulative fatigue damage","target":"fatigue-miner-damage","kind":"industry"},
     {"term":"variable amplitude fatigue life","target":"fatigue-miner-damage","kind":"industry"},
-    {"term":"how long will a part last with different loads","target":"fatigue-miner-damage","kind":"question"}
+    {"term":"how long will a part last with different loads","target":"fatigue-miner-damage","kind":"question"},
+    {"term":"combined loading fatigue","target":"fatigue-combined-loading","kind":"industry"},
+    {"term":"von mises alternating stress","target":"fatigue-combined-loading","kind":"industry"},
+    {"term":"bending and torsion fatigue","target":"fatigue-combined-loading","kind":"industry"},
+    {"term":"multiaxial fatigue stress","target":"fatigue-combined-loading","kind":"industry"},
+    {"term":"shaft fatigue with bending and twisting","target":"fatigue-combined-loading","kind":"question"}
   ]
 }
