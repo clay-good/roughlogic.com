@@ -1412,6 +1412,7 @@ export const CITATIONS = {
     assumptions: [
       { name: "Convection", value: "Churchill-Chu horizontal-cylinder correlation, air properties at the film temperature, 1 atm", source: "Churchill and Chu (1975)" },
       { name: "Radiation", value: "gray surface to large surroundings at the air temperature", source: "Stefan-Boltzmann" },
+      { name: "Wind", value: "optional (added 2026-10-09): forced cross-flow convection by Churchill-Bernstein (1977), Nu = 0.3 + 0.62 Re^(1/2) Pr^(1/3)/[1 + (0.4/Pr)^(2/3)]^(1/4) [1 + (Re/282000)^(5/8)]^(4/5), combined with natural convection as (Nu_F^3 + Nu_N^3)^(1/3); reproduces Incropera Example 7.4 (Re 6,071, Pr 0.700, Nu 40.6)", source: "Churchill and Bernstein (1977); Incropera" },
       { name: "Surface temperature", value: "taken as the fluid temperature (thin metal wall)", source: "scope of this tile" },
     ],
   },

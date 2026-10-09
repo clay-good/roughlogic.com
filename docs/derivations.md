@@ -2488,7 +2488,7 @@ cross-check.
 | calc-hvac.js | `computeApproachDeltaT` | `{ outdoor_F, condenser_saturation_F, supply_F, return_F, approach_normal_low ...` | _ | _ | _ |
 | calc-hvac.js | `computeAssemblyRValue` | `{ cavity_r = 0, continuous_r = 0, stud_depth_in = 0, framing_factor = 0.25, a...` | _ | _ | _ |
 | calc-hvac.js | `computeBalancePoint` | `{ heating_capacity_btu_hr_at_design, design_outdoor_F, building_heat_loss_btu...` | _ | _ | _ |
-| calc-hvac.js | `computeBarePipeHeatLoss` | `{ od_in = 0, surface_f = 0, amb_f = 70, emissivity = 0.8, length_ft = 1 } = {}` | _ | _ | _ |
+| calc-hvac.js | `computeBarePipeHeatLoss` | `{ od_in = 0, surface_f = 0, amb_f = 70, emissivity = 0.8, length_ft = 1, wind...` | _ | _ | _ |
 | calc-hvac.js | `computeBaseboardLengthForLoad` | `{ target_btuhr = 0, water_temp_F = 0, flow_gpm = 1, model = "slant_fin_baseli...` | _ | _ | _ |
 | calc-hvac.js | `computeBaseboardOutput` | `{ water_temp_F = 0, flow_gpm = 1, length_ft = 0, model = "slant_fin_baseline" }` | _ | _ | _ |
 | calc-hvac.js | `computeBeltAndPulley` | `{ drive_dia_in = 0, driven_dia_in = 0, center_distance_in = 0, motor_rpm = 0 }` | _ | _ | _ |
@@ -4432,7 +4432,7 @@ per spec-v14 §13.1 second paragraph.
 | `ashrae-622-ventilation` | ASHRAE 62.2 Whole-House Mechanical Ventilation Rate | ASHRAE 62.2-2019 §4.1; spec-v219 section 2.1 pinned example (no credit) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `assembly-r-value` | Wall Assembly R-Value | ASHRAE Handbook of Fundamentals paral...; spec-v99 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `balance-point` | Heat Pump Balance Point | Project (first-principles); slope_capacity = 300 Btu/hr/F (1 percent of design); slop... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `bare-pipe-heat-loss` | Bare Pipe Heat Loss (Convection and Radiation) | Engineers Edge; 2 in nominal pipe (OD 2.375 in) at 280 F; emissivity 0.8 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
+| `bare-pipe-heat-loss` | Bare Pipe Heat Loss (Convection and Radiation) | Engineers Edge; 2 in nominal pipe (OD 2.375 in) at 280 F; emissivity 0.8 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `baseboard-length-for-load` | Baseboard Length for a Room Load | Slant/Fin (inverse); 4,800 BTU/hr, 180 F water, 1 gpm, Fine/Line 30 (580 BTU/f... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+4 more) |
 | `baseboard-output` | Hydronic Baseboard Output | Slant/Fin; 180 F water / 1 gpm / 8 ft of Slant/Fin Fine/Line 30 -> 5... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `belt-pulley` | Belt Length and Pulley Speed | Project (first-principles); 4 in drive / 8 in driven / 18 in centers / 1750 RPM motor... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |

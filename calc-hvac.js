@@ -3016,13 +3016,18 @@ HVAC_RENDERERS["pipe-heat-loss-radial"] = renderPipeHeatLossRadial;
 // from its surface by natural convection, Churchill-Chu for a horizontal cylinder,
 // Nu = {0.60 + 0.387 Ra^(1/6) / [1 + (0.559/Pr)^(9/16)]^(8/27)}^2, with air properties at the film
 // temperature (Sutherland viscosity and conductivity, 1 atm), plus radiation eps sigma (Ts^4 - Ta^4).
-// dims: in { od_in: L, surface_f: T, amb_f: T, emissivity: dimensionless, length_ft: L } out: { conv_coefficient: M T^-3, rad_coefficient: M T^-3, q_per_ft_btuh: M*L*T^-3, q_total_btuh: M*L^2*T^-3, conv_share: dimensionless }
-export function computeBarePipeHeatLoss({ od_in = 0, surface_f = 0, amb_f = 70, emissivity = 0.8, length_ft = 1 } = {}) {
+// Wind added 2026-10-09: forced convection in cross flow by Churchill-Bernstein (1977),
+// Nu = 0.3 + 0.62 Re^(1/2) Pr^(1/3) / [1 + (0.4/Pr)^(2/3)]^(1/4) x [1 + (Re/282000)^(5/8)]^(4/5),
+// combined with the natural-convection Nu as (Nu_F^3 + Nu_N^3)^(1/3) (Churchill; Incropera 9.9).
+// dims: in { od_in: L, surface_f: T, amb_f: T, emissivity: dimensionless, length_ft: L, wind_mph: L T^-1 } out: { conv_coefficient: M T^-3, rad_coefficient: M T^-3, q_per_ft_btuh: M*L*T^-3, q_total_btuh: M*L^2*T^-3, conv_share: dimensionless, reynolds: dimensionless, forced_nusselt: dimensionless }
+export function computeBarePipeHeatLoss({ od_in = 0, surface_f = 0, amb_f = 70, emissivity = 0.8, length_ft = 1, wind_mph = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const od = Number(od_in) || 0, Ts = Number(surface_f), Ta = Number(amb_f), eps = Number(emissivity), L = Number(length_ft) || 0;
   if (!(od > 0)) return { error: "Pipe outside diameter must be positive (in)." };
   if (!(eps > 0 && eps <= 1)) return { error: "Surface emissivity must be above 0 and at most 1 (0.8 for oxidized steel)." };
   if (!(L > 0)) return { error: "Pipe length must be positive (ft)." };
+  const wind = Number(wind_mph) || 0;
+  if (wind < 0) return { error: "Wind speed cannot be negative (mph)." };
   const TsK = (Ts - 32) * 5 / 9 + 273.15, TaK = (Ta - 32) * 5 / 9 + 273.15;
   if (!(TsK > 0 && TaK > 0)) return { error: "Temperatures must be above absolute zero (F)." };
   if (Ts === Ta) return { error: "The surface and the air are at the same temperature; there is no heat flow." };
@@ -3035,7 +3040,12 @@ export function computeBarePipeHeatLoss({ od_in = 0, surface_f = 0, amb_f = 70, 
   const Dm = od * 0.0254;
   const Ra = 9.80665 / Tf * Math.abs(TsK - TaK) * Dm ** 3 / (nu * nu / Pr);
   if (!(Ra <= 1e12)) return { error: "Rayleigh number above 1e12 is outside the Churchill-Chu correlation; the pipe is too large or too hot for this screen." };
-  const Nu = Math.pow(0.6 + 0.387 * Math.pow(Ra, 1 / 6) / Math.pow(1 + Math.pow(0.559 / Pr, 9 / 16), 8 / 27), 2);
+  const NuN = Math.pow(0.6 + 0.387 * Math.pow(Ra, 1 / 6) / Math.pow(1 + Math.pow(0.559 / Pr, 9 / 16), 8 / 27), 2);
+  const reynolds = wind * 0.44704 * Dm / nu;
+  const forced_nusselt = wind > 0
+    ? 0.3 + 0.62 * Math.sqrt(reynolds) * Math.cbrt(Pr) / Math.pow(1 + Math.pow(0.4 / Pr, 2 / 3), 0.25) * Math.pow(1 + Math.pow(reynolds / 282000, 5 / 8), 0.8)
+    : 0;
+  const Nu = wind > 0 ? Math.cbrt(forced_nusselt ** 3 + NuN ** 3) : NuN;
   const conv_coefficient = Nu * kAir / Dm * 0.17611; // W/m2K -> BTU/hr ft2 F
   const sigma = 0.1714e-8; // BTU/hr ft2 R4
   const TsR = Ts + 459.67, TaR = Ta + 459.67;
@@ -3047,7 +3057,8 @@ export function computeBarePipeHeatLoss({ od_in = 0, surface_f = 0, amb_f = 70, 
   if (![conv_coefficient, rad_coefficient, q_per_ft_btuh, q_total_btuh].every(Number.isFinite)) return { error: "Heat-loss math is not a finite value; check the inputs." };
   return {
     conv_coefficient, rad_coefficient, q_per_ft_btuh, q_total_btuh, conv_share, rayleigh: Ra, gain: Ts < Ta,
-    note: "Heat lost from the outside of a bare horizontal pipe to still room air: natural convection by the Churchill-Chu correlation for a horizontal cylinder, with air properties at the film temperature, plus radiation to surroundings at the air temperature, q = eps sigma (Ts^4 - Ta^4). Radiation is often HALF the loss on a bare steel pipe, which is why a painted or oxidized surface (emissivity about 0.8) loses far more than bright aluminum jacketing (about 0.1). The surface temperature is taken as the fluid temperature, which is close for a thin steel wall with steam or hot water inside. Still air only: any draft raises the convection, and wind outdoors raises it several times. With emissivity 0.8 this reproduces the published bare-steel-pipe table to 80 F still air within about 1.5%. A negative result is a heat GAIN on a pipe colder than the air. A screen; ASTM C680 and the engineer govern.",
+    reynolds, forced_nusselt, natural_nusselt: NuN, prandtl: Pr, windy: wind > 0,
+    note: "Heat lost from the outside of a bare horizontal pipe to still room air: natural convection by the Churchill-Chu correlation for a horizontal cylinder, with air properties at the film temperature, plus radiation to surroundings at the air temperature, q = eps sigma (Ts^4 - Ta^4). Radiation is often HALF the loss on a bare steel pipe, which is why a painted or oxidized surface (emissivity about 0.8) loses far more than bright aluminum jacketing (about 0.1). The surface temperature is taken as the fluid temperature, which is close for a thin steel wall with steam or hot water inside. Enter a wind speed and forced convection across the pipe is added by the Churchill-Bernstein correlation, combined with natural convection as (Nu_F^3 + Nu_N^3)^(1/3): a 10 mph wind raises the convection several times, so an outdoor bare line loses far more than the still-air figure. With emissivity 0.8 this reproduces the published bare-steel-pipe table to 80 F still air within about 1.5%. A negative result is a heat GAIN on a pipe colder than the air. A screen; ASTM C680 and the engineer govern.",
   };
 }
 export const barePipeHeatLossExample = { inputs: { od_in: 2.375, surface_f: 280, amb_f: 80, emissivity: 0.8, length_ft: 1 } };
@@ -3056,25 +3067,26 @@ function renderBarePipeHeatLoss(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: natural convection from a horizontal cylinder (Churchill and Chu, 1975), Nu = {0.60 + 0.387 Ra^(1/6)/[1 + (0.559/Pr)^(9/16)]^(8/27)}^2, air properties at the film temperature, plus gray-body radiation q = eps sigma (Ts^4 - Ta^4), sigma = 0.1714e-8 BTU/hr ft2 R4 (standard heat transfer, as in Incropera and ASHRAE Fundamentals), by name. Still air. A screen; ASTM C680 and the engineer govern.";
   const od = makeNumber("Pipe outside diameter (in; 2-in pipe is 2.375)", "bphl-od", { step: "any", min: "0" });
   const ts = makeNumber("Pipe surface temperature (°F)", "bphl-ts", { step: "any" });
-  const ta = makeNumber("Still-air temperature (°F)", "bphl-ta", { step: "any", value: "70" });
+  const ta = makeNumber("Air temperature (°F)", "bphl-ta", { step: "any", value: "70" });
   const eps = makeNumber("Surface emissivity (0.8 oxidized steel, 0.1 aluminum jacket)", "bphl-eps", { step: "any", min: "0", max: "1", value: "0.8" });
   const len = makeNumber("Pipe length (ft)", "bphl-len", { step: "any", min: "0", value: "1" });
-  for (const f of [od, ts, ta, eps, len]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { od.input.value = "2.375"; ts.input.value = "280"; ta.input.value = "80"; eps.input.value = "0.8"; len.input.value = "1"; update(); });
+  const wind = makeNumber("Wind speed across the pipe (mph, 0 for still air)", "bphl-wind", { step: "any", min: "0", value: "0" });
+  for (const f of [od, ts, ta, eps, len, wind]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { od.input.value = "2.375"; ts.input.value = "280"; ta.input.value = "80"; eps.input.value = "0.8"; len.input.value = "1"; wind.input.value = "0"; update(); });
   const oPF = makeOutputLine(outputRegion, "Heat loss per linear foot", "bphl-out-pf");
   const oT = makeOutputLine(outputRegion, "Total heat loss", "bphl-out-t");
   const oH = makeOutputLine(outputRegion, "Surface coefficients", "bphl-out-h");
   const oNote = makeOutputLine(outputRegion, "Note", "bphl-out-note");
   function readNum(i, d) { if (i.value === "") return d; const n = Number(i.value); return Number.isFinite(n) ? n : NaN; }
   const update = debounce(() => {
-    const r = computeBarePipeHeatLoss({ od_in: readNum(od.input, 0), surface_f: readNum(ts.input, NaN), amb_f: readNum(ta.input, 70), emissivity: readNum(eps.input, 0.8), length_ft: readNum(len.input, 1) });
+    const r = computeBarePipeHeatLoss({ od_in: readNum(od.input, 0), surface_f: readNum(ts.input, NaN), amb_f: readNum(ta.input, 70), emissivity: readNum(eps.input, 0.8), length_ft: readNum(len.input, 1), wind_mph: readNum(wind.input, 0) });
     if (r.error) { oPF.textContent = r.error; oT.textContent = "-"; oH.textContent = "-"; oNote.textContent = ""; return; }
     oPF.textContent = fmt(r.q_per_ft_btuh, 1) + " BTU/hr-ft" + (r.gain ? " (negative: a heat GAIN)" : "");
     oT.textContent = fmt(r.q_total_btuh, 0) + " BTU/hr";
-    oH.textContent = "convection " + fmt(r.conv_coefficient, 2) + " + radiation " + fmt(r.rad_coefficient, 2) + " BTU/hr-ft2-F (" + fmt(r.conv_share * 100, 0) + "% convection)";
+    oH.textContent = "convection " + fmt(r.conv_coefficient, 2) + " + radiation " + fmt(r.rad_coefficient, 2) + " BTU/hr-ft2-F (" + fmt(r.conv_share * 100, 0) + "% convection" + (r.windy ? ", wind Re " + fmt(r.reynolds, 0) : "") + ")";
     oNote.textContent = r.note;
   }, DEBOUNCE_MS);
-  for (const f of [od.input, ts.input, ta.input, eps.input, len.input]) f.addEventListener("input", update);
+  for (const f of [od.input, ts.input, ta.input, eps.input, len.input, wind.input]) f.addEventListener("input", update);
 }
 HVAC_RENDERERS["bare-pipe-heat-loss"] = renderBarePipeHeatLoss;
 

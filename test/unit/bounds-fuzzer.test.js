@@ -59088,3 +59088,17 @@ test("bounds: gas-dp-flow-meter computed Cd is the RHG value at the Reynolds num
   assert.ok("error" in _gdpfC({ ...b, cd_mode: "flange", viscosity_cp: -1 }));
   assert.ok("error" in _gdpfC({ ...b, cd_mode: "nozzle" }));
 });
+
+import { computeBarePipeHeatLoss as _bphW } from "../../calc-hvac.js";
+test("bounds: bare-pipe-heat-loss wind adds Churchill-Bernstein forced convection", () => {
+  const cb = (Re, Pr) => 0.3 + 0.62 * Math.sqrt(Re) * Math.cbrt(Pr) / Math.pow(1 + Math.pow(0.4 / Pr, 2 / 3), 0.25) * Math.pow(1 + Math.pow(Re / 282000, 5 / 8), 0.8);
+  // Incropera Example 7.4: Re 6,071, Pr 0.700 -> Nu 40.6.
+  assert.ok(Math.abs(cb(10 * 0.0127 / 20.92e-6, 0.7) - 40.6) < 0.05);
+  const b = { od_in: 2.375, surface_f: 280, amb_f: 80, emissivity: 0.8, length_ft: 1 };
+  const still = _bphW(b), windy = _bphW({ ...b, wind_mph: 10 });
+  assert.equal(_bphW({ ...b, wind_mph: 0 }).q_per_ft_btuh, still.q_per_ft_btuh);
+  assert.ok(Math.abs(windy.forced_nusselt - cb(windy.reynolds, windy.prandtl)) < 1e-12);
+  assert.ok(windy.q_per_ft_btuh > 2 * still.q_per_ft_btuh);
+  assert.ok(_bphW({ ...b, wind_mph: 20 }).q_per_ft_btuh > windy.q_per_ft_btuh);
+  assert.ok("error" in _bphW({ ...b, wind_mph: -5 }));
+});
