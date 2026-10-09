@@ -23430,7 +23430,7 @@ export const CITATIONS = {
     editionNote: "Both say the same physical thing: flow is driven by the difference of the SQUARES of the absolute pressures, not by the pressure difference. Diameter then dominates everything else, going as roughly the 2.6 to 2.67 power, so a modest increase in size is a large increase in capacity while doubling the length costs only about 30% of the flow. That exponent is why looping a line is such an effective way to add capacity. The two equations can differ substantially on the same segment, which is why both are shown and neither is presented as the answer.",
     assumptions: [
       { name: "Absolute pressures", value: "the driving term is P1 squared minus P2 squared on psia, not on gauge", source: "the published equations" },
-      { name: "Compressibility is entered", value: "flow goes as about Z^-0.5, so assuming 1.0 where Z is below 1 at transmission pressure understates flow; the base pressure is fixed at 14.73 psia", source: "the gas analysis" },
+      { name: "Compressibility", value: "entered, or computed (added 2026-10-09) from the gravity by Sutton pseudo-criticals and Dranchuk-Abou-Kassem at the average pressure (2/3)(P1 + P2 - P1 P2/(P1 + P2)) and the flowing temperature; flow goes as about Z^-0.5, so 1.0 at transmission pressure understates flow; base pressure 14.73 psia", source: "gas-z-factor; the gas analysis" },
       { name: "Uniform elevation", value: "elevation change, two-phase flow and line pack are not modelled", source: "the operator's hydraulic model" },
     ],
   },

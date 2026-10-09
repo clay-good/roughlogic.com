@@ -60,6 +60,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **`gas-pipeline-flow` can compute its own Z.** A "Compressibility Z" select now offers computed, which takes Z from the gas gravity at the standard average line pressure (2/3)(P1 + P2 - P1 P2/(P1 + P2)) and the flowing temperature by the `gas-z-factor` method (Sutton + Dranchuk-Abou-Kassem). On the example 850/600 psig line it is Z = 0.887 at 747 psia, and the Panhandle A flow rises from 142.7 to 152.3 MMSCFD over the Z = 1 entry. Entered Z (the default) is unchanged.
+
 - **`clutch-engagement-energy` gives the average heat at a duty cycle.** Engagements per hour now turn the per-engagement energy into the heat the clutch must shed: the example engagement 60 times an hour is 284 BTU/hr, the figure to hold against the maker's thermal rating.
 
 - **`bond-work-index-power` solves for the finest product a mill can make.** With the available mill power and the feed rate entered, it inverts Bond's law, P80 = [(kW/tph)/(10 Wi) + 1/sqrt(F80)]^-2: 800 kW at 100 st/h on the example ore reaches about 115 microns, where 75 needs 1,090 kW.

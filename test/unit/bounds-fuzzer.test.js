@@ -59013,3 +59013,15 @@ test("bounds: clutch-engagement-energy heat rate is energy x engagements per hou
   assert.equal(_ceeH(b).heat_rate_btuh, 0);
   assert.ok("error" in _ceeH({ ...b, engagements_per_hour: -1 }));
 });
+
+import { computeGasPipelineFlow as _gpfZ, computeGasZFactor as _gzfP } from "../../calc-oilgas.js";
+test("bounds: gas-pipeline-flow computed Z equals gas-z-factor at the average pressure", () => {
+  const b = { equation: "panhandle_a", id_in: 15.5, length_mi: 42, inlet_psig: 850, outlet_psig: 600, gravity: 0.6, flowing_temp_f: 60, efficiency: 0.92 };
+  const c = _gpfZ({ ...b, z_mode: "computed" });
+  const P1 = 864.7, P2 = 614.7, Pavg = (2 / 3) * (P1 + P2 - (P1 * P2) / (P1 + P2));
+  assert.ok(Math.abs(c.avg_pressure_psia - Pavg) < 1e-9);
+  assert.ok(Math.abs(c.z_used - _gzfP({ gas_gravity: 0.6, pressure_psig: Pavg - 14.7, temperature_f: 60 }).z) < 1e-12);
+  // Entering that same Z reproduces the flow.
+  assert.ok(Math.abs(_gpfZ({ ...b, z_factor: c.z_used }).q_scfd - c.q_scfd) < 1e-6);
+  assert.ok("error" in _gpfZ({ ...b, z_mode: "guess" }));
+});

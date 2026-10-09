@@ -233,16 +233,19 @@ const _ogPanhandleA = (tb, pb, dp2, g, t, l, z, d, e) =>
   _OG_PANHANDLE_A_COEFF * Math.pow(tb / pb, _OG_PANHANDLE_A_TB_EXP)
   * Math.pow(dp2 / (Math.pow(g, _OG_PANHANDLE_A_GRAVITY_EXP) * t * l * z), _OG_PANHANDLE_A_BRACKET_EXP)
   * Math.pow(d, _OG_PANHANDLE_A_DIAMETER_EXP) * e;
-// dims: in { id_in: L, length_mi: L, inlet_psig: M L^-1 T^-2, outlet_psig: M L^-1 T^-2, gravity: dimensionless, flowing_temp_f: T, z_factor: dimensionless, efficiency: dimensionless, alternate_id_in: L } out: { squared_difference: dimensionless, q_scfd: L^3 T^-1, q_mmscfd: L^3 T^-1, alternate_q_scfd: L^3 T^-1, diameter_capacity_ratio: dimensionless }
+// Computed Z added 2026-10-09: z_mode "computed" takes Z from gas-z-factor (Sutton + Dranchuk-Abou-Kassem) at the
+// standard average flowing pressure P_avg = (2/3)(P1 + P2 - P1 P2/(P1 + P2)) and the flowing temperature.
+// dims: in { id_in: L, length_mi: L, inlet_psig: M L^-1 T^-2, outlet_psig: M L^-1 T^-2, gravity: dimensionless, flowing_temp_f: T, z_factor: dimensionless, efficiency: dimensionless, alternate_id_in: L, z_mode: dimensionless } out: { squared_difference: dimensionless, q_scfd: L^3 T^-1, q_mmscfd: L^3 T^-1, alternate_q_scfd: L^3 T^-1, diameter_capacity_ratio: dimensionless , z_used: dimensionless, avg_pressure_psia: M L^-1 T^-2 }
 export function computeGasPipelineFlow({
   equation = "panhandle_a", id_in = 0, length_mi = 0, inlet_psig = 0, outlet_psig = 0,
-  gravity = 0.6, flowing_temp_f = 60, z_factor = 1, efficiency = 0.92, alternate_id_in = 0,
+  gravity = 0.6, flowing_temp_f = 60, z_factor = 1, efficiency = 0.92, alternate_id_in = 0, z_mode = "entered",
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(id_in > 0)) return { error: "Inside diameter must be positive (in)." };
   if (!(length_mi > 0)) return { error: "Segment length must be positive (miles)." };
   if (!(gravity > 0)) return { error: "Gas specific gravity must be positive." };
-  if (!(z_factor > 0)) return { error: "Compressibility factor must be positive." };
+  if (z_mode !== "entered" && z_mode !== "computed") return { error: "Compressibility must be entered or computed." };
+  if (z_mode === "entered" && !(z_factor > 0)) return { error: "Compressibility factor must be positive." };
   if (!(efficiency > 0 && efficiency <= 1)) return { error: "Pipeline efficiency must be above 0 and at most 1." };
   if (alternate_id_in < 0) return { error: "Alternate diameter cannot be negative (in)." };
   const inlet_psia = inlet_psig + _OG_ATM_PSIA;
@@ -255,8 +258,15 @@ export function computeGasPipelineFlow({
   // The driving term. Reported on its own because it is the part that is
   // counter-intuitive and the part a field decision usually turns on.
   const squared_difference = inlet_psia * inlet_psia - outlet_psia * outlet_psia;
-  const weymouth_scfd = _ogWeymouth(_OG_BASE_TEMP_R, _OG_BASE_PRESSURE_PSIA, squared_difference, gravity, flowing_temp_r, length_mi, z_factor, id_in, efficiency);
-  const panhandle_scfd = _ogPanhandleA(_OG_BASE_TEMP_R, _OG_BASE_PRESSURE_PSIA, squared_difference, gravity, flowing_temp_r, length_mi, z_factor, id_in, efficiency);
+  const avg_pressure_psia = (2 / 3) * (inlet_psia + outlet_psia - (inlet_psia * outlet_psia) / (inlet_psia + outlet_psia));
+  let z_used = z_factor;
+  if (z_mode === "computed") {
+    const zr = computeGasZFactor({ gas_gravity: gravity, pressure_psig: avg_pressure_psia - _OG_ATM_PSIA, temperature_f: flowing_temp_f });
+    if (zr.error) return { error: "Computed Z: " + zr.error };
+    z_used = zr.z;
+  }
+  const weymouth_scfd = _ogWeymouth(_OG_BASE_TEMP_R, _OG_BASE_PRESSURE_PSIA, squared_difference, gravity, flowing_temp_r, length_mi, z_used, id_in, efficiency);
+  const panhandle_scfd = _ogPanhandleA(_OG_BASE_TEMP_R, _OG_BASE_PRESSURE_PSIA, squared_difference, gravity, flowing_temp_r, length_mi, z_used, id_in, efficiency);
   const is_weymouth = equation === "weymouth";
   const q_scfd = is_weymouth ? weymouth_scfd : panhandle_scfd;
   const alternate_q_scfd = is_weymouth ? panhandle_scfd : weymouth_scfd;
@@ -274,11 +284,11 @@ export function computeGasPipelineFlow({
     : "a " + fmt(alternate_id_in, 2) + " in line carries " + fmt(diameter_capacity_ratio, 2) + " times this one at the same pressures, from the d^" + fmt(diameter_exp, 4) + " exponent -- a " + fmt((alternate_id_in / id_in - 1) * 100, 0) + "% diameter change for a " + fmt((diameter_capacity_ratio - 1) * 100, 0) + "% capacity change";
   if (![squared_difference, q_scfd, alternate_q_scfd, q_mmscfd, diameter_capacity_ratio].every(Number.isFinite)) return { error: "Gas pipeline flow math is not a finite value." };
   return {
-    inlet_psia, outlet_psia, squared_difference, flowing_temp_r,
+    inlet_psia, outlet_psia, squared_difference, flowing_temp_r, z_used, z_computed: z_mode === "computed", avg_pressure_psia,
     q_scfd, q_mscfd, q_mmscfd, equation_label,
     alternate_q_scfd, alternate_label,
     has_alternate, diameter_capacity_ratio, diameter_verdict,
-    note: "Steady-state gas transmission flow by the two equations the trade actually uses, reported side by side because the choice between them is a judgment. Both say the same physical thing: flow is driven by the difference of the SQUARES of the absolute pressures, not by the pressure difference. That squared form is the part worth carrying in the field, because it means dropping the outlet pressure buys much more additional flow on a high-pressure line than the same drop does on a low-pressure one. Weymouth suits short, smaller-diameter, high-friction and rough pipe and is generally conservative on large lines; Panhandle A suits long large-diameter transmission at higher flow. They can differ substantially on the same segment, which is why both are shown and neither is presented as the answer. Diameter dominates everything else: capacity goes as diameter to roughly the 2.6 to 2.67 power, so a modest increase in size is a large increase in capacity while doubling the length costs only about 30 percent of the flow. That exponent is why looping a line -- laying a parallel segment -- is such an effective way to add capacity, and why a small restriction anywhere in a run costs more than intuition suggests. Efficiency is where a real line differs from a calculated one: a factor near 0.92 is a clean dry line, and liquid holdup, internal corrosion product, or a partially closed valve show up here and are the usual reason measured flow falls short of predicted. Compressibility is ENTERED because it depends on pressure, temperature and composition (gas-z-factor computes it from the gas gravity), and assuming 1.0 at transmission pressure, where Z runs below 1, UNDERSTATES the flow -- the equations go as about Z^-0.5 (0.85 gives 8% more than 1.0). This is a steady-state, isothermal, single-phase screen at one uniform elevation: it does not handle elevation change, two-phase or liquid-bearing flow, transients and line pack, or compressor station hydraulics, and it does not select the equation for you. The operator's own hydraulic model and the pipeline engineer of record govern.",
+    note: "Steady-state gas transmission flow by the two equations the trade actually uses, reported side by side because the choice between them is a judgment. Both say the same physical thing: flow is driven by the difference of the SQUARES of the absolute pressures, not by the pressure difference. That squared form is the part worth carrying in the field, because it means dropping the outlet pressure buys much more additional flow on a high-pressure line than the same drop does on a low-pressure one. Weymouth suits short, smaller-diameter, high-friction and rough pipe and is generally conservative on large lines; Panhandle A suits long large-diameter transmission at higher flow. They can differ substantially on the same segment, which is why both are shown and neither is presented as the answer. Diameter dominates everything else: capacity goes as diameter to roughly the 2.6 to 2.67 power, so a modest increase in size is a large increase in capacity while doubling the length costs only about 30 percent of the flow. That exponent is why looping a line -- laying a parallel segment -- is such an effective way to add capacity, and why a small restriction anywhere in a run costs more than intuition suggests. Efficiency is where a real line differs from a calculated one: a factor near 0.92 is a clean dry line, and liquid holdup, internal corrosion product, or a partially closed valve show up here and are the usual reason measured flow falls short of predicted. Compressibility depends on pressure, temperature and composition; enter it, or choose computed and Z comes from the gas gravity at the average line pressure (2/3)(P1 + P2 - P1 P2/(P1 + P2)) by the gas-z-factor method. Assuming 1.0 at transmission pressure, where Z runs below 1, UNDERSTATES the flow -- the equations go as about Z^-0.5 (0.85 gives 8% more than 1.0). This is a steady-state, isothermal, single-phase screen at one uniform elevation: it does not handle elevation change, two-phase or liquid-bearing flow, transients and line pack, or compressor station hydraulics, and it does not select the equation for you. The operator's own hydraulic model and the pipeline engineer of record govern.",
   };
 }
 export const gasPipelineFlowExample = { inputs: { equation: "panhandle_a", id_in: 15.5, length_mi: 42, inlet_psig: 850, outlet_psig: 600, gravity: 0.60, flowing_temp_f: 60, z_factor: 1.0, efficiency: 0.92, alternate_id_in: 19.25 } };
@@ -293,7 +303,8 @@ OILGAS_RENDERERS["gas-pipeline-flow"] = _simpleRenderer({
     { key: "outlet_psig", label: "Outlet pressure (psig)", kind: "number" },
     { key: "gravity", label: "Gas specific gravity (air = 1)", kind: "number", default: 0.6 },
     { key: "flowing_temp_f", label: "Flowing temperature (°F)", kind: "number", attrs: { step: "any" }, default: 60 },
-    { key: "z_factor", label: "Compressibility factor Z", kind: "number", default: 1 },
+    { key: "z_mode", label: "Compressibility Z", kind: "select", default: "entered", options: [{ value: "entered", label: "Entered below" }, { value: "computed", label: "Computed from gravity at the average line pressure (Sutton + DAK)" }] },
+    { key: "z_factor", label: "Compressibility factor Z (when entered)", kind: "number", default: 1 },
     { key: "efficiency", label: "Pipeline efficiency E (0-1)", kind: "number", default: 0.92 },
     { key: "alternate_id_in", label: "Alternative diameter (in, 0 to skip)", kind: "number" },
   ],
@@ -301,6 +312,7 @@ OILGAS_RENDERERS["gas-pipeline-flow"] = _simpleRenderer({
     { key: "d", id: "gpf-out-d", label: "Driving term", value: (r) => fmt(r.squared_difference, 0) + " psia² (" + fmt(r.inlet_psia, 1) + "² − " + fmt(r.outlet_psia, 1) + "²)" },
     { key: "q", id: "gpf-out-q", label: "Flow", value: (r) => fmt(r.q_mmscfd, 2) + " MMSCFD (" + fmt(r.q_mscfd, 0) + " MSCFD) by " + r.equation_label },
     { key: "a", id: "gpf-out-a", label: "By the other equation", value: (r) => fmt(r.alternate_q_scfd / 1000000, 2) + " MMSCFD by " + r.alternate_label },
+    { key: "z", id: "gpf-out-z", label: "Compressibility used", value: (r) => "Z = " + fmt(r.z_used, 4) + (r.z_computed ? " (computed at the " + fmt(r.avg_pressure_psia, 0) + " psia average pressure)" : " (entered)") },
     { key: "l", id: "gpf-out-l", label: "Larger pipe", value: (r) => r.diameter_verdict },
     { key: "n", id: "gpf-out-n", label: "Note", value: (r) => r.note },
   ],

@@ -169611,6 +169611,42 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "gas-pipeline-flow",
+  "source_publisher": "Project (first-principles)",
+  "source_title": "Example line with Z computed at the average pressure",
+  "source_edition_or_year": "Panhandle A with Sutton + DAK Z",
+  "source_section_or_page": "P_avg = (2/3)(864.7 + 614.7 - 864.7 x 614.7/1479.4) = 746.7 psia; Z(0.6 SG, 60 F) = 0.8873; Q = 142.75 x 0.8873^-0.5394 = 152.26 MMSCFD (Panhandle A goes as Z^-0.5394)",
+  "verified_by": "rl",
+  "verified_on": "2026-10-09",
+  "inputs": {
+   "equation": "panhandle_a",
+   "id_in": 15.5,
+   "length_mi": 42,
+   "inlet_psig": 850,
+   "outlet_psig": 600,
+   "gravity": 0.6,
+   "flowing_temp_f": 60,
+   "z_factor": 1.0,
+   "efficiency": 0.92,
+   "alternate_id_in": 19.25,
+   "z_mode": "computed"
+  },
+  "outputs": {
+   "z_used": {
+    "value": 0.8873,
+    "tolerance": {
+     "pct": 0.5
+    }
+   },
+   "q_mmscfd": {
+    "value": 152.26,
+    "tolerance": {
+     "pct": 0.5
+    }
+   }
+  }
  }
  ]
 }
