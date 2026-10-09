@@ -169584,6 +169584,33 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "clutch-engagement-energy",
+  "source_publisher": "Project (first-principles)",
+  "source_title": "The example engagement repeated 60 times an hour",
+  "source_edition_or_year": "energy per engagement x rate",
+  "source_section_or_page": "4.7304 BTU x 60 = 283.8 BTU/hr",
+  "verified_by": "rl",
+  "verified_on": "2026-10-09",
+  "inputs": {
+   "driver_wr2_lbft2": 20,
+   "driven_wr2_lbft2": 10,
+   "driver_rpm": 1800,
+   "driven_rpm": 0,
+   "slip_torque_lbft": 100,
+   "absorbing_weight_lb": 15,
+   "specific_heat_btu_lbf": 0.12,
+   "engagements_per_hour": 60
+  },
+  "outputs": {
+   "heat_rate_btuh": {
+    "value": 283.83,
+    "tolerance": {
+     "pct": 0.5
+    }
+   }
+  }
  }
  ]
 }

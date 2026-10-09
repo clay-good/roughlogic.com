@@ -59004,3 +59004,12 @@ test("bounds: bond-work-index-power achievable P80 inverts the forward energy", 
   assert.ok(Math.abs(inv.achievable_p80_um - 75) < 1e-9);
   assert.ok("error" in _bwiInv({ work_index_kwh_st: 13, feed_f80_um: 1000, product_p80_um: 75, available_kw: 500 }));
 });
+
+import { computeClutchEngagementEnergy as _ceeH } from "../../calc-machining.js";
+test("bounds: clutch-engagement-energy heat rate is energy x engagements per hour", () => {
+  const b = { driver_wr2_lbft2: 20, driven_wr2_lbft2: 10, driver_rpm: 1800, driven_rpm: 0 };
+  const r = _ceeH({ ...b, engagements_per_hour: 60 });
+  assert.ok(Math.abs(r.heat_rate_btuh - 60 * r.energy_btu) < 1e-12);
+  assert.equal(_ceeH(b).heat_rate_btuh, 0);
+  assert.ok("error" in _ceeH({ ...b, engagements_per_hour: -1 }));
+});

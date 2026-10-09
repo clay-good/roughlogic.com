@@ -11979,7 +11979,7 @@ export const CITATIONS = {
     ],
   },
   "clutch-engagement-energy": {
-    formula: "I = WR^2/g (g = 32.174 ft/s^2); dw = |n1 - n2| x 2 pi/60; E = I1 I2 dw^2/(2 (I1 + I2)) ft lb; E_btu = E/778.169; t_slip = I1 I2 dw/(T (I1 + I2)); n_final = (WR1^2 n1 + WR2^2 n2)/(WR1^2 + WR2^2); dT = E_btu/(C m).",
+    formula: "I = WR^2/g (g = 32.174 ft/s^2); dw = |n1 - n2| x 2 pi/60; E = I1 I2 dw^2/(2 (I1 + I2)) ft lb; E_btu = E/778.169; t_slip = I1 I2 dw/(T (I1 + I2)); n_final = (WR1^2 n1 + WR2^2 n2)/(WR1^2 + WR2^2); dT = E_btu/(C m); average heat = E_btu x engagements per hour.",
     edition: "Clutch and brake energy considerations (Shigley, Mischke and Budynas, Mechanical Engineering Design, Ch. 16), by name: the kinetic energy lost when two inertias lock together by friction, the slip time at a constant torque, and the temperature rise of the absorbing mass.",
     freeAccess: "Conservation of angular momentum and energy; the inertias, speeds, torque, mass, and specific heat are the user's inputs.",
     governance: GOVERNANCE.general,
