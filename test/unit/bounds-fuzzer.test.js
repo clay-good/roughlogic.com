@@ -58500,3 +58500,25 @@ test("bounds: motor-overload-sizing 1 hp or less, automatically started, follows
   assert.equal(_olThermal({ fla_A: 4, protection: "thermal" }).mult, 1.70);
   assert.ok("error" in _olThermal({ fla_A: 4, motor_size: "tiny" }));
 });
+
+import { computeConcreteAnchorBreakout as _cabCrack, computeConcreteAnchorPryout as _capyCrack } from "../../calc-concrete.js";
+test("bounds: anchor breakout and pryout apply the ACI 318-19 17.6.2.5.1 / 17.6.2.6.1 uncracked factors", () => {
+  const base = { embedment_in: 6, fc_psi: 4000, edge_distance_in: 100 };
+  const c = _cabCrack(base);
+  const u = _cabCrack({ ...base, cracking: "uncracked" });
+  assert.equal(c.psi_c, 1.0);
+  assert.equal(u.psi_c, 1.25);
+  assert.equal(u.psi_cp, 1.0); // cast-in takes no splitting factor
+  // Hand: Nb = 24 sqrt(4000) 6^1.5 = 22,308 lb; x 1.25 = 27,885 lb.
+  assert.ok(Math.abs(u.ncb_lb - 27885.48) < 0.05);
+  // Post-installed, hef 4, ca1 8 < cac 16: Nb = 17 sqrt(4000) 8 = 8,601 lb; x 1.4 x 0.5 = 6,021 lb.
+  const pi = _cabCrack({ embedment_in: 4, fc_psi: 4000, edge_distance_in: 8, anchor_type: "post-installed", cracking: "uncracked" });
+  assert.equal(pi.psi_c, 1.4);
+  assert.equal(pi.psi_cp, 0.5);
+  assert.ok(Math.abs(pi.ncb_lb - 6020.98) < 0.05);
+  // At cac the splitting factor lifts to 1.0; below 1.5 hef it floors at 1.5 hef / cac.
+  assert.equal(_cabCrack({ embedment_in: 4, fc_psi: 4000, edge_distance_in: 16, anchor_type: "post-installed", cracking: "uncracked" }).psi_cp, 1.0);
+  assert.equal(_cabCrack({ embedment_in: 4, fc_psi: 4000, edge_distance_in: 2, anchor_type: "post-installed", cracking: "uncracked" }).psi_cp, 0.375);
+  assert.ok(Math.abs(_capyCrack({ ...base, cracking: "uncracked" }).vcp_lb - 2 * 27885.48) < 0.1);
+  assert.ok("error" in _cabCrack({ ...base, cracking: "partly" }));
+});

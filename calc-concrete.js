@@ -1686,8 +1686,8 @@ CONCRETE_RENDERERS["concrete-cracked-inertia-tee"] = _simpleRenderer({
 
 // ===================== spec-v548: cast-in anchor tension concrete breakout (ACI 318-19 Ch. 17) =====================
 
-// dims: in { embedment_in: L, fc_psi: M L^-1 T^-2, edge_distance_in: L, anchor_type: dimensionless, lambda: dimensionless } out: { nb_lb: M L T^-2, ncb_lb: M L T^-2, phi_ncb_lb: M L T^-2, phi_tension: dimensionless }
-export function computeConcreteAnchorBreakout({ embedment_in = 0, fc_psi = 0, edge_distance_in = 0, anchor_type = "cast-in", lambda = 1.0 } = {}) {
+// dims: in { embedment_in: L, fc_psi: M L^-1 T^-2, edge_distance_in: L, anchor_type: dimensionless, lambda: dimensionless, cracking: dimensionless } out: { nb_lb: M L T^-2, ncb_lb: M L T^-2, phi_ncb_lb: M L T^-2, phi_tension: dimensionless }
+export function computeConcreteAnchorBreakout({ embedment_in = 0, fc_psi = 0, edge_distance_in = 0, anchor_type = "cast-in", lambda = 1.0, cracking = "cracked" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const hef = Number(embedment_in) || 0;
   const fc = Number(fc_psi) || 0;
@@ -1702,6 +1702,7 @@ export function computeConcreteAnchorBreakout({ embedment_in = 0, fc_psi = 0, ed
   // by its ACI 355.2 / 355.4 category, 0.65 / 0.55 / 0.45 for Category 1 / 2 / 3.
   const _anchor = { "cast-in": [24, 0.70], "post-installed": [17, 0.65], "post-installed-cat2": [17, 0.55], "post-installed-cat3": [17, 0.45] }[anchor_type];
   if (!_anchor) return { error: "Anchor type must be cast-in or post-installed (Category 1, 2 or 3)." };
+  if (cracking !== "cracked" && cracking !== "uncracked") return { error: "Cracking must be cracked or uncracked." };
   const [kc, phi_tension] = _anchor;
   // ACI 318-19 17.3.1 caps f'c in the anchor equations at 10,000 psi cast-in and 8,000 psi
   // post-installed. Added 2026-10-07, after the shear-breakout and blowout tiles (2026-10-03):
@@ -1711,11 +1712,19 @@ export function computeConcreteAnchorBreakout({ embedment_in = 0, fc_psi = 0, ed
   const psi_ed = ca1 < 1.5 * hef ? 0.7 + 0.3 * ca1 / (1.5 * hef) : 1.0;
   const ANc = Math.min(ca1 + 1.5 * hef, 3 * hef) * (2 * 1.5 * hef);
   const area_ratio = Math.min(ANc / ANco, 1.0);
-  const ncb_lb = area_ratio * psi_ed * nb_lb;
+  // ACI 318-19 17.6.2.5.1, added 2026-10-09: psi_c,N = 1.25 cast-in and 1.4 post-installed (kc = 17)
+  // where analysis shows no cracking at service loads, 1.0 cracked. An uncracked post-installed anchor
+  // without splitting reinforcement also takes psi_cp,N (17.6.2.6.1) with the 17.9.5 default critical
+  // edge distance cac = 4 hef (torque- or displacement-controlled expansion; undercut is 2.5 hef).
+  const uncracked = cracking === "uncracked";
+  const psi_c = uncracked ? (anchor_type === "cast-in" ? 1.25 : 1.4) : 1.0;
+  const cac = 4 * hef;
+  const psi_cp = uncracked && anchor_type !== "cast-in" && ca1 < cac ? Math.max(ca1 / cac, 1.5 * hef / cac) : 1.0;
+  const ncb_lb = area_ratio * psi_ed * psi_c * psi_cp * nb_lb;
   const phi_ncb_lb = phi_tension * ncb_lb;
   return {
-    nb_lb, ANco, psi_ed, ANc, area_ratio, ncb_lb, phi_ncb_lb, kc, phi_tension,
-    note: "The basic strength scales with the embedment to the 1.5 power (a deeper anchor gains fast); a near-edge anchor loses capacity to the edge factor psi_ed and a truncated projected area (a full cone needs 1.5 hef of edge on all sides). Cast-in (kc = 24) and post-installed (kc = 17) anchors differ; the cracked-vs-uncracked factor psi_c also applies (taken as 1.0 here). phi is Condition B (no supplementary reinforcement): 0.70 cast-in, and 0.65 / 0.55 / 0.45 for a post-installed anchor qualified in Category 1 / 2 / 3. ACI 318-19 Chapter 17 and the engineer of record govern.",
+    nb_lb, ANco, psi_ed, ANc, area_ratio, psi_c, psi_cp, ncb_lb, phi_ncb_lb, kc, phi_tension,
+    note: "The basic strength scales with the embedment to the 1.5 power (a deeper anchor gains fast); a near-edge anchor loses capacity to the edge factor psi_ed and a truncated projected area (a full cone needs 1.5 hef of edge on all sides). Cast-in (kc = 24) and post-installed (kc = 17) anchors differ. Concrete shown by analysis to stay uncracked at service loads takes psi_c,N = 1.25 cast-in or 1.4 post-installed (17.6.2.5.1); an uncracked post-installed anchor without splitting reinforcement closer to an edge than cac also takes psi_cp,N = max(ca,min, 1.5 hef)/cac (17.6.2.6.1), with the 17.9.5 default cac = 4 hef for expansion anchors (an undercut anchor's 2.5 hef or the product report's value would be less conservative). phi is Condition B (no supplementary reinforcement): 0.70 cast-in, and 0.65 / 0.55 / 0.45 for a post-installed anchor qualified in Category 1 / 2 / 3. ACI 318-19 Chapter 17 and the engineer of record govern.",
   };
 }
 
@@ -1860,7 +1869,7 @@ CONCRETE_RENDERERS["concrete-corbel-bracket"] = _simpleRenderer({
 });
 
 CONCRETE_RENDERERS["concrete-anchor-breakout"] = _simpleRenderer({
-  citation: "Citation: ACI 318-19 Section 17.6.2 concrete breakout in tension (CCD method): Nb = kc lambda sqrt(f'c) hef^1.5 (kc = 24 cast-in, 17 post-installed), ANco = 9 hef^2, edge factor psi_ed = 0.7 + 0.3 ca1/(1.5 hef) when ca1 < 1.5 hef, Ncb = (ANc/ANco) psi_ed Nb, phiNcb = phi Ncb, phi 0.70 cast-in and 0.65 / 0.55 / 0.45 post-installed Category 1 / 2 / 3 (Condition B, no supplementary reinforcement). The basic strength scales with embedment^1.5; a near-edge anchor loses capacity to the edge factor and a truncated projected area. Cracked-vs-uncracked psi_c applies (1.0 here). ACI 318 Chapter 17 and the engineer of record govern.",
+  citation: "Citation: ACI 318-19 Section 17.6.2 concrete breakout in tension (CCD method): Nb = kc lambda sqrt(f'c) hef^1.5 (kc = 24 cast-in, 17 post-installed), ANco = 9 hef^2, edge factor psi_ed = 0.7 + 0.3 ca1/(1.5 hef) when ca1 < 1.5 hef, Ncb = (ANc/ANco) psi_ed Nb, phiNcb = phi Ncb, phi 0.70 cast-in and 0.65 / 0.55 / 0.45 post-installed Category 1 / 2 / 3 (Condition B, no supplementary reinforcement). The basic strength scales with embedment^1.5; a near-edge anchor loses capacity to the edge factor and a truncated projected area. Cracking factor psi_c,N = 1.0 cracked, 1.25 cast-in / 1.4 post-installed uncracked (17.6.2.5.1); uncracked post-installed splitting factor psi_cp,N = max(ca,min, 1.5 hef)/cac with cac = 4 hef (17.6.2.6.1, 17.9.5). ACI 318 Chapter 17 and the engineer of record govern.",
   example: concreteAnchorBreakoutExample.inputs,
   fields: [
     { key: "embedment_in", label: "Effective embedment hef (in)", kind: "number" },
@@ -1868,10 +1877,11 @@ CONCRETE_RENDERERS["concrete-anchor-breakout"] = _simpleRenderer({
     { key: "edge_distance_in", label: "Nearest edge distance ca1 (in, large = away)", kind: "number" },
     { key: "anchor_type", label: "Anchor type", kind: "select", options: [{ value: "cast-in", label: "Cast-in (kc = 24)" }, { value: "post-installed", label: "Post-installed, Category 1 (kc = 17)" }, { value: "post-installed-cat2", label: "Post-installed, Category 2 (kc = 17)" }, { value: "post-installed-cat3", label: "Post-installed, Category 3 (kc = 17)" }] },
     { key: "lambda", label: "Lightweight factor lambda", kind: "number" },
+    { key: "cracking", label: "Concrete at service loads", kind: "select", options: [{ value: "cracked", label: "Cracked (psi_c,N 1.0)" }, { value: "uncracked", label: "Uncracked by analysis (psi_c,N 1.25 cast-in, 1.4 post-installed)" }] },
   ],
   outputs: [
     { key: "nb", id: "cab-out-nb", label: "Basic breakout Nb", value: (r) => fmt(r.nb_lb, 0) + " lb" },
-    { key: "ncb", id: "cab-out-ncb", label: "Nominal breakout Ncb (edge-modified)", value: (r) => fmt(r.ncb_lb, 0) + " lb (psi_ed " + fmt(r.psi_ed, 2) + ", area " + fmt(r.area_ratio, 3) + ")" },
+    { key: "ncb", id: "cab-out-ncb", label: "Nominal breakout Ncb (edge-modified)", value: (r) => fmt(r.ncb_lb, 0) + " lb (psi_ed " + fmt(r.psi_ed, 2) + ", area " + fmt(r.area_ratio, 3) + (r.psi_c !== 1 ? ", psi_c,N " + fmt(r.psi_c, 2) : "") + (r.psi_cp !== 1 ? ", psi_cp,N " + fmt(r.psi_cp, 3) : "") + ")" },
     { key: "phi", id: "cab-out-phi", label: "Design capacity phiNcb", value: (r) => fmt(r.phi_ncb_lb, 0) + " lb" },
     { key: "n", id: "cab-out-n", label: "Note", value: (r) => r.note },
   ],
@@ -2059,10 +2069,10 @@ CONCRETE_RENDERERS["concrete-anchor-shear-breakout"] = _simpleRenderer({
 // Vcp = kcp x Ncp, Ncp = Ncb (the tension-breakout strength, computed by CALLING the landed
 // computeConcreteAnchorBreakout so the two tiles can never drift); kcp = 1.0 for hef < 2.5 in,
 // 2.0 for hef >= 2.5 in; phi = 0.70 Condition B. Governs short stiff anchors AWAY from an edge.
-// dims: in { embedment_in: L, fc_psi: M L^-1 T^-2, edge_distance_in: L, anchor_type: dimensionless, lambda: dimensionless } out: { ncb_lb: M L T^-2, vcp_lb: M L T^-2, phi_vcp_lb: M L T^-2 }
-export function computeConcreteAnchorPryout({ embedment_in = 0, fc_psi = 4000, edge_distance_in = 0, anchor_type = "cast-in", lambda = 1.0 } = {}) {
+// dims: in { embedment_in: L, fc_psi: M L^-1 T^-2, edge_distance_in: L, anchor_type: dimensionless, lambda: dimensionless, cracking: dimensionless } out: { ncb_lb: M L T^-2, vcp_lb: M L T^-2, phi_vcp_lb: M L T^-2 }
+export function computeConcreteAnchorPryout({ embedment_in = 0, fc_psi = 4000, edge_distance_in = 0, anchor_type = "cast-in", lambda = 1.0, cracking = "cracked" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
-  const base = computeConcreteAnchorBreakout({ embedment_in, fc_psi, edge_distance_in, anchor_type, lambda });
+  const base = computeConcreteAnchorBreakout({ embedment_in, fc_psi, edge_distance_in, anchor_type, lambda, cracking });
   if (base.error) return { error: base.error };
   const hef = Number(embedment_in) || 0;
   const kcp = hef < 2.5 ? 1.0 : 2.0;
@@ -2070,13 +2080,13 @@ export function computeConcreteAnchorPryout({ embedment_in = 0, fc_psi = 4000, e
   const phi_vcp_lb = 0.70 * vcp_lb;
   if (![vcp_lb, phi_vcp_lb].every(Number.isFinite)) return { error: "Pryout math did not produce a finite value." };
   return {
-    ncb_lb: base.ncb_lb, kcp, vcp_lb, phi_vcp_lb,
-    note: "Pryout is the shear mode that governs SHORT, STIFF anchors AWAY from an edge - the anchor rotates and pries a breakout body out of the surface BEHIND it, so the capacity is proportional to the tension-breakout strength (Vcp = kcp Ncb), not to any edge distance in the shear direction. Near an edge, concrete-anchor-shear-breakout applies instead, and a shear design takes the LEAST of steel, edge breakout, and pryout. kcp jumps from 1.0 to 2.0 at hef = 2.5 in. Single anchor; the group form and psi_c credits are not modeled. phi = 0.70 is Condition B (no supplementary reinforcement). ACI 318 Chapter 17 and the engineer of record govern - a design check, not a stamped anchor design.",
+    ncb_lb: base.ncb_lb, psi_c: base.psi_c, psi_cp: base.psi_cp, kcp, vcp_lb, phi_vcp_lb,
+    note: "Pryout is the shear mode that governs SHORT, STIFF anchors AWAY from an edge - the anchor rotates and pries a breakout body out of the surface BEHIND it, so the capacity is proportional to the tension-breakout strength (Vcp = kcp Ncb), not to any edge distance in the shear direction. Near an edge, concrete-anchor-shear-breakout applies instead, and a shear design takes the LEAST of steel, edge breakout, and pryout. kcp jumps from 1.0 to 2.0 at hef = 2.5 in. Single anchor; the group form is not modeled. Uncracked concrete raises Ncb, and so the pryout, by psi_c,N (17.6.2.5.1; the cracking select). phi = 0.70 is Condition B (no supplementary reinforcement). ACI 318 Chapter 17 and the engineer of record govern - a design check, not a stamped anchor design.",
   };
 }
 export const concreteAnchorPryoutExample = { inputs: { embedment_in: 6, fc_psi: 4000, edge_distance_in: 100, anchor_type: "cast-in", lambda: 1.0 } };
 CONCRETE_RENDERERS["concrete-anchor-pryout"] = _simpleRenderer({
-  citation: "Citation: ACI 318-19 Section 17.7.3 concrete pryout: Vcp = kcp x Ncp with Ncp = Ncb, the Section 17.6.2 tension-breakout strength (17.7.3.1a); kcp = 1.0 for hef < 2.5 in and 2.0 for hef >= 2.5 in; phiVcp = 0.70 Vcp (Condition B, Table 17.5.3). Pryout governs short stiff anchors away from an edge loaded in shear - the anchor pries a breakout body out of the surface behind it, so the capacity tracks the tension breakout, not an edge distance. Near an edge the 17.7.2 shear breakout applies instead; a shear design takes the least of steel, edge breakout, and pryout. ACI 318 Chapter 17 and the engineer of record govern.",
+  citation: "Citation: ACI 318-19 Section 17.7.3 concrete pryout: Vcp = kcp x Ncp with Ncp = Ncb, the Section 17.6.2 tension-breakout strength (17.7.3.1a); kcp = 1.0 for hef < 2.5 in and 2.0 for hef >= 2.5 in; phiVcp = 0.70 Vcp (Condition B, Table 17.5.3). Ncb carries the 17.6.2.5.1 cracking factor psi_c,N (1.25 cast-in, 1.4 post-installed, uncracked). Pryout governs short stiff anchors away from an edge loaded in shear - the anchor pries a breakout body out of the surface behind it, so the capacity tracks the tension breakout, not an edge distance. Near an edge the 17.7.2 shear breakout applies instead; a shear design takes the least of steel, edge breakout, and pryout. ACI 318 Chapter 17 and the engineer of record govern.",
   example: concreteAnchorPryoutExample.inputs,
   fields: [
     { key: "embedment_in", label: "Effective embedment hef (in)", kind: "number" },
@@ -2084,6 +2094,7 @@ CONCRETE_RENDERERS["concrete-anchor-pryout"] = _simpleRenderer({
     { key: "edge_distance_in", label: "Nearest edge distance ca1 (in, large = away)", kind: "number" },
     { key: "anchor_type", label: "Anchor type", kind: "select", options: [{ value: "cast-in", label: "Cast-in (kc = 24)" }, { value: "post-installed", label: "Post-installed, Category 1 (kc = 17)" }, { value: "post-installed-cat2", label: "Post-installed, Category 2 (kc = 17)" }, { value: "post-installed-cat3", label: "Post-installed, Category 3 (kc = 17)" }] },
     { key: "lambda", label: "Lightweight factor lambda_a (1.0 normal weight)", kind: "number" },
+    { key: "cracking", label: "Concrete at service loads", kind: "select", options: [{ value: "cracked", label: "Cracked (psi_c,N 1.0)" }, { value: "uncracked", label: "Uncracked by analysis (psi_c,N 1.25 cast-in, 1.4 post-installed)" }] },
   ],
   outputs: [
     { key: "ncb", id: "capy-out-ncb", label: "Tension breakout Ncb (the base)", value: (r) => fmt(r.ncb_lb, 0) + " lb (" + fmt(r.ncb_lb / 1000, 1) + " kip)" },

@@ -19223,15 +19223,16 @@ export const CITATIONS = {
     ],
   },
   "concrete-anchor-breakout": {
-    formula: "Nb = kc lambda sqrt(f'c) hef^1.5 (kc 24 cast-in, 17 post-installed); ANco = 9 hef^2; psi_ed = 0.7 + 0.3 ca1/(1.5 hef) when ca1 < 1.5 hef; Ncb = (ANc/ANco) psi_ed Nb; phiNcb = phi Ncb, phi 0.70 cast-in and 0.65 / 0.55 / 0.45 post-installed Category 1 / 2 / 3 (Condition B, no supplementary reinforcement).",
+    formula: "Nb = kc lambda sqrt(f'c) hef^1.5 (kc 24 cast-in, 17 post-installed); ANco = 9 hef^2; psi_ed = 0.7 + 0.3 ca1/(1.5 hef) when ca1 < 1.5 hef; Ncb = (ANc/ANco) psi_ed psi_c,N psi_cp,N Nb (psi_c,N 1.0 cracked, 1.25 cast-in / 1.4 post-installed uncracked; psi_cp,N = max(ca1, 1.5 hef)/(4 hef) for an uncracked post-installed anchor with ca1 < 4 hef, else 1.0); phiNcb = phi Ncb, phi 0.70 cast-in and 0.65 / 0.55 / 0.45 post-installed Category 1 / 2 / 3 (Condition B, no supplementary reinforcement).",
     edition: "The ACI 318-19 Section 17.6.2 concrete breakout strength in tension (CCD method), by name.",
     freeAccess: "ACI 318 is readable free through the ACI online reading room at concrete.org; the Chapter 17 anchoring provisions are in the published code.",
     governance: GOVERNANCE.general,
-    editionNote: "The basic strength scales with the embedment to the 1.5 power (a deeper anchor gains fast); a near-edge anchor loses capacity to the edge factor psi_ed and a truncated projected area (a full cone needs 1.5 hef of edge on all sides); cast-in (kc = 24) and post-installed (kc = 17) anchors use different kc; the cracked-vs-uncracked factor psi_c applies (taken as 1.0 here). A design aid, not the engineer of record.",
+    editionNote: "The basic strength scales with the embedment to the 1.5 power (a deeper anchor gains fast); a near-edge anchor loses capacity to the edge factor psi_ed and a truncated projected area (a full cone needs 1.5 hef of edge on all sides); cast-in (kc = 24) and post-installed (kc = 17) anchors use different kc; concrete shown uncracked at service loads takes psi_c,N 1.25 cast-in or 1.4 post-installed, and an uncracked post-installed anchor near an edge takes the splitting factor psi_cp,N with the default cac = 4 hef (added 2026-10-09; until then psi_c was fixed at 1.0, the cracked value). A design aid, not the engineer of record.",
     assumptions: [
       { name: "kc constant", value: "24 cast-in, 17 post-installed (CCD basic-strength coefficient)", source: "ACI 318-19 17.6.2.2" },
       { name: "Projected area", value: "ANco = 9 hef^2; a full breakout cone needs 1.5 hef of edge on all sides", source: "ACI 318-19 17.6.2.1" },
-      { name: "psi_c cracked factor", value: "taken as 1.0 (cracked); an uncracked section with supplementary reinforcement raises it", source: "ACI 318-19 17.6.2.6" },
+      { name: "psi_c,N cracking factor", value: "1.0 cracked; 1.25 cast-in or 1.4 post-installed (kc = 17) where analysis shows no cracking at service loads", source: "ACI 318-19 17.6.2.5.1" },
+      { name: "psi_cp,N splitting factor", value: "uncracked post-installed anchor without splitting reinforcement: max(ca,min, 1.5 hef)/cac when ca,min < cac, with the default cac = 4 hef for expansion anchors (2.5 hef undercut would be less conservative)", source: "ACI 318-19 17.6.2.6.1, 17.9.5" },
     ],
   },
   "concrete-anchor-shear-breakout": {
@@ -19248,11 +19249,11 @@ export const CITATIONS = {
     ],
   },
   "concrete-anchor-pryout": {
-    formula: "Vcp = kcp x Ncp with Ncp = Ncb (the 17.6.2 tension-breakout strength); kcp = 1.0 for hef < 2.5 in, 2.0 for hef >= 2.5 in; phiVcp = 0.70 Vcp (Condition B).",
+    formula: "Vcp = kcp x Ncp with Ncp = Ncb (the 17.6.2 tension-breakout strength, with its psi_c,N cracking factor); kcp = 1.0 for hef < 2.5 in, 2.0 for hef >= 2.5 in; phiVcp = 0.70 Vcp (Condition B).",
     edition: "The ACI 318-19 Section 17.7.3 concrete pryout strength of an anchor in shear (17.7.3.1a), by name.",
     freeAccess: "ACI 318 is readable free through the ACI online reading room at concrete.org; the Chapter 17 anchoring provisions are in the published code.",
     governance: GOVERNANCE.general,
-    editionNote: "Pryout governs SHORT, STIFF anchors AWAY from an edge loaded in shear - the anchor rotates and pries a breakout body out of the surface behind it, so the capacity is proportional to the tension-breakout strength and does not involve an edge distance in the shear direction. Near an edge, the 17.7.2 shear breakout applies instead; a shear design takes the LEAST of steel, edge breakout, and pryout. Ncb here is computed by the same routine as concrete-anchor-breakout, inheriting its documented simplifications (psi_c = 1.0, single edge, Condition B). Single anchor; the group form Vcpg = kcp Ncbg is not modeled. phi = 0.70 is Condition B (no supplementary reinforcement). ACI 318 Chapter 17 and the engineer of record govern - a design check, not a stamped anchor design.",
+    editionNote: "Pryout governs SHORT, STIFF anchors AWAY from an edge loaded in shear - the anchor rotates and pries a breakout body out of the surface behind it, so the capacity is proportional to the tension-breakout strength and does not involve an edge distance in the shear direction. Near an edge, the 17.7.2 shear breakout applies instead; a shear design takes the LEAST of steel, edge breakout, and pryout. Ncb here is computed by the same routine as concrete-anchor-breakout, inheriting its cracking select (psi_c,N 1.0 cracked, 1.25 / 1.4 uncracked, added 2026-10-09) and its documented simplifications (single edge, Condition B). Single anchor; the group form Vcpg = kcp Ncbg is not modeled. phi = 0.70 is Condition B (no supplementary reinforcement). ACI 318 Chapter 17 and the engineer of record govern - a design check, not a stamped anchor design.",
     assumptions: [
       { name: "Pryout base", value: "Ncp = Ncb, the tension concrete-breakout strength; the tile calls the landed breakout routine so the two can never drift", source: "ACI 318-19 17.7.3.1" },
       { name: "kcp threshold", value: "1.0 below hef = 2.5 in, 2.0 at or above it", source: "ACI 318-19 17.7.3.1" },

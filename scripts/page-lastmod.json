@@ -1486,16 +1486,16 @@
       "date": "2026-09-29"
     },
     "/tools/concrete-anchor-breakout/": {
-      "sha": "08cc1119f4b86ebd",
-      "date": "2026-09-29"
+      "sha": "2378bdc31160bfbe",
+      "date": "2026-10-09"
     },
     "/tools/concrete-anchor-interaction/": {
       "sha": "ebdca66192f93b19",
       "date": "2026-09-29"
     },
     "/tools/concrete-anchor-pryout/": {
-      "sha": "539cdde74b7d647a",
-      "date": "2026-09-29"
+      "sha": "b636467361cbe542",
+      "date": "2026-10-09"
     },
     "/tools/concrete-anchor-pullout/": {
       "sha": "e172549056036d64",
