@@ -2,99 +2,99 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "6000ce7c04fa3a9a",
+      "sha": "7290105102c17c57",
       "date": "2026-10-09"
     },
     "/tools/": {
-      "sha": "3a57461f86ff6df1",
+      "sha": "a96211dffa4b3e33",
       "date": "2026-10-09"
     },
     "/collections/disaster-response/": {
-      "sha": "1d6dbf5d7349622f",
+      "sha": "84f1c59891ebc814",
       "date": "2026-10-09"
     },
     "/groups/accounting/": {
-      "sha": "0b0bd35b3237def9",
+      "sha": "2897f5867337713d",
       "date": "2026-10-09"
     },
     "/groups/agriculture/": {
-      "sha": "a166a74e060c4a5d",
+      "sha": "772478c13236372e",
       "date": "2026-10-09"
     },
     "/groups/construction/": {
-      "sha": "9b834a810a49ae7d",
+      "sha": "7f9228abb666a2f3",
       "date": "2026-10-09"
     },
     "/groups/cross-trade/": {
-      "sha": "71e9f9f5721690dc",
+      "sha": "39ed4d9b9fb03629",
       "date": "2026-10-09"
     },
     "/groups/educators/": {
-      "sha": "dae93204aa316804",
+      "sha": "5a11321529c51df2",
       "date": "2026-10-09"
     },
     "/groups/electrical/": {
-      "sha": "2459431255980af4",
+      "sha": "4ca4fd030c4a56d3",
       "date": "2026-10-09"
     },
     "/groups/field/": {
-      "sha": "ed08ed4a6b7a99cd",
+      "sha": "ea5b6d48d35a979a",
       "date": "2026-10-09"
     },
     "/groups/fire-ground/": {
-      "sha": "205307ed984662e8",
+      "sha": "c0d0dbdd8c9fee85",
       "date": "2026-10-09"
     },
     "/groups/historical/": {
-      "sha": "7c12641bd648c2f0",
+      "sha": "4e1dad4bc3e41c18",
       "date": "2026-10-09"
     },
     "/groups/hvac/": {
-      "sha": "50a31cba37087ae4",
+      "sha": "d55243b915fd44c5",
       "date": "2026-10-09"
     },
     "/groups/kitchen/": {
-      "sha": "28bcd55bdc7dc386",
+      "sha": "56c0554847815cfd",
       "date": "2026-10-09"
     },
     "/groups/lab/": {
-      "sha": "6e7876ee198c6b90",
+      "sha": "c2a471b183bd9eb7",
       "date": "2026-10-09"
     },
     "/groups/mechanic/": {
-      "sha": "d89727076f206a79",
+      "sha": "e4a82d1558b13c89",
       "date": "2026-10-09"
     },
     "/groups/plumbing/": {
-      "sha": "a03c1176874e5e1c",
+      "sha": "c4ad50cc18bfbe15",
       "date": "2026-10-09"
     },
     "/groups/real-estate/": {
-      "sha": "504f8ccd86561cc8",
+      "sha": "3b76dfde749a6dd5",
       "date": "2026-10-09"
     },
     "/groups/references/": {
-      "sha": "e85b5ba0d53fb4c6",
+      "sha": "c66a21e52acd52e3",
       "date": "2026-10-09"
     },
     "/groups/restoration/": {
-      "sha": "bf2ccc25c19b205d",
+      "sha": "f78c462fdf797edb",
       "date": "2026-10-09"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "25768d24fc8cc8b0",
+      "sha": "3d1a0bd5e3480d4f",
       "date": "2026-10-09"
     },
     "/groups/stage/": {
-      "sha": "d55ea9a3802156a3",
+      "sha": "6566d5bb8b18a811",
       "date": "2026-10-09"
     },
     "/groups/trucking/": {
-      "sha": "f6dad5162019346a",
+      "sha": "9b11c37a0109acf2",
       "date": "2026-10-09"
     },
     "/groups/water/": {
-      "sha": "598945a401b620cc",
+      "sha": "50d2e2f5713a6442",
       "date": "2026-10-09"
     },
     "/tools/aav-install-check/": {
@@ -570,8 +570,8 @@
       "date": "2026-09-29"
     },
     "/tools/bearing-l10-life/": {
-      "sha": "b198b0cfdb630468",
-      "date": "2026-09-29"
+      "sha": "fc306bd1321168ea",
+      "date": "2026-10-09"
     },
     "/tools/bearing-max-load/": {
       "sha": "7b4f431d1560b447",
@@ -1396,6 +1396,10 @@
     "/tools/column-buckling-wood/": {
       "sha": "f8584f2ccd4a1d1b",
       "date": "2026-09-30"
+    },
+    "/tools/column-secant-formula/": {
+      "sha": "c45678e1443a2653",
+      "date": "2026-10-09"
     },
     "/tools/combined-stress-axial-bending/": {
       "sha": "f6c454b94dd7d8c6",
@@ -2714,8 +2718,8 @@
       "date": "2026-10-03"
     },
     "/tools/euler-johnson-column/": {
-      "sha": "105544de0a425e4a",
-      "date": "2026-09-29"
+      "sha": "3f7111512cc0a1e2",
+      "date": "2026-10-09"
     },
     "/tools/ev-charge-cost/": {
       "sha": "c4986670a66506f1",
@@ -3942,8 +3946,8 @@
       "date": "2026-09-29"
     },
     "/tools/impact-load-factor/": {
-      "sha": "3d164dc452e4741f",
-      "date": "2026-09-29"
+      "sha": "44177ffc9eff7d0d",
+      "date": "2026-10-09"
     },
     "/tools/inclined-plane-force/": {
       "sha": "eeb15e4434b92b77",
@@ -7370,8 +7374,8 @@
       "date": "2026-10-01"
     },
     "/tools/spring-wire-stress/": {
-      "sha": "78f8e88758ab0563",
-      "date": "2026-09-29"
+      "sha": "f58ce9795ee288a6",
+      "date": "2026-10-09"
     },
     "/tools/sprinkler-density/": {
       "sha": "3fd4d560deeb4736",

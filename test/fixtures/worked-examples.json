@@ -168451,6 +168451,46 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "column-secant-formula",
+  "source_publisher": "McGraw-Hill (Beer, Johnston, DeWolf)",
+  "source_title": "Mechanics of Materials, Sample Problem 10.2",
+  "source_edition_or_year": "3rd edition (2002)",
+  "source_section_or_page": "slides 10-16 to 10-18 (Benha University course PDF, '12 Buckling.pdf'): 8 ft fixed-free tube, I 8.0 in^4, A 3.54 in^2, c 2 in, E 29e6 psi, P = Pcr/2 = 31.1 kips at e = 0.75 in",
+  "verified_by": "rl",
+  "verified_on": "2026-10-09",
+  "inputs": {
+   "load_lbf": 31100,
+   "eccentricity_in": 0.75,
+   "extreme_fiber_in": 2,
+   "modulus_psi": 29000000,
+   "yield_strength_psi": 0,
+   "moment_of_inertia_in4": 8.0,
+   "area_in2": 3.54,
+   "length_in": 96,
+   "end_condition": "fixed-free"
+  },
+  "outputs": {
+   "max_stress_psi": {
+    "value": 22000,
+    "tolerance": {
+     "pct": 1
+    }
+   },
+   "max_deflection_in": {
+    "value": 0.939,
+    "tolerance": {
+     "pct": 1
+    }
+   },
+   "critical_load_lbf": {
+    "value": 62100,
+    "tolerance": {
+     "pct": 0.5
+    }
+   }
+  }
  }
  ]
 }

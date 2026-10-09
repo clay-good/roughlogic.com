@@ -24,6 +24,7 @@
 // better match".
 
 const RELATED = {
+  "column-secant-formula": ["euler-johnson-column","combined-stress-axial-bending","section-properties"],
   "conduit-jam-ratio": ["conduit-fill", "pulling-tension", "cable-bend-radius", "min-bend-radius"],
   "velocity-head": ["pipe-velocity", "flow-continuity", "bernoulli-head", "orifice-flow"],
   "flow-continuity": ["pipe-velocity", "velocity-head", "bernoulli-head", "reducer-offset"],

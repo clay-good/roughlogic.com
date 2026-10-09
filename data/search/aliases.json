@@ -116497,6 +116497,31 @@
    "term": "what z factor do i use for natural gas",
    "target": "gas-z-factor",
    "kind": "question"
+  },
+  {
+   "term": "secant formula column",
+   "target": "column-secant-formula",
+   "kind": "industry"
+  },
+  {
+   "term": "eccentric column load",
+   "target": "column-secant-formula",
+   "kind": "industry"
+  },
+  {
+   "term": "eccentrically loaded column stress",
+   "target": "column-secant-formula",
+   "kind": "industry"
+  },
+  {
+   "term": "column load off center",
+   "target": "column-secant-formula",
+   "kind": "question"
+  },
+  {
+   "term": "how much does an off center load weaken a column",
+   "target": "column-secant-formula",
+   "kind": "question"
   }
  ]
 }

@@ -175,6 +175,7 @@ export const BESPOKE_LABELS = {
   "coil-face-velocity": {"cfm":"Airflow (cfm)","face_width_in":"Coil face width (in)","face_height_in":"Coil face height (in)","threshold_fpm":"Carryover threshold (fpm, default 500)"},
   "coil-length": {"outside_diameter_in":"Coil outside diameter OD (in)","inside_diameter_in":"Core / mandrel diameter ID (in)","material_thickness_in":"Material thickness t (in)"},
   "column-buckling-wood": {"b_in":"Column width b (in)","d_in":"Column depth d (in)","le_in":"Unbraced length lu (in) - Ke is applied below","fc_star_psi":"Fc* (psi)","emin_psi":"Emin (psi)","ke":"Effective-length factor Ke"},
+  "column-secant-formula": {"load_lbf":"Axial load P (lbf)","eccentricity_in":"Eccentricity e (in)","extreme_fiber_in":"Distance to the extreme fiber (in)","modulus_psi":"Modulus E (psi)","yield_strength_psi":"Yield strength Sy (psi, blank to skip)","moment_of_inertia_in4":"Moment of inertia I (in⁴)","area_in2":"Cross-section area A (in²)","length_in":"Unbraced length L (in)","end_condition":"End condition"},
   "combustion-air": {"btu_input":"Appliance BTU input","room_volume_ft3":"Room volume (ft³)"},
   "combustion-air-max-input": {"room_volume_ft3":"Room volume (ft³)"},
   "combustion-lambda": {"fuel":"Fuel","flue_o2_pct":"Flue-gas O2 (%, dry, air-free)"},

@@ -1268,7 +1268,7 @@ export function computeEulerJohnsonColumn({ modulus_psi = 30000000, yield_streng
   if (![critical_load_lbf, critical_stress_psi, slenderness_ratio, transition_slenderness].every(Number.isFinite) || !(critical_load_lbf > 0)) return { error: "Column-buckling math is not a finite value; check the inputs." };
   return {
     critical_load_lbf, critical_stress_psi, slenderness_ratio, transition_slenderness, radius_of_gyration_in, effective_length_factor: K, mode,
-    note: "Concentric critical buckling load of a straight, prismatic column by the Euler and J.B. Johnson formulas (Shigley Ch. 4). The radius of gyration r = sqrt(I/A) and the effective slenderness SR = K L/r set the behavior against the transition SR_D = pi sqrt(2 E/Sy). A long column (SR >= SR_D) buckles elastically, Pcr = pi^2 E I/(K L)^2 (Euler), and the load drops with the square of the length. An intermediate column (SR < SR_D) follows the Johnson parabola Pcr = A[Sy - (Sy SR/(2 pi))^2/E], which is tangent to the Euler curve at SR_D and to the squash load A Sy at SR = 0, so it correctly caps the short-column load where the Euler hyperbola would run to infinity. K is the end-condition factor (pinned-pinned 1.0, fixed-free 2.0, fixed-fixed 0.5, fixed-pinned 0.7, theoretical). Concentric load only; the secant formula (eccentric load), local/flange buckling, and code-specific steel/wood/concrete provisions are separate. Apply a safety factor to Pcr. A design aid; Shigley and the engineer of record govern.",
+    note: "Concentric critical buckling load of a straight, prismatic column by the Euler and J.B. Johnson formulas (Shigley Ch. 4). The radius of gyration r = sqrt(I/A) and the effective slenderness SR = K L/r set the behavior against the transition SR_D = pi sqrt(2 E/Sy). A long column (SR >= SR_D) buckles elastically, Pcr = pi^2 E I/(K L)^2 (Euler), and the load drops with the square of the length. An intermediate column (SR < SR_D) follows the Johnson parabola Pcr = A[Sy - (Sy SR/(2 pi))^2/E], which is tangent to the Euler curve at SR_D and to the squash load A Sy at SR = 0, so it correctly caps the short-column load where the Euler hyperbola would run to infinity. K is the end-condition factor (pinned-pinned 1.0, fixed-free 2.0, fixed-fixed 0.5, fixed-pinned 0.7, theoretical). Concentric load only; an eccentric load is column-secant-formula, and local/flange buckling and code-specific steel/wood/concrete provisions are separate. Apply a safety factor to Pcr. A design aid; Shigley and the engineer of record govern.",
   };
 }
 export const eulerJohnsonColumnExample = { inputs: { modulus_psi: 30000000, yield_strength_psi: 40000, moment_of_inertia_in4: 0.05, area_in2: 1.0, length_in: 20, end_condition: "pinned-pinned" } };
@@ -1299,6 +1299,85 @@ function renderEulerJohnsonColumn(inputRegion, outputRegion, citationEl) {
   end.select.addEventListener("change", update);
 }
 MACHINING_RENDERERS["euler-johnson-column"] = renderEulerJohnsonColumn;
+
+// spec-v1935: eccentrically loaded column by the secant formula (Beer & Johnston 10.6; Shigley 4-16).
+// sigma_max = (P/A)[1 + (e c/r^2) sec((K L/2r) sqrt(P/(E A)))], y_max = e[sec(...) - 1]. Stress is NOT linear
+// in P, so a safety factor goes on the LOAD: with Sy entered, the load at first yield is found by bisection.
+// dims: in { load_lbf: M L T^-2, eccentricity_in: L, extreme_fiber_in: L, modulus_psi: M L^-1 T^-2, yield_strength_psi: M L^-1 T^-2, moment_of_inertia_in4: L^4, area_in2: L^2, length_in: L, end_condition: dimensionless } out: { critical_load_lbf: M L T^-2, load_ratio: dimensionless, secant_term: dimensionless, max_deflection_in: L, max_stress_psi: M L^-1 T^-2, yield_load_lbf: M L T^-2, yield_load_factor: dimensionless }
+export function computeColumnSecantFormula({ load_lbf = 0, eccentricity_in = 0, extreme_fiber_in = 0, modulus_psi = 29000000, yield_strength_psi = 0, moment_of_inertia_in4 = 0, area_in2 = 0, length_in = 0, end_condition = "pinned-pinned" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (Number(modulus_psi) > 0 && Number(modulus_psi) < 1e5) return { error: "Enter the modulus E in psi (29,000,000 for steel), not ksi." };
+  const P = Number(load_lbf) || 0, e = Number(eccentricity_in) || 0, c = Number(extreme_fiber_in) || 0;
+  const E = Number(modulus_psi) || 0, Sy = Number(yield_strength_psi) || 0;
+  const I = Number(moment_of_inertia_in4) || 0, A = Number(area_in2) || 0, L = Number(length_in) || 0;
+  const end = COLUMN_END_K[end_condition];
+  if (!(P > 0)) return { error: "Axial load P must be positive (lbf)." };
+  if (e < 0) return { error: "Eccentricity e cannot be negative (in)." };
+  if (!(c > 0)) return { error: "Distance to the extreme fiber c must be positive (in)." };
+  if (!(E > 0)) return { error: "Modulus of elasticity E must be positive (psi)." };
+  if (Sy < 0) return { error: "Yield strength cannot be negative (psi; blank to skip)." };
+  if (!(I > 0)) return { error: "Moment of inertia I must be positive (in^4)." };
+  if (!(A > 0)) return { error: "Cross-section area A must be positive (in^2)." };
+  if (!(L > 0)) return { error: "Length L must be positive (in)." };
+  if (!end) return { error: "End condition must be pinned-pinned, fixed-free, fixed-fixed, or fixed-pinned." };
+  const K = end.k;
+  const r2 = I / A;
+  const critical_load_lbf = (Math.PI * Math.PI * E * I) / Math.pow(K * L, 2);
+  if (!(P < critical_load_lbf)) return { error: "The load reaches the Euler critical load (" + Math.round(critical_load_lbf) + " lbf); the column buckles at any eccentricity." };
+  const sec = (load) => 1 / Math.cos((Math.PI / 2) * Math.sqrt(load / critical_load_lbf));
+  const stress = (load) => (load / A) * (1 + (e * c / r2) * sec(load));
+  const load_ratio = P / critical_load_lbf;
+  const secant_term = sec(P);
+  const max_deflection_in = e * (secant_term - 1);
+  const max_stress_psi = stress(P);
+  let yield_load_lbf = 0, yield_load_factor = 0;
+  if (Sy > 0) {
+    // sigma_max rises monotonically from 0 to infinity on [0, Pcr): bisect for sigma_max = Sy.
+    let lo = 0, hi = critical_load_lbf;
+    for (let i = 0; i < 200; i++) { const m = (lo + hi) / 2; if (stress(m) < Sy) lo = m; else hi = m; }
+    yield_load_lbf = (lo + hi) / 2;
+    yield_load_factor = yield_load_lbf / P;
+  }
+  if (![critical_load_lbf, secant_term, max_deflection_in, max_stress_psi, yield_load_lbf].every(Number.isFinite)) return { error: "Secant-formula math is not a finite value; check the inputs." };
+  return {
+    critical_load_lbf, load_ratio, secant_term, max_deflection_in, max_stress_psi, yield_load_lbf, yield_load_factor,
+    radius_of_gyration_in: Math.sqrt(r2), eccentricity_ratio: e * c / r2, effective_length_factor: K, has_yield: Sy > 0,
+    note: "An eccentric load bends the column as well as compressing it, and the bending feeds on itself: the deflection adds to the lever arm. The secant formula gives the peak stress at mid-height, sigma_max = (P/A)[1 + (e c/r^2) sec((K L/2r) sqrt(P/(E A)))], and the lateral deflection y_max = e[sec(...) - 1], where e c/r^2 is the eccentricity ratio and the secant grows without bound as P approaches the Euler load. Because the stress is not proportional to the load, a safety factor belongs on the LOAD: the load at first yield (Sy entered) divided by the applied load, not Sy over sigma_max. Elastic, initially straight, prismatic column with the same eccentricity at both ends, bending about the axis of I. Local buckling and code column curves (AISC, NDS) are separate. Beer & Johnston and the engineer of record govern.",
+  };
+}
+export const columnSecantFormulaExample = { inputs: { load_lbf: 31100, eccentricity_in: 0.75, extreme_fiber_in: 2, modulus_psi: 29000000, yield_strength_psi: 0, moment_of_inertia_in4: 8.0, area_in2: 3.54, length_in: 96, end_condition: "fixed-free" } };
+function renderColumnSecantFormula(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: the secant formula for an eccentrically loaded column (Beer, Johnston and DeWolf, Mechanics of Materials, Sec. 10.6; Shigley Ch. 4): sigma_max = (P/A)[1 + (e c/r^2) sec((K L/2r) sqrt(P/(E A)))], y_max = e[sec((pi/2) sqrt(P/Pcr)) - 1], Pcr = pi^2 E I/(K L)^2; the load at first yield solves sigma_max = Sy. Elastic, prismatic, equal end eccentricities. A design aid; the engineer of record governs.";
+  const P = makeNumber("Axial load P (lbf)", "csf-p", { step: "any", min: "0" });
+  const e = makeNumber("Eccentricity e (in)", "csf-e", { step: "any", min: "0" });
+  const c = makeNumber("Distance to the extreme fiber (in)", "csf-c", { step: "any", min: "0" });
+  const E = makeNumber("Modulus E (psi)", "csf-mod", { step: "any", min: "0", value: "29000000" });
+  const Sy = makeNumber("Yield strength Sy (psi, blank to skip)", "csf-sy", { step: "any", min: "0" });
+  const I = makeNumber("Moment of inertia I (in⁴)", "csf-i", { step: "any", min: "0" });
+  const A = makeNumber("Cross-section area A (in²)", "csf-a", { step: "any", min: "0" });
+  const L = makeNumber("Unbraced length L (in)", "csf-l", { step: "any", min: "0" });
+  const end = makeSelect("End condition", "csf-end", Object.keys(COLUMN_END_K).map((k) => ({ value: k, label: COLUMN_END_K[k].label, selected: k === "pinned-pinned" })));
+  for (const f of [P, e, c, E, Sy, I, A, L, end]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { P.input.value = "31100"; e.input.value = "0.75"; c.input.value = "2"; E.input.value = "29000000"; Sy.input.value = ""; I.input.value = "8.0"; A.input.value = "3.54"; L.input.value = "96"; end.select.value = "fixed-free"; update(); });
+  const oS = makeOutputLine(outputRegion, "Maximum stress", "csf-out-s");
+  const oY = makeOutputLine(outputRegion, "Lateral deflection", "csf-out-y");
+  const oP = makeOutputLine(outputRegion, "Euler load and P/Pcr", "csf-out-p");
+  const oF = makeOutputLine(outputRegion, "Load at first yield", "csf-out-f");
+  const oNote = makeOutputLine(outputRegion, "Note", "csf-out-note");
+  function readNum(i) { if (i.value === "") return 0; const v = Number(i.value); return Number.isFinite(v) ? v : 0; }
+  const update = debounce(() => {
+    const r = computeColumnSecantFormula({ load_lbf: readNum(P.input), eccentricity_in: readNum(e.input), extreme_fiber_in: readNum(c.input), modulus_psi: readNum(E.input), yield_strength_psi: readNum(Sy.input), moment_of_inertia_in4: readNum(I.input), area_in2: readNum(A.input), length_in: readNum(L.input), end_condition: end.select.value });
+    if (r.error) { oS.textContent = r.error; oY.textContent = "-"; oP.textContent = "-"; oF.textContent = "-"; oNote.textContent = ""; return; }
+    oS.textContent = fmt(r.max_stress_psi, 0) + " psi (secant " + fmt(r.secant_term, 3) + ", eccentricity ratio " + fmt(r.eccentricity_ratio, 3) + ")";
+    oY.textContent = fmt(r.max_deflection_in, 3) + " in";
+    oP.textContent = fmt(r.critical_load_lbf, 0) + " lbf; P/Pcr " + fmt(r.load_ratio, 3) + " (r = " + fmt(r.radius_of_gyration_in, 3) + " in, K = " + fmt(r.effective_length_factor, 2) + ")";
+    oF.textContent = r.has_yield ? fmt(r.yield_load_lbf, 0) + " lbf, " + fmt(r.yield_load_factor, 2) + " times the applied load" : "enter Sy to find it";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [P, e, c, E, Sy, I, A, L]) f.input.addEventListener("input", update);
+  end.select.addEventListener("change", update);
+}
+MACHINING_RENDERERS["column-secant-formula"] = renderColumnSecantFormula;
 
 // ===================== spec-v1297: thick-wall cylinder stress (Lame) =====================
 // hoop-stress-thin-wall gives P D/(2t) "valid for D/t >= 20"; below that (a hydraulic-cylinder tube, thick pipe,

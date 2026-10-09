@@ -175,6 +175,7 @@ export const BESPOKE_OUTPUT_LABELS = {
   "coil-face-velocity": {"face_velocity_fpm":"Face velocity","face_area_ft2":"Face area","note":"Note"},
   "coil-length": {"length_ft":"Coil length","length_in":"Coil length (in)","note":"Note"},
   "column-buckling-wood": {"slenderness_ratio":"Slenderness le/d","cp":"Column stability factor Cp","capacity_lb":"Allowable axial capacity"},
+  "column-secant-formula": {"max_stress_psi":"Maximum stress","max_deflection_in":"Lateral deflection","critical_load_lbf":"Euler load and P/Pcr","has_yield":"Load at first yield","note":"Note"},
   "combustion-air": {"required_volume_ft3":"Required volume","adequate_by_volume":"Adequate by volume","opening_outdoor_in2":"Outdoor opening","opening_indoor_in2":"Indoor opening"},
   "combustion-air-max-input": {"max_btu_input":"Max appliance input (by volume)","note":"Note"},
   "combustion-lambda": {"lambda":"Lambda","excess_air_pct":"Excess air","afr_actual":"Actual air-fuel ratio (by mass)","note":"Note"},

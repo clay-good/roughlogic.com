@@ -121,6 +121,7 @@ export const BESPOKE_OUTPUT_UNITS = {
   "coil-face-velocity": {"face_area_ft2":{"prefix":"","suffix":" ft^2","digits":2}},
   "coil-length": {"length_ft":{"prefix":"","suffix":" ft","digits":1},"length_in":{"prefix":"","suffix":" in","digits":0}},
   "column-buckling-wood": {"capacity_lb":{"prefix":"","suffix":" lb","digits":0}},
+  "column-secant-formula": {"max_deflection_in":{"prefix":"","suffix":" in","digits":3}},
   "combustion-air": {"required_volume_ft3":{"prefix":"","suffix":" ft^3","digits":0},"opening_outdoor_in2":{"prefix":"","suffix":" in^2","digits":1},"opening_indoor_in2":{"prefix":"","suffix":" in^2","digits":1}},
   "combustion-lambda": {"excess_air_pct":{"prefix":"","suffix":"%","digits":1}},
   "commercial-lighting-load": {"lighting_va":{"prefix":"","suffix":" VA","digits":0},"recep_va":{"prefix":"","suffix":" VA","digits":0},"recep_demand_va":{"prefix":"","suffix":" VA","digits":0},"total_va":{"prefix":"","suffix":" VA","digits":0},"total_a":{"prefix":"","suffix":" A","digits":1}},

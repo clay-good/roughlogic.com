@@ -1267,6 +1267,7 @@ export const COMPUTE_MAP = {
   "power-screw-torque": { module: "../../calc-machining.js", fn: "computePowerScrewTorque" },
   "disk-clutch-torque": { module: "../../calc-machining.js", fn: "computeDiskClutchTorque" },
   "euler-johnson-column": { module: "../../calc-machining.js", fn: "computeEulerJohnsonColumn" },
+  "column-secant-formula": { module: "../../calc-machining.js", fn: "computeColumnSecantFormula" },
   "thick-wall-cylinder-stress": { module: "../../calc-machining.js", fn: "computeThickWallCylinderStress" },
   "rack-and-pinion": { module: "../../calc-machining.js", fn: "computeRackAndPinion" },
   "plain-bearing-pressure-pv": { module: "../../calc-machining.js", fn: "computePlainBearingPressurePv" },

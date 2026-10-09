@@ -1589,6 +1589,7 @@ export const RENDERER_MAP = {
   "power-screw-torque": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },
   "disk-clutch-torque": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },
   "euler-johnson-column": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },
+  "column-secant-formula": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },
   "thick-wall-cylinder-stress": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },
   "rack-and-pinion": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },
   "plain-bearing-pressure-pv": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },

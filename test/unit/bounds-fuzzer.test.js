@@ -58562,3 +58562,19 @@ test("bounds: gas-z-factor reproduces the IEOM 2018 DAK table and the Wichert-Az
   assert.ok("error" in _gzf({ gas_gravity: 0.65, pressure_psig: 2000, temperature_f: -200 }));
   assert.ok("error" in _gzf({ gas_gravity: 0.5, pressure_psig: 2000, temperature_f: 150 }));
 });
+
+import { computeColumnSecantFormula as _csf, columnSecantFormulaExample as _csfEx } from "../../calc-machining.js";
+test("bounds: column-secant-formula reproduces Beer and Johnston SP 10.2 and finds the first-yield load", () => {
+  const r = _csf(_csfEx.inputs);
+  assert.ok(Math.abs(r.max_stress_psi - 22000) / 22000 < 0.005);
+  assert.ok(Math.abs(r.max_deflection_in - 0.939) / 0.939 < 0.005);
+  // Zero eccentricity is the centric stress P/A.
+  assert.ok(Math.abs(_csf({ ..._csfEx.inputs, eccentricity_in: 0 }).max_stress_psi - 31100 / 3.54) < 1e-6);
+  // The first-yield load puts sigma_max exactly at Sy and sits below Pcr.
+  const y = _csf({ ..._csfEx.inputs, yield_strength_psi: 36000 });
+  assert.ok(y.yield_load_lbf > 31100 && y.yield_load_lbf < y.critical_load_lbf);
+  assert.ok(Math.abs(_csf({ ..._csfEx.inputs, load_lbf: y.yield_load_lbf }).max_stress_psi - 36000) < 1e-3);
+  assert.ok("error" in _csf({ ..._csfEx.inputs, load_lbf: 70000 }));
+  assert.ok("error" in _csf({ ..._csfEx.inputs, modulus_psi: 29000 }));
+  assert.ok("error" in _csf({ ..._csfEx.inputs, end_condition: "free" }));
+});
