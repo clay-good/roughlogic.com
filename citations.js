@@ -12631,6 +12631,18 @@ export const CITATIONS = {
       { name: "Failure mode", value: "too little engagement strips the threads before the bolt yields", source: "fastener practice" },
     ],
   },
+  "weld-preheat-cet": {
+    formula: "CET = C + (Mn + Mo)/10 + (Cr + Cu)/20 + Ni/40; d = t x 25.4 mm; Q = arc energy x efficiency / 25.4 kJ/mm; Tp = 697 CET + 160 tanh(d/35) + 62 HD^0.35 + (53 CET - 32) Q - 328 degC; valid CET 0.20-0.50, d 10-90 mm, HD 1-20 ml/100 g, Q 0.5-4.0 kJ/mm.",
+    edition: "EN 1011-2:2001 Annex C, Method B (the CET method of Uwer and Hohne), by name, as published by AG der Dillinger Huttenwerke in its welding e-service.",
+    freeAccess: "The CET and preheat equations and their validity ranges are published free by Dillinger (service.dillinger.de, e-service welding help); the chemistry, thickness, hydrogen, and heat input are the user's inputs.",
+    governance: GOVERNANCE.general,
+    editionNote: "Minimum preheat and interpass temperature to avoid hydrogen-assisted cold cracking in non-alloy and low-alloy steels, by the European CET method; it is not the AWS D1.1 prequalified table or Annex H. Arc efficiency per EN 1011-1 (0.8 SMAW and GMAW, 0.6 GTAW, 1.0 SAW). Outside the validity ranges the tile returns an error rather than extrapolate. A screen; the WPS and the steel maker govern.",
+    assumptions: [
+      { name: "CET", value: "C + (Mn + Mo)/10 + (Cr + Cu)/20 + Ni/40, weight percent", source: "EN 1011-2 Annex C; Dillinger" },
+      { name: "Preheat equation", value: "Tp = 697 CET + 160 tanh(d/35) + 62 HD^0.35 + (53 CET - 32) Q - 328 degC", source: "EN 1011-2 Annex C Method B; Dillinger" },
+      { name: "Heat input", value: "Q = arc energy x efficiency, EN 1011-1 efficiencies", source: "EN 1011-1" },
+    ],
+  },
   "weld-cooling-rate-t85": {
     formula: "3D: t8/5 = (6700 - 5 T0) x Q x [1/(500 - T0) - 1/(800 - T0)] x F3. 2D: t8/5 = (4300 - 4.3 T0) x 1e5 x Q^2 / d^2 x [1/(500 - T0)^2 - 1/(800 - T0)^2] x F2. The transition thickness is where the two are equal; the larger value governs.",
     edition: "The t8/5 weld cooling-time model in its two- and three-dimensional heat-flow forms, with the transition thickness where they cross, by name -- the formulation published in EN 1011-2 and the standard welding-metallurgy references, cited and not reproduced. Heat input in kJ/mm, temperatures in degrees Celsius, and thickness in millimetres, which is the notation this model is universally written in. The welding procedure specification, the carbon-equivalent screen, and a qualified welding engineer govern.",

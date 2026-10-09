@@ -58865,3 +58865,16 @@ test("bounds: pulp-density-solids round-trips weight percent and pulp SG and con
   assert.ok("error" in _pds({ solids_sg: 2.7 }));
   assert.ok("error" in _pds({ solids_sg: 2.7, pulp_sg: 3 }));
 });
+
+import { computeWeldPreheatCet as _wpc } from "../../calc-fab.js";
+test("bounds: weld-preheat-cet follows the CET preheat equation and its trends", () => {
+  // CET 0.40 exactly (C 0.30, Mn 1.0), 30 mm, HD 5, Q 1.5 kJ/mm -> 154.6 degC.
+  const r = _wpc({ c: 0.3, mn: 1.0, thickness_in: 30 / 25.4, hydrogen_ml_100g: 5, arc_energy_kj_in: 1.5 * 25.4, arc_efficiency: 1 });
+  const want = 697 * 0.4 + 160 * Math.tanh(30 / 35) + 62 * Math.pow(5, 0.35) + (53 * 0.4 - 32) * 1.5 - 328;
+  assert.ok(Math.abs(r.preheat_c - want) < 1e-9 && Math.abs(want - 154.6) < 0.1);
+  const base = { c: 0.18, mn: 1.4, cu: 0.2, ni: 0.1, thickness_in: 1.25, hydrogen_ml_100g: 5, arc_energy_kj_in: 40, arc_efficiency: 0.8 };
+  assert.ok(_wpc({ ...base, arc_energy_kj_in: 60 }).preheat_c < _wpc(base).preheat_c);
+  assert.ok(_wpc({ ...base, hydrogen_ml_100g: 15 }).preheat_c > _wpc(base).preheat_c);
+  assert.ok("error" in _wpc({ ...base, c: 0.05, mn: 0.3 }));
+  assert.ok("error" in _wpc({ ...base, thickness_in: 0.25 }));
+});

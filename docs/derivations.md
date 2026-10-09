@@ -2263,6 +2263,7 @@ cross-check.
 | calc-fab.js | `computeWeldGroupEccentric` | `{ load_lb = 0, ecc_in = 0, weld_len_in = 0, separation_in = 0, allow_per_16 =...` | _ | _ | _ |
 | calc-fab.js | `computeWeldMetalVolume` | `{ joint_type = "fillet", fillet_leg_in = 0, groove_area_in2 = 0, length_in = ...` | _ | _ | _ |
 | calc-fab.js | `computeWeldPassesArcTime` | `{ A_groove = 0, length_in = 0, a_pass = 0, dep_rate = 0, density = 0.283, op_...` | _ | _ | _ |
+| calc-fab.js | `computeWeldPreheatCet` | `{ c = 0, mn = 0, mo = 0, cr = 0, cu = 0, ni = 0, thickness_in = 0, hydrogen_m...` | _ | _ | _ |
 | calc-fab.js | `computeWeldPreheatFuel` | `{ steel_lb, start_temp_F, preheat_temp_F, efficiency_pct = 25, c_steel = 0.11...` | _ | _ | _ |
 | calc-fab.js | `computeWeldTransverseShrinkage` | `{ weld_area_in2 = 0, thickness_in = 0, weld_count = 1, root_opening_in = 0 } ...` | _ | _ | _ |
 | calc-fab.js | `computeWeldTravelSpeed` | `{ V_volts = 0, I_amps = 0, eta = 1.0, HI_kjin = 0 } = {}` | _ | _ | _ |
@@ -3918,7 +3919,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2502.
+Row count: 2503.
 
 <!-- END function-corpus-v14 -->
 
@@ -4695,7 +4696,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-extraction-rate` | Water Extraction Volume, Time, and Waste-Tank Dumps | Project (first-principles); standing + absorbed; wand time = total / gpm | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+4 more) |
 
-### Group E Construction (626 tiles)
+### Group E Construction (627 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -5293,6 +5294,7 @@ per spec-v14 §13.1 second paragraph.
 | `weld-heat-input` | Welding Heat Input | AWS D1.1 / ASME BPVC Section IX (by n...; 25 V, 200 A, 8 in/min, eta 0.8 -> arc energy 37500 J/in, ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `weld-metal-volume` | Weld Deposit Weight, Filler, and Pass Count | first-principles joint geometry and s...; 5/16 in fillet, 120 in, 0.90 eff -> 0.0488 in2, 1.66 lb d... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+10 more) |
 | `weld-passes-arc-time` | Weld Passes and Arc Time to Fill a Groove | welding-cost estimating; spec-v357 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
+| `weld-preheat-cet` | Minimum Weld Preheat (CET Method) | Project (first-principles); CET = 0.18 + 0.14 + 0.01 + 0.0025 = 0.3325; d = 31.75 mm;... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `weld-preheat-fuel` | Weld Preheat Energy and Fuel | Carbon-steel specific heat / propane ...; 200 lb, 70 to 300 degF, 25% efficiency -> 5,060 Btu, 20,2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `weld-transverse-shrinkage` | Weld Transverse Shrinkage and Pre-Set | Blodgett, Design of Welded Structures; 0.10 in2 weld in 1/2 in plate, 3 welds -> 0.040 in per we... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `weld-travel-speed` | Weld Travel Speed for a Target Heat Input | AWS / ASME; spec-v358 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
@@ -6340,6 +6342,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 
-Tile count: 2249. Fixture-covered or reference-cadence: 2249 / 2249.
+Tile count: 2250. Fixture-covered or reference-cadence: 2250 / 2250.
 
 <!-- END tile-index-v14 -->

@@ -509,6 +509,7 @@ const _TILES = [
   ["tube-bend-wall-thinning", "E"],
   ["counterbore-depth", "K"],
   ["weld-cooling-rate-t85", "E"],
+  ["weld-preheat-cet", "E"],
   ["interpass-temperature-control", "E"],
 
   // v43 cross-trade tank gauging (calc-cross.js)

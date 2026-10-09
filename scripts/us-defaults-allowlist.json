@@ -517,6 +517,12 @@
    "match": "(L)",
    "family": "federal disaster relief commodity planning",
    "justification": "FEMA and state EMA commodity planning count bottled water in liters -- 3 L per person per day, an 18,000 L tractor-trailer load -- because the product ships in liter bottles on liter-rated pallets. The tile also reports gallons."
+  },
+  {
+   "module": "calc-fab.js",
+   "match": "ml/100 g",
+   "family": "welding",
+   "justification": "Diffusible hydrogen is reported in ml/100 g of weld metal in US practice too (AWS A4.3; the H4/H8/H16 electrode designators)."
   }
  ]
 }

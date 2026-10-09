@@ -1348,6 +1348,7 @@ export const RENDERER_MAP = {
   "sheet-metal-gauge": { module: "../../calc-fab.js", exportName: "FAB_RENDERERS" },
   "tube-bend-wall-thinning": { module: "../../calc-fab.js", exportName: "FAB_RENDERERS" },
   "weld-cooling-rate-t85": { module: "../../calc-fab.js", exportName: "FAB_RENDERERS" },
+  "weld-preheat-cet": { module: "../../calc-fab.js", exportName: "FAB_RENDERERS" },
   "interpass-temperature-control": { module: "../../calc-fab.js", exportName: "FAB_RENDERERS" },
   "vessel-head-volume": { module: "../../calc-fab.js", exportName: "FAB_RENDERERS" },
   "center-of-gravity-2point": { module: "../../calc-layout.js", exportName: "LAYOUT_RENDERERS" },

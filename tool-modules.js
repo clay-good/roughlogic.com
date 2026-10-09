@@ -1088,7 +1088,7 @@ export const TOOL_MODULES = (() => {
     "barstock-cutlist", "bar-nesting", "sheet-metal-gauge",
     // trade expansion v1402-v1412
     "tube-bend-wall-thinning",
-    "weld-cooling-rate-t85",
+    "weld-cooling-rate-t85", "weld-preheat-cet",
     "interpass-temperature-control",
     // spec-v912 dished tank / vessel head volume (group E)
     "vessel-head-volume",

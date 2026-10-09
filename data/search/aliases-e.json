@@ -6417,6 +6417,11 @@
     {"term":"percent solids slurry","target":"pulp-density-solids","kind":"industry"},
     {"term":"marcy scale","target":"pulp-density-solids","kind":"industry"},
     {"term":"pulp specific gravity to percent solids","target":"pulp-density-solids","kind":"industry"},
-    {"term":"how much water to add to make slurry","target":"pulp-density-solids","kind":"question"}
+    {"term":"how much water to add to make slurry","target":"pulp-density-solids","kind":"question"},
+    {"term":"weld preheat temperature","target":"weld-preheat-cet","kind":"industry"},
+    {"term":"cet preheat","target":"weld-preheat-cet","kind":"industry"},
+    {"term":"hydrogen cracking preheat","target":"weld-preheat-cet","kind":"industry"},
+    {"term":"en 1011-2 preheat","target":"weld-preheat-cet","kind":"industry"},
+    {"term":"what preheat do i need for this steel","target":"weld-preheat-cet","kind":"question"}
   ]
 }

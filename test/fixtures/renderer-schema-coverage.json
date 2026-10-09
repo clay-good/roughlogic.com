@@ -1,7 +1,7 @@
 {
   "note": "spec-v1184 coverage ratchet. Tiles whose renderer exposes a render.schema consistent with the compute function. Grow with `node scripts/check-renderer-schema.mjs --write`; regeneration is intentional.",
-  "total_tiles": 2249,
-  "covered_count": 2170,
+  "total_tiles": 2250,
+  "covered_count": 2171,
   "covered": [
     "aav-install-check",
     "abatement-containment",
@@ -2100,6 +2100,7 @@
     "weld-heat-input",
     "weld-metal-volume",
     "weld-passes-arc-time",
+    "weld-preheat-cet",
     "weld-preheat-fuel",
     "weld-transverse-shrinkage",
     "weld-travel-speed",

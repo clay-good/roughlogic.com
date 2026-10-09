@@ -113,6 +113,7 @@ export const COMPUTE_MAP = {
   "tube-bend-wall-thinning": { module: "../../calc-fab.js", fn: "computeTubeBendWallThinning" },
   "counterbore-depth": { module: "../../calc-machining.js", fn: "computeCounterboreDepth" },
   "weld-cooling-rate-t85": { module: "../../calc-fab.js", fn: "computeWeldCoolingRateT85" },
+  "weld-preheat-cet": { module: "../../calc-fab.js", fn: "computeWeldPreheatCet" },
   "interpass-temperature-control": { module: "../../calc-fab.js", fn: "computeInterpassTemperatureControl" },
   "taylor-tool-life": { module: "../../calc-machining.js", fn: "computeTaylorToolLife" },
   "cutting-diameter-for-rpm": { module: "../../calc-machining.js", fn: "computeCuttingDiameterForRpm" },

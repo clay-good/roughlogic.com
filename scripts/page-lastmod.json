@@ -2,99 +2,99 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "d4984d595b6f0785",
+      "sha": "d893f67a55c389f3",
       "date": "2026-10-09"
     },
     "/tools/": {
-      "sha": "d4ee4201b844b6f9",
+      "sha": "c49e56e83f3eb082",
       "date": "2026-10-09"
     },
     "/collections/disaster-response/": {
-      "sha": "eeb9a2d1e5e915ae",
+      "sha": "ff8cd5d40ef28d41",
       "date": "2026-10-09"
     },
     "/groups/accounting/": {
-      "sha": "9e136b0aab26967b",
+      "sha": "d15987704cbbb862",
       "date": "2026-10-09"
     },
     "/groups/agriculture/": {
-      "sha": "e6b0451951e5aa21",
+      "sha": "717a076a41baf789",
       "date": "2026-10-09"
     },
     "/groups/construction/": {
-      "sha": "108fa8e1707ab69d",
+      "sha": "dad87db6e02b802d",
       "date": "2026-10-09"
     },
     "/groups/cross-trade/": {
-      "sha": "0e9c3fca43c4f639",
+      "sha": "d472cce000146bba",
       "date": "2026-10-09"
     },
     "/groups/educators/": {
-      "sha": "ad876187c440ff83",
+      "sha": "72dddc8048df8ff3",
       "date": "2026-10-09"
     },
     "/groups/electrical/": {
-      "sha": "1f0db62edac218dd",
+      "sha": "57b70b8cd84a964f",
       "date": "2026-10-09"
     },
     "/groups/field/": {
-      "sha": "70317e8c45918605",
+      "sha": "292c02b975b2cf2c",
       "date": "2026-10-09"
     },
     "/groups/fire-ground/": {
-      "sha": "2958db0741bd83d1",
+      "sha": "04625bb824544fcf",
       "date": "2026-10-09"
     },
     "/groups/historical/": {
-      "sha": "7d98a4a567372fcd",
+      "sha": "20ad4b5f78ca778e",
       "date": "2026-10-09"
     },
     "/groups/hvac/": {
-      "sha": "e529af3a1622b215",
+      "sha": "206f69cc93f8945e",
       "date": "2026-10-09"
     },
     "/groups/kitchen/": {
-      "sha": "a3c4386adc9ff3aa",
+      "sha": "3c7c9bb68dd3436d",
       "date": "2026-10-09"
     },
     "/groups/lab/": {
-      "sha": "33ab59447ba35500",
+      "sha": "8de67aa59c114d88",
       "date": "2026-10-09"
     },
     "/groups/mechanic/": {
-      "sha": "26eeb981913613b9",
+      "sha": "8e37b9f72b066b7e",
       "date": "2026-10-09"
     },
     "/groups/plumbing/": {
-      "sha": "a00383e1dfa795fc",
+      "sha": "a3af53ac1ba19057",
       "date": "2026-10-09"
     },
     "/groups/real-estate/": {
-      "sha": "430437022b4a00c0",
+      "sha": "e392b5b1c1c3d459",
       "date": "2026-10-09"
     },
     "/groups/references/": {
-      "sha": "2be5ae90a2eade61",
+      "sha": "bb3c3a5c5a1945a5",
       "date": "2026-10-09"
     },
     "/groups/restoration/": {
-      "sha": "3cf8247b87e3bb7d",
+      "sha": "8bc525bc0a092854",
       "date": "2026-10-09"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "759bdde42b1fd02d",
+      "sha": "8f59b28dd99046d2",
       "date": "2026-10-09"
     },
     "/groups/stage/": {
-      "sha": "1df9142cb72f5d28",
+      "sha": "152a697b7c07cf76",
       "date": "2026-10-09"
     },
     "/groups/trucking/": {
-      "sha": "dbbab61b2bddb6d6",
+      "sha": "3b964023727afdcf",
       "date": "2026-10-09"
     },
     "/groups/water/": {
-      "sha": "46d306ef30b428a8",
+      "sha": "d2c7d7b73c6722ec",
       "date": "2026-10-09"
     },
     "/tools/aav-install-check/": {
@@ -8790,8 +8790,8 @@
       "date": "2026-09-29"
     },
     "/tools/weld-heat-input/": {
-      "sha": "0374b7cd26d1991c",
-      "date": "2026-10-03"
+      "sha": "b2b8da18b71b5d5f",
+      "date": "2026-10-09"
     },
     "/tools/weld-metal-volume/": {
       "sha": "cbb98394014dc43a",
@@ -8801,9 +8801,13 @@
       "sha": "6eaef4e4219c192b",
       "date": "2026-10-03"
     },
+    "/tools/weld-preheat-cet/": {
+      "sha": "3e68d78cc266be52",
+      "date": "2026-10-09"
+    },
     "/tools/weld-preheat-fuel/": {
-      "sha": "29a8dc700dca3ba1",
-      "date": "2026-10-03"
+      "sha": "11071ee70b3206d7",
+      "date": "2026-10-09"
     },
     "/tools/weld-transverse-shrinkage/": {
       "sha": "5d50e1943fbb5538",

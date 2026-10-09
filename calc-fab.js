@@ -2026,6 +2026,58 @@ FAB_RENDERERS["weld-cooling-rate-t85"] = _simpleRenderer({
   compute: computeWeldCoolingRateT85,
 });
 
+// spec-v1946: minimum preheat by the CET method (EN 1011-2 Annex C, Method B; Uwer and Hohne), as
+// published by Dillinger: CET = C + (Mn + Mo)/10 + (Cr + Cu)/20 + Ni/40 (wt %), Tp (degC) = 697 CET + 160 tanh(d/35)
+// + 62 HD^0.35 + (53 CET - 32) Q - 328, d plate thickness (mm), HD diffusible hydrogen (ml/100 g), Q effective heat
+// input (kJ/mm). Valid for CET 0.2-0.5, d 10-90 mm, HD 1-20, Q 0.5-4.0. carbon-equivalent gives only a CE band.
+// dims: in { c: dimensionless, mn: dimensionless, mo: dimensionless, cr: dimensionless, cu: dimensionless, ni: dimensionless, thickness_in: L, hydrogen_ml_100g: dimensionless, arc_energy_kj_in: M L T^-2, arc_efficiency: dimensionless } out: { cet: dimensionless, preheat_c: T, preheat_f: T, heat_input_kj_mm: M L T^-2 }
+export function computeWeldPreheatCet({ c = 0, mn = 0, mo = 0, cr = 0, cu = 0, ni = 0, thickness_in = 0, hydrogen_ml_100g = 5, arc_energy_kj_in = 0, arc_efficiency = 0.8 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const el = [c, mn, mo, cr, cu, ni].map((x) => Number(x) || 0);
+  if (el.some((x) => x < 0)) return { error: "Element contents cannot be negative (weight percent)." };
+  const [C, Mn, Mo, Cr, Cu, Ni] = el;
+  const t = Number(thickness_in) || 0, HD = Number(hydrogen_ml_100g) || 0, E = Number(arc_energy_kj_in) || 0, eta = Number(arc_efficiency) || 0;
+  if (!(eta > 0 && eta <= 1)) return { error: "Arc efficiency must be above 0 and at most 1 (EN 1011-1: 0.8 SMAW and GMAW, 0.6 GTAW, 1.0 SAW)." };
+  const cet = C + (Mn + Mo) / 10 + (Cr + Cu) / 20 + Ni / 40;
+  const d = t * 25.4;
+  const Q = (E * eta) / 25.4;
+  if (!(cet >= 0.2 && cet <= 0.5)) return { error: "CET " + cet.toFixed(3) + " is outside the 0.20-0.50% range the method covers." };
+  if (!(d >= 10 && d <= 90)) return { error: "Thickness must be 10 to 90 mm (0.39 to 3.54 in) for this method." };
+  if (!(HD >= 1 && HD <= 20)) return { error: "Diffusible hydrogen must be 1 to 20 ml/100 g (about 5 for low-hydrogen SMAW, 3 for GMAW)." };
+  if (!(Q >= 0.5 && Q <= 4.0)) return { error: "Effective heat input " + Q.toFixed(2) + " kJ/mm is outside 0.5-4.0 kJ/mm (12.7-101.6 kJ/in after efficiency)." };
+  const preheat_c = 697 * cet + 160 * Math.tanh(d / 35) + 62 * Math.pow(HD, 0.35) + (53 * cet - 32) * Q - 328;
+  const preheat_f = preheat_c * 9 / 5 + 32;
+  if (![cet, preheat_c, preheat_f].every(Number.isFinite)) return { error: "Preheat math is not a finite value; check the inputs." };
+  return {
+    cet, preheat_c, preheat_f, heat_input_kj_mm: Q, thickness_mm: d,
+    note: "The minimum preheat (and interpass) temperature to avoid hydrogen cracking by the CET method of EN 1011-2 (Annex C, Method B), as Dillinger publishes it: CET = C + (Mn + Mo)/10 + (Cr + Cu)/20 + Ni/40, then Tp = 697 CET + 160 tanh(d/35) + 62 HD^0.35 + (53 CET - 32) Q - 328 degC, with the thickness d in mm, the diffusible hydrogen HD in ml/100 g, and the effective heat input Q = arc energy x efficiency in kJ/mm. Higher heat input LOWERS the required preheat (slower cooling), thicker plate raises it (the effect flattens above about 60 mm), and wetter consumables raise it sharply. A result at or below the shop temperature means no preheat is needed beyond keeping the steel dry and above freezing. The method covers CET 0.20-0.50, 10-90 mm, 1-20 ml/100 g, and 0.5-4.0 kJ/mm and returns an error outside them. This is the European method; an AWS D1.1 job uses its own prequalified preheat table or Annex H. A screen; the WPS and the steel maker govern.",
+  };
+}
+export const weldPreheatCetExample = { inputs: { c: 0.18, mn: 1.4, mo: 0, cr: 0, cu: 0.2, ni: 0.1, thickness_in: 1.25, hydrogen_ml_100g: 5, arc_energy_kj_in: 40, arc_efficiency: 0.8 } };
+FAB_RENDERERS["weld-preheat-cet"] = _simpleRenderer({
+  citation: "Citation: minimum preheat by the CET method of EN 1011-2 Annex C (Method B), as published by Dillinger: CET = C + (Mn + Mo)/10 + (Cr + Cu)/20 + Ni/40; Tp = 697 CET + 160 tanh(d/35) + 62 HD^0.35 + (53 CET - 32) Q - 328 degC (d mm, HD ml/100 g, Q kJ/mm), valid CET 0.20-0.50, d 10-90 mm, HD 1-20, Q 0.5-4.0. A screen; the WPS governs.",
+  example: weldPreheatCetExample.inputs,
+  fields: [
+    { key: "c", label: "Carbon C (wt %)", kind: "number" },
+    { key: "mn", label: "Manganese Mn (wt %)", kind: "number" },
+    { key: "mo", label: "Molybdenum Mo (wt %)", kind: "number" },
+    { key: "cr", label: "Chromium Cr (wt %)", kind: "number" },
+    { key: "cu", label: "Copper Cu (wt %)", kind: "number" },
+    { key: "ni", label: "Nickel Ni (wt %)", kind: "number" },
+    { key: "thickness_in", label: "Plate thickness (in)", kind: "number" },
+    { key: "hydrogen_ml_100g", label: "Diffusible hydrogen (ml/100 g; 5 low-hydrogen SMAW, 3 GMAW)", kind: "number", default: 5, attrs: { step: "any", value: "5" } },
+    { key: "arc_energy_kj_in", label: "Arc energy (kJ/in)", kind: "number" },
+    { key: "arc_efficiency", label: "Arc efficiency (EN 1011-1: 0.8 SMAW/GMAW, 0.6 GTAW, 1.0 SAW)", kind: "number", default: 0.8, attrs: { step: "any", value: "0.8" } },
+  ],
+  outputs: [
+    { key: "t", id: "wpc-out-t", label: "Minimum preheat", value: (r) => fmt(r.preheat_f, 0) + " °F (" + fmt(r.preheat_c, 0) + " °C)" },
+    { key: "c", id: "wpc-out-c", label: "CET", value: (r) => fmt(r.cet, 3) + "%" },
+    { key: "q", id: "wpc-out-q", label: "Effective heat input and thickness", value: (r) => fmt(r.heat_input_kj_mm, 2) + " kJ/mm; " + fmt(r.thickness_mm, 1) + " mm" },
+    { key: "n", id: "wpc-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeWeldPreheatCet,
+});
+
 // ===================== spec-v1412: interpass temperature window =====================
 // dims: in { tau_min: T, ambient_f: T, preheat_min_f: T, interpass_max_f: T, current_temp_f: T, restart_temp_f: T, elapsed_min: T } out: { idle_allowance_min: T, required_wait_min: T, temp_at_elapsed_f: T }
 export function computeInterpassTemperatureControl({ tau_min = 0, ambient_f = 70, preheat_min_f = 0, interpass_max_f = 0, current_temp_f = 0, restart_temp_f = 0, elapsed_min = 0 } = {}) {

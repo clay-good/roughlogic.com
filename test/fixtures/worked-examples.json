@@ -169235,6 +169235,41 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "weld-preheat-cet",
+  "source_publisher": "Project (first-principles)",
+  "source_title": "0.18 C, 1.4 Mn, 0.2 Cu, 0.1 Ni plate, 1-1/4 in, SMAW 40 kJ/in, HD 5",
+  "source_edition_or_year": "EN 1011-2 Method B equation (Dillinger)",
+  "source_section_or_page": "CET = 0.18 + 0.14 + 0.01 + 0.0025 = 0.3325; d = 31.75 mm; Q = 40 x 0.8/25.4 = 1.2598 kJ/mm; Tp = 231.75 + 115.18 + 108.90 - 18.12 - 328 = 109.7 degC = 229.5 F",
+  "verified_by": "rl",
+  "verified_on": "2026-10-09",
+  "inputs": {
+   "c": 0.18,
+   "mn": 1.4,
+   "mo": 0,
+   "cr": 0,
+   "cu": 0.2,
+   "ni": 0.1,
+   "thickness_in": 1.25,
+   "hydrogen_ml_100g": 5,
+   "arc_energy_kj_in": 40,
+   "arc_efficiency": 0.8
+  },
+  "outputs": {
+   "cet": {
+    "value": 0.3325,
+    "tolerance": {
+     "pct": 0.5
+    }
+   },
+   "preheat_c": {
+    "value": 109.7,
+    "tolerance": {
+     "pct": 0.5
+    }
+   }
+  }
  }
  ]
 }

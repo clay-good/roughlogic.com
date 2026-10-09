@@ -190,6 +190,7 @@ const RELATED = {
   "tube-bend-wall-thinning": ["bend-allowance","multi-bend-flat-pattern","press-brake-tonnage"],
   "counterbore-depth": ["tap-drill-size","reaming-drill-allowance","bolt-torque"],
   "weld-cooling-rate-t85": ["weld-preheat-fuel","weld-passes-arc-time","interpass-temperature-control"],
+  "weld-preheat-cet": ["carbon-equivalent","weld-cooling-rate-t85","interpass-temperature-control"],
   "interpass-temperature-control": ["weld-cooling-rate-t85","weld-preheat-fuel","weld-passes-arc-time"],
   "taylor-tool-life": ["cutting-speed-rpm", "cutting-diameter-for-rpm", "tap-drill-size"],
   "cutting-diameter-for-rpm": ["cutting-speed-rpm", "drill-point-depth", "drill-point-angle-from-length"],
