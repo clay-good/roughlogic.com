@@ -254,6 +254,7 @@ function renderSlingAngle(inputRegion, outputRegion, citationEl) {
 // dims: in { sweep_width_m: L, track_spacing_m: L, target_pod: dimensionless } out: { coverage: dimensionless, pod: dimensionless, spacing_for_pod_m: L }
 export function computeSearchTrackSpacing({ sweep_width_m = 0, track_spacing_m = 0, target_pod = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if ([track_spacing_m].some((x) => Number(x) < 0)) return { error: "Track spacing cannot be negative." };
   const w = Number(sweep_width_m) || 0;
   const s = Number(track_spacing_m) || 0;
   const tp = Number(target_pod) || 0;

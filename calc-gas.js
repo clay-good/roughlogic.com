@@ -990,6 +990,7 @@ export function computePropaneRegulatorSizing({
   lockup_psig = 0, downstream_rating_psig = 0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if ([capacity_at_max_inlet_cfh, second_stage_capacity_cfh, lockup_psig, downstream_rating_psig].some((x) => Number(x) < 0)) return { error: "Regulator capacities, lock-up and the downstream rating cannot be negative." };
   if (!(connected_load_btuh > 0)) return { error: "Connected load must be greater than zero." };
   if (!(btu_per_ft3 > 0)) return { error: "Energy content per cubic foot must be greater than zero." };
   if (!(capacity_at_min_inlet_cfh > 0)) return { error: "First-stage capacity at the minimum inlet pressure must be greater than zero." };
@@ -1063,6 +1064,7 @@ export function computeLpContainerSeparation({
   next_size_required_building_ft = 0, relief_points_at_opening = "no",
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if ([required_property_line_ft, required_ignition_ft, required_opening_ft, measured_property_line_ft, measured_ignition_ft, measured_opening_ft, next_size_required_building_ft].some((x) => Number(x) < 0)) return { error: "Required and measured distances cannot be negative." };
   if (!(water_capacity_gal > 0)) return { error: "Container water capacity must be greater than zero." };
   if (!(required_building_ft > 0)) return { error: "The required distance to the building must be greater than zero." };
   if (!(measured_building_ft > 0)) return { error: "The measured distance to the building must be greater than zero." };
@@ -1131,6 +1133,7 @@ export function computePropaneRunTime({
   gallons_per_hdd = 0, hdd_per_day = 0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if ([gallons_per_hdd, hdd_per_day].some((x) => Number(x) < 0)) return { error: "Gallons per degree day and degree days per day cannot be negative." };
   if (!(water_capacity_gal > 0)) return { error: "Water capacity must be greater than zero." };
   if (!(fill_limit_pct > 0) || fill_limit_pct > 100) return { error: "The filling limit must be greater than zero and no more than 100 percent." };
   if (!(current_gauge_pct > 0) || current_gauge_pct > 100) return { error: "The gauge reading must be greater than zero and no more than 100 percent." };

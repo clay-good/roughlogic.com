@@ -1358,6 +1358,7 @@ export function computeRentalWorksheet({
   utilities, hoa_fees, other_expenses,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if ([property_value_in, cash_invested_in, market_grm_in].some((x) => Number(x) < 0)) return { error: "Property value, cash invested and market GRM cannot be negative." };
   const inputs = {
     advertising, auto_travel, cleaning_maintenance, commissions, insurance, legal_professional,
     management_fees, mortgage_interest, other_interest, repairs, supplies, property_taxes,

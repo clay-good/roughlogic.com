@@ -2540,6 +2540,7 @@ export function computeRefractoryShellTemperature({
   shell_limit_f = 0, acid_dew_point_f = 0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if ([layer1_thickness_in, layer2_thickness_in, layer3_thickness_in].some((x) => Number(x) < 0)) return { error: "Layer thicknesses cannot be negative." };
   if (!(hot_face_f > ambient_f)) return { error: "The hot face must be above ambient." };
   if (!(film_coeff_btu_hr_ft2_f > 0)) return { error: "The outer film coefficient must be positive." };
   const layers = [
@@ -2657,6 +2658,7 @@ export function computeCryogenicBoiloff({
   molecular_weight = 0, vapour_temp_r = 0, alt_vapour_space_pct = 0, withdrawal_gal_day = 0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if ([molecular_weight, vapour_temp_r].some((x) => Number(x) < 0)) return { error: "Molecular weight and the absolute vapour temperature cannot be negative." };
   if (!(tank_volume_gal > 0)) return { error: "Tank volume must be positive." };
   if (!(ner_pct_per_day > 0)) return { error: "The normal evaporation rate must be positive." };
   if (!(liquid_density_lb_gal > 0)) return { error: "Liquid density must be positive." };

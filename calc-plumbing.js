@@ -305,6 +305,7 @@ export const pipeVolumeExample = {
 // dims: in { flow_gpm: L^3 T^-1, total_dynamic_head_ft: L, efficiency: dimensionless, fluid_specific_gravity: dimensionless } out: { brake_hp: M L^2 T^-3, motor_hp: M L^2 T^-3 }
 export function computePumpSize({ flow_gpm, total_dynamic_head_ft, efficiency = 0.65, fluid_specific_gravity = 1 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if ([fluid_specific_gravity].some((x) => Number(x) < 0)) return { error: "Fluid specific gravity cannot be negative." };
   // Hydraulic horsepower: HP_h = (Q * H * SG) / 3960.  Pump shaft hp = HP_h / efficiency.
   const hp_h = (flow_gpm * total_dynamic_head_ft * fluid_specific_gravity) / 3960;
   const hp_shaft = efficiency > 0 ? hp_h / efficiency : null;

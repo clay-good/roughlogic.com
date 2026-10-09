@@ -522,6 +522,7 @@ TREATMENT_RENDERERS["pool-volume"] = renderPoolVolume;
 // dims: in { total_ppm: dimensionless, free_ppm: dimensionless, ratio: dimensionless, gallons: L^3, avail: dimensionless } out: { combined_ppm: dimensionless, dose_ppm: dimensionless, lb_product: dimensionless }
 export function computeBreakpointChlorination({ total_ppm = 0, free_ppm = 0, ratio = 10, gallons = 0, avail = 0 } = {}) {
   const _g = _finiteGuardPool(arguments[0]); if (_g) return _g;
+  if ([gallons, avail].some((x) => Number(x) < 0)) return { error: "Pool volume and available chlorine cannot be negative." };
   const total = Number(total_ppm) || 0;
   const free = Number(free_ppm) || 0;
   const r = Number(ratio) || 0;

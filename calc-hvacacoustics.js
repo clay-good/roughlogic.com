@@ -104,6 +104,7 @@ export function computeGrilleNeckNc({
   damper_at_neck = "no",
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if ([next_size_free_area_ft2, room_nc_target].some((x) => Number(x) < 0)) return { error: "The next-size free area and the room NC target cannot be negative." };
   if (!(airflow_cfm > 0)) return { error: "Airflow must be greater than zero." };
   if (!(neck_free_area_ft2 > 0)) return { error: "Neck free area must be greater than zero." };
   if (!(rated_nc > 0)) return { error: "The manufacturer NC rating at this flow must be greater than zero." };
@@ -263,6 +264,7 @@ export function computeSilencerInsertionLoss({
   fan_available_static_in_wc = 0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if ([alt_face_width_in, alt_face_height_in, target_velocity_fpm, fan_available_static_in_wc].some((x) => Number(x) < 0)) return { error: "Alternative face dimensions, target velocity and available fan static cannot be negative." };
   if (!(airflow_cfm > 0)) return { error: "Airflow must be greater than zero." };
   if (!(face_width_in > 0) || !(face_height_in > 0)) return { error: "Silencer face dimensions must be greater than zero." };
   if (!(reference_drop_in_wc > 0) || !(reference_velocity_fpm > 0)) return { error: "The reference pressure drop and the velocity it was measured at must both be greater than zero." };

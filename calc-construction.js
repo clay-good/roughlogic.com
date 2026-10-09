@@ -796,6 +796,7 @@ export function renderMaterialQuantity(inputRegion, outputRegion, citationEl) {
 // dims: in { total_rise_in: L, total_run_in: L, tread_cut_depth_in: L } out: { stringer_in: L, board_feet: L^3 }
 export function computeStairStringer({ total_rise_in, total_run_in, tread_cut_depth_in = 1 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if ([tread_cut_depth_in].some((x) => Number(x) < 0)) return { error: "Tread cut depth cannot be negative." };
   tread_cut_depth_in = Number(tread_cut_depth_in);
   const r = Number(total_rise_in) || 0;
   const run = Number(total_run_in) || 0;
@@ -1021,6 +1022,7 @@ export const MASONRY_UNIT_FACE_IN = {
 // dims: in { wall_area_ft2: L^2, unit_type: dimensionless, mortar_joint_in: L, waste_factor: dimensionless } out: { units: dimensionless, mortar_ft3: L^3 }
 export function computeMasonryCount({ wall_area_ft2, unit_type, mortar_joint_in = 0.375, waste_factor = 0.05 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if ([waste_factor].some((x) => Number(x) < 0)) return { error: "Waste factor cannot be negative." };
   const a = Number(wall_area_ft2) || 0;
   const m = Number(mortar_joint_in) || 0;
   const u = MASONRY_UNIT_FACE_IN[unit_type];

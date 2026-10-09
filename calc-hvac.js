@@ -71,6 +71,7 @@ export function manualJCooling({
   outdoor_RH_percent = 50,
 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if ([floor_area_ft2].some((x) => Number(x) < 0)) return { error: "Floor area cannot be negative." };
   const dT = Math.max(0, outdoor_design_F - indoor_design_F);
   const Uw = U_FACTORS.wall[insulation_level];
   const Uc = U_FACTORS.ceiling[insulation_level];
@@ -138,6 +139,7 @@ export function manualJHeating({
   ceiling_height_ft = 8,
 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if ([floor_area_ft2].some((x) => Number(x) < 0)) return { error: "Floor area cannot be negative." };
   const dT = Math.max(0, indoor_design_F - outdoor_design_F);
   const Uw = U_FACTORS.wall[insulation_level];
   const Uc = U_FACTORS.ceiling[insulation_level];
@@ -1676,6 +1678,7 @@ export function computeNPSHa({
   target_margin_ft = 3, // spec-v1568: the margin a hot-condensate pump is set up for
 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if ([npsh_required_ft].some((x) => Number(x) < 0)) return { error: "NPSH required cannot be negative." };
   source_elevation_relative_ft = Number(source_elevation_relative_ft); friction_loss_ft = Number(friction_loss_ft);
   if (!(water_temp_F >= 32)) return { error: "Water temperature must be at or above 32 F." };
   if (water_temp_F > 300) return { error: "Water temperature above 300 F is past the bundled vapor-pressure table." };

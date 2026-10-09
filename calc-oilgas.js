@@ -1010,6 +1010,7 @@ export function computeTankStrappingVolume({
   volume_correction_factor = 1, sediment_water_pct = 0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if ([gauge_in, closing_gauge_ft, closing_gauge_in].some((x) => Number(x) < 0)) return { error: "Gauge readings cannot be negative." };
   if (!(tank_diameter_ft > 0)) return { error: "Tank diameter must be greater than zero." };
   const opening_height_ft = gauge_ft + gauge_in / 12;
   if (!(opening_height_ft > 0)) return { error: "The gauge height must be greater than zero." };
@@ -1065,6 +1066,7 @@ export function computeTankVentApi2000({
   installed_pressure_ft3h = 0, installed_vacuum_ft3h = 0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if ([pump_in_bph, pump_out_bph, thermal_out_ft3h, thermal_in_ft3h, fire_case_ft3h, installed_pressure_ft3h, installed_vacuum_ft3h].some((x) => Number(x) < 0)) return { error: "Pumping rates, venting requirements and installed capacities cannot be negative." };
   if (!(pump_in_bph > 0) && !(pump_out_bph > 0)) return { error: "Enter at least one of the pump-in and pump-out rates." };
   if (!(volatile_factor > 0)) return { error: "The volatile allowance factor must be greater than zero." };
 
@@ -1306,6 +1308,7 @@ export function computeFlareRadiationDistance({
   solar_btuh_ft2 = 0, available_distance_ft = 0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if ([available_distance_ft].some((x) => Number(x) < 0)) return { error: "Available distance cannot be negative." };
   if (!(heat_release_btuh > 0)) return { error: "Heat release must be greater than zero." };
   if (!(radiant_fraction > 0) || radiant_fraction >= 1) return { error: "The radiant fraction must be greater than zero and less than 1." };
   if (!(allowable_btuh_ft2 > 0)) return { error: "The allowable radiation level must be greater than zero." };
@@ -1365,6 +1368,7 @@ export function computeWellDeclineReserves({
   economic_limit_bpd = 0, years_ahead = 0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if ([years_ahead].some((x) => Number(x) < 0)) return { error: "Years ahead cannot be negative." };
   if (!(initial_rate_bpd > 0)) return { error: "Initial rate must be greater than zero." };
   if (!(decline_rate > 0)) return { error: "The decline rate must be greater than zero." };
   if (!(economic_limit_bpd > 0)) return { error: "The economic limit rate must be greater than zero." };

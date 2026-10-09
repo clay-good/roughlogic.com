@@ -50,7 +50,10 @@ async function silentPerturbations(perturb) {
     if (!d || !d.inputs) continue;
     const base = stable(fn({ ...row.inputs }));
     for (const f of d.inputs) {
-      if (f.kind !== "number") continue;
+      // An input the schema could not type (kind null: an agent-only or
+      // unmapped parameter) is still a number when its worked example says so;
+      // the agent door accepts it, so it is held to the same rule.
+      if (f.kind !== "number" && !(f.kind == null && typeof row.inputs[f.key] === "number")) continue;
       const v = Number(row.inputs[f.key]);
       if (!(v > 0)) continue;
       const bad = perturb(f, v);

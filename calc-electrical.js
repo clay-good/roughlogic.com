@@ -2338,6 +2338,7 @@ export function computeServiceLoadStandard({
   service_voltage = 240,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if ([small_appliance_circuits, laundry_circuit].some((x) => Number(x) < 0)) return { error: "Circuit counts cannot be negative." };
   if (!(area_ft2 >= 0)) return { error: "Area must be non-negative." };
   // General lighting: 3 VA per ft^2 (NEC 2023 220.41 dwelling; 220.12 before 2023).
   const lighting_VA = (Number(area_ft2) || 0) * 3;
