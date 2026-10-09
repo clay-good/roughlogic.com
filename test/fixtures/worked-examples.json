@@ -169537,6 +169537,29 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "particle-settling-velocity",
+  "source_publisher": "Project (first-principles)",
+  "source_title": "0.05 mm sand at 68 F in a 10% solids suspension",
+  "source_edition_or_year": "Richardson and Zaki (1954)",
+  "source_section_or_page": "Stokes vs = 2.2466 mm/s, Re = 0.112 -> n = 4.65; v = 2.2466 x 0.9^4.65 = 1.3764 mm/s",
+  "verified_by": "rl",
+  "verified_on": "2026-10-09",
+  "inputs": {
+   "particle_diameter_mm": 0.05,
+   "particle_sg": 2.65,
+   "water_temp_f": 68,
+   "solids_volume_pct": 10
+  },
+  "outputs": {
+   "hindered_velocity_mm_s": {
+    "value": 1.3764,
+    "tolerance": {
+     "pct": 0.5
+    }
+   }
+  }
  }
  ]
 }

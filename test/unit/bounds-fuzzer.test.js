@@ -58985,3 +58985,14 @@ test("bounds: shaft-critical-speed-rayleigh reduces to sqrt(g/y) for one mass", 
   assert.ok("error" in _scr({ weight_1_lb: 100 }));
   assert.ok("error" in _scr({}));
 });
+
+import { computeParticleSettlingVelocity as _psvH } from "../../calc-treatment.js";
+test("bounds: particle settling hindered velocity follows Richardson-Zaki", () => {
+  const dilute = _psvH({}), c10 = _psvH({ solids_volume_pct: 10 });
+  assert.equal(c10.richardson_zaki_n, 4.65);
+  assert.ok(Math.abs(c10.hindered_velocity_mm_s - dilute.settling_velocity_mm_s * 0.9 ** 4.65) < 1e-12);
+  assert.equal(dilute.hindered_velocity_mm_s, dilute.settling_velocity_mm_s);
+  // Coarse grains: high Re, smaller exponent.
+  assert.ok(_psvH({ particle_diameter_mm: 2, solids_volume_pct: 10 }).richardson_zaki_n < 4.65);
+  assert.ok("error" in _psvH({ solids_volume_pct: 60 }));
+});

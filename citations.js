@@ -10508,7 +10508,7 @@ export const CITATIONS = {
     ],
   },
   "particle-settling-velocity": {
-    formula: "settling_velocity Vs = g x (rho_p - rho_w) x d^2 / (18 mu) (Stokes, SI, reported in mm/s and ft/min); reynolds Re = rho_w x Vs x d / mu; Stokes valid for Re < ~1. Water mu from the Vogel correlation and rho_w from a table fit, both by temperature.",
+    formula: "settling_velocity Vs = g x (rho_p - rho_w) x d^2 / (18 mu) (Stokes, SI, reported in mm/s and ft/min); reynolds Re = rho_w x Vs x d / mu; Stokes valid for Re < ~1. Water mu from the Vogel correlation and rho_w from a table fit, both by temperature.; hindered (optional): v = vs (1 - c)^n, Richardson-Zaki n = 4.65 (Re < 0.2), 4.35 Re^-0.03 (0.2-1), 4.45 Re^-0.1 (1-500), 2.39 (> 500)",
     edition: "Stokes' law for discrete-particle (Type I) settling, first-principles; Davis & Cornwell, Introduction to Environmental Engineering, by name. The engineer governs the basin.",
     freeAccess: "Stokes' law and the particle Reynolds number are public physics; the water viscosity and density correlations are standard published fits; the particle size and density come from the grit or floc being settled.",
     governance: GOVERNANCE.water,

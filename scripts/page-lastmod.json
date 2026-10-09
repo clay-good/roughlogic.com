@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "e4a1f95e52cf0ae3",
+      "sha": "33cb00fd1a3fec1b",
       "date": "2026-10-09"
     },
     "/tools/": {
@@ -5258,8 +5258,8 @@
       "date": "2026-09-29"
     },
     "/tools/particle-settling-velocity/": {
-      "sha": "9e5f30a3fde10588",
-      "date": "2026-09-29"
+      "sha": "c2019d0e66d4e409",
+      "date": "2026-10-09"
     },
     "/tools/partition-mass-law-tl/": {
       "sha": "2f2f7d5201f0bcff",

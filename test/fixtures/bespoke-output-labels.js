@@ -625,7 +625,7 @@ export const BESPOKE_OUTPUT_LABELS = {
   "parabolic-segment": {"area":"Segment area","arc_length":"Curved arc length","note":"Note"},
   "paraboloid-volume": {"full_ft3":"Full volume","radius_at_level":"Liquid-surface radius at that depth","note":"Note"},
   "parallel-conductor-derate": {"i_total_A":"Total parallel ampacity","adjustment_factor":"Adjustment factor applied","i_set_A":"Per-set current","adequacy":"Adequacy"},
-  "particle-settling-velocity": {"settling_velocity_mm_s":"Settling velocity","settling_velocity_ft_min":"Settling velocity (ft/min)","reynolds":"Particle Reynolds number","regime":"Flow regime"},
+  "particle-settling-velocity": {"settling_velocity_mm_s":"Settling velocity","settling_velocity_ft_min":"Settling velocity (ft/min)","reynolds":"Particle Reynolds number","regime":"Flow regime","has_solids":"Hindered settling velocity"},
   "payroll-withholding": {"fed_income_tax_period":"Federal income tax this period","ss_tax_period":"Social Security this period","medicare_period":"Medicare this period","total_employee_period":"Total employee deduction"},
   "pcr-master-mix": {"total_master_mix":"Total master mix volume (uL)"},
   "pdp": {"pdp_psi":"Pump discharge pressure","elevation_psi":"Elevation contribution"},

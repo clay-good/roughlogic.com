@@ -1307,12 +1307,16 @@ function _v943renderOilWaterSeparatorSizing(inputRegion, outputRegion, citationE
 TREATMENT_RENDERERS["oil-water-separator-sizing"] = _v943renderOilWaterSeparatorSizing;
 
 // ===================== spec-v1271: discrete-particle settling velocity (Stokes' law) =====================
-// dims: in { particle_diameter_mm: L, particle_sg: dimensionless, water_temp_f: T } out: { settling_velocity_mm_s: L T^-1, settling_velocity_ft_min: L T^-1, reynolds: dimensionless }
-export function computeParticleSettlingVelocity({ particle_diameter_mm = 0.05, particle_sg = 2.65, water_temp_f = 68 } = {}) {
+// Hindered settling added 2026-10-09 (the note said it was separate): with a solids volume fraction c entered, the
+// Richardson-Zaki (1954) relation v = vs (1 - c)^n, n = 4.65 (Re < 0.2), 4.35 Re^-0.03 (0.2-1), 4.45 Re^-0.1 (1-500),
+// 2.39 (above 500), with the wall term dropped (container much wider than the particle).
+// dims: in { particle_diameter_mm: L, particle_sg: dimensionless, water_temp_f: T, solids_volume_pct: dimensionless } out: { settling_velocity_mm_s: L T^-1, settling_velocity_ft_min: L T^-1, reynolds: dimensionless, hindered_velocity_mm_s: L T^-1 }
+export function computeParticleSettlingVelocity({ particle_diameter_mm = 0.05, particle_sg = 2.65, water_temp_f = 68, solids_volume_pct = 0 } = {}) {
   const _g = _finiteGuardPool(arguments[0]); if (_g) return _g;
   if (!(particle_diameter_mm > 0)) return { error: "Particle diameter must be positive (mm)." };
   if (!(particle_sg > 1)) return { error: "Particle specific gravity must be greater than 1: a denser-than-water particle settles, a lighter one floats (for a rising oil droplet see oil-water-separator-sizing)." };
   if (!(water_temp_f > 32 && water_temp_f < 212)) return { error: "Water temperature must be between 32 and 212 F (liquid water)." };
+  if (!(solids_volume_pct >= 0 && solids_volume_pct <= 50)) return { error: "Solids volume fraction must be from 0 to 50 percent (0 for a dilute, discrete particle)." };
   const t_c = (water_temp_f - 32) / 1.8;
   const t_k = t_c + 273.15;
   // Dynamic viscosity of water (N s/m^2), Vogel correlation (Davis & Cornwell):
@@ -1328,6 +1332,8 @@ export function computeParticleSettlingVelocity({ particle_diameter_mm = 0.05, p
   const settling_velocity_mm_s = vs_ms * 1000;
   const settling_velocity_ft_min = vs_ms * 3.28084 * 60;
   if (![settling_velocity_mm_s, settling_velocity_ft_min, reynolds].every(Number.isFinite)) return { error: "Settling-velocity math is not a finite value." };
+  const rz_n = reynolds < 0.2 ? 4.65 : reynolds < 1 ? 4.35 * Math.pow(reynolds, -0.03) : reynolds < 500 ? 4.45 * Math.pow(reynolds, -0.1) : 2.39;
+  const hindered_velocity_mm_s = settling_velocity_mm_s * Math.pow(1 - solids_volume_pct / 100, rz_n);
   const regime = reynolds < 1
     ? "Stokes (laminar) -- valid"
     : reynolds <= 1000
@@ -1338,7 +1344,8 @@ export function computeParticleSettlingVelocity({ particle_diameter_mm = 0.05, p
     settling_velocity_ft_min,
     reynolds,
     regime,
-    note: "The terminal settling velocity of a discrete spherical particle in still water by Stokes' law, Vs = g (rho_p - rho_w) d^2 / (18 mu) -- the workhorse of grit-chamber and Type I sedimentation-basin design. Water density and viscosity are computed from the temperature (colder water is more viscous and settles particles more slowly). A 0.05 mm silt grain (SG 2.65) at 68 F settles about 2.25 mm/s (0.44 ft/min) at a particle Reynolds number of 0.11, safely in the Stokes regime. Stokes' law holds only while Re = rho_w Vs d / mu is below about 1; a 0.5 mm sand grain reaches Re ~ 112, so the tile FLAGS it -- there the real velocity is lower and the transition (CD-based) or Newton's law applies. The overflow rate of an ideal clarifier equals this critical settling velocity: a particle is removed when its Vs meets or exceeds the surface loading. A discrete (Type I) settling screen only: flocculent, hindered, and compression settling, non-spherical shape, and short-circuiting are separate. First-principles (Stokes 1851; Davis & Cornwell, Introduction to Environmental Engineering)." ,
+    hindered_velocity_mm_s, richardson_zaki_n: rz_n, has_solids: solids_volume_pct > 0,
+    note: "The terminal settling velocity of a discrete spherical particle in still water by Stokes' law, Vs = g (rho_p - rho_w) d^2 / (18 mu) -- the workhorse of grit-chamber and Type I sedimentation-basin design. Water density and viscosity are computed from the temperature (colder water is more viscous and settles particles more slowly). A 0.05 mm silt grain (SG 2.65) at 68 F settles about 2.25 mm/s (0.44 ft/min) at a particle Reynolds number of 0.11, safely in the Stokes regime. Stokes' law holds only while Re = rho_w Vs d / mu is below about 1; a 0.5 mm sand grain reaches Re ~ 112, so the tile FLAGS it -- there the real velocity is lower and the transition (CD-based) or Newton's law applies. The overflow rate of an ideal clarifier equals this critical settling velocity: a particle is removed when its Vs meets or exceeds the surface loading. A discrete (Type I) settling screen; with the solids by volume entered it also gives the hindered velocity of a concentrated suspension by Richardson-Zaki, vs (1 - c)^n (n 4.65 in the Stokes range, falling to 2.39 at high Reynolds number). Flocculent and compression settling, non-spherical shape, and short-circuiting are separate. First-principles (Stokes 1851; Davis & Cornwell, Introduction to Environmental Engineering)." ,
   };
 }
 
@@ -1349,24 +1356,27 @@ function _v1271renderParticleSettlingVelocity(inputRegion, outputRegion, citatio
   const d = makeNumber("Particle diameter (mm)", "psv-d", { step: "any", min: "0" });
   const sg = makeNumber("Particle specific gravity", "psv-sg", { step: "any", min: "0" });
   const tf = makeNumber("Water temperature (°F)", "psv-tf", { step: "any" });
-  for (const f of [d, sg, tf]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { d.input.value = "0.05"; sg.input.value = "2.65"; tf.input.value = "68"; update(); });
+  const cv = makeNumber("Solids by volume (%, for hindered settling; blank if dilute)", "psv-cv", { step: "any", min: "0", max: "50" });
+  for (const f of [d, sg, tf, cv]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { d.input.value = "0.05"; sg.input.value = "2.65"; tf.input.value = "68"; cv.input.value = ""; update(); });
   const oVs = makeOutputLine(outputRegion, "Settling velocity", "psv-out-vs");
   const oVsF = makeOutputLine(outputRegion, "Settling velocity (ft/min)", "psv-out-vsf");
   const oRe = makeOutputLine(outputRegion, "Particle Reynolds number", "psv-out-re");
   const oReg = makeOutputLine(outputRegion, "Flow regime", "psv-out-reg");
+  const oH = makeOutputLine(outputRegion, "Hindered settling velocity", "psv-out-h");
   const update = debounce(() => {
     const r = computeParticleSettlingVelocity({
       particle_diameter_mm: d.input.value === "" ? 0.05 : Number(d.input.value), particle_sg: sg.input.value === "" ? 2.65 : Number(sg.input.value),
-      water_temp_f: tf.input.value === "" ? 68 : Number(tf.input.value),
+      water_temp_f: tf.input.value === "" ? 68 : Number(tf.input.value), solids_volume_pct: cv.input.value === "" ? 0 : Number(cv.input.value),
     });
-    if (r.error) { oVs.textContent = r.error; oVsF.textContent = "-"; oRe.textContent = "-"; oReg.textContent = "-"; return; }
+    if (r.error) { oVs.textContent = r.error; oVsF.textContent = "-"; oRe.textContent = "-"; oReg.textContent = "-"; oH.textContent = "-"; return; }
     oVs.textContent = fmt(r.settling_velocity_mm_s, 3) + " mm/s";
     oVsF.textContent = fmt(r.settling_velocity_ft_min, 3) + " ft/min";
     oRe.textContent = fmt(r.reynolds, 3);
     oReg.textContent = r.regime;
+    oH.textContent = r.has_solids ? fmt(r.hindered_velocity_mm_s, 3) + " mm/s (Richardson-Zaki n = " + fmt(r.richardson_zaki_n, 2) + ")" : "enter the solids by volume for a concentrated suspension";
   }, DEBOUNCE_MS);
-  for (const f of [d, sg, tf]) f.input.addEventListener("input", update);
+  for (const f of [d, sg, tf, cv]) f.input.addEventListener("input", update);
 }
 TREATMENT_RENDERERS["particle-settling-velocity"] = _v1271renderParticleSettlingVelocity;
 

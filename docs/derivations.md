@@ -3725,7 +3725,7 @@ cross-check.
 | calc-treatment.js | `computeFlocculatorPaddlePower` | `{ paddle_radius_ft = 0, wheel_rpm = 0, paddle_area_ft2 = 0, drag_coeff = 1.8,...` | _ | _ | _ |
 | calc-treatment.js | `computeLangelierIndex` | `{ ph = 0, temp = 0, temp_unit = "C", ca_mgl = 0, alk_mgl = 0, tds_mgl = 0 } = {}` | _ | _ | _ |
 | calc-treatment.js | `computeOilWaterSeparatorSizing` | `{ flow_gpm = 50, oil_sg = 0.85, droplet_micron = 150, water_viscosity_cp = 1....` | _ | _ | _ |
-| calc-treatment.js | `computeParticleSettlingVelocity` | `{ particle_diameter_mm = 0.05, particle_sg = 2.65, water_temp_f = 68 } = {}` | _ | _ | _ |
+| calc-treatment.js | `computeParticleSettlingVelocity` | `{ particle_diameter_mm = 0.05, particle_sg = 2.65, water_temp_f = 68, solids_...` | _ | _ | _ |
 | calc-treatment.js | `computePoolAlkalinityAdjust` | `{ gallons = 0, current_ta_ppm = 0, target_ta_ppm = 0 } = {}` | _ | _ | _ |
 | calc-treatment.js | `computePoolCalciumHardnessDose` | `{ gallons = 20000, ppm_increase = 20, product_purity_pct = 77 } = {}` | _ | _ | _ |
 | calc-treatment.js | `computePoolChlorineDose` | `{ ppm = 0, gallons = 0, product = "cal-hypo-65", avail = 0 } = {}` | _ | _ | _ |
@@ -5976,7 +5976,7 @@ per spec-v14 §13.1 second paragraph.
 | `lift-station-outage-storage` | Lift Station Outage: Time to Overflow and Pump-and-Haul Loads | Project (first-principles); mass balance | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `main-flushing-volume` | Water Main Flushing Volume, Duration, and Velocity | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `oil-water-separator-sizing` | Gravity Oil/Water Separator Surface Area (API 421) | API Publication 421 (gravity oil/wate...; Vt=9.81*(rho_w-rho_o)*d^2/(18*mu) SI -> 0.3285 ft/min; vH... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
-| `particle-settling-velocity` | Discrete-Particle Settling Velocity (Stokes' Law) | Stokes' law (Davis & Cornwell, Introd...; mu=2.414e-5*10^(247.8/(293.15-140))=1.0019e-3; rho_w=998.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `particle-settling-velocity` | Discrete-Particle Settling Velocity (Stokes' Law) | Stokes' law (Davis & Cornwell, Introd...; mu=2.414e-5*10^(247.8/(293.15-140))=1.0019e-3; rho_w=998.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `pool-alkalinity-adjust` | Pool Total Alkalinity Adjustment | NSPF CPO Handbook / ANSI-APSP-ICC dos...; spec-v93 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `pool-calcium-hardness-dose` | Pool Calcium Hardness Increase (Calcium Chloride) | Pool calcium hardness increase (calci...; lb = 20*20000*8.34e-6*(110.98/100.09)/0.77 = 3.336*1.1088... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `pool-chlorine-dose` | Pool Free-Chlorine Dose by Product | pool-care practice; spec-v353 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
