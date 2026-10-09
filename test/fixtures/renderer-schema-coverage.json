@@ -1,7 +1,7 @@
 {
   "note": "spec-v1184 coverage ratchet. Tiles whose renderer exposes a render.schema consistent with the compute function. Grow with `node scripts/check-renderer-schema.mjs --write`; regeneration is intentional.",
-  "total_tiles": 2248,
-  "covered_count": 2169,
+  "total_tiles": 2249,
+  "covered_count": 2170,
   "covered": [
     "aav-install-check",
     "abatement-containment",
@@ -1380,6 +1380,7 @@
     "pull-box-sizing",
     "pulley-ma-gen",
     "pulling-tension",
+    "pulp-density-solids",
     "pulse-flowmeter-k-factor",
     "pump-eff-w2w",
     "pump-impeller-trim",

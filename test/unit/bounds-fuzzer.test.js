@@ -58851,3 +58851,17 @@ test("bounds: screen-efficiency recoveries close the fines and coarse balances",
   assert.ok(Math.abs(_sef({ feed_undersize_pct: 40, oversize_undersize_pct: 0, undersize_undersize_pct: 100 }).overall_efficiency_pct - 100) < 1e-9);
   assert.ok("error" in _sef({ feed_undersize_pct: 5, oversize_undersize_pct: 8, undersize_undersize_pct: 98 }));
 });
+
+import { computePulpDensitySolids as _pds } from "../../calc-mining.js";
+test("bounds: pulp-density-solids round-trips weight percent and pulp SG and conserves volume", () => {
+  for (const w of [10, 40, 70]) {
+    const a = _pds({ solids_sg: 2.7, percent_solids_wt: w, dry_solids_stph: 100 });
+    assert.ok(Math.abs(_pds({ solids_sg: 2.7, pulp_sg: a.pulp_sg_out }).percent_solids_out - w) < 1e-9);
+    // Slurry ft^3/h = solids volume + water volume.
+    const cfh = (100 * 2000) / (2.7 * 62.428) + (a.water_stph * 2000) / 62.428;
+    assert.ok(Math.abs(a.slurry_gpm - (cfh / 60) * (1728 / 231)) < 1e-6);
+  }
+  assert.ok("error" in _pds({ solids_sg: 2.7, percent_solids_wt: 40, pulp_sg: 1.3 }));
+  assert.ok("error" in _pds({ solids_sg: 2.7 }));
+  assert.ok("error" in _pds({ solids_sg: 2.7, pulp_sg: 3 }));
+});

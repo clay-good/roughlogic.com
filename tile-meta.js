@@ -860,6 +860,7 @@ const _TILES = [
   ["bond-work-index-power", "E"],
   ["circulating-load-ratio", "E"],
   ["screen-efficiency", "E"],
+  ["pulp-density-solids", "E"],
   ["screen-deck-capacity", "E"],
   ["belt-feeder-capacity", "E"],
   ["dust-collector-air-to-cloth", "E"],

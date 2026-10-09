@@ -588,6 +588,58 @@ MINING_RENDERERS["screen-efficiency"] = _simpleRenderer({
   compute: computeScreenEfficiency,
 });
 
+// spec-v1945: pulp (slurry) density and percent solids, the Marcy-scale relations. Mass fractions add by volume:
+// 1/SG_pulp = w/SG_s + (1 - w)/SG_liquid, so w = SG_s (SG_p - SG_l) / (SG_p (SG_s - SG_l)). From a dry feed rate
+// it also gives the water to add and the slurry flow in gpm. Either the percent solids or the measured pulp SG is entered.
+// dims: in { solids_sg: dimensionless, percent_solids_wt: dimensionless, pulp_sg: dimensionless, liquid_sg: dimensionless, dry_solids_stph: M T^-1 } out: { pulp_sg_out: dimensionless, percent_solids_out: dimensionless, percent_solids_vol: dimensionless, water_stph: M T^-1, slurry_gpm: L^3 T^-1 }
+export function computePulpDensitySolids({ solids_sg = 2.7, percent_solids_wt = 0, pulp_sg = 0, liquid_sg = 1.0, dry_solids_stph = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const Ss = Number(solids_sg) || 0, Sl = Number(liquid_sg) || 0, Q = Number(dry_solids_stph) || 0;
+  const wIn = Number(percent_solids_wt) || 0, SpIn = Number(pulp_sg) || 0;
+  if (!(Sl > 0)) return { error: "Liquid specific gravity must be positive (1.0 for water)." };
+  if (!(Ss > Sl)) return { error: "Solids specific gravity must exceed the liquid's (about 2.6-2.8 for most rock)." };
+  if (Q < 0) return { error: "Dry solids rate cannot be negative (short tons per hour; blank to skip)." };
+  if ((wIn > 0) === (SpIn > 0)) return { error: "Enter either the percent solids by weight or the measured pulp specific gravity, not both." };
+  let w, Sp;
+  if (wIn > 0) {
+    if (!(wIn < 100)) return { error: "Percent solids must be below 100." };
+    w = wIn / 100;
+    Sp = 1 / (w / Ss + (1 - w) / Sl);
+  } else {
+    if (!(SpIn > Sl && SpIn < Ss)) return { error: "Pulp specific gravity must lie between the liquid's and the solids'." };
+    Sp = SpIn;
+    w = (Ss * (Sp - Sl)) / (Sp * (Ss - Sl));
+  }
+  const percent_solids_vol = (w / Ss) / (w / Ss + (1 - w) / Sl) * 100;
+  const water_stph = Q * (1 - w) / w;
+  // Slurry volume flow: tons/h -> lb/min -> ft^3/min -> gpm (7.48052 gal/ft^3, water 62.428 lb/ft^3).
+  const slurry_gpm = Q > 0 ? ((Q / w) * 2000 / 60) / (Sp * 62.428) * (1728 / 231) : 0;
+  if (![Sp, w, percent_solids_vol, water_stph, slurry_gpm].every(Number.isFinite)) return { error: "Pulp-density math is not a finite value; check the inputs." };
+  return {
+    pulp_sg_out: Sp, percent_solids_out: w * 100, percent_solids_vol, water_stph, slurry_gpm, has_rate: Q > 0,
+    note: "The two numbers a mill or dredge operator trades back and forth: percent solids by weight and the pulp (slurry) density a Marcy scale reads. Because solids and liquid add by volume, 1/SG_pulp = w/SG_solids + (1 - w)/SG_liquid, and inverted, w = SG_s (SG_p - SG_l)/(SG_p (SG_s - SG_l)). Percent solids by volume is much lower than by weight (40% by weight of 2.7 SG rock is under 20% by volume), and volume is what a pump and pipe see. With a dry solids rate it also gives the water to add and the slurry flow in gpm. Solids SG comes from the ore (about 2.65 quartz, 2.7 limestone, 5.0 magnetite). Fully wetted solids, no entrained air. A screen; plant sampling governs.",
+  };
+}
+export const pulpDensitySolidsExample = { inputs: { solids_sg: 2.7, percent_solids_wt: 40, pulp_sg: 0, liquid_sg: 1.0, dry_solids_stph: 100 } };
+MINING_RENDERERS["pulp-density-solids"] = _simpleRenderer({
+  citation: "Citation: pulp density and percent solids by volume addition (the Marcy-scale relations, as in Wills' Mineral Processing Technology), by name: 1/SG_pulp = w/SG_s + (1 - w)/SG_l; w = SG_s (SG_p - SG_l)/(SG_p (SG_s - SG_l)); water = dry tons x (1 - w)/w; slurry gpm from mass over pulp density. Fully wetted solids, no air. A screen; plant sampling governs.",
+  example: pulpDensitySolidsExample.inputs,
+  fields: [
+    { key: "solids_sg", label: "Solids specific gravity (2.7 typical rock)", kind: "number", default: 2.7, attrs: { step: "any", value: "2.7" } },
+    { key: "percent_solids_wt", label: "Percent solids by weight (or leave blank and enter the pulp SG)", kind: "number" },
+    { key: "pulp_sg", label: "Measured pulp specific gravity (or leave blank and enter % solids)", kind: "number" },
+    { key: "liquid_sg", label: "Liquid specific gravity (1.0 water)", kind: "number", default: 1, attrs: { step: "any", value: "1" } },
+    { key: "dry_solids_stph", label: "Dry solids rate (short tons per hour, blank to skip)", kind: "number" },
+  ],
+  outputs: [
+    { key: "p", id: "pds-out-p", label: "Pulp specific gravity", value: (r) => fmt(r.pulp_sg_out, 3) + " (" + fmt(r.pulp_sg_out * 8.3454, 2) + " lb/gal)" },
+    { key: "w", id: "pds-out-w", label: "Percent solids", value: (r) => fmt(r.percent_solids_out, 1) + "% by weight, " + fmt(r.percent_solids_vol, 1) + "% by volume" },
+    { key: "q", id: "pds-out-q", label: "Water and slurry flow", value: (r) => (r.has_rate ? fmt(r.water_stph, 1) + " st/h of water; " + fmt(r.slurry_gpm, 0) + " gpm of slurry" : "enter the dry solids rate") },
+    { key: "n", id: "pds-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computePulpDensitySolids,
+});
+
 // ===================== spec-v1513: vibrating screen deck capacity =====================
 
 // dims: in { deck_width_ft: L, deck_length_ft: L, base_capacity_tph_per_sqft: M T^-1 L^-2, oversize_factor: dimensionless, halfsize_factor: dimensionless, deck_factor: dimensionless, wet_factor: dimensionless, efficiency_factor: dimensionless, actual_feed_tph: M T^-1 } out: { screen_area_sqft: L^2, combined_multiplier: dimensionless, capacity_tph: M T^-1, percent_of_capacity: dimensionless, area_required_sqft: L^2 }

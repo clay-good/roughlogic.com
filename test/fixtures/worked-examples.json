@@ -169199,6 +169199,42 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "pulp-density-solids",
+  "source_publisher": "Project (first-principles)",
+  "source_title": "40% solids by weight, 2.7 SG rock, 100 st/h dry",
+  "source_edition_or_year": "Marcy-scale relations",
+  "source_section_or_page": "1/(0.4/2.7 + 0.6) = 1.3366; vol % = 0.14815/0.74815 = 19.80%; water 150 st/h; slurry 500,000 lb/h / (1.3366 x 62.428) = 99.87 cfm = 747 gpm",
+  "verified_by": "rl",
+  "verified_on": "2026-10-09",
+  "inputs": {
+   "solids_sg": 2.7,
+   "percent_solids_wt": 40,
+   "pulp_sg": 0,
+   "liquid_sg": 1.0,
+   "dry_solids_stph": 100
+  },
+  "outputs": {
+   "pulp_sg_out": {
+    "value": 1.3366,
+    "tolerance": {
+     "pct": 0.5
+    }
+   },
+   "percent_solids_vol": {
+    "value": 19.8,
+    "tolerance": {
+     "pct": 0.5
+    }
+   },
+   "slurry_gpm": {
+    "value": 747.1,
+    "tolerance": {
+     "pct": 0.5
+    }
+   }
+  }
  }
  ]
 }

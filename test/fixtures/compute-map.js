@@ -1632,6 +1632,7 @@ export const COMPUTE_MAP = {
   "bond-work-index-power": { module: "../../calc-mining.js", fn: "computeBondWorkIndexPower" },
   "circulating-load-ratio": { module: "../../calc-mining.js", fn: "computeCirculatingLoadRatio" },
   "screen-efficiency": { module: "../../calc-mining.js", fn: "computeScreenEfficiency" },
+  "pulp-density-solids": { module: "../../calc-mining.js", fn: "computePulpDensitySolids" },
   "screen-deck-capacity": { module: "../../calc-mining.js", fn: "computeScreenDeckCapacity" },
   "belt-feeder-capacity": { module: "../../calc-mining.js", fn: "computeBeltFeederCapacity" },
   "dust-collector-air-to-cloth": { module: "../../calc-mining.js", fn: "computeDustCollectorAirToCloth" },

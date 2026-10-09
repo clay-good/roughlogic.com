@@ -60,6 +60,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **`calc-mining.js` gzip cap raised 35,000 -> 42,000 B.** The four mineral-processing calculators added 2026-10-09 (Bond work index, circulating load, screen efficiency, pulp density) take it past the old cap. It is lazy-loaded and outside the home-view payload.
+
 - **`band-brake-torque` gives the peak lining pressure and band stress.** It said band stress and width were separate. An optional band width now returns the peak lining pressure at the tight end, p_max = T1/(b r), and a thickness adds the band tension stress T1/(b t): the example's 205.6 lbf tight side on a 2 in by 1/16 in band over a 6 in radius is 17.1 psi and 1,645 psi. Torque results are unchanged.
 
 - **`sump-basin-sizing` checks a sewage ejector against IPC Table 712.4.2.** An optional discharge-size select (2, 2-1/2, or 3 in) now compares the pump rate with the table's minimum capacity (21, 30, 46 gpm, each about 2 ft/s of scouring velocity in that pipe) and reports the velocity: the 30 gpm example pump meets a 2 or 2-1/2 in discharge but falls below the 46 gpm a 3 in line needs. Clear-water sumps (the default) are unchanged.
@@ -105,6 +107,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 - **`concrete-anchor-shear-breakout` covers shear parallel to an edge (ACI 318-19 17.7.2.1(c)).** The note said this case was "not modeled". A direction select now applies it: twice the breakout computed as if the shear acted toward that edge, with psi_edV = 1.0. The 3/4 in anchor 6 in from an edge goes from 8,366 lb toward the edge to 16,731 lb parallel to it; with a 4 in corner distance, psi_edV drops out before doubling (5,035 -> 12,084 lb).
 
 ### Added
+
+- **`pulp-density-solids`: pulp density and percent solids, either way (spec-v1945, Group E, `calc-mining.js`), 2,248 -> 2,249, v0.438.0.** Nothing converted between percent solids by weight and the slurry specific gravity a Marcy scale reads. This one does both ways from the solids SG (1/SG_p = w/SG_s + (1 - w)/SG_l), adds the percent by volume, and from a dry rate the water to add and the slurry gpm: 40% solids of 2.7 SG rock is a 1.337 SG pulp, 19.8% by volume, 747 gpm at 100 st/h.
 
 - **`screen-efficiency`: screen efficiency by the two-product formula (spec-v1944, Group E, `calc-mining.js`), 2,247 -> 2,248, v0.437.0.** `screen-deck-capacity` said screening efficiency was not computed. From three assays of the percent finer than the aperture (feed, oversize, undersize) this returns the share of feed passing, the fines recovery, the oversize efficiency, and the overall efficiency: 40 / 8 / 98 % gives 35.6% passing, 87.1% fines recovery, and 86.1% overall.
 

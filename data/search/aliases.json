@@ -116747,6 +116747,31 @@
    "term": "how well is my screen working",
    "target": "screen-efficiency",
    "kind": "question"
+  },
+  {
+   "term": "pulp density",
+   "target": "pulp-density-solids",
+   "kind": "industry"
+  },
+  {
+   "term": "percent solids slurry",
+   "target": "pulp-density-solids",
+   "kind": "industry"
+  },
+  {
+   "term": "marcy scale",
+   "target": "pulp-density-solids",
+   "kind": "industry"
+  },
+  {
+   "term": "pulp specific gravity to percent solids",
+   "target": "pulp-density-solids",
+   "kind": "industry"
+  },
+  {
+   "term": "how much water to add to make slurry",
+   "target": "pulp-density-solids",
+   "kind": "question"
   }
  ]
 }

@@ -1511,6 +1511,7 @@ const RELATED = {
   "bond-work-index-power": ["crusher-reduction-ratio","screen-deck-capacity","belt-feeder-capacity"],
   "circulating-load-ratio": ["bond-work-index-power","screen-deck-capacity","crusher-reduction-ratio"],
   "screen-efficiency": ["screen-deck-capacity","circulating-load-ratio","crusher-reduction-ratio"],
+  "pulp-density-solids": ["slurry-critical-velocity","circulating-load-ratio","bond-work-index-power"],
   "screen-deck-capacity": ["crusher-reduction-ratio","belt-feeder-capacity","fine-aggregate-grading"],
   "belt-feeder-capacity": ["belt-conveyor-tension-power","screen-deck-capacity","crusher-reduction-ratio"],
   "dust-collector-air-to-cloth": ["dust-deflagration-vent-area","dust-collection-duct","hood-exhaust"],

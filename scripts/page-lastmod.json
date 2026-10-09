@@ -2,99 +2,99 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "28706a6837281aac",
+      "sha": "d4984d595b6f0785",
       "date": "2026-10-09"
     },
     "/tools/": {
-      "sha": "1c1b57bd834eb8db",
+      "sha": "d4ee4201b844b6f9",
       "date": "2026-10-09"
     },
     "/collections/disaster-response/": {
-      "sha": "018466adffc1e803",
+      "sha": "eeb9a2d1e5e915ae",
       "date": "2026-10-09"
     },
     "/groups/accounting/": {
-      "sha": "eadccad3c5f02696",
+      "sha": "9e136b0aab26967b",
       "date": "2026-10-09"
     },
     "/groups/agriculture/": {
-      "sha": "fe53c3979b5c6eb5",
+      "sha": "e6b0451951e5aa21",
       "date": "2026-10-09"
     },
     "/groups/construction/": {
-      "sha": "7ef5d0830260bd49",
+      "sha": "108fa8e1707ab69d",
       "date": "2026-10-09"
     },
     "/groups/cross-trade/": {
-      "sha": "4f1614789c39786e",
+      "sha": "0e9c3fca43c4f639",
       "date": "2026-10-09"
     },
     "/groups/educators/": {
-      "sha": "3ee253af30174a5a",
+      "sha": "ad876187c440ff83",
       "date": "2026-10-09"
     },
     "/groups/electrical/": {
-      "sha": "f0df48d6d1df5f0b",
+      "sha": "1f0db62edac218dd",
       "date": "2026-10-09"
     },
     "/groups/field/": {
-      "sha": "285e7025d41124c4",
+      "sha": "70317e8c45918605",
       "date": "2026-10-09"
     },
     "/groups/fire-ground/": {
-      "sha": "2b6b39dbad68d9c4",
+      "sha": "2958db0741bd83d1",
       "date": "2026-10-09"
     },
     "/groups/historical/": {
-      "sha": "cec66e49d5b78400",
+      "sha": "7d98a4a567372fcd",
       "date": "2026-10-09"
     },
     "/groups/hvac/": {
-      "sha": "fb3955d0fc1be517",
+      "sha": "e529af3a1622b215",
       "date": "2026-10-09"
     },
     "/groups/kitchen/": {
-      "sha": "4700557e133aa10b",
+      "sha": "a3c4386adc9ff3aa",
       "date": "2026-10-09"
     },
     "/groups/lab/": {
-      "sha": "a2ad6bfb92224064",
+      "sha": "33ab59447ba35500",
       "date": "2026-10-09"
     },
     "/groups/mechanic/": {
-      "sha": "73d7e1d6f6a8ca32",
+      "sha": "26eeb981913613b9",
       "date": "2026-10-09"
     },
     "/groups/plumbing/": {
-      "sha": "14821e6dec57a8fc",
+      "sha": "a00383e1dfa795fc",
       "date": "2026-10-09"
     },
     "/groups/real-estate/": {
-      "sha": "d633d89105b5397a",
+      "sha": "430437022b4a00c0",
       "date": "2026-10-09"
     },
     "/groups/references/": {
-      "sha": "5b37da6e6e941b07",
+      "sha": "2be5ae90a2eade61",
       "date": "2026-10-09"
     },
     "/groups/restoration/": {
-      "sha": "5d4610da4290d13f",
+      "sha": "3cf8247b87e3bb7d",
       "date": "2026-10-09"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "87cc2eadd259b5c8",
+      "sha": "759bdde42b1fd02d",
       "date": "2026-10-09"
     },
     "/groups/stage/": {
-      "sha": "f50426f9961316eb",
+      "sha": "1df9142cb72f5d28",
       "date": "2026-10-09"
     },
     "/groups/trucking/": {
-      "sha": "e0b206bc3544d4b1",
+      "sha": "dbbab61b2bddb6d6",
       "date": "2026-10-09"
     },
     "/groups/water/": {
-      "sha": "9bfcbafd9d65c3e1",
+      "sha": "46d306ef30b428a8",
       "date": "2026-10-09"
     },
     "/tools/aav-install-check/": {
@@ -4290,8 +4290,8 @@
       "date": "2026-10-01"
     },
     "/tools/lidar-point-density/": {
-      "sha": "39cd13ace46e11a0",
-      "date": "2026-09-29"
+      "sha": "35ea9f1b23e791a8",
+      "date": "2026-10-09"
     },
     "/tools/lifeline-tension/": {
       "sha": "ab6f705309461992",
@@ -5840,6 +5840,10 @@
     "/tools/pulling-tension/": {
       "sha": "c61245624430a221",
       "date": "2026-09-29"
+    },
+    "/tools/pulp-density-solids/": {
+      "sha": "59cf45c56f07623d",
+      "date": "2026-10-09"
     },
     "/tools/pulse-flowmeter-k-factor/": {
       "sha": "b484925ab32d4ef9",

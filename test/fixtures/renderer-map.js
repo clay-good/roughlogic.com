@@ -915,6 +915,7 @@ export const RENDERER_MAP = {
   "bond-work-index-power": { module: "../../calc-mining.js", exportName: "MINING_RENDERERS" },
   "circulating-load-ratio": { module: "../../calc-mining.js", exportName: "MINING_RENDERERS" },
   "screen-efficiency": { module: "../../calc-mining.js", exportName: "MINING_RENDERERS" },
+  "pulp-density-solids": { module: "../../calc-mining.js", exportName: "MINING_RENDERERS" },
   "screen-deck-capacity": { module: "../../calc-mining.js", exportName: "MINING_RENDERERS" },
   "belt-feeder-capacity": { module: "../../calc-mining.js", exportName: "MINING_RENDERERS" },
   "dust-collector-air-to-cloth": { module: "../../calc-mining.js", exportName: "MINING_RENDERERS" },

@@ -15506,6 +15506,17 @@ export const CITATIONS = {
       { name: "Efficiency", value: "fines recovery x oversize efficiency", source: "Wills" },
     ],
   },
+  "pulp-density-solids": {
+    formula: "1/SG_p = w/SG_s + (1 - w)/SG_l; w = SG_s (SG_p - SG_l)/(SG_p (SG_s - SG_l)); vol % = (w/SG_s)/(w/SG_s + (1 - w)/SG_l); water = Q (1 - w)/w; slurry gpm = (Q/w x 2000/60) / (SG_p x 62.428) x 1728/231.",
+    edition: "Pulp density and percent solids by volume addition (the Marcy-scale relations, as in Wills' Mineral Processing Technology), by name.",
+    freeAccess: "Mixture arithmetic on the user's own specific gravities and rates.",
+    governance: GOVERNANCE.general,
+    editionNote: "Converts between percent solids by weight and pulp specific gravity for fully wetted solids with no entrained air, and from a dry solids rate gives the water to add and the slurry volume flow (water at 62.428 lb/ft^3). Percent solids by volume, not by weight, is what pumps and pipes see. A screen; plant sampling governs.",
+    assumptions: [
+      { name: "Volume addition", value: "solids and liquid volumes add (no air, fully wetted)", source: "Wills" },
+      { name: "Water density", value: "62.428 lb/ft^3 (8.345 lb/gal)", source: "physical constant" },
+    ],
+  },
   "crusher-reduction-ratio": {
     formula: "reduction ratio = feed size / product size on 80% passing sizes; circuit ratios MULTIPLY, so an even split is the total raised to one over the stage count; stages needed = ceil(log of the total over log of the machine's high ratio).",
     edition: "The reduction ratio relation and the multiplicative circuit rule by name, with typical machine ranges (Metso Crushing and Screening Handbook, 7th ed.: jaw 3 to 5, primary gyratory 6 to 8, secondary cone 3 to 4, tertiary cone 2 to 3.5; impactors run higher) entered rather than shipped. The crusher manufacturer's selection data and the plant designer govern.",
