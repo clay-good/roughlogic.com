@@ -116522,6 +116522,31 @@
    "term": "how much does an off center load weaken a column",
    "target": "column-secant-formula",
    "kind": "question"
+  },
+  {
+   "term": "s-n curve calculator",
+   "target": "fatigue-finite-life",
+   "kind": "industry"
+  },
+  {
+   "term": "finite life fatigue strength",
+   "target": "fatigue-finite-life",
+   "kind": "industry"
+  },
+  {
+   "term": "fatigue life cycles to failure",
+   "target": "fatigue-finite-life",
+   "kind": "industry"
+  },
+  {
+   "term": "basquin equation",
+   "target": "fatigue-finite-life",
+   "kind": "industry"
+  },
+  {
+   "term": "how many cycles will this part last",
+   "target": "fatigue-finite-life",
+   "kind": "question"
   }
  ]
 }

@@ -2,99 +2,99 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "7290105102c17c57",
+      "sha": "4cad9383438b5522",
       "date": "2026-10-09"
     },
     "/tools/": {
-      "sha": "a96211dffa4b3e33",
+      "sha": "b21a50f0f07c2283",
       "date": "2026-10-09"
     },
     "/collections/disaster-response/": {
-      "sha": "84f1c59891ebc814",
+      "sha": "75e8329939eab5e1",
       "date": "2026-10-09"
     },
     "/groups/accounting/": {
-      "sha": "2897f5867337713d",
+      "sha": "6b7823fc627021a7",
       "date": "2026-10-09"
     },
     "/groups/agriculture/": {
-      "sha": "772478c13236372e",
+      "sha": "0f268a0df4027de5",
       "date": "2026-10-09"
     },
     "/groups/construction/": {
-      "sha": "7f9228abb666a2f3",
+      "sha": "16a4194cab784bcb",
       "date": "2026-10-09"
     },
     "/groups/cross-trade/": {
-      "sha": "39ed4d9b9fb03629",
+      "sha": "b4a9855f4066d34b",
       "date": "2026-10-09"
     },
     "/groups/educators/": {
-      "sha": "5a11321529c51df2",
+      "sha": "75503f2d9ae5618d",
       "date": "2026-10-09"
     },
     "/groups/electrical/": {
-      "sha": "4ca4fd030c4a56d3",
+      "sha": "4612f84f1120113b",
       "date": "2026-10-09"
     },
     "/groups/field/": {
-      "sha": "ea5b6d48d35a979a",
+      "sha": "d2eb7e9b0d51f2a2",
       "date": "2026-10-09"
     },
     "/groups/fire-ground/": {
-      "sha": "c0d0dbdd8c9fee85",
+      "sha": "5e403db6dac99157",
       "date": "2026-10-09"
     },
     "/groups/historical/": {
-      "sha": "4e1dad4bc3e41c18",
+      "sha": "219baa741d935da2",
       "date": "2026-10-09"
     },
     "/groups/hvac/": {
-      "sha": "d55243b915fd44c5",
+      "sha": "21182dc5a43b1728",
       "date": "2026-10-09"
     },
     "/groups/kitchen/": {
-      "sha": "56c0554847815cfd",
+      "sha": "8d17fddee946f8ac",
       "date": "2026-10-09"
     },
     "/groups/lab/": {
-      "sha": "c2a471b183bd9eb7",
+      "sha": "424c85c9f903239d",
       "date": "2026-10-09"
     },
     "/groups/mechanic/": {
-      "sha": "e4a82d1558b13c89",
+      "sha": "446554c87251560b",
       "date": "2026-10-09"
     },
     "/groups/plumbing/": {
-      "sha": "c4ad50cc18bfbe15",
+      "sha": "b97b8a3f0f53ceb2",
       "date": "2026-10-09"
     },
     "/groups/real-estate/": {
-      "sha": "3b76dfde749a6dd5",
+      "sha": "23757703af27bfc3",
       "date": "2026-10-09"
     },
     "/groups/references/": {
-      "sha": "c66a21e52acd52e3",
+      "sha": "8d91c148f9bfc956",
       "date": "2026-10-09"
     },
     "/groups/restoration/": {
-      "sha": "f78c462fdf797edb",
+      "sha": "6e778af36f917048",
       "date": "2026-10-09"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "3d1a0bd5e3480d4f",
+      "sha": "3510414d04e12094",
       "date": "2026-10-09"
     },
     "/groups/stage/": {
-      "sha": "6566d5bb8b18a811",
+      "sha": "bb1fc5f001ec3858",
       "date": "2026-10-09"
     },
     "/groups/trucking/": {
-      "sha": "9b11c37a0109acf2",
+      "sha": "a0e6c95a78c5fec3",
       "date": "2026-10-09"
     },
     "/groups/water/": {
-      "sha": "50d2e2f5713a6442",
+      "sha": "1a992d9c90b5eb7e",
       "date": "2026-10-09"
     },
     "/tools/aav-install-check/": {
@@ -2646,8 +2646,8 @@
       "date": "2026-09-29"
     },
     "/tools/endurance-limit-marin/": {
-      "sha": "4509b5aaa38d1189",
-      "date": "2026-09-29"
+      "sha": "e336f29e2717d21e",
+      "date": "2026-10-09"
     },
     "/tools/engine-bmep/": {
       "sha": "2d91b4b50fa8cd8c",
@@ -2857,9 +2857,13 @@
       "sha": "260e3c2d2b4d8bd8",
       "date": "2026-09-29"
     },
+    "/tools/fatigue-finite-life/": {
+      "sha": "351d663f1a04b9f2",
+      "date": "2026-10-09"
+    },
     "/tools/fatigue-safety-factor/": {
-      "sha": "acee117c71673dc2",
-      "date": "2026-09-29"
+      "sha": "ffd69b20491092c4",
+      "date": "2026-10-09"
     },
     "/tools/fdc-supply-check/": {
       "sha": "e9010c335d0646c3",

@@ -963,7 +963,7 @@ export function computeFatigueSafetyFactor({ alternating_stress_psi = 0, mean_st
   const governs = governing_n === langer_ny && langer_ny < fatigue_n ? "first-cycle yield (Langer)" : "fatigue";
   return {
     fatigue_n, langer_ny, governing_n, governs,
-    note: "Infinite-life fatigue safety factor for a uniaxial fluctuating stress, with the alternating amplitude sigma_a and the mean (midrange) sigma_m. Modified Goodman 1/n = sa/Se + sm/Sut is the standard design line; Soderberg 1/n = sa/Se + sm/Sy is the most conservative (it never yields); Gerber n sa/Se + (n sm/Sut)^2 = 1 is the least conservative and the best fit to test data. Se is the CORRECTED endurance limit (Se' ~= 0.5 Sut for steel with Sut < 200 ksi, times the Marin surface/size/load/temperature/reliability factors) and is an input here so the tile needs no material tables. The Langer line ny = Sy/(sa + sm) catches first-cycle yielding, which can govern at high mean stress; the reported governing factor is the smaller of the two. With sigma_m = 0 (fully reversed) every criterion gives n = Se/sigma_a. Uniaxial stress, infinite life; building Se from the Marin factors, notch sensitivity (Kf), finite-life S-N counting, and multiaxial combination are separate. A design aid; Shigley / Juvinall and the engineer of record govern.",
+    note: "Infinite-life fatigue safety factor for a uniaxial fluctuating stress, with the alternating amplitude sigma_a and the mean (midrange) sigma_m. Modified Goodman 1/n = sa/Se + sm/Sut is the standard design line; Soderberg 1/n = sa/Se + sm/Sy is the most conservative (it never yields); Gerber n sa/Se + (n sm/Sut)^2 = 1 is the least conservative and the best fit to test data. Se is the CORRECTED endurance limit (Se' ~= 0.5 Sut for steel with Sut < 200 ksi, times the Marin surface/size/load/temperature/reliability factors) and is an input here so the tile needs no material tables. The Langer line ny = Sy/(sa + sm) catches first-cycle yielding, which can govern at high mean stress; the reported governing factor is the smaller of the two. With sigma_m = 0 (fully reversed) every criterion gives n = Se/sigma_a. Uniaxial stress, infinite life; Se from the Marin factors is endurance-limit-marin and finite life is fatigue-finite-life; notch sensitivity (Kf) and multiaxial combination are separate. A design aid; Shigley / Juvinall and the engineer of record govern.",
   };
 }
 export const fatigueSafetyFactorExample = { inputs: { alternating_stress_psi: 25000, mean_stress_psi: 30000, endurance_limit_psi: 40000, ultimate_strength_psi: 100000, yield_strength_psi: 80000, criterion: "goodman" } };
@@ -1045,7 +1045,7 @@ export function computeEnduranceLimitMarin({ ultimate_strength_psi = 0, surface_
   if (![ka, kb, kc, ke, endurance_limit_psi].every(Number.isFinite) || !(endurance_limit_psi > 0)) return { error: "Endurance-limit math is not a finite value; check the inputs." };
   return {
     endurance_limit_psi, uncorrected_se_psi, ka, kb, kc, kd, ke,
-    note: "The corrected endurance limit Se = ka kb kc kd ke Se' (Shigley Ch. 6 Marin equation), the input the fatigue-safety-factor tile needs. Se' is the rotating-beam limit, 0.5 Sut for steel with Sut <= 200 ksi (capped at 100 ksi above that). ka = a (Sut in kpsi)^b corrects for surface finish (Shigley 11th ed. Table 6-2: ground 1.21/-0.067, machined 2.00/-0.217, hot-rolled 11.0/-0.650, as-forged 12.7/-0.758); kb is the size factor 0.879 d^-0.107 (0.11-2 in) or 0.91 d^-0.157 (2-10 in) for rotating bending/torsion, and 1 for axial loading; kc is the load factor (1 bending, 0.85 axial, 0.59 torsion); kd the temperature factor (1 at room temperature); ke the reliability factor (0.897 at 90%, 0.814 at 99%). The five factors typically cut the raw 0.5 Sut roughly in half, which is why a part sized on Se' alone can be fatigue-unsafe. Feed Se into fatigue-safety-factor. Steel; non-steel materials, stress concentration (Kf), and finite-life S-N reductions are separate. A design aid; Shigley and the engineer of record govern.",
+    note: "The corrected endurance limit Se = ka kb kc kd ke Se' (Shigley Ch. 6 Marin equation), the input the fatigue-safety-factor tile needs. Se' is the rotating-beam limit, 0.5 Sut for steel with Sut <= 200 ksi (capped at 100 ksi above that). ka = a (Sut in kpsi)^b corrects for surface finish (Shigley 11th ed. Table 6-2: ground 1.21/-0.067, machined 2.00/-0.217, hot-rolled 11.0/-0.650, as-forged 12.7/-0.758); kb is the size factor 0.879 d^-0.107 (0.11-2 in) or 0.91 d^-0.157 (2-10 in) for rotating bending/torsion, and 1 for axial loading; kc is the load factor (1 bending, 0.85 axial, 0.59 torsion); kd the temperature factor (1 at room temperature); ke the reliability factor (0.897 at 90%, 0.814 at 99%). The five factors typically cut the raw 0.5 Sut roughly in half, which is why a part sized on Se' alone can be fatigue-unsafe. Feed Se into fatigue-safety-factor. Steel; finite-life strength is fatigue-finite-life, and non-steel materials and stress concentration (Kf) are separate. A design aid; Shigley and the engineer of record govern.",
   };
 }
 export const enduranceLimitMarinExample = { inputs: { ultimate_strength_psi: 105000, surface_finish: "machined", diameter_in: 1, load_type: "bending", reliability_pct: "99", temperature_factor_kd: 1 } };
@@ -1084,6 +1084,69 @@ function renderEnduranceLimitMarin(inputRegion, outputRegion, citationEl) {
   for (const f of [surf, load, rel]) f.select.addEventListener("change", update);
 }
 MACHINING_RENDERERS["endurance-limit-marin"] = renderEnduranceLimitMarin;
+
+// spec-v1936: finite-life fatigue strength and life on the Shigley S-N line (Eqs. 6-13 to 6-16). The Marin and
+// safety-factor tiles stop at infinite life; this draws the line from (10^3, f Sut) to (10^6, Se):
+// a = (f Sut)^2 / Se, b = -(1/3) log10(f Sut / Se), Sf = a N^b, N = (sigma_a / a)^(1/b). f from Shigley's
+// Fig. 6-18 fit, f = 1.06 - 2.8e-3 Sut + 6.9e-6 Sut^2 (Sut in kpsi, 70-200), 0.9 below 70 kpsi, unless entered.
+// dims: in { ultimate_strength_psi: M L^-1 T^-2, endurance_limit_psi: M L^-1 T^-2, fatigue_fraction: dimensionless, cycles: dimensionless, alternating_stress_psi: M L^-1 T^-2 } out: { f_used: dimensionless, coefficient_a_psi: M L^-1 T^-2, exponent_b: dimensionless, strength_at_cycles_psi: M L^-1 T^-2, life_cycles: dimensionless }
+export function computeFatigueFiniteLife({ ultimate_strength_psi = 0, endurance_limit_psi = 0, fatigue_fraction = 0, cycles = 0, alternating_stress_psi = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const Sut = Number(ultimate_strength_psi) || 0, Se = Number(endurance_limit_psi) || 0;
+  const fIn = Number(fatigue_fraction) || 0, N = Number(cycles) || 0, sa = Number(alternating_stress_psi) || 0;
+  if (Sut > 0 && Sut < 1000) return { error: "Enter the ultimate strength in psi (90,000 for 90 kpsi), not kpsi." };
+  if (!(Sut > 0)) return { error: "Ultimate strength Sut must be positive (psi)." };
+  if (!(Se > 0)) return { error: "Corrected endurance limit Se must be positive (psi)." };
+  if (fIn < 0 || fIn > 1) return { error: "Fatigue strength fraction f must be between 0 and 1 (blank for Shigley's fit)." };
+  if (N < 0 || sa < 0) return { error: "Cycles and alternating stress cannot be negative." };
+  if (!(N > 0) && !(sa > 0)) return { error: "Enter a number of cycles (for the strength) or an alternating stress (for the life), or both." };
+  if (N > 0 && (N < 1000 || N > 1e6)) return { error: "Cycles must be from 1,000 to 1,000,000: below 10^3 is low-cycle fatigue, and above 10^6 the strength is the endurance limit Se." };
+  const ksi = Sut / 1000;
+  if (!(fIn > 0) && ksi > 200) return { error: "Shigley's f fit covers Sut up to 200 kpsi; enter f for a stronger steel." };
+  const f_used = fIn > 0 ? fIn : (ksi < 70 ? 0.9 : 1.06 - 2.8e-3 * ksi + 6.9e-6 * ksi * ksi);
+  const s1000 = f_used * Sut;
+  if (!(s1000 > Se)) return { error: "f Sut (" + Math.round(s1000) + " psi) must exceed Se for the S-N line to slope down; check Se." };
+  const coefficient_a_psi = (s1000 * s1000) / Se;
+  const exponent_b = -Math.log10(s1000 / Se) / 3;
+  const strength_at_cycles_psi = N > 0 ? coefficient_a_psi * Math.pow(N, exponent_b) : 0;
+  let life_cycles = 0, life_note = "";
+  if (sa > 0) {
+    if (sa <= Se) life_note = "infinite: the stress is at or below the endurance limit";
+    else if (sa > s1000) life_note = "under 1,000 cycles: the stress is above f Sut, in the low-cycle range this line does not cover";
+    else life_cycles = Math.pow(sa / coefficient_a_psi, 1 / exponent_b);
+  }
+  if (![coefficient_a_psi, exponent_b, strength_at_cycles_psi, life_cycles].every(Number.isFinite)) return { error: "S-N math is not a finite value; check the inputs." };
+  return {
+    f_used, f_entered: fIn > 0, coefficient_a_psi, exponent_b, strength_at_cycles_psi, life_cycles, life_note, has_cycles: N > 0, has_stress: sa > 0,
+    note: "The finite-life part of the idealized S-N diagram for steel: a straight line on log-log axes from f Sut at 1,000 cycles to the corrected endurance limit Se at 1,000,000. Its constants are a = (f Sut)^2/Se and b = -(1/3) log(f Sut/Se), so the fatigue strength at N cycles is Sf = a N^b and the life at a completely reversed stress sigma_a is N = (sigma_a/a)^(1/b). The fraction f comes from Shigley's fit to Fig. 6-18 (0.9 below 70 kpsi) unless entered. Enter the CORRECTED Se from the Marin factors; using the specimen value 0.5 Sut overstates the life of a real part. Life is very sensitive to stress: a few percent more stress takes a large share off the cycles. Completely reversed stress; for a mean stress, convert to an equivalent reversed stress first (Goodman). Steel only; aluminum has no endurance limit. A design aid; Shigley and test data govern.",
+  };
+}
+export const fatigueFiniteLifeExample = { inputs: { ultimate_strength_psi: 90000, endurance_limit_psi: 45000, fatigue_fraction: 0.86, cycles: 10000, alternating_stress_psi: 55000 } };
+function renderFatigueFiniteLife(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: the finite-life S-N line (Shigley, Mechanical Engineering Design, Ch. 6, Eqs. 6-13 to 6-16): a = (f Sut)^2/Se, b = -(1/3) log(f Sut/Se), Sf = a N^b for 10^3 <= N <= 10^6, N = (sigma_a/a)^(1/b); f from the Fig. 6-18 fit f = 1.06 - 2.8e-3 Sut + 6.9e-6 Sut^2 (kpsi), 0.9 below 70 kpsi. Steel, completely reversed stress. A design aid; Shigley and test data govern.";
+  const sut = makeNumber("Ultimate strength Sut (psi)", "ffl-sut", { step: "any", min: "0" });
+  const se = makeNumber("Corrected endurance limit Se (psi)", "ffl-se", { step: "any", min: "0" });
+  const f = makeNumber("Fatigue strength fraction f (blank for Shigley's fit)", "ffl-f", { step: "any", min: "0", max: "1" });
+  const n = makeNumber("Cycles N, 1,000 to 1,000,000 (for the strength)", "ffl-n", { step: "any", min: "0" });
+  const sa = makeNumber("Reversed alternating stress (psi, for the life)", "ffl-sa", { step: "any", min: "0" });
+  for (const x of [sut, se, f, n, sa]) inputRegion.appendChild(x.wrap);
+  attachExampleButton(inputRegion, () => { sut.input.value = "90000"; se.input.value = "45000"; f.input.value = "0.86"; n.input.value = "10000"; sa.input.value = "55000"; update(); });
+  const oL = makeOutputLine(outputRegion, "S-N line", "ffl-out-line");
+  const oS = makeOutputLine(outputRegion, "Fatigue strength at N", "ffl-out-s");
+  const oN = makeOutputLine(outputRegion, "Life at the stress", "ffl-out-n");
+  const oNote = makeOutputLine(outputRegion, "Note", "ffl-out-note");
+  function readNum(i) { if (i.value === "") return 0; const v = Number(i.value); return Number.isFinite(v) ? v : 0; }
+  const update = debounce(() => {
+    const r = computeFatigueFiniteLife({ ultimate_strength_psi: readNum(sut.input), endurance_limit_psi: readNum(se.input), fatigue_fraction: readNum(f.input), cycles: readNum(n.input), alternating_stress_psi: readNum(sa.input) });
+    if (r.error) { oL.textContent = r.error; oS.textContent = "-"; oN.textContent = "-"; oNote.textContent = ""; return; }
+    oL.textContent = "Sf = " + fmt(r.coefficient_a_psi, 0) + " N^" + fmt(r.exponent_b, 4) + " psi (f = " + fmt(r.f_used, 3) + (r.f_entered ? ", entered" : ", Shigley fit") + ")";
+    oS.textContent = r.has_cycles ? fmt(r.strength_at_cycles_psi, 0) + " psi" : "enter cycles to find it";
+    oN.textContent = !r.has_stress ? "enter a stress to find it" : r.life_note ? r.life_note : fmt(r.life_cycles, 0) + " cycles";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const x of [sut, se, f, n, sa]) x.input.addEventListener("input", update);
+}
+MACHINING_RENDERERS["fatigue-finite-life"] = renderFatigueFiniteLife;
 
 // ===================== spec-v1288: power-screw torque, efficiency, and self-locking (Shigley Ch. 8) =====================
 // acme-thread-depth / stub-acme-thread-depth give lead-screw GEOMETRY and name the use ("vises, presses, lead

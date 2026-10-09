@@ -58578,3 +58578,20 @@ test("bounds: column-secant-formula reproduces Beer and Johnston SP 10.2 and fin
   assert.ok("error" in _csf({ ..._csfEx.inputs, modulus_psi: 29000 }));
   assert.ok("error" in _csf({ ..._csfEx.inputs, end_condition: "free" }));
 });
+
+import { computeFatigueFiniteLife as _ffl } from "../../calc-machining.js";
+test("bounds: fatigue-finite-life reproduces Shigley Example 6-2 and meets Se at 10^6 cycles", () => {
+  const r = _ffl({ ultimate_strength_psi: 90000, endurance_limit_psi: 45000, fatigue_fraction: 0.86, cycles: 10000, alternating_stress_psi: 55000 });
+  assert.ok(Math.abs(r.strength_at_cycles_psi - 64600) / 64600 < 0.002);
+  assert.ok(Math.abs(r.life_cycles - 77500) / 77500 < 0.005);
+  const ends = (n) => _ffl({ ultimate_strength_psi: 90000, endurance_limit_psi: 45000, cycles: n }).strength_at_cycles_psi;
+  assert.ok(Math.abs(ends(1e6) - 45000) < 1e-6);
+  // Shigley fit at 90 kpsi: f = 1.06 - 0.252 + 0.05589 = 0.86389.
+  assert.ok(Math.abs(ends(1000) - 0.86389 * 90000) < 0.5);
+  assert.equal(_ffl({ ultimate_strength_psi: 60000, endurance_limit_psi: 30000, cycles: 1000 }).f_used, 0.9);
+  assert.ok(_ffl({ ultimate_strength_psi: 90000, endurance_limit_psi: 45000, alternating_stress_psi: 45000 }).life_note.startsWith("infinite"));
+  assert.ok(_ffl({ ultimate_strength_psi: 90000, endurance_limit_psi: 45000, alternating_stress_psi: 80000 }).life_note.startsWith("under 1,000"));
+  assert.ok("error" in _ffl({ ultimate_strength_psi: 90, endurance_limit_psi: 45 }));
+  assert.ok("error" in _ffl({ ultimate_strength_psi: 90000, endurance_limit_psi: 45000, cycles: 500 }));
+  assert.ok("error" in _ffl({ ultimate_strength_psi: 90000, endurance_limit_psi: 45000 }));
+});

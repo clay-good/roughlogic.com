@@ -24,6 +24,7 @@
 // better match".
 
 const RELATED = {
+  "fatigue-finite-life": ["endurance-limit-marin","fatigue-safety-factor","shaft-torsion"],
   "column-secant-formula": ["euler-johnson-column","combined-stress-axial-bending","section-properties"],
   "conduit-jam-ratio": ["conduit-fill", "pulling-tension", "cable-bend-radius", "min-bend-radius"],
   "velocity-head": ["pipe-velocity", "flow-continuity", "bernoulli-head", "orifice-flow"],

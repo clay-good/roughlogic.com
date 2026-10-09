@@ -168491,6 +168491,42 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "fatigue-finite-life",
+  "source_publisher": "McGraw-Hill (Shigley, Mischke, Budynas)",
+  "source_title": "Mechanical Engineering Design, Example 6-2 (1050 HR steel)",
+  "source_edition_or_year": "Ch. 6",
+  "source_section_or_page": "Example 6-2(b),(c): Sut 90 kpsi, Se' 45 kpsi, f 0.86 from Fig. 6-18; Sf at 10^4 cycles 64.6 kpsi, life at 55 kpsi 77,500 cycles (book rounds a to 133.1 kpsi and b to -0.0785)",
+  "verified_by": "rl",
+  "verified_on": "2026-10-09",
+  "inputs": {
+   "ultimate_strength_psi": 90000,
+   "endurance_limit_psi": 45000,
+   "fatigue_fraction": 0.86,
+   "cycles": 10000,
+   "alternating_stress_psi": 55000
+  },
+  "outputs": {
+   "strength_at_cycles_psi": {
+    "value": 64600,
+    "tolerance": {
+     "pct": 0.5
+    }
+   },
+   "life_cycles": {
+    "value": 77500,
+    "tolerance": {
+     "pct": 1
+    }
+   },
+   "coefficient_a_psi": {
+    "value": 133100,
+    "tolerance": {
+     "pct": 0.5
+    }
+   }
+  }
  }
  ]
 }
