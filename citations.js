@@ -15486,7 +15486,7 @@ export const CITATIONS = {
     ],
   },
   "bond-work-index-power": {
-    formula: "W = 10 Wi (1/sqrt(P80) - 1/sqrt(F80)) kWh per short ton (F80, P80 in microns); power_kW = W x feed rate (short tons per hour); hp = kW / 0.7457.",
+    formula: "W = 10 Wi (1/sqrt(P80) - 1/sqrt(F80)) kWh per short ton (F80, P80 in microns); power_kW = W x feed rate (short tons per hour); hp = kW / 0.7457; with an available power, the finest product is P80 = [(kW/tph)/(10 Wi) + 1/sqrt(F80)]^-2.",
     edition: "Bond's third theory of comminution (F. C. Bond, 'The Third Theory of Comminution,' Trans. AIME 193, 1952; 'Crushing and Grinding Calculations,' Allis-Chalmers, 1961), by name.",
     freeAccess: "A published empirical law; the work index (from a Bond lab test), the sizes, and the feed rate are the user's inputs.",
     governance: GOVERNANCE.general,

@@ -60,6 +60,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **`bond-work-index-power` solves for the finest product a mill can make.** With the available mill power and the feed rate entered, it inverts Bond's law, P80 = [(kW/tph)/(10 Wi) + 1/sqrt(F80)]^-2: 800 kW at 100 st/h on the example ore reaches about 115 microns, where 75 needs 1,090 kW.
+
 - **`particle-settling-velocity` gives the hindered settling velocity.** It said hindered settling was separate. An optional solids volume fraction now applies Richardson-Zaki, v = vs (1 - c)^n with n from the particle Reynolds number (4.65 in the Stokes range down to 2.39 at high Re): the 0.05 mm sand example settles at 1.38 mm/s in a 10% suspension instead of 2.25. Blank keeps the discrete-particle answer.
 
 - **`weir-flow` applies the approach-velocity correction for rectangular weirs.** It ignored it. With the approach channel width and the weir height entered, the Francis form Q = C L [(H + hv)^1.5 - hv^1.5] is iterated with hv from the approach velocity Q/(B (P + H)): a 1 ft high suppressed weir with 1 ft of head in a 4 ft channel carries 14.16 cfs, 6.3% over the still-pool 13.32. Blank keeps the plain rating; a V-notch is unchanged.

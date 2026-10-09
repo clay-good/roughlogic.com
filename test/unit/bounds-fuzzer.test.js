@@ -58996,3 +58996,11 @@ test("bounds: particle settling hindered velocity follows Richardson-Zaki", () =
   assert.ok(_psvH({ particle_diameter_mm: 2, solids_volume_pct: 10 }).richardson_zaki_n < 4.65);
   assert.ok("error" in _psvH({ solids_volume_pct: 60 }));
 });
+
+import { computeBondWorkIndexPower as _bwiInv } from "../../calc-mining.js";
+test("bounds: bond-work-index-power achievable P80 inverts the forward energy", () => {
+  const fwd = _bwiInv({ work_index_kwh_st: 13, feed_f80_um: 1000, product_p80_um: 75, feed_rate_stph: 100 });
+  const inv = _bwiInv({ work_index_kwh_st: 13, feed_f80_um: 1000, product_p80_um: 75, feed_rate_stph: 100, available_kw: fwd.power_kw });
+  assert.ok(Math.abs(inv.achievable_p80_um - 75) < 1e-9);
+  assert.ok("error" in _bwiInv({ work_index_kwh_st: 13, feed_f80_um: 1000, product_p80_um: 75, available_kw: 500 }));
+});

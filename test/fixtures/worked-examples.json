@@ -169560,6 +169560,30 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "bond-work-index-power",
+  "source_publisher": "Project (first-principles)",
+  "source_title": "Finest product from 800 kW at 100 st/h, Wi 13, F80 1,000 microns",
+  "source_edition_or_year": "Bond's law inverted",
+  "source_section_or_page": "1/sqrt(P80) = 8/130 + 1/sqrt(1000) = 0.061538 + 0.031623 = 0.093161; P80 = 115.2 microns",
+  "verified_by": "rl",
+  "verified_on": "2026-10-09",
+  "inputs": {
+   "work_index_kwh_st": 13,
+   "feed_f80_um": 1000,
+   "product_p80_um": 75,
+   "feed_rate_stph": 100,
+   "available_kw": 800
+  },
+  "outputs": {
+   "achievable_p80_um": {
+    "value": 115.22,
+    "tolerance": {
+     "pct": 0.5
+    }
+   }
+  }
  }
  ]
 }

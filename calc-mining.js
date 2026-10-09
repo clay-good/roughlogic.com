@@ -471,21 +471,27 @@ MINING_RENDERERS["crusher-reduction-ratio"] = _simpleRenderer({
 // 1952; "Crushing and Grinding Calculations," 1961). W = 10 Wi (1/sqrt(P80) - 1/sqrt(F80)) kWh per short ton,
 // sizes in microns at 80 percent passing; power = W x feed rate. crusher-reduction-ratio gives the ratio, not the
 // energy behind it.
-// dims: in { work_index_kwh_st: dimensionless, feed_f80_um: L, product_p80_um: L, feed_rate_stph: M T^-1 } out: { specific_energy_kwh_st: dimensionless, power_kw: M L^2 T^-3, power_hp: M L^2 T^-3, reduction_ratio: dimensionless }
-export function computeBondWorkIndexPower({ work_index_kwh_st = 0, feed_f80_um = 0, product_p80_um = 0, feed_rate_stph = 0 } = {}) {
+// Inverse added 2026-10-09: with the mill's available power and the feed rate, the finest product it can make is
+// 1/sqrt(P80) = (kW/tph)/(10 Wi) + 1/sqrt(F80).
+// dims: in { work_index_kwh_st: dimensionless, feed_f80_um: L, product_p80_um: L, feed_rate_stph: M T^-1, available_kw: M L^2 T^-3 } out: { specific_energy_kwh_st: dimensionless, power_kw: M L^2 T^-3, power_hp: M L^2 T^-3, reduction_ratio: dimensionless, achievable_p80_um: L }
+export function computeBondWorkIndexPower({ work_index_kwh_st = 0, feed_f80_um = 0, product_p80_um = 0, feed_rate_stph = 0, available_kw = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const Wi = Number(work_index_kwh_st) || 0, F = Number(feed_f80_um) || 0, P = Number(product_p80_um) || 0, Q = Number(feed_rate_stph) || 0;
   if (!(Wi > 0)) return { error: "Bond work index must be positive (kWh per short ton; about 10-20 for most ores)." };
   if (!(F > 0) || !(P > 0)) return { error: "Feed F80 and product P80 must be positive (microns; 25,400 microns per inch)." };
   if (!(P < F)) return { error: "The product must be finer than the feed (P80 below F80)." };
   if (Q < 0) return { error: "Feed rate cannot be negative (short tons per hour; blank for energy only)." };
+  const avail = Number(available_kw) || 0;
+  if (avail < 0) return { error: "Available power cannot be negative (kW; blank to skip)." };
+  if (avail > 0 && !(Q > 0)) return { error: "Enter the feed rate with the available power to find the achievable product size." };
+  const achievable_p80_um = avail > 0 ? Math.pow(avail / Q / (10 * Wi) + 1 / Math.sqrt(F), -2) : 0;
   const specific_energy_kwh_st = 10 * Wi * (1 / Math.sqrt(P) - 1 / Math.sqrt(F));
   const power_kw = specific_energy_kwh_st * Q;
   const power_hp = power_kw / 0.745699872;
   const reduction_ratio = F / P;
   if (![specific_energy_kwh_st, power_kw, power_hp].every(Number.isFinite)) return { error: "Bond-law math is not a finite value; check the inputs." };
   return {
-    specific_energy_kwh_st, power_kw, power_hp, reduction_ratio, has_rate: Q > 0,
+    specific_energy_kwh_st, power_kw, power_hp, reduction_ratio, has_rate: Q > 0, achievable_p80_um, has_available: avail > 0,
     note: "Bond's third theory of comminution: the energy to break rock is proportional to the new crack length, so W = 10 Wi (1/sqrt(P80) - 1/sqrt(F80)) kWh per short ton, with the feed and product sizes in microns at 80 percent passing and Wi the Bond work index from a lab test (about 10 to 20 kWh per short ton for most ores; Bond defined it as the energy to take an infinitely coarse feed to 80 percent passing 100 microns). Fine grinding is where the energy goes: halving P80 from 150 to 75 microns costs far more than crushing from 6 in to 1 in. The result is the power at the mill pinion for a wet overflow ball mill; Rowland's efficiency factors (dry grinding, open circuit, fineness, diameter, oversize feed, reduction ratio) adjust it and are not applied here. A screen; the mill vendor's sizing governs.",
   };
 }
@@ -498,10 +504,12 @@ MINING_RENDERERS["bond-work-index-power"] = _simpleRenderer({
     { key: "feed_f80_um", label: "Feed size F80 (microns; 25,400 per inch)", kind: "number" },
     { key: "product_p80_um", label: "Product size P80 (microns)", kind: "number" },
     { key: "feed_rate_stph", label: "Feed rate (short tons per hour, blank for energy only)", kind: "number" },
+    { key: "available_kw", label: "Available mill power (kW, blank to skip; gives the finest achievable P80)", kind: "number" },
   ],
   outputs: [
     { key: "w", id: "bwi-out-w", label: "Specific energy", value: (r) => fmt(r.specific_energy_kwh_st, 2) + " kWh per short ton (reduction ratio " + fmt(r.reduction_ratio, 1) + ")" },
     { key: "p", id: "bwi-out-p", label: "Power at the pinion", value: (r) => (r.has_rate ? fmt(r.power_kw, 0) + " kW (" + fmt(r.power_hp, 0) + " hp)" : "enter a feed rate") },
+    { key: "a", id: "bwi-out-a", label: "Finest product the available power reaches", value: (r) => (r.has_available ? fmt(r.achievable_p80_um, 0) + " microns P80" : "enter the available power") },
     { key: "n", id: "bwi-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeBondWorkIndexPower,
