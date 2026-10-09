@@ -141,7 +141,10 @@ if (fixedSinceBaseline.length) {
   process.exit(1);
 }
 if (process.argv.includes("--list-unresolved")) {
-  for (const id of unresolvedIds.slice().sort()) console.log(id);
+  // One write, awaited, then exit: a console.log per id followed by process.exit(0) let Node drop
+  // queued pipe writes, and check-readme-counts (which reads this through a pipe) once counted 339
+  // of 401 ids in CI and failed a correct README (b04d41ae, 2026-10-09).
+  await new Promise((done) => process.stdout.write(unresolvedIds.slice().sort().map((id) => id + "\n").join(""), done));
   process.exit(0);
 }
 console.log(`check-example-parity OK: ${compared} tiles compared, ${diverged.length} known divergences (baseline), 0 new (${unresolved} tiles have no example export to compare).`);
