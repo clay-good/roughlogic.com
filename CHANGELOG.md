@@ -60,7 +60,7 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
-- **`spanline-sag-tension` takes a point load at midspan.** It covered a uniform load only (a litter on a rescue highline or a block on a tramline was sent elsewhere). An optional midspan point load now adds by superposition: H = (w L^2/8 + P L/4)/d, anchor tension sqrt(H^2 + (w L/2 + P/2)^2), and the matching slack. A 300 lb litter on a 100 ft highline sagging 10 ft puts 778 lb on each anchor. Uniform-load results are unchanged.
+- **`spanline-sag-tension` takes a point load at midspan.** It covered a uniform load only (a litter on a rescue highline or a block on a tramline was sent elsewhere). An optional midspan point load now adds by superposition: H = (w L^2/8 + P L/4)/d, anchor tension sqrt(H^2 + (w L/2 + P/2)^2), and the matching slack. A 300 lb litter on a 100 ft highline sagging 10 ft puts 778 lb on each anchor; the inverse, `spanline-sag-for-tension`, takes the same point load (a 1,000 lb anchor limit needs at least 7.7 ft of sag). Uniform-load results are unchanged.
 
 - **`plume-rise-briggs` takes the stability class.** Its note said stability was not modelled. A Pasquill class select now keeps the neutral-unstable relations for A through D and applies Briggs' stable form for E and F, 2.6 (F/(u s))^(1/3) with s = (g/Ta) dtheta/dz at 0.020 and 0.035 K/m, as EPA's ISC3 does; in stable air rise goes as the cube root of 1/wind, so doubling the wind cuts it by 21%, not half. The example stack rises 185 ft neutral, 180 ft in class E, and 149 ft in class F. Class D (the default) is unchanged.
 

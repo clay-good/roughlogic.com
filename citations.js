@@ -16445,7 +16445,7 @@ export const CITATIONS = {
     ],
   },
   "spanline-sag-for-tension": {
-    formula: "d_min = w x L^2 / (8 x sqrt(T_allow^2 - (w x L / 2)^2)); the inverse of T_support = w L^2 / (8 d) sqrt(1 + (4 d / L)^2) solved for the sag.",
+    formula: "d_min = (w L^2/8 + P L/4) / sqrt(T_allow^2 - (w L/2 + P/2)^2), the inverse of spanline-sag-tension with an optional midspan point load P; with P = 0 it is w L^2 / (8 sqrt(T_allow^2 - (w L/2)^2)).",
     edition: "Shallow-cable parabola statics (by name) with ASME B30.9 / Wire Rope Users Manual rigging practice; first-principles, no edition cycle.",
     freeAccess: "The shallow-cable parabola (H = w L^2 / 8d) is a public statics result; ASME B30.9 governs sling and rigging practice. An ESTIMATE only; the certified rope WLL and the head rigger govern.",
     governance: GOVERNANCE.rigging,

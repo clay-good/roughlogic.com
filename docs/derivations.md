@@ -3418,7 +3418,7 @@ cross-check.
 | calc-rigging.js | `computeRollerJackForce` | `{ load_lb, roll_coef = 0.03, incline_deg = 0, skate_cap_lb } = {}` | _ | _ | _ |
 | calc-rigging.js | `computeShackleEyeboltWll` | `{ leg_load_lb, rated_wll_lb, angle_deg = 0, hardware = "shackle", design_fact...` | _ | _ | _ |
 | calc-rigging.js | `computeSlingDdEfficiency` | `{ rated_wll_lb, bend_dia_in, sling_dia_in } = {}` | _ | _ | _ |
-| calc-rigging.js | `computeSpanlineSagForTension` | `{ span_ft, load_lb_per_ft, allowable_tension_lb } = {}` | _ | _ | _ |
+| calc-rigging.js | `computeSpanlineSagForTension` | `{ span_ft, load_lb_per_ft, allowable_tension_lb, point_load_lb = 0 } = {}` | _ | _ | _ |
 | calc-rigging.js | `computeSpanlineSagTension` | `{ span_ft, load_lb_per_ft, sag_ft, point_load_lb = 0 } = {}` | _ | _ | _ |
 | calc-rigging.js | `computeSpreaderBeam` | `{ load_lb, bar_length_ft, top_height_ft } = {}` | _ | _ | _ |
 | calc-rigging.js | `computeSpreaderBeamMinHeight` | `{ load_lb, bar_length_ft, sling_wll_lb } = {}` | _ | _ | _ |
@@ -6330,7 +6330,7 @@ per spec-v14 §13.1 second paragraph.
 | `roller-jack-force` | Roller / Skate / Jacking Push Force | Standard machinery-moving practice; 12,000 lb on skates (coef 0.03), level, 5,000 lb skate ->... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `shackle-eyebolt-wll` | Shackle / Eye-Bolt WLL and Angular Derate | ASME B30.26 / B18.15 manufacturer data; shoulder eye bolt rated 7,000 lb, leg 3,000 lb, pull 45 d... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `sling-d-d-efficiency` | Wire-Rope Sling D/d Bend Efficiency | WRTB Wire Rope Users Manual / ASME B30.9; 10,000 lb 6x19 sling around a 3 in pin, 1 in sling -> D/d... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `spanline-sag-for-tension` | Spanned Cable Minimum Sag for a Tension Limit | Shallow-cable parabola statics (by na...; spec-v670 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
+| `spanline-sag-for-tension` | Spanned Cable Minimum Sag for a Tension Limit | Shallow-cable parabola statics (by na...; spec-v670 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `spanline-sag-tension` | Spanned Cable Sag and Tension | Shallow-cable parabola statics (by name); spec-v484 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `spreader-beam` | Spreader Bar vs Lifting Beam Below the Hook | ASME BTH-1 / B30.20; 10,000 lb on a 10 ft bar, top 6 ft -> 50.2 deg, 6,509 lb ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `spreader-beam-min-height` | Spreader Beam Minimum Top-Point Height | ASME BTH-1 / B30.20 (solved for the h...; 10,000 lb on a 10 ft bar, 6,000 lb slings -> 56.4 deg, 7.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |

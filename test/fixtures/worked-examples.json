@@ -169396,6 +169396,29 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "spanline-sag-for-tension",
+  "source_publisher": "Project (first-principles)",
+  "source_title": "Rescue highline: 300 lb litter, 100 ft span, 0.1 lb/ft rope, 1,000 lb anchor limit",
+  "source_edition_or_year": "cable statics, superposition",
+  "source_section_or_page": "V = 5 + 150 = 155 lb; d = (125 + 7,500)/sqrt(1,000^2 - 155^2) = 7.718 ft",
+  "verified_by": "rl",
+  "verified_on": "2026-10-09",
+  "inputs": {
+   "span_ft": 100,
+   "load_lb_per_ft": 0.1,
+   "allowable_tension_lb": 1000,
+   "point_load_lb": 300
+  },
+  "outputs": {
+   "min_sag_ft": {
+    "value": 7.718,
+    "tolerance": {
+     "pct": 0.5
+    }
+   }
+  }
  }
  ]
 }

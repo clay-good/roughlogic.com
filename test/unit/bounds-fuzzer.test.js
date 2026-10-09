@@ -58928,3 +58928,12 @@ test("bounds: spanline-sag-tension midspan point load by superposition", () => {
   assert.ok(Math.abs(p.slack_ft - 2 * 25 / 100) < 1e-12);
   assert.ok("error" in _sstP({ span_ft: 100, load_lb_per_ft: 0, sag_ft: 5 }));
 });
+
+import { computeSpanlineSagForTension as _ssftP, computeSpanlineSagTension as _sstP2 } from "../../calc-rigging.js";
+test("bounds: spanline-sag-for-tension with a point load round-trips through spanline-sag-tension", () => {
+  for (const [w, P, T] of [[0.1, 300, 1000], [1, 0, 502.5], [0, 400, 2500]]) {
+    const r = _ssftP({ span_ft: 100, load_lb_per_ft: w, allowable_tension_lb: T, point_load_lb: P });
+    assert.ok(Math.abs(_sstP2({ span_ft: 100, load_lb_per_ft: w, sag_ft: r.min_sag_ft, point_load_lb: P }).support_tension_lb - T) < 1e-6);
+  }
+  assert.ok("error" in _ssftP({ span_ft: 100, load_lb_per_ft: 0.1, allowable_tension_lb: 150, point_load_lb: 300 }));
+});
