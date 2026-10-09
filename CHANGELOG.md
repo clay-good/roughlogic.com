@@ -60,6 +60,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **`dividing-head` covers angular indexing.** It said angular and differential indexing were out of scope. An "Index by" select now takes an angle in degrees: one crank turn moves the work 360/ratio degrees (9 on a 40:1 head), so 13 degrees 20 minutes is 1 turn plus 13 holes on the 27-hole circle (one hole there is 20 minutes). Indexing by equal divisions is unchanged; differential indexing remains out of scope.
+
 - **`concrete-anchor-breakout` and `concrete-anchor-pryout` take uncracked concrete (ACI 318-19 17.6.2.5.1 and 17.6.2.6.1).** Both fixed the cracking factor at 1.0, the cracked value, and said the uncracked credit was not modeled. A "Concrete at service loads" select now applies psi_c,N = 1.25 cast-in or 1.4 post-installed where analysis shows no cracking, and for an uncracked post-installed anchor nearer an edge than cac = 4 hef, the splitting factor psi_cp,N = max(ca,min, 1.5 hef)/cac. A cast-in anchor at 6 in embedment in 4,000 psi concrete goes from 22,308 lb to 27,885 lb nominal breakout, and its pryout from 44,617 lb to 55,771 lb. Cracked (the default) is unchanged.
 
 - **`motor-overload-sizing` covers motors of 1 hp or less, automatically started (NEC 430.32(B)).** Its note said small motors were separate. A "Motor size" select now applies 430.32(B)(1), the same 125%/115% nameplate rule and 430.32(C) ceiling for a separate overload device (a 4 A motor with a 1.15 service factor: 5.0 A, up to 5.6 A), and 430.32(B)(2), under which an integral thermal protector approved for the motor has no percentage ceiling (the 170%/156%/140% bands are for motors over 1 hp). The over-1-hp modes are unchanged.

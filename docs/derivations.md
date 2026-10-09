@@ -3472,7 +3472,7 @@ cross-check.
 | calc-shop.js | `computeCycloneSeparatorSizing` | `{ inlet_width_ft = 0, inlet_velocity_fps = 0, turns = 5, gas_viscosity_lb_ft_...` | _ | _ | _ |
 | calc-shop.js | `computeCylinderStorageSeparation` | `{ separation_ft = 0, barrier_present = "no", barrier_height_ft = 0, barrier_n...` | _ | _ | _ |
 | calc-shop.js | `computeCylindricalWedgeVolume` | `{ base_diameter_ft = 0, height_ft = 0 } = {}` | _ | _ | _ |
-| calc-shop.js | `computeDividingHead` | `{ divisions = 0, worm_ratio = 40, circles = "" } = {}` | _ | _ | _ |
+| calc-shop.js | `computeDividingHead` | `{ divisions = 0, worm_ratio = 40, circles = "", index_by = "divisions", angle...` | _ | _ | _ |
 | calc-shop.js | `computeDovetailOverPins` | `{ dovetail_type = "male", known = "flat", dimension_in = 0, pin_dia_in = 0, a...` | _ | _ | _ |
 | calc-shop.js | `computeDustCollectionDuct` | `{ cfm_per_machine = 0, branch_velocity_fpm = 4000, main_velocity_fpm = 3500, ...` | _ | _ | _ |
 | calc-shop.js | `computeEllipseAreaPerimeter` | `{ major_axis = 0, minor_axis = 0 } = {}` | _ | _ | _ |
@@ -5678,7 +5678,7 @@ per spec-v14 §13.1 second paragraph.
 | `density-altitude` | Density Altitude and Pressure Altitude | FAA density-altitude method (ISA laps...; spec-v500 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `disk-clutch-torque` | Disk Clutch / Brake Friction Torque | Project (first-principles); disk clutch torque | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `displacement-cr` | Engine Displacement and Compression Ratio | Project (first-principles) over stand...; 4.0 bore / 3.48 stroke / 8 cyl / 64 cc chamber / 4.1 gask... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
-| `dividing-head` | Dividing-Head Simple Indexing | First-principles indexing arithmetic ...; N 9 on a 40:1 head -> 4 turns + 4/9; on a 54-hole circle ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+6 more) |
+| `dividing-head` | Dividing-Head Simple Indexing | First-principles indexing arithmetic ...; N 9 on a 40:1 head -> 4 turns + 4/9; on a 54-hole circle ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+7 more) |
 | `dock-piling-lateral` | Dock Piling Embedment and Lateral Load | Project (first-principles); the standards named in the tile citation govern; recomput... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `dovetail-over-pins` | Dovetail Slide Measurement Over Rods | Machinery's Handbook (Checking a Dove...; k = 0.500 x (1 + cot(30 deg)) = 0.500 x (1 + 1.73205) = 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `drill-feed-thrust` | Drill Speed, Feed, Power, and Torque | Project (first-principles); RPM = 3.82 SFM / D; torque = 63,025 hp / RPM | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |

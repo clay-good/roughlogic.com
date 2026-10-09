@@ -168556,6 +168556,36 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "dividing-head",
+  "source_publisher": "Project (first-principles)",
+  "source_title": "Angular indexing 13 degrees 20 minutes on a 40:1 head",
+  "source_edition_or_year": "indexing arithmetic",
+  "source_section_or_page": "turns = 13.3333 x 40/360 = 1.4815 = 1 turn + 13/27; one hole on the 27-hole circle = 20 minutes",
+  "verified_by": "rl",
+  "verified_on": "2026-10-09",
+  "inputs": {
+   "divisions": 0,
+   "worm_ratio": 40,
+   "circles": "27,54",
+   "index_by": "angle",
+   "angle_deg": 13.333333333
+  },
+  "outputs": {
+   "turns": {
+    "value": 1.48148,
+    "tolerance": {
+     "pct": 0.5
+    }
+   },
+   "full_turns": {
+    "value": 1,
+    "tolerance": {
+     "pct": 0.5
+    }
+   }
+  }
  }
  ]
 }

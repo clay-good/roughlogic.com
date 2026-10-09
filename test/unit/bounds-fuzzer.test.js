@@ -58612,3 +58612,16 @@ test("bounds: fatigue-notch-sensitivity reproduces Shigley Example 6-6 and stays
   assert.ok("error" in _fns({ kt: 2, notch_radius_in: 0.1, ultimate_strength_psi: 40000 }));
   assert.ok("error" in _fns({ kt: 2, notch_radius_in: 0.1, ultimate_strength_psi: 100 }));
 });
+
+import { computeDividingHead as _dhAng } from "../../calc-shop.js";
+test("bounds: dividing-head angular indexing turns = angle x ratio / 360", () => {
+  const r = _dhAng({ index_by: "angle", angle_deg: 13 + 20 / 60, circles: "27,18" });
+  assert.equal(r.full_turns, 1);
+  assert.equal(r.settings.find((s) => s.circle === 27).holes, 13);
+  assert.equal(r.settings.find((s) => s.circle === 18).whole, false);
+  assert.ok(Math.abs(_dhAng({ index_by: "angle", angle_deg: 90, circles: "20" }).turns - 10) < 1e-12);
+  // Divisions mode is unchanged.
+  assert.equal(_dhAng({ divisions: 9, circles: "27" }).settings[0].holes, 12);
+  assert.ok("error" in _dhAng({ index_by: "angle", angle_deg: 0, circles: "27" }));
+  assert.ok("error" in _dhAng({ index_by: "spiral", divisions: 9, circles: "27" }));
+});

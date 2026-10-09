@@ -483,14 +483,20 @@ SHOP_RENDERERS["tailstock-setover"] = _v805renderTailstockSetover;
 // that product is a whole number. First-principles ratio arithmetic.
 // =====================================================================
 
-// dims: in { divisions: dimensionless, worm_ratio: dimensionless, circles: dimensionless } out: { full_turns: dimensionless }
-export function computeDividingHead({ divisions = 0, worm_ratio = 40, circles = "" } = {}) {
-  const _g = _finiteGuard({ divisions, worm_ratio }); if (_g) return _g;
+// dims: in { divisions: dimensionless, worm_ratio: dimensionless, circles: dimensionless, index_by: dimensionless, angle_deg: dimensionless } out: { full_turns: dimensionless }
+export function computeDividingHead({ divisions = 0, worm_ratio = 40, circles = "", index_by = "divisions", angle_deg = 0 } = {}) {
+  const _g = _finiteGuard({ divisions, worm_ratio, angle_deg }); if (_g) return _g;
+  if (index_by !== "divisions" && index_by !== "angle") return { error: "Index by must be divisions or an angle." };
+  const byAngle = index_by === "angle";
   const N = Math.round(Number(divisions) || 0);
   const ratio = Number(worm_ratio) || 0;
-  if (!(N >= 1)) return { error: "Number of divisions must be 1 or more." };
+  const A = Number(angle_deg) || 0;
+  if (!byAngle && !(N >= 1)) return { error: "Number of divisions must be 1 or more." };
+  if (byAngle && !(A > 0 && A < 360)) return { error: "Angle must be between 0 and 360 degrees." };
   if (!(ratio > 0)) return { error: "Worm ratio must be positive." };
-  const turns = ratio / N;
+  // Angular indexing, added 2026-10-09: one crank turn moves the work 360/ratio degrees
+  // (9 degrees on a 40:1 head), so turns = angle x ratio / 360.
+  const turns = byAngle ? A * ratio / 360 : ratio / N;
   const full_turns = Math.floor(turns + 1e-9);
   const fraction = turns - full_turns; // 0..1
   // Parse the hole-circle list.
@@ -512,43 +518,51 @@ export function computeDividingHead({ divisions = 0, worm_ratio = 40, circles = 
   for (const H of holeCircles) {
     // holes = fraction * H = remNum * H / N. Integer iff (remNum*H) % N == 0.
     const prod = remNumExact * H;
-    const holesFloat = prod / N;
+    const holesFloat = byAngle ? fraction * H : prod / N;
     const holesRounded = Math.round(holesFloat);
-    const isWhole = Math.abs(holesFloat - holesRounded) < 1e-9 && holesRounded >= 0;
+    const isWhole = Math.abs(holesFloat - holesRounded) < (byAngle ? 1e-6 : 1e-9) && holesRounded >= 0;
     settings.push({ circle: H, holes: isWhole ? holesRounded : null, whole: isWhole });
   }
   const usable = settings.filter((s) => s.whole);
   const notes = [];
-  notes.push("Crank turns per division = ratio / N (" + ratio + "/" + N + " on this head). The fractional part times a hole-circle count gives the hole move when that product is a whole number. First-principles ratio arithmetic.");
+  notes.push(byAngle
+    ? "Angular indexing: one crank turn moves the work 360/ratio = " + (360 / ratio) + " degrees, so crank turns = angle x ratio / 360 (" + A + " x " + ratio + "/360 on this head). One hole on an H-hole circle moves the work 360/(ratio x H) degrees (20 minutes on the 27-hole circle of a 40:1 head). The fractional part times a hole-circle count gives the hole move when that product is a whole number; an angle no circle divides evenly needs a closer circle or differential indexing."
+    : "Crank turns per division = ratio / N (" + ratio + "/" + N + " on this head). The fractional part times a hole-circle count gives the hole move when that product is a whole number. First-principles ratio arithmetic.");
   if (fraction === 0) {
     notes.push("The division comes out to whole crank turns; no index plate is needed.");
   } else if (usable.length === 0) {
     notes.push("None of the supplied hole circles divides evenly for this division - it needs a different plate or differential indexing (out of scope here).");
   }
-  return { divisions: N, worm_ratio: ratio, turns, full_turns, fraction, settings, notes };
+  return { divisions: byAngle ? 0 : N, index_by, angle_deg: A, worm_ratio: ratio, turns, full_turns, fraction, settings, notes };
 }
 export const dividingHeadExample = { inputs: { divisions: 9, worm_ratio: 40, circles: "27,54" } };
 
 function _v40renderDividingHead(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Simple (plain) indexing on a 40:1 dividing head - turns per division = ratio / N, hole move = fraction x hole-circle count - first-principles arithmetic as in Machinery's Handbook (Industrial Press), by name; public domain. Differential and angular indexing are out of scope.";
+  citationEl.textContent = "Citation: Simple (plain) indexing on a 40:1 dividing head - turns per division = ratio / N, hole move = fraction x hole-circle count - first-principles arithmetic as in Machinery's Handbook (Industrial Press), by name; public domain. Angular indexing: turns = angle x ratio / 360 (angle/9 degrees on a 40:1 head). Differential indexing is out of scope.";
   const div = makeNumber("Divisions wanted N", "dh-div", { step: "1", min: "1" });
   const ratio = makeNumber("Worm ratio (turns per rev)", "dh-ratio", { step: "any", min: "0", value: "40" }); ratio.input.value = "40";
   const circles = makeText("Index-plate hole circles (comma list)", "dh-circles", { placeholder: "15,16,17,18,19,20" });
-  for (const f of [div, ratio, circles]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { div.input.value = "9"; ratio.input.value = "40"; circles.input.value = "27,54"; update(); });
+  const by = makeSelect("Index by", "dh-by", [
+    { value: "divisions", label: "Equal divisions N", selected: true },
+    { value: "angle", label: "An angle (degrees)" },
+  ]);
+  const ang = makeNumber("Angle (degrees, for angular indexing)", "dh-ang", { step: "any", min: "0" });
+  for (const f of [by, div, ang, ratio, circles]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { by.select.value = "divisions"; div.input.value = "9"; ang.input.value = ""; ratio.input.value = "40"; circles.input.value = "27,54"; update(); });
   const oTurns = makeOutputLine(outputRegion, "Crank turns per division", "dh-out-turns");
   const oPlate = makeOutputLine(outputRegion, "Plate settings", "dh-out-plate");
   const oNote = makeOutputLine(outputRegion, "Notes", "dh-out-note");
   const update = debounce(() => {
-    const r = computeDividingHead({ divisions: _readNum(div.input), worm_ratio: _readNum(ratio.input), circles: circles.input.value });
+    const r = computeDividingHead({ divisions: _readNum(div.input), worm_ratio: _readNum(ratio.input), circles: circles.input.value, index_by: by.select.value, angle_deg: _readNum(ang.input) });
     if (r.error) { oTurns.textContent = r.error; oPlate.textContent = "-"; oNote.textContent = ""; return; }
-    oTurns.textContent = r.full_turns + " full turn" + (r.full_turns === 1 ? "" : "s") + (r.fraction > 0 ? " + " + fmt(r.fraction, 6) + " of a turn" : "");
+    oTurns.textContent = (r.index_by === "angle" ? "for " + fmt(r.angle_deg, 4) + " degrees: " : "") + r.full_turns + " full turn" + (r.full_turns === 1 ? "" : "s") + (r.fraction > 0 ? " + " + fmt(r.fraction, 6) + " of a turn" : "");
     const usable = r.settings.filter((s) => s.whole);
     oPlate.textContent = usable.length ? usable.map((s) => r.full_turns + " turns + " + s.holes + " holes on the " + s.circle + "-hole circle").join("; ") : "no supplied circle divides evenly";
     oNote.textContent = r.notes.join(" ");
   }, DEBOUNCE_MS);
-  for (const f of [div.input, ratio.input]) f.addEventListener("input", update);
+  for (const f of [div.input, ratio.input, ang.input]) f.addEventListener("input", update);
   circles.input.addEventListener("input", update);
+  by.select.addEventListener("change", update);
 }
 SHOP_RENDERERS["dividing-head"] = _v40renderDividingHead;
 

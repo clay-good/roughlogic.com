@@ -12132,11 +12132,11 @@ export const CITATIONS = {
     ],
   },
   "dividing-head": {
-    formula: "Turns per division = ratio / N (40/N on a standard 40:1 head). For a hole circle of H holes the move is the fractional part x H holes, reported when that product is a whole number.",
+    formula: "Turns per division = ratio / N (40/N on a standard 40:1 head); angular indexing turns = angle x ratio / 360 (angle/9 degrees on 40:1). For a hole circle of H holes the move is the fractional part x H holes, reported when that product is a whole number.",
     edition: "Simple (plain) indexing on a 40:1 dividing head - first-principles ratio arithmetic as in Machinery's Handbook (Industrial Press), by name; public domain.",
-    freeAccess: "Pure arithmetic, public; differential and angular indexing are out of scope.",
+    freeAccess: "Pure arithmetic, public; differential indexing is out of scope, and angular indexing is the Index-by select (added 2026-10-09).",
     governance: GOVERNANCE.general,
-    editionNote: "First-principles ratio arithmetic. Only simple (plain) indexing is computed; differential and angular indexing need a different setup.",
+    editionNote: "First-principles ratio arithmetic. Simple (plain) indexing by equal divisions, and angular indexing by degrees (one crank turn = 360/ratio degrees, 9 on a 40:1 head; one hole on the 27-hole circle = 20 minutes). Differential indexing needs change gears and a different setup.",
     assumptions: [
       { name: "Worm ratio and plate circles", value: "the worm ratio (default 40:1) and the available index-plate hole circles are user-supplied", source: "indexing geometry" },
     ],

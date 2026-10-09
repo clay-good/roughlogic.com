@@ -259,7 +259,7 @@ export const BESPOKE_OUTPUT_LABELS = {
   "disinfection-ct": {"CT_achieved":"CT achieved (mg-min/L)","CT_required_selected":"CT required (selected log)","required_t10_min":"Required t10 at this residual","log_inactivation":"Log inactivation (Giardia)","pass_3log_giardia":"Pass 3-log Giardia","pass_4log_virus":"Pass 4-log virus","warnings":"Notes"},
   "disk-clutch-torque": {"uniform_wear_torque_in_lbf":"Torque (uniform wear, design)","uniform_pressure_torque_in_lbf":"Torque (uniform pressure)","max_pressure_psi":"Max contact pressure","note":"Note"},
   "distance-distance-intersection": {"sol1_n_ft":"Solution A (N, E)","tangent":"Solution B (N, E)","d_ft":"Between control points","note":"Note"},
-  "dividing-head": {"notes":"Notes"},
+  "dividing-head": {"index_by":"Crank turns per division","full_turns":"Plate settings","notes":"Notes"},
   "dmx-planner": {"ranges":"Per-fixture ranges","utilization":"Universe utilization","conflicts":"Conflicts","split_recommended":"Recommendation"},
   "doubling-time": {"doubling_time":"Doubling time","note":"Note"},
   "dovetail-over-pins": {"offset_in":"Offset k = D(1 + cot(a/2))","note":"Note"},
