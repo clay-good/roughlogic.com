@@ -169367,6 +169367,35 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "spanline-sag-tension",
+  "source_publisher": "Project (first-principles)",
+  "source_title": "Rescue highline: 300 lb litter at midspan, 100 ft span, 0.1 lb/ft rope, 10 ft sag",
+  "source_edition_or_year": "cable statics, superposition",
+  "source_section_or_page": "H = (0.1 x 100^2/8 + 300 x 100/4)/10 = 762.5 lb; V = 5 + 150 = 155 lb; T = sqrt(762.5^2 + 155^2) = 778.1 lb",
+  "verified_by": "rl",
+  "verified_on": "2026-10-09",
+  "inputs": {
+   "span_ft": 100,
+   "load_lb_per_ft": 0.1,
+   "sag_ft": 10,
+   "point_load_lb": 300
+  },
+  "outputs": {
+   "horizontal_tension_lb": {
+    "value": 762.5,
+    "tolerance": {
+     "pct": 0.5
+    }
+   },
+   "support_tension_lb": {
+    "value": 778.09,
+    "tolerance": {
+     "pct": 0.5
+    }
+   }
+  }
  }
  ]
 }

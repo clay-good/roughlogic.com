@@ -60,6 +60,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **`spanline-sag-tension` takes a point load at midspan.** It covered a uniform load only (a litter on a rescue highline or a block on a tramline was sent elsewhere). An optional midspan point load now adds by superposition: H = (w L^2/8 + P L/4)/d, anchor tension sqrt(H^2 + (w L/2 + P/2)^2), and the matching slack. A 300 lb litter on a 100 ft highline sagging 10 ft puts 778 lb on each anchor. Uniform-load results are unchanged.
+
 - **`plume-rise-briggs` takes the stability class.** Its note said stability was not modelled. A Pasquill class select now keeps the neutral-unstable relations for A through D and applies Briggs' stable form for E and F, 2.6 (F/(u s))^(1/3) with s = (g/Ta) dtheta/dz at 0.020 and 0.035 K/m, as EPA's ISC3 does; in stable air rise goes as the cube root of 1/wind, so doubling the wind cuts it by 21%, not half. The example stack rises 185 ft neutral, 180 ft in class E, and 149 ft in class F. Class D (the default) is unchanged.
 
 - **`concrete-anchor-breakout` and `concrete-anchor-pryout` take anchor groups (ACI 318-19 17.6.2.1).** They covered a single anchor and the pryout note said the group form was not modeled. Rows toward the edge and anchors per row, with their spacings, now set the group projected area ANc = [min(ca1, 1.5 hef) + (n1 - 1) min(s1, 3 hef) + 1.5 hef] x [3 hef + (n2 - 1) min(s2, 3 hef)], capped at n ANco, for a concentric load; pryout becomes Vcpg = kcp Ncbg. Four anchors at 6 in on a 6 in embedment carry 39,659 lb, 1.78 single-anchor breakouts rather than 4. Single-anchor results are unchanged.

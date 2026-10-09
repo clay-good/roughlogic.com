@@ -58915,3 +58915,16 @@ test("bounds: lift-bag-sizing displaces the in-water weight and scales air with 
   assert.ok("error" in _lbs({ object_weight_lb: 1000, object_density_lb_ft3: 40, depth_ft: 10 }));
   assert.ok("error" in _lbs({ object_weight_lb: 1000, water_density_lb_ft3: 8.34, depth_ft: 10 }));
 });
+
+import { computeSpanlineSagTension as _sstP } from "../../calc-rigging.js";
+test("bounds: spanline-sag-tension midspan point load by superposition", () => {
+  const u = _sstP({ span_ft: 100, load_lb_per_ft: 1, sag_ft: 2.5 });
+  assert.equal(u.horizontal_tension_lb, 500);
+  assert.ok(Math.abs(u.cable_length_ft - (100 + 8 * 2.5 * 2.5 / 300)) < 1e-12);
+  // A pure point load: two straight legs, H = P L / (4 d), and small-slope slack 2 d^2 / L.
+  const p = _sstP({ span_ft: 100, load_lb_per_ft: 0, sag_ft: 5, point_load_lb: 400 });
+  assert.equal(p.horizontal_tension_lb, 2000);
+  assert.ok(Math.abs(p.support_tension_lb - Math.hypot(2000, 200)) < 1e-9);
+  assert.ok(Math.abs(p.slack_ft - 2 * 25 / 100) < 1e-12);
+  assert.ok("error" in _sstP({ span_ft: 100, load_lb_per_ft: 0, sag_ft: 5 }));
+});

@@ -16432,7 +16432,7 @@ export const CITATIONS = {
     ],
   },
   "spanline-sag-tension": {
-    formula: "H = w x L^2 / (8 x d); T_support = H x sqrt(1 + (4 d / L)^2); length = L + 8 d^2 / (3 L); slack = length - L; sag_ratio = d / L.",
+    formula: "H = (w L^2/8 + P L/4)/d; V = w L/2 + P/2; T_support = sqrt(H^2 + V^2) (= H sqrt(1 + (4 d/L)^2) with P = 0); slack = [w^2 (L/2)^3/3 + w P (L/2)^2/2 + P^2 (L/2)/4]/H^2 (= 8 d^2/(3 L) with P = 0); length = L + slack; sag_ratio = d / L.",
     edition: "Shallow-cable parabola statics (by name) with ASME B30.9 / Wire Rope Users Manual rigging practice; first-principles, no edition cycle.",
     freeAccess: "The shallow-cable parabola (H = w L^2 / 8d) is a public statics result; ASME B30.9 governs sling and rigging practice. An ESTIMATE only; the certified rope WLL and the head rigger govern.",
     governance: GOVERNANCE.rigging,
