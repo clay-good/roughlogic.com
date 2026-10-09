@@ -342,6 +342,7 @@ export const BESPOKE_OUTPUT_LABELS = {
   "fan-sheave-for-target-cfm": {"new_drive_sheave_in":"New drive sheave (pitch dia)","new_bhp":"Power and static pressure","note":"Note"},
   "fastener-pullout": {"withdrawal_per_inch_lb":"Withdrawal per inch","total_withdrawal_lb":"Total withdrawal"},
   "fatigue-finite-life": {"coefficient_a_psi":"S-N line","has_cycles":"Fatigue strength at N","has_stress":"Life at the stress","note":"Note"},
+  "fatigue-miner-damage": {"blocks_to_failure":"Repetitions of the block to failure","life_1_cycles":"Life at each block's stress","cycles_to_failure":"Total cycles to failure","note":"Note"},
   "fatigue-notch-sensitivity": {"kf":"Fatigue stress-concentration factor","notch_sensitivity_q":"Notch sensitivity q","neuber_constant":"Neuber constant","note":"Note"},
   "fatigue-safety-factor": {"fatigue_n":"Fatigue safety factor n","langer_ny":"First-cycle yield factor n_y","governing_n":"Governing","note":"Note"},
   "feed-conversion-ratio": {"average_daily_gain_lb":"Average daily gain","feed_conversion_ratio":"Feed conversion ratio","total_gain_lb":"Total gain","note":"Note"},

@@ -1203,6 +1203,68 @@ function renderFatigueNotchSensitivity(inputRegion, outputRegion, citationEl) {
 }
 MACHINING_RENDERERS["fatigue-notch-sensitivity"] = renderFatigueNotchSensitivity;
 
+// spec-v1938: cumulative fatigue damage by the Palmgren-Miner rule (Shigley Sec. 6-15, Eq. 6-57) on the
+// same finite-life S-N line as fatigue-finite-life. D = sum(n_i / N_i); a block below Se does no damage
+// (Shigley's convention with an endurance limit); failure is predicted at D = 1, so the block repeats 1/D times.
+// dims: in { ultimate_strength_psi: M L^-1 T^-2, endurance_limit_psi: M L^-1 T^-2, fatigue_fraction: dimensionless, stress_1_psi: M L^-1 T^-2, cycles_1: dimensionless, stress_2_psi: M L^-1 T^-2, cycles_2: dimensionless, stress_3_psi: M L^-1 T^-2, cycles_3: dimensionless } out: { life_1_cycles: dimensionless, life_2_cycles: dimensionless, life_3_cycles: dimensionless, damage: dimensionless, blocks_to_failure: dimensionless, cycles_to_failure: dimensionless }
+export function computeFatigueMinerDamage({ ultimate_strength_psi = 0, endurance_limit_psi = 0, fatigue_fraction = 0, stress_1_psi = 0, cycles_1 = 0, stress_2_psi = 0, cycles_2 = 0, stress_3_psi = 0, cycles_3 = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const blocks = [[stress_1_psi, cycles_1], [stress_2_psi, cycles_2], [stress_3_psi, cycles_3]].map(([s, n]) => [Number(s) || 0, Number(n) || 0]);
+  if (blocks.some(([s, n]) => s < 0 || n < 0)) return { error: "Stresses and cycle counts cannot be negative." };
+  if (blocks.some(([s, n]) => (s > 0) !== (n > 0))) return { error: "Each block needs both a stress and a cycle count (leave both blank to skip it)." };
+  if (!blocks.some(([s]) => s > 0)) return { error: "Enter at least one block: a reversed stress and its cycle count." };
+  // The S-N line and its range checks are the finite-life tile's, called so the two cannot drift.
+  const line = computeFatigueFiniteLife({ ultimate_strength_psi, endurance_limit_psi, fatigue_fraction, cycles: 1000 });
+  if (line.error) return { error: line.error };
+  const Se = Number(endurance_limit_psi), s1000 = line.f_used * Number(ultimate_strength_psi);
+  const lives = blocks.map(([s]) => (s > 0 && s > Se ? Math.pow(s / line.coefficient_a_psi, 1 / line.exponent_b) : 0));
+  if (blocks.some(([s]) => s > s1000)) return { error: "A block's stress is above f Sut (" + Math.round(s1000) + " psi): under 1,000 cycles, in the low-cycle range the S-N line does not cover." };
+  const damage = blocks.reduce((d, [s, n], i) => d + (lives[i] > 0 ? n / lives[i] : 0), 0);
+  const blockCycles = blocks.reduce((t, [, n]) => t + n, 0);
+  const blocks_to_failure = damage > 0 ? 1 / damage : 0;
+  const cycles_to_failure = blocks_to_failure * blockCycles;
+  if (![damage, blocks_to_failure, cycles_to_failure].every(Number.isFinite)) return { error: "Miner's-rule math is not a finite value; check the inputs." };
+  return {
+    life_1_cycles: lives[0], life_2_cycles: lives[1], life_3_cycles: lives[2], damage, blocks_to_failure, cycles_to_failure,
+    f_used: line.f_used, infinite: damage === 0, fails_in_block: damage >= 1,
+    note: "Palmgren-Miner cumulative damage: each block of n cycles at a reversed stress uses up n/N of the life, where N is that stress's life on the finite-life S-N line, and failure is predicted when the fractions sum to 1. A block at or below the endurance limit is counted as doing no damage. The result is how many times the whole block (all entered cycles) can repeat; entering cycle FRACTIONS (0.2, 0.5, 0.3) instead gives the total cycles to failure directly. Miner's rule ignores load order (high-then-low does more damage than the sum says), and measured failures scatter from about D = 0.7 to 2.2, so treat the answer as an estimate with margin. Completely reversed stresses on steel; convert mean stresses first. A design aid; test data govern.",
+  };
+}
+export const fatigueMinerDamageExample = { inputs: { ultimate_strength_psi: 100000, endurance_limit_psi: 50000, fatigue_fraction: 0.9, stress_1_psi: 70000, cycles_1: 0.2, stress_2_psi: 55000, cycles_2: 0.5, stress_3_psi: 40000, cycles_3: 0.3 } };
+function renderFatigueMinerDamage(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: the Palmgren-Miner linear damage rule D = sum(n_i/N_i), failure at D = 1 (Shigley, Mechanical Engineering Design, Sec. 6-15), with each N_i from the finite-life S-N line a = (f Sut)^2/Se, b = -(1/3) log(f Sut/Se), N = (sigma/a)^(1/b), and no damage at or below Se. Steel, completely reversed stress. A design aid; test data govern.";
+  const sut = makeNumber("Ultimate strength Sut (psi)", "fmd-sut", { step: "any", min: "0" });
+  const se = makeNumber("Corrected endurance limit Se (psi)", "fmd-se", { step: "any", min: "0" });
+  const f = makeNumber("Fatigue strength fraction f (blank for Shigley's fit)", "fmd-f", { step: "any", min: "0", max: "1" });
+  const s1 = makeNumber("Block 1 reversed stress (psi)", "fmd-s1", { step: "any", min: "0" });
+  const n1 = makeNumber("Block 1 cycles", "fmd-n1", { step: "any", min: "0" });
+  const s2 = makeNumber("Block 2 reversed stress (psi, optional)", "fmd-s2", { step: "any", min: "0" });
+  const n2 = makeNumber("Block 2 cycles", "fmd-n2", { step: "any", min: "0" });
+  const s3 = makeNumber("Block 3 reversed stress (psi, optional)", "fmd-s3", { step: "any", min: "0" });
+  const n3 = makeNumber("Block 3 cycles", "fmd-n3", { step: "any", min: "0" });
+  const all = [sut, se, f, s1, n1, s2, n2, s3, n3];
+  for (const x of all) inputRegion.appendChild(x.wrap);
+  attachExampleButton(inputRegion, () => { sut.input.value = "100000"; se.input.value = "50000"; f.input.value = "0.9"; s1.input.value = "70000"; n1.input.value = "0.2"; s2.input.value = "55000"; n2.input.value = "0.5"; s3.input.value = "40000"; n3.input.value = "0.3"; update(); });
+  const oD = makeOutputLine(outputRegion, "Repetitions of the block to failure", "fmd-out-b");
+  const oL = makeOutputLine(outputRegion, "Life at each block's stress", "fmd-out-l");
+  const oT = makeOutputLine(outputRegion, "Total cycles to failure", "fmd-out-t");
+  const oNote = makeOutputLine(outputRegion, "Note", "fmd-out-note");
+  function readNum(i) { if (i.value === "") return 0; const v = Number(i.value); return Number.isFinite(v) ? v : 0; }
+  const life = (n) => (n > 0 ? fmt(n, 0) : "no damage (at or below Se)");
+  const update = debounce(() => {
+    const r = computeFatigueMinerDamage({ ultimate_strength_psi: readNum(sut.input), endurance_limit_psi: readNum(se.input), fatigue_fraction: readNum(f.input), stress_1_psi: readNum(s1.input), cycles_1: readNum(n1.input), stress_2_psi: readNum(s2.input), cycles_2: readNum(n2.input), stress_3_psi: readNum(s3.input), cycles_3: readNum(n3.input) });
+    if (r.error) { oD.textContent = r.error; oL.textContent = "-"; oT.textContent = "-"; oNote.textContent = ""; return; }
+    oD.textContent = fmt(r.blocks_to_failure, 3) + " (damage per block D = " + fmt(r.damage, 5) + (r.fails_in_block ? "; FAILS within one block" : "") + ")";
+    if (r.infinite) oD.textContent = "unlimited: every block is at or below Se";
+    oL.textContent = [s1, s2, s3].map((x, i) => (readNum(x.input) > 0 ? "block " + (i + 1) + ": " + life([r.life_1_cycles, r.life_2_cycles, r.life_3_cycles][i]) : "")).filter(Boolean).join("; ");
+    oT.textContent = fmt(r.cycles_to_failure, 0) + " cycles";
+    if (r.infinite) oT.textContent = "unlimited";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const x of all) x.input.addEventListener("input", update);
+}
+MACHINING_RENDERERS["fatigue-miner-damage"] = renderFatigueMinerDamage;
+
 // ===================== spec-v1288: power-screw torque, efficiency, and self-locking (Shigley Ch. 8) =====================
 // acme-thread-depth / stub-acme-thread-depth give lead-screw GEOMETRY and name the use ("vises, presses, lead
 // screws"), but the mechanics - the torque to raise or lower a load and whether the screw back-drives - was never

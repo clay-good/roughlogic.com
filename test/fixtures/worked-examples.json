@@ -168586,6 +168586,46 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "fatigue-miner-damage",
+  "source_publisher": "Project (first-principles)",
+  "source_title": "Three-level block: 20% at 70 kpsi, 50% at 55 kpsi, 30% at 40 kpsi (Sut 100 kpsi, Se 50 kpsi, f 0.9)",
+  "source_edition_or_year": "Palmgren-Miner on the Shigley S-N line",
+  "source_section_or_page": "a = 162 kpsi, b = -0.08509; N1 = 19,173, N2 = 326,247, 40 kpsi below Se; N = 1/(0.2/N1 + 0.5/N2) = 83,583",
+  "verified_by": "rl",
+  "verified_on": "2026-10-09",
+  "inputs": {
+   "ultimate_strength_psi": 100000,
+   "endurance_limit_psi": 50000,
+   "fatigue_fraction": 0.9,
+   "stress_1_psi": 70000,
+   "cycles_1": 0.2,
+   "stress_2_psi": 55000,
+   "cycles_2": 0.5,
+   "stress_3_psi": 40000,
+   "cycles_3": 0.3
+  },
+  "outputs": {
+   "cycles_to_failure": {
+    "value": 83583,
+    "tolerance": {
+     "pct": 0.5
+    }
+   },
+   "life_1_cycles": {
+    "value": 19173,
+    "tolerance": {
+     "pct": 0.5
+    }
+   },
+   "life_2_cycles": {
+    "value": 326247,
+    "tolerance": {
+     "pct": 0.5
+    }
+   }
+  }
  }
  ]
 }

@@ -11891,6 +11891,18 @@ export const CITATIONS = {
       { name: "Scope", value: "uniaxial, infinite life; notch Kf, finite-life S-N, and multiaxial combination are separate", source: "scope of this tile" },
     ],
   },
+  "fatigue-miner-damage": {
+    formula: "S-N line as fatigue-finite-life: a = (f Sut)^2/Se, b = -(1/3) log10(f Sut/Se), N_i = (sigma_i/a)^(1/b) for Se < sigma_i <= f Sut, no damage at or below Se; D = sum(n_i/N_i) per block; blocks to failure = 1/D; cycles to failure = (1/D) sum(n_i).",
+    edition: "The Palmgren-Miner linear cumulative-damage rule (Shigley, Mischke and Budynas, Mechanical Engineering Design, Sec. 6-15), by name, on the Shigley finite-life S-N line.",
+    freeAccess: "Standard published fatigue relations; the strengths, f, and the stress blocks are the user's inputs.",
+    governance: GOVERNANCE.general,
+    editionNote: "Linear damage summation: each block uses n/N of the life and failure is predicted at D = 1. It ignores load sequence (a high-then-low history does more damage than the sum) and measured D at failure scatters from roughly 0.7 to 2.2. Blocks at or below Se are counted as no damage, Shigley's convention with an endurance limit; above f Sut (under 10^3 cycles) the tile returns an error rather than extrapolate. Steel, completely reversed stress. A design aid; test data govern.",
+    assumptions: [
+      { name: "Damage rule", value: "D = sum(n_i/N_i), failure at D = 1", source: "Palmgren (1924), Miner (1945); Shigley Sec. 6-15" },
+      { name: "Lives", value: "from the finite-life S-N line, computed by the fatigue-finite-life routine", source: "Shigley Eqs. 6-13 to 6-16" },
+      { name: "Below the endurance limit", value: "no damage", source: "Shigley Sec. 6-15" },
+    ],
+  },
   "fatigue-notch-sensitivity": {
     formula: "sqrt(a) [sqrt(in)] = 0.246 - 3.08e-3 Sut + 1.51e-5 Sut^2 - 2.67e-8 Sut^3 (bending/axial) or 0.190 - 2.51e-3 Sut + 1.35e-5 Sut^2 - 2.67e-8 Sut^3 (torsion), Sut in kpsi; q = 1/(1 + sqrt(a)/sqrt(r)); Kf = 1 + q (Kt - 1).",
     edition: "Neuber's notch-sensitivity equation with the steel Neuber constants (Shigley, Mischke and Budynas, Mechanical Engineering Design, Ch. 6, Eqs. 6-32 to 6-35), by name; it reproduces Shigley Example 6-6 (Sut 690 MPa = 100 kpsi, r = 3 mm, Kt = 1.65: sqrt(a) = 0.0622 sqrt(in), Kf = 1.55).",

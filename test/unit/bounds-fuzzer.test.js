@@ -58625,3 +58625,18 @@ test("bounds: dividing-head angular indexing turns = angle x ratio / 360", () =>
   assert.ok("error" in _dhAng({ index_by: "angle", angle_deg: 0, circles: "27" }));
   assert.ok("error" in _dhAng({ index_by: "spiral", divisions: 9, circles: "27" }));
 });
+
+import { computeFatigueMinerDamage as _fmd, computeFatigueFiniteLife as _fflM } from "../../calc-machining.js";
+test("bounds: fatigue-miner-damage sums n/N on the finite-life line", () => {
+  const base = { ultimate_strength_psi: 100000, endurance_limit_psi: 50000, fatigue_fraction: 0.9 };
+  const r = _fmd({ ...base, stress_1_psi: 70000, cycles_1: 0.2, stress_2_psi: 55000, cycles_2: 0.5, stress_3_psi: 40000, cycles_3: 0.3 });
+  assert.ok(Math.abs(r.cycles_to_failure - 83583) / 83583 < 0.001);
+  assert.equal(r.life_3_cycles, 0);
+  // One block at its own life is exactly D = 1.
+  const N = _fflM({ ...base, alternating_stress_psi: 60000 }).life_cycles;
+  assert.ok(Math.abs(_fmd({ ...base, stress_1_psi: 60000, cycles_1: N }).damage - 1) < 1e-9);
+  assert.equal(_fmd({ ...base, stress_1_psi: 45000, cycles_1: 1e9 }).infinite, true);
+  assert.ok("error" in _fmd({ ...base, stress_1_psi: 70000 }));
+  assert.ok("error" in _fmd({ ...base, stress_1_psi: 95000, cycles_1: 10 }));
+  assert.ok("error" in _fmd(base));
+});

@@ -1,7 +1,7 @@
 {
   "note": "spec-v1184 coverage ratchet. Tiles whose renderer exposes a render.schema consistent with the compute function. Grow with `node scripts/check-renderer-schema.mjs --write`; regeneration is intentional.",
-  "total_tiles": 2241,
-  "covered_count": 2164,
+  "total_tiles": 2242,
+  "covered_count": 2165,
   "covered": [
     "aav-install-check",
     "abatement-containment",
@@ -670,6 +670,7 @@
     "fan-system-effect",
     "fastener-pullout",
     "fatigue-finite-life",
+    "fatigue-miner-damage",
     "fatigue-notch-sensitivity",
     "fatigue-safety-factor",
     "fdc-supply-check",

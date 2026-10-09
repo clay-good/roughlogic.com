@@ -1588,6 +1588,7 @@ export const RENDERER_MAP = {
   "endurance-limit-marin": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },
   "fatigue-finite-life": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },
   "fatigue-notch-sensitivity": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },
+  "fatigue-miner-damage": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },
   "power-screw-torque": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },
   "disk-clutch-torque": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },
   "euler-johnson-column": { module: "../../calc-machining.js", exportName: "MACHINING_RENDERERS" },

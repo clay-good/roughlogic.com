@@ -1266,6 +1266,7 @@ export const COMPUTE_MAP = {
   "endurance-limit-marin": { module: "../../calc-machining.js", fn: "computeEnduranceLimitMarin" },
   "fatigue-finite-life": { module: "../../calc-machining.js", fn: "computeFatigueFiniteLife" },
   "fatigue-notch-sensitivity": { module: "../../calc-machining.js", fn: "computeFatigueNotchSensitivity" },
+  "fatigue-miner-damage": { module: "../../calc-machining.js", fn: "computeFatigueMinerDamage" },
   "power-screw-torque": { module: "../../calc-machining.js", fn: "computePowerScrewTorque" },
   "disk-clutch-torque": { module: "../../calc-machining.js", fn: "computeDiskClutchTorque" },
   "euler-johnson-column": { module: "../../calc-machining.js", fn: "computeEulerJohnsonColumn" },
