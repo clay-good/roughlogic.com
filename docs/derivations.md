@@ -2926,7 +2926,7 @@ cross-check.
 | calc-mechanic.js | `computeMeanPistonSpeed` | `{ stroke_in = 0, rpm = 0 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computePaintMixRatio` | `{ paint_volume_oz = 0, part_paint = 4, part_hardener = 1, part_reducer = 0 } ...` | _ | _ | _ |
 | calc-mechanic.js | `computePlanetaryGearRatio` | `{ sun_teeth = 0, ring_teeth = 0, input_speed_rpm = 0, configuration = "ring-f...` | _ | _ | _ |
-| calc-mechanic.js | `computeProjectileRange` | `{ velocity_fps = 0, angle_deg = 0 } = {}` | _ | _ | _ |
+| calc-mechanic.js | `computeProjectileRange` | `{ velocity_fps = 0, angle_deg = 0, launch_height_ft = 0 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computePropPitchSelection` | `{ current_pitch_in = 0, current_wot_rpm = 0, target_wot_rpm = 0, rpm_per_inch...` | _ | _ | _ |
 | calc-mechanic.js | `computePropSlip` | `{ rpm = 0, gear_ratio = 1, pitch_in = 0, gps_speed_kt = 0 }` | _ | _ | _ |
 | calc-mechanic.js | `computeReserveCapacityAmpHours` | `{ rc_minutes = 0 } = {}` | _ | _ | _ |
@@ -5746,7 +5746,7 @@ per spec-v14 §13.1 second paragraph.
 | `plain-bearing-pressure-pv` | Plain (Sleeve) Bearing Pressure and PV | Project (first-principles); P=W/(LD), PV=P*V | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `planetary-gear-ratio` | Planetary (Epicyclic) Gear Ratio | Project (first-principles); Willis epicyclic ratio | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+4 more) |
 | `power-screw-torque` | Power-Screw Torque, Efficiency, and Self-Locking | Project (first-principles); T_raise/T_lower power screw | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
-| `projectile-range` | Projectile Range, Height, and Flight Time | Project (first-principles); R = v^2 sin(2 theta)/g | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+4 more) |
+| `projectile-range` | Projectile Range, Height, and Flight Time | Project (first-principles); R = v^2 sin(2 theta)/g | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+5 more) |
 | `prop-pitch-selection` | Marine Propeller Pitch Selection | outboard prop selection practice; spec-v462 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `prop-slip` | Marine Prop Slip | Project (first-principles); theoretical_kt = (4500/1.85) * 19 / 1215.2 = 38.03; slip ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `propeller-track-balance` | Propeller Track, Balance, and Vibration Limit | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |

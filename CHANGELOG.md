@@ -60,6 +60,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **`projectile-range` takes a launch height.** It assumed level ground and said launch height was separate. A launch height above the landing plane (negative if the landing is higher) now sets the flight time (v sin(theta) + sqrt((v sin(theta))^2 + 2 g h))/g and the range, and every case reports the angle for the longest reach, atan(v/sqrt(v^2 + 2 g h)): 80 ft/s at 30 degrees from 20 ft up carries 201.8 ft, and 42.4 degrees would carry it farthest. Level-ground results are unchanged.
+
 - **`universal-joint-speed` gives the torque pulsation and peak output acceleration.** It said torque pulsation was separate. An optional input torque now returns the output torque range, T cos(beta) to T/cos(beta) (power is conserved), and every case reports the peak output angular acceleration, omega^2 cos(beta) sin^2(beta) sin(2 theta)/(1 - sin^2(beta) sin^2(theta))^2 at its worst angle: 200 lb-ft through 10 degrees at 1,000 rpm swings 197 to 203 lb-ft and peaks at 336 rad/s^2.
 
 - **`calc-concrete.js` gzip cap raised 54,000 -> 58,000 B.** The 2026-10-09 anchor cracking factors, concentrated-load deflection, and axial one-way shear took the module to about 54.3 KB gzipped. It is lazy-loaded and outside the home-view payload.

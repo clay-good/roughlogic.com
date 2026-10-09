@@ -168942,6 +168942,34 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "projectile-range",
+  "source_publisher": "Project (first-principles)",
+  "source_title": "80 ft/s at 30 degrees from 20 ft above the landing",
+  "source_edition_or_year": "projectile kinematics",
+  "source_section_or_page": "vy = 40, vx = 69.282; t = (40 + sqrt(1600 + 2 x 32.174 x 20))/32.174 = 2.9132 s; R = 201.83 ft; best angle atan(80/sqrt(6400 + 1286.96)) = 42.38 deg",
+  "verified_by": "rl",
+  "verified_on": "2026-10-09",
+  "inputs": {
+   "velocity_fps": 80,
+   "angle_deg": 30,
+   "launch_height_ft": 20
+  },
+  "outputs": {
+   "range_ft": {
+    "value": 201.83,
+    "tolerance": {
+     "pct": 0.5
+    }
+   },
+   "best_angle_deg": {
+    "value": 42.38,
+    "tolerance": {
+     "pct": 0.5
+    }
+   }
+  }
  }
  ]
 }

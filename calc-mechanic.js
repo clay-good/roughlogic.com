@@ -1890,22 +1890,30 @@ MECHANIC_RENDERERS["hydraulic-accumulator-volume"] = _simpleRenderer({
 // fire-stream-reaction gives the nozzle force but not the TRAJECTORY. Level-ground projectile:
 // R = v^2 sin(2 theta)/g, H = v^2 sin^2(theta)/(2g), t = 2 v sin(theta)/g. Range peaks at 45 deg;
 // complementary angles give equal range. Still-air upper bound (no drag). g = 32.174 ft/s^2.
-// dims: in { velocity_fps: L T^-1, angle_deg: dimensionless } out: { range_ft: L, max_height_ft: L, flight_time_s: T }
-export function computeProjectileRange({ velocity_fps = 0, angle_deg = 0 } = {}) {
+// Launch height added 2026-10-09 (the note named it as separate): with the launch h above the landing plane,
+// t = (v sin + sqrt((v sin)^2 + 2 g h))/g, R = v cos t, and the best angle is atan(v / sqrt(v^2 + 2 g h)).
+// dims: in { velocity_fps: L T^-1, angle_deg: dimensionless, launch_height_ft: L } out: { range_ft: L, max_height_ft: L, flight_time_s: T, best_angle_deg: dimensionless }
+export function computeProjectileRange({ velocity_fps = 0, angle_deg = 0, launch_height_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const v = Number(velocity_fps) || 0;
   const th = Number(angle_deg);
   if (!(v > 0)) return { error: "Launch speed must be positive (ft/s)." };
   if (!(th > 0 && th < 90)) return { error: "Launch angle must be between 0 and 90 degrees." };
   const g = 32.174; // ft/s^2
+  const h = Number(launch_height_ft) || 0;
   const rad = (th * Math.PI) / 180;
-  const range_ft = (v * v * Math.sin(2 * rad)) / g;
-  const max_height_ft = (v * v * Math.sin(rad) * Math.sin(rad)) / (2 * g);
-  const flight_time_s = (2 * v * Math.sin(rad)) / g;
+  const vy = v * Math.sin(rad), vx = v * Math.cos(rad);
+  const disc = vy * vy + 2 * g * h;
+  if (disc < 0) return { error: "The trajectory never climbs to a landing " + (-h) + " ft above the launch; raise the speed or the angle." };
+  const flight_time_s = (vy + Math.sqrt(disc)) / g;
+  const range_ft = vx * flight_time_s;
+  const max_height_ft = (vy * vy) / (2 * g);
+  // disc >= 0 with theta < 90 makes v^2 + 2 g h > 0, so the optimum is always defined.
+  const best_angle_deg = (Math.atan(v / Math.sqrt(v * v + 2 * g * h)) * 180) / Math.PI;
   if (![range_ft, max_height_ft, flight_time_s].every(Number.isFinite) || !(range_ft > 0)) return { error: "Projectile math is not a finite value; check the inputs." };
   return {
-    range_ft, max_height_ft, flight_time_s, complementary_angle_deg: 90 - th,
-    note: "Still-air, level-ground trajectory of a point projectile launched at speed v and angle theta above horizontal: horizontal range R = v^2 sin(2 theta)/g, maximum height H = v^2 sin^2(theta)/(2g), and time of flight t = 2 v sin(theta)/g, with g = 32.174 ft/s^2. The range peaks at 45 degrees; any two complementary angles (for example 30 and 60 degrees) give the SAME range but different heights and hang times, the trade a nozzle operator or a sprinkler layout makes between reach, height, and coverage. Air resistance is NEGLECTED, so a real water stream or light object falls short of these numbers - they are the still-air upper bound. A launch height above the landing plane, wind, and stream break-up are separate. Use it for reach and clearance estimates, not a ballistic or aerodynamic calculation. A planning estimate; field conditions govern.",
+    range_ft, max_height_ft, flight_time_s, complementary_angle_deg: 90 - th, best_angle_deg, launch_height_ft: h,
+    note: "Still-air, level-ground trajectory of a point projectile launched at speed v and angle theta above horizontal: horizontal range R = v^2 sin(2 theta)/g, maximum height H = v^2 sin^2(theta)/(2g), and time of flight t = 2 v sin(theta)/g, with g = 32.174 ft/s^2. The range peaks at 45 degrees; any two complementary angles (for example 30 and 60 degrees) give the SAME range but different heights and hang times, the trade a nozzle operator or a sprinkler layout makes between reach, height, and coverage. Air resistance is NEGLECTED, so a real water stream or light object falls short of these numbers - they are the still-air upper bound. A launch height above the landing plane is an input: the flight time becomes (v sin(theta) + sqrt((v sin(theta))^2 + 2 g h))/g and the longest reach moves below 45 degrees, to atan(v/sqrt(v^2 + 2 g h)); wind and stream break-up are separate. Use it for reach and clearance estimates, not a ballistic or aerodynamic calculation. A planning estimate; field conditions govern.",
   };
 }
 export const projectileRangeExample = { inputs: { velocity_fps: 80, angle_deg: 45 } };
@@ -1916,11 +1924,12 @@ MECHANIC_RENDERERS["projectile-range"] = _simpleRenderer({
   fields: [
     { key: "velocity_fps", label: "Launch speed v (ft/s)", kind: "number" },
     { key: "angle_deg", label: "Launch angle above horizontal (deg)", kind: "number" },
+    { key: "launch_height_ft", label: "Launch height above the landing (ft; 0 level, negative if landing higher)", kind: "number", attrs: { step: "any" } },
   ],
   outputs: [
-    { key: "r", id: "prj-out-r", label: "Horizontal range", value: (r) => fmt(r.range_ft, 1) + " ft" },
-    { key: "h", id: "prj-out-h", label: "Maximum height", value: (r) => fmt(r.max_height_ft, 1) + " ft" },
-    { key: "t", id: "prj-out-t", label: "Time of flight", value: (r) => fmt(r.flight_time_s, 2) + " s (same range at " + fmt(r.complementary_angle_deg, 0) + " deg)" },
+    { key: "r", id: "prj-out-r", label: "Horizontal range", value: (r) => fmt(r.range_ft, 1) + " ft (longest at " + fmt(r.best_angle_deg, 1) + " deg)" },
+    { key: "h", id: "prj-out-h", label: "Maximum height", value: (r) => fmt(r.max_height_ft, 1) + " ft above the launch" },
+    { key: "t", id: "prj-out-t", label: "Time of flight", value: (r) => fmt(r.flight_time_s, 2) + " s" + (r.launch_height_ft === 0 ? " (same range at " + fmt(r.complementary_angle_deg, 0) + " deg)" : "") },
     { key: "n", id: "prj-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeProjectileRange,

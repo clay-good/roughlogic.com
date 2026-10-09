@@ -58756,3 +58756,15 @@ test("bounds: universal-joint torque pulsation conserves power and the peak acce
   assert.equal(_ujT({ joint_angle_deg: 10, input_speed_rpm: 1000 }).has_torque, false);
   assert.ok("error" in _ujT({ joint_angle_deg: 10, input_speed_rpm: 1000, input_torque_lbft: -5 }));
 });
+
+import { computeProjectileRange as _prjH } from "../../calc-mechanic.js";
+test("bounds: projectile-range launch height lands on the plane and the best angle maximizes range", () => {
+  const g = 32.174, v = 80, h = 20;
+  const r = _prjH({ velocity_fps: v, angle_deg: 30, launch_height_ft: h });
+  const t = r.flight_time_s, vy = v * Math.sin(Math.PI / 6);
+  assert.ok(Math.abs(h + vy * t - 0.5 * g * t * t) < 1e-9);
+  const best = _prjH({ velocity_fps: v, angle_deg: r.best_angle_deg, launch_height_ft: h }).range_ft;
+  for (const d of [-1, 1]) assert.ok(_prjH({ velocity_fps: v, angle_deg: r.best_angle_deg + d, launch_height_ft: h }).range_ft < best);
+  assert.equal(_prjH({ velocity_fps: v, angle_deg: 30 }).best_angle_deg, 45);
+  assert.ok("error" in _prjH({ velocity_fps: 20, angle_deg: 30, launch_height_ft: -100 }));
+});
