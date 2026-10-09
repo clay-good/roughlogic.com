@@ -731,9 +731,10 @@ OILGAS_RENDERERS["casing-cement-volume"] = _simpleRenderer({
 // Pressure comes from the VERTICAL height of fluid, so a crew that reaches for
 // measured depth on a deviated well believes it has overbalance it does not
 // have. That error is computed here rather than warned about.
-// dims: in { mud_weight_ppg: M L^-3, tvd_ft: L, measured_depth_ft: L, formation_pressure_psi: M L^-1 T^-2 } out: { gradient_psi_ft: M L^-2 T^-2, hydrostatic_psi: M L^-1 T^-2, overbalance_psi: M L^-1 T^-2, formation_emw_ppg: M L^-3, md_hydrostatic_psi: M L^-1 T^-2, md_error_psi: M L^-1 T^-2 }
+// Equivalent circulating density added 2026-10-09 (the note named it as separate): ECD = MW + APL/(0.052 TVD).
+// dims: in { mud_weight_ppg: M L^-3, tvd_ft: L, measured_depth_ft: L, formation_pressure_psi: M L^-1 T^-2, annular_pressure_loss_psi: M L^-1 T^-2 } out: { gradient_psi_ft: M L^-2 T^-2, hydrostatic_psi: M L^-1 T^-2, overbalance_psi: M L^-1 T^-2, formation_emw_ppg: M L^-3, md_hydrostatic_psi: M L^-1 T^-2, md_error_psi: M L^-1 T^-2 , circulating_bhp_psi: M L^-1 T^-2, ecd_ppg: M L^-3 }
 export function computeMudHydrostaticPressure({
-  mud_weight_ppg = 0, tvd_ft = 0, measured_depth_ft = 0, formation_pressure_psi = 0,
+  mud_weight_ppg = 0, tvd_ft = 0, measured_depth_ft = 0, formation_pressure_psi = 0, annular_pressure_loss_psi = 0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(mud_weight_ppg > 0)) return { error: "Mud weight must be positive (ppg)." };
@@ -742,6 +743,7 @@ export function computeMudHydrostaticPressure({
   if (measured_depth_ft < 0) return { error: "Measured depth cannot be negative (ft)." };
   if (measured_depth_ft > 0 && measured_depth_ft < tvd_ft) return { error: "Measured depth cannot be less than true vertical depth." };
   if (formation_pressure_psi < 0) return { error: "Formation pressure cannot be negative (psi)." };
+  if (annular_pressure_loss_psi < 0) return { error: "Annular pressure loss cannot be negative (psi; 0 when static)." };
   const gradient_psi_ft = _OG_MUD_GRADIENT_CONST * mud_weight_ppg;
   const hydrostatic_psi = gradient_psi_ft * tvd_ft;
   // Overbalance, with the SIGN driven off a boolean rather than off a minus.
@@ -764,12 +766,15 @@ export function computeMudHydrostaticPressure({
   const md_verdict = !has_md
     ? "(no measured depth entered, or it equals the true vertical depth)"
     : "using the " + fmt(measured_depth_ft, 0) + " ft measured depth instead of the " + fmt(tvd_ft, 0) + " ft true vertical gives " + fmt(md_hydrostatic_psi, 0) + " psi -- " + fmt(md_error_psi, 0) + " psi of pressure that is not there" + (has_formation ? ", so a crew reading it believes it has " + fmt(md_apparent_overbalance_psi, 0) + " psi of overbalance when it has " + fmt(overbalance_psi, 0) : "");
-  if (![gradient_psi_ft, hydrostatic_psi, overbalance_psi, formation_emw_ppg, md_hydrostatic_psi, md_error_psi].every(Number.isFinite)) return { error: "Hydrostatic math is not a finite value." };
+  const circulating_bhp_psi = hydrostatic_psi + annular_pressure_loss_psi;
+  const ecd_ppg = mud_weight_ppg + annular_pressure_loss_psi / (_OG_MUD_GRADIENT_CONST * tvd_ft);
+  const has_apl = annular_pressure_loss_psi > 0;
+  if (![gradient_psi_ft, hydrostatic_psi, overbalance_psi, formation_emw_ppg, md_hydrostatic_psi, md_error_psi, ecd_ppg].every(Number.isFinite)) return { error: "Hydrostatic math is not a finite value." };
   return {
-    gradient_psi_ft, hydrostatic_psi,
+    gradient_psi_ft, hydrostatic_psi, circulating_bhp_psi, ecd_ppg, has_apl,
     has_formation, overbalance_psi, is_overbalanced, formation_emw_ppg, balance_verdict,
     has_md, md_hydrostatic_psi, md_error_psi, md_apparent_overbalance_psi, md_verdict,
-    note: "The hydrostatic pressure a mud column exerts, and the overbalance it holds against a formation. The 0.052 constant is only unit conversion -- a pound per gallon over a foot of vertical column is 0.052 psi -- but the depth it multiplies is the entire point. Pressure comes from the VERTICAL height of fluid, so a well drilled to twelve thousand feet of measured depth that is only nine thousand eight hundred feet true vertical has the hydrostatic of nine thousand eight hundred, and a crew that reaches for the measured depth believes it has hundreds of psi more overbalance than it does. On a high-angle or horizontal well that gap is enormous, and it is computed here rather than warned about, because the difference between a warning and a number is whether anyone acts on it. Everything in well control is built on this one line. Formation pressure expressed as an equivalent mud weight, kick tolerance, the kill sheet, leak-off test results and equivalent circulating density are all this relation rearranged. Getting the sense of the comparison right is the whole job: hydrostatic above formation pressure is overbalance and the well is static, below it and the well flows -- so the verdict here is driven off a boolean the calculation returns rather than off the sign of a subtraction, which is a thing people misread. This is the STATIC column only. It does not include the annular friction that raises bottom-hole pressure while circulating, which is the equivalent circulating density, nor the surge and swab pressures from moving pipe, nor any cuttings loading, gas cutting, or temperature and compressibility effect on mud density downhole. It does not evaluate the fracture gradient, so it cannot tell you whether a weight the formation will hold is a weight the shoe will hold. The well's own pressure data, the leak-off or formation integrity test, the drilling program, and a qualified well-control supervisor govern.",
+    note: "The hydrostatic pressure a mud column exerts, and the overbalance it holds against a formation. The 0.052 constant is only unit conversion -- a pound per gallon over a foot of vertical column is 0.052 psi -- but the depth it multiplies is the entire point. Pressure comes from the VERTICAL height of fluid, so a well drilled to twelve thousand feet of measured depth that is only nine thousand eight hundred feet true vertical has the hydrostatic of nine thousand eight hundred, and a crew that reaches for the measured depth believes it has hundreds of psi more overbalance than it does. On a high-angle or horizontal well that gap is enormous, and it is computed here rather than warned about, because the difference between a warning and a number is whether anyone acts on it. Everything in well control is built on this one line. Formation pressure expressed as an equivalent mud weight, kick tolerance, the kill sheet, leak-off test results and equivalent circulating density are all this relation rearranged. Getting the sense of the comparison right is the whole job: hydrostatic above formation pressure is overbalance and the well is static, below it and the well flows -- so the verdict here is driven off a boolean the calculation returns rather than off the sign of a subtraction, which is a thing people misread. This is the STATIC column only. With the annular pressure loss entered it adds the friction that raises bottom-hole pressure while circulating, the equivalent circulating density ECD = MW + APL/(0.052 TVD), which is what the shoe and any weak zone actually see while pumping. It does not include the surge and swab pressures from moving pipe, nor any cuttings loading, gas cutting, or temperature and compressibility effect on mud density downhole. It does not evaluate the fracture gradient, so it cannot tell you whether a weight the formation will hold is a weight the shoe will hold. The well's own pressure data, the leak-off or formation integrity test, the drilling program, and a qualified well-control supervisor govern.",
   };
 }
 export const mudHydrostaticPressureExample = { inputs: { mud_weight_ppg: 12.5, tvd_ft: 9800, measured_depth_ft: 12000, formation_pressure_psi: 6100 } };
@@ -781,12 +786,14 @@ OILGAS_RENDERERS["mud-hydrostatic-pressure"] = _simpleRenderer({
     { key: "tvd_ft", label: "True vertical depth (ft)", kind: "number" },
     { key: "measured_depth_ft", label: "Measured depth (ft, 0 to skip the comparison)", kind: "number" },
     { key: "formation_pressure_psi", label: "Formation pressure (psi, 0 to skip)", kind: "number" },
+    { key: "annular_pressure_loss_psi", label: "Annular pressure loss while circulating (psi, 0 when static)", kind: "number" },
   ],
   outputs: [
     { key: "g", id: "mhp-out-g", label: "Mud gradient", value: (r) => fmt(r.gradient_psi_ft, 4) + " psi per ft" },
     { key: "h", id: "mhp-out-h", label: "Hydrostatic at TVD", value: (r) => fmt(r.hydrostatic_psi, 0) + " psi" },
     { key: "b", id: "mhp-out-b", label: "Against the formation", value: (r) => r.balance_verdict },
     { key: "m", id: "mhp-out-m", label: "If measured depth were used", value: (r) => r.md_verdict },
+    { key: "e", id: "mhp-out-e", label: "Circulating (ECD)", value: (r) => (r.has_apl ? fmt(r.ecd_ppg, 2) + " ppg equivalent, " + fmt(r.circulating_bhp_psi, 0) + " psi at the bottom while pumping" : "enter the annular pressure loss to see it") },
     { key: "n", id: "mhp-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeMudHydrostaticPressure,

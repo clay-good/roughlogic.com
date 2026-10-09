@@ -58768,3 +58768,15 @@ test("bounds: projectile-range launch height lands on the plane and the best ang
   assert.equal(_prjH({ velocity_fps: v, angle_deg: 30 }).best_angle_deg, 45);
   assert.ok("error" in _prjH({ velocity_fps: 20, angle_deg: 30, launch_height_ft: -100 }));
 });
+
+import { computeMudHydrostaticPressure as _mhpE } from "../../calc-oilgas.js";
+test("bounds: mud-hydrostatic-pressure ECD adds APL/(0.052 TVD)", () => {
+  const b = { mud_weight_ppg: 12.5, tvd_ft: 9800 };
+  const r = _mhpE({ ...b, annular_pressure_loss_psi: 250 });
+  assert.ok(Math.abs(r.ecd_ppg - (12.5 + 250 / (0.052 * 9800))) < 1e-12);
+  assert.ok(Math.abs(r.circulating_bhp_psi - (r.hydrostatic_psi + 250)) < 1e-9);
+  // ECD recovers the circulating BHP through the same 0.052 constant.
+  assert.ok(Math.abs(0.052 * r.ecd_ppg * 9800 - r.circulating_bhp_psi) < 1e-6);
+  assert.equal(_mhpE(b).ecd_ppg, 12.5);
+  assert.ok("error" in _mhpE({ ...b, annular_pressure_loss_psi: -1 }));
+});

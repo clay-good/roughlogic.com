@@ -168970,6 +168970,36 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "mud-hydrostatic-pressure",
+  "source_publisher": "Project (first-principles)",
+  "source_title": "Equivalent circulating density with 250 psi annular pressure loss",
+  "source_edition_or_year": "well-control relations",
+  "source_section_or_page": "ECD = 12.5 + 250/(0.052 x 9,800) = 12.99 ppg; circulating BHP = 6,370 + 250 = 6,620 psi",
+  "verified_by": "rl",
+  "verified_on": "2026-10-09",
+  "inputs": {
+   "mud_weight_ppg": 12.5,
+   "tvd_ft": 9800,
+   "measured_depth_ft": 12000,
+   "formation_pressure_psi": 6100,
+   "annular_pressure_loss_psi": 250
+  },
+  "outputs": {
+   "ecd_ppg": {
+    "value": 12.991,
+    "tolerance": {
+     "pct": 0.5
+    }
+   },
+   "circulating_bhp_psi": {
+    "value": 6620,
+    "tolerance": {
+     "pct": 0.5
+    }
+   }
+  }
  }
  ]
 }

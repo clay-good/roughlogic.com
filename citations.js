@@ -23428,13 +23428,13 @@ export const CITATIONS = {
   },
   "mud-hydrostatic-pressure": {
     formula: "P = 0.052 x mud weight x TRUE VERTICAL depth; gradient = 0.052 x mud weight; overbalance = hydrostatic - formation pressure; equivalent mud weight = pressure / (0.052 x TVD); and the measured-depth error is that same gradient over the extra depth.",
-    edition: "The mud hydrostatic relation as every well-control manual writes it, where 0.052 is the pounds-per-gallon-per-foot to psi conversion (exactly 0.0519481). The STATIC column only: it excludes equivalent circulating density, surge and swab, cuttings loading, gas cutting, and downhole temperature and compressibility effects on density, and it does not evaluate the fracture gradient.",
+    edition: "The mud hydrostatic relation as every well-control manual writes it, where 0.052 is the pounds-per-gallon-per-foot to psi conversion (exactly 0.0519481). The static column, plus the equivalent circulating density ECD = MW + APL/(0.052 TVD) when an annular pressure loss is entered (added 2026-10-09); it excludes surge and swab, cuttings loading, gas cutting, and downhole temperature and compressibility effects on density, and it does not evaluate the fracture gradient.",
     freeAccess: "One multiplication and one conversion constant.",
     governance: GOVERNANCE.general,
     editionNote: "Pressure comes from the VERTICAL height of fluid, so a well drilled to twelve thousand feet of measured depth that is only nine thousand eight hundred true vertical has the hydrostatic of nine thousand eight hundred -- and a crew reaching for measured depth believes it has hundreds of psi of overbalance it does not have. That error is COMPUTED here rather than warned about, because the difference between a warning and a number is whether anyone acts on it. Everything in well control is this one line rearranged, and getting the sense of the comparison right is the whole job, so the verdict is driven off a boolean rather than off the sign of a subtraction.",
     assumptions: [
       { name: "True vertical depth", value: "measured depth on a deviated well overstates hydrostatic directly", source: "the directional survey" },
-      { name: "Static column only", value: "equivalent circulating density, surge and swab are excluded", source: "the drilling program" },
+      { name: "Static column, optional ECD", value: "ECD = MW + APL/(0.052 TVD) with the annular pressure loss entered from the hydraulics program; surge and swab are excluded", source: "the drilling program" },
       { name: "No fracture gradient", value: "a weight the formation holds may not be one the shoe holds", source: "the leak-off or formation integrity test" },
     ],
   },
