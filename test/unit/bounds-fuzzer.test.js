@@ -10094,7 +10094,7 @@ import {
   computeRefrigerantVelocity, renderRefrigerantVelocity,
   computeRefrigerantLineSize, renderRefrigerantLineSize,
   renderPitotTraverseCfm, renderPitotTraverseAverage,
-  renderDpFlowMeter, renderGasDpFlowMeter, renderOrificePressureLoss,
+  renderDpFlowMeter, renderGasDpFlowMeter, renderOrificePressureLoss, renderOrificeDischargeCoefficient,
 } from "../../calc-velocity.js";
 
 test("bounds: calc-hvac computeDuctVelocityPressure pins V = 4005*sqrt(VP) + inverse + rejects non-positive/Infinity", () => {
@@ -10197,7 +10197,7 @@ test("bounds: calc-edu computeCurveGradeScaler pins flat/sqrt/linear + clamp + r
 });
 
 test("bounds: v23 export-function renderers are callable functions (DOM-bound sentinel)", () => {
-  for (const fn of [renderDuctVelocityPressure, renderRefrigerantVelocity, renderRefrigerantLineSize, renderPitotTraverseCfm, renderPitotTraverseAverage, renderDpFlowMeter, renderGasDpFlowMeter, renderOrificePressureLoss, renderFireStreamReaction, renderSprinklerKFactor, renderOd600CellCount, renderCurveGradeScaler]) {
+  for (const fn of [renderDuctVelocityPressure, renderRefrigerantVelocity, renderRefrigerantLineSize, renderPitotTraverseCfm, renderPitotTraverseAverage, renderDpFlowMeter, renderGasDpFlowMeter, renderOrificePressureLoss, renderOrificeDischargeCoefficient, renderFireStreamReaction, renderSprinklerKFactor, renderOd600CellCount, renderCurveGradeScaler]) {
     assert.strictEqual(typeof fn, "function", "render symbol must be a function");
   }
 });
@@ -59036,4 +59036,24 @@ test("bounds: separator-retention-sizing computed Z equals gas-z-factor at the o
   assert.ok(Math.abs(e.gas_density_lb_ft3 - c.gas_density_lb_ft3) < 1e-12);
   assert.ok(Math.abs(e.actual_velocity_fps - c.actual_velocity_fps) < 1e-12);
   assert.ok("error" in _srsZ({ ...b, z_mode: "guess" }));
+});
+
+import { computeOrificeDischargeCoefficient as _odc } from "../../calc-velocity.js";
+test("bounds: orifice-discharge-coefficient matches the fluids RHG value and flags the ISO limits", () => {
+  const D = 0.07391 / 0.0254, d = 0.0222 / 0.0254, Re = (4 * 0.12) / (Math.PI * 0.07391 * 1.85e-5);
+  assert.ok(Math.abs(_odc({ pipe_id_in: D, bore_in: d, taps: "flange", reynolds_number: Re }).discharge_coefficient - 0.5990326277163659) < 1e-12);
+  const b = { pipe_id_in: 4.026, bore_in: 2.013, taps: "flange", reynolds_number: 200000 };
+  const r = _odc(b);
+  assert.equal(r.in_iso_range, true);
+  // C falls toward its infinite-Re value as Re rises.
+  assert.ok(_odc({ ...b, reynolds_number: 1e7 }).discharge_coefficient < r.discharge_coefficient);
+  assert.ok(r.discharge_coefficient > r.c_infinite_re);
+  assert.equal(_odc({ ...b, reynolds_number: 3000 }).in_iso_range, false);
+  assert.equal(_odc({ ...b, bore_in: 0.3 }).in_iso_range, false);
+  // The small-pipe term applies only under 2.8 in.
+  assert.ok(_odc({ ...b, pipe_id_in: 2.5, bore_in: 1.25 }).small_pipe_term > 0);
+  assert.equal(r.small_pipe_term, 0);
+  for (const bad of [{ pipe_id_in: -1 }, { bore_in: 5 }, { reynolds_number: -1 }, { taps: "pipe" }, { reynolds_mode: "liquid_flow", flow_gpm: -1 }, { reynolds_mode: "liquid_flow", flow_gpm: 100, viscosity_cst: -1 }]) {
+    assert.ok("error" in _odc({ ...b, ...bad }));
+  }
 });

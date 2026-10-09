@@ -116847,6 +116847,31 @@
    "term": "is my shaft running near critical",
    "target": "shaft-critical-speed-rayleigh",
    "kind": "question"
+  },
+  {
+   "term": "orifice discharge coefficient",
+   "target": "orifice-discharge-coefficient",
+   "kind": "industry"
+  },
+  {
+   "term": "reader-harris gallagher",
+   "target": "orifice-discharge-coefficient",
+   "kind": "industry"
+  },
+  {
+   "term": "orifice plate coefficient",
+   "target": "orifice-discharge-coefficient",
+   "kind": "industry"
+  },
+  {
+   "term": "iso 5167 orifice",
+   "target": "orifice-discharge-coefficient",
+   "kind": "industry"
+  },
+  {
+   "term": "what discharge coefficient does my orifice plate have",
+   "target": "orifice-discharge-coefficient",
+   "kind": "question"
   }
  ]
 }

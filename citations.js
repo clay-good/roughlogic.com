@@ -18658,6 +18658,17 @@ export const CITATIONS = {
       { name: "Scope", value: "incompressible liquid only; a gas needs an expansion factor Y", source: "scope of this tile" },
     ],
   },
+  "orifice-discharge-coefficient": {
+    formula: "C = 0.5961 + 0.0261 b^2 - 0.216 b^8 + 0.000521 (1e6 b/Re)^0.7 + (0.0188 + 0.0063 A) b^3.5 (1e6/Re)^0.3 + (0.043 + 0.080 e^-10L1 - 0.123 e^-7L1)(1 - 0.11 A) b^4/(1 - b^4) - 0.031 (M2 - 0.8 M2^1.1) b^1.3; A = (19000 b/Re)^0.8, M2 = 2 L2/(1 - b); corner L1 = L2 = 0, D and D/2 L1 = 1 and L2 = 0.47, flange L1 = L2 = 1 in/D; plus 0.011 (0.75 - b)(2.8 - D in) for D under 2.8 in; flow coefficient C/sqrt(1 - b^4); liquid Re = 4Q/(pi D nu).",
+    edition: "ISO 5167-2:2003, Measurement of fluid flow by means of pressure differential devices, Part 2: Orifice plates (the Reader-Harris/Gallagher equation, also in ASME MFC-3M), cited by name.",
+    freeAccess: "The equation is published in the standard and reproduced in the open-source fluids library (C_Reader_Harris_Gallagher), whose docstring value this matches to seven digits; the pipe, bore, taps and Reynolds number are the user's inputs.",
+    governance: GOVERNANCE.general,
+    editionNote: "For square-edge concentric orifice plates that meet ISO 5167 in edge sharpness, roughness and straight runs. The limits of use (bore at least 12.5 mm, pipe 50 to 1,000 mm, beta 0.1 to 0.75, Re at least 5,000, and 16,000 beta^2 above beta 0.56 or 170 beta^2 D(mm) for flange taps) are checked and flagged, not enforced. A calibrated meter governs.",
+    assumptions: [
+      { name: "Plate", value: "square-edge concentric orifice; quadrant-edge, conical-entrance and eccentric plates and venturis are not covered", source: "ISO 5167-2 scope" },
+      { name: "Reynolds number", value: "entered, or from a liquid flow Q (gpm) and kinematic viscosity (cSt) as 4Q/(pi D nu); a gas's Re comes from its mass flow", source: "definition" },
+    ],
+  },
   "orifice-pressure-loss": {
     formula: "dW/dP = (sqrt(1 - beta^4 (1 - Cd^2)) - Cd beta^2) / (sqrt(1 - beta^4 (1 - Cd^2)) + Cd beta^2); permanent loss = (dW/dP) dP; recovered = dP - loss. beta = d/D; 1 psi = 27.68 in w.c.",
     edition: "The ISO 5167-1/2 permanent (unrecovered) pressure-loss ratio for a square-edge orifice plate, cited by name; the underlying loss physics is public and the manufacturer's or ISO 5167 loss data governs.",

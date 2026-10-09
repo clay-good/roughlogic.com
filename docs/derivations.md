@@ -3798,6 +3798,7 @@ cross-check.
 | calc-velocity.js | `computeDpFlowMeter` | `{ pipe_id_in = 0, bore_in = 0, dp_psi = 0, cd = 0.61, fluid_density_lb_ft3 = ...` | _ | _ | _ |
 | calc-velocity.js | `computeDuctVelocityPressure` | `{ solve_for = "velocity", vp_inwc = 0, velocity_fpm = 0 } = {}` | _ | _ | _ |
 | calc-velocity.js | `computeGasDpFlowMeter` | `{ pipe_id_in = 0, bore_in = 0, p1_psia = 0, dp_psi = 0, temp_f = 60, gas_sg =...` | _ | _ | _ |
+| calc-velocity.js | `computeOrificeDischargeCoefficient` | `{ pipe_id_in = 0, bore_in = 0, taps = "flange", reynolds_mode = "entered", re...` | _ | _ | _ |
 | calc-velocity.js | `computeOrificePressureLoss` | `{ pipe_id_in = 0, bore_in = 0, dp_psi = 0, cd = 0.61 } = {}` | _ | _ | _ |
 | calc-velocity.js | `computePitotTraverseAverage` | `{ vp_readings, w_in = 0, h_in = 0 } = {}` | _ | _ | _ |
 | calc-velocity.js | `computePitotTraverseCfm` | `{ vp_avg_inwc = 0, w_in = 0, h_in = 0 } = {}` | _ | _ | _ |
@@ -3806,6 +3807,7 @@ cross-check.
 | calc-velocity.js | `renderDpFlowMeter` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-velocity.js | `renderDuctVelocityPressure` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-velocity.js | `renderGasDpFlowMeter` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
+| calc-velocity.js | `renderOrificeDischargeCoefficient` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-velocity.js | `renderOrificePressureLoss` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-velocity.js | `renderPitotTraverseAverage` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-velocity.js | `renderPitotTraverseCfm` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
@@ -3921,7 +3923,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2505.
+Row count: 2507.
 
 <!-- END function-corpus-v14 -->
 
@@ -4414,7 +4416,7 @@ per spec-v14 §13.1 second paragraph.
 | `wobbe-index` | Wobbe Index (Fuel-Gas Interchangeability) | Wobbe index (fuel-gas interchangeabil...; WI = 1000 / sqrt(0.60) = 1000 / 0.77460 = 1290.99 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `wsfu-demand` | Probable Peak Demand (WSFU to GPM) | Hunter's curve (NBS BMS65) / IPC 2021...; 120 WSFU flush-valve -> 73.0 GPM, a printed row of Table ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group C HVAC (217 tiles)
+### Group C HVAC (218 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4568,6 +4570,7 @@ per spec-v14 §13.1 second paragraph.
 | `nitrogen-pressure-test` | Nitrogen Pressure Test (Temperature-Corrected) | First-principles Gay-Lussac's law (co...; spec-v105 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `npsh-a` | Pump NPSH Available | Hydraulic Institute / centrifugal-pum...; 0 ft elevation / 60 F water / +5 ft flooded source / 2 ft... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+5 more) |
 | `oil-burner-firing-rate` | Oil Burner Nozzle Firing Rate (GPH) | Oil burner nozzle firing rate (NORA /...; input = 88,000 / 0.85 = 103,529; GPH = 103,529 / 138,500 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
+| `orifice-discharge-coefficient` | Orifice Discharge Coefficient (Reader-Harris/Gallagher, ISO 5167-2) | ISO 5167-2:2003 (Reader-Harris/Gallag...; b = 0.5; A = (19000 x 0.5/200000)^0.8 = 0.0874; L1 = L2 =... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `orifice-pressure-loss` | Orifice Permanent (Unrecovered) Pressure Loss (ISO 5167) | ISO 5167-1/2; beta = 2/4 = 0.5, beta^4 = 0.0625, Cd^2 = 0.3721. root = ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `outdoor-air-mix` | Outdoor Air Mix | ASHRAE Handbook (Fundamentals); Return 75 F / 50% RH, outdoor 95 F / 60% RH, OA fraction ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `outdoor-air-ventilation` | ASHRAE 62.1 Outdoor-Air Ventilation | ASHRAE; Vbz = Rp*Pz + Ra*Az; Voz = Vbz / E_z | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -6346,6 +6349,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 
-Tile count: 2252. Fixture-covered or reference-cadence: 2252 / 2252.
+Tile count: 2253. Fixture-covered or reference-cadence: 2253 / 2253.
 
 <!-- END tile-index-v14 -->

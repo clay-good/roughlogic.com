@@ -456,7 +456,7 @@ export const TOOL_MODULES = (() => {
   // module) into calc-velocity.js. They keep group: "C" (group letter
   // independent of module, the v42/v70/v71/v72/v73 precedent).
   declare("./calc-velocity.js", "VELOCITY_RENDERERS", [
-    "duct-velocity-pressure", "refrigerant-velocity", "refrigerant-line-size", "pitot-traverse-cfm", "pitot-traverse-average", "dp-flow-meter", "gas-dp-flow-meter", "orifice-pressure-loss",
+    "duct-velocity-pressure", "refrigerant-velocity", "refrigerant-line-size", "pitot-traverse-cfm", "pitot-traverse-average", "dp-flow-meter", "gas-dp-flow-meter", "orifice-pressure-loss", "orifice-discharge-coefficient",
   ]);
   declare("./calc-restoration.js", "RESTORATION_RENDERERS", [
     // trade expansion v1445-v1448

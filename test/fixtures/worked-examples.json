@@ -169685,6 +169685,96 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "orifice-discharge-coefficient",
+  "source_publisher": "ISO 5167-2:2003 (Reader-Harris/Gallagher equation)",
+  "source_title": "4 in line, beta 0.5, flange taps, Re 200,000",
+  "source_edition_or_year": "2003",
+  "source_section_or_page": "b = 0.5; A = (19000 x 0.5/200000)^0.8 = 0.0874; L1 = L2 = 1/4.026; C_inf = 0.60114; slope terms bring C to 0.60489; C/sqrt(1 - 0.0625) = 0.62472",
+  "verified_by": "rl",
+  "verified_on": "2026-10-09",
+  "inputs": {
+   "pipe_id_in": 4.026,
+   "bore_in": 2.013,
+   "taps": "flange",
+   "reynolds_mode": "entered",
+   "reynolds_number": 200000,
+   "flow_gpm": 0,
+   "viscosity_cst": 1
+  },
+  "outputs": {
+   "discharge_coefficient": {
+    "value": 0.60489,
+    "tolerance": {
+     "abs": 2e-05
+    }
+   },
+   "flow_coefficient": {
+    "value": 0.62472,
+    "tolerance": {
+     "abs": 2e-05
+    }
+   },
+   "c_infinite_re": {
+    "value": 0.60114,
+    "tolerance": {
+     "abs": 2e-05
+    }
+   }
+  }
+ },
+ {
+  "tile_id": "orifice-discharge-coefficient",
+  "source_publisher": "Caleb Bell, fluids (open-source Python library)",
+  "source_title": "C_Reader_Harris_Gallagher docstring example",
+  "source_edition_or_year": "fluids.flow_meter",
+  "source_section_or_page": "D = 0.07391 m, Do = 0.0222 m, rho 1.165 kg/m3, mu 1.85e-5 Pa s, m = 0.12 kg/s, flange taps -> C = 0.5990326277163659 (Re_D = 4m/(pi D mu) = 111,742)",
+  "verified_by": "rl",
+  "verified_on": "2026-10-09",
+  "inputs": {
+   "pipe_id_in": 2.909842519685039,
+   "bore_in": 0.8740157480314961,
+   "taps": "flange",
+   "reynolds_mode": "entered",
+   "reynolds_number": 111741.99838972857,
+   "flow_gpm": 0,
+   "viscosity_cst": 1
+  },
+  "outputs": {
+   "discharge_coefficient": {
+    "value": 0.5990326,
+    "tolerance": {
+     "abs": 5e-07
+    }
+   }
+  }
+ },
+ {
+  "tile_id": "orifice-discharge-coefficient",
+  "source_publisher": "Project (first-principles)",
+  "source_title": "Reynolds number from a water flow",
+  "source_edition_or_year": "Re = 4Q/(pi D nu)",
+  "source_section_or_page": "100 gpm = 385 in3/s; 1 cSt = 0.00155 in2/s; Re = 4 x 385/(pi x 4.026 x 0.00155) = 78,553",
+  "verified_by": "rl",
+  "verified_on": "2026-10-09",
+  "inputs": {
+   "pipe_id_in": 4.026,
+   "bore_in": 2.013,
+   "taps": "flange",
+   "reynolds_mode": "liquid_flow",
+   "reynolds_number": 0,
+   "flow_gpm": 100,
+   "viscosity_cst": 1
+  },
+  "outputs": {
+   "reynolds_used": {
+    "value": 78553,
+    "tolerance": {
+     "pct": 0.01
+    }
+   }
+  }
  }
  ]
 }

@@ -1522,6 +1522,7 @@ export const COMPUTE_MAP = {
   "dp-flow-meter": { module: "../../calc-velocity.js", fn: "computeDpFlowMeter" },
   "gas-dp-flow-meter": { module: "../../calc-velocity.js", fn: "computeGasDpFlowMeter" },
   "orifice-pressure-loss": { module: "../../calc-velocity.js", fn: "computeOrificePressureLoss" },
+  "orifice-discharge-coefficient": { module: "../../calc-velocity.js", fn: "computeOrificeDischargeCoefficient" },
   "pitot-traverse-average": { module: "../../calc-velocity.js", fn: "computePitotTraverseAverage" },
   "outside-air-percent-temps": { module: "../../calc-hvacservice.js", fn: "computeOutsideAirPercentTemps" },
   "colebrook-friction-factor": { module: "../../calc-hvacairside.js", fn: "computeColebrookFrictionFactor" },

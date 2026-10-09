@@ -494,6 +494,7 @@ export const RENDERER_MAP = {
   "dp-flow-meter": { module: "../../calc-velocity.js", exportName: "VELOCITY_RENDERERS" },
   "gas-dp-flow-meter": { module: "../../calc-velocity.js", exportName: "VELOCITY_RENDERERS" },
   "orifice-pressure-loss": { module: "../../calc-velocity.js", exportName: "VELOCITY_RENDERERS" },
+  "orifice-discharge-coefficient": { module: "../../calc-velocity.js", exportName: "VELOCITY_RENDERERS" },
   "water-extraction-rate": { module: "../../calc-restoration.js", exportName: "RESTORATION_RENDERERS" },
   "sewage-loss-disposal": { module: "../../calc-restoration.js", exportName: "RESTORATION_RENDERERS" },
   "psychrometric": { module: "../../calc-restoration.js", exportName: "RESTORATION_RENDERERS" },

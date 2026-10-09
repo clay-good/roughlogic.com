@@ -608,6 +608,7 @@ export const BESPOKE_OUTPUT_LABELS = {
   "one-way-anova": {"eta_squared":"Effect size (eta squared)","note":"Note"},
   "open-delta-transformer": {"available_3ph_kva":"Bank capacity (3-phase)","per_transformer_kva":"Each unit loaded to","verdict":"Verdict"},
   "orifice-diameter-for-flow": {"d_in":"Required orifice diameter","a_ft2":"Orifice area","note":"Note"},
+  "orifice-discharge-coefficient": {"discharge_coefficient":"Discharge coefficient C","flow_coefficient":"Flow coefficient C/sqrt(1 - beta^4)","c_infinite_re":"C at infinite Reynolds number","range_verdict":"Limits of use","note":"Note"},
   "orifice-flow": {"a_ft2":"Orifice area","q_cfs":"Discharge","note":"Note"},
   "orifice-pressure-loss": {"permanent_loss_psi":"Permanent pressure loss","loss_fraction":"Loss fraction of dP","recovered_psi":"Recovered downstream","beta_ratio":"Beta ratio (d/D)","note":"Note"},
   "osmolarity": {"osmolarity_osmol_l":"Osmolarity","osmotic_pressure_atm":"Osmotic pressure","note":"Note"},

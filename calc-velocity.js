@@ -477,3 +477,103 @@ export function renderOrificePressureLoss(inputRegion, outputRegion, citationEl)
   for (const f of [D, d, dp, cd]) f.input.addEventListener("input", update);
 }
 VELOCITY_RENDERERS["orifice-pressure-loss"] = renderOrificePressureLoss;
+
+// ===================== spec-v1949: orifice discharge coefficient (Reader-Harris/Gallagher, ISO 5167-2) =====================
+// The dp-flow-meter, gas-dp-flow-meter and orifice-pressure-loss calculators all take the discharge coefficient
+// as an ENTERED number (0.61 by default). For a square-edge concentric orifice plate ISO 5167-2:2003 gives it by
+// the Reader-Harris/Gallagher equation from beta, the pipe Reynolds number and the tap position:
+//   C = 0.5961 + 0.0261 b^2 - 0.216 b^8 + 0.000521 (1e6 b/Re)^0.7 + (0.0188 + 0.0063 A) b^3.5 (1e6/Re)^0.3
+//       + (0.043 + 0.080 e^-10L1 - 0.123 e^-7L1)(1 - 0.11 A) b^4/(1 - b^4) - 0.031 (M2 - 0.8 M2^1.1) b^1.3
+//   A = (19000 b/Re)^0.8, M2 = 2 L2/(1 - b); corner taps L1 = L2 = 0, D and D/2 taps L1 = 1 and L2 = 0.47,
+//   flange taps L1 = L2 = 1 in/D; plus 0.011 (0.75 - b)(2.8 - D in) when D is under 2.8 in.
+// dims: in { pipe_id_in: L, bore_in: L, taps: dimensionless, reynolds_mode: dimensionless, reynolds_number: dimensionless, flow_gpm: L^3 T^-1, viscosity_cst: L^2 T^-1 } out: { discharge_coefficient: dimensionless, beta_ratio: dimensionless, flow_coefficient: dimensionless, reynolds_used: dimensionless, c_infinite_re: dimensionless, small_pipe_term: dimensionless }
+export function computeOrificeDischargeCoefficient({ pipe_id_in = 0, bore_in = 0, taps = "flange", reynolds_mode = "entered", reynolds_number = 0, flow_gpm = 0, viscosity_cst = 1 } = {}) {
+  const D = Number(pipe_id_in), d = Number(bore_in), re = Number(reynolds_number), q = Number(flow_gpm), nu = Number(viscosity_cst);
+  if (![D, d, re, q, nu].every(Number.isFinite)) return { error: "All inputs must be finite numbers." };
+  if (!(D > 0)) return { error: "Pipe inside diameter must be positive (in)." };
+  if (!(d > 0)) return { error: "Bore / orifice diameter must be positive (in)." };
+  if (!(d < D)) return { error: "The bore diameter must be smaller than the pipe inside diameter." };
+  if (taps !== "flange" && taps !== "corner" && taps !== "d_d2") return { error: "Taps must be flange, corner, or D and D/2." };
+  let Re = re;
+  if (reynolds_mode === "liquid_flow") {
+    if (!(q > 0)) return { error: "Liquid flow must be positive (gpm)." };
+    if (!(nu > 0)) return { error: "Kinematic viscosity must be positive (cSt; water at 68 F is about 1.0)." };
+    // Re = 4Q/(pi D nu): gpm to in^3/s by 231/60, cSt (1e-6 m^2/s) to in^2/s by 1/0.0254^2.
+    Re = 4 * (q * 231 / 60) / (Math.PI * D * nu * 1e-6 / (0.0254 * 0.0254));
+  } else if (reynolds_mode !== "entered") {
+    return { error: "Reynolds number must be entered or from liquid flow." };
+  } else if (!(re > 0)) {
+    return { error: "Pipe Reynolds number must be positive." };
+  }
+  const b = d / D, b4 = Math.pow(b, 4);
+  const L1 = taps === "corner" ? 0 : taps === "d_d2" ? 1 : 1 / D;
+  const L2 = taps === "corner" ? 0 : taps === "d_d2" ? 0.47 : 1 / D;
+  const M2 = 2 * L2 / (1 - b);
+  const tap_term = (b4 / (1 - b4)) * (0.043 + 0.080 * Math.exp(-10 * L1) - 0.123 * Math.exp(-7 * L1));
+  const downstream_term = -0.031 * (M2 - 0.8 * Math.pow(M2, 1.1)) * Math.pow(b, 1.3);
+  const small_pipe_term = D < 2.8 ? 0.011 * (0.75 - b) * (2.8 - D) : 0;
+  const base = 0.5961 + 0.0261 * b * b - 0.216 * Math.pow(b, 8);
+  const A = Math.pow(19000 * b / Re, 0.8);
+  const discharge_coefficient = base + 0.000521 * Math.pow(1e6 * b / Re, 0.7) + (0.0188 + 0.0063 * A) * Math.pow(b, 3.5) * Math.pow(1e6 / Re, 0.3)
+    + tap_term * (1 - 0.11 * A) + downstream_term + small_pipe_term;
+  const c_infinite_re = base + tap_term + downstream_term + small_pipe_term;
+  const flow_coefficient = discharge_coefficient / Math.sqrt(1 - b4);
+  if (![discharge_coefficient, c_infinite_re, flow_coefficient, Re].every(Number.isFinite)) return { error: "Discharge-coefficient math is not a finite value." };
+  // ISO 5167-2 limits of use: d >= 12.5 mm, 50 mm <= D <= 1000 mm, 0.1 <= beta <= 0.75, and a minimum Re.
+  const re_min = taps === "flange" ? Math.max(5000, 170 * b * b * D * 25.4) : b > 0.56 ? 16000 * b * b : 5000;
+  const outside = [];
+  if (d < 12.5 / 25.4) outside.push("bore under 0.49 in (12.5 mm)");
+  if (D < 50 / 25.4 || D > 1000 / 25.4) outside.push("pipe outside 1.97 to 39.4 in (50 to 1,000 mm)");
+  if (b < 0.1 || b > 0.75) outside.push("beta outside 0.10 to 0.75");
+  if (Re < re_min) outside.push("Reynolds number under " + _v23h_fmt(re_min, 0));
+  const in_iso_range = outside.length === 0;
+  const range_verdict = in_iso_range
+    ? "Inside the ISO 5167-2 limits of use for " + (taps === "flange" ? "flange" : taps === "corner" ? "corner" : "D and D/2") + " taps, where the equation's stated uncertainty is about 0.5% for beta 0.2 to 0.6."
+    : "OUTSIDE the ISO 5167-2 limits of use (" + outside.join("; ") + "): the equation still returns a number, but the standard gives it no stated uncertainty there; calibrate the meter.";
+  return {
+    discharge_coefficient, beta_ratio: b, flow_coefficient, reynolds_used: Re, c_infinite_re, small_pipe_term,
+    in_iso_range, range_verdict,
+    note: "The discharge coefficient of a square-edge concentric orifice plate by the Reader-Harris/Gallagher equation of ISO 5167-2:2003 (also ASME MFC-3M), the number dp-flow-meter, gas-dp-flow-meter and orifice-pressure-loss take as entered. It depends on the beta ratio, the pipe Reynolds number and where the pressure taps are, which is why 0.61 is only a typical value: a small bore at high Reynolds number is near 0.60, and a large beta in a small line with flange taps runs higher. C falls slowly as the Reynolds number rises toward its infinite-Re value, so a meter sized at one flow reads slightly differently at another; for a gas, compute Re from the mass flow, Re = 4 m/(pi D mu), and iterate once with the flow from gas-dp-flow-meter. The flow coefficient C/sqrt(1 - beta^4) is the factor the flow equation multiplies by the bore area. This is the standard's equation only: it assumes a plate, edge sharpness, roughness and straight runs that meet ISO 5167, it does not cover quadrant-edge, conical-entrance or eccentric plates, venturis or nozzles, and it is not a calibration. Outside the limits of use it is flagged.",
+  };
+}
+export const orificeDischargeCoefficientExample = { inputs: { pipe_id_in: 4.026, bore_in: 2.013, taps: "flange", reynolds_mode: "entered", reynolds_number: 200000, flow_gpm: 0, viscosity_cst: 1 } };
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+export function renderOrificeDischargeCoefficient(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: ISO 5167-2:2003 (ASME MFC-3M) Reader-Harris/Gallagher orifice discharge coefficient, by name: C = 0.5961 + 0.0261 b^2 - 0.216 b^8 + 0.000521 (1e6 b/Re)^0.7 + (0.0188 + 0.0063 A) b^3.5 (1e6/Re)^0.3 + (0.043 + 0.080 e^-10L1 - 0.123 e^-7L1)(1 - 0.11 A) b^4/(1 - b^4) - 0.031 (M2 - 0.8 M2^1.1) b^1.3, A = (19000 b/Re)^0.8, plus 0.011 (0.75 - b)(2.8 - D) under 2.8 in. Square-edge concentric plates only; calibration governs.";
+  const D = _v23h_makeNumber("Pipe inside diameter (in)", "odc-D", { step: "any", min: "0" });
+  const d = _v23h_makeNumber("Bore / orifice diameter (in)", "odc-d", { step: "any", min: "0" });
+  const taps = _v23h_makeSelect("Pressure taps", "odc-taps", [
+    { value: "flange", label: "Flange taps (1 in each side)", selected: true },
+    { value: "corner", label: "Corner taps" },
+    { value: "d_d2", label: "D and D/2 taps" },
+  ]);
+  const mode = _v23h_makeSelect("Reynolds number", "odc-mode", [
+    { value: "entered", label: "Entered below", selected: true },
+    { value: "liquid_flow", label: "From a liquid flow and viscosity" },
+  ]);
+  const re = _v23h_makeNumber("Pipe Reynolds number Re_D (when entered)", "odc-re", { step: "any", min: "0" });
+  const q = _v23h_makeNumber("Liquid flow (gpm, for the flow option)", "odc-q", { step: "any", min: "0" });
+  const nu = _v23h_makeNumber("Kinematic viscosity (cSt, water about 1.0)", "odc-nu", { step: "any", min: "0" }); nu.input.value = "1";
+  for (const f of [D, d, taps, mode, re, q, nu]) inputRegion.appendChild(f.wrap);
+  const oC = _v23h_makeOut(outputRegion, "Discharge coefficient C", "odc-out-c");
+  const oK = _v23h_makeOut(outputRegion, "Flow coefficient C/sqrt(1 - beta^4)", "odc-out-k");
+  const oB = _v23h_makeOut(outputRegion, "Beta ratio / Reynolds number", "odc-out-b");
+  const oI = _v23h_makeOut(outputRegion, "C at infinite Reynolds number", "odc-out-i");
+  const oR = _v23h_makeOut(outputRegion, "Limits of use", "odc-out-r");
+  const oNote = _v23h_makeOut(outputRegion, "Note", "odc-out-n");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : NaN; }
+  const update = _v23h_debounce(() => {
+    const r = computeOrificeDischargeCoefficient({ pipe_id_in: readNum(D.input), bore_in: readNum(d.input), taps: taps.select.value, reynolds_mode: mode.select.value, reynolds_number: readNum(re.input), flow_gpm: readNum(q.input), viscosity_cst: readNum(nu.input) });
+    if (r.error) { oC.textContent = r.error; oK.textContent = "-"; oB.textContent = "-"; oI.textContent = "-"; oR.textContent = "-"; oNote.textContent = ""; return; }
+    oC.textContent = _v23h_fmt(r.discharge_coefficient, 4);
+    oK.textContent = _v23h_fmt(r.flow_coefficient, 4);
+    oB.textContent = _v23h_fmt(r.beta_ratio, 3) + " / " + _v23h_fmt(r.reynolds_used, 0);
+    oI.textContent = _v23h_fmt(r.c_infinite_re, 4);
+    oR.textContent = r.range_verdict;
+    oNote.textContent = r.note;
+  }, _V23H_DEB);
+  _v23h_attachEx(inputRegion, () => { D.input.value = "4.026"; d.input.value = "2.013"; taps.select.value = "flange"; mode.select.value = "entered"; re.input.value = "200000"; q.input.value = "0"; nu.input.value = "1"; update(); });
+  for (const f of [D, d, re, q, nu]) f.input.addEventListener("input", update);
+  for (const f of [taps, mode]) f.select.addEventListener("change", update);
+}
+VELOCITY_RENDERERS["orifice-discharge-coefficient"] = renderOrificeDischargeCoefficient;

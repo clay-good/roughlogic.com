@@ -600,6 +600,7 @@ export const BESPOKE_LABELS = {
   "one-way-anova": {"groups_text":"Groups (one group per line; values separated by spaces or commas)"},
   "open-delta-transformer": {"transformer_kva_each":"Transformer rating, each (kVA)","required_load_kva":"Required three-phase load (kVA)"},
   "orifice-diameter-for-flow": {"q_cfs":"Target discharge (cfs)","h_ft":"Head to orifice center (ft)","cd":"Discharge coefficient Cd"},
+  "orifice-discharge-coefficient": {"pipe_id_in":"Pipe inside diameter (in)","bore_in":"Bore / orifice diameter (in)","taps":"Pressure taps","reynolds_mode":"Reynolds number","reynolds_number":"Pipe Reynolds number Re_D (when entered)","flow_gpm":"Liquid flow (gpm, for the flow option)","viscosity_cst":"Kinematic viscosity (cSt, water about 1.0)"},
   "orifice-flow": {"d_in":"Orifice diameter (in)","h_ft":"Head to orifice center (ft)","cd":"Discharge coefficient Cd"},
   "orifice-pressure-loss": {"pipe_id_in":"Pipe inside diameter (in)","bore_in":"Bore / orifice diameter (in)","dp_psi":"Differential pressure across taps (psi)","cd":"Orifice discharge coefficient Cd (~0.61)"},
   "osmolarity": {"concentration_mol_l":"Molar concentration C (mol/L)","vant_hoff_i":"van't Hoff factor i (1 glucose, 2 NaCl, 3 CaCl2)","temperature_c":"Temperature (°C)"},

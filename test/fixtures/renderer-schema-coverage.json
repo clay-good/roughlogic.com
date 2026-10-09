@@ -1,7 +1,7 @@
 {
   "note": "spec-v1184 coverage ratchet. Tiles whose renderer exposes a render.schema consistent with the compute function. Grow with `node scripts/check-renderer-schema.mjs --write`; regeneration is intentional.",
-  "total_tiles": 2252,
-  "covered_count": 2173,
+  "total_tiles": 2253,
+  "covered_count": 2174,
   "covered": [
     "aav-install-check",
     "abatement-containment",
@@ -1203,6 +1203,7 @@
     "optical-return-loss",
     "order-pick-labor-standard",
     "orifice-diameter-for-flow",
+    "orifice-discharge-coefficient",
     "orifice-flow",
     "orifice-pressure-loss",
     "osha-timber-trench-shoring",
