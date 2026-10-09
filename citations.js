@@ -1424,7 +1424,7 @@ export const CITATIONS = {
     editionNote: "Single-formula (radial log-mean conduction); distinct from the flat-wall insulation tiles. k is at the mean insulation temperature.",
     assumptions: [
       { name: "k at mean temperature", value: "insulation conductivity rises with temperature; the value entered is at the mean insulation temperature", source: "ASTM C335" },
-      { name: "Outer film", value: "optional; without it the jacket is taken at ambient (conservative). About 1.5-2.5 BTU/hr-sq ft-F in still air for a painted or canvas jacket (added 2026-10-09)", source: "ASHRAE Fundamentals" },
+      { name: "Outer film", value: "optional; without it the jacket is taken at ambient (conservative). About 1.5-2.5 BTU/hr-sq ft-F in still air for a painted or canvas jacket (added 2026-10-09); or computed from the bare-pipe-heat-loss model (Churchill-Chu, gray-body radiation, Churchill-Bernstein wind) at the jacket OD, iterated with the jacket temperature", source: "ASHRAE Fundamentals; bare-pipe-heat-loss" },
     ],
   },
 

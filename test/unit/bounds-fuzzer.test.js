@@ -59118,3 +59118,17 @@ test("bounds: insulation-thickness computed film is the bare-pipe coefficient at
   assert.ok("error" in _itF({ ...b, film_mode: "computed", jacket_emissivity: 1.5 }));
   assert.ok("error" in _itF({ ...b, film_mode: "guess" }));
 });
+
+import { computePipeHeatLossRadial as _phlrCF } from "../../calc-hvac.js";
+test("bounds: pipe-heat-loss-radial computed film balances the bare-surface loss at the jacket", () => {
+  const b = { od_in: 2, thickness_in: 1, k_value: 0.25, hot_f: 200, amb_f: 70, length_ft: 1 };
+  const c = _phlrCF({ ...b, film_mode: "computed", jacket_emissivity: 0.9 });
+  const bp = _bphF({ od_in: 4, surface_f: c.surface_temp_f, amb_f: 70, emissivity: 0.9 });
+  assert.ok(Math.abs(bp.q_per_ft_btuh - c.q_per_ft_btuh) < 1e-6);
+  assert.ok(Math.abs(_phlrCF({ ...b, film_coeff_btu_hr_ft2_f: c.film_used_btu_hr_ft2_f }).q_per_ft_btuh - c.q_per_ft_btuh) < 1e-6);
+  // The film resistance lowers the loss below the jacket-at-ambient figure; wind raises it back toward that figure.
+  assert.ok(c.q_per_ft_btuh < _phlrCF(b).q_per_ft_btuh);
+  assert.ok(_phlrCF({ ...b, film_mode: "computed", jacket_emissivity: 0.9, wind_mph: 15 }).q_per_ft_btuh > c.q_per_ft_btuh);
+  assert.ok("error" in _phlrCF({ ...b, film_mode: "computed", jacket_emissivity: 0 }));
+  assert.ok("error" in _phlrCF({ ...b, film_mode: "computed", wind_mph: -1 }));
+});

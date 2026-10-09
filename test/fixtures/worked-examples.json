@@ -169912,6 +169912,40 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "pipe-heat-loss-radial",
+  "source_publisher": "Project (first-principles)",
+  "source_title": "Example insulated pipe with the outer film computed (painted jacket, still air)",
+  "source_edition_or_year": "Churchill-Chu + gray-body radiation at the jacket, iterated",
+  "source_section_or_page": "jacket OD 4 in; h = 1.561 BTU/hr ft2 F at the converged 83.46 F jacket; R_ins = ln(2)/(2 pi 0.25/12) = 5.295, R_film = 1/(2 pi (2/12) 1.561) = 0.6117; q = 130/5.907 = 22.01 BTU/hr ft, equal to the bare-surface loss at 83.46 F",
+  "verified_by": "rl",
+  "verified_on": "2026-10-09",
+  "inputs": {
+   "od_in": 2,
+   "thickness_in": 1,
+   "k_value": 0.25,
+   "hot_f": 200,
+   "amb_f": 70,
+   "length_ft": 1,
+   "film_mode": "computed",
+   "jacket_emissivity": 0.9,
+   "wind_mph": 0
+  },
+  "outputs": {
+   "q_per_ft_btuh": {
+    "value": 22.01,
+    "tolerance": {
+     "pct": 0.5
+    }
+   },
+   "surface_temp_f": {
+    "value": 83.46,
+    "tolerance": {
+     "abs": 0.2
+    }
+   }
+  }
  }
  ]
 }

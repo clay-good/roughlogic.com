@@ -2989,8 +2989,10 @@ HVAC_RENDERERS["economizer-savings-hours"] = renderEconomizerSavingsHours;
 // Q/L = 2*pi*k'*(T_hot - T_amb) / ln(r2/r1), k' = k_inF/12 in BTU/(hr.ft.F). Optional outer film added
 // 2026-10-09 (the note said the film was ignored): with h > 0 the resistances add,
 // Q/L = (T_hot - T_amb) / (ln(r2/r1)/(2 pi k') + 1/(2 pi r2 h)), and the jacket runs at T_amb + (Q/L)/(2 pi r2 h).
-// dims: in { od_in: L, thickness_in: L, k_value: dimensionless, hot_f: T, amb_f: T, length_ft: L, film_coeff_btu_hr_ft2_f: M T^-3 } out: { q_per_ft_btuh: M*L*T^-3, q_total_btuh: M*L^2*T^-3, surface_temp_f: T }
-export function computePipeHeatLossRadial({ od_in = 0, thickness_in = 0, k_value = 0, hot_f = 0, amb_f = 0, length_ft = 1, film_coeff_btu_hr_ft2_f = 0 } = {}) {
+// Computed film added 2026-10-09: film_mode "computed" takes h from bare-pipe-heat-loss (natural convection,
+// radiation at the jacket emissivity, optional wind) at the jacket OD, iterated with the jacket temperature it sets.
+// dims: in { od_in: L, thickness_in: L, k_value: dimensionless, hot_f: T, amb_f: T, length_ft: L, film_coeff_btu_hr_ft2_f: M T^-3, film_mode: dimensionless, jacket_emissivity: dimensionless, wind_mph: L T^-1 } out: { q_per_ft_btuh: M*L*T^-3, q_total_btuh: M*L^2*T^-3, surface_temp_f: T, film_used_btu_hr_ft2_f: M T^-3 }
+export function computePipeHeatLossRadial({ od_in = 0, thickness_in = 0, k_value = 0, hot_f = 0, amb_f = 0, length_ft = 1, film_coeff_btu_hr_ft2_f = 0, film_mode = "entered", jacket_emissivity = 0.9, wind_mph = 0 } = {}) {
   const od = Number(od_in) || 0;
   const th = Number(thickness_in) || 0;
   const k = Number(k_value) || 0;
@@ -3001,8 +3003,14 @@ export function computePipeHeatLossRadial({ od_in = 0, thickness_in = 0, k_value
   if (!(k > 0 && Number.isFinite(k))) return { error: "Insulation k-value must be positive (BTU-in/hr-ft2-F)." };
   if (!Number.isFinite(hot) || !Number.isFinite(amb)) return { error: "Temperatures must be finite (F)." };
   if (!(L > 0 && Number.isFinite(L))) return { error: "Pipe length must be positive (ft)." };
-  const h = Number(film_coeff_btu_hr_ft2_f) || 0;
+  let h = Number(film_coeff_btu_hr_ft2_f) || 0;
   if (h < 0) return { error: "Outer film coefficient cannot be negative (BTU/hr-sq ft-F; blank for conduction only)." };
+  if (!Number.isFinite(h)) return { error: "Outer film coefficient must be a finite number (BTU/hr-sq ft-F)." };
+  if (film_mode !== "entered" && film_mode !== "computed") return { error: "The film coefficient must be entered or computed." };
+  const computedFilm = film_mode === "computed";
+  const eps = Number(jacket_emissivity), wind = Number(wind_mph) || 0;
+  if (computedFilm && !(eps > 0 && eps <= 1)) return { error: "Jacket emissivity must be above 0 and at most 1 (0.9 painted or PVC, 0.1 bright aluminum)." };
+  if (wind < 0) return { error: "Wind speed cannot be negative (mph)." };
   if (amb >= hot) {
     return { q_per_ft_btuh: 0, q_total_btuh: 0, note: "Ambient is at or above the surface temperature - no outward heat loss." };
   }
@@ -3010,6 +3018,20 @@ export function computePipeHeatLossRadial({ od_in = 0, thickness_in = 0, k_value
   const r2 = r1 + th;
   const kFt = k / 12; // BTU/(hr.ft.F)
   const rIns = Math.log(r2 / r1) / (2 * Math.PI * kFt); // hr-ft-F/BTU per ft of pipe
+  if (computedFilm) {
+    // h depends on the jacket temperature it sets: start near ambient and repeat (damped) until it settles.
+    let ts = amb + 0.1 * (hot - amb);
+    for (let i = 0; i < 200; i++) {
+      const bp = computeBarePipeHeatLoss({ od_in: 2 * r2, surface_f: ts, amb_f: amb, emissivity: eps, wind_mph: wind });
+      if (bp.error) return { error: "Computed film: " + bp.error };
+      h = bp.conv_coefficient + bp.rad_coefficient;
+      const rF = 1 / (2 * Math.PI * (r2 / 12) * h);
+      const next = amb + (hot - amb) * rF / (rIns + rF);
+      const settled = Math.abs(next - ts) < 1e-9;
+      ts = 0.5 * ts + 0.5 * next;
+      if (settled) break;
+    }
+  }
   const rFilm = h > 0 ? 1 / (2 * Math.PI * (r2 / 12) * h) : 0;
   const qPerFt = (hot - amb) / (rIns + rFilm);
   const qTotal = qPerFt * L;
@@ -3017,8 +3039,8 @@ export function computePipeHeatLossRadial({ od_in = 0, thickness_in = 0, k_value
   return {
     q_per_ft_btuh: Number.isFinite(qPerFt) ? qPerFt : null,
     q_total_btuh: Number.isFinite(qTotal) ? qTotal : null,
-    surface_temp_f: Number.isFinite(surfaceTemp) ? surfaceTemp : null, has_film: h > 0,
-    note: "Radial (cylindrical) conduction, log-mean form; distinct from the flat-wall insulation tiles. k rises with temperature - the value is at the mean insulation temperature. With no film coefficient the jacket is taken at ambient (conservative: it overstates the loss); enter the outer film coefficient (about 1.5-2.5 BTU/hr-sq ft-F for a painted or canvas jacket in still air, roughly 1.2 for bright aluminum; bare-pipe-heat-loss reports convection plus radiation for a surface) and the film resistance adds in series and the jacket surface temperature is reported.",
+    surface_temp_f: Number.isFinite(surfaceTemp) ? surfaceTemp : null, has_film: h > 0, film_used_btu_hr_ft2_f: h, film_computed: computedFilm,
+    note: "Radial (cylindrical) conduction, log-mean form; distinct from the flat-wall insulation tiles. k rises with temperature - the value is at the mean insulation temperature. With no film coefficient the jacket is taken at ambient (conservative: it overstates the loss); enter the outer film coefficient (about 1.5-2.5 BTU/hr-sq ft-F for a painted or canvas jacket in still air, roughly 1.2 for bright aluminum; bare-pipe-heat-loss reports convection plus radiation for a surface) and the film resistance adds in series and the jacket surface temperature is reported; or choose computed and the coefficient comes from that bare-pipe model at the jacket diameter, emissivity and any wind, iterated with the jacket temperature it sets.",
   };
 }
 export const pipeHeatLossRadialExample = { inputs: { od_in: 2, thickness_in: 1, k_value: 0.25, hot_f: 200, amb_f: 70, length_ft: 1 } };
@@ -3031,23 +3053,32 @@ function renderPipeHeatLossRadial(inputRegion, outputRegion, citationEl) {
   const hot = makeNumber("Fluid / surface temperature (°F)", "phlr-hot", { step: "any" });
   const amb = makeNumber("Ambient temperature (°F)", "phlr-amb", { step: "any" });
   const len = makeNumber("Pipe length (ft)", "phlr-len", { step: "any", min: "0" });
+  const fm = makeSelect("Outer film coefficient", "phlr-fm", [
+    { value: "entered", label: "Entered below (blank for conduction only)" },
+    { value: "computed", label: "Computed: natural convection + radiation (+ wind) at the jacket" },
+  ]);
   const film = makeNumber("Outer film coefficient (BTU/hr-sq ft-F, blank for conduction only)", "phlr-h", { step: "any", min: "0" });
-  for (const f of [od, th, k, hot, amb, len, film]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { od.input.value = "2"; th.input.value = "1"; k.input.value = "0.25"; hot.input.value = "200"; amb.input.value = "70"; len.input.value = "1"; update(); });
+  const je = makeNumber("Jacket emissivity (computed film; 0.9 painted or PVC, 0.1 aluminum)", "phlr-je", { step: "any", min: "0", max: "1", value: "0.9" });
+  je.input.value = "0.9";
+  const wind = makeNumber("Wind speed (mph, computed film; 0 for still air)", "phlr-wind", { step: "any", min: "0", value: "0" });
+  wind.input.value = "0";
+  for (const f of [od, th, k, hot, amb, len, fm, film, je, wind]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { od.input.value = "2"; th.input.value = "1"; k.input.value = "0.25"; hot.input.value = "200"; amb.input.value = "70"; len.input.value = "1"; fm.select.value = "entered"; je.input.value = "0.9"; wind.input.value = "0"; update(); });
   const oPF = makeOutputLine(outputRegion, "Heat loss per linear foot", "phlr-out-pf");
   const oT = makeOutputLine(outputRegion, "Total heat loss", "phlr-out-t");
   const oS = makeOutputLine(outputRegion, "Jacket surface temperature", "phlr-out-s");
   const oNote = makeOutputLine(outputRegion, "Note", "phlr-out-note");
   function readNum(i) { if (i.value === "") return NaN; const n = Number(i.value); return Number.isFinite(n) ? n : NaN; }
   const update = debounce(() => {
-    const r = computePipeHeatLossRadial({ od_in: readNum(od.input), thickness_in: readNum(th.input), k_value: readNum(k.input), hot_f: readNum(hot.input), amb_f: readNum(amb.input), length_ft: readNum(len.input), film_coeff_btu_hr_ft2_f: readNum(film.input) });
+    const r = computePipeHeatLossRadial({ od_in: readNum(od.input), thickness_in: readNum(th.input), k_value: readNum(k.input), hot_f: readNum(hot.input), amb_f: readNum(amb.input), length_ft: readNum(len.input), film_coeff_btu_hr_ft2_f: readNum(film.input), film_mode: fm.select.value, jacket_emissivity: readNum(je.input), wind_mph: readNum(wind.input) });
     if (r.error) { oPF.textContent = r.error; oT.textContent = ""; oS.textContent = ""; oNote.textContent = ""; return; }
     oPF.textContent = fmt(r.q_per_ft_btuh, 1) + " BTU/hr-ft";
     oT.textContent = fmt(r.q_total_btuh, 1) + " BTU/hr";
-    oS.textContent = r.has_film ? fmt(r.surface_temp_f, 1) + " °F" : "enter a film coefficient (taken at ambient without one)";
+    oS.textContent = r.has_film ? fmt(r.surface_temp_f, 1) + " °F" + (r.film_computed ? " (computed film " + fmt(r.film_used_btu_hr_ft2_f, 2) + " BTU/hr-sq ft-F)" : "") : "enter a film coefficient (taken at ambient without one)";
     oNote.textContent = r.note;
   }, DEBOUNCE_MS);
-  for (const f of [od.input, th.input, k.input, hot.input, amb.input, len.input, film.input]) f.addEventListener("input", update);
+  for (const f of [od.input, th.input, k.input, hot.input, amb.input, len.input, film.input, je.input, wind.input]) f.addEventListener("input", update);
+  fm.select.addEventListener("change", update);
 }
 HVAC_RENDERERS["pipe-heat-loss-radial"] = renderPipeHeatLossRadial;
 
