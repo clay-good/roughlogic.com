@@ -1085,7 +1085,7 @@ export function computeGearToothBendingStress({ transmitted_load_lb = 0, diametr
 export const gearToothBendingStressExample = { inputs: { transmitted_load_lb: 500, diametral_pitch_1_in: 8, face_width_in: 1.5, number_of_teeth: 20, tooth_system: "20-full-depth" } };
 
 MECHANIC_RENDERERS["gear-tooth-bending-stress"] = _simpleRenderer({
-  citation: "Citation: Lewis beam-strength equation (Wilfred Lewis, 1892; public domain): sigma = Wt / (F pc y) with face width F, circular pitch pc = pi/Pd, and the Lewis form factor y = a - b/T (20 deg full depth a,b = 0.154, 0.912; 14.5 deg full depth 0.124, 0.684; 20 deg stub 0.175, 0.841). The diametral-pitch form is sigma = Wt Pd / (F Y) with Y = pi y. Static Lewis stress only - the Barth velocity factor and the AGMA 2001 geometry (J) and load factors are not modeled. The gear maker and AGMA govern.",
+  citation: "Citation: Lewis beam-strength equation (Wilfred Lewis, 1892; public domain): sigma = Wt / (F pc y) with face width F, circular pitch pc = pi/Pd, and the Lewis form factor y = a - b/T (20 deg full depth a,b = 0.154, 0.912; 14.5 deg full depth 0.124, 0.684; 20 deg stub 0.175, 0.841). The diametral-pitch form is sigma = Wt Pd / (F Y) with Y = pi y. Static Lewis stress only - the Barth velocity factor is gear-dynamic-tooth-stress, and the AGMA 2001 geometry (J) and load factors are not modeled. The gear maker and AGMA govern.",
   example: gearToothBendingStressExample.inputs,
   fields: [
     { key: "transmitted_load_lb", label: "Transmitted (tangential) load Wt (lb)", kind: "number" },

@@ -13030,7 +13030,7 @@ export const CITATIONS = {
     editionNote: "Lewis beam strength treats a spur-gear tooth as a cantilever loaded by the tangential (transmitted) load Wt at the pitch line, so the bending stress at the weakest root section is sigma = Wt / (F pc y), with face width F, circular pitch pc = pi/Pd, and the Lewis form factor y = a - b/T for the tooth system. The diametral-pitch form factor Y = pi y gives the identical result as sigma = Wt Pd/(F Y). This is the STATIC Lewis stress: it does not apply the velocity (Barth) dynamic factor or the AGMA 2001 geometry (J) and load-distribution factors, so it runs optimistic at speed. Compare against the material endurance limit with the maker's factors; AGMA 2001 and the gear maker govern.",
     assumptions: [
       { name: "Form factor", value: "y = a - b/T closed form (circular-pitch convention); Y = pi y is the diametral-pitch form", source: "Lewis / Shigley" },
-      { name: "Static stress only", value: "no Barth velocity factor, no AGMA J or load-distribution factors", source: "scope of this tile" },
+      { name: "Static stress only", value: "no Barth velocity factor (gear-dynamic-tooth-stress applies it), no AGMA J or load-distribution factors", source: "scope of this tile" },
       { name: "Tooth system", value: "20 deg full depth, 14.5 deg full depth, or 20 deg stub", source: "standard involute proportions" },
     ],
   },
