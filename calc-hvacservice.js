@@ -699,7 +699,7 @@ export function computeInfiltrationLoad({ cfm = 0, delta_t_f = 0, delta_gr = 0 }
   const q_total = q_sensible + q_latent;
   return {
     q_sensible, q_latent, q_total,
-    note: "ASHRAE air-side equations: sensible Qs = 1.08 x CFM x delta-T and latent Ql = 0.68 x CFM x delta-grains. The 1.08 and 0.68 are sea-level standard-air constants (an altitude correction is a separate adjustment). The airflow is the natural infiltration from a blower-door test or a design estimate; enter the design dry-bulb difference and, for cooling, the indoor-outdoor humidity-ratio difference in grains/lb (zero for a heating load, so the latent term drops out). This is the infiltration component only - envelope conduction, solar, and internal gains are separate Manual J line items. A design-load aid, not a stamped Manual J.",
+    note: "ASHRAE air-side equations: sensible Qs = 1.08 x CFM x delta-T and latent Ql = 0.68 x CFM x delta-grains. The 1.08 and 0.68 are sea-level standard-air constants (an altitude correction is a separate adjustment). The airflow is the natural infiltration from a blower-door test or a design estimate; enter the design dry-bulb difference and, for cooling, the indoor-outdoor humidity-ratio difference in grains/lb (zero for a heating load, so the latent term drops out). This is the infiltration component only - envelope conduction (envelope-conduction-load), solar, and internal gains are separate Manual J line items. A design-load aid, not a stamped Manual J.",
   };
 }
 export const infiltrationLoadExample = { inputs: { cfm: 56.5, delta_t_f: 70, delta_gr: 0 } };

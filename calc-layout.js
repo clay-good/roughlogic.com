@@ -532,7 +532,7 @@ export function computeThreadPitch({ thread_standard = "inch", tpi = 0, pitch_mm
   const lead_mm = pmm * n;
   const notes = [];
   notes.push("Inch pitch P = 1 / TPI; metric pitch is the millimetre value (TPI = 25.4 / P). Lead = pitch x starts is the axial advance per turn; on a single-start thread the lead equals the pitch.");
-  notes.push("The 60-degree sharp-V height H = P x cos(30) = P x sqrt(3) / 2 is the theoretical fundamental triangle; the actual truncated thread depth and the tap-drill size are thread-form- and class-specific (UN crest/root flats, ISO 60-degree truncation) and are not computed here.");
+  notes.push("The 60-degree sharp-V height H = P x cos(30) = P x sqrt(3) / 2 is the theoretical fundamental triangle; the actual truncated thread depth is thread-form- and class-specific (UN crest/root flats, ISO 60-degree truncation) and is not computed here; tap-drill-size gives the drill.");
   if (n > 1) notes.push("A " + n + "-start thread advances " + n + "x the pitch per turn for faster traverse with the same pitch (thread depth).");
   return {
     thread_standard: isMetric ? "metric" : "inch",
@@ -546,7 +546,7 @@ export function computeThreadPitch({ thread_standard = "inch", tpi = 0, pitch_mm
 export const threadPitchExample = { inputs: { thread_standard: "inch", tpi: 20, pitch_mm: 0, starts: 1 } };
 
 function _v38renderThreadPitch(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Thread pitch, lead, and 60-degree form - Unified (UN/UNC/UNF) inch and ISO metric threads share a 60-degree included angle; inch pitch P = 1 / TPI, metric pitch is the millimetre value (TPI = 25.4 / P), lead = pitch x starts, and the sharp-V fundamental height H = P x sqrt(3) / 2 - first-principles geometry as in Machinery's Handbook (Industrial Press), by name. The truncated thread depth and tap-drill size are thread-form- and class-specific and are not computed here.";
+  citationEl.textContent = "Citation: Thread pitch, lead, and 60-degree form - Unified (UN/UNC/UNF) inch and ISO metric threads share a 60-degree included angle; inch pitch P = 1 / TPI, metric pitch is the millimetre value (TPI = 25.4 / P), lead = pitch x starts, and the sharp-V fundamental height H = P x sqrt(3) / 2 - first-principles geometry as in Machinery's Handbook (Industrial Press), by name. The truncated thread depth is thread-form- and class-specific and is not computed here; tap-drill-size gives the drill.";
   const std = makeSelect("Thread standard", "tp-std", [
     { value: "inch", label: "Inch (UN/UNC/UNF: enter TPI)" },
     { value: "metric", label: "Metric (ISO: enter pitch in mm)" },

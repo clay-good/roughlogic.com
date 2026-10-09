@@ -336,7 +336,7 @@ export function computeIdealGasLaw({ solve_for = "moles", pressure_atm = 0, volu
   }
   out.molar_volume_l = out.moles > 0 ? out.volume_l / out.moles : null;
   if (![out.pressure_atm, out.volume_l, out.moles, out.temperature_k].every(Number.isFinite)) return { error: "Ideal-gas math is not a finite value." };
-  out.note = "The ideal gas law PV = nRT, the member that links moles (from the mass-moles or molecular-weight tiles) to a gas's pressure, volume, and temperature -- solvable for whichever of the four is unknown, with R = 0.0820573 L*atm/(mol*K) and the temperature in kelvin (entered in C). One mole of any ideal gas fills 22.41 L at STP (0 C, 1 atm) and 24.47 L at 25 C and 1 atm, so a bench chemist reads moles straight off a measured gas volume. Solving for pressure gives a sealed vessel's pressure as it is heated or filled; solving for volume sizes a gas-collection or displacement setup; solving for temperature backs out the gas temperature from a closed P-V state. Real gases deviate at high pressure or near condensation (a van der Waals or compressibility Z correction is separate); the density = P x molar_mass / (R x T) needs the molar mass, which the molecular-weight tile supplies. A first-principles chemistry aid; the measurement conditions and the gas's real behavior govern.";
+  out.note = "The ideal gas law PV = nRT, the member that links moles (from the mass-moles or molecular-weight tiles) to a gas's pressure, volume, and temperature -- solvable for whichever of the four is unknown, with R = 0.0820573 L*atm/(mol*K) and the temperature in kelvin (entered in C). One mole of any ideal gas fills 22.41 L at STP (0 C, 1 atm) and 24.47 L at 25 C and 1 atm, so a bench chemist reads moles straight off a measured gas volume. Solving for pressure gives a sealed vessel's pressure as it is heated or filled; solving for volume sizes a gas-collection or displacement setup; solving for temperature backs out the gas temperature from a closed P-V state. Real gases deviate at high pressure or near condensation (van-der-waals, or for natural gas gas-z-factor, makes the correction); the density = P x molar_mass / (R x T) needs the molar mass, which the molecular-weight tile supplies. A first-principles chemistry aid; the measurement conditions and the gas's real behavior govern.";
   return out;
 }
 export const idealGasLawExample = { inputs: { solve_for: "volume", pressure_atm: 1, volume_l: 0, moles: 1, temperature_c: 25 } };
@@ -797,7 +797,7 @@ function renderMassMoles(inputRegion, outputRegion, citationEl) {
 }
 
 function renderIdealGasLaw(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: ideal gas law PV = nRT, R = 0.0820573 L*atm/(mol*K), temperatures in kelvin; solvable for any of P, V, n, T (any general chemistry text). Real gases deviate at high pressure / near condensation (van der Waals or a Z factor is separate); density needs the molar mass. First principles.";
+  citationEl.textContent = "Citation: ideal gas law PV = nRT, R = 0.0820573 L*atm/(mol*K), temperatures in kelvin; solvable for any of P, V, n, T (any general chemistry text). Real gases deviate at high pressure / near condensation (van-der-waals, or for natural gas gas-z-factor, makes the correction); density needs the molar mass. First principles.";
   inputRegion.appendChild(makeNotice(LAB_NOTICE));
   const solve = makeSelect("Solve for", "igl-solve", [
     { value: "moles", label: "Moles n" },

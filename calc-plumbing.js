@@ -4035,7 +4035,7 @@ export function computeOrificeDiameterForFlow({ q_cfs = 0, h_ft = 0, cd = 0.60 }
   const d_in = 12 * Math.sqrt(4 * a_ft2 / Math.PI);
   return {
     a_ft2, d_in,
-    note: "Inverse orifice sizing: the diameter that passes a target discharge under a steady head, from Q = Cd A sqrt(2 g h) solved for A = Q / (Cd sqrt(2 g h)) and d = sqrt(4 A / pi), with g = 32.2 ft/s^2, Cd about 0.6 for a sharp-edged orifice (~0.8 short tube, ~0.98 rounded), and the head measured to the orifice centroid. This sizes a detention-outlet or restrictor plate to hold a release to a target rate; because the flow scales with the square root of the head, the required area scales as 1/sqrt(h), so a 4x head shrinks the diameter to 0.71x. Free/submerged discharge under a steady head for a small orifice - it does not integrate the falling head of a draining tank (the time-to-drain is separate). A design aid; the engineer of record governs.",
+    note: "Inverse orifice sizing: the diameter that passes a target discharge under a steady head, from Q = Cd A sqrt(2 g h) solved for A = Q / (Cd sqrt(2 g h)) and d = sqrt(4 A / pi), with g = 32.2 ft/s^2, Cd about 0.6 for a sharp-edged orifice (~0.8 short tube, ~0.98 rounded), and the head measured to the orifice centroid. This sizes a detention-outlet or restrictor plate to hold a release to a target rate; because the flow scales with the square root of the head, the required area scales as 1/sqrt(h), so a 4x head shrinks the diameter to 0.71x. Free/submerged discharge under a steady head for a small orifice - it does not integrate the falling head of a draining tank (tank-drain-time integrates it). A design aid; the engineer of record governs.",
   };
 }
 export const orificeDiameterForFlowExample = { inputs: { q_cfs: 1.5, h_ft: 4, cd: 0.60 } };
@@ -4126,7 +4126,7 @@ export function computeChannelFroudeNumber({ b_ft = 0, q_cfs = 0, y_ft = 0 } = {
 export const channelFroudeNumberExample = { inputs: { b_ft: 4, q_cfs: 50, y_ft: 2 } };
 
 function _v304renderChannelFroudeNumber(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: open-channel Froude number Fr = V/sqrt(g D) (g = 32.2, D = y rectangular), the subcritical/critical/supercritical regimes, and the rectangular critical depth yc = (q^2/g)^(1/3), as compiled in Chow, by name. Rectangular section; normal depth and hydraulic jump are separate. A design aid; the engineer of record governs.";
+  citationEl.textContent = "Citation: open-channel Froude number Fr = V/sqrt(g D) (g = 32.2, D = y rectangular), the subcritical/critical/supercritical regimes, and the rectangular critical depth yc = (q^2/g)^(1/3), as compiled in Chow, by name. Rectangular section; normal depth is channel-normal-depth and the jump is hydraulic-jump. A design aid; the engineer of record governs.";
   attachExampleButton(inputRegion, () => { b.input.value = "4"; q.input.value = "50"; y.input.value = "2"; update(); });
   const b = makeNumber("Channel width b (ft)", "cfn-b", { step: "any", min: "0" });
   const q = makeNumber("Discharge Q (cfs)", "cfn-q", { step: "any", min: "0" });

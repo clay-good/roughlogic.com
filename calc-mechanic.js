@@ -1959,7 +1959,7 @@ export function computeFreeFallDrop({ drop_height_ft = 0, object_weight_lb = 0 }
 export const freeFallDropExample = { inputs: { drop_height_ft: 50, object_weight_lb: 5 } };
 
 MECHANIC_RENDERERS["free-fall-drop"] = _simpleRenderer({
-  citation: "Citation: still-air free-fall kinematics (standard mechanics): impact speed v = sqrt(2 g h), fall time t = sqrt(2 h/g), impact energy KE = W h (= m g h), g = 32.174 ft/s^2. Air drag (terminal velocity), impact deceleration force, and horizontal launch are separate. A safety-planning estimate; the competent person governs.",
+  citation: "Citation: still-air free-fall kinematics (standard mechanics): impact speed v = sqrt(2 g h), fall time t = sqrt(2 h/g), impact energy KE = W h (= m g h), g = 32.174 ft/s^2. Air drag is terminal-velocity, the impact deceleration force is impact-load-factor, and a horizontal launch is projectile-range. A safety-planning estimate; the competent person governs.",
   example: freeFallDropExample.inputs,
   fields: [
     { key: "drop_height_ft", label: "Drop height h (ft)", kind: "number" },

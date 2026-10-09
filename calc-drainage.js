@@ -151,7 +151,7 @@ export function computeRoofDrainSizing({ roof_area, rainfall_rate, drain_slope =
     leader_over: leader.over,
     horiz_over: horizontal.over,
     drain_slope,
-    note: "Rainfall rate is the locale-specific 100-year / 1-hour value from IPC Figure 1106.1 (not a national default). Sloped, vertical, and parapet walls add their contributing area per IPC 1106.4. Overflow drains and scuppers (IPC 1107) are a separate required path this tile does not size. The capacity tables carry the published IPC 2021 values (Table 1106.3 vertical leaders, with the Table 1106.2 vertical column for 10-15 in; Table 1106.2 horizontal storm drains by slope) as editable breakpoints.",
+    note: "Rainfall rate is the locale-specific 100-year / 1-hour value from IPC Figure 1106.1 (not a national default). Sloped, vertical, and parapet walls add their contributing area per IPC 1106.4. Overflow drains and scuppers (IPC 1107) are a separate required path this tile does not size; overflow-scupper-sizing sizes them. The capacity tables carry the published IPC 2021 values (Table 1106.3 vertical leaders, with the Table 1106.2 vertical column for 10-15 in; Table 1106.2 horizontal storm drains by slope) as editable breakpoints.",
   };
 }
 
@@ -559,13 +559,13 @@ export function computeManningPipeCapacity({ d_in = 0, slope = 0, material = "pv
   const q_gpm = q_cfs * (60 * 1728 / 231);
   return {
     n, a_ft2, r_ft, v_fps, q_cfs, q_gpm,
-    note: "Manning full-bore gravity-flow capacity: V = (1.486/n) R^(2/3) sqrt(S) with the hydraulic radius R = D/4 for a circular pipe flowing full and Q = V (pi/4) D^2 - the discharge side of the same Manning equation the manning-slope tile inverts. The roughness n is taken from the standard tables (PVC 0.009, cast iron / concrete 0.013, corrugated metal 0.024). Because Q scales with sqrt(S), doubling the slope raises the capacity only about 1.41x. A steady, uniform (normal-depth) full flow in a circular pipe; it does not compute the partial-flow depth, and a circular pipe actually carries a few percent more than full-bore at about 0.94 depth (the partial-flow curves are separate). A design aid; the engineer of record and the local plumbing/sewer code govern.",
+    note: "Manning full-bore gravity-flow capacity: V = (1.486/n) R^(2/3) sqrt(S) with the hydraulic radius R = D/4 for a circular pipe flowing full and Q = V (pi/4) D^2 - the discharge side of the same Manning equation the manning-slope tile inverts. The roughness n is taken from the standard tables (PVC 0.009, cast iron / concrete 0.013, corrugated metal 0.024). Because Q scales with sqrt(S), doubling the slope raises the capacity only about 1.41x. A steady, uniform (normal-depth) full flow in a circular pipe; it does not compute the partial-flow depth, and a circular pipe actually carries a few percent more than full-bore at about 0.94 depth (pipe-partial-flow-depth gives the partial-flow depth). A design aid; the engineer of record and the local plumbing/sewer code govern.",
   };
 }
 export const manningPipeCapacityExample = { inputs: { d_in: 8, slope: 0.01, material: "concrete" } };
 
 function renderManningPipeCapacity(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Manning full-bore capacity V = (1.486/n) R^(2/3) S^(1/2), R = D/4, Q = V (pi/4) D^2, by name. Circular pipe flowing full; the roughness n is from the standard tables. The partial-flow depth is separate. A design aid; the engineer of record governs.";
+  citationEl.textContent = "Citation: Manning full-bore capacity V = (1.486/n) R^(2/3) S^(1/2), R = D/4, Q = V (pi/4) D^2, by name. Circular pipe flowing full; the roughness n is from the standard tables. The partial-flow depth is pipe-partial-flow-depth. A design aid; the engineer of record governs.";
   attachExampleButton(inputRegion, () => fillExample(manningPipeCapacityExample.inputs));
   const d = makeNumber("Pipe diameter (in)", "mpc-d", { step: "any", min: "0" });
   const s = makeNumber("Pipe slope S (ft/ft)", "mpc-s", { step: "any", min: "0" });
