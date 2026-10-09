@@ -19474,7 +19474,7 @@ export const CITATIONS = {
     editionNote: "The MINIMUM wall that holds the jacket exactly at the dew point - industry practice rounds UP to the next stock wall and designs to the WORST sustained (design-day) RH, not the average. Assumes still air (1.65 BTU/hr-ft^2-F outside film, the same public reference value the hot-pipe sibling uses) and an intact vapor retarder: a torn jacket moves the condensation inside the insulation, which no thickness fixes. Near-saturation inputs error out rather than extrapolate (at 100% RH no finite wall keeps a cold surface dry). Energy sizing is the separate insulation-thickness tile. Manufacturer condensation tables and the mechanical code govern.",
     assumptions: [
       { name: "Dew point source", value: "computed from the repo's pinned saturation-vapor-pressure / dew-point functions, not a lookup", source: "pure-math.js psychrometrics (Magnus form)" },
-      { name: "Film coefficient", value: "1.65 BTU/hr-ft^2-F still-air default, identical to the insulation-thickness sibling", source: "public engineering reference value" },
+      { name: "Film coefficient", value: "1.65 BTU/hr-ft^2-F still-air default, identical to the insulation-thickness sibling; or computed (added 2026-10-09) from Churchill-Chu natural convection and gray-body radiation at the jacket emissivity, OD and dew-point surface", source: "public engineering reference value; bare-pipe-heat-loss" },
       { name: "Vapor retarder", value: "assumed continuous; failure moves condensation inside the insulation", source: "manufacturer design guides" },
     ],
   },

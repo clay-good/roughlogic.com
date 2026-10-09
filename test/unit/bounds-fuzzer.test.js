@@ -59132,3 +59132,17 @@ test("bounds: pipe-heat-loss-radial computed film balances the bare-surface loss
   assert.ok("error" in _phlrCF({ ...b, film_mode: "computed", jacket_emissivity: 0 }));
   assert.ok("error" in _phlrCF({ ...b, film_mode: "computed", wind_mph: -1 }));
 });
+
+import { computePipeInsulationForCondensation as _pifcF } from "../../calc-hvac.js";
+test("bounds: pipe-insulation-for-condensation computed film is the bare-pipe value at the dew-point jacket", () => {
+  const b = { pipe_od_in: 1, pipe_temp_F: 40, ambient_F: 75, ambient_rh_pct: 50, k_btu_in_per_hr_ft2_F: 0.27 };
+  for (const eps of [0.9, 0.1]) {
+    const c = _pifcF({ ...b, film_mode: "computed", jacket_emissivity: eps });
+    const bp = _bphF({ od_in: 2 * c.r2_in, surface_f: c.dew_point_F, amb_f: 75, emissivity: eps });
+    assert.ok(Math.abs(c.film_used_btu_hr_ft2_F - (bp.conv_coefficient + bp.rad_coefficient)) < 1e-12);
+    assert.ok(Math.abs(_pifcF({ ...b, outside_film_coeff_btu_hr_ft2_F: c.film_used_btu_hr_ft2_F }).thickness_in - c.thickness_in) < 1e-9);
+  }
+  // A bright (low-emissivity) jacket needs more insulation to stay dry.
+  assert.ok(_pifcF({ ...b, film_mode: "computed", jacket_emissivity: 0.1 }).thickness_in > _pifcF({ ...b, film_mode: "computed", jacket_emissivity: 0.9 }).thickness_in);
+  assert.ok("error" in _pifcF({ ...b, film_mode: "computed", jacket_emissivity: 0 }));
+});

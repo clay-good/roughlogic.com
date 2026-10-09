@@ -169946,6 +169946,39 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "pipe-insulation-for-condensation",
+  "source_publisher": "Project (first-principles)",
+  "source_title": "Example cold pipe, bright aluminum jacket, film computed",
+  "source_edition_or_year": "Churchill-Chu + gray-body radiation at the dew-point jacket",
+  "source_section_or_page": "dew point 55.1 F; jacket OD 1.374 in at 55.1 F in 75 F air, emissivity 0.1: h = 0.940 BTU/hr ft2 F; 2 pi (0.27/12)(15.1)/ln(0.6868/0.5) = 0.940 (2 pi 0.6868/12)(19.9) at t = 0.187 in",
+  "verified_by": "rl",
+  "verified_on": "2026-10-09",
+  "inputs": {
+   "pipe_od_in": 1,
+   "pipe_temp_F": 40,
+   "ambient_F": 75,
+   "ambient_rh_pct": 50,
+   "k_btu_in_per_hr_ft2_F": 0.27,
+   "outside_film_coeff_btu_hr_ft2_F": 1.65,
+   "film_mode": "computed",
+   "jacket_emissivity": 0.1
+  },
+  "outputs": {
+   "thickness_in": {
+    "value": 0.1868,
+    "tolerance": {
+     "pct": 0.5
+    }
+   },
+   "film_used_btu_hr_ft2_F": {
+    "value": 0.9402,
+    "tolerance": {
+     "pct": 0.5
+    }
+   }
+  }
  }
  ]
 }
