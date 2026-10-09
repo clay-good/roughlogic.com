@@ -2,99 +2,99 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "1a33ed4908b8e155",
+      "sha": "ec2b05b8a8e0b050",
       "date": "2026-10-09"
     },
     "/tools/": {
-      "sha": "a299f4be30723bd4",
+      "sha": "74b5450be26a8a84",
       "date": "2026-10-09"
     },
     "/collections/disaster-response/": {
-      "sha": "6e67ff179486c873",
+      "sha": "f822321ebb8fc2b4",
       "date": "2026-10-09"
     },
     "/groups/accounting/": {
-      "sha": "0da2d8c086a45ea1",
+      "sha": "6f433101f5237958",
       "date": "2026-10-09"
     },
     "/groups/agriculture/": {
-      "sha": "88d7164759353696",
+      "sha": "6732fcb58067a03f",
       "date": "2026-10-09"
     },
     "/groups/construction/": {
-      "sha": "70aa822ad8074b5b",
+      "sha": "f16d1bda8a3db731",
       "date": "2026-10-09"
     },
     "/groups/cross-trade/": {
-      "sha": "1446b88e5db15470",
+      "sha": "9f9b98e884643582",
       "date": "2026-10-09"
     },
     "/groups/educators/": {
-      "sha": "d47f26e95b87c12e",
+      "sha": "cbee44b6c66ff33d",
       "date": "2026-10-09"
     },
     "/groups/electrical/": {
-      "sha": "1bc7405d71a7f627",
+      "sha": "942ba16cbe590cf3",
       "date": "2026-10-09"
     },
     "/groups/field/": {
-      "sha": "7c43edd3e1e15a90",
+      "sha": "469d1a71060b6065",
       "date": "2026-10-09"
     },
     "/groups/fire-ground/": {
-      "sha": "b8485db2af267a48",
+      "sha": "47d307a06c2b8945",
       "date": "2026-10-09"
     },
     "/groups/historical/": {
-      "sha": "0063c9cce4e4c785",
+      "sha": "338c208ff6a1a60c",
       "date": "2026-10-09"
     },
     "/groups/hvac/": {
-      "sha": "fbbcd12f57521809",
+      "sha": "dd2efff7481dcaa0",
       "date": "2026-10-09"
     },
     "/groups/kitchen/": {
-      "sha": "a2718515b62f9dcc",
+      "sha": "53ff3832161f4a9e",
       "date": "2026-10-09"
     },
     "/groups/lab/": {
-      "sha": "c400a463f673e2cf",
+      "sha": "1f0ee0aaf0ac46ad",
       "date": "2026-10-09"
     },
     "/groups/mechanic/": {
-      "sha": "8cd419f704be2e75",
+      "sha": "db687c48d6745171",
       "date": "2026-10-09"
     },
     "/groups/plumbing/": {
-      "sha": "e2ca2eeb86c03453",
+      "sha": "b15a9f1abf7bd4f9",
       "date": "2026-10-09"
     },
     "/groups/real-estate/": {
-      "sha": "64e7fe66478cc959",
+      "sha": "9518366165c6feab",
       "date": "2026-10-09"
     },
     "/groups/references/": {
-      "sha": "32ae99b5f6637b4b",
+      "sha": "aa190ad0ab6c6b8d",
       "date": "2026-10-09"
     },
     "/groups/restoration/": {
-      "sha": "d2e97400748b6a00",
+      "sha": "5abe7dbbcf36a017",
       "date": "2026-10-09"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "9da54d3f84cc197c",
+      "sha": "fcfc6899a1d298f5",
       "date": "2026-10-09"
     },
     "/groups/stage/": {
-      "sha": "103e2636db1201ae",
+      "sha": "c205be7d615f8aab",
       "date": "2026-10-09"
     },
     "/groups/trucking/": {
-      "sha": "fcffaf7bae370915",
+      "sha": "e84b21196b8d1cc6",
       "date": "2026-10-09"
     },
     "/groups/water/": {
-      "sha": "52c2089a979b8f20",
+      "sha": "b9cf15272aa60dd5",
       "date": "2026-10-09"
     },
     "/tools/aav-install-check/": {
@@ -638,7 +638,7 @@
       "date": "2026-09-29"
     },
     "/tools/berthing-fender-energy/": {
-      "sha": "c16fecb8cd4f4fb7",
+      "sha": "cff6cfb7b8e69047",
       "date": "2026-10-09"
     },
     "/tools/beverage-co2-duration/": {
@@ -1236,6 +1236,10 @@
     "/tools/circular-segment-area/": {
       "sha": "ea06bcaa870824ed",
       "date": "2026-09-29"
+    },
+    "/tools/circulating-load-ratio/": {
+      "sha": "8844d4f5c31ad59d",
+      "date": "2026-10-09"
     },
     "/tools/cistern-storage-days/": {
       "sha": "6ee504a864470b73",
@@ -4378,8 +4382,8 @@
       "date": "2026-09-29"
     },
     "/tools/loader-production/": {
-      "sha": "a8564f32ab2c9a7b",
-      "date": "2026-09-30"
+      "sha": "5ae29a62baabe962",
+      "date": "2026-10-09"
     },
     "/tools/loan-amortization/": {
       "sha": "973bc3f0601c4d50",
@@ -6686,8 +6690,8 @@
       "date": "2026-10-01"
     },
     "/tools/screen-deck-capacity/": {
-      "sha": "f24da3472b2488b4",
-      "date": "2026-09-29"
+      "sha": "b3e4a4b447ac569e",
+      "date": "2026-10-09"
     },
     "/tools/screw-conveyor/": {
       "sha": "b34506aee4c00f7c",

@@ -6402,6 +6402,11 @@
     {"term":"ball mill power","target":"bond-work-index-power","kind":"industry"},
     {"term":"grinding energy kwh per ton","target":"bond-work-index-power","kind":"industry"},
     {"term":"bonds law comminution","target":"bond-work-index-power","kind":"industry"},
-    {"term":"how much power to grind ore","target":"bond-work-index-power","kind":"question"}
+    {"term":"how much power to grind ore","target":"bond-work-index-power","kind":"question"},
+    {"term":"circulating load","target":"circulating-load-ratio","kind":"industry"},
+    {"term":"cyclone circulating load","target":"circulating-load-ratio","kind":"industry"},
+    {"term":"two product formula","target":"circulating-load-ratio","kind":"industry"},
+    {"term":"recirculating load ball mill","target":"circulating-load-ratio","kind":"industry"},
+    {"term":"how much goes back to the mill","target":"circulating-load-ratio","kind":"question"}
   ]
 }

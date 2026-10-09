@@ -58829,3 +58829,13 @@ test("bounds: bond-work-index-power returns Wi itself for infinite feed to 100 m
   assert.ok("error" in _bwi({ work_index_kwh_st: 13, feed_f80_um: 75, product_p80_um: 1000 }));
   assert.ok("error" in _bwi({ work_index_kwh_st: 0, feed_f80_um: 1000, product_p80_um: 75 }));
 });
+
+import { computeCirculatingLoadRatio as _clr } from "../../calc-mining.js";
+test("bounds: circulating-load-ratio closes the size-class mass balance", () => {
+  for (const [f, o, u] of [[40, 70, 25], [55, 90, 30], [20, 5, 60]]) {
+    const r = _clr({ feed_pct: f, overflow_pct: o, underflow_pct: u, new_feed_stph: 100 });
+    assert.ok(Math.abs(r.classifier_feed_stph * f - (100 * o + r.underflow_stph * u)) < 1e-9);
+  }
+  assert.ok("error" in _clr({ feed_pct: 80, overflow_pct: 70, underflow_pct: 25 }));
+  assert.ok("error" in _clr({ feed_pct: 40, overflow_pct: 140, underflow_pct: 25 }));
+});

@@ -15484,6 +15484,17 @@ export const CITATIONS = {
       { name: "Efficiency factors", value: "Rowland EF1-EF8 not applied", source: "scope of this tile" },
     ],
   },
+  "circulating-load-ratio": {
+    formula: "U/O = (o - f)/(f - u) on one size class (f classifier feed, o overflow, u underflow, percent); circulating load % = 100 U/O; underflow = (U/O) x new feed; classifier feed = new feed + underflow.",
+    edition: "The two-product formula for a classifier closing a grinding circuit, a steady-state mass balance on one size class (as in Wills' Mineral Processing Technology), by name.",
+    freeAccess: "A mass balance on the user's own size assays; no published data is bundled.",
+    governance: GOVERNANCE.general,
+    editionNote: "Steady-state circulating load from a single size class, dry solids basis; the classifier overflow equals the new feed. The result is sensitive to assay error when the feed fraction is close to either product, so use the size class with the widest spread or average several. A screen; a full mass balance governs.",
+    assumptions: [
+      { name: "Two-product formula", value: "U/O = (o - f)/(f - u)", source: "mass balance; Wills" },
+      { name: "Steady state", value: "overflow = new feed; no accumulation in the mill or sump", source: "scope of this tile" },
+    ],
+  },
   "crusher-reduction-ratio": {
     formula: "reduction ratio = feed size / product size on 80% passing sizes; circuit ratios MULTIPLY, so an even split is the total raised to one over the stage count; stages needed = ceil(log of the total over log of the machine's high ratio).",
     edition: "The reduction ratio relation and the multiplicative circuit rule by name, with typical machine ranges (Metso Crushing and Screening Handbook, 7th ed.: jaw 3 to 5, primary gyratory 6 to 8, secondary cone 3 to 4, tertiary cone 2 to 3.5; impactors run higher) entered rather than shipped. The crusher manufacturer's selection data and the plant designer govern.",

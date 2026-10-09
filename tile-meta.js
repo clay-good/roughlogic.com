@@ -858,6 +858,7 @@ const _TILES = [
   ["blast-stemming-length", "E"],
   ["crusher-reduction-ratio", "E"],
   ["bond-work-index-power", "E"],
+  ["circulating-load-ratio", "E"],
   ["screen-deck-capacity", "E"],
   ["belt-feeder-capacity", "E"],
   ["dust-collector-air-to-cloth", "E"],

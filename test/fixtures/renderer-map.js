@@ -913,6 +913,7 @@ export const RENDERER_MAP = {
   "blast-stemming-length": { module: "../../calc-mining.js", exportName: "MINING_RENDERERS" },
   "crusher-reduction-ratio": { module: "../../calc-mining.js", exportName: "MINING_RENDERERS" },
   "bond-work-index-power": { module: "../../calc-mining.js", exportName: "MINING_RENDERERS" },
+  "circulating-load-ratio": { module: "../../calc-mining.js", exportName: "MINING_RENDERERS" },
   "screen-deck-capacity": { module: "../../calc-mining.js", exportName: "MINING_RENDERERS" },
   "belt-feeder-capacity": { module: "../../calc-mining.js", exportName: "MINING_RENDERERS" },
   "dust-collector-air-to-cloth": { module: "../../calc-mining.js", exportName: "MINING_RENDERERS" },

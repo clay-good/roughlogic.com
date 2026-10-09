@@ -507,6 +507,46 @@ MINING_RENDERERS["bond-work-index-power"] = _simpleRenderer({
   compute: computeBondWorkIndexPower,
 });
 
+// spec-v1943: circulating load of a closed grinding circuit by the two-product formula. screen-deck-capacity says
+// the recirculating load is not computed. At steady state the classifier splits its feed F into overflow O (the
+// circuit product, equal to the new feed) and underflow U (back to the mill); a mass balance on any size class with
+// fractions f, o, u gives U/O = (o - f)/(f - u).
+// dims: in { feed_pct: dimensionless, overflow_pct: dimensionless, underflow_pct: dimensionless, new_feed_stph: M T^-1 } out: { circulating_load_ratio: dimensionless, circulating_load_pct: dimensionless, underflow_stph: M T^-1, classifier_feed_stph: M T^-1 }
+export function computeCirculatingLoadRatio({ feed_pct = 0, overflow_pct = 0, underflow_pct = 0, new_feed_stph = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const f = Number(feed_pct), o = Number(overflow_pct), u = Number(underflow_pct), Q = Number(new_feed_stph) || 0;
+  if (![f, o, u].every((x) => x >= 0 && x <= 100)) return { error: "Each size-class percentage must be from 0 to 100." };
+  if (Q < 0) return { error: "New feed rate cannot be negative (short tons per hour; blank for the ratio only)." };
+  // The feed must lie strictly between the two products for the split to be physical.
+  if (!((o > f && f > u) || (o < f && f < u))) return { error: "The classifier feed fraction must lie between the overflow and underflow fractions; check the assays." };
+  const circulating_load_ratio = (o - f) / (f - u);
+  const circulating_load_pct = circulating_load_ratio * 100;
+  const underflow_stph = circulating_load_ratio * Q;
+  const classifier_feed_stph = Q + underflow_stph;
+  if (![circulating_load_ratio, underflow_stph].every(Number.isFinite)) return { error: "Circulating-load math is not a finite value; check the assays." };
+  return {
+    circulating_load_ratio, circulating_load_pct, underflow_stph, classifier_feed_stph, has_rate: Q > 0,
+    note: "The circulating load of a mill closed with a cyclone or screen: the tonnage the classifier sends back to the mill, relative to the new feed. At steady state the classifier overflow equals the new feed, so a mass balance on any one size class (the percent passing 75 microns is common) in the classifier feed f, overflow o, and underflow u gives the two-product formula U/O = (o - f)/(f - u). Ball-mill circuits typically run 150 to 350 percent. The answer is sensitive to assay error when f sits close to o or u, so use the size class with the widest spread, or average several. Steady state, no water or density terms (dry solids basis). A screen; a full mass balance governs.",
+  };
+}
+export const circulatingLoadRatioExample = { inputs: { feed_pct: 40, overflow_pct: 70, underflow_pct: 25, new_feed_stph: 100 } };
+MINING_RENDERERS["circulating-load-ratio"] = _simpleRenderer({
+  citation: "Citation: the two-product formula for a classifier in a closed grinding circuit, U/O = (o - f)/(f - u) on one size class (standard mineral-processing mass balance, as in Wills' Mineral Processing Technology), by name; underflow tonnage = ratio x new feed, classifier feed = new feed + underflow. Steady state, dry solids. A screen; a full mass balance governs.",
+  example: circulatingLoadRatioExample.inputs,
+  fields: [
+    { key: "feed_pct", label: "Classifier feed, % in the size class (e.g. % passing 75 microns)", kind: "number" },
+    { key: "overflow_pct", label: "Overflow, % in the same size class", kind: "number" },
+    { key: "underflow_pct", label: "Underflow, % in the same size class", kind: "number" },
+    { key: "new_feed_stph", label: "New feed to the circuit (short tons per hour, blank for the ratio only)", kind: "number" },
+  ],
+  outputs: [
+    { key: "c", id: "clr-out-c", label: "Circulating load", value: (r) => fmt(r.circulating_load_pct, 0) + "% of the new feed (ratio " + fmt(r.circulating_load_ratio, 2) + ")" },
+    { key: "t", id: "clr-out-t", label: "Tonnage", value: (r) => (r.has_rate ? fmt(r.underflow_stph, 0) + " st/h back to the mill; " + fmt(r.classifier_feed_stph, 0) + " st/h to the classifier" : "enter the new feed rate") },
+    { key: "n", id: "clr-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeCirculatingLoadRatio,
+});
+
 // ===================== spec-v1513: vibrating screen deck capacity =====================
 
 // dims: in { deck_width_ft: L, deck_length_ft: L, base_capacity_tph_per_sqft: M T^-1 L^-2, oversize_factor: dimensionless, halfsize_factor: dimensionless, deck_factor: dimensionless, wet_factor: dimensionless, efficiency_factor: dimensionless, actual_feed_tph: M T^-1 } out: { screen_area_sqft: L^2, combined_multiplier: dimensionless, capacity_tph: M T^-1, percent_of_capacity: dimensionless, area_required_sqft: L^2 }
@@ -532,7 +572,7 @@ export function computeScreenDeckCapacity({ deck_width_ft = 0, deck_length_ft = 
     verdict: over_capacity
       ? "OVER capacity -- the bed is too deep for particles to reach the wire, and oversize in the product is an AREA problem with no mechanical fault anywhere"
       : "inside capacity at the entered feed rate",
-    note: "Every factor in the chain is a departure from a reference condition, and the chain is multiplicative, so the errors compound rather than average. The two that dominate are the halfsize and oversize factors: a feed with a lot of material smaller than half the opening screens far faster than the base rate, and a feed sitting right at the opening size screens far slower. That is why a screen comfortable on one gradation blinds and floods on another from the same pit, and why tightening a crusher upstream can cost a deck a third of its capacity without anyone touching the screen. For field use the important output is not the capacity number, it is the comparison against what the deck is actually being fed. A deck running above its calculated capacity carries a bed too deep for particles to reach the wire, and the symptom is oversize in the product with no mechanical fault anywhere -- the screen is working correctly and is simply out of area. Knowing that stops a crew from chasing stroke, slope, and wire tension for a problem none of them can fix. The base capacity and every factor come from the screen manufacturer's published tables and differ between manufacturers and between media types; this does not ship them and the result is only as good as the values entered. It does not size the drive, select stroke, speed, or slope, choose screen media, or evaluate blinding and pegging, which are material-property problems -- clay, moisture, flaky particles, near-size material -- that no capacity formula predicts. It does not compute screening efficiency or the recirculating load in a closed circuit, both of which change the tonnage the deck actually sees, and structural capacity and the deck's rated load are separate limits. The screen manufacturer's selection data and the plant designer govern.",
+    note: "Every factor in the chain is a departure from a reference condition, and the chain is multiplicative, so the errors compound rather than average. The two that dominate are the halfsize and oversize factors: a feed with a lot of material smaller than half the opening screens far faster than the base rate, and a feed sitting right at the opening size screens far slower. That is why a screen comfortable on one gradation blinds and floods on another from the same pit, and why tightening a crusher upstream can cost a deck a third of its capacity without anyone touching the screen. For field use the important output is not the capacity number, it is the comparison against what the deck is actually being fed. A deck running above its calculated capacity carries a bed too deep for particles to reach the wire, and the symptom is oversize in the product with no mechanical fault anywhere -- the screen is working correctly and is simply out of area. Knowing that stops a crew from chasing stroke, slope, and wire tension for a problem none of them can fix. The base capacity and every factor come from the screen manufacturer's published tables and differ between manufacturers and between media types; this does not ship them and the result is only as good as the values entered. It does not size the drive, select stroke, speed, or slope, choose screen media, or evaluate blinding and pegging, which are material-property problems -- clay, moisture, flaky particles, near-size material -- that no capacity formula predicts. It does not compute screening efficiency or the recirculating load in a closed circuit (circulating-load-ratio does), both of which change the tonnage the deck actually sees, and structural capacity and the deck's rated load are separate limits. The screen manufacturer's selection data and the plant designer govern.",
   };
 }
 const screenDeckExample = { inputs: { deck_width_ft: 8, deck_length_ft: 20, base_capacity_tph_per_sqft: 3.5, oversize_factor: 1.1, halfsize_factor: 1.15, deck_factor: 0.9, wet_factor: 1.25, efficiency_factor: 0.95, actual_feed_tph: 400 } };

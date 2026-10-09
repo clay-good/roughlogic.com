@@ -169135,6 +169135,35 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "circulating-load-ratio",
+  "source_publisher": "Project (first-principles)",
+  "source_title": "Cyclone closing a ball mill: 40 / 70 / 25 % passing 75 microns",
+  "source_edition_or_year": "two-product formula",
+  "source_section_or_page": "U/O = (70 - 40)/(40 - 25) = 2.00 (200%); 100 st/h new feed -> 200 st/h underflow, 300 st/h cyclone feed; check 300 x 0.40 = 100 x 0.70 + 200 x 0.25",
+  "verified_by": "rl",
+  "verified_on": "2026-10-09",
+  "inputs": {
+   "feed_pct": 40,
+   "overflow_pct": 70,
+   "underflow_pct": 25,
+   "new_feed_stph": 100
+  },
+  "outputs": {
+   "circulating_load_pct": {
+    "value": 200,
+    "tolerance": {
+     "pct": 0.5
+    }
+   },
+   "classifier_feed_stph": {
+    "value": 300,
+    "tolerance": {
+     "pct": 0.5
+    }
+   }
+  }
  }
  ]
 }
