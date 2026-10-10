@@ -116922,6 +116922,31 @@
    "term": "how much heat does an uninsulated tank lose",
    "target": "flat-surface-heat-loss",
    "kind": "question"
+  },
+  {
+   "term": "friction hoist traction",
+   "target": "friction-hoist-traction",
+   "kind": "industry"
+  },
+  {
+   "term": "koepe hoist slip",
+   "target": "friction-hoist-traction",
+   "kind": "industry"
+  },
+  {
+   "term": "hoist rope slip on the drum",
+   "target": "friction-hoist-traction",
+   "kind": "industry"
+  },
+  {
+   "term": "koepe wheel tension ratio",
+   "target": "friction-hoist-traction",
+   "kind": "industry"
+  },
+  {
+   "term": "will my friction hoist ropes slip",
+   "target": "friction-hoist-traction",
+   "kind": "question"
   }
  ]
 }

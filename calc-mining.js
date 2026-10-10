@@ -1204,7 +1204,7 @@ export function computeHoistRopeSafetyFactor({ conveyance_lb = 0, people_count =
     max_payload_lb: Math.max(0, max_payload_lb),
     depth_at_limit_ft: Math.max(0, depth_at_limit_ft),
     verdict: factor_of_safety >= minimum_fs * (1 - 1e-9) ? "at or above the entered statutory minimum" : "BELOW the entered statutory minimum",
-    note: "On a shallow shaft the rope's own weight is a footnote; on a deep one it can exceed the payload, and because it hangs from the sheave the whole of it is carried at the top where the factor of safety is checked. A calculation that includes the cage and the people but not the rope produces a comfortable-looking number that is simply wrong, and it is wrong in the UNSAFE direction and by more as the shaft gets deeper. Note also that every rope hangs the full length, so the rope weight carries the rope COUNT as a multiplier -- dropping it is the same class of error as dropping the rope entirely. Depth, not payload, is what consumes the margin: doubling the shaft depth on the same cage and the same people takes a substantial bite out of the factor of safety. The second half matters more in practice. A rope with an adequate factor of safety can still be due for retirement, because ropes are retired on CONDITION and on TIME rather than on calculated stress: broken wires per rope lay, loss of diameter, corrosion, distortion, and in many jurisdictions a maximum service life regardless of condition. A hoist rope that passes this arithmetic and fails the broken-wire count comes out of service, and no factor of safety argument changes that. This is a static calculation. It does not model dynamic loads from acceleration, deceleration, emergency braking, or shock, all of which add substantially and which the statutory factors are partly there to cover; it does not evaluate friction hoist traction, which is a separate and governing check on a Koepe installation, or rope stretch (wire-rope-stretch), sheave and drum diameter ratios and their effect on rope life, attachments and terminations, or the brake system. It does not perform the statutory rope inspection. Hoisting people is among the most heavily regulated activities in mining: MSHA, the applicable ASME and state hoisting requirements, the hoist and rope manufacturers, and the mine's hoisting plan govern.",
+    note: "On a shallow shaft the rope's own weight is a footnote; on a deep one it can exceed the payload, and because it hangs from the sheave the whole of it is carried at the top where the factor of safety is checked. A calculation that includes the cage and the people but not the rope produces a comfortable-looking number that is simply wrong, and it is wrong in the UNSAFE direction and by more as the shaft gets deeper. Note also that every rope hangs the full length, so the rope weight carries the rope COUNT as a multiplier -- dropping it is the same class of error as dropping the rope entirely. Depth, not payload, is what consumes the margin: doubling the shaft depth on the same cage and the same people takes a substantial bite out of the factor of safety. The second half matters more in practice. A rope with an adequate factor of safety can still be due for retirement, because ropes are retired on CONDITION and on TIME rather than on calculated stress: broken wires per rope lay, loss of diameter, corrosion, distortion, and in many jurisdictions a maximum service life regardless of condition. A hoist rope that passes this arithmetic and fails the broken-wire count comes out of service, and no factor of safety argument changes that. This is a static calculation. It does not model dynamic loads from acceleration, deceleration, emergency braking, or shock, all of which add substantially and which the statutory factors are partly there to cover; it does not evaluate friction hoist traction (friction-hoist-traction does), which is a separate and governing check on a Koepe installation, or rope stretch (wire-rope-stretch), sheave and drum diameter ratios and their effect on rope life, attachments and terminations, or the brake system. It does not perform the statutory rope inspection. Hoisting people is among the most heavily regulated activities in mining: MSHA, the applicable ASME and state hoisting requirements, the hoist and rope manufacturers, and the mine's hoisting plan govern.",
   };
 }
 const hoistRopeExample = { inputs: { conveyance_lb: 4200, people_count: 8, person_weight_lb: 180, rope_length_ft: 1400, rope_weight_per_ft: 1.8, rope_count: 4, rope_breaking_lb: 128000, minimum_fs: 8 } };
@@ -1232,4 +1232,94 @@ MINING_RENDERERS["hoist-rope-safety-factor"] = _simpleRenderer({
     { key: "n", id: "hrs-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeHoistRopeSafetyFactor,
+});
+
+// =====================================================================
+// spec-v1952: friction (Koepe) hoist traction -- will the ropes slip on the drive wheel?
+// =====================================================================
+// hoist-rope-safety-factor checks the rope's strength and names traction as "a separate and governing check"
+// on a friction hoist. A friction hoist drives its ropes by grip alone, so the ratio of the two rope tensions
+// at the wheel cannot exceed the capstan limit e^(mu theta). Tensions are plain statics: each side carries its
+// conveyance, any payload, and the head or tail rope hanging on it. With the loaded conveyance at the bottom
+// the loaded side carries the head ropes; at the top it carries the tail ropes. Accelerating the loaded side
+// up (or braking it on the way down) multiplies its tension by (1 + a/g) and the other side's by (1 - a/g).
+const _KOEPE_G_FT_S2 = 32.174;
+// dims: in { loaded_conveyance_lb: M L T^-2, payload_lb: M L T^-2, opposite_side_lb: M L T^-2, head_rope_lb_ft: M T^-2, tail_rope_lb_ft: M T^-2, depth_ft: L, friction_coefficient: dimensionless, wrap_deg: dimensionless, acceleration_ft_s2: L T^-2 } out: { slip_limit_ratio: dimensionless, static_ratio: dimensionless, dynamic_ratio: dimensionless, static_margin: dimensionless, dynamic_margin: dimensionless, max_acceleration_ft_s2: L T^-2, t1_static_lb: M L T^-2, t2_static_lb: M L T^-2 }
+export function computeFrictionHoistTraction({
+  loaded_conveyance_lb = 0, payload_lb = 0, opposite_side_lb = 0,
+  head_rope_lb_ft = 0, tail_rope_lb_ft = 0, depth_ft = 0,
+  friction_coefficient = 0.25, wrap_deg = 180, acceleration_ft_s2 = 0,
+} = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(loaded_conveyance_lb > 0)) return { error: "Loaded-side conveyance weight must be positive (lb)." };
+  if (!(payload_lb >= 0)) return { error: "Payload cannot be negative (lb)." };
+  if (!(opposite_side_lb > 0)) return { error: "Opposite-side weight (empty conveyance or counterweight) must be positive (lb)." };
+  if (!(head_rope_lb_ft >= 0) || !(tail_rope_lb_ft >= 0)) return { error: "Rope weights cannot be negative (lb/ft, all ropes together)." };
+  if (!(depth_ft > 0)) return { error: "Hoisting depth must be positive (ft)." };
+  if (!(friction_coefficient > 0 && friction_coefficient <= 1)) return { error: "Friction coefficient must be above 0 and at most 1 (about 0.25 for common tread liners)." };
+  if (!(wrap_deg > 0 && wrap_deg <= 360)) return { error: "Wrap angle must be above 0 and at most 360 degrees (180 for a tower-mounted wheel)." };
+  if (!(acceleration_ft_s2 >= 0 && acceleration_ft_s2 < _KOEPE_G_FT_S2)) return { error: "Acceleration must be 0 or more and below gravity (ft/s2)." };
+  const slip_limit_ratio = Math.exp(friction_coefficient * wrap_deg * Math.PI / 180);
+  const loaded = loaded_conveyance_lb + payload_lb;
+  // The two ends of the wind. Whichever side is at the bottom carries the head ropes; the one at the top, the tail ropes.
+  const positions = [
+    { where: "loaded conveyance at the bottom", t_loaded: loaded + head_rope_lb_ft * depth_ft, t_other: opposite_side_lb + tail_rope_lb_ft * depth_ft },
+    { where: "loaded conveyance at the top", t_loaded: loaded + tail_rope_lb_ft * depth_ft, t_other: opposite_side_lb + head_rope_lb_ft * depth_ft },
+  ];
+  const k = acceleration_ft_s2 / _KOEPE_G_FT_S2;
+  const ratioOf = (a, b) => (a >= b ? a / b : b / a);
+  let worst_static = null, worst_dynamic = null;
+  for (const p of positions) {
+    const s = ratioOf(p.t_loaded, p.t_other);
+    // Heavy side accelerating up (or being braked on the way down) is the case that raises the ratio.
+    const hi = Math.max(p.t_loaded, p.t_other), lo = Math.min(p.t_loaded, p.t_other);
+    const d = (hi * (1 + k)) / (lo * (1 - k));
+    if (!worst_static || s > worst_static.ratio) worst_static = { ratio: s, where: p.where, hi, lo };
+    if (!worst_dynamic || d > worst_dynamic.ratio) worst_dynamic = { ratio: d, where: p.where, hi, lo };
+  }
+  const static_ratio = worst_static.ratio, dynamic_ratio = worst_dynamic.ratio;
+  const static_margin = slip_limit_ratio / static_ratio;
+  const dynamic_margin = slip_limit_ratio / dynamic_ratio;
+  // (hi (1 + a/g)) / (lo (1 - a/g)) = limit  ->  a/g = (limit lo - hi) / (limit lo + hi), at the governing position.
+  const aFrac = (slip_limit_ratio * worst_static.lo - worst_static.hi) / (slip_limit_ratio * worst_static.lo + worst_static.hi);
+  const max_acceleration_ft_s2 = Math.max(0, aFrac) * _KOEPE_G_FT_S2;
+  const static_slips = static_ratio >= slip_limit_ratio * (1 - 1e-12);
+  const dynamic_slips = dynamic_ratio >= slip_limit_ratio * (1 - 1e-12);
+  if (![slip_limit_ratio, static_ratio, dynamic_ratio, static_margin, dynamic_margin, max_acceleration_ft_s2].every(Number.isFinite)) return { error: "Traction math is not a finite value; check the inputs." };
+  const limit_verdict = "the ropes hold up to a tension ratio of " + fmt(slip_limit_ratio, 3) + " (e^(mu theta) at mu " + fmt(friction_coefficient, 2) + " and " + fmt(wrap_deg, 0) + " degrees of wrap)";
+  const static_verdict = (static_slips ? "SLIPS AT REST: " : "") + "standing, the tension ratio is " + fmt(static_ratio, 3) + " with the " + worst_static.where + " (" + fmt(worst_static.hi, 0) + " lb against " + fmt(worst_static.lo, 0) + " lb), " + fmt(static_margin, 2) + " times inside the slip limit";
+  const dynamic_verdict = acceleration_ft_s2 > 0
+    ? (dynamic_slips ? "SLIPS: " : "") + "at " + fmt(acceleration_ft_s2, 2) + " ft/s2 the ratio rises to " + fmt(dynamic_ratio, 3) + ", " + fmt(dynamic_margin, 2) + " times inside the limit" + (dynamic_slips ? " -- the ropes slide on the wheel" : "")
+    : "enter an acceleration or braking rate to check the moving case";
+  const accel_verdict = "the ropes begin to slip at " + fmt(max_acceleration_ft_s2, 2) + " ft/s2 (" + fmt(max_acceleration_ft_s2 / _KOEPE_G_FT_S2, 3) + " g) of acceleration of the heavy side upward, or of braking it on the way down";
+  return {
+    slip_limit_ratio, static_ratio, dynamic_ratio, static_margin, dynamic_margin, max_acceleration_ft_s2,
+    t1_static_lb: worst_static.hi, t2_static_lb: worst_static.lo, static_slips, dynamic_slips,
+    limit_verdict, static_verdict, dynamic_verdict, accel_verdict,
+    note: "A friction (Koepe) hoist has no rope anchored to its wheel: the ropes are driven by grip alone, so the hoist can lift only as long as the ratio of the two rope tensions stays below the capstan limit e^(mu theta). At mu 0.25 and a half wrap that limit is 2.19, and it does not depend on how heavy the system is, only on the RATIO -- which is why a friction hoist runs with balanced conveyances or a counterweight, and why tail ropes are hung under the conveyances to cancel the head-rope weight that would otherwise swing the ratio from one end of the wind to the other. Both ends of the wind are checked, because the side at the bottom carries the head ropes. Acceleration is what uses up the margin: raising the heavy side at a multiplies its tension by (1 + a/g) and the light side's by (1 - a/g), and emergency braking of a descending load does the same, so the braking rate is usually the governing case and the reason brake deceleration on a friction hoist is limited. This uses rope weights for all ropes together, treats the ropes as weightless in the acceleration term beyond their hanging weight, and takes one friction coefficient; it does not include the inertia of the wheel and sheaves, liner wear, wet or greased ropes (which lower mu sharply), rope oscillation, or the tread pressure limit on the liners. The statutory hoist requirements and the hoist manufacturer govern.",
+  };
+}
+export const frictionHoistTractionExample = { inputs: { loaded_conveyance_lb: 20000, payload_lb: 30000, opposite_side_lb: 20000, head_rope_lb_ft: 24, tail_rope_lb_ft: 24, depth_ft: 3000, friction_coefficient: 0.25, wrap_deg: 180, acceleration_ft_s2: 3 } };
+MINING_RENDERERS["friction-hoist-traction"] = _simpleRenderer({
+  citation: "Citation: the capstan (Euler-Eytelwein) relation T1/T2 = e^(mu theta) for a rope on a driving wheel, applied to the rope tensions of a friction hoist from statics: conveyance, payload and the head or tail rope hanging on each side, with (1 + a/g) and (1 - a/g) on the heavy and light sides under acceleration. First principles; the friction coefficient is entered. The statutory hoist requirements and the manufacturer govern.",
+  example: frictionHoistTractionExample.inputs,
+  fields: [
+    { key: "loaded_conveyance_lb", label: "Loaded-side conveyance weight, empty (lb)", kind: "number" },
+    { key: "payload_lb", label: "Payload (lb)", kind: "number" },
+    { key: "opposite_side_lb", label: "Opposite side: empty conveyance or counterweight (lb)", kind: "number" },
+    { key: "head_rope_lb_ft", label: "Head ropes, all together (lb per ft)", kind: "number" },
+    { key: "tail_rope_lb_ft", label: "Tail (balance) ropes, all together (lb per ft, 0 if none)", kind: "number" },
+    { key: "depth_ft", label: "Hoisting depth (ft)", kind: "number" },
+    { key: "friction_coefficient", label: "Rope-to-liner friction coefficient (about 0.25)", kind: "number", default: 0.25, attrs: { step: "any", min: "0", max: "1" } },
+    { key: "wrap_deg", label: "Wrap angle on the wheel (degrees, 180 typical)", kind: "number", default: 180, attrs: { step: "any", min: "0", max: "360" } },
+    { key: "acceleration_ft_s2", label: "Acceleration or braking rate (ft/s², 0 to skip)", kind: "number" },
+  ],
+  outputs: [
+    { key: "slip_limit_ratio", id: "fht-out-l", label: "Slip limit", value: (r) => r.limit_verdict },
+    { key: "static_ratio", id: "fht-out-s", label: "At rest", value: (r) => r.static_verdict },
+    { key: "dynamic_ratio", id: "fht-out-d", label: "Accelerating or braking", value: (r) => r.dynamic_verdict },
+    { key: "max_acceleration_ft_s2", id: "fht-out-a", label: "Rate at which it slips", unit: "ft/s²", value: (r) => r.accel_verdict },
+    { key: "note", id: "fht-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeFrictionHoistTraction,
 });

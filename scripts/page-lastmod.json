@@ -2,99 +2,99 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "f1ed0848d5c28c8a",
+      "sha": "a8ee854333641c24",
       "date": "2026-10-10"
     },
     "/tools/": {
-      "sha": "6a0555a42e4a81c2",
+      "sha": "9c271e305b2a054c",
       "date": "2026-10-10"
     },
     "/collections/disaster-response/": {
-      "sha": "43ee2d679bd44705",
+      "sha": "c4a9dc6110af878e",
       "date": "2026-10-10"
     },
     "/groups/accounting/": {
-      "sha": "736dc062a51acf70",
+      "sha": "6971d1b0d2214830",
       "date": "2026-10-10"
     },
     "/groups/agriculture/": {
-      "sha": "409fd64a5ef77450",
+      "sha": "ed64b553a9d8168e",
       "date": "2026-10-10"
     },
     "/groups/construction/": {
-      "sha": "3692357f29428654",
+      "sha": "f592a636821a413d",
       "date": "2026-10-10"
     },
     "/groups/cross-trade/": {
-      "sha": "1e5872821bf6f3f9",
+      "sha": "01289e23f7c69279",
       "date": "2026-10-10"
     },
     "/groups/educators/": {
-      "sha": "33163e2c7c17e595",
+      "sha": "06bdad0f8e326af5",
       "date": "2026-10-10"
     },
     "/groups/electrical/": {
-      "sha": "6f8f385cf2125cc1",
+      "sha": "35c18f619f3ecaa7",
       "date": "2026-10-10"
     },
     "/groups/field/": {
-      "sha": "951de19a1607a7d9",
+      "sha": "736a356d97b1b47c",
       "date": "2026-10-10"
     },
     "/groups/fire-ground/": {
-      "sha": "b0c31ffc955542e2",
+      "sha": "3121ec117d5eaa92",
       "date": "2026-10-10"
     },
     "/groups/historical/": {
-      "sha": "97fec7f92f7260f2",
+      "sha": "70f2e2df4ca6405c",
       "date": "2026-10-10"
     },
     "/groups/hvac/": {
-      "sha": "cf352be6c0b306a5",
+      "sha": "4f520a1286cffd0c",
       "date": "2026-10-10"
     },
     "/groups/kitchen/": {
-      "sha": "8d696a430511a03c",
+      "sha": "a7622a69fa8c9222",
       "date": "2026-10-10"
     },
     "/groups/lab/": {
-      "sha": "8a4f4473c91fab5d",
+      "sha": "eeb6c8ba7dcc8c95",
       "date": "2026-10-10"
     },
     "/groups/mechanic/": {
-      "sha": "f2f7bcdd8e99aa01",
+      "sha": "dba33651d47e4e50",
       "date": "2026-10-10"
     },
     "/groups/plumbing/": {
-      "sha": "c872e84f1de845cf",
+      "sha": "267d8316204a784a",
       "date": "2026-10-10"
     },
     "/groups/real-estate/": {
-      "sha": "fbeeef27bf2d402f",
+      "sha": "53fe51d7fb0cc60a",
       "date": "2026-10-10"
     },
     "/groups/references/": {
-      "sha": "e7d08994df7bf41e",
+      "sha": "4d077a27eb0257f3",
       "date": "2026-10-10"
     },
     "/groups/restoration/": {
-      "sha": "143c3cdd4cdfb9a5",
+      "sha": "59041fd9e9db14f5",
       "date": "2026-10-10"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "20e4f745207f0ca6",
+      "sha": "c9ddc75254cd0afa",
       "date": "2026-10-10"
     },
     "/groups/stage/": {
-      "sha": "92dcdbc2634bfba1",
+      "sha": "3966b5be1ab9543d",
       "date": "2026-10-10"
     },
     "/groups/trucking/": {
-      "sha": "8b7d36fbc3446291",
+      "sha": "59589c6bdd4cfdd3",
       "date": "2026-10-10"
     },
     "/groups/water/": {
-      "sha": "a8d9d2e9255038a0",
+      "sha": "7a0e8fb987ac0615",
       "date": "2026-10-10"
     },
     "/tools/aav-install-check/": {
@@ -3217,6 +3217,10 @@
       "sha": "4d4112d256fcb971",
       "date": "2026-10-03"
     },
+    "/tools/friction-hoist-traction/": {
+      "sha": "667d9eb879a305ec",
+      "date": "2026-10-10"
+    },
     "/tools/friction-loss/": {
       "sha": "3616cc982eb6c972",
       "date": "2026-10-07"
@@ -3782,8 +3786,8 @@
       "date": "2026-09-29"
     },
     "/tools/hoist-rope-safety-factor/": {
-      "sha": "cf40c85a466cb177",
-      "date": "2026-10-01"
+      "sha": "21c4b1d18008340d",
+      "date": "2026-10-10"
     },
     "/tools/hoistway-venting/": {
       "sha": "b946d2e69b02b22c",
@@ -6550,8 +6554,8 @@
       "date": "2026-10-03"
     },
     "/tools/rope-safety-factor/": {
-      "sha": "caae3a79e901ad21",
-      "date": "2026-10-03"
+      "sha": "0efc4ab4562c2631",
+      "date": "2026-10-10"
     },
     "/tools/rotary-phase-converter-sizing/": {
       "sha": "1cdad3c81d90820d",

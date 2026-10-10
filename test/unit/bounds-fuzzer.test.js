@@ -59240,3 +59240,28 @@ test("bounds: a required input left out is an error, not an answer (undefined sl
   assert.ok("error" in _shU({ refrigerant: "R-410A", system_pressure_psig: 118, mode: "superheat" }));
   assert.ok(!("error" in _shU({ refrigerant: "R-410A", system_pressure_psig: 118, line_temperature_F: 50, mode: "superheat" })));
 });
+
+import { computeFrictionHoistTraction as _fht } from "../../calc-mining.js";
+test("bounds: friction-hoist-traction follows the capstan limit and statics", () => {
+  const b = { loaded_conveyance_lb: 20000, payload_lb: 30000, opposite_side_lb: 20000, head_rope_lb_ft: 24, tail_rope_lb_ft: 24, depth_ft: 3000, friction_coefficient: 0.25, wrap_deg: 180, acceleration_ft_s2: 3 };
+  const r = _fht(b);
+  assert.ok(Math.abs(r.slip_limit_ratio - Math.exp(0.25 * Math.PI)) < 1e-12);
+  assert.ok(Math.abs(r.static_ratio - 122000 / 92000) < 1e-12);
+  const k = 3 / 32.174;
+  assert.ok(Math.abs(r.dynamic_ratio - (122000 * (1 + k)) / (92000 * (1 - k))) < 1e-12);
+  // Running at the reported slip acceleration lands exactly on the limit.
+  assert.ok(Math.abs(_fht({ ...b, acceleration_ft_s2: r.max_acceleration_ft_s2 }).dynamic_ratio - r.slip_limit_ratio) < 1e-9);
+  // With matched tail ropes both ends of the wind give the same ratio; without them the bottom position governs and slips.
+  const noTail = _fht({ ...b, tail_rope_lb_ft: 0, acceleration_ft_s2: 0 });
+  assert.ok(Math.abs(noTail.static_ratio - 122000 / 20000) < 1e-12);
+  assert.equal(noTail.static_slips, true);
+  assert.equal(noTail.max_acceleration_ft_s2, 0);
+  // More wrap or more friction raises the limit; the tension ratio does not depend on either.
+  assert.ok(_fht({ ...b, wrap_deg: 220 }).slip_limit_ratio > r.slip_limit_ratio);
+  assert.equal(_fht({ ...b, friction_coefficient: 0.3 }).static_ratio, r.static_ratio);
+  // A counterweight heavier than the loaded side is handled as the heavy side.
+  assert.ok(_fht({ ...b, opposite_side_lb: 80000 }).static_ratio > 1);
+  for (const bad of [{ loaded_conveyance_lb: 0 }, { payload_lb: -1 }, { opposite_side_lb: 0 }, { depth_ft: 0 }, { friction_coefficient: 0 }, { friction_coefficient: 1.2 }, { wrap_deg: 0 }, { wrap_deg: 400 }, { acceleration_ft_s2: 40 }, { head_rope_lb_ft: -1 }]) {
+    assert.ok("error" in _fht({ ...b, ...bad }));
+  }
+});

@@ -928,6 +928,7 @@ export const RENDERER_MAP = {
   "rock-bolt-support-pressure": { module: "../../calc-mining.js", exportName: "MINING_RENDERERS" },
   "blast-fume-clearance-time": { module: "../../calc-mining.js", exportName: "MINING_RENDERERS" },
   "hoist-rope-safety-factor": { module: "../../calc-mining.js", exportName: "MINING_RENDERERS" },
+  "friction-hoist-traction": { module: "../../calc-mining.js", exportName: "MINING_RENDERERS" },
   "hdd-bend-radius": { module: "../../calc-trenchless.js", exportName: "TRENCHLESS_RENDERERS" },
   "hdd-fluid-volume": { module: "../../calc-trenchless.js", exportName: "TRENCHLESS_RENDERERS" },
   "hdd-annular-pressure": { module: "../../calc-trenchless.js", exportName: "TRENCHLESS_RENDERERS" },

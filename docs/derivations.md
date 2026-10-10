@@ -3000,6 +3000,7 @@ cross-check.
 | calc-mining.js | `computeCrusherReductionRatio` | `{ feed_size_in = 0, product_size_in = 0, stages = 2, machine_ratio_low = 3, m...` | _ | _ | _ |
 | calc-mining.js | `computeDustCollectorAirToCloth` | `{ airflow_cfm = 0, bag_count = 0, bag_diameter_in = 0, bag_length_ft = 0, ran...` | _ | _ | _ |
 | calc-mining.js | `computeDustDeflagrationVentArea` | `{ volume_cuft = 0, kst_bar_m_s = 0, pmax_bar = 8, p_red_psig = 0, p_stat_psig...` | _ | _ | _ |
+| calc-mining.js | `computeFrictionHoistTraction` | `{ loaded_conveyance_lb = 0, payload_lb = 0, opposite_side_lb = 0, head_rope_l...` | _ | _ | _ |
 | calc-mining.js | `computeHighwallBenchGeometry` | `{ bench_height_ft = 0, bench_width_ft = 0, face_angle_deg = 0, bench_count = ...` | _ | _ | _ |
 | calc-mining.js | `computeHoistRopeSafetyFactor` | `{ conveyance_lb = 0, people_count = 0, person_weight_lb = 180, rope_length_ft...` | _ | _ | _ |
 | calc-mining.js | `computeMineFaceVentilation` | `{ heading_width_ft = 0, heading_height_ft = 0, fan_airflow_cfm = 0, tubing_ef...` | _ | _ | _ |
@@ -3925,7 +3926,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2509.
+Row count: 2510.
 
 <!-- END function-corpus-v14 -->
 
@@ -4704,7 +4705,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-extraction-rate` | Water Extraction Volume, Time, and Waste-Tank Dumps | Project (first-principles); standing + absorbed; wand time = total / gpm | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+4 more) |
 
-### Group E Construction (627 tiles)
+### Group E Construction (628 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4923,6 +4924,7 @@ per spec-v14 §13.1 second paragraph.
 | `formwork-tie-load` | Formwork Tie Load and Spacing | Formwork tie-load identity (first-pri...; tie load = 600*2*2 = 2,400 lb; util = 2400/3000 = 0.80 (p... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `foundation-waterproofing-takeoff` | Foundation Waterproofing / Dampproofing Takeoff | Foundation waterproofing/dampproofing...; area = 150*8 = 1200; gal = ceil(1200*1.10/50) = ceil(26.4... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `fresh-concrete-temp` | Fresh Concrete Temperature (ACI 305.1) | ACI 305.1 Hot Weather Concreting (bat...; agg 3000 lb@80F, cement 564 lb@150F, water 240 lb@70F, ag... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `friction-hoist-traction` | Friction (Koepe) Hoist Traction and Slip Limit | Project (first-principles); limit e^(0.25 pi) = 2.193; T = 20,000 + 30,000 + 24 x 3,0... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `frost-depth-berggren` | Frost Penetration Depth (Stefan / Modified Berggren) | Stefan / modified-Berggren frost pene...; L = 144*100*0.15 = 2160; X = sqrt(48*1.0*2000/2160) = 6.6... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `garage-door-torsion-spring` | Garage Door Torsion Spring Torque, Turns, and Rate | Project (first-principles); torque = weight x drum radius; rate = torque / turns; rec... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `gas-pipeline-flow` | Gas Pipeline Flow (Weymouth and Panhandle A) | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
@@ -6353,6 +6355,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 
-Tile count: 2255. Fixture-covered or reference-cadence: 2255 / 2255.
+Tile count: 2256. Fixture-covered or reference-cadence: 2256 / 2256.
 
 <!-- END tile-index-v14 -->

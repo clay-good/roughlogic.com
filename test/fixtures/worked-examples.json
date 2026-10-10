@@ -170276,6 +170276,86 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "friction-hoist-traction",
+  "source_publisher": "Project (first-principles)",
+  "source_title": "30,000 lb payload on balanced conveyances at 3,000 ft with matching tail ropes",
+  "source_edition_or_year": "capstan relation and statics",
+  "source_section_or_page": "limit e^(0.25 pi) = 2.193; T = 20,000 + 30,000 + 24 x 3,000 = 122,000 lb against 20,000 + 72,000 = 92,000 lb, ratio 1.326; at 3 ft/s2 122,000 x 1.0932/(92,000 x 0.9068) = 1.599; slips at g (2.193 x 92,000 - 122,000)/(2.193 x 92,000 + 122,000) = 7.93 ft/s2",
+  "verified_by": "rl",
+  "verified_on": "2026-10-09",
+  "inputs": {
+   "loaded_conveyance_lb": 20000,
+   "payload_lb": 30000,
+   "opposite_side_lb": 20000,
+   "head_rope_lb_ft": 24,
+   "tail_rope_lb_ft": 24,
+   "depth_ft": 3000,
+   "friction_coefficient": 0.25,
+   "wrap_deg": 180,
+   "acceleration_ft_s2": 3
+  },
+  "outputs": {
+   "slip_limit_ratio": {
+    "value": 2.1933,
+    "tolerance": {
+     "pct": 0.1
+    }
+   },
+   "static_ratio": {
+    "value": 1.3261,
+    "tolerance": {
+     "pct": 0.1
+    }
+   },
+   "dynamic_ratio": {
+    "value": 1.5988,
+    "tolerance": {
+     "pct": 0.1
+    }
+   },
+   "max_acceleration_ft_s2": {
+    "value": 7.928,
+    "tolerance": {
+     "pct": 0.2
+    }
+   }
+  }
+ },
+ {
+  "tile_id": "friction-hoist-traction",
+  "source_publisher": "Project (first-principles)",
+  "source_title": "The same hoist with no tail ropes",
+  "source_edition_or_year": "capstan relation and statics",
+  "source_section_or_page": "loaded side at the bottom carries all 72,000 lb of head rope: 122,000 lb against 20,000 lb, ratio 6.10, far past the 2.193 limit",
+  "verified_by": "rl",
+  "verified_on": "2026-10-09",
+  "inputs": {
+   "loaded_conveyance_lb": 20000,
+   "payload_lb": 30000,
+   "opposite_side_lb": 20000,
+   "head_rope_lb_ft": 24,
+   "tail_rope_lb_ft": 0,
+   "depth_ft": 3000,
+   "friction_coefficient": 0.25,
+   "wrap_deg": 180,
+   "acceleration_ft_s2": 0
+  },
+  "outputs": {
+   "static_ratio": {
+    "value": 6.1,
+    "tolerance": {
+     "pct": 0.1
+    }
+   },
+   "max_acceleration_ft_s2": {
+    "value": 0,
+    "tolerance": {
+     "abs": 0.001
+    }
+   }
+  }
  }
  ]
 }

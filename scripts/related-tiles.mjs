@@ -1524,6 +1524,7 @@ const RELATED = {
   "rock-bolt-support-pressure": ["highwall-bench-geometry","shotcrete-rebound-quantity","mine-face-ventilation"],
   "blast-fume-clearance-time": ["mine-face-ventilation","blast-powder-factor","confined-space-vent"],
   "hoist-rope-safety-factor": ["wire-rope-strength","rope-safety-factor","wire-rope-stretch"],
+  "friction-hoist-traction": ["hoist-rope-safety-factor","porta-wrap-friction","traction-roping-ratio"],
   // spec-v1596..v1604: the 2026-09-05 trade-expansion trenchless band.
   "hdd-bend-radius": ["hdd-pullback","hdd-fluid-volume","hdd-annular-pressure"],
   "hdd-fluid-volume": ["hdd-annular-pressure","hdd-pullback","annular-grout-volume"],

@@ -1646,6 +1646,7 @@ export const COMPUTE_MAP = {
   "rock-bolt-support-pressure": { module: "../../calc-mining.js", fn: "computeRockBoltSupportPressure" },
   "blast-fume-clearance-time": { module: "../../calc-mining.js", fn: "computeBlastFumeClearanceTime" },
   "hoist-rope-safety-factor": { module: "../../calc-mining.js", fn: "computeHoistRopeSafetyFactor" },
+  "friction-hoist-traction": { module: "../../calc-mining.js", fn: "computeFrictionHoistTraction" },
   // spec-v1596..v1604 trenchless band
   "hdd-bend-radius": { module: "../../calc-trenchless.js", fn: "computeHddBendRadius" },
   "hdd-fluid-volume": { module: "../../calc-trenchless.js", fn: "computeHddFluidVolume" },

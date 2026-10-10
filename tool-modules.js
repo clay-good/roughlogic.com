@@ -737,7 +737,7 @@ export const TOOL_MODULES = (() => {
     "dust-deflagration-vent-area",
     // spec-v1517..v1523, part 2 of the same module.
     "mine-face-ventilation", "pit-dewatering-staging", "highwall-bench-geometry",
-    "rock-bolt-support-pressure", "blast-fume-clearance-time", "hoist-rope-safety-factor",
+    "rock-bolt-support-pressure", "blast-fume-clearance-time", "hoist-rope-safety-factor", "friction-hoist-traction",
   ]);
   // spec-v1596..v1604: the trenchless, HDD and utility locating bench.
   // v1596 and v1604 were cut as duplicates of hdd-pullback and manning-slope,

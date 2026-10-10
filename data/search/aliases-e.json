@@ -6422,6 +6422,11 @@
     {"term":"cet preheat","target":"weld-preheat-cet","kind":"industry"},
     {"term":"hydrogen cracking preheat","target":"weld-preheat-cet","kind":"industry"},
     {"term":"en 1011-2 preheat","target":"weld-preheat-cet","kind":"industry"},
-    {"term":"what preheat do i need for this steel","target":"weld-preheat-cet","kind":"question"}
+    {"term":"what preheat do i need for this steel","target":"weld-preheat-cet","kind":"question"},
+    {"term":"friction hoist traction","target":"friction-hoist-traction","kind":"industry"},
+    {"term":"koepe hoist slip","target":"friction-hoist-traction","kind":"industry"},
+    {"term":"hoist rope slip on the drum","target":"friction-hoist-traction","kind":"industry"},
+    {"term":"koepe wheel tension ratio","target":"friction-hoist-traction","kind":"industry"},
+    {"term":"will my friction hoist ropes slip","target":"friction-hoist-traction","kind":"question"}
   ]
 }

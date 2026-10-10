@@ -874,6 +874,7 @@ const _TILES = [
   ["rock-bolt-support-pressure", "E"],
   ["blast-fume-clearance-time", "E"],
   ["hoist-rope-safety-factor", "E"],
+  ["friction-hoist-traction", "E"],
   // spec-v1596..v1604 trenchless band (v1596 and v1604 CUT as duplicates)
   ["hdd-bend-radius", "E"],
   ["hdd-fluid-volume", "E"],
