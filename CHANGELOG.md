@@ -6,6 +6,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Tests
 
+- **A tolerance wider than its group's ceiling now fails lint unless it says why.** `docs/how-it-works.md` and `docs/correctness.md` both state that no fixture tolerance is wider than its group ceiling without a written justification. `check-cross-validation` only warned, "until the justification fields are added", and three rows on `kitchen-makeup-air-deficit` had none. Those rows compare against a published table that prints pressure to 0.01 in wc, which is a real 1 to 2% of rounding; they now carry that reason in a `tolerance_justification` field, and the warning is an error. Seeded by removing one justification.
+
 - **Three more ranked-first waits in `search-prefill.test.js` get 20 s.** The spec-v1341 prefill tests waited the default 5 s for the first search row and timed out three retries running on a loaded runner (run 38058775183); the run after it passed unchanged. They now use the allowance the query-table cases were given on 2026-10-10.
 
 - **`npm test` checks that every example button loads the example the page prints.** `check-example-parity` compares the two only for tiles that export their example constant; the other 401 were left to a one-minute browser sweep that runs in CI alone, which is where `saturated-steam-properties` was caught. The fake-DOM render sweep already clicks every tile's example button, so it now makes the same comparison for all 2,227 tiles that have both, in about a second. Four tiles register a metric fixture against a US form holding the same example and are listed by name; the list may only shrink. Seeded by changing one tile's example.

@@ -140978,6 +140978,7 @@
    "source_section_or_page": "pp. 21-22, Table 3 \"Maximum Pressure across Different Door Widths\" (total opening force 30 lb, 7 ft door, knob 3 in from the latch edge): 36 in door with a 6 lb closer, max dP 0.4 in wc. The printed relation F = Fd + 5.2 W A dP / (2(W - d)) puts the pressure share at 30 - 6 = 24 lb -- a difference of two printed numbers, the tile omits the closer. Tolerance covers dP printed to 0.01 in wc. Placeholders build the pressure: building_leakage 1 cfm/Pa, hood_exhaust_cfm = 0.4 x 249.089 (Pa), other/makeup/transfer 0.",
    "verified_by": "rl",
    "verified_on": "2026-10-01",
+   "tolerance_justification": "The source prints the maximum pressure to 0.01 in wc and the force as a difference of two whole pounds, so the pressure share carries about 1 to 2% of rounding that is the table's, not the tile's; the tile's own arithmetic reproduces the printed relation exactly.",
    "inputs": {
     "hood_exhaust_cfm": 99.63560000000001,
     "other_exhaust_cfm": 0,
@@ -141004,6 +141005,7 @@
    "source_section_or_page": "pp. 21-22, Table 3 \"Maximum Pressure across Different Door Widths\" (total opening force 30 lb, 7 ft door, knob 3 in from the latch edge): 32 in door with a 6 lb closer, max dP 0.45 in wc. The printed relation F = Fd + 5.2 W A dP / (2(W - d)) puts the pressure share at 30 - 6 = 24 lb -- a difference of two printed numbers, the tile omits the closer. Tolerance covers dP printed to 0.01 in wc. Placeholders build the pressure: building_leakage 1 cfm/Pa, hood_exhaust_cfm = 0.45 x 249.089 (Pa), other/makeup/transfer 0.",
    "verified_by": "rl",
    "verified_on": "2026-10-01",
+   "tolerance_justification": "The source prints the maximum pressure to 0.01 in wc and the force as a difference of two whole pounds, so the pressure share carries about 1 to 2% of rounding that is the table's, not the tile's; the tile's own arithmetic reproduces the printed relation exactly.",
    "inputs": {
     "hood_exhaust_cfm": 112.09005,
     "other_exhaust_cfm": 0,
@@ -141030,6 +141032,7 @@
    "source_section_or_page": "pp. 21-22, Table 3 \"Maximum Pressure across Different Door Widths\" (total opening force 30 lb, 7 ft door, knob 3 in from the latch edge): 36 in door with a 12 lb closer, max dP 0.3 in wc. The printed relation F = Fd + 5.2 W A dP / (2(W - d)) puts the pressure share at 30 - 12 = 18 lb -- a difference of two printed numbers, the tile omits the closer. Tolerance covers dP printed to 0.01 in wc. Placeholders build the pressure: building_leakage 1 cfm/Pa, hood_exhaust_cfm = 0.3 x 249.089 (Pa), other/makeup/transfer 0.",
    "verified_by": "rl",
    "verified_on": "2026-10-01",
+   "tolerance_justification": "The source prints the maximum pressure to 0.01 in wc and the force as a difference of two whole pounds, so the pressure share carries about 1 to 2% of rounding that is the table's, not the tile's; the tile's own arithmetic reproduces the printed relation exactly.",
    "inputs": {
     "hood_exhaust_cfm": 74.7267,
     "other_exhaust_cfm": 0,

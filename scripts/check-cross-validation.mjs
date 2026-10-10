@@ -26,9 +26,11 @@
 //     - Worked-examples file missing (delegated to
 //       check-worked-examples.mjs; this script depends on the file
 //       existing).
-//   WARN (does not fail; scaffolding):
 //     - A tile fixture's tolerance.pct exceeds the per-group ceiling
-//       and the fixture row carries no `tolerance_justification` note.
+//       and the fixture row carries no `tolerance_justification` note
+//       (a warning until 2026-10-10, when the last unjustified rows were
+//       justified).
+//   WARN (does not fail; scaffolding):
 //     - A corpus row whose module is not represented in any fixture
 //       (informational; the function may be a helper that is only
 //       exercised via a tile-level fixture under a different name).
@@ -151,10 +153,14 @@ async function main() {
       if (pct === null) continue;
       toleranceCheckedCount++;
       if (pct > ceiling && !row.tolerance_justification && !(out.tolerance && out.tolerance.justification)) {
-        warnings.push(
+        // An ERROR since 2026-10-10. It was a warning "until the justification
+        // fields are added"; the last three unjustified rows got theirs that
+        // day, so a tolerance wider than its group's ceiling now needs a written
+        // reason to land at all.
+        errors.push(
           "row " + i + " (" + row.tile_id + ", group " + group + "): output '" + name +
           "' tolerance.pct=" + pct + " > group ceiling " + ceiling +
-          "; add tolerance_justification per spec-v14 §14.2.",
+          "; tighten it, or add a tolerance_justification saying why the source cannot be matched closer (spec-v14 §14.2).",
         );
         toleranceWarnCount++;
       }
@@ -230,10 +236,10 @@ async function main() {
     for (const w of warnings) console.warn("WARN: " + w);
     console.warn(
       "v14 cross-validation lint OK with " + warnings.length +
-      " warning(s) (Phase B scaffolding; warnings will graduate to errors once tolerance_justification fields are added per spec-v14 §14.2).",
+      " warning(s).",
     );
   } else {
-    console.log("v14 cross-validation lint OK (" + toleranceWarnCount + " tolerance warnings, 0 errors).");
+    console.log("v14 cross-validation lint OK (every tolerance is inside its group ceiling or carries a written justification; 0 errors).");
   }
 }
 
