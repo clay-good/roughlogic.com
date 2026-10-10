@@ -722,7 +722,10 @@ function introspectInputs(fn) {
         // the compute would read as NaN, so it is left undefined.
         try { def = JSON.parse(raw.replace(/'/g, '"')); } catch { def = undefined; }
       }
-      return { name, default: def };
+      // `hasDefault` separates "no default at all" from "a default that is not a
+      // literal"; both leave `default` undefined, and only the first is a
+      // required input.
+      return { name, default: def, hasDefault: eq !== -1 };
     })
     .filter(Boolean);
 }
@@ -1143,6 +1146,17 @@ export async function outputDisplays(id, inputs) {
   return out;
 }
 
+// The inputs a call left out that the compute cannot fill in: a key the tile's
+// own worked example supplies, absent from the call, whose parameter declares
+// no default. A parameter WITH a default is optional and is never listed.
+function missingInputs(fn, args, exampleRows) {
+  const example = exampleRows && exampleRows[0] ? exampleRows[0].inputs || {} : {};
+  const hasDefault = new Map(introspectInputs(fn).map((p) => [p.name, p.hasDefault]));
+  if (!hasDefault.size) return [];
+  const given = args && typeof args === "object" ? args : {};
+  return Object.keys(example).filter((k) => !(k in given) && hasDefault.get(k) === false);
+}
+
 export async function run({ id, inputs } = {}) {
   const { COMPUTE_MAP, RENDERER_MAP, examples, modCache, byId } = await load();
   if (!byId.has(id)) throw new Error(`unknown calculator id: ${JSON.stringify(id)}. Call search_calculators to find one.`);
@@ -1165,7 +1179,25 @@ export async function run({ id, inputs } = {}) {
   const schema = schemaIfConsistent(await readSchema(id, RENDERER_MAP, modCache), fn);
   if (!usedExample) args = validateSelects(schema, args);
   if (!usedExample) args = coerceNumericStrings(schema, args, examples.get(id));
-  const result = fn({ ...(args || {}) });
+  // A caller can omit any input. A parameter with no default is then
+  // `undefined`, and until 2026-10-09 the door passed that straight through:
+  // five computes threw (voltage-drop with no material), and about 80 more
+  // returned NaN, which JSON prints as null beside whatever verdict string the
+  // compute still built (voltage-drop said "within advisory" for a null drop).
+  // Now a throw becomes an error, a non-finite answer becomes an error, and
+  // every omitted input that has no default is named in a warning.
+  const missing = usedExample ? [] : missingInputs(fn, args, examples.get(id));
+  const missingNote = missing.length ? " Not supplied: " + missing.join(", ") + "." : "";
+  let result;
+  try {
+    result = fn({ ...(args || {}) });
+  } catch (e) {
+    result = { error: "The calculator could not run on these inputs (" + String(e && e.message ? e.message : e) + ")." + missingNote + " Call describe_calculator for the inputs it needs." };
+  }
+  if (result && typeof result === "object" && !result.error) {
+    const bad = Object.entries(result).filter(([, v]) => typeof v === "number" && !Number.isFinite(v)).map(([k]) => k);
+    if (bad.length) result = { error: "The calculator did not produce a finite value for " + bad.join(", ") + "." + missingNote + " Call describe_calculator for the inputs it needs." };
+  }
   const out = { id, inputs: args || {}, usedExample, result };
   // spec-v1189: alongside the raw result, the rendered outputs a person sees —
   // each with its unit and the formatted display string.
@@ -1214,7 +1246,7 @@ export async function run({ id, inputs } = {}) {
   // caller-supplied inputs are checked.
   out.warnings = usedExample
     ? []
-    : validateNumbers(schema, args).concat(
+    : missing.map((key) => ({ key, rule: "missing", message: `"${key}" was not supplied and has no default, so the calculator read it as blank. Call describe_calculator for the inputs it takes.` })).concat(validateNumbers(schema, args)).concat(
       validateKnownKeys(
         fn,
         args,

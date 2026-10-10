@@ -601,6 +601,54 @@ test("run_calculator: yes/no/on/off/1/0 for a boolean answer as true/false do, c
   assert.deepEqual(differ, [], "a boolean word was not read as its boolean:\n  " + differ.join("\n  "));
 });
 
+// A caller can leave any input out. A parameter with no default is then
+// undefined: five computes threw (voltage-drop with no material) and about 80
+// returned NaN, which JSON prints as null -- voltage-drop still said "within
+// advisory" beside a null drop. With each input of each first worked example
+// omitted in turn, the door must not throw and must never hand back a
+// non-finite number, and an omitted input that has no default must be named.
+test("run_calculator: an omitted input never throws or returns a non-finite number, catalog-wide", async () => {
+  const { run } = await import("../../mcp/catalog.mjs");
+  const { readFile } = await import("node:fs/promises");
+  const { COMPUTE_MAP } = await import("../fixtures/compute-map.js");
+  const { rows } = JSON.parse(await readFile(new URL("../fixtures/worked-examples.json", import.meta.url), "utf8"));
+  const first = new Map();
+  for (const r of rows) if (!first.has(r.tile_id) && COMPUTE_MAP[r.tile_id]) first.set(r.tile_id, r.inputs);
+  const bad = [];
+  let named = 0;
+  for (const [id, inputs] of first) {
+    for (const key of Object.keys(inputs)) {
+      const rest = { ...inputs };
+      delete rest[key];
+      if (!Object.keys(rest).length) continue; // an empty call runs the worked example
+      let r;
+      try { r = await run({ id, inputs: rest }); } catch (e) { bad.push(`${id}::${key} threw ${String(e.message).slice(0, 40)}`); continue; }
+      const res = r.result || {};
+      for (const [k, v] of Object.entries(res)) if (typeof v === "number" && !Number.isFinite(v)) { bad.push(`${id}::${key} returned ${k}=${v}`); break; }
+      if ((r.warnings || []).some((w) => w.rule === "missing" && w.key === key)) named++;
+    }
+  }
+  assert.deepEqual(bad, [], "an omitted input threw or returned a non-finite number:\n  " + bad.slice(0, 40).join("\n  "));
+  assert.ok(named > 100, "expected omitted no-default inputs to be named in a warning, got " + named);
+});
+
+test("run_calculator: voltage-drop with an input left out is an error that names it", async () => {
+  const { run } = await import("../../mcp/catalog.mjs");
+  const full = { source_voltage_V: 120, length_ft: 150, awg: "12", current_A: 20, material: "copper", phase: "single" };
+  const noLength = { ...full }; delete noLength.length_ft;
+  const a = await run({ id: "voltage-drop", inputs: noLength });
+  assert.match(a.result.error, /finite value/);
+  assert.match(a.result.error, /length_ft/);
+  assert.ok(a.warnings.some((w) => w.rule === "missing" && w.key === "length_ft"));
+  const noMaterial = { ...full }; delete noMaterial.material;
+  const b = await run({ id: "voltage-drop", inputs: noMaterial });
+  assert.match(b.result.error, /could not run/);
+  // A complete call is unchanged and carries no missing warning.
+  const c = await run({ id: "voltage-drop", inputs: full });
+  assert.ok(Number.isFinite(c.result.drop_V));
+  assert.ok(!c.warnings.some((w) => w.rule === "missing"));
+});
+
 // A typed select is checked against its options. A string input the schema
 // does NOT type as a select (a compute-sourced tile, or a param the extractor
 // could not map) reaches the compute as sent, and four computes fell back to a
