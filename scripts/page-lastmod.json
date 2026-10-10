@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "28a2501112b74642",
+      "sha": "63f44308fc22be6d",
       "date": "2026-10-10"
     },
     "/tools/": {
@@ -6178,8 +6178,8 @@
       "date": "2026-10-03"
     },
     "/tools/rc-slender-column-magnify/": {
-      "sha": "b6d1ff489bae8fef",
-      "date": "2026-09-29"
+      "sha": "af253fe7292e1810",
+      "date": "2026-10-10"
     },
     "/tools/rc-tbeam-flexure/": {
       "sha": "badd7bc8df2fdbae",
@@ -6982,12 +6982,12 @@
       "date": "2026-09-29"
     },
     "/tools/shear-stud-strength/": {
-      "sha": "9f68cf6d97325fd5",
-      "date": "2026-09-29"
+      "sha": "f8b782baadabbd9b",
+      "date": "2026-10-10"
     },
     "/tools/shearwall-deflection/": {
-      "sha": "2bafb44608fa85af",
-      "date": "2026-09-29"
+      "sha": "acb0b1e9c3fbb886",
+      "date": "2026-10-10"
     },
     "/tools/shearwall-overturning/": {
       "sha": "bbd5cb7f872cbaba",
@@ -7126,8 +7126,8 @@
       "date": "2026-10-03"
     },
     "/tools/slip-critical-with-tension/": {
-      "sha": "9cd8fb7c532498b9",
-      "date": "2026-10-03"
+      "sha": "290befae7c4b6af9",
+      "date": "2026-10-10"
     },
     "/tools/slope/": {
       "sha": "4e2bdb03e709e8d9",
@@ -7722,8 +7722,8 @@
       "date": "2026-09-29"
     },
     "/tools/steel-floor-vibration/": {
-      "sha": "25730af95250d39c",
-      "date": "2026-09-29"
+      "sha": "2af28d47c90cbe76",
+      "date": "2026-10-10"
     },
     "/tools/steel-h1-interaction/": {
       "sha": "77755740b4261add",

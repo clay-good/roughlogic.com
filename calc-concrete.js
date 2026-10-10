@@ -66,7 +66,9 @@ function _simpleRenderer(spec) {
       const params = {};
       for (const f of spec.fields) {
         if (f.kind === "select") params[f.key] = fields[f.key].select.value;
-        else params[f.key] = Number(fields[f.key].input.value) || 0;
+        // A field marked `required` passes null when blank, so the compute can
+        // ask for it. Blank must not become 0 where 0 is a real value (0 F).
+        else params[f.key] = f.required && fields[f.key].input.value === "" ? null : Number(fields[f.key].input.value) || 0;
       }
       const r = spec.compute(params);
       if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }
@@ -299,7 +301,7 @@ export function computeRcColumnSteelForLoad({ target_load_kip = 0, b_in = 0, h_i
   if (!(target > 0)) return { error: "Target factored axial load must be positive (kip)." };
   if (!(b > 0) || !(h > 0)) return { error: "Column dimensions must be positive (in)." };
   if (!(fc > 0) || !(fy > 0)) return { error: "Concrete and steel strengths must be positive (psi)." };
-  if (!(fy > 0.85 * fc)) return { error: "Steel yield must exceed 0.85 f'c." };
+  if (!(Math.min(fy, 80000) > 0.85 * fc)) return { error: "Steel yield (capped at 80,000 psi in Po) must exceed 0.85 f'c." };
   const ag_in2 = b * h;
   const fyc = Math.min(fy, 80000); // ACI 318-19 22.4.2.1 caps fy at 80 ksi in Po, as the forward tile does
   const ast_strength = (target * 1000 / 0.52 - 0.85 * fc * ag_in2) / (fyc - 0.85 * fc);
@@ -361,6 +363,7 @@ export function computeRcPunchingShear({ c1_in = 0, c2_in = 0, d_in = 0, fc_psi 
   if (!(d_in > 0)) return { error: "Effective slab depth must be positive (in)." };
   if (!(fc_psi > 0)) return { error: "Concrete strength must be positive (psi)." };
   if (!(lambda > 0 && lambda <= 1)) return { error: "The lightweight factor lambda is over 0 and up to 1.0." };
+  if (position !== "interior" && position !== "edge" && position !== "corner") return { error: "Column position must be interior, edge, or corner." };
   const alpha_s = position === "edge" ? 30 : (position === "corner" ? 20 : 40);
   // The critical section sits d/2 from the column faces, and a slab edge cuts
   // it off (ACI 318-19 22.6.4): interior four sides, edge three sides (c1
@@ -448,7 +451,7 @@ export function computeRcOneWayShear({ fc_psi = 4000, bw_in = 0, d_in = 0, as_in
 export const rcOneWayShearExample = { inputs: { fc_psi: 4000, bw_in: 12, d_in: 16, as_in2: 1.0, vu_kip: 0, lambda: 1.0 } };
 
 CONCRETE_RENDERERS["rc-one-way-shear"] = _simpleRenderer({
-  citation: "Citation: ACI 318-19 Table 22.5.5.1(c) one-way shear Vc = 8 lambda_s lambda (rho_w)^(1/3) sqrt(f'c) bw d for a member without at least minimum shear reinforcement, the 22.5.5.1.3 size-effect factor lambda_s = sqrt(2/(1 + d/10)) <= 1.0, the 22.5.3.1 sqrt(f'c) <= 100 psi cap, and phi = 0.75, by name. No axial load; the stirrup-reinforced case is rc-beam-shear. A design aid, not a substitute for the engineer of record.",
+  citation: "Citation: ACI 318-19 Table 22.5.5.1(c) one-way shear Vc = 8 lambda_s lambda (rho_w)^(1/3) sqrt(f'c) bw d for a member without at least minimum shear reinforcement, the 22.5.5.1.3 size-effect factor lambda_s = sqrt(2/(1 + d/10)) <= 1.0, the 22.5.3.1 sqrt(f'c) <= 100 psi cap, and phi = 0.75, by name. Axial load enters as Nu/(6 Ag) when entered; the stirrup-reinforced case is rc-beam-shear. A design aid, not a substitute for the engineer of record.",
   example: rcOneWayShearExample.inputs,
   fields: [
     { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number" },
@@ -558,6 +561,10 @@ export function computeRcHookDevelopment({ db_in = 0, fy_psi = 60000, fc_psi = 4
   if (!(psi_e > 0) || !(psi_r > 0) || !(psi_o > 0)) return { error: "Modification factors must be positive (1.0 is the base)." };
   if (!(lambda > 0 && lambda <= 1)) return { error: "The lightweight factor lambda is over 0 and up to 1.0." };
   if (joint !== "general" && joint !== "smf") return { error: "Joint must be general (25.4.3) or a special moment frame joint (18.8.5)." };
+  // For hooked bars lambda is 0.75 for ANY lightweight concrete (Table 25.4.3.2 and
+  // 18.8.5.1), not the 19.2.4 value: a sand-lightweight 0.85 entered here used to
+  // pass through and gave a hook 12% short.
+  if (lambda < 1) lambda = 0.75;
   // 25.4.1.4 caps sqrt(f'c) at 100 psi in development-length calculations; in
   // the denominator, the cap lengthens ldh above f'c = 10,000 psi (conservative).
   const sqrt_fc = Math.min(Math.sqrt(fc_psi), 100);
@@ -680,7 +687,7 @@ export function computeRcSlabMinThickness({ l_ft = 0, support = "simply", member
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(l_ft > 0)) return { error: "Span must be positive (ft)." };
   if (!(fy_psi > 0)) return { error: "Steel yield fy must be positive (psi)." };
-  if (!(wc_pcf > 0)) return { error: "Concrete unit weight must be positive (pcf)." };
+  if (!(wc_pcf >= 90)) return { error: "Concrete unit weight must be at least 90 pcf, the lightest concrete the table's lightweight factor covers." };
   // Table 7.3.1.1 (one-way slabs) and Table 9.3.1.1 (beams) are different rows.
   const denoms = _RC_HMIN_DENOMS[member];
   if (!denoms) return { error: "Member must be slab or beam." };
@@ -781,12 +788,28 @@ export function computeRcDoublyReinforced({ b_in = 0, d_in = 0, dp_in = 0, as_in
   if (!(as_in2 > asp_in2)) return { error: "The tension steel must exceed the compression steel (As > A's) for a net tension couple." };
   if (!(fc_psi > 0) || !(fy_psi > 0)) return { error: "Concrete and steel strengths must be positive (psi)." };
   const beta1 = _RC_BETA1(fc_psi);
-  const a_in = ((as_in2 - asp_in2) * fy_psi) / (0.85 * fc_psi * b_in);
-  const c_in = a_in / beta1;
-  const eps_y = fy_psi / 29e6; // eps_ty = fy/Es, the yield (compression-controlled) strain
+  const Es = 29e6;
+  const eps_y = fy_psi / Es; // eps_ty = fy/Es, the yield (compression-controlled) strain
+  // Strain compatibility, both steels at their own stress. The closed form
+  // a = (As - A's) fy / (0.85 f'c b) assumes BOTH yield, and until 2026-10-10 it was
+  // used whatever the strains said: a heavily reinforced section whose tension
+  // steel had not yielded still got fy (9% high at As 12, A's 1 on a 14 x 22 beam),
+  // and a neutral axis below the tension steel still returned a capacity. The
+  // force balance 0.85 f'c b beta1 c + A's fs' = As fs is solved for c by
+  // bisection; where both steels yield it returns the closed form exactly.
+  const fsAt = (c) => Math.min(fy_psi, Es * 0.003 * (d_in - c) / c);
+  const fspAt = (c) => Math.max(-fy_psi, Math.min(fy_psi, Es * 0.003 * (c - dp_in) / c));
+  const unbalanced = (c) => 0.85 * fc_psi * b_in * beta1 * c + asp_in2 * fspAt(c) - as_in2 * fsAt(c);
+  let lo = 1e-6, hi = d_in;
+  for (let i = 0; i < 200; i++) { const mid = (lo + hi) / 2; if (unbalanced(mid) > 0) hi = mid; else lo = mid; }
+  const c_in = (lo + hi) / 2;
+  const a_in = beta1 * c_in;
+  const fs_psi = fsAt(c_in), fsp_psi = fspAt(c_in);
   const eps_sp = 0.003 * (c_in - dp_in) / c_in;
   const eps_t = 0.003 * (d_in - c_in) / c_in;
-  const comp_yields = eps_sp >= eps_y;
+  const tension_yields = eps_t >= eps_y * (1 - 1e-9);
+  // With no compression steel there is nothing to yield; the check does not apply.
+  const comp_yields = asp_in2 > 0 ? eps_sp >= eps_y * (1 - 1e-9) : true;
   // ACI 318-19 21.2.2 / Table 21.2.2: the tension-controlled limit is eps_ty +
   // 0.003 and the transition denominator is 0.003 - NOT the fixed 0.005 of
   // 318-14. They coincide only near Grade 60 (eps_ty ~ 0.00207); for Grade 80
@@ -795,11 +818,12 @@ export function computeRcDoublyReinforced({ b_in = 0, d_in = 0, dp_in = 0, as_in
   const tc_limit = eps_y + 0.003;
   const tension_controlled = eps_t >= tc_limit;
   const phi = tension_controlled ? 0.90 : (eps_t <= eps_y ? 0.65 : 0.65 + 0.25 * (eps_t - eps_y) / 0.003);
-  const mn_lbin = (as_in2 - asp_in2) * fy_psi * (d_in - a_in / 2) + asp_in2 * fy_psi * (d_in - dp_in);
+  // Moments of the concrete block and the compression steel about the tension steel.
+  const mn_lbin = 0.85 * fc_psi * b_in * a_in * (d_in - a_in / 2) + asp_in2 * fsp_psi * (d_in - dp_in);
   const mn_kipft = mn_lbin / 12000;
   const phi_mn_kipft = phi * mn_kipft;
   return {
-    a_in, c_in, beta1, eps_sp, eps_t, eps_y, tc_limit, comp_yields, tension_controlled, phi, mn_kipft, phi_mn_kipft,
+    a_in, c_in, beta1, eps_sp, eps_t, eps_y, tc_limit, comp_yields, tension_yields, fs_psi, fsp_psi, tension_controlled, phi, mn_kipft, phi_mn_kipft,
     note: "ACI 318-19 doubly-reinforced rectangular-beam flexure: a = (As - A's) fy / (0.85 f'c b), c = a/beta1, and Mn = (As - A's) fy (d - a/2) + A's fy (d - d') - the singly-reinforced couple plus the steel-to-steel couple. This ASSUMES both steel layers yield (the compression-steel yield check epsilon's = 0.003 (c - d')/c >= fy/Es is flagged when it fails, where a rigorous solution would iterate with f's = Es epsilon's <= fy). The strength-reduction factor phi follows ACI 318-19 21.2.2: tension-controlled (phi = 0.90) at epsilon_t >= epsilon_ty + 0.003, compression-controlled (phi = 0.65) at epsilon_t <= epsilon_ty = fy/Es, and phi = 0.65 + 0.25 (epsilon_t - epsilon_ty)/0.003 between - the 2019 edition replaced the fixed 0.005 tension-controlled limit with epsilon_ty + 0.003, which matters for Grade 80 and 100 steel. Rectangular section (no T-beam flange); minimum steel, bar spacing, and development are not checked. A design aid, not a substitute for the structural engineer of record's stamped design.",
   };
 }
@@ -819,7 +843,7 @@ CONCRETE_RENDERERS["rc-doubly-reinforced"] = _simpleRenderer({
   ],
   outputs: [
     { key: "ac", id: "rdr-out-ac", label: "Stress block a / neutral axis c", value: (r) => fmt(r.a_in, 2) + " / " + fmt(r.c_in, 2) + " in" },
-    { key: "yld", id: "rdr-out-yld", label: "Compression steel yields?", value: (r) => (r.comp_yields ? "yes (epsilon's " + fmt(r.eps_sp, 5) + " >= " + fmt(r.eps_y, 5) + ")" : "NO - both-yield assumption not met; result unconservative") },
+    { key: "yld", id: "rdr-out-yld", label: "Compression steel yields?", value: (r) => (r.comp_yields ? "yes (epsilon's " + fmt(r.eps_sp, 5) + " >= " + fmt(r.eps_y, 5) + ")" : "no - it is at " + fmt(r.fsp_psi / 1000, 1) + " ksi, and the capacity is computed at that stress") + (r.tension_yields ? "" : "; THE TENSION STEEL HAS NOT YIELDED (" + fmt(r.fs_psi / 1000, 1) + " ksi): the section is compression-controlled and over-reinforced") },
     { key: "tc", id: "rdr-out-tc", label: "Section (phi)", value: (r) => (r.tension_controlled ? "tension-controlled (phi 0.90)" : "transition (phi " + fmt(r.phi, 3) + ")") + ", epsilon_t " + fmt(r.eps_t, 4) },
     { key: "mn", id: "rdr-out-mn", label: "Nominal Mn", value: (r) => fmt(r.mn_kipft, 1) + " kip-ft" },
     { key: "pm", id: "rdr-out-pm", label: "Design phi Mn", value: (r) => fmt(r.phi_mn_kipft, 1) + " kip-ft" },
@@ -1490,7 +1514,18 @@ export function computeConcreteLongtermDefl({ immediate_defl_in = 0, duration_mo
   if (di < 0) return { error: "Immediate deflection cannot be negative (in)." };
   if (!(mo > 0)) return { error: "Sustained-load duration must be positive (months)." };
   if (rho < 0) return { error: "Compression-steel ratio cannot be negative." };
-  const xi = mo >= 60 ? 2.0 : mo >= 12 ? 1.4 : mo >= 6 ? 1.2 : 1.0;
+  if (rho > 0.08) return { error: "The compression-steel ratio is a fraction (0.01 for 1%), and no more than 0.08." };
+  // Table 24.2.4.1.3 gives xi at 3, 6, 12 and 60 months or more: 1.0, 1.2, 1.4,
+  // 2.0. Between those points it rises (Fig. R24.2.4.1), so stepping down to the
+  // last table point understated a 3 to 5 year deflection by up to 30% (1.4 at
+  // 59 months, 2.0 at 60). Interpolated here on the logarithm of time, which
+  // tracks the figure; under 3 months the 3-month value is kept, which is high.
+  const XI = [[3, 1.0], [6, 1.2], [12, 1.4], [60, 2.0]];
+  let xi = mo >= 60 ? 2.0 : 1.0;
+  for (let i = 0; i < XI.length - 1; i++) {
+    const [m0, x0] = XI[i], [m1, x1] = XI[i + 1];
+    if (mo >= m0 && mo < m1) xi = x0 + (x1 - x0) * Math.log(mo / m0) / Math.log(m1 / m0);
+  }
   const lambda = xi / (1 + 50 * rho);
   const additional_defl_in = lambda * di;
   const total_defl_in = di + additional_defl_in;
@@ -1773,7 +1808,8 @@ export function computeRcSlenderColumnMagnify({ factored_axial_kip = 0, end_mome
   if (!(lu > 0)) return { error: "Unbraced length must be positive (ft)." };
   if (!(k > 0)) return { error: "Effective-length factor k must be positive." };
   if (!(EI > 0)) return { error: "Effective stiffness EI must be positive (kip-in^2)." };
-  if (h < 0) return { error: "Column dimension h cannot be negative (in)." };
+  if (!(h > 0)) return { error: "Enter the column dimension h in the direction of bending (in); the minimum moment M2,min = Pu (0.6 + 0.03 h) needs it." };
+  if (Math.abs(M1) > M2 * (1 + 1e-9)) return { error: "M1 is the SMALLER end moment in magnitude; it cannot exceed M2. Swap them." };
   // ACI 318-19 Eq. 6.6.4.5.3a: Cm = 0.6 - 0.4 M1/M2, with M1/M2 NEGATIVE for single curvature and no
   // lower bound. Until 2026-09-25 this was the ACI 318-05 form (0.6 + 0.4 M1/M2 >= 0.4, positive for single
   // curvature) under a 318-19 citation, so a single-curvature M1 entered the 318-19 way halved Cm.
@@ -1783,9 +1819,14 @@ export function computeRcSlenderColumnMagnify({ factored_axial_kip = 0, end_mome
   if (Pu >= 0.75 * pc_kip) return { error: "Axial load is at or above 0.75 x Pc - the column has buckled; increase the section or reduce the length." };
   const delta_ns = Math.max(cm / (1 - Pu / (0.75 * pc_kip)), 1.0);
   const m2_min_kft = Pu * (0.6 + 0.03 * h) / 12;
-  const mc_kft = Math.max(delta_ns * M2, m2_min_kft);
+  // 6.6.4.5.4: M2 in Mc = delta M2 shall be at least M2,min -- the floor goes on
+  // M2 BEFORE it is magnified. Until 2026-10-10 this was max(delta M2, M2,min),
+  // which leaves a small end moment under a large magnifier unamplified (44% low
+  // at Pu 200, M2 10, delta 2.03).
+  const m2_used_kft = Math.max(M2, m2_min_kft);
+  const mc_kft = delta_ns * m2_used_kft;
   return {
-    cm, pc_kip, delta_ns, m2_min_kft, mc_kft,
+    cm, pc_kip, delta_ns, m2_min_kft, m2_used_kft, mc_kft,
     note: "The critical buckling load Pc carries a 0.75 stiffness reduction in the denominator; the design moment is floored at M2,min = Pu(0.6 + 0.03h). A column just over the slenderness limit k lu/r <= 34 + 12(M1/M2) (ACI 318-19 Eq. 6.2.5.1b) picks up a magnifier the flexure check never applies. In ACI 318-19, M1/M2 is NEGATIVE for single curvature (Cm up to 1.0) and positive for double curvature (which lowers Cm, to 0.2 at M1 = M2) -- the reverse of the pre-2014 sign convention. ACI 318 and the engineer of record govern.",
   };
 }
@@ -1793,7 +1834,7 @@ export function computeRcSlenderColumnMagnify({ factored_axial_kip = 0, end_mome
 export const rcSlenderColumnMagnifyExample = { inputs: { factored_axial_kip: 200, end_moment_m2_kft: 80, end_moment_m1_kft: -50, unbraced_len_ft: 14, eff_length_k: 1.0, eff_stiffness_ei: 1500000, column_dim_h_in: 16 } };
 
 CONCRETE_RENDERERS["rc-slender-column-magnify"] = _simpleRenderer({
-  citation: "Citation: ACI 318-19 Section 6.6.4.5 nonsway (braced) moment magnifier: Cm = 0.6 - 0.4 M1/M2 (M1/M2 negative for single curvature, per 318-19); Pc = pi^2 EI / (k lu)^2; delta_ns = max(Cm / (1 - Pu/(0.75 Pc)), 1.0); Mc = max(delta_ns M2, M2,min), M2,min = Pu(0.6 + 0.03h). The 0.75 stiffness reduction sits in the denominator; the moment is floored at M2,min. A column just over the slenderness limit picks up an amplifier the flexure check never applies. ACI 318 and the engineer of record govern.",
+  citation: "Citation: ACI 318-19 Section 6.6.4.5 nonsway (braced) moment magnifier: Cm = 0.6 - 0.4 M1/M2 (M1/M2 negative for single curvature, per 318-19); Pc = pi^2 EI / (k lu)^2; delta_ns = max(Cm / (1 - Pu/(0.75 Pc)), 1.0); Mc = delta_ns x max(M2, M2,min) (6.6.4.5.4: the floor applies to M2 before it is magnified), M2,min = Pu(0.6 + 0.03h). The 0.75 stiffness reduction sits in the denominator; the moment is floored at M2,min. A column just over the slenderness limit picks up an amplifier the flexure check never applies. ACI 318 and the engineer of record govern.",
   example: rcSlenderColumnMagnifyExample.inputs,
   fields: [
     { key: "factored_axial_kip", label: "Factored axial load Pu (kip)", kind: "number" },
@@ -1831,6 +1872,7 @@ export function computeConcreteCorbelBracket({ factored_shear_lb = 0, horiz_tens
   if (!(d > 0)) return { error: "Effective depth d must be positive (in)." };
   if (!(b > 0)) return { error: "Width b must be positive (in)." };
   if (!(h > 0)) return { error: "Height h must be positive (in)." };
+  if (h < d) return { error: "The overall height h at the support face cannot be less than the effective depth d." };
   if (!(fc > 0)) return { error: "Concrete strength f'c must be positive (psi)." };
   if (!(fy > 0)) return { error: "Yield strength fy must be positive (psi)." };
   if (!(mu > 0)) return { error: "Shear-friction coefficient must be positive." };
@@ -2264,8 +2306,13 @@ CONCRETE_RENDERERS["concrete-anchor-interaction"] = _simpleRenderer({
 // heat of solids (cement + aggregate) ~0.22 Btu/lb-F and water = 1.0. Free surface moisture on the
 // aggregate is water at the aggregate temperature.
 // dims: in { agg_weight_lb: M, agg_temp_f: T, cement_weight_lb: M, cement_temp_f: T, water_weight_lb: M, water_temp_f: T, agg_moisture_weight_lb: M } out: { concrete_temp_f: T }
-export function computeFreshConcreteTemp({ agg_weight_lb = 0, agg_temp_f = 0, cement_weight_lb = 0, cement_temp_f = 0, water_weight_lb = 0, water_temp_f = 0, agg_moisture_weight_lb = 0 } = {}) {
+export function computeFreshConcreteTemp({ agg_weight_lb = 0, agg_temp_f = null, cement_weight_lb = 0, cement_temp_f = null, water_weight_lb = 0, water_temp_f = null, agg_moisture_weight_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A missing temperature is not 0 F: three ingredients with the water left blank
+  // read 69.7 F, a plausible, cooler-than-real answer on a hot-weather check.
+  for (const [name, v] of [["aggregate", agg_temp_f], ["cement", cement_temp_f], ["mix water", water_temp_f]]) {
+    if (v === null || v === undefined || v === "") return { error: "Enter the " + name + " temperature (F)." };
+  }
   const Wa = Number(agg_weight_lb) || 0;
   const Ta = Number(agg_temp_f);
   const Wc = Number(cement_weight_lb) || 0;
@@ -2295,11 +2342,11 @@ CONCRETE_RENDERERS["fresh-concrete-temp"] = _simpleRenderer({
   example: freshConcreteTempExample.inputs,
   fields: [
     { key: "agg_weight_lb", label: "Aggregate weight (lb)", kind: "number" },
-    { key: "agg_temp_f", label: "Aggregate temperature (°F)", kind: "number", attrs: { step: "any" } },
+    { key: "agg_temp_f", label: "Aggregate temperature (°F)", kind: "number", required: true, attrs: { step: "any" } },
     { key: "cement_weight_lb", label: "Cement weight (lb)", kind: "number" },
-    { key: "cement_temp_f", label: "Cement temperature (°F)", kind: "number", attrs: { step: "any" } },
+    { key: "cement_temp_f", label: "Cement temperature (°F)", kind: "number", required: true, attrs: { step: "any" } },
     { key: "water_weight_lb", label: "Added (mix) water weight (lb)", kind: "number" },
-    { key: "water_temp_f", label: "Mix water temperature (°F)", kind: "number", attrs: { step: "any" } },
+    { key: "water_temp_f", label: "Mix water temperature (°F)", kind: "number", required: true, attrs: { step: "any" } },
     { key: "agg_moisture_weight_lb", label: "Free moisture on aggregate (lb)", kind: "number" },
   ],
   outputs: [
@@ -2445,6 +2492,7 @@ export function computeSlabDowelSchedule({ joint_length_ft = 40, slab_thickness_
   if (!(num_joints >= 1)) return { error: "Number of joints must be at least 1." };
   // One dowel every spacing along the joint, inset from each edge, plus one to start.
   const usable_in = joint_length_ft * 12 - 2 * edge_clearance_in;
+  if (!(usable_in > 0)) return { error: "The two edge clearances take up the whole joint; no dowel fits." };
   const dowels_per_joint = usable_in <= 1e-9 ? 1 : Math.floor(usable_in / dowel_spacing_in + 1e-9) + 1;
   const total_dowels = dowels_per_joint * Math.round(num_joints);
   const dowel_diameter_in = slab_thickness_in / 8;

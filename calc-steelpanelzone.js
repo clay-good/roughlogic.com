@@ -91,6 +91,7 @@ export function computeSteelPanelZoneShear({ fy_ksi = 50, col_depth_dc_in = 0, c
   if (!(dc > 0)) return { error: "Column depth must be positive (in)." };
   if (!(tw > 0)) return { error: "Column web thickness must be positive (in)." };
   if (bcf < 0) return { error: "Column flange width cannot be negative (in)." };
+  if (included && !(bcf > 0 && tcf > 0)) return { error: "With panel-zone deformation in the analysis the flange term needs the column flange width and thickness (in)." };
   if (tf < 0) return { error: "Beam flange thickness cannot be negative (in)." };
   if (!(db > tf)) return { error: "Beam depth must exceed the flange thickness (in)." };
   if (Mf < 0) return { error: "Demand moment cannot be negative (kip-in)." };
@@ -156,7 +157,9 @@ export function computeSteelDoublerPlate({ required_shear_kip = 0, fy_ksi = 50, 
   const shortfall_kip = Math.max(0, Vu - phi_rn_bare_kip);
   const t_strength_in = shortfall_kip / perInch;
   const t_stability_in = (dz + wz) / 90;
-  const needs_doubler = shortfall_kip > 0;
+  // Round-off slack: a demand equal to the bare capacity (183.33 against 183.32999999999998)
+  // is not a shortfall and does not call for a plate.
+  const needs_doubler = shortfall_kip > 1e-9 * Math.max(1, Vu);
   const t_required_in = needs_doubler ? Math.max(t_strength_in, t_stability_in) : 0;
   const t_plate_in = needs_doubler ? Math.ceil(t_required_in * 16 - 1e-9) / 16 : 0;
   const governed_by = !needs_doubler ? "none" : (t_stability_in > t_strength_in ? "stability (AISC 341, (dz + wz) / 90)" : "strength (J10-9 shortfall)");

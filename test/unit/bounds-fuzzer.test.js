@@ -17248,7 +17248,9 @@ test("bounds: spec-v1215 computeSteelCb pins Eq. F1-1, the uniform-moment baseli
   assert.ok(_v1215({ mmax: 100, ma: 50, mb: 100, mc: 50 }).cb > r.cb);
   assert.ok(Math.abs(_v1215({ mmax: 200, ma: 150, mb: 200, mc: 150 }).cb - r.cb) < 1e-12); // doubled magnitude, same Cb
   // Cb is always >= 1 when the quarter moments do not exceed Mmax.
-  for (const t of [[100, 0, 0, 0], [100, 100, 0, 100], [100, 33, 66, 99]]) {
+  // (All three quarter moments zero is a blank form, not a diagram: an error since hardening slice 2.)
+  assert.ok(_v1215({ mmax: 100, ma: 0, mb: 0, mc: 0 }).error);
+  for (const t of [[100, 100, 0, 100], [100, 33, 66, 99]]) {
     assert.ok(_v1215({ mmax: t[0], ma: t[1], mb: t[2], mc: t[3] }).cb >= 1 - 1e-12);
   }
   // Signs are taken as absolute (a reverse-curvature diagram uses magnitudes).
@@ -17943,7 +17945,9 @@ test("bounds: spec-v300 computeRcDoublyReinforced pins the two couples, the yiel
   // ACI 318-19 21.2.2: the tension-controlled limit is eps_ty + 0.003, NOT the
   // fixed 0.005 of 318-14. For Grade 100 a transition section (eps_t = 0.00517)
   // must NOT be classified tension-controlled and must get phi < 0.90.
-  const g100 = _v300({ b_in: 14, d_in: 22, dp_in: 2, as_in2: 8, asp_in2: 3, fc_psi: 8000, fy_psi: 100000 });
+  // As 6.5 (was 8): with the compression steel at its strain-compatible stress (hardening slice 2) the
+  // old section's eps_t fell to 0.0039; this one sits in the window the assertion is about.
+  const g100 = _v300({ b_in: 14, d_in: 22, dp_in: 2, as_in2: 6.5, asp_in2: 3, fc_psi: 8000, fy_psi: 100000 });
   assert.ok(Math.abs(g100.tc_limit - (100000 / 29e6 + 0.003)) < 1e-12);
   assert.ok(g100.eps_t > 0.005 && g100.eps_t < g100.tc_limit); // above the old limit, below the real one
   assert.strictEqual(g100.tension_controlled, false);
@@ -18635,7 +18639,9 @@ test("bounds: spec-v316 computeSteelBoltTensionShear pins the reduction, the cap
   assert.ok(Math.abs(r2.avail_tension_kip - 0.75 * 90 * 0.442) < 1e-9);
   // Full shear floors F'nt at zero.
   const r3 = _v316({ fnt_ksi: 90, fnv_ksi: 54, ab_in2: 0.442, frv_ksi: 54, method: "LRFD" });
-  assert.strictEqual(r3.fpnt_ksi, 0);
+  // A shear demand above the bolt's own available shear (0.75 x 54 = 40.5 ksi) is an error since
+  // hardening slice 2; it used to floor F'nt at 0 and report a zero tension capacity.
+  assert.ok(r3.error);
   // ASD branch uses Omega = 2.00.
   const rA = _v316({ fnt_ksi: 90, fnv_ksi: 54, ab_in2: 0.442, frv_ksi: 10, method: "ASD" });
   assert.ok(Math.abs(rA.fpnt_ksi - Math.min(1.3 * 90 - 2 * 90 / 54 * 10, 90)) < 1e-9);
@@ -28461,7 +28467,8 @@ test("bounds: spec-v634 computeRequiredSectionModulus pins the LRFD/ASD required
   const backA = _v634fwd({ fy: 50, zx: a.zx_req, mu: 0 });
   assert.ok(Math.abs(backA.ma_kipft - 200) < 1e-6);
   // Unknown method defaults to LRFD.
-  assert.equal(_v634({ fy: 50, moment_kipft: 200, method: "xyz" }).method, "lrfd");
+  // An unknown method is an error since hardening slice 2 (it used to fall through to LRFD).
+  assert.ok(_v634({ fy: 50, moment_kipft: 200, method: "xyz" }).error);
   // Error seams: non-finite, non-positive Fy / moment.
   assert.ok("error" in _v634({ fy: 0, moment_kipft: 200 }));
   assert.ok("error" in _v634({ fy: 50, moment_kipft: 0 }));
@@ -59877,4 +59884,82 @@ test("hardening slice 1 (rigging, fall protection, rescue, diving, collapse shor
   assert.ok("error" in _s1Floor({ floor_type: "concrete", slab_thickness_in: 0 }));
   assert.ok(!("error" in _s1Floor({ floor_type: "concrete", slab_thickness_in: 6 })));
   assert.ok("error" in _s1Store({ coverage_fraction: 0 }));
+});
+
+import { computeSteelBoltTensionShear as _s2Bts, computeSteelCb as _s2Cb, computeStaggeredNetWidth as _s2Stag, computeBoltShearBearing as _s2Bsb, computeSteelBeamShear as _s2Shr, computeRequiredSectionModulus as _s2Zx, computeSteelFloorVibration as _s2Vib, computeSteelTensionMember as _s2Ten } from "../../calc-steel.js";
+import { computeSteelDoublerPlate as _s2Dbl, computeSteelPanelZoneShear as _s2Pz } from "../../calc-steelpanelzone.js";
+import { computeRcSlenderColumnMagnify as _s2Slen, computeRcDoublyReinforced as _s2Dr, computeRcHookDevelopment as _s2Hook, computeConcreteCorbelBracket as _s2Corb, computeRcPunchingShear as _s2Punch, computeConcreteLongtermDefl as _s2Lt, computeFreshConcreteTemp as _s2Fct, computeRcColumnSteelForLoad as _s2Col, computeSlabDowelSchedule as _s2Dow } from "../../calc-concrete.js";
+test("hardening slice 2 (structural steel, lateral, concrete part 1): the reviewed defects stay fixed", () => {
+  // steel-bolt-tension-shear: no tension is reported for a bolt already over its shear strength.
+  assert.ok("error" in _s2Bts({ ab_in2: 0.442, frv_ksi: 45 }));
+  assert.ok("error" in _s2Bts({ ab_in2: 0.442, frv_ksi: 30, method: "ASD" }));
+  assert.ok(Math.abs(_s2Bts({ ab_in2: 0.442, frv_ksi: 20 }).fpnt_ksi - (117 - (90 / 40.5) * 20)) < 1e-9);
+  // steel-cb: a blank diagram is not Cb = 5.
+  assert.ok("error" in _s2Cb({ mmax: 100 }));
+  assert.ok(Math.abs(_s2Cb({ mmax: 100, ma: 100, mb: 100, mc: 100 }).cb - 1) < 1e-12);
+  // staggered-net-width: a chain of n holes crosses at most n - 1 gage spaces.
+  const stag = { plate_width_in: 12, thickness_in: 0.5, bolt_dia_in: 0.75, gage_in: 3, pitch_in: 2, holes_straight: 2, holes_zigzag: 3 };
+  assert.ok("error" in _s2Stag({ ...stag, gage_spaces_zigzag: 3 }));
+  assert.ok(!("error" in _s2Stag({ ...stag, gage_spaces_zigzag: 2 })));
+  // bolt-shear-bearing: interior tearout can govern; d + 1/8 at 1 in; a hole that breaks the edge is an error.
+  const thin = _s2Bsb({ t_in: 0.25, le_in: 3, s_in: 2 });
+  assert.ok(thin.rn_gov === thin.rn_int && thin.governed_by === "interior tearout/bearing" && thin.rn_gov < thin.rn_shear);
+  assert.ok(Math.abs(_s2Bsb({ d_in: 1, ab_in2: 0.785, le_in: 1.25, t_in: 0.25 }).lc_edge - (1.25 - 1.125 / 2)) < 1e-12);
+  assert.ok(Math.abs(_s2Bsb({ d_in: 0.75, le_in: 1.5 }).lc_edge - (1.5 - 0.8125 / 2)) < 1e-12);
+  assert.ok("error" in _s2Bsb({ le_in: 0.3 }) && "error" in _s2Bsb({ le_in: 0 }) && "error" in _s2Bsb({ s_in: 0.5 }));
+  // steel-beam-shear: Cv1 cannot exceed 1, and Omega is one of the two code values.
+  const w = { fy: 50, d: 17.99, tw: 0.355 };
+  assert.ok("error" in _s2Shr({ ...w, cv1: 1.5 }) && "error" in _s2Shr({ ...w, omega_v: 1.0 }) && "error" in _s2Shr({ ...w, omega_v: 1.6 }));
+  assert.ok(Math.abs(_s2Shr({ ...w, cv1: 1, omega_v: 1.5 }).va - 0.6 * 50 * 17.99 * 0.355 / 1.5) < 1e-9);
+  assert.ok("error" in _s2Zx({ fy: 50, moment_kipft: 200, method: "ASD" }));
+  assert.ok(Math.abs(_s2Zx({ fy: 50, moment_kipft: 200, method: "asd" }).zx_req - 12 * 1.67 * 200 / 50) < 1e-9);
+  // steel-floor-vibration: a frequency outside 3 to 9 Hz is flagged.
+  assert.equal(_s2Vib({ natural_freq_hz: 2, effective_wt_lb: 300000 }).in_range, false);
+  assert.equal(_s2Vib({ natural_freq_hz: 12, effective_wt_lb: 300000 }).in_range, false);
+  assert.equal(_s2Vib({ natural_freq_hz: 5, effective_wt_lb: 30000 }).in_range, true);
+  // steel-tension-member: the label follows each method where they disagree.
+  assert.match(_s2Ten({ ag_in2: 10, fy: 50, fu: 59.95, nh: 0 }).governs, /ASD: gross-section yielding governs; LRFD: net-section rupture governs/);
+  // steel-doubler-plate: demand equal to capacity needs no plate.
+  assert.equal(_s2Dbl({ required_shear_kip: 183.33, fy_ksi: 50, col_depth_dc_in: 14, col_web_tw_in: 0.485, pz_depth_dz_in: 22.64, pz_width_wz_in: 12.44 }).needs_doubler, false);
+  assert.equal(_s2Dbl({ required_shear_kip: 190, fy_ksi: 50, col_depth_dc_in: 14, col_web_tw_in: 0.485, pz_depth_dz_in: 22.64, pz_width_wz_in: 12.44 }).needs_doubler, true);
+  // rc-slender-column-magnify: the minimum moment is magnified too.
+  const sl = _s2Slen({ factored_axial_kip: 200, end_moment_m2_kft: 10, end_moment_m1_kft: -10, unbraced_len_ft: 14, eff_length_k: 1, eff_stiffness_ei: 1500000, column_dim_h_in: 16 });
+  assert.ok(Math.abs(sl.mc_kft - sl.delta_ns * 18) < 1e-9 && sl.mc_kft > 36);
+  const big = _s2Slen({ factored_axial_kip: 200, end_moment_m2_kft: 80, end_moment_m1_kft: -50, unbraced_len_ft: 14, eff_length_k: 1, eff_stiffness_ei: 1500000, column_dim_h_in: 16 });
+  assert.ok(Math.abs(big.mc_kft - big.delta_ns * 80) < 1e-9);
+  assert.ok("error" in _s2Slen({ factored_axial_kip: 200, end_moment_m2_kft: 80, end_moment_m1_kft: 200, unbraced_len_ft: 14, eff_stiffness_ei: 1500000, column_dim_h_in: 16 }));
+  assert.ok("error" in _s2Slen({ factored_axial_kip: 200, end_moment_m2_kft: 80, end_moment_m1_kft: -50, unbraced_len_ft: 14, eff_stiffness_ei: 1500000 }));
+  // rc-doubly-reinforced: strain compatibility. Both yielding reproduces the closed form...
+  const ok = _s2Dr({ b_in: 14, d_in: 22, dp_in: 2, as_in2: 8, asp_in2: 3 });
+  const a = (8 - 3) * 60000 / (0.85 * 4000 * 14);
+  assert.ok(ok.tension_yields && ok.comp_yields && Math.abs(ok.mn_kipft - ((8 - 3) * 60000 * (22 - a / 2) + 3 * 60000 * 20) / 12000) < 1e-6);
+  // ...an over-reinforced section is computed at the stress its tension steel really has...
+  const over = _s2Dr({ b_in: 14, d_in: 22, dp_in: 2, as_in2: 12, asp_in2: 1 });
+  assert.ok(over.tension_yields === false && over.fs_psi < 60000 && Math.abs(over.mn_kipft - 851.2) < 0.5 && over.phi === 0.65);
+  // ...forces balance in every case, and the neutral axis never passes the tension steel.
+  for (const [As, Asp] of [[4, 0], [8, 3], [12, 1], [20, 1], [6, 5.5]]) {
+    const r = _s2Dr({ b_in: 14, d_in: 22, dp_in: 2, as_in2: As, asp_in2: Asp });
+    assert.ok(r.c_in > 0 && r.c_in < 22 && r.mn_kipft > 0, As + "/" + Asp);
+    assert.ok(Math.abs(0.85 * 4000 * 14 * r.a_in + Asp * r.fsp_psi - As * r.fs_psi) < 1, "force balance " + As + "/" + Asp);
+  }
+  assert.equal(_s2Dr({ b_in: 14, d_in: 22, dp_in: 2, as_in2: 4, asp_in2: 0 }).comp_yields, true);
+  // rc-hook-development: any lightweight concrete takes lambda 0.75.
+  assert.ok(Math.abs(_s2Hook({ db_in: 1, lambda: 0.85, joint: "smf" }).ldh_in - _s2Hook({ db_in: 1, lambda: 0.75, joint: "smf" }).ldh_in) < 1e-12);
+  assert.ok(Math.abs(_s2Hook({ db_in: 1, lambda: 0.85 }).ldh_in - _s2Hook({ db_in: 1, lambda: 0.75 }).ldh_in) < 1e-12);
+  assert.ok(_s2Hook({ db_in: 1, lambda: 0.85 }).ldh_in > _s2Hook({ db_in: 1, lambda: 1 }).ldh_in);
+  assert.ok("error" in _s2Corb({ factored_shear_lb: 40000, horiz_tension_lb: 40000, shear_span_av_in: 6, eff_depth_d_in: 12, height_h_in: 6, width_b_in: 14 }));
+  assert.ok("error" in _s2Punch({ c1_in: 20, c2_in: 20, d_in: 6, position: "Edge" }));
+  // concrete-longterm-defl: xi rises between the table points and equals them at each.
+  const xi = (m) => _s2Lt({ immediate_defl_in: 0.4, duration_months: m }).xi;
+  for (const [m, x] of [[3, 1.0], [6, 1.2], [12, 1.4], [60, 2.0], [240, 2.0]]) assert.ok(Math.abs(xi(m) - x) < 1e-12, m + " months");
+  let prev = 0; for (let m = 1; m <= 80; m += 0.5) { assert.ok(xi(m) >= prev - 1e-12 && xi(m) - prev < 0.06 || m === 1, "step at " + m); prev = xi(m); }
+  assert.ok(xi(36) > 1.75 && xi(36) < 1.85 && xi(59.9) > 1.99);
+  assert.ok("error" in _s2Lt({ immediate_defl_in: 0.4, duration_months: 60, comp_steel_ratio: 1 }));
+  // fresh-concrete-temp: a missing temperature is an error; 0 F entered is accepted.
+  const mix = { agg_weight_lb: 3000, agg_temp_f: 80, cement_weight_lb: 564, cement_temp_f: 150, water_weight_lb: 240 };
+  assert.ok("error" in _s2Fct(mix) && "error" in _s2Fct({ ...mix, water_temp_f: null }));
+  assert.ok(!("error" in _s2Fct({ ...mix, water_temp_f: 0 })));
+  assert.ok("error" in _s2Col({ target_load_kip: 12000, b_in: 16, h_in: 16, fc_psi: 96000, fy_psi: 100000 }));
+  assert.ok("error" in _s2Dow({ joint_length_ft: 1, edge_clearance_in: 10 }));
+  assert.ok("error" in _s2Pz({ fy_ksi: 50, col_depth_dc_in: 14, col_web_tw_in: 0.485, beam_depth_db_in: 24, beam_flange_tf_in: 0.77, demand_moment_kin: 5000, pz_in_analysis: "yes" }));
 });

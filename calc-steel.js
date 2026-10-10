@@ -132,7 +132,8 @@ export function computeRequiredSectionModulus({ fy = 50, moment_kipft = 0, metho
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(fy > 0)) return { error: "Yield stress Fy must be positive (ksi)." };
   if (!(moment_kipft > 0)) return { error: "Demand moment must be positive (kip-ft)." };
-  const m = method === "asd" ? "asd" : "lrfd";
+  if (method !== "asd" && method !== "lrfd") return { error: "Method must be lrfd or asd." };
+  const m = method;
   const zx_req = m === "lrfd" ? (12 * moment_kipft) / (0.90 * fy) : (12 * 1.67 * moment_kipft) / fy;
   const basis = m === "lrfd" ? "LRFD: Zx >= 12 Mu / (phi_b Fy), phi_b = 0.90" : "ASD: Zx >= 12 Omega Ma / Fy, Omega = 1.67";
   return {
@@ -210,8 +211,8 @@ export function computeSteelBeamShear({ fy = 50, d = 0, tw = 0, cv1 = 1.0, omega
   if (!(fy > 0)) return { error: "Yield stress Fy must be positive (ksi)." };
   if (!(d > 0)) return { error: "Section depth d must be positive (in)." };
   if (!(tw > 0)) return { error: "Web thickness tw must be positive (in)." };
-  if (!(cv1 > 0)) return { error: "Web shear coefficient Cv1 must be positive." };
-  if (!(omega_v > 0)) return { error: "Safety factor Omega_v must be positive." };
+  if (!(cv1 > 0 && cv1 <= 1)) return { error: "Web shear coefficient Cv1 must be above 0 and no more than 1.0." };
+  if (Math.abs(omega_v - 1.50) > 1e-9 && Math.abs(omega_v - 1.67) > 1e-9) return { error: "Omega_v is 1.50 (rolled I-shape web with Cv1 = 1.0, paired with phi 1.00) or 1.67 (paired with phi 0.90). No other value is in G2.1." };
   if (vu < 0) return { error: "Required shear cannot be negative (kips)." };
   const aw = d * tw;
   const vn = 0.6 * fy * aw * cv1;
@@ -359,16 +360,22 @@ export function computeBoltShearBearing({ d_in = 0.75, ab_in2 = 0.4418, fnv_ksi 
   if (!(fu_ksi > 0)) return { error: "Tensile strength Fu must be positive (ksi)." };
   if (le_in < 0) return { error: "Edge distance cannot be negative (in)." };
   if (s_in < 0) return { error: "Bolt spacing cannot be negative (in)." };
-  const dh = dh_in > 0 ? dh_in : d_in + 0.0625;
+  // Standard hole, Table J3.3: d + 1/16 in below 1 in, d + 1/8 in at 1 in and over.
+  const dh = dh_in > 0 ? dh_in : d_in + (d_in >= 1 ? 0.125 : 0.0625);
   if (dh <= d_in) return { error: "Hole diameter dh must exceed the bolt diameter d." };
+  if (!(le_in > dh / 2)) return { error: "The edge distance (hole centre to edge) must exceed half the hole diameter; otherwise the hole breaks out of the edge." };
+  if (s_in > 0 && !(s_in > dh)) return { error: "Bolt spacing must exceed the hole diameter, or be 0 to skip the interior check." };
   const rn_shear = nplanes * fnv_ksi * ab_in2;
   const bearing_cap = 2.4 * d_in * t_in * fu_ksi;
   const lc_edge = le_in - dh / 2;
   const rn_edge = Math.min(1.2 * lc_edge * t_in * fu_ksi, bearing_cap);
   const lc_int = s_in > 0 ? s_in - dh : null;
   const rn_int = s_in > 0 ? Math.min(1.2 * lc_int * t_in * fu_ksi, bearing_cap) : null;
-  const rn_gov = Math.min(rn_shear, rn_edge);
-  const governed_by = rn_shear <= rn_edge ? "bolt shear" : "edge tearout/bearing";
+  // The interior bolt's tearout is a per-bolt strength too, and can be the lowest
+  // of the three (thin ply, close spacing). Until 2026-10-10 it was printed and
+  // left out of the governing value.
+  const rn_gov = Math.min(rn_shear, rn_edge, rn_int === null ? Infinity : rn_int);
+  const governed_by = rn_gov === rn_shear ? "bolt shear" : rn_gov === rn_edge ? "edge tearout/bearing" : "interior tearout/bearing";
   const phi_rn = 0.75 * rn_gov;
   const rn_asd = rn_gov / 2.00;
   return { rn_shear, bearing_cap, lc_edge, rn_edge, lc_int, rn_int, rn_gov, governed_by, phi_rn, rn_asd };
@@ -472,6 +479,10 @@ export function computeSteelCb({ mmax = 0, ma = 0, mb = 0, mc = 0 } = {}) {
   const MC = Math.abs(Number(mc) || 0);
   if (!(Mmax > 0)) return { error: "The maximum moment Mmax in the unbraced segment must be positive (kip-ft)." };
   if (MA > Mmax || MB > Mmax || MC > Mmax) return { error: "The quarter/mid/three-quarter-point moments cannot exceed Mmax (Mmax is the largest moment in the segment)." };
+  // Three zeros are a blank form, not a moment diagram: the formula would return
+  // its ceiling of 5.0, which fed to an LTB check takes a long beam to its full
+  // plastic moment.
+  if (MA === 0 && MB === 0 && MC === 0) return { error: "Enter the moments at the quarter, mid and three-quarter points of the unbraced segment (kip-ft). All three blank or zero is not a moment diagram." };
   const denom = 2.5 * Mmax + 3 * MA + 4 * MB + 3 * MC;
   const cb = 12.5 * Mmax / denom;
   if (!Number.isFinite(cb)) return { error: "Cb math is not a finite value." };
@@ -646,7 +657,12 @@ export function computeSteelTensionMember({ ag_in2 = 0, fy = 36, fu = 58, t_in =
   const lrfd_yield = 0.90 * pn_yield_kip;
   const lrfd_rupt = 0.75 * pn_rupt_kip;
   const p_lrfd_kip = Math.min(lrfd_yield, lrfd_rupt);
-  const governs = asd_rupt < asd_yield ? "net-section rupture governs (shear lag)" : "gross-section yielding governs";
+  // The two methods can disagree on which limit state governs in a narrow band
+  // (Fu Ae / Fy Ag between 1.198 and 1.200), so the label says so when they do.
+  const asdRupture = asd_rupt < asd_yield, lrfdRupture = lrfd_rupt < lrfd_yield;
+  const governs = asdRupture === lrfdRupture
+    ? (asdRupture ? "net-section rupture governs (shear lag)" : "gross-section yielding governs")
+    : "ASD: " + (asdRupture ? "net-section rupture" : "gross-section yielding") + " governs; LRFD: " + (lrfdRupture ? "net-section rupture" : "gross-section yielding") + " governs";
   return {
     an_in2, u, ae_in2, pn_yield_kip, pn_rupt_kip, asd_yield, asd_rupt, p_asd_kip, p_lrfd_kip, governs,
     note: "AISC 360-22 Chapter D tension member: gross yielding Pn = Fy Ag (Omega = 1.67, phi = 0.90) against net rupture Pn = Fu Ae with Ae = U An (Omega = 2.00, phi = 0.75); An deducts nh holes at the entered diameter, and U = 1 - xbar/L (Table D3.1 Case 2) unless overridden. Single transverse hole line (no staggered s^2/4g chain); block shear and the bolts are the separate steel-block-shear and bolt-shear-bearing tiles; L/r slenderness is serviceability guidance. A design aid, not a substitute for the engineer of record.",
@@ -1148,6 +1164,12 @@ export function computeSteelBoltTensionShear({ fnt_ksi = 90, fnv_ksi = 54, ab_in
   if (!(ab_in2 > 0)) return { error: "Bolt area Ab must be positive (in^2)." };
   if (frv_ksi < 0) return { error: "Required shear stress cannot be negative (ksi)." };
   if (method !== "LRFD" && method !== "ASD") return { error: "Method must be LRFD or ASD." };
+  // J3.8 presumes the bolt is adequate in shear: the available shear stress must
+  // equal or exceed frv. The interaction line only reaches zero at 1.3 times
+  // that, so past the shear strength it kept reporting tension for a bolt that
+  // had already failed (5.6 kip at 45 ksi on a bolt good for 40.5).
+  const avail_shear_ksi = method === "LRFD" ? 0.75 * fnv_ksi : fnv_ksi / 2.00;
+  if (frv_ksi > avail_shear_ksi * (1 + 1e-9)) return { error: "The required shear stress, " + fmt(frv_ksi, 1) + " ksi, is over the bolt's available shear stress of " + fmt(avail_shear_ksi, 1) + " ksi. The bolt fails in shear; no tension is available." };
   const k = method === "LRFD" ? fnt_ksi / (0.75 * fnv_ksi) : (2.00 * fnt_ksi) / fnv_ksi;
   const fpnt_ksi = Math.max(Math.min(1.3 * fnt_ksi - k * frv_ksi, fnt_ksi), 0);
   const avail_tension_kip = method === "LRFD" ? 0.75 * fpnt_ksi * ab_in2 : (fpnt_ksi * ab_in2) / 2.00;
@@ -1389,16 +1411,22 @@ export function computeSteelFloorVibration({ natural_freq_hz = 0, effective_wt_l
   if (!(limit > 0)) return { error: "Occupancy limit must be positive (e.g. 0.005 office)." };
   const ap_over_g = P0 * Math.exp(-0.35 * fn) / (beta * W);
   const pass = ap_over_g <= limit + 1e-9 * Math.abs(limit);
+  // Design Guide 11's walking criterion is for low-frequency floors, about 3 to 9
+  // Hz. The expression keeps falling with frequency and keeps rising below 3 Hz,
+  // but it is not the governing check out there (below 3 Hz a floor can lock onto
+  // the walking pace; above 9 Hz the response is impulsive).
+  const in_range = fn >= 3 && fn <= 9;
   return {
-    ap_over_g, limit_ratio: limit, pass,
-    note: "Acceleration falls with frequency through the e^(-0.35 fn) term, so for the same weight and damping a stiffer floor responds less; floors at about 4-8 Hz, where the walking harmonics excite them, respond most. Damping (beta) and the effective panel weight (W) matter as much as the frequency. The natural frequency comes from the combined beam-plus-girder deflection. A full DG11 evaluation and the engineer of record govern.",
+    ap_over_g, limit_ratio: limit, pass, in_range,
+    range_caution: in_range ? "" : "OUTSIDE the 3 to 9 Hz range this walking criterion is written for; the figure is not a valid check at " + fmt(fn, 1) + " Hz",
+    note: "Acceleration falls with frequency through the e^(-0.35 fn) term, so for the same weight and damping a stiffer floor responds less. The criterion is written for floors of about 3 to 9 Hz, the range walking harmonics excite; outside it the figure is flagged and is not a valid check. Damping (beta) and the effective panel weight (W) matter as much as the frequency. The natural frequency comes from the combined beam-plus-girder deflection. A full DG11 evaluation and the engineer of record govern.",
   };
 }
 
 export const steelFloorVibrationExample = { inputs: { natural_freq_hz: 5, effective_wt_lb: 30000, damping_ratio: 0.03, walker_force_lb: 65, limit_ratio: 0.005 } };
 
 STEEL_RENDERERS["steel-floor-vibration"] = _simpleRenderer({
-  citation: "Citation: AISC Design Guide 11 (2nd ed.) walking-vibration serviceability check: ap/g = P0 x e^(-0.35 fn) / (beta W), pass when ap/g <= ao/g. Common values: P0 ~ 65 lb (office), occupancy limit 0.5% g (office/residence), 1.5% g (mall). Acceleration falls with frequency through the exponential term; floors at about 4-8 Hz, where walking harmonics excite them, respond most. A serviceability screen; a full DG11 evaluation and the engineer of record govern.",
+  citation: "Citation: AISC Design Guide 11 (2nd ed.) walking-vibration serviceability check: ap/g = P0 x e^(-0.35 fn) / (beta W), pass when ap/g <= ao/g. Common values: P0 ~ 65 lb (office), occupancy limit 0.5% g (office/residence), 1.5% g (mall). Acceleration falls with frequency through the exponential term. The criterion is written for floors of about 3 to 9 Hz, the range walking harmonics excite. A serviceability screen; a full DG11 evaluation and the engineer of record govern.",
   example: steelFloorVibrationExample.inputs,
   fields: [
     { key: "natural_freq_hz", label: "Floor natural frequency fn (Hz)", kind: "number" },
@@ -1409,7 +1437,7 @@ STEEL_RENDERERS["steel-floor-vibration"] = _simpleRenderer({
   ],
   outputs: [
     { key: "a", id: "sfv-out-a", label: "Peak acceleration ap/g", value: (r) => fmt(r.ap_over_g * 100, 2) + "% g" },
-    { key: "p", id: "sfv-out-p", label: "Walking-vibration check", value: (r) => (r.pass ? "PASS" : "FAIL") + " (limit " + fmt(r.limit_ratio * 100, 2) + "% g)" },
+    { key: "p", id: "sfv-out-p", label: "Walking-vibration check", value: (r) => (r.pass ? "PASS" : "FAIL") + " (limit " + fmt(r.limit_ratio * 100, 2) + "% g)" + (r.in_range ? "" : " -- " + r.range_caution) },
     { key: "n", id: "sfv-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeSteelFloorVibration,
@@ -1513,6 +1541,7 @@ export function computeStaggeredNetWidth({ plate_width_in = 0, thickness_in = 0,
   if (!Number.isInteger(k) || k < 0) return { error: "Gage spaces in the zigzag chain must be a whole number, zero or more." };
   if (k > 0 && !(g > 0)) return { error: "Gage must be positive (in) where the zigzag chain crosses a gage space." };
   if (k > 0 && !(s > 0)) return { error: "Pitch must be positive (in) where the zigzag chain crosses a gage space." };
+  if (k > nZ - 1) return { error: "A chain through " + nZ + " hole(s) crosses at most " + (nZ - 1) + " gage space(s); more than that credits stagger the chain does not have." };
   if (nZ < nS) return { error: "A zigzag chain crossing fewer holes than the straight chain is not a stagger - check which chain is which." };
 
   const hole_dia_in = db + allow;
