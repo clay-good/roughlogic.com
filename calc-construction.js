@@ -5684,6 +5684,8 @@ export function computeEgressCapacity({ occupant_load = 0, sprinklered = true, p
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(occupant_load > 0)) return { error: "Occupant load must be positive." };
   if (!(min_door_in > 0)) return { error: "Minimum door clear width must be positive (in)." };
+  // An unknown path used to be read as level, the smaller factor, so "stairs" returned less exit width than a stair needs.
+  if (path !== "level" && path !== "stair") return { error: "Path must be level (doors, corridors, ramps) or stair." };
   const sprk = sprinklered === true || sprinklered === "yes" || sprinklered === "true";
   const isStair = path === "stair";
   const reduced = sprk && !_NO_SPRINKLER_REDUCTION.has(occupancy_group);

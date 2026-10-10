@@ -274,7 +274,9 @@ export function computeBoxFill({ box_volume_in3, conductors_by_size, devices = 0
     if (Number(count) < 0) return { error: "Conductor counts cannot be negative." };
     fill += v * (count || 0);
   }
-  const largest = BOX_FILL_PER_CONDUCTOR_IN3[largest_awg_for_clamp_and_device] || 0;
+  // An unknown size used to count the clamp and device allowances as zero, understating the fill.
+  if (BOX_FILL_PER_CONDUCTOR_IN3[largest_awg_for_clamp_and_device] === undefined) return { error: "Unknown AWG for the clamp and device allowance: " + largest_awg_for_clamp_and_device };
+  const largest = BOX_FILL_PER_CONDUCTOR_IN3[largest_awg_for_clamp_and_device];
   if (internal_clamps) fill += largest;
   fill += 2 * largest * devices;
   return { fill_in3: fill, box_volume_in3, pass: fill <= box_volume_in3 + 1e-9 * Math.abs(box_volume_in3), free_in3: box_volume_in3 - fill };

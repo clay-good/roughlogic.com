@@ -601,6 +601,54 @@ test("run_calculator: yes/no/on/off/1/0 for a boolean answer as true/false do, c
   assert.deepEqual(differ, [], "a boolean word was not read as its boolean:\n  " + differ.join("\n  "));
 });
 
+// A typed select is checked against its options. A string input the schema
+// does NOT type as a select (a compute-sourced tile, or a param the extractor
+// could not map) reaches the compute as sent, and four computes fell back to a
+// default without saying so: egress-capacity read path "stairs" as level (the
+// smaller width factor), per-diem-interest read day_count "360" as a 365-day
+// year, box-fill dropped the clamp and device allowances for an unknown AWG,
+// and parallel-conductor-derate passed an unknown size through its 1/0 check.
+// Every short untyped string in a first worked example must reject a value it
+// does not know, or be listed here with the reason.
+const OPEN_STRING_INPUTS = new Map([
+  ["loan-limits::state", "an unknown place returns the national baseline, labelled as such"],
+  ["loan-limits::county_name", "an unknown place returns the national baseline, labelled as such"],
+  ["hud-fmr::state", "an unknown state returns kind: unknown"],
+  ["hud-fmr::area_name", "the area is matched by FIPS; the name is a label"],
+  ["primer-tm::sequence", "free text; non-ACGT characters are counted in dropped_chars"],
+]);
+test("run_calculator: an untyped string input rejects a value it does not know", async () => {
+  const { run, describe } = await import("../../mcp/catalog.mjs");
+  const { readFile } = await import("node:fs/promises");
+  const { COMPUTE_MAP } = await import("../fixtures/compute-map.js");
+  const { rows } = JSON.parse(await readFile(new URL("../fixtures/worked-examples.json", import.meta.url), "utf8"));
+  const first = new Map();
+  for (const r of rows) if (!first.has(r.tile_id) && COMPUTE_MAP[r.tile_id]) first.set(r.tile_id, r.inputs);
+  const silent = [];
+  let probed = 0;
+  for (const [id, inputs] of first) {
+    const d = await describe({ id });
+    const fields = new Map(((d && d.inputs) || []).map((f) => [f.key ?? f.name, f]));
+    for (const [key, v] of Object.entries(inputs)) {
+      if (typeof v !== "string") continue;
+      const f = fields.get(key);
+      if (f && f.kind === "select" && Array.isArray(f.options) && f.options.length) continue;
+      // Free text, lists and dates are not a closed set of choices.
+      if (/[\n,;]|\d{4}-\d\d/.test(v) || v.length > 24) continue;
+      probed++;
+      let r;
+      try { r = await run({ id, inputs: { ...inputs, [key]: "__bogus__" } }); } catch { continue; }
+      const refused = r.error || (r.result && r.result.error) || (r.warnings || []).length > 0;
+      if (!refused) silent.push(id + "::" + key);
+    }
+  }
+  assert.ok(probed > 30, "expected untyped string inputs to probe");
+  const unlisted = silent.filter((k) => !OPEN_STRING_INPUTS.has(k));
+  assert.deepEqual(unlisted, [], "These string inputs answered an unknown value with no error; validate them in the compute or list them in OPEN_STRING_INPUTS:\n  " + unlisted.join("\n  "));
+  const stale = [...OPEN_STRING_INPUTS.keys()].filter((k) => !silent.includes(k));
+  assert.deepEqual(stale, [], "Listed as open but now refuses an unknown value; remove from OPEN_STRING_INPUTS:\n  " + stale.join("\n  "));
+});
+
 test("run_calculator: a select value that looks numeric stays a string", async () => {
   const { run } = await import("../../mcp/catalog.mjs");
   const out = await run({ id: "voltage-drop", inputs: { voltage: "120", length_ft: "150", awg: "12", current_A: "20", material: "copper", phase: "single" } });

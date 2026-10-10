@@ -51,6 +51,8 @@ export function computeParallelConductorDerate({ i_single_A = 0, n_sets = 1, tot
   if (!(Is > 0 && Number.isFinite(Is))) return { error: "Single-conductor ampacity must be positive (A)." };
   if (!(N >= 1)) return { error: "Number of parallel sets must be at least 1." };
   if (!(amb > 0 && amb <= 1)) return { error: "Ambient-correction factor must be in (0, 1]." };
+  // An unrecognized size used to pass the 1/0 minimum check unexamined.
+  if (size && !PARALLEL_NOT_PERMITTED.has(size) && !/^[1-4]\/0$/.test(size) && !(Number(size) >= 250)) return { error: "Conductor size must be an AWG size (such as 1/0 or 4/0) or a kcmil size of 250 or more; leave it blank to skip the 1/0 minimum check." };
   if (size && PARALLEL_NOT_PERMITTED.has(size)) {
     return { error: "Paralleled conductors must be 1/0 AWG or larger (NEC 310.10). " + size + " AWG is not permitted in parallel." };
   }

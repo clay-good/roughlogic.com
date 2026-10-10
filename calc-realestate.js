@@ -1867,6 +1867,8 @@ export function computePerDiemInterest({ loan_amount, annual_rate_pct, closing_d
   const lastDay = new Date(Date.UTC(year, month, 0)).getUTCDate();
   if (day > lastDay) return { error: "Closing day is past the last day of that month." };
   const conv = String(day_count || "actual365");
+  // An unknown convention used to fall back to a 365-day year without saying so ("360" was read as 365).
+  if (!["actual365", "actual360", "thirty360"].includes(conv)) return { error: "Day count must be actual365, actual360, or thirty360." };
   const basis = (conv === "actual360" || conv === "thirty360") ? 360 : 365;
   // DR-12: under 30/360 the 31st is treated as day 30, so a close on the
   // 31st should still accrue one inclusive day, not zero. Cap the day at 30
