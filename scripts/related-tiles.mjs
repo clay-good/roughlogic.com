@@ -1561,6 +1561,7 @@ const RELATED = {
   "laundry-washer-turns": ["laundry-dryer-evaporation","laundry-cost-per-pound","warewasher-hot-water"],
   "laundry-cost-per-pound": ["laundry-dryer-evaporation","laundry-washer-turns","warewasher-hot-water"],
   "laundry-dryer-evaporation": ["laundry-cost-per-pound","laundry-washer-turns","dryer-duct-length"],
+  "saturated-steam-properties": ["steam-pipe-velocity","flash-steam-pct","steam-trap-sizing","deaerator-steam-demand"],
   "blowdown-heat-recovery": ["steam-boiler-blowdown","deaerator-steam-demand","flash-steam-pct"],
   "deaerator-steam-demand": ["blowdown-heat-recovery","condensate-return-sizing","npsh-a"],
   "safety-valve-capacity": ["steam-prv-area-for-capacity","steam-prv-napier","boiler-horsepower"],

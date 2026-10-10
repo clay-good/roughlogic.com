@@ -2007,6 +2007,7 @@ export const COMPUTE_MAP = {
   "laundry-dryer-evaporation": { module: "../../calc-steamplant.js", fn: "computeLaundryDryerEvaporation" },
   "blowdown-heat-recovery": { module: "../../calc-steamplant.js", fn: "computeBlowdownHeatRecovery" },
   "deaerator-steam-demand": { module: "../../calc-steamplant.js", fn: "computeDeaeratorSteamDemand" },
+  "saturated-steam-properties": { module: "../../calc-steamplant.js", fn: "computeSaturatedSteamProperties" },
   "safety-valve-capacity": { module: "../../calc-steamplant.js", fn: "computeSafetyValveCapacity" },
   "fuel-oil-atomizing-viscosity": { module: "../../calc-steamplant.js", fn: "computeFuelOilAtomizingViscosity" },
   // spec-v1450..v1460 overhead line and distribution band

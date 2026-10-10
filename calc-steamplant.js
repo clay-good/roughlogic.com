@@ -423,6 +423,102 @@ STEAMPLANT_RENDERERS["blowdown-heat-recovery"] = _simpleRenderer({
   compute: computeBlowdownHeatRecovery,
 });
 
+// ============ spec-v1959: saturated steam properties (IAPWS-IF97) ============
+//
+// Seven steam tiles take a specific volume, a latent heat or a liquid enthalpy
+// "from the steam tables". This is the table: the IAPWS Industrial Formulation
+// 1997, saturation line (Eq. 31) with region 1 for the liquid (Eq. 7) and
+// region 2 for the vapor (Eq. 15). Coefficients are Tables 2, 10, 11 and 34 of
+// the 2007 revised release; rows are [I, J, n] (Table 10: [J, n]).
+const _IF97_R1 = [[0, -2, 0.14632971213167], [0, -1, -0.84548187169114], [0, 0, -3.7563603672040005], [0, 1, 3.3855169168385], [0, 2, -0.95791963387872], [0, 3, 0.15772038513228], [0, 4, -0.016616417199501], [0, 5, 0.00081214629983568], [1, -9, 0.00028319080123804], [1, -7, -0.00060706301565874], [1, -1, -0.018990068218419004], [1, 0, -0.032529748770505004], [1, 1, -0.021841717175414], [1, 3, -5.283835796993001e-05], [2, -3, -0.00047184321073267], [2, 0, -0.00030001780793026], [2, 1, 4.7661393906987e-05], [2, 3, -4.4141845330846005e-06], [2, 17, -7.2694996297594e-16], [3, -4, -3.1679644845054e-05], [3, 0, -2.8270797985312004e-06], [3, 6, -8.5205128120103e-10], [4, -5, -2.2425281908000003e-06], [4, -2, -6.517122289560099e-07], [4, 10, -1.4341729937924e-13], [5, -8, -4.0516996860117e-07], [8, -11, -1.2734301741641e-09], [8, -6, -1.7424871230634003e-10], [21, -29, -6.876213129553101e-19], [23, -31, 1.4478307828521e-20], [29, -38, 2.6335781662795e-23], [30, -39, -1.1947622640071e-23], [31, -40, 1.8228094581404e-24], [32, -41, -9.3537087292458e-26]];
+const _IF97_R2O = [[0, -9.6927686500217], [1, 10.086655968018], [-5, -0.005608791128302], [-4, 0.071452738081455], [-3, -0.40710498223928], [-2, 1.4240819171444], [-1, -4.383951131945], [2, -0.28408632460772], [3, 0.021268463753307]];
+const _IF97_R2 = [[1, 0, -0.0017731742473213], [1, 1, -0.017834862292358002], [1, 2, -0.045996013696365], [1, 3, -0.05758125908343201], [1, 6, -0.05032527872793], [2, 1, -3.3032641670203e-05], [2, 2, -0.00018948987516315], [2, 4, -0.0039392777243355], [2, 7, -0.043797295650573], [2, 36, -2.6674547914087e-05], [3, 0, 2.0481737692309e-08], [3, 1, 4.3870667284434996e-07], [3, 3, -3.227767723857e-05], [3, 6, -0.0015033924542148], [3, 35, -0.040668253562649], [4, 1, -7.8847309559367e-10], [4, 2, 1.2790717852284999e-08], [4, 3, 4.822537271850699e-07], [5, 7, 2.2922076337661e-06], [6, 3, -1.6714766451061e-11], [6, 16, -0.0021171472321355003], [6, 35, -23.895741934104002], [7, 0, -5.905956432427e-18], [7, 11, -1.2621808899101e-06], [7, 25, -0.038946842435739], [8, 8, 1.1256211360459e-11], [8, 36, -8.2311340897998], [9, 13, 1.9809712802088e-08], [10, 4, 1.0406965210174001e-19], [10, 10, -1.0234747095929e-13], [10, 14, -1.0018179379511e-09], [16, 29, -8.0882908646985e-11], [16, 50, 0.10693031879409], [18, 57, -0.33662250574171], [20, 20, 8.9185845355421e-25], [20, 35, 3.0629316876232e-13], [20, 48, -4.2002467698208e-06], [21, 21, -5.9056029685639e-26], [22, 53, 3.7826947613457006e-06], [23, 39, -1.2768608934681e-15], [24, 26, 7.3087610595061e-29], [24, 40, 5.5414715350777995e-17], [24, 58, -9.436970724121e-07]];
+const _IF97_SAT = [1167.0521452767, -724213.16703206, -17.073846940092, 12020.82470247, -3232555.0322333, 14.91510861353, -4823.2657361591, 405113.40542057, -0.23855557567849, 650.17534844798];
+const _IF97_R = 0.461526; // kJ/(kg K)
+// Saturation temperature, K, from pressure in MPa (Eq. 31).
+function if97SaturationTempK(p_mpa) {
+  const n = _IF97_SAT, b = Math.pow(p_mpa, 0.25);
+  const E = b * b + n[2] * b + n[5], F = n[0] * b * b + n[3] * b + n[6], G = n[1] * b * b + n[4] * b + n[7];
+  const D = 2 * G / (-F - Math.sqrt(F * F - 4 * E * G));
+  return (n[9] + D - Math.sqrt((n[9] + D) * (n[9] + D) - 4 * (n[8] + n[9] * D))) / 2;
+}
+// Saturation pressure, MPa, from temperature in K (Eq. 30).
+function if97SaturationPressureMpa(t_k) {
+  const n = _IF97_SAT, th = t_k + n[8] / (t_k - n[9]);
+  const A = th * th + n[0] * th + n[1], B = n[2] * th * th + n[3] * th + n[4], C = n[5] * th * th + n[6] * th + n[7];
+  return Math.pow(2 * C / (-B + Math.sqrt(B * B - 4 * A * C)), 4);
+}
+// Liquid water: [v m3/kg, h kJ/kg] at T in K, p in MPa (region 1).
+function if97Region1(t_k, p_mpa) {
+  const pi = p_mpa / 16.53, tau = 1386 / t_k;
+  let gp = 0, gt = 0;
+  for (const [I, J, n] of _IF97_R1) {
+    gp -= n * I * Math.pow(7.1 - pi, I - 1) * Math.pow(tau - 1.222, J);
+    gt += n * Math.pow(7.1 - pi, I) * J * Math.pow(tau - 1.222, J - 1);
+  }
+  return [_IF97_R * t_k / p_mpa * pi * gp / 1000, _IF97_R * t_k * tau * gt];
+}
+// Steam: [v m3/kg, h kJ/kg] at T in K, p in MPa (region 2).
+function if97Region2(t_k, p_mpa) {
+  const pi = p_mpa, tau = 540 / t_k;
+  let gp = 1 / pi, gt = 0;
+  for (const [J, n] of _IF97_R2O) gt += n * J * Math.pow(tau, J - 1);
+  for (const [I, J, n] of _IF97_R2) {
+    gp += n * I * Math.pow(pi, I - 1) * Math.pow(tau - 0.5, J);
+    gt += n * Math.pow(pi, I) * J * Math.pow(tau - 0.5, J - 1);
+  }
+  return [_IF97_R * t_k / p_mpa * pi * gp / 1000, _IF97_R * t_k * tau * gt];
+}
+// The four equations, exposed so a test can hold them to the release's own
+// program-verification tables (Tables 5, 15, 35 and 36).
+export const IF97 = { saturationTempK: if97SaturationTempK, saturationPressureMpa: if97SaturationPressureMpa, region1: if97Region1, region2: if97Region2 };
+const _PSI_PER_MPA = 1e6 / 6894.757293168; // exact pound-force per square inch
+const _FT3LB_PER_M3KG = 0.45359237 / Math.pow(0.3048, 3);
+const _BTULB_PER_KJKG = 1 / 2.326; // International Table Btu
+// dims: in { gauge_pressure_psig: M L^-1 T^-2, atmosphere_psia: M L^-1 T^-2 } out: { absolute_pressure_psia: M L^-1 T^-2, sat_temp_f: T, spec_vol_ft3lb: L^3 M^-1, liquid_spec_vol_ft3lb: L^3 M^-1, steam_density_lb_ft3: M L^-3, hf_btulb: L^2 T^-2, hfg_btulb: L^2 T^-2, hg_btulb: L^2 T^-2 }
+export function computeSaturatedSteamProperties({ gauge_pressure_psig = 0, atmosphere_psia = 14.696 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(atmosphere_psia >= 8 && atmosphere_psia <= 16)) return { error: "Atmospheric pressure must be between 8 and 16 psia (14.696 at sea level, about 12.2 at 5,000 ft)." };
+  const absolute_pressure_psia = gauge_pressure_psig + atmosphere_psia;
+  if (!(absolute_pressure_psia >= 0.1)) return { error: "The absolute pressure must be at least 0.1 psia. A vacuum is a negative gauge pressure no larger than the atmosphere." };
+  if (!(absolute_pressure_psia <= 2300)) return { error: "This covers saturated steam up to 2,300 psia. Above that, use a full steam-property program." };
+  const p_mpa = absolute_pressure_psia / _PSI_PER_MPA;
+  const t_k = if97SaturationTempK(p_mpa);
+  const [vf, hf] = if97Region1(t_k, p_mpa);
+  const [vg, hg] = if97Region2(t_k, p_mpa);
+  const sat_temp_f = t_k * 1.8 - 459.67;
+  const spec_vol_ft3lb = vg * _FT3LB_PER_M3KG;
+  const liquid_spec_vol_ft3lb = vf * _FT3LB_PER_M3KG;
+  const hf_btulb = hf * _BTULB_PER_KJKG, hg_btulb = hg * _BTULB_PER_KJKG;
+  const hfg_btulb = hg_btulb - hf_btulb;
+  const steam_density_lb_ft3 = 1 / spec_vol_ft3lb;
+  if (![sat_temp_f, spec_vol_ft3lb, liquid_spec_vol_ft3lb, hf_btulb, hfg_btulb, hg_btulb].every(Number.isFinite)) return { error: "Steam property math is not a finite value." };
+  return {
+    absolute_pressure_psia, sat_temp_f, spec_vol_ft3lb, liquid_spec_vol_ft3lb, steam_density_lb_ft3, hf_btulb, hfg_btulb, hg_btulb,
+    is_vacuum: gauge_pressure_psig < 0,
+    note: "The saturated steam table as a calculator: the boiling temperature at a pressure, the volume a pound of steam occupies, and the heat in the water and in the steam. These are the numbers the steam calculators ask for by name. The specific volume goes to steam-pipe-velocity, steam-pipe-capacity and condensate-return-sizing; the latent heat (hfg) to steam-trap-sizing, steam-kettle-heatup and deaerator-steam-demand; and the liquid enthalpy (hf) at the high and low pressures, with hfg at the low one, to flash-steam-pct. Latent heat FALLS as pressure rises, so a pound of high-pressure steam delivers less heat when it condenses than a pound of low-pressure steam, though it is hotter and takes far less pipe. A gauge reads above the atmosphere, so the same gauge pressure is a lower absolute pressure and a lower boiling point at altitude; enter the local atmosphere (about 12.2 psia at 5,000 ft) where that matters. A negative gauge pressure is a vacuum, as in a condenser or a vacuum return. Enthalpies are measured from liquid water at 32 F, as in every US steam table. The values come from the IAPWS Industrial Formulation 1997, the standard behind modern published tables, and agree with them to the digits those tables print. This is SATURATED steam and water only. It does not cover superheated steam, wet steam of a stated quality, subcooled water, or pressures above 2,300 psia.",
+  };
+}
+const saturatedSteamPropertiesExample = { inputs: { gauge_pressure_psig: 100, atmosphere_psia: 14.696 } };
+STEAMPLANT_RENDERERS["saturated-steam-properties"] = _simpleRenderer({
+  citation: "Citation: IAPWS R7-97(2012), Revised Release on the IAPWS Industrial Formulation 1997 for the Thermodynamic Properties of Water and Steam: the saturation-temperature equation (Eq. 31), the region 1 equation for the saturated liquid (Eq. 7) and the region 2 equation for the saturated vapor (Eq. 15). Free at iapws.org. Converted with 1 psi = 6,894.757 Pa, 1 Btu/lb = 2.326 kJ/kg and 1 lb = 0.45359237 kg. Saturated conditions from 0.1 to 2,300 psia.",
+  example: saturatedSteamPropertiesExample.inputs,
+  fields: [
+    { key: "gauge_pressure_psig", label: "Steam pressure (psig; negative for vacuum)", kind: "number", attrs: { step: "any" } },
+    { key: "atmosphere_psia", label: "Atmospheric pressure (psia)", kind: "number", default: 14.696 },
+  ],
+  outputs: [
+    { key: "t", id: "ssp-out-t", label: "Saturation temperature", value: (r) => fmt(r.sat_temp_f, 1) + " F at " + fmt(r.absolute_pressure_psia, 2) + " psia" },
+    { key: "v", id: "ssp-out-v", label: "Steam specific volume", value: (r) => fmt(r.spec_vol_ft3lb, r.spec_vol_ft3lb < 10 ? 3 : 2) + " cu ft/lb (" + fmt(r.steam_density_lb_ft3, 4) + " lb/cu ft)" },
+    { key: "l", id: "ssp-out-l", label: "Latent heat, hfg", value: (r) => fmt(r.hfg_btulb, 1) + " Btu/lb" },
+    { key: "f", id: "ssp-out-f", label: "Liquid enthalpy, hf", value: (r) => fmt(r.hf_btulb, 1) + " Btu/lb" },
+    { key: "g", id: "ssp-out-g", label: "Steam enthalpy, hg", value: (r) => fmt(r.hg_btulb, 1) + " Btu/lb" },
+    { key: "w", id: "ssp-out-w", label: "Water specific volume", value: (r) => fmt(r.liquid_spec_vol_ft3lb, 5) + " cu ft/lb" },
+    { key: "n", id: "ssp-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSaturatedSteamProperties,
+});
+
 // ============ spec-v1567: deaerator steam demand and vent rate ============
 
 // dims: in { feedwater_lb_hr: M / T, condensate_fraction: dimensionless, alt_condensate_fraction: dimensionless, condensate_temp_f: T, makeup_temp_f: T, da_saturation_temp_f: T, latent_heat_btu_lb: L^2 T^-2, steam_enthalpy_btu_lb: L^2 T^-2, vent_fraction: dimensionless, boiler_efficiency: dimensionless, fuel_cost_per_mmbtu: dimensionless, hours_per_year: T } out: { mixed_temp_f: T, heating_steam_lb_hr: M / T, heating_steam_pct: dimensionless, vent_steam_lb_hr: M / T, vent_annual_cost: dimensionless, condensate_return_annual_saving: dimensionless }

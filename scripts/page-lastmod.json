@@ -2,99 +2,99 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "1e3e07307608e746",
+      "sha": "b745774721bee02f",
       "date": "2026-10-10"
     },
     "/tools/": {
-      "sha": "102aedd229bf3849",
+      "sha": "3187de04a3e8b0ea",
       "date": "2026-10-10"
     },
     "/collections/disaster-response/": {
-      "sha": "5b78ba2334d905ea",
+      "sha": "d2d20e9a91ebe663",
       "date": "2026-10-10"
     },
     "/groups/accounting/": {
-      "sha": "b21a131f8774c9d5",
+      "sha": "7b5bc4c77871eb4d",
       "date": "2026-10-10"
     },
     "/groups/agriculture/": {
-      "sha": "1ec30c0dc5ab29a6",
+      "sha": "4002aec577096618",
       "date": "2026-10-10"
     },
     "/groups/construction/": {
-      "sha": "92075c289b9f0563",
+      "sha": "d9e0ed7e67acca87",
       "date": "2026-10-10"
     },
     "/groups/cross-trade/": {
-      "sha": "df333f5dcbcd1397",
+      "sha": "51a5625467cc9988",
       "date": "2026-10-10"
     },
     "/groups/educators/": {
-      "sha": "aa96a669f12a0cd7",
+      "sha": "cae992f0bc2924bf",
       "date": "2026-10-10"
     },
     "/groups/electrical/": {
-      "sha": "3b6facbffd7f6b98",
+      "sha": "fd4b0ac6aaa4209f",
       "date": "2026-10-10"
     },
     "/groups/field/": {
-      "sha": "8f5e4ed10073eec7",
+      "sha": "102a71d37ec02b04",
       "date": "2026-10-10"
     },
     "/groups/fire-ground/": {
-      "sha": "1e97ddaf3c4e9c72",
+      "sha": "97e0cd62c9faab13",
       "date": "2026-10-10"
     },
     "/groups/historical/": {
-      "sha": "4ddf35227cd34357",
+      "sha": "b045032416c2b342",
       "date": "2026-10-10"
     },
     "/groups/hvac/": {
-      "sha": "5aaa145206c603c0",
+      "sha": "e7ab990766466309",
       "date": "2026-10-10"
     },
     "/groups/kitchen/": {
-      "sha": "bae98f619c91a46c",
+      "sha": "daddbf09971b23cb",
       "date": "2026-10-10"
     },
     "/groups/lab/": {
-      "sha": "a8a1e16b0dba2a18",
+      "sha": "514f6fbc10bfc747",
       "date": "2026-10-10"
     },
     "/groups/mechanic/": {
-      "sha": "8adf80e0d4bbe84f",
+      "sha": "cfcb689a9feb3c53",
       "date": "2026-10-10"
     },
     "/groups/plumbing/": {
-      "sha": "5eb1a8d9789c916c",
+      "sha": "5f49fb81babaa87e",
       "date": "2026-10-10"
     },
     "/groups/real-estate/": {
-      "sha": "3a166c8cc8579a74",
+      "sha": "e61159da100134c2",
       "date": "2026-10-10"
     },
     "/groups/references/": {
-      "sha": "1f8b87db90cb5066",
+      "sha": "f9cf8b475fde561a",
       "date": "2026-10-10"
     },
     "/groups/restoration/": {
-      "sha": "bb2e5db1ee5af19a",
+      "sha": "4e9313941f1d3a17",
       "date": "2026-10-10"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "382c4b8bcd4cd41f",
+      "sha": "78f351da20d4876f",
       "date": "2026-10-10"
     },
     "/groups/stage/": {
-      "sha": "f9ca5febef78966d",
+      "sha": "28c741de1aa96771",
       "date": "2026-10-10"
     },
     "/groups/trucking/": {
-      "sha": "8fb827140e3eac49",
+      "sha": "5d052883b7361ded",
       "date": "2026-10-10"
     },
     "/groups/water/": {
-      "sha": "0486513ca113df54",
+      "sha": "33bcc11fad869b15",
       "date": "2026-10-10"
     },
     "/tools/aav-install-check/": {
@@ -3058,8 +3058,8 @@
       "date": "2026-10-03"
     },
     "/tools/flash-steam-pct/": {
-      "sha": "fe3cecd5c93aebaa",
-      "date": "2026-09-29"
+      "sha": "da641a0a2ce77e8b",
+      "date": "2026-10-10"
     },
     "/tools/flat-oval-duct/": {
       "sha": "95f5ed4e8684fa22",
@@ -6318,8 +6318,8 @@
       "date": "2026-10-01"
     },
     "/tools/refrigeration-relief-capacity/": {
-      "sha": "5f96aec54371e505",
-      "date": "2026-10-01"
+      "sha": "b2f99dee502d4c2b",
+      "date": "2026-10-10"
     },
     "/tools/regular-polygon/": {
       "sha": "82eb6e2bf156a75a",
@@ -6680,6 +6680,10 @@
     "/tools/sanitary-dfu/": {
       "sha": "b0bc8f768aaf8881",
       "date": "2026-09-29"
+    },
+    "/tools/saturated-steam-properties/": {
+      "sha": "f43b29331791c5d5",
+      "date": "2026-10-10"
     },
     "/tools/sawmill-residue-yield/": {
       "sha": "8706f062dc7925db",
@@ -7626,12 +7630,12 @@
       "date": "2026-10-01"
     },
     "/tools/steam-pipe-capacity/": {
-      "sha": "3ac9444572ffa3d3",
-      "date": "2026-09-29"
+      "sha": "d381e27f359d3418",
+      "date": "2026-10-10"
     },
     "/tools/steam-pipe-velocity/": {
-      "sha": "cf01cb7249846cf5",
-      "date": "2026-09-29"
+      "sha": "31cd03002252e049",
+      "date": "2026-10-10"
     },
     "/tools/steam-prv-area-for-capacity/": {
       "sha": "edd7ee75f3af938f",
@@ -7642,8 +7646,8 @@
       "date": "2026-09-29"
     },
     "/tools/steam-trap-sizing/": {
-      "sha": "ca12c236e570a390",
-      "date": "2026-09-29"
+      "sha": "ba5c914962dc4aed",
+      "date": "2026-10-10"
     },
     "/tools/steel-b1-amplifier/": {
       "sha": "5bbcb41546e2bbbd",

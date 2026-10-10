@@ -257,7 +257,7 @@ export function computeFlashSteamPct({ hf_high = 0, hf_low = 0, hfg_low = 0 } = 
 export const flashSteamPctExample = { inputs: { hf_high: 309, hf_low: 180, hfg_low: 970 } };
 
 function _renderFlashSteamPct(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Flash steam fraction = (hf_high - hf_low) / hfg_low - the sensible-heat surplus a condensate carries across a pressure drop re-boils a fraction back to steam - first-principles steam thermodynamics, by name. Enthalpies are read from the ASME saturated-water steam tables at the two pressures. This is the thermodynamic-ideal fraction; trap subcooling and line losses move the field value, and a flash-recovery vessel is sized from the manufacturer's data.";
+  citationEl.textContent = "Citation: Flash steam fraction = (hf_high - hf_low) / hfg_low - the sensible-heat surplus a condensate carries across a pressure drop re-boils a fraction back to steam - first-principles steam thermodynamics, by name. Enthalpies are read from the ASME saturated-water steam tables at the two pressures (saturated-steam-properties gives them). This is the thermodynamic-ideal fraction; trap subcooling and line losses move the field value, and a flash-recovery vessel is sized from the manufacturer's data.";
   const hfH = makeNumber("Liquid enthalpy hf at high pressure (Btu/lb)", "fs-hfh", { step: "any", min: "0" });
   const hfL = makeNumber("Liquid enthalpy hf at low pressure (Btu/lb)", "fs-hfl", { step: "any", min: "0" });
   const hfg = makeNumber("Latent heat hfg at low pressure (Btu/lb)", "fs-hfg", { step: "any", min: "0" });
@@ -298,7 +298,7 @@ export function computeSteamPipeVelocity({ steam_flow_lbhr = 0, spec_vol_ft3lb =
 export const steamPipeVelocityExample = { inputs: { steam_flow_lbhr: 1000, spec_vol_ft3lb: 13.7, vel_ceiling_fpm: 6000 } };
 
 function _renderSteamPipeVelocity(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Steam main sizing by continuity - req_area = (flow x specific_volume) / (velocity x 60), then the smallest Sch 40 nominal whose ID clears the required diameter - first-principles, with the recommended velocity band (supply mains ~6,000 to 12,000 ft/min) per ASHRAE Fundamentals / Systems, by name. The specific volume is read from the saturated-steam table at the line pressure. The velocity band is a recommendation, not a code limit; noise, erosion, and condensate reverse-flow bear on the choice, which the engineer of record governs.";
+  citationEl.textContent = "Citation: Steam main sizing by continuity - req_area = (flow x specific_volume) / (velocity x 60), then the smallest Sch 40 nominal whose ID clears the required diameter - first-principles, with the recommended velocity band (supply mains ~6,000 to 12,000 ft/min) per ASHRAE Fundamentals / Systems, by name. The specific volume is read from the saturated-steam table at the line pressure (saturated-steam-properties gives it). The velocity band is a recommendation, not a code limit; noise, erosion, and condensate reverse-flow bear on the choice, which the engineer of record governs.";
   const flow = makeNumber("Steam mass flow (lb/hr)", "sv-flow", { step: "any", min: "0" });
   const sv = makeNumber("Steam specific volume at pressure (ft3/lb)", "sv-sv", { step: "any", min: "0" });
   const vc = makeNumber("Allowable velocity (ft/min)", "sv-vc", { step: "any", min: "0", value: "6000" });
@@ -341,7 +341,7 @@ export function computeSteamPipeCapacity({ nps = "2", spec_vol_ft3lb = 0, vel_ce
 export const steamPipeCapacityExample = { inputs: { nps: "2", spec_vol_ft3lb: 13.7, vel_ceiling_fpm: 6000 } };
 
 function _renderSteamPipeCapacity(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Steam main capacity by continuity - max flow = velocity x 60 x internal area / specific_volume, the area from the Sch 40 ID - the inverse of the steam-main sizer, with the recommended velocity band (supply mains ~6,000 to 12,000 ft/min) per ASHRAE Fundamentals / Systems, by name. The specific volume is read from the saturated-steam table at the line pressure. The velocity band is a recommendation, not a code limit; noise, erosion, and condensate reverse-flow bear on the choice, which the engineer of record governs.";
+  citationEl.textContent = "Citation: Steam main capacity by continuity - max flow = velocity x 60 x internal area / specific_volume, the area from the Sch 40 ID - the inverse of the steam-main sizer, with the recommended velocity band (supply mains ~6,000 to 12,000 ft/min) per ASHRAE Fundamentals / Systems, by name. The specific volume is read from the saturated-steam table at the line pressure (saturated-steam-properties gives it). The velocity band is a recommendation, not a code limit; noise, erosion, and condensate reverse-flow bear on the choice, which the engineer of record governs.";
   const size = makeSelect("Existing Sch 40 size (in)", "sc-size", _SCH40_ID_IN.map(([n, id]) => ({ value: n, label: n + " in (ID " + id + ")" })));
   size.select.value = "2";
   const sv = makeNumber("Steam specific volume at pressure (ft3/lb)", "sc-sv", { step: "any", min: "0" });
@@ -381,7 +381,7 @@ export function computeSteamTrapSizing({ heat_duty_btuhr = 0, hfg_btulb = 0, saf
 export const steamTrapSizingExample = { inputs: { heat_duty_btuhr: 400000, hfg_btulb: 945, safety_factor: 2 } };
 
 function _renderSteamTrapSizing(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Condensate load = heat duty / latent heat; required trap capacity = load x safety factor (2x typical, 3x warm-up / modulating) - first-principles steam thermodynamics and the safety-factor practice, by name. The latent heat is read from the saturated-steam table at the operating pressure. The trap is selected from the manufacturer's capacity chart at the actual differential pressure the installation develops; warm-up, modulating, and stall conditions can demand a larger factor or a different trap type.";
+  citationEl.textContent = "Citation: Condensate load = heat duty / latent heat; required trap capacity = load x safety factor (2x typical, 3x warm-up / modulating) - first-principles steam thermodynamics and the safety-factor practice, by name. The latent heat is read from the saturated-steam table at the operating pressure (saturated-steam-properties gives it). The trap is selected from the manufacturer's capacity chart at the actual differential pressure the installation develops; warm-up, modulating, and stall conditions can demand a larger factor or a different trap type.";
   const q = makeNumber("Heat duty served (Btu/hr)", "st-q", { step: "any", min: "0" });
   const hfg = makeNumber("Latent heat hfg at pressure (Btu/lb)", "st-hfg", { step: "any", min: "0" });
   const sf = makeNumber("Safety factor (2 typical, 3 warm-up)", "st-sf", { step: "any", min: "1", value: "2" });

@@ -59446,3 +59446,45 @@ test("bounds: free-surface-moment is rho l b^3 / 12, falls as n squared, and fee
     assert.ok("error" in _fsm({ ...ok, ...bad }), JSON.stringify(bad));
   }
 });
+
+import { computeSaturatedSteamProperties as _ssp, IF97 as _if97 } from "../../calc-steamplant.js";
+const { region1: _if1, region2: _if2, saturationPressureMpa: _ifP, saturationTempK: _ifT } = _if97;
+import { computeFlashSteamPct as _sspFlash } from "../../calc-pipefit.js";
+test("bounds: saturated-steam-properties reproduces the IAPWS-IF97 program-verification tables", () => {
+  const close = (got, want) => assert.ok(Math.abs(got / want - 1) < 5e-9, got + " vs " + want);
+  // Table 5 (region 1): [T K, p MPa, v m3/kg, h kJ/kg].
+  for (const [T, p, v, h] of [[300, 3, 0.100215168e-2, 0.115331273e3], [300, 80, 0.971180894e-3, 0.184142828e3], [500, 3, 0.120241800e-2, 0.975542239e3]]) {
+    const r = _if1(T, p); close(r[0], v); close(r[1], h);
+  }
+  // Table 15 (region 2).
+  for (const [T, p, v, h] of [[300, 0.0035, 0.394913866e2, 0.254991145e4], [700, 0.0035, 0.923015898e2, 0.333568375e4], [700, 30, 0.542946619e-2, 0.263149474e4]]) {
+    const r = _if2(T, p); close(r[0], v); close(r[1], h);
+  }
+  // Tables 35 and 36 (saturation line), and the two equations invert each other.
+  for (const [T, p] of [[300, 0.353658941e-2], [500, 0.263889776e1], [600, 0.123443146e2]]) close(_ifP(T), p);
+  for (const [p, T] of [[0.1, 0.372755919e3], [1, 0.453035632e3], [10, 0.584149488e3]]) close(_ifT(p), T);
+  for (const p of [0.001, 0.1, 1, 5, 15]) close(_ifP(_ifT(p)), p);
+  // The tile: atmospheric steam and the usual table points.
+  const atm = _ssp({ gauge_pressure_psig: 0 });
+  assert.ok(Math.abs(atm.sat_temp_f - 212) < 0.06 && Math.abs(atm.spec_vol_ft3lb - 26.80) < 0.01 && Math.abs(atm.hfg_btulb - 970.1) < 0.2 && Math.abs(atm.hf_btulb - 180.1) < 0.1);
+  const p100 = _ssp({ gauge_pressure_psig: 100 });
+  assert.ok(Math.abs(p100.sat_temp_f - 337.9) < 0.05 && Math.abs(p100.spec_vol_ft3lb - 3.89) < 0.005 && Math.abs(p100.hfg_btulb - 880.9) < 0.1);
+  assert.ok(Math.abs(p100.hg_btulb - p100.hf_btulb - p100.hfg_btulb) < 1e-9);
+  assert.ok(Math.abs(p100.steam_density_lb_ft3 * p100.spec_vol_ft3lb - 1) < 1e-12);
+  // Monotonic along the line: hotter, denser, less latent heat as pressure rises.
+  let prev = _ssp({ gauge_pressure_psig: -14 });
+  for (const g of [-10, 0, 15, 50, 150, 400, 1000, 2000, 2285]) {
+    const r = _ssp({ gauge_pressure_psig: g });
+    assert.ok(r.sat_temp_f > prev.sat_temp_f && r.spec_vol_ft3lb < prev.spec_vol_ft3lb && r.hfg_btulb < prev.hfg_btulb && r.hf_btulb > prev.hf_btulb && r.liquid_spec_vol_ft3lb > prev.liquid_spec_vol_ft3lb, "at " + g);
+    prev = r;
+  }
+  // Altitude: the same gauge pressure boils cooler on a 12.2 psia atmosphere.
+  assert.ok(_ssp({ gauge_pressure_psig: 15, atmosphere_psia: 12.2 }).sat_temp_f < _ssp({ gauge_pressure_psig: 15 }).sat_temp_f);
+  assert.equal(_ssp({ gauge_pressure_psig: -5 }).is_vacuum, true);
+  // Its hf and hfg drive flash-steam-pct: 100 psig condensate to atmosphere flashes about 13%.
+  const flash = _sspFlash({ hf_high: p100.hf_btulb, hf_low: atm.hf_btulb, hfg_low: atm.hfg_btulb });
+  assert.ok(Math.abs(flash.flash_pct - 13.3) < 0.2);
+  for (const bad of [{ gauge_pressure_psig: -14.7 }, { gauge_pressure_psig: -100 }, { gauge_pressure_psig: 2300 }, { gauge_pressure_psig: 1e5 }, { atmosphere_psia: 0 }, { atmosphere_psia: 7 }, { atmosphere_psia: 17 }, { atmosphere_psia: -14.696 }]) {
+    assert.ok("error" in _ssp({ gauge_pressure_psig: 100, atmosphere_psia: 14.696, ...bad }), JSON.stringify(bad));
+  }
+});

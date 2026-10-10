@@ -2434,6 +2434,15 @@
     {"term":"zone leakage cfm50","target":"zonal-add-a-hole","kind":"industry"},
     {"term":"attic bypass leakage cfm","target":"zonal-add-a-hole","kind":"industry"},
     {"term":"house to garage leakage","target":"zonal-add-a-hole","kind":"industry"},
-    {"term":"how much air leaks through the attic","target":"zonal-add-a-hole","kind":"question"}
+    {"term":"how much air leaks through the attic","target":"zonal-add-a-hole","kind":"question"},
+    {"term":"steam table","target":"saturated-steam-properties","kind":"industry"},
+    {"term":"saturated steam table","target":"saturated-steam-properties","kind":"industry"},
+    {"term":"steam properties by pressure","target":"saturated-steam-properties","kind":"industry"},
+    {"term":"steam specific volume","target":"saturated-steam-properties","kind":"industry"},
+    {"term":"latent heat of steam","target":"saturated-steam-properties","kind":"industry"},
+    {"term":"steam temperature at pressure","target":"saturated-steam-properties","kind":"industry"},
+    {"term":"hfg steam","target":"saturated-steam-properties","kind":"industry"},
+    {"term":"what temperature is steam at 100 psi","target":"saturated-steam-properties","kind":"question"},
+    {"term":"boiling point of water at pressure","target":"saturated-steam-properties","kind":"industry"}
   ]
 }

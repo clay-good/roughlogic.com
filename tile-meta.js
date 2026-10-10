@@ -1117,6 +1117,7 @@ const _TILES = [
   ["laundry-dryer-evaporation", "G"],
   ["blowdown-heat-recovery", "C"],
   ["deaerator-steam-demand", "C"],
+  ["saturated-steam-properties", "C"],
   ["safety-valve-capacity", "C"],
   ["fuel-oil-atomizing-viscosity", "C"],
   // spec-v1450..v1460 overhead line and distribution band

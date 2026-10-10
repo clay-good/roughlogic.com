@@ -3652,6 +3652,7 @@ cross-check.
 | calc-steamplant.js | `computeLaundryDryerEvaporation` | `{ dry_weight_lb_per_day = 0, retained_moisture_fraction = 0.45, improved_reta...` | _ | _ | _ |
 | calc-steamplant.js | `computeLaundryWasherTurns` | `{ machine_capacity_lb = 0, wash_cycle_min = 0, load_unload_min = 0, idle_min ...` | _ | _ | _ |
 | calc-steamplant.js | `computeSafetyValveCapacity` | `{ rated_steaming_capacity_lb_hr = 0, fuel_input_btuh = 0, boiler_efficiency =...` | _ | _ | _ |
+| calc-steamplant.js | `computeSaturatedSteamProperties` | `{ gauge_pressure_psig = 0, atmosphere_psia = 14.696 } = {}` | _ | _ | _ |
 | calc-steampressure.js | `computeAsmeHeadThickness` | `{ design_pressure_psi = 0, inside_diameter_in = 0, allowable_stress_psi = 0, ...` | _ | _ | _ |
 | calc-steampressure.js | `computeAsmeShellThickness` | `{ design_pressure_psi = 0, inside_radius_in = 0, allowable_stress_psi = 0, jo...` | _ | _ | _ |
 | calc-steampressure.js | `computeRadiatorEdrOutput` | `{ edr_sqft = 320, system_k = 240, pickup_factor = 0.33 } = {}` | _ | _ | _ |
@@ -3932,7 +3933,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2516.
+Row count: 2517.
 
 <!-- END function-corpus-v14 -->
 
@@ -4426,7 +4427,7 @@ per spec-v14 §13.1 second paragraph.
 | `wobbe-index` | Wobbe Index (Fuel-Gas Interchangeability) | Wobbe index (fuel-gas interchangeabil...; WI = 1000 / sqrt(0.60) = 1000 / 0.77460 = 1290.99 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `wsfu-demand` | Probable Peak Demand (WSFU to GPM) | Hunter's curve (NBS BMS65) / IPC 2021...; 120 WSFU flush-valve -> 73.0 GPM, a printed row of Table ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group C HVAC (221 tiles)
+### Group C HVAC (222 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4623,6 +4624,7 @@ per spec-v14 §13.1 second paragraph.
 | `round-to-rect-duct` | Round-to-Rectangular Duct Equivalent | ASHRAE Fundamentals (duct design) / S...; 14 in x 8 in rectangular -> equivalent diameter 11.46 in | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `run-capacitor-microfarad` | Run Capacitor Microfarad Check | First-principles capacitive reactance...; spec-v104 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `safety-valve-capacity` | Boiler Safety Valve Relieving Capacity | Project (first-principles); ASME BPVC Sections I and IV, the National Board, and the ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `saturated-steam-properties` | Saturated Steam Properties (Steam Table by Pressure) | IAPWS; Table 36, saturation temperatures from Eq. 31: p = 1 MPa ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `secondary-glycol-loop` | Secondary Coolant (Glycol) Loop Flow and Pump Penalty | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `seer-eer` | SEER and EER Conversion | Project (engineering approximation); EER 12 -> SEER 14.435 / SEER2 estimate 13.714 on the NREL... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `server-inlet-envelope` | Server Inlet Temperature and Humidity Envelope | Project (first-principles); current ASHRAE TC 9.9 and equipment limits govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -6367,6 +6369,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 
-Tile count: 2262. Fixture-covered or reference-cadence: 2262 / 2262.
+Tile count: 2263. Fixture-covered or reference-cadence: 2263 / 2263.
 
 <!-- END tile-index-v14 -->

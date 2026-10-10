@@ -1,7 +1,7 @@
 {
   "note": "spec-v1184 coverage ratchet. Tiles whose renderer exposes a render.schema consistent with the compute function. Grow with `node scripts/check-renderer-schema.mjs --write`; regeneration is intentional.",
-  "total_tiles": 2262,
-  "covered_count": 2188,
+  "total_tiles": 2263,
+  "covered_count": 2189,
   "covered": [
     "aav-install-check",
     "abatement-containment",
@@ -1591,6 +1591,7 @@
     "sand-permeability-vent",
     "sandbag-levee-quantity",
     "sanitary-dfu",
+    "saturated-steam-properties",
     "sawmill-residue-yield",
     "scaffold-guardrail-check",
     "scaffold-leg-load",

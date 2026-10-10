@@ -777,7 +777,7 @@ export const TOOL_MODULES = (() => {
   // commercial laundry. Three keep group "G", four take group "C".
   declare("./calc-steamplant.js", "STEAMPLANT_RENDERERS", [
     "laundry-washer-turns", "laundry-cost-per-pound", "laundry-dryer-evaporation",
-    "blowdown-heat-recovery", "deaerator-steam-demand", "safety-valve-capacity",
+    "blowdown-heat-recovery", "deaerator-steam-demand", "saturated-steam-properties", "safety-valve-capacity",
     "fuel-oil-atomizing-viscosity",
   ]);
   // spec-v1450..v1460: the overhead line and distribution bench. The charter

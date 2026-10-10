@@ -965,6 +965,7 @@ export const RENDERER_MAP = {
   "laundry-dryer-evaporation": { module: "../../calc-steamplant.js", exportName: "STEAMPLANT_RENDERERS" },
   "blowdown-heat-recovery": { module: "../../calc-steamplant.js", exportName: "STEAMPLANT_RENDERERS" },
   "deaerator-steam-demand": { module: "../../calc-steamplant.js", exportName: "STEAMPLANT_RENDERERS" },
+  "saturated-steam-properties": { module: "../../calc-steamplant.js", exportName: "STEAMPLANT_RENDERERS" },
   "safety-valve-capacity": { module: "../../calc-steamplant.js", exportName: "STEAMPLANT_RENDERERS" },
   "fuel-oil-atomizing-viscosity": { module: "../../calc-steamplant.js", exportName: "STEAMPLANT_RENDERERS" },
   "duct-bank-ampacity-derate": { module: "../../calc-lineworker.js", exportName: "LINEWORKER_RENDERERS" },

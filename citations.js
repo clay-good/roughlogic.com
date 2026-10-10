@@ -21686,7 +21686,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.general,
     editionNote: "Single-edition (the flash relation and the steam-table enthalpies do not roll). This is the THERMODYNAMIC-IDEAL flash fraction - real trap behavior, subcooling, and line losses move the field number, and a flash-recovery vessel is sized from the manufacturer's data. The ASME steam tables supply the enthalpy points.",
     assumptions: [
-      { name: "Enthalpies", value: "saturated-liquid enthalpies hf and latent heat hfg from the ASME steam tables at the two pressures (user-supplied for an off-table pressure)", source: "ASME steam tables" },
+      { name: "Enthalpies", value: "saturated-liquid enthalpies hf and latent heat hfg from the ASME steam tables at the two pressures (saturated-steam-properties computes them at any pressure)", source: "ASME steam tables" },
       { name: "Ideal flash", value: "the fraction is the thermodynamic ideal; trap subcooling and line losses lower the field value", source: "steam thermodynamics" },
     ],
   },
@@ -21697,7 +21697,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.general,
     editionNote: "Single-edition (continuity and the nominal pipe schedule do not roll). The velocity band is a RECOMMENDATION, not a code limit - noise, erosion, and the condensate-loading reverse-flow case at low velocity all bear on the final choice, which the engineer of record governs. ASHRAE supplies the band and specific volumes.",
     assumptions: [
-      { name: "Specific volume", value: "saturated-steam specific volume from the steam table at the line pressure (user-supplied for an off-table pressure)", source: "ASHRAE Fundamentals" },
+      { name: "Specific volume", value: "saturated-steam specific volume from the steam table at the line pressure (saturated-steam-properties computes it at any pressure)", source: "ASHRAE Fundamentals" },
       { name: "Velocity band", value: "supply mains ~6,000 to 12,000 ft/min is a recommendation, not a code limit", source: "ASHRAE Systems" },
       { name: "Pipe schedule", value: "Sch 40 nominal inside diameters per ASME B36.10M mill dimensions", source: "ASME B36.10M" },
     ],
@@ -21710,7 +21710,7 @@ export const CITATIONS = {
     editionNote: "Single-edition (continuity and the nominal pipe schedule do not roll). The max steam mass flow an existing Sch 40 main carries within an allowable velocity, the inverse of the steam-main sizer: the internal area from the ASME B36.10M Sch 40 ID, times the velocity ceiling, over the specific volume. The velocity band is a RECOMMENDATION, not a code limit - noise, erosion, and the condensate-loading reverse-flow case at low velocity all bear on the choice, which the engineer of record governs. ASHRAE supplies the band and specific volumes.",
     assumptions: [
       { name: "Continuity", value: "capacity = velocity x internal area / specific volume (the inverse of the main sizer)", source: "first-principles continuity" },
-      { name: "Specific volume", value: "saturated-steam specific volume from the steam table at the line pressure (user-supplied for an off-table pressure)", source: "ASHRAE Fundamentals" },
+      { name: "Specific volume", value: "saturated-steam specific volume from the steam table at the line pressure (saturated-steam-properties computes it at any pressure)", source: "ASHRAE Fundamentals" },
       { name: "Pipe schedule", value: "Sch 40 nominal inside diameters per ASME B36.10M mill dimensions", source: "ASME B36.10M" },
     ],
   },
@@ -21744,7 +21744,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.general,
     editionNote: "Single-edition (the relation and the safety-factor practice do not roll). The trap is SELECTED FROM THE MANUFACTURER'S CAPACITY CHART at the actual differential pressure the installation develops - this tile gives the load and the capacity target, not a trap model, and modulating, warm-up, and stall conditions can demand a larger factor or a different trap type.",
     assumptions: [
-      { name: "Latent heat", value: "hfg from the saturated-steam table at the operating pressure (user-supplied for an off-table pressure)", source: "ASME steam tables" },
+      { name: "Latent heat", value: "hfg from the saturated-steam table at the operating pressure (saturated-steam-properties computes it at any pressure)", source: "ASME steam tables" },
       { name: "Safety factor", value: "2x typical, 3x on warm-up / modulating service; higher factors for stall conditions", source: "steam-trap selection practice" },
       { name: "Selection", value: "the trap is sized from the manufacturer's capacity chart at the actual differential pressure", source: "manufacturer capacity chart" },
     ],
@@ -24459,6 +24459,19 @@ export const CITATIONS = {
       { name: "Cycles are a chemistry limit", value: "not an optimization variable", source: "the water treatment program and the boiler manufacturer" },
       { name: "Surface blowdown only", value: "the intermittent bottom blowdown that removes sludge is separate", source: "boiler operating practice" },
       { name: "Sewer discharge temperature is regulated", value: "and is not evaluated here", source: "local discharge limits" },
+    ],
+  },
+  "saturated-steam-properties": {
+    formula: "Absolute pressure = gauge + atmosphere. Saturation temperature from IAPWS-IF97 Eq. 31. Saturated liquid volume and enthalpy (vf, hf) from the region 1 Gibbs equation, Eq. 7, and saturated vapor (vg, hg) from the region 2 Gibbs equation, Eq. 15, both evaluated at the saturation temperature and pressure: v = (R T / p) pi gamma_pi, h = R T tau gamma_tau, R = 0.461526 kJ/(kg K). hfg = hg - hf. Converted with 1 psi = 6,894.757 Pa, 1 Btu/lb = 2.326 kJ/kg, 1 cu ft/lb = 0.0624280 m3/kg.",
+    edition: "IAPWS R7-97(2012), Revised Release on the IAPWS Industrial Formulation 1997 for the Thermodynamic Properties of Water and Steam (International Association for the Properties of Water and Steam, Lucerne, 2007; editorial update 2012). The formulation behind the ASME steam tables since 1997.",
+    freeAccess: "Free at iapws.org/technical-guidance/release/IF97-Rev. The coefficients are its Tables 2, 10, 11 and 34. Its computer-program verification values (Tables 5, 15, 35 and 36: 18 values of volume, enthalpy, saturation pressure and saturation temperature) are reproduced to 9 significant digits by this implementation, and a unit test holds them.",
+    governance: GOVERNANCE.general,
+    editionNote: "Enthalpy is measured from liquid water at the triple point (32.018 F), the convention of US steam tables, so values line up with a printed table. Latent heat falls and saturation temperature rises with pressure. Gauge pressure depends on the local atmosphere: at 5,000 ft (about 12.2 psia) the same gauge reading is a lower absolute pressure and a lower boiling point. Saturated conditions only; region 1 and region 2 of the formulation meet the saturation line up to 623.15 K (2,397 psia), and this tile stops at 2,300 psia.",
+    assumptions: [
+      { name: "Saturated", value: "dry saturated steam and saturated water; no superheat, wetness or subcooling", source: "scope of this tile" },
+      { name: "Atmosphere", value: "14.696 psia unless entered; valid 8 to 16 psia", source: "entered" },
+      { name: "Range", value: "0.1 to 2,300 psia absolute", source: "IAPWS-IF97 regions 1, 2 and 4" },
+      { name: "Unit conversions", value: "exact definitions of the pound, foot and International Table Btu", source: "NIST SP 811" },
     ],
   },
   "deaerator-steam-demand": {
