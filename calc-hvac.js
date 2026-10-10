@@ -187,7 +187,9 @@ const DUCT_ROUGHNESS_FT = 0.0003; // galvanized steel default
 // dims: in { cfm: L^3 T^-1, friction_in_wc_per_100ft: dimensionless, roughness_ft: L } out: { diameter_in: L, velocity_fpm: L T^-1 }
 export function computeDuctSize({ cfm, friction_in_wc_per_100ft = 0.08, roughness_ft = DUCT_ROUGHNESS_FT }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
-  if (cfm <= 0 || friction_in_wc_per_100ft <= 0) return { error: "Provide positive CFM and friction rate." };
+  // `!(x > 0)` rather than `x <= 0`: a CFM left out is undefined, and NaN <= 0 is false, so a call with no
+  // airflow used to return a 2 in duct.
+  if (!(cfm > 0) || !(friction_in_wc_per_100ft > 0)) return { error: "Provide positive CFM and friction rate." };
 
   // Solve d (in inches) such that Darcy-Weisbach friction rate equals target.
   // 1 in w.c./100 ft = 5.197 lb/ft^2 / 100 ft = 0.05197 lb/ft^3 of head loss along pipe.
@@ -604,6 +606,9 @@ export function computeInsulationThickness({
   if (!(pipe_od_in > 0)) return { error: "Pipe outside diameter must be positive." };
   if (!(k_btu_in_per_hr_ft2_F > 0)) return { error: "Insulation conductivity must be positive." };
   if (!computedFilm && !(outside_film_coeff_btu_hr_ft2_F > 0)) return { error: "The outer film coefficient must be positive." };
+  // A temperature left out is undefined, and NaN fails every "<= 0" test below: until 2026-10-09 a call with
+  // no surface temperature returned 0.001 in.
+  if (![surface_temp_F, ambient_F, surface_limit_F].every((t) => typeof t === "number" && Number.isFinite(t))) return { error: "Pipe surface, ambient and surface-limit temperatures are all required (degF)." };
   const r1 = pipe_od_in / 2;
   const dT = surface_temp_F - ambient_F;
   if (dT <= 0) return { error: "Pipe surface must exceed ambient." };

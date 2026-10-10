@@ -240,6 +240,9 @@ export function computeSuperheatSubcool({ refrigerant, system_pressure_psig, lin
   const r = REFRIGERANTS[refrigerant];
   if (!r) return { error: "Unknown refrigerant." };
   // Subcooling reads the bubble point; superheat, the dew point.
+  // A pressure or line temperature left out is undefined; the table lookup then returned its first row and
+  // the tile answered with a saturation temperature for a pressure nobody gave.
+  if (typeof system_pressure_psig !== "number" || typeof line_temperature_F !== "number") return { error: "System pressure (psig) and line temperature (degF) are both required." };
   const pairs = mode === "subcool" && r.bubble_pairs ? r.bubble_pairs : r.pt_pairs;
   const sat_T = _satLookup(refrigerant, pairs, { pressure_psig: system_pressure_psig }, mode === "subcool");
   if (sat_T === null) return { error: _OUT_OF_TABLE(refrigerant) };

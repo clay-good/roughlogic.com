@@ -59225,3 +59225,18 @@ test("bounds: flat-surface-heat-loss reproduces Incropera Example 9.3 and the or
     assert.ok("error" in _fshl({ ...b, orientation: "vertical", ...bad }));
   }
 });
+
+import { computeInsulationThickness as _itU, computeDuctSize as _dsU } from "../../calc-hvac.js";
+import { computeSuperheatSubcool as _shU } from "../../calc-refrigerant.js";
+test("bounds: a required input left out is an error, not an answer (undefined slips past <= 0 guards)", () => {
+  // NaN <= 0 is false, so `if (x <= 0) return error` lets an undefined input through. These three returned
+  // finite garbage until 2026-10-09: 0.001 in of insulation, a 2 in duct, a saturation temperature.
+  assert.ok("error" in _itU({ pipe_od_in: 1, ambient_F: 75, surface_limit_F: 120, k_btu_in_per_hr_ft2_F: 0.27 }));
+  assert.ok("error" in _itU({ pipe_od_in: 1, surface_temp_F: 250, surface_limit_F: 120, k_btu_in_per_hr_ft2_F: 0.27 }));
+  assert.ok("error" in _itU({ pipe_od_in: 1, surface_temp_F: 250, ambient_F: 75, k_btu_in_per_hr_ft2_F: 0.27 }));
+  assert.ok("error" in _dsU({ friction_in_wc_per_100ft: 0.08 }));
+  assert.ok(_dsU({ cfm: 400, friction_in_wc_per_100ft: 0.08 }).round_diameter_in > 5);
+  assert.ok("error" in _shU({ refrigerant: "R-410A", line_temperature_F: 50, mode: "superheat" }));
+  assert.ok("error" in _shU({ refrigerant: "R-410A", system_pressure_psig: 118, mode: "superheat" }));
+  assert.ok(!("error" in _shU({ refrigerant: "R-410A", system_pressure_psig: 118, line_temperature_F: 50, mode: "superheat" })));
+});
