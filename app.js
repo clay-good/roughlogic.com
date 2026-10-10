@@ -896,11 +896,39 @@ function bindSearch() {
   // usable progressively instead of waiting on one monolithic shard.
   let aliasRows = [];
   let aliasLoaded = false;
+  // How long arriving alias shards are gathered before one re-rank.
+  const ALIAS_REFRESH_MS = 60;
   async function ensureAliases() {
     if (aliasLoaded) return;
     aliasLoaded = true;
     const merged = [];
     const groups = [...new Set(TOOLS.map((t) => t.group))];
+    // Every alias row is checked against the catalog by id. (Until 2026-10-10
+    // this consulted nameToId, which is keyed by tile NAME and so never hit,
+    // and then scanned TOOLS for each of ~23,000 rows.)
+    const knownIds = new Set(TOOLS.map((t) => t.id));
+    // Fold arrived shards into the ranker and refresh the open dropdown ONCE
+    // per short window, not once per shard. Each refresh re-ranks the query
+    // against every alias loaded so far, about 100 ms; doing it for each of the
+    // 21 shards as they landed back to back blocked the main thread for over
+    // two seconds after the first search keystroke (measured 2026-10-10: 22
+    // consecutive long tasks, 2.2 s on a fast laptop, longer than a 5 s test
+    // timeout on a loaded CI runner). Shards that trickle in on a slow network
+    // still fold in progressively, one refresh per window.
+    let refreshTimer = 0;
+    const flushAliases = () => {
+      if (refreshTimer) { clearTimeout(refreshTimer); refreshTimer = 0; }
+      if (aliasRows.length === merged.length) return;
+      aliasRows = merged.slice();
+      // The condition is "results are ON SCREEN", not "the input has focus":
+      // a reader who pastes a query and clicks away, or a browser that moves
+      // focus while a shard is in flight, would otherwise be left looking at
+      // the pre-alias results with no keystroke coming to correct them. It
+      // still never opens a CLOSED dropdown, which is what the focus check
+      // was really protecting.
+      if (document.activeElement === input || !list.hidden) render(input.value, true);
+    };
+    const scheduleAliasRefresh = () => { if (!refreshTimer) refreshTimer = setTimeout(flushAliases, ALIAS_REFRESH_MS); };
     await Promise.all(groups.map(async (g) => {
       try {
         const file = "aliases-" + String(g).toLowerCase() + ".json";
@@ -913,21 +941,17 @@ function bindSearch() {
         const rows = [];
         for (const row of json.aliases) {
           if (!row || typeof row.term !== "string" || typeof row.target !== "string") continue;
-          if (!nameToId.has(row.target) && !TOOLS.some((t) => t.id === row.target)) continue;
+          if (!knownIds.has(row.target)) continue;
           rows.push({ term: row.term.toLowerCase(), target: row.target });
         }
         merged.push(...rows);
-        aliasRows = merged.slice();
         // Refresh the open dropdown so just-loaded aliases become searchable.
-        // The condition is "results are ON SCREEN", not "the input has focus":
-        // a reader who pastes a query and clicks away, or a browser that moves
-        // focus while a shard is in flight, would otherwise be left looking at
-        // the pre-alias results with no keystroke coming to correct them. It
-        // still never opens a CLOSED dropdown, which is what the focus check
-        // was really protecting.
-        if (document.activeElement === input || !list.hidden) render(input.value, true);
+        scheduleAliasRefresh();
       } catch { /* one group failing leaves the rest searchable */ }
     }));
+    // Everything that will arrive has: fold in the remainder now, so a caller
+    // awaiting this sees every alias.
+    flushAliases();
     // A transient failure must not cost the session its aliases. Without them
     // the ranking is visibly worse -- "asphalt tonnage 2400 sq ft" leads with a
     // carpet takeoff -- and the only recovery was a full reload, because

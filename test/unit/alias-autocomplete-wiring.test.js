@@ -68,10 +68,10 @@ test("alias terms are kept only for targets that are real tile ids", async () =>
   const t = await readApp();
   // Defensive filter: a renamed tile in aliases.json must not become a
   // dead navigation.
-  assert.match(
-    t,
-    /if\s*\(!nameToId\.has\(row\.target\)\s*&&\s*!TOOLS\.some\(\(t\)\s*=>\s*t\.id\s*===\s*row\.target\)\)\s*continue;/,
-  );
+  // A set of tile IDS since 2026-10-10. The earlier form consulted nameToId
+  // (keyed by tile name, so it never matched an id) and then scanned TOOLS.
+  assert.match(t, /const knownIds = new Set\(TOOLS\.map\(\(t\) => t\.id\)\);/);
+  assert.match(t, /if\s*\(!knownIds\.has\(row\.target\)\)\s*continue;/);
 });
 
 test("alias terms map a free-text phrase to a tile id", async () => {

@@ -66,6 +66,8 @@ The citation registry was split the same day, for the same reason and with no se
 
 The shards total about 14% more than the single file, which only the service worker's offline precache pays. `test/unit/citation-shards.test.js` holds every shard entry equal to the registry's and the copy text identical; `test/integration/citation-shards.test.js` checks in a browser that a deep link fetches one shard and that `/citations.js` is not on the site.
 
+**Search's first keystroke, measured 2026-10-10.** Loading the 21 alias shards used to re-rank the query and rebuild the result list once per shard: 22 consecutive long tasks and 2.2 s of blocked main thread on a fast laptop, 2.4 s from page load to a prefilled calculator. Shards that arrive within 60 ms are now folded in with one refresh: 2 long tasks, 0.28 s blocked, 0.69 s to the prefilled calculator. The byte counts above did not change; the time did. `test/integration/search-alias-refresh.test.js` counts list rebuilds so the storm cannot return unnoticed.
+
 What follows is the catalog analysis that led here, kept as written.
 
 ### The measurement (2026-08-29 to 2026-10-09)
