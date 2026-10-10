@@ -171093,6 +171093,81 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "flash-steam-pct",
+  "source_publisher": "Project (first-principles)",
+  "source_title": "100 psig condensate discharged to atmosphere, values from the pressures",
+  "source_edition_or_year": "flash relation with IAPWS-IF97 saturated enthalpies",
+  "source_section_or_page": "hf at 114.696 psia = 309.08, hf at 14.696 psia = 180.13, hfg at 14.696 psia = 970.14 Btu/lb: (309.08 - 180.13) / 970.14 = 13.29%. Printed steam tables (309, 180, 970) give 13.3%",
+  "verified_by": "rl",
+  "verified_on": "2026-10-10",
+  "inputs": {
+   "steam_basis": "pressure",
+   "high_pressure_psig": 100,
+   "low_pressure_psig": 0
+  },
+  "outputs": {
+   "flash_pct": {
+    "value": 13.29,
+    "tolerance": {
+     "abs": 0.02
+    }
+   },
+   "hf_high_used_btulb": {
+    "value": 309.08,
+    "tolerance": {
+     "abs": 0.05
+    }
+   },
+   "hf_low_used_btulb": {
+    "value": 180.13,
+    "tolerance": {
+     "abs": 0.05
+    }
+   },
+   "hfg_low_used_btulb": {
+    "value": 970.14,
+    "tolerance": {
+     "abs": 0.05
+    }
+   }
+  }
+ },
+ {
+  "tile_id": "steam-trap-sizing",
+  "source_publisher": "Project (first-principles)",
+  "source_title": "400,000 Btu/hr on 15 psig steam, latent heat from the pressure",
+  "source_edition_or_year": "condensate load with the IAPWS-IF97 latent heat",
+  "source_section_or_page": "hfg at 29.696 psia = 945.60 Btu/lb (printed tables list 945.6 at 15 psig): 400,000 / 945.60 = 423.0 lb/hr, x 2 = 846.0 lb/hr",
+  "verified_by": "rl",
+  "verified_on": "2026-10-10",
+  "inputs": {
+   "heat_duty_btuhr": 400000,
+   "safety_factor": 2,
+   "steam_basis": "pressure",
+   "steam_pressure_psig": 15
+  },
+  "outputs": {
+   "hfg_used_btulb": {
+    "value": 945.6,
+    "tolerance": {
+     "abs": 0.05
+    }
+   },
+   "condensate_lbhr": {
+    "value": 423.01,
+    "tolerance": {
+     "pct": 0.05
+    }
+   },
+   "req_capacity_lbhr": {
+    "value": 846.02,
+    "tolerance": {
+     "pct": 0.05
+    }
+   }
+  }
  }
  ]
 }

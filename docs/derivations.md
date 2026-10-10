@@ -3062,7 +3062,7 @@ cross-check.
 | calc-pipefit.js | `computeCondensateReturnSizing` | `{ condensate_lbhr = 0, flash_fraction = 0, spec_vol_ft3lb = 0, vel_ceiling_fp...` | _ | _ | _ |
 | calc-pipefit.js | `computeExpansionGuideSpacing` | `{ pipe_od_in = 0, d1_mult = 4, d2_mult = 14 } = {}` | _ | _ | _ |
 | calc-pipefit.js | `computeFlangeRating` | `{ flange_class = 150, temp_f = 0 } = {}` | _ | _ | _ |
-| calc-pipefit.js | `computeFlashSteamPct` | `{ hf_high = 0, hf_low = 0, hfg_low = 0 } = {}` | _ | _ | _ |
+| calc-pipefit.js | `computeFlashSteamPct` | `{ hf_high = 0, hf_low = 0, hfg_low = 0, steam_basis = "entered", high_pressur...` | _ | _ | _ |
 | calc-pipefit.js | `computeHangerRodSizing` | `{ load_lb = 0, temp_derate = 1 } = {}` | _ | _ | _ |
 | calc-pipefit.js | `computePipeFilledSupportLoad` | `{ od_in = 0, wall_in = 0, pipe_density = 490, fluid_density = 62.4, insul_thk...` | _ | _ | _ |
 | calc-pipefit.js | `computePipePressureRating` | `{ od_in = 0, wall_in = 0, allow_stress = 0, joint_factor = 1, y_coeff = 0.4, ...` | _ | _ | _ |
@@ -3071,7 +3071,7 @@ cross-check.
 | calc-pipefit.js | `computeReducerOffset` | `{ large_od_in = 0, small_od_in = 0, lay_length_in = 0, type = "concentric" } ...` | _ | _ | _ |
 | calc-pipefit.js | `computeSteamPipeCapacity` | `{ nps = "2", spec_vol_ft3lb = 0, vel_ceiling_fpm = 0, steam_basis = "entered"...` | _ | _ | _ |
 | calc-pipefit.js | `computeSteamPipeVelocity` | `{ steam_flow_lbhr = 0, spec_vol_ft3lb = 0, vel_ceiling_fpm = 0, steam_basis =...` | _ | _ | _ |
-| calc-pipefit.js | `computeSteamTrapSizing` | `{ heat_duty_btuhr = 0, hfg_btulb = 0, safety_factor = 2 } = {}` | _ | _ | _ |
+| calc-pipefit.js | `computeSteamTrapSizing` | `{ heat_duty_btuhr = 0, hfg_btulb = 0, safety_factor = 2, steam_basis = "enter...` | _ | _ | _ |
 | calc-plumbing.js | `computeBackflow` | `` | _ | _ | _ |
 | calc-plumbing.js | `computeBackflowLoss` | `{ device_class = "RP", flow_gpm = 0, pipe_size_in = "1" }` | _ | _ | _ |
 | calc-plumbing.js | `computeBackflowSizing` | `{ service_flow_gpm = 0, hazard = "high", assembly_type = "RP", pipe_size_in =...` | _ | _ | _ |
@@ -4303,7 +4303,7 @@ per spec-v14 §13.1 second paragraph.
 | `fixture-clearance-check` | Plumbing Fixture Clearances (IPC 405.3.1) | International Code Council; 'A water closet, urinal, lavatory or bidet shall not be s... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `flange-rating` | Flange Pressure-Temperature Rating (ASME B16.5) | ASME B16.5 pressure-temperature ratin...; spec-v203 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+4 more) |
 | `flare-radiation-distance` | Flare Thermal Radiation Safe Distance (API 521) | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
-| `flash-steam-pct` | Flash Steam Percentage Across a Pressure Drop | Steam thermodynamics; ASME steam tabl...; spec-v157 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
+| `flash-steam-pct` | Flash Steam Percentage Across a Pressure Drop | Steam thermodynamics; ASME steam tabl...; spec-v157 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `flow-continuity` | Flow Continuity Velocity at a Size Change | fluid mechanics; spec-v372 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `friction-loss` | Friction Loss | Project (first-principles); 10 gpm through 100 ft of 1 in SCH40 PVC -> ~5.49 ft head ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `gas-altitude-derate` | High-Altitude Appliance Input Derate | NFPA 54 (National Fuel Gas Code) / IF...; spec-v111 section 2.1 pinned example (100k at 6,000 ft ->... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
@@ -4388,7 +4388,7 @@ per spec-v14 §13.1 second paragraph.
 | `steam-pipe-velocity` | Steam Main Size from Flow and Velocity | Continuity; ASHRAE Fundamentals / Sys...; spec-v158 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `steam-prv-area-for-capacity` | Steam PRV Orifice Area for a Required Capacity (Napier) | Napier's formula / ASME/API 520 (solv...; spec-v759 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `steam-prv-napier` | Steam Orifice / PRV Capacity (Napier) | Napier's formula / ASME/API 520; 0.5 in2 orifice, 100 psia upstream, 30 psia downstream, C... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
-| `steam-trap-sizing` | Steam Trap Condensate Load and Required Capacity | Steam thermodynamics; safety-factor p...; spec-v159 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+4 more) |
+| `steam-trap-sizing` | Steam Trap Condensate Load and Required Capacity | Steam thermodynamics; safety-factor p...; spec-v159 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+5 more) |
 | `stormwater-detention-volume` | Stormwater Detention Volume (Modified Rational) | Modified Rational method; spec-v428 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `stormwater-max-drainage-area` | Max Tributary Drainage Area for an Allowable Flow | USEPA / NRCS; 2 cfs allowable, asphalt (C=0.95), 2 in/hr -> 1.053 acres... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `stormwater-rational` | Stormwater Rational Method | USEPA / NRCS; 5000 ft^2 asphalt (C=0.95), 2 in/hr -> 0.218 cfs / 97.9 g... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |

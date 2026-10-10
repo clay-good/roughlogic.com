@@ -21688,7 +21688,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.general,
     editionNote: "Single-edition (the flash relation and the steam-table enthalpies do not roll). This is the THERMODYNAMIC-IDEAL flash fraction - real trap behavior, subcooling, and line losses move the field number, and a flash-recovery vessel is sized from the manufacturer's data. The ASME steam tables supply the enthalpy points.",
     assumptions: [
-      { name: "Enthalpies", value: "saturated-liquid enthalpies hf and latent heat hfg from the ASME steam tables at the two pressures (saturated-steam-properties computes them at any pressure)", source: "ASME steam tables" },
+      { name: "Enthalpies", value: "saturated-liquid enthalpies hf and latent heat hfg from the ASME steam tables at the two pressures, entered, or computed from the two entered gauge pressures by IAPWS-IF97 on a 14.696 psia atmosphere", source: "ASME steam tables" },
       { name: "Ideal flash", value: "the fraction is the thermodynamic ideal; trap subcooling and line losses lower the field value", source: "steam thermodynamics" },
     ],
   },
@@ -21746,7 +21746,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.general,
     editionNote: "Single-edition (the relation and the safety-factor practice do not roll). The trap is SELECTED FROM THE MANUFACTURER'S CAPACITY CHART at the actual differential pressure the installation develops - this tile gives the load and the capacity target, not a trap model, and modulating, warm-up, and stall conditions can demand a larger factor or a different trap type.",
     assumptions: [
-      { name: "Latent heat", value: "hfg from the saturated-steam table at the operating pressure (saturated-steam-properties computes it at any pressure)", source: "ASME steam tables" },
+      { name: "Latent heat", value: "hfg from the saturated-steam table at the operating pressure, entered, or computed from an entered gauge pressure by IAPWS-IF97 on a 14.696 psia atmosphere", source: "ASME steam tables" },
       { name: "Safety factor", value: "2x typical, 3x on warm-up / modulating service; higher factors for stall conditions", source: "steam-trap selection practice" },
       { name: "Selection", value: "the trap is sized from the manufacturer's capacity chart at the actual differential pressure", source: "manufacturer capacity chart" },
     ],

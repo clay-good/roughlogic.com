@@ -244,33 +244,50 @@ PIPEFIT_RENDERERS["pipe-spacing-rack"] = _renderPipeSpacingRack;
 // ---------------------------------------------------------------------
 // v157 Flash steam percentage (flash-steam-pct)
 // ---------------------------------------------------------------------
-// dims: in { hf_high: L^2 T^-2, hf_low: L^2 T^-2, hfg_low: L^2 T^-2 } out: { flash_fraction: dimensionless, flash_pct: dimensionless }
-export function computeFlashSteamPct({ hf_high = 0, hf_low = 0, hfg_low = 0 } = {}) {
+const _STEAM_TABLE_BASIS_OPTIONS = [{ value: "entered", label: "Enter the steam-table values" }, { value: "pressure", label: "From the pressure (saturated)" }];
+// dims: in { hf_high: L^2 T^-2, hf_low: L^2 T^-2, hfg_low: L^2 T^-2, high_pressure_psig: M L^-1 T^-2, low_pressure_psig: M L^-1 T^-2 } out: { flash_fraction: dimensionless, flash_pct: dimensionless, hf_high_used_btulb: L^2 T^-2, hf_low_used_btulb: L^2 T^-2, hfg_low_used_btulb: L^2 T^-2 }
+export function computeFlashSteamPct({ hf_high = 0, hf_low = 0, hfg_low = 0, steam_basis = "entered", high_pressure_psig = 0, low_pressure_psig = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
-  const hfH = Number(hf_high);
-  const hfL = Number(hf_low);
-  const hfg = Number(hfg_low);
+  let hfH = Number(hf_high);
+  let hfL = Number(hf_low);
+  let hfg = Number(hfg_low);
+  if (steam_basis === "pressure") {
+    // Saturated water at each pressure on a 14.696 psia atmosphere (IAPWS-IF97).
+    const hi = saturatedSteam(Number(high_pressure_psig) + 14.696), lo = saturatedSteam(Number(low_pressure_psig) + 14.696);
+    if (!hi || !lo) return { error: "Both pressures must be between -14.5 and 2,285 psig for saturated steam-table values." };
+    if (!(Number(high_pressure_psig) > Number(low_pressure_psig))) return { error: "The high-side pressure must exceed the low-side pressure (no flash otherwise)." };
+    hfH = hi.hf_btulb; hfL = lo.hf_btulb; hfg = lo.hfg_btulb;
+  } else if (steam_basis !== "entered") {
+    return { error: "Choose how the steam-table values are given: entered, or from the two pressures." };
+  }
   if (!(hfg > 0)) return { error: "Low-side latent heat must be positive (Btu/lb)." };
   if (!(hfH > hfL)) return { error: "High-side enthalpy must exceed the low-side enthalpy (no flash otherwise)." };
   const flash_fraction = (hfH - hfL) / hfg;
-  return { flash_fraction, flash_pct: flash_fraction * 100 };
+  return { flash_fraction, flash_pct: flash_fraction * 100, hf_high_used_btulb: hfH, hf_low_used_btulb: hfL, hfg_low_used_btulb: hfg, from_pressure: steam_basis === "pressure" };
 }
 export const flashSteamPctExample = { inputs: { hf_high: 309, hf_low: 180, hfg_low: 970 } };
 
 function _renderFlashSteamPct(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Flash steam fraction = (hf_high - hf_low) / hfg_low - the sensible-heat surplus a condensate carries across a pressure drop re-boils a fraction back to steam - first-principles steam thermodynamics, by name. Enthalpies are read from the ASME saturated-water steam tables at the two pressures (saturated-steam-properties gives them). This is the thermodynamic-ideal fraction; trap subcooling and line losses move the field value, and a flash-recovery vessel is sized from the manufacturer's data.";
+  citationEl.textContent = "Citation: Flash steam fraction = (hf_high - hf_low) / hfg_low - the sensible-heat surplus a condensate carries across a pressure drop re-boils a fraction back to steam - first-principles steam thermodynamics, by name. Enthalpies are read from the ASME saturated-water steam tables at the two pressures, or computed from the two entered gauge pressures by IAPWS-IF97 on a 14.696 psia atmosphere. This is the thermodynamic-ideal fraction; trap subcooling and line losses move the field value, and a flash-recovery vessel is sized from the manufacturer's data.";
+  const basis = makeSelect("Steam-table values", "fs-basis", _STEAM_TABLE_BASIS_OPTIONS);
+  basis.select.value = "entered";
   const hfH = makeNumber("Liquid enthalpy hf at high pressure (Btu/lb)", "fs-hfh", { step: "any", min: "0" });
   const hfL = makeNumber("Liquid enthalpy hf at low pressure (Btu/lb)", "fs-hfl", { step: "any", min: "0" });
   const hfg = makeNumber("Latent heat hfg at low pressure (Btu/lb)", "fs-hfg", { step: "any", min: "0" });
-  for (const f of [hfH, hfL, hfg]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { hfH.input.value = "309"; hfL.input.value = "180"; hfg.input.value = "970"; update(); });
+  const pHigh = makeNumber("High-side pressure (psig, when computing)", "fs-phigh", { step: "any" });
+  const pLow = makeNumber("Low-side pressure (psig, when computing)", "fs-plow", { step: "any" });
+  for (const f of [basis, hfH, hfL, hfg, pHigh, pLow]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { basis.select.value = "entered"; hfH.input.value = "309"; hfL.input.value = "180"; hfg.input.value = "970"; pHigh.input.value = ""; pLow.input.value = ""; update(); });
   const oPct = makeOutputLine(outputRegion, "Flash steam", "fs-out-pct");
+  const oUsed = makeOutputLine(outputRegion, "Steam-table values used", "fs-out-used");
   const update = debounce(() => {
-    const r = computeFlashSteamPct({ hf_high: Number(hfH.input.value) || 0, hf_low: Number(hfL.input.value) || 0, hfg_low: Number(hfg.input.value) || 0 });
-    if (r.error) { oPct.textContent = r.error; return; }
+    const r = computeFlashSteamPct({ hf_high: Number(hfH.input.value) || 0, hf_low: Number(hfL.input.value) || 0, hfg_low: Number(hfg.input.value) || 0, steam_basis: basis.select.value, high_pressure_psig: Number(pHigh.input.value) || 0, low_pressure_psig: Number(pLow.input.value) || 0 });
+    if (r.error) { oPct.textContent = r.error; oUsed.textContent = "-"; return; }
     oPct.textContent = fmt(r.flash_pct, 1) + "% of the condensate flashes to steam";
+    oUsed.textContent = "hf " + fmt(r.hf_high_used_btulb, 1) + " high, " + fmt(r.hf_low_used_btulb, 1) + " low; hfg " + fmt(r.hfg_low_used_btulb, 1) + " Btu/lb";
   }, DEBOUNCE_MS);
-  for (const f of [hfH.input, hfL.input, hfg.input]) f.addEventListener("input", update);
+  for (const f of [hfH.input, hfL.input, hfg.input, pHigh.input, pLow.input]) f.addEventListener("input", update);
+  basis.select.addEventListener("change", update);
 }
 PIPEFIT_RENDERERS["flash-steam-pct"] = _renderFlashSteamPct;
 
@@ -394,38 +411,52 @@ PIPEFIT_RENDERERS["steam-pipe-capacity"] = _renderSteamPipeCapacity;
 // ---------------------------------------------------------------------
 // v159 Steam trap condensate load and required capacity (steam-trap-sizing)
 // ---------------------------------------------------------------------
-// dims: in { heat_duty_btuhr: M L^2 T^-3, hfg_btulb: L^2 T^-2, safety_factor: dimensionless } out: { condensate_lbhr: M T^-1, req_capacity_lbhr: M T^-1 }
-export function computeSteamTrapSizing({ heat_duty_btuhr = 0, hfg_btulb = 0, safety_factor = 2 } = {}) {
+// dims: in { heat_duty_btuhr: M L^2 T^-3, hfg_btulb: L^2 T^-2, safety_factor: dimensionless, steam_pressure_psig: M L^-1 T^-2 } out: { condensate_lbhr: M T^-1, req_capacity_lbhr: M T^-1, hfg_used_btulb: L^2 T^-2 }
+export function computeSteamTrapSizing({ heat_duty_btuhr = 0, hfg_btulb = 0, safety_factor = 2, steam_basis = "entered", steam_pressure_psig = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const q = Number(heat_duty_btuhr);
-  const hfg = Number(hfg_btulb);
+  let hfg = Number(hfg_btulb);
   const sf = Number(safety_factor);
   if (!(q > 0)) return { error: "Heat duty must be positive (Btu/hr)." };
+  if (steam_basis === "pressure") {
+    // Latent heat of saturated steam at the gauge pressure, 14.696 psia atmosphere (IAPWS-IF97).
+    const sat = saturatedSteam(Number(steam_pressure_psig) + 14.696);
+    if (!sat) return { error: "Steam pressure must be between -14.5 and 2,285 psig for a saturated latent heat." };
+    hfg = sat.hfg_btulb;
+  } else if (steam_basis !== "entered") {
+    return { error: "Choose how the latent heat is given: entered, or from the steam pressure." };
+  }
   if (!(hfg > 0)) return { error: "Latent heat must be positive (Btu/lb)." };
   if (!(sf >= 1)) return { error: "Safety factor must be at least 1." };
   const condensate_lbhr = q / hfg;
   const req_capacity_lbhr = condensate_lbhr * sf;
-  return { condensate_lbhr, req_capacity_lbhr };
+  return { condensate_lbhr, req_capacity_lbhr, hfg_used_btulb: hfg, from_pressure: steam_basis === "pressure" };
 }
 export const steamTrapSizingExample = { inputs: { heat_duty_btuhr: 400000, hfg_btulb: 945, safety_factor: 2 } };
 
 function _renderSteamTrapSizing(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Condensate load = heat duty / latent heat; required trap capacity = load x safety factor (2x typical, 3x warm-up / modulating) - first-principles steam thermodynamics and the safety-factor practice, by name. The latent heat is read from the saturated-steam table at the operating pressure (saturated-steam-properties gives it). The trap is selected from the manufacturer's capacity chart at the actual differential pressure the installation develops; warm-up, modulating, and stall conditions can demand a larger factor or a different trap type.";
+  citationEl.textContent = "Citation: Condensate load = heat duty / latent heat; required trap capacity = load x safety factor (2x typical, 3x warm-up / modulating) - first-principles steam thermodynamics and the safety-factor practice, by name. The latent heat is read from the saturated-steam table at the operating pressure, or computed from an entered gauge pressure by IAPWS-IF97 on a 14.696 psia atmosphere. The trap is selected from the manufacturer's capacity chart at the actual differential pressure the installation develops; warm-up, modulating, and stall conditions can demand a larger factor or a different trap type.";
   const q = makeNumber("Heat duty served (Btu/hr)", "st-q", { step: "any", min: "0" });
+  const basis = makeSelect("Latent heat", "st-basis", _STEAM_TABLE_BASIS_OPTIONS);
+  basis.select.value = "entered";
   const hfg = makeNumber("Latent heat hfg at pressure (Btu/lb)", "st-hfg", { step: "any", min: "0" });
+  const psig = makeNumber("Steam pressure (psig, when computing)", "st-psig", { step: "any" });
   const sf = makeNumber("Safety factor (2 typical, 3 warm-up)", "st-sf", { step: "any", min: "1", value: "2" });
   sf.input.value = "2";
-  for (const f of [q, hfg, sf]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { q.input.value = "400000"; hfg.input.value = "945"; sf.input.value = "2"; update(); });
+  for (const f of [q, basis, hfg, psig, sf]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { q.input.value = "400000"; basis.select.value = "entered"; hfg.input.value = "945"; psig.input.value = ""; sf.input.value = "2"; update(); });
   const oLoad = makeOutputLine(outputRegion, "Running condensate load", "st-out-load");
   const oCap = makeOutputLine(outputRegion, "Required trap capacity", "st-out-cap");
+  const oHfg = makeOutputLine(outputRegion, "Latent heat used", "st-out-hfg");
   const update = debounce(() => {
-    const r = computeSteamTrapSizing({ heat_duty_btuhr: Number(q.input.value) || 0, hfg_btulb: Number(hfg.input.value) || 0, safety_factor: Number(sf.input.value) || 0 });
-    if (r.error) { oLoad.textContent = r.error; oCap.textContent = "-"; return; }
+    const r = computeSteamTrapSizing({ heat_duty_btuhr: Number(q.input.value) || 0, hfg_btulb: Number(hfg.input.value) || 0, safety_factor: Number(sf.input.value) || 0, steam_basis: basis.select.value, steam_pressure_psig: Number(psig.input.value) || 0 });
+    if (r.error) { oLoad.textContent = r.error; oCap.textContent = "-"; oHfg.textContent = "-"; return; }
     oLoad.textContent = fmt(r.condensate_lbhr, 0) + " lb/hr";
     oCap.textContent = fmt(r.req_capacity_lbhr, 0) + " lb/hr at the operating differential";
+    oHfg.textContent = fmt(r.hfg_used_btulb, 1) + " Btu/lb";
   }, DEBOUNCE_MS);
-  for (const f of [q.input, hfg.input, sf.input]) f.addEventListener("input", update);
+  for (const f of [q.input, hfg.input, psig.input, sf.input]) f.addEventListener("input", update);
+  basis.select.addEventListener("change", update);
 }
 PIPEFIT_RENDERERS["steam-trap-sizing"] = _renderSteamTrapSizing;
 

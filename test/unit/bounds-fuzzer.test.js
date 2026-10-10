@@ -59515,3 +59515,34 @@ test("bounds: the steam main tiles compute the same answer from a pressure as fr
   }
   assert.ok("error" in _spvP({ steam_flow_lbhr: 1000, vel_ceiling_fpm: 6000 }));
 });
+
+import { computeSteamTrapSizing as _stsP } from "../../calc-pipefit.js";
+test("bounds: flash-steam-pct and steam-trap-sizing compute the same answer from pressures as from the table values", () => {
+  for (const [hi, lo] of [[100, 0], [150, 15], [600, 100], [15, -5], [0, -10]]) {
+    const H = _ssp({ gauge_pressure_psig: hi }), L = _ssp({ gauge_pressure_psig: lo });
+    const a = _sspFlash({ steam_basis: "pressure", high_pressure_psig: hi, low_pressure_psig: lo });
+    const b = _sspFlash({ hf_high: H.hf_btulb, hf_low: L.hf_btulb, hfg_low: L.hfg_btulb });
+    assert.ok(Math.abs(a.flash_fraction - b.flash_fraction) < 1e-12, hi + " to " + lo);
+    assert.ok(a.flash_fraction > 0 && a.flash_fraction < 1 && a.from_pressure === true && b.from_pressure === false);
+    assert.ok(Math.abs(a.hf_high_used_btulb - H.hf_btulb) < 1e-12 && Math.abs(a.hfg_low_used_btulb - L.hfg_btulb) < 1e-12);
+  }
+  // A bigger drop flashes more.
+  assert.ok(_sspFlash({ steam_basis: "pressure", high_pressure_psig: 150, low_pressure_psig: 0 }).flash_pct > _sspFlash({ steam_basis: "pressure", high_pressure_psig: 50, low_pressure_psig: 0 }).flash_pct);
+  for (const bad of [{ high_pressure_psig: 0, low_pressure_psig: 0 }, { high_pressure_psig: 5, low_pressure_psig: 50 }, { high_pressure_psig: 3000 }, { low_pressure_psig: -20 }, { steam_basis: "wet" }]) {
+    assert.ok("error" in _sspFlash({ steam_basis: "pressure", high_pressure_psig: 100, low_pressure_psig: 0, ...bad }), JSON.stringify(bad));
+  }
+  for (const psig of [-10, 0, 15, 125, 600]) {
+    const hfg = _ssp({ gauge_pressure_psig: psig }).hfg_btulb;
+    const a = _stsP({ heat_duty_btuhr: 400000, safety_factor: 3, steam_basis: "pressure", steam_pressure_psig: psig });
+    const b = _stsP({ heat_duty_btuhr: 400000, safety_factor: 3, hfg_btulb: hfg });
+    assert.ok(Math.abs(a.req_capacity_lbhr - b.req_capacity_lbhr) < 1e-9 && Math.abs(a.hfg_used_btulb - hfg) < 1e-12);
+  }
+  // Higher pressure, less latent heat, more condensate for the same duty.
+  assert.ok(_stsP({ heat_duty_btuhr: 1e6, steam_basis: "pressure", steam_pressure_psig: 150 }).condensate_lbhr > _stsP({ heat_duty_btuhr: 1e6, steam_basis: "pressure", steam_pressure_psig: 5 }).condensate_lbhr);
+  for (const bad of [{ steam_pressure_psig: -14.7 }, { steam_pressure_psig: 5000 }, { steam_basis: "wet" }]) {
+    assert.ok("error" in _stsP({ heat_duty_btuhr: 400000, steam_basis: "pressure", steam_pressure_psig: 15, ...bad }), JSON.stringify(bad));
+  }
+  // Entered mode is unchanged.
+  assert.ok(Math.abs(_stsP({ heat_duty_btuhr: 400000, hfg_btulb: 945, safety_factor: 2 }).req_capacity_lbhr - 800000 / 945) < 1e-9);
+  assert.ok("error" in _stsP({ heat_duty_btuhr: 400000 }));
+});

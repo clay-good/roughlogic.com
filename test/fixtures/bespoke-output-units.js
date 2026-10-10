@@ -621,7 +621,7 @@ export const BESPOKE_OUTPUT_UNITS = {
   "steam-pipe-capacity": {"capacity_lbhr":{"prefix":"","suffix":" lb/hr","digits":0},"spec_vol_used_ft3lb":{"prefix":"","suffix":" ft3/lb","digits":2}},
   "steam-pipe-velocity": {"actual_fpm":{"prefix":"","suffix":" ft/min","digits":0},"spec_vol_used_ft3lb":{"prefix":"","suffix":" ft3/lb","digits":2}},
   "steam-prv-area-for-capacity": {"required_area_in2":{"prefix":"","suffix":" in^2","digits":3}},
-  "steam-trap-sizing": {"condensate_lbhr":{"prefix":"","suffix":" lb/hr","digits":0}},
+  "steam-trap-sizing": {"condensate_lbhr":{"prefix":"","suffix":" lb/hr","digits":0},"hfg_used_btulb":{"prefix":"","suffix":" Btu/lb","digits":1}},
   "stopping-sight-distance": {"perception_reaction_ft":{"prefix":"","suffix":" ft","digits":1},"braking_distance_ft":{"prefix":"","suffix":" ft","digits":1},"total_ssd_ft":{"prefix":"","suffix":" ft","digits":1}},
   "stormwater-detention-volume": {"q_in_cfs":{"prefix":"","suffix":" cfs","digits":2}},
   "stormwater-rational": {"peak_flow_cfs":{"prefix":"","suffix":" cfs","digits":3},"peak_flow_gpm":{"prefix":"","suffix":" gpm","digits":1}},
