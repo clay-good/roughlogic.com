@@ -25980,7 +25980,10 @@ test("bounds: spec-v550 computeCraneOutriggerReaction pins the even share, the o
   const r = _v550({ gross_load_kip: 40, counterweight_kip: 30, load_radius_ft: 30, cw_radius_ft: 12, outrigger_spread_ft: 20 });
   assert.ok(Math.abs(r.even_share_kip - 17.5) < 1e-9); // (40+30)/4
   assert.ok(Math.abs(r.overturning_kipft - 840) < 1e-9); // 40*30 - 30*12
-  assert.ok(Math.abs(r.reaction_max_kip - 47.2) < 0.1); // 17.5 + 840/(sqrt2*20)
+  // 17.5 - 840/(sqrt2*20) is negative: the far outrigger has lifted, the crane stands on
+  // three, and the loaded corner carries 840 / (20/sqrt2) = 59.4 kip. (This line pinned the
+  // four-pad figure, 47.2, until 2026-10-10.)
+  assert.ok(r.far_outrigger_lifted && Math.abs(r.reaction_max_kip - 59.4) < 0.1);
   // The worst corner carries far more than the even quarter-share.
   assert.ok(r.reaction_max_kip > 2.5 * r.even_share_kip);
   // A wider spread lowers the reaction.
@@ -26079,7 +26082,10 @@ test("bounds: spec-v554 computeLiftingLugDesign pins the three mode capacities, 
   // The BTH-1 1.20 factor fails a lug the old form passed: 44 kip, 2 in pin in a 2.06 in hole, a = 1.8.
   const tight = _v554({ applied_load_kip: 44, plate_thick_in: 1.0, hole_dia_in: 2.06, pin_dia_in: 2.0, edge_dist_in: 1.8, plate_width_in: 4.0, fy_ksi: 36, fu_ksi: 58, design_factor: 2.0 });
   assert.equal(tight.adequate, false);
-  assert.equal(tight.governing_mode, "shear tear-out");
+  // Since 2026-10-10 the single-plane fracture mode (Eq. 3-49) is computed, and at this
+  // short edge distance it is lower than tear-out.
+  assert.equal(tight.governing_mode, "single-plane fracture beyond the hole");
+  assert.ok(tight.fracture_kip < tight.tearout_kip);
   assert.ok("error" in _v554({ applied_load_kip: 20, plate_thick_in: 1.0, hole_dia_in: 4.0, pin_dia_in: 1.0, edge_dist_in: 2.0, plate_width_in: 4.0 })); // w <= Dh
   assert.ok("error" in _v554({ applied_load_kip: 20, plate_thick_in: 1.0, hole_dia_in: 1.06, pin_dia_in: 1.0, edge_dist_in: 2.0, plate_width_in: 4.0, design_factor: 0.5 }));
 });
@@ -45347,13 +45353,13 @@ test("bounds: spec-v1558 computeSurfaceAirConsumption reserves before it plans",
   assert.ok(Math.abs(r.ascent_avg_ata - (1 + 47.5 / 33)) < 1e-12);
   assert.ok(Math.abs(r.ascent_gas_cuft - 10.5707) < 1e-3);
   assert.ok(Math.abs(r.stop_gas_cuft - 8.72727) < 1e-4);
-  assert.ok(Math.abs(r.rock_bottom_cuft - (r.ascent_gas_cuft + r.stop_gas_cuft)) < 1e-12);
-  assert.ok(Math.abs(r.rock_bottom_cuft - 19.2980) < 1e-3);
+  assert.ok(Math.abs(r.rock_bottom_cuft - (r.ascent_gas_cuft + r.stop_gas_cuft + r.final_ascent_gas_cuft)) < 1e-12);
+  assert.ok(Math.abs(r.rock_bottom_cuft - 20.5253) < 1e-3); // 19.298 to the stop, plus 1.227 from the stop to the surface
   // The reserve is a quarter of the cylinder and is subtracted BEFORE the
   // dive is sized -- 27 min of usable gas, not the 36 the cylinder suggests.
   assert.ok(Math.abs(r.usable_gas_cuft - (80 - r.rock_bottom_cuft)) < 1e-12);
-  assert.ok(Math.abs(r.reserve_share_pct - 24.1225) < 1e-3);
-  assert.ok(Math.abs(r.max_bottom_time_min - 27.2725) < 1e-3);
+  assert.ok(Math.abs(r.reserve_share_pct - 100 * r.rock_bottom_cuft / 80) < 1e-9 && Math.abs(r.reserve_share_pct - 25.6566) < 1e-3);
+  assert.ok(Math.abs(r.max_bottom_time_min - 26.7211) < 1e-3);
   assert.ok(Math.abs(r.naive_bottom_time_min - 35.9428) < 1e-3);
   assert.ok(r.max_bottom_time_min < r.naive_bottom_time_min);
   // Everything is exactly linear in the team size and the elevated rate.
@@ -45368,7 +45374,8 @@ test("bounds: spec-v1558 computeSurfaceAirConsumption reserves before it plans",
   // A reserve that eats the whole cylinder is an error, not a negative dive.
   assert.ok("error" in _v1558({ ...base, cylinder_volume_cuft: 15 }));
   assert.ok("error" in _v1558({ ...base, sac_cuft_per_min: 0 }));
-  assert.ok("error" in _v1558({ ...base, stop_depth_ft: 80 }));
+  assert.ok("error" in _v1558({ ...base, stop_depth_ft: 81 }), "a stop deeper than the dive is an entry error");
+  assert.ok(!("error" in _v1558({ ...base, stop_depth_ft: 80 })), "a stop at the bottom depth is allowed, so a dive no deeper than its stop can be planned");
   assert.ok("error" in _v1558({ ...base, team_size: 0 }));
   assert.ok("error" in _v1558({ ...base, ascent_rate_fpm: 0 }));
   assert.ok("error" in _v1558({ ...base, planned_depth_ft: Infinity }));
@@ -45484,11 +45491,15 @@ test("bounds: spec-v1561 computeUmbilicalAirSupply keeps flow and reserve separa
   assert.ok(Math.abs(_v1561({ ...base, diver_count: 6 }).required_scfm - 2 * r.required_scfm) < 1e-9);
   assert.ok(_v1561({ ...base, diver_count: 2 }).required_scfm < r.required_scfm);
   // The reserve is a SEPARATE calculation and carries its own verdict.
-  assert.ok(Math.abs(r.reserve_required_cuft - 1.4 * r.depth_ata * 10) < 1e-12);
+  // For every diver on the spread (one diver's worth until 2026-10-10).
+  assert.ok(Math.abs(r.reserve_required_cuft - 3 * 1.4 * r.depth_ata * 10) < 1e-9);
+  assert.ok(Math.abs(r.reserve_per_diver_cuft - 1.4 * r.depth_ata * 10) < 1e-12);
   // Usable only down to bottom pressure: 8 x (200 - 100/33 x 14.7) / 14.7.
   assert.ok(Math.abs(r.tank_free_gas_cuft - 8 * (200 - 100 / 33 * 14.7) / 14.7) < 1e-9);
-  assert.ok(r.reserve_margin_cuft > 0);
-  assert.ok(r.reserve_verdict.includes("covers it"));
+  // Three divers need 169 cu ft and this tank frees 85: short. One diver is covered.
+  assert.ok(r.reserve_margin_cuft < 0 && r.reserve_verdict.includes("SHORT"));
+  const solo = _v1561({ ...base, diver_count: 1 });
+  assert.ok(solo.reserve_margin_cuft > 0 && solo.reserve_verdict.includes("covers it"));
   // A spread that passes the flow check and fails the reserve check: the
   // exact case the tile exists to catch.
   const thin = _v1561({ ...base, volume_tank_cuft: 2 });
@@ -57339,7 +57350,7 @@ test("bounds: spec-v1903 computeReliefStorageFloorLoad pins average and local pr
   const ok = _v1903({ ...base, tiers: 1, coverage_fraction: 0.4 });
   assert.ok(Math.abs(ok.average_psf - 69) < 1e-9);
   assert.ok(ok.average_ratio < 1);
-  assert.strictEqual(_v1903({ ...base, coverage_fraction: 0 }).average_psf, 0);
+  assert.ok("error" in _v1903({ ...base, coverage_fraction: 0 }), "no coverage is not a layout; it used to read as passing on average");
   for (const bad of [{ pallet_weight_lb: 0 }, { footprint_length_in: 0 }, { footprint_width_in: 0 }, { tiers: 0 }, { tiers: 1.5 }, { coverage_fraction: -0.01 }, { coverage_fraction: 1.01 }, { floor_area_sqft: 0 }, { design_live_load_psf: 0 }, { pallet_weight_lb: Infinity }]) {
     assert.ok("error" in _v1903({ ...base, ...bad }), JSON.stringify(bad));
   }
@@ -59766,4 +59777,104 @@ test("bounds: fixes from the 2026-10-10 independent review of the 28 calculators
   assert.ok(Math.abs(lb.in_water_weight_lb / 1000 - (1 - 64 / 150)) < 1e-9);
   assert.match(lb.note, /a little over half for concrete/);
   assert.doesNotMatch(lb.note, /a third for concrete/);
+});
+
+import { computeCraneOutriggerReaction as _s1Out, computeLiftingLugDesign as _s1Lug, computeForkliftCapacityDerate as _s1Fork, computeShackleEyeboltWll as _s1Shk, computeWinchDrumLinePull as _s1Winch, computeMultiLegSling as _s1Mls, computeTandemLiftShare as _s1Tan, computeCgLoadShare as _s1Cg } from "../../calc-rigging.js";
+import { computeFallArrestClearance as _s1Fac, computeSlingAngle as _s1Sa, computeSweatRateHydration as _s1Sw, computeFallArrestAnchorage as _s1Faa, computeRopeMA as _s1Rope, computeConfinedSpacePurge as _s1Purge } from "../../calc-rescue.js";
+import { computePortableLadderSetup as _s1Lad, computeHearingProtectorNrr as _s1Nrr } from "../../calc-safety.js";
+import { computeUmbilicalAirSupply as _s1Umb, computeSurfaceAirConsumption as _s1Sac, computeNoDecompressionLimit as _s1Ndl, computeNitroxMod as _s1Mod, computeNitroxEad as _s1Ead, computeChamberGasVolume as _s1Chm } from "../../calc-diving.js";
+import { computeUsrCribCapacity as _s1Crib, computeCollapseFloorLoad as _s1Floor, computeReliefStorageFloorLoad as _s1Store } from "../../calc-usar.js";
+test("hardening slice 1 (rigging, fall protection, rescue, diving, collapse shoring): the reviewed defects stay fixed", () => {
+  // crane-outrigger-reaction: three-point statics once the far pad lifts, |M|, and an overturned crane is an error.
+  const o1 = _s1Out({ gross_load_kip: 40, counterweight_kip: 30, load_radius_ft: 30, cw_radius_ft: 12, outrigger_spread_ft: 20 });
+  assert.ok(o1.far_outrigger_lifted && Math.abs(o1.reaction_max_kip - 840 / (20 / Math.SQRT2)) < 1e-9);
+  const o2 = _s1Out({ gross_load_kip: 40, counterweight_kip: 60, load_radius_ft: 20, cw_radius_ft: 10, outrigger_spread_ft: 24 });
+  assert.ok(!o2.far_outrigger_lifted && Math.abs(o2.reaction_max_kip + o2.far_reaction_kip - 50) < 1e-9, "the two diagonal pads carry half the total while all four are down");
+  assert.ok("error" in _s1Out({ gross_load_kip: 40, counterweight_kip: 0, load_radius_ft: 60, outrigger_spread_ft: 20 }));
+  const o3 = _s1Out({ gross_load_kip: 5, counterweight_kip: 30, load_radius_ft: 10, cw_radius_ft: 12, outrigger_spread_ft: 20 });
+  assert.ok(o3.reaction_max_kip > o3.even_share_kip && o3.loaded_side === "counterweight");
+  // The max never exceeds the total on the crane, and is continuous where the far pad lifts.
+  for (let r = 5; r <= 40; r += 0.25) {
+    const x = _s1Out({ gross_load_kip: 40, counterweight_kip: 30, load_radius_ft: r, cw_radius_ft: 12, outrigger_spread_ft: 20 });
+    if (!("error" in x)) assert.ok(x.reaction_max_kip <= 70 + 1e-9 && x.reaction_max_kip >= 17.5 - 1e-9, "radius " + r);
+  }
+  const lift = (40 * 0 + 17.5 * 2 * (20 / Math.SQRT2) + 30 * 12) / 40; // radius at which the far pad just lifts
+  assert.ok(Math.abs(_s1Out({ gross_load_kip: 40, counterweight_kip: 30, load_radius_ft: lift - 1e-6, cw_radius_ft: 12, outrigger_spread_ft: 20 }).reaction_max_kip - _s1Out({ gross_load_kip: 40, counterweight_kip: 30, load_radius_ft: lift + 1e-6, cw_radius_ft: 12, outrigger_spread_ft: 20 }).reaction_max_kip) < 1e-4);
+  // lifting-lug-design: single-plane fracture beyond the hole is computed and can govern.
+  const lug = _s1Lug({ applied_load_kip: 48, plate_thick_in: 1, hole_dia_in: 2.06, pin_dia_in: 2, edge_dist_in: 2, plate_width_in: 4, fy_ksi: 50, fu_ksi: 65, design_factor: 2 });
+  assert.ok(lug.adequate === false && lug.governing_mode === "single-plane fracture beyond the hole" && Math.abs(lug.fracture_kip - 43.08) < 0.01);
+  assert.equal(lug.governing_kip, Math.min(lug.bearing_kip, lug.tension_kip, lug.tearout_kip, lug.fracture_kip));
+  // forklift-capacity-derate: a short load center never raises capacity above the plate.
+  const fk = _s1Fork({ rated_cap_lb: 5000, rated_lc_in: 24, actual_lc_in: 12, load_lb: 9000 });
+  assert.ok(fk.net_capacity_lb === 5000 && fk.pass === false);
+  assert.equal(_s1Fork({ rated_cap_lb: 5000, rated_lc_in: 24, actual_lc_in: 30, load_lb: 3900 }).net_capacity_lb, 4000);
+  // shackle-eyebolt-wll: the required catalog rating is the leg load over the derate; unknown hardware is rejected.
+  const sh = _s1Shk({ leg_load_lb: 3000, rated_wll_lb: 7000, angle_deg: 45, hardware: "shoulder_eyebolt" });
+  assert.ok(sh.pass === false && Math.abs(sh.required_wll_lb - 10000) < 1e-6 && sh.required_wll_lb > 7000);
+  assert.ok("error" in _s1Shk({ leg_load_lb: 3000, rated_wll_lb: 7000, angle_deg: 45, hardware: "eyebolt" }));
+  assert.ok("error" in _s1Winch({ rated_pull_lb: 10000, drum_dia_in: 10, rope_dia_in: 0.5, barrel_width_in: 10, target_layer: 2.9 }));
+  assert.ok("error" in _s1Winch({ rated_pull_lb: 10000, drum_dia_in: 10, rope_dia_in: 2, barrel_width_in: 1, target_layer: 1 }));
+  assert.ok("error" in _s1Mls({ total_load_lb: 8000, num_legs: 2.5, horizontal_angle_deg: 60 }));
+  // A blank centre of gravity (NaN from the renderer) is an error, not "under pick 1".
+  assert.ok("error" in _s1Tan({ total_weight_lb: 40000, span_in: 300, cg_from_c1_in: NaN, c1_chart_lb: 60000, c2_chart_lb: 24000 }));
+  assert.ok("error" in _s1Cg({ total_weight_lb: 1000, span_in: 100, cg_from_p1_in: NaN }));
+  // fall-arrest-clearance: below the ANCHOR includes the anchor's height above the D-ring.
+  const fa = _s1Fac({ free_fall_distance_ft: 2, deceleration_distance_ft: 4, worker_height_ft: 5, safety_margin_ft: 3, available_clearance_ft: 14, anchor_above_dring_ft: 4 });
+  assert.ok(fa.required_clearance_ft === 18 && fa.adequate === false && fa.clearance_below_feet_ft === 9);
+  // Same 6 ft lanyard, anchor level with the D-ring: the same 18 ft below the anchor.
+  assert.equal(_s1Fac({ free_fall_distance_ft: 6, deceleration_distance_ft: 4, worker_height_ft: 5, safety_margin_ft: 3 }).required_clearance_ft, 18);
+  assert.ok("error" in _s1Fac({ free_fall_distance_ft: 6, deceleration_distance_ft: 4, worker_height_ft: 5, safety_margin_ft: 3, anchor_above_dring_ft: -2 }));
+  // sling-angle: "vertical" does not swallow a spread angle.
+  const sv = _s1Sa({ load_lb: 4000, sling_config: "vertical", included_angle_deg: 120, n_legs: 2 });
+  assert.ok(sv.angle_ignored === true && sv.tension_per_leg_lb === 2000 && Math.abs(sv.spread_tension_per_leg_lb - 4000) < 1e-6);
+  assert.equal(_s1Sa({ load_lb: 4000, sling_config: "bridle", included_angle_deg: 120, n_legs: 2 }).angle_ignored, false);
+  assert.equal(_s1Sa({ load_lb: 4000, sling_config: "vertical", included_angle_deg: 0, n_legs: 2 }).tension_per_leg_lb, 2000);
+  assert.equal(_s1Sa({ load_lb: 4000, sling_config: "vertical", n_legs: 2 }).tension_per_leg_lb, 2000);
+  assert.ok(Math.abs(_s1Sa({ load_lb: 4000, sling_config: "bridle", included_angle_deg: 120, n_legs: 2 }).tension_per_leg_lb - 4000) < 1e-6);
+  assert.ok("error" in _s1Sa({ load_lb: 4000, sling_config: "bridle", n_legs: 2 }));
+  assert.ok("error" in _s1Sw({ pre_weight_lb: 180, fluid_oz: 20, duration_hr: 2 }));
+  assert.ok("error" in _s1Faa({ design_route: "Engineered", anchorage_capacity_lb: 5000, design_load_lb: 4000 }));
+  assert.ok(typeof _s1Rope() === "object" && typeof _s1Purge() === "object" && typeof _s1Sa() === "object");
+  // portable-ladder-setup: the rail budget charges what the setup uses.
+  // (The grasping-device alternative still budgets the full 3 ft: it excuses the extension, not the reach.)
+  assert.equal(_s1Lad({ ladder_length_ft: 24, landing_height_ft: 22, extension_above_landing_ft: 1, secured_with_grasping_device: "yes" }).length_ok, false);
+  assert.equal(_s1Lad({ ladder_length_ft: 26, landing_height_ft: 22, extension_above_landing_ft: 5 }).length_ok, false);
+  assert.equal(_s1Lad({ ladder_length_ft: 24, landing_height_ft: 22, extension_above_landing_ft: 3 }).length_ok, false);
+  // hearing-protector-nrr: the note's ordering matches the numbers. A-weighted: OSHA-50 above NIOSH muff below NRR 14, below it above.
+  const att = (nrr, method) => _s1Nrr({ twa_db: 100, weighting: "A", nrr_db: nrr, method }).effective_attenuation_db;
+  assert.ok(att(10, "osha-50") > att(10, "niosh-muff") && att(20, "osha-50") < att(20, "niosh-muff"));
+  assert.ok(Math.abs(att(14, "osha-50") - att(14, "niosh-muff")) < 1e-9);
+  for (const nrr of [10, 14, 20, 33]) assert.ok(att(nrr, "appendix-b") >= att(nrr, "osha-50") && att(nrr, "appendix-b") >= att(nrr, "niosh-muff"));
+  assert.match(_s1Nrr({ twa_db: 100, weighting: "A", nrr_db: 25, method: "appendix-b" }).note, /cross at an NRR of 14/);
+  // umbilical-air-supply: the reserve is for every diver.
+  const u = { depth_ft: 100, compressor_scfm: 60, alt_depth_ft: 190, volume_tank_cuft: 8, tank_pressure_psi: 200 };
+  assert.ok(Math.abs(_s1Umb({ ...u, diver_count: 3 }).reserve_required_cuft / _s1Umb({ ...u, diver_count: 1 }).reserve_required_cuft - 3) < 1e-12);
+  assert.match(_s1Umb({ ...u, diver_count: 3 }).reserve_verdict, /SHORT/);
+  assert.ok(_s1Umb({ ...u, diver_count: 3, compressor_scfm: 3 }).max_depth_ft === 0);
+  // surface-air-consumption: the reserve reaches the surface, and a dive shallower than the stop works.
+  const sac = _s1Sac({ sac_cuft_per_min: 0.6, planned_depth_ft: 80, planned_bottom_time_min: 20, cylinder_volume_cuft: 80, team_size: 2, stress_sac_cuft_per_min: 1 });
+  assert.ok(Math.abs(sac.final_ascent_gas_cuft - 2 * 1 * 0.5 * (1 + 7.5 / 33)) < 1e-9);
+  assert.ok(Math.abs(sac.rock_bottom_cuft - sac.ascent_gas_cuft - sac.stop_gas_cuft - sac.final_ascent_gas_cuft) < 1e-9);
+  assert.ok(!("error" in _s1Sac({ sac_cuft_per_min: 0.6, planned_depth_ft: 15, planned_bottom_time_min: 20, cylinder_volume_cuft: 80, team_size: 2, stress_sac_cuft_per_min: 1 })));
+  // no-decompression-limit: oxygen is checked; a comparison residual past the limit is rejected; no negative depth.
+  const ndl = _s1Ndl({ planned_depth_ft: 130, table_ndl_min: 55, planned_bottom_time_min: 30, oxygen_fraction: 0.5 });
+  assert.ok(ndl.oxygen_over === true && /OXYGEN IS OVER/.test(ndl.verdict));
+  assert.equal(_s1Ndl({ planned_depth_ft: 60, table_ndl_min: 55, planned_bottom_time_min: 30, oxygen_fraction: 0.32 }).oxygen_over, false);
+  assert.ok("error" in _s1Ndl({ planned_depth_ft: 60, table_ndl_min: 55, planned_bottom_time_min: 30, alt_residual_time_min: 70 }));
+  assert.equal(_s1Ndl({ planned_depth_ft: 10, table_ndl_min: 55, planned_bottom_time_min: 30, oxygen_fraction: 0.5 }).equivalent_air_depth_ft, 0);
+  // nitrox: no mix richer than pure oxygen.
+  assert.ok(_s1Mod({ oxygen_fraction: 0.32, planned_depth_ft: 10 }).best_mix_pct_floor === 100);
+  const ead = _s1Ead({ oxygen_fraction: 0.36, depth_ft: 10, target_ead_ft: 5 });
+  assert.ok(ead.deepest_usable_pct_floor <= 100 && ead.deepest_usable_ead_ft >= 0);
+  assert.equal(_s1Chm({ chamber_volume_cuft: 250, treatment_pressure_psig: 60, ventilation_acfm_per_occupant: 2, occupant_count: 2, treatment_minutes: 240, air_inventory_cuft: 500, oxygen_acfm_per_occupant: 1.0, oxygen_minutes: 120 }).longest_treatment_min, 0);
+  // usr-crib-capacity: only the crossings under the load carry it.
+  const crib = { timber_size: "4x4", layup: "2x2", bearing_condition: "all", crib_load_lb: 20000 };
+  const all = _s1Crib(crib).crib_capacity_lb;
+  assert.ok(Math.abs(_s1Crib({ ...crib, bearing_condition: "one_corner" }).crib_capacity_lb - all / 4) < 1e-9);
+  assert.ok(Math.abs(_s1Crib({ ...crib, bearing_condition: "two_corners" }).crib_capacity_lb - all / 2) < 1e-9);
+  assert.match(_s1Crib({ ...crib, bearing_condition: "one_corner" }).load_verdict, /^OVER/);
+  assert.ok("error" in _s1Floor({ floor_type: "entered", floor_self_weight_psf: 0 }));
+  assert.ok("error" in _s1Floor({ floor_type: "concrete", slab_thickness_in: 0 }));
+  assert.ok(!("error" in _s1Floor({ floor_type: "concrete", slab_thickness_in: 6 })));
+  assert.ok("error" in _s1Store({ coverage_fraction: 0 }));
 });

@@ -3343,13 +3343,13 @@ cross-check.
 | calc-reliefwater.js | `computeResponderCampSanitation` | `{ men_count = 0, women_count = 0, pressure_water = "yes" } = {}` | _ | _ | _ |
 | calc-reliefwater.js | `computeRtcrColiformSamples` | `{ population_served = 0, tc_positive_count = 0, positive_repeat_count = 0, ro...` | _ | _ | _ |
 | calc-reliefwater.js | `computeSolarWaterPumpSizing` | `{ daily_demand_gpd = 0, peak_sun_hours = 0, tdh_ft = 0, pump_efficiency = 0, ...` | _ | _ | _ |
-| calc-rescue.js | `computeConfinedSpacePurge` | `{ volume_ft3 = 0, blower_cfm = 0, target_purges = 7 }` | _ | _ | _ |
+| calc-rescue.js | `computeConfinedSpacePurge` | `{ volume_ft3 = 0, blower_cfm = 0, target_purges = 7 } = {}` | _ | _ | _ |
 | calc-rescue.js | `computeFallArrestAnchorage` | `{ workers_attached = 1, anchorage_capacity_lb = 0, design_route = "prescripti...` | _ | _ | _ |
 | calc-rescue.js | `computeFallArrestClearance` | `{ free_fall_distance_ft = 0, deceleration_distance_ft = 0, worker_height_ft =...` | _ | _ | _ |
-| calc-rescue.js | `computeRopeMA` | `{ rig = "3:1", efficiency = 0.9, load_lb = 0 }` | _ | _ | _ |
+| calc-rescue.js | `computeRopeMA` | `{ rig = "3:1", efficiency = 0.9, load_lb = 0 } = {}` | _ | _ | _ |
 | calc-rescue.js | `computeSearchTrackSpacing` | `{ sweep_width_m = 0, track_spacing_m = 0, target_pod = 0 } = {}` | _ | _ | _ |
 | calc-rescue.js | `computeSearcherHours` | `{ area_acres = 0, track_spacing_ft = 0, speed_mph = 0, searchers = 1 } = {}` | _ | _ | _ |
-| calc-rescue.js | `computeSlingAngle` | `{ load_lb = 0, sling_config = "vertical", included_angle_deg = 60, n_legs = 2...` | _ | _ | _ |
+| calc-rescue.js | `computeSlingAngle` | `{ load_lb = 0, sling_config = "vertical", included_angle_deg = null, n_legs =...` | _ | _ | _ |
 | calc-rescue.js | `computeSweatRateHydration` | `{ pre_weight_lb = 0, post_weight_lb = 0, fluid_oz = 0, urine_oz = 0, duration...` | _ | _ | _ |
 | calc-rescue.js | `computeSweepWidthCorrection` | `{ uncorrected_width_ft = 0, weather_factor = 1, speed_factor = 1, fatigue_fac...` | _ | _ | _ |
 | calc-restoration.js | `computeAirMovers` | `{ affected_area_ft2, water_class = "2", rooms = 1, wall_ceiling_ft2 = 0, inse...` | _ | _ | _ |
@@ -5561,7 +5561,7 @@ per spec-v14 §13.1 second paragraph.
 | `spherical-zone-volume` | Spherical Zone (Segment of Two Bases) Volume | Project (first-principles); prismatoid rule V=(pi h/6)(3r1^2+3r2^2+h^2) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+4 more) |
 | `spray-booth-airflow` | Spray Booth Airflow and Makeup Air Load | NFPA; exhaust = opening x face velocity; load = 1.08 x cfm x dT | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `stack-emission-pte` | Stack Emission Rate and Potential to Emit | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
-| `surface-air-consumption` | Dive Surface Air Consumption, Rock Bottom, and Gas Planning | Project (first-principles); the operation's diving safety manual and the supervisor g... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `surface-air-consumption` | Dive Surface Air Consumption, Rock Bottom, and Gas Planning | Project (first-principles); CORRECTED 2026-10-10: the reserve now includes the last l... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `swing-fall-geometry` | Swing Fall Geometry (Pendulum Drop and Arc) | pendulum geometry; asin(10/20) = exactly 30 deg; drop 20 - sqrt(400-100) = 2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `tank-volume` | Tank Volume (Dipstick) | First-principles circular-segment geo...; 24 in dia x 48 in horizontal, depth 12 in (half) -> 47.00... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+6 more) |
 | `tank-volume-dished-heads` | Horizontal Tank Volume with Dished Heads (Dipstick) | Project (first-principles); shell segment + head cap (b/R = 1/2) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5581,7 +5581,7 @@ per spec-v14 §13.1 second paragraph.
 | `triangle-sas` | Triangle Solver (Two Sides and the Included Angle) | Project (first-principles); law of cosines | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+8 more) |
 | `triangle-ssa` | Triangle Solver (Two Sides and a Non-Included Angle, the Ambiguous Case) | Project (first-principles); law of sines, ambiguous case | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `triangle-sss` | Triangle Solver (Three Sides) | Project (first-principles); law of cosines / Heron | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+6 more) |
-| `umbilical-air-supply` | Surface-Supplied Diver Air Supply Rate and Reserve | Project (first-principles); the applicable commercial diving regulations and the supe... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `umbilical-air-supply` | Surface-Supplied Diver Air Supply Rate and Reserve | Project (first-principles); CORRECTED 2026-10-10: the reserve is for every diver on t... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `unit-converter` | Unit Converter | NIST SI/customary unit conversion fac...; 100 ft -> meters: 30.48 m; pure unit conversion identity | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `upgrade-roi` | Upgrade ROI / Payback | Project (first-principles); NPV = -C + sum(S / (1+d)^i) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `vbelt-drive` | V-Belt Sheave and Drive Sizing | ANSI/RMA / Gates; L = 2C + (pi/2)(D1+D2) + (D2-D1)^2/(4C); design_HP = HP*SF | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -6349,7 +6349,7 @@ per spec-v14 §13.1 second paragraph.
 | `crane-ground-bearing` | Crane Ground Bearing Pressure and Mat Size | OSHA 1926 Subpart CC / outrigger-reac...; 60,000 lb on a 4.0 ft^2 float, 3,000 psf allowable -> 15,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `crane-load-radius-boom` | Crane Load Radius and Boom-Tip Height from Boom Geometry | Crane boom geometry (load radius / ti...; R = 4 + 30*cos(60) = 19; H = 6 + 30*sin(60) = 31.98; angl... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `crane-net-capacity` | Crane Net Capacity After Deductions | OSHA 1926.1417(o) / ASME B30.5; gross 30,000, hook 800, wire 400, below-hook 600, load 22... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `crane-outrigger-reaction` | Crane Outrigger Reaction from Lift Geometry | Crane load-moment method / SAE J1063 ...; 40 kip at 30 ft, 30 kip CW at 12 ft, 20 ft spread -> even... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `crane-outrigger-reaction` | Crane Outrigger Reaction from Lift Geometry | Crane load-moment method / SAE J1063 ...; CORRECTED 2026-10-10: at this geometry the far outrigger ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `crane-power-line-clearance` | Crane Power Line Clearance (OSHA 1926.1408) | Occupational Safety and Health Admini...; Table A: up to 50 kV, 10 ft. Having determined the line i... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `forklift-capacity-derate` | Forklift Load-Center Capacity Derate | ASME B56.1 / truck data plate; 5,000 lb @ 24 in handling a load at 36 in, 3,000 lb -> 3,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `guy-wire-tension` | Guy-Wire / Down-Guy Tension and Mast Download | Guy-wire / down-guy tension and mast ...; theta = atan(20/20) = 45 deg; tension = 500/cos45 = 707.1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |

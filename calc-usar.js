@@ -127,6 +127,11 @@ export function computeCollapseFloorLoad({ floor_type = "concrete", slab_thickne
   if (!(Number.isInteger(floors_bearing) && floors_bearing >= 1)) return { error: "Floors bearing on the shore must be a whole number of at least 1." };
   if (!(shore_spacing_ft > 0) || !(tributary_width_ft > 0)) return { error: "Shore spacing and tributary width must be positive." };
   if (!(Number.isInteger(posts_per_shore) && posts_per_shore >= 1)) return { error: "Posts per shore must be a whole number of at least 1." };
+  // The floor itself is the load being shored. A concrete slab of no thickness, or
+  // an "entered" self-weight left at zero, used to pass on the rescuer allowance
+  // alone: 480 lb on a shore under a collapsed floor.
+  if (floor_type === "concrete" && !(slab_thickness_in > 0)) return { error: "Enter the slab thickness (in); a concrete floor weighs about 12.5 psf per inch." };
+  if (floor_type === "entered" && !(floor_self_weight_psf > 0)) return { error: "Enter the floor's self-weight (psf), or choose a floor construction." };
   const self_weight_psf = floor_type === "concrete" ? slab_thickness_in * _CONCRETE_PSF_PER_IN
     : floor_type === "entered" ? floor_self_weight_psf : _FLOOR_PSF[floor_type];
   // Each collapsed floor above brings its own slab, contents, and partitions;
@@ -286,7 +291,13 @@ export function computeUsrCribCapacity({ timber_size = "6x6", layup = "3x3", spe
   const contact_points = _CRIB_POINTS[layup];
   const base_capacity_lb = contact_area_sqin * contact_points * bearing_stress_psi;
   const species_factor = _SPECIES_FACTOR[species];
-  const crib_capacity_lb = base_capacity_lb * species_factor;
+  // L = A x N x P counts the crossings that are UNDER THE LOAD. A load bearing on
+  // one corner of the crib is on one crossing, and on two corners on two. Until
+  // 2026-10-10 the bearing condition lowered the height limit and left the
+  // capacity at every crossing, so 20,000 lb on one corner of a 4x4 crib read
+  // "within the crib capacity" at 0.82 where one crossing carries 6,125 lb.
+  const loaded_points = bearing_condition === "one_corner" ? 1 : bearing_condition === "two_corners" ? 2 : contact_points;
+  const crib_capacity_lb = contact_area_sqin * loaded_points * bearing_stress_psi * species_factor;
   const height_ratio = _CRIB_RATIO[bearing_condition];
   const ratio_height_ft = height_ratio * crib_width_ft;
   const practical_height_ft = _CRIB_PRACTICAL_FT[timber_size];
@@ -297,7 +308,7 @@ export function computeUsrCribCapacity({ timber_size = "6x6", layup = "3x3", spe
   const load_entered = crib_load_lb > 0;
   const load_ratio = crib_load_lb / crib_capacity_lb;
   return {
-    member_in, contact_area_sqin, contact_points, base_capacity_lb, species_factor, crib_capacity_lb,
+    member_in, contact_area_sqin, contact_points, loaded_points, base_capacity_lb, species_factor, crib_capacity_lb,
     height_ratio, ratio_height_ft, practical_height_ft, max_height_ft, governing_limit, load_ratio, load_entered,
     load_verdict: !load_entered ? "no load entered" : load_ratio <= 1 + 1e-9 ? "within the crib capacity" : "OVER the crib capacity -- add crossings (3x3), larger timber, or more cribs",
     note: "A crib fails by crushing the wood across the grain where the layers cross, so its capacity is the number of crossing points times the area of each times the allowable bearing stress, L = A x N x P. That is why a 3x3 layup carries more than twice a 2x2 of the same timber: nine contact points instead of four. The crushing failure is slow and audible, which is why cribbing is trusted in collapse work. Height is a stability limit that tightens as the crib loses contact: three times the narrowest width with every point bearing, two for lift-and-crib work, one and a half on two of four corners, one on a single corner, and a practical ceiling of about 4 ft for 4x4 and 6 ft for 6x6 cribbing; the lower limit governs, and a crib that must be taller is widened rather than stacked higher. Keep the crib within about 15 degrees of level. The 2021 Shoring Operations Guide uses 500 psi for No. 1 and better Douglas Fir; the 2006 Field Operations Guide lists 625 psi perpendicular to grain, so the stress is an input and the SOG value is the default. The surface under the crib must carry the same load over the crib's footprint. This does not check that surface, the load path above, wedges and shims, lateral or aftershock stability, or plastic cribbing, which follows its manufacturer's ratings. The US&R guides, the US&R Structures Specialist, and the incident's structural engineer govern.",
@@ -329,7 +340,7 @@ USAR_RENDERERS["usr-crib-capacity"] = _simpleRenderer({
   ],
   outputs: [
     { key: "pts", id: "ucc-out-pts", label: "Contact points", value: (r) => fmt(r.contact_points, 0) + " at " + fmt(r.contact_area_sqin, 2) + " sq in each" },
-    { key: "cap", id: "ucc-out-cap", label: "Crib capacity with species factor", value: (r) => fmt(r.crib_capacity_lb, 0) + " lb (" + fmt(r.base_capacity_lb, 0) + " lb x " + fmt(r.species_factor, 2) + ")" },
+    { key: "cap", id: "ucc-out-cap", label: "Crib capacity with species factor", value: (r) => fmt(r.crib_capacity_lb, 0) + " lb on the " + fmt(r.loaded_points, 0) + " crossing(s) under the load (all " + fmt(r.contact_points, 0) + " would carry " + fmt(r.base_capacity_lb * r.species_factor, 0) + " lb)" },
     { key: "h", id: "ucc-out-h", label: "Maximum crib height", value: (r) => fmt(r.max_height_ft, 2) + " ft -- governed by " + r.governing_limit + " (ratio " + fmt(r.ratio_height_ft, 2) + " ft, practical " + fmt(r.practical_height_ft, 0) + " ft)" },
     { key: "load", id: "ucc-out-load", label: "Load check", value: (r) => r.load_entered ? fmt(r.load_ratio, 2) + " of capacity -- " + r.load_verdict : r.load_verdict },
     { key: "n", id: "ucc-out-n", label: "Note", value: (r) => r.note },
@@ -713,7 +724,7 @@ export function computeReliefStorageFloorLoad({ pallet_weight_lb = 2300, footpri
   if (!(pallet_weight_lb > 0)) return { error: "Pallet gross weight must be positive." };
   if (!(footprint_length_in > 0) || !(footprint_width_in > 0)) return { error: "Pallet footprint dimensions must be positive." };
   if (!(Number.isInteger(tiers) && tiers >= 1)) return { error: "Tiers stacked must be a whole number of at least 1." };
-  if (!(coverage_fraction >= 0 && coverage_fraction <= 1)) return { error: "Coverage fraction must be between 0 and 1." };
+  if (!(coverage_fraction > 0 && coverage_fraction <= 1)) return { error: "Coverage fraction must be above 0 and no more than 1 (the share of the floor under pallets)." };
   if (!(floor_area_sqft > 0)) return { error: "Floor area must be positive." };
   if (!(design_live_load_psf > 0)) return { error: "Design live load must be positive (from the drawings, or the occupancy's ASCE 7 Table 4.3-1 / IBC Table 1607.1 value)." };
   const footprint_area_sqft = footprint_length_in * footprint_width_in / _SQIN_PER_SQFT;

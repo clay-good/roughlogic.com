@@ -47,7 +47,7 @@ const _finiteGuard = (o) => {
 // minutes = (volume * target_purges) / CFM. OSHA 1910.146 cited by section.
 
 // dims: in { volume_ft3: L^3, blower_cfm: L^3 T^-1, target_purges: dimensionless } out: minutes: T
-export function computeConfinedSpacePurge({ volume_ft3 = 0, blower_cfm = 0, target_purges = 7 }) {
+export function computeConfinedSpacePurge({ volume_ft3 = 0, blower_cfm = 0, target_purges = 7 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(volume_ft3 > 0)) return { error: "Volume must be positive." };
   if (!(blower_cfm > 0)) return { error: "Blower CFM must be positive." };
@@ -78,7 +78,7 @@ export const ROPE_RIGS = {
 
 // dims: in { rig: dimensionless, efficiency: dimensionless, load_lb: M L T^-2 }
 //        out: { theoretical_ma: dimensionless, actual_ma: dimensionless, haul_force_lb: M L T^-2, pulleys: dimensionless }
-export function computeRopeMA({ rig = "3:1", efficiency = 0.9, load_lb = 0 }) {
+export function computeRopeMA({ rig = "3:1", efficiency = 0.9, load_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const r = ROPE_RIGS[rig];
   if (!r) return { error: "Unknown rig type." };
@@ -121,11 +121,24 @@ function _v27SlingDDEfficiency(dd) {
 
 // dims: in { load_lb: M L T^-2, sling_config: dimensionless, included_angle_deg: dimensionless, n_legs: dimensionless }
 //        out: { tension_per_leg_lb: M L T^-2, choker_factor: dimensionless }
-export function computeSlingAngle({ load_lb = 0, sling_config = "vertical", included_angle_deg = 60, n_legs = 2, dd_ratio = 0, sling_rated_capacity_lb = 0 }) {
+export function computeSlingAngle({ load_lb = 0, sling_config = "vertical", included_angle_deg = null, n_legs = 2, dd_ratio = 0, sling_rated_capacity_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // No angle given: a vertical hitch has none; any other hitch needs one.
+  if (included_angle_deg === null || included_angle_deg === undefined || included_angle_deg === "") {
+    if (sling_config !== "vertical") return { error: "Enter the included angle between the legs (deg)." };
+    included_angle_deg = 0;
+  }
   if (!(load_lb >= 0)) return { error: "Load must be non-negative." };
   if (!(n_legs >= 1)) return { error: "At least one leg required." };
-  if (!(included_angle_deg > 0 && included_angle_deg < 180)) return { error: "Included angle must be 0-180 deg." };
+  // A vertical hitch hangs straight and its legs carry W/n. "Vertical" is the
+  // first option in the list and the angle field is always on the form, so an
+  // angle is often present with it; the W/n figure stands, but it is no longer
+  // silent about it: `angle_ignored` is set and `spread_tension_per_leg_lb` says
+  // what those legs carry if they really spread at that angle (two legs at 120
+  // degrees: twice the vertical figure). 0 degrees, the one angle a vertical
+  // hitch has, is accepted (it was rejected until 2026-10-10).
+  if (sling_config !== "vertical" && !(included_angle_deg > 0 && included_angle_deg < 180)) return { error: "Included angle must be 0-180 deg." };
+  if (!(included_angle_deg >= 0 && included_angle_deg < 180)) return { error: "Included angle must be 0-180 deg." };
   // Included (apex) angle: each leg sits included_angle/2 off the vertical, so
   // vertical equilibrium is n * T * cos(theta/2) = W and T = W / (n cos(theta/2)).
   // Tension is W/n when the legs are vertical (theta -> 0) and diverges as the
@@ -169,10 +182,13 @@ export function computeSlingAngle({ load_lb = 0, sling_config = "vertical", incl
     effective_capacity_lb = rated * dd_efficiency;
     utilization = effective_capacity_lb > 0 ? tension_per_leg / effective_capacity_lb : null;
   }
+  const angle_ignored = sling_config === "vertical" && included_angle_deg > 1e-9;
+  const spread_tension_per_leg_lb = angle_ignored ? load_lb / (Math.min(n_legs, 2) * Math.cos(theta_rad)) : null;
   return {
     tension_per_leg_lb: tension_per_leg, choker_factor: factor,
     min_required_capacity_lb, angle_factor, low_angle_hazard,
     dd_efficiency, effective_capacity_lb, utilization,
+    angle_ignored, spread_tension_per_leg_lb,
   };
 }
 
@@ -241,6 +257,7 @@ function renderSlingAngle(inputRegion, outputRegion, citationEl) {
     const r = computeSlingAngle({ load_lb: Number(w.input.value) || 0, sling_config: c.select.value, included_angle_deg: Number(a.input.value) || 0, n_legs: Number(n.input.value) || 1, sling_rated_capacity_lb: Number(cap.input.value) || 0, dd_ratio: Number(dd.input.value) || 0 });
     if (r.error) { oT.textContent = r.error; oReq.textContent = "-"; oHaz.textContent = "-"; return; }
     oT.textContent = _fmtF(r.tension_per_leg_lb, 0) + " lb";
+    if (r.angle_ignored) oT.textContent += " for legs hanging straight down. THE ANGLE ENTERED IS NOT USED for a vertical hitch: legs spread at that angle carry " + _fmtF(r.spread_tension_per_leg_lb, 0) + " lb each -- choose bridle or basket if they spread";
     oReq.textContent = r.utilization !== null && r.utilization !== undefined
       ? ("rated " + _fmtF(r.effective_capacity_lb, 0) + " lb effective (D/d " + _fmtF(r.dd_efficiency, 2) + "); utilization " + _fmtF(r.utilization, 2))
       : ("needs >= " + _fmtF(r.min_required_capacity_lb, 0) + " lb rated");
@@ -305,7 +322,8 @@ export function computeSweatRateHydration({ pre_weight_lb = 0, post_weight_lb = 
   const urine = Number(urine_oz) || 0;
   const hrs = Number(duration_hr) || 0;
   if (!(pre > 0)) return { error: "Pre-activity weight must be positive (lb)." };
-  if (post < 0) return { error: "Post-activity weight must be non-negative (lb)." };
+  if (!(post > 0)) return { error: "Post-activity weight must be positive (lb)." };
+  if (post < pre / 2) return { error: "The post-activity weight is under half the starting weight; check both entries." };
   if (fluid < 0) return { error: "Fluid consumed must be non-negative (fl oz)." };
   if (urine < 0) return { error: "Urine output must be non-negative (fl oz)." };
   if (!(hrs > 0)) return { error: "Duration must be positive (hours)." };
@@ -445,8 +463,15 @@ function renderSweepWidthCorrection(inputRegion, outputRegion, citationEl) {
 // --- v779 F: Required fall-arrest clearance below the anchor (`fall-arrest-clearance`) ---
 // RFC = free-fall distance + deceleration distance + worker height (D-ring to feet)
 // + safety margin. If the available clearance is below RFC the worker strikes the level.
-// dims: in { free_fall_distance_ft: L, deceleration_distance_ft: L, worker_height_ft: L, safety_margin_ft: L, available_clearance_ft: L } out: { required_clearance_ft: L, margin_ft: L, adequate: dimensionless }
-export function computeFallArrestClearance({ free_fall_distance_ft = 0, deceleration_distance_ft = 0, worker_height_ft = 0, safety_margin_ft = 0, available_clearance_ft = 0 } = {}) {
+// That sum is measured from where the D-ring STARTS. Below the ANCHOR the worker
+// needs the anchor's height above the D-ring as well: the D-ring ends one
+// connector length plus the deceleration distance below the anchor, and the
+// connector length is the free fall plus that height. Until 2026-10-10 the sum
+// without it was labelled "below the anchor", which is right only when the anchor
+// is level with the D-ring: a 6 ft lanyard on an anchor 4 ft overhead (2 ft of free
+// fall) read 14 ft "adequate" where the worker's feet reach 15 ft below the anchor.
+// dims: in { free_fall_distance_ft: L, deceleration_distance_ft: L, worker_height_ft: L, safety_margin_ft: L, available_clearance_ft: L, anchor_above_dring_ft: L } out: { required_clearance_ft: L, clearance_below_feet_ft: L, margin_ft: L, adequate: dimensionless }
+export function computeFallArrestClearance({ free_fall_distance_ft = 0, deceleration_distance_ft = 0, worker_height_ft = 0, safety_margin_ft = 0, available_clearance_ft = 0, anchor_above_dring_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const ffd = Number(free_fall_distance_ft);
   const dd = Number(deceleration_distance_ft);
@@ -457,19 +482,23 @@ export function computeFallArrestClearance({ free_fall_distance_ft = 0, decelera
   if (!(dd >= 0)) return { error: "Deceleration distance must be zero or greater (ft)." };
   if (!(hh > 0)) return { error: "Worker height (D-ring to feet) must be positive (ft)." };
   if (!(sf >= 0)) return { error: "Safety margin must be zero or greater (ft)." };
-  const required_clearance_ft = ffd + dd + hh + sf;
+  const up = Number(anchor_above_dring_ft) || 0;
+  if (!(up >= 0)) return { error: "Anchor height above the D-ring must be zero or greater (ft); for an anchor level with or below the D-ring enter 0, which errs on the safe side." };
+  const required_clearance_ft = up + ffd + dd + hh + sf;
+  // The same requirement measured from the surface the worker stands on.
+  const clearance_below_feet_ft = ffd + dd + sf;
   const hasAvail = avail > 0;
   const margin_ft = hasAvail ? avail - required_clearance_ft : null;
   const adequate = hasAvail ? margin_ft >= -1e-9 : null;
   return {
-    required_clearance_ft, margin_ft, adequate,
-    note: "Required fall clearance below the anchor for a personal fall-arrest system: RFC = free-fall distance + deceleration distance + worker height (harness D-ring to the feet) + a safety margin. Enter each explicitly - the free-fall distance depends on the anchor position relative to the D-ring (a foot-level anchor gives a large free fall, an overhead anchor a small one) and on the connector length; the deceleration distance is the energy absorber's stroke - OSHA 1926.502(d)(16)(iv) limits the system to 3.5 ft, but an ANSI/ASSP Z359.13 absorber rated for a 6 ft free fall may deploy up to 48 in (4 ft) and one rated for 12 ft up to 60 in, so plan on the label's figure (a self-retracting lifeline is usually less); the worker height D-ring-to-feet is about 5 ft; and the safety margin (commonly 2-3 ft) keeps the feet off the lower level. If the available clearance below the anchor is less than RFC, the worker contacts the level before the system arrests the fall. A planning aid; the equipment manufacturer's instructions and a qualified/competent person govern per ANSI Z359 and OSHA 1926 Subpart M.",
+    required_clearance_ft, clearance_below_feet_ft, margin_ft, adequate,
+    note: "Required fall clearance below the anchor for a personal fall-arrest system: RFC = anchor height above the D-ring + free-fall distance + deceleration distance + worker height (harness D-ring to the feet) + a safety margin. The first two together are the connector length, so an overhead anchor shortens the free fall without shortening the clearance needed below the anchor. Measured from the surface the worker stands on, the same requirement is free fall + deceleration + margin. Enter each explicitly - the free-fall distance depends on the anchor position relative to the D-ring (a foot-level anchor gives a large free fall, an overhead anchor a small one) and on the connector length; the deceleration distance is the energy absorber's stroke - OSHA 1926.502(d)(16)(iv) limits the system to 3.5 ft, but an ANSI/ASSP Z359.13 absorber rated for a 6 ft free fall may deploy up to 48 in (4 ft) and one rated for 12 ft up to 60 in, so plan on the label's figure (a self-retracting lifeline is usually less); the worker height D-ring-to-feet is about 5 ft; and the safety margin (commonly 2-3 ft) keeps the feet off the lower level. If the available clearance below the anchor is less than RFC, the worker contacts the level before the system arrests the fall. A planning aid; the equipment manufacturer's instructions and a qualified/competent person govern per ANSI Z359 and OSHA 1926 Subpart M.",
   };
 }
 export const fallArrestClearanceExample = { inputs: { free_fall_distance_ft: 6, deceleration_distance_ft: 4, worker_height_ft: 5, safety_margin_ft: 3, available_clearance_ft: 20 } };
 
 function renderFallArrestClearance(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Notice: the equipment manufacturer's instructions and a qualified / competent person govern all fall protection per ANSI Z359.1 and OSHA 1926 Subpart M; a planning aid. Citation: required fall clearance RFC = free-fall distance + deceleration distance + worker height (D-ring to feet) + safety margin. OSHA 1926.502(d)(16)(iv) limits deceleration to 3.5 ft, while an ANSI/ASSP Z359.13 lanyard rated for a 6 ft free fall may deploy up to 4 ft - plan on the label; the free-fall distance depends on the anchor position and connector length.";
+  citationEl.textContent = "Notice: the equipment manufacturer's instructions and a qualified / competent person govern all fall protection per ANSI Z359.1 and OSHA 1926 Subpart M; a planning aid. Citation: required fall clearance below the anchor RFC = anchor height above the D-ring + free-fall distance + deceleration distance + worker height (D-ring to feet) + safety margin. OSHA 1926.502(d)(16)(iv) limits deceleration to 3.5 ft, while an ANSI/ASSP Z359.13 lanyard rated for a 6 ft free fall may deploy up to 4 ft - plan on the label; the free-fall distance depends on the anchor position and connector length.";
   _aeF(inputRegion, () => fillExample(fallArrestClearanceExample.inputs));
   const ffd = _mnF("Free-fall distance (ft)", "fac-ffd", { step: "any", min: "0", value: "6" });
   ffd.input.value = "6";
@@ -480,19 +509,23 @@ function renderFallArrestClearance(inputRegion, outputRegion, citationEl) {
   const sf = _mnF("Safety margin (ft)", "fac-sf", { step: "any", min: "0", value: "3" });
   sf.input.value = "3";
   const av = _mnF("Available clearance below anchor (ft, optional)", "fac-av", { step: "any", min: "0" });
-  for (const f of [ffd, dd, hh, sf, av]) inputRegion.appendChild(f.wrap);
+  const up = _mnF("Anchor height above the D-ring (ft, 0 if level or below)", "fac-up", { step: "any", min: "0", value: "0" });
+  up.input.value = "0";
+  for (const f of [ffd, up, dd, hh, sf, av]) inputRegion.appendChild(f.wrap);
   const oR = _moF(outputRegion, "Required clearance below anchor", "fac-out-r");
+  const oF = _moF(outputRegion, "Same, below the worker's feet", "fac-out-f");
   const oM = _moF(outputRegion, "Margin vs available", "fac-out-m");
   const oN = _moF(outputRegion, "Note", "fac-out-n");
-  function fillExample(x) { ffd.input.value = x.free_fall_distance_ft; dd.input.value = x.deceleration_distance_ft; hh.input.value = x.worker_height_ft; sf.input.value = x.safety_margin_ft; av.input.value = x.available_clearance_ft; update(); }
+  function fillExample(x) { ffd.input.value = x.free_fall_distance_ft; up.input.value = "0"; dd.input.value = x.deceleration_distance_ft; hh.input.value = x.worker_height_ft; sf.input.value = x.safety_margin_ft; av.input.value = x.available_clearance_ft; update(); }
   const update = _debF(() => {
-    const r = computeFallArrestClearance({ free_fall_distance_ft: Number(ffd.input.value) || 0, deceleration_distance_ft: Number(dd.input.value) || 0, worker_height_ft: Number(hh.input.value) || 0, safety_margin_ft: Number(sf.input.value) || 0, available_clearance_ft: Number(av.input.value) || 0 });
-    if (r.error) { oR.textContent = r.error; oM.textContent = "-"; oN.textContent = ""; return; }
+    const r = computeFallArrestClearance({ free_fall_distance_ft: Number(ffd.input.value) || 0, deceleration_distance_ft: Number(dd.input.value) || 0, worker_height_ft: Number(hh.input.value) || 0, safety_margin_ft: Number(sf.input.value) || 0, available_clearance_ft: Number(av.input.value) || 0, anchor_above_dring_ft: Number(up.input.value) || 0 });
+    if (r.error) { oR.textContent = r.error; oM.textContent = "-"; oF.textContent = "-"; oN.textContent = ""; return; }
     oR.textContent = _fmtF(r.required_clearance_ft, 1) + " ft";
+    oF.textContent = _fmtF(r.clearance_below_feet_ft, 1) + " ft below the surface the worker stands on";
     oM.textContent = r.margin_ft === null ? "enter available clearance to check" : _fmtF(r.margin_ft, 1) + " ft (" + (r.adequate ? "adequate" : "NOT adequate - shorten the connector, use an SRL, or move the anchor up") + ")";
     oN.textContent = r.note;
   }, _DF);
-  for (const el of [ffd.input, dd.input, hh.input, sf.input, av.input]) el.addEventListener("input", update);
+  for (const el of [ffd.input, up.input, dd.input, hh.input, sf.input, av.input]) el.addEventListener("input", update);
 }
 
 export const RESCUE_RENDERERS = {
@@ -528,6 +561,7 @@ export function computeFallArrestAnchorage({ workers_attached = 1, anchorage_cap
   const af = Number(arresting_force_lb) || 0;
   const dd = Number(deceleration_distance_ft) || 0;
   const ff = Number(free_fall_ft) || 0;
+  if (design_route !== "engineered" && design_route !== "prescriptive") return { error: "Design route must be prescriptive (5,000 lb per worker) or engineered (twice the design load)." };
   const engineered = design_route === "engineered";
   if (!Number.isInteger(n) || n < 1) return { error: "Workers attached must be a whole number of 1 or more." };
   if (cap < 0 || dl < 0 || af < 0 || dd < 0 || ff < 0) return { error: "Loads and distances cannot be negative." };

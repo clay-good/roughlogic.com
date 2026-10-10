@@ -6423,7 +6423,7 @@ export const CITATIONS = {
     ],
   },
   "fall-arrest-clearance": {
-    formula: "required_clearance = free_fall_distance + deceleration_distance + worker_height (D-ring to feet) + safety_margin; margin = available_clearance - required_clearance; adequate when margin >= 0.",
+    formula: "required_clearance below the anchor = anchor height above the D-ring + free_fall_distance + deceleration_distance + worker_height (D-ring to feet) + safety_margin (the first two together are the connector length); below the surface the worker stands on = free_fall_distance + deceleration_distance + safety_margin; margin = available_clearance - required_clearance; adequate when margin >= 0.",
     edition: "ANSI Z359.1 (Fall Protection Code) and OSHA 1926 Subpart M fall-clearance calculation, by name.",
     freeAccess: "The additive fall-clearance model is public (ANSI Z359 / OSHA 1926 Subpart M); OSHA standards are free at osha.gov, the Z359 standards are licensed.",
     governance: GOVERNANCE.fire,
@@ -16543,7 +16543,7 @@ export const CITATIONS = {
     ],
   },
   "crane-outrigger-reaction": {
-    formula: "even = (W + Wc)/4; overturning M = W x R - Wc x Rc; R_max = even + M/(sqrt(2) x spread).",
+    formula: "even = (W + Wc)/4; overturning M = W x R - Wc x Rc; R_max = even + |M|/(sqrt(2) x spread) while the far outrigger stays in compression. When even is less than |M|/(sqrt(2) x spread) that pad has lifted, the crane stands on three, and R_max = sqrt(2) x |M| / spread. At |M| >= (W + Wc) x spread / sqrt(2) the resultant is over the corner and the crane overturns.",
     edition: "Crane load-moment method / SAE J1063 stability, by name.",
     freeAccess: "The over-corner outrigger-reaction estimate is a public statics result; the crane manufacturer's load-moment chart governs.",
     governance: GOVERNANCE.rigging,
@@ -16565,7 +16565,7 @@ export const CITATIONS = {
     ],
   },
   "lifting-lug-design": {
-    formula: "bearing = 1.25 Fy Dp t / Nd; tension through the pinhole = Cr Fu 2 t beff / (1.20 Nd), beff = min(4t, be, 0.6 be (Fu/Fy) sqrt(Dh/be)), Cr = 1 - 0.275 sqrt(1 - Dp²/Dh²); double-plane shear tear-out = 0.70 Fu Av / (1.20 Nd), Av = 2 t (a - Dh/2 + (Dp/2)(1 - cos φ)), φ = 55 Dp/Dh degrees; governing = min; DCR = load / governing.",
+    formula: "bearing = 1.25 Fy Dp t / Nd; tension through the pinhole = Cr Fu 2 t beff / (1.20 Nd), beff = min(4t, be, 0.6 be (Fu/Fy) sqrt(Dh/be)), Cr = 1 - 0.275 sqrt(1 - Dp²/Dh²); single-plane fracture beyond the hole = Cr Fu / (1.20 Nd) [1.13 (a - Dh/2) + 0.92 be / (1 + be/Dh)] t; double-plane shear tear-out = 0.70 Fu Av / (1.20 Nd), Av = 2 t (a - Dh/2 + (Dp/2)(1 - cos φ)), φ = 55 Dp/Dh degrees; governing = min of the four; DCR = load / governing.",
     edition: "The ASME BTH-1 Section 3-3.3 pin-connected-plate (lifting lug / padeye) strength checks, by name.",
     freeAccess: "ASME BTH-1 is available through ASME; the pin-plate strength relations are established design checks. An estimate; the engineer of record governs.",
     governance: GOVERNANCE.rigging,
@@ -19684,7 +19684,7 @@ export const CITATIONS = {
     edition: "OSHA 29 CFR 1926.1053, Subpart X - Stairways and Ladders. A US federal regulation in the public domain, quoted directly. The rail-budget arithmetic is geometry from the setup ratio, not a code value.",
     freeAccess: "29 CFR is published in full at no cost by OSHA and the eCFR.",
     governance: GOVERNANCE.general,
-    editionNote: "The 3 ft extension is a rule everyone knows and almost nobody costs out. It comes out of the CLIMBABLE length, and so does the setback: at a 4:1 setup every foot of height consumes 1.0308 ft of rail, so a 24 ft ladder needs 25.8 ft of rail to put its rails 3 ft above a 22 ft landing and simply does not reach. The highest landing that ladder actually serves is about 20.3 ft. A ladder never reaches its label - the number on the side is rail length, not working height - and buying the ladder whose number matches the roof height is the classic mistake this tile exists to prevent. Where the 3 ft extension is genuinely impossible the standard offers an alternative rather than a waiver: the ladder shall be secured at its top to a rigid support that will not deflect, AND a grasping device shall be provided. Both, not either, and the tile treats a claim of the alternative as satisfying the rule while naming what it requires. Rung spacing is a WINDOW rather than a minimum - not less than 10 in nor more than 14 in between centrelines - so rungs that are too close fail as surely as rungs that are too far apart, because what the window protects is a climber\'s stride. The clear width between side rails for all portable ladders is at least 11.5 in. Not checked: the 4:1 angle itself, which the ladder-angle tile computes and which this only uses to work out the rail budget; the ladder\'s duty rating and the load on it; securing the base and the footing it stands on; fixed ladders and ladders on scaffolds; the prohibition on standing on the top step of a stepladder; overlap between the sections of an extension ladder, which the extension-ladder-overlap tile computes and which reduces usable length further still; electrical clearance and conductive side rails near energized lines; and inspection and removal of defective ladders. A screen, not a ladder plan; Subpart X and the competent person govern.",
+    editionNote: "The 3 ft extension is a rule everyone knows and almost nobody costs out. It comes out of the CLIMBABLE length, and so does the setback: at a 4:1 setup every foot of height consumes 1.0328 ft of rail, so a 24 ft ladder needs 25.8 ft of rail to put its rails 3 ft above a 22 ft landing and simply does not reach. The highest landing that ladder actually serves is about 20.2 ft. A ladder never reaches its label - the number on the side is rail length, not working height - and buying the ladder whose number matches the roof height is the classic mistake this tile exists to prevent. Where the 3 ft extension is genuinely impossible the standard offers an alternative rather than a waiver: the ladder shall be secured at its top to a rigid support that will not deflect, AND a grasping device shall be provided. Both, not either, and the tile treats a claim of the alternative as satisfying the rule while naming what it requires. Rung spacing is a WINDOW rather than a minimum - not less than 10 in nor more than 14 in between centrelines - so rungs that are too close fail as surely as rungs that are too far apart, because what the window protects is a climber\'s stride. The clear width between side rails for all portable ladders is at least 11.5 in. Not checked: the 4:1 angle itself, which the ladder-angle tile computes and which this only uses to work out the rail budget; the ladder\'s duty rating and the load on it; securing the base and the footing it stands on; fixed ladders and ladders on scaffolds; the prohibition on standing on the top step of a stepladder; overlap between the sections of an extension ladder, which the extension-ladder-overlap tile computes and which reduces usable length further still; electrical clearance and conductive side rails near energized lines; and inspection and removal of defective ladders. A screen, not a ladder plan; Subpart X and the competent person govern.",
     assumptions: [
       { name: "Extension", value: "side rails at least 3 ft above the upper landing surface", source: "29 CFR 1926.1053" },
       { name: "Alternative", value: "secured at the top to a rigid support AND a grasping device provided", source: "29 CFR 1926.1053" },
@@ -24601,7 +24601,7 @@ export const CITATIONS = {
     ],
   },
   "umbilical-air-supply": {
-    formula: "required surface flow (scfm) = the rate per diver (acfm) x the absolute pressure (1 + depth / 33 seawater) x the number of divers including the standby; the deepest compliant depth = 33 x (compressor capacity / (rate x divers) - 1); the volume tank's usable gas = its capacity x (its pressure - the bottom pressure, depth x 14.7 / 33) / 14.7 psi, before the helmet's over-bottom pressure.",
+    formula: "required surface flow (scfm) = the rate per diver (acfm) x the absolute pressure (1 + depth / 33 seawater) x the number of divers including the standby; the deepest compliant depth = 33 x (compressor capacity / (rate x divers) - 1); the reserve required = the rate per diver x the absolute pressure x the reserve minutes x the number of divers; the volume tank's usable gas = its capacity x (its pressure - the bottom pressure, depth x 14.7 / 33) / 14.7 psi, before the helmet's over-bottom pressure.",
     edition: "The surface-supplied flow relation by name, with the independent reserve breathing supply named as a SEPARATE regulatory requirement. The rate per diver is set by the applicable regulation, not by arithmetic. The applicable commercial diving regulations, the operation's diving safety manual, and the diving supervisor govern.",
     freeAccess: "Flow arithmetic on the spread's own equipment figures; no regulatory table is reproduced.",
     governance: GOVERNANCE.general,
@@ -26299,7 +26299,7 @@ export const CITATIONS = {
     ],
   },
   "usr-crib-capacity": {
-    formula: "L = A x N x P x species factor: A = actual member width squared (12.25 sq in for 4x4, 30.25 for 6x6), N = 4 (2x2) or 9 (3x3), P = 500 psi (entered; SOG value); maximum height = min(ratio x shortest width, practical ceiling), ratio 3 (all bearing), 2 (lifting), 1.5 (two of four corners), 1 (one corner); practical ceiling 4 ft (4x4), 6 ft (6x6).",
+    formula: "L = A x N x P x species factor: A = actual member width squared (12.25 sq in for 4x4, 30.25 for 6x6), N = 4 (2x2) or 9 (3x3) when the load bears on every crossing, 2 when it bears on two corners and 1 on one corner (the crossings under the load, applied here on the formula's own terms), P = 500 psi (entered; SOG value); maximum height = min(ratio x shortest width, practical ceiling), ratio 3 (all bearing), 2 (lifting), 1.5 (two of four corners), 1 (one corner); practical ceiling 4 ft (4x4), 6 ft (6x6).",
     edition: "USACE US&R Shoring Operations Guide, Ed. 5.0 (2021), Additional Information -- Cribbing (L = A x N x P, 500 psi for No. 1 and better Douglas Fir, 85% and 75% species factors, 4 ft and 6 ft recommended maxima) and Rescue Specialist Reference Data (height-to-width ratios, 15 degree maximum slope), cited by figure.",
     freeAccess: "A product of three numbers and published ratios; the SOG is a free USACE publication.",
     governance: GOVERNANCE.structural,

@@ -82,7 +82,7 @@ function _v938renderWireRopeClips(inputRegion, outputRegion, citationEl) {
   const oSpace = makeOutputLine(outputRegion, "Clip spacing (6 x diameter)", "wrc-out-space");
   const oTail = makeOutputLine(outputRegion, "Rope turnback from the thimble", "wrc-out-tail");
   const update = debounce(() => {
-    const r = computeWireRopeClips({ rope_diameter_in: dia.input.value === "" ? 0.75 : Number(dia.input.value), clip_material: mat.select.value });
+    const r = computeWireRopeClips({ rope_diameter_in: Number(dia.input.value) || 0, clip_material: mat.select.value });
     if (r.error) { oClips.textContent = r.error; oSpace.textContent = "-"; oTail.textContent = "-"; return; }
     oClips.textContent = fmt(r.clip_count, 0) + " clips";
     oSpace.textContent = fmt(r.spacing_in, 2) + " in on center";

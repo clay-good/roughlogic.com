@@ -99,6 +99,7 @@ export function computeNoDecompressionLimit({ planned_depth_ft = 0, table_ndl_mi
   if (!(residual_nitrogen_time_min < table_ndl_min)) return { error: "Residual nitrogen time is at or beyond the table's limit for this depth: this profile has no no-decompression time at all." };
   if (!(planned_bottom_time_min > 0)) return { error: "Planned bottom time must be positive." };
   if (!(alt_residual_time_min >= 0)) return { error: "The compared residual nitrogen time cannot be negative." };
+  if (!(alt_residual_time_min < table_ndl_min)) return { error: "The compared residual nitrogen time is at or beyond the table's limit for this depth; it leaves no no-decompression time to compare." };
   if (!(oxygen_fraction > 0 && oxygen_fraction < 1)) return { error: "Oxygen fraction must be between 0 and 1." };
   if (!(feet_per_atm > 0)) return { error: "Feet per atmosphere must be positive (33 seawater, 34 fresh)." };
   // The table's limit is not the diver's limit on a repetitive dive: residual
@@ -113,15 +114,23 @@ export function computeNoDecompressionLimit({ planned_depth_ft = 0, table_ndl_mi
   // A nitrox mix is planned by entering the AIR table at the equivalent air
   // depth, which is where the extra bottom time comes from.
   const nitrogen_fraction = 1 - oxygen_fraction;
-  const equivalent_air_depth_ft = (nitrogen_fraction / _N2_IN_AIR) * (planned_depth_ft + feet_per_atm) - feet_per_atm;
+  // A rich mix at a shallow depth has less nitrogen than air at the surface; the
+  // air table has no row above the surface, so the equivalent depth stops at 0.
+  const equivalent_air_depth_ft = Math.max(0, (nitrogen_fraction / _N2_IN_AIR) * (planned_depth_ft + feet_per_atm) - feet_per_atm);
+  // The equivalent air depth is only half of a nitrox plan. Oxygen sets its own
+  // depth limit and this tile reported the nitrogen side with no oxygen check at
+  // all: EAN50 at 130 ft read "inside the table's limit" at 2.47 ata.
+  const ppo2_at_depth = oxygen_fraction * (1 + planned_depth_ft / feet_per_atm);
+  const oxygen_over = ppo2_at_depth > 1.6 + 1e-9;
   return {
     adjusted_ndl_min, credited_bottom_time_min, remaining_min, exceeds,
     residual_share_pct, alt_adjusted_ndl_min, surface_interval_gain_min,
-    nitrogen_fraction, equivalent_air_depth_ft,
+    nitrogen_fraction, equivalent_air_depth_ft, ppo2_at_depth, oxygen_over,
     table_ndl_min, planned_depth_ft,
-    verdict: exceeds
+    verdict: (exceeds
       ? "OVER the table's limit once residual nitrogen is credited -- this is a decompression dive, not a no-decompression one"
-      : "inside the table's limit with " + fmt(remaining_min, 0) + " min of the adjusted limit unused",
+      : "inside the table's limit with " + fmt(remaining_min, 0) + " min of the adjusted limit unused")
+      + (oxygen_over ? ". BUT THE OXYGEN IS OVER ITS LIMIT: this mix is " + fmt(ppo2_at_depth, 2) + " ata of oxygen at this depth, past the 1.6 ata contingency ceiling, so the mix is not usable here whatever the nitrogen says" : ""),
     note: "The limit falls very steeply with depth, so the difference between a moderate depth and a deeper one is not a proportional loss of bottom time but a large one. That shape is why depth discipline matters more than time discipline on a working dive, and why a few feet deeper than planned can consume the whole margin. REPETITIVE DIVING IS WHERE THE ARITHMETIC LIVES. A diver surfacing carries residual nitrogen that off-gasses over the surface interval, and the table converts what is left into minutes that count against the next dive as though they had already been spent at that depth. The adjusted limit is the table's figure minus that residual, and on a short surface interval it can be a small fraction of the headline number -- which is the number a diver planning without the residual would be working to. The trade of surface interval against bottom time is the whole structure of a repetitive dive plan, and it is reported here so both halves are visible at once. NO FORMULA PRODUCES A NO-DECOMPRESSION LIMIT, and this does not attempt one. Different tables and algorithms give materially different answers for the same profile, they are validated as complete systems, and mixing a limit from one with a residual nitrogen figure from another is not valid. This performs the bookkeeping around whichever table the operation uses; the table supplies the limit and the residual, and the entered figures must come from the same one. It does not model tissue compartments, decompression obligation, omitted decompression, or repetitive group letters, and it does not correct for altitude -- sea-level tables do not apply at altitude and a separate procedure governs. The applicable dive tables or computer algorithm, the diving supervisor, and the operation's diving safety manual govern.",
   };
 }
@@ -159,7 +168,8 @@ export function computeSurfaceAirConsumption({ sac_cuft_per_min = 0, planned_dep
   if (!(cylinder_volume_cuft > 0)) return { error: "Cylinder volume must be positive (cu ft)." };
   if (!(team_size >= 1)) return { error: "Team size must be at least 1." };
   if (!(ascent_rate_fpm > 0)) return { error: "Ascent rate must be positive (ft/min)." };
-  if (!(stop_depth_ft > 0 && stop_depth_ft < planned_depth_ft)) return { error: "The stop depth must be above the bottom and below the surface." };
+  if (!(stop_depth_ft > 0)) return { error: "The stop depth must be below the surface." };
+  if (stop_depth_ft > planned_depth_ft) return { error: "The stop depth is deeper than the dive. For a dive shallower than the usual stop, enter the dive's own depth as the stop depth." };
   if (!(stop_time_min > 0)) return { error: "Stop time must be positive." };
   if (!(stress_sac_cuft_per_min > 0)) return { error: "The elevated (stress) consumption rate must be positive." };
   if (!(feet_per_atm > 0)) return { error: "Feet per atmosphere must be positive (33 seawater, 34 fresh)." };
@@ -170,12 +180,19 @@ export function computeSurfaceAirConsumption({ sac_cuft_per_min = 0, planned_dep
   const bottom_gas_cuft = rate_at_depth_cuft_min * planned_bottom_time_min;
   // Rock bottom: the whole team from the deepest point, at the ascent rate,
   // through the stop, sharing gas, at an elevated rate. Computed FIRST.
-  const ascent_time_min = (planned_depth_ft - stop_depth_ft) / ascent_rate_fpm;
-  const ascent_avg_ata = 1 + ((planned_depth_ft + stop_depth_ft) / 2) / feet_per_atm;
+  // A stop AT the bottom depth (a dive no deeper than its stop) has no ascent before it.
+  const stop_at_ft = stop_depth_ft;
+  const ascent_time_min = (planned_depth_ft - stop_at_ft) / ascent_rate_fpm;
+  const ascent_avg_ata = 1 + ((planned_depth_ft + stop_at_ft) / 2) / feet_per_atm;
   const ascent_gas_cuft = team_size * stress_sac_cuft_per_min * ascent_time_min * ascent_avg_ata;
-  const stop_ata = 1 + stop_depth_ft / feet_per_atm;
+  const stop_ata = 1 + stop_at_ft / feet_per_atm;
   const stop_gas_cuft = team_size * stress_sac_cuft_per_min * stop_time_min * stop_ata;
-  const rock_bottom_cuft = ascent_gas_cuft + stop_gas_cuft;
+  // The last leg, from the stop to the surface. Until 2026-10-10 the reserve ended
+  // at the stop, short by the gas to finish the ascent (6% on the default dive,
+  // more from a deeper stop).
+  const final_ascent_time_min = stop_at_ft / ascent_rate_fpm;
+  const final_ascent_gas_cuft = team_size * stress_sac_cuft_per_min * final_ascent_time_min * (1 + (stop_at_ft / 2) / feet_per_atm);
+  const rock_bottom_cuft = ascent_gas_cuft + stop_gas_cuft + final_ascent_gas_cuft;
   const usable_gas_cuft = cylinder_volume_cuft - rock_bottom_cuft;
   if (!(usable_gas_cuft > 0)) return { error: "The reserve this team needs to reach the surface from this depth is the whole cylinder: there is no usable gas for a dive at all." };
   const max_bottom_time_min = usable_gas_cuft / rate_at_depth_cuft_min;
@@ -183,7 +200,7 @@ export function computeSurfaceAirConsumption({ sac_cuft_per_min = 0, planned_dep
   const reserve_share_pct = rock_bottom_cuft / cylinder_volume_cuft * 100;
   return {
     depth_ata, rate_at_depth_cuft_min, bottom_gas_cuft,
-    ascent_time_min, ascent_avg_ata, ascent_gas_cuft, stop_ata, stop_gas_cuft,
+    ascent_time_min, ascent_avg_ata, ascent_gas_cuft, stop_ata, stop_gas_cuft, final_ascent_gas_cuft,
     rock_bottom_cuft, usable_gas_cuft, max_bottom_time_min, naive_bottom_time_min,
     reserve_share_pct, planned_bottom_time_min,
     plan_verdict: bottom_gas_cuft <= usable_gas_cuft
@@ -235,7 +252,9 @@ export function computeNitroxMod({ oxygen_fraction = 0.32, ppo2_limit = 1.4, con
   const mod_contingency_ft = feet_per_atm * (contingency_ppo2_limit / oxygen_fraction - 1);
   // What a supervisor actually uses when blending: the richest mix the
   // planned depth allows at the working limit.
-  const best_mix_fraction = ppo2_limit / depth_ata;
+  // Capped at pure oxygen: shallower than the depth where 100% reaches the limit
+  // the quotient exceeds 1, and "EAN107" is not a gas.
+  const best_mix_fraction = Math.min(1, ppo2_limit / depth_ata);
   // ROUNDING A BLEND FIGURE UP PUTS THE DIVER PAST THE LIMIT. The exact
   // fraction is almost never a whole percent, so the analysable blend is the
   // floor of it, and the ppO2 that blend actually produces is reported with
@@ -304,13 +323,14 @@ export function computeNitroxEad({ oxygen_fraction = 0.36, depth_ft = 0, target_
   // THE OXYGEN CHECK, which is the half a plan built on EAD alone is missing.
   const ppo2_at_depth = oxygen_fraction * depth_ata;
   const oxygen_ok = ppo2_at_depth <= ppo2_limit + 1e-9 * Math.abs(ppo2_limit);
-  const deepest_usable_mix = ppo2_limit / depth_ata;
+  // Capped at pure oxygen, for the same reason as nitrox-mod.
+  const deepest_usable_mix = Math.min(1, ppo2_limit / depth_ata);
   // Floored to a blendable whole percent for the same reason as `nitrox-mod`:
   // rounding a mix UP puts the diver past the limit. spec-v1560 called EAN35
   // "a mix that works at 100 ft"; it is 1.411 ata, over the 1.4 it cites.
   const deepest_usable_pct_floor = Math.floor(deepest_usable_mix * 100 + 1e-9);
   const deepest_usable_ppo2 = deepest_usable_pct_floor / 100 * depth_ata;
-  const deepest_usable_ead_ft = ((1 - deepest_usable_pct_floor / 100) / _N2_IN_AIR) * (depth_ft + feet_per_atm) - feet_per_atm;
+  const deepest_usable_ead_ft = Math.max(0, ((1 - deepest_usable_pct_floor / 100) / _N2_IN_AIR) * (depth_ft + feet_per_atm) - feet_per_atm);
   return {
     nitrogen_fraction, depth_ata, equivalent_air_depth_ft, depth_reduction_ft,
     pn2_at_depth, mix_for_target_ead, ppo2_at_depth, oxygen_ok,
@@ -369,9 +389,15 @@ export function computeUmbilicalAirSupply({ diver_count = 3, depth_ft = 0, rate_
   const alt_depth_ata = 1 + alt_depth_ft / feet_per_atm;
   const alt_required_scfm = rate_per_diver_acfm * alt_depth_ata * diver_count;
   // The number a supervisor wants: where this spread stops complying.
-  const max_depth_ft = feet_per_atm * (compressor_scfm / (rate_per_diver_acfm * diver_count) - 1);
-  // The reserve is a separate, regulatory calculation, not the flow one.
-  const reserve_required_cuft = rate_per_diver_acfm * depth_ata * reserve_minutes;
+  // Not below the surface: a compressor too small for these divers even at the
+  // surface supports no depth at all.
+  const max_depth_ft = Math.max(0, feet_per_atm * (compressor_scfm / (rate_per_diver_acfm * diver_count) - 1));
+  // The reserve is a separate, regulatory calculation, not the flow one. It is
+  // for EVERY diver on the spread, the standby included. Until 2026-10-10 it was
+  // one diver's worth whatever the count, so three divers at 100 ft read "the
+  // volume tank covers it" on a third of what they need.
+  const reserve_per_diver_cuft = rate_per_diver_acfm * depth_ata * reserve_minutes;
+  const reserve_required_cuft = reserve_per_diver_cuft * diver_count;
   // The tank only delivers while it is above the pressure at the diver: gas
   // below bottom pressure (depth x 14.7 / feet_per_atm, gauge) never reaches
   // the helmet. Until 2026-09-19 the tank was drained to 0 psig on paper,
@@ -383,7 +409,7 @@ export function computeUmbilicalAirSupply({ diver_count = 3, depth_ft = 0, rate_
   return {
     depth_ata, per_diver_scfm, required_scfm, compressor_margin_scfm,
     alt_depth_ata, alt_required_scfm, max_depth_ft,
-    reserve_required_cuft, tank_free_gas_cuft, reserve_margin_cuft,
+    reserve_required_cuft, reserve_per_diver_cuft, tank_free_gas_cuft, reserve_margin_cuft,
     compressor_scfm, alt_depth_ft, diver_count,
     flow_verdict: compressor_margin_scfm >= -1e-9
       ? "the compressor has " + fmt(compressor_margin_scfm, 1) + " scfm of margin here"
@@ -449,7 +475,8 @@ export function computeChamberGasVolume({ chamber_volume_cuft = 0, treatment_pre
   const air_margin_cuft = air_inventory_cuft - total_air_cuft;
   // The longest table this inventory supports, which is the question the
   // installation calculation is actually asking.
-  const longest_treatment_min = (air_inventory_cuft - pressurize_cuft) / ventilation_cfm_free;
+  // Not negative: an inventory that cannot even pressurize the chamber supports no treatment.
+  const longest_treatment_min = Math.max(0, (air_inventory_cuft - pressurize_cuft) / ventilation_cfm_free);
   return {
     treatment_ata, pressurize_cuft, ventilation_cfm_free, ventilation_cuft,
     total_air_cuft, ventilation_share_pct, pressurize_share_pct,

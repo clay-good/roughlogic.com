@@ -117,7 +117,12 @@ export function computePortableLadderSetup({ ladder_length_ft = 0, landing_heigh
   const railPerFootOfHeight = 1 / Math.sqrt(1 - 1 / (ratio * ratio));
   const base_setback_ft = H * railPerFootOfHeight / ratio;
   const rail_used_to_landing_ft = H * railPerFootOfHeight;
-  const rail_used_total_ft = rail_used_to_landing_ft + REQ_EXT * railPerFootOfHeight;
+  // The rail above the landing: the 3 ft the rule requires, or more if more is
+  // entered. The grasping-device alternative excuses the extension, not the
+  // reach, so the budget still holds 3 ft for it. (Until 2026-10-10 the budget
+  // charged exactly 3 ft, so 5 ft entered above the landing was not charged.)
+  const ext_budget_ft = Math.max(ext, REQ_EXT);
+  const rail_used_total_ft = rail_used_to_landing_ft + ext_budget_ft * railPerFootOfHeight;
   const length_ok = rail_used_total_ft <= L + 1e-9 * Math.abs(L);
   const length_short_ft = Math.max(0, rail_used_total_ft - L);
   // The highest landing this ladder can actually serve, with the 3 ft still above it.
@@ -244,7 +249,7 @@ export function computeHearingProtectorNrr({ twa_db = 0, weighting = "A", nrr_db
     + (dual ? "DUAL PROTECTION adds " + dual_bonus_applied_db + " dB here. That value is editable and it is not from Appendix B: OSHA's Technical Manual guidance commonly adds 5 dB to the higher-rated device, while NIOSH recommends double protection above a 100 dBA TWA without quantifying the gain. Two protectors do not add their ratings - the second one is working against the sound that gets in by bone conduction and around the first. " : "")
     + "RESULT: " + effective_attenuation_db.toFixed(1) + " dB of effective attenuation leaves " + protected_twa_db.toFixed(1) + " dB at the ear against a " + target + " dB target - " + (meets_target ? "MEETS it with " + margin_db.toFixed(1) + " dB to spare. " : "OVER by " + (-margin_db).toFixed(1) + " dB. ")
     + (attenuation_floored ? "The method produced a negative attenuation, which is meaningless, so it is reported as zero; the protector is not credited with making things worse. " : "")
-    + "THE TWO FAMILIES CROSS OVER, which is worth knowing before arguing about which is stricter: an A-weighted Appendix B figure loses a flat 7 dB while a NIOSH figure loses a percentage, so at a low NRR the NIOSH earmuff number is the MORE generous of the two and at a high NRR it is the less. Neither method dominates the other. "
+    + "WHICH METHOD IS STRICTER depends on the NRR, which is worth knowing before arguing about it. Appendix B alone, with no derating, always credits the most. Of the two derated figures on an A-weighted exposure, OSHA's halves what is left after the 7 dB and the NIOSH earmuff figure keeps 75% of the label before the 7 dB: they cross at an NRR of 14, the OSHA figure the more generous below it and the NIOSH earmuff figure above it. The NIOSH formable-plug and other-plug figures are stricter than OSHA's at every NRR. "
     + "LABEL VERSUS REALITY: the package says " + nrr + " dB and this method credits " + effective_attenuation_db.toFixed(1) + " dB, a gap of " + label_vs_real_db.toFixed(1) + " dB. "
     + (meets_target ? "" : "To reach the target by this method the NRR would have to be about " + nrr_needed_db.toFixed(1) + " dB" + (nrr_needed_db > 33 ? " - which exceeds anything on the market, so the answer is engineering controls, administrative limits, or dual protection rather than a better earplug. " : ". "))
     + "Not checked: whether the exposure itself is measured correctly, which is the TWA calculation and a separate question; the noise spectrum, since the NRR is a single number standing in for a curve and low-frequency noise defeats it; fit, which is what the derating exists to approximate and which fit-testing measures directly rather than estimating; wearing time, where taking a protector off for even a few minutes of an eight-hour shift costs far more than any derating; whether the protector is undamaged, the right size, and correctly inserted; the audiometric testing, training, and recordkeeping the standard also requires; and the significant-threshold-shift provision, which requires attenuation sufficient to reduce exposure to a TWA of 85 dB. An attenuation estimate, not a hearing conservation program; 29 CFR 1910.95 and the program administrator govern.";

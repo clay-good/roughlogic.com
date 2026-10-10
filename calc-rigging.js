@@ -37,6 +37,11 @@ const _finiteGuard = (o) => {
 
 export const RIGGING_RENDERERS = {};
 
+// A field's number, or NaN when it is blank, for an input where 0 is a real
+// position (a centre of gravity directly under one pick point) and a blank must
+// not be read as it. The computes reject a non-finite value with their own message.
+function _numOrNaN(input) { return input.value === "" ? NaN : Number(input.value); }
+
 // --- cg-load-share: Center of Gravity and Per-Pick-Point Load Share ---
 //
 // load_p1 = W * d2 / span; load_p2 = W * d1 / span (the pick nearest the
@@ -80,7 +85,7 @@ function renderCgLoadShare(inputRegion, outputRegion, citationEl) {
   const oImb = makeOutputLine(outputRegion, "Imbalance", "cls-out-imb");
   const oVerdict = makeOutputLine(outputRegion, "CG position", "cls-out-verdict");
   const update = debounce(() => {
-    const r = computeCgLoadShare({ total_weight_lb: Number(w.input.value) || 0, span_in: Number(span.input.value) || 0, cg_from_p1_in: Number(d1.input.value) || 0 });
+    const r = computeCgLoadShare({ total_weight_lb: Number(w.input.value) || 0, span_in: Number(span.input.value) || 0, cg_from_p1_in: _numOrNaN(d1.input) });
     if (r.error) { oP1.textContent = r.error; for (const o of [oP2, oImb, oVerdict]) o.textContent = "-"; return; }
     oP1.textContent = fmt(r.load_p1, 0) + " lb";
     oP2.textContent = fmt(r.load_p2, 0) + " lb";
@@ -516,7 +521,7 @@ function renderTandemLiftShare(inputRegion, outputRegion, citationEl) {
     const r = computeTandemLiftShare({
       total_weight_lb: Number(w.input.value) || 0,
       span_in: Number(span.input.value) || 0,
-      cg_from_c1_in: Number(cg.input.value) || 0,
+      cg_from_c1_in: _numOrNaN(cg.input),
       derate_pct: derate.input.value === "" ? 75 : Number(derate.input.value),
       c1_chart_lb: Number(c1.input.value) || 0,
       c2_chart_lb: Number(c2.input.value) || 0,
@@ -569,13 +574,18 @@ export function computeShackleEyeboltWll({ leg_load_lb, rated_wll_lb, angle_deg 
   if (!Number.isFinite(rated) || rated <= 0) return { error: "Rated WLL must be a positive finite number (lb)." };
   if (!Number.isFinite(angle) || angle < 0 || angle > 90) return { error: "Angle of pull must be between 0 and 90 degrees." };
   if (!Number.isFinite(df) || df <= 0) return { error: "Design factor must be a positive finite number." };
+  if (hardware !== "shoulder_eyebolt" && hardware !== "shackle") return { error: "Hardware must be a shackle or a shoulder eye bolt." };
   const curve = hardware === "shoulder_eyebolt" ? EYEBOLT_DERATE : SHACKLE_DERATE;
   const derate = _derateInterp(curve, angle);
   const deratedCapacity = rated * derate;
   const mbs = rated * df;
   if (![derate, deratedCapacity, mbs].every(Number.isFinite)) return { error: "Derate math is not a finite value." };
   return {
-    required_wll_lb: leg,
+    // The CATALOG rating this pull needs: the leg load over the derate at this
+    // angle. (Until 2026-10-10 this echoed the leg load, so a 3,000 lb pull at 45
+    // degrees on an eye bolt read "Required WLL 3,000 lb" beside a 7,000 lb bolt
+    // that fails; it needs 10,000.)
+    required_wll_lb: derate > 0 ? leg / derate : null,
     derate,
     derated_capacity_lb: deratedCapacity,
     mbs_lb: mbs,
@@ -603,7 +613,7 @@ function renderShackleEyeboltWll(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const r = computeShackleEyeboltWll({ leg_load_lb: Number(leg.input.value) || 0, rated_wll_lb: Number(rated.input.value) || 0, angle_deg: Number(angle.input.value) || 0, hardware: hardware.select.value });
     if (r.error) { oReq.textContent = r.error; for (const o of [oDerate, oCap, oVerdict]) o.textContent = "-"; return; }
-    oReq.textContent = fmt(r.required_wll_lb, 0) + " lb (MBS at 5:1 " + fmt(r.mbs_lb, 0) + " lb)";
+    oReq.textContent = fmt(r.required_wll_lb, 0) + " lb catalog WLL needed at this angle (this one: MBS at 5:1 " + fmt(r.mbs_lb, 0) + " lb)";
     oDerate.textContent = fmt(r.derate * 100, 0) + "% (" + r.hardware + ")";
     oCap.textContent = fmt(r.derated_capacity_lb, 0) + " lb";
     oVerdict.textContent = r.verdict;
@@ -743,7 +753,10 @@ export function computeForkliftCapacityDerate({ rated_cap_lb, rated_lc_in = 24, 
   if (!Number.isFinite(ratedLc) || ratedLc <= 0) return { error: "Rated load center must be a positive finite number (in)." };
   if (!Number.isFinite(actualLc) || actualLc <= 0) return { error: "Actual load center must be a positive finite number (in)." };
   if (!Number.isFinite(load) || load <= 0) return { error: "Load must be a positive finite number (lb)." };
-  const netCapacity = ratedCap * ratedLc / actualLc;
+  // A longer load center derates the truck. A SHORTER one never raises it above
+  // the plate: the plate is the rating. (Until 2026-10-10 a 12 in load center on a
+  // 5,000 lb truck read 10,000 lb and passed a 9,000 lb load.)
+  const netCapacity = Math.min(ratedCap, ratedCap * ratedLc / actualLc);
   const marginPct = (netCapacity - load) / netCapacity * 100;
   if (![netCapacity, marginPct].every(Number.isFinite)) return { error: "Derate math is not a finite value." };
   return {
@@ -988,6 +1001,7 @@ export function computeMultiLegSling({ total_load_lb = 0, num_legs = 2, horizont
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(total_load_lb > 0)) return { error: "Total load must be positive (lb)." };
   if (!(num_legs >= 1)) return { error: "Number of legs must be at least 1." };
+  if (!Number.isInteger(Number(num_legs))) return { error: "Number of legs must be a whole number." };
   if (!(horizontal_angle_deg > 0) || horizontal_angle_deg > 90) return { error: "Leg angle from horizontal must be between 0 and 90 degrees (exclusive of 0)." };
   const sin = Math.sin(horizontal_angle_deg * Math.PI / 180);
   if (!(sin > 0)) return { error: "Leg angle yields a non-positive sine." };
@@ -1349,7 +1363,9 @@ export function computeWinchDrumLinePull({ rated_pull_lb, drum_dia_in, rope_dia_
   if (!Number.isFinite(dr) || dr <= 0) return { error: "Rope diameter must be a positive finite number (in)." };
   if (!Number.isFinite(bw) || bw <= 0) return { error: "Barrel width must be a positive finite number (in)." };
   if (!Number.isFinite(n) || n < 1) return { error: "Target layer must be at least 1." };
-  const layer = Math.floor(n);
+  if (!Number.isInteger(n)) return { error: "Target layer must be a whole number; a partly filled layer pulls at the next layer's figure." };
+  if (dr > bw) return { error: "The rope is wider than the drum barrel; not one wrap fits." };
+  const layer = n;
   // The rating is the FIRST-LAYER figure, and the first wrap acts at its rope
   // centerline, D + d -- not at the bare barrel. Until 2026-09-18 the ratio was
   // taken to D, so layer 1 read below its own rating (9,524 of 10,000 lb).
@@ -1390,8 +1406,9 @@ function renderWinchDrumLinePull(inputRegion, outputRegion, citationEl) {
 RIGGING_RENDERERS["winch-drum-line-pull"] = renderWinchDrumLinePull;
 
 // --- spec-v550 Z: Crane outrigger reaction from lift geometry (`crane-outrigger-reaction`) ---
-// even = (W+Wc)/4. M = W*R - Wc*Rc. R_max = even + M/(sqrt(2)*spread).
-// dims: in { gross_load_kip: M L T^-2, counterweight_kip: M L T^-2, load_radius_ft: L, cw_radius_ft: L, outrigger_spread_ft: L } out: { even_share_kip: M L T^-2, overturning_kipft: M L^2 T^-2, reaction_max_kip: M L T^-2 }
+// even = (W+Wc)/4. M = W*R - Wc*Rc. R_max = even + |M|/(sqrt(2)*spread) while the far outrigger
+// stays down; sqrt(2)*|M|/spread once it lifts; overturned at |M| >= (W+Wc)*spread/sqrt(2).
+// dims: in { gross_load_kip: M L T^-2, counterweight_kip: M L T^-2, load_radius_ft: L, cw_radius_ft: L, outrigger_spread_ft: L } out: { even_share_kip: M L T^-2, overturning_kipft: M L^2 T^-2, reaction_max_kip: M L T^-2, far_reaction_kip: M L T^-2 }
 export function computeCraneOutriggerReaction({ gross_load_kip, counterweight_kip = 0, load_radius_ft, cw_radius_ft = 0, outrigger_spread_ft } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const W = Number(gross_load_kip);
@@ -1406,15 +1423,34 @@ export function computeCraneOutriggerReaction({ gross_load_kip, counterweight_ki
   if (!Number.isFinite(sp) || sp <= 0) return { error: "Outrigger spread must be a positive finite number (ft)." };
   const even_share_kip = (W + Wc) / 4;
   const overturning_kipft = W * R - Wc * Rc;
-  const reaction_max_kip = even_share_kip + overturning_kipft / (Math.SQRT2 * sp);
+  // Over a corner the two diagonal outriggers sit sp/sqrt(2) from the centre. The
+  // net moment can act toward the load or (a light load on a heavy counterweight)
+  // toward the counterweight; either way one diagonal corner takes it, so its
+  // magnitude is what loads an outrigger.
+  const half_diagonal_ft = sp / Math.SQRT2;
+  const moment_kipft = Math.abs(overturning_kipft);
+  const total_kip = W + Wc;
+  // The resultant sits moment/total from the centre. At the half-diagonal it is
+  // over the corner outrigger and the crane is at the point of tipping.
+  if (moment_kipft >= total_kip * half_diagonal_ft) return { error: "The crane overturns: the net moment puts the resultant " + fmt(moment_kipft / total_kip, 1) + " ft from the centre, at or beyond the corner outrigger " + fmt(half_diagonal_ft, 1) + " ft out. Shorten the radius, lighten the load, add counterweight or widen the spread." };
+  // Rigid four-point share: even +/- M/(2 x half diagonal). It holds only while the
+  // FAR outrigger stays in compression. Once that would go negative the pad has
+  // lifted, the crane stands on three, and moments about the line through the two
+  // side outriggers give the loaded corner M / half diagonal. (Until 2026-10-10 the
+  // four-point figure was reported regardless, 21% low on this tile's own example.)
+  const far_four_point_kip = even_share_kip - moment_kipft / (2 * half_diagonal_ft);
+  const far_outrigger_lifted = far_four_point_kip < -1e-9; // round-off: exactly zero is still on the ground
+  const reaction_max_kip = far_outrigger_lifted ? moment_kipft / half_diagonal_ft : even_share_kip + moment_kipft / (2 * half_diagonal_ft);
+  const far_reaction_kip = far_outrigger_lifted ? 0 : far_four_point_kip;
   return {
-    even_share_kip, overturning_kipft, reaction_max_kip,
+    even_share_kip, overturning_kipft, reaction_max_kip, far_reaction_kip, far_outrigger_lifted,
+    loaded_side: overturning_kipft >= -1e-9 ? "load" : "counterweight", // round-off: a balanced crane reads as the load side
     note: "The maximum reaction is not a quarter of the total: swinging the boom over a corner concentrates the overturning into one diagonal outrigger (which can carry well over half the load). A wider outrigger spread lowers the reaction. This is a planning estimate that feeds crane-ground-bearing; the crane manufacturer's load-moment chart and outrigger reaction data govern.",
   };
 }
 
 function renderCraneOutriggerReaction(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Crane load-moment method / SAE J1063 stability, by name. even = (W + Wc)/4; overturning M = W R - Wc Rc; R_max = even + M/(sqrt(2) spread). The maximum outrigger reaction is not a quarter of the total - over a corner the overturning concentrates into one diagonal outrigger. A wider spread lowers it. A planning estimate feeding crane-ground-bearing; the crane load-moment chart and outrigger reaction data govern.";
+  citationEl.textContent = "Citation: Crane load-moment method / SAE J1063 stability, by name. even = (W + Wc)/4; overturning M = W R - Wc Rc; R_max = even + |M|/(sqrt(2) spread) while the far outrigger stays down, sqrt(2)|M|/spread once it lifts, and overturning at |M| >= (W + Wc) spread/sqrt(2). The maximum outrigger reaction is not a quarter of the total - over a corner the overturning concentrates into one diagonal outrigger. A wider spread lowers it. A planning estimate feeding crane-ground-bearing; the crane load-moment chart and outrigger reaction data govern.";
   const w = makeNumber("Gross suspended load (kip)", "cor-w", { step: "any", min: "0" });
   const wc = makeNumber("Counterweight (kip)", "cor-wc", { step: "any", min: "0", value: "0" });
   const r = makeNumber("Load radius R (ft)", "cor-r", { step: "any", min: "0" });
@@ -1431,6 +1467,7 @@ function renderCraneOutriggerReaction(inputRegion, outputRegion, citationEl) {
     oE.textContent = fmt(x.even_share_kip, 1) + " kip";
     oM.textContent = fmt(x.overturning_kipft, 0) + " kip-ft";
     oR.textContent = fmt(x.reaction_max_kip, 1) + " kip";
+    oR.textContent += " on the " + x.loaded_side + " side" + (x.far_outrigger_lifted ? "; the opposite outrigger has LIFTED and the crane is standing on three" : "; the opposite outrigger carries " + fmt(x.far_reaction_kip, 1) + " kip");
   }, DEBOUNCE_MS);
   for (const f of [w, wc, r, rc, sp]) f.input.addEventListener("input", update);
 }
@@ -1448,7 +1485,7 @@ RIGGING_RENDERERS["crane-outrigger-reaction"] = renderCraneOutriggerReaction;
 // Dp/2, both without the 1.20: 40-60% above BTH-1, enough to pass a lug BTH-1
 // fails (44 kip on a 1 in plate, 4 in wide, 2.06 in hole, 1.8 in edge: DCR
 // 0.98 "adequate" where tear-out gives 1.11).
-// dims: in { applied_load_kip: M L T^-2, plate_thick_in: L, hole_dia_in: L, pin_dia_in: L, edge_dist_in: L, plate_width_in: L, fy_ksi: M L^-1 T^-2, fu_ksi: M L^-1 T^-2, design_factor: dimensionless } out: { bearing_kip: M L T^-2, tension_kip: M L T^-2, tearout_kip: M L T^-2, dcr: dimensionless }
+// dims: in { applied_load_kip: M L T^-2, plate_thick_in: L, hole_dia_in: L, pin_dia_in: L, edge_dist_in: L, plate_width_in: L, fy_ksi: M L^-1 T^-2, fu_ksi: M L^-1 T^-2, design_factor: dimensionless } out: { fracture_kip: M L T^-2, bearing_kip: M L T^-2, tension_kip: M L T^-2, tearout_kip: M L T^-2, dcr: dimensionless }
 export function computeLiftingLugDesign({ applied_load_kip, plate_thick_in, hole_dia_in, pin_dia_in, edge_dist_in, plate_width_in, fy_ksi = 36, fu_ksi = 58, design_factor = 2.0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const P = Number(applied_load_kip), t = Number(plate_thick_in), Dh = Number(hole_dia_in), Dp = Number(pin_dia_in);
@@ -1473,18 +1510,24 @@ export function computeLiftingLugDesign({ applied_load_kip, plate_thick_in, hole
   const phi_rad = (55 * Dp / Dh) * Math.PI / 180;
   const Av = 2 * ((a - Dh / 2) + (Dp / 2) * (1 - Math.cos(phi_rad))) * t;
   const tearout_kip = 0.70 * Fu * Av / (1.20 * Nd);
-  const governing_kip = Math.min(bearing_kip, tension_kip, tearout_kip);
-  const governing_mode = governing_kip === bearing_kip ? "bearing" : governing_kip === tension_kip ? "net tension" : "shear tear-out";
+  // Single-plane fracture beyond the hole (3-3.3.1, Eq. 3-49): the plate splits on
+  // the line of the load. Pb = Cr Fu / (1.20 Nd) [1.13 (R - Dh/2) + 0.92 be / (1 + be/Dh)] t,
+  // R the hole-centre-to-edge distance. Until 2026-10-10 this mode was missing, and it
+  // governs a lug with a short edge distance: 48 kip on a 1 in plate, 4 in wide, 2.06 in
+  // hole, 2 in to the edge read DCR 0.98 "adequate" where this mode gives 1.11.
+  const fracture_kip = Cr * Fu / (1.20 * Nd) * (1.13 * (a - Dh / 2) + 0.92 * be / (1 + be / Dh)) * t;
+  const governing_kip = Math.min(bearing_kip, tension_kip, tearout_kip, fracture_kip);
+  const governing_mode = governing_kip === bearing_kip ? "bearing" : governing_kip === tension_kip ? "net tension" : governing_kip === tearout_kip ? "shear tear-out" : "single-plane fracture beyond the hole";
   const dcr = P / governing_kip;
   return {
-    bearing_kip, tension_kip, tearout_kip, governing_kip, governing_mode, dcr, adequate: dcr <= 1 + 1e-9,
+    bearing_kip, tension_kip, tearout_kip, fracture_kip, governing_kip, governing_mode, dcr, adequate: dcr <= 1 + 1e-9,
     beff_in: beff, Cr, Av_in2: Av,
     note: "The four modes trade off through hole placement: moving the hole from the edge cures tear-out but shrinks the net tension width, and the pin-to-hole clearance drives bearing - a lug sized for gross tension alone can tear out at the pin. The design factor Nd depends on the ASME BTH-1 design category and service class. Cheek plates and weld design are separate checks. ASME BTH-1 and the engineer of record govern.",
   };
 }
 
 function renderLiftingLugDesign(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: ASME BTH-1 Section 3-3.3 pin-connected plates (lifting lug / padeye): bearing = 1.25 Fy Dp t/Nd; tension through the pinhole = Cr Fu 2t beff/(1.20 Nd) with beff = min(4t, be, 0.6(Fu/Fy)sqrt(Dh/be) be) and Cr = 1 - 0.275 sqrt(1 - Dp^2/Dh^2); double-plane shear = 0.70 Fu Av/(1.20 Nd) with Av = 2[a' + (Dp/2)(1 - cos phi)]t, phi = 55 Dp/Dh deg, a' measured from the hole edge; governing = the minimum. The four modes trade off through hole placement - a lug sized for gross tension alone can tear out at the pin. Nd depends on the BTH-1 design category and service class. ASME BTH-1 and the engineer of record govern.";
+  citationEl.textContent = "Citation: ASME BTH-1 Section 3-3.3 pin-connected plates (lifting lug / padeye): bearing = 1.25 Fy Dp t/Nd; tension through the pinhole = Cr Fu 2t beff/(1.20 Nd) with beff = min(4t, be, 0.6(Fu/Fy)sqrt(Dh/be) be) and Cr = 1 - 0.275 sqrt(1 - Dp^2/Dh^2); single-plane fracture beyond the hole = Cr Fu/(1.20 Nd) [1.13(a - Dh/2) + 0.92 be/(1 + be/Dh)] t; double-plane shear = 0.70 Fu Av/(1.20 Nd) with Av = 2[a' + (Dp/2)(1 - cos phi)]t, phi = 55 Dp/Dh deg, a' measured from the hole edge; governing = the minimum. The four modes trade off through hole placement - a lug sized for gross tension alone can tear out at the pin. Nd depends on the BTH-1 design category and service class. ASME BTH-1 and the engineer of record govern.";
   const P = makeNumber("Applied load (kip)", "llg-p", { step: "any", min: "0" });
   const t = makeNumber("Plate thickness t (in)", "llg-t", { step: "any", min: "0" });
   const Dh = makeNumber("Hole diameter Dh (in)", "llg-dh", { step: "any", min: "0" });
@@ -1496,13 +1539,13 @@ function renderLiftingLugDesign(inputRegion, outputRegion, citationEl) {
   const nd = makeNumber("Design factor Nd", "llg-nd", { step: "any", min: "1", value: "2.0" }); nd.input.value = "2.0";
   for (const f of [P, t, Dh, Dp, a, w, fy, fu, nd]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { P.input.value = "20"; t.input.value = "1.0"; Dh.input.value = "1.06"; Dp.input.value = "1.0"; a.input.value = "2.0"; w.input.value = "4.0"; fy.input.value = "36"; fu.input.value = "58"; nd.input.value = "2.0"; update(); });
-  const oCap = makeOutputLine(outputRegion, "Bearing / tension / tear-out", "llg-out-cap");
+  const oCap = makeOutputLine(outputRegion, "Bearing / tension / tear-out / fracture beyond the hole", "llg-out-cap");
   const oGov = makeOutputLine(outputRegion, "Governing mode / capacity", "llg-out-gov");
   const oDcr = makeOutputLine(outputRegion, "Demand / capacity", "llg-out-dcr");
   const update = debounce(() => {
     const r = computeLiftingLugDesign({ applied_load_kip: Number(P.input.value) || 0, plate_thick_in: Number(t.input.value) || 0, hole_dia_in: Number(Dh.input.value) || 0, pin_dia_in: Number(Dp.input.value) || 0, edge_dist_in: Number(a.input.value) || 0, plate_width_in: Number(w.input.value) || 0, fy_ksi: Number(fy.input.value) || 0, fu_ksi: Number(fu.input.value) || 0, design_factor: Number(nd.input.value) || 0 });
     if (r.error) { oCap.textContent = r.error; for (const o of [oGov, oDcr]) o.textContent = "-"; return; }
-    oCap.textContent = fmt(r.bearing_kip, 1) + " / " + fmt(r.tension_kip, 1) + " / " + fmt(r.tearout_kip, 1) + " kip";
+    oCap.textContent = fmt(r.bearing_kip, 1) + " / " + fmt(r.tension_kip, 1) + " / " + fmt(r.tearout_kip, 1) + " / " + fmt(r.fracture_kip, 1) + " kip";
     oGov.textContent = r.governing_mode + " at " + fmt(r.governing_kip, 1) + " kip";
     oDcr.textContent = fmt(r.dcr, 2) + (r.adequate ? " (adequate)" : " - OVER, fails by " + r.governing_mode);
   }, DEBOUNCE_MS);

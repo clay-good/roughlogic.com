@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "5296f7688eb6ccf4",
+      "sha": "28a2501112b74642",
       "date": "2026-10-10"
     },
     "/tools/": {
@@ -82,7 +82,7 @@
       "date": "2026-10-10"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "0c6dbca52ce0c2e6",
+      "sha": "38523666c8b73d0a",
       "date": "2026-10-10"
     },
     "/groups/stage/": {
@@ -1930,8 +1930,8 @@
       "date": "2026-10-03"
     },
     "/tools/crane-outrigger-reaction/": {
-      "sha": "7e7f7735d8818a94",
-      "date": "2026-09-29"
+      "sha": "7b0a32a28d4ccacd",
+      "date": "2026-10-10"
     },
     "/tools/crane-power-line-clearance/": {
       "sha": "0cccbba02c72c826",
@@ -2850,8 +2850,8 @@
       "date": "2026-09-30"
     },
     "/tools/fall-arrest-clearance/": {
-      "sha": "2b1c7e7bbe77445c",
-      "date": "2026-09-30"
+      "sha": "f7d10acff7f0b1b9",
+      "date": "2026-10-10"
     },
     "/tools/fall-protection-clearance/": {
       "sha": "ca13b93d7a275d54",
@@ -4338,8 +4338,8 @@
       "date": "2026-10-01"
     },
     "/tools/lifting-lug-design/": {
-      "sha": "8713542a4cb97da0",
-      "date": "2026-10-03"
+      "sha": "d22c34c41fd81912",
+      "date": "2026-10-10"
     },
     "/tools/ligation-molar-ratio/": {
       "sha": "59712d34fc02e876",
@@ -5702,8 +5702,8 @@
       "date": "2026-09-29"
     },
     "/tools/portable-ladder-setup/": {
-      "sha": "1d4a5f1fbf2d6cbd",
-      "date": "2026-10-07"
+      "sha": "5eda7fa4c5ed2b8b",
+      "date": "2026-10-10"
     },
     "/tools/post-hole-concrete/": {
       "sha": "6300739cbb168b21",
@@ -7890,8 +7890,8 @@
       "date": "2026-09-29"
     },
     "/tools/surface-air-consumption/": {
-      "sha": "336188d545bdbd0c",
-      "date": "2026-09-29"
+      "sha": "63ac436276625d83",
+      "date": "2026-10-10"
     },
     "/tools/surface-condensation-risk/": {
       "sha": "00aa1f5c9da69755",
@@ -8518,8 +8518,8 @@
       "date": "2026-09-29"
     },
     "/tools/umbilical-air-supply/": {
-      "sha": "2f9523ae5f1fc967",
-      "date": "2026-10-03"
+      "sha": "6ccbddc8474d660b",
+      "date": "2026-10-10"
     },
     "/tools/unit-converter/": {
       "sha": "5246356a65222b17",
@@ -8546,8 +8546,8 @@
       "date": "2026-09-29"
     },
     "/tools/usr-crib-capacity/": {
-      "sha": "616cbaf7259c96ba",
-      "date": "2026-10-01"
+      "sha": "c05a9f11f072f5e8",
+      "date": "2026-10-10"
     },
     "/tools/usr-raker-shore/": {
       "sha": "89b920e085dcfa9d",

@@ -38335,7 +38335,7 @@
    "source_publisher": "Crane load-moment method / SAE J1063 stability",
    "source_title": "R_max = (W+Wc)/4 + M/(sqrt(2) x spread); M = W R - Wc Rc",
    "source_edition_or_year": "crane load-moment method",
-   "source_section_or_page": "40 kip at 30 ft, 30 kip CW at 12 ft, 20 ft spread -> even 17.5, M 840, R_max 47.2 kip",
+   "source_section_or_page": "CORRECTED 2026-10-10: at this geometry the far outrigger lifts (even share 17.5 kip is less than the moment share), so the crane stands on three and the loaded corner carries M / (spread/sqrt 2) = 59.4 kip, not the four-point figure 47.2 this row held. 40 kip at 30 ft, 30 kip CW at 12 ft, 20 ft spread -> even 17.5, M 840, R_max 47.2 kip",
    "verified_by": "rl",
    "verified_on": "2026-07-09",
    "inputs": {
@@ -38359,7 +38359,7 @@
      }
     },
     "reaction_max_kip": {
-     "value": 47.2,
+     "value": 59.4,
      "tolerance": {
       "abs": 0.1
      }
@@ -38371,7 +38371,7 @@
    "source_publisher": "Crane load-moment method / SAE J1063 stability",
    "source_title": "a wider outrigger spread lowers the worst-corner reaction",
    "source_edition_or_year": "crane load-moment method",
-   "source_section_or_page": "Same lift on a 30 ft spread -> R_max 37.3 kip (10 kip lighter on the corner)",
+   "source_section_or_page": "CORRECTED 2026-10-10: at this geometry the far outrigger lifts (even share 17.5 kip is less than the moment share), so the crane stands on three and the loaded corner carries M / (spread/sqrt 2) = 39.6 kip, not the four-point figure 37.3 this row held. Same lift on a 30 ft spread -> R_max 37.3 kip (10 kip lighter on the corner)",
    "verified_by": "rl",
    "verified_on": "2026-07-09",
    "inputs": {
@@ -38383,7 +38383,7 @@
    },
    "outputs": {
     "reaction_max_kip": {
-     "value": 37.3,
+     "value": 39.6,
      "tolerance": {
       "abs": 0.1
      }
@@ -115173,7 +115173,7 @@
    "source_publisher": "Project (first-principles)",
    "source_title": "0.65 cu ft/min SAC, 25 min at 80 ft, 80 cu ft cylinder, two divers to a 15 ft stop",
    "source_edition_or_year": "rate at depth = SAC x (1 + d/33); rock bottom = team x stress rate x (ascent at avg ata + stop at stop ata)",
-   "source_section_or_page": "the operation's diving safety manual and the supervisor govern",
+   "source_section_or_page": "CORRECTED 2026-10-10: the reserve now includes the last leg from the stop to the surface (0.5 min for the team at 1.227 ata, 1.23 cu ft), which it had left out. the operation's diving safety manual and the supervisor govern",
    "verified_by": "rl",
    "verified_on": "2026-09-06",
    "inputs": {
@@ -115220,19 +115220,19 @@
      }
     },
     "rock_bottom_cuft": {
-     "value": 19.298,
+     "value": 20.525253,
      "tolerance": {
       "pct": 0.5
      }
     },
     "usable_gas_cuft": {
-     "value": 60.702,
+     "value": 59.474747,
      "tolerance": {
       "pct": 0.5
      }
     },
     "max_bottom_time_min": {
-     "value": 27.2725,
+     "value": 26.721125,
      "tolerance": {
       "pct": 0.5
      }
@@ -115382,7 +115382,7 @@
    "source_publisher": "Project (first-principles)",
    "source_title": "Two divers plus a standby at 100 ft, 1.4 acfm each, against a 20 scfm compressor",
    "source_edition_or_year": "Q = rate x (1 + d/33) x divers; max depth = 33 x (capacity/(rate x divers) - 1)",
-   "source_section_or_page": "the applicable commercial diving regulations and the supervisor govern",
+   "source_section_or_page": "CORRECTED 2026-10-10: the reserve is for every diver on the spread (3 x 56.42 = 169.27 cu ft), not one. the applicable commercial diving regulations and the supervisor govern",
    "verified_by": "rl",
    "verified_on": "2026-09-06",
    "inputs": {
@@ -115434,7 +115434,7 @@
      }
     },
     "reserve_required_cuft": {
-     "value": 56.4242,
+     "value": 169.27273,
      "tolerance": {
       "pct": 0.5
      }

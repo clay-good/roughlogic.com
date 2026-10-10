@@ -337,7 +337,7 @@ export const BESPOKE_OUTPUT_LABELS = {
   "exterior-opening-protection": {"pass":"Proposed openings"},
   "extinguisher-coverage": {"required_extinguishers":"Extinguishers required","grid_spacing_ft":"Idealised grid","travel_governs":"Which limit governs","note":"Note"},
   "fall-arrest-anchorage": {"required_anchorage_lb":"Anchorage required","anchorage_ok":"Anchorage verdict","force_ok":"System performance (502(d)(16))","passes":"Verdict","note":"Note"},
-  "fall-arrest-clearance": {"required_clearance_ft":"Required clearance below anchor","margin_ft":"Margin vs available","note":"Note"},
+  "fall-arrest-clearance": {"required_clearance_ft":"Required clearance below anchor","clearance_below_feet_ft":"Same, below the worker's feet","margin_ft":"Margin vs available","note":"Note"},
   "fall-protection-clearance": {"required_clearance_ft":"Required clearance","remaining_clearance_ft":"Remaining clearance","flag":"Status"},
   "fan-motor-bhp": {"ahp":"Air horsepower","bhp":"Brake horsepower (BHP)","next_nema_hp":"Next standard motor HP"},
   "fan-motor-max-airflow": {"max_cfm":"Max airflow","note":"Note"},
