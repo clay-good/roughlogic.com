@@ -1638,6 +1638,7 @@ export const COMPUTE_MAP = {
   "pulp-density-solids": { module: "../../calc-mining.js", fn: "computePulpDensitySolids" },
   "screen-deck-capacity": { module: "../../calc-mining.js", fn: "computeScreenDeckCapacity" },
   "belt-feeder-capacity": { module: "../../calc-mining.js", fn: "computeBeltFeederCapacity" },
+  "belt-feeder-pull": { module: "../../calc-mining.js", fn: "computeBeltFeederPull" },
   "dust-collector-air-to-cloth": { module: "../../calc-mining.js", fn: "computeDustCollectorAirToCloth" },
   "dust-deflagration-vent-area": { module: "../../calc-mining.js", fn: "computeDustDeflagrationVentArea" },
   // spec-v1517..v1523 mining band, part 2

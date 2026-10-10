@@ -171370,6 +171370,130 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "belt-feeder-pull",
+  "source_publisher": "Project (first-principles)",
+  "source_title": "A 36 in by 12 ft slot under 100 lb/cu ft material",
+  "source_edition_or_year": "arithmetic on the named relations",
+  "source_section_or_page": "100 x 12 x 3^2 = 10,800 lb per unit of q: 27,000 lb initial at q 2.5, 10,800 lb flowing. mu = 0.8 sin 45 = 0.5657: 15,274 and 6,109 lb. At 60 fpm, 27.77 and 11.11 hp to shear; 30.86 and 12.34 hp at 90%",
+  "verified_by": "rl",
+  "verified_on": "2026-10-10",
+  "inputs": {
+   "slot_width_in": 36,
+   "slot_length_ft": 12,
+   "bulk_density_pcf": 100,
+   "internal_friction_deg": 45,
+   "surcharge_initial": 2.5,
+   "surcharge_flow": 1,
+   "belt_speed_fpm": 60,
+   "other_resistance_initial_lb": 0,
+   "other_resistance_flow_lb": 0,
+   "drive_efficiency": 0.9
+  },
+  "outputs": {
+   "load_initial_lb": {
+    "value": 27000,
+    "tolerance": {
+     "abs": 0.01
+    }
+   },
+   "pull_initial_lb": {
+    "value": 15273.5,
+    "tolerance": {
+     "pct": 0.01
+    }
+   },
+   "pull_flow_lb": {
+    "value": 6109.4,
+    "tolerance": {
+     "pct": 0.01
+    }
+   },
+   "drive_power_initial_hp": {
+    "value": 30.856,
+    "tolerance": {
+     "pct": 0.01
+    }
+   },
+   "drive_power_flow_hp": {
+    "value": 12.342,
+    "tolerance": {
+     "pct": 0.01
+    }
+   }
+  }
+ },
+ {
+  "tile_id": "belt-feeder-pull",
+  "source_publisher": "Bulk Solids Handling (Trans Tech Publications)",
+  "source_title": "A. W. Roberts and K. S. Manjunath, Wall Pressure-Feeder Load Interactions in Mass Flow Hopper/Feeder Combinations, Part II",
+  "source_edition_or_year": "vol. 6 no. 5, October 1986 (bulk-online.com, BSH_1986_05_009.pdf)",
+  "source_section_or_page": "Section 12.2 design example, p. 909-910: B 1.50 m, L 5.00 m, 0.95 t/m3, delta 50 deg, qi 2.54, qf 1.05, 0.50 m/s, efficiency 90%. Printed: Qi 265.89 kN, Fi 162.94 kN, Qf 109.84 kN, Ff 67.31 kN, Pi 81.47 kW, Pf 33.66 kW, total 229.73 and 146.90 kN, 127.63 and 81.61 kW. Converted at 1 kN = 224.809 lbf and 1 hp = 0.745700 kW; the other resistances are the printed totals less the shear forces. The printed q values are rounded to three figures, hence 0.3%.",
+  "verified_by": "rl",
+  "verified_on": "2026-10-10",
+  "inputs": {
+   "slot_width_in": 59.0551,
+   "slot_length_ft": 16.4042,
+   "bulk_density_pcf": 59.3066,
+   "internal_friction_deg": 50,
+   "surcharge_initial": 2.54,
+   "surcharge_flow": 1.05,
+   "belt_speed_fpm": 98.4252,
+   "other_resistance_initial_lb": 15015.0,
+   "other_resistance_flow_lb": 17892.5,
+   "drive_efficiency": 0.9
+  },
+  "outputs": {
+   "load_initial_lb": {
+    "value": 59774.0,
+    "tolerance": {
+     "pct": 0.3
+    }
+   },
+   "pull_initial_lb": {
+    "value": 36630.0,
+    "tolerance": {
+     "pct": 0.3
+    }
+   },
+   "load_flow_lb": {
+    "value": 24693.0,
+    "tolerance": {
+     "pct": 0.3
+    }
+   },
+   "pull_flow_lb": {
+    "value": 15132.0,
+    "tolerance": {
+     "pct": 0.3
+    }
+   },
+   "shear_power_initial_hp": {
+    "value": 109.25,
+    "tolerance": {
+     "pct": 0.3
+    }
+   },
+   "shear_power_flow_hp": {
+    "value": 45.14,
+    "tolerance": {
+     "pct": 0.3
+    }
+   },
+   "drive_power_initial_hp": {
+    "value": 171.15,
+    "tolerance": {
+     "pct": 0.3
+    }
+   },
+   "drive_power_flow_hp": {
+    "value": 109.44,
+    "tolerance": {
+     "pct": 0.3
+    }
+   }
+  }
  }
  ]
 }

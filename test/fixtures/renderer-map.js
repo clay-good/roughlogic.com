@@ -923,6 +923,7 @@ export const RENDERER_MAP = {
   "pulp-density-solids": { module: "../../calc-mining.js", exportName: "MINING_RENDERERS" },
   "screen-deck-capacity": { module: "../../calc-mining.js", exportName: "MINING_RENDERERS" },
   "belt-feeder-capacity": { module: "../../calc-mining.js", exportName: "MINING_RENDERERS" },
+  "belt-feeder-pull": { module: "../../calc-mining.js", exportName: "MINING_RENDERERS" },
   "dust-collector-air-to-cloth": { module: "../../calc-mining.js", exportName: "MINING_RENDERERS" },
   "dust-deflagration-vent-area": { module: "../../calc-mining.js", exportName: "MINING_RENDERERS" },
   "mine-face-ventilation": { module: "../../calc-mining.js", exportName: "MINING_RENDERERS" },

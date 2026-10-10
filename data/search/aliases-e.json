@@ -6437,6 +6437,12 @@
     {"term":"maasp","target":"kick-tolerance","kind":"industry"},
     {"term":"maximum allowable annular surface pressure","target":"kick-tolerance","kind":"industry"},
     {"term":"maximum allowable shut in casing pressure","target":"kick-tolerance","kind":"industry"},
-    {"term":"how big a kick can the shoe take","target":"kick-tolerance","kind":"question"}
+    {"term":"how big a kick can the shoe take","target":"kick-tolerance","kind":"question"},
+    {"term":"belt feeder power","target":"belt-feeder-pull","kind":"industry"},
+    {"term":"belt feeder pull","target":"belt-feeder-pull","kind":"industry"},
+    {"term":"feeder load from hopper","target":"belt-feeder-pull","kind":"industry"},
+    {"term":"hopper surcharge factor","target":"belt-feeder-pull","kind":"industry"},
+    {"term":"belt feeder drive sizing","target":"belt-feeder-pull","kind":"industry"},
+    {"term":"how much power does a belt feeder need","target":"belt-feeder-pull","kind":"question"}
   ]
 }

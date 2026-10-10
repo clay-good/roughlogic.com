@@ -727,7 +727,7 @@ export function computeBeltFeederCapacity({ opening_width_in = 0, opening_height
   return {
     cross_section_sqft, volumetric_cfh, tph, required_speed_fpm, required_opening_in,
     alternative_tph, density_change_pct,
-    note: "A belt feeder is a metering device: the material sits in a hopper and the belt pulls a ribbon out from under it whose cross-section is fixed by the gate opening. Output is therefore linear in speed, which is what makes a feeder controllable, and linear in the opening, which is what makes it adjustable. A conveyor, by contrast, carries whatever is put on it in a surcharged profile, and its capacity relation does not apply here at all. The density check is worth running in the field, because it is the quiet way a plant changes its tonnage without changing a setting: the same feeder on a heavier ore delivers proportionally more at exactly the same gate and speed, so a feeder calibrated on one material is not calibrated on another. The failure the arithmetic does not capture is ratholing. A feeder that draws material from only part of the hopper opening -- because the belt speed profile is uneven or the interface is badly designed -- creates a flow channel while the rest of the hopper stays static, and the static material eventually consolidates into an arch that stops flow entirely. The fix is an interface that increases in cross-section in the direction of travel so the belt draws progressively along the whole opening, and it is a design feature rather than an adjustment. This assumes the material fills the opening uniformly and flows freely, which is exactly what does not happen with wet, sticky, or cohesive material: arching, ratholing, and flushing depend on the material's shear properties and the hopper's geometry and are resolved by a flow-properties test and a hopper design. It does not compute the belt pull or drive power a feeder requires, which is much higher than a conveyor's because the belt is shearing material under a full hopper load, and which is a common undersizing error. The feeder manufacturer, a material flow-properties test, and the plant designer govern.",
+    note: "A belt feeder is a metering device: the material sits in a hopper and the belt pulls a ribbon out from under it whose cross-section is fixed by the gate opening. Output is therefore linear in speed, which is what makes a feeder controllable, and linear in the opening, which is what makes it adjustable. A conveyor, by contrast, carries whatever is put on it in a surcharged profile, and its capacity relation does not apply here at all. The density check is worth running in the field, because it is the quiet way a plant changes its tonnage without changing a setting: the same feeder on a heavier ore delivers proportionally more at exactly the same gate and speed, so a feeder calibrated on one material is not calibrated on another. The failure the arithmetic does not capture is ratholing. A feeder that draws material from only part of the hopper opening -- because the belt speed profile is uneven or the interface is badly designed -- creates a flow channel while the rest of the hopper stays static, and the static material eventually consolidates into an arch that stops flow entirely. The fix is an interface that increases in cross-section in the direction of travel so the belt draws progressively along the whole opening, and it is a design feature rather than an adjustment. This assumes the material fills the opening uniformly and flows freely, which is exactly what does not happen with wet, sticky, or cohesive material: arching, ratholing, and flushing depend on the material's shear properties and the hopper's geometry and are resolved by a flow-properties test and a hopper design. The belt pull and drive power a feeder requires are much higher than a conveyor's, because the belt is shearing material under a full hopper load, and undersizing them is a common error; belt-feeder-pull computes them. The feeder manufacturer, a material flow-properties test, and the plant designer govern.",
   };
 }
 const beltFeederExample = { inputs: { opening_width_in: 36, opening_height_in: 8, belt_speed_fpm: 60, bulk_density_pcf: 100, target_tph: 400, alternative_density_pcf: 160 } };
@@ -751,6 +751,80 @@ MINING_RENDERERS["belt-feeder-capacity"] = _simpleRenderer({
     { key: "n", id: "bfc-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeBeltFeederCapacity,
+});
+
+// ===================== spec-v1962: belt feeder load, pull and power =====================
+//
+// belt-feeder-capacity meters the tonnage and says the pull is much higher than
+// a conveyor's. This is that pull, by Roberts' feeder-load method: the hopper
+// puts a vertical load Q = q x bulk weight density x L x B^2 on the feeder
+// through a slot B wide and L long, q being the nondimensional surcharge
+// factor from the hopper analysis, far larger when the bin was filled from
+// empty than once material is flowing. Shearing the material takes F = mu Q
+// with mu = 0.8 sin(effective angle of internal friction).
+// dims: in { slot_width_in: L, slot_length_ft: L, bulk_density_pcf: M L^-3, internal_friction_deg: dimensionless, surcharge_initial: dimensionless, surcharge_flow: dimensionless, belt_speed_fpm: L T^-1, other_resistance_initial_lb: M L T^-2, other_resistance_flow_lb: M L T^-2, drive_efficiency: dimensionless } out: { load_initial_lb: M L T^-2, load_flow_lb: M L T^-2, shear_coefficient: dimensionless, pull_initial_lb: M L T^-2, pull_flow_lb: M L T^-2, shear_power_initial_hp: M L^2 T^-3, shear_power_flow_hp: M L^2 T^-3, total_pull_initial_lb: M L T^-2, total_pull_flow_lb: M L T^-2, drive_power_initial_hp: M L^2 T^-3, drive_power_flow_hp: M L^2 T^-3, initial_to_flow_ratio: dimensionless }
+export function computeBeltFeederPull({
+  slot_width_in = 0, slot_length_ft = 0, bulk_density_pcf = 0, internal_friction_deg = 0,
+  surcharge_initial = 0, surcharge_flow = 0, belt_speed_fpm = 0,
+  other_resistance_initial_lb = 0, other_resistance_flow_lb = 0, drive_efficiency = 0.9,
+} = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(slot_width_in > 0 && slot_width_in <= 240)) return { error: "Enter the hopper outlet slot width (in, up to 240)." };
+  if (!(slot_length_ft > 0 && slot_length_ft <= 200)) return { error: "Enter the hopper outlet slot length along the belt (ft, up to 200)." };
+  if (!(bulk_density_pcf > 0 && bulk_density_pcf <= 500)) return { error: "Bulk density must be positive (lb per cubic foot, up to 500)." };
+  if (!(internal_friction_deg >= 15 && internal_friction_deg <= 70)) return { error: "The effective angle of internal friction must be between 15 and 70 degrees." };
+  if (!(surcharge_flow > 0 && surcharge_flow <= 50)) return { error: "Enter the flow surcharge factor q from the hopper analysis (above 0, up to 50)." };
+  if (!(surcharge_initial >= surcharge_flow && surcharge_initial <= 50)) return { error: "The initial (filled from empty) surcharge factor must be at least the flow factor and no more than 50." };
+  if (!(belt_speed_fpm > 0 && belt_speed_fpm <= 1000)) return { error: "Belt speed must be positive (fpm, up to 1,000)." };
+  if (other_resistance_initial_lb < 0 || other_resistance_flow_lb < 0) return { error: "Skirt and belt resistances cannot be negative (lb)." };
+  if (!(drive_efficiency > 0 && drive_efficiency <= 1)) return { error: "Drive efficiency must be above 0 and no more than 1." };
+  const b_ft = slot_width_in / 12;
+  // Bulk density in lb/cu ft is a weight density in lbf/cu ft at standard gravity.
+  const unit_load_lb = bulk_density_pcf * slot_length_ft * b_ft * b_ft;
+  const load_initial_lb = surcharge_initial * unit_load_lb;
+  const load_flow_lb = surcharge_flow * unit_load_lb;
+  const shear_coefficient = 0.8 * Math.sin(internal_friction_deg * Math.PI / 180);
+  const pull_initial_lb = shear_coefficient * load_initial_lb;
+  const pull_flow_lb = shear_coefficient * load_flow_lb;
+  const hp = (force_lb) => force_lb * belt_speed_fpm / 33000;
+  const shear_power_initial_hp = hp(pull_initial_lb), shear_power_flow_hp = hp(pull_flow_lb);
+  const total_pull_initial_lb = pull_initial_lb + other_resistance_initial_lb;
+  const total_pull_flow_lb = pull_flow_lb + other_resistance_flow_lb;
+  const drive_power_initial_hp = hp(total_pull_initial_lb) / drive_efficiency;
+  const drive_power_flow_hp = hp(total_pull_flow_lb) / drive_efficiency;
+  const initial_to_flow_ratio = load_initial_lb / load_flow_lb;
+  if (![load_initial_lb, pull_initial_lb, drive_power_initial_hp, drive_power_flow_hp].every(Number.isFinite)) return { error: "Belt feeder math is not a finite value." };
+  return {
+    load_initial_lb, load_flow_lb, shear_coefficient, pull_initial_lb, pull_flow_lb,
+    shear_power_initial_hp, shear_power_flow_hp, total_pull_initial_lb, total_pull_flow_lb,
+    drive_power_initial_hp, drive_power_flow_hp, initial_to_flow_ratio,
+    note: "Why a belt feeder needs a far bigger drive than a conveyor carrying the same tonnage. A conveyor only carries its load. A feeder drags a ribbon of material out from under everything standing in the hopper, and the belt has to SHEAR that material along the plane of the outlet. The vertical load the hopper puts on the feeder is q x bulk weight density x slot length x slot width squared, where q is a nondimensional surcharge factor that comes out of the hopper's flow analysis. The slot width is squared, so widening the outlet raises the load fast. There are two values of q and the difference is the whole problem. When a bin is filled from empty onto a stopped feeder the material is in an initial stress state and bears on the feeder with much of the head above it; once it is flowing, an arch of stress forms in the hopper and carries most of that head, and the load falls to a fraction. The first start after filling is the design case for the drive and the belt, and running power is a poor guide to it. The pull to shear the material is the load times 0.8 x the sine of the effective angle of internal friction, the value Roberts recommends from test work, and power is pull times belt speed. Skirtplate drag, belt and idler friction and the empty belt add to both cases; enter them as the other resistances, or leave them at zero to see the shear alone. Leaving a cushion of material on the feeder when the bin is emptied, and not filling onto a stopped belt from a great height, both keep the initial load down. THE SURCHARGE FACTORS ARE ENTERED AND THIS DOES NOT COMPUTE THEM: they depend on the hopper half-angle, wall friction, the head in the bin and how it was filled, and published charts and the flow-properties test supply them. It does not check belt slip under the material, design the hopper for mass flow, or size the gearbox for starting torque. The feeder manufacturer and a material flow-properties test govern.",
+  };
+}
+export const beltFeederPullExample = { inputs: { slot_width_in: 36, slot_length_ft: 12, bulk_density_pcf: 100, internal_friction_deg: 45, surcharge_initial: 2.5, surcharge_flow: 1, belt_speed_fpm: 60, other_resistance_initial_lb: 0, other_resistance_flow_lb: 0, drive_efficiency: 0.9 } };
+MINING_RENDERERS["belt-feeder-pull"] = _simpleRenderer({
+  citation: "Citation: A. W. Roberts and K. S. Manjunath, Wall Pressure-Feeder Load Interactions in Mass Flow Hopper/Feeder Combinations, Part II, Bulk Solids Handling vol. 6 no. 5 (October 1986) -- feeder load Q = q x bulk weight density x L x B^2 for a plane-flow slot (Eq. 21), force to shear F = mu Q (Eq. 30) with mu = 0.8 sin(effective angle of internal friction) recommended, and power P = F v (Eq. 32), total power = total resistance x v / efficiency (Eq. 42). The surcharge factors q are ENTERED from the hopper analysis. The feeder manufacturer and a material flow-properties test govern.",
+  example: beltFeederPullExample.inputs,
+  fields: [
+    { key: "slot_width_in", label: "Hopper outlet slot width B (in)", kind: "number" },
+    { key: "slot_length_ft", label: "Outlet slot length along the belt L (ft)", kind: "number" },
+    { key: "bulk_density_pcf", label: "Bulk density (lb/cu ft)", kind: "number" },
+    { key: "internal_friction_deg", label: "Effective angle of internal friction (deg)", kind: "number" },
+    { key: "surcharge_initial", label: "Surcharge factor q, filled from empty", kind: "number" },
+    { key: "surcharge_flow", label: "Surcharge factor q, flowing", kind: "number" },
+    { key: "belt_speed_fpm", label: "Belt speed (fpm)", kind: "number" },
+    { key: "other_resistance_initial_lb", label: "Skirt and belt resistance, initial (lb, 0 to skip)", kind: "number" },
+    { key: "other_resistance_flow_lb", label: "Skirt and belt resistance, flowing (lb, 0 to skip)", kind: "number" },
+    { key: "drive_efficiency", label: "Drive efficiency (0 to 1)", kind: "number", default: 0.9 },
+  ],
+  outputs: [
+    { key: "s", id: "bfp-out-s", label: "First start after filling", value: (r) => fmt(r.total_pull_initial_lb, 0) + " lb of belt pull, " + fmt(r.drive_power_initial_hp, 1) + " hp at the drive" },
+    { key: "f", id: "bfp-out-f", label: "Running", value: (r) => fmt(r.total_pull_flow_lb, 0) + " lb of belt pull, " + fmt(r.drive_power_flow_hp, 1) + " hp at the drive" },
+    { key: "q", id: "bfp-out-q", label: "Load on the feeder from the hopper", value: (r) => fmt(r.load_initial_lb, 0) + " lb initial, " + fmt(r.load_flow_lb, 0) + " lb flowing (" + fmt(r.initial_to_flow_ratio, 1) + " to 1)" },
+    { key: "p", id: "bfp-out-p", label: "Pull to shear the material alone", value: (r) => fmt(r.pull_initial_lb, 0) + " lb initial, " + fmt(r.pull_flow_lb, 0) + " lb flowing, at a coefficient of " + fmt(r.shear_coefficient, 3) },
+    { key: "n", id: "bfp-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeBeltFeederPull,
 });
 
 // ===================== spec-v1515: dust collector air-to-cloth ratio =====================

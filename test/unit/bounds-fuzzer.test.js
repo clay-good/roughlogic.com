@@ -59637,3 +59637,31 @@ test("bounds: compressed-air-condensate balances the water and follows the psych
     assert.ok("error" in _cac({ ...base, ...bad }), JSON.stringify(bad));
   }
 });
+
+import { computeBeltFeederPull as _bfp } from "../../calc-mining.js";
+test("bounds: belt-feeder-pull reproduces the Roberts and Manjunath (1986) design example", () => {
+  const kN = 224.80894387, kW = 0.74569987;
+  // Section 12.2. q is back-figured from the printed loads so the comparison is not limited by its three printed digits.
+  const unit = 0.95 * 9.81 * 5 * 1.5 * 1.5; // kN per unit of q
+  const r = _bfp({ slot_width_in: 1.5 / 0.0254, slot_length_ft: 5 / 0.3048, bulk_density_pcf: 950 / 16.01846337, internal_friction_deg: 50, surcharge_initial: 265.89 / unit, surcharge_flow: 109.84 / unit, belt_speed_fpm: 0.5 * 60 / 0.3048, other_resistance_initial_lb: (229.73 - 162.94) * kN, other_resistance_flow_lb: (146.90 - 67.31) * kN, drive_efficiency: 0.9 });
+  const close = (got, want) => assert.ok(Math.abs(got / want - 1) < 0.001, got + " vs " + want);
+  close(r.load_initial_lb / kN, 265.89); close(r.load_flow_lb / kN, 109.84);
+  close(r.pull_initial_lb / kN, 162.94); close(r.pull_flow_lb / kN, 67.31);
+  close(r.shear_power_initial_hp * kW, 81.47); close(r.shear_power_flow_hp * kW, 33.66);
+  close(r.drive_power_initial_hp * kW, 127.63); close(r.drive_power_flow_hp * kW, 81.61);
+  // The printed surcharge factors themselves.
+  assert.ok(Math.abs(265.89 / unit - 2.54) < 0.005 && Math.abs(109.84 / unit - 1.05) < 0.005);
+  const base = { slot_width_in: 36, slot_length_ft: 12, bulk_density_pcf: 100, internal_friction_deg: 45, surcharge_initial: 2.5, surcharge_flow: 1, belt_speed_fpm: 60, other_resistance_initial_lb: 0, other_resistance_flow_lb: 0, drive_efficiency: 0.9 };
+  const b = _bfp(base);
+  // Slot width is squared; length, density, q and speed are linear.
+  assert.ok(Math.abs(_bfp({ ...base, slot_width_in: 72 }).load_flow_lb / b.load_flow_lb - 4) < 1e-12);
+  assert.ok(Math.abs(_bfp({ ...base, slot_length_ft: 24 }).pull_initial_lb / b.pull_initial_lb - 2) < 1e-12);
+  assert.ok(Math.abs(_bfp({ ...base, belt_speed_fpm: 120 }).drive_power_flow_hp / b.drive_power_flow_hp - 2) < 1e-12);
+  assert.ok(Math.abs(b.initial_to_flow_ratio - 2.5) < 1e-12 && Math.abs(b.shear_coefficient - 0.8 * Math.SQRT1_2) < 1e-12);
+  // Other resistances add to the pull before efficiency.
+  const o = _bfp({ ...base, other_resistance_flow_lb: 1000 });
+  assert.ok(Math.abs(o.total_pull_flow_lb - b.total_pull_flow_lb - 1000) < 1e-9 && Math.abs(o.drive_power_flow_hp - (b.pull_flow_lb + 1000) * 60 / 33000 / 0.9) < 1e-9);
+  for (const bad of [{ slot_width_in: 0 }, { slot_width_in: 36000 }, { slot_length_ft: 0 }, { bulk_density_pcf: -100 }, { internal_friction_deg: 5 }, { internal_friction_deg: 4500 }, { surcharge_flow: 0 }, { surcharge_initial: 0.5 }, { surcharge_initial: 2500 }, { belt_speed_fpm: 0 }, { belt_speed_fpm: 60000 }, { other_resistance_initial_lb: -1 }, { drive_efficiency: 0 }, { drive_efficiency: 90 }]) {
+    assert.ok("error" in _bfp({ ...base, ...bad }), JSON.stringify(bad));
+  }
+});

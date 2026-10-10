@@ -864,6 +864,7 @@ const _TILES = [
   ["pulp-density-solids", "E"],
   ["screen-deck-capacity", "E"],
   ["belt-feeder-capacity", "E"],
+  ["belt-feeder-pull", "E"],
   ["dust-collector-air-to-cloth", "E"],
   ["dust-deflagration-vent-area", "E"],
   // spec-v1517..v1523 mining band, part 2 (spec-v1520 cut as a duplicate of

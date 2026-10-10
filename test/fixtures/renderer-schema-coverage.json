@@ -1,7 +1,7 @@
 {
   "note": "spec-v1184 coverage ratchet. Tiles whose renderer exposes a render.schema consistent with the compute function. Grow with `node scripts/check-renderer-schema.mjs --write`; regeneration is intentional.",
-  "total_tiles": 2265,
-  "covered_count": 2191,
+  "total_tiles": 2266,
+  "covered_count": 2192,
   "covered": [
     "aav-install-check",
     "abatement-containment",
@@ -126,6 +126,7 @@
     "belt-conveyor-tension-power",
     "belt-deflection-tension",
     "belt-feeder-capacity",
+    "belt-feeder-pull",
     "belt-hp-transmitted",
     "belt-pulley",
     "bend-allowance",

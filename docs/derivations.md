@@ -2993,6 +2993,7 @@ cross-check.
 | calc-millwright.js | `computeVibrationForcingFrequencies` | `{ rpm = 0, blade_count = 0, gear_tooth_count = 0, belt_length_in = 0, sheave_...` | _ | _ | _ |
 | calc-millwright.js | `computeVibrationSeverityZone` | `{ reading = 0, reading_is_mm_s = 0, boundary_ab = 0.0441, boundary_bc = 0.110...` | _ | _ | _ |
 | calc-mining.js | `computeBeltFeederCapacity` | `{ opening_width_in = 0, opening_height_in = 0, belt_speed_fpm = 0, bulk_densi...` | _ | _ | _ |
+| calc-mining.js | `computeBeltFeederPull` | `{ slot_width_in = 0, slot_length_ft = 0, bulk_density_pcf = 0, internal_frict...` | _ | _ | _ |
 | calc-mining.js | `computeBlastAirblastOverpressure` | `{ distance_ft = 0, charge_per_delay_lb = 0, airblast_k = 0.2, airblast_b = 1....` | _ | _ | _ |
 | calc-mining.js | `computeBlastBurdenSpacing` | `{ hole_diameter_in = 0, burden_ratio = 25, bench_height_ft = 0, spacing_ratio...` | _ | _ | _ |
 | calc-mining.js | `computeBlastFumeClearanceTime` | `{ heading_volume_cuft = 0, delivered_cfm = 0, target_fraction_pct = 1, wait_t...` | _ | _ | _ |
@@ -3935,7 +3936,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2519.
+Row count: 2520.
 
 <!-- END function-corpus-v14 -->
 
@@ -4718,7 +4719,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-extraction-rate` | Water Extraction Volume, Time, and Waste-Tank Dumps | Project (first-principles); standing + absorbed; wand time = total / gpm | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+4 more) |
 
-### Group E Construction (630 tiles)
+### Group E Construction (631 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4756,6 +4757,7 @@ per spec-v14 §13.1 second paragraph.
 | `beam-loading` | Beam Loading | Project (first-principles); 200 plf / 12 ft / E = 1.6e6 psi / 4x10 -> M = 3600 lb-ft,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `beam-reactions` | Simple-Span Beam Reactions and Max Moment | Statics / AISC simple-beam diagrams; L 16 ft, w 200 plf -> R 1600 lb, M_max 6400 ft-lb | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `belt-feeder-capacity` | Belt Feeder Volumetric Capacity and Density Check | Project (first-principles); a feeder relation, not a conveyor's | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `belt-feeder-pull` | Belt Feeder Load, Pull and Power | Project (first-principles); 100 x 12 x 3^2 = 10,800 lb per unit of q: 27,000 lb initi... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `bend-allowance` | Sheet Metal Bend Allowance | Project (first-principles); BA = (pi/180) * 90 * (0.125 + 0.44 * 0.06) = 0.2378; setb... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `bend-springback` | Sheet-Metal Bend Springback | Machinery's Handbook sheet-metal spri...; x = 1*50000/(29e6*0.1) = 0.017241; Ks = 4x^3-3x+1 = 0.948... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `berthing-fender-energy` | Berthing Energy and Fender Selection | Project (first-principles); published berthing guidance and the berth designer govern... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
@@ -6373,6 +6375,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 
-Tile count: 2265. Fixture-covered or reference-cadence: 2265 / 2265.
+Tile count: 2266. Fixture-covered or reference-cadence: 2266 / 2266.
 
 <!-- END tile-index-v14 -->

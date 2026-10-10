@@ -15558,6 +15558,19 @@ export const CITATIONS = {
       { name: "A tighter crusher can starve a screen", value: "fewer fines is a lower halfsize factor and a large capacity loss", source: "screening practice" },
     ],
   },
+  "belt-feeder-pull": {
+    formula: "Feeder load Q = q x bulk weight density x L x B^2 for a plane-flow slot outlet B wide and L long, with q the nondimensional surcharge factor, one value for the initial (filled from empty) condition and a smaller one for flow. Force to shear the material F = mu Q, mu = 0.8 sin(effective angle of internal friction). Shear power = F v; drive power = (F + other resistances) x v / efficiency. In US units: lb/cu ft x ft x ft^2 = lb; hp = lb x fpm / 33,000.",
+    edition: "A. W. Roberts and K. S. Manjunath, Wall Pressure-Feeder Load Interactions in Mass Flow Hopper/Feeder Combinations, Part II, Bulk Solids Handling vol. 6 no. 5, October 1986: Eqs. 21, 30, 32 and 42, and conclusion 5 for the 0.8 sin value. The surcharge-factor expressions (its Eqs. 24 to 29, after McLean and Arnold) are not reproduced; q is entered.",
+    freeAccess: "Free at bulk-online.com (BSH_1986_05_009.pdf). Its design example, section 12.2 (B 1.50 m, L 5.00 m, 0.95 t/m3, 50 degrees, q 2.54 and 1.05, 0.50 m/s, 90% efficiency), prints loads of 265.89 and 109.84 kN, shear forces of 162.94 and 67.31 kN, shear powers of 81.47 and 33.66 kW and total powers of 127.63 and 81.61 kW; converted to US units this tile returns each within 0.04%.",
+    governance: GOVERNANCE.general,
+    editionNote: "The initial load can be several times the flow load and sets the drive. The paper reports that mu = sin(delta) overestimates and mu = 0.4 underestimates measured power, and recommends 0.8 sin(delta). A reader on the publisher's forum disputes the flow surcharge factor in the paper's example; this tile does not depend on it because q is entered. Plane-flow slot outlets only. Skirtplate, belt, idler and empty-belt resistances are entered as a total, not computed.",
+    assumptions: [
+      { name: "Surcharge factors are entered", value: "they depend on hopper half-angle, wall friction, head and filling method", source: "the hopper flow analysis" },
+      { name: "Shear coefficient", value: "0.8 x sin(effective angle of internal friction)", source: "Roberts and Manjunath (1986), conclusion 5" },
+      { name: "Plane-flow slot", value: "Q = q x weight density x L x B^2", source: "Roberts and Manjunath (1986), Eq. 21" },
+      { name: "Other resistances", value: "skirtplates, belt load, empty belt; entered as one figure per case", source: "entered" },
+    ],
+  },
   "belt-feeder-capacity": {
     formula: "volumetric flow = opening width x opening height x belt speed x 60; tonnage = that volume x bulk density / 2,000; the belt speed for a target tonnage and the gate opening for it invert the same relation.",
     edition: "The metering relation for a fixed rectangular gate by name -- a FEEDER's relation, not a conveyor's surcharged-profile one. The feeder manufacturer, a material flow-properties test, and the plant designer govern.",

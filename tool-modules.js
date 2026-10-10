@@ -733,7 +733,7 @@ export const TOOL_MODULES = (() => {
   declare("./calc-mining.js", "MINING_RENDERERS", [
     "blast-powder-factor", "blast-burden-spacing", "blast-scaled-distance-ppv",
     "blast-airblast-overpressure", "blast-stemming-length", "crusher-reduction-ratio", "bond-work-index-power", "circulating-load-ratio", "screen-efficiency", "pulp-density-solids",
-    "screen-deck-capacity", "belt-feeder-capacity", "dust-collector-air-to-cloth",
+    "screen-deck-capacity", "belt-feeder-capacity", "belt-feeder-pull", "dust-collector-air-to-cloth",
     "dust-deflagration-vent-area",
     // spec-v1517..v1523, part 2 of the same module.
     "mine-face-ventilation", "pit-dewatering-staging", "highwall-bench-geometry",
