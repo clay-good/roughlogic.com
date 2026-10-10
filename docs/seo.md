@@ -37,8 +37,8 @@ the strip is a one-block revert to `index.html`.
 
 Shells are generated at build time by
 [../scripts/build-shells.mjs](../scripts/build-shells.mjs) from the
-TOOLS array in [../tools-data.js](../tools-data.js) (lazy-loaded out
-of `app.js` per spec-v17 §H.2), the `GROUP_NAMES` map in
+TOOLS array in [../tools-data.js](../tools-data.js) (the source of truth;
+the browser loads the generated `tools-lead.js`), the `GROUP_NAMES` map in
 [../app.js](../app.js), and the spec-v13 Phase E per-tile `related`
 registry in [../scripts/related-tiles.mjs](../scripts/related-tiles.mjs)
 (moved out of `tile-meta.js` so the runtime no longer carries it).

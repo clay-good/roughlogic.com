@@ -145,6 +145,7 @@ async function main() {
   // fetches, so requiring every file in that directory would be wrong.
   const SHARDED = [
     { dir: "fields", label: "data/fields", match: (f) => f.endsWith(".json") && f !== "manifest.json" },
+    { dir: "desc", label: "data/desc", match: (f) => f.endsWith(".json") && f !== "manifest.json" },
     { dir: "search", label: "data/search", match: (f) => /^aliases-[A-Za-z0-9_-]+\.json$/.test(f) },
   ];
 

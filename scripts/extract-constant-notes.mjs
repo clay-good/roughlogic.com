@@ -88,7 +88,8 @@ async function collect() {
 //
 // The obvious encoding -- 976 quoted tile ids -- is 8.7 KB gzipped against this
 // module's 6 KB budget, and the ids are pure redundancy: every one of them is
-// already in tools-data.js, which any tile page has loaded before this module
+// already in tools-lead.js (the browser's catalog: tools-data.js rows in the
+// same order), which any tile page has loaded before this module
 // is reached. So ship the ANSWER (yes/no per tile) rather than the questions:
 // 1,709 bits is 214 bytes, ~300 after base64, and the ids come from TOOLS.
 //
@@ -111,7 +112,7 @@ function render(ids) {
     "//",
     `// ${ids.length} of ${TOOLS.length} tiles, one bit each in TOOLS order (see the`,
     "// generator for why this is a bitmap and not a list of ids).",
-    'import { TOOLS } from "./tools-data.js";',
+    'import { TOOLS } from "./tools-lead.js";',
     "",
     `const BITS = "${b64}";`,
     "",

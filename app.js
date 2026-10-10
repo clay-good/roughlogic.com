@@ -9,6 +9,7 @@
 import { verifyManifestIntegrity, verifyShard } from "./integrity.js";
 import { parseHashRoute } from "./routing.js";
 import { leadSentence, restOfDescription } from "./text-lead.js";
+import { descBucket } from "./desc-bucket.js";
 
 // Recents (utility 120) was removed in v11; see specs/spec-v11.md.
 
@@ -183,8 +184,14 @@ const GROUP_NAMES = {
 
 // Tool registry. Order matches spec.md section 12.
 // Each entry: id (kebab-case route), name, group, trades, desc.
-// spec-v17 §H.2: the TOOLS metadata registry (~30 KB gzipped) lives in
-// tools-data.js and is lazy-loaded so the bare home view excludes it.
+// spec-v17 §H.2: the TOOLS metadata registry is lazy-loaded so the bare home
+// view excludes it. Since 2026-10-10 the browser loads tools-lead.js, generated
+// from tools-data.js by scripts/build-catalog-lead.mjs: the same rows in the
+// same order with `desc` cut to its opening sentence (204 KB gzipped against
+// 714 KB), because a deep link needs one row's name and lead, not 2,258 whole
+// descriptions. The remainder of each description is fetched from
+// data/desc/<bucket>.json: one shard for a tile view, all of them before a
+// search ranks, so search sees exactly the text it always did.
 // The home #tools view is static HTML; TOOLS is needed only to route a
 // tile hash, render a tool view, or power search -- all on interaction
 // or a deep-link, never at home first paint. ensureTools() mirrors the
@@ -194,9 +201,45 @@ let _toolsPromise = null;
 function ensureTools() {
   if (TOOLS) return Promise.resolve(TOOLS);
   if (!_toolsPromise) {
-    _toolsPromise = import("./tools-data.js").then((m) => { TOOLS = m.TOOLS; return TOOLS; });
+    _toolsPromise = import("./tools-lead.js").then((m) => { TOOLS = m.TOOLS; return TOOLS; });
   }
   return _toolsPromise;
+}
+// A row with `more` carries only its opening sentence; its shard holds the
+// rest, and appending it restores the description character for character
+// (the generator asserts that for every tile). A failed fetch is forgotten so
+// the next call retries, and leaves the opening sentences in place.
+const _descShards = new Map();
+function ensureDescShard(bucket) {
+  if (!_descShards.has(bucket)) {
+    const file = bucket + ".json";
+    _descShards.set(bucket, fetch("data/desc/" + file, { credentials: "omit" })
+      .then(async (r) => {
+        if (!r.ok) { _descShards.delete(bucket); return; }
+        const text = await r.text();
+        await verifyShard("desc", file, text);
+        const rest = (JSON.parse(text) || {}).rest;
+        if (!rest) return;
+        for (const t of TOOLS) {
+          if (t.more && typeof rest[t.id] === "string") { t.desc += rest[t.id]; t.more = 0; }
+        }
+      })
+      .catch(() => { _descShards.delete(bucket); }));
+  }
+  return _descShards.get(bucket);
+}
+// The whole description of one tile (its Details body and meta description).
+function ensureDescription(tool) {
+  return tool && tool.more ? ensureDescShard(descBucket(tool.id)) : Promise.resolve();
+}
+// Every description, for search: all shards in parallel, awaited the way the
+// single catalog file used to be.
+function ensureFullDescriptions() {
+  return ensureTools().then(() => {
+    const buckets = new Set();
+    for (const t of TOOLS) if (t.more) buckets.add(descBucket(t.id));
+    return Promise.all([...buckets].map(ensureDescShard));
+  });
 }
 const EMPTY_IDS = [];
 
@@ -405,7 +448,9 @@ function updateHeadForTool(id) {
   const tool = TOOLS.find((t) => t.id === id);
   if (!tool) return updateHeadForHome();
   setHeadLink("canonical", SITE_ORIGIN + "/tools/" + id + "/");
-  import("./shell-meta.js").then((meta) => {
+  // The description meta is built from the whole description, so wait for the
+  // tile's shard as well; the title does not need it but the pair is set together.
+  Promise.all([import("./shell-meta.js"), ensureDescription(tool)]).then(([meta]) => {
     if (state.route.view !== "tool" || state.route.id !== id) return;
     const head = meta.headForTool(tool);
     document.title = head.title;
@@ -644,12 +689,22 @@ function renderToolView(id, params) {
   const proofSummary = document.createElement("summary");
   proofSummary.textContent = "Details, formula, and sources";
   proof.appendChild(proofSummary);
+  // The remainder of the description. When it is still in its shard the
+  // paragraph is placed now, inside the closed <details>, and filled when the
+  // shard lands, so nothing moves on the page.
   const detailText = restOfDescription(tool.desc);
-  if (detailText) {
+  if (detailText || tool.more) {
     const detailBody = document.createElement("p");
     detailBody.className = "view-detail";
     detailBody.textContent = detailText;
     proof.appendChild(detailBody);
+    if (tool.more) {
+      ensureDescription(tool).then(() => {
+        const full = restOfDescription(tool.desc);
+        if (full) detailBody.textContent = full;
+        else if (!detailBody.textContent) detailBody.remove();
+      });
+    }
   }
   proof.appendChild(citation);
 
@@ -786,8 +841,8 @@ function bindSearch() {
   if (!input || !list) return;
 
   // The TOOLS registry is lazy-loaded; these indexes are built on first
-  // interaction (focus / keystroke), behind ensureTools(), so the bare
-  // home view never pulls tools-data.js.
+  // interaction (focus / keystroke), behind ensureFullDescriptions(), so the
+  // bare home view never pulls the catalog.
   let nameToId = new Map();
   let ALL = [];
   let searchReady = false;
@@ -1259,7 +1314,9 @@ function bindSearch() {
     ensureDiscovery();
     ensureSlots();
     ensurePreview();
-    ensureTools().then(() => { initSearchData(); ensureAliases(); render(input.value); });
+    // Search ranks on whole descriptions, so it waits for every description
+    // shard the way it used to wait for the one catalog file.
+    ensureFullDescriptions().then(() => { initSearchData(); ensureAliases(); render(input.value); });
   }
   input.addEventListener("focus", loadAndRender);
   input.addEventListener("input", loadAndRender);

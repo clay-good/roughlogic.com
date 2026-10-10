@@ -42,7 +42,10 @@ export async function hashPages() {
   const read = async (p) => readFile(p, "utf8");
 
   const home = await read(resolve(DIST, "index.html"));
-  const catalog = await read(resolve(DIST, "tools-data.js"));
+  // The catalog is read from the repo, not dist: tools-data.js stopped shipping
+  // on 2026-10-10 (the browser loads the generated tools-lead.js). It was copied
+  // verbatim before, so the home page hash is unchanged by the move.
+  const catalog = await read(resolve(ROOT, "tools-data.js"));
   pages.set("/", sha(home + "\n" + catalog));
 
   pages.set("/tools/", sha(await read(resolve(DIST, "tools", "index.html"))));

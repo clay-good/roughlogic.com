@@ -19,7 +19,12 @@ const FILES = [
   "styles.css",
   "app.js",
   "tool-modules.js",
-  "tools-data.js",
+  // The browser's catalog (opening sentences only) and its shard rule; generated
+  // from tools-data.js by scripts/build-catalog-lead.mjs. tools-data.js itself
+  // is no longer shipped: nothing in the browser imports it since 2026-10-10, and
+  // every build script, gate and the agent door read the repo copy.
+  "tools-lead.js",
+  "desc-bucket.js",
   "sw.js",
   "manual-j-worker.js",
   "pure-math.js",
@@ -233,6 +238,10 @@ async function checkRuntimeFilesEnumerated() {
     "wrangler.jsonc", "lighthouserc.json",
     // spec-v1926: build-time data for scripts/build-shells.mjs; never shipped.
     "collections.js",
+    // The full catalog: the source of truth for every build script, gate and
+    // the agent door, and the input to scripts/build-catalog-lead.mjs. The
+    // browser loads the generated tools-lead.js instead, so it is not shipped.
+    "tools-data.js",
   ]);
   const missing = [];
   for (const name of await readdir(ROOT)) {

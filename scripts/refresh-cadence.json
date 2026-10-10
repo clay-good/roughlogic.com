@@ -114,6 +114,12 @@
       "rationale": "Project-authored field descriptors generated from the renderers themselves (spec-v1339). Never stale in practice -- build-field-index.mjs --check regenerates and fails the lint on any drift the moment a schema changes, so the date stamp is a formality rather than the real gate."
     },
     {
+      "folder": "desc",
+      "cadence": "annual",
+      "max_age_days": 730,
+      "rationale": "Project-authored tile descriptions split from tools-data.js (the part after each opening sentence). Never stale in practice -- build-catalog-lead.mjs --check regenerates and fails the lint on any drift the moment a description changes, so the date stamp is a formality rather than the real gate."
+    },
+    {
       "folder": "field",
       "cadence": "annual",
       "max_age_days": 730,

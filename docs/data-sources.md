@@ -631,6 +631,15 @@ A standard the tiles cite but no shard holds data from has no manifest to appear
 - Sharding: One shard per tile group, matching the `aliases-<letter>.json` convention, so the browser derives the filename from the group it already knows and never fetches a manifest to find one. Group E is split in two (`e-1`, `e-2`) because a single shard gzips to 31.7 KB; the split rule lives in `field-bucket.js` and is imported by both the writer and the reader so they cannot disagree. The shard set is not fixed -- a group gains a shard the first time one of its tiles is indexed -- so `scripts/check-sw-precache.mjs` checks the service worker's precache list against the files on disk in both directions.
 - Privacy: Lazy fetch on first use, cached per session, never at first paint. Nothing about a query is recorded or transmitted; the extraction is regex and table lookup running locally.
 
+### data/desc/*.json (tile descriptions after the opening sentence)
+
+- Source: Generated runtime shards holding the part of each tile's description that follows its opening sentence, split from `tools-data.js` by `scripts/build-catalog-lead.mjs`. `tools-data.js` stays the source of truth; the browser loads `tools-lead.js` (the same rows in the same order with `desc` cut to the opening sentence) and appends a shard's text to restore a description exactly.
+- License: MIT-licensed creative work, identical to the descriptions it is split from. Not derived from any external standard.
+- Cadence: Regenerated whenever a description changes; `node scripts/build-catalog-lead.mjs --check` fails CI on any drift, and the generator fails outright if a description does not reconstruct character for character or a shard passes 96 KB gzip.
+- Shard layout: `{ version: 1, bucket, rest: { <tile-id>: "<remainder>" } }`. A tile whose description is a single sentence has no entry.
+- Sharding: One shard per first character of the tile id (see `desc-bucket.js`, shared by the generator and `app.js`), so the browser derives the filename from the id it already has.
+- Privacy: A tile view fetches its one shard; the first search keystroke fetches all of them in parallel. Same-origin static files, precached by the service worker; nothing about a query is recorded or transmitted.
+
 ### data/cross/glossary.json (v5, utility 271)
 
 - Source: Original plain-English definitions written by the project author. MIT licensed.

@@ -7,7 +7,7 @@
 //
 // 1578 of 2258 tiles, one bit each in TOOLS order (see the
 // generator for why this is a bitmap and not a list of ids).
-import { TOOLS } from "./tools-data.js";
+import { TOOLS } from "./tools-lead.js";
 
 const BITS = "CQAI/wEA8If+DwCghwIMn/9/ACTYIAGAv9f//z9AD2De/g4EAIEKG8SBdAAAgP89AACACDAA/IPg+/8nif+7AB/g//85AHz//4ObnwRPf4APAHz/Dz/QfwQAcP4DAOB/+P8Fw/+P399/nP/jn/k/5v5/v/v//7vv+/9/vuz/+///1////////3/f//3//f8////+//3///9fD/79/P/x/jnfAADw//+f/v////9/+//9H/6v71/v+//f//f3////////7/9/+/+/AgA/HgBw+SEMfiNA/suacfK/8///B/v/hwsI9///////f//zf/+7/+/v//3//////v//z/vf/////t//////+///+v///////7//vzuX9wfPAw==";
 

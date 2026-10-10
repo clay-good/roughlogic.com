@@ -33,7 +33,10 @@ test("bindSearch lazy-loads the per-group alias shards via ensureAliases", async
   // and the alias fetch off the first-paint path. spec-v589 adds the
   // ranking module to the same lazy path (ensureDiscovery).
   assert.match(t, /input\.addEventListener\("focus",\s*loadAndRender\)/);
-  assert.match(t, /function loadAndRender\(\)\s*\{\s*ensureDiscovery\(\);\s*ensureSlots\(\);\s*ensurePreview\(\);\s*ensureTools\(\)\.then\(\(\)\s*=>\s*\{\s*initSearchData\(\);\s*ensureAliases\(\);/);
+  // Since 2026-10-10 the catalog arrives as tools-lead.js plus description
+  // shards, and search waits for all of them (ensureFullDescriptions) because
+  // it ranks on whole descriptions.
+  assert.match(t, /function loadAndRender\(\)\s*\{\s*ensureDiscovery\(\);\s*ensureSlots\(\);\s*ensurePreview\(\);[\s\S]{0,300}?ensureFullDescriptions\(\)\.then\(\(\)\s*=>\s*\{\s*initSearchData\(\);\s*ensureAliases\(\);/);
 });
 
 test("the spec-v592 preview, did-you-mean, and browse fallback are wired", async () => {

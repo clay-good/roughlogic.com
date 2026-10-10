@@ -21,7 +21,10 @@ phase docs ([edition-rollover.md](edition-rollover.md),
   in the URL or complete report payload.
 - [ ] Tile renders without console warnings or errors.
 - [ ] Tile id is added to the `TOOLS` array in [../tools-data.js](../tools-data.js)
-  (the catalog registry; lazy-loaded out of `app.js` per spec-v10 §H.2).
+  (the catalog registry; the source of truth).
+- [ ] `node scripts/build-catalog-lead.mjs` is re-run after any change to
+  `tools-data.js`. It regenerates `tools-lead.js` (what the browser loads) and
+  the `data/desc/` shards; lint runs it with `--check` and fails on drift.
 - [ ] Tile renderer is wired into the per-group `<NAME>_RENDERERS`
   dispatch table in `calc-<group>.js`, and the tile id is added to
   the matching `declare("./calc-<group>.js", "<NAME>_RENDERERS",

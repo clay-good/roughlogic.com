@@ -141,12 +141,23 @@ integrity.js + theme.js + routing.js) gzips to **45,008 B** as of
 2026-08-27, well under the 100 KB budget in spec.md section 11.1.
 
 Two registries that once lived inside `app.js` are dynamic-imported and
-are therefore outside that payload: the `TOOLS` catalog registry in
-`tools-data.js`, loaded on the first search keystroke or tile route, and
+are therefore outside that payload: the `TOOLS` catalog registry, loaded
+on the first search keystroke or tile route, and
 the `TOOL_MODULES` tile-id to renderer table in `tool-modules.js`, loaded
 on the first tile open by `loadRenderer()`. Both grow by one entry per
 tile, so keeping them out of the home view is what stops first paint from
 getting slower every time the catalog grows.
+
+The catalog reaches the browser in two parts since 2026-10-10.
+`tools-data.js` is the source of truth -- every build script, gate and the
+agent door read it -- but it is no longer shipped. `scripts/build-catalog-lead.mjs`
+generates `tools-lead.js`, the same rows in the same order with each `desc`
+cut to its opening sentence, and `data/desc/<letter>.json`, the remainders
+sharded by the first letter of the tile id. A tile route imports
+`tools-lead.js` and fetches its one shard for the Details body and the
+description meta; search fetches every shard in parallel and restores every
+description before it ranks, so results are what they were with the single
+file. A deep link went from 714 KB gzipped to 204 KB plus one shard.
 
 ## v2 hash format
 

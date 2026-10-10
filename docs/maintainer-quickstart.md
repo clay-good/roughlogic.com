@@ -30,8 +30,10 @@ Tests live in `test/unit/` and `test/integration/`.
 3. Wire the tile into the registries (each is a one-line add; the
    lint gates below enforce that none is missed):
    - `{ id, name, group, trades, desc }` row in the `TOOLS` array in
-     [../tools-data.js](../tools-data.js) (the catalog registry,
-     lazy-loaded out of `app.js` per spec-v17 §H.2 -- NOT in app.js).
+     [../tools-data.js](../tools-data.js) (the catalog registry and source of
+     truth -- NOT in app.js). Then run `node scripts/build-catalog-lead.mjs`,
+     which regenerates `tools-lead.js` (what the browser loads) and the
+     `data/desc/` shards from it.
    - `[id, group]` row in `_TILES` in [../tile-meta.js](../tile-meta.js).
    - the tile id in the matching `declare("./calc-<group>.js",
      "<NAME>_RENDERERS", [...])` list in

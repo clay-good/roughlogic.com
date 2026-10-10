@@ -1,0 +1,162 @@
+{
+  "name": "desc",
+  "version": "2026-10-10",
+  "fetched": "2026-10-10",
+  "edition": "Original project-authored tile descriptions, split from tools-data.js: the part of each description after its opening sentence. Derived data: tools-data.js is authoritative and these shards regenerate from it. Not from any external standard.",
+  "asOf": "2026-10-10",
+  "refresh_cadence": "annual",
+  "shards": [
+    {
+      "file": "a.json",
+      "name": "Tile descriptions after the opening sentence, a runtime shard (generated)",
+      "gzip_size_bytes": 19556
+    },
+    {
+      "file": "b.json",
+      "name": "Tile descriptions after the opening sentence, b runtime shard (generated)",
+      "gzip_size_bytes": 32101
+    },
+    {
+      "file": "c.json",
+      "name": "Tile descriptions after the opening sentence, c runtime shard (generated)",
+      "gzip_size_bytes": 62654
+    },
+    {
+      "file": "d.json",
+      "name": "Tile descriptions after the opening sentence, d runtime shard (generated)",
+      "gzip_size_bytes": 32663
+    },
+    {
+      "file": "e.json",
+      "name": "Tile descriptions after the opening sentence, e runtime shard (generated)",
+      "gzip_size_bytes": 16388
+    },
+    {
+      "file": "f.json",
+      "name": "Tile descriptions after the opening sentence, f runtime shard (generated)",
+      "gzip_size_bytes": 27951
+    },
+    {
+      "file": "g.json",
+      "name": "Tile descriptions after the opening sentence, g runtime shard (generated)",
+      "gzip_size_bytes": 27509
+    },
+    {
+      "file": "h.json",
+      "name": "Tile descriptions after the opening sentence, h runtime shard (generated)",
+      "gzip_size_bytes": 21860
+    },
+    {
+      "file": "i.json",
+      "name": "Tile descriptions after the opening sentence, i runtime shard (generated)",
+      "gzip_size_bytes": 11215
+    },
+    {
+      "file": "j.json",
+      "name": "Tile descriptions after the opening sentence, j runtime shard (generated)",
+      "gzip_size_bytes": 2056
+    },
+    {
+      "file": "k.json",
+      "name": "Tile descriptions after the opening sentence, k runtime shard (generated)",
+      "gzip_size_bytes": 6736
+    },
+    {
+      "file": "l.json",
+      "name": "Tile descriptions after the opening sentence, l runtime shard (generated)",
+      "gzip_size_bytes": 20147
+    },
+    {
+      "file": "m.json",
+      "name": "Tile descriptions after the opening sentence, m runtime shard (generated)",
+      "gzip_size_bytes": 30147
+    },
+    {
+      "file": "n.json",
+      "name": "Tile descriptions after the opening sentence, n runtime shard (generated)",
+      "gzip_size_bytes": 5694
+    },
+    {
+      "file": "o.json",
+      "name": "Tile descriptions after the opening sentence, o runtime shard (generated)",
+      "gzip_size_bytes": 9447
+    },
+    {
+      "file": "p.json",
+      "name": "Tile descriptions after the opening sentence, p runtime shard (generated)",
+      "gzip_size_bytes": 42561
+    },
+    {
+      "file": "q.json",
+      "name": "Tile descriptions after the opening sentence, q runtime shard (generated)",
+      "gzip_size_bytes": 1316
+    },
+    {
+      "file": "r.json",
+      "name": "Tile descriptions after the opening sentence, r runtime shard (generated)",
+      "gzip_size_bytes": 41286
+    },
+    {
+      "file": "s.json",
+      "name": "Tile descriptions after the opening sentence, s runtime shard (generated)",
+      "gzip_size_bytes": 75271
+    },
+    {
+      "file": "t.json",
+      "name": "Tile descriptions after the opening sentence, t runtime shard (generated)",
+      "gzip_size_bytes": 40134
+    },
+    {
+      "file": "u.json",
+      "name": "Tile descriptions after the opening sentence, u runtime shard (generated)",
+      "gzip_size_bytes": 5231
+    },
+    {
+      "file": "v.json",
+      "name": "Tile descriptions after the opening sentence, v runtime shard (generated)",
+      "gzip_size_bytes": 10178
+    },
+    {
+      "file": "w.json",
+      "name": "Tile descriptions after the opening sentence, w runtime shard (generated)",
+      "gzip_size_bytes": 25266
+    },
+    {
+      "file": "y.json",
+      "name": "Tile descriptions after the opening sentence, y runtime shard (generated)",
+      "gzip_size_bytes": 1283
+    },
+    {
+      "file": "z.json",
+      "name": "Tile descriptions after the opening sentence, z runtime shard (generated)",
+      "gzip_size_bytes": 1022
+    }
+  ],
+  "hashes": {
+    "a.json": "f8447d7998d110c62c72742ce940867c204e9e4244c4384068fc2f63189dc4a5",
+    "b.json": "b9037207ab375d02272e851a4902bc95263bdf268bbf52de9b7bbb3203af4fa9",
+    "c.json": "cd638ec3d99a7b5c053deb6066dfd5e79afeecf86757f4fcf092fc1af11ac7b2",
+    "d.json": "a38404c5a1f951c67910ab28e487c3f851b930ab24207643fd9c816b951ddb49",
+    "e.json": "8055b63c2dc910362a0ee777de775c8a1c48eb3780280bea4f0df0cf57de12fb",
+    "f.json": "8b864e2c74f58d3be73828c55692a1611d62ed752f94b37d1bfb0b95ad6e68e7",
+    "g.json": "314686798601004143736574a31c2377302c92c1f2724f7d71c050431ab2e545",
+    "h.json": "b06651f5f3989423fd84e5b19a3171aae0ca44dffa37281d85282c0dd752d95c",
+    "i.json": "d74399af4258298e4dd18114c2be159ab151c0bd7a31a10ccad430aa0d129bc5",
+    "j.json": "f5ed4f82111db1d3843a7bd30f8cdddc13ecb47a09bccdf96f9b39993bd7e253",
+    "k.json": "a1e0977f0839487eddc2687eac830d12a381533cc538d52a17182510964fe1b4",
+    "l.json": "b48ae9d86f57cfafc5387326c95ce2ca5f66a26987c89ed49fa665bcb9a2b223",
+    "m.json": "5a54543bd256e136ba5c9583de4916f0c6c2f8efdddabc1d62f88debac1458a4",
+    "n.json": "e2ae0436152f5f7f44abd8b30c8a71d2a8dd78505798d4741f260728c1842551",
+    "o.json": "d61f0064b6371561e933c719893d6075da6ba7752ff67b47e6f1f8a433bad323",
+    "p.json": "ce960c02e932e4ef1dae781ac04eb62d6a2f6c83d98babce46fd06b6219af85d",
+    "q.json": "a83d9062334d0d6fd4ff7ddffcbf0778411f275d092c331e78c04f57565af3a7",
+    "r.json": "fa8f0c06d824e34cb10869dbc618a66c5f7775e4d715508f78a7c44b1963c628",
+    "s.json": "d472e50e1634ac026d1be8d2b6616cc7d904acc65acc7a51a3c0473c2db78690",
+    "t.json": "b5916cf61e16d506b5c2b2941bba5e1390b3c04c17ee3052022d55ea7820f777",
+    "u.json": "1ef4efbedf72e2f7e7679cade3e511adbac4d0859361e8b7e77561daf95b5e08",
+    "v.json": "79f42da546338997866b6f5e22ce899ad1adcb06f06ca56e34db6aafbb7d5338",
+    "w.json": "0e6be649e5489cbba1e95ed5351da6722d9897bd2360393e7add6d5bce5feb33",
+    "y.json": "8159cfea22c44901e139ac49b55b87177249febe58d8fc0211c95d508cc9eafc",
+    "z.json": "4b77bf6f1caab513f05e05380fa52e71d8c352967bf851448dd95061dce7ec27"
+  }
+}
