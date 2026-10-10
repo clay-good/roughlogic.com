@@ -288,7 +288,7 @@ export const BESPOKE_OUTPUT_LABELS = {
   "duct-static-pressure-total": {"total_esp_in_wc":"Total external static","notes":"Notes"},
   "duct-static-regain": {"static_regain_inwc":"Static regain"},
   "duct-transition-length": {"length_concentric_in":"Concentric length","length_eccentric_in":"Eccentric (one flat side) length","slope_ratio":"Run-to-offset ratio"},
-  "duct-velocity-pressure": {"solve_for":"Result"},
+  "duct-velocity-pressure": {"solve_for":"Result","velocity_constant":"Note"},
   "dump-truck-loads": {"loads":"Truck loads","payload_cy":"Governing payload"},
   "dust-control-water": {"gal_per_app":"Gallons per application","daily_gal":"Daily water and trips"},
   "earthwork-end-area": {"total_ft3":"Total volume","prismoidal_ft3":"Prismoidal (single pair)","adjusted_ft3":"Swell/shrink adjusted"},

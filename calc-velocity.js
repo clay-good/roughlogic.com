@@ -24,45 +24,58 @@ export const VELOCITY_RENDERERS = {};
 // level, 70 F). At altitude or high temperature the density correction is
 // not applied; the result is then a standard-air equivalent, flagged.
 //
-// dims: in { solve_for: dimensionless, vp_inwc: dimensionless, velocity_fpm: L T^-1 } out: { velocity_fpm: L T^-1, vp_inwc: dimensionless }
-export function computeDuctVelocityPressure({ solve_for = "velocity", vp_inwc = 0, velocity_fpm = 0 } = {}) {
-  const K = 4005;
+// Air density added 2026-10-09: V = 4005 sqrt(VP x 0.075/rho). At 0.075 lb/ft^3 this is the standard-air
+// constant unchanged; at altitude or in hot air the same velocity pressure is a higher velocity.
+const _V23H_STD_AIR_LB_FT3 = 0.075;
+// The velocity constant for an air density; null when the density is not usable. Blank (0) means standard air.
+const _v23hVelocityK = (air_density_lb_ft3) => {
+  const rho = air_density_lb_ft3 === 0 || air_density_lb_ft3 === undefined || air_density_lb_ft3 === "" ? _V23H_STD_AIR_LB_FT3 : Number(air_density_lb_ft3);
+  if (!(rho >= 0.02 && rho <= 0.15)) return null;
+  return { K: 4005 * Math.sqrt(_V23H_STD_AIR_LB_FT3 / rho), rho };
+};
+const _V23H_DENSITY_ERROR = "Air density must be between 0.02 and 0.15 lb/ft^3 (0.075 is standard air; leave it there if unsure).";
+// dims: in { solve_for: dimensionless, vp_inwc: dimensionless, velocity_fpm: L T^-1, air_density_lb_ft3: M L^-3 } out: { velocity_fpm: L T^-1, vp_inwc: dimensionless, velocity_constant: dimensionless }
+export function computeDuctVelocityPressure({ solve_for = "velocity", vp_inwc = 0, velocity_fpm = 0, air_density_lb_ft3 = 0.075 } = {}) {
+  const kd = _v23hVelocityK(air_density_lb_ft3);
+  if (!kd) return { error: _V23H_DENSITY_ERROR };
+  const K = kd.K;
   if (solve_for === "vp") {
     const v = Number(velocity_fpm) || 0;
     if (!(v > 0 && Number.isFinite(v))) return { error: "Air velocity must be positive (fpm)." };
     const vp = (v / K) ** 2;
-    return { solve_for, velocity_fpm: v, vp_inwc: vp };
+    return { solve_for, velocity_fpm: v, vp_inwc: vp, velocity_constant: K, air_density_lb_ft3: kd.rho };
   }
   // solve_for velocity (default)
   const vp = Number(vp_inwc) || 0;
   if (!(vp > 0 && Number.isFinite(vp))) return { error: "Velocity pressure must be positive (in. w.c.)." };
   const v = K * Math.sqrt(vp);
-  return { solve_for: "velocity", vp_inwc: vp, velocity_fpm: v };
+  return { solve_for: "velocity", vp_inwc: vp, velocity_fpm: v, velocity_constant: K, air_density_lb_ft3: kd.rho };
 }
 
 export const ductVelocityPressureExample = { inputs: { solve_for: "velocity", vp_inwc: 0.25, velocity_fpm: 0 } };
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderDuctVelocityPressure(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Per the ACCA Manual D / ASHRAE Fundamentals velocity-pressure relation V = 4005 x sqrt(VP) for standard air (0.075 lb/ft^3, sea level). At altitude or high temperature apply a density correction. Public duct-design relation.";
+  citationEl.textContent = "Citation: Per the ACCA Manual D / ASHRAE Fundamentals velocity-pressure relation V = 4005 x sqrt(VP) for standard air (0.075 lb/ft^3, sea level), scaled by sqrt(0.075/density) when an air density is entered for altitude or temperature. Public duct-design relation.";
   const mode = _v23h_makeSelect("Solve for", "dvp-mode", [
     { value: "velocity", label: "Velocity from VP", selected: true },
     { value: "vp", label: "VP from velocity" },
   ]);
   const vp = _v23h_makeNumber("Velocity pressure (in. w.c.)", "dvp-vp", { step: "any", min: "0" });
   const vel = _v23h_makeNumber("Air velocity (fpm)", "dvp-vel", { step: "any", min: "0" });
-  for (const f of [mode, vp, vel]) inputRegion.appendChild(f.wrap);
-  _v23h_attachEx(inputRegion, () => { mode.select.value = "velocity"; vp.input.value = "0.25"; vel.input.value = ""; update(); });
+  const rho = _v23h_makeNumber("Air density (lb/ft3, 0.075 standard)", "dvp-rho", { step: "any", min: "0" }); rho.input.value = "0.075";
+  for (const f of [mode, vp, vel, rho]) inputRegion.appendChild(f.wrap);
+  _v23h_attachEx(inputRegion, () => { mode.select.value = "velocity"; vp.input.value = "0.25"; vel.input.value = ""; rho.input.value = "0.075"; update(); });
   const oOut = _v23h_makeOut(outputRegion, "Result", "dvp-out");
   const oNote = _v23h_makeOut(outputRegion, "Note", "dvp-out-note");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = _v23h_debounce(() => {
-    const r = computeDuctVelocityPressure({ solve_for: mode.select.value, vp_inwc: readNum(vp.input), velocity_fpm: readNum(vel.input) });
+    const r = computeDuctVelocityPressure({ solve_for: mode.select.value, vp_inwc: readNum(vp.input), velocity_fpm: readNum(vel.input), air_density_lb_ft3: readNum(rho.input) });
     if (r.error) { oOut.textContent = r.error; oNote.textContent = ""; return; }
     oOut.textContent = r.solve_for === "vp" ? _v23h_fmt(r.vp_inwc, 4) + " in. w.c." : _v23h_fmt(r.velocity_fpm, 0) + " fpm";
-    oNote.textContent = "Standard-air constant (4005); apply a density correction at altitude or high temperature.";
+    oNote.textContent = "Velocity constant " + _v23h_fmt(r.velocity_constant, 0) + " at " + _v23h_fmt(r.air_density_lb_ft3, 4) + " lb/ft3 (4005 for standard air, scaled by sqrt(0.075/density)); air-density-correction gives the density at altitude or temperature.";
   }, _V23H_DEB);
-  for (const f of [mode.select, vp.input, vel.input]) f.addEventListener("input", update);
+  for (const f of [mode.select, vp.input, vel.input, rho.input]) f.addEventListener("input", update);
 }
 VELOCITY_RENDERERS["duct-velocity-pressure"] = renderDuctVelocityPressure;
 
@@ -168,18 +181,20 @@ VELOCITY_RENDERERS["refrigerant-line-size"] = renderRefrigerantLineSize;
 
 // ===================== spec-v385: pitot traverse airflow (HVAC airflow field-methods trio) =====================
 
-// dims: in { vp_avg_inwc: dimensionless, w_in: L, h_in: L } out: { v_fpm: L T^-1, area_ft2: L^2, cfm: L^3 T^-1 }
-export function computePitotTraverseCfm({ vp_avg_inwc = 0, w_in = 0, h_in = 0 } = {}) {
+// dims: in { vp_avg_inwc: dimensionless, w_in: L, h_in: L, air_density_lb_ft3: M L^-3 } out: { v_fpm: L T^-1, area_ft2: L^2, cfm: L^3 T^-1, velocity_constant: dimensionless }
+export function computePitotTraverseCfm({ vp_avg_inwc = 0, w_in = 0, h_in = 0, air_density_lb_ft3 = 0.075 } = {}) {
+  const kd = _v23hVelocityK(air_density_lb_ft3);
+  if (!kd) return { error: _V23H_DENSITY_ERROR };
   const vp = Number(vp_avg_inwc) || 0;
   const w = Number(w_in) || 0;
   const h = Number(h_in) || 0;
   if (!(vp > 0 && Number.isFinite(vp))) return { error: "Average velocity pressure must be positive (in. w.c.)." };
   if (!(w > 0 && Number.isFinite(w))) return { error: "Duct width must be positive (in)." };
   if (!(h > 0 && Number.isFinite(h))) return { error: "Duct height must be positive (in)." };
-  const v_fpm = 4005 * Math.sqrt(vp);
+  const v_fpm = kd.K * Math.sqrt(vp);
   const area_ft2 = (w * h) / 144;
   const cfm = v_fpm * area_ft2;
-  return { v_fpm, area_ft2, cfm };
+  return { v_fpm, area_ft2, cfm, velocity_constant: kd.K };
 }
 
 export const pitotTraverseCfmExample = { inputs: { vp_avg_inwc: 0.15, w_in: 24, h_in: 12 } };
@@ -190,20 +205,21 @@ export function renderPitotTraverseCfm(inputRegion, outputRegion, citationEl) {
   const vp = _v23h_makeNumber("Average velocity pressure (in. w.c.)", "ptc-vp", { step: "any", min: "0" });
   const w = _v23h_makeNumber("Duct width (in)", "ptc-w", { step: "any", min: "0" });
   const h = _v23h_makeNumber("Duct height (in)", "ptc-h", { step: "any", min: "0" });
-  for (const f of [vp, w, h]) inputRegion.appendChild(f.wrap);
-  _v23h_attachEx(inputRegion, () => { vp.input.value = "0.15"; w.input.value = "24"; h.input.value = "12"; update(); });
+  const rho = _v23h_makeNumber("Air density (lb/ft3, 0.075 standard)", "ptc-rho", { step: "any", min: "0" }); rho.input.value = "0.075";
+  for (const f of [vp, w, h, rho]) inputRegion.appendChild(f.wrap);
+  _v23h_attachEx(inputRegion, () => { vp.input.value = "0.15"; w.input.value = "24"; h.input.value = "12"; rho.input.value = "0.075"; update(); });
   const oVel = _v23h_makeOut(outputRegion, "Traverse velocity", "ptc-out-v");
   const oArea = _v23h_makeOut(outputRegion, "Duct area", "ptc-out-a");
   const oCfm = _v23h_makeOut(outputRegion, "Airflow", "ptc-out-cfm");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = _v23h_debounce(() => {
-    const r = computePitotTraverseCfm({ vp_avg_inwc: readNum(vp.input), w_in: readNum(w.input), h_in: readNum(h.input) });
+    const r = computePitotTraverseCfm({ vp_avg_inwc: readNum(vp.input), w_in: readNum(w.input), h_in: readNum(h.input), air_density_lb_ft3: readNum(rho.input) });
     if (r.error) { oVel.textContent = r.error; oArea.textContent = ""; oCfm.textContent = ""; return; }
-    oVel.textContent = _v23h_fmt(r.v_fpm, 0) + " fpm";
+    oVel.textContent = _v23h_fmt(r.v_fpm, 0) + " fpm (velocity constant " + _v23h_fmt(r.velocity_constant, 0) + ")";
     oArea.textContent = _v23h_fmt(r.area_ft2, 2) + " ft^2";
     oCfm.textContent = _v23h_fmt(r.cfm, 0) + " CFM";
   }, _V23H_DEB);
-  for (const f of [vp.input, w.input, h.input]) f.addEventListener("input", update);
+  for (const f of [vp.input, w.input, h.input, rho.input]) f.addEventListener("input", update);
 }
 VELOCITY_RENDERERS["pitot-traverse-cfm"] = renderPitotTraverseCfm;
 
@@ -215,8 +231,10 @@ VELOCITY_RENDERERS["pitot-traverse-cfm"] = renderPitotTraverseCfm;
 // takes the raw per-point VP readings, converts EACH to a velocity, and averages
 // the velocities -- the method NEBB/AABC/ASHRAE actually require -- and shows how
 // much the single-average-VP shortcut over-reads.
-// dims: in { vp_readings: dimensionless, w_in: L, h_in: L } out: { v_avg_fpm: L T^-1, area_ft2: L^2, cfm: L^3 T^-1, v_vp_average_fpm: L T^-1, cfm_vp_average: L^3 T^-1, overread_pct: dimensionless, point_count: dimensionless }
-export function computePitotTraverseAverage({ vp_readings, w_in = 0, h_in = 0 } = {}) {
+// dims: in { vp_readings: dimensionless, w_in: L, h_in: L, air_density_lb_ft3: M L^-3 } out: { v_avg_fpm: L T^-1, area_ft2: L^2, cfm: L^3 T^-1, v_vp_average_fpm: L T^-1, cfm_vp_average: L^3 T^-1, overread_pct: dimensionless, point_count: dimensionless, velocity_constant: dimensionless }
+export function computePitotTraverseAverage({ vp_readings, w_in = 0, h_in = 0, air_density_lb_ft3 = 0.075 } = {}) {
+  const kd = _v23hVelocityK(air_density_lb_ft3);
+  if (!kd) return { error: _V23H_DENSITY_ERROR };
   const w = Number(w_in) || 0;
   const h = Number(h_in) || 0;
   if (!Array.isArray(vp_readings) || vp_readings.length < 1) return { error: "Enter at least one traverse-point velocity pressure (in. w.c.)." };
@@ -226,7 +244,7 @@ export function computePitotTraverseAverage({ vp_readings, w_in = 0, h_in = 0 } 
   if (!vp_readings.some((vp) => vp > 0)) return { error: "At least one velocity-pressure reading must be positive (in. w.c.)." };
   if (!(w > 0 && Number.isFinite(w))) return { error: "Duct width must be positive (in)." };
   if (!(h > 0 && Number.isFinite(h))) return { error: "Duct height must be positive (in)." };
-  const K = 4005; // standard-air velocity constant (0.075 lb/ft^3, sea level)
+  const K = kd.K; // 4005 for standard air (0.075 lb/ft^3), scaled by sqrt(0.075/density)
   const velocities = vp_readings.map((vp) => K * Math.sqrt(vp));
   const n = velocities.length;
   const v_avg_fpm = velocities.reduce((a, b) => a + b, 0) / n;
@@ -237,7 +255,7 @@ export function computePitotTraverseAverage({ vp_readings, w_in = 0, h_in = 0 } 
   const cfm_vp_average = v_vp_average_fpm * area_ft2;
   const overread_pct = (v_vp_average_fpm / v_avg_fpm - 1) * 100;
   return {
-    v_avg_fpm, area_ft2, cfm, v_vp_average_fpm, cfm_vp_average, overread_pct, point_count: n,
+    v_avg_fpm, area_ft2, cfm, v_vp_average_fpm, cfm_vp_average, overread_pct, point_count: n, velocity_constant: K,
     note: "The correct pitot-traverse average converts each equal-area point's velocity pressure to a velocity (V = 4005 sqrt(VP) for standard air) and averages the VELOCITIES, because velocity is what integrates to flow across the duct; CFM = average velocity x duct area. Averaging the velocity pressures first and taking one square root (the pitot-traverse-cfm tile's single-input shortcut) always reads high, since the square root is concave -- here by " + overread_pct.toFixed(2) + " percent. Space the points on an equal-area or log-Tchebycheff traverse per NEBB/AABC/ASHRAE, use enough points, and apply a density correction at altitude or high temperature. A field measurement, not a substitute for a calibrated flow station.",
   };
 }
@@ -249,8 +267,9 @@ export function renderPitotTraverseAverage(inputRegion, outputRegion, citationEl
   reads.input.value = "0.09\n0.16\n0.25\n0.16";
   const w = _v23h_makeNumber("Duct width (in)", "pta-w", { step: "any", min: "0" });
   const h = _v23h_makeNumber("Duct height (in)", "pta-h", { step: "any", min: "0" });
-  for (const f of [reads, w, h]) inputRegion.appendChild(f.wrap);
-  _v23h_attachEx(inputRegion, () => { reads.input.value = "0.09\n0.16\n0.25\n0.16"; w.input.value = "24"; h.input.value = "12"; update(); });
+  const rho = _v23h_makeNumber("Air density (lb/ft3, 0.075 standard)", "pta-rho", { step: "any", min: "0" }); rho.input.value = "0.075";
+  for (const f of [reads, w, h, rho]) inputRegion.appendChild(f.wrap);
+  _v23h_attachEx(inputRegion, () => { reads.input.value = "0.09\n0.16\n0.25\n0.16"; w.input.value = "24"; h.input.value = "12"; rho.input.value = "0.075"; update(); });
   const oV = _v23h_makeOut(outputRegion, "Average velocity (velocity-averaged)", "pta-out-v");
   const oCfm = _v23h_makeOut(outputRegion, "Airflow", "pta-out-cfm");
   const oShortcut = _v23h_makeOut(outputRegion, "VP-average shortcut (over-reads)", "pta-out-short");
@@ -267,14 +286,14 @@ export function renderPitotTraverseAverage(inputRegion, outputRegion, citationEl
   const update = _v23h_debounce(() => {
     const list = parseNums(reads.input.value);
     if (list === null) { oV.textContent = "Each velocity pressure must be a finite number, one per line."; oCfm.textContent = "-"; oShortcut.textContent = "-"; oNote.textContent = ""; return; }
-    const r = computePitotTraverseAverage({ vp_readings: list, w_in: readNum(w.input), h_in: readNum(h.input) });
+    const r = computePitotTraverseAverage({ vp_readings: list, w_in: readNum(w.input), h_in: readNum(h.input), air_density_lb_ft3: readNum(rho.input) });
     if (r.error) { oV.textContent = r.error; oCfm.textContent = "-"; oShortcut.textContent = "-"; oNote.textContent = ""; return; }
     oV.textContent = _v23h_fmt(r.v_avg_fpm, 0) + " fpm over " + r.point_count + " points (" + _v23h_fmt(r.area_ft2, 2) + " ft^2)";
     oCfm.textContent = _v23h_fmt(r.cfm, 0) + " CFM";
     oShortcut.textContent = _v23h_fmt(r.cfm_vp_average, 0) + " CFM (" + _v23h_fmt(r.overread_pct, 2) + " percent high)";
     oNote.textContent = r.note;
   }, _V23H_DEB);
-  for (const f of [reads.input, w.input, h.input]) f.addEventListener("input", update);
+  for (const f of [reads.input, w.input, h.input, rho.input]) f.addEventListener("input", update);
 }
 VELOCITY_RENDERERS["pitot-traverse-average"] = renderPitotTraverseAverage;
 

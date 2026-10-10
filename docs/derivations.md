@@ -3797,12 +3797,12 @@ cross-check.
 | calc-usar.js | `computeUsrRakerShore` | `{ wall_psf = 125, wall_height_ft = 14, raker_spacing_ft = 8, roof_depth_ft = ...` | _ | _ | _ |
 | calc-usar.js | `computeUsrVerticalShoreCapacity` | `{ shore_height_ft = 10, post_size = "4x4", post_width_in = 3.5, post_depth_in...` | _ | _ | _ |
 | calc-velocity.js | `computeDpFlowMeter` | `{ pipe_id_in = 0, bore_in = 0, dp_psi = 0, cd = 0.61, fluid_density_lb_ft3 = ...` | _ | _ | _ |
-| calc-velocity.js | `computeDuctVelocityPressure` | `{ solve_for = "velocity", vp_inwc = 0, velocity_fpm = 0 } = {}` | _ | _ | _ |
+| calc-velocity.js | `computeDuctVelocityPressure` | `{ solve_for = "velocity", vp_inwc = 0, velocity_fpm = 0, air_density_lb_ft3 =...` | _ | _ | _ |
 | calc-velocity.js | `computeGasDpFlowMeter` | `{ pipe_id_in = 0, bore_in = 0, p1_psia = 0, dp_psi = 0, temp_f = 60, gas_sg =...` | _ | _ | _ |
 | calc-velocity.js | `computeOrificeDischargeCoefficient` | `{ pipe_id_in = 0, bore_in = 0, taps = "flange", reynolds_mode = "entered", re...` | _ | _ | _ |
 | calc-velocity.js | `computeOrificePressureLoss` | `{ pipe_id_in = 0, bore_in = 0, dp_psi = 0, cd = 0.61 } = {}` | _ | _ | _ |
-| calc-velocity.js | `computePitotTraverseAverage` | `{ vp_readings, w_in = 0, h_in = 0 } = {}` | _ | _ | _ |
-| calc-velocity.js | `computePitotTraverseCfm` | `{ vp_avg_inwc = 0, w_in = 0, h_in = 0 } = {}` | _ | _ | _ |
+| calc-velocity.js | `computePitotTraverseAverage` | `{ vp_readings, w_in = 0, h_in = 0, air_density_lb_ft3 = 0.075 } = {}` | _ | _ | _ |
+| calc-velocity.js | `computePitotTraverseCfm` | `{ vp_avg_inwc = 0, w_in = 0, h_in = 0, air_density_lb_ft3 = 0.075 } = {}` | _ | _ | _ |
 | calc-velocity.js | `computeRefrigerantLineSize` | `{ mass_flow_lb_hr = 0, specific_volume_ft3_lb = 0, target_velocity_fpm = 1500...` | _ | _ | _ |
 | calc-velocity.js | `computeRefrigerantVelocity` | `{ mass_flow_lb_hr = 0, line_id_in = 0, specific_volume_ft3_lb = 0, orientatio...` | _ | _ | _ |
 | calc-velocity.js | `renderDpFlowMeter` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
@@ -4504,7 +4504,7 @@ per spec-v14 §13.1 second paragraph.
 | `duct-static-pressure-total` | Total External Static Pressure | ACCA Manual D / SMACNA (by name); filter 0.10 + registers 0.03 + grille 0.03 + coil 0.30 + ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `duct-static-regain` | Duct Static Regain at a Velocity Decrease | Duct static-regain method (SMACNA / A...; VP_up = (2000/4005)^2 = 0.2494; VP_dn = (1500/4005)^2 = 0... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `duct-transition-length` | Duct Transition (Reducer) Length from Slope | duct transition length geometry (SMACNA); concentric = ((20-12)/2)/tan(15) = 4/0.26795 = 14.93; ecc... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
-| `duct-velocity-pressure` | Duct Velocity Pressure | ACCA Manual D / ASHRAE Fundamentals (...; VP 0.25 in. w.c. -> V = 4005 * 0.5 = 2002.5 fpm | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `duct-velocity-pressure` | Duct Velocity Pressure | ACCA Manual D / ASHRAE Fundamentals (...; VP 0.25 in. w.c. -> V = 4005 * 0.5 = 2002.5 fpm | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `economic-insulation-thickness` | Economic (Least-Cost) Insulation Thickness | economic-thickness analysis; dT 250, R0 0.5, k 0.27, 8,000 h, $12/MMBtu at 80% efficie... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `economizer-enthalpy-changeover` | Economizer Enthalpy Changeover | ASHRAE 90.1; spec-v443 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `economizer-savings-hours` | Air-Side Economizer Free-Cooling Hours | ASHRAE sensible-heat relation + Stand...; 4000 CFM, dT 20 F -> 86,400 BTU/hr | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4580,7 +4580,7 @@ per spec-v14 §13.1 second paragraph.
 | `pipe-heat-loss-radial` | Insulated Pipe Heat Loss (Radial) | Fourier cylindrical-shell conduction ...; r1=1 in, r2=2 in, k=0.25, 200 vs 70 F -> ~24.55 BTU/hr-ft | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `pipe-insulation-for-condensation` | Pipe Insulation for Condensation Control (Cold Lines) | public engineering relations; 1-in OD at 40 F in 75 F / 50% RH -> dew point 55.1 F, min... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `pitot-traverse-average` | Pitot Traverse Airflow from Point Readings (Velocity-Averaged) | ASHRAE Fundamentals / AABC-NEBB; Point velocities 4005 x sqrt(VP) = 1201.5, 1602, 2002.5, ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
-| `pitot-traverse-cfm` | Pitot Traverse Airflow (Velocity Pressure to CFM) | ASHRAE Fundamentals / AABC-NEBB; spec-v385 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `pitot-traverse-cfm` | Pitot Traverse Airflow (Velocity Pressure to CFM) | ASHRAE Fundamentals / AABC-NEBB; spec-v385 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `plenum-return-drop` | Ceiling Plenum Return Path Pressure Drop | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `product-pull-down-load` | Product Pull-Down Load | ASHRAE Refrigeration; spec-v433 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `product-pull-down-time` | Product Pull-Down Time | ASHRAE Refrigeration; spec-v698 section 2.1 pinned example (inverse of spec-v433) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |

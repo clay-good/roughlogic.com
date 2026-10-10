@@ -70,6 +70,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **The three velocity-pressure calculators take an air density.** `duct-velocity-pressure`, `pitot-traverse-cfm` and `pitot-traverse-average` used the standard-air constant 4005 and told the reader to apply a density correction themselves. An air density field (0.075 lb/ft3 by default, which changes nothing) now scales it, V = 4005 sqrt(VP x 0.075/density): at 0.0612 lb/ft3, about 5,000 ft, a 0.25 in. w.c. reading is 2,217 fpm rather than 2,003, an 11% difference in airflow. `air-density-correction` gives the density for an altitude and temperature.
+
 - **`refractory-shell-temperature` can compute its outer film coefficient.** A select now offers computed: natural convection on a vertical wall (Churchill-Chu, on a wall height) plus gray-body radiation at a shell emissivity, iterated with the shell temperature it sets. The correlation reproduces Incropera Example 9.2 (Nu = 147). On the example three-layer lining the film is 2.29 BTU/hr/sq ft/degF (0.94 convection + 1.35 radiation) and the shell runs 238 F, against 258 F at the entered 2.0. Entered (the default) is unchanged.
 
 - **`pipe-insulation-for-condensation` can compute its outer film coefficient.** A select now offers computed: still-air convection and radiation at the jacket emissivity and diameter with the jacket at the dew point (the `bare-pipe-heat-loss` model), solved inside the thickness search. On the example (1 in pipe at 40 F, 75 F and 50% RH) a painted jacket gives h = 1.76 and 0.11 in, but a bright aluminum jacket (emissivity 0.1) gives h = 0.94 and needs 0.19 in, the reason low-emissivity jackets sweat first. Entered (the default) is unchanged.

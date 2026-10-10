@@ -170097,6 +170097,73 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "duct-velocity-pressure",
+  "source_publisher": "Project (first-principles)",
+  "source_title": "0.25 in. w.c. at 0.0612 lb/ft3 (about 5,000 ft)",
+  "source_edition_or_year": "V = 4005 sqrt(VP x 0.075/rho)",
+  "source_section_or_page": "4005 x sqrt(0.25 x 0.075/0.0612) = 4005 x 0.55351 = 2,216.8 fpm (1096.2 sqrt(0.25/0.0612) = 2,215.6)",
+  "verified_by": "rl",
+  "verified_on": "2026-10-09",
+  "inputs": {
+   "solve_for": "velocity",
+   "vp_inwc": 0.25,
+   "air_density_lb_ft3": 0.0612
+  },
+  "outputs": {
+   "velocity_fpm": {
+    "value": 2216.8,
+    "tolerance": {
+     "pct": 0.1
+    }
+   }
+  }
+ },
+ {
+  "tile_id": "pitot-traverse-cfm",
+  "source_publisher": "Project (first-principles)",
+  "source_title": "24 x 12 duct, 0.15 in. w.c. at 0.060 lb/ft3",
+  "source_edition_or_year": "V = 4005 sqrt(VP x 0.075/rho)",
+  "source_section_or_page": "4005 x sqrt(0.15 x 0.075/0.060) = 1,734.2 fpm x 2.0 sq ft = 3,468 CFM",
+  "verified_by": "rl",
+  "verified_on": "2026-10-09",
+  "inputs": {
+   "vp_avg_inwc": 0.15,
+   "w_in": 24,
+   "h_in": 12,
+   "air_density_lb_ft3": 0.06
+  },
+  "outputs": {
+   "cfm": {
+    "value": 3468.4,
+    "tolerance": {
+     "pct": 0.1
+    }
+   }
+  }
+ },
+ {
+  "tile_id": "duct-velocity-pressure",
+  "source_publisher": "Project (first-principles)",
+  "source_title": "Velocity pressure of 2,000 fpm at 0.0612 lb/ft3",
+  "source_edition_or_year": "VP = (V/4005)^2 x rho/0.075",
+  "source_section_or_page": "(2000/4005)^2 x 0.0612/0.075 = 0.24938 x 0.816 = 0.2035 in. w.c.",
+  "verified_by": "rl",
+  "verified_on": "2026-10-09",
+  "inputs": {
+   "solve_for": "vp",
+   "velocity_fpm": 2000,
+   "air_density_lb_ft3": 0.0612
+  },
+  "outputs": {
+   "vp_inwc": {
+    "value": 0.2035,
+    "tolerance": {
+     "pct": 0.1
+    }
+   }
+  }
  }
  ]
 }

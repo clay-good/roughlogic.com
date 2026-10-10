@@ -59183,3 +59183,23 @@ test("bounds: refractory-shell-temperature computed film balances the lining flu
   assert.ok("error" in _rstF({ ...b, film_mode: "computed", wall_height_ft: 0 }));
   assert.ok("error" in _rstF({ ...b, film_mode: "guess" }));
 });
+
+import { computeDuctVelocityPressure as _dvpRho, computePitotTraverseCfm as _ptcRho, computePitotTraverseAverage as _ptaRho } from "../../calc-velocity.js";
+test("bounds: the velocity-pressure tiles scale 4005 by sqrt(0.075/density)", () => {
+  const std = _dvpRho({ vp_inwc: 0.25 });
+  assert.equal(std.velocity_fpm, 4005 * 0.5);
+  assert.equal(_dvpRho({ vp_inwc: 0.25, air_density_lb_ft3: 0.075 }).velocity_fpm, std.velocity_fpm);
+  assert.equal(_dvpRho({ vp_inwc: 0.25, air_density_lb_ft3: 0 }).velocity_fpm, std.velocity_fpm); // blank is standard air
+  const thin = _dvpRho({ vp_inwc: 0.25, air_density_lb_ft3: 0.0612 });
+  assert.ok(Math.abs(thin.velocity_fpm - 4005 * Math.sqrt(0.25 * 0.075 / 0.0612)) < 1e-9);
+  // Within 0.1% of the exact 1096.2 sqrt(VP/rho) form.
+  assert.ok(Math.abs(thin.velocity_fpm / (1096.2 * Math.sqrt(0.25 / 0.0612)) - 1) < 1e-3);
+  // The inverse mode round-trips at the same density.
+  assert.ok(Math.abs(_dvpRho({ solve_for: "vp", velocity_fpm: thin.velocity_fpm, air_density_lb_ft3: 0.0612 }).vp_inwc - 0.25) < 1e-12);
+  const a = _ptcRho({ vp_avg_inwc: 0.15, w_in: 24, h_in: 12 }), b = _ptcRho({ vp_avg_inwc: 0.15, w_in: 24, h_in: 12, air_density_lb_ft3: 0.06 });
+  assert.ok(Math.abs(b.cfm / a.cfm - Math.sqrt(0.075 / 0.06)) < 1e-12);
+  const c = _ptaRho({ vp_readings: [0.09, 0.16, 0.25, 0.16], w_in: 24, h_in: 12 }), d = _ptaRho({ vp_readings: [0.09, 0.16, 0.25, 0.16], w_in: 24, h_in: 12, air_density_lb_ft3: 0.06 });
+  assert.ok(Math.abs(d.cfm / c.cfm - Math.sqrt(0.075 / 0.06)) < 1e-12);
+  assert.ok(Math.abs(d.overread_pct - c.overread_pct) < 1e-9); // the shortcut's over-read does not depend on density
+  for (const bad of [-1, 0.001, 5]) assert.ok("error" in _ptcRho({ vp_avg_inwc: 0.15, w_in: 24, h_in: 12, air_density_lb_ft3: bad }));
+});

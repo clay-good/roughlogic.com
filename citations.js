@@ -3272,6 +3272,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.mechanical,
     editionNote: "Single-edition (standard-air velocity-pressure identity; apply a density correction off standard conditions).",
     assumptions: [
+      { name: "Air density", value: "optional (added 2026-10-09): V = 4005 sqrt(VP x 0.075/rho), the standard-air constant scaled for the entered density (the exact form is 1096.2 sqrt(VP/rho)); 0.075 lb/ft^3 leaves it unchanged", source: "ASHRAE Fundamentals; air-density-correction" },
       { name: "Air density", value: "standard air 0.075 lb/ft^3 (sea level, 70 F); the 4005 constant is density-dependent", source: "ASHRAE Fundamentals" },
     ],
   },
@@ -18630,6 +18631,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.general,
     editionNote: "The methodologically-correct Pitot-traverse average: convert each equal-area point's velocity pressure to a velocity V = 4005 sqrt(VP) for standard air (0.075 lb/ft^3, sea level), average the VELOCITIES, then CFM = average velocity x duct cross-sectional area. Averaging the velocity pressures first and taking one square root reads high, because the square root is concave (Jensen's inequality) -- the tile reports that over-read against the average velocity so a technician can see the size of the shortcut error. Space the points on an equal-area or log-Tchebycheff traverse and use enough of them; apply a density correction at altitude or high temperature, where the result is otherwise a standard-air equivalent. A field measurement, not a substitute for a calibrated flow station or the equipment's own airflow rating.",
     assumptions: [
+      { name: "Air density", value: "optional (added 2026-10-09): V = 4005 sqrt(VP x 0.075/rho), the standard-air constant scaled for the entered density (the exact form is 1096.2 sqrt(VP/rho)); 0.075 lb/ft^3 leaves it unchanged", source: "ASHRAE Fundamentals; air-density-correction" },
       { name: "Velocity from VP", value: "V = 4005 sqrt(VP) for standard air, per point", source: "ASHRAE Fundamentals" },
       { name: "Correct average", value: "average the point velocities, not the velocity pressures", source: "AABC / NEBB field practice" },
       { name: "Standard air", value: "apply a density correction at altitude or high temperature", source: "scope of this tile" },
@@ -18642,6 +18644,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.general,
     editionNote: "The Pitot-tube traverse airflow: velocity V = 4005 sqrt(VP) for standard air (0.075 lb/ft^3, sea level) from a single traverse-average velocity pressure, then CFM = V x duct cross-sectional area. This takes one already-averaged VP; the more exact field method converts each point's VP to a velocity and averages the velocities (the pitot-traverse-average tile), which reads slightly lower because the square root is concave. Apply a density correction at altitude or high temperature, where the result is otherwise a standard-air equivalent. This returns a field measurement, not a substitute for a calibrated flow station or the equipment's own airflow rating. A field aid; the balancing report and equipment ratings govern.",
     assumptions: [
+      { name: "Air density", value: "optional (added 2026-10-09): V = 4005 sqrt(VP x 0.075/rho), the standard-air constant scaled for the entered density (the exact form is 1096.2 sqrt(VP/rho)); 0.075 lb/ft^3 leaves it unchanged", source: "ASHRAE Fundamentals; air-density-correction" },
       { name: "Velocity from VP", value: "V = 4005 sqrt(VP) for standard air", source: "ASHRAE Fundamentals" },
       { name: "Traverse average", value: "takes one pre-averaged VP; averaging point velocities is more exact (pitot-traverse-average)", source: "AABC / NEBB field practice" },
       { name: "Standard air", value: "apply a density correction at altitude or high temperature", source: "scope of this tile" },

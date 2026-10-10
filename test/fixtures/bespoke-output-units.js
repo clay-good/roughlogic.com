@@ -448,7 +448,7 @@ export const BESPOKE_OUTPUT_UNITS = {
   "pipe-volume": {"gallons_per_ft":{"prefix":"","suffix":" gal/ft","digits":4}},
   "piti": {"monthly_principal_and_interest":{"prefix":"$","suffix":"","digits":2},"monthly_tax":{"prefix":"$","suffix":"","digits":2},"monthly_insurance":{"prefix":"$","suffix":"","digits":2},"monthly_hoa":{"prefix":"$","suffix":"","digits":2},"monthly_pmi":{"prefix":"$","suffix":"","digits":2},"piti":{"prefix":"$","suffix":"","digits":2},"piti_plus_hoa":{"prefix":"$","suffix":"","digits":2},"annual_total":{"prefix":"$","suffix":"","digits":2}},
   "pitot-traverse-average": {"cfm":{"prefix":"","suffix":" CFM","digits":0}},
-  "pitot-traverse-cfm": {"v_fpm":{"prefix":"","suffix":" fpm","digits":0},"area_ft2":{"prefix":"","suffix":" ft^2","digits":2},"cfm":{"prefix":"","suffix":" CFM","digits":0}},
+  "pitot-traverse-cfm": {"area_ft2":{"prefix":"","suffix":" ft^2","digits":2},"cfm":{"prefix":"","suffix":" CFM","digits":0}},
   "pivot-application-rate": {"app_rate_in_hr":{"prefix":"","suffix":" in/hr","digits":2}},
   "pivot-timer-depth": {"revolution_hr":{"prefix":"","suffix":" hr","digits":1},"depth_in":{"prefix":"","suffix":" in","digits":3},"pass_days":{"prefix":"","suffix":" days","digits":2}},
   "plain-bearing-pressure-pv": {"projected_pressure_psi":{"prefix":"","suffix":" psi","digits":1},"surface_velocity_fpm":{"prefix":"","suffix":" ft/min","digits":1}},

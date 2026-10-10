@@ -2518,8 +2518,8 @@
       "date": "2026-09-29"
     },
     "/tools/duct-velocity-pressure/": {
-      "sha": "c763cdbef161ac92",
-      "date": "2026-09-29"
+      "sha": "3d2d3d3e3e6600ee",
+      "date": "2026-10-10"
     },
     "/tools/duct-wrap-takeoff/": {
       "sha": "0fe5b9526e64605b",
@@ -5482,12 +5482,12 @@
       "date": "2026-10-03"
     },
     "/tools/pitot-traverse-average/": {
-      "sha": "a2fcab9c1dde94c9",
-      "date": "2026-10-03"
+      "sha": "e71973b8610ba1e3",
+      "date": "2026-10-10"
     },
     "/tools/pitot-traverse-cfm/": {
-      "sha": "cec01c109ca1a8b9",
-      "date": "2026-10-03"
+      "sha": "d87c8e5274a840d1",
+      "date": "2026-10-10"
     },
     "/tools/pivot-application-rate/": {
       "sha": "32afe7f9d12705ff",
