@@ -14,7 +14,25 @@ const BAD = /\bnull\b|\bundefined|\bNaN|\bInfinity/;
 // fraction the tile explains is mathematically undefined.
 const ALLOWED = /\b(?:a|no|that|the|first|each|left|right) null\b|\bfraction is undefined\b/gi;
 
-const report = { rendered: 0, withExample: 0, leaks: [], crashes: [], exampleErrors: [], unlistened: [] };
+// rows[0] per tile is the worked example the page prints (see
+// test/integration/example-parity-runtime.test.js, whose comparison this
+// repeats without a browser).
+const { readFileSync } = await import("node:fs");
+const FIRST_ROW = new Map();
+for (const row of JSON.parse(readFileSync(new URL("./worked-examples.json", import.meta.url), "utf8")).rows) {
+  if (!FIRST_ROW.has(row.tile_id)) FIRST_ROW.set(row.tile_id, row);
+}
+const near = (a, b) => Math.abs(a - b) <= Math.max(Math.abs(b) * 0.002, 1e-9);
+function present(value, shown) {
+  if (typeof value === "number" || (typeof value === "string" && value.trim() !== "" && Number.isFinite(Number(value)))) {
+    const n = Number(value);
+    return shown.some((x) => String(x).trim() !== "" && Number.isFinite(Number(x)) && near(n, Number(x)));
+  }
+  if (typeof value === "string") return shown.some((x) => String(x).trim().toLowerCase() === value.trim().toLowerCase());
+  return true; // booleans, arrays and objects: other gates own those
+}
+
+const report = { rendered: 0, withExample: 0, leaks: [], crashes: [], exampleErrors: [], unlistened: [], exampleMismatch: [], exampleCompared: 0 };
 for (const { id } of TOOLS) {
   const reg = RENDERER_MAP[id];
   if (!reg) continue;
@@ -49,6 +67,23 @@ for (const { id } of TOOLS) {
     flushTimers();
     report.withExample++;
     scan("example");
+    // The button must load the worked example the page prints. Values, not
+    // keys: half or more of the fixture's inputs missing from the form is a
+    // different example (the runtime spec's threshold, and its reasons).
+    const row = FIRST_ROW.get(id);
+    const wanted = row && row.inputs ? Object.entries(row.inputs).filter(([, v]) => v !== null && v !== undefined && typeof v !== "object" && typeof v !== "boolean") : [];
+    if (wanted.length) {
+      report.exampleCompared++;
+      const shown = [];
+      for (const el of [...inputs.querySelectorAll("input"), ...inputs.querySelectorAll("textarea")]) if (el.value != null && String(el.value).trim() !== "") shown.push(el.value);
+      for (const el of inputs.querySelectorAll("select")) {
+        shown.push(el.value);
+        const picked = [...el.options].find((o) => o.value === el.value);
+        if (picked) shown.push(picked.textContent);
+      }
+      const missing = wanted.filter(([, v]) => !present(v, shown));
+      if (missing.length * 2 >= wanted.length) report.exampleMismatch.push(`${id}: ${missing.length}/${wanted.length} fixture inputs absent (${missing.map(([k, v]) => `${k}=${JSON.stringify(v)}`).slice(0, 4).join(", ")})`);
+    }
     // The renderer factories show a compute error by writing it into the first
     // line and "-" into every other one. A worked example should never land there.
     const lines = outputs.querySelectorAll("span").filter((x) => x.classList.contains("out-value") && !x.classList.contains("note-value"));
