@@ -44,7 +44,17 @@ Two §H.2 extractions produced that headroom, and they are the same move made tw
 
 ## The catalog registry is the next real budget problem
 
-`tools-data.js` holds one row per tile and is **1,090,548 B raw / 397,907 B gzipped**, at 92.5% of the 430,000 B cap in `check-module-sizes`. That cap has been raised at nearly every expansion band (most recently 400,000 to 430,000 one band earlier), and at roughly 220 gzipped bytes per tile another ~145 tiles reaches it again. Raising it once more is the cheapest move available and it is the reason the file is this size.
+`tools-data.js` holds one row per tile and, measured 2026-10-09, is **2,013,468 B raw / 714,049 B gzipped**, at 99.2% of the 720,000 B cap in `check-module-sizes`. It was 397,907 B gzipped when the tables below were measured on 2026-08-29, so it has grown 79% in six weeks: the tile count rose by about a quarter and the descriptions got longer (a description now averages 747 B, and descriptions are 89% of the file, up from 79%). The cap has been raised at nearly every expansion band (430,000, then 520,000, 600,000 and 720,000), and at roughly 320 gzipped bytes per tile about 18 more tiles reaches it again. Raising it once more is the cheapest move available and it is the reason the file is this size.
+
+The same three shapes re-measured on 2026-10-09 (the catalog rebuilt as a module literal and gzipped, as described below):
+
+| | gzipped | deep link vs today |
+| --- | --- | --- |
+| catalog as it ships (full `desc`) | 703,163 B | -- |
+| catalog carrying `leadSentence(desc)` only | **203,297 B** | 71% smaller |
+| catalog carrying no description at all | 67,292 B | 90% smaller |
+
+The proportions are the ones the August measurement found; the absolute cost of leaving it alone has nearly doubled. What follows is the August analysis, unchanged.
 
 Measured composition, 2026-08-29:
 
