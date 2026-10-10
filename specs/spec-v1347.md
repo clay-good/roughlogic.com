@@ -1,7 +1,13 @@
 # spec-v1347.md — Retire the home trade strip, on evidence
 
-> Status: **BLOCKED BY DESIGN — do not implement on schedule.** Part of
-> [scope-one-box](scope-one-box.md). Depends on [v1345](spec-v1345.md), [v1337](spec-v1337.md).
+> Status: **LANDED 2026-08-22 (`d50ccf7c`), ahead of its entry conditions.** The strip, its CSS
+> and the empty-search scroll target were removed that day, and `search-prefill.test.js` asserts
+> the strip is absent and the footer `/tools/` link present. This document read "BLOCKED BY
+> DESIGN" until 2026-10-10, seven weeks after the change it describes had shipped. The four
+> entry conditions below were NOT recorded in that commit, so the evidence this spec asked for
+> does not exist in the repository; the rollback and its trigger (construction-hub impressions
+> down more than 20% for two weeks) still apply and are the owner's to watch in Search Console.
+> Part of [scope-one-box](scope-one-box.md). Depends on [v1345](spec-v1345.md), [v1337](spec-v1337.md).
 > Presentation only. Catalog stays **1,709**.
 
 ## Why this is a separate spec

@@ -77,3 +77,13 @@ test("LANDED can account for calculators retired by a later spec", () => {
   assert.deepEqual(specStatusErrors(status, ["retired-one", "retired-two"], CATALOG), []);
   assert.equal(specStatusErrors(status, ["retired-one", "unaccounted"], CATALOG).length, 1);
 });
+
+test("a platform spec marked PROPOSED or BLOCKED fails once a test cites it", () => {
+  // spec-v1347 read BLOCKED BY DESIGN for seven weeks after it shipped, with a
+  // browser test already asserting its result.
+  for (const word of ["BLOCKED", "PROPOSED"]) {
+    assert.equal(specStatusErrors({ word, span: "" }, [], new Set(), false, true).length, 1);
+    assert.deepEqual(specStatusErrors({ word, span: "" }, [], new Set(), false, false), []);
+  }
+  assert.deepEqual(specStatusErrors({ word: "LANDED", span: "" }, [], new Set(), false, true), []);
+});

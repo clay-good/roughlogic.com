@@ -1,14 +1,16 @@
 # scope-one-box.md — One box in, an instrument out
 
-> Status: **IN PROGRESS.** Eleven specs, `spec-v1337` through `spec-v1347`.
+> Status: **COMPLETE.** Eleven specs, `spec-v1337` through `spec-v1347`.
 > Adapts the shipped sophiewell.com program (`spec-v751`–`v758`) to this catalog and this
 > catalog's traffic. No tile is added, removed, or renumbered **by this program**. (The
 > catalog itself has grown since: **1,709 when this was written, 1,804 as of 2026-09-02**.
 > Every count below was re-measured on that date -- this is the live charter, and a live
 > charter with the counts it was born with is a charter nobody can check.)
 >
-> **Ten of eleven shipped:** v1337, v1338, v1339, v1340, v1341, v1342, v1343, v1344, v1345, v1346.
-> Only v1347 remains, and it is deliberately blocked on Search Console evidence.
+> **All eleven shipped:** v1337, v1338, v1339, v1340, v1341, v1342, v1343, v1344, v1345, v1346,
+> and v1347 on 2026-08-22 (`d50ccf7c`). v1347 was designed to wait on Search Console evidence and
+> shipped without it; this charter and the spec said "blocked" until 2026-10-10. Its rollback
+> trigger still stands.
 
 ## The product in one line
 
@@ -88,7 +90,7 @@ lands before any pixel moves; the additive nav work lands before any link is rem
 | ~~[v1337](spec-v1337.md)~~ | ~~The home page becomes one box. **All 21 trade links kept.**~~ **SHIPPED** | v1345 | low |
 | ~~[v1338](spec-v1338.md)~~ | ~~Answer first, inputs second~~ **SHIPPED** | — | low |
 | ~~[v1344](spec-v1344.md)~~ | ~~An MCP `answer_query` that reads the same registry~~ **SHIPPED** | v1340 | none |
-| [v1347](spec-v1347.md) | Retire the home trade strip — **gated on Search Console evidence** | v1337 | the only real one |
+| [v1347](spec-v1347.md) | Retire the home trade strip — **shipped 2026-08-22 without the Search Console evidence it was gated on; rollback trigger still applies** | v1337 | the only real one |
 
 ## The four SEO invariants, enforced not promised
 

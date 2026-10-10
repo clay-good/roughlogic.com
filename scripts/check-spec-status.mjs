@@ -17,6 +17,9 @@
 //             Mark it LANDED or CUT.
 //   LANDED    fails when a named id is missing from the catalog, unless the
 //             status explicitly resolves one missing id with "built as `x`".
+//   PROPOSED or BLOCKED, on a platform spec that names no tile, fails when a
+//             test under test/ cites the spec as `spec-vN:` -- the test is
+//             holding behavior the status says does not exist yet.
 //   CUT       fails when a named id IS in the catalog, unless the status names
 //             it (an exact id collision with an older tile, disclosed).
 // Older specs use `Implementation status` or `Status: **SHIPPED**`. Those
@@ -65,13 +68,17 @@ const names = (span, id) => new RegExp("(^|[^a-z0-9-])" + id + "($|[^a-z0-9-])")
 
 // Errors for one spec. `catalog` is a Set of live tile ids; `built` is true
 // when a calc module carries this spec's section header.
-export function specStatusErrors({ word, span }, ids, catalog, built = false) {
+export function specStatusErrors({ word, span }, ids, catalog, built = false, tested = false) {
   const live = ids.filter((id) => catalog.has(id));
   const missing = ids.filter((id) => !catalog.has(id));
   if (ids.length === 0) {
-    return word === "PROPOSED" && built
-      ? ["says PROPOSED but a calc module names it in a `// spec-vN` comment; mark it LANDED or CUT"]
-      : [];
+    if (word === "PROPOSED" && built) return ["says PROPOSED but a calc module names it in a `// spec-vN` comment; mark it LANDED or CUT"];
+    // A platform spec names no tile, so the catalog cannot say whether it
+    // shipped. A test that cites it can: spec-v1347 read BLOCKED BY DESIGN for
+    // seven weeks after its change landed, while search-prefill.test.js
+    // asserted the result under a `spec-v1347:` comment.
+    if ((word === "PROPOSED" || word === "BLOCKED") && tested) return ["says " + word + " but a test under test/ cites it as `spec-vN:`; if the change shipped, mark it LANDED"];
+    return [];
   }
   if (word === "PROPOSED") {
     if (missing.length === 0) return ["says PROPOSED but " + live.map((i) => "`" + i + "`").join(", ") + " is in the catalog; mark it LANDED"];
@@ -108,6 +115,14 @@ function main() {
     if (!/^calc-.*\.js$/.test(name)) continue;
     for (const m of readFileSync(join(ROOT, name), "utf8").matchAll(/^\/\/[ =]*spec-v(\d+)[:\s]/gm)) headers.add(m[1]);
   }
+  // Specs a test cites by number in a comment or a test title.
+  const tested = new Set();
+  for (const dir of ["unit", "integration"]) {
+    for (const name of readdirSync(join(ROOT, "test", dir))) {
+      if (!name.endsWith(".js")) continue;
+      for (const m of readFileSync(join(ROOT, "test", dir, name), "utf8").matchAll(/\bspec-v(\d+)\s*[:(]/g)) tested.add(m[1]);
+    }
+  }
   const errors = [];
   const tally = {};
   const specs = readdirSync(join(ROOT, "specs")).filter((n) => /^spec-v\d+\.md$/.test(n));
@@ -120,7 +135,7 @@ function main() {
     }
     tally[status.word] = (tally[status.word] || 0) + 1;
     const v = /\d+/.exec(name)[0];
-    for (const e of specStatusErrors(status, specTileIds(text), catalog, headers.has(v))) errors.push("specs/" + name + ": " + e);
+    for (const e of specStatusErrors(status, specTileIds(text), catalog, headers.has(v), tested.has(v))) errors.push("specs/" + name + ": " + e);
   }
   if (errors.length > 0) {
     for (const e of errors.slice(0, 25)) console.error("ERROR: " + e);
