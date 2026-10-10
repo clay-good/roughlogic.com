@@ -1528,7 +1528,7 @@ export const TOOL_MODULES = (() => {
     "flare-radiation-distance", "well-decline-reserves",
     "pipeline-mao-barlow", "gas-pipeline-flow", "gas-z-factor", "liquid-pipeline-station-spacing",
     "pig-batch-volume", "cathodic-anode-count-life", "corroded-pipe-b31g",
-    "casing-cement-volume", "mud-hydrostatic-pressure", "kill-mud-weight",
+    "casing-cement-volume", "mud-hydrostatic-pressure", "kill-mud-weight", "kick-tolerance",
     "annular-velocity-cleaning", "cuttings-slip-velocity",
   ]);
   // spec-v1484..v1494: the industrial refrigeration bench (Group C). Separate

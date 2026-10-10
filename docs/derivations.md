@@ -3035,6 +3035,7 @@ cross-check.
 | calc-oilgas.js | `computeFlareRadiationDistance` | `{ heat_release_btuh = 0, radiant_fraction = 0, allowable_btuh_ft2 = 0, solar_...` | _ | _ | _ |
 | calc-oilgas.js | `computeGasPipelineFlow` | `{ equation = "panhandle_a", id_in = 0, length_mi = 0, inlet_psig = 0, outlet_...` | _ | _ | _ |
 | calc-oilgas.js | `computeGasZFactor` | `{ gas_gravity = 0.65, pressure_psig = 0, temperature_f = 0, co2_pct = 0, h2s_...` | _ | _ | _ |
+| calc-oilgas.js | `computeKickTolerance` | `{ mud_weight_ppg = 0, shoe_emw_ppg = 0, shoe_tvd_ft = 0, well_tvd_ft = 0, kic...` | _ | _ | _ |
 | calc-oilgas.js | `computeKillMudWeight` | `{ original_mw_ppg = 0, tvd_ft = 0, sidpp_psi = 0, scr_pressure_psi = 0, safet...` | _ | _ | _ |
 | calc-oilgas.js | `computeLiquidPipelineStationSpacing` | `{ total_length_mi = 0, friction_gradient_ft_per_mi = 0, elevation_change_ft =...` | _ | _ | _ |
 | calc-oilgas.js | `computeMudHydrostaticPressure` | `{ mud_weight_ppg = 0, tvd_ft = 0, measured_depth_ft = 0, formation_pressure_p...` | _ | _ | _ |
@@ -3933,7 +3934,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2517.
+Row count: 2518.
 
 <!-- END function-corpus-v14 -->
 
@@ -4716,7 +4717,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-extraction-rate` | Water Extraction Volume, Time, and Waste-Tank Dumps | Project (first-principles); standing + absorbed; wand time = total / gpm | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+4 more) |
 
-### Group E Construction (629 tiles)
+### Group E Construction (630 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4991,6 +4992,7 @@ per spec-v14 §13.1 second paragraph.
 | `joist-notch-bore-limit` | Floor Joist Notching and Boring Limits (IRC R502.8.1) | floor joist notch/bore limits (IRC R5...; end = 9.25/4 = 2.3125; depth = 9.25/6 = 1.5417; length = ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `jominy-quench-severity` | Jominy Hardenability: How Deep the Hardness Reaches | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `key-cut-macs-check` | Key Bitting MACS and Adjacent Cut Check | Project (first-principles); the manufacturer's cut specification governs the value | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+4 more) |
+| `kick-tolerance` | Kick Tolerance at the Casing Shoe | Project (first-principles); shoe limit 0.052 x 14 x 3,000 = 2,184 psi; mud at the sho... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `kill-mud-weight` | Well Control Kill Mud Weight and Circulating Pressure | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `knee-toe-clearance` | Knee and Toe Clearance (2010 ADA Standards 306) | US Department of Justice / US Access ...; 306.3.1: 'Space under an element between 9 inches and 27 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `landing-check` | Stairway and Exterior-Door Landing Check | International Code Council; 'Landings shall have a dimension of not less than 36 inch... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -6369,6 +6371,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 
-Tile count: 2263. Fixture-covered or reference-cadence: 2263 / 2263.
+Tile count: 2264. Fixture-covered or reference-cadence: 2264 / 2264.
 
 <!-- END tile-index-v14 -->

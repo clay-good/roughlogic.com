@@ -1850,6 +1850,7 @@ export const RENDERER_MAP = {
   "casing-cement-volume": { module: "../../calc-oilgas.js", exportName: "OILGAS_RENDERERS" },
   "mud-hydrostatic-pressure": { module: "../../calc-oilgas.js", exportName: "OILGAS_RENDERERS" },
   "kill-mud-weight": { module: "../../calc-oilgas.js", exportName: "OILGAS_RENDERERS" },
+  "kick-tolerance": { module: "../../calc-oilgas.js", exportName: "OILGAS_RENDERERS" },
   "annular-velocity-cleaning": { module: "../../calc-oilgas.js", exportName: "OILGAS_RENDERERS" },
   "cuttings-slip-velocity": { module: "../../calc-oilgas.js", exportName: "OILGAS_RENDERERS" },
   "ammonia-charge-inventory": { module: "../../calc-refrigeration.js", exportName: "REFRIGERATION_RENDERERS" },

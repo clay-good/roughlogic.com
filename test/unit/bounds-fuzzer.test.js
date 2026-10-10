@@ -59565,3 +59565,39 @@ test("bounds: condensate-return-sizing computes the same answer from two pressur
   // Entered mode is unchanged.
   assert.equal(_crsP({ condensate_lbhr: 800, flash_fraction: 0.13, spec_vol_ft3lb: 26.8 }).flash_lbhr, 104);
 });
+
+import { computeKickTolerance as _kt } from "../../calc-oilgas.js";
+test("bounds: kick-tolerance puts the shoe exactly at its limit with the reported influx height", () => {
+  const base = { mud_weight_ppg: 10, shoe_emw_ppg: 14, shoe_tvd_ft: 3000, well_tvd_ft: 5000, kick_intensity_ppg: 0.5, influx_gradient_psi_ft: 0.1, annular_capacity_dp_bbl_ft: 0.0459, annular_capacity_bha_bbl_ft: 0.0292, safety_margin_psi: 0 };
+  for (const over of [{}, { kick_intensity_ppg: 1.5 }, { safety_margin_psi: 150 }, { mud_weight_ppg: 12, shoe_emw_ppg: 15.5, well_tvd_ft: 9000, shoe_tvd_ft: 6000 }, { influx_gradient_psi_ft: 0 }]) {
+    const i = { ...base, ...over }, r = _kt(i);
+    assert.ok(!r.fills_open_hole && r.max_influx_height_ft > 0, JSON.stringify(over));
+    const gm = 0.052 * i.mud_weight_ppg, open = i.well_tvd_ft - i.shoe_tvd_ft, H = r.max_influx_height_ft;
+    // Pressure at the shoe = formation pressure less the mud and gas columns between.
+    assert.ok(Math.abs(r.formation_pressure_psi - gm * (open - H) - i.influx_gradient_psi_ft * H - r.shoe_limit_psi) < 1e-6);
+    // Casing pressure at shut-in with that gas still on bottom never exceeds the limit.
+    const casing = r.formation_pressure_psi - gm * (i.well_tvd_ft - H) - i.influx_gradient_psi_ft * H;
+    assert.ok(Math.abs(casing - r.maasp_psi) < 1e-6);
+    assert.equal(r.kick_tolerance_bbl, Math.min(r.volume_at_shoe_as_shut_in_bbl, r.volume_at_bottom_bbl));
+    assert.ok(Math.abs(r.volume_at_shoe_as_shut_in_bbl * r.formation_pressure_psi - r.volume_at_shoe_bbl * r.shoe_limit_psi) < 1e-6);
+  }
+  // More kick intensity, heavier mud or a weaker shoe each leave less tolerance.
+  const t = (o) => _kt({ ...base, ...o }).kick_tolerance_bbl;
+  assert.ok(t({ kick_intensity_ppg: 1 }) < t({}) && t({ mud_weight_ppg: 11 }) < t({}) && t({ shoe_emw_ppg: 13 }) < t({}) && t({ safety_margin_psi: 100 }) < t({}));
+  // At exactly the largest zero-influx kick there is nothing left; beyond it the answer says so.
+  const edge = _kt({ ...base, kick_intensity_ppg: _kt(base).max_kick_intensity_ppg });
+  assert.ok(edge.max_influx_height_ft < 1e-6 && edge.kick_tolerance_bbl < 1e-6);
+  const none = _kt({ ...base, kick_intensity_ppg: 3 });
+  assert.equal(none.governed_by, "none");
+  assert.equal(none.kick_tolerance_bbl, 0);
+  assert.match(none.verdict, /^NO kick tolerance/);
+  // A very strong shoe: the whole open hole can be gas and the height is capped there.
+  const strong = _kt({ ...base, shoe_emw_ppg: 20, kick_intensity_ppg: 0 });
+  assert.ok(strong.fills_open_hole && strong.max_influx_height_ft === 2000);
+  // A wide annulus around the pipe below the shoe makes the bottom-hole volume govern, and the reverse.
+  assert.equal(_kt({ ...base, annular_capacity_dp_bbl_ft: 0.2 }).governed_by, "bottom");
+  assert.equal(_kt({ ...base, annular_capacity_bha_bbl_ft: 0.2 }).governed_by, "shoe");
+  for (const bad of [{ mud_weight_ppg: 0 }, { mud_weight_ppg: -10 }, { shoe_emw_ppg: 10 }, { shoe_emw_ppg: 9 }, { shoe_tvd_ft: 0 }, { well_tvd_ft: 3000 }, { well_tvd_ft: 5e6 }, { kick_intensity_ppg: -0.5 }, { influx_gradient_psi_ft: 0.52 }, { influx_gradient_psi_ft: -0.1 }, { annular_capacity_dp_bbl_ft: 0 }, { annular_capacity_bha_bbl_ft: 0 }, { annular_capacity_bha_bbl_ft: 29.2 }, { safety_margin_psi: -50 }, { safety_margin_psi: 624 }]) {
+    assert.ok("error" in _kt({ ...base, ...bad }), JSON.stringify(bad));
+  }
+});

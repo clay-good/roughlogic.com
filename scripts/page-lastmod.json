@@ -2,99 +2,99 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "b745774721bee02f",
+      "sha": "146b8887153161ad",
       "date": "2026-10-10"
     },
     "/tools/": {
-      "sha": "3187de04a3e8b0ea",
+      "sha": "c947630c53963ba6",
       "date": "2026-10-10"
     },
     "/collections/disaster-response/": {
-      "sha": "d2d20e9a91ebe663",
+      "sha": "b6bb15aa41ffe0c3",
       "date": "2026-10-10"
     },
     "/groups/accounting/": {
-      "sha": "7b5bc4c77871eb4d",
+      "sha": "a7c573fcd23f79bf",
       "date": "2026-10-10"
     },
     "/groups/agriculture/": {
-      "sha": "4002aec577096618",
+      "sha": "11524c01b6732aeb",
       "date": "2026-10-10"
     },
     "/groups/construction/": {
-      "sha": "d9e0ed7e67acca87",
+      "sha": "97b16f8b0df68ae2",
       "date": "2026-10-10"
     },
     "/groups/cross-trade/": {
-      "sha": "51a5625467cc9988",
+      "sha": "ce277a2e0885dc2b",
       "date": "2026-10-10"
     },
     "/groups/educators/": {
-      "sha": "cae992f0bc2924bf",
+      "sha": "0065347104204c05",
       "date": "2026-10-10"
     },
     "/groups/electrical/": {
-      "sha": "fd4b0ac6aaa4209f",
+      "sha": "5ebba4a3d026b414",
       "date": "2026-10-10"
     },
     "/groups/field/": {
-      "sha": "102a71d37ec02b04",
+      "sha": "92ce9cfb8191feef",
       "date": "2026-10-10"
     },
     "/groups/fire-ground/": {
-      "sha": "97e0cd62c9faab13",
+      "sha": "35f253d1a8d53256",
       "date": "2026-10-10"
     },
     "/groups/historical/": {
-      "sha": "b045032416c2b342",
+      "sha": "04706797f97f1b4f",
       "date": "2026-10-10"
     },
     "/groups/hvac/": {
-      "sha": "e7ab990766466309",
+      "sha": "8e8929b324347058",
       "date": "2026-10-10"
     },
     "/groups/kitchen/": {
-      "sha": "daddbf09971b23cb",
+      "sha": "28770150da2f045d",
       "date": "2026-10-10"
     },
     "/groups/lab/": {
-      "sha": "514f6fbc10bfc747",
+      "sha": "3244adef087cc204",
       "date": "2026-10-10"
     },
     "/groups/mechanic/": {
-      "sha": "cfcb689a9feb3c53",
+      "sha": "f607c03d51c0b26d",
       "date": "2026-10-10"
     },
     "/groups/plumbing/": {
-      "sha": "5f49fb81babaa87e",
+      "sha": "97368ccc4f42f8bc",
       "date": "2026-10-10"
     },
     "/groups/real-estate/": {
-      "sha": "e61159da100134c2",
+      "sha": "525ff6ce0a0b558d",
       "date": "2026-10-10"
     },
     "/groups/references/": {
-      "sha": "f9cf8b475fde561a",
+      "sha": "665ec78b8a172da0",
       "date": "2026-10-10"
     },
     "/groups/restoration/": {
-      "sha": "4e9313941f1d3a17",
+      "sha": "e8cdb810c25b5e2e",
       "date": "2026-10-10"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "78f351da20d4876f",
+      "sha": "9f1ed6711d53ab4f",
       "date": "2026-10-10"
     },
     "/groups/stage/": {
-      "sha": "28c741de1aa96771",
+      "sha": "663a4f94d6c3041b",
       "date": "2026-10-10"
     },
     "/groups/trucking/": {
-      "sha": "5d052883b7361ded",
+      "sha": "f98ce61b35d064e8",
       "date": "2026-10-10"
     },
     "/groups/water/": {
-      "sha": "33bcc11fad869b15",
+      "sha": "2d8aa221bd1e2e1e",
       "date": "2026-10-10"
     },
     "/tools/aav-install-check/": {
@@ -1014,8 +1014,8 @@
       "date": "2026-09-29"
     },
     "/tools/casing-cement-volume/": {
-      "sha": "d871a20ee34dd44a",
-      "date": "2026-09-29"
+      "sha": "215dcd6ff4d58fa3",
+      "date": "2026-10-10"
     },
     "/tools/casting-pour-yield/": {
       "sha": "299f93221859897b",
@@ -4161,9 +4161,13 @@
       "sha": "692411ee4938a4ca",
       "date": "2026-09-29"
     },
+    "/tools/kick-tolerance/": {
+      "sha": "24f58f554e20155f",
+      "date": "2026-10-10"
+    },
     "/tools/kill-mud-weight/": {
-      "sha": "c2f49a37c8a3910a",
-      "date": "2026-09-29"
+      "sha": "4922c89f9ee1c3b9",
+      "date": "2026-10-10"
     },
     "/tools/kiln-charge-water/": {
       "sha": "f145debccb93f496",

@@ -1736,6 +1736,7 @@ const RELATED = {
   "corroded-pipe-b31g": ["pipeline-mao-barlow","cathodic-anode-count-life","hoop-stress-thin-wall"],
   "casing-cement-volume": ["annular-velocity-cleaning","annular-grout-volume","mud-hydrostatic-pressure"],
   "mud-hydrostatic-pressure": ["kill-mud-weight","annular-velocity-cleaning","casing-cement-volume"],
+  "kick-tolerance": ["kill-mud-weight","mud-hydrostatic-pressure","casing-cement-volume"],
   "kill-mud-weight": ["mud-hydrostatic-pressure","annular-velocity-cleaning","casing-cement-volume"],
   "annular-velocity-cleaning": ["mud-hydrostatic-pressure","casing-cement-volume","kill-mud-weight"],
   "cuttings-slip-velocity": ["annular-velocity-cleaning","mud-hydrostatic-pressure","particle-settling-velocity"],

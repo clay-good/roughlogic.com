@@ -117157,6 +117157,36 @@
    "term": "boiling point of water at pressure",
    "target": "saturated-steam-properties",
    "kind": "industry"
+  },
+  {
+   "term": "kick tolerance",
+   "target": "kick-tolerance",
+   "kind": "industry"
+  },
+  {
+   "term": "kick tolerance calculation",
+   "target": "kick-tolerance",
+   "kind": "industry"
+  },
+  {
+   "term": "maasp",
+   "target": "kick-tolerance",
+   "kind": "industry"
+  },
+  {
+   "term": "maximum allowable annular surface pressure",
+   "target": "kick-tolerance",
+   "kind": "industry"
+  },
+  {
+   "term": "maximum allowable shut in casing pressure",
+   "target": "kick-tolerance",
+   "kind": "industry"
+  },
+  {
+   "term": "how big a kick can the shoe take",
+   "target": "kick-tolerance",
+   "kind": "question"
   }
  ]
 }

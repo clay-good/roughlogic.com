@@ -867,12 +867,12 @@ export function computeKillMudWeight({
     icp_psi, fcp_psi,
     has_pump, drillpipe_volume_bbl, strokes_to_bit, minutes_to_bit,
     has_rounded, rounded_bhp_change_psi, rounded_is_below, rounding_verdict,
-    note: "The kill sheet arithmetic for a shut-in well: the mud weight that balances the formation, and the drillpipe pressures to hold while circulating it. Shut-in drillpipe pressure is the amount by which formation pressure exceeds the hydrostatic already in the hole, read directly at surface through a column of clean mud. Converting that pressure back into density is the same 0.052 relation rearranged, and the result is the weight that balances the formation with no surface pressure at all. The circulating pressures follow. Initial circulating pressure is the shut-in pressure plus whatever it takes to move mud at the slow rate; final circulating pressure is the slow-rate pressure scaled by the density ratio, since a heavier mud takes proportionally more pressure to circulate. Between them the drillpipe pressure is walked down on a schedule while kill mud goes to the bit, and it is held at the final value from there until the influx is out. The rounding question is where this gets dangerous, and it is why the rounded weight is an input here rather than a note. A kill weight rounded DOWN -- to a tidier number, or to what is already mixed -- leaves the well underbalanced by the difference, and the arithmetic that looks like it adds pressure actually subtracts it. The direction is therefore reported as a verdict computed from the two weights rather than as a signed number a reader has to interpret. Rounding UP is the safe direction and it has its own limit: excessive kill weight risks fracturing the formation at the shoe and turning a kick into an underground blowout, which is a check against the fracture gradient that this does not make. This is the driller's-method kill sheet for a vertical or near-vertical well with a clean drillpipe column: it does not compute kick tolerance or the equivalent mud weight at the shoe, handle a plugged or wet-string reading, account for influx type and migration, or model the annulus pressure profile or choke schedule. The ICP-to-FCP drillpipe schedule it gives is the wait-and-weight (engineer's) method; in the driller's method the second circulation holds casing pressure constant while kill mud goes to the bit. The operator's well control procedures, the certified kill sheet, and a qualified well-control supervisor govern.",
+    note: "The kill sheet arithmetic for a shut-in well: the mud weight that balances the formation, and the drillpipe pressures to hold while circulating it. Shut-in drillpipe pressure is the amount by which formation pressure exceeds the hydrostatic already in the hole, read directly at surface through a column of clean mud. Converting that pressure back into density is the same 0.052 relation rearranged, and the result is the weight that balances the formation with no surface pressure at all. The circulating pressures follow. Initial circulating pressure is the shut-in pressure plus whatever it takes to move mud at the slow rate; final circulating pressure is the slow-rate pressure scaled by the density ratio, since a heavier mud takes proportionally more pressure to circulate. Between them the drillpipe pressure is walked down on a schedule while kill mud goes to the bit, and it is held at the final value from there until the influx is out. The rounding question is where this gets dangerous, and it is why the rounded weight is an input here rather than a note. A kill weight rounded DOWN -- to a tidier number, or to what is already mixed -- leaves the well underbalanced by the difference, and the arithmetic that looks like it adds pressure actually subtracts it. The direction is therefore reported as a verdict computed from the two weights rather than as a signed number a reader has to interpret. Rounding UP is the safe direction and it has its own limit: excessive kill weight risks fracturing the formation at the shoe and turning a kick into an underground blowout, which is a check against the fracture gradient that this does not make. This is the driller's-method kill sheet for a vertical or near-vertical well with a clean drillpipe column: it does not check the casing shoe (kick-tolerance does that before the kick), handle a plugged or wet-string reading, account for influx type and migration, or model the annulus pressure profile or choke schedule. The ICP-to-FCP drillpipe schedule it gives is the wait-and-weight (engineer's) method; in the driller's method the second circulation holds casing pressure constant while kill mud goes to the bit. The operator's well control procedures, the certified kill sheet, and a qualified well-control supervisor govern.",
   };
 }
 export const killMudWeightExample = { inputs: { original_mw_ppg: 12.5, tvd_ft: 9800, sidpp_psi: 380, scr_pressure_psi: 600, safety_margin_ppg: 0, rounded_mw_ppg: 13.0, drillpipe_capacity_bbl_ft: 0.01776, measured_depth_ft: 9800, pump_output_bbl_stroke: 0.117, pump_spm: 30 } };
 OILGAS_RENDERERS["kill-mud-weight"] = _simpleRenderer({
-  citation: "Citation: the driller's-method kill sheet as every well-control manual writes it -- kill mud weight = original weight + SIDPP / (0.052 x TVD), formation pressure = SIDPP + 0.052 x MW x TVD, initial circulating pressure = SIDPP + slow-circulating-rate pressure, and final circulating pressure = SCR pressure x (kill weight / original weight). For a vertical or near-vertical well with a clean drillpipe column: it does not compute kick tolerance or the equivalent mud weight at the shoe, handle a plugged or wet string, account for influx type and migration, model the annulus profile or choke schedule, or check the fracture gradient. The operator's well control procedures, the certified kill sheet, and a qualified well-control supervisor govern.",
+  citation: "Citation: the driller's-method kill sheet as every well-control manual writes it -- kill mud weight = original weight + SIDPP / (0.052 x TVD), formation pressure = SIDPP + 0.052 x MW x TVD, initial circulating pressure = SIDPP + slow-circulating-rate pressure, and final circulating pressure = SCR pressure x (kill weight / original weight). For a vertical or near-vertical well with a clean drillpipe column: it does not check the casing shoe (kick-tolerance does that before the kick), handle a plugged or wet string, account for influx type and migration, model the annulus profile or choke schedule, or check the fracture gradient. The operator's well control procedures, the certified kill sheet, and a qualified well-control supervisor govern.",
   example: killMudWeightExample.inputs,
   fields: [
     { key: "original_mw_ppg", label: "Original mud weight (ppg)", kind: "number" },
@@ -895,6 +895,85 @@ OILGAS_RENDERERS["kill-mud-weight"] = _simpleRenderer({
     { key: "n", id: "kmw-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeKillMudWeight,
+});
+
+// ============ spec-v1960: kick tolerance at the casing shoe ============
+//
+// kill-mud-weight circulates a kick out and says it does not check the shoe.
+// This is that check, made before the kick: how much gas the open hole can take
+// before the pressure at the weak point under the last casing shoe reaches what
+// the leak-off test showed the formation holds. Hydrostatics and Boyle's law.
+// dims: in { mud_weight_ppg: M L^-3, shoe_emw_ppg: M L^-3, shoe_tvd_ft: L, well_tvd_ft: L, kick_intensity_ppg: M L^-3, influx_gradient_psi_ft: M L^-2 T^-2, annular_capacity_dp_bbl_ft: L^2, annular_capacity_bha_bbl_ft: L^2, safety_margin_psi: M L^-1 T^-2 } out: { maasp_psi: M L^-1 T^-2, formation_pressure_psi: M L^-1 T^-2, shoe_limit_psi: M L^-1 T^-2, max_influx_height_ft: L, volume_at_shoe_bbl: L^3, volume_at_shoe_as_shut_in_bbl: L^3, volume_at_bottom_bbl: L^3, kick_tolerance_bbl: L^3, max_kick_intensity_ppg: M L^-3 }
+export function computeKickTolerance({
+  mud_weight_ppg = 0, shoe_emw_ppg = 0, shoe_tvd_ft = 0, well_tvd_ft = 0, kick_intensity_ppg = 0.5,
+  influx_gradient_psi_ft = 0.1, annular_capacity_dp_bbl_ft = 0, annular_capacity_bha_bbl_ft = 0, safety_margin_psi = 0,
+} = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(mud_weight_ppg > 0 && mud_weight_ppg <= 25)) return { error: "Mud weight must be between 0 and 25 ppg." };
+  if (!(shoe_emw_ppg > mud_weight_ppg && shoe_emw_ppg <= 30)) return { error: "The leak-off (or formation integrity) equivalent mud weight at the shoe must be above the mud weight in the hole and no more than 30 ppg." };
+  if (!(shoe_tvd_ft > 0)) return { error: "Enter the casing shoe depth (true vertical, ft)." };
+  if (!(well_tvd_ft > shoe_tvd_ft && well_tvd_ft <= 50000)) return { error: "The well depth must be below the casing shoe (true vertical, ft, up to 50,000)." };
+  if (!(kick_intensity_ppg >= 0 && kick_intensity_ppg <= 10)) return { error: "Kick intensity must be between 0 and 10 ppg over the mud weight." };
+  const mud_gradient = 0.052 * mud_weight_ppg;
+  if (!(influx_gradient_psi_ft >= 0 && influx_gradient_psi_ft < mud_gradient)) return { error: "The influx gradient must be zero or more and lighter than the mud (" + fmt(mud_gradient, 3) + " psi/ft); dry gas is about 0.1." };
+  if (!(annular_capacity_dp_bbl_ft > 0 && annular_capacity_dp_bbl_ft <= 5)) return { error: "Enter the annular capacity around the drill pipe below the shoe (bbl/ft, up to 5)." };
+  if (!(annular_capacity_bha_bbl_ft > 0 && annular_capacity_bha_bbl_ft <= 5)) return { error: "Enter the annular capacity around the bottom-hole assembly (bbl/ft, up to 5)." };
+  if (safety_margin_psi < 0) return { error: "The safety margin cannot be negative (psi)." };
+  const fracture_pressure_psi = 0.052 * shoe_emw_ppg * shoe_tvd_ft;
+  const maasp_psi = fracture_pressure_psi - mud_gradient * shoe_tvd_ft - safety_margin_psi;
+  if (!(maasp_psi > 1e-9)) return { error: "The safety margin is as large as the whole margin between the mud and the leak-off at the shoe; there is no casing pressure to work with." };
+  const shoe_limit_psi = fracture_pressure_psi - safety_margin_psi;
+  const formation_pressure_psi = 0.052 * (mud_weight_ppg + kick_intensity_ppg) * well_tvd_ft;
+  const open_hole_ft = well_tvd_ft - shoe_tvd_ft;
+  // Shoe pressure with H feet of influx in the open hole: Pf - Gm (open hole - H) - Gi H.
+  const height_raw_ft = (shoe_limit_psi - formation_pressure_psi + mud_gradient * open_hole_ft) / (mud_gradient - influx_gradient_psi_ft);
+  // The kick intensity that uses the whole margin with no influx at all.
+  const max_kick_intensity_ppg = maasp_psi / (0.052 * well_tvd_ft);
+  const none = height_raw_ft <= 1e-9;
+  const fills_open_hole = height_raw_ft >= open_hole_ft;
+  const max_influx_height_ft = none ? 0 : Math.min(height_raw_ft, open_hole_ft);
+  const volume_at_shoe_bbl = max_influx_height_ft * annular_capacity_dp_bbl_ft;
+  // Boyle's law back to bottom-hole conditions: the same gas is smaller where it entered.
+  const volume_at_shoe_as_shut_in_bbl = volume_at_shoe_bbl * shoe_limit_psi / formation_pressure_psi;
+  const volume_at_bottom_bbl = max_influx_height_ft * annular_capacity_bha_bbl_ft;
+  const kick_tolerance_bbl = Math.min(volume_at_shoe_as_shut_in_bbl, volume_at_bottom_bbl);
+  const governed_by = none ? "none" : volume_at_shoe_as_shut_in_bbl <= volume_at_bottom_bbl ? "shoe" : "bottom";
+  if (![maasp_psi, formation_pressure_psi, max_influx_height_ft, kick_tolerance_bbl, max_kick_intensity_ppg].every(Number.isFinite)) return { error: "Kick tolerance math is not a finite value." };
+  const verdict = none
+    ? "NO kick tolerance at a " + fmt(kick_intensity_ppg, 2) + " ppg kick: the shut-in pressure alone reaches the shoe limit before any gas enters. The most this shoe takes with no influx is " + fmt(max_kick_intensity_ppg, 2) + " ppg"
+    : fmt(kick_tolerance_bbl, 1) + " bbl at a " + fmt(kick_intensity_ppg, 2) + " ppg kick, set by the gas " + (governed_by === "shoe" ? "when its top reaches the shoe" : "as first shut in around the bottom-hole assembly") + (fills_open_hole ? "; the limit is not reached even with the whole open hole full of gas, so the height is capped at the open hole" : "");
+  return {
+    maasp_psi, formation_pressure_psi, shoe_limit_psi, fracture_pressure_psi, max_influx_height_ft,
+    volume_at_shoe_bbl, volume_at_shoe_as_shut_in_bbl, volume_at_bottom_bbl, kick_tolerance_bbl, max_kick_intensity_ppg,
+    governed_by, fills_open_hole, verdict,
+    note: "How big a gas kick the well can take and still be shut in and circulated out without breaking down the formation under the last casing shoe. The shoe is the weak point: the leak-off test showed what it holds, as an equivalent mud weight, and the mud already in the hole uses part of that. What is left is the maximum allowable casing pressure. A kick spends it two ways. The formation pressure that caused the kick raises the pressure everywhere in the well, which is the kick intensity, in ppg above the mud weight. And gas is much lighter than mud, so every foot of mud it displaces below the shoe takes hydrostatic away and the casing pressure has to rise to make it up. Setting the pressure at the shoe equal to its limit gives the tallest column of gas the open hole can hold. That height becomes a volume twice: around the bottom-hole assembly, where the gas first sits and the annulus is tight, and around the drill pipe just below the shoe, where the gas arrives larger because it has expanded. The second is brought back to bottom-hole conditions by Boyle's law so the two can be compared, and the SMALLER is the kick tolerance: the pit gain the crew must detect and shut in before reaching. Raising the mud weight to drill ahead lowers it, which is why this is recalculated for each hole section at its heaviest planned mud. The figure also reported is the largest kick intensity the shoe takes with no gas in the hole at all. This is the single-bubble method for a VERTICAL well: it treats the gas as one slug, ignores temperature, gas compressibility, migration and solution in oil-based mud, and takes no credit for dispersion; choke-line friction on a subsea stack and any trapped pressure come out of the margin and belong in the safety margin entered. The operator's well-control standard and a certified supervisor govern.",
+  };
+}
+export const kickToleranceExample = { inputs: { mud_weight_ppg: 10, shoe_emw_ppg: 14, shoe_tvd_ft: 3000, well_tvd_ft: 5000, kick_intensity_ppg: 0.5, influx_gradient_psi_ft: 0.1, annular_capacity_dp_bbl_ft: 0.0459, annular_capacity_bha_bbl_ft: 0.0292, safety_margin_psi: 0 } };
+OILGAS_RENDERERS["kick-tolerance"] = _simpleRenderer({
+  citation: "Citation: the single-bubble kick tolerance method as well-control manuals state it -- maximum allowable casing pressure = 0.052 x (leak-off equivalent - mud weight) x shoe depth less a safety margin; formation pressure = 0.052 x (mud weight + kick intensity) x well depth; the tallest influx is where the shoe pressure, formation pressure less the mud and gas columns between, equals the shoe limit; and its volume at the shoe is converted to shut-in conditions by Boyle's law. Hydrostatics and the ideal gas law for a vertical well. The operator's well-control standard governs.",
+  example: kickToleranceExample.inputs,
+  fields: [
+    { key: "mud_weight_ppg", label: "Mud weight in the hole (ppg)", kind: "number" },
+    { key: "shoe_emw_ppg", label: "Leak-off or FIT equivalent at the shoe (ppg)", kind: "number" },
+    { key: "shoe_tvd_ft", label: "Casing shoe depth, true vertical (ft)", kind: "number" },
+    { key: "well_tvd_ft", label: "Well depth, true vertical (ft)", kind: "number" },
+    { key: "kick_intensity_ppg", label: "Kick intensity over the mud weight (ppg)", kind: "number", default: 0.5 },
+    { key: "influx_gradient_psi_ft", label: "Influx gradient (psi/ft; dry gas 0.1)", kind: "number", default: 0.1 },
+    { key: "annular_capacity_dp_bbl_ft", label: "Annulus around drill pipe below the shoe (bbl/ft)", kind: "number" },
+    { key: "annular_capacity_bha_bbl_ft", label: "Annulus around the bottom-hole assembly (bbl/ft)", kind: "number" },
+    { key: "safety_margin_psi", label: "Safety margin off the casing pressure (psi)", kind: "number" },
+  ],
+  outputs: [
+    { key: "k", id: "kt-out-k", label: "Kick tolerance", value: (r) => r.verdict },
+    { key: "m", id: "kt-out-m", label: "Maximum allowable casing pressure", value: (r) => fmt(r.maasp_psi, 0) + " psi (shoe limit " + fmt(r.shoe_limit_psi, 0) + " psi)" },
+    { key: "h", id: "kt-out-h", label: "Tallest influx the open hole takes", value: (r) => fmt(r.max_influx_height_ft, 0) + " ft" },
+    { key: "v", id: "kt-out-v", label: "As a volume", value: (r) => fmt(r.volume_at_bottom_bbl, 1) + " bbl around the bottom-hole assembly; " + fmt(r.volume_at_shoe_bbl, 1) + " bbl at the shoe, " + fmt(r.volume_at_shoe_as_shut_in_bbl, 1) + " bbl of pit gain when shut in" },
+    { key: "i", id: "kt-out-i", label: "Largest kick with no influx", value: (r) => fmt(r.max_kick_intensity_ppg, 2) + " ppg over the mud weight" },
+    { key: "f", id: "kt-out-f", label: "Formation pressure at this kick", value: (r) => fmt(r.formation_pressure_psi, 0) + " psi" },
+    { key: "n", id: "kt-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeKickTolerance,
 });
 
 // =====================================================================

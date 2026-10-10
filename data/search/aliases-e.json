@@ -6431,6 +6431,12 @@
     {"term":"cuttings transport ratio","target":"cuttings-slip-velocity","kind":"industry"},
     {"term":"moore correlation slip velocity","target":"cuttings-slip-velocity","kind":"industry"},
     {"term":"hole cleaning slip velocity","target":"cuttings-slip-velocity","kind":"industry"},
-    {"term":"how fast do cuttings fall in mud","target":"cuttings-slip-velocity","kind":"question"}
+    {"term":"how fast do cuttings fall in mud","target":"cuttings-slip-velocity","kind":"question"},
+    {"term":"kick tolerance","target":"kick-tolerance","kind":"industry"},
+    {"term":"kick tolerance calculation","target":"kick-tolerance","kind":"industry"},
+    {"term":"maasp","target":"kick-tolerance","kind":"industry"},
+    {"term":"maximum allowable annular surface pressure","target":"kick-tolerance","kind":"industry"},
+    {"term":"maximum allowable shut in casing pressure","target":"kick-tolerance","kind":"industry"},
+    {"term":"how big a kick can the shoe take","target":"kick-tolerance","kind":"question"}
   ]
 }

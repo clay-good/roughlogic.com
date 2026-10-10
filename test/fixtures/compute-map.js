@@ -2278,6 +2278,7 @@ export const COMPUTE_MAP = {
   "casing-cement-volume": { module: "../../calc-oilgas.js", fn: "computeCasingCementVolume" },
   "mud-hydrostatic-pressure": { module: "../../calc-oilgas.js", fn: "computeMudHydrostaticPressure" },
   "kill-mud-weight": { module: "../../calc-oilgas.js", fn: "computeKillMudWeight" },
+  "kick-tolerance": { module: "../../calc-oilgas.js", fn: "computeKickTolerance" },
   "annular-velocity-cleaning": { module: "../../calc-oilgas.js", fn: "computeAnnularVelocityCleaning" },
   "cuttings-slip-velocity": { module: "../../calc-oilgas.js", fn: "computeCuttingsSlipVelocity" },
   "ammonia-charge-inventory": { module: "../../calc-refrigeration.js", fn: "computeAmmoniaChargeInventory" },

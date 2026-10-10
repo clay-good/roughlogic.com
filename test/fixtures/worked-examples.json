@@ -171216,6 +171216,104 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "kick-tolerance",
+  "source_publisher": "Project (first-principles)",
+  "source_title": "10 ppg mud under a 14 ppg shoe at 3,000 ft, drilling at 5,000 ft, 0.5 ppg kick",
+  "source_edition_or_year": "hydrostatics and Boyle's law",
+  "source_section_or_page": "shoe limit 0.052 x 14 x 3,000 = 2,184 psi; mud at the shoe 1,560 psi; casing pressure limit 624 psi. Pf = 0.052 x 10.5 x 5,000 = 2,730 psi. H = (2,184 - 2,730 + 0.52 x 2,000) / (0.52 - 0.1) = 1,176.2 ft. Check: 2,730 - 0.52 x 823.8 - 0.1 x 1,176.2 = 2,184. At the shoe 1,176.2 x 0.0459 = 53.99 bbl, x 2,184/2,730 = 43.19 bbl shut in; at bottom 1,176.2 x 0.0292 = 34.34 bbl, which governs",
+  "verified_by": "rl",
+  "verified_on": "2026-10-10",
+  "inputs": {
+   "mud_weight_ppg": 10,
+   "shoe_emw_ppg": 14,
+   "shoe_tvd_ft": 3000,
+   "well_tvd_ft": 5000,
+   "kick_intensity_ppg": 0.5,
+   "influx_gradient_psi_ft": 0.1,
+   "annular_capacity_dp_bbl_ft": 0.0459,
+   "annular_capacity_bha_bbl_ft": 0.0292,
+   "safety_margin_psi": 0
+  },
+  "outputs": {
+   "maasp_psi": {
+    "value": 624,
+    "tolerance": {
+     "abs": 0.01
+    }
+   },
+   "formation_pressure_psi": {
+    "value": 2730,
+    "tolerance": {
+     "abs": 0.01
+    }
+   },
+   "max_influx_height_ft": {
+    "value": 1176.19,
+    "tolerance": {
+     "pct": 0.01
+    }
+   },
+   "volume_at_shoe_as_shut_in_bbl": {
+    "value": 43.19,
+    "tolerance": {
+     "pct": 0.05
+    }
+   },
+   "volume_at_bottom_bbl": {
+    "value": 34.345,
+    "tolerance": {
+     "pct": 0.05
+    }
+   },
+   "kick_tolerance_bbl": {
+    "value": 34.345,
+    "tolerance": {
+     "pct": 0.05
+    }
+   },
+   "max_kick_intensity_ppg": {
+    "value": 2.4,
+    "tolerance": {
+     "abs": 0.001
+    }
+   }
+  }
+ },
+ {
+  "tile_id": "kick-tolerance",
+  "source_publisher": "Project (first-principles)",
+  "source_title": "The same well at a 2 ppg kick with weightless gas",
+  "source_edition_or_year": "hydrostatics",
+  "source_section_or_page": "Pf = 0.052 x 12 x 5,000 = 3,120 psi; H = (2,184 - 3,120 + 1,040) / 0.52 = 200 ft; casing pressure with 200 ft of gas at bottom = 3,120 - 0.52 x 4,800 = 624 psi, the limit",
+  "verified_by": "rl",
+  "verified_on": "2026-10-10",
+  "inputs": {
+   "mud_weight_ppg": 10,
+   "shoe_emw_ppg": 14,
+   "shoe_tvd_ft": 3000,
+   "well_tvd_ft": 5000,
+   "kick_intensity_ppg": 2,
+   "influx_gradient_psi_ft": 0,
+   "annular_capacity_dp_bbl_ft": 0.0459,
+   "annular_capacity_bha_bbl_ft": 0.0292,
+   "safety_margin_psi": 0
+  },
+  "outputs": {
+   "max_influx_height_ft": {
+    "value": 200,
+    "tolerance": {
+     "abs": 0.01
+    }
+   },
+   "volume_at_bottom_bbl": {
+    "value": 5.84,
+    "tolerance": {
+     "abs": 0.01
+    }
+   }
+  }
  }
  ]
 }
