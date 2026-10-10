@@ -12,6 +12,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **`pulling-tension` rejects a bend over 360 degrees, and the agent door checks nested results.** A bend angle mistyped in the thousands overflowed e^(mu x angle) to an infinite tension. The door's check for a non-finite answer now looks inside per-row output as well as the top-level values.
+
 - **A value mistyped by orders of magnitude no longer freezes, crashes, or prints Infinity.** A sweep multiplying each input by 1,000, 1,000,000 and their inverses found: two calculators that froze the page (`smoke-detector-spacing-count` with a spacing of 0.03 for 30, `duct-bank-ampacity-derate` with thousands of ducts), one that exhausted memory (`pipe-template-wrap` with millions of stations), two that threw (`bell-curve-zscore` more than 999 sigma below the mean, `basement-flood-pumpdown` on a schedule of millions of days), and 24 that returned Infinity or NaN, among them six loan calculators where a term under half a month rounded to zero payments (`loan-amortization`, `amortization-schedule`, `piti`, `rent-vs-buy`, `cost-of-waiting`, `mortgage-point-breakeven`) and several decibel and exponent overflows. Each now returns an error that says what to check. The tile-contract gate applies these four scales to every input of every worked example from now on, in its existing worker with a timeout and a memory cap.
 - **The agent door keeps a designed infinite answer.** The door change above refused any non-finite number, which would have turned `exterior-opening-protection`'s "no limit" (an infinite allowable area with `no_limit: true`) into an error. NaN is still refused; an infinite value is returned with an `unbounded` warning.
 

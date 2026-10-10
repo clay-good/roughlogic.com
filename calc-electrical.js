@@ -1450,6 +1450,8 @@ export function computePullingTension({
     const angle_rad = (Number(b.angle_deg) || 0) * Math.PI / 180;
     const radius_ft = Number(b.radius_ft) || 0;
     if (angle_rad < 0) return { error: "Bend angle must be non-negative." };
+    // A bend is at most a full turn; an angle mistyped in the thousands overflowed e^(mu theta) to Infinity.
+    if (angle_rad > 2 * Math.PI + 1e-9) return { error: "A single bend cannot exceed 360 degrees; enter each bend separately." };
     if (!(radius_ft > 0)) return { error: "Bend radius must be positive." };
     const T_in = tension;
     const T_out = T_in * Math.exp(mu * angle_rad);

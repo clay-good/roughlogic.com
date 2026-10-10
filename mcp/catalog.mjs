@@ -1200,9 +1200,16 @@ export async function run({ id, inputs } = {}) {
   // flagged in a warning rather than refused; JSON prints it as null.
   let unbounded = [];
   if (result && typeof result === "object" && !result.error) {
-    const nan = Object.entries(result).filter(([, v]) => typeof v === "number" && Number.isNaN(v)).map(([k]) => k);
-    if (nan.length) result = { error: "The calculator did not produce a finite value for " + nan.join(", ") + "." + missingNote + " Call describe_calculator for the inputs it needs." };
-    else unbounded = Object.entries(result).filter(([, v]) => v === Infinity || v === -Infinity).map(([k]) => k);
+    // Looked for at any depth: a list tile reports per-row figures in a nested array.
+    const walk = (v, path, test, hits) => {
+      if (typeof v === "number") { if (test(v)) hits.push(path); }
+      else if (Array.isArray(v)) v.forEach((x, i) => walk(x, `${path}[${i}]`, test, hits));
+      else if (v && typeof v === "object") for (const [k, x] of Object.entries(v)) walk(x, path ? `${path}.${k}` : k, test, hits);
+      return hits;
+    };
+    const nan = walk(result, "", Number.isNaN, []);
+    if (nan.length) result = { error: "The calculator did not produce a finite value for " + nan.slice(0, 6).join(", ") + "." + missingNote + " Call describe_calculator for the inputs it needs." };
+    else unbounded = walk(result, "", (v) => v === Infinity || v === -Infinity, []).slice(0, 12);
   }
   const out = { id, inputs: args || {}, usedExample, result };
   // spec-v1189: alongside the raw result, the rendered outputs a person sees —
