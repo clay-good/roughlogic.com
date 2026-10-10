@@ -2,99 +2,99 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "cef3c78dec83429d",
+      "sha": "ed56b6ef0eb24c38",
       "date": "2026-10-10"
     },
     "/tools/": {
-      "sha": "3beffbc2bae16d5a",
+      "sha": "a856fbe740814ce7",
       "date": "2026-10-10"
     },
     "/collections/disaster-response/": {
-      "sha": "ca1ee80a425db4af",
+      "sha": "3cd9576395374beb",
       "date": "2026-10-10"
     },
     "/groups/accounting/": {
-      "sha": "5572f6f1e83ff0ea",
+      "sha": "1ff786c0486ddf99",
       "date": "2026-10-10"
     },
     "/groups/agriculture/": {
-      "sha": "892bca7ee4db1b5c",
+      "sha": "38b0c5fde9479439",
       "date": "2026-10-10"
     },
     "/groups/construction/": {
-      "sha": "45b56d23521c2a9e",
+      "sha": "ff40d896c5af1eb4",
       "date": "2026-10-10"
     },
     "/groups/cross-trade/": {
-      "sha": "dffcea2351acb626",
+      "sha": "4cc1bc0784823826",
       "date": "2026-10-10"
     },
     "/groups/educators/": {
-      "sha": "38a1232e5974afc6",
+      "sha": "5eb3a7e99586fd1c",
       "date": "2026-10-10"
     },
     "/groups/electrical/": {
-      "sha": "e1a7474db9f08d97",
+      "sha": "140c0b83bb182eaa",
       "date": "2026-10-10"
     },
     "/groups/field/": {
-      "sha": "0619eba878446361",
+      "sha": "f302f083c8f67f47",
       "date": "2026-10-10"
     },
     "/groups/fire-ground/": {
-      "sha": "0fc735da3a0614c4",
+      "sha": "2309cf08dcf44753",
       "date": "2026-10-10"
     },
     "/groups/historical/": {
-      "sha": "d4177dfed213e1f9",
+      "sha": "290dd52846e3b5eb",
       "date": "2026-10-10"
     },
     "/groups/hvac/": {
-      "sha": "c8421a50804fc5f0",
+      "sha": "bbf4f582631554d5",
       "date": "2026-10-10"
     },
     "/groups/kitchen/": {
-      "sha": "e499b51b348ec39b",
+      "sha": "c59ff5b37a95cd47",
       "date": "2026-10-10"
     },
     "/groups/lab/": {
-      "sha": "e6f4029efc8e8c2e",
+      "sha": "39b523d44339d032",
       "date": "2026-10-10"
     },
     "/groups/mechanic/": {
-      "sha": "417f2eed549d5596",
+      "sha": "7e864ef4bc26cba0",
       "date": "2026-10-10"
     },
     "/groups/plumbing/": {
-      "sha": "07a7487ad245b3cf",
+      "sha": "4f6e099cb010473b",
       "date": "2026-10-10"
     },
     "/groups/real-estate/": {
-      "sha": "692774035b4dcf4a",
+      "sha": "1e605d2e487c5f31",
       "date": "2026-10-10"
     },
     "/groups/references/": {
-      "sha": "014f01d6e0af3193",
+      "sha": "792c832cbf53c9d5",
       "date": "2026-10-10"
     },
     "/groups/restoration/": {
-      "sha": "809836ec8703db41",
+      "sha": "bc996f2ac93b8953",
       "date": "2026-10-10"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "b4dca7ff2771d377",
+      "sha": "5a190663c0c85594",
       "date": "2026-10-10"
     },
     "/groups/stage/": {
-      "sha": "d33ab9ab3dda3d2d",
+      "sha": "54ac64c37173f33a",
       "date": "2026-10-10"
     },
     "/groups/trucking/": {
-      "sha": "d5de32424ebd6492",
+      "sha": "e26689ee40ec5993",
       "date": "2026-10-10"
     },
     "/groups/water/": {
-      "sha": "8fa356c0c4f75ca2",
+      "sha": "7a43daf5411e741c",
       "date": "2026-10-10"
     },
     "/tools/aav-install-check/": {
@@ -7274,12 +7274,12 @@
       "date": "2026-09-29"
     },
     "/tools/solar-altitude-angle/": {
-      "sha": "52b5f70d89839e22",
-      "date": "2026-09-29"
+      "sha": "fa3fe4e66a0b9d66",
+      "date": "2026-10-10"
     },
     "/tools/solar-azimuth-angle/": {
-      "sha": "bc894bd9a32e79c9",
-      "date": "2026-10-03"
+      "sha": "f90695846793a631",
+      "date": "2026-10-10"
     },
     "/tools/solar-egc-690-45/": {
       "sha": "86b591cd8f7f7616",
@@ -7288,6 +7288,10 @@
     "/tools/solar-thermal-collector/": {
       "sha": "49c8a57620d96de7",
       "date": "2026-09-29"
+    },
+    "/tools/solar-time-correction/": {
+      "sha": "c7b9ba63fd162a78",
+      "date": "2026-10-10"
     },
     "/tools/solar-times/": {
       "sha": "b4bd662c3858bfac",
@@ -8066,8 +8070,8 @@
       "date": "2026-09-29"
     },
     "/tools/thermistor-steinhart-hart/": {
-      "sha": "cff466096ef279a9",
-      "date": "2026-10-01"
+      "sha": "0b22260047692af6",
+      "date": "2026-10-10"
     },
     "/tools/thermoforming-draw-ratio/": {
       "sha": "734f176098bd1b78",

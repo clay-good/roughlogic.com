@@ -16832,7 +16832,19 @@ export const CITATIONS = {
       { name: "Altitude", value: "sin(altitude) = sin(lat) sin(dec) + cos(lat) cos(dec) cos(H)", source: "NOAA/ASHRAE solar geometry" },
       { name: "Declination", value: "dec = 23.45 sin(360 (284 + n)/365) (Cooper's equation)", source: "Cooper (1969)" },
       { name: "Hour angle", value: "H = 15 x (hours from solar noon); solar-noon form altitude = 90 - |lat - dec|", source: "solar geometry" },
-      { name: "Scope", value: "true solar time, flat horizon; refraction and the equation of time are separate", source: "scope of this tile" },
+      { name: "Scope", value: "true solar time, flat horizon; solar-time-correction converts a clock time; refraction is separate", source: "scope of this tile; solar-time-correction" },
+    ],
+  },
+  "solar-time-correction": {
+    formula: "Solar time = clock time + 4 (longitude - 15 x UTC offset) + E, in minutes, longitude in degrees with west negative. Equation of time E = 229.2 (0.000075 + 0.001868 cos B - 0.032077 sin B - 0.014615 cos 2B - 0.04089 sin 2B), B = (n - 1) 360/365 for day of year n. Hours from solar noon = solar time - 12. Solar noon on the clock = 12:00 minus the total correction.",
+    edition: "Spencer (1971) equation of time and the standard-to-solar time relation as given in Duffie and Beckman, Solar Engineering of Thermal Processes, eqs. 1.5.2 and 1.5.3, cited by name. The book writes longitudes in degrees west, solar time = standard time + 4 (Lst - Lloc) + E; with west negative and the standard meridian at 15 degrees per hour of UTC offset this is the same relation.",
+    freeAccess: "The series is five terms and is reproduced in NOAA's General Solar Position Calculations with nearly identical coefficients. Duffie and Beckman Example 1.5.1 (Madison, Wisconsin, 89.4 W, February 3, 10:30 Central Standard) gives E = -13.5 min and a solar time of 10:19; this tile returns -13.49 min and 10:19.",
+    governance: GOVERNANCE.general,
+    editionNote: "Good to about half a minute. The series repeats every 365 days, so it ignores the leap-year cycle and the slow drift of the orbit. Daylight time is handled by entering the offset the clock is keeping. A longitude correction over two hours is flagged as a probable sign error.",
+    assumptions: [
+      { name: "Equation of time", value: "Spencer's five-term series on day of year", source: "Duffie and Beckman eq. 1.5.3" },
+      { name: "Clock meridian", value: "15 degrees per hour of the entered UTC offset", source: "definition of zone time" },
+      { name: "Sign convention", value: "longitude and UTC offset negative west of Greenwich, as in solar-times", source: "scope of this tile" },
     ],
   },
   "solar-azimuth-angle": {
@@ -16844,7 +16856,7 @@ export const CITATIONS = {
     assumptions: [
       { name: "Azimuth", value: "gamma = atan2(cos(dec) sin(H), cos(H) cos(dec) sin(lat) - sin(dec) cos(lat)); compass = 180 + gamma", source: "NOAA / Duffie & Beckman solar geometry" },
       { name: "Declination / hour angle", value: "dec = 23.45 sin(360 (284 + n)/365) (Cooper); H = 15 x (hours from solar noon)", source: "solar geometry" },
-      { name: "Scope", value: "compass bearing clockwise from true north; true solar time, flat horizon; refraction and equation of time separate", source: "scope of this tile" },
+      { name: "Scope", value: "compass bearing clockwise from true north; true solar time, flat horizon; solar-time-correction converts a clock time; refraction is separate", source: "scope of this tile; solar-time-correction" },
     ],
   },
   "pv-max-ambient-for-power": {

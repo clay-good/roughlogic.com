@@ -1,7 +1,7 @@
 {
   "note": "spec-v1184 coverage ratchet. Tiles whose renderer exposes a render.schema consistent with the compute function. Grow with `node scripts/check-renderer-schema.mjs --write`; regeneration is intentional.",
-  "total_tiles": 2259,
-  "covered_count": 2185,
+  "total_tiles": 2260,
+  "covered_count": 2186,
   "covered": [
     "aav-install-check",
     "abatement-containment",
@@ -1741,6 +1741,7 @@
     "solar-azimuth-angle",
     "solar-egc-690-45",
     "solar-thermal-collector",
+    "solar-time-correction",
     "solar-times",
     "solar-water-pump-sizing",
     "solder-joint-quantity",

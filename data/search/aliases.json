@@ -117022,6 +117022,41 @@
    "term": "how much air leaks through the attic",
    "target": "zonal-add-a-hole",
    "kind": "question"
+  },
+  {
+   "term": "equation of time",
+   "target": "solar-time-correction",
+   "kind": "industry"
+  },
+  {
+   "term": "solar time from clock time",
+   "target": "solar-time-correction",
+   "kind": "industry"
+  },
+  {
+   "term": "local solar time",
+   "target": "solar-time-correction",
+   "kind": "industry"
+  },
+  {
+   "term": "apparent solar time",
+   "target": "solar-time-correction",
+   "kind": "industry"
+  },
+  {
+   "term": "hours from solar noon",
+   "target": "solar-time-correction",
+   "kind": "industry"
+  },
+  {
+   "term": "when is solar noon",
+   "target": "solar-time-correction",
+   "kind": "question"
+  },
+  {
+   "term": "what time is solar noon",
+   "target": "solar-time-correction",
+   "kind": "question"
   }
  ]
 }

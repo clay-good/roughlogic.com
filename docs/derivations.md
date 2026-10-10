@@ -3590,6 +3590,7 @@ cross-check.
 | calc-solarfield.js | `computeSolarAltitude` | `{ latitude_deg = 0, day_of_year = 355, hours_from_solar_noon = 0 } = {}` | _ | _ | _ |
 | calc-solarfield.js | `computeSolarAzimuth` | `{ latitude_deg = 0, day_of_year = 172, hours_from_solar_noon = 0 } = {}` | _ | _ | _ |
 | calc-solarfield.js | `computeSolarEgc69045` | `{ ocpd_rating_a = 0, pv_isc_a = 0, vd_upsized = "no" } = {}` | _ | _ | _ |
+| calc-solarfield.js | `computeSolarTimeCorrection` | `{ clock_hour = 12, clock_minute = 0, day_of_year = 1, longitude_deg = 0, utc_...` | _ | _ | _ |
 | calc-specialtytrades.js | `computeAwningCanopyLoad` | `{ projection_ft = 0, width_ft = 0, wind_speed_mph = 0, kz = 0.98, kzt = 1, kd...` | _ | _ | _ |
 | calc-specialtytrades.js | `computeElevatorHandlingCapacity` | `{ rise_ft = 0, car_speed_fpm = 0, passengers_per_trip = 0, probable_stops = 0...` | _ | _ | _ |
 | calc-specialtytrades.js | `computeEscalatorCapacity` | `{ speed_fpm = 0, step_depth_in = 0, persons_per_step = 1, loading_factor = 0....` | _ | _ | _ |
@@ -3929,7 +3930,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2513.
+Row count: 2514.
 
 <!-- END function-corpus-v14 -->
 
@@ -3997,7 +3998,7 @@ spec-v14 §12.1) record the v6 source-stamp recheck row in
 [docs/v6-audit.md](v6-audit.md) rather than a formula derivation,
 per spec-v14 §13.1 second paragraph.
 
-### Group A Electrical (260 tiles)
+### Group A Electrical (261 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4216,6 +4217,7 @@ per spec-v14 §13.1 second paragraph.
 | `solar-altitude-angle` | Solar Altitude / Winter-Design Sun Elevation | NOAA/ASHRAE solar geometry (Cooper's ...; dec = 23.45 sin(360 (284+355)/365) = -23.45; at solar noo... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `solar-azimuth-angle` | Solar Azimuth (Sun Compass Bearing) | NOAA / Duffie & Beckman solar geometr...; dec = 23.45; H = -45 deg; from-south gamma = atan2(cos23.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `solar-egc-690-45` | PV Equipment Grounding Conductor (NEC 690.45) | NFPA; 20 A OCPD -> 12 AWG copper EGC (above the 14 AWG floor) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `solar-time-correction` | Clock Time to Solar Time (Equation of Time and Longitude) | Duffie and Beckman; Example 1.5.1: Madison, Wisconsin (L = 89.4 W, standard m... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `speaker-70v-line` | 70-Volt Distributed Speaker Line | constant-voltage distributed audio pr...; sixteen 8 W taps (128 W) on a 200 W amp at 20% headroom -... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `splice-loss-mismatch` | Fusion Splice Loss from Fiber and Geometry Mismatch | Project (first-principles); splicer and fiber data and acceptance standards govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `split-phase-leg-balance` | 120/240 V Generator Leg Balance | Project (first-principles); spec-v1892 Section 3 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -6361,6 +6363,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 
-Tile count: 2259. Fixture-covered or reference-cadence: 2259 / 2259.
+Tile count: 2260. Fixture-covered or reference-cadence: 2260 / 2260.
 
 <!-- END tile-index-v14 -->

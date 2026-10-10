@@ -851,6 +851,7 @@ export const BESPOKE_OUTPUT_LABELS = {
   "solar-azimuth-angle": {"azimuth_deg":"Solar azimuth (compass bearing)","altitude_deg":"Solar altitude (for reference)","note":"Note"},
   "solar-egc-690-45": {"basis_current_a":"Sizing basis","egc_awg":"Required EGC (copper)","note":"Note"},
   "solar-thermal-collector": {"efficiency":"Collector efficiency","useful_btu_hr":"Useful heat output"},
+  "solar-time-correction": {"solar_time_text":"Solar time","hours_from_solar_noon":"Hours from solar noon","solar_noon_text":"Solar noon on the clock","note":"Note"},
   "solder-joint-quantity": {"solder_lb":"Solder in the joints (order about 2x: CDA adds 100% for waste)","spools":"Spools"},
   "soot-cleaning-takeoff": {"dry_sponges":"Chem sponges","labor_hours":"Dry-sponging labor","seal_coat":"Odor-seal primer"},
   "sous-vide-pasteurization": {"come_up_minutes":"Come-up time (min)","hold_minutes":"Hold time at bath temp (min)","total_minutes":"Total time (min)","warnings":"Notes"},

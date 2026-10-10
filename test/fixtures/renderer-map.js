@@ -127,6 +127,7 @@ export const RENDERER_MAP = {
   "shadow-length": { module: "../../calc-solarfield.js", exportName: "SOLARFIELD_RENDERERS" },
   "solar-altitude-angle": { module: "../../calc-solarfield.js", exportName: "SOLARFIELD_RENDERERS" },
   "solar-azimuth-angle": { module: "../../calc-solarfield.js", exportName: "SOLARFIELD_RENDERERS" },
+  "solar-time-correction": { module: "../../calc-solarfield.js", exportName: "SOLARFIELD_RENDERERS" },
   "pv-rail-clamp-takeoff": { module: "../../calc-solarfield.js", exportName: "SOLARFIELD_RENDERERS" },
   "pv-ballast-weight": { module: "../../calc-solarfield.js", exportName: "SOLARFIELD_RENDERERS" },
   "dc-shunt-sizing": { module: "../../calc-solarfield.js", exportName: "SOLARFIELD_RENDERERS" },

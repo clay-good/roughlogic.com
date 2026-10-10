@@ -170688,6 +170688,84 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "solar-time-correction",
+  "source_publisher": "Duffie and Beckman",
+  "source_title": "Solar Engineering of Thermal Processes",
+  "source_edition_or_year": "4th ed., Wiley, 2013",
+  "source_section_or_page": "Example 1.5.1: Madison, Wisconsin (L = 89.4 W, standard meridian 90 W), February 3 (n = 34), 10:30 AM Central Time. Printed: E = -13.5 min; solar time = standard time + 4 (90 - 89.4) - 13.5 = standard time - 11.1 min = 10:19. Read from the example as recalled; recomputed from eq. 1.5.3 to -13.49 min.",
+  "verified_by": "rl",
+  "verified_on": "2026-10-10",
+  "inputs": {
+   "clock_hour": 10,
+   "clock_minute": 30,
+   "day_of_year": 34,
+   "longitude_deg": -89.4,
+   "utc_offset_hours": -6
+  },
+  "outputs": {
+   "equation_of_time_min": {
+    "value": -13.5,
+    "tolerance": {
+     "abs": 0.05
+    }
+   },
+   "longitude_correction_min": {
+    "value": 2.4,
+    "tolerance": {
+     "abs": 0.001
+    }
+   },
+   "total_correction_min": {
+    "value": -11.1,
+    "tolerance": {
+     "abs": 0.05
+    }
+   },
+   "solar_time_hours": {
+    "value": 10.3167,
+    "tolerance": {
+     "abs": 0.01
+    }
+   }
+  }
+ },
+ {
+  "tile_id": "solar-time-correction",
+  "source_publisher": "Project (first-principles)",
+  "source_title": "Denver on daylight time, late June",
+  "source_edition_or_year": "zone-time definition and Spencer's series",
+  "source_section_or_page": "105 W is the Mountain meridian, but the clock keeps Central-equivalent UTC-6 in summer, so the site is 15 degrees west of the clock's meridian: -60 min. E on day 180 is -3.05 min. 13:00 MDT is 11:56.9 solar; solar noon is 13:03 on the clock.",
+  "verified_by": "rl",
+  "verified_on": "2026-10-10",
+  "inputs": {
+   "clock_hour": 13,
+   "clock_minute": 0,
+   "day_of_year": 180,
+   "longitude_deg": -105,
+   "utc_offset_hours": -6
+  },
+  "outputs": {
+   "longitude_correction_min": {
+    "value": -60,
+    "tolerance": {
+     "abs": 0.001
+    }
+   },
+   "equation_of_time_min": {
+    "value": -3.0517,
+    "tolerance": {
+     "abs": 0.001
+    }
+   },
+   "solar_noon_clock_hours": {
+    "value": 13.0509,
+    "tolerance": {
+     "abs": 0.001
+    }
+   }
+  }
  }
  ]
 }

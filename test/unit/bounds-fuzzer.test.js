@@ -59353,3 +59353,38 @@ test("bounds: zonal-add-a-hole reproduces the Energy Conservatory open-a-door ex
     assert.ok("error" in _zah({ ...ok, ...bad }), JSON.stringify(bad));
   }
 });
+
+import { computeSolarTimeCorrection as _stc, computeSolarAltitude as _stcAlt } from "../../calc-solarfield.js";
+test("bounds: solar-time-correction reproduces Duffie and Beckman Example 1.5.1 and the known shape of the equation of time", () => {
+  const m = _stc({ clock_hour: 10, clock_minute: 30, day_of_year: 34, longitude_deg: -89.4, utc_offset_hours: -6 });
+  assert.equal(m.equation_of_time_min.toFixed(1), "-13.5");
+  assert.ok(Math.abs(m.longitude_correction_min - 2.4) < 1e-9);
+  assert.equal(m.solar_time_text, "10:19");
+  assert.ok(Math.abs(m.hours_from_solar_noon - (m.solar_time_hours - 12)) < 1e-12);
+  // Extremes: about -14.2 min in mid-February and +16.4 min in early November; four zero crossings a year.
+  const e = (n) => _stc({ day_of_year: n }).equation_of_time_min;
+  let lo = Infinity, hi = -Infinity, loDay = 0, hiDay = 0, crossings = 0;
+  for (let n = 1; n <= 365; n++) {
+    if (e(n) < lo) { lo = e(n); loDay = n; }
+    if (e(n) > hi) { hi = e(n); hiDay = n; }
+    if (n > 1 && Math.sign(e(n)) !== Math.sign(e(n - 1))) crossings++;
+  }
+  // The series puts the February minimum on day 45, three days after the ephemeris date.
+  assert.ok(Math.abs(lo + 14.2) < 0.2 && Math.abs(loDay - 42) <= 4);
+  assert.ok(Math.abs(hi - 16.4) < 0.2 && Math.abs(hiDay - 307) <= 4);
+  assert.equal(crossings, 4);
+  // On the clock's own meridian the only correction is the equation of time.
+  assert.ok(Math.abs(_stc({ day_of_year: 100, longitude_deg: -90, utc_offset_hours: -6 }).longitude_correction_min) < 1e-12);
+  // Daylight time (offset one hour more) puts solar noon exactly an hour later on the clock.
+  const std = _stc({ day_of_year: 180, longitude_deg: -105, utc_offset_hours: -7 }), dst = _stc({ day_of_year: 180, longitude_deg: -105, utc_offset_hours: -6 });
+  assert.ok(Math.abs(dst.solar_noon_clock_hours - std.solar_noon_clock_hours - 1) < 1e-12);
+  // At the clock time it reports as solar noon, the sun is at its daily high: altitude = 90 - |lat - dec|.
+  const noon = _stc({ clock_hour: Math.floor(std.solar_noon_clock_hours), clock_minute: (std.solar_noon_clock_hours % 1) * 60, day_of_year: 180, longitude_deg: -105, utc_offset_hours: -7 });
+  assert.ok(Math.abs(noon.hours_from_solar_noon) < 1e-9);
+  const alt = _stcAlt({ latitude_deg: 40, day_of_year: 180, hours_from_solar_noon: noon.hours_from_solar_noon });
+  assert.ok(Math.abs(alt.altitude_deg - (90 - Math.abs(40 - alt.declination_deg))) < 1e-6);
+  assert.equal(_stc({ longitude_deg: 105, utc_offset_hours: -7 }).far_from_meridian, true);
+  for (const bad of [{ clock_hour: 24 }, { clock_hour: -1 }, { clock_minute: 60 }, { day_of_year: 0 }, { day_of_year: 367 }, { longitude_deg: 181 }, { utc_offset_hours: -13 }, { utc_offset_hours: 15 }]) {
+    assert.ok("error" in _stc({ clock_hour: 10, clock_minute: 30, day_of_year: 34, longitude_deg: -89.4, utc_offset_hours: -6, ...bad }), JSON.stringify(bad));
+  }
+});

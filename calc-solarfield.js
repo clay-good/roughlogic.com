@@ -142,12 +142,12 @@ export function computeSolarAltitude({ latitude_deg = 0, day_of_year = 355, hour
   if (![declination_deg, hour_angle_deg, altitude_deg].every(Number.isFinite)) return { error: "Solar-altitude math is not a finite value." };
   return {
     altitude_deg, declination_deg, hour_angle_deg, below_horizon: altitude_deg <= 0,
-    note: "The solar altitude (elevation) angle, the sun position the shadow-length and pv-row-spacing tiles need but no tile produced (solar-times gives sunrise/sunset and declination, not altitude). sin(altitude) = sin(lat) sin(dec) + cos(lat) cos(dec) cos(H), with the declination from Cooper's equation dec = 23.45 sin(360 (284 + n)/365) for day-of-year n and the hour angle H = 15 x (hours from solar noon), negative in the morning. At solar noon (H = 0) this reduces to altitude = 90 - |lat - dec|, the WINTER-DESIGN sun elevation a shading, solar-access, tree, or setback study turns on: at 40 deg N on the winter solstice (n = 355, dec = -23.4) the noon sun reaches only 26.6 deg, and by 3 p.m. it has dropped to about 14 deg. Feed the altitude into the shadow-length tile or the noon/3 p.m. value into pv-row-spacing as the profile angle. A negative altitude means the sun is below the horizon (reported, not errored). True solar time and a flat horizon are assumed; the equation of time (from solar-times), refraction near the horizon, and terrain are separate. A site-planning geometry; the engineer of record and the actual sun path govern.",
+    note: "The solar altitude (elevation) angle, the sun position the shadow-length and pv-row-spacing tiles need but no tile produced (solar-times gives sunrise/sunset and declination, not altitude). sin(altitude) = sin(lat) sin(dec) + cos(lat) cos(dec) cos(H), with the declination from Cooper's equation dec = 23.45 sin(360 (284 + n)/365) for day-of-year n and the hour angle H = 15 x (hours from solar noon), negative in the morning. At solar noon (H = 0) this reduces to altitude = 90 - |lat - dec|, the WINTER-DESIGN sun elevation a shading, solar-access, tree, or setback study turns on: at 40 deg N on the winter solstice (n = 355, dec = -23.4) the noon sun reaches only 26.6 deg, and by 3 p.m. it has dropped to about 14 deg. Feed the altitude into the shadow-length tile or the noon/3 p.m. value into pv-row-spacing as the profile angle. A negative altitude means the sun is below the horizon (reported, not errored). True solar time and a flat horizon are assumed; solar-time-correction converts a clock time to hours from solar noon, and refraction near the horizon and terrain are separate. A site-planning geometry; the engineer of record and the actual sun path govern.",
   };
 }
 export const solarAltitudeExample = { inputs: { latitude_deg: 40, day_of_year: 355, hours_from_solar_noon: 0 } };
 function renderSolarAltitude(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: solar altitude angle (NOAA/ASHRAE solar geometry): sin(altitude) = sin(lat) sin(dec) + cos(lat) cos(dec) cos(H), with the declination from Cooper's equation dec = 23.45 sin(360 (284 + n)/365) and the hour angle H = 15 (hours from solar noon); at solar noon altitude = 90 - |lat - dec|. True solar time and a flat horizon assumed; refraction and the equation of time are separate. A site-planning geometry; the actual sun path governs.";
+  citationEl.textContent = "Citation: solar altitude angle (NOAA/ASHRAE solar geometry): sin(altitude) = sin(lat) sin(dec) + cos(lat) cos(dec) cos(H), with the declination from Cooper's equation dec = 23.45 sin(360 (284 + n)/365) and the hour angle H = 15 (hours from solar noon); at solar noon altitude = 90 - |lat - dec|. True solar time and a flat horizon assumed; solar-time-correction converts a clock time, and refraction is separate. A site-planning geometry; the actual sun path governs.";
   const lat = makeNumber("Latitude (deg, + north)", "salt-lat", { step: "any" });
   const doy = makeNumber("Day of year (1-365; 355 = winter solstice)", "salt-doy", { step: "1", min: "1", max: "366" });
   const hrs = makeNumber("Hours from solar noon (- morning, + afternoon)", "salt-hrs", { step: "any", min: "-12", max: "12" });
@@ -167,6 +167,70 @@ function renderSolarAltitude(inputRegion, outputRegion, citationEl) {
   for (const f of [lat, doy, hrs]) f.input.addEventListener("input", update);
 }
 SOLARFIELD_RENDERERS["solar-altitude-angle"] = renderSolarAltitude;
+
+const _clockText = (hours) => {
+  let m = Math.round(hours * 60) % 1440;
+  if (m < 0) m += 1440;
+  return (m - m % 60) / 60 + ":" + String(m % 60).padStart(2, "0");
+};
+// ===================== spec-v1956: clock time to solar time =====================
+// solar-altitude-angle and solar-azimuth-angle take "hours from solar noon" and say the equation
+// of time is separate; a person on site has a clock. Solar time = clock time + 4 min per degree
+// the site sits east of its time-zone meridian + the equation of time E, with E from Spencer's
+// series as Duffie & Beckman print it (eq. 1.5.3) and B = (n - 1) 360/365.
+// dims: in { clock_hour: T, clock_minute: T, day_of_year: dimensionless, longitude_deg: dimensionless, utc_offset_hours: T } out: { equation_of_time_min: T, longitude_correction_min: T, total_correction_min: T, solar_time_hours: T, hours_from_solar_noon: dimensionless, solar_noon_clock_hours: T }
+export function computeSolarTimeCorrection({ clock_hour = 12, clock_minute = 0, day_of_year = 1, longitude_deg = 0, utc_offset_hours = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(clock_hour >= 0 && clock_hour < 24)) return { error: "Clock hour must be from 0 to 23 (24-hour clock)." };
+  if (!(clock_minute >= 0 && clock_minute < 60)) return { error: "Clock minute must be from 0 to 59." };
+  if (!(day_of_year >= 1 && day_of_year <= 366)) return { error: "Day of year must be between 1 and 366." };
+  if (!(longitude_deg >= -180 && longitude_deg <= 180)) return { error: "Longitude must be between -180 and 180 degrees (west is negative)." };
+  if (!(utc_offset_hours >= -12 && utc_offset_hours <= 14)) return { error: "The clock's UTC offset must be between -12 and +14 hours." };
+  const B = (day_of_year - 1) * 2 * Math.PI / 365;
+  const equation_of_time_min = 229.2 * (0.000075 + 0.001868 * Math.cos(B) - 0.032077 * Math.sin(B) - 0.014615 * Math.cos(2 * B) - 0.04089 * Math.sin(2 * B));
+  // 4 minutes per degree east of the meridian the clock keeps (15 deg per hour of offset).
+  const longitude_correction_min = 4 * (longitude_deg - 15 * utc_offset_hours);
+  const total_correction_min = longitude_correction_min + equation_of_time_min;
+  const clock_hours = clock_hour + clock_minute / 60;
+  const solar_time_hours = clock_hours + total_correction_min / 60;
+  const hours_from_solar_noon = solar_time_hours - 12;
+  const solar_noon_clock_hours = 12 - total_correction_min / 60;
+  if (![equation_of_time_min, solar_time_hours, solar_noon_clock_hours].every(Number.isFinite)) return { error: "Solar-time math is not a finite value." };
+  const far_from_meridian = Math.abs(longitude_correction_min) > 120;
+  return {
+    equation_of_time_min, longitude_correction_min, total_correction_min, solar_time_hours, hours_from_solar_noon, solar_noon_clock_hours,
+    solar_time_text: _clockText(solar_time_hours), solar_noon_text: _clockText(solar_noon_clock_hours), far_from_meridian,
+    note: "Converts the time on a clock to true solar time, the time the sun keeps, which is what solar-altitude-angle, solar-azimuth-angle and any shading study run on. Two corrections apply. The first is where the site sits in its time zone: the sun crosses a meridian 4 minutes later for each degree west, so a site west of the meridian its clock keeps (15 degrees per hour of UTC offset) runs behind the clock. The second is the equation of time, the seasonal drift of the real sun against a steady clock from the tilt of the earth's axis and its elliptical orbit: about 14 minutes behind in mid-February and 16 minutes ahead in early November, crossing zero four times a year. Solar time = clock time + 4 x (longitude - 15 x UTC offset) + equation of time, longitude in degrees with west negative. Enter the offset the clock is actually keeping: Central Standard is -6 and Central Daylight is -5, so daylight time moves solar noon an hour later on the clock without a separate step. The hours-from-solar-noon figure (negative in the morning) is the input the sun-angle calculators take. A longitude correction over two hours usually means a wrong sign on the longitude or the offset." + (far_from_meridian ? " THIS ENTRY is more than two hours from its clock's meridian -- check both signs." : "") + " The equation of time here is Spencer's series, good to about half a minute; it ignores the year-to-year shift of a few seconds and the leap-day offset. An ephemeris governs where seconds matter.",
+  };
+}
+export const solarTimeCorrectionExample = { inputs: { clock_hour: 10, clock_minute: 30, day_of_year: 34, longitude_deg: -89.4, utc_offset_hours: -6 } };
+function renderSolarTimeCorrection(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: solar time = standard time + 4 (Lst - Lloc) + E, minutes, with longitudes in degrees west and the equation of time E = 229.2 (0.000075 + 0.001868 cos B - 0.032077 sin B - 0.014615 cos 2B - 0.04089 sin 2B), B = (n - 1) 360/365 (Spencer 1971, as given in Duffie and Beckman, Solar Engineering of Thermal Processes, eqs. 1.5.2 and 1.5.3). Entered here with west longitude negative and the clock's UTC offset, which is the same relation. Good to about half a minute; an ephemeris governs.";
+  const hr = makeNumber("Clock hour (0-23)", "stc-hr", { step: "1", min: "0", max: "23" });
+  const mn = makeNumber("Clock minute (0-59)", "stc-mn", { step: "any", min: "0", max: "59" });
+  const doy = makeNumber("Day of year (1-365; Feb 3 = 34)", "stc-doy", { step: "1", min: "1", max: "366" });
+  const lon = makeNumber("Longitude (deg, west negative)", "stc-lon", { step: "any", min: "-180", max: "180" });
+  const utc = makeNumber("Clock's UTC offset (h; CST -6, CDT -5)", "stc-utc", { step: "any", min: "-12", max: "14" });
+  for (const f of [hr, mn, doy, lon, utc]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { hr.input.value = "10"; mn.input.value = "30"; doy.input.value = "34"; lon.input.value = "-89.4"; utc.input.value = "-6"; update(); });
+  const oSol = makeOutputLine(outputRegion, "Solar time", "stc-out-sol");
+  const oHrs = makeOutputLine(outputRegion, "Hours from solar noon", "stc-out-hrs");
+  const oNoon = makeOutputLine(outputRegion, "Solar noon on the clock", "stc-out-noon");
+  const oCor = makeOutputLine(outputRegion, "Equation of time / longitude correction", "stc-out-cor");
+  const oNote = makeOutputLine(outputRegion, "Note", "stc-out-n");
+  function readNum(i) { if (i.value === "") return 0; const v = Number(i.value); return Number.isFinite(v) ? v : 0; }
+  const update = debounce(() => {
+    const r = computeSolarTimeCorrection({ clock_hour: readNum(hr.input), clock_minute: readNum(mn.input), day_of_year: readNum(doy.input), longitude_deg: readNum(lon.input), utc_offset_hours: readNum(utc.input) });
+    if (r.error) { oSol.textContent = r.error; oHrs.textContent = "-"; oNoon.textContent = "-"; oCor.textContent = "-"; oNote.textContent = ""; return; }
+    oSol.textContent = r.solar_time_text + " (clock " + (r.total_correction_min >= 0 ? "+" : "-") + fmt(Math.abs(r.total_correction_min), 1) + " min)";
+    oHrs.textContent = fmt(r.hours_from_solar_noon, 2) + " h";
+    oNoon.textContent = r.solar_noon_text;
+    oCor.textContent = fmt(r.equation_of_time_min, 1) + " min / " + fmt(r.longitude_correction_min, 1) + " min";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [hr, mn, doy, lon, utc]) f.input.addEventListener("input", update);
+}
+SOLARFIELD_RENDERERS["solar-time-correction"] = renderSolarTimeCorrection;
 
 // spec-v1248: solar azimuth (compass bearing of the sun). The companion to solar-altitude-angle:
 // window-overhang-shade and shadow-DIRECTION studies need the azimuth, but solar-altitude produces
@@ -198,12 +262,12 @@ export function computeSolarAzimuth({ latitude_deg = 0, day_of_year = 172, hours
   if (![azimuth_deg, altitude_deg, declination_deg, hour_angle_deg].every(Number.isFinite)) return { error: "Solar-azimuth math is not a finite value." };
   return {
     azimuth_deg, altitude_deg, declination_deg, hour_angle_deg, compass, below_horizon: altitude_deg <= 0,
-    note: "The solar azimuth, the sun's compass bearing (degrees clockwise from true north: 90 = due east, 180 = due south, 270 = due west), the companion the window-overhang-shade tile and any shadow-DIRECTION study need alongside the altitude that solar-altitude-angle produces. It uses the robust two-argument form azimuth-from-south gamma = atan2(cos(dec) sin(H), cos(H) cos(dec) sin(lat) - sin(dec) cos(lat)), then compass bearing = 180 + gamma, with the declination from Cooper's equation dec = 23.45 sin(360 (284 + n)/365) and the hour angle H = 15 x (hours from solar noon), negative in the morning. At solar noon north of the Tropic of Cancer (latitude above the declination) the sun bears due south (180 deg); before noon it is to the east (bearing < 180) and after noon to the west (> 180). At 40 deg N on the summer solstice the sunrise sun sits well north of east (bearing ~ 58 deg) and swings to due south at noon. The shadow points in the opposite direction (bearing +/- 180). This is the compass bearing paired with the altitude to place the sun in the sky or aim a fixed panel; true solar time and a flat horizon are assumed, and the equation of time (from solar-times) and refraction are separate. A site-planning geometry; the actual sun path governs.",
+    note: "The solar azimuth, the sun's compass bearing (degrees clockwise from true north: 90 = due east, 180 = due south, 270 = due west), the companion the window-overhang-shade tile and any shadow-DIRECTION study need alongside the altitude that solar-altitude-angle produces. It uses the robust two-argument form azimuth-from-south gamma = atan2(cos(dec) sin(H), cos(H) cos(dec) sin(lat) - sin(dec) cos(lat)), then compass bearing = 180 + gamma, with the declination from Cooper's equation dec = 23.45 sin(360 (284 + n)/365) and the hour angle H = 15 x (hours from solar noon), negative in the morning. At solar noon north of the Tropic of Cancer (latitude above the declination) the sun bears due south (180 deg); before noon it is to the east (bearing < 180) and after noon to the west (> 180). At 40 deg N on the summer solstice the sunrise sun sits well north of east (bearing ~ 58 deg) and swings to due south at noon. The shadow points in the opposite direction (bearing +/- 180). This is the compass bearing paired with the altitude to place the sun in the sky or aim a fixed panel; true solar time and a flat horizon are assumed; solar-time-correction converts a clock time to hours from solar noon, and refraction is separate. A site-planning geometry; the actual sun path governs.",
   };
 }
 export const solarAzimuthExample = { inputs: { latitude_deg: 40, day_of_year: 172, hours_from_solar_noon: -3 } };
 function renderSolarAzimuth(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: solar azimuth (compass bearing, clockwise from true north): from-south azimuth gamma = atan2(cos(dec) sin(H), cos(H) cos(dec) sin(lat) - sin(dec) cos(lat)), compass = 180 + gamma; declination from Cooper's equation dec = 23.45 sin(360 (284 + n)/365), hour angle H = 15 (hours from solar noon) (NOAA / Duffie & Beckman solar geometry). At solar noon north of the Tropic of Cancer (latitude above the declination) the sun bears due south (180 deg). True solar time and a flat horizon assumed; the equation of time and refraction are separate. The actual sun path governs.";
+  citationEl.textContent = "Citation: solar azimuth (compass bearing, clockwise from true north): from-south azimuth gamma = atan2(cos(dec) sin(H), cos(H) cos(dec) sin(lat) - sin(dec) cos(lat)), compass = 180 + gamma; declination from Cooper's equation dec = 23.45 sin(360 (284 + n)/365), hour angle H = 15 (hours from solar noon) (NOAA / Duffie & Beckman solar geometry). At solar noon north of the Tropic of Cancer (latitude above the declination) the sun bears due south (180 deg). True solar time and a flat horizon assumed; solar-time-correction converts a clock time, and refraction is separate. The actual sun path governs.";
   const lat = makeNumber("Latitude (deg, + north)", "sazi-lat", { step: "any" });
   const doy = makeNumber("Day of year (1-365; 172 = summer solstice)", "sazi-doy", { step: "1", min: "1", max: "366" });
   const hrs = makeNumber("Hours from solar noon (- morning, + afternoon)", "sazi-hrs", { step: "any", min: "-12", max: "12" });

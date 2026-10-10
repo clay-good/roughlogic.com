@@ -1144,6 +1144,7 @@ export const COMPUTE_MAP = {
   "shadow-length": { module: "../../calc-solarfield.js", fn: "computeShadowLength" },
   "solar-altitude-angle": { module: "../../calc-solarfield.js", fn: "computeSolarAltitude" },
   "solar-azimuth-angle": { module: "../../calc-solarfield.js", fn: "computeSolarAzimuth" },
+  "solar-time-correction": { module: "../../calc-solarfield.js", fn: "computeSolarTimeCorrection" },
   "engine-bmep": { module: "../../calc-mechanic.js", fn: "computeEngineBmep" },
   "compressor-displacement": { module: "../../calc-refrigerant.js", fn: "computeCompressorDisplacement" },
   "compressor-volumetric-efficiency": { module: "../../calc-refrigerant.js", fn: "computeCompressorVolumetricEfficiency" },

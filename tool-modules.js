@@ -139,7 +139,7 @@ export const TOOL_MODULES = (() => {
   // existing public behavior.
   declare("./calc-solarfield.js", "SOLARFIELD_RENDERERS", [
     "solar-egc-690-45", "shadow-length", "solar-altitude-angle",
-    "solar-azimuth-angle", "pv-rail-clamp-takeoff", "pv-ballast-weight",
+    "solar-azimuth-angle", "solar-time-correction", "pv-rail-clamp-takeoff", "pv-ballast-weight",
     "dc-shunt-sizing", "ev-range-per-hour", "battery-series-parallel",
     "bifacial-pv-gain",
   ]);

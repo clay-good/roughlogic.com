@@ -587,6 +587,7 @@ export const BESPOKE_OUTPUT_UNITS = {
   "soil-stabilization-quantity": {"tons":{"prefix":"","suffix":" tons","digits":1},"spread_lb_per_sy":{"prefix":"","suffix":" lb/sy","digits":1}},
   "soil-swell-shrink": {"loose_cy":{"prefix":"","suffix":" cy","digits":1},"compacted_cy":{"prefix":"","suffix":" cy","digits":1}},
   "solar-thermal-collector": {"efficiency":{"prefix":"","suffix":"%","digits":1,"scale":100}},
+  "solar-time-correction": {"hours_from_solar_noon":{"prefix":"","suffix":" h","digits":2}},
   "solder-joint-quantity": {"solder_lb":{"prefix":"","suffix":" lb","digits":2},"spools":{"prefix":"","suffix":" spools","digits":0}},
   "soot-cleaning-takeoff": {"dry_sponges":{"prefix":"","suffix":" sponges"},"labor_hours":{"prefix":"","suffix":" hr","digits":1}},
   "sous-vide-pasteurization": {"come_up_minutes":{"prefix":"","suffix":" min","digits":1},"hold_minutes":{"prefix":"","suffix":" min","digits":1},"total_minutes":{"prefix":"","suffix":" min","digits":1}},
