@@ -23297,7 +23297,20 @@ export const CITATIONS = {
     assumptions: [
       { name: "Flow exponent 0.65", value: "real envelopes run roughly 0.5 to 0.75", source: "the power-law leakage model" },
       { name: "Series leakage, two planes", value: "a zone with a third path is not this model", source: "a multi-point diagnostic" },
-      { name: "A ratio, not a flow", value: "it does not report cfm through either plane", source: "an add-a-hole measurement" },
+      { name: "A ratio, not a flow", value: "it does not report cfm through either plane; zonal-add-a-hole does, from an add-a-hole test", source: "an add-a-hole measurement; zonal-add-a-hole" },
+    ],
+  },
+  "zonal-add-a-hole": {
+    formula: "Two planes in series carry the same flow: C_hz (P - z)^n = C_zo z^n, with P the house pressure and z the zone pressure, both to outside, n = 0.65. A hole in the house-side plane leaves C_zo unchanged, so C_zo = dQ / (z_after^n - z_before^n); a hole in the outdoor-side plane leaves C_hz unchanged, so C_hz = dQ / ((P - z_after)^n - (P - z_before)^n). dQ is the rise in blower-door flow at the same P. Path flow before the hole = C_hz (P - z_before)^n; each plane alone at house pressure = C P^n.",
+    edition: "The add-a-hole and open-a-door methods of zone pressure diagnostics (Michael Blasnik and Jim Fitzgerald), as charted by Cox and Olson in The Energy Conservatory's Zone Pressure Diagnostics (ZPD) Trainer Software User's Guide, 2014, cited by name.",
+    freeAccess: "Free at energyconservatory.com/wp-content/uploads/2014/07/zpd_trainer_manual.pdf. Its Open a Door #1 demonstration (p. 8: garage 45 Pa to the house, 3,595 then 4,503 CFM50) prints 280 CFM50 garage to house, 1,170 garage to outside, 262 total path leakage and 7.3% of total leakage; this tile returns 280.5, 1,169.9, 261.9 and 7.29%.",
+    governance: GOVERNANCE.general,
+    editionNote: "The path flow is the ceiling on what sealing that zone can take off the blower-door number, not a forecast: it assumes one plane sealed perfectly. The per-plane figures are each plane alone under the full house pressure and are larger than the path flow. The result divides a flow difference by a difference of pressures raised to 0.65, so a small pressure change makes it sensitive to gauge and wind noise; the guide's own charts mark that region as high uncertainty and say a larger hole reduces it.",
+    assumptions: [
+      { name: "Flow exponent 0.65 on both planes", value: "real envelopes run roughly 0.5 to 0.75", source: "the power-law leakage model" },
+      { name: "Unopened plane unchanged", value: "its coefficient is the same before and after the hole", source: "the add-a-hole method" },
+      { name: "Series leakage, two planes", value: "a zone with a third path is not this model", source: "a multi-point diagnostic" },
+      { name: "Small-change caution", value: "flagged when the zone moves less than a tenth of the house pressure", source: "scope of this tile" },
     ],
   },
   "caz-depressurization-limit": {

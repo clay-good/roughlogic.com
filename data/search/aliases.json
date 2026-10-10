@@ -112420,7 +112420,7 @@
   },
   {
    "term": "add a hole test",
-   "target": "zonal-pressure-diagnostics",
+   "target": "zonal-add-a-hole",
    "kind": "industry"
   },
   {
@@ -116991,6 +116991,36 @@
   {
    "term": "how fast do cuttings fall in mud",
    "target": "cuttings-slip-velocity",
+   "kind": "question"
+  },
+  {
+   "term": "add a hole method",
+   "target": "zonal-add-a-hole",
+   "kind": "industry"
+  },
+  {
+   "term": "open a door method zone leakage",
+   "target": "zonal-add-a-hole",
+   "kind": "industry"
+  },
+  {
+   "term": "zone leakage cfm50",
+   "target": "zonal-add-a-hole",
+   "kind": "industry"
+  },
+  {
+   "term": "attic bypass leakage cfm",
+   "target": "zonal-add-a-hole",
+   "kind": "industry"
+  },
+  {
+   "term": "house to garage leakage",
+   "target": "zonal-add-a-hole",
+   "kind": "industry"
+  },
+  {
+   "term": "how much air leaks through the attic",
+   "target": "zonal-add-a-hole",
    "kind": "question"
   }
  ]

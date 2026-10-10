@@ -427,12 +427,12 @@ export function computeZonalPressureDiagnostics({
     zone_a_ratio: a.ratio, zone_a_path_ratio: a.path_ratio, zone_a_verdict: a.verdict, zone_a_present: a.present,
     zone_b_ratio: b.ratio, zone_b_path_ratio: b.path_ratio, zone_b_verdict: b.verdict, zone_b_present: b.present,
     both, priority,
-    note: "What a zone's pressure reading during a blower-door test says about where its leakage actually is. Two leakage paths in series -- house to attic, attic to outside -- divide the pressure between them exactly as two resistors divide a voltage, so the intermediate zone's pressure is a direct readout of which path has the resistance. A zone sitting near house pressure has almost all its resistance between itself and outdoors, meaning the plane between it and the house is wide open and the zone is effectively part of the house. A zone sitting near outdoor pressure has a tight plane on the house side and is effectively outdoors. That single reading redirects the work, which is the whole value of it. A high pressure ratio at the attic says seal the ceiling plane -- top plates, wire and pipe penetrations, the attic hatch, recessed lights -- and blowing more insulation on top of an unsealed ceiling is close to wasted money, because insulation does not stop air. A low ratio says the ceiling is already tight and the money is elsewhere in the building. The leakage path ratio reported here puts a number on it rather than leaving it as a direction, because the 0.65-power relation is not intuitive: a pressure ratio of a half means the two paths are equally leaky, and the ratio climbs steeply on either side of that. Two readings are usually taken together, because the priority between planes is what a scope of work needs. The add-a-hole method extends this: opening a known hole to outside and re-reading isolates each path separately, which turns the ratio into an actual leakage area rather than a comparison. That refinement is not computed here. This interprets ENTERED readings from a blower-door test with the house held at a reference pressure: it does not perform the test, correct for the sign or reference of each gauge (a reading taken against the wrong reference inverts the conclusion), estimate leakage areas in absolute terms, or account for a zone with more than two significant paths, such as an attic connected to a garage. The BPI or RESNET procedure in force and the technician's own judgment govern.",
+    note: "What a zone's pressure reading during a blower-door test says about where its leakage actually is. Two leakage paths in series -- house to attic, attic to outside -- divide the pressure between them exactly as two resistors divide a voltage, so the intermediate zone's pressure is a direct readout of which path has the resistance. A zone sitting near house pressure has almost all its resistance between itself and outdoors, meaning the plane between it and the house is wide open and the zone is effectively part of the house. A zone sitting near outdoor pressure has a tight plane on the house side and is effectively outdoors. That single reading redirects the work, which is the whole value of it. A high pressure ratio at the attic says seal the ceiling plane -- top plates, wire and pipe penetrations, the attic hatch, recessed lights -- and blowing more insulation on top of an unsealed ceiling is close to wasted money, because insulation does not stop air. A low ratio says the ceiling is already tight and the money is elsewhere in the building. The leakage path ratio reported here puts a number on it rather than leaving it as a direction, because the 0.65-power relation is not intuitive: a pressure ratio of a half means the two paths are equally leaky, and the ratio climbs steeply on either side of that. Two readings are usually taken together, because the priority between planes is what a scope of work needs. The add-a-hole method extends this: opening a hole in one plane and re-reading the zone and the blower door isolates each path, which turns the ratio into actual flows rather than a comparison. zonal-add-a-hole computes that. This interprets ENTERED readings from a blower-door test with the house held at a reference pressure: it does not perform the test, correct for the sign or reference of each gauge (a reading taken against the wrong reference inverts the conclusion), estimate leakage areas in absolute terms, or account for a zone with more than two significant paths, such as an attic connected to a garage. The BPI or RESNET procedure in force and the technician's own judgment govern.",
   };
 }
 export const zonalPressureDiagnosticsExample = { inputs: { house_pressure_pa: 50, zone_a_pressure_pa: 42, zone_b_pressure_pa: 6, zone_a_label: "attic", zone_b_label: "crawl" } };
 BUILDINGPERF_RENDERERS["zonal-pressure-diagnostics"] = _simpleRenderer({
-  citation: "Citation: zonal pressure diagnostics as blower-door practice states it -- the pressure ratio PR = zone-to-outside over house-to-outside, with two leakage paths in series dividing the pressure like resistors, and the ratio of house-to-zone leakage to zone-to-outside leakage equal to (PR / (1 - PR))^0.65, the field leakage exponent. Readings are ENTERED from a test with the house at a reference pressure. It does not perform the test, correct for gauge sign or reference (a reading against the wrong reference inverts the conclusion), estimate leakage areas in absolute terms (the add-a-hole method does that and is not computed here), or handle a zone with more than two significant paths. The BPI or RESNET procedure in force governs.",
+  citation: "Citation: zonal pressure diagnostics as blower-door practice states it -- the pressure ratio PR = zone-to-outside over house-to-outside, with two leakage paths in series dividing the pressure like resistors, and the ratio of house-to-zone leakage to zone-to-outside leakage equal to (PR / (1 - PR))^0.65, the field leakage exponent. Readings are ENTERED from a test with the house at a reference pressure. It does not perform the test, correct for gauge sign or reference (a reading against the wrong reference inverts the conclusion), estimate leakage in absolute terms (zonal-add-a-hole does that from an add-a-hole test), or handle a zone with more than two significant paths. The BPI or RESNET procedure in force governs.",
   example: zonalPressureDiagnosticsExample.inputs,
   fields: [
     { key: "house_pressure_pa", label: "House to outside (Pa)", kind: "number", default: 50, attrs: { step: "any" } },
@@ -448,6 +448,80 @@ BUILDINGPERF_RENDERERS["zonal-pressure-diagnostics"] = _simpleRenderer({
     { key: "n", id: "zpd-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeZonalPressureDiagnostics,
+});
+
+// =====================================================================
+// spec-v1955: add-a-hole zone leakage (flows through each plane).
+// =====================================================================
+//
+// A zone pressure alone gives the RATIO of the two planes. Opening a hole in
+// one plane and re-reading the zone and the blower door turns it into flows:
+// the plane that was NOT opened keeps its coefficient, so the change in
+// blower-door flow is that plane's flow change, C (dP_after^n - dP_before^n).
+// dims: in { house_pressure_pa: M L^-1 T^-2, zone_before_pa: M L^-1 T^-2, zone_after_pa: M L^-1 T^-2, cfm_before: L^3 T^-1, cfm_after: L^3 T^-1 } out: { flow_change_cfm: L^3 T^-1, path_flow_cfm: L^3 T^-1, path_share_pct: dimensionless, house_to_zone_cfm50: L^3 T^-1, zone_to_outside_cfm50: L^3 T^-1 }
+export function computeZonalAddAHole({
+  house_pressure_pa = 50, hole_side = "house", zone_before_pa = 0, zone_after_pa = 0,
+  cfm_before = 0, cfm_after = 0,
+} = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (hole_side !== "house" && hole_side !== "outside") return { error: "Choose which plane the hole was opened in: house to zone, or zone to outside." };
+  if (!(house_pressure_pa > 0)) return { error: "The house-to-outside pressure must be positive (Pa)." };
+  if (zone_before_pa < 0 || zone_after_pa < 0) return { error: "Zone pressures cannot be negative (Pa) -- enter the magnitude of the zone-to-outside difference." };
+  if (zone_before_pa > house_pressure_pa || zone_after_pa > house_pressure_pa) return { error: "A zone cannot read a larger pressure to outside than the house does -- check which reference each reading was taken against." };
+  if (!(zone_before_pa > 0) || zone_before_pa >= house_pressure_pa) return { error: "Before the hole the zone must read between outdoor and house pressure. At either end one plane is already open and there is no series path to split." };
+  if (hole_side === "house" && !(zone_after_pa > zone_before_pa)) return { error: "A hole between the house and the zone pulls the zone TOWARD house pressure, so the reading after must be higher than before." };
+  if (hole_side === "outside" && !(zone_after_pa < zone_before_pa)) return { error: "A hole between the zone and outside pulls the zone TOWARD outdoor pressure, so the reading after must be lower than before." };
+  if (!(cfm_before > 0)) return { error: "Enter the blower-door flow before the hole (CFM at the house pressure)." };
+  if (!(cfm_after > cfm_before)) return { error: "Opening a hole can only raise the blower-door flow at the same house pressure. The flow after must be higher than before." };
+  const n = 0.65; // field leakage exponent, as in zonal-pressure-diagnostics
+  const pw = (x) => Math.pow(x, n);
+  const flow_change_cfm = cfm_after - cfm_before;
+  const hz_before = house_pressure_pa - zone_before_pa, hz_after = house_pressure_pa - zone_after_pa;
+  // The unopened plane carries the whole flow change at an unchanged coefficient.
+  let c_hz, c_zo;
+  if (hole_side === "house") {
+    c_zo = flow_change_cfm / (pw(zone_after_pa) - pw(zone_before_pa));
+    c_hz = c_zo * pw(zone_before_pa) / pw(hz_before);
+  } else {
+    c_hz = flow_change_cfm / (pw(hz_after) - pw(hz_before));
+    c_zo = c_hz * pw(hz_before) / pw(zone_before_pa);
+  }
+  const path_flow_cfm = c_hz * pw(hz_before);
+  const house_to_zone_cfm50 = c_hz * pw(house_pressure_pa);
+  const zone_to_outside_cfm50 = c_zo * pw(house_pressure_pa);
+  if (![path_flow_cfm, house_to_zone_cfm50, zone_to_outside_cfm50].every(Number.isFinite)) return { error: "Add-a-hole math is not a finite value." };
+  if (path_flow_cfm > cfm_before) return { error: "These readings put more air through the zone than the blower door moved before the hole. The zone pressure barely changed for the flow change entered -- recheck both readings or open a larger hole." };
+  const path_share_pct = 100 * path_flow_cfm / cfm_before;
+  const small_change = Math.abs(zone_after_pa - zone_before_pa) < 0.1 * house_pressure_pa;
+  return {
+    flow_change_cfm, path_flow_cfm, path_share_pct, house_to_zone_cfm50, zone_to_outside_cfm50, small_change,
+    caution: small_change
+      ? "The zone moved less than a tenth of the house pressure, which is inside gauge and wind noise. Open a larger hole and repeat before trusting these flows."
+      : "The zone pressure moved enough to read.",
+    note: "Turns a zone pressure into air flows. A zone reading alone gives only the RATIO of two planes in series (zonal-pressure-diagnostics). Opening a hole in one plane -- an attic hatch or a house-to-garage door on the house side, a roof vent or overhead door on the outdoor side -- and re-reading the zone and the blower door at the same house pressure adds the missing equation. The plane that was not opened keeps its leakage, so the whole change in blower-door flow went through it at a known change in pressure; that fixes its coefficient, and the series balance before the hole fixes the other. The flow through the path before the hole is the most the blower-door number can fall if either plane were sealed perfectly; real air sealing recovers part of it. The two per-plane figures are what each plane would pass alone with the full house pressure across it, so they are larger than the path flow and are for comparing the planes, not for adding to the house total. Open the hole in the plane with the larger pressure across it, and make it big: a small pressure change divides a flow difference by a small number, and wind moves both. Fully opening a door (zone reads house or outdoor pressure after) is the cleanest case. Both planes are taken at the field exponent 0.65. Readings are ENTERED as zone to outside; a gauge on the house side reads the house pressure minus that. It does not perform the test, correct a reading taken against the wrong reference, model a zone with a third path such as an attic over a garage, or give leakage areas. The BPI or RESNET procedure in force and the technician's own judgment govern.",
+  };
+}
+export const zonalAddAHoleExample = { inputs: { house_pressure_pa: 50, hole_side: "house", zone_before_pa: 5, zone_after_pa: 50, cfm_before: 3595, cfm_after: 4503 } };
+BUILDINGPERF_RENDERERS["zonal-add-a-hole"] = _simpleRenderer({
+  citation: "Citation: the add-a-hole and open-a-door methods of zone pressure diagnostics (Blasnik and Fitzgerald; the Cox-Olson charts in The Energy Conservatory's ZPD Trainer guide). Two leakage planes in series carry the same flow, C1 dP1^n = C2 dP2^n; a hole opened in one plane leaves the other's coefficient unchanged, so that coefficient is the change in blower-door flow over the change in dP^n across it, with n = 0.65. Readings are ENTERED. It does not perform the test, correct for gauge reference, handle a zone with a third path, or report leakage areas. The BPI or RESNET procedure in force governs.",
+  example: zonalAddAHoleExample.inputs,
+  fields: [
+    { key: "house_pressure_pa", label: "House to outside (Pa)", kind: "number", default: 50, attrs: { step: "any" } },
+    { key: "hole_side", label: "Hole opened between", kind: "select", default: "house", options: [{ value: "house", label: "House and zone (hatch, door)" }, { value: "outside", label: "Zone and outside (vent, overhead door)" }] },
+    { key: "zone_before_pa", label: "Zone to outside before (Pa)", kind: "number", attrs: { step: "any" } },
+    { key: "zone_after_pa", label: "Zone to outside after (Pa)", kind: "number", attrs: { step: "any" } },
+    { key: "cfm_before", label: "Blower door flow before (CFM)", kind: "number", attrs: { step: "any" } },
+    { key: "cfm_after", label: "Blower door flow after (CFM)", kind: "number", attrs: { step: "any" } },
+  ],
+  outputs: [
+    { key: "p", id: "zah-out-p", label: "Flow through the zone before the hole", value: (r) => fmt(r.path_flow_cfm, 0) + " CFM, " + fmt(r.path_share_pct, 1) + "% of the blower-door flow" },
+    { key: "h", id: "zah-out-h", label: "House-to-zone plane alone at house pressure", value: (r) => fmt(r.house_to_zone_cfm50, 0) + " CFM" },
+    { key: "o", id: "zah-out-o", label: "Zone-to-outside plane alone at house pressure", value: (r) => fmt(r.zone_to_outside_cfm50, 0) + " CFM" },
+    { key: "d", id: "zah-out-d", label: "Blower door flow change", value: (r) => fmt(r.flow_change_cfm, 0) + " CFM" },
+    { key: "c", id: "zah-out-c", label: "Reading quality", value: (r) => r.caution },
+    { key: "n", id: "zah-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeZonalAddAHole,
 });
 
 // =====================================================================

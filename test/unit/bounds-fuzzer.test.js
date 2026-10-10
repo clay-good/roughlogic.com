@@ -59321,3 +59321,35 @@ test("bounds: cuttings-slip-velocity matches Moore's published forms in all thre
     assert.ok("error" in _csv({ ...b, apparent_viscosity_cp: 50, ...bad }));
   }
 });
+
+import { computeZonalAddAHole as _zah } from "../../calc-buildingperf.js";
+test("bounds: zonal-add-a-hole reproduces the Energy Conservatory open-a-door example and recovers simulated planes", () => {
+  // ZPD Trainer guide p. 8: prints 280, 1,170, 262 CFM50 and 7.3%.
+  const g = _zah({ house_pressure_pa: 50, hole_side: "house", zone_before_pa: 5, zone_after_pa: 50, cfm_before: 3595, cfm_after: 4503 });
+  assert.equal(Math.round(g.house_to_zone_cfm50), 280);
+  assert.equal(Math.round(g.zone_to_outside_cfm50), 1170);
+  assert.equal(Math.round(g.path_flow_cfm), 262);
+  assert.equal(g.path_share_pct.toFixed(1), "7.3");
+  // Forward-simulate two planes plus a hole on either side, then recover them.
+  const n = 0.65, P = 50, other = 1800;
+  const sim = (chz, czo) => { const k = Math.pow(chz / czo, 1 / n); const z = P * k / (1 + k); return { z, q: other + chz * Math.pow(P - z, n) }; };
+  for (const [chz, czo, hole] of [[30, 80, 100], [120, 40, 60], [10, 10, 500]]) {
+    const a = sim(chz, czo);
+    for (const side of ["house", "outside"]) {
+      const b = side === "house" ? sim(chz + hole, czo) : sim(chz, czo + hole);
+      const r = _zah({ hole_side: side, zone_before_pa: a.z, zone_after_pa: b.z, cfm_before: a.q, cfm_after: b.q });
+      assert.ok(Math.abs(r.house_to_zone_cfm50 / (chz * Math.pow(P, n)) - 1) < 1e-9);
+      assert.ok(Math.abs(r.zone_to_outside_cfm50 / (czo * Math.pow(P, n)) - 1) < 1e-9);
+      assert.ok(Math.abs(r.path_flow_cfm - (a.q - other)) < 1e-6);
+      // The path flow can never exceed what either plane passes alone.
+      assert.ok(r.path_flow_cfm <= Math.min(r.house_to_zone_cfm50, r.zone_to_outside_cfm50) + 1e-9);
+    }
+  }
+  // A change under a tenth of the house pressure is flagged.
+  assert.equal(_zah({ zone_before_pa: 20, zone_after_pa: 24, cfm_before: 3000, cfm_after: 3050 }).small_change, true);
+  assert.equal(g.small_change, false);
+  const ok = { house_pressure_pa: 50, hole_side: "house", zone_before_pa: 5, zone_after_pa: 50, cfm_before: 3595, cfm_after: 4503 };
+  for (const bad of [{ house_pressure_pa: 0 }, { zone_before_pa: 0 }, { zone_before_pa: 50 }, { zone_after_pa: 3 }, { zone_after_pa: 60 }, { hole_side: "outside" }, { hole_side: "roof" }, { cfm_before: 0 }, { cfm_after: 3595 }, { cfm_after: -4503 }, { zone_after_pa: 5.0001 }]) {
+    assert.ok("error" in _zah({ ...ok, ...bad }), JSON.stringify(bad));
+  }
+});

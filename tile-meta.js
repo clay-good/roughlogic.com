@@ -1168,6 +1168,7 @@ const _TILES = [
   ["building-tightness-limit", "C"],
   ["ventilation-rate-procedure", "C"],
   ["zonal-pressure-diagnostics", "C"],
+  ["zonal-add-a-hole", "C"],
   ["caz-depressurization-limit", "C"],
   ["stack-effect-npp", "C"],
   ["bill-disaggregation", "C"],

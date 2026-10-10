@@ -170602,6 +170602,92 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "zonal-add-a-hole",
+  "source_publisher": "The Energy Conservatory",
+  "source_title": "Zone Pressure Diagnostics (ZPD) Trainer Software User's Guide",
+  "source_edition_or_year": "2014 (energyconservatory.com/wp-content/uploads/2014/07/zpd_trainer_manual.pdf)",
+  "source_section_or_page": "Chapter 4, Using Data from ZPD Trainer and the Open a Door #1 Chart for a Demonstration, p. 8: garage WRT house 45 Pa (5 Pa to outside), 3,595 CFM50 door closed, 4,503 door open (garage at house pressure). Printed: difference 908; leakage garage to house 280; garage to outside 1,170; total path leakage 262; percentage of total leakage 7.3%. Printed values are whole CFM50.",
+  "verified_by": "rl",
+  "verified_on": "2026-10-10",
+  "inputs": {
+   "house_pressure_pa": 50,
+   "hole_side": "house",
+   "zone_before_pa": 5,
+   "zone_after_pa": 50,
+   "cfm_before": 3595,
+   "cfm_after": 4503
+  },
+  "outputs": {
+   "flow_change_cfm": {
+    "value": 908,
+    "tolerance": {
+     "abs": 0.001
+    }
+   },
+   "house_to_zone_cfm50": {
+    "value": 280,
+    "tolerance": {
+     "abs": 0.5
+    }
+   },
+   "zone_to_outside_cfm50": {
+    "value": 1170,
+    "tolerance": {
+     "abs": 0.5
+    }
+   },
+   "path_flow_cfm": {
+    "value": 262,
+    "tolerance": {
+     "abs": 0.5
+    }
+   },
+   "path_share_pct": {
+    "value": 7.3,
+    "tolerance": {
+     "abs": 0.05
+    }
+   }
+  }
+ },
+ {
+  "tile_id": "zonal-add-a-hole",
+  "source_publisher": "Project (first-principles)",
+  "source_title": "A vent opened to outside, simulated forward from known planes",
+  "source_edition_or_year": "series power-law leakage, n = 0.65",
+  "source_section_or_page": "planes C_hz = 30 and C_zo = 80 CFM/Pa^0.65 beside 2,000 CFM of other leakage: zone 9.0546 Pa, path 335.01 CFM; a vent taking C_zo to 180 moves the zone to 2.9859 Pa and the path to 366.50 CFM. Recovered: 30 x 50^0.65 = 381.46 and 80 x 50^0.65 = 1,017.23",
+  "verified_by": "rl",
+  "verified_on": "2026-10-10",
+  "inputs": {
+   "house_pressure_pa": 50,
+   "hole_side": "outside",
+   "zone_before_pa": 9.054588688229366,
+   "zone_after_pa": 2.985881240311968,
+   "cfm_before": 2335.0075999394935,
+   "cfm_after": 2366.4963465876867
+  },
+  "outputs": {
+   "house_to_zone_cfm50": {
+    "value": 381.4624,
+    "tolerance": {
+     "pct": 0.01
+    }
+   },
+   "zone_to_outside_cfm50": {
+    "value": 1017.2331,
+    "tolerance": {
+     "pct": 0.01
+    }
+   },
+   "path_flow_cfm": {
+    "value": 335.0076,
+    "tolerance": {
+     "pct": 0.01
+    }
+   }
+  }
  }
  ]
 }

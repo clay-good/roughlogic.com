@@ -1353,7 +1353,7 @@ export const TOOL_MODULES = (() => {
     "ground-loop-flow-antifreeze",
 
     "effective-leakage-area", "building-tightness-limit",
-    "ventilation-rate-procedure", "zonal-pressure-diagnostics",
+    "ventilation-rate-procedure", "zonal-pressure-diagnostics", "zonal-add-a-hole",
     "caz-depressurization-limit", "stack-effect-npp", "bill-disaggregation",
     "continuous-insulation-ratio",
   ]);

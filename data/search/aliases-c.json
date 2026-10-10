@@ -2266,7 +2266,7 @@
     {"term":"pressure ratio attic","target":"zonal-pressure-diagnostics","kind":"industry"},
     {"term":"series leakage diagnostic","target":"zonal-pressure-diagnostics","kind":"industry"},
     {"term":"where is the house leaking","target":"zonal-pressure-diagnostics","kind":"industry"},
-    {"term":"add a hole test","target":"zonal-pressure-diagnostics","kind":"industry"},
+    {"term":"add a hole test","target":"zonal-add-a-hole","kind":"industry"},
     {"term":"combustion appliance zone depressurization","target":"caz-depressurization-limit","kind":"industry"},
     {"term":"caz test limit","target":"caz-depressurization-limit","kind":"industry"},
     {"term":"backdraft test pressure","target":"caz-depressurization-limit","kind":"industry"},
@@ -2428,6 +2428,12 @@
     {"term":"glycol correction factor","target":"glycol-fluid-factor","kind":"industry"},
     {"term":"propylene glycol specific heat","target":"glycol-fluid-factor","kind":"industry"},
     {"term":"glycol gpm correction","target":"glycol-fluid-factor","kind":"industry"},
-    {"term":"how much more flow does glycol need","target":"glycol-fluid-factor","kind":"question"}
+    {"term":"how much more flow does glycol need","target":"glycol-fluid-factor","kind":"question"},
+    {"term":"add a hole method","target":"zonal-add-a-hole","kind":"industry"},
+    {"term":"open a door method zone leakage","target":"zonal-add-a-hole","kind":"industry"},
+    {"term":"zone leakage cfm50","target":"zonal-add-a-hole","kind":"industry"},
+    {"term":"attic bypass leakage cfm","target":"zonal-add-a-hole","kind":"industry"},
+    {"term":"house to garage leakage","target":"zonal-add-a-hole","kind":"industry"},
+    {"term":"how much air leaks through the attic","target":"zonal-add-a-hole","kind":"question"}
   ]
 }

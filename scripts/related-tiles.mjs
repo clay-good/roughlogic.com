@@ -1614,6 +1614,7 @@ const RELATED = {
   "building-tightness-limit": ["blower-door-ach50","ashrae-622-ventilation","caz-depressurization-limit"],
   "ventilation-rate-procedure": ["ashrae-622-ventilation","vav-box-airflow","building-tightness-limit"],
   "zonal-pressure-diagnostics": ["effective-leakage-area","blower-door-ach50","duct-leakage"],
+  "zonal-add-a-hole": ["zonal-pressure-diagnostics","blower-door-ach50","effective-leakage-area"],
   "caz-depressurization-limit": ["combustion-air","building-tightness-limit","stack-effect-npp"],
   "stack-effect-npp": ["chimney-height-for-draft","caz-depressurization-limit","blower-door-ach50"],
   "bill-disaggregation": ["degree-day-energy","balance-point","manual-j-heating"],

@@ -1687,6 +1687,7 @@ export const RENDERER_MAP = {
   "building-tightness-limit": { module: "../../calc-buildingperf.js", exportName: "BUILDINGPERF_RENDERERS" },
   "ventilation-rate-procedure": { module: "../../calc-buildingperf.js", exportName: "BUILDINGPERF_RENDERERS" },
   "zonal-pressure-diagnostics": { module: "../../calc-buildingperf.js", exportName: "BUILDINGPERF_RENDERERS" },
+  "zonal-add-a-hole": { module: "../../calc-buildingperf.js", exportName: "BUILDINGPERF_RENDERERS" },
   "caz-depressurization-limit": { module: "../../calc-buildingperf.js", exportName: "BUILDINGPERF_RENDERERS" },
   "stack-effect-npp": { module: "../../calc-buildingperf.js", exportName: "BUILDINGPERF_RENDERERS" },
   "bill-disaggregation": { module: "../../calc-buildingperf.js", exportName: "BUILDINGPERF_RENDERERS" },

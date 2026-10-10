@@ -1529,6 +1529,7 @@ cross-check.
 | calc-buildingperf.js | `computeGroundLoopFlowAntifreeze` | `{ tons = 0, gpm_per_ton = 3.0, pipe_id_in = 0, fluid_density_lb_ft3 = 63.9, f...` | _ | _ | _ |
 | calc-buildingperf.js | `computeStackEffectNpp` | `{ height_ft = 0, indoor_temp_f = 70, outdoor_temp_f = 0, neutral_plane_fracti...` | _ | _ | _ |
 | calc-buildingperf.js | `computeVentilationRateProcedure` | `{ rp_cfm_per_person = 0, ra_cfm_per_ft2 = 0, ez = 1, people_1 = 0, area_1_ft2...` | _ | _ | _ |
+| calc-buildingperf.js | `computeZonalAddAHole` | `{ house_pressure_pa = 50, hole_side = "house", zone_before_pa = 0, zone_after...` | _ | _ | _ |
 | calc-buildingperf.js | `computeZonalPressureDiagnostics` | `{ house_pressure_pa = 50, zone_a_pressure_pa = 0, zone_b_pressure_pa = 0, zon...` | _ | _ | _ |
 | calc-civil.js | `computeCompoundCurve` | `{ r1_ft = 0, r2_ft = 0, delta1_deg = 0, delta2_deg = 0 } = {}` | _ | _ | _ |
 | calc-civil.js | `computeCurveDeflectionStakeout` | `{ mode, radius_ft, degree_of_curve, arc_length_ft } = {}` | _ | _ | _ |
@@ -3928,7 +3929,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2512.
+Row count: 2513.
 
 <!-- END function-corpus-v14 -->
 
@@ -4421,7 +4422,7 @@ per spec-v14 §13.1 second paragraph.
 | `wobbe-index` | Wobbe Index (Fuel-Gas Interchangeability) | Wobbe index (fuel-gas interchangeabil...; WI = 1000 / sqrt(0.60) = 1000 / 0.77460 = 1290.99 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `wsfu-demand` | Probable Peak Demand (WSFU to GPM) | Hunter's curve (NBS BMS65) / IPC 2021...; 120 WSFU flush-valve -> 73.0 GPM, a printed row of Table ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group C HVAC (220 tiles)
+### Group C HVAC (221 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4644,6 +4645,7 @@ per spec-v14 §13.1 second paragraph.
 | `wet-bulb-psychrometer` | Wet-Bulb Sling Psychrometer | ASHRAE Handbook (Fundamentals); 80 F dry-bulb / 67 F wet-bulb at 1013.25 hPa -> ~50.7% RH... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `window-overhang-shade` | Window Overhang Shading (Profile Angle and Shade Line) | ASHRAE Handbook-Fundamentals (Fenestr...; spec-v1012 section 2.1 pinned example; tan(profile) = tan... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `window-solar-heat-gain` | Window Solar Heat Gain and Conduction Cooling Load | ASHRAE / ACCA Manual J fenestration; spec-v227 section 2.1 pinned example (west window) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `zonal-add-a-hole` | Add-a-Hole Zone Leakage (Flow Through an Attic, Garage or Crawl Space) | The Energy Conservatory; Chapter 4, Using Data from ZPD Trainer and the Open a Doo... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `zonal-pressure-diagnostics` | Zonal Pressure Diagnostics (Series Leakage Split for Attics and Crawlspaces) | Project (first-principles); the standards named in the tile citation govern; recomput... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
 ### Group D Restoration (57 tiles)
@@ -6359,6 +6361,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 
-Tile count: 2258. Fixture-covered or reference-cadence: 2258 / 2258.
+Tile count: 2259. Fixture-covered or reference-cadence: 2259 / 2259.
 
 <!-- END tile-index-v14 -->

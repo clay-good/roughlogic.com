@@ -2089,6 +2089,7 @@ export const COMPUTE_MAP = {
   "building-tightness-limit": { module: "../../calc-buildingperf.js", fn: "computeBuildingTightnessLimit" },
   "ventilation-rate-procedure": { module: "../../calc-buildingperf.js", fn: "computeVentilationRateProcedure" },
   "zonal-pressure-diagnostics": { module: "../../calc-buildingperf.js", fn: "computeZonalPressureDiagnostics" },
+  "zonal-add-a-hole": { module: "../../calc-buildingperf.js", fn: "computeZonalAddAHole" },
   "caz-depressurization-limit": { module: "../../calc-buildingperf.js", fn: "computeCazDepressurizationLimit" },
   "stack-effect-npp": { module: "../../calc-buildingperf.js", fn: "computeStackEffectNpp" },
   "bill-disaggregation": { module: "../../calc-buildingperf.js", fn: "computeBillDisaggregation" },

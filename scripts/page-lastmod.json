@@ -2,99 +2,99 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "884892753f169af6",
+      "sha": "cef3c78dec83429d",
       "date": "2026-10-10"
     },
     "/tools/": {
-      "sha": "8a1d71de9e9259ae",
+      "sha": "3beffbc2bae16d5a",
       "date": "2026-10-10"
     },
     "/collections/disaster-response/": {
-      "sha": "d2f21b2c6d45cbe2",
+      "sha": "ca1ee80a425db4af",
       "date": "2026-10-10"
     },
     "/groups/accounting/": {
-      "sha": "faa6bf236e6e7085",
+      "sha": "5572f6f1e83ff0ea",
       "date": "2026-10-10"
     },
     "/groups/agriculture/": {
-      "sha": "ce5ea8b8ce7a30d3",
+      "sha": "892bca7ee4db1b5c",
       "date": "2026-10-10"
     },
     "/groups/construction/": {
-      "sha": "4c999b37d86beaec",
+      "sha": "45b56d23521c2a9e",
       "date": "2026-10-10"
     },
     "/groups/cross-trade/": {
-      "sha": "e425ce0e432dd624",
+      "sha": "dffcea2351acb626",
       "date": "2026-10-10"
     },
     "/groups/educators/": {
-      "sha": "b85325e711eb6a90",
+      "sha": "38a1232e5974afc6",
       "date": "2026-10-10"
     },
     "/groups/electrical/": {
-      "sha": "b9276508a81ba9be",
+      "sha": "e1a7474db9f08d97",
       "date": "2026-10-10"
     },
     "/groups/field/": {
-      "sha": "e5201bdcda11ac4f",
+      "sha": "0619eba878446361",
       "date": "2026-10-10"
     },
     "/groups/fire-ground/": {
-      "sha": "faacf51f91752404",
+      "sha": "0fc735da3a0614c4",
       "date": "2026-10-10"
     },
     "/groups/historical/": {
-      "sha": "8057881f40ab5dc7",
+      "sha": "d4177dfed213e1f9",
       "date": "2026-10-10"
     },
     "/groups/hvac/": {
-      "sha": "a0a454c0af14a91d",
+      "sha": "c8421a50804fc5f0",
       "date": "2026-10-10"
     },
     "/groups/kitchen/": {
-      "sha": "9a9f128af74332dc",
+      "sha": "e499b51b348ec39b",
       "date": "2026-10-10"
     },
     "/groups/lab/": {
-      "sha": "f45648a5a1931a05",
+      "sha": "e6f4029efc8e8c2e",
       "date": "2026-10-10"
     },
     "/groups/mechanic/": {
-      "sha": "98366f8ad00019d9",
+      "sha": "417f2eed549d5596",
       "date": "2026-10-10"
     },
     "/groups/plumbing/": {
-      "sha": "aa0029623a22d21b",
+      "sha": "07a7487ad245b3cf",
       "date": "2026-10-10"
     },
     "/groups/real-estate/": {
-      "sha": "93759d9493f7945d",
+      "sha": "692774035b4dcf4a",
       "date": "2026-10-10"
     },
     "/groups/references/": {
-      "sha": "297f62d875de598b",
+      "sha": "014f01d6e0af3193",
       "date": "2026-10-10"
     },
     "/groups/restoration/": {
-      "sha": "72dceb57354c933b",
+      "sha": "809836ec8703db41",
       "date": "2026-10-10"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "8e5b01104d71c096",
+      "sha": "b4dca7ff2771d377",
       "date": "2026-10-10"
     },
     "/groups/stage/": {
-      "sha": "0fadad804f46d6d7",
+      "sha": "d33ab9ab3dda3d2d",
       "date": "2026-10-10"
     },
     "/groups/trucking/": {
-      "sha": "8dfdd01c0d0e698c",
+      "sha": "d5de32424ebd6492",
       "date": "2026-10-10"
     },
     "/groups/water/": {
-      "sha": "1810fbb3badc3d86",
+      "sha": "8fa356c0c4f75ca2",
       "date": "2026-10-10"
     },
     "/tools/aav-install-check/": {
@@ -9125,9 +9125,13 @@
       "sha": "5029f14ca24e5492",
       "date": "2026-09-29"
     },
+    "/tools/zonal-add-a-hole/": {
+      "sha": "ef9ab4df83f7b9bf",
+      "date": "2026-10-10"
+    },
     "/tools/zonal-pressure-diagnostics/": {
-      "sha": "b8fbc74a0b1edd41",
-      "date": "2026-10-03"
+      "sha": "2d26845d218d8897",
+      "date": "2026-10-10"
     }
   }
 }
