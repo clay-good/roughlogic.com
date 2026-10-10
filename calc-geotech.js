@@ -107,6 +107,9 @@ export function computeSoilBearingCapacity({ c = 0, phi = 0, gamma = 120, b_ft =
   const nq = Math.exp(Math.PI * Math.tan(phi_r)) * Math.tan(Math.PI / 4 + phi_r / 2) ** 2;
   const nc = phi < 0.01 ? 2 + Math.PI : (nq - 1) / Math.tan(phi_r);
   const ngamma = 2 * (nq + 1) * Math.tan(phi_r);
+  // Until 2026-10-10 any unrecognized shape was silently a square footing, whose shape factors
+  // raise a clay footing's capacity about 19% over the strip the caller may have meant.
+  if (shape !== "strip" && shape !== "square") return { error: "Footing shape must be strip or square." };
   const bl = shape === "strip" ? 0 : 1;
   const sc = 1 + bl * (nq / nc);
   const sq = 1 + bl * Math.tan(phi_r);
@@ -375,9 +378,11 @@ export function computeRetainingWallStability({ h_ft = 0, b_ft = 0, t_base = 0, 
   const w_stem = gamma_c * t_stem * h_stem, a_stem = toe_ft + t_stem / 2;
   const w_base = gamma_c * b_ft * t_base, a_base = b_ft / 2;
   const w_soil = gamma_s * heel * h_stem, a_soil = toe_ft + t_stem + heel / 2;
-  const w_surch = q * heel, a_surch = a_soil;
-  const sum_v = w_stem + w_base + w_soil + w_surch;
-  const mr = w_stem * a_stem + w_base * a_base + w_soil * a_soil + w_surch * a_surch;
+  // The surcharge drives (Ka q H below) but is NOT credited as weight on the heel: a surcharge is
+  // usually live load, and the stability case is the one with it behind the heel and not on it.
+  // Until 2026-10-10 q x heel was added to the resisting side, which raised both factors of safety.
+  const sum_v = w_stem + w_base + w_soil;
+  const mr = w_stem * a_stem + w_base * a_base + w_soil * a_soil;
   const pa_soil = 0.5 * ka * gamma_s * h_ft * h_ft;
   const pa_surch = ka * q * h_ft;
   const pa_tot = pa_soil + pa_surch;
@@ -386,16 +391,23 @@ export function computeRetainingWallStability({ h_ft = 0, b_ft = 0, t_base = 0, 
   const fs_sl = mu * sum_v / pa_tot;
   const x_bar = (mr - mo) / sum_v;
   const ecc = b_ft / 2 - x_bar;
-  const q_max = (sum_v / b_ft) * (1 + 6 * ecc / b_ft);
-  const q_min = (sum_v / b_ft) * (1 - 6 * ecc / b_ft);
-  const middle_third = Math.abs(ecc) <= b_ft / 6;
-  return { ka, sum_v, mr, mo, pa_tot, fs_ot, fs_sl, ecc, q_max, q_min, middle_third };
+  const middle_third = Math.abs(ecc) <= b_ft / 6 + 1e-9 * b_ft;
+  // Soil carries no tension. Outside the middle third the trapezoid formula reports a negative
+  // heel pressure and understates the toe; the base bears on a triangle 3 x_bar long instead, with
+  // a toe pressure of 2 V / (3 x_bar). Until 2026-10-10 the trapezoid was used at any eccentricity.
+  // A resultant at or beyond the toe (x_bar <= 0) has no bearing solution at all.
+  const resultant_off_base = !(x_bar > 1e-9 * b_ft);
+  const lifted = !middle_third && ecc > 1e-9 * b_ft;
+  const q_max = resultant_off_base ? null : lifted ? 2 * sum_v / (3 * x_bar) : (sum_v / b_ft) * (1 + 6 * ecc / b_ft);
+  const q_min = resultant_off_base ? null : lifted ? 0 : (sum_v / b_ft) * (1 - 6 * ecc / b_ft);
+  const bearing_length_ft = resultant_off_base ? 0 : lifted ? 3 * x_bar : b_ft;
+  return { ka, sum_v, mr, mo, pa_tot, fs_ot, fs_sl, ecc, q_max, q_min, middle_third, bearing_length_ft, resultant_off_base };
 }
 
 export const retainingWallStabilityExample = { inputs: { h_ft: 10, b_ft: 6, t_base: 1, t_stem: 1, toe_ft: 1, gamma_s: 110, gamma_c: 150, phi: 30, mu: 0.5, q: 0 } };
 
 GEOTECH_RENDERERS["retaining-wall-stability"] = _simpleRenderer({
-  citation: "Citation: the standard cantilever-retaining-wall global-stability checks -- overturning FS = Mr / Mo, sliding FS = mu x sum(V) / Pa, and toe bearing q = (sum(V)/B) x (1 +/- 6e/B) with Rankine active pressure -- as compiled in Das, Principles of Foundation Engineering, and NAVFAC DM-7.02, against the IBC 1807.2.3 minimum factor of safety of 1.5 for both sliding and overturning (standard practice designs overturning to 2.0). A global-stability check of a level, cohesionless, dry backfill on a level base with the stem, base, and heel soil idealized as rectangles: it does not check the internal reinforced-concrete design of the stem or base (see the RC beam tiles), does not credit passive resistance at the toe (conservatively neglected), does not apply seismic (Mononobe-Okabe) pressure or a sloped or submerged backfill, and reports gross toe pressure the user must compare against the allowable from the soil bearing capacity tile. Take the geometry from the drawings and the soil parameters from the geotechnical report. A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
+  citation: "Citation: the standard cantilever-retaining-wall global-stability checks -- overturning FS = Mr / Mo, sliding FS = mu x sum(V) / Pa, and toe bearing q = (sum(V)/B) x (1 +/- 6e/B) with Rankine active pressure -- as compiled in Das, Principles of Foundation Engineering, and NAVFAC DM-7.02, against the IBC 1807.2.3 minimum factor of safety of 1.5 for both sliding and overturning (standard practice designs overturning to 2.0). A global-stability check of a level, cohesionless, dry backfill on a level base with the stem, base, and heel soil idealized as rectangles: it does not check the internal reinforced-concrete design of the stem or base (see the RC beam tiles), does not credit passive resistance at the toe or the surcharge as weight on the heel (both conservatively neglected; the surcharge still drives), takes no soil tension (outside the middle third the toe pressure is 2V/(3 x_bar) on the bearing length 3 x_bar), does not apply seismic (Mononobe-Okabe) pressure or a sloped or submerged backfill, and reports gross toe pressure the user must compare against the allowable from the soil bearing capacity tile. Take the geometry from the drawings and the soil parameters from the geotechnical report. A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
   example: retainingWallStabilityExample.inputs,
   fields: [
     { key: "h_ft", label: "Total wall height H (ft)", kind: "number" },
@@ -415,7 +427,7 @@ GEOTECH_RENDERERS["retaining-wall-stability"] = _simpleRenderer({
     { key: "ot", id: "rws-out-ot", label: "Overturning FS (target 2.0)", value: (r) => fmt(r.fs_ot, Math.abs(r.fs_ot - 2.0) < 0.005 && r.fs_ot !== 2.0 ? 4 : 2) + (r.fs_ot >= 2.0 ? " (pass)" : r.fs_ot >= 1.5 ? " (below 2.0 target; IBC min 1.5)" : " (FAIL, below IBC 1.5)") },
     { key: "sl", id: "rws-out-sl", label: "Sliding FS (min 1.5)", value: (r) => fmt(r.fs_sl, Math.abs(r.fs_sl - 1.5) < 0.005 && r.fs_sl !== 1.5 ? 4 : 2) + (r.fs_sl >= 1.5 ? " (pass)" : " (FAIL, below IBC 1.5)") },
     { key: "ec", id: "rws-out-ec", label: "Eccentricity e (middle third = B/6)", value: (r) => fmt(r.ecc, 2) + " ft" + (r.middle_third ? " (in middle third)" : " (OUTSIDE middle third, heel uplift)") },
-    { key: "qp", id: "rws-out-qp", label: "Toe / heel pressure", value: (r) => fmt(r.q_max, 0) + " / " + fmt(r.q_min, 0) + " psf (compare toe to allowable bearing)" },
+    { key: "qp", id: "rws-out-qp", label: "Toe / heel pressure", value: (r) => r.resultant_off_base ? "none -- the resultant falls at or beyond the toe; the wall overturns before it bears" : fmt(r.q_max, 0) + " / " + fmt(r.q_min, 0) + " psf (compare toe to allowable bearing" + (r.middle_third ? ")" : "; no tension taken, bearing on " + fmt(r.bearing_length_ft, 2) + " ft of base)") },
   ],
   compute: computeRetainingWallStability,
 });
@@ -513,7 +525,10 @@ export function computePileAxialCapacity({ d_ft = 0, l_ft = 0, cu_ksf = 0, alpha
   if (!(l_ft > 0)) return { error: "Embedded length must be positive (ft)." };
   if (!(cu_ksf > 0)) return { error: "Undrained shear strength must be positive (ksf)." };
   if (!(alpha > 0 && alpha <= 1)) return { error: "The adhesion factor alpha is over 0 and up to 1.0." };
-  if (!(fs > 0)) return { error: "The factor of safety must be positive." };
+  if (!(fs >= 1)) return { error: "The factor of safety must be at least 1 (an allowable load cannot exceed the ultimate)." };
+  // Nc = 9 is Skempton's value for a tip embedded at least about four diameters; a shallower tip
+  // is a footing, with a smaller bearing factor.
+  if (l_ft < 4 * d_ft) return { error: "Embedded length is under four pile diameters: the tip factor Nc = 9 does not apply to so shallow a foundation. Use the bearing-capacity calculator." };
   const as_ft2 = Math.PI * d_ft * l_ft;
   const ap_ft2 = (Math.PI * d_ft * d_ft) / 4;
   const qs_kip = alpha * cu_ksf * as_ft2;
@@ -565,13 +580,14 @@ export function computePileLengthForCapacity({ qall_target_kip = 0, d_ft = 0, cu
   if (!(D > 0)) return { error: "Pile diameter must be positive (ft)." };
   if (!(cu > 0)) return { error: "Undrained shear strength must be positive (ksf)." };
   if (!(a > 0 && a <= 1)) return { error: "The adhesion factor alpha is over 0 and up to 1.0." };
-  if (!(FS > 0)) return { error: "The factor of safety must be positive." };
+  if (!(FS >= 1)) return { error: "The factor of safety must be at least 1 (an allowable load cannot exceed the ultimate)." };
   const qult_kip = qall * FS;
   const ap_ft2 = (Math.PI * D * D) / 4;
   const qp_kip = 9 * cu * ap_ft2;
   const qs_required_kip = qult_kip - qp_kip;
   if (!(qs_required_kip > 0)) return { error: "End bearing alone (" + qp_kip.toFixed(1) + " kip) already meets the ultimate target; reduce the target load or the diameter -- a real pile still needs minimum embedment and a load test." };
   const l_ft = qs_required_kip / (a * cu * Math.PI * D);
+  if (l_ft < 4 * D) return { error: "The length this load needs is under four pile diameters (" + l_ft.toFixed(1) + " ft): the tip factor Nc = 9 does not apply to so shallow a foundation. Use a smaller diameter or the bearing-capacity calculator." };
   return {
     l_ft, qp_kip, qs_required_kip, qult_kip,
     note: "Alpha (total-stress) method solved for the embedment: the ultimate demand is Qall x FS, the end bearing Qp = 9 cu (pi D^2/4) is fixed by the diameter, and the skin friction alpha cu (pi D L) must supply the rest, so L = (Qall x FS - Qp) / (alpha cu pi D). Single straight-shaft pile in one uniform cohesive layer - not the beta method for sand, no group efficiency, no negative skin friction or uplift, no driving/dynamic capacity. A design aid; the geotechnical engineer of record and, where required, a load test govern.",
@@ -604,7 +620,7 @@ export function computeSlopeStabilityInfinite({ beta_deg = 0, phi_deg = 0, c_psf
   c_psf = Number(c_psf);
   if (!(beta_deg > 0 && beta_deg < 90)) return { error: "Slope angle must be between 0 and 90 degrees (exclusive)." };
   if (!(phi_deg >= 0 && phi_deg < 90)) return { error: "Friction angle must be at least 0 and below 90 degrees." };
-  if (c_psf < 0) return { error: "Effective cohesion cannot be negative (psf)." };
+  if (!(c_psf >= 0)) return { error: "Effective cohesion must be a number, zero or more (psf)." };
   if (!(gamma_pcf > 0)) return { error: "Unit weight must be positive (pcf)." };
   if (!(h_ft > 0)) return { error: "Failure-plane depth must be positive (ft)." };
   const b = (beta_deg * Math.PI) / 180;
@@ -648,7 +664,7 @@ export function computeSlopeStabilitySeepage({ beta_deg = 0, phi_deg = 0, c_psf 
   c_psf = Number(c_psf);
   if (!(beta_deg > 0 && beta_deg < 90)) return { error: "Slope angle must be between 0 and 90 degrees (exclusive)." };
   if (!(phi_deg >= 0 && phi_deg < 90)) return { error: "Friction angle must be at least 0 and below 90 degrees." };
-  if (c_psf < 0) return { error: "Effective cohesion cannot be negative (psf)." };
+  if (!(c_psf >= 0)) return { error: "Effective cohesion must be a number, zero or more (psf)." };
   if (!(gamma_sat > _GAMMA_W)) return { error: "Saturated unit weight must exceed the water unit weight (62.4 pcf)." };
   if (!(h_ft > 0)) return { error: "Failure-plane depth must be positive (ft)." };
   const b = beta_deg * Math.PI / 180;
@@ -657,7 +673,7 @@ export function computeSlopeStabilitySeepage({ beta_deg = 0, phi_deg = 0, c_psf 
   const resisting_psf = c_psf + (gamma_sat - _GAMMA_W) * h_ft * Math.cos(b) * Math.cos(b) * Math.tan(p);
   const fs_seep = resisting_psf / driving_psf;
   const fs_dry = (c_psf + gamma_sat * h_ft * Math.cos(b) * Math.cos(b) * Math.tan(p)) / driving_psf;
-  const verdict = fs_seep >= 1.5 ? "at or above the customary 1.5 - the slope holds under seepage" : (fs_seep >= 1.0 ? "between 1.0 and 1.5 - marginal; add a subdrain or flatten the slope" : "below 1.0 - the slope is predicted to slide under seepage");
+  const verdict = fs_seep >= 1.5 - 1e-9 ? "at or above the customary 1.5 - the slope holds under seepage" : (fs_seep >= 1.0 - 1e-9 ? "between 1.0 and 1.5 - marginal; add a subdrain or flatten the slope" : "below 1.0 - the slope is predicted to slide under seepage");
   return {
     driving_psf, resisting_psf, fs_seep, fs_dry, verdict,
     note: "Infinite-slope factor of safety with steady seepage parallel to the slope and the water table at the surface: FS = (c' + (gamma_sat - gamma_w) H cos^2 beta tan phi') / (gamma_sat H sin beta cos beta), gamma_w = 62.4 pcf, as compiled in the Das and NAVFAC slope-stability references. The pore pressure cuts the friction term to the buoyant weight while the driving weight stays saturated, so for a cohesionless soil the factor of safety drops to (gamma_sat - gamma_w)/gamma_sat of the dry value - about half. Shallow translational slide, drained effective-stress parameters, no seismic loading - not a circular Bishop/Spencer analysis. A working subdrain that relieves the seepage restores the dry value shown for contrast. A screening aid; the geotechnical engineer of record governs.",
@@ -764,9 +780,12 @@ GEOTECH_RENDERERS["spt-required-n60"] = _simpleRenderer({
 });
 
 // dims: in { gamma_moist_pcf: M L^-2 T^-2, gamma_sat_pcf: M L^-2 T^-2, depth_ft: L, water_table_depth_ft: L, surcharge_psf: M L^-1 T^-2 } out: { total_stress_psf: M L^-1 T^-2, pore_pressure_psf: M L^-1 T^-2, effective_stress_psf: M L^-1 T^-2, gamma_buoy_pcf: M L^-2 T^-2, depth_below_wt_ft: L }
-export function computeSoilVerticalEffectiveStress({ gamma_moist_pcf = 120, gamma_sat_pcf = 125, depth_ft = 0, water_table_depth_ft = 0, surcharge_psf = 0 } = {}) {
+export function computeSoilVerticalEffectiveStress({ gamma_moist_pcf = 120, gamma_sat_pcf = 125, depth_ft = 0, water_table_depth_ft = null, surcharge_psf = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   surcharge_psf = Number(surcharge_psf);
+  // A missing water-table depth used to mean a table at the surface, which halves the stress.
+  if (water_table_depth_ft === null || water_table_depth_ft === "") return { error: "Enter the water-table depth (ft): 0 for a table at the surface, or a depth at or below the point of interest for a dry profile." };
+  water_table_depth_ft = Number(water_table_depth_ft);
   if (!(gamma_moist_pcf > 0)) return { error: "Moist unit weight must be positive (pcf)." };
   if (!(gamma_sat_pcf > _GAMMA_W)) return { error: "Saturated unit weight must exceed the water unit weight (62.4 pcf)." };
   if (!(depth_ft > 0)) return { error: "Depth must be positive (ft)." };
@@ -873,6 +892,7 @@ export function computePileGroupEfficiency({ rows_n = 0, cols_m = 0, diameter_in
   const q = Number(single_allow_kip) || 0;
   if (!(n >= 1)) return { error: "Number of rows must be at least 1." };
   if (!(m >= 1)) return { error: "Number of columns must be at least 1." };
+  if (!Number.isInteger(n) || !Number.isInteger(m)) return { error: "Rows and columns are whole numbers of piles." };
   if (!(d > 0)) return { error: "Pile diameter must be positive (in)." };
   if (!(s >= d)) return { error: "Center-to-center spacing must be at least the pile diameter (in)." };
   if (q < 0) return { error: "Single-pile allowable cannot be negative (kip)." };
@@ -924,6 +944,7 @@ export function computePileGroupSpacingForEfficiency({ rows_n = 0, cols_m = 0, d
   const eg = Number(target_eg) || 0;
   if (!(n >= 1)) return { error: "Number of rows must be at least 1." };
   if (!(m >= 1)) return { error: "Number of columns must be at least 1." };
+  if (!Number.isInteger(n) || !Number.isInteger(m)) return { error: "Rows and columns are whole numbers of piles." };
   if (!(d > 0)) return { error: "Pile diameter must be positive (in)." };
   if (!(eg > 0 && eg < 1)) return { error: "Target efficiency must be between 0 and 1 (a group always loses some efficiency at finite spacing)." };
   const K = (n - 1) * m + (m - 1) * n;
@@ -1017,6 +1038,7 @@ export function computeFrostDepthBerggren({ freezing_index_f_days = 2000, frozen
   if (!(frozen_conductivity_btu > 0)) return { error: "Frozen thermal conductivity must be positive (BTU/hr-ft-F)." };
   if (!(dry_density_pcf > 0)) return { error: "Dry density must be positive (pcf)." };
   if (!(water_content_pct > 0)) return { error: "Water content must be positive (percent)." };
+  if (water_content_pct < 1) return { error: "Water content is entered in percent (15, not 0.15); a soil under 1% moisture has almost no latent heat and this method does not apply." };
   if (!(berggren_lambda > 0 && berggren_lambda <= 1)) return { error: "Berggren lambda coefficient must be between 0 and 1." };
   // Stefan: X = sqrt(48 kf FI / L); 48 = 2 x 24 (F-days -> F-hours). L = 144 x gamma_d x w/100 (latent heat of fusion).
   const volumetric_latent_heat_btu_ft3 = 144 * dry_density_pcf * (water_content_pct / 100);
@@ -1090,13 +1112,19 @@ export function computeSeismicEarthPressure({ phi = 0, delta = 0, theta = 0, alp
   const d_pae = pae - pa_static;
   const pae_h = pae * Math.cos(D + T);
   const pae_v = pae * Math.sin(D + T);
-  // Seed-Whitman (1970) simplified increment, the conservative envelope most
-  // codes allow in place of the full M-O algebra.
+  // Seed-Whitman (1970) simplified increment. It was fitted to a smooth vertical wall at
+  // phi near 35 degrees and is NOT an upper bound: with wall friction or a weaker soil the full
+  // M-O increment above exceeds it (phi 30, delta 20, kh 0.3: 2,370 against 1,944 lb/ft).
   const sw_increment = 0.375 * kh * gamma * h_ft * h_ft;
+  // An upward kv with little kh makes Pae smaller than the static thrust. The wall still has to
+  // carry the static case, so the governing thrust and its line of action never fall below it;
+  // until 2026-10-10 a negative increment at 0.6H pulled the resultant below H/3.
+  const below_static = d_pae < -1e-9 * pa_static;
+  const p_design = Math.max(pae, pa_static);
   // Combined line of action: the static thrust at H/3, the dynamic increment
   // at 0.6H (Seed-Whitman), weighted onto the total.
-  const y_bar_ft = (pa_static * (h_ft / 3) + d_pae * (0.6 * h_ft)) / pae;
-  return { kae, ka_static, psi_deg: psi * 180 / Math.PI, pae, pa_static, d_pae, pae_h, pae_v, sw_increment, y_bar_ft };
+  const y_bar_ft = below_static ? h_ft / 3 : (pa_static * (h_ft / 3) + d_pae * (0.6 * h_ft)) / pae;
+  return { kae, ka_static, psi_deg: psi * 180 / Math.PI, pae, pa_static, d_pae, pae_h, pae_v, sw_increment, y_bar_ft, below_static, p_design };
 }
 
 export const seismicEarthPressureExample = { inputs: { phi: 35, delta: 17.5, theta: 0, alpha: 0, gamma: 120, h_ft: 12, kh: 0.15, kv: 0 } };
@@ -1117,10 +1145,10 @@ GEOTECH_RENDERERS["seismic-earth-pressure"] = _simpleRenderer({
   outputs: [
     { key: "k", id: "sep-out-k", label: "Kae (seismic) / Ka (static Coulomb)", value: (r) => fmt(r.kae, 3) + " / " + fmt(r.ka_static, 3) },
     { key: "ps", id: "sep-out-ps", label: "Seismic inertia angle psi", value: (r) => fmt(r.psi_deg, 2) + " deg" },
-    { key: "p", id: "sep-out-p", label: "Total seismic thrust Pae", value: (r) => fmt(r.pae, 0) + " lb/ft (static " + fmt(r.pa_static, 0) + ")" },
-    { key: "dp", id: "sep-out-dp", label: "Dynamic increment Pae - Pa", value: (r) => fmt(r.d_pae, 0) + " lb/ft (Seed-Whitman 0.375 kh gamma H^2 = " + fmt(r.sw_increment, 0) + ", the conservative envelope)" },
+    { key: "p", id: "sep-out-p", label: "Total seismic thrust Pae", value: (r) => fmt(r.pae, 0) + " lb/ft (static " + fmt(r.pa_static, 0) + ")" + (r.below_static ? " -- BELOW the static thrust; the static case of " + fmt(r.p_design, 0) + " lb/ft governs" : "") },
+    { key: "dp", id: "sep-out-dp", label: "Dynamic increment Pae - Pa", value: (r) => fmt(r.d_pae, 0) + " lb/ft (Seed-Whitman 0.375 kh gamma H^2 = " + fmt(r.sw_increment, 0) + (r.d_pae > r.sw_increment ? ", which is LOWER here -- use the M-O figure)" : ", the simplified check)") },
     { key: "ph", id: "sep-out-ph", label: "Horizontal / vertical components", value: (r) => fmt(r.pae_h, 0) + " / " + fmt(r.pae_v, 0) + " lb/ft" },
-    { key: "y", id: "sep-out-y", label: "Combined line of action above the base", value: (r) => fmt(r.y_bar_ft, 2) + " ft (static at H/3, increment at 0.6H)" },
+    { key: "y", id: "sep-out-y", label: "Combined line of action above the base", value: (r) => fmt(r.y_bar_ft, 2) + (r.below_static ? " ft (H/3, the static case)" : " ft (static at H/3, increment at 0.6H)") },
   ],
   compute: computeSeismicEarthPressure,
 });
@@ -1158,9 +1186,13 @@ export function computeCohesiveEarthPressure({ phi = 0, c_psf = 0, gamma = 120, 
   // backfill can put the crossing below the base (no positive pressure at all).
   const z_raw = (2 * c_psf * rka - ka * q) / (ka * gamma);
   const z_c_ft = Math.min(Math.max(z_raw, 0), h_ft);
-  // Cracked-wall thrust: the triangle below the crack only, no tension credited.
-  const pa_cracked = Math.max(sigma_base, 0) * (h_ft - z_c_ft) / 2;
-  const y_bar_ft = pa_cracked > 0 ? (h_ft - z_c_ft) / 3 : 0;
+  // Cracked-wall thrust: the positive pressure below the crack only, no tension credited. That is
+  // a triangle when a crack forms, and a trapezoid when the surcharge keeps the top in compression
+  // (sigma_top > 0, zc = 0). Until 2026-10-10 the trapezoid case was still summed as a triangle,
+  // which dropped the rectangular part and read up to 19% below the uncracked thrust.
+  const s_top = Math.max(sigma_top, 0), s_base = Math.max(sigma_base, 0), l_pos = h_ft - z_c_ft;
+  const pa_cracked = (s_top + s_base) * l_pos / 2;
+  const y_bar_ft = pa_cracked > 0 ? (l_pos / 3) * (2 * s_top + s_base) / (s_top + s_base) : 0;
   // Uncracked (theoretical) thrust: the full trapezoid including the negative
   // top, the value most texts print before the crack is admitted.
   const pa_uncracked = 0.5 * ka * gamma * h_ft * h_ft + ka * q * h_ft - 2 * c_psf * rka * h_ft;

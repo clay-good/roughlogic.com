@@ -58528,7 +58528,7 @@
   {
    "tile_id": "retaining-wall-stability",
    "source_publisher": "Das / NAVFAC DM-7.02 stability checks vs IBC 1807.2.3",
-   "source_title": "cross-check: the same wall with a 300 psf surcharge -> FS overturning 2.28, FS sliding 1.31 FAILS the 1.5 minimum",
+   "source_title": "cross-check: the same wall with a 300 psf surcharge driving and not credited as heel weight -> FS overturning 1.85, FS sliding 1.10 FAILS the 1.5 minimum",
    "source_edition_or_year": "spec-v262 worked example (machine-verified)",
    "source_section_or_page": "spec-v262 section 2.1 cross-check",
    "verified_by": "rl",
@@ -58547,7 +58547,7 @@
    },
    "outputs": {
     "sum_v": {
-     "value": 7410.0,
+     "value": 6210.0,
      "tolerance": {
       "abs": 0.01
      }
@@ -58559,13 +58559,13 @@
      }
     },
     "fs_ot": {
-     "value": 2.2828,
+     "value": 1.8509,
      "tolerance": {
       "abs": 0.001
      }
     },
     "fs_sl": {
-     "value": 1.3076,
+     "value": 1.0959,
      "tolerance": {
       "abs": 0.001
      }
@@ -59104,7 +59104,8 @@
    "inputs": {
     "gamma_moist_pcf": 120,
     "gamma_sat_pcf": 125,
-    "depth_ft": 20
+    "depth_ft": 20,
+    "water_table_depth_ft": 0
    },
    "outputs": {
     "total_stress_psf": {

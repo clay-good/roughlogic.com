@@ -19,7 +19,7 @@
     {
       "file": "c.json",
       "name": "Tile descriptions after the opening sentence, c runtime shard (generated)",
-      "gzip_size_bytes": 62859
+      "gzip_size_bytes": 62903
     },
     {
       "file": "d.json",
@@ -69,7 +69,7 @@
     {
       "file": "m.json",
       "name": "Tile descriptions after the opening sentence, m runtime shard (generated)",
-      "gzip_size_bytes": 30190
+      "gzip_size_bytes": 30203
     },
     {
       "file": "n.json",
@@ -94,12 +94,12 @@
     {
       "file": "r.json",
       "name": "Tile descriptions after the opening sentence, r runtime shard (generated)",
-      "gzip_size_bytes": 41286
+      "gzip_size_bytes": 41320
     },
     {
       "file": "s.json",
       "name": "Tile descriptions after the opening sentence, s runtime shard (generated)",
-      "gzip_size_bytes": 75674
+      "gzip_size_bytes": 75672
     },
     {
       "file": "t.json",
@@ -135,7 +135,7 @@
   "hashes": {
     "a.json": "5184039623f1fcaf1d2fc5264a66cd375321f893fb930236306d8394e32775be",
     "b.json": "182fc522a415c290dfcd6e783a6316c80d2b15f80d948c68eeb88e4696b9476b",
-    "c.json": "6e19a5ed704e4a3c5946fd37039f4a5b75e472a684b68ddef2797d80154a7773",
+    "c.json": "82dddf9ffeae7c64e4588407683599dd2ec4547679a5b8b5186916731f942cb4",
     "d.json": "a38404c5a1f951c67910ab28e487c3f851b930ab24207643fd9c816b951ddb49",
     "e.json": "8055b63c2dc910362a0ee777de775c8a1c48eb3780280bea4f0df0cf57de12fb",
     "f.json": "050700e7659acf6e16e04512eca1f1000abbf52dbd4be4176514d8a040df98d6",
@@ -145,13 +145,13 @@
     "j.json": "f5ed4f82111db1d3843a7bd30f8cdddc13ecb47a09bccdf96f9b39993bd7e253",
     "k.json": "5f77d6342abd293ae22be3af0c6e52534bc2c506169204441b09065762465934",
     "l.json": "b48ae9d86f57cfafc5387326c95ce2ca5f66a26987c89ed49fa665bcb9a2b223",
-    "m.json": "2bafd97d78838638dba16d47470956bdcf5dab0fc618b158046c3dc8e0bd9879",
+    "m.json": "4ae739ac2825cd513bded3bf8005b32c393ab3d83c5ebd5d676fc6e328b87137",
     "n.json": "e2ae0436152f5f7f44abd8b30c8a71d2a8dd78505798d4741f260728c1842551",
     "o.json": "d61f0064b6371561e933c719893d6075da6ba7752ff67b47e6f1f8a433bad323",
     "p.json": "895df60d94b8b3619486c2bba0c76b349a8930fbb83ffd5ea3c36c55b98d1b21",
     "q.json": "a83d9062334d0d6fd4ff7ddffcbf0778411f275d092c331e78c04f57565af3a7",
-    "r.json": "fa8f0c06d824e34cb10869dbc618a66c5f7775e4d715508f78a7c44b1963c628",
-    "s.json": "be9500592be835706304584e7ab46c37309e574a2c94a435d3cdc44e6d72315f",
+    "r.json": "399432858f498d02e34e6606612d98723bdce9d809056cfea0376654bc547890",
+    "s.json": "5bcaf394562c80664dbbe5b82dd657e9fd65e38afcb00aba063453aa58b5c95c",
     "t.json": "a95ab02e31342304da2b686d38390fc89bc87365a3bde515fc32d510bc3a4350",
     "u.json": "332e7ae96035a5adae6e8ed04fb788cd96124ea061fc1f61e180aa95b0a26584",
     "v.json": "79f42da546338997866b6f5e22ce899ad1adcb06f06ca56e34db6aafbb7d5338",

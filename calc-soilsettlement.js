@@ -81,13 +81,17 @@ export const SOILSETTLEMENT_RENDERERS = {};
 // dims: in { cc: dimensionless, h_ft: L, e0: dimensionless, sig0_psf: M L^-1 T^-2, dsig_psf: M L^-1 T^-2 } out: { sc_ft: L, sc_in: L }
 export function computeSoilConsolidationSettlement({ cc = 0, h_ft = 0, e0 = 0, sig0_psf = 0, dsig_psf = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Coerced first: a string stress used to concatenate in sig0 + dsig ("2000" + "1000").
+  cc = Number(cc); h_ft = Number(h_ft); e0 = Number(e0); sig0_psf = Number(sig0_psf); dsig_psf = Number(dsig_psf);
   if (!(cc > 0)) return { error: "The compression index Cc must be positive." };
   if (!(h_ft > 0)) return { error: "Layer thickness must be positive (ft)." };
   if (!(1 + e0 > 0)) return { error: "The void ratio e0 must give a positive (1 + e0)." };
   if (!(e0 > 0)) return { error: "The initial void ratio e0 must be positive." };
   if (!(sig0_psf > 0)) return { error: "The initial effective stress must be positive (psf)." };
-  if (dsig_psf < 0) return { error: "The stress increase cannot be negative (psf)." };
+  if (!(dsig_psf >= 0)) return { error: "The stress increase must be a number, zero or more (psf)." };
   const sc_ft = (cc * h_ft / (1 + e0)) * Math.log10((sig0_psf + dsig_psf) / sig0_psf);
+  // A layer cannot settle by more than its voids: H e0 / (1 + e0). The log law has no such limit.
+  if (sc_ft >= h_ft * e0 / (1 + e0)) return { error: "This settlement is more than the layer's entire void space (H e0 / (1 + e0) = " + (12 * h_ft * e0 / (1 + e0)).toFixed(1) + " in). The log-stress law does not hold that far; check the inputs." };
   const sc_in = sc_ft * 12;
   return {
     sc_ft, sc_in,
@@ -121,7 +125,7 @@ SOILSETTLEMENT_RENDERERS["soil-consolidation-settlement"] = _simpleRenderer({
 // dims: in { cc: dimensionless, cr: dimensionless, h_ft: L, e0: dimensionless, sig0_psf: M L^-1 T^-2, sigp_psf: M L^-1 T^-2, dsig_psf: M L^-1 T^-2 } out: { sc_ft: L, sc_in: L, ocr: dimensionless }
 export function computeOverconsolidatedSettlement({ cc = 0, cr = 0, h_ft = 0, e0 = 0, sig0_psf = 0, sigp_psf = 0, dsig_psf = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
-  dsig_psf = Number(dsig_psf);
+  cc = Number(cc); cr = Number(cr); h_ft = Number(h_ft); e0 = Number(e0); sig0_psf = Number(sig0_psf); sigp_psf = Number(sigp_psf); dsig_psf = Number(dsig_psf);
   if (!(cc > 0)) return { error: "The compression index Cc must be positive." };
   if (!(cr > 0)) return { error: "The recompression index Cr must be positive (typically Cr is about 0.1 to 0.2 of Cc)." };
   if (cr > cc) return { error: "The recompression index Cr cannot exceed the compression index Cc." };
@@ -130,7 +134,7 @@ export function computeOverconsolidatedSettlement({ cc = 0, cr = 0, h_ft = 0, e0
   if (!(e0 > 0)) return { error: "The initial void ratio e0 must be positive." };
   if (!(sig0_psf > 0)) return { error: "The initial effective stress must be positive (psf)." };
   if (!(sigp_psf >= sig0_psf)) return { error: "The preconsolidation stress cannot be less than the current effective stress (that soil is under-consolidated, a different case)." };
-  if (dsig_psf < 0) return { error: "The stress increase cannot be negative (psf)." };
+  if (!(dsig_psf >= 0)) return { error: "The stress increase must be a number, zero or more (psf)." };
   const factor = h_ft / (1 + e0);
   const final_stress_psf = sig0_psf + dsig_psf;
   let sc_ft, crosses_preconsolidation;
@@ -143,6 +147,8 @@ export function computeOverconsolidatedSettlement({ cc = 0, cr = 0, h_ft = 0, e0
     sc_ft = cr * factor * Math.log10(sigp_psf / sig0_psf) + cc * factor * Math.log10(final_stress_psf / sigp_psf);
     crosses_preconsolidation = true;
   }
+  // A layer cannot settle by more than its voids: H e0 / (1 + e0). The log law has no such limit.
+  if (sc_ft >= h_ft * e0 / (1 + e0)) return { error: "This settlement is more than the layer's entire void space (H e0 / (1 + e0) = " + (12 * h_ft * e0 / (1 + e0)).toFixed(1) + " in). The log-stress law does not hold that far; check the inputs." };
   const sc_in = sc_ft * 12;
   const ocr = sigp_psf / sig0_psf;
   if (![sc_ft, sc_in, ocr].every(Number.isFinite)) return { error: "Consolidation math is not a finite value." };
@@ -220,6 +226,8 @@ export function computeSettlementLimitLoad({ sc_allow_in = 0, cc = 0, h_ft = 0, 
   if (!(e0 > 0)) return { error: "The initial void ratio e0 must be positive." };
   if (!(sig0_psf > 0)) return { error: "The initial effective stress must be positive (psf)." };
   const sc_ft = sc_allow_in / 12;
+  // A layer cannot settle by more than its voids: H e0 / (1 + e0). The log law has no such limit.
+  if (sc_ft >= h_ft * e0 / (1 + e0)) return { error: "This settlement is more than the layer's entire void space (H e0 / (1 + e0) = " + (12 * h_ft * e0 / (1 + e0)).toFixed(1) + " in). The log-stress law does not hold that far; check the inputs." };
   const stress_ratio = Math.pow(10, sc_ft * (1 + e0) / (cc * h_ft));
   const dsig_psf = sig0_psf * (stress_ratio - 1);
   const final_stress_psf = sig0_psf + dsig_psf;
@@ -252,15 +260,16 @@ SOILSETTLEMENT_RENDERERS["settlement-limit-load"] = _simpleRenderer({
 export function computeFootingEccentricPressure({ p_kip = 0, m_kft = 0, b_ft = 0, l_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(p_kip > 0)) return { error: "Vertical load must be positive (kip)." };
-  if (m_kft < 0) return { error: "Enter the moment magnitude as non-negative (kip-ft)." };
+  if (!(m_kft >= 0)) return { error: "Enter the moment magnitude as a number, zero or more (kip-ft)." };
   if (!(b_ft > 0) || !(l_ft > 0)) return { error: "Footing dimensions must be positive (ft)." };
   const e_ft = m_kft / p_kip;
   const kern = b_ft / 6;
   let q_max_ksf, q_min_ksf, bearing_len_ft, kern_status;
-  if (e_ft <= kern) {
+  // Slack on the kern edge: 0.3/3 against 0.6/6 differ in the last bit and used to read "outside".
+  if (e_ft <= kern * (1 + 1e-9)) {
     const q_avg = p_kip / (b_ft * l_ft);
     q_max_ksf = q_avg * (1 + (6 * e_ft) / b_ft);
-    q_min_ksf = q_avg * (1 - (6 * e_ft) / b_ft);
+    q_min_ksf = Math.max(0, q_avg * (1 - (6 * e_ft) / b_ft));
     bearing_len_ft = b_ft;
     kern_status = "inside the middle-third kern (e <= B/6): full trapezoidal bearing";
   } else {
@@ -382,9 +391,13 @@ export function computeConsolidationDegree({ cv_ft2_day = 0, hdr_ft = 0, t_days 
   if (!(t > 0)) return { error: "Elapsed time must be positive (days)." };
   const tv = cv * t / (hdr * hdr);
   const TV_60 = (Math.PI / 4) * 0.36; // Tv at U = 60%
+  // The two published fits do not meet at U = 60: the parabola gives Tv 0.2827 and the log fit
+  // 0.2863. Between them U holds at 60 so it never falls as time passes; until 2026-10-10 it
+  // dropped from 60.0 to 59.7 across the seam.
+  const TV_60_LOG = 1.781 - 0.933 * Math.log10(40);
   const u_percent = tv <= TV_60
     ? 100 * Math.sqrt(4 * tv / Math.PI)
-    : 100 - Math.pow(10, (1.781 - tv) / 0.933);
+    : tv < TV_60_LOG ? 60 : 100 - Math.pow(10, (1.781 - tv) / 0.933);
   return {
     tv, u_percent,
     note: "Inverse Terzaghi 1-D consolidation: the degree of consolidation U reached after an elapsed time t, from the time factor Tv = cv t / Hdr^2 inverted - U = 100 sqrt(4 Tv / pi) for Tv <= 0.283 (U <= 60%) and U = 100 - 10^((1.781 - Tv)/0.933) above. This is the inverse of the consolidation-time tile (which gives the time to reach a target U): the field/monitoring question of how far a surcharge or fill has consolidated so far. Hdr is the longest drainage path - the full layer for single (one-way) drainage, half for double - so mis-setting it changes Tv by a factor of four. The decelerating curve means U approaches 100% asymptotically and never quite reaches it. A design aid; the engineer of record and the site-specific cv govern.",

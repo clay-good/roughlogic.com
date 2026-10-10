@@ -64,7 +64,9 @@ function _simpleRenderer(spec) {
       const params = {};
       for (const f of spec.fields) {
         if (f.kind === "select") params[f.key] = fields[f.key].select.value;
-        else params[f.key] = Number(fields[f.key].input.value) || 0;
+        // A field marked `required` passes null when blank, so the compute can
+        // ask for it instead of reading a cleared field as a real 0.
+        else params[f.key] = f.required && fields[f.key].input.value === "" ? null : Number(fields[f.key].input.value) || 0;
       }
       const r = spec.compute(params);
       if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }
@@ -151,9 +153,12 @@ export function computeCmuShearWall({ fm_psi = 1500, b_in = 0, dv_in = 0, p_lb =
   if (!(dv_in > 0)) return { error: "Shear depth dv must be positive (in)." };
   if (!(s_in > 0)) return { error: "Horizontal bar spacing must be positive (in)." };
   if (!(fs_psi > 0)) return { error: "Allowable steel stress Fs must be positive (psi)." };
-  if (p_lb < 0) return { error: "Axial load P cannot be negative (lb)." };
-  if (av_in2 < 0) return { error: "Shear-reinforcement area Av cannot be negative (in^2)." };
-  if (mvd < 0) return { error: "Shear-span ratio M/(V dv) cannot be negative." };
+  // A cleared M/(V dv) field used to compute as 0, the most generous value the term can take.
+  if (mvd === null || mvd === "") return { error: "Enter the shear-span ratio M/(V dv); 1.0 is the conservative value when it is not known." };
+  p_lb = Number(p_lb); av_in2 = Number(av_in2); mvd = Number(mvd);
+  if (!(p_lb >= 0)) return { error: "Axial load P must be a number, zero or more (lb)." };
+  if (!(av_in2 >= 0)) return { error: "Shear-reinforcement area Av must be a number, zero or more (in^2)." };
+  if (!(mvd >= 0)) return { error: "Shear-span ratio M/(V dv) must be a number, zero or more." };
   const gamma_g = { full: 1.0, partial: 0.75 }[grouting];
   if (gamma_g === undefined) return { error: "Grouting must be full or partial." };
   if (special !== "yes" && special !== "no") return { error: "Special reinforced shear wall must be yes or no." };
@@ -180,7 +185,7 @@ MASONRY_RENDERERS["cmu-shear-wall"] = _simpleRenderer({
     { key: "b_in", label: "Net wall thickness (in)", kind: "number" },
     { key: "dv_in", label: "Shear depth dv, wall length (in)", kind: "number" },
     { key: "p_lb", label: "Sustained axial load P (lb)", kind: "number", default: 0 },
-    { key: "mvd", label: "Shear-span ratio M/(V dv)", kind: "number", default: 0.5 },
+    { key: "mvd", label: "Shear-span ratio M/(V dv)", kind: "number", default: 0.5, required: true },
     { key: "av_in2", label: "Horizontal bar area Av (in², 0 = none)", kind: "number", default: 0 },
     { key: "s_in", label: "Horizontal bar spacing s (in)", kind: "number" },
     { key: "fs_psi", label: "Allowable steel stress Fs (psi)", kind: "number" },
@@ -438,8 +443,11 @@ export function computeMasonryAnchorEmbedment({ required_tension_lb = 0, fm_psi 
   const apt_in2 = Math.PI * lbe_in * lbe_in;
   const bas_lb = 0.6 * ab * fy;
   const steel_adequate = bas_lb >= T - 1e-9 * Math.abs(T);
+  // TMS 402 sets a floor the strength solution knows nothing about: the effective embedment is
+  // at least 4 bolt diameters and never under 2 in. A light load solves to well under that.
+  const below_min_embedment = lbe_in < 2;
   return {
-    lbe_in, apt_in2, bas_lb, steel_adequate,
+    lbe_in, apt_in2, bas_lb, steel_adequate, below_min_embedment,
     note: "The effective embedment lbe that makes the TMS 402 masonry-breakout capacity Bab = 1.25 x (pi lbe^2) x sqrt(f'm) equal the required tension, the inverse of masonry-anchor-bolt. Deeper embedment pulls a larger 45-degree cone and carries more load. The steel branch Bas = 0.6 x Ab x fy is a separate ceiling: if it is below the required tension the bolt yields no matter how deep it is set, so a larger-diameter or higher-grade bolt is needed. Edge distance or overlapping cones reduce the projected area Apt (this full-cone value is an upper bound, so the real required embedment is deeper); anchor shear (pryout) is a separate check. A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
   };
 }
@@ -454,7 +462,7 @@ MASONRY_RENDERERS["masonry-anchor-embedment"] = _simpleRenderer({
     { key: "fy_psi", label: "Bolt yield fy (psi, A307 = 36000)", kind: "number" },
   ],
   outputs: [
-    { key: "lbe", id: "mae-out-lbe", label: "Required embedment lbe", value: (r) => fmt(r.lbe_in, 2) + " in" },
+    { key: "lbe", id: "mae-out-lbe", label: "Required embedment lbe", value: (r) => fmt(r.lbe_in, 2) + " in for strength" + (r.below_min_embedment ? " -- BELOW the TMS 402 minimum; set the bolt at 4 bolt diameters and not less than 2 in" : " (and not less than 4 bolt diameters or 2 in)") },
     { key: "apt", id: "mae-out-apt", label: "Projected area Apt = pi lbe²", value: (r) => fmt(r.apt_in2, 1) + " in^2" },
     { key: "bas", id: "mae-out-bas", label: "Steel ceiling Bas = 0.6 Ab fy", value: (r) => fmt(r.bas_lb, 0) + " lb (" + (r.steel_adequate ? "adequate for T" : "BELOW T -- use a larger/stronger bolt") + ")" },
     { key: "n", id: "mae-out-n", label: "Note", value: (r) => r.note },
@@ -554,14 +562,11 @@ export function computeMasonryPrismFm({ unit_type = "concrete", unit_strength_ps
   const uMin = rows[0][0], uMax = rows[rows.length - 1][0], fMax = rows[rows.length - 1][1];
   let f_m_psi = 0, below_range = false, above_range = false;
   if (u <= uMin) {
-    // At the C90 minimum, take the bottom row exactly; below it, extrapolate the bottom
-    // segment (a lower, conservative f'm) and flag that the unit does not qualify.
+    // At the C90 minimum, take the bottom row exactly. Below it there is no table value. Until
+    // 2026-10-10 the bottom segment was extended downward, and since f'm falls only 0.42 psi per
+    // psi of unit there, a 1,000 psi unit read f'm 1,583 -- above the unit itself.
     if (u === uMin) { f_m_psi = rows[0][1]; }
-    else {
-      below_range = true;
-      const [u0, f0] = rows[0], [u1, f1] = rows[1];
-      f_m_psi = f0 + (f1 - f0) * (u - u0) / (u1 - u0);
-    }
+    else return { error: "A unit under " + uMin.toLocaleString("en-US") + " psi net-area strength is below the bottom row of TMS 602 Table 2 (and the ASTM C90 minimum). The unit-strength method gives no f'm for it; test prisms." };
   } else if (u >= uMax) {
     // The unit-strength method caps f'm at the tabulated maximum; a higher f'm needs a
     // prism test. Clamp and flag.
@@ -601,7 +606,7 @@ export function computeBrickVeneerWeepCount({ wall_length_ft = 30, max_spacing_i
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(wall_length_ft > 0)) return { error: "Wall length must be positive (ft)." };
   if (!(max_spacing_in > 0)) return { error: "Maximum spacing must be positive (in)." };
-  if (!(flashing_lines > 0)) return { error: "Flashing lines must be positive." };
+  if (!(flashing_lines >= 1) || !Number.isInteger(flashing_lines)) return { error: "Flashing lines is a whole number, 1 or more." };
   const length_in = wall_length_ft * 12;
   // Weeps at the ends plus one every max_spacing: count = ceil(length / spacing) + 1.
   const weeps_per_line = Math.ceil(length_in / max_spacing_in - 1e-9) + 1;
@@ -642,6 +647,7 @@ export function computeMasonryJointReinforcement({ wall_length_ft = 40, wall_hei
   const reinforced_courses = Math.ceil(wall_height_ft * 12 / vertical_spacing_in - 1e-9);
   // Each added piece laps the last by at least 6 in (9 in for 3/16 in wire), so it adds only piece - lap.
   // Until 2026-09-25 the lap was ignored: a 40 ft wall took 4 ten-foot pieces instead of 5.
+  if (lap_in === null || lap_in === "") return { error: "Enter the lap between pieces (in): 6 minimum, 9 for 3/16 in wire." };
   const lap_ft = (Number(lap_in) || 0) / 12;
   if (!(lap_ft >= 0 && lap_ft < piece_length_ft)) return { error: "Lap must be at least 0 and shorter than a piece (in)." };
   const pieces_per_course = wall_length_ft <= piece_length_ft ? 1 : 1 + Math.ceil((wall_length_ft - piece_length_ft) / (piece_length_ft - lap_ft) - 1e-9);
@@ -664,7 +670,7 @@ MASONRY_RENDERERS["masonry-joint-reinforcement"] = _simpleRenderer({
     { key: "wall_height_ft", label: "Wall height (ft)", kind: "number" },
     { key: "vertical_spacing_in", label: "Vertical spacing (in, code cap 16)", kind: "number" },
     { key: "piece_length_ft", label: "Wire piece length (ft)", kind: "number" },
-    { key: "lap_in", label: "Lap between pieces (in, 6 min; 9 for 3/16 in wire)", kind: "number", default: 6 },
+    { key: "lap_in", label: "Lap between pieces (in, 6 min; 9 for 3/16 in wire)", kind: "number", default: 6, required: true },
   ],
   outputs: [
     { key: "c", id: "mjr-out-c", label: "Reinforced courses", value: (r) => fmt(r.reinforced_courses, 0) },
@@ -760,6 +766,7 @@ export function computeFireplaceFlueArea({ opening_width_in = 0, opening_height_
   const a = Number(flue_inside_a_in) || 0;
   const b = Number(flue_inside_b_in) || 0;
   const H = Number(chimney_height_ft) || 0;
+  if (flue_shape !== "round" && flue_shape !== "rectangular") return { error: "Flue shape must be round or rectangular." };
   const round = flue_shape === "round";
   if (!(w > 0) || !(h > 0)) return { error: "Fireplace opening width and height must be positive (in)." };
   if (!(H > 0)) return { error: "Chimney height must be positive (ft), measured from the firebox floor to the top of the flue." };
@@ -929,7 +936,7 @@ export function computeMortarBatchC270({ cement_volumes = 1, lime_volumes = 0.5,
   if (!(cement_volumes > 0)) return { error: "The cement proportion must be positive (volumes)." };
   if (lime_volumes < 0) return { error: "The lime proportion cannot be negative (volumes)." };
   if (!(sand_ratio > 0)) return { error: "The sand proportion must be positive (times the cementitious total)." };
-  if (!(cement_bags > 0)) return { error: "The batch size must be at least one bag of cement." };
+  if (!(cement_bags > 0)) return { error: "The batch size must be positive (bags of cement; a fraction of a bag is fine)." };
   if (unit_strength_psi < 0 || mortar_strength_psi < 0) return { error: "A strength cannot be negative (psi)." };
   const SAND_MIN_RATIO = 2.25;
   const SAND_MAX_RATIO = 3.0;
@@ -950,6 +957,7 @@ export function computeMortarBatchC270({ cement_volumes = 1, lime_volumes = 0.5,
   // The rule that runs against instinct: a mortar harder than the unit cracks
   // the unit rather than the joint, and the unit is not repointable.
   const compatible = (unit_strength_psi > 0 && mortar_strength_psi > 0) ? mortar_strength_psi < unit_strength_psi : null;
+  const equal_strength = compatible === false && mortar_strength_psi === unit_strength_psi;
   const strength_ratio = (unit_strength_psi > 0 && mortar_strength_psi > 0) ? mortar_strength_psi / unit_strength_psi : null;
   const outs = [cement_cuft, lime_cuft, cementitious_cuft, sand_cuft, sand_min_cuft, sand_max_cuft, lime_bags, sand_shovels];
   if (!outs.every(Number.isFinite)) return { error: "Mortar batch math is not a finite value." };
@@ -962,19 +970,19 @@ export function computeMortarBatchC270({ cement_volumes = 1, lime_volumes = 0.5,
     ? "Enter the unit and mortar compressive strengths to check compatibility."
     : compatible
       ? "COMPATIBLE: the mortar at " + fmt(mortar_strength_psi, 0) + " psi is weaker than the unit at " + fmt(unit_strength_psi, 0) + " psi, so movement cracks the JOINT, which is repointable"
-      : "MORTAR HARDER THAN THE UNIT: " + fmt(mortar_strength_psi, 0) + " psi against a " + fmt(unit_strength_psi, 0) + " psi unit. Stress transfers into the unit and the unit spalls, which is not repointable -- this is how soft historic brick gets destroyed by a repointing";
+      : (equal_strength ? "MORTAR AS HARD AS THE UNIT: " : "MORTAR HARDER THAN THE UNIT: ") + fmt(mortar_strength_psi, 0) + " psi against a " + fmt(unit_strength_psi, 0) + " psi unit. Stress transfers into the unit and the unit spalls, which is not repointable -- this is how soft historic brick gets destroyed by a repointing";
   return {
     cement_volumes, lime_volumes, sand_ratio, cement_bags, cement_cuft, lime_cuft,
     cementitious_cuft, sand_cuft, sand_min_cuft, sand_max_cuft, sand_in_range,
     lime_bags, sand_shovels, batch_yield_cuft, cement_weight_lb, lime_weight_lb,
     unit_strength_psi, mortar_strength_psi, compatible, strength_ratio,
     sand_verdict, compat_verdict,
-    note: "ASTM C270 gives mortar as VOLUME PROPORTIONS of cementitious material and sand, and the batch scales from the cement: one bag of portland is one cubic foot, so a Type S at one part cement to half a part lime is a bag of cement and half a cubic foot of lime (0.4 of a 50 lb bag), with sand between 2.25 and 3 times the sum of the two. THE COUNTERINTUITIVE RULE IS THE IMPORTANT ONE: a stronger mortar is often a worse mortar. Mortar is meant to be the sacrificial element, so that movement and stress crack the joint -- which is repointable -- rather than the masonry unit, which is not. Repointing soft historic brick with a hard Type S or M mortar is a well documented way to destroy the brick, because the hard mortar transfers stress into the unit and the unit spalls. Type O, or a lime mortar, exists for exactly that case, and the strength comparison here is the check that catches it before the wall does. THE PROPORTION VERSUS PROPERTY DISTINCTION MATTERS AT THE MIXER. C270 allows a mortar to be specified either by proportion or by laboratory-tested properties, and the two are not interchangeable: a proportion-specified mortar is batched to the volumes and is not tested for strength at all. Field-tested mortar is tested to a different standard with different acceptance than laboratory mortar, and field results routinely come in below the laboratory values for the same mortar -- treating that as a failure is a common and expensive misunderstanding. SAND VOLUME IS THE TERM MOST OFTEN ABUSED, because it is measured by shovel rather than by box. The allowable range is broad, and running at the high end produces a harsh, unworkable mortar that masons then correct with water, which changes the water-cement ratio, the strength, the shrinkage and the bond all at once. The shovel count here is a working figure at about half a cubic foot per shovel of damp sand and is no substitute for a measured batch box. Proportions the reader supplies for the type in question. NO TYPE TABLE IS SHIPPED: the cement and lime volumes for M, S, N and O come from C270 itself, they differ between the portland-lime and the masonry-cement and mortar-cement systems, and a project specification can require something else entirely. It does not compute water, which is added to workability rather than to a ratio and is the mason's judgment; it does not address air content, retempering, board life, colour or admixtures; and it does not evaluate bond strength, water penetration, or freeze-thaw durability, which are properties of the assembly rather than of the batch. ASTM C270, the project specification, and the mason of record govern.",
+    note: "ASTM C270 gives mortar as VOLUME PROPORTIONS of cementitious material and sand, and the batch scales from the cement: one bag of portland is one cubic foot, so a Type S at one part cement to half a part lime is a bag of cement and half a cubic foot of lime (0.4 of a 50 lb bag), with sand between 2.25 and 3 times the sum of the two. THE COUNTERINTUITIVE RULE IS THE IMPORTANT ONE: a stronger mortar is often a worse mortar. Mortar is meant to be the sacrificial element, so that movement and stress crack the joint -- which is repointable -- rather than the masonry unit, which is not. Repointing soft historic brick with a hard Type S or M mortar is a well documented way to destroy the brick, because the hard mortar transfers stress into the unit and the unit spalls. Type O, or a lime mortar, exists for exactly that case, and the strength comparison here is the check that catches it before the wall does. THE PROPORTION VERSUS PROPERTY DISTINCTION MATTERS AT THE MIXER. C270 allows a mortar to be specified either by proportion or by laboratory-tested properties, and the two are not interchangeable: a proportion-specified mortar is batched to the volumes and is not tested for strength at all. Field-tested mortar is tested to a different standard with different acceptance than laboratory mortar, and field results routinely come in below the laboratory values for the same mortar -- treating that as a failure is a common and expensive misunderstanding. SAND VOLUME IS THE TERM MOST OFTEN ABUSED, because it is measured by shovel rather than by box. The allowable range is broad, and running at the high end produces a harsh, unworkable mortar that masons then correct with water, which changes the water-cement ratio, the strength, the shrinkage and the bond all at once. The shovel count here is a working figure at about a fifth of a cubic foot per shovel of damp sand (five shovels to the cubic foot) and is no substitute for a measured batch box. Proportions the reader supplies for the type in question. NO TYPE TABLE IS SHIPPED: the cement and lime volumes for M, S, N and O come from C270 itself, they differ between the portland-lime and the masonry-cement and mortar-cement systems, and a project specification can require something else entirely. It does not compute water, which is added to workability rather than to a ratio and is the mason's judgment; it does not address air content, retempering, board life, colour or admixtures; and it does not evaluate bond strength, water penetration, or freeze-thaw durability, which are properties of the assembly rather than of the batch. ASTM C270, the project specification, and the mason of record govern.",
   };
 }
 const mortarBatchC270Example = { inputs: { cement_volumes: 1, lime_volumes: 0.5, sand_ratio: 2.5, cement_bags: 1, unit_strength_psi: 3000, mortar_strength_psi: 1800 } };
 MASONRY_RENDERERS["mortar-batch-c270"] = _simpleRenderer({
-  citation: "Citation: the ASTM C270 proportion specification by name -- mortar is batched by VOLUME, with sand between 2.25 and 3.0 times the sum of the cementitious volumes -- scaled here from bags of portland at one cubic foot and 94 lb per bag, hydrated lime at about 1.25 cu ft and 50 lb per bag, and a working half cubic foot per shovel of damp sand. NO TYPE TABLE IS SHIPPED: the cement and lime volumes for Types M, S, N and O come from C270 and differ between the portland-lime, masonry-cement and mortar-cement systems. Proportion-specified and property-specified mortars are not interchangeable, and field-tested mortar is tested to different acceptance than laboratory mortar. ASTM C270, the project specification, and the mason of record govern.",
+  citation: "Citation: the ASTM C270 proportion specification by name -- mortar is batched by VOLUME, with sand between 2.25 and 3.0 times the sum of the cementitious volumes -- scaled here from bags of portland at one cubic foot and 94 lb per bag, hydrated lime at about 1.25 cu ft and 50 lb per bag, and a working fifth of a cubic foot per shovel of damp sand. NO TYPE TABLE IS SHIPPED: the cement and lime volumes for Types M, S, N and O come from C270 and differ between the portland-lime, masonry-cement and mortar-cement systems. Proportion-specified and property-specified mortars are not interchangeable, and field-tested mortar is tested to different acceptance than laboratory mortar. ASTM C270, the project specification, and the mason of record govern.",
   example: mortarBatchC270Example.inputs,
   fields: [
     { key: "cement_volumes", label: "Portland cement (volumes)", kind: "number", default: 1 },

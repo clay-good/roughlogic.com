@@ -140,6 +140,9 @@ export function computeSoilPhaseRelations({ gamma_pcf = 0, w_pct = 0, gs = 2.70 
   if (!(e_ratio > 0)) return { error: "The inputs give a non-positive void ratio - check the unit weight and Gs (an impossibly dense soil)." };
   const n_porosity = e_ratio / (1 + e_ratio);
   const s_pct = ((w_pct / 100) * gs) / e_ratio * 100;
+  // More water than the voids can hold: the three inputs contradict each other. A half-point of
+  // slack covers rounded lab values on a saturated sample.
+  if (s_pct > 100.5) return { error: "These inputs give " + s_pct.toFixed(1) + "% saturation, more water than the voids can hold. The unit weight, water content and Gs are not consistent; recheck them." };
   return {
     gamma_d_pcf, e_ratio, n_porosity, s_pct,
     note: "Soil three-phase relations from the total unit weight, water content, and specific gravity of solids: dry unit weight gamma_d = gamma/(1 + w), void ratio e = Gs gamma_w/gamma_d - 1, porosity n = e/(1 + e), degree of saturation S = w Gs/e, with gamma_w = 62.4 pcf (fresh water) and Gs ~ 2.65-2.72 for common soils. The void ratio feeds a consolidation settlement, the porosity a seepage calc, and the saturation says how much air is left to squeeze out. Enter Gs (measure or estimate by soil type); it does not compute the permeability (soil-permeability does), the effective stress, or the compaction relative density. An engineering aid; the soil test data govern.",
@@ -321,8 +324,8 @@ export function computeSoilActivity({ ll = 0, pl = 0, clay_fraction_pct = 0 } = 
   const pi = ll - pl;
   const activity = pi / clay_fraction_pct;
   let activity_class, mineral;
-  if (activity < 0.75) { activity_class = "inactive"; mineral = "kaolinite-like -- low swell"; }
-  else if (activity <= 1.25) { activity_class = "normal"; mineral = "illite-like -- moderate swell"; }
+  if (activity < 0.75 - 1e-9) { activity_class = "inactive"; mineral = "kaolinite-like -- low swell"; }
+  else if (activity <= 1.25 + 1e-9) { activity_class = "normal"; mineral = "illite-like -- moderate swell"; }
   else { activity_class = "active"; mineral = "montmorillonite / smectite-like -- high swell, potentially expansive"; }
   return {
     pi, activity, activity_class, mineral,
@@ -411,8 +414,11 @@ SOILPROPERTIES_RENDERERS["fineness-modulus"] = _v799renderFinenessModulus;
 // The FM leg is delegated to computeFinenessModulus so the summary tile and this
 // acceptance tile can never drift on the FM definition or its band.
 // dims: in { p38: dimensionless, p4: dimensionless, p8: dimensionless, p16: dimensionless, p30: dimensionless, p50: dimensionless, p100: dimensionless } out: { fm: dimensionless, max_retained_pct: dimensionless }
-export function computeFineAggregateGrading({ p38 = 100, p4 = 100, p8 = 90, p16 = 68, p30 = 45, p50 = 18, p100 = 5 } = {}) {
+export function computeFineAggregateGrading({ p38, p4, p8, p16, p30, p50, p100 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // No defaults: until 2026-10-10 an omitted sieve was filled with a conforming value (a missing
+  // #100 read 5%), so a partial sieve analysis could earn a CONFORMS verdict.
+  if ([p38, p4, p8, p16, p30, p50, p100].some((v) => v === undefined || v === null || v === "")) return { error: "Enter the percent passing for all seven sieves (3/8 in through #100)." };
   // ASTM C33 §6.1 fine-aggregate grading limits (percent passing).
   const sieves = [
     { key: "3/8 in", p: Number(p38), lo: 100, hi: 100 },
@@ -509,6 +515,9 @@ export function computeSoilGradationCoefficients({ d10_mm = 0, d30_mm = 0, d60_m
   if (!(d60_mm >= d30_mm)) return { error: "D60 must be at least D30 (the sizes come off one grain-size curve and must increase)." };
   if (pct_coarse_passing_no4 < 0 || pct_coarse_passing_no4 > 100) return { error: "Percent of the coarse fraction passing the #4 sieve must be between 0 and 100." };
   if (pct_fines < 0 || pct_fines > 100) return { error: "Percent fines (passing #200) must be between 0 and 100." };
+  if (pct_coarse_passing_no4 === null || pct_coarse_passing_no4 === "") return { error: "Enter the percent of the coarse fraction passing the #4 sieve; it decides gravel or sand." };
+  // More than 10% passing the #200 (0.075 mm) puts D10 below 0.075 mm by definition.
+  if (pct_fines > 10 && d10_mm >= 0.075) return { error: "With more than 10% fines passing the #200 sieve (0.075 mm), D10 must be smaller than 0.075 mm. The D10 and the fines content are not from the same curve." };
   const cu = d60_mm / d10_mm;
   const cc = (d30_mm * d30_mm) / (d10_mm * d60_mm);
   // USCS coarse fraction: MORE than half of it retained on the #4 is a gravel; ASTM D2487 puts
@@ -569,7 +578,7 @@ function _v1018renderSoilGradationCoefficients(inputRegion, outputRegion, citati
       d10_mm: Number(d10.input.value) || 0,
       d30_mm: Number(d30.input.value) || 0,
       d60_mm: Number(d60.input.value) || 0,
-      pct_coarse_passing_no4: Number(p4.input.value) || 0,
+      pct_coarse_passing_no4: p4.input.value === "" ? null : Number(p4.input.value) || 0,
       pct_fines: Number(pf.input.value) || 0,
     });
     if (r.error) { for (const o of [oCu, oCc, oGrade, oSym, oK, oNote]) o.textContent = "-"; oCu.textContent = r.error; return; }

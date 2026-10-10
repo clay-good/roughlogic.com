@@ -1561,7 +1561,7 @@ cross-check.
 | calc-concrete.js | `computeConcreteBeamMinFlexuralSteel` | `{ fc_psi = 4000, fy_psi = 60000, bw_in = 0, d_in = 0 } = {}` | _ | _ | _ |
 | calc-concrete.js | `computeConcreteBearingStrength` | `{ loaded_area_in2 = 0, support_area_in2 = 0, fc_psi = 4000, factored_load_kip...` | _ | _ | _ |
 | calc-concrete.js | `computeConcreteCorbelBracket` | `{ factored_shear_lb = 0, horiz_tension_lb = 0, shear_span_av_in = 0, eff_dept...` | _ | _ | _ |
-| calc-concrete.js | `computeConcreteCrackControlSpacing` | `{ fs_psi = 40000, cc_in = 0 } = {}` | _ | _ | _ |
+| calc-concrete.js | `computeConcreteCrackControlSpacing` | `{ fs_psi = 40000, cc_in = null } = {}` | _ | _ | _ |
 | calc-concrete.js | `computeConcreteCrackedInertiaDoubly` | `{ b_in = 0, d_in = 0, as_in2 = 0, fc_psi = 4000, asp_in2 = 0, dp_in = 2.5 } = {}` | _ | _ | _ |
 | calc-concrete.js | `computeConcreteCrackedInertiaTee` | `{ b_in = 0, hf_in = 0, bw_in = 0, d_in = 0, as_in2 = 0, fc_psi = 4000 } = {}` | _ | _ | _ |
 | calc-concrete.js | `computeConcreteCrackingMoment` | `{ b_in = 0, h_in = 0, fc_psi = 4000, lambda = 1.0 } = {}` | _ | _ | _ |
@@ -3542,7 +3542,7 @@ cross-check.
 | calc-shop.js | `computeTurningSurfaceFinish` | `{ feed_ipr_in = 0, nose_radius_in = 0 } = {}` | _ | _ | _ |
 | calc-shop.js | `computeWeldDutyCycle` | `{ rated_amps = 0, rated_duty_pct = 0, target_amps = 0 } = {}` | _ | _ | _ |
 | calc-soilproperties.js | `computeAtterbergIndices` | `{ ll = 0, pl = 0, w_pct = 0 } = {}` | _ | _ | _ |
-| calc-soilproperties.js | `computeFineAggregateGrading` | `{ p38 = 100, p4 = 100, p8 = 90, p16 = 68, p30 = 45, p50 = 18, p100 = 5 } = {}` | _ | _ | _ |
+| calc-soilproperties.js | `computeFineAggregateGrading` | `{ p38, p4, p8, p16, p30, p50, p100 } = {}` | _ | _ | _ |
 | calc-soilproperties.js | `computeFinenessModulus` | `{ r4 = 0, r8 = 0, r16 = 0, r30 = 0, r50 = 0, r100 = 0 } = {}` | _ | _ | _ |
 | calc-soilproperties.js | `computeRelativeCompaction` | `{ wet_pcf = 0, w_pct = 0, max_pcf = 0, spec_pct = 95 } = {}` | _ | _ | _ |
 | calc-soilproperties.js | `computeSoilActivity` | `{ ll = 0, pl = 0, clay_fraction_pct = 0 } = {}` | _ | _ | _ |

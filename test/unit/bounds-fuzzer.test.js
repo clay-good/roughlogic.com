@@ -16859,11 +16859,12 @@ test("bounds: spec-v262 computeRetainingWallStability pins the three checks, the
   // Cross-check: a 300 psf surcharge drops sliding below the IBC 1.5 minimum and pushes
   // the resultant outside the middle third (heel uplift).
   const r2 = _v262({ h_ft: 10, b_ft: 6, t_base: 1, t_stem: 1, toe_ft: 1, gamma_s: 110, gamma_c: 150, phi: 30, mu: 0.5, q: 300 });
-  assert.ok(Math.abs(r2.fs_ot - 2.2828500000000003) < 1e-9);
-  assert.ok(Math.abs(r2.fs_sl - 1.3076470588235296) < 1e-9);
+  // Since hardening slice 3 the surcharge drives but is not credited as heel weight (was 2.28 / 1.31).
+  assert.ok(Math.abs(r2.fs_ot - 1.85085) < 1e-9);
+  assert.ok(Math.abs(r2.fs_sl - 1.0958823529411765) < 1e-9);
   assert.ok(r2.fs_sl < 1.5);
   assert.strictEqual(r2.middle_third, false);
-  assert.ok(r2.q_min < 0);
+  assert.strictEqual(r2.q_min, 0); // no tension: triangular bearing since hardening slice 3
   // Error seams, including the no-heel geometry guard.
   assert.ok("error" in _v262({ h_ft: 0, b_ft: 6, t_base: 1, t_stem: 1, toe_ft: 1, phi: 30 }));
   assert.ok("error" in _v262({ h_ft: 10, b_ft: 0, t_base: 1, t_stem: 1, toe_ft: 1, phi: 30 }));
@@ -21933,7 +21934,7 @@ test("bounds: spec-v551 computeMasonryPrismFm pins Table 2 rows, interpolation, 
   assert.ok(Math.abs(_v551({ unit_type: "concrete", unit_strength_psi: 2925, mortar_type: "ms" }).f_m_psi - 2375) < 1e-9);
   // Below the ASTM C90 2,000 psi minimum: flagged, and f'm is lower than the bottom row (not overstated).
   const below = _v551({ unit_type: "concrete", unit_strength_psi: 1900, mortar_type: "ms" });
-  assert.ok(below.below_range === true && below.f_m_psi < 2000);
+  assert.ok("error" in below); // no table value below the bottom row (hardening slice 3)
   // Above the table: capped at the tabulated maximum and flagged.
   const above = _v551({ unit_type: "concrete", unit_strength_psi: 5000, mortar_type: "ms" });
   assert.ok(above.above_range === true && Math.abs(above.f_m_psi - 3000) < 1e-9);
@@ -32191,8 +32192,8 @@ test("bounds: spec-v1018 computeSoilGradationCoefficients pins Cu/Cc, the both-c
   // Fines ladder: < 5 clean symbol, 5-12 dual, > 12 the fines govern.
   assert.strictEqual(_v1018({ ...base, pct_fines: 4.9 }).uscs_symbol, "SW");
   assert.ok(_v1018({ ...base, pct_fines: 8 }).uscs_symbol.includes("-"));
-  assert.ok(_v1018({ ...base, pct_fines: 20 }).uscs_symbol.includes("atterberg"));
-  assert.ok(!_v1018({ ...base, pct_fines: 20 }).uscs_symbol.startsWith("SW"));
+  assert.ok(_v1018({ ...base, d10_mm: 0.05, pct_fines: 20 }).uscs_symbol.includes("atterberg")); // D10 under 0.075 mm, as 20% fines requires
+  assert.ok(!_v1018({ ...base, d10_mm: 0.05, pct_fines: 20 }).uscs_symbol.startsWith("SW"));
   // Hazen: flagged out of range here (Cu 8 >= 5), valid for a uniform clean sand.
   assert.ok(Math.abs(r.hazen_k_cm_s - 0.0225) < 1e-12);
   assert.strictEqual(r.hazen_valid, false);
@@ -59962,4 +59963,104 @@ test("hardening slice 2 (structural steel, lateral, concrete part 1): the review
   assert.ok("error" in _s2Col({ target_load_kip: 12000, b_in: 16, h_in: 16, fc_psi: 96000, fy_psi: 100000 }));
   assert.ok("error" in _s2Dow({ joint_length_ft: 1, edge_clearance_in: 10 }));
   assert.ok("error" in _s2Pz({ fy_ksi: 50, col_depth_dc_in: 14, col_web_tw_in: 0.485, beam_depth_db_in: 24, beam_flange_tf_in: 0.77, demand_moment_kin: 5000, pz_in_analysis: "yes" }));
+});
+
+// Hardening slice 3 (2026-10-10): the rest of concrete, masonry and the geotechnical family,
+// 76 calculators re-derived and run by independent reviewers. One assertion per confirmed defect.
+import { computeRcBeamFlexure as _s3Flex, computeRcBeamShear as _s3Shear, computeRcDevelopmentLength as _s3Ld, computeConcreteStrengthFromRupture as _s3Rup, computeTBeamEffectiveFlangeWidth as _s3Fw, computeRcTBeamFlexure as _s3Tb, computeConcreteBeamMinFlexuralSteel as _s3Min, computeConcreteCrackControlSpacing as _s3Crack } from "../../calc-concrete.js";
+import { computeSoilBearingCapacity as _s3Bear, computeRetainingWallStability as _s3Wall, computePileAxialCapacity as _s3Pile, computePileLengthForCapacity as _s3PileL, computeSlopeStabilityInfinite as _s3Slope, computeSlopeStabilitySeepage as _s3Seep, computeSoilVerticalEffectiveStress as _s3Sig, computePileGroupEfficiency as _s3Grp, computePileGroupSpacingForEfficiency as _s3GrpS, computeFrostDepthBerggren as _s3Frost, computeSeismicEarthPressure as _s3Mo, computeCohesiveEarthPressure as _s3Coh } from "../../calc-geotech.js";
+import { computeSoilConsolidationSettlement as _s3Cons, computeOverconsolidatedSettlement as _s3Oc, computeSettlementLimitLoad as _s3Lim, computeFootingEccentricPressure as _s3Ecc, computeConsolidationDegree as _s3Deg } from "../../calc-soilsettlement.js";
+import { computeSoilPhaseRelations as _s3Phase, computeSoilActivity as _s3Act, computeFineAggregateGrading as _s3Fa, computeSoilGradationCoefficients as _s3Grad } from "../../calc-soilproperties.js";
+import { computeMasonryPrismFm as _s3Prism, computeBrickVeneerWeepCount as _s3Weep, computeMasonryJointReinforcement as _s3Jr, computeFireplaceFlueArea as _s3Flue, computeCmuShearWall as _s3Cmu, computeMasonryAnchorEmbedment as _s3Anc, computeMortarBatchC270 as _s3Mortar } from "../../calc-masonry.js";
+
+test("hardening slice 3 (concrete part 2, masonry, geotechnical): the reviewed defects stay fixed", () => {
+  const near = (a, b, tol) => assert.ok(Math.abs(a - b) <= tol, a + " vs " + b);
+  // Concrete. A beam that is not tension-controlled is rated at the Table 21.2.2 phi, not 0.90.
+  const fx = _s3Flex({ as_in2: 6, b: 12, d: 21.5 });
+  assert.strictEqual(fx.tension_controlled, false);
+  near(fx.phi, 0.745, 0.001); near(fx.phi_mn, 382.1, 0.1);
+  near(_s3Flex({ as_in2: 3, b: 12, d: 21.5 }).phi, 0.90, 1e-12);
+  assert.ok("error" in _s3Flex({ as_in2: 20, b: 12, d: 10 }));
+  // sqrt(f'c) over 100 psi does not waive stirrups.
+  assert.strictEqual(_s3Shear({ fc: 16000, bw: 12, d: 21.5, av_in2: 0.22, vu: 22 }).min_required, true);
+  assert.strictEqual(_s3Shear({ fc: 16000, bw: 12, d: 21.5, av_in2: 0.22, vu: 19 }).min_required, false);
+  assert.ok("error" in _s3Ld({ db: 1, psi_t: 0.5 }));
+  assert.ok("error" in _s3Ld({ db: 1, psi_s: 0.5 }));
+  assert.ok(!("error" in _s3Ld({ db: 0.75, psi_s: 0.8 })));
+  assert.ok("error" in _s3Rup({ fr_psi: 474.342, lambda: 0 }));
+  assert.ok("error" in _s3Fw({ bw_in: 12, hf_in: 4, ln_in: 240, sw_in: 48, beam_type: "Edge" }));
+  assert.ok("error" in _s3Tb({ as_in2: 6, bw_in: 12, hf_in: 4, d_in: 24, ln_in: 240, sw_in: 48, beam_type: "exterior" }));
+  near(_s3Min({ fc_psi: 4000, fy_psi: 100000, bw_in: 12, d_in: 20 }).as_min_in2, 0.60, 1e-9);
+  assert.ok("error" in _s3Crack({ fs_psi: 40000 }));
+  near(_s3Crack({ fs_psi: 40000, cc_in: 2 }).s_max_in, 10, 1e-9);
+
+  // Geotechnical.
+  assert.ok("error" in _s3Bear({ c: 1000, phi: 0, b_ft: 4, df_ft: 2, shape: "Strip" }));
+  const W = { h_ft: 10, t_base: 1, t_stem: 1, toe_ft: 1, gamma_s: 110, gamma_c: 150, phi: 30, mu: 0.5 };
+  // A surcharge drives and is not credited as heel weight.
+  const wq = _s3Wall({ ...W, b_ft: 6, q: 300 });
+  near(wq.sum_v, 6210, 1e-6); near(wq.fs_sl, 1.0959, 1e-4); near(wq.fs_ot, 1.8509, 1e-4);
+  // Outside the middle third the toe pressure is 2V / (3 x_bar) and the heel carries none.
+  const w4 = _s3Wall({ ...W, b_ft: 4, q: 0 });
+  near(w4.q_max, 3371.6, 0.1); assert.strictEqual(w4.q_min, 0); near(w4.bearing_length_ft, 2.3312, 1e-3);
+  const w3 = _s3Wall({ ...W, b_ft: 3, q: 0 });
+  assert.strictEqual(w3.resultant_off_base, true); assert.strictEqual(w3.q_max, null);
+  near(_s3Wall({ ...W, b_ft: 6, q: 0 }).q_max, 1731.0, 0.1);
+  assert.ok("error" in _s3Pile({ d_ft: 1.3333, l_ft: 40, cu_ksf: 1, alpha: 0.55, fs: 0.5 }));
+  assert.ok("error" in _s3Pile({ d_ft: 4, l_ft: 2, cu_ksf: 1 }));
+  assert.ok("error" in _s3PileL({ qall_target_kip: 50, d_ft: 1.3333, cu_ksf: 1, fs: 0.5 }));
+  assert.ok("error" in _s3Slope({ beta_deg: 20, phi_deg: 30, c_psf: "abc", h_ft: 5 }));
+  assert.ok("error" in _s3Seep({ beta_deg: 20, phi_deg: 30, c_psf: "abc", h_ft: 5 }));
+  assert.ok(_s3Seep({ beta_deg: 7, phi_deg: 20, c_psf: 0.7021203128742286, gamma_sat: 125, h_ft: 3 }).verdict.startsWith("at or above"));
+  assert.ok("error" in _s3Sig({ depth_ft: 20 }));
+  near(_s3Sig({ depth_ft: 20, water_table_depth_ft: 0 }).effective_stress_psf, 1252, 1e-6);
+  assert.ok("error" in _s3Grp({ rows_n: 2.5, cols_m: 3, diameter_in: 12, spacing_in: 36, single_allow_kip: 100 }));
+  assert.ok("error" in _s3GrpS({ rows_n: 2.5, cols_m: 3, diameter_in: 12, target_eg: 0.8 }));
+  assert.ok("error" in _s3Frost({ water_content_pct: 0.15 }));
+  // An upward kv that drives Pae below static: the static case governs, at H/3.
+  const mo = _s3Mo({ phi: 35, delta: 17.5, gamma: 120, h_ft: 12, kh: 0.05, kv: 0.3 });
+  assert.strictEqual(mo.below_static, true); near(mo.y_bar_ft, 4, 1e-12); near(mo.p_design, mo.pa_static, 1e-9);
+  const mo2 = _s3Mo({ phi: 30, delta: 20, gamma: 120, h_ft: 12, kh: 0.3, kv: 0 });
+  assert.ok(mo2.d_pae > mo2.sw_increment); // Seed-Whitman is not an upper bound
+  // No tension crack: the design thrust is the whole trapezoid and equals the uncracked figure.
+  const co = _s3Coh({ phi: 20, c_psf: 100, gamma: 115, h_ft: 20, q: 1000 });
+  near(co.pa_cracked, co.pa_uncracked, 1e-6); near(co.y_bar_ft, 7.944, 0.001);
+  near(_s3Coh({ phi: 20, c_psf: 300, gamma: 115, h_ft: 20, q: 0 }).pa_cracked, 4439.4, 0.1);
+
+  // Settlement.
+  near(_s3Cons({ cc: 0.25, h_ft: 10, e0: 0.9, sig0_psf: 2000, dsig_psf: "1000" }).sc_in, 2.7804, 1e-3);
+  assert.ok("error" in _s3Cons({ cc: 0.25, h_ft: 10, e0: 0.9, sig0_psf: 2000, dsig_psf: "abc" }));
+  near(_s3Oc({ cc: 0.25, cr: 0.05, h_ft: 10, e0: 0.9, sig0_psf: "2000", sigp_psf: "3000", dsig_psf: "2000" }).final_stress_psf, 4000, 1e-9);
+  assert.ok("error" in _s3Lim({ sc_allow_in: 30, cc: 0.25, h_ft: 2, e0: 0.9, sig0_psf: 2000 }));
+  assert.ok("error" in _s3Cons({ cc: 1, h_ft: 10, e0: 0.5, sig0_psf: 1, dsig_psf: 1e9 }));
+  assert.ok(_s3Ecc({ p_kip: 3, m_kft: 0.3, b_ft: 0.6, l_ft: 1 }).kern_status.startsWith("inside"));
+  let prev = 0;
+  for (let t = 270; t <= 300; t += 0.1) { const u = _s3Deg({ cv_ft2_day: 0.1, hdr_ft: 10, t_days: t }).u_percent; assert.ok(u >= prev - 1e-12, "U fell at t = " + t); prev = u; }
+
+  // Soil properties.
+  assert.ok("error" in _s3Phase({ gamma_pcf: 135, w_pct: 25, gs: 2.7 }));
+  assert.ok(!("error" in _s3Phase({ gamma_pcf: 120, w_pct: 15, gs: 2.7 })));
+  assert.strictEqual(_s3Act({ ll: 40.3, pl: 25.3, clay_fraction_pct: 20 }).activity_class, "normal");
+  assert.ok("error" in _s3Fa({}));
+  assert.ok("error" in _s3Fa({ p38: 100, p4: 98, p8: 85, p16: 68, p30: 45, p50: 18 }));
+  assert.strictEqual(_s3Fa({ p38: 100, p4: 98, p8: 85, p16: 68, p30: 45, p50: 18, p100: 5 }).conforms, true);
+  assert.ok("error" in _s3Grad({ d10_mm: 0.2, d30_mm: 0.5, d60_mm: 1.0, pct_coarse_passing_no4: null }));
+  assert.ok("error" in _s3Grad({ d10_mm: 0.15, d30_mm: 0.5, d60_mm: 1.0, pct_coarse_passing_no4: 60, pct_fines: 15 }));
+
+  // Masonry.
+  assert.ok("error" in _s3Prism({ unit_strength_psi: 1000, mortar_type: "ms" }));
+  near(_s3Prism({ unit_strength_psi: 2000, mortar_type: "ms" }).f_m_psi, 2000, 1e-9);
+  assert.ok("error" in _s3Weep({ flashing_lines: 0.4 }));
+  assert.ok("error" in _s3Weep({ flashing_lines: 2.4 }));
+  assert.ok("error" in _s3Jr({ lap_in: "" }));
+  assert.strictEqual(_s3Jr({}).total_pieces, 45);
+  assert.ok("error" in _s3Flue({ opening_width_in: 36, opening_height_in: 30, flue_shape: "Round", flue_inside_dia_in: 12, flue_inside_a_in: 9, flue_inside_b_in: 12, chimney_height_ft: 20 }));
+  assert.ok("error" in _s3Cmu({ b_in: 7.625, dv_in: 96, mvd: null }));
+  assert.ok("error" in _s3Cmu({ b_in: 7.625, dv_in: 96, p_lb: "abc" }));
+  assert.strictEqual(_s3Anc({ required_tension_lb: 100 }).below_min_embedment, true);
+  assert.strictEqual(_s3Anc({ required_tension_lb: 5000 }).below_min_embedment, false);
+  // The shovel text states the figure the count uses: 0.2 cu ft, five to the cubic foot.
+  const mb = _s3Mortar({});
+  near(mb.sand_shovels, mb.sand_cuft * 5, 1e-9);
+  assert.ok(!/half a cubic foot per shovel/.test(mb.note) && /fifth of a cubic foot per shovel/.test(mb.note));
 });

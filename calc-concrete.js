@@ -104,22 +104,27 @@ export function computeRcBeamFlexure({ fc = 4000, fy = 60000, as_in2 = 0, b = 0,
   const a_in = (as_in2 * fy) / (0.85 * fc * b);
   const mn_kipin = as_in2 * fy * (d - a_in / 2) / 1000;
   const mn_kipft = mn_kipin / 12;
-  const phi_mn = 0.90 * mn_kipft;
-  const util = mu > 0 ? mu / phi_mn : null;
   // phi = 0.90 holds only for a tension-controlled section, and ACI 318-19 9.3.3.1 requires a
   // nonprestressed beam to be one (eps_t >= eps_ty + 0.003). Until 2026-10-03 this was never
-  // checked, so an over-reinforced beam read "OK" at phi 0.90.
+  // checked, so an over-reinforced beam read "OK" at phi 0.90; until 2026-10-10 the check only
+  // changed a label and phi Mn was still 0.90 Mn (21% high on a section the T-beam tile rates at
+  // phi 0.745). phi now follows Table 21.2.2, as the T-beam and doubly reinforced tiles do.
   const c_in = a_in / _RC_BETA1(fc);
-  const eps_t = c_in > 0 ? 0.003 * (d - c_in) / c_in : null;
-  const tc_limit = fy / 29e6 + 0.003;
-  const tension_controlled = eps_t !== null && eps_t >= tc_limit - 1e-9 * tc_limit;
-  return { a_in, mn_kipft, phi_mn, util, eps_t, tc_limit, tension_controlled };
+  if (c_in >= d) return { error: "The neutral axis falls at or below the tension steel - this section is grossly over-reinforced and cannot be designed as a beam. Reduce As or enlarge the section." };
+  const eps_t = 0.003 * (d - c_in) / c_in;
+  const eps_ty = fy / 29e6;
+  const tc_limit = eps_ty + 0.003;
+  const tension_controlled = eps_t >= tc_limit - 1e-9 * tc_limit;
+  const phi = tension_controlled ? 0.90 : eps_t <= eps_ty ? 0.65 : 0.65 + 0.25 * (eps_t - eps_ty) / 0.003;
+  const phi_mn = phi * mn_kipft;
+  const util = mu > 0 ? mu / phi_mn : null;
+  return { a_in, mn_kipft, phi_mn, util, eps_t, tc_limit, tension_controlled, phi };
 }
 
 export const rcBeamFlexureExample = { inputs: { fc: 4000, fy: 60000, as_in2: 3.00, b: 12, d: 21.5, mu: 200 } };
 
 CONCRETE_RENDERERS["rc-beam-flexure"] = _simpleRenderer({
-  citation: "Citation: ACI 318-19 §22.2.2.4.1 (equivalent rectangular stress block, a = As x fy / (0.85 x f'c x b)), §22.2 (Mn = As x fy x (d - a/2)), and §21.2.2 (phi = 0.90 for a tension-controlled section). Covers only a singly-reinforced rectangular section assumed tension-controlled -- confirm the net tensile strain epsilon_t is at least 0.005 (§21.2.2); compression reinforcement, T-beam flange action, minimum steel (§9.6.1.2), and shear are not checked here (see the RC beam shear tile). Take As and d from the reinforcement schedule for the actual section. A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
+  citation: "Citation: ACI 318-19 §22.2.2.4.1 (equivalent rectangular stress block, a = As x fy / (0.85 x f'c x b)), §22.2 (Mn = As x fy x (d - a/2)), and §21.2.2 (phi = 0.90 for a tension-controlled section, net tensile strain at least fy/Es + 0.003, falling linearly to 0.65 at fy/Es). Covers only a singly-reinforced rectangular section; a beam that is not tension-controlled fails §9.3.3.1 and is reported at its reduced phi; compression reinforcement, T-beam flange action, minimum steel (§9.6.1.2), and shear are not checked here (see the RC beam shear tile). Take As and d from the reinforcement schedule for the actual section. A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
   example: rcBeamFlexureExample.inputs,
   fields: [
     { key: "fc", label: "Concrete strength f'c (psi)", kind: "number" },
@@ -132,7 +137,7 @@ CONCRETE_RENDERERS["rc-beam-flexure"] = _simpleRenderer({
   outputs: [
     { key: "a", id: "rbf-out-a", label: "Stress-block depth a", value: (r) => fmt(r.a_in, 2) + " in" },
     { key: "mn", id: "rbf-out-mn", label: "Nominal moment Mn", value: (r) => fmt(r.mn_kipft, 1) + " kip-ft" },
-    { key: "pm", id: "rbf-out-pm", label: "Design moment phi Mn (phi = 0.90)", value: (r) => fmt(r.phi_mn, 1) + " kip-ft" },
+    { key: "pm", id: "rbf-out-pm", label: "Design moment phi Mn", value: (r) => fmt(r.phi_mn, 1) + " kip-ft (phi = " + fmt(r.phi, 2) + (r.tension_controlled ? ")" : "; NOT tension-controlled, eps_t " + fmt(r.eps_t, 4) + " under " + fmt(r.tc_limit, 4) + " -- fails ACI 318-19 9.3.3.1)") },
     { key: "ut", id: "rbf-out-ut", label: "Demand / capacity", value: (r) => r.util === null ? "- (no Mu entered)" : fmt(r.util, Math.abs(r.util - 1) < 0.005 && r.util !== 1 ? 4 : 2) + (r.util <= 1 + 1e-9 ? (r.tension_controlled ? " (OK)" : " (NOT tension-controlled - fails ACI 318-19 9.3.3.1)") : " (OVER)") },
   ],
   compute: computeRcBeamFlexure,
@@ -166,7 +171,10 @@ export function computeRcBeamShear({ fc = 4000, fyt = 60000, bw = 0, d = 0, av_i
   const vs_req_kip = vu > 0 ? Math.max(0, vu / 0.75 - vc_kip) : 0;
   const s_req_in = vs_req_kip > 0 ? av_in2 * fyt_used_psi * d / (vs_req_kip * 1000) : null;
   const sqfc_bwd_kip = Math.sqrt(fc) * bw * d / 1000;
-  const min_required = vu > 0.75 * lambda * sqfc_bwd_kip;
+  // 22.5.3.1 caps sqrt(f'c) at 100 psi unless Av,min is provided (22.5.3.2), so the test for
+  // "no stirrups at all" uses the capped value. Until 2026-10-10 a 16,000 psi beam was told it
+  // needed none at a shear the capped expression does not allow.
+  const min_required = vu > 0.75 * lambda * Math.min(Math.sqrt(fc), 100) * bw * d / 1000;
   const s_avmin_in = av_in2 * fyt_used_psi / (Math.max(0.75 * Math.sqrt(fc), 50) * bw);
   const tight = vs_req_kip > 4 * sqfc_bwd_kip;
   const s_geom_in = tight ? Math.min(d / 4, 12) : Math.min(d / 2, 24);
@@ -212,6 +220,10 @@ export function computeRcDevelopmentLength({ fc = 4000, fy = 60000, db = 0, psi_
   if (!(db > 0)) return { error: "Bar diameter db must be positive (in)." };
   if (!(conf > 0)) return { error: "Confinement term (cb + Ktr)/db must be positive." };
   if (!(psi_t > 0) || !(psi_e > 0) || !(psi_s > 0) || !(psi_g > 0)) return { error: "The psi factors must be positive." };
+  // Table 25.4.2.5 has no value under 1.0 for casting position, coating or grade, and none under
+  // 0.8 for bar size. A smaller entry shortened ld in proportion with nothing said.
+  if (psi_t < 1 || psi_e < 1 || psi_g < 1) return { error: "psi_t, psi_e and psi_g are 1.0 or more in ACI 318-19 Table 25.4.2.5." };
+  if (psi_s < 0.8) return { error: "The bar-size factor psi_s is 0.8 (No. 6 and smaller) or 1.0 in ACI 318-19 Table 25.4.2.5." };
   if (!(lambda > 0)) return { error: "Lightweight factor lambda must be positive." };
   if (lambda > 1) return { error: "Lightweight factor lambda cannot exceed 1.0 (ACI 318-19 19.2.4)." };
   const te = Math.min(psi_t * psi_e, 1.7);
@@ -1019,7 +1031,8 @@ CONCRETE_RENDERERS["concrete-modulus-of-rupture"] = _simpleRenderer({
 export function computeConcreteStrengthFromRupture({ fr_psi = 0, lambda = 1.0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const fr = Number(fr_psi) || 0;
-  const lam = Number(lambda) > 0 ? Number(lambda) : 1.0;
+  // A blank or zero lambda is an error, as in the forward tile; it used to become 1.0.
+  const lam = Number(lambda);
   if (!(fr > 0)) return { error: "Modulus of rupture fr must be positive (psi)." };
   if (!(lam > 0)) return { error: "Lightweight factor lambda must be positive." };
   if (lam > 1) return { error: "Lightweight factor lambda cannot exceed 1.0 (ACI 318-19 19.2.4)." };
@@ -1062,12 +1075,12 @@ export function computeConcreteCrackingMoment({ b_in = 0, h_in = 0, fc_psi = 400
   const out_of_band = lambda < 0.75 || lambda > 1.0;
   return {
     fr_psi, sm_in3, mcr_lbin, mcr_kipft, out_of_band,
-    note: "ACI 318-19 cracking moment Mcr = fr Ig / yt, the bending moment at which a plain (uncracked) section first cracks in flexure. With the modulus of rupture fr = 7.5 lambda sqrt(f'c) (§19.2.3.1; lambda 1.0 normalweight, 0.75 all-lightweight) and the gross rectangular section modulus S = Ig/yt = b h^2/6, Mcr = fr b h^2/6. This is the value behind the effective-moment-of-inertia (Ie) deflection analysis and the minimum-flexural-reinforcement check (the design strength must reach at least 1.2 Mcr). Gross rectangular section with the reinforcement transform neglected (the standard approximation); a T-beam or a heavily reinforced section uses the transformed Ig. A design aid; the engineer of record's stamped design governs.",
+    note: "ACI 318-19 cracking moment Mcr = fr Ig / yt, the bending moment at which a plain (uncracked) section first cracks in flexure. With the modulus of rupture fr = 7.5 lambda sqrt(f'c) (§19.2.3.1; lambda 1.0 normalweight, 0.75 all-lightweight) and the gross rectangular section modulus S = Ig/yt = b h^2/6, Mcr = fr b h^2/6. This is the value behind the effective-moment-of-inertia (Ie) deflection analysis and the prestressed-member minimum-reinforcement check (§9.6.2.1: design strength at least 1.2 Mcr; a nonprestressed beam uses the As,min of §9.6.1.2 instead). Gross rectangular section with the reinforcement transform neglected (the standard approximation); a T-beam or a heavily reinforced section uses the transformed Ig. A design aid; the engineer of record's stamped design governs.",
   };
 }
 export const concreteCrackingMomentExample = { inputs: { b_in: 12, h_in: 20, fc_psi: 4000, lambda: 1.0 } };
 CONCRETE_RENDERERS["concrete-cracking-moment"] = _simpleRenderer({
-  citation: "Citation: ACI 318-19 cracking moment Mcr = fr Ig/yt = fr b h^2/6 for a gross rectangular section, with the modulus of rupture fr = 7.5 lambda sqrt(f'c) (§19.2.3.1). The value behind the Ie deflection analysis and the minimum-reinforcement check (design strength >= 1.2 Mcr). A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
+  citation: "Citation: ACI 318-19 cracking moment Mcr = fr Ig/yt = fr b h^2/6 for a gross rectangular section, with the modulus of rupture fr = 7.5 lambda sqrt(f'c) (§19.2.3.1). The value behind the Ie deflection analysis and the prestressed-member minimum-reinforcement check (design strength >= 1.2 Mcr, §9.6.2.1; a nonprestressed beam uses the As,min of §9.6.1.2 instead). A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
   example: concreteCrackingMomentExample.inputs,
   fields: [
     { key: "b_in", label: "Section width b (in)", kind: "number" },
@@ -1086,7 +1099,7 @@ CONCRETE_RENDERERS["concrete-cracking-moment"] = _simpleRenderer({
 
 // concrete-depth-for-cracking-moment: inverse of concrete-cracking-moment. The forward tile gives the cracking moment
 // from the section depth; the inverse recovers the section depth that reaches a target cracking moment for a given width,
-// so a designer sizes the section to a target Mcr (e.g. 1.2 Mcr for minimum flexural reinforcement). From
+// so a designer sizes the section to a target Mcr (e.g. 1.2 Mcr for a prestressed member's minimum reinforcement). From
 // Mcr = fr b h^2 / 6 with fr = 7.5 lambda sqrt(f'c), h = sqrt( 6 Mcr / (fr b) ).
 // dims: in { target_mcr_kipft: M L^2 T^-2, b_in: L, fc_psi: M L^-1 T^-2, lambda: dimensionless } out: { h_in: L, fr_psi: M L^-1 T^-2, sm_in3: L^3 }
 export function computeConcreteDepthForCrackingMoment({ target_mcr_kipft = 0, b_in = 0, fc_psi = 4000, lambda = 1.0 } = {}) {
@@ -1108,12 +1121,12 @@ export function computeConcreteDepthForCrackingMoment({ target_mcr_kipft = 0, b_
   if (![fr_psi, h_in, sm_in3].every(Number.isFinite)) return { error: "Section-depth math is not a finite value." };
   return {
     h_in, fr_psi, sm_in3, out_of_band,
-    note: "ACI 318-19 cracking moment Mcr = fr b h^2/6 solved for the total depth: h = sqrt( 6 Mcr / (fr b) ), with the modulus of rupture fr = 7.5 lambda sqrt(f'c) (§19.2.3.1). Size to the target Mcr you need - for the minimum-flexural-reinforcement check the design strength must reach at least 1.2 Mcr, so a common use is to enter 1.2 Mcr and check the section against it. This is a gross rectangular section with the reinforcement transform neglected (the standard approximation); a T-beam or heavily reinforced section uses the transformed Ig, and the flexural, shear, and deflection design still govern the final depth. A design aid; the engineer of record's stamped design governs.",
+    note: "ACI 318-19 cracking moment Mcr = fr b h^2/6 solved for the total depth: h = sqrt( 6 Mcr / (fr b) ), with the modulus of rupture fr = 7.5 lambda sqrt(f'c) (§19.2.3.1). Size to the target Mcr you need - for a prestressed member's minimum-reinforcement check (§9.6.2.1) the design strength must reach at least 1.2 Mcr, so a common use is to enter 1.2 Mcr and check the section against it. This is a gross rectangular section with the reinforcement transform neglected (the standard approximation); a T-beam or heavily reinforced section uses the transformed Ig, and the flexural, shear, and deflection design still govern the final depth. A design aid; the engineer of record's stamped design governs.",
   };
 }
 export const concreteDepthForCrackingMomentExample = { inputs: { target_mcr_kipft: 31.6, b_in: 12, fc_psi: 4000, lambda: 1.0 } };
 CONCRETE_RENDERERS["concrete-depth-for-cracking-moment"] = _simpleRenderer({
-  citation: "Citation: ACI 318-19 cracking moment Mcr = fr b h^2/6 (fr = 7.5 lambda sqrt(f'c), §19.2.3.1) solved for the depth: h = sqrt( 6 Mcr / (fr b) ). The value behind the minimum-reinforcement check (design strength >= 1.2 Mcr). A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
+  citation: "Citation: ACI 318-19 cracking moment Mcr = fr b h^2/6 (fr = 7.5 lambda sqrt(f'c), §19.2.3.1) solved for the depth: h = sqrt( 6 Mcr / (fr b) ). The value behind the prestressed-member minimum-reinforcement check (design strength >= 1.2 Mcr, §9.6.2.1; a nonprestressed beam uses the As,min of §9.6.1.2 instead). A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
   example: concreteDepthForCrackingMomentExample.inputs,
   fields: [
     { key: "target_mcr_kipft", label: "Target cracking moment Mcr (kip-ft)", kind: "number" },
@@ -1186,6 +1199,8 @@ export function computeTBeamEffectiveFlangeWidth({ bw_in = 0, hf_in = 0, ln_in =
   if (!(hf > 0)) return { error: "Flange (slab) thickness hf must be positive (in)." };
   if (!(ln > 0)) return { error: "Clear span ln must be positive (in)." };
   if (!(sw > 0)) return { error: "Clear distance to the adjacent web sw must be positive (in)." };
+  // An unrecognized type used to be an interior beam, which counts the flange on both sides.
+  if (beam_type !== "edge" && beam_type !== "interior") return { error: "Beam type must be interior (flange both sides) or edge (flange one side)." };
   const edge = beam_type === "edge";
   const overhang = edge
     ? Math.min(6 * hf, sw / 2, ln / 12)
@@ -1232,19 +1247,22 @@ export function computeConcreteBeamMinFlexuralSteel({ fc_psi = 4000, fy_psi = 60
   if (!(fy > 0)) return { error: "Steel yield fy must be positive (psi)." };
   if (!(bw > 0)) return { error: "Web width bw must be positive (in)." };
   if (!(d > 0)) return { error: "Effective depth d must be positive (in)." };
-  const term_sqrt = 3 * Math.sqrt(fc) / fy;
-  const term_flat = 200 / fy;
+  // 9.6.1.2: fy in this expression is limited to 80,000 psi, so Grade 100 steel gets no further
+  // reduction in As,min. Until 2026-10-10 it did (0.48 in^2 where 0.60 is required).
+  const fy_used_psi = Math.min(fy, 80000);
+  const term_sqrt = 3 * Math.sqrt(fc) / fy_used_psi;
+  const term_flat = 200 / fy_used_psi;
   const ratio = Math.max(term_sqrt, term_flat);
   const as_min_in2 = ratio * bw * d;
   const governs = term_sqrt >= term_flat ? "3 sqrt(f'c)/fy" : "200/fy";
   return {
-    ratio, as_min_in2, governs,
-    note: "ACI 318-19 §9.6.1.2 minimum flexural reinforcement: As,min = max(3 sqrt(f'c)/fy, 200/fy) x bw x d, so the beam has more capacity cracked than uncracked and does not fail suddenly at first cracking. The 200/fy floor governs up to about f'c = 4444 psi; above that the 3 sqrt(f'c)/fy term controls. For a statically determinate T-beam with the flange in tension, bw is replaced by the smaller of 2 bw and the flange width (not applied here). A design aid; the engineer of record's stamped design governs.",
+    ratio, as_min_in2, governs, fy_used_psi,
+    note: "ACI 318-19 §9.6.1.2 minimum flexural reinforcement: As,min = max(3 sqrt(f'c)/fy, 200/fy) x bw x d, with fy taken as no more than 80,000 psi, so the beam has more capacity cracked than uncracked and does not fail suddenly at first cracking. The 200/fy floor governs up to about f'c = 4444 psi; above that the 3 sqrt(f'c)/fy term controls. For a statically determinate T-beam with the flange in tension, bw is replaced by the smaller of 2 bw and the flange width (not applied here). A design aid; the engineer of record's stamped design governs.",
   };
 }
 export const concreteBeamMinFlexuralSteelExample = { inputs: { fc_psi: 4000, fy_psi: 60000, bw_in: 12, d_in: 20 } };
 CONCRETE_RENDERERS["concrete-beam-min-flexural-steel"] = _simpleRenderer({
-  citation: "Citation: ACI 318-19 §9.6.1.2: minimum flexural reinforcement As,min = max(3 sqrt(f'c)/fy, 200/fy) x bw x d, ensuring the cracking moment does not exceed the flexural capacity (no sudden failure at first crack). The 200/fy floor governs to about f'c = 4444 psi; the sqrt term controls above. A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
+  citation: "Citation: ACI 318-19 §9.6.1.2: minimum flexural reinforcement As,min = max(3 sqrt(f'c)/fy, 200/fy) x bw x d with fy limited to 80,000 psi, ensuring the cracking moment does not exceed the flexural capacity (no sudden failure at first crack). The 200/fy floor governs to about f'c = 4444 psi; the sqrt term controls above. A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
   example: concreteBeamMinFlexuralSteelExample.inputs,
   fields: [
     { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number" },
@@ -1261,9 +1279,11 @@ CONCRETE_RENDERERS["concrete-beam-min-flexural-steel"] = _simpleRenderer({
 });
 
 // dims: in { fs_psi: M L^-1 T^-2, cc_in: L } out: { s1_in: L, s2_in: L, s_max_in: L }
-export function computeConcreteCrackControlSpacing({ fs_psi = 40000, cc_in = 0 } = {}) {
+export function computeConcreteCrackControlSpacing({ fs_psi = 40000, cc_in = null } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const fs = Number(fs_psi) || 0;
+  // A blank cover used to compute as 0 in, which gives the widest spacing the rule allows.
+  if (cc_in === null || cc_in === "") return { error: "Enter the clear cover cc (in); the spacing limit tightens as cover grows." };
   const cc = Number(cc_in) || 0;
   if (!(fs > 0)) return { error: "Service-load steel stress fs must be positive (psi)." };
   if (!(cc >= 0)) return { error: "Clear cover must be non-negative (in)." };
@@ -1283,7 +1303,7 @@ CONCRETE_RENDERERS["concrete-crack-control-spacing"] = _simpleRenderer({
   example: concreteCrackControlSpacingExample.inputs,
   fields: [
     { key: "fs_psi", label: "Service steel stress fs (psi; 2/3 fy is permitted, 40,000 for Grade 60)", kind: "number", default: 40000 },
-    { key: "cc_in", label: "Clear cover cc (in)", kind: "number" },
+    { key: "cc_in", label: "Clear cover cc (in)", kind: "number", required: true },
   ],
   outputs: [
     { key: "s1", id: "ccs-out-s1", label: "s1 = 15(40000/fs) - 2.5 cc", value: (r) => fmt(r.s1_in, 1) + " in" },

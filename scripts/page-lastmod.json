@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "63f44308fc22be6d",
+      "sha": "87c96c6b66519716",
       "date": "2026-10-10"
     },
     "/tools/": {
@@ -1562,12 +1562,12 @@
       "date": "2026-10-08"
     },
     "/tools/concrete-cracking-moment/": {
-      "sha": "6eb339d851b07a44",
-      "date": "2026-09-29"
+      "sha": "1485491046727790",
+      "date": "2026-10-10"
     },
     "/tools/concrete-depth-for-cracking-moment/": {
-      "sha": "a9746e5fc7829644",
-      "date": "2026-09-29"
+      "sha": "216390a5f238c622",
+      "date": "2026-10-10"
     },
     "/tools/concrete-effective-inertia/": {
       "sha": "491373e17391ed3d",
@@ -4618,8 +4618,8 @@
       "date": "2026-09-29"
     },
     "/tools/masonry-anchor-embedment/": {
-      "sha": "8369da82de0fc325",
-      "date": "2026-09-29"
+      "sha": "453b1257f85a7663",
+      "date": "2026-10-10"
     },
     "/tools/masonry-anchor-shear/": {
       "sha": "c4b232c814a7d87a",
@@ -4866,8 +4866,8 @@
       "date": "2026-10-01"
     },
     "/tools/mortar-batch-c270/": {
-      "sha": "adab52ca481be0f3",
-      "date": "2026-10-01"
+      "sha": "fbff150f5cef61eb",
+      "date": "2026-10-10"
     },
     "/tools/mortar-mix/": {
       "sha": "9c935c60da062a30",
@@ -6118,8 +6118,8 @@
       "date": "2026-09-29"
     },
     "/tools/rc-beam-flexure/": {
-      "sha": "1c1fc90eb19a211d",
-      "date": "2026-09-29"
+      "sha": "cfbb64622d1527a2",
+      "date": "2026-10-10"
     },
     "/tools/rc-beam-shear/": {
       "sha": "e8d1f3396b72033a",
@@ -6426,8 +6426,8 @@
       "date": "2026-10-03"
     },
     "/tools/retaining-wall-stability/": {
-      "sha": "0c0f64d36811dc32",
-      "date": "2026-09-29"
+      "sha": "29adf5353db75b42",
+      "date": "2026-10-10"
     },
     "/tools/retrieval-winch-force/": {
       "sha": "a8c81f0d28cad53e",
@@ -6834,8 +6834,8 @@
       "date": "2026-10-03"
     },
     "/tools/seismic-earth-pressure/": {
-      "sha": "d402185c69c75f35",
-      "date": "2026-10-03"
+      "sha": "d1cd8af71f55fb9a",
+      "date": "2026-10-10"
     },
     "/tools/seismic-overturning-moment/": {
       "sha": "cdf2237b7c3bb39f",
