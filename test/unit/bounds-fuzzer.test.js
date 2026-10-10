@@ -59265,3 +59265,29 @@ test("bounds: friction-hoist-traction follows the capstan limit and statics", ()
     assert.ok("error" in _fht({ ...b, ...bad }));
   }
 });
+
+import { computeGlycolFluidFactor as _gff } from "../../calc-hvacsystems.js";
+test("bounds: glycol-fluid-factor reproduces every printed Dow value and interpolates between them", () => {
+  // Dow Form 180-01273-402AMS, section 4.2: rows 40 / 180 / 325 F, columns 30 / 40 / 50 / 60% by volume.
+  const cp = [[0.894, 0.847, 0.794, 0.734], [0.947, 0.916, 0.878, 0.833], [1.002, 0.987, 0.965, 0.936]];
+  const rho = [[65.30, 66.03, 66.68, 67.23], [62.60, 63.09, 63.50, 63.83], [57.89, 58.18, 58.41, 58.59]];
+  const visc = [[5.75, 9.63, 14.28, 23.65], [0.68, 0.85, 1.08, 1.29], [0.31, 0.39, 0.40, 0.45]];
+  [40, 180, 325].forEach((t, i) => [30, 40, 50, 60].forEach((p, j) => {
+    const r = _gff({ glycol_pct: p, fluid_temp_f: t });
+    assert.ok(Math.abs(r.specific_heat_btu_lb_f - cp[i][j]) < 1e-9, `cp ${p}% ${t}F`);
+    assert.ok(Math.abs(r.density_lb_ft3 - rho[i][j]) < 1e-9, `rho ${p}% ${t}F`);
+    assert.ok(Math.abs(r.viscosity_centipoise - visc[i][j]) < 1e-9, `visc ${p}% ${t}F`);
+    assert.ok(Math.abs(r.fluid_factor - 60 * rho[i][j] / (1728 / 231) * cp[i][j]) < 1e-9);
+  }));
+  // Between nodes the value lies between its neighbours; more glycol always lowers the factor.
+  const mid = _gff({ glycol_pct: 35, fluid_temp_f: 110 });
+  assert.ok(mid.specific_heat_btu_lb_f > 0.847 && mid.specific_heat_btu_lb_f < 0.947);
+  assert.ok(_gff({ glycol_pct: 50, fluid_temp_f: 60 }).fluid_factor < _gff({ glycol_pct: 30, fluid_temp_f: 60 }).fluid_factor);
+  const f = _gff({ glycol_pct: 40, fluid_temp_f: 40, load_btuh: 240000, delta_t_f: 10 });
+  assert.ok(Math.abs(f.flow_gpm - 240000 / (f.fluid_factor * 10)) < 1e-9);
+  assert.equal(f.water_flow_gpm, 48);
+  assert.equal(f.freeze_point_f, -7);
+  for (const bad of [{ glycol_pct: 20 }, { glycol_pct: 70 }, { fluid_temp_f: 20 }, { fluid_temp_f: 400 }, { load_btuh: -1 }, { delta_t_f: -1 }]) {
+    assert.ok("error" in _gff({ glycol_pct: 40, fluid_temp_f: 100, ...bad }));
+  }
+});

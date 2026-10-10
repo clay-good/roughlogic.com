@@ -452,6 +452,7 @@ export const RENDERER_MAP = {
   "compressor-volumetric-efficiency": { module: "../../calc-refrigerant.js", exportName: "REFRIGERANT_RENDERERS" },
   "refractory-shell-temperature": { module: "../../calc-hvacsystems.js", exportName: "HVACSYSTEMS_RENDERERS" },
   "flat-surface-heat-loss": { module: "../../calc-hvacsystems.js", exportName: "HVACSYSTEMS_RENDERERS" },
+  "glycol-fluid-factor": { module: "../../calc-hvacsystems.js", exportName: "HVACSYSTEMS_RENDERERS" },
   "cryogenic-boiloff": { module: "../../calc-hvacsystems.js", exportName: "HVACSYSTEMS_RENDERERS" },
   "flow-hood-correction": { module: "../../calc-hvacsystems.js", exportName: "HVACSYSTEMS_RENDERERS" },
   "fan-system-effect": { module: "../../calc-hvacsystems.js", exportName: "HVACSYSTEMS_RENDERERS" },

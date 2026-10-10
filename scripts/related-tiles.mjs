@@ -1589,6 +1589,7 @@ const RELATED = {
   "spray-transfer-efficiency": ["coating-coverage-dft","powder-coating-coverage","spray-booth-airflow","paint-mix-ratio"],
   "adhesive-bond-area": ["construction-adhesive-tubes","fillet-weld-strength","bolt-stretch"],
   "refractory-shell-temperature": ["insulation-thickness","pipe-heat-loss-radial","flue-gas-dew-point"],
+  "glycol-fluid-factor": ["hydronic-gpm-deltat","glycol-mix","secondary-glycol-loop"],
   "flat-surface-heat-loss": ["bare-pipe-heat-loss","insulation-heat-loss","refractory-shell-temperature"],
   "cryogenic-boiloff": ["pipe-insulation-for-condensation","insulation-thickness","evaporation-load"],
   "gaussian-dispersion-screen": ["plume-rise-briggs","stack-emission-pte","odor-dilution-threshold"],

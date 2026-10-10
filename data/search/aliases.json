@@ -116947,6 +116947,31 @@
    "term": "will my friction hoist ropes slip",
    "target": "friction-hoist-traction",
    "kind": "question"
+  },
+  {
+   "term": "glycol fluid factor",
+   "target": "glycol-fluid-factor",
+   "kind": "industry"
+  },
+  {
+   "term": "glycol correction factor",
+   "target": "glycol-fluid-factor",
+   "kind": "industry"
+  },
+  {
+   "term": "propylene glycol specific heat",
+   "target": "glycol-fluid-factor",
+   "kind": "industry"
+  },
+  {
+   "term": "glycol gpm correction",
+   "target": "glycol-fluid-factor",
+   "kind": "industry"
+  },
+  {
+   "term": "how much more flow does glycol need",
+   "target": "glycol-fluid-factor",
+   "kind": "question"
   }
  ]
 }

@@ -2423,6 +2423,11 @@
     {"term":"tank wall heat loss","target":"flat-surface-heat-loss","kind":"industry"},
     {"term":"bare surface heat loss","target":"flat-surface-heat-loss","kind":"industry"},
     {"term":"natural convection flat plate","target":"flat-surface-heat-loss","kind":"industry"},
-    {"term":"how much heat does an uninsulated tank lose","target":"flat-surface-heat-loss","kind":"question"}
+    {"term":"how much heat does an uninsulated tank lose","target":"flat-surface-heat-loss","kind":"question"},
+    {"term":"glycol fluid factor","target":"glycol-fluid-factor","kind":"industry"},
+    {"term":"glycol correction factor","target":"glycol-fluid-factor","kind":"industry"},
+    {"term":"propylene glycol specific heat","target":"glycol-fluid-factor","kind":"industry"},
+    {"term":"glycol gpm correction","target":"glycol-fluid-factor","kind":"industry"},
+    {"term":"how much more flow does glycol need","target":"glycol-fluid-factor","kind":"question"}
   ]
 }

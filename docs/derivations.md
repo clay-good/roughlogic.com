@@ -2627,6 +2627,7 @@ cross-check.
 | calc-hvacsystems.js | `computeFilterPressureDrop` | `{ filter_type = "merv13", face_area_ft2 = 0, face_velocity_fpm = 300, clean_d...` | _ | _ | _ |
 | calc-hvacsystems.js | `computeFlatSurfaceHeatLoss` | `{ orientation = "vertical", side_a_ft = 0, side_b_ft = 0, surface_f = 0, amb_...` | _ | _ | _ |
 | calc-hvacsystems.js | `computeFlowHoodCorrection` | `{ hood_reading_cfm = 0, correction_factor = 1, reference_traverse_cfm = 0, de...` | _ | _ | _ |
+| calc-hvacsystems.js | `computeGlycolFluidFactor` | `{ glycol_pct = 0, fluid_temp_f = 0, load_btuh = 0, delta_t_f = 0 } = {}` | _ | _ | _ |
 | calc-hvacsystems.js | `computeHumidifierCapacity` | `{ cfm = 0, supply_db_F = 70, entering_rh_pct = 20, target_rh_pct = 40, altitu...` | _ | _ | _ |
 | calc-hvacsystems.js | `computeHxLmtdNtu` | `{ config = "counterflow", th_in_F = 0, th_out_F = 0, tc_in_F = 0, tc_out_F = ...` | _ | _ | _ |
 | calc-hvacsystems.js | `computeHydronicBufferTank` | `{ min_on_time_min = 0, source_min_btu = 0, zone_min_load_btu = 0, delta_t_f =...` | _ | _ | _ |
@@ -3926,7 +3927,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2510.
+Row count: 2511.
 
 <!-- END function-corpus-v14 -->
 
@@ -4419,7 +4420,7 @@ per spec-v14 §13.1 second paragraph.
 | `wobbe-index` | Wobbe Index (Fuel-Gas Interchangeability) | Wobbe index (fuel-gas interchangeabil...; WI = 1000 / sqrt(0.60) = 1000 / 0.77460 = 1290.99 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `wsfu-demand` | Probable Peak Demand (WSFU to GPM) | Hunter's curve (NBS BMS65) / IPC 2021...; 120 WSFU flush-valve -> 73.0 GPM, a printed row of Table ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group C HVAC (219 tiles)
+### Group C HVAC (220 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4541,6 +4542,7 @@ per spec-v14 §13.1 second paragraph.
 | `gas-meter-clock` | Gas-Meter Clocking (Actual Firing Rate) | First-principles meter-clocking arith...; spec-v110 section 2.1 pinned example (1 cf dial, 37 sec, ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `gas-meter-clock-target` | Gas-Meter Clock Target Time | First-principles meter-clocking arith...; spec-v652 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `geothermal-loop` | Geothermal Loop Length | IGSHPA / ASHRAE Handbook (Applications); 60,000 BTU/hr heating (governs over 48,000 BTU/hr cooling... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `glycol-fluid-factor` | Glycol Fluid Factor and Solution Properties (Propylene Glycol) | The Dow Chemical Company; 4.2 Typical Properties of Aqueous Solutions: 40% glycol b... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+4 more) |
 | `grille-face-velocity` | Grille/Register Face Velocity and Free-Area Sizing | ASHRAE / SMACNA; spec-v348 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `grille-neck-nc` | Grille Neck Velocity and NC Level | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `ground-loop-flow-antifreeze` | Ground Loop Flow, Antifreeze, and Pump Power | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -6355,6 +6357,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 
-Tile count: 2256. Fixture-covered or reference-cadence: 2256 / 2256.
+Tile count: 2257. Fixture-covered or reference-cadence: 2257 / 2257.
 
 <!-- END tile-index-v14 -->

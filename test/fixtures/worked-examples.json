@@ -170356,6 +170356,155 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "glycol-fluid-factor",
+  "source_publisher": "The Dow Chemical Company",
+  "source_title": "DOWFROST HD Heat Transfer Fluid, Engineering Specifications for Closed-Loop HVAC Systems",
+  "source_edition_or_year": "Form No. 180-01273-402AMS, April 2002",
+  "source_section_or_page": "4.2 Typical Properties of Aqueous Solutions: 40% glycol by volume at 40 F, specific heat 0.847 BTU/lb F, density 66.03 lb/ft3; factor = 60 x 66.03/7.4805 x 0.847",
+  "verified_by": "rl",
+  "verified_on": "2026-10-09",
+  "inputs": {
+   "glycol_pct": 40,
+   "fluid_temp_f": 40,
+   "load_btuh": 240000,
+   "delta_t_f": 10
+  },
+  "outputs": {
+   "specific_heat_btu_lb_f": {
+    "value": 0.847,
+    "tolerance": {
+     "abs": 0.0005
+    }
+   },
+   "density_lb_ft3": {
+    "value": 66.03,
+    "tolerance": {
+     "abs": 0.005
+    }
+   },
+   "fluid_factor": {
+    "value": 448.58,
+    "tolerance": {
+     "pct": 0.05
+    }
+   },
+   "flow_gpm": {
+    "value": 53.5,
+    "tolerance": {
+     "pct": 0.1
+    }
+   }
+  }
+ },
+ {
+  "tile_id": "glycol-fluid-factor",
+  "source_publisher": "The Dow Chemical Company",
+  "source_title": "DOWFROST HD Heat Transfer Fluid, Engineering Specifications for Closed-Loop HVAC Systems",
+  "source_edition_or_year": "Form No. 180-01273-402AMS, April 2002",
+  "source_section_or_page": "4.2 Typical Properties of Aqueous Solutions: 30% glycol by volume at 180 F, specific heat 0.947 BTU/lb F, density 62.60 lb/ft3; factor = 60 x 62.60/7.4805 x 0.947",
+  "verified_by": "rl",
+  "verified_on": "2026-10-09",
+  "inputs": {
+   "glycol_pct": 30,
+   "fluid_temp_f": 180
+  },
+  "outputs": {
+   "specific_heat_btu_lb_f": {
+    "value": 0.947,
+    "tolerance": {
+     "abs": 0.0005
+    }
+   },
+   "density_lb_ft3": {
+    "value": 62.6,
+    "tolerance": {
+     "abs": 0.005
+    }
+   }
+  }
+ },
+ {
+  "tile_id": "glycol-fluid-factor",
+  "source_publisher": "The Dow Chemical Company",
+  "source_title": "DOWFROST HD Heat Transfer Fluid, Engineering Specifications for Closed-Loop HVAC Systems",
+  "source_edition_or_year": "Form No. 180-01273-402AMS, April 2002",
+  "source_section_or_page": "4.2 Typical Properties of Aqueous Solutions: 50% glycol by volume at 180 F, specific heat 0.878 BTU/lb F, density 63.50 lb/ft3; factor = 60 x 63.50/7.4805 x 0.878",
+  "verified_by": "rl",
+  "verified_on": "2026-10-09",
+  "inputs": {
+   "glycol_pct": 50,
+   "fluid_temp_f": 180
+  },
+  "outputs": {
+   "specific_heat_btu_lb_f": {
+    "value": 0.878,
+    "tolerance": {
+     "abs": 0.0005
+    }
+   },
+   "density_lb_ft3": {
+    "value": 63.5,
+    "tolerance": {
+     "abs": 0.005
+    }
+   }
+  }
+ },
+ {
+  "tile_id": "glycol-fluid-factor",
+  "source_publisher": "The Dow Chemical Company",
+  "source_title": "DOWFROST HD Heat Transfer Fluid, Engineering Specifications for Closed-Loop HVAC Systems",
+  "source_edition_or_year": "Form No. 180-01273-402AMS, April 2002",
+  "source_section_or_page": "4.2 Typical Properties of Aqueous Solutions: 60% glycol by volume at 325 F, specific heat 0.936 BTU/lb F, density 58.59 lb/ft3; factor = 60 x 58.59/7.4805 x 0.936",
+  "verified_by": "rl",
+  "verified_on": "2026-10-09",
+  "inputs": {
+   "glycol_pct": 60,
+   "fluid_temp_f": 325
+  },
+  "outputs": {
+   "specific_heat_btu_lb_f": {
+    "value": 0.936,
+    "tolerance": {
+     "abs": 0.0005
+    }
+   },
+   "density_lb_ft3": {
+    "value": 58.59,
+    "tolerance": {
+     "abs": 0.005
+    }
+   }
+  }
+ },
+ {
+  "tile_id": "glycol-fluid-factor",
+  "source_publisher": "The Dow Chemical Company",
+  "source_title": "DOWFROST HD Heat Transfer Fluid, Engineering Specifications for Closed-Loop HVAC Systems",
+  "source_edition_or_year": "Form No. 180-01273-402AMS, April 2002",
+  "source_section_or_page": "4.2 Typical Properties of Aqueous Solutions: 30% glycol by volume at 40 F, specific heat 0.894 BTU/lb F, density 65.30 lb/ft3; factor = 60 x 65.30/7.4805 x 0.894",
+  "verified_by": "rl",
+  "verified_on": "2026-10-09",
+  "inputs": {
+   "glycol_pct": 30,
+   "fluid_temp_f": 40
+  },
+  "outputs": {
+   "specific_heat_btu_lb_f": {
+    "value": 0.894,
+    "tolerance": {
+     "abs": 0.0005
+    }
+   },
+   "density_lb_ft3": {
+    "value": 65.3,
+    "tolerance": {
+     "abs": 0.005
+    }
+   }
+  }
  }
  ]
 }

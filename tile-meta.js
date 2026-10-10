@@ -1144,6 +1144,7 @@ const _TILES = [
   ["adhesive-bond-area", "K"],
   ["refractory-shell-temperature", "C"],
   ["flat-surface-heat-loss", "C"],
+  ["glycol-fluid-factor", "C"],
   ["cryogenic-boiloff", "C"],
   ["gaussian-dispersion-screen", "G"],
   ["noise-barrier-insertion-loss", "G"],

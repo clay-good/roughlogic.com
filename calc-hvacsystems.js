@@ -2870,3 +2870,78 @@ HVACSYSTEMS_RENDERERS["flat-surface-heat-loss"] = _simpleRenderer({
     { key: "note", label: "Note", value: (r) => r.note },
   ],
 });
+
+// ===================== spec-v1953: propylene glycol solution properties and the hydronic fluid factor =====================
+// hydronic-gpm-deltat, coil-capacity-verification and secondary-glycol-loop take the fluid factor, specific heat
+// or gravity of a glycol loop as ENTERED. This gives them from the manufacturer's table: The Dow Chemical
+// Company, DOWFROST HD Heat Transfer Fluid, Engineering Specifications for Closed-Loop HVAC Systems (Form
+// No. 180-01273-402AMS, April 2002), section 4.2 "Typical Properties of Aqueous Solutions" (glycol percent by
+// volume) and 4.3 freezing points. Interpolated linearly in percent and in temperature between the printed
+// columns and rows (viscosity on its logarithm). The fluid factor is 60 min/h x density / 7.4805 gal/ft3 x cp.
+const _PG_PERCENTS = [30, 40, 50, 60];
+const _PG_TEMPS_F = [40, 180, 325];
+const _PG_SPECIFIC_HEAT = [[0.894, 0.847, 0.794, 0.734], [0.947, 0.916, 0.878, 0.833], [1.002, 0.987, 0.965, 0.936]];
+const _PG_DENSITY_LB_FT3 = [[65.30, 66.03, 66.68, 67.23], [62.60, 63.09, 63.50, 63.83], [57.89, 58.18, 58.41, 58.59]];
+const _PG_VISCOSITY_CP = [[5.75, 9.63, 14.28, 23.65], [0.68, 0.85, 1.08, 1.29], [0.31, 0.39, 0.40, 0.45]];
+const _PG_FREEZE_F = [8, -7, -28, -60];
+const _PG_GAL_PER_FT3 = 1728 / 231;
+const _pgLerp = (xs, ys, x) => {
+  let i = 0;
+  while (i < xs.length - 2 && x > xs[i + 1]) i++;
+  return ys[i] + (ys[i + 1] - ys[i]) * (x - xs[i]) / (xs[i + 1] - xs[i]);
+};
+// Bilinear on the printed grid: across percent in each temperature row, then across temperature.
+const _pgTable = (table, pct, tempF, log) => {
+  const rows = table.map((row) => _pgLerp(_PG_PERCENTS, log ? row.map(Math.log) : row, pct));
+  const v = _pgLerp(_PG_TEMPS_F, rows, tempF);
+  return log ? Math.exp(v) : v;
+};
+// dims: in { glycol_pct: dimensionless, fluid_temp_f: T, load_btuh: M L^2 T^-3, delta_t_f: T } out: { specific_heat_btu_lb_f: L^2 T^-2, density_lb_ft3: M L^-3, specific_gravity: dimensionless, fluid_factor: dimensionless, flow_multiplier: dimensionless, freeze_point_f: T, flow_gpm: L^3 T^-1, water_flow_gpm: L^3 T^-1 }
+export function computeGlycolFluidFactor({ glycol_pct = 0, fluid_temp_f = 0, load_btuh = 0, delta_t_f = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(glycol_pct >= 30 && glycol_pct <= 60)) return { error: "Glycol concentration must be 30 to 60 percent by volume, the range of the manufacturer's table." };
+  if (!(fluid_temp_f >= 40 && fluid_temp_f <= 325)) return { error: "Fluid temperature must be 40 to 325 degF, the range of the manufacturer's table." };
+  if (!(load_btuh >= 0)) return { error: "Load cannot be negative (BTU/hr, 0 to skip)." };
+  if (!(delta_t_f >= 0)) return { error: "Temperature difference cannot be negative (degF, 0 to skip)." };
+  const specific_heat_btu_lb_f = _pgTable(_PG_SPECIFIC_HEAT, glycol_pct, fluid_temp_f, false);
+  const density_lb_ft3 = _pgTable(_PG_DENSITY_LB_FT3, glycol_pct, fluid_temp_f, false);
+  const viscosity_centipoise = _pgTable(_PG_VISCOSITY_CP, glycol_pct, fluid_temp_f, true);
+  const freeze_point_f = _pgLerp(_PG_PERCENTS, _PG_FREEZE_F, glycol_pct);
+  const specific_gravity = density_lb_ft3 / 62.37; // water at 60 degF
+  const fluid_factor = 60 * density_lb_ft3 / _PG_GAL_PER_FT3 * specific_heat_btu_lb_f;
+  const flow_multiplier = 500 / fluid_factor;
+  const has_load = load_btuh > 0 && delta_t_f > 0;
+  const flow_gpm = has_load ? load_btuh / (fluid_factor * delta_t_f) : 0;
+  const water_flow_gpm = has_load ? load_btuh / (500 * delta_t_f) : 0;
+  if (![specific_heat_btu_lb_f, density_lb_ft3, viscosity_centipoise, fluid_factor, flow_multiplier].every(Number.isFinite)) return { error: "Glycol property math is not a finite value." };
+  const factor_verdict = fmt(fluid_factor, 0) + " BTU/hr per gpm per degF, against 500 for water: the same load and temperature difference take " + fmt((flow_multiplier - 1) * 100, 0) + "% more flow";
+  const property_verdict = "specific heat " + fmt(specific_heat_btu_lb_f, 3) + " BTU/lb/degF, density " + fmt(density_lb_ft3, 2) + " lb/cu ft (gravity " + fmt(specific_gravity, 3) + "), viscosity about " + fmt(viscosity_centipoise, 2) + " centipoise";
+  const flow_verdict = has_load
+    ? fmt(flow_gpm, 1) + " gpm for " + fmt(load_btuh, 0) + " BTU/hr at a " + fmt(delta_t_f, 0) + " degF difference, where water would take " + fmt(water_flow_gpm, 1) + " gpm"
+    : "enter a load and a temperature difference for the flow";
+  const freeze_verdict = "freezes at about " + fmt(freeze_point_f, 0) + " degF; burst protection extends lower";
+  return {
+    specific_heat_btu_lb_f, density_lb_ft3, specific_gravity, viscosity_centipoise, fluid_factor, flow_multiplier, freeze_point_f, flow_gpm, water_flow_gpm, has_load,
+    factor_verdict, property_verdict, flow_verdict, freeze_verdict,
+    note: "The fluid factor for a propylene glycol loop: the 500 in Q = 500 x GPM x dT is water (8.34 lb/gal x 60 min/h x 1.0 BTU/lb/degF), and a glycol solution is denser but carries noticeably less heat per pound, so the factor drops and the same load needs more flow. It also changes with temperature -- a chilled loop at 40 degF has a lower factor than the same mix in a heating loop at 180 degF -- so use the loop's average temperature. Viscosity is the other cost of glycol: at 40 degF a 40% solution is several times as thick as water, which raises the pressure drop and the pump head well beyond what the extra flow alone would. Values are Dow's published typical properties for DOWFROST HD inhibited propylene glycol by VOLUME percent, interpolated linearly between the printed 30/40/50/60% columns and 40/180/325 degF rows (viscosity on its logarithm), so a value between rows is an estimate; ethylene glycol and other brands differ, and concentrations under 30% are outside the table. Use the factor in hydronic-gpm-deltat, coil-capacity-verification and secondary-glycol-loop; glycol-mix gives the concentration for a freeze point. The fluid manufacturer's data for the actual product governs.",
+  };
+}
+export const glycolFluidFactorExample = { inputs: { glycol_pct: 40, fluid_temp_f: 40, load_btuh: 240000, delta_t_f: 10 } };
+HVACSYSTEMS_RENDERERS["glycol-fluid-factor"] = _simpleRenderer({
+  compute: computeGlycolFluidFactor,
+  example: glycolFluidFactorExample.inputs,
+  citation: "Citation: The Dow Chemical Company, DOWFROST HD Heat Transfer Fluid, Engineering Specifications for Closed-Loop HVAC Systems (Form No. 180-01273-402AMS, April 2002), sections 4.2 and 4.3: typical properties of aqueous solutions by volume percent, by name. Fluid factor = 60 x density / 7.4805 x specific heat. Typical properties, interpolated; the manufacturer's data for the actual fluid governs.",
+  fields: [
+    { key: "glycol_pct", label: "Propylene glycol concentration (% by volume, 30 to 60)", attrs: { step: "any", min: "30", max: "60" } },
+    { key: "fluid_temp_f", label: "Average fluid temperature (°F, 40 to 325)", attrs: { step: "any", min: "40", max: "325" } },
+    { key: "load_btuh", label: "Load (BTU/hr, 0 to skip)" },
+    { key: "delta_t_f", label: "Fluid temperature difference (°F, 0 to skip)" },
+  ],
+  outputs: [
+    { key: "fluid_factor", label: "Fluid factor", value: (r) => r.factor_verdict },
+    { key: "specific_heat_btu_lb_f", label: "Properties", value: (r) => r.property_verdict },
+    { key: "flow_gpm", label: "Flow", unit: "gpm", value: (r) => r.flow_verdict },
+    { key: "freeze_point_f", label: "Freeze point", unit: "°F", value: (r) => r.freeze_verdict },
+    { key: "note", label: "Note", value: (r) => r.note },
+  ],
+});

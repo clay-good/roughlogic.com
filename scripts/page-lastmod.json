@@ -2,99 +2,99 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "a8ee854333641c24",
+      "sha": "8806666e1e470184",
       "date": "2026-10-10"
     },
     "/tools/": {
-      "sha": "9c271e305b2a054c",
+      "sha": "fa2c598b85312b1f",
       "date": "2026-10-10"
     },
     "/collections/disaster-response/": {
-      "sha": "c4a9dc6110af878e",
+      "sha": "b4586a1f2ea1c8ee",
       "date": "2026-10-10"
     },
     "/groups/accounting/": {
-      "sha": "6971d1b0d2214830",
+      "sha": "74bb1b81bb42945a",
       "date": "2026-10-10"
     },
     "/groups/agriculture/": {
-      "sha": "ed64b553a9d8168e",
+      "sha": "7dadece3e978051d",
       "date": "2026-10-10"
     },
     "/groups/construction/": {
-      "sha": "f592a636821a413d",
+      "sha": "384806c585b1632b",
       "date": "2026-10-10"
     },
     "/groups/cross-trade/": {
-      "sha": "01289e23f7c69279",
+      "sha": "6cec54b44995fa16",
       "date": "2026-10-10"
     },
     "/groups/educators/": {
-      "sha": "06bdad0f8e326af5",
+      "sha": "f403564d720e5c35",
       "date": "2026-10-10"
     },
     "/groups/electrical/": {
-      "sha": "35c18f619f3ecaa7",
+      "sha": "a6049f6682211b37",
       "date": "2026-10-10"
     },
     "/groups/field/": {
-      "sha": "736a356d97b1b47c",
+      "sha": "eb42cc4793d44221",
       "date": "2026-10-10"
     },
     "/groups/fire-ground/": {
-      "sha": "3121ec117d5eaa92",
+      "sha": "9fe46127350d75f6",
       "date": "2026-10-10"
     },
     "/groups/historical/": {
-      "sha": "70f2e2df4ca6405c",
+      "sha": "c6ef0c986b772141",
       "date": "2026-10-10"
     },
     "/groups/hvac/": {
-      "sha": "4f520a1286cffd0c",
+      "sha": "58576aad72a5e175",
       "date": "2026-10-10"
     },
     "/groups/kitchen/": {
-      "sha": "a7622a69fa8c9222",
+      "sha": "ab4cd52c19946ecc",
       "date": "2026-10-10"
     },
     "/groups/lab/": {
-      "sha": "eeb6c8ba7dcc8c95",
+      "sha": "ced91d8c6df0bf2b",
       "date": "2026-10-10"
     },
     "/groups/mechanic/": {
-      "sha": "dba33651d47e4e50",
+      "sha": "6e3b8304a1ce83e9",
       "date": "2026-10-10"
     },
     "/groups/plumbing/": {
-      "sha": "267d8316204a784a",
+      "sha": "09d96713b3da28b5",
       "date": "2026-10-10"
     },
     "/groups/real-estate/": {
-      "sha": "53fe51d7fb0cc60a",
+      "sha": "63056a8d820dfafd",
       "date": "2026-10-10"
     },
     "/groups/references/": {
-      "sha": "4d077a27eb0257f3",
+      "sha": "b3163cba23471f23",
       "date": "2026-10-10"
     },
     "/groups/restoration/": {
-      "sha": "59041fd9e9db14f5",
+      "sha": "9aed8b3d911e2b6c",
       "date": "2026-10-10"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "c9ddc75254cd0afa",
+      "sha": "bf290b93c4c388a7",
       "date": "2026-10-10"
     },
     "/groups/stage/": {
-      "sha": "3966b5be1ab9543d",
+      "sha": "bd45d8ffbdf947c8",
       "date": "2026-10-10"
     },
     "/groups/trucking/": {
-      "sha": "59589c6bdd4cfdd3",
+      "sha": "c73a13197e2685ab",
       "date": "2026-10-10"
     },
     "/groups/water/": {
-      "sha": "7a0e8fb987ac0615",
+      "sha": "e44a7109f247a433",
       "date": "2026-10-10"
     },
     "/tools/aav-install-check/": {
@@ -3473,6 +3473,10 @@
       "sha": "4d51004d3103bb14",
       "date": "2026-09-29"
     },
+    "/tools/glycol-fluid-factor/": {
+      "sha": "c7543e15b6e2e701",
+      "date": "2026-10-10"
+    },
     "/tools/glycol-mix/": {
       "sha": "d7f6990abdf1ac7e",
       "date": "2026-09-29"
@@ -3574,8 +3578,8 @@
       "date": "2026-10-03"
     },
     "/tools/ground-loop-flow-antifreeze/": {
-      "sha": "c14d720d6309abe6",
-      "date": "2026-10-03"
+      "sha": "ec38dd244db2b8ea",
+      "date": "2026-10-10"
     },
     "/tools/ground-potential-rise/": {
       "sha": "980c5cf1fde9ddc7",
@@ -3930,8 +3934,8 @@
       "date": "2026-10-03"
     },
     "/tools/hydronic-gpm-deltat/": {
-      "sha": "1066e6ffe0c325c0",
-      "date": "2026-09-29"
+      "sha": "162c0ca844667756",
+      "date": "2026-10-10"
     },
     "/tools/hydronic-injection-mixing/": {
       "sha": "8cbf828b1bf61a6b",
@@ -6762,8 +6766,8 @@
       "date": "2026-09-29"
     },
     "/tools/secondary-glycol-loop/": {
-      "sha": "e0bdd4516da646e5",
-      "date": "2026-09-29"
+      "sha": "a9ee623638436e77",
+      "date": "2026-10-10"
     },
     "/tools/section-121-exclusion/": {
       "sha": "7ed63f3662ce8956",

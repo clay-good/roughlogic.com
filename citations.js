@@ -18800,11 +18800,11 @@ export const CITATIONS = {
     edition: "The water-side sensible-heat transport Q = 500 x GPM x dT and its rearrangement to the design flow, with the chilled-water 24 tons/dT shortcut and the glycol-lowered factor, a standard hydronic relation, by name.",
     freeAccess: "The water-side heat-transport equation and its 500 factor are public hydronic-design results.",
     governance: GOVERNANCE.general,
-    editionNote: "The hydronic flow GPM = Q / (500 dT) from Q = 500 GPM dT (500 = 8.33 lb/gal x 60 min/h x 1.0 Btu/lb-degF for water), the chilled-water form GPM = 24 tons/dT (12,000/500 = 24), and the note that a propylene-glycol mix lowers the 500 factor (about 485 at 30% PG) via its density and specific heat. This returns the design system flow for pure water at the sea-level factor - it uses 500 (adjust for glycol or a different fluid via the fluid factor), assumes the full load is carried by the entered delta-T (no bypass or primary/secondary decoupling), and does not size the pump head (pump-tdh does), the pipe, or the coil. A design aid, not a substitute for the mechanical engineer of record's design.",
+    editionNote: "The hydronic flow GPM = Q / (500 dT) from Q = 500 GPM dT (500 = 8.33 lb/gal x 60 min/h x 1.0 Btu/lb-degF for water), the chilled-water form GPM = 24 tons/dT (12,000/500 = 24), and the note that a propylene-glycol mix lowers the 500 factor (468 to 476 at 30% PG by Dow's published properties; glycol-fluid-factor gives it) via its density and specific heat. This returns the design system flow for pure water at the sea-level factor - it uses 500 (adjust for glycol or a different fluid via the fluid factor), assumes the full load is carried by the entered delta-T (no bypass or primary/secondary decoupling), and does not size the pump head (pump-tdh does), the pipe, or the coil. A design aid, not a substitute for the mechanical engineer of record's design.",
     assumptions: [
       { name: "Heat transport", value: "GPM = Q / (500 dT) for water; 500 = 8.33 x 60 x 1.0", source: "water-side sensible heat" },
       { name: "Chilled-water shortcut", value: "GPM = 24 tons/dT (12,000/500 = 24)", source: "hydronic design practice" },
-      { name: "Fluid factor", value: "about 485 at 30% propylene glycol; adjust for a non-water fluid", source: "glycol property data" },
+      { name: "Fluid factor", value: "468 at 40 F to 476 at 180 F for 30% propylene glycol by volume (until 2026-10-09 this said about 485); glycol-fluid-factor gives it for a concentration and temperature", source: "Dow DOWFROST HD typical properties, Form 180-01273-402AMS" },
     ],
   },
   "pump-specific-speed": {
@@ -22571,6 +22571,18 @@ export const CITATIONS = {
   // band, in the existing calc-hvacsystems.js. Two of the band's four specs
   // were cut as duplicates and landed additively on the tiles that already
   // held the relation (insulation-thickness, pipe-insulation-takeoff).
+  "glycol-fluid-factor": {
+    formula: "Fluid factor = 60 min/h x density (lb/ft3) / 7.4805 gal/ft3 x specific heat (BTU/lb F), in BTU/hr per gpm per degF (500 for water); flow multiplier = 500 / factor; GPM = Q / (factor x dT). Properties interpolated linearly in percent and temperature between the printed 30/40/50/60% columns and 40/180/325 degF rows, viscosity on its logarithm; specific gravity = density / 62.37.",
+    edition: "The Dow Chemical Company, DOWFROST HD Heat Transfer Fluid, Engineering Specifications for Closed-Loop HVAC Systems, Form No. 180-01273-402AMS (April 2002), section 4.2 Typical Properties of Aqueous Solutions (glycol percentage by volume) and 4.3 Freezing and Boiling Points, cited by name.",
+    freeAccess: "The manufacturer's specification sheet is distributed free by Dow and its distributors; the twelve printed specific heat and density values are reproduced exactly at the table's own concentrations and temperatures.",
+    governance: GOVERNANCE.general,
+    editionNote: "Typical properties of one inhibited propylene glycol product, which the sheet says are not to be construed as specifications. Between the printed rows a value is a linear estimate (density is slightly curved over the 140 and 145 degF gaps). Ethylene glycol, other brands and concentrations under 30% are not covered. The manufacturer's data for the fluid actually in the loop governs.",
+    assumptions: [
+      { name: "Concentration basis", value: "percent by VOLUME, 30 to 60", source: "Dow Form 180-01273-402AMS, 4.2" },
+      { name: "Water reference", value: "factor 500 (8.34 lb/gal x 60 min/h x 1.0 BTU/lb F); gravity against 62.37 lb/ft3 at 60 degF", source: "hydronic design practice" },
+      { name: "Freeze point", value: "8 / -7 / -28 / -60 degF at 30 / 40 / 50 / 60%, interpolated", source: "Dow Form 180-01273-402AMS, 4.3" },
+    ],
+  },
   "flat-surface-heat-loss": {
     formula: "Air at the film temperature (Sutherland mu and k, ideal-gas density, cp 1,006 J/kg K); Ra = g (1/Tf) |Ts - Ta| L^3/(nu alpha). Vertical (L = height): Nu = 0.68 + 0.670 Ra^(1/4)/[1 + (0.492/Pr)^(9/16)]^(4/9) to Ra 1e9, else [0.825 + 0.387 Ra^(1/6)/(1 + (0.492/Pr)^(9/16))^(8/27)]^2. Horizontal (L = area/perimeter): hot side up or cold side down Nu = 0.54 Ra^(1/4) to Ra 1e7, else 0.15 Ra^(1/3); hot side down or cold side up Nu = 0.27 Ra^(1/4). h_rad = eps sigma (Ts^4 - Ta^4)/(Ts - Ta), sigma = 0.1714e-8 BTU/hr ft2 R4; q = (h_conv + h_rad) A (Ts - Ta).",
     edition: "Free convection from flat plates as given in Incropera, DeWitt, Bergman and Lavine, Fundamentals of Heat and Mass Transfer, Ch. 9 (Churchill and Chu 1975 for the vertical plate; McAdams for the horizontal plate), and gray-body radiation to large surroundings, by name.",

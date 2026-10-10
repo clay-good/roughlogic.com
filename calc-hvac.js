@@ -4106,13 +4106,13 @@ export function computeHydronicGpmDeltat({ load = 0, unit_tons = 0, dt_f = 0, fa
   const _g = _finiteGuardEnv(arguments[0]); if (_g) return _g;
   if (!(load > 0)) return { error: "Load must be positive." };
   if (!(dt_f > 0)) return { error: "Design delta-T must be positive (degF)." };
-  if (!(factor > 0)) return { error: "The fluid factor must be positive (500 water, ~485 at 30% PG)." };
+  if (!(factor > 0)) return { error: "The fluid factor must be positive (500 water; about 470 at 30% propylene glycol, from glycol-fluid-factor)." };
   const is_tons = unit_tons === 1;
   const q_btuh = is_tons ? load * 12000 : load;
   const gpm = q_btuh / (factor * dt_f);
   return {
     q_btuh, gpm,
-    note: "Water-side heat transport Q = 500 x GPM x dT (500 = 8.33 lb/gal x 60 min/h x 1.0 Btu/lb-degF for water), rearranged to the design flow GPM = Q / (500 dT); for chilled water the shortcut is GPM = 24 tons/dT (12,000/500 = 24). The delta-T is the lever: a wide design delta-T shrinks the flow, pump, and pipe for the same load. Pure water at the sea-level factor (adjust for glycol via the fluid factor, about 485 at 30% propylene glycol); assumes the full load is carried by the entered delta-T (no bypass or primary/secondary decoupling), and does not size the pump head (pump-tdh does), the pipe, or the coil. A design aid; the mechanical engineer of record's design governs.",
+    note: "Water-side heat transport Q = 500 x GPM x dT (500 = 8.33 lb/gal x 60 min/h x 1.0 Btu/lb-degF for water), rearranged to the design flow GPM = Q / (500 dT); for chilled water the shortcut is GPM = 24 tons/dT (12,000/500 = 24). The delta-T is the lever: a wide design delta-T shrinks the flow, pump, and pipe for the same load. Pure water at the sea-level factor (adjust for glycol via the fluid factor, about 470 at 30% propylene glycol and lower at 40 to 50%; glycol-fluid-factor gives it for a concentration and temperature); assumes the full load is carried by the entered delta-T (no bypass or primary/secondary decoupling), and does not size the pump head (pump-tdh does), the pipe, or the coil. A design aid; the mechanical engineer of record's design governs.",
   };
 }
 export const hydronicGpmDeltatExample = { inputs: { load: 10, unit_tons: 1, dt_f: 10, factor: 500 } };
@@ -4123,7 +4123,7 @@ HVAC_RENDERERS["hydronic-gpm-deltat"] = _rEnv({
     { key: "load", label: "Load (Btu/h, or tons if unit set to 1)", kind: "number" },
     { key: "unit_tons", label: "Load unit (0 = Btu/h, 1 = tons)", kind: "number", default: 0 },
     { key: "dt_f", label: "Design delta-T (degF)", kind: "number" },
-    { key: "factor", label: "Fluid factor (500 water, ~485 30% PG)", kind: "number" },
+    { key: "factor", label: "Fluid factor (500 water, about 470 for 30% PG)", kind: "number" },
   ],
   outputs: [
     { key: "q", id: "hgd-out-q", label: "Load", value: (r) => fmt(r.q_btuh, 0) + " Btu/h" },
