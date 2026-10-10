@@ -637,6 +637,41 @@ test("run_calculator: an omitted input never throws or returns a non-finite numb
   assert.ok(named > 100, "expected omitted no-default inputs to be named in a warning, got " + named);
 });
 
+// The page strikes a value that misses a field's step; the door said nothing,
+// so 7.5 bolts ran and the compute used the fraction or rounded it silently.
+test("run_calculator: a fractional value in a whole-number field is flagged", async () => {
+  const { run, describe } = await import("../../mcp/catalog.mjs");
+  const ex = (await describe({ id: "flange-coupling-torque" })).example.inputs;
+  const whole = await run({ id: "flange-coupling-torque", inputs: ex });
+  assert.ok(!whole.warnings.some((w) => w.rule === "step"));
+  const half = await run({ id: "flange-coupling-torque", inputs: { ...ex, bolt_count: ex.bolt_count + 0.5 } });
+  assert.ok(half.warnings.some((w) => w.rule === "step" && w.key === "bolt_count"));
+});
+
+// No first worked example may trip the step rule on its own values.
+test("run_calculator: no worked example misses its own field step", async () => {
+  const { describe } = await import("../../mcp/catalog.mjs");
+  const { readFile } = await import("node:fs/promises");
+  const { COMPUTE_MAP } = await import("../fixtures/compute-map.js");
+  const { rows } = JSON.parse(await readFile(new URL("../fixtures/worked-examples.json", import.meta.url), "utf8"));
+  const first = new Map();
+  for (const r of rows) if (!first.has(r.tile_id) && COMPUTE_MAP[r.tile_id]) first.set(r.tile_id, r.inputs);
+  const bad = [];
+  for (const [id, inputs] of first) {
+    const d = await describe({ id });
+    for (const f of (d && d.inputs) || []) {
+      const a = f.attrs;
+      if (f.kind !== "number" || !a || a.step == null || a.step === "" || a.step === "any") continue;
+      const v = inputs[f.key];
+      if (typeof v !== "number") continue;
+      const base = a.min != null && a.min !== "" ? Number(a.min) : 0;
+      const q = (v - base) / Number(a.step);
+      if (Math.abs(q - Math.round(q)) > 1e-9) bad.push(`${id}::${f.key} = ${v} (step ${a.step}, min ${a.min ?? 0})`);
+    }
+  }
+  assert.deepEqual(bad, []);
+});
+
 test("run_calculator: a designed infinite answer is kept and flagged, not refused", async () => {
   const { run } = await import("../../mcp/catalog.mjs");
   const r = await run({ id: "exterior-opening-protection", inputs: { fsd_ft: 35, wall_area: 1000, protected: false, actual_opening: 900 } });

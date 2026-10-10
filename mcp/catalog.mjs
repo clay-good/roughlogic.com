@@ -293,6 +293,17 @@ function validateNumbers(schema, inputs) {
     if (attrs.max != null && attrs.max !== "" && value > Number(attrs.max)) {
       warnings.push({ key, value, rule: "max", limit: Number(attrs.max), message: `${key} is above the field maximum (${attrs.max}).` });
     }
+    // The page strikes a value that misses the field's step (2.5 in a count
+    // field). The door said nothing: 7.5 bolts or 3.5 conductors ran, and the
+    // compute either used the fraction or rounded it without saying which way.
+    const step = attrs.step != null && attrs.step !== "" && attrs.step !== "any" ? Number(attrs.step) : null;
+    if (step > 0) {
+      const base = attrs.min != null && attrs.min !== "" && Number.isFinite(Number(attrs.min)) ? Number(attrs.min) : 0;
+      const q = (value - base) / step;
+      if (Math.abs(q - Math.round(q)) > 1e-9) {
+        warnings.push({ key, value, rule: "step", limit: step, message: step === 1 ? `${key} takes a whole number; ${value} is not one.` : `${key} takes multiples of ${step}; ${value} is not one.` });
+      }
+    }
   }
   return warnings;
 }
