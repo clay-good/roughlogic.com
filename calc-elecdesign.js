@@ -72,7 +72,7 @@ function _simpleRenderer(spec) {
   };
 
   _rlRender.schema = {
-    inputs: (spec.fields || []).map((f) => ({ key: f.key, label: f.label, kind: f.kind, options: f.options ?? null, default: f.default ?? null, attrs: f.attrs ?? null })),
+    inputs: (spec.fields || []).map((f) => ({ key: f.key, label: f.label, kind: f.kind ?? "number", options: f.options ?? null, default: f.default ?? null, attrs: f.attrs ?? (f.kind && f.kind !== "number" ? null : { step: "any", min: "0" }) })),
     outputs: (spec.outputs || []).map((o) => ({ key: o.key, label: o.label, unit: o.unit ?? null, format: o.value })),
     citation: spec.citation ?? null,
     scope: spec.scope ?? null,
@@ -947,7 +947,7 @@ ELECDESIGN_RENDERERS["fuse-let-through"] = _simpleRenderer({
   example: fuseLetThroughExample.inputs,
   fields: [
     { key: "conductor_cmil", label: "Conductor area (circular mils)", kind: "number" },
-    { key: "initial_temp_c", label: "Initial conductor temperature (deg C)", kind: "number", default: 75 },
+    { key: "initial_temp_c", label: "Initial conductor temperature (deg C)", kind: "number", default: 75, attrs: { step: "any" } },
     { key: "damage_temp_c", label: "Insulation damage temperature (deg C)", kind: "number" },
     { key: "duration_s", label: "Fault duration basis (s)", kind: "number" },
     { key: "let_through_i2t", label: "Device let-through I-squared-t (A2s, from the curve)", kind: "number" },

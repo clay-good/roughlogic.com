@@ -73,7 +73,7 @@ function _simpleRenderer(spec) {
   };
 
   _rfRender.schema = {
-    inputs: (spec.fields || []).map((f) => ({ key: f.key, label: f.label, kind: f.kind, options: f.options ?? null, default: f.default ?? null, attrs: f.attrs ?? null })),
+    inputs: (spec.fields || []).map((f) => ({ key: f.key, label: f.label, kind: f.kind ?? "number", options: f.options ?? null, default: f.default ?? null, attrs: f.attrs ?? (f.kind && f.kind !== "number" ? null : { step: "any", min: "0" }) })),
     outputs: (spec.outputs || []).map((o) => ({ key: o.key, label: o.label, unit: o.unit ?? null, format: o.value })),
     citation: spec.citation ?? null,
     scope: spec.scope ?? null,
@@ -515,7 +515,7 @@ REFRIGERATION_RENDERERS["condenser-td-head-pressure"] = _simpleRenderer({
     { key: "ambient_f", label: "Design ambient on that basis (°F)", kind: "number", attrs: { step: "any" } },
     { key: "design_td_f", label: "Design TD (°F)", kind: "number" },
     { key: "alternate_ambient_f", label: "Alternative ambient (°F, 0 to reuse the design ambient)", kind: "number", attrs: { step: "any" } },
-    { key: "alternate_td_f", label: "Alternative TD (°F, 0 to reuse the design TD)", kind: "number" },
+    { key: "alternate_td_f", label: "Alternative TD (°F, 0 to reuse the design TD)", kind: "number", attrs: { step: "any" } },
     { key: "power_pct_per_deg_f", label: "Compressor power sensitivity (% per °F of condensing)", kind: "number", default: 1.75 },
     { key: "compressor_hp", label: "Compressor power (hp, 0 to skip the cost)", kind: "number" },
     { key: "annual_hours", label: "Annual operating hours", kind: "number" },

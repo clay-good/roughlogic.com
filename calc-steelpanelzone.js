@@ -62,7 +62,7 @@ function _simpleRenderer(spec) {
   };
 
   _rlRender.schema = {
-    inputs: (spec.fields || []).map((f) => ({ key: f.key, label: f.label, kind: f.kind, options: f.options ?? null, default: f.default ?? null, attrs: f.attrs ?? null })),
+    inputs: (spec.fields || []).map((f) => ({ key: f.key, label: f.label, kind: f.kind ?? "number", options: f.options ?? null, default: f.default ?? null, attrs: f.attrs ?? (f.kind && f.kind !== "number" ? null : { step: "any", min: "0" }) })),
     outputs: (spec.outputs || []).map((o) => ({ key: o.key, label: o.label, unit: o.unit ?? null, format: o.value })),
     citation: spec.citation ?? null,
     scope: spec.scope ?? null,
@@ -121,7 +121,7 @@ STEELPANELZONE_RENDERERS["steel-panel-zone-shear"] = _simpleRenderer({
     { key: "beam_depth_db_in", label: "Beam depth db (in)", kind: "number" },
     { key: "beam_flange_tf_in", label: "Beam flange tf (in)", kind: "number" },
     { key: "demand_moment_kin", label: "Sum of beam flange moments (kip-in)", kind: "number" },
-    { key: "col_shear_kip", label: "Column shear Vcol (kip)", kind: "number" },
+    { key: "col_shear_kip", label: "Column shear Vcol (kip)", kind: "number", attrs: { step: "any" } },
     { key: "pz_in_analysis", label: "Panel-zone deformation in the frame analysis?", kind: "select", options: [{ value: "no", label: "No (use basic strength J10-9)" }, { value: "yes", label: "Yes (flange bonus J10-11 allowed)" }] },
   ],
   outputs: [

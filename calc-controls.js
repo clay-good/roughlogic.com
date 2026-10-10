@@ -64,7 +64,7 @@ function _simpleRenderer(spec) {
   };
 
   _rlRender.schema = {
-    inputs: (spec.fields || []).map((f) => ({ key: f.key, label: f.label, kind: f.kind, options: f.options ?? null, default: f.default ?? null, attrs: f.attrs ?? null })),
+    inputs: (spec.fields || []).map((f) => ({ key: f.key, label: f.label, kind: f.kind ?? "number", options: f.options ?? null, default: f.default ?? null, attrs: f.attrs ?? (f.kind && f.kind !== "number" ? null : { step: "any", min: "0" }) })),
     outputs: (spec.outputs || []).map((o) => ({ key: o.key, label: o.label, unit: o.unit ?? null, format: o.value })),
     citation: spec.citation ?? null,
     scope: spec.scope ?? null,
@@ -130,8 +130,8 @@ CONTROLS_RENDERERS["transmitter-span-scaling"] = _simpleRenderer({
     { key: "upper_range_limit", label: "Sensor upper range limit (URL, eng units)", kind: "number" },
     { key: "loop_ma", label: "Loop current (mA)", kind: "number", default: 12 },
     { key: "accuracy_pct", label: "Quoted accuracy (%)", kind: "number", default: 0.1 },
-    { key: "low_reading_value", label: "Low reading of interest (eng units, 0 to skip)", kind: "number", default: 0 },
-    { key: "alt_upper_range_value", label: "Narrower calibrated URV (eng units, 0 to skip)", kind: "number", default: 0 },
+    { key: "low_reading_value", label: "Low reading of interest (eng units, 0 to skip)", kind: "number", default: 0, attrs: { step: "any" } },
+    { key: "alt_upper_range_value", label: "Narrower calibrated URV (eng units, 0 to skip)", kind: "number", default: 0, attrs: { step: "any" } },
   ],
   outputs: [
     { key: "v", id: "tss-out-v", label: "Value at the loop current", value: (r) => fmt(r.value_eng, 2) + " eng units" },

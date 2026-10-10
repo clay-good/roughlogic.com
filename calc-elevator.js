@@ -72,7 +72,7 @@ function _simpleRenderer(spec) {
   };
 
   _rlRender.schema = {
-    inputs: (spec.fields || []).map((f) => ({ key: f.key, label: f.label, kind: f.kind, options: f.options ?? null, default: f.default ?? null, attrs: f.attrs ?? null })),
+    inputs: (spec.fields || []).map((f) => ({ key: f.key, label: f.label, kind: f.kind ?? "number", options: f.options ?? null, default: f.default ?? null, attrs: f.attrs ?? (f.kind && f.kind !== "number" ? null : { step: "any", min: "0" }) })),
     outputs: (spec.outputs || []).map((o) => ({ key: o.key, label: o.label, unit: o.unit ?? null, format: o.value })),
     citation: spec.citation ?? null,
     scope: spec.scope ?? null,
@@ -440,7 +440,7 @@ ELEVATOR_RENDERERS["machine-room-heat"] = _simpleRenderer({
     { key: "other_gains_btuh", label: "Lighting and envelope gains (BTU/h)", kind: "number" },
     { key: "room_volume_cuft", label: "Machine room volume (cu ft)", kind: "number" },
     { key: "ambient_limit_f", label: "Equipment maximum temperature (degF)", kind: "number", default: 104 },
-    { key: "starting_temp_f", label: "Room temperature when cooling is lost (degF)", kind: "number", default: 80 },
+    { key: "starting_temp_f", label: "Room temperature when cooling is lost (degF)", kind: "number", default: 80, attrs: { step: "any" } },
   ],
   outputs: [
     { key: "r", id: "mrh-out-r", label: "Heat rejected while running", value: (r) => fmt(r.heat_running_btuh, 0) + " BTU/h" },

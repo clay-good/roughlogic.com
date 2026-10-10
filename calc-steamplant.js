@@ -80,7 +80,7 @@ function _simpleRenderer(spec) {
   };
 
   _spRender.schema = {
-    inputs: (spec.fields || []).map((f) => ({ key: f.key, label: f.label, kind: f.kind, options: f.options ?? null, default: f.default ?? null, attrs: f.attrs ?? null })),
+    inputs: (spec.fields || []).map((f) => ({ key: f.key, label: f.label, kind: f.kind ?? "number", options: f.options ?? null, default: f.default ?? null, attrs: f.attrs ?? (f.kind && f.kind !== "number" ? null : { step: "any", min: "0" }) })),
     outputs: (spec.outputs || []).map((o) => ({ key: o.key, label: o.label, unit: o.unit ?? null, format: o.value })),
     citation: spec.citation ?? null,
     scope: spec.scope ?? null,
@@ -242,7 +242,7 @@ STEAMPLANT_RENDERERS["laundry-cost-per-pound"] = _simpleRenderer({
     { key: "gal_per_lb", label: "Water use (gallons per pound)", kind: "number" },
     { key: "water_rate_per_gal", label: "Water rate ($ per gallon)", kind: "number" },
     { key: "sewer_rate_per_gal", label: "Sewer rate ($ per gallon)", kind: "number" },
-    { key: "incoming_temp_f", label: "Incoming water temperature (F)", kind: "number", default: 60 },
+    { key: "incoming_temp_f", label: "Incoming water temperature (F)", kind: "number", default: 60, attrs: { step: "any" } },
     { key: "wash_temp_f", label: "Wash temperature (F)", kind: "number", default: 140 },
     { key: "hot_fraction", label: "Fraction of the water heated (0-1)", kind: "number", default: 0.6 },
     { key: "heater_efficiency", label: "Water heater efficiency (0-1)", kind: "number", default: 0.8 },
@@ -673,12 +673,12 @@ STEAMPLANT_RENDERERS["fuel-oil-atomizing-viscosity"] = _simpleRenderer({
   example: fuelOilAtomizingViscosityExample.inputs,
   fields: [
     { key: "v1_ssu", label: "Data sheet viscosity 1 (SSU)", kind: "number" },
-    { key: "t1_f", label: "Data sheet temperature 1 (F)", kind: "number" },
+    { key: "t1_f", label: "Data sheet temperature 1 (F)", kind: "number", attrs: { step: "any" } },
     { key: "v2_ssu", label: "Data sheet viscosity 2 (SSU)", kind: "number" },
     { key: "t2_f", label: "Data sheet temperature 2 (F)", kind: "number" },
     { key: "target_ssu", label: "Target atomizing viscosity (SSU)", kind: "number", default: 150 },
     { key: "pumping_limit_ssu", label: "Pumping viscosity limit (SSU)", kind: "number", default: 4000 },
-    { key: "check_temp_f", label: "Check a heater setpoint (F)", kind: "number", default: 185 },
+    { key: "check_temp_f", label: "Check a heater setpoint (F)", kind: "number", default: 185, attrs: { step: "any" } },
   ],
   outputs: [
     { key: "a", id: "foa-out-a", label: "Atomizing setpoint at the burner", value: (r) => fmt(r.temp_for_target_f, 0) + " F to reach " + fmt(r.target_ssu, 0) + " SSU" },

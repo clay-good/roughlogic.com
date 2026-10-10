@@ -63,7 +63,7 @@ function _simpleRenderer(spec) {
   };
 
   _hsRender.schema = {
-    inputs: (spec.fields || []).map((f) => ({ key: f.key, label: f.label, kind: f.kind, options: f.options ?? null, default: f.default ?? null, attrs: f.attrs ?? null })),
+    inputs: (spec.fields || []).map((f) => ({ key: f.key, label: f.label, kind: f.kind ?? "number", options: f.options ?? null, default: f.default ?? null, attrs: f.attrs ?? (f.kind && f.kind !== "number" ? null : { step: "any", min: "0" }) })),
     outputs: (spec.outputs || []).map((o) => ({ key: o.key, label: o.label, unit: o.unit ?? null, format: o.value })),
     citation: spec.citation ?? null,
     scope: spec.scope ?? null,
@@ -528,7 +528,7 @@ HVACACOUSTICS_RENDERERS["duct-breakout-noise"] = _simpleRenderer({
     { key: "sound_power_db", label: "Sound power in the duct (dB)" },
     { key: "breakout_tl_db", label: "Breakout transmission loss (dB)" },
     { key: "room_absorption_sabins", label: "Room absorption (sabins)" },
-    { key: "room_criterion_db", label: "Room criterion (dB, 0 to skip)" },
+    { key: "room_criterion_db", label: "Room criterion (dB, 0 to skip)", attrs: { step: "any" } },
     { key: "lagging_improvement_db", label: "Lagging improvement (dB, 0 to skip)" },
   ],
   outputs: [
@@ -563,9 +563,9 @@ HVACACOUSTICS_RENDERERS["silencer-insertion-loss"] = _simpleRenderer({
     { key: "alt_face_width_in", label: "Alternative face width (in, 0 to skip)" },
     { key: "alt_face_height_in", label: "Alternative face height (in)" },
     { key: "target_velocity_fpm", label: "Target face velocity (fpm, 0 to skip)" },
-    { key: "upstream_lw_db", label: "Sound power upstream (dB, 0 to skip)" },
-    { key: "insertion_loss_db", label: "Insertion loss (dB)" },
-    { key: "regenerated_lw_db", label: "Regenerated sound power (dB, 0 to skip)" },
+    { key: "upstream_lw_db", label: "Sound power upstream (dB, 0 to skip)", attrs: { step: "any" } },
+    { key: "insertion_loss_db", label: "Insertion loss (dB)", attrs: { step: "any" } },
+    { key: "regenerated_lw_db", label: "Regenerated sound power (dB, 0 to skip)", attrs: { step: "any" } },
     { key: "fan_available_static_in_wc", label: "Fan available static (in wc, 0 to skip)" },
   ],
   outputs: [
@@ -596,8 +596,8 @@ HVACACOUSTICS_RENDERERS["mechanical-room-nc"] = _simpleRenderer({
     { key: "partition_tl_db", label: "Partition transmission loss at this band (dB)" },
     { key: "partition_area_ft2", label: "Partition area (sq ft)" },
     { key: "receiving_absorption_sabins", label: "Receiving room absorption (sabins)" },
-    { key: "criterion_db", label: "Room criterion (dB, 0 to skip)" },
-    { key: "measured_spl_db", label: "Measured level in the receiving room (dB, 0 to skip)" },
+    { key: "criterion_db", label: "Room criterion (dB, 0 to skip)", attrs: { step: "any" } },
+    { key: "measured_spl_db", label: "Measured level in the receiving room (dB, 0 to skip)", attrs: { step: "any" } },
     { key: "flanking_threshold_db", label: "Flanking threshold (dB)", default: 5 },
   ],
   outputs: [

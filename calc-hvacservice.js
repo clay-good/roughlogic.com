@@ -82,7 +82,7 @@ function _simpleRenderer(spec) {
   };
 
   _rlRender.schema = {
-    inputs: (spec.fields || []).map((f) => ({ key: f.key, label: f.label, kind: f.kind, options: f.options ?? null, default: f.default ?? null, attrs: f.attrs ?? null })),
+    inputs: (spec.fields || []).map((f) => ({ key: f.key, label: f.label, kind: f.kind ?? "number", options: f.options ?? null, default: f.default ?? null, attrs: f.attrs ?? (f.kind && f.kind !== "number" ? null : { step: "any", min: "0" }) })),
     outputs: (spec.outputs || []).map((o) => ({ key: o.key, label: o.label, unit: o.unit ?? null, format: o.value })),
     citation: spec.citation ?? null,
     scope: spec.scope ?? null,
@@ -369,8 +369,8 @@ HVACSERVICE_RENDERERS["nitrogen-pressure-test"] = _simpleRenderer({
   example: nitrogenPressureExample.inputs,
   fields: [
     { key: "start_psig", label: "Test pressure at start (psig)", kind: "number" },
-    { key: "start_temp_F", label: "Temperature at start (°F)", kind: "number" },
-    { key: "end_temp_F", label: "Temperature at end (°F)", kind: "number" },
+    { key: "start_temp_F", label: "Temperature at start (°F)", kind: "number", attrs: { step: "any" } },
+    { key: "end_temp_F", label: "Temperature at end (°F)", kind: "number", attrs: { step: "any" } },
     { key: "end_psig", label: "Gauge pressure at end (psig)", kind: "number" },
     { key: "atm_psi", label: "Atmospheric pressure (psi)", kind: "number", default: 14.7 },
     { key: "tolerance_psi", label: "Leak tolerance (psi)", kind: "number", default: 1 },
@@ -503,7 +503,7 @@ HVACSERVICE_RENDERERS["furnace-temp-rise"] = _simpleRenderer({
   citation: "Citation: first-principles sensible-heat relation Qs = 1.08 x CFM x delta-T solved for airflow, with output = input x efficiency (public); the 1.08 sea-level air factor is fixed; the efficiency (default 80%) is editable. The rating-plate temperature-rise range and the equipment manufacturer govern.",
   example: furnaceTempRiseExample.inputs,
   fields: [
-    { key: "return_air_F", label: "Return-air temp (°F)", kind: "number" },
+    { key: "return_air_F", label: "Return-air temp (°F)", kind: "number", attrs: { step: "any" } },
     { key: "supply_air_F", label: "Supply-air temp (°F)", kind: "number" },
     { key: "input_btuh", label: "Furnace input (BTU/hr)", kind: "number" },
     { key: "efficiency_pct", label: "Efficiency (%)", kind: "number", default: 80 },
@@ -554,7 +554,7 @@ HVACSERVICE_RENDERERS["furnace-airflow-to-rise"] = _simpleRenderer({
     { key: "input_btuh", label: "Furnace input (BTU/hr)", kind: "number" },
     { key: "efficiency_pct", label: "Efficiency (%)", kind: "number" },
     { key: "cfm", label: "Blower airflow (CFM)", kind: "number" },
-    { key: "return_air_F", label: "Return-air temp (°F)", kind: "number", default: 70 },
+    { key: "return_air_F", label: "Return-air temp (°F)", kind: "number", default: 70, attrs: { step: "any" } },
     { key: "rise_min_F", label: "Plate min rise (°F)", kind: "number", default: 40 },
     { key: "rise_max_F", label: "Plate max rise (°F)", kind: "number", default: 70 },
   ],
@@ -708,7 +708,7 @@ HVACSERVICE_RENDERERS["infiltration-load"] = _simpleRenderer({
   example: infiltrationLoadExample.inputs,
   fields: [
     { key: "cfm", label: "Infiltration airflow (cfm)", kind: "number" },
-    { key: "delta_t_f", label: "Design indoor-outdoor delta-T (°F)", kind: "number" },
+    { key: "delta_t_f", label: "Design indoor-outdoor delta-T (°F)", kind: "number", attrs: { step: "any" } },
     { key: "delta_gr", label: "Humidity-ratio diff (grains/lb)", kind: "number" },
   ],
   outputs: [
@@ -743,7 +743,7 @@ HVACSERVICE_RENDERERS["outside-air-percent-temps"] = _simpleRenderer({
   fields: [
     { key: "t_ra_f", label: "Return-air temperature T_ra (°F)", kind: "number" },
     { key: "t_ma_f", label: "Mixed-air temperature T_ma (°F)", kind: "number" },
-    { key: "t_oa_f", label: "Outdoor-air temperature T_oa (°F)", kind: "number" },
+    { key: "t_oa_f", label: "Outdoor-air temperature T_oa (°F)", kind: "number", attrs: { step: "any" } },
   ],
   outputs: [
     { key: "pct", id: "oapt-out-pct", label: "Outside-air fraction", value: (r) => fmt(r.pct_oa, 1) + "% OA" },

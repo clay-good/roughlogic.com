@@ -65,7 +65,7 @@ function _simpleRenderer(spec) {
   };
 
   _rlRender.schema = {
-    inputs: (spec.fields || []).map((f) => ({ key: f.key, label: f.label, kind: f.kind, options: f.options ?? null, default: f.default ?? null, attrs: f.attrs ?? null })),
+    inputs: (spec.fields || []).map((f) => ({ key: f.key, label: f.label, kind: f.kind ?? "number", options: f.options ?? null, default: f.default ?? null, attrs: f.attrs ?? (f.kind && f.kind !== "number" ? null : { step: "any", min: "0" }) })),
     outputs: (spec.outputs || []).map((o) => ({ key: o.key, label: o.label, unit: o.unit ?? null, format: o.value })),
     citation: spec.citation ?? null,
     scope: spec.scope ?? null,
@@ -246,7 +246,7 @@ FINISHING_RENDERERS["galvanize-kettle-throughput"] = _simpleRenderer({
     { key: "area_per_ton_ft2", label: "Surface area per ton (sq ft/ton)", kind: "number" },
     { key: "steel_specific_heat_btu_lb_f", label: "Steel specific heat (Btu/lb-degF)", kind: "number", default: 0.12 },
     { key: "bath_temp_f", label: "Bath temperature (degF)", kind: "number", default: 830 },
-    { key: "ambient_temp_f", label: "Ambient steel temperature (degF)", kind: "number", default: 70 },
+    { key: "ambient_temp_f", label: "Ambient steel temperature (degF)", kind: "number", default: 70, attrs: { step: "any" } },
     { key: "burner_btu_hr", label: "Burner heat delivered to the steel (Btu/hr)", kind: "number" },
   ],
   outputs: [

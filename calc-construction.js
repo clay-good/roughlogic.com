@@ -2042,7 +2042,7 @@ function _simpleRenderer(spec) {
   };
 
   _rlRender.schema = {
-    inputs: (spec.fields || []).map((f) => ({ key: f.key, label: f.label, kind: f.kind, options: f.options ?? null, default: f.default ?? null, attrs: f.attrs ?? null })),
+    inputs: (spec.fields || []).map((f) => ({ key: f.key, label: f.label, kind: f.kind ?? "number", options: f.options ?? null, default: f.default ?? null, attrs: f.attrs ?? (f.kind && f.kind !== "number" ? null : { step: "any", min: "0" }) })),
     outputs: (spec.outputs || []).map((o) => ({ key: o.key, label: o.label, unit: o.unit ?? null, format: o.value })),
     citation: spec.citation ?? null,
     scope: spec.scope ?? null,
@@ -6270,7 +6270,7 @@ const _renderMassConcreteTempRise = _simpleRenderer({
   fields: [
     { key: "cementitious_lb_per_cy", label: "Total cementitious content (lb/cy)", kind: "number" },
     { key: "rise_f_per_100lb", label: "Adiabatic rise per 100 lb cementitious (degF)", kind: "number" },
-    { key: "placing_temp_f", label: "Concrete placing temperature (degF)", kind: "number" },
+    { key: "placing_temp_f", label: "Concrete placing temperature (degF)", kind: "number", attrs: { step: "any" } },
     { key: "diff_limit_f", label: "Surface-core differential target (degF)", kind: "number" },
   ],
   outputs: [
@@ -7234,7 +7234,7 @@ const _renderWindMwfrsPressure = _simpleRenderer({
   fields: [
     { key: "qz_psf", label: "Windward velocity pressure qz, including Kd (psf)", kind: "number" },
     { key: "qh_psf", label: "Leeward velocity pressure qh, including Kd (psf)", kind: "number" },
-    { key: "cp_ww", label: "Windward wall Cp", kind: "number", default: 0.8 },
+    { key: "cp_ww", label: "Windward wall Cp", kind: "number", default: 0.8, attrs: { step: "any" } },
     { key: "cp_lw", label: "Leeward wall Cp", kind: "number", default: -0.5 },
     { key: "g_f", label: "Gust-effect factor G", kind: "number" },
     { key: "gcpi", label: "Internal GCpi magnitude", kind: "number", default: 0.18 },
@@ -7685,8 +7685,8 @@ const _renderCombinedStressAxialBending = _simpleRenderer({
   citation: "Citation: Combined axial + bending stress first-principles (mechanics of materials): sigma = P/A +/- M c/I; the kern / no-tension threshold e <= r^2/c. Short member (no P-delta amplification). A design aid, not a substitute for the engineer of record.",
   example: combinedStressAxialBendingExample.inputs,
   fields: [
-    { key: "P_lb", label: "Axial force P (lb, + compression)", kind: "number" },
-    { key: "M_lbin", label: "Bending moment M (lb-in)", kind: "number" },
+    { key: "P_lb", label: "Axial force P (lb, + compression)", kind: "number", attrs: { step: "any" } },
+    { key: "M_lbin", label: "Bending moment M (lb-in)", kind: "number", attrs: { step: "any" } },
     { key: "e_in", label: "OR eccentricity e (in; sets M = P e)", kind: "number" },
     { key: "A_in2", label: "Area A (in²)", kind: "number" },
     { key: "c_in", label: "Extreme-fiber distance c (in)", kind: "number" },
@@ -7830,7 +7830,7 @@ const _renderThermalStressRestrained = _simpleRenderer({
   fields: [
     { key: "E_psi", label: "Modulus E (psi; 29e6 steel, 10e6 alum)", kind: "number" },
     { key: "alpha", label: "Thermal expansion alpha (/F; 6.5e-6 steel)", kind: "number" },
-    { key: "dT_F", label: "Temperature change dT (F, + heating)", kind: "number" },
+    { key: "dT_F", label: "Temperature change dT (F, + heating)", kind: "number", attrs: { step: "any" } },
     { key: "A_in2", label: "Cross-section area A (in², for force)", kind: "number" },
     { key: "L_in", label: "Length L (in, for free expansion)", kind: "number" },
     { key: "restraint", label: "Restraint factor (0-1, default 1)", kind: "number", default: 1 },

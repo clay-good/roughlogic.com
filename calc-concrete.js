@@ -79,7 +79,7 @@ function _simpleRenderer(spec) {
   };
 
   _rlRender.schema = {
-    inputs: (spec.fields || []).map((f) => ({ key: f.key, label: f.label, kind: f.kind, options: f.options ?? null, default: f.default ?? null, attrs: f.attrs ?? null })),
+    inputs: (spec.fields || []).map((f) => ({ key: f.key, label: f.label, kind: f.kind ?? "number", options: f.options ?? null, default: f.default ?? null, attrs: f.attrs ?? (f.kind && f.kind !== "number" ? null : { step: "any", min: "0" }) })),
     outputs: (spec.outputs || []).map((o) => ({ key: o.key, label: o.label, unit: o.unit ?? null, format: o.value })),
     citation: spec.citation ?? null,
     scope: spec.scope ?? null,
@@ -125,7 +125,7 @@ CONCRETE_RENDERERS["rc-beam-flexure"] = _simpleRenderer({
     { key: "as_in2", label: "Tension steel area As (in²)", kind: "number" },
     { key: "b", label: "Beam width b (in)", kind: "number" },
     { key: "d", label: "Effective depth d (in)", kind: "number" },
-    { key: "mu", label: "Required moment Mu (kip-ft, 0 = capacity only)", kind: "number", default: 0 },
+    { key: "mu", label: "Required moment Mu (kip-ft, 0 = capacity only)", kind: "number", default: 0, attrs: { step: "any" } },
   ],
   outputs: [
     { key: "a", id: "rbf-out-a", label: "Stress-block depth a", value: (r) => fmt(r.a_in, 2) + " in" },
@@ -186,7 +186,7 @@ CONCRETE_RENDERERS["rc-beam-shear"] = _simpleRenderer({
     { key: "bw", label: "Web width bw (in)", kind: "number" },
     { key: "d", label: "Effective depth d (in)", kind: "number" },
     { key: "av_in2", label: "Stirrup area Av, both legs (in²)", kind: "number" },
-    { key: "vu", label: "Factored shear Vu (kip, 0 = capacity only)", kind: "number", default: 0 },
+    { key: "vu", label: "Factored shear Vu (kip, 0 = capacity only)", kind: "number", default: 0, attrs: { step: "any" } },
     { key: "lambda", label: "Lightweight factor lambda (1.0 normalweight)", kind: "number" },
   ],
   outputs: [
@@ -532,7 +532,7 @@ CONCRETE_RENDERERS["rc-min-shear-reinforcement"] = _simpleRenderer({
     { key: "bw_in", label: "Web width bw (in)", kind: "number" },
     { key: "d_in", label: "Effective depth d (in)", kind: "number" },
     { key: "av_in2", label: "Stirrup area Av, both legs (in²)", kind: "number" },
-    { key: "vu_kip", label: "Factored shear Vu (kip, 0 = detailing only)", kind: "number", default: 0 },
+    { key: "vu_kip", label: "Factored shear Vu (kip, 0 = detailing only)", kind: "number", default: 0, attrs: { step: "any" } },
     { key: "lambda", label: "Lightweight factor lambda (1.0 normalweight)", kind: "number" },
   ],
   outputs: [
@@ -2295,11 +2295,11 @@ CONCRETE_RENDERERS["fresh-concrete-temp"] = _simpleRenderer({
   example: freshConcreteTempExample.inputs,
   fields: [
     { key: "agg_weight_lb", label: "Aggregate weight (lb)", kind: "number" },
-    { key: "agg_temp_f", label: "Aggregate temperature (°F)", kind: "number" },
+    { key: "agg_temp_f", label: "Aggregate temperature (°F)", kind: "number", attrs: { step: "any" } },
     { key: "cement_weight_lb", label: "Cement weight (lb)", kind: "number" },
-    { key: "cement_temp_f", label: "Cement temperature (°F)", kind: "number" },
+    { key: "cement_temp_f", label: "Cement temperature (°F)", kind: "number", attrs: { step: "any" } },
     { key: "water_weight_lb", label: "Added (mix) water weight (lb)", kind: "number" },
-    { key: "water_temp_f", label: "Mix water temperature (°F)", kind: "number" },
+    { key: "water_temp_f", label: "Mix water temperature (°F)", kind: "number", attrs: { step: "any" } },
     { key: "agg_moisture_weight_lb", label: "Free moisture on aggregate (lb)", kind: "number" },
   ],
   outputs: [
@@ -2623,7 +2623,7 @@ CONCRETE_RENDERERS["rc-tbeam-flexure"] = _simpleRenderer({
     { key: "sw_in", label: "Clear distance to the next web sw (in)", kind: "number" },
     { key: "beam_type", label: "Beam location", kind: "select", options: [{ value: "interior", label: "Interior (flange both sides)", selected: true }, { value: "edge", label: "Edge / spandrel (one side)" }] },
     { key: "be_override_in", label: "Effective width override (in; 0 = compute it)", kind: "number" },
-    { key: "mu_kipft", label: "Required moment Mu (kip-ft; 0 = capacity only)", kind: "number", default: 0 },
+    { key: "mu_kipft", label: "Required moment Mu (kip-ft; 0 = capacity only)", kind: "number", default: 0, attrs: { step: "any" } },
   ],
   outputs: [
     { key: "be", id: "rtb-out-be", label: "Effective flange width be", value: (r) => fmt(r.be_in, 1) + " in" + (r.be_source === "override" ? " (entered)" : " (" + r.be_governs + " governs)") },

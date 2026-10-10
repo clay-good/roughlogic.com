@@ -66,7 +66,7 @@ function _simpleRenderer(spec) {
   };
 
   _rlRender.schema = {
-    inputs: (spec.fields || []).map((f) => ({ key: f.key, label: f.label, kind: f.kind, options: f.options ?? null, default: f.default ?? null, attrs: f.attrs ?? null })),
+    inputs: (spec.fields || []).map((f) => ({ key: f.key, label: f.label, kind: f.kind ?? "number", options: f.options ?? null, default: f.default ?? null, attrs: f.attrs ?? (f.kind && f.kind !== "number" ? null : { step: "any", min: "0" }) })),
     outputs: (spec.outputs || []).map((o) => ({ key: o.key, label: o.label, unit: o.unit ?? null, format: o.value })),
     citation: spec.citation ?? null,
     scope: spec.scope ?? null,
@@ -397,11 +397,11 @@ WINTEROPS_RENDERERS["ice-melt-working-temperature"] = _simpleRenderer({
     { key: "area_ft2", label: "Area to treat (sq ft)", kind: "number" },
     { key: "ice_thickness_in", label: "Ice thickness (in)", kind: "number" },
     { key: "ice_density_lb_ft3", label: "Ice density (lb per cu ft)", kind: "number", default: 57.2 },
-    { key: "pavement_temp_f", label: "Pavement temperature (degF)", kind: "number", default: 30 },
+    { key: "pavement_temp_f", label: "Pavement temperature (degF)", kind: "number", default: 30, attrs: { step: "any" } },
     { key: "capacity_lb_ice_per_lb", label: "Melting capacity at that temperature (lb ice per lb)", kind: "number" },
     { key: "alt_temp_f", label: "Colder temperature to compare (degF)", kind: "number", default: 20 },
     { key: "alt_capacity_lb_ice_per_lb", label: "Melting capacity there (lb ice per lb, 0 to skip)", kind: "number" },
-    { key: "practical_limit_f", label: "Product practical working limit (degF)", kind: "number", default: 15 },
+    { key: "practical_limit_f", label: "Product practical working limit (degF)", kind: "number", default: 15, attrs: { step: "any" } },
     { key: "eutectic_f", label: "Product eutectic temperature (degF)", kind: "number", default: -6 },
   ],
   outputs: [

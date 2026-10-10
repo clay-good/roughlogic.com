@@ -107,7 +107,7 @@ function _simpleRenderer(spec) {
   };
 
   _hsRender.schema = {
-    inputs: (spec.fields || []).map((f) => ({ key: f.key, label: f.label, kind: f.kind, options: f.options ?? null, default: f.default ?? null, attrs: f.attrs ?? null })),
+    inputs: (spec.fields || []).map((f) => ({ key: f.key, label: f.label, kind: f.kind ?? "number", options: f.options ?? null, default: f.default ?? null, attrs: f.attrs ?? (f.kind && f.kind !== "number" ? null : { step: "any", min: "0" }) })),
     outputs: (spec.outputs || []).map((o) => ({ key: o.key, label: o.label, unit: o.unit ?? null, format: o.value })),
     citation: spec.citation ?? null,
     scope: spec.scope ?? null,
@@ -2621,7 +2621,7 @@ HVACSYSTEMS_RENDERERS["refractory-shell-temperature"] = _simpleRenderer({
   citation: "Citation: one-dimensional steady-state plane-wall conduction -- each layer contributes thickness / conductivity and the outer film one / coefficient, the flux is the total drop over the total resistance, and each interface is the hot face less the flux times the resistance ahead of it. Conductivities are ENTERED because refractory k varies strongly with temperature and product; the manufacturer's k-versus-mean-temperature curve governs and a single value across a 2,000 degF drop is the largest approximation here. It does not address dry-out schedules, expansion joints, anchors and their thermal bridges, corners and penetrations, gas-side radiation, slag attack, or spalling. The refractory and insulation manufacturers' data and the furnace or boiler designer govern.",
   fields: [
     { key: "hot_face_f", label: "Hot face temperature (°F)" },
-    { key: "ambient_f", label: "Ambient temperature (°F)" },
+    { key: "ambient_f", label: "Ambient temperature (°F)", attrs: { step: "any" } },
     { key: "film_coeff_btu_hr_ft2_f", label: "Outer film coefficient (BTU/hr/sq ft/°F)" },
     { key: "layer1_thickness_in", label: "Layer 1 (hot face) thickness (in)" },
     { key: "layer1_k", label: "Layer 1 k (BTU-in/hr/sq ft/°F)" },
@@ -2632,7 +2632,7 @@ HVACSYSTEMS_RENDERERS["refractory-shell-temperature"] = _simpleRenderer({
     { key: "layer3_thickness_in", label: "Layer 3 thickness (in, 0 to skip)" },
     { key: "layer3_k", label: "Layer 3 k (BTU-in/hr/sq ft/°F)" },
     { key: "layer3_limit_f", label: "Layer 3 service limit (°F, 0 to skip)" },
-    { key: "shell_limit_f", label: "Shell temperature limit (°F, 0 to skip)" },
+    { key: "shell_limit_f", label: "Shell temperature limit (°F, 0 to skip)", attrs: { step: "any" } },
     { key: "acid_dew_point_f", label: "Acid dew point for flue gas service (°F, 0 to skip)" },
   ],
   outputs: [

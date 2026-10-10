@@ -97,7 +97,7 @@ function _simpleRenderer(spec) {
   };
 
   _lwRender.schema = {
-    inputs: (spec.fields || []).map((f) => ({ key: f.key, label: f.label, kind: f.kind, options: f.options ?? null, default: f.default ?? null, attrs: f.attrs ?? null })),
+    inputs: (spec.fields || []).map((f) => ({ key: f.key, label: f.label, kind: f.kind ?? "number", options: f.options ?? null, default: f.default ?? null, attrs: f.attrs ?? (f.kind && f.kind !== "number" ? null : { step: "any", min: "0" }) })),
     outputs: (spec.outputs || []).map((o) => ({ key: o.key, label: o.label, unit: o.unit ?? null, format: o.value })),
     citation: spec.citation ?? null,
     scope: spec.scope ?? null,
@@ -273,8 +273,8 @@ LINEWORKER_RENDERERS["conductor-sag-at-temperature"] = _simpleRenderer({
     { key: "modulus_psi", label: "Modulus of elasticity (psi)", kind: "number" },
     { key: "alpha_per_f", label: "Coefficient of thermal expansion (per degF)", kind: "number" },
     { key: "tension1_lb", label: "Initial horizontal tension (lb)", kind: "number" },
-    { key: "temp1_f", label: "Initial temperature (F)", kind: "number", default: 60 },
-    { key: "temp2_f", label: "Final temperature (F)", kind: "number", default: 120 },
+    { key: "temp1_f", label: "Initial temperature (F)", kind: "number", default: 60, attrs: { step: "any" } },
+    { key: "temp2_f", label: "Final temperature (F)", kind: "number", default: 120, attrs: { step: "any" } },
     { key: "rated_strength_lb", label: "Rated breaking strength (lb, 0 to skip)", kind: "number" },
   ],
   outputs: [
@@ -425,7 +425,7 @@ LINEWORKER_RENDERERS["conductor-uplift-check"] = _simpleRenderer({
     { key: "weight_lb_per_ft", label: "Conductor weight (lb/ft)", kind: "number" },
     { key: "tension_lb", label: "Horizontal tension, cold condition (lb)", kind: "number" },
     { key: "back_span_ft", label: "Back span (ft, 0 to skip)", kind: "number" },
-    { key: "back_span_rise_ft", label: "Rise from this structure UP to the back structure (ft; negative if it is lower)", kind: "number" },
+    { key: "back_span_rise_ft", label: "Rise from this structure UP to the back structure (ft; negative if it is lower)", kind: "number", attrs: { step: "any" } },
   ],
   outputs: [
     { key: "l", id: "cup-out-l", label: "Vertical load at the low structure", value: (r) => fmt(r.vertical_load_low_lb, 1) + " lb -- " + fmt(r.half_weight_lb, 1) + " lb of conductor weight against " + fmt(r.slope_component_lb, 1) + " lb pulling up" },
@@ -855,7 +855,7 @@ LINEWORKER_RENDERERS["conductor-creep-elongation"] = _simpleRenderer({
     { key: "weight_lb_per_ft", label: "Conductor weight (lb/ft)", kind: "number" },
     { key: "modulus_psi", label: "Modulus of elasticity (psi)", kind: "number" },
     { key: "tension1_lb", label: "Tension at the design condition (lb)", kind: "number" },
-    { key: "design_temp_f", label: "Design temperature (F)", kind: "number", default: 60 },
+    { key: "design_temp_f", label: "Design temperature (F)", kind: "number", default: 60, attrs: { step: "any" } },
   ],
   outputs: [
     { key: "e", id: "cce-out-e", label: "Equivalent temperature rise", value: (r) => fmt(r.equivalent_temp_rise_f, 1) + " F -- bigger than most seasonal swings, permanent, and running the SAME way as a hot day" },

@@ -80,7 +80,7 @@ function _simpleRenderer(spec) {
   };
 
   _rlRender.schema = {
-    inputs: (spec.fields || []).map((f) => ({ key: f.key, label: f.label, kind: f.kind, options: f.options ?? null, default: f.default ?? null, attrs: f.attrs ?? null })),
+    inputs: (spec.fields || []).map((f) => ({ key: f.key, label: f.label, kind: f.kind ?? "number", options: f.options ?? null, default: f.default ?? null, attrs: f.attrs ?? (f.kind && f.kind !== "number" ? null : { step: "any", min: "0" }) })),
     outputs: (spec.outputs || []).map((o) => ({ key: o.key, label: o.label, unit: o.unit ?? null, format: o.value })),
     citation: spec.citation ?? null,
     scope: spec.scope ?? null,
@@ -280,7 +280,7 @@ FIRESPRINKLER_RENDERERS["sprinkler-pressure-demand"] = _simpleRenderer({
     { key: "pipe_id_in", label: "Pipe internal diameter (in)", kind: "number" },
     { key: "c_factor", label: "Hazen-Williams C (steel 120 wet / 100 dry or preaction; 150 CPVC; 100 CI)", kind: "number" },
     { key: "equiv_length_ft", label: "Equivalent length: pipe + fittings (ft)", kind: "number" },
-    { key: "elevation_ft", label: "Elevation of remote head above base of riser (ft)", kind: "number" },
+    { key: "elevation_ft", label: "Elevation of remote head above base of riser (ft)", kind: "number", attrs: { step: "any" } },
   ],
   outputs: [
     { key: "sp", id: "spd-out-sp", label: "Start pressure at remote head", value: (r) => fmt(r.start_pressure_psi, 1) + " psi" + (r.below_min ? " (below 7 psi minimum)" : "") },
