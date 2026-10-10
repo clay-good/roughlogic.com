@@ -21,8 +21,8 @@ export const VELOCITY_RENDERERS = {};
 
 // --- C.1: Duct velocity pressure (V = 4005*sqrt(VP), sea-level std air) ---
 // The 4005 constant assumes standard air density (0.075 lb/ft^3 at sea
-// level, 70 F). At altitude or high temperature the density correction is
-// not applied; the result is then a standard-air equivalent, flagged.
+// level, 70 F). An entered air density scales the constant (added 2026-10-09);
+// left at 0.075 the result is the standard-air figure.
 //
 // Air density added 2026-10-09: V = 4005 sqrt(VP x 0.075/rho). At 0.075 lb/ft^3 this is the standard-air
 // constant unchanged; at altitude or in hot air the same velocity pressure is a higher velocity.
@@ -201,7 +201,7 @@ export const pitotTraverseCfmExample = { inputs: { vp_avg_inwc: 0.15, w_in: 24, 
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderPitotTraverseCfm(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Pitot-tube traverse airflow (ASHRAE Fundamentals / AABC-NEBB field practice): velocity V = 4005 x sqrt(VP) for standard air (0.075 lb/ft^3, sea level) from a single traverse-average velocity pressure, then CFM = V x duct area. This takes one pre-averaged VP; the more exact method converts each point's VP to a velocity and averages the velocities (the pitot-traverse-average tile), which reads slightly lower because the square root is concave. Apply a density correction at altitude or high temperature. A field measurement, not a substitute for a calibrated flow station.";
+  citationEl.textContent = "Citation: Pitot-tube traverse airflow (ASHRAE Fundamentals / AABC-NEBB field practice): velocity V = 4005 x sqrt(VP) for standard air (0.075 lb/ft^3, sea level) from a single traverse-average velocity pressure, then CFM = V x duct area. This takes one pre-averaged VP; the more exact method converts each point's VP to a velocity and averages the velocities (the pitot-traverse-average tile), which reads slightly lower because the square root is concave. Enter the air density at altitude or high temperature (air-density-correction gives it). A field measurement, not a substitute for a calibrated flow station.";
   const vp = _v23h_makeNumber("Average velocity pressure (in. w.c.)", "ptc-vp", { step: "any", min: "0" });
   const w = _v23h_makeNumber("Duct width (in)", "ptc-w", { step: "any", min: "0" });
   const h = _v23h_makeNumber("Duct height (in)", "ptc-h", { step: "any", min: "0" });
@@ -256,13 +256,13 @@ export function computePitotTraverseAverage({ vp_readings, w_in = 0, h_in = 0, a
   const overread_pct = (v_vp_average_fpm / v_avg_fpm - 1) * 100;
   return {
     v_avg_fpm, area_ft2, cfm, v_vp_average_fpm, cfm_vp_average, overread_pct, point_count: n, velocity_constant: K,
-    note: "The correct pitot-traverse average converts each equal-area point's velocity pressure to a velocity (V = 4005 sqrt(VP) for standard air) and averages the VELOCITIES, because velocity is what integrates to flow across the duct; CFM = average velocity x duct area. Averaging the velocity pressures first and taking one square root (the pitot-traverse-cfm tile's single-input shortcut) always reads high, since the square root is concave -- here by " + overread_pct.toFixed(2) + " percent. Space the points on an equal-area or log-Tchebycheff traverse per NEBB/AABC/ASHRAE, use enough points, and apply a density correction at altitude or high temperature. A field measurement, not a substitute for a calibrated flow station.",
+    note: "The correct pitot-traverse average converts each equal-area point's velocity pressure to a velocity (V = 4005 sqrt(VP) for standard air) and averages the VELOCITIES, because velocity is what integrates to flow across the duct; CFM = average velocity x duct area. Averaging the velocity pressures first and taking one square root (the pitot-traverse-cfm tile's single-input shortcut) always reads high, since the square root is concave -- here by " + overread_pct.toFixed(2) + " percent. Space the points on an equal-area or log-Tchebycheff traverse per NEBB/AABC/ASHRAE, use enough points, and enter the air density at altitude or high temperature (air-density-correction gives it). A field measurement, not a substitute for a calibrated flow station.",
   };
 }
 export const pitotTraverseAverageExample = { inputs: { vp_readings: [0.09, 0.16, 0.25, 0.16], w_in: 24, h_in: 12 } };
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderPitotTraverseAverage(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Pitot-tube traverse airflow averaged the correct way (ASHRAE Fundamentals / AABC / NEBB field practice, by name): convert each equal-area point's velocity pressure to a velocity V = 4005 x sqrt(VP) for standard air (0.075 lb/ft^3, sea level), average the velocities, then CFM = average velocity x duct area. Averaging the velocity pressures first reads high because the square root is concave. Apply a density correction at altitude or high temperature. A field measurement, not a substitute for a calibrated flow station.";
+  citationEl.textContent = "Citation: Pitot-tube traverse airflow averaged the correct way (ASHRAE Fundamentals / AABC / NEBB field practice, by name): convert each equal-area point's velocity pressure to a velocity V = 4005 x sqrt(VP) for standard air (0.075 lb/ft^3, sea level), average the velocities, then CFM = average velocity x duct area. Averaging the velocity pressures first reads high because the square root is concave. Enter the air density at altitude or high temperature (air-density-correction gives it). A field measurement, not a substitute for a calibrated flow station.";
   const reads = _v23h_makeTextarea("Velocity pressure at each traverse point (in. w.c.), one per line", "pta-reads", { rows: "5" });
   reads.input.value = "0.09\n0.16\n0.25\n0.16";
   const w = _v23h_makeNumber("Duct width (in)", "pta-w", { step: "any", min: "0" });

@@ -2958,7 +2958,7 @@ export function computeEconomizerSavingsHours({ cfm = 0, delta_t_f = 0, hours = 
     tons: Number.isFinite(qSens) ? qSens / 12000 : null,
     ton_hours: Number.isFinite(tonHours) ? tonHours : null,
     no_cooling: false,
-    note: "Sensible free-cooling capacity at the mix-to-supply delta-T. The 1.08 factor is sea-level standard air (apply a density correction at altitude). ASHRAE 90.1 economizer changeover governs eligibility.",
+    note: "Sensible free-cooling capacity at the mix-to-supply delta-T. The 1.08 factor is sea-level standard air (air-density-correction gives the corrected factor at altitude). ASHRAE 90.1 economizer changeover governs eligibility.",
   };
 }
 export const economizerSavingsHoursExample = { inputs: { cfm: 4000, delta_t_f: 20, hours: 1500 } };

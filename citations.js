@@ -1386,7 +1386,7 @@ export const CITATIONS = {
     edition: "ASHRAE sensible-heat relation Q = 1.08 * CFM * dT (public); air-side economizer changeover per ASHRAE Standard 90.1, by name.",
     freeAccess: "ASHRAE 90.1 free read-only at ashrae.org; the 1.08 sensible factor is public.",
     governance: GOVERNANCE.mechanical,
-    editionNote: "Single-relation (the 1.08 factor is sea-level standard air; apply a density correction at altitude). Design conditions govern.",
+    editionNote: "Single-relation (the 1.08 factor is sea-level standard air; air-density-correction gives the corrected factor at altitude). Design conditions govern.",
     assumptions: [
       { name: "Standard air", value: "1.08 BTU/(hr.CFM.F) at sea level, 70 F", source: "ASHRAE Fundamentals" },
     ],
@@ -15890,7 +15890,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.general,
     editionNote: "Single-edition (the equipment manufacturer's rating plate and the licensed tech govern).",
     assumptions: [
-      { name: "Air factor", value: "1.08 BTU/hr per CFM per F is sea-level standard air; at altitude or high humidity it falls", source: "first principles" },
+      { name: "Air factor", value: "1.08 BTU/hr per CFM per F is sea-level standard air; at altitude or high humidity it falls (air-density-correction gives the corrected factor)", source: "first principles" },
       { name: "Efficiency", value: "default 80% steady-state / thermal efficiency, an editable nameplate value", source: "rating plate" },
       { name: "Rise range", value: "default 40 to 70 F; the rating plate's stamped range is the governing limit", source: "rating plate" },
     ],
@@ -15903,7 +15903,7 @@ export const CITATIONS = {
     editionNote: "The inverse of the furnace temperature-rise tile: given a blower airflow (a tap or a target CFM), predict the temperature rise it produces so the blower can be set before measuring. From the sensible-heat relation the rise = output / (1.08 x CFM), the output = input x efficiency, and the supply-air temperature = return + rise. A lower airflow raises the rise and risks overheat and high-limit trips; a higher airflow lowers it and risks cold, clammy supply air and heat-exchanger condensation. The rating-plate rise range (commonly 40 to 70 F) is the governing limit and the 1.08 factor is sea-level standard air. The equipment manufacturer and the licensed tech govern.",
     assumptions: [
       { name: "Rise from airflow", value: "delta_T = output / (1.08 x CFM), output = input x efficiency", source: "first principles" },
-      { name: "Air factor", value: "1.08 BTU/hr per CFM per F is sea-level standard air; at altitude or high humidity it falls", source: "first principles" },
+      { name: "Air factor", value: "1.08 BTU/hr per CFM per F is sea-level standard air; at altitude or high humidity it falls (air-density-correction gives the corrected factor)", source: "first principles" },
       { name: "Rise range", value: "default 40 to 70 F; the rating plate's stamped range is the governing limit", source: "rating plate" },
     ],
   },
@@ -18629,12 +18629,12 @@ export const CITATIONS = {
     edition: "Pitot-traverse airflow averaged per ASHRAE Fundamentals / AABC / NEBB field practice: average the point velocities, not the velocity pressures. By name.",
     freeAccess: "The V = 4005 sqrt(VP) standard-air relation and the average-the-velocities traverse method are standard published air-balancing procedures.",
     governance: GOVERNANCE.general,
-    editionNote: "The methodologically-correct Pitot-traverse average: convert each equal-area point's velocity pressure to a velocity V = 4005 sqrt(VP) for standard air (0.075 lb/ft^3, sea level), average the VELOCITIES, then CFM = average velocity x duct cross-sectional area. Averaging the velocity pressures first and taking one square root reads high, because the square root is concave (Jensen's inequality) -- the tile reports that over-read against the average velocity so a technician can see the size of the shortcut error. Space the points on an equal-area or log-Tchebycheff traverse and use enough of them; apply a density correction at altitude or high temperature, where the result is otherwise a standard-air equivalent. A field measurement, not a substitute for a calibrated flow station or the equipment's own airflow rating.",
+    editionNote: "The methodologically-correct Pitot-traverse average: convert each equal-area point's velocity pressure to a velocity V = 4005 sqrt(VP) for standard air (0.075 lb/ft^3, sea level), average the VELOCITIES, then CFM = average velocity x duct cross-sectional area. Averaging the velocity pressures first and taking one square root reads high, because the square root is concave (Jensen's inequality) -- the tile reports that over-read against the average velocity so a technician can see the size of the shortcut error. Space the points on an equal-area or log-Tchebycheff traverse and use enough of them; enter the air density at altitude or high temperature (air-density-correction gives it), where the result is otherwise a standard-air equivalent. A field measurement, not a substitute for a calibrated flow station or the equipment's own airflow rating.",
     assumptions: [
       { name: "Air density", value: "optional (added 2026-10-09): V = 4005 sqrt(VP x 0.075/rho), the standard-air constant scaled for the entered density (the exact form is 1096.2 sqrt(VP/rho)); 0.075 lb/ft^3 leaves it unchanged", source: "ASHRAE Fundamentals; air-density-correction" },
       { name: "Velocity from VP", value: "V = 4005 sqrt(VP) for standard air, per point", source: "ASHRAE Fundamentals" },
       { name: "Correct average", value: "average the point velocities, not the velocity pressures", source: "AABC / NEBB field practice" },
-      { name: "Standard air", value: "apply a density correction at altitude or high temperature", source: "scope of this tile" },
+      { name: "Standard air", value: "0.075 lb/ft^3 unless an air density is entered; air-density-correction gives the density at altitude or high temperature", source: "scope of this tile" },
     ],
   },
   "pitot-traverse-cfm": {
@@ -18642,12 +18642,12 @@ export const CITATIONS = {
     edition: "The Pitot-traverse airflow measurement (velocity-pressure to velocity, standard air) from ASHRAE Fundamentals / AABC-NEBB field practice, by name.",
     freeAccess: "The V = 4005 sqrt(VP) standard-air relation and the traverse-average method are standard published air-balancing procedures.",
     governance: GOVERNANCE.general,
-    editionNote: "The Pitot-tube traverse airflow: velocity V = 4005 sqrt(VP) for standard air (0.075 lb/ft^3, sea level) from a single traverse-average velocity pressure, then CFM = V x duct cross-sectional area. This takes one already-averaged VP; the more exact field method converts each point's VP to a velocity and averages the velocities (the pitot-traverse-average tile), which reads slightly lower because the square root is concave. Apply a density correction at altitude or high temperature, where the result is otherwise a standard-air equivalent. This returns a field measurement, not a substitute for a calibrated flow station or the equipment's own airflow rating. A field aid; the balancing report and equipment ratings govern.",
+    editionNote: "The Pitot-tube traverse airflow: velocity V = 4005 sqrt(VP) for standard air (0.075 lb/ft^3, sea level) from a single traverse-average velocity pressure, then CFM = V x duct cross-sectional area. This takes one already-averaged VP; the more exact field method converts each point's VP to a velocity and averages the velocities (the pitot-traverse-average tile), which reads slightly lower because the square root is concave. Enter the air density at altitude or high temperature (air-density-correction gives it), where the result is otherwise a standard-air equivalent. This returns a field measurement, not a substitute for a calibrated flow station or the equipment's own airflow rating. A field aid; the balancing report and equipment ratings govern.",
     assumptions: [
       { name: "Air density", value: "optional (added 2026-10-09): V = 4005 sqrt(VP x 0.075/rho), the standard-air constant scaled for the entered density (the exact form is 1096.2 sqrt(VP/rho)); 0.075 lb/ft^3 leaves it unchanged", source: "ASHRAE Fundamentals; air-density-correction" },
       { name: "Velocity from VP", value: "V = 4005 sqrt(VP) for standard air", source: "ASHRAE Fundamentals" },
       { name: "Traverse average", value: "takes one pre-averaged VP; averaging point velocities is more exact (pitot-traverse-average)", source: "AABC / NEBB field practice" },
-      { name: "Standard air", value: "apply a density correction at altitude or high temperature", source: "scope of this tile" },
+      { name: "Standard air", value: "0.075 lb/ft^3 unless an air density is entered; air-density-correction gives the density at altitude or high temperature", source: "scope of this tile" },
     ],
   },
   "dp-flow-meter": {
@@ -23365,7 +23365,7 @@ export const CITATIONS = {
   },
   "coil-capacity-verification": {
     formula: "air sensible Q = 1.08 x CFM x dT; air total Q = 4.5 x CFM x dh on a wet coil; water Q = fluid factor x GPM x dT with 500 for water; the heat balance difference is the gap between the air side used and the water side, as a percentage of the water side, judged against an entered tolerance.",
-    edition: "The coil heat balance as ASHRAE and balancing practice writes it, where 1.08 is 0.075 lb/cu ft x 0.24 BTU/lb-degF x 60 min/h, 4.5 is 0.075 x 60, and 500 is 8.33 lb/gal x 60 x 1.0. The tolerance and the fluid factor are ENTERED. Sea-level standard air: it does not correct for altitude or non-standard density, derive enthalpy from dry-bulb and wet-bulb readings, assess instrument accuracy, or evaluate coil cleanliness, circuiting or approach.",
+    edition: "The coil heat balance as ASHRAE and balancing practice writes it, where 1.08 is 0.075 lb/cu ft x 0.24 BTU/lb-degF x 60 min/h, 4.5 is 0.075 x 60, and 500 is 8.33 lb/gal x 60 x 1.0. The tolerance and the fluid factor are ENTERED. Sea-level standard air: it does not correct for altitude or non-standard density (air-density-correction gives the corrected 1.08 and 4.5 factors), derive enthalpy from dry-bulb and wet-bulb readings, assess instrument accuracy, or evaluate coil cleanliness, circuiting or approach.",
     freeAccess: "Three constants and two temperature differences.",
     governance: GOVERNANCE.general,
     editionNote: "Two independent measurements are the whole value of the exercise: agreement is strong evidence that both are right, and disagreement LOCALISES the problem. Air side high points at an overstated airflow or at air bypassing the coil; water side high usually means the flow measurement is wrong or the sensors are too close together for the delta. The sensible-versus-total distinction is the trap, because a sensible-only air side will fall short of a wet coil's water side for no reason but the method -- and correcting the method does NOT license calling any remaining disagreement acceptable, which is why the tolerance is entered and the verdict computed against it.",

@@ -1366,8 +1366,8 @@
       "date": "2026-09-29"
     },
     "/tools/coil-capacity-verification/": {
-      "sha": "6f296c293c5c3549",
-      "date": "2026-09-29"
+      "sha": "926d815d445055fa",
+      "date": "2026-10-10"
     },
     "/tools/coil-face-area/": {
       "sha": "6b842b8616610d05",
@@ -3250,12 +3250,12 @@
       "date": "2026-10-01"
     },
     "/tools/furnace-airflow-to-rise/": {
-      "sha": "2f76f262723f65d8",
-      "date": "2026-10-03"
+      "sha": "cfe86de726a98664",
+      "date": "2026-10-10"
     },
     "/tools/furnace-temp-rise/": {
-      "sha": "ed737f10bf2c4d8b",
-      "date": "2026-10-03"
+      "sha": "1e64bcda18e7e10c",
+      "date": "2026-10-10"
     },
     "/tools/fuse-let-through/": {
       "sha": "fa63fc2676fdd757",
@@ -5482,11 +5482,11 @@
       "date": "2026-10-03"
     },
     "/tools/pitot-traverse-average/": {
-      "sha": "e71973b8610ba1e3",
+      "sha": "ff6400dd103f37fb",
       "date": "2026-10-10"
     },
     "/tools/pitot-traverse-cfm/": {
-      "sha": "d87c8e5274a840d1",
+      "sha": "baef4dcbf0e6651c",
       "date": "2026-10-10"
     },
     "/tools/pivot-application-rate/": {
