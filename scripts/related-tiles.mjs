@@ -1734,6 +1734,7 @@ const RELATED = {
   "mud-hydrostatic-pressure": ["kill-mud-weight","annular-velocity-cleaning","casing-cement-volume"],
   "kill-mud-weight": ["mud-hydrostatic-pressure","annular-velocity-cleaning","casing-cement-volume"],
   "annular-velocity-cleaning": ["mud-hydrostatic-pressure","casing-cement-volume","kill-mud-weight"],
+  "cuttings-slip-velocity": ["annular-velocity-cleaning","mud-hydrostatic-pressure","particle-settling-velocity"],
   // spec-v1484..v1494: industrial refrigeration band.
   "ammonia-charge-inventory": ["machinery-room-ventilation","refrigeration-relief-capacity","receiver-pumpdown-capacity"],
   "two-stage-interstage-pressure": ["compression-ratio-refrig","refrigeration-cop","condenser-td-head-pressure"],

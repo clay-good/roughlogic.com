@@ -44,7 +44,7 @@ Two §H.2 extractions produced that headroom, and they are the same move made tw
 
 ## The catalog registry is the next real budget problem
 
-`tools-data.js` holds one row per tile and, measured 2026-10-09, is **2,013,468 B raw / 714,049 B gzipped**, at 99.2% of the 720,000 B cap in `check-module-sizes`. It was 397,907 B gzipped when the tables below were measured on 2026-08-29, so it has grown 79% in six weeks: the tile count rose by about a quarter and the descriptions got longer (a description now averages 747 B, and descriptions are 89% of the file, up from 79%). The cap has been raised at nearly every expansion band (430,000, then 520,000, 600,000 and 720,000), and at roughly 320 gzipped bytes per tile about 18 more tiles reaches it again. Raising it once more is the cheapest move available and it is the reason the file is this size.
+`tools-data.js` holds one row per tile and, measured 2026-10-09, is **2,013,468 B raw / 714,049 B gzipped**, which was 99.2% of the 720,000 B cap then in `check-module-sizes`. It was 397,907 B gzipped when the tables below were measured on 2026-08-29, so it has grown 79% in six weeks: the tile count rose by about a quarter and the descriptions got longer (a description now averages 747 B, and descriptions are 89% of the file, up from 79%). The cap has been raised at nearly every expansion band (430,000, then 520,000, 600,000 and 720,000), and was raised again to 800,000 B on 2026-10-10 when the file reached 99.3% of it; at roughly 320 gzipped bytes per tile that is room for about 260 more tiles. Raising it is the cheapest move available and it is the reason the file is this size.
 
 The same three shapes re-measured on 2026-10-09 (the catalog rebuilt as a module literal and gzipped, as described below):
 
@@ -70,7 +70,7 @@ Descriptions are four fifths of it. Without them the registry gzips to **47,224 
 
 Two paths pay that today, and neither needs all of it:
 
-- **A deep link** (`/index.html#<id>`, what search results and shared links point at) loads the whole catalog before it can validate the id and read one row's name and description. It needs 1 of 2,257.
+- **A deep link** (`/index.html#<id>`, what search results and shared links point at) loads the whole catalog before it can validate the id and read one row's name and description. It needs 1 of 2,258.
 - **The first search keystroke** loads it too, because `toolMatches` searches `name + " " + desc`. This one genuinely wants every description.
 
 So the deep-link case is a clean win, and the search case turns out not to be the tradeoff it first looked like. Search only degrades if it ranks *before* the descriptions arrive; if it awaits every description shard exactly as it awaits `tools-data.js` today, results are identical and the bytes are the same, fetched in parallel instead of serially.
@@ -138,7 +138,7 @@ The §14.3 starter estimates (vet 22 KB / ems 25 KB / aviation 18 KB / realestat
 ## v13 per-shell budgets (spec-v13 §12.1)
 
 Spec-v13 added a build-time prerender step that emits one static HTML
-shell per tile (`/tools/<id>/index.html`, 2,257 shells) and one per
+shell per tile (`/tools/<id>/index.html`, 2,258 shells) and one per
 group (`/groups/<slug>/index.html`, 21 shells), plus the catalog hub at
 `/tools/` and the not-found page at `/404.html`. The shells are separate
 documents from the SPA home view, served as static files by Cloudflare

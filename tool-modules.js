@@ -1529,7 +1529,7 @@ export const TOOL_MODULES = (() => {
     "pipeline-mao-barlow", "gas-pipeline-flow", "gas-z-factor", "liquid-pipeline-station-spacing",
     "pig-batch-volume", "cathodic-anode-count-life", "corroded-pipe-b31g",
     "casing-cement-volume", "mud-hydrostatic-pressure", "kill-mud-weight",
-    "annular-velocity-cleaning",
+    "annular-velocity-cleaning", "cuttings-slip-velocity",
   ]);
   // spec-v1484..v1494: the industrial refrigeration bench (Group C). Separate
   // from calc-refrigerant.js, which holds the SERVICE bench -- superheat,

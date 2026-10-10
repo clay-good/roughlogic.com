@@ -1249,6 +1249,7 @@ const _TILES = [
   ["mud-hydrostatic-pressure", "E"],
   ["kill-mud-weight", "E"],
   ["annular-velocity-cleaning", "E"],
+  ["cuttings-slip-velocity", "E"],
   // spec-v1484..v1494 industrial refrigeration band (new calc-refrigeration.js)
   ["ammonia-charge-inventory", "C"],
   ["two-stage-interstage-pressure", "C"],

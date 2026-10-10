@@ -1846,6 +1846,7 @@ export const RENDERER_MAP = {
   "mud-hydrostatic-pressure": { module: "../../calc-oilgas.js", exportName: "OILGAS_RENDERERS" },
   "kill-mud-weight": { module: "../../calc-oilgas.js", exportName: "OILGAS_RENDERERS" },
   "annular-velocity-cleaning": { module: "../../calc-oilgas.js", exportName: "OILGAS_RENDERERS" },
+  "cuttings-slip-velocity": { module: "../../calc-oilgas.js", exportName: "OILGAS_RENDERERS" },
   "ammonia-charge-inventory": { module: "../../calc-refrigeration.js", exportName: "REFRIGERATION_RENDERERS" },
   "two-stage-interstage-pressure": { module: "../../calc-refrigeration.js", exportName: "REFRIGERATION_RENDERERS" },
   "refrigerated-case-load": { module: "../../calc-refrigeration.js", exportName: "REFRIGERATION_RENDERERS" },

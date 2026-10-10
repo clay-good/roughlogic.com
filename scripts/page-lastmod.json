@@ -2,99 +2,99 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "8806666e1e470184",
+      "sha": "884892753f169af6",
       "date": "2026-10-10"
     },
     "/tools/": {
-      "sha": "fa2c598b85312b1f",
+      "sha": "8a1d71de9e9259ae",
       "date": "2026-10-10"
     },
     "/collections/disaster-response/": {
-      "sha": "b4586a1f2ea1c8ee",
+      "sha": "d2f21b2c6d45cbe2",
       "date": "2026-10-10"
     },
     "/groups/accounting/": {
-      "sha": "74bb1b81bb42945a",
+      "sha": "faa6bf236e6e7085",
       "date": "2026-10-10"
     },
     "/groups/agriculture/": {
-      "sha": "7dadece3e978051d",
+      "sha": "ce5ea8b8ce7a30d3",
       "date": "2026-10-10"
     },
     "/groups/construction/": {
-      "sha": "384806c585b1632b",
+      "sha": "4c999b37d86beaec",
       "date": "2026-10-10"
     },
     "/groups/cross-trade/": {
-      "sha": "6cec54b44995fa16",
+      "sha": "e425ce0e432dd624",
       "date": "2026-10-10"
     },
     "/groups/educators/": {
-      "sha": "f403564d720e5c35",
+      "sha": "b85325e711eb6a90",
       "date": "2026-10-10"
     },
     "/groups/electrical/": {
-      "sha": "a6049f6682211b37",
+      "sha": "b9276508a81ba9be",
       "date": "2026-10-10"
     },
     "/groups/field/": {
-      "sha": "eb42cc4793d44221",
+      "sha": "e5201bdcda11ac4f",
       "date": "2026-10-10"
     },
     "/groups/fire-ground/": {
-      "sha": "9fe46127350d75f6",
+      "sha": "faacf51f91752404",
       "date": "2026-10-10"
     },
     "/groups/historical/": {
-      "sha": "c6ef0c986b772141",
+      "sha": "8057881f40ab5dc7",
       "date": "2026-10-10"
     },
     "/groups/hvac/": {
-      "sha": "58576aad72a5e175",
+      "sha": "a0a454c0af14a91d",
       "date": "2026-10-10"
     },
     "/groups/kitchen/": {
-      "sha": "ab4cd52c19946ecc",
+      "sha": "9a9f128af74332dc",
       "date": "2026-10-10"
     },
     "/groups/lab/": {
-      "sha": "ced91d8c6df0bf2b",
+      "sha": "f45648a5a1931a05",
       "date": "2026-10-10"
     },
     "/groups/mechanic/": {
-      "sha": "6e3b8304a1ce83e9",
+      "sha": "98366f8ad00019d9",
       "date": "2026-10-10"
     },
     "/groups/plumbing/": {
-      "sha": "09d96713b3da28b5",
+      "sha": "aa0029623a22d21b",
       "date": "2026-10-10"
     },
     "/groups/real-estate/": {
-      "sha": "63056a8d820dfafd",
+      "sha": "93759d9493f7945d",
       "date": "2026-10-10"
     },
     "/groups/references/": {
-      "sha": "b3163cba23471f23",
+      "sha": "297f62d875de598b",
       "date": "2026-10-10"
     },
     "/groups/restoration/": {
-      "sha": "9aed8b3d911e2b6c",
+      "sha": "72dceb57354c933b",
       "date": "2026-10-10"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "bf290b93c4c388a7",
+      "sha": "8e5b01104d71c096",
       "date": "2026-10-10"
     },
     "/groups/stage/": {
-      "sha": "bd45d8ffbdf947c8",
+      "sha": "0fadad804f46d6d7",
       "date": "2026-10-10"
     },
     "/groups/trucking/": {
-      "sha": "c73a13197e2685ab",
+      "sha": "8dfdd01c0d0e698c",
       "date": "2026-10-10"
     },
     "/groups/water/": {
-      "sha": "e44a7109f247a433",
+      "sha": "1810fbb3badc3d86",
       "date": "2026-10-10"
     },
     "/tools/aav-install-check/": {
@@ -298,8 +298,8 @@
       "date": "2026-09-29"
     },
     "/tools/annular-velocity-cleaning/": {
-      "sha": "6764ea58fe92f288",
-      "date": "2026-09-29"
+      "sha": "6ec99420a1b3184b",
+      "date": "2026-10-10"
     },
     "/tools/annulus-area/": {
       "sha": "52590a04d57082c4",
@@ -2020,6 +2020,10 @@
     "/tools/cutting-speed-rpm/": {
       "sha": "2c21f832eb112961",
       "date": "2026-09-29"
+    },
+    "/tools/cuttings-slip-velocity/": {
+      "sha": "df247bc03c45b552",
+      "date": "2026-10-10"
     },
     "/tools/cwr-neutral-temperature/": {
       "sha": "2208588577d70182",

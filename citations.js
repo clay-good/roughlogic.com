@@ -23596,6 +23596,18 @@ export const CITATIONS = {
       { name: "Vertical or near-vertical", value: "influx migration and the annulus profile are not modelled", source: "a qualified well-control supervisor" },
     ],
   },
+  "cuttings-slip-velocity": {
+    formula: "Apparent viscosity mu_a = (K/144) ((d2 - d1)/v_a)^(1-n) ((2 + 1/n)/0.0208)^n, v_a in ft/s, diameters in inches, K in equivalent cP. Particle Re = 928 rho_f v_s d/mu_a (ppg, ft/s, in, cP). v_s = 82.87 d^2 (rho_s - rho_f)/mu_a for Re under 3; 2.90 d (rho_s - rho_f)^0.667/(rho_f^0.333 mu_a^0.333) for 3 to 300; 1.54 sqrt(d (rho_s - rho_f)/rho_f) over 300. rho_s = SG x 8.3454 ppg. Transport ratio = (v_a - v_s)/v_a.",
+    edition: "Moore's correlation for cuttings slip velocity: P. L. Moore, Drilling Practices Manual (1974), as presented in Bourgoyne, Millheim, Chenevert and Young, Applied Drilling Engineering (SPE Textbook Series), cited by name.",
+    freeAccess: "The three slip-velocity forms follow from the force balance v^2 = 4 g d (rho_s - rho_f)/(3 f rho_f) with friction factors 40/Re, 22/sqrt(Re) and 1.5; worked in field units that derivation gives 82.91, 2.904, 1.544 and a Reynolds constant of 927.7, which round to the published 82.87, 2.90, 1.54 and 928. The tile computes with the derived values.",
+    governance: GOVERNANCE.general,
+    editionNote: "A vertical-hole, single-particle estimate for a cutting of one equivalent diameter. A shear-thinning mud is thinner at a higher annular velocity, so the slip velocity rises with pump rate; in turbulent slip viscosity drops out. It does not model cuttings beds in a deviated or horizontal hole, pipe rotation, eccentricity or concentration. The 0.5 transport ratio in the verdict is a commonly quoted minimum, not a rule.",
+    assumptions: [
+      { name: "Friction factors", value: "40/Re laminar, 22/sqrt(Re) transitional, 1.5 turbulent, for an irregular cutting", source: "Moore (1974)" },
+      { name: "Regime", value: "the form whose own Reynolds number falls in its range; the transitional form in the narrow gaps at Re 3 and 300", source: "scope of this tile" },
+      { name: "Apparent viscosity", value: "the Newtonian viscosity giving the same annular friction as the power-law mud, or an entered value", source: "Bourgoyne et al." },
+    ],
+  },
   "annular-velocity-cleaning": {
     formula: "annular velocity ft/min = 24.5 x gpm / (D_hole^2 - D_pipe^2); annular capacity bbl/ft = (D_hole^2 - D_pipe^2) / 1029.4; transport ratio = (annular velocity - slip velocity) / annular velocity; bottoms up = annular volume / pump output; and the flow for a target velocity is the first relation inverted.",
     edition: "The oilfield annular relations as every drilling and well-control manual writes them. Slip velocity is ENTERED because it depends on cutting size and density and on mud rheology. A vertical-hole screen with a concentric annulus: it does not compute slip velocity, model cuttings beds or eccentricity on a deviated well, account for pipe rotation, evaluate equivalent circulating density or the pressure the rate costs, or address hole washout.",
@@ -23603,7 +23615,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.general,
     editionNote: "Because the annular area is a difference of SQUARES, velocity changes fast with hole size: the rate that cleans a small hole around a given pipe is nowhere near enough in a large one, which is why rate has to rise with every larger section. The number that matters is transport ratio rather than velocity alone -- how much faster the mud rises than the cuttings fall. On a high-angle well none of this is sufficient: cuttings form a bed on the low side and mechanical agitation from rotation is what removes them, so a horizontal section that looks clean by this arithmetic can still be packing off. That is the limit of the calculation and it is a real one.",
     assumptions: [
-      { name: "Slip velocity is entered", value: "it depends on cutting size and density and on mud rheology", source: "the mud engineer" },
+      { name: "Slip velocity is entered", value: "it depends on cutting size and density and on mud rheology; cuttings-slip-velocity computes it by Moore's correlation", source: "the mud engineer; cuttings-slip-velocity" },
       { name: "Vertical hole, concentric annulus", value: "cuttings beds and eccentricity on a deviated well are not modelled", source: "the directional driller" },
       { name: "No circulating pressure", value: "the equivalent circulating density the rate costs is separate", source: "the drilling program" },
     ],

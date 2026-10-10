@@ -1,7 +1,7 @@
 {
   "note": "spec-v1184 coverage ratchet. Tiles whose renderer exposes a render.schema consistent with the compute function. Grow with `node scripts/check-renderer-schema.mjs --write`; regeneration is intentional.",
-  "total_tiles": 2257,
-  "covered_count": 2183,
+  "total_tiles": 2258,
+  "covered_count": 2184,
   "covered": [
     "aav-install-check",
     "abatement-containment",
@@ -471,6 +471,7 @@
     "cutting-diameter-for-rpm",
     "cutting-fluid-concentration",
     "cutting-speed-rpm",
+    "cuttings-slip-velocity",
     "cwr-neutral-temperature",
     "cyclone-separator-sizing",
     "cylinder-storage-separation",

@@ -6224,7 +6224,7 @@
     {"term":"hole cleaning","target":"annular-velocity-cleaning","kind":"industry"},
     {"term":"transport ratio","target":"annular-velocity-cleaning","kind":"industry"},
     {"term":"bottoms up","target":"annular-velocity-cleaning","kind":"industry"},
-    {"term":"cuttings slip velocity","target":"annular-velocity-cleaning","kind":"industry"},
+    {"term":"cuttings slip velocity","target":"cuttings-slip-velocity","kind":"industry"},
     {"term":"weld visual acceptance criteria","target":"weld-visual-acceptance","kind":"industry"},
     {"term":"aws d1.1 undercut limit","target":"weld-visual-acceptance","kind":"industry"},
     {"term":"weld porosity acceptance","target":"weld-visual-acceptance","kind":"industry"},
@@ -6427,6 +6427,10 @@
     {"term":"koepe hoist slip","target":"friction-hoist-traction","kind":"industry"},
     {"term":"hoist rope slip on the drum","target":"friction-hoist-traction","kind":"industry"},
     {"term":"koepe wheel tension ratio","target":"friction-hoist-traction","kind":"industry"},
-    {"term":"will my friction hoist ropes slip","target":"friction-hoist-traction","kind":"question"}
+    {"term":"will my friction hoist ropes slip","target":"friction-hoist-traction","kind":"question"},
+    {"term":"cuttings transport ratio","target":"cuttings-slip-velocity","kind":"industry"},
+    {"term":"moore correlation slip velocity","target":"cuttings-slip-velocity","kind":"industry"},
+    {"term":"hole cleaning slip velocity","target":"cuttings-slip-velocity","kind":"industry"},
+    {"term":"how fast do cuttings fall in mud","target":"cuttings-slip-velocity","kind":"question"}
   ]
 }

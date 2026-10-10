@@ -170505,6 +170505,103 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "cuttings-slip-velocity",
+  "source_publisher": "Moore, Drilling Practices Manual (1974), as given in Bourgoyne et al., Applied Drilling Engineering (SPE)",
+  "source_title": "0.25 in cutting, 9.5 ppg power-law mud, 8.75 by 5 in annulus at 200 ft/min",
+  "source_edition_or_year": "Moore's correlation, transitional slip",
+  "source_section_or_page": "mu_a = (200/144)(3.75/3.333)^0.3 ((2 + 1/0.7)/0.0208)^0.7 = 51.2 cP; v = 2.90 x 0.25 x 12.198^0.667/(9.5^0.333 x 51.2^0.333) = 0.489 ft/s = 29.3 ft/min; Re = 928 x 9.5 x 0.489 x 0.25/51.2 = 21; TR = (200 - 29.3)/200 = 0.853",
+  "verified_by": "rl",
+  "verified_on": "2026-10-10",
+  "inputs": {
+   "cutting_diameter_in": 0.25,
+   "cutting_sg": 2.6,
+   "mud_weight_ppg": 9.5,
+   "viscosity_mode": "power_law",
+   "apparent_viscosity_cp": 0,
+   "flow_index_n": 0.7,
+   "consistency_k": 200,
+   "hole_dia_in": 8.75,
+   "pipe_od_in": 5,
+   "annular_velocity_ft_min": 200
+  },
+  "outputs": {
+   "slip_velocity_ft_min": {
+    "value": 29.3,
+    "tolerance": {
+     "pct": 1
+    }
+   },
+   "apparent_viscosity_used_cp": {
+    "value": 51.2,
+    "tolerance": {
+     "pct": 1
+    }
+   },
+   "transport_ratio": {
+    "value": 0.853,
+    "tolerance": {
+     "pct": 1
+    }
+   }
+  }
+ },
+ {
+  "tile_id": "cuttings-slip-velocity",
+  "source_publisher": "Moore, Drilling Practices Manual (1974), as given in Bourgoyne et al., Applied Drilling Engineering (SPE)",
+  "source_title": "Laminar slip in a 500 cP mud",
+  "source_edition_or_year": "Moore's correlation, Re under 3",
+  "source_section_or_page": "v = 82.87 x 0.25^2 x (21.698 - 9.5)/500 = 0.1264 ft/s; Re = 928 x 9.5 x 0.1264 x 0.25/500 = 0.56",
+  "verified_by": "rl",
+  "verified_on": "2026-10-10",
+  "inputs": {
+   "cutting_diameter_in": 0.25,
+   "cutting_sg": 2.6,
+   "mud_weight_ppg": 9.5,
+   "viscosity_mode": "apparent",
+   "apparent_viscosity_cp": 500,
+   "annular_velocity_ft_min": 120
+  },
+  "outputs": {
+   "slip_velocity_fps": {
+    "value": 0.1264,
+    "tolerance": {
+     "pct": 0.5
+    }
+   },
+   "particle_reynolds": {
+    "value": 0.56,
+    "tolerance": {
+     "pct": 2
+    }
+   }
+  }
+ },
+ {
+  "tile_id": "cuttings-slip-velocity",
+  "source_publisher": "Moore, Drilling Practices Manual (1974), as given in Bourgoyne et al., Applied Drilling Engineering (SPE)",
+  "source_title": "Turbulent slip in a 1 cP fluid",
+  "source_edition_or_year": "Moore's correlation, Re over 300",
+  "source_section_or_page": "v = 1.54 sqrt(0.25 x 12.198/9.5) = 0.8725 ft/s (the tile's derived constant 1.544 gives 0.8747)",
+  "verified_by": "rl",
+  "verified_on": "2026-10-10",
+  "inputs": {
+   "cutting_diameter_in": 0.25,
+   "cutting_sg": 2.6,
+   "mud_weight_ppg": 9.5,
+   "viscosity_mode": "apparent",
+   "apparent_viscosity_cp": 1,
+   "annular_velocity_ft_min": 120
+  },
+  "outputs": {
+   "slip_velocity_fps": {
+    "value": 0.8725,
+    "tolerance": {
+     "pct": 0.5
+    }
+   }
+  }
  }
  ]
 }

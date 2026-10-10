@@ -2274,6 +2274,7 @@ export const COMPUTE_MAP = {
   "mud-hydrostatic-pressure": { module: "../../calc-oilgas.js", fn: "computeMudHydrostaticPressure" },
   "kill-mud-weight": { module: "../../calc-oilgas.js", fn: "computeKillMudWeight" },
   "annular-velocity-cleaning": { module: "../../calc-oilgas.js", fn: "computeAnnularVelocityCleaning" },
+  "cuttings-slip-velocity": { module: "../../calc-oilgas.js", fn: "computeCuttingsSlipVelocity" },
   "ammonia-charge-inventory": { module: "../../calc-refrigeration.js", fn: "computeAmmoniaChargeInventory" },
   "two-stage-interstage-pressure": { module: "../../calc-refrigeration.js", fn: "computeTwoStageInterstagePressure" },
   "refrigerated-case-load": { module: "../../calc-refrigeration.js", fn: "computeRefrigeratedCaseLoad" },

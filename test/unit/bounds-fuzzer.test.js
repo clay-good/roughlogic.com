@@ -59291,3 +59291,33 @@ test("bounds: glycol-fluid-factor reproduces every printed Dow value and interpo
     assert.ok("error" in _gff({ glycol_pct: 40, fluid_temp_f: 100, ...bad }));
   }
 });
+
+import { computeCuttingsSlipVelocity as _csv } from "../../calc-oilgas.js";
+test("bounds: cuttings-slip-velocity matches Moore's published forms in all three regimes", () => {
+  const b = { cutting_diameter_in: 0.25, cutting_sg: 2.6, mud_weight_ppg: 9.5, viscosity_mode: "apparent", annular_velocity_ft_min: 120 };
+  const drho = 2.6 * 8.3454 - 9.5;
+  const lam = _csv({ ...b, apparent_viscosity_cp: 500 }), mid = _csv({ ...b, apparent_viscosity_cp: 50 }), tur = _csv({ ...b, apparent_viscosity_cp: 1 });
+  // The tile's derived constants (82.91, 2.904, 1.544) against the published rounded ones.
+  assert.ok(Math.abs(lam.slip_velocity_fps / (82.87 * 0.0625 * drho / 500) - 1) < 0.002);
+  assert.ok(Math.abs(mid.slip_velocity_fps / (2.90 * 0.25 * Math.pow(drho, 0.667) / (Math.pow(9.5, 0.333) * Math.pow(50, 0.333))) - 1) < 0.005);
+  assert.ok(Math.abs(tur.slip_velocity_fps / (1.54 * Math.sqrt(0.25 * drho / 9.5)) - 1) < 0.005);
+  assert.ok(lam.particle_reynolds < 3 && mid.particle_reynolds > 3 && mid.particle_reynolds < 300 && tur.particle_reynolds > 300);
+  // Each regime satisfies its own force balance: v^2 = 4 g d drho / (3 f rho_f).
+  const f = (r) => 4 * 32.174 * (0.25 / 12) * drho / (3 * 9.5 * r.slip_velocity_fps ** 2);
+  assert.ok(Math.abs(f(lam) * lam.particle_reynolds - 40) < 1e-6);
+  assert.ok(Math.abs(f(mid) * Math.sqrt(mid.particle_reynolds) - 22) < 1e-6);
+  assert.ok(Math.abs(f(tur) - 1.5) < 1e-9);
+  // Thicker mud slips less; transport ratio is the share of annular velocity kept.
+  assert.ok(lam.slip_velocity_fps < mid.slip_velocity_fps && mid.slip_velocity_fps < tur.slip_velocity_fps);
+  assert.ok(Math.abs(mid.transport_ratio - (120 - mid.slip_velocity_ft_min) / 120) < 1e-12);
+  // Power-law mode: the apparent viscosity fed back as an entered value gives the same slip.
+  const pl = _csv({ cutting_diameter_in: 0.25, cutting_sg: 2.6, mud_weight_ppg: 9.5, viscosity_mode: "power_law", flow_index_n: 0.7, consistency_k: 200, hole_dia_in: 8.75, pipe_od_in: 5, annular_velocity_ft_min: 200 });
+  assert.ok(Math.abs(_csv({ ...b, apparent_viscosity_cp: pl.apparent_viscosity_used_cp, annular_velocity_ft_min: 200 }).slip_velocity_fps - pl.slip_velocity_fps) < 1e-12);
+  // n = 1 is Newtonian: the apparent viscosity does not depend on the annular velocity.
+  const n1a = _csv({ ...pl, flow_index_n: 1, cutting_diameter_in: 0.25, cutting_sg: 2.6, mud_weight_ppg: 9.5, viscosity_mode: "power_law", consistency_k: 30, hole_dia_in: 8.75, pipe_od_in: 5, annular_velocity_ft_min: 100 });
+  const n1b = _csv({ cutting_diameter_in: 0.25, cutting_sg: 2.6, mud_weight_ppg: 9.5, viscosity_mode: "power_law", flow_index_n: 1, consistency_k: 30, hole_dia_in: 8.75, pipe_od_in: 5, annular_velocity_ft_min: 300 });
+  assert.ok(Math.abs(n1a.apparent_viscosity_used_cp - n1b.apparent_viscosity_used_cp) < 1e-9);
+  for (const bad of [{ cutting_diameter_in: 0 }, { cutting_sg: 1 }, { mud_weight_ppg: 25 }, { apparent_viscosity_cp: 0 }, { viscosity_mode: "bingham" }, { annular_velocity_ft_min: -1 }]) {
+    assert.ok("error" in _csv({ ...b, apparent_viscosity_cp: 50, ...bad }));
+  }
+});

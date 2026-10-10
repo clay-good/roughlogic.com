@@ -3029,6 +3029,7 @@ cross-check.
 | calc-oilgas.js | `computeCasingCementVolume` | `{ hole_dia_in = 0, casing_od_in = 0, casing_id_in = 0, cement_column_ft = 0, ...` | _ | _ | _ |
 | calc-oilgas.js | `computeCathodicAnodeCountLife` | `{ od_in = 0, length_mi = 0, coating_efficiency_pct = 0, current_density_ma_pe...` | _ | _ | _ |
 | calc-oilgas.js | `computeCorrodedPipeB31g` | `{ od_in = 0, wall_in = 0, smys_psi = 0, defect_depth_in = 0, defect_length_in...` | _ | _ | _ |
+| calc-oilgas.js | `computeCuttingsSlipVelocity` | `{ cutting_diameter_in = 0, cutting_sg = 2.6, mud_weight_ppg = 0, viscosity_mo...` | _ | _ | _ |
 | calc-oilgas.js | `computeFlareRadiationDistance` | `{ heat_release_btuh = 0, radiant_fraction = 0, allowable_btuh_ft2 = 0, solar_...` | _ | _ | _ |
 | calc-oilgas.js | `computeGasPipelineFlow` | `{ equation = "panhandle_a", id_in = 0, length_mi = 0, inlet_psig = 0, outlet_...` | _ | _ | _ |
 | calc-oilgas.js | `computeGasZFactor` | `{ gas_gravity = 0.65, pressure_psig = 0, temperature_f = 0, co2_pct = 0, h2s_...` | _ | _ | _ |
@@ -3927,7 +3928,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2511.
+Row count: 2512.
 
 <!-- END function-corpus-v14 -->
 
@@ -4707,7 +4708,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-extraction-rate` | Water Extraction Volume, Time, and Waste-Tank Dumps | Project (first-principles); standing + absorbed; wand time = total / gpm | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+4 more) |
 
-### Group E Construction (628 tiles)
+### Group E Construction (629 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4855,6 +4856,7 @@ per spec-v14 §13.1 second paragraph.
 | `curing-compound-coverage` | Concrete Curing Compound Coverage | liquid membrane cure coverage (ASTM C...; gallons = ceil(2500*1/200) = ceil(12.5) = 13; pails = cei... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `curtain-wall-mullion-deflection` | Curtain Wall Mullion Deflection and Required Stiffness | AAMA; L/175 up to 13 ft 6 in | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `curve-deflection-stakeout` | Curve Deflection-Angle Stakeout | AASHTO Green Book / FM 5-233 (by name); delta = (100/1000)(180/pi) = 5.7296 deg; chord = 1000 sin... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `cuttings-slip-velocity` | Cuttings Slip Velocity and Transport Ratio (Moore) | Moore, Drilling Practices Manual (197...; mu_a = (200/144)(3.75/3.333)^0.3 ((2 + 1/0.7)/0.0208)^0.7... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `cwr-neutral-temperature` | Continuous Welded Rail Thermal Force and Neutral Temperature | Project (first-principles); 49 CFR 213 CWR plan requirements named | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `cylinder-storage-separation` | Compressed Gas Cylinder Storage Separation (OSHA 1926.350) | Occupational Safety and Health Admini...; 'Oxygen cylinders in storage shall be separated from fuel... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `debris-management-site-sizing` | Debris Management Site Acreage and Volume Reduction | FEMA / USACE; Appendix B, USACE model Step 2 example: 7,000,000 cy / 16... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -6357,6 +6359,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 
-Tile count: 2257. Fixture-covered or reference-cadence: 2257 / 2257.
+Tile count: 2258. Fixture-covered or reference-cadence: 2258 / 2258.
 
 <!-- END tile-index-v14 -->

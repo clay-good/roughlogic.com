@@ -948,7 +948,7 @@ export function computeAnnularVelocityCleaning({
     has_slip, transport_ratio, cuttings_rise, transport_verdict,
     has_bottoms_up, annular_volume_bbl, bottoms_up_strokes, bottoms_up_min, bottoms_up_verdict,
     has_target, flow_for_target_gpm,
-    note: "The annular velocity a pump rate produces, whether it actually carries cuttings, and how long a bottoms-up takes. Annular velocity is flow over annular area, and because that area is a difference of SQUARES it changes fast with hole size: the same pump rate that cleans a small hole around a given pipe is nowhere near enough in a large one. That is why rate has to rise with every larger hole section, and why a washed-out interval is a cleaning problem as well as a cement problem. The number that matters is transport ratio rather than velocity alone -- what counts is how much faster the mud rises than the cuttings fall. Slip velocity depends on cutting size and density and on the mud's rheology, so a thin mud carries poorly at any rate, which is why hole cleaning is fixed with sweeps, rheology and pipe rotation as much as with flow. On a high-angle well none of this is sufficient: cuttings form a bed on the low side of the hole, and mechanical agitation from rotation is what removes them, so a horizontal section that looks clean by this arithmetic can still be packing off. That is the limit of the calculation and it is a real one. Bottoms-up time is the companion number and the one a crew actually uses: how long before what the bit is making reaches the shakers. The rate a target velocity would need is reported too, because in a large hole that rate is often more than the pumps or the motor will take, and that is the moment sweeps and rheology stop being optional. Slip velocity is ENTERED because it depends on the cuttings and the mud. This is a vertical-hole screen with a concentric annulus: it does not compute slip velocity, model cuttings beds or eccentricity on a deviated well, account for pipe rotation, evaluate equivalent circulating density or the pressure the rate costs, or address the effect of hole washout on the real annular area. The drilling program, the mud engineer, and the directional driller govern.",
+    note: "The annular velocity a pump rate produces, whether it actually carries cuttings, and how long a bottoms-up takes. Annular velocity is flow over annular area, and because that area is a difference of SQUARES it changes fast with hole size: the same pump rate that cleans a small hole around a given pipe is nowhere near enough in a large one. That is why rate has to rise with every larger hole section, and why a washed-out interval is a cleaning problem as well as a cement problem. The number that matters is transport ratio rather than velocity alone -- what counts is how much faster the mud rises than the cuttings fall. Slip velocity depends on cutting size and density and on the mud's rheology, so a thin mud carries poorly at any rate, which is why hole cleaning is fixed with sweeps, rheology and pipe rotation as much as with flow. On a high-angle well none of this is sufficient: cuttings form a bed on the low side of the hole, and mechanical agitation from rotation is what removes them, so a horizontal section that looks clean by this arithmetic can still be packing off. That is the limit of the calculation and it is a real one. Bottoms-up time is the companion number and the one a crew actually uses: how long before what the bit is making reaches the shakers. The rate a target velocity would need is reported too, because in a large hole that rate is often more than the pumps or the motor will take, and that is the moment sweeps and rheology stop being optional. Slip velocity is ENTERED because it depends on the cuttings and the mud (cuttings-slip-velocity computes it by Moore's correlation). This is a vertical-hole screen with a concentric annulus: it does not compute slip velocity, model cuttings beds or eccentricity on a deviated well, account for pipe rotation, evaluate equivalent circulating density or the pressure the rate costs, or address the effect of hole washout on the real annular area. The drilling program, the mud engineer, and the directional driller govern.",
   };
 }
 export const annularVelocityCleaningExample = { inputs: { hole_dia_in: 8.75, pipe_od_in: 5.0, flow_gpm: 420, slip_velocity_ft_min: 30, measured_depth_ft: 9800, pump_output_bbl_stroke: 0.117, pump_spm: 30, target_velocity_ft_min: 0 } };
@@ -1570,4 +1570,107 @@ OILGAS_RENDERERS["well-decline-reserves"] = _simpleRenderer({
     { key: "decisionVerdict", label: "What it is for", value: (r) => r.decisionVerdict },
     { key: "note", label: "Note", value: (r) => r.note },
   ],
+});
+
+// =====================================================================
+// spec-v1954: cuttings slip velocity and transport ratio (Moore's correlation).
+// =====================================================================
+// annular-velocity-cleaning takes the slip velocity as ENTERED "because it depends on the cuttings and the mud".
+// Moore's correlation (Drilling Practices Manual, 1974; as given in Bourgoyne et al., Applied Drilling
+// Engineering) computes it: an apparent viscosity for the power-law mud at the annular shear rate, a particle
+// Reynolds number, and a friction factor of 40/Re (Re under 3), 22/sqrt(Re) (3 to 300) or 1.5 (over 300) in the
+// force balance v^2 = 4 g d (rho_s - rho_f)/(3 f rho_f). Worked through in field units those give the published
+// forms v = 82.87 d^2 (rho_s - rho_f)/mu, 2.90 d (rho_s - rho_f)^0.667/(rho_f^0.333 mu^0.333) and
+// 1.54 sqrt(d (rho_s - rho_f)/rho_f) with Re = 928 rho_f v d/mu. The constants below are the derived ones
+// (82.91, 2.904, 1.544, 927.7), which round to the published figures.
+const _CSV_G_FT_S2 = 32.174;
+const _CSV_WATER_PPG = 8.3454;
+// ppg to lb/ft3, inches to ft, cP to lb/(ft s): Re = _CSV_RE x rho_f(ppg) x v(ft/s) x d(in) / mu(cP)
+const _CSV_RE = (1728 / 231) / (12 * 0.001 * 0.3048 / 0.45359237);
+const _CSV_K_LAMINAR = 4 * _CSV_G_FT_S2 / 12 * _CSV_RE / 120;
+const _CSV_K_INTERMEDIATE = Math.pow(4 * _CSV_G_FT_S2 / 12 * Math.sqrt(_CSV_RE) / 66, 2 / 3);
+const _CSV_K_TURBULENT = Math.sqrt(4 * _CSV_G_FT_S2 / 12 / 4.5);
+// dims: in { cutting_diameter_in: L, cutting_sg: dimensionless, mud_weight_ppg: M L^-3, viscosity_mode: dimensionless, apparent_viscosity_cp: M L^-1 T^-1, flow_index_n: dimensionless, consistency_k: dimensionless, hole_dia_in: L, pipe_od_in: L, annular_velocity_ft_min: L T^-1 } out: { slip_velocity_ft_min: L T^-1, slip_velocity_fps: L T^-1, particle_reynolds: dimensionless, apparent_viscosity_used_cp: M L^-1 T^-1, transport_ratio: dimensionless, net_velocity_ft_min: L T^-1 }
+export function computeCuttingsSlipVelocity({
+  cutting_diameter_in = 0, cutting_sg = 2.6, mud_weight_ppg = 0,
+  viscosity_mode = "power_law", apparent_viscosity_cp = 0,
+  flow_index_n = 0, consistency_k = 0, hole_dia_in = 0, pipe_od_in = 0,
+  annular_velocity_ft_min = 0,
+} = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(cutting_diameter_in > 0 && cutting_diameter_in <= 2)) return { error: "Cutting diameter must be above 0 and at most 2 in." };
+  if (!(cutting_sg > 1 && cutting_sg <= 6)) return { error: "Cutting specific gravity must be above 1 and at most 6 (about 2.6 for most formations)." };
+  if (!(mud_weight_ppg > 0)) return { error: "Mud weight must be positive (ppg)." };
+  if (viscosity_mode !== "power_law" && viscosity_mode !== "apparent") return { error: "Viscosity must be from the power-law mud properties or an entered apparent viscosity." };
+  if (!(annular_velocity_ft_min >= 0)) return { error: "Annular velocity cannot be negative (ft/min)." };
+  const rho_s = cutting_sg * _CSV_WATER_PPG;
+  if (!(rho_s > mud_weight_ppg)) return { error: "The cutting is no denser than the mud, so it does not settle." };
+  let mu;
+  if (viscosity_mode === "apparent") {
+    if (!(apparent_viscosity_cp > 0)) return { error: "Apparent viscosity must be positive (cP)." };
+    mu = apparent_viscosity_cp;
+  } else {
+    if (!(flow_index_n > 0 && flow_index_n <= 1)) return { error: "Flow behavior index n must be above 0 and at most 1." };
+    if (!(consistency_k > 0)) return { error: "Consistency index K must be positive (equivalent cP)." };
+    if (!(hole_dia_in > 0) || !(pipe_od_in >= 0) || !(hole_dia_in > pipe_od_in)) return { error: "The hole must be larger than the pipe, and both must be valid diameters (in)." };
+    if (!(annular_velocity_ft_min > 0)) return { error: "Annular velocity must be positive (ft/min) to find the mud's apparent viscosity in the annulus." };
+    const va_fps = annular_velocity_ft_min / 60;
+    // The Newtonian viscosity giving the same annular friction as the power-law mud at this velocity.
+    mu = (consistency_k / 144) * Math.pow((hole_dia_in - pipe_od_in) / va_fps, 1 - flow_index_n) * Math.pow((2 + 1 / flow_index_n) * 48, flow_index_n);
+  }
+  const d = cutting_diameter_in, drho = rho_s - mud_weight_ppg, rf = mud_weight_ppg;
+  const reOf = (v) => _CSV_RE * rf * v * d / mu;
+  const vLam = _CSV_K_LAMINAR * d * d * drho / mu;
+  const vInt = _CSV_K_INTERMEDIATE * d * Math.pow(drho, 2 / 3) / (Math.cbrt(rf) * Math.cbrt(mu));
+  const vTur = _CSV_K_TURBULENT * Math.sqrt(d * drho / rf);
+  // Take the regime whose own Reynolds number falls in its range; the friction factors do not quite meet at
+  // Re 3 and 300, so in the narrow gaps the intermediate form is used.
+  let slip_velocity_fps, regime;
+  if (reOf(vLam) < 3) { slip_velocity_fps = vLam; regime = "laminar slip (particle Reynolds number under 3)"; }
+  else if (reOf(vTur) > 300) { slip_velocity_fps = vTur; regime = "turbulent slip (particle Reynolds number over 300)"; }
+  else { slip_velocity_fps = vInt; regime = "transitional slip (particle Reynolds number 3 to 300)"; }
+  const particle_reynolds = reOf(slip_velocity_fps);
+  const slip_velocity_ft_min = slip_velocity_fps * 60;
+  const has_annular = annular_velocity_ft_min > 0;
+  const net_velocity_ft_min = has_annular ? annular_velocity_ft_min - slip_velocity_ft_min : 0;
+  const transport_ratio = has_annular ? net_velocity_ft_min / annular_velocity_ft_min : 0;
+  if (![mu, slip_velocity_fps, particle_reynolds, transport_ratio].every(Number.isFinite)) return { error: "Slip-velocity math is not a finite value; check the inputs." };
+  const slip_verdict = fmt(slip_velocity_ft_min, 1) + " ft/min (" + fmt(slip_velocity_fps, 3) + " ft/s) in " + regime + ", at a particle Reynolds number of " + fmt(particle_reynolds, 1);
+  const viscosity_verdict = viscosity_mode === "apparent"
+    ? fmt(mu, 1) + " cP, as entered"
+    : fmt(mu, 1) + " cP apparent, from n = " + fmt(flow_index_n, 2) + " and K = " + fmt(consistency_k, 0) + " at " + fmt(annular_velocity_ft_min, 0) + " ft/min in a " + fmt(hole_dia_in, 2) + " by " + fmt(pipe_od_in, 2) + " in annulus";
+  const transport_verdict = !has_annular
+    ? "enter the annular velocity for the transport ratio"
+    : net_velocity_ft_min <= 0
+      ? "THE CUTTINGS DO NOT RISE: they slip " + fmt(slip_velocity_ft_min, 0) + " ft/min in mud moving up at " + fmt(annular_velocity_ft_min, 0) + " ft/min"
+      : "cuttings rise at " + fmt(net_velocity_ft_min, 0) + " ft/min, a transport ratio of " + fmt(transport_ratio, 2) + " (the share of the mud's velocity the cuttings keep; about 0.5 or more is a commonly quoted minimum for a vertical hole)";
+  return {
+    slip_velocity_ft_min, slip_velocity_fps, particle_reynolds, apparent_viscosity_used_cp: mu, transport_ratio, net_velocity_ft_min, has_annular,
+    slip_verdict, viscosity_verdict, transport_verdict,
+    note: "How fast a cutting falls back through the mud, by Moore's correlation: the mud's apparent viscosity in the annulus, a particle Reynolds number, and a friction factor for an irregular cutting (40/Re in laminar slip, 22/sqrt(Re) in transition, 1.5 in turbulent slip) in the balance of weight against drag. The cutting's net upward velocity is the annular velocity less this, and the transport ratio is the share of the mud's velocity it keeps. Two things follow that are easy to get backwards. A SHEAR-THINNING mud has a lower apparent viscosity at high annular velocity, so pumping faster thins the mud in the annulus and the slip velocity rises even as the annular velocity does; and in turbulent slip the viscosity drops out entirely, so only mud weight and cutting size matter. This is the slip velocity annular-velocity-cleaning takes as entered. It is a vertical-hole, single-particle estimate for a cutting of one equivalent diameter: it does not model cuttings beds in a deviated or horizontal hole (where this approach does not apply), pipe rotation or eccentricity, particle concentration, or shape beyond the correlation's own friction factors. The mud engineer and the operator's hole-cleaning practice govern.",
+  };
+}
+export const cuttingsSlipVelocityExample = { inputs: { cutting_diameter_in: 0.25, cutting_sg: 2.6, mud_weight_ppg: 9.5, viscosity_mode: "power_law", apparent_viscosity_cp: 0, flow_index_n: 0.7, consistency_k: 200, hole_dia_in: 8.75, pipe_od_in: 5, annular_velocity_ft_min: 200 } };
+OILGAS_RENDERERS["cuttings-slip-velocity"] = _simpleRenderer({
+  citation: "Citation: Moore's correlation for cuttings slip velocity (P. L. Moore, Drilling Practices Manual, 1974; as presented in Bourgoyne, Millheim, Chenevert and Young, Applied Drilling Engineering, SPE), by name: apparent viscosity = (K/144)((d2 - d1)/v)^(1-n)((2 + 1/n)/0.0208)^n; Re = 928 rho_f v d/mu; v = 82.87 d^2 (rho_s - rho_f)/mu under Re 3, 2.90 d (rho_s - rho_f)^0.667/(rho_f^0.333 mu^0.333) from 3 to 300, 1.54 sqrt(d (rho_s - rho_f)/rho_f) over 300. Vertical hole; the mud engineer governs.",
+  example: cuttingsSlipVelocityExample.inputs,
+  fields: [
+    { key: "cutting_diameter_in", label: "Cutting equivalent diameter (in)", kind: "number" },
+    { key: "cutting_sg", label: "Cutting specific gravity (2.6 typical)", kind: "number", default: 2.6 },
+    { key: "mud_weight_ppg", label: "Mud weight (ppg)", kind: "number" },
+    { key: "viscosity_mode", label: "Mud viscosity from", kind: "select", default: "power_law", options: [{ value: "power_law", label: "Power-law n and K at the annular velocity" }, { value: "apparent", label: "An entered apparent viscosity" }] },
+    { key: "apparent_viscosity_cp", label: "Apparent viscosity (cP, when entered)", kind: "number" },
+    { key: "flow_index_n", label: "Flow behavior index n (power law)", kind: "number" },
+    { key: "consistency_k", label: "Consistency index K (equivalent cP, power law)", kind: "number" },
+    { key: "hole_dia_in", label: "Hole or casing inside diameter (in)", kind: "number" },
+    { key: "pipe_od_in", label: "Pipe outside diameter (in)", kind: "number" },
+    { key: "annular_velocity_ft_min", label: "Annular velocity (ft/min)", kind: "number" },
+  ],
+  outputs: [
+    { key: "s", id: "csv-out-s", label: "Slip velocity", value: (r) => r.slip_verdict },
+    { key: "v", id: "csv-out-v", label: "Mud viscosity used", value: (r) => r.viscosity_verdict },
+    { key: "t", id: "csv-out-t", label: "Cuttings transport", value: (r) => r.transport_verdict },
+    { key: "n", id: "csv-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeCuttingsSlipVelocity,
 });

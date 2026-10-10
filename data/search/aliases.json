@@ -111585,7 +111585,7 @@
   },
   {
    "term": "cuttings slip velocity",
-   "target": "annular-velocity-cleaning",
+   "target": "cuttings-slip-velocity",
    "kind": "industry"
   },
   {
@@ -116971,6 +116971,26 @@
   {
    "term": "how much more flow does glycol need",
    "target": "glycol-fluid-factor",
+   "kind": "question"
+  },
+  {
+   "term": "cuttings transport ratio",
+   "target": "cuttings-slip-velocity",
+   "kind": "industry"
+  },
+  {
+   "term": "moore correlation slip velocity",
+   "target": "cuttings-slip-velocity",
+   "kind": "industry"
+  },
+  {
+   "term": "hole cleaning slip velocity",
+   "target": "cuttings-slip-velocity",
+   "kind": "industry"
+  },
+  {
+   "term": "how fast do cuttings fall in mud",
+   "target": "cuttings-slip-velocity",
    "kind": "question"
   }
  ]
