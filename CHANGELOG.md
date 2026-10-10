@@ -64,6 +64,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **`refractory-shell-temperature` can compute its outer film coefficient.** A select now offers computed: natural convection on a vertical wall (Churchill-Chu, on a wall height) plus gray-body radiation at a shell emissivity, iterated with the shell temperature it sets. The correlation reproduces Incropera Example 9.2 (Nu = 147). On the example three-layer lining the film is 2.29 BTU/hr/sq ft/degF (0.94 convection + 1.35 radiation) and the shell runs 238 F, against 258 F at the entered 2.0. Entered (the default) is unchanged.
+
 - **`pipe-insulation-for-condensation` can compute its outer film coefficient.** A select now offers computed: still-air convection and radiation at the jacket emissivity and diameter with the jacket at the dew point (the `bare-pipe-heat-loss` model), solved inside the thickness search. On the example (1 in pipe at 40 F, 75 F and 50% RH) a painted jacket gives h = 1.76 and 0.11 in, but a bright aluminum jacket (emissivity 0.1) gives h = 0.94 and needs 0.19 in, the reason low-emissivity jackets sweat first. Entered (the default) is unchanged.
 
 - **`pipe-heat-loss-radial` can compute its outer film coefficient.** The same computed option as `insulation-thickness`: h comes from the `bare-pipe-heat-loss` model at the jacket diameter, jacket emissivity and any wind, iterated with the jacket temperature it sets. On the example (2 in pipe, 1 in of k 0.25 insulation, 200 F in 70 F air) a painted jacket settles at h = 1.56 and 83.5 F, and the loss is 22.0 BTU/hr per foot against 24.6 with the jacket taken at ambient. Entered (the default) is unchanged.

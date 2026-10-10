@@ -170049,6 +170049,54 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "refractory-shell-temperature",
+  "source_publisher": "Project (first-principles)",
+  "source_title": "Example lining with the shell film computed (10 ft wall, emissivity 0.8)",
+  "source_edition_or_year": "Churchill-Chu vertical plate + gray-body radiation, iterated",
+  "source_section_or_page": "layers 4.5/8.5 + 2.5/1.9 + 2/0.55 = 5.4816; film converges at 2.287 (0.936 convection + 1.351 radiation) with the shell at 238.5 F; flux = 2010/(5.4816 + 1/2.287) = 339.6 BTU/hr/sq ft",
+  "verified_by": "rl",
+  "verified_on": "2026-10-09",
+  "inputs": {
+   "hot_face_f": 2100,
+   "ambient_f": 90,
+   "film_coeff_btu_hr_ft2_f": 2,
+   "layer1_thickness_in": 4.5,
+   "layer1_k": 8.5,
+   "layer1_limit_f": 3000,
+   "layer2_thickness_in": 2.5,
+   "layer2_k": 1.9,
+   "layer2_limit_f": 2000,
+   "layer3_thickness_in": 2,
+   "layer3_k": 0.55,
+   "layer3_limit_f": 1200,
+   "shell_limit_f": 140,
+   "acid_dew_point_f": 0,
+   "film_mode": "computed",
+   "shell_emissivity": 0.8,
+   "wall_height_ft": 10
+  },
+  "outputs": {
+   "shell_temp_f": {
+    "value": 238.5,
+    "tolerance": {
+     "abs": 0.5
+    }
+   },
+   "film_used_btu_hr_ft2_f": {
+    "value": 2.287,
+    "tolerance": {
+     "pct": 0.5
+    }
+   },
+   "flux_btu_hr_ft2": {
+    "value": 339.6,
+    "tolerance": {
+     "pct": 0.5
+    }
+   }
+  }
  }
  ]
 }

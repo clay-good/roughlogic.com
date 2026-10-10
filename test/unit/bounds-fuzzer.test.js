@@ -59165,3 +59165,21 @@ test("bounds: pool-evaporation-rate follows the ASHRAE and Carrier forms", () =>
     assert.ok("error" in _perE({ ...b, ...bad }));
   }
 });
+
+import { computeRefractoryShellTemperature as _rstF } from "../../calc-hvacsystems.js";
+test("bounds: refractory-shell-temperature computed film balances the lining flux at the shell", () => {
+  // Churchill-Chu vertical plate, Incropera Example 9.2: Ra 1.813e9, Pr 0.690 -> Nu 147.
+  const nuV = (Ra, Pr) => Math.pow(0.825 + 0.387 * Math.pow(Ra, 1 / 6) / Math.pow(1 + Math.pow(0.492 / Pr, 9 / 16), 8 / 27), 2);
+  assert.ok(Math.abs(nuV(1.813e9, 0.69) - 147) < 0.5);
+  const b = { hot_face_f: 2100, ambient_f: 90, layer1_thickness_in: 4.5, layer1_k: 8.5, layer2_thickness_in: 2.5, layer2_k: 1.9, layer3_thickness_in: 2, layer3_k: 0.55 };
+  const c = _rstF({ ...b, film_mode: "computed", shell_emissivity: 0.8, wall_height_ft: 10 });
+  // The film carries off exactly the flux the lining conducts, and entering it reproduces the shell.
+  assert.ok(Math.abs(c.film_used_btu_hr_ft2_f * (c.shell_temp_f - 90) - c.flux_btu_hr_ft2) < 1e-6);
+  assert.ok(Math.abs(c.film_convection + c.film_radiation - c.film_used_btu_hr_ft2_f) < 1e-12);
+  assert.ok(Math.abs(_rstF({ ...b, film_coeff_btu_hr_ft2_f: c.film_used_btu_hr_ft2_f }).shell_temp_f - c.shell_temp_f) < 1e-6);
+  // A bright casing radiates less and runs hotter.
+  assert.ok(_rstF({ ...b, film_mode: "computed", shell_emissivity: 0.3, wall_height_ft: 10 }).shell_temp_f > c.shell_temp_f);
+  assert.ok("error" in _rstF({ ...b, film_mode: "computed", shell_emissivity: 0 }));
+  assert.ok("error" in _rstF({ ...b, film_mode: "computed", wall_height_ft: 0 }));
+  assert.ok("error" in _rstF({ ...b, film_mode: "guess" }));
+});

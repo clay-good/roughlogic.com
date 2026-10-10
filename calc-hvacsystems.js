@@ -2531,18 +2531,41 @@ HVACSYSTEMS_RENDERERS["plenum-return-drop"] = _simpleRenderer({
 // and the outer film adds 1/h, so the flux is the total drop over the total
 // resistance and every interface temperature is the hot face less the flux
 // times the resistance ahead of it.
-// dims: in { hot_face_f: T, ambient_f: T, film_coeff_btu_hr_ft2_f: M T^-3, layer1_thickness_in: L, layer1_k: M L T^-3, layer1_limit_f: T, layer2_thickness_in: L, layer2_k: M L T^-3, layer2_limit_f: T, layer3_thickness_in: L, layer3_k: M L T^-3, layer3_limit_f: T, shell_limit_f: T, acid_dew_point_f: T } out: { total_resistance: dimensionless, flux_btu_hr_ft2: M T^-3, interface1_f: T, interface2_f: T, interface3_f: T, shell_temp_f: T }
+// Computed film added 2026-10-09: film_mode "computed" takes the outer coefficient from natural convection on a
+// vertical plate (Churchill and Chu 1975, Nu = {0.825 + 0.387 Ra^(1/6)/[1 + (0.492/Pr)^(9/16)]^(8/27)}^2 on the
+// wall height, air at the film temperature) plus gray-body radiation eps sigma (Ts^4 - Ta^4)/(Ts - Ta), iterated
+// with the shell temperature it sets. Reproduces Incropera Example 9.2 (Ra 1.813e9, Pr 0.690 -> Nu 147).
+const _refractoryShellFilm = (tsF, taF, heightFt, eps) => {
+  const TsK = (tsF - 32) * 5 / 9 + 273.15, TaK = (taF - 32) * 5 / 9 + 273.15, Tf = (TsK + TaK) / 2;
+  const mu = 1.716e-5 * Math.pow(Tf / 273.15, 1.5) * (273.15 + 110.4) / (Tf + 110.4);
+  const kAir = 0.0241 * Math.pow(Tf / 273.15, 1.5) * (273.15 + 194) / (Tf + 194);
+  const nu = mu / (101325 / (287.05 * Tf));
+  const Pr = 1006 * mu / kAir;
+  const Lm = heightFt * 0.3048;
+  const Ra = 9.80665 / Tf * Math.abs(TsK - TaK) * Lm ** 3 / (nu * nu / Pr);
+  const Nu = Math.pow(0.825 + 0.387 * Math.pow(Ra, 1 / 6) / Math.pow(1 + Math.pow(0.492 / Pr, 9 / 16), 8 / 27), 2);
+  const conv = Nu * kAir / Lm * 0.17611; // W/m2K -> BTU/hr ft2 F
+  const TsR = tsF + 459.67, TaR = taF + 459.67;
+  const rad = eps * 0.1714e-8 * (TsR ** 4 - TaR ** 4) / (TsR - TaR);
+  return { conv, rad, Ra, Pr, Nu };
+};
+// dims: in { hot_face_f: T, ambient_f: T, film_coeff_btu_hr_ft2_f: M T^-3, layer1_thickness_in: L, layer1_k: M L T^-3, layer1_limit_f: T, layer2_thickness_in: L, layer2_k: M L T^-3, layer2_limit_f: T, layer3_thickness_in: L, layer3_k: M L T^-3, layer3_limit_f: T, shell_limit_f: T, acid_dew_point_f: T, film_mode: dimensionless, shell_emissivity: dimensionless, wall_height_ft: L } out: { film_used_btu_hr_ft2_f: M T^-3, total_resistance: dimensionless, flux_btu_hr_ft2: M T^-3, interface1_f: T, interface2_f: T, interface3_f: T, shell_temp_f: T }
 export function computeRefractoryShellTemperature({
   hot_face_f = 0, ambient_f = 0, film_coeff_btu_hr_ft2_f = 2.0,
   layer1_thickness_in = 0, layer1_k = 0, layer1_limit_f = 0,
   layer2_thickness_in = 0, layer2_k = 0, layer2_limit_f = 0,
   layer3_thickness_in = 0, layer3_k = 0, layer3_limit_f = 0,
   shell_limit_f = 0, acid_dew_point_f = 0,
+  film_mode = "entered", shell_emissivity = 0.8, wall_height_ft = 10,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if ([layer1_thickness_in, layer2_thickness_in, layer3_thickness_in].some((x) => Number(x) < 0)) return { error: "Layer thicknesses cannot be negative." };
   if (!(hot_face_f > ambient_f)) return { error: "The hot face must be above ambient." };
-  if (!(film_coeff_btu_hr_ft2_f > 0)) return { error: "The outer film coefficient must be positive." };
+  if (film_mode !== "entered" && film_mode !== "computed") return { error: "The film coefficient must be entered or computed." };
+  const computedFilm = film_mode === "computed";
+  if (!computedFilm && !(film_coeff_btu_hr_ft2_f > 0)) return { error: "The outer film coefficient must be positive." };
+  if (computedFilm && !(shell_emissivity > 0 && shell_emissivity <= 1)) return { error: "Shell emissivity must be above 0 and at most 1 (0.8 oxidized or painted steel, 0.3 aluminum paint)." };
+  if (computedFilm && !(wall_height_ft > 0 && wall_height_ft <= 200)) return { error: "Wall height must be above 0 and at most 200 ft." };
   const layers = [
     { t: layer1_thickness_in, k: layer1_k, limit: layer1_limit_f, n: 1 },
     { t: layer2_thickness_in, k: layer2_k, limit: layer2_limit_f, n: 2 },
@@ -2554,9 +2577,26 @@ export function computeRefractoryShellTemperature({
     if (!(L.limit >= 0)) return { error: "Layer " + L.n + " service limit cannot be negative (0 to skip)." };
   }
   // k is BTU-in / (hr ft^2 F), so t/k is already hr ft^2 F / BTU.
-  const film_resistance = 1 / film_coeff_btu_hr_ft2_f;
-  let total_resistance = film_resistance;
-  for (const L of layers) total_resistance += L.t / L.k;
+  let layer_resistance = 0;
+  for (const L of layers) layer_resistance += L.t / L.k;
+  let film_used_btu_hr_ft2_f = film_coeff_btu_hr_ft2_f;
+  let film_convection = 0, film_radiation = 0;
+  if (computedFilm) {
+    // The coefficient depends on the shell temperature it sets: start a little above ambient and repeat (damped).
+    let ts = ambient_f + 0.1 * (hot_face_f - ambient_f);
+    for (let i = 0; i < 300; i++) {
+      const fl = _refractoryShellFilm(ts, ambient_f, wall_height_ft, shell_emissivity);
+      film_convection = fl.conv; film_radiation = fl.rad;
+      film_used_btu_hr_ft2_f = fl.conv + fl.rad;
+      const next = ambient_f + (hot_face_f - ambient_f) * (1 / film_used_btu_hr_ft2_f) / (layer_resistance + 1 / film_used_btu_hr_ft2_f);
+      const settled = Math.abs(next - ts) < 1e-9;
+      ts = 0.5 * ts + 0.5 * next;
+      if (settled) break;
+    }
+    if (!(film_used_btu_hr_ft2_f > 0)) return { error: "The computed film coefficient is not a finite value; check the temperatures." };
+  }
+  const film_resistance = 1 / film_used_btu_hr_ft2_f;
+  const total_resistance = film_resistance + layer_resistance;
   const flux_btu_hr_ft2 = (hot_face_f - ambient_f) / total_resistance;
   // Every interface is the hot face less the flux times the resistance AHEAD of it.
   // A layer's service limit applies at its HOT face -- the interface AHEAD of it,
@@ -2597,6 +2637,7 @@ export function computeRefractoryShellTemperature({
   const has_dew_point = acid_dew_point_f > 0;
   const shell_below_dew = has_dew_point && shell_temp_f < acid_dew_point_f;
   const shell_verdict = fmt(shell_temp_f, 0) + " degF at the shell"
+    + (computedFilm ? " (computed film " + fmt(film_used_btu_hr_ft2_f, 2) + " BTU/hr/sq ft/degF: " + fmt(film_convection, 2) + " convection + " + fmt(film_radiation, 2) + " radiation)" : "")
     + (has_shell_limit ? (shell_over ? " -- ABOVE the " + fmt(shell_limit_f, 0) + " degF limit entered" : " -- within the " + fmt(shell_limit_f, 0) + " degF limit entered") : "")
     + (has_dew_point
       ? (shell_below_dew
@@ -2606,12 +2647,13 @@ export function computeRefractoryShellTemperature({
   if (![total_resistance, flux_btu_hr_ft2, shell_temp_f, interface1_f].every(Number.isFinite)) return { error: "Refractory lining math is not a finite value." };
   return {
     total_resistance, film_resistance, flux_btu_hr_ft2, layer_count: layers.length,
+    film_used_btu_hr_ft2_f, film_computed: computedFilm, film_convection, film_radiation,
     interface1_f, interface2_f, interface3_f, shell_temp_f,
     layer1_hot_face_f, layer2_hot_face_f, layer3_hot_face_f,
     any_interface_over: over_layers.length > 0, over_layer_count: over_layers.length,
     has_shell_limit, shell_over, has_dew_point, shell_below_dew,
     flux_verdict, interface_verdict, backup_verdict, shell_verdict,
-    note: "A furnace or boiler lining is a series of resistances and the whole design lives at the interfaces, not at the shell. Per unit area each layer adds its thickness over its conductivity, the outer film adds one over its coefficient, the flux is the total temperature drop over the total resistance, and every interface temperature is the hot face less the flux times the resistance ahead of it. The trap worth carrying is that INSULATING THE OUTSIDE OF A FURNACE MAKES THE INSIDE HOTTER. Adding a layer of block insulation to cut heat loss raises every interface behind the hot face, because less heat is now escaping, and a lining 'improved' that way can put the insulating firebrick above its service temperature. The failure does not appear at commissioning; it appears months later as a shell hot spot where the backup has shrunk and opened a path. So every layer addition has to be checked at every interface, not just at the shell. The shell itself carries two limits that pull in opposite directions. One is the personnel and structural limit, which wants the shell cool. The other applies on flue gas service: the casing must stay ABOVE the acid dew point, roughly 250 to 300 degF depending on the fuel's sulphur, or sulphuric acid condenses on the inside and corrodes it -- so over-insulating a flue gas casing to save energy is a corrosion failure. Conductivities are ENTERED because they vary strongly with temperature and with the specific product, and a refractory k at 2,000 degF is not its k at room temperature; the manufacturer's k-versus-mean-temperature curve is the real source and using a single value across a 2,000 degF drop is the largest approximation here. This is a one-dimensional steady-state plane wall. It does not address transient heating and the dry-out schedule a new lining requires, thermal expansion and the joints that accommodate it, corners, arches, penetrations, anchors and the thermal bridge every anchor makes, gas-side convection and radiation to the hot face, slag or chemical attack, or spalling. The refractory and insulation manufacturers' data, the furnace or boiler designer, and the applicable code govern.",
+    note: "A furnace or boiler lining is a series of resistances and the whole design lives at the interfaces, not at the shell. Per unit area each layer adds its thickness over its conductivity, the outer film adds one over its coefficient, the flux is the total temperature drop over the total resistance, and every interface temperature is the hot face less the flux times the resistance ahead of it. The film coefficient is entered, or computed for a vertical wall in still air from natural convection plus radiation at the shell emissivity, which rises with shell temperature and falls sharply on a bright or aluminum-painted casing. The trap worth carrying is that INSULATING THE OUTSIDE OF A FURNACE MAKES THE INSIDE HOTTER. Adding a layer of block insulation to cut heat loss raises every interface behind the hot face, because less heat is now escaping, and a lining 'improved' that way can put the insulating firebrick above its service temperature. The failure does not appear at commissioning; it appears months later as a shell hot spot where the backup has shrunk and opened a path. So every layer addition has to be checked at every interface, not just at the shell. The shell itself carries two limits that pull in opposite directions. One is the personnel and structural limit, which wants the shell cool. The other applies on flue gas service: the casing must stay ABOVE the acid dew point, roughly 250 to 300 degF depending on the fuel's sulphur, or sulphuric acid condenses on the inside and corrodes it -- so over-insulating a flue gas casing to save energy is a corrosion failure. Conductivities are ENTERED because they vary strongly with temperature and with the specific product, and a refractory k at 2,000 degF is not its k at room temperature; the manufacturer's k-versus-mean-temperature curve is the real source and using a single value across a 2,000 degF drop is the largest approximation here. This is a one-dimensional steady-state plane wall. It does not address transient heating and the dry-out schedule a new lining requires, thermal expansion and the joints that accommodate it, corners, arches, penetrations, anchors and the thermal bridge every anchor makes, gas-side convection and radiation to the hot face, slag or chemical attack, or spalling. The refractory and insulation manufacturers' data, the furnace or boiler designer, and the applicable code govern.",
   };
 }
 export const refractoryShellTemperatureExample = { inputs: { hot_face_f: 2100, ambient_f: 90, film_coeff_btu_hr_ft2_f: 2.0, layer1_thickness_in: 4.5, layer1_k: 8.5, layer1_limit_f: 3000, layer2_thickness_in: 2.5, layer2_k: 1.9, layer2_limit_f: 2000, layer3_thickness_in: 2.0, layer3_k: 0.55, layer3_limit_f: 1200, shell_limit_f: 140, acid_dew_point_f: 0 } };
@@ -2622,7 +2664,10 @@ HVACSYSTEMS_RENDERERS["refractory-shell-temperature"] = _simpleRenderer({
   fields: [
     { key: "hot_face_f", label: "Hot face temperature (°F)" },
     { key: "ambient_f", label: "Ambient temperature (°F)", attrs: { step: "any" } },
-    { key: "film_coeff_btu_hr_ft2_f", label: "Outer film coefficient (BTU/hr/sq ft/°F)" },
+    { key: "film_mode", label: "Outer film coefficient", kind: "select", default: "entered", options: [{ value: "entered", label: "Entered below" }, { value: "computed", label: "Computed: still-air convection on a vertical wall + radiation" }] },
+    { key: "film_coeff_btu_hr_ft2_f", label: "Outer film coefficient (BTU/hr/sq ft/°F, when entered)" },
+    { key: "shell_emissivity", label: "Shell emissivity (computed film; 0.8 oxidized or painted steel)", default: 0.8, attrs: { step: "any", min: "0", max: "1" } },
+    { key: "wall_height_ft", label: "Wall height (ft, computed film)", default: 10 },
     { key: "layer1_thickness_in", label: "Layer 1 (hot face) thickness (in)" },
     { key: "layer1_k", label: "Layer 1 k (BTU-in/hr/sq ft/°F)" },
     { key: "layer1_limit_f", label: "Layer 1 service limit (°F, 0 to skip)" },
