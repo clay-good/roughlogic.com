@@ -22,6 +22,8 @@
 // missing entries so audit PRs ship one group at a time without breaking
 // the rest of the catalog.
 
+import { fillCitationText, renderCitationEntry, buildReferenceText } from "./citation-block.js";
+
 // Governance notice variants from spec-v6.md §2.5. Imported by audit PRs
 // so the wording is centralized; an inspector reading the page sees the
 // same phrasing regardless of which calc module owns the tile.
@@ -26585,177 +26587,18 @@ export const CITATIONS = {
   },
 };
 
-// --- Citation linkifier ---
+// --- Reference block and copy text ---
 //
-// The §3 reference rows ("Public free-access pointer", "Edition / source
-// date", governance, edition note) and the assumption sources name their
-// authoritative source by bare domain (nfpa.org/freeaccess, ecfr.gov,
-// nist.gov/pml, codes.iccsafe.org, ...) rather than as a clickable URL.
-// fillCitationText() renders those bare domains as real <a href> links so
-// a tradesperson can tap straight through to the source, while leaving the
-// surrounding prose as plain text. The TLD set is whitelisted to the
-// authorities that actually appear in CITATIONS so version tokens like
-// "802.3", "B31", or "29 CFR 1910.146" never match. textContent of the
-// host element is preserved (link text === the domain), so the existing
-// citation unit tests that assert on textContent still hold.
-const CITATION_LINK_RE =
-  /\b((?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+(?:gov|org|com|edu|net|mil|int))(\/[A-Za-z0-9._~:/?#@!$&'*+,;=%-]*[A-Za-z0-9_~/#-])?/gi;
-
-function appendPlainText(host, text) {
-  if (typeof document.createTextNode === "function") {
-    host.appendChild(document.createTextNode(text));
-  } else {
-    // DOM-stub path (unit tests): no createTextNode, so wrap in a span.
-    const s = document.createElement("span");
-    s.textContent = text;
-    host.appendChild(s);
-  }
-}
-
-export function fillCitationText(host, value) {
-  const str = typeof value === "string" ? value : "";
-  CITATION_LINK_RE.lastIndex = 0;
-  let last = 0;
-  let matched = false;
-  let m;
-  while ((m = CITATION_LINK_RE.exec(str)) !== null) {
-    matched = true;
-    if (m.index > last) appendPlainText(host, str.slice(last, m.index));
-    const token = m[0];
-    const a = document.createElement("a");
-    a.textContent = token;
-    a.setAttribute("href", "https://" + token);
-    a.setAttribute("rel", "noopener noreferrer");
-    a.className = "citation-link";
-    host.appendChild(a);
-    last = m.index + token.length;
-  }
-  if (!matched) { host.textContent = str; return; }
-  if (last < str.length) appendPlainText(host, str.slice(last));
-}
-
-// --- Reference-block renderer (spec-v6.md §3) ---
-//
-// Mounts the six-line block beneath the result region. Idempotent: if a
-// block already exists for `tool.id`, it's replaced. No-op if the tile
-// has no structured citation yet (the audit pass adds them group by
-// group).
+// The renderer lives in citation-block.js, which is what the browser loads
+// (with one data/citations/<bucket>.json shard) since 2026-10-10. These
+// wrappers look a tile id up in the registry above, for the build scripts and
+// tests that hold an id.
+export { fillCitationText };
 
 export function renderCitationBlock(parent, toolId) {
-  if (!parent) return null;
-  const c = CITATIONS[toolId];
-  if (!c) return null;
-  // Replace any existing block.
-  const prev = parent.querySelector(".v6-reference-block");
-  if (prev) parent.removeChild(prev);
-
-  const block = document.createElement("section");
-  block.className = "v6-reference-block";
-  block.setAttribute("aria-label", "Reference block");
-
-  const heading = document.createElement("h2");
-  heading.textContent = "Reference";
-  heading.className = "v6-reference-heading";
-  block.appendChild(heading);
-
-  const dl = document.createElement("dl");
-  dl.className = "v6-reference-list";
-
-  const rows = [
-    ["formula", "Formula or table", c.formula],
-    ["edition", "Source and edition", c.edition],
-    ["access", "Free access", c.freeAccess],
-    ["governance", "What governs", c.governance],
-    ["scope", "Scope and edition notes", c.editionNote],
-  ];
-  for (const [key, label, value] of rows) {
-    if (!value) continue;
-    const row = document.createElement("div");
-    row.className = "v6-reference-row v6-reference-row-" + key;
-    const dt = document.createElement("dt");
-    dt.className = "v6-reference-term";
-    dt.textContent = label;
-    const dd = document.createElement("dd");
-    dd.className = "v6-reference-value";
-    fillCitationText(dd, value);
-    row.appendChild(dt);
-    row.appendChild(dd);
-    dl.appendChild(row);
-  }
-  block.appendChild(dl);
-
-  // Numeric assumptions list (spec §3 line 6).
-  if (Array.isArray(c.assumptions) && c.assumptions.length > 0) {
-    const sub = document.createElement("h3");
-    sub.textContent = "Numeric assumptions";
-    sub.className = "v6-reference-subheading";
-    block.appendChild(sub);
-
-    const dl2 = document.createElement("dl");
-    dl2.className = "v6-assumption-list";
-    for (const a of c.assumptions) {
-      const row = document.createElement("div");
-      row.className = "v6-assumption-row";
-      const dt = document.createElement("dt");
-      dt.className = "v6-assumption-term";
-      dt.textContent = a.name;
-      const dd = document.createElement("dd");
-      dd.className = "v6-assumption-value";
-      fillCitationText(dd, a.value);
-      if (a.source) {
-        const source = document.createElement("small");
-        source.className = "v6-assumption-source";
-        appendPlainText(source, "Source: ");
-        const sourceValue = document.createElement("span");
-        fillCitationText(sourceValue, a.source);
-        source.appendChild(sourceValue);
-        dd.appendChild(source);
-      }
-      row.appendChild(dt);
-      row.appendChild(dd);
-      dl2.appendChild(row);
-    }
-    block.appendChild(dl2);
-  } else {
-    const note = document.createElement("p");
-    note.className = "v6-assumption-note";
-    note.textContent = "No additional numeric assumptions: every input on this tile is user-supplied.";
-    block.appendChild(note);
-  }
-
-  parent.appendChild(block);
-  return block;
+  return renderCitationEntry(parent, CITATIONS[toolId]);
 }
 
-// --- "Copy answer with full reference block" affordance (spec-v6.md §3 / §8) ---
-//
-// Builds the plain-text string a tradesperson pastes into a job log,
-// RFI, permit application, or text to the foreman. Concatenates the
-// tool name, the user-visible answer string (provided by the caller),
-// and the six §3 lines plus the assumption list. Returns the string;
-// the caller wires it to a "Copy answer with full reference block"
-// button using clipboard.copyText.
-
 export function buildAnswerWithReference(toolName, answerSummary, toolId) {
-  const c = CITATIONS[toolId];
-  const lines = [];
-  lines.push(toolName);
-  if (answerSummary) lines.push(answerSummary);
-  if (!c) {
-    lines.push("(structured reference block not yet authored for this tile)");
-    return lines.join("\n");
-  }
-  lines.push("");
-  if (c.formula)     lines.push("Formula: " + c.formula);
-  if (c.edition)     lines.push("Edition: " + c.edition);
-  if (c.freeAccess)  lines.push("Free access: " + c.freeAccess);
-  if (c.governance)  lines.push("Governance: " + c.governance);
-  if (c.editionNote) lines.push("Edition note: " + c.editionNote);
-  if (Array.isArray(c.assumptions) && c.assumptions.length > 0) {
-    lines.push("Assumptions:");
-    for (const a of c.assumptions) {
-      lines.push("  - " + a.name + ": " + a.value + (a.source ? "  (" + a.source + ")" : ""));
-    }
-  }
-  return lines.join("\n");
+  return buildReferenceText(toolName, answerSummary, CITATIONS[toolId]);
 }

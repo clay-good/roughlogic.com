@@ -159,6 +159,14 @@ description meta; search fetches every shard in parallel and restores every
 description before it ranks, so results are what they were with the single
 file. A deep link went from 714 KB gzipped to 204 KB plus one shard.
 
+The citations reach the browser the same way, also since 2026-10-10.
+`citations.js` is the per-tile citation registry and the source of truth for
+`build-shells`, the citation gates and the tests, and it is no longer shipped.
+`scripts/build-citation-shards.mjs` writes `data/citations/<NN>.json`, 64
+shards by a hash of the tile id (`citation-bucket.js`). A tile route imports
+`citation-block.js`, the reference-block renderer, and fetches its one shard.
+Showing one citation went from 1,150 KB gzipped to under 30 KB.
+
 ## v2 hash format
 
 The home-view URL hash supports a multi-key form joined by `&`:

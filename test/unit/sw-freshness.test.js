@@ -92,9 +92,17 @@ test("the shell pre-cache list is in sync with the v10 shipped helper modules", 
   const t = await readSw();
   // Each v10 shared helper must be pre-cached on install so the offline
   // case can dynamic-import it.
-  for (const f of ["limitation-banner.js", "search-discovery.js", "citations.js"]) {
+  for (const f of ["limitation-banner.js", "search-discovery.js", "citation-block.js", "citation-bucket.js"]) {
     assert.match(t, new RegExp("\\./" + f.replace(".", "\\.")));
   }
+  // The citation registry itself left the site on 2026-10-10: the browser
+  // loads the renderer above and one data/citations shard, so the 1.15 MB
+  // source file must not be precached, and every shard must be.
+  assert.doesNotMatch(t, /"\.\/citations\.js"/);
+  for (let i = 0; i < 64; i++) {
+    assert.ok(t.includes('"./data/citations/' + String(i).padStart(2, "0") + '.json"'), "shard " + i);
+  }
+  assert.ok(t.includes('"./data/citations/manifest.json"'));
 });
 
 test("the shell pre-cache list includes the data/search/ shards", async () => {

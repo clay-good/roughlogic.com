@@ -114,6 +114,12 @@
       "rationale": "Project-authored field descriptors generated from the renderers themselves (spec-v1339). Never stale in practice -- build-field-index.mjs --check regenerates and fails the lint on any drift the moment a schema changes, so the date stamp is a formality rather than the real gate."
     },
     {
+      "folder": "citations",
+      "cadence": "annual",
+      "max_age_days": 730,
+      "rationale": "The project's per-tile citation registry split from citations.js into runtime shards. Never stale in practice -- build-citation-shards.mjs --check regenerates and fails the lint on any drift the moment a citation changes, so the date stamp is a formality rather than the real gate."
+    },
+    {
       "folder": "desc",
       "cadence": "annual",
       "max_age_days": 730,

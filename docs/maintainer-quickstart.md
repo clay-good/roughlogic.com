@@ -71,7 +71,10 @@ Tests live in `test/unit/` and `test/integration/`.
    - Edge cases: zero, negative, max, missing input.
 5. Add the inline entry (formula / edition / freeAccess / governance) in
    [../citations.js](../citations.js) -- `check-citation-coverage` fails on a
-   `TOOLS` id with no `CITATIONS` row.
+   `TOOLS` id with no `CITATIONS` row. Then run
+   `node scripts/build-citation-shards.mjs`, which regenerates the
+   `data/citations/` shards the browser fetches (the registry itself is not
+   shipped).
 
    **Add a source-stamp row to [citation-discipline.md](citation-discipline.md)
    only for a bespoke, hand-written renderer.** `build-citation-strings --check`
@@ -92,6 +95,7 @@ Tests live in `test/unit/` and `test/integration/`.
    node scripts/build-tile-index.mjs
    node scripts/build-field-index.mjs
    node scripts/build-alias-shards.mjs
+   node scripts/build-citation-shards.mjs
    node scripts/extract-constant-notes.mjs
    node scripts/extract-bespoke-schemas.mjs --write
    node scripts/build-renderer-map.mjs

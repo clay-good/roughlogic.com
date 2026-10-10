@@ -640,6 +640,15 @@ A standard the tiles cite but no shard holds data from has no manifest to appear
 - Sharding: One shard per first character of the tile id (see `desc-bucket.js`, shared by the generator and `app.js`), so the browser derives the filename from the id it already has.
 - Privacy: A tile view fetches its one shard; the first search keystroke fetches all of them in parallel. Same-origin static files, precached by the service worker; nothing about a query is recorded or transmitted.
 
+### data/citations/*.json (per-tile citations)
+
+- Source: Generated runtime shards of the project's citation registry, split from `citations.js` by `scripts/build-citation-shards.mjs`. Each entry is one tile's formula, source and edition, free-access pointer, governance notice, scope note and numeric assumptions. `citations.js` stays the source of truth for the build and every citation gate; the browser loads `citation-block.js` (the renderer) and one shard.
+- License: MIT-licensed project text. The registry names its sources by title and section and reproduces no table from any of them.
+- Cadence: Regenerated whenever a citation changes; `node scripts/build-citation-shards.mjs --check` fails CI on any drift, and the generator fails outright if an entry does not survive JSON unchanged or a shard passes 64 KB gzip.
+- Shard layout: `{ version: 1, bucket, entries: { <tile-id>: { formula, edition, freeAccess, governance, editionNote, assumptions } } }`.
+- Sharding: 64 shards by a hash of the tile id (see `citation-bucket.js`, shared by the generator and `app.js`), so the browser derives the filename from the id it already has. Hashed rather than by first letter because ids starting with "s" alone carry 171 KB gzipped.
+- Privacy: A tile view fetches its one shard. Same-origin static files, precached by the service worker; nothing about a view is recorded or transmitted.
+
 ### data/cross/glossary.json (v5, utility 271)
 
 - Source: Original plain-English definitions written by the project author. MIT licensed.

@@ -1,0 +1,396 @@
+{
+  "name": "citations",
+  "version": "2026-10-10",
+  "fetched": "2026-10-10",
+  "edition": "The project's per-tile citation registry, split from citations.js: each tile's formula, source and edition, free-access pointer, governance notice, scope note and numeric assumptions. Derived data: citations.js is authoritative and these shards regenerate from it. The registry names its sources; it reproduces no table from any of them.",
+  "asOf": "2026-10-10",
+  "refresh_cadence": "annual",
+  "shards": [
+    {
+      "file": "00.json",
+      "name": "Tile citations, runtime shard 00 of 64 (generated)",
+      "gzip_size_bytes": 18032
+    },
+    {
+      "file": "01.json",
+      "name": "Tile citations, runtime shard 01 of 64 (generated)",
+      "gzip_size_bytes": 18554
+    },
+    {
+      "file": "02.json",
+      "name": "Tile citations, runtime shard 02 of 64 (generated)",
+      "gzip_size_bytes": 17731
+    },
+    {
+      "file": "03.json",
+      "name": "Tile citations, runtime shard 03 of 64 (generated)",
+      "gzip_size_bytes": 29574
+    },
+    {
+      "file": "04.json",
+      "name": "Tile citations, runtime shard 04 of 64 (generated)",
+      "gzip_size_bytes": 21347
+    },
+    {
+      "file": "05.json",
+      "name": "Tile citations, runtime shard 05 of 64 (generated)",
+      "gzip_size_bytes": 25219
+    },
+    {
+      "file": "06.json",
+      "name": "Tile citations, runtime shard 06 of 64 (generated)",
+      "gzip_size_bytes": 20343
+    },
+    {
+      "file": "07.json",
+      "name": "Tile citations, runtime shard 07 of 64 (generated)",
+      "gzip_size_bytes": 17228
+    },
+    {
+      "file": "08.json",
+      "name": "Tile citations, runtime shard 08 of 64 (generated)",
+      "gzip_size_bytes": 22830
+    },
+    {
+      "file": "09.json",
+      "name": "Tile citations, runtime shard 09 of 64 (generated)",
+      "gzip_size_bytes": 23020
+    },
+    {
+      "file": "10.json",
+      "name": "Tile citations, runtime shard 10 of 64 (generated)",
+      "gzip_size_bytes": 15367
+    },
+    {
+      "file": "11.json",
+      "name": "Tile citations, runtime shard 11 of 64 (generated)",
+      "gzip_size_bytes": 26332
+    },
+    {
+      "file": "12.json",
+      "name": "Tile citations, runtime shard 12 of 64 (generated)",
+      "gzip_size_bytes": 23559
+    },
+    {
+      "file": "13.json",
+      "name": "Tile citations, runtime shard 13 of 64 (generated)",
+      "gzip_size_bytes": 21348
+    },
+    {
+      "file": "14.json",
+      "name": "Tile citations, runtime shard 14 of 64 (generated)",
+      "gzip_size_bytes": 15504
+    },
+    {
+      "file": "15.json",
+      "name": "Tile citations, runtime shard 15 of 64 (generated)",
+      "gzip_size_bytes": 25558
+    },
+    {
+      "file": "16.json",
+      "name": "Tile citations, runtime shard 16 of 64 (generated)",
+      "gzip_size_bytes": 24212
+    },
+    {
+      "file": "17.json",
+      "name": "Tile citations, runtime shard 17 of 64 (generated)",
+      "gzip_size_bytes": 19454
+    },
+    {
+      "file": "18.json",
+      "name": "Tile citations, runtime shard 18 of 64 (generated)",
+      "gzip_size_bytes": 24979
+    },
+    {
+      "file": "19.json",
+      "name": "Tile citations, runtime shard 19 of 64 (generated)",
+      "gzip_size_bytes": 24904
+    },
+    {
+      "file": "20.json",
+      "name": "Tile citations, runtime shard 20 of 64 (generated)",
+      "gzip_size_bytes": 23348
+    },
+    {
+      "file": "21.json",
+      "name": "Tile citations, runtime shard 21 of 64 (generated)",
+      "gzip_size_bytes": 22703
+    },
+    {
+      "file": "22.json",
+      "name": "Tile citations, runtime shard 22 of 64 (generated)",
+      "gzip_size_bytes": 20555
+    },
+    {
+      "file": "23.json",
+      "name": "Tile citations, runtime shard 23 of 64 (generated)",
+      "gzip_size_bytes": 19981
+    },
+    {
+      "file": "24.json",
+      "name": "Tile citations, runtime shard 24 of 64 (generated)",
+      "gzip_size_bytes": 14267
+    },
+    {
+      "file": "25.json",
+      "name": "Tile citations, runtime shard 25 of 64 (generated)",
+      "gzip_size_bytes": 21642
+    },
+    {
+      "file": "26.json",
+      "name": "Tile citations, runtime shard 26 of 64 (generated)",
+      "gzip_size_bytes": 20918
+    },
+    {
+      "file": "27.json",
+      "name": "Tile citations, runtime shard 27 of 64 (generated)",
+      "gzip_size_bytes": 17569
+    },
+    {
+      "file": "28.json",
+      "name": "Tile citations, runtime shard 28 of 64 (generated)",
+      "gzip_size_bytes": 24897
+    },
+    {
+      "file": "29.json",
+      "name": "Tile citations, runtime shard 29 of 64 (generated)",
+      "gzip_size_bytes": 25699
+    },
+    {
+      "file": "30.json",
+      "name": "Tile citations, runtime shard 30 of 64 (generated)",
+      "gzip_size_bytes": 16435
+    },
+    {
+      "file": "31.json",
+      "name": "Tile citations, runtime shard 31 of 64 (generated)",
+      "gzip_size_bytes": 24728
+    },
+    {
+      "file": "32.json",
+      "name": "Tile citations, runtime shard 32 of 64 (generated)",
+      "gzip_size_bytes": 21690
+    },
+    {
+      "file": "33.json",
+      "name": "Tile citations, runtime shard 33 of 64 (generated)",
+      "gzip_size_bytes": 24441
+    },
+    {
+      "file": "34.json",
+      "name": "Tile citations, runtime shard 34 of 64 (generated)",
+      "gzip_size_bytes": 21091
+    },
+    {
+      "file": "35.json",
+      "name": "Tile citations, runtime shard 35 of 64 (generated)",
+      "gzip_size_bytes": 20398
+    },
+    {
+      "file": "36.json",
+      "name": "Tile citations, runtime shard 36 of 64 (generated)",
+      "gzip_size_bytes": 19040
+    },
+    {
+      "file": "37.json",
+      "name": "Tile citations, runtime shard 37 of 64 (generated)",
+      "gzip_size_bytes": 17955
+    },
+    {
+      "file": "38.json",
+      "name": "Tile citations, runtime shard 38 of 64 (generated)",
+      "gzip_size_bytes": 22354
+    },
+    {
+      "file": "39.json",
+      "name": "Tile citations, runtime shard 39 of 64 (generated)",
+      "gzip_size_bytes": 27487
+    },
+    {
+      "file": "40.json",
+      "name": "Tile citations, runtime shard 40 of 64 (generated)",
+      "gzip_size_bytes": 19776
+    },
+    {
+      "file": "41.json",
+      "name": "Tile citations, runtime shard 41 of 64 (generated)",
+      "gzip_size_bytes": 13085
+    },
+    {
+      "file": "42.json",
+      "name": "Tile citations, runtime shard 42 of 64 (generated)",
+      "gzip_size_bytes": 25696
+    },
+    {
+      "file": "43.json",
+      "name": "Tile citations, runtime shard 43 of 64 (generated)",
+      "gzip_size_bytes": 20403
+    },
+    {
+      "file": "44.json",
+      "name": "Tile citations, runtime shard 44 of 64 (generated)",
+      "gzip_size_bytes": 22473
+    },
+    {
+      "file": "45.json",
+      "name": "Tile citations, runtime shard 45 of 64 (generated)",
+      "gzip_size_bytes": 22025
+    },
+    {
+      "file": "46.json",
+      "name": "Tile citations, runtime shard 46 of 64 (generated)",
+      "gzip_size_bytes": 21094
+    },
+    {
+      "file": "47.json",
+      "name": "Tile citations, runtime shard 47 of 64 (generated)",
+      "gzip_size_bytes": 21908
+    },
+    {
+      "file": "48.json",
+      "name": "Tile citations, runtime shard 48 of 64 (generated)",
+      "gzip_size_bytes": 26391
+    },
+    {
+      "file": "49.json",
+      "name": "Tile citations, runtime shard 49 of 64 (generated)",
+      "gzip_size_bytes": 15422
+    },
+    {
+      "file": "50.json",
+      "name": "Tile citations, runtime shard 50 of 64 (generated)",
+      "gzip_size_bytes": 24389
+    },
+    {
+      "file": "51.json",
+      "name": "Tile citations, runtime shard 51 of 64 (generated)",
+      "gzip_size_bytes": 18743
+    },
+    {
+      "file": "52.json",
+      "name": "Tile citations, runtime shard 52 of 64 (generated)",
+      "gzip_size_bytes": 17674
+    },
+    {
+      "file": "53.json",
+      "name": "Tile citations, runtime shard 53 of 64 (generated)",
+      "gzip_size_bytes": 20211
+    },
+    {
+      "file": "54.json",
+      "name": "Tile citations, runtime shard 54 of 64 (generated)",
+      "gzip_size_bytes": 19664
+    },
+    {
+      "file": "55.json",
+      "name": "Tile citations, runtime shard 55 of 64 (generated)",
+      "gzip_size_bytes": 14670
+    },
+    {
+      "file": "56.json",
+      "name": "Tile citations, runtime shard 56 of 64 (generated)",
+      "gzip_size_bytes": 25573
+    },
+    {
+      "file": "57.json",
+      "name": "Tile citations, runtime shard 57 of 64 (generated)",
+      "gzip_size_bytes": 16724
+    },
+    {
+      "file": "58.json",
+      "name": "Tile citations, runtime shard 58 of 64 (generated)",
+      "gzip_size_bytes": 18896
+    },
+    {
+      "file": "59.json",
+      "name": "Tile citations, runtime shard 59 of 64 (generated)",
+      "gzip_size_bytes": 19005
+    },
+    {
+      "file": "60.json",
+      "name": "Tile citations, runtime shard 60 of 64 (generated)",
+      "gzip_size_bytes": 19573
+    },
+    {
+      "file": "61.json",
+      "name": "Tile citations, runtime shard 61 of 64 (generated)",
+      "gzip_size_bytes": 19213
+    },
+    {
+      "file": "62.json",
+      "name": "Tile citations, runtime shard 62 of 64 (generated)",
+      "gzip_size_bytes": 17157
+    },
+    {
+      "file": "63.json",
+      "name": "Tile citations, runtime shard 63 of 64 (generated)",
+      "gzip_size_bytes": 23990
+    }
+  ],
+  "hashes": {
+    "00.json": "fb780ddd945b92dddaea1370ada7d244cd8597b3048108a9c41392c4c849fb29",
+    "01.json": "1e17d3f25f588432e4d9043694d2b08894060291703469932baec47601cc77a7",
+    "02.json": "5401c5329aac7e5df099131ffa322d5c226142bfa5c8365684a9015aaf0a5276",
+    "03.json": "af68bd46623db3cb7e208a257e19d9ce2fd61d6a489a58c58f63246d14645614",
+    "04.json": "97c518346b8f517f3fc61e4f3d06f4987c0c926d50db43bf212a6201558a963f",
+    "05.json": "3863427fbb42b9a05a6174c1c616bd915ec62584dd9f0943d6d1afe025f67619",
+    "06.json": "290688ca1ac3c945a65c8a15fda55db657ebfa0696cfa72c3e29c75371540d57",
+    "07.json": "439a1e3d10fd877b4b5fd2ccbee086fbbdb2cfbcfea85ec4ef1cb67cb8432442",
+    "08.json": "1c926de0f209694808433927d70e8e546a9505f3c4f458e7fc5f65dc5f636240",
+    "09.json": "5503c72050f5f634a8accf1d86f63a2a82e22947ca25f0a3561b99b31fa5f592",
+    "10.json": "6b52af9e7b7606aee5f0fb22393d60de3fe5b819511f8d1ceef34f4e468ac61d",
+    "11.json": "b213d591290500d71b88e5ea60ce0386ff3169e601b1ea05b08f5c7f775b9b0f",
+    "12.json": "f018a67d727b8aa8a2e886aac37406aaa2d49cbebd0fa884db6db3452b3cdf4b",
+    "13.json": "71b84fc7973bd6d47b065563537d5b304fc2102e6334191851d9102b2636a31e",
+    "14.json": "5551e8b80673a15792e90873e90adb35f1feb1578706fa95db311923679422c5",
+    "15.json": "9812635612ed8e7b3ed4f057c8b0122ff7b53d9fe25375159eadac5ba1a1e2e3",
+    "16.json": "bcd729e15835b42096181c9238b9f034a98f568fd4e46970de2bbb64b5539589",
+    "17.json": "22a5dbe4b36c0472e6d5d4ccd0cfcf3ab24c58161fee78246f535e619f79ebf5",
+    "18.json": "8cc40e2f66577400c17c1e3029bc7781062b9601e37d2a5d76dc59b7e9ecc0c2",
+    "19.json": "c6e5988a2df662bd60570395358fb382834bfbe24fd137e061d1293fa08d1626",
+    "20.json": "0da414aef257a834412cbc2b90cb3c62cefe1f5c7af87485f3fc1824e5adebcb",
+    "21.json": "5eed51c0f7e92709e9cc63536e3e10fb969327a3954a2edff3e12d0d70595f94",
+    "22.json": "4035fb6208644fc3f79a35014ecb7f56f7678ff20f58f5f64c80f7f2dac0110f",
+    "23.json": "d0c55d7470a6159c3bda988adf07428e6c296a59b90c71e0e3d0a1d6e93b6cfc",
+    "24.json": "4cbc82cf5dcc82ef93285004f6cfd1127de74181c29ece36d7a7666d4e405dbf",
+    "25.json": "ccaaf887504b7bec36df1371b6071708bc66bc848cdf712d05b1498fc3c68ff2",
+    "26.json": "921819b7d3b24e23ceea83a5bcfa99979b22a2c3f012576516a761bff75571f6",
+    "27.json": "68ee6af6d65e7ed5812c41f043c1a9a7b5d8443e5891ba56e3a58ed742a5df3c",
+    "28.json": "01986e09909b0000273fd9f664fbdbd9055429fc2c58bff36499a26c3a576825",
+    "29.json": "189bba593a1caea2c8fbf35ef8f9f618a5f1bc41b799be087daea9d62dfd99a6",
+    "30.json": "b4f4c7450b258cfe5807e2197882d2e4033a9f141c496a47f296e52fba90aaf6",
+    "31.json": "19f5e51408c7013e38c56a3067249154a29dd52c9b1b74c5745111a7033fff96",
+    "32.json": "7752026f5b275d657f205da1bcecbc467a256a5ae993212a5e7e0bc3054e9b55",
+    "33.json": "d1b2aea10395588313f3b82ee1d0552c36a70572e81e49ee70edf3a2ba4fcdc0",
+    "34.json": "de39d984e0c3572c7aa019f4a31a5482ce26c95fe7d8455756a1d2817e8002db",
+    "35.json": "90644f048e622812361315613f81efa5aec0b2aadaff20b12b758e7e65f34943",
+    "36.json": "acfbaef5dab748d960f6c5edfbf7310d724f35079b8e7c408ba390945b7b8d95",
+    "37.json": "35ccbb8ee3b8f732124d97a29507521e7462fcee6d3eb8a566edd37384d6282a",
+    "38.json": "8c45c74b2fa5d781a401fc6804a5f34dcb93d23269898f6cc34085c29ccdab28",
+    "39.json": "97739fcc15d84c626fbf05e980ceb40ce4c7dd76ac7b9a9980db0ec7a8975d76",
+    "40.json": "baaf15ebccaf676f75a61443c9d89e2837ed67bc627b8aefe8fb9970109c8ae0",
+    "41.json": "5e0eb817284c2bf1eb0d1ae92b193c5e2d8aed9cf9328d784f29c5634a1a442f",
+    "42.json": "3be6f2e73260e9771d10636692918fc76381664b319a0fd4f540aeb55fbeef69",
+    "43.json": "7929946564493f486274ec12989890a7833cc367acdea53d3818fcc0848a6fec",
+    "44.json": "63cfe7793ec981393d28a530fc6097584b997e8e984df875ec6b3cc37d068a56",
+    "45.json": "d10b76df8b9cbdd095e7c9ca6e6e70f02c16932ffca00be52da832936343d220",
+    "46.json": "db95fad5e28789df25d4557ac5b783a6f0029e39ffad3dc476098dbe2ef9fd71",
+    "47.json": "eb5e1613da4cbf67995d9ca736bb1db9de9de9c688237fcd0e44d6dc2165eb64",
+    "48.json": "6ea730af583ebe24fcef12dcb9adec6b03cd233fd94747d049c88282dfca882b",
+    "49.json": "155cbc0bf2cf10cfbcfee0f516025f023abeede2133aa09f5a1f6c95e978d609",
+    "50.json": "826d7dab27ffc5819d0829fb9f04fcbeab065e363f075a1cd6d35c29941258e6",
+    "51.json": "df6bc14294da23f40de003f3c675e96360f4ac9b9c0056976bde170d94e43745",
+    "52.json": "59e14bf6bf45d8a16265d81e007c6ea8f365e3cec3a050b95da9fa15194325d0",
+    "53.json": "25959cc90a51bf04ffb13ed555add65eef40d784596c50aaf930b2cdc10b1331",
+    "54.json": "c5dc5af8fa6b99e5c734e250784d453f1b89ddf45439b3f5c61999e04b85b704",
+    "55.json": "b032b0e920601124119b743f7757d2b303f75420f68b241c0d65161e2b66f520",
+    "56.json": "c2c47ba0555d3c28ac56311149fd85f07a48b92b624a529279f9f7a7e3540f39",
+    "57.json": "e3d362dc26067224fc89ea4dd6a086129c092c2da286b5229efeefaa18abfb90",
+    "58.json": "58f9dee2a9edbc017a28dfe9ef2dadda63fe70457660a119002ee09eba4789f4",
+    "59.json": "bf6cadee8e638fefaf6eae1a47ef02d8a1c4f97a2be2073be72531314cde71f6",
+    "60.json": "c156154e23358b537d53d70739fd5451aef684d305d05c53531c5fa9e265313c",
+    "61.json": "947fff31f95a49ef53e369fab025611c76fa674d550cfef9117f237aa299e997",
+    "62.json": "082140b09a6c8038cd59bc04e11b153ef20724eaccd5d920ec1538bdd44029b8",
+    "63.json": "94ca2cfe8bd92907c59358d6a9bd7e34c0e3a9cae31cd2b7d3276d7fb06d88cf"
+  }
+}

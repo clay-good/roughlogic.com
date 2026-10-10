@@ -10,6 +10,7 @@ import { verifyManifestIntegrity, verifyShard } from "./integrity.js";
 import { parseHashRoute } from "./routing.js";
 import { leadSentence, restOfDescription } from "./text-lead.js";
 import { descBucket } from "./desc-bucket.js";
+import { citationBucket } from "./citation-bucket.js";
 
 // Recents (utility 120) was removed in v11; see specs/spec-v11.md.
 
@@ -240,6 +241,28 @@ function ensureFullDescriptions() {
     for (const t of TOOLS) if (t.more) buckets.add(descBucket(t.id));
     return Promise.all([...buckets].map(ensureDescShard));
   });
+}
+// One tile's structured citation, from data/citations/<bucket>.json. The whole
+// registry (citations.js, 1.15 MB gzipped at 2,263 tiles) used to be imported
+// to show one entry; since 2026-10-10 it is sharded by a hash of the tile id
+// and stays out of the browser. Resolves to the entry, or null when the tile
+// has none or the fetch fails -- a failed fetch is forgotten so the next view
+// retries, and the renderer's own one-line citation stays on the page.
+const _citationShards = new Map();
+function ensureCitation(id) {
+  const bucket = citationBucket(id);
+  if (!_citationShards.has(bucket)) {
+    const file = bucket + ".json";
+    _citationShards.set(bucket, fetch("data/citations/" + file, { credentials: "omit" })
+      .then(async (r) => {
+        if (!r.ok) { _citationShards.delete(bucket); return null; }
+        const text = await r.text();
+        await verifyShard("citations", file, text);
+        return (JSON.parse(text) || {}).entries || null;
+      })
+      .catch(() => { _citationShards.delete(bucket); return null; }));
+  }
+  return _citationShards.get(bucket).then((entries) => (entries && entries[id]) || null);
 }
 const EMPTY_IDS = [];
 
@@ -714,13 +737,14 @@ function renderToolView(id, params) {
   proof.appendChild(sources);
   view.appendChild(proof);
 
-  // v6 §3 / §7: lazy-load the structured citation map. When the tile id has
-  // a structured CITATIONS entry, mount the six-line reference block under
+  // v6 §3 / §7: lazy-load the tile's structured citation (its one shard) and
+  // the block renderer. When the tile id has a CITATIONS entry, mount the
+  // six-line reference block under
   // the sources region and add a "Copy answer with full reference block"
   // button that emits the §3 plain-text format. Tiles not yet audited
   // continue to render the legacy inline citation only.
-  import("./citations.js").then((cit) => {
-    const block = cit.renderCitationBlock(sources, id);
+  Promise.all([import("./citation-block.js"), ensureCitation(id)]).then(([cit, entry]) => {
+    const block = cit.renderCitationEntry(sources, entry);
     if (block) {
       // The structured block states the formula, the edition, the free-access
       // pointer and what governs, in six labelled rows. The renderer's own
@@ -752,7 +776,7 @@ function renderToolView(id, params) {
           // "Copy" button label ("Needed final score: 88CopyMax / min ...").
           const answerSummary = cb.collectOutputs(outputRegion)
             .map((r) => r.label + ": " + r.value).join("\n");
-          const text = cit.buildAnswerWithReference(tool.name, answerSummary, id);
+          const text = cit.buildReferenceText(tool.name, answerSummary, entry);
           cb.copyText(text, copyBtn);
         } catch {
           // Fallback: leave the text on the page in a focusable element.
