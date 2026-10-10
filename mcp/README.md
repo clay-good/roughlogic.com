@@ -26,6 +26,25 @@ Typical flow: `search_calculators({query:"voltage drop", trade:"electrical"})`
 inputs:{phase:"single", material:"copper", awg:"10", length_ft:150,
 current_A:20, source_voltage_V:240}})`.
 
+### What `run_calculator` tells you besides the answer
+
+`warnings` is a list of `{ key, rule, message }`. A warning never blocks the
+calculation; `result.error` does.
+
+| `rule` | Meaning |
+|---|---|
+| `min` / `max` | the value is outside the range the page's field allows |
+| `step` | a fraction in a whole-number field (2.5 in a count) |
+| `unknown` | the key is not an input of this calculator; it was ignored and the default used |
+| `missing` | an input was left out and has no default, so the calculator read it as blank |
+| `unbounded` | a result value is infinite: unlimited by design, or a division by zero. JSON prints it as null; read the result's flags and verdict text |
+
+`result.error` is returned, with no numbers, when the calculator rejects the
+inputs, when it cannot run on them at all, or when it would otherwise hand back
+NaN. A select value that is not one of its options fails the tool call itself,
+with the allowed values named. Checkbox inputs accept
+true/false, yes/no, on/off and 1/0. Numbers may be sent as strings.
+
 ### Resources and prompts
 
 The server also implements the MCP `resources/*` and `prompts/*` surfaces, so a
