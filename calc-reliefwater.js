@@ -280,7 +280,7 @@ RELIEFWATER_RENDERERS["contact-time-baffling"] = _simpleRenderer({
     { key: "min_depth_ft", label: "Minimum operating depth (ft)" },
     { key: "peak_flow_gpm", label: "Peak hourly flow (gpm)" },
     { key: "baffling_condition", label: "Baffling condition (EPA Table 4-2)", kind: "select", options: [{ value: "unbaffled", label: "Unbaffled, mixed flow (0.1)" }, { value: "poor", label: "Poor: single inlet/outlet, no baffles (0.3)" }, { value: "average", label: "Average: some intra-basin baffles (0.5)" }, { value: "superior", label: "Superior: serpentine baffling (0.7)" }, { value: "perfect", label: "Perfect: plug flow, pipeline (1.0)" }, { value: "custom", label: "Entered factor (tracer study or state)" }], default: "unbaffled" },
-    { key: "custom_baffling_factor", label: "Entered baffling factor (0.1-1.0)", attrs: { step: "any", min: "0.1", max: "1" } },
+    { key: "custom_baffling_factor", label: "Entered baffling factor (0.1-1.0)", attrs: { step: "any", min: "0", max: "1" } },
     { key: "residual_mg_l", label: "Outlet free-chlorine residual (mg/L, optional)" },
   ],
   outputs: [

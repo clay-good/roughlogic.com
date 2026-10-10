@@ -780,7 +780,7 @@ LINEWORKER_RENDERERS["nesc-district-loading"] = _simpleRenderer({
     { key: "custom_ice_in", label: "Custom radial ice (in, district 0 only)", kind: "number", default: 0 },
     { key: "custom_wind_psf", label: "Custom wind pressure (psf, district 0 only)", kind: "number", default: 0 },
     { key: "custom_k_lb_per_ft", label: "Custom constant k (lb/ft, district 0 only)", kind: "number", default: 0 },
-    { key: "custom_temp_f", label: "Custom design temperature (F, district 0 only)", kind: "number", default: 0 },
+    { key: "custom_temp_f", label: "Custom design temperature (F, district 0 only)", kind: "number", default: 0, attrs: { step: "any" } },
   ],
   outputs: [
     { key: "d", id: "ndl-out-d", label: "District applied", value: (r) => r.district_name + ": " + fmt(r.ice_in, 2) + " in of radial ice, " + fmt(r.wind_psf, 1) + " psf, k = " + fmt(r.k_lb_per_ft, 2) + " lb/ft, at " + fmt(r.design_temp_f, 0) + " F" },

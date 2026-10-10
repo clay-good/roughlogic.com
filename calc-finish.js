@@ -658,8 +658,8 @@ FINISH_RENDERERS["rough-opening-size"] = _simpleRenderer({
     { key: "opening_type", label: "Opening type", kind: "select", options: [{ value: "prehung-door", label: "Prehung door (enter SLAB size)", selected: true }, { value: "window", label: "Window (enter FRAME outside dims)" }] },
     { key: "unit_width_in", label: "Unit width (in)", kind: "number" },
     { key: "unit_height_in", label: "Unit height (in)", kind: "number" },
-    { key: "width_adder_in", label: "Width adder override (in, -1 = convention)", kind: "number", default: -1 },
-    { key: "height_adder_in", label: "Height adder override (in, -1 = convention)", kind: "number", default: -1 },
+    { key: "width_adder_in", label: "Width adder override (in, -1 = convention)", kind: "number", default: -1, attrs: { step: "any" } },
+    { key: "height_adder_in", label: "Height adder override (in, -1 = convention)", kind: "number", default: -1, attrs: { step: "any" } },
   ],
   outputs: [
     { key: "row", id: "ros-out-w", label: "Rough opening width", value: (r) => fmt(r.ro_width_in, 2) + " in (+" + fmt(r.wa_used, 2) + ")" },

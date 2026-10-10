@@ -120,3 +120,31 @@ test("ceiling: an efficiency, lambda, Cd, or fraction past 1 (or 100%) errors or
   const stale = CEILING_EXEMPT.filter((k) => !silent.includes(k));
   assert.deepEqual(stale, [], "Exempt but now rejects the value; remove from CEILING_EXEMPT:\n  " + stale.join("\n  "));
 });
+
+// The page marks a value below a field's `min` as invalid and strikes the
+// result. A worked example or a field default that sits below its own field's
+// minimum therefore loads as an invalid tile: ice-melt-working-temperature's
+// eutectic default of -6 F sat in a field the shared factory drew as min="0"
+// until 2026-10-09. Every example value and default must satisfy the minimum
+// its field declares.
+test("no worked-example value or default sits below its field's own minimum", async () => {
+  const { rows } = JSON.parse(await readFile(FIXTURE, "utf8"));
+  const bad = [];
+  // Only a tile's FIRST row is what its Example button loads, and a default
+  // of 0 is a blank field rather than a prefilled value.
+  const first = new Map();
+  for (const r of rows) if (!first.has(r.tile_id)) first.set(r.tile_id, r);
+  for (const [id, row] of first) {
+    if (!COMPUTE_MAP[id]) continue;
+    const d = await describe({ id });
+    if (!d || !d.inputs) continue;
+    for (const f of d.inputs) {
+      const min = declared(f, "min");
+      if (f.kind !== "number" || min == null) continue;
+      const ex = row.inputs[f.key];
+      if (typeof ex === "number" && ex < min) bad.push(`${id}::${f.key} example ${ex} is below min ${min}`);
+      if (typeof f.default === "number" && f.default !== 0 && f.default < min) bad.push(`${id}::${f.key} default ${f.default} is below min ${min}`);
+    }
+  }
+  assert.deepEqual(bad, [], "These values load as invalid on their own page; drop the field's min or fix the value:\n  " + bad.join("\n  "));
+});

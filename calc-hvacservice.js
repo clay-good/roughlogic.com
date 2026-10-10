@@ -742,7 +742,7 @@ HVACSERVICE_RENDERERS["outside-air-percent-temps"] = _simpleRenderer({
   example: outsideAirPercentTempsExample.inputs,
   fields: [
     { key: "t_ra_f", label: "Return-air temperature T_ra (°F)", kind: "number" },
-    { key: "t_ma_f", label: "Mixed-air temperature T_ma (°F)", kind: "number" },
+    { key: "t_ma_f", label: "Mixed-air temperature T_ma (°F)", kind: "number", attrs: { step: "any" } },
     { key: "t_oa_f", label: "Outdoor-air temperature T_oa (°F)", kind: "number", attrs: { step: "any" } },
   ],
   outputs: [

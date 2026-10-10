@@ -1798,7 +1798,7 @@ CONCRETE_RENDERERS["rc-slender-column-magnify"] = _simpleRenderer({
   fields: [
     { key: "factored_axial_kip", label: "Factored axial load Pu (kip)", kind: "number" },
     { key: "end_moment_m2_kft", label: "Larger end moment M2 (kip-ft)", kind: "number" },
-    { key: "end_moment_m1_kft", label: "Smaller end moment M1 (kip-ft; negative for single curvature, ACI 318-19)", kind: "number" },
+    { key: "end_moment_m1_kft", label: "Smaller end moment M1 (kip-ft; negative for single curvature, ACI 318-19)", kind: "number", attrs: { step: "any" } },
     { key: "unbraced_len_ft", label: "Unbraced length lu (ft)", kind: "number" },
     { key: "eff_length_k", label: "Effective-length factor k", kind: "number" },
     { key: "eff_stiffness_ei", label: "Effective stiffness EI (kip-in²)", kind: "number" },

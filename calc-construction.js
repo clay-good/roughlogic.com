@@ -7138,7 +7138,7 @@ const _renderWindCcPressure = _simpleRenderer({
   fields: [
     { key: "v_mph", label: "Basic wind speed V (mph)", kind: "number" },
     { key: "kz", label: "Exposure coefficient Kz (mean roof ht)", kind: "number" },
-    { key: "gcp", label: "External coefficient GCp (signed, zone)", kind: "number" },
+    { key: "gcp", label: "External coefficient GCp (signed, zone)", kind: "number", attrs: { step: "any" } },
     { key: "kzt", label: "Topographic factor Kzt", kind: "number" },
     { key: "kd", label: "Directionality factor Kd", kind: "number" },
     { key: "ke", label: "Ground-elevation factor Ke", kind: "number" },
@@ -7235,7 +7235,7 @@ const _renderWindMwfrsPressure = _simpleRenderer({
     { key: "qz_psf", label: "Windward velocity pressure qz, including Kd (psf)", kind: "number" },
     { key: "qh_psf", label: "Leeward velocity pressure qh, including Kd (psf)", kind: "number" },
     { key: "cp_ww", label: "Windward wall Cp", kind: "number", default: 0.8, attrs: { step: "any" } },
-    { key: "cp_lw", label: "Leeward wall Cp", kind: "number", default: -0.5 },
+    { key: "cp_lw", label: "Leeward wall Cp", kind: "number", default: -0.5, attrs: { step: "any" } },
     { key: "g_f", label: "Gust-effect factor G", kind: "number" },
     { key: "gcpi", label: "Internal GCpi magnitude", kind: "number", default: 0.18 },
   ],

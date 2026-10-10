@@ -399,10 +399,10 @@ WINTEROPS_RENDERERS["ice-melt-working-temperature"] = _simpleRenderer({
     { key: "ice_density_lb_ft3", label: "Ice density (lb per cu ft)", kind: "number", default: 57.2 },
     { key: "pavement_temp_f", label: "Pavement temperature (degF)", kind: "number", default: 30, attrs: { step: "any" } },
     { key: "capacity_lb_ice_per_lb", label: "Melting capacity at that temperature (lb ice per lb)", kind: "number" },
-    { key: "alt_temp_f", label: "Colder temperature to compare (degF)", kind: "number", default: 20 },
+    { key: "alt_temp_f", label: "Colder temperature to compare (degF)", kind: "number", default: 20, attrs: { step: "any" } },
     { key: "alt_capacity_lb_ice_per_lb", label: "Melting capacity there (lb ice per lb, 0 to skip)", kind: "number" },
     { key: "practical_limit_f", label: "Product practical working limit (degF)", kind: "number", default: 15, attrs: { step: "any" } },
-    { key: "eutectic_f", label: "Product eutectic temperature (degF)", kind: "number", default: -6 },
+    { key: "eutectic_f", label: "Product eutectic temperature (degF)", kind: "number", default: -6, attrs: { step: "any" } },
   ],
   outputs: [
     { key: "i", id: "imw-out-i", label: "Ice to be melted", value: (r) => fmt(r.ice_volume_ft3, 1) + " cu ft (" + fmt(r.ice_mass_lb, 0) + " lb)" },
