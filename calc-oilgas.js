@@ -62,7 +62,9 @@ function _simpleRenderer(spec) {
       const params = {};
       for (const f of spec.fields) {
         if (f.kind === "select") params[f.key] = fields[f.key].select.value;
-        else params[f.key] = Number(fields[f.key].input.value) || 0;
+        // A field marked `required` passes null when blank, so the compute can
+        // ask for it. Blank must not become 0 where 0 is a real value (0 F).
+        else params[f.key] = f.required && fields[f.key].input.value === "" ? null : Number(fields[f.key].input.value) || 0;
       }
       const r = spec.compute(params);
       if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }
@@ -1313,9 +1315,10 @@ function _dakZ(tpr, ppr) {
   return { z: zOf(rho_r), rho_r };
 }
 // dims: in { gas_gravity: dimensionless, pressure_psig: M L^-1 T^-2, temperature_f: T, co2_pct: dimensionless, h2s_pct: dimensionless, tpc_r: T, ppc_psia: M L^-1 T^-2 } out: { pressure_psia: M L^-1 T^-2, temperature_r: T, tpc_used_r: T, ppc_used_psia: M L^-1 T^-2, epsilon_r: T, tpr: dimensionless, ppr: dimensionless, z: dimensionless, density_lb_ft3: M L^-3, bg_ft3_scf: dimensionless }
-export function computeGasZFactor({ gas_gravity = 0.65, pressure_psig = 0, temperature_f = 0, co2_pct = 0, h2s_pct = 0, tpc_r = 0, ppc_psia = 0 } = {}) {
+export function computeGasZFactor({ gas_gravity = 0.65, pressure_psig = 0, temperature_f = null, co2_pct = 0, h2s_pct = 0, tpc_r = 0, ppc_psia = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(gas_gravity > 0.55 && gas_gravity < 2)) return { error: "Gas specific gravity must be above 0.55 (methane) and below 2 (air = 1)." };
+  if (temperature_f === null || temperature_f === undefined || temperature_f === "") return { error: "Enter the gas temperature (F)." };
   if (co2_pct < 0 || h2s_pct < 0) return { error: "CO2 and H2S cannot be negative (mole %)." };
   if (!(co2_pct + h2s_pct < 100)) return { error: "CO2 plus H2S must be under 100 mole %." };
   if (tpc_r < 0 || ppc_psia < 0) return { error: "Pseudo-critical temperature and pressure cannot be negative (leave blank to use Sutton)." };
@@ -1355,7 +1358,7 @@ OILGAS_RENDERERS["gas-z-factor"] = _simpleRenderer({
   fields: [
     { key: "gas_gravity", label: "Gas specific gravity (air = 1)", kind: "number", default: 0.65 },
     { key: "pressure_psig", label: "Pressure (psig)", kind: "number" },
-    { key: "temperature_f", label: "Temperature (°F)", kind: "number", attrs: { step: "any" } },
+    { key: "temperature_f", label: "Temperature (°F)", kind: "number", required: true, attrs: { step: "any" } },
     { key: "co2_pct", label: "CO2 (mole %, 0 if sweet)", kind: "number" },
     { key: "h2s_pct", label: "H2S (mole %, 0 if sweet)", kind: "number" },
     { key: "tpc_r", label: "Pseudo-critical temperature (°R, blank for Sutton)", kind: "number" },
@@ -1706,12 +1709,18 @@ export function computeCuttingsSlipVelocity({
   const vLam = _CSV_K_LAMINAR * d * d * drho / mu;
   const vInt = _CSV_K_INTERMEDIATE * d * Math.pow(drho, 2 / 3) / (Math.cbrt(rf) * Math.cbrt(mu));
   const vTur = _CSV_K_TURBULENT * Math.sqrt(d * drho / rf);
-  // Take the regime whose own Reynolds number falls in its range; the friction factors do not quite meet at
-  // Re 3 and 300, so in the narrow gaps the intermediate form is used.
+  // The three forms are one force balance with friction factors 40/Re, 22/sqrt(Re)
+  // and 1.5. Those curves cross at Re 3.3 and Re 215, not exactly at the published
+  // limits of 3 and 300, so "the form whose own Reynolds number is in its range"
+  // has gaps where no form qualifies: until 2026-10-10 the gap near 300 took the
+  // transitional form, which there gives a HIGHER slip than the turbulent one, so
+  // a thicker mud could slip faster and the verdict named a range its own
+  // Reynolds number was outside. The largest friction factor governs, which is the
+  // SMALLEST of the three velocities: continuous, and falling as the mud thickens.
   let slip_velocity_fps, regime;
-  if (reOf(vLam) < 3) { slip_velocity_fps = vLam; regime = "laminar slip (particle Reynolds number under 3)"; }
-  else if (reOf(vTur) > 300) { slip_velocity_fps = vTur; regime = "turbulent slip (particle Reynolds number over 300)"; }
-  else { slip_velocity_fps = vInt; regime = "transitional slip (particle Reynolds number 3 to 300)"; }
+  if (vLam <= vInt && vLam <= vTur) { slip_velocity_fps = vLam; regime = "laminar slip (friction factor 40/Re)"; }
+  else if (vTur <= vInt) { slip_velocity_fps = vTur; regime = "turbulent slip (friction factor 1.5)"; }
+  else { slip_velocity_fps = vInt; regime = "transitional slip (friction factor 22/sqrt(Re))"; }
   const particle_reynolds = reOf(slip_velocity_fps);
   const slip_velocity_ft_min = slip_velocity_fps * 60;
   const has_annular = annular_velocity_ft_min > 0;

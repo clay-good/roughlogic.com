@@ -94,7 +94,9 @@ function _simpleRenderer(spec) {
       const params = {};
       for (const f of spec.fields) {
         if (f.kind === "select") params[f.key] = fields[f.key].select.value;
-        else params[f.key] = Number(fields[f.key].input.value) || 0;
+        // A field marked `required` passes null when blank, so the compute can
+        // ask for it. Blank must not become 0 where 0 is a real value (0 F).
+        else params[f.key] = f.required && fields[f.key].input.value === "" ? null : Number(fields[f.key].input.value) || 0;
       }
       const r = spec.compute(params);
       if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }
@@ -2803,16 +2805,26 @@ HVACSYSTEMS_RENDERERS["cryogenic-boiloff"] = _simpleRenderer({
 // (hot facing up, or cold facing down); "stable" is the other one.
 const _flatPlateNusselt = (Ra, Pr, orientation) => {
   if (orientation === "vertical") {
-    return Ra <= 1e9
-      ? 0.68 + 0.670 * Math.pow(Ra, 0.25) / Math.pow(1 + Math.pow(0.492 / Pr, 9 / 16), 4 / 9)
-      : Math.pow(0.825 + 0.387 * Math.pow(Ra, 1 / 6) / Math.pow(1 + Math.pow(0.492 / Pr, 9 / 16), 8 / 27), 2);
+    // Churchill-Chu: the laminar form (best below Ra 1e9) and the all-range form.
+    // They differ by a third at Ra 1e9 (Nu about 92 against 123 for air), so a
+    // hard switch there made a 0.5% change in height move the loss 13%. Between
+    // Ra 1e8 and 1e9 the two are blended on log10(Ra): the laminar form alone
+    // below, the all-range form alone above, and no step in between. The blend
+    // is this tile's, not a published correlation.
+    const laminar = 0.68 + 0.670 * Math.pow(Ra, 0.25) / Math.pow(1 + Math.pow(0.492 / Pr, 9 / 16), 4 / 9);
+    const allRange = Math.pow(0.825 + 0.387 * Math.pow(Ra, 1 / 6) / Math.pow(1 + Math.pow(0.492 / Pr, 9 / 16), 8 / 27), 2);
+    // Weight on the all-range form: 0 at Ra 1e8 and below, 1 at Ra 1e9 and above.
+    const w = Math.min(1, Math.max(0, Math.log10(Ra) - 8));
+    return (1 - w) * laminar + w * allRange;
   }
   if (orientation === "enhanced") return Ra <= 1e7 ? 0.54 * Math.pow(Ra, 0.25) : 0.15 * Math.cbrt(Ra);
   return 0.27 * Math.pow(Ra, 0.25);
 };
 // dims: in { orientation: dimensionless, side_a_ft: L, side_b_ft: L, surface_f: T, amb_f: T, emissivity: dimensionless } out: { conv_coefficient: M T^-3, rad_coefficient: M T^-3, flux_btu_hr_ft2: M T^-3, q_total_btuh: M L^2 T^-3, area_ft2: L^2, characteristic_length_ft: L, rayleigh: dimensionless, conv_share: dimensionless }
-export function computeFlatSurfaceHeatLoss({ orientation = "vertical", side_a_ft = 0, side_b_ft = 0, surface_f = 0, amb_f = 70, emissivity = 0.9 } = {}) {
+export function computeFlatSurfaceHeatLoss({ orientation = "vertical", side_a_ft = 0, side_b_ft = 0, surface_f = null, amb_f = 70, emissivity = 0.9 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (surface_f === null || surface_f === undefined || surface_f === "") return { error: "Enter the surface temperature (F)." };
+  if (amb_f === null || amb_f === "") return { error: "Enter the surrounding air temperature (F)." };
   if (!["vertical", "up", "down"].includes(orientation)) return { error: "Orientation must be vertical, horizontal facing up, or horizontal facing down." };
   if (!(side_a_ft > 0) || !(side_b_ft > 0)) return { error: "Both surface dimensions must be positive (ft)." };
   if (!(emissivity > 0 && emissivity <= 1)) return { error: "Surface emissivity must be above 0 and at most 1 (0.9 painted, 0.1 bright aluminum)." };
@@ -2859,7 +2871,7 @@ HVACSYSTEMS_RENDERERS["flat-surface-heat-loss"] = _simpleRenderer({
     { key: "orientation", label: "Surface orientation", kind: "select", default: "vertical", options: [{ value: "vertical", label: "Vertical (wall, tank side)" }, { value: "up", label: "Horizontal, facing up (top)" }, { value: "down", label: "Horizontal, facing down (underside)" }] },
     { key: "side_a_ft", label: "Height of a vertical surface, or one side of a horizontal one (ft)" },
     { key: "side_b_ft", label: "Width, or the other side (ft)" },
-    { key: "surface_f", label: "Surface temperature (°F)", attrs: { step: "any" } },
+    { key: "surface_f", label: "Surface temperature (°F)", required: true, attrs: { step: "any" } },
     { key: "amb_f", label: "Air temperature (°F)", default: 70, attrs: { step: "any" } },
     { key: "emissivity", label: "Surface emissivity (0.9 painted, 0.1 bright aluminum)", default: 0.9, attrs: { step: "any", min: "0", max: "1" } },
   ],

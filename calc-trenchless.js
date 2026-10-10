@@ -603,9 +603,12 @@ export function computeCippFullyDeteriorated({ host_id_in = 0, ovality_pct = 0, 
   ].filter(([, t]) => t !== null);
   const [governs, thickness_in] = candidates.reduce((m, c) => (c[1] > m[1] ? c : m));
   const dimension_ratio = D / thickness_in;
-  const bending_stress_psi = water_psi > 0
+  // The X1.2 expression is the bending an OVAL liner sees; with no ovality, or at
+  // a very low dimension ratio, it is zero or negative and means nothing.
+  const bending_raw_psi = water_psi > 0 && q > 0
     ? (1.5 * (q / 100) * (1 + q / 100) * dimension_ratio * dimension_ratio - 0.5 * (1 + q / 100) * dimension_ratio) * water_psi * N
     : null;
+  const bending_stress_psi = bending_raw_psi !== null && bending_raw_psi > 0 ? bending_raw_psi : null;
   const outs = [total_load_psi, load_thickness_in, stiffness_thickness_in, thickness_in, dimension_ratio];
   if (!outs.every(Number.isFinite)) return { error: "Liner thickness math is not a finite value." };
   return {
@@ -637,7 +640,7 @@ TRENCHLESS_RENDERERS["cipp-fully-deteriorated"] = _simpleRenderer({
     { key: "q", id: "cfd-out-q", label: "Total external load q_t", value: (r) => fmt(r.total_load_psi, 2) + " psi (" + fmt(r.water_psi, 2) + " water + " + fmt(r.soil_psi, 2) + " soil at R_w " + fmt(r.buoyancy_factor, 2) + " + live)" },
     { key: "t", id: "cfd-out-t", label: "Required liner thickness", value: (r) => fmt(r.thickness_in, 3) + " in (DR " + fmt(r.dimension_ratio, 1) + "), governed by " + r.governs },
     { key: "c", id: "cfd-out-c", label: "Each F1216 check", value: (r) => "load " + fmt(r.load_thickness_in, 3) + " in, stiffness " + fmt(r.stiffness_thickness_in, 3) + " in, buckling " + (r.buckling_thickness_in === null ? "n/a (no groundwater)" : fmt(r.buckling_thickness_in, 3) + " in") + ", bending " + (r.bending_thickness_in === null ? "n/a" : fmt(r.bending_thickness_in, 3) + " in") },
-    { key: "b", id: "cfd-out-b", label: "Ovality bending stress at that thickness", value: (r) => r.bending_stress_psi === null ? "n/a (no groundwater above the pipe)" : fmt(r.bending_stress_psi, 0) + " psi" },
+    { key: "b", id: "cfd-out-b", label: "Ovality bending stress at that thickness", value: (r) => r.bending_stress_psi === null ? "n/a (no groundwater above the pipe, or no ovality bending at this thickness)" : fmt(r.bending_stress_psi, 0) + " psi" },
     { key: "n", id: "cfd-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeCippFullyDeteriorated,

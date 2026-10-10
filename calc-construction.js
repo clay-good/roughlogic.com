@@ -7083,7 +7083,9 @@ export function computeWoodTensionBending({ t_lb = 0, m_inlb = 0, a_in2 = 0, s_i
   const passes = governing <= 1 + 1e-9;
   return {
     ft_psi, fb_psi, fb_dstar_used_psi: fbss, tension_interaction, compression_side_ratio, governing, passes,
-    verdict: passes ? "passes both NDS 3.9.1 checks (at or under 1.0)" : (tension_interaction > compression_side_ratio ? "FAILS Eq. 3.9-1, the tension face" : "FAILS Eq. 3.9-2, the compression face"),
+    verdict: passes ? "passes both NDS 3.9.1 checks (at or under 1.0)"
+      : (tension_interaction > 1 + 1e-9 && compression_side_ratio > 1 + 1e-9 ? "FAILS both Eq. 3.9-1, the tension face, and Eq. 3.9-2, the compression face"
+        : tension_interaction > compression_side_ratio ? "FAILS Eq. 3.9-1, the tension face" : "FAILS Eq. 3.9-2, the compression face"),
     note: "A truss bottom chord carrying a ceiling, or a tie with an eccentric connection, is in tension and bending at once. NDS 3.9.1 checks the tension face, ft/Ft' + fb/Fb* <= 1.0, where Fb* is the adjusted bending value WITHOUT the beam stability factor CL, because the tension face cannot buckle; and the compression face, (fb - ft)/Fb** <= 1.0, where Fb** keeps CL but drops the volume factor CV, because the axial tension only partly relieves the compression from bending and a slender, unbraced member can still buckle laterally. For sawn lumber with no CV, Fb** is simply Fb' (leave it blank to use Fb*). Use the net area at a bolt hole for ft (the wood-tension-member calculation shows the deduction). Uniaxial bending; biaxial bending is a separate check. A design aid; the engineer of record governs.",
   };
 }

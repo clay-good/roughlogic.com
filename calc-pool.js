@@ -65,7 +65,9 @@ function _simpleRenderer(spec) {
       const params = {};
       for (const f of spec.fields) {
         if (f.kind === "select") params[f.key] = fields[f.key].select.value;
-        else params[f.key] = Number(fields[f.key].input.value) || 0;
+        // A field marked `required` passes null when blank, so the compute can
+        // ask for it. Blank must not become 0 where 0 is a real value (0 F).
+        else params[f.key] = f.required && fields[f.key].input.value === "" ? null : Number(fields[f.key].input.value) || 0;
       }
       const r = spec.compute(params);
       if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }
@@ -431,17 +433,18 @@ POOL_RENDERERS["spa-drain-interval"] = _simpleRenderer({
 // Indoor (natatorium): ASHRAE HVAC Applications Ch. 6 (Carrier), W = 0.1 A (pw - pa) Fa lb/h, with pw the
 // saturation pressure at the water temperature and pa the room vapor pressure (in. Hg), Fa the activity factor.
 // Outdoor: the Carrier form with the air velocity, W = A (pw - pa)(95 + 0.425 V)/Y, V in fpm and Y the latent
-// heat (BTU/lb); at V = 0 it is the 0.1 coefficient. Vapor pressures from the catalog's Magnus functions.
+// heat (BTU/lb); at V = 0 it is 95/Y, about 0.091, a little under the indoor 0.1. Vapor pressures from the catalog's Magnus functions.
 const _POOL_HPA_PER_INHG = 33.86389;
 // dims: in { surface_area_ft2: L^2, water_temp_f: T, air_temp_f: T, rh_pct: dimensionless, setting: dimensionless, activity_factor: dimensionless, wind_mph: L T^-1 } out: { evaporation_lb_hr: M T^-1, evaporation_gal_day: L^3 T^-1, evaporation_in_day: L T^-1, latent_load_btuh: M L^2 T^-3, pw_inhg: M L^-1 T^-2, pa_inhg: M L^-1 T^-2 }
 export function computePoolEvaporationRate({
-  surface_area_ft2 = 0, water_temp_f = 0, air_temp_f = 0, rh_pct = 50,
+  surface_area_ft2 = 0, water_temp_f = 0, air_temp_f = null, rh_pct = 50,
   setting = "indoor", activity_factor = "1.0", wind_mph = 0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const A = Number(surface_area_ft2), tw = Number(water_temp_f), ta = Number(air_temp_f), rh = Number(rh_pct), v = Number(wind_mph) || 0;
   const fa = Number(activity_factor);
   if (!(A > 0)) return { error: "Pool surface area must be greater than zero (sq ft)." };
+  if (air_temp_f === null || air_temp_f === undefined || air_temp_f === "") return { error: "Enter the air temperature (F)." };
   if (!(tw > 32 && tw < 140)) return { error: "Water temperature must be above 32 F and below 140 F." };
   if (!(ta > -40 && ta < 140)) return { error: "Air temperature must be between -40 F and 140 F." };
   if (!(rh >= 0 && rh <= 100)) return { error: "Relative humidity must be 0 to 100 percent." };
@@ -472,7 +475,7 @@ export function computePoolEvaporationRate({
   return {
     evaporation_lb_hr, evaporation_gal_day, evaporation_in_day, latent_load_btuh, pw_inhg, pa_inhg, condensing,
     rate_verdict, load_verdict,
-    note: "Evaporation from a pool surface from the vapor-pressure difference between the water and the air. Indoors this is the ASHRAE (Carrier) natatorium equation W = 0.1 A (pw - pa) Fa, with an activity factor for how the pool is used: 0.5 residential or unoccupied, 0.65 condominium or therapy, 0.8 hotel, 1.0 public, school or whirlpool, 1.5 wave pool or water slides. Outdoors the Carrier form adds the air velocity over the water, W = A (pw - pa)(95 + 0.425 V)/Y, which at no wind is the same 0.1 coefficient, so wind is what makes an outdoor pool lose several times an indoor one. The difference is the water's saturation pressure against the air's actual vapor pressure, so warm water under dry air evaporates fastest, and raising the room temperature or humidity of a natatorium cuts evaporation. The in/day figure is the rate pool-cover-evaporation asks for. These are design estimates: ASHRAE notes the equation can deviate substantially from measurements (a mean deviation over 30% has been reported), the activity factors are judgment, and an outdoor pool also loses heat to radiation and convection, which this does not compute. The mechanical engineer and measured make-up water govern.",
+    note: "Evaporation from a pool surface from the vapor-pressure difference between the water and the air. Indoors this is the ASHRAE (Carrier) natatorium equation W = 0.1 A (pw - pa) Fa, with an activity factor for how the pool is used: 0.5 residential or unoccupied, 0.65 condominium or therapy, 0.8 hotel, 1.0 public, school or whirlpool, 1.5 wave pool or water slides. Outdoors the Carrier form adds the air velocity over the water, W = A (pw - pa)(95 + 0.425 V)/Y, which in still air is 95/Y, about 0.091, a little under the indoor 0.1, so wind is what makes an outdoor pool lose several times an indoor one. The difference is the water's saturation pressure against the air's actual vapor pressure, so warm water under dry air evaporates fastest, and raising the room temperature or humidity of a natatorium cuts evaporation. The in/day figure is the rate pool-cover-evaporation asks for. These are design estimates: ASHRAE notes the equation can deviate substantially from measurements (a mean deviation over 30% has been reported), the activity factors are judgment, and an outdoor pool also loses heat to radiation and convection, which this does not compute. The mechanical engineer and measured make-up water govern.",
   };
 }
 export const poolEvaporationRateExample = { inputs: { surface_area_ft2: 1000, water_temp_f: 82, air_temp_f: 84, rh_pct: 50, setting: "indoor", activity_factor: "0.8", wind_mph: 0 } };
@@ -483,7 +486,7 @@ POOL_RENDERERS["pool-evaporation-rate"] = _simpleRenderer({
   fields: [
     { key: "surface_area_ft2", label: "Pool surface area (ft²)", kind: "number", attrs: { step: "any" } },
     { key: "water_temp_f", label: "Water temperature (°F)", kind: "number", attrs: { step: "any" } },
-    { key: "air_temp_f", label: "Air temperature (°F)", kind: "number", attrs: { step: "any" } },
+    { key: "air_temp_f", label: "Air temperature (°F)", kind: "number", required: true, attrs: { step: "any" } },
     { key: "rh_pct", label: "Relative humidity (%)", kind: "number", default: 50, attrs: { step: "any" } },
     { key: "setting", label: "Setting", kind: "select", default: "indoor", options: [{ value: "indoor", label: "Indoor (ASHRAE natatorium equation)" }, { value: "outdoor", label: "Outdoor (Carrier, with wind)" }] },
     { key: "activity_factor", label: "Activity factor (indoor)", kind: "select", default: "1.0", options: [{ value: "0.5", label: "0.5 residential or unoccupied" }, { value: "0.65", label: "0.65 condominium or therapy" }, { value: "0.8", label: "0.8 hotel" }, { value: "1.0", label: "1.0 public, school, or whirlpool" }, { value: "1.5", label: "1.5 wave pool or water slides" }] },

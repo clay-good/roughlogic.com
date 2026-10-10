@@ -3104,8 +3104,10 @@ HVAC_RENDERERS["pipe-heat-loss-radial"] = renderPipeHeatLossRadial;
 // Nu = 0.3 + 0.62 Re^(1/2) Pr^(1/3) / [1 + (0.4/Pr)^(2/3)]^(1/4) x [1 + (Re/282000)^(5/8)]^(4/5),
 // combined with the natural-convection Nu as (Nu_F^3 + Nu_N^3)^(1/3) (Churchill; Incropera 9.9).
 // dims: in { od_in: L, surface_f: T, amb_f: T, emissivity: dimensionless, length_ft: L, wind_mph: L T^-1 } out: { conv_coefficient: M T^-3, rad_coefficient: M T^-3, q_per_ft_btuh: M*L*T^-3, q_total_btuh: M*L^2*T^-3, conv_share: dimensionless, reynolds: dimensionless, forced_nusselt: dimensionless }
-export function computeBarePipeHeatLoss({ od_in = 0, surface_f = 0, amb_f = 70, emissivity = 0.8, length_ft = 1, wind_mph = 0 } = {}) {
+export function computeBarePipeHeatLoss({ od_in = 0, surface_f = null, amb_f = 70, emissivity = 0.8, length_ft = 1, wind_mph = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (surface_f === null || surface_f === undefined || surface_f === "") return { error: "Enter the pipe surface temperature (F)." };
+  if (amb_f === null || amb_f === "") return { error: "Enter the surrounding air temperature (F)." };
   const od = Number(od_in) || 0, Ts = Number(surface_f), Ta = Number(amb_f), eps = Number(emissivity), L = Number(length_ft) || 0;
   if (!(od > 0)) return { error: "Pipe outside diameter must be positive (in)." };
   if (!(eps > 0 && eps <= 1)) return { error: "Surface emissivity must be above 0 and at most 1 (0.8 for oxidized steel)." };

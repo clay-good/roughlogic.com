@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "315a8710bc0da003",
+      "sha": "5296f7688eb6ccf4",
       "date": "2026-10-10"
     },
     "/tools/": {
@@ -1418,8 +1418,8 @@
       "date": "2026-10-09"
     },
     "/tools/column-secant-formula/": {
-      "sha": "c45678e1443a2653",
-      "date": "2026-10-09"
+      "sha": "6adb56343dc0d616",
+      "date": "2026-10-10"
     },
     "/tools/combined-stress-axial-bending/": {
       "sha": "f6c454b94dd7d8c6",
@@ -2030,7 +2030,7 @@
       "date": "2026-09-29"
     },
     "/tools/cuttings-slip-velocity/": {
-      "sha": "df247bc03c45b552",
+      "sha": "8cc00e68c11e1bb3",
       "date": "2026-10-10"
     },
     "/tools/cwr-neutral-temperature/": {
@@ -2898,8 +2898,8 @@
       "date": "2026-10-09"
     },
     "/tools/fatigue-notch-sensitivity/": {
-      "sha": "e60d6447aec69b6f",
-      "date": "2026-10-09"
+      "sha": "179cdc508168e7bb",
+      "date": "2026-10-10"
     },
     "/tools/fatigue-safety-factor/": {
       "sha": "a14bedf0273393b6",
@@ -3074,7 +3074,7 @@
       "date": "2026-09-29"
     },
     "/tools/flat-surface-heat-loss/": {
-      "sha": "99e8efa9c0f23183",
+      "sha": "2d50f6be8541c644",
       "date": "2026-10-10"
     },
     "/tools/flat-top-stockpile-volume/": {
@@ -3490,7 +3490,7 @@
       "date": "2026-09-29"
     },
     "/tools/glycol-fluid-factor/": {
-      "sha": "c7543e15b6e2e701",
+      "sha": "24c627fb2d7f00fb",
       "date": "2026-10-10"
     },
     "/tools/glycol-mix/": {

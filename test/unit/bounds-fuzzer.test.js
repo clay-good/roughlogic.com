@@ -59698,3 +59698,72 @@ test("bounds: fixes from the 2026-10-10 independent review of the day's new code
   assert.ok(Math.abs(_spvP({ steam_flow_lbhr: 1000, vel_ceiling_fpm: 6000, steam_basis: "pressure", steam_pressure_psig: 0 }).spec_vol_used_ft3lb - 26.80) < 0.01);
   assert.ok(Math.abs(_stsP({ heat_duty_btuhr: 1e5, steam_basis: "pressure", steam_pressure_psig: 0 }).hfg_used_btulb - 970.1) < 0.1);
 });
+
+import { computeFatigueCombinedLoading as _rv2Fcl, computeFatigueNotchSensitivity as _rv2Fns, computeColumnSecantFormula as _rv2Csf } from "../../calc-machining.js";
+import { computeCippFullyDeteriorated as _rv2Cipp } from "../../calc-trenchless.js";
+import { computeFlatSurfaceHeatLoss as _rv2Flat } from "../../calc-hvacsystems.js";
+import { computeCuttingsSlipVelocity as _rv2Slip, computeGasZFactor as _rv2Z } from "../../calc-oilgas.js";
+import { computeWoodTensionBending as _rv2Wtb } from "../../calc-construction.js";
+import { computePoolEvaporationRate as _rv2Pool } from "../../calc-pool.js";
+import { computeBarePipeHeatLoss as _rv2Bare } from "../../calc-hvac.js";
+import { computeLiftBagSizing as _rv2Lift } from "../../calc-diving.js";
+test("bounds: fixes from the 2026-10-10 independent review of the 28 calculators added since the last audit", () => {
+  // fatigue-combined-loading: the peak is the larger in-phase extreme, so a negative mean counts.
+  assert.ok(Math.abs(_rv2Fcl({ bending_alt_psi: 10000, bending_mean_psi: -30000 }).vm_max_psi - 40000) < 1e-6);
+  assert.ok(Math.abs(_rv2Fcl({ bending_alt_psi: 10000, bending_mean_psi: 30000 }).vm_max_psi - 40000) < 1e-6);
+  assert.ok(Math.abs(_rv2Fcl({ bending_alt_psi: 10000, bending_mean_psi: 20000, torsion_alt_psi: 5000, torsion_mean_psi: -15000 }).vm_max_psi - Math.sqrt(1e8 + 3 * 4e8)) < 1e-6);
+  // The sign of every mean stress together cannot change the peak.
+  const a = { bending_alt_psi: 8000, bending_mean_psi: 12000, axial_alt_psi: 2000, axial_mean_psi: -5000, torsion_alt_psi: 3000, torsion_mean_psi: 7000, kf_bending: 1.6, kf_axial: 1.2, kfs_torsion: 1.4 };
+  assert.ok(Math.abs(_rv2Fcl(a).vm_max_psi - _rv2Fcl({ ...a, bending_mean_psi: -12000, axial_mean_psi: 5000, torsion_mean_psi: -7000 }).vm_max_psi) < 1e-6);
+  // fatigue-notch-sensitivity: q never exceeds 1, and torsion stops at 220 kpsi.
+  assert.ok("error" in _rv2Fns({ kt: 2, notch_radius_in: 0.01, ultimate_strength_psi: 235000, load_type: "torsion" }));
+  for (const sut of [50000, 100000, 150000, 200000, 220000]) for (const lt of ["bending", "torsion"]) {
+    const r = _rv2Fns({ kt: 2, notch_radius_in: 0.01, ultimate_strength_psi: sut, load_type: lt });
+    assert.ok(r.notch_sensitivity_q > 0 && r.notch_sensitivity_q <= 1 && r.kf <= 2, lt + " " + sut);
+  }
+  assert.ok(_rv2Fns({ kt: 2, notch_radius_in: 0.01, ultimate_strength_psi: 250000, load_type: "bending" }).notch_sensitivity_q <= 1);
+  // column-secant-formula: no eccentricity and a slender column buckles before it yields.
+  const col = { load_lbf: 31100, extreme_fiber_in: 2, modulus_psi: 29e6, yield_strength_psi: 36000, moment_of_inertia_in4: 8, area_in2: 3.54, length_in: 96, end_condition: "fixed-free" };
+  assert.equal(_rv2Csf({ ...col, eccentricity_in: 0 }).buckles_before_yield, true);
+  assert.equal(_rv2Csf({ ...col, eccentricity_in: 0.75 }).buckles_before_yield, false);
+  // cipp-fully-deteriorated: the ovality bending stress is never reported negative.
+  const cippIn = { host_id_in: 12, ovality_pct: 5, soil_cover_ft: 5, groundwater_head_ft: 2, soil_unit_weight_pcf: 120, live_load_psi: 2, soil_modulus_psi: 1000, long_term_modulus_psi: 150000, initial_modulus_psi: 300000, long_term_flexural_strength_psi: 2500, enhancement_factor: 7, safety_factor: 2 };
+  const cipp = _rv2Cipp({ ...cippIn, ovality_pct: 0 });
+  assert.ok(!("error" in cipp) && cipp.bending_stress_psi === null);
+  assert.ok(_rv2Cipp(cippIn).bending_stress_psi > 0);
+  for (const q of [0, 1, 2, 5, 8, 10]) for (const cover of [3, 10, 40]) {
+    const x = _rv2Cipp({ ...cippIn, ovality_pct: q, soil_cover_ft: cover, groundwater_head_ft: cover });
+    if (!("error" in x)) assert.ok(x.bending_stress_psi === null || x.bending_stress_psi > 0, q + "% at " + cover + " ft");
+  }
+  // flat-surface-heat-loss: continuous through Ra 1e9 on a vertical surface.
+  let prev = null;
+  for (let h = 1.5; h <= 3.0001; h += 0.01) {
+    const c = _rv2Flat({ orientation: "vertical", side_a_ft: h, side_b_ft: 10, surface_f: 180, amb_f: 70, emissivity: 0.9 }).conv_coefficient;
+    if (prev !== null) assert.ok(Math.abs(c / prev - 1) < 0.02, "step at " + h.toFixed(2) + " ft: " + prev + " -> " + c);
+    prev = c;
+  }
+  // cuttings-slip-velocity: slip never rises as the mud thickens, through every regime change.
+  let last = Infinity;
+  for (let mu = 0.5; mu <= 800; mu *= 1.03) {
+    const s = _rv2Slip({ cutting_diameter_in: 0.25, cutting_sg: 2.6, mud_weight_ppg: 9.5, viscosity_mode: "apparent", apparent_viscosity_cp: mu, annular_velocity_ft_min: 120 }).slip_velocity_fps;
+    assert.ok(s <= last + 1e-12, "slip rose at " + mu.toFixed(2) + " cP");
+    last = s;
+  }
+  // wood-tension-bending: when both equations fail the verdict names both.
+  assert.match(_rv2Wtb({ t_lb: 100, m_inlb: 12000, a_in2: 8.25, s_in3: 7.563, ft_adj_psi: 1009, fb_star_psi: 1495, fb_dstar_psi: 1000 }).verdict, /FAILS both/);
+  // A blank or omitted temperature is an error, not 0 F; an entered 0 F is still accepted.
+  assert.ok("error" in _rv2Pool({ surface_area_ft2: 1000, water_temp_f: 82 }));
+  assert.ok(!("error" in _rv2Pool({ surface_area_ft2: 1000, water_temp_f: 82, air_temp_f: 0 })));
+  assert.ok("error" in _rv2Flat({ orientation: "vertical", side_a_ft: 8, side_b_ft: 10 }));
+  assert.ok(!("error" in _rv2Flat({ orientation: "vertical", side_a_ft: 8, side_b_ft: 10, surface_f: 0 })));
+  assert.ok("error" in _rv2Z({ gas_gravity: 0.7 }));
+  assert.ok(!("error" in _rv2Z({ gas_gravity: 0.7, pressure_psig: 1000, temperature_f: 0 })));
+  assert.ok("error" in _rv2Bare({ od_in: 2.375 }));
+  assert.ok("error" in _rv2Bare({ od_in: 2.375, surface_f: 300, amb_f: null }));
+  assert.ok(!("error" in _rv2Bare({ od_in: 2.375, surface_f: 0 })));
+  // lift-bag-sizing: the note agrees with the code on concrete in seawater (57%, not a third).
+  const lb = _rv2Lift({ object_weight_lb: 1000, object_density_lb_ft3: 150, water_density_lb_ft3: 64, depth_ft: 66, bag_rating_lb: 500, breakout_lb: 0 });
+  assert.ok(Math.abs(lb.in_water_weight_lb / 1000 - (1 - 64 / 150)) < 1e-9);
+  assert.match(lb.note, /a little over half for concrete/);
+  assert.doesNotMatch(lb.note, /a third for concrete/);
+});

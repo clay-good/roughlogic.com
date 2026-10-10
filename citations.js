@@ -11939,7 +11939,7 @@ export const CITATIONS = {
     edition: "Neuber's notch-sensitivity equation with the steel Neuber constants (Shigley, Mischke and Budynas, Mechanical Engineering Design, Ch. 6, Eqs. 6-32 to 6-35), by name; it reproduces Shigley Example 6-6 (Sut 690 MPa = 100 kpsi, r = 3 mm, Kt = 1.65: sqrt(a) = 0.0622 sqrt(in), Kf = 1.55).",
     freeAccess: "Standard published fatigue relations; Kt (from a chart), the notch radius, and the strength are the user's inputs.",
     governance: GOVERNANCE.general,
-    editionNote: "The fatigue stress-concentration factor a steel part actually feels at a notch: Kf = 1 + q (Kt - 1), with q from the notch radius and the ultimate strength. Kt is read from a stress-concentration chart for the geometry; this does not compute it. Steel with Sut 50 to 250 kpsi, the range of the Neuber-constant fits. A design aid; test data govern.",
+    editionNote: "The fatigue stress-concentration factor a steel part actually feels at a notch: Kf = 1 + q (Kt - 1), with q from the notch radius and the ultimate strength. Kt is read from a stress-concentration chart for the geometry; this does not compute it. Steel with Sut 50 to 250 kpsi in bending and axial load and 50 to 220 kpsi in torsion, the ranges of the Neuber-constant fits. A design aid; test data govern.",
     assumptions: [
       { name: "Notch sensitivity", value: "Neuber q = 1/(1 + sqrt(a)/sqrt(r))", source: "Shigley Eq. 6-34" },
       { name: "Neuber constant", value: "cubic fits in Sut (kpsi) for bending/axial and torsion, steel", source: "Shigley Eqs. 6-35a, 6-35b" },
@@ -22637,7 +22637,7 @@ export const CITATIONS = {
     ],
   },
   "flat-surface-heat-loss": {
-    formula: "Air at the film temperature (Sutherland mu and k, ideal-gas density, cp 1,006 J/kg K); Ra = g (1/Tf) |Ts - Ta| L^3/(nu alpha). Vertical (L = height): Nu = 0.68 + 0.670 Ra^(1/4)/[1 + (0.492/Pr)^(9/16)]^(4/9) to Ra 1e9, else [0.825 + 0.387 Ra^(1/6)/(1 + (0.492/Pr)^(9/16))^(8/27)]^2. Horizontal (L = area/perimeter): hot side up or cold side down Nu = 0.54 Ra^(1/4) to Ra 1e7, else 0.15 Ra^(1/3); hot side down or cold side up Nu = 0.27 Ra^(1/4). h_rad = eps sigma (Ts^4 - Ta^4)/(Ts - Ta), sigma = 0.1714e-8 BTU/hr ft2 R4; q = (h_conv + h_rad) A (Ts - Ta).",
+    formula: "Air at the film temperature (Sutherland mu and k, ideal-gas density, cp 1,006 J/kg K); Ra = g (1/Tf) |Ts - Ta| L^3/(nu alpha). Vertical (L = height): Nu = 0.68 + 0.670 Ra^(1/4)/[1 + (0.492/Pr)^(9/16)]^(4/9) to Ra 1e8 and [0.825 + 0.387 Ra^(1/6)/(1 + (0.492/Pr)^(9/16))^(8/27)]^2 from Ra 1e9; between them the two are blended on log10(Ra), because they differ by a third at Ra 1e9 and a hard switch made the loss jump with a small change in height (the blend is this tile's, not a published correlation). Horizontal (L = area/perimeter): hot side up or cold side down Nu = 0.54 Ra^(1/4) to Ra 1e7, else 0.15 Ra^(1/3); hot side down or cold side up Nu = 0.27 Ra^(1/4). h_rad = eps sigma (Ts^4 - Ta^4)/(Ts - Ta), sigma = 0.1714e-8 BTU/hr ft2 R4; q = (h_conv + h_rad) A (Ts - Ta).",
     edition: "Free convection from flat plates as given in Incropera, DeWitt, Bergman and Lavine, Fundamentals of Heat and Mass Transfer, Ch. 9 (Churchill and Chu 1975 for the vertical plate; McAdams for the horizontal plate), and gray-body radiation to large surroundings, by name.",
     freeAccess: "Standard heat-transfer correlations; checked against the textbook's Example 9.3 (a 0.75 by 0.3 m duct at 45 C in 15 C air: sides 4.23, top 5.47, bottom 2.07 W/m2 K), reproduced within 1%.",
     governance: GOVERNANCE.general,
@@ -23683,7 +23683,7 @@ export const CITATIONS = {
     editionNote: "A vertical-hole, single-particle estimate for a cutting of one equivalent diameter. A shear-thinning mud is thinner at a higher annular velocity, so the slip velocity rises with pump rate; in turbulent slip viscosity drops out. It does not model cuttings beds in a deviated or horizontal hole, pipe rotation, eccentricity or concentration. The 0.5 transport ratio in the verdict is a commonly quoted minimum, not a rule.",
     assumptions: [
       { name: "Friction factors", value: "40/Re laminar, 22/sqrt(Re) transitional, 1.5 turbulent, for an irregular cutting", source: "Moore (1974)" },
-      { name: "Regime", value: "the form whose own Reynolds number falls in its range; the transitional form in the narrow gaps at Re 3 and 300", source: "scope of this tile" },
+      { name: "Regime", value: "the largest of the three friction factors governs, so the smallest of the three velocities; the curves cross at Re 3.3 and 215, close to the published limits of 3 and 300, and the result is continuous and falls as the mud thickens", source: "scope of this tile" },
       { name: "Apparent viscosity", value: "the Newtonian viscosity giving the same annular friction as the power-law mud, or an entered value", source: "Bourgoyne et al." },
     ],
   },

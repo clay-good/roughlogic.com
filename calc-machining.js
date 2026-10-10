@@ -1161,6 +1161,9 @@ export function computeFatigueNotchSensitivity({ kt = 0, notch_radius_in = 0, ul
   if (!(r > 0)) return { error: "Notch radius must be positive (in)." };
   if (!(Sut >= 50000 && Sut <= 250000)) return { error: "The Neuber constants are fit for steel with Sut from 50,000 to 250,000 psi." };
   if (load_type !== "bending" && load_type !== "torsion") return { error: "Load type must be bending/axial or torsion." };
+  // The torsion fit crosses zero near 233 kpsi and would give q above 1 (Kfs above
+  // Kt), which cannot be; Shigley gives it to 220 kpsi.
+  if (load_type === "torsion" && Sut > 220000) return { error: "The torsion Neuber constant is fit for steel with Sut up to 220,000 psi." };
   const k = Sut / 1000;
   const neuber_constant = load_type === "torsion"
     ? 0.190 - 2.51e-3 * k + 1.35e-5 * k * k - 2.67e-8 * k ** 3
@@ -1170,7 +1173,7 @@ export function computeFatigueNotchSensitivity({ kt = 0, notch_radius_in = 0, ul
   if (![neuber_constant, notch_sensitivity_q, kf].every(Number.isFinite)) return { error: "Notch-sensitivity math is not a finite value; check the inputs." };
   return {
     neuber_constant, notch_sensitivity_q, kf, load_type,
-    note: "A notch raises the local stress by Kt in a static, brittle sense, but in fatigue a steel part feels less than the full Kt: Kf = 1 + q (Kt - 1), where the notch sensitivity q runs from 0 (the notch does not matter) to 1 (the full Kt). Neuber's q = 1/(1 + sqrt(a)/sqrt(r)) rises with the notch radius r and with the strength, so a sharp notch in soft steel is forgiving and the same notch in hard steel is not. Kt comes from a stress-concentration chart (Peterson; Shigley Table A-15) for the geometry; this does not compute it. Multiply the nominal alternating stress by Kf (Kfs in torsion) before the fatigue-safety-factor or the finite-life S-N line, or divide Se by it. Steel, Sut 50 to 250 kpsi. A design aid; Shigley and test data govern.",
+    note: "A notch raises the local stress by Kt in a static, brittle sense, but in fatigue a steel part feels less than the full Kt: Kf = 1 + q (Kt - 1), where the notch sensitivity q runs from 0 (the notch does not matter) to 1 (the full Kt). Neuber's q = 1/(1 + sqrt(a)/sqrt(r)) rises with the notch radius r and with the strength, so a sharp notch in soft steel is forgiving and the same notch in hard steel is not. Kt comes from a stress-concentration chart (Peterson; Shigley Table A-15) for the geometry; this does not compute it. Multiply the nominal alternating stress by Kf (Kfs in torsion) before the fatigue-safety-factor or the finite-life S-N line, or divide Se by it. Steel, Sut 50 to 250 kpsi (to 220 kpsi in torsion). A design aid; Shigley and test data govern.",
   };
 }
 export const fatigueNotchSensitivityExample = { inputs: { kt: 1.65, notch_radius_in: 0.1181, ultimate_strength_psi: 100000, load_type: "bending" } };
@@ -1281,7 +1284,15 @@ export function computeFatigueCombinedLoading({ bending_alt_psi = 0, bending_mea
   const vm_alt_psi = Math.sqrt(Math.pow(kb * sab + ka * saa / 0.85, 2) + 3 * Math.pow(kt * ta, 2));
   const vm_mean_psi = Math.sqrt(Math.pow(kb * smb + ka * sma, 2) + 3 * Math.pow(kt * tm, 2));
   // First-cycle yield check: the peak von Mises stress (with the notch factors kept).
-  const vm_max_psi = Math.sqrt(Math.pow(kb * (sab + smb) + ka * (saa + sma), 2) + 3 * Math.pow(kt * (ta + tm), 2));
+  // A component cycles between mean - amplitude and mean + amplitude, and with a
+  // NEGATIVE mean the larger magnitude is at mean - amplitude: a bar cycling from
+  // -40,000 to -20,000 psi peaks at 40,000, not 20,000. So both in-phase extremes
+  // are evaluated and the larger is the peak. (Until 2026-10-10 only mean +
+  // amplitude was, which understated the yield check under a compressive or
+  // reversed mean.)
+  const vmAt = (sign) => Math.sqrt(Math.pow(kb * (smb + sign * sab) + ka * (sma + sign * saa), 2) + 3 * Math.pow(kt * (tm + sign * ta), 2));
+  // In-phase loading, as the method assumes: all components reach an extreme together.
+  const vm_max_psi = Math.max(vmAt(1), vmAt(-1));
   if (![vm_alt_psi, vm_mean_psi, vm_max_psi].every(Number.isFinite)) return { error: "Combined-loading math is not a finite value; check the inputs." };
   return {
     vm_alt_psi, vm_mean_psi, vm_max_psi,
@@ -1636,6 +1647,10 @@ export function computeColumnSecantFormula({ load_lbf = 0, eccentricity_in = 0, 
   const max_deflection_in = e * (secant_term - 1);
   const max_stress_psi = stress(P);
   let yield_load_lbf = 0, yield_load_factor = 0;
+  // With no eccentricity the stress is only P/A, and a slender column reaches its
+  // Euler load before that ever gets to Sy: it buckles, it does not yield. The
+  // bisection below would then return Pcr and call it the load at first yield.
+  const buckles_before_yield = Sy > 0 && critical_load_lbf / A < Sy && !(e > 0);
   if (Sy > 0) {
     // sigma_max rises monotonically from 0 to infinity on [0, Pcr): bisect for sigma_max = Sy.
     let lo = 0, hi = critical_load_lbf;
@@ -1645,7 +1660,7 @@ export function computeColumnSecantFormula({ load_lbf = 0, eccentricity_in = 0, 
   }
   if (![critical_load_lbf, secant_term, max_deflection_in, max_stress_psi, yield_load_lbf].every(Number.isFinite)) return { error: "Secant-formula math is not a finite value; check the inputs." };
   return {
-    critical_load_lbf, load_ratio, secant_term, max_deflection_in, max_stress_psi, yield_load_lbf, yield_load_factor,
+    critical_load_lbf, load_ratio, secant_term, max_deflection_in, max_stress_psi, yield_load_lbf, yield_load_factor, buckles_before_yield,
     radius_of_gyration_in: Math.sqrt(r2), eccentricity_ratio: e * c / r2, effective_length_factor: K, has_yield: Sy > 0,
     note: "An eccentric load bends the column as well as compressing it, and the bending feeds on itself: the deflection adds to the lever arm. The secant formula gives the peak stress at mid-height, sigma_max = (P/A)[1 + (e c/r^2) sec((K L/2r) sqrt(P/(E A)))], and the lateral deflection y_max = e[sec(...) - 1], where e c/r^2 is the eccentricity ratio and the secant grows without bound as P approaches the Euler load. Because the stress is not proportional to the load, a safety factor belongs on the LOAD: the load at first yield (Sy entered) divided by the applied load, not Sy over sigma_max. Elastic, initially straight, prismatic column with the same eccentricity at both ends, bending about the axis of I. Local buckling and code column curves (AISC, NDS) are separate. Beer & Johnston and the engineer of record govern.",
   };
@@ -1677,6 +1692,7 @@ function renderColumnSecantFormula(inputRegion, outputRegion, citationEl) {
     oY.textContent = fmt(r.max_deflection_in, 3) + " in";
     oP.textContent = fmt(r.critical_load_lbf, 0) + " lbf; P/Pcr " + fmt(r.load_ratio, 3) + " (r = " + fmt(r.radius_of_gyration_in, 3) + " in, K = " + fmt(r.effective_length_factor, 2) + ")";
     oF.textContent = r.has_yield ? fmt(r.yield_load_lbf, 0) + " lbf, " + fmt(r.yield_load_factor, 2) + " times the applied load" : "enter Sy to find it";
+    if (r.buckles_before_yield) oF.textContent = "never reached: with no eccentricity this column buckles at its Euler load, " + fmt(r.critical_load_lbf, 0) + " lbf, before the stress gets to Sy";
     oNote.textContent = r.note;
   }, DEBOUNCE_MS);
   for (const f of [P, e, c, E, Sy, I, A, L]) f.input.addEventListener("input", update);

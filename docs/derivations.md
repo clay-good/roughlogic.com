@@ -2489,7 +2489,7 @@ cross-check.
 | calc-hvac.js | `computeApproachDeltaT` | `{ outdoor_F, condenser_saturation_F, supply_F, return_F, approach_normal_low ...` | _ | _ | _ |
 | calc-hvac.js | `computeAssemblyRValue` | `{ cavity_r = 0, continuous_r = 0, stud_depth_in = 0, framing_factor = 0.25, a...` | _ | _ | _ |
 | calc-hvac.js | `computeBalancePoint` | `{ heating_capacity_btu_hr_at_design, design_outdoor_F, building_heat_loss_btu...` | _ | _ | _ |
-| calc-hvac.js | `computeBarePipeHeatLoss` | `{ od_in = 0, surface_f = 0, amb_f = 70, emissivity = 0.8, length_ft = 1, wind...` | _ | _ | _ |
+| calc-hvac.js | `computeBarePipeHeatLoss` | `{ od_in = 0, surface_f = null, amb_f = 70, emissivity = 0.8, length_ft = 1, w...` | _ | _ | _ |
 | calc-hvac.js | `computeBaseboardLengthForLoad` | `{ target_btuhr = 0, water_temp_F = 0, flow_gpm = 1, model = "slant_fin_baseli...` | _ | _ | _ |
 | calc-hvac.js | `computeBaseboardOutput` | `{ water_temp_F = 0, flow_gpm = 1, length_ft = 0, model = "slant_fin_baseline" }` | _ | _ | _ |
 | calc-hvac.js | `computeBeltAndPulley` | `{ drive_dia_in = 0, driven_dia_in = 0, center_distance_in = 0, motor_rpm = 0 }` | _ | _ | _ |
@@ -2626,7 +2626,7 @@ cross-check.
 | calc-hvacsystems.js | `computeEnvelopeConductionLoad` | `{ area_ft2 = 0, u_factor = 0, cltd_f = 0 } = {}` | _ | _ | _ |
 | calc-hvacsystems.js | `computeFanSystemEffect` | `{ flow_cfm = 0, outlet_width_in = 0, outlet_height_in = 0, straight_duct_ft =...` | _ | _ | _ |
 | calc-hvacsystems.js | `computeFilterPressureDrop` | `{ filter_type = "merv13", face_area_ft2 = 0, face_velocity_fpm = 300, clean_d...` | _ | _ | _ |
-| calc-hvacsystems.js | `computeFlatSurfaceHeatLoss` | `{ orientation = "vertical", side_a_ft = 0, side_b_ft = 0, surface_f = 0, amb_...` | _ | _ | _ |
+| calc-hvacsystems.js | `computeFlatSurfaceHeatLoss` | `{ orientation = "vertical", side_a_ft = 0, side_b_ft = 0, surface_f = null, a...` | _ | _ | _ |
 | calc-hvacsystems.js | `computeFlowHoodCorrection` | `{ hood_reading_cfm = 0, correction_factor = 1, reference_traverse_cfm = 0, de...` | _ | _ | _ |
 | calc-hvacsystems.js | `computeGlycolFluidFactor` | `{ glycol_pct = 0, fluid_temp_f = 0, load_btuh = 0, delta_t_f = 0 } = {}` | _ | _ | _ |
 | calc-hvacsystems.js | `computeHumidifierCapacity` | `{ cfm = 0, supply_db_F = 70, entering_rh_pct = 20, target_rh_pct = 40, altitu...` | _ | _ | _ |
@@ -3036,7 +3036,7 @@ cross-check.
 | calc-oilgas.js | `computeCuttingsSlipVelocity` | `{ cutting_diameter_in = 0, cutting_sg = 2.6, mud_weight_ppg = 0, viscosity_mo...` | _ | _ | _ |
 | calc-oilgas.js | `computeFlareRadiationDistance` | `{ heat_release_btuh = 0, radiant_fraction = 0, allowable_btuh_ft2 = 0, solar_...` | _ | _ | _ |
 | calc-oilgas.js | `computeGasPipelineFlow` | `{ equation = "panhandle_a", id_in = 0, length_mi = 0, inlet_psig = 0, outlet_...` | _ | _ | _ |
-| calc-oilgas.js | `computeGasZFactor` | `{ gas_gravity = 0.65, pressure_psig = 0, temperature_f = 0, co2_pct = 0, h2s_...` | _ | _ | _ |
+| calc-oilgas.js | `computeGasZFactor` | `{ gas_gravity = 0.65, pressure_psig = 0, temperature_f = null, co2_pct = 0, h...` | _ | _ | _ |
 | calc-oilgas.js | `computeKickTolerance` | `{ mud_weight_ppg = 0, shoe_emw_ppg = 0, shoe_tvd_ft = 0, well_tvd_ft = 0, kic...` | _ | _ | _ |
 | calc-oilgas.js | `computeKillMudWeight` | `{ original_mw_ppg = 0, tvd_ft = 0, sidpp_psi = 0, scr_pressure_psi = 0, safet...` | _ | _ | _ |
 | calc-oilgas.js | `computeLiquidPipelineStationSpacing` | `{ total_length_mi = 0, friction_gradient_ft_per_mi = 0, elevation_change_ft =...` | _ | _ | _ |
@@ -3172,7 +3172,7 @@ cross-check.
 | calc-plumbingtakeoff.js | `computeSolarThermalCollector` | `{ optical_efficiency = 0.70, loss_coeff = 0.85, inlet_temp_f = 120, ambient_t...` | _ | _ | _ |
 | calc-plumbingtakeoff.js | `computeSolderJointQuantity` | `{ joints = 200, wire_in_per_joint = 0.75, wire_dia_in = 0.125, solder_density...` | _ | _ | _ |
 | calc-pool.js | `computePoolCoverEvaporation` | `{ surface_area_ft2 = 0, evaporation_in_day = 0, cover_effectiveness_pct = 90,...` | _ | _ | _ |
-| calc-pool.js | `computePoolEvaporationRate` | `{ surface_area_ft2 = 0, water_temp_f = 0, air_temp_f = 0, rh_pct = 50, settin...` | _ | _ | _ |
+| calc-pool.js | `computePoolEvaporationRate` | `{ surface_area_ft2 = 0, water_temp_f = 0, air_temp_f = null, rh_pct = 50, set...` | _ | _ | _ |
 | calc-pool.js | `computePoolHeatPumpCapacity` | `{ rated_capacity_btuh = 0, air_derate_factor = 1, humidity_derate_factor = 1,...` | _ | _ | _ |
 | calc-pool.js | `computePoolPumpSpeedSavings` | `{ pump_hp = 0, full_speed_hours = 0, speed_fraction = 0.5, electricity_rate_p...` | _ | _ | _ |
 | calc-pool.js | `computeSpaDrainInterval` | `{ spa_gallons = 0, daily_bathers = 0, days_since_drain = 0, alternative_bathe...` | _ | _ | _ |
