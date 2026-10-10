@@ -1133,6 +1133,7 @@ const _TILES = [
   ["sagging-return-wave", "A"],
   // spec-v1640..v1647 marine and aviation band
   ["metacentric-height", "K"],
+  ["free-surface-moment", "K"],
   ["marine-shaft-diameter", "K"],
   ["house-battery-alternator", "K"],
   ["travel-lift-sling-placement", "K"],

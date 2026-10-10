@@ -59419,3 +59419,30 @@ test("bounds: train-resistance-davis matches the three named forms and Szanto's 
     assert.ok("error" in _trd({ ...ok, ...bad }), JSON.stringify(bad));
   }
 });
+
+import { computeFreeSurfaceMoment as _fsm, computeMetacentricHeight as _fsmGm } from "../../calc-marineaviation.js";
+test("bounds: free-surface-moment is rho l b^3 / 12, falls as n squared, and feeds metacentric-height", () => {
+  const r = _fsm({ tank_length_ft: 10, tank_breadth_ft: 8, liquid_density_lb_ft3: 64, displacement_lb: 60000 });
+  assert.ok(Math.abs(r.free_surface_moment_ftlb - 64 * 10 * 512 / 12) < 1e-9);
+  assert.ok(Math.abs(r.free_surface_correction_ft - r.free_surface_moment_ftlb / 60000) < 1e-12);
+  // n compartments across: the moment is exactly n sub-tanks of breadth b/n.
+  for (const n of [2, 3, 5]) {
+    const whole = _fsm({ tank_length_ft: 10, tank_breadth_ft: 8, compartments_across: n });
+    const parts = _fsm({ tank_length_ft: 10, tank_breadth_ft: 8 / n, tanks: n });
+    assert.ok(Math.abs(whole.free_surface_moment_ftlb / parts.free_surface_moment_ftlb - 1) < 1e-12);
+    assert.ok(Math.abs(whole.undivided_moment_ftlb / whole.free_surface_moment_ftlb - n * n) < 1e-9);
+  }
+  // "One more division" is the moment at n + 1.
+  assert.ok(Math.abs(_fsm({ tank_length_ft: 10, tank_breadth_ft: 8, compartments_across: 2 }).moment_if_split_ftlb / _fsm({ tank_length_ft: 10, tank_breadth_ft: 8, compartments_across: 3 }).free_surface_moment_ftlb - 1) < 1e-12);
+  // Breadth is cubed; length, density and tank count are linear.
+  assert.ok(Math.abs(_fsm({ tank_length_ft: 10, tank_breadth_ft: 16 }).free_surface_moment_ftlb / r.free_surface_moment_ftlb - 8) < 1e-12);
+  assert.ok(Math.abs(_fsm({ tank_length_ft: 20, tank_breadth_ft: 8, tanks: 3, liquid_density_lb_ft3: 32 }).free_surface_moment_ftlb / r.free_surface_moment_ftlb - 3) < 1e-12);
+  // The stability tile applies the same correction from this moment.
+  const gm = _fsmGm({ km_ft: 6, kg_ft: 4, displacement_lb: 60000, free_surface_moment_ftlb: r.free_surface_moment_ftlb });
+  assert.ok(Math.abs(gm.free_surface_correction_ft - r.free_surface_correction_ft) < 1e-12);
+  assert.equal(_fsm({ tank_length_ft: 10, tank_breadth_ft: 8 }).has_displacement, false);
+  const ok = { tank_length_ft: 10, tank_breadth_ft: 8, liquid_density_lb_ft3: 64, compartments_across: 1, tanks: 1, displacement_lb: 60000 };
+  for (const bad of [{ tank_length_ft: 0 }, { tank_length_ft: -10 }, { tank_length_ft: 1e4 }, { tank_breadth_ft: 0 }, { tank_breadth_ft: 8000 }, { liquid_density_lb_ft3: 0 }, { liquid_density_lb_ft3: 64000 }, { compartments_across: 0 }, { compartments_across: 1.5 }, { tanks: 0 }, { tanks: 1000 }, { displacement_lb: -60000 }]) {
+    assert.ok("error" in _fsm({ ...ok, ...bad }), JSON.stringify(bad));
+  }
+});

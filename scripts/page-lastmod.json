@@ -2,99 +2,99 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "29fe50bada508b77",
+      "sha": "1e3e07307608e746",
       "date": "2026-10-10"
     },
     "/tools/": {
-      "sha": "6299c5940722b283",
+      "sha": "102aedd229bf3849",
       "date": "2026-10-10"
     },
     "/collections/disaster-response/": {
-      "sha": "fb2536499df14b94",
+      "sha": "5b78ba2334d905ea",
       "date": "2026-10-10"
     },
     "/groups/accounting/": {
-      "sha": "2d0a0e0541e6bc27",
+      "sha": "b21a131f8774c9d5",
       "date": "2026-10-10"
     },
     "/groups/agriculture/": {
-      "sha": "cd79762b8de28100",
+      "sha": "1ec30c0dc5ab29a6",
       "date": "2026-10-10"
     },
     "/groups/construction/": {
-      "sha": "dffb988e71055fe7",
+      "sha": "92075c289b9f0563",
       "date": "2026-10-10"
     },
     "/groups/cross-trade/": {
-      "sha": "ba4f0ea809a33662",
+      "sha": "df333f5dcbcd1397",
       "date": "2026-10-10"
     },
     "/groups/educators/": {
-      "sha": "7f6a3f78604ca1f8",
+      "sha": "aa96a669f12a0cd7",
       "date": "2026-10-10"
     },
     "/groups/electrical/": {
-      "sha": "d1718b254ce415ed",
+      "sha": "3b6facbffd7f6b98",
       "date": "2026-10-10"
     },
     "/groups/field/": {
-      "sha": "c3476df28a13e471",
+      "sha": "8f5e4ed10073eec7",
       "date": "2026-10-10"
     },
     "/groups/fire-ground/": {
-      "sha": "33ff31b68f98db1c",
+      "sha": "1e97ddaf3c4e9c72",
       "date": "2026-10-10"
     },
     "/groups/historical/": {
-      "sha": "c2f4fce971a5849d",
+      "sha": "4ddf35227cd34357",
       "date": "2026-10-10"
     },
     "/groups/hvac/": {
-      "sha": "8bcb40fe8bdcbd81",
+      "sha": "5aaa145206c603c0",
       "date": "2026-10-10"
     },
     "/groups/kitchen/": {
-      "sha": "b5988202fd72b348",
+      "sha": "bae98f619c91a46c",
       "date": "2026-10-10"
     },
     "/groups/lab/": {
-      "sha": "346b0b27468d8835",
+      "sha": "a8a1e16b0dba2a18",
       "date": "2026-10-10"
     },
     "/groups/mechanic/": {
-      "sha": "0415debea1cf4d4c",
+      "sha": "8adf80e0d4bbe84f",
       "date": "2026-10-10"
     },
     "/groups/plumbing/": {
-      "sha": "337f39a2ec71fdb0",
+      "sha": "5eb1a8d9789c916c",
       "date": "2026-10-10"
     },
     "/groups/real-estate/": {
-      "sha": "b3208b387549e7cb",
+      "sha": "3a166c8cc8579a74",
       "date": "2026-10-10"
     },
     "/groups/references/": {
-      "sha": "c5b62d68be2ede72",
+      "sha": "1f8b87db90cb5066",
       "date": "2026-10-10"
     },
     "/groups/restoration/": {
-      "sha": "66f346aa96e4bcc5",
+      "sha": "bb2e5db1ee5af19a",
       "date": "2026-10-10"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "8a9307905a18fb02",
+      "sha": "382c4b8bcd4cd41f",
       "date": "2026-10-10"
     },
     "/groups/stage/": {
-      "sha": "10de49c36056c223",
+      "sha": "f9ca5febef78966d",
       "date": "2026-10-10"
     },
     "/groups/trucking/": {
-      "sha": "63e24219d14e274b",
+      "sha": "8fb827140e3eac49",
       "date": "2026-10-10"
     },
     "/groups/water/": {
-      "sha": "73dabed941fa333c",
+      "sha": "0486513ca113df54",
       "date": "2026-10-10"
     },
     "/tools/aav-install-check/": {
@@ -3201,6 +3201,10 @@
       "sha": "f43954a84180037e",
       "date": "2026-10-09"
     },
+    "/tools/free-surface-moment/": {
+      "sha": "ee5a4a2a4be81e75",
+      "date": "2026-10-10"
+    },
     "/tools/freezer-underfloor-heat/": {
       "sha": "b0fd6ad5e292bad3",
       "date": "2026-09-29"
@@ -4738,8 +4742,8 @@
       "date": "2026-09-29"
     },
     "/tools/metacentric-height/": {
-      "sha": "14b662e7be65af68",
-      "date": "2026-09-29"
+      "sha": "06d5d7cd1ad471ef",
+      "date": "2026-10-10"
     },
     "/tools/metal-deck-takeoff/": {
       "sha": "8d9d47b1a0113081",
@@ -8458,8 +8462,8 @@
       "date": "2026-09-29"
     },
     "/tools/turning-surface-finish/": {
-      "sha": "dd7b6903eb6b8465",
-      "date": "2026-10-03"
+      "sha": "29eaf7fefa1252b2",
+      "date": "2026-10-10"
     },
     "/tools/turnout-frog-lead/": {
       "sha": "1675cc8df52f5210",

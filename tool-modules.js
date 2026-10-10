@@ -1256,7 +1256,7 @@ export const TOOL_MODULES = (() => {
   // spec-v1873 cap-relief split: the spec-v1640..v1647 marine and aviation
   // field-reference band moved intact from calc-mechanic.js.
   declare("./calc-marineaviation.js", "MARINEAVIATION_RENDERERS", [
-    "metacentric-height", "marine-shaft-diameter", "house-battery-alternator",
+    "metacentric-height", "free-surface-moment", "marine-shaft-diameter", "house-battery-alternator",
     "travel-lift-sling-placement", "dock-piling-lateral", "control-cable-tension",
     "propeller-track-balance", "aviation-fuel-weight",
   ]);

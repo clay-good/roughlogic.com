@@ -2058,6 +2058,7 @@ export const COMPUTE_MAP = {
   "walk-in-door-infiltration": { module: "../../calc-kitchen.js", fn: "computeWalkInDoorInfiltration" },
   "kitchen-makeup-air-deficit": { module: "../../calc-kitchen.js", fn: "computeKitchenMakeupAirDeficit" },
   "metacentric-height": { module: "../../calc-marineaviation.js", fn: "computeMetacentricHeight" },
+  "free-surface-moment": { module: "../../calc-marineaviation.js", fn: "computeFreeSurfaceMoment" },
   "marine-shaft-diameter": { module: "../../calc-marineaviation.js", fn: "computeMarineShaftDiameter" },
   "house-battery-alternator": { module: "../../calc-marineaviation.js", fn: "computeHouseBatteryAlternator" },
   "travel-lift-sling-placement": { module: "../../calc-marineaviation.js", fn: "computeTravelLiftSlingPlacement" },

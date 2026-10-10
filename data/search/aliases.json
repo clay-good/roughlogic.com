@@ -112125,7 +112125,7 @@
   },
   {
    "term": "free surface effect",
-   "target": "metacentric-height",
+   "target": "free-surface-moment",
    "kind": "industry"
   },
   {
@@ -117086,6 +117086,31 @@
   {
    "term": "how much horsepower to pull a train",
    "target": "train-resistance-davis",
+   "kind": "question"
+  },
+  {
+   "term": "free surface moment",
+   "target": "free-surface-moment",
+   "kind": "industry"
+  },
+  {
+   "term": "free surface correction",
+   "target": "free-surface-moment",
+   "kind": "industry"
+  },
+  {
+   "term": "slack tank stability",
+   "target": "free-surface-moment",
+   "kind": "industry"
+  },
+  {
+   "term": "virtual rise of g",
+   "target": "free-surface-moment",
+   "kind": "industry"
+  },
+  {
+   "term": "how much gm does a slack tank cost",
+   "target": "free-surface-moment",
    "kind": "question"
   }
  ]

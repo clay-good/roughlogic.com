@@ -2854,6 +2854,7 @@ cross-check.
 | calc-marineaviation.js | `computeAviationFuelWeight` | `{ gallons = 0, standard_density_lb_gal = _MEC_JET_A_LB_GAL, reference_temp_f ...` | _ | _ | _ |
 | calc-marineaviation.js | `computeControlCableTension` | `{ nominal_tension_lb = 0, reference_temp_f = 70, ambient_temp_f = 70, cable_a...` | _ | _ | _ |
 | calc-marineaviation.js | `computeDockPilingLateral` | `{ lateral_load_lb = 0, height_above_mudline_ft = 0, pile_diameter_in = 0, soi...` | _ | _ | _ |
+| calc-marineaviation.js | `computeFreeSurfaceMoment` | `{ tank_length_ft = 0, tank_breadth_ft = 0, liquid_density_lb_ft3 = 64, compar...` | _ | _ | _ |
 | calc-marineaviation.js | `computeHouseBatteryAlternator` | `{ daily_consumption_ah = 0, bank_ah = 0, usable_dod = 0.5, alternator_a = 0, ...` | _ | _ | _ |
 | calc-marineaviation.js | `computeMarineShaftDiameter` | `{ engine_hp = 0, shaft_rpm = 0, shaft_diameter_in = 0, allowable_stress_psi =...` | _ | _ | _ |
 | calc-marineaviation.js | `computeMetacentricHeight` | `{ km_ft = 0, kg_ft = 0, displacement_lb = 0, added_weight_lb = 0, added_kg_ft...` | _ | _ | _ |
@@ -3931,7 +3932,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2515.
+Row count: 2516.
 
 <!-- END function-corpus-v14 -->
 
@@ -5664,7 +5665,7 @@ per spec-v14 §13.1 second paragraph.
 | `truck-swept-path-width` | Swept-Path Width (Turn Lane Occupancy) | AASHTO Green Book (swept-path width =...; OT = 50 - sqrt(2500 - (400 + 1600)) = 50 - sqrt(500) = 50... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `warehouse-cube-utilization` | Storage Position Count and Cube Utilisation | Project (first-principles); layout drawings and the slotting policy govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group K Mechanic (173 tiles)
+### Group K Mechanic (174 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -5739,6 +5740,7 @@ per spec-v14 §13.1 second paragraph.
 | `flange-coupling-torque` | Rigid Flange Coupling Torque Capacity | Project (first-principles); T = n(pi/4 d^2 tau)(BCD/2) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `flywheel-energy` | Flywheel Kinetic Energy and Speed Fluctuation | Flywheel kinetic energy and speed flu...; I = 100/32.174 x 1 = 3.108; omega = 1000 x pi/30 = 104.72... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `free-fall-drop` | Free-Fall Drop Time, Impact Speed, and Energy | Project (first-principles); v=sqrt(2gh) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
+| `free-surface-moment` | Free Surface Moment of a Slack Tank | Project (first-principles); i = 10 x 8^3 / 12 = 426.67 ft^4; x 64 lb/cu ft = 27,306.7... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `fuel-range` | Fuel Energy and Range | Project (first-principles); range = 18 * 28 * 1.0 = 504 mi; total_btu = 18 * 112000 =... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `gear-chordal-thickness` | Gear-Tooth Chordal Thickness (Caliper) | Machinery's Handbook / AGMA (gear-too...; half-angle 2.25 deg; tc = 4 sin(2.25) = 0.15704; ac = 0.1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `gear-contact-stress` | Gear Tooth Contact Stress (Surface Durability) | Project (first-principles); sigma_c = Cp sqrt(Wt/(F dp I)) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
@@ -6365,6 +6367,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 
-Tile count: 2261. Fixture-covered or reference-cadence: 2261 / 2261.
+Tile count: 2262. Fixture-covered or reference-cadence: 2262 / 2262.
 
 <!-- END tile-index-v14 -->

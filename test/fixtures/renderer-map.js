@@ -1561,6 +1561,7 @@ export const RENDERER_MAP = {
   "turn-radius-bank": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },
   "climb-gradient-roc": { module: "../../calc-mechanic.js", exportName: "MECHANIC_RENDERERS" },
   "metacentric-height": { module: "../../calc-marineaviation.js", exportName: "MARINEAVIATION_RENDERERS" },
+  "free-surface-moment": { module: "../../calc-marineaviation.js", exportName: "MARINEAVIATION_RENDERERS" },
   "marine-shaft-diameter": { module: "../../calc-marineaviation.js", exportName: "MARINEAVIATION_RENDERERS" },
   "house-battery-alternator": { module: "../../calc-marineaviation.js", exportName: "MARINEAVIATION_RENDERERS" },
   "travel-lift-sling-placement": { module: "../../calc-marineaviation.js", exportName: "MARINEAVIATION_RENDERERS" },

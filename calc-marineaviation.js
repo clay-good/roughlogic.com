@@ -178,7 +178,7 @@ export function computeMetacentricHeight({
     gm_change_ft, gm_loss_pct, weight_fraction_pct, raises_kg, addition_verdict,
     has_fsm, free_surface_correction_ft, effective_gm_ft, fsm_verdict,
     gz_ft, effective_is_positive, stability_verdict,
-    note: "A vessel's metacentric height, what a weight addition does to it, and the righting arm that follows. GM is KM minus KG: KM comes off the hull's hydrostatic curves at the loaded draft and is a property of the hull form, while KG is the vertical centre of gravity of everything aboard and is the number a refit changes. Because GM is a DIFFERENCE between two numbers of similar size, a modest change in KG is a large percentage change in stability -- which is why a refit adding a few hundred pounds high can matter more than one adding a ton low, and why the percentage is reported here rather than only the new value. Every weight added moves the centre of gravity toward it, so a radar arch, an enclosure, a tender on the cabin top, or ice on the rigging all raise KG and reduce GM directly. Free surface is the effect that surprises people, because it depends on the tank's WIDTH CUBED and not on how much liquid is in it. A wide shallow tank half full costs far more stability than a narrow deep one holding the same volume, and a tank that is nearly empty is nearly as bad as one that is half full. The correction is a moment divided by displacement and it reduces the effective GM, which is why it is applied here after the weight addition rather than before. A negative GM is not a small problem. The vessel does not simply feel tender: it is unstable upright and lolls to an angle of heel where the righting arm becomes positive, and it can flop from one side to the other. The sign is therefore a computed verdict here rather than a number for the reader to interpret, and the righting arm is reported as meaningless when GM is negative. This is a SMALL-ANGLE screen: GZ = GM sin(theta) holds only while the metacentre is effectively stationary, which is roughly the first ten to fifteen degrees, and beyond that the real righting arm comes from a full cross-curves calculation. It does not compute KM, which needs the hull form; it does not compute the free surface moment, which needs each tank's geometry; and it does not evaluate the stability CRITERIA any authority applies, which are about the area under the righting arm curve rather than about GM alone. The vessel's own stability booklet, a naval architect, and the applicable rules govern.",
+    note: "A vessel's metacentric height, what a weight addition does to it, and the righting arm that follows. GM is KM minus KG: KM comes off the hull's hydrostatic curves at the loaded draft and is a property of the hull form, while KG is the vertical centre of gravity of everything aboard and is the number a refit changes. Because GM is a DIFFERENCE between two numbers of similar size, a modest change in KG is a large percentage change in stability -- which is why a refit adding a few hundred pounds high can matter more than one adding a ton low, and why the percentage is reported here rather than only the new value. Every weight added moves the centre of gravity toward it, so a radar arch, an enclosure, a tender on the cabin top, or ice on the rigging all raise KG and reduce GM directly. Free surface is the effect that surprises people, because it depends on the tank's WIDTH CUBED and not on how much liquid is in it. A wide shallow tank half full costs far more stability than a narrow deep one holding the same volume, and a tank that is nearly empty is nearly as bad as one that is half full. The correction is a moment divided by displacement and it reduces the effective GM, which is why it is applied here after the weight addition rather than before. A negative GM is not a small problem. The vessel does not simply feel tender: it is unstable upright and lolls to an angle of heel where the righting arm becomes positive, and it can flop from one side to the other. The sign is therefore a computed verdict here rather than a number for the reader to interpret, and the righting arm is reported as meaningless when GM is negative. This is a SMALL-ANGLE screen: GZ = GM sin(theta) holds only while the metacentre is effectively stationary, which is roughly the first ten to fifteen degrees, and beyond that the real righting arm comes from a full cross-curves calculation. It does not compute KM, which needs the hull form; the free surface moment is entered, and free-surface-moment computes it for rectangular tanks; and it does not evaluate the stability CRITERIA any authority applies, which are about the area under the righting arm curve rather than about GM alone. The vessel's own stability booklet, a naval architect, and the applicable rules govern.",
   };
 }
 export const metacentricHeightExample = { inputs: { km_ft: 2.6, kg_ft: 2.1, displacement_lb: 42000, added_weight_lb: 900, added_kg_ft: 9.5, free_surface_moment_ftlb: 0, heel_angle_deg: 10 } };
@@ -203,6 +203,58 @@ MARINEAVIATION_RENDERERS["metacentric-height"] = _simpleRenderer({
     { key: "n", id: "mch-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeMetacentricHeight,
+});
+
+// ============ spec-v1958: free surface moment of a rectangular tank ============
+//
+// metacentric-height takes the free surface moment as entered. For a
+// rectangular tank it is geometry: the liquid surface's second moment of area
+// about its own fore-and-aft centreline, l b^3 / 12, times the liquid density.
+// dims: in { tank_length_ft: L, tank_breadth_ft: L, liquid_density_lb_ft3: M L^-3, compartments_across: dimensionless, tanks: dimensionless, displacement_lb: M L T^-2 } out: { free_surface_moment_ftlb: M L^2 T^-2, undivided_moment_ftlb: M L^2 T^-2, surface_inertia_ft4: L^4, free_surface_correction_ft: L, moment_if_split_ftlb: M L^2 T^-2 }
+export function computeFreeSurfaceMoment({
+  tank_length_ft = 0, tank_breadth_ft = 0, liquid_density_lb_ft3 = 64, compartments_across = 1, tanks = 1, displacement_lb = 0,
+} = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(tank_length_ft > 0 && tank_length_ft <= 1000)) return { error: "Enter the tank's fore-and-aft length (ft, up to 1,000)." };
+  if (!(tank_breadth_ft > 0 && tank_breadth_ft <= 300)) return { error: "Enter the tank's breadth across the vessel (ft, up to 300)." };
+  if (!(liquid_density_lb_ft3 > 0 && liquid_density_lb_ft3 <= 1000)) return { error: "Liquid density must be positive (lb per cubic foot; seawater 64, fresh water 62.4, diesel about 53)." };
+  if (!(Number.isInteger(compartments_across) && compartments_across >= 1 && compartments_across <= 20)) return { error: "Compartments across must be a whole number from 1 to 20 (1 = no fore-and-aft division)." };
+  if (!(Number.isInteger(tanks) && tanks >= 1 && tanks <= 100)) return { error: "Tanks must be a whole number from 1 to 100." };
+  if (displacement_lb < 0) return { error: "Displacement cannot be negative (lb); leave it at 0 to skip the GM correction." };
+  // n equal compartments each have breadth b/n: n x l (b/n)^3 / 12 = l b^3 / (12 n^2).
+  const surface_inertia_ft4 = tanks * tank_length_ft * Math.pow(tank_breadth_ft, 3) / (12 * compartments_across * compartments_across);
+  const free_surface_moment_ftlb = liquid_density_lb_ft3 * surface_inertia_ft4;
+  const undivided_moment_ftlb = free_surface_moment_ftlb * compartments_across * compartments_across;
+  const moment_if_split_ftlb = free_surface_moment_ftlb * compartments_across * compartments_across / ((compartments_across + 1) * (compartments_across + 1));
+  const has_displacement = displacement_lb > 0;
+  const free_surface_correction_ft = has_displacement ? free_surface_moment_ftlb / displacement_lb : 0;
+  if (![free_surface_moment_ftlb, moment_if_split_ftlb, free_surface_correction_ft].every(Number.isFinite)) return { error: "Free surface math is not a finite value." };
+  return {
+    free_surface_moment_ftlb, undivided_moment_ftlb, surface_inertia_ft4, free_surface_correction_ft, moment_if_split_ftlb,
+    has_displacement, compartments_across, next_compartments: compartments_across + 1,
+    note: "The free surface moment of slack rectangular tanks, the number metacentric-height takes as entered. When a tank is neither full nor empty its liquid runs to the low side as the vessel heels, and the effect on stability is the same as raising the centre of gravity by the free surface moment divided by the displacement. The moment is the liquid's density times the second moment of area of its surface about the surface's own fore-and-aft centreline, which for a rectangle is length times breadth CUBED over twelve. Two things follow that surprise people. The DEPTH of liquid does not appear: a tank an inch deep costs as much as one nearly full, as long as the surface reaches both sides and does not touch the top or expose the bottom. And breadth is cubed, so a fore-and-aft division that makes n equal compartments cuts the moment by n squared: one centreline bulkhead leaves a quarter. A swash plate with openings is not a division for this purpose. Where the tank sits in the vessel, high or low, port or starboard, does not change the moment. The density is the liquid in the tank, not the water outside: seawater about 64 lb per cubic foot, fresh water 62.4, diesel about 53. Count every slack tank; the moments add. A tank filled to the top or emptied has none, which is why tanks are pressed up or stripped rather than left part full. This is for rectangular surfaces at small angles of heel. It does not handle a tank whose plan is not a rectangle (use the builder's tank tables), a surface that reaches the tank top or bottom as the vessel heels, liquid transfer through cross-connections, or water trapped on deck. The stability booklet and the authority's criteria govern.",
+  };
+}
+const freeSurfaceMomentExample = { inputs: { tank_length_ft: 10, tank_breadth_ft: 8, liquid_density_lb_ft3: 64, compartments_across: 1, tanks: 1, displacement_lb: 60000 } };
+MARINEAVIATION_RENDERERS["free-surface-moment"] = _simpleRenderer({
+  citation: "Citation: the free surface correction as naval architecture states it -- virtual rise of the centre of gravity = (liquid density x i) / displacement, with i the second moment of area of the liquid surface about its own fore-and-aft centreline, l b^3 / 12 for a rectangular surface, and n equal fore-and-aft compartments dividing the moment by n^2 (Principles of Naval Architecture, SNAME, and standard ship stability texts, by name). Small angles of heel, rectangular surfaces that stay clear of the tank top and bottom. The stability booklet governs.",
+  example: freeSurfaceMomentExample.inputs,
+  fields: [
+    { key: "tank_length_ft", label: "Tank length, fore and aft (ft)", kind: "number" },
+    { key: "tank_breadth_ft", label: "Tank breadth, across the vessel (ft)", kind: "number" },
+    { key: "liquid_density_lb_ft3", label: "Liquid density (lb/cu ft; seawater 64, fresh 62.4, diesel 53)", kind: "number", default: 64 },
+    { key: "compartments_across", label: "Compartments across (1 = undivided)", kind: "number", default: 1, attrs: { step: "1", min: "1", max: "20" } },
+    { key: "tanks", label: "Identical slack tanks", kind: "number", default: 1, attrs: { step: "1", min: "1", max: "100" } },
+    { key: "displacement_lb", label: "Vessel displacement (lb, 0 to skip)", kind: "number" },
+  ],
+  outputs: [
+    { key: "m", id: "fsm-out-m", label: "Free surface moment", value: (r) => fmt(r.free_surface_moment_ftlb, 0) + " ft-lb" },
+    { key: "g", id: "fsm-out-g", label: "Loss of metacentric height", value: (r) => r.has_displacement ? fmt(r.free_surface_correction_ft, 3) + " ft (" + fmt(r.free_surface_correction_ft * 12, 1) + " in)" : "(enter the displacement)" },
+    { key: "s", id: "fsm-out-s", label: "With one more fore-and-aft division", value: (r) => fmt(r.moment_if_split_ftlb, 0) + " ft-lb as " + fmt(r.next_compartments, 0) + " compartments across" },
+    { key: "u", id: "fsm-out-u", label: "Undivided, for comparison", value: (r) => fmt(r.undivided_moment_ftlb, 0) + " ft-lb" },
+    { key: "n", id: "fsm-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeFreeSurfaceMoment,
 });
 
 // =====================================================================

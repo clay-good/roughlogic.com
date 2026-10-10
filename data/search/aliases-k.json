@@ -1543,7 +1543,7 @@
     {"term":"metacentric height","target":"metacentric-height","kind":"industry"},
     {"term":"gm","target":"metacentric-height","kind":"industry"},
     {"term":"righting arm","target":"metacentric-height","kind":"industry"},
-    {"term":"free surface effect","target":"metacentric-height","kind":"industry"},
+    {"term":"free surface effect","target":"free-surface-moment","kind":"industry"},
     {"term":"vessel stability","target":"metacentric-height","kind":"industry"},
     {"term":"kg km","target":"metacentric-height","kind":"industry"},
     {"term":"propeller shaft diameter","target":"marine-shaft-diameter","kind":"industry"},
@@ -1629,6 +1629,11 @@
     {"term":"rayleigh critical speed","target":"shaft-critical-speed-rayleigh","kind":"industry"},
     {"term":"whirl speed","target":"shaft-critical-speed-rayleigh","kind":"industry"},
     {"term":"rotor critical speed","target":"shaft-critical-speed-rayleigh","kind":"industry"},
-    {"term":"is my shaft running near critical","target":"shaft-critical-speed-rayleigh","kind":"question"}
+    {"term":"is my shaft running near critical","target":"shaft-critical-speed-rayleigh","kind":"question"},
+    {"term":"free surface moment","target":"free-surface-moment","kind":"industry"},
+    {"term":"free surface correction","target":"free-surface-moment","kind":"industry"},
+    {"term":"slack tank stability","target":"free-surface-moment","kind":"industry"},
+    {"term":"virtual rise of g","target":"free-surface-moment","kind":"industry"},
+    {"term":"how much gm does a slack tank cost","target":"free-surface-moment","kind":"question"}
   ]
 }

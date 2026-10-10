@@ -22406,9 +22406,22 @@ export const CITATIONS = {
   },
   // spec-v1640..v1647: the 2026-09-08 trade-expansion marine and aviation
   // band, in the existing calc-mechanic.js. Eight tiles, nothing cut.
+  "free-surface-moment": {
+    formula: "Free surface moment = liquid density x i, with i = l b^3 / 12 the second moment of area of a rectangular liquid surface about its own fore-and-aft centreline (l fore and aft, b across). n equal fore-and-aft compartments give l b^3 / (12 n^2). Identical tanks add. Loss of metacentric height = free surface moment / displacement. Units: lb per cubic foot x ft^4 = ft-lb; divided by lb gives ft.",
+    edition: "The free surface correction as naval architecture states it: Principles of Naval Architecture (SNAME), intact stability, and standard ship stability texts such as Derrett, Ship Stability for Masters and Mates, cited by name.",
+    freeAccess: "The second moment of area of a rectangle and one division; no table is reproduced. The n-squared rule follows from the cube: n compartments of breadth b/n give n (b/n)^3 = b^3 / n^2.",
+    governance: GOVERNANCE.general,
+    editionNote: "The depth of liquid does not enter, so a nearly empty wide tank costs as much as a half-full one, provided the surface reaches both sides and stays clear of the tank top and bottom. Breadth is cubed, which is why a centreline bulkhead is worth a factor of four. The tank's position in the vessel does not change the moment. Valid at small angles of heel for rectangular surfaces; a shaped tank needs the builder's tank tables.",
+    assumptions: [
+      { name: "Rectangular surface", value: "i = l b^3 / 12; a tank of another plan is not this model", source: "the builder's tank tables" },
+      { name: "Liquid density", value: "the liquid in the tank: seawater about 64 lb/cu ft, fresh water 62.4, diesel about 53", source: "entered" },
+      { name: "Slack tank", value: "surface reaches both sides and clears the top and bottom through the heel", source: "scope of this tile" },
+      { name: "Divisions are watertight", value: "a swash plate with openings does not divide the surface", source: "scope of this tile" },
+    ],
+  },
   "metacentric-height": {
     formula: "GM = KM - KG; a weight addition gives new KG = (W KG + w kg) / (W + w); the free surface correction is the free surface moment over displacement and reduces the effective GM; and the righting arm at a small angle is GZ = GM sin(theta).",
-    edition: "The small-angle stability relations as naval architecture states them. KM comes off the hull's hydrostatic curves at the loaded draft and is ENTERED; the free surface moment needs each tank's geometry and is ENTERED. A SMALL-ANGLE screen only, valid while the metacentre is effectively stationary, roughly the first 10 to 15 degrees. It does not compute KM, does not compute the free surface moment, and does not evaluate the stability CRITERIA any authority applies, which concern the area under the righting arm curve rather than GM alone.",
+    edition: "The small-angle stability relations as naval architecture states them. KM comes off the hull's hydrostatic curves at the loaded draft and is ENTERED; the free surface moment needs each tank's geometry and is ENTERED (free-surface-moment computes it for rectangular tanks). A SMALL-ANGLE screen only, valid while the metacentre is effectively stationary, roughly the first 10 to 15 degrees. It does not compute KM and does not evaluate the stability CRITERIA any authority applies, which concern the area under the righting arm curve rather than GM alone.",
     freeAccess: "One difference and one moment balance; no hydrostatic table is reproduced.",
     governance: GOVERNANCE.general,
     editionNote: "GM is a DIFFERENCE between two numbers of similar size, so a modest change in KG is a large percentage change in stability -- which is why a refit adding a few hundred pounds high can matter more than one adding a ton low. Free surface is the effect that surprises people, because it depends on the tank's WIDTH CUBED rather than on how much liquid is in it: a wide shallow tank half full costs far more than a narrow deep one holding the same volume. A negative GM is not a small problem -- the vessel is unstable upright and lolls to an angle of heel -- so the sign is a computed verdict here rather than a number to interpret.",

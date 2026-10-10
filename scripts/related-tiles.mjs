@@ -1578,6 +1578,7 @@ const RELATED = {
   "conductor-creep-elongation": ["conductor-sag-at-temperature","line-ground-clearance-nesc","ruling-span"],
   "sagging-return-wave": ["ruling-span","conductor-sag-at-temperature","line-ground-clearance-nesc"],
   // spec-v1640..v1647: marine and aviation band.
+  "free-surface-moment": ["metacentric-height","hull-displacement","barge-draft-displacement"],
   "metacentric-height": ["hull-displacement","travel-lift-sling-placement","sailboat-performance-ratios"],
   "marine-shaft-diameter": ["shaft-diameter-for-torsion","prop-pitch-selection","prop-slip"],
   "house-battery-alternator": ["alternator-charging-load","abyc-dc-wire","battery-runtime"],
