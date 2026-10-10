@@ -1,7 +1,7 @@
 {
   "note": "spec-v1184 coverage ratchet. Tiles whose renderer exposes a render.schema consistent with the compute function. Grow with `node scripts/check-renderer-schema.mjs --write`; regeneration is intentional.",
   "total_tiles": 2254,
-  "covered_count": 2178,
+  "covered_count": 2180,
   "covered": [
     "aav-install-check",
     "abatement-containment",
@@ -289,6 +289,7 @@
     "close-interval-survey-readings",
     "closet-shelf-takeoff",
     "closing-costs",
+    "clutch-engagement-energy",
     "cmu-grout-volume",
     "cmu-shear-wall",
     "cmu-wall-axial",
@@ -674,6 +675,7 @@
     "fan-sheave-for-target-cfm",
     "fan-system-effect",
     "fastener-pullout",
+    "fatigue-combined-loading",
     "fatigue-finite-life",
     "fatigue-miner-damage",
     "fatigue-notch-sensitivity",

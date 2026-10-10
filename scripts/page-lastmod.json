@@ -1286,8 +1286,8 @@
       "date": "2026-09-29"
     },
     "/tools/clutch-engagement-energy/": {
-      "sha": "e4244e9eb4667c99",
-      "date": "2026-10-09"
+      "sha": "0a06f3e2fe51a4c7",
+      "date": "2026-10-10"
     },
     "/tools/cmu-grout-volume/": {
       "sha": "e6824d94d71d60e4",
@@ -2874,8 +2874,8 @@
       "date": "2026-09-29"
     },
     "/tools/fatigue-combined-loading/": {
-      "sha": "653e59aef52dd1d3",
-      "date": "2026-10-09"
+      "sha": "38dc6608a07b0932",
+      "date": "2026-10-10"
     },
     "/tools/fatigue-finite-life/": {
       "sha": "351d663f1a04b9f2",

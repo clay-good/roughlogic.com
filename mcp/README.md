@@ -204,7 +204,7 @@ also `"eta^2 = "` -- and calling that a unit would be a guess. `outputUnits(id)`
 in `catalog.mjs` exposes them as what they are.
 
 `answer_query` reads the `data/fields/` descriptors the website reads, which
-exist for 2,216 calculators. For the other 38 it projects the descriptors from
+exist for 2,218 calculators. For the other 36 it projects the descriptors from
 `describe_calculator` instead, naming each input with the caption the
 calculator itself prints. A field whose verified
 example holds something a numeric extractor must not guess at -- a list, a
@@ -362,7 +362,7 @@ a pipe size in inches is still a length among lengths and the case the phase
 was written for keeps filling, while `wire-ampacity` measures amps, degrees
 and counts and has no home for a distance. Same dimension, not same unit --
 narrowing it to the unit would have broken `pipe-volume`, whose size dropdown
-declares no unit in its label at all. Recovery across all 2,216 tiles is
+declares no unit in its label at all. Recovery across all 2,218 tiles is
 unchanged by that one.
 
 The two that remain are not fixed, and both are traced rather than mysterious.

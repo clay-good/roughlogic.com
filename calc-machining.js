@@ -1291,17 +1291,16 @@ export function computeFatigueCombinedLoading({ bending_alt_psi = 0, bending_mea
 export const fatigueCombinedLoadingExample = { inputs: { bending_alt_psi: 10000, bending_mean_psi: 0, axial_alt_psi: 0, axial_mean_psi: 0, torsion_alt_psi: 0, torsion_mean_psi: 5000, kf_bending: 2, kf_axial: 1, kfs_torsion: 1.5 } };
 function renderFatigueCombinedLoading(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: combinations of loading modes (Shigley, Mechanical Engineering Design, Ch. 6): sigma'a = sqrt((Kf sa_bend + Kf sa_axial/0.85)^2 + 3 (Kfs ta)^2), sigma'm = sqrt((Kf sm_bend + Kf sm_axial)^2 + 3 (Kfs tm)^2), used with a rotating-bending Se; peak von Mises for first-cycle yield. In-phase loading. A design aid; Shigley and test data govern.";
-  const f = [
-    makeNumber("Bending alternating stress (psi)", "fcl-sab", { step: "any", min: "0" }),
-    makeNumber("Bending mean stress (psi)", "fcl-smb", { step: "any" }),
-    makeNumber("Axial alternating stress (psi)", "fcl-saa", { step: "any", min: "0" }),
-    makeNumber("Axial mean stress (psi)", "fcl-sma", { step: "any" }),
-    makeNumber("Torsional alternating stress (psi)", "fcl-ta", { step: "any", min: "0" }),
-    makeNumber("Torsional mean stress (psi)", "fcl-tm", { step: "any" }),
-    makeNumber("Kf, bending (1 if no notch)", "fcl-kb", { step: "any", min: "1", value: "1" }),
-    makeNumber("Kf, axial (1 if no notch)", "fcl-ka", { step: "any", min: "1", value: "1" }),
-    makeNumber("Kfs, torsion (1 if no notch)", "fcl-kt", { step: "any", min: "1", value: "1" }),
-  ];
+  const sab = makeNumber("Bending alternating stress (psi)", "fcl-sab", { step: "any", min: "0" });
+  const smb = makeNumber("Bending mean stress (psi)", "fcl-smb", { step: "any" });
+  const saa = makeNumber("Axial alternating stress (psi)", "fcl-saa", { step: "any", min: "0" });
+  const sma = makeNumber("Axial mean stress (psi)", "fcl-sma", { step: "any" });
+  const ta = makeNumber("Torsional alternating stress (psi)", "fcl-ta", { step: "any", min: "0" });
+  const tm = makeNumber("Torsional mean stress (psi)", "fcl-tm", { step: "any" });
+  const kb = makeNumber("Kf, bending (1 if no notch)", "fcl-kb", { step: "any", min: "1", value: "1" });
+  const ka = makeNumber("Kf, axial (1 if no notch)", "fcl-ka", { step: "any", min: "1", value: "1" });
+  const kt = makeNumber("Kfs, torsion (1 if no notch)", "fcl-kt", { step: "any", min: "1", value: "1" });
+  const f = [sab, smb, saa, sma, ta, tm, kb, ka, kt];
   for (const x of f) inputRegion.appendChild(x.wrap);
   const ex = [10000, 0, 0, 0, 0, 5000, 2, 1, 1.5];
   attachExampleButton(inputRegion, () => { f.forEach((x, i) => { x.input.value = String(ex[i]); }); update(); });
@@ -1311,7 +1310,7 @@ function renderFatigueCombinedLoading(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "fcl-out-note");
   function readNum(i, d) { if (i.value === "") return d; const v = Number(i.value); return Number.isFinite(v) ? v : d; }
   const update = debounce(() => {
-    const r = computeFatigueCombinedLoading({ bending_alt_psi: readNum(f[0].input, 0), bending_mean_psi: readNum(f[1].input, 0), axial_alt_psi: readNum(f[2].input, 0), axial_mean_psi: readNum(f[3].input, 0), torsion_alt_psi: readNum(f[4].input, 0), torsion_mean_psi: readNum(f[5].input, 0), kf_bending: readNum(f[6].input, 1), kf_axial: readNum(f[7].input, 1), kfs_torsion: readNum(f[8].input, 1) });
+    const r = computeFatigueCombinedLoading({ bending_alt_psi: readNum(sab.input, 0), bending_mean_psi: readNum(smb.input, 0), axial_alt_psi: readNum(saa.input, 0), axial_mean_psi: readNum(sma.input, 0), torsion_alt_psi: readNum(ta.input, 0), torsion_mean_psi: readNum(tm.input, 0), kf_bending: readNum(kb.input, 1), kf_axial: readNum(ka.input, 1), kfs_torsion: readNum(kt.input, 1) });
     if (r.error) { oA.textContent = r.error; oM.textContent = "-"; oX.textContent = "-"; oNote.textContent = ""; return; }
     oA.textContent = fmt(r.vm_alt_psi, 0) + " psi (sigma_a for the Goodman check)";
     oM.textContent = fmt(r.vm_mean_psi, 0) + " psi (sigma_m)";
@@ -1496,16 +1495,15 @@ export function computeClutchEngagementEnergy({ driver_wr2_lbft2 = 0, driven_wr2
 export const clutchEngagementEnergyExample = { inputs: { driver_wr2_lbft2: 20, driven_wr2_lbft2: 10, driver_rpm: 1800, driven_rpm: 0, slip_torque_lbft: 100, absorbing_weight_lb: 15, specific_heat_btu_lbf: 0.12 } };
 function renderClutchEngagementEnergy(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: clutch and brake energy considerations (Shigley, Mechanical Engineering Design, Ch. 16): E = I1 I2 (w1 - w2)^2/(2 (I1 + I2)), slip time t = I1 I2 (w1 - w2)/(T (I1 + I2)), I = WR^2/g, temperature rise dT = E/(C m) with E in BTU (778.169 ft lb per BTU). One engagement, no cooling. A design aid; the clutch maker's energy rating governs.";
-  const f = [
-    makeNumber("Driving-side inertia WR² (lb ft²)", "cee-wr1", { step: "any", min: "0" }),
-    makeNumber("Driven-side inertia WR² (lb ft²)", "cee-wr2", { step: "any", min: "0" }),
-    makeNumber("Driving-side speed (rpm)", "cee-n1", { step: "any", min: "0" }),
-    makeNumber("Driven-side speed (rpm, 0 from rest)", "cee-n2", { step: "any", min: "0" }),
-    makeNumber("Slip torque of the clutch (lb ft, blank to skip)", "cee-t", { step: "any", min: "0" }),
-    makeNumber("Weight of metal absorbing the heat (lb, blank to skip)", "cee-m", { step: "any", min: "0" }),
-    makeNumber("Specific heat (BTU/lb °F; 0.12 steel or cast iron)", "cee-c", { step: "any", min: "0", value: "0.12" }),
-    makeNumber("Engagements per hour (blank to skip)", "cee-cph", { step: "any", min: "0" }),
-  ];
+  const wr1 = makeNumber("Driving-side inertia WR² (lb ft²)", "cee-wr1", { step: "any", min: "0" });
+  const wr2 = makeNumber("Driven-side inertia WR² (lb ft²)", "cee-wr2", { step: "any", min: "0" });
+  const n1 = makeNumber("Driving-side speed (rpm)", "cee-n1", { step: "any", min: "0" });
+  const n2 = makeNumber("Driven-side speed (rpm, 0 from rest)", "cee-n2", { step: "any", min: "0" });
+  const tq = makeNumber("Slip torque of the clutch (lb ft, blank to skip)", "cee-t", { step: "any", min: "0" });
+  const mass = makeNumber("Weight of metal absorbing the heat (lb, blank to skip)", "cee-m", { step: "any", min: "0" });
+  const cp = makeNumber("Specific heat (BTU/lb °F; 0.12 steel or cast iron)", "cee-c", { step: "any", min: "0", value: "0.12" });
+  const cph = makeNumber("Engagements per hour (blank to skip)", "cee-cph", { step: "any", min: "0" });
+  const f = [wr1, wr2, n1, n2, tq, mass, cp, cph];
   for (const x of f) inputRegion.appendChild(x.wrap);
   const ex = [20, 10, 1800, 0, 100, 15, 0.12, ""];
   attachExampleButton(inputRegion, () => { f.forEach((x, i) => { x.input.value = String(ex[i]); }); update(); });
@@ -1517,7 +1515,7 @@ function renderClutchEngagementEnergy(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "cee-out-note");
   function readNum(i, d) { if (i.value === "") return d; const v = Number(i.value); return Number.isFinite(v) ? v : d; }
   const update = debounce(() => {
-    const r = computeClutchEngagementEnergy({ driver_wr2_lbft2: readNum(f[0].input, 0), driven_wr2_lbft2: readNum(f[1].input, 0), driver_rpm: readNum(f[2].input, 0), driven_rpm: readNum(f[3].input, 0), slip_torque_lbft: readNum(f[4].input, 0), absorbing_weight_lb: readNum(f[5].input, 0), specific_heat_btu_lbf: readNum(f[6].input, 0.12), engagements_per_hour: readNum(f[7].input, 0) });
+    const r = computeClutchEngagementEnergy({ driver_wr2_lbft2: readNum(wr1.input, 0), driven_wr2_lbft2: readNum(wr2.input, 0), driver_rpm: readNum(n1.input, 0), driven_rpm: readNum(n2.input, 0), slip_torque_lbft: readNum(tq.input, 0), absorbing_weight_lb: readNum(mass.input, 0), specific_heat_btu_lbf: readNum(cp.input, 0.12), engagements_per_hour: readNum(cph.input, 0) });
     if (r.error) { oE.textContent = r.error; oN.textContent = "-"; oT.textContent = "-"; oD.textContent = "-"; oH.textContent = "-"; oNote.textContent = ""; return; }
     oE.textContent = fmt(r.energy_ftlb, 0) + " ft-lb (" + fmt(r.energy_btu, 2) + " BTU)";
     oN.textContent = fmt(r.final_rpm, 0) + " rpm";
