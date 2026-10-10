@@ -2,99 +2,99 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "ed56b6ef0eb24c38",
+      "sha": "29fe50bada508b77",
       "date": "2026-10-10"
     },
     "/tools/": {
-      "sha": "a856fbe740814ce7",
+      "sha": "6299c5940722b283",
       "date": "2026-10-10"
     },
     "/collections/disaster-response/": {
-      "sha": "3cd9576395374beb",
+      "sha": "fb2536499df14b94",
       "date": "2026-10-10"
     },
     "/groups/accounting/": {
-      "sha": "1ff786c0486ddf99",
+      "sha": "2d0a0e0541e6bc27",
       "date": "2026-10-10"
     },
     "/groups/agriculture/": {
-      "sha": "38b0c5fde9479439",
+      "sha": "cd79762b8de28100",
       "date": "2026-10-10"
     },
     "/groups/construction/": {
-      "sha": "ff40d896c5af1eb4",
+      "sha": "dffb988e71055fe7",
       "date": "2026-10-10"
     },
     "/groups/cross-trade/": {
-      "sha": "4cc1bc0784823826",
+      "sha": "ba4f0ea809a33662",
       "date": "2026-10-10"
     },
     "/groups/educators/": {
-      "sha": "5eb3a7e99586fd1c",
+      "sha": "7f6a3f78604ca1f8",
       "date": "2026-10-10"
     },
     "/groups/electrical/": {
-      "sha": "140c0b83bb182eaa",
+      "sha": "d1718b254ce415ed",
       "date": "2026-10-10"
     },
     "/groups/field/": {
-      "sha": "f302f083c8f67f47",
+      "sha": "c3476df28a13e471",
       "date": "2026-10-10"
     },
     "/groups/fire-ground/": {
-      "sha": "2309cf08dcf44753",
+      "sha": "33ff31b68f98db1c",
       "date": "2026-10-10"
     },
     "/groups/historical/": {
-      "sha": "290dd52846e3b5eb",
+      "sha": "c2f4fce971a5849d",
       "date": "2026-10-10"
     },
     "/groups/hvac/": {
-      "sha": "bbf4f582631554d5",
+      "sha": "8bcb40fe8bdcbd81",
       "date": "2026-10-10"
     },
     "/groups/kitchen/": {
-      "sha": "c59ff5b37a95cd47",
+      "sha": "b5988202fd72b348",
       "date": "2026-10-10"
     },
     "/groups/lab/": {
-      "sha": "39b523d44339d032",
+      "sha": "346b0b27468d8835",
       "date": "2026-10-10"
     },
     "/groups/mechanic/": {
-      "sha": "7e864ef4bc26cba0",
+      "sha": "0415debea1cf4d4c",
       "date": "2026-10-10"
     },
     "/groups/plumbing/": {
-      "sha": "4f6e099cb010473b",
+      "sha": "337f39a2ec71fdb0",
       "date": "2026-10-10"
     },
     "/groups/real-estate/": {
-      "sha": "1e605d2e487c5f31",
+      "sha": "b3208b387549e7cb",
       "date": "2026-10-10"
     },
     "/groups/references/": {
-      "sha": "792c832cbf53c9d5",
+      "sha": "c5b62d68be2ede72",
       "date": "2026-10-10"
     },
     "/groups/restoration/": {
-      "sha": "bc996f2ac93b8953",
+      "sha": "66f346aa96e4bcc5",
       "date": "2026-10-10"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "5a190663c0c85594",
+      "sha": "8a9307905a18fb02",
       "date": "2026-10-10"
     },
     "/groups/stage/": {
-      "sha": "54ac64c37173f33a",
+      "sha": "10de49c36056c223",
       "date": "2026-10-10"
     },
     "/groups/trucking/": {
-      "sha": "e26689ee40ec5993",
+      "sha": "63e24219d14e274b",
       "date": "2026-10-10"
     },
     "/groups/water/": {
-      "sha": "7a43daf5411e741c",
+      "sha": "73dabed941fa333c",
       "date": "2026-10-10"
     },
     "/tools/aav-install-check/": {
@@ -8198,8 +8198,8 @@
       "date": "2026-09-29"
     },
     "/tools/tonnage-rating-grade/": {
-      "sha": "55ed69943a3e737a",
-      "date": "2026-10-03"
+      "sha": "366bcd9ab63c35b0",
+      "date": "2026-10-10"
     },
     "/tools/tool-maintenance/": {
       "sha": "2de3730ad3716e98",
@@ -8262,8 +8262,12 @@
       "date": "2026-09-29"
     },
     "/tools/train-brake-reduction/": {
-      "sha": "7f0657b63db4c6b4",
-      "date": "2026-10-01"
+      "sha": "a4974c56bffe17a1",
+      "date": "2026-10-10"
+    },
+    "/tools/train-resistance-davis/": {
+      "sha": "d3190533a9ffa3ab",
+      "date": "2026-10-10"
     },
     "/tools/transfer-station-throughput/": {
       "sha": "cf6bbec58d93bf5c",

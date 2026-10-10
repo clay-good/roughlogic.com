@@ -705,7 +705,7 @@ export const TOOL_MODULES = (() => {
   // spec-v1539..v1545: the railroad track and equipment bench, a trade the
   // catalog served with zero tiles. All seven keep group "E".
   declare("./calc-rail.js", "RAIL_RENDERERS", [
-    "railcar-load-limit", "tonnage-rating-grade", "train-brake-reduction", "clearance-plate-envelope",
+    "railcar-load-limit", "tonnage-rating-grade", "train-resistance-davis", "train-brake-reduction", "clearance-plate-envelope",
     "track-superelevation", "degree-of-curve", "cwr-neutral-temperature",
     "rail-wear-condemning-limit", "track-warp-fra-class",
     "ballast-section-volume", "turnout-frog-lead",

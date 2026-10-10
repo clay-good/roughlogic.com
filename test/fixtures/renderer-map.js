@@ -879,6 +879,7 @@ export const RENDERER_MAP = {
   "well-shock-chlorination": { module: "../../calc-disinfect.js", exportName: "DISINFECT_RENDERERS" },
   "railcar-load-limit": { module: "../../calc-rail.js", exportName: "RAIL_RENDERERS" },
   "tonnage-rating-grade": { module: "../../calc-rail.js", exportName: "RAIL_RENDERERS" },
+  "train-resistance-davis": { module: "../../calc-rail.js", exportName: "RAIL_RENDERERS" },
   "train-brake-reduction": { module: "../../calc-rail.js", exportName: "RAIL_RENDERERS" },
   "clearance-plate-envelope": { module: "../../calc-rail.js", exportName: "RAIL_RENDERERS" },
   "track-superelevation": { module: "../../calc-rail.js", exportName: "RAIL_RENDERERS" },

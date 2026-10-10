@@ -110280,7 +110280,7 @@
   },
   {
    "term": "train resistance lb per ton",
-   "target": "tonnage-rating-grade",
+   "target": "train-resistance-davis",
    "kind": "industry"
   },
   {
@@ -117056,6 +117056,36 @@
   {
    "term": "what time is solar noon",
    "target": "solar-time-correction",
+   "kind": "question"
+  },
+  {
+   "term": "davis formula train resistance",
+   "target": "train-resistance-davis",
+   "kind": "industry"
+  },
+  {
+   "term": "modified davis equation",
+   "target": "train-resistance-davis",
+   "kind": "industry"
+  },
+  {
+   "term": "davis equation",
+   "target": "train-resistance-davis",
+   "kind": "industry"
+  },
+  {
+   "term": "train rolling resistance",
+   "target": "train-resistance-davis",
+   "kind": "industry"
+  },
+  {
+   "term": "railcar rolling resistance",
+   "target": "train-resistance-davis",
+   "kind": "industry"
+  },
+  {
+   "term": "how much horsepower to pull a train",
+   "target": "train-resistance-davis",
    "kind": "question"
   }
  ]

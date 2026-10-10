@@ -1787,6 +1787,7 @@ const RELATED = {
   "tilt-up-brace-load": ["tilt-up-lift-stress","wind-pressure","shore-post-load"],
   "railcar-load-limit": ["tonnage-rating-grade","clearance-plate-envelope","freight-density"],
   "tonnage-rating-grade": ["railcar-load-limit","haul-road-resistance","train-brake-reduction"],
+  "train-resistance-davis": ["tonnage-rating-grade","haul-road-resistance","railcar-load-limit"],
   "train-brake-reduction": ["tonnage-rating-grade","railcar-load-limit","air-brake-pushrod-stroke"],
   "clearance-plate-envelope": ["degree-of-curve","railcar-load-limit","track-superelevation"],
   // spec-v1610..v1615: the 2026-09-08 traffic, work zone, and pavement band.

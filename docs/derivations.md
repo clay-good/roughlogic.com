@@ -3204,6 +3204,7 @@ cross-check.
 | calc-rail.js | `computeTrackSuperelevation` | `{ degree_of_curve = 0, speed_mph = 0, actual_elevation_in = 0, allowable_unba...` | _ | _ | _ |
 | calc-rail.js | `computeTrackWarp` | `{ measured_a_in = 0, designed_a_in = 0, measured_b_in = 0, designed_b_in = 0,...` | _ | _ | _ |
 | calc-rail.js | `computeTrainBrakeReduction` | `{ charged_pressure_psi = 90, reduction_psi = 0, cylinder_ratio = 2.5, full_se...` | _ | _ | _ |
+| calc-rail.js | `computeTrainResistanceDavis` | `{ car_weight_tons = 0, axles_per_car = 4, speed_mph = 0, air_coefficient = 0....` | _ | _ | _ |
 | calc-rail.js | `computeTurnoutFrogGeometry` | `{ frog_number = 0, distance_beyond_frog_ft = 0, required_separation_ft = 0, l...` | _ | _ | _ |
 | calc-realestate.js | `compute1031Timeline` | `{ sale_close_iso }` | _ | _ | _ |
 | calc-realestate.js | `computeAmortizationSchedule` | `{ principal, apr_percent, term_years, extra_monthly_principal }` | _ | _ | _ |
@@ -3930,7 +3931,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2514.
+Row count: 2515.
 
 <!-- END function-corpus-v14 -->
 
@@ -5601,7 +5602,7 @@ per spec-v14 §13.1 second paragraph.
 | `tool-maintenance` | Tool Maintenance Intervals | Project bundled tool maintenance sche...; Reference compute returns the per-attribute table; runner... | [docs/v6-audit.md](v6-audit.md) (reference cadence) |
 | `triage-quickread` | Field First Aid Triage Quick-Read | START / SALT triage protocols (projec...; Returns 4 categories + notice + citation; tested on the n... | [docs/v6-audit.md](v6-audit.md) (reference cadence) |
 
-### Group J Trucking (56 tiles)
+### Group J Trucking (57 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -5656,6 +5657,7 @@ per spec-v14 §13.1 second paragraph.
 | `tonnage-rating-grade` | Locomotive Tonnage Rating on a Ruling Grade | Project (first-principles); the standards named in the tile citation govern; recomput... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `trailer-tongue-weight` | Trailer Tongue Weight and Sway Check | NHTSA / SAE J2807 towing tongue-weigh...; spec-v486 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `train-brake-reduction` | Train Air Brake Reduction and Cylinder Pressure | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+4 more) |
+| `train-resistance-davis` | Train Resistance on Level Track (Davis Formulas) | Project (first-principles); w = 33 tons per axle: 0.6 + 20/33 + 0.01 x 30 + 0.07 x 90... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `transfer-station-throughput` | Transfer Station Throughput and Trailer Loadout | Project (first-principles); the facility's scale records govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `truck-off-tracking` | Low-Speed Off-Tracking (Swept Path) | AASHTO Green Book (low-speed off-trac...; OT = 50 - sqrt(2500 - 400) = 50 - 45.826 = 4.174 ft; effe... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `truck-startability` | Truck Startable Grade (Traction Limit) | Traction-limited gradeability (first-...; drive fraction 34000/80000 = 0.425; grade = 100 (0.6 x 0.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -6363,6 +6365,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 
-Tile count: 2260. Fixture-covered or reference-cadence: 2260 / 2260.
+Tile count: 2261. Fixture-covered or reference-cadence: 2261 / 2261.
 
 <!-- END tile-index-v14 -->

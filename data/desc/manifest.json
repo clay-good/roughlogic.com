@@ -104,7 +104,7 @@
     {
       "file": "t.json",
       "name": "Tile descriptions after the opening sentence, t runtime shard (generated)",
-      "gzip_size_bytes": 40134
+      "gzip_size_bytes": 40315
     },
     {
       "file": "u.json",
@@ -152,7 +152,7 @@
     "q.json": "a83d9062334d0d6fd4ff7ddffcbf0778411f275d092c331e78c04f57565af3a7",
     "r.json": "fa8f0c06d824e34cb10869dbc618a66c5f7775e4d715508f78a7c44b1963c628",
     "s.json": "b6df53c37c698ff064a96afa55d11942ea4b07b9e28367b7741686b0b7c8d8bf",
-    "t.json": "b5916cf61e16d506b5c2b2941bba5e1390b3c04c17ee3052022d55ea7820f777",
+    "t.json": "10e385bdae07135ae395547ed0e1b8be80e6d83d56ce129f4373257aa9f3099b",
     "u.json": "1ef4efbedf72e2f7e7679cade3e511adbac4d0859361e8b7e77561daf95b5e08",
     "v.json": "79f42da546338997866b6f5e22ce899ad1adcb06f06ca56e34db6aafbb7d5338",
     "w.json": "0e6be649e5489cbba1e95ed5351da6722d9897bd2360393e7add6d5bce5feb33",

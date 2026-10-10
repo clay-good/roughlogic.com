@@ -59388,3 +59388,34 @@ test("bounds: solar-time-correction reproduces Duffie and Beckman Example 1.5.1 
     assert.ok("error" in _stc({ clock_hour: 10, clock_minute: 30, day_of_year: 34, longitude_deg: -89.4, utc_offset_hours: -6, ...bad }), JSON.stringify(bad));
   }
 });
+
+import { computeTrainResistanceDavis as _trd, computeTonnageRatingGrade as _trdTon } from "../../calc-rail.js";
+test("bounds: train-resistance-davis matches the three named forms and Szanto's RP-548 table", () => {
+  const r = _trd({ car_weight_tons: 132, axles_per_car: 4, speed_mph: 30, air_coefficient: 0.07, cars: 100 });
+  assert.ok(Math.abs(r.resistance_lb_per_ton - (0.6 + 20 / 33 + 0.3 + 0.07 * 900 / 132)) < 1e-12);
+  assert.ok(Math.abs(r.rp548_lb_per_ton - (1.3 + 72.5 / 132 + 0.015 * 30 + 0.055 * 900 / 132)) < 1e-12);
+  assert.ok(Math.abs(r.davis_1926_lb_per_ton - (1.3 + 29 / 33 + 0.045 * 30 + 0.0005 * 110 * 900 / 132)) < 1e-12);
+  assert.ok(Math.abs(r.train_resistance_lb - r.resistance_lb_per_ton * 132 * 100) < 1e-6);
+  assert.ok(Math.abs(r.power_hp - r.train_resistance_lb * 30 / 375) < 1e-9);
+  // Szanto (CORE 2016) Table 1, RP-548, 80 tonne four-axle wagon, N per tonne.
+  const tons = 80 / 0.90718474, nPerTonne = 4.4482216 / 0.90718474;
+  for (const [kmh, printed] of [[20, 11.9], [80, 21.7], [100, 26.9]]) {
+    const v = _trd({ car_weight_tons: tons, speed_mph: kmh / 1.609344 }).rp548_lb_per_ton * nPerTonne;
+    assert.ok(Math.abs(v / printed - 1) < 0.015, kmh + " km/h: " + v);
+  }
+  // Same table, empty 20 tonne wagon at 100 km/h: 74.4 N/t.
+  assert.ok(Math.abs(_trd({ car_weight_tons: 20 / 0.90718474, speed_mph: 100 / 1.609344 }).rp548_lb_per_ton * nPerTonne / 74.4 - 1) < 0.015);
+  // An empty car shows more lb/ton but fewer lb than the same car loaded.
+  const empty = _trd({ car_weight_tons: 30, speed_mph: 50 }), loaded = _trd({ car_weight_tons: 132, speed_mph: 50 });
+  assert.ok(empty.resistance_lb_per_ton > loaded.resistance_lb_per_ton && empty.car_resistance_lb < loaded.car_resistance_lb);
+  // Resistance rises with speed, and the 1926 journal-bearing form sits above both later ones.
+  assert.ok(_trd({ car_weight_tons: 132, speed_mph: 60 }).resistance_lb_per_ton > loaded.resistance_lb_per_ton);
+  assert.ok(r.davis_1926_lb_per_ton > r.rp548_lb_per_ton && r.rp548_lb_per_ton > r.resistance_lb_per_ton);
+  // Its result is the rolling resistance tonnage-rating-grade takes.
+  const t = _trdTon({ tractive_effort_lb: 140000, ruling_grade_pct: 1, rolling_resistance_lb_per_ton: r.resistance_lb_per_ton });
+  assert.ok(Math.abs(t.total_resistance_lb_per_ton - (20 + r.resistance_lb_per_ton)) < 1e-12);
+  const ok = { car_weight_tons: 132, axles_per_car: 4, speed_mph: 30, air_coefficient: 0.07, cars: 100 };
+  for (const bad of [{ car_weight_tons: 0 }, { car_weight_tons: -132 }, { car_weight_tons: 132000 }, { axles_per_car: 0 }, { axles_per_car: 4.5 }, { speed_mph: -30 }, { speed_mph: 30000 }, { air_coefficient: 0 }, { air_coefficient: 7 }, { cars: 0 }, { cars: 1.5 }, { cars: 100000 }]) {
+    assert.ok("error" in _trd({ ...ok, ...bad }), JSON.stringify(bad));
+  }
+});

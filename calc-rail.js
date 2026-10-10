@@ -630,7 +630,7 @@ export function computeTonnageRatingGrade({ tractive_effort_lb = 0, ruling_grade
     level_resistance_lb_per_ton, level_tonnage_tons, grade_penalty_x,
     alternate_grade_pct, alternate_resistance_lb_per_ton, alternate_tonnage_tons,
     drivers_needed_for_te_lb, adhesion_verdict,
-    note: "Twenty pounds per ton per percent of grade is the number to carry: it is just the component of weight along the slope, and it dwarfs everything else on the list. On the level a train resists at three to five pounds per ton; put it on a one percent grade and grade resistance alone adds twenty, so a modest hill multiplies the required pull several times over. THAT IS WHY THE RULING GRADE SETS THE TRAIN. The steepest sustained grade on the route, curve resistance included, determines the tonnage rating for the whole run, and a single short hill sets the makeup for hundreds of level miles behind it. Curvature adds about eight tenths of a pound per ton per degree, which is small beside a grade and large beside nothing, and it belongs in the ruling grade calculation rather than beside it. THE SECOND CONSTRAINT IS ADHESION AND IT IS A SEPARATE CEILING. A locomotive cannot deliver more tractive effort than friction between wheel and rail allows -- roughly twenty five to thirty five percent of the weight on its drivers with modern adhesion control, and much less on wet, leafy, or contaminated rail. The rating follows whichever of the two is LOWER, and which one governs is reported here in words, because it is easy to compute an adhesion limit, find it larger than the consist's own tractive effort, and mistakenly use it. A tonnage rating that assumes tractive effort the locomotives cannot put down is a train that stalls, and the fall-back on a rated hill is helpers or doubling the hill -- both planned from this same arithmetic. A steady-state rating at constant speed. It does not address acceleration, starting resistance -- which is higher than running resistance and is why a train that stalls may be unable to restart on a grade -- train dynamics, slack action, or drawbar and coupler limits, which cap how much tonnage may be pulled behind a given point regardless of power. It does not compute the Davis or any other speed-dependent resistance formula: rolling resistance is entered, and it rises at low speed and again at high speed. It says nothing about braking, dynamic brake capacity, or the descending side of the hill, which is a different and often harder problem. The railroad's own tonnage tables, the locomotive builder's tractive effort curves, and the operating department govern.",
+    note: "Twenty pounds per ton per percent of grade is the number to carry: it is just the component of weight along the slope, and it dwarfs everything else on the list. On the level a train resists at three to five pounds per ton; put it on a one percent grade and grade resistance alone adds twenty, so a modest hill multiplies the required pull several times over. THAT IS WHY THE RULING GRADE SETS THE TRAIN. The steepest sustained grade on the route, curve resistance included, determines the tonnage rating for the whole run, and a single short hill sets the makeup for hundreds of level miles behind it. Curvature adds about eight tenths of a pound per ton per degree, which is small beside a grade and large beside nothing, and it belongs in the ruling grade calculation rather than beside it. THE SECOND CONSTRAINT IS ADHESION AND IT IS A SEPARATE CEILING. A locomotive cannot deliver more tractive effort than friction between wheel and rail allows -- roughly twenty five to thirty five percent of the weight on its drivers with modern adhesion control, and much less on wet, leafy, or contaminated rail. The rating follows whichever of the two is LOWER, and which one governs is reported here in words, because it is easy to compute an adhesion limit, find it larger than the consist's own tractive effort, and mistakenly use it. A tonnage rating that assumes tractive effort the locomotives cannot put down is a train that stalls, and the fall-back on a rated hill is helpers or doubling the hill -- both planned from this same arithmetic. A steady-state rating at constant speed. It does not address acceleration, starting resistance -- which is higher than running resistance and is why a train that stalls may be unable to restart on a grade -- train dynamics, slack action, or drawbar and coupler limits, which cap how much tonnage may be pulled behind a given point regardless of power. Rolling resistance is entered, and it rises at low speed and again at high speed; train-resistance-davis computes it from the car weight, axles and speed. It says nothing about braking, dynamic brake capacity, or the descending side of the hill, which is a different and often harder problem. The railroad's own tonnage tables, the locomotive builder's tractive effort curves, and the operating department govern.",
   };
 }
 const tonnageRatingGradeExample = { inputs: { tractive_effort_lb: 140000, ruling_grade_pct: 1.2, rolling_resistance_lb_per_ton: 3, curve_degrees: 3, weight_on_drivers_lb: 1680000, adhesion_factor: 0.3, alternate_grade_pct: 0.5 } };
@@ -656,6 +656,65 @@ RAIL_RENDERERS["tonnage-rating-grade"] = _simpleRenderer({
     { key: "n", id: "trg-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeTonnageRatingGrade,
+});
+
+// ============ spec-v1957: train resistance on level tangent track (Davis) ============
+//
+// tonnage-rating-grade takes rolling resistance as entered. The Davis family
+// computes it: a constant, a per-axle journal term that falls with axle load, a
+// term linear in speed, and an air term that does not depend on weight at all.
+// dims: in { car_weight_tons: M, axles_per_car: dimensionless, speed_mph: L T^-1, air_coefficient: dimensionless, cars: dimensionless } out: { resistance_lb_per_ton: M L T^-2, axle_term_lb_per_ton: M L T^-2, speed_term_lb_per_ton: M L T^-2, air_term_lb_per_ton: M L T^-2, car_resistance_lb: M L T^-2, train_resistance_lb: M L T^-2, power_hp: M L^2 T^-3, equivalent_grade_pct: dimensionless, rp548_lb_per_ton: M L T^-2, davis_1926_lb_per_ton: M L T^-2 }
+export function computeTrainResistanceDavis({ car_weight_tons = 0, axles_per_car = 4, speed_mph = 0, air_coefficient = 0.07, cars = 1 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(car_weight_tons > 0 && car_weight_tons <= 400)) return { error: "Enter the gross weight of one car in tons (up to 400)." };
+  if (!(Number.isInteger(axles_per_car) && axles_per_car >= 2 && axles_per_car <= 12)) return { error: "Axles per car must be a whole number from 2 to 12." };
+  if (!(speed_mph >= 0 && speed_mph <= 150)) return { error: "Speed must be between 0 and 150 mph." };
+  if (!(air_coefficient > 0 && air_coefficient <= 1)) return { error: "The air coefficient K must be greater than zero and no more than 1 (0.07 conventional, 0.0935 containers, 0.16 trailers on flat cars)." };
+  if (!(Number.isInteger(cars) && cars >= 1 && cars <= 1000)) return { error: "Cars must be a whole number from 1 to 1,000." };
+  const w = car_weight_tons / axles_per_car;
+  const v2_over_wn = speed_mph * speed_mph / car_weight_tons;
+  // Modified Davis (1970): R = 0.6 + 20/w + 0.01 V + K V^2 / (w n), lb per ton.
+  const axle_term_lb_per_ton = 20 / w;
+  const speed_term_lb_per_ton = 0.01 * speed_mph;
+  const air_term_lb_per_ton = air_coefficient * v2_over_wn;
+  const resistance_lb_per_ton = 0.6 + axle_term_lb_per_ton + speed_term_lb_per_ton + air_term_lb_per_ton;
+  // AAR RP-548 prints 72.5/(w n) for a four-axle car: 18.125 lb per axle.
+  const rp548_lb_per_ton = 1.3 + (72.5 / 4) / w + 0.015 * speed_mph + 0.055 * v2_over_wn;
+  // Davis (1926), freight cars, at the 110 sq ft frontal area RP-548 carries.
+  const davis_1926_lb_per_ton = 1.3 + 29 / w + 0.045 * speed_mph + 0.0005 * 110 * v2_over_wn;
+  const car_resistance_lb = resistance_lb_per_ton * car_weight_tons;
+  const train_resistance_lb = car_resistance_lb * cars;
+  const power_hp = train_resistance_lb * speed_mph / 375;
+  const equivalent_grade_pct = resistance_lb_per_ton / _GRADE_RESISTANCE_LB_PER_TON_PER_PCT;
+  if (![resistance_lb_per_ton, rp548_lb_per_ton, davis_1926_lb_per_ton, train_resistance_lb, power_hp].every(Number.isFinite)) return { error: "Train resistance math is not a finite value." };
+  return {
+    resistance_lb_per_ton, axle_term_lb_per_ton, speed_term_lb_per_ton, air_term_lb_per_ton,
+    car_resistance_lb, train_resistance_lb, power_hp, equivalent_grade_pct,
+    rp548_lb_per_ton, davis_1926_lb_per_ton, axle_load_tons: w, cars,
+    note: "The resistance of freight cars rolling at steady speed on level, straight track, by the Davis family of formulas. Each has four parts: a constant, a per-axle term that is divided by the axle load, a term that rises with speed, and an air term that rises with the square of speed and does not depend on weight at all. That last point drives everything: the result is in pounds per TON, so an empty car shows a far higher figure than a loaded one at the same speed, while its pounds of resistance are lower. Read the pounds for the train, not the pounds per ton, when comparing consists. The answer is the 1970 modified Davis form, R = 0.6 + 20/w + 0.01 V + K V^2/(w n), with w the tons per axle, n the axles per car and K the air coefficient: 0.07 for conventional equipment, 0.0935 for containers, 0.16 for trailers on flat cars. Two others are shown beside it because published constants disagree and the choice moves the answer: the AAR RP-548 form, 1.3 + 72.5/(w n) + 0.015 V + 0.055 V^2/(w n) as printed for a four-axle car, and the original 1926 Davis form for freight cars, 1.3 + 29/w + 0.045 V + 0.0005 A V^2/(w n) at A = 110 sq ft, which was fitted to journal-bearing cars and runs high for roller bearings. The result feeds tonnage-rating-grade as its rolling resistance. Every car is taken as identical; for a mixed train, run each block and add the pounds. It does not include the locomotives (their own formula and a much larger air term), grade (20 lb per ton per percent), curvature, starting resistance, wind, or cold-weather bearing drag. These are empirical fits with a spread on the order of 20%; the railroad's own train-performance data governs.",
+  };
+}
+const trainResistanceDavisExample = { inputs: { car_weight_tons: 132, axles_per_car: 4, speed_mph: 30, air_coefficient: 0.07, cars: 100 } };
+RAIL_RENDERERS["train-resistance-davis"] = _simpleRenderer({
+  citation: "Citation: the Davis train resistance formulas by name -- W. J. Davis Jr., The Tractive Resistance of Electric Locomotives and Cars (General Electric Review, 1926), R = 1.3 + 29/w + 0.045 V + 0.0005 A V^2/(w n) for freight cars; the 1970 modified Davis form R = 0.6 + 20/w + 0.01 V + K V^2/(w n) carried in the AREMA Manual for Railway Engineering, Chapter 16; and AAR RP-548, R = 1.3 + 72.5/(w n) + 0.015 V + 0.055 V^2/(w n). Pounds per ton, w in tons per axle, V in mph. Level tangent track at steady speed, cars only. Empirical, with a spread on the order of 20%; the railroad's own data governs.",
+  example: trainResistanceDavisExample.inputs,
+  fields: [
+    { key: "car_weight_tons", label: "Gross weight of one car (tons)", kind: "number" },
+    { key: "axles_per_car", label: "Axles per car", kind: "number", default: 4, attrs: { step: "1", min: "2", max: "12" } },
+    { key: "speed_mph", label: "Speed (mph)", kind: "number" },
+    { key: "air_coefficient", label: "Air coefficient K (0.07 conventional, 0.0935 container, 0.16 trailer)", kind: "number", default: 0.07 },
+    { key: "cars", label: "Cars in the train", kind: "number", default: 1, attrs: { step: "1", min: "1", max: "1000" } },
+  ],
+  outputs: [
+    { key: "r", id: "trd-out-r", label: "Resistance (modified Davis)", value: (r) => fmt(r.resistance_lb_per_ton, 2) + " lb/ton -- constant 0.6, axle " + fmt(r.axle_term_lb_per_ton, 2) + ", speed " + fmt(r.speed_term_lb_per_ton, 2) + ", air " + fmt(r.air_term_lb_per_ton, 2) },
+    { key: "t", id: "trd-out-t", label: "Pull to hold that speed", value: (r) => fmt(r.train_resistance_lb, 0) + " lb for " + fmt(r.cars, 0) + " car(s), " + fmt(r.car_resistance_lb, 0) + " lb each" },
+    { key: "p", id: "trd-out-p", label: "Power at the rail", value: (r) => fmt(r.power_hp, 0) + " hp" },
+    { key: "g", id: "trd-out-g", label: "Same as a grade of", value: (r) => fmt(r.equivalent_grade_pct, 3) + "%" },
+    { key: "a", id: "trd-out-a", label: "AAR RP-548 form", value: (r) => fmt(r.rp548_lb_per_ton, 2) + " lb/ton" },
+    { key: "d", id: "trd-out-d", label: "Original Davis (1926, 110 sq ft)", value: (r) => fmt(r.davis_1926_lb_per_ton, 2) + " lb/ton" },
+    { key: "n", id: "trd-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeTrainResistanceDavis,
 });
 
 // ============ spec-v1548: train air brake reduction ============

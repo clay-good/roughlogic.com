@@ -1301,6 +1301,7 @@ const _TILES = [
   ["tilt-up-brace-load", "E"],
   ["railcar-load-limit", "J"],
   ["tonnage-rating-grade", "J"],
+  ["train-resistance-davis", "J"],
   ["train-brake-reduction", "J"],
   ["clearance-plate-envelope", "J"],
   // spec-v1610..v1615 traffic, work zone, and pavement band

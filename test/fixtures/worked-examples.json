@@ -170766,6 +170766,96 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "train-resistance-davis",
+  "source_publisher": "Project (first-principles)",
+  "source_title": "A hundred 132-ton four-axle cars at 30 mph, modified Davis",
+  "source_edition_or_year": "arithmetic on the named formula",
+  "source_section_or_page": "w = 33 tons per axle: 0.6 + 20/33 + 0.01 x 30 + 0.07 x 900/132 = 0.6 + 0.606 + 0.300 + 0.477 = 1.983 lb/ton; x 132 tons = 261.8 lb per car, 26,180 lb for 100 cars; x 30/375 = 2,094 hp; 1.983/20 = 0.099% grade",
+  "verified_by": "rl",
+  "verified_on": "2026-10-10",
+  "inputs": {
+   "car_weight_tons": 132,
+   "axles_per_car": 4,
+   "speed_mph": 30,
+   "air_coefficient": 0.07,
+   "cars": 100
+  },
+  "outputs": {
+   "resistance_lb_per_ton": {
+    "value": 1.9833,
+    "tolerance": {
+     "pct": 0.1
+    }
+   },
+   "train_resistance_lb": {
+    "value": 26180,
+    "tolerance": {
+     "pct": 0.1
+    }
+   },
+   "power_hp": {
+    "value": 2094.4,
+    "tolerance": {
+     "pct": 0.1
+    }
+   },
+   "equivalent_grade_pct": {
+    "value": 0.09917,
+    "tolerance": {
+     "pct": 0.1
+    }
+   }
+  }
+ },
+ {
+  "tile_id": "train-resistance-davis",
+  "source_publisher": "Conference on Railway Excellence (RTSA)",
+  "source_title": "F. Szanto, Rolling Resistance Revisited",
+  "source_edition_or_year": "CORE 2016, Melbourne (rosap.ntl.bts.gov/view/dot/79083)",
+  "source_section_or_page": "Table 1, Resistance components for 80 tonne wagon as per AAR RP-548: 20 km/h, 80 t, R' = 11.9 N/t. Converted: 80 t = 88.185 short tons, 20 km/h = 12.427 mph, 1 lb/ton = 4.9033 N/t, so 11.9 N/t = 2.427 lb/ton. The paper rounds its metric constants (6.5, 320, 0.046, 0.096, g = 10), hence the 1.5% tolerance.",
+  "verified_by": "rl",
+  "verified_on": "2026-10-10",
+  "inputs": {
+   "car_weight_tons": 88.1849,
+   "axles_per_car": 4,
+   "speed_mph": 12.4274,
+   "air_coefficient": 0.07,
+   "cars": 1
+  },
+  "outputs": {
+   "rp548_lb_per_ton": {
+    "value": 2.427,
+    "tolerance": {
+     "pct": 1.5
+    }
+   }
+  }
+ },
+ {
+  "tile_id": "train-resistance-davis",
+  "source_publisher": "Conference on Railway Excellence (RTSA)",
+  "source_title": "F. Szanto, Rolling Resistance Revisited",
+  "source_edition_or_year": "CORE 2016, Melbourne (rosap.ntl.bts.gov/view/dot/79083)",
+  "source_section_or_page": "Table 1, Resistance components for 80 tonne wagon as per AAR RP-548: 100 km/h, 80 t, R' = 26.9 N/t. Converted: 80 t = 88.185 short tons, 100 km/h = 62.137 mph, 1 lb/ton = 4.9033 N/t, so 26.9 N/t = 5.486 lb/ton. The paper rounds its metric constants (6.5, 320, 0.046, 0.096, g = 10), hence the 1.5% tolerance.",
+  "verified_by": "rl",
+  "verified_on": "2026-10-10",
+  "inputs": {
+   "car_weight_tons": 88.1849,
+   "axles_per_car": 4,
+   "speed_mph": 62.1371,
+   "air_coefficient": 0.07,
+   "cars": 1
+  },
+  "outputs": {
+   "rp548_lb_per_ton": {
+    "value": 5.486,
+    "tolerance": {
+     "pct": 1.5
+    }
+   }
+  }
  }
  ]
 }

@@ -24195,8 +24195,21 @@ export const CITATIONS = {
     editionNote: "Twenty pounds per ton per percent of grade is just the component of weight along the slope, and it dwarfs everything else: on the level a train resists at three to five pounds per ton, and a one percent grade adds twenty. That is why the ruling grade sets the tonnage rating for a whole run and why a single short hill sets the makeup for hundreds of level miles. THE SECOND CONSTRAINT IS ADHESION AND IT IS A SEPARATE CEILING -- the rating follows whichever of the two is lower, and which one governs is reported in words, because it is easy to compute an adhesion limit, find it larger than the consist's own tractive effort, and mistakenly use it.",
     assumptions: [
       { name: "Steady state at constant speed", value: "no acceleration, starting resistance, slack action or drawbar limits", source: "the operating department" },
-      { name: "Rolling resistance is entered", value: "it rises at low speed and again at high speed; no Davis formula is applied", source: "the railroad's own data" },
+      { name: "Rolling resistance is entered", value: "it rises at low speed and again at high speed; train-resistance-davis computes it by the Davis formulas", source: "the railroad's own data; train-resistance-davis" },
       { name: "Nothing about braking", value: "the descending side of the hill is a different and often harder problem", source: "the railroad's train handling rules" },
+    ],
+  },
+  "train-resistance-davis": {
+    formula: "Pounds per ton, w = tons per axle, n = axles per car, V = mph. Modified Davis (1970): R = 0.6 + 20/w + 0.01 V + K V^2/(w n), K = 0.07 conventional, 0.0935 containers, 0.16 trailers on flat cars. AAR RP-548: R = 1.3 + 72.5/(w n) + 0.015 V + 0.055 V^2/(w n), printed for a four-axle car and applied as 18.125 lb per axle. Davis (1926), freight cars: R = 1.3 + 29/w + 0.045 V + 0.0005 A V^2/(w n), shown at A = 110 sq ft. Train pull = R x car tons x cars; power at the rail = pull x V/375; equivalent grade in % = R/20.",
+    edition: "W. J. Davis Jr., The Tractive Resistance of Electric Locomotives and Cars, General Electric Review, 1926; the 1970 modified Davis equation as carried in the AREMA Manual for Railway Engineering, Chapter 16; AAR Recommended Practice RP-548. All cited by name.",
+    freeAccess: "The 1926 and RP-548 forms were read from F. Szanto, Rolling Resistance Revisited, Conference on Railway Excellence, Melbourne, 2016, eqs. 1 and 2, free at rosap.ntl.bts.gov/view/dot/79083. Its Table 1 lists RP-548 for an 80 tonne four-axle wagon as 11.9, 21.7 and 26.9 N per tonne at 20, 80 and 100 km/h; this tile gives 11.8, 21.6 and 26.8 (the paper rounds its metric constants). The 1970 form and its K values are the widely published ones and were not read from the AREMA Manual itself.",
+    governance: GOVERNANCE.general,
+    editionNote: "The air term does not depend on weight, so pounds per ton rises sharply for an empty car while its pounds of resistance fall; compare trains in pounds. The 1926 constants were fitted to journal-bearing cars and run high for roller bearings. The 1977 FRA review of these formulas puts the spread at about 20%, and the paper cited here argues the speed term is near zero in practice. Cars only: locomotive resistance, grade, curvature, starting resistance and wind are separate.",
+    assumptions: [
+      { name: "Identical cars", value: "one weight and axle count for the whole train; run mixed blocks separately and add the pounds", source: "scope of this tile" },
+      { name: "RP-548 axle term", value: "72.5/(w n) for four axles, taken as 18.125 lb per axle for other counts", source: "Szanto (2016) eq. 2" },
+      { name: "1926 frontal area", value: "110 sq ft, the area RP-548 carries", source: "Szanto (2016)" },
+      { name: "Level tangent track, steady speed", value: "no grade, curve, acceleration or wind", source: "scope of this tile" },
     ],
   },
   "train-brake-reduction": {

@@ -458,7 +458,7 @@
     {"term":"railcar cube versus weight","target":"railcar-load-limit","kind":"industry"},
     {"term":"locomotive tonnage rating","target":"tonnage-rating-grade","kind":"industry"},
     {"term":"ruling grade tonnage","target":"tonnage-rating-grade","kind":"industry"},
-    {"term":"train resistance lb per ton","target":"tonnage-rating-grade","kind":"industry"},
+    {"term":"train resistance lb per ton","target":"train-resistance-davis","kind":"industry"},
     {"term":"adhesion limited tractive effort","target":"tonnage-rating-grade","kind":"industry"},
     {"term":"helper district tonnage","target":"tonnage-rating-grade","kind":"industry"},
     {"term":"train air brake reduction","target":"train-brake-reduction","kind":"industry"},
@@ -495,6 +495,12 @@
     {"term":"pod type i ii iii","target":"pod-site-configuration","kind":"industry"},
     {"term":"pod lanes staff","target":"pod-site-configuration","kind":"industry"},
     {"term":"drive through distribution site","target":"pod-site-configuration","kind":"industry"},
-    {"term":"how many pods do we need","target":"pod-site-configuration","kind":"industry"}
+    {"term":"how many pods do we need","target":"pod-site-configuration","kind":"industry"},
+    {"term":"davis formula train resistance","target":"train-resistance-davis","kind":"industry"},
+    {"term":"modified davis equation","target":"train-resistance-davis","kind":"industry"},
+    {"term":"davis equation","target":"train-resistance-davis","kind":"industry"},
+    {"term":"train rolling resistance","target":"train-resistance-davis","kind":"industry"},
+    {"term":"railcar rolling resistance","target":"train-resistance-davis","kind":"industry"},
+    {"term":"how much horsepower to pull a train","target":"train-resistance-davis","kind":"question"}
   ]
 }

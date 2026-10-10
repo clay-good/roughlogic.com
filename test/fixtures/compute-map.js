@@ -2034,6 +2034,7 @@ export const COMPUTE_MAP = {
   "tilt-up-brace-load": { module: "../../calc-concreteplacement.js", fn: "computeTiltUpBraceLoad" },
   "railcar-load-limit": { module: "../../calc-rail.js", fn: "computeRailcarLoadLimit" },
   "tonnage-rating-grade": { module: "../../calc-rail.js", fn: "computeTonnageRatingGrade" },
+  "train-resistance-davis": { module: "../../calc-rail.js", fn: "computeTrainResistanceDavis" },
   "train-brake-reduction": { module: "../../calc-rail.js", fn: "computeTrainBrakeReduction" },
   "clearance-plate-envelope": { module: "../../calc-rail.js", fn: "computeClearancePlateEnvelope" },
   "square-to-round-development": { module: "../../calc-metalair.js", fn: "computeSquareToRoundDevelopment" },
