@@ -287,7 +287,7 @@
       "covers": "calendar year",
       "where": "data/accounting/se-tax-parameters.json; SE_TAX_PARAMETERS",
       "last_verified": "2026-09-02",
-      "verification_note": "Announced with the annual COLA. 2026 is $184,500; the bundled value was $183,600 until 2026-09-02. ssa.gov 403s an automated fetch -- irs.gov/taxtopics/tc751 carries the same figure. 2026-10-10: irs.gov/taxtopics/tc751 (last reviewed 2026-09-24) still reads \"For earnings in 2026, this base limit is $184,500\" and names no 2027 figure; SSA announces the 2027 base with the COLA on 2026-10-14. last_verified is deliberately NOT advanced: a stamp dated after this year's publication month would silence the recheck warning before the 2027 figure exists to be read. Advance it only after reading the 2027 base, on or after 2026-10-14."
+      "verification_note": "Announced with the annual COLA. 2026 is $184,500; the bundled value was $183,600 until 2026-09-02. ssa.gov 403s an automated fetch -- irs.gov/taxtopics/tc751 carries the same figure."
     },
     {
       "id": "fhfa-conforming-loan-limit",
