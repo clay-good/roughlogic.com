@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "9aa660bca9130c8f",
+      "sha": "315a8710bc0da003",
       "date": "2026-10-10"
     },
     "/tools/": {
@@ -566,8 +566,8 @@
       "date": "2026-09-29"
     },
     "/tools/bearing-defect-frequencies/": {
-      "sha": "ac1494fdffce32dc",
-      "date": "2026-09-29"
+      "sha": "f2684a72281094c7",
+      "date": "2026-10-10"
     },
     "/tools/bearing-equivalent-load/": {
       "sha": "22593fe2c0649f31",
@@ -4594,8 +4594,8 @@
       "date": "2026-09-29"
     },
     "/tools/marine-shaft-diameter/": {
-      "sha": "86fc4f970e6f3240",
-      "date": "2026-10-09"
+      "sha": "c1b234272ca0ca4a",
+      "date": "2026-10-10"
     },
     "/tools/markup/": {
       "sha": "7daf482a37a52103",
@@ -5506,8 +5506,8 @@
       "date": "2026-09-29"
     },
     "/tools/pit-dewatering-staging/": {
-      "sha": "3703394748df9387",
-      "date": "2026-10-09"
+      "sha": "22302c029078426c",
+      "date": "2026-10-10"
     },
     "/tools/piti/": {
       "sha": "e4c39afe8d6ed0a8",
@@ -7102,8 +7102,8 @@
       "date": "2026-09-29"
     },
     "/tools/skip-line-layout/": {
-      "sha": "9ff810c973b6e452",
-      "date": "2026-09-29"
+      "sha": "50a17bd148205cac",
+      "date": "2026-10-10"
     },
     "/tools/slab-dowel-schedule/": {
       "sha": "310759a6305e3ab0",
@@ -8334,8 +8334,8 @@
       "date": "2026-09-29"
     },
     "/tools/transverse-wind-load-conductor/": {
-      "sha": "51c08366ef18dc87",
-      "date": "2026-09-29"
+      "sha": "e593df2f4bf7dd00",
+      "date": "2026-10-10"
     },
     "/tools/trap-arm/": {
       "sha": "851ea69aaf802195",

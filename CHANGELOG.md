@@ -91,6 +91,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **Five more notes name the calculator for what they leave out.** `bearing-defect-frequencies` (bearing life: `bearing-l10-life`), `marine-shaft-diameter` (critical speed: `shaft-critical-speed-rayleigh`), `skip-line-layout` (paint quantity: `striping-paint-quantity`), `transverse-wind-load-conductor` (pole capacity: `pole-class-groundline-moment`) and `pit-dewatering-staging` (NPSH available: `npsh-a`) each said a calculation was separate or not computed while a calculator for it already existed.
+
 - **`blowdown-heat-recovery` and `deaerator-steam-demand` name the steam table calculator.** Both take enthalpies, a latent heat or a saturation temperature "from the steam tables"; their citations now point to `saturated-steam-properties`, which gives them at any pressure.
 
 - **`condensate-return-sizing` takes the two pressures.** It asked for a flash fraction and the flash steam's specific volume, each from another lookup. A select now computes both from the pressure at the trap and the return pressure by IAPWS-IF97 and prints them. 800 lb/hr of 100 psig condensate into an atmospheric return flashes 106 lb/hr, 47.5 cfm, and needs a 1-1/2 in return at 4,000 ft/min. Entered values work as before and stay the default. This completes the pressure option across the five pipefitting steam calculators.
