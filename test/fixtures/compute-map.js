@@ -2321,6 +2321,7 @@ export const COMPUTE_MAP = {
   "gear-reducer-service-factor": { module: "../../calc-millwright.js", fn: "computeGearReducerServiceFactor" },
   "air-compressor-cfm-sizing": { module: "../../calc-millwright.js", fn: "computeAirCompressorCfmSizing" },
   "air-dryer-sizing": { module: "../../calc-millwright.js", fn: "computeAirDryerSizing" },
+  "compressed-air-condensate": { module: "../../calc-millwright.js", fn: "computeCompressedAirCondensate" },
   "receiver-pump-up-time": { module: "../../calc-millwright.js", fn: "computeReceiverPumpUpTime" },
   "vacuum-evacuation-time": { module: "../../calc-millwright.js", fn: "computeVacuumEvacuationTime" },
   "shaft-critical-speed-rayleigh": { module: "../../calc-millwright.js", fn: "computeShaftCriticalSpeedRayleigh" },

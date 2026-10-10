@@ -22115,6 +22115,19 @@ export const CITATIONS = {
       { name: "Altitude is not corrected", value: "it reduces the mass delivered at the same volumetric rating", source: "compressed air practice" },
     ],
   },
+  "compressed-air-condensate": {
+    formula: "Humidity ratio W = 0.621945 Pw / (P - Pw), lb of water per lb of dry air. Intake: Pw = relative humidity x Psat(intake temperature), P = atmosphere. Dry air = scfm x 0.075 lb/cu ft x 60. Water in = dry air x W. After cooling at line pressure the air holds at most Ws = 0.621945 Psat(T) / (P line absolute - Psat(T)); condensate = dry air x (W in - Ws at the line temperature), and the dryer removes dry air x (W leaving the line - Ws at the pressure dew point). Gallons per day = lb/hr x 24 / 8.34.",
+    edition: "The psychrometric humidity-ratio relation, ASHRAE Handbook -- Fundamentals, Psychrometrics, cited by name; saturation pressure of water from IAPWS R7-97(2012) Eq. 30 (the shared steam-tables.js). Standard air at 0.075 lb per standard cubic foot.",
+    freeAccess: "A mass balance on water; the saturation equation is free at iapws.org and is held to the release's verification values by a unit test. The example, 100 scfm at 75 F and 75% relative humidity, takes in 18.1 gal/day of vapor and drains 17.3, in line with the roughly 18 to 20 gal/day compressor makers quote for a 25 hp machine in humid weather.",
+    governance: GOVERNANCE.general,
+    editionNote: "The enhancement factor for moist air under pressure (under 1% at 100 psig) is not applied, and the dry-air mass uses one standard density, so figures are good to a few percent. Steady flow at the delivered scfm: a compressor that unloads or cycles makes proportionally less. Pressure dew points below 32 F are outside the saturation equation used and are not computed. Condensate from a lubricated compressor carries oil and is regulated waste water.",
+    assumptions: [
+      { name: "Standard air", value: "0.075 lb of dry air per standard cubic foot", source: "common definition of scfm" },
+      { name: "Saturated after cooling", value: "air leaving each stage holds no more than the saturated ratio at that temperature and line pressure", source: "psychrometrics" },
+      { name: "Water", value: "8.34 lb per gallon", source: "physical data" },
+      { name: "Dew point range", value: "32 F and above", source: "scope of this tile" },
+    ],
+  },
   "air-dryer-sizing": {
     formula: "the inlet temperature, operating pressure and ambient correction factors MULTIPLY: corrected capacity = rated x their product, and required rating = actual flow / their product; a regenerative desiccant dryer's compressor load = actual flow / (1 - purge fraction).",
     edition: "The compressed-air dryer correction-factor method as standard practice, by name, with the factors taken from the dryer manufacturer's OWN tables because they differ by model and technology. A refrigerated dryer holds roughly a 35 to 40 degF pressure dew point and cannot go below freezing without icing. The dryer manufacturer's correction tables and dew point ratings, and the requirements of the air application, govern.",

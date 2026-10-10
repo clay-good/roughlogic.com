@@ -59601,3 +59601,39 @@ test("bounds: kick-tolerance puts the shoe exactly at its limit with the reporte
     assert.ok("error" in _kt({ ...base, ...bad }), JSON.stringify(bad));
   }
 });
+
+import { computeCompressedAirCondensate as _cac } from "../../calc-millwright.js";
+test("bounds: compressed-air-condensate balances the water and follows the psychrometric ratio", () => {
+  const base = { flow_scfm: 100, inlet_temp_f: 75, inlet_rh_pct: 75, atmosphere_psia: 14.696, line_pressure_psig: 100, line_temp_f: 100, dryer_dew_point_f: 38 };
+  const psat = (f) => _if97.saturationPressureMpa((f + 459.67) / 1.8) * 1e6 / 6894.757293168;
+  const r = _cac(base);
+  // W = 0.621945 Pw / (P - Pw) at the intake.
+  const pw = 0.75 * psat(75);
+  const mw = 18.015268 / 28.966; // molar mass of water over dry air
+  assert.ok(Math.abs(r.intake_humidity_ratio - mw * pw / (14.696 - pw)) < 1e-12);
+  assert.ok(Math.abs(r.intake_water_lb_hr - 450 * r.intake_humidity_ratio) < 1e-9);
+  // Every pound of water taken in is condensed, removed by the dryer, or still vapor.
+  for (const over of [{}, { inlet_rh_pct: 100, inlet_temp_f: 95 }, { line_temp_f: 60 }, { inlet_rh_pct: 20, inlet_temp_f: 40 }, { dryer_dew_point_f: 120 }, { line_pressure_psig: 175 }, { atmosphere_psia: 12.2 }]) {
+    const x = _cac({ ...base, ...over });
+    assert.ok(Math.abs(x.intake_water_lb_hr - x.condensed_lb_hr - x.dryer_removed_lb_hr - x.remaining_vapor_lb_hr) < 1e-9, JSON.stringify(over));
+    assert.ok(x.condensed_lb_hr >= 0 && x.dryer_removed_lb_hr >= 0 && x.remaining_vapor_lb_hr >= 0);
+    assert.ok(Math.abs(x.total_liquid_gal_day - (x.condensed_lb_hr + x.dryer_removed_lb_hr) * 24 / 8.34) < 1e-9);
+  }
+  // Air leaving the dryer is saturated at the pressure dew point and line pressure.
+  const ws = mw * psat(38) / (114.696 - psat(38));
+  assert.ok(Math.abs(r.remaining_vapor_lb_hr - 450 * ws) < 1e-9);
+  // Dry cold intake air does not condense in a warm line; a dryer warmer than the line removes nothing.
+  const dry = _cac({ ...base, inlet_temp_f: 40, inlet_rh_pct: 20 });
+  assert.ok(dry.saturated_in_line === false && dry.condensed_lb_hr === 0 && dry.dryer_removed_lb_hr > 0);
+  assert.equal(_cac({ ...base, dryer_dew_point_f: 120 }).dryer_removed_lb_hr, 0);
+  // More humidity, more pressure and a cooler line each put more liquid in the drains; flow scales it.
+  const liquid = (o) => _cac({ ...base, ...o }).condensed_lb_hr;
+  assert.ok(liquid({ inlet_rh_pct: 95 }) > liquid({}) && liquid({ line_pressure_psig: 175 }) > liquid({}) && liquid({ line_temp_f: 80 }) > liquid({}));
+  assert.ok(Math.abs(_cac({ ...base, flow_scfm: 500 }).total_liquid_gal_day / r.total_liquid_gal_day - 5) < 1e-9);
+  // Dried to a 38 F pressure dew point at 100 psig, the air's dew point at the atmosphere is below freezing.
+  assert.equal(r.atmospheric_dew_point_f, null);
+  assert.ok(Math.abs(_cac({ ...base, dryer_dew_point_f: 100 }).atmospheric_dew_point_f - 40) < 3);
+  for (const bad of [{ flow_scfm: 0 }, { flow_scfm: -100 }, { inlet_temp_f: 20 }, { inlet_temp_f: 7500 }, { inlet_rh_pct: 101 }, { inlet_rh_pct: -75 }, { atmosphere_psia: 0 }, { line_pressure_psig: 0 }, { line_pressure_psig: 1e5 }, { line_temp_f: 10 }, { line_temp_f: 1e5 }, { dryer_dew_point_f: -40 }, { dryer_dew_point_f: 38000 }]) {
+    assert.ok("error" in _cac({ ...base, ...bad }), JSON.stringify(bad));
+  }
+});

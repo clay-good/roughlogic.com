@@ -1000,6 +1000,7 @@ export const RENDERER_MAP = {
   "gear-reducer-service-factor": { module: "../../calc-millwright.js", exportName: "MILLWRIGHT_RENDERERS" },
   "air-compressor-cfm-sizing": { module: "../../calc-millwright.js", exportName: "MILLWRIGHT_RENDERERS" },
   "air-dryer-sizing": { module: "../../calc-millwright.js", exportName: "MILLWRIGHT_RENDERERS" },
+  "compressed-air-condensate": { module: "../../calc-millwright.js", exportName: "MILLWRIGHT_RENDERERS" },
   "receiver-pump-up-time": { module: "../../calc-millwright.js", exportName: "MILLWRIGHT_RENDERERS" },
   "vacuum-evacuation-time": { module: "../../calc-millwright.js", exportName: "MILLWRIGHT_RENDERERS" },
   "shaft-critical-speed-rayleigh": { module: "../../calc-millwright.js", exportName: "MILLWRIGHT_RENDERERS" },

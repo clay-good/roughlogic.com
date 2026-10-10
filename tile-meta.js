@@ -1337,6 +1337,7 @@ const _TILES = [
   ["gear-reducer-service-factor", "K"],
   ["air-compressor-cfm-sizing", "K"],
   ["air-dryer-sizing", "K"],
+  ["compressed-air-condensate", "K"],
   ["receiver-pump-up-time", "K"],
   ["vacuum-evacuation-time", "K"],
   ["shaft-critical-speed-rayleigh", "K"],

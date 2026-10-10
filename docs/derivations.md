@@ -2979,6 +2979,7 @@ cross-check.
 | calc-millwright.js | `computeAirDryerSizing` | `{ actual_scfm = 0, temp_correction = 1, pressure_correction = 1, ambient_corr...` | _ | _ | _ |
 | calc-millwright.js | `computeAlignmentThermalGrowth` | `{ stationary_support_height_in = 0, stationary_alpha_per_f = 0.0000065, stati...` | _ | _ | _ |
 | calc-millwright.js | `computeBearingDefectFrequencies` | `{ rpm = 0, ball_count = 0, ball_diameter_in = 0, pitch_diameter_in = 0, conta...` | _ | _ | _ |
+| calc-millwright.js | `computeCompressedAirCondensate` | `{ flow_scfm = 0, inlet_temp_f = 70, inlet_rh_pct = 50, atmosphere_psia = 14.6...` | _ | _ | _ |
 | calc-millwright.js | `computeCouplingAlignmentTolerance` | `{ rpm = 0, measured_offset_in = 0, measured_angularity_mils_per_in = 0, offse...` | _ | _ | _ |
 | calc-millwright.js | `computeGearReducerServiceFactor` | `{ transmitted_hp = 0, service_factor = 1, catalog_mechanical_hp = 0, catalog_...` | _ | _ | _ |
 | calc-millwright.js | `computeReceiverPumpUpTime` | `{ receiver_volume_ft3 = 0, fill_start_psig = 0, fill_end_psig = 0, compressor...` | _ | _ | _ |
@@ -3934,7 +3935,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2518.
+Row count: 2519.
 
 <!-- END function-corpus-v14 -->
 
@@ -5669,7 +5670,7 @@ per spec-v14 §13.1 second paragraph.
 | `truck-swept-path-width` | Swept-Path Width (Turn Lane Occupancy) | AASHTO Green Book (swept-path width =...; OT = 50 - sqrt(2500 - (400 + 1600)) = 50 - sqrt(500) = 50... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `warehouse-cube-utilization` | Storage Position Count and Cube Utilisation | Project (first-principles); layout drawings and the slotting policy govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group K Mechanic (174 tiles)
+### Group K Mechanic (175 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -5705,6 +5706,7 @@ per spec-v14 §13.1 second paragraph.
 | `climb-gradient-roc` | Climb Gradient to Rate of Climb | FAA TERPS / AIM (departure climb grad...; 300 ft/nm gradient at 120 kt -> 300 x 120 / 60 = 600 ft/m... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `clutch-engagement-energy` | Clutch or Brake Engagement Energy and Heat | Project (first-principles); I1 = 0.62162, I2 = 0.31081 slug ft2; dw = 188.50 rad/s; E... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `column-secant-formula` | Eccentrically Loaded Column (Secant Formula) | McGraw-Hill (Beer, Johnston, DeWolf); slides 10-16 to 10-18 (Benha University course PDF, '12 B... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `compressed-air-condensate` | Compressed Air Moisture and Condensate | Project (first-principles); Psat(75 F) = 0.4302 psia, Pw = 0.3226; W = 0.621945 x 0.3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `control-cable-tension` | Aircraft Control Cable Tension and Temperature Correction | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `cooling-system-flow` | Cooling-System Coolant Flow for a Heat Load | heat-transfer first principles; spec-v398 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `counterbore-depth` | Counterbore Depth and Thread Engagement Left | Project (first-principles); one diameter of engagement into steel | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -6371,6 +6373,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 
-Tile count: 2264. Fixture-covered or reference-cadence: 2264 / 2264.
+Tile count: 2265. Fixture-covered or reference-cadence: 2265 / 2265.
 
 <!-- END tile-index-v14 -->

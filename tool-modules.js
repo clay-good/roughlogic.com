@@ -809,7 +809,7 @@ export const TOOL_MODULES = (() => {
     "vibration-forcing-frequencies", "bearing-defect-frequencies",
     "single-plane-field-balance",
     "roller-chain-wear-elongation", "gear-reducer-service-factor",
-    "air-compressor-cfm-sizing", "air-dryer-sizing",
+    "air-compressor-cfm-sizing", "air-dryer-sizing", "compressed-air-condensate",
     "receiver-pump-up-time", "vacuum-evacuation-time", "shaft-critical-speed-rayleigh",
   ]);
   // spec-v80 cap-relief split: the spec-v25 site-civil / roadway-geometry

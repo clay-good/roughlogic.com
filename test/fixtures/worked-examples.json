@@ -171314,6 +171314,62 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "compressed-air-condensate",
+  "source_publisher": "Project (first-principles)",
+  "source_title": "100 scfm, intake 75 F and 75% RH, 100 psig line at 100 F, 38 F dryer",
+  "source_edition_or_year": "psychrometric mass balance",
+  "source_section_or_page": "Psat(75 F) = 0.4302 psia, Pw = 0.3226; W = 0.621945 x 0.3226 / 14.3734 = 0.013960; dry air 450 lb/hr, water in 6.282 lb/hr. At 114.696 psia and 100 F, Psat = 0.9505: Ws = 0.005197, condensate 450 x 0.008763 = 3.943 lb/hr. At 38 F, Psat = 0.1126: Ws = 0.000611, dryer 2.064 lb/hr, vapor left 0.275 lb/hr. Liquid 6.007 lb/hr = 17.29 gal/day",
+  "verified_by": "rl",
+  "verified_on": "2026-10-10",
+  "inputs": {
+   "flow_scfm": 100,
+   "inlet_temp_f": 75,
+   "inlet_rh_pct": 75,
+   "atmosphere_psia": 14.696,
+   "line_pressure_psig": 100,
+   "line_temp_f": 100,
+   "dryer_dew_point_f": 38
+  },
+  "outputs": {
+   "intake_humidity_ratio": {
+    "value": 0.01396,
+    "tolerance": {
+     "pct": 0.1
+    }
+   },
+   "intake_water_lb_hr": {
+    "value": 6.282,
+    "tolerance": {
+     "pct": 0.1
+    }
+   },
+   "condensed_lb_hr": {
+    "value": 3.943,
+    "tolerance": {
+     "pct": 0.1
+    }
+   },
+   "dryer_removed_lb_hr": {
+    "value": 2.0636,
+    "tolerance": {
+     "pct": 0.1
+    }
+   },
+   "remaining_vapor_lb_hr": {
+    "value": 0.275,
+    "tolerance": {
+     "pct": 0.2
+    }
+   },
+   "total_liquid_gal_day": {
+    "value": 17.286,
+    "tolerance": {
+     "pct": 0.1
+    }
+   }
+  }
  }
  ]
 }

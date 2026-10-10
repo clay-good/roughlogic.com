@@ -1822,6 +1822,7 @@ const RELATED = {
   "roller-chain-wear-elongation": ["roller-chain-length","gear-reducer-service-factor","vibration-forcing-frequencies"],
   "gear-reducer-service-factor": ["roller-chain-wear-elongation","vibration-severity-zone","motor-shaft-torque"],
   "air-compressor-cfm-sizing": ["receiver-pump-up-time","air-dryer-sizing","air-receiver"],
+  "compressed-air-condensate": ["air-dryer-sizing","air-receiver","air-compressor-cfm-sizing"],
   "air-dryer-sizing": ["air-compressor-cfm-sizing","receiver-pump-up-time","air-receiver"],
   "receiver-pump-up-time": ["air-receiver","air-compressor-cfm-sizing","air-dryer-sizing"],
   "vacuum-evacuation-time": ["vacuum-decay-test","air-compressor-cfm-sizing","receiver-pump-up-time"],

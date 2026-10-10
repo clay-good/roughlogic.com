@@ -117187,6 +117187,36 @@
    "term": "how big a kick can the shoe take",
    "target": "kick-tolerance",
    "kind": "question"
+  },
+  {
+   "term": "compressed air condensate",
+   "target": "compressed-air-condensate",
+   "kind": "industry"
+  },
+  {
+   "term": "compressed air moisture",
+   "target": "compressed-air-condensate",
+   "kind": "industry"
+  },
+  {
+   "term": "compressor water per day",
+   "target": "compressed-air-condensate",
+   "kind": "industry"
+  },
+  {
+   "term": "air compressor condensate gallons per day",
+   "target": "compressed-air-condensate",
+   "kind": "industry"
+  },
+  {
+   "term": "how much water does an air compressor make",
+   "target": "compressed-air-condensate",
+   "kind": "question"
+  },
+  {
+   "term": "pressure dew point water removal",
+   "target": "compressed-air-condensate",
+   "kind": "industry"
   }
  ]
 }

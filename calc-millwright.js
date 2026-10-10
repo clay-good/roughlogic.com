@@ -34,6 +34,7 @@ import {
   DEBOUNCE_MS, debounce, makeNumber,
   makeOutputLine, attachExampleButton, fmt,
 } from "./ui-fields.js";
+import { IF97 } from "./steam-tables.js";
 
 // v18 §7 contract guard: reject a non-finite numeric input (copied verbatim
 // from the sibling calc-* modules; non-exported, no corpus row).
@@ -1004,7 +1005,7 @@ export function computeAirDryerSizing({ actual_scfm = 0, temp_correction = 1, pr
     purge_verdict: purge_fraction <= 0
       ? "(no purge entered -- a refrigerated dryer has none; a heatless regenerative desiccant unit runs about 15%)"
       : "at " + fmt(purge_fraction * 100, 0) + "% purge the compressor must supply " + fmt(compressor_load_scfm, 1) + " scfm to deliver " + fmt(actual_scfm, 0) + " to the plant -- " + fmt(purge_scfm, 1) + " scfm of compressor capacity that exists only to dry air, and it is ADDED to the compressor sizing, not subtracted from the dryer's",
-    note: "A refrigerated dryer's catalog number is stated at one set of conditions -- typically 100 psig inlet, 100 degF inlet air, 100 degF ambient -- and a plant almost never sits at all three. Every correction runs the same way: hotter inlet air carries far more water and derates the dryer, lower pressure means more actual volume per unit mass and derates it, and a hotter ambient hurts the condenser and derates it again. BECAUSE THEY MULTIPLY, three individually modest factors compound: 0.80 times 1.10 times 0.95 is 0.836, so a 200 scfm nameplate delivers only 167 scfm and the honest requirement is 239. A dryer selected on its badge number is the reason water comes out of the drops. The choice between refrigerated and desiccant is a DEW POINT decision, not a capacity one. A refrigerated dryer holds roughly a 35 to 40 degF pressure dew point and cannot go below freezing without icing, so anything running outdoors, feeding an unheated line, or supplying instrument or breathing air needs desiccant. The cost of desiccant is the purge: a heatless regenerative dryer diverts around 15% of its own throughput to regenerate the offline tower, and that purge is real compressor capacity which must be ADDED to the compressor sizing rather than subtracted from the dryer's -- delivering 200 scfm to the plant through a 15% purge means the compressor supplies 235. This applies correction factors the user takes from the manufacturer's own tables; it does not supply them, because they differ by model and by dryer technology and a generic table is the thing that goes stale. It does not select a dryer, determine the required pressure dew point for the application, or evaluate whether a refrigerated unit will ice; it does not size the pre-filters and after-filters that a desiccant bed requires and without which the bed is destroyed by oil carryover; and it does not address drain traps, which are where most compressed-air moisture problems actually originate. It does not compute the moisture load itself. The dryer manufacturer's correction tables and dew point ratings, and the requirements of the air application, govern.",
+    note: "A refrigerated dryer's catalog number is stated at one set of conditions -- typically 100 psig inlet, 100 degF inlet air, 100 degF ambient -- and a plant almost never sits at all three. Every correction runs the same way: hotter inlet air carries far more water and derates the dryer, lower pressure means more actual volume per unit mass and derates it, and a hotter ambient hurts the condenser and derates it again. BECAUSE THEY MULTIPLY, three individually modest factors compound: 0.80 times 1.10 times 0.95 is 0.836, so a 200 scfm nameplate delivers only 167 scfm and the honest requirement is 239. A dryer selected on its badge number is the reason water comes out of the drops. The choice between refrigerated and desiccant is a DEW POINT decision, not a capacity one. A refrigerated dryer holds roughly a 35 to 40 degF pressure dew point and cannot go below freezing without icing, so anything running outdoors, feeding an unheated line, or supplying instrument or breathing air needs desiccant. The cost of desiccant is the purge: a heatless regenerative dryer diverts around 15% of its own throughput to regenerate the offline tower, and that purge is real compressor capacity which must be ADDED to the compressor sizing rather than subtracted from the dryer's -- delivering 200 scfm to the plant through a 15% purge means the compressor supplies 235. This applies correction factors the user takes from the manufacturer's own tables; it does not supply them, because they differ by model and by dryer technology and a generic table is the thing that goes stale. It does not select a dryer, determine the required pressure dew point for the application, or evaluate whether a refrigerated unit will ice; it does not size the pre-filters and after-filters that a desiccant bed requires and without which the bed is destroyed by oil carryover; and it does not address drain traps, which are where most compressed-air moisture problems actually originate. The moisture load itself is computed by compressed-air-condensate. The dryer manufacturer's correction tables and dew point ratings, and the requirements of the air application, govern.",
   };
 }
 const airDryerSizingExample = { inputs: { actual_scfm: 200, temp_correction: 0.8, pressure_correction: 1.1, ambient_correction: 0.95, candidate_rated_scfm: 200, purge_fraction: 0.15 } };
@@ -1027,6 +1028,80 @@ MILLWRIGHT_RENDERERS["air-dryer-sizing"] = _simpleRenderer({
     { key: "n", id: "ads-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeAirDryerSizing,
+});
+
+// ============ spec-v1961: compressed air moisture and condensate ============
+//
+// air-dryer-sizing sizes the dryer and says it does not compute the moisture
+// load. This does: the water the compressor takes in with its air, what drops
+// out as liquid once the air is compressed and cooled, and what a dryer takes
+// out to its pressure dew point. Humidity ratio W = 0.622 Pw / (P - Pw), with
+// the saturation pressure of water from the IAPWS-IF97 line in steam-tables.js.
+const _CA_PSI_PER_MPA = 1e6 / 6894.757293168;
+// Molar mass of water over that of dry air, 0.62194 (ASHRAE Fundamentals).
+const _CA_MW_RATIO = 18.015268 / 28.966;
+const _caSatPsia = (temp_f) => IF97.saturationPressureMpa((temp_f + 459.67) / 1.8) * _CA_PSI_PER_MPA;
+const _caSaturatedW = (temp_f, pressure_psia) => { const pw = _caSatPsia(temp_f); return pw < pressure_psia ? _CA_MW_RATIO * pw / (pressure_psia - pw) : Number.POSITIVE_INFINITY; };
+// dims: in { flow_scfm: L^3 T^-1, inlet_temp_f: T, inlet_rh_pct: dimensionless, atmosphere_psia: M L^-1 T^-2, line_pressure_psig: M L^-1 T^-2, line_temp_f: T, dryer_dew_point_f: T } out: { intake_water_lb_hr: M T^-1, intake_humidity_ratio: dimensionless, line_humidity_ratio: dimensionless, condensed_lb_hr: M T^-1, condensed_gal_day: L^3 T^-1, dryer_removed_lb_hr: M T^-1, dryer_removed_gal_day: L^3 T^-1, remaining_vapor_lb_hr: M T^-1, total_liquid_gal_day: L^3 T^-1, atmospheric_dew_point_f: T }
+export function computeCompressedAirCondensate({ flow_scfm = 0, inlet_temp_f = 70, inlet_rh_pct = 50, atmosphere_psia = 14.696, line_pressure_psig = 100, line_temp_f = 100, dryer_dew_point_f = 38 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(flow_scfm > 0 && flow_scfm <= 1e6)) return { error: "Enter the compressor's delivered air flow (scfm)." };
+  if (!(inlet_temp_f >= 32 && inlet_temp_f <= 130)) return { error: "Inlet air temperature must be between 32 and 130 F." };
+  if (!(inlet_rh_pct >= 0 && inlet_rh_pct <= 100)) return { error: "Inlet relative humidity must be between 0 and 100%." };
+  if (!(atmosphere_psia >= 8 && atmosphere_psia <= 16)) return { error: "Atmospheric pressure must be between 8 and 16 psia (14.696 at sea level)." };
+  if (!(line_pressure_psig > 0 && line_pressure_psig <= 1000)) return { error: "Line pressure must be above 0 and no more than 1,000 psig." };
+  if (!(line_temp_f >= 32 && line_temp_f <= 250)) return { error: "The compressed air temperature must be between 32 and 250 F." };
+  if (!(dryer_dew_point_f >= 32 && dryer_dew_point_f <= 250)) return { error: "The dryer pressure dew point must be between 32 and 250 F here. A desiccant dryer below freezing removes nearly all of the vapor shown as remaining." };
+  const line_psia = line_pressure_psig + atmosphere_psia;
+  // Standard air: 0.075 lb of dry air per standard cubic foot.
+  const dry_air_lb_hr = flow_scfm * 0.075 * 60;
+  const inlet_pw_psia = inlet_rh_pct / 100 * _caSatPsia(inlet_temp_f);
+  const intake_humidity_ratio = _CA_MW_RATIO * inlet_pw_psia / (atmosphere_psia - inlet_pw_psia);
+  const intake_water_lb_hr = dry_air_lb_hr * intake_humidity_ratio;
+  // Compressed and cooled, the air holds at most the saturated ratio at line pressure.
+  const line_humidity_ratio = Math.min(intake_humidity_ratio, _caSaturatedW(line_temp_f, line_psia));
+  const condensed_lb_hr = dry_air_lb_hr * (intake_humidity_ratio - line_humidity_ratio);
+  const saturated_in_line = condensed_lb_hr > 1e-12;
+  const dryer_humidity_ratio = Math.min(line_humidity_ratio, _caSaturatedW(dryer_dew_point_f, line_psia));
+  const dryer_removed_lb_hr = dry_air_lb_hr * (line_humidity_ratio - dryer_humidity_ratio);
+  const remaining_vapor_lb_hr = dry_air_lb_hr * dryer_humidity_ratio;
+  const LB_PER_GAL = 8.34;
+  const condensed_gal_day = condensed_lb_hr * 24 / LB_PER_GAL;
+  const dryer_removed_gal_day = dryer_removed_lb_hr * 24 / LB_PER_GAL;
+  const total_liquid_gal_day = condensed_gal_day + dryer_removed_gal_day;
+  // The dew point the dried air has once it is let down to the atmosphere.
+  const out_pw_psia = dryer_humidity_ratio * atmosphere_psia / (_CA_MW_RATIO + dryer_humidity_ratio);
+  const atmospheric_dew_point_f = out_pw_psia >= _caSatPsia(32) ? IF97.saturationTempK(out_pw_psia / _CA_PSI_PER_MPA) * 1.8 - 459.67 : null;
+  if (![intake_water_lb_hr, condensed_lb_hr, dryer_removed_lb_hr, remaining_vapor_lb_hr, total_liquid_gal_day].every(Number.isFinite)) return { error: "Compressed-air moisture math is not a finite value." };
+  return {
+    intake_water_lb_hr, intake_humidity_ratio, line_humidity_ratio, condensed_lb_hr, condensed_gal_day,
+    dryer_removed_lb_hr, dryer_removed_gal_day, remaining_vapor_lb_hr, total_liquid_gal_day,
+    atmospheric_dew_point_f, saturated_in_line, dry_air_lb_hr,
+    note: "How much water a compressor makes. Air comes in carrying water vapor, and compressing it does not remove any: it packs the same vapor into a fraction of the volume. Once the compressed air cools, in the aftercooler, the receiver and the piping, it can hold only what saturated air holds at that temperature and at LINE pressure, which is far less per pound of air than at the atmosphere, and the difference drops out as liquid. That is the condensate the aftercooler separator, the receiver drain and the drip legs have to carry away, around the clock. A refrigerated dryer then chills the air to its pressure dew point, about 38 F, and takes out most of what is left; the vapor that remains will not condense in the plant unless a pipe runs colder than that dew point. The drains matter as much as the dryer: a failed drain sends this water downstream as liquid, which no dryer is sized to catch. Humid weather is the design case. The same compressor makes several times more water on a hot, humid afternoon than on a cold dry morning, so size drains and dryers for the worst intake air, not the average. The flow is the air DELIVERED in standard cubic feet per minute, at 0.075 lb of dry air per standard cubic foot. A dryer dew point below 32 F is not computed here; a desiccant dryer at -40 F removes nearly all of the vapor shown as remaining. This is a mass balance at steady flow. It does not size a dryer (air-dryer-sizing does), a separator or a drain, allow for a compressor that unloads or cycles, or account for oil carried with the condensate, which is why it cannot go to a storm drain. The equipment manufacturer's data governs.",
+  };
+}
+export const compressedAirCondensateExample = { inputs: { flow_scfm: 100, inlet_temp_f: 75, inlet_rh_pct: 75, atmosphere_psia: 14.696, line_pressure_psig: 100, line_temp_f: 100, dryer_dew_point_f: 38 } };
+MILLWRIGHT_RENDERERS["compressed-air-condensate"] = _simpleRenderer({
+  citation: "Citation: a water mass balance on compressed air from the psychrometric humidity ratio, W = 0.622 Pw / (P - Pw) (ASHRAE Handbook -- Fundamentals, Psychrometrics, by name), with the saturation pressure of water from IAPWS-IF97 Eq. 30 and standard air at 0.075 lb per standard cubic foot. Water in = dry air x W at the intake; the air leaves each stage holding no more than the saturated W at that temperature and the line's absolute pressure, and the difference is liquid. First principles; the equipment manufacturer's data governs.",
+  example: compressedAirCondensateExample.inputs,
+  fields: [
+    { key: "flow_scfm", label: "Air delivered (scfm)", kind: "number" },
+    { key: "inlet_temp_f", label: "Intake air temperature (F)", kind: "number", default: 70 },
+    { key: "inlet_rh_pct", label: "Intake relative humidity (%)", kind: "number", default: 50 },
+    { key: "atmosphere_psia", label: "Atmospheric pressure (psia)", kind: "number", default: 14.696 },
+    { key: "line_pressure_psig", label: "Line pressure (psig)", kind: "number", default: 100 },
+    { key: "line_temp_f", label: "Compressed air temperature after cooling (F)", kind: "number", default: 100 },
+    { key: "dryer_dew_point_f", label: "Dryer pressure dew point (F; refrigerated about 38)", kind: "number", default: 38 },
+  ],
+  outputs: [
+    { key: "t", id: "cac-out-t", label: "Liquid water to drain", value: (r) => fmt(r.total_liquid_gal_day, 1) + " gal/day (" + fmt(r.condensed_lb_hr + r.dryer_removed_lb_hr, 2) + " lb/hr)" },
+    { key: "c", id: "cac-out-c", label: "At the aftercooler, receiver and drops", value: (r) => r.saturated_in_line ? fmt(r.condensed_gal_day, 1) + " gal/day (" + fmt(r.condensed_lb_hr, 2) + " lb/hr)" : "none: the air is not saturated at this line temperature" },
+    { key: "d", id: "cac-out-d", label: "At the dryer", value: (r) => fmt(r.dryer_removed_gal_day, 1) + " gal/day (" + fmt(r.dryer_removed_lb_hr, 2) + " lb/hr)" },
+    { key: "i", id: "cac-out-i", label: "Water vapor taken in", value: (r) => fmt(r.intake_water_lb_hr, 2) + " lb/hr in " + fmt(r.dry_air_lb_hr, 0) + " lb/hr of air" },
+    { key: "v", id: "cac-out-v", label: "Vapor left in the dried air", value: (r) => fmt(r.remaining_vapor_lb_hr, 3) + " lb/hr" + (r.atmospheric_dew_point_f === null ? ", a dew point below 32 F at the atmosphere" : ", a " + fmt(r.atmospheric_dew_point_f, 0) + " F dew point at the atmosphere") },
+    { key: "n", id: "cac-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeCompressedAirCondensate,
 });
 
 // ============ spec-v1483: vacuum pump evacuation time ============
