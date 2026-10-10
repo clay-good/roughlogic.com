@@ -802,6 +802,20 @@ async function main() {
       cPhrase(/left ([\d,]+) names declared two ways/, stillSplit.length,
         "count of names still declared two ways", "left N names declared two ways");
     }
+    // THIRD SURFACE. The same document's prose restates the coverage as
+    // "N of N across M modules". Nothing read it, and on 2026-10-10 it said
+    // "2,516 of 2,513": a count fixer had rewritten one number and not the
+    // other, under a green lint.
+    const prose = correctness.match(/([\d,]+) of ([\d,]+) across ([\d,]+) modules/);
+    const proseNums = prose ? prose.slice(1, 4).map((n) => Number(n.replace(/,/g, ""))) : null;
+    if (!proseNums || proseNums[0] !== annotated || proseNums[1] !== totalFunctions || proseNums[2] !== SOURCES.length) {
+      errors.push(
+        "docs/correctness.md's prose must say `" + annotated.toLocaleString("en-US") + " of " +
+        totalFunctions.toLocaleString("en-US") + " across " + SOURCES.length +
+        " modules` (annotated functions of exported functions); it says " +
+        (prose ? "`" + prose[0] + "`" : "nothing matching `N of N across M modules`") + ".",
+      );
+    }
     if (!/annotat|declar/i.test(row)) {
       errors.push(
         "docs/how-it-works.md's check-dimensions row does not say it checks a declaration. " +

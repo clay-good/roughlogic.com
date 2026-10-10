@@ -6,6 +6,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Tests
 
+- **`check-dimensions` reads the coverage sentence in `docs/correctness.md`.** The document's prose restates the annotation coverage as "N of N across M modules", and no gate read it. On 2026-10-10 it said "2,516 of 2,513": a count update had changed one number and not the other, under a green lint. The gate now holds all three numbers to the live counts, and was checked by seeding each wrong in turn.
+
 - **A timing-free guard on printed output lines.** `test/unit/formatted-output-guard.test.js` runs every declarative renderer's formatter on each worked example, and on each example with one input blanked or zeroed (about 82,000 lines in half a second), and fails on `undefined`, `NaN`, `Infinity`, or a bare `null`. The browser check that covers the same leak reads the page after a debounce, and it passed twice over the inventory-turnover leak fixed today. Seeding a misspelled result key into one formatter turns it red. No current tile fails it.
 
 - **The same guard for every renderer, bespoke ones included.** `test/unit/render-text-guard.test.js` drives all 2,235 renderers against a small fake DOM (`test/fixtures/fake-dom.js`, run in a child process), clicks "Test with example", then blanks each input, cycles every select option, and toggles each checkbox, flushing the debounce timers by hand and reading the output after each change. It takes about a second. Re-seeding today's inventory-turnover leak turns it red; no current tile fails it. The first version of both guards required a word boundary after "undefined" and so missed "undefinedx", the exact leak; both now match the browser check's leading-boundary form.
