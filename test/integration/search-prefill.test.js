@@ -139,7 +139,7 @@ test("spec-v1341 prefill: a template's gaps are filled from the question too", a
   await input.click();
   await input.fill("voltage drop 120v 150 ft 12 awg copper 20a single phase");
   await expect(page.locator("#search-results .search-result").first().locator(".sr-name"))
-    .toHaveText("Voltage Drop");
+    .toHaveText("Voltage Drop", { timeout: 20000 });
   await input.press("Enter");
 
   // The slots.json template sets source/length/current. It does NOT list the
@@ -163,7 +163,7 @@ test("spec-v1341 provenance: captioned on a typed question, cleared on edit", as
   await input.click();
   await input.fill("voltage drop 120v 150 ft 12 awg copper 20a single phase");
   await expect(page.locator("#search-results .search-result").first().locator(".sr-name"))
-    .toHaveText("Voltage Drop");
+    .toHaveText("Voltage Drop", { timeout: 20000 });
   await input.press("Enter");
 
   const captions = page.locator(".field-provenance");
@@ -521,7 +521,7 @@ test("spec-v1343: a specific query routes straight through, no card", async ({ p
   await input.click();
   await input.fill("voltage drop 120v 150 ft 12 awg copper 20a single phase");
   await expect(page.locator("#search-results .search-result").first().locator(".sr-name"))
-    .toHaveText("Voltage Drop");
+    .toHaveText("Voltage Drop", { timeout: 20000 });
   await input.press("Enter");
   await expect(page).toHaveURL(/#voltage-drop\?v=1&/);
   await expect(page.locator(".pick-card")).toHaveCount(0);

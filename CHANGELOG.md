@@ -6,6 +6,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Tests
 
+- **Three more ranked-first waits in `search-prefill.test.js` get 20 s.** The spec-v1341 prefill tests waited the default 5 s for the first search row and timed out three retries running on a loaded runner (run 38058775183); the run after it passed unchanged. They now use the allowance the query-table cases were given on 2026-10-10.
+
 - **`npm test` checks that every example button loads the example the page prints.** `check-example-parity` compares the two only for tiles that export their example constant; the other 401 were left to a one-minute browser sweep that runs in CI alone, which is where `saturated-steam-properties` was caught. The fake-DOM render sweep already clicks every tile's example button, so it now makes the same comparison for all 2,227 tiles that have both, in about a second. Four tiles register a metric fixture against a US form holding the same example and are listed by name; the list may only shrink. Seeded by changing one tile's example.
 
 - **Three search tests wait for the rows instead of sleeping.** `a11y.test.js` counted the empty-query dropdown 120 ms after a click. Since the catalog split the dropdown renders after the description shards load, and on a loaded CI runner the count read 0 three retries running (run 38056106460, on a commit that touched no search code). That test and the two beside it now wait for the result rows and poll the route.
