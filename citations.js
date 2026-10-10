@@ -3802,7 +3802,7 @@ export const CITATIONS = {
     ],
   },
   "insulation-heat-loss": {
-    formula: "R_cond = ln(r2/r1) / (2π × k); h_outside = h_conv(V) + h_rad(eps, T); R_outside = 1 / (h_outside × 2π × r2); Q = (T_s − T_a) / (R_cond + R_outside). h_conv = cube-root sum of natural (ASHRAE simplified horizontal cylinder: max(0.27 (ΔT/D)^0.25, 0.18 ΔT^(1/3))) and forced (Hilpert Nu = C Re^m Pr^(1/3), standard air) convection; h_rad = eps × σ × ((T_s_R² + T_a_R²)(T_s_R + T_a_R)). Iterate for outer-surface temperature.",
+    formula: "R_cond = ln(r2/r1) / (2π × k); h_outside = h_conv + h_rad; R_outside = 1 / (h_outside × 2π × r2); Q = (T_s − T_a) / (R_cond + R_outside). Since 2026-10-09 h_outside is the bare-pipe-heat-loss model: Churchill-Chu natural convection for a horizontal cylinder with air properties at the film temperature, Churchill-Bernstein forced convection for the air velocity, combined as the cube-root sum of cubes, and h_rad = eps × σ × (T_s⁴ − T_a⁴)/(T_s − T_a). Iterate for the outer-surface temperature.",
     edition: "ASHRAE Handbook Fundamentals chapter 25 (insulation) by name; ASTM C680 (cylindrical surface conditions) by name; manufacturer k-values from data/hvac/insulation-k-values.json.",
     freeAccess: "ASTM C680 licensed; manufacturer technical bulletins free at each manufacturer site.",
     governance: GOVERNANCE.mechanical,
@@ -3810,7 +3810,7 @@ export const CITATIONS = {
     assumptions: [
       { name: "Stefan-Boltzmann constant σ", value: "0.1714×10⁻⁸ BTU/(hr·ft²·°R⁴)", source: "physical fact" },
       { name: "Default jacket emissivity", value: "0.9 (painted steel / fabric jacket)", source: "engineering practice" },
-      { name: "Film air properties", value: "standard air (nu 1.69e-4 ft^2/s, k 0.0150 Btu/hr-ft-F, Pr 0.71), not re-evaluated at the film temperature", source: "engineering practice" },
+      { name: "Film air properties", value: "Sutherland viscosity and conductivity at the film temperature, 1 atm (the bare-pipe-heat-loss model); until 2026-10-09 a simplified ASHRAE form with standard-air properties, which read 5 to 17% higher in convection on small pipe", source: "Churchill and Chu (1975); bare-pipe-heat-loss" },
       { name: "Iterative outer-surface T solve", value: "12 fixed-point iterations for the R_outside ↔ T_s2 coupling", source: "engineering practice" },
     ],
   },

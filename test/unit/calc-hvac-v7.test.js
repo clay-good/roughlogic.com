@@ -245,13 +245,13 @@ test("245 example yields finite outputs", () => {
   assert.ok(r.effectiveness_pct > 0 && r.effectiveness_pct < 100);
 });
 
-test("245 bare-pipe film matches ASHRAE free convection, not a flat 0.225", () => {
-  // 2.375 in OD at 200 F in 70 F still air: ASHRAE simplified 0.27 (dT/D)^0.25 = 1.37
-  // convective + 1.31 radiative -> ~217 Btu/hr-ft; Churchill-Chu gives ~203 and ASHRAE's
-  // bare-pipe tables ~190-200. The old flat 0.225 gave 124.
+test("245 bare-pipe film is the Churchill-Chu model, not a flat 0.225", () => {
+  // 2.375 in OD at 200 F in 70 F still air: Churchill-Chu convection + radiation gives 202.6
+  // Btu/hr-ft, where ASHRAE's bare-pipe tables read ~190-200. Until 2026-10-09 the simplified
+  // 0.27 (dT/D)^0.25 form gave 217; the old flat 0.225 gave 124.
   const r = computeInsulationHeatLoss(insulationHeatLossExample.inputs);
-  assert.ok(r.Q_bare_BTU_hr_ft > 190 && r.Q_bare_BTU_hr_ft < 225, "bare " + r.Q_bare_BTU_hr_ft);
-  // Wind raises the bare loss well above still air (Hilpert cross-flow).
+  assert.ok(r.Q_bare_BTU_hr_ft > 195 && r.Q_bare_BTU_hr_ft < 210, "bare " + r.Q_bare_BTU_hr_ft);
+  // Wind raises the bare loss well above still air (Churchill-Bernstein cross-flow).
   const windy = computeInsulationHeatLoss({ ...insulationHeatLossExample.inputs, air_velocity_fpm: 1000 });
   assert.ok(windy.Q_bare_BTU_hr_ft > 2 * r.Q_bare_BTU_hr_ft);
 });

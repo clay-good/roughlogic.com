@@ -8898,9 +8898,9 @@
    "source_publisher": "Project (first-principles)",
    "source_title": "Bare-pipe vs insulated-pipe heat loss per ft (radial conduction + convective/radiative surface loss)",
    "source_edition_or_year": "ASHRAE Fundamentals heat-transfer chapter; manufacturer fiberglass k = 0.025 W/m-K typical",
-   "source_section_or_page": "2.375 in OD pipe at 200 F into 70 F still air with 1.5 in fiberglass -> 216.6 BTU/hr-ft bare vs 22.96 BTU/hr-ft insulated (89.4% effectiveness); bare film h = 1.37 conv (ASHRAE 0.27 (dT/D)^0.25) + 1.31 rad; Churchill-Chu gives ~203, ASHRAE bare-pipe tables ~190-200",
+   "source_section_or_page": "2.375 in OD pipe at 200 F into 70 F still air with 1.5 in fiberglass -> 202.6 BTU/hr-ft bare (Churchill-Chu convection 1.19 + radiation 1.31 BTU/hr ft2 F, the bare-pipe-heat-loss model) vs 22.91 BTU/hr-ft insulated (88.7% effectiveness); ASHRAE bare-pipe tables read ~190-200",
    "verified_by": "rl",
-   "verified_on": "2026-09-18",
+   "verified_on": "2026-10-09",
    "inputs": {
     "pipe_OD_in": 2.375,
     "surface_T_F": 200,
@@ -8911,19 +8911,19 @@
    },
    "outputs": {
     "Q_bare_BTU_hr_ft": {
-     "value": 216.62,
+     "value": 202.6,
      "tolerance": {
       "abs": 1
      }
     },
     "Q_insulated_BTU_hr_ft": {
-     "value": 22.96,
+     "value": 22.91,
      "tolerance": {
       "abs": 0.5
      }
     },
     "effectiveness_pct": {
-     "value": 89.4,
+     "value": 88.7,
      "tolerance": {
       "abs": 0.5
      }

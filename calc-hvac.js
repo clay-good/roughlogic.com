@@ -2161,6 +2161,7 @@ export const INSULATION_K_VALUES_v7 = {
 };
 
 // Outside film on a horizontal cylinder of diameter D_ft, Btu/hr-ft^2-F.
+// FALLBACK ONLY since 2026-10-09 (see the top of _filmCoeff); kept for the cases the exact model declines.
 // Natural: ASHRAE Fundamentals simplified free convection in air, laminar
 // 0.27 (dT/D)^0.25, turbulent 0.18 dT^(1/3), the larger governing. Forced:
 // Hilpert's cross-flow correlation Nu = C Re^m Pr^(1/3) with standard-air
@@ -2170,6 +2171,13 @@ export const INSULATION_K_VALUES_v7 = {
 // which put a bare 2 in line at 124 Btu/hr-ft where ASHRAE's tables give ~200.
 const _HILPERT = [[4, 0.989, 0.330], [40, 0.911, 0.385], [4000, 0.683, 0.466], [40000, 0.193, 0.618], [Infinity, 0.027, 0.805]];
 function _filmCoeff(V_fpm, eps_jacket, T_surface_F, T_ambient_F, D_ft) {
+  // Since 2026-10-09 the film is the bare-pipe-heat-loss model (Churchill-Chu natural convection with
+  // film-temperature air properties, Churchill-Bernstein for wind, gray-body radiation), so this tile and that
+  // one give the same loss for the same bare pipe. The simplified ASHRAE form below read 5 to 17% higher in
+  // convection on small pipe and stays only as the fallback where that model declines (equal temperatures,
+  // an emissivity of 0).
+  const exact = computeBarePipeHeatLoss({ od_in: D_ft * 12, surface_f: T_surface_F, amb_f: T_ambient_F, emissivity: eps_jacket, wind_mph: Math.max(0, V_fpm) / 88 });
+  if (!exact.error) return exact.conv_coefficient + exact.rad_coefficient;
   const dT = Math.abs(T_surface_F - T_ambient_F);
   const h_nat = Math.max(0.27 * Math.pow(dT / D_ft, 0.25), 0.18 * Math.cbrt(dT));
   const V_fps = Math.max(0, V_fpm) / 60;
