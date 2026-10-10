@@ -107,9 +107,13 @@ for (const c of CASES) {
     // keeps moving while the lazy alias / slot / discovery shards land -- so
     // waiting for merely "a row is visible" raced, and under full-suite load
     // this query landed on max-circuit-length-for-vd instead of voltage-drop.
-    // Wait for the row that should win to actually be the first one.
+    // Wait for the row that should win to actually be the first one. The
+    // default 5 s was not always enough for the shards on a loaded CI runner:
+    // on 2026-10-10 "friction loss 200 ft of hose at 150 gpm" still showed
+    // friction-loss first after 5 s, three retries running, on a commit that
+    // touched nothing search-related, and passed on the next commit.
     await expect(page.locator("#search-results .search-result").first().locator(".sr-name"))
-      .toHaveText(c.title);
+      .toHaveText(c.title, { timeout: 20000 });
     await input.press("Enter");
     await expect(page).toHaveURL(new RegExp("#" + c.name + "\\?v=1&"));
     for (const [id, value] of Object.entries(c.filled)) {
