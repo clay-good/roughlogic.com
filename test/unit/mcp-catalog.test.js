@@ -568,6 +568,39 @@ test("run_calculator: numeric and boolean strings answer the same as typed value
   assert.deepEqual(differ, [], "stringified numbers changed the answer:\n  " + differ.join("\n  "));
 });
 
+// "false" was the only boolean word the door read. "no", "off" and "0" are just
+// as truthy as strings: breaker-sizing answered continuous: "no" with the 125%
+// continuous ampacity. Every boolean in every first worked example, sent as
+// each common spelling, must answer as the typed boolean does.
+test("run_calculator: yes/no/on/off/1/0 for a boolean answer as true/false do, catalog-wide", async () => {
+  const { run } = await import("../../mcp/catalog.mjs");
+  const { readFile } = await import("node:fs/promises");
+  const { COMPUTE_MAP } = await import("../fixtures/compute-map.js");
+  const { rows } = JSON.parse(await readFile(new URL("../fixtures/worked-examples.json", import.meta.url), "utf8"));
+  const first = new Map();
+  for (const r of rows) if (!first.has(r.tile_id) && COMPUTE_MAP[r.tile_id]) first.set(r.tile_id, r.inputs);
+  const stable = (o) => JSON.stringify(o, (k, v) => (typeof v === "number" ? Math.round(v * 1e6) / 1e6 : v));
+  const differ = [];
+  let probed = 0;
+  for (const [id, inputs] of first) {
+    for (const [key, v] of Object.entries(inputs)) {
+      if (typeof v !== "boolean") continue;
+      probed++;
+      for (const [typed, words] of [[true, ["yes", "on", "1", "TRUE"]], [false, ["no", "off", "0", "False"]]]) {
+        let a;
+        try { a = stable((await run({ id, inputs: { ...inputs, [key]: typed } })).result); } catch { continue; }
+        for (const w of words) {
+          let b;
+          try { b = stable((await run({ id, inputs: { ...inputs, [key]: w } })).result); } catch { continue; }
+          if (a !== b) differ.push(`${id}::${key} "${w}"`);
+        }
+      }
+    }
+  }
+  assert.ok(probed > 20, "expected boolean inputs to probe");
+  assert.deepEqual(differ, [], "a boolean word was not read as its boolean:\n  " + differ.join("\n  "));
+});
+
 test("run_calculator: a select value that looks numeric stays a string", async () => {
   const { run } = await import("../../mcp/catalog.mjs");
   const out = await run({ id: "voltage-drop", inputs: { voltage: "120", length_ft: "150", awg: "12", current_A: "20", material: "copper", phase: "single" } });

@@ -343,6 +343,14 @@ function validateSelects(schema, inputs) {
 // on purpose. The same goes for a checkbox sent as "false", which is a truthy
 // string: 17 tiles read it as true, and 2 that test `=== true` read "true" as
 // false.
+// The spellings a caller uses for a checkbox. "false" was the only one read
+// until 2026-10-09: "no", "off" and "0" are just as truthy as strings, and 23
+// tiles answered them as TRUE (breaker-sizing returned the 125% continuous
+// ampacity for continuous: "no").
+const _BOOLEAN_WORDS = new Map([["true", true], ["yes", true], ["on", true], ["y", true], ["1", true], ["false", false], ["no", false], ["off", false], ["n", false], ["0", false]]);
+function booleanWord(value) {
+  return _BOOLEAN_WORDS.get(String(value).trim().toLowerCase());
+}
 function coerceNumericStrings(schema, inputs, exampleRows) {
   if (!inputs || typeof inputs !== "object") return inputs;
   const kinds = new Map(schema ? schema.inputs.map((f) => [f.key, f.kind]) : []);
@@ -359,11 +367,11 @@ function coerceNumericStrings(schema, inputs, exampleRows) {
     }
     if (typeof value !== "string" || value.trim() === "") continue;
     const kind = kinds.get(key);
-    const flag = /^(true|false)$/i.test(value.trim());
+    const flag = booleanWord(value);
     const boolean = kind ? kind === "checkbox" : typeof example[key] === "boolean";
-    if (boolean && flag) {
+    if (boolean && flag !== undefined) {
       if (out === inputs) out = { ...inputs };
-      out[key] = value.trim().toLowerCase() === "true";
+      out[key] = flag;
       continue;
     }
     const numeric = kind ? kind === "number" : typeof example[key] === "number";
@@ -383,7 +391,7 @@ function coerceNumericStrings(schema, inputs, exampleRows) {
 function asTyped(value, like) {
   if (typeof value !== "string" || value.trim() === "") return value;
   if (typeof like === "number") { const n = Number(value); return Number.isFinite(n) ? n : value; }
-  if (typeof like === "boolean" && /^(true|false)$/i.test(value.trim())) return value.trim().toLowerCase() === "true";
+  if (typeof like === "boolean" && booleanWord(value) !== undefined) return booleanWord(value);
   return value;
 }
 function coerceListLike(list, exampleList) {
