@@ -244,17 +244,23 @@ PIPEFIT_RENDERERS["pipe-spacing-rack"] = _renderPipeSpacingRack;
 // ---------------------------------------------------------------------
 // v157 Flash steam percentage (flash-steam-pct)
 // ---------------------------------------------------------------------
+// A pressure mode with no pressure given. Blank must not quietly mean 0 psig,
+// which is a real pressure (atmospheric steam) and a different answer.
+const _noPressure = (v) => v === null || v === undefined || v === "";
+// A number field's value, or null when it is blank.
+function _numOrNull(input) { if (input.value === "") return null; const v = Number(input.value); return Number.isFinite(v) ? v : null; }
 const _STEAM_TABLE_BASIS_OPTIONS = [{ value: "entered", label: "Enter the steam-table values" }, { value: "pressure", label: "From the pressure (saturated)" }];
 // dims: in { hf_high: L^2 T^-2, hf_low: L^2 T^-2, hfg_low: L^2 T^-2, high_pressure_psig: M L^-1 T^-2, low_pressure_psig: M L^-1 T^-2 } out: { flash_fraction: dimensionless, flash_pct: dimensionless, hf_high_used_btulb: L^2 T^-2, hf_low_used_btulb: L^2 T^-2, hfg_low_used_btulb: L^2 T^-2 }
-export function computeFlashSteamPct({ hf_high = 0, hf_low = 0, hfg_low = 0, steam_basis = "entered", high_pressure_psig = 0, low_pressure_psig = 0 } = {}) {
+export function computeFlashSteamPct({ hf_high = 0, hf_low = 0, hfg_low = 0, steam_basis = "entered", high_pressure_psig = null, low_pressure_psig = null } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   let hfH = Number(hf_high);
   let hfL = Number(hf_low);
   let hfg = Number(hfg_low);
   if (steam_basis === "pressure") {
     // Saturated water at each pressure on a 14.696 psia atmosphere (IAPWS-IF97).
+    if (_noPressure(high_pressure_psig) || _noPressure(low_pressure_psig)) return { error: "Enter both pressures (psig); 0 is atmospheric." };
     const hi = saturatedSteam(Number(high_pressure_psig) + 14.696), lo = saturatedSteam(Number(low_pressure_psig) + 14.696);
-    if (!hi || !lo) return { error: "Both pressures must be between -14.5 and 2,285 psig for saturated steam-table values." };
+    if (!hi || !lo) return { error: "Both pressures must be between -14.59 and 2,285 psig for saturated steam-table values." };
     if (!(Number(high_pressure_psig) > Number(low_pressure_psig))) return { error: "The high-side pressure must exceed the low-side pressure (no flash otherwise)." };
     hfH = hi.hf_btulb; hfL = lo.hf_btulb; hfg = lo.hfg_btulb;
   } else if (steam_basis !== "entered") {
@@ -281,7 +287,7 @@ function _renderFlashSteamPct(inputRegion, outputRegion, citationEl) {
   const oPct = makeOutputLine(outputRegion, "Flash steam", "fs-out-pct");
   const oUsed = makeOutputLine(outputRegion, "Steam-table values used", "fs-out-used");
   const update = debounce(() => {
-    const r = computeFlashSteamPct({ hf_high: Number(hfH.input.value) || 0, hf_low: Number(hfL.input.value) || 0, hfg_low: Number(hfg.input.value) || 0, steam_basis: basis.select.value, high_pressure_psig: Number(pHigh.input.value) || 0, low_pressure_psig: Number(pLow.input.value) || 0 });
+    const r = computeFlashSteamPct({ hf_high: Number(hfH.input.value) || 0, hf_low: Number(hfL.input.value) || 0, hfg_low: Number(hfg.input.value) || 0, steam_basis: basis.select.value, high_pressure_psig: _numOrNull(pHigh.input), low_pressure_psig: _numOrNull(pLow.input) });
     if (r.error) { oPct.textContent = r.error; oUsed.textContent = "-"; return; }
     oPct.textContent = fmt(r.flash_pct, 1) + "% of the condensate flashes to steam";
     oUsed.textContent = "hf " + fmt(r.hf_high_used_btulb, 1) + " high, " + fmt(r.hf_low_used_btulb, 1) + " low; hfg " + fmt(r.hfg_low_used_btulb, 1) + " Btu/lb";
@@ -304,12 +310,13 @@ function _steamSpecificVolume(steam_basis, spec_vol_ft3lb, steam_pressure_psig) 
     return sv > 0 ? { sv } : { error: "Specific volume must be positive (ft3/lb)." };
   }
   if (steam_basis !== "pressure") return { error: "Choose how the steam specific volume is given: entered, or from the steam pressure." };
+  if (_noPressure(steam_pressure_psig)) return { error: "Enter the steam pressure (psig); 0 is steam at atmospheric pressure." };
   const sat = saturatedSteam(Number(steam_pressure_psig) + 14.696);
-  if (!sat) return { error: "Steam pressure must be between -14.5 and 2,285 psig for a saturated specific volume." };
+  if (!sat) return { error: "Steam pressure must be between -14.59 and 2,285 psig for a saturated specific volume." };
   return { sv: sat.spec_vol_ft3lb, sat_temp_f: sat.sat_temp_f };
 }
 // dims: in { steam_flow_lbhr: M T^-1, spec_vol_ft3lb: L^3 M^-1, vel_ceiling_fpm: L T^-1, steam_pressure_psig: M L^-1 T^-2 } out: { req_area_in2: L^2, req_dia_in: L, chosen_nps: dimensionless, chosen_id_in: L, actual_fpm: L T^-1, spec_vol_used_ft3lb: L^3 M^-1 }
-export function computeSteamPipeVelocity({ steam_flow_lbhr = 0, spec_vol_ft3lb = 0, vel_ceiling_fpm = 0, steam_basis = "entered", steam_pressure_psig = 0 } = {}) {
+export function computeSteamPipeVelocity({ steam_flow_lbhr = 0, spec_vol_ft3lb = 0, vel_ceiling_fpm = 0, steam_basis = "entered", steam_pressure_psig = null } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const flow = Number(steam_flow_lbhr);
   const vc = Number(vel_ceiling_fpm);
@@ -346,7 +353,7 @@ function _renderSteamPipeVelocity(inputRegion, outputRegion, citationEl) {
   const oVel = makeOutputLine(outputRegion, "Actual velocity in it", "sv-out-vel");
   const oSv = makeOutputLine(outputRegion, "Steam specific volume used", "sv-out-sv");
   const update = debounce(() => {
-    const r = computeSteamPipeVelocity({ steam_flow_lbhr: Number(flow.input.value) || 0, spec_vol_ft3lb: Number(sv.input.value) || 0, vel_ceiling_fpm: Number(vc.input.value) || 0, steam_basis: basis.select.value, steam_pressure_psig: Number(psig.input.value) || 0 });
+    const r = computeSteamPipeVelocity({ steam_flow_lbhr: Number(flow.input.value) || 0, spec_vol_ft3lb: Number(sv.input.value) || 0, vel_ceiling_fpm: Number(vc.input.value) || 0, steam_basis: basis.select.value, steam_pressure_psig: _numOrNull(psig.input) });
     if (r.error) { oReq.textContent = r.error; oSize.textContent = "-"; oVel.textContent = "-"; oSv.textContent = "-"; return; }
     oReq.textContent = fmt(r.req_area_in2, 2) + " in^2 (" + fmt(r.req_dia_in, 2) + " in dia)";
     oSize.textContent = r.chosen_nps + " in (ID " + fmt(r.chosen_id_in, 3) + " in)";
@@ -364,7 +371,7 @@ PIPEFIT_RENDERERS["steam-pipe-velocity"] = _renderSteamPipeVelocity;
 // much steam it carries within an allowable velocity.
 // ---------------------------------------------------------------------
 // dims: in { nps: dimensionless, spec_vol_ft3lb: L^3 M^-1, vel_ceiling_fpm: L T^-1, steam_pressure_psig: M L^-1 T^-2 } out: { id_in: L, area_in2: L^2, capacity_lbhr: M T^-1, spec_vol_used_ft3lb: L^3 M^-1 }
-export function computeSteamPipeCapacity({ nps = "2", spec_vol_ft3lb = 0, vel_ceiling_fpm = 0, steam_basis = "entered", steam_pressure_psig = 0 } = {}) {
+export function computeSteamPipeCapacity({ nps = "2", spec_vol_ft3lb = 0, vel_ceiling_fpm = 0, steam_basis = "entered", steam_pressure_psig = null } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const vc = Number(vel_ceiling_fpm);
   const row = _SCH40_ID_IN.find(([n]) => n === nps);
@@ -396,7 +403,7 @@ function _renderSteamPipeCapacity(inputRegion, outputRegion, citationEl) {
   const oArea = makeOutputLine(outputRegion, "Internal area", "sc-out-area");
   const oSv = makeOutputLine(outputRegion, "Steam specific volume used", "sc-out-sv");
   const update = debounce(() => {
-    const r = computeSteamPipeCapacity({ nps: size.select.value, spec_vol_ft3lb: Number(sv.input.value) || 0, vel_ceiling_fpm: Number(vc.input.value) || 0, steam_basis: basis.select.value, steam_pressure_psig: Number(psig.input.value) || 0 });
+    const r = computeSteamPipeCapacity({ nps: size.select.value, spec_vol_ft3lb: Number(sv.input.value) || 0, vel_ceiling_fpm: Number(vc.input.value) || 0, steam_basis: basis.select.value, steam_pressure_psig: _numOrNull(psig.input) });
     if (r.error) { oCap.textContent = r.error; oArea.textContent = "-"; oSv.textContent = "-"; return; }
     oCap.textContent = fmt(r.capacity_lbhr, 0) + " lb/hr";
     oArea.textContent = fmt(r.area_in2, 2) + " in^2 (ID " + fmt(r.id_in, 3) + " in)";
@@ -412,7 +419,7 @@ PIPEFIT_RENDERERS["steam-pipe-capacity"] = _renderSteamPipeCapacity;
 // v159 Steam trap condensate load and required capacity (steam-trap-sizing)
 // ---------------------------------------------------------------------
 // dims: in { heat_duty_btuhr: M L^2 T^-3, hfg_btulb: L^2 T^-2, safety_factor: dimensionless, steam_pressure_psig: M L^-1 T^-2 } out: { condensate_lbhr: M T^-1, req_capacity_lbhr: M T^-1, hfg_used_btulb: L^2 T^-2 }
-export function computeSteamTrapSizing({ heat_duty_btuhr = 0, hfg_btulb = 0, safety_factor = 2, steam_basis = "entered", steam_pressure_psig = 0 } = {}) {
+export function computeSteamTrapSizing({ heat_duty_btuhr = 0, hfg_btulb = 0, safety_factor = 2, steam_basis = "entered", steam_pressure_psig = null } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const q = Number(heat_duty_btuhr);
   let hfg = Number(hfg_btulb);
@@ -420,8 +427,9 @@ export function computeSteamTrapSizing({ heat_duty_btuhr = 0, hfg_btulb = 0, saf
   if (!(q > 0)) return { error: "Heat duty must be positive (Btu/hr)." };
   if (steam_basis === "pressure") {
     // Latent heat of saturated steam at the gauge pressure, 14.696 psia atmosphere (IAPWS-IF97).
+    if (_noPressure(steam_pressure_psig)) return { error: "Enter the steam pressure (psig); 0 is steam at atmospheric pressure." };
     const sat = saturatedSteam(Number(steam_pressure_psig) + 14.696);
-    if (!sat) return { error: "Steam pressure must be between -14.5 and 2,285 psig for a saturated latent heat." };
+    if (!sat) return { error: "Steam pressure must be between -14.59 and 2,285 psig for a saturated latent heat." };
     hfg = sat.hfg_btulb;
   } else if (steam_basis !== "entered") {
     return { error: "Choose how the latent heat is given: entered, or from the steam pressure." };
@@ -449,7 +457,7 @@ function _renderSteamTrapSizing(inputRegion, outputRegion, citationEl) {
   const oCap = makeOutputLine(outputRegion, "Required trap capacity", "st-out-cap");
   const oHfg = makeOutputLine(outputRegion, "Latent heat used", "st-out-hfg");
   const update = debounce(() => {
-    const r = computeSteamTrapSizing({ heat_duty_btuhr: Number(q.input.value) || 0, hfg_btulb: Number(hfg.input.value) || 0, safety_factor: Number(sf.input.value) || 0, steam_basis: basis.select.value, steam_pressure_psig: Number(psig.input.value) || 0 });
+    const r = computeSteamTrapSizing({ heat_duty_btuhr: Number(q.input.value) || 0, hfg_btulb: Number(hfg.input.value) || 0, safety_factor: Number(sf.input.value) || 0, steam_basis: basis.select.value, steam_pressure_psig: _numOrNull(psig.input) });
     if (r.error) { oLoad.textContent = r.error; oCap.textContent = "-"; oHfg.textContent = "-"; return; }
     oLoad.textContent = fmt(r.condensate_lbhr, 0) + " lb/hr";
     oCap.textContent = fmt(r.req_capacity_lbhr, 0) + " lb/hr at the operating differential";
@@ -690,7 +698,7 @@ PIPEFIT_RENDERERS["hanger-rod-sizing"] = _renderHangerRodSizing;
 // water-hammers. Flash mass x specific volume / continuity, then the
 // smallest Sch 40 nominal at a return-velocity ceiling.
 // dims: in { condensate_lbhr: M T^-1, flash_fraction: dimensionless, spec_vol_ft3lb: L^3 M^-1, vel_ceiling_fpm: L T^-1, supply_pressure_psig: M L^-1 T^-2, return_pressure_psig: M L^-1 T^-2 } out: { flash_lbhr: M T^-1, vol_cfm: L^3 T^-1, req_area_in2: L^2, req_dia_in: L, chosen_nps: dimensionless, chosen_id_in: L, flash_fraction_used: dimensionless, spec_vol_used_ft3lb: L^3 M^-1 }
-export function computeCondensateReturnSizing({ condensate_lbhr = 0, flash_fraction = 0, spec_vol_ft3lb = 0, vel_ceiling_fpm = 4000, steam_basis = "entered", supply_pressure_psig = 0, return_pressure_psig = 0 } = {}) {
+export function computeCondensateReturnSizing({ condensate_lbhr = 0, flash_fraction = 0, spec_vol_ft3lb = 0, vel_ceiling_fpm = 4000, steam_basis = "entered", supply_pressure_psig = null, return_pressure_psig = null } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const load = Number(condensate_lbhr);
   let ff = Number(flash_fraction);
@@ -700,8 +708,9 @@ export function computeCondensateReturnSizing({ condensate_lbhr = 0, flash_fract
   if (steam_basis === "pressure") {
     // Flash fraction and flash-steam volume from the trap inlet and return
     // pressures, saturated, on a 14.696 psia atmosphere (IAPWS-IF97).
+    if (_noPressure(supply_pressure_psig) || _noPressure(return_pressure_psig)) return { error: "Enter both pressures (psig); 0 is atmospheric." };
     const hi = saturatedSteam(Number(supply_pressure_psig) + 14.696), lo = saturatedSteam(Number(return_pressure_psig) + 14.696);
-    if (!hi || !lo) return { error: "Both pressures must be between -14.5 and 2,285 psig for saturated steam-table values." };
+    if (!hi || !lo) return { error: "Both pressures must be between -14.59 and 2,285 psig for saturated steam-table values." };
     if (!(Number(supply_pressure_psig) > Number(return_pressure_psig))) return { error: "The pressure at the trap must exceed the return pressure (no flash otherwise)." };
     ff = (hi.hf_btulb - lo.hf_btulb) / lo.hfg_btulb;
     sv = lo.spec_vol_ft3lb;
@@ -741,7 +750,7 @@ function _renderCondensateReturnSizing(inputRegion, outputRegion, citationEl) {
   const oSize = makeOutputLine(outputRegion, "Smallest Sch 40 return", "cr-out-size");
   const oUsed = makeOutputLine(outputRegion, "Flash fraction / specific volume used", "cr-out-used");
   const update = debounce(() => {
-    const r = computeCondensateReturnSizing({ condensate_lbhr: Number(load.input.value) || 0, flash_fraction: Number(ff.input.value) || 0, spec_vol_ft3lb: Number(sv.input.value) || 0, vel_ceiling_fpm: Number(vc.input.value) || 0, steam_basis: basis.select.value, supply_pressure_psig: Number(pSupply.input.value) || 0, return_pressure_psig: Number(pReturn.input.value) || 0 });
+    const r = computeCondensateReturnSizing({ condensate_lbhr: Number(load.input.value) || 0, flash_fraction: Number(ff.input.value) || 0, spec_vol_ft3lb: Number(sv.input.value) || 0, vel_ceiling_fpm: Number(vc.input.value) || 0, steam_basis: basis.select.value, supply_pressure_psig: _numOrNull(pSupply.input), return_pressure_psig: _numOrNull(pReturn.input) });
     if (r.error) { oFlash.textContent = r.error; oReq.textContent = "-"; oSize.textContent = "-"; oUsed.textContent = "-"; return; }
     oFlash.textContent = fmt(r.flash_lbhr, 0) + " lb/hr flash (" + fmt(r.vol_cfm, 1) + " cfm)";
     oReq.textContent = fmt(r.req_area_in2, 2) + " in^2 (" + fmt(r.req_dia_in, 2) + " in dia)";

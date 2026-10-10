@@ -59,3 +59,31 @@ test("search: an alias loaded from a shard still ranks its tile", async ({ page 
   await expect(page.locator("#search-results .search-result").first().locator(".sr-name"))
     .toHaveText("Add-a-Hole Zone Leakage (Flow Through an Attic, Garage or Crawl Space)", { timeout: 20000 });
 });
+
+test("search: alias shards landing after Escape do not reopen the dropdown", async ({ page }) => {
+  const held = [];
+  let release = false;
+  await page.route("**/data/search/aliases-*.json", async (route) => {
+    if (release) return route.continue();
+    held.push(route);
+  });
+  await page.goto("/");
+  const input = page.locator("#search-input");
+  await input.click();
+  await input.fill("voltage drop");
+  await expect(page.locator("#search-results .search-result").first()).toBeVisible({ timeout: 20000 });
+  await expect.poll(() => held.length, { timeout: 20000 }).toBeGreaterThanOrEqual(15);
+  // The reader dismisses the list; focus stays in the box.
+  await input.press("Escape");
+  await expect(page.locator("#search-results")).toBeHidden();
+  release = true;
+  const responses = Promise.all(held.map((r) => page.waitForResponse((resp) => resp.url() === r.request().url())));
+  await Promise.all(held.map((r) => r.continue()));
+  await responses;
+  await page.waitForTimeout(500);
+  await expect(page.locator("#search-results")).toBeHidden();
+  // The aliases still arrived: the next keystroke ranks with them.
+  await input.fill("add a hole test");
+  await expect(page.locator("#search-results .search-result").first().locator(".sr-name"))
+    .toHaveText("Add-a-Hole Zone Leakage (Flow Through an Attic, Garage or Crawl Space)", { timeout: 20000 });
+});

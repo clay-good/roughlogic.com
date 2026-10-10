@@ -188,12 +188,20 @@ export function computeSolarTimeCorrection({ clock_hour = 12, clock_minute = 0, 
   if (!(utc_offset_hours >= -12 && utc_offset_hours <= 14)) return { error: "The clock's UTC offset must be between -12 and +14 hours." };
   const B = (day_of_year - 1) * 2 * Math.PI / 365;
   const equation_of_time_min = 229.2 * (0.000075 + 0.001868 * Math.cos(B) - 0.032077 * Math.sin(B) - 0.014615 * Math.cos(2 * B) - 0.04089 * Math.sin(2 * B));
-  // 4 minutes per degree east of the meridian the clock keeps (15 deg per hour of offset).
-  const longitude_correction_min = 4 * (longitude_deg - 15 * utc_offset_hours);
+  // 4 minutes per degree east of the meridian the clock keeps (15 deg per hour of
+  // offset), taken the short way round: UTC+14 keeps the 150 W meridian, so
+  // Kiritimati at 157.4 W is 7.4 degrees west of it, not 367.4.
+  let east_of_meridian_deg = (longitude_deg - 15 * utc_offset_hours) % 360;
+  if (east_of_meridian_deg > 180) east_of_meridian_deg -= 360;
+  if (east_of_meridian_deg <= -180) east_of_meridian_deg += 360;
+  const longitude_correction_min = 4 * east_of_meridian_deg;
   const total_correction_min = longitude_correction_min + equation_of_time_min;
   const clock_hours = clock_hour + clock_minute / 60;
   const solar_time_hours = clock_hours + total_correction_min / 60;
-  const hours_from_solar_noon = solar_time_hours - 12;
+  // Kept within half a day of noon: 0:05 on the clock can be 23:35 solar the day before.
+  let hours_from_solar_noon = (solar_time_hours - 12) % 24;
+  if (hours_from_solar_noon > 12) hours_from_solar_noon -= 24;
+  if (hours_from_solar_noon < -12) hours_from_solar_noon += 24;
   const solar_noon_clock_hours = 12 - total_correction_min / 60;
   if (![equation_of_time_min, solar_time_hours, solar_noon_clock_hours].every(Number.isFinite)) return { error: "Solar-time math is not a finite value." };
   const far_from_meridian = Math.abs(longitude_correction_min) > 120;

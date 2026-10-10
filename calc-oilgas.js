@@ -933,8 +933,12 @@ export function computeKickTolerance({
   const fills_open_hole = height_raw_ft >= open_hole_ft;
   const max_influx_height_ft = none ? 0 : Math.min(height_raw_ft, open_hole_ft);
   const volume_at_shoe_bbl = max_influx_height_ft * annular_capacity_dp_bbl_ft;
-  // Boyle's law back to bottom-hole conditions: the same gas is smaller where it entered.
-  const volume_at_shoe_as_shut_in_bbl = volume_at_shoe_bbl * shoe_limit_psi / formation_pressure_psi;
+  // Boyle's law back to bottom-hole conditions: the same gas is smaller where it
+  // entered. The pressure at the shoe with H of influx below it equals the shoe
+  // limit when H is the limiting height, and is LOWER when the height was capped
+  // at the open hole, so it is computed, not assumed to be the limit.
+  const shoe_pressure_with_influx_psi = formation_pressure_psi - mud_gradient * (open_hole_ft - max_influx_height_ft) - influx_gradient_psi_ft * max_influx_height_ft;
+  const volume_at_shoe_as_shut_in_bbl = volume_at_shoe_bbl * shoe_pressure_with_influx_psi / formation_pressure_psi;
   const volume_at_bottom_bbl = max_influx_height_ft * annular_capacity_bha_bbl_ft;
   const kick_tolerance_bbl = Math.min(volume_at_shoe_as_shut_in_bbl, volume_at_bottom_bbl);
   const governed_by = none ? "none" : volume_at_shoe_as_shut_in_bbl <= volume_at_bottom_bbl ? "shoe" : "bottom";

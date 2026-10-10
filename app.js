@@ -923,10 +923,12 @@ function bindSearch() {
       // The condition is "results are ON SCREEN", not "the input has focus":
       // a reader who pastes a query and clicks away, or a browser that moves
       // focus while a shard is in flight, would otherwise be left looking at
-      // the pre-alias results with no keystroke coming to correct them. It
-      // still never opens a CLOSED dropdown, which is what the focus check
-      // was really protecting.
-      if (document.activeElement === input || !list.hidden) render(input.value, true);
+      // the pre-alias results with no keystroke coming to correct them. And
+      // it must never open a CLOSED dropdown: until 2026-10-10 this also
+      // refreshed whenever the input had focus, so a reader who pressed
+      // Escape (list closed, focus kept) while shards were still landing had
+      // the whole catalog reopen under them.
+      if (!list.hidden) render(input.value, true);
     };
     const scheduleAliasRefresh = () => { if (!refreshTimer) refreshTimer = setTimeout(flushAliases, ALIAS_REFRESH_MS); };
     await Promise.all(groups.map(async (g) => {

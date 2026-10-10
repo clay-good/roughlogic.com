@@ -59665,3 +59665,36 @@ test("bounds: belt-feeder-pull reproduces the Roberts and Manjunath (1986) desig
     assert.ok("error" in _bfp({ ...base, ...bad }), JSON.stringify(bad));
   }
 });
+
+test("bounds: fixes from the 2026-10-10 independent review of the day's new code", () => {
+  // solar-time-correction: the clock meridian is taken the short way round.
+  // UTC+14 keeps 150 W, so Kiritimati (157.4 W) is 7.4 degrees west of it.
+  const k = _stc({ clock_hour: 12, clock_minute: 0, day_of_year: 100, longitude_deg: -157.4, utc_offset_hours: 14 });
+  assert.ok(Math.abs(k.longitude_correction_min + 29.6) < 1e-9 && k.far_from_meridian === false);
+  assert.ok(Math.abs(k.hours_from_solar_noon) < 1);
+  const samoa = _stc({ clock_hour: 12, clock_minute: 0, day_of_year: 100, longitude_deg: -171.8, utc_offset_hours: 13 });
+  assert.ok(Math.abs(samoa.longitude_correction_min - 4 * (-171.8 - 195 + 360)) < 1e-9);
+  // Hours from solar noon stay within half a day of noon.
+  for (const [h, m] of [[0, 5], [23, 55], [12, 0], [6, 30]]) {
+    const x = _stc({ clock_hour: h, clock_minute: m, day_of_year: 45, longitude_deg: -95, utc_offset_hours: -6 });
+    assert.ok(x.hours_from_solar_noon >= -12 && x.hours_from_solar_noon <= 12, h + ":" + m + " -> " + x.hours_from_solar_noon);
+  }
+  // kick-tolerance: when the open hole is full of gas the shoe sits BELOW its
+  // limit, and gas is larger at the shoe than where it entered, never smaller.
+  const capped = _kt({ mud_weight_ppg: 10, shoe_emw_ppg: 14, shoe_tvd_ft: 4500, well_tvd_ft: 5000, kick_intensity_ppg: 0, influx_gradient_psi_ft: 0.1, annular_capacity_dp_bbl_ft: 0.0459, annular_capacity_bha_bbl_ft: 0.0459, safety_margin_psi: 0 });
+  assert.ok(capped.fills_open_hole && capped.volume_at_shoe_as_shut_in_bbl < capped.volume_at_shoe_bbl);
+  assert.ok(Math.abs(capped.volume_at_shoe_as_shut_in_bbl - 22.95 * (2600 - 0.1 * 500) / 2600) < 1e-6);
+  for (const ki of [0, 0.5, 1, 2]) {
+    const x = _kt({ mud_weight_ppg: 10, shoe_emw_ppg: 14, shoe_tvd_ft: 3000, well_tvd_ft: 5000, kick_intensity_ppg: ki, influx_gradient_psi_ft: 0.1, annular_capacity_dp_bbl_ft: 0.0459, annular_capacity_bha_bbl_ft: 0.0292, safety_margin_psi: 0 });
+    assert.ok(x.volume_at_shoe_as_shut_in_bbl <= x.volume_at_shoe_bbl + 1e-12, "ki " + ki);
+  }
+  // Steam calculators: a pressure mode with no pressure is an error, and 0 psig is atmospheric steam.
+  assert.ok("error" in _spvP({ steam_flow_lbhr: 1000, vel_ceiling_fpm: 6000, steam_basis: "pressure" }));
+  assert.ok("error" in _spcP({ nps: "2", vel_ceiling_fpm: 6000, steam_basis: "pressure" }));
+  assert.ok("error" in _stsP({ heat_duty_btuhr: 1e5, steam_basis: "pressure" }));
+  assert.ok("error" in _sspFlash({ steam_basis: "pressure", high_pressure_psig: 100 }));
+  assert.ok("error" in _sspFlash({ steam_basis: "pressure", low_pressure_psig: 0 }));
+  assert.ok("error" in _crsP({ condensate_lbhr: 800, steam_basis: "pressure", supply_pressure_psig: 100 }));
+  assert.ok(Math.abs(_spvP({ steam_flow_lbhr: 1000, vel_ceiling_fpm: 6000, steam_basis: "pressure", steam_pressure_psig: 0 }).spec_vol_used_ft3lb - 26.80) < 0.01);
+  assert.ok(Math.abs(_stsP({ heat_duty_btuhr: 1e5, steam_basis: "pressure", steam_pressure_psig: 0 }).hfg_used_btulb - 970.1) < 0.1);
+});
