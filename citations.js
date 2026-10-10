@@ -22559,6 +22559,18 @@ export const CITATIONS = {
   // band, in the existing calc-hvacsystems.js. Two of the band's four specs
   // were cut as duplicates and landed additively on the tiles that already
   // held the relation (insulation-thickness, pipe-insulation-takeoff).
+  "flat-surface-heat-loss": {
+    formula: "Air at the film temperature (Sutherland mu and k, ideal-gas density, cp 1,006 J/kg K); Ra = g (1/Tf) |Ts - Ta| L^3/(nu alpha). Vertical (L = height): Nu = 0.68 + 0.670 Ra^(1/4)/[1 + (0.492/Pr)^(9/16)]^(4/9) to Ra 1e9, else [0.825 + 0.387 Ra^(1/6)/(1 + (0.492/Pr)^(9/16))^(8/27)]^2. Horizontal (L = area/perimeter): hot side up or cold side down Nu = 0.54 Ra^(1/4) to Ra 1e7, else 0.15 Ra^(1/3); hot side down or cold side up Nu = 0.27 Ra^(1/4). h_rad = eps sigma (Ts^4 - Ta^4)/(Ts - Ta), sigma = 0.1714e-8 BTU/hr ft2 R4; q = (h_conv + h_rad) A (Ts - Ta).",
+    edition: "Free convection from flat plates as given in Incropera, DeWitt, Bergman and Lavine, Fundamentals of Heat and Mass Transfer, Ch. 9 (Churchill and Chu 1975 for the vertical plate; McAdams for the horizontal plate), and gray-body radiation to large surroundings, by name.",
+    freeAccess: "Standard heat-transfer correlations; checked against the textbook's Example 9.3 (a 0.75 by 0.3 m duct at 45 C in 15 C air: sides 4.23, top 5.47, bottom 2.07 W/m2 K), reproduced within 1%.",
+    governance: GOVERNANCE.general,
+    editionNote: "Heat loss from a bare flat surface to still air. A hot surface facing up (or a cold one facing down) is buoyancy-assisted and convects about two and a half times as fast as the same surface facing the other way. Radiation is usually half or more of the loss. The combined coefficient is the outer film the insulation calculators take as entered. Valid to Ra 1e13; wind and forced convection are not included.",
+    assumptions: [
+      { name: "Characteristic length", value: "height for a vertical plate; area over perimeter for a horizontal one", source: "Incropera Ch. 9" },
+      { name: "Radiation", value: "gray surface to large surroundings at the air temperature", source: "Stefan-Boltzmann" },
+      { name: "Still air", value: "no wind or forced convection; the surface temperature is uniform", source: "scope of this tile" },
+    ],
+  },
   "refractory-shell-temperature": {
     formula: "one-dimensional steady-state plane-wall conduction: each layer contributes thickness / conductivity and the outer film one / coefficient, the flux is the total temperature drop over the total resistance, and each interface temperature is the hot face less the flux times the resistance ahead of it; the shell is the ambient plus the flux times the film resistance.",
     edition: "A steady-state series-resistance solve with every interface reported against its own layer's service limit, and the shell against both a personnel limit and, on flue gas service, an acid dew point. Conductivities are ENTERED because refractory k varies strongly with temperature and with the specific product. It does not address transient heating and dry-out schedules, thermal expansion and joints, corners, arches, penetrations, anchors and the thermal bridge each anchor makes, gas-side convection and radiation, slag or chemical attack, or spalling.",

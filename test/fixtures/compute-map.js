@@ -2065,6 +2065,7 @@ export const COMPUTE_MAP = {
   "spray-transfer-efficiency": { module: "../../calc-mechanic.js", fn: "computeSprayTransferEfficiency" },
   "adhesive-bond-area": { module: "../../calc-mechanic.js", fn: "computeAdhesiveBondArea" },
   "refractory-shell-temperature": { module: "../../calc-hvacsystems.js", fn: "computeRefractoryShellTemperature" },
+  "flat-surface-heat-loss": { module: "../../calc-hvacsystems.js", fn: "computeFlatSurfaceHeatLoss" },
   "cryogenic-boiloff": { module: "../../calc-hvacsystems.js", fn: "computeCryogenicBoiloff" },
   "gaussian-dispersion-screen": { module: "../../calc-airquality.js", fn: "computeGaussianDispersionScreen" },
   "noise-barrier-insertion-loss": { module: "../../calc-airquality.js", fn: "computeNoiseBarrierInsertionLoss" },

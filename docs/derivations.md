@@ -2625,6 +2625,7 @@ cross-check.
 | calc-hvacsystems.js | `computeEnvelopeConductionLoad` | `{ area_ft2 = 0, u_factor = 0, cltd_f = 0 } = {}` | _ | _ | _ |
 | calc-hvacsystems.js | `computeFanSystemEffect` | `{ flow_cfm = 0, outlet_width_in = 0, outlet_height_in = 0, straight_duct_ft =...` | _ | _ | _ |
 | calc-hvacsystems.js | `computeFilterPressureDrop` | `{ filter_type = "merv13", face_area_ft2 = 0, face_velocity_fpm = 300, clean_d...` | _ | _ | _ |
+| calc-hvacsystems.js | `computeFlatSurfaceHeatLoss` | `{ orientation = "vertical", side_a_ft = 0, side_b_ft = 0, surface_f = 0, amb_...` | _ | _ | _ |
 | calc-hvacsystems.js | `computeFlowHoodCorrection` | `{ hood_reading_cfm = 0, correction_factor = 1, reference_traverse_cfm = 0, de...` | _ | _ | _ |
 | calc-hvacsystems.js | `computeHumidifierCapacity` | `{ cfm = 0, supply_db_F = 70, entering_rh_pct = 20, target_rh_pct = 40, altitu...` | _ | _ | _ |
 | calc-hvacsystems.js | `computeHxLmtdNtu` | `{ config = "counterflow", th_in_F = 0, th_out_F = 0, tc_in_F = 0, tc_out_F = ...` | _ | _ | _ |
@@ -3924,7 +3925,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2508.
+Row count: 2509.
 
 <!-- END function-corpus-v14 -->
 
@@ -4417,7 +4418,7 @@ per spec-v14 §13.1 second paragraph.
 | `wobbe-index` | Wobbe Index (Fuel-Gas Interchangeability) | Wobbe index (fuel-gas interchangeabil...; WI = 1000 / sqrt(0.60) = 1000 / 0.77460 = 1290.99 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `wsfu-demand` | Probable Peak Demand (WSFU to GPM) | Hunter's curve (NBS BMS65) / IPC 2021...; 120 WSFU flush-valve -> 73.0 GPM, a printed row of Table ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group C HVAC (218 tiles)
+### Group C HVAC (219 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4526,6 +4527,7 @@ per spec-v14 §13.1 second paragraph.
 | `fixed-orifice-target-superheat` | Fixed-Orifice Target Superheat (Charging) | EPA 608 / manufacturer charging-chart...; Target SH = (3 x 63 - 80 - 95)/2 = (189 - 175)/2 = 14/2 =... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `flash-gas-subcool` | Liquid-Line Subcooling to Prevent Flash Gas | ASHRAE Refrigeration Handbook; 40 ft R-410A riser, 15 psi friction -> 17.2 psi lift, 32.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `flat-oval-duct` | Flat-Oval Duct Equivalent Round Diameter | ASHRAE Fundamentals (duct design) / S...; A = (pi/4)(10^2) + 10(20-10) = 78.54 + 100 = 178.54 in^2;... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `flat-surface-heat-loss` | Bare Flat Surface Heat Loss (Convection + Radiation) | Project (first-principles); Ra = 5.76e10 on the 8 ft height; h_conv = 0.893, h_rad = ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `flow-hood-correction` | Flow Hood Reading Correction and Diffuser Airflow | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `flue-gas-combustion-eff` | Flue-Gas Combustion Efficiency (Stack Loss) | Siegert stack-loss method (DIN combus...; Natural gas, 5% O2, 400 F stack over 70 F air -> CO2 8.90... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `flue-gas-dew-point` | Natural-Gas Flue-Gas Water Dew Point | Natural-gas flue-gas water dew point ...; frac = 2/(1 + 9.52 x 1.15) = 0.1674; p = 127.2 mmHg; Anto... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
@@ -6351,6 +6353,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 
-Tile count: 2254. Fixture-covered or reference-cadence: 2254 / 2254.
+Tile count: 2255. Fixture-covered or reference-cadence: 2255 / 2255.
 
 <!-- END tile-index-v14 -->

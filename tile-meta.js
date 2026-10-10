@@ -1142,6 +1142,7 @@ const _TILES = [
   ["spray-transfer-efficiency", "K"],
   ["adhesive-bond-area", "K"],
   ["refractory-shell-temperature", "C"],
+  ["flat-surface-heat-loss", "C"],
   ["cryogenic-boiloff", "C"],
   ["gaussian-dispersion-screen", "G"],
   ["noise-barrier-insertion-loss", "G"],

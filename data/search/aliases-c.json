@@ -2418,6 +2418,11 @@
     {"term":"reader-harris gallagher","target":"orifice-discharge-coefficient","kind":"industry"},
     {"term":"orifice plate coefficient","target":"orifice-discharge-coefficient","kind":"industry"},
     {"term":"iso 5167 orifice","target":"orifice-discharge-coefficient","kind":"industry"},
-    {"term":"what discharge coefficient does my orifice plate have","target":"orifice-discharge-coefficient","kind":"question"}
+    {"term":"what discharge coefficient does my orifice plate have","target":"orifice-discharge-coefficient","kind":"question"},
+    {"term":"flat surface heat loss","target":"flat-surface-heat-loss","kind":"industry"},
+    {"term":"tank wall heat loss","target":"flat-surface-heat-loss","kind":"industry"},
+    {"term":"bare surface heat loss","target":"flat-surface-heat-loss","kind":"industry"},
+    {"term":"natural convection flat plate","target":"flat-surface-heat-loss","kind":"industry"},
+    {"term":"how much heat does an uninsulated tank lose","target":"flat-surface-heat-loss","kind":"question"}
   ]
 }

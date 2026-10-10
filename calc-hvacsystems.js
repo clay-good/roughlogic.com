@@ -2792,3 +2792,81 @@ HVACSYSTEMS_RENDERERS["cryogenic-boiloff"] = _simpleRenderer({
     { key: "note", label: "Note", value: (r) => r.note },
   ],
 });
+
+// ===================== spec-v1951: heat loss from a bare flat surface to still air =====================
+// bare-pipe-heat-loss covers a horizontal cylinder; a tank wall, an equipment panel or the top of a duct is a
+// flat plate. Natural convection by the plate correlations in Incropera (Churchill-Chu for a vertical plate;
+// McAdams for a horizontal one, with the heated side up or down), air at the film temperature, plus gray-body
+// radiation. Reproduces Incropera Example 9.3 (0.75 x 0.3 m duct, 45 C in 15 C air): sides 4.23, top 5.47,
+// bottom 2.07 W/m2 K.
+// Natural-convection Nusselt number on the characteristic length. "enhanced" is the buoyancy-assisted face
+// (hot facing up, or cold facing down); "stable" is the other one.
+const _flatPlateNusselt = (Ra, Pr, orientation) => {
+  if (orientation === "vertical") {
+    return Ra <= 1e9
+      ? 0.68 + 0.670 * Math.pow(Ra, 0.25) / Math.pow(1 + Math.pow(0.492 / Pr, 9 / 16), 4 / 9)
+      : Math.pow(0.825 + 0.387 * Math.pow(Ra, 1 / 6) / Math.pow(1 + Math.pow(0.492 / Pr, 9 / 16), 8 / 27), 2);
+  }
+  if (orientation === "enhanced") return Ra <= 1e7 ? 0.54 * Math.pow(Ra, 0.25) : 0.15 * Math.cbrt(Ra);
+  return 0.27 * Math.pow(Ra, 0.25);
+};
+// dims: in { orientation: dimensionless, side_a_ft: L, side_b_ft: L, surface_f: T, amb_f: T, emissivity: dimensionless } out: { conv_coefficient: M T^-3, rad_coefficient: M T^-3, flux_btu_hr_ft2: M T^-3, q_total_btuh: M L^2 T^-3, area_ft2: L^2, characteristic_length_ft: L, rayleigh: dimensionless, conv_share: dimensionless }
+export function computeFlatSurfaceHeatLoss({ orientation = "vertical", side_a_ft = 0, side_b_ft = 0, surface_f = 0, amb_f = 70, emissivity = 0.9 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!["vertical", "up", "down"].includes(orientation)) return { error: "Orientation must be vertical, horizontal facing up, or horizontal facing down." };
+  if (!(side_a_ft > 0) || !(side_b_ft > 0)) return { error: "Both surface dimensions must be positive (ft)." };
+  if (!(emissivity > 0 && emissivity <= 1)) return { error: "Surface emissivity must be above 0 and at most 1 (0.9 painted, 0.1 bright aluminum)." };
+  const TsK = (surface_f - 32) * 5 / 9 + 273.15, TaK = (amb_f - 32) * 5 / 9 + 273.15;
+  if (!(TsK > 0 && TaK > 0)) return { error: "Temperatures must be above absolute zero (F)." };
+  if (Math.abs(surface_f - amb_f) < 1e-12) return { error: "The surface and the air are at the same temperature; there is no heat flow." };
+  // Air at the film temperature, 1 atm: Sutherland viscosity and conductivity, ideal-gas density, cp 1,006 J/kg K.
+  const Tf = (TsK + TaK) / 2;
+  const mu = 1.716e-5 * Math.pow(Tf / 273.15, 1.5) * (273.15 + 110.4) / (Tf + 110.4);
+  const kAir = 0.0241 * Math.pow(Tf / 273.15, 1.5) * (273.15 + 194) / (Tf + 194);
+  const nu = mu / (101325 / (287.05 * Tf));
+  const Pr = 1006 * mu / kAir;
+  const area_ft2 = side_a_ft * side_b_ft;
+  // A vertical plate scales on its height (side A); a horizontal one on area over perimeter.
+  const characteristic_length_ft = orientation === "vertical" ? side_a_ft : area_ft2 / (2 * (side_a_ft + side_b_ft));
+  const Lm = characteristic_length_ft * 0.3048;
+  const rayleigh = 9.80665 / Tf * Math.abs(TsK - TaK) * Lm ** 3 / (nu * nu / Pr);
+  if (!(rayleigh <= 1e13)) return { error: "Rayleigh number above 1e13 is outside these correlations; the surface is too large or too hot for this screen." };
+  const hot = surface_f > amb_f;
+  // A hot plate facing up and a cold plate facing down are the same buoyancy-assisted case.
+  const regime = orientation === "vertical" ? "vertical" : ((orientation === "up") === hot ? "enhanced" : "stable");
+  const nusselt = _flatPlateNusselt(rayleigh, Pr, regime);
+  const conv_coefficient = nusselt * kAir / Lm * 0.17611; // W/m2K -> BTU/hr ft2 F
+  const TsR = surface_f + 459.67, TaR = amb_f + 459.67;
+  const rad_coefficient = emissivity * 0.1714e-8 * (TsR ** 4 - TaR ** 4) / (TsR - TaR);
+  const flux_btu_hr_ft2 = (conv_coefficient + rad_coefficient) * (surface_f - amb_f);
+  const q_total_btuh = flux_btu_hr_ft2 * area_ft2;
+  const conv_share = conv_coefficient / (conv_coefficient + rad_coefficient);
+  if (![conv_coefficient, rad_coefficient, flux_btu_hr_ft2, q_total_btuh].every(Number.isFinite)) return { error: "Heat-loss math is not a finite value; check the inputs." };
+  const loss_verdict = fmt(Math.abs(q_total_btuh), 0) + " BTU/hr " + (hot ? "lost from" : "GAINED by") + " " + fmt(area_ft2, 1) + " sq ft, " + fmt(Math.abs(flux_btu_hr_ft2), 1) + " BTU/hr per sq ft";
+  const film_verdict = "convection " + fmt(conv_coefficient, 2) + " + radiation " + fmt(rad_coefficient, 2) + " = " + fmt(conv_coefficient + rad_coefficient, 2) + " BTU/hr/sq ft/degF (" + fmt(conv_share * 100, 0) + "% convection)";
+  return {
+    conv_coefficient, rad_coefficient, flux_btu_hr_ft2, q_total_btuh, area_ft2, characteristic_length_ft, rayleigh, nusselt, prandtl: Pr, conv_share, gain: !hot, regime,
+    loss_verdict, film_verdict,
+    note: "Heat lost from a bare flat surface to still air: natural convection by the flat-plate correlations in Incropera (Churchill-Chu for a vertical plate, on its height; McAdams for a horizontal plate, on area over perimeter) with air properties at the film temperature, plus radiation to surroundings at the air temperature. Orientation matters: a hot surface facing UP sheds heat about two and a half times as fast by convection as the same surface facing DOWN, where the warm air is trapped against it, and a cold surface is the mirror image. Radiation is usually half or more of the loss, so a painted surface (emissivity 0.9) loses far more than bright aluminum (0.1). The combined coefficient here is the film that insulation-thickness, pipe-heat-loss-radial and refractory-shell-temperature take as entered. Still air only; wind raises the convection several times. For a pipe use bare-pipe-heat-loss. A negative result is a heat gain on a surface colder than the air. A screen; ASTM C680 and the engineer govern.",
+  };
+}
+export const flatSurfaceHeatLossExample = { inputs: { orientation: "vertical", side_a_ft: 8, side_b_ft: 10, surface_f: 180, amb_f: 70, emissivity: 0.9 } };
+HVACSYSTEMS_RENDERERS["flat-surface-heat-loss"] = _simpleRenderer({
+  compute: computeFlatSurfaceHeatLoss,
+  example: flatSurfaceHeatLossExample.inputs,
+  citation: "Citation: natural convection from a flat plate (Incropera, Fundamentals of Heat and Mass Transfer, Ch. 9: Churchill and Chu for a vertical plate; McAdams for a horizontal plate, Nu = 0.54 Ra^(1/4) or 0.15 Ra^(1/3) with the heated side up and 0.27 Ra^(1/4) with it down), air properties at the film temperature, plus gray-body radiation, sigma = 0.1714e-8 BTU/hr ft2 R4, by name. Still air; a screen.",
+  fields: [
+    { key: "orientation", label: "Surface orientation", kind: "select", default: "vertical", options: [{ value: "vertical", label: "Vertical (wall, tank side)" }, { value: "up", label: "Horizontal, facing up (top)" }, { value: "down", label: "Horizontal, facing down (underside)" }] },
+    { key: "side_a_ft", label: "Height of a vertical surface, or one side of a horizontal one (ft)" },
+    { key: "side_b_ft", label: "Width, or the other side (ft)" },
+    { key: "surface_f", label: "Surface temperature (°F)", attrs: { step: "any" } },
+    { key: "amb_f", label: "Air temperature (°F)", default: 70, attrs: { step: "any" } },
+    { key: "emissivity", label: "Surface emissivity (0.9 painted, 0.1 bright aluminum)", default: 0.9, attrs: { step: "any", min: "0", max: "1" } },
+  ],
+  outputs: [
+    { key: "q_total_btuh", label: "Heat loss", unit: "BTU/hr", value: (r) => r.loss_verdict },
+    { key: "conv_coefficient", label: "Surface coefficients", unit: "BTU/hr/sq ft/°F", value: (r) => r.film_verdict },
+    { key: "rayleigh", label: "Rayleigh number", value: (r) => fmt(r.rayleigh, 0) + " on a " + fmt(r.characteristic_length_ft, 2) + " ft characteristic length" },
+    { key: "note", label: "Note", value: (r) => r.note },
+  ],
+});

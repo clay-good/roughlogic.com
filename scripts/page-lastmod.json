@@ -2,100 +2,100 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "1dc9bbd5a113f854",
-      "date": "2026-10-09"
+      "sha": "f1ed0848d5c28c8a",
+      "date": "2026-10-10"
     },
     "/tools/": {
-      "sha": "93c1a84ad7f6cbb3",
-      "date": "2026-10-09"
+      "sha": "6a0555a42e4a81c2",
+      "date": "2026-10-10"
     },
     "/collections/disaster-response/": {
-      "sha": "0a97532deec62207",
-      "date": "2026-10-09"
+      "sha": "43ee2d679bd44705",
+      "date": "2026-10-10"
     },
     "/groups/accounting/": {
-      "sha": "602dc880fd95d1db",
-      "date": "2026-10-09"
+      "sha": "736dc062a51acf70",
+      "date": "2026-10-10"
     },
     "/groups/agriculture/": {
-      "sha": "3ef1339c7f99ac3e",
-      "date": "2026-10-09"
+      "sha": "409fd64a5ef77450",
+      "date": "2026-10-10"
     },
     "/groups/construction/": {
-      "sha": "b875a3d5db7a790c",
-      "date": "2026-10-09"
+      "sha": "3692357f29428654",
+      "date": "2026-10-10"
     },
     "/groups/cross-trade/": {
-      "sha": "850b7a650d6c6163",
-      "date": "2026-10-09"
+      "sha": "1e5872821bf6f3f9",
+      "date": "2026-10-10"
     },
     "/groups/educators/": {
-      "sha": "05bf73fc2c413c6b",
-      "date": "2026-10-09"
+      "sha": "33163e2c7c17e595",
+      "date": "2026-10-10"
     },
     "/groups/electrical/": {
-      "sha": "134616122f1e055f",
-      "date": "2026-10-09"
+      "sha": "6f8f385cf2125cc1",
+      "date": "2026-10-10"
     },
     "/groups/field/": {
-      "sha": "1722e3dc8183f720",
-      "date": "2026-10-09"
+      "sha": "951de19a1607a7d9",
+      "date": "2026-10-10"
     },
     "/groups/fire-ground/": {
-      "sha": "c023457b220b22f2",
-      "date": "2026-10-09"
+      "sha": "b0c31ffc955542e2",
+      "date": "2026-10-10"
     },
     "/groups/historical/": {
-      "sha": "1156503dda103505",
-      "date": "2026-10-09"
+      "sha": "97fec7f92f7260f2",
+      "date": "2026-10-10"
     },
     "/groups/hvac/": {
-      "sha": "17cfe645fba0eab0",
-      "date": "2026-10-09"
+      "sha": "cf352be6c0b306a5",
+      "date": "2026-10-10"
     },
     "/groups/kitchen/": {
-      "sha": "cf132802415f175b",
-      "date": "2026-10-09"
+      "sha": "8d696a430511a03c",
+      "date": "2026-10-10"
     },
     "/groups/lab/": {
-      "sha": "47c4eccbba73baa7",
-      "date": "2026-10-09"
+      "sha": "8a4f4473c91fab5d",
+      "date": "2026-10-10"
     },
     "/groups/mechanic/": {
-      "sha": "0cad5c22722e84e3",
-      "date": "2026-10-09"
+      "sha": "f2f7bcdd8e99aa01",
+      "date": "2026-10-10"
     },
     "/groups/plumbing/": {
-      "sha": "e19c1c653bb93459",
-      "date": "2026-10-09"
+      "sha": "c872e84f1de845cf",
+      "date": "2026-10-10"
     },
     "/groups/real-estate/": {
-      "sha": "2dfa565b3f3adafc",
-      "date": "2026-10-09"
+      "sha": "fbeeef27bf2d402f",
+      "date": "2026-10-10"
     },
     "/groups/references/": {
-      "sha": "ffba6fbbc54611c2",
-      "date": "2026-10-09"
+      "sha": "e7d08994df7bf41e",
+      "date": "2026-10-10"
     },
     "/groups/restoration/": {
-      "sha": "01e9cfdb4b2968f9",
-      "date": "2026-10-09"
+      "sha": "143c3cdd4cdfb9a5",
+      "date": "2026-10-10"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "fdc841d13854b2b0",
-      "date": "2026-10-09"
+      "sha": "20e4f745207f0ca6",
+      "date": "2026-10-10"
     },
     "/groups/stage/": {
-      "sha": "e3255f3498df433f",
-      "date": "2026-10-09"
+      "sha": "92dcdbc2634bfba1",
+      "date": "2026-10-10"
     },
     "/groups/trucking/": {
-      "sha": "83e5fc55678a81bf",
-      "date": "2026-10-09"
+      "sha": "8b7d36fbc3446291",
+      "date": "2026-10-10"
     },
     "/groups/water/": {
-      "sha": "b9f5852edb52baa3",
-      "date": "2026-10-09"
+      "sha": "a8d9d2e9255038a0",
+      "date": "2026-10-10"
     },
     "/tools/aav-install-check/": {
       "sha": "6124c721c9aa5eea",
@@ -478,8 +478,8 @@
       "date": "2026-09-29"
     },
     "/tools/bare-pipe-heat-loss/": {
-      "sha": "c70b30fdb2378764",
-      "date": "2026-10-09"
+      "sha": "2db3e0b9ff8e65e8",
+      "date": "2026-10-10"
     },
     "/tools/barge-draft-displacement/": {
       "sha": "96d9d9e7e043498d",
@@ -3061,6 +3061,10 @@
       "sha": "95f5ed4e8684fa22",
       "date": "2026-09-29"
     },
+    "/tools/flat-surface-heat-loss/": {
+      "sha": "99e8efa9c0f23183",
+      "date": "2026-10-10"
+    },
     "/tools/flat-top-stockpile-volume/": {
       "sha": "0fcb50e0ab48164f",
       "date": "2026-09-29"
@@ -4030,8 +4034,8 @@
       "date": "2026-09-29"
     },
     "/tools/insulation-heat-loss/": {
-      "sha": "037f2c3425167fb9",
-      "date": "2026-10-09"
+      "sha": "2f7e8a04d37fa0d2",
+      "date": "2026-10-10"
     },
     "/tools/insulation-resistance-pi/": {
       "sha": "9517ed35397b5ad8",

@@ -418,7 +418,7 @@ export const TOOL_MODULES = (() => {
   // module, the v42/v70..v80 precedent).
   declare("./calc-hvacsystems.js", "HVACSYSTEMS_RENDERERS", [
     // spec-v1677, v1678: the mechanical insulation band.
-    "refractory-shell-temperature", "cryogenic-boiloff",
+    "refractory-shell-temperature", "cryogenic-boiloff", "flat-surface-heat-loss",
 
     // spec-v1622..v1631: the test-and-balance and hydronic systems band.
     "flow-hood-correction", "fan-system-effect", "proportional-balance-ratio",

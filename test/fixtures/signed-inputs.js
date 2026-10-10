@@ -395,4 +395,6 @@ export const SIGNED_INPUTS = [
   "taping-corrections::t0_f",
   "taping-corrections::t_f",
   "time-alignment::ambient_C",
+  "flat-surface-heat-loss::surface_f",
+  "flat-surface-heat-loss::amb_f",
 ];

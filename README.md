@@ -2,7 +2,7 @@
 
 **Free calculators for the trades. No ads, no accounts, works offline.**
 
-[roughlogic.com](https://roughlogic.com) is 2,254 small, single-purpose calculators for electricians, plumbers, HVAC techs, carpenters, firefighters, surveyors, and dozens of other trades. Every answer comes from a published formula and names its source.
+[roughlogic.com](https://roughlogic.com) is 2,255 small, single-purpose calculators for electricians, plumbers, HVAC techs, carpenters, firefighters, surveyors, and dozens of other trades. Every answer comes from a published formula and names its source.
 
 <p align="center">
   <img src="docs/img/home-mobile.png" width="240" alt="roughlogic home view on a phone: a headline, one line of description, a single search box, and four tappable example questions">

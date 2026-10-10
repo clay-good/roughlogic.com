@@ -59203,3 +59203,25 @@ test("bounds: the velocity-pressure tiles scale 4005 by sqrt(0.075/density)", ()
   assert.ok(Math.abs(d.overread_pct - c.overread_pct) < 1e-9); // the shortcut's over-read does not depend on density
   for (const bad of [-1, 0.001, 5]) assert.ok("error" in _ptcRho({ vp_avg_inwc: 0.15, w_in: 24, h_in: 12, air_density_lb_ft3: bad }));
 });
+
+import { computeFlatSurfaceHeatLoss as _fshl } from "../../calc-hvacsystems.js";
+test("bounds: flat-surface-heat-loss reproduces Incropera Example 9.3 and the orientation ordering", () => {
+  const W = 0.17611; // W/m2 K per BTU/hr ft2 F, inverted below
+  const duct = (orientation, a, b) => _fshl({ orientation, side_a_ft: a / 0.3048, side_b_ft: b, surface_f: 113, amb_f: 59, emissivity: 0.9 }).conv_coefficient / W;
+  assert.ok(Math.abs(duct("vertical", 0.3, 10) / 4.23 - 1) < 0.015);
+  assert.ok(Math.abs(duct("up", 0.75, 10000) / 5.47 - 1) < 0.015);
+  assert.ok(Math.abs(duct("down", 0.75, 10000) / 2.07 - 1) < 0.015);
+  const b = { side_a_ft: 4, side_b_ft: 6, surface_f: 180, amb_f: 70, emissivity: 0.9 };
+  const up = _fshl({ ...b, orientation: "up" }), down = _fshl({ ...b, orientation: "down" }), vert = _fshl({ ...b, orientation: "vertical" });
+  assert.ok(up.conv_coefficient > vert.conv_coefficient && vert.conv_coefficient > down.conv_coefficient);
+  // Radiation does not depend on orientation.
+  assert.ok(Math.abs(up.rad_coefficient - down.rad_coefficient) < 1e-12);
+  assert.ok(Math.abs(up.q_total_btuh - (up.conv_coefficient + up.rad_coefficient) * 24 * 110) < 1e-6);
+  // A cold surface facing down is the buoyancy-assisted case, and it gains heat.
+  const cold = _fshl({ ...b, orientation: "down", surface_f: 40, amb_f: 80 });
+  assert.equal(cold.regime, "enhanced");
+  assert.ok(cold.q_total_btuh < 0 && cold.gain === true);
+  for (const bad of [{ side_a_ft: 0 }, { emissivity: 0 }, { emissivity: 1.2 }, { surface_f: 70 }, { orientation: "tilted" }]) {
+    assert.ok("error" in _fshl({ ...b, orientation: "vertical", ...bad }));
+  }
+});
