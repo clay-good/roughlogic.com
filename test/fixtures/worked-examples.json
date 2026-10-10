@@ -171023,6 +171023,76 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "steam-pipe-velocity",
+  "source_publisher": "Project (first-principles)",
+  "source_title": "1,000 lb/hr of 15 psig steam at 6,000 ft/min, volume from the pressure",
+  "source_edition_or_year": "continuity with the IAPWS-IF97 saturated specific volume",
+  "source_section_or_page": "15 psig is 29.696 psia: vg = 13.880 cu ft/lb (printed steam tables list 13.9 at 15 psig). Area = 1,000 x 13.880 / (6,000 x 60) = 0.038555 sq ft = 5.552 sq in, 2.659 in diameter; the smallest Sch 40 that clears it is 3 in (ID 3.068), where the steam runs 4,506 ft/min",
+  "verified_by": "rl",
+  "verified_on": "2026-10-10",
+  "inputs": {
+   "steam_flow_lbhr": 1000,
+   "vel_ceiling_fpm": 6000,
+   "steam_basis": "pressure",
+   "steam_pressure_psig": 15
+  },
+  "outputs": {
+   "spec_vol_used_ft3lb": {
+    "value": 13.88,
+    "tolerance": {
+     "pct": 0.05
+    }
+   },
+   "req_area_in2": {
+    "value": 5.552,
+    "tolerance": {
+     "pct": 0.05
+    }
+   },
+   "req_dia_in": {
+    "value": 2.6588,
+    "tolerance": {
+     "pct": 0.05
+    }
+   },
+   "actual_fpm": {
+    "value": 4506.1,
+    "tolerance": {
+     "pct": 0.05
+    }
+   }
+  }
+ },
+ {
+  "tile_id": "steam-pipe-capacity",
+  "source_publisher": "Project (first-principles)",
+  "source_title": "A 2 in Sch 40 main on 100 psig steam at 6,000 ft/min, volume from the pressure",
+  "source_edition_or_year": "continuity with the IAPWS-IF97 saturated specific volume",
+  "source_section_or_page": "100 psig is 114.696 psia: vg = 3.892 cu ft/lb (printed steam tables list 3.89). Area of a 2.067 in bore = 0.023303 sq ft; 6,000 x 60 x 0.023303 / 3.892 = 2,155 lb/hr",
+  "verified_by": "rl",
+  "verified_on": "2026-10-10",
+  "inputs": {
+   "nps": "2",
+   "vel_ceiling_fpm": 6000,
+   "steam_basis": "pressure",
+   "steam_pressure_psig": 100
+  },
+  "outputs": {
+   "spec_vol_used_ft3lb": {
+    "value": 3.8922,
+    "tolerance": {
+     "pct": 0.05
+    }
+   },
+   "capacity_lbhr": {
+    "value": 2155.4,
+    "tolerance": {
+     "pct": 0.05
+    }
+   }
+  }
  }
  ]
 }

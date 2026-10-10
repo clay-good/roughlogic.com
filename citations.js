@@ -21699,7 +21699,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.general,
     editionNote: "Single-edition (continuity and the nominal pipe schedule do not roll). The velocity band is a RECOMMENDATION, not a code limit - noise, erosion, and the condensate-loading reverse-flow case at low velocity all bear on the final choice, which the engineer of record governs. ASHRAE supplies the band and specific volumes.",
     assumptions: [
-      { name: "Specific volume", value: "saturated-steam specific volume from the steam table at the line pressure (saturated-steam-properties computes it at any pressure)", source: "ASHRAE Fundamentals" },
+      { name: "Specific volume", value: "saturated-steam specific volume from the steam table at the line pressure, entered, or computed from an entered gauge pressure by IAPWS-IF97 on a 14.696 psia atmosphere (saturated-steam-properties shows the full set and takes a local atmosphere)", source: "ASHRAE Fundamentals" },
       { name: "Velocity band", value: "supply mains ~6,000 to 12,000 ft/min is a recommendation, not a code limit", source: "ASHRAE Systems" },
       { name: "Pipe schedule", value: "Sch 40 nominal inside diameters per ASME B36.10M mill dimensions", source: "ASME B36.10M" },
     ],
@@ -21712,7 +21712,7 @@ export const CITATIONS = {
     editionNote: "Single-edition (continuity and the nominal pipe schedule do not roll). The max steam mass flow an existing Sch 40 main carries within an allowable velocity, the inverse of the steam-main sizer: the internal area from the ASME B36.10M Sch 40 ID, times the velocity ceiling, over the specific volume. The velocity band is a RECOMMENDATION, not a code limit - noise, erosion, and the condensate-loading reverse-flow case at low velocity all bear on the choice, which the engineer of record governs. ASHRAE supplies the band and specific volumes.",
     assumptions: [
       { name: "Continuity", value: "capacity = velocity x internal area / specific volume (the inverse of the main sizer)", source: "first-principles continuity" },
-      { name: "Specific volume", value: "saturated-steam specific volume from the steam table at the line pressure (saturated-steam-properties computes it at any pressure)", source: "ASHRAE Fundamentals" },
+      { name: "Specific volume", value: "saturated-steam specific volume from the steam table at the line pressure, entered, or computed from an entered gauge pressure by IAPWS-IF97 on a 14.696 psia atmosphere (saturated-steam-properties shows the full set and takes a local atmosphere)", source: "ASHRAE Fundamentals" },
       { name: "Pipe schedule", value: "Sch 40 nominal inside diameters per ASME B36.10M mill dimensions", source: "ASME B36.10M" },
     ],
   },

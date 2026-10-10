@@ -165,6 +165,7 @@ const SHELL_ASSETS = [
   "./v5-platform.js",
   "./citation-block.js",
   "./citation-bucket.js",
+  "./steam-tables.js",
   "./constant-notes.js",
   "./cost-output.js",
   "./context-band.js",

@@ -59447,7 +59447,8 @@ test("bounds: free-surface-moment is rho l b^3 / 12, falls as n squared, and fee
   }
 });
 
-import { computeSaturatedSteamProperties as _ssp, IF97 as _if97 } from "../../calc-steamplant.js";
+import { computeSaturatedSteamProperties as _ssp } from "../../calc-steamplant.js";
+import { IF97 as _if97 } from "../../steam-tables.js";
 const { region1: _if1, region2: _if2, saturationPressureMpa: _ifP, saturationTempK: _ifT } = _if97;
 import { computeFlashSteamPct as _sspFlash } from "../../calc-pipefit.js";
 test("bounds: saturated-steam-properties reproduces the IAPWS-IF97 program-verification tables", () => {
@@ -59487,4 +59488,30 @@ test("bounds: saturated-steam-properties reproduces the IAPWS-IF97 program-verif
   for (const bad of [{ gauge_pressure_psig: -14.7 }, { gauge_pressure_psig: -100 }, { gauge_pressure_psig: 2300 }, { gauge_pressure_psig: 1e5 }, { atmosphere_psia: 0 }, { atmosphere_psia: 7 }, { atmosphere_psia: 17 }, { atmosphere_psia: -14.696 }]) {
     assert.ok("error" in _ssp({ gauge_pressure_psig: 100, atmosphere_psia: 14.696, ...bad }), JSON.stringify(bad));
   }
+});
+
+import { computeSteamPipeVelocity as _spvP, computeSteamPipeCapacity as _spcP } from "../../calc-pipefit.js";
+test("bounds: the steam main tiles compute the same answer from a pressure as from its specific volume", () => {
+  for (const psig of [-10, 0, 15, 100, 250, 600]) {
+    const sv = _ssp({ gauge_pressure_psig: psig }).spec_vol_ft3lb;
+    const a = _spvP({ steam_flow_lbhr: 1000, vel_ceiling_fpm: 6000, steam_basis: "pressure", steam_pressure_psig: psig });
+    const b = _spvP({ steam_flow_lbhr: 1000, vel_ceiling_fpm: 6000, spec_vol_ft3lb: sv });
+    assert.ok(Math.abs(a.spec_vol_used_ft3lb - sv) < 1e-12 && a.from_pressure === true && b.from_pressure === false);
+    assert.equal(a.chosen_nps, b.chosen_nps);
+    assert.ok(Math.abs(a.actual_fpm - b.actual_fpm) < 1e-9 && Math.abs(a.req_area_in2 - b.req_area_in2) < 1e-12);
+    const c = _spcP({ nps: "4", vel_ceiling_fpm: 8000, steam_basis: "pressure", steam_pressure_psig: psig });
+    const d = _spcP({ nps: "4", vel_ceiling_fpm: 8000, spec_vol_ft3lb: sv });
+    assert.ok(Math.abs(c.capacity_lbhr - d.capacity_lbhr) < 1e-9);
+  }
+  // Denser steam at higher pressure: a smaller main, and more capacity in the same one.
+  assert.ok(_spvP({ steam_flow_lbhr: 5000, vel_ceiling_fpm: 6000, steam_basis: "pressure", steam_pressure_psig: 150 }).req_dia_in < _spvP({ steam_flow_lbhr: 5000, vel_ceiling_fpm: 6000, steam_basis: "pressure", steam_pressure_psig: 15 }).req_dia_in);
+  assert.ok(_spcP({ nps: "2", vel_ceiling_fpm: 6000, steam_basis: "pressure", steam_pressure_psig: 150 }).capacity_lbhr > _spcP({ nps: "2", vel_ceiling_fpm: 6000, steam_basis: "pressure", steam_pressure_psig: 15 }).capacity_lbhr);
+  // The entered mode is unchanged and ignores the pressure field; the pressure mode ignores the entered volume.
+  assert.deepEqual(_spvP({ steam_flow_lbhr: 1000, spec_vol_ft3lb: 13.7, vel_ceiling_fpm: 6000, steam_pressure_psig: 400 }).actual_fpm, _spvP({ steam_flow_lbhr: 1000, spec_vol_ft3lb: 13.7, vel_ceiling_fpm: 6000 }).actual_fpm);
+  assert.equal(_spcP({ nps: "2", vel_ceiling_fpm: 6000, steam_basis: "pressure", steam_pressure_psig: 100, spec_vol_ft3lb: 99 }).spec_vol_used_ft3lb, _spcP({ nps: "2", vel_ceiling_fpm: 6000, steam_basis: "pressure", steam_pressure_psig: 100 }).spec_vol_used_ft3lb);
+  for (const bad of [{ steam_pressure_psig: -14.7 }, { steam_pressure_psig: 2300 }, { steam_pressure_psig: 1e5 }, { steam_basis: "superheated" }]) {
+    assert.ok("error" in _spvP({ steam_flow_lbhr: 1000, vel_ceiling_fpm: 6000, steam_basis: "pressure", steam_pressure_psig: 15, ...bad }), JSON.stringify(bad));
+    assert.ok("error" in _spcP({ nps: "2", vel_ceiling_fpm: 6000, steam_basis: "pressure", steam_pressure_psig: 15, ...bad }), JSON.stringify(bad));
+  }
+  assert.ok("error" in _spvP({ steam_flow_lbhr: 1000, vel_ceiling_fpm: 6000 }));
 });

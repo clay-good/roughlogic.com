@@ -25,6 +25,7 @@ import {
   DEBOUNCE_MS, debounce, makeNumber, makeSelect,
   makeOutputLine, attachExampleButton, fmt,
 } from "./ui-fields.js";
+import { saturatedSteam } from "./steam-tables.js";
 
 // Nominal Schedule 40 steel pipe inside diameters (in), keyed by NPS, for
 // the steam-main velocity sizing (v158). Standard mill dimensions (ASME
@@ -276,14 +277,29 @@ PIPEFIT_RENDERERS["flash-steam-pct"] = _renderFlashSteamPct;
 // ---------------------------------------------------------------------
 // v158 Steam main size from flow and velocity (steam-pipe-velocity)
 // ---------------------------------------------------------------------
-// dims: in { steam_flow_lbhr: M T^-1, spec_vol_ft3lb: L^3 M^-1, vel_ceiling_fpm: L T^-1 } out: { req_area_in2: L^2, req_dia_in: L, chosen_nps: dimensionless, chosen_id_in: L, actual_fpm: L T^-1 }
-export function computeSteamPipeVelocity({ steam_flow_lbhr = 0, spec_vol_ft3lb = 0, vel_ceiling_fpm = 0 } = {}) {
+// The steam specific volume for the two steam-main tiles: the entered value, or
+// (steam_basis "pressure") saturated steam at the gauge pressure on a 14.696
+// psia atmosphere, from the IAPWS-IF97 code in steam-tables.js.
+const _STEAM_BASIS_OPTIONS = [{ value: "entered", label: "Enter the specific volume" }, { value: "pressure", label: "From the steam pressure (saturated)" }];
+function _steamSpecificVolume(steam_basis, spec_vol_ft3lb, steam_pressure_psig) {
+  if (steam_basis === "entered") {
+    const sv = Number(spec_vol_ft3lb);
+    return sv > 0 ? { sv } : { error: "Specific volume must be positive (ft3/lb)." };
+  }
+  if (steam_basis !== "pressure") return { error: "Choose how the steam specific volume is given: entered, or from the steam pressure." };
+  const sat = saturatedSteam(Number(steam_pressure_psig) + 14.696);
+  if (!sat) return { error: "Steam pressure must be between -14.5 and 2,285 psig for a saturated specific volume." };
+  return { sv: sat.spec_vol_ft3lb, sat_temp_f: sat.sat_temp_f };
+}
+// dims: in { steam_flow_lbhr: M T^-1, spec_vol_ft3lb: L^3 M^-1, vel_ceiling_fpm: L T^-1, steam_pressure_psig: M L^-1 T^-2 } out: { req_area_in2: L^2, req_dia_in: L, chosen_nps: dimensionless, chosen_id_in: L, actual_fpm: L T^-1, spec_vol_used_ft3lb: L^3 M^-1 }
+export function computeSteamPipeVelocity({ steam_flow_lbhr = 0, spec_vol_ft3lb = 0, vel_ceiling_fpm = 0, steam_basis = "entered", steam_pressure_psig = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const flow = Number(steam_flow_lbhr);
-  const sv = Number(spec_vol_ft3lb);
   const vc = Number(vel_ceiling_fpm);
   if (!(flow > 0)) return { error: "Steam flow must be positive (lb/hr)." };
-  if (!(sv > 0)) return { error: "Specific volume must be positive (ft3/lb)." };
+  const steam = _steamSpecificVolume(steam_basis, spec_vol_ft3lb, steam_pressure_psig);
+  if (steam.error) return steam;
+  const sv = steam.sv;
   if (!(vc > 0)) return { error: "Velocity ceiling must be positive (ft/min)." };
   const req_area_ft2 = (flow * sv) / (vc * 60);
   const req_area_in2 = req_area_ft2 * 144;
@@ -293,29 +309,35 @@ export function computeSteamPipeVelocity({ steam_flow_lbhr = 0, spec_vol_ft3lb =
   if (!chosen) return { error: "Required diameter exceeds the bundled 12 in Sch 40 table; size a larger main from the schedule." };
   const chosen_area_ft2 = (Math.PI / 4) * Math.pow(chosen[1] / 12, 2);
   const actual_fpm = (flow * sv) / (chosen_area_ft2 * 60);
-  return { req_area_in2, req_dia_in, chosen_nps: chosen[0], chosen_id_in: chosen[1], actual_fpm };
+  return { req_area_in2, req_dia_in, chosen_nps: chosen[0], chosen_id_in: chosen[1], actual_fpm, spec_vol_used_ft3lb: sv, from_pressure: steam_basis === "pressure" };
 }
 export const steamPipeVelocityExample = { inputs: { steam_flow_lbhr: 1000, spec_vol_ft3lb: 13.7, vel_ceiling_fpm: 6000 } };
 
 function _renderSteamPipeVelocity(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Steam main sizing by continuity - req_area = (flow x specific_volume) / (velocity x 60), then the smallest Sch 40 nominal whose ID clears the required diameter - first-principles, with the recommended velocity band (supply mains ~6,000 to 12,000 ft/min) per ASHRAE Fundamentals / Systems, by name. The specific volume is read from the saturated-steam table at the line pressure (saturated-steam-properties gives it). The velocity band is a recommendation, not a code limit; noise, erosion, and condensate reverse-flow bear on the choice, which the engineer of record governs.";
+  citationEl.textContent = "Citation: Steam main sizing by continuity - req_area = (flow x specific_volume) / (velocity x 60), then the smallest Sch 40 nominal whose ID clears the required diameter - first-principles, with the recommended velocity band (supply mains ~6,000 to 12,000 ft/min) per ASHRAE Fundamentals / Systems, by name. The specific volume is read from the saturated-steam table at the line pressure, or computed from an entered gauge pressure by IAPWS-IF97 for dry saturated steam on a 14.696 psia atmosphere. The velocity band is a recommendation, not a code limit; noise, erosion, and condensate reverse-flow bear on the choice, which the engineer of record governs.";
   const flow = makeNumber("Steam mass flow (lb/hr)", "sv-flow", { step: "any", min: "0" });
+  const basis = makeSelect("Steam specific volume", "sv-basis", _STEAM_BASIS_OPTIONS);
+  basis.select.value = "entered";
   const sv = makeNumber("Steam specific volume at pressure (ft3/lb)", "sv-sv", { step: "any", min: "0" });
+  const psig = makeNumber("Steam pressure (psig, when computing the volume)", "sv-psig", { step: "any" });
   const vc = makeNumber("Allowable velocity (ft/min)", "sv-vc", { step: "any", min: "0", value: "6000" });
   vc.input.value = "6000";
-  for (const f of [flow, sv, vc]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { flow.input.value = "1000"; sv.input.value = "13.7"; vc.input.value = "6000"; update(); });
+  for (const f of [flow, basis, sv, psig, vc]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { flow.input.value = "1000"; basis.select.value = "entered"; sv.input.value = "13.7"; psig.input.value = ""; vc.input.value = "6000"; update(); });
   const oReq = makeOutputLine(outputRegion, "Required internal area / diameter", "sv-out-req");
   const oSize = makeOutputLine(outputRegion, "Smallest Sch 40 main", "sv-out-size");
   const oVel = makeOutputLine(outputRegion, "Actual velocity in it", "sv-out-vel");
+  const oSv = makeOutputLine(outputRegion, "Steam specific volume used", "sv-out-sv");
   const update = debounce(() => {
-    const r = computeSteamPipeVelocity({ steam_flow_lbhr: Number(flow.input.value) || 0, spec_vol_ft3lb: Number(sv.input.value) || 0, vel_ceiling_fpm: Number(vc.input.value) || 0 });
-    if (r.error) { oReq.textContent = r.error; oSize.textContent = "-"; oVel.textContent = "-"; return; }
+    const r = computeSteamPipeVelocity({ steam_flow_lbhr: Number(flow.input.value) || 0, spec_vol_ft3lb: Number(sv.input.value) || 0, vel_ceiling_fpm: Number(vc.input.value) || 0, steam_basis: basis.select.value, steam_pressure_psig: Number(psig.input.value) || 0 });
+    if (r.error) { oReq.textContent = r.error; oSize.textContent = "-"; oVel.textContent = "-"; oSv.textContent = "-"; return; }
     oReq.textContent = fmt(r.req_area_in2, 2) + " in^2 (" + fmt(r.req_dia_in, 2) + " in dia)";
     oSize.textContent = r.chosen_nps + " in (ID " + fmt(r.chosen_id_in, 3) + " in)";
     oVel.textContent = fmt(r.actual_fpm, 0) + " ft/min";
+    oSv.textContent = fmt(r.spec_vol_used_ft3lb, 2) + " ft3/lb";
   }, DEBOUNCE_MS);
-  for (const f of [flow.input, sv.input, vc.input]) f.addEventListener("input", update);
+  for (const f of [flow.input, sv.input, psig.input, vc.input]) f.addEventListener("input", update);
+  basis.select.addEventListener("change", update);
 }
 PIPEFIT_RENDERERS["steam-pipe-velocity"] = _renderSteamPipeVelocity;
 
@@ -324,41 +346,48 @@ PIPEFIT_RENDERERS["steam-pipe-velocity"] = _renderSteamPipeVelocity;
 // The inverse of steam-pipe-velocity: given an existing Sch 40 main, how
 // much steam it carries within an allowable velocity.
 // ---------------------------------------------------------------------
-// dims: in { nps: dimensionless, spec_vol_ft3lb: L^3 M^-1, vel_ceiling_fpm: L T^-1 } out: { id_in: L, area_in2: L^2, capacity_lbhr: M T^-1 }
-export function computeSteamPipeCapacity({ nps = "2", spec_vol_ft3lb = 0, vel_ceiling_fpm = 0 } = {}) {
+// dims: in { nps: dimensionless, spec_vol_ft3lb: L^3 M^-1, vel_ceiling_fpm: L T^-1, steam_pressure_psig: M L^-1 T^-2 } out: { id_in: L, area_in2: L^2, capacity_lbhr: M T^-1, spec_vol_used_ft3lb: L^3 M^-1 }
+export function computeSteamPipeCapacity({ nps = "2", spec_vol_ft3lb = 0, vel_ceiling_fpm = 0, steam_basis = "entered", steam_pressure_psig = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
-  const sv = Number(spec_vol_ft3lb);
   const vc = Number(vel_ceiling_fpm);
   const row = _SCH40_ID_IN.find(([n]) => n === nps);
   if (!row) return { error: "Unknown nominal Sch 40 size." };
-  if (!(sv > 0)) return { error: "Specific volume must be positive (ft3/lb)." };
+  const steam = _steamSpecificVolume(steam_basis, spec_vol_ft3lb, steam_pressure_psig);
+  if (steam.error) return steam;
+  const sv = steam.sv;
   if (!(vc > 0)) return { error: "Velocity ceiling must be positive (ft/min)." };
   const id_in = row[1];
   const area_ft2 = (Math.PI / 4) * Math.pow(id_in / 12, 2);
   const capacity_lbhr = vc * 60 * area_ft2 / sv;
-  return { id_in, area_in2: area_ft2 * 144, capacity_lbhr };
+  return { id_in, area_in2: area_ft2 * 144, capacity_lbhr, spec_vol_used_ft3lb: sv, from_pressure: steam_basis === "pressure" };
 }
 export const steamPipeCapacityExample = { inputs: { nps: "2", spec_vol_ft3lb: 13.7, vel_ceiling_fpm: 6000 } };
 
 function _renderSteamPipeCapacity(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Steam main capacity by continuity - max flow = velocity x 60 x internal area / specific_volume, the area from the Sch 40 ID - the inverse of the steam-main sizer, with the recommended velocity band (supply mains ~6,000 to 12,000 ft/min) per ASHRAE Fundamentals / Systems, by name. The specific volume is read from the saturated-steam table at the line pressure (saturated-steam-properties gives it). The velocity band is a recommendation, not a code limit; noise, erosion, and condensate reverse-flow bear on the choice, which the engineer of record governs.";
+  citationEl.textContent = "Citation: Steam main capacity by continuity - max flow = velocity x 60 x internal area / specific_volume, the area from the Sch 40 ID - the inverse of the steam-main sizer, with the recommended velocity band (supply mains ~6,000 to 12,000 ft/min) per ASHRAE Fundamentals / Systems, by name. The specific volume is read from the saturated-steam table at the line pressure, or computed from an entered gauge pressure by IAPWS-IF97 for dry saturated steam on a 14.696 psia atmosphere. The velocity band is a recommendation, not a code limit; noise, erosion, and condensate reverse-flow bear on the choice, which the engineer of record governs.";
   const size = makeSelect("Existing Sch 40 size (in)", "sc-size", _SCH40_ID_IN.map(([n, id]) => ({ value: n, label: n + " in (ID " + id + ")" })));
   size.select.value = "2";
+  const basis = makeSelect("Steam specific volume", "sc-basis", _STEAM_BASIS_OPTIONS);
+  basis.select.value = "entered";
   const sv = makeNumber("Steam specific volume at pressure (ft3/lb)", "sc-sv", { step: "any", min: "0" });
+  const psig = makeNumber("Steam pressure (psig, when computing the volume)", "sc-psig", { step: "any" });
   const vc = makeNumber("Allowable velocity (ft/min)", "sc-vc", { step: "any", min: "0", value: "6000" });
   vc.input.value = "6000";
-  for (const f of [size, sv, vc]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { size.select.value = "2"; sv.input.value = "13.7"; vc.input.value = "6000"; update(); });
+  for (const f of [size, basis, sv, psig, vc]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { size.select.value = "2"; basis.select.value = "entered"; sv.input.value = "13.7"; psig.input.value = ""; vc.input.value = "6000"; update(); });
   const oCap = makeOutputLine(outputRegion, "Max steam capacity", "sc-out-cap");
   const oArea = makeOutputLine(outputRegion, "Internal area", "sc-out-area");
+  const oSv = makeOutputLine(outputRegion, "Steam specific volume used", "sc-out-sv");
   const update = debounce(() => {
-    const r = computeSteamPipeCapacity({ nps: size.select.value, spec_vol_ft3lb: Number(sv.input.value) || 0, vel_ceiling_fpm: Number(vc.input.value) || 0 });
-    if (r.error) { oCap.textContent = r.error; oArea.textContent = "-"; return; }
+    const r = computeSteamPipeCapacity({ nps: size.select.value, spec_vol_ft3lb: Number(sv.input.value) || 0, vel_ceiling_fpm: Number(vc.input.value) || 0, steam_basis: basis.select.value, steam_pressure_psig: Number(psig.input.value) || 0 });
+    if (r.error) { oCap.textContent = r.error; oArea.textContent = "-"; oSv.textContent = "-"; return; }
     oCap.textContent = fmt(r.capacity_lbhr, 0) + " lb/hr";
     oArea.textContent = fmt(r.area_in2, 2) + " in^2 (ID " + fmt(r.id_in, 3) + " in)";
+    oSv.textContent = fmt(r.spec_vol_used_ft3lb, 2) + " ft3/lb";
   }, DEBOUNCE_MS);
   size.select.addEventListener("input", update);
-  for (const f of [sv.input, vc.input]) f.addEventListener("input", update);
+  basis.select.addEventListener("change", update);
+  for (const f of [sv.input, psig.input, vc.input]) f.addEventListener("input", update);
 }
 PIPEFIT_RENDERERS["steam-pipe-capacity"] = _renderSteamPipeCapacity;
 

@@ -383,6 +383,7 @@ const CAPS = {
   // and citations.js left the site, so it has no cap. What ships is the block
   // renderer and the shard rule.
   "citation-block.js": 6144,
+  "steam-tables.js": 6144, // IAPWS-IF97 saturation, region 1 and region 2 coefficients (about 2.9 KB gzipped); shared by calc-steamplant.js and calc-pipefit.js, loaded only with a steam tile
   "citation-bucket.js": 6144,
 
   // v10 §B.1 limitation-banner shared component. The CANONICAL copy

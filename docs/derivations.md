@@ -3069,8 +3069,8 @@ cross-check.
 | calc-pipefit.js | `computePipeSpacingRack` | `{ pipe_od_in = 0, insulation_thickness_in = 0, clearance_in = 1, pipe_count =...` | _ | _ | _ |
 | calc-pipefit.js | `computeRacewayExpansion` | `{ run_length_ft = 0, temp_range_f = 0, alpha_per_f = 0.0000338, fitting_trave...` | _ | _ | _ |
 | calc-pipefit.js | `computeReducerOffset` | `{ large_od_in = 0, small_od_in = 0, lay_length_in = 0, type = "concentric" } ...` | _ | _ | _ |
-| calc-pipefit.js | `computeSteamPipeCapacity` | `{ nps = "2", spec_vol_ft3lb = 0, vel_ceiling_fpm = 0 } = {}` | _ | _ | _ |
-| calc-pipefit.js | `computeSteamPipeVelocity` | `{ steam_flow_lbhr = 0, spec_vol_ft3lb = 0, vel_ceiling_fpm = 0 } = {}` | _ | _ | _ |
+| calc-pipefit.js | `computeSteamPipeCapacity` | `{ nps = "2", spec_vol_ft3lb = 0, vel_ceiling_fpm = 0, steam_basis = "entered"...` | _ | _ | _ |
+| calc-pipefit.js | `computeSteamPipeVelocity` | `{ steam_flow_lbhr = 0, spec_vol_ft3lb = 0, vel_ceiling_fpm = 0, steam_basis =...` | _ | _ | _ |
 | calc-pipefit.js | `computeSteamTrapSizing` | `{ heat_duty_btuhr = 0, hfg_btulb = 0, safety_factor = 2 } = {}` | _ | _ | _ |
 | calc-plumbing.js | `computeBackflow` | `` | _ | _ | _ |
 | calc-plumbing.js | `computeBackflowLoss` | `{ device_class = "RP", flow_gpm = 0, pipe_size_in = "1" }` | _ | _ | _ |
@@ -4384,8 +4384,8 @@ per spec-v14 §13.1 second paragraph.
 | `specific-energy` | Open-Channel Specific Energy and Alternate Depth | Specific energy E = y + q^2/(2 g y^2)...; spec-v637 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `static-pressure-piping` | Static Pressure Loss in Piping | Project (first-principles); 30 ft column of water -> 30 * 62.4 / 144 = 13.00 psi elev... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `steam-boiler-blowdown` | Steam Boiler Surface Blowdown (Cycles of Concentration) | Steam boiler surface blowdown (TDS ma...; CoC = 3500/100 = 35; blowdown = 10000*100/(3500-100) = 29... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
-| `steam-pipe-capacity` | Steam Main Capacity from Size and Velocity | Continuity; ASHRAE Fundamentals / Sys...; spec-v643 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
-| `steam-pipe-velocity` | Steam Main Size from Flow and Velocity | Continuity; ASHRAE Fundamentals / Sys...; spec-v158 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
+| `steam-pipe-capacity` | Steam Main Capacity from Size and Velocity | Continuity; ASHRAE Fundamentals / Sys...; spec-v643 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
+| `steam-pipe-velocity` | Steam Main Size from Flow and Velocity | Continuity; ASHRAE Fundamentals / Sys...; spec-v158 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `steam-prv-area-for-capacity` | Steam PRV Orifice Area for a Required Capacity (Napier) | Napier's formula / ASME/API 520 (solv...; spec-v759 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `steam-prv-napier` | Steam Orifice / PRV Capacity (Napier) | Napier's formula / ASME/API 520; 0.5 in2 orifice, 100 psia upstream, 30 psia downstream, C... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `steam-trap-sizing` | Steam Trap Condensate Load and Required Capacity | Steam thermodynamics; safety-factor p...; spec-v159 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+4 more) |
