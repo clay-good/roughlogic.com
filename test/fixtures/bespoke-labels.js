@@ -195,7 +195,7 @@ export const BESPOKE_LABELS = {
   "compressor-short-cycle": {"system_type":"System type","load_fraction_pct":"Load fraction (% of design)","observed_cph":"Observed cycles/hr (optional)"},
   "compressor-volumetric-efficiency": {"clearance_ratio":"Clearance ratio (~0.03-0.06)","suction_pressure_psia":"Suction pressure (psia)","discharge_pressure_psia":"Discharge pressure (psia)","polytropic_exponent":"Polytropic exponent n (~1.11 R-22)"},
   "concrete": {"shape":"Shape","waste_factor":"Waste factor (0-1)"},
-  "condensate-return-sizing": {"condensate_lbhr":"Condensate load to the return (lb/hr)","flash_fraction":"Flash fraction at return pressure (0-1)","spec_vol_ft3lb":"Flash-steam specific volume at return pressure (ft3/lb)","vel_ceiling_fpm":"Return velocity ceiling (ft/min)"},
+  "condensate-return-sizing": {"condensate_lbhr":"Condensate load to the return (lb/hr)","flash_fraction":"Flash fraction at return pressure (0-1)","spec_vol_ft3lb":"Flash-steam specific volume at return pressure (ft3/lb)","vel_ceiling_fpm":"Return velocity ceiling (ft/min)","steam_basis":"Flash fraction and volume","supply_pressure_psig":"Pressure at the trap (psig, when computing)","return_pressure_psig":"Return line pressure (psig, when computing)"},
   "condenser-cop-for-heat-rejection": {"q_evap":"Evaporator capacity (tons, or Btu/h if unit set to 0)","target_thr":"Total heat of rejection (same unit as capacity)","unit_tons":"Capacity unit"},
   "condenser-heat-rejection": {"q_evap":"Evaporator capacity (tons, or Btu/h if unit set to 0)","unit_tons":"Capacity unit","cop":"Coefficient of performance COP"},
   "conductivity-from-tds": {"tds_mgl":"Total dissolved solids (mg/L)","k_factor":"TDS/EC factor (0.4-0.9, default 0.65)"},

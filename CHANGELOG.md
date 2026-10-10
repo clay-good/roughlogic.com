@@ -83,6 +83,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **`condensate-return-sizing` takes the two pressures.** It asked for a flash fraction and the flash steam's specific volume, each from another lookup. A select now computes both from the pressure at the trap and the return pressure by IAPWS-IF97 and prints them. 800 lb/hr of 100 psig condensate into an atmospheric return flashes 106 lb/hr, 47.5 cfm, and needs a 1-1/2 in return at 4,000 ft/min. Entered values work as before and stay the default. This completes the pressure option across the five pipefitting steam calculators.
+
 - **`flash-steam-pct` and `steam-trap-sizing` take pressures.** Flash steam asked for two liquid enthalpies and a latent heat from a steam table; trap sizing asked for a latent heat. Each now has a select that computes them from gauge pressure by IAPWS-IF97 and prints the values used. Condensate from 100 psig to atmosphere flashes 13.3%; 400,000 Btu/hr on 15 psig steam is 423 lb/hr of condensate. Entering the table values works as before and stays the default.
 
 - **`steam-pipe-velocity` and `steam-pipe-capacity` take a steam pressure.** Both asked for the steam's specific volume, read from a steam table. A "Steam specific volume" select now offers "From the steam pressure": enter the gauge pressure and the calculator computes the dry saturated specific volume by IAPWS-IF97 (the code behind `saturated-steam-properties`, now in the shared `steam-tables.js`) and prints the value it used. 1,000 lb/hr at 15 psig and 6,000 ft/min needs a 3 in main at 4,506 ft/min; a 2 in main on 100 psig steam carries 2,155 lb/hr. Entering the volume works as before and stays the default.

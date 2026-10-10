@@ -59546,3 +59546,22 @@ test("bounds: flash-steam-pct and steam-trap-sizing compute the same answer from
   assert.ok(Math.abs(_stsP({ heat_duty_btuhr: 400000, hfg_btulb: 945, safety_factor: 2 }).req_capacity_lbhr - 800000 / 945) < 1e-9);
   assert.ok("error" in _stsP({ heat_duty_btuhr: 400000 }));
 });
+
+import { computeCondensateReturnSizing as _crsP } from "../../calc-pipefit.js";
+test("bounds: condensate-return-sizing computes the same answer from two pressures as from their flash fraction and volume", () => {
+  for (const [hi, lo] of [[100, 0], [150, 15], [50, -5], [600, 50]]) {
+    const ff = _sspFlash({ steam_basis: "pressure", high_pressure_psig: hi, low_pressure_psig: lo }).flash_fraction;
+    const sv = _ssp({ gauge_pressure_psig: lo }).spec_vol_ft3lb;
+    const a = _crsP({ condensate_lbhr: 800, steam_basis: "pressure", supply_pressure_psig: hi, return_pressure_psig: lo });
+    const b = _crsP({ condensate_lbhr: 800, flash_fraction: ff, spec_vol_ft3lb: sv });
+    assert.ok(Math.abs(a.flash_fraction_used - ff) < 1e-12 && Math.abs(a.spec_vol_used_ft3lb - sv) < 1e-12, hi + " to " + lo);
+    assert.ok(Math.abs(a.vol_cfm - b.vol_cfm) < 1e-9 && a.chosen_nps === b.chosen_nps && a.from_pressure && !b.from_pressure);
+  }
+  // A vacuum return carries far more volume per pound of flash than a pressurized one.
+  assert.ok(_crsP({ condensate_lbhr: 800, steam_basis: "pressure", supply_pressure_psig: 100, return_pressure_psig: -8 }).vol_cfm > 2 * _crsP({ condensate_lbhr: 800, steam_basis: "pressure", supply_pressure_psig: 100, return_pressure_psig: 0 }).vol_cfm);
+  for (const bad of [{ supply_pressure_psig: 0 }, { return_pressure_psig: 100 }, { supply_pressure_psig: 9000 }, { return_pressure_psig: -15 }, { steam_basis: "wet" }]) {
+    assert.ok("error" in _crsP({ condensate_lbhr: 800, steam_basis: "pressure", supply_pressure_psig: 100, return_pressure_psig: 0, ...bad }), JSON.stringify(bad));
+  }
+  // Entered mode is unchanged.
+  assert.equal(_crsP({ condensate_lbhr: 800, flash_fraction: 0.13, spec_vol_ft3lb: 26.8 }).flash_lbhr, 104);
+});

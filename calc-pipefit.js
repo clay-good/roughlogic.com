@@ -689,14 +689,25 @@ PIPEFIT_RENDERERS["hanger-rod-sizing"] = _renderHangerRodSizing;
 // volume), not for the liquid - size for the liquid and it floods and
 // water-hammers. Flash mass x specific volume / continuity, then the
 // smallest Sch 40 nominal at a return-velocity ceiling.
-// dims: in { condensate_lbhr: M T^-1, flash_fraction: dimensionless, spec_vol_ft3lb: L^3 M^-1, vel_ceiling_fpm: L T^-1 } out: { flash_lbhr: M T^-1, vol_cfm: L^3 T^-1, req_area_in2: L^2, req_dia_in: L, chosen_nps: dimensionless, chosen_id_in: L }
-export function computeCondensateReturnSizing({ condensate_lbhr = 0, flash_fraction = 0, spec_vol_ft3lb = 0, vel_ceiling_fpm = 4000 } = {}) {
+// dims: in { condensate_lbhr: M T^-1, flash_fraction: dimensionless, spec_vol_ft3lb: L^3 M^-1, vel_ceiling_fpm: L T^-1, supply_pressure_psig: M L^-1 T^-2, return_pressure_psig: M L^-1 T^-2 } out: { flash_lbhr: M T^-1, vol_cfm: L^3 T^-1, req_area_in2: L^2, req_dia_in: L, chosen_nps: dimensionless, chosen_id_in: L, flash_fraction_used: dimensionless, spec_vol_used_ft3lb: L^3 M^-1 }
+export function computeCondensateReturnSizing({ condensate_lbhr = 0, flash_fraction = 0, spec_vol_ft3lb = 0, vel_ceiling_fpm = 4000, steam_basis = "entered", supply_pressure_psig = 0, return_pressure_psig = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const load = Number(condensate_lbhr);
-  const ff = Number(flash_fraction);
-  const sv = Number(spec_vol_ft3lb);
+  let ff = Number(flash_fraction);
+  let sv = Number(spec_vol_ft3lb);
   const vc = Number(vel_ceiling_fpm);
   if (!(load > 0)) return { error: "Condensate load must be positive (lb/hr)." };
+  if (steam_basis === "pressure") {
+    // Flash fraction and flash-steam volume from the trap inlet and return
+    // pressures, saturated, on a 14.696 psia atmosphere (IAPWS-IF97).
+    const hi = saturatedSteam(Number(supply_pressure_psig) + 14.696), lo = saturatedSteam(Number(return_pressure_psig) + 14.696);
+    if (!hi || !lo) return { error: "Both pressures must be between -14.5 and 2,285 psig for saturated steam-table values." };
+    if (!(Number(supply_pressure_psig) > Number(return_pressure_psig))) return { error: "The pressure at the trap must exceed the return pressure (no flash otherwise)." };
+    ff = (hi.hf_btulb - lo.hf_btulb) / lo.hfg_btulb;
+    sv = lo.spec_vol_ft3lb;
+  } else if (steam_basis !== "entered") {
+    return { error: "Choose how the flash fraction and specific volume are given: entered, or from the two pressures." };
+  }
   if (!(ff >= 0 && ff < 1)) return { error: "Flash fraction must be 0 to <1 (use flash-steam-pct)." };
   if (!(sv > 0)) return { error: "Flash-steam specific volume must be positive (ft3/lb)." };
   if (!(vc > 0)) return { error: "Velocity ceiling must be positive (ft/min)." };
@@ -708,30 +719,37 @@ export function computeCondensateReturnSizing({ condensate_lbhr = 0, flash_fract
   let chosen = null;
   for (const [nps, id] of _SCH40_ID_IN) { if (id >= req_dia_in) { chosen = [nps, id]; break; } }
   if (!chosen) return { error: "Required diameter exceeds the bundled 12 in Sch 40 table; size a larger return from the schedule." };
-  return { flash_lbhr, vol_cfm, req_area_in2, req_dia_in, chosen_nps: chosen[0], chosen_id_in: chosen[1] };
+  return { flash_lbhr, vol_cfm, req_area_in2, req_dia_in, chosen_nps: chosen[0], chosen_id_in: chosen[1], flash_fraction_used: ff, spec_vol_used_ft3lb: sv, from_pressure: steam_basis === "pressure" };
 }
 export const condensateReturnSizingExample = { inputs: { condensate_lbhr: 800, flash_fraction: 0.13, spec_vol_ft3lb: 26.8, vel_ceiling_fpm: 4000 } };
 
 function _renderCondensateReturnSizing(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Condensate return sized for the flash steam - flash = load x flash_fraction; volumetric flow = flash x specific_volume / 60; required area = flow / velocity ceiling, then the smallest Sch 40 nominal whose ID clears the required diameter - first-principles continuity, with the return-velocity ceiling (~4,000 to 5,000 ft/min, lower than a supply main) per ASHRAE / Spirax Sarco return-sizing practice, by name. The return is sized for the flash, not the liquid; a wet, dry, or vacuum return and any lift each change the scheme, which the engineer of record governs.";
+  citationEl.textContent = "Citation: Condensate return sized for the flash steam - flash = load x flash_fraction; volumetric flow = flash x specific_volume / 60; required area = flow / velocity ceiling, then the smallest Sch 40 nominal whose ID clears the required diameter - first-principles continuity, with the return-velocity ceiling (~4,000 to 5,000 ft/min, lower than a supply main) per ASHRAE / Spirax Sarco return-sizing practice, by name. The flash fraction and the flash-steam specific volume are entered, or computed from the pressure at the trap and the return pressure by IAPWS-IF97 on a 14.696 psia atmosphere. The return is sized for the flash, not the liquid; a wet, dry, or vacuum return and any lift each change the scheme, which the engineer of record governs.";
   const load = makeNumber("Condensate load to the return (lb/hr)", "cr-load", { step: "any", min: "0" });
+  const basis = makeSelect("Flash fraction and volume", "cr-basis", _STEAM_TABLE_BASIS_OPTIONS);
+  basis.select.value = "entered";
   const ff = makeNumber("Flash fraction at return pressure (0-1)", "cr-ff", { step: "any", min: "0", max: "1" });
   const sv = makeNumber("Flash-steam specific volume at return pressure (ft3/lb)", "cr-sv", { step: "any", min: "0" });
+  const pSupply = makeNumber("Pressure at the trap (psig, when computing)", "cr-psupply", { step: "any" });
+  const pReturn = makeNumber("Return line pressure (psig, when computing)", "cr-preturn", { step: "any" });
   const vc = makeNumber("Return velocity ceiling (ft/min)", "cr-vc", { step: "any", min: "0", value: "4000" });
   vc.input.value = "4000";
-  for (const f of [load, ff, sv, vc]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { load.input.value = "800"; ff.input.value = "0.13"; sv.input.value = "26.8"; vc.input.value = "4000"; update(); });
+  for (const f of [load, basis, ff, sv, pSupply, pReturn, vc]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { load.input.value = "800"; basis.select.value = "entered"; ff.input.value = "0.13"; sv.input.value = "26.8"; pSupply.input.value = ""; pReturn.input.value = ""; vc.input.value = "4000"; update(); });
   const oFlash = makeOutputLine(outputRegion, "Flash steam / volume", "cr-out-flash");
   const oReq = makeOutputLine(outputRegion, "Required internal area / diameter", "cr-out-req");
   const oSize = makeOutputLine(outputRegion, "Smallest Sch 40 return", "cr-out-size");
+  const oUsed = makeOutputLine(outputRegion, "Flash fraction / specific volume used", "cr-out-used");
   const update = debounce(() => {
-    const r = computeCondensateReturnSizing({ condensate_lbhr: Number(load.input.value) || 0, flash_fraction: Number(ff.input.value) || 0, spec_vol_ft3lb: Number(sv.input.value) || 0, vel_ceiling_fpm: Number(vc.input.value) || 0 });
-    if (r.error) { oFlash.textContent = r.error; oReq.textContent = "-"; oSize.textContent = "-"; return; }
+    const r = computeCondensateReturnSizing({ condensate_lbhr: Number(load.input.value) || 0, flash_fraction: Number(ff.input.value) || 0, spec_vol_ft3lb: Number(sv.input.value) || 0, vel_ceiling_fpm: Number(vc.input.value) || 0, steam_basis: basis.select.value, supply_pressure_psig: Number(pSupply.input.value) || 0, return_pressure_psig: Number(pReturn.input.value) || 0 });
+    if (r.error) { oFlash.textContent = r.error; oReq.textContent = "-"; oSize.textContent = "-"; oUsed.textContent = "-"; return; }
     oFlash.textContent = fmt(r.flash_lbhr, 0) + " lb/hr flash (" + fmt(r.vol_cfm, 1) + " cfm)";
     oReq.textContent = fmt(r.req_area_in2, 2) + " in^2 (" + fmt(r.req_dia_in, 2) + " in dia)";
     oSize.textContent = r.chosen_nps + " in (ID " + fmt(r.chosen_id_in, 3) + " in)";
+    oUsed.textContent = fmt(r.flash_fraction_used * 100, 1) + "% / " + fmt(r.spec_vol_used_ft3lb, 2) + " ft3/lb";
   }, DEBOUNCE_MS);
-  for (const f of [load.input, ff.input, sv.input, vc.input]) f.addEventListener("input", update);
+  for (const f of [load.input, ff.input, sv.input, pSupply.input, pReturn.input, vc.input]) f.addEventListener("input", update);
+  basis.select.addEventListener("change", update);
 }
 PIPEFIT_RENDERERS["condensate-return-sizing"] = _renderCondensateReturnSizing;
 

@@ -21836,7 +21836,7 @@ export const CITATIONS = {
   "condensate-return-sizing": {
     formula: "flash_lbhr = condensate_lbhr x flash_fraction; vol_cfm = flash_lbhr x spec_vol_ft3lb / 60; req_area_ft2 = vol_cfm / vel_ceiling_fpm; req_dia_in = sqrt(4 x req_area_ft2 / pi) x 12; then the smallest Sch 40 nominal whose ID >= req_dia_in.",
     edition: "First-principles continuity on the FLASH steam; the return-velocity ceiling (~4,000 to 5,000 ft/min, lower than a supply main) per ASHRAE / Spirax Sarco return-sizing practice, by name. Sch 40 IDs are ASME B36.10M nominal mill dimensions.",
-    freeAccess: "Continuity (mass flow x specific volume = volumetric flow) is public; the flash fraction comes from flash-steam-pct and the flash-steam specific volume from the saturated-steam table at the return pressure.",
+    freeAccess: "Continuity (mass flow x specific volume = volumetric flow) is public; the flash fraction comes from flash-steam-pct and the flash-steam specific volume from the saturated-steam table at the return pressure, or both are computed from the pressure at the trap and the return pressure by IAPWS-IF97.",
     governance: GOVERNANCE.general,
     editionNote: "Single-edition (continuity and the nominal pipe schedule do not roll). The return is sized for the FLASH STEAM, not the liquid - a return sized for the gallons floods and water-hammers. The velocity ceiling is a RECOMMENDATION lower than a supply main; a wet, dry, or vacuum return and any lift each change the scheme, which the engineer of record governs. ASHRAE / Spirax Sarco supply the return-sizing practice.",
     assumptions: [

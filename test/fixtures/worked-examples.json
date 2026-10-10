@@ -171168,6 +171168,54 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "condensate-return-sizing",
+  "source_publisher": "Project (first-principles)",
+  "source_title": "800 lb/hr of 100 psig condensate into an atmospheric return, values from the pressures",
+  "source_edition_or_year": "flash relation and continuity with IAPWS-IF97 saturated properties",
+  "source_section_or_page": "flash = (309.08 - 180.13) / 970.14 = 13.29%, 106.3 lb/hr; vg at 14.696 psia = 26.80 cu ft/lb, so 47.5 cfm; at 4,000 ft/min that is 1.710 sq in, 1.475 in diameter, and the smallest Sch 40 that clears it is 1-1/2 in (ID 1.610)",
+  "verified_by": "rl",
+  "verified_on": "2026-10-10",
+  "inputs": {
+   "condensate_lbhr": 800,
+   "vel_ceiling_fpm": 4000,
+   "steam_basis": "pressure",
+   "supply_pressure_psig": 100,
+   "return_pressure_psig": 0
+  },
+  "outputs": {
+   "flash_fraction_used": {
+    "value": 0.13292,
+    "tolerance": {
+     "pct": 0.1
+    }
+   },
+   "spec_vol_used_ft3lb": {
+    "value": 26.8,
+    "tolerance": {
+     "pct": 0.05
+    }
+   },
+   "flash_lbhr": {
+    "value": 106.33,
+    "tolerance": {
+     "pct": 0.1
+    }
+   },
+   "vol_cfm": {
+    "value": 47.5,
+    "tolerance": {
+     "pct": 0.1
+    }
+   },
+   "req_dia_in": {
+    "value": 1.4756,
+    "tolerance": {
+     "pct": 0.1
+    }
+   }
+  }
  }
  ]
 }
