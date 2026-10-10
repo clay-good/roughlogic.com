@@ -397,7 +397,7 @@ export function computeBlowdownHeatRecovery({ steam_rate_lb_hr = 0, cycles_of_co
 }
 const blowdownHeatRecoveryExample = { inputs: { steam_rate_lb_hr: 20000, cycles_of_concentration: 5, alt_cycles_of_concentration: 10, blowdown_liquid_enthalpy_btu_lb: 338.5, flash_liquid_enthalpy_btu_lb: 196.2, flash_latent_btu_lb: 960.2, makeup_temp_f: 60, heat_exchanger_effectiveness: 0.85, boiler_efficiency: 0.8, fuel_cost_per_mmbtu: 9, hours_per_year: 8000 } };
 STEAMPLANT_RENDERERS["blowdown-heat-recovery"] = _simpleRenderer({
-  citation: "Citation: the continuous surface blowdown relation by name -- blowdown / steam = feedwater TDS / (boiler TDS - feedwater TDS) = 1 / (cycles - 1), the same TDS mass balance the blowdown-rate calculator uses -- and the flash fraction (h_f high - h_f low) / h_fg low at the flash tank pressure. Saturated water enthalpies are entered from the steam tables for the boiler and flash tank pressures. ASME, the boiler manufacturer, the water treatment program, and the jurisdiction's boiler inspector govern.",
+  citation: "Citation: the continuous surface blowdown relation by name -- blowdown / steam = feedwater TDS / (boiler TDS - feedwater TDS) = 1 / (cycles - 1), the same TDS mass balance the blowdown-rate calculator uses -- and the flash fraction (h_f high - h_f low) / h_fg low at the flash tank pressure. Saturated water enthalpies are entered from the steam tables for the boiler and flash tank pressures; saturated-steam-properties gives them at any pressure. ASME, the boiler manufacturer, the water treatment program, and the jurisdiction's boiler inspector govern.",
   example: blowdownHeatRecoveryExample.inputs,
   fields: [
     { key: "steam_rate_lb_hr", label: "Steam rate (lb/hr)", kind: "number" },
@@ -518,7 +518,7 @@ export function computeDeaeratorSteamDemand({ feedwater_lb_hr = 0, condensate_fr
 }
 const deaeratorSteamDemandExample = { inputs: { feedwater_lb_hr: 25000, condensate_fraction: 0.6, alt_condensate_fraction: 0.8, condensate_temp_f: 190, makeup_temp_f: 60, da_saturation_temp_f: 227, latent_heat_btu_lb: 960.2, steam_enthalpy_btu_lb: 1156.4, vent_fraction: 0.003, boiler_efficiency: 0.8, fuel_cost_per_mmbtu: 9, hours_per_year: 8000 } };
 STEAMPLANT_RENDERERS["deaerator-steam-demand"] = _simpleRenderer({
-  citation: "Citation: the deaerating feedwater heater mixing heat balance by name -- mixed incoming temperature from the condensate and makeup proportions, heat = flow x (saturation temperature - mixed temperature), and heating steam = heat / the latent heat at the deaerator operating pressure. Saturation temperature, latent heat, and steam enthalpy are entered from the steam tables for that pressure. ASME, the deaerator manufacturer, the water treatment program, and the jurisdiction's boiler inspector govern.",
+  citation: "Citation: the deaerating feedwater heater mixing heat balance by name -- mixed incoming temperature from the condensate and makeup proportions, heat = flow x (saturation temperature - mixed temperature), and heating steam = heat / the latent heat at the deaerator operating pressure. Saturation temperature, latent heat, and steam enthalpy are entered from the steam tables for that pressure; saturated-steam-properties gives them. ASME, the deaerator manufacturer, the water treatment program, and the jurisdiction's boiler inspector govern.",
   example: deaeratorSteamDemandExample.inputs,
   fields: [
     { key: "feedwater_lb_hr", label: "Incoming water flow, condensate plus makeup (lb/hr)", kind: "number" },

@@ -690,8 +690,8 @@
       "date": "2026-09-29"
     },
     "/tools/blowdown-heat-recovery/": {
-      "sha": "ee3d528281ad2d57",
-      "date": "2026-09-29"
+      "sha": "399c30d863f6fe25",
+      "date": "2026-10-10"
     },
     "/tools/blower-door-ach50/": {
       "sha": "9737fcc605c8ded2",
@@ -2074,8 +2074,8 @@
       "date": "2026-09-29"
     },
     "/tools/deaerator-steam-demand/": {
-      "sha": "5dcc1789353e5d3d",
-      "date": "2026-10-01"
+      "sha": "e89500a390f02747",
+      "date": "2026-10-10"
     },
     "/tools/debris-load-ticket/": {
       "sha": "ed9e6b0522e4d435",
