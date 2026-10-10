@@ -198,11 +198,14 @@ test("focusing the empty search shows the full catalog dropdown", async ({ page 
   await page.goto("/index.html");
   await page.waitForSelector("#search-input", { timeout: 5000 });
   await page.locator("#search-input").click();
-  await page.waitForTimeout(120);
-  expect(await page.locator("#search-results").isVisible()).toBe(true);
   // Empty query lists the whole catalog. The count is derived from the
   // TOOLS registry (TOOL_IDS) so it never goes stale when tiles are added.
-  expect(await page.locator(".search-result").count()).toBe(TOOL_IDS.length);
+  // The dropdown renders after the lead catalog and every description shard
+  // have loaded (the 2026-10-10 catalog split), so this waits for the rows
+  // rather than sleeping: a fixed 120 ms read 0 rows three times running on a
+  // loaded CI runner (run 38056106460).
+  await expect(page.locator(".search-result")).toHaveCount(TOOL_IDS.length, { timeout: 20000 });
+  await expect(page.locator("#search-results")).toBeVisible();
 });
 
 test("header theme toggle touch target is at least 48x48 pixels", async ({ page }) => {
@@ -313,10 +316,11 @@ test("search routes on Enter for a partial name match", async ({ page }) => {
   await page.goto("/index.html");
   await page.waitForSelector("#search-input", { timeout: 5000 });
   await page.fill("#search-input", "wire ampac");
-  await page.waitForTimeout(120);
+  // Wait for the ranked rows, not a fixed delay: they render once the catalog
+  // and its description shards have loaded.
+  await expect(page.locator(".search-result").first()).toBeVisible({ timeout: 20000 });
   await page.locator("#search-input").press("Enter");
-  await page.waitForTimeout(150);
-  expect(await page.evaluate(() => location.hash)).toBe("#wire-ampacity");
+  await expect.poll(() => page.evaluate(() => location.hash)).toBe("#wire-ampacity");
   expect(await page.locator("#view-region").isVisible()).toBe(true);
 });
 
@@ -324,11 +328,10 @@ test("clicking a search result routes to that tool", async ({ page }) => {
   await page.goto("/index.html");
   await page.waitForSelector("#search-input", { timeout: 5000 });
   await page.fill("#search-input", "ohm");
-  await page.waitForTimeout(120);
-  // First result for "ohm" is Ohm's Law; clicking it routes to the tool.
-  await page.locator(".search-result").first().click();
-  await page.waitForTimeout(200);
-  expect(await page.evaluate(() => location.hash)).toBe("#ohms-law");
+  // First result for "ohm" is Ohm's Law; clicking it routes to the tool. The
+  // click waits for the row, and the hash is polled rather than slept on.
+  await page.locator(".search-result").first().click({ timeout: 20000 });
+  await expect.poll(() => page.evaluate(() => location.hash)).toBe("#ohms-law");
   expect(await page.locator("#view-region").isVisible()).toBe(true);
 });
 

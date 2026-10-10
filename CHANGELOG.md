@@ -6,6 +6,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Tests
 
+- **Three search tests wait for the rows instead of sleeping.** `a11y.test.js` counted the empty-query dropdown 120 ms after a click. Since the catalog split the dropdown renders after the description shards load, and on a loaded CI runner the count read 0 three retries running (run 38056106460, on a commit that touched no search code). That test and the two beside it now wait for the result rows and poll the route.
+
 - **`check-dimensions` reads the coverage sentence in `docs/correctness.md`.** The document's prose restates the annotation coverage as "N of N across M modules", and no gate read it. On 2026-10-10 it said "2,516 of 2,513": a count update had changed one number and not the other, under a green lint. The gate now holds all three numbers to the live counts, and was checked by seeding each wrong in turn.
 
 - **A timing-free guard on printed output lines.** `test/unit/formatted-output-guard.test.js` runs every declarative renderer's formatter on each worked example, and on each example with one input blanked or zeroed (about 82,000 lines in half a second), and fails on `undefined`, `NaN`, `Infinity`, or a bare `null`. The browser check that covers the same leak reads the page after a debounce, and it passed twice over the inventory-turnover leak fixed today. Seeding a misspelled result key into one formatter turns it red. No current tile fails it.
