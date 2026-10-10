@@ -378,6 +378,7 @@ export function computeOpticalReturnLoss({ connector_count = 0, connector_reflec
   const with_unmated_linear = connector_linear_total + unmated_end_count * fresnel_linear;
   const with_unmated_orl_db = -10 * Math.log10(with_unmated_linear);
   const apc_orl_db = -10 * Math.log10(connector_count * Math.pow(10, apc_reflectance_db / 10));
+  if (![apc_orl_db, connector_only_orl_db].every(Number.isFinite)) return { error: "The optical return loss result is not a finite number; check the inputs for a value that is far out of range." };
   return {
     fresnel_reflectance_pct: 100 * fresnel_linear, fresnel_reflectance_db,
     connector_only_orl_db, with_unmated_orl_db, apc_orl_db,

@@ -223,6 +223,7 @@ export function computeSettlementLimitLoad({ sc_allow_in = 0, cc = 0, h_ft = 0, 
   const stress_ratio = Math.pow(10, sc_ft * (1 + e0) / (cc * h_ft));
   const dsig_psf = sig0_psf * (stress_ratio - 1);
   const final_stress_psf = sig0_psf + dsig_psf;
+  if (![dsig_psf].every(Number.isFinite)) return { error: "The settlement limit load result is not a finite number; check the inputs for a value that is far out of range." };
   return {
     dsig_psf, final_stress_psf, stress_ratio,
     note: "The inverse of the primary-consolidation settlement tile: the maximum load-induced stress increase d_sigma that keeps a normally-consolidated clay's primary settlement within an allowable limit. Solving Sc = (Cc H/(1 + e0)) log10((sigma'0 + d_sigma)/sigma'0) for d_sigma gives d_sigma = sigma'0 (10^(Sc(1 + e0)/(Cc H)) - 1). Because settlement grows with the log of the stress RATIO, the allowable increment is a fraction of the existing stress, and a tighter settlement limit allows disproportionately less load. Single normally-consolidated layer at one representative mid-layer stress (sublayer the profile for accuracy) - not the immediate elastic settlement, secondary creep, or the time rate. A design aid, not a substitute for the geotechnical engineer of record's report.",

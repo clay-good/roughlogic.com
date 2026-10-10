@@ -148,6 +148,7 @@ export function computeGrilleNeckNc({
     : "no neck-mounted balancing damper was reported. That is worth confirming on a complaint, because a damper behind the diffuser generates turbulence with nothing between it and the room, and it commonly makes more noise than the diffuser does";
   const roomVerdict = "AND THE PUBLISHED NC ASSUMES A ROOM -- a fairly absorptive one. A diffuser rated NC 28 in a carpeted office with a lay-in ceiling reads several points higher in a hard-surfaced room with a gypsum ceiling, which is why the same selection is quiet in one space and audible in another. That correction is ENTERED here rather than assumed";
 
+  if (![target_velocity_fpm].every(Number.isFinite)) return { error: "The grille neck nc result is not a finite number; check the inputs for a value that is far out of range." };
   return {
     neck_velocity_fpm, effective_nc, has_target, over_target_db, meets_target,
     has_next, next_velocity_fpm, velocity_ratio, velocity_drop_pct, nc_change_db, next_nc, next_meets,
@@ -328,6 +329,7 @@ export function computeSilencerInsertionLoss({
   const couplingVerdict = "INSERTION LOSS AND PRESSURE DROP ARE NOT INDEPENDENT. The geometry that absorbs sound -- narrow passages, thick baffles -- is the geometry that restricts flow, so more attenuation costs static in the same fitting. Attenuation rises with LENGTH and so does pressure drop, but linearly; regenerated noise rises much faster with VELOCITY. That asymmetry is the whole design rule";
   const sequenceVerdict = "THE PRACTICAL SEQUENCE IS: get the face velocity down by transitioning to a larger cross-section AT the silencer, choose the length for the attenuation needed, then check the pressure drop against the fan's available static and the regenerated noise against the room criterion. Doing it in the other order produces a silencer that fits the duct and solves nothing";
 
+  if (![downstream_lw_db].every(Number.isFinite)) return { error: "The silencer insertion loss result is not a finite number; check the inputs for a value that is far out of range." };
   return {
     face_area_ft2, face_velocity_fpm, pressure_drop_in_wc,
     has_alt, alt_face_area_ft2, alt_face_velocity_fpm, alt_pressure_drop_in_wc,
@@ -389,6 +391,7 @@ export function computeMechanicalRoomNc({
   const sealVerdict = "AND A FEW SQUARE INCHES OF OPEN PENETRATION CAN UNDO AN ENTIRE ASSEMBLY, which is why sealing is not a detail. Sound follows the path of least resistance and an unsealed conduit sleeve is a very low resistance path; the wall's rating describes the wall, not the holes through it";
   const comparativeVerdict = "THE VALUE HERE IS COMPARATIVE RATHER THAN ABSOLUTE. Neither the source level nor the transmission loss is known precisely in the field, so the absolute prediction carries real uncertainty -- but the DIFFERENCE between prediction and measurement is robust, and that difference is what identifies flanking. Finding the flanking path is cheaper than any acoustic upgrade";
 
+  if (![energy_factor].every(Number.isFinite)) return { error: "The mechanical room nc result is not a finite number; check the inputs for a value that is far out of range." };
   return {
     area_term_db, received_spl_db, has_criterion, over_criterion_db, meets_criterion, tl_required_db,
     has_measured, measured_excess_db, flanking_likely, energy_factor,

@@ -1474,6 +1474,8 @@ export function computeDuctBankAmpacityDerate({
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(ducts_across > 0 && ducts_down > 0)) return { error: "The duct bank must be at least one duct across and one down." };
   if (!Number.isInteger(ducts_across) || !Number.isInteger(ducts_down)) return { error: "Duct counts must be whole numbers." };
+  // The mutual-heating sum is over every pair of ducts; a mistyped count in the thousands froze the page.
+  if (ducts_across > 50 || ducts_down > 50) return { error: "A duct bank of more than 50 ducts across or down is outside this screen." };
   if (!(spacing_in > 0)) return { error: "Duct center-to-center spacing must be positive." };
   if (!(depth_to_top_in > 0)) return { error: "Depth to the top duct must be positive." };
   if (!(base_table_ampacity_a > 0)) return { error: "The base table ampacity must be positive." };

@@ -446,6 +446,7 @@ export function computeMasterKeyCapacity({ cut_positions = 0, usable_depths = 0,
   const alternative_change_keys = Math.pow(per_mastered_position, alternative_mastered_positions);
   const margin = change_keys_available - change_keys_required;
   const utilisation_pct = change_keys_required / change_keys_available * 100;
+  if (![theoretical_total].every(Number.isFinite)) return { error: "The master key bitting capacity result is not a finite number; check the inputs for a value that is far out of range." };
   return {
     theoretical_total, per_mastered_position, change_keys_available, alternative_change_keys,
     margin, utilisation_pct,

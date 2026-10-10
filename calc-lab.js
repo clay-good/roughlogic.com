@@ -643,6 +643,7 @@ export function computeHendersonHasselbalch({
   const moles_total = total_buffer_concentration * total_volume;
   const moles_base = moles_total * fraction_base;
   const moles_acid = moles_total * fraction_acid;
+  if (![ratio_base_acid].every(Number.isFinite)) return { error: "The henderson hasselbalch result is not a finite number; check the inputs for a value that is far out of range." };
   return {
     ratio_base_acid, fraction_base, fraction_acid,
     moles_base, moles_acid, total_moles: moles_total,

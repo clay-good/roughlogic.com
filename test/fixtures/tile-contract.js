@@ -41,6 +41,19 @@ const FIXTURE = new URL("./worked-examples.json", import.meta.url);
 // a non-numeric paste (NaN), and a runaway magnitude (Infinity, e.g. the
 // 1e999 a user can paste into a number field).
 const BAD_NUMERICS = [0, -1, NaN, Infinity];
+// A value mistyped by orders of magnitude: a dropped or doubled decimal point,
+// feet typed as inches, a count with three extra digits. Applied to each
+// nonzero example value as a multiple, so the perturbation is always far
+// outside the tile's working range. Added 2026-10-09 after a sweep at these
+// scales found two computes that froze (smoke-detector-spacing-count with a
+// tiny spacing, duct-bank-ampacity-derate with thousands of ducts), two that
+// threw, and 21 that returned Infinity or NaN (a loan term rounding to zero
+// months, a 10^(dB/10) overflow).
+const BAD_SCALES = [1e3, 1e-3, 1e6, 1e-6];
+// A tile whose INFINITE output is a designed answer, not a leak.
+const DESIGNED_INFINITE = new Set([
+  "exterior-opening-protection", // allowable_pct = Infinity with no_limit: true past the unlimited-opening distance
+]);
 
 function deepFreeze(obj) {
   if (obj && typeof obj === "object") {
@@ -123,7 +136,8 @@ export async function sweepRow(row) {
   // throw (Tier 1), never leak a NaN/Infinity (Tier 2).
   for (const [key, val] of Object.entries(input)) {
     if (typeof val !== "number" || !Number.isFinite(val)) continue;
-    for (const bad of BAD_NUMERICS) {
+    const scaled = val === 0 ? [] : BAD_SCALES.map((f) => val * f);
+    for (const bad of [...BAD_NUMERICS, ...scaled]) {
       const perturbed = { ...input, [key]: bad };
       let rr;
       try {
@@ -138,6 +152,7 @@ export async function sweepRow(row) {
       }
       if (!rr.error) {
         const leaked = nonFiniteFields(rr);
+        if (leaked.length && scaled.includes(bad) && DESIGNED_INFINITE.has(row.tile_id) && leaked.every((k) => Math.abs(rr[k]) === Infinity)) continue;
         if (leaked.length) t2(`${row.tile_id}::${key}::${String(bad)}`, `${key}=${String(bad)} leaked non-finite field(s): ${leaked.join(", ")} (C-1/C-3)`);
       }
     }

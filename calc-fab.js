@@ -203,6 +203,8 @@ export function computePipeTemplateWrap({ outside_diameter_in = 0, cut_angle_deg
   const N = Number(stations);
   if (!(OD > 0)) return { error: "Outside diameter must be positive (in)." };
   if (!Number.isInteger(N) || N < 4) return { error: "Use at least 4 equal stations to scribe a usable template." };
+  // Every station is a row in the result; millions of them exhausted memory.
+  if (N > 720) return { error: "More than 720 stations is finer than a template can be scribed; use 720 or fewer." };
   if (!(alpha >= 0) || !(alpha < 90)) return { error: "Cut angle must be in [0, 90) degrees from square." };
   const circumference_in = Math.PI * OD;
   const tanA = Math.tan(alpha * Math.PI / 180);

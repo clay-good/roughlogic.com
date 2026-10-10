@@ -6442,6 +6442,7 @@ export function computeConcreteMaturity({ concrete_temp_f = 0, hours = 0, datum_
     target_hours = target_ttf_c / (Tc - T0);
     target_days = target_hours / 24;
   }
+  if (![age_factor, te_hours].every(Number.isFinite)) return { error: "The equivalent age is not a finite number; check the activation constant Q (about 5,000 K for Type I cement)." };
   return { Tc, T0, M_c, M_f, age_factor, te_hours, te_days, target_hours, target_days };
 }
 
@@ -8613,6 +8614,7 @@ export function computeGlulamVolumeFactor({ span_ft = 0, depth_in = 0, width_in 
   const raw = kL * Math.pow(21 / span, 1 / xExp) * Math.pow(12 / d, 1 / xExp) * Math.pow(5.125 / b, 1 / xExp);
   const cv = Math.min(raw, 1.0);
   const reduction_pct = (1 - cv) * 100;
+  if (![cv].every(Number.isFinite)) return { error: "The glulam volume factor result is not a finite number; check the inputs for a value that is far out of range." };
   return {
     cv, reduction_pct, capped: raw > 1.0,
     note: "NDS 2018 §5.3.6 glulam volume factor Cv = (21/L)^(1/x) x (12/d)^(1/x) x (5.125/b)^(1/x), capped at 1.0, where L is the length between points of zero moment (the span, for a simple beam; ft), d and b the depth and width (in), and x = 10 for softwoods (20 for Southern Pine). The current NDS has no loading factor KL (an NDS 1997 term); leave KL at 1.0 unless reproducing a pre-2001 design. A larger stressed volume is more likely to contain a strength-limiting defect, so the reference bending value is reduced. The allowable bending uses the LESSER of Cv and the beam-stability factor CL; Cv applies to glulam bending about the x-x axis, not sawn lumber. A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",

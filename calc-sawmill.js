@@ -194,6 +194,7 @@ export function computeKilnDryingTime({ mc_initial_pct = 0, mc_final_pct = 0, fs
   const alt_cycle_days = alt_drying_days + equalize_condition_days;
   const proportional_days = drying_days * (alt_thickness_in / thickness_in);
   const underquote_factor = thickness_scale / (alt_thickness_in / thickness_in);
+  if (![thickness_scale].every(Number.isFinite)) return { error: "The kiln drying time result is not a finite number; check the inputs for a value that is far out of range." };
   return {
     days_above_fsp, days_below_fsp, drying_days, cycle_days,
     points_removed, linear_rate_ppd, below_share_pct, rate_below_fsp_ppd,

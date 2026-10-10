@@ -308,6 +308,8 @@ export function computeSmokeDetectorSpacingCount({ room_length_ft = 60, room_wid
   const fitsCircle = (a, b) => b / 2 < R && a <= Math.round(2 * Math.sqrt(R * R - (b / 2) * (b / 2))) + 1e-9;
   const cellOk = (a, b) => (a <= S * (1 + 1e-9) && b <= S * (1 + 1e-9)) || fitsCircle(a, b) || fitsCircle(b, a);
   const rMax = Math.ceil(room_length_ft / S - 1e-9), cMax = Math.ceil(room_width_ft / S - 1e-9);
+  // A spacing typed far too small (0.03 for 30) would search millions of grids and freeze the page.
+  if (rMax * cMax > 250000) return { error: "That spacing puts more than 250,000 detectors in the room; check the listed spacing (ft)." };
   let rows = rMax, cols = cMax;
   for (let r = 1; r <= rMax; r++) {
     for (let c = 1; c <= cMax; c++) {

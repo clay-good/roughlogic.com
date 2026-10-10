@@ -222,6 +222,7 @@ export function computeWindShearHubHeight({ measured_speed_mph = 0, measured_hei
   const derived_hub_speed_mph = measured_speed_mph * Math.pow(height_ratio, derived_exponent);
   // Extrapolating much past twice the measurement height is not defensible.
   const extrapolation_ratio = height_ratio;
+  if (![alt_hub_speed_mph, speed_ratio, hub_speed_mph, energy_ratio, alt_energy_vs_entered].every(Number.isFinite)) return { error: "The wind shear hub height result is not a finite number; check the inputs for a value that is far out of range." };
   return {
     height_ratio, speed_ratio, hub_speed_mph, energy_ratio,
     alt_hub_speed_mph, alt_energy_vs_entered,
@@ -310,6 +311,7 @@ export function computeWeibullCapacityFactor({ weibull_k = 2, weibull_c_mph = 0,
   const rated_annual_mwh = rated_power_kw * _HOURS_PER_YEAR / 1000;
   const capacity_factor = net_aep_mwh / rated_annual_mwh;
   const gross_capacity_factor = gross_aep_mwh / rated_annual_mwh;
+  if (![gross_aep_mwh, mean_speed_mph].every(Number.isFinite)) return { error: "The weibull capacity factor result is not a finite number; check the inputs for a value that is far out of range." };
   return {
     mean_speed_mph, energy_pattern_factor,
     hours_below_cut_in, hours_above_cut_out, hours_operating,

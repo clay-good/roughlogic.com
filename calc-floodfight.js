@@ -395,6 +395,8 @@ export function computeBasementFloodPumpdown({ floor_area_sqft = 0, water_depth_
   if (!(daily_drawdown_ft > 0)) return { error: "Daily drawdown must be positive." };
   if (daily_drawdown_ft > 3) return { error: "FEMA's staged pump-down limits the drawdown to 2 to 3 ft per day; 3 ft is the maximum." };
   if (!(pump_gpm > 0)) return { error: "Pump rate must be positive." };
+  // The schedule lists every day; a depth or drawdown mistyped by orders of magnitude overflowed the stack.
+  if (water_depth_ft / daily_drawdown_ft > 3650) return { error: "At that drawdown the pump-down would take more than ten years; check the depth and the daily drawdown." };
   const gal_per_ft = floor_area_sqft * _GAL_PER_CUFT;
   const total_gal = gal_per_ft * water_depth_ft;
   // Two 1 ft test days, then the daily rate until empty.

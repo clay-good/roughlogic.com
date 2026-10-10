@@ -229,6 +229,8 @@ export function computePITI({
   if (!Number.isFinite(apr) || apr < 0) return { error: "Enter a non-negative APR." };
   if (!Number.isFinite(yrs) || yrs <= 0) return { error: "Enter a positive term in years." };
   const n = Math.round(yrs * 12);
+  // A term under half a month rounded to 0 payments and divided by zero.
+  if (n < 1) return { error: "The term must be at least one month." };
   const r = apr / 100 / 12;
   const pi = r === 0 ? P / n : (P * r) / (1 - Math.pow(1 + r, -n));
   const monthly_tax = tax / 12;
@@ -998,6 +1000,8 @@ export function computeAmortizationSchedule({ principal, apr_percent, term_years
   if (!Number.isFinite(yrs) || yrs <= 0 || yrs > 50) return { error: "Enter a term 0 to 50 years." };
   if (!Number.isFinite(extra) || extra < 0) return { error: "Extra principal must be non-negative." };
   const n = Math.round(yrs * 12);
+  // A term under half a month rounded to 0 payments and divided by zero.
+  if (n < 1) return { error: "The term must be at least one month." };
   const r = apr / 100 / 12;
   const pi = r === 0 ? P / n : (P * r) / (1 - Math.pow(1 + r, -n));
   const rows = [];
@@ -1106,6 +1110,8 @@ export function computeCostOfWaiting({ principal, current_rate_percent, future_r
   if (!Number.isFinite(r2) || r2 < 0 || r2 > 30) return { error: "Enter a future rate 0 to 30 percent." };
   if (!Number.isFinite(yrs) || yrs <= 0 || yrs > 50) return { error: "Enter a term 0 to 50 years." };
   const n = Math.round(yrs * 12);
+  // A term under half a month rounded to 0 payments and divided by zero.
+  if (n < 1) return { error: "The term must be at least one month." };
   function piFn(rPct) {
     const r = rPct / 100 / 12;
     if (r === 0) return P / n;
@@ -1766,6 +1772,8 @@ export function computeMortgagePointBreakeven({ loan_amount, base_rate_pct, poin
   if (!Number.isFinite(cpct) || cpct <= 0) return { error: "Enter a positive point cost (percent of loan)." };
   if (!Number.isFinite(yrs) || yrs <= 0) return { error: "Enter a positive term in years." };
   const n = Math.round(yrs * 12);
+  // A term under half a month rounded to 0 payments and divided by zero.
+  if (n < 1) return { error: "The term must be at least one month." };
   const pay = (ratePct) => { const r = ratePct / 100 / 12; return r === 0 ? P / n : (P * r) / (1 - Math.pow(1 + r, -n)); };
   const payment_base = pay(rb);
   const payment_points = pay(rp);
@@ -1786,6 +1794,7 @@ export function computeMortgagePointBreakeven({ loan_amount, base_rate_pct, poin
   } else {
     verdict = "Enter a holding period for a worth-it verdict.";
   }
+  if (![payment_base].every(Number.isFinite)) return { error: "The mortgage point breakeven result is not a finite number; check the inputs for a value that is far out of range." };
   return { payment_base, payment_points, monthly_savings, point_cost, break_even_months, break_even_years: break_even_months / 12, flags, verdict };
 }
 
@@ -2094,6 +2103,7 @@ export function computeRentVsBuy({
   if (N < 1) return { error: "Holding period must round to at least one year." };
   const loan = price - down;
   const n = Math.round(term * 12);
+  if (n < 1) return { error: "The loan term must be at least one month." };
   const mr = rate / 100 / 12;
   const pi = mr === 0 ? loan / n : (loan * mr) / (1 - Math.pow(1 + mr, -n));
   // Remaining balance after N years (N*12 payments) on the loan.

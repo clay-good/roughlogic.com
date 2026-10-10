@@ -316,6 +316,8 @@ export function computeStackingAisleWidth({ load_length_in = 0, operating_cleara
   const turret_modules = Math.floor(building_width_in / turret_module_in + 1e-9);
   const turret_gain = turret_modules - counterbalanced_modules;
   const reach_gain = reach_modules - counterbalanced_modules;
+  // The gains are percentages OF the counterbalanced layout; with none fitting they divided by zero.
+  if (!(counterbalanced_modules > 0)) return { error: "The building is too narrow for even one counterbalanced aisle module at these dimensions; check the building width and the truck and load dimensions." };
   return {
     counterbalanced_aisle_in, counterbalanced_aisle_ft: counterbalanced_aisle_in / IN_PER_FT,
     reach_aisle_in, reach_aisle_ft: reach_aisle_in / IN_PER_FT,

@@ -269,6 +269,7 @@ export function computeSubSlabSuctionField({
   const fines_verdict = "THE SUB-SLAB MATERIAL DECIDES EVERYTHING, and it varies more than any other input. Clean gravel can carry a field twenty-five or thirty feet from a single point; a slab poured over compacted fines or native soil can give a field of a few feet, and that building needs several points REGARDLESS OF FAN SIZE. A bigger fan on a tight sub-slab pulls harder on the same small area, which is why fan upsizing is the wrong response to poor communication";
   const timing_verdict = "AND THAT IS THE FINDING THE COMMUNICATION TEST EXISTS TO PRODUCE -- BEFORE ANYTHING IS INSTALLED. Drilling a test hole, applying vacuum, and reading a micromanometer at candidate locations costs an hour and settles the point count. Discovering the same thing after a single-point system fails its post-mitigation test costs a second mobilisation, a second penetration, and the homeowner's confidence";
   if (![effective_radius_ft, area_per_point_ft2, points_required, coverage_ratio, longest_dimension_ft].every(Number.isFinite)) return { error: "Suction field math is not a finite value." };
+  if (![points_by_length].every(Number.isFinite)) return { error: "The sub slab suction field result is not a finite number; check the inputs for a value that is far out of range." };
   return {
     effective_radius_ft, upper_bound_ft, bracket_verdict,
     area_per_point_ft2, points_required, coverage_ratio, area_verdict,

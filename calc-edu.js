@@ -1397,7 +1397,7 @@ const BELLCURVE_BANDS = [
   { min_sigma: 0,    letter: "B",  note: "mean to mean + 1 sigma (~34.1%)" },
   { min_sigma: -1,   letter: "C",  note: "mean - 1 sigma to mean (~34.1%)" },
   { min_sigma: -2,   letter: "D",  note: "mean - 2 to mean - 1 sigma (~13.6%)" },
-  { min_sigma: -999, letter: "F",  note: "below mean - 2 sigma (~2.3%)" },
+  { min_sigma: -Infinity, letter: "F",  note: "below mean - 2 sigma (~2.3%)" },
 ];
 
 // dims: in { raw: dimensionless, mean: dimensionless, sd: dimensionless } out: { z: dimensionless, percentile: dimensionless }

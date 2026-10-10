@@ -1194,9 +1194,15 @@ export async function run({ id, inputs } = {}) {
   } catch (e) {
     result = { error: "The calculator could not run on these inputs (" + String(e && e.message ? e.message : e) + ")." + missingNote + " Call describe_calculator for the inputs it needs." };
   }
+  // NaN is never an answer. An INFINITE value sometimes is one by design
+  // (exterior-opening-protection returns Infinity with no_limit: true past the
+  // fire separation distance where openings are unlimited), so it is kept and
+  // flagged in a warning rather than refused; JSON prints it as null.
+  let unbounded = [];
   if (result && typeof result === "object" && !result.error) {
-    const bad = Object.entries(result).filter(([, v]) => typeof v === "number" && !Number.isFinite(v)).map(([k]) => k);
-    if (bad.length) result = { error: "The calculator did not produce a finite value for " + bad.join(", ") + "." + missingNote + " Call describe_calculator for the inputs it needs." };
+    const nan = Object.entries(result).filter(([, v]) => typeof v === "number" && Number.isNaN(v)).map(([k]) => k);
+    if (nan.length) result = { error: "The calculator did not produce a finite value for " + nan.join(", ") + "." + missingNote + " Call describe_calculator for the inputs it needs." };
+    else unbounded = Object.entries(result).filter(([, v]) => v === Infinity || v === -Infinity).map(([k]) => k);
   }
   const out = { id, inputs: args || {}, usedExample, result };
   // spec-v1189: alongside the raw result, the rendered outputs a person sees —
@@ -1246,7 +1252,7 @@ export async function run({ id, inputs } = {}) {
   // caller-supplied inputs are checked.
   out.warnings = usedExample
     ? []
-    : missing.map((key) => ({ key, rule: "missing", message: `"${key}" was not supplied and has no default, so the calculator read it as blank. Call describe_calculator for the inputs it takes.` })).concat(validateNumbers(schema, args)).concat(
+    : unbounded.map((key) => ({ key, rule: "unbounded", message: `"${key}" is infinite (unlimited, or a division by zero); JSON prints it as null. Read the result's flags and verdict text for which.` })).concat(missing.map((key) => ({ key, rule: "missing", message: `"${key}" was not supplied and has no default, so the calculator read it as blank. Call describe_calculator for the inputs it takes.` }))).concat(validateNumbers(schema, args)).concat(
       validateKnownKeys(
         fn,
         args,

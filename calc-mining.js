@@ -240,6 +240,7 @@ export function computeBlastScaledDistancePPV({ distance_ft = 0, charge_per_dela
   // limit = K x (D / sqrt(W))^-b, D = sqrt(W) x (K / limit)^(1/b).
   const compliant_distance_ft = Math.sqrt(charge_per_delay_lb) * Math.pow(site_k / ppv_limit_in_s, 1 / site_b);
   const charge_headroom_lb = max_charge_lb - charge_per_delay_lb;
+  if (![compliant_distance_ft].every(Number.isFinite)) return { error: "The blast scaled distance ppv result is not a finite number; check the inputs for a value that is far out of range." };
   return {
     scaled_distance, predicted_ppv_in_s, margin_in_s, ppv_ok, sd_ok,
     max_charge_lb, compliant_distance_ft, charge_headroom_lb,
@@ -309,6 +310,7 @@ export function computeBlastAirblastOverpressure({ distance_ft = 0, charge_per_d
   const vented_psi = _AIRBLAST_REF_PSI * Math.pow(10, vented_db / 20);
   const vented_ok = vented_db <= limit_db + 1e-9 * Math.abs(limit_db);
   const vented_pressure_factor = Math.pow(10, confinement_penalty_db / 20);
+  if (![limit_psi, overpressure_db, sd_at_limit, vented_psi].every(Number.isFinite)) return { error: "The blast airblast overpressure result is not a finite number; check the inputs for a value that is far out of range." };
   return {
     cube_root_scaled_distance, overpressure_psi, overpressure_db, limit_psi,
     margin_db, db_ok, sd_at_limit, max_charge_lb, compliant_distance_ft,

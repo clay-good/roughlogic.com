@@ -605,8 +605,9 @@ test("run_calculator: yes/no/on/off/1/0 for a boolean answer as true/false do, c
 // undefined: five computes threw (voltage-drop with no material) and about 80
 // returned NaN, which JSON prints as null -- voltage-drop still said "within
 // advisory" beside a null drop. With each input of each first worked example
-// omitted in turn, the door must not throw and must never hand back a
-// non-finite number, and an omitted input that has no default must be named.
+// omitted in turn, the door must not throw and must never hand back NaN (an
+// infinite value, which is sometimes a designed answer, must carry a warning),
+// and an omitted input that has no default must be named.
 test("run_calculator: an omitted input never throws or returns a non-finite number, catalog-wide", async () => {
   const { run } = await import("../../mcp/catalog.mjs");
   const { readFile } = await import("node:fs/promises");
@@ -624,12 +625,24 @@ test("run_calculator: an omitted input never throws or returns a non-finite numb
       let r;
       try { r = await run({ id, inputs: rest }); } catch (e) { bad.push(`${id}::${key} threw ${String(e.message).slice(0, 40)}`); continue; }
       const res = r.result || {};
-      for (const [k, v] of Object.entries(res)) if (typeof v === "number" && !Number.isFinite(v)) { bad.push(`${id}::${key} returned ${k}=${v}`); break; }
+      for (const [k, v] of Object.entries(res)) {
+        if (typeof v !== "number" || Number.isFinite(v)) continue;
+        // NaN is refused outright; an infinite value must at least be flagged.
+        if (Number.isNaN(v) || !(r.warnings || []).some((w) => w.rule === "unbounded" && w.key === k)) { bad.push(`${id}::${key} returned ${k}=${v}`); break; }
+      }
       if ((r.warnings || []).some((w) => w.rule === "missing" && w.key === key)) named++;
     }
   }
   assert.deepEqual(bad, [], "an omitted input threw or returned a non-finite number:\n  " + bad.slice(0, 40).join("\n  "));
   assert.ok(named > 100, "expected omitted no-default inputs to be named in a warning, got " + named);
+});
+
+test("run_calculator: a designed infinite answer is kept and flagged, not refused", async () => {
+  const { run } = await import("../../mcp/catalog.mjs");
+  const r = await run({ id: "exterior-opening-protection", inputs: { fsd_ft: 35, wall_area: 1000, protected: false, actual_opening: 900 } });
+  assert.equal(r.result.no_limit, true);
+  assert.equal(r.result.allowable_pct, Infinity);
+  assert.ok(r.warnings.some((w) => w.rule === "unbounded" && w.key === "allowable_pct"));
 });
 
 test("run_calculator: voltage-drop with an input left out is an error that names it", async () => {
