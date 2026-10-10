@@ -170933,6 +170933,51 @@
  },
  {
   "tile_id": "saturated-steam-properties",
+  "source_publisher": "Project (first-principles)",
+  "source_title": "Steam at 100 psig, sea level",
+  "source_edition_or_year": "IAPWS-IF97 Eqs. 31, 7 and 15 evaluated on the saturation line",
+  "source_section_or_page": "114.696 psia: 337.88 F, vg 3.892 cu ft/lb, hf 309.1, hfg 880.9, hg 1,190.0 Btu/lb; printed steam tables list 337.9 F, 3.89, 309, 881 and 1,190 at 100 psig",
+  "verified_by": "rl",
+  "verified_on": "2026-10-10",
+  "inputs": {
+   "gauge_pressure_psig": 100,
+   "atmosphere_psia": 14.696
+  },
+  "outputs": {
+   "sat_temp_f": {
+    "value": 337.88,
+    "tolerance": {
+     "abs": 0.05
+    }
+   },
+   "spec_vol_ft3lb": {
+    "value": 3.8922,
+    "tolerance": {
+     "pct": 0.05
+    }
+   },
+   "hf_btulb": {
+    "value": 309.08,
+    "tolerance": {
+     "abs": 0.05
+    }
+   },
+   "hfg_btulb": {
+    "value": 880.87,
+    "tolerance": {
+     "abs": 0.05
+    }
+   },
+   "hg_btulb": {
+    "value": 1189.95,
+    "tolerance": {
+     "abs": 0.05
+    }
+   }
+  }
+ },
+ {
+  "tile_id": "saturated-steam-properties",
   "source_publisher": "IAPWS",
   "source_title": "R7-97(2012) Revised Release on the IAPWS Industrial Formulation 1997",
   "source_edition_or_year": "2007, editorial update 2012 (iapws.org/technical-guidance/release/IF97-Rev)",
@@ -170975,51 +171020,6 @@
     "value": 211.2907,
     "tolerance": {
      "abs": 0.001
-    }
-   }
-  }
- },
- {
-  "tile_id": "saturated-steam-properties",
-  "source_publisher": "Project (first-principles)",
-  "source_title": "Steam at 100 psig, sea level",
-  "source_edition_or_year": "IAPWS-IF97 Eqs. 31, 7 and 15 evaluated on the saturation line",
-  "source_section_or_page": "114.696 psia: 337.88 F, vg 3.892 cu ft/lb, hf 309.1, hfg 880.9, hg 1,190.0 Btu/lb; printed steam tables list 337.9 F, 3.89, 309, 881 and 1,190 at 100 psig",
-  "verified_by": "rl",
-  "verified_on": "2026-10-10",
-  "inputs": {
-   "gauge_pressure_psig": 100,
-   "atmosphere_psia": 14.696
-  },
-  "outputs": {
-   "sat_temp_f": {
-    "value": 337.88,
-    "tolerance": {
-     "abs": 0.05
-    }
-   },
-   "spec_vol_ft3lb": {
-    "value": 3.8922,
-    "tolerance": {
-     "pct": 0.05
-    }
-   },
-   "hf_btulb": {
-    "value": 309.08,
-    "tolerance": {
-     "abs": 0.05
-    }
-   },
-   "hfg_btulb": {
-    "value": 880.87,
-    "tolerance": {
-     "abs": 0.05
-    }
-   },
-   "hg_btulb": {
-    "value": 1189.95,
-    "tolerance": {
-     "abs": 0.05
     }
    }
   }

@@ -16,6 +16,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **`saturated-steam-properties` loads the example its page prints.** The page prints a tile's first registered worked example, and that was the IAPWS 1 MPa verification row (130.34 psig), while "Test with example" loaded 100 psig. The 100 psig row is now first. The tile's example, and those of `train-resistance-davis` and `free-surface-moment`, are exported so the static example-parity gate in lint compares them; they had been left to the browser sweep, which is where CI caught this.
+
 - **Three calculators no longer answer when a required input is missing.** An input left out is undefined, and a guard written as `x <= 0` lets it through because NaN is not less than or equal to anything. `insulation-thickness` returned 0.001 in with no surface temperature, `duct-sizing` returned a 2 in duct with no airflow, and `superheat-subcool` returned a saturation temperature with no pressure. Each now returns an error. The page was not affected (a blank field reads as 0); this was reachable through the agent door, which already flags the omission with a `missing` warning.
 
 - **The agent door flags a fraction in a whole-number field.** The page strikes a value that misses a field's step, such as 2.5 in a count. The door said nothing: of 236 whole-number fields, 116 computes used the fraction (7.5 bolts, 3.5 parallel sets) and 53 rounded it down or up without saying which. `run_calculator` now returns a `step` warning naming the field.
