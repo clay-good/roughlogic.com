@@ -33,6 +33,9 @@ export function computeWeirFlow({ weir_type = "vnotch90", head_ft = 0, crest_len
   const H = Number(head_ft) || 0;
   const L = Number(crest_length_ft) || 0;
   if (!(H > 0 && Number.isFinite(H))) return { error: "Head over crest must be positive (ft)." };
+  if (!["vnotch90", "rect_suppressed", "rect_contracted"].includes(weir_type)) return { error: "Weir type must be vnotch90, rect_suppressed or rect_contracted (a Cipolletti weir has its own calculator)." };
+  // The Francis end-contraction term (L - 0.2 H) is good to about H = L/3; by H = 3 L the computed flow FALLS as the head rises.
+  if (weir_type === "rect_contracted" && L > 0 && H > L) return { error: "The head is greater than the crest length; the Francis contracted-weir relation does not hold (it is good to about a third of the crest length)." };
   let cfs, approach_velocity_fps = 0, plain_cfs = 0;
   if (weir_type === "vnotch90") {
     const C = coeff > 0 ? coeff : 2.49;
@@ -266,6 +269,7 @@ export function computeWeirHeadFromFlow({ weir_type = "vnotch90", target_flow_cf
   const Q = Number(target_flow_cfs) || 0;
   const L = Number(crest_length_ft) || 0;
   if (!(Q > 0 && Number.isFinite(Q))) return { error: "Target flow must be positive (cfs)." };
+  if (!["vnotch90", "rect_suppressed", "rect_contracted"].includes(weir_type)) return { error: "Weir type must be vnotch90, rect_suppressed or rect_contracted (a Cipolletti weir has its own calculator)." };
   let head_ft;
   if (weir_type === "vnotch90") {
     const C = coeff > 0 ? coeff : 2.49;

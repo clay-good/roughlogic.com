@@ -232,7 +232,8 @@ export function computeRespiratorCartridgeLife({
   const humid = humidity_pct > 65;
   const humidity_adjusted_hr = humid ? worst_case_schedule_hr > 0 ? worst_case_schedule_hr * humidity_derate_above_65 : schedule_hr * humidity_derate_above_65 : (worst_case_schedule_hr > 0 ? worst_case_schedule_hr : schedule_hr);
   // The schedule that governs is the shortest of the three; the headline must not stop at the typical one.
-  const governing_schedule_hr = humidity_adjusted_hr;
+  // (Taken as a minimum since 2026-10-11: a "worst case" entered below the typical concentration used to LENGTHEN it.)
+  const governing_schedule_hr = Math.min(humidity_adjusted_hr, schedule_hr);
   const governing_changes_per_shift = Math.ceil(shift_hours / governing_schedule_hr - 1e-9) - 1;
   const governing_text = governing_schedule_hr < schedule_hr - 1e-9 * schedule_hr
     ? "; BUT THE GOVERNING SCHEDULE, after the worst case" + (humid ? " and the humidity derate" : "") + ", is " + fmt(governing_schedule_hr, 1) + " hours -- "
@@ -306,6 +307,8 @@ export function computeArcRatedClothingSelection({
     ? "LAYERING IS NOT ADDITION. Two 8 cal garments do not make a 16 cal system: the system rating comes from TESTING THE COMBINATION, and the air gaps between layers contribute in a way arithmetic does not predict. Substituting a different underlayer changes the system that was tested, so the tested system rating is the only figure to design to"
     : "the entered garments sum to " + fmt(garment_ratings_sum_cal_cm2, 1) + " cal/cm2, and THAT SUM IS NOT THE SYSTEM RATING. Layering is not addition -- the rating comes from testing the combination, and the air gaps between layers contribute in a way arithmetic does not predict"
       + (has_system ? ", which is why the tested " + fmt(system_arc_rating_cal_cm2, 1) + " and the arithmetic " + fmt(garment_ratings_sum_cal_cm2, 1) + " are different numbers and only the tested one counts" : "");
+  // Only the exact string "yes" used to count, so "Yes" or true let a prohibited underlayer pass.
+  if (meltable_underlayer !== "yes" && meltable_underlayer !== "no") return { error: "Answer yes or no: is a meltable (non-arc-rated synthetic) layer worn underneath?" };
   const meltable = meltable_underlayer === "yes";
   const underlayer_verdict = meltable
     ? "MELTABLE UNDERLAYER INDICATED, AND THAT IS PROHIBITED regardless of the system rating above. Polyester, nylon and acetate next to the skin melt in an arc event and adhere to it, producing injuries worse than the arc alone. Natural fibre or arc-rated underlayers only -- and that includes the undershirt and the socks, which is where it is forgotten"

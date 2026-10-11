@@ -79,6 +79,7 @@ function _invNorm(p) {
 // dims: in { avg_daily_demand: dimensionless, lead_time_days: T, demand_sd: dimensionless, service_level_pct: dimensionless } out: { z: dimensionless, safety_stock: dimensionless, reorder_point: dimensionless }
 export function computeReorderPoint({ avg_daily_demand = 0, lead_time_days = 0, demand_sd = 0, service_level_pct = 95 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (Number(service_level_pct) < 50) return { error: "A service level below 50% gives a negative safety stock; enter 50 to 99.9." };
   const dd = Number(avg_daily_demand) || 0;
   const lt = Number(lead_time_days) || 0;
   const sd = Number(demand_sd) || 0;
@@ -135,7 +136,10 @@ export function computeUnitsOfProductionDepr({ cost_basis = 0, salvage_value = 0
   if (!(total > 0)) return { error: "Total estimated units must be positive." };
   if (period < 0 || accum < 0) return { error: "Period and accumulated units cannot be negative." };
   const rate = (cost - salvage) / total;
-  const period_depreciation = rate * period;
+  // Depreciation stops at salvage: the period's charge cannot exceed what was left before it.
+  if (accum > 0 && accum < period) return { error: "Accumulated units include this period, so they cannot be fewer than the period's units." };
+  const _before = Math.max(cost - rate * Math.max(0, accum - period), salvage);
+  const period_depreciation = Math.min(rate * period, _before - salvage);
   const book_value = Math.max(cost - rate * accum, salvage);
   if (![rate, period_depreciation, book_value].every(Number.isFinite)) return { error: "Depreciation math is not a finite value." };
   return {

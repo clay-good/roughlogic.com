@@ -479,7 +479,7 @@ export function computeHazardTreeStumpScreen({ disaster_threat = "yes", dbh_in =
       ? "eligible for extraction as a hazardous stump: 50% or more of the root ball exposed, over 24 in at 24 in above ground, on public property, an immediate threat"
       : !root_ball_half
         ? "less than 50% of the root ball exposed: flush cut, not extracted"
-        : !stump_over_24
+        : !stump_over_24 && disaster_threat === "yes" && stump_on_public_property === "yes"
           ? "24 in or less: not a special-equipment extraction; FEMA pays such stumps per cubic yard from the conversion table"
           : "does not meet the hazardous-stump criteria as entered",
     stump_volume_cy, root_ball_volume_cy, extraction_volume_cy,

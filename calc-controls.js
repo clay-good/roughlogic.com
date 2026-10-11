@@ -371,7 +371,7 @@ export function computeDamperActuatorTorque({ damper_width_in = 0, damper_height
   if (!(damper_width_in > 0)) return { error: "Damper width must be positive (in)." };
   if (!(damper_height_in > 0)) return { error: "Damper height must be positive (in)." };
   if (!(torque_factor_in_lb_ft2 > 0)) return { error: "Torque factor must be positive (in-lb per sq ft)." };
-  if (!(safety_factor > 0)) return { error: "Safety factor must be positive." };
+  if (!(safety_factor >= 1)) return { error: "The safety factor is 1 or more; below 1 the actuator is selected under the torque the damper needs." };
   if (sealed_torque_factor_in_lb_ft2 < 0) return { error: "Sealed torque factor cannot be negative (in-lb per sq ft)." };
   const damper_area_ft2 = damper_width_in * damper_height_in / 144;
   const largest = _ACTUATOR_SIZES_IN_LB[_ACTUATOR_SIZES_IN_LB.length - 1];

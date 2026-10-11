@@ -499,7 +499,8 @@ export function computeLabContainmentPressure({
   // The fragility: a small offset inside a large exhaust.
   const has_drift = supply_drift_pct > 0 && has_supply;
   const drift_cfm = has_drift ? supply_cfm * supply_drift_pct / 100 : 0;
-  const drift_swamps = has_drift && drift_cfm > Math.abs(offset_cfm);
+  // A drift equal to the offset leaves nothing: neutral is not containment.
+  const drift_swamps = has_drift && drift_cfm >= Math.abs(offset_cfm) * (1 - 1e-9);
   const drift_verdict = !has_drift
     ? "(no supply drift entered -- and the fragility of a small offset inside a large exhaust is the practical finding)"
     : drift_swamps
@@ -508,7 +509,7 @@ export function computeLabContainmentPressure({
   // The VAV sash swing, which is larger still.
   const has_sash = hood_sash_closed_cfm > 0 && hood_exhaust_cfm > 0;
   const sash_swing_cfm = has_sash ? hood_exhaust_cfm - hood_sash_closed_cfm : 0;
-  const positive_on_close = has_sash && has_supply && (supply_cfm - (hood_sash_closed_cfm + general_exhaust_cfm)) > 0;
+  const positive_on_close = has_sash && has_supply && (supply_cfm - (hood_sash_closed_cfm + general_exhaust_cfm)) >= -1e-9 * supply_cfm;
   const sash_verdict = !has_sash
     ? "(no sash-closed hood flow entered -- and on a VAV hood the swing is larger than any drift)"
     : "THE VAV HOOD SWING IS LARGER STILL. A sash closing takes the hood from " + fmt(hood_exhaust_cfm, 0) + " to " + fmt(hood_sash_closed_cfm, 0) + " cfm -- a " + fmt(sash_swing_cfm, 0) + " cfm change"

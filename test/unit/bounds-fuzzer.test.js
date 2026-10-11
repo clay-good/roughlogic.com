@@ -61072,3 +61072,30 @@ test("hardening slice 25 (steam, marine and aviation, building performance, flow
   const two = FF.computeRoofSnowIceWeight({ layer1_depth_in: 16, layer1_type: "settled", layer2_depth_in: 8, layer2_type: "settled", design_snow_psf: 25 });
   assert.equal(two.action, one.action);
 });
+
+test("hardening slice 26 (sawmill, winter ops, controls, open channel, hygiene, containment, debris, operations finance)", async () => {
+  const HY = await import("../../calc-hygiene.js");
+  const CT = await import("../../calc-controls.js");
+  const OF = await import("../../calc-operations-finance.js");
+  const OC = await import("../../calc-openchannel.js");
+  const CN = await import("../../calc-containment.js");
+  // a prohibited underlayer is rejected however "yes" is spelled
+  assert.ok(HY.computeArcRatedClothingSelection({ incident_energy_cal_cm2: 8, system_arc_rating_cal_cm2: 12, meltable_underlayer: "Yes" }).error);
+  // a "worst case" lighter than the typical one cannot lengthen the change schedule
+  const rc = HY.computeRespiratorCartridgeLife({ estimated_life_hr: 8, concentration_ppm: 100, worst_case_ppm: 50 });
+  assert.ok(rc.governing_schedule_hr <= rc.schedule_hr);
+  assert.ok(CT.computeDamperActuatorTorque({ damper_width_in: 48, damper_height_in: 36, safety_factor: 0.5 }).error);
+  // depreciation stops at salvage
+  const dp = OF.computeUnitsOfProductionDepr({ cost_basis: 50000, salvage_value: 5000, total_units: 100000, period_units: 30000, accumulated_units: 120000 });
+  assert.ok(Math.abs(dp.period_depreciation - 4500) < 1e-9);
+  assert.equal(OF.computeUnitsOfProductionDepr({ cost_basis: 50000, salvage_value: 5000, total_units: 100000, period_units: 8000, accumulated_units: 8000 }).period_depreciation, 3600);
+  assert.ok(OF.computeReorderPoint({ avg_daily_demand: 1, lead_time_days: 7, demand_sd: 20, service_level_pct: 10 }).error);
+  // weirs: a type the tile does not have, and a head past the Francis range
+  assert.ok(OC.computeWeirFlow({ weir_type: "cipolletti", head_ft: 0.5, crest_length_ft: 3 }).error);
+  assert.ok(OC.computeWeirHeadFromFlow({ weir_type: "zzz", target_flow_cfs: 5, crest_length_ft: 3 }).error);
+  assert.ok(OC.computeWeirFlow({ weir_type: "rect_contracted", head_ft: 3.5, crest_length_ft: 1 }).error);
+  assert.ok(!OC.computeWeirFlow({ weir_type: "rect_contracted", head_ft: 0.5, crest_length_ft: 3 }).error);
+  // a lab that is exactly neutral with the sash closed is not "still negative"
+  const lab = CN.computeLabContainmentPressure({ room_volume_ft3: 9600, required_ach: 8, hood_exhaust_cfm: 1200, general_exhaust_cfm: 80, supply_cfm: 480, hood_sash_closed_cfm: 400 });
+  assert.equal(lab.positive_on_close, true);
+});
