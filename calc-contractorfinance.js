@@ -80,6 +80,7 @@ CONTRACTOR_FINANCE_RENDERERS["labor-burden-rate"] = renderLaborBurdenRate;
 // dims: in { purchase: dimensionless, salvage: dimensionless, life_hr: dimensionless, annual_hr: dimensionless, iit_pct: dimensionless, fuel_gph: L^3 T^-1, fuel_price: dimensionless, maint_hr: dimensionless, wear_hr: dimensionless } out: { owning_hr: dimensionless, operating_hr: dimensionless, total_hr: dimensionless }
 export function computeEquipmentHourlyRate({ purchase = 0, salvage = 0, life_hr = 0, annual_hr = 0, iit_pct = 0, fuel_gph = 0, fuel_price = 0, maint_hr = 0, wear_hr = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (Number(iit_pct) < 0) return { error: "Interest, insurance and tax percent cannot be negative." };
   const pur = Number(purchase) || 0;
   const sal = Number(salvage) || 0;
   const life = Number(life_hr) || 0;
@@ -140,6 +141,7 @@ CONTRACTOR_FINANCE_RENDERERS["equipment-hourly-rate"] = renderEquipmentHourlyRat
 // dims: in { annual_overhead: dimensionless, basis: dimensionless, billable_hours: dimensionless, annual_direct: dimensionless, job_direct: dimensionless } out: { rate_hr: dimensionless, overhead_pct: dimensionless, job_overhead: dimensionless }
 export function computeOverheadRecoveryRate({ annual_overhead = 0, basis = "per-hour", billable_hours = 0, annual_direct = 0, job_direct = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (basis !== "per-hour" && basis !== "markup") return { error: "Basis must be per-hour or markup." };
   const oh = Number(annual_overhead) || 0;
   if (!(oh > 0)) return { error: "Annual overhead must be positive ($)." };
   if (basis === "markup") {

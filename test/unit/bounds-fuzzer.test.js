@@ -30284,7 +30284,8 @@ test("bounds: spec-v960 computeDuctStaticRegain pins VP = (V/4005)^2, the regain
   assert.equal(r.is_loss, false);
   // A velocity INCREASE gives a negative regain (static loss), flagged.
   const loss = _v960({ upstream_velocity_fpm: 1500, downstream_velocity_fpm: 2000, recovery_factor: 0.75 });
-  assert.ok(Math.abs(loss.static_regain_inwc - -0.081840) < 1e-4);
+  // -0.0818 until 2026-10-11 (R applied to a contraction); the static loss is the full VP rise, 0.1091.
+  assert.ok(Math.abs(loss.static_regain_inwc - -0.109102) < 1e-4);
   assert.equal(loss.is_loss, true);
   // Regain is linear in the recovery factor; R = 0 recovers nothing.
   assert.ok(Math.abs(_v960({ upstream_velocity_fpm: 2000, downstream_velocity_fpm: 1500, recovery_factor: 1 }).static_regain_inwc - r.static_regain_inwc / 0.75) < 1e-6);
@@ -61006,4 +61007,37 @@ test("hardening slice 23 (brewing, pipefitting, process, waste, specialty trades
   assert.ok(BR.computeYeastPitchRate({ batch_volume_gal: 310, original_gravity: 13.6, pitch_rate_million_per_ml_plato: 0.75, slurry_cells_per_ml: 1.2e9, viability_pct: 90 }).error);
   assert.ok(DH.computeGateOperatorDuty({ gate_weight_lb: 800, gate_length_ft: 20, operator_speed_fps: 1, cycles_per_day: 200, operating_hours: 30 }).error);
   assert.ok(SPT.computeShoringReshoringLoad({ slab_dead_psf: 100, construction_live_psf: 50, form_dead_psf: 10, connected_levels: 2.5, governing_slab_capacity_psf: 160 }).error);
+});
+
+test("hardening slice 24 (education statistics, lab, contractor finance, solar field, trucking field, duct and weld, datacenter, marine)", async () => {
+  const EA = await import("../../calc-educationassessment.js");
+  const MA = await import("../../calc-metalair.js");
+  const DC = await import("../../calc-datacenter.js");
+  const TF = await import("../../calc-truckingfield.js");
+  const SF = await import("../../calc-solarfield.js");
+  const MR = await import("../../calc-marine.js");
+  const CF = await import("../../calc-contractorfinance.js");
+  // a trailing comma is not a zero observation
+  const clean = EA.computeOneWayAnova({ groups_text: "88,90,92,85,91\n79,82,80,78,84\n93,95,91,90,94" });
+  const comma = EA.computeOneWayAnova({ groups_text: "88,90,92,85,91,\n79,82,80,78,84\n93,95,91,90,94" });
+  assert.ok(Math.abs(clean.f_stat - comma.f_stat) < 1e-9);
+  assert.ok(EA.computeTwoSampleTTest({ mean1: 78.5, sd1: 6, n1: 25, mean2: 78, sd2: 7, n2: 22, alpha: 5 }).error);
+  assert.ok(EA.computePairedTTest({ mean_diff: 0.1, sd_diff: 3, n_pairs: 20, alpha: 1.5 }).error);
+  // a contraction loses the whole rise in velocity pressure, whatever the recovery factor
+  for (const recovery_factor of [0, 0.5, 0.75, 1]) {
+    const r = MA.computeDuctStaticRegain({ upstream_velocity_fpm: 1500, downstream_velocity_fpm: 2000, recovery_factor });
+    assert.ok(Math.abs(r.static_regain_inwc - (r.vp_upstream_inwc - r.vp_downstream_inwc)) < 1e-12);
+    assert.equal(r.is_loss, true);
+  }
+  assert.ok(MA.computeGrooveWeldStrength({ weld_type: "PJP", effective_throat_in: 0.25, length_in: 6, electrode: "E6010", method: "ASD" }).error);
+  // datacenter: no supply temperature is not 0 F
+  assert.ok(DC.computeChilledWaterRideThrough({ loop_volume_gal: 2000, it_load_kw: 500, max_temp_f: 60, generator_transfer_min: 1, chiller_restart_min: 15 }).error);
+  assert.ok(DC.computeCracSensibleDerate({ airflow_cfm: 12000, return_temp_f: 75 }).error);
+  assert.ok(TF.computeHazmatPlacardThreshold({ materials: [{ gross_lb: "abc" }, { gross_lb: 900 }] }).error);
+  assert.ok(TF.computeHazmatPlacardThreshold({ materials: [null] }).error);
+  assert.ok(SF.computeBatterySeriesParallel({ parallel_strings: 1.5 }).error);
+  assert.ok(SF.computePvRailClampTakeoff({ rows: 2, modules_per_row: 0.5 }).error);
+  assert.ok(MR.computeBerthingFenderEnergy({ ...MR.berthingFenderEnergyExample?.inputs, virtual_mass_factor: 0.9 }).error);
+  assert.ok(CF.computeEquipmentHourlyRate({ ...CF.equipmentHourlyRateExample.inputs, iit_pct: -50 }).error);
+  assert.ok(CF.computeOverheadRecoveryRate({ annual_overhead: 200000, basis: "percent", billable_hours: 8000 }).error);
 });

@@ -151,6 +151,7 @@ EDUCATIONASSESSMENT_RENDERERS["category-weighted-grade"] = renderCategoryWeighte
 // t = (m1-m2)/sqrt(s1^2/n1 + s2^2/n2); Welch-Satterthwaite df; p from tcdf.
 // dims: in { mean1: dimensionless, sd1: dimensionless, n1: dimensionless, mean2: dimensionless, sd2: dimensionless, n2: dimensionless, tail: dimensionless } out: { t_stat: dimensionless, p_value: dimensionless }
 export function computeTwoSampleTTest({ mean1 = 0, sd1 = 0, n1 = 0, mean2 = 0, sd2 = 0, n2 = 0, tail = "two", alpha = 0.05 } = {}) {
+  if (!(Number(alpha) > 0 && Number(alpha) < 1)) return { error: "Alpha is a probability between 0 and 1 (0.05)." };
   if ([alpha].some((x) => Number(x) < 0)) return { error: "Significance level alpha cannot be negative." };
   const m1 = Number(mean1), s1 = Number(sd1), nn1 = Number(n1);
   const m2 = Number(mean2), s2 = Number(sd2), nn2 = Number(n2);
@@ -208,6 +209,7 @@ EDUCATIONASSESSMENT_RENDERERS["two-sample-t-test"] = renderTwoSampleTTest;
 // On the n differences d_i (before-after / matched pairs): t = d_bar / (s_d / sqrt(n)), df = n-1, p from tcdf.
 // dims: in { mean_diff: dimensionless, sd_diff: dimensionless, n_pairs: dimensionless, tail: dimensionless, alpha: dimensionless } out: { t_stat: dimensionless, df: dimensionless, p_value: dimensionless }
 export function computePairedTTest({ mean_diff = 0, sd_diff = 0, n_pairs = 0, tail = "two", alpha = 0.05 } = {}) {
+  if (!(Number(alpha) > 0 && Number(alpha) < 1)) return { error: "Alpha is a probability between 0 and 1 (0.05)." };
   if ([alpha].some((x) => Number(x) < 0)) return { error: "Significance level alpha cannot be negative." };
   const d = Number(mean_diff), sd = Number(sd_diff), n = Number(n_pairs);
   if (![d, sd, n].every(Number.isFinite)) return { error: "All inputs must be finite numbers." };
@@ -259,6 +261,7 @@ EDUCATIONASSESSMENT_RENDERERS["paired-t-test"] = renderPairedTTest;
 // Tests a sample mean against a hypothesized/target value mu0: t = (x_bar - mu0)/(s/sqrt(n)), df = n-1, p from tcdf.
 // dims: in { sample_mean: dimensionless, sample_sd: dimensionless, n: dimensionless, hypothesized_mean: dimensionless, tail: dimensionless, alpha: dimensionless } out: { t_stat: dimensionless, df: dimensionless, p_value: dimensionless }
 export function computeOneSampleTTest({ sample_mean = 0, sample_sd = 0, n = 0, hypothesized_mean = 0, tail = "two", alpha = 0.05 } = {}) {
+  if (!(Number(alpha) > 0 && Number(alpha) < 1)) return { error: "Alpha is a probability between 0 and 1 (0.05)." };
   if ([alpha].some((x) => Number(x) < 0)) return { error: "Significance level alpha cannot be negative." };
   const xbar = Number(sample_mean), s = Number(sample_sd), nn = Number(n), mu0 = Number(hypothesized_mean);
   if (![xbar, s, nn, mu0].every(Number.isFinite)) return { error: "All inputs must be finite numbers." };
@@ -319,7 +322,9 @@ EDUCATIONASSESSMENT_RENDERERS["one-sample-t-test"] = renderOneSampleTTest;
 export function computeOneWayAnova({ groups_text = "" } = {}) {
   if (typeof groups_text !== "string") return { error: "Provide the group data as text, one group per line." };
   const groups = groups_text.split("\n").map((l) => l.trim()).filter((l) => l.length > 0)
-    .map((l) => l.split(/[\s,]+/).map(Number).filter((v) => Number.isFinite(v)))
+    // Drop empty tokens before converting: Number("") is 0, so a trailing comma used to add a
+    // zero observation to the group (F 32.2 became 0.9, "not significant").
+    .map((l) => l.split(/[\s,]+/).filter((tok) => tok !== "").map(Number).filter((v) => Number.isFinite(v)))
     .filter((g) => g.length > 0);
   const k = groups.length;
   if (k < 2) return { error: "Enter at least two groups (one group per line, values separated by spaces or commas)." };

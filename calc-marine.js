@@ -97,6 +97,8 @@ export const MARINE_RENDERERS = {};
 
 // dims: in { pipe_diameter_in: L, velocity_fps: L T^-1, concentration_pct: dimensionless, porosity: dimensionless, solids_specific_gravity: dimensionless, effective_hours: T, alternative_concentration_pct: dimensionless } out: { flow_cfs: L^3 T^-1, solids_cfs: L^3 T^-1, in_situ_cfs: L^3 T^-1, production_cy_per_hr: L^3 T^-1, slurry_specific_gravity: dimensionless }
 export function computeDredgeProductionRate({ pipe_diameter_in = 0, velocity_fps = 0, concentration_pct = 0, porosity = 0, solids_specific_gravity = 0, effective_hours = 0, alternative_concentration_pct = 0 } = {}) {
+  if (effective_hours > 24) return { error: "Effective hours are per day, 24 or fewer." };
+  if (porosity > 0 && porosity < 1 && concentration_pct > (1 - porosity) * 100) return { error: "The slurry cannot carry more solids by volume than the bank itself holds (1 - porosity)." };
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   if (!(pipe_diameter_in > 0) || !(velocity_fps > 0)) return { error: "Pipe diameter and velocity must be positive." };
   if (!(concentration_pct > 0 && concentration_pct < 100) || !(alternative_concentration_pct > 0 && alternative_concentration_pct < 100)) {
@@ -444,7 +446,7 @@ export function computeBerthingFenderEnergy({ displacement_tons = 0, approach_ve
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   if (!(displacement_tons > 0)) return { error: "Vessel displacement must be positive." };
   if (!(approach_velocity_fps > 0) || !(alternative_velocity_fps > 0)) return { error: "Approach velocities must be positive." };
-  if (!(virtual_mass_factor > 0)) return { error: "The virtual mass factor must be positive." };
+  if (!(virtual_mass_factor >= 1)) return { error: "The virtual (added) mass factor is 1 or more -- commonly 1.3 to 1.8; the water moving with the hull cannot subtract from its mass." };
   if (!(eccentricity_factor > 0 && eccentricity_factor <= 1)) return { error: "The eccentricity factor must be above 0 and at most 1." };
   if (!(softness_factor > 0 && softness_factor <= 1)) return { error: "The softness factor must be above 0 and at most 1." };
   if (!(configuration_factor > 0 && configuration_factor <= 1)) return { error: "The berth configuration factor must be above 0 and at most 1." };
@@ -524,7 +526,8 @@ export function computeMooringLoadWindCurrent({ wind_area_ft2 = 0, wind_drag_coe
   if (!(line_count >= 1)) return { error: "There must be at least one mooring line." };
   if (!(line_angle_deg >= 0 && line_angle_deg < 90)) return { error: "The horizontal line angle must be at least 0 and below 90 degrees." };
   if (!(worst_line_share_pct > 0 && worst_line_share_pct <= 100)) return { error: "The most-loaded line's share must be above 0 and at most 100%." };
-  if (!(safety_factor > 0)) return { error: "The safety factor must be positive." };
+  if (!(safety_factor >= 1)) return { error: "The safety factor must be 1 or more." };
+  if (line_count > 0 && worst_line_share_pct < 100 / line_count - 1e-9) return { error: "The most-loaded line cannot carry less than an equal share (" + (100 / line_count).toFixed(1) + "% with these lines)." };
   // Wind: the 0.00256 coefficient already carries air density for V in mph.
   const wind_force_lb = 0.00256 * wind_drag_coefficient * wind_area_ft2 * wind_speed_mph * wind_speed_mph;
   const current_speed_fps = current_speed_knots * FT_PER_KNOT;

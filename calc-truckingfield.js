@@ -405,6 +405,8 @@ export function computeHazmatPlacardThreshold({ materials = [], table1_present =
   let table2_aggregate_lb = 0;
   const classes = new Set();
   for (const m of materials) {
+    // An unreadable weight is not 0 lb: it used to drop out of the aggregate and read "not placarded".
+    if (!m || !Number.isFinite(Number(m.gross_lb)) || m.gross_lb === "" || m.gross_lb === null) return { error: "Each material needs a gross weight (lb)." };
     const gross = Number(m.gross_lb) || 0;
     if (gross < 0) return { error: "Gross weight cannot be negative." };
     // The aggregate is across ALL Table 2 hazard classes on the vehicle, not per class.

@@ -101,7 +101,9 @@ const _FEXX = { E60: 60, E70: 70, E80: 80, E90: 90, E100: 100, E110: 110 };
 // dims: in { weld_type: dimensionless, effective_throat_in: L, base_thickness_in: L, length_in: L, applied_load_lb: dimensionless, electrode: dimensionless, base_fy_ksi: M L^-1 T^-2, base_fu_ksi: M L^-1 T^-2 } out: { throat_in: L, capacity_lb: dimensionless, utilization: dimensionless }
 export function computeGrooveWeldStrength({ weld_type = "PJP", effective_throat_in = 0, base_thickness_in = 0, length_in = 0, electrode = "E70", method = "ASD", applied_load_lb = 0, base_fy_ksi = 36, base_fu_ksi = 58 } = {}) {
   const _g = _finiteGuard({ effective_throat_in, base_thickness_in, length_in, applied_load_lb, base_fy_ksi, base_fu_ksi }); if (_g) return _g;
-  const Fexx = _FEXX[electrode] || 70;
+  // An electrode not in the table used to be run as E70 (E60 came out 17% strong).
+  if (!Object.hasOwn(_FEXX, electrode)) return { error: "Unknown electrode classification; use one of " + Object.keys(_FEXX).join(", ") + "." };
+  const Fexx = _FEXX[electrode];
   const L = Number(length_in);
   const M = String(method) === "LRFD" ? "LRFD" : "ASD";
   const type = String(weld_type).toUpperCase() === "CJP" ? "CJP" : "PJP";
@@ -183,7 +185,9 @@ METALAIR_RENDERERS["groove-weld-strength"] = _renderGrooveWeldStrength;
 // dims: in { applied_load_lb: dimensionless, weld_type: dimensionless, effective_throat_in: L, base_thickness_in: L, electrode: dimensionless, method: dimensionless, base_fy_ksi: M L^-1 T^-2, base_fu_ksi: M L^-1 T^-2 } out: { required_length_in: L, stress_ksi: M L^-1 T^-2, throat_in: L }
 export function computeGrooveWeldLengthForLoad({ applied_load_lb = 0, weld_type = "PJP", effective_throat_in = 0, base_thickness_in = 0, electrode = "E70", method = "ASD", base_fy_ksi = 36, base_fu_ksi = 58 } = {}) {
   const _g = _finiteGuard({ applied_load_lb, effective_throat_in, base_thickness_in, base_fy_ksi, base_fu_ksi }); if (_g) return _g;
-  const Fexx = _FEXX[electrode] || 70;
+  // An electrode not in the table used to be run as E70 (E60 came out 17% strong).
+  if (!Object.hasOwn(_FEXX, electrode)) return { error: "Unknown electrode classification; use one of " + Object.keys(_FEXX).join(", ") + "." };
+  const Fexx = _FEXX[electrode];
   const M = String(method) === "LRFD" ? "LRFD" : "ASD";
   const type = String(weld_type).toUpperCase() === "CJP" ? "CJP" : "PJP";
   const load = Number(applied_load_lb) || 0;
@@ -413,7 +417,12 @@ export function computeDuctStaticRegain({ upstream_velocity_fpm = 2000, downstre
   // Velocity pressure VP = (V/4005)^2 (standard air); static regain = R x (VP_upstream - VP_downstream).
   const vp_upstream_inwc = Math.pow(upstream_velocity_fpm / 4005, 2);
   const vp_downstream_inwc = Math.pow(downstream_velocity_fpm / 4005, 2);
-  const static_regain_inwc = recovery_factor * (vp_upstream_inwc - vp_downstream_inwc);
+  // R is a DIFFUSER recovery factor: it discounts what an expansion gives back. When the air
+  // speeds up, static falls by the whole rise in velocity pressure (plus the fitting loss), and
+  // R has no business reducing that. Until 2026-10-11 a 1,500 to 2,000 fpm contraction read
+  // -0.082 in w.c. where the velocity pressure alone takes 0.109.
+  const _dvp = vp_upstream_inwc - vp_downstream_inwc;
+  const static_regain_inwc = downstream_velocity_fpm <= upstream_velocity_fpm ? recovery_factor * _dvp : _dvp;
   if (![vp_upstream_inwc, vp_downstream_inwc, static_regain_inwc].every(Number.isFinite)) return { error: "Static-regain math is not a finite value." };
   return {
     vp_upstream_inwc,

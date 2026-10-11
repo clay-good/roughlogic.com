@@ -246,6 +246,7 @@ DATACENTER_RENDERERS["ups-module-redundancy"] = _simpleRenderer({
 
 // dims: in { airflow_cfm: L^3 T^-1, supply_temp_f: T^1, return_temp_f: T^1, contained_return_temp_f: T^1, bypass_return_temp_f: T^1 } out: { capacity_btu_h: L^2 M T^-3, capacity_tons: dimensionless, capacity_kw: L^2 M T^-3, contained_capacity_kw: L^2 M T^-3 }
 export function computeCracSensibleDerate({ airflow_cfm = 0, supply_temp_f = 0, return_temp_f = 0, contained_return_temp_f = 0, bypass_return_temp_f = 0 } = {}) {
+  { const v = arguments[0]?.supply_temp_f; if (v === undefined || v === null || v === "") return { error: "Enter the supply temperature (F)." }; }
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   if (!(airflow_cfm > 0)) return { error: "Unit airflow must be positive." };
   if (![return_temp_f, contained_return_temp_f, bypass_return_temp_f].every((v) => v > supply_temp_f)) return { error: "Every return-air temperature must be above supply-air temperature." };
@@ -288,6 +289,7 @@ DATACENTER_RENDERERS["crac-sensible-derate"] = _simpleRenderer({
 
 // dims: in { it_load_kw: L^2 M T^-3, equipment_delta_t_f: T^1, unit_count: dimensionless, airflow_per_unit_cfm: L^3 T^-1, supply_temp_f: T^1, exhaust_temp_f: T^1, fan_power_per_unit_kw: L^2 M T^-3, tariff_per_kwh: dimensionless } out: { it_airflow_cfm: L^3 T^-1, supply_airflow_cfm: L^3 T^-1, bypass_cfm: L^3 T^-1, return_temp_f: T^1, annual_fan_savings: dimensionless }
 export function computeContainmentBypassAirflow({ it_load_kw = 0, equipment_delta_t_f = 0, unit_count = 0, airflow_per_unit_cfm = 0, supply_temp_f = 0, exhaust_temp_f = 0, fan_power_per_unit_kw = 0, tariff_per_kwh = 0 } = {}) {
+  { const v = arguments[0]?.supply_temp_f; if (v === undefined || v === null || v === "") return { error: "Enter the supply temperature (F)." }; }
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   if (!(it_load_kw > 0) || !(equipment_delta_t_f > 0) || !(unit_count > 0) || !(airflow_per_unit_cfm > 0) || !(tariff_per_kwh > 0)) return { error: "Load, temperature rise, unit count, airflow, and tariff must be positive." };
   if (!(exhaust_temp_f > supply_temp_f) || !(fan_power_per_unit_kw >= 0)) return { error: "Exhaust temperature must exceed supply temperature, and fan power cannot be negative." };
@@ -404,6 +406,7 @@ DATACENTER_RENDERERS["pdu-branch-loading"] = _simpleRenderer({
 
 // dims: in { loop_volume_gal: L^3, it_load_kw: L^2 M T^-3, supply_temp_f: T^1, max_temp_f: T^1, generator_transfer_min: T, chiller_restart_min: T, smaller_loop_volume_gal: L^3 } out: { stored_cooling_btu: L^2 M T^-2, ride_through_min: T, required_restart_min: T, ride_margin_min: T, additional_volume_gal: L^3 }
 export function computeChilledWaterRideThrough({ loop_volume_gal = 0, it_load_kw = 0, supply_temp_f = 0, max_temp_f = 0, generator_transfer_min = 0, chiller_restart_min = 0, smaller_loop_volume_gal = 0 } = {}) {
+  { const v = arguments[0]?.supply_temp_f; if (v === undefined || v === null || v === "") return { error: "Enter the supply temperature (F)." }; }
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   if (!(loop_volume_gal > 0) || !(it_load_kw > 0) || !(smaller_loop_volume_gal > 0)) return { error: "Loop volumes and IT load must be positive." };
   if (!(max_temp_f > supply_temp_f) || !(generator_transfer_min >= 0) || !(chiller_restart_min >= 0)) return { error: "Maximum temperature must exceed supply temperature, and restart times cannot be negative." };

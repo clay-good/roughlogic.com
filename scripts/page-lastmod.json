@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "4cb29ba4d348c83c",
+      "sha": "ededc5d211a04771",
       "date": "2026-10-11"
     },
     "/tools/": {
@@ -7302,8 +7302,8 @@
       "date": "2026-10-10"
     },
     "/tools/solar-egc-690-45/": {
-      "sha": "86b591cd8f7f7616",
-      "date": "2026-09-29"
+      "sha": "3f0f2811dbe94232",
+      "date": "2026-10-11"
     },
     "/tools/solar-thermal-collector/": {
       "sha": "49c8a57620d96de7",

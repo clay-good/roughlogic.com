@@ -55,7 +55,7 @@ export function computeSolarEgc69045({ ocpd_rating_a = 0, pv_isc_a = 0, vd_upsiz
 export const solarEgc69045Example = { inputs: { ocpd_rating_a: 20, pv_isc_a: 0, vd_upsized: "no" } };
 
 function renderSolarEgc69045(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: NEC 2023 690.45 equipment grounding conductors for PV systems with Table 250.122: the EGC is sized from the governing overcurrent rating (or, where there is no OCPD, from an assumed device at the PV maximum circuit current, 1.25 x Isc), never smaller than 14 AWG, and 690.45 waives the 250.122(B) proportional upsize so enlarging the circuit conductors for voltage drop does not enlarge the EGC. The NEC and the AHJ govern.";
+  citationEl.textContent = "Citation: NEC 2023 690.45 equipment grounding conductors for PV systems with Table 250.122: the EGC is sized from the governing overcurrent rating (or, where there is no OCPD, from an assumed device at 125% of the PV maximum circuit current per 690.9(B), 1.5625 x Isc), never smaller than 14 AWG, and 690.45 waives the 250.122(B) proportional upsize so enlarging the circuit conductors for voltage drop does not enlarge the EGC. The NEC and the AHJ govern.";
   const ocpd = makeNumber("OCPD rating (A, 0 = no OCPD)", "segc-ocpd", { step: "1", min: "0" });
   const isc = makeNumber("PV short-circuit current (A, used if no OCPD)", "segc-isc", { step: "any", min: "0" });
   const vd = makeSelect("Conductors upsized for voltage drop?", "segc-vd", [{ value: "no", label: "No" }, { value: "yes", label: "Yes" }]);
@@ -67,7 +67,7 @@ function renderSolarEgc69045(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const r = computeSolarEgc69045({ ocpd_rating_a: Number(ocpd.input.value) || 0, pv_isc_a: Number(isc.input.value) || 0, vd_upsized: vd.select.value });
     if (r.error) { oBasis.textContent = r.error; oEgc.textContent = "-"; oNote.textContent = ""; return; }
-    oBasis.textContent = fmt(r.basis_current_a, 1) + " A (" + (r.has_ocpd ? "OCPD rating" : "1.25 x PV Isc - no OCPD") + ")";
+    oBasis.textContent = fmt(r.basis_current_a, 1) + " A (" + (r.has_ocpd ? "OCPD rating" : "1.5625 x PV Isc - no OCPD") + ")";
     oEgc.textContent = r.egc_awg + " AWG" + (r.egc_awg === "14" ? " (14 AWG minimum)" : "");
     oNote.textContent = r.note;
   }, DEBOUNCE_MS);
@@ -300,6 +300,7 @@ SOLARFIELD_RENDERERS["solar-azimuth-angle"] = renderSolarAzimuth;
 // dims: in { rows: dimensionless, modules_per_row: dimensionless, module_width_ft: L, gap_ft: L, rails_per_row: dimensionless, rail_stock_ft: L } out: { run_len_ft: L, rail_lf: L, mid_clamps: dimensionless, end_clamps: dimensionless, splices: dimensionless }
 export function computePvRailClampTakeoff({ rows = 2, modules_per_row = 12, module_width_ft = 3.42, gap_ft = 0, rails_per_row = 2, rail_stock_ft = 14 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  for (const v of [rows, modules_per_row, rails_per_row]) if (!Number.isInteger(Number(v)) || Number(v) < 1) return { error: "Rows, modules per row and rails per row are whole numbers, 1 or more." };
   if (!(rows > 0)) return { error: "Row count must be positive." };
   if (!(modules_per_row > 0)) return { error: "Modules per row must be positive." };
   if (!(module_width_ft > 0)) return { error: "Module width must be positive (ft)." };
@@ -501,6 +502,7 @@ SOLARFIELD_RENDERERS["ev-range-per-hour"] = _v968renderEvRangePerHour;
 // dims: in { target_bus_v: M L^2 T^-3 I^-1, module_v: M L^2 T^-3 I^-1, module_ah: I T, parallel_strings: dimensionless, depth_of_discharge: dimensionless } out: { series_count: dimensionless, actual_bus_v: M L^2 T^-3 I^-1, total_ah: I T, usable_kwh: M L^2 T^-2 }
 export function computeBatterySeriesParallel({ target_bus_v = 48, module_v = 12.8, module_ah = 100, parallel_strings = 2, depth_of_discharge = 0.8 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!Number.isInteger(Number(parallel_strings))) return { error: "Parallel strings is a whole number." };
   if (!(target_bus_v > 0)) return { error: "Target bus voltage must be positive (V)." };
   if (!(module_v > 0)) return { error: "Module nominal voltage must be positive (V)." };
   if (!(module_ah > 0)) return { error: "Module capacity must be positive (Ah)." };
