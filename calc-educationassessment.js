@@ -462,6 +462,8 @@ function _averageRanks(arr) {
 }
 // dims: in { x_values: dimensionless, y_values: dimensionless, alpha: dimensionless } out: { n: dimensionless, rho: dimensionless, rho_squared: dimensionless, df: dimensionless, t: dimensionless, p_value: dimensionless }
 export function computeSpearman({ x_values, y_values, alpha = 0.05 } = {}) {
+  { const bad = (raw) => Array.isArray(raw) ? raw.some((v) => !Number.isFinite(v)) : typeof raw === "string" && raw.split(/[\s,]+/).some((tok) => tok !== "" && !Number.isFinite(Number(tok)));
+    if (bad(x_values) || bad(y_values)) return { error: "Every entry must be a number; a non-numeric entry would be dropped from one series and shift the pairing." }; }
   const xs = Array.isArray(x_values) ? x_values.filter(Number.isFinite) : parseNumberList(x_values);
   const ys = Array.isArray(y_values) ? y_values.filter(Number.isFinite) : parseNumberList(y_values);
   if (xs.length < 3 || ys.length < 3) return { error: "Enter at least 3 paired (x, y) values in each series." };

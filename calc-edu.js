@@ -231,6 +231,16 @@ export function renderReadability(inputRegion, outputRegion, citationEl) {
 // variance/SD distinction is exposed so the student can pick the one
 // their assignment specifies.
 
+// True when a series holds an entry that is not a number. The paired-series tiles used to drop
+// such an entry from ITS series only, which shifted every later pair (x4 met y5) and still
+// returned a confident fit.
+function _hasBadToken(raw) {
+  if (Array.isArray(raw)) return raw.some((v) => !Number.isFinite(v));
+  if (typeof raw !== "string") return false;
+  return raw.split(/[\s,]+/).some((tok) => tok !== "" && !Number.isFinite(Number(tok)));
+}
+const _BAD_TOKEN_ERROR = "Every entry must be a number; a non-numeric entry would be dropped from one series and shift the pairing.";
+
 function parseNumberList(raw) {
   if (typeof raw !== "string") return [];
   const out = [];
@@ -950,6 +960,9 @@ const Z_CRITICAL = { 80: 1.2816, 90: 1.6449, 95: 1.9600, 98: 2.3263, 99: 2.5758 
 // dims: in { mode: dimensionless, n: dimensionless, proportion: dimensionless, mean: dimensionless, sd: dimensionless, confidence: dimensionless } out: { lower: dimensionless, upper: dimensionless, margin: dimensionless }
 export function computeConfidenceInterval({ mode, n, proportion, mean, sd, confidence_pct }) {
   const conf = Math.round(Number(confidence_pct));
+  if (Math.abs(Number(confidence_pct) - conf) > 1e-9) return { error: "Confidence must be one of 80, 90, 95, 98, 99." };
+  { const _m = String(mode || "proportion").toLowerCase(); const _blank = (v) => v === undefined || v === null || v === "";
+    if (_m === "proportion" ? _blank(proportion) : (_blank(mean) || _blank(sd))) return { error: _m === "proportion" ? "Enter the sample proportion." : "Enter the sample mean and standard deviation." }; }
   if (!(conf in Z_CRITICAL)) return { error: "Confidence must be one of 80, 90, 95, 98, 99." };
   const z = Z_CRITICAL[conf];
   const N = Number(n);
@@ -1406,6 +1419,7 @@ const BELLCURVE_BANDS = [
 
 // dims: in { raw: dimensionless, mean: dimensionless, sd: dimensionless } out: { z: dimensionless, percentile: dimensionless }
 export function computeBellCurve({ raw_score, mean, sd }) {
+  for (const v of [raw_score, mean, sd]) if (v === undefined || v === null || v === "") return { error: "Enter the raw score, the mean and the standard deviation." };
   const x = Number(raw_score);
   const mu = Number(mean);
   const sigma = Number(sd);
@@ -1666,6 +1680,7 @@ export function renderPeriodicElement(inputRegion, outputRegion, citationEl) {
 
 // dims: in { x_values: dimensionless, y_values: dimensionless, predict_x: dimensionless, alpha: dimensionless } out: { slope: dimensionless, intercept: dimensionless, r2: dimensionless, rse: dimensionless }
 export function computeLinearRegression({ x_values, y_values, predict_x = null, alpha = 0.05 }) {
+  if (_hasBadToken(x_values) || _hasBadToken(y_values)) return { error: _BAD_TOKEN_ERROR };
   const xs = Array.isArray(x_values) ? x_values.filter(Number.isFinite) : parseNumberList(x_values);
   const ys = Array.isArray(y_values) ? y_values.filter(Number.isFinite) : parseNumberList(y_values);
   if (xs.length < 3 || ys.length < 3) return { error: "Enter at least 3 paired (x, y) values in each series." };
@@ -1802,6 +1817,7 @@ function _pearsonStrength(absr) {
 
 // dims: in { x_values: dimensionless, y_values: dimensionless, alpha: dimensionless } out: { r: dimensionless, r2: dimensionless, t: dimensionless, p_value: dimensionless }
 export function computePearson({ x_values, y_values, alpha = 0.05 }) {
+  if (_hasBadToken(x_values) || _hasBadToken(y_values)) return { error: _BAD_TOKEN_ERROR };
   const xs = Array.isArray(x_values) ? x_values.filter(Number.isFinite) : parseNumberList(x_values);
   const ys = Array.isArray(y_values) ? y_values.filter(Number.isFinite) : parseNumberList(y_values);
   if (xs.length < 3 || ys.length < 3) return { error: "Enter at least 3 paired (x, y) values in each series." };
@@ -1903,6 +1919,8 @@ export function renderPearson(inputRegion, outputRegion, citationEl) {
 
 // dims: in { observed: dimensionless, expected_type: dimensionless, alpha: dimensionless } out: { chi_square: dimensionless, df: dimensionless, p_value: dimensionless }
 export function computeChiSquareGof({ observed, expected, expected_type = "counts", alpha = 0.05 }) {
+  if (_hasBadToken(observed) || _hasBadToken(expected)) return { error: _BAD_TOKEN_ERROR };
+  if (expected_type !== "counts" && expected_type !== "proportions") return { error: "Expected values are counts or proportions." };
   const obs = Array.isArray(observed) ? observed.filter(Number.isFinite) : parseNumberList(observed);
   const exp = Array.isArray(expected) ? expected.filter(Number.isFinite) : parseNumberList(expected);
   if (obs.length < 2 || exp.length < 2) return { error: "Enter at least 2 categories for both observed and expected." };
@@ -1923,6 +1941,10 @@ export function computeChiSquareGof({ observed, expected, expected_type = "count
     expCounts = exp.map((p) => (p / propSum) * totalObs);
   } else {
     expCounts = exp.slice();
+    // Expected COUNTS have to add up to the observed total, or the statistic measures the
+    // difference in sample size instead of the difference in shape (50/50 against 60/60 read 3.33).
+    const _expTotal = expCounts.reduce((p, q) => p + q, 0);
+    if (Math.abs(_expTotal - totalObs) > 0.005 * totalObs) return { error: "The expected counts add up to " + _expTotal + " but the observed to " + totalObs + "; enter expected counts for the same total, or switch to proportions." };
   }
   if (expCounts.some((e) => !(e > 0))) return { error: "Every expected count must be positive (chi-square divides by it)." };
 

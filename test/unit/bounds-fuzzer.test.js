@@ -61132,3 +61132,21 @@ test("hardening slice 28 (second pass: flow meters, radiography, plastics, separ
   assert.ok(T.computeOilWaterSeparatorSizing({ flow_gpm: 50, oil_sg: 0.9, droplet_micron: 1000, water_viscosity_cp: 1, water_sg: 1 }).error);
   assert.ok(!T.computeOilWaterSeparatorSizing({ flow_gpm: 50, oil_sg: 0.9, droplet_micron: 150, water_viscosity_cp: 1, water_sg: 1 }).error);
 });
+
+test("hardening slice 29 (second pass: classroom statistics)", async () => {
+  const ED = await import("../../calc-edu.js");
+  const EA = await import("../../calc-educationassessment.js");
+  // a non-numeric entry is an error, not a silent re-pairing
+  assert.ok(ED.computeLinearRegression({ x_values: "1, 2, x, 4, 5", y_values: "2, 4, 5, 4, y" }).error);
+  assert.ok(ED.computePearson({ x_values: [1, 2, NaN, 4, 5], y_values: [2, 4, 6, 8, 10] }).error);
+  assert.ok(EA.computeSpearman({ x_values: "1, 2, NA, 4, 5, 6", y_values: "1, 2, 3, 4, x, 6" }).error);
+  assert.ok(!ED.computeLinearRegression({ x_values: "1, 2, 3, 4, 5", y_values: "2, 4, 5, 4, 6" }).error);
+  // expected counts must share the observed total
+  assert.ok(ED.computeChiSquareGof({ observed: "50,50", expected: "60,60" }).error);
+  assert.ok(ED.computeChiSquareGof({ observed: "10,20,30,40", expected: "25,25,25,25", expected_type: "proportion" }).error);
+  assert.ok(!ED.computeChiSquareGof({ observed: "10,20,30,40", expected: "25,25,25,25" }).error);
+  // blanks are not zeros
+  assert.ok(ED.computeConfidenceInterval({ mode: "mean", n: 36, mean: 50, sd: "", confidence_pct: 95 }).error);
+  assert.ok(ED.computeConfidenceInterval({ mode: "mean", n: 36, mean: 50, sd: 6, confidence_pct: 94.6 }).error);
+  assert.ok(ED.computeBellCurve({ raw_score: "", mean: 75, sd: 10 }).error);
+});
