@@ -22,7 +22,6 @@ export const INERT_INPUTS = {
   "contact-time-baffling::width_ft": "read only for a rectangular vessel",
   "control-joint-spacing::max_spacing_ft": "moves the answer once another input changes (1,500 randomized settings)",
   "cooling-curve::start_F": "reviewed guard-only input (scripts/guard-only-inputs-allowlist.json)",
-  "coupling-alignment-tolerance::spacer_end_offset_in": "moves the answer once another input changes (1,500 randomized settings)",
   "crane-power-line-clearance::boom_length_ft": "moves the answer once another input changes (1,500 randomized settings)",
   "cylinder-storage-separation::barrier_rating_hr": "moves the answer once another input changes (1,500 randomized settings)",
   "decibel-converter::ref_type": "read only in the reference-level mode",

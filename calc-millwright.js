@@ -377,6 +377,7 @@ export function computeCouplingAlignmentTolerance({ rpm = 0, measured_offset_in 
   // spacer, not an offset at a plane: a long spacer legitimately allows a
   // large end-to-end offset while the slope stays tight.
   const spacer_slope_mils_per_in = spacer_length_in > 0 ? spacer_end_offset_in * _MILS_PER_IN / spacer_length_in : null;
+  if (spacer_end_offset_in > 0 && !(spacer_length_in > 0)) return { error: "Enter the spacer length to judge the spacer end offset." };
   const spacer_passes = spacer_slope_mils_per_in === null ? null : spacer_slope_mils_per_in <= angularity_acceptable_mils_per_in * (1 + 1e-9);
   const outs = [offset_pct_of_acceptable, angularity_pct_of_acceptable, offset_over_by_in];
   if (!outs.every(Number.isFinite)) return { error: "Alignment tolerance math is not a finite value." };
@@ -697,6 +698,8 @@ MILLWRIGHT_RENDERERS["single-plane-field-balance"] = _simpleRenderer({
 // dims: in { chain_pitch_in: L, pitches_measured: dimensionless, measured_length_in: L, elongation_limit_pct: dimensionless, sprocket_teeth: dimensionless } out: { nominal_length_in: L, elongation_pct: dimensionless, elongation_in: L, allowable_length_in: L, remaining_allowance_in: L }
 export function computeRollerChainWearElongation({ chain_pitch_in = 0, pitches_measured = 0, measured_length_in = 0, elongation_limit_pct = 1.5, sprocket_teeth = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Above 67 teeth the chain jumps the sprocket before it reaches the wear limit: the allowable elongation is 200 / N percent.
+  if (sprocket_teeth > 67 && elongation_limit_pct > 0) elongation_limit_pct = Math.min(elongation_limit_pct, 200 / sprocket_teeth);
   if (!(chain_pitch_in > 0)) return { error: "Chain pitch must be positive (in)." };
   if (!(pitches_measured >= 1)) return { error: "Measure across at least one pitch -- and twelve or more is what makes the reading resolvable." };
   if (!(measured_length_in > 0)) return { error: "The measured length must be positive (in)." };
@@ -833,6 +836,10 @@ MILLWRIGHT_RENDERERS["gear-reducer-service-factor"] = _simpleRenderer({
 // dims: in { tool1_qty: dimensionless, tool1_cfm: L^3 / T, tool1_duty: dimensionless, tool2_qty: dimensionless, tool2_cfm: L^3 / T, tool2_duty: dimensionless, tool3_qty: dimensionless, tool3_cfm: L^3 / T, tool3_duty: dimensionless, tool4_qty: dimensionless, tool4_cfm: L^3 / T, tool4_duty: dimensionless, leak_allowance_pct: dimensionless, growth_allowance_pct: dimensionless, cfm_per_hp: M^-1 L T^2 } out: { connected_cfm: L^3 / T, average_cfm: L^3 / T, with_leaks_cfm: L^3 / T, design_cfm: L^3 / T, motor_hp: M L^2 T^-3 }
 export function computeAirCompressorCfmSizing({ tool1_qty = 0, tool1_cfm = 0, tool1_duty = 0, tool2_qty = 0, tool2_cfm = 0, tool2_duty = 0, tool3_qty = 0, tool3_cfm = 0, tool3_duty = 0, tool4_qty = 0, tool4_cfm = 0, tool4_duty = 0, leak_allowance_pct = 15, growth_allowance_pct = 20, cfm_per_hp = 4 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  for (const [q, c, d] of [[tool1_qty, tool1_cfm, tool1_duty], [tool2_qty, tool2_cfm, tool2_duty], [tool3_qty, tool3_cfm, tool3_duty], [tool4_qty, tool4_cfm, tool4_duty]]) {
+    if (q > 0 && c > 0 && !(d > 0)) return { error: "Enter a duty factor for every tool with a quantity and a cfm (0.5 for half the time); a blank duty counted that tool as no demand." };
+    if (d > 1) return { error: "Duty is a fraction of the time, 1 or less." };
+  }
   // Unit / range guard added 2026-09-26 after printed-example probing.
   if ([arguments[0]?.leak_allowance_pct, arguments[0]?.growth_allowance_pct].some((v) => Number(v) > 0 && Number(v) < 1)) return { error: "Enter the leak and growth allowances as percents (15 for 15%), not fractions." };
   const tools = [[tool1_qty, tool1_cfm, tool1_duty], [tool2_qty, tool2_cfm, tool2_duty], [tool3_qty, tool3_cfm, tool3_duty], [tool4_qty, tool4_cfm, tool4_duty]];
@@ -905,6 +912,9 @@ MILLWRIGHT_RENDERERS["air-compressor-cfm-sizing"] = _simpleRenderer({
 // dims: in { receiver_volume_ft3: L^3, fill_start_psig: M L^-1 T^-2, fill_end_psig: M L^-1 T^-2, compressor_scfm: L^3 / T, cut_out_psig: M L^-1 T^-2, cut_in_psig: M L^-1 T^-2, net_demand_scfm: L^3 / T, required_cover_minutes: T } out: { pump_up_minutes: T, draw_down_minutes: T, usable_free_air_ft3: L^3, receiver_required_ft3: L^3, band_psi: M L^-1 T^-2 }
 export function computeReceiverPumpUpTime({ receiver_volume_ft3 = 0, fill_start_psig = 0, fill_end_psig = 0, compressor_scfm = 0, cut_out_psig = 0, cut_in_psig = 0, net_demand_scfm = 0, required_cover_minutes = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A blank cut-in is not 0 psig: a receiver drained to atmosphere is not usable storage.
+  if (cut_out_psig > 0 && net_demand_scfm > 0 && !(cut_in_psig > 0)) return { error: "Enter the cut-in pressure; the usable storage is the band between cut-out and cut-in." };
+  if (cut_in_psig > 0 && cut_out_psig > 0 && cut_in_psig >= cut_out_psig) return { error: "Cut-in pressure must be below cut-out." };
   const ATM = 14.7;
   if (!(receiver_volume_ft3 > 0)) return { error: "Receiver volume must be positive (cu ft)." };
   if (fill_start_psig < 0 || fill_end_psig < 0 || cut_out_psig < 0 || cut_in_psig < 0) return { error: "Pressures cannot be negative (psig)." };

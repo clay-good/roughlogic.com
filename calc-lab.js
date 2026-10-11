@@ -130,6 +130,9 @@ export function computeDilution({ c1, v1, c2, v2 }) {
   }
   const knowns = [c1, v1, c2, v2].filter((x) => Number.isFinite(x) && x > 0).length;
   if (knowns < 3) return { error: "Provide three of c1, v1, c2, v2 (positive values)." };
+  if ([c1, v1, c2, v2].some((x) => Number.isFinite(x) && x < 0)) return { error: "Concentrations and volumes cannot be negative." };
+  // With all four entered there is nothing to solve, and they have to agree.
+  if (knowns === 4 && Math.abs(c1 * v1 - c2 * v2) > 1e-6 * Math.max(c1 * v1, c2 * v2)) return { error: "All four values are entered and C1 x V1 does not equal C2 x V2; leave the one to solve blank." };
   let out = { c1, v1, c2, v2 };
   if (!(c1 > 0)) out.c1 = (c2 * v2) / v1;
   else if (!(v1 > 0)) out.v1 = (c2 * v2) / c1;
@@ -485,6 +488,7 @@ export const osmolarityExample = { inputs: { concentration_mol_l: 0.154, vant_ho
 // dims: in { standard_potential_v: M L^2 T^-3 I^-1, electrons_n: dimensionless, reaction_quotient: dimensionless, temperature_c: T } out: { cell_potential_v: M L^2 T^-3 I^-1, nernst_slope_v: M L^2 T^-3 I^-1 }
 export function computeNernstEquation({ standard_potential_v = 0, electrons_n = 1, reaction_quotient = 1, temperature_c = 25 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (temperature_c === null || temperature_c === "" || standard_potential_v === null || standard_potential_v === "") return { error: "Enter the standard potential and the temperature." };
   const R = 8.314; // J/(mol*K)
   const F = 96485; // C/mol
   const E0 = Number(standard_potential_v);
@@ -520,6 +524,8 @@ export const nernstEquationExample = { inputs: { standard_potential_v: 1.10, ele
 //  baked into the published RCF formula.)
 export function computeRcf({ rotor_radius_mm = 0, rpm, rcf }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (Number(rpm) < 0 || Number(rcf) < 0) return { error: "RPM and RCF cannot be negative." };
+  if (Number(rpm) > 0 && Number(rcf) > 0) return { error: "Enter RPM or RCF, not both; the other is the answer." };
   if (!(rotor_radius_mm > 0)) return { error: "Rotor radius (mm) must be positive." };
   const r_cm = rotor_radius_mm / 10;
   if (Number.isFinite(rpm) && rpm > 0) {

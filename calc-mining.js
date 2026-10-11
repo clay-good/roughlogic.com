@@ -102,6 +102,7 @@ const _BAR_PER_PSI = 0.0689475729;
 // dims: in { burden_ft: L, spacing_ft: L, bench_height_ft: L, hole_diameter_in: L, subdrill_ft: L, stemming_ft: L, explosive_sg: dimensionless, rock_density_pcf: M L^-3, hole_count: dimensionless } out: { loading_density_lb_per_ft: M L^-1, charge_length_ft: L, charge_weight_lb: M L T^-2, rock_tons_per_hole: M, powder_factor_lb_per_ton: dimensionless }
 export function computeBlastPowderFactor({ burden_ft = 0, spacing_ft = 0, bench_height_ft = 0, hole_diameter_in = 0, subdrill_ft = 0, stemming_ft = 0, explosive_sg = 0.82, rock_density_pcf = 0, hole_count = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (explosive_sg > 3) return { error: "Enter the explosive's specific gravity (ANFO is about 0.82), not a density in kg/m3 or pcf." };
   if (!(burden_ft > 0)) return { error: "Burden must be positive." };
   if (!(spacing_ft > 0)) return { error: "Spacing must be positive." };
   if (Number(rock_density_pcf) > 0 && Number(rock_density_pcf) < 50) return { error: "Enter rock density in lb per cu ft (about 150-180), not g/cc." };
@@ -278,8 +279,11 @@ MINING_RENDERERS["blast-scaled-distance-ppv"] = _simpleRenderer({
 
 // ===================== spec-v1510: airblast overpressure =====================
 
+// The default constants are the best-fit line OSMRE prints with its BIVDEP example data set
+// (A = 0.220, slope -0.883). Until 2026-10-11 the defaults were K 0.2, b 1.2, which read 8 to 24 dB
+// BELOW that document's own measured records (680 ft, 426.5 lb: 126 dB measured, 110 predicted).
 // dims: in { distance_ft: L, charge_per_delay_lb: M L T^-2, airblast_k: dimensionless, airblast_b: dimensionless, limit_db: dimensionless } out: { cube_root_scaled_distance: dimensionless, overpressure_psi: M L^-1 T^-2, overpressure_db: dimensionless, limit_psi: M L^-1 T^-2, max_charge_lb: M L T^-2 }
-export function computeBlastAirblastOverpressure({ distance_ft = 0, charge_per_delay_lb = 0, airblast_k = 0.2, airblast_b = 1.2, limit_db = 133, confinement_penalty_db = 20 } = {}) {
+export function computeBlastAirblastOverpressure({ distance_ft = 0, charge_per_delay_lb = 0, airblast_k = 0.22, airblast_b = 0.883, limit_db = 133, confinement_penalty_db = 20 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(distance_ft > 0)) return { error: "Distance to the structure must be positive." };
   if (!(charge_per_delay_lb > 0)) return { error: "Charge weight per delay must be positive." };
@@ -320,15 +324,15 @@ export function computeBlastAirblastOverpressure({ distance_ft = 0, charge_per_d
     note: "The cube root is the physical difference from ground vibration. Airblast is an expanding spherical pressure wave in air, so it scales with the cube root of energy, while ground vibration scales with the square root -- which means charge weight has LESS leverage on airblast than on vibration, and halving a charge buys about a quarter more scaled distance where the same halving buys about forty percent on the ground side. What matters more is confinement and weather. Confinement dominates. A properly stemmed hole releases almost nothing to the air; a hole with short stemming, an exposed detonating cord trunkline, a mud seam that vents, or an unstemmed secondary charge can be tens of decibels worse for the same pounds, and because decibels are logarithmic, 20 dB is a factor of ten in pressure. No adjustment to the pattern buys that back: the fix is stemming, covered trunklines, and not shooting into a wind or an inversion. Weather is the other multiplier, and a temperature inversion or a wind toward the neighbours can focus airblast well above any flat-ground prediction, which is why blast plans carry wind and inversion restrictions that no formula replaces. The constants depend heavily on confinement and this cannot know whether a hole will vent. It does not address ground vibration, flyrock, or the structure-response question of what overpressure actually damages what, and decibel limits and their measurement weighting differ between jurisdictions. Blasting is a licensed activity: the blaster in charge, the state and federal explosives regulations, MSHA or OSHA jurisdiction, and the site's blast plan govern.",
   };
 }
-const airblastExample = { inputs: { distance_ft: 1200, charge_per_delay_lb: 340, airblast_k: 0.2, airblast_b: 1.2, limit_db: 133, confinement_penalty_db: 20 } };
+const airblastExample = { inputs: { distance_ft: 1200, charge_per_delay_lb: 340, airblast_k: 0.22, airblast_b: 0.883, limit_db: 133, confinement_penalty_db: 20 } };
 MINING_RENDERERS["blast-airblast-overpressure"] = _simpleRenderer({
   citation: "Citation: the cube-root scaled distance SD = distance / cube root of the charge per delay, the overpressure relation P = K x SD raised to minus b, and the decibel conversion 20 log10(P / 2.9e-9 psi), by name. Site constants depend heavily on confinement and are entered. The blaster in charge and the site's blast plan govern.",
   example: airblastExample.inputs,
   fields: [
     { key: "distance_ft", label: "Distance to the nearest structure (ft)", kind: "number" },
     { key: "charge_per_delay_lb", label: "Charge weight per delay (lb)", kind: "number" },
-    { key: "airblast_k", label: "Airblast constant K (psi)", kind: "number", default: 0.2 },
-    { key: "airblast_b", label: "Airblast exponent b", kind: "number", default: 1.2 },
+    { key: "airblast_k", label: "Airblast constant K (psi)", kind: "number", default: 0.22 },
+    { key: "airblast_b", label: "Airblast exponent b", kind: "number", default: 0.883 },
     { key: "limit_db", label: "Regulatory limit (dB linear peak)", kind: "number", default: 133 },
     { key: "confinement_penalty_db", label: "Penalty if the hole vents (dB)", kind: "number", default: 20 },
   ],
@@ -890,6 +894,8 @@ MINING_RENDERERS["dust-collector-air-to-cloth"] = _simpleRenderer({
 // dims: in { volume_cuft: L^3, kst_bar_m_s: dimensionless, pmax_bar: M L^-1 T^-2, p_red_psig: M L^-1 T^-2, p_stat_psig: M L^-1 T^-2, length_to_diameter: dimensionless, stronger_p_red_psig: M L^-1 T^-2, available_vent_area_sqft: L^2 } out: { vent_area_sqft: L^2, vent_area_at_stronger_sqft: L^2, dust_class: dimensionless }
 export function computeDustDeflagrationVentArea({ volume_cuft = 0, kst_bar_m_s = 0, pmax_bar = 8, p_red_psig = 0, p_stat_psig = 0, length_to_diameter = 2, stronger_p_red_psig = 0, available_vent_area_sqft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (pmax_bar > 0 && pmax_bar < 2) return { error: "Enter Pmax in bar (dusts run about 5 to 12 bar); a value under 2 looks like MPa or a reduced pressure." };
+  if (pmax_bar > 14) return { error: "Pmax above 14 bar is outside the range of the vent-area relation." };
   if (!(volume_cuft > 0)) return { error: "Enclosure volume must be positive." };
   if (!(kst_bar_m_s > 0)) return { error: "Kst must be positive -- and it comes from testing the actual dust, not from a table." };
   if (!(p_red_psig > 0)) return { error: "Enclosure reduced-pressure strength must be positive." };
@@ -1011,7 +1017,7 @@ MINING_RENDERERS["mine-face-ventilation"] = _simpleRenderer({
     { key: "v", id: "mfv-out-v", label: "Face velocity", value: (r) => fmt(r.face_velocity_fpm, 0) + " fpm -- " + (r.velocity_ok ? "meets the sweep minimum" : "BELOW the sweep minimum") },
     { key: "g", id: "mfv-out-g", label: "Governing requirement", value: (r) => fmt(r.governing_cfm, 0) + " cfm from " + r.governing + " -- " + r.verdict },
     { key: "m", id: "mfv-out-m", label: "Diesel machines the delivered air supports", value: (r) => fmt(r.max_diesel_units, 0) },
-    { key: "e", id: "mfv-out-e", label: "Tubing efficiency that would clear it", value: (r) => fmt(r.efficiency_needed_pct, 0) + "% -- couplings and repairs, not a bigger fan" },
+    { key: "e", id: "mfv-out-e", label: "Tubing efficiency that would clear it", value: (r) => fmt(r.efficiency_needed_pct, 0) + "%" + (r.efficiency_needed_pct > 100 ? " -- more than any tubing can deliver: this face needs a bigger fan or a second one" : " -- couplings and repairs, not a bigger fan") },
     { key: "n", id: "mfv-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeMineFaceVentilation,

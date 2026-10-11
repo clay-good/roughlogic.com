@@ -269,6 +269,7 @@ export function computeGasPipelineFlow({
   }
   const weymouth_scfd = _ogWeymouth(_OG_BASE_TEMP_R, _OG_BASE_PRESSURE_PSIA, squared_difference, gravity, flowing_temp_r, length_mi, z_used, id_in, efficiency);
   const panhandle_scfd = _ogPanhandleA(_OG_BASE_TEMP_R, _OG_BASE_PRESSURE_PSIA, squared_difference, gravity, flowing_temp_r, length_mi, z_used, id_in, efficiency);
+  if (equation !== "weymouth" && equation !== "panhandle_a") return { error: "Equation must be weymouth or panhandle_a." };
   const is_weymouth = equation === "weymouth";
   const q_scfd = is_weymouth ? weymouth_scfd : panhandle_scfd;
   const alternate_q_scfd = is_weymouth ? panhandle_scfd : weymouth_scfd;
@@ -769,7 +770,7 @@ export function computeMudHydrostaticPressure({
     ? "(no formation pressure entered)"
     : is_overbalanced
       ? "OVERBALANCED by " + fmt(overbalance_psi, 0) + " psi -- the well is static; in mud weight terms the formation is " + fmt(formation_emw_ppg, 2) + " ppg equivalent against " + fmt(mud_weight_ppg, 2) + " ppg in the hole"
-      : overbalance_psi < 0
+      : overbalance_psi < -1e-6
         ? "UNDERBALANCED by " + fmt(-overbalance_psi, 0) + " psi -- the well will flow; the formation is " + fmt(formation_emw_ppg, 2) + " ppg equivalent against " + fmt(mud_weight_ppg, 2) + " ppg in the hole"
         : "exactly balanced at " + fmt(formation_emw_ppg, 2) + " ppg equivalent";
   // The error this exists to prevent, as a number.
@@ -1153,7 +1154,7 @@ export function computeTankVentApi2000({
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if ([pump_in_bph, pump_out_bph, thermal_out_ft3h, thermal_in_ft3h, fire_case_ft3h, installed_pressure_ft3h, installed_vacuum_ft3h].some((x) => Number(x) < 0)) return { error: "Pumping rates, venting requirements and installed capacities cannot be negative." };
   if (!(pump_in_bph > 0) && !(pump_out_bph > 0)) return { error: "Enter at least one of the pump-in and pump-out rates." };
-  if (!(volatile_factor > 0)) return { error: "The volatile allowance factor must be greater than zero." };
+  if (!(volatile_factor >= 1)) return { error: "The volatile allowance factor is 1 or more (it adds flashing vapour to the displaced volume)." };
 
   // Whatever volume goes in displaces an equal volume of vapour out, with
   // an allowance above unity for a volatile product because some flashes.
@@ -1224,6 +1225,7 @@ export function computeSeparatorRetentionSizing({
   liquid_density_lb_ft3 = 0, k_factor = 0.35, z_mode = "entered",
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  for (const k of ["temperature_f", "pressure_psig"]) { const v = arguments[0]?.[k]; if (v === undefined || v === null || v === "") return { error: "Enter the operating pressure and temperature; gas density depends on both." }; }
   if (!(vessel_diameter_ft > 0) || !(seam_to_seam_ft > 0)) return { error: "Vessel diameter and seam-to-seam length must be greater than zero." };
   if (!(liquid_fraction > 0) || liquid_fraction >= 1) return { error: "The liquid fraction must be greater than zero and less than 1." };
   if (!(liquid_rate_bpd > 0)) return { error: "Liquid rate must be greater than zero." };
@@ -1459,7 +1461,10 @@ export function computeWellDeclineReserves({
   if (!(decline_rate > 0)) return { error: "The decline rate must be greater than zero." };
   if (!(economic_limit_bpd > 0)) return { error: "The economic limit rate must be greater than zero." };
   if (economic_limit_bpd >= initial_rate_bpd) return { error: "The economic limit must be below the initial rate." };
-  const effective_entered = String(rate_is_effective) === "yes";
+  // Only the exact string "yes" used to count; true, "Yes" or "effective" fell to nominal and overstated reserves 17%.
+  const _rie = String(rate_is_effective).toLowerCase();
+  if (!["yes", "no", "true", "false", "effective", "nominal"].includes(_rie)) return { error: "Say whether the decline rate is effective (yes) or nominal (no)." };
+  const effective_entered = _rie === "yes" || _rie === "true" || _rie === "effective";
   if (effective_entered && decline_rate >= 1) return { error: "An effective annual decline must be less than 1 (100 percent)." };
 
   const nominal_decline = effective_entered ? -Math.log(1 - decline_rate) : decline_rate;

@@ -128,6 +128,7 @@ FARMPRODUCTION_RENDERERS["mulch-topsoil-volume"] = renderMulchTopsoilVolume;
 // dims: in { bushels: dimensionless, lb_per_bushel: dimensionless, mi_percent: dimensionless, mf_percent: dimensionless, btu_per_lb: dimensionless, price_per_gal: dimensionless } out: { weight_lb: M, water_lb: M, energy_btu: M L^2 T^-2, propane_gal: L^3 }
 export function computeGrainDryingEnergy({ bushels = 0, lb_per_bushel = 56, mi_percent = 0, mf_percent = 0, btu_per_lb = 1500, price_per_gal = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (Number(mi_percent) >= 100) return { error: "Initial moisture must be below 100% (wet basis)." };
   const bu = Number(bushels) || 0;
   const lbbu = Number(lb_per_bushel) || 0;
   const mi = Number(mi_percent) || 0;
@@ -432,6 +433,9 @@ export function computeManureStorageVolume({ daily_manure_ft3 = 0, wastewater_ft
   if (fb < 0) return { error: "Freeboard cannot be negative (in)." };
   const manure_volume_ft3 = (manure + ww + bed) * days;
   const precip_storm_ft3 = area * (precip + storm) / 12;
+  // Freeboard is depth over the surface, roofed or not; with the area at 0 it silently vanished
+  // from the total (28% short on the worked example).
+  if (!(area > 0) && fb > 0) return { error: "Enter the storage surface area: freeboard is a depth over that surface. For a roofed store keep the area and set the precipitation and storm depths to 0." };
   const freeboard_ft3 = area * fb / 12;
   const total_ft3 = manure_volume_ft3 + precip_storm_ft3 + freeboard_ft3;
   const total_gal = total_ft3 * (1728 / 231);
@@ -448,7 +452,7 @@ function _v582renderManureStorageVolume(inputRegion, outputRegion, citationEl) {
   const ww = makeNumber("Added wastewater (ft3/day, 0 if none)", "msv-ww", { step: "any", min: "0" });
   const bed = makeNumber("Added bedding (ft3/day, 0 if none)", "msv-bed", { step: "any", min: "0" });
   const days = makeNumber("Storage period (days; under 120 flagged short)", "msv-days", { step: "any", min: "0" });
-  const area = makeNumber("Surface area (ft2, 0 if roofed)", "msv-area", { step: "any", min: "0" });
+  const area = makeNumber("Surface area (ft2; for a roofed store keep it and zero the rain)", "msv-area", { step: "any", min: "0" });
   const precip = makeNumber("Net precipitation over period (in)", "msv-precip", { step: "any", min: "0" });
   const storm = makeNumber("25-yr 24-hr storm depth (in)", "msv-storm", { step: "any", min: "0" });
   const fb = makeNumber("Freeboard (in: 6 vertical wall / 12 other)", "msv-fb", { step: "any", min: "0" });
@@ -836,6 +840,7 @@ FARMPRODUCTION_RENDERERS["dressing-percentage"] = _r({
 // dims: in { latitude_deg: dimensionless, month: dimensionless, tmax_f: T, tmin_f: T } out: { et0_in_day: L T^-1, et0_mm_day: L T^-1, ra_mj_m2_day: dimensionless, day_of_year: dimensionless, tmean_f: T }
 export function computeReferenceEt0({ latitude_deg = 0, month = "jul", tmax_f = 0, tmin_f = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  for (const k of ["tmax_f", "tmin_f", "latitude_deg"]) { const v = arguments[0]?.[k]; if (v === undefined || v === null || v === "") return { error: "Enter the latitude and the daily maximum and minimum temperatures." }; }
   const MONTHS = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
   const mi = MONTHS.indexOf(String(month));
   if (mi < 0) return { error: "Month must be one of jan..dec." };

@@ -60901,3 +60901,40 @@ test("hardening slice 20 (solar, survey, civil, education, arborist)", async () 
   assert.ok(Math.abs(fn.hinge_width_in - 12) < 1e-9);
   assert.equal(AR.computeFellingNotchHinge({ cut_dia_in: 20, notch_pct: 22 }).hinge_width_in, 16);
 });
+
+test("hardening slice 21 (lab, farm production, mining, millwright, oil and gas, references)", async () => {
+  const MI = await import("../../calc-mining.js");
+  const OG = await import("../../calc-oilgas.js");
+  const MW = await import("../../calc-millwright.js");
+  const FP = await import("../../calc-farmproduction.js");
+  const LB = await import("../../calc-lab.js");
+  const RF = await import("../../calc-references.js");
+  // airblast defaults are OSMRE's printed regression, and land within a few dB of its records
+  const ab = MI.computeBlastAirblastOverpressure({ distance_ft: 680, charge_per_delay_lb: 426.5 });
+  assert.ok(Math.abs(ab.overpressure_db - 126) < 4, "OSMRE record 3: " + ab.overpressure_db);
+  assert.ok(MI.computeBlastAirblastOverpressure({ distance_ft: 1200, charge_per_delay_lb: 340 }).overpressure_db > 115);
+  assert.ok(MI.computeDustDeflagrationVentArea({ volume_cuft: 1000, kst_bar_m_s: 150, pmax_bar: 0.8, p_red_psig: 5, p_stat_psig: 1.5 }).error);
+  assert.ok(MI.computeBlastPowderFactor({ burden_ft: 10, spacing_ft: 12, bench_height_ft: 30, hole_diameter_in: 4, stemming_ft: 7, explosive_sg: 1250, rock_density_pcf: 165 }).error);
+  // oil and gas
+  const wd = { initial_rate_bpd: 420, decline_rate: 0.28, economic_limit_bpd: 15, years_ahead: 5 };
+  assert.equal(OG.computeWellDeclineReserves({ ...wd, rate_is_effective: true }).remaining_reserves_bbl, OG.computeWellDeclineReserves({ ...wd, rate_is_effective: "yes" }).remaining_reserves_bbl);
+  assert.ok(OG.computeWellDeclineReserves({ ...wd, rate_is_effective: "maybe" }).error);
+  assert.ok(OG.computeGasPipelineFlow({ equation: "panhandle_b", id_in: 12, length_mi: 50, inlet_psig: 900, outlet_psig: 600 }).error);
+  assert.ok(OG.computeTankVentApi2000({ pump_in_bph: 3000, pump_out_bph: 2000, volatile_factor: 0.1 }).error);
+  assert.ok(OG.computeSeparatorRetentionSizing({ vessel_diameter_ft: 4, seam_to_seam_ft: 12, liquid_rate_bpd: 1200, required_retention_min: 3, gas_rate_mmscfd: 3.5, pressure_psig: 400, liquid_density_lb_ft3: 52 }).error);
+  // millwright
+  assert.ok(MW.computeReceiverPumpUpTime({ receiver_volume_ft3: 120, cut_out_psig: 175, net_demand_scfm: 30, required_cover_minutes: 2 }).error);
+  const ch = { chain_pitch_in: 0.625, pitches_measured: 12, measured_length_in: 7.6875, elongation_limit_pct: 3 };
+  assert.equal(MW.computeRollerChainWearElongation({ ...ch, sprocket_teeth: 19 }).replace, false);
+  assert.equal(MW.computeRollerChainWearElongation({ ...ch, sprocket_teeth: 100 }).replace, true);
+  assert.ok(MW.computeAirCompressorCfmSizing({ tool1_qty: 2, tool1_cfm: 5 }).error);
+  // farm
+  assert.ok(FP.computeManureStorageVolume({ daily_manure_ft3: 150, bedding_ft3: 20, storage_days: 120, surface_area_ft2: 0, freeboard_in: 12 }).error);
+  assert.ok(FP.computeGrainDryingEnergy({ bushels: 1000, mi_percent: 150, mf_percent: 15 }).error);
+  assert.ok(FP.computeReferenceEt0({ latitude_deg: 45, month: "jul", tmax_f: 86 }).error);
+  // lab
+  assert.ok(LB.computeDilution({ c1: 1, v1: 1, c2: 0.1, v2: 5 }).error);
+  assert.ok(!LB.computeDilution({ c1: 1, v1: 1, c2: 0.1, v2: 10 }).error);
+  assert.ok(LB.computeRcf({ rotor_radius_mm: 85, rpm: 10000, rcf: 500 }).error);
+  assert.ok(RF.computeSalesTaxNexus({ state: "toString" }).error);
+});

@@ -516,7 +516,7 @@ export const SALES_TAX_NEXUS = {
 //  convention; transaction-count threshold is a dimensionless
 //  integer count; state / citation / date tokens are categorical.)
 export function computeSalesTaxNexus({ state = "CA" } = {}) {
-  const row = SALES_TAX_NEXUS[state];
+  const row = Object.hasOwn(SALES_TAX_NEXUS, state) ? SALES_TAX_NEXUS[state] : undefined;
   if (!row) return { error: "State " + state + " not bundled." };
   return { state, ...row };
 }

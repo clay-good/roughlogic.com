@@ -2994,7 +2994,7 @@ cross-check.
 | calc-millwright.js | `computeVibrationSeverityZone` | `{ reading = 0, reading_is_mm_s = 0, boundary_ab = 0.0441, boundary_bc = 0.110...` | _ | _ | _ |
 | calc-mining.js | `computeBeltFeederCapacity` | `{ opening_width_in = 0, opening_height_in = 0, belt_speed_fpm = 0, bulk_densi...` | _ | _ | _ |
 | calc-mining.js | `computeBeltFeederPull` | `{ slot_width_in = 0, slot_length_ft = 0, bulk_density_pcf = 0, internal_frict...` | _ | _ | _ |
-| calc-mining.js | `computeBlastAirblastOverpressure` | `{ distance_ft = 0, charge_per_delay_lb = 0, airblast_k = 0.2, airblast_b = 1....` | _ | _ | _ |
+| calc-mining.js | `computeBlastAirblastOverpressure` | `{ distance_ft = 0, charge_per_delay_lb = 0, airblast_k = 0.22, airblast_b = 0...` | _ | _ | _ |
 | calc-mining.js | `computeBlastBurdenSpacing` | `{ hole_diameter_in = 0, burden_ratio = 25, bench_height_ft = 0, spacing_ratio...` | _ | _ | _ |
 | calc-mining.js | `computeBlastFumeClearanceTime` | `{ heading_volume_cuft = 0, delivered_cfm = 0, target_fraction_pct = 1, wait_t...` | _ | _ | _ |
 | calc-mining.js | `computeBlastPowderFactor` | `{ burden_ft = 0, spacing_ft = 0, bench_height_ft = 0, hole_diameter_in = 0, s...` | _ | _ | _ |
