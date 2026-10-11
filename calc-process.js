@@ -672,7 +672,7 @@ export function computeThermoplasticTemperatureDerate({
         ? "the system runs " + fmt(operating_pressure_psi, 0) + " psi, " + fmt(utilization_pct, 0) + "% of the derated rating, with " + fmt(margin_psi, 0) + " psi of margin"
         : "the system runs " + fmt(operating_pressure_psi, 0) + " psi against a " + fmt(derated_pressure_psi, 0) + " psi allowable -- " + fmt(-margin_psi, 0) + " psi OVER, and " + fmt(utilization_pct, 0) + "% of the rating. Plastic pipe ratings are long-term hydrostatic strength figures, so a modest overpressure may not fail on the day -- it fails early instead, and the failure gets blamed on the pipe; far over the rating it can fail at once";
   // The inversion: what pressure this line may carry at this temperature.
-  const allowable_verdict = "the allowable at this temperature is " + fmt(derated_pressure_psi, 0) + " psi. Design to that figure, not to the number printed on the pipe, because the printed rating is stated at 73 degF and sustained temperature is exactly what the derating addresses";
+  const allowable_verdict = over_temp ? "NO ALLOWABLE: the material is not rated at this temperature, so the " + fmt(derated_pressure_psi, 0) + " psi the factor gives is not a design figure" : "the allowable at this temperature is " + fmt(derated_pressure_psi, 0) + " psi. Design to that figure, not to the number printed on the pipe, because the printed rating is stated at 73 degF and sustained temperature is exactly what the derating addresses";
   const has_alt = alt_derating_factor > 0;
   const alt_derated_psi = has_alt ? rated_pressure_psi * alt_derating_factor : 0;
   const alt_verdict = !has_alt

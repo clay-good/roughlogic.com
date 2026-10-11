@@ -61119,3 +61119,16 @@ test("hardening slice 27 (second pass over deferred findings)", async () => {
   assert.ok(LV.computeWirelessLinkBudget({ distance_km: 1e-6, frequency_mhz: 100 }).error);
   assert.ok(WD.computeTurbineDensityCorrection({ elevation_ft: 100000, measured_power_kw: 1000, curve_power_kw: 1500, wind_speed_mph: 20 }).error);
 });
+
+test("hardening slice 28 (second pass: flow meters, radiography, plastics, separators)", async () => {
+  const V = await import("../../calc-velocity.js");
+  const T = await import("../../calc-treatment.js");
+  // a computed orifice coefficient has to be one an orifice can have
+  assert.ok(V.computeDpFlowMeter({ pipe_id_in: 2.067, bore_in: 1, dp_psi: 0.05, cd_mode: "corner", viscosity_cst: 300, fluid_density_lb_ft3: 55 }).error);
+  const ok = V.computeDpFlowMeter({ pipe_id_in: 4.026, bore_in: 2, dp_psi: 2, cd_mode: "flange", fluid_density_lb_ft3: 62.4, viscosity_cst: 1 });
+  assert.ok(!ok.error && ok.cd_used > 0.59 && ok.cd_used < 0.63);
+  assert.ok(V.computeGasDpFlowMeter({ pipe_id_in: 2, bore_in: 0.2, p1_psia: 15, dp_psi: 0.0001, cd_mode: "corner" }).error);
+  // Stokes is not stretched to millimetre droplets
+  assert.ok(T.computeOilWaterSeparatorSizing({ flow_gpm: 50, oil_sg: 0.9, droplet_micron: 1000, water_viscosity_cp: 1, water_sg: 1 }).error);
+  assert.ok(!T.computeOilWaterSeparatorSizing({ flow_gpm: 50, oil_sg: 0.9, droplet_micron: 150, water_viscosity_cp: 1, water_sg: 1 }).error);
+});

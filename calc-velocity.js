@@ -342,6 +342,9 @@ export function computeDpFlowMeter({ pipe_id_in = 0, bore_in = 0, dp_psi = 0, cd
       if (settled) break;
     }
   }
+  // A computed coefficient outside what an orifice can have means the Reader-Harris/Gallagher
+  // fit was asked about a flow it does not describe (Re in the tens gave Cd 1.49 and twice the flow).
+  if (computed && !(Cd > 0.55 && Cd < 0.75)) return { error: "The computed discharge coefficient (" + Cd.toFixed(3) + " at Re " + Math.round(reynolds_number) + ") is outside the range of a sharp-edged orifice; the Reynolds number or geometry is outside ISO 5167-2. Enter a coefficient from a calibration instead." };
   const q_m3s = Cd * q_per_cd;
   const flow_gpm = q_m3s * 15850.323;
   const throat_velocity_fps = (q_m3s / A2) * 3.2808399;
@@ -447,6 +450,9 @@ export function computeGasDpFlowMeter({ pipe_id_in = 0, bore_in = 0, p1_psia = 0
       if (settled) break;
     }
   }
+  // A computed coefficient outside what an orifice can have means the Reader-Harris/Gallagher
+  // fit was asked about a flow it does not describe (Re in the tens gave Cd 1.49 and twice the flow).
+  if (computed && !(Cd > 0.55 && Cd < 0.75)) return { error: "The computed discharge coefficient (" + Cd.toFixed(3) + " at Re " + Math.round(reynolds_number) + ") is outside the range of a sharp-edged orifice; the Reynolds number or geometry is outside ISO 5167-2. Enter a coefficient from a calibration instead." };
   const qm = Cd * qm_per_cd;
   const mass_flow_lb_min = qm * 60;
   const acfm = qm / rho1 * 60;

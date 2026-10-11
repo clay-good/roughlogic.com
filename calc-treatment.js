@@ -1266,6 +1266,9 @@ export function computeOilWaterSeparatorSizing({ flow_gpm = 50, oil_sg = 0.85, d
   const mu = water_viscosity_cp * 1e-3;
   const vt_ms = 9.81 * (rho_w - rho_o) * d_m * d_m / (18 * mu);
   const rise_velocity_ftmin = vt_ms * 3.28084 * 60;
+  // Stokes holds while the droplet Reynolds number is below about 1; past it the rise is slower
+  // than this and the area comes out too small (a 1,000 micron droplet is Re 67 here).
+  if (rho_w * vt_ms * d_m / mu > 1) return { error: "A droplet this large rises outside the Stokes regime (droplet Reynolds number over 1), so the relation over-predicts the rise and undersizes the separator. API 421 designs to 150 micron." };
   const q_ft3min = flow_gpm * (231 / 1728);
   // API 421: F = Ft x Fs, Fs = 1.2 (short-circuiting) and Ft the turbulence
   // factor at the design ratio vH / Vt, with vH = 15 Vt capped at 3 ft/min:

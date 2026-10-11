@@ -329,7 +329,9 @@ export function computeRtExposureTime({
   const limit_verdict = !has_limit
     ? "(no unsharpness limit entered -- and whether the extra distance is worth buying depends entirely on it)"
     : base_passes
-      ? "the " + fmt(base_distance_in, 1) + " in distance ALREADY meets the " + fmt(unsharpness_limit_in, 5) + " in limit, so it is the right choice and the longer shot buys nothing the code asks for"
+      ? (has_new && ug_new_in > unsharpness_limit_in * (1 + 1e-9)
+        ? "the " + fmt(base_distance_in, 1) + " in distance meets the " + fmt(unsharpness_limit_in, 5) + " in limit, but the PROPOSED " + fmt(new_distance_in, 1) + " in shot does NOT (" + fmt(ug_new_in, 5) + " in); the minimum distance that meets it is " + fmt(distance_for_limit_in, 1) + " in"
+        : "the " + fmt(base_distance_in, 1) + " in distance ALREADY meets the " + fmt(unsharpness_limit_in, 5) + " in limit, so it is the right choice and the longer shot buys nothing the code asks for")
       : "the " + fmt(base_distance_in, 1) + " in distance FAILS the " + fmt(unsharpness_limit_in, 5) + " in limit; the minimum distance that meets it is " + fmt(distance_for_limit_in, 1) + " in, which costs " + fmt(Math.pow(distance_for_limit_in / base_distance_in, 2), 2) + "x the exposure";
   const has_decay = days_elapsed > 0;
   const decay_factor = has_decay ? Math.pow(0.5, days_elapsed / half_life_days) : 1;
