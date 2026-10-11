@@ -113,7 +113,7 @@ export function computeEmergencyWaterBleachDose({ water_volume = 0, volume_unit 
   if (bleach_strength_pct > 15) return { error: "Bleach strength above 15% is not a household or commercial liquid bleach; check the label." };
   if (!(drop_volume_ml > 0)) return { error: "Drop volume must be positive." };
   const toGal = { gal: 1, qt: 0.25, L: 1 / _L_PER_GAL };
-  if (!(volume_unit in toGal)) return { error: "Volume unit must be gallons, quarts, or litres." };
+  if (!Object.hasOwn(toGal, volume_unit)) return { error: "Volume unit must be gallons, quarts, or litres." };
   if (!["clear", "cloudy"].includes(water_condition)) return { error: "Water condition must be clear or cloudy." };
   const water_gal = water_volume * toGal[volume_unit];
   const water_l = water_gal * _L_PER_GAL;

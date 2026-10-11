@@ -61041,3 +61041,34 @@ test("hardening slice 24 (education statistics, lab, contractor finance, solar f
   assert.ok(CF.computeEquipmentHourlyRate({ ...CF.equipmentHourlyRateExample.inputs, iit_pct: -50 }).error);
   assert.ok(CF.computeOverheadRecoveryRate({ annual_overhead: 200000, basis: "percent", billable_hours: 8000 }).error);
 });
+
+test("hardening slice 25 (steam, marine and aviation, building performance, flow metering, telecom, relief and flood fight)", async () => {
+  const STP = await import("../../calc-steampressure.js");
+  const MAV = await import("../../calc-marineaviation.js");
+  const BP = await import("../../calc-buildingperf.js");
+  const VEL = await import("../../calc-velocity.js");
+  const TEL = await import("../../calc-telecom.js");
+  const FF = await import("../../calc-floodfight.js");
+  const DM = await import("../../calc-demo.js");
+  const RP = await import("../../calc-reliefpower.js");
+  // Napier is the choked flow; it is withheld when the valve is not choked
+  const np = { orifice_area_in2: 0.5, upstream_p_psia: 100, discharge_coeff: 0.9 };
+  assert.equal(STP.computeSteamPrvNapier({ ...np, downstream_p_psia: 100 }).steam_capacity_lb_hr, null);
+  assert.ok(Math.abs(STP.computeSteamPrvNapier({ ...np, downstream_p_psia: 20 }).steam_capacity_lb_hr - 2317.5) < 1e-6);
+  // a sling is checked on its tension, not its vertical share
+  const tl = MAV.computeTravelLiftSlingPlacement({ displacement_lb: 28000, sling_spacing_ft: 18, cg_from_fwd_ft: 9, sling_wll_lb: 14500, sling_angle_deg: 60 });
+  assert.equal(tl.within_wll, false);
+  assert.equal(MAV.computeTravelLiftSlingPlacement({ displacement_lb: 28000, sling_spacing_ft: 18, cg_from_fwd_ft: 9, sling_wll_lb: 14500, sling_angle_deg: 90 }).within_wll, true);
+  assert.ok(BP.computeCazDepressurizationLimit({ measured_depressurization_pa: 4.5, has_natural_draft_water_heater: "Yes", has_induced_draft: "yes" }).error);
+  assert.ok(VEL.computeRefrigerantVelocity({ mass_flow_lb_hr: 600, line_id_in: 0.9, specific_volume_ft3_lb: 0.5, orientation: "vertical" }).error);
+  assert.ok(TEL.computePonSplitLossBudget({ class_budget_db: 28, split_ratio: 0.5, attenuation_db_km: 0.35 }).error);
+  assert.ok(DM.computeMoistureDryGoal({ reference_reading: 40, affected_reading: null }).error);
+  assert.ok(RP.computeGeneratorAltitudeTempDerate({ rated_kw: 300, site_elevation_ft: 5000 }).error);
+  // flood fight: option names spelled like object built-ins, and the snow verdict at the limit
+  assert.ok(FF.computeEmergencyEarthLeveeSection({ height_ft: 4, fill: "clay", foundation: "toString", top_width_ft: 3, length_ft: 100 }).error);
+  assert.ok(FF.computeFloodLateralLoad({ depth_ft: 4, width_ft: 10, water: "constructor" }).error);
+  assert.ok(FF.computeRoofSnowIceWeight({ design_snow_psf: 30 }).error);
+  const one = FF.computeRoofSnowIceWeight({ layer1_depth_in: 24, layer1_type: "settled", design_snow_psf: 25 });
+  const two = FF.computeRoofSnowIceWeight({ layer1_depth_in: 16, layer1_type: "settled", layer2_depth_in: 8, layer2_type: "settled", design_snow_psf: 25 });
+  assert.equal(two.action, one.action);
+});

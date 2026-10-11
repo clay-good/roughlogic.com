@@ -149,8 +149,9 @@ export function computeEmergencyEarthLeveeSection({ height_ft = 0, fill = "sand"
   if (!(top_width_ft > 0)) return { error: "Top width must be positive." };
   if (!(length_ft > 0)) return { error: "Levee length must be positive." };
   const SLOPES = { sand: [3, 5], clay: [2.5, 2.5] };
-  if (!SLOPES[fill]) return { error: "Fill material must be sand or clay." };
+  if (!Object.hasOwn(SLOPES, fill)) return { error: "Fill material must be sand or clay." };
   const CREEP = { fine_sand: 15, fine_gravel: 9, impervious: 0 };
+  if (!Object.hasOwn(CREEP, foundation)) return { error: "Foundation must be fine_sand, fine_gravel or impervious." };
   if (!(foundation in CREEP)) return { error: "Foundation must be fine sand, fine gravel, or impervious." };
   const [riverside_slope_h, landside_slope_h] = SLOPES[fill];
   const base_width_ft = top_width_ft + (riverside_slope_h + landside_slope_h) * height_ft;
@@ -216,7 +217,7 @@ export function computeFloodLateralLoad({ depth_ft = 0, width_ft = 0, water = "f
   if (!(depth_ft > 0)) return { error: "Still-water flood depth must be positive." };
   if (!(width_ft > 0)) return { error: "Wall or obstruction width must be positive." };
   if (!(entered_velocity_fps >= 0)) return { error: "Velocity cannot be negative." };
-  if (!(water in _GAMMA_PCF)) return { error: "Water must be fresh or salt." };
+  if (!Object.hasOwn(_GAMMA_PCF, water)) return { error: "Water must be fresh or salt." };
   if (!["lower", "upper", "entered"].includes(velocity_basis)) return { error: "Velocity basis must be lower bound, upper bound, or entered." };
   if (!["wall", "square_pile", "round_pile"].includes(obstruction)) return { error: "Obstruction must be a wall, a square or rectangular pile, or a round pile." };
   const gamma = _GAMMA_PCF[water];
@@ -289,6 +290,7 @@ export function computeFloodDebrisImpact({ debris_weight_lb = 1000, zone = "a", 
   // Table 8-3 prints 0 below 1 ft, 0.375 at 2.5 ft, 0.75 at 4 ft and 1.0
   // above 5 ft; every row lies on 0.25 (ds - 1), clamped to [0, 1].
   const depth_coefficient = zone === "v_floodway" ? 1.0 : Math.min(1, Math.max(0, 0.25 * (depth_ft - 1)));
+  if (!Object.hasOwn(CB, screening) || !Object.hasOwn(CSTR, structure)) return { error: "Unknown screening or structure type." };
   const blockage_coefficient = CB[screening];
   const structure_coefficient_s_per_ft = CSTR[structure];
   const impact_force_lb = debris_weight_lb * velocity_used_fps * depth_coefficient * blockage_coefficient * structure_coefficient_s_per_ft;
@@ -331,7 +333,7 @@ FLOODFIGHT_RENDERERS["flood-debris-impact"] = _simpleRenderer({
 export function computeFloodUpliftCoverSlab({ head_ft = 0, water = "fresh", element = "slab", slab_thickness_in = 4, slab_area_sqft = 0, cover_diameter_ft = 2, cover_weight_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(head_ft > 0)) return { error: "Head above the underside must be positive." };
-  if (!(water in _GAMMA_PCF)) return { error: "Water must be fresh or salt." };
+  if (!Object.hasOwn(_GAMMA_PCF, water)) return { error: "Water must be fresh or salt." };
   if (!["slab", "cover"].includes(element)) return { error: "Element must be a slab or a round cover." };
   let area_sqft;
   let resisting_psf;
@@ -450,6 +452,7 @@ FLOODFIGHT_RENDERERS["basement-flood-pumpdown"] = _simpleRenderer({
 // dims: in { layer1_depth_in: L, layer1_type: dimensionless, layer2_depth_in: L, layer2_type: dimensionless, layer3_depth_in: L, layer3_type: dimensionless, entered_weight_pcf: M L^-2 T^-2, ground_snow_psf: M L^-1 T^-2, override_range: dimensionless, design_snow_psf: M L^-1 T^-2 } out: { layer1_psf: M L^-1 T^-2, layer2_psf: M L^-1 T^-2, layer3_psf: M L^-1 T^-2, total_psf: M L^-1 T^-2, design_ratio: dimensionless }
 export function computeRoofSnowIceWeight({ layer1_depth_in = 0, layer1_type = "wet", layer2_depth_in = 0, layer2_type = "ice", layer3_depth_in = 0, layer3_type = "dry", entered_weight_pcf = 15, ground_snow_psf = 0, override_range = "no", design_snow_psf = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(layer1_depth_in > 0) && !(layer2_depth_in > 0) && !(layer3_depth_in > 0)) return { error: "Enter at least one layer depth; with none measured there is nothing to compare with the design load." };
   if (![layer1_depth_in, layer2_depth_in, layer3_depth_in].every((d) => d >= 0)) return { error: "Layer depths cannot be negative." };
   if (!(design_snow_psf > 0)) return { error: "Roof design snow load must be positive." };
   // FEMA P-957 Section 2.2 unit weights (psf per ft of depth); settled snow
@@ -475,9 +478,9 @@ export function computeRoofSnowIceWeight({ layer1_depth_in = 0, layer1_type = "w
   const [layer1_psf, layer2_psf, layer3_psf] = [0, 1, 2].map((i) => depths[i] / 12 * unit(types[i]));
   const total_psf = layer1_psf + layer2_psf + layer3_psf;
   const design_ratio = total_psf / design_snow_psf;
-  const action = design_ratio >= 1
+  const action = design_ratio >= 1 - 1e-9
     ? "AT OR OVER the roof design snow load -- get the load off by a safe method now, and leave the building at once if any warning sign appears (sagging, new cracks, creaking, doors or windows that stick)"
-    : design_ratio >= 0.75
+    : design_ratio >= 0.75 * (1 - 1e-9)
       ? "APPROACHING the design snow load -- plan careful, even clearing by a safe method; leave if any warning sign appears"
       : "below the design snow load by this estimate -- warning signs (sagging, new cracks, creaking, sticking doors) override the arithmetic";
   return {
@@ -555,6 +558,7 @@ export function computeStormPanelPlywood({ opening_width_in = 0, opening_height_
     ? opening_count * Math.min(Math.ceil(panel_width_in / 48 - 1e-9) * Math.ceil(panel_height_in / 96 - 1e-9), Math.ceil(panel_height_in / 48 - 1e-9) * Math.ceil(panel_width_in / 96 - 1e-9))
     : Math.ceil(opening_count / per_sheet - 1e-9);
   const table_column = span_ft <= 4 ? "panel span <= 4 ft" : span_ft <= 6 ? "4 ft < panel span <= 6 ft" : "6 ft < panel span <= 8 ft";
+  if (!Object.hasOwn(FASTENERS, fastener_type)) return { error: "Unknown fastener type." };
   const fastener_label = FASTENERS[fastener_type];
   return {
     panel_width_in, panel_height_in, span_in, span_ft, fastened_edge_in, fasteners_per_edge, fasteners_per_panel,
@@ -621,9 +625,9 @@ export function computeManufacturedHomeAnchorCount({ wind_zone = "I", floor_widt
   if (!(Number.isInteger(sections) && sections >= 1 && sections <= 3)) return { error: "Number of sections must be 1, 2, or 3." };
   const zone = _MH_TABLE[wind_zone];
   if (!zone) return { error: "Wind zone must be I, II, or III (24 CFR 3285.402 Tables 1-3)." };
-  const byWidth = zone[floor_width_row];
+  const byWidth = Object.hasOwn(zone, floor_width_row) ? zone[floor_width_row] : null;
   if (!byWidth) return { error: "Nominal floor width must be 12/24, 14/28, or 16/32 ft." };
-  const row = byWidth[strap_height_row];
+  const row = Object.hasOwn(byWidth, strap_height_row) ? byWidth[strap_height_row] : null;
   if (!row) return { error: "Strap height must be one of the tabulated rows: 25, 33, 46, or 67 in." };
   if (!["82.5", "99.5"].includes(beam_spacing_row)) return { error: "I-beam spacing must be 82.5 or 99.5 in." };
   if (!["near", "second"].includes(method)) return { error: "Method must be near beam or second beam." };

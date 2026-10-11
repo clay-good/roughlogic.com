@@ -99,6 +99,7 @@ export function computeRefrigerantVelocity({ mass_flow_lb_hr = 0, line_id_in = 0
   const riser_min = 1500; // suction-riser oil-return minimum (fpm), advisory
   const horiz_min = 700;  // horizontal minimum (fpm), advisory
   const noise_max = 4000;
+  if (orientation !== "riser" && orientation !== "horizontal") return { error: "Orientation must be riser or horizontal." };
   const min = orientation === "riser" ? riser_min : horiz_min;
   let verdict = "within oil-return window";
   if (velocity_fpm < min) verdict = "below oil-return minimum (risk of oil trapping)";

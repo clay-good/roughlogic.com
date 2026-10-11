@@ -40,9 +40,13 @@ export function computeSteamPrvNapier({ orifice_area_in2 = 0, upstream_p_psia = 
   if (!(Cd > 0 && Cd <= 1)) return { error: "Discharge coefficient must be over 0 and at most 1." };
   const choke_threshold_psia = 0.58 * P1;
   const choked = P2 < choke_threshold_psia;
-  const steam_capacity_lb_hr = 51.5 * Cd * A * P1;
+  // Napier's W = 51.5 Cd A P1 is the CHOKED flow. Below the critical drop the flow is less and
+  // falls to zero as P2 approaches P1; until 2026-10-11 the choked figure was returned anyway
+  // (2,317 lb/hr through a valve with no pressure drop across it). It is now withheld.
+  const choked_capacity_lb_hr = 51.5 * Cd * A * P1;
+  const steam_capacity_lb_hr = choked ? choked_capacity_lb_hr : null;
   return {
-    steam_capacity_lb_hr, choked, choke_threshold_psia,
+    steam_capacity_lb_hr, choked_capacity_lb_hr, choked, choke_threshold_psia,
     note: "Flow chokes when the downstream absolute pressure is below 58% of the upstream, and the capacity then depends only on the upstream pressure - dropping the downstream further does not increase it. Napier is for saturated steam (superheat needs a Ksh factor). A liquid Cv (which scales with the square root of pressure drop) is wrong for choked steam, which is linear in the upstream pressure. The discharge coefficient (about 0.6 for a sharp-edged orifice, near 1 for a nozzle) must be applied. ASME/API and the valve manufacturer govern - a sizing aid, not a relief-valve certification.",
   };
 }
@@ -63,7 +67,7 @@ function _renderSteamPrvNapier(inputRegion, outputRegion, citationEl) {
     const r = computeSteamPrvNapier({ orifice_area_in2: readNum(A.input), upstream_p_psia: readNum(P1.input), downstream_p_psia: readNum(P2.input), discharge_coeff: Cd.input.value === "" ? 0.9 : readNum(Cd.input) });
     if (r.error) { oChoke.textContent = r.error; oCap.textContent = "-"; oNote.textContent = ""; return; }
     oChoke.textContent = r.choked ? "Choked (P2 < " + fmt(r.choke_threshold_psia, 1) + " psia) - capacity set by upstream only" : "Subcritical (P2 >= " + fmt(r.choke_threshold_psia, 1) + " psia) - apply a subcritical correction";
-    oCap.textContent = fmt(r.steam_capacity_lb_hr, 0) + " lb/hr (saturated)";
+    oCap.textContent = r.steam_capacity_lb_hr === null ? "not choked: less than " + fmt(r.choked_capacity_lb_hr, 0) + " lb/hr -- Napier does not give subcritical flow" : fmt(r.steam_capacity_lb_hr, 0) + " lb/hr (saturated)";
     oNote.textContent = r.note;
   }, DEBOUNCE_MS);
   for (const f of [A, P1, P2, Cd]) f.input.addEventListener("input", update);

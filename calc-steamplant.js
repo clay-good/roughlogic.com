@@ -671,6 +671,7 @@ const _unWalther = (x) => _ssuFromCst(Math.pow(10, Math.pow(10, x)) - _WALTHER_O
 // dims: in { v1_ssu: L^2 / T, t1_f: T, v2_ssu: L^2 / T, t2_f: T, target_ssu: L^2 / T, pumping_limit_ssu: L^2 / T, check_temp_f: T } out: { slope_b: dimensionless, temp_for_target_f: T, temp_for_pumping_f: T, viscosity_at_check_ssu: L^2 / T, setpoint_spread_f: T }
 export function computeFuelOilAtomizingViscosity({ v1_ssu = 0, t1_f = 0, v2_ssu = 0, t2_f = 0, target_ssu = 150, pumping_limit_ssu = 4000, check_temp_f = 185 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  for (const k of ["t1_f", "t2_f"]) { const v = arguments[0]?.[k]; if (v === undefined || v === null || v === "") return { error: "Enter the temperature of both viscosity points (F)." }; }
   if (!(v1_ssu >= 32)) return { error: "The first viscosity must be at least 32 SSU (the Saybolt scale's floor)." };
   if (!(v2_ssu >= 32)) return { error: "The second viscosity must be at least 32 SSU (the Saybolt scale's floor)." };
   if (!(target_ssu >= 32)) return { error: "The target atomizing viscosity must be at least 32 SSU." };

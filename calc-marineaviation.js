@@ -456,7 +456,11 @@ export function computeTravelLiftSlingPlacement({
     : (aft_carries_more ? "the AFT" : "the FORWARD") + " sling carries " + fmt(governing_lb, 0) + " lb against " + fmt(displacement_lb - governing_lb, 0) + " lb on the other -- " + fmt(Math.max(aft_share_pct, 100 - aft_share_pct), 0) + "% of the boat, and " + fmt(difference_lb, 0) + " lb more than the other sling";
   // The check people actually make, and why it is wrong.
   const has_wll = sling_wll_lb > 0;
-  const within_wll = has_wll && governing_lb <= sling_wll_lb + 1e-9 * Math.abs(sling_wll_lb);
+  // A sling is rated on its TENSION, which is the vertical share over sin(angle): at 60 degrees a
+  // 14,000 lb share is 16,166 lb in the sling. Until 2026-10-11 the vertical share was compared.
+  const _sinA = Math.sin(sling_angle_deg * Math.PI / 180);
+  const within_wll = has_wll && governing_lb / _sinA <= sling_wll_lb + 1e-9 * Math.abs(sling_wll_lb);
+  // (The half-the-weight check stays the naive one people make: weight / 2 against the rating.)
   const even_split_would_pass = has_wll && even_split_lb <= sling_wll_lb + 1e-9 * Math.abs(sling_wll_lb);
   const wll_verdict = !has_wll
     ? "(no sling working load limit entered)"

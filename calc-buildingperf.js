@@ -548,6 +548,8 @@ export function computeCazDepressurizationLimit({
   }
   if (largest_exhaust_cfm < 0) return { error: "Exhaust airflow cannot be negative (cfm)." };
   const present = [];
+  // Only the exact string "yes" used to count, so "Yes" or true dropped the appliance and its tighter limit.
+  for (const k of ["has_natural_draft_water_heater", "has_natural_draft_furnace", "has_induced_draft", "has_direct_vent"]) { const v = arguments[0]?.[k]; if (v !== undefined && v !== "yes" && v !== "no") return { error: "Answer yes or no for each appliance type." }; }
   if (has_natural_draft_water_heater === "yes") present.push({ name: "natural draft water heater", limit: natural_draft_wh_limit_pa });
   if (has_natural_draft_furnace === "yes") present.push({ name: "natural draft furnace or boiler", limit: natural_draft_furnace_limit_pa });
   if (has_induced_draft === "yes") present.push({ name: "mechanically assisted draft appliance", limit: induced_draft_limit_pa });

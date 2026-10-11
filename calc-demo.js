@@ -104,6 +104,7 @@ export const DEMO_RENDERERS = {};
 //  delta and the verdict are dimensionless.)
 export function computeMoistureDryGoal({ reference_reading, affected_reading, acceptable_delta = 4 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  for (const v of [reference_reading, affected_reading]) if (v === null || v === "") return { error: "Enter both moisture readings." };
   const ref = Number(reference_reading);
   const aff = Number(affected_reading);
   const allow = Number(acceptable_delta);

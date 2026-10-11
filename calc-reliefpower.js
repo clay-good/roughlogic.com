@@ -124,6 +124,7 @@ function _curveError(pts) {
 // dims: in { rated_kw: M L^2 T^-3, site_elevation_ft: L, site_ambient_f: T, altitude_threshold_ft: L, altitude_step_ft: L, altitude_rate_pct: dimensionless, temp_threshold_f: T, temp_step_f: T, temp_rate_pct: dimensionless } out: { altitude_derate_pct: dimensionless, temperature_derate_pct: dimensionless, total_derate_pct: dimensionless, multiplied_derate_pct: dimensionless, available_kw: M L^2 T^-3, available_multiplied_kw: M L^2 T^-3, lost_kw: M L^2 T^-3, method_difference_kw: M L^2 T^-3 }
 export function computeGeneratorAltitudeTempDerate({ rated_kw = 0, site_elevation_ft = 0, site_ambient_f = 0, altitude_threshold_ft = 0, altitude_step_ft = 0, altitude_rate_pct = 0, temp_threshold_f = 0, temp_step_f = 0, temp_rate_pct = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  { const v = arguments[0]?.site_ambient_f; if (v === undefined || v === null || v === "") return { error: "Enter the site ambient temperature (F)." }; }
   if (!(rated_kw > 0)) return { error: "Rated kW must be positive." };
   if (!(altitude_step_ft > 0) || !(temp_step_f > 0)) return { error: "The altitude and temperature derate steps must be positive." };
   if (!(altitude_rate_pct > 0) || !(temp_rate_pct > 0)) return { error: "The altitude and temperature derate rates must be positive." };
