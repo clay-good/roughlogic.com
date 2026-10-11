@@ -351,6 +351,7 @@ export function computeCropYield({
   ground_loss_area_ft2 = 0,
 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (arguments[0]?.moisture_pct !== undefined && !(Number(arguments[0].moisture_pct) > 0)) return { error: "Enter the harvest moisture (%); a blank is not bone-dry grain." };
   const stdMoist = STD_MOISTURE_PCT[crop];
   const testWeight = TEST_WEIGHT_LB_PER_BU[crop];
   if (!Number.isFinite(stdMoist)) return { error: "Unknown crop." };
@@ -547,7 +548,7 @@ function renderUniformity(inputRegion, outputRegion, citationEl) {
     update();
   }
   function update() {
-    const vals = rows.map((r) => Number(r.value)).filter((v) => Number.isFinite(v) && v > 0);
+    const vals = rows.map((r) => Number(r.value)).filter((v) => Number.isFinite(v) && v >= 0); // a dry can typed as 0 is a reading; only blanks are skipped
     if (vals.length < 4) { oM.textContent = "Need at least 4 readings."; oC.textContent = "-"; oD.textContent = "-"; oF.textContent = "-"; return; }
     const r = computeUniformity({ catch_volumes: vals });
     if (r.error) { oM.textContent = r.error; return; }
@@ -644,12 +645,13 @@ const THI_INTERVENTIONS = {
 //  dimensionless humidity correction, so the index surfaces as a
 //  temperature `T`.)
 export function computeTHI({
-  temperature = 0,
+  temperature = null,
   unit = "F",
-  rh_percent = 0,
+  rh_percent = null,
   animal = "dairy-cow",
   ventilation = "closed",
 } = {}) {
+  if ([temperature, rh_percent].some((x) => x === null || x === "")) return { error: "Enter the air temperature and the relative humidity." };
   const T = Number(temperature);
   const RH = Number(rh_percent);
   if (!Number.isFinite(T)) return { error: "Temperature must be a number." };
@@ -1821,6 +1823,9 @@ function _v23SimpleRenderer(spec) {
 //
 // dims: in { rei_hours: dimensionless, phi_days: dimensionless, hours_since_application: dimensionless, days_since_application: dimensionless } out: { rei_remaining_hours: dimensionless, phi_remaining_days: dimensionless, rei_clear: dimensionless, phi_clear: dimensionless, early_entry_violation: dimensionless, early_harvest_violation: dimensionless }
 export function computePesticideReiPhi({ rei_hours = 0, phi_days = 0, hours_since_application = 0, days_since_application = 0 } = {}) {
+  // A blank or non-numeric label interval used to read CLEAR.
+  for (const [k, v] of [["rei_hours", rei_hours], ["phi_days", phi_days]]) if (v === null || v === "" || !Number.isFinite(Number(v)) || Number(v) < 0) return { error: "Enter the label's " + (k === "rei_hours" ? "restricted-entry interval (hours)" : "pre-harvest interval (days)") + "; 0 only if the label says none." };
+  if (!(Number(rei_hours) > 0) && !(Number(phi_days) > 0)) return { error: "Enter the label's restricted-entry interval (hours) and pre-harvest interval (days)." };
   const rei = Number(rei_hours) || 0;
   const phi = Number(phi_days) || 0;
   if (Number(hours_since_application) < 0) return { error: "Hours since application cannot be negative." };
@@ -1862,6 +1867,9 @@ AGRICULTURE_RENDERERS["pesticide-rei-phi"] = renderPesticideReiPhi;
 // method caps Tmax at cutoff AND floors Tmin at base before averaging.
 // dims: in { tmax_series: dimensionless, tmin_series: dimensionless, base_f: T, cutoff_f: T, method: dimensionless } out: { accumulated_gdd: dimensionless, days: dimensionless }
 export function computeGrowingDegreeDays({ days_series = [], base_f = 50, cutoff_f = 0, method = "standard" } = {}) {
+  if (method !== "standard" && method !== "modified") return { error: "Method must be standard or modified." };
+  if (!Number.isFinite(Number(base_f))) return { error: "Base temperature must be a number (F)." };
+  if (Number(cutoff_f) > 0 && Number(cutoff_f) <= Number(base_f)) return { error: "The upper cutoff must be above the base temperature." };
   const base = Number(base_f) || 0;
   const cutoff = Number(cutoff_f) || 0;
   if (!Array.isArray(days_series) || days_series.length === 0) return { error: "Enter at least one day of Tmax/Tmin." };
@@ -1874,10 +1882,11 @@ export function computeGrowingDegreeDays({ days_series = [], base_f = 50, cutoff
     if (!Number.isFinite(tmax) || !Number.isFinite(tmin)) { flagged++; daily.push(null); continue; }
     if (tmin > tmax) { flagged++; daily.push(null); continue; }
     let tmaxAdj = cutoff > 0 ? Math.min(tmax, cutoff) : tmax;
-    let tminAdj = tmin;
+    // The cutoff caps BOTH temperatures: a 98/90 day at an 86 cutoff is 36 GDD, not 38.
+    let tminAdj = cutoff > 0 ? Math.min(tmin, cutoff) : tmin;
     if (method === "modified") {
       if (cutoff > 0) tmaxAdj = Math.min(tmax, cutoff);
-      tminAdj = Math.max(tmin, base);
+      tminAdj = Math.max(tminAdj, base);
     }
     const avg = (tmaxAdj + tminAdj) / 2;
     const gdd = Math.max(0, avg - base);
@@ -1980,6 +1989,8 @@ AGRICULTURE_RENDERERS["pearson-square-ration"] = renderPearsonSquareRation;
 // temperature breakpoints. Intake-ratio method: gal = DMI * ratio / 8.345.
 // dims: in { method: dimensionless, head: dimensionless, temp_f: T, t_low_f: T, gal_low: L^3, t_high_f: T, gal_high: L^3, dmi_lb: M, water_per_dmi: dimensionless, lactating: dimensionless } out: { per_head_gpd: L^3 T^-1, herd_gpd: L^3 T^-1 }
 export function computeLivestockWaterRequirement({ method = "table", head = 1, temp_f = 0, t_low_f = 0, gal_low = 0, t_high_f = 0, gal_high = 0, dmi_lb = 0, water_per_dmi = 3.5, lactating = false } = {}) {
+  if (method !== "table" && method !== "intake") return { error: "Method must be table or intake." };
+  if (Number(gal_low) < 0 || Number(gal_high) < 0) return { error: "Water intakes cannot be negative (gal)." };
   const n = Math.round(Number(head) || 0);
   if (!(n >= 1)) return { error: "Head count must be at least 1." };
   let perHead = 0;
@@ -1999,6 +2010,8 @@ export function computeLivestockWaterRequirement({ method = "table", head = 1, t
   }
   if (lactating) perHead *= 2;
   const herd = perHead * n;
+  // Extrapolating a cold day below the low breakpoint can run the line through zero.
+  if (!(perHead >= 0)) return { error: "The temperature is so far outside the entered breakpoints that the straight line gives a negative intake; enter breakpoints that bracket it." };
   return {
     per_head_gpd: Number.isFinite(perHead) ? perHead : null,
     herd_gpd: Number.isFinite(herd) ? herd : null,
@@ -2044,6 +2057,8 @@ AGRICULTURE_RENDERERS["livestock-water-requirement"] = renderLivestockWaterRequi
 // dims: in { ratio: dimensionless, fuel_amount: L^3, fuel_unit: dimensionless } out: { oil_oz: L^3, oil_ml: L^3, oz_per_gallon: dimensionless }
 export function computeTwoStrokeMix({ ratio = 50, fuel_amount = 0, fuel_unit = "gallon" } = {}) {
   const _g = _finiteGuard({ ratio, fuel_amount }); if (_g) return _g;
+  // Anything but "liter" used to be gallons: "liters" asked for 3.8 times the oil.
+  if (fuel_unit !== "gallon" && fuel_unit !== "liter") return { error: "Fuel unit must be gallon or liter." };
   const r = Number(ratio);
   const amt = Number(fuel_amount);
   if (!(r > 0)) return { error: "Mix ratio must be positive (the X in X:1)." };
@@ -2099,6 +2114,7 @@ AGRICULTURE_RENDERERS["two-stroke-mix"] = renderTwoStrokeMix;
 // dims: in { fuel_amount: L^3, fuel_unit: dimensionless, oil_amount: L^3, target_ratio: dimensionless } out: { ratio: dimensionless, oz_per_gallon: dimensionless, ml_per_liter: dimensionless }
 export function computeTwoStrokeMixRatioCheck({ fuel_amount = 0, fuel_unit = "gallon", oil_amount = 0, target_ratio = 50 } = {}) {
   const _g = _finiteGuard({ fuel_amount, oil_amount, target_ratio }); if (_g) return _g;
+  if (fuel_unit !== "gallon" && fuel_unit !== "liter") return { error: "Fuel unit must be gallon or liter." };
   const fuel = Number(fuel_amount);
   const oil = Number(oil_amount);
   const tr = Number(target_ratio);
@@ -2187,6 +2203,7 @@ export function computeNozzleFlowPressure({ rated_gpm, rated_psi, new_psi, targe
 // dims: in { base_buffer_ft: L, wind_mph: L T^-1, boom_height_in: L, ref_height_in: L } out: { buffer_ft: L }
 export function computeSprayDriftBuffer({ base_buffer_ft = 0, droplet_class = "medium", wind_mph, boom_height_in = 20, ref_height_in = 20 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!Object.hasOwn(_v84_DROPLET_BASE, String(droplet_class))) return { error: "Droplet class must be one of: " + Object.keys(_v84_DROPLET_BASE).join(", ") + "." };
   const classBase = _v84_DROPLET_BASE[String(droplet_class)] || _v84_DROPLET_BASE.medium;
   const base = Number(base_buffer_ft) > 0 ? Number(base_buffer_ft) : classBase;
   const wind = Number(wind_mph);
@@ -2352,9 +2369,13 @@ export function computeHayDryMatter({ bale_weight_lb = 0, moisture_pct = 0, targ
   const over_threshold = moisture_pct > safe_threshold_pct + 1e-9 * Math.abs(safe_threshold_pct);
   return {
     dry_matter_lb, weight_at_target_lb, over_threshold,
-    flag: over_threshold
-      ? "above the " + fmt(safe_threshold_pct, 0) + "% safe ceiling - heating / mold risk; do not store tight, consider a preservative or further drying"
-      : "at or below the " + fmt(safe_threshold_pct, 0) + "% safe ceiling - ok to store",
+    // No storage verdict on a 0% entry: it is a dry-matter-basis conversion or a blank field, and
+    // a blank used to earn "ok to store". The threshold prints unrounded (18.5 read "19").
+    flag: !(moisture_pct > 0)
+      ? "no storage verdict - enter the bale's actual moisture to check it against the " + fmt(safe_threshold_pct, 1) + "% safe ceiling"
+      : over_threshold
+        ? "above the " + fmt(safe_threshold_pct, 1) + "% safe ceiling - heating / mold risk; do not store tight, consider a preservative or further drying"
+        : "at or below the " + fmt(safe_threshold_pct, 1) + "% safe ceiling - ok to store",
     note: "Dry matter is the bale weight times (1 - moisture). Restating at a target moisture (dry matter / (1 - target)) lets you compare loads bought and sold at different moistures on an equal basis. Bale tight only below the safe-storage moisture ceiling (about 18% for large packages, 20% for small squares - both editable); wetter hay heats and molds, and very wet stacks can spontaneously combust. The producer and local extension guidance govern.",
   };
 }
@@ -2499,6 +2520,9 @@ AGRICULTURE_RENDERERS["irrigation-zone-runtime"] = renderIrrigationZoneRuntime;
 // dims: in { mode: dimensionless, tubing_ft: L, spacing_in: L, emitter_gph: L^3 T^-1, emitter_count: dimensionless, valve_gpm: L^3 T^-1 } out: { emitters: dimensionless, zone_gph: L^3 T^-1, zone_gpm: L^3 T^-1, utilization: dimensionless }
 export function computeDripZoneFlow({ mode = "inline", tubing_ft = 0, spacing_in = 0, emitter_gph = 0, emitter_count = 0, valve_gpm = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // "point-source" (the option's own label) and any other spelling used to run as inline tubing.
+  if (mode !== "inline" && mode !== "point") return { error: "Mode must be inline or point." };
+  if (mode === "point" && !Number.isInteger(Number(emitter_count))) return { error: "Emitter count is a whole number." };
   if (!(emitter_gph > 0)) return { error: "Per-emitter flow must be positive (gph)." };
   if (!(valve_gpm > 0)) return { error: "Valve flow limit must be positive (gpm)." };
   let emitters;
@@ -2617,6 +2641,8 @@ AGRICULTURE_RENDERERS["sod-takeoff"] = renderSodTakeoff;
 // dims: in { W_lb: M, M_wet_pct: dimensionless, M_dry_pct: dimensionless, handling: dimensionless, tw_lbbu: M } out: { W_dry_lb: M, W_net_lb: M, bushels: dimensionless, moist_shrink_pct: dimensionless, total_shrink_pct: dimensionless }
 export function computeGrainShrinkMoisture({ W_lb = 0, M_wet_pct = 0, M_dry_pct = 0, handling = 0.5, tw_lbbu = 56 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(Number(handling) >= 0 && Number(handling) <= 5)) return { error: "Handling shrink is a percent between 0 and 5 (0.5 is typical)." };
+  if (!(Number(M_dry_pct) > 1) || !(Number(M_wet_pct) > 1)) return { error: "Enter both moistures as percents (20 and 15, not 0.20 and 0.15)." };
   const W = Number(W_lb) || 0;
   const Mw = Number(M_wet_pct) || 0;
   const Md = Number(M_dry_pct) || 0;
@@ -2725,6 +2751,8 @@ AGRICULTURE_RENDERERS["livestock-dry-matter-intake"] = renderLivestockDryMatterI
 // dims: in { crop_need: dimensionless, total_nutr: dimensionless, availability: dimensionless } out: { available_per_unit: dimensionless, rate: dimensionless, applied_nutrient: dimensionless }
 export function computeManureApplicationRate({ crop_need = 0, total_nutr = 0, availability = 0, form = "solid" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (Number(availability) > 0 && Number(availability) <= 1) return { error: "Enter availability as a percent (50 for 50%), not a fraction." };
+  if (form !== "solid" && form !== "liquid") return { error: "Form must be solid or liquid." };
   const need = Number(crop_need) || 0;
   const total = Number(total_nutr) || 0;
   const avail = Number(availability) || 0;

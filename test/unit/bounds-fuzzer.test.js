@@ -60674,3 +60674,43 @@ test("hardening slice 15 (restoration, water): the reviewed defects stay fixed",
   near(fc.cut_line_lf, 120, 1e-9); near(fc.baseboard_lf, 120, 1e-9);
   err(_s15R.computeFloodCutTakeoff({ wall_perimeter_ft: 60, removed_faces: 7 }));
 });
+
+// Hardening slice 16 (2026-10-11): cross-trade and agriculture, 80 calculators re-derived and run
+// by independent reviewers. One assertion per confirmed defect.
+import * as _s16A from "../../calc-agriculture.js";
+import * as _s16C from "../../calc-cross.js";
+
+test("hardening slice 16 (cross-trade, agriculture): the reviewed defects stay fixed", () => {
+  const near = (a, b, tol) => assert.ok(Math.abs(a - b) <= tol, a + " vs " + b);
+  const err = (r) => assert.ok(r && typeof r.error === "string", JSON.stringify(r).slice(0, 120));
+  // A blank label interval is not CLEAR.
+  err(_s16A.computePesticideReiPhi({}));
+  err(_s16A.computePesticideReiPhi({ rei_hours: "abc", phi_days: 7, hours_since_application: 1, days_since_application: 1 }));
+  // Blank readings are not 0.
+  assert.ok(/no storage verdict/.test(_s16A.computeHayDryMatter({ bale_weight_lb: 1200 }).flag));
+  err(_s16A.computeTHI({ temperature: 95, rh_percent: null, animal: "dairy-cow" }));
+  err(_s16C.computeHeatStress({ T_F: 100 }));
+  err(_s16C.computeBeltHpTransmitted({ tight_side_tension_lb: 250, slack_side_tension_lb: null, sheave_diameter_in: 6, sheave_rpm: 1750 }));
+  err(_s16C.computeNIOSHLifting({ weight_lb: 20, H_in: 12, V_in: 20, D_in: 20, frequency_per_min: 5, duration_hr: 0 }));
+  // Unknown options.
+  err(_s16A.computeSprayDriftBuffer({ droplet_class: "very_fine", wind_mph: 10 }));
+  err(_s16A.computeDripZoneFlow({ mode: "point-source", emitter_count: 2000, emitter_gph: 0.9, valve_gpm: 12 }));
+  err(_s16A.computeTwoStrokeMix({ ratio: 50, fuel_amount: 5, fuel_unit: "liters" }));
+  err(_s16A.computeTwoStrokeMixRatioCheck({ fuel_amount: 5, fuel_unit: "liters", oil_amount: 100, target_ratio: 50 }));
+  err(_s16A.computeGrowingDegreeDays({ days_series: [{ tmax: 70, tmin: 40 }], method: "Modified" }));
+  err(_s16A.computeLivestockWaterRequirement({ method: "Intake", head: 50, temp_f: 80, t_low_f: 40, gal_low: 8, t_high_f: 90, gal_high: 20 }));
+  err(_s16A.computeManureApplicationRate({ crop_need: 150, total_nutr: 10, availability: 0.5 }));
+  err(_s16C.computeTankVolume({ orientation: "Vertical", diameter: 24, length: 48, depth: 30 }));
+  err(_s16C.computeTankVolume({ linear_unit: "feet", diameter: 2, length: 4, depth: 1 }));
+  err(_s16C.computeCrossConnectionAirGap({ opening_in: 1, measured_in: 2, near_wall: "on" }));
+  assert.strictEqual(_s16C.computeCrossConnectionAirGap({ opening_in: 1, measured_in: 2, near_wall: 1 }).passes, false);
+  // Wrong numbers.
+  near(_s16A.computeGrowingDegreeDays({ days_series: [{ tmax: 98, tmin: 90 }], base_f: 50, cutoff_f: 86 }).accumulated_gdd ?? _s16A.computeGrowingDegreeDays({ days_series: [{ tmax: 98, tmin: 90 }], base_f: 50, cutoff_f: 86 }).total_gdd, 36, 1e-9);
+  err(_s16A.computeLivestockWaterRequirement({ method: "table", head: 50, temp_f: 0, t_low_f: 40, gal_low: 8, t_high_f: 90, gal_high: 20 }));
+  err(_s16C.computeBeltCenterDistance({ large_pitch_diameter_in: 10, small_pitch_diameter_in: 4, belt_pitch_length_in: 36 }));
+  err(_s16A.computeGrainShrinkMoisture({ W_lb: 10000, M_wet_pct: 20, M_dry_pct: 15, handling: 99 }));
+  err(_s16C.computeRainwaterYield({ catchment_ft2: 1000, annual_in: 30, efficiency: 85 }));
+  err(_s16C.computeLoanPayment({ principal: 10000, apr_percent: -5, term_months: 12 }));
+  err(_s16C.computeUpgradeROI({ incremental_cost: 10000, annual_savings: 1000, discount_rate_percent: -100, years: 10 }));
+  err(_s16C.computeUpgradeROI({ incremental_cost: 10000, annual_savings: 1000, years: 1e8 }));
+});

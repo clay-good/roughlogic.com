@@ -1465,7 +1465,7 @@ cross-check.
 | calc-agriculture.js | `computeSprinklerGpmForPrecip` | `{ target_precip_in_hr = 0, zone_ft2 = 0 } = {}` | _ | _ | _ |
 | calc-agriculture.js | `computeSprinklerPrecipRate` | `{ zone_gpm = 0, zone_ft2 = 0 } = {}` | _ | _ | _ |
 | calc-agriculture.js | `computeStockingRate` | `{ area_acres = 0, forage_lb_per_acre = 0, utilization_pct = 40, animal_class ...` | _ | _ | _ |
-| calc-agriculture.js | `computeTHI` | `{ temperature = 0, unit = "F", rh_percent = 0, animal = "dairy-cow", ventilat...` | _ | _ | _ |
+| calc-agriculture.js | `computeTHI` | `{ temperature = null, unit = "F", rh_percent = null, animal = "dairy-cow", ve...` | _ | _ | _ |
 | calc-agriculture.js | `computeTankMix` | `{ tank_gal = 0, spray_volume_gpa = 0, product_rate_per_acre = 0, product_unit...` | _ | _ | _ |
 | calc-agriculture.js | `computeTimberCruise` | `{ small_end_dib_in = 0, log_length_ft = 16, rule = "doyle", price_per_bf = 0 }` | _ | _ | _ |
 | calc-agriculture.js | `computeTwoStrokeMix` | `{ ratio = 50, fuel_amount = 0, fuel_unit = "gallon" } = {}` | _ | _ | _ |

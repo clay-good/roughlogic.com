@@ -593,6 +593,8 @@ export function renderTipOut(inputRegion, outputRegion, citationEl) {
 // dims: in { principal: dimensionless, apr_percent: dimensionless, term_months: T } out: { payment: dimensionless, total_interest: dimensionless }
 export function computeLoanPayment({ principal, apr_percent, term_months }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(Number(apr_percent) >= 0 && Number(apr_percent) <= 100)) return { error: "APR must be between 0 and 100 percent." };
+  if (!Number.isInteger(Number(term_months))) return { error: "Term is a whole number of months." };
   const P = Number(principal) || 0;
   const apr = Number(apr_percent) || 0;
   const n = Math.floor(Number(term_months) || 0);
@@ -625,6 +627,8 @@ export const loanPaymentExample = {
 // dims: in { incremental_cost: dimensionless, annual_savings: dimensionless, discount_rate_percent: dimensionless, years: T } out: { npv: dimensionless, payback_years: T, irr: dimensionless }
 export function computeUpgradeROI({ incremental_cost, annual_savings, discount_rate_percent = 0, years = 10 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(Number(discount_rate_percent) > -100)) return { error: "The discount rate must be above -100%." };
+  if (Number(years) > 200) return { error: "The analysis period cannot exceed 200 years." };
   const C = Number(incremental_cost) || 0;
   const S = Number(annual_savings) || 0;
   const d = (Number(discount_rate_percent) || 0) / 100;
@@ -1228,6 +1232,7 @@ export function computeNIOSHLifting({
   asymmetry_deg = 0, frequency_per_min = 1, duration_hr = 1, coupling = "good",
 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(Number(duration_hr) > 0)) return { error: "Enter the lifting duration (hours); the frequency multiplier depends on it." };
   if (!(weight_lb >= 0)) return { error: "Weight must be non-negative." };
   if (!(H_in >= 10 && H_in <= 25)) return { error: "Horizontal distance must be 10-25 in." };
   if (!(V_in >= 0 && V_in <= 70)) return { error: "Vertical lift origin must be 0-70 in." };
@@ -1267,6 +1272,8 @@ export const nioshLiftingExample = {
 
 // dims: in { T_F: T, RH_percent: dimensionless, solar: dimensionless } out: { heat_index_F: T, band: dimensionless }
 export function computeHeatStress({ T_F = 0, RH_percent = 0, solar = false }) {
+  if ([arguments[0]?.T_F, arguments[0]?.RH_percent].some((x) => x === undefined || x === null || x === "")) return { error: "Enter the air temperature (F) and the relative humidity (%)." };
+  if (!(Number(RH_percent) >= 0 && Number(RH_percent) <= 100)) return { error: "Relative humidity is between 0 and 100%." };
   T_F = Number(T_F);
   if (!(T_F >= -50 && T_F <= 200)) return { error: "Temperature out of range." };
   if (!(RH_percent >= 0 && RH_percent <= 100)) return { error: "RH must be 0-100." };
@@ -1417,6 +1424,8 @@ export const rampSlopeExample = { inputs: { rise_in: 6, run_in: 72 } };
 // dims: in { catchment_ft2: L^2, monthly_in: L, annual_in: L, efficiency: dimensionless } out: { gallons: L^3 }
 export function computeRainwaterYield({ catchment_ft2 = 0, monthly_in = [], annual_in = null, efficiency = 0.85 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (efficiency === null || efficiency === "" || !(Number(efficiency) > 0 && Number(efficiency) <= 1)) return { error: "Collection efficiency is a fraction over 0 and at most 1 (0.85, not 85)." };
+  if (Array.isArray(monthly_in) && monthly_in.some((x) => Number(x) < 0)) return { error: "Monthly rainfall cannot be negative (in)." };
   // Until 2026-09-26 a negative entry here returned a negative quantity with no error.
   if (["catchment_ft2", "annual_in", "efficiency"].some((k) => Number(arguments[0]?.[k]) < 0)) return { error: "Catchment area, rainfall, and efficiency cannot be negative." };
   if (!(catchment_ft2 > 0)) return { error: "Catchment area must be positive." };
@@ -2566,6 +2575,8 @@ export function computeBeltCenterDistance({ large_pitch_diameter_in = 0, small_p
   if (disc < 0) return { error: "No real center distance: the belt is too short for this pair of sheaves. Use the next longer standard belt." };
   const center_distance_in = (A + Math.sqrt(disc)) / 4;
   if (!(center_distance_in > 0)) return { error: "Center-distance math is not a finite value; check the inputs." };
+  // The sheaves have to clear each other.
+  if (center_distance_in <= (a + b) / 2) return { error: "This belt is too short: at the center distance it gives, the two sheaves would overlap. Use a longer belt." };
   const sinHalf = (D - d) / (2 * center_distance_in);
   const half_deg = Math.asin(Math.min(1, Math.max(-1, sinHalf))) * 180 / Math.PI;
   const wrap_small_deg = 180 - 2 * half_deg;
@@ -2610,6 +2621,7 @@ CROSS_RENDERERS["belt-center-distance"] = renderBeltCenterDistance;
 // dims: in { tight_side_tension_lb: M L T^-2, slack_side_tension_lb: M L T^-2, sheave_diameter_in: L, sheave_rpm: T^-1 } out: { belt_speed_fpm: L T^-1, effective_tension_lb: M L T^-2, power_hp: M L^2 T^-3 }
 export function computeBeltHpTransmitted({ tight_side_tension_lb = 0, slack_side_tension_lb = 0, sheave_diameter_in = 0, sheave_rpm = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(Number(tight_side_tension_lb) > 0) || slack_side_tension_lb === null || slack_side_tension_lb === "" || !(Number(slack_side_tension_lb) > 0)) return { error: "Enter both the tight-side and slack-side belt tensions (lb); a running belt has no zero-tension side." };
   const T1 = Number(tight_side_tension_lb) || 0;
   const T2 = Number(slack_side_tension_lb) || 0;
   const D = Number(sheave_diameter_in) || 0;
@@ -2852,6 +2864,8 @@ CROSS_RENDERERS["rolling-offset"] = renderRollingOffset;
 // dims: in { orientation: dimensionless, linear_unit: dimensionless, diameter: L, length: L, depth: L } out: { volume_gal: L^3, full_gal: L^3, percent_full: dimensionless }
 export function computeTankVolume({ orientation = "horizontal", linear_unit = "in", diameter = 0, length = 0, depth = 0 } = {}) {
   const _g = _finiteGuard({ diameter, length, depth }); if (_g) return _g;
+  if (orientation !== "horizontal" && orientation !== "vertical") return { error: "Orientation must be horizontal or vertical." };
+  if (linear_unit !== "in" && linear_unit !== "ft") return { error: "Linear unit must be in or ft." };
   const factor = String(linear_unit) === "ft" ? 12 : 1; // to inches
   const D = (Number(diameter) || 0) * factor;
   const L = (Number(length) || 0) * factor;
@@ -2987,7 +3001,8 @@ export function computeCrossConnectionAirGap({ opening_in = 0, near_wall = false
   // and 2-1/2; 1 in: 2 and 3), then 2x and 3x the opening. Until 2026-09-25 this used 2x / 3x at every
   // size with floors of 1 / 1.5 in and cited 608.15.1 (an earlier edition's numbering), short by up to 0.7 in near a wall.
   const [air_gap_in, air_gap_wall_in] = opening <= 0.5 ? [1, 1.5] : opening <= 0.75 ? [1.5, 2.5] : opening <= 1 ? [2, 3] : [2 * opening, 3 * opening];
-  const wall = near_wall === true || near_wall === "true" || near_wall === "yes"; // a "false" string must not read as near a wall
+  if (![true, false, "true", "false", "yes", "no", 1, 0, "1", "0"].includes(near_wall)) return { error: "near_wall must be yes or no." };
+  const wall = near_wall === true || near_wall === "true" || near_wall === "yes" || near_wall === 1 || near_wall === "1"; // a "false" string must not read as near a wall
   const required_in = wall ? air_gap_wall_in : air_gap_in;
   const passes = measured > 0 ? measured >= required_in - 1e-9 * Math.abs(required_in) : null;
   return {
