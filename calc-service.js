@@ -98,11 +98,14 @@ function renderGasApplianceDemand(inputRegion, outputRegion, citationEl) {
     for (const raw of String(text).split("\n")) {
       const line = raw.trim();
       if (!line) continue;
-      const parts = line.split(",");
-      const num = Number(parts[parts.length - 1].trim());
+      // The number may carry thousands separators ("furnace,100,000"), which a plain split on
+      // commas read as a 0 BTU/hr appliance named "furnace,100".
+      const m = /^(?:(.*?),\s*)?(\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+(?:\.\d+)?)\s*$/.exec(line);
+      if (!m) return null;
+      const num = Number(m[2].replace(/,/g, ""));
       if (!Number.isFinite(num)) return null;
       vals.push(num);
-      labels.push(parts.length > 1 ? parts.slice(0, -1).join(",").trim() : "appliance " + vals.length);
+      labels.push(m[1] ? m[1].trim() : "appliance " + vals.length);
     }
     return { vals, labels };
   }
@@ -738,7 +741,7 @@ function renderVfdEnergySavings(inputRegion, outputRegion, citationEl) {
   const oUsd = makeOutputLine(outputRegion, "Dollars saved", "vfd-out-usd");
   const oNote = makeOutputLine(outputRegion, "Note", "vfd-out-note");
   const update = debounce(() => {
-    const r = computeVfdEnergySavings({ full_load_kw: Number(kw.input.value) || 0, frac_a: Number(fa.input.value) || 0, hours_a: Number(ha.input.value) || 0, frac_b: Number(fb.input.value) || 0, hours_b: Number(hb.input.value) || 0, frac_c: Number(fc.input.value) || 0, hours_c: Number(hc.input.value) || 0, rate_kwh: Number(rate.input.value) || 0 });
+    const r = computeVfdEnergySavings({ full_load_kw: Number(kw.input.value) || 0, frac_a: fa.input.value === "" ? 1 : Number(fa.input.value), hours_a: Number(ha.input.value) || 0, frac_b: fb.input.value === "" ? 0.75 : Number(fb.input.value), hours_b: Number(hb.input.value) || 0, frac_c: fc.input.value === "" ? 0.5 : Number(fc.input.value), hours_c: Number(hc.input.value) || 0, rate_kwh: Number(rate.input.value) || 0 });
     if (r.error) { oFull.textContent = r.error; oVfd.textContent = "-"; oSaved.textContent = "-"; oUsd.textContent = "-"; oNote.textContent = ""; return; }
     oFull.textContent = fmt(r.full_kwh, 0) + " kWh/yr";
     oVfd.textContent = fmt(r.vfd_kwh, 0) + " kWh/yr";

@@ -562,7 +562,10 @@ export function computeMiredGelShift({ source_k = 3200, target_k = 5600, applied
   const source_mired = 1e6 / source_k;
   const target_mired = 1e6 / target_k;
   const shift_needed = target_mired - source_mired;
-  const nearest = MIRED_CORRECTIONS.reduce((a, b) => (Math.abs(b.shift - shift_needed) < Math.abs(a.shift - shift_needed) ? b : a));
+  // "No gel" is a candidate too: for a shift smaller than half the lightest filter, any sheet
+  // lands further from the target than the bare source does (3,200 to 3,170 K used to be handed
+  // an Eighth CTB, the wrong direction and 15 mireds off where no gel is 3 off).
+  const nearest = [{ name: "no gel (the shift is smaller than the lightest filter corrects)", shift: 0 }, ...MIRED_CORRECTIONS].reduce((a, b) => (Math.abs(b.shift - shift_needed) < Math.abs(a.shift - shift_needed) ? b : a));
   const nearest_error = shift_needed - nearest.shift;
   const effective_shift = applied_shift !== 0 ? applied_shift : nearest.shift;
   const applied_mired = source_mired + effective_shift;

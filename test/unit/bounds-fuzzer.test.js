@@ -61150,3 +61150,19 @@ test("hardening slice 29 (second pass: classroom statistics)", async () => {
   assert.ok(ED.computeConfidenceInterval({ mode: "mean", n: 36, mean: 50, sd: 6, confidence_pct: 94.6 }).error);
   assert.ok(ED.computeBellCurve({ raw_score: "", mean: 75, sd: 10 }).error);
 });
+
+test("hardening slice 30 (second pass: gel selection, frac-out limits)", async () => {
+  const SP = await import("../../calc-stageproduction.js");
+  const TR = await import("../../calc-trenchless.js");
+  // a 3 mired need is closer to no gel than to the lightest filter
+  const g = SP.computeMiredGelShift({ source_k: 3200, target_k: 3170 });
+  assert.equal(g.nearest_shift, 0);
+  assert.notEqual(SP.computeMiredGelShift({ source_k: 3200, target_k: 5600 }).nearest_shift, 0);
+  // the density limit holds the factor of safety at BOTH stations
+  const inp = { cover_depth_ft: 30, shallow_cover_ft: 8, soil_unit_weight_pcf: 120, soil_cohesion_psf: 600, fluid_density_ppg: 9.5, annular_friction_psi: 0, required_fs: 1.5 };
+  const h = TR.computeHddAnnularPressure(inp);
+  const at = TR.computeHddAnnularPressure({ ...inp, fluid_density_ppg: h.max_fluid_density_ppg });
+  assert.ok(!at.error && at.shallow_ok !== false, JSON.stringify(at.verdict));
+  assert.match(at.verdict, /both stations hold/);
+  assert.match(TR.computeHddAnnularPressure({ ...inp, fluid_density_ppg: 20 }).verdict, /^BOTH stations are below/);
+});

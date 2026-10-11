@@ -244,7 +244,11 @@ export function computeHddAnnularPressure({ cover_depth_ft = 0, shallow_cover_ft
   // The maximum fluid density that holds the required factor of safety at the
   // SHALLOW station, which is where the margin is thinnest.
   const allowed_pressure_psi = shallow.limiting_psi / required_fs;
-  const max_fluid_density_ppg = (allowed_pressure_psi - annular_friction_psi) / (_PSI_PER_FT_PER_PPG * shallow_cover_ft);
+  // ...unless cohesion makes the DEEP station the one with less margin: the density has to hold
+  // the factor of safety at both, so the lower of the two limits is the limit.
+  const max_fluid_density_ppg = Math.min(
+    (allowed_pressure_psi - annular_friction_psi) / (_PSI_PER_FT_PER_PPG * shallow_cover_ft),
+    (deep.limiting_psi / required_fs - annular_friction_psi) / (_PSI_PER_FT_PER_PPG * cover_depth_ft));
   const max_friction_psi = allowed_pressure_psi - shallow.hydrostatic_psi;
   const shallow_holds = shallow.factor_of_safety >= required_fs - 1e-9 * Math.abs(required_fs);
   const deep_holds = deep.factor_of_safety >= required_fs - 1e-9 * Math.abs(required_fs);
@@ -268,6 +272,8 @@ export function computeHddAnnularPressure({ cover_depth_ft = 0, shallow_cover_ft
     governing_station: governs_deep ? "the deep station" : "the shallow station",
     verdict: shallow_holds && deep_holds
       ? "both stations hold the required factor of safety (the " + (governs_deep ? "deep" : "shallow") + " one is lower)"
+      : !shallow_holds && !deep_holds
+        ? "BOTH stations are below the required factor of safety, the " + (governs_deep ? "DEEP" : "SHALLOW") + " one by more (" + fmt(deep.factor_of_safety, 2) + " deep, " + fmt(shallow.factor_of_safety, 2) + " shallow)"
       : !shallow_holds
         ? "the SHALLOW station is below the required factor of safety -- that is where a frac-out starts, not at the deepest point under the crossing"
         : "the DEEP station is below the required factor of safety -- the shallow station holds, but the bore pressure under the crossing exceeds what the cover resists",
