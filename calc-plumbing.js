@@ -305,6 +305,8 @@ export const pipeVolumeExample = {
 // dims: in { flow_gpm: L^3 T^-1, total_dynamic_head_ft: L, efficiency: dimensionless, fluid_specific_gravity: dimensionless } out: { brake_hp: M L^2 T^-3, motor_hp: M L^2 T^-3 }
 export function computePumpSize({ flow_gpm, total_dynamic_head_ft, efficiency = 0.65, fluid_specific_gravity = 1 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(Number(flow_gpm) > 0) || !(Number(total_dynamic_head_ft) > 0)) return { error: "Flow (gpm) and total dynamic head (ft) must be positive." };
+  if (Number(efficiency) > 1 || Number(efficiency) < 0) return { error: "Pump efficiency is a fraction between 0 and 1 (0.65, not 65)." };
   if ([fluid_specific_gravity].some((x) => Number(x) < 0)) return { error: "Fluid specific gravity cannot be negative." };
   // Hydraulic horsepower: HP_h = (Q * H * SG) / 3960.  Pump shaft hp = HP_h / efficiency.
   const hp_h = (flow_gpm * total_dynamic_head_ft * fluid_specific_gravity) / 3960;
@@ -657,6 +659,7 @@ export function computeRecircPumpHead({
   equivalent_length_per_fitting_ft = 2,
 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (Number(arguments[0]?.fittings_count) < 0 || (arguments[0]?.fittings_count !== undefined && !Number.isFinite(Number(arguments[0].fittings_count)))) return { error: "Fittings count must be a number, zero or more." };
   const d = Number(internal_diameter_in) || 0;
   const L = Number(pipe_length_ft) || 0;
   const Q = Number(target_flow_gpm) || 0;
@@ -1070,6 +1073,9 @@ export const stormwaterMaxDrainageAreaExample = {
 // dims: in { working_pressure_psi: M L^-1 T^-2, system_volume_gal: L^3, material: dimensionless, multiplier: dimensionless } out: { test_pressure_psi: M L^-1 T^-2, hold_minutes: T }
 export function computeHydrostaticTest({ working_pressure_psi = 0, system_volume_gal = 0, material = "water", multiplier = null }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Anything that was not exactly "fuel_gas" used to be water, losing the 3 psig floor.
+  if (material !== "water" && material !== "fuel_gas") return { error: "Material must be water or fuel_gas." };
+  if (multiplier !== null && multiplier !== undefined && multiplier !== "" && Number(multiplier) > 0 && Number(multiplier) < (material === "fuel_gas" ? 1.5 : 1)) return { error: material === "fuel_gas" ? "A fuel-gas test is at least 1.5 times the working pressure (IFGC 406.4.1)." : "A test pressure cannot be below the working pressure." };
   if (!(working_pressure_psi > 0)) return { error: "Working pressure must be positive." };
   if (!(system_volume_gal >= 0)) return { error: "System volume must be non-negative." };
   // Default multipliers per public engineering practice.
@@ -1191,7 +1197,9 @@ export function computeGlycolMix({ system_volume_gal = 0, target_burst_F = 32, g
   // Find smallest percent whose freeze_F <= target.
   let percent = null;
   for (let i = 0; i < curve.length - 1; i++) {
-    if (curve[i].freeze_F >= target_burst_F && curve[i + 1].freeze_F < target_burst_F) {
+    // `<=` on the lower row: an exact match on the last (coldest) row used to fall through to the
+    // first row's 0% glycol.
+    if (curve[i].freeze_F >= target_burst_F && curve[i + 1].freeze_F <= target_burst_F) {
       // interpolate
       const a = curve[i], b = curve[i + 1];
       const t = (a.freeze_F - target_burst_F) / (a.freeze_F - b.freeze_F);
@@ -1264,6 +1272,8 @@ function rhoAt(F) {
 // dims: in { system_volume_gal: L^3, fill_temperature_F: T, max_temperature_F: T, fill_pressure_psi: M L^-1 T^-2, relief_pressure_psi: M L^-1 T^-2 } out: { tank_gal: L^3 }
 export function computeExpansionTank({ system_volume_gal = 0, fill_temperature_F = 60, max_temperature_F = 200, fill_pressure_psi = 12, relief_pressure_psi = 30 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (fill_pressure_psi === null || fill_pressure_psi === "") fill_pressure_psi = 12;
+  relief_pressure_psi = Number(relief_pressure_psi);
   fill_pressure_psi = Number(fill_pressure_psi);
   if (!(system_volume_gal > 0)) return { error: "System volume must be positive." };
   if (!(max_temperature_F > fill_temperature_F)) return { error: "Max temperature must exceed fill temperature." };
@@ -1807,7 +1817,7 @@ function _v7p_renderWaterHammer(inputRegion, outputRegion, citationEl) {
     const r = computeWaterHammerSurge({
       material: mat.select.value, pipe_size: sz.select.value,
       velocity_fps: Number(v.input.value) || 0, closure_time_s: Number(tc.input.value) || 0,
-      run_length_ft: Number(len.input.value) || 1, fluid: fluid.select.value,
+      run_length_ft: Number(len.input.value) || 0, fluid: fluid.select.value,
     });
     if (r.error) { oC.textContent = r.error; oS.textContent = "-"; oR.textContent = "-"; oF.textContent = "-"; return; }
     oC.textContent = _v7p_fmt(r.celerity_fps, 0) + " fps";
@@ -2074,6 +2084,10 @@ export function computeRecircLoopSizing({
   // ladder.
   const hyd_hp = (gpm_required * head_ft) / 3960; // ideal hydraulic HP
   const hp_required = hyd_hp / 0.25;
+  // Past the top of the circulator ladder there is no size to recommend: until 2026-10-10 a loop
+  // needing 6 hp was told 1/4 hp.
+  if (!Number.isFinite(hp_required)) return { error: "Loop sizing did not produce a finite pump requirement; check the temperature drop and insulation inputs." };
+  if (hp_required > RECIRC_PUMP_LADDER_HP[RECIRC_PUMP_LADDER_HP.length - 1] * (1 + 1e-9)) return { error: "This loop needs about " + hp_required.toFixed(1) + " hp at " + head_ft.toFixed(0) + " ft of head, far past a recirculation circulator: the pipe is too small or the allowed temperature drop too tight. Upsize the loop or insulate it." };
   let recommended_hp = RECIRC_PUMP_LADDER_HP[RECIRC_PUMP_LADDER_HP.length - 1];
   for (const h of RECIRC_PUMP_LADDER_HP) { if (h >= hp_required) { recommended_hp = h; break; } }
 
@@ -2633,6 +2647,8 @@ export function computeSanitaryDfu({
   for (const [type, count] of Object.entries(fixtures)) {
     const dfu = SANITARY_DFU_VALUES[type];
     const n = Number(count) || 0;
+    // An unlisted fixture used to be dropped from the total without a word.
+    if (dfu == null && n > 0) return { error: "Unknown fixture type '" + type + "'. Use one of: " + Object.keys(SANITARY_DFU_VALUES).join(", ") + "." };
     if (dfu != null && n > 0) total_dfu += dfu * n;
   }
   if (!(total_dfu > 0)) return { error: "Enter at least one fixture count." };
@@ -2827,6 +2843,7 @@ export function computeTrapPrimer({
     warnings.push("Manual priming is not one of the trap-seal protection methods of IPC 2021 §1002.4.1 (a potable-water or reclaimed-water primer valve, a wastewater-supplied primer device, an ASSE 1072 barrier device, or a lavatory or hand-sink drain connection); a floor drain whose seal is subject to evaporation needs one of them.");
   }
   if (zone === "parking" && prime_method === "manual") {
+    compliant = false;
     warnings.push("Parking-structure drains evaporate seasonally, and manual priming is not an IPC 1002.4.1 method; where the seal is subject to evaporation, use one of the listed methods.");
   }
   if (ozPerCycle <= 0) warnings.push("Enter the primer delivery volume per cycle (manufacturer cut sheet) to estimate annual water use.");
@@ -2933,6 +2950,7 @@ export function computeBackflowSizing({
   min_residual_psi = 20,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (arguments[0]?.hazard !== undefined && arguments[0].hazard !== "high" && arguments[0].hazard !== "low") return { error: "Hazard must be high or low." };
   const flow = Number(service_flow_gpm);
   const up = Number(upstream_pressure_psi);
   const minRes = Number.isFinite(Number(min_residual_psi)) ? Number(min_residual_psi) : 20;
@@ -3310,6 +3328,7 @@ PLUMBING_RENDERERS["vent-sizing-stack"] = renderVentSizingStack;
 // dims: in { hot_temp_F: T, cold_temp_F: T, hot_gpm: L^3 T^-1, cold_gpm: L^3 T^-1, target_temp_F: T } out: { blend_temp_F: T, percent_hot: dimensionless, hot_fraction: dimensionless, hot_cold_ratio: dimensionless, hot_gpm: L^3 T^-1 }
 export function computeMixedWaterTemp({ mode = "find-blend", hot_temp_F = 0, cold_temp_F = 0, hot_gpm = 0, cold_gpm = 0, target_temp_F = 0 } = {}) {
   const _g = _finiteGuard({ hot_temp_F, cold_temp_F, hot_gpm, cold_gpm, target_temp_F }); if (_g) return _g;
+  if (!(Number(hot_temp_F) > 32) || !(Number(cold_temp_F) > 32)) return { error: "Enter the hot and cold supply temperatures (above 32 F)." };
   const Th = Number(hot_temp_F), Tc = Number(cold_temp_F);
   // IPC scald limits: 120 F for shower and tub-shower valves (424.3) and tub
   // fillers (424.5); 110 F for public hand-washing (416.5, ASSE 1070). Until
@@ -3523,7 +3542,9 @@ export function computePipeVelocity({ mode = "velocity-from-flow", flow_gpm = 0,
   if (!(d > 0)) return { error: "Pipe inside diameter must be positive (in)." };
   const mat = String(material).toLowerCase();
   const svc = String(service).toLowerCase() === "cold" ? "cold" : "hot";
-  const ceilTable = _V26_VELOCITY_CEILING[mat] || _V26_VELOCITY_CEILING.steel;
+  // An unknown material used to take the steel ceiling, the most lenient.
+  if (!Object.hasOwn(_V26_VELOCITY_CEILING, mat)) return { error: "Material must be one of: " + Object.keys(_V26_VELOCITY_CEILING).join(", ") + "." };
+  const ceilTable = _V26_VELOCITY_CEILING[mat];
   const ceiling = ceilTable[svc];
   const K = 0.4085; // v(ft/s) = 0.4085 * gpm / d^2
 
@@ -3621,6 +3642,7 @@ PLUMBING_RENDERERS["pipe-velocity"] = _v26renderPipeVelocity;
 //  flow L^3 T^-1 (GPM). The curve is a piecewise-linear table.)
 export function computeWsfuDemand({ wsfu, system_type = "flush_tank", curve = null } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!curve && system_type !== "flush_tank" && system_type !== "flush_valve") return { error: "System type must be flush_tank or flush_valve." };
   const fu = Number(wsfu);
   if (!Number.isFinite(fu) || fu < 0) return { error: "WSFU must be a non-negative finite number." };
   const c = curve || (system_type === "flush_valve" ? WSFU_FLUSH_VALVE : WSFU_FLUSH_TANK);
@@ -3684,6 +3706,8 @@ PLUMBING_RENDERERS["wsfu-demand"] = renderWsfuDemand;
 //  L to a pressure.)
 export function computeSupplyPressureBudget({ street_pressure, fixture_height = 0, meter_loss = 0, bfp_loss = 0, friction_loss = 0, fixture_min = 8 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if ([meter_loss, bfp_loss, friction_loss].some((x) => Number(x) < 0)) return { error: "Losses cannot be negative (psi)." };
+  if (fixture_min === null || fixture_min === "") fixture_min = 8;
   const street = Number(street_pressure) || 0;
   const height = Number(fixture_height) || 0;
   const meter = Number(meter_loss) || 0;
@@ -3826,6 +3850,9 @@ PLUMBING_RENDERERS["water-heater-storage-sizing"] = renderWaterHeaterStorageSizi
 // dims: in { invert_in_ft: L, slope: dimensionless, slope_units: dimensionless, run_ft: L, pipe_od_in: L, surface_out_ft: L, min_cover_ft: L } out: { slope_ftft: dimensionless, total_fall_ft: L, invert_out_ft: L, top_of_pipe_ft: L, cover_out_ft: L, cover_flag: dimensionless }
 export function computeDrainageInvert({ invert_in_ft = 0, slope = 0, slope_units = "in_per_ft", run_ft = 0, pipe_od_in = 0, surface_out_ft = null, min_cover_ft = null }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (slope_units !== "in_per_ft" && slope_units !== "percent") return { error: "Slope units must be in_per_ft or percent." };
+  if (Number(pipe_od_in) < 0) return { error: "Pipe outside diameter cannot be negative (in)." };
+  if (min_cover_ft !== null && Number(min_cover_ft) < 0) return { error: "Minimum cover cannot be negative (ft)." };
   if (!(run_ft > 0)) return { error: "Run length must be positive." };
   if (!(slope >= 0)) return { error: "Slope must be non-negative." };
   const slope_ftft = slope_units === "percent" ? slope / 100 : slope / 12;
@@ -3957,6 +3984,7 @@ PLUMBING_RENDERERS["radiant-loop-sizing"] = renderRadiantLoopSizing;
 // dims: in { l_ft: L, s_slope: dimensionless } out: { tc_min: T, tc_hr: T }
 export function computeTimeOfConcentration({ l_ft = 0, s_slope = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (Number(s_slope) > 1) return { error: "Slope is in ft/ft (0.02 for 2%); a value over 1 is outside the Kirpich relation." };
   if (!(l_ft > 0)) return { error: "Flow-path length must be positive (ft)." };
   if (!(s_slope > 0)) return { error: "Slope must be positive (ft/ft)." };
   const tc_min = 0.0078 * Math.pow(l_ft, 0.77) * Math.pow(s_slope, -0.385);
@@ -3989,6 +4017,7 @@ PLUMBING_RENDERERS["time-of-concentration"] = _v302renderTimeOfConcentration;
 // dims: in { d_in: L, h_ft: L, cd: dimensionless } out: { a_ft2: L^2, q_cfs: L^3 T^-1, q_gpm: L^3 T^-1 }
 export function computeOrificeFlow({ d_in = 0, h_ft = 0, cd = 0.60 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (Number(d_in) > 0 && Number(h_ft) > 0 && Number(h_ft) < Number(d_in) / 24) return { error: "The head to the orifice center is less than its radius: the opening is not submerged and flows as a weir, not an orifice." };
   if (!(d_in > 0)) return { error: "Orifice diameter must be positive (in)." };
   if (!(h_ft > 0)) return { error: "Head must be positive (ft)." };
   if (!(cd > 0)) return { error: "The discharge coefficient must be positive (~0.6 sharp-edged)." };
@@ -4066,6 +4095,7 @@ PLUMBING_RENDERERS["orifice-diameter-for-flow"] = _v639renderOrificeDiameterForF
 // dims: in { tank_area_ft2: L^2, d_in: L, cd: dimensionless, h1_ft: L, h2_ft: L } out: { a_o_ft2: L^2, t_s: T, t_min: T }
 export function computeTankDrainTime({ tank_area_ft2 = 0, d_in = 0, cd = 0.60, h1_ft = 0, h2_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (Number(tank_area_ft2) > 0 && Math.PI * Math.pow(Number(d_in) / 24, 2) > 0.25 * Number(tank_area_ft2)) return { error: "The orifice is more than a quarter of the tank's plan area; the falling-head relation assumes a small opening." };
   if (!(tank_area_ft2 > 0)) return { error: "Tank cross-section area must be positive (ft^2)." };
   if (!(d_in > 0)) return { error: "Orifice diameter must be positive (in)." };
   if (!(cd > 0)) return { error: "The discharge coefficient must be positive (~0.6 sharp-edged)." };
@@ -4306,6 +4336,7 @@ PLUMBING_RENDERERS["specific-energy"] = _v637renderSpecificEnergy;
 // dims: in { V_fps: L T^-1, rho: M L^-3 } out: { h_v_ft: L, q_psf: M L^-1 T^-2, q_psi: M L^-1 T^-2 }
 export function computeVelocityHead({ V_fps = 0, rho = 1.94 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (Number(rho) < 0) return { error: "Density cannot be negative (slug/ft3)." };
   const V = Number(V_fps) || 0;
   const r = Number(rho) > 0 ? Number(rho) : 1.94;
   if (!(V > 0)) return { error: "Velocity must be positive (ft/s)." };
@@ -4377,6 +4408,7 @@ PLUMBING_RENDERERS["flow-continuity"] = _v372renderFlowContinuity;
 // dims: in { P_psi: M L^-1 T^-2, V_fps: L T^-1, z_ft: L, gamma: M L^-2 T^-2 } out: { h_press_ft: L, h_vel_ft: L, H_ft: L }
 export function computeBernoulliHead({ P_psi = 0, V_fps = 0, z_ft = 0, gamma = 62.4 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(Number(gamma) > 0)) return { error: "Specific weight must be positive (62.4 lb/ft3 for water)." };
   const P = Number(P_psi);
   const V = Number(V_fps) || 0;
   const z = Number(z_ft);
@@ -4567,6 +4599,7 @@ PLUMBING_RENDERERS["stormwater-detention-volume"] = _v428renderStormwaterDetenti
 // dims: in { height_ft: L, margin_psi: M L^-1 T^-2 } out: { fill_psi: M L^-1 T^-2, static_psi: M L^-1 T^-2, top_static_psi: M L^-1 T^-2 }
 export function computeHydronicFillPressure({ height_ft = 0, margin_psi = 4 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (margin_psi === null || margin_psi === "" || !Number.isFinite(Number(margin_psi))) margin_psi = 4;
   const height = Number(height_ft) || 0;
   const margin = Number(margin_psi) || 0;
   if (!(height > 0)) return { error: "Height to the highest point must be positive (ft)." };
@@ -4619,6 +4652,9 @@ PLUMBING_RENDERERS["hydronic-fill-pressure"] = _v452renderHydronicFillPressure;
 // dims: in { bottom_width_ft: L, side_slope_z: dimensionless, depth_ft: L, n: dimensionless, s_slope: dimensionless } out: { area_sf: L^2, velocity_fps: L T^-1, flow_cfs: L^3 T^-1, hyd_radius_ft: L, froude: dimensionless }
 export function computeTrapezoidalChannelFlow({ bottom_width_ft = 0, side_slope_z = 2, depth_ft = 0, n = 0.03, s_slope = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A blank side slope from the page is 0 (a vertical wall) while an omitted one is 2; a blank is
+  // neither, so it is asked for.
+  if (side_slope_z === null || side_slope_z === "") return { error: "Enter the side slope z (horizontal to 1 vertical; 0 for a rectangular channel)." };
   const b = Number(bottom_width_ft);
   const z = Number(side_slope_z);
   const y = Number(depth_ft) || 0;

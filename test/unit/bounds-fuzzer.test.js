@@ -60470,3 +60470,50 @@ test("hardening slice 10 (HVAC, airside, acoustics): the reviewed defects stay f
   // The remedy below sqrt(2) is a softer mount, not a stiffer one.
   assert.ok(!/fix is a stiffer isolator/.test(JSON.stringify(_s10A.computeVibrationIsolation({ rpm: 200, static_deflection_in: 1 }))));
 });
+
+// Hardening slice 11 (2026-10-10): plumbing, plumbing code checks, takeoff and pool, 78 calculators
+// re-derived and run by independent reviewers. One assertion per confirmed defect.
+import * as _s11P from "../../calc-plumbing.js";
+import * as _s11C from "../../calc-plumbingcode.js";
+import * as _s11T from "../../calc-plumbingtakeoff.js";
+import * as _s11L from "../../calc-pool.js";
+
+test("hardening slice 11 (plumbing, code checks, pool): the reviewed defects stay fixed", () => {
+  const near = (a, b, tol) => assert.ok(Math.abs(a - b) <= tol, a + " vs " + b);
+  const err = (r) => assert.ok(r && typeof r.error === "string", JSON.stringify(r).slice(0, 120));
+  // The coldest row of the glycol curve is 60%, not 0%.
+  near(_s11P.computeGlycolMix({ system_volume_gal: 100, target_burst_F: -55, glycol_type: "propylene" }).glycol_percent, 60, 1e-9);
+  // A loop past the circulator ladder is refused instead of told 1/4 hp.
+  err(_s11P.computeRecircLoopSizing({ loop_length_ft: 1500, nominal_size_in: "0.75", insulation_in: 0.5, hot_supply_F: 140, set_point_delta_F: 5 }));
+  assert.strictEqual(_s11P.computeTrapPrimer({ floor_drain_count: 6, zone: "parking", prime_method: "manual" }).compliant, false);
+  err(_s11P.computeSanitaryDfu({ fixtures: { lavatory: 1, toilet: 10 } }));
+  // A reducing valve cannot raise pressure.
+  const ws = _s11C.computeWaterServicePressureCheck({ static_pressure_psi: 30, prv_setpoint_psi: 60, min_fixture_pressure_psi: 40, expansion_control_present: "yes" });
+  assert.strictEqual(ws.delivered_psi, 30); assert.strictEqual(ws.passes, false);
+  err(_s11C.computeWaterServicePressureCheck({ static_pressure_psi: 95, prv_setpoint_psi: 60, has_storage_water_heater: "Yes" }));
+  assert.strictEqual(_s11C.computeVentTerminalCheck({ roof_other_use: "yes", snow_accumulation_in: 90, height_above_roof_in: 84 }).required_height_in, 96);
+  err(_s11C.computeVentTerminalCheck({ roof_other_use: true }));
+  // Unknown options that took the lenient branch.
+  err(_s11P.computeHydrostaticTest({ working_pressure_psi: 0.5, material: "gas" }));
+  err(_s11P.computeHydrostaticTest({ working_pressure_psi: 100, material: "fuel_gas", multiplier: 1.1 }));
+  err(_s11P.computeDrainageInvert({ invert_in_ft: 100, slope: 2, slope_units: "pct", run_ft: 80, pipe_od_in: 4.5 }));
+  err(_s11P.computeBackflowSizing({ service_flow_gpm: 100, hazard: "High", assembly_type: "DC", pipe_size_in: "2", upstream_pressure_psi: 70 }));
+  err(_s11P.computePipeVelocity({ flow_gpm: 10, diameter_in: 0.785, material: "brass" }));
+  err(_s11P.computeWsfuDemand({ wsfu: 50, system_type: "flushvalve" }));
+  // Blank, negative and impossible inputs.
+  err(_s11P.computePumpSize({ flow_gpm: 100, total_dynamic_head_ft: 80, efficiency: 65 }));
+  err(_s11P.computePumpSize({}));
+  near(_s11P.computeExpansionTank({ system_volume_gal: 100, fill_pressure_psi: null }).tank_volume_gal ?? 0, _s11P.computeExpansionTank({ system_volume_gal: 100 }).tank_volume_gal ?? 1, 1e-9);
+  err(_s11P.computeSupplyPressureBudget({ street_pressure: 40, fixture_height: 30, meter_loss: -20, friction_loss: 12, fixture_min: 20 }));
+  err(_s11P.computeMixedWaterTemp({ cold_temp_F: 60, hot_gpm: 1, cold_gpm: 1 }));
+  err(_s11P.computeTrapezoidalChannelFlow({ bottom_width_ft: 10, side_slope_z: null, depth_ft: 3, n: 0.03, s_slope: 0.001 }));
+  err(_s11P.computeBernoulliHead({ P_psi: 30, V_fps: 5, z_ft: 10, gamma: -5 }));
+  err(_s11P.computeVelocityHead({ V_fps: 10, rho: -1 }));
+  err(_s11P.computeOrificeFlow({ d_in: 24, h_ft: 0.5 }));
+  err(_s11P.computeTankDrainTime({ tank_area_ft2: 0.1, d_in: 12, h1_ft: 9, h2_ft: 0 }));
+  err(_s11P.computeTimeOfConcentration({ l_ft: 1000, s_slope: 2 }));
+  err(_s11T.computePexHomerunTakeoff({ fixtures: 8.5, hot_fixtures: 5.5 }));
+  err(_s11L.computePoolPumpSpeedSavings({ pump_hp: 2, full_speed_hours: 30, speed_fraction: 0.5, rate_per_kwh: 0.16 }));
+  assert.strictEqual(_s11L.computePoolPumpSpeedSavings({ pump_hp: 2, full_speed_hours: 16, speed_fraction: 0.5, rate_per_kwh: 0.16 }).exceeds_day, true);
+  assert.strictEqual(_s11L.computeSpaDrainInterval({ spa_gallons: 400, daily_bathers: 6, current_tds_ppm: 2500, tds_limit_ppm: 1500 }).over_tds, true);
+});

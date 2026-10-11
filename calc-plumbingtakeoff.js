@@ -346,6 +346,7 @@ PLUMBINGTAKEOFF_RENDERERS["hydronic-system-volume"] = _v903renderHydronicSystemV
 // dims: in { fixtures: dimensionless, hot_fixtures: dimensionless, avg_run_ft: L, waste_pct: dimensionless } out: { cold_ports: dimensionless, hot_ports: dimensionless, total_ports: dimensionless, tubing_lf: L }
 export function computePexHomerunTakeoff({ fixtures = 8, hot_fixtures = 6, avg_run_ft = 35, waste_pct = 10 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!Number.isInteger(Number(fixtures)) || !Number.isInteger(Number(hot_fixtures))) return { error: "Fixture counts are whole numbers." };
   if (!(fixtures > 0)) return { error: "Fixture count must be positive." };
   if (!(avg_run_ft > 0)) return { error: "Average run must be positive (ft)." };
   if (hot_fixtures < 0) return { error: "Hot-fixture count cannot be negative." };

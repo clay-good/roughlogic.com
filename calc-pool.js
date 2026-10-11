@@ -200,6 +200,7 @@ export function computePoolPumpSpeedSavings({
   const power_fraction = Math.pow(speed_fraction, 3);
   const reduced_kw = full_kw * power_fraction;
   // The turnover is held constant, so the run time extends inversely with flow.
+  if (full_speed_hours > 24) return { error: "A pump cannot run more than 24 hours a day." };
   const reduced_hours = full_speed_hours / speed_fraction;
   const energy_fraction = power_fraction / speed_fraction;
   const full_kwh_day = full_kw * full_speed_hours;
@@ -207,7 +208,9 @@ export function computePoolPumpSpeedSavings({
   const saving_kwh_day = full_kwh_day - reduced_kwh_day;
   const affinity_verdict = "at " + fmt(speed_fraction * 100, 0) + "% speed the pump moves " + fmt(speed_fraction * 100, 0) + "% of the flow and draws " + fmt(power_fraction * 100, 1) + "% of the power -- the cube law. But the same water still has to be turned over, so the run time goes from " + fmt(full_speed_hours, 1) + " to " + fmt(reduced_hours, 1) + " hours";
   const energy_verdict = "ENERGY PER TURNOVER IS THE NUMBER THAT COUNTS, and it is " + fmt(energy_fraction * 100, 1) + "% of full speed -- the cube of the speed divided by the speed, which is the SQUARE. A " + fmt(speed_fraction * 100, 0) + "% speed gives a " + fmt((1 - energy_fraction) * 100, 0) + "% saving, not the " + fmt((1 - power_fraction) * 100, 1) + "% the power figure alone suggests. Quoting the power saving for a pool overstates it by " + fmt((1 - power_fraction) / (1 - energy_fraction), 2) + " times";
-  const daily_verdict = fmt(full_kw, 2) + " kW for " + fmt(full_speed_hours, 1) + " h is " + fmt(full_kwh_day, 1) + " kWh a day at full speed, against " + fmt(reduced_kw, 2) + " kW for " + fmt(reduced_hours, 1) + " h -- " + fmt(reduced_kwh_day, 1) + " kWh, a saving of " + fmt(saving_kwh_day, 1) + " kWh a day";
+  // The same turnover at reduced speed can need more hours than a day has.
+  const exceeds_day = reduced_hours > 24 * (1 + 1e-9);
+  const daily_verdict = (exceeds_day ? "NOT ACHIEVABLE AS ENTERED: the same turnover at this speed needs " + fmt(reduced_hours, 1) + " h a day; the saving below assumes it. " : "") + fmt(full_kw, 2) + " kW for " + fmt(full_speed_hours, 1) + " h is " + fmt(full_kwh_day, 1) + " kWh a day at full speed, against " + fmt(reduced_kw, 2) + " kW for " + fmt(reduced_hours, 1) + " h -- " + fmt(reduced_kwh_day, 1) + " kWh, a saving of " + fmt(saving_kwh_day, 1) + " kWh a day";
   const has_cost = electricity_rate_per_kwh > 0 && days_per_year > 0;
   const annual_saving_cost = has_cost ? saving_kwh_day * days_per_year * electricity_rate_per_kwh : 0;
   const cost_verdict = !has_cost
@@ -223,6 +226,7 @@ export function computePoolPumpSpeedSavings({
   const filtration_verdict = "AND FILTRATION IS BETTER AT LOW FLOW, NOT WORSE, which is the counterintuitive part. Slower water through a sand or cartridge bed gives finer particles time to be captured rather than driven through, so long slow filtration cleans better than short fast filtration as well as costing less. The instinct that a pump on low speed is 'not really doing anything' has it backwards";
   if (![full_kw, reduced_kw, reduced_hours, full_kwh_day, reduced_kwh_day, saving_kwh_day, annual_saving_cost, energy_fraction].every(Number.isFinite)) return { error: "Pool pump math is not a finite value." };
   return {
+    exceeds_day,
     full_kw, power_fraction, reduced_kw, reduced_hours, energy_fraction,
     full_kwh_day, reduced_kwh_day, saving_kwh_day,
     affinity_verdict, energy_verdict, daily_verdict,
@@ -381,7 +385,8 @@ export function computeSpaDrainInterval({
     : "at " + fmt(alternative_bathers, 1) + " bathers a day the interval becomes " + fmt(alternative_interval_days, 0) + " days. THE INTERVAL IS INVERSE IN BATHER LOAD, so a spa used twice as hard needs draining twice as often -- and a rule set for a quiet household is wrong for the week the family visits";
   const has_tds = current_tds_ppm > 0 && fill_tds_ppm > 0;
   const tds_rise_ppm = has_tds ? current_tds_ppm - fill_tds_ppm : 0;
-  const over_tds = has_tds && current_tds_ppm > tds_limit_ppm + 1e-9 * Math.abs(tds_limit_ppm);
+  // The limit check needs only the current reading, not the fill water's.
+  const over_tds = current_tds_ppm > 0 && tds_limit_ppm > 0 && current_tds_ppm > tds_limit_ppm + 1e-9 * Math.abs(tds_limit_ppm);
   const tds_verdict = !has_tds
     ? "(no fill and current TDS entered -- and a TDS reading is the measurement the interval rule stands in for)"
     : "TDS has risen " + fmt(tds_rise_ppm, 0) + " ppm above the " + fmt(fill_tds_ppm, 0) + " ppm fill water, to " + fmt(current_tds_ppm, 0) + " ppm"

@@ -233,6 +233,7 @@ PLUMBINGCODE_RENDERERS["shower-compartment-check"] = _v1134renderShowerCompartme
 // dims: in { height_above_roof_in: L, snow_accumulation_in: L, roof_other_use: dimensionless, design_temp_f: T, vent_diameter_in: L, increase_inside_envelope_in: L, horizontal_to_opening_ft: L, height_above_opening_ft: L, roof_minimum_in: L } out: { required_height_in: L, height_deficit_in: L, min_diameter_in: L, min_increase_depth_in: L }
 export function computeVentTerminalCheck({ height_above_roof_in = 6, snow_accumulation_in = 0, roof_other_use = "no", design_temp_f = 20, vent_diameter_in = 2, increase_inside_envelope_in = 0, horizontal_to_opening_ft = 20, height_above_opening_ft = 0, roof_minimum_in = 6 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (roof_other_use !== "yes" && roof_other_use !== "no") return { error: "roof_other_use must be yes or no." };
   const h = Number(height_above_roof_in) || 0;
   const snow = Number(snow_accumulation_in) || 0;
   const t = Number(design_temp_f);
@@ -254,7 +255,8 @@ export function computeVentTerminalCheck({ height_above_roof_in = 6, snow_accumu
   // Height: IRC P3103.1.1 (6 in, or 6 in over the anticipated snow); IPC 2021 903.1.1 leaves the
   // number to the adopting jurisdiction (Connecticut writes 12). Until 2026-09-25 this was credited
   // to IPC 903.1 with the 6 in hard-coded, so a 12 in jurisdiction passed a 6 in vent.
-  const required_height_in = otherUse ? 84 : Math.max(roofMin, snow + 6);
+  // A roof in use raises the requirement to 7 ft; it never lowers one the snow already sets higher.
+  const required_height_in = otherUse ? Math.max(84, roofMin, snow + 6) : Math.max(roofMin, snow + 6);
   const height_ok = h >= required_height_in - 1e-9 * Math.abs(required_height_in);
   const height_deficit_in = Math.max(0, required_height_in - h);
   const snow_governs = !otherUse && snow + 6 > roofMin;
@@ -618,6 +620,7 @@ PLUMBINGCODE_RENDERERS["cleanout-layout"] = _v1140renderCleanoutLayout;
 // dims: in { static_pressure_psi: M L^-1 T^-2, min_fixture_pressure_psi: M L^-1 T^-2, has_check_or_backflow: dimensionless, has_storage_water_heater: dimensionless, expansion_control_present: dimensionless, prv_setpoint_psi: M L^-1 T^-2 } out: { over_by_psi: M L^-1 T^-2, headroom_psi: M L^-1 T^-2 }
 export function computeWaterServicePressureCheck({ static_pressure_psi = 0, min_fixture_pressure_psi = 20, has_check_or_backflow = "no", has_storage_water_heater = "yes", expansion_control_present = "no", prv_setpoint_psi = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  for (const [k, v] of [["has_check_or_backflow", has_check_or_backflow], ["has_storage_water_heater", has_storage_water_heater], ["expansion_control_present", expansion_control_present]]) if (v !== "yes" && v !== "no") return { error: k + " must be yes or no." };
   const p = Number(static_pressure_psi) || 0;
   const minFix = Number(min_fixture_pressure_psi) || 0;
   const set = Number(prv_setpoint_psi) || 0;
@@ -635,7 +638,8 @@ export function computeWaterServicePressureCheck({ static_pressure_psi = 0, min_
   const setpoint_ok = setpoint_entered ? set <= MAX + 1e-9 * Math.abs(MAX) : null;
   // A fitted PRV regulates (and closes the system) whatever the static pressure; until
   // 2026-10-03 one below 80 psi was ignored and the system read OPEN.
-  const delivered = setpoint_entered ? set : p;
+  // A reducing valve cannot raise pressure: the delivered pressure is the lower of the two.
+  const delivered = setpoint_entered ? Math.min(set, p) : p;
   const headroom_psi = delivered - minFix;
   const fixture_ok = headroom_psi >= -1e-9 * Math.abs(minFix);
 

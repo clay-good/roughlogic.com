@@ -117,8 +117,6 @@ export const SIGNED_INPUTS = [
   "horizontal-curve::pi_station_ft",
   "vertical-curve::eval_station_ft",
   "amp-power-spl::sensitivity_db",
-  "mixed-water-temp::hot_temp_F",
-  "mixed-water-temp::cold_temp_F",
   "fixed-orifice-target-superheat::indoor_wetbulb_f",
   "fixed-orifice-target-superheat::outdoor_drybulb_f",
   "wireless-fspl::tx_power_dbm",
