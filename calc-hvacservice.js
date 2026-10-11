@@ -148,7 +148,8 @@ export function computeRecoveryCylinder({ water_capacity_lb = 0, refrig_density_
   if (current_net_lb < 0) return { error: "Current charge must be non-negative." };
   if (!(water_capacity_lb > 0)) return { error: "Cylinder water capacity (WC) must be positive (lb)." };
   if (!(refrig_density_lb_gal > 0)) return { error: "Refrigerant liquid density must be positive (lb/gal)." };
-  if (!(fill_fraction > 0 && fill_fraction <= 1)) return { error: "Fill fraction must be in (0, 1]." };
+  // The 80% rule is the maximum: a larger fraction used to be accepted under the citation that forbids it.
+  if (!(fill_fraction > 0 && fill_fraction <= 0.8)) return { error: "Fill fraction must be over 0 and at most 0.8, the maximum safe fill of a recovery cylinder." };
   const specific_gravity = refrig_density_lb_gal / _WATER_LB_PER_GAL;
   const max_net_lb = fill_fraction * water_capacity_lb * specific_gravity;
   const remaining_lb = Math.max(0, max_net_lb - current_net_lb);
@@ -291,6 +292,7 @@ HVACSERVICE_RENDERERS["run-capacitor-microfarad"] = _simpleRenderer({
 // dims: in { start_micron: M L^-1 T^-2, end_micron: M L^-1 T^-2, hold_min: T, pass_ceiling_micron: M L^-1 T^-2 } out: { rise_micron: M L^-1 T^-2, rate_micron_per_min: M L^-1 T^-3 }
 export function computeVacuumDecayTest({ start_micron = 0, end_micron = 0, hold_min = 0, pass_ceiling_micron = 500 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (Number(end_micron) < Number(start_micron)) return { error: "The end reading is lower than the start: a vacuum cannot deepen with the pump valved off. Check the two readings." };
   if (!(start_micron > 0)) return { error: "Starting vacuum level must be positive (microns)." };
   if (!(end_micron > 0)) return { error: "Ending vacuum level must be positive (microns)." };
   if (!(hold_min > 0)) return { error: "Hold time must be positive (minutes)." };
@@ -336,8 +338,10 @@ const _F_TO_R = 459.67;
 // leak: expected_P2_abs = P1_abs x T2/T1, and any pressure lost below that
 // expected value is the leak.
 // dims: in { start_psig: M L^-1 T^-2, start_temp_F: T, end_temp_F: T, end_psig: M L^-1 T^-2, atm_psi: M L^-1 T^-2, tolerance_psi: M L^-1 T^-2 } out: { expected_psig: M L^-1 T^-2, leak_drop_psi: M L^-1 T^-2, gauge_change_psi: M L^-1 T^-2 }
-export function computeNitrogenPressureTest({ start_psig = 0, start_temp_F = 0, end_temp_F = 0, end_psig = 0, atm_psi = 14.7, tolerance_psi = 1 } = {}) {
+export function computeNitrogenPressureTest({ start_psig = 0, start_temp_F = null, end_temp_F = null, end_psig = 0, atm_psi = 14.7, tolerance_psi = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A blank temperature used to be 0 F, which "explained" a real pressure loss as a cold night.
+  if (start_temp_F === null || start_temp_F === "" || end_temp_F === null || end_temp_F === "") return { error: "Enter the line temperature at the start and at the end of the test (F)." };
   if (!(start_psig > 0)) return { error: "Starting test pressure must be positive (psig)." };
   if (end_psig < 0) return { error: "Ending pressure must be non-negative (psig)." };
   if (!(atm_psi > 0)) return { error: "Atmospheric pressure must be positive (psi)." };
@@ -479,6 +483,7 @@ const _SENSIBLE_HEAT_FACTOR = 1.08; // BTU/hr per CFM per F, sea level.
 // dims: in { return_air_F: T, supply_air_F: T, input_btuh: M L^2 T^-3, efficiency_pct: dimensionless, rise_min_F: T, rise_max_F: T } out: { delta_T_F: T, output_btuh: M L^2 T^-3, cfm: L^3 T^-1 }
 export function computeFurnaceTempRise({ return_air_F = 0, supply_air_F = 0, input_btuh = 0, efficiency_pct = 80, rise_min_F = 40, rise_max_F = 70 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(Number(rise_max_F) > 0) || Number(rise_min_F) > Number(rise_max_F)) return { error: "Enter the nameplate temperature-rise range (minimum and maximum, F), minimum below maximum." };
   // An efficiency is a percent; 0 < value < 1 is a fraction typed into a percent field (added 2026-09-26).
   if (["efficiency_pct"].some((k) => { const v = Number(arguments[0]?.[k]); return v > 0 && v < 1; })) return { error: "Enter efficiencies as a percent (85 for 85%), not a fraction." };
   if (!(input_btuh > 0)) return { error: "Furnace input must be positive (BTU/hr)." };
@@ -692,6 +697,8 @@ HVACSERVICE_RENDERERS["ashrae-622-ventilation"] = _simpleRenderer({
 // dims: in { cfm: L^3 T^-1, delta_t_f: T, delta_gr: dimensionless } out: { q_sensible: M L^2 T^-3, q_latent: M L^2 T^-3, q_total: M L^2 T^-3 }
 export function computeInfiltrationLoad({ cfm = 0, delta_t_f = 0, delta_gr = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // The temperature difference is a magnitude: a cooling-day 75 - 95 = -20 used to SUBTRACT the sensible load from the latent.
+  delta_t_f = Math.abs(Number(delta_t_f));
   if (!(cfm > 0)) return { error: "Infiltration airflow must be positive (cfm)." };
   if (delta_gr < 0) return { error: "Humidity-ratio difference cannot be negative (grains/lb)." };
   const q_sensible = 1.08 * cfm * delta_t_f;
@@ -837,8 +844,10 @@ HVACSERVICE_RENDERERS["excess-air-o2"] = _v583renderExcessAirO2;
 // ===================== spec-v584 C: air-free CO correction =====================
 // CO_air_free = CO_measured * 20.9 / (20.9 - O2).
 // dims: in { measured_co_ppm: dimensionless, measured_o2_pct: dimensionless } out: { co_air_free_ppm: dimensionless }
-export function computeCoAirFree({ measured_co_ppm = 0, measured_o2_pct = 0 } = {}) {
+export function computeCoAirFree({ measured_co_ppm = 0, measured_o2_pct = null } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A blank O2 used to be 0%, which applies no correction and labels the raw reading "air-free".
+  if (measured_o2_pct === null || measured_o2_pct === "") return { error: "Enter the flue O2 reading (%); without it the CO cannot be corrected to air-free." };
   const co = Number(measured_co_ppm) || 0;
   const o2 = Number(measured_o2_pct) || 0;
   if (co < 0) return { error: "Measured CO cannot be negative (ppm)." };
@@ -919,6 +928,7 @@ HVACSERVICE_RENDERERS["draft-hood-dilution"] = _v622renderDraftHoodDilution;
 // dims: in { stack_height_ft: L, ambient_temp_f: T, mean_flue_temp_f: T, baro_psia: M L^-1 T^-2, net_factor: dimensionless } out: { draft_theoretical_inwc: M L^-1 T^-2, draft_net_inwc: M L^-1 T^-2 }
 export function computeChimneyDraft({ stack_height_ft = 0, ambient_temp_f = 0, mean_flue_temp_f = 0, baro_psia = 14.7, net_factor = 0.6 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (Number(net_factor) > 1) return { error: "The net factor is the share of theoretical draft left after flow losses and cannot exceed 1." };
   const H = Number(stack_height_ft) || 0;
   const to_f = Number(ambient_temp_f);
   const tm_f = Number(mean_flue_temp_f);
@@ -968,6 +978,7 @@ HVACSERVICE_RENDERERS["chimney-draft"] = _v585renderChimneyDraft;
 // dims: in { target_draft_net_inwc: M L^-1 T^-2, ambient_temp_f: T, mean_flue_temp_f: T, baro_psia: M L^-1 T^-2, net_factor: dimensionless } out: { required_height_ft: L }
 export function computeChimneyHeightForDraft({ target_draft_net_inwc = 0, ambient_temp_f = 0, mean_flue_temp_f = 0, baro_psia = 14.7, net_factor = 0.6 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (Number(net_factor) > 1) return { error: "The net factor is the share of theoretical draft left after flow losses and cannot exceed 1." };
   const target = Number(target_draft_net_inwc) || 0;
   const to_f = Number(ambient_temp_f);
   const tm_f = Number(mean_flue_temp_f);
@@ -1022,6 +1033,7 @@ const _V594_FUELS = {
 // dims: in { flue_o2_pct: dimensionless, stack_temp_f: T, air_temp_f: T } out: { co2_pct: dimensionless, stack_loss_pct: dimensionless, eff_net_pct: dimensionless, eff_gross_pct: dimensionless }
 export function computeFlueGasCombustionEff({ fuel = "natural_gas", flue_o2_pct = 0, stack_temp_f = 0, air_temp_f = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (Number(flue_o2_pct) >= 18) return { error: "Flue O2 of 18% or more is nearly ambient air; the stack-loss relation does not hold there. Check the probe position." };
   const f = _V594_FUELS[fuel];
   if (!f) return { error: "Fuel must be natural gas, propane, or #2 fuel oil." };
   const o2 = Number(flue_o2_pct) || 0;

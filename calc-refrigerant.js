@@ -222,12 +222,12 @@ export const refrigerantPTExample = {
 function _v8shScDiagnostic(value, mode) {
   if (!Number.isFinite(value)) return null;
   if (mode === "superheat") {
-    if (value < 5)  return { band: "low",  diagnostic: "low - check overcharge or restricted metering" };
-    if (value > 25) return { band: "high", diagnostic: "high - check coil fouling or low charge" };
+    if (value < 5)  return { band: "low",  diagnostic: "low - check overcharge, low evaporator airflow or a fouled coil" };
+    if (value > 25) return { band: "high", diagnostic: "high - check low charge or a restricted metering device" };
     return { band: "in-range", diagnostic: "in-range (5-25 F)" };
   }
   if (mode === "subcool") {
-    if (value < 2)  return { band: "low",  diagnostic: "low - check undercharge or liquid-line restriction" };
+    if (value < 2)  return { band: "low",  diagnostic: "low - check undercharge" };
     if (value > 10) return { band: "high", diagnostic: "high - check overcharge" };
     return { band: "in-range", diagnostic: "in-range (2-10 F)" };
   }
@@ -742,6 +742,8 @@ export function computeRefrigerationCop({ h1_btulb = 0, h2_btulb = 0, h4_btulb =
   const t_cond_r = tcond_f + 459.67;
   if (!(t_cond_r > t_evap_r)) return { error: "The condenser temperature must exceed the evaporator temperature." };
   const cop_carnot = t_evap_r / (t_cond_r - t_evap_r);
+  // No cycle beats Carnot between the same two temperatures; a result that does has inconsistent inputs.
+  if (cop > cop_carnot * (1 + 1e-9)) return { error: "These enthalpies give a COP above the Carnot limit for these temperatures; the readings are not consistent." };
   const eta_2nd = cop / cop_carnot;
   return {
     cop, cop_carnot, eta_2nd, eer,
@@ -925,6 +927,9 @@ REFRIGERANT_RENDERERS["walk-in-cooler-load"] = _v432renderWalkInCoolerLoad;
 // dims: in { mass_lb: M, cp_above: dimensionless, t_enter_f: T, t_storage_f: T, t_freeze_f: T, hif_btu_lb: dimensionless, cp_below: dimensionless, hours: T } out: { q_btu: M L^2 T^-2, rate_btuh: M L^2 T^-3 }
 export function computeProductPullDownLoad({ mass_lb = 0, cp_above = 0, t_enter_f = 0, t_storage_f = 0, t_freeze_f = 0, hif_btu_lb = 0, cp_below = 0, hours = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Freezing product needs all three of the freeze point, the latent heat and the frozen specific
+  // heat; with one blank the load used to fall back to sensible-only, 60% short on the example.
+  if (Number(t_storage_f) < 32 && Number(t_enter_f) > Number(t_storage_f) && (Number(t_freeze_f) !== 0 || Number(hif_btu_lb) > 0 || Number(cp_below) > 0) && !(Number(t_freeze_f) !== 0 && Number(hif_btu_lb) > 0 && Number(cp_below) > 0)) return { error: "Freezing a product needs its freeze point, latent heat and frozen specific heat; enter all three (or none for a load that stays unfrozen)." };
   const mass = Number(mass_lb) || 0;
   const cpa = Number(cp_above) || 0;
   const tEnter = Number(t_enter_f);
@@ -1060,7 +1065,7 @@ export function computeEvaporatorTdDtd({ box_temp_f = 0, sst_f = 0, design_load_
   const has_load = design_load_btuh > 0;
   // The two questions a coil selection actually asks: does this coil carry the
   // load at this TD, and what TD would it need to.
-  const load_met = has_ua && has_load && capacity_at_dtd_btuh >= design_load_btuh;
+  const load_met = has_ua && has_load && capacity_at_dtd_btuh >= design_load_btuh * (1 - 1e-9);
   const ua_required_btuh_f = has_load ? design_load_btuh / dtd : 0;
   const td_required_f = has_ua && has_load ? design_load_btuh / coil_ua_btuh_f : 0;
   const ua_ratio_vs_rating = has_rating_td && ua_required_btuh_f > 0 ? ua_required_btuh_f / coil_ua_btuh_f : 0;
@@ -1250,6 +1255,7 @@ REFRIGERANT_RENDERERS["refrigerant-lineset-charge-adjust"] = _v861renderRefriger
 // dims: in { clearance_ratio: dimensionless, suction_pressure_psia: M L^-1 T^-2, discharge_pressure_psia: M L^-1 T^-2, polytropic_exponent: dimensionless } out: { compression_ratio: dimensionless, volumetric_efficiency_pct: dimensionless }
 export function computeCompressorVolumetricEfficiency({ clearance_ratio = 0.045, suction_pressure_psia = 70, discharge_pressure_psia = 300, polytropic_exponent = 1.11 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (Number(clearance_ratio) > 0.5) return { error: "Clearance is a ratio (0.045 for 4.5%), not a percent." };
   if (!(clearance_ratio >= 0)) return { error: "Clearance ratio cannot be negative." };
   if (!(suction_pressure_psia > 0)) return { error: "Suction pressure must be positive (psia)." };
   if (!(discharge_pressure_psia > suction_pressure_psia)) return { error: "Discharge pressure must exceed suction pressure (compression ratio > 1)." };
@@ -1258,6 +1264,7 @@ export function computeCompressorVolumetricEfficiency({ clearance_ratio = 0.045,
   const compression_ratio = discharge_pressure_psia / suction_pressure_psia;
   const volumetric_efficiency_pct = 100 * (1 + clearance_ratio - clearance_ratio * Math.pow(compression_ratio, 1 / polytropic_exponent));
   if (![compression_ratio, volumetric_efficiency_pct].every(Number.isFinite)) return { error: "Volumetric-efficiency math is not a finite value." };
+  if (!(volumetric_efficiency_pct > 0)) return { error: "At this compression ratio and clearance the re-expanding gas fills the whole stroke: the compressor pumps nothing. Reduce the ratio or stage the compression." };
   return {
     compression_ratio,
     volumetric_efficiency_pct,
@@ -1405,6 +1412,7 @@ REFRIGERANT_RENDERERS["txv-capacity-check"] = _simpleRenderer({
 // dims: in { frost_lb: M, coil_temp_f: T, coil_mass_lb: M, coil_specific_heat: L^2 T^-2, coil_temp_rise_f: T, heater_btuh: M L^2 T^-3, defrost_efficiency: dimensionless, drain_temp_f: T } out: { sensible_btu: M L^2 T^-2, latent_btu: M L^2 T^-2, meltwater_btu: M L^2 T^-2, total_btu: M L^2 T^-2, defrost_min: T }
 export function computeDefrostCycleSizing({ frost_lb = 0, coil_temp_f = -10, coil_mass_lb = 0, coil_specific_heat = 0.10, coil_temp_rise_f = 0, heater_btuh = 0, defrost_efficiency = 0.8, drain_temp_f = 32 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (Number(coil_temp_rise_f) > 0 && Number(coil_temp_f) + Number(coil_temp_rise_f) < 32) return { error: "The coil must rise past 32 F to melt the frost; the entered rise ends below freezing." };
   if (!(frost_lb > 0)) return { error: "Frost mass per cycle must be positive." };
   if (!(coil_temp_f < 32)) return { error: "The coil must start below 32 F, or there is no frost to melt." };
   if (!(coil_mass_lb >= 0)) return { error: "Coil mass cannot be negative." };

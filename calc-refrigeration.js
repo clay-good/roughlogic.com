@@ -463,6 +463,7 @@ export function computeCondenserTdHeadPressure({
   power_pct_per_deg_f = 1.75, compressor_hp = 0, annual_hours = 0, energy_rate_per_kwh = 0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (arguments[0]?.condenser_type !== undefined && !["air_cooled", "evaporative"].includes(arguments[0].condenser_type)) return { error: "Condenser type must be air_cooled or evaporative." };
   if (!(design_td_f > 0)) return { error: "Design TD must be positive (degF)." };
   if (power_pct_per_deg_f < 0) return { error: "Compressor power sensitivity cannot be negative (% per degF)." };
   if (compressor_hp < 0 || annual_hours < 0 || energy_rate_per_kwh < 0) return { error: "Compressor power, hours, and rate cannot be negative." };
@@ -477,6 +478,8 @@ export function computeCondenserTdHeadPressure({
   const alternate_condensing_f = alternate_ambient_f !== 0 ? alternate_ambient_f + alt_td : ambient_f + alt_td;
   const condensing_change_f = alternate_condensing_f - condensing_f;
   const power_change_pct = condensing_change_f * power_pct_per_deg_f;
+  // The per-degree sensitivity is a small-change rule; carried far enough it "saves" more than the compressor uses.
+  if (Math.abs(power_change_pct) > 50) return { error: "A condensing change of " + Math.abs(condensing_change_f).toFixed(0) + " F is far past the range the per-degree power rule holds over; compare conditions no more than about 25 F apart." };
   const condensing_falls = condensing_change_f < -1e-9;
   // Price the change, if a machine and a duty cycle were entered.
   const has_cost_basis = compressor_hp > 0 && annual_hours > 0;
@@ -795,7 +798,8 @@ export function computeRefrigerationReliefCapacity({
     : piping_adequate
       ? "the discharge run is " + fmt(equivalent_length_ft, 0) + " ft equivalent against the " + fmt(max_allowable_equivalent_length_ft, 0) + " ft the valve supports, with " + fmt(length_margin_ft, 0) + " ft to spare"
       : "the discharge run is " + fmt(equivalent_length_ft, 0) + " ft equivalent against the " + fmt(max_allowable_equivalent_length_ft, 0) + " ft the valve supports -- " + fmt(-length_margin_ft, 0) + " ft TOO LONG, so back pressure reduces the installed capacity below the stamped rating and the vessel is not protected";
-  const system_adequate = valve_adequate && (piping_adequate || !has_piping_check);
+  // No piping check is no system verdict: until 2026-10-10 a blank allowable length read "both pass".
+  const system_adequate = has_piping_check ? valve_adequate && piping_adequate : null;
   if (![required_lb_min, margin_ratio, dl_product_ft2, equivalent_length_ft, length_margin_ft].every(Number.isFinite)) return { error: "Relief capacity math is not a finite value." };
   return {
     combustibles_multiplier, relief_basis,
@@ -824,7 +828,7 @@ REFRIGERATION_RENDERERS["refrigeration-relief-capacity"] = _simpleRenderer({
     { key: "c", id: "rrc-out-c", label: "Required relieving capacity", value: (r) => fmt(r.required_lb_min, 1) + " lb/min of air" },
     { key: "v", id: "rrc-out-v", label: "Against the valve", value: (r) => r.valve_verdict },
     { key: "p", id: "rrc-out-p", label: "Discharge piping", value: (r) => r.piping_verdict },
-    { key: "s", id: "rrc-out-s", label: "System", value: (r) => r.system_adequate ? "the valve and its discharge piping both pass" : "the relief system does NOT pass as entered" },
+    { key: "s", id: "rrc-out-s", label: "System", value: (r) => r.system_adequate === null ? (r.valve_adequate ? "the valve passes; the discharge piping was NOT checked (enter its allowable length)" : "the relief valve does NOT pass as entered") : r.system_adequate ? "the valve and its discharge piping both pass" : "the relief system does NOT pass as entered" },
     { key: "n", id: "rrc-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeRefrigerationReliefCapacity,

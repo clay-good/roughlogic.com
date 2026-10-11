@@ -49099,7 +49099,9 @@ test("bounds: spec-v1493 computeRefrigerationReliefCapacity -- the piping half f
   // rests on the valve alone and the note says the check is missing.
   const noPipe = _v1493({ ...base, pipe_straight_length_ft: 0, fitting_equivalent_length_ft: 0, max_allowable_equivalent_length_ft: 0 });
   assert.equal(noPipe.has_piping_check, false);
-  assert.equal(noPipe.system_adequate, true);
+  // No piping check is no SYSTEM verdict since hardening slice 14 (it read "both pass"); the valve verdict stands alone.
+  assert.equal(noPipe.system_adequate, null);
+  assert.equal(noPipe.valve_adequate, true);
   assert.ok(_v1493({ ...base, f_constant: 0 }).error);
   assert.ok(_v1493({ ...base, vessel_diameter_ft: 0 }).error);
 });
@@ -60596,4 +60598,42 @@ test("hardening slice 13 (shop, machining): the reviewed defects stay fixed", ()
   assert.ok(_s13M.computeBearingEquivalentLoad({ radial_load_lbf: 1000, thrust_load_lbf: 300.5, static_rating_lbf: 2731.8 }).equivalent_load_lbf >= 1000);
   const marin = _s13M.computeEnduranceLimitMarin({ ultimate_strength_psi: 30000, surface_finish: "hot-rolled", diameter_in: 1, reliability_pct: "50" });
   assert.ok(marin.error || marin.ka <= 1 + 1e-12, JSON.stringify(marin).slice(0, 160));
+});
+
+// Hardening slice 14 (2026-10-10): HVAC systems, HVAC service and refrigeration, 92 calculators
+// re-derived and run by independent reviewers. One assertion per confirmed defect.
+import * as _s14S from "../../calc-hvacservice.js";
+import * as _s14R from "../../calc-refrigerant.js";
+import * as _s14G from "../../calc-refrigeration.js";
+import * as _s14H from "../../calc-hvacsystems.js";
+
+test("hardening slice 14 (HVAC systems, service, refrigeration): the reviewed defects stay fixed", () => {
+  const near = (a, b, tol) => assert.ok(Math.abs(a - b) <= tol, a + " vs " + b);
+  const err = (r) => assert.ok(r && typeof r.error === "string", JSON.stringify(r).slice(0, 120));
+  // A blank O2 is not 0%: the raw CO is never labelled air-free.
+  err(_s14S.computeCoAirFree({ measured_co_ppm: 350 }));
+  near(_s14S.computeCoAirFree({ measured_co_ppm: 350, measured_o2_pct: 8 }).co_air_free_ppm, 350 * 20.9 / 12.9, 0.5);
+  // A blank end temperature no longer explains away a 22 psi loss.
+  err(_s14S.computeNitrogenPressureTest({ start_psig: 150, start_temp_F: 70, end_psig: 128 }));
+  // A cooling-day delta-T adds to the latent load instead of cancelling it.
+  near(_s14S.computeInfiltrationLoad({ cfm: 100, delta_t_f: -20, delta_gr: 30 }).q_total, 4200, 1e-6);
+  err(_s14S.computeRecoveryCylinder({ water_capacity_lb: 50, refrig_density_lb_gal: 9, current_net_lb: 45, fill_fraction: 1 }));
+  err(_s14S.computeFlueGasCombustionEff({ flue_o2_pct: 20.8, stack_temp_f: 400, air_temp_f: 70 }));
+  err(_s14S.computeChimneyDraft({ stack_height_ft: 30, ambient_temp_f: 60, mean_flue_temp_f: 400, net_factor: 2 }));
+  err(_s14S.computeVacuumDecayTest({ start_micron: 900, end_micron: 450, hold_min: 15 }));
+  err(_s14S.computeFurnaceTempRise({ return_air_F: 70, supply_air_F: 120, input_btuh: 80000, rise_min_F: 70, rise_max_F: 40 }));
+  // Refrigeration.
+  err(_s14R.computeProductPullDownLoad({ mass_lb: 2000, cp_above: 0.9, t_enter_f: 80, t_storage_f: 0, t_freeze_f: 28, cp_below: 0.45, hours: 24 }));
+  near(_s14R.computeProductPullDownLoad({ mass_lb: 2000, cp_above: 0.9, t_enter_f: 80, t_storage_f: 0, t_freeze_f: 28, hif_btu_lb: 100, cp_below: 0.45, hours: 24 }).q_btu, 2000 * (0.9 * 52 + 100 + 0.45 * 28), 1e-6);
+  assert.strictEqual(_s14R.computeEvaporatorTdDtd({ box_temp_f: 35.3, sst_f: 25.3, design_load_btuh: 24000, coil_ua_btuh_f: 2400 }).load_met, true);
+  err(_s14R.computeDefrostCycleSizing({ frost_lb: 20, coil_temp_f: -10, coil_mass_lb: 150, coil_temp_rise_f: 5, heater_btuh: 12000 }));
+  err(_s14R.computeCompressorVolumetricEfficiency({ clearance_ratio: 0.06, suction_pressure_psia: 15, discharge_pressure_psia: 400, polytropic_exponent: 1.11 }));
+  err(_s14R.computeCompressorVolumetricEfficiency({ clearance_ratio: 4.5 }));
+  err(_s14R.computeRefrigerationCop({ h1_btulb: 180, h2_btulb: 185, h4_btulb: 120, tevap_f: 40, tcond_f: 120 }));
+  { const ex = _s14G.computeRefrigerationReliefCapacity({ ..._s14G.refrigerationReliefCapacityExample.inputs, max_allowable_equivalent_length_ft: 0 }); assert.strictEqual(ex.has_piping_check, false); assert.strictEqual(ex.system_adequate, null); }
+  err(_s14G.computeCondenserTdHeadPressure({ condenser_type: "evap", ambient_f: 95, td_f: 15 }));
+  // HVAC systems.
+  err(_s14H.computeValveActuatorCloseOff({ is_spring_return: "Yes" }));
+  err(_s14H.computeLouverFreeArea({ application: "Intake" }));
+  err(_s14H.computeFanSystemEffect({ inlet_condition: "bogus" }));
 });

@@ -2589,7 +2589,7 @@ cross-check.
 | calc-hvacservice.js | `computeChilledWaterDeltaT` | `{ load_btuh = 0, actual_gpm = 0, design_delta_t_f = 0 } = {}` | _ | _ | _ |
 | calc-hvacservice.js | `computeChimneyDraft` | `{ stack_height_ft = 0, ambient_temp_f = 0, mean_flue_temp_f = 0, baro_psia = ...` | _ | _ | _ |
 | calc-hvacservice.js | `computeChimneyHeightForDraft` | `{ target_draft_net_inwc = 0, ambient_temp_f = 0, mean_flue_temp_f = 0, baro_p...` | _ | _ | _ |
-| calc-hvacservice.js | `computeCoAirFree` | `{ measured_co_ppm = 0, measured_o2_pct = 0 } = {}` | _ | _ | _ |
+| calc-hvacservice.js | `computeCoAirFree` | `{ measured_co_ppm = 0, measured_o2_pct = null } = {}` | _ | _ | _ |
 | calc-hvacservice.js | `computeCombustionLambda` | `{ fuel = "natural_gas", flue_o2_pct = 0 } = {}` | _ | _ | _ |
 | calc-hvacservice.js | `computeCondensateDrain` | `{ tons = 0, pints_per_ton_hr = 3, run_ft = 0, slope_in_per_ft = 0.125 } = {}` | _ | _ | _ |
 | calc-hvacservice.js | `computeCondensateOverflowPan` | `{ unit_width_in = 0, unit_length_in = 0, pan_width_in = 0, pan_length_in = 0,...` | _ | _ | _ |
@@ -2607,7 +2607,7 @@ cross-check.
 | calc-hvacservice.js | `computeGasMeterClockTarget` | `{ target_input_btuh = 0, dial_size_cf = 0, heating_value_btu_cf = 1030 } = {}` | _ | _ | _ |
 | calc-hvacservice.js | `computeHvacEquipmentCircuit` | `{ compressor_rla_A = 0, fan_fla_A = 0, other_load_A = 0, installed_breaker_A ...` | _ | _ | _ |
 | calc-hvacservice.js | `computeInfiltrationLoad` | `{ cfm = 0, delta_t_f = 0, delta_gr = 0 } = {}` | _ | _ | _ |
-| calc-hvacservice.js | `computeNitrogenPressureTest` | `{ start_psig = 0, start_temp_F = 0, end_temp_F = 0, end_psig = 0, atm_psi = 1...` | _ | _ | _ |
+| calc-hvacservice.js | `computeNitrogenPressureTest` | `{ start_psig = 0, start_temp_F = null, end_temp_F = null, end_psig = 0, atm_p...` | _ | _ | _ |
 | calc-hvacservice.js | `computeOilBurnerFiringRate` | `{ output_btu_hr = 88000, steady_state_efficiency_pct = 85, heating_value_btu_...` | _ | _ | _ |
 | calc-hvacservice.js | `computeOutsideAirPercentTemps` | `{ t_ra_f = 0, t_ma_f = 0, t_oa_f = 0 } = {}` | _ | _ | _ |
 | calc-hvacservice.js | `computeRecoveryCylinder` | `{ water_capacity_lb = 0, refrig_density_lb_gal = 0, current_net_lb = 0, fill_...` | _ | _ | _ |

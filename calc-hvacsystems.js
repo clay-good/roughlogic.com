@@ -1718,6 +1718,7 @@ export function computeFanSystemEffect({
   inlet_condition = "clear", fan_curve_tp_inwg = 0, measured_tp_inwg = 0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (arguments[0]?.inlet_condition !== undefined && !["clear", "elbow_against_swirl", "elbow_with_swirl"].includes(arguments[0].inlet_condition)) return { error: "Unknown inlet condition." };
   if (!(flow_cfm > 0)) return { error: "Fan airflow must be positive (cfm)." };
   if (!(outlet_width_in > 0)) return { error: "Outlet width must be positive (in)." };
   if (!(outlet_height_in > 0)) return { error: "Outlet height must be positive (in)." };
@@ -1851,7 +1852,7 @@ export function computeProportionalBalanceRatio({
   const rows_text = targets.map((t) => t.label + " " + fmt(t.ratio, 2) + (t.is_reference ? " (REFERENCE, leave wide open)" : " -> " + fmt(t.target, 0) + " cfm")).join("; ");
   const method_verdict = already_proportional
     ? "the outlets are already within a hundredth of each other in ratio, so equalizing has nothing to do -- go straight to the branch damper"
-    : "throttle every outlet to the " + fmt(reference_ratio, 2) + " ratio that outlet " + reference_label + " sets, leaving " + reference_label + " wide open; then open the branch damper by a factor of " + fmt(branch_adjustment_factor, 3) + " to bring the whole set to design";
+    : "throttle every outlet to the " + fmt(reference_ratio, 2) + " ratio that outlet " + reference_label + " sets, leaving " + reference_label + " wide open; then " + (branch_adjustment_factor < 1 ? "close" : "open") + " the branch damper to a factor of " + fmt(branch_adjustment_factor, 3) + " to bring the whole set to design";
   if (![reference_ratio, branch_design_cfm, branch_measured_cfm, branch_after_equalizing_cfm, branch_adjustment_factor].every(Number.isFinite)) return { error: "Proportional balancing math is not a finite value." };
   return {
     outlet_count: rows.length, rows_text, reference_label, reference_ratio,
@@ -1882,7 +1883,7 @@ HVACSYSTEMS_RENDERERS["proportional-balance-ratio"] = _simpleRenderer({
     { key: "r", id: "pbr-out-r", label: "Ratios", value: (r) => r.rows_text },
     { key: "f", id: "pbr-out-f", label: "Reference outlet", value: (r) => "outlet " + r.reference_label + " at " + fmt(r.reference_ratio, 3) + ", the lowest -- leave it wide open" },
     { key: "m", id: "pbr-out-m", label: "Method", value: (r) => r.method_verdict },
-    { key: "b", id: "pbr-out-b", label: "Branch", value: (r) => fmt(r.branch_measured_cfm, 0) + " cfm measured against " + fmt(r.branch_design_cfm, 0) + " design; once equalized it reads " + fmt(r.branch_after_equalizing_cfm, 0) + " cfm, and the branch damper then opens by " + fmt(r.branch_adjustment_factor, 3) },
+    { key: "b", id: "pbr-out-b", label: "Branch", value: (r) => fmt(r.branch_measured_cfm, 0) + " cfm measured against " + fmt(r.branch_design_cfm, 0) + " design; once equalized it reads " + fmt(r.branch_after_equalizing_cfm, 0) + " cfm, and the branch damper then " + (r.branch_adjustment_factor < 1 ? "closes" : "opens") + " to " + fmt(r.branch_adjustment_factor, 3) },
     { key: "n", id: "pbr-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeProportionalBalanceRatio,
@@ -2032,6 +2033,7 @@ export function computeCoilCapacityVerification({
   const has_enthalpy = enthalpy_drop_btu_lb > 0;
   const air_total_btuh = has_enthalpy ? _HS_TOTAL_HEAT_CONST * airflow_cfm * enthalpy_drop_btu_lb : 0;
   const air_used_btuh = has_enthalpy ? air_total_btuh : air_sensible_btuh;
+  if (has_enthalpy && air_total_btuh < air_sensible_btuh * (1 - 1e-9)) return { error: "The enthalpy drop gives a total load below the sensible load from the dry-bulb drop, which a cooling coil cannot do; recheck the readings." };
   const latent_btuh = has_enthalpy ? air_total_btuh - air_sensible_btuh : 0;
   const balance_difference_pct = Math.abs(water_btuh - air_used_btuh) / water_btuh * 100;
   const sensible_only_difference_pct = Math.abs(water_btuh - air_sensible_btuh) / water_btuh * 100;
@@ -2103,6 +2105,7 @@ export function computeValveActuatorCloseOff({
   actuator_closeoff_psi = 0, spring_closeoff_psi = 0, is_spring_return = "no",
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (arguments[0]?.is_spring_return !== undefined && !["yes", "no"].includes(arguments[0].is_spring_return)) return { error: "is_spring_return must be yes or no." };
   if (!(seat_area_in2 > 0)) return { error: "The effective seat area must be positive (sq in)." };
   if (design_differential_psi < 0 || minimum_flow_differential_psi < 0) return { error: "Differential pressures cannot be negative (psi)." };
   if (actuator_closeoff_psi < 0 || spring_closeoff_psi < 0) return { error: "Actuator ratings cannot be negative (psi)." };
@@ -2380,6 +2383,7 @@ export function computeLouverFreeArea({
   water_penetration_fpm = 0, allowable_velocity_fpm = 0, application = "intake",
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (arguments[0]?.application !== undefined && !["intake", "relief"].includes(arguments[0].application)) return { error: "Application must be intake or relief." };
   if (!(width_ft > 0)) return { error: "Louver width must be positive (ft)." };
   if (!(height_ft > 0)) return { error: "Louver height must be positive (ft)." };
   if (!(free_area_ratio > 0 && free_area_ratio <= 1)) return { error: "The free area ratio must be above 0 and at most 1." };
