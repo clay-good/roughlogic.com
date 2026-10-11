@@ -164,7 +164,6 @@ export const SIGNED_INPUTS = [
   "surface-condensation-risk::air_temp_f",
   "surface-condensation-risk::surface_temp_f",
   "heat-pump-cold-capacity::design_temp_f",
-  "concrete-maturity::datum_f",
   "snowmelt-load::t_air_f",
   "steel-panel-zone-shear::col_shear_kip",
   "sprinkler-pressure-demand::elevation_ft",

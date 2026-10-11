@@ -92648,7 +92648,7 @@
      }
     },
     "shelf_boards": {
-     "value": 3,
+     "value": 4,
      "tolerance": {
       "abs": 0.001
      }

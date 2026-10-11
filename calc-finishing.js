@@ -141,6 +141,7 @@ FINISHING_RENDERERS["galvanize-coating-weight"] = _simpleRenderer({
 // dims: in { dragout_gal_per_1000ft2: L^3 L^-2, area_ft2_per_day: L^2, bath_volume_gal: L^3, bath_concentrate_pct: dimensionless, dilution_ratio: dimensionless, rinse_stages: dimensionless } out: { dragout_gal_day: L^3, concentrate_gal_day: L^3, bath_turnover_days: T, single_rinse_gal_day: L^3, rinse_flow_gal_day: L^3 }
 export function computePretreatmentBathDragout({ dragout_gal_per_1000ft2 = 0, area_ft2_per_day = 0, bath_volume_gal = 0, bath_concentrate_pct = 5, dilution_ratio = 1000, rinse_stages = 2 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!Number.isInteger(Number(rinse_stages))) return { error: "Rinse stages is a whole number." };
   if (!(dragout_gal_per_1000ft2 > 0)) return { error: "Dragout rate must be positive (gal per 1,000 sq ft)." };
   if (!(area_ft2_per_day > 0)) return { error: "Area processed must be positive (sq ft per day)." };
   if (!(bath_volume_gal > 0)) return { error: "Bath volume must be positive (gal)." };

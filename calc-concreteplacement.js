@@ -145,7 +145,7 @@ CONCRETEPLACEMENT_RENDERERS["concrete-pump-line-pressure"] = _simpleRenderer({
   citation: "Citation: the static and friction pressure components of a concrete pump line by name -- static gradient = unit weight (pcf) / 144, so normal weight concrete is 1.04 psi per foot of rise; friction = equivalent length x the friction loss per 100 ft, with bends and flexible hose converted to equivalent feet of straight line -- with ACI 304.2R for pumping and the pump manufacturer's ratings named. NO FRICTION CHART IS SHIPPED: the loss per 100 ft depends on slump, aggregate, fines, admixtures, temperature, and line condition, and published charts give ranges. The limit compared against is the pump's rated CONCRETE pressure, not its hydraulic pressure. ACI 304.2R, the pump manufacturer's ratings, the concrete supplier's mix design, and the contractor's competent person govern.",
   example: concretePumpLinePressureExample.inputs,
   fields: [
-    { key: "horizontal_length_ft", label: "Horizontal steel line (ft)", kind: "number" },
+    { key: "horizontal_length_ft", label: "Steel line length (ft; include the riser pipe, which has friction as well as lift)", kind: "number" },
     { key: "vertical_lift_ft", label: "Vertical lift (ft)", kind: "number" },
     { key: "unit_weight_pcf", label: "Concrete unit weight (pcf)", kind: "number", default: 150 },
     { key: "friction_psi_per_100ft", label: "Friction loss from the chart (psi per 100 ft)", kind: "number" },
@@ -269,6 +269,7 @@ export function computePostTensionElongation({ strand_area_in2 = 0, modulus_psi 
   const no_friction_elongation_in = jacking_force_lb * length_in / (strand_area_in2 * modulus_psi);
   const friction_overstatement_in = no_friction_elongation_in - theoretical_elongation_in;
   const expected_measured_in = theoretical_elongation_in - anchor_set_in;
+  if (!(expected_measured_in > 0)) return { error: "The anchor set is as large as the theoretical elongation: this tendon is too short for an elongation check to mean anything." };
   const elongation_difference_in = measured_elongation_in > 0 ? measured_elongation_in - expected_measured_in : null;
   const elongation_difference_pct = elongation_difference_in === null ? null : elongation_difference_in / expected_measured_in * 100;
   // ACI 318 investigates only a difference that EXCEEDS 7%; the 1e-9 keeps 7.000000000000008
@@ -325,6 +326,7 @@ CONCRETEPLACEMENT_RENDERERS["post-tension-elongation"] = _simpleRenderer({
 // dims: in { panel_width_ft: L, panel_height_ft: L, thickness_in: L, unit_weight_pcf: M L^-3, lift_day_strength_psi: M L^-1 T^-2, insert_rows: dimensionless, insert_columns: dimensionless, suction_fraction: dimensionless, safety_factor: dimensionless } out: { panel_weight_lb: M L T^-2, load_per_insert_lb: M L T^-2, span_between_rows_ft: L, bending_stress_psi: M L^-1 T^-2, modulus_of_rupture_psi: M L^-1 T^-2, allowable_stress_psi: M L^-1 T^-2, rows_required: dimensionless }
 export function computeTiltUpLiftStress({ panel_width_ft = 0, panel_height_ft = 0, thickness_in = 0, unit_weight_pcf = 150, lift_day_strength_psi = 0, insert_rows = 2, insert_columns = 2, suction_fraction = 0, safety_factor = 1.5 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!Number.isInteger(Number(insert_rows)) || !Number.isInteger(Number(insert_columns))) return { error: "Insert rows and columns are whole numbers." };
   if (!(panel_width_ft > 0)) return { error: "Panel width must be positive (ft)." };
   if (!(panel_height_ft > 0)) return { error: "Panel height must be positive (ft)." };
   if (!(thickness_in > 0)) return { error: "Panel thickness must be positive (in)." };
@@ -410,6 +412,8 @@ CONCRETEPLACEMENT_RENDERERS["tilt-up-lift-stress"] = _simpleRenderer({
 // dims: in { panel_width_ft: L, panel_height_ft: L, wind_pressure_psf: M L^-1 T^-2, resultant_height_ft: L, brace_attachment_height_ft: L, brace_angle_deg: dimensionless, brace_count: dimensionless, brace_capacity_lb: M L T^-2, alternate_angle_deg: dimensionless, brace_safety_factor: dimensionless } out: { design_axial_per_brace_lb: M L T^-2, wind_force_lb: M L T^-2, lateral_per_brace_lb: M L T^-2, axial_per_brace_lb: M L T^-2, anchor_horizontal_lb: M L T^-2, braces_required: dimensionless, alternate_axial_lb: M L T^-2 }
 export function computeTiltUpBraceLoad({ panel_width_ft = 0, panel_height_ft = 0, wind_pressure_psf = 0, resultant_height_ft = 0, brace_attachment_height_ft = 0, brace_angle_deg = 55, brace_count = 2, brace_capacity_lb = 0, alternate_angle_deg = 45, brace_safety_factor = 1.5 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (Number(brace_attachment_height_ft) > Number(panel_height_ft)) return { error: "The brace attachment cannot be above the top of the panel." };
+  if (Number(resultant_height_ft) > Number(panel_height_ft)) return { error: "The wind resultant cannot act above the top of the panel." };
   if (!(panel_width_ft > 0)) return { error: "Panel width must be positive (ft)." };
   if (!(panel_height_ft > 0)) return { error: "Panel height must be positive (ft)." };
   if (!(wind_pressure_psf > 0)) return { error: "The erection design wind pressure must be positive (psf)." };

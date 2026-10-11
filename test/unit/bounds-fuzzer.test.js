@@ -32589,7 +32589,8 @@ test("bounds: spec-v1028 computeClosetShelfTakeoff pins the worked example, the 
   const base = { single_hang_ft: 6, double_hang_ft: 4, linen_wall_ft: 3, linen_shelf_count: 4, bracket_spacing_in: 32, stock_length_ft: 8 };
   const r = _v1028(base);
   assert.ok(r.rod_lf === 14 && r.shelf_lf === 22);
-  assert.ok(r.rod_sticks === 2 && r.shelf_boards === 3);
+  // 4 boards since hardening slice 9: the pieces (6, 4, 3, 3, 3, 3 ft) do not pack into three 8 ft boards.
+  assert.ok(r.rod_sticks === 2 && r.shelf_boards === 4);
   assert.ok(r.brackets === 22 && r.splice_needed === false);
   // Per-run support formula: 6 ft at 32 in -> ceil(72/32)+1 = 4.
   const sOnly = _v1028({ single_hang_ft: 6, double_hang_ft: 0, linen_wall_ft: 0, bracket_spacing_in: 32, stock_length_ft: 8 });
@@ -60387,4 +60388,42 @@ test("hardening slice 8 (construction part 2): the reviewed defects stay fixed",
   err(_s7.computeSeismicDesignSpectralAcceleration({ fa: 1.1, fv: 1.9 }));
   near(_s7.computeGuardPostLoad({ post_spacing_ft: 8, uniform_plf: "" }).governing_load_lb, 400, 1e-9);
   assert.strictEqual(_s7.computeTemporaryStairwayCheck({ riser_count: 3, total_rise_in: 20, riser_height_in: 11, tread_depth_in: 12 }).rail_required, true);
+});
+
+// Hardening slice 9 (2026-10-10): the rest of construction, concrete placement and finishes,
+// 88 calculators re-derived and run by independent reviewers. One assertion per confirmed defect.
+import * as _s9F from "../../calc-finish.js";
+import * as _s9CP from "../../calc-concreteplacement.js";
+import * as _s9FG from "../../calc-finishing.js";
+
+test("hardening slice 9 (construction part 3, concrete placement, finishes): the reviewed defects stay fixed", () => {
+  const near = (a, b, tol) => assert.ok(Math.abs(a - b) <= tol, a + " vs " + b);
+  const err = (r) => assert.ok(r && typeof r.error === "string", JSON.stringify(r).slice(0, 120));
+  // Blank or unknown values that passed a code check.
+  err(_s7.computeStairCodeCheck({ occupancy: "Commercial", riser_height_in: 7.75, tread_depth_in: 10, stair_width_in: 36 }));
+  err(_s7.computeStairCodeCheck({ occupancy: "residential", tread_depth_in: 10, stair_width_in: 36 }));
+  err(_s7.computeMaterialStackingLimits({ material: "lumber", stack_height_ft: 18, handled_manually: "Yes" }));
+  err(_s7.computeSeismicBaseShear({ weight_kip: 200, sds: 1.0, r_factor: 6.5, ie: 1, period_s: 0.3 }));
+  err(_s7.computeSeismicOverturningStability({ overturning_moment_kipft: 5422, dead_load_kip: 900, footprint_width_ft: 20, sds: 1, design_method: "ASD" }));
+  err(_s7.computeReachRange({ approach: "side", obstructed: "yes", obstruction_depth_in: 10, obstruction_height_in: 0, element_height_in: 48 }));
+  err(_s7.computeEgressTravelDistance({}));
+  err(_s7.computeEgressTravelDistance({ travel_ft: 50, common_path_ft: 90 }));
+  err(_s7.computeExteriorOpeningProtection({ fsd_ft: 40, wall_area: 100, actual_opening: 500 }));
+  // Formulas used outside their limits.
+  err(_s7.computeWoodBeamCompressionNotch({ fv_prime_psi: 180, b_in: 3.5, d_in: 11.25, dn_in: 2, e_in: 0.5, v_applied_lb: 3500 }));
+  err(_s7.computeGlulamVolumeFactor({ span_ft: 32, depth_in: 24, width_in: 6.75, x: 1000 }));
+  err(_s7.computeConcreteMaturity({ concrete_temp_f: 50, hours: 168, datum_f: 0, target_ttf_c: 1600 }));
+  // A stair is held to the stairway minimum, not the door leaf.
+  assert.strictEqual(_s7.computeEgressCapacity({ occupant_load: 160, sprinklered: true, path: "stair", min_door_in: 32 }).per_exit_in, 44);
+  assert.strictEqual(_s7.computeEgressCapacity({ occupant_load: 40, sprinklered: true, path: "stair", min_door_in: 32 }).per_exit_in, 36);
+  // Finishes.
+  assert.strictEqual(_s9F.computeClosetShelfTakeoff({ single_hang_ft: 6, double_hang_ft: 4, linen_wall_ft: 3, linen_shelf_count: 4 }).shelf_boards, 4);
+  assert.strictEqual(_s9F.computeClosetShelfTakeoff({ single_hang_ft: 5, double_hang_ft: 5 }).rod_sticks, 3);
+  assert.strictEqual(_s9F.computeFlooringTakeoff({ room_length_ft: 10, room_width_ft: 4.2, plank_width_in: 7.2 }).rip_needed, false);
+  assert.strictEqual(_s9F.computeCountertopOverhangSupport({ overhang_in: 5.4, total_depth_in: 16.2, thickness_cm: 3, run_length_ft: 6 }).supported, true);
+  // Concrete placement.
+  err(_s9CP.computePostTensionElongation({ strand_area_in2: 0.153, modulus_psi: 28500000, tendon_length_ft: 2, jacking_stress_ksi: 216 }));
+  err(_s9CP.computeTiltUpBraceLoad({ panel_width_ft: 24, panel_height_ft: 24, wind_pressure_psf: 12, brace_attachment_height_ft: 40, brace_count: 3, brace_capacity_lb: 9000 }));
+  err(_s9CP.computeTiltUpLiftStress({ panel_width_ft: 20, panel_height_ft: 30, thickness_in: 7.25, lift_day_strength_psi: 2500, insert_rows: 2.5 }));
+  err(_s9FG.computePretreatmentBathDragout({ dragout_gal_per_1000ft2: 2, area_ft2_per_day: 10000, bath_volume_gal: 1000, rinse_stages: 2.5 }));
 });

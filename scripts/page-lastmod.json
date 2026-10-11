@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "0a082f99825f593e",
+      "sha": "3269fa55bd3bc8fe",
       "date": "2026-10-11"
     },
     "/tools/": {
@@ -1282,8 +1282,8 @@
       "date": "2026-09-29"
     },
     "/tools/closet-shelf-takeoff/": {
-      "sha": "9e837208ebdc7739",
-      "date": "2026-09-29"
+      "sha": "881f313308aa9ee2",
+      "date": "2026-10-11"
     },
     "/tools/closing-costs/": {
       "sha": "ae8ef509434e19ae",
@@ -1614,8 +1614,8 @@
       "date": "2026-09-29"
     },
     "/tools/concrete-pump-line-pressure/": {
-      "sha": "3e443117b4cdf845",
-      "date": "2026-09-29"
+      "sha": "c0ef3cb11d181100",
+      "date": "2026-10-11"
     },
     "/tools/concrete-sawcut-footage/": {
       "sha": "41dabfe350e374e3",
@@ -3982,8 +3982,8 @@
       "date": "2026-09-29"
     },
     "/tools/ice-barrier-coverage/": {
-      "sha": "8244162de7115734",
-      "date": "2026-09-29"
+      "sha": "4b4cbf10fb71d866",
+      "date": "2026-10-11"
     },
     "/tools/ice-machine-sizing/": {
       "sha": "b21bad6f5a7ac603",

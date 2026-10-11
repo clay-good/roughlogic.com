@@ -4947,6 +4947,9 @@ CONSTRUCTION_RENDERERS["guard-handrail-check"] = renderGuardHandrailCheck;
 // dims: in { occupancy: dimensionless, riser_height_in: L, tread_depth_in: L, stair_width_in: L, occupant_load: dimensionless } out: { max_riser: L, min_tread: L, min_width: L, two_r_plus_t: L }
 export function computeStairCodeCheck({ occupancy = "commercial", riser_height_in = 0, tread_depth_in = 0, stair_width_in = 0, occupant_load = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // An unrecognized occupancy used to get the lenient residential limits, and a blank riser passed.
+  if (occupancy !== "commercial" && occupancy !== "residential") return { error: "Occupancy must be commercial or residential." };
+  if (!(Number(riser_height_in) > 0) || !(Number(tread_depth_in) > 0) || !(Number(stair_width_in) > 0)) return { error: "Enter the riser height, tread depth and stair width (in)." };
   tread_depth_in = Number(tread_depth_in);
   if (riser_height_in < 0 || tread_depth_in < 0 || stair_width_in < 0) {
     return { error: "Riser, tread, and width must be non-negative (in)." };
@@ -5377,6 +5380,7 @@ CONSTRUCTION_RENDERERS["asce7-load-combinations"] = _simpleRenderer({
 // dims: in { weight_kip: M L T^-2, sds: dimensionless, sd1: dimensionless, r_factor: dimensionless, ie: dimensionless, period_s: T, s1: dimensionless } out: { cs: dimensionless, base_shear_kip: M L T^-2 }
 export function computeSeismicBaseShear({ weight_kip = 0, sds = 0, sd1 = 0, r_factor = 0, ie = 1.0, period_s = 0, s1 = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(Number(sd1) > 0)) return { error: "SD1 must be positive (g); left blank, Cs fell to the code minimum." };
   if (!(weight_kip > 0)) return { error: "Seismic weight must be positive (kips)." };
   if (!(sds > 0)) return { error: "SDS must be positive (g)." };
   if (!(r_factor > 0)) return { error: "Response-modification factor R must be positive." };
@@ -5762,8 +5766,11 @@ export function computeEgressCapacity({ occupant_load = 0, sprinklered = true, p
   const single_max = _singleExitMax(occupancy_group, story);
   const exits_required = occupant_load <= single_max ? 1 : occupant_load <= 500 ? 2 : occupant_load <= 1000 ? 3 : 4;
   const total_width_in = occupant_load * factor;
-  const per_exit_in = Math.max(total_width_in / exits_required, min_door_in);
-  const governed = per_exit_in === min_door_in ? "door/leaf minimum" : "required width";
+  // A stairway has its own floor: IBC 1011.2, 44 in, or 36 in serving fewer than 50 occupants.
+  // Until 2026-10-10 a stair was held only to the 32 in door-leaf minimum.
+  const component_min_in = isStair ? Math.max(min_door_in, Number(occupant_load) < 50 ? 36 : 44) : min_door_in;
+  const per_exit_in = Math.max(total_width_in / exits_required, component_min_in);
+  const governed = per_exit_in === component_min_in ? (isStair ? "stairway minimum (IBC 1011.2)" : "door/leaf minimum") : "required width";
   return { factor, exits_required, single_exit_max: single_max, story, total_width_in, per_exit_in, governed, sprinklered: sprk, path: isStair ? "stair" : "level" };
 }
 
@@ -6433,7 +6440,7 @@ const _renderConcreteEvaporationRate = _simpleRenderer({
   example: concreteEvaporationRateExample.inputs,
   fields: [
     { key: "air_temp_f", label: "Air temperature (°F)", kind: "number", default: 70, attrs: { step: "any" } },
-    { key: "concrete_temp_f", label: "Concrete temperature (°F; enter it, or use the air temperature if unknown)", kind: "number", attrs: { step: "any" } },
+    { key: "concrete_temp_f", label: "Concrete temperature (°F; enter it, or use the air temperature if unknown)", kind: "number", attrs: { step: "any" }, blankUndefined: true },
     { key: "rh_pct", label: "Relative humidity (%)", kind: "number", default: 50 },
     { key: "wind_mph", label: "Wind speed (mph)", kind: "number" },
   ],
@@ -6495,6 +6502,7 @@ CONSTRUCTION_RENDERERS["concrete-strength-gain"] = _renderConcreteStrengthGain;
 // dims: in { concrete_temp_f: T, hours: T, datum_f: T, q_kelvin: T, ref_temp_f: T, target_ttf_c: T^2 } out: { M_c: T^2, M_f: T^2, age_factor: dimensionless, te_hours: T, te_days: T, target_hours: T, target_days: T }
 export function computeConcreteMaturity({ concrete_temp_f = 0, hours = 0, datum_f = 32, q_kelvin = 5000, ref_temp_f = 68, target_ttf_c = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(Number(datum_f) >= 10 && Number(datum_f) <= 50)) return { error: "The datum temperature is between 10 and 50 degF (32 degF, or 14 degF for Type I cement by ASTM C1074)." };
   if (!(hours > 0)) return { error: "Elapsed time must be positive (hours)." };
   if (!(q_kelvin > 0)) return { error: "Activation constant Q must be positive (kelvin)." };
   if (target_ttf_c < 0) return { error: "Target TTF cannot be negative (deg C-hr)." };
@@ -6600,6 +6608,8 @@ CONSTRUCTION_RENDERERS["allowable-area"] = _renderAllowableArea;
 // dims: in { travel_ft: L, travel_limit_ft: L, common_path_ft: L, common_path_limit_ft: L, dead_end_ft: L, dead_end_limit_ft: L } out: { margin_travel: L, margin_common: L, margin_deadend: L }
 export function computeEgressTravelDistance({ travel_ft = 0, travel_limit_ft = 300, common_path_ft = 0, common_path_limit_ft = 100, dead_end_ft = 0, dead_end_limit_ft = 50 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(Number(travel_ft) > 0)) return { error: "Enter the measured exit access travel distance (ft)." };
+  if (Number(common_path_ft) > Number(travel_ft)) return { error: "The common path is part of the travel distance and cannot be longer than it." };
   if (travel_ft < 0 || common_path_ft < 0 || dead_end_ft < 0) return { error: "Measured distances cannot be negative (ft)." };
   if (!(travel_limit_ft > 0) || !(common_path_limit_ft > 0) || !(dead_end_limit_ft > 0)) return { error: "Limits must be positive (ft)." };
   const pass_travel = travel_ft <= travel_limit_ft + 1e-9 * Math.abs(travel_limit_ft);
@@ -6644,6 +6654,7 @@ CONSTRUCTION_RENDERERS["egress-travel-distance"] = _renderEgressTravelDistance;
 // dims: in { fsd_ft: L, wall_area: L^2, actual_opening: L^2 } out: { allowable_pct: dimensionless, allowable_area: L^2 }
 export function computeExteriorOpeningProtection({ fsd_ft = 0, wall_area = 0, protected: prot = false, actual_opening = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (Number(actual_opening) > Number(wall_area)) return { error: "The opening area cannot exceed the wall area." };
   if (fsd_ft < 0) return { error: "Fire separation distance cannot be negative (ft)." };
   if (!(wall_area > 0)) return { error: "Wall area must be positive (ft^2)." };
   if (actual_opening < 0) return { error: "Opening area cannot be negative (ft^2)." };
@@ -6795,6 +6806,8 @@ CONSTRUCTION_RENDERERS["wood-beam-shear"] = _renderWoodBeamShear;
 // dims: in { fv_prime_psi: M L^-1 T^-2, b_in: L, d_in: L, dn_in: L, e_in: L, v_applied_lb: M L T^-2 } out: { de_in: L, vr_lb: M L T^-2, vr_tension_lb: M L T^-2, fv_psi: M L^-1 T^-2, dcr: dimensionless }
 export function computeWoodBeamCompressionNotch({ fv_prime_psi = 0, b_in = 0, d_in = 0, dn_in = 0, e_in = 0, v_applied_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Eq. 3.4-5 holds only inside the NDS notch limits; a compression-side end notch may not exceed 2/5 of the depth.
+  if (Number(d_in) > 0 && Number(dn_in) > 0 && Number(d_in) - Number(dn_in) > 0.4 * Number(d_in) + 1e-9) return { error: "The notch removes more than 2/5 of the depth, beyond the NDS limit for a compression-side end notch; this equation does not apply." };
   if (!(fv_prime_psi > 0)) return { error: "Fv' must be positive (psi)." };
   if (!(b_in > 0)) return { error: "Breadth b must be positive (in)." };
   if (!(d_in > 0)) return { error: "Full depth d must be positive (in)." };
@@ -8687,6 +8700,7 @@ CONSTRUCTION_RENDERERS["trim-linear-footage"] = _v440renderTrimLinearFootage;
 // dims: in { span_ft: L, depth_in: L, width_in: L, x: dimensionless, kl: dimensionless } out: { cv: dimensionless, reduction_pct: dimensionless }
 export function computeGlulamVolumeFactor({ span_ft = 0, depth_in = 0, width_in = 0, x = 10, kl = 1.0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (Number(x) !== 10 && Number(x) !== 20) return { error: "The exponent x is 20 for Southern Pine and 10 for all other species (NDS 5.3.6)." };
   const span = Number(span_ft) || 0;
   const d = Number(depth_in) || 0;
   const b = Number(width_in) || 0;
@@ -11942,6 +11956,7 @@ CONSTRUCTION_RENDERERS["carpet-seam-layout"] = _simpleRenderer({
 // dims: in { overturning_moment_kipft: M L^2 T^-2, dead_load_kip: M L T^-2, footprint_width_ft: L, arm_override_ft: L, sds: dimensionless, design_method: dimensionless, apply_soil_reduction: dimensionless, required_ratio: dimensionless } out: { ev_coeff: dimensionless, dead_coeff: dimensionless, w_eff_kip: M L T^-2, arm_ft: L, m_resist_kipft: M L^2 T^-2, m_demand_kipft: M L^2 T^-2, ratio: dimensionless, eccentricity_ft: L, kern_ft: L }
 export function computeSeismicOverturningStability({ overturning_moment_kipft = 0, dead_load_kip = 0, footprint_width_ft = 0, arm_override_ft = 0, sds = 1.0, design_method = "lrfd", apply_soil_reduction = "no", required_ratio = 1.0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (design_method !== "lrfd" && design_method !== "asd") return { error: "Design method must be lrfd or asd." };
   const M0 = Number(overturning_moment_kipft) || 0;
   const D = Number(dead_load_kip) || 0;
   const B = Number(footprint_width_ft) || 0;
@@ -13220,6 +13235,7 @@ CONSTRUCTION_RENDERERS["flammable-cabinet-storage"] = _simpleRenderer({
 // dims: in { material: dimensionless, stack_height_ft: L, taper_provided_in: L, block_height_in: L, block_length_in: L, handled_manually: dimensionless } out: { max_height_ft: L, taper_required_in: L, taper_shortfall_in: L, tiers_above_threshold: dimensionless }
 export function computeMaterialStackingLimits({ material = "brick", stack_height_ft = 0, taper_provided_in = 0, block_height_in = 8, block_length_in = 16, handled_manually = "no" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (handled_manually !== "yes" && handled_manually !== "no") return { error: "Handled manually must be yes or no." };
   const h = Number(stack_height_ft) || 0;
   const tp = Number(taper_provided_in) || 0;
   const bh = Number(block_height_in) || 0;
@@ -13491,6 +13507,7 @@ CONSTRUCTION_RENDERERS["sign-character-height"] = _simpleRenderer({
 // dims: in { approach: dimensionless, obstructed: dimensionless, obstruction_depth_in: L, obstruction_height_in: L, element_height_in: L } out: { max_height_in: L, min_height_in: L, height_excess_in: L, max_obstruction_depth_in: L }
 export function computeReachRange({ approach = "forward", obstructed = "yes", obstruction_depth_in = 0, obstruction_height_in = 0, element_height_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (approach === "side" && obstructed === "yes" && !(Number(obstruction_height_in) > 0)) return { error: "Enter the height of the obstruction (in); a side reach is only allowed over one 34 in high or less." };
   const depth = Number(obstruction_depth_in) || 0;
   const obsH = Number(obstruction_height_in) || 0;
   const h = Number(element_height_in) || 0;

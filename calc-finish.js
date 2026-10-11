@@ -157,7 +157,7 @@ export function computeFlooringTakeoff({ room_length_ft = 0, room_width_ft = 0, 
     if (!(usable_width_in > 0)) return { error: "The expansion gaps leave no room across the floor." };
     full_rows = Math.floor(usable_width_in / plank_width_in + 1e-9);
     remainder = usable_width_in - full_rows * plank_width_in;
-    rip_needed = remainder > 0 && remainder < plank_width_in / 3;
+    rip_needed = remainder > 1e-6 && remainder < plank_width_in / 3;
     start_width = rip_needed ? (remainder + plank_width_in) / 2 : plank_width_in;
   }
   return {
@@ -694,8 +694,18 @@ export function computeClosetShelfTakeoff({ single_hang_ft = 0, double_hang_ft =
   const shelf_lf = s + d + lw * (lw > 0 ? lc : 0);
   const perRun = (ft) => (ft > 0 ? Math.ceil((ft * 12) / spacing - 1e-9) + 1 : 0);
   const brackets = perRun(s) + 2 * perRun(d) + (lw > 0 ? lc * perRun(lw) : 0);
-  const rod_sticks = Math.ceil(rod_lf / stock - 1e-9);
-  const shelf_boards = Math.ceil(shelf_lf / stock - 1e-9);
+  // Sticks are counted by PACKING the actual pieces (first-fit, longest first): a splice may not
+  // land mid-span, so offcuts cannot be joined. Until 2026-10-10 the count was total footage over
+  // stock, which read 3 boards for the default closet where no cut list fits fewer than 4.
+  if (Math.max(s, d, lw) > 200 * stock || lc > 200) return { error: "A run this long against this stock length is not a closet; check the units (walls in ft, stock in ft)." };
+  const whole = (x) => Math.floor(x / stock + 1e-9);
+  const pack = (pieces) => pieces
+    .flatMap((x) => [...Array(whole(x)).fill(stock), x - stock * whole(x)].filter((v) => v > 1e-9))
+    .sort((a, b) => b - a)
+    .reduce((bins, p) => ((i) => (i >= 0 ? bins.map((free, k) => (k === i ? free - p : free)) : [...bins, stock - p]))(bins.findIndex((free) => free >= p - 1e-9)), [])
+    .length;
+  const rod_sticks = pack([s, d, d].filter((x) => x > 0));
+  const shelf_boards = pack([s, d, ...Array(lw > 0 ? lc : 0).fill(lw)].filter((x) => x > 0));
   const longest_run_ft = Math.max(s, d, lw);
   const splice_needed = longest_run_ft > stock;
   if (![rod_lf, shelf_lf, rod_sticks, shelf_boards, brackets].every(Number.isFinite)) return { error: "Closet-takeoff math did not produce a finite value." };
@@ -754,7 +764,7 @@ export function computeCountertopOverhangSupport({ overhang_in = 0, total_depth_
   const one_third_limit_in = depth / 3;
   const governing_limit_in = Math.min(thickness_limit_in, one_third_limit_in);
   const governing_rule = one_third_limit_in < thickness_limit_in ? "the one-third-of-depth rule" : "the thickness rule";
-  const supported = oh <= governing_limit_in;
+  const supported = oh <= governing_limit_in * (1 + 1e-9);
   const thickness_in = th * 0.393701;
   const psf = dens * thickness_in / 12;
   const overhang_weight_plf = psf * oh / 12;
