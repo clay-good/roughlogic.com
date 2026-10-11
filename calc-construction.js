@@ -4639,6 +4639,7 @@ const _blastNozzle = (bore) => {
 //  totals are masses M.)
 export function computeAbrasiveBlast({ nozzle_bore_in, pressure_psi = 100, area_ft2, lb_per_ft2 = 8 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (![0.1875, 0.25, 0.3125, 0.375, 0.4375, 0.5].some((b) => Math.abs(Number(nozzle_bore_in) - b) < 0.005)) return { error: "Nozzle bore must be one of the table sizes: 3/16, 1/4, 5/16, 3/8, 7/16 or 1/2 in." };
   const bore = Number(nozzle_bore_in);
   const pressure = Number(pressure_psi);
   const area = Number(area_ft2);
@@ -4707,6 +4708,7 @@ CONSTRUCTION_RENDERERS["abrasive-blast"] = _v69renderAbrasiveBlast;
 // dims: in { length_ft: L, post_spacing_ft: L, rails_per_section: dimensionless, picket_width_in: L, picket_gap_in: L } out: { sections: dimensionless, posts: dimensionless, rails: dimensionless, pickets: dimensionless }
 export function computeFenceEstimate({ length_ft = 0, post_spacing_ft = 8, rails_per_section = 2, picket_width_in = 0, picket_gap_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (![rails_per_section].every((x) => Number.isInteger(Number(x)))) return { error: "Rails per section are whole numbers." };
   if (picket_gap_in < 0) return { error: "Picket gap must be non-negative." };
   if (picket_width_in < 0) return { error: "Picket width must be non-negative." };
   if (!(length_ft > 0)) return { error: "Fence run must be positive." };
@@ -4746,6 +4748,8 @@ CONSTRUCTION_RENDERERS["fence-estimate"] = renderFenceEstimate;
 // dims: in { num_posts: dimensionless, hole_diameter_in: L, hole_depth_in: L, post_side_in: L, bag_yield_cuft: L^3 } out: { concrete_each_cuft: L^3, total_cuft: L^3, bags: dimensionless }
 export function computePostHoleConcrete({ num_posts = 0, hole_diameter_in = 0, hole_depth_in = 0, post_side_in = 0, bag_yield_cuft = 0.45 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (Number(post_side_in) > 0 && Number(post_side_in) * Math.SQRT2 > Number(hole_diameter_in)) return { error: "A square post this size does not fit the hole (its diagonal exceeds the hole diameter)." };
+  if (![num_posts].every((x) => Number.isInteger(Number(x)))) return { error: "Posts are whole numbers." };
   if (post_side_in < 0) return { error: "Post side must be non-negative." };
   if (!(num_posts > 0)) return { error: "Number of posts must be positive." };
   if (!(hole_diameter_in > 0)) return { error: "Hole diameter must be positive." };
@@ -4870,7 +4874,7 @@ const renderRebarLapSplice = _simpleRenderer({
   ],
   outputs: [
     { key: "d", id: "rls-out-d", label: "Bar diameter", value: (r) => fmt(r.db, 3) + " in" },
-    { key: "l", id: "rls-out-l", label: "Lap length", value: (r) => fmt(r.lap_in, 1) + " in (" + r.lap_ft + " ft " + fmt(r.lap_in_rem, 0) + " in)" },
+    { key: "l", id: "rls-out-l", label: "Lap length", value: (r) => { const up = Math.ceil(r.lap_in - 1e-9); return fmt(r.lap_in, 1) + " in (" + Math.floor(up / 12 + 1e-9) + " ft " + (up % 12) + " in)"; } },
     { key: "g", id: "rls-out-g", label: "Governed by", value: (r) => r.governed },
     { key: "n", id: "rls-out-n", label: "Note", value: (r) => r.note },
   ],
@@ -4890,6 +4894,9 @@ CONSTRUCTION_RENDERERS["rebar-lap-splice"] = renderRebarLapSplice;
 // dims: in { occupancy: dimensionless, surface_height_in: L, measured_guard_in: L, measured_infill_gap_in: L, at_stairs: dimensionless, measured_handrail_in: L } out: { min_guard: L, max_infill: L }
 export function computeGuardHandrailCheck({ occupancy = "residential", surface_height_in = 0, measured_guard_in = 0, measured_infill_gap_in = 0, at_stairs = "no", measured_handrail_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (occupancy !== "residential" && occupancy !== "commercial") return { error: "Occupancy must be residential or commercial." };
+  // Blank fields used to pass: a blank surface height read "no guard required" and a blank gap read 0 in.
+  if (!(Number(surface_height_in) > 0)) return { error: "Enter the walking-surface height above grade (in)." };
   if (surface_height_in < 0 || measured_guard_in < 0 || measured_infill_gap_in < 0 || measured_handrail_in < 0) {
     return { error: "Heights and gaps must be non-negative (in)." };
   }
@@ -6261,6 +6268,7 @@ CONSTRUCTION_RENDERERS["concrete-vibrator-spacing"] = _renderConcreteVibratorSpa
 // dims: in { lateral_pressure_psf: M L^-1 T^-2, h_spacing_ft: L, v_spacing_ft: L, tie_swl_lb: M L T^-2 } out: { tie_load_lb: M L T^-2, utilization: dimensionless, max_trib_area_ft2: L^2 }
 export function computeFormworkTieLoad({ lateral_pressure_psf = 600, h_spacing_ft = 2, v_spacing_ft = 2, tie_swl_lb = 3000 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  lateral_pressure_psf = Number(lateral_pressure_psf); h_spacing_ft = Number(h_spacing_ft); v_spacing_ft = Number(v_spacing_ft); tie_swl_lb = Number(tie_swl_lb);
   if (!(lateral_pressure_psf > 0)) return { error: "Lateral pressure must be positive (psf)." };
   if (!(h_spacing_ft > 0)) return { error: "Horizontal spacing must be positive (ft)." };
   if (!(v_spacing_ft > 0)) return { error: "Vertical spacing must be positive (ft)." };
@@ -6310,6 +6318,9 @@ CONSTRUCTION_RENDERERS["formwork-tie-load"] = _renderFormworkTieLoad;
 // dims: in { cementitious_lb_per_cy: dimensionless, rise_f_per_100lb: dimensionless, placing_temp_f: T, diff_limit_f: T } out: { delta_t_f: T, peak_temp_f: T }
 export function computeMassConcreteTempRise({ cementitious_lb_per_cy = 600, rise_f_per_100lb = 12, placing_temp_f = 70, diff_limit_f = 35 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A cleared placing temperature used to be 0 degF, which reads the peak 70 degF low.
+  if (placing_temp_f === null || placing_temp_f === "" || !(Number(placing_temp_f) >= 35 && Number(placing_temp_f) <= 110)) return { error: "Enter the concrete placing temperature, 35 to 110 degF." };
+  cementitious_lb_per_cy = Number(cementitious_lb_per_cy); rise_f_per_100lb = Number(rise_f_per_100lb); placing_temp_f = Number(placing_temp_f); diff_limit_f = Number(diff_limit_f);
   if (!(cementitious_lb_per_cy > 0)) return { error: "Cementitious content must be positive (lb/cy)." };
   if (!(rise_f_per_100lb > 0)) return { error: "Rise coefficient must be positive (degF/100lb)." };
   if (!(diff_limit_f > 0)) return { error: "Differential limit must be positive (degF)." };
@@ -6910,6 +6921,7 @@ CONSTRUCTION_RENDERERS["wood-bolt-connection"] = _renderWoodBoltConnection;
 // dims: in { r_lb: M L T^-2, b_in: L, lb_in: L, fcperp_psi: M L^-1 T^-2, near_end: dimensionless } out: { cb_f: dimensionless, fcperp_adj_psi: M L^-1 T^-2, fc_perp_psi: M L^-1 T^-2, dcr: dimensionless, lb_req_in: L }
 export function computeWoodBearingPerpendicular({ r_lb = 0, b_in = 0, lb_in = 0, fcperp_psi = 625, near_end = "no" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (near_end !== "yes" && near_end !== "no") return { error: "Bearing near the member end must be yes or no." };
   if (!(r_lb > 0)) return { error: "Bearing reaction must be positive (lb)." };
   if (!(b_in > 0) || !(lb_in > 0)) return { error: "Bearing width and length must be positive (in)." };
   if (!(fcperp_psi > 0)) return { error: "The Fc-perp design value must be positive (psi)." };
@@ -7190,7 +7202,10 @@ export function computeWindCcPressure({ v_mph = 0, kz = 0, gcp = 0, kzt = 1.0, k
   const qh_psf = 0.00256 * kz * kzt * kd * ke * v_mph * v_mph;
   const p_a_psf = qh_psf * (gcp - gcpi);
   const p_b_psf = qh_psf * (gcp + gcpi);
-  const p_gov_psf = Math.abs(p_a_psf) >= Math.abs(p_b_psf) ? p_a_psf : p_b_psf;
+  const p_calc_psf = Math.abs(p_a_psf) >= Math.abs(p_b_psf) ? p_a_psf : p_b_psf;
+  // ASCE 7 30.2.2: components and cladding are designed for at least 16 psf, either direction.
+  const minimum_governs = Math.abs(p_calc_psf) < 16;
+  const p_gov_psf = minimum_governs ? (p_calc_psf < 0 ? -16 : 16) : p_calc_psf;
   return {
     qh_psf, p_a_psf, p_b_psf, p_gov_psf,
     note: "ASCE 7-22 Chapter 30 components-and-cladding design pressure p = qh [(GCp) - (GCpi)], with the velocity pressure qh = 0.00256 Kz Kzt Kd Ke V^2 (Kd = 0.85, V in mph; 7-22 moved Kd out of qh and writes p = qh Kd [(GCp) - (GCpi)], the same pressure, so the qh shown here is the 7-22 qh times Kd) and GCpi = +/-0.18 for an enclosed building; both internal-pressure signs are evaluated and the larger-magnitude one governs. GCp is read from the Chapter 30 figures for the roof/wall zone and effective wind area (enter it) - a roof corner (Zone 3) draws the worst suction. This is the local cladding/fastener pressure, not the MWFRS whole-building pressure (wind-mwfrs-pressure), and it excludes the parapet/overhang special cases. A design aid, not a substitute for the engineer of record.",
@@ -7270,6 +7285,9 @@ CONSTRUCTION_RENDERERS["snow-drift-load"] = _renderSnowDriftLoad;
 // dims: in { qz_psf: M L^-1 T^-2, qh_psf: M L^-1 T^-2, cp_ww: dimensionless, cp_lw: dimensionless, g_f: dimensionless, gcpi: dimensionless } out: { p_ww_psf: M L^-1 T^-2, p_lw_psf: M L^-1 T^-2, p_net_psf: M L^-1 T^-2 }
 export function computeWindMwfrsPressure({ qz_psf = 0, qh_psf = 0, cp_ww = 0.8, cp_lw = -0.5, g_f = 0.85, gcpi = 0.18 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (cp_ww === null || cp_ww === "" || cp_lw === null || cp_lw === "") return { error: "Enter the windward and leeward pressure coefficients Cp (0.8 and -0.5 are typical)." };
+  if (Number(cp_lw) > 0) return { error: "The leeward Cp is a suction and is entered negative (-0.5)." };
+  if (!(Number(g_f) > 0 && Number(g_f) <= 2)) return { error: "Gust-effect factor G must be over 0 and at most 2 (0.85 for a rigid building)." };
   if (!(qz_psf > 0) || !(qh_psf > 0)) return { error: "The windward and leeward velocity pressures must be positive (psf)." };
   if (!(g_f > 0)) return { error: "The gust-effect factor G must be positive (0.85 rigid)." };
   if (gcpi < 0) return { error: "Enter the internal pressure magnitude GCpi as a positive number (0.18 enclosed)." };
@@ -7428,6 +7446,7 @@ CONSTRUCTION_RENDERERS["wind-velocity-pressure-exposure-coefficient"] = _renderW
 // dims: in { g: dimensionless, d_in: L, p_in: L, cd: dimensionless, toenail: dimensionless, cm: dimensionless } out: { w_lbin: M T^-2, z_w: M L T^-2 }
 export function computeWoodNailWithdrawal({ g = 0, d_in = 0, p_in = 0, cd = 1.0, toenail = "no", cm = 1.0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (toenail !== "yes" && toenail !== "no") return { error: "Toenail must be yes or no." };
   if (!(g > 0)) return { error: "Specific gravity must be positive (0.50 DF-L, 0.42 SPF)." };
   if (!(d_in > 0)) return { error: "Nail diameter must be positive (in)." };
   if (!(p_in > 0)) return { error: "Penetration must be positive (in)." };
@@ -7545,6 +7564,7 @@ CONSTRUCTION_RENDERERS["wood-nail-lateral"] = _renderWoodNailLateral;
 // dims: in { g: dimensionless, d_in: L, p_thread_in: L, cd: dimensionless, end_grain: dimensionless } out: { w_lbin: M T^-2, z_w: M L T^-2 }
 export function computeWoodLagWithdrawal({ g = 0, d_in = 0, p_thread_in = 0, cd = 1.0, end_grain = "no" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (end_grain !== "yes" && end_grain !== "no") return { error: "End grain must be yes or no." };
   if (!(g > 0)) return { error: "Specific gravity must be positive (0.50 DF-L, 0.42 SPF)." };
   if (!(d_in > 0)) return { error: "Lag shank diameter must be positive (in)." };
   if (!(p_thread_in > 0)) return { error: "Thread penetration must be positive (in)." };
@@ -7621,6 +7641,7 @@ CONSTRUCTION_RENDERERS["wood-screw-withdrawal"] = _renderWoodScrewWithdrawal;
 // dims: in { L_ft: L, P_lb: M L T^-2, w_plf: M T^-2, E_psi: M L^-1 T^-2, I_in4: L^4 } out: { M_lbft: M L^2 T^-2, V_lb: M L T^-2, delta_in: L }
 export function computeCantileverBeam({ L_ft = 0, P_lb = 0, w_plf = 0, E_psi = 29e6, I_in4 = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (Number(P_lb) < 0 || Number(w_plf) < 0) return { error: "Loads act downward and cannot be negative; mixed-direction loads are not this case." };
   P_lb = Number(P_lb);
   if (!(L_ft > 0)) return { error: "Cantilever length must be positive (ft)." };
   if (!(E_psi > 0)) return { error: "Modulus of elasticity must be positive (psi)." };
@@ -7731,7 +7752,10 @@ export function computeCombinedStressAxialBending({ P_lb = 0, M_lbin = 0, A_in2 
   if (!(c_in > 0)) return { error: "Extreme-fiber distance c must be positive (in)." };
   if (!(I_in4 > 0)) return { error: "Moment of inertia must be positive (in^4)." };
   // Eccentricity, if entered, defines the moment M = P e.
-  const M = e_in > 0 ? P_lb * e_in : M_lbin;
+  // The eccentricity is a magnitude, and it and a moment are alternatives: until 2026-10-10 a
+  // negative e dropped the bending entirely and an entered moment was discarded when e was given.
+  if (e_in !== 0 && M_lbin !== 0) return { error: "Enter either an eccentricity or a moment, not both." };
+  const M = e_in !== 0 ? P_lb * Math.abs(e_in) : M_lbin;
   const sigma_axial = P_lb / A_in2;
   const sigma_bend = M * c_in / I_in4;
   // The moment's sign only says which face is which; the extreme fibers are P/A +/- |M c/I|. Until
@@ -8037,6 +8061,7 @@ CONSTRUCTION_RENDERERS["hoop-stress-mawp"] = _renderHoopStressMawp;
 // dims: in { ss: dimensionless, s1: dimensionless, fa: dimensionless, fv: dimensionless } out: { sms: dimensionless, sm1: dimensionless, sds: dimensionless, sd1: dimensionless }
 export function computeSeismicDesignSpectralAcceleration({ ss = 0, s1 = 0, fa = 0, fv = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(Number(ss) > 0) || !(Number(s1) > 0)) return { error: "Enter the mapped accelerations Ss and S1 (g); a blank is not a zero-seismicity site." };
   const Ss = Number(ss) || 0, S1 = Number(s1) || 0, Fa = Number(fa) || 0, Fv = Number(fv) || 0;
   if (!(Ss >= 0) || !(S1 >= 0)) return { error: "Mapped accelerations Ss and S1 must be non-negative (fraction of g)." };
   if (!(Fa > 0)) return { error: "Short-period site coefficient Fa must be positive." };
@@ -8083,7 +8108,7 @@ export function computeSeismicStoryDrift({ delta_xe_in = 0, cd = 0, ie = 1.0, hs
   const delta_a = dr * hsx;
   const util = delta_x / delta_a;
   return {
-    delta_x, delta_a, util, ok: delta_x <= delta_a,
+    delta_x, delta_a, util, ok: delta_x <= delta_a * (1 + 1e-9),
     note: "ASCE 7-22 Eq. 12.8-15: the amplified design story drift delta_x = Cd delta_xe / Ie, compared with the allowable delta_a = (drift coefficient) x story height (Table 12.12-1, commonly 0.020 hsx for most buildings, 0.007-0.025 by risk category and system). delta_xe is the elastic drift from the strength-level analysis. Exceeding delta_a means stiffen the frame. A design aid; the engineer of record's stamped design governs.",
   };
 }
@@ -8782,6 +8807,7 @@ CONSTRUCTION_RENDERERS["multi-bend-flat-pattern"] = _v454renderMultiBendFlatPatt
 // dims: in { attic_area_ft2: L^2, cfm_per_ft2: L T^-1, dark_roof: dimensionless } out: { fan_cfm: L^3 T^-1, intake_ft2: L^2, intake_in2: L^2 }
 export function computePoweredAtticVentilator({ attic_area_ft2 = 0, cfm_per_ft2 = 0.7, dark_roof = "no" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (dark_roof !== "yes" && dark_roof !== "no" && dark_roof !== true && dark_roof !== false) return { error: "Dark roof must be yes or no." };
   const area = Number(attic_area_ft2) || 0;
   const factor = Number(cfm_per_ft2) || 0;
   const dark = dark_roof === "yes" || dark_roof === true;
@@ -9042,7 +9068,9 @@ export function computeSnowUnbalancedGable({ ground_snow_pg_psf = 0, flat_roof_p
   // side to 0 and the leeward to pg, uniform (7-22 dropped Is). Until
   // 2026-09-19 W <= 20 ft read "not applicable, balanced governs", missing a
   // leeward load 20-45% above the balanced one.
-  const inBand = slope_deg >= 2.38 && slope_deg <= 30.2;
+  // The band is 1/2 on 12 through 7 on 12 INCLUSIVE; 7 on 12 is 30.26 degrees, which the rounded
+  // 30.2 used to exclude.
+  const inBand = roof_rise_on_12 >= 0.5 - 1e-9 && roof_rise_on_12 <= 7 + 1e-9;
   const applicable = inBand;
   const shortSpan = W <= 20;
   const gamma = Math.min(0.13 * pg + 14, 30);
@@ -9221,6 +9249,9 @@ export function computeAsceLiveLoadReduction({ unreduced_load_psf = 0, tributary
     const floor_psf = L0 * floor_fraction;
     if (reduced_load_psf < floor_psf) { reduced_load_psf = floor_psf; floored = true; }
   }
+  // ASCE 7 4.7.3: a live load over 100 psf is not reduced, except that a member carrying two or
+  // more floors may take at most 20% off. Until 2026-10-10 a 150 psf load was cut 58%.
+  if (L0 > 100) reduced_load_psf = floors_supported === "two_plus" ? Math.max(reduced_load_psf, 0.8 * L0) : L0;
   if (![reduced_load_psf, kll_at_ft2, multiplier].every(Number.isFinite)) return { error: "Live-load-reduction math is not a finite value." };
   const reduction_percent = (1 - reduced_load_psf / L0) * 100;
   return {
@@ -10283,6 +10314,8 @@ CONSTRUCTION_RENDERERS["rebar-tie-wire"] = _v878renderRebarTieWire;
 // dims: in { holes: dimensionless, hole_dia_in: L, bar_dia_in: L, embed_in: L, cartridge_in3: L^3, waste_pct: dimensionless } out: { per_hole_in3: L^3, total_in3: L^3, cartridges: dimensionless }
 export function computeAnchorEpoxyVolume({ holes = 40, hole_dia_in = 0.75, bar_dia_in = 0.625, embed_in = 6, cartridge_in3 = 15.3, waste_pct = 10 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(Number(bar_dia_in) > 0)) return { error: "Bar or rod diameter must be positive (in)." };
+  if (![holes].every((x) => Number.isInteger(Number(x)))) return { error: "Holes are whole numbers." };
   if (!(holes > 0)) return { error: "Hole count must be positive." };
   if (!(hole_dia_in > 0)) return { error: "Hole diameter must be positive (in)." };
   if (!(embed_in > 0)) return { error: "Embedment must be positive (in)." };
@@ -10389,6 +10422,7 @@ export function computeBalusterPicketCount({ rail_clear_in = 96, picket_width_in
   const pickets = Math.ceil((rail_clear_in - max_gap_in) / (picket_width_in + max_gap_in) - 1e-9);
   const gaps = pickets + 1;
   const actual_gap_in = (rail_clear_in - pickets * picket_width_in) / gaps;
+  if (!(actual_gap_in > 0)) return { error: "Pickets this wide cannot be spaced within this gap limit on this span; the span is too short for the layout." };
   if (![pickets, gaps, actual_gap_in].every(Number.isFinite)) return { error: "Picket-count math is not a finite value." };
   return {
     pickets,
@@ -10634,6 +10668,7 @@ CONSTRUCTION_RENDERERS["concrete-sawcut-footage"] = _v886renderConcreteSawcutFoo
 // dims: in { run_width_ft: L, spacing_in: L, ends_per_joist: dimensionless, nails_per_hanger: dimensionless } out: { joists: dimensionless, hangers: dimensionless, hanger_nails: dimensionless }
 export function computeJoistHangerCount({ run_width_ft = 16, spacing_in = 16, ends_per_joist = 2, nails_per_hanger = 10 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (![ends_per_joist, nails_per_hanger].every((x) => Number.isInteger(Number(x)))) return { error: "Ends per joist and nails per hanger are whole numbers." };
   if (!(run_width_ft > 0)) return { error: "Joist-run width must be positive (ft)." };
   if (!(spacing_in > 0)) return { error: "Joist spacing must be positive (in)." };
   if (ends_per_joist < 0) return { error: "Ends per joist cannot be negative." };
@@ -10684,7 +10719,8 @@ export function computeDrywallFastenerTakeoff({ sheets = 100, sheet_length_ft = 
   if (!(stud_spacing_in > 0)) return { error: "Stud spacing must be positive (in)." };
   if (!(field_screw_spacing_in > 0)) return { error: "Field screw spacing must be positive (in)." };
   const studs_per_sheet = Math.floor(sheet_width_ft * 12 / stud_spacing_in + 1e-9) + 1;
-  const screws_per_stud = Math.floor(sheet_length_ft * 12 / field_screw_spacing_in + 1e-9) + 1;
+  // Rounded UP: floor left 9 intervals of 10.67 in on a sheet spaced at a 10 in maximum.
+  const screws_per_stud = Math.ceil(sheet_length_ft * 12 / field_screw_spacing_in - 1e-9) + 1;
   const screws_per_sheet = studs_per_sheet * screws_per_stud;
   const total_screws = sheets * screws_per_sheet;
   if (![screws_per_sheet, total_screws].every(Number.isFinite)) return { error: "Fastener math is not a finite value." };
@@ -10725,6 +10761,7 @@ CONSTRUCTION_RENDERERS["drywall-fastener-takeoff"] = _v888renderDrywallFastenerT
 // dims: in { area_sf: L^2, glass_thickness_in: L, safety_factor: dimensionless, cup_wll_lb: M L T^-2, glass_density_psf_in: M L^-2 T^-2 } out: { weight_lb: M L T^-2, cups: dimensionless }
 export function computeGlassVacuumLift({ area_sf = 32, glass_thickness_in = 0.5, safety_factor = 4, cup_wll_lb = 150, glass_density_psf_in = 13.0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (Number(safety_factor) < 1) return { error: "The safety factor is 1 or more (4 is the usual rule for vacuum lifting)." };
   if (!(area_sf > 0)) return { error: "Area must be positive (ft^2)." };
   if (!(glass_thickness_in > 0)) return { error: "Glass thickness must be positive (in)." };
   if (!(safety_factor > 0)) return { error: "Safety factor must be positive." };
@@ -10806,6 +10843,7 @@ CONSTRUCTION_RENDERERS["polymeric-sand-bags"] = _v891renderPolymericSandBags;
 // dims: in { area_sf: L^2, board_area_sf: L^2, layers: dimensionless, waste_pct: dimensionless } out: { boards: dimensionless }
 export function computeRigidFoamBoardCount({ area_sf = 1600, board_area_sf = 32, layers = 1, waste_pct = 8 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (![layers].every((x) => Number.isInteger(Number(x)))) return { error: "Layers are whole numbers." };
   if (!(area_sf > 0)) return { error: "Area must be positive (ft^2)." };
   if (!(board_area_sf > 0)) return { error: "Board area must be positive (ft^2)." };
   if (!(layers > 0)) return { error: "Layer count must be positive." };
@@ -10933,6 +10971,7 @@ CONSTRUCTION_RENDERERS["housewrap-rolls"] = _v895renderHousewrapRolls;
 // dims: in { perimeter_ft: L, height_ft: L, gate_width_ft: L, corners: dimensionless, line_post_spacing_ft: L, end_posts: dimensionless } out: { fabric_lf: L, rail_wire_lf: L, terminals: dimensionless, total_posts: dimensionless, line_posts: dimensionless, tension_bands: dimensionless }
 export function computeChainLinkFenceTakeoff({ perimeter_ft = 200, height_ft = 4, gate_width_ft = 0, corners = 4, line_post_spacing_ft = 10, end_posts = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (![corners, end_posts].every((x) => Number.isInteger(Number(x)))) return { error: "Corner and end post counts are whole numbers." };
   if (!(perimeter_ft > 0)) return { error: "Perimeter must be positive (ft)." };
   if (!(height_ft > 0)) return { error: "Fence height must be positive (ft)." };
   if (!(line_post_spacing_ft > 0)) return { error: "Line post spacing must be positive (ft)." };
@@ -10944,7 +10983,9 @@ export function computeChainLinkFenceTakeoff({ perimeter_ft = 200, height_ft = 4
   // Top rail and bottom tension wire follow the fabric, so gate openings come off (Master Halco).
   const rail_wire_lf = fabric_lf;
   const terminals = corners + end_posts + (gate_width_ft > 0 ? 2 : 0);
-  const total_posts = Math.ceil(perimeter_ft / line_post_spacing_ft - 1e-9);
+  // A closed loop has as many posts as bays; a run with free ends has one more. And there are never
+  // fewer posts than terminals. Until 2026-10-10 an open 200 ft run read 20 posts where 21 stand.
+  const total_posts = Math.max(terminals, Math.ceil(perimeter_ft / line_post_spacing_ft - 1e-9) + (end_posts > 0 ? 1 : 0));
   const line_posts = Math.max(0, total_posts - terminals);
   // A corner post takes fabric from two directions and so two sets of bands; ends and gate jambs one.
   // One band per foot of height less one, rounded up (Master Halco: 3 for a 42 in fence). Until
@@ -11234,6 +11275,7 @@ CONSTRUCTION_RENDERERS["joist-cantilever-check"] = _simpleRenderer({
 // dims: in { perimeter_ft: L, below_grade_height_ft: L, coverage_sf_per_gal: L^-1, waste_pct: dimensionless, coats: dimensionless } out: { wall_area_sf: L^2, gallons: L^3 }
 export function computeFoundationWaterproofingTakeoff({ perimeter_ft = 150, below_grade_height_ft = 8, coverage_sf_per_gal = 50, waste_pct = 10, coats = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(Number(coats) >= 1)) return { error: "Coats must be a whole number, 1 or more." };
   if (!(perimeter_ft > 0)) return { error: "Foundation perimeter must be positive (ft)." };
   if (!(below_grade_height_ft > 0)) return { error: "Below-grade wall height must be positive (ft)." };
   if (!(coverage_sf_per_gal > 0)) return { error: "Coverage rate must be positive (sf/gal)." };
@@ -11820,7 +11862,8 @@ export function computeCarpetSeamLayout({ room_length_ft = 0, room_width_ft = 0,
   };
   const a = lay(L, W);   // drops run lengthwise
   const b = lay(W, L);   // drops run crosswise
-  const lengthwise_better = a.running_ft <= b.running_ft;
+  // On equal material the layout with fewer seams wins (the description says the seam count decides it).
+  const lengthwise_better = a.running_ft < b.running_ft - 1e-9 || (Math.abs(a.running_ft - b.running_ft) <= 1e-9 && a.seam_count <= b.seam_count);
   const best = lengthwise_better ? a : b;
   const alt = lengthwise_better ? b : a;
 
@@ -12074,6 +12117,8 @@ CONSTRUCTION_RENDERERS["membrane-fastener-takeoff"] = _simpleRenderer({
 // dims: in { post_height_in: L, post_spacing_ft: L, concentrated_lb: M L T^-2, uniform_plf: M T^-2, post_b_in: L, post_d_in: L, allowable_fb_psi: M L^-1 T^-2, connection_lever_in: L } out: { governing_load_lb: M L T^-2, moment_inlb: M L^2 T^-2, section_modulus_in3: L^3, required_fb_psi: M L^-1 T^-2, connection_force_lb: M L T^-2, force_multiplier: dimensionless }
 export function computeGuardPostLoad({ post_height_in = 36, post_spacing_ft = 6, concentrated_lb = 200, uniform_plf = 50, post_b_in = 3.5, post_d_in = 3.5, allowable_fb_psi = 0, connection_lever_in = 4 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (uniform_plf === null || uniform_plf === "") uniform_plf = 50;
+  if (concentrated_lb === null || concentrated_lb === "") concentrated_lb = 200;
   const h = Number(post_height_in) || 0;
   const spacing = Number(post_spacing_ft) || 0;
   const P = Number(concentrated_lb) || 0;
@@ -12235,6 +12280,7 @@ CONSTRUCTION_RENDERERS["egress-window-check"] = _simpleRenderer({
 // dims: in { landing_depth_in: L, landing_width_in: L, flight_width_in: L, threshold_drop_in: L, kind: dimensionless, min_depth_in: L, max_threshold_drop_in: L } out: { depth_deficit_in: L, width_deficit_in: L, drop_excess_in: L, min_landing_area_sf: L^2 }
 export function computeLandingCheck({ landing_depth_in = 0, landing_width_in = 0, flight_width_in = 36, threshold_drop_in = 0, kind = "stair", min_depth_in = 36, max_threshold_drop_in = 1.5 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (kind !== "stair" && kind !== "door") return { error: "Kind must be stair or door." };
   const d = Number(landing_depth_in) || 0;
   const w = Number(landing_width_in) || 0;
   const fw = Number(flight_width_in) || 0;
@@ -12314,6 +12360,7 @@ CONSTRUCTION_RENDERERS["landing-check"] = _simpleRenderer({
 // dims: in { clear_perpendicular_in: L, clear_latch_side_in: L, door_clear_width_in: L, side: dimensionless, min_pull_perpendicular_in: L, min_pull_latch_in: L, min_push_perpendicular_in: L } out: { required_perpendicular_in: L, required_latch_in: L, perpendicular_deficit_in: L, latch_deficit_in: L, required_area_sf: L^2 }
 export function computeDoorManeuveringClearance({ clear_perpendicular_in = 0, clear_latch_side_in = 0, door_clear_width_in = 32, side = "pull", min_pull_perpendicular_in = 60, min_pull_latch_in = 18, min_push_perpendicular_in = 48 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (side !== "pull" && side !== "push") return { error: "Side must be pull or push." };
   const perp = Number(clear_perpendicular_in) || 0;
   const latch = Number(clear_latch_side_in) || 0;
   const wide = Number(door_clear_width_in) || 0;
@@ -12419,7 +12466,7 @@ export function computeDryerDuctLength({ straight_run_ft = 0, elbow_90_count = 0
   const remaining_straight_ft = Math.max(0, maxL - developed_length_ft);
   const fitting_share_pct = developed_length_ft > 0 ? (fitting_equivalent_ft / developed_length_ft) * 100 : 0;
   // M1502.4.7: over 35 ft of equivalent length the duct has to be labelled at the connection.
-  const label_required = developed_length_ft > 35;
+  const label_required = developed_length_ft > 35 * (1 + 1e-9);
   // M1502.4.3: the transition duct is a separate 8 ft listed assembly and is NOT counted here.
   const transition_over = trans > 8 + 1e-9 * Math.abs(8);
 
@@ -12452,7 +12499,7 @@ CONSTRUCTION_RENDERERS["dryer-duct-length"] = _simpleRenderer({
     { key: "transition_duct_ft", label: "Transition duct length (ft; not counted, 8 ft limit)", kind: "number", default: 0 },
   ],
   outputs: [
-    { key: "d", id: "ddl-out-d", label: "Developed length", value: (r) => fmt(r.developed_length_ft, 2) + " ft" + (r.within ? " - WITHIN" : " - OVER by " + fmt(r.over_by_ft, 2) + " ft") },
+    { key: "d", id: "ddl-out-d", label: "Developed length", value: (r) => fmt(r.developed_length_ft, 2) + " ft" + (!r.equivalents_entered ? " - NOT A VERDICT: elbows are counted as zero length until their equivalent lengths are entered" : r.within ? " - WITHIN" : " - OVER by " + fmt(r.over_by_ft, 2) + " ft") },
     { key: "f", id: "ddl-out-f", label: "Fittings cost", value: (r) => fmt(r.fitting_equivalent_ft, 2) + " ft, " + fmt(r.fitting_share_pct, 0) + "% of the total" },
     { key: "r", id: "ddl-out-r", label: "Straight run still available", value: (r) => r.within ? fmt(r.remaining_straight_ft, 2) + " ft" : "none - already over" },
     { key: "l", id: "ddl-out-l", label: "Label required (M1502.4.7)", value: (r) => r.label_required ? "yes - tag the equivalent length within 6 ft of the connection" : "no" },
@@ -12477,6 +12524,7 @@ CONSTRUCTION_RENDERERS["dryer-duct-length"] = _simpleRenderer({
 // dims: in { sleeping_rooms: dimensionless, sleeping_areas: dimensionless, additional_stories: dimensionless, alarm_type: dimensionless, distance_to_cooking_ft: L, distance_to_bath_door_ft: L } out: { required_alarms: dimensionless, required_cooking_ft: L, cooking_deficit_ft: L, bath_deficit_ft: L }
 export function computeSmokeAlarmPlacement({ sleeping_rooms = 0, sleeping_areas = 1, additional_stories = 0, alarm_type = "ionization", distance_to_cooking_ft = 0, distance_to_bath_door_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (sleeping_areas === null || sleeping_areas === "") sleeping_areas = 1;
   const rooms = Number(sleeping_rooms) || 0;
   const areas = Number(sleeping_areas) || 0;
   const stories = Number(additional_stories) || 0;
@@ -12553,6 +12601,8 @@ CONSTRUCTION_RENDERERS["smoke-alarm-placement"] = _simpleRenderer({
 // dims: in { sleeping_areas: dimensionless, bedrooms_with_appliance: dimensionless, has_fuel_appliance: dimensionless, has_attached_garage: dimensionless, stories: dimensionless, per_story_amendment: dimensionless } out: { required_alarms: dimensionless, area_alarms: dimensionless, bedroom_alarms: dimensionless, story_alarms: dimensionless }
 export function computeCoAlarmPlacement({ sleeping_areas = 1, bedrooms_with_appliance = 0, has_fuel_appliance = "yes", has_attached_garage = "no", stories = 1, per_story_amendment = "no" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  for (const [k, v] of [["has_fuel_appliance", has_fuel_appliance], ["has_attached_garage", has_attached_garage], ["per_story_amendment", per_story_amendment]]) if (v !== "yes" && v !== "no") return { error: k + " must be yes or no." };
+  if (sleeping_areas === null || sleeping_areas === "") sleeping_areas = 1;
   const areas = Number(sleeping_areas) || 0;
   const bedApp = Number(bedrooms_with_appliance) || 0;
   const st = Number(stories) || 0;
@@ -12996,7 +13046,9 @@ export function computeTemporaryStairwayCheck({ riser_count = 0, total_rise_in =
   if (rise < 0 || rv < 0 || tv < 0 || rail < 0 || land < 0) return { error: "Rises, variations, and heights cannot be negative (in)." };
 
   const ANGLE_MIN = 30, ANGLE_MAX = 50, VAR_MAX = 0.25, RISER_TRIGGER = 4, RISE_TRIGGER = 30, RAIL_MIN = 36, LANDING_MIN = 30;
-  const total_rise_used_in = rise > 0 ? rise : n * rh;
+  // The larger of the entered rise and risers x height: an entered rise used to override taller geometry.
+  // (A measured rise within 5% of the geometry is taken as entered.)
+  const total_rise_used_in = rise > 0 && n * rh <= rise * 1.05 ? rise : Math.max(rise > 0 ? rise : 0, n * rh);
   // Angle from the actual step geometry.
   const angle_deg = Math.atan(rh / td) * 180 / Math.PI;
   const angle_ok = angle_deg >= ANGLE_MIN - 1e-9 * Math.abs(ANGLE_MIN) && angle_deg <= ANGLE_MAX + 1e-9 * Math.abs(ANGLE_MAX);

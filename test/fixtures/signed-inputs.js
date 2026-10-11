@@ -193,7 +193,6 @@ export const SIGNED_INPUTS = [
   "refrigerant-mass-flow::h4_btulb",
   "refrigeration-cop::h4_btulb",
   "refrigeration-cop::tevap_f",
-  "mass-concrete-temp-rise::placing_temp_f",
   "haul-road-resistance::grade_pct",
   "wall-condensation-gradient::t_in_f",
   "wall-condensation-gradient::t_out_f",

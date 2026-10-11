@@ -35813,11 +35813,13 @@ test("bounds: spec-v1152 computeTemporaryStairwayCheck pins the whichever-is-les
   assert.ok(r.worst_variation_in === 0.5 && !r.uniform_ok && !r.passes);
   // WHICHEVER IS LESS = whichever comes FIRST: either condition alone triggers the rail.
   for (const [n, rise, expected] of [[3, 24, false], [3, 31, true], [4, 24, true], [6, 42, true], [1, 30, false]]) {
-    const t = _v1152({ ...base, riser_count: n, total_rise_in: rise });
+    // The riser height is kept consistent with the entered rise: since hardening slice 8 a rise
+    // well under risers x height no longer overrides the geometry.
+    const t = _v1152({ ...base, riser_count: n, total_rise_in: rise, riser_height_in: rise / n });
     assert.ok(t.rail_required === expected, "trigger wrong at " + n + " risers / " + rise + " in");
     assert.ok(t.by_risers === (n >= 4) && t.by_height === (rise > 30));
   }
-  assert.ok(_v1152({ ...base, riser_count: 3, total_rise_in: 30 }).rail_required === false, "30 in exactly is not MORE than 30");
+  assert.ok(_v1152({ ...base, riser_count: 3, total_rise_in: 30, riser_height_in: 10 }).rail_required === false, "30 in exactly is not MORE than 30");
   assert.ok(_v1152({ ...base, riser_count: 3, total_rise_in: 30.1 }).rail_required);
   // The rise falls back to risers x riser height when not entered.
   const derived = _v1152({ ...base, riser_count: 6, total_rise_in: 0, riser_height_in: 7 });
@@ -60335,4 +60337,54 @@ test("hardening slice 7 (construction part 1): the reviewed defects stay fixed",
   const dd = _s7.computeDemoDebris({ structure_type: "concrete", volume_yd3: 100 });
   assert.strictEqual(dd.dumpster_count, 3);
   assert.strictEqual(_s7.computeDemoDebris({ structure_type: "wood_frame", volume_yd3: 25 }).dumpster_count, 1);
+});
+
+// Hardening slice 8 (2026-10-10): construction part 2, 90 calculators re-derived and run by
+// independent reviewers. One assertion per confirmed defect.
+test("hardening slice 8 (construction part 2): the reviewed defects stay fixed", () => {
+  const near = (a, b, tol) => assert.ok(Math.abs(a - b) <= tol, a + " vs " + b);
+  const err = (r) => assert.ok(r && typeof r.error === "string", JSON.stringify(r).slice(0, 120));
+  // Code rules that were missing.
+  near(_s7.computeWindCcPressure({ v_mph: 95, kz: 0.57, gcp: -0.9 }).p_gov_psf, -16, 1e-9); // 30.2.2 minimum
+  assert.strictEqual(_s7.computeAsceLiveLoadReduction({ unreduced_load_psf: 150, tributary_area_ft2: 2000, floors_supported: "one" }).reduced_load_psf, 150);
+  near(_s7.computeAsceLiveLoadReduction({ unreduced_load_psf: 150, tributary_area_ft2: 2000, floors_supported: "two_plus" }).reduced_load_psf, 120, 1e-9);
+  assert.strictEqual(_s7.computeSnowUnbalancedGable({ ground_snow_pg_psf: 30, flat_roof_ps_psf: 25, roof_rise_on_12: 7, eave_to_ridge_ft: 30, w2: 0.5 }).applicable, true);
+  // Counts.
+  const cl = _s7.computeChainLinkFenceTakeoff({ perimeter_ft: 200, corners: 0, end_posts: 2 });
+  assert.strictEqual(cl.total_posts, 21); assert.strictEqual(cl.line_posts, 19);
+  assert.ok(_s7.computeChainLinkFenceTakeoff({ perimeter_ft: 20, corners: 4 }).total_posts >= 4);
+  assert.strictEqual(_s7.computeDrywallFastenerTakeoff({ field_screw_spacing_in: 10 }).screws_per_stud, 11);
+  const cs1 = _s7.computeCarpetSeamLayout({ room_length_ft: 30, room_width_ft: 20 }), cs2 = _s7.computeCarpetSeamLayout({ room_length_ft: 20, room_width_ft: 30 });
+  assert.strictEqual(cs1.seam_count ?? cs1.best?.seam_count, cs2.seam_count ?? cs2.best?.seam_count);
+  // Bending no longer dropped.
+  near(_s7.computeCombinedStressAxialBending({ P_lb: 20000, e_in: -1, A_in2: 30.25, c_in: 2.75, I_in4: 76.3 }).sigma_max_psi ?? _s7.computeCombinedStressAxialBending({ P_lb: 20000, e_in: -1, A_in2: 30.25, c_in: 2.75, I_in4: 76.3 }).sigma_max, 1382, 1);
+  err(_s7.computeCombinedStressAxialBending({ P_lb: 20000, e_in: 1, M_lbin: 90000, A_in2: 30.25, c_in: 2.75, I_in4: 76.3 }));
+  // Verdict at the exact limit.
+  assert.strictEqual(_s7.computeSeismicStoryDrift({ delta_xe_in: 0.28, cd: 3, ie: 1, hsx_in: 120, drift_ratio: 0.007 }).ok, true);
+  // Guards.
+  err(_s7.computeGlassVacuumLift({ safety_factor: 0.5 }));
+  assert.strictEqual(_s7.computeFormworkTieLoad({ lateral_pressure_psf: 5000, tie_swl_lb: "3000" }).pass, false);
+  err(_s7.computeMassConcreteTempRise({ placing_temp_f: null }));
+  err(_s7.computeJoistHangerCount({ ends_per_joist: 1.5 }));
+  err(_s7.computeAnchorEpoxyVolume({ bar_dia_in: -1 }));
+  err(_s7.computeBalusterPicketCount({ rail_clear_in: 6, picket_width_in: 5.5, max_gap_in: 0.2 }));
+  err(_s7.computeFoundationWaterproofingTakeoff({ coats: 0 }));
+  err(_s7.computeWoodNailWithdrawal({ g: 0.5, d_in: 0.131, p_in: 1.5, toenail: "Yes" }));
+  err(_s7.computeWoodLagWithdrawal({ g: 0.5, d_in: 0.375, p_thread_in: 2, end_grain: "YES" }));
+  err(_s7.computeWoodBearingPerpendicular({ r_lb: 800, b_in: 1.5, lb_in: 1.5, near_end: "Yes" }));
+  err(_s7.computeCantileverBeam({ L_ft: 6, P_lb: 300, w_plf: -100, I_in4: 100 }));
+  err(_s7.computeWindMwfrsPressure({ qz_psf: 20, qh_psf: 20, cp_lw: 0.5 }));
+  err(_s7.computeWindMwfrsPressure({ qz_psf: 20, qh_psf: 20, g_f: 85 }));
+  err(_s7.computeAbrasiveBlast({ nozzle_bore_in: 1.0, area_ft2: 500 }));
+  err(_s7.computePostHoleConcrete({ num_posts: 10, hole_diameter_in: 4.2, hole_depth_in: 30, post_side_in: 3.5 }));
+  err(_s7.computeDoorManeuveringClearance({ clear_perpendicular_in: 48, clear_latch_side_in: 0, side: "PULL" }));
+  err(_s7.computeLandingCheck({ landing_depth_in: 36, landing_width_in: 36, threshold_drop_in: 7.75, kind: "Door" }));
+  err(_s7.computeGuardHandrailCheck({ occupancy: "Commercial", surface_height_in: 48, measured_guard_in: 36, measured_infill_gap_in: 3 }));
+  err(_s7.computeGuardHandrailCheck({}));
+  err(_s7.computeCoAlarmPlacement({ sleeping_areas: 2, has_fuel_appliance: true }));
+  assert.ok(_s7.computeCoAlarmPlacement({ sleeping_areas: "", has_fuel_appliance: "yes", stories: 2 }).required_alarms >= 1);
+  assert.strictEqual(_s7.computeDryerDuctLength({ straight_run_ft: 30, elbow_90_count: 4, elbow_45_count: 2 }).equivalents_entered, false); // the page withholds the verdict on this flag
+  err(_s7.computeSeismicDesignSpectralAcceleration({ fa: 1.1, fv: 1.9 }));
+  near(_s7.computeGuardPostLoad({ post_spacing_ft: 8, uniform_plf: "" }).governing_load_lb, 400, 1e-9);
+  assert.strictEqual(_s7.computeTemporaryStairwayCheck({ riser_count: 3, total_rise_in: 20, riser_height_in: 11, tread_depth_in: 12 }).rail_required, true);
 });
