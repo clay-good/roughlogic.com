@@ -341,7 +341,6 @@ export const SIGNED_INPUTS = [
   "hx-lmtd-ntu::tc_in_F",
   "growing-degree-days::base_f",
   "livestock-water-requirement::t_low_f",
-  "langelier-index::temp",
   "two-sample-t-test::mean1",
   "two-sample-t-test::mean2",
   "one-sample-t-test::sample_mean",

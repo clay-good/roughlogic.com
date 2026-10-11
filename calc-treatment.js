@@ -19,8 +19,14 @@ export function computeLangelierIndex({ ph = 0, temp = 0, temp_unit = "C", ca_mg
   const ca = Number(ca_mgl) || 0;
   const alk = Number(alk_mgl) || 0;
   const tds = Number(tds_mgl) || 0;
+  if (temp === null || temp === "") return { error: "Enter the water temperature." };
+  // Any unit that was not exactly "F" used to be read as Celsius ("f" made 77 F water 77 C).
+  const _tu = String(temp_unit).toUpperCase();
+  if (_tu !== "F" && _tu !== "C") return { error: "Temperature unit must be F or C." };
   let tC = Number(temp);
-  if (temp_unit === "F") tC = (tC - 32) * 5 / 9;
+  if (_tu === "F") tC = (tC - 32) * 5 / 9;
+  if (!(tC >= 0 && tC <= 100)) return { error: "Water temperature must be between freezing and boiling." };
+  if (pH > 14) return { error: "pH must be between 0 and 14." };
   if (!Number.isFinite(pH) || pH <= 0) return { error: "pH must be a positive number." };
   if (!(ca > 0 && Number.isFinite(ca))) return { error: "Calcium hardness must be positive (mg/L as CaCO3)." };
   if (!(alk > 0 && Number.isFinite(alk))) return { error: "Total alkalinity must be positive (mg/L as CaCO3)." };
@@ -523,6 +529,8 @@ TREATMENT_RENDERERS["pool-volume"] = renderPoolVolume;
 export function computeBreakpointChlorination({ total_ppm = 0, free_ppm = 0, ratio = 10, gallons = 0, avail = 0 } = {}) {
   const _g = _finiteGuardPool(arguments[0]); if (_g) return _g;
   if ([gallons, avail].some((x) => Number(x) < 0)) return { error: "Pool volume and available chlorine cannot be negative." };
+  if (Number(avail) > 100) return { error: "Available chlorine is a percent of the product, 100 or less." };
+  if (Number(avail) > 0 && Number(avail) < 1) return { error: "Enter available chlorine as a percent (65 for 65%), not a fraction." };
   const total = Number(total_ppm) || 0;
   const free = Number(free_ppm) || 0;
   const r = Number(ratio) || 0;
@@ -817,7 +825,7 @@ export function computeVaAlkalinityRatio({ volatile_acids_mgl = 0, alkalinity_mg
   if (!(alk > 0)) return { error: "Alkalinity must be positive (mg/L as CaCO3)." };
   if (va < 0) return { error: "Volatile acids cannot be negative (mg/L)." };
   const ratio = va / alk;
-  const band = ratio < 0.1 ? "stable"
+  const band = ratio < 0.1 * (1 - 1e-9) ? "stable"
     : ratio <= 0.25 ? "acceptable"
     : ratio <= 0.4 ? "corrective action"
     : "souring";

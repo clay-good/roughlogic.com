@@ -743,6 +743,7 @@ export function computeTr55TimeOfConcentration({
   if (shL > 0) {
     if (!(num(shallow_slope) > 0)) return { error: "Shallow-concentrated slope must be positive (ft/ft)." };
     const paved = String(shallow_surface).toLowerCase() === "paved";
+    if (!paved && String(shallow_surface).toLowerCase() !== "unpaved") return { error: "Shallow-flow surface must be paved or unpaved." };
     v_shallow_fps = (paved ? 20.3282 : 16.1345) * Math.sqrt(num(shallow_slope));
     tt_shallow_hr = shL / (3600 * v_shallow_fps);
   }
@@ -1133,6 +1134,7 @@ const _CULVERT_INLET = {
 // dims: in { diameter_in: L, flow_cfs: L^3 T^-1, slope: dimensionless, config: dimensionless } out: { d_ft: L, barrel_area_ft2: L^2, dc_ft: L, hc_ft: L, hw_ft: L, hw_over_d: dimensionless, hc_over_d: dimensionless }
 export function computeCulvertInletControl({ diameter_in = 0, flow_cfs = 0, slope = 0, config = "concrete_groove_headwall" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (Number(slope) > 0.5) return { error: "Enter the barrel slope in ft/ft (0.01 for 1%); a slope above 0.5 is outside these culvert relations." };
   const C = _CULVERT_INLET[config];
   if (!C) return { error: "Unknown culvert shape / inlet configuration." };
   if (!(diameter_in > 0)) return { error: "Culvert diameter must be positive (in)." };
@@ -1237,6 +1239,7 @@ const _BOX_CULVERT_INLET = {
 // dims: in { span_in: L, rise_in: L, flow_cfs: L^3 T^-1, slope: dimensionless, config: dimensionless } out: { span_ft: L, rise_ft: L, barrel_area_ft2: L^2, dc_ft: L, hc_ft: L, hw_ft: L, hw_over_d: dimensionless, hc_over_d: dimensionless }
 export function computeBoxCulvertInletControl({ span_in = 0, rise_in = 0, flow_cfs = 0, slope = 0, config = "wingwall_30_75" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (Number(slope) > 0.5) return { error: "Enter the barrel slope in ft/ft (0.01 for 1%); a slope above 0.5 is outside these culvert relations." };
   const C = _BOX_CULVERT_INLET[config];
   if (!C) return { error: "Unknown box inlet configuration." };
   if (!(span_in > 0)) return { error: "Box span (width) must be positive (in)." };
@@ -1338,6 +1341,7 @@ const _CULVERT_OUTLET_KE = {
 // dims: in { diameter_in: L, flow_cfs: L^3 T^-1, length_ft: L, slope: dimensionless, manning_n: dimensionless, tw_ft: L, config: dimensionless } out: { d_ft: L, barrel_area_ft2: L^2, v_fps: L T^-1, velocity_head_ft: L, head_loss_ft: L, dc_ft: L, ho_ft: L, hw_ft: L, friction_coeff: dimensionless, ke: dimensionless }
 export function computeCulvertOutletControl({ diameter_in = 0, flow_cfs = 0, length_ft = 0, slope = 0, manning_n, tw_ft = 0, config = "concrete_square_headwall" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (Number(slope) > 0.5) return { error: "Enter the barrel slope in ft/ft (0.01 for 1%); a slope above 0.5 is outside these culvert relations." };
   tw_ft = Number(tw_ft);
   const C = _CULVERT_OUTLET_KE[config];
   if (!C) return { error: "Unknown culvert inlet configuration." };
@@ -1417,7 +1421,7 @@ function renderCulvertOutletControl(inputRegion, outputRegion, citationEl) {
       for (const o of [oH, oV, oHo, oNote]) o.textContent = "-";
       return;
     }
-    oHW.textContent = fmt(r.hw_ft, 2) + " ft above the inlet invert" + (r.barrel_full ? "" : " -- below the crown; full-flow form is approximate here");
+    oHW.textContent = r.hw_ft < 0 ? "outlet control does not govern here: the barrel's fall exceeds the losses (" + fmt(r.hw_ft, 2) + " ft); inlet control sets the headwater" : fmt(r.hw_ft, 2) + " ft above the inlet invert" + (r.barrel_full ? "" : " -- below the crown; full-flow form is approximate here");
     oH.textContent = fmt(r.head_loss_ft, 2) + " ft (Ke " + fmt(r.ke, 2) + ", friction multiple " + fmt(r.friction_coeff, 2) + " x velocity head)";
     oV.textContent = fmt(r.v_fps, 2) + " fps (velocity head " + fmt(r.velocity_head_ft, 2) + " ft)";
     oHo.textContent = fmt(r.ho_ft, 2) + " ft (max of tailwater and (dc + D)/2; dc " + fmt(r.dc_ft, 2) + " ft)";
@@ -1448,6 +1452,7 @@ const _BOX_OUTLET_KE = {
 // dims: in { span_in: L, rise_in: L, flow_cfs: L^3 T^-1, length_ft: L, slope: dimensionless, manning_n: dimensionless, tw_ft: L, config: dimensionless } out: { span_ft: L, rise_ft: L, barrel_area_ft2: L^2, r_ft: L, v_fps: L T^-1, velocity_head_ft: L, head_loss_ft: L, dc_ft: L, ho_ft: L, hw_ft: L, friction_coeff: dimensionless, ke: dimensionless }
 export function computeBoxCulvertOutletControl({ span_in = 0, rise_in = 0, flow_cfs = 0, length_ft = 0, slope = 0, manning_n = 0.012, tw_ft = 0, config = "wingwall_30_75" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (Number(slope) > 0.5) return { error: "Enter the barrel slope in ft/ft (0.01 for 1%); a slope above 0.5 is outside these culvert relations." };
   tw_ft = Number(tw_ft);
   const C = _BOX_OUTLET_KE[config];
   if (!C) return { error: "Unknown box culvert inlet configuration." };
@@ -1517,7 +1522,7 @@ function renderBoxCulvertOutletControl(inputRegion, outputRegion, citationEl) {
       for (const o of [oH, oV, oHo, oNote]) o.textContent = "-";
       return;
     }
-    oHW.textContent = fmt(r.hw_ft, 2) + " ft above the inlet invert" + (r.barrel_full ? "" : " -- below the crown; full-flow form is approximate here");
+    oHW.textContent = r.hw_ft < 0 ? "outlet control does not govern here: the barrel's fall exceeds the losses (" + fmt(r.hw_ft, 2) + " ft); inlet control sets the headwater" : fmt(r.hw_ft, 2) + " ft above the inlet invert" + (r.barrel_full ? "" : " -- below the crown; full-flow form is approximate here");
     oH.textContent = fmt(r.head_loss_ft, 2) + " ft (Ke " + fmt(r.ke, 2) + ", friction multiple " + fmt(r.friction_coeff, 2) + " x velocity head)";
     oV.textContent = fmt(r.v_fps, 2) + " fps (velocity head " + fmt(r.velocity_head_ft, 2) + " ft)";
     oHo.textContent = fmt(r.ho_ft, 2) + " ft (max of tailwater and (dc + D)/2; dc " + fmt(r.dc_ft, 2) + " ft)";
@@ -1765,8 +1770,11 @@ export function computeWellPointSpacing({ excavation_depth_ft = 0, water_table_d
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(excavation_depth_ft > 0)) return { error: "Excavation depth must be positive (ft)." };
   if (water_table_depth_ft < 0) return { error: "The water table depth cannot be negative (ft below grade)." };
-  if (!(excavation_depth_ft > water_table_depth_ft)) return { error: "The excavation does not reach the water table; no dewatering is indicated by this calculation." };
   if (subgrade_margin_ft < 0) return { error: "The margin below subgrade cannot be negative (ft)." };
+  // The water has to be held the MARGIN below subgrade, so the test is against the target depth:
+  // a table 2 ft under a 22 ft cut with a 3 ft margin still wants 1 ft of drawdown. Until
+  // 2026-10-11 this compared the excavation depth alone and said no dewatering was indicated.
+  if (!(excavation_depth_ft + subgrade_margin_ft > water_table_depth_ft)) return { error: "The water table is already below the target depth (subgrade plus the margin); no dewatering is indicated by this calculation." };
   if (!(practical_lift_ft > 0)) return { error: "The practical suction lift per stage must be positive (ft) -- commonly 15 to 18." };
   if (!(excavation_length_ft > 0)) return { error: "Excavation length must be positive (ft)." };
   if (!(excavation_width_ft > 0)) return { error: "Excavation width must be positive (ft)." };
@@ -1853,7 +1861,7 @@ export function computeWaterQualityVolume({ rainfall_depth_in = 0, impervious_pe
   if (!outs.every(Number.isFinite)) return { error: "Water quality volume math is not a finite value." };
   const lever_verdict = alternative_wqv_cf === null
     ? "Enter a comparison impervious percentage to see what the site plan is worth against the facility."
-    : "AT " + fmt(alternative_impervious_percent, 0) + "% IMPERVIOUS the volume is " + fmt(alternative_wqv_cf, 0) + " cu ft -- " + fmt(volume_saved_pct, 0) + "% less to treat, from the SITE PLAN rather than from the facility. Disconnecting impervious area and treating it at the source is far cheaper than building the pond it would otherwise need";
+    : "AT " + fmt(alternative_impervious_percent, 0) + "% IMPERVIOUS the volume is " + fmt(alternative_wqv_cf, 0) + " cu ft -- " + (volume_saved_pct < 0 ? fmt(-volume_saved_pct, 0) + "% MORE to treat" : fmt(volume_saved_pct, 0) + "% less to treat") + ", from the SITE PLAN rather than from the facility. Disconnecting impervious area and treating it at the source is far cheaper than building the pond it would otherwise need";
   return {
     rainfall_depth_in, impervious_percent, area_ac, runoff_coefficient,
     wqv_cf, wqv_ac_ft, wqv_gal, alternative_impervious_percent,

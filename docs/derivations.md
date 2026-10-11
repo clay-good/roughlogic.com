@@ -3620,14 +3620,14 @@ cross-check.
 | calc-stage.js | `computeLightingBeam` | `{ beam_angle_deg = 0, throw_distance = 0, distance_unit = "ft", source = "can...` | _ | _ | _ |
 | calc-stage.js | `computeLightingThrowForPool` | `{ target_pool_diameter = 0, beam_angle_deg = 0, distance_unit = "ft" } = {}` | _ | _ | _ |
 | calc-stage.js | `computeMassLawTL` | `{ surface_mass_psf = 0, frequency_hz = 0, incidence = "field" } = {}` | _ | _ | _ |
-| calc-stage.js | `computeNeutralImbalance` | `{ I_A = 0, I_B = 0, I_C = 0, harmonic_loads = false }` | _ | _ | _ |
+| calc-stage.js | `computeNeutralImbalance` | `{ I_A = 0, I_B = 0, I_C = 0, harmonic_loads = false } = {}` | _ | _ | _ |
 | calc-stage.js | `computePowerDistro` | `{ watts = 0, voltage_v = 208, phase = "three", rating_a = 0, pf = 1, derate =...` | _ | _ | _ |
 | calc-stage.js | `computeProjectorBrightness` | `{ screen_w_ft = 0, screen_h_ft = 0, screen_gain = 1.0, target_foot_lamberts =...` | _ | _ | _ |
 | calc-stage.js | `computeProjectorMaxScreenSize` | `{ available_lumens = 0, screen_gain = 1.0, target_foot_lamberts = 16, aspect_...` | _ | _ | _ |
 | calc-stage.js | `computeRiggingCheck` | `{ hardware = "sling_5_8_steel", configuration = "vertical", load_lb = 0, incl...` | _ | _ | _ |
 | calc-stage.js | `computeRoomAbsorptionTarget` | `{ volume_ft3 = 0, target_rt60_s = 0, existing_sabins = 0, sabine_coeff = 0.04...` | _ | _ | _ |
 | calc-stage.js | `computeRoomAcoustics` | `{ volume_ft3 = 0, total_sabins = 0, length_ft = 0, width_ft = 0, height_ft = ...` | _ | _ | _ |
-| calc-stage.js | `computeSPL` | `{ L1_dB = 0, d1 = 1, d2 = 0, mode = "free_field", n_sources = 1 }` | _ | _ | _ |
+| calc-stage.js | `computeSPL` | `{ L1_dB = 0, d1 = 1, d2 = 0, mode = "free_field", n_sources = 1 } = {}` | _ | _ | _ |
 | calc-stage.js | `computeSPLAtmospheric` | `{ source_SPL_dB = 0, d_ref_m = 1, d_far_m = 0, temperature_C = 20, RH_percent...` | _ | _ | _ |
 | calc-stage.js | `computeSPLDistanceForLevel` | `{ L1_dB = 0, d1 = 1, target_L2_dB = 0, mode = "free_field", n_sources = 1 } = {}` | _ | _ | _ |
 | calc-stage.js | `computeSpeakerImpedance` | `{ topology, z_ohm, count, series_per_branch, branches, amp_min_ohm, power_w }` | _ | _ | _ |

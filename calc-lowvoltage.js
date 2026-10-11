@@ -342,6 +342,9 @@ export function computeCableTrayFill({ tray_type = "ladder", tray_width_in = 0, 
   const width = Number(tray_width_in);
   if (!(width > 0)) return { error: "Tray inside width must be positive (in)." };
   if (!Array.isArray(cables) || cables.length === 0) return { error: "Enter at least one cable group (count x diameter)." };
+  // An unknown type used to get the ladder allowance, the generous one.
+  if (!["ladder", "solid-bottom"].includes(tray_type)) return { error: "Unknown tray type." };
+  if (!cables.some((c) => Number(c && c.count) > 0)) return { error: "Enter a cable count of at least one." };
   let diameter_sum = 0, area_sum = 0, hasLarge = false, hasSmall = false;
   for (const c of cables) {
     const count = Math.max(0, Number(c && c.count) || 0);
@@ -556,6 +559,7 @@ export function computeSpeaker70vLine({ amp_rated_w = 0, headroom_percent = 20, 
   const tc = Math.max(0, Number(tap_count) || 0);
   const total_tap_w = tw * tc;
   const headroom = Number(headroom_percent) || 0;
+  if (!(headroom >= 0 && headroom < 100)) return { error: "Headroom must be between 0 and 100 percent." };
   const budget_limit_w = rating * (1 - headroom / 100);
   const within_budget = total_tap_w <= budget_limit_w + 1e-9 * Math.abs(budget_limit_w);
   const notes = [];
@@ -570,11 +574,11 @@ export function computeSpeaker70vLine({ amp_rated_w = 0, headroom_percent = 20, 
   const len = Number(run_length_ft) || 0;
   const ohms_per_kft = Number(wire_ohms_per_1000ft) || 0;
   if (len > 0 && ohms_per_kft > 0 && total_tap_w > 0) {
-    const I = total_tap_w / V;
+    // The wire is in series with the line's load Z = V^2 / P, so the speakers see V Z / (Z + R)
+    // and the level falls 20 log10(1 + R / Z). Until 2026-10-11 this took I^2 R at the full-voltage
+    // current, which read about half the true dB on a short run and 113 dB on a long one.
     const R = 2 * (len / 1000) * ohms_per_kft;
-    const p_loss = I * I * R;
-    const delivered = Math.max(total_tap_w - p_loss, 1e-9);
-    line_loss_db = 10 * Math.log10(total_tap_w / delivered);
+    line_loss_db = 20 * Math.log10(1 + R / reflected_impedance_ohm);
   }
   notes.push("Constant-voltage line; the amplifier spec governs. Distinct from the low-impedance speaker-impedance tile (Group N).");
   return { total_tap_w, budget_limit_w, within_budget, reflected_impedance_ohm, max_additional_taps, line_voltage_v: V, line_loss_db, notes };
@@ -674,6 +678,8 @@ export function computeStandbyBatteryRuntime({ battery_ah = 0, standby_current_a
   if (!(Is > 0)) return { error: "Standby current must be positive (A)." };
   if (!(Ia >= 0) || !(Ma >= 0)) return { error: "Alarm current and period must be non-negative." };
   if (!(d > 0)) return { error: "Derate factor must be positive." };
+  // The factor divides the nameplate; below 1 it would credit more capacity than the battery has.
+  if (d < 1) return { error: "The aging / derate factor is 1 or more (1.25 is typical); below 1 it would credit capacity above nameplate." };
   const alarm_ah = Ia * (Ma / 60);
   const usable_ah = Ah / d;
   // Inverse of required_ah = (Is x Hs + Ia x Ma/60) x derate: Hs = (Ah/derate - alarm_ah) / Is.
@@ -718,7 +724,10 @@ export function computeCoaxRgLoss({ mode = "loss", loss_per_100ft_db = 0, length
   const lp = Number(loss_per_100ft_db);
   if (!(lp > 0)) return { error: "Per-100-ft loss must be positive (dB)." };
 
+  if (mode !== "max-run" && mode !== "loss") return { error: "Mode must be loss or max-run." };
   if (mode === "max-run") {
+    const _blank = (v) => v === null || v === undefined || v === "";
+    if (_blank(source_level) || _blank(target_level)) return { error: "Enter source and target levels for max-run." };
     const src = Number(source_level), tgt = Number(target_level);
     if (!Number.isFinite(src) || !Number.isFinite(tgt)) return { error: "Enter source and target levels for max-run." };
     if (!(src > tgt)) return { error: "Source level must exceed the target level." };
@@ -787,7 +796,7 @@ export function computeCameraLensFov({ sensor_width_mm = 0, focal_length_mm = 0,
   const fov_deg = 2 * Math.atan(sensor / (2 * focal)) * 180 / Math.PI;
   const scene_ft = dist * sensor / focal;
   const ppf = px / scene_ft;
-  const dori = ppf >= 76 ? "Identify (>= 76 ppf)" : ppf >= 38 ? "Recognize (>= 38 ppf)" : ppf >= 19 ? "Observe (>= 19 ppf)" : ppf >= 8 ? "Detect (>= 8 ppf)" : "below Detect (< 8 ppf)";
+  const dori = ppf >= 76 * (1 - 1e-9) ? "Identify (>= 76 ppf)" : ppf >= 38 * (1 - 1e-9) ? "Recognize (>= 38 ppf)" : ppf >= 19 * (1 - 1e-9) ? "Observe (>= 19 ppf)" : ppf >= 8 * (1 - 1e-9) ? "Detect (>= 8 ppf)" : "below Detect (< 8 ppf)";
   return {
     fov_deg, scene_ft, ppf, dori,
     note: "Camera lens field of view and pixel density (IEC 62676-4 DORI): the horizontal field of view is 2 x atan(sensor width / (2 x focal length)); the scene width at the target = distance x sensor / focal; the pixel density in pixels per foot (ppf) = horizontal resolution / scene width. The DORI bands set the density needed for a task: Detect 8 ppf, Observe 19, Recognize 38, Identify 76 (per meter these are 25/63/125/250 ppm). A longer lens narrows the FOV and raises the density at that distance. A design aid; verify against the manufacturer's lens chart and a live view.",
@@ -880,6 +889,7 @@ export function computeCeilingSpeakerCoverage({ ceiling_ft = 0, ear_ft = 0, cove
   const diameter_ft = 2 * (ceiling - ear) * Math.tan((cov / 2) * Math.PI / 180);
   // D / sqrt 2 exactly (Bose In-ceiling Design Guide multipliers 2.45 / 1.84 = 3.46 / 2.61 over sqrt 2);
   // 0.7 until 2026-10-02 read 1,200 ft^2 at a 12 ft circle as 18 speakers where 17 cover it.
+  if (layout !== "minimum_overlap" && layout !== "edge_to_edge") return { error: "Layout must be edge_to_edge or minimum_overlap." };
   const spacing_ft = layout === "minimum_overlap" ? Math.SQRT1_2 * diameter_ft : diameter_ft;
   const count = Math.ceil(area / (spacing_ft * spacing_ft) - 1e-9);
   return {
@@ -978,7 +988,8 @@ export function computeStructuredCablingChannel({ permanent_link_m = 0, cords_m 
   const pl = Number(permanent_link_m) || 0;
   const cords = Number(cords_m) || 0;
   const temp = Number(temp_c) || 0;
-  const derate = Number(derate_per_c) || 0;
+  // A blank or zero coefficient is "not entered", not "this cable does not de-rate".
+  const derate = Number(derate_per_c) || 0.004;
   if (!(pl > 0)) return { error: "Permanent-link length must be positive (m)." };
   if (cords < 0) return { error: "Cord length must be non-negative (m)." };
   if (derate < 0) return { error: "De-rate factor must be non-negative." };
@@ -1012,7 +1023,7 @@ function _renderStructuredCablingChannel(inputRegion, outputRegion, citationEl) 
   const oCh = makeOutputLine(outputRegion, "Channel vs 100 m", "scc-out-ch");
   const oNote = makeOutputLine(outputRegion, "Note", "scc-out-n");
   const update = debounce(() => {
-    const r = computeStructuredCablingChannel({ permanent_link_m: Number(pl.input.value) || 0, cords_m: Number(cd.input.value) || 0, temp_c: Number(tc.input.value) || 0, derate_per_c: Number(dr.input.value) || 0 });
+    const r = computeStructuredCablingChannel({ permanent_link_m: Number(pl.input.value) || 0, cords_m: Number(cd.input.value) || 0, temp_c: tc.input.value === "" ? 20 : Number(tc.input.value), derate_per_c: Number(dr.input.value) || 0.004 });
     if (r.error) { oPl.textContent = r.error; oCh.textContent = "-"; oNote.textContent = ""; return; }
     oPl.textContent = fmt(r.max_pl_m, 1) + " m max -- link " + (r.pl_ok ? "OK" : "TOO LONG");
     oCh.textContent = fmt(r.channel_m, 1) + " m -- channel " + (r.chan_ok ? "OK" : "OVER 100 m") + (r.cords_ok ? "" : "; cords over the 10 m TIA total");

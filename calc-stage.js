@@ -246,7 +246,8 @@ export const dmxExample = {
 //        out: { neutral_A: I, imbalance_percent: dimensionless, harmonic_warning: dimensionless }
 // (Phase currents carry the SI base electric-current dimension `I`;
 // the harmonic-loads flag is a boolean categorical, dimensionless.)
-export function computeNeutralImbalance({ I_A = 0, I_B = 0, I_C = 0, harmonic_loads = false }) {
+export function computeNeutralImbalance({ I_A = 0, I_B = 0, I_C = 0, harmonic_loads = false } = {}) {
+  I_A = Number(I_A); I_B = Number(I_B); I_C = Number(I_C);
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (I_A < 0 || I_B < 0 || I_C < 0) return { error: "Currents must be non-negative." };
   const I_N = Math.sqrt(Math.max(0, I_A * I_A + I_B * I_B + I_C * I_C - I_A * I_B - I_B * I_C - I_A * I_C));
@@ -279,9 +280,9 @@ export const SPL_MODES = {
 //        out: { L2_dB: dimensionless, L2_freefield_dB: dimensionless, mode_factor_dB: dimensionless }
 // (Decibels are a logarithmic ratio and therefore dimensionless; mode
 // is a categorical string. Only the d1 / d2 distances carry length.)
-export function computeSPL({ L1_dB = 0, d1 = 1, d2 = 0, mode = "free_field", n_sources = 1 }) {
+export function computeSPL({ L1_dB = 0, d1 = 1, d2 = 0, mode = "free_field", n_sources = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
-  const m = SPL_MODES[mode];
+  const m = Object.hasOwn(SPL_MODES, mode) ? SPL_MODES[mode] : null;
   if (!m) return { error: "Unknown mode." };
   if (!(d1 > 0)) return { error: "Reference distance must be positive." };
   if (!(d2 > 0)) return { error: "Target distance must be positive." };
@@ -399,7 +400,9 @@ function _r(spec) {
       for (const f of spec.fields) {
         if (f.kind === "select") params[f.key] = fields[f.key].select.value;
         else if (f.kind === "checkbox") params[f.key] = fields[f.key].input.checked;
-        else params[f.key] = Number(fields[f.key].input.value) || 0;
+        // A cleared field that has a declared default means the default, not zero
+        // (a cleared 68 F air temperature used to compute at 0 F).
+        else params[f.key] = fields[f.key].input.value === "" && f.default !== undefined ? f.default : Number(fields[f.key].input.value) || 0;
       }
       const r = spec.compute(params);
       if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }
@@ -663,7 +666,8 @@ export function computeSPLAtmospheric({
   if (!(d1 > 0)) return { error: "Reference distance must be positive." };
   if (!(d2 > 0)) return { error: "Target distance must be positive." };
   if (d2 < d1) return { error: "Target distance must not be below the reference distance (the source SPL is defined at the reference distance)." };
-  if (!Number.isFinite(T_C)) return { error: "Temperature must be numeric." };
+  if (temperature_C === null || temperature_C === "" || RH_percent === null || RH_percent === "") return { error: "Enter the air temperature and relative humidity; absorption depends strongly on both." };
+  if (!Number.isFinite(T_C) || T_C <= -100 || T_C > 100) return { error: "Temperature must be numeric and a real air temperature (C)." };
   if (!Number.isFinite(RH) || RH < 0 || RH > 100) return { error: "Relative humidity must be 0 - 100 percent." };
   if (!(P > 0)) return { error: "Pressure must be positive." };
   const T_K = T_C + 273.15;
@@ -675,7 +679,8 @@ export function computeSPLAtmospheric({
   const inverse_square_dB = 20 * Math.log10(d2 / d1);
   const bands = SPL_OCTAVE_BANDS_HZ.map((f) => {
     const alpha_dB_m = _v9_atmosphericAbsorption({ f_Hz: f, T_K, h_r, p_a_kPa: P });
-    const absorption_dB = alpha_dB_m * d2;
+    // Air absorbs over the path travelled FROM the reference point, not from the source.
+    const absorption_dB = alpha_dB_m * (d2 - d1);
     const SPL_far_dB = L1 - inverse_square_dB - absorption_dB;
     return { f_Hz: f, alpha_dB_per_m: alpha_dB_m, absorption_dB, SPL_far_dB };
   });
@@ -1011,7 +1016,10 @@ export function computeAmpPowerSpl({ sensitivity_db, power_w, distance_m, crest_
   if (typeof target_spl_db === "number") {
     power_for_target_w = Math.pow(10, (target_spl_db - sensitivity_db + 20 * Math.log10(distance_m)) / 10);
     if (!Number.isFinite(power_for_target_w)) return { error: "Target SPL out of representable range." };
-    if (max_spl_db > 0) target_achievable = target_spl_db <= max_spl_db;
+    // The rated maximum is a 1 m figure like the sensitivity, so the level to compare is the one
+    // the speaker makes at 1 m to deliver the target at the listener. Until 2026-10-11 the target
+    // at the listener was compared straight to the rating (110 dB at 10 m passed a 120 dB box).
+    if (max_spl_db > 0) target_achievable = target_spl_db + 20 * Math.log10(distance_m) <= max_spl_db + 1e-9 * max_spl_db;
   }
   return { spl_db, peak_spl_db, power_for_target_w, target_achievable };
 }
@@ -1455,6 +1463,7 @@ STAGE_RENDERERS["partition-mass-law-tl"] = renderMassLawTL;
 // dims: in { temperature_f: T } out: { speed_ftps: L T^-1, speed_mps: L T^-1, delay_ms_per_ft: T L^-1 }
 export function computeSpeedOfSoundAir({ temperature_f = 68 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (temperature_f === null || temperature_f === "") return { error: "Enter the air temperature (F)." };
   const tf = Number(temperature_f);
   if (!Number.isFinite(tf)) return { error: "Temperature must be a number (F)." };
   const tc = (tf - 32) / 1.8;
@@ -1588,7 +1597,8 @@ export function computeLedTapeRun({ power_per_ft_w = 0, run_length_ft = 0, suppl
   const psu_w = load_w / (1 - head / 100);
   const current_a = load_w / volt;
   const end_drop_v = current_a * (rpf * len) / 2;
-  const end_voltage_v = volt - end_drop_v;
+  // More drop than supply is not a negative voltage; the far end is simply dark.
+  const end_voltage_v = Math.max(0, volt - end_drop_v);
   const drop_pct = end_drop_v / volt * 100;
   const too_long = drop_pct > tol + 1e-9 * Math.abs(tol);
   return {
@@ -1606,7 +1616,7 @@ const renderLedTapeRun = _r({
     { key: "supply_voltage_v", label: "Supply voltage (V, 12 / 24)", kind: "number" },
     { key: "resistance_per_ft", label: "Round-trip resistance (ohm/ft)", kind: "number" },
     { key: "headroom_pct", label: "PSU headroom (%)", kind: "number", default: 20 },
-    { key: "drop_tolerance_pct", label: "Acceptable end drop (%)", kind: "number" },
+    { key: "drop_tolerance_pct", label: "Acceptable end drop (%)", kind: "number", default: 10 },
   ],
   outputs: [
     { key: "l", id: "ltr-out-l", label: "Total load / PSU size", value: (r) => fmt(r.load_w, 1) + " W (PSU >= " + fmt(r.psu_w, 0) + " W)" },
@@ -1665,7 +1675,7 @@ export function computeSPLDistanceForLevel({ L1_dB = 0, d1 = 1, target_L2_dB = 0
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // Unit / range guard added 2026-09-26 after printed-example probing.
   if (!(Number(arguments[0]?.target_L2_dB) > 0)) return { error: "The target level must be a positive dB SPL." };
-  const m = SPL_MODES[mode];
+  const m = Object.hasOwn(SPL_MODES, mode) ? SPL_MODES[mode] : null;
   if (!m) return { error: "Unknown mode." };
   const ref = Number(d1) || 0;
   const n = Number(n_sources) || 0;

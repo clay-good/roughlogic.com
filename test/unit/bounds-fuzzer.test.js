@@ -48096,7 +48096,11 @@ test("bounds: spec-v1739 computeWellPointSpacing -- suction lift is a ceiling, n
   // Capacity is the entered per-point figure times the points -- an upper
   // bound from the equipment, not a flow the soil must deliver.
   assert.ok(Math.abs(r.system_capacity_gpm - r.points_per_stage * base.point_capacity_gpm) < 1e-9);
-  assert.ok("error" in _v1739({ ...base, excavation_depth_ft: 4 }));
+  // A 2 ft cut with the 3 ft margin targets 5 ft, above the 6 ft table: nothing to dewater.
+  // (This pinned a 4 ft cut until 2026-10-11, but its 7 ft target is 1 ft into the water; the
+  // guard now compares the target depth, the quantity the drawdown is figured from.)
+  assert.ok("error" in _v1739({ ...base, excavation_depth_ft: 2 }));
+  assert.ok(Math.abs(_v1739({ ...base, excavation_depth_ft: 4 }).total_drawdown_ft - 1) < 1e-9);
   assert.ok("error" in _v1739({ ...base, point_spacing_ft: 0 }));
 });
 
@@ -60805,4 +60809,48 @@ test("hardening slice 18 (trucking, fabrication, earthwork)", async () => {
   assert.ok(E.computeRusleSoilLoss({ r_factor: 100, k_factor: 0.3, ls_factor: 1, c_factor: null, p_factor: 1, acres: 1 }).error);
   assert.ok(E.computeRiprapD50({ velocity_fps: 8, specific_gravity: 165 }).error);
   assert.ok(E.computeHaulCycleProduction({ truck_cap_lcy: 12, load_min: 2, haul_min: 5, return_min: 4, eff_min_per_hr: 500 }).error);
+});
+
+test("hardening slice 19 (water treatment, stage, drainage, low voltage)", async () => {
+  const T = await import("../../calc-treatment.js");
+  const ST = await import("../../calc-stage.js");
+  const D = await import("../../calc-drainage.js");
+  const LV = await import("../../calc-lowvoltage.js");
+  // 70 V line: the wire is in series with Z = V^2 / P
+  const sp = LV.computeSpeaker70vLine({ amp_rated_w: 400, headroom_percent: 20, tap_watts: 10, tap_count: 20, line_voltage_v: 70.7, run_length_ft: 2500, wire_ohms_per_1000ft: 6.385 });
+  const Z = 70.7 * 70.7 / 200, R = 2 * 2.5 * 6.385;
+  assert.ok(Math.abs(sp.line_loss_db - 20 * Math.log10(1 + R / Z)) < 1e-9);
+  assert.ok(sp.line_loss_db < 10);
+  assert.ok(LV.computeSpeaker70vLine({ amp_rated_w: 200, headroom_percent: -50, tap_watts: 10, tap_count: 28 }).error);
+  // a blank de-rate coefficient is the standard one, not none
+  assert.equal(LV.computeStructuredCablingChannel({ permanent_link_m: 90, cords_m: 5, temp_c: 60, derate_per_c: 0 }).ok, LV.computeStructuredCablingChannel({ permanent_link_m: 90, cords_m: 5, temp_c: 60 }).ok);
+  assert.ok(LV.computeStandbyBatteryRuntime({ battery_ah: 18, standby_current_a: 0.5, alarm_current_a: 2, alarm_minutes: 5, derate: 0.5 }).error);
+  assert.ok(LV.computeCoaxRgLoss({ mode: "max-run", loss_per_100ft_db: 6.3, source_level: null, target_level: -10 }).error);
+  assert.ok(LV.computeCoaxRgLoss({ mode: "maxrun", loss_per_100ft_db: 6.3, length_ft: 100 }).error);
+  assert.ok(LV.computeCableTrayFill({ tray_type: "solid", tray_width_in: 12, cables: [{ count: 16, diameter_in: 1 }] }).error);
+  assert.ok(LV.computeCableTrayFill({ tray_type: "ladder", tray_width_in: 12, cables: [{ count: 0, diameter_in: 1 }] }).error);
+  assert.ok(LV.computeCeilingSpeakerCoverage({ ceiling_ft: 12, ear_ft: 4, coverage_deg: 90, room_area_ft2: 1200, layout: "min_overlap" }).error);
+  assert.match(LV.computeCameraLensFov({ sensor_width_mm: 4.8, focal_length_mm: 2.8, distance_ft: 140, h_pixels: 1920 }).dori ?? "", /^Detect/);
+  // stage
+  assert.equal(ST.computeAmpPowerSpl({ sensitivity_db: 90, power_w: 100, distance_m: 10, target_spl_db: 110, max_spl_db: 120 }).target_achievable, false);
+  const at = ST.computeSPLAtmospheric({ source_SPL_dB: 95, d_ref_m: 100, d_far_m: 100 });
+  assert.ok(Math.abs(at.SPL_far_1kHz_dB - 95) < 1e-9, "no travel, no loss");
+  assert.ok(ST.computeSPLAtmospheric({ source_SPL_dB: 95, d_ref_m: 1, d_far_m: 100, RH_percent: null, temperature_C: null }).error);
+  assert.ok(ST.computeSPL({ L1_dB: 110, d1: 1, d2: 30, mode: "constructor" }).error);
+  assert.ok(ST.computeSPL().error);
+  assert.ok(Math.abs(ST.computeNeutralImbalance({ I_A: "100", I_B: "85", I_C: "70" }).imbalance_percent - ST.computeNeutralImbalance({ I_A: 100, I_B: 85, I_C: 70 }).imbalance_percent) < 1e-9);
+  assert.ok(ST.computeSpeedOfSoundAir({ temperature_f: "" }).error);
+  assert.equal(ST.computeLedTapeRun({ power_per_ft_w: 4.4, run_length_ft: 100, supply_voltage_v: 12, resistance_per_ft: 0.05 }).end_voltage_v, 0);
+  // drainage
+  const wp = D.computeWellPointSpacing({ excavation_depth_ft: 22, water_table_depth_ft: 24, subgrade_margin_ft: 3, practical_lift_ft: 15, excavation_length_ft: 100, excavation_width_ft: 60, point_spacing_ft: 5 });
+  assert.ok(Math.abs(wp.total_drawdown_ft - 1) < 1e-9);
+  assert.ok(D.computeTr55TimeOfConcentration({ ...D.tr55TimeOfConcentrationExample.inputs, shallow_surface: "pavement" }).error);
+  assert.ok(D.computeCulvertInletControl({ diameter_in: 36, flow_cfs: 5, slope: 1 }).error);
+  // treatment
+  const li = { ph: 7.5, temp: 77, ca_mgl: 200, alk_mgl: 150, tds_mgl: 320 };
+  assert.ok(Math.abs(T.computeLangelierIndex({ ...li, temp_unit: "f" }).lsi - T.computeLangelierIndex({ ...li, temp_unit: "F" }).lsi) < 1e-12);
+  assert.ok(T.computeLangelierIndex({ ...li, temp_unit: "K" }).error);
+  assert.ok(T.computeLangelierIndex({ ...li, temp: "", temp_unit: "F" }).error);
+  assert.equal(T.computeVaAlkalinityRatio({ volatile_acids_mgl: 50.3, alkalinity_mgl: 503 }).band, "acceptable");
+  assert.ok(T.computeBreakpointChlorination({ total_ppm: 1.5, free_ppm: 1, ratio: 10, gallons: 15000, avail: 650 }).error);
 });
