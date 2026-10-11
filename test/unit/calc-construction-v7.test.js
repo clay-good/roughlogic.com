@@ -60,9 +60,10 @@ test("246 errors on zero / negative inputs", () => {
   assert.ok(computeStairStringer({ total_rise_in: 109, target_rise_in: 7, target_tread_in: 0 }).error);
 });
 
-test("246 angle_deg matches atan2(rise, run)", () => {
+test("246 angle_deg is the unit pitch, atan2(exact rise, tread)", () => {
+  // Since hardening slice 7: total rise over (risers - 1) treads is steeper than the stair.
   const r = computeStairStringer(stairStringerExampleV7.inputs);
-  const expected = Math.atan2(stairStringerExampleV7.inputs.total_rise_in, r.total_run_in) * 180 / Math.PI;
+  const expected = Math.atan2(r.exact_rise_in, r.tread_depth_in) * 180 / Math.PI;
   assert.ok(close(r.angle_deg, expected, 0.001));
 });
 

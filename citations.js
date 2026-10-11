@@ -3588,7 +3588,7 @@ export const CITATIONS = {
   // --- v7 Group E extensions (utilities 246 through 251) ---
 
   "stair-stringer-layout": {
-    formula: "Riser count = ceil(total_rise / target_rise). Exact rise = total / count. Total run = (count − 1) × tread. Stringer hypotenuse = sqrt(rise² + run²). Throat depth = stringer_thickness × cos(theta) − exact_rise × sin(theta) where theta = atan2(rise, run). Pass/fail against user-entered local-code rise max and tread min.",
+    formula: "Riser count = ceil(total_rise / target_rise). Exact rise = total / count. Total run = (count − 1) × tread. Stringer hypotenuse = sqrt(rise² + run²). Stair angle theta = atan2(exact_rise, tread), the unit pitch. Throat depth = stringer depth − exact_rise × tread / sqrt(exact_rise² + tread²), the board depth less the altitude of the notch triangle. Pass/fail against user-entered local-code rise max and tread min.",
     edition: IRC_2021 + " §R311.7 referenced by name; the user supplies the AHJ's adopted max rise and min tread (the tile does not bundle code values).",
     freeAccess: ICC_FREE,
     governance: GOVERNANCE.structural,

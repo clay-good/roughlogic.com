@@ -60282,3 +60282,57 @@ test("hardening slice 6 (fire, sprinkler, fire water, gas, relief): the reviewed
   assert.ok(/SHORT of the load at BOTH/.test(JSON.stringify(_s6G.computePropaneRegulatorSizing({ ..._s6G.propaneRegulatorSizingExample.inputs, connected_load_btuh: 1000000 }))));
   err(_s6R.computeSafeRoomCapacity({ room_type: "community_tornado", gross_area_sqft: 12000, usable_method: "net", net_usable_area_sqft: 11997, bed_spaces_count: 399 }));
 });
+
+// Hardening slice 7 (2026-10-10): construction part 1, 90 calculators re-derived and run by
+// independent reviewers. One assertion per confirmed defect.
+import * as _s7 from "../../calc-construction.js";
+
+test("hardening slice 7 (construction part 1): the reviewed defects stay fixed", () => {
+  const near = (a, b, tol) => assert.ok(Math.abs(a - b) <= tol, a + " vs " + b);
+  const err = (r) => assert.ok(r && typeof r.error === "string", JSON.stringify(r).slice(0, 120));
+  // The stair throat is the board depth less the altitude of the notch triangle, at the unit pitch.
+  const st = _s7.computeStairStringerV7({ total_rise_in: 105, target_rise_in: 7, target_tread_in: 11, stringer_thickness_in: 9.25 });
+  near(st.throat_in, 9.25 - 7 * 11 / Math.hypot(7, 11), 1e-9); assert.ok(st.throat_in < 3.5);
+  near(_s7.computeStairStringerV7({ total_rise_in: 14, target_rise_in: 7, target_tread_in: 11 }).angle_deg, 32.47, 0.01);
+  // An irregular hip shares one rise.
+  const hip = _s7.computeHipValleyRafter({ run_ft: 14, pitch: 6, pitch_irregular: 9 });
+  near(hip.irregular.common_2_length_ft, 11.667, 0.001); near(hip.irregular.hip_length_irregular_ft, 18.22, 0.01);
+  err(_s7.computeHipValleyRafter({ run_ft: 14, pitch: 6, overhang_in: -500 }));
+  // Blank read as a real value, and unknown options.
+  err(_s7.computeDeckBeamPost({ joist_span_ft: 14, beam_span_ft: 10, post_height_ft: 8, live_load_psf: null, dead_load_psf: 10 }));
+  err(_s7.computeDeckBeamPost({ joist_span_ft: 14, beam_span_ft: 10, ledger: "xyz" }));
+  err(_s7.computeSnowLoad({ Pg_psf: 30, Ce: null, Ct: "" }));
+  err(_s7.computeSnowLoad({ Pg_psf: 30, Cs: 5 }));
+  err(_s7.computeWindPressure({ V_mph: 100, exposure: "d" }));
+  err(_s7.computePlywoodSpan({ span_rating: "48/24", application: "roof", support_spacing_in: 48, live_load_psf: 30, dead_load_psf: 10, edge_support: "none" }));
+  err(_s7.computeFilletWeldStrength({ leg_in: 0.25, length_in: 6, electrode: "E90" }));
+  err(_s7.computeFilletWeldStrength({ leg_in: 0.25, length_in: 6, method: "lrfd" }));
+  err(_s7.computeMembraneFastenerTakeoff({ field_seam_covered: "Yes" }));
+  err(_s7.computeMortarMix({ unit_count: 600, joint_in: 0 }));
+  // Out-of-table or impossible inputs that used to answer.
+  err(_s7.computeConcreteMixDesign({ strength_psi: 8000 }));
+  err(_s7.computeExcavationVolume({ length_ft: 10, width_ft: 10, depth_ft: 5, side_slope_angle_deg: -45 }));
+  err(_s7.computeLayoutSquaring({ mode: "check-square", side_a: 30, side_b: 40, diag1: 5, diag2: 5, tolerance: 0.25 }));
+  err(_s7.computeCraneLiftCheck({ load_lb: 8000, rigging_lb: -7000, chart_capacity_lb: 12000 }));
+  err(_s7.computeSillPlateAnchorCount({ wall_length_ft: 40, end_distance_in: 60 }));
+  err(_s7.computeSillPlateAnchorCount({ wall_length_ft: 40, max_spacing_ft: 8 }));
+  err(_s7.computeDuctWrapTakeoff({ overlap_waste_factor: 0.5 }));
+  err(_s7.computeDuctMetalWeight({ seam_factor: 0.5 }));
+  err(_s7.computeMetalStudTakeoff({ openings: 3, extra_per_opening: 1.5 }));
+  err(_s7.computeTileCount({ area_ft2: 100, tile_width_in: 12, tile_height_in: 12, waste_factor: -2 }));
+  err(_s7.computeMasonryCount({ wall_area_ft2: 100, unit_type: "cmu_8x8x16", mortar_joint_in: -7.625 }));
+  err(_s7.computeAsphaltTackCoatQuantity({ area_sf: 10000, residue_pct: 0.6 }));
+  err(_s7.computePaintCoverage({ area_ft2: 700, coats: 0 }));
+  err(_s7.computeRafter({ horizontal_span_ft: -12, pitch_rise_per_12: 6 }));
+  err(_s7.computeStairs({}));
+  err(_s7.computeRebar({ length_ft: 20, width_ft: 0.4, spacing_in: 12 }));
+  err(_s7.computeRebar({ spacing_in: 12 }));
+  err(_s7.computeScaffoldTakeoff({ lifts: 2.5 }));
+  err(_s7.computeAsphaltPavingSpeed({ speed_fpm: 20, width_ft: 12, depth_in: 2, eff_min_per_hr: 90 }));
+  // Wrong numbers.
+  const an = _s7.computeAnchorEmbedment({ uplift_lb: 5000, bolt_diameter_in: 0.625, fc_psi: 3000, cracked: true });
+  near(an.embedment_in, 3.091, 0.001); near(an.embedment_ft, 3.091 / 12, 0.001);
+  const dd = _s7.computeDemoDebris({ structure_type: "concrete", volume_yd3: 100 });
+  assert.strictEqual(dd.dumpster_count, 3);
+  assert.strictEqual(_s7.computeDemoDebris({ structure_type: "wood_frame", volume_yd3: 25 }).dumpster_count, 1);
+});

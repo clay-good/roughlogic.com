@@ -40,6 +40,7 @@ const _finiteGuard = (o) => {
 // dims: in { total_rise_in: L, preferred_riser_height_in: L } out: { risers: dimensionless, riser_height_in: L, tread_depth_in: L, total_run_in: L }
 export function computeStairs({ total_rise_in, preferred_riser_height_in = 7.5 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(Number(total_rise_in) > 0)) return { error: "Total rise must be positive (in)." };
   if (total_rise_in <= 0) return { error: "Total rise must be positive." };
   if (!(preferred_riser_height_in > 0)) return { error: "Preferred riser height must be positive." };
   // Number of risers: round to nearest that gets closest to preferred height.
@@ -112,6 +113,9 @@ export const roofPitchExample = {
 // dims: in { horizontal_span_ft: L, pitch_rise_per_12: dimensionless, overhang_ft: L } out: { rafter_length_ft: L }
 export function computeRafter({ horizontal_span_ft, pitch_rise_per_12, overhang_ft = 0 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(Number(horizontal_span_ft) > 0)) return { error: "Horizontal span must be positive (ft)." };
+  if (!(Number(pitch_rise_per_12) >= 0) || pitch_rise_per_12 === null) return { error: "Pitch (rise per 12) must be a number, zero or more." };
+  if (!(Number(overhang_ft) >= 0)) return { error: "Overhang cannot be negative (ft)." };
   // pitch is rise per 12 in run. Hypotenuse multiplier = sqrt(rise^2 + 12^2)/12.
   const m = Math.sqrt(pitch_rise_per_12 * pitch_rise_per_12 + 144) / 12;
   const rafter_ft = (horizontal_span_ft + overhang_ft) * m;
@@ -213,6 +217,10 @@ export const concreteExample = {
 // dims: in { length_ft: L, width_ft: L, spacing_in: L, edge_clearance_in: L, bar_size: dimensionless } out: { bars_count: dimensionless, total_length_ft: L }
 export function computeRebar({ length_ft, width_ft, spacing_in, edge_clearance_in = 3, bar_size = "#4" }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Blank or tiny dimensions used to return a negative bar length.
+  if (!(Number(length_ft) > 0) || !(Number(width_ft) > 0)) return { error: "Length and width must be positive (ft)." };
+  if (!(Number(edge_clearance_in) >= 0)) return { error: "Edge clearance cannot be negative (in)." };
+  if (Number(length_ft) * 12 <= 2 * edge_clearance_in || Number(width_ft) * 12 <= 2 * edge_clearance_in) return { error: "The slab is narrower than twice the edge clearance; no bar fits." };
   if (spacing_in <= 0) return { error: "Spacing must be positive." };
   const length_in = length_ft * 12;
   const width_in = width_ft * 12;
@@ -656,7 +664,7 @@ export function renderRebar(inputRegion, outputRegion, citationEl) {
   const oB = makeOutputLine(outputRegion, "Bars (along width)", "rb-out-b");
   const oT = makeOutputLine(outputRegion, "Total linear feet", "rb-out-t");
   const update = debounce(() => {
-    const r = computeRebar({ length_ft: Number(l.input.value) || 0, width_ft: Number(w.input.value) || 0, spacing_in: Number(sp.input.value) || 12, edge_clearance_in: Number(ec.input.value) || 3, bar_size: size.select.value });
+    const r = computeRebar({ length_ft: Number(l.input.value) || 0, width_ft: Number(w.input.value) || 0, spacing_in: Number(sp.input.value) || 12, edge_clearance_in: ec.input.value === "" ? 3 : Number(ec.input.value), bar_size: size.select.value });
     if (r.error) { oA.textContent = r.error; oB.textContent = "-"; oT.textContent = "-"; return; }
     oA.textContent = String(r.bars_along_length);
     oB.textContent = String(r.bars_along_width);
@@ -840,7 +848,7 @@ export function computeJoistDeflection({ uniform_load_plf, span_ft, E_psi, I_in4
     deflection_in: delta_in,
     limit_L_over_360_in: limit_360_in,
     limit_L_over_240_in: limit_240_in,
-    pass_L_over_360: delta_in <= limit_360_in,
+    pass_L_over_360: delta_in <= limit_360_in * (1 + 1e-9),
     pass_L_over_240: delta_in <= limit_240_in,
   };
 }
@@ -916,6 +924,7 @@ export const footingAreaExample = {
 // dims: in { area_ft2: L^2, tile_width_in: L, tile_height_in: L, grout_joint_width_in: L, tile_thickness_in: L, waste_factor: dimensionless } out: { tiles: dimensionless, grout_volume_in3: L^3 }
 export function computeTileCount({ area_ft2, tile_width_in, tile_height_in, grout_joint_width_in = 0.125, tile_thickness_in = 0.25, waste_factor = 0.10 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(Number(waste_factor) >= 0) || !(Number(grout_joint_width_in) >= 0)) return { error: "Waste factor and grout joint must be numbers, zero or more." };
   const a = Number(area_ft2) || 0;
   const tw = Number(tile_width_in) || 0;
   const th = Number(tile_height_in) || 0;
@@ -947,6 +956,8 @@ export const PAINT_COVERAGE_FT2_PER_GAL = { smooth: 350, textured: 250, rough: 1
 // dims: in { area_ft2: L^2, coats: dimensionless, primer_needed: dimensionless, surface_porosity: dimensionless } out: { gallons: L^3 }
 export function computePaintCoverage({ area_ft2, coats = 2, primer_needed = false, surface_porosity = "smooth" }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(Number(coats) >= 1)) return { error: "Coats must be 1 or more." };
+  if (typeof primer_needed === "string") primer_needed = primer_needed === "true" || primer_needed === "yes";
   // Until 2026-09-26 a negative entry here returned a negative quantity with no error.
   if (["area_ft2", "coats"].some((k) => Number(arguments[0]?.[k]) < 0)) return { error: "Area and number of coats cannot be negative." };
   const a = Number(area_ft2) || 0;
@@ -976,6 +987,7 @@ export const paintCoverageExample = {
 // dims: in { length_ft: L, width_ft: L, depth_ft: L, side_slope_angle_deg: dimensionless } out: { volume_yd3: L^3 }
 export function computeExcavationVolume({ length_ft, width_ft, depth_ft, side_slope_angle_deg = 90 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (side_slope_angle_deg !== undefined && side_slope_angle_deg !== null && side_slope_angle_deg !== "" && !(Number(side_slope_angle_deg) >= 15 && Number(side_slope_angle_deg) <= 90)) return { error: "Side-slope angle is measured from horizontal and must be between 15 and 90 degrees (90 is a vertical cut)." };
   const L = Number(length_ft) || 0;
   const W = Number(width_ft) || 0;
   const D = Number(depth_ft) || 0;
@@ -1022,6 +1034,7 @@ export const MASONRY_UNIT_FACE_IN = {
 // dims: in { wall_area_ft2: L^2, unit_type: dimensionless, mortar_joint_in: L, waste_factor: dimensionless } out: { units: dimensionless, mortar_ft3: L^3 }
 export function computeMasonryCount({ wall_area_ft2, unit_type, mortar_joint_in = 0.375, waste_factor = 0.05 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(Number(mortar_joint_in) >= 0) || !(Number(waste_factor) >= 0)) return { error: "Mortar joint and waste factor must be numbers, zero or more." };
   if ([waste_factor].some((x) => Number(x) < 0)) return { error: "Waste factor cannot be negative." };
   const a = Number(wall_area_ft2) || 0;
   const m = Number(mortar_joint_in) || 0;
@@ -1054,6 +1067,9 @@ export const WIND_PRESSURE_CP = {
 // dims: in { V_mph: L T^-1, exposure: dimensionless, Kz: dimensionless, Kzt: dimensionless, Kd: dimensionless, G: dimensionless } out: { q_psf: M L^-1 T^-2, windward_psf: M L^-1 T^-2, leeward_psf: M L^-1 T^-2, q_design_psf: M L^-1 T^-2 }
 export function computeWindPressure({ V_mph, exposure = "C", Kz = 0, Kzt = 1.0, Kd = 0.85, G = 0.85 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // An unknown exposure used to be C, which reads 15% low for a D site.
+  if (exposure !== "B" && exposure !== "C" && exposure !== "D") return { error: "Exposure must be B, C or D." };
+  if (Number(Kzt) < 0 || Number(Kd) < 0 || Number(G) < 0 || Number(Kz) < 0) return { error: "Kz, Kzt, Kd and G cannot be negative." };
   const V = Number(V_mph) || 0;
   if (V <= 0) return { error: "Wind speed must be positive." };
   const q_psf = 0.00256 * V * V;
@@ -1147,6 +1163,9 @@ function _asce722DriftHeight(pg, lu, w2) {
 // dims: in { Pg_psf: M L^-1 T^-2, Ce: dimensionless, Ct: dimensionless, Cs: dimensionless, drift_upwind_length_ft: L, w2: dimensionless } out: { Pf_psf: M L^-1 T^-2, Ps_psf: M L^-1 T^-2, drift_height_ft: L }
 export function computeSnowLoad({ Pg_psf, Ce = 1.0, Ct = 1.0, Cs = 1.0, drift_upwind_length_ft = 0, w2 = SNOW_W2_DEFAULT }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Blank or zero exposure and thermal factors used to give a 0 psf roof.
+  if (!(Number(Ce) > 0) || !(Number(Ct) > 0) || Ce === null || Ct === null || Ce === "" || Ct === "") return { error: "Exposure factor Ce and thermal factor Ct must be positive (0.7 to 1.3)." };
+  if (Number(Cs) > 1 || Number(Cs) < 0) return { error: "Slope factor Cs is between 0 and 1." };
   Ce = Number(Ce); Ct = Number(Ct);
   const Pg = Number(Pg_psf) || 0;
   if (Pg <= 0) return { error: "Ground snow load must be positive." };
@@ -1201,7 +1220,9 @@ export function computeAnchorEmbedment({ uplift_lb, bolt_diameter_in, fc_psi, cr
   let edge_reduced_flag = false;
   const edge = Number(edge_distance_in) || 0;
   if (edge > 0 && Number.isFinite(edge) && edge < edge_critical_in) edge_reduced_flag = true;
-  return { embedment_in: ld_in, embedment_cracked_in, edge_critical_in, edge_reduced_flag, cracked: !!cracked, embedment_ft: ld_in / 12, T_lb: T, bolt_diameter_in: d };
+  // embedment_in is the depth to USE: the cracked depth when cracked concrete is selected. Until
+  // 2026-10-10 it stayed at the uncracked figure, 14% short for anyone reading the raw result.
+  return { embedment_in: embedment_cracked_in, embedment_uncracked_in: ld_in, embedment_cracked_in, edge_critical_in, edge_reduced_flag, cracked: !!cracked, embedment_ft: embedment_cracked_in / 12, T_lb: T, bolt_diameter_in: d };
 }
 
 export const anchorEmbedmentExample = {
@@ -1607,6 +1628,8 @@ export const asphaltTonnageExample = { inputs: { area_ft2: 5000, depth_in: 3, de
 //  figures a mass M and a length L, with the "per hour" implicit.)
 export function computeAsphaltPavingSpeed({ speed_fpm = 0, width_ft = 0, depth_in = 0, density_pcf = 145, eff_min_per_hr = 50, hours_per_day = 8 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (Number(eff_min_per_hr) > 60) return { error: "Working minutes per hour cannot exceed 60." };
+  if (Number(hours_per_day) > 24) return { error: "Hours per day cannot exceed 24." };
   if (!(speed_fpm > 0)) return { error: "Paver speed must be positive (ft/min)." };
   if (!(width_ft > 0)) return { error: "Mat width must be positive (ft)." };
   if (!(depth_in > 0)) return { error: "Mat depth must be positive (in)." };
@@ -1660,6 +1683,7 @@ export const MORTAR_TYPES = ["N", "S", "M"];
 // dims: in { unit_count: dimensionless, unit_kind: dimensionless, joint_in: L, mortar_type: dimensionless } out: { bags_70: dimensionless, sand_ft3: L^3 }
 export function computeMortarMix({ unit_count = 0, unit_kind = "brick", joint_in = 0.375, mortar_type = "N" }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(Number(joint_in) > 0)) return { error: "Mortar joint thickness must be positive (in); 3/8 in is standard." };
   // Until 2026-09-26 a negative entry here returned a negative quantity with no error.
   if (["unit_count", "joint_in"].some((k) => Number(arguments[0]?.[k]) < 0)) return { error: "Unit count and joint thickness cannot be negative." };
   if (!(unit_count > 0)) return { error: "Unit count must be positive." };
@@ -1694,6 +1718,10 @@ export const ACI_211_W_C = {
 // dims: in { strength_psi: M L^-1 T^-2, exposure: dimensionless, max_aggregate_in: L, slump_in: L } out: { wc_ratio: dimensionless, cement_lb_per_yd3: M L^-3 }
 export function computeConcreteMixDesign({ strength_psi = 3000, exposure = "interior", max_aggregate_in = 1, slump_in = 4 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Above the table the 6,000 psi mix used to be returned under the requested strength's name.
+  if (strength_psi > 6000) return { error: "This table stops at 6,000 psi; a higher strength needs a trial-batch mix design." };
+  if (max_aggregate_in > 2) return { error: "This table covers aggregate up to 2 in." };
+  if (!(slump_in > 0 && slump_in <= 8)) return { error: "Slump must be over 0 and at most 8 in." };
   const tbl = ACI_211_W_C[exposure];
   if (!tbl) return { error: "Unknown exposure class." };
   if (!(strength_psi >= 1500)) return { error: "Strength must be at least 1500 psi." };
@@ -1907,6 +1935,12 @@ export const DUMPSTER_SIZES_YD3 = [10, 20, 30, 40];
 // dims: in { structure_type: dimensionless, volume_yd3: L^3 } out: { debris_yd3: L^3, containers: dimensionless }
 export function computeDemoDebris({ structure_type = "wood_frame", volume_yd3 = 0 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (volume_yd3 > 40) {
+    // One box cannot hold it: until 2026-10-10 the answer was still "40 yd3".
+    const pcf0 = DEMO_DEBRIS_PCF[structure_type];
+    if (!Number.isFinite(pcf0)) return { error: "Unknown structure type." };
+    return { tons: volume_yd3 * 27 * pcf0 / 2000, volume_ft3: volume_yd3 * 27, dumpster_yd3: 40, dumpster_count: Math.ceil(volume_yd3 / 40 - 1e-9), pcf: pcf0 };
+  }
   const pcf = DEMO_DEBRIS_PCF[structure_type];
   if (!Number.isFinite(pcf)) return { error: "Unknown structure type." };
   if (!(volume_yd3 > 0)) return { error: "Volume must be positive." };
@@ -1914,7 +1948,7 @@ export function computeDemoDebris({ structure_type = "wood_frame", volume_yd3 = 
   const tons = (volume_ft3 * pcf) / 2000;
   // Dumpster recommendation (volume-based; weight limits per dumpster vary by hauler).
   const dumpster_yd3 = DUMPSTER_SIZES_YD3.find((s) => s >= volume_yd3 - 1e-9 * Math.abs(volume_yd3)) || DUMPSTER_SIZES_YD3[DUMPSTER_SIZES_YD3.length - 1];
-  return { tons, volume_ft3, dumpster_yd3, pcf };
+  return { tons, volume_ft3, dumpster_yd3, dumpster_count: 1, pcf };
 }
 
 export const demoDebrisExample = { inputs: { structure_type: "wood_frame", volume_yd3: 25 } };
@@ -2133,6 +2167,7 @@ const renderAsphaltPavingSpeed = _simpleRenderer({
 // dims: in { area_sf: L^2, residual_rate_gal_sy: L, residue_pct: dimensionless } out: { area_sy: L^2, undiluted_gal_sy: L, emulsion_gallons: L^3, residual_gallons: L^3 }
 export function computeAsphaltTackCoatQuantity({ area_sf = 0, residual_rate_gal_sy = 0.04, residue_pct = 60 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (Number(residue_pct) > 0 && Number(residue_pct) <= 1) return { error: "Enter the residue as a percent (60 for 60%), not a fraction." };
   if (!(area_sf > 0)) return { error: "Area must be positive (ft^2)." };
   if (!(residual_rate_gal_sy > 0)) return { error: "Residual application rate must be positive (gal/sy)." };
   if (!(residue_pct > 0) || residue_pct > 100) return { error: "Residue must be between 0 and 100 percent." };
@@ -2275,7 +2310,7 @@ const renderWeldUsage = _simpleRenderer({
     { key: "process", label: "Process", kind: "select", options: ["SMAW", "GMAW", "FCAW", "GTAW"].map((v) => ({ value: v, label: v })) },
     { key: "weld_cross_section_in2", label: "Weld cross-section (in²)", kind: "number" },
     { key: "weld_length_in", label: "Weld length (in)", kind: "number" },
-    { key: "deposition_rate_lb_per_min", label: "Deposition rate (lb per MINUTE; blank: 0.12 GMAW, 0.06 SMAW, 0.20 FCAW, 0.03 GTAW)", kind: "number" },
+    { key: "deposition_rate_lb_per_min", label: "Deposition rate (lb per MINUTE; blank: 0.12 GMAW, 0.06 SMAW, 0.20 FCAW, 0.03 GTAW)", kind: "number", blankUndefined: true },
   ],
   outputs: [
     { key: "d", id: "wu-out-d", label: "Deposit (lb)", value: (r) => _fmtC(r.deposit_lb, 2) },
@@ -2295,7 +2330,7 @@ const renderDemoDebris = _simpleRenderer({
   ],
   outputs: [
     { key: "t", id: "dd-out-t", label: "Tons", value: (r) => _fmtC(r.tons, 1) },
-    { key: "d", id: "dd-out-d", label: "Recommended dumpster (yd³)", value: (r) => String(r.dumpster_yd3) },
+    { key: "d", id: "dd-out-d", label: "Recommended dumpster (yd³)", value: (r) => r.dumpster_count > 1 ? r.dumpster_count + " x " + r.dumpster_yd3 + " (more than one box; weight limits may call for more)" : String(r.dumpster_yd3) },
   ],
   compute: computeDemoDebris,
 });
@@ -2399,8 +2434,13 @@ export function computeStairStringerV7({
   const tread_count = Math.max(1, riser_count - 1);
   const total_run_in = tread_count * target_tread_in;
   const stringer_length_in = Math.sqrt(total_rise_in * total_rise_in + total_run_in * total_run_in);
-  const theta = Math.atan2(total_rise_in, total_run_in);
-  const throat_in = stringer_thickness_in * Math.cos(theta) - exact_rise_in * Math.sin(theta);
+  // The stair's pitch is the UNIT rise over the UNIT run. Until 2026-10-10 the angle used the total
+  // rise over one tread fewer than the risers, which is steeper (a two-riser 7/11 stair read 51.8
+  // degrees), and the throat was W cos(theta) - rise sin(theta), which is not the depth left under
+  // a notch. The notch is the rise/tread triangle; its altitude onto the board edge is
+  // rise x tread / hypotenuse, and the throat is the board depth less that.
+  const theta = Math.atan2(exact_rise_in, target_tread_in);
+  const throat_in = stringer_thickness_in - exact_rise_in * target_tread_in / Math.sqrt(exact_rise_in * exact_rise_in + target_tread_in * target_tread_in);
   const rise_pass = exact_rise_in <= code_max_rise_in + 1e-9 * Math.abs(code_max_rise_in);
   // IRC R311.7.5.2 measures tread depth nosing to nosing (the unit run); the nosing projection does not add to it.
   const tread_pass = target_tread_in >= code_min_tread_in - 1e-9 * Math.abs(code_min_tread_in);
@@ -2426,6 +2466,7 @@ export function computeHipValleyRafter({
   overhang_in = 12, jack_oc_in = 16,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (Number(overhang_in) < 0) return { error: "Overhang cannot be negative (in)." };
   if (!(run_ft > 0) || !Number.isFinite(run_ft)) return { error: "Building run must be a finite positive length." };
   if (!(pitch >= 0)) return { error: "Pitch must be non-negative." };
   const m_common = Math.sqrt(pitch * pitch + 144) / 12;
@@ -2453,7 +2494,13 @@ export function computeHipValleyRafter({
   const irregular = pitch_irregular > 0 ? {
     pitch_2: pitch_irregular,
     common_2_run_multiplier: Math.sqrt(pitch_irregular * pitch_irregular + 144) / 12,
-    common_2_length_ft: run_ft * Math.sqrt(pitch_irregular * pitch_irregular + 144) / 12,
+    // The two planes of an irregular hip share one RISE (run x pitch / 12), so the second plane's
+    // run is rise x 12 / pitch 2, not the first run again. Until 2026-10-10 the second common was
+    // run x its multiplier, which implies two different ridge heights.
+    rise_ft: run_ft * pitch / 12,
+    run_2_ft: run_ft * pitch / pitch_irregular,
+    common_2_length_ft: Math.sqrt(Math.pow(run_ft * pitch / pitch_irregular, 2) + Math.pow(run_ft * pitch / 12, 2)),
+    hip_length_irregular_ft: Math.sqrt(run_ft * run_ft + Math.pow(run_ft * pitch / pitch_irregular, 2) + Math.pow(run_ft * pitch / 12, 2)),
   } : null;
   return {
     common_run_multiplier: m_common,
@@ -2545,6 +2592,8 @@ export function computePlywoodSpan({
   live_load_psf = 0, dead_load_psf = 0, edge_support = "yes",
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (arguments[0]?.edge_support !== undefined && !["yes", "no", true, false].includes(arguments[0].edge_support)) return { error: "Edge support must be yes or no." };
+  if (Number(arguments[0]?.live_load_psf) < 0 || Number(arguments[0]?.dead_load_psf) < 0) return { error: "Loads cannot be negative (psf)." };
   panel_thickness_in = Number(panel_thickness_in);
   const rating = APA_SPAN_RATINGS[span_rating];
   if (!rating) return { error: "Unknown span rating." };
@@ -2640,6 +2689,7 @@ export function computeCraneLiftCheck({
   sling_legs = 1, sling_angle_deg = 90, chart_capacity_lb = 0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  for (const [k, v] of Object.entries(arguments[0] ?? {})) if (typeof v === "number" && v < 0) return { error: "Weights, deductions and capacities cannot be negative (" + k + ")." };
   if (!(load_lb > 0)) return { error: "Load must be positive." };
   if (!(sling_legs >= 1)) return { error: "Sling legs ≥ 1." };
   if (!(sling_angle_deg > 0 && sling_angle_deg <= 90)) return { error: "Sling angle in (0, 90] degrees." };
@@ -3514,6 +3564,9 @@ export function computeDeckBeamPost({
   deflection_limit = 360,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A blank load arrives as null and used to size the deck for 0 psf.
+  if (live_load_psf === null || live_load_psf === "" || dead_load_psf === null || dead_load_psf === "") return { error: "Enter the live and dead loads (psf); 40 and 10 are the usual residential deck values." };
+  if (ledger !== "attached" && ledger !== "freestanding") return { error: "Ledger must be attached or freestanding." };
   const joist = Number(joist_span_ft) || 0;
   const beamSpan = Number(beam_span_ft) || 0;
   const postH = Number(post_height_ft) || 0;
@@ -4198,6 +4251,9 @@ CONSTRUCTION_RENDERERS["metal-weight"] = renderMetalWeight;
 // dims: in { side_a: L, side_b: L, diag1: L, diag2: L, tolerance: L, sym_left: L, sym_right: L } out: { ideal_diagonal: L, out_of_square: L, triple_a: L, triple_b: L, triple_c: L, symmetry_difference: L }
 export function computeLayoutSquaring({ mode, side_a, side_b, diag1, diag2, tolerance = 0, sym_left = 0, sym_right = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (mode !== "check-square" && mode !== "find-diagonal") return { error: "Mode must be check-square or find-diagonal." };
+  // A diagonal shorter than the difference of the sides cannot close the figure either.
+  if (mode === "check-square" && [diag1, diag2].some((d) => Number(d) > 0 && Number(d) <= Math.abs(Number(side_a) - Number(side_b)))) return { error: "A diagonal cannot be shorter than the difference of the two sides; recheck the measurements." };
   const a = Number(side_a) || 0;
   const b = Number(side_b) || 0;
   if (!(a > 0)) return { error: "Side a must be greater than zero." };
@@ -4356,7 +4412,11 @@ function _v27MaxFillet(t) { return t < 0.25 ? t : t - 0.0625; }
 // dims: in { leg_in: L, length_in: L, base_thickness_in: L, applied_load_lb: dimensionless } out: { throat_in: L, strength_per_in_lb: dimensionless, capacity_lb: dimensionless }
 export function computeFilletWeldStrength({ mode = "capacity-from-size", leg_in = 0, length_in = 0, electrode = "E70", base_thickness_in = 0, applied_load_lb = 0, method = "ASD" } = {}) {
   const _g = _finiteGuard({ leg_in, length_in, base_thickness_in, applied_load_lb }); if (_g) return _g;
-  const Fexx = _V27_FEXX[electrode] || 70;
+  if (mode !== "capacity-from-size" && mode !== "size-from-load") return { error: "Mode must be capacity-from-size or size-from-load." };
+  if (method !== "ASD" && method !== "LRFD") return { error: "Method must be ASD or LRFD." };
+  // An electrode that is not in the table used to be computed as E70 (17% high for E60).
+  if (!Object.hasOwn(_V27_FEXX, String(electrode))) return { error: "Electrode must be one of: " + Object.keys(_V27_FEXX).join(", ") + "." };
+  const Fexx = _V27_FEXX[electrode];
   const L = Number(length_in);
   const M = String(method) === "LRFD" ? "LRFD" : "ASD";
   // unit shear strength per inch of weld: ASD allowable 0.30*Fexx; LRFD 0.75*0.60*Fexx.
@@ -5968,6 +6028,7 @@ CONSTRUCTION_RENDERERS["scaffold-leg-load"] = _renderScaffoldLegLoad;
 // dims: in { run_length_ft: L, bay_length_ft: L, lifts: dimensionless, planks_per_bay: dimensionless } out: { bays: dimensionless, frames: dimensionless, braces: dimensionless, planks: dimensionless, base_plates: dimensionless }
 export function computeScaffoldTakeoff({ run_length_ft = 40, bay_length_ft = 7, lifts = 1, planks_per_bay = 4 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!Number.isInteger(Number(lifts)) || !(Number(lifts) >= 1)) return { error: "Lifts is a whole number, 1 or more." };
   if (!(run_length_ft > 0)) return { error: "Run length must be positive (ft)." };
   if (!(bay_length_ft > 0)) return { error: "Bay length must be positive (ft)." };
   if (!(lifts > 0)) return { error: "Lifts must be positive." };
@@ -9252,6 +9313,8 @@ CONSTRUCTION_RENDERERS["shingle-nails"] = _v850renderShingleNails;
 // dims: in { width_in: L, height_in: L, length_ft: L, lb_per_sf: M L^-2, seam_factor: dimensionless } out: { perimeter_ft: L, area_sf: L^2, weight_lb: M }
 export function computeDuctMetalWeight({ width_in = 24, height_in = 12, length_ft = 100, lb_per_sf = 1.156, seam_factor = 1.15 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (Number(seam_factor) < 1) return { error: "The seam and waste multiplier is 1 or more (1.15 for 15%)." };
+  width_in = Number(width_in); height_in = Number(height_in); length_ft = Number(length_ft);
   if (!(width_in > 0)) return { error: "Duct width must be positive (in)." };
   if (!(height_in > 0)) return { error: "Duct height must be positive (in)." };
   if (!(length_ft > 0)) return { error: "Run length must be positive (ft)." };
@@ -9351,6 +9414,8 @@ CONSTRUCTION_RENDERERS["duct-bank-concrete"] = _v853renderDuctBankConcrete;
 // dims: in { width_in: L, height_in: L, length_ft: L, overlap_waste_factor: dimensionless, roll_coverage_sf: L^2 } out: { perimeter_ft: L, wrap_sf: L^2, rolls: dimensionless }
 export function computeDuctWrapTakeoff({ width_in = 20, height_in = 12, length_ft = 40, overlap_waste_factor = 1.15, roll_coverage_sf = 100 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (Number(overlap_waste_factor) < 1) return { error: "The overlap and waste multiplier is 1 or more (1.15 for 15%)." };
+  width_in = Number(width_in); height_in = Number(height_in); length_ft = Number(length_ft);
   if (!(width_in > 0)) return { error: "Duct width must be positive (in)." };
   if (!(height_in > 0)) return { error: "Duct height must be positive (in)." };
   if (!(length_ft > 0)) return { error: "Run length must be positive (ft)." };
@@ -9663,6 +9728,10 @@ CONSTRUCTION_RENDERERS["construction-adhesive-tubes"] = _v866renderConstructionA
 // dims: in { wall_length_ft: L, max_spacing_ft: L, end_distance_in: L } out: { effective_len_ft: L, bolts: dimensionless }
 export function computeSillPlateAnchorCount({ wall_length_ft = 40, max_spacing_ft = 6, end_distance_in = 9 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // IRC R403.1.6: bolts at most 6 ft apart and one within 12 in of each plate end. The note said so
+  // and the code took whatever was typed.
+  if (Number(max_spacing_ft) > 6) return { error: "IRC R403.1.6 allows at most 6 ft between anchor bolts; enter 6 or less." };
+  if (Number(end_distance_in) > 12) return { error: "IRC R403.1.6 requires a bolt within 12 in of each plate end; enter 12 or less." };
   if (!(wall_length_ft > 0)) return { error: "Wall length must be positive (ft)." };
   if (!(max_spacing_ft > 0)) return { error: "Max spacing must be positive (ft)." };
   if (end_distance_in < 0) return { error: "End distance cannot be negative (in)." };
@@ -9704,6 +9773,7 @@ CONSTRUCTION_RENDERERS["sill-plate-anchor-count"] = _v867renderSillPlateAnchorCo
 // dims: in { wall_length_ft: L, spacing_in: L, openings: dimensionless, extra_per_opening: dimensionless } out: { studs: dimensionless, track_lf: L }
 export function computeMetalStudTakeoff({ wall_length_ft = 50, spacing_in = 16, openings = 2, extra_per_opening = 2 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!Number.isInteger(Number(openings)) || !Number.isInteger(Number(extra_per_opening))) return { error: "Openings and extra studs per opening are whole numbers." };
   if (!(wall_length_ft > 0)) return { error: "Wall length must be positive (ft)." };
   if (!(spacing_in > 0)) return { error: "Stud spacing must be positive (in)." };
   if (openings < 0) return { error: "Opening count cannot be negative." };
@@ -11922,6 +11992,7 @@ CONSTRUCTION_RENDERERS["seismic-overturning-stability"] = _simpleRenderer({
 // dims: in { roof_area_sf: L^2, roll_width_ft: L, sidelap_in: L, field_spacing_in: L, perimeter_spacing_in: L, perimeter_fraction_pct: dimensionless, field_seam_covered: dimensionless, waste_pct: dimensionless } out: { seam_lf: L, field_fasteners: dimensionless, perimeter_fasteners: dimensionless, total_fasteners: dimensionless, plates: dimensionless, cover_tape_lf: L, fasteners_per_square: dimensionless }
 export function computeMembraneFastenerTakeoff({ roof_area_sf = 8000, roll_width_ft = 10, sidelap_in = 6, field_spacing_in = 12, perimeter_spacing_in = 6, perimeter_fraction_pct = 25, field_seam_covered = "no", waste_pct = 5 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (field_seam_covered !== "yes" && field_seam_covered !== "no") return { error: "Field seam covered must be yes or no." };
   const area = Number(roof_area_sf) || 0;
   const rw = Number(roll_width_ft) || 0;
   const lap = Number(sidelap_in) || 0;

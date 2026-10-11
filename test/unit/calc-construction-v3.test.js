@@ -99,7 +99,8 @@ test("Mix design: cement bags positive", () => { const r = computeConcreteMixDes
 test("Mix design: higher slump -> more water", () => { const a = computeConcreteMixDesign({ strength_psi: 4000, exposure: "interior", max_aggregate_in: 1, slump_in: 4 }); const b = computeConcreteMixDesign({ strength_psi: 4000, exposure: "interior", max_aggregate_in: 1, slump_in: 7 }); assert.ok(b.water_lb_yd3 > a.water_lb_yd3); });
 test("Mix design: bigger aggregate -> less water", () => { const a = computeConcreteMixDesign({ strength_psi: 4000, exposure: "interior", max_aggregate_in: 0.5, slump_in: 4 }); const b = computeConcreteMixDesign({ strength_psi: 4000, exposure: "interior", max_aggregate_in: 2, slump_in: 4 }); assert.ok(b.water_lb_yd3 <= a.water_lb_yd3); });
 test("Mix design: every exposure has 6000 psi entry", () => { for (const k of Object.keys(ACI_211_W_C)) assert.ok(ACI_211_W_C[k][6000] > 0, k); });
-test("Mix design: high strength clamps to lowest w/c", () => { const r = computeConcreteMixDesign({ strength_psi: 8000, exposure: "interior", max_aggregate_in: 1, slump_in: 4 }); assert.ok(close(r.wc_ratio, ACI_211_W_C.interior[6000], 0.001)); });
+// Above the 6,000 psi table top is an error since hardening slice 7 (it used to return the 6,000 psi mix under the higher strength's name).
+test("Mix design: strength above the table is refused", () => { const r = computeConcreteMixDesign({ strength_psi: 8000, exposure: "interior", max_aggregate_in: 1, slump_in: 4 }); assert.ok(r.error); assert.ok(close(computeConcreteMixDesign({ strength_psi: 6000, exposure: "interior", max_aggregate_in: 1, slump_in: 4 }).wc_ratio, ACI_211_W_C.interior[6000], 0.001)); });
 test("Mix design: fine aggregate non-negative", () => { const r = computeConcreteMixDesign({ strength_psi: 4000, exposure: "interior", max_aggregate_in: 1, slump_in: 4 }); assert.ok(r.fine_lb_yd3 >= 0); });
 
 // 153 Bolt torque

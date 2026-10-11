@@ -270,11 +270,11 @@ test("deck post: a 6x6 is a TIMBER (NDS Table 4D), not dimension lumber", () => 
   // The 6x6 branch must actually USE them. At 12 ft the engine picks a 6x6;
   // hand-check: le/d = 26.18, FcE = 0.822 x 440,000 / 26.18^2 = 527.6,
   // CP = 0.6927, F_c' = 363.7, capacity = 363.7 x 30.25 = 11,001 lb.
-  const tall = computeDeckBeamPost({ joist_span_ft: 12, beam_span_ft: 10, post_height_ft: 12, live_load_psf: 40, dead_load_psf: 10, species_grade: "SYP_No2", soil_class: "clay", ledger: "free" });
+  const tall = computeDeckBeamPost({ joist_span_ft: 12, beam_span_ft: 10, post_height_ft: 12, live_load_psf: 40, dead_load_psf: 10, species_grade: "SYP_No2", soil_class: "clay", ledger: "freestanding" });
   assert.strictEqual(tall.post_size, "6x6");
   assert.ok(Math.abs(tall.post_allowable_load_lb - 11001) < 5);
   // The 4x4 branch is dimension lumber and must be unaffected.
-  const short = computeDeckBeamPost({ joist_span_ft: 12, beam_span_ft: 10, post_height_ft: 8, live_load_psf: 40, dead_load_psf: 10, species_grade: "SYP_No2", soil_class: "clay", ledger: "free" });
+  const short = computeDeckBeamPost({ joist_span_ft: 12, beam_span_ft: 10, post_height_ft: 8, live_load_psf: 40, dead_load_psf: 10, species_grade: "SYP_No2", soil_class: "clay", ledger: "freestanding" });
   assert.strictEqual(short.post_size, "4x4");
   assert.ok(Math.abs(short.post_allowable_load_lb - 6169) < 5);
 });
