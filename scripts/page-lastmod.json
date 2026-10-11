@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "0c8501e9dc9ef050",
+      "sha": "1791be1f787612f4",
       "date": "2026-10-11"
     },
     "/tools/": {
@@ -286,8 +286,8 @@
       "date": "2026-09-29"
     },
     "/tools/anchor-rode-scope/": {
-      "sha": "44ccf6c746dd55f8",
-      "date": "2026-09-29"
+      "sha": "c9c9b035cd31a9f4",
+      "date": "2026-10-11"
     },
     "/tools/anhydrous-ammonia-rate/": {
       "sha": "5a4389a4cb2595a8",
@@ -2170,8 +2170,8 @@
       "date": "2026-10-11"
     },
     "/tools/density-altitude/": {
-      "sha": "7dc78ee646fb26d5",
-      "date": "2026-10-09"
+      "sha": "06e6abc8b8677c29",
+      "date": "2026-10-11"
     },
     "/tools/depreciation-recapture/": {
       "sha": "bfa94f8c076e6ef7",
@@ -2406,8 +2406,8 @@
       "date": "2026-10-09"
     },
     "/tools/driveshaft-max-length/": {
-      "sha": "2e4f3d20d640a93c",
-      "date": "2026-10-03"
+      "sha": "2108e85e00a29861",
+      "date": "2026-10-11"
     },
     "/tools/drone-gsd-overlap/": {
       "sha": "fb415f51abe0b33a",

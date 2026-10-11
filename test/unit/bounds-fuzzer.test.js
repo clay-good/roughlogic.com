@@ -60517,3 +60517,43 @@ test("hardening slice 11 (plumbing, code checks, pool): the reviewed defects sta
   assert.strictEqual(_s11L.computePoolPumpSpeedSavings({ pump_hp: 2, full_speed_hours: 16, speed_fraction: 0.5, rate_per_kwh: 0.16 }).exceeds_day, true);
   assert.strictEqual(_s11L.computeSpaDrainInterval({ spa_gallons: 400, daily_bathers: 6, current_tds_ppm: 2500, tds_limit_ppm: 1500 }).over_tds, true);
 });
+
+// Hardening slice 12 (2026-10-10): mechanic, 87 calculators re-derived and run by independent
+// reviewers. One assertion per confirmed defect.
+import * as _s12 from "../../calc-mechanic.js";
+
+test("hardening slice 12 (mechanic): the reviewed defects stay fixed", () => {
+  const near = (a, b, tol) => assert.ok(Math.abs(a - b) <= tol, a + " vs " + b);
+  const err = (r) => assert.ok(r && typeof r.error === "string", JSON.stringify(r).slice(0, 120));
+  // A unit that is not exactly "ccmin" is no longer read as lb/h (10.5 times high).
+  err(_s12.computeInjectorMaxHp({ inj_flow: 328.125, flow_unit: "cc/min", n_cyl: 8, duty: 0.8, bsfc: 0.5 }));
+  near(_s12.computeInjectorMaxHp({ inj_flow: 328.125, flow_unit: "ccmin", n_cyl: 8, duty: 0.8, bsfc: 0.5 }).hp_max, 400, 1e-6);
+  // Omitted temperatures are not 0 F.
+  err(_s12.computeTurboMaxBoostForChargeTemp({ max_charge_temp_f: 250 }));
+  err(_s12.computeTurboPressureRatio({ boost_psi: 15 }));
+  err(_s12.computeCarburetorAltitudeJetting({ actual_pressure_inhg: 22.22, jet_flow_number: 160 }));
+  err(_s12.computeUjointOperatingAngle({ input_angle_deg: 3, output_angle_deg: null }));
+  // Unknown options.
+  err(_s12.computeHpFromTorque({ solve_for: "kw", torque_lbft: 400, rpm: 5000 }));
+  err(_s12.computeHpFromTorque({}));
+  err(_s12.computeGearMphRpm({ solve_for: "x", rpm: 3000, axle_ratio: 3.73, tire_dia_in: 28 }));
+  err(_s12.computeVolumetricEfficiency({ displacement_ci: 350, rpm: 5500, cycle: "2" }));
+  err(_s12.computeValveFlowCoefficient({ fluid: "steam", cv: 10, dp_psi: 25 }));
+  err(_s12.computeFuelRange({ solve_for: "Tank", target_range_mi: 300, tank_gal: 18, mpg: 28 }));
+  err(_s12.computeCoolingSystemFlow({ q_btuh: 150000, dt_f: 10, coolant: "glycol" }));
+  err(_s12.computeBeltDeflectionTension({ center_distance_in: 32, large_sheave_dia_in: 12, small_sheave_dia_in: 4, measured_force_lb: 5, rec_min_force_lb: 4.9, rec_max_force_lb: 7.2, belt_condition: "New" }));
+  err(_s12.computeGearDynamicToothStress({ horsepower: 4, rpm: 1000, number_of_teeth: 43, diametral_pitch_1_in: 8, face_width_in: 0.5, is_idler: true }));
+  // A new belt exactly at its minimum is in range.
+  assert.strictEqual(_s12.computeBeltDeflectionTension({ center_distance_in: 32, large_sheave_dia_in: 12, small_sheave_dia_in: 4, measured_force_lb: 6.37, rec_min_force_lb: 4.9, rec_max_force_lb: 7.2, belt_condition: "new", new_belt_factor: 1.3 }).under, false);
+  // Undercut thresholds follow 2k / sin^2(phi).
+  const gb = (teeth, sys) => _s12.computeGearToothBendingStress({ transmitted_load_lb: 100, diametral_pitch_1_in: 8, face_width_in: 1, number_of_teeth: teeth, tooth_system: sys });
+  assert.ok(gb(17, "20-full-depth").undercut_flag); assert.ok(!gb(18, "20-full-depth").undercut_flag);
+  assert.ok(!gb(14, "20-stub").undercut_flag); assert.ok(gb(13, "20-stub").undercut_flag);
+  // Impossible inputs.
+  err(_s12.computeFlywheelEnergy({ energy_fluctuation_ftlb: 100000 }));
+  err(_s12.computeDensityAltitude({ field_elevation_ft: 5000, altimeter_in_hg: 1013, oat_f: 59 }));
+  err(_s12.computeDisplacementCR({ bore_in: 4, stroke_in: 3.48, cylinders: 8, chamber_cc: -5, gasket_bore_in: 4.1, gasket_thickness_in: 0.04 }));
+  // Text follows the numbers.
+  assert.ok(/slowest, at 0 and 180/.test(JSON.stringify(_s12.computeUniversalJointSpeed({ input_speed_rpm: 1000, joint_angle_deg: 10 }))));
+  assert.ok(!/LESS than its rating/.test(JSON.stringify(_s12.computeInjectorFlowAtPressure({ rated_flow_ccmin: 550, rated_pressure_psi: 43.5, rail_pressure_psi: 60, manifold_pressure_psig: 5, system_type: "returnless" }))));
+});

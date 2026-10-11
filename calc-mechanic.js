@@ -66,6 +66,7 @@ export function computeDisplacementCR({
   deck_clearance_in = 0, dome_dish_cc = 0,
 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (arguments[0]?.chamber_cc !== undefined && !(Number(arguments[0].chamber_cc) > 0)) return { error: "Combustion chamber volume must be positive (cc)." };
   if (!(bore_in > 0 && stroke_in > 0 && cylinders > 0)) return { error: "Bore / stroke / cylinder count must be positive." };
   if (gasket_bore_in < 0 || gasket_thickness_in < 0) return { error: "Gasket bore and thickness cannot be negative (in)." };
   // Per-cylinder swept volume (in^3): pi/4 * bore^2 * stroke
@@ -276,6 +277,7 @@ export const FUEL_PROPERTIES = {
 // cost-per-mile are monetary, dimensionless.)
 export function computeFuelRange({ fuel = "gasoline_E10", tank_gal = 0, mpg = 0, mpg_basis = "gasoline_E10", load_factor = 1.0, price_per_gal = 0, solve_for = "range", target_range_mi = 0 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (arguments[0]?.solve_for !== undefined && !["range", "mpg", "tank"].includes(arguments[0].solve_for)) return { error: "Solve for must be range, mpg or tank." };
   const p = FUEL_PROPERTIES[fuel];
   if (!p) return { error: "Unknown fuel." };
   if (!(load_factor > 0 && load_factor <= 1.5)) return { error: "Load factor must be 0-1.5." };
@@ -712,6 +714,8 @@ export const MECHANIC_RENDERERS = {
 //
 // dims: in { solve_for: dimensionless, fluid: dimensionless, specific_gravity: dimensionless, cv: dimensionless, flow_gpm: L^3 T^-1, dp_psi: M L^-1 T^-2 } out: { cv: dimensionless, flow_gpm: L^3 T^-1, dp_psi: M L^-1 T^-2 }
 export function computeValveFlowCoefficient({ solve_for = "flow", fluid = "liquid", specific_gravity = 1, cv = 0, flow_gpm = 0, dp_psi = 0 } = {}) {
+  if (arguments[0]?.solve_for !== undefined && !["flow", "cv", "dp"].includes(arguments[0].solve_for)) return { error: "Solve for must be flow, cv or dp." };
+  if (arguments[0]?.fluid !== undefined && !["liquid", "gas"].includes(arguments[0].fluid)) return { error: "Fluid must be liquid or gas." };
   const SG = Number(specific_gravity) || 0;
   const Cv = Number(cv) || 0;
   const Q = Number(flow_gpm) || 0;
@@ -1073,7 +1077,10 @@ export function computeGearToothBendingStress({ transmitted_load_lb = 0, diametr
   const pc = Math.PI / Pd;
   const bending_stress_psi = Wt / (F * pc * y);
   const lewis_Y_diametral = Math.PI * y;
-  const undercut_teeth = tooth_system === "14.5-full-depth" ? 32 : 17;
+  // Minimum teeth to avoid undercut is 2k / sin^2(phi): 32 at 14.5 degrees, 18 at 20 degrees
+  // full depth (17.1 rounds UP) and 14 for the 20-degree stub (k = 0.8). Until 2026-10-10 both
+  // 20-degree systems used 17.
+  const undercut_teeth = tooth_system === "14.5-full-depth" ? 32 : tooth_system === "20-stub" ? 14 : 18;
   const undercut_flag = T < undercut_teeth
     ? "Fewer than " + undercut_teeth + " teeth may undercut at the root; the Lewis factor assumes a full tooth."
     : null;
@@ -1511,7 +1518,7 @@ export function computeUniversalJointSpeed({ joint_angle_deg = 0, input_speed_rp
   return {
     max_output_rpm, min_output_rpm, fluctuation_pct, velocity_ratio_max: 1 / cb, velocity_ratio_min: cb,
     max_output_torque_lbft, min_output_torque_lbft, peak_output_accel_rad_s2, has_torque: T > 0,
-    note: "Cardan (Hooke) universal-joint speed variation. A single U-joint at operating angle beta makes its output run ahead of and then behind the input twice per revolution: the output speed ranges between omega cos(beta) (slowest, at 90 and 270 degrees of input) and omega/cos(beta) (fastest, at 0 and 180 degrees), a peak-to-peak fluctuation of (1/cos(beta) - cos(beta)) = sin(beta) tan(beta) of the input speed. The swing grows fast with angle - about +/-1.5% at 10 degrees but nearly 29% peak-to-peak at 30 degrees - which is why U-joint working angles are held to a few degrees. A second joint phased 90 degrees at an equal angle (a double-Cardan or a matched two-joint shaft) reverses the error so the far output turns uniformly again. With an input torque entered it also gives the torque pulsation (power is conserved, so the output torque runs T cos(beta) to T/cos(beta), highest when the output runs slowest) and the peak output angular acceleration, omega^2 cos(beta) sin^2(beta) sin(2 theta)/(1 - sin^2(beta) sin^2(theta))^2, about omega^2 beta^2 at small angles, which drives the inertia torque on whatever the shaft turns. The secondary shaking couple, the cancellation math for a specific double-Cardan geometry, and true constant-velocity (CV) joints are separate. Match and phase the joints on a real shaft. A design aid; Machinery's Handbook / Shigley and the driveline maker govern.",
+    note: "Cardan (Hooke) universal-joint speed variation. A single U-joint at operating angle beta makes its output run ahead of and then behind the input twice per revolution: the output speed ranges between omega cos(beta) (slowest, at 0 and 180 degrees of input) and omega/cos(beta) (fastest, at 90 and 270 degrees), a peak-to-peak fluctuation of (1/cos(beta) - cos(beta)) = sin(beta) tan(beta) of the input speed. The swing grows fast with angle - about +/-1.5% at 10 degrees but nearly 29% peak-to-peak at 30 degrees - which is why U-joint working angles are held to a few degrees. A second joint phased 90 degrees at an equal angle (a double-Cardan or a matched two-joint shaft) reverses the error so the far output turns uniformly again. With an input torque entered it also gives the torque pulsation (power is conserved, so the output torque runs T cos(beta) to T/cos(beta), highest when the output runs slowest) and the peak output angular acceleration, omega^2 cos(beta) sin^2(beta) sin(2 theta)/(1 - sin^2(beta) sin^2(theta))^2, about omega^2 beta^2 at small angles, which drives the inertia torque on whatever the shaft turns. The secondary shaking couple, the cancellation math for a specific double-Cardan geometry, and true constant-velocity (CV) joints are separate. Match and phase the joints on a real shaft. A design aid; Machinery's Handbook / Shigley and the driveline maker govern.",
   };
 }
 export const universalJointSpeedExample = { inputs: { joint_angle_deg: 10, input_speed_rpm: 1000 } };
@@ -2041,6 +2048,8 @@ MECHANIC_RENDERERS["terminal-velocity"] = _simpleRenderer({
 // HP = Torque * RPM / 5252; kW = HP * 0.7457. Solve for any of {HP, T, RPM}.
 // dims: in { solve_for: dimensionless, torque_lbft: M*L^2*T^-2, rpm: T^-1, hp: M L^2 T^-3 } out: { hp: M L^2 T^-3, kw: M L^2 T^-3 }
 export function computeHpFromTorque({ solve_for = "hp", torque_lbft = 0, rpm = 0, hp = 0 } = {}) {
+  if (!["hp", "torque", "rpm"].includes(solve_for)) return { error: "Solve for must be hp, torque or rpm." };
+  if (solve_for === "hp" && (!(Number(torque_lbft) > 0) || !(Number(rpm) > 0))) return { error: "Enter torque (lb-ft) and rpm." };
   const T = Number(torque_lbft) || 0;
   const N = Number(rpm) || 0;
   const HP = Number(hp) || 0;
@@ -2096,6 +2105,7 @@ MECHANIC_RENDERERS["hp-from-torque"] = renderHpFromTorque;
 // 4-stroke theoretical CFM = disp * RPM / 3456; 2-stroke / 1728. VE% = actual/theoretical*100.
 // dims: in { displacement_ci: L^3, rpm: T^-1, cycle: dimensionless, actual_cfm: L^3*T^-1, ve_pct: dimensionless } out: { theoretical_cfm: L^3*T^-1, ve_pct: dimensionless }
 export function computeVolumetricEfficiency({ displacement_ci = 0, rpm = 0, cycle = "four", actual_cfm = 0, ve_pct = 0 } = {}) {
+  if (arguments[0]?.cycle !== undefined && !["two", "four"].includes(arguments[0].cycle)) return { error: "Cycle must be two or four." };
   const disp = Number(displacement_ci) || 0;
   const N = Number(rpm) || 0;
   const actual = Number(actual_cfm) || 0;
@@ -2145,6 +2155,7 @@ MECHANIC_RENDERERS["volumetric-efficiency"] = renderVolumetricEfficiency;
 // MPH = RPM * pi * dia * 60 / (trans * axle * 63360); revs/mile = 63360/(pi*dia).
 // dims: in { solve_for: dimensionless, rpm: T^-1, trans_ratio: dimensionless, axle_ratio: dimensionless, tire_dia_in: L, mph: L*T^-1 } out: { mph: L*T^-1, rpm: T^-1 }
 export function computeGearMphRpm({ solve_for = "mph", rpm = 0, trans_ratio = 1, axle_ratio = 0, tire_dia_in = 0, mph = 0 } = {}) {
+  if (solve_for !== "mph" && solve_for !== "rpm") return { error: "Solve for must be mph or rpm." };
   const N = Number(rpm) || 0;
   const trans = Number(trans_ratio) || 0;
   const axle = Number(axle_ratio) || 0;
@@ -2291,6 +2302,8 @@ MECHANIC_RENDERERS["injector-size"] = renderInjectorSize;
 // dims: in { inj_flow: M T^-1, flow_unit: dimensionless, n_cyl: dimensionless, duty: dimensionless, bsfc: T^2 L^-2 } out: { inj_lbh: M T^-1, total_lbh: M T^-1, hp_max: M L^2 T^-3 }
 export function computeInjectorMaxHp({ inj_flow = 0, flow_unit = "lbh", n_cyl = 0, duty = 0.80, bsfc = 0.50 } = {}) {
   const _g = _finiteGuard({ inj_flow, n_cyl, duty, bsfc }); if (_g) return _g;
+  // "cc/min" and anything else that was not exactly "ccmin" used to be read as lb/h, 10.5 times high.
+  if (arguments[0]?.flow_unit !== undefined && !["lbh", "ccmin"].includes(String(arguments[0].flow_unit))) return { error: "Flow unit must be lbh or ccmin." };
   const flow = Number(inj_flow) || 0;
   const n = Number(n_cyl) || 0;
   const d = Number(duty) || 0;
@@ -2600,6 +2613,7 @@ MECHANIC_RENDERERS["hydraulic-pump-flow"] = _simpleRenderer({
 // dims: in { q_btuh: M L^2 T^-3, dt_f: T, coolant: dimensionless } out: { gpm: L^3 T^-1 }
 export function computeCoolingSystemFlow({ q_btuh = 0, dt_f = 0, coolant = "water" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (arguments[0]?.coolant !== undefined && !["water", "glycol50"].includes(String(arguments[0].coolant))) return { error: "Coolant must be water or glycol50." };
   const q = Number(q_btuh) || 0;
   const dt = Number(dt_f) || 0;
   const cmap = { water: 500, glycol50: 427 };
@@ -2800,6 +2814,7 @@ MECHANIC_RENDERERS["torque-adapter-correction"] = _simpleRenderer({
 // dims: in { field_elevation_ft: L, altimeter_in_hg: dimensionless, oat_f: T, relative_humidity_pct: dimensionless } out: { oat_c: T, pa_ft: L, isa_c: T, da_ft: L, humidity_add_ft: L }
 export function computeDensityAltitude({ field_elevation_ft = 0, altimeter_in_hg = 29.92, oat_f = 59, relative_humidity_pct = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(Number(altimeter_in_hg) >= 25 && Number(altimeter_in_hg) <= 32)) return { error: "Altimeter setting is in inches of mercury, 25 to 32 (29.92 standard); hPa is not accepted here." };
   const elev = Number(field_elevation_ft) || 0;
   const alt = Number(altimeter_in_hg) || 0;
   const oatf = Number(oat_f);
@@ -2831,7 +2846,7 @@ export function computeDensityAltitude({ field_elevation_ft = 0, altimeter_in_hg
 export const densityAltitudeExample = { inputs: { field_elevation_ft: 5000, altimeter_in_hg: 29.92, oat_f: 95 } };
 
 MECHANIC_RENDERERS["density-altitude"] = _simpleRenderer({
-  citation: "Citation: FAA density-altitude method (FAA-H-8083-25 / ICAO Standard Atmosphere): PA = elevation + 145,366 x (1 - (altimeter/29.92)^0.190284); ISA = 15 - 2 x (PA/1000) degrees C; DA = PA + 120 x (OAT - ISA). Density altitude is the pressure altitude corrected for temperature; this dry-air model ignores humidity. A planning estimate; the aircraft flight manual and the pilot in command govern.",
+  citation: "Citation: FAA density-altitude method (FAA-H-8083-25 / ICAO Standard Atmosphere): PA = elevation + 145,366 x (1 - (altimeter/29.92)^0.190284); ISA = 15 - 2 x (PA/1000) degrees C; DA = PA + 120 x (OAT - ISA). Density altitude is the pressure altitude corrected for temperature; humidity is included through the vapor pressure when a relative humidity is entered (it lowers density and raises DA). A planning estimate; the aircraft flight manual and the pilot in command govern.",
   example: densityAltitudeExample.inputs,
   fields: [
     { key: "field_elevation_ft", label: "Field / station elevation (ft)", kind: "number" },
@@ -3040,7 +3055,7 @@ MECHANIC_RENDERERS["anchor-rode-scope"] = _simpleRenderer({
   fields: [
     { key: "water_depth_ft", label: "Water depth at high tide (ft)", kind: "number" },
     { key: "bow_height_ft", label: "Bow-roller height above water (ft)", kind: "number" },
-    { key: "scope_ratio", label: "Desired scope (7 rope+chain / 5 mixed / 3 all-chain)", kind: "number" },
+    { key: "scope_ratio", label: "Desired scope (7 for rope with chain, 5 for all-chain; 3 is a calm-weather lunch stop)", kind: "number" },
     { key: "boat_loa_ft", label: "Boat length overall (ft, for swing radius)", kind: "number" },
   ],
   outputs: [
@@ -3058,8 +3073,10 @@ MECHANIC_RENDERERS["anchor-rode-scope"] = _simpleRenderer({
 // about 1% off the gamma the note states.
 const _AIR_ISENTROPIC_EXP = (1.4 - 1) / 1.4;
 // dims: in { boost_psi: M L^-1 T^-2, ambient_psia: M L^-1 T^-2, inlet_temp_f: T, compressor_eff_pct: dimensionless } out: { pr: dimensionless, t_out_f: T, temp_rise_f: T }
-export function computeTurboPressureRatio({ boost_psi = 0, ambient_psia = 14.7, inlet_temp_f = 0, compressor_eff_pct = 70 } = {}) {
+export function computeTurboPressureRatio({ boost_psi = 0, ambient_psia = 14.7, inlet_temp_f = null, compressor_eff_pct = 70 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // An omitted inlet temperature used to run as 0 F, which reads the outlet 100 F cool.
+  if (inlet_temp_f === null || inlet_temp_f === "") return { error: "Enter the compressor inlet air temperature (F)." };
   // An efficiency is a percent; 0 < value < 1 is a fraction typed into a percent field (added 2026-09-26).
   if (["compressor_eff_pct"].some((k) => { const v = Number(arguments[0]?.[k]); return v > 0 && v < 1; })) return { error: "Enter efficiencies as a percent (85 for 85%), not a fraction." };
   const boost = Number(boost_psi) || 0;
@@ -3106,8 +3123,9 @@ MECHANIC_RENDERERS["turbo-pressure-ratio"] = _simpleRenderer({
 // PR = [1 + eff x (T_out/T_in - 1)]^(1/0.2857) and boost = ambient x (PR - 1),
 // all temperatures absolute (Rankine).
 // dims: in { max_charge_temp_f: T, inlet_temp_f: T, compressor_eff_pct: dimensionless, ambient_psia: M L^-1 T^-2 } out: { max_boost_psi: M L^-1 T^-2, pressure_ratio: dimensionless }
-export function computeTurboMaxBoostForChargeTemp({ max_charge_temp_f = 0, inlet_temp_f = 0, compressor_eff_pct = 70, ambient_psia = 14.7 } = {}) {
+export function computeTurboMaxBoostForChargeTemp({ max_charge_temp_f = null, inlet_temp_f = null, compressor_eff_pct = 70, ambient_psia = 14.7 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (inlet_temp_f === null || inlet_temp_f === "" || max_charge_temp_f === null || max_charge_temp_f === "") return { error: "Enter the inlet air temperature and the maximum charge temperature (F)." };
   // An efficiency is a percent; 0 < value < 1 is a fraction typed into a percent field (added 2026-09-26).
   if (["compressor_eff_pct"].some((k) => { const v = Number(arguments[0]?.[k]); return v > 0 && v < 1; })) return { error: "Enter efficiencies as a percent (85 for 85%), not a fraction." };
   const tout = Number(max_charge_temp_f);
@@ -3824,6 +3842,8 @@ MECHANIC_RENDERERS["dynamic-compression-ratio"] = _simpleRenderer({
 // dims: in { input_angle_deg: dimensionless, output_angle_deg: dimensionless } out: { first_joint_variation_pct: dimensionless, second_joint_variation_pct: dimensionless, angle_difference_deg: dimensionless }
 export function computeUjointOperatingAngle({ input_angle_deg = 10, output_angle_deg = 10 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // The page used to fill a blank angle with 10 degrees, so one typed angle was judged against an invented one.
+  if (input_angle_deg === null || input_angle_deg === "" || output_angle_deg === null || output_angle_deg === "") return { error: "Enter both joint operating angles (degrees)." };
   if (!(input_angle_deg >= 0 && input_angle_deg < 90)) return { error: "Input (first) U-joint operating angle must be between 0 and 90 degrees." };
   if (!(output_angle_deg >= 0 && output_angle_deg < 90)) return { error: "Output (second) U-joint operating angle must be between 0 and 90 degrees." };
   // A single Cardan (Hooke) joint at angle b makes the output speed swing between cos(b) and 1/cos(b) of the input,
@@ -3856,7 +3876,7 @@ function _v959renderUjointOperatingAngle(inputRegion, outputRegion, citationEl) 
   const oF = makeOutputLine(outputRegion, "Per-joint speed variation", "uja-out-f");
   const update = debounce(() => {
     const r = computeUjointOperatingAngle({
-      input_angle_deg: ia.input.value === "" ? 10 : Number(ia.input.value), output_angle_deg: oa.input.value === "" ? 10 : Number(oa.input.value),
+      input_angle_deg: ia.input.value === "" ? null : Number(ia.input.value), output_angle_deg: oa.input.value === "" ? null : Number(oa.input.value),
     });
     if (r.error) { oV.textContent = r.error; oF.textContent = "-"; return; }
     oV.textContent = r.verdict + " (delta " + fmt(r.angle_difference_deg, 1) + " deg)";
@@ -3954,6 +3974,8 @@ MECHANIC_RENDERERS["sailboat-performance-ratios"] = _simpleRenderer({
 // dims: in { weight_lb: M, radius_of_gyration_ft: L, rpm: T^-1, energy_fluctuation_ftlb: M L^2 T^-2 } out: { kinetic_energy_ftlb: M L^2 T^-2, speed_fluctuation_pct: dimensionless }
 export function computeFlywheelEnergy({ weight_lb = 100, radius_of_gyration_ft = 1, rpm = 1000, energy_fluctuation_ftlb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // The speed can only swing until the minimum reaches zero: a pulse over 4 x the stored energy is not a fluctuation.
+  if (Number(energy_fluctuation_ftlb) > 0 && Number(energy_fluctuation_ftlb) > 4 * 0.5 * (Number(weight_lb) / 32.174) * Math.pow(Number(radius_of_gyration_ft), 2) * Math.pow(Number(rpm) * 2 * Math.PI / 60, 2)) return { error: "The energy pulse is more than four times the flywheel's stored energy: it would stop the flywheel, not swing its speed. Use a heavier flywheel or check the pulse." };
   if (!(weight_lb > 0)) return { error: "Flywheel weight must be positive (lb)." };
   if (!(radius_of_gyration_ft > 0)) return { error: "Radius of gyration must be positive (ft)." };
   if (!(rpm > 0)) return { error: "Speed must be positive (rpm)." };
@@ -4088,7 +4110,7 @@ export function computeInjectorFlowAtPressure({ rated_flow_ccmin = 0, rated_pres
     loses_flow_under_boost, returnless,
     note: "An injector is an orifice, so flow follows the SQUARE ROOT of the pressure differential across it - which means pressure is a weak lever: it takes 4x the differential to double the flow, and no amount of fuel pressure rescues an injector that is simply too small. "
       + (returnless
-        ? "RETURNLESS system: the rail is held at a fixed pressure, so the differential is rail minus manifold. " + (map > 0 ? "Under " + map + " psi of boost the differential drops to " + effective_dp_psi.toFixed(1) + " psi and this injector flows " + Math.abs(pct_change).toFixed(1) + "% LESS than its rating - the engine loses fuel exactly when it wants more, and it is the classic returnless-plus-boost failure. Raise the rail or fit a manifold-referenced regulator. " : "At " + map + " psig manifold the differential is " + effective_dp_psi.toFixed(1) + " psi. ")
+        ? "RETURNLESS system: the rail is held at a fixed pressure, so the differential is rail minus manifold. " + (map > 0 ? "Under " + map + " psi of boost the differential drops to " + effective_dp_psi.toFixed(1) + " psi and this injector flows " + Math.abs(pct_change).toFixed(1) + "% " + (pct_change < 0 ? "LESS" : "more") + " than its rating (and less than the same rail gives with no boost) - the engine loses fuel exactly when it wants more, and it is the classic returnless-plus-boost failure. Raise the rail or fit a manifold-referenced regulator. " : "At " + map + " psig manifold the differential is " + effective_dp_psi.toFixed(1) + " psi. ")
         : "RETURN system with a manifold-referenced regulator: the regulator tracks manifold pressure and holds the differential CONSTANT, so boost does not change the static flow - which is the whole reason that plumbing exists. ")
       + "Static flow only: this is the injector's full-open capacity, not what it delivers at a given pulse width, and it says nothing about the dead time (latency) that shifts with voltage and pressure and that a tune must correct. Raising rail pressure also slows the injector's opening and can push a small injector out of its linear range at short pulse widths. Gasoline at about 0.72 specific gravity for the cc/min to lb/h conversion; ethanol blends are denser per unit energy and change the whole fuel budget. A tuning aid; the injector's own flow data and the tuner's measured fueling govern.",
   };
@@ -4126,6 +4148,7 @@ MECHANIC_RENDERERS["injector-flow-at-pressure"] = _simpleRenderer({
 // dims: in { center_distance_in: L, large_sheave_dia_in: L, small_sheave_dia_in: L, measured_force_lb: M L T^-2, rec_min_force_lb: M L T^-2, rec_max_force_lb: M L T^-2, belt_condition: dimensionless, new_belt_factor: dimensionless, belt_count: dimensionless } out: { span_in: L, deflection_in: L, static_tension_lb: M L T^-2, target_min_force_lb: M L T^-2, target_max_force_lb: M L T^-2, wrap_angle_deg: dimensionless, shaft_load_lb: M L T^-2 }
 export function computeBeltDeflectionTension({ center_distance_in = 0, large_sheave_dia_in = 0, small_sheave_dia_in = 0, measured_force_lb = 0, rec_min_force_lb = 0, rec_max_force_lb = 0, belt_condition = "used", new_belt_factor = 1.3, belt_count = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (arguments[0]?.belt_condition !== undefined && !["new", "used"].includes(String(arguments[0].belt_condition))) return { error: "Belt condition must be new or used." };
   const C = Number(center_distance_in) || 0;
   const D = Number(large_sheave_dia_in) || 0;
   const d = Number(small_sheave_dia_in) || 0;
@@ -4152,7 +4175,7 @@ export function computeBeltDeflectionTension({ center_distance_in = 0, large_she
   const factor = isNew ? kNew : 1;
   const target_min_force_lb = fmin * factor;
   const target_max_force_lb = fmax * factor;
-  const under = F < target_min_force_lb;
+  const under = F < target_min_force_lb * (1 - 1e-9);
   const over = F > target_max_force_lb + 1e-9 * Math.abs(target_max_force_lb);
   const status = under ? "UNDER-TENSIONED" : over ? "OVER-TENSIONED" : "IN RANGE";
   const pct_of_min = target_min_force_lb > 0 ? (F / target_min_force_lb) * 100 : null;
@@ -4220,6 +4243,8 @@ MECHANIC_RENDERERS["belt-deflection-tension"] = _simpleRenderer({
 // dims: in { horsepower: M L^2 T^-3, rpm: T^-1, number_of_teeth: dimensionless, diametral_pitch_1_in: L^-1, face_width_in: L, tooth_system: dimensionless, y_diametral_override: dimensionless, tooth_cut: dimensionless, is_idler: dimensionless, sut_psi: M L^-1 T^-2 } out: { pitch_diameter_in: L, torque_inlb: M L^2 T^-2, wt_lb: M L T^-2, velocity_fpm: L T^-1, kv: dimensionless, static_stress_psi: M L^-1 T^-2, dynamic_stress_psi: M L^-1 T^-2, allowable_psi: M L^-1 T^-2, safety_factor: dimensionless }
 export function computeGearDynamicToothStress({ horsepower = 0, rpm = 0, number_of_teeth = 0, diametral_pitch_1_in = 0, face_width_in = 0, tooth_system = "20-full-depth", y_diametral_override = 0, tooth_cut = "cut", is_idler = "no", sut_psi = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (arguments[0]?.is_idler !== undefined && !["yes", "no"].includes(arguments[0].is_idler)) return { error: "is_idler must be yes or no." };
+  if (arguments[0]?.tooth_cut !== undefined && !["cut", "cast"].includes(String(arguments[0].tooth_cut))) return { error: "Tooth cut must be cut or cast." };
   const hp = Number(horsepower) || 0, N = Number(rpm) || 0, T = Number(number_of_teeth) || 0;
   const Pd = Number(diametral_pitch_1_in) || 0, F = Number(face_width_in) || 0;
   const Yov = Number(y_diametral_override) || 0, Sut = Number(sut_psi) || 0;
@@ -4325,8 +4350,9 @@ MECHANIC_RENDERERS["gear-dynamic-tooth-stress"] = _simpleRenderer({
 // ===========================================================================
 
 // dims: in { baseline_pressure_inhg: M L^-1 T^-2, baseline_temp_f: T, actual_pressure_inhg: M L^-1 T^-2, actual_temp_f: T, jet_flow_number: dimensionless, jet_diameter_in: L } out: { density_ratio: dimensionless, corrected_jet_number: dimensionless, corrected_jet_diameter_in: L }
-export function computeCarburetorAltitudeJetting({ baseline_pressure_inhg = 29.92, baseline_temp_f = 59, actual_pressure_inhg = 0, actual_temp_f = 0, jet_flow_number = 0, jet_diameter_in = 0 } = {}) {
+export function computeCarburetorAltitudeJetting({ baseline_pressure_inhg = 29.92, baseline_temp_f = 59, actual_pressure_inhg = 0, actual_temp_f = null, jet_flow_number = 0, jet_diameter_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (actual_temp_f === null || actual_temp_f === "") return { error: "Enter the actual air temperature (F)." };
   if (!(baseline_pressure_inhg > 0)) return { error: "Baseline absolute pressure must be positive." };
   if (!(actual_pressure_inhg > 0)) return { error: "Actual absolute pressure must be positive." };
   if (!(baseline_temp_f + 459.67 > 0)) return { error: "Baseline temperature must be above absolute zero." };
@@ -4487,7 +4513,7 @@ export function computeAdhesiveBondArea({ bond_length_in = 0, bond_width_in = 0,
     : elevated_drop_pct > 0
       ? "at " + fmt(elevated_shear_strength_psi, 0) + " psi the same joint carries " + fmt(elevated_capacity_lb, 0)
         + " lb, " + fmt(elevated_drop_pct, 0) + "% BELOW the entered figure"
-        + (has_required && elevated_capacity_lb < required_load_lb ? " -- and that is short of the required load, so the joint is adequate cold and not hot" : "")
+        + (has_required && elevated_capacity_lb < required_load_lb ? (adequate ? " -- and that is short of the required load, so the joint is adequate cold and not hot" : " -- short of the required load hot as well as cold") : "")
       : "the entered elevated-temperature strength is not below the reference strength, so there is no reduction to apply";
   // Bond line thickness has an optimum, not a minimum.
   const has_line = bond_line_in > 0 && bond_line_min_in > 0 && bond_line_max_in > 0;

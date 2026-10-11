@@ -2954,8 +2954,8 @@ cross-check.
 | calc-mechanic.js | `computeTorsionSpringRate` | `{ wire_diameter_in = 0, mean_coil_diameter_in = 0, active_coils = 0, deflecti...` | _ | _ | _ |
 | calc-mechanic.js | `computeTrapSpeedHorsepower` | `{ weight_lb = 0, trap_mph = 0 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeTrueAirspeed` | `{ cas_kt = 0, density_altitude_ft = 0 } = {}` | _ | _ | _ |
-| calc-mechanic.js | `computeTurboMaxBoostForChargeTemp` | `{ max_charge_temp_f = 0, inlet_temp_f = 0, compressor_eff_pct = 70, ambient_p...` | _ | _ | _ |
-| calc-mechanic.js | `computeTurboPressureRatio` | `{ boost_psi = 0, ambient_psia = 14.7, inlet_temp_f = 0, compressor_eff_pct = ...` | _ | _ | _ |
+| calc-mechanic.js | `computeTurboMaxBoostForChargeTemp` | `{ max_charge_temp_f = null, inlet_temp_f = null, compressor_eff_pct = 70, amb...` | _ | _ | _ |
+| calc-mechanic.js | `computeTurboPressureRatio` | `{ boost_psi = 0, ambient_psia = 14.7, inlet_temp_f = null, compressor_eff_pct...` | _ | _ | _ |
 | calc-mechanic.js | `computeTurnRadiusBank` | `{ airspeed_kt = 0, bank_angle_deg = 0 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeUjointOperatingAngle` | `{ input_angle_deg = 10, output_angle_deg = 10 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeUniversalJointSpeed` | `{ joint_angle_deg = 0, input_speed_rpm = 0, input_torque_lbft = 0 } = {}` | _ | _ | _ |

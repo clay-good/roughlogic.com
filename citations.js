@@ -5424,7 +5424,7 @@ export const CITATIONS = {
     ],
   },
   "driveshaft-max-length": {
-    formula: "N_crit falls as 1/L^2, so L_max = L_ref × sqrt(0.65 × N_crit_ref / target_rpm), keeping the running speed at or below 0.65 × critical. The inverse of N_crit = (4.7/L^2) × sqrt(E I / (rho A)).",
+    formula: "N_crit falls as 1/L^2, so L_max = L_ref × sqrt(0.65 × N_crit_ref / target_rpm), keeping the running speed at or below 0.65 × critical. The inverse of N_crit (rpm) = (94.25/L^2) × sqrt(E I / (rho A)).",
     edition: "Euler-Bernoulli beam theory by name; AAM (American Axle) and Spicer / Dana driveshaft engineering manuals by name.",
     freeAccess: "Beam-theory principles free in mechanics-of-materials texts at university OCW.",
     governance: GOVERNANCE.general,
@@ -13153,7 +13153,7 @@ export const CITATIONS = {
     edition: "The Cardan (Hooke) universal-joint velocity relation, output speed ranging between omega cos(beta) and omega/cos(beta) (Machinery's Handbook; Shigley, Mechanical Engineering Design), by name.",
     freeAccess: "The Cardan velocity relation is a standard published kinematics result; the joint angle and input speed are the user's inputs.",
     governance: GOVERNANCE.general,
-    editionNote: "Cardan (Hooke) universal-joint speed variation. A single U-joint at operating angle beta makes its output run ahead of and then behind the input twice per revolution: the output speed ranges between omega cos(beta) (slowest, at 90 and 270 degrees of input) and omega/cos(beta) (fastest, at 0 and 180 degrees), a peak-to-peak fluctuation of (1/cos(beta) - cos(beta)) = sin(beta) tan(beta) of the input speed. The swing grows fast with angle - about +/-1.5% at 10 degrees but nearly 29% peak-to-peak at 30 degrees - which is why U-joint working angles are held to a few degrees. A second joint phased 90 degrees at an equal angle (a double-Cardan or a matched two-joint shaft) reverses the error so the far output turns uniformly again. With an input torque entered it also gives the torque pulsation (power is conserved, so the output torque runs T cos(beta) to T/cos(beta), highest when the output runs slowest) and the peak output angular acceleration, omega^2 cos(beta) sin^2(beta) sin(2 theta)/(1 - sin^2(beta) sin^2(theta))^2, about omega^2 beta^2 at small angles, which drives the inertia torque on whatever the shaft turns. The secondary shaking couple, the cancellation math for a specific double-Cardan geometry, and true constant-velocity (CV) joints are separate. Match and phase the joints on a real shaft. A design aid; Machinery's Handbook / Shigley and the driveline maker govern.",
+    editionNote: "Cardan (Hooke) universal-joint speed variation. A single U-joint at operating angle beta makes its output run ahead of and then behind the input twice per revolution: the output speed ranges between omega cos(beta) (slowest, at 0 and 180 degrees of input) and omega/cos(beta) (fastest, at 90 and 270 degrees), a peak-to-peak fluctuation of (1/cos(beta) - cos(beta)) = sin(beta) tan(beta) of the input speed. The swing grows fast with angle - about +/-1.5% at 10 degrees but nearly 29% peak-to-peak at 30 degrees - which is why U-joint working angles are held to a few degrees. A second joint phased 90 degrees at an equal angle (a double-Cardan or a matched two-joint shaft) reverses the error so the far output turns uniformly again. With an input torque entered it also gives the torque pulsation (power is conserved, so the output torque runs T cos(beta) to T/cos(beta), highest when the output runs slowest) and the peak output angular acceleration, omega^2 cos(beta) sin^2(beta) sin(2 theta)/(1 - sin^2(beta) sin^2(theta))^2, about omega^2 beta^2 at small angles, which drives the inertia torque on whatever the shaft turns. The secondary shaking couple, the cancellation math for a specific double-Cardan geometry, and true constant-velocity (CV) joints are separate. Match and phase the joints on a real shaft. A design aid; Machinery's Handbook / Shigley and the driveline maker govern.",
     assumptions: [
       { name: "Velocity relation", value: "output between omega cos(beta) and omega/cos(beta), twice per rev", source: "Cardan / Hooke" },
       { name: "Fluctuation", value: "1/cos(beta) - cos(beta) = sin(beta) tan(beta), grows fast with angle", source: "kinematics" },
@@ -14784,7 +14784,7 @@ export const CITATIONS = {
     assumptions: [
       { name: "Pressure altitude", value: "PA = elevation + 145,366 x (1 - (altimeter/29.92)^0.190284); equals the field elevation at a standard 29.92 setting", source: "FAA-H-8083-25, altimeter-setting conversion table" },
       { name: "ISA lapse", value: "standard temperature falls 2 degrees C per 1000 ft from 15 C at sea level", source: "ICAO Standard Atmosphere" },
-      { name: "Dry air", value: "ignores humidity, which lowers density and raises DA further", source: "scope of this tile" },
+      { name: "Humidity", value: "included through the vapor pressure when a relative humidity is entered; it lowers density and raises DA", source: "scope of this tile" },
     ],
   },
   "true-airspeed": {
