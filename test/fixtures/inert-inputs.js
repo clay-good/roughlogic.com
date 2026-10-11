@@ -118,7 +118,6 @@ export const INERT_INPUTS = {
   "shore-post-load::min_design_psf": "moves the answer once another input changes (1,500 randomized settings)",
   "soil-gradation-coefficients::pct_fines": "moves the answer once another input changes (1,500 randomized settings)",
   "soot-cleaning-takeoff::seal_coat": "moves the answer once another input changes (1,500 randomized settings)",
-  "sous-vide-pasteurization::initial_temperature_F": "reviewed guard-only input (scripts/guard-only-inputs-allowlist.json)",
   "spoil-setback::min_setback_ft": "moves the answer once another input changes (1,500 randomized settings)",
   "spray-foam-board-feet::waste_pct": "moves the answer once another input changes (1,500 randomized settings)",
   "stack-emission-pte::control_enforceable": "moves the answer once another input changes (1,500 randomized settings)",

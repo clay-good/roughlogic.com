@@ -73,7 +73,7 @@ test("S179: example deducts at least the bonus portion", () => { const r = compu
 test("S179: small asset fully expensed under cap", () => { const r = computeSection179({ cost: 60000, business_use_pct: 100, taxable_income: 100000, tax_year: 2025 }); assert.equal(r.section_179_deduction, 60000); });
 test("S179: limited by taxable income", () => { const r = computeSection179({ cost: 60000, business_use_pct: 100, taxable_income: 10000, tax_year: 2025 }); assert.equal(r.section_179_deduction, 10000); });
 test("S179: phaseout reduces cap dollar-for-dollar", () => { const params = SECTION_179_LIMITS[2025]; const r = computeSection179({ cost: params.phaseout_start + 100000, business_use_pct: 100, taxable_income: 5000000, tax_year: 2025 }); assert.ok(r.dollar_cap === Math.max(0, params.cap - 100000)); });
-test("S179: business_use scales basis", () => { const r = computeSection179({ cost: 60000, business_use_pct: 50, taxable_income: 100000, tax_year: 2025 }); assert.equal(r.business_basis, 30000); });
+test("S179: business_use scales basis", () => { const r = computeSection179({ cost: 60000, business_use_pct: 75, taxable_income: 100000, tax_year: 2025 }); assert.equal(r.business_basis, 45000); }); // 75, not 50: section 179 needs more than 50% business use
 test("S179: bonus applies to residual after 179", () => { const r = computeSection179({ cost: 5000000, business_use_pct: 100, taxable_income: 5000000, tax_year: 2025 }); const after = r.business_basis - r.section_179_deduction; assert.ok(close(r.bonus_depreciation, after * 1.00, 1)); });
 
 // The One Big Beautiful Bill Act rewrote both halves of this table from 2025.

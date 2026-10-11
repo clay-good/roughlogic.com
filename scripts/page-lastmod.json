@@ -866,8 +866,8 @@
       "date": "2026-10-01"
     },
     "/tools/brine-cure/": {
-      "sha": "902d20aa26233414",
-      "date": "2026-10-03"
+      "sha": "eac8dac26273f954",
+      "date": "2026-10-11"
     },
     "/tools/broad-crested-weir/": {
       "sha": "9d8be00ab88afe0b",
@@ -7330,8 +7330,8 @@
       "date": "2026-09-29"
     },
     "/tools/sous-vide-pasteurization/": {
-      "sha": "a21db209d4c930fe",
-      "date": "2026-10-03"
+      "sha": "1fe7bb81e491bd04",
+      "date": "2026-10-11"
     },
     "/tools/spa-drain-interval/": {
       "sha": "4b0c5e8414ec5910",

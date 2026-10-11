@@ -30,7 +30,8 @@ test("MACRS: 15-year totals to 100%", () => { const r = computeMacrs({ cost: 100
 test("MACRS: 20-year totals to 100%", () => { const r = computeMacrs({ cost: 100, class_life: 20, year_of_interest: 21 }); const sum = r.schedule.reduce((a, b) => a + b.depreciation, 0); assert.ok(close(sum, 100, 0.05)); });
 test("MACRS: year_of_interest beyond schedule clamps", () => { const r = computeMacrs({ cost: 1000, class_life: 5, year_of_interest: 99 }); assert.equal(r.year_of_interest, 6); });
 
-test("S179: 0% business use yields 0 deduction", () => { const r = computeSection179({ cost: 50000, business_use_pct: 0, taxable_income: 100000, tax_year: 2025 }); assert.equal(r.section_179_deduction, 0); });
+// Until 2026-10-11 this expected a $0 deduction; IRC 179(d)(1) needs more than 50% business use, so 0% is an error that says so.
+test("S179: 0% business use is not eligible", () => { const r = computeSection179({ cost: 50000, business_use_pct: 0, taxable_income: 100000, tax_year: 2025 }); assert.match(r.error, /more than 50%/); });
 test("S179: invalid year errors", () => { assert.ok(computeSection179({ cost: 100, tax_year: 2099 }).error); });
 test("S179: 110% business use errors", () => { assert.ok(computeSection179({ cost: 100, business_use_pct: 110, tax_year: 2025 }).error); });
 test("S179: phaseout zeroes cap above cap+threshold", () => { const params = SECTION_179_LIMITS[2025]; const r = computeSection179({ cost: params.phaseout_start + params.cap + 100, business_use_pct: 100, taxable_income: 999999999, tax_year: 2025 }); assert.equal(r.dollar_cap, 0); });

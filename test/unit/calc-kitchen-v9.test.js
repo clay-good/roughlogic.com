@@ -13,24 +13,27 @@ import {
 const close = (a, b, tol) => Math.abs(a - b) <= tol;
 const closePct = (a, b, pct) => Math.abs(a - b) <= Math.max(Math.abs(b) * (pct / 100), 1e-6);
 
-test("sous-vide: 1 in poultry @ 140 F bath, 38 F start -> ~43 min come-up, 12 min hold", () => {
+test("sous-vide: 1 in poultry @ 140 F bath, 38 F start -> ~80 min come-up, 12 min hold", () => {
   const r = computeSousVidePasteurization(sousVidePasteurizationExample.inputs);
   assert.ok(!r.error);
-  // L = 0.0127 m; alpha = 1.4e-7; a 99.5% center approach needs Fo = 2.245 (one-term slab):
-  // come-up = 2.245 * 0.0127^2 / 1.4e-7 = 2587 s = 43.1 min.
-  assert.ok(closePct(r.come_up_minutes, 43.11, 1));
+  // L = 0.0127 m; alpha = 1.4e-7. With the film at the bag (h 95 W/m2K, k 0.48 W/mK, Bi 2.51) a
+  // 99.5% center approach needs Fo = 4.19, not the ideal-surface 2.245 this pinned until 2026-10-11:
+  // come-up = 4.19 * 0.0127^2 / 1.4e-7 = 4824 s = 80.4 min (Baldwin's slab table: about 75 to 80).
+  assert.ok(closePct(r.come_up_minutes, 80.41, 1));
   // Hold at 140 F = 12 min, FDA Food Code Table 3-2.
   assert.ok(close(r.hold_minutes, 12, 0.001));
-  assert.ok(closePct(r.total_minutes, 55.11, 1));
+  assert.ok(closePct(r.total_minutes, 92.41, 1));
   // Poultry is not what Table 3-2 is written for, and the tile says so.
   assert.ok(r.warnings.some((w) => /whole meat roasts/.test(w)));
 });
 
-test("sous-vide: come-up time scales with the square of thickness", () => {
+test("sous-vide: come-up time grows between linearly and with the square of thickness", () => {
   const r1 = computeSousVidePasteurization({ category: "poultry", thickness_in: 1.0, bath_temperature_F: 140, initial_temperature_F: 38 });
   const r2 = computeSousVidePasteurization({ category: "poultry", thickness_in: 2.0, bath_temperature_F: 140, initial_temperature_F: 38 });
-  // Doubling thickness quadruples come-up time.
-  assert.ok(closePct(r2.come_up_minutes / r1.come_up_minutes, 4, 1));
+  // With a finite film, doubling thickness more than doubles the come-up but does not quite
+  // quadruple it (the film matters less on a thick piece); the ideal-surface model gave exactly 4.
+  const ratio = r2.come_up_minutes / r1.come_up_minutes;
+  assert.ok(ratio > 2.5 && ratio < 4, "ratio " + ratio);
 });
 
 test("sous-vide: lower bath temp dramatically increases hold time", () => {

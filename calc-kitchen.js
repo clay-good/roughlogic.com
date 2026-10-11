@@ -189,6 +189,8 @@ const COOLING_BASE_MIN = {
 // temperature from time.)
 export function computeCoolingCurve({ start_F = 135, ambient_F = 70, container = "full_pan_4in", product_type = "thick_liquid" }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // The ambient adjustment stops growing at 100 F, so a hotter room used to pass anyway.
+  if (Number(ambient_F) > 100) return { error: "Cooling in a space above 100 F is outside this model and is not creditable; move the product to refrigeration, an ice bath or a blast chiller." };
   const tbl = COOLING_BASE_MIN[container];
   if (!tbl) return { error: "Unknown container." };
   const base = tbl[product_type];
@@ -508,9 +510,10 @@ const renderPanConversion = _r({
 //
 //   Come-up time uses the one-term slab solution at the centerline. The
 //   center temperature ratio (T_bath - T_center) / (T_bath - T_initial)
-//   reaches 0.005 at Fourier number Fo = 2.245 for a slab of half-thickness L:
+//   reaches 0.005 at a Fourier number Fo that depends on the film at the bag
+//   (Bi = h L / k; Fo = 2.245 only for an ideal surface, about 4.2 at 1 in):
 //
-//     come_up_seconds = 2.245 * L_m^2 / alpha
+//     come_up_seconds = Fo * L_m^2 / alpha
 //
 //   Hold time at bath = food center temperature, by linear interpolation
 //   between the Table 3-2 rows. Bath temperature
@@ -579,6 +582,8 @@ export function computeSousVidePasteurization({
   if (!Number.isFinite(T_bath) || T_bath < 100) return { error: "Bath temperature must be a number >= 100 F." };
   if (!Number.isFinite(T_init)) return { error: "Initial temperature must be a number." };
   if (T_init >= T_bath) return { error: "Initial temperature must be below bath temperature." };
+  // A frozen piece has to thaw first, and the latent heat is not in this model.
+  if (T_init < 32) return { error: "A frozen start is outside this model (the latent heat of thawing is not counted); thaw under refrigeration first, or use a validated cook-from-frozen table." };
 
   // Slab half-thickness in meters. 1 in = 0.0254 m. The slab model
   // treats heating from both sides (typical sous-vide bag in water),
@@ -589,7 +594,18 @@ export function computeSousVidePasteurization({
   // A 99.5% approach (theta = 0.005) needs Fo = ln((4/pi)/0.005)/(pi/2)^2 = 2.245.
   // Until 2026-09-19 this took Fo = 0.4, where the center has closed only half
   // the gap (theta = 0.47): the come-up was 5.6x short, on the unsafe side.
-  const Fo_995 = Math.log((4 / Math.PI) / 0.005) / Math.pow(Math.PI / 2, 2);
+  // That best case is NOT a water bath: the film at the bag is finite (about 95 W/m2K in a stirred
+  // bath against a meat conductivity near 0.48 W/mK), so the surface lags and the come-up is
+  // longer. With Biot = h L / k, the first eigenvalue solves zeta tan(zeta) = Bi and
+  // theta = C1 exp(-zeta^2 Fo), C1 = 4 sin(zeta) / (2 zeta + sin(2 zeta)). For a 1 in piece that
+  // is Fo = 4.2, not 2.245: until 2026-10-11 the come-up read about 1.9 times short (46 min where
+  // the finite-film answer, and Baldwin's slab table, are near 75 to 85).
+  const biot = 95 * L_m / 0.48;
+  let zLo = 1e-6, zHi = Math.PI / 2 - 1e-9;
+  for (let i = 0; i < 80; i++) { const zm = (zLo + zHi) / 2; if (zm * Math.tan(zm) < biot) zLo = zm; else zHi = zm; }
+  const zeta = (zLo + zHi) / 2;
+  const c1 = 4 * Math.sin(zeta) / (2 * zeta + Math.sin(2 * zeta));
+  const Fo_995 = Math.log(c1 / 0.005) / (zeta * zeta);
   const come_up_seconds = (Fo_995 * L_m * L_m) / cat.alpha;
   const come_up_minutes = come_up_seconds / 60;
 
@@ -623,16 +639,16 @@ export function computeSousVidePasteurization({
 
 export const sousVidePasteurizationExample = {
   // 1-inch chicken breast in a 140 F bath, refrigerated initial 38 F.
-  // L = 0.5 in = 0.0127 m -> Fo = 2.245 (99.5% approach) t = 2.245 * 0.0127^2 / 1.4e-7
-  //   = 2.245 * 1.6129e-4 / 1.4e-7 = 2587 s = 43.1 min come-up
-  // Hold at 140 F = 12 min (Table 3-2). Total ~55 min.
+  // L = 0.5 in = 0.0127 m -> Bi = 95 x 0.0127 / 0.48 = 2.51, zeta = 1.142, Fo = 4.19 (99.5% approach)
+  //   t = 4.19 * 1.6129e-4 / 1.4e-7 = 4824 s = 80.4 min come-up
+  // Hold at 140 F = 12 min (Table 3-2). Total ~92 min.
   inputs: { category: "poultry", thickness_in: 1.0, bath_temperature_F: 140, initial_temperature_F: 38 },
 };
 
 import { renderLimitationBanner as _v9sv_banner, getLimitationCopy as _v9sv_copy } from "./limitation-banner.js";
 
 function renderSousVidePasteurization(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Per FDA Food Code 3-401.11(B)(2) Table 3-2 holding times (whole meat roasts). Come-up time from the one-term slab solution at the centerline, Fo = 2.245 for a 99.5% approach. Bundled food-thermal-diffusivity values per public engineering references (Baldwin Practical Guide to Sous Vide Cooking). Local food-safety authority and a qualified processing authority govern commercial-kitchen use. Free at fda.gov/food/retail-food-protection/fda-food-code.";
+  citationEl.textContent = "Citation: Per FDA Food Code 3-401.11(B)(2) Table 3-2 holding times (whole meat roasts). Come-up time from the one-term slab solution at the centerline for a 99.5% approach with a finite film at the bag (h = 95 W/m2K, k = 0.48 W/mK; Fo about 4.2 at 1 in). Bundled food-thermal-diffusivity values per public engineering references (Baldwin Practical Guide to Sous Vide Cooking). Local food-safety authority and a qualified processing authority govern commercial-kitchen use. Free at fda.gov/food/retail-food-protection/fda-food-code.";
   _v9sv_banner(inputRegion, _v9sv_copy("sous-vide-pasteurization"));
 
   const c = makeSelect("Food category", "sv-c",
@@ -698,6 +714,9 @@ export const KITCHEN_RENDERERS = {
 // brine nitrite ppm = cure*0.0625*1e6/(salt+water+cure); salt-to-add = target%*total/100 - salt.
 // dims: in { mode: dimensionless, water_g: M, salt_g: M, meat_g: M, cure_g: M, target_pct: dimensionless, product: dimensionless } out: { concentration_pct: dimensionless, nitrite_ppm: dimensionless, product: dimensionless }
 export function computeBrineCure({ mode = "brine", water_g = 0, salt_g = 0, meat_g = 0, cure_g = 0, target_pct = 0, product = "chopped" } = {}) {
+  if (mode !== "brine" && mode !== "equilibrium") return { error: "Mode must be brine or equilibrium." };
+  // The nitrite limit of an equilibrium cure is on the meat; with cure entered and no meat the check read "no cure".
+  if (mode === "equilibrium" && Number(cure_g) > 0 && !(Number(meat_g) > 0)) return { error: "Enter the meat weight: the nitrite limit of an equilibrium cure is figured on the green weight of the meat." };
   const water = Number(water_g) || 0;
   const salt = Number(salt_g) || 0;
   const meat = Number(meat_g) || 0;
@@ -738,7 +757,13 @@ export function computeBrineCure({ mode = "brine", water_g = 0, salt_g = 0, meat
   // A maximum is reached, not exceeded, at the limit, and 120 ppm is the level pumped bacon is
   // required to carry. Until 2026-10-03 ">=" flagged a cure exactly at each limit.
   const over_max = nitritePpm > limit_ppm + 1e-9 * limit_ppm;
-  const saltToAdd = target > 0 ? target * total / 100 - salt : null;
+  // Salt to reach the target BY THE SAME DEFINITION the concentration above uses: a brine is
+  // salt / (salt + water), so salt = t water / (1 - t); an equilibrium cure is salt / (meat + water).
+  // Until 2026-10-11 this was target x (everything in the tub) - salt, which for a 10% brine on
+  // 1,000 g of water said 100 g (a 9.1% brine) where 111 g is needed.
+  const tFrac = target / 100;
+  const saltNeeded = mode === "equilibrium" ? tFrac * (meat + water) : (tFrac < 1 ? tFrac * water / (1 - tFrac) : NaN);
+  const saltToAdd = target > 0 ? Math.max(0, saltNeeded - salt) : null;
   return {
     concentration_pct: Number.isFinite(concentration) ? concentration : null,
     nitrite_ppm: Number.isFinite(nitritePpm) ? nitritePpm : null,
@@ -866,6 +891,7 @@ KITCHEN_RENDERERS["bakers-percentage"] = renderBakersPercentage;
 // (Dollar amounts are dimensionless money per spec-v14; percent is dimensionless.)
 export function computeFoodCostPercentage({ beginning_inventory = 0, purchases = 0, ending_inventory = 0, food_sales = 0, theoretical_cost_pct = 0, employee_meals = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (Number(beginning_inventory) + Number(purchases) - Number(ending_inventory) - Number(employee_meals) < 0) return { error: "Ending inventory and employee meals exceed what was on hand: the cost of goods is negative, which means a miscount." };
   if (beginning_inventory < 0 || purchases < 0 || ending_inventory < 0 || theoretical_cost_pct < 0 || employee_meals < 0) return { error: "Dollar and percent inputs must be non-negative." };
   if (!(food_sales > 0)) return { error: "Food sales must be positive." };
   // Cost of food consumed = beginning + purchases - ending; cost of food SOLD then deducts food that left
@@ -1323,6 +1349,7 @@ KITCHEN_RENDERERS["as-purchased-quantity"] = _r({
 // dims: in { original_gravity: dimensionless, final_gravity: dimensionless } out: { abv_pct: dimensionless, apparent_attenuation_pct: dimensionless }
 export function computeAbvFromGravity({ original_gravity = 1.055, final_gravity = 1.012 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(Number(original_gravity) >= 1 && Number(original_gravity) <= 1.2) || !(Number(final_gravity) >= 0.98 && Number(final_gravity) <= 1.2)) return { error: "Enter specific gravities (1.055 and 1.012), not points or degrees Plato." };
   if (!(original_gravity > 1)) return { error: "Original gravity must be greater than 1.000." };
   if (!(final_gravity > 0)) return { error: "Final gravity must be positive." };
   if (!(original_gravity > final_gravity)) return { error: "Original gravity must exceed the final gravity (fermentation lowers gravity)." };
@@ -2297,6 +2324,7 @@ KITCHEN_RENDERERS["grease-duct-cleaning-interval"] = _simpleRenderer({
 // dims: in { door_width_ft: L, door_height_ft: L, full_open_cfm: L^3 T^-1, openings_per_hour: T^-1, seconds_open_each: T, protection_factor: dimensionless, enthalpy_difference_btu_lb: L^2 T^-2, moisture_difference_lb_lb: dimensionless, air_density_lb_ft3: M L^-3 } out: { door_area_ft2: L^2, door_open_factor: dimensionless, effective_cfm: L^3 T^-1, total_load_btuh: M L^2 T^-3, latent_load_btuh: M L^2 T^-3, latent_share_pct: dimensionless, frost_lb_day: M }
 export function computeWalkInDoorInfiltration({ door_width_ft = 0, door_height_ft = 0, full_open_cfm = 0, openings_per_hour = 0, seconds_open_each = 0, protection_factor = 1, enthalpy_difference_btu_lb = 0, moisture_difference_lb_lb = 0, air_density_lb_ft3 = 0.0765 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (Number(moisture_difference_lb_lb) * 1061 > Number(enthalpy_difference_btu_lb) * (1 + 1e-9) && Number(enthalpy_difference_btu_lb) > 0) return { error: "The moisture difference carries more latent heat than the whole enthalpy difference entered; the two psychrometric readings are not consistent." };
   // Unit / range guard added 2026-09-26 after printed-example probing.
   if (Number(arguments[0]?.moisture_difference_lb_lb) > 0.05) return { error: "Enter the humidity ratio difference in lb of water per lb of dry air (about 0.005), not grains." }; if (Number(arguments[0]?.openings_per_hour) * Number(arguments[0]?.seconds_open_each) > 3600) return { error: "The door cannot be open more than 3,600 seconds an hour; check openings and seconds." };
   if (!(door_width_ft > 0)) return { error: "Door width must be positive (ft)." };
@@ -2416,7 +2444,10 @@ export function computeKitchenMakeupAirDeficit({ hood_exhaust_cfm = 0, other_exh
   const door_force_ok = door_total_force_lbf === null ? null : door_total_force_lbf <= EGRESS_DOOR_LIMIT_LBF + 1e-9 * Math.abs(EGRESS_DOOR_LIMIT_LBF);
   const outs = [total_exhaust_cfm, deficit_cfm, deficit_percent, uncontrolled_cfm, makeup_shortfall_cfm];
   if (!outs.every(Number.isFinite)) return { error: "Makeup air balance math is not a finite value." };
-  const balance_verdict = balanced
+  // More makeup than exhaust is not "balanced": the kitchen runs positive and pushes its air into the dining room.
+  const balance_verdict = deficit_cfm < -1e-9 * total_exhaust_cfm
+    ? "SURPLUS OF " + fmt(-deficit_cfm, 0) + " CFM: dedicated makeup exceeds the exhaust, so the kitchen runs POSITIVE and pushes heat, grease and odours toward the dining room. A kitchen is kept slightly negative; trim the makeup air."
+    : balanced
     ? "BALANCED within the intended transfer: a " + fmt(deficit_cfm, 0) + " cfm deficit against " + fmt(intended_transfer_cfm, 0) + " cfm of transfer air the design intends to draw from the dining room"
     : "SHORT BY " + fmt(makeup_shortfall_cfm, 0) + " CFM: a " + fmt(deficit_cfm, 0) + " cfm deficit (" + fmt(deficit_percent, 0) + "% of exhaust) less " + fmt(intended_transfer_cfm, 0) + " cfm of intended transfer. That air comes through the envelope, under doors, and down any flue that will pass it";
   const door_verdict = door_force_lbf === null

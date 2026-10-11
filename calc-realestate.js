@@ -218,6 +218,7 @@ export function computePITI({
   monthly_pmi,
 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  for (const [k, v] of Object.entries(arguments[0] ?? {})) if (typeof v === "number" && v < 0) return { error: "Payment components cannot be negative (" + k + ")." };
   const P = Number(principal);
   const apr = Number(apr_percent);
   const yrs = Number(term_years);
@@ -371,6 +372,8 @@ function dayOfWeekIso(isoDate) {
 //  of-week tokens and the April-15 caveat are categorical
 //  (dimensionless).)
 export function compute1031Timeline({ sale_close_iso }) {
+  // Date.UTC rolls an impossible date forward (Feb 30 becomes Mar 2), which moved both deadlines late.
+  { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(sale_close_iso || "")); if (m) { const d = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3])); if (+m[1] < 1900 || d.getUTCFullYear() !== +m[1] || d.getUTCMonth() !== +m[2] - 1 || d.getUTCDate() !== +m[3]) return { error: "That is not a real calendar date; enter the closing date as YYYY-MM-DD." }; } }
   if (typeof sale_close_iso !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(sale_close_iso)) {
     return { error: "Enter a sale-close date in YYYY-MM-DD format." };
   }
@@ -669,6 +672,7 @@ export function renderPropertyTax(inputRegion, outputRegion, citationEl) {
 // (Cap rate and DSCR are dimensionless ratios of like-dim
 //  dollar aggregates; bands are categorical tokens.)
 export function computeCapRateDSCR({ noi_annual, property_value, annual_debt_service, loan_amount = 0, loan_rate_pct = 0, amort_years = 0, operating_expenses_annual = 0, potential_gross_income = 0 }) {
+  if (Number(loan_rate_pct) < 0) return { error: "Loan rate cannot be negative (%)." };
   const noi = Number(noi_annual);
   const val = Number(property_value);
   let ads = Number(annual_debt_service);
@@ -1664,7 +1668,9 @@ export function computeHudFmr({ shard = null, state = "", fips = "", area_name =
   if (!match && wantState && wantName) {
     match = shard.areas.find((a) => a.state === wantState && a.name.toLowerCase().includes(wantName)) || null;
   }
-  if (!match && wantState) {
+  // The state-only fallback is for a state-only question; a name or FIPS that was supplied and
+  // missed must not come back as another metro's rents (Fresno used to return San Francisco).
+  if (!match && wantState && !wantName && !wantFips) {
     match = shard.areas.find((a) => a.state === wantState) || null;
   }
   if (!match) {
@@ -1788,7 +1794,11 @@ export function computeMortgagePointBreakeven({ loan_amount, base_rate_pct, poin
     // Compare against the first whole month that recovers the cost, and print that month: 60 mo held
     // vs a 60.18 mo break-even is not yet recovered (60 x $99.70 < $6,000), and 60 vs 59.6 is.
     const breakEvenMonth = Math.ceil(break_even_months - 1e-9);
-    verdict = holdMonths >= breakEvenMonth
+    // The saving stops when the loan does: a break-even past the term is never reached.
+    const termMonths = Math.round(Number(term_years) * 12);
+    verdict = Number.isFinite(termMonths) && termMonths > 0 && breakEvenMonth > termMonths
+      ? "Never recovered: the break-even is month " + breakEvenMonth + ", past the " + termMonths + "-month loan term."
+      : holdMonths >= breakEvenMonth
       ? "Worth it: you hold " + holdMonths + " mo, past the " + breakEvenMonth + "-mo break-even."
       : "Not worth it for this hold: you exit at " + holdMonths + " mo, before the " + breakEvenMonth + "-mo break-even.";
   } else {
@@ -2320,6 +2330,8 @@ function _v23SimpleRenderer(spec) {
 // =====================================================================
 // dims: in { asset_class: dimensionless, accumulated_depreciation: dimensionless, total_gain: dimensionless, ordinary_rate_pct: dimensionless, straight_line_depreciation: dimensionless, max_1250_rate_pct: dimensionless } out: { recaptured: dimensionless, rate_applied_pct: dimensionless, recapture_tax: dimensionless, remaining_capital_gain: dimensionless }
 export function computeDepreciationRecapture({ asset_class = "1250", accumulated_depreciation = 0, total_gain = 0, ordinary_rate_pct = 0, straight_line_depreciation = 0, max_1250_rate_pct = 25 } = {}) {
+  if (asset_class !== "1245" && asset_class !== "1250") return { error: "Asset class must be 1245 (personal property) or 1250 (real property)." };
+  if (Number(max_1250_rate_pct) > 25) return { error: "The unrecaptured section 1250 rate is a maximum of 25%." };
   const accum = Number(accumulated_depreciation) || 0;
   const gain = Number(total_gain) || 0;
   const ord = Number(ordinary_rate_pct) || 0;
@@ -2335,10 +2347,16 @@ export function computeDepreciationRecapture({ asset_class = "1250", accumulated
     return { asset_class: "1245", recaptured, rate_applied_pct: ord, recapture_tax, remaining_capital_gain: gain - recaptured };
   }
   // §1250 real property: unrecaptured §1250 gain = min(gain, straight-line depreciation) at the 25% max.
-  const slClamped = Math.max(0, Math.min(sl, accum));
+  // A blank straight-line figure means the property was depreciated straight-line throughout
+  // (every building placed in service after 1986), so all of the accumulated figure is
+  // unrecaptured section 1250 gain. Until 2026-10-11 a blank read as 0 and the recapture as $0.
+  const slClamped = sl > 0 ? Math.max(0, Math.min(sl, accum)) : accum;
   const recaptured = Math.min(gain, slClamped);
   const recapture_tax = recaptured * (max25 / 100);
-  return { asset_class: "1250", recaptured, rate_applied_pct: max25, recapture_tax, remaining_capital_gain: gain - recaptured };
+  // Depreciation taken beyond straight-line (additional depreciation) is ordinary income under 1250(a).
+  const additional_ordinary = Math.min(Math.max(0, gain - recaptured), Math.max(0, accum - slClamped));
+  const additional_tax = additional_ordinary * (ord / 100);
+  return { asset_class: "1250", recaptured, rate_applied_pct: max25, recapture_tax: recapture_tax + additional_tax, additional_ordinary_recapture: additional_ordinary, remaining_capital_gain: gain - recaptured - additional_ordinary };
 }
 export const depreciationRecaptureExample = { inputs: { asset_class: "1250", accumulated_depreciation: 100000, total_gain: 150000, ordinary_rate_pct: 32, straight_line_depreciation: 100000, max_1250_rate_pct: 25 } };
 const renderDepreciationRecapture = _v23SimpleRenderer({
@@ -2409,6 +2427,7 @@ REALESTATE_RENDERERS["rent-roll-vacancy"] = renderRentRollVacancy;
 // selected basis (the market GRM is read on the same annual or monthly basis as the rent).
 // dims: in { price: dimensionless, gross_rent: dimensionless, rent_basis: dimensionless, market_grm: dimensionless } out: { grm_annual: dimensionless, gross_yield_pct: dimensionless }
 export function computeGrossRentMultiplier({ price = 0, gross_rent = 0, rent_basis = "annual", market_grm = 0 } = {}) {
+  if (rent_basis !== "annual" && rent_basis !== "monthly") return { error: "Rent basis must be annual or monthly." };
   const P = Number(price) || 0;
   const rent = Number(gross_rent) || 0;
   const mgrm = Number(market_grm) || 0;
@@ -2594,6 +2613,7 @@ REALESTATE_RENDERERS["seller-net-sheet"] = renderSellerNetSheet;
 // (Debt yield = NOI / loan = ratio of like-dim dollars = dimensionless.)
 export function computeDebtYield({ mode = "yield", noi = 0, loan = 0, dy_target = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (mode !== "yield" && mode !== "maxloan") return { error: "Unknown mode." };
   const n = Number(noi) || 0;
   if (!(n > 0)) return { error: "Enter a positive net operating income." };
   if (mode === "maxloan") {
@@ -2655,6 +2675,7 @@ REALESTATE_RENDERERS["debt-yield"] = renderDebtYield;
 // (Break-even occupancy = (opex + debt service) / PGI = dimensionless ratio.)
 export function computeBreakEvenOccupancy({ opex = 0, debt_svc = 0, pgi = 0, target_occ = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (Number(target_occ) > 0 && Number(target_occ) <= 1) return { error: "Enter the target occupancy as a percent (92 for 92%), not a fraction." };
   const o = Number(opex) || 0;
   const d = Number(debt_svc) || 0;
   const p = Number(pgi) || 0;

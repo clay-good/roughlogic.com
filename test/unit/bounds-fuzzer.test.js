@@ -1871,11 +1871,19 @@ test("bounds: calc-kitchen computeSousVidePasteurization pins come-up time = Fo(
         Math.abs(r.total_minutes - (r.come_up_minutes + r.hold_minutes)) < 1e-9,
         `total = come_up + hold`,
       );
-      // come-up identity: 0.4 * (thickness/2 * 0.0254)^2 / alpha in seconds, / 60 -> minutes.
+      // come-up identity: Fo(99.5%) * (thickness/2 * 0.0254)^2 / alpha in seconds, / 60 -> minutes.
+      // Since 2026-10-11 the film at the bag is finite (h = 95 W/m2K, k = 0.48 W/mK), so Fo comes
+      // from the first eigenvalue of zeta tan(zeta) = Bi instead of the Bi -> infinity 2.245
+      // (which read the come-up about half the water-bath figure). Fixed point here, bisection in the tile.
       const L_m = (thickness_in * 0.0254) / 2;
-      const expected_come_up_min = ((Math.log((4 / Math.PI) / 0.005) / Math.pow(Math.PI / 2, 2)) * L_m * L_m) / r.diffusivity_m2_per_s / 60;
+      const Bi = 95 * L_m / 0.48;
+      let z = 1;
+      for (let i = 0; i < 400; i++) z = Math.atan(Bi / z);
+      const Fo = Math.log(4 * Math.sin(z) / (2 * z + Math.sin(2 * z)) / 0.005) / (z * z);
+      const expected_come_up_min = (Fo * L_m * L_m) / r.diffusivity_m2_per_s / 60;
+      assert.ok(Fo > 2.245, "a finite film is always slower than the ideal surface");
       assert.ok(
-        Math.abs(r.come_up_minutes - expected_come_up_min) < 1e-9,
+        Math.abs(r.come_up_minutes - expected_come_up_min) < 1e-6,
         `come_up identity ${category} th=${thickness_in}: ${r.come_up_minutes} vs ${expected_come_up_min}`,
       );
     }
@@ -3006,9 +3014,11 @@ test("bounds: calc-accounting computeSection179 pins the cap + phase-out + taxab
   assert.strictEqual(ti_limit.section_179_deduction, 30000);
   // After 179: 70k remaining; bonus 100% * 70k = 70k.
   assert.ok(Math.abs(ti_limit.bonus_depreciation - 70000 * 1.00) < 1e-9, `bonus identity`);
-  // Business-use percent reduces basis: 50% of 100k = 50k basis.
-  const partial = computeSection179({ cost: 100000, business_use_pct: 50, taxable_income: 200000, tax_year: 2025 });
-  assert.strictEqual(partial.business_basis, 50000);
+  // Business-use percent reduces basis: 60% of 100k = 60k basis. (This pinned 50% until
+  // 2026-10-11; IRC 179(d)(1) needs MORE than 50% business use, so 50% is now an error.)
+  const partial = computeSection179({ cost: 100000, business_use_pct: 60, taxable_income: 200000, tax_year: 2025 });
+  assert.strictEqual(partial.business_basis, 60000);
+  assert.ok("error" in computeSection179({ cost: 100000, business_use_pct: 50, taxable_income: 200000, tax_year: 2025 }));
 });
 
 test("bounds: calc-accounting computeSection179 rejects non-positive cost / out-of-band use percent / unknown tax year (documented)", () => {
@@ -60713,4 +60723,38 @@ test("hardening slice 16 (cross-trade, agriculture): the reviewed defects stay f
   err(_s16C.computeLoanPayment({ principal: 10000, apr_percent: -5, term_months: 12 }));
   err(_s16C.computeUpgradeROI({ incremental_cost: 10000, annual_savings: 1000, discount_rate_percent: -100, years: 10 }));
   err(_s16C.computeUpgradeROI({ incremental_cost: 10000, annual_savings: 1000, years: 1e8 }));
+});
+
+test("hardening slice 17 (kitchen, real estate, accounting)", async () => {
+  const K = await import("../../calc-kitchen.js");
+  const RE = await import("../../calc-realestate.js");
+  const AC = await import("../../calc-accounting.js");
+  // sous vide: a finite film at the bag, and no frozen starts
+  const sv = K.computeSousVidePasteurization({ category: "poultry", thickness_in: 1, bath_temperature_F: 140 });
+  assert.ok(sv.come_up_minutes > 75 && sv.come_up_minutes < 86, "1 in come-up " + sv.come_up_minutes);
+  assert.ok(K.computeSousVidePasteurization({ category: "beef", thickness_in: 1, bath_temperature_F: 135, initial_temperature_F: 0 }).error);
+  assert.ok(K.computeCoolingCurve({ ...K.coolingCurveExample.inputs, ambient_F: 120 }).error);
+  // brine: salt to add reaches the target by the brine's own definition
+  const br = K.computeBrineCure({ mode: "brine", water_g: 1000, salt_g: 0, target_pct: 10 });
+  assert.ok(Math.abs(br.salt_to_add_g - 1000 / 9) < 1e-6);
+  assert.equal(K.computeBrineCure({ mode: "brine", water_g: 1000, salt_g: 500, target_pct: 10 }).salt_to_add_g, 0);
+  assert.ok(K.computeBrineCure({ mode: "toString", water_g: 1000, salt_g: 50 }).error);
+  assert.ok(K.computeBrineCure({ mode: "equilibrium", water_g: 1000, salt_g: 50, cure_g: 5 }).error);
+  assert.ok(K.computeAbvFromGravity({ original_gravity: 55, final_gravity: 12 }).error);
+  assert.match(K.computeKitchenMakeupAirDeficit({ hood_exhaust_cfm: 2000, dedicated_makeup_cfm: 2600 }).balance_verdict, /^SURPLUS/);
+  // real estate
+  assert.ok(RE.computeDepreciationRecapture({ ...RE.depreciationRecaptureExample?.inputs, asset_class: "1255" }).error);
+  assert.ok(RE.compute1031Timeline({ sale_close_iso: "2026-02-30" }).error);
+  assert.ok(RE.computeDebtYield({ mode: "toString", noi: 1, loan: 1 }).error);
+  assert.ok(!RE.computeDebtYield({ mode: "maxloan", noi: 120000, dy_target: 10 }).error);
+  assert.ok(RE.computeGrossRentMultiplier({ price: 500000, rent: 4000, rent_basis: "weekly" }).error);
+  // accounting
+  assert.ok(AC.computeSection179({ ...AC.section179Example.inputs, business_use_pct: 50 }).error);
+  assert.ok(AC.computeMileageRollup({ trips: [{ miles: -40 }], tax_year: 2025 }).error);
+  assert.match(AC.computeEstimatedTax({ projected_current_tax: 20000, prior_year_tax: 0 }).notice, /PRIOR-YEAR TAX IS \$0/);
+  const be = AC.computeBreakeven({ fixed_costs: 50000, variable_cost_per_unit: 8, sale_price_per_unit: 20, target_units: 3000 });
+  assert.equal(be.below_breakeven, true);
+  assert.equal(be.loss_at_target, 14000);
+  const it = AC.computeInventoryTurnover({ cogs: 500000, beginning_inventory: 250000, ending_inventory: 250000, period_days: 91.25, industry_key: "retail_general" });
+  assert.ok(Math.abs(it.comparison.delta - (8 - it.comparison.industry_aggregate)) < 1e-9);
 });

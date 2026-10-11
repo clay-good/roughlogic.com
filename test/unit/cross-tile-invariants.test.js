@@ -3788,15 +3788,20 @@ test("monotonicity: computeSousVidePasteurization come_up_minutes is strictly in
   const a = computeSousVidePasteurization({ category: "poultry", thickness_in: 0.5, bath_temperature_F: 140, initial_temperature_F: 38 });
   const b = computeSousVidePasteurization({ category: "poultry", thickness_in: 1.0, bath_temperature_F: 140, initial_temperature_F: 38 });
   const ratio = b.come_up_minutes / a.come_up_minutes;
-  assert.ok(Math.abs(ratio - 4) < 1e-9,
-    `L^2 scaling broken: ratio = ${ratio} (expected 4)`);
+  // (Exactly 4 until 2026-10-11; with a finite film at the bag the ratio sits between 2 and 4.)
+  assert.ok(ratio > 2 && ratio < 4,
+    `thickness scaling broken: ratio = ${ratio} (expected between 2 and 4)`);
   // Closed-form pin from sousVidePasteurizationExample: thickness=1.0,
   // bath=140 F, poultry alpha=1.4e-7 m^2/s. L = 0.0127 m; come_up =
   // 2.245 * 0.0127^2 / 1.4e-7 / 60 = 43.1 min.
   const ref = computeSousVidePasteurization({ category: "poultry", thickness_in: 1.0, bath_temperature_F: 140, initial_temperature_F: 38 });
-  const expectedSec = ((Math.log((4 / Math.PI) / 0.005) / Math.pow(Math.PI / 2, 2)) * Math.pow(0.0127, 2)) / ref.diffusivity_m2_per_s;
+  // Since 2026-10-11 the Fourier number carries the film at the bag: Bi = 95 x 0.0127 / 0.48,
+  // zeta = atan(Bi / zeta), Fo = ln(C1 / 0.005) / zeta^2 = 4.19 (80.4 min), not the ideal 2.245.
+  let zeta = 1;
+  for (let i = 0; i < 400; i++) zeta = Math.atan(95 * 0.0127 / 0.48 / zeta);
+  const expectedSec = ((Math.log(4 * Math.sin(zeta) / (2 * zeta + Math.sin(2 * zeta)) / 0.005) / (zeta * zeta)) * Math.pow(0.0127, 2)) / ref.diffusivity_m2_per_s;
   const expectedMin = expectedSec / 60;
-  assert.ok(Math.abs(ref.come_up_minutes - expectedMin) < 1e-9,
+  assert.ok(Math.abs(ref.come_up_minutes - expectedMin) < 1e-6,
     `come_up = ${ref.come_up_minutes}, expected ${expectedMin}`);
   // total = come_up + hold pin.
   assert.ok(Math.abs(ref.total_minutes - (ref.come_up_minutes + ref.hold_minutes)) < 1e-12,
@@ -4269,7 +4274,8 @@ test("monotonicity: computeCoolingCurve phase1_minutes and phase2_minutes are st
   const hot110 = computeCoolingCurve({ start_F: 165, ambient_F: 110, container: "full_pan_4in", product_type: "thick_liquid" });
   assert.ok(Math.abs(hot100.phase1_minutes - 1.6 * ref.phase1_minutes) < 1e-12,
     `hot-clamp: phase1 at 100 F = ${hot100.phase1_minutes} != 1.6 * base = ${1.6 * ref.phase1_minutes}`);
-  assert.equal(hot100.phase1_minutes, hot110.phase1_minutes);
+  // Past the ceiling the model used to answer the 100 F figure (so any room passed); it is an error since 2026-10-11.
+  assert.ok(hot110.error);
 });
 
 test("monotonicity: computeCashOnCash cash_on_cash_percent is strictly increasing in annual_pretax_cashflow at fixed cash_invested; payback_years strictly decreasing in cashflow (CoC = CF / Inv linear pin)", () => {

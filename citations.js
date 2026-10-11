@@ -658,7 +658,7 @@ export const CITATIONS = {
   },
 
   "brine-cure": {
-    formula: "brine% = salt/(salt+water)*100; equilibrium salt% = salt/(meat+water)*100; equilibrium ingoing nitrite ppm = cure*0.0625*1e6/meat (green meat weight), limit by product: chopped 156.25 (1/4 oz per 100 lb; FSIS prints 156) and dry cure 625 ppm (9 CFR 424.21(c)), bacon 120 pumped/immersion and 200 dry cured (424.22(b)); brine nitrite ppm = cure*0.0625*1e6/(salt+water+cure); salt-to-add = target%*total/100 - salt.",
+    formula: "brine% = salt/(salt+water)*100; equilibrium salt% = salt/(meat+water)*100; equilibrium ingoing nitrite ppm = cure*0.0625*1e6/meat (green meat weight), limit by product: chopped 156.25 (1/4 oz per 100 lb; FSIS prints 156) and dry cure 625 ppm (9 CFR 424.21(c)), bacon 120 pumped/immersion and 200 dry cured (424.22(b)); brine nitrite ppm = cure*0.0625*1e6/(salt+water+cure); salt-to-add = target*water/(1 - target) - salt for a brine and target*(meat+water) - salt for an equilibrium cure (never negative).",
     edition: "First-principles mass-fraction chemistry. Prague Powder #1 is 6.25% sodium nitrite; ingoing nitrite limits from USDA FSIS 9 CFR 424.21(c) (chopped 1/4 oz and dry cure 1 oz per 100 lb; pickle 2 lb per 100 gal) and 424.22(b) (bacon).",
     freeAccess: "Free at fsis.usda.gov and ecfr.gov; the user confirms the current FSIS ingoing limit.",
     governance: GOVERNANCE.general,
@@ -2507,7 +2507,7 @@ export const CITATIONS = {
   },
 
   "sous-vide-pasteurization": {
-    formula: "come_up_seconds = 2.245 * L_m^2 / alpha (one-term slab centerline solution, Fo for a 99.5% approach). hold_minutes from linear interpolation of FDA Food Code 3-401.11(B)(2) Table 3-2 (whole meat roasts) at the bath temperature. total = come_up + hold.",
+    formula: "come_up_seconds = Fo * L_m^2 / alpha, with Fo = ln(C1/0.005)/zeta^2 for a 99.5% approach from the one-term slab centerline solution at a finite film: Bi = h L/k (h 95 W/m2K, k 0.48 W/mK), zeta tan(zeta) = Bi, C1 = 4 sin(zeta)/(2 zeta + sin(2 zeta)); Fo is about 4.2 for a 1 in piece. hold_minutes from linear interpolation of FDA Food Code 3-401.11(B)(2) Table 3-2 (whole meat roasts) at the bath temperature. total = come_up + hold.",
     edition: "FDA Food Code 3-401.11(B)(2) Table 3-2 (holding times for whole meat roasts). One-term slab thermal-diffusion solution.",
     freeAccess: "fda.gov (Food, Retail Food Protection, FDA Food Code).",
     governance: GOVERNANCE.food,

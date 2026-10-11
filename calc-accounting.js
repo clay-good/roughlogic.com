@@ -243,6 +243,9 @@ export const macrsExample = { inputs: { cost: 50000, class_life: 5, convention: 
 //  categorical parameters object (dimensionless).)
 export function computeSection179({ cost = 0, business_use_pct = 100, taxable_income = 0, tax_year = 2025, bonus_pct = null }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Section 179 is available only for property used MORE than half in business (IRC 179(d)(1), Pub 946).
+  if (Number(business_use_pct) <= 50) return { error: "Section 179 requires more than 50% business use; at 50% or less the property is depreciated under ADS instead." };
+  if (bonus_pct !== null && bonus_pct !== undefined && bonus_pct !== "" && !(Number(bonus_pct) >= 0 && Number(bonus_pct) <= 100)) return { error: "Bonus depreciation percent must be between 0 and 100." };
   if (!(cost > 0)) return { error: "Asset cost must be positive." };
   if (!(business_use_pct >= 0 && business_use_pct <= 100)) return { error: "Business-use percent must be 0-100." };
   const params = SECTION_179_LIMITS[tax_year];
@@ -330,6 +333,7 @@ export function computeEstimatedTax({
   prior_year_multiplier = 1.0, tax_year = 2025,
 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (Number(current_withholding) < 0) return { error: "Withholding cannot be negative." };
   if (!(projected_current_tax >= 0)) return { error: "Projected tax cannot be negative." };
   if (!(prior_year_tax >= 0)) return { error: "Prior-year tax cannot be negative." };
   // IRC 6654(d)(1)(B): the prior-year safe harbor is 100%, or 110% above $150,000 AGI; the UI
@@ -349,7 +353,8 @@ export function computeEstimatedTax({
     after_withholding: owed_after_wh,
     per_quarter,
     due_dates: dates,
-    notice: "Smaller of 90% current or " + Math.round(prior_year_multiplier * 100) + "% prior. See IRS Form 1040-ES.",
+    notice: "Smaller of 90% current or " + Math.round(prior_year_multiplier * 100) + "% prior. See IRS Form 1040-ES."
+      + (prior_year_tax > 0 || !(projected_current_tax > 0) ? "" : " PRIOR-YEAR TAX IS $0, so the required payment reads $0: that exception holds only if last year was a full 12-month year with no tax liability (IRC 6654(e)(2)). If the field was simply left blank, enter last year's total tax; otherwise the figure to pay toward is the 90% leg, " + Math.round(ninety_pct) + "."),
   };
 }
 
@@ -468,6 +473,7 @@ export function computeAmortization({
   principal = 0, annual_rate_pct = 0, term_months = 0, extra_principal = 0,
   first_payment_date = null,
 }) {
+  if (Number(arguments[0]?.extra_principal) < 0) return { error: "Extra principal cannot be negative." };
   if (!(principal > 0) || !Number.isFinite(principal)) return { error: "Principal must be a finite positive amount." };
   if (!(annual_rate_pct >= 0) || !Number.isFinite(annual_rate_pct)) return { error: "Rate must be a finite non-negative percent." };
   if (!(term_months > 0)) return { error: "Term must be positive." };
@@ -543,7 +549,9 @@ export function computeBreakeven({
   const be_revenue = be_units * sale_price_per_unit;
   const margin_of_safety_units = target_units > 0 ? Math.max(0, target_units - be_units) : null;
   const margin_of_safety_pct = target_units > 0 ? margin_of_safety_units / target_units : null;
-  return { contribution_margin: cm, contribution_margin_ratio: cm_ratio, breakeven_units: be_units, breakeven_revenue: be_revenue, margin_of_safety_units, margin_of_safety_pct };
+  // A target under break-even has no margin of safety; say it is a loss instead of showing a bare 0.
+  const below_breakeven = target_units > 0 && target_units < be_units - 1e-9 * be_units;
+  return { contribution_margin: cm, contribution_margin_ratio: cm_ratio, breakeven_units: be_units, breakeven_revenue: be_revenue, margin_of_safety_units, margin_of_safety_pct, below_breakeven, loss_at_target: below_breakeven ? fixed_costs - target_units * cm : null };
 }
 
 export const breakevenExample = { inputs: { fixed_costs: 50000, variable_cost_per_unit: 8, sale_price_per_unit: 20, target_units: 6000 } };
@@ -604,7 +612,8 @@ export function computeInventoryTurnover({
   if (industry_key) {
     const bench = INVENTORY_BENCHMARKS[industry_key];
     if (bench) {
-      const delta = turnover - bench.turnover_aggregate;
+      // The benchmark is turns per YEAR; a quarter's turnover has to be annualized before it is compared.
+      const delta = turnover * 365 / period_days - bench.turnover_aggregate;
       comparison = { industry: industry_key, industry_aggregate: bench.turnover_aggregate, delta, source: bench.source, year: bench.year };
     }
   }
@@ -645,6 +654,7 @@ export const cccExample = { inputs: { dso: 45, dio: 60, dpo: 30 } };
 //  amount = miles * rate stays a dimensionless dollar aggregate
 //  per the §7.1 monetary convention.)
 export function computeMileageRollup({ trips = [], tax_year = 2025 }) {
+  if (Array.isArray(trips) && trips.some((t) => !t || Number(t.miles) < 0 || !Number.isFinite(Number(t.miles ?? 0)))) return { error: "Each trip needs a mileage of zero or more." };
   if (!Array.isArray(trips)) return { error: "Trips must be an array." };
   const rate_row = STANDARD_MILEAGE_RATES[tax_year];
   if (!rate_row) return { error: "Tax year " + tax_year + " not bundled." };
@@ -1071,7 +1081,7 @@ function renderBreakeven(inputRegion, outputRegion, citationEl) {
     beR.textContent = "$" + fmt(r.breakeven_revenue, 2);
     cm.textContent = "$" + fmt(r.contribution_margin, 2);
     cmr.textContent = fmt(r.contribution_margin_ratio * 100, 2) + "%";
-    mos.textContent = r.margin_of_safety_units == null ? "-" : fmt(r.margin_of_safety_units, 2) + " units (" + fmt(r.margin_of_safety_pct * 100, 2) + "%)";
+    mos.textContent = r.margin_of_safety_units == null ? "-" : r.below_breakeven ? "none: the target is below break-even, a loss of $" + fmt(r.loss_at_target, 2) : fmt(r.margin_of_safety_units, 2) + " units (" + fmt(r.margin_of_safety_pct * 100, 2) + "%)";
   }, DEBOUNCE_MS);
   for (const f of [fc, vc, sp, tu]) f.input.addEventListener("input", update);
   attachExampleButton(inputRegion, () => {
@@ -1126,7 +1136,7 @@ function renderInventoryTurnover(inputRegion, outputRegion, citationEl) {
     tn.textContent = fmt(r.turnover, 2) + "x";
     dsi.textContent = r.days_sales_of_inventory === null ? "n/a (no COGS in period)" : fmt(r.days_sales_of_inventory, 1) + " days";
     cmp.textContent = r.comparison
-      ? r.comparison.industry + ": industry aggregate " + fmt(r.comparison.industry_aggregate, 1) + "x (" + r.comparison.year + "); delta " + (r.comparison.delta >= 0 ? "+" : "") + fmt(r.comparison.delta, 2) + "x"
+      ? r.comparison.industry + ": industry aggregate " + fmt(r.comparison.industry_aggregate, 1) + "x a year (" + r.comparison.year + "); annualized delta " + (r.comparison.delta >= 0 ? "+" : "") + fmt(r.comparison.delta, 2) + "x"
       : "-";
   }, DEBOUNCE_MS);
   for (const el of [cogs.input, bi.input, ei.input, days.input, ind.select]) el.addEventListener("input", update);
@@ -1280,6 +1290,8 @@ export const ACCOUNTING_RENDERERS = {
 // drops below salvage; optional straight-line crossover.
 // dims: in { cost: dimensionless, salvage: dimensionless, life_yr: dimensionless, factor: dimensionless, year: dimensionless, sl_switch: dimensionless } out: { year_dep: dimensionless, book_value: dimensionless }
 export function computeDecliningBalanceDepreciation({ cost = 0, salvage = 0, life_yr = 0, factor = 2, year = 1, sl_switch = true } = {}) {
+  if (!Number.isInteger(Number(year)) || Number(year) < 1) return { error: "Year is a whole number, 1 or more." };
+  if (Number(year) > Math.round(Number(life_yr)) && Number(life_yr) > 0) return { error: "Year " + year + " is past the asset's " + Math.round(Number(life_yr)) + "-year life; depreciation is $0." };
   const C = Number(cost) || 0;
   const S = Number(salvage) || 0;
   const life = Math.round(Number(life_yr) || 0);
@@ -1347,6 +1359,8 @@ ACCOUNTING_RENDERERS["declining-balance-depreciation"] = renderDecliningBalanceD
 // dims: in { cost: dimensionless, salvage: dimensionless, life_yr: dimensionless, year: dimensionless } out: { year_depreciation: dimensionless, accumulated_depreciation: dimensionless, book_value: dimensionless }
 export function computeSumOfYearsDigitsDepreciation({ cost = 0, salvage = 0, life_yr = 0, year = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!Number.isInteger(Number(year)) || Number(year) < 1) return { error: "Year is a whole number, 1 or more." };
+  if (Number(year) > Math.round(Number(life_yr)) && Number(life_yr) > 0) return { error: "Year " + year + " is past the asset's " + Math.round(Number(life_yr)) + "-year life; depreciation is $0." };
   const C = Number(cost) || 0;
   const S = Number(salvage) || 0;
   const life = Math.round(Number(life_yr) || 0);
@@ -1574,6 +1588,8 @@ ACCOUNTING_RENDERERS["markup-vs-margin"] = renderMarkupVsMargin;
 // SS = min(wages, SS_base)*6.2%; Medicare = wages*1.45%; FUTA = min(wages,7000)*rate; SUTA = min(wages,state_base)*rate.
 // dims: in { wages: dimensionless, ss_base: dimensionless, futa_base: dimensionless, futa_rate_pct: dimensionless, suta_rate_pct: dimensionless, suta_base: dimensionless } out: { total_employer_tax: dimensionless, loaded_cost: dimensionless }
 export function computeEmployerPayrollTax({ wages = 0, ss_base = 0, futa_base = 7000, futa_rate_pct = 0.6, suta_rate_pct = 0, suta_base = 0 } = {}) {
+  if (Number(suta_rate_pct) > 0 && !(Number(suta_base) > 0)) return { error: "Enter the state unemployment wage base; with a SUTA rate and no base the tax read $0." };
+  if (futa_rate_pct === null || futa_rate_pct === "") futa_rate_pct = 0.6;
   const W = Number(wages) || 0;
   const ssBase = Number(ss_base) || 0;
   const futaBase = Number(futa_base) || 0;

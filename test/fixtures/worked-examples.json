@@ -4240,7 +4240,7 @@
    "source_publisher": "FDA Food Code 3-401.11(B)(2) / one-term slab solution",
    "source_title": "1-inch chicken @ 140 F bath (refrigerated 38 F initial) -> 6.5-log Salmonella reduction",
    "source_edition_or_year": "FDA Food Code Table 3-2 (whole meat roasts; the tile warns it is not written for poultry)",
-   "source_section_or_page": "one-term slab centerline, Fo = 2.245 for a 99.5% approach -> 43.1 min come-up; Table 3-2 hold at 140 F = 12 min",
+   "source_section_or_page": "one-term slab centerline with a finite film (h = 95 W/m2K, k = 0.48 W/mK, Bi = 2.51, zeta = 1.142, C1 = 1.19, Fo = 4.19 for a 99.5% approach) -> 80.4 min come-up; Table 3-2 hold at 140 F = 12 min",
    "verified_by": "rl",
    "verified_on": "2026-09-19",
    "inputs": {
@@ -4251,7 +4251,7 @@
    },
    "outputs": {
     "come_up_minutes": {
-     "value": 43.11,
+     "value": 80.41,
      "tolerance": {
       "pct": 1
      }
@@ -4263,7 +4263,7 @@
      }
     },
     "total_minutes": {
-     "value": 55.11,
+     "value": 92.41,
      "tolerance": {
       "pct": 1
      }
