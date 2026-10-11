@@ -1088,7 +1088,10 @@ function rowsConsistent(a1, b1, c1, a2, b2, c2) {
   // including the constant. If a1/a2 = b1/b2 = c1/c2 (with care for
   // zeros) -> consistent; otherwise inconsistent.
   // Cross-multiplication form avoids division by zero.
-  return a1 * c2 === a2 * c1 && b1 * c2 === b2 * c1;
+  // With float slack: 0.1x + 0.2y = 0.3 and 0.3x + 0.6y = 0.9 are the same line, but
+  // 0.1 * 0.9 !== 0.3 * 0.3 in binary and exact equality called them parallel.
+  const near = (p, q) => Math.abs(p - q) <= 1e-9 * (Math.abs(p) + Math.abs(q));
+  return near(a1 * c2, a2 * c1) && near(b1 * c2, b2 * c1);
 }
 
 // dims: in { a1: dimensionless, b1: dimensionless, c1: dimensionless, a2: dimensionless, b2: dimensionless, c2: dimensionless } out: { x: dimensionless, y: dimensionless }
@@ -1102,7 +1105,8 @@ export function computeLinearSystem2x2({ a1, b1, c1, a2, b2, c2 }) {
   if (A2 === 0 && B2 === 0) return { error: "Row 2 has both a2 and b2 = 0; not a linear equation." };
   const det = A1 * B2 - A2 * B1;
   // Tolerance for "near-zero" determinant on float math.
-  const eps = 1e-12 * (Math.abs(A1 * B2) + Math.abs(A2 * B1) + 1);
+  // Relative only: an absolute term called 1e-6 x = 2e-6, 1e-6 y = 3e-6 singular.
+  const eps = 1e-12 * (Math.abs(A1 * B2) + Math.abs(A2 * B1));
   if (Math.abs(det) <= eps) {
     if (rowsConsistent(A1, B1, C1, A2, B2, C2)) {
       return { kind: "infinite", determinant: det, message: "Rows are scalar multiples: infinitely many solutions (the two equations describe the same line)." };

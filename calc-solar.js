@@ -54,6 +54,7 @@ export function computePVStringSizing({
   cell_temp_rise_C = 30,
 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  for (const k of ["record_low_C", "record_high_C"]) { const v = arguments[0]?.[k]; if (v === undefined || v === null || v === "") return { error: "Enter the site's record low and record high temperatures (C); the string limits are set by them." }; }
   inverter_mppt_max_V = Number(inverter_mppt_max_V);
   if (!module_voc_V || !module_vmp_V) return { error: "Module Voc and Vmp are required." };
   // A negative voltage used to return a negative maximum string length (-14 modules) with no error.
@@ -90,6 +91,9 @@ export const pvStringSizingExample = {
 // dims: in { amp_hours: I T, system_V: M L^2 T^-3 I^-1, dod_percent: dimensionless, load_W: M L^2 T^-3, peukert_k: dimensionless, rated_hours: T } out: { usable_wh: M L^2 T^-3 T, hours: T }
 export function computeBatteryRuntime({ amp_hours, system_V, dod_percent = 100, load_W, peukert_k = 1, inverter_efficiency_pct = 100, rated_hours = 20 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (Number(dod_percent) > 100) return { error: "Depth of discharge cannot exceed 100%." };
+  if (Number(inverter_efficiency_pct) > 0 && Number(inverter_efficiency_pct) < 1) return { error: "Enter inverter efficiency as a percent (90 for 90%), not a fraction." };
+  if (Number(inverter_efficiency_pct) > 100) return { error: "Inverter efficiency cannot exceed 100%." };
   // Until 2026-09-26 a negative entry here returned a negative quantity with no error.
   if (["amp_hours", "system_V", "dod_percent", "load_W"].some((k) => Number(arguments[0]?.[k]) < 0)) return { error: "Battery capacity, voltage, depth of discharge, and load cannot be negative." };
   const Ah = Number(amp_hours) || 0;
@@ -484,6 +488,7 @@ export function renderOffGridBattery(inputRegion, outputRegion, citationEl) {
 // (copper, 75 C terminations, 30 C ambient); verify against NEC 310.16.
 
 const _EV_BREAKER_SIZES = [15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 90, 100, 110, 125, 150, 175, 200];
+const _NEC_310_16_CU_75C = { "14": 20, "12": 25, "10": 35, "8": 50, "6": 65, "4": 85, "3": 100, "2": 115, "1": 130, "1/0": 150, "2/0": 175, "3/0": 200, "4/0": 230 };
 const _EV_CU_AWG = ["14", "12", "10", "8", "6", "4", "3", "2", "1", "1/0", "2/0", "3/0", "4/0"];
 
 // dims: in { charger_amps: I, main_breaker_a: I, existing_load_a: I, busbar_rating_a: I, load_managed: dimensionless } out: { continuous_circuit_a: I, recommended_breaker_a: I, new_panel_load_a: I, headroom_a: I }
@@ -512,7 +517,9 @@ export function computeEvChargerLoad({
   // covers the continuous circuit ampacity.
   let recommended_conductor_awg = null;
   for (const awg of _EV_CU_AWG) {
-    const amp = ampacityFromPhysics({ material: "copper", awg, insulation_rating_C: 75, ambient_C: 30, bundle_count: 1 });
+    // The physics model runs above NEC Table 310.16 from 2 AWG up (139 A where the table allows
+    // 115), which picked one to two sizes small for a circuit over 100 A. The lower of the two governs.
+    const amp = Math.min(ampacityFromPhysics({ material: "copper", awg, insulation_rating_C: 75, ambient_C: 30, bundle_count: 1 }), _NEC_310_16_CU_75C[awg]);
     if (amp >= continuous_circuit_a) { recommended_conductor_awg = awg; break; }
   }
 
@@ -665,6 +672,7 @@ function renderPvCircuitAmpacity(inputRegion, outputRegion, citationEl) {
 // dims: in { dc_kw: M L^2 T^-3, psh: T, perf_ratio: dimensionless } out: { annual_kwh: M L^2 T^-2, specific_yield: T, capacity_factor: dimensionless, monthly_kwh_avg: M L^2 T^-2 }
 export function computePvEnergyYield({ dc_kw = 0, psh = 5.0, perf_ratio = 0.77 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (Number(psh) > 24) return { error: "Peak sun hours are per day; more than 24 is not possible." };
   if (!(dc_kw > 0)) return { error: "DC nameplate must be positive (kW)." };
   if (!(psh > 0)) return { error: "Peak-sun-hours must be positive." };
   if (!(perf_ratio > 0 && perf_ratio <= 1)) return { error: "Performance ratio must be in (0, 1]." };
@@ -1101,6 +1109,9 @@ export const SOLAR_RENDERERS = {
 // dims: in { T_amb_C: T, G_wm2: M T^-3, NOCT_C: T, P_stc_W: M L^2 T^-3, gamma: dimensionless } out: { T_cell_C: T, P_W: M L^2 T^-3, loss_pct: dimensionless }
 export function computePvCellTemperaturePower({ T_amb_C = 0, G_wm2 = 0, NOCT_C = 45, P_stc_W = 0, gamma = -0.35 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // -0.0035 is the coefficient as a fraction; the tile works in %/C (the inverse tile already rejects it).
+  if (Number(gamma) < 0 && Number(gamma) > -0.05) return { error: "Enter the temperature coefficient in %/C (about -0.35), not as a fraction." };
+  if (arguments[0]?.T_amb_C === null || arguments[0]?.T_amb_C === "") return { error: "Enter the ambient temperature (C)." };
   const Ta = Number(T_amb_C);
   const G = Number(G_wm2) || 0;
   const noct = Number(NOCT_C) || 0;

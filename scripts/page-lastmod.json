@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "b645a5c4995bbae5",
+      "sha": "2ddf6ad8619df94d",
       "date": "2026-10-11"
     },
     "/tools/": {
@@ -7370,8 +7370,8 @@
       "date": "2026-09-29"
     },
     "/tools/speed-hump-geometry/": {
-      "sha": "319fae703a046cbb",
-      "date": "2026-09-29"
+      "sha": "d53373663219ac59",
+      "date": "2026-10-11"
     },
     "/tools/speed-of-sound-air/": {
       "sha": "e9efeecd811474e1",
@@ -8110,8 +8110,8 @@
       "date": "2026-10-03"
     },
     "/tools/thinning-target-tpa/": {
-      "sha": "7709a88be1532716",
-      "date": "2026-09-29"
+      "sha": "c51717e8b1cca5ff",
+      "date": "2026-10-11"
     },
     "/tools/thinset-coverage/": {
       "sha": "77a0d224b2fa06a8",

@@ -70,7 +70,9 @@ export function computeLogLimbWeight({ butt_dia_in, top_dia_in, length_ft, speci
   if (!Number.isFinite(butt) || butt <= 0) return { error: "Butt diameter must be a positive finite number (in)." };
   if (!Number.isFinite(top) || top <= 0) return { error: "Top diameter must be a positive finite number (in)." };
   if (!Number.isFinite(length) || length <= 0) return { error: "Length must be a positive finite number (ft)." };
-  const dens = density != null ? Number(density) : (GREEN_DENSITY[species] || GREEN_DENSITY.generic_hardwood);
+  // A misspelled species used to weigh as generic hardwood, lighter than hickory or oak.
+  if (density == null && !Object.hasOwn(GREEN_DENSITY, species)) return { error: "Unknown species; pick one from the list or enter a green density." };
+  const dens = density != null ? Number(density) : GREEN_DENSITY[species];
   if (!Number.isFinite(dens) || dens <= 0) return { error: "Green density must be a positive finite number (lb/ft^3)." };
   const r1 = butt / 24, r2 = top / 24;
   const volumeFt3 = Math.PI / 3 * length * (r1 * r1 + r1 * r2 + r2 * r2);
@@ -177,10 +179,13 @@ export function computeFellingNotchHinge({ cut_dia_in, notch_pct = 22, open_face
   const openFace = Number(open_face);
   if (!Number.isFinite(dia) || dia <= 0) return { error: "Cut diameter must be a positive finite number (in)." };
   if (!Number.isFinite(notchPct) || notchPct <= 0 || notchPct >= 100) return { error: "Notch depth must be between 0 and 100 percent of diameter." };
-  if (!Number.isFinite(openFace) || openFace <= 0) return { error: "Open-face angle must be a positive finite number (deg)." };
+  if (!Number.isFinite(openFace) || openFace <= 0 || openFace >= 180) return { error: "Open-face angle must be between 0 and 180 degrees." };
+  if (notchPct > 50) return { error: "A notch deeper than half the diameter leaves no back cut; 20 to 25% is the practice." };
   const notchDepthIn = dia * notchPct / 100;
   const hingeThickIn = dia * 0.10;
-  const hingeWidthIn = dia * 0.80;
+  // The hinge is the chord at the back of the notch, 2 sqrt(d (D - d)); it reaches the 80% target
+  // only with a notch about 20% deep. A shallower notch cannot give an 80% hinge.
+  const hingeWidthIn = Math.min(dia * 0.80, 2 * Math.sqrt(notchDepthIn * (dia - notchDepthIn)));
   if (![notchDepthIn, hingeThickIn, hingeWidthIn].every(Number.isFinite)) return { error: "Notch math is not a finite value." };
   return {
     notch_depth_in: notchDepthIn,
@@ -431,13 +436,13 @@ export function computeThinningTargetTpa({ sdi_max = 0, target_pct = 0, qmd_in =
   const ba_target = tpa_target * 0.005454 * qmd * qmd;
   return {
     sdi_target, tpa_target, cut_tpa, ba_target,
-    note: "The inverse of reineke-sdi: the residual stand that puts the density at the target percent of the species maximum. The common management band runs ~35% (onset of competition) to ~55-60% (lower limit of the self-thinning zone). Thinning from below raises the QMD, so the residual lands conservatively below the target density. A management aid; a qualified silvicultural prescription governs.",
+    note: "The inverse of reineke-sdi: the residual stand that puts the density at the target percent of the species maximum. The common management band runs ~35% (onset of competition) to ~55-60% (lower limit of the self-thinning zone). Thinning from below raises the QMD, and at the same trees per acre a larger QMD is a HIGHER density: figure the target at the QMD the residual stand will have, or the stand is left denser than prescribed (157 TPA meant for 35% at 10 in is 47% at 12 in). A management aid; a qualified silvicultural prescription governs.",
   };
 }
 export const thinningTargetTpaExample = { inputs: { sdi_max: 450, target_pct: 35, qmd_in: 10, current_tpa: 300 } };
 
 function _v619renderThinningTargetTpa(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Reineke Stand Density Index (Reineke 1933; USDA FS stocking-guide practice), by name. SDI_target = SDI_max x target% / 100; TPA_target = SDI_target / (QMD/10)^1.605; cut = max(0, current - target); BA_target = TPA_target x 0.005454 x QMD^2. The maximum SDI is species-specific; the management band runs ~35% to ~55-60% of it. Thinning from below raises the QMD, so the residual lands conservatively below the target. A management aid; a qualified silvicultural prescription governs.";
+  citationEl.textContent = "Citation: Reineke Stand Density Index (Reineke 1933; USDA FS stocking-guide practice), by name. SDI_target = SDI_max x target% / 100; TPA_target = SDI_target / (QMD/10)^1.605; cut = max(0, current - target); BA_target = TPA_target x 0.005454 x QMD^2. The maximum SDI is species-specific; the management band runs ~35% to ~55-60% of it. Thinning from below raises the QMD, and at the same trees per acre a larger QMD is a HIGHER density: figure the target at the QMD the residual stand will have, or the stand is left denser than prescribed (157 TPA meant for 35% at 10 in is 47% at 12 in). A management aid; a qualified silvicultural prescription governs.";
   const smax = makeNumber("Species maximum SDI", "ttt-max", { step: "any", min: "0", value: "450" }); smax.input.value = "450";
   const pct = makeNumber("Target percent of maximum (%)", "ttt-pct", { step: "any", min: "0", max: "100", value: "35" }); pct.input.value = "35";
   const qmd = makeNumber("Quadratic mean diameter (in)", "ttt-qmd", { step: "any", min: "0" });
@@ -716,7 +721,7 @@ export function computeTreeCrzEncroachment({ dbh_in = 0, radius_factor = 1.0, li
   if (!Number.isFinite(dbh) || dbh <= 0) return { error: "DBH must be a positive finite number (in)." };
   if (!Number.isFinite(factor) || factor <= 0) return { error: "Radius factor must be a positive finite number (ft/in)." };
   if (!Number.isFinite(d) || d < 0) return { error: "Limit-line distance cannot be negative (ft)." };
-  const threshold_pct = _V608_TOLERANCE[species_tolerance];
+  const threshold_pct = Object.hasOwn(_V608_TOLERANCE, species_tolerance) ? _V608_TOLERANCE[species_tolerance] : undefined;
   if (threshold_pct === undefined) return { error: "Species tolerance must be tolerant, intermediate, or sensitive." };
   const radius_ft = factor * dbh;
   const area_ft2 = Math.PI * radius_ft * radius_ft;
@@ -781,7 +786,7 @@ export function computeCrownPruningDose({ live_foliage = 0, removed_foliage = 0,
   const removed = Number(removed_foliage);
   if (!Number.isFinite(live) || live <= 0) return { error: "Live foliage must be a positive finite number." };
   if (!Number.isFinite(removed) || removed < 0) return { error: "Removed foliage must be a non-negative finite number." };
-  if (!(maturity_class in _CROWN_CAP_PCT)) return { error: "Maturity class must be young, mature, over-mature, or stressed." };
+  if (!Object.hasOwn(_CROWN_CAP_PCT, maturity_class)) return { error: "Maturity class must be young, mature, over-mature, or stressed." };
   const removal_pct = removed / live * 100;
   const cap_pct = _CROWN_CAP_PCT[maturity_class];
   const within = removal_pct <= cap_pct + 1e-9 * Math.abs(cap_pct);

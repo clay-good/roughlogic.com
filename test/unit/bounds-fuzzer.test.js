@@ -46984,10 +46984,13 @@ test("bounds: spec-v1611 computeSpeedHumpGeometry -- 3 in over 6 ft is 4.17%, no
   assert.ok(Math.abs(table.ramp_length_ft - r.ramp_length_ft) < 1e-12);
   assert.ok(Math.abs(table.ramp_slope_pct - r.ramp_slope_pct) < 1e-12);
   assert.ok(Math.abs(table.vertical_accel_g - r.vertical_accel_g) < 1e-12);
-  // And the flat top, not the height, is what the wheelbase feels: a 120 in
-  // wheelbase sits entirely on a 10 ft flat, so nothing is lifted at all.
+  // A 120 in wheelbase fits on the 10 ft flat, so CENTRED nothing is lifted -- which is all
+  // this checked until 2026-10-11. Crossing is another matter: with the rear axle on the flat
+  // and the front at the ramp toe, the table's edge stands 1.47 in above the line between the
+  // axles (a position sweep; by hand, rear at 3 in, front at 0, 2.25 in profile over a 0.9 in chord
+  // is already 1.35).
   assert.equal(table.sits_on_flat, true);
-  assert.ok(Math.abs(table.clearance_required_in) < 1e-12);
+  assert.ok(table.clearance_required_in > 1.4 && table.clearance_required_in < 1.5);
   // Length enters squared and height linearly: double the length quarters the
   // acceleration, halve the height halves it.
   const longer = _v1611({ ...hump, total_length_ft: 24 });
@@ -60853,4 +60856,48 @@ test("hardening slice 19 (water treatment, stage, drainage, low voltage)", async
   assert.ok(T.computeLangelierIndex({ ...li, temp: "", temp_unit: "F" }).error);
   assert.equal(T.computeVaAlkalinityRatio({ volatile_acids_mgl: 50.3, alkalinity_mgl: 503 }).band, "acceptable");
   assert.ok(T.computeBreakpointChlorination({ total_ppm: 1.5, free_ppm: 1, ratio: 10, gallons: 15000, avail: 650 }).error);
+});
+
+test("hardening slice 20 (solar, survey, civil, education, arborist)", async () => {
+  const SO = await import("../../calc-solar.js");
+  const ED = await import("../../calc-edu.js");
+  const SU = await import("../../calc-survey.js");
+  const CI = await import("../../calc-civil.js");
+  const AR = await import("../../calc-arborist.js");
+  // EV branch conductor: the NEC table, not the physics model, above 100 A
+  assert.equal(SO.computeEvChargerLoad({ charger_amps: 100, main_breaker_a: 400 }).recommended_conductor_awg, "1");
+  assert.equal(SO.computeEvChargerLoad({ charger_amps: 160, main_breaker_a: 400 }).recommended_conductor_awg, "3/0");
+  assert.equal(SO.computeEvChargerLoad({ charger_amps: 48, main_breaker_a: 200 }).recommended_conductor_awg, "6");
+  assert.ok(SO.computeBatteryRuntime({ amp_hours: 100, system_V: 12, dod_percent: 150, load_W: 120 }).error);
+  assert.ok(SO.computePvCellTemperaturePower({ T_amb_C: 30, G_wm2: 800, P_stc_W: 400, gamma: -0.0035 }).error);
+  assert.ok(SO.computePvEnergyYield({ dc_kw: 8, psh: 30, perf_ratio: 1 }).error);
+  // 2x2 systems: the same line is the same line in floating point
+  assert.equal(ED.computeLinearSystem2x2({ a1: 0.1, b1: 0.2, c1: 0.3, a2: 0.3, b2: 0.6, c2: 0.9 }).kind, "infinite");
+  const tiny = ED.computeLinearSystem2x2({ a1: 1e-6, b1: 0, c1: 2e-6, a2: 0, b2: 1e-6, c2: 3e-6 });
+  assert.equal(tiny.kind, "unique");
+  assert.ok(Math.abs(tiny.x - 2) < 1e-9 && Math.abs(tiny.y - 3) < 1e-9);
+  assert.equal(ED.computeLinearSystem2x2({ a1: 1, b1: 2, c1: 3, a2: 2, b2: 4, c2: 7 }).kind, "none");
+  // survey
+  assert.ok(SU.computeThreePointResection({ ax: 1000, ay: 5000, azimuth_to_a_deg: 315, bx: 3000, by: 5400, azimuth_to_b_deg: 225 }).error);
+  assert.ok(SU.computeTapingCorrections({ l_ft: 100, h_ft: 150 }).error);
+  assert.ok(SU.computeTapingCorrections({ l_ft: 100, p_lb: 20, a_in2: 0.006 }).error);
+  assert.ok(SU.computeTapingCorrections({ l_ft: 100, p_lb: 0.5, w_plf: 0.02 }).error);
+  assert.ok(SU.computeGradeRodCutFill({ benchmark_elev_ft: 100, backsight_ft: 5.2, ground_rod_ft: 4.9 }).error);
+  // civil: off the curve the grade is the tangent
+  const vc = CI.computeVerticalCurve({ g1_pct: 3, g2_pct: -2, length_ft: 400, pvi_station_ft: 5000, pvi_elevation_ft: 100, eval_station_ft: 5600 });
+  assert.ok(Math.abs(vc.eval_elevation_ft - 88) < 1e-9);
+  assert.ok(CI.computeHorizontalSightlineOffset({ mode: "M", R_ft: 100, S_ft: 942 }).error);
+  assert.ok(CI.computeCurveDeflectionStakeout({ mode: "radius", radius_ft: 500, arc_length_ft: 3500 }).error);
+  // a flat-topped table grounds a long wheelbase at its edge, not its centre
+  const hump = CI.computeSpeedHumpGeometry({ height_in: 3.5, total_length_ft: 22, flat_top_length_ft: 10, wheelbase_in: 120, ground_clearance_in: 1.5 });
+  assert.ok(hump.clearance_required_in > 1.6 && hump.clearance_required_in < 1.8, "table " + hump.clearance_required_in);
+  assert.equal(hump.clears, false);
+  assert.match(CI.computeIntersectionSightTriangle({ major_speed_mph: 45, time_gap_s: 7.5, available_left_ft: 600 }).verdict ?? CI.computeIntersectionSightTriangle({ major_speed_mph: 45, time_gap_s: 7.5, available_left_ft: 600 }).sight_verdict, /ONE DIRECTION MEASURED/);
+  // arborist
+  assert.ok(AR.computeTreeCrzEncroachment({ dbh_in: 20, limit_distance_ft: 5, species_tolerance: "constructor" }).error);
+  assert.ok(AR.computeCrownPruningDose({ live_foliage: 100, removed_foliage: 10, maturity_class: "toString" }).error);
+  assert.ok(AR.computeLogLimbWeight({ butt_dia_in: 16, top_dia_in: 16, length_ft: 8, species: "hikory" }).error);
+  const fn = AR.computeFellingNotchHinge({ cut_dia_in: 20, notch_pct: 10 });
+  assert.ok(Math.abs(fn.hinge_width_in - 12) < 1e-9);
+  assert.equal(AR.computeFellingNotchHinge({ cut_dia_in: 20, notch_pct: 22 }).hinge_width_in, 16);
 });

@@ -11554,7 +11554,7 @@ export const CITATIONS = {
     edition: "Reineke Stand Density Index inverted to a stocking target (Reineke 1933; USDA FS stocking-guide practice), by name.",
     freeAccess: "The Reineke SDI relation is a public forest-mensuration result; the maximum SDI is species-specific from published tables.",
     governance: GOVERNANCE.general,
-    editionNote: "The maximum SDI is species-specific; the common management band runs ~35% (onset of competition) to ~55-60% (lower limit of the self-thinning zone) of it. Thinning from below raises the QMD, so the residual stand lands conservatively below the target density. The QMD comes from quadratic-mean-diameter and the diagnosis from reineke-sdi. A management aid; a qualified silvicultural prescription governs.",
+    editionNote: "The maximum SDI is species-specific; the common management band runs ~35% (onset of competition) to ~55-60% (lower limit of the self-thinning zone) of it. Thinning from below raises the QMD, and at the same trees per acre a larger QMD is a HIGHER density: figure the target at the QMD the residual stand will have, or the stand is left denser than prescribed (157 TPA meant for 35% at 10 in is 47% at 12 in). The QMD comes from quadratic-mean-diameter and the diagnosis from reineke-sdi. A management aid; a qualified silvicultural prescription governs.",
     assumptions: [
       { name: "Inverse Reineke", value: "TPA_target = SDI_target / (QMD/10)^1.605 at the pre-thin QMD; thinning from below raises QMD, making the target conservative", source: "Reineke 1933" },
       { name: "Species maximum", value: "SDI_max comes from published species tables (e.g. ~450 ponderosa pine, ~600 Douglas-fir)", source: "USDA FS stocking guides" },

@@ -379,9 +379,12 @@ export function computeTapingCorrections({ l_ft = 0, t_f = 68, t0_f = 68, h_ft =
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(l_ft > 0)) return { error: "Measured length must be positive (ft)." };
   const ct_ft = alpha_f * (t_f - t0_f) * l_ft;
+  if (Math.abs(h_ft) >= l_ft) return { error: "The elevation difference cannot equal or exceed the slope length measured." };
   const ch_ft = h_ft !== 0 ? -(h_ft * h_ft) / (2 * l_ft) : 0;
   let cp_ft = 0;
   if (p_lb !== 0 && a_in2 > 0) {
+    // The correction is for the pull DIFFERENCE; with no standard pull it stretched the tape from zero.
+    if (!(p0_lb > 0)) return { error: "Enter the tape's standardization pull (P0) to apply a tension correction." };
     if (!(e_psi > 0)) return { error: "The tape modulus must be positive when a tension correction is applied." };
     cp_ft = ((p_lb - p0_lb) * l_ft) / (a_in2 * e_psi);
   }
@@ -389,6 +392,7 @@ export function computeTapingCorrections({ l_ft = 0, t_f = 68, t0_f = 68, h_ft =
   if (w_plf !== 0) {
     if (!(p_lb > 0)) return { error: "The applied pull must be positive when a sag correction is applied." };
     cs_ft = -(w_plf * w_plf * Math.pow(l_ft, 3)) / (24 * p_lb * p_lb);
+    if (-cs_ft > 0.05 * l_ft) return { error: "The sag correction is over 5% of the length, far outside the small-sag formula; check the pull and the tape weight per foot." };
   }
   const corrected_ft = l_ft + ct_ft + ch_ft + cp_ft + cs_ft;
   return {
@@ -1005,6 +1009,10 @@ export function computeThreePointResection({ ax = 0, ay = 0, azimuth_to_a_deg = 
   const t = ((bx - ax) * cb - (by - ay) * sb) / det;
   const east = ax + t * sa;
   const north = ay + t * ca;
+  // The fix has to lie on the back-azimuth RAY from each point, not on the line extended the
+  // other way: a bearing entered 180 degrees out used to return a confident, wrong position.
+  const sB = (east - bx) * sb + (north - by) * cb;
+  if (!(t > 0) || !(sB > 0)) return { error: "These bearings do not agree with the two known points: from the fix they produce, at least one point would lie in the opposite direction. Check for a reversed (back) bearing or swapped points." };
   const distance_a_ft = Math.hypot(east - ax, north - ay);
   const distance_b_ft = Math.hypot(east - bx, north - by);
   // Positional error scales as one over the sine of the intersection angle.
@@ -1114,6 +1122,7 @@ SURVEY_RENDERERS["slope-staking"] = _simpleRenderer({
 // dims: in { benchmark_elev_ft: L, backsight_ft: L, design_elev_ft: L, ground_rod_ft: L } out: { hi_ft: L, grade_rod_ft: L, ground_elevation_ft: L, cut_fill_ft: L }
 export function computeGradeRodCutFill({ benchmark_elev_ft = 0, backsight_ft = 0, design_elev_ft = 0, ground_rod_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  { const v = arguments[0]?.design_elev_ft; if (v === undefined || v === null || v === "") return { error: "Enter the design (grade) elevation." }; }
   if (!Number.isFinite(benchmark_elev_ft) || !Number.isFinite(design_elev_ft)) return { error: "Benchmark and design elevations must be finite numbers." };
   if (!(backsight_ft > 0)) return { error: "Backsight rod reading must be positive." };
   if (!(ground_rod_ft > 0)) return { error: "Ground rod reading must be positive." };

@@ -390,6 +390,8 @@ export function computeCurveDeflectionStakeout({ mode, radius_ft, degree_of_curv
     if (!(R > 0)) return { error: "Radius must be greater than zero." };
   }
   const l = Number(arc_length_ft) || 0;
+  // The deflection from the PC is half the central angle; past a half circle the chord shortens and then goes negative.
+  if (l > Math.PI * R) return { error: "The arc is longer than a half circle on this radius; deflection-angle stakeout from the PC does not apply." };
   if (!(l > 0)) return { error: "Arc length from the PC must be greater than zero." };
   const delta_rad = l / (2 * R);
   const deflection_deg = (delta_rad * 180) / Math.PI;
@@ -462,7 +464,9 @@ export function computeVerticalCurve({ g1_pct, g2_pct, length_ft, pvi_station_ft
   let evalElev = null, evalX = null;
   if (eval_station_ft != null && eval_station_ft !== "") {
     const es = Number(eval_station_ft);
-    if (Number.isFinite(es)) { evalX = es - bvcSta; const e = elevAt(evalX); evalElev = Number.isFinite(e) ? e : null; }
+    // Off the curve the grade line is the tangent, not the parabola carried on: 400 ft past the
+    // EVC of the 3% / -2% example the extrapolated curve read 10 ft low.
+    if (Number.isFinite(es)) { evalX = es - bvcSta; const e = evalX < 0 ? bvcElev + (g1 / 100) * evalX : evalX > L ? evcElev + (g2 / 100) * (evalX - L) : elevAt(evalX); evalElev = Number.isFinite(e) ? e : null; }
   }
   let turningSta = null, turningElev = null, turningType = null, turningNote = null;
   if (g1 === g2) {
@@ -912,13 +916,14 @@ CIVIL_RENDERERS["sag-vertical-curve-comfort"] = renderSagVerticalCurveComfort;
 // dims: in { R_ft: L, S_ft: L, M_ft: L } out: { M_ft: L, S_ft: L }
 export function computeHorizontalSightlineOffset({ mode, R_ft, S_ft, M_ft } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (mode !== "maxS" && Number(R_ft) > 0 && Number(S_ft) > Math.PI * Number(R_ft)) return { error: "The sight distance is longer than a half circle of this radius; the middle-ordinate relation does not apply." };
   const R = Number(R_ft) || 0;
   if (!(R > 0)) return { error: "Curve radius must be greater than zero." };
   if (mode === "maxS") {
     const M = Number(M_ft) || 0;
     if (!(M > 0)) return { error: "Cleared offset M must be greater than zero." };
     const ratio = 1 - M / R;
-    if (!(ratio >= -1 && ratio <= 1)) return { error: "Cleared offset exceeds the curve radius." };
+    if (!(ratio >= 0 && ratio <= 1)) return { error: "Cleared offset exceeds the curve radius." };
     const S = (R / 28.6479) * (Math.acos(ratio) * 180 / Math.PI);
     if (!Number.isFinite(S)) return { error: "Sight distance is not valid." };
     return { mode: "maxS", S_ft: S, M_ft: null };
@@ -1098,7 +1103,19 @@ export function computeSpeedHumpGeometry({ height_in = 0, total_length_ft = 0, f
     return height_in * (1 - (intoRamp / ramp_length_ft) * (intoRamp / ramp_length_ft));
   };
   const wheel_height_in = profileHeightIn(half_wheelbase_ft);
-  const clearance_required_in = height_in - wheel_height_in;
+  // The worst position is not always centred. On a flat-topped table a vehicle straddling the
+  // edge has one axle up and one down, and the table's corner rises into the wheelbase: the
+  // 22 ft table at 3.5 in read 0 in centred where 1.7 in is needed. Sweep the vehicle across.
+  const _wb_ft = 2 * half_wheelbase_ft;
+  let clearance_required_in = height_in - wheel_height_in;
+  for (let i = 0; i <= 400; i++) {
+    const rear = -total_length_ft / 2 - _wb_ft + (total_length_ft + _wb_ft) * i / 400;
+    const hr = profileHeightIn(rear), hf = profileHeightIn(rear + _wb_ft);
+    for (let j = 1; j < 60; j++) {
+      const f = j / 60;
+      clearance_required_in = Math.max(clearance_required_in, profileHeightIn(rear + f * _wb_ft) - (hr + f * (hf - hr)));
+    }
+  }
   const clearance_margin_in = ground_clearance_in - clearance_required_in;
   const clears = clearance_margin_in >= -1e-9;
   const sits_on_flat = wheelbase_in / IN_PER_FT <= flat_top_length_ft;
@@ -1106,15 +1123,15 @@ export function computeSpeedHumpGeometry({ height_in = 0, total_length_ft = 0, f
   const outs = [ramp_length_ft, ramp_slope_pct, vertical_accel_g, comfort_speed_mph, clearance_required_in, ramp_length_for_target_ft];
   if (!outs.every(Number.isFinite)) return { error: "Speed hump geometry is not a finite value." };
   const clearance_verdict = clears
-    ? "CLEARS: the crest sits " + fmt(clearance_required_in, 2) + " in above the line between the axles, against " + fmt(ground_clearance_in, 2) + " in of clearance -- " + fmt(clearance_margin_in, 2) + " in to spare"
-    : "GROUNDS OUT: the crest sits " + fmt(clearance_required_in, 2) + " in above the line between the axles and the vehicle has only " + fmt(ground_clearance_in, 2) + " in, so it is " + fmt(-clearance_margin_in, 2) + " in short";
+    ? "CLEARS: at the worst position the device rises " + fmt(clearance_required_in, 2) + " in above the line between the axles, against " + fmt(ground_clearance_in, 2) + " in of clearance -- " + fmt(clearance_margin_in, 2) + " in to spare"
+    : "GROUNDS OUT: at the worst position the device rises " + fmt(clearance_required_in, 2) + " in above the line between the axles and the vehicle has only " + fmt(ground_clearance_in, 2) + " in, so it is " + fmt(-clearance_margin_in, 2) + " in short";
   return {
     height_in, total_length_ft, flat_top_length_ft, ramp_length_ft, ramp_slope_pct,
     crossing_speed_mph, vertical_accel_g, vertical_accel_fps2, comfort_limit_g,
     comfort_speed_mph, wheelbase_in, ground_clearance_in, wheel_height_in,
     clearance_required_in, clearance_margin_in, clears, sits_on_flat,
     target_ramp_slope_pct, ramp_length_for_target_ft, clearance_verdict,
-    note: "A speed hump's height and length set the speed a driver finds comfortable, and getting the proportions wrong produces either a device nobody slows for or one that bottoms out a fire truck. THE RAMP IS TREATED HERE AS A PARABOLA, which has a constant second derivative -- so the vertical acceleration a wheel feels is constant across the ramp and works out to eight times the height times the square of the speed, over the square of the transition length. Two things follow, and both are the design. Length matters more than height, because it enters squared: doubling the length quarters the acceleration at the same speed, while halving the height only halves it. And the speed at which a given ramp reaches a stated comfort limit falls straight out of the same relation, which is what a design speed actually means for a vertical deflection device. A classic twelve foot hump three inches high reaches a quarter of gravity at about sixteen miles an hour, which is why it works. THE FLAT TOP IS A SEPARATE MECHANISM AND IT IS THE REASON SPEED TABLES EXIST. A table with the same height and the same ramp slope has the same ramp acceleration and a materially higher tolerable speed, and the difference is not in the ramp at all: a short hump lifts one axle at a time and pitches the vehicle, while a flat top long enough for the whole wheelbase to sit on removes that pitching entirely. That is what this reports as the ground clearance question. A vehicle whose wheelbase spans the crest has its belly lifted above the line between its axles, and the amount is the crest height less the profile height under the wheels -- zero when the wheelbase sits entirely on the flat, and the full device height when the wheelbase is longer than the device. A long low vehicle on a short hump is where a device becomes a hazard. Emergency access is the constraint that usually settles the argument in a neighbourhood. Each short hump costs a fire apparatus seconds, and a corridor with six of them costs meaningful response time; departments object legitimately, and tables and cushions are the compromises that come out of this same geometry. That delay is NOT quantified here -- it needs the fire department's own apparatus and route data. This is a geometric screen. It does not design a traffic calming installation: device selection, spacing, placement relative to driveways, intersections, drainage, bus and emergency routes, signing and marking, and the public process are all part of a program this arithmetic supports rather than replaces. Device dimensions are set by the agency's standard drawings and by ITE traffic calming guidance and they vary, and taking dimensions from another jurisdiction is a common source of devices that do not perform as expected. It does not evaluate drainage, which a hump across a gutter line disrupts, or pavement construction and durability, and it does not address speed cushions or chicanes. The agency's standard drawings, ITE traffic calming guidance, the fire department, and the adopted MUTCD for signing and marking govern.",
+    note: "A speed hump's height and length set the speed a driver finds comfortable, and getting the proportions wrong produces either a device nobody slows for or one that bottoms out a fire truck. THE RAMP IS TREATED HERE AS A PARABOLA, which has a constant second derivative -- so the vertical acceleration a wheel feels is constant across the ramp and works out to eight times the height times the square of the speed, over the square of the transition length. Two things follow, and both are the design. Length matters more than height, because it enters squared: doubling the length quarters the acceleration at the same speed, while halving the height only halves it. And the speed at which a given ramp reaches a stated comfort limit falls straight out of the same relation, which is what a design speed actually means for a vertical deflection device. A classic twelve foot hump three inches high reaches a quarter of gravity at about sixteen miles an hour, which is why it works. THE FLAT TOP IS A SEPARATE MECHANISM AND IT IS THE REASON SPEED TABLES EXIST. A table with the same height and the same ramp slope has the same ramp acceleration and a materially higher tolerable speed, and the difference is not in the ramp at all: a short hump lifts one axle at a time and pitches the vehicle, while a flat top long enough for the whole wheelbase to sit on removes that pitching entirely. That is what this reports as the ground clearance question. A vehicle whose wheelbase spans the crest has its belly lifted above the line between its axles, and the amount is the crest height less the profile height under the wheels, taken at the WORST position as the vehicle crosses: a flat-topped table still lifts the belly while one axle is on the flat and the other is down the ramp (a 22 ft table 3.5 in high wants 1.7 in under a 10 ft wheelbase), and the figure is the full device height when the wheelbase is longer than the device. A long low vehicle on a short hump is where a device becomes a hazard. Emergency access is the constraint that usually settles the argument in a neighbourhood. Each short hump costs a fire apparatus seconds, and a corridor with six of them costs meaningful response time; departments object legitimately, and tables and cushions are the compromises that come out of this same geometry. That delay is NOT quantified here -- it needs the fire department's own apparatus and route data. This is a geometric screen. It does not design a traffic calming installation: device selection, spacing, placement relative to driveways, intersections, drainage, bus and emergency routes, signing and marking, and the public process are all part of a program this arithmetic supports rather than replaces. Device dimensions are set by the agency's standard drawings and by ITE traffic calming guidance and they vary, and taking dimensions from another jurisdiction is a common source of devices that do not perform as expected. It does not evaluate drainage, which a hump across a gutter line disrupts, or pavement construction and durability, and it does not address speed cushions or chicanes. The agency's standard drawings, ITE traffic calming guidance, the fire department, and the adopted MUTCD for signing and marking govern.",
   };
 }
 const speedHumpGeometryExample = { inputs: { height_in: 3, total_length_ft: 12, flat_top_length_ft: 0, crossing_speed_mph: 25, comfort_limit_g: 0.25, wheelbase_in: 120, ground_clearance_in: 5, target_ramp_slope_pct: 5 } };
@@ -1174,7 +1191,7 @@ export function computeIntersectionSightTriangle({ major_speed_mph = 0, time_gap
   const verdict = adequate === null
     ? "Measure the available sight distance in each direction to check the intersection."
     : adequate
-      ? "ADEQUATE: the shorter of the two measured directions is " + fmt(worst_available_ft, 0) + " ft against a requirement of " + fmt(required_distance_ft, 0) + " ft"
+      ? (available_left_ft > 0 && available_right_ft > 0 ? "ADEQUATE" : "ADEQUATE IN THE ONE DIRECTION MEASURED (the requirement applies each way; measure the other)") + ": the shorter of the two measured directions is " + fmt(worst_available_ft, 0) + " ft against a requirement of " + fmt(required_distance_ft, 0) + " ft"
       : "DEFICIENT: the shorter of the two measured directions is " + fmt(worst_available_ft, 0) + " ft against a requirement of " + fmt(required_distance_ft, 0) + " ft, short by " + fmt(required_distance_ft - worst_available_ft, 0) + " ft. What is there suits " + fmt(adequate_speed_mph, 0) + " mph, not " + fmt(major_speed_mph, 0);
   return {
     major_speed_mph, time_gap_s, extra_lanes, added_gap_per_lane_s, total_time_gap_s,
