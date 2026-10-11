@@ -46062,7 +46062,10 @@ test("bounds: spec-v1457 computeTransverseWindLoadConductor -- wind span, not ru
   assert.ok(Math.abs(three.conductor_force_lb - 3 * r.conductor_force_lb) < 1e-9);
   assert.ok(Math.abs(three.pole_force_lb - r.pole_force_lb) < 1e-12);
   // Skipping the pole leaves only the conductor moment.
-  const noPole = _v1457({ ...base, pole_top_diameter_in: 0 });
+  // All three pole dimensions blank skips the pole; a half-entered pole is an error since
+  // hardening slice 5 (it used to be dropped without a word).
+  assert.ok("error" in _v1457({ ...base, pole_top_diameter_in: 0 }));
+  const noPole = _v1457({ ...base, pole_top_diameter_in: 0, pole_groundline_diameter_in: 0, pole_height_above_ground_ft: 0 });
   assert.strictEqual(noPole.has_pole, false);
   assert.strictEqual(noPole.pole_force_lb, 0);
   assert.ok(Math.abs(noPole.groundline_moment_ftlb - r.conductor_moment_ftlb) < 1e-9);
@@ -60159,4 +60162,62 @@ test("hardening slice 4 (electrical, electrical design): the reviewed defects st
   err(_s4D.computeSelectiveCoordinationScreen({ device_type: "breaker", upstream_rating_a: 100, downstream_rating_a: 100, available_fault_a: 500 }));
   err(_s4D.computeSelectiveCoordinationScreen({ device_type: "fuse", upstream_rating_a: 100, downstream_rating_a: 100, published_ratio: 0.5, available_fault_a: 500 }));
   err(_s4D.computeLightingUniformityRatio({ readings: [1, 2, 3], target_maxmin: -3 }));
+});
+
+// Hardening slice 5 (2026-10-10): feeders, motors, power quality, electrical field and lineworker,
+// 68 calculators re-derived and run by independent reviewers. One assertion per confirmed defect.
+import * as _s5F from "../../calc-feeder.js";
+import * as _s5EF from "../../calc-electricalfield.js";
+import * as _s5PQ from "../../calc-powerquality.js";
+import * as _s5M from "../../calc-motor.js";
+import * as _s5LW from "../../calc-lineworker.js";
+
+test("hardening slice 5 (feeders, motors, power quality, lineworker): the reviewed defects stay fixed", () => {
+  const near = (a, b, tol) => assert.ok(Math.abs(a - b) <= tol, a + " vs " + b);
+  const err = (r) => assert.ok(r && typeof r.error === "string", JSON.stringify(r).slice(0, 120));
+  // Feeders.
+  err(_s5F.computeGeneratorConductor445({ gen_kw: 12, voltage_v: 240, phase: "single", power_factor: 1 }));
+  near(_s5F.computeGeneratorConductor445({ gen_kw: 12, voltage_v: 240, phase: 1, power_factor: 1 }).nameplate_a, 50, 1e-9);
+  assert.strictEqual(_s5F.computeTransformerConductorProtection({ kva: 5, primary_v: 480, secondary_v: 208 }).primary_ocpd_max_A, 10); // was null
+  err(_s5F.computeTransformerConductorProtection({ kva: 500, primary_v: 4160, secondary_v: 480 }));
+  const ems = _s5F.computeEvLoadManagementEms({ charger_count: 4, per_charger_a: 40, evems_limit_a: 180 });
+  assert.strictEqual(ems.freed_headroom_a, 0); assert.strictEqual(ems.managed_demand_a, 200);
+  assert.strictEqual(_s5F.computeEvChargerThrottle({ aggregate_limit_a: 1000, charger_max_a: 40, active_chargers: 4 }).full_rate_count, 4);
+  // Electrical field.
+  err(_s5EF.computeCableReelCapacity({ drum_dia_in: -40 }));
+  assert.ok(_s5EF.computeConduitNipple60Fill({ conduit_area_sqin: 1, conductor_area_sqin: 0.74, conductor_count: 1 }).verdict.startsWith("OVER 60%"));
+  err(_s5EF.computeConduitNipple60Fill({ conductor_count: 2.5 }));
+  // Power quality.
+  err(_s5PQ.computeTransformerKFactor({ i1: 1, i11: 1, i13: 1 }));
+  err(_s5PQ.computeMotorCapacitorMax({ v_ll: 480, i_noload_a: 8, safety_factor: 1.5 }));
+  const unb = _s5PQ.computeMotorUnbalanceDerate({ v_ab: 460, v_bc: 460, v_ca: 100 });
+  assert.strictEqual(unb.do_not_operate, true); assert.strictEqual(unb.derate_factor, null);
+  assert.strictEqual(_s5PQ.computeTddIeee519({ isc_a: 10000, il_a: 400 }).pass, null);
+  assert.strictEqual(_s5PQ.computeTddIeee519({ isc_a: 10000, il_a: 400, measured_tdd_pct: 6 }).pass, true);
+  err(_s5PQ.computeMotorVdStarting({ source_voltage_V: 240, length_ft: 250, cmils: 26240, lrc_A: 180, phase: 1 }));
+  err(_s5PQ.computeMotorVdStarting({ source_voltage_V: 120, length_ft: 2000, cmils: 4110, lrc_A: 100, phase: "single" }));
+  err(_s5PQ.computeParallelConductorDerate({ i_single_A: 200, n_sets: 2.5 }));
+  assert.ok(/AT LEAST this large/.test(_s5PQ.computeCapacitorBankForResonanceOrder({ short_circuit_mva: 200, target_resonant_order: 4.7 }).note));
+  // Motors.
+  assert.strictEqual(_s5M.computeVfdReflectedWave({ rise_time_us: 1, system_voltage_v: 4160, run_length_ft: 1000 }).exceeds_invduty, true);
+  assert.strictEqual(_s5M.computeMotorLockedRotorKva({ horsepower: 25, code_letter: "V", voltage_v: 460 }).open_ended_band, true);
+  err(_s5M.computeMotorMaxHpForStartingCurrent({ max_starting_current_a: 300, code_letter: "V", voltage_v: 460 }));
+  err(_s5M.computeMotorSyncSlip({ poles: 4, rated_rpm: 3600 }));
+  err(_s5M.computeMotorSyncSlip({ poles: 4 }));
+  err(_s5M.computeMultiMotorFeeder({ largest_flc_a: 28, sum_other_flc_a: 26 }));
+  err(_s5M.computeMotorOperatingCost({ hp: 50, hours_per_year: 20000 }));
+  err(_s5M.computeMotorOperatingCost({ hp: 50, hours_per_year: 4000, load_factor_pct: 0.75 }));
+  // Lineworker.
+  const an = _s5LW.computeGuyAnchorHoldingCapacity({ helix_diameter_in: 12, installed_depth_ft: 7, cohesion_psf: 1000, soil_unit_weight_pcf: 110, factor_of_safety: 2, installing_torque_ftlb: 300, torque_factor_per_ft: 10, guy_tension_lb: 2000 });
+  assert.strictEqual(an.holds, false); near(an.margin_lb, -500, 1e-6);
+  const sag = { span_ft: 600, area_in2: 0.7264, weight1_lb_per_ft: 1.094, weight2_lb_per_ft: 1.094, modulus_psi: 11200000, alpha_per_f: 0.0000106, tension1_lb: 6000, temp1_f: 60, temp2_f: 120, rated_strength_lb: 31500 };
+  assert.ok(_s5LW.computeConductorSagAtTemperature(sag).direction.startsWith("hotter"));
+  assert.ok(_s5LW.computeConductorSagAtTemperature({ ...sag, weight1_lb_per_ft: 2.5, temp2_f: 60 }).direction.startsWith("lighter: the load came off"));
+  assert.ok(_s5LW.computeConductorSagAtTemperature({ ...sag, temp2_f: 60 }).direction.startsWith("unchanged"));
+  const hot = _s5LW.computeConductorSagAtTemperature({ ...sag, weight2_lb_per_ft: 2.5, temp2_f: -40, rated_strength_lb: 8000 });
+  assert.strictEqual(hot.over_rated_strength, true); assert.ok(hot.direction.startsWith("OVER RATED STRENGTH"));
+  err(_s5LW.computeConductorSagAtTemperature({ ...sag, temp1_f: null }));
+  err(_s5LW.computeMeterCtPtMultiplier({ ct_primary_a: 200, pt_primary_v: 7200, demand_register_kw: 1.8, service_voltage_kv: 480 }));
+  err(_s5LW.computeRecloserFuseCoordination({ fault_current_a: 2000, fast_curve_s: 0.3, slow_curve_s: 0.05, fuse_min_melt_s: 0.5, fuse_total_clear_s: 0.6 }));
+  err(_s5LW.computeCounterpoiseResistance({ soil_resistivity_ohm_cm: 10000, length_ft: 2, burial_depth_in: 48, wire_diameter_in: 1 }));
 });

@@ -44,7 +44,8 @@ function cccAdjustmentFactor(n) {
 //        out: { i_total_A: I, i_set_A: I, adjustment_factor: dimensionless }
 export function computeParallelConductorDerate({ i_single_A = 0, n_sets = 1, total_ccc = 0, ambient_factor = 1, i_load_A = 0, conductor_size = "" } = {}) {
   const Is = Number(i_single_A) || 0;
-  const N = Math.round(Number(n_sets) || 0);
+  if (!Number.isInteger(Number(n_sets))) return { error: "Parallel sets is a whole number." };
+  const N = Number(n_sets) || 0;
   const amb = Number(ambient_factor);
   const ccc = Math.round(Number(total_ccc) || 0);
   const size = String(conductor_size || "").trim();
@@ -195,6 +196,7 @@ export function computeMotorVdStarting({ source_voltage_V = 0, length_ft = 0, cm
   const X = Number(reactance_ohm_per_kft);
   if (!(pf > 0 && pf <= 1)) return { error: "Starting power factor must be in (0, 1] (locked rotor is typically 0.2-0.4)." };
   if (!(X >= 0)) return { error: "Conductor reactance cannot be negative (ohm per 1,000 ft)." };
+  if (phase !== "single" && phase !== "three") return { error: "Phase must be single or three." };
   const factor = phase === "single" ? 2 : Math.sqrt(3);
   // Locked-rotor current is mostly reactive, so the drop is I (R cos phi +
   // X sin phi) at the STARTING power factor, not I R. Until 2026-09-19 the
@@ -204,6 +206,7 @@ export function computeMotorVdStarting({ source_voltage_V = 0, length_ft = 0, cm
   const sinPhi = Math.sqrt(1 - pf * pf);
   const vDrop = factor * lrc * L * (R_ft * pf + (X / 1000) * sinPhi);
   const vTerminal = V - vDrop;
+  if (vDrop >= V) return { error: "The computed drop is the whole source voltage or more: this conductor cannot start this motor, and the constant-current model no longer applies. Check the conductor size and length." };
   const dipPct = vDrop / V * 100;
   const lim = Number.isFinite(limit) && limit > 0 ? limit : 15;
   return {
@@ -290,8 +293,9 @@ export function computeMotorUnbalanceDerate({ v_ab = 0, v_bc = 0, v_ca = 0 } = {
     v_avg,
     max_dev,
     unbalance_pct: Number.isFinite(unbalance_pct) ? unbalance_pct : null,
-    derate_factor: Number.isFinite(derate_factor) ? derate_factor : null,
-    allowable_pct: Number.isFinite(derate_factor) ? derate_factor * 100 : null,
+    // Above 5% there is no derate to offer: the motor should not run at all.
+    derate_factor: Number.isFinite(derate_factor) && !do_not_operate ? derate_factor : null,
+    allowable_pct: Number.isFinite(derate_factor) && !do_not_operate ? derate_factor * 100 : null,
     do_not_operate,
     note: do_not_operate
       ? "Over 5% voltage unbalance: NEMA MG-1 says the motor SHOULD NOT BE OPERATED. Correct the unbalance source (loading, connections, the supply) before running."
@@ -316,7 +320,7 @@ function _v172renderMotorUnbalanceDerate(inputRegion, outputRegion, citationEl) 
     const r = computeMotorUnbalanceDerate({ v_ab: Number(ab.input.value) || 0, v_bc: Number(bc.input.value) || 0, v_ca: Number(ca.input.value) || 0 });
     if (r.error) { oUb.textContent = r.error; oDerate.textContent = "-"; oFlag.textContent = "-"; oNote.textContent = ""; return; }
     oUb.textContent = fmt(r.unbalance_pct, 2) + "% (avg " + fmt(r.v_avg, 1) + " V, max dev " + fmt(r.max_dev, 1) + " V)";
-    oDerate.textContent = fmt(r.derate_factor, 3) + " (load to ~" + fmt(r.allowable_pct, 0) + "% of nameplate)";
+    oDerate.textContent = r.derate_factor === null ? "none -- do not operate above 5% unbalance" : fmt(r.derate_factor, 3) + " (load to ~" + fmt(r.allowable_pct, 0) + "% of nameplate)";
     oFlag.textContent = r.do_not_operate ? "DO NOT OPERATE (over 5% unbalance)" : "Derate and run; correct the unbalance source";
     oNote.textContent = r.note;
   }, DEBOUNCE_MS);
@@ -349,7 +353,9 @@ export function computeTransformerKFactor({ i1 = 1, i3 = 0, i5 = 0, i7 = 0, i9 =
     den += ih * ih;
   }
   const k_factor = num / den;
-  const recommended_k_rating = _K_RATINGS.find((r) => r >= k_factor - 1e-9 * Math.abs(k_factor)) ?? _K_RATINGS[_K_RATINGS.length - 1];
+  // Past the largest standard rating there is none to recommend; it used to answer K-40 anyway.
+  const recommended_k_rating = _K_RATINGS.find((r) => r >= k_factor - 1e-9 * Math.abs(k_factor)) ?? null;
+  if (recommended_k_rating === null) return { error: "This spectrum's K-factor is " + k_factor.toFixed(1) + ", above the largest standard K-rated transformer (K-" + _K_RATINGS[_K_RATINGS.length - 1] + "). Filter the harmonics or derate a larger unit per IEEE C57.110." };
   return {
     k_factor,
     recommended_k_rating,
@@ -403,6 +409,7 @@ export function computeMotorCapacitorMax({ v_ll = 0, i_noload_a = 0, safety_fact
   if (!(v > 0)) return { error: "Motor line-to-line voltage must be positive (V)." };
   if (i < 0) return { error: "No-load current must be non-negative (A)." };
   if (!(sf > 0)) return { error: "Safety factor must be positive." };
+  if (sf > 1) return { error: "The safety factor is a fraction of the magnetizing kVAR and cannot exceed 1 (0.90, not 90)." };
   const magnetizing_kvar = Math.sqrt(3) * v * i / 1000;
   const max_capacitor_kvar = sf * magnetizing_kvar;
   return {
@@ -493,17 +500,17 @@ export function computeCapacitorBankForResonanceOrder({ short_circuit_mva = 0, t
   const max_cap_bank_mvar = sc / (h * h);
   return {
     max_cap_bank_mvar,
-    note: "The harmonic parallel-resonance relation h = sqrt(MVA_sc / MVAR_cap) solved for the bank: the LARGEST power-factor capacitor bank that keeps the resonant order at or above the target. A bigger bank lowers the resonant order toward the strong low-order harmonics (the 5th, 7th, ...), so a target just below the lowest harmonic of concern (about 4.7 to stay under the 5th) sets a ceiling on the bank. Split the correction into smaller banks, add a detuning reactor (making it a filter), or run a harmonic study if power factor needs more than this. This uses the bus short-circuit level and ignores load and resistive damping. A screening aid, not a harmonic study.",
+    note: "The harmonic parallel-resonance relation h = sqrt(MVA_sc / MVAR_cap) solved for the bank: the power-factor capacitor bank that puts the resonance exactly AT the target order. A bigger bank lowers the resonant order and a smaller one raises it, so which side is safe depends on the target: to keep the resonance BELOW a harmonic (a target of about 4.7 to sit under the 5th) the bank must be AT LEAST this large, and a smaller bank drifts up onto the 5th; to keep it ABOVE a harmonic (a target of about 5.5 or 7.5) the bank must be NO LARGER than this. Split the correction into smaller banks, add a detuning reactor (making it a filter), or run a harmonic study if power factor needs more than this. This uses the bus short-circuit level and ignores load and resistive damping. A screening aid, not a harmonic study.",
   };
 }
 export const capacitorBankForResonanceOrderExample = { inputs: { short_circuit_mva: 200, target_resonant_order: 4.7 } };
 function _v717renderCapacitorBankForResonanceOrder(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: parallel-resonance order of a PF capacitor bank (IEEE 519 / IEEE 1531) solved for the bank: MVAR_cap = MVA_sc / h_target^2, the largest bank that keeps the resonant order at or above the target (a bigger bank lowers the order toward the low harmonics). A screening aid; a harmonic study governs.";
+  citationEl.textContent = "Citation: parallel-resonance order of a PF capacitor bank (IEEE 519 / IEEE 1531) solved for the bank: MVAR_cap = MVA_sc / h_target^2, the bank that puts the resonance at the target order (a bigger bank lowers the order, a smaller one raises it; below a harmonic this is a minimum size, above one a maximum). A screening aid; a harmonic study governs.";
   const sc = makeNumber("Short-circuit power at the capacitor bus, utility + transformer combined (MVA)", "cbr-sc", { step: "any", min: "0" });
-  const h = makeNumber("Target min resonant order (e.g. 4.7 to stay below the 5th)", "cbr-h", { step: "any", min: "0" });
+  const h = makeNumber("Target resonant order (e.g. 4.7 to sit just below the 5th)", "cbr-h", { step: "any", min: "0" });
   for (const f of [sc, h]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { sc.input.value = "200"; h.input.value = "4.7"; update(); });
-  const oM = makeOutputLine(outputRegion, "Max capacitor bank", "cbr-out-m");
+  const oM = makeOutputLine(outputRegion, "Capacitor bank that resonates at the target", "cbr-out-m");
   const oNote = makeOutputLine(outputRegion, "Note", "cbr-out-n");
   function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
@@ -518,17 +525,19 @@ POWERQUALITY_RENDERERS["capacitor-bank-for-resonance-order"] = _v717renderCapaci
 
 // ===================== spec-v524: total demand distortion limit check (IEEE 519-2022) =====================
 // dims: in { isc_a: I, il_a: I, measured_tdd_pct: dimensionless } out: { ratio: dimensionless, limit_pct: dimensionless, pass: dimensionless }
-export function computeTddIeee519({ isc_a = 0, il_a = 0, measured_tdd_pct = 0 } = {}) {
+export function computeTddIeee519({ isc_a = 0, il_a = 0, measured_tdd_pct = null } = {}) {
   const isc = Number(isc_a);
   const il = Number(il_a);
-  const tdd = Number(measured_tdd_pct);
+  // No measurement entered is no verdict; a blank used to be 0% and read "compliant".
+  const has_measurement = measured_tdd_pct !== null && measured_tdd_pct !== "";
+  const tdd = has_measurement ? Number(measured_tdd_pct) : 0;
   if (!Number.isFinite(isc) || !Number.isFinite(il) || !Number.isFinite(tdd)) return { error: "All numeric inputs must be finite numbers." };
   if (!(isc > 0)) return { error: "Short-circuit current must be positive (A)." };
   if (!(il > 0)) return { error: "Maximum demand current must be positive (A)." };
   if (tdd < 0) return { error: "Measured TDD cannot be negative (%)." };
   const ratio = isc / il;
   const limit_pct = ratio < 20 ? 5.0 : ratio < 50 ? 8.0 : ratio < 100 ? 12.0 : ratio <= 1000 ? 15.0 : 20.0;
-  const pass = tdd <= limit_pct + 1e-9 * Math.abs(limit_pct);
+  const pass = has_measurement ? tdd <= limit_pct + 1e-9 * Math.abs(limit_pct) : null;
   if (![ratio, limit_pct].every(Number.isFinite)) return { error: "TDD-limit math is not a finite value." };
   return {
     ratio, limit_pct, pass,
@@ -549,11 +558,11 @@ function _v524renderTddIeee519(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "tdd-out-n");
   function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeTddIeee519({ isc_a: readNum(isc.input), il_a: readNum(il.input), measured_tdd_pct: readNum(tdd.input) });
+    const r = computeTddIeee519({ isc_a: readNum(isc.input), il_a: readNum(il.input), measured_tdd_pct: tdd.input.value === "" ? null : readNum(tdd.input) });
     if (r.error) { oRatio.textContent = r.error; oLimit.textContent = "-"; oPass.textContent = "-"; oNote.textContent = ""; return; }
     oRatio.textContent = fmt(r.ratio, 0);
     oLimit.textContent = fmt(r.limit_pct, 1) + "%";
-    oPass.textContent = r.pass ? "yes (TDD within the limit)" : "NO -- exceeds the IEEE 519 limit at this stiffness";
+    oPass.textContent = r.pass === null ? "enter the measured TDD for a verdict" : r.pass ? "yes (TDD within the limit)" : "NO -- exceeds the IEEE 519 limit at this stiffness";
     oNote.textContent = r.note;
   }, DEBOUNCE_MS);
   for (const f of [isc, il, tdd]) f.input.addEventListener("input", update);

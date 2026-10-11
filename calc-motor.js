@@ -40,8 +40,9 @@ export function computeMotorSyncSlip({ line_freq_hz = 60, poles = 4, rated_rpm =
   if (!(line_freq_hz > 0)) return { error: "Line frequency must be positive (Hz)." };
   if (!(poles > 0)) return { error: "Pole count must be a positive even integer." };
   if (!Number.isInteger(poles) || poles % 2 !== 0) return { error: "Pole count must be an even integer (2, 4, 6, 8, ...)." };
-  if (!(rated_rpm >= 0)) return { error: "Rated speed cannot be negative (rpm)." };
+  if (!(rated_rpm > 0)) return { error: "Enter the nameplate full-load speed (rpm)." };
   const sync_rpm = (120 * line_freq_hz) / poles; // poles > 0 forces this positive
+  if (rated_rpm > sync_rpm * (1 + 1e-9)) return { error: "The nameplate speed is above the " + sync_rpm.toFixed(0) + " rpm synchronous speed for this pole count; a motor runs below it. Check the poles." };
   const slip = (sync_rpm - rated_rpm) / sync_rpm;
   const slip_pct = slip * 100;
   const rotor_freq_hz = slip * line_freq_hz;
@@ -175,6 +176,8 @@ export function computeMotorOperatingCost({ hp = 0, efficiency_pct = 93, load_fa
   if (!(hours_per_year > 0)) return { error: "Annual run hours must be positive." };
   if (!(efficiency_pct > 0 && efficiency_pct <= 100)) return { error: "Efficiency must be in (0, 100] percent." };
   if (!(load_factor_pct >= 0)) return { error: "Load factor cannot be negative (percent)." };
+  if (load_factor_pct > 0 && load_factor_pct < 1) return { error: "Enter the load factor as a percent (75 for 75%), not a fraction." };
+  if (hours_per_year > 8760) return { error: "A year has 8,760 hours." };
   if (!(rate_usd_per_kwh >= 0)) return { error: "Energy rate cannot be negative ($/kWh)." };
   const input_kw = (hp * 0.746 * (load_factor_pct / 100)) / (efficiency_pct / 100);
   const annual_kwh = input_kw * hours_per_year;
@@ -282,7 +285,7 @@ export function computeMultiMotorFeeder({ largest_flc_a = 0, sum_other_flc_a = 0
   sum_other_flc_a = Number(sum_other_flc_a); largest_branch_ocpd_a = Number(largest_branch_ocpd_a);
   if (!(largest_flc_a >= 0)) return { error: "Largest motor full-load current cannot be negative (A)." };
   if (!(sum_other_flc_a >= 0)) return { error: "Sum of other motor full-load currents cannot be negative (A)." };
-  if (!(largest_branch_ocpd_a >= 0)) return { error: "Largest branch overcurrent device rating cannot be negative (A)." };
+  if (!(largest_branch_ocpd_a > 0)) return { error: "Enter the largest branch-circuit overcurrent device rating (A)." };
   const min_feeder_ampacity_a = 1.25 * largest_flc_a + sum_other_flc_a; // 430.24
   // 430.62(A) takes the largest branch device on ANY motor plus the FLCs of the OTHER motors. When
   // that device sits on a smaller motor, the largest motor's FLC is one of the "others". Until
@@ -443,12 +446,14 @@ export function computeMotorLockedRotorKva({ horsepower = 0, code_letter = "G", 
   if (ph !== 1 && ph !== 3) return { error: "Phase must be 1 or 3." };
   const kva_per_hp = _NEC_430_7B_KVA_PER_HP[letter];
   if (kva_per_hp === undefined) return { error: "Code letter must be a NEC Table 430.7(B) letter (A-V, excluding I, O, Q)." };
+  // Letter V is "22.4 and up": an open-ended band with no upper end to be conservative about.
+  const open_ended_band = letter === "V";
   const locked_rotor_kva = hp * kva_per_hp;
   const lra_a = ph === 3 ? locked_rotor_kva * 1000 / (Math.sqrt(3) * v) : locked_rotor_kva * 1000 / v;
   if (![locked_rotor_kva, lra_a].every(Number.isFinite)) return { error: "Locked-rotor math is not a finite value." };
   return {
-    kva_per_hp, locked_rotor_kva, lra_a,
-    note: "NEC Table 430.7(B) locked-rotor code letter: the letter maps to a band of locked-rotor (starting) kVA per horsepower; this tile uses the upper end of the band for a conservative starting current. locked_rotor_kva = hp x kVA/hp and LRA = kVA x 1000 / (sqrt(3) x V) three-phase (kVA x 1000 / V single-phase). The code letter is about starting kVA and is NOT the design letter (A/B/C/D), which describes the torque-speed curve -- the two are routinely confused. The '6x FLA' rule of thumb holds only for mid-range code letters and undersizes high-code motors that draw 7-8x FLA at start, which the instantaneous-trip breaker, the SCCR check, and the voltage-dip calculation must account for. The actual measured inrush and the motor nameplate govern. A design aid, not a substitute for the nameplate.",
+    kva_per_hp, locked_rotor_kva, lra_a, open_ended_band,
+    note: (open_ended_band ? "CODE LETTER V IS OPEN-ENDED (22.4 kVA/hp AND UP): the figures here are a FLOOR, not a conservative ceiling -- get the locked-rotor current from the manufacturer. " : "") + "NEC Table 430.7(B) locked-rotor code letter: the letter maps to a band of locked-rotor (starting) kVA per horsepower; this tile uses the upper end of the band for a conservative starting current. locked_rotor_kva = hp x kVA/hp and LRA = kVA x 1000 / (sqrt(3) x V) three-phase (kVA x 1000 / V single-phase). The code letter is about starting kVA and is NOT the design letter (A/B/C/D), which describes the torque-speed curve -- the two are routinely confused. The '6x FLA' rule of thumb holds only for mid-range code letters and undersizes high-code motors that draw 7-8x FLA at start, which the instantaneous-trip breaker, the SCCR check, and the voltage-dip calculation must account for. The actual measured inrush and the motor nameplate govern. A design aid, not a substitute for the nameplate.",
   };
 }
 export const motorLockedRotorKvaExample = { inputs: { horsepower: 25, code_letter: "G", voltage_v: 460, phase: 3 } };
@@ -492,6 +497,7 @@ export function computeMotorMaxHpForStartingCurrent({ max_starting_current_a = 0
   if (!(lra > 0)) return { error: "Max starting current must be positive (A)." };
   const base = computeMotorLockedRotorKva({ horsepower: 1, code_letter, voltage_v, phase });
   if (base.error) return { error: base.error };
+  if (base.open_ended_band) return { error: "Code letter V is open-ended (22.4 kVA/hp and up), so no maximum horsepower can be stated from it; use the manufacturer's locked-rotor current." };
   const lra_per_hp_a = base.lra_a;
   const max_horsepower = lra / lra_per_hp_a;
   if (![max_horsepower, lra_per_hp_a].every(Number.isFinite)) return { error: "Locked-rotor math is not a finite value." };
@@ -653,7 +659,10 @@ export function computeVfdReflectedWave({ rise_time_us = 0, velocity_pct = 50, s
   const l_crit_ft = rt * cable_velocity_ft_us / 2;
   const v_bus_v = Math.SQRT2 * Vll;
   const v_peak_v = run > l_crit_ft ? 2 * v_bus_v : v_bus_v * (1 + run / l_crit_ft);
-  const limit_invduty_v = 3.1 * Vll;
+  // MG-1 Part 31.4.4.2: 3.1 x rated voltage for motors rated 600 V and less, 2.04 x above that.
+  // Until 2026-10-10 the 3.1 factor was applied at any voltage, and since a fully developed
+  // reflection is 2.83 x the line voltage the inverter-duty check could never fail.
+  const limit_invduty_v = (Vll > 600 ? 2.04 : 3.1) * Vll;
   const limit_genpurpose_v = 1000;
   return {
     cable_velocity_ft_us, l_crit_ft, v_bus_v, v_peak_v, limit_invduty_v, limit_genpurpose_v,

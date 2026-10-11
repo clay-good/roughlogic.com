@@ -37,7 +37,9 @@ export const FEEDER_RENDERERS = {};
 
 // NEC 240.6(A) standard overcurrent device ampere ratings.
 const _V26_STD_OCPD = [15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 90, 100, 110, 125, 150, 175, 200, 225, 250, 300, 350, 400, 450, 500, 600, 700, 800, 1000, 1200, 1600, 2000, 2500, 3000, 4000, 5000, 6000];
-function _v26StdDown(x) { let best = null; for (const s of _V26_STD_OCPD) { if (s <= x) best = s; } return best; }
+// Rounding DOWN also reaches the small fuse ratings of 240.6(A) (1, 3, 6, 10 A): until 2026-10-10
+// anything under 15 A had no size at all and the page printed "null A".
+function _v26StdDown(x) { let best = null; for (const s of [1, 3, 6, 10, ..._V26_STD_OCPD]) { if (s <= x) best = s; } return best; }
 function _v26StdUp(x) { for (const s of _V26_STD_OCPD) { if (s >= x) return s; } return null; }
 
 // dims: in { motors: dimensionless, nonmotor_continuous_A: I, nonmotor_noncontinuous_A: I } out: { conductor_min_A: I, feeder_ocpd_max_A: I }
@@ -71,6 +73,7 @@ export function computeMotorFeederMultiple({ motors = [], nonmotor_continuous_A 
   // 430.62 does NOT round up; take the next-smaller standard size where the sum is not a standard rating.
   const isStd = _V26_STD_OCPD.includes(feeder_ocpd_raw_A);
   const feeder_ocpd_max_A = isStd ? feeder_ocpd_raw_A : _v26StdDown(feeder_ocpd_raw_A);
+  if (feeder_ocpd_max_A === null) return { error: "The 430.62 sum is under 1 A; there is no standard device that small. Check the motor currents." };
 
   const notes = [];
   if (!isStd) notes.push("430.62 feeder device is a maximum, not rounded up: " + _v26fmt(feeder_ocpd_raw_A, 1) + " A is not a standard rating, so the next size down (" + feeder_ocpd_max_A + " A) is used.");
@@ -146,6 +149,7 @@ export function computeTransformerConductorProtection({ kva = 0, primary_v = 0, 
   if (!(VP > 0)) return { error: "Primary voltage must be positive." };
   if (!(VS > 0)) return { error: "Secondary voltage must be positive." };
   if (PH !== 1 && PH !== 3) return { error: "Phase must be 1 or 3." };
+  if (VP > 1000 || VS > 1000) return { error: "This calculator applies NEC Table 450.3(B), transformers 1,000 V and less; over 1,000 V is Table 450.3(A)." };
 
   const f = PH === 1 ? 1 : Math.sqrt(3);
   const primary_fla_A = (KVA * 1000) / (f * VP);
@@ -172,6 +176,7 @@ export function computeTransformerConductorProtection({ kva = 0, primary_v = 0, 
     ? (_V26_STD_OCPD.includes(primary_raw_A) ? primary_raw_A : _v26StdUp(primary_raw_A))
     : (_V26_STD_OCPD.includes(primary_raw_A) ? primary_raw_A : _v26StdDown(primary_raw_A));
 
+  if (primary_ocpd_max_A === null) return { error: "The primary device falls outside the standard ratings of NEC 240.6(A) (under 1 A or over 6,000 A)." };
   let secondary_ocpd_max_A = null, sb = null, secondary_raw_A = null;
   if (secondary_protection) {
     sb = secondaryBand(secondary_fla_A);
@@ -181,6 +186,7 @@ export function computeTransformerConductorProtection({ kva = 0, primary_v = 0, 
       : (_V26_STD_OCPD.includes(secondary_raw_A) ? secondary_raw_A : _v26StdDown(secondary_raw_A));
   }
 
+  if (secondary_protection && secondary_ocpd_max_A === null) return { error: "The secondary device falls outside the standard ratings of NEC 240.6(A) (under 1 A or over 6,000 A)." };
   // 240.21(C): the secondary tap conductor must carry at least the secondary current.
   const secondary_conductor_min_A = secondary_fla_A;
 
@@ -402,7 +408,10 @@ export function computeGeneratorConductor445({ nameplate_current_a = 0, gen_kw =
   const npIn = Number(nameplate_current_a) || 0;
   const kw = Number(gen_kw) || 0;
   const v = Number(voltage_v) || 0;
-  const ph = Number(phase) === 1 ? 1 : 3;
+  // Any phase that was not exactly 1 used to be three-phase, which reads a single-phase set 42% low.
+  if (Number(phase) !== 1 && Number(phase) !== 3) return { error: "Phase must be 1 or 3." };
+  if (npIn < 0) return { error: "Nameplate current cannot be negative (A)." };
+  const ph = Number(phase);
   const pf = Number(power_factor) || 0;
   let nameplate_a;
   if (npIn > 0) {
@@ -522,7 +531,8 @@ export function computeEvLoadManagementEms({ charger_count = 0, per_charger_a = 
   const unmanaged_sum_a = 1.25 * per * n;
   const managed = limit > 0;
   if (managed && !(limit > 0)) return { error: "EVEMS limit must be positive when management is used." };
-  const managed_demand_a = managed ? (setpoint125 ? 1.25 : 1.0) * limit : unmanaged_sum_a;
+  // A limit at or above what the chargers can draw restricts nothing: the demand is the plain sum.
+  const managed_demand_a = managed ? Math.min((setpoint125 ? 1.25 : 1.0) * limit, unmanaged_sum_a) : unmanaged_sum_a;
   const freed_headroom_a = unmanaged_sum_a - managed_demand_a;
   return {
     unmanaged_sum_a, managed_demand_a, freed_headroom_a, managed, setpoint125,
@@ -572,7 +582,7 @@ export function computeEvChargerThrottle({ aggregate_limit_a = 0, charger_max_a 
   if (!(active >= 1)) return { error: "Active-charger count must be at least 1." };
   const share_a = limit / active;
   const throttled_a = Math.min(cmax, share_a);
-  const full_rate_count = Math.floor(limit / cmax + 1e-9);
+  const full_rate_count = Math.min(active, Math.floor(limit / cmax + 1e-9));
   const all_full = active * cmax <= limit + 1e-9 * Math.abs(limit);
   return {
     throttled_a, full_rate_count, all_full, share_a,

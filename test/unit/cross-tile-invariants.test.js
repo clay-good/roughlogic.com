@@ -12258,7 +12258,7 @@ test("monotonicity: motor synchronous speed/slip and shaft torque track their in
   const st = (o) => m.computeMotorShaftTorque({ hp: 10, rpm: 1750, ...o });
   assert.ok(Math.abs(ss({}).sync_rpm - 120 * 60 / 4) < 1e-9, "synchronous speed = 120 f / poles");
   assert.ok(ss({ poles: 2 }).sync_rpm > ss({}).sync_rpm, "synchronous speed must rise as pole count drops");
-  assert.ok(ss({ line_freq_hz: 50 }).sync_rpm < ss({}).sync_rpm, "synchronous speed must fall at lower line frequency");
+  assert.ok(ss({ line_freq_hz: 50, rated_rpm: 1450 }).sync_rpm < ss({}).sync_rpm, "synchronous speed must fall at lower line frequency");
   assert.ok(ss({ rated_rpm: 1780 }).slip_pct < ss({}).slip_pct, "slip must fall as the rated speed nears synchronous");
   assert.ok(Math.abs(ss({}).slip_pct - (1800 - 1750) / 1800 * 100) < 1e-6, "slip % = (Ns - rated) / Ns");
   assert.ok(st({ hp: 20 }).torque_lbft > st({}).torque_lbft, "shaft torque must rise with horsepower");

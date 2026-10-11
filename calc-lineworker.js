@@ -88,7 +88,9 @@ function _simpleRenderer(spec) {
     }
     const update = debounce(() => {
       const params = {};
-      for (const f of spec.fields) params[f.key] = Number(fields[f.key].input.value) || 0;
+      // A field marked `required` passes null when blank, so the compute can ask for it
+      // instead of reading a cleared field as a real 0.
+      for (const f of spec.fields) params[f.key] = f.required && fields[f.key].input.value === "" ? null : Number(fields[f.key].input.value) || 0;
       const r = spec.compute(params);
       if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }
       for (const o of spec.outputs) outs[o.key].textContent = o.value(r);
@@ -229,6 +231,9 @@ export function computeConductorSagAtTemperature({ span_ft = 0, area_in2 = 0, we
   if (!(alpha_per_f > 0)) return { error: "Coefficient of thermal expansion must be positive (per degF)." };
   if (!(tension1_lb > 0)) return { error: "Initial horizontal tension must be positive (lb)." };
   if (rated_strength_lb < 0) return { error: "Rated strength cannot be negative (lb)." };
+  // A cleared temperature field used to compute as 0 F.
+  if (temp1_f === null || temp1_f === "" || temp2_f === null || temp2_f === "") return { error: "Enter both the initial and the final conductor temperature (F)." };
+  temp1_f = Number(temp1_f); temp2_f = Number(temp2_f);
   const EA = modulus_psi * area_in2;
   const L = span_ft;
   const sag1_ft = weight1_lb_per_ft * L * L / (8 * tension1_lb);
@@ -255,9 +260,18 @@ export function computeConductorSagAtTemperature({ span_ft = 0, area_in2 = 0, we
     thermal_term_lb, initial_curve_term, cubic_k: K, cubic_c: C, ea_lb: EA,
     tension1_lb, tension1_pct_rated, tension2_pct_rated, temp1_f, temp2_f,
     weight2_used_lb_per_ft: w2,
-    direction: tension2_lb <= tension1_lb
-      ? (temp2_f > temp1_f ? "hotter" : "lighter") + ": tension falls and sag grows, and the clearance question is the one that matters"
-      : (temp2_f < temp1_f ? "colder" : "heavier") + ": tension climbs toward the conductor's limit and the structure loading climbs with it",
+    over_rated_strength: rated_strength_lb > 0 && tension2_lb > rated_strength_lb * (1 + 1e-9),
+    // The wording follows what the numbers did. A lighter load drops the tension AND the sag
+    // (ice coming off), which until 2026-10-10 read "tension falls and sag grows".
+    direction: Math.abs(tension2_lb - tension1_lb) <= 1e-9 * tension1_lb && Math.abs(sag2_ft - sag1_ft) <= 1e-9 * sag1_ft
+      ? "unchanged: the same temperature and loading, so the same tension and sag"
+      : tension2_lb <= tension1_lb
+        ? (sag2_ft > sag1_ft
+          ? "hotter: tension falls and sag grows, and the clearance question is the one that matters"
+          : "lighter: the load came off, so tension and sag both fall")
+        : (rated_strength_lb > 0 && tension2_lb > rated_strength_lb * (1 + 1e-9)
+          ? "OVER RATED STRENGTH: the final tension is " + fmt(tension2_lb / rated_strength_lb * 100, 0) + "% of the conductor's rated strength -- this condition breaks it"
+          : (temp2_f < temp1_f ? "colder" : "heavier") + ": tension climbs toward the conductor's limit and the structure loading climbs with it"),
     note: "Two things fight each other when a conductor heats up. The metal grows -- alpha times the temperature change of free thermal strain -- and that growth has to go somewhere, so it goes into sag. But sagging lowers the tension, and lower tension lets the elastic stretch relax, which pulls some length back. The change-of-state equation states that total length is conserved across the two conditions once both effects are counted, and because the sag term carries the tension squared in its denominator the result is a CUBIC in the final tension. There is no closed form worth writing on a tailboard, which is precisely why this is a calculator. The magnitude is always larger than people expect and the direction is always the same. ACSR Drake on a 600 ft ruling span strung to 6,000 lb at 60 degF comes back at 4,380 lb at 120 degF: sixty degrees cost 1,620 lb of tension, 27.0%, and bought 3.03 ft of sag, taking the conductor from 8.21 ft to 11.24 ft. That is a 37% sag increase from a 27% tension drop, because sag is inversely proportional to tension and so it always moves further than the tension does. A crew that sagged that span in spring and left 3 ft of clearance margin has none left on a hot August afternoon with the line loaded. Run backwards it handles the cold case, where the concern is not clearance but tension climbing toward the conductor's limit and the structure loading that comes with it. And it takes a LOAD change as well as a temperature change: enter a different weight per foot for the second condition and it answers the ice case, where the weight climbs at the same time the metal is cold and stiff. Enter the resultant from the district loading calculator to get that case right. This is the single-span parabolic change of state with the conductor treated as one homogeneous material. It does not model ACSR as separate aluminium and steel components with their own moduli and expansion coefficients, which matters at high temperature where the aluminium goes slack and the steel takes the load -- the knee-point behaviour is real and it is not here. It does not include creep, which is permanent and additive and is handled separately, and it does not use the exact catenary, which departs from the parabola on very long or very slack spans. It does not check clearance, evaluate inclined spans, or produce a stringing chart. The conductor manufacturer's stress-strain data, the utility's sag-tension program and stringing charts, and the applicable NESC edition govern.",
   };
 }
@@ -273,8 +287,8 @@ LINEWORKER_RENDERERS["conductor-sag-at-temperature"] = _simpleRenderer({
     { key: "modulus_psi", label: "Modulus of elasticity (psi)", kind: "number" },
     { key: "alpha_per_f", label: "Coefficient of thermal expansion (per degF)", kind: "number" },
     { key: "tension1_lb", label: "Initial horizontal tension (lb)", kind: "number" },
-    { key: "temp1_f", label: "Initial temperature (F)", kind: "number", default: 60, attrs: { step: "any" } },
-    { key: "temp2_f", label: "Final temperature (F)", kind: "number", default: 120, attrs: { step: "any" } },
+    { key: "temp1_f", label: "Initial temperature (F)", kind: "number", default: 60, attrs: { step: "any" }, required: true },
+    { key: "temp2_f", label: "Final temperature (F)", kind: "number", default: 120, attrs: { step: "any" }, required: true },
     { key: "rated_strength_lb", label: "Rated breaking strength (lb, 0 to skip)", kind: "number" },
   ],
   outputs: [
@@ -410,7 +424,7 @@ export function computeConductorUpliftCheck({ span_ft = 0, elevation_rise_ft = 0
     structure_verdict: structure_vertical_load_lb === null
       ? "(no back span entered -- the real load at the structure is BOTH adjacent spans together)"
       : structure_vertical_load_lb < 0
-        ? "with the back span counted the structure is STILL being lifted, with " + fmt(-structure_vertical_load_lb, 0) + " lb net"
+        ? "with the back span counted the structure is " + (uplift ? "STILL being lifted" : "being LIFTED even though this span alone bears down") + ", with " + fmt(-structure_vertical_load_lb, 0) + " lb net"
         : "with the back span counted the structure carries " + fmt(structure_vertical_load_lb, 0) + " lb net downward",
     note: "In hilly country a suspension structure sitting in a sag between two higher structures can be lifted rather than loaded, and uplift unseats a suspension clamp, inverts a post insulator, and is a listed cause of structure damage. An inclined span's weight does not split evenly: the horizontal tension acting along the sloped chord adds a downward component at the high support and an equal UPWARD component at the low one, so the vertical load at the low structure is half the conductor weight less that component. When the component wins, the load goes negative. A 500 ft span rising 60 ft at 1.094 lb/ft and a cold 5,000 lb of tension puts 273.5 lb of conductor weight against 600.0 lb of upward pull, for -326.5 lb: the structure is being lifted with 326 lb. The same arithmetic says where the low point of the curve sits, and it lands 298 ft OUTSIDE the span -- which is the geometric statement of the identical condition, because a span whose low point falls outside itself is a span pulling up at one end. The threshold is worth stating exactly: uplift begins when the tension reaches the weight per foot times the span squared, over twice the rise, which on that span is 2,279 lb, so anything above that lifts. The condition worsens in COLD weather, because cold means high tension and the tension is the term doing the lifting -- which is the opposite of the intuition built on clearance problems, where hot is the bad case. The check must be run at the structure against BOTH adjacent spans together, since the real vertical load there is the sum of what each side contributes; enter the back span and its rise and the net is reported. This is a static vertical-load check on the conductor at one condition. It does not size or select a suspension, tension, or hold-down assembly, evaluate insulator swing under wind, or address the longitudinal loads a hold-down arrangement introduces. It does not compute the tension -- enter the cold, high-tension governing case from the change-of-state calculation -- and it assumes the same horizontal tension in both adjacent spans, which is the ruling-span idealization and is weakest on exactly the steep, unequal spans where uplift occurs. The utility's construction standards, the applicable NESC edition, and the line designer govern.",
   };
@@ -597,19 +611,23 @@ export function computeGuyAnchorHoldingCapacity({ helix_diameter_in = 0, install
   const torque_capacity_lb = installing_torque_ftlb > 0 ? torque_factor_per_ft * installing_torque_ftlb : null;
   const torque_allowable_lb = torque_capacity_lb === null ? null : torque_capacity_lb / factor_of_safety;
   const method_ratio = torque_capacity_lb === null ? null : torque_capacity_lb / ultimate_capacity_lb;
-  const margin_lb = guy_tension_lb > 0 ? allowable_capacity_lb - guy_tension_lb : null;
+  // The margin is taken on the LOWER allowable. When an installing torque is entered it is the
+  // measurement of the soil actually there; until 2026-10-10 an anchor whose torque capacity fell
+  // short of the guy still read "holds" on the calculated figure.
+  const governing_allowable_lb = torque_allowable_lb === null ? allowable_capacity_lb : Math.min(allowable_capacity_lb, torque_allowable_lb);
+  const margin_lb = guy_tension_lb > 0 ? governing_allowable_lb - guy_tension_lb : null;
   const outs = [helix_area_ft2, ultimate_capacity_lb, allowable_capacity_lb];
   if (!outs.every(Number.isFinite)) return { error: "Anchor capacity math is not a finite value." };
   return {
     helix_area_ft2, overburden_psf, cohesive_capacity_lb, granular_capacity_lb, governs,
     ultimate_capacity_lb, allowable_capacity_lb, torque_capacity_lb, torque_allowable_lb,
-    method_ratio, guy_tension_lb, margin_lb, factor_of_safety,
+    method_ratio, guy_tension_lb, margin_lb, factor_of_safety, governing_allowable_lb,
     holds: margin_lb === null ? null : margin_lb >= -1e-9,
     margin_verdict: margin_lb === null
       ? "(no guy tension entered)"
       : margin_lb >= 0
-        ? fmt(margin_lb, 0) + " lb of allowable capacity to spare against the " + fmt(guy_tension_lb, 0) + " lb guy"
-        : "SHORT by " + fmt(-margin_lb, 0) + " lb against the " + fmt(guy_tension_lb, 0) + " lb guy",
+        ? fmt(margin_lb, 0) + " lb of allowable capacity to spare against the " + fmt(guy_tension_lb, 0) + " lb guy" + (torque_allowable_lb !== null && torque_allowable_lb < allowable_capacity_lb ? " (on the torque-based capacity, the lower of the two)" : "")
+        : "SHORT by " + fmt(-margin_lb, 0) + " lb against the " + fmt(guy_tension_lb, 0) + " lb guy" + (torque_allowable_lb !== null && torque_allowable_lb < allowable_capacity_lb ? " (on the torque-based capacity, the lower of the two)" : ""),
     torque_verdict: torque_capacity_lb === null
       ? "(no installing torque entered -- it is the better number when the machine reads one, because it measures the soil that is actually there)"
       : Math.abs(Math.log(method_ratio)) > Math.log(1.5)
@@ -670,6 +688,8 @@ export function computeTransverseWindLoadConductor({ wind_pressure_psf = 0, wind
   // because the pole is wider at the bottom. Until 2026-09-19 it was taken at
   // mid-height, 7% high on the pole's moment (conservative).
   const has_pole = pole_top_diameter_in > 0 && pole_groundline_diameter_in > 0 && pole_height_above_ground_ft > 0;
+  // A half-entered pole used to be dropped without a word, losing its share of the moment.
+  if (!has_pole && (pole_top_diameter_in > 0 || pole_groundline_diameter_in > 0 || pole_height_above_ground_ft > 0)) return { error: "Enter all three pole dimensions (top diameter, groundline diameter, height) or leave all three blank." };
   const pole_projected_area_ft2 = has_pole
     ? ((pole_top_diameter_in + pole_groundline_diameter_in) / 2 / _IN_PER_FT) * pole_height_above_ground_ft : 0;
   const pole_force_lb = pressure_psf * pole_projected_area_ft2;
@@ -736,7 +756,8 @@ export function computeNescDistrictLoading({ bare_diameter_in = 0, bare_weight_l
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(bare_diameter_in > 0)) return { error: "Bare conductor diameter must be positive (in)." };
   if (!(bare_weight_lb_per_ft > 0)) return { error: "Bare conductor weight must be positive (lb/ft)." };
-  const d = Math.round(district);
+  if (!Number.isInteger(Number(district))) return { error: "District must be 1 (Heavy), 2 (Medium), 3 (Light), or 0 to enter custom ice, wind, and constant." };
+  const d = Number(district);
   if (![0, 1, 2, 3].includes(d)) return { error: "District must be 1 (Heavy), 2 (Medium), 3 (Light), or 0 to enter custom ice, wind, and constant." };
   if (custom_ice_in < 0 || custom_wind_psf < 0 || custom_k_lb_per_ft < 0) return { error: "Custom ice, wind, and constant cannot be negative." };
   const preset = _NESC_DISTRICTS[d];
@@ -976,6 +997,8 @@ export function computeTransformerDiversityLoading({ customers = 0, individual_p
   if (!(continuous_rating_kva > 0)) return { error: "Transformer continuous rating must be positive (kVA)." };
   if (short_time_rating_kva < 0) return { error: "Short-time rating cannot be negative (kVA)." };
   if (average_demand_kva < 0) return { error: "Average demand cannot be negative (kVA)." };
+  if (short_time_rating_kva > 0 && short_time_rating_kva < continuous_rating_kva) return { error: "A short-time rating is at or above the continuous rating." };
+  if (average_demand_kva > customers * individual_peak_kva * diversity_factor * (1 + 1e-9)) return { error: "The average demand cannot exceed the diversified peak (a load factor above 1)." };
   const connected_kva = customers * individual_peak_kva;
   const diversified_kva = connected_kva * diversity_factor;
   const continuous_loading_pct = diversified_kva / continuous_rating_kva * 100;
@@ -1171,6 +1194,7 @@ export function computeRecloserFuseCoordination({ fault_current_a = 0, fast_curv
   if (!(heating_factor >= 1)) return { error: "The fuse heating factor cannot be below one -- the element retains heat between operations, it does not shed extra." };
   if (!(system_frequency_hz > 0)) return { error: "System frequency must be positive (Hz)." };
   if (!(fuse_total_clear_s >= fuse_min_melt_s)) return { error: "Total clearing time cannot be shorter than minimum melt for the same fuse." };
+  if (!(slow_curve_s >= fast_curve_s)) return { error: "The recloser's slow curve cannot be faster than its fast curve at the same current." };
   const heated_fast_s = fast_curve_s * heating_factor;
   const coordination_ratio = fuse_min_melt_s / heated_fast_s;
   // Eaton TD132010EN: minimum melt "at least" the heated fast time, and total
@@ -1297,7 +1321,9 @@ LINEWORKER_RENDERERS["feeder-loss-load-factor"] = _simpleRenderer({
 export function computeMeterCtPtMultiplier({ ct_primary_a = 0, ct_secondary_a = 5, pt_primary_v = 0, pt_secondary_v = 120, register_constant = 1, register_reading_kwh = 0, demand_register_kw = 0, service_voltage_kv = 0, ct_rating_factor = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // Unit / range guard added 2026-09-26 after printed-example probing.
-  if (Number(arguments[0]?.service_voltage_kv) > 1000) return { error: "Enter the service voltage in kV (12.47), not volts." };
+  // 208, 240, 480 and 600 are the common CT-rated services and are volts, not kV: read as kV they
+  // made the implied current tiny and the sanity check always PLAUSIBLE.
+  if (Number(arguments[0]?.service_voltage_kv) > 1000 || [120, 208, 240, 277, 480, 600].includes(Number(arguments[0]?.service_voltage_kv))) return { error: "Enter the service voltage in kV (12.47, or 0.48 for a 480 V service), not volts." };
   if (!(ct_primary_a > 0)) return { error: "CT primary rating must be positive (A)." };
   if (!(ct_secondary_a > 0)) return { error: "CT secondary rating must be positive (A)." };
   if (!(pt_primary_v > 0)) return { error: "PT primary rating must be positive (V)." };
@@ -1377,6 +1403,10 @@ export function computeCounterpoiseResistance({ soil_resistivity_ohm_cm = 0, len
   if (!(radials >= 1)) return { error: "There must be at least one radial." };
   if (!(coupling_penalty >= 1)) return { error: "The mutual-coupling penalty cannot be below one -- radials interfere with each other, they do not help each other." };
   if (target_resistance_ohm < 0) return { error: "Target resistance cannot be negative (ohm)." };
+  // The horizontal-wire form assumes a wire much longer than it is deep; shorter than that the
+  // resistance it gives RISES with length.
+  if (length_ft * 12 < 10 * burial_depth_in) return { error: "The counterpoise must be at least ten times as long as it is deep for this formula to hold." };
+  if (!Number.isInteger(Number(radials))) return { error: "Radials is a whole number." };
   const CM_PER_FT = 30.48;
   const CM_PER_IN = 2.54;
   const d_cm = wire_diameter_in * CM_PER_IN;

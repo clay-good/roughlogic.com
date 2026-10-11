@@ -3184,7 +3184,7 @@ cross-check.
 | calc-powerquality.js | `computeNeutralCurrent3ph` | `{ ia_A = 0, ib_A = 0, ic_A = 0, triplen_pct = 0 } = {}` | _ | _ | _ |
 | calc-powerquality.js | `computeParallelConductorDerate` | `{ i_single_A = 0, n_sets = 1, total_ccc = 0, ambient_factor = 1, i_load_A = 0...` | _ | _ | _ |
 | calc-powerquality.js | `computeRlcReactanceResonance` | `{ frequency_hz = 60, resistance_ohm = 10, inductance_h = 0.05, capacitance_uf...` | _ | _ | _ |
-| calc-powerquality.js | `computeTddIeee519` | `{ isc_a = 0, il_a = 0, measured_tdd_pct = 0 } = {}` | _ | _ | _ |
+| calc-powerquality.js | `computeTddIeee519` | `{ isc_a = 0, il_a = 0, measured_tdd_pct = null } = {}` | _ | _ | _ |
 | calc-powerquality.js | `computeTransformerKFactor` | `{ i1 = 1, i3 = 0, i5 = 0, i7 = 0, i9 = 0, i11 = 0, i13 = 0 } = {}` | _ | _ | _ |
 | calc-process.js | `computeCastingPourYield` | `{ casting_weight_lb = 0, gating_weight_lb = 0, castings_per_mould = 1, melt_e...` | _ | _ | _ |
 | calc-process.js | `computeExtrusionOutputRate` | `{ product_od_in = 0, wall_thickness_in = 0, line_speed_ft_min = 0, melt_densi...` | _ | _ | _ |
@@ -4036,7 +4036,7 @@ per spec-v14 §13.1 second paragraph.
 | `cable-tray-fill` | Cable Tray Fill | NEC Article 392.22(A) (by name); six 1.5 in 4/0 cables in a 12 in ladder tray -> 9 in of 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `camera-lens-fov` | Camera Lens FOV and Pixel Density (DORI) | IEC 62676-4 DORI; spec-v456 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `camera-max-distance-for-ppf` | Camera Max Distance for a Pixel Density (DORI) | IEC 62676-4 DORI (solved for the dist...; spec-v741 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
-| `capacitor-bank-for-resonance-order` | Max PF Capacitor Bank to Keep Resonance Off a Harmonic | parallel-resonance order of a PF capa...; 200 MVA bus, target order 4.7 (below the 5th) -> 9.05 MVA... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `capacitor-bank-for-resonance-order` | PF Capacitor Bank for a Target Resonant Order | parallel-resonance order of a PF capa...; 200 MVA bus, target order 4.7 (below the 5th) -> 9.05 MVA... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `capacitor-bank-voltage-rise` | Line Capacitor Bank Voltage Rise | Project (first-principles); ANSI C84.1, IEEE 1036 and a distribution power-flow study... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+5 more) |
 | `capacitor-discharge-time` | Capacitor Discharge Time and Bleed Resistor (NEC 460.6) | NEC 2023 460.6; spec-v495 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `cctv-retention-days` | CCTV Retention Days from Disk Capacity | first-principles NVR/VMS bitrate acco...; 16000 GB disk, 8 cameras at 4 Mbps, 24 h -> 16000 / (8 * ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |

@@ -36,6 +36,7 @@ export function computeCableReelCapacity({ flange_dia_in = 30, drum_dia_in = 12,
   if (!(cable_od_in > 0)) return { error: "Cable OD must be positive (in)." };
   if (!(fill_factor > 0)) return { error: "Fill factor must be positive." };
   if (fill_factor > 1) return { error: "Fill factor cannot exceed 1." };
+  if (!(drum_dia_in >= 0)) return { error: "Drum diameter cannot be negative (in)." };
   if (!(flange_dia_in > drum_dia_in)) return { error: "Flange diameter must exceed the drum diameter (no winding annulus)." };
   const length_ft = (fill_factor * Math.PI * (flange_dia_in * flange_dia_in - drum_dia_in * drum_dia_in) * traverse_width_in) / (48 * cable_od_in * cable_od_in);
   if (!Number.isFinite(length_ft)) return { error: "Reel-capacity math is not a finite value." };
@@ -320,7 +321,7 @@ function _v933renderWelderResistanceCircuitConductor(inputRegion, outputRegion, 
 ELECTRICALFIELD_RENDERERS["welder-resistance-circuit-conductor"] = _v933renderWelderResistanceCircuitConductor;
 
 // ===================== spec-v941: battery-to-inverter DC conductor and OCPD (NEC 690.9 / 706) =====================
-const _V941_STD_OCPD = [15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 90, 100, 110, 125, 150, 175, 200, 225, 250, 300, 350, 400, 450, 500, 600, 700, 800, 1000, 1200];
+const _V941_STD_OCPD = [15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 90, 100, 110, 125, 150, 175, 200, 225, 250, 300, 350, 400, 450, 500, 600, 700, 800, 1000, 1200, 1600, 2000, 2500, 3000, 4000, 5000, 6000];
 // dims: in { inverter_power_w: M L^2 T^-3, battery_voltage_v: M L^2 T^-3 I^-1, efficiency_pct: dimensionless } out: { dc_current_a: I, min_conductor_ampacity_a: I, ocpd_a: I }
 export function computeBatteryInverterDcConductor({ inverter_power_w = 4000, battery_voltage_v = 48, efficiency_pct = 90 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
@@ -565,6 +566,7 @@ export function computeConduitNipple60Fill({ conduit_area_sqin = 0.864, conducto
   if (!(conduit_area_sqin > 0)) return { error: "Conduit total area must be positive (sq in, NEC Ch. 9 Table 4)." };
   if (!(conductor_area_sqin > 0)) return { error: "Conductor area must be positive (sq in, NEC Ch. 9 Table 5)." };
   if (!(conductor_count > 0)) return { error: "Conductor count must be positive." };
+  if (!Number.isInteger(Number(conductor_count))) return { error: "Conductor count is a whole number." };
   // NEC Ch. 9 Note 4: a nipple <= 24 in between enclosures may fill to 60% (vs the normal 40% for 3+ conductors).
   const fill_area_sqin = conductor_count * conductor_area_sqin;
   const fill_pct = fill_area_sqin / conduit_area_sqin * 100;
@@ -576,7 +578,7 @@ export function computeConduitNipple60Fill({ conduit_area_sqin = 0.864, conducto
   const normal_max_conductors = note7(0.40 * conduit_area_sqin / conductor_area_sqin);
   if (![fill_area_sqin, fill_pct, nipple_max_conductors, normal_max_conductors].every(Number.isFinite)) return { error: "Nipple-fill math is not a finite value." };
   // The verdicts use the Note 7 counts, so a count the rounded-up maximum allows passes.
-  const nipple_ok = fill_pct <= 60 + 1e-9 * Math.abs(60) || conductor_count <= nipple_max_conductors + 1e-9 * nipple_max_conductors;
+  const nipple_ok = fill_pct <= 60 + 1e-9 * Math.abs(60) || conductor_count > 2 && conductor_count <= nipple_max_conductors + 1e-9 * nipple_max_conductors;
   // Ch. 9 Table 1: the normal limit is 53% for one conductor, 31% for two, 40% for three or more.
   const normal_limit_pct = conductor_count === 1 ? 53 : conductor_count === 2 ? 31 : 40;
   const passes_normal = fill_pct <= normal_limit_pct + 1e-9 * Math.abs(normal_limit_pct) || (conductor_count > 2 && conductor_count <= normal_max_conductors + 1e-9 * normal_max_conductors);
@@ -656,6 +658,7 @@ export function computeMwbcVoltageDrop({ awg = "12", material = "copper", one_wa
   const vd_b_volts = r_ohms * (2 * ib - ia);
   const volts_a = v - vd_a_volts;
   const volts_b = v - vd_b_volts;
+  if (!(volts_a > 0) || !(volts_b > 0)) return { error: "The computed drop is the whole source voltage or more on at least one leg: this conductor cannot carry this load over this length." };
   const pct_a = vd_a_volts / v * 100;
   const pct_b = vd_b_volts / v * 100;
   const heavier = Math.max(ia, ib);
@@ -705,7 +708,7 @@ function _v1109renderMwbcVoltageDrop(inputRegion, outputRegion, citationEl) {
     const r = computeMwbcVoltageDrop({
       awg: aw.select.value, material: mt.select.value, one_way_length_ft: Number(ln.input.value),
       load_a_amps: Number(la.input.value), load_b_amps: Number(lb.input.value),
-      source_volts: Number(sv.input.value), temperature_C: Number(tc.input.value),
+      source_volts: Number(sv.input.value), temperature_C: tc.input.value === "" ? undefined : Number(tc.input.value),
     });
     if (r.error) { oN.textContent = r.error; oA.textContent = "-"; oB.textContent = "-"; oC.textContent = "-"; oZ.textContent = "-"; return; }
     oN.textContent = fmt(r.neutral_amps, 1) + " A";

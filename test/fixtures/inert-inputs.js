@@ -43,7 +43,6 @@ export const INERT_INPUTS = {
   "floor-level-change::opening_perpendicular": "read only when an opening size is entered",
   "gas-appliance-connection::shutoff_distance_ft": "moves the answer once another input changes (1,500 randomized settings)",
   "gate-operator-duty-cycle::intermittent_duty_limit_pct": "moves the answer once another input changes (1,500 randomized settings)",
-  "generator-conductor-445::phase": "read only on the kW path when no nameplate current is entered, and only 1 vs 3",
   "generator-droop-load-share::unit3_droop_pct": "read only with a third unit",
   "generator-droop-load-share::unit3_no_load_hz": "read only with a third unit",
   "glass-thickness-wind::spacer_allowance_psf": "moves the answer once another input changes (1,500 randomized settings)",

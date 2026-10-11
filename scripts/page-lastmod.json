@@ -2,12 +2,12 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "ee9417af2f1b73a6",
-      "date": "2026-10-10"
+      "sha": "0a082f99825f593e",
+      "date": "2026-10-11"
     },
     "/tools/": {
-      "sha": "360e4785f9780921",
-      "date": "2026-10-10"
+      "sha": "0f322118711f539c",
+      "date": "2026-10-11"
     },
     "/collections/disaster-response/": {
       "sha": "51111c32a5d02f19",
@@ -34,8 +34,8 @@
       "date": "2026-10-10"
     },
     "/groups/electrical/": {
-      "sha": "0308062a467e20dd",
-      "date": "2026-10-10"
+      "sha": "0ffcad32c2e41503",
+      "date": "2026-10-11"
     },
     "/groups/field/": {
       "sha": "043d6c273f0824dd",
@@ -958,12 +958,12 @@
       "date": "2026-09-29"
     },
     "/tools/capacitor-bank-for-resonance-order/": {
-      "sha": "996d3d81ca9c35ad",
-      "date": "2026-09-29"
+      "sha": "885745da9f5211b9",
+      "date": "2026-10-11"
     },
     "/tools/capacitor-bank-voltage-rise/": {
-      "sha": "ef30437414c65b1e",
-      "date": "2026-10-09"
+      "sha": "a4909338dd7a8356",
+      "date": "2026-10-11"
     },
     "/tools/capacitor-discharge-time/": {
       "sha": "6d9c1dffc7318f39",

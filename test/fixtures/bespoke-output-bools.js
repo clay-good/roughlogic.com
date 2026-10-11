@@ -42,7 +42,6 @@ export const BESPOKE_OUTPUT_BOOLS = {
   "silt-fence-drainage": {"slope_ok":{"t":"OK (within the AHJ slope-length limit)","f":"OVER the AHJ slope-length limit"}},
   "spore-io-ratio": {"pass":{"t":"Supportable -- indoor at/below outdoor, no marker","f":"Not supportable -- see ratio / marker"}},
   "surface-condensation-risk": {"condensing":{"t":"Condensing -- surface at/below dew point","f":"Clear -- surface above dew point"}},
-  "tdd-ieee-519": {"pass":{"t":"yes (TDD within the limit)","f":"NO -- exceeds the IEEE 519 limit at this stiffness"}},
   "trap-primer": {"compliant":{"t":"OK for this zone","f":"Not compliant as configured"}},
   "triangle-sss": {"is_right":{"t":"Yes - a 90 deg angle is opposite the longest side (square)","f":"No right angle (not a square corner)"}},
   "trunk-decay-strength": {"concern":{"t":"YES - t/R below 0.30, escalate to a full TRAQ assessment","f":"no - t/R at or above 0.30 (still a screen only)"}},
