@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "feffa27e39c7eafc",
+      "sha": "b645a5c4995bbae5",
       "date": "2026-10-11"
     },
     "/tools/": {
@@ -490,8 +490,8 @@
       "date": "2026-10-09"
     },
     "/tools/barstock-cutlist/": {
-      "sha": "90aed9e23c98ee4f",
-      "date": "2026-09-29"
+      "sha": "cbb487e482336321",
+      "date": "2026-10-11"
     },
     "/tools/basal-area-prism/": {
       "sha": "d25117432a5ca3ca",
@@ -5458,8 +5458,8 @@
       "date": "2026-09-29"
     },
     "/tools/pipe-miter-cut/": {
-      "sha": "b6e21c5d804f8c76",
-      "date": "2026-09-29"
+      "sha": "1c36de178b92d64a",
+      "date": "2026-10-11"
     },
     "/tools/pipe-partial-flow-depth/": {
       "sha": "81d2c8f9a3b1fc3d",
@@ -8526,8 +8526,8 @@
       "date": "2026-09-29"
     },
     "/tools/unit-cost-earthwork/": {
-      "sha": "84f9eb10f2838de3",
-      "date": "2026-09-29"
+      "sha": "42c9f8d1987eb5d5",
+      "date": "2026-10-11"
     },
     "/tools/units-of-production-depr/": {
       "sha": "3d5c979db7925a45",

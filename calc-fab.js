@@ -137,7 +137,7 @@ export function computePipeMiterCut({ total_angle_deg = 90, pieces = 2, outside_
   const cutback_in = OD * Math.tan(miter_angle_deg * Math.PI / 180);
   const R = Number(centerline_radius_in) || 0;
   // Centerline length of a full intermediate gore; end pieces are half this.
-  const gore_centerline_in = R > 0 ? R * (A / cuts) * Math.PI / 180 : null;
+  const gore_centerline_in = R > 0 ? 2 * R * Math.tan(A / (2 * cuts) * Math.PI / 180) : null;
   // spec-v1680 gored-elbow-angles was CUT here rather than built: the turn per
   // joint, the cut angle and the end-half-gore rule are all above. What it had
   // that this did not is the THROAT and HEEL -- the short and long sides each
@@ -145,15 +145,19 @@ export function computePipeMiterCut({ total_angle_deg = 90, pieces = 2, outside_
   // elbow. Leaving the centerline radius at zero leaves the answer unchanged.
   const gore_turn_deg = A / cuts;
   const gore_turn_rad = gore_turn_deg * Math.PI / 180;
-  const heel_length_in = R > 0 ? (R + OD / 2) * gore_turn_rad : null;
-  const throat_length_in = R > 0 ? Math.max(0, (R - OD / 2) * gore_turn_rad) : null;
+  // A gore is a STRAIGHT piece cut at the miter angle on both ends, so its sides are tangent
+  // lengths, 2 (R +/- OD/2) tan(theta), not arcs. Until 2026-10-11 these were arc lengths, which
+  // are about 5% short at 22.5 deg and do not differ by the 2 OD tan(theta) the two cuts require.
+  const _tanT = Math.tan(miter_angle_deg * Math.PI / 180);
+  const heel_length_in = R > 0 ? 2 * (R + OD / 2) * _tanT : null;
+  const throat_length_in = R > 0 ? Math.max(0, 2 * (R - OD / 2) * _tanT) : null;
   const end_gore_centerline_in = gore_centerline_in === null ? null : gore_centerline_in / 2;
   const end_gore_heel_in = heel_length_in === null ? null : heel_length_in / 2;
   const end_gore_throat_in = throat_length_in === null ? null : throat_length_in / 2;
   // The whole elbow measured along its centerline arc, which is what has to
   // come off the stock.
-  const developed_centerline_in = R > 0 ? R * A * Math.PI / 180 : null;
-  const developed_heel_in = R > 0 ? (R + OD / 2) * A * Math.PI / 180 : null;
+  const developed_centerline_in = R > 0 ? cuts * gore_centerline_in : null;
+  const developed_heel_in = R > 0 ? cuts * heel_length_in : null;
   notes.push(cuts + " cut(s)/weld(s); cut angle " + fmt(miter_angle_deg, 3) + " deg from square; cutback = OD*tan(theta) is the long side minus the short side -- marked from the centerline, each side moves half of it, (OD/2)*tan(theta) = " + fmt(cutback_in / 2, 3) + " in. End pieces are half-gores. The welding procedure, bevel, and engineer of record govern.");
   if (R > 0) notes.push("Each middle gore turns " + fmt(gore_turn_deg, 3) + " deg: heel " + fmt(heel_length_in, 3) + " in, throat " + fmt(throat_length_in, 3) + " in, centerline " + fmt(gore_centerline_in, 3) + " in; end gores are half of each. The elbow develops " + fmt(developed_centerline_in, 3) + " in on the centerline and " + fmt(developed_heel_in, 3) + " in on the heel, before seam and bevel allowance.");
   return {
@@ -443,6 +447,8 @@ export function computeConduitSaddle({ mode = "three-point", depth_in = 0, prese
   const depth = Number(depth_in) || 0;
   if (!(depth > 0)) return { error: "Obstruction depth must be greater than zero (in)." };
   let centerBend, outerBend, fieldMultiplier, shrinkPerIn;
+  if (preset !== "60/30" && preset !== "45/22.5") return { error: "Bend preset must be 45/22.5 or 60/30." };
+  if (mode !== "three-point" && mode !== "four-point") return { error: "Saddle type must be three-point or four-point." };
   if (preset === "60/30") { centerBend = 60; outerBend = 30; fieldMultiplier = 2.0; shrinkPerIn = 0.25; }
   else { centerBend = 45; outerBend = 22.5; fieldMultiplier = 2.5; shrinkPerIn = 3 / 16; }
   const outerRad = outerBend * Math.PI / 180;
@@ -457,7 +463,8 @@ export function computeConduitSaddle({ mode = "three-point", depth_in = 0, prese
       mode: "four-point",
       mark_spacing_in: Number.isFinite(legSpacing) ? legSpacing : null,
       width_in: width,
-      center_bend_deg: centerBend,
+      // All four bends of a four-point saddle are at the outer angle (the note and the spacing say so).
+      center_bend_deg: outerBend,
       outer_bend_deg: outerBend,
       shrink_in: null,
       note: "Four-point saddle = two back-to-back offsets, each leg spacing = depth / sin(outer angle), separated by the obstruction width. Bend all four at the outer angle. Confirm deduct against your bender.",
@@ -702,7 +709,7 @@ export function computeWeldPreheatFuel({ steel_lb, start_temp_F, preheat_temp_F,
 export function computeWeldCostPerFoot({ deposit_lb_per_ft, deposition_eff_pct = 95, filler_cost_per_lb = 0, deposition_rate_lb_hr, operating_factor_pct = 30, labor_rate_per_hr = 0, gas_cost_per_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // An efficiency is a percent; 0 < value < 1 is a fraction typed into a percent field (added 2026-09-26).
-  if (["deposition_eff_pct"].some((k) => { const v = Number(arguments[0]?.[k]); return v > 0 && v < 1; })) return { error: "Enter efficiencies as a percent (85 for 85%), not a fraction." };
+  if (["deposition_eff_pct", "operating_factor_pct"].some((k) => { const v = Number(arguments[0]?.[k]); return v > 0 && v < 1; })) return { error: "Enter efficiencies as a percent (85 for 85%), not a fraction." };
   // Until 2026-09-26 a negative entry here returned a negative quantity with no error.
   if (["deposit_lb_per_ft", "filler_cost_per_lb", "deposition_rate_lb_hr", "labor_rate_per_hr", "gas_cost_per_ft"].some((k) => Number(arguments[0]?.[k]) < 0)) return { error: "Deposit, costs, and rates cannot be negative." };
   const deposit = Number(deposit_lb_per_ft);
@@ -891,6 +898,7 @@ export function computeWeldMetalVolume({ joint_type = "fillet", fillet_leg_in = 
   if (!(length > 0)) return { error: "Weld length must be positive (in)." };
   if (!(eff > 0 && eff <= 1)) return { error: "Deposition efficiency must be in (0, 1]." };
   if (!(maxPass > 0)) return { error: "Max single-pass area must be positive (in2)." };
+  if (joint_type !== "groove" && joint_type !== "fillet") return { error: "Joint type must be fillet or groove." };
   if (joint_type === "groove") {
     if (!(grooveArea > 0)) return { error: "Groove area must be positive (in2)." };
   } else if (!(leg > 0)) {
@@ -1224,12 +1232,15 @@ export function computeShrinkFit({ nominal_dia_in = 0, interference_in = 0, clea
   if (!(alpha > 0)) return { error: "Coefficient of thermal expansion must be positive (per degF)." };
   if (!(interference >= 0)) return { error: "Interference must be zero or positive (in)." };
   if (!(clearance >= 0)) return { error: "Assembly clearance must be zero or positive (in)." };
+  if (!Number.isFinite(ambient)) return { error: "Ambient temperature must be a number (degF)." };
   const deltaT = (interference + clearance) / (alpha * dia);
+  // Liquid nitrogen boils at -320 degF; a colder target cannot be reached by chilling the shaft.
+  const chillOk = ambient - deltaT >= -320;
   return {
     delta_t_f: deltaT,
     heat_to_f: ambient + deltaT,
-    chill_to_f: ambient - deltaT,
-    note: "Thermal-growth relation delta_dia = alpha x dia x delta_T (steel alpha about 6.5e-6 per degF). Heat the outer/bore part to heat_to, or chill the inner/shaft part to chill_to, to open the fit enough to assemble by hand. A chill below dry ice (-109 degF) needs liquid nitrogen. The alloy's published coefficient governs the number; the interference contact pressure (a separate Lame thick-cylinder check) and the engineer govern the joint's holding capacity -- this tile sizes only the assembly temperature.",
+    chill_to_f: chillOk ? ambient - deltaT : null,
+    note: (chillOk ? "" : "CHILLING ALONE CANNOT DO THIS FIT: it would take " + fmt(ambient - deltaT, 0) + " degF, colder than liquid nitrogen (-320 degF). Heat the outer part, or split the difference by heating the bore and chilling the shaft. ") + "Thermal-growth relation delta_dia = alpha x dia x delta_T (steel alpha about 6.5e-6 per degF). Heat the outer/bore part to heat_to, or chill the inner/shaft part to chill_to, to open the fit enough to assemble by hand. A chill below dry ice (-109 degF) needs liquid nitrogen. The alloy's published coefficient governs the number; the interference contact pressure (a separate Lame thick-cylinder check) and the engineer govern the joint's holding capacity -- this tile sizes only the assembly temperature.",
   };
 }
 export const shrinkFitExample = { inputs: { nominal_dia_in: 4.0, interference_in: 0.004, clearance_in: 0.002, alpha_per_f: 0.0000065, ambient_f: 70 } };
@@ -1260,7 +1271,7 @@ function _v134renderShrinkFit(inputRegion, outputRegion, citationEl) {
     if (r.error) { oDt.textContent = r.error; for (const o of [oHeat, oChill]) o.textContent = "-"; return; }
     oDt.textContent = fmt(r.delta_t_f, 0) + " degF";
     oHeat.textContent = fmt(r.heat_to_f, 0) + " degF";
-    oChill.textContent = fmt(r.chill_to_f, 0) + " degF" + (r.chill_to_f < -109 ? " (needs liquid nitrogen)" : "");
+    oChill.textContent = r.chill_to_f === null ? "not reachable (colder than liquid nitrogen); heat the outer part" : fmt(r.chill_to_f, 0) + " degF" + (r.chill_to_f < -109 ? " (needs liquid nitrogen)" : "");
   }, DEBOUNCE_MS);
   for (const f of [dia, interference, clearance, alpha, ambient]) f.input.addEventListener("input", update);
 }
@@ -1703,6 +1714,8 @@ export function computeBarNesting({ cut_list = "", stock_length_in = 240, kerf_i
   for (const line of lines) {
     const parts = line.split(/[,\s]+/).filter(Boolean);
     if (parts.length < 2) return { error: "Each line needs a length and a quantity: " + line };
+    // "62,4,38,6" on one line used to keep the first pair and drop the rest (an under-order).
+    if (parts.length > 2) return { error: "One size per line as length,quantity; put each size on its own line: " + line };
     const len = Number(parts[0]);
     const qty = Number(parts[1]);
     if (!Number.isFinite(len) || !(len > 0)) return { error: "Piece length must be a positive number: " + line };
@@ -1810,6 +1823,8 @@ const _GSG_GALV_IN = { 8: 0.1681, 9: 0.1532, 10: 0.1382, 11: 0.1233, 12: 0.1084,
 export function computeSheetMetalGauge({ gauge = 0, material = "steel" } = {}) {
   const _g = _finiteGuard({ gauge }); if (_g) return _g;
   const n = Math.round(Number(gauge) || 0);
+  // 16.5 used to round to 17 ga, the THINNER sheet, without saying so.
+  if (Math.abs(Number(gauge) - n) > 1e-9) return { error: "Gauge is a whole number (16, not 16.5)." };
   const mat = String(material);
   if (mat !== "steel" && mat !== "galvanized" && mat !== "aluminum") return { error: "Material must be steel, galvanized, or aluminum." };
   let thickness_in;

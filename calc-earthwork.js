@@ -140,6 +140,7 @@ export function computeHaulCycleProduction({ truck_cap_lcy, load_min, haul_min =
     if (!Number.isFinite(v) || v < 0) return { error: n + " time must be a non-negative finite number (min)." };
   }
   if (!Number.isFinite(eff) || eff <= 0) return { error: "Working minutes per hour must be a positive finite number." };
+  if (eff > 60) return { error: "Working minutes per hour cannot exceed 60." };
   const cycleMin = load + haul + dump + ret + spot;
   const loadsPerHour = eff / cycleMin;
   const productionLcyHr = cap * loadsPerHour;
@@ -208,6 +209,7 @@ EARTHWORK_RENDERERS["haul-cycle-production"] = _v67renderHaulCycleProduction;
 //  every time is T; production is a volume-rate L^3 T^-1 and the daily volume L^3.)
 export function computeLoaderProduction({ bucket_cap_lcy, fill_factor = 0.95, cycle_min, eff_min_per_hr = 50, hours_per_day = 8 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (Number(eff_min_per_hr) > 60) return { error: "Working minutes per hour cannot exceed 60." };
   const cap = Number(bucket_cap_lcy);
   const fill = Number(fill_factor);
   const cycle = Number(cycle_min);
@@ -271,6 +273,7 @@ EARTHWORK_RENDERERS["loader-production"] = _v809renderLoaderProduction;
 //  cycles-per-hour is dimensionless and production a volume-rate L^3 T^-1.)
 export function computeDozerProduction({ blade_cap_lcy, push_dist_ft, push_speed_fpm, return_speed_fpm, fixed_min = 0.05, eff_min_per_hr = 50 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (Number(eff_min_per_hr) > 60) return { error: "Working minutes per hour cannot exceed 60." };
   const blade = Number(blade_cap_lcy);
   const push = Number(push_dist_ft);
   const pushSpeed = Number(push_speed_fpm);
@@ -454,6 +457,7 @@ EARTHWORK_RENDERERS["ripper-production"] = _v820renderRipperProduction;
 //  the dry and water weights M and the water gallons a volume L^3.)
 export function computeWaterForCompaction({ volume_bcy, dry_density_pcf, omc_pct, field_pct } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (field_pct === null || field_pct === "" || omc_pct === null || omc_pct === "") return { error: "Enter both the optimum and the field moisture content (%)." };
   // Unit / range guard added 2026-09-26 after printed-example probing.
   if (Number(arguments[0]?.omc_pct) > 0 && Number(arguments[0]?.omc_pct) < 1) return { error: "Enter moisture contents as percents (12 for 12%), not fractions." }; if (Number(arguments[0]?.field_pct) > 100 || Number(arguments[0]?.omc_pct) > 100) return { error: "A moisture content over 100% is not a soil at optimum; check the value." };
   const vol = Number(volume_bcy);
@@ -491,7 +495,7 @@ function _v821renderWaterForCompaction(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const r = computeWaterForCompaction({
       volume_bcy: Number(vol.input.value) || 0, dry_density_pcf: Number(dd.input.value) || 0,
-      omc_pct: omc.input.value === "" ? 0 : Number(omc.input.value), field_pct: field.input.value === "" ? 0 : Number(field.input.value),
+      omc_pct: omc.input.value === "" ? NaN : Number(omc.input.value), field_pct: field.input.value === "" ? NaN : Number(field.input.value),
     });
     if (r.error) { oWater.textContent = r.error; oDry.textContent = "-"; return; }
     if (r.needs_drying) {
@@ -514,6 +518,7 @@ EARTHWORK_RENDERERS["water-for-compaction"] = _v821renderWaterForCompaction;
 //  figures are a mass M, with the per-acre-year implicit on the rate.)
 export function computeRusleSoilLoss({ r_factor, k_factor, ls_factor, c_factor, p_factor, acres } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (c_factor === null || c_factor === "" || p_factor === null || p_factor === "") return { error: "Enter the cover (C) and practice (P) factors; bare soil with no practice is 1 and 1." };
   const R = Number(r_factor);
   const K = Number(k_factor);
   const LS = Number(ls_factor);
@@ -550,7 +555,7 @@ function _v822renderRusleSoilLoss(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const res = computeRusleSoilLoss({
       r_factor: Number(r.input.value) || 0, k_factor: Number(k.input.value) || 0, ls_factor: Number(ls.input.value) || 0,
-      c_factor: c.input.value === "" ? 0 : Number(c.input.value), p_factor: p.input.value === "" ? 0 : Number(p.input.value),
+      c_factor: c.input.value === "" ? NaN : Number(c.input.value), p_factor: p.input.value === "" ? NaN : Number(p.input.value),
       acres: Number(ac.input.value) || 0,
     });
     if (res.error) { oA.textContent = res.error; oSite.textContent = "-"; return; }
@@ -578,6 +583,7 @@ export function computeRiprapD50({ velocity_fps, specific_gravity = 2.65, turbul
   if (!Number.isFinite(C) || C <= 0) return { error: "Turbulence coefficient must be a positive finite number." };
   if (!Number.isFinite(SF) || SF <= 0) return { error: "Safety factor must be a positive finite number." };
   if (!Number.isFinite(Ss) || Ss <= 1) return { error: "Specific gravity must be greater than 1 (stone denser than water)." };
+  if (Ss > 4) return { error: "Enter the stone's specific gravity (about 2.65), not its unit weight in pcf." };
   const d50_ft = (SF * V * V) / (2 * 32.2 * C * C * (Ss - 1));
   const d50_in = d50_ft * 12;
   if (![d50_ft, d50_in].every(Number.isFinite)) return { error: "Stone-size math is not a finite value." };
@@ -1014,8 +1020,8 @@ function _v831renderPipeFlotation(inputRegion, outputRegion, citationEl) {
   const oReq = makeOutputLine(outputRegion, "Backfill to meet the target (FS on the whole uplift; FS on the backfill only, as WSSC C-4)", "pf-out-req");
   const update = debounce(() => {
     const r = computePipeFlotation({
-      pipe_od_in: od.input.value === "" ? 48 : Number(od.input.value), pipe_weight_plf: pw.input.value === "" ? 200 : Number(pw.input.value),
-      backfill_weight_plf: bw.input.value === "" ? 900 : Number(bw.input.value), target_fs: tf.input.value === "" ? 1.5 : Number(tf.input.value),
+      pipe_od_in: od.input.value === "" ? NaN : Number(od.input.value), pipe_weight_plf: pw.input.value === "" ? NaN : Number(pw.input.value),
+      backfill_weight_plf: bw.input.value === "" ? NaN : Number(bw.input.value), target_fs: tf.input.value === "" ? 1.5 : Number(tf.input.value),
       water_unit_wt_pcf: uw.input.value === "" ? 62.4 : Number(uw.input.value),
     });
     if (r.error) { oFs.textContent = r.error; oUplift.textContent = "-"; oReq.textContent = "-"; return; }
@@ -1072,8 +1078,8 @@ function _v832renderRestrainedPipeLength(inputRegion, outputRegion, citationEl) 
   const oThrust = makeOutputLine(outputRegion, "Thrust at the bend", "rpl-out-thrust");
   const update = debounce(() => {
     const r = computeRestrainedPipeLength({
-      pipe_od_in: od.input.value === "" ? 12 : Number(od.input.value), pressure_psi: p.input.value === "" ? 150 : Number(p.input.value),
-      bend_angle_deg: ba.input.value === "" ? 90 : Number(ba.input.value), unit_resistance_plf: ur.input.value === "" ? 600 : Number(ur.input.value),
+      pipe_od_in: od.input.value === "" ? NaN : Number(od.input.value), pressure_psi: p.input.value === "" ? NaN : Number(p.input.value),
+      bend_angle_deg: ba.input.value === "" ? 90 : Number(ba.input.value), unit_resistance_plf: ur.input.value === "" ? NaN : Number(ur.input.value),
       safety_factor: sfx.input.value === "" ? 1.5 : Number(sfx.input.value),
     });
     if (r.error) { oLen.textContent = r.error; oThrust.textContent = "-"; return; }
@@ -1156,7 +1162,7 @@ function _v833renderHddPullback(inputRegion, outputRegion, citationEl) {
   const oGov = makeOutputLine(outputRegion, "Governing limit", "hdd-out-gov");
   const update = debounce(() => {
     const r = computeHddPullback({
-      eff_weight_plf: ew.input.value === "" ? 5 : Number(ew.input.value), length_ft: ln.input.value === "" ? 800 : Number(ln.input.value),
+      eff_weight_plf: ew.input.value === "" ? NaN : Number(ew.input.value), length_ft: ln.input.value === "" ? NaN : Number(ln.input.value),
       friction_coeff: fc.input.value === "" ? 0.3 : Number(fc.input.value), bend_factor: bf.input.value === "" ? 1.5 : Number(bf.input.value),
       total_bend_deg: tb.input.value === "" ? 0 : Number(tb.input.value),
       fluid_drag_lb: fd.input.value === "" ? 0 : Number(fd.input.value), pipe_safe_pull_lb: sp.input.value === "" ? 0 : Number(sp.input.value),
@@ -1476,9 +1482,9 @@ function _v848renderFlexiblePipeDeflection(inputRegion, outputRegion, citationEl
   const oLoad = makeOutputLine(outputRegion, "Soil load on the pipe", "fpd-out-load");
   const update = debounce(() => {
     const r = computeFlexiblePipeDeflection({
-      cover_ft: c.input.value === "" ? 12 : Number(c.input.value), soil_density_pcf: d.input.value === "" ? 120 : Number(d.input.value),
+      cover_ft: c.input.value === "" ? NaN : Number(c.input.value), soil_density_pcf: d.input.value === "" ? 120 : Number(d.input.value),
       deflection_lag: dl.input.value === "" ? 1.5 : Number(dl.input.value), bedding_constant: k.input.value === "" ? 0.1 : Number(k.input.value),
-      pipe_stiffness_psi: ps.input.value === "" ? 46 : Number(ps.input.value), soil_modulus_psi: em.input.value === "" ? 1000 : Number(em.input.value),
+      pipe_stiffness_psi: ps.input.value === "" ? NaN : Number(ps.input.value), soil_modulus_psi: em.input.value === "" ? NaN : Number(em.input.value),
       allowable_pct: al.input.value === "" ? 5 : Number(al.input.value),
     });
     if (r.error) { oDefl.textContent = r.error; oLoad.textContent = "-"; return; }

@@ -11647,7 +11647,7 @@ export const CITATIONS = {
     ],
   },
   "pipe-miter-cut": {
-    formula: "For an n-piece miter turning total angle A: n-1 cuts (welds); cut angle theta = A/(2*(n-1)) from square; cutback = OD * tan(theta). End pieces are half-gores.",
+    formula: "For an n-piece miter turning total angle A: n-1 cuts (welds); cut angle theta = A/(2*(n-1)) from square; cutback = OD * tan(theta). End pieces are half-gores. With a centerline radius R each middle gore is a straight piece 2 R tan(theta) long on the centerline, 2 (R + OD/2) tan(theta) on the heel and 2 (R - OD/2) tan(theta) on the throat.",
     edition: "Multi-piece (lobster-back) miter-elbow geometry - the per-cut miter angle A/(2*(n-1)) and the OD*tan(theta) cutback - as taught in NCCER Pipefitting and the standard fabrication references, by name; first-principles geometry.",
     freeAccess: "Public first-principles geometry. The welding procedure, the bevel, and the engineer of record govern the fabricated fitting.",
     governance: GOVERNANCE.general,

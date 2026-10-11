@@ -48000,19 +48000,22 @@ test("bounds: spec-v1680 cut -- pipe-miter-cut gains the throat and heel, angles
   assert.ok(Math.abs(five.gore_turn_deg - 22.5) < 1e-12);
   assert.ok(Math.abs(five.miter_angle_deg - 11.25) < 1e-12);
   // With a radius, the throat and heel bracket the centreline, and their
-  // difference is exactly the diameter through the turn.
+  // difference is exactly the two cutbacks. (Until 2026-10-11 these were ARC lengths --
+  // 14.137 / 19.144 / 9.130 -- but a gore is a straight piece cut at theta on both ends, so its
+  // sides are tangent lengths 2 (R +/- OD/2) tan(theta); the arc figures cut each gore 5% short.)
   const withR = _v1680host({ ...base, centerline_radius_in: 18 });
-  assert.ok(Math.abs(withR.gore_centerline_in - 14.1371669) < 1e-6);
-  assert.ok(Math.abs(withR.heel_length_in - 19.1440802) < 1e-6);
-  assert.ok(Math.abs(withR.throat_length_in - 9.13025365) < 1e-6);
+  assert.ok(Math.abs(withR.gore_centerline_in - 14.9116882) < 1e-6);
+  assert.ok(Math.abs(withR.heel_length_in - 20.1929112) < 1e-6);
+  assert.ok(Math.abs(withR.throat_length_in - 9.6304653) < 1e-6);
   assert.ok(withR.throat_length_in < withR.gore_centerline_in);
   assert.ok(withR.heel_length_in > withR.gore_centerline_in);
-  assert.ok(Math.abs(withR.heel_length_in - withR.throat_length_in - base.outside_diameter_in * withR.gore_turn_deg * Math.PI / 180) < 1e-9);
+  assert.ok(Math.abs(withR.heel_length_in - withR.throat_length_in - 2 * withR.cutback_in) < 1e-9);
   // The centreline is exactly the mean of the two.
   assert.ok(Math.abs((withR.heel_length_in + withR.throat_length_in) / 2 - withR.gore_centerline_in) < 1e-9);
-  // End gores are half of each, and the whole elbow develops to the full arc.
+  // End gores are half of each, and the whole elbow develops to the straight pieces laid end
+  // to end: the tangent polygon around the arc, a little longer than the arc itself.
   assert.ok(Math.abs(withR.end_gore_centerline_in - withR.gore_centerline_in / 2) < 1e-12);
-  assert.ok(Math.abs(withR.developed_centerline_in - 18 * Math.PI / 2) < 1e-9);
+  assert.ok(withR.developed_centerline_in > 18 * Math.PI / 2);
   assert.ok(Math.abs(withR.developed_centerline_in - withR.gore_centerline_in * withR.n_welds) < 1e-9);
   // A radius shorter than the pipe's own half-diameter has no throat left.
   const tightBend = _v1680host({ ...base, centerline_radius_in: 4 });
@@ -60757,4 +60760,49 @@ test("hardening slice 17 (kitchen, real estate, accounting)", async () => {
   assert.equal(be.loss_at_target, 14000);
   const it = AC.computeInventoryTurnover({ cogs: 500000, beginning_inventory: 250000, ending_inventory: 250000, period_days: 91.25, industry_key: "retail_general" });
   assert.ok(Math.abs(it.comparison.delta - (8 - it.comparison.industry_aggregate)) < 1e-9);
+});
+
+test("hardening slice 18 (trucking, fabrication, earthwork)", async () => {
+  const T = await import("../../calc-trucking.js");
+  const F = await import("../../calc-fab.js");
+  const E = await import("../../calc-earthwork.js");
+  // freight class at an exact cutoff
+  assert.equal(T.computeFreightDensity({ length_in: 48, width_in: 40, height_in: 30, weight_lb: 1000 }).density_class, T.computeFreightDensity({ length_in: 12, width_in: 12, height_in: 12, weight_lb: 30 }).density_class);
+  assert.ok(T.computeTrailerTongueWeight({ trailer_gross_weight_lb: 10000, tongue_weight_lb: 2000, hitch_type: "fifth_wheel" }).error);
+  assert.ok(T.computeDIM({ length_in: 12, width_in: 12, height_in: 12, actual_weight_lb: 5, carrier: "toString" }).error);
+  assert.ok(T.computeBridgeFormula({ axle_weights_lb: [-10000, 30000], axle_spacings_ft: [10] }).error);
+  assert.ok(T.computeBridgeFormula({ axle_weights_lb: [10000, 10000], axle_spacings_ft: [-30] }).error);
+  assert.ok(T.computeReeferBurn({ ambient_band: "HOT" }).error);
+  assert.equal(T.computeReeferBurn({ tank_gal: 7.8, haul_hr: 10, ambient_band: "hot" }).refuel_required, T.computeReeferBurn({ tank_gal: 6.5, haul_hr: 10 }).refuel_required);
+  // a slide that only moves the overweight to the other group says so
+  const ax = T.computeAxleLoadDistribution({ drive_lb: 34100, trailer_lb: 33800, kingpin_to_tandem_in: 400, hole_spacing_in: 6, tandem_cap: 34000 });
+  assert.equal(ax.fixes_both, false);
+  assert.match(ax.note, /DOES NOT MAKE THE LOAD LEGAL/);
+  // hours of service: the weekly limit and a break the window does not outlast
+  const wk = T.computeHOS({ profile: "property_70_8", events: [{ kind: "drive", hours: 2 }], weekly_on_duty_used_hr: 70, current_time_iso: "2026-10-11T12:00:00Z" });
+  assert.match(wk.next_drive_reason, /weekly limit/);
+  const brk = T.computeHOS({ profile: "property_70_8", events: [{ kind: "on_duty", hours: 5.7 }, { kind: "drive", hours: 8 }], current_time_iso: "2026-10-11T12:00:00Z" });
+  assert.match(brk.next_drive_reason, /10-hour reset/);
+  assert.ok(T.computeHOS({ events: [null] }).error);
+  // pallets: a layout that exists, and a pallet that fits under the roof
+  const base = { case_length_in: 12, case_width_in: 12, case_height_in: 12, case_weight_lb: 1, cases_per_pallet: 1, trailer: "dry_van_53" };
+  assert.equal(T.computePalletLoadout({ ...base, pallet_length_in: 60, pallet_width_in: 30, pinwheel: true }).pallets_by_floor, 31);
+  assert.ok(T.computePalletLoadout({ ...base, pallet_height_in: 120 }).error);
+  // fabrication
+  assert.ok(F.computeWeldMetalVolume({ joint_type: "bevel", fillet_leg_in: 0.25, groove_area_in2: 0.5, length_in: 100 }).error);
+  const m = F.computePipeMiterCut({ total_angle_deg: 90, pieces: 3, outside_diameter_in: 12.75, centerline_radius_in: 18 });
+  assert.ok(Math.abs(m.heel_length_in - m.throat_length_in - 2 * m.cutback_in) < 1e-9, "a gore's two sides differ by both cutbacks");
+  assert.ok(Math.abs(m.gore_centerline_in - 2 * 18 * Math.tan(22.5 * Math.PI / 180)) < 1e-9);
+  const sf = F.computeShrinkFit({ nominal_dia_in: 1, interference_in: 0.004, clearance_in: 0.002 });
+  assert.equal(sf.chill_to_f, null);
+  assert.match(sf.note, /^CHILLING ALONE CANNOT/);
+  assert.equal(F.computeConduitSaddle({ mode: "four-point", depth_in: 2, width_in: 6, preset: "60/30" }).center_bend_deg, 30);
+  assert.ok(F.computeConduitSaddle({ mode: "4pt", depth_in: 2 }).error);
+  assert.ok(F.computeSheetMetalGauge({ gauge: 16.5, material: "steel" }).error);
+  assert.ok(F.computeBarNesting({ cut_list: "62,4,38,6", stock_length_in: 240 }).error);
+  // earthwork
+  assert.ok(E.computeWaterForCompaction({ volume_bcy: 100, dry_density_pcf: 105, omc_pct: 14, field_pct: "" }).error);
+  assert.ok(E.computeRusleSoilLoss({ r_factor: 100, k_factor: 0.3, ls_factor: 1, c_factor: null, p_factor: 1, acres: 1 }).error);
+  assert.ok(E.computeRiprapD50({ velocity_fps: 8, specific_gravity: 165 }).error);
+  assert.ok(E.computeHaulCycleProduction({ truck_cap_lcy: 12, load_min: 2, haul_min: 5, return_min: 4, eff_min_per_hr: 500 }).error);
 });

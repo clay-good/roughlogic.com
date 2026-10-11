@@ -60,7 +60,7 @@ export const DIM_DIVISORS = {
 //  break-even cube and current cube are volumes `L^3`.)
 export function computeDIM({ length_in = 0, width_in = 0, height_in = 0, actual_weight_lb = 0, carrier = "UPS_Daily" }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
-  const c = DIM_DIVISORS[carrier];
+  const c = Object.hasOwn(DIM_DIVISORS, carrier) ? DIM_DIVISORS[carrier] : null;
   if (!c) return { error: "Unknown carrier." };
   if (!(length_in > 0 && width_in > 0 && height_in > 0)) return { error: "Dimensions must be positive." };
   if (!(actual_weight_lb >= 0)) return { error: "Actual weight must be non-negative." };
@@ -123,10 +123,12 @@ export function computeFreightDensity({ length_in = 0, width_in = 0, height_in =
   if (!(length_in > 0 && width_in > 0 && height_in > 0)) return { error: "Dimensions must be positive." };
   if (!(weight_lb > 0)) return { error: "Weight must be positive." };
   const cubic_ft = (length_in * width_in * height_in) / 1728;
-  const density_pcf = weight_lb / cubic_ft;
+  // Multiply before dividing and allow float slack: 48 x 40 x 30 in at 1,000 lb is exactly
+  // 30 pcf, but weight / (volume / 1728) gave 29.999999999999996 and the next (costlier) class.
+  const density_pcf = weight_lb * 1728 / (length_in * width_in * height_in);
   let bracket = NMFC_DENSITY_BRACKETS[NMFC_DENSITY_BRACKETS.length - 1];
   for (const b of NMFC_DENSITY_BRACKETS) {
-    if (density_pcf >= b.min_pcf) { bracket = b; break; }
+    if (density_pcf >= b.min_pcf - 1e-9 * b.min_pcf) { bracket = b; break; }
   }
   return { density_pcf, cubic_ft, density_class: bracket.class };
 }
@@ -175,6 +177,7 @@ export function computePalletLoadout({
   // "Infinity" (a degenerate-input render leak invisible to the numeric-field
   // contract sweep because the field is String()-formatted).
   if (!(pallet_length_in > 0 && pallet_width_in > 0 && pallet_height_in > 0)) return { error: "Pallet dimensions must be positive." };
+  if (pallet_height_in > tr.H) return { error: "A " + pallet_height_in + " in pallet does not fit under the " + tr.H + " in interior height of this trailer." };
 
   // Floor-area pallets: lay 48x40 the long way, then pinwheel the second
   // row 40x48 if allowed.
@@ -184,10 +187,15 @@ export function computePalletLoadout({
   let pinwheelTotal = aligned;
   if (pinwheel) {
     // Approximate pinwheel layout: alternate orientations every row.
-    const rows = Math.floor(tr.W / 48 + 1e-9);
-    const altPalletsByWidth = Math.floor(tr.W / pallet_length_in + 1e-9);
-    pinwheelTotal = palletsByLength * Math.max(palletsByWidth, altPalletsByWidth);
-    pinwheelTotal = Math.min(pinwheelTotal, Math.floor((tr.L * tr.W) / (pallet_length_in * pallet_width_in) + 1e-9));
+    // Lanes down the trailer, each in one orientation: a lanes straight (pallet width across) and
+    // b lanes turned (pallet length across), the best mix that fits the width. Until 2026-10-11 this
+    // multiplied the row count of one orientation by the lane count of the other, a layout that
+    // does not exist (a 30 x 60 pallet read 35 in a 53 ft van where 31 fit).
+    const turnedByLength = Math.floor(tr.L / pallet_width_in + 1e-9);
+    for (let a = 0; a <= palletsByWidth; a++) {
+      const b = Math.max(0, Math.floor((tr.W - a * pallet_width_in) / pallet_length_in + 1e-9));
+      pinwheelTotal = Math.max(pinwheelTotal, a * palletsByLength + b * turnedByLength);
+    }
   }
   const pallets_by_floor = pinwheel ? pinwheelTotal : aligned;
 
@@ -260,6 +268,8 @@ export const HOS_PROFILES = {
 //  / break-taken flags and the next-step reason text.)
 export function computeHOS({ profile = "property_70_8", events = [], weekly_on_duty_used_hr = 0, current_time_iso = null }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(Number(weekly_on_duty_used_hr) >= 0) || typeof weekly_on_duty_used_hr !== "number") return { error: "Weekly on-duty hours already used must be a number, zero or more." };
+  if (Array.isArray(events) && events.some((e) => !e || typeof e !== "object")) return { error: "Each event needs a kind and hours." };
   const p = HOS_PROFILES[profile];
   if (!p) return { error: "Unknown HOS profile." };
   if (!Array.isArray(events)) return { error: "Events must be a list." };
@@ -301,6 +311,8 @@ export function computeHOS({ profile = "property_70_8", events = [], weekly_on_d
   const drive_remaining = Math.max(0, p.drive_max - drive_used);
   const on_duty_remaining = Math.max(0, p.on_duty_window - window_elapsed);
   const weekly_remaining = Math.max(0, p.weekly_max - (weekly_on_duty_used_hr + weekly_on_duty));
+  // 395.3(b) / 395.5(b): no driving after the 60 or 70 on-duty hours are used.
+  const weekly_exhausted = weekly_remaining <= 1e-9;
   const needs_break_at_8_hours = p.break_required && cumulative_drive_since_break >= 8;
   // v8 §C.5: when current_time_iso is supplied, derive the next legal
   // drive-start timestamp. Driver may resume after a 30-minute break (if
@@ -311,7 +323,13 @@ export function computeHOS({ profile = "property_70_8", events = [], weekly_on_d
   if (current_time_iso) {
     const t = new Date(current_time_iso);
     if (Number.isNaN(t.getTime())) return { error: "current_time_iso must be a valid ISO date string." };
-    if (drive_remaining <= 0 || on_duty_remaining <= 0) {
+    if (weekly_exhausted) {
+      // Hours roll back on as old days drop off; the 34-hour restart is the route that does not need the log.
+      const next = new Date(t.getTime() + 34 * 3600 * 1000);
+      next_drive_start_iso = p.window_is_clock ? next.toISOString() : null;
+      next_drive_reason = p.weekly_max + "-hour weekly limit reached: no driving until hours drop off the " + p.weekly_window_days + "-day period" + (p.window_is_clock ? " or a 34-hour restart" : "");
+    } else if (drive_remaining <= 0 || on_duty_remaining <= 0 || (needs_break_at_8_hours && on_duty_remaining < 0.5 - 1e-9)) {
+      // (A 30-minute break that the duty window does not outlast leaves nothing to drive in.)
       // The profile's off-duty reset.
       const next = new Date(t.getTime() + p.off_duty_reset_hr * 3600 * 1000);
       next_drive_start_iso = next.toISOString();
@@ -385,6 +403,9 @@ export function computeBridgeFormula({ axle_weights_lb = [], axle_spacings_ft = 
   // emitted NaN into the bridge_violations string. Use the coerced copies.
   const weights = axle_weights_lb.map((w) => Number(w) || 0);
   const spacings = axle_spacings_ft.map((s) => Number(s) || 0);
+  // A negative axle offset the group it sat in, and a negative spacing gave a 0 lb formula maximum.
+  if (weights.some((w) => !(w > 0) || !Number.isFinite(w))) return { error: "Each axle weight must be a positive number (lb)." };
+  if (spacings.some((s) => !(s > 0) || !Number.isFinite(s))) return { error: "Each axle spacing must be a positive number (ft)." };
   const total = weights.reduce((a, b) => a + b, 0);
   // Per-axle flags
   const single_max = 20000;
@@ -496,6 +517,7 @@ export function computeReeferBurn({ unit = "thermo_king_continuous", tank_gal = 
   if (!u) return { error: "Unknown reefer unit." };
   if (!(tank_gal > 0)) return { error: "Tank must be positive." };
   if (!(haul_hr > 0)) return { error: "Haul hours must be positive." };
+  if (!["hot", "moderate", "cold"].includes(ambient_band)) return { error: "Ambient band must be hot, moderate or cold." };
   const ambient_factor = ambient_band === "hot" ? 1.20 : (ambient_band === "cold" ? 0.85 : 1.00);
   const gph = u.gph * ambient_factor;
   const fuel_burned = gph * haul_hr;
@@ -514,7 +536,7 @@ export function computeReeferBurn({ unit = "thermo_king_continuous", tank_gal = 
   }
   return {
     gph, fuel_burned, run_time_hr,
-    refuel_required: fuel_burned_effective > tank_gal,
+    refuel_required: fuel_burned_effective > tank_gal + 1e-9 * tank_gal,
     haul_hr_effective, fuel_burned_effective, reserve_gal,
     attribution: u.attribution,
   };
@@ -1202,7 +1224,8 @@ export function computeCargoSecurementWLL({ cargo_weight_lb = 0, tiedown_count =
   if (!(len > 0 && Number.isFinite(len))) return { error: "Cargo length must be positive (ft)." };
   // 393.106(d): full WLL only for a tiedown over the cargo to the other side; half for a
   // direct or same-side tiedown. (Until 2026-09-24 every tiedown counted in full.)
-  const credit = { over_other_side: 1, direct: 0.5, same_side: 0.5 }[tiedown_path];
+  const _credits = { over_other_side: 1, direct: 0.5, same_side: 0.5 };
+  const credit = Object.hasOwn(_credits, tiedown_path) ? _credits[tiedown_path] : undefined;
   if (credit === undefined) return { error: "Tiedown path must be over_other_side, direct, or same_side." };
   const aggregate_wll_lb = n * wll * credit;
   const required_wll_lb = 0.5 * W;
@@ -1432,7 +1455,8 @@ export function computeAxleLoadDistribution({ drive_lb = 0, trailer_lb = 0, king
     projected_drive_lb: Number.isFinite(driveNew) ? driveNew : null,
     projected_trailer_lb: Number.isFinite(trailerNew) ? trailerNew : null,
     fixes_both: Number.isFinite(driveNew) && Number.isFinite(trailerNew) && driveNew <= cap && trailerNew <= cap,
-    note: (grossOver ? "Both groups average over cap - sliding cannot fix an over-gross load. " : "")
+    note: (grossOver ? "Both groups average over cap - sliding cannot fix an over-gross load. "
+      : holes > 0 && !(driveNew <= cap && trailerNew <= cap) ? "THIS SLIDE DOES NOT MAKE THE LOAD LEGAL: one hole is " + Math.round(shiftPerHole) + " lb, more than the room left on the other group, so the move puts " + (driveNew > cap ? "the drives" : "the trailer tandems") + " about " + Math.round(Math.max(driveNew, trailerNew) - cap) + " lb over. Shift or remove cargo instead. " : "")
       + "Sliding redistributes between drive and trailer groups only. The steer limit is set by the fifth-wheel position, not the tandem slide. Bridge-formula spacing may bind before the cap.",
   };
 }
@@ -1828,6 +1852,7 @@ export function computeTrailerTongueWeight({ trailer_gross_weight_lb = 0, tongue
   if (!(tongue > 0)) return { error: "Tongue weight must be positive (lb)." };
   if (!(tongue < gross)) return { error: "Tongue weight must be less than the trailer gross weight (the tongue carries a fraction of the load)." };
   if (!(rating >= 0)) return { error: "Hitch rating must be zero or positive (lb)." };
+  if (hitch_type !== "gooseneck" && hitch_type !== "conventional") return { error: "Hitch type must be conventional or gooseneck (a fifth wheel uses the gooseneck band)." };
   const band = hitch_type === "gooseneck" ? { low: 15, high: 25, label: "gooseneck / fifth wheel" } : { low: 10, high: 15, label: "conventional (bumper-pull)" };
   const tongue_pct = tongue / gross * 100;
   const target_low_lb = gross * band.low / 100;
