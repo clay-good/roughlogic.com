@@ -220,7 +220,7 @@ export const BESPOKE_OUTPUT_LABELS = {
   "copper-resistance": {"resistance_ohm":"Resistance","resistance_ohm_per_kft":"Per 1000 ft"},
   "cost-of-waiting": {"monthly_pi_now":"Monthly P&I at current rate","monthly_pi_future":"Monthly P&I at future rate","monthly_delta":"Monthly delta","total_interest_delta":"Lifetime interest delta","rate_delta_pct":"Rate delta (pp)"},
   "cost-per-mile": {"total_cpm":"Total cost per mile","note":"Note"},
-  "countersink-depth": {"z_in":"Plunge depth below surface","z_full_in":"Theoretical full-cone travel","note":"Note"},
+  "countersink-depth": {"z_in":"Depth of the countersink cone (pilot edge to surface)","z_full_in":"Theoretical full-cone travel","note":"Note"},
   "countersink-diameter-from-depth": {"countersink_dia_in":"Finished countersink diameter D_cs","cone_dia_in":"Cone diameter from the plunge alone","note":"Note"},
   "crane-ground-bearing": {"gbp_psf":"Ground bearing pressure","verdict":"Verdict","required_ft2":"Area required to pass","mat_side_ft":"Square mat side"},
   "crane-lift-quick": {"gross_load_lb":"Gross load","per_leg_lb":"Per-leg sling tension","percent_of_chart":"Percent of chart","flag":"Flag"},

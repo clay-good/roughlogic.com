@@ -222,6 +222,7 @@ MACHINING_RENDERERS["cutting-diameter-for-rpm"] = renderCuttingDiameterForRpm;
 // dims: in { brix_reading: dimensionless, refractometer_factor: dimensionless, sump_volume_gal: L^3, target_pct: dimensionless } out: { current_pct: dimensionless, add_gal: L^3 }
 export function computeCuttingFluidConcentration({ brix_reading = 0, refractometer_factor = 0, sump_volume_gal = 0, target_pct = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (Number(brix_reading) * Number(refractometer_factor) > 100) return { error: "Brix x refractometer factor is over 100%; check the reading and the factor." };
   if (brix_reading < 0) return { error: "Brix reading must be non-negative." };
   if (!(refractometer_factor > 0)) return { error: "Refractometer factor must be positive." };
   if (!(sump_volume_gal > 0)) return { error: "Sump volume must be positive." };
@@ -561,6 +562,7 @@ MACHINING_RENDERERS["ballnose-scallop-height"] = renderBallnoseScallopHeight;
 // dims: in { diametral_pitch: dimensionless, teeth: dimensionless, mating_teeth: dimensionless } out: { pitch_dia_in: L, outside_dia_in: L, addendum_in: L, dedendum_in: L, whole_depth_in: L, root_dia_in: L, center_dist_in: L }
 export function computeSpurGearGeometry({ diametral_pitch = 0, teeth = 0, mating_teeth = 0 } = {}) {
   const _g = _finiteGuard({ diametral_pitch, teeth, mating_teeth }); if (_g) return _g;
+  if (!Number.isInteger(Number(teeth)) || Number(teeth) < 5 || (Number(mating_teeth) !== 0 && (!Number.isInteger(Number(mating_teeth)) || Number(mating_teeth) < 5))) return { error: "Tooth counts are whole numbers of 5 or more." };
   const pd = Number(diametral_pitch) || 0;
   const n = Number(teeth) || 0;
   const nm = Number(mating_teeth) || 0;
@@ -892,7 +894,9 @@ export function computeBearingEquivalentLoad({ radial_load_lbf = 0, thrust_load_
   const thrust_governs = Fa / Fr > e;
   const x_factor = thrust_governs ? 0.56 : 1;
   const y_factor = thrust_governs ? Y : 0;
-  const equivalent_load_lbf = x_factor * Fr + y_factor * Fa;
+  // Adding thrust never lowers the equivalent load: just above e, 0.56 Fr + Y Fa dips a fraction
+  // under Fr on some rows, so P is floored at the radial load.
+  const equivalent_load_lbf = Math.max(Fr, x_factor * Fr + y_factor * Fa);
   if (![e, Y, equivalent_load_lbf].every(Number.isFinite) || !(equivalent_load_lbf > 0)) return { error: "Equivalent-load math is not a finite value." };
   return {
     equivalent_load_lbf, e_ratio: e, x_factor, y_factor, thrust_governs, fa_over_fr: Fa / Fr,
@@ -1033,7 +1037,9 @@ export function computeEnduranceLimitMarin({ ultimate_strength_psi = 0, surface_
   if (!(kd > 0)) return { error: "Temperature factor kd must be positive." };
   const Sut_ksi = Sut / 1000;
   const uncorrected_se_psi = Sut_ksi <= 200 ? 0.5 * Sut : 100000; // steel rotating-beam limit, capped at 100 ksi
-  const ka = surf.a * Math.pow(Sut_ksi, surf.b);
+  // A surface factor cannot exceed 1: the curve fit does at low strength (hot-rolled under about
+  // 40 ksi), which used to put Se above the polished-specimen Se'.
+  const ka = Math.min(1, surf.a * Math.pow(Sut_ksi, surf.b));
   let kb;
   if (load_type === "axial") {
     kb = 1; // size factor does not apply to axial loading
@@ -1945,7 +1951,7 @@ function renderCountersinkDepth(inputRegion, outputRegion, citationEl) {
   const hole = makeNumber("Pilot / through-hole diameter (in)", "csd-hole", { step: "any", min: "0" });
   for (const f of [d, ang, hole]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { d.input.value = "0.5"; ang.select.value = "82"; hole.input.value = "0.25"; update(); });
-  const oZ = makeOutputLine(outputRegion, "Plunge depth below surface", "csd-out-z");
+  const oZ = makeOutputLine(outputRegion, "Depth of the countersink cone (pilot edge to surface)", "csd-out-z");
   const oZf = makeOutputLine(outputRegion, "Theoretical full-cone travel", "csd-out-zf");
   const oNote = makeOutputLine(outputRegion, "Note", "csd-out-n");
   function readNum(i) { if (i.value === "") return 0; const v = Number(i.value); return Number.isFinite(v) ? v : 0; }

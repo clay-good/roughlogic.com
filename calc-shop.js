@@ -54,6 +54,8 @@ export const SHOP_RENDERERS = {};
 // dims: in { cut_length_in: L, rpm: T^-1, feed_ipr_in: L, feed_ipm_in: L T^-1, passes: dimensionless } out: { feed_ipm: L T^-1, time_min: T, time_s: T, total_min: T }
 export function computeMachiningTime({ feed_mode = "rpm-ipr", cut_length_in = 0, rpm = 0, feed_ipr_in = 0, feed_ipm_in = 0, passes = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (feed_mode !== "rpm-ipr" && feed_mode !== "direct") return { error: "Feed mode must be rpm-ipr or direct." };
+  if (!Number.isInteger(Number(passes))) return { error: "Passes is a whole number." };
   const L = Number(cut_length_in) || 0;
   if (!(L > 0)) return { error: "Cut length must be positive (in)." };
   const n = Math.round(Number(passes));
@@ -117,6 +119,7 @@ SHOP_RENDERERS["machining-time"] = _v40renderMachiningTime;
 // dims: in { mode: dimensionless, woc_in: L, doc_in: L, feed_ipm_in: L T^-1, sfm: L T^-1, feed_ipr_in: L, drill_dia_in: L } out: { mrr_in3: L^3 T^-1, mrr_cm3: L^3 T^-1 }
 export function computeMaterialRemovalRate({ mode = "milling", woc_in = 0, doc_in = 0, feed_ipm_in = 0, sfm = 0, feed_ipr_in = 0, drill_dia_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!["milling", "turning", "drilling"].includes(String(mode))) return { error: "Mode must be milling, turning or drilling." };
   const m = String(mode);
   let mrr_in3, formula;
   if (m === "turning") {
@@ -183,6 +186,9 @@ SHOP_RENDERERS["material-removal-rate"] = _v40renderMaterialRemovalRate;
 // dims: in { feed_ipr_in: L, nose_radius_in: L } out: { rt_in: L, ra_in: L }
 export function computeTurningSurfaceFinish({ feed_ipr_in = 0, nose_radius_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // The f^2 / (8 r) form approximates the scallop of an arc and holds only while the feed is well
+  // under the nose diameter; at f = 2r it already reads half the true height.
+  if (Number(nose_radius_in) > 0 && Number(feed_ipr_in) > Number(nose_radius_in)) return { error: "The feed is more than the nose radius: the finish is no longer set by the radius alone and this relation does not apply. Use a larger nose radius or a lighter feed." };
   const f = Number(feed_ipr_in) || 0, r = Number(nose_radius_in) || 0;
   if (!(f > 0)) return { error: "Feed per revolution must be positive (IPR)." };
   if (!(r > 0)) return { error: "Tool nose radius must be positive (in)." };
@@ -321,6 +327,7 @@ SHOP_RENDERERS["taper-calc"] = _v40renderTaperCalc;
 // dims: in { known_dia_in: L, known_end: dimensionless, taper_per_foot: dimensionless, length_in: L } out: { large_dia_in: L, small_dia_in: L, change_in: L, angle_per_side_deg: dimensionless, included_angle_deg: dimensionless }
 export function computeTaperDiameter({ known_dia_in = 0, known_end = "large", taper_per_foot = 0, length_in = 0 } = {}) {
   const _g = _finiteGuard({ known_dia_in, taper_per_foot, length_in }); if (_g) return _g;
+  if (known_end !== "large" && known_end !== "small") return { error: "Known end must be large or small." };
   const known = Number(known_dia_in) || 0;
   const tpf = Number(taper_per_foot) || 0;
   const L = Number(length_in) || 0;
@@ -486,6 +493,8 @@ SHOP_RENDERERS["tailstock-setover"] = _v805renderTailstockSetover;
 // dims: in { divisions: dimensionless, worm_ratio: dimensionless, circles: dimensionless, index_by: dimensionless, angle_deg: dimensionless } out: { full_turns: dimensionless }
 export function computeDividingHead({ divisions = 0, worm_ratio = 40, circles = "", index_by = "divisions", angle_deg = 0 } = {}) {
   const _g = _finiteGuard({ divisions, worm_ratio, angle_deg }); if (_g) return _g;
+  if (index_by !== "divisions" && index_by !== "angle") return { error: "Index by must be divisions or angle." };
+  if (index_by === "divisions" && !Number.isInteger(Number(divisions))) return { error: "Divisions is a whole number." };
   if (index_by !== "divisions" && index_by !== "angle") return { error: "Index by must be divisions or an angle." };
   const byAngle = index_by === "angle";
   const N = Math.round(Number(divisions) || 0);
@@ -520,7 +529,7 @@ export function computeDividingHead({ divisions = 0, worm_ratio = 40, circles = 
     const prod = remNumExact * H;
     const holesFloat = byAngle ? fraction * H : prod / N;
     const holesRounded = Math.round(holesFloat);
-    const isWhole = Math.abs(holesFloat - holesRounded) < (byAngle ? 1e-6 : 1e-9) && holesRounded >= 0;
+    const isWhole = Math.abs(holesFloat - holesRounded) < (byAngle ? 2e-3 : 1e-9) && holesRounded >= 0; // 2e-3 holes: an angle typed to four decimals (13.3333) still finds its circle
     settings.push({ circle: H, holes: isWhole ? holesRounded : null, whole: isWhole });
   }
   const usable = settings.filter((s) => s.whole);
@@ -583,6 +592,7 @@ const _WIRE_MAX_P = 1.010362;
 // dims: in { thread_standard: dimensionless, tpi: L^-1, pitch_mm: L, pitch_diameter_in: L, wire_dia_in: L } out: { best_wire_in: L, measurement_over_wires_in: L }
 export function computeThreadMeasureWire({ thread_standard = "inch", tpi = 0, pitch_mm = 0, pitch_diameter_in = 0, wire_dia_in = 0 } = {}) {
   const _g = _finiteGuard({ tpi, pitch_mm, pitch_diameter_in, wire_dia_in }); if (_g) return _g;
+  if (thread_standard !== "inch" && thread_standard !== "metric") return { error: "Thread standard must be inch or metric." };
   const isMetric = String(thread_standard) === "metric";
   let P_in;
   if (isMetric) {
@@ -649,6 +659,7 @@ SHOP_RENDERERS["thread-measure-wire"] = _v40renderThreadMeasureWire;
 // dims: in { thread_standard: dimensionless, tpi: L^-1, pitch_mm: L, measurement_over_wires_in: L, wire_dia_in: L } out: { pitch_diameter_in: L, best_wire_in: L, pitch_in: L }
 export function computeThreadPitchDiaFromWires({ thread_standard = "inch", tpi = 0, pitch_mm = 0, measurement_over_wires_in = 0, wire_dia_in = 0 } = {}) {
   const _g = _finiteGuard({ tpi, pitch_mm, measurement_over_wires_in, wire_dia_in }); if (_g) return _g;
+  if (thread_standard !== "inch" && thread_standard !== "metric") return { error: "Thread standard must be inch or metric." };
   const isMetric = String(thread_standard) === "metric";
   let P_in;
   if (isMetric) {
@@ -813,6 +824,7 @@ SHOP_RENDERERS["press-brake-max-thickness"] = _v724renderPressBrakeMaxThickness;
 // dims: in { shape: dimensionless, diameter_in: L, side_a_in: L, side_b_in: L, perimeter_in: L, thickness_in: L, shear_strength_psi: M L^-1 T^-2 } out: { perimeter_in: L, force_lb: dimensionless, force_tons: dimensionless }
 export function computePunchForce({ shape = "round", diameter_in = 0, side_a_in = 0, side_b_in = 0, perimeter_in = 0, thickness_in = 0, shear_strength_psi = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!["round", "rectangular", "perimeter"].includes(String(shape))) return { error: "Shape must be round, rectangular or perimeter." };
   const sh = String(shape);
   const T = Number(thickness_in) || 0, tau = Number(shear_strength_psi) || 0;
   if (!(T > 0)) return { error: "Material thickness must be positive (in)." };
@@ -1041,6 +1053,7 @@ const _V41_TAP_K = 76.98; // 60-degree percent-of-thread constant (1 / 0.012990)
 // dims: in { thread_standard: dimensionless, major_dia_in: L, tpi: L^-1, pitch_mm: L, thread_percent: dimensionless } out: { drill_dia_in: L, drill_dia_mm: L, nearest_64th_in: L, nearest_64th_percent: dimensionless }
 export function computeTapDrillSize({ thread_standard = "inch", major_dia_in = 0, tpi = 0, pitch_mm = 0, thread_percent = 75 } = {}) {
   const _g = _finiteGuard({ major_dia_in, tpi, pitch_mm, thread_percent }); if (_g) return _g;
+  if (thread_standard !== "inch" && thread_standard !== "metric") return { error: "Thread standard must be inch or metric." };
   const pct = Number(thread_percent) || 0;
   if (!(pct > 0) || pct > 100) return { error: "Target thread engagement must be between 0 and 100 percent." };
   const isMetric = String(thread_standard) === "metric";
@@ -1065,7 +1078,12 @@ export function computeTapDrillSize({ thread_standard = "inch", major_dia_in = 0
   const drill_dia_in = D_major_in - delta_in;
   if (!(drill_dia_in > 0)) return { error: "Computed drill diameter is not positive - lower the target thread percent or check the inputs." };
   // Nearest 1/64 in fraction (the named letter / number / fraction drill is a chart lookup).
-  const nearest_64th_in = Math.round(drill_dia_in * 64) / 64;
+  // The nearest 1/64, but never one that leaves more than a full thread (a hole under the minor
+  // diameter breaks taps): when rounding lands below the 100% size, the next 1/64 up is taken.
+  const full_thread_dia_in = D_major_in - 100 / (_V41_TAP_K * n_tpi);
+  const nearest_raw_in = Math.round(drill_dia_in * 64) / 64;
+  const nearest_64th_in = nearest_raw_in < full_thread_dia_in - 1e-9 ? Math.ceil(full_thread_dia_in * 64 - 1e-9) / 64 : nearest_raw_in;
+  if (!(nearest_64th_in < D_major_in)) return { error: "This thread is too small for a fractional (1/64 in) drill; use the number or metric drill nearest " + drill_dia_in.toFixed(4) + " in." };
   const nearest_64th_percent = _V41_TAP_K * (D_major_in - nearest_64th_in) * n_tpi;
   const notes = [];
   notes.push("For a 60-degree thread the percent of full thread = 76.98 x (D_major - D_drill) x TPI, so the tap drill D_drill = D_major - % / (76.98 x TPI). First-principles thread geometry (the 76.98 constant is 1 / 0.012990).");
@@ -1121,6 +1139,10 @@ SHOP_RENDERERS["tap-drill-size"] = _v41renderTapDrillSize;
 // dims: in { reference: dimensionless, diameter_in: L, thickness_in: L, k_factor: dimensionless } out: { neutral_dia_in: L, blank_length_in: L }
 export function computeRolledBlank({ reference = "od", diameter_in = 0, thickness_in = 0, k_factor = 0.5 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Anything that was not exactly "id" used to be the outside diameter, 1.57 in short on a 12 in ID.
+  if (reference !== "od" && reference !== "id") return { error: "Reference must be od or id." };
+  if (k_factor === null || k_factor === "") k_factor = 0.5;
+  if (!(Number(k_factor) > 0 && Number(k_factor) <= 0.5)) return { error: "The neutral-axis k-factor is over 0 and at most 0.5 (0.5 for a rolled cylinder, lower for a tight bend)." };
   const Dv = Number(diameter_in) || 0, T = Number(thickness_in) || 0;
   const k = Number(k_factor);
   if (!(Dv > 0)) return { error: "Diameter must be positive (in)." };
@@ -1754,6 +1776,7 @@ SHOP_RENDERERS["circular-sector"] = _v1321renderCircularSector;
 // dims: in { diameter_ft: L, shell_length_ft: L, fill_depth_ft: L } out: { volume_ft3: L^3, volume_gal: L^3, shell_volume_ft3: L^3, heads_volume_ft3: L^3, full_ft3: L^3, full_gal: L^3, percent_full: dimensionless }
 export function computeTankVolumeDishedHeads({ diameter_ft = 0, shell_length_ft = 0, fill_depth_ft = 0, head_type = "elliptical" } = {}) {
   const _g = _finiteGuard({ diameter_ft, shell_length_ft, fill_depth_ft }); if (_g) return _g;
+  if (head_type !== "elliptical" && head_type !== "hemispherical") return { error: "Head type must be elliptical (2:1) or hemispherical." };
   const D = Number(diameter_ft) || 0;
   const L = Number(shell_length_ft) || 0;
   let h = Number(fill_depth_ft) || 0;
@@ -2325,6 +2348,9 @@ SHOP_RENDERERS["press-fit-interference-for-force"] = _v728renderPressFitInterfer
 // dims: in { small_teeth_n1: dimensionless, large_teeth_n2: dimensionless, center_distance_in: L, pitch_in: L } out: { length_pitches: dimensionless, length_even: dimensionless, center_corrected_in: L }
 export function computeRollerChainLength({ small_teeth_n1 = 0, large_teeth_n2 = 0, center_distance_in = 0, pitch_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // The sprockets have to clear each other: the center distance must exceed the sum of their pitch radii.
+  { const pd = (n) => Number(pitch_in) / Math.sin(Math.PI / Number(n)); if (Number(small_teeth_n1) >= 3 && Number(large_teeth_n2) >= 3 && Number(center_distance_in) > 0 && Number(center_distance_in) <= (pd(small_teeth_n1) + pd(large_teeth_n2)) / 2) return { error: "The sprockets overlap at this center distance; it must exceed half the sum of the two pitch diameters." }; }
+  if (!Number.isInteger(Number(small_teeth_n1)) || !Number.isInteger(Number(large_teeth_n2))) return { error: "Tooth counts are whole numbers." };
   const n1 = Number(small_teeth_n1) || 0;
   const n2 = Number(large_teeth_n2) || 0;
   const c = Number(center_distance_in) || 0;
@@ -2425,6 +2451,7 @@ SHOP_RENDERERS["sprocket-pitch-diameter"] = _v801renderSprocketPitchDiameter;
 // dims: in { separation_ft: L, barrier_present: dimensionless, barrier_height_ft: L, barrier_noncombustible: dimensionless, barrier_rating_hr: T, cylinders_upright: dimensionless, valve_caps_secured: dimensionless } out: { required_separation_ft: L, separation_shortfall_ft: L, required_barrier_height_ft: L, required_rating_hr: T }
 export function computeCylinderStorageSeparation({ separation_ft = 0, barrier_present = "no", barrier_height_ft = 0, barrier_noncombustible = "no", barrier_rating_hr = 0, cylinders_upright = "yes", valve_caps_secured = "yes" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (Number(barrier_rating_hr) > 4) return { error: "The barrier fire rating is in HOURS (0.5 for a half-hour barrier); a rating over 4 hours is not a real assembly." };
   const sep = Number(separation_ft) || 0;
   const bh = Number(barrier_height_ft) || 0;
   const br = Number(barrier_rating_hr) || 0;
@@ -2815,6 +2842,8 @@ const _dustArea = (dia_in) => Math.PI * (dia_in / 12) * (dia_in / 12) / 4;
 // dims: in { cfm_per_machine: L^3 T^-1, branch_velocity_fpm: L T^-1, main_velocity_fpm: L T^-1, machines: dimensionless, simultaneous: dimensionless } out: { branch_area_sqft: L^2, branch_diameter_in: L, branch_velocity_actual_fpm: L T^-1 }
 export function computeDustCollectionDuct({ cfm_per_machine = 0, branch_velocity_fpm = 4000, main_velocity_fpm = 3500, machines = 1, simultaneous = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Past the largest stocked size the table used to answer "16 in" for any airflow.
+  if (Number(simultaneous) * Number(cfm_per_machine) / Number(main_velocity_fpm) > _dustArea(DUST_DUCT_SIZES_IN[DUST_DUCT_SIZES_IN.length - 1]) * 1.15) return { error: "The main needs a duct larger than the " + DUST_DUCT_SIZES_IN[DUST_DUCT_SIZES_IN.length - 1] + " in top of this size table; split the system or size it as an industrial main." };
   if (!(cfm_per_machine > 0)) return { error: "Airflow per machine must be positive." };
   if (!(branch_velocity_fpm > 0)) return { error: "Minimum branch conveying velocity must be positive." };
   if (!(main_velocity_fpm > 0)) return { error: "Minimum main conveying velocity must be positive." };
@@ -3426,6 +3455,7 @@ SHOP_RENDERERS["quench-severity"] = _simpleRenderer({
 // dims: in { tons_per_hour: M T^-1, belt_speed_fpm: L T^-1, length_ft: L, lift_ft: L, belt_weight_plf: M T^-2, idler_weight_plf: M T^-2, friction_factor: dimensionless, drive_efficiency: dimensionless } out: { effective_tension_lb: M L T^-2, belt_hp: M L^2 T^-3, motor_hp: M L^2 T^-3 }
 export function computeBeltConveyorTensionPower({ tons_per_hour = 0, belt_speed_fpm = 0, length_ft = 0, lift_ft = 0, belt_weight_plf = 0, idler_weight_plf = 0, friction_factor = 0.022, drive_efficiency = 0.85 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (Number(lift_ft) > Number(length_ft)) return { error: "The lift cannot exceed the conveyor length." };
   if (!(tons_per_hour > 0)) return { error: "Capacity in tons per hour must be positive." };
   if (!(belt_speed_fpm > 0)) return { error: "Belt speed must be positive." };
   if (!(length_ft > 0)) return { error: "Conveyor length must be positive." };

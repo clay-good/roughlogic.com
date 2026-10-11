@@ -60557,3 +60557,43 @@ test("hardening slice 12 (mechanic): the reviewed defects stay fixed", () => {
   assert.ok(/slowest, at 0 and 180/.test(JSON.stringify(_s12.computeUniversalJointSpeed({ input_speed_rpm: 1000, joint_angle_deg: 10 }))));
   assert.ok(!/LESS than its rating/.test(JSON.stringify(_s12.computeInjectorFlowAtPressure({ rated_flow_ccmin: 550, rated_pressure_psi: 43.5, rail_pressure_psi: 60, manifold_pressure_psig: 5, system_type: "returnless" }))));
 });
+
+// Hardening slice 13 (2026-10-10): shop and machining, 102 calculators re-derived and run by
+// independent reviewers. One assertion per confirmed defect.
+import * as _s13S from "../../calc-shop.js";
+import * as _s13M from "../../calc-machining.js";
+
+test("hardening slice 13 (shop, machining): the reviewed defects stay fixed", () => {
+  const near = (a, b, tol) => assert.ok(Math.abs(a - b) <= tol, a + " vs " + b);
+  const err = (r) => assert.ok(r && typeof r.error === "string", JSON.stringify(r).slice(0, 120));
+  // Unknown options no longer take a default branch.
+  err(_s13S.computeRolledBlank({ reference: "ID", diameter_in: 12, thickness_in: 0.25 }));
+  err(_s13S.computeTaperDiameter({ known_dia_in: 1, known_end: "Small", taper_per_foot: 0.6, length_in: 3 }));
+  err(_s13S.computeTankVolumeDishedHeads({ diameter_ft: 8, shell_length_ft: 20, fill_depth_ft: 4, head_type: "Hemispherical" }));
+  err(_s13S.computeMaterialRemovalRate({ mode: "Turning", woc_in: 0.5, doc_in: 0.1, feed_ipm_in: 10 }));
+  err(_s13S.computeMachiningTime({ feed_mode: "ipm", cut_length_in: 6, rpm: 500, feed_ipr_in: 0.01, feed_ipm_in: 20 }));
+  err(_s13S.computeMachiningTime({ cut_length_in: 6, rpm: 500, feed_ipr_in: 0.01, passes: 2.4 }));
+  err(_s13S.computePunchForce({ shape: "rectangle", diameter_in: 0.5, side_a_in: 4, side_b_in: 4, thickness_in: 0.25, shear_strength_psi: 50000 }));
+  err(_s13S.computeThreadMeasureWire({ thread_standard: "mm", tpi: 13, pitch_mm: 1.5, pitch_diameter_in: 0.45, wire_dia_in: 0.045 }));
+  err(_s13S.computeDividingHead({ divisions: 7.5, circles: "27,18" }));
+  // A blank k-factor is the stated 0.5, not 0.
+  near(_s13S.computeRolledBlank({ reference: "od", diameter_in: 12, thickness_in: 0.25, k_factor: null }).blank_length_in, 36.914, 0.001);
+  // The fractional tap drill never leaves more than a full thread.
+  const td = _s13S.computeTapDrillSize({ major_dia_in: 0.3125, tpi: 18, thread_percent: 100 });
+  assert.ok(td.nearest_64th_in >= 0.3125 - 100 / (76.98 * 18) - 1e-6, JSON.stringify(td).slice(0, 200));
+  err(_s13S.computeTapDrillSize({ major_dia_in: 0.012, tpi: 200 }));
+  // A typed decimal angle finds its circle.
+  assert.deepStrictEqual(_s13S.computeDividingHead({ index_by: "angle", angle_deg: 13.3333, circles: "27,18" }).settings[0], { circle: 27, holes: 13, whole: true });
+  // Geometry and regime checks.
+  err(_s13S.computeTurningSurfaceFinish({ feed_ipr_in: 0.1, nose_radius_in: 0.01 }));
+  err(_s13S.computeRollerChainLength({ small_teeth_n1: 17, large_teeth_n2: 51, center_distance_in: 2, pitch_in: 0.5 }));
+  err(_s13S.computeBeltConveyorTensionPower({ tons_per_hour: 500, belt_speed_fpm: 400, length_ft: 100, lift_ft: 500, belt_weight_plf: 10, idler_weight_plf: 15 }));
+  err(_s13S.computeDustCollectionDuct({ cfm_per_machine: 8000, machines: 3, simultaneous: 3 }));
+  err(_s13S.computeCylinderStorageSeparation({ separation_ft: 5, barrier_present: "yes", barrier_height_ft: 5, barrier_noncombustible: "yes", barrier_rating_hr: 30 }));
+  err(_s13M.computeSpurGearGeometry({ diametral_pitch: 10, teeth: 2 }));
+  err(_s13M.computeCuttingFluidConcentration({ brix_reading: 60, refractometer_factor: 2, sump_volume_gal: 50, target_pct: 8 }));
+  // Adding thrust never lowers the equivalent load; a surface factor never exceeds 1.
+  assert.ok(_s13M.computeBearingEquivalentLoad({ radial_load_lbf: 1000, thrust_load_lbf: 300.5, static_rating_lbf: 2731.8 }).equivalent_load_lbf >= 1000);
+  const marin = _s13M.computeEnduranceLimitMarin({ ultimate_strength_psi: 30000, surface_finish: "hot-rolled", diameter_in: 1, reliability_pct: "50" });
+  assert.ok(marin.error || marin.ka <= 1 + 1e-12, JSON.stringify(marin).slice(0, 160));
+});
