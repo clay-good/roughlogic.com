@@ -311,7 +311,9 @@ export function computeWirelessIntermod({ f1_mhz = 0, f2_mhz = 0, test_freq_mhz 
   const spacing_mhz = hi - lo;
   const third_low_mhz = 2 * lo - hi;
   const third_high_mhz = 2 * hi - lo;
-  const fifth_low_mhz = 3 * lo - 2 * hi;
+  // A mixing product is a frequency: |3 f1 - 2 f2|. Signed, 470 and 900 MHz gave -390 and the
+  // real product sitting exactly on a 390 MHz channel read 350 MHz clear.
+  const fifth_low_mhz = Math.abs(3 * lo - 2 * hi);
   const fifth_high_mhz = 3 * hi - 2 * lo;
   const products = [third_low_mhz, third_high_mhz, fifth_low_mhz, fifth_high_mhz];
   let nearest_product_mhz = null;

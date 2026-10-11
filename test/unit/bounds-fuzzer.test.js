@@ -58951,8 +58951,12 @@ test("bounds: plume-rise-briggs stable classes use 2.6 (F/(u s))^(1/3)", () => {
   const Ta = (60 - 32) * 5 / 9 + 273.15, u = 12 * 1609.344 / 3600, s = 9.80665 / Ta * 0.035;
   assert.ok(Math.abs(f.plume_rise_ft - 2.6 * Math.cbrt(f.buoyancy_flux / (u * s)) / 0.3048) < 1e-6);
   assert.equal(_prbS({ ...b, stability_class: "A" }).plume_rise_ft, d.plume_rise_ft);
-  // Stable rise scales as wind^(-1/3).
-  assert.ok(Math.abs(_prbS({ ...b, wind_mph: 24, stability_class: "F" }).plume_rise_ft * Math.cbrt(2) - f.plume_rise_ft) < 1e-6);
+  // Stable rise scales as wind^(-1/3) while it is the lower figure...
+  assert.ok(Math.abs(_prbS({ ...b, wind_mph: 6, stability_class: "F" }).plume_rise_ft - f.plume_rise_ft * Math.cbrt(2)) < 1e-6);
+  // ...and is capped at the neutral rise, which falls as 1/wind and undercuts it by 24 mph. (Until
+  // 2026-10-11 the stable form ran uncapped and read ABOVE neutral air in a strong wind.)
+  const f24 = _prbS({ ...b, wind_mph: 24, stability_class: "F" });
+  assert.equal(f24.plume_rise_ft, f24.neutral_rise_ft);
   assert.ok("error" in _prbS({ ...b, stability_class: "G" }));
 });
 
@@ -60937,4 +60941,37 @@ test("hardening slice 21 (lab, farm production, mining, millwright, oil and gas,
   assert.ok(!LB.computeDilution({ c1: 1, v1: 1, c2: 0.1, v2: 10 }).error);
   assert.ok(LB.computeRcf({ rotor_radius_mm: 85, rpm: 10000, rcf: 500 }).error);
   assert.ok(RF.computeSalesTaxNexus({ state: "toString" }).error);
+});
+
+test("hardening slice 22 (field, service, layout, air quality, corrosion, greenhouse, stage production)", async () => {
+  const SV = await import("../../calc-service.js");
+  const FD = await import("../../calc-field.js");
+  const SP = await import("../../calc-stageproduction.js");
+  const AQ = await import("../../calc-airquality.js");
+  const CO = await import("../../calc-corrosion.js");
+  // a fifth-order product landing on the channel is a collision, not 350 MHz of margin
+  assert.equal(SP.computeWirelessIntermod({ f1_mhz: 470, f2_mhz: 900, test_freq_mhz: 390 }).fifth_low_mhz, 390);
+  // stable air caps the plume at or below its neutral rise at every wind speed
+  const pl = Object.values(AQ).find((f) => typeof f === "function" && f.name === "computePlumeRiseBriggs");
+  for (const wind_mph of [5, 12, 30, 60]) {
+    const r = pl({ stack_height_ft: 120, stack_diameter_ft: 5, exit_velocity_fps: 55, exit_temp_f: 350, ambient_temp_f: 60, wind_mph, stability_class: "E" });
+    assert.ok(!r.error, r.error);
+    assert.ok(r.plume_rise_ft <= r.neutral_rise_ft * (1 + 1e-9), "wind " + wind_mph);
+  }
+  // corrosion: squat columns are outside Dwight's relation
+  assert.ok(CO.computeCokeBreezeBackfill({ hole_diameter_in: 48, hole_depth_ft: 1, anode_diameter_in: 3, anode_length_ft: 1, anode_count: 1, backfill_density_pcf: 45, bag_weight_lb: 50, waste_pct: 10, soil_resistivity_ohm_cm: 3000 }).error);
+  // service
+  assert.ok(SV.computeInsulationResistancePi({ ir_30s_mohm: 5, ir_1min_mohm: 5.5, ir_10min_mohm: NaN }).error);
+  assert.equal(SV.computeServiceConductorSizing({ service_A: 200, material: "Aluminum" }).size, SV.computeServiceConductorSizing({ service_A: 200, material: "aluminum" }).size);
+  assert.ok(SV.computeServiceConductorSizing({ service_A: 200, material: "brass" }).error);
+  assert.ok(SV.computeCommercialLightingLoad({ floor_area_ft2: 10000, unit_load_va_ft2: 1.3, supply_v: 240, phases: 2 }).error);
+  assert.ok(SV.computeRangeDemand22055({ num_ranges: 1, nameplate_kw: 60 }).error);
+  assert.ok(SV.computeVfdEnergySavings({ full_load_kw: 10, hours_a: 8000, hours_b: 8000, hours_c: 8000 }).error);
+  assert.ok(SV.computePipeSupportSpacing({ material: "copper_pipe", pipe_size: 2, run_length: 40, orientation: "Vertical" }).error);
+  // field
+  assert.ok(FD.computeUTM({ direction: "utm_to_latlon", zone: 13, hemisphere: "N", easting: 500000, northing: 12000000 }).error);
+  assert.ok(FD.computeUTM({ direction: "utm_to_latlon", zone: 13, hemisphere: "N", easting: 5000000, northing: 4000000 }).error);
+  assert.ok(FD.computeHikingTime({ distance: 6, distance_unit: "miles" }).error);
+  assert.ok(FD.computeSolarTimes({ lat_deg: 40, lon_deg: -105, date_iso: "2026-02-30", tz_offset_hours: -7 }).error);
+  assert.ok(!FD.computeSolarTimes({ lat_deg: 40, lon_deg: -105, date_iso: "2026-06-21", tz_offset_hours: -6 }).error);
 });

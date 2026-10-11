@@ -919,7 +919,10 @@ export function computePlumeRiseBriggs({
     : _AQ_BRIGGS_COEFF_HIGH * Math.pow(buoyancy_flux, _AQ_BRIGGS_EXP_HIGH) / wind_ms;
   const is_stable = stab === "E" || stab === "F";
   const stability_s = is_stable ? (_AQ_G_SI / ambient_k) * (stab === "E" ? 0.020 : 0.035) : 0;
-  const plume_rise_m = is_stable ? 2.6 * Math.cbrt(buoyancy_flux / (wind_ms * stability_s)) : neutral_rise_m;
+  // Stable air CAPS the rise; it cannot lift a plume higher than neutral air would. The stable
+  // form falls as u^(-1/3) and the neutral as 1/u, so above about 12 mph the stable figure alone
+  // overtook the neutral one (120 ft against 56 at 40 mph). The lower governs.
+  const plume_rise_m = is_stable ? Math.min(2.6 * Math.cbrt(buoyancy_flux / (wind_ms * stability_s)), neutral_rise_m) : neutral_rise_m;
   const neutral_rise_ft = neutral_rise_m / _AQ_M_PER_FT;
   const plume_rise_ft = plume_rise_m / _AQ_M_PER_FT;
   const effective_height_ft = stack_height_ft + plume_rise_ft;

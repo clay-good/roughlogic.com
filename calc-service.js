@@ -219,6 +219,7 @@ const _supportLookup = (table, material, size, orientation) => {
 //  table is a length L; the hanger count is a dimensionless ceil ratio.)
 export function computePipeSupportSpacing({ material = "copper", pipe_size, run_length, orientation = "horizontal", table = null } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (orientation !== "horizontal" && orientation !== "vertical") return { error: "Orientation must be horizontal or vertical." };
   const size = Number(pipe_size);
   const run = Number(run_length);
   if (!Number.isFinite(size) || size <= 0) return { error: "Pipe size must be a positive finite number (in)." };
@@ -383,6 +384,7 @@ export function computeRangeDemand22055({ num_ranges = 1, nameplate_kw = 0, supp
   const kw = Number(nameplate_kw) || 0;
   const v = Number(supply_v) || 0;
   if (!(kw > 0)) return { error: "Range nameplate rating must be positive (kW)." };
+  if (kw > 27) return { error: "Table 220.55 stops at 27 kW per range; a larger appliance is taken at its nameplate." };
   if (!(n >= 1)) return { error: "Number of ranges must be at least 1." };
   if (!(v > 0)) return { error: "Service voltage must be positive (V)." };
 
@@ -567,6 +569,7 @@ SERVICE_RENDERERS["neutral-demand-220-61"] = _v169renderNeutralDemand;
 // dims: in { floor_area_ft2: L^2, unit_load_va_ft2: dimensionless, receptacle_count: dimensionless, supply_v: M L^2 T^-3 I^-1, phases: dimensionless } out: { lighting_va: dimensionless, recep_va: dimensionless, recep_demand_va: dimensionless, total_va: M L^2 T^-3, total_a: I }
 export function computeCommercialLightingLoad({ floor_area_ft2 = 0, unit_load_va_ft2 = 0, receptacle_count = 0, supply_v = 208, phases = 3 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (Number(phases) !== 1 && Number(phases) !== 3) return { error: "Phases must be 1 or 3." };
   const area = Number(floor_area_ft2) || 0;
   if (!(area >= 0)) return { error: "Floor area must be non-negative (ft^2)." };
   const unit = Number(unit_load_va_ft2) || 0;
@@ -706,6 +709,7 @@ export function computeVfdEnergySavings({ full_load_kw = 0, frac_a = 1.0, hours_
   if (hours_a < 0 || hours_b < 0 || hours_c < 0) return { error: "Hours per bin must be non-negative." };
   for (const f of [frac_a, frac_b, frac_c]) if (!(f >= 0 && f <= 1)) return { error: "Each flow fraction must be between 0 and 1." };
   if (rate_kwh < 0) return { error: "Energy rate must be non-negative." };
+  if (hours_a + hours_b + hours_c > 8760) return { error: "The three bins add up to more than the 8,760 hours in a year." };
   const vfd_kwh = full_load_kw * (frac_a ** 3 * hours_a + frac_b ** 3 * hours_b + frac_c ** 3 * hours_c);
   const full_kwh = full_load_kw * (hours_a + hours_b + hours_c);
   const saved_kwh = full_kwh - vfd_kwh;
@@ -883,7 +887,10 @@ const _SC_AL_75 = [
 export function computeServiceConductorSizing({ service_A = 0, material = "copper" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(service_A > 0)) return { error: "Service rating must be positive (A)." };
-  const set = material === "aluminum" ? _SC_AL_75 : _SC_CU_75;
+  // "Aluminum" or "AL" used to be sized as copper (2/0 where aluminum needs 4/0).
+  const _mat = String(material).trim().toLowerCase();
+  if (!["aluminum", "al", "copper", "cu"].includes(_mat)) return { error: "Material must be copper or aluminum." };
+  const set = _mat === "aluminum" || _mat === "al" ? _SC_AL_75 : _SC_CU_75;
   const A_req = 0.83 * service_A;
   let size = null, size_ampacity_A = null;
   for (const [s, amp] of set) {
@@ -959,8 +966,9 @@ function _v957renderInsulationResistancePi(inputRegion, outputRegion, citationEl
   const oDar = makeOutputLine(outputRegion, "Dielectric absorption ratio (DAR)", "irp-out-dar");
   const update = debounce(() => {
     const r = computeInsulationResistancePi({
-      ir_30s_mohm: t30.input.value === "" ? 800 : Number(t30.input.value), ir_1min_mohm: t60.input.value === "" ? 1040 : Number(t60.input.value),
-      ir_10min_mohm: t600.input.value === "" ? 4160 : Number(t600.input.value),
+      // A CLEARED field is a missing reading, not the worked example's (which built a PI on a phantom 4,160 Mohm).
+      ir_30s_mohm: t30.input.value === "" ? NaN : Number(t30.input.value), ir_1min_mohm: t60.input.value === "" ? NaN : Number(t60.input.value),
+      ir_10min_mohm: t600.input.value === "" ? NaN : Number(t600.input.value),
     });
     if (r.error) { oPi.textContent = r.error; oDar.textContent = "-"; return; }
     oPi.textContent = fmt(r.polarization_index, 2) + " -- " + r.pi_verdict;

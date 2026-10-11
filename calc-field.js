@@ -280,6 +280,9 @@ export function computeUTM({ direction = "latlon_to_utm", lat_deg = 0, lon_deg =
   if (direction === "utm_to_latlon") {
     if (zone < 1 || zone > 60) return { error: "Zone out of range (1-60)." };
     if (!(easting > 0 && northing >= 0)) return { error: "Easting and northing must be positive." };
+    // A zone is 6 degrees wide and the grid runs pole-side to 10,000,000 m; outside these a typo returned an impossible position.
+    if (easting < 100000 || easting > 900000) return { error: "Easting must be between 100,000 and 900,000 m; a UTM zone is no wider." };
+    if (northing > 10000000) return { error: "Northing cannot exceed 10,000,000 m." };
     if (!["N", "S"].includes(hemisphere)) return { error: "Hemisphere must be N or S." };
     return utmToLatLon(zone, hemisphere, easting, northing);
   }
@@ -305,6 +308,7 @@ function fractionalYear(date) {
 //  offset, day-length, and equation-of-time intervals all carry
 //  the §7.1 base-token `T`.)
 export function computeSolarTimes({ lat_deg = 0, lon_deg = 0, date_iso = "", tz_offset_hours = 0 }) {
+  { const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(date_iso || "")); if (m) { const d = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3])); if (d.getUTCMonth() !== +m[2] - 1 || d.getUTCDate() !== +m[3]) return { error: "Invalid date." }; } else if (date_iso) return { error: "Invalid date; use YYYY-MM-DD." }; }
   if (!(lat_deg >= -89.5 && lat_deg <= 89.5)) return { error: "Latitude out of range." };
   if (!(lon_deg >= -180 && lon_deg <= 180)) return { error: "Longitude out of range." };
   // A non-finite tz offset makes the 1440-minute wrap loop in fmtTime spin
@@ -1205,6 +1209,7 @@ FIELD_RENDERERS["search-probability"] = renderSearchProbability;
 export function computeHikingTime({ distance = 0, distance_unit = "km", ascent = 0, ascent_unit = "m", speed = 0, factor = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const KM_PER_MI = 1.609344, M_PER_FT = 0.3048;
+  if (!["mi", "km"].includes(String(distance_unit)) || !["m", "ft"].includes(String(ascent_unit))) return { error: "Distance is in mi or km and ascent in ft or m." };
   const isMi = String(distance_unit) === "mi";
   const dist = Number(distance) || 0;
   if (!(dist > 0)) return { error: "Distance must be positive." };

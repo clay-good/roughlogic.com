@@ -126,6 +126,8 @@ export function computeAnodeBedResistance({ soil_resistivity_ohm_cm = 0, column_
   const alternative_spacing_bed_ohm = _sundeBed(soil_resistivity_ohm_cm, column_length_ft, diameter_ft, anode_count, alternative_spacing_ft);
   // Sunde's interference term breaks down when anodes crowd together: at 1 ft spacing a 10-anode bed read worse than one anode.
   if (!(bed_resistance_ohm < single_anode_resistance_ohm) || !(alternative_spacing_bed_ohm < single_anode_resistance_ohm)) return { error: "At that spacing the anodes crowd each other so much that Sunde's relation reads the bed worse than a single anode; the spacing is outside the relation's range (space anodes at least a column length apart)." };
+  // The comparison columns need the same slenderness the base column is checked for.
+  if ((alternative_length_ft > 0 && !(8 * alternative_length_ft / diameter_ft > Math.E)) || (alternative_diameter_in > 0 && !(8 * column_length_ft / (alternative_diameter_in / IN_PER_FT) > Math.E))) return { error: "The comparison column is too short for its diameter; Dwight's relation needs a long slender column." };
   const alternative_length_single_ohm = _dwightSingle(soil_resistivity_ohm_cm, alternative_length_ft, diameter_ft);
   const alternative_diameter_single_ohm = _dwightSingle(soil_resistivity_ohm_cm, column_length_ft, alternative_diameter_in / IN_PER_FT);
   return {
@@ -910,6 +912,8 @@ export function computeCokeBreezeBackfill({ hole_diameter_in = 0, hole_depth_ft 
   if (!(backfill_density_pcf > 0) || !(bag_weight_lb > 0)) return { error: "Backfill density and bag weight must be positive." };
   if (!(waste_pct >= 0)) return { error: "The waste allowance cannot be negative." };
   if (!(soil_resistivity_ohm_cm > 0)) return { error: "Soil resistivity must be positive." };
+  // Dwight's relation needs ln(8L/d) > 1, for the wider comparison hole as well; a squat hole read a NEGATIVE resistance.
+  if (!(8 * hole_depth_ft / (1.25 * hole_diameter_in / IN_PER_FT) > Math.E)) return { error: "The hole is too short for its diameter; Dwight's relation needs a long slender column (depth well over a third of the diameter)." };
   const hole_diameter_ft = hole_diameter_in / IN_PER_FT;
   const anode_diameter_ft = anode_diameter_in / IN_PER_FT;
   const column_ft3 = Math.PI / 4 * hole_diameter_ft * hole_diameter_ft * hole_depth_ft;
