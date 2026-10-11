@@ -2508,7 +2508,7 @@ cross-check.
 | calc-hvac.js | `computeDuctLeakage` | `{ design_cfm = 0, measured_cfm = 0, duct_surface_ft2 = 0, test_pressure_inwc ...` | _ | _ | _ |
 | calc-hvac.js | `computeDuctSize` | `{ cfm, friction_in_wc_per_100ft = 0.08, roughness_ft = DUCT_ROUGHNESS_FT }` | _ | _ | _ |
 | calc-hvac.js | `computeEconomicInsulationThickness` | `{ delta_t_f = 0, bare_r_value = 0.5, k_btu_in = 0.27, operating_hours = 8000,...` | _ | _ | _ |
-| calc-hvac.js | `computeEconomizerEnthalpyChangeover` | `{ mode = "differential_enthalpy", h_outdoor = 0, h_return = 0, t_outdoor_f = ...` | _ | _ | _ |
+| calc-hvac.js | `computeEconomizerEnthalpyChangeover` | `{ mode = "differential_enthalpy", h_outdoor = null, h_return = null, t_outdoo...` | _ | _ | _ |
 | calc-hvac.js | `computeEconomizerSavingsHours` | `{ cfm = 0, delta_t_f = 0, hours = 0 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeEquivalentLength` | `{ items = [] }` | _ | _ | _ |
 | calc-hvac.js | `computeErvSensibleRecovery` | `{ cfm = 0, t_oa_F = 0, t_ra_F = 0, eps_s = 0.75 } = {}` | _ | _ | _ |

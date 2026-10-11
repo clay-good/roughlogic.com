@@ -422,6 +422,8 @@ export function computeRooftopCurbUplift({
   windward_fastener_count = 0, fastener_capacity_lb = 0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // No windward fasteners with a lateral load used to drop the overturning couple and pass.
+  if (Number(lateral_psf) > 0 && !(Number(windward_fastener_count) >= 1)) return { error: "Enter the number of fasteners on the windward side; they carry the overturning couple from the lateral wind." };
   if (!(unit_length_ft > 0) || !(unit_width_ft > 0)) return { error: "Unit plan dimensions must be greater than zero." };
   if (!(unit_height_ft > 0)) return { error: "Unit height must be greater than zero." };
   if (!(unit_weight_lb > 0)) return { error: "Unit weight must be greater than zero." };

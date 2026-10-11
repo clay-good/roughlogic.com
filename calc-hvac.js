@@ -332,6 +332,9 @@ export const seerEerExample = {
 // dims: in { heating_capacity_btu_hr_at_design: M L^2 T^-3, design_outdoor_F: T, building_heat_loss_btu_hr: M L^2 T^-3, indoor_F: T } out: { balance_point_F: T, aux_heat_btu_hr: M L^2 T^-3, aux_strip_kw: M L^2 T^-3 }
 export function computeBalancePoint({ heating_capacity_btu_hr_at_design, design_outdoor_F, building_heat_loss_btu_hr, indoor_F = 65 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (![heating_capacity_btu_hr_at_design, design_outdoor_F, building_heat_loss_btu_hr].every((x) => x !== null && x !== undefined && x !== "" && Number.isFinite(Number(x)))) return { error: "Enter the heat pump capacity, the design outdoor temperature and the building heat loss." };
+  if (!(Number(heating_capacity_btu_hr_at_design) > 0) || !(Number(building_heat_loss_btu_hr) > 0)) return { error: "Capacity and heat loss must be positive (Btu/h)." };
+  if (!(Number(design_outdoor_F) <= Number(indoor_F) - 1)) return { error: "The design outdoor temperature must be at least a degree below the indoor balance temperature." };
   // Capacity falls roughly linearly with outdoor temperature; building load
   // is linear in (indoor - outdoor). Solve for outdoor temp where they meet.
   // Capacity model: Q_cap(T) = Q_design + slope * (T - design_F).
@@ -359,6 +362,8 @@ export const balancePointExample = {
 // dims: in { sensible_btu_hr: M L^2 T^-3, total_btu_hr: M L^2 T^-3 } out: { shr: dimensionless }
 export function computeSHR({ sensible_btu_hr, total_btu_hr }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(Number(total_btu_hr) > 0) || !(Number(sensible_btu_hr) >= 0)) return { error: "Enter a positive total load and a sensible load of zero or more (Btu/h)." };
+  if (Number(sensible_btu_hr) > Number(total_btu_hr) * (1 + 1e-9)) return { error: "The sensible load cannot exceed the total load." };
   if (total_btu_hr <= 0) return { error: "Total load must be positive." };
   return { SHR: sensible_btu_hr / total_btu_hr };
 }
@@ -379,7 +384,7 @@ export function computeCfmPerTon({ tons, climate = "standard" }) {
     humid:    { factor: 350, label: "Humid climate", hint: "low SHR (<0.75); reduce CFM to drive more latent removal." },
   };
   // v8 §C.3: explicit climate-selector input mode with a one-line hint.
-  const m = map[climate] || map.standard;
+  const m = Object.hasOwn(map, String(climate)) ? map[climate] : map.standard;
   if (!(tons > 0)) return { error: "Tons must be positive." };
   return {
     cfm_per_ton: m.factor,
@@ -399,6 +404,7 @@ export const cfmPerTonExample = {
 // dims: in { btu_input: M L^2 T^-3, room_volume_ft3: L^3 } out: { required_volume_ft3: L^3, sufficient: dimensionless }
 export function computeCombustionAir({ btu_input, room_volume_ft3 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(Number(btu_input) > 0)) return { error: "Enter the total appliance input (Btu/h)." };
   // Until 2026-09-26 a negative entry here returned a negative quantity with no error.
   if (["btu_input", "room_volume_ft3"].some((k) => Number(arguments[0]?.[k]) < 0)) return { error: "Appliance input and room volume cannot be negative." };
   // If room volume >= 50 ft^3 per 1000 BTU/hr, combustion air is "adequate
@@ -483,6 +489,8 @@ export const approachDeltaTExample = {
 // dims: in { return_T_F: T, return_RH_percent: dimensionless, outdoor_T_F: T, outdoor_RH_percent: dimensionless, oa_fraction: dimensionless } out: { mixed_T_F: T, mixed_RH_percent: dimensionless }
 export function computeOutdoorAirMix({ return_T_F, return_RH_percent, outdoor_T_F, outdoor_RH_percent, oa_fraction }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (![return_T_F, return_RH_percent, outdoor_T_F, outdoor_RH_percent, oa_fraction].every((x) => x !== null && x !== undefined && x !== "" && Number.isFinite(Number(x)))) return { error: "Enter both air states (F and % RH) and the outdoor-air fraction." };
+  if (![return_RH_percent, outdoor_RH_percent].every((x) => Number(x) >= 0 && Number(x) <= 100)) return { error: "Relative humidity is between 0 and 100%." };
   const f = Math.max(0, Math.min(1, Number(oa_fraction) || 0));
   const ra_T_C = F_to_C(return_T_F);
   const oa_T_C = F_to_C(outdoor_T_F);
@@ -550,6 +558,9 @@ export const equivalentLengthExample = {
 // dims: in { dry_bulb_F: T, wet_bulb_F: T, P_hPa: M L^-1 T^-2 } out: { rh_percent: dimensionless, dewpoint_F: T, humidity_ratio: dimensionless }
 export function computeWetBulbPsychrometer({ dry_bulb_F, wet_bulb_F, P_hPa = 1013.25 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if ([dry_bulb_F, wet_bulb_F].some((x) => x === null || x === undefined || x === "" || !Number.isFinite(Number(x)))) return { error: "Enter the dry-bulb and wet-bulb temperatures (F)." };
+  if (Number(wet_bulb_F) > Number(dry_bulb_F)) return { error: "The wet-bulb cannot be above the dry-bulb." };
+  if (!(Number(P_hPa) > 300)) return { error: "Station pressure must be a real atmospheric pressure (hPa)." };
   const Td_C = F_to_C(dry_bulb_F);
   const Tw_C = F_to_C(wet_bulb_F);
   if (Tw_C > Td_C) return { error: "Wet-bulb cannot exceed dry-bulb." };
@@ -1485,6 +1496,7 @@ export const affinityLawsExample = {
 // dims: in { drive_dia_in: L, driven_dia_in: L, center_distance_in: L, motor_rpm: T^-1 } out: { driven_rpm: T^-1, belt_length_in: L }
 export function computeBeltAndPulley({ drive_dia_in = 0, driven_dia_in = 0, center_distance_in = 0, motor_rpm = 0 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (Number(center_distance_in) > 0 && Number(center_distance_in) < (Number(drive_dia_in) + Number(driven_dia_in)) / 2) return { error: "The sheaves overlap at this center distance; it must be at least half the sum of the two diameters." };
   if (!(drive_dia_in > 0 && driven_dia_in > 0)) return { error: "Pulley diameters must be positive." };
   if (!(center_distance_in > 0)) return { error: "Center distance must be positive." };
   const D = Math.max(drive_dia_in, driven_dia_in);
@@ -2226,7 +2238,8 @@ export function computeInsulationHeatLoss({
     Q_ins = dT / (R_cond + R_out);
     T_s2 = surface_T_F - Q_ins * R_cond;
   }
-  const effectiveness_pct = Q_bare_per_ft > 0 ? (1 - Q_ins / Q_bare_per_ft) * 100 : 0;
+  // A chilled line gains heat (negative Q); the ratio is the same either way.
+  const effectiveness_pct = Q_bare_per_ft !== 0 ? (1 - Q_ins / Q_bare_per_ft) * 100 : 0;
   return {
     Q_bare_BTU_hr_ft: Q_bare_per_ft,
     Q_insulated_BTU_hr_ft: Q_ins,
@@ -2512,6 +2525,8 @@ export function computeOutdoorAirVentilation({
   Ez = 1.0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Blank rates used to answer "0 cfm required".
+  if (!(Number(Rp_cfm_per_person) > 0) && !(Number(Ra_cfm_per_ft2) > 0)) return { error: "Enter the people rate Rp and the area rate Ra from ASHRAE 62.1 Table 6-1 (pick a space type, or type them)." };
   const Rp = Number(Rp_cfm_per_person) || 0;
   const Ra = Number(Ra_cfm_per_ft2) || 0;
   const Pz = Number(people) || 0;
@@ -2676,8 +2691,11 @@ export function computeHoodExhaust({
     if (!row) return { error: "Unknown Type I hood type '" + hood_type + "'." };
     const m = row[duty];
     if (m == null) return { error: "Duty '" + duty + "' is not permitted with hood type '" + hood_type + "' per IMC 507.5.1-507.5.4." };
-    cfm_per_ft = m;
-    Q_cfm = m * L;
+    // IMC 507.5 lists the double island canopy rate PER SIDE: both long faces are open, so the
+    // hood exhausts twice the tabulated cfm/ft. Until 2026-10-10 it read the same as a wall canopy.
+    const sides = hood_type === "double-island" ? 2 : 1;
+    cfm_per_ft = m * sides;
+    Q_cfm = m * sides * L;
   }
 
   // Makeup air per IMC 508: typically 80 percent of exhaust as a
@@ -3761,6 +3779,8 @@ HVAC_RENDERERS["dual-fuel-balance-point"] = _rEnv({
 
 // dims: in { cap_47_btuh: M L^2 T^-3, cap_17_btuh: M L^2 T^-3, design_temp_f: T, design_load_btuh: M L^2 T^-3 } out: { slope: M L^2 T^-3, cap_design: M L^2 T^-3, shortfall: M L^2 T^-3, aux_kw: M L^2 T^-3 }
 export function computeHeatPumpColdCapacity({ cap_47_btuh = 0, cap_17_btuh = 0, design_temp_f = 0, design_load_btuh = 0 } = {}) {
+  // Swapped rating points gave a unit whose capacity ROSE as it got colder.
+  if (Number(cap_17_btuh) > Number(cap_47_btuh)) return { error: "The 17 F capacity cannot exceed the 47 F capacity; check that the two rating points are not swapped." };
   const _g = _finiteGuardEnv(arguments[0]); if (_g) return _g;
   if (!(cap_47_btuh > 0) || !(cap_17_btuh > 0)) return { error: "Rated capacities must be positive (Btu/h)." };
   if (!(design_load_btuh > 0)) return { error: "Design heating load must be positive (Btu/h)." };
@@ -3998,7 +4018,12 @@ export function computeMuaTemperingLoad({ cfm = 0, t_oa_F = 0, t_target_F = 0, e
   // 2,000 cfm 95 -> 55 F, 120 -> 65 gr/lb read -11,600 Btu/h total instead of 161,200.
   const cooling = dT_F < 0;
   const Q_s_btuh = 1.08 * cfm * Math.abs(dT_F);
-  const Q_l_btuh = 0.68 * cfm * (w_oa_gr - w_target_gr);
+  // The latent term is a magnitude that ADDS in both directions: drying on a cooling unit, and
+  // humidifying on a heating one (water evaporated is heat added). Until 2026-10-10 the signed
+  // latent subtracted: a winter unit humidifying 10 -> 40 gr/lb read 56,400 Btu/h where 138,000 is
+  // the load, and a cooling unit with a humid target could read a negative coil.
+  if (cooling && w_target_gr > w_oa_gr) return { error: "A cooling coil cannot leave the air wetter than it entered; check the target humidity ratio." };
+  const Q_l_btuh = 0.68 * cfm * Math.abs(w_oa_gr - w_target_gr);
   const Q_t_btuh = Q_s_btuh + Q_l_btuh;
   const input_btuh = cooling ? 0 : Q_s_btuh / eta;
   return {
@@ -4105,6 +4130,8 @@ HVAC_RENDERERS["reynolds-number-pipe"] = _rEnv({
 
 // dims: in { load: M L^2 T^-3, unit_tons: dimensionless, dt_f: T, factor: dimensionless } out: { q_btuh: M L^2 T^-3, gpm: L^3 T^-1 }
 export function computeHydronicGpmDeltat({ load = 0, unit_tons = 0, dt_f = 0, factor = 500 } = {}) {
+  if (![0, 1, "0", "1", true, false].includes(unit_tons)) return { error: "The load unit flag is 0 (Btu/h) or 1 (tons)." };
+  unit_tons = unit_tons === 1 || unit_tons === "1" || unit_tons === true ? 1 : 0;
   const _g = _finiteGuardEnv(arguments[0]); if (_g) return _g;
   if (!(load > 0)) return { error: "Load must be positive." };
   if (!(dt_f > 0)) return { error: "Design delta-T must be positive (degF)." };
@@ -4261,6 +4288,8 @@ HVAC_RENDERERS["building-ua"] = _v329renderBuildingUa;
 
 // dims: in { ua_btuhf: M L^2 T^-3, hdd: T, eff: dimensionless, fuel: dimensionless, price: dimensionless } out: { q_mmbtu: M L^2 T^-2, fuel_units: dimensionless, cost: dimensionless }
 export function computeDegreeDayEnergy({ ua_btuhf = 0, hdd = 0, eff, fuel = "gas", price = 0 } = {}) {
+  if (!Object.hasOwn({ gas: 1, oil: 1, electric: 1 }, String(fuel))) return { error: "Fuel must be gas (therm), oil (gal), or electric (kWh)." };
+  if (Number(eff) > 10) return { error: "Efficiency is a fraction (AFUE 0.80) or a COP (about 2 to 5), not a percent." };
   const _g = _finiteGuardEnv(arguments[0]); if (_g) return _g;
   if (!(ua_btuhf > 0)) return { error: "The heat-loss coefficient UA must be positive (Btu/h-F)." };
   if (!(hdd > 0)) return { error: "Heating degree-days must be positive (degF-days)." };
@@ -4402,6 +4431,8 @@ const _RADIANT_FLOOR_COEF = 8.92 * (3600 / 1055.05585262 * 0.09290304) / Math.po
 // dims: in { mode: dimensionless, t_surface_f: T, t_room_f: T, q_target: M T^-3 } out: { q_btuh_ft2: M T^-3, t_surface_out_f: T }
 export function computeRadiantFloorOutput({ mode = "surface_to_q", t_surface_f = 0, t_room_f = 70, q_target = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (mode !== "surface_to_q" && mode !== "q_to_surface") return { error: "Mode must be surface_to_q or q_to_surface." };
+  if (t_room_f === null || t_room_f === "" || !(Number(t_room_f) >= 40 && Number(t_room_f) <= 95)) return { error: "Enter the room air temperature, 40 to 95 F." };
   const room = Number(t_room_f);
   if (!Number.isFinite(room)) return { error: "Enter a valid room temperature (F)." };
   if (mode === "q_to_surface") {
@@ -4506,8 +4537,12 @@ HVAC_RENDERERS["snowmelt-load"] = _rEnv({
 });
 
 // dims: in { mode: dimensionless, h_outdoor: L^2 T^-2, h_return: L^2 T^-2, t_outdoor_f: T, setpoint_f: T } out: { enable: dimensionless, margin: dimensionless }
-export function computeEconomizerEnthalpyChangeover({ mode = "differential_enthalpy", h_outdoor = 0, h_return = 0, t_outdoor_f = 0, setpoint_f = 0 } = {}) {
+export function computeEconomizerEnthalpyChangeover({ mode = "differential_enthalpy", h_outdoor = null, h_return = null, t_outdoor_f = 0, setpoint_f = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // An unknown mode used to run as differential enthalpy, and blank enthalpies returned ENABLE.
+  if (!["differential_enthalpy", "fixed_drybulb", "differential_enthalpy_drybulb"].includes(mode)) return { error: "Mode must be differential_enthalpy, fixed_drybulb or differential_enthalpy_drybulb." };
+  if (mode !== "fixed_drybulb" && [h_outdoor, h_return].some((x) => x === null || x === "")) return { error: "Enter the outdoor and return air enthalpies (Btu/lb)." };
+  if (mode === "fixed_drybulb" && !(Number(setpoint_f) > 0)) return { error: "Enter the dry-bulb high-limit setpoint (F)." };
   if (mode === "fixed_drybulb") {
     const toa = Number(t_outdoor_f);
     const sp = Number(setpoint_f);
@@ -4790,7 +4825,7 @@ export function computeFanSheaveForTargetCfm({ current_cfm = 0, target_cfm = 0, 
   if (![ratio, required_fan_rpm, new_drive_sheave_in, driven_sheave_in].every(Number.isFinite)) return { error: "Sheave-change math did not produce a finite value." };
   return {
     ratio, required_fan_rpm, new_drive_sheave_in, driven_sheave_in, check_fan_rpm,
-    new_bhp, new_sp_inwg, bhp_increase_pct, motor_overloaded, over_motor_rpm,
+    new_bhp, new_sp_inwg, bhp_increase_pct, motor_overloaded, motor_checked: mhp > 0, over_motor_rpm,
     note: "Airflow follows speed one-for-one, but brake horsepower follows the CUBE: this change is "
       + ((ratio - 1) * 100).toFixed(1) + "% on airflow and " + bhp_increase_pct.toFixed(1) + "% on horsepower. "
       + (motor_overloaded ? "THE MOTOR IS OVERLOADED at " + new_bhp.toFixed(2) + " bhp against a " + mhp + " hp motor - this sheave change trips the overloads or cooks the motor, and it is the single most common way a well-meant airflow fix fails. " : "")
@@ -4825,7 +4860,7 @@ function renderFanSheaveForTargetCfm(inputRegion, outputRegion, citationEl) {
     if (r.error) { oR.textContent = r.error; oS.textContent = ""; oP.textContent = ""; oN.textContent = ""; return; }
     oR.textContent = r.ratio.toFixed(4) + " -- " + r.required_fan_rpm.toFixed(0) + " rpm" + (r.over_motor_rpm ? " (EXCEEDS motor speed)" : "");
     oS.textContent = r.new_drive_sheave_in.toFixed(2) + " in (from " + Number(ds.input.value).toFixed(2) + "; fan sheave stays " + r.driven_sheave_in.toFixed(2) + " in)";
-    oP.textContent = (r.new_bhp > 0 ? r.new_bhp.toFixed(2) + " bhp, +" + r.bhp_increase_pct.toFixed(0) + "%" + (r.motor_overloaded ? " -- OVER the motor" : " -- within the motor") : "power not checked")
+    oP.textContent = (r.new_bhp > 0 ? r.new_bhp.toFixed(2) + " bhp, +" + r.bhp_increase_pct.toFixed(0) + "%" + (r.motor_overloaded ? " -- OVER the motor" : r.motor_checked === false ? " -- motor not checked (no motor hp entered)" : " -- within the motor") : "power not checked")
       + (r.new_sp_inwg > 0 ? "; static " + r.new_sp_inwg.toFixed(2) + " in w.c." : "");
     oN.textContent = r.note;
   };

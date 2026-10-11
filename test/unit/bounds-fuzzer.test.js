@@ -60427,3 +60427,46 @@ test("hardening slice 9 (construction part 3, concrete placement, finishes): the
   err(_s9CP.computeTiltUpLiftStress({ panel_width_ft: 20, panel_height_ft: 30, thickness_in: 7.25, lift_day_strength_psi: 2500, insert_rows: 2.5 }));
   err(_s9FG.computePretreatmentBathDragout({ dragout_gal_per_1000ft2: 2, area_ft2_per_day: 10000, bath_volume_gal: 1000, rinse_stages: 2.5 }));
 });
+
+// Hardening slice 10 (2026-10-10): HVAC, airside and acoustics, 84 calculators re-derived and run
+// by independent reviewers. One assertion per confirmed defect.
+import * as _s10H from "../../calc-hvac.js";
+import * as _s10A from "../../calc-hvacairside.js";
+import * as _s10C from "../../calc-hvacacoustics.js";
+
+test("hardening slice 10 (HVAC, airside, acoustics): the reviewed defects stay fixed", () => {
+  const near = (a, b, tol) => assert.ok(Math.abs(a - b) <= tol, a + " vs " + b);
+  const err = (r) => assert.ok(r && typeof r.error === "string", JSON.stringify(r).slice(0, 120));
+  // Heating and humidifying both add heat; the latent no longer cancels the sensible.
+  near(_s10H.computeMuaTemperingLoad({ cfm: 2000, t_oa_F: 20, t_target_F: 65, eta: 0.8, w_oa_gr: 10, w_target_gr: 40 }).Q_t_btuh, 97200 + 40800, 1e-6);
+  err(_s10H.computeMuaTemperingLoad({ cfm: 2000, t_oa_F: 95, t_target_F: 75, w_oa_gr: 30, w_target_gr: 65 }));
+  // A double island canopy exhausts per side.
+  assert.strictEqual(_s10H.computeHoodExhaust({ hood_type: "double-island", duty: "heavy", length_ft: 8 }).Q_exhaust_cfm, 6400);
+  assert.strictEqual(_s10H.computeHoodExhaust({ hood_type: "wall-canopy", duty: "heavy", length_ft: 8 }).Q_exhaust_cfm, 3200);
+  // A chilled line's insulation has an effectiveness too.
+  near(_s10H.computeInsulationHeatLoss({ pipe_OD_in: 2.375, surface_T_F: 40, ambient_T_F: 90, thickness_in: 1.5 }).effectiveness_pct, 84.8, 0.2);
+  // Guards.
+  err(_s10H.computeHeatPumpColdCapacity({ cap_47_btuh: 22000, cap_17_btuh: 36000, design_temp_f: 5, design_load_btuh: 30000 }));
+  err(_s10H.computeEconomizerEnthalpyChangeover({ mode: "fixed_enthalpy", h_outdoor: 24, h_return: 28 }));
+  err(_s10H.computeEconomizerEnthalpyChangeover({ mode: "differential_enthalpy" }));
+  err(_s10H.computeHydronicGpmDeltat({ load: 10, unit_tons: 2, dt_f: 10 }));
+  near(_s10H.computeHydronicGpmDeltat({ load: 10, unit_tons: "1", dt_f: 10 }).gpm, 24, 1e-9);
+  err(_s10H.computeDegreeDayEnergy({ ua_btuhf: 500, hdd: 5000, eff: 80, fuel: "gas", price: 1.2 }));
+  err(_s10H.computeDegreeDayEnergy({ ua_btuhf: 500, hdd: 5000, fuel: "toString" }));
+  err(_s10H.computeWetBulbPsychrometer({ dry_bulb_F: 80 }));
+  err(_s10H.computeRadiantFloorOutput({ mode: "zzz", t_surface_f: 85 }));
+  err(_s10H.computeRadiantFloorOutput({ t_surface_f: 85, t_room_f: null }));
+  err(_s10H.computeSHR({ sensible_btu_hr: 40000, total_btu_hr: 30000 }));
+  err(_s10H.computeOutdoorAirMix({ return_T_F: 75, return_RH_percent: -60, outdoor_T_F: 95, outdoor_RH_percent: 40, oa_fraction: 0.2 }));
+  err(_s10H.computeOutdoorAirVentilation({ people: 25, floor_area_ft2: 2500 }));
+  err(_s10H.computeBalancePoint({ heating_capacity_btu_hr_at_design: 30000, design_outdoor_F: 70, building_heat_loss_btu_hr: 50000, indoor_F: 65 }));
+  err(_s10H.computeBeltAndPulley({ drive_dia_in: 4, driven_dia_in: 20, center_distance_in: 5, motor_rpm: 1750 }));
+  err(_s10H.computeCombustionAir({ room_volume_ft3: 4000 }));
+  assert.strictEqual(_s10H.computeCfmPerTon({ tons: 3, climate: "toString" }).total_cfm, 1200); // a prototype key is not a climate
+  err(_s10A.computeCoolingCoilTotalLoad({ cfm: 2000, h_ent_btu: 31.48 }));
+  err(_s10A.computeCoilBypassFactor({ t_ent_f: 80, t_lvg_f: 55 }));
+  err(_s10A.computeColebrookFrictionFactor({ reynolds: 1e8, rel_roughness: 3.7 }));
+  err(_s10C.computeRooftopCurbUplift({ unit_length_ft: 8, unit_width_ft: 5, unit_height_ft: 4, unit_weight_lb: 1400, uplift_psf: 28, lateral_psf: 22, fastener_count: 8, windward_fastener_count: 0, fastener_capacity_lb: 40 }));
+  // The remedy below sqrt(2) is a softer mount, not a stiffer one.
+  assert.ok(!/fix is a stiffer isolator/.test(JSON.stringify(_s10A.computeVibrationIsolation({ rpm: 200, static_deflection_in: 1 }))));
+});

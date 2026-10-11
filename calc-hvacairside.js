@@ -274,7 +274,7 @@ export function computeVibrationIsolation({ equipment_rpm = 0, static_deflection
   const efficiency_pct = isolating ? (1 - transmissibility) * 100 : null;
   return {
     fn_hz, fn_cpm, disturbing_hz, ratio, transmissibility, efficiency_pct, isolating,
-    note: "ASHRAE Handbook -- Fundamentals, Sound and Vibration: the single-degree-of-freedom vibration isolator. The isolated system's natural frequency fn = 3.13 / sqrt(static deflection in inches) Hz (= (1/2pi) sqrt(g/deflection)); the disturbing frequency is the running speed rpm/60 Hz (the lowest forcing frequency, which isolates worst); the transmissibility T = 1 / |(f/fn)^2 - 1| is the fraction of the shaking force that still reaches the structure, and the isolation efficiency is (1 - T). Isolation requires the frequency ratio to exceed sqrt(2) = 1.414; below that the mount amplifies the vibration (true resonance at a ratio of 1), and the fix is a stiffer isolator (less deflection raises fn). The undamped idealization (damping trims high-frequency isolation slightly but tames the resonant peak). The deflection is the isolator's rated value under the actual load; the equipment unbalance, floor stiffness, seismic restraint, and the isolator selection are the mechanical engineer's. A design aid, not a stamped vibration-isolation design.",
+    note: "ASHRAE Handbook -- Fundamentals, Sound and Vibration: the single-degree-of-freedom vibration isolator. The isolated system's natural frequency fn = 3.13 / sqrt(static deflection in inches) Hz (= (1/2pi) sqrt(g/deflection)); the disturbing frequency is the running speed rpm/60 Hz (the lowest forcing frequency, which isolates worst); the transmissibility T = 1 / |(f/fn)^2 - 1| is the fraction of the shaking force that still reaches the structure, and the isolation efficiency is (1 - T). Isolation requires the frequency ratio to exceed sqrt(2) = 1.414; below that the mount amplifies the vibration (true resonance at a ratio of 1), and the fix is a SOFTER isolator with more static deflection (which lowers fn below the forcing frequency) or, where that much deflection is impractical, a rigid mount; a stiffer isolator only moves toward transmitting the vibration unchanged. The undamped idealization (damping trims high-frequency isolation slightly but tames the resonant peak). The deflection is the isolator's rated value under the actual load; the equipment unbalance, floor stiffness, seismic restraint, and the isolator selection are the mechanical engineer's. A design aid, not a stamped vibration-isolation design.",
   };
 }
 export const vibrationIsolationExample = { inputs: { equipment_rpm: 900, static_deflection_in: 1 } };
@@ -298,7 +298,7 @@ function _renderVibrationIsolation(inputRegion, outputRegion, citationEl) {
     oFd.textContent = fmt(r.disturbing_hz, 2) + " Hz";
     oR.textContent = fmt(r.ratio, 2) + (r.isolating ? " (over sqrt(2): isolating)" : " (under sqrt(2): amplifying)");
     oT.textContent = fmt(r.transmissibility, 3);
-    oEff.textContent = r.isolating ? fmt(r.efficiency_pct, 1) + "%" : "none - the mount AMPLIFIES " + fmt(r.transmissibility, 1) + "x (near resonance; use a stiffer isolator)";
+    oEff.textContent = r.isolating ? fmt(r.efficiency_pct, 1) + "%" : "none - the mount AMPLIFIES " + fmt(r.transmissibility, 1) + "x (near resonance; use a softer isolator with more deflection, or mount it rigidly)";
     oNote.textContent = r.note;
   }, DEBOUNCE_MS);
   attachExampleButton(inputRegion, () => { rpm.input.value = "900"; defl.input.value = "1"; update(); });
@@ -448,6 +448,7 @@ HVACAIRSIDE_RENDERERS["drybulb-from-enthalpy"] = _rEnv({
 
 // dims: in { cfm: L^3 T^-1, h_ent_btu: L^2 T^-2, h_lvg_btu: L^2 T^-2 } out: { q_btuh: M L^2 T^-3, tons: M L^2 T^-3, dh: L^2 T^-2 }
 export function computeCoolingCoilTotalLoad({ cfm = 0, h_ent_btu = 0, h_lvg_btu = 0 } = {}) {
+  if ([arguments[0]?.h_ent_btu, arguments[0]?.h_lvg_btu].some((x) => x === undefined || x === null || x === "" || !Number.isFinite(Number(x)))) return { error: "Enter both the entering and leaving air enthalpies (Btu/lb)." };
   const _g = _finiteGuardEnv(arguments[0]); if (_g) return _g;
   const q = Number(cfm) || 0;
   if (!(q > 0)) return { error: "Airflow must be positive (cfm)." };
@@ -479,6 +480,7 @@ HVACAIRSIDE_RENDERERS["cooling-coil-total-load"] = _rEnv({
 
 // dims: in { t_ent_f: T, t_lvg_f: T, t_adp_f: T } out: { bf: dimensionless, cf: dimensionless }
 export function computeCoilBypassFactor({ t_ent_f = 0, t_lvg_f = 0, t_adp_f = 0 } = {}) {
+  if (arguments[0]?.t_adp_f === undefined || t_adp_f === null || t_adp_f === "") return { error: "Enter the coil apparatus dew point (F)." };
   const _g = _finiteGuardEnv(arguments[0]); if (_g) return _g;
   const te = Number(t_ent_f);
   const tl = Number(t_lvg_f);
@@ -554,6 +556,7 @@ HVACAIRSIDE_RENDERERS["fan-affinity-laws"] = _rEnv({
 
 // dims: in { reynolds: dimensionless, rel_roughness: dimensionless } out: { f: dimensionless }
 export function computeColebrookFrictionFactor({ reynolds = 0, rel_roughness = 0 } = {}) {
+  if (Number(rel_roughness) > 0.05) return { error: "Relative roughness above 0.05 is outside the range of the Colebrook and Swamee-Jain relations." };
   const _g = _finiteGuardEnv(arguments[0]); if (_g) return _g;
   const re = Number(reynolds) || 0;
   const rr = Number(rel_roughness) || 0;

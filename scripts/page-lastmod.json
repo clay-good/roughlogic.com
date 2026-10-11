@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "3269fa55bd3bc8fe",
+      "sha": "0c8501e9dc9ef050",
       "date": "2026-10-11"
     },
     "/tools/": {
@@ -8682,8 +8682,8 @@
       "date": "2026-09-29"
     },
     "/tools/vibration-isolation/": {
-      "sha": "ef24919586f86ebf",
-      "date": "2026-10-03"
+      "sha": "de1388a90ba12768",
+      "date": "2026-10-11"
     },
     "/tools/vibration-severity-zone/": {
       "sha": "a92fb8ec2df049d2",
