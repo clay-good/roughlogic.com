@@ -61210,3 +61210,18 @@ test("hardening slice 33 (second pass: bottoms-up flow agreement, scaled distanc
   assert.match(MI.computeBlastScaledDistancePPV({ distance_ft: 6000, charge_per_delay_lb: 11000 }).sd_verdict, /asks 65/);
   assert.doesNotMatch(MI.computeBlastScaledDistancePPV({ distance_ft: 1200, charge_per_delay_lb: 340 }).sd_verdict, /asks 65/);
 });
+
+test("hardening slice 34 (second pass: UTM zone exceptions)", async () => {
+  const F = await import("../../calc-field.js");
+  // 32V is widened over south-west Norway, and Svalbard uses 31X/33X/35X/37X
+  const bergen = F.computeUTM({ direction: "latlon_to_utm", lat_deg: 60.39, lon_deg: 5.32 });
+  assert.equal(bergen.zone, 32);
+  const back = F.computeUTM({ direction: "utm_to_latlon", zone: 32, hemisphere: "N", easting: bergen.easting, northing: bergen.northing });
+  assert.ok(Math.abs(back.lat_deg - 60.39) < 1e-6 && Math.abs(back.lon_deg - 5.32) < 1e-6);
+  assert.equal(F.computeUTM({ direction: "latlon_to_utm", lat_deg: 78.2, lon_deg: 15.6 }).zone, 33);
+  assert.equal(F.computeUTM({ direction: "latlon_to_utm", lat_deg: 78.2, lon_deg: 8 }).zone, 31);
+  assert.equal(F.computeUTM({ direction: "latlon_to_utm", lat_deg: 78.2, lon_deg: 25 }).zone, 35);
+  // everywhere else the plain 6 degree rule stands
+  assert.equal(F.computeUTM({ direction: "latlon_to_utm", lat_deg: 50, lon_deg: 5 }).zone, 31);
+  assert.equal(F.computeUTM({ direction: "latlon_to_utm", lat_deg: 40, lon_deg: -105 }).zone, 13);
+});

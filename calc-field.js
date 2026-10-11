@@ -205,7 +205,12 @@ export function latlonToUTM(lat_deg, lon_deg) {
   const e2 = f * (2 - f);
   const ePrime2 = e2 / (1 - e2);
   const k0 = 0.9996;
-  const zone = utmZone(lon_deg);
+  // The grid's two exceptions to plain 6 degree zones: 32V is widened over south-west Norway
+  // (56-64 N, 3-12 E), and Svalbard (72-84 N) uses 31X, 33X, 35X and 37X only. Without them a
+  // position near Bergen came out in zone 31 where every map and GPS says 32.
+  let zone = utmZone(lon_deg);
+  if (lat_deg >= 56 && lat_deg < 64 && lon_deg >= 3 && lon_deg < 12) zone = 32;
+  else if (lat_deg >= 72 && lat_deg <= 84 && lon_deg >= 0 && lon_deg < 42) zone = lon_deg < 9 ? 31 : lon_deg < 21 ? 33 : lon_deg < 33 ? 35 : 37;
   const lon0 = (zone * 6 - 183) * Math.PI / 180;
   const phi = lat_deg * Math.PI / 180;
   const lam = lon_deg * Math.PI / 180;
