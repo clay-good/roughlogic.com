@@ -25,6 +25,7 @@ export const FIREWATER_RENDERERS = {};
 // dims: in { static_psi: M L^-1 T^-2, residual_psi: M L^-1 T^-2, qf_gpm: L^3 T^-1 } out: { hf_psi: M L^-1 T^-2, hr_psi: M L^-1 T^-2, qr_gpm: L^3 T^-1 }
 export function computeHydrantAvailableFlow({ static_psi = 0, residual_psi = 0, qf_gpm = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(Number(residual_psi) > 0)) return { error: "Enter the residual pressure read during the flow test (psi)." };
   const s = Number(static_psi) || 0;
   const res = Number(residual_psi) || 0;
   const qf = Number(qf_gpm) || 0;
@@ -163,6 +164,7 @@ FIREWATER_RENDERERS["iowa-rate-of-flow"] = renderIowaRateOfFlow;
 // dims: in { target_flow_gpm: L^3 T^-1, hose_coefficient: dimensionless, max_discharge_psi: M L^-1 T^-2, intake_residual_psi: M L^-1 T^-2, elevation_ft: L } out: { budget_psi: M L^-1 T^-2, fl_per_100_psi: M L^-1 T^-2, max_distance_ft: L }
 export function computeRelayPumpDistance({ target_flow_gpm = 0, hose_coefficient = 0, max_discharge_psi = 0, intake_residual_psi = 20, elevation_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (Number(intake_residual_psi) < 0) return { error: "Intake residual pressure cannot be negative (psi)." };
   const Q = Number(target_flow_gpm) || 0;
   const C = Number(hose_coefficient) || 0;
   const maxD = Number(max_discharge_psi) || 0;
@@ -221,6 +223,7 @@ export function computeDraftLiftMax({ site_elevation_ft = 0, pump_factor = 0.667
   if (!(factor > 0 && factor <= 1)) return { error: "Pump condition factor must be over 0 and at most 1." };
   const theoretical_lift_ft = 33.9 - elev / 1000;
   const attainable_lift_ft = factor * theoretical_lift_ft - loss;
+  if (!(attainable_lift_ft > 0)) return { error: "No draft is possible here: the suction losses and altitude use up the whole attainable lift. Shorten or enlarge the suction hose, or relay." };
   return {
     theoretical_lift_ft, attainable_lift_ft,
     note: "A real pump cannot pull a perfect vacuum, so about two-thirds of theoretical is the practical ceiling (about 22.5 ft at sea level), and every 1,000 ft of altitude takes about a foot off the theoretical lift (about two-thirds of a foot off the attainable). Lift is limited by atmospheric pressure pushing water up the suction, not the pump pulling it, so a bigger pump does not help; over the attainable lift you must resite the pump lower. 1 in Hg of vacuum is about 1.13 ft of lift. A planning aid, not incident command.",
@@ -263,6 +266,7 @@ export function computeVacuumLiftReading({ vacuum_inhg = 0, site_elevation_ft = 
   const suction_head_ft = vac * 1.13;
   const theoretical_ceiling_ft = 33.9 - elev / 1000;
   const attainable_ceiling_ft = factor * theoretical_ceiling_ft;
+  if (!(attainable_ceiling_ft > 0)) return { error: "Site elevation is beyond the range of the 1 ft per 1,000 ft rule; no draft ceiling can be stated." };
   const margin_ft = attainable_ceiling_ft - suction_head_ft;
   const pct_of_attainable = attainable_ceiling_ft > 0 ? suction_head_ft / attainable_ceiling_ft * 100 : null;
   const over_ceiling = margin_ft < -1e-9;
@@ -453,6 +457,8 @@ FIREWATER_RENDERERS["tanker-fleet-size"] = renderTankerFleetSize;
 // dims: in { inlet_pressure_psi: M L^-1 T^-2, eductor_flow_gpm: L^3 T^-1, hose_coefficient: dimensionless, nozzle_pressure_psi: M L^-1 T^-2, elevation_ft: L } out: { max_back_pressure_psi: M L^-1 T^-2, fl_per_100_psi: M L^-1 T^-2, max_length_ft: L }
 export function computeFoamEductorLimit({ inlet_pressure_psi = 0, eductor_flow_gpm = 0, hose_coefficient = 0, nozzle_pressure_psi = 0, elevation_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A blank nozzle pressure used to be a real 0 psi nozzle, which let the hose run 929 ft where 121 is the limit.
+  if (!(Number(nozzle_pressure_psi) > 0)) return { error: "Enter the nozzle pressure the eductor is matched to (psi)." };
   const inlet = Number(inlet_pressure_psi) || 0;
   const Q = Number(eductor_flow_gpm) || 0;
   const C = Number(hose_coefficient) || 0;

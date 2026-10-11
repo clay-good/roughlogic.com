@@ -35370,7 +35370,9 @@ test("bounds: spec-v1143 computeExtinguisherCoverage pins the 2d^2 identity agai
   assert.ok(r.area_per_unit_sf === 11250 && r.cap_matches_geometry);
   assert.ok(r.by_travel === 4 && r.by_area_cap === 4 && r.required_extinguishers === 4);
   // Geometry holds at every travel distance, and the grid relation is self-consistent.
-  for (const d of [15, 30, 50, 75, 100]) {
+  // Class B stops at 50 ft since hardening slice 6 (NFPA 10's 30 or 50 ft); 75 and 100 are errors.
+  assert.ok("error" in _v1143({ ...base, hazard_class: "B", travel_distance_ft: 75 }));
+  for (const d of [15, 30, 50]) {
     const t = _v1143({ ...base, hazard_class: "B", travel_distance_ft: d });
     assert.ok(Math.abs(t.area_per_unit_sf - 2 * d * d) < 1e-9);
     assert.ok(Math.abs(t.grid_spacing_ft - d * Math.SQRT2) < 1e-9);
@@ -60220,4 +60222,63 @@ test("hardening slice 5 (feeders, motors, power quality, lineworker): the review
   err(_s5LW.computeMeterCtPtMultiplier({ ct_primary_a: 200, pt_primary_v: 7200, demand_register_kw: 1.8, service_voltage_kv: 480 }));
   err(_s5LW.computeRecloserFuseCoordination({ fault_current_a: 2000, fast_curve_s: 0.3, slow_curve_s: 0.05, fuse_min_melt_s: 0.5, fuse_total_clear_s: 0.6 }));
   err(_s5LW.computeCounterpoiseResistance({ soil_resistivity_ohm_cm: 10000, length_ft: 2, burial_depth_in: 48, wire_diameter_in: 1 }));
+});
+
+// Hardening slice 6 (2026-10-10): fire, sprinkler, fire water, fuel gas and relief, 73 calculators
+// re-derived and run by independent reviewers. One assertion per confirmed defect.
+import * as _s6F from "../../calc-fire.js";
+import * as _s6FS from "../../calc-firesprinkler.js";
+import * as _s6FW from "../../calc-firewater.js";
+import * as _s6G from "../../calc-gas.js";
+import * as _s6R from "../../calc-relief.js";
+
+test("hardening slice 6 (fire, sprinkler, fire water, gas, relief): the reviewed defects stay fixed", () => {
+  const near = (a, b, tol) => assert.ok(Math.abs(a - b) <= tol, a + " vs " + b);
+  const err = (r) => assert.ok(r && typeof r.error === "string", JSON.stringify(r).slice(0, 120));
+  // Blank read as a real value.
+  err(_s6F.computeScbaCylinderTime({ V_rated_scf: 88, P_rated_psi: 4500, P_start_psi: 4500, P_alarm_psi: null, consumption_lpm: 40 }));
+  near(_s6F.computeBrakingDistance({ speed_mph: 55, friction_coefficient: 0.7, reaction_time_s: null }).total_distance_ft, 265.0, 0.1);
+  err(_s6F.computeBrakingDistance({ speed_mph: 55, friction_coefficient: 0.7, reaction_time_s: -2 }));
+  near(_s6F.computeElevationPressureLoss({ mode: "feet", value: 100, floor_height_ft: 0 }).rule_psi, 50, 1e-9);
+  err(_s6F.computeElevationPressureLoss({ mode: "ft", value: 9 }));
+  err(_s6F.computeFoam({ fire_area_ft2: 1500, foam_percentage: 0 }));
+  near(_s6F.computeFoam({ fire_area_ft2: 1500, foam_percentage: null, duration_min: null }).total_concentrate_gallons, 1500 * 0.10 * 0.03 * 15, 1e-9);
+  err(_s6FW.computeFoamEductorLimit({ inlet_pressure_psi: 200, eductor_flow_gpm: 95, hose_coefficient: 15.5 }));
+  err(_s6FW.computeHydrantAvailableFlow({ static_psi: 70, qf_gpm: 1000 }));
+  err(_s6G.computePropaneVaporizationRate({}));
+  // Unchecked coefficients, signs and options.
+  err(_s6F.computeHydrantFlow({ pitot_psi: 40, outlet_diameter_in: 2.5, c: 1.5 }));
+  err(_s6F.computeHydrantFlow({ pitot_psi: 40, outlet_diameter_in: 2.5, c: null }));
+  err(_s6G.computeGasLeakRate({ orifice_diameter_in: 0.05, upstream_psi: 0.25, gas: "natural_gas", c: 0 }));
+  err(_s6F.computePDP({ nozzle_pressure_psi: 100, friction_loss_psi: 25, elevation_ft: -400 }));
+  err(_s6F.computePDP({ nozzle_pressure_psi: 100, friction_loss_psi: 25, elevation_ft: "x" }));
+  err(_s6F.computeStandpipePDP({ standpipe_class: "IV", nozzle_pressure_psi: 100, design_gpm: 250 }));
+  err(_s6F.computeFireFriction({ hose_diameter: "2.5_in", gpm: 250, length_ft: -200 }));
+  err(_s6F.computeAerialLadderReach({ angle_deg: 120, extension_ft: 100 }));
+  err(_s6F.computeLadderPipeReach({ angle_deg: -30, extension_ft: 100, nozzle_type: "fog_master", nozzle_pressure_psi: 100 }));
+  err(_s6F.computeFireStreamReaction({ nozzle_type: "Fog", flow_gpm: 150, bore_in: 0.5, nozzle_pressure_psi: 100 }));
+  err(_s6F.computeSprinklerKFactor({ solve_for: "K", flow_gpm: 20, pressure_psi: 10 }));
+  err(_s6F.computeSprinklerDensity({ area_of_operation_ft2: 1500, density_gpm_per_ft2: -0.3, hazard_category: "light" }));
+  err(_s6F.computeSprinklerDensity({ area_of_operation_ft2: 1500, density_gpm_per_ft2: 0.1, hazard_category: "bogus" }));
+  const w = { volume_ft3: 30000, occupancy_class: 7, construction_class: "V" };
+  assert.strictEqual(_s6F.computeNFPA1142WaterSupply({ ...w, sprinkler_listed: "false" }).Q_min_gal, _s6F.computeNFPA1142WaterSupply({ ...w, sprinkler_listed: false }).Q_min_gal);
+  assert.ok(_s6F.computeNFPA1142WaterSupply({ ...w, sprinkler_listed: false }).Q_min_gal > 0);
+  err(_s6F.computeConfinedSpaceVent({ length_ft: -10, width_ft: -10, height_ft: 10 }));
+  err(_s6F.computeExtinguisherCoverage({ floor_area_sf: 40000, hazard_class: "B", travel_distance_ft: 500 }));
+  err(_s6F.computeStandpipeFriction({ riser_height_ft: 100, outlet_count: 2, gpm_per_outlet: 250, outlet_length_ft: -100 }));
+  err(_s6F.computeRequiredFireFlow({ structure_area_ft2: 50000, occupancy_factor: -1 }));
+  err(_s6F.computeFdcSupplyCheck({ fdc_pressure_psi: 150, total_flow_gpm: 500, lines: 1.5, line_length_ft: 100 }));
+  err(_s6F.computeMasterStreamReach({ nozzle_type: "fog_master", nozzle_pressure_psi: 1000 }));
+  err(_s6F.computeHoseLaySectionCount({ map_distance_ft: 1000, slack_fraction: 20, hose_id_in: 1.5 }));
+  err(_s6G.computeGasPipeSizing({ btu_load: 100000, length_ft: 0, gas: "natural_gas" }));
+  err(_s6FW.computeRelayPumpDistance({ target_flow_gpm: 800, hose_coefficient: 0.08, max_discharge_psi: 200, intake_residual_psi: -100 }));
+  err(_s6FW.computeDraftLiftMax({ site_elevation_ft: 3000, suction_losses_ft: 25 }));
+  err(_s6FS.computeSprinklerSystemDemand({ hose_gpm: "abc" }));
+  err(_s6FS.computeJockeyPumpSizing({ fire_pump_gpm: 50, churn_psi: 10, min_static_psi: 0 }));
+  // Verdicts that disagreed with the numbers.
+  const hs = _s6FS.computeHydrantSpacingCount({ required_flow_gpm: 1000, credited_flow_per_hydrant_gpm: 1000, frontage_ft: 1200, average_spacing_ft: 500, max_distance_ft: 100 });
+  assert.strictEqual(hs.hydrants_for_max_distance, 7); assert.ok(/7 hydrants in all/.test(hs.verdict));
+  near(_s6G.computeGasAltitudeDerate({ nameplate_input_btuh: "100000", elevation_ft: "10000", derate_pct_per_1000: "4", threshold_ft: "2000" }).factor, 0.6, 1e-9);
+  assert.ok(/SHORT of the load at BOTH/.test(JSON.stringify(_s6G.computePropaneRegulatorSizing({ ..._s6G.propaneRegulatorSizingExample.inputs, connected_load_btuh: 1000000 }))));
+  err(_s6R.computeSafeRoomCapacity({ room_type: "community_tornado", gross_area_sqft: 12000, usable_method: "net", net_usable_area_sqft: 11997, bed_spaces_count: 399 }));
 });

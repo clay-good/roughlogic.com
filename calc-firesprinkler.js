@@ -134,6 +134,7 @@ FIRESPRINKLER_RENDERERS["fire-pump-curve"] = _simpleRenderer({
 // dims: in { density: L T^-1, design_area: L^2, hose_gpm: L^3 T^-1, duration_min: T } out: { sprinkler_gpm: L^3 T^-1, total_gpm: L^3 T^-1, volume_gal: L^3 }
 export function computeSprinklerSystemDemand({ density = 0.20, design_area = 1500, hose_gpm = 250, duration_min = 90 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (![density, design_area, hose_gpm, duration_min].every((x) => Number.isFinite(Number(x)) && Number(x) >= 0)) return { error: "Density, area, hose allowance and duration must be numbers, zero or more." };
   hose_gpm = Number(hose_gpm);
   if (!(density > 0)) return { error: "Design density must be positive (gpm/ft^2)." };
   if (!(design_area > 0)) return { error: "Design area must be positive (ft^2)." };
@@ -253,6 +254,7 @@ FIRESPRINKLER_RENDERERS["sprinkler-head-layout"] = _simpleRenderer({
 // dims: in { q_head_gpm: L^3 T^-1, k_factor: dimensionless, q_total_gpm: L^3 T^-1, pipe_id_in: L, c_factor: dimensionless, equiv_length_ft: L, elevation_ft: L } out: { start_pressure_psi: M L^-1 T^-2, friction_per_ft_psi: M L^-1 T^-2, friction_psi: M L^-1 T^-2, elevation_psi: M L^-1 T^-2, demand_psi: M L^-1 T^-2 }
 export function computeSprinklerPressureDemand({ q_head_gpm = 0, k_factor = 5.6, q_total_gpm = 0, pipe_id_in = 0, c_factor = 120, equiv_length_ft = 0, elevation_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!Number.isFinite(Number(elevation_ft))) return { error: "Elevation must be a number (ft)." };
   if (!(q_head_gpm > 0)) return { error: "Remote-head flow must be positive (gpm)." };
   if (!(k_factor > 0)) return { error: "K-factor must be positive (gpm/psi^0.5)." };
   if (!(q_total_gpm > 0)) return { error: "Total flow must be positive (gpm)." };
@@ -386,6 +388,7 @@ FIRESPRINKLER_RENDERERS["drypipe-air-compressor"] = _simpleRenderer({
 // dims: in { fire_pump_gpm: L^3 T^-1, churn_psi: M L^-1 T^-2, min_static_psi: M L^-1 T^-2 } out: { jockey_gpm: L^3 T^-1, jockey_stop_psi: M L^-1 T^-2, jockey_start_psi: M L^-1 T^-2, fire_pump_start_psi: M L^-1 T^-2 }
 export function computeJockeyPumpSizing({ fire_pump_gpm = 750, churn_psi = 120, min_static_psi = 50 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(Number(min_static_psi) > 0)) return { error: "Enter the minimum static supply pressure (psi)." };
   if (!(fire_pump_gpm > 0)) return { error: "Fire pump rated flow must be positive (gpm)." };
   if (!(churn_psi > 0)) return { error: "Churn (shutoff) pressure must be positive (psi)." };
   if (min_static_psi < 0) return { error: "Minimum static pressure cannot be negative (psi)." };
@@ -614,6 +617,9 @@ export function computeHydrantSpacingCount({ required_flow_gpm = 0, credited_flo
   const actual_spacing_ft = governing_count > 1 ? frontage_ft / (governing_count - 1) : frontage_ft;
   const worst_distance_ft = actual_spacing_ft / 2;
   const passes = worst_distance_ft <= max_distance_ft + 1e-9 * Math.abs(max_distance_ft);
+  // The count that actually meets the maximum-distance limit (evenly spaced, one at each end).
+  // "Add a hydrant" understated it: 1,200 ft at a 100 ft limit takes seven, not five.
+  const hydrants_for_max_distance = Math.max(governing_count, Math.ceil(frontage_ft / (2 * max_distance_ft) - 1e-9) + 1);
   const governing = hydrants_by_frontage > hydrants_by_flow
     ? "the spacing rule (geometry)"
     : hydrants_by_flow > hydrants_by_frontage
@@ -621,7 +627,7 @@ export function computeHydrantSpacingCount({ required_flow_gpm = 0, credited_flo
       : "neither: both rules ask for the same count, with no margin on either";
   const verdict = passes
     ? "PASSES: no point on the frontage sits more than " + fmt(worst_distance_ft, 0) + " ft from a hydrant, inside the " + fmt(max_distance_ft, 0) + " ft limit"
-    : "FAILS the maximum-distance limit by " + fmt(worst_distance_ft - max_distance_ft, 0) + " ft -- add a hydrant";
+    : "FAILS the maximum-distance limit by " + fmt(worst_distance_ft - max_distance_ft, 0) + " ft -- " + hydrants_for_max_distance + " hydrants in all are needed to meet it";
   if (![hydrants_by_flow, hydrants_by_frontage, actual_spacing_ft, worst_distance_ft].every(Number.isFinite)) return { error: "Hydrant-spacing math is not a finite value." };
   return {
     hydrants_by_flow,
@@ -629,6 +635,7 @@ export function computeHydrantSpacingCount({ required_flow_gpm = 0, credited_flo
     governing_count,
     actual_spacing_ft,
     worst_distance_ft,
+    hydrants_for_max_distance,
     passes,
     governing,
     verdict,

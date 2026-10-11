@@ -139,6 +139,10 @@ export function ifgcLowPressureFlow({ d_in, dP_in_wc, cr, L_ft }) {
 // dims: in { btu_load: M L^2 T^-3, length_ft: L, gas: dimensionless, dP_in_wc: M L^-1 T^-2, candidate_sizes: dimensionless } out: { recommended_size_in: L, candidates: dimensionless }
 export function computeGasPipeSizing({ btu_load, length_ft, gas, dP_in_wc = 0.5, candidate_sizes = ["0.5", "0.75", "1", "1.25", "1.5", "2"] }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(Number(btu_load) > 0)) return { error: "Connected load must be positive (BTU/h)." };
+  if (!(Number(length_ft) > 0)) return { error: "Pipe length must be positive (ft)." };
+  if (!(Number(dP_in_wc) > 0)) return { error: "Allowable pressure drop must be positive (in w.c.)." };
+  if (Number(dP_in_wc) > 41) return { error: "A drop over about 41 in w.c. (1.5 psi) is outside the low-pressure equation this table uses." };
   const props = GAS_PROPERTIES[gas];
   if (!props) return { error: "Unknown gas." };
   // A negative load makes `required_cfh` negative, which the first candidate
@@ -213,6 +217,8 @@ const _ORIFICE_CFH_K = 25 * Math.sqrt(2 * 144 * 32.174 / 0.0764);
 // dims: in { orifice_diameter_in: L, upstream_psi: M L^-1 T^-2, gas: dimensionless, c: dimensionless } out: { leak_rate_scfh: L^3 T^-1 }
 export function computeGasLeakRate({ orifice_diameter_in, upstream_psi, gas, c = 0.7 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // The coefficient was never checked: 0 or blank answered "no leak" for a real hole.
+  if (!(Number(c) > 0 && Number(c) <= 1)) return { error: "Discharge coefficient must be over 0 and at most 1 (about 0.6 to 0.7 for a rough hole)." };
   c = Number(c);
   const props = GAS_PROPERTIES[gas];
   if (!props) return { error: "Unknown gas." };
@@ -221,7 +227,7 @@ export function computeGasLeakRate({ orifice_diameter_in, upstream_psi, gas, c =
   if (d <= 0 || dP <= 0) return { error: "Provide positive orifice diameter and pressure." };
   // The equation holds gas density at its standard value; gas density rises with line pressure,
   // so the leak is understated more at higher pressure. Until 2026-10-03 any pressure was accepted.
-  if (dP > 5) return { error: "Above 5 psig the incompressible orifice equation under-reads the leak by more than about 15% (and chokes near 13 psig); this low-pressure estimate does not apply." };
+  if (dP > 5) return { error: "Above 5 psig the incompressible orifice equation departs from the compressible result by more than a few percent (and the flow chokes near 13 psig); this low-pressure estimate does not apply." };
   const A = Math.PI * (d / 2) ** 2;
   const Q = _ORIFICE_CFH_K * c * A * Math.sqrt(dP / props.specific_gravity);
   return {
@@ -281,7 +287,7 @@ export function computeGasLeakHoleDiameter({ leak_rate_cfh, upstream_psi, gas, c
   const cd = Number(c) || 0;
   if (!(Q > 0)) return { error: "Provide a positive leak rate (cfh)." };
   if (!(dP > 0)) return { error: "Provide a positive upstream pressure (psi)." };
-  if (dP > 5) return { error: "Above 5 psig the incompressible orifice equation under-reads the leak by more than about 15% (and chokes near 13 psig); this low-pressure estimate does not apply." };
+  if (dP > 5) return { error: "Above 5 psig the incompressible orifice equation departs from the compressible result by more than a few percent (and the flow chokes near 13 psig); this low-pressure estimate does not apply." };
   if (!(cd > 0)) return { error: "Discharge coefficient must be positive." };
   const orifice_area_in2 = Q / (_ORIFICE_CFH_K * cd * Math.sqrt(dP / props.specific_gravity));
   const orifice_diameter_in = Math.sqrt(4 * orifice_area_in2 / Math.PI);
@@ -450,6 +456,9 @@ GAS_RENDERERS["gas-pipe-max-flow"] = renderGasPipeMaxFlow;
 // dims: in { nameplate_input_btuh: M L^2 T^-3, elevation_ft: L, derate_pct_per_1000: dimensionless, threshold_ft: L } out: { steps_1000: dimensionless, factor: dimensionless, derated_input_btuh: M L^2 T^-3 }
 export function computeGasAltitudeDerate({ nameplate_input_btuh = 0, elevation_ft = 0, derate_pct_per_1000 = 4, threshold_ft = 2000 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  nameplate_input_btuh = Number(nameplate_input_btuh); elevation_ft = Number(elevation_ft); threshold_ft = Number(threshold_ft);
+  if (derate_pct_per_1000 === null || derate_pct_per_1000 === "") derate_pct_per_1000 = 4;
+  derate_pct_per_1000 = Number(derate_pct_per_1000);
   if (!(nameplate_input_btuh > 0)) return { error: "Nameplate input must be positive (BTU/hr)." };
   if (elevation_ft < 0) return { error: "Elevation must be non-negative (ft)." };
   if (derate_pct_per_1000 < 0) return { error: "Derate percent must be non-negative." };
@@ -851,6 +860,8 @@ export function computePropaneVaporizationRate({
   reference_ambient_f = 0, connected_load_btuh = 0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // An omitted temperature used to be a real 0 degF.
+  for (const k of ["liquid_temperature_f"]) if (arguments[0]?.[k] === undefined || arguments[0]?.[k] === null || arguments[0]?.[k] === "") return { error: "Enter the liquid (tank) temperature (degF); in steady cold weather it is the ambient." };
   if (!(tank_diameter_ft > 0) || !(tank_length_ft > 0)) return { error: "Tank diameter and length must be greater than zero." };
   if (!(percent_full > 0) || percent_full > 100) return { error: "Percent full must be greater than zero and no more than 100." };
   if (!(reference_percent_full > 0) || reference_percent_full > 100) return { error: "Reference percent full must be greater than zero and no more than 100." };
@@ -927,6 +938,7 @@ export function computePropaneFillOutage({
   btu_per_gal = _LP_BTU_PER_GAL, liquid_temperature_f = 0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (arguments[0]?.liquid_temperature_f === undefined || arguments[0]?.liquid_temperature_f === null || arguments[0]?.liquid_temperature_f === "") return { error: "Enter the liquid temperature at the time of the gauge reading (degF)." };
   if (!(water_capacity_gal > 0)) return { error: "Water capacity must be greater than zero." };
   if (!(fill_limit_pct > 0) || fill_limit_pct > 100) return { error: "The filling limit must be greater than zero and no more than 100 percent." };
   if (current_gauge_pct < 0 || current_gauge_pct > 100) return { error: "The gauge reading must be between zero and 100 percent." };
@@ -1023,7 +1035,9 @@ export function computePropaneRegulatorSizing({
     ? "no warm-tank capacity was entered, so only the cold case is checked -- which is the case that matters"
     : passes_warm_fails_cold
       ? "AND THAT IS THE TRAP THE SPEC NAMES. At the warm tank pressure the same regulator passes " + fmt(capacity_at_max_inlet_cfh, 0) + " CFH and looks ample; at the cold one it passes " + fmt(capacity_at_min_inlet_cfh, 0) + ", a fall of " + fmt(capacity_fall_pct, 0) + "%. It is sized on a summer afternoon and starves on a January morning"
-      : "the same regulator passes " + fmt(capacity_at_max_inlet_cfh, 0) + " CFH at the warm tank pressure and " + fmt(capacity_at_min_inlet_cfh, 0) + " at the cold one, a fall of " + fmt(capacity_fall_pct, 0) + "% -- and it carries the load at both, which is what sizing at the minimum tank pressure is for";
+      : (short_at_min || short_at_max)
+        ? "the same regulator passes " + fmt(capacity_at_max_inlet_cfh, 0) + " CFH at the warm tank pressure and " + fmt(capacity_at_min_inlet_cfh, 0) + " at the cold one -- SHORT of the load at " + (short_at_min && short_at_max ? "BOTH" : short_at_max ? "the warm point" : "the cold point") + "; it needs a larger regulator, not a warmer day"
+        : "the same regulator passes " + fmt(capacity_at_max_inlet_cfh, 0) + " CFH at the warm tank pressure and " + fmt(capacity_at_min_inlet_cfh, 0) + " at the cold one, a fall of " + fmt(capacity_fall_pct, 0) + "% -- and it carries the load at both, which is what sizing at the minimum tank pressure is for";
   const secondVerdict = !has_second
     ? "no second-stage capacity was entered"
     : short_second
@@ -1133,6 +1147,7 @@ export function computePropaneRunTime({
   gallons_per_hdd = 0, hdd_per_day = 0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (Number(arguments[0]?.current_gauge_pct) > Number(arguments[0]?.fill_limit_pct ?? 80) + 1e-9) return { error: "The gauge reads above the filling limit: the container is overfilled. See the fill-and-outage calculator before planning run time." };
   if ([gallons_per_hdd, hdd_per_day].some((x) => Number(x) < 0)) return { error: "Gallons per degree day and degree days per day cannot be negative." };
   if (!(water_capacity_gal > 0)) return { error: "Water capacity must be greater than zero." };
   if (!(fill_limit_pct > 0) || fill_limit_pct > 100) return { error: "The filling limit must be greater than zero and no more than 100 percent." };

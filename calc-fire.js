@@ -42,6 +42,7 @@ export const HOSE_FRICTION_COEFFICIENTS = {
 //        out: { friction_loss_psi: M L^-1 T^-2, coefficient: dimensionless }
 export function computeFireFriction({ hose_diameter, gpm, length_ft }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(Number(gpm) >= 0) || !(Number(length_ft) >= 0) || gpm === null || length_ft === null) return { error: "Flow (gpm) and hose length (ft) must be numbers, zero or more." };
   const C = HOSE_FRICTION_COEFFICIENTS[hose_diameter];
   if (C === undefined) return { error: "Unknown hose diameter." };
   return { friction_loss_psi: fireHoseFrictionLoss({ C, gpm, length_ft }), coefficient: C };
@@ -58,6 +59,8 @@ export const fireFrictionExample = {
 //        out: { pdp_psi: M L^-1 T^-2, elevation_psi: M L^-1 T^-2 }
 export function computePDP({ nozzle_pressure_psi, friction_loss_psi, elevation_ft = 0, appliance_loss_psi = 0 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!Number.isFinite(Number(elevation_ft))) return { error: "Elevation must be a number (ft; negative for a downhill lay)." };
+  elevation_ft = Number(elevation_ft);
   nozzle_pressure_psi = Number(nozzle_pressure_psi); friction_loss_psi = Number(friction_loss_psi); appliance_loss_psi = Number(appliance_loss_psi);
   // DR-08: pressures and losses cannot be negative (elevation may be, for a
   // downhill lay). One validation pass for the unguarded pressure inputs.
@@ -67,6 +70,7 @@ export function computePDP({ nozzle_pressure_psi, friction_loss_psi, elevation_f
   // Elevation: add 0.5 psi per foot up; subtract per foot down.
   const elevation_psi = elevation_ft * 0.5;
   const pdp = nozzle_pressure_psi + friction_loss_psi + elevation_psi + appliance_loss_psi;
+  if (pdp < -1e-9) return { error: "The downhill head exceeds every loss: gravity alone over-supplies this line and there is no pump discharge pressure to set. Gate the line down." };
   return { pdp_psi: pdp, elevation_psi };
 }
 
@@ -81,6 +85,10 @@ export const pdpExample = {
 //        out: { flow_gpm: L^3 T^-1, coefficient_of_discharge: dimensionless, reaction_lb: M L T^-2 }
 export function computeHydrantFlow({ pitot_psi, outlet_diameter_in, c = 0.9 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // The coefficient was never checked: 1.5 overstated the supply and a blank read 0 gpm.
+  if (!(Number(c) > 0 && Number(c) <= 1)) return { error: "The outlet coefficient is over 0 and at most 1 (0.9 smooth, 0.8 square, 0.7 projecting)." };
+  if (!(Number(outlet_diameter_in) > 0)) return { error: "Outlet diameter must be positive (in)." };
+  if (!(Number(pitot_psi) >= 0)) return { error: "Pitot pressure cannot be negative (psi)." };
   c = Number(c);
   // v23 EN.12: smooth-bore outlet reaction NR = 1.57 * d^2 * NP (IFSTA),
   // treating the pitot pressure as the nozzle pressure. Finite-guarded so a
@@ -118,6 +126,8 @@ export const ISO_CONSTRUCTION_FACTORS = {
 //        out: { needed_fire_flow_gpm: L^3 T^-1, base_C_gpm: L^3 T^-1, construction_factor: dimensionless, iowa_rate_gpm: L^3 T^-1, divergence_gpm: L^3 T^-1 }
 export function computeRequiredFireFlow({ structure_area_ft2, construction_class = "ordinary", occupancy_factor = 1.0, exposure_factor = 0, communication_factor = 0, volume_ft3 = 0 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(Number(occupancy_factor) > 0)) return { error: "Occupancy factor must be positive (0.75 to 1.25)." };
+  if (!Number.isFinite(Number(exposure_factor)) || !Number.isFinite(Number(communication_factor))) return { error: "Exposure and communication factors must be numbers." };
   const F = ISO_CONSTRUCTION_FACTORS[construction_class];
   if (!F) return { error: "Unknown construction class." };
   // DR-05 (RC-1): a negative area yields sqrt(negative) = NaN in the flow.
@@ -167,6 +177,7 @@ export const MASTER_STREAM_TYPES = {
 //        out: { typical_reach_ft: L, nozzle_type: dimensionless, base_reach_ft: L, typical_pressure_psi: M L^-1 T^-2, reaction_lb: M L T^-2 }
 export function computeMasterStreamReach({ nozzle_type, nozzle_pressure_psi }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (Number(nozzle_pressure_psi) > 200) return { error: "Nozzle pressure is over 200 psi, beyond any master stream device; the reach scaling does not extend that far." };
   const t = MASTER_STREAM_TYPES[nozzle_type];
   if (!t) return { error: "Unknown nozzle type." };
   // DR-06 (RC-1): a negative pressure makes sqrt(negative) = NaN, and the
@@ -201,6 +212,7 @@ export const masterStreamExample = {
 //        out: { horizontal_reach_ft: L, vertical_reach_ft: L }
 export function computeAerialLadderReach({ angle_deg, extension_ft }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(Number(angle_deg) >= 0 && Number(angle_deg) <= 90) || angle_deg === null) return { error: "Ladder angle must be between 0 and 90 degrees." };
   // DR-08: a negative extension yields a negative reach. Length is non-negative.
   if (!(extension_ft >= 0)) return { error: "Ladder extension cannot be negative." };
   const rad = angle_deg * Math.PI / 180;
@@ -220,6 +232,11 @@ export const aerialLadderExample = {
 //        out: { total_solution_gpm: L^3 T^-1, concentrate_gpm: L^3 T^-1, total_concentrate_gallons: L^3, total_solution_gallons: L^3 }
 export function computeFoam({ fire_area_ft2, application_rate_gpm_per_ft2 = 0.10, foam_percentage = 3, duration_min = 15 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (foam_percentage === null || foam_percentage === "") foam_percentage = 3;
+  if (duration_min === null || duration_min === "") duration_min = 15;
+  // Zero percent or zero minutes answered "0 gal needed"; the inverse tile already refuses both.
+  if (!(foam_percentage > 0 && foam_percentage <= 100)) return { error: "Foam percentage must be over 0 and at most 100 (1, 3 or 6 for most concentrates)." };
+  if (!(duration_min > 0)) return { error: "Application duration must be positive (min)." };
   // DR-07: no validation let negatives flow to finite-but-negative gallons.
   if (!(fire_area_ft2 > 0)) return { error: "Fire area must be positive." };
   if (!(application_rate_gpm_per_ft2 > 0)) return { error: "Application rate must be positive." };
@@ -581,6 +598,8 @@ export const SPRINKLER_HAZARD_MIN_AREA_FT2 = {
 //        out: { total_gpm: L^3 T^-1, density_gpm_per_ft2: L T^-1, meets_minimum: dimensionless, hazard_minimum_density: L T^-1, hazard_minimum_area_ft2: L^2 }
 export function computeSprinklerDensity({ area_of_operation_ft2, density_gpm_per_ft2, hazard_category }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (Number(density_gpm_per_ft2) < 0) return { error: "Density cannot be negative (gpm/ft2)." };
+  if (hazard_category && !Object.hasOwn(SPRINKLER_HAZARD_MIN_DENSITY, String(hazard_category))) return { error: "Unknown hazard category." };
   const a = Number(area_of_operation_ft2) || 0;
   let d = Number(density_gpm_per_ft2) || 0;
   if (a <= 0) return { error: "Area must be positive." };
@@ -611,6 +630,8 @@ export const sprinklerDensityExample = {
 //        out: { elevation_psi: M L^-1 T^-2, friction_total_psi: M L^-1 T^-2, per_outlet_psi: M L^-1 T^-2, total_psi: M L^-1 T^-2, outlet_count: dimensionless, total_flow_gpm: L^3 T^-1 }
 export function computeStandpipeFriction({ riser_height_ft, outlet_count, gpm_per_outlet, outlet_length_ft = 50, hose_diameter = "2.5_in" }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(Number(outlet_length_ft) >= 0)) return { error: "Hose length cannot be negative (ft)." };
+  if (!Number.isInteger(Number(outlet_count)) || !(Number(outlet_count) >= 1)) return { error: "Outlet count is a whole number, 1 or more." };
   const h = Number(riser_height_ft) || 0;
   const n = Number(outlet_count) || 0;
   const Q = Number(gpm_per_outlet) || 0;
@@ -644,6 +665,7 @@ export const standpipeExample = {
 //        out: { horizontal_ladder_ft: L, vertical_ladder_ft: L, stream_reach_ft: L, horizontal_stream_ft: L, horizontal_total_ft: L }
 export function computeLadderPipeReach({ angle_deg, extension_ft, nozzle_type, nozzle_pressure_psi }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(Number(angle_deg) >= 0 && Number(angle_deg) <= 90) || angle_deg === null) return { error: "Ladder angle must be between 0 and 90 degrees." };
   const ladder = computeAerialLadderReach({ angle_deg, extension_ft });
   if (ladder.error) return ladder;
   const stream = computeMasterStreamReach({ nozzle_type, nozzle_pressure_psi });
@@ -674,6 +696,8 @@ export const ladderPipeExample = {
 //        out: { braking_distance_ft: L, reaction_distance_ft: L, total_distance_ft: L, effective_friction: dimensionless }
 export function computeBrakingDistance({ speed_mph, friction_coefficient, grade_percent = 0, reaction_time_s = 1.5 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (reaction_time_s === null || reaction_time_s === "") reaction_time_s = 1.5;
+  if (!(Number(reaction_time_s) >= 0)) return { error: "Reaction time cannot be negative (s)." };
   const v = Number(speed_mph) || 0;
   const mu = Number(friction_coefficient) || 0;
   const g_pct = Number(grade_percent) || 0;
@@ -896,6 +920,8 @@ export function computeIsoNeededFireFlow({
   exposure_factor_x = null,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A zero or negative exposure distance (an abutting building) used to skip the exposure factor.
+  if (Number(arguments[0]?.exposure_distance_ft) < 0) return { error: "Exposure distance cannot be negative (ft)." };
   if (!(area_ft2 > 0)) return { error: "Building footprint area must be positive." };
   if (vertical_openings !== "protected" && vertical_openings !== "unprotected") return { error: "Vertical openings must be protected or unprotected." };
   if (!(stories >= 1)) return { error: "Stories must be >= 1." };
@@ -930,7 +956,7 @@ export function computeIsoNeededFireFlow({
   if (xIn !== null) {
     if (!(xIn >= 0 && xIn <= 0.6)) return { error: "Exposure factor X must be between 0 and 0.60 (ISO Table 330A)." };
     X = xIn;
-  } else if (exposure_distance_ft > 0 && exposure_distance_ft <= 40) {
+  } else if (exposure_distance_ft >= 0 && exposure_distance_ft <= 40) {
     return { error: "An exposure within 40 ft carries a charge that depends on its wall construction and length-height value: read X from ISO Table 330A(1-3) and enter it." };
   }
   const P = Math.max(0, Number(exposure_communication_factor) || 0);
@@ -1033,6 +1059,8 @@ export function computeScbaCylinderTime({
   consumption_lpm = 0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A blank alarm pressure used to be 0 psi, which made "time to the low-air alarm" the time to empty.
+  if (!(Number(P_alarm_psi) > 0)) return { error: "Enter the low-air alarm pressure (psi), about a third of the rated pressure." };
   const L_PER_FT3 = 0.3048 * 0.3048 * 0.3048 * 1000;
   const Vr = Number(V_rated_scf) || 0;
   const Pr = Number(P_rated_psi) || 0;
@@ -1186,6 +1214,9 @@ export function computeNFPA1142WaterSupply({
   sprinkler_listed = false,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // "false" as a string is truthy and used to halve the supply.
+  if (typeof sprinkler_listed === "string") sprinkler_listed = sprinkler_listed === "true" || sprinkler_listed === "yes";
+  if (typeof exposure_within_50_ft === "string") exposure_within_50_ft = exposure_within_50_ft === "true" || exposure_within_50_ft === "yes";
   const V = Number(volume_ft3) || 0;
   if (!(V > 0)) return { error: "Building volume must be positive (ft^3)." };
   const occ = NFPA1142_OCCUPANCY[occupancy_class];
@@ -1324,6 +1355,7 @@ export function computeConfinedSpaceVent({
   target_purges = null,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (Number(length_ft) < 0 || Number(width_ft) < 0 || Number(height_ft) < 0) return { error: "Dimensions cannot be negative (ft)." };
   const L = Number(length_ft) || 0;
   const W = Number(width_ft) || 0;
   const H = Number(height_ft) || 0;
@@ -1447,6 +1479,8 @@ export function computeStandpipePDP({
   building_height_ft = 0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (standpipe_class !== "I" && standpipe_class !== "II" && standpipe_class !== "III") return { error: "Standpipe class must be I, II or III." };
+  if (appliance_loss_psi === null || appliance_loss_psi === "") appliance_loss_psi = 25;
   const elev = Number(highest_outlet_elevation_ft) || 0;
   // NFPA 14 7.8: Class I and III are 100 psi residual at 250 gpm on a 2-1/2 in outlet;
   // Class II is 65 psi at 100 gpm on a 1-1/2 in occupant-use station. Supplying neither
@@ -1567,6 +1601,7 @@ export function computeSmokeEjector({
   entry_opening_ft2 = 0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (Number(length_ft) < 0 || Number(width_ft) < 0 || Number(height_ft) < 0) return { error: "Dimensions cannot be negative (ft)." };
   const L = Number(length_ft) || 0;
   const W = Number(width_ft) || 0;
   const H = Number(height_ft) || 0;
@@ -1674,6 +1709,7 @@ import {
 //
 // dims: in { nozzle_type: dimensionless, bore_in: L, flow_gpm: L^3 T^-1, nozzle_pressure_psi: M L^-1 T^-2 } out: { reaction_lb: dimensionless }
 export function computeFireStreamReaction({ nozzle_type = "smooth", bore_in = 0, flow_gpm = 0, nozzle_pressure_psi = 0 } = {}) {
+  if (nozzle_type !== "smooth" && nozzle_type !== "fog") return { error: "Nozzle type must be smooth or fog." };
   const np = Number(nozzle_pressure_psi) || 0;
   if (!(np > 0 && Number.isFinite(np))) return { error: "Nozzle pressure must be positive (psi)." };
   let reaction_lb;
@@ -1723,6 +1759,7 @@ FIRE_RENDERERS["fire-stream-reaction"] = renderFireStreamReaction;
 // --- F.2: Sprinkler K-factor solver (Q = K * sqrt(P)) ---
 // dims: in { solve_for: dimensionless, flow_gpm: L^3 T^-1, pressure_psi: M L^-1 T^-2, k_factor: dimensionless } out: { flow_gpm: L^3 T^-1, pressure_psi: M L^-1 T^-2, k_factor: dimensionless }
 export function computeSprinklerKFactor({ solve_for = "flow", flow_gpm = 0, pressure_psi = 0, k_factor = 0 } = {}) {
+  if (solve_for !== "flow" && solve_for !== "pressure" && solve_for !== "k") return { error: "Solve for must be flow, pressure or k." };
   const Q = Number(flow_gpm) || 0;
   const P = Number(pressure_psi) || 0;
   const K = Number(k_factor) || 0;
@@ -1779,12 +1816,15 @@ FIRE_RENDERERS["sprinkler-k-factor"] = renderSprinklerKFactor;
 // Exact P = 0.434 * dH_ft; rule of thumb ~5 psi/floor (~10-ft floors).
 // dims: in { mode: dimensionless, value: dimensionless, floor_height_ft: L, direction: dimensionless } out: { exact_psi: M*L^-1*T^-2, rule_psi: M*L^-1*T^-2 }
 export function computeElevationPressureLoss({ mode = "floors", value = 0, floor_height_ft = 10, direction = "up" } = {}) {
+  if (mode !== "floors" && mode !== "feet") return { error: "Mode must be floors or feet." };
+  if (direction !== "up" && direction !== "down") return { error: "Direction must be up or down." };
   const v = Number(value) || 0;
   const fh = Number(floor_height_ft) || 0;
   if (!Number.isFinite(v) || v < 0) return { error: "Elevation change / floor count must be non-negative." };
   if (mode === "floors" && !(fh > 0 && Number.isFinite(fh))) return { error: "Floor height must be positive (ft)." };
   const elevFt = mode === "floors" ? v * fh : v;
-  const floors = mode === "floors" ? v : (fh > 0 ? v / fh : 0);
+  // In feet mode a blank floor height falls back to the 10 ft the rule assumes (it used to make the rule line 0 psi).
+  const floors = mode === "floors" ? v : v / (fh > 0 ? fh : 10);
   const exact = 0.434 * elevFt;
   const rule = 5 * floors;
   const sign = direction === "down" ? -1 : 1; // up = loss (positive), down = gain (negative)
@@ -1962,6 +2002,8 @@ FIRE_RENDERERS["smooth-bore-diameter-for-flow"] = renderSmoothBoreDiameterForFlo
 // dims: in { floor_area_sf: L^2, hazard_class: dimensionless, travel_distance_ft: L, area_cap_sf: L^2 } out: { travel_used_ft: L, grid_spacing_ft: L, area_per_unit_sf: L^2, by_travel: dimensionless, by_area_cap: dimensionless, required_extinguishers: dimensionless }
 export function computeExtinguisherCoverage({ floor_area_sf = 0, hazard_class = "A", travel_distance_ft = 0, area_cap_sf = 11250 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // NFPA 10 Class B travel is 30 or 50 ft by rating; a longer entry used to pass on the area cap.
+  if (hazard_class === "B" && Number(travel_distance_ft) > 50) return { error: "Class B travel distance is 30 or 50 ft (NFPA 10 Table 6.3.1.1), set by the extinguisher rating; it cannot exceed 50 ft." };
   const area = Number(floor_area_sf) || 0;
   const dIn = Number(travel_distance_ft) || 0;
   const cap = Number(area_cap_sf) || 0;
@@ -2147,6 +2189,7 @@ FIRE_RENDERERS["ppv-fan-sizing"] = _simpleRenderer({
 // dims: in { map_distance_ft: L, slack_fraction: dimensionless, section_length_ft: L, hose_id_in: L, dry_weight_per_section_lb: M } out: { lay_length_ft: L, sections: dimensionless, actual_reach_ft: L, charged_weight_lb: M }
 export function computeHoseLaySectionCount({ map_distance_ft = 0, slack_fraction = 0.20, section_length_ft = 50, hose_id_in = 0, dry_weight_per_section_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (Number(slack_fraction) > 5) return { error: "Slack is a fraction of the map distance (0.20 for 20%), not a percent." };
   if (!(map_distance_ft > 0)) return { error: "Map distance must be positive." };
   if (!(slack_fraction >= 0)) return { error: "Slack allowance cannot be negative." };
   if (!(section_length_ft > 0)) return { error: "Section length must be positive." };
@@ -2172,6 +2215,7 @@ export function computeHoseLaySectionCount({ map_distance_ft = 0, slack_fraction
     gallons,
     water_per_section_lb,
     charged_weight_lb,
+    dry_weight_entered: dry_weight_per_section_lb > 0,
     note: "How many sections a hose lay takes, how far it actually reaches, and what it weighs charged. The section count is a ceiling function on a padded distance and both halves matter. A lay never runs the straight-line distance: it goes around the building, up the stairs, and over the fence, and a 20% slack allowance is a conservative planning figure that a bad approach will exceed. Undercounting by one section at the end of a long lay is a break in the line at the worst possible moment, which is the whole reason a lay is counted before it is pulled rather than after. A 600 ft approach at 20% slack is 720 ft of hose, which is 15 fifty-foot sections where the map alone would have said 12 -- three sections of difference. The weight line is the one crews feel. Water is 8.34 lb per gallon and a 2.5 in line holds 0.255 gal per foot, so a 50 ft section carries about 106 lb of water on top of the hose itself, and a fifteen-section lay is over a ton of charged line on the ground: perfectly manageable while it is moving on flat ground, and immovable the moment it has to be advanced up a stairwell. That is the number behind every rule about advancing dry and charging at the door. A planning estimate; the actual approach, the department's SOPs, and the officer on the line govern.",
   };
 }
@@ -2193,7 +2237,7 @@ FIRE_RENDERERS["hose-lay-section-count"] = _simpleRenderer({
     { key: "s", id: "hlsc-out-s", label: "Sections required", value: (r) => String(r.sections) + " (the map distance alone would say " + String(r.sections_by_map) + ")" },
     { key: "r", id: "hlsc-out-r", label: "Actual reach", value: (r) => fmt(r.actual_reach_ft, 0) + " ft" },
     { key: "g", id: "hlsc-out-g", label: "Water in the charged lay", value: (r) => fmt(r.gallons, 1) + " gal (" + fmt(r.gal_per_ft, 3) + " gal per ft)" },
-    { key: "w", id: "hlsc-out-w", label: "Total charged weight", value: (r) => fmt(r.charged_weight_lb, 0) + " lb" },
+    { key: "w", id: "hlsc-out-w", label: "Total charged weight", value: (r) => fmt(r.charged_weight_lb, 0) + " lb" + (r.dry_weight_entered === false ? " (WATER ONLY -- no dry hose weight entered)" : "") },
     { key: "n", id: "hlsc-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeHoseLaySectionCount,
@@ -2203,6 +2247,7 @@ FIRE_RENDERERS["hose-lay-section-count"] = _simpleRenderer({
 // dims: in { fdc_pressure_psi: M L^-1 T^-2, total_flow_gpm: L^3 T^-1, lines: dimensionless, line_length_ft: L, friction_coefficient: dimensionless, elevation_ft: L } out: { flow_per_line_gpm: L^3 T^-1, friction_loss_psi: M L^-1 T^-2, engine_pressure_psi: M L^-1 T^-2 }
 export function computeFdcSupplyCheck({ fdc_pressure_psi = 0, total_flow_gpm = 0, lines = 2, line_length_ft = 0, friction_coefficient = 0.677, elevation_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!Number.isInteger(Number(lines)) || !(Number(lines) >= 1)) return { error: "Supply lines is a whole number, 1 or more." };
   if (!(fdc_pressure_psi > 0)) return { error: "Pressure required at the connection must be positive." };
   if (!(total_flow_gpm > 0)) return { error: "Total flow must be positive." };
   if (!(lines >= 1)) return { error: "Supply-line count must be at least 1." };
