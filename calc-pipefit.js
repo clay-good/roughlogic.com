@@ -526,17 +526,25 @@ export function computePipePressureRating({ od_in = 0, wall_in = 0, allow_stress
   const W = Number(weld_strength_reduction);
   if (!(W > 0 && W <= 1)) return { error: "Weld strength reduction factor W must be in (0, 1]." };
   const SEW = S * E * W;
+  if (mode !== "required_wall" && mode !== "allowable_pressure") return { error: "Mode must be allowable_pressure or required_wall." };
+  // B31 gives y as 0.4 to 0.7 (by material and temperature); 4 typed for 0.4 read the rating 50% high.
+  if (!(y >= 0 && y <= 1)) return { error: "The coefficient y is between 0.4 and 0.7 for B31 piping." };
   if (mode === "required_wall") {
     const dp = Number(design_p);
     if (!(dp > 0)) return { error: "Design pressure must be positive (psi)." };
     const t_min = (dp * od) / (2 * (SEW + dp * y)) + A;
     // The pipe ordered must still meet t_min after its mill under-tolerance.
     const t_nominal_min = t_min / (1 - mt);
+    // The thin-wall equation holds for t < D/6 (B31.3 304.1.2); past that it is thick-wall design.
+    if (t_min - A >= od / 6) return { error: "The required wall is D/6 or more; the B31 thin-wall equation does not apply and thick-wall design governs." };
     return { mode, t_min, t_nominal_min };
   }
   // allowable-pressure mode
   const wall = Number(wall_in);
   if (!(wall > 0)) return { error: "Wall thickness must be positive (in)." };
+  if (wall >= od / 2) return { error: "The wall cannot be half the outside diameter or more." };
+  // Past t = D/6 the thin-wall form overstates the rating (41% high at a 2 in wall on 4.5 in OD against Lame).
+  if (wall * (1 - mt) - A >= od / 6) return { error: "The wall is D/6 or more; the B31 thin-wall equation does not apply and thick-wall design governs." };
   const t_avail = wall * (1 - mt);
   const denom = od - 2 * y * (t_avail - A);
   if (!(denom > 0)) return { error: "Degenerate geometry: D - 2y(t - A) is not positive." };

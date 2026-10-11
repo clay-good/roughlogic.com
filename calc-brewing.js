@@ -442,6 +442,7 @@ BREWING_RENDERERS["beer-color-srm"] = _simpleRenderer({
 
 // dims: in { batch_volume_gal: L^3, original_gravity: dimensionless, pitch_rate_million_per_ml_plato: dimensionless, slurry_cells_per_ml: L^-3, viability_pct: dimensionless, aged_viability_pct: dimensionless, strong_original_gravity: dimensionless } out: { plato: dimensionless, cells_required: dimensionless, slurry_ml: L^3, slurry_gal: L^3, aged_slurry_gal: L^3, strong_cells_required: dimensionless }
 export function computeYeastPitchRate({ batch_volume_gal = 0, original_gravity = 0, pitch_rate_million_per_ml_plato = 0, slurry_cells_per_ml = 0, viability_pct = 0, aged_viability_pct = 0, strong_original_gravity = 0 } = {}) {
+  if (original_gravity > 1.2 || (strong_original_gravity > 1.2)) return { error: "Enter gravities as specific gravity (1.055), not points or degrees Plato." };
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   // Unit / range guard added 2026-09-26 after printed-example probing.
   if ([arguments[0]?.viability_pct, arguments[0]?.aged_viability_pct].some((v) => Number(v) > 0 && Number(v) < 1)) return { error: "Enter viability as a percent (94 for 94%), not a fraction." }; if (Number(arguments[0]?.slurry_cells_per_ml) > 0 && Number(arguments[0]?.slurry_cells_per_ml) < 1e6) return { error: "Enter the slurry count in cells per mL (2,200,000,000), not in billions." };
@@ -643,6 +644,7 @@ BREWING_RENDERERS["carbonation-volumes-pressure"] = _simpleRenderer({
 
 // dims: in { batch_volume_gal: L^3, original_gravity: dimensionless, final_gravity: dimensionless, heat_of_fermentation_btu_per_lb: L^2 T^-2, peak_day_share_pct: dimensionless, crash_start_temp_f: T, crash_target_temp_f: T, crash_hours: T, tank_surface_sqft: L^2, tank_u_factor: M T^-4, cellar_temp_f: T, glycol_delta_t_f: T } out: { fermentation_heat_btu: M L^2 T^-2, adiabatic_rise_f: T, fermentation_load_btuh: M L^2 T^-3, crash_load_btuh: M L^2 T^-3, glycol_gpm: L^3 T^-1 }
 export function computeFermenterGlycolLoad({ batch_volume_gal = 0, original_gravity = 0, final_gravity = 0, heat_of_fermentation_btu_per_lb = 0, peak_day_share_pct = 0, crash_start_temp_f = 0, crash_target_temp_f = 0, crash_hours = 0, tank_surface_sqft = 0, tank_u_factor = 0, cellar_temp_f = 0, glycol_delta_t_f = 0 } = {}) {
+  if (original_gravity > 1.2 || final_gravity > 1.2) return { error: "Enter gravities as specific gravity (1.055), not points or degrees Plato." };
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   // Unit / range guard added 2026-09-26 after printed-example probing.
   if ([arguments[0]?.peak_day_share_pct].some((v) => Number(v) > 0 && Number(v) < 1)) return { error: "Enter the peak-day share as a percent (40 for 40%), not a fraction." };

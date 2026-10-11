@@ -674,6 +674,7 @@ DOORHARDWARE_RENDERERS["fire-door-clearance"] = _simpleRenderer({
 // dims: in { gate_weight_lb: M L T^-2, rolling_coefficient: dimensionless, grade_pct: dimensionless, gate_length_ft: L, operator_speed_fps: L T^-1, cycles_per_day: dimensionless, operating_hours: T, operator_rated_force_lb: M L T^-2, intermittent_duty_limit_pct: dimensionless } out: { rolling_force_lb: M L T^-2, grade_force_lb: M L T^-2, total_force_lb: M L T^-2, travel_time_s: T, cycle_time_s: T, duty_cycle_pct: dimensionless }
 export function computeGateOperatorDuty({ gate_weight_lb = 0, rolling_coefficient = 0.1, grade_pct = 0, gate_length_ft = 0, operator_speed_fps = 0, cycles_per_day = 0, operating_hours = 0, operator_rated_force_lb = 0, intermittent_duty_limit_pct = 10 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (operating_hours > 24) return { error: "Operating hours are per day, 24 or fewer." };
   if (!(gate_weight_lb > 0)) return { error: "Gate weight must be positive." };
   if (!(rolling_coefficient > 0 && rolling_coefficient <= 1)) return { error: "Rolling coefficient must be in (0, 1]." };
   if (!(grade_pct >= 0)) return { error: "Grade cannot be negative." };

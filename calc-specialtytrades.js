@@ -255,14 +255,17 @@ export function computeAwningCanopyLoad({ projection_ft = 0, width_ft = 0, wind_
   const dead_force_lb = dead_load_psf * area_sqft;
   const net_uplift_lb = uplift_force_lb - dead_force_lb;
   const gravity_force_lb = Math.max(snow_force_lb, downward_force_lb);
-  const uplift_governs = uplift_force_lb > gravity_force_lb;
+  // Dead load works against uplift and with gravity: the cases to compare are the NET uplift and
+  // gravity plus dead. Until 2026-10-11 gross uplift was compared with snow or wind alone, so a
+  // heavy canopy with no net uplift at all still read "UPLIFT governs".
+  const uplift_governs = net_uplift_lb > gravity_force_lb + dead_force_lb;
   const dead_offset_pct = uplift_force_lb > 0 ? dead_force_lb / uplift_force_lb * 100 : 0;
   if (![area_sqft, q_psf, uplift_force_lb, snow_force_lb, net_uplift_lb].every(Number.isFinite)) return { error: "Canopy load math is not a finite value." };
   return {
     area_sqft, q_psf, uplift_psf, downward_psf, uplift_force_lb, downward_force_lb,
     snow_pf_psf, snow_force_lb, dead_force_lb, net_uplift_lb, gravity_force_lb,
     uplift_governs, dead_offset_pct,
-    governing: uplift_governs ? "UPLIFT governs at " + fmt(uplift_force_lb, 0) + " lb up, " + fmt((uplift_force_lb / gravity_force_lb - 1) * 100, 0) + "% over the gravity case" : "the gravity case governs at " + fmt(gravity_force_lb, 0) + " lb down",
+    governing: uplift_governs ? "UPLIFT governs at " + fmt(net_uplift_lb, 0) + " lb net up (after the canopy's own weight), " + fmt((net_uplift_lb / (gravity_force_lb + dead_force_lb) - 1) * 100, 0) + "% over the gravity case" : "the gravity case governs at " + fmt(gravity_force_lb + dead_force_lb, 0) + " lb down with the dead load" + (net_uplift_lb > 1e-9 * uplift_force_lb ? "; net uplift is " + fmt(net_uplift_lb, 0) + " lb and still needs a load path" : "; the dead load cancels the uplift"),
     note: "Wind uplift and snow on an attached canopy or awning, where the governing case is usually uplift and the anchors are the whole design. A canopy is open underneath, so wind acts on BOTH faces at once -- pressure on top and suction below, or the reverse -- and ASCE 7 handles that with a NET pressure coefficient rather than the separate external and internal coefficients used on an enclosed building. That is what makes a canopy different from a roof. On a roof, gravity is the design case and wind uplift is a check; on a canopy the uplift case frequently governs outright, and it loads the wall anchors in TENSION and the connection in PRYING, which are the two load directions masonry and stud walls are worst at and the two that get detailed most casually because the canopy looks light. Both cases have to be run because the two loads come from different weather: the snow case governs the members and the deflection, the uplift case governs the anchors. A 12 ft by 20 ft canopy in a 115 mph wind sees about 28 psf of velocity pressure, 34 psf of net uplift, and 8,122 lb trying to pull it off the wall, against 5,040 lb of flat-roof snow pushing down -- uplift beats snow by 61 percent and it acts the wrong way, while the canopy's own 800 lb of dead weight offsets only a tenth of it. That is the number that decides whether this canopy is through-bolted with backing plates or lagged into a stud, and it is the number nobody runs before the second one blows off. LOAD ONLY, NOT A CANOPY DESIGN. It does not size members, connections, or anchors, does not compute the prying and eccentric moment at the wall, and does not check the wall or its backup for the tension it is being asked to carry, which on masonry is frequently the actual limit. Kz, Kzt, Kd, Cn, Ce, and Ct are all ASCE 7 values determined elsewhere, and pg is the ASCE 7-22 ground snow load for the risk category (7-22 has no Is), and a wrong Cn moves the answer by a factor. Fabric awnings behave differently again, and drifting or sliding snow off the roof above can far exceed the flat-roof value. ASCE 7, the structural engineer, and the AHJ govern.",
   };
 }
@@ -771,6 +774,7 @@ SPECIALTYTRADES_RENDERERS["suspended-scaffold-counterweight"] = _simpleRenderer(
 // dims: in { slab_dead_psf: M L^-1 T^-2, construction_live_psf: M L^-1 T^-2, form_dead_psf: M L^-1 T^-2, connected_levels: dimensionless, backshored: dimensionless, governing_slab_capacity_psf: M L^-1 T^-2, governing_slab_strength_psi: M L^-1 T^-2 } out: { new_pour_load_psf: M L^-1 T^-2, redistributed_load_psf: M L^-1 T^-2, share_per_level_psf: M L^-1 T^-2, governing_level_load_psf: M L^-1 T^-2, capacity_margin_psf: M L^-1 T^-2, levels_required: dimensionless }
 export function computeShoringReshoringLoad({ slab_dead_psf = 0, construction_live_psf = 0, form_dead_psf = 0, connected_levels = 0, backshored = 0, governing_slab_capacity_psf = 0, governing_slab_strength_psi = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!Number.isInteger(Number(connected_levels))) return { error: "Connected levels is a whole number of floors." };
   if (!(slab_dead_psf > 0)) return { error: "The slab dead load must be positive (psf)." };
   if (construction_live_psf < 0) return { error: "Construction live load cannot be negative (psf)." };
   if (form_dead_psf < 0) return { error: "Formwork dead load cannot be negative (psf)." };

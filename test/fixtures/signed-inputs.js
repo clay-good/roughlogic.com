@@ -143,7 +143,6 @@ export const SIGNED_INPUTS = [
   "window-overhang-shade::solar_altitude_deg",
   "window-solar-heat-gain::cltd_f",
   "envelope-conduction-load::cltd_f",
-  "pipe-pressure-rating::y_coeff",
   "shrink-fit::ambient_f",
   "thermistor-steinhart-hart::coeff_a",
   "thermistor-steinhart-hart::coeff_c",

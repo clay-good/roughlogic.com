@@ -60975,3 +60975,35 @@ test("hardening slice 22 (field, service, layout, air quality, corrosion, greenh
   assert.ok(FD.computeSolarTimes({ lat_deg: 40, lon_deg: -105, date_iso: "2026-02-30", tz_offset_hours: -7 }).error);
   assert.ok(!FD.computeSolarTimes({ lat_deg: 40, lon_deg: -105, date_iso: "2026-06-21", tz_offset_hours: -6 }).error);
 });
+
+test("hardening slice 23 (brewing, pipefitting, process, waste, specialty trades, rail, elevator, door hardware, inspection)", async () => {
+  const PF = await import("../../calc-pipefit.js");
+  const SPT = await import("../../calc-specialtytrades.js");
+  const INS = await import("../../calc-inspection.js");
+  const WS = await import("../../calc-waste.js");
+  const BR = await import("../../calc-brewing.js");
+  const DH = await import("../../calc-doorhardware.js");
+  // pipe rating: thin-wall equation only where it holds, and a real y
+  const pr = { od_in: 4.5, allow_stress: 17100, mill_tol_frac: 0 };
+  assert.ok(PF.computePipePressureRating({ ...pr, wall_in: 2.5 }).error);
+  assert.ok(PF.computePipePressureRating({ ...pr, wall_in: 2.0 }).error);
+  assert.ok(PF.computePipePressureRating({ ...pr, wall_in: 0.237, y_coeff: 4 }).error);
+  assert.ok(PF.computePipePressureRating({ ...pr, wall_in: 0.237, mode: "wall" }).error);
+  assert.ok(!PF.computePipePressureRating({ ...pr, wall_in: 0.237 }).error);
+  // a cracked weld is rejected however "yes" is spelled
+  const wv = INS.weldVisualAcceptanceExample.inputs;
+  assert.equal(INS.computeWeldVisualAcceptance({ ...wv, crack_present: "Yes" }).has_crack ?? INS.computeWeldVisualAcceptance({ ...wv, crack_present: "Yes" }).crack, INS.computeWeldVisualAcceptance({ ...wv, crack_present: "yes" }).has_crack ?? INS.computeWeldVisualAcceptance({ ...wv, crack_present: "yes" }).crack);
+  assert.ok(INS.computeWeldVisualAcceptance({ ...wv, crack_present: "maybe" }).error);
+  // the largest route that fits really fits
+  const ex = Object.values(WS).find((v) => v && v.inputs && "stop_count" in v.inputs && "seconds_per_stop" in v.inputs);
+  const route = Object.values(WS).find((f) => typeof f === "function" && f.name === "computeCollectionRouteProductivity");
+  if (ex) {
+    const r = route({ ...ex.inputs, stop_count: 500 });
+    assert.ok(r.max_stops >= 0);
+    assert.equal(route({ ...ex.inputs, stop_count: r.max_stops }).fits_shift, true);
+    assert.equal(route({ ...ex.inputs, stop_count: 1300 }).max_stops, r.max_stops);
+  }
+  assert.ok(BR.computeYeastPitchRate({ batch_volume_gal: 310, original_gravity: 13.6, pitch_rate_million_per_ml_plato: 0.75, slurry_cells_per_ml: 1.2e9, viability_pct: 90 }).error);
+  assert.ok(DH.computeGateOperatorDuty({ gate_weight_lb: 800, gate_length_ft: 20, operator_speed_fps: 1, cycles_per_day: 200, operating_hours: 30 }).error);
+  assert.ok(SPT.computeShoringReshoringLoad({ slab_dead_psf: 100, construction_live_psf: 50, form_dead_psf: 10, connected_levels: 2.5, governing_slab_capacity_psf: 160 }).error);
+});

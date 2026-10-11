@@ -116,9 +116,10 @@ export function computeTrackSuperelevation({ degree_of_curve = 0, speed_mph = 0,
   return {
     equilibrium_in, unbalance_in, max_speed_mph, equilibrium_at_target_in, required_elevation_in,
     condition, over_elevation, over_unbalance, required_over_cap,
-    flag: over_elevation ? "OVER the entered elevation cap"
+    flag: over_elevation ? "OVER the entered elevation cap" + (over_unbalance ? " and OVER the allowable unbalance at this speed" : "")
       : over_unbalance ? "OVER the allowable unbalance at this speed"
-        : "within both entered caps",
+        : required_over_cap ? "within both caps at this speed, but the target speed needs " + fmt(required_elevation_in, 2) + " in of elevation, MORE than the entered cap allows"
+          : "within both entered caps",
     note: "Equilibrium elevation is the bank at which nothing pushes sideways on either rail. Freight track is deliberately underelevated, because a curve elevated for the fastest train punishes the slowest one, so the operating rule is written on UNBALANCE rather than on elevation. Actual elevation is commonly capped near 6 in in railroad practice (FRA 213.57(a) allows up to 8 in on Classes 1-2 and 7 in on Classes 3-5) and unbalance near 3 in, with more only by specific approval for specific equipment. Elevation cannot be applied without adequate spiral transitions to run it in and out, which usually governs whether a given elevation is achievable at all. The FRA Track Safety Standards at 49 CFR 213, the railroad's engineering instructions and timetable special instructions, and the track owner govern.",
   };
 }

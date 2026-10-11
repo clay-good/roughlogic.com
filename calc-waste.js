@@ -369,7 +369,16 @@ export function computeCollectionRouteProductivity({ stop_count = 0, seconds_per
   const overhead_hours = fixed_time_hr + break_time_hr;
   const route_day_hours = collection_hours + haul_hours + tipping_hours + overhead_hours;
   const available_hours = shift_hours - haul_hours - tipping_hours - overhead_hours;
-  const max_stops = Math.floor(available_hours * SEC_PER_HOUR / seconds_per_stop + 1e-9);
+  // More stops are more tons and, past a payload, another trip to the tip. The largest route
+  // that fits is found per load count: the stops the remaining hours allow, capped by what that
+  // many loads can carry. Until 2026-10-11 the hours of the CURRENT route's trips were used, so
+  // a one-load route was told 981 stops fit where 981 need a second load and run 9 hours.
+  let max_stops = 0;
+  for (let loads = 1; loads <= 50; loads++) {
+    const hrs = shift_hours - loads * (round_trip_min + tipping_min) / MIN_PER_HOUR - overhead_hours;
+    if (!(hrs > 0)) break;
+    max_stops = Math.max(max_stops, Math.min(Math.floor(hrs * SEC_PER_HOUR / seconds_per_stop + 1e-9), Math.floor(loads * truck_payload_tons * LB_PER_TON / setout_weight_lb + 1e-9)));
+  }
   // The cliff: one more load is a whole haul cycle, added in a single step.
   const next_load_hours = (disposal_loads + 1) * (round_trip_min + tipping_min) / MIN_PER_HOUR;
   const next_load_route_day_hours = collection_hours + next_load_hours + overhead_hours;
@@ -425,6 +434,7 @@ WASTE_RENDERERS["collection-route-productivity"] = _simpleRenderer({
 
 // dims: in { daily_tons: M, operating_hours: T, peak_hour_share_pct: dimensionless, collection_payload_tons: M, floor_time_min: T, trailer_payload_tons: M, trailer_round_trip_hr: T, loose_density_lb_per_cy: M L^-3, pile_depth_ft: L, manoeuvring_factor: dimensionless, loadout_delay_hr: T } out: { peak_hour_tons: M, peak_arrivals_per_hour: T^-1, unloading_positions: dimensionless, trailer_loads_per_day: dimensionless, trailer_fleet: dimensionless, surge_floor_sqft: L^2 }
 export function computeTransferStationThroughput({ daily_tons = 0, operating_hours = 0, peak_hour_share_pct = 0, collection_payload_tons = 0, floor_time_min = 0, trailer_payload_tons = 0, trailer_round_trip_hr = 0, loose_density_lb_per_cy = 0, pile_depth_ft = 0, manoeuvring_factor = 0, loadout_delay_hr = 0 } = {}) {
+  if (operating_hours > 0 && peak_hour_share_pct > 0 && peak_hour_share_pct < 100 / operating_hours - 1e-9) return { error: "The peak hour cannot carry less than an average hour (" + (100 / operating_hours).toFixed(1) + "% of the day here)." };
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   if (!(daily_tons > 0) || !(operating_hours > 0)) return { error: "Daily tonnage and operating hours must be positive." };
   if (!(peak_hour_share_pct > 0 && peak_hour_share_pct <= 100)) return { error: "The peak hour share must be above 0 and at most 100%." };

@@ -115,7 +115,10 @@ export function computeWeldVisualAcceptance({
   if (allowed_undersize_fraction < 0 || allowed_undersize_fraction > 1) return { error: "The permitted undersize length fraction must be between 0 and 1." };
   // A CRACK IS REJECTABLE WITHOUT DIMENSION. It is reported first, before any
   // measurement, because no tolerance applies to it.
-  const has_crack = crack_present === "yes";
+  // Only the exact string "yes" used to reject; "Yes" or true accepted a cracked weld.
+  const _cp = String(crack_present).trim().toLowerCase();
+  if (!["yes", "no", "true", "false"].includes(_cp)) return { error: "Say whether a crack is present: yes or no." };
+  const has_crack = _cp === "yes" || _cp === "true";
   const crack_verdict = has_crack
     ? "REJECT. A CRACK IS PRESENT, and that rejects the weld regardless of every dimension below. No size applies: any crack is rejectable, and a crater crack at a stop is the one most likely to be dismissed as cosmetic"
     : "no crack reported. Any crack is rejectable without regard to size -- and the crater crack at a stop is the one most often called cosmetic and left";
@@ -468,6 +471,7 @@ export function computeMtYokeCoilAmperage({
   const ld_raw = has_coil ? length_used_in / part_diameter_in : 0;
   const ld_used = has_coil ? Math.min(15, Math.max(2, ld_raw)) : 0;
   const ld_clamped = has_coil && Math.abs(ld_used - ld_raw) > 1e-12;
+  if (fill_factor !== "high" && fill_factor !== "low") return { error: "Fill factor must be high or low." };
   const is_high_fill = fill_factor === "high";
   const fill_constant = is_high_fill ? _MT_COIL_HIGH_FILL_CONSTANT : _MT_COIL_LOW_FILL_CONSTANT;
   // ASTM E709 / E1444, and spec-v1668 as written: a high-fill coil takes
@@ -484,6 +488,8 @@ export function computeMtYokeCoilAmperage({
     ? "A circular field finds LONGITUDINAL cracks and is blind to transverse ones. An inspection performed with one shot has inspected for ONE crack orientation, and reporting it as an inspection of the part is wrong -- finding the other requires a second, separate shot in the other field direction"
     : "THE ORIENTATION TRAP. The coil shot produces a LONGITUDINAL field, which finds TRANSVERSE discontinuities -- cracks running around the part. A longitudinal crack running along the axis produces no leakage field in that shot and will not indicate, no matter how strong the field or how good the particles. Finding it requires the CIRCULAR field above, and that is a second, separate inspection. One shot inspects for one crack orientation, and reporting it as an inspection of the part is wrong";
   const has_yoke = yoke_pole_spacing_in > 0;
+  // "DC" in capitals used to get the 10 lb AC lift test, which a weak DC yoke passes.
+  if (yoke_current !== "dc" && yoke_current !== "ac") return { error: "Yoke current must be ac or dc." };
   const is_dc = yoke_current === "dc";
   const yoke_lift_required_lb = has_yoke ? (is_dc ? 40 : 10) : 0;
   const yoke_verdict = !has_yoke
