@@ -61200,3 +61200,13 @@ test("hardening slice 32 (second pass: clarifier weir limit, radon fan operating
   assert.ok(CN.computeRadonFanStatic({ flow_cfm: 60, pipe_diameter_in: 4, pipe_length_ft: 30, fan_static_in_wc: 1.2, measured_vacuum_in_wc: 1.5 }).error);
   assert.ok(!CN.computeRadonFanStatic({ flow_cfm: 60, pipe_diameter_in: 4, pipe_length_ft: 30, fan_static_in_wc: 1.2, measured_vacuum_in_wc: 0.9 }).error);
 });
+
+test("hardening slice 33 (second pass: bottoms-up flow agreement, scaled distance beyond 5,000 ft)", async () => {
+  const OG = await import("../../calc-oilgas.js");
+  const MI = await import("../../calc-mining.js");
+  const av = { hole_dia_in: 8.75, pipe_od_in: 5, flow_gpm: 420, measured_depth_ft: 9800, pump_output_bbl_stroke: 0.117 };
+  assert.match(OG.computeAnnularVelocityCleaning({ ...av, pump_spm: 30 }).bottoms_up_verdict, /PUMP ENTRIES IMPLY 147 GPM/);
+  assert.doesNotMatch(OG.computeAnnularVelocityCleaning({ ...av, pump_spm: 420 / (0.117 * 42) }).bottoms_up_verdict, /PUMP ENTRIES IMPLY/);
+  assert.match(MI.computeBlastScaledDistancePPV({ distance_ft: 6000, charge_per_delay_lb: 11000 }).sd_verdict, /asks 65/);
+  assert.doesNotMatch(MI.computeBlastScaledDistancePPV({ distance_ft: 1200, charge_per_delay_lb: 340 }).sd_verdict, /asks 65/);
+});

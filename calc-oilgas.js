@@ -1024,7 +1024,12 @@ export function computeAnnularVelocityCleaning({
   const bottoms_up_min = bottoms_up_strokes > 0 && pump_spm > 0 ? bottoms_up_strokes / pump_spm : 0;
   const bottoms_up_verdict = !has_bottoms_up
     ? "(no measured depth entered)"
-    : fmt(annular_volume_bbl, 1) + " bbl in the annulus" + (bottoms_up_strokes > 0 ? ", " + fmt(bottoms_up_strokes, 0) + " strokes" : "") + (bottoms_up_min > 0 ? " and " + fmt(bottoms_up_min, 0) + " minutes to bottoms up" : "");
+    : fmt(annular_volume_bbl, 1) + " bbl in the annulus" + (bottoms_up_strokes > 0 ? ", " + fmt(bottoms_up_strokes, 0) + " strokes" : "") + (bottoms_up_min > 0 ? " and " + fmt(bottoms_up_min, 0) + " minutes to bottoms up" : "")
+      // The stroke count is at the PUMP entries; the velocity above is at the entered flow. When
+      // the two disagree the page used to show both without saying so (420 gpm beside a 147 gpm pump).
+      + (pump_output_bbl_stroke > 0 && pump_spm > 0 && Math.abs(pump_output_bbl_stroke * pump_spm * 42 - flow_gpm) > 0.05 * flow_gpm
+        ? ". THE PUMP ENTRIES IMPLY " + fmt(pump_output_bbl_stroke * pump_spm * 42, 0) + " GPM, NOT THE " + fmt(flow_gpm, 0) + " GPM ENTERED: at the entered flow bottoms up is " + fmt(annular_volume_bbl * 42 / flow_gpm, 0) + " minutes, and at the pump's rate the annular velocity is " + fmt(annular_velocity_ft_min * pump_output_bbl_stroke * pump_spm * 42 / flow_gpm, 0) + " ft/min. Make the two agree"
+        : "");
   // Inverted: the rate a target velocity needs in this annulus.
   const has_target = target_velocity_ft_min > 0;
   const flow_for_target_gpm = has_target ? target_velocity_ft_min * annular_area_in2 / _OG_ANNULAR_VELOCITY_CONST : 0;
@@ -1052,7 +1057,7 @@ OILGAS_RENDERERS["annular-velocity-cleaning"] = _simpleRenderer({
     { key: "target_velocity_ft_min", label: "Target annular velocity (ft/min, 0 to skip)", kind: "number" },
   ],
   outputs: [
-    { key: "v", id: "avc-out-v", label: "Annular velocity", value: (r) => fmt(r.annular_velocity_ft_min, 0) + " ft/min across " + fmt(r.annular_area_in2, 2) + " sq in of annulus" },
+    { key: "v", id: "avc-out-v", label: "Annular velocity", value: (r) => fmt(r.annular_velocity_ft_min, 0) + " ft/min (D^2 - d^2 = " + fmt(r.annular_area_in2, 2) + " sq in, an open area of " + fmt(r.annular_area_in2 * Math.PI / 4, 2) + " sq in)" },
     { key: "t", id: "avc-out-t", label: "Cuttings transport", value: (r) => r.transport_verdict },
     { key: "c", id: "avc-out-c", label: "Annular capacity", value: (r) => fmt(r.annular_capacity_bbl_ft, 4) + " bbl/ft" },
     { key: "b", id: "avc-out-b", label: "Bottoms up", value: (r) => r.bottoms_up_verdict },
