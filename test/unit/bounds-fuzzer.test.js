@@ -60637,3 +60637,40 @@ test("hardening slice 14 (HVAC systems, service, refrigeration): the reviewed de
   err(_s14H.computeLouverFreeArea({ application: "Intake" }));
   err(_s14H.computeFanSystemEffect({ inlet_condition: "bogus" }));
 });
+
+// Hardening slice 15 (2026-10-10): restoration and water, 89 calculators re-derived and run by
+// independent reviewers. One assertion per confirmed defect.
+import * as _s15R from "../../calc-restoration.js";
+import * as _s15W from "../../calc-water.js";
+
+test("hardening slice 15 (restoration, water): the reviewed defects stay fixed", () => {
+  const near = (a, b, tol) => assert.ok(Math.abs(a - b) <= tol, a + " vs " + b);
+  const err = (r) => assert.ok(r && typeof r.error === "string", JSON.stringify(r).slice(0, 120));
+  // Whole machines are not split across breakers.
+  assert.strictEqual(_s15R.computeEquipmentCircuitLoad({ qty_lgr_dehu: 3, breaker_A: 20 }).circuits_required, 3);
+  assert.strictEqual(_s15R.computeEquipmentCircuitLoad({ qty_lgr_dehu: 5, breaker_A: 20 }).circuits_required, 5);
+  // A pump head is checked with or without drawdown.
+  assert.strictEqual(_s15W.computeConstantPressureWellVfd({ static_lift_ft: 300, friction_at_design_ft: 25, design_flow_gpm: 20, setpoint_psi: 50, reduced_flow_gpm: 5, pump_max_head_ft: 200 }).cannot_hold, true);
+  // The stricter of two cycle limits governs.
+  near(_s15W.computeWetWellCycleTime({ pump_gpm: 250, well_diameter_ft: 6, min_cycle_minutes: 5, max_starts_per_hour: 6, inflow_gpm: 125 }).cycle_min, 10, 1e-9);
+  // Blank or impossible readings.
+  err(_s15W.computeChlorineDemand({ applied_mg_l: 1, measured_residual_mg_l: 2, target_residual_mg_l: 0.5 }));
+  err(_s15W.computeUvRequiredExposure({ target_dose_mj_cm2: 40, intensity_mw_cm2: -10, exposure_time_s: 4 }));
+  err(_s15W.computeAerationOxygenDemand({ bod_removed_lb_day: 1000, oxygen_factor: 1.1, sote_pct: 20, water_temp_F: 300 }));
+  err(_s15R.computeDryingChamberCO2({ containment_volume_ft3: 2000, co2_generation_cfm: 0.06, target_indoor_ppm: 1000, outdoor_ppm: 0 }));
+  err(_s15R.computeGrainsRemoved({ cfm: 250, inlet_gpp: 90, outlet_gpp: 0, hours: 24 }));
+  err(_s15R.computeWoodEmc({ temperature_F: -100, rh_pct: 50 }));
+  err(_s15R.computePsychrometric({ temperature_F: 75, RH_percent: 150 }));
+  err(_s15R.computePsychrometric({}));
+  err(_s15R.computeDehumidifierSize({ water_class: "2" }));
+  err(_s15R.computeDehumidifierSize({ room_cubic_feet: 8000, water_class: "5" }));
+  err(_s15R.computeAntimicrobialDilution({ affected_area_ft2: 400, coverage_ft2_per_gal: 200, tank_size_gal: 1.5, oz_per_gal: 200 }));
+  err(_s15R.computeAntimicrobialDilution({ affected_area_ft2: 400, coverage_ft2_per_gal: 200, tank_size_gal: 1.5, mode: "Ratio", ratio_N: 10 }));
+  err(_s15R.computeWaterClassScreen({ floor_wet_fraction: 0.04, wall_wet_fraction: 1, ceiling_wet_fraction: 1, floor_area_ft2: 200 }));
+  err(_s15R.computeCavityDryingSystem({ affected_wall_ft: 10, stud_spacing_in: 16, ports_per_bay: 1.3 }));
+  err(_s15R.computeSmokeResidueMethod({ residue_type: "toString" }));
+  // Both faces open doubles the cut line and the baseboard.
+  const fc = _s15R.computeFloodCutTakeoff({ wall_perimeter_ft: 60, cut_height_in: 24, removed_faces: 2 });
+  near(fc.cut_line_lf, 120, 1e-9); near(fc.baseboard_lf, 120, 1e-9);
+  err(_s15R.computeFloodCutTakeoff({ wall_perimeter_ft: 60, removed_faces: 7 }));
+});

@@ -35,6 +35,10 @@ const _finiteGuard = (o) => {
 //  per pound divides out). RH and specific humidity are dimensionless.)
 export function computePsychrometric({ temperature_F, RH_percent, atmospheric_pressure_hPa = 1013.25 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if ([temperature_F, RH_percent].some((x) => x === null || x === undefined || x === "" || !Number.isFinite(Number(x)))) return { error: "Enter the dry-bulb temperature (F) and the relative humidity (%)." };
+  if (!(Number(RH_percent) >= 0 && Number(RH_percent) <= 100)) return { error: "Relative humidity is between 0 and 100%." };
+  if (!(Number(atmospheric_pressure_hPa) > 300)) return { error: "Atmospheric pressure must be a real station pressure (hPa)." };
+  if (Number(temperature_F) >= 200) return { error: "Above about 200 F the vapor pressure approaches atmospheric and this relation does not apply." };
   const T_C = F_to_C(temperature_F);
   const r = psychrometric({ T_C, RH_percent, P_hPa: atmospheric_pressure_hPa });
   return {
@@ -66,6 +70,7 @@ export const psychrometricExample = {
 export function computeDryingGoal({ outdoor_temperature_F, outdoor_RH_percent, indoor_temperature_F = 70, margin_GPP = 10 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const out = computePsychrometric({ temperature_F: outdoor_temperature_F, RH_percent: outdoor_RH_percent });
+  if (out.error) return { error: out.error };
   const target_GPP = Math.max(0, out.GPP - margin_GPP);
   // Convert target GPP back into an indoor RH at indoor temperature.
   // RH = e / e_s. e from W = 0.622 * e / (P - e); GPP = W * 7000 -> W = GPP/7000.
@@ -108,6 +113,8 @@ const IICRC_LGR_FT3_PER_PINT_BY_CLASS = { "1": 100, "2": 50, "3": 40, "4": 40 };
 //  multipliers; the operational-guidance string is categorical.)
 export function computeDehumidifierSize({ room_cubic_feet, water_class = "2", expected_pints_per_day = null }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(Number(room_cubic_feet) > 0)) return { error: "Enter the room volume (cubic feet)." };
+  if (!["1", "2", "3", "4"].includes(String(water_class))) return { error: "Water class must be 1, 2, 3 or 4." };
   // Every threshold below is `>=`, so a negative volume clears none of them and
   // the tile recommends the SMALLEST equipment: measured 2026-09-10,
   // `room_cubic_feet = -6000` moved this tile's own example from "stage
@@ -325,6 +332,7 @@ export function renderPsychrometric(inputRegion, outputRegion, citationEl) {
   const oVP = makeOutputLine(outputRegion, "Vapor pressure", "py-out-vp");
   const update = debounce(() => {
     const r = computePsychrometric({ temperature_F: Number(T.input.value) || 0, RH_percent: Number(RH.input.value) || 0, atmospheric_pressure_hPa: (Number(P.input.value) || 29.92) * 33.8638866667 });
+    if (r.error) { oDP.textContent = r.error; oGP.textContent = "-"; oVP.textContent = "-"; return; }
     oDP.textContent = fmt(r.dew_point_F, 1) + " F";
     oGP.textContent = fmt(r.GPP, 1);
     oVP.textContent = fmt(r.vapor_pressure_hPa / 33.8638866667, 3) + " in Hg (" + fmt(r.vapor_pressure_hPa, 2) + " hPa)";
@@ -975,6 +983,7 @@ export function computeDryingLog({
     }
     if (Number(r.ambient_RH) < 0 || Number(r.ambient_RH) > 100) return { error: "Ambient RH must be 0 - 100 percent." };
     if (Number(r.chamber_RH) < 0 || Number(r.chamber_RH) > 100) return { error: "Chamber RH must be 0 - 100 percent." };
+    if (Number(r.ambient_T_F) >= 200 || Number(r.chamber_T_F) >= 200) return { error: "Temperatures of 200 F or more are outside the psychrometric relation." };
   }
 
   const rows = readings.map((r, i) => {
@@ -1011,6 +1020,9 @@ export function computeDryingLog({
     // +/-Infinity, which Math.max would pass through as a non-finite field.
     // Guard finiteness before the projection is used.
     if (Number.isFinite(t_target)) days_to_target = Math.max(0, t_target - last.day_index);
+    // The trend line can cross the target while the last actual reading is still above it; "0 days"
+    // is only said when the chamber is really there.
+    if (days_to_target === 0 && last.chamber_GPP > target + 1e-9) days_to_target = null;
   }
 
   const warnings = [];
@@ -1174,7 +1186,15 @@ export function computeEquipmentCircuitLoad({
   if (total_amps <= 0) return { error: "Enter at least one piece of equipment (or an other-load amperage)." };
 
   const continuous_limit_A = _V16D_CONTINUOUS_FACTOR * breaker;
-  const circuits_required = Math.ceil(total_amps / continuous_limit_A - 1e-9);
+  // Whole machines cannot be split across breakers, so the count is the larger of the amperage
+  // total and what packing each type onto its own circuits needs. Until 2026-10-10 three 8.5 A
+  // dehumidifiers read "2 circuits" on 20 A breakers, though no two of them fit on one.
+  const mixed_bound = Math.ceil(total_amps / continuous_limit_A - 1e-9);
+  const type_bound = Object.entries(counts).reduce((worst, [key, n]) => {
+    const per = Math.floor(continuous_limit_A / RESTORATION_EQUIPMENT_AMPS[key].amps + 1e-9);
+    return n > 0 && per >= 1 ? Math.max(worst, Math.ceil(n / per - 1e-9)) : worst;
+  }, 0);
+  const circuits_required = Math.max(mixed_bound, type_bound);
   const total_va = total_amps * volts;
   // Utilization if every unit shared one breaker (the field shortcut to avoid).
   const single_circuit_utilization = total_amps / breaker;
@@ -1309,6 +1329,8 @@ function _v23SimpleRenderer(spec) {
 // =====================================================================
 // dims: in { containment_volume_ft3: L^3, co2_generation_cfm: L^3 T^-1, target_indoor_ppm: dimensionless, outdoor_ppm: dimensionless } out: { fresh_air_cfm: L^3 T^-1, ach: T^-1, above_target: dimensionless }
 export function computeDryingChamberCO2({ containment_volume_ft3 = 0, co2_generation_cfm = 0, target_indoor_ppm = 1000, outdoor_ppm = 420 } = {}) {
+  // A cleared outdoor field used to be 0 ppm, which understates the fresh air about 40%.
+  if (!(Number(outdoor_ppm) >= 300)) return { error: "Outdoor CO2 is about 420 ppm; a value under 300 is not a real atmosphere." };
   const V = Number(containment_volume_ft3) || 0;
   const gen = Number(co2_generation_cfm) || 0;
   const Ci = Number(target_indoor_ppm) || 0;
@@ -1349,6 +1371,7 @@ RESTORATION_RENDERERS["drying-chamber-co2"] = renderDryingChamberCO2;
 // mass-air * dG / 7000; gal = lb/hr * hours / 8.345.
 // dims: in { cfm: L^3*T^-1, inlet_gpp: dimensionless, outlet_gpp: dimensionless, hours: T } out: { water_lb_hr: M*T^-1, water_gal: L^3 }
 export function computeGrainsRemoved({ cfm = 0, inlet_gpp = 0, outlet_gpp = 0, hours = 0 } = {}) {
+  if (!(Number(inlet_gpp) > 0) || !(Number(outlet_gpp) > 0)) return { error: "Enter the inlet and outlet humidity ratios (grains per pound); a dehumidifier does not deliver 0 GPP air." };
   const CFM = Number(cfm) || 0;
   const inG = Number(inlet_gpp) || 0;
   const outG = Number(outlet_gpp) || 0;
@@ -1583,6 +1606,8 @@ RESTORATION_RENDERERS["mold-conditions"] = renderMoldConditions;
 //  evaporation-load pints precedent.)
 export function computeAntimicrobialDilution({ affected_area_ft2, coverage_ft2_per_gal, tank_size_gal, mode = "oz_per_gal", oz_per_gal = 0, ratio_N = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (mode !== "oz_per_gal" && mode !== "ratio") return { error: "Mode must be oz_per_gal or ratio." };
+  if (mode === "oz_per_gal" && Number(oz_per_gal) > 128) return { error: "More than 128 fl oz per gallon is more concentrate than the gallon holds; check the label rate." };
   const area = Number(affected_area_ft2) || 0;
   const cov = Number(coverage_ft2_per_gal) || 0;
   const tank = Number(tank_size_gal) || 0;
@@ -1727,6 +1752,7 @@ RESTORATION_RENDERERS["air-sample-volume"] = renderAirSampleVolume;
 // dims: in { temperature_F: T, rh_pct: dimensionless } out: { emc_pct: dimensionless }
 export function computeWoodEmc({ temperature_F = 0, rh_pct = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(Number(temperature_F) >= 30 && Number(temperature_F) <= 212)) return { error: "The Wood Handbook EMC fit covers 30 to 212 F; enter the air temperature." };
   if (rh_pct < 0 || rh_pct > 100) return { error: "Relative humidity must be between 0 and 100 percent." };
   const T = temperature_F;
   const h = rh_pct / 100;
@@ -1783,6 +1809,7 @@ RESTORATION_RENDERERS["wood-emc"] = renderWoodEmc;
 //        out: { cut_line_lf: L, drywall_sf: L^2, drywall_sheets: dimensionless, insulation_sf: L^2, baseboard_lf: L }
 export function computeFloodCutTakeoff({ wall_perimeter_ft = 0, cut_height_in = 24, removed_faces = 1, has_insulation = 1, has_baseboard = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (Number(removed_faces) !== 1 && Number(removed_faces) !== 2) return { error: "Removed faces is 1 (one side of the wall) or 2 (both sides)." };
   const perim = Number(wall_perimeter_ft) || 0;
   const cut = Number(cut_height_in) || 0;
   const faces = Number(removed_faces) || 0;
@@ -1792,11 +1819,12 @@ export function computeFloodCutTakeoff({ wall_perimeter_ft = 0, cut_height_in = 
   const ins = has_insulation ? 1 : 0;
   const base = has_baseboard ? 1 : 0;
   const cut_height_ft = cut / 12;
-  const cut_line_lf = perim;
+  // Both faces open means a score cut and a baseboard run on EACH side of the wall.
+  const cut_line_lf = perim * Number(removed_faces);
   const drywall_sf = perim * cut_height_ft * faces;
   const drywall_sheets = Math.ceil(drywall_sf / 32 - 1e-9); // standard 4x8 sheet = 32 ft^2
   const insulation_sf = ins ? perim * cut_height_ft : 0;
-  const baseboard_lf = base ? perim : 0;
+  const baseboard_lf = base ? perim * Number(removed_faces) : 0;
   return { cut_line_lf, drywall_sf, drywall_sheets, insulation_sf, baseboard_lf };
 }
 export const floodCutTakeoffExample = { inputs: { wall_perimeter_ft: 60, cut_height_in: 24, removed_faces: 1, has_insulation: 1, has_baseboard: 1 } };
@@ -1965,6 +1993,8 @@ export function computeWaterClassScreen({ floor_wet_fraction = 0, wall_wet_fract
   if (!(wick >= 0)) return { error: "Wick height must be non-negative (ft)." };
   const Fa = Number(floor_area_ft2) || 0, Wa = Number(wall_area_ft2) || 0, Ca = Number(ceiling_area_ft2) || 0;
   if (Fa < 0 || Wa < 0 || Ca < 0) return { error: "Room areas cannot be negative (ft2)." };
+  // A partly entered room used to weight the blank surfaces at zero, so fully wet walls dropped out.
+  if (Fa + Wa + Ca > 0 && ((floor > 0 && !(Fa > 0)) || (wall > 0 && !(Wa > 0)) || (ceil > 0 && !(Ca > 0)))) return { error: "Enter the area of every surface that is wet (floor, wall, ceiling), or leave all three areas blank to use a typical room's proportions." };
   const useRoom = Fa + Wa + Ca > 0;
   const F = useRoom ? Fa : 144, W = useRoom ? Wa : 384, C = useRoom ? Ca : 144;
   const wet_share_pct = (floor * F + wall * W + ceil * C) / (F + W + C) * 100;
@@ -2403,6 +2433,7 @@ RESTORATION_RENDERERS["hydroxyl-sizing"] = renderHydroxylSizing;
 // systems = ceil(ports / ports_per_system).
 // dims: in { affected_wall_ft: L, stud_spacing_in: L, ports_per_bay: dimensionless, ports_per_system: dimensionless } out: { bays: dimensionless, ports: dimensionless, systems: dimensionless }
 export function computeCavityDryingSystem({ affected_wall_ft = 0, stud_spacing_in = 16, ports_per_bay = 1, ports_per_system = 12 } = {}) {
+  if (!Number.isInteger(Number(ports_per_bay)) || !(Number(ports_per_bay) >= 1)) return { error: "Ports per bay is a whole number, 1 or more." };
   const wall = Number(affected_wall_ft);
   const spacing = Number(stud_spacing_in);
   const perBay = Number(ports_per_bay);
@@ -2719,7 +2750,7 @@ const SMOKE_RESIDUE_TABLE = {
 };
 // dims: in { residue_type: dimensionless } out: { method: dimensionless }
 export function computeSmokeResidueMethod({ residue_type = "dry" } = {}) {
-  const row = SMOKE_RESIDUE_TABLE[residue_type];
+  const row = Object.hasOwn(SMOKE_RESIDUE_TABLE, String(residue_type)) ? SMOKE_RESIDUE_TABLE[residue_type] : undefined;
   if (!row) return { error: "Unknown residue type." };
   return { ...row, note: "A test-clean of an inconspicuous area GOVERNS the final method; solvent selection and substrate compatibility are the cleaner's call. This screen narrows the method, it is not a procedure. ANSI/IICRC S700 governs." };
 }

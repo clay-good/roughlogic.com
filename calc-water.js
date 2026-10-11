@@ -1614,6 +1614,8 @@ WATER_RENDERERS["backflow-test-psi"] = renderBackflowTestPSI;
 // dims: in { applied_mg_l: M L^-3, measured_residual_mg_l: M L^-3, target_residual_mg_l: M L^-3 } out: { demand_mg_l: M L^-3, dose_for_target_mg_l: M L^-3 }
 export function computeChlorineDemand({ applied_mg_l = 0, measured_residual_mg_l = 0, target_residual_mg_l = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A residual above the applied dose is a misread or swapped fields; it used to give a negative demand and a dose of zero or less.
+  if (Number(measured_residual_mg_l) > Number(applied_mg_l)) return { error: "The measured residual cannot exceed the applied dose; check the two readings." };
   target_residual_mg_l = Number(target_residual_mg_l);
   if (!(applied_mg_l > 0)) return { error: "Applied chlorine must be positive (mg/L)." };
   if (measured_residual_mg_l < 0) return { error: "Measured residual must be non-negative (mg/L)." };
@@ -1680,6 +1682,7 @@ WATER_RENDERERS["uv-dose"] = renderUvDose;
 // dims: in { target_dose_mj_cm2: M T^-2, intensity_mw_cm2: M T^-3, exposure_time_s: T } out: { required_time_s: T, required_intensity_mw_cm2: M T^-3 }
 export function computeUvRequiredExposure({ target_dose_mj_cm2 = 40, intensity_mw_cm2 = 0, exposure_time_s = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (Number(intensity_mw_cm2) < 0 || Number(exposure_time_s) < 0) return { error: "Intensity and exposure time cannot be negative." };
   const target = Number(target_dose_mj_cm2) || 0;
   const I = Number(intensity_mw_cm2) || 0;
   const t = Number(exposure_time_s) || 0;
@@ -1885,6 +1888,7 @@ WATER_RENDERERS["was-srt-control"] = renderWasSrtControl;
 // dims: in { bod_removed_lb_day: M T^-1, oxygen_factor: dimensionless, nh3_nitrified_lb_day: M T^-1, sote_pct: dimensionless, alpha: dimensionless, fouling_f: dimensionless, beta: dimensionless, water_temp_F: T, do_mg_l: M L^-3, cs_field_mg_l: M L^-3, cs20_mg_l: M L^-3 } out: { o2_demand_lb_day: M T^-1, air_scfm: L^3 T^-1 }
 export function computeAerationOxygenDemand({ bod_removed_lb_day = 0, oxygen_factor = 0, nh3_nitrified_lb_day = 0, sote_pct = 0, alpha = 0.5, fouling_f = 0.9, beta = 0.95, water_temp_F = 68, do_mg_l = 2, cs_field_mg_l = 9.09, cs20_mg_l = 9.09 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (water_temp_F === null || water_temp_F === "" || !(Number(water_temp_F) >= 32 && Number(water_temp_F) <= 104)) return { error: "Enter the mixed-liquor temperature, 32 to 104 F." };
   const bod = Number(bod_removed_lb_day) || 0;
   const factor = Number(oxygen_factor) || 0;
   const nh3 = Number(nh3_nitrified_lb_day) || 0;
@@ -2503,7 +2507,9 @@ export function computeConstantPressureWellVfd({
   const has_drawdown = drawdown_at_design_ft > 0;
   const head_with_drawdown_ft = has_drawdown ? head_at_design_ft + drawdown_at_design_ft : 0;
   const has_curve = pump_max_head_ft > 0;
-  const cannot_hold = has_drawdown && has_curve && head_with_drawdown_ft > pump_max_head_ft;
+  // The pump head is checked whenever one is entered, with or without drawdown: until 2026-10-10
+  // a 200 ft pump against a 440 ft requirement read fine if the drawdown field was blank.
+  const cannot_hold = has_curve && (head_at_design_ft + (has_drawdown ? drawdown_at_design_ft : 0)) > pump_max_head_ft * (1 + 1e-9);
   const drawdown_verdict = !has_drawdown
     ? "(no drawdown entered -- and drawdown is what makes the demand-day complaint)"
     : "AND THE DRAWDOWN MOVES THE TARGET. Pumping " + fmt(design_flow_gpm, 0) + " gpm draws the level down another " + fmt(drawdown_at_design_ft, 0) + " ft, so the head required becomes " + fmt(head_with_drawdown_ft, 0) + " ft"
@@ -2564,7 +2570,8 @@ export function computeWetWellCycleTime({
   if (min_cycle_minutes < 0 || max_starts_per_hour < 0) return { error: "Cycle time and starts per hour cannot be negative." };
   if (!(min_cycle_minutes > 0) && !(max_starts_per_hour > 0)) return { error: "Enter either a minimum cycle time or a maximum starts per hour." };
   if (inflow_gpm < 0 || inflow_gpm >= pump_gpm) return { error: "Inflow must be at least 0 and below the pump rate -- at or above it the pump never shuts off." };
-  const cycle_min = min_cycle_minutes > 0 ? min_cycle_minutes : 60 / max_starts_per_hour;
+  // With both limits entered the STRICTER one governs (6 starts an hour is a 10 minute cycle).
+  const cycle_min = Math.max(min_cycle_minutes > 0 ? min_cycle_minutes : 0, max_starts_per_hour > 0 ? 60 / max_starts_per_hour : 0);
   const starts_per_hour = 60 / cycle_min;
   // The worst case is inflow at half the pump rate.
   const worst_case_inflow_gpm = pump_gpm / 2;

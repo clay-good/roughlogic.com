@@ -92,9 +92,12 @@ test("v18 §7: degenerate field is null (RC-2), not Infinity, and finite fields 
   assert.ok(Number.isFinite(pal.pallets_by_floor));
   noLeak(pal);
 
-  for (const rh of [0, -1]) {
-    const ps = computePsychrometric({ temperature_F: 70, RH_percent: rh });
+  {
+    const ps = computePsychrometric({ temperature_F: 70, RH_percent: 0 });
     assert.ok(finite(ps.dew_point_F));
     noLeak(ps);
+    // A negative RH is an error since hardening slice 15 (it used to return a negative GPP); an
+    // error is not a leak either.
+    assert.ok(typeof computePsychrometric({ temperature_F: 70, RH_percent: -1 }).error === "string");
   }
 });
