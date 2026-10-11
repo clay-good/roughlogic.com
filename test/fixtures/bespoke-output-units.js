@@ -109,7 +109,6 @@ export const BESPOKE_OUTPUT_UNITS = {
   "circular-segment-area": {"segment_area_in2":{"prefix":"","suffix":" in^2","digits":3}},
   "cistern-storage-days": {"reserve_days":{"prefix":"","suffix":" days","digits":1}},
   "clarifier-area-for-loading": {"required_area_ft2":{"prefix":"","suffix":" ft^2","digits":0}},
-  "clarifier-surface-loading": {"weir_gpd_ft":{"prefix":"","suffix":" gpd/ft","digits":0}},
   "class-of-loss-screen": {"water_class":{"prefix":"Class ","suffix":""},"evap_factor_gal_ft2":{"prefix":"","suffix":" gal/ft^2"}},
   "clausius-clapeyron": {"slope_k":{"prefix":"","suffix":" K","digits":1}},
   "closing-costs": {"total_mid":{"prefix":"$","suffix":"","digits":2},"total_pct_of_price_mid":{"prefix":"","suffix":" %","digits":2}},

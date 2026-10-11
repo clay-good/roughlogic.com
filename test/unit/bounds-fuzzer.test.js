@@ -60996,14 +60996,12 @@ test("hardening slice 23 (brewing, pipefitting, process, waste, specialty trades
   assert.equal(INS.computeWeldVisualAcceptance({ ...wv, crack_present: "Yes" }).has_crack ?? INS.computeWeldVisualAcceptance({ ...wv, crack_present: "Yes" }).crack, INS.computeWeldVisualAcceptance({ ...wv, crack_present: "yes" }).has_crack ?? INS.computeWeldVisualAcceptance({ ...wv, crack_present: "yes" }).crack);
   assert.ok(INS.computeWeldVisualAcceptance({ ...wv, crack_present: "maybe" }).error);
   // the largest route that fits really fits
-  const ex = Object.values(WS).find((v) => v && v.inputs && "stop_count" in v.inputs && "seconds_per_stop" in v.inputs);
-  const route = Object.values(WS).find((f) => typeof f === "function" && f.name === "computeCollectionRouteProductivity");
-  if (ex) {
-    const r = route({ ...ex.inputs, stop_count: 500 });
-    assert.ok(r.max_stops >= 0);
-    assert.equal(route({ ...ex.inputs, stop_count: r.max_stops }).fits_shift, true);
-    assert.equal(route({ ...ex.inputs, stop_count: 1300 }).max_stops, r.max_stops);
-  }
+  const routeIn = { stop_count: 500, seconds_per_stop: 25, setout_weight_lb: 40, truck_payload_tons: 10, round_trip_min: 50, tipping_min: 15, fixed_time_hr: 1, break_time_hr: 0.5, shift_hours: 8 };
+  const rt = WS.computeCollectionRouteProductivity(routeIn);
+  assert.ok(!rt.error && rt.max_stops > 0);
+  assert.equal(WS.computeCollectionRouteProductivity({ ...routeIn, stop_count: rt.max_stops }).fits_shift, true);
+  assert.equal(WS.computeCollectionRouteProductivity({ ...routeIn, stop_count: rt.max_stops + 1 }).fits_shift, false);
+  assert.equal(WS.computeCollectionRouteProductivity({ ...routeIn, stop_count: 1300 }).max_stops, rt.max_stops);
   assert.ok(BR.computeYeastPitchRate({ batch_volume_gal: 310, original_gravity: 13.6, pitch_rate_million_per_ml_plato: 0.75, slurry_cells_per_ml: 1.2e9, viability_pct: 90 }).error);
   assert.ok(DH.computeGateOperatorDuty({ gate_weight_lb: 800, gate_length_ft: 20, operator_speed_fps: 1, cycles_per_day: 200, operating_hours: 30 }).error);
   assert.ok(SPT.computeShoringReshoringLoad({ slab_dead_psf: 100, construction_live_psf: 50, form_dead_psf: 10, connected_levels: 2.5, governing_slab_capacity_psf: 160 }).error);
@@ -61188,4 +61186,17 @@ test("hardening slice 31 (second pass: coating mean, pile refusal, kill mud roun
     const r = OG.computeKillMudWeight({ ...km.inputs, safety_margin_ppg: 0.5, rounded_mw_ppg: Math.ceil(base.kill_mw_ppg * 10 + 0.5) / 10 });
     assert.ok(!/underbalanced by that much/.test(JSON.stringify(r)), "still overbalanced");
   }
+});
+
+test("hardening slice 32 (second pass: clarifier weir limit, radon fan operating point)", async () => {
+  const T = await import("../../calc-treatment.js");
+  const CN = await import("../../calc-containment.js");
+  const cl = T.computeClarifierSurfaceLoading({ flow_mgd: 1.2, surface_ft2: 1256.6, weir_len_ft: 20, mlss_mgl: 3000, ras_mgd: 0.6 });
+  assert.equal(cl.weir_overloaded, true);
+  assert.equal(cl.weir_limit_gpd_ft, 30000);
+  assert.equal(T.computeClarifierSurfaceLoading({ flow_mgd: 1.2, surface_ft2: 1256.6, weir_len_ft: 100 }).weir_overloaded, false);
+  assert.equal(T.computeClarifierSurfaceLoading({ flow_mgd: 0.5, surface_ft2: 1256.6, weir_len_ft: 22 }).weir_overloaded, true);
+  assert.ok(CN.computeRadonFanStatic({ flow_cfm: 300, pipe_diameter_in: 4, pipe_length_ft: 100, fan_static_in_wc: 1.2 }).error);
+  assert.ok(CN.computeRadonFanStatic({ flow_cfm: 60, pipe_diameter_in: 4, pipe_length_ft: 30, fan_static_in_wc: 1.2, measured_vacuum_in_wc: 1.5 }).error);
+  assert.ok(!CN.computeRadonFanStatic({ flow_cfm: 60, pipe_diameter_in: 4, pipe_length_ft: 30, fan_static_in_wc: 1.2, measured_vacuum_in_wc: 0.9 }).error);
 });

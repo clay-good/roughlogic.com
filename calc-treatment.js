@@ -592,6 +592,10 @@ export function computeClarifierSurfaceLoading({ flow_mgd = 0, surface_ft2 = 0, 
   return {
     sor_gpd_ft2, weir_gpd_ft, solids_lb_ft2_day,
     sor_overloaded: sor_gpd_ft2 > 1000 + 1e-9 * Math.abs(1000),
+    // Ten States 72.43: weir loading no more than 20,000 gpd/ft at plants of 1 MGD or less, 30,000 above.
+    // The description promises a weir check; until 2026-10-11 only the surface rate was flagged.
+    weir_limit_gpd_ft: flow <= 1 ? 20000 : 30000,
+    weir_overloaded: weir_gpd_ft > (flow <= 1 ? 20000 : 30000) * (1 + 1e-9),
     note: "Clarifier loading checks: surface overflow rate SOR = flow / surface area (gpd/ft^2), weir overflow rate = flow / total weir length (gpd/ft), and (for a secondary clarifier) solids loading = (flow + return sludge flow) x MLSS x 8.34 / area (lb/ft^2/day). Recommended Standards for Wastewater Facilities (Ten States, 2014) limits: primary tanks 1,000 gpd/ft^2 at design average flow (700 if they receive waste activated sludge; 1,500-2,000 and 1,200 at peak hour); activated-sludge final tanks at peak hour 1,200 (conventional), 1,000 (extended aeration) or 800 (2-stage nitrification) gpd/ft^2 with 40 or 35 lb/ft^2/day peak solids (72.232); weir loading 20,000 gpd/ft for plants of 1 MGD or less and 30,000 above (72.43). The flag here trips above 1,000 gpd/ft^2; exceeding the SOR carries floc over the weir. The state design criteria govern. An operations aid; the operator of record and the primacy agency govern compliance.",
   };
 }
@@ -614,7 +618,7 @@ function renderClarifierSurfaceLoading(inputRegion, outputRegion, citationEl) {
     const r = computeClarifierSurfaceLoading({ flow_mgd: readNum(flow.input), surface_ft2: readNum(area.input), weir_len_ft: readNum(weir.input), mlss_mgl: readNum(mlss.input), ras_mgd: readNum(ras.input) });
     if (r.error) { oSor.textContent = r.error; oWeir.textContent = "-"; oSolids.textContent = "-"; oNote.textContent = ""; return; }
     oSor.textContent = fmt(r.sor_gpd_ft2, 0) + " gpd/ft^2" + (r.sor_overloaded ? " (OVER 1,000, the Ten States primary design-average and extended-aeration limit -- floc carryover risk)" : "");
-    oWeir.textContent = fmt(r.weir_gpd_ft, 0) + " gpd/ft";
+    oWeir.textContent = fmt(r.weir_gpd_ft, 0) + " gpd/ft" + (r.weir_overloaded ? " (OVER the " + fmt(r.weir_limit_gpd_ft, 0) + " gpd/ft Ten States limit for this plant size -- add weir length)" : "");
     oSolids.textContent = r.solids_lb_ft2_day == null ? "(enter MLSS for a secondary clarifier)" : fmt(r.solids_lb_ft2_day, 1) + " lb/ft^2/day";
     oNote.textContent = r.note;
   }, DEBOUNCE_MS);

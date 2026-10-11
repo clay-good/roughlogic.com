@@ -165,6 +165,10 @@ export function computeRadonFanStatic({
   const velocity_verdict = fmt(pipe_diameter_in, 0) + " in pipe is " + fmt(area_ft2, 4) + " sq ft, so " + fmt(flow_cfm, 0) + " cfm runs at " + fmt(velocity_fpm, 0) + " fpm"
     + (pipe_length_ft > 0 ? ", and " + fmt(pipe_length_ft, 0) + " ft of it costs about " + fmt(pipe_loss_in_wc, 3) + " in wc of friction" : "");
   const has_fan = fan_static_in_wc > 0 && pipe_length_ft > 0;
+  // A fan cannot push this flow through a pipe that takes more static than the fan makes, and a
+  // vacuum above the fan's static at this flow was not measured on this fan curve point.
+  if (has_fan && pipe_loss_in_wc > fan_static_in_wc * (1 + 1e-9)) return { error: "The pipe alone needs " + pipe_loss_in_wc.toFixed(2) + " in wc at this flow, more than the " + fan_static_in_wc + " in wc the fan develops; the fan cannot move this flow through this pipe. Check the flow, or the fan static at that flow." };
+  if (fan_static_in_wc > 0 && measured_vacuum_in_wc > fan_static_in_wc * (1 + 1e-9)) return { error: "The measured vacuum is above the static the fan develops at this flow; the fan-curve figure and the reading do not belong to the same operating point." };
   const pipe_share_pct = has_fan ? pipe_loss_in_wc / fan_static_in_wc * 100 : 0;
   const share_verdict = !has_fan
     ? "(no fan static pressure and pipe length entered -- and the SHARE is the whole point)"
