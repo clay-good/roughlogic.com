@@ -88,7 +88,10 @@ export const ELECDESIGN_RENDERERS = {};
 export function computePullBoxSizing({ pull_type = "straight", largest_raceway_in = 0, other_raceways_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   other_raceways_in = Number(other_raceways_in);
-  if (other_raceways_in < 0) return { error: "The same-row other-raceways sum must be non-negative." };
+  if (!(other_raceways_in >= 0)) return { error: "The same-row other-raceways sum must be a number, zero or more." };
+  // "u" and any other spelling used to take the straight-pull 8x rule, which is the shorter box.
+  if (pull_type === "u") pull_type = "angle";
+  if (pull_type !== "straight" && pull_type !== "angle") return { error: "Pull type must be straight or angle (an angle pull covers a U pull)." };
   if (!(largest_raceway_in > 0)) return { error: "Largest raceway trade size must be positive." };
   const straight_min = 8 * largest_raceway_in;
   const angle_min = 6 * largest_raceway_in + other_raceways_in;
@@ -347,6 +350,7 @@ export function computeLightingUniformityRatio({ readings = [], target_avgmin = 
   const avg_min = avg / min;
   const max_min = max / min;
   const U0 = min / avg;
+  if (Number(target_avgmin) < 0 || Number(target_maxmin) < 0) return { error: "Target ratios cannot be negative (0 to skip a target)." };
   const ta = Number(target_avgmin) || 0;
   const tm = Number(target_maxmin) || 0;
   let pass = null;
@@ -392,6 +396,9 @@ export function computeEgressLightingCheck({ avg_fc = 0, min_fc = 0, max_fc = 0,
   if (!(avg > 0)) return { error: "Average illuminance must be positive (fc)." };
   if (!(min > 0)) return { error: "Minimum illuminance must be positive (fc)." };
   if (!(max >= min)) return { error: "Maximum must be at least the minimum (fc)." };
+  // An average outside its own minimum and maximum is not a set of readings.
+  if (!(avg >= min && avg <= max)) return { error: "The average must lie between the minimum and the maximum (fc)." };
+  if (mode !== "normal" && mode !== "emergency-initial" && mode !== "emergency-90min-end") return { error: "Mode must be normal, emergency-initial or emergency-90min-end." };
   // Normal egress lighting (IBC 1008.2.1, NFPA 101 7.8.1.3) is at least
   // 1 fc at EVERY point of the walking surface. The 1.0 average / 0.1
   // minimum pair is the EMERGENCY initial requirement (NFPA 101 7.9.2.1),
@@ -408,7 +415,7 @@ export function computeEgressLightingCheck({ avg_fc = 0, min_fc = 0, max_fc = 0,
   const ratio_ok = (emergency || emergencyInitial) ? max_min <= 40 + 1e-9 * Math.abs(40) : true;
   const pass = avg_ok && min_ok && ratio_ok;
   return {
-    max_min, avg_thr, min_thr, avg_ok, min_ok, ratio_ok, pass, emergency,
+    max_min, avg_thr, min_thr, avg_ok, min_ok, ratio_ok, pass, emergency: emergency || emergencyInitial, ratio_applies: emergency || emergencyInitial,
     note: "Egress/means-of-egress lighting check per NFPA 101 / IBC: normal lighting puts at least 1 fc on every point of the walking surface; emergency lighting starts at 1.0 fc average with a 0.1 fc minimum and, at the end of the 90-minute emergency (battery/generator) period the floor drops to 0.6 fc average and 0.06 fc minimum, and the maximum-to-minimum ratio must not exceed 40:1 (no over-bright spot beside a dark one). A single dark spot below the minimum fails the path even when the average holds - the reason a spot check, not just an average, is required. A design aid; the adopted NFPA 101 / IBC edition and the AHJ govern.",
   };
 }
@@ -428,7 +435,7 @@ ELECDESIGN_RENDERERS["egress-lighting-check"] = _simpleRenderer({
   ],
   outputs: [
     { key: "res", id: "elc-out-res", label: "Result", value: (r) => r.pass ? "COMPLIANT" : "NON-COMPLIANT" },
-    { key: "det", id: "elc-out-det", label: "Checks", value: (r) => "avg " + (r.avg_ok ? "OK" : "FAIL") + " (>=" + r.avg_thr + "), min " + (r.min_ok ? "OK" : "FAIL") + " (>=" + r.min_thr + "), max/min " + fmt(r.max_min, 0) + " (" + (r.ratio_ok ? "OK" : "FAIL") + ", <=40)" },
+    { key: "det", id: "elc-out-det", label: "Checks", value: (r) => "avg " + (r.avg_ok ? "OK" : "FAIL") + " (>=" + r.avg_thr + "), min " + (r.min_ok ? "OK" : "FAIL") + " (>=" + r.min_thr + "), max/min " + fmt(r.max_min, 0) + (r.ratio_applies ? " (" + (r.ratio_ok ? "OK" : "FAIL") + ", <=40)" : " (the 40:1 limit applies to emergency lighting only)") },
     { key: "n", id: "elc-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeEgressLightingCheck,
@@ -440,7 +447,8 @@ export function computeNeutralGroundingResistor({ system_voltage_ll_v = 0, targe
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const vll = Number(system_voltage_ll_v) || 0;
   const i = Number(target_fault_a) || 0;
-  const d = String(duty) === "lrg" ? "lrg" : "hrg";
+  if (String(duty) !== "lrg" && String(duty) !== "hrg") return { error: "Duty must be hrg (high-resistance, continuous) or lrg (low-resistance, short-time)." };
+  const d = String(duty);
   if (!(vll > 0)) return { error: "System line-to-line voltage must be positive (V)." };
   if (!(i > 0)) return { error: "Target fault current must be positive (A)." };
   const v_ln_v = vll / Math.sqrt(3);
@@ -487,6 +495,9 @@ export function computeStepTouchVoltage({ clearing_time_s = 0, surface_resistivi
   if (!(rho > 0)) return { error: "Native resistivity must be positive (ohm-m)." };
   if (!(hs > 0)) return { error: "Surface layer thickness must be positive (m)." };
   if (!(ts > 0)) return { error: "Clearing time must be positive (s)." };
+  // Dalziel's body-current relation, the basis of these limits, was fitted for shocks of 0.03 to
+  // 3 s (IEEE 80). Shorter than that it promises tolerable voltages in the tens of kilovolts.
+  if (ts < 0.03 || ts > 3) return { error: "Clearing time must be between 0.03 and 3 s, the range the IEEE 80 body-current relation covers." };
   if (bw !== 50 && bw !== 70) return { error: "Body weight must be 50 or 70 (kg)." };
   const cs = 1 - 0.09 * (1 - rho / rhos) / (2 * hs + 0.09);
   const k = bw === 70 ? 0.157 : 0.116;
@@ -607,7 +618,8 @@ export function computeSccrCombination({ component_sccrs_ka = [], feeder_ir_ka =
   const candidates = feeder > 0 ? vals.concat([feeder]) : vals;
   const panel_sccr_ka = Math.min(...candidates);
   const governing_is_feeder = feeder > 0 && feeder === panel_sccr_ka && feeder < Math.min(...vals);
-  const compliant = panel_sccr_ka >= fault - 1e-9 * Math.abs(fault);
+  // No fault current entered is no verdict; it used to read PASS against 0 kA.
+  const compliant = fault > 0 ? panel_sccr_ka >= fault - 1e-9 * Math.abs(fault) : null;
   return {
     panel_sccr_ka, compliant, governing_is_feeder, n: vals.length,
     note: "The panel SCCR is the lowest-rated power-circuit component (one 5 kA contactor caps the panel), not the main device; the feeder overcurrent device's interrupting rating also bounds it. A current-limiting fuse or breaker ahead of a weak component can raise the combination rating through its let-through energy (a listed combination) - re-enter that component at its qualified rating. NEC 409.110 requires the SCCR to be marked and to meet or exceed the available fault. UL 508A and the AHJ govern.",
@@ -629,7 +641,7 @@ function renderSccrCombination(inputRegion, outputRegion, citationEl) {
     const r = computeSccrCombination({ component_sccrs_ka: comps.input.value, feeder_ir_ka: Number(feeder.input.value) || 0, available_fault_ka: Number(fault.input.value) || 0 });
     if (r.error) { oSccr.textContent = r.error; oComp.textContent = "-"; oNote.textContent = ""; return; }
     oSccr.textContent = fmt(r.panel_sccr_ka, 1) + " kA (" + r.n + " components" + (r.governing_is_feeder ? ", feeder IR governs" : "") + ")";
-    oComp.textContent = r.compliant ? "PASS (>= " + fmt(Number(fault.input.value) || 0, 1) + " kA fault)" : "FAIL - below the " + fmt(Number(fault.input.value) || 0, 1) + " kA fault; raise the weakest component";
+    oComp.textContent = r.compliant === null ? "Enter the available fault current for a verdict" : r.compliant ? "PASS (>= " + fmt(Number(fault.input.value) || 0, 1) + " kA fault)" : "FAIL - below the " + fmt(Number(fault.input.value) || 0, 1) + " kA fault; raise the weakest component";
     oNote.textContent = r.note;
   }, DEBOUNCE_MS);
   for (const f of [comps, feeder, fault]) f.input.addEventListener("input", update);
@@ -783,6 +795,7 @@ export function computeGroundingGridConductor({ fault_current_ka = 0, clearing_t
   if (!m) return { error: "Material and joint type must be one of the listed IEEE 80 combinations." };
   if (!(fault_current_ka > 0)) return { error: "Symmetrical fault current must be positive (kA)." };
   if (!(clearing_time_s > 0)) return { error: "Fault duration must be positive (s)." };
+  installed_kcmil = Number(installed_kcmil);
   if (!(installed_kcmil >= 0)) return { error: "Installed conductor size cannot be negative." };
   // Scales with the SQUARE ROOT of time and LINEARLY with current: faster protection is a
   // real substitute for copper, and high available fault current costs conductor everywhere.
@@ -833,10 +846,12 @@ export function computeSelectiveCoordinationScreen({ device_type = "fuse", upstr
   if (!(upstream_rating_a > 0)) return { error: "Upstream device rating must be positive." };
   if (!(downstream_rating_a > 0)) return { error: "Downstream device rating must be positive." };
   if (!(upstream_rating_a >= downstream_rating_a)) return { error: "The upstream device should not be smaller than the downstream one." };
+  // Two breakers of one rating share a time-current curve: either can open first.
+  if (device_type === "breaker" && !(upstream_rating_a > downstream_rating_a)) return { error: "Two breakers of the same rating cannot coordinate; the upstream device must be larger." };
   if (!(available_fault_a > 0)) return { error: "Available fault current at the downstream device must be positive." };
   const ratio = upstream_rating_a / downstream_rating_a;
   if (device_type === "fuse") {
-    if (!(published_ratio > 0)) return { error: "The published fuse ratio for the family must be positive." };
+    if (!(published_ratio >= 1)) return { error: "A published fuse selectivity ratio is 1 or more (typically 1.5 to 8)." };
     // Within a family, meeting the PUBLISHED ratio coordinates all the way to the
     // interrupting rating -- the ratio table is the whole answer.
     const coordinated = ratio >= published_ratio * (1 - 1e-9);

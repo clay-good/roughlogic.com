@@ -23,7 +23,7 @@
     },
     "box-fill": {
       "group": "calc-electrical.js (Group A)",
-      "stamp": "Citation: per NEC 2023 §314.16 (volume allowances by conductor size; devices count twice the largest conductor; internal clamps count once). AHJ governs. Free at nfpa.org/freeaccess."
+      "stamp": "Citation: per NEC 2023 §314.16 (volume allowances by conductor size; devices count twice the largest conductor; internal clamps count once; one allowance for up to four equipment grounding conductors and a quarter more for each beyond four). AHJ governs. Free at nfpa.org/freeaccess."
     },
     "breaker-sizing": {
       "group": "calc-electrical.js (Group A)",

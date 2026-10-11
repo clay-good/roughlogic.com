@@ -429,7 +429,7 @@ export const BESPOKE_OUTPUT_LABELS = {
   "groove-weld-length-for-load": {"required_length_in":"Required weld length","throat_in":"Effective throat / unit strength","notes":"Notes"},
   "groove-weld-strength": {"capacity_lb":"Shear capacity","throat_in":"Effective throat / unit strength","utilization":"Utilization","notes":"Notes"},
   "gross-rent-multiplier": {"note":"Note"},
-  "grounding-electrode": {"resistance_ohms":"Resistance to remote earth (ohms)","meets_25_ohm":"Meets NEC 25-ohm advisory","supplemental_count_to_25_ohm":"Supplemental rod count to 25 ohms","warnings":"Notes"},
+  "grounding-electrode": {"resistance_ohms":"Resistance to remote earth (ohms)","meets_25_ohm":"Meets NEC 25-ohm advisory","supplemental_count_to_25_ohm":"Electrodes in parallel to reach 25 ohms","warnings":"Notes"},
   "grounding-electrode-conductor": {"required_gec":"Required GEC","base_gec":"Table 250.66 base","cap_note":"Cap applied","note":"Note"},
   "growing-degree-days": {"accumulated_gdd":"Accumulated GDD","days":"Days counted","note":"Note"},
   "growth-projected-count": {"final_count":"Projected count or OD","note":"Note"},

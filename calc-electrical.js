@@ -59,6 +59,9 @@ const _ohmUnknown = (x) => !Number.isFinite(x);
 export function computeOhmsLaw({ V, I, R, P }) {
   const known = [V, I, R, P].filter((x) => x !== null && x !== undefined && Number.isFinite(x));
   if (known.length < 2) return { error: "Provide any two of V, I, R, P." };
+  // Resistance and power are magnitudes here; a negative one made sqrt(P R) NaN with no error.
+  if ((Number.isFinite(R) && R < 0) || (Number.isFinite(P) && P < 0)) return { error: "Resistance and power cannot be negative." };
+  if (known.length === 2 && Number.isFinite(V) && Number.isFinite(R) && R === 0) return { error: "Zero resistance across a voltage is a short circuit: the current has no finite value." };
   const have = { V, I, R, P };
   const out = { ...have };
   for (const k of ["V", "I", "R", "P"]) if (_ohmUnknown(out[k])) out[k] = null;
@@ -125,7 +128,7 @@ export const wireAmpacityExample = {
 // --- Utility 3: Voltage Drop ---
 
 // dims: in { phase: dimensionless, material: dimensionless, awg: dimensionless, length_ft: L, current_A: I, source_voltage_V: M L^2 T^-3 I^-1 } out: { drop_V: M L^2 T^-3 I^-1, drop_percent: dimensionless, voltage_at_load_V: M L^2 T^-3 I^-1 }
-export function computeVoltageDrop({ phase, material, awg, length_ft, current_A, source_voltage_V }) {
+export function computeVoltageDrop({ phase = "single", material, awg, length_ft, current_A, source_voltage_V }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // A negative length or current makes the drop negative, and the flag ladder
   // below compares a SIGNED percent, so -9.88% reads as "within advisory
@@ -135,6 +138,12 @@ export function computeVoltageDrop({ phase, material, awg, length_ft, current_A,
   if (Number(length_ft) < 0 || Number(current_A) < 0) {
     return { error: "Length and current cannot be negative." };
   }
+  // An unknown phase used to be single-phase, an unknown material threw, and an omitted length
+  // returned NaN beside a "within advisory" flag.
+  if (phase !== "single" && phase !== "three") return { error: "Phase must be single or three." };
+  if (material !== "copper" && material !== "aluminum") return { error: "Material must be copper or aluminum." };
+  if (!Number.isFinite(Number(length_ft)) || !Number.isFinite(Number(current_A)) || length_ft === null || current_A === null) return { error: "length_ft (one-way, ft) and current_A must each be a finite value." };
+  try { awgToNumber(awg); } catch { return { error: "Choose a valid AWG size (14 through 4/0); kcmil sizes are not in this table." }; }
   const drop_V = voltageDrop({ phase, material, awg, length_ft, current_A });
   const percent = source_voltage_V > 0 ? (drop_V / source_voltage_V) * 100 : null;
   // v8 §C.1: companion output (voltage at load) and advisory / limit flags.
@@ -220,7 +229,7 @@ export function computeConduitFill({ conduit, trade_size, conductors }) {
     if (a === undefined) return { error: "No Chapter 9 Table 5 area is bundled for " + c.awg + " AWG " + c.insulation + "; this calculator carries " + c.insulation + " from " + Object.keys(ins).sort((x, y) => ins[x] - ins[y])[0] + " to " + Object.keys(ins).sort((x, y) => ins[x] - ins[y]).slice(-1)[0] + " AWG." };
     if (Number(c.count) < 0) return { error: "Conductor counts cannot be negative." };
     total += a * (c.count || 1);
-    count += (c.count || 1);
+    count += (Number(c.count) || 1);
   }
 
   const fill_in2 = total;
@@ -262,11 +271,22 @@ export const BOX_FILL_PER_CONDUCTOR_IN3 = {
 };
 
 // dims: in { box_volume_in3: L^3, conductors_by_size: dimensionless, devices: dimensionless, internal_clamps: dimensionless, largest_awg_for_clamp_and_device: dimensionless } out: { fill_in3: L^3, free_in3: L^3, pass: dimensionless }
-export function computeBoxFill({ box_volume_in3, conductors_by_size, devices = 0, internal_clamps = false, largest_awg_for_clamp_and_device = "14" }) {
+export function computeBoxFill({ box_volume_in3, conductors_by_size, devices = 0, internal_clamps = false, largest_awg_for_clamp_and_device = null, grounding_conductors = 0 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // Until 2026-09-26 a negative entry here returned a negative quantity with no error.
   if (["box_volume_in3", "devices"].some((k) => Number(arguments[0]?.[k]) < 0)) return { error: "Box volume and device count cannot be negative." };
   box_volume_in3 = Number(box_volume_in3);
+  if (!(box_volume_in3 > 0)) return { error: "Box volume must be positive (cubic inches)." };
+  if (!conductors_by_size || typeof conductors_by_size !== "object") return { error: "Enter the conductors by size." };
+  // The clamp, device and grounding allowances are taken on the LARGEST conductor present.
+  // Until 2026-10-10 an omitted size meant 14 AWG whatever was in the box, and the 314.16(B)(5)
+  // grounding allowance the citation names was not computed at all.
+  if (largest_awg_for_clamp_and_device === null || largest_awg_for_clamp_and_device === undefined || largest_awg_for_clamp_and_device === "") {
+    const present = Object.keys(conductors_by_size).filter((k) => BOX_FILL_PER_CONDUCTOR_IN3[k] !== undefined && Number(conductors_by_size[k]) > 0);
+    largest_awg_for_clamp_and_device = present.length ? present.reduce((a, b) => (BOX_FILL_PER_CONDUCTOR_IN3[b] > BOX_FILL_PER_CONDUCTOR_IN3[a] ? b : a)) : "14";
+  }
+  const n_egc = Number(grounding_conductors) || 0;
+  if (n_egc < 0 || !Number.isInteger(n_egc)) return { error: "Equipment grounding conductors is a whole number, zero or more." };
   let fill = 0;
   for (const [awg, count] of Object.entries(conductors_by_size)) {
     const v = BOX_FILL_PER_CONDUCTOR_IN3[awg];
@@ -279,7 +299,11 @@ export function computeBoxFill({ box_volume_in3, conductors_by_size, devices = 0
   const largest = BOX_FILL_PER_CONDUCTOR_IN3[largest_awg_for_clamp_and_device];
   if (internal_clamps) fill += largest;
   fill += 2 * largest * devices;
-  return { fill_in3: fill, box_volume_in3, pass: fill <= box_volume_in3 + 1e-9 * Math.abs(box_volume_in3), free_in3: box_volume_in3 - fill };
+  // 314.16(B)(5): one allowance for up to four equipment grounding conductors, and a quarter
+  // allowance for each one beyond four.
+  const grounding_in3 = n_egc === 0 ? 0 : largest * (1 + 0.25 * Math.max(0, n_egc - 4));
+  fill += grounding_in3;
+  return { grounding_in3, fill_in3: fill, box_volume_in3, pass: fill <= box_volume_in3 + 1e-9 * Math.abs(box_volume_in3), free_in3: box_volume_in3 - fill };
 }
 
 export const boxFillExample = {
@@ -298,7 +322,9 @@ export function computeBreakerSize({ load_A, continuous, load_W = 0, voltage_V =
   let derived_load_A = Number(load_A) || 0;
   let used_input_mode = "amps";
   if (derived_load_A <= 0 && load_W > 0 && voltage_V > 0) {
-    const pf = power_factor > 0 ? power_factor : 1;
+    if (!(power_factor > 0 && power_factor <= 1)) return { error: "Power factor must be greater than 0 and no more than 1." };
+    if (phase !== "single" && phase !== "three") return { error: "Phase must be single or three." };
+    const pf = power_factor;
     if (phase === "three") {
       derived_load_A = load_W / (Math.sqrt(3) * voltage_V * pf);
     } else {
@@ -310,8 +336,10 @@ export function computeBreakerSize({ load_A, continuous, load_W = 0, voltage_V =
   const continuous_required_A = derived_load_A * 1.25;
   const non_continuous_required_A = derived_load_A;
   const required_A = continuous ? continuous_required_A : non_continuous_required_A;
-  const standardSizes = [15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 90, 100, 110, 125, 150, 175, 200, 225, 250, 300, 350, 400];
-  const next_A = standardSizes.find((s) => s >= required_A - 1e-9 * Math.abs(required_A)) ?? required_A;
+  // The whole 240.6(A) ladder. Until 2026-10-10 it stopped at 400 A and anything larger echoed
+  // the requirement back as a "standard" size (412.5 A where 450 is the next rating).
+  const next_A = _STD_OCPD_240_6.find((s) => s >= required_A - 1e-9 * Math.abs(required_A));
+  if (next_A === undefined) return { error: "The load needs more than the largest standard rating in NEC 240.6(A) (6,000 A); this is an engineered service." };
   return {
     required_A, next_standard_A: next_A,
     derived_load_A,
@@ -351,6 +379,8 @@ export const MOTOR_FLA_TABLE = {
 
 // dims: in { hp: M L^2 T^-3, voltage: M L^2 T^-3 I^-1, phase: dimensionless } out: { fla_A: I }
 export function computeMotorFLA({ hp, voltage, phase }) {
+  // An unknown or omitted phase used to read the three-phase table, whose currents are lower.
+  if (phase !== "single" && phase !== "three") return { error: "Phase must be single or three." };
   const row = MOTOR_FLA_TABLE[hp];
   if (!row) return { error: "Horsepower not in bundled table." };
   const key = phase === "single" ? "single_" + voltage + "V" : "three_" + voltage + "V";
@@ -387,7 +417,7 @@ export function computeTransformerSize({ load_kW, power_factor = 1, primary_V, s
   // Round up to the ANSI/IEEE C57 step (15, 30, 45, 75, 112.5, 150, 225,
   // 300, 500, 750, 1000 kVA) via the v8 Phase D helper. Returns the
   // calculated kVA AND the next-standard recommendation per spec §C.1.
-  const r = _v8roundToStandard(kVA, phase === "three" ? _v8STANDARD_SIZES.transformer_kVA : _v8STANDARD_SIZES.transformer_kVA_1ph);
+  const r = _v8roundToStandard(kVA * (1 - 1e-12), phase === "three" ? _v8STANDARD_SIZES.transformer_kVA : _v8STANDARD_SIZES.transformer_kVA_1ph);
   const next = r && !r.error ? r.recommended : kVA;
   return {
     required_kVA: kVA, next_standard_kVA: next,
@@ -408,6 +438,8 @@ export function computeThreePhase({ V_LL, I_L, pf }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // A power factor above 1 made kW exceed kVA without complaint.
   if (Number(pf) > 1 || Number(pf) < 0) return { error: "Power factor must be between 0 and 1." };
+  if (pf === undefined || pf === null || pf === "") return { error: "Enter the power factor (1 for a resistive load)." };
+  if (Number(V_LL) < 0 || Number(I_L) < 0) return { error: "Voltage and current cannot be negative." };
   return threePhasePower({ V_LL, I_L, pf });
 }
 
@@ -421,6 +453,13 @@ export const threePhaseExample = {
 // dims: in { material: dimensionless, awg: dimensionless, length_ft: L, temperature_C: T } out: { resistance_ohms: M L^2 T^-3 I^-2 }
 export function computeConductorResistance({ material, awg, length_ft, temperature_C }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A blank temperature used to be 0 C (the page) or NaN (a direct call); both are refused now.
+  if (temperature_C === undefined || temperature_C === null || temperature_C === "") return { error: "Enter the conductor temperature (C): 20 for the reference value, 75 for a loaded conductor." };
+  temperature_C = Number(temperature_C); length_ft = Number(length_ft);
+  if (!(temperature_C >= -50 && temperature_C <= 250)) return { error: "Conductor temperature must be between -50 and 250 C." };
+  if (!(length_ft >= 0)) return { error: "Length cannot be negative (ft)." };
+  if (material !== "copper" && material !== "aluminum") return { error: "Material must be copper or aluminum." };
+  try { awgToNumber(awg); } catch { return { error: "Choose a valid AWG size (40 through 4/0); kcmil sizes are not gauge numbers." }; }
   const length_m = length_ft * 0.3048;
   const R = conductorResistance({ material, awg, length_m, temperature_C });
   const R_per_kft = conductorResistancePerKft({ material, awg, temperature_C });
@@ -460,6 +499,9 @@ export function computeEGCSize({ ocpd_A, material }) {
   // from 10 AWG to 14 AWG -- an undersized equipment grounding conductor,
   // returned as though it were the answer.
   if (Number(ocpd_A) < 0) return { error: "OCPD rating cannot be negative (A)." };
+  if (!(Number(ocpd_A) > 0)) return { error: "Enter the overcurrent device rating (A)." };
+  // Anything that was not exactly "aluminum" used to return the smaller copper size.
+  if (material !== "copper" && material !== "aluminum") return { error: "Material must be copper or aluminum." };
   const row = EGC_TABLE_AWG.find((r) => ocpd_A <= r.ocpd_max_A);
   if (!row) return { error: "OCPD rating exceeds bundled table; consult engineering analysis." };
   return { egc_awg: material === "aluminum" ? row.aluminum : row.copper };
@@ -706,7 +748,7 @@ export function renderConduitFill(inputRegion, outputRegion, citationEl, params)
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderBoxFill(inputRegion, outputRegion, citationEl, params) {
-  citationEl.textContent = "Citation: per NEC 2023 §314.16 (volume allowances by conductor size; devices count twice the largest conductor; internal clamps count once). AHJ governs. Free at nfpa.org/freeaccess.";
+  citationEl.textContent = "Citation: per NEC 2023 §314.16 (volume allowances by conductor size; devices count twice the largest conductor; internal clamps count once; one allowance for up to four equipment grounding conductors and a quarter more for each beyond four). AHJ governs. Free at nfpa.org/freeaccess.";
   attachExampleButton(inputRegion, () => fillExample({ vol: 22.5, awg: "12", count: 6, devices: 1, clamps: true }));
 
   const vol = makeNumber("Box volume (in³)", "bf-vol", { step: "any", min: "0" });
@@ -717,7 +759,8 @@ export function renderBoxFill(inputRegion, outputRegion, citationEl, params) {
   const count = makeNumber("Conductor count", "bf-count", { step: "1", min: "0" });
   const devices = makeNumber("Device count", "bf-dev", { step: "1", min: "0" });
   const clamps = makeCheckbox("Internal clamps present", "bf-clamps");
-  for (const f of [vol, awg, count, devices, clamps]) inputRegion.appendChild(f.wrap);
+  const egc = makeNumber("Equipment grounding conductors (not in the count above)", "bf-egc", { step: "1", min: "0" });
+  for (const f of [vol, awg, count, devices, clamps, egc]) inputRegion.appendChild(f.wrap);
 
   const outFill = makeOutputLine(outputRegion, "Fill", "bf-out-fill");
   const outPass = makeOutputLine(outputRegion, "Result", "bf-out-pass");
@@ -734,13 +777,14 @@ export function renderBoxFill(inputRegion, outputRegion, citationEl, params) {
       devices: Number(devices.input.value) || 0,
       internal_clamps: clamps.input.checked,
       largest_awg_for_clamp_and_device: a,
+      grounding_conductors: Number(egc.input.value) || 0,
     });
     if (r.error) { outFill.textContent = r.error; outPass.textContent = "-"; return; }
     outFill.textContent = fmt(r.fill_in3, 2) + " in^3 (free " + fmt(r.free_in3, 2) + " in^3)";
     outPass.textContent = r.pass ? "Pass" : "Fail";
   }, DEBOUNCE_MS);
 
-  for (const el of [vol.input, awg.select, count.input, devices.input, clamps.input]) el.addEventListener("input", update);
+  for (const el of [vol.input, awg.select, count.input, devices.input, clamps.input, egc.input]) el.addEventListener("input", update);
 }
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
@@ -996,6 +1040,8 @@ export function computeServiceLoad({
   hvac_heating_W = 0,
 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A negative load subtracted from the service; none is meaningful.
+  if ([area_ft2, small_appliance_circuits, laundry_circuits, fixed_appliances_W, range_W, dryer_W, hvac_cooling_W, hvac_heating_W].some((x) => Number(x) < 0)) return { error: "Area, circuit counts and loads cannot be negative." };
   const lighting = (Number(area_ft2) || 0) * 3;
   const small_appliance = (Number(small_appliance_circuits) || 0) * 1500;
   const laundry = (Number(laundry_circuits) || 0) * 1500;
@@ -1024,7 +1070,10 @@ export function computeServiceLoad({
 
   const total_W = general_demand + fixed_demand + range_demand + dryer_demand + hvac_demand;
   const required_A = total_W / 240;
-  const next_standard_A = STANDARD_SERVICE_AMPACITIES.find((s) => s >= required_A - 1e-9 * Math.abs(required_A)) ?? required_A;
+  // NEC 230.79(C): a one-family dwelling service is at least 100 A, so the walk starts there.
+  // Past the top of the list there is no standard size to name: null, and the page says so
+  // (until 2026-10-10 the requirement itself was echoed back as a "standard" 434.9 A).
+  const next_standard_A = STANDARD_SERVICE_AMPACITIES.find((s) => s >= 100 && s >= required_A - 1e-9 * Math.abs(required_A)) ?? null;
   return {
     total_demand_W: total_W,
     required_A,
@@ -1055,6 +1104,11 @@ export const serviceLoadExample = {
 
 // dims: in { items: dimensionless } out: { recommended_kW: M L^2 T^-3 }
 export function computeGeneratorSize({ items = [] }) {
+  if (!Array.isArray(items)) return { error: "Items must be a list of loads." };
+  for (const it of items) {
+    const r = Number(it?.running_watts ?? 0), s = Number(it?.starting_watts ?? 0);
+    if (!Number.isFinite(r) || !Number.isFinite(s) || r < 0 || s < 0) return { error: "Running and starting watts must be finite numbers, zero or more." };
+  }
   let running_total = 0;
   let max_surge_excess = 0;
   for (const it of items) {
@@ -1218,7 +1272,7 @@ const LIGHTING_DENSITY_REMOVED = {
 export function computeLightingDensity({ area_ft2, occupancy_class }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const a = Number(area_ft2) || 0;
-  const w_per_ft2 = LIGHTING_DENSITY_W_PER_FT2[occupancy_class];
+  const w_per_ft2 = Object.hasOwn(LIGHTING_DENSITY_W_PER_FT2, String(occupancy_class)) ? LIGHTING_DENSITY_W_PER_FT2[occupancy_class] : undefined;
   if (w_per_ft2 === undefined) return { error: LIGHTING_DENSITY_REMOVED[occupancy_class] || "Unknown occupancy class." };
   if (a <= 0) return { error: "Area must be positive." };
   const target_W = a * w_per_ft2;
@@ -1279,7 +1333,7 @@ export function renderServiceLoad(inputRegion, outputRegion, citationEl, params)
     });
     outTotal.textContent = fmt(r.total_demand_W, 0) + " W";
     outAmps.textContent = fmt(r.required_A, 1) + " A";
-    outNext.textContent = r.next_standard_A + " A";
+    outNext.textContent = r.next_standard_A === null ? "none listed (over 400 A: an engineered service)" : r.next_standard_A + " A";
   }, DEBOUNCE_MS);
 
   for (const el of [area.input, sa.input, ld.input, fixed.input, range.input, dryer.input, cool.input, heat.input]) el.addEventListener("input", update);
@@ -1440,6 +1494,8 @@ export function computePullingTension({
   if (!(run_length_ft > 0)) return { error: "Run length must be positive." };
   if (!Array.isArray(bends)) return { error: "Bends must be a list." };
   if (straight_run_ft < 0) return { error: "Straight run cannot be negative." };
+  if (straight_run_ft > run_length_ft) return { error: "The straight run before the bend cannot be longer than the whole run." };
+  if (bends.some((b) => !b || typeof b !== "object")) return { error: "Each bend needs an angle and a radius." };
 
   // Tension at the head of the straight run (entering the first bend).
   let tension = mu * cable_weight_lb_per_ft * straight_run_ft;
@@ -1575,7 +1631,7 @@ export function computePhaseBalance({ circuits = [], threshold_percent = 10 }) {
     const phase = c.phase;
     const load = Number(c.load_W) || 0;
     if (!totals.hasOwnProperty(phase)) return { error: "Unknown phase tag: " + phase };
-    if (load < 0) return { error: "Loads must be non-negative." };
+    if (!(load >= 0) || !Number.isFinite(load)) return { error: "Loads must be finite and non-negative." };
     totals[phase] += load;
   }
   const values = [totals.A, totals.B, totals.C];
@@ -1651,6 +1707,8 @@ export function computeMultiLoadVoltageDrop({
   const r_per_kft = kResistancePerKft({ material, awg });
   if (!Number.isFinite(r_per_kft)) return { error: "Unknown conductor size or material." };
   // Sort by distance ascending.
+  if (material !== "copper" && material !== "aluminum") return { error: "Material must be copper or aluminum." };
+  if (loads.some((l) => !(Number(l?.distance_ft) >= 0) || !(Number(l?.current_A) >= 0))) return { error: "Each load needs a distance (ft) and a current (A), zero or more." };
   const ordered = [...loads].map((l) => ({ distance_ft: Number(l.distance_ft) || 0, current_A: Number(l.current_A) || 0 })).sort((a, b) => a.distance_ft - b.distance_ft);
   // Cumulative current downstream of each segment determines I*R drop on it.
   // Walk from the source: at each segment, current = sum of loads at or beyond.
@@ -1778,6 +1836,9 @@ export function computePoEBudget({ poe_class = "at", category = "Cat6", run_leng
   const ohmsPer100m = POE_CABLE_OHMS_PER_100M[category];
   if (!Number.isFinite(ohmsPer100m)) return { error: "Unknown cable category." };
   if (!(run_length_ft >= 0)) return { error: "Run length must be non-negative." };
+  // The Ethernet channel itself ends at 100 m whatever the power budget says.
+  if (run_length_ft > 328.084 + 1e-6) return { error: "The run is over the 100 m (328 ft) Ethernet channel limit; power budget aside, the link is out of standard. Use an extender or a midspan." };
+  if (!(ambient_C >= -40 && ambient_C <= 90)) return { error: "Ambient temperature must be between -40 and 90 C." };
   // Convert: 100 m = 328.084 ft. Resistance for the run length.
   const length_m = run_length_ft / 3.28084;
   // Temperature correction: copper alpha 0.00393 per K; cable rated at 20 C.
@@ -1846,7 +1907,9 @@ function renderPullingTension(inputRegion, outputRegion, citationEl, params) {
   }
   const update = debounce(() => {
     const bends = [];
-    if (Number(b1ang.input.value) > 0 && Number(b1rad.input.value) > 0) {
+    // A bend with a blank radius still multiplies the tension (the capstan term has no radius in
+    // it); it is passed through so the compute asks for the radius instead of dropping the bend.
+    if (Number(b1ang.input.value) > 0) {
       bends.push({ angle_deg: Number(b1ang.input.value), radius_ft: Number(b1rad.input.value) });
     }
     const r = computePullingTension({
@@ -1978,7 +2041,7 @@ function renderPhaseBalance(inputRegion, outputRegion, citationEl, params) {
       oTot.textContent = "-"; oImb.textContent = "-"; oFinal.textContent = "-"; oSwaps.textContent = "-";
       return;
     }
-    const r = computePhaseBalance({ circuits, threshold_percent: Number(thr.input.value) || 10 });
+    const r = computePhaseBalance({ circuits, threshold_percent: thr.input.value === "" ? 10 : Number(thr.input.value) });
     if (r.error) { oTot.textContent = r.error; oImb.textContent = "-"; oFinal.textContent = "-"; oSwaps.textContent = "-"; return; }
     oTot.textContent = fmt(r.totals.A, 0) + " / " + fmt(r.totals.B, 0) + " / " + fmt(r.totals.C, 0) + " W";
     oImb.textContent = fmt(r.imbalance_percent, 2) + " %";
@@ -2147,9 +2210,12 @@ export function computeTransformerKvaSizing({
   if (!Array.isArray(loads) || loads.length === 0) return { error: "Provide at least one load." };
   if (!(primary_V > 0)) return { error: "Primary voltage must be positive." };
   if (!(secondary_V > 0)) return { error: "Secondary voltage must be positive." };
+  if (phase !== "three" && phase !== "single") return { error: "Phase must be single or three." };
   const sqrt_phases = phase === "three" ? Math.sqrt(3) : 1;
   let connected_kVA = 0;
   for (const ln of loads) {
+    // An out-of-range pf (85 for 0.85) used to be treated as 1.0, which undersizes the bank.
+    if (ln.pf !== undefined && ln.pf !== null && ln.pf !== "" && !(Number(ln.pf) > 0 && Number(ln.pf) <= 1)) return { error: "Each load's power factor must be greater than 0 and no more than 1 (0.85, not 85)." };
     const pf = Number(ln.pf) > 0 && Number(ln.pf) <= 1 ? Number(ln.pf) : 1;
     let kVA;
     if (ln.kVA !== undefined && ln.kVA !== null) kVA = Number(ln.kVA);
@@ -2208,6 +2274,7 @@ export function computeShortCircuitPP({
   if (!(C_value > 0)) return { error: "Conductor C-value must be positive." };
   if (!(length_ft >= 0)) return { error: "Run length must be non-negative." };
   if (!(parallel_sets >= 1)) return { error: "Parallel sets must be >= 1." };
+  if (phase !== "three" && phase !== "single") return { error: "Phase must be single or three." };
   const sqrt_phases = phase === "three" ? POINT_TO_POINT_SQRT3 : 1;
   // Bussmann multiplies the nameplate %Z by 0.9 for the worst case, since a transformer's actual
   // impedance may run below nameplate (UL 1561 +/-10%). Until 2026-10-03 the tile used %Z as-is,
@@ -2266,11 +2333,16 @@ export function computeGeneratorMotorStarting({
   if (!(dip_factor > 0 && dip_factor < 1)) return { error: "Dip factor must be between 0 and 1." };
   const xd = Number(generator_xd);
   if (!(xd > 0 && xd <= 1)) return { error: "Generator transient reactance X'd must be over 0 and at most 1 per unit (typically 0.15-0.30)." };
+  if (!Object.hasOwn({ occasional: 1, frequent: 1, continuous: 1 }, String(starts_per_hour))) return { error: "Starts per hour must be occasional, frequent or continuous." };
   let running_kW = Number(non_motor_kW) || 0;
   let worst_starting_kVA = 0;
   for (const m of motors) {
-    const hp = Number(m.hp);
+    const hp = Number(m?.hp);
     if (!(Number.isFinite(hp) && hp > 0)) return { error: "Each motor needs a positive hp." };
+    if (Number(m.running_kW) < 0) return { error: "A motor's running kW cannot be negative." };
+    if (m.phase !== undefined && m.phase !== null && m.phase !== "" && m.phase !== "single" && m.phase !== "three") return { error: "A motor's phase must be single or three." };
+    // A locked-rotor current with no voltage used to be dropped for the code-letter estimate.
+    if (Number(m.lra_A) > 0 && !(Number(m.voltage_V) > 0)) return { error: "A motor with a locked-rotor current also needs its voltage." };
     const motor_kW = Number(m.running_kW) || hp * 0.746;
     running_kW += motor_kW;
     let starting_kVA;
@@ -2278,7 +2350,7 @@ export function computeGeneratorMotorStarting({
       const sqrt_phases = m.phase === "single" ? 1 : POINT_TO_POINT_SQRT3;
       starting_kVA = (Number(m.lra_A) * Number(m.voltage_V) * sqrt_phases) / 1000;
     } else {
-      const code = (m.code_letter || "G").toUpperCase();
+      const code = String(m.code_letter || "G").toUpperCase();
       const per_hp = NEMA_MG1_CODE_LETTERS[code];
       if (per_hp === undefined) return { error: "Unknown code letter " + code };
       starting_kVA = hp * per_hp;
@@ -2344,6 +2416,9 @@ export function computeServiceLoadStandard({
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if ([small_appliance_circuits, laundry_circuit].some((x) => Number(x) < 0)) return { error: "Circuit counts cannot be negative." };
   if (!(area_ft2 >= 0)) return { error: "Area must be non-negative." };
+  if ([fixed_appliances_W, fixed_appliance_count, range_W, dryer_W, largest_motor_W, hvac_cooling_W, hvac_heating_W].some((x) => Number(x) < 0)) return { error: "Loads cannot be negative." };
+  if (!(Number(service_voltage) > 0)) return { error: "Service voltage must be positive (V)." };
+  if (Number(range_W) > 27000) return { error: "Table 220.55 Note 1 stops at a 27 kW range; a larger one is outside this method." };
   // General lighting: 3 VA per ft^2 (NEC 2023 220.41 dwelling; 220.12 before 2023).
   const lighting_VA = (Number(area_ft2) || 0) * 3;
   const sa_VA = (Number(small_appliance_circuits) || 0) * 1500;
@@ -2663,6 +2738,9 @@ export function computePanelRebalance({
     if (!(phase in totals)) return { error: "Each circuit needs phase A, B, or C." };
     totals[phase] += amps;
   }
+  if (swappable_pairs !== null && swappable_pairs !== undefined && !Array.isArray(swappable_pairs)) return { error: "Swappable pairs must be a list." };
+  // Amps as numbers from here on: string amps used to total correctly and then find no swap.
+  circuits = circuits.map((c) => ({ ...c, amps: Number(c.amps) }));
   const phases = ["A", "B", "C"];
   const values = phases.map((p) => totals[p]);
   const mean = (totals.A + totals.B + totals.C) / 3;
@@ -3000,7 +3078,7 @@ export function computeMotorBranchFromNameplate({
   const computed_fla_A = (HP * 746) / denom;
 
   // Design FLA: larger of computed or nameplate (when nameplate provided).
-  const np = Number.isFinite(nameplate_fla_A) && nameplate_fla_A > 0 ? Number(nameplate_fla_A) : null;
+  const np = nameplate_fla_A !== null && nameplate_fla_A !== "" && Number(nameplate_fla_A) > 0 ? Number(nameplate_fla_A) : null;
   const design_fla_A = np !== null ? Math.max(computed_fla_A, np) : computed_fla_A;
   const design_source = np !== null && np >= computed_fla_A ? "nameplate" : "computed";
 
@@ -3169,6 +3247,9 @@ export function computeGroundingElectrodeResistance({
     const L_cm = L_ft * 30.48;
     const d_cm_rod = d_in * 2.54;
     const d_cm = electrode_type === "ufer" ? Math.max(d_cm_rod, (Number(ufer_concrete_diameter_in) || 6) * 2.54) : d_cm_rod;
+    // Dwight's rod formula holds for a slender rod; a stub shorter than a few diameters drives
+    // the log term negative.
+    if (!(L_cm > 10 * d_cm)) return { error: "The rod must be at least ten diameters long for the driven-rod formula." };
     R = (rho / (2 * Math.PI * L_cm)) * (Math.log(8 * L_cm / d_cm) - 1);
     if (electrode_type === "ufer") {
       // The concrete's benefit is the larger effective diameter above. Until 2026-10-03 the result
@@ -3258,7 +3339,7 @@ export function renderGroundingElectrode(inputRegion, outputRegion, citationEl) 
 
   const oR = makeOutputLine(outputRegion, "Resistance to remote earth (ohms)", "ge-out-r");
   const o25 = makeOutputLine(outputRegion, "Meets NEC 25-ohm advisory", "ge-out-25");
-  const oS = makeOutputLine(outputRegion, "Supplemental rod count to 25 ohms", "ge-out-s");
+  const oS = makeOutputLine(outputRegion, "Electrodes in parallel to reach 25 ohms", "ge-out-s");
   const oW = makeOutputLine(outputRegion, "Notes", "ge-out-w");
 
   function readNum(input) {
@@ -3473,6 +3554,8 @@ export function computePowerTriangle({
 
   const mags = [["kw", KW], ["kva", KVA], ["kvar", KVAR]].filter(([, v]) => v !== null);
   let out_kw, out_kva, out_kvar;
+  // Two values fix the triangle; a third was silently ignored even when it contradicted them.
+  if (mags.length + (theta !== null ? 1 : 0) > 2) return { error: "Supply exactly two of kW, kVA, kVAR and PF (or angle); a third value over-determines the triangle." };
   if (mags.length >= 2) {
     if (KW !== null && KVA !== null) {
       if (KW > KVA + 1e-9) return { error: "kW cannot exceed kVA." };
@@ -3486,12 +3569,12 @@ export function computePowerTriangle({
   } else if (mags.length === 1 && theta !== null) {
     const c = Math.cos(theta), s = Math.sin(theta);
     if (KW !== null) {
-      if (!(c > 0)) return { error: "Real power with a 90-degree angle (PF 0) has no finite apparent power." };
+      if (!(c > 1e-9)) return { error: "Real power with a 90-degree angle (PF 0) has no finite apparent power." };
       out_kw = KW; out_kva = KW / c; out_kvar = out_kva * s;
     } else if (KVA !== null) {
       out_kva = KVA; out_kw = KVA * c; out_kvar = KVA * s;
     } else { // KVAR
-      if (!(s > 0)) return { error: "Reactive power with a 0-degree angle (PF 1) has no finite apparent power." };
+      if (!(s > 1e-9)) return { error: "Reactive power with a 0-degree angle (PF 1) has no finite apparent power." };
       out_kva = KVAR / s; out_kw = out_kva * c; out_kvar = KVAR;
     }
   } else {
@@ -3657,6 +3740,9 @@ export function computeAmbientAmpacityAdjust({
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const base = Number(base_ampacity_a) || 0;
   const col = Number(temp_column) || 0;
+  // A blank field arrives as null, and Number(null) is 0 C: the "10 C or less" row, which RAISES
+  // the ampacity up to 29%. Blank is refused instead.
+  if (ambient_c === null || ambient_c === "") return { error: "Ambient temperature is required (C)." };
   const amb = Number(ambient_c);
   const n = Number(conductor_count) || 0;
   if (!(base > 0)) return { error: "Base ampacity must be positive (A; from your NEC 310.16 column)." };
@@ -3779,8 +3865,11 @@ export function computeServiceLoadOptional({
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const area = Number(area_ft2) || 0;
-  const sa = Number(small_appliance_circuits) || 0;
-  const laundry = Number(laundry_circuits) || 0;
+  // NEC 220.52 requires two small-appliance circuits and one laundry circuit; a blank field is
+  // that minimum, not zero, and fewer than the minimum is not a dwelling this method covers.
+  const sa = small_appliance_circuits === null || small_appliance_circuits === "" ? 2 : Number(small_appliance_circuits);
+  const laundry = laundry_circuits === null || laundry_circuits === "" ? 1 : Number(laundry_circuits);
+  if (!(sa >= 0) || !(laundry >= 0)) return { error: "Circuit counts cannot be negative." };
   const fixed = Number(fixed_appliances_kw) || 0;
   const range = Number(range_kw) || 0;
   const dryer = Number(dryer_kw) || 0;
@@ -4196,6 +4285,9 @@ ELECTRICAL_RENDERERS["grounding-electrode-conductor"] = renderGroundingElectrode
 export function computeBondingJumper({ mode = "supply-side", material = "copper", service_kcmil = 0, ocpd_A = 0, parallel_sets = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (material !== "copper" && material !== "aluminum") return { error: "Material must be copper or aluminum." };
+  // Any mode other than "supply-side" used to size an equipment bonding jumper from the OCPD.
+  if (mode !== "supply-side" && mode !== "equipment") return { error: "Mode must be supply-side or equipment." };
+  if (!(Number(parallel_sets) >= 1) || !Number.isInteger(Number(parallel_sets))) return { error: "Parallel sets is a whole number, 1 or more." };
   if (mode === "supply-side") {
     if (!(service_kcmil > 0)) return { error: "Service conductor area must be positive (kcmil)." };
     const base = _table25066Base(service_kcmil, material);
@@ -4275,6 +4367,8 @@ export function computeMinConductorForVd({ phase = "single", material = "copper"
   if (!(length_ft > 0)) return { error: "Run length must be positive (ft)." };
   if (!(source_voltage_V > 0)) return { error: "Source voltage must be positive (V)." };
   if (!(target_percent > 0)) return { error: "Target drop percent must be positive." };
+  if (target_percent > 100) return { error: "Target drop is a percent of the source voltage and cannot exceed 100." };
+  if (phase !== "single" && phase !== "three") return { error: "Phase must be single or three." };
   const allowed_drop_V = (target_percent / 100) * source_voltage_V;
   const cu = _minAwgForDrop({ phase, material: "copper", current_A, length_ft, allowed_drop_V });
   const al = _minAwgForDrop({ phase, material: "aluminum", current_A, length_ft, allowed_drop_V });
@@ -4342,6 +4436,10 @@ export function computeConductorShortCircuitWithstand({ area_cmil = 0, fault_cur
   if (!(fault_current_a > 0)) return { error: "Fault current must be positive (A)." };
   if (!(clearing_time_s > 0)) return { error: "Clearing time must be positive (s)." };
   if (!(t_final_c > t_initial_c)) return { error: "Final temperature must exceed the initial temperature (deg C)." };
+  // Outside these the log term stops meaning anything: an initial temperature near -B gives an
+  // infinite withstand, and a final temperature past the metal's melting point is not a limit.
+  if (!(t_initial_c >= -40)) return { error: "Initial conductor temperature must be -40 C or warmer." };
+  if (t_final_c > (material === "aluminum" ? 660 : 1083)) return { error: "Final temperature is above the conductor's melting point; use the insulation's short-circuit limit (150 or 250 C)." };
   const C = m.K * Math.log10((t_final_c + m.B) / (t_initial_c + m.B)); // > 0 since t_final > t_initial
   const withstand_a = area_cmil * Math.sqrt(C / clearing_time_s);
   const min_cmil = fault_current_a * Math.sqrt(clearing_time_s / C);
@@ -4372,7 +4470,7 @@ function renderConductorShortCircuitWithstand(inputRegion, outputRegion, citatio
   const oMin = makeOutputLine(outputRegion, "Minimum size for the fault", "csw-out-min");
   const oNote = makeOutputLine(outputRegion, "Note", "csw-out-note");
   const update = debounce(() => {
-    const r = computeConductorShortCircuitWithstand({ area_cmil: Number(area.input.value) || 0, fault_current_a: Number(fault.input.value) || 0, clearing_time_s: Number(time.input.value) || 0, material: mat.select.value, t_initial_c: Number(ti.input.value) || 0, t_final_c: Number(tf.input.value) || 0 });
+    const r = computeConductorShortCircuitWithstand({ area_cmil: Number(area.input.value) || 0, fault_current_a: Number(fault.input.value) || 0, clearing_time_s: Number(time.input.value) || 0, material: mat.select.value, t_initial_c: ti.input.value === "" ? undefined : Number(ti.input.value), t_final_c: tf.input.value === "" ? undefined : Number(tf.input.value) });
     if (r.error) { oWith.textContent = r.error; oVerdict.textContent = "-"; oMin.textContent = "-"; oNote.textContent = "-"; return; }
     oWith.textContent = fmt(r.withstand_a, 0) + " A";
     oVerdict.textContent = r.adequate ? "Adequate (withstand >= fault)" : "UNDERSIZED -- size up to the minimum below";
@@ -4389,8 +4487,11 @@ export function computeConduitThermalExpansion({ run_length_ft = 0, temp_change_
   if (!(run_length_ft > 0)) return { error: "Run length must be positive (ft)." };
   if (!(coeff_in_per_in_f > 0)) return { error: "Coefficient of expansion must be positive (in/in/deg-F)." };
   if (!(trigger_in > 0)) return { error: "Trigger length must be positive (in)." };
-  // A zero or negative temperature swing yields zero longitudinal expansion to absorb.
-  const delta_l_in = Math.max(0, coeff_in_per_in_f * (run_length_ft * 12) * temp_change_f);
+  // The swing is a magnitude: a run that contracts 50 F moves as far as one that expands 50 F,
+  // and the inverse tile already takes it that way. Until 2026-10-10 a negative or blank swing
+  // returned 0 in and "not required".
+  if (!(Math.abs(Number(temp_change_f)) > 0)) return { error: "Enter the temperature swing (deg F), the difference between the coldest and hottest the run will see." };
+  const delta_l_in = coeff_in_per_in_f * (run_length_ft * 12) * Math.abs(Number(temp_change_f));
   const fitting_required = delta_l_in >= trigger_in - 1e-9 * trigger_in;
   return {
     delta_l_in, fitting_required,
@@ -4473,9 +4574,11 @@ export function computeEgcUpsizeProportional({ base_egc_cmil = 0, base_phase_cmi
   if (!(base_phase_cmil > 0)) return { error: "Base phase-conductor area must be positive (circular mils)." };
   if (!(installed_phase_cmil > 0)) return { error: "Installed phase-conductor area must be positive (circular mils)." };
   const ratio = Math.max(1, installed_phase_cmil / base_phase_cmil); // never reduce the EGC below its table size
-  const upsized_egc_cmil = base_egc_cmil * ratio;
+  // 250.122(A): the EGC is never required to be larger than the circuit conductors.
+  const capped_at_phase = base_egc_cmil * ratio > installed_phase_cmil;
+  const upsized_egc_cmil = Math.min(base_egc_cmil * ratio, installed_phase_cmil);
   return {
-    ratio, upsized_egc_cmil,
+    ratio, upsized_egc_cmil, capped_at_phase,
     note: "NEC 250.122(B): when ungrounded conductors are increased in size, the EGC increases in the same circular-mil proportion. ratio = max(1, installed phase / base phase); upsized EGC = base EGC x ratio, then select the next standard AWG/kcmil at or above this. The base EGC (250.122 table) and base phase area are user-supplied; the EGC need not exceed the ungrounded conductors. The AHJ governs.",
   };
 }
@@ -4496,7 +4599,7 @@ function renderEgcUpsizeProportional(inputRegion, outputRegion, citationEl) {
     const r = computeEgcUpsizeProportional({ base_egc_cmil: Number(egc.input.value) || 0, base_phase_cmil: Number(basep.input.value) || 0, installed_phase_cmil: Number(inst.input.value) || 0 });
     if (r.error) { oRatio.textContent = r.error; oEgc.textContent = "-"; oNote.textContent = "-"; return; }
     oRatio.textContent = fmt(r.ratio, Math.abs(r.ratio - 1) < 0.0005 && r.ratio !== 1 ? 5 : 3) + (r.ratio <= 1 + 1e-9 ? " (no upsize -- EGC stays at table size)" : "");
-    oEgc.textContent = fmt(r.upsized_egc_cmil, 0) + " cmil (select the next standard size up)";
+    oEgc.textContent = fmt(r.upsized_egc_cmil, 0) + (r.capped_at_phase ? " cmil (capped at the installed phase conductor, 250.122(A))" : " cmil (select the next standard size up)");
     oNote.textContent = r.note;
   }, DEBOUNCE_MS);
   for (const el of [egc.input, basep.input, inst.input]) el.addEventListener("input", update);
@@ -4582,7 +4685,7 @@ export function computeBuckBoostSizing({ supply_v = 0, desired_v = 0, load_a = 0
   if (boost_v === 0) {
     notes.push("The supply already equals the desired voltage; no buck-boost transformer is needed.");
   } else {
-    notes.push("The autotransformer is rated only for the " + direction + " voltage times the load current, a fraction of the full load kVA - that is the point of the connection. Select the next standard catalog kVA at or above this figure.");
+    notes.push("The autotransformer is rated only for the " + (direction === "none" ? "buck or boost" : direction) + " voltage times the load current, a fraction of the full load kVA - that is the point of the connection. Select the next standard catalog kVA at or above this figure.");
   }
   notes.push("Buck-boost selection, the connection diagram, and the overcurrent protection are the manufacturer's and the AHJ's. This sizes the required kVA; it does not select a catalog unit or its protection. NEC Article 450 governs.");
 
@@ -4641,7 +4744,9 @@ export function computeWirewayFill({ width_in = 0, height_in = 0, conductor_area
   const n = Number(ccc_count) || 0;
   if (!(w > 0)) return { error: "Wireway interior width must be positive." };
   if (!(h > 0)) return { error: "Wireway interior height must be positive." };
-  if (ca < 0) return { error: "Conductor area must be non-negative." };
+  // An omitted area used to read as an empty wireway that passes the 20% fill.
+  if (!(ca > 0)) return { error: "Enter the total conductor cross-sectional area (in^2), insulation included." };
+  if (!(n >= 0)) return { error: "Current-carrying conductor count cannot be negative." };
 
   const interior_in2 = w * h;
   const allowed_in2 = 0.20 * interior_in2;
@@ -4704,18 +4809,23 @@ ELECTRICAL_RENDERERS["wireway-fill"] = _v170renderWirewayFill;
 // =====================================================================
 
 // dims: in { measured_ambient_f: T, height_above_roof_in: L, base_ampacity_a: I } out: { adder_f: T, design_ambient_f: T, correction: dimensionless, corrected_a: I }
-export function computeRooftopTempAdder({ measured_ambient_f = 0, height_above_roof_in = 0, base_ampacity_a = 0 } = {}) {
+export function computeRooftopTempAdder({ measured_ambient_f = null, height_above_roof_in = 0, base_ampacity_a = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Blank, null and omitted all used to become 0 F, whose correction factor RAISES the ampacity.
+  if (measured_ambient_f === null || measured_ambient_f === "") return { error: "Measured ambient is required (deg-F)." };
   const ambF = Number(measured_ambient_f);
   const ht = Number(height_above_roof_in);
   const base = Number(base_ampacity_a) || 0;
   if (!Number.isFinite(ambF)) return { error: "Measured ambient is required (deg-F)." };
+  if (!(ambF >= -130 && ambF <= 140)) return { error: "Measured outdoor ambient must be between -130 and 140 deg-F." };
   if (!(ht >= 0)) return { error: "Height above roof must be non-negative (in)." };
   if (!(base > 0)) return { error: "Base ampacity (90 C column) must be positive." };
 
   const adder_f = ht < 0.875 ? 60 : 0;             // 7/8 in = 0.875 in threshold; 60 deg-F = 33 deg-C
   const design_ambient_f = ambF + adder_f;
-  const design_ambient_c = (design_ambient_f - 32) * 5 / 9;
+  // The rule is written as 33 C. Converting 60 F of difference gives 33.33 C, which pushed an
+  // ambient that lands exactly on a table row (37 + 33 = 70 C) into the next, lower row.
+  const design_ambient_c = Math.round(((ambF - 32) * 5 / 9 + (adder_f ? 33 : 0)) * 1e6) / 1e6;
   // 90 C-column ambient correction factor (310.15(B)(1)), step table on the C value.
   let correction = null;
   for (const [maxC, f] of _AMBIENT_FACTORS[90]) { if (design_ambient_c <= maxC) { correction = f; break; } }
@@ -4884,7 +4994,8 @@ export function computeMotorBranchProtection({ flc_a = 0, device_type = "inverse
   const ladder = /fuse/i.test(device_type) ? _STD_FUSE_240_6 : _STD_OCPD_240_6;
   const next_std = ladder.find((s) => s >= max_ocpd_a - 1e-9 * Math.abs(max_ocpd_a));
   const is_standard = ladder.some((s) => Math.abs(s - max_ocpd_a) < 1e-9);
-  const max_ocpd_std_a = next_std ?? max_ocpd_a;
+  if (next_std === undefined) return { error: "The calculated device is past the largest standard rating in NEC 240.6(A) (6,000 A); this is an engineered installation." };
+  const max_ocpd_std_a = next_std;
   const min_disconnect_a = 1.15 * flc;
   return {
     multiplier,
@@ -5067,6 +5178,9 @@ export function computeConduitJamRatio({ conduit_id_in = 0, conductor_od_in = 0,
   if (!(n >= 1 && Number.isInteger(n))) return { error: "Number of conductors must be a whole number, at least 1." };
   // Southwire / IEEE 1185 jam ratio = 1.05 x ID / OD: a bend ovals the conduit about 5%, and that is where jams happen.
   // Until 2026-09-26 the straight ID/OD was used, flagging EC&M's 1.05 x 5.07/1.60 = 3.33 "no jam" pull as 3.17, jam-prone.
+  // The conductors have to fit before they can jam: n equal circles in a circle.
+  const fit_min = n === 1 ? 1 : n === 2 ? 2 : n === 3 ? 1 + 2 / Math.sqrt(3) : n === 4 ? 1 + Math.SQRT2 : null;
+  if (fit_min !== null && id / od < fit_min - 1e-9) return { error: n + " conductors of this diameter do not fit in this conduit at all (ID / OD must be at least " + fit_min.toFixed(2) + ")." };
   const ratio = 1.05 * id / od;
   const in_band = ratio >= 2.8 && ratio <= 3.2;
   const jam_prone = n === 3 && in_band;
@@ -5083,7 +5197,7 @@ function _v374renderConduitJamRatio(inputRegion, outputRegion, citationEl) {
   const n = makeNumber("Number of conductors", "cjr-n", { step: "1", min: "1" });
   for (const f of [id, od, n]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { id.input.value = "2.067"; od.input.value = "0.65"; n.input.value = "3"; update(); });
-  const oRatio = makeOutputLine(outputRegion, "Jam ratio (ID / OD)", "cjr-out-ratio");
+  const oRatio = makeOutputLine(outputRegion, "Jam ratio (1.05 x ID / OD)", "cjr-out-ratio");
   const oVerdict = makeOutputLine(outputRegion, "Jam risk", "cjr-out-verdict");
   const oNote = makeOutputLine(outputRegion, "Note", "cjr-out-note");
   const update = debounce(() => {
@@ -5115,6 +5229,9 @@ export function computeMotorEfficiencyUpgradeSavings({ hp = 0, load = 0, eff_sta
   if (!(ep > 0 && ep <= 1)) return { error: "Premium efficiency must be a fraction in (0, 1]." };
   if (!(hr > 0)) return { error: "Annual run hours must be positive." };
   if (rate < 0) return { error: "Electricity rate must be non-negative." };
+  if (hr > 8760) return { error: "A year has 8,760 hours." };
+  if (rate > 2) return { error: "Enter the electricity rate in dollars per kWh (0.12, not 12)." };
+  if (!(ep > es)) return { error: "The premium motor's efficiency must be higher than the standard motor's." };
   const kw_standard = h * 0.746 * ld / es;
   const kw_premium = h * 0.746 * ld / ep;
   const kw_saved = kw_standard - kw_premium;
@@ -5324,7 +5441,7 @@ export function computeTransformerVoltageRegulation({ percent_r = 0, percent_x =
   if (ld < 0) return { error: "Per-unit loading cannot be negative." };
   if (ld > 3) return { error: "Enter the load as a per-unit fraction of the rating (1.0 = full load), not a percent." };
   const cos = pf;
-  const sin = Math.sqrt(Math.max(0, 1 - pf * pf)) * (leading ? -1 : 1);
+  const sin = Math.sqrt(Math.max(0, 1 - pf * pf)) * (leading === true || leading === "true" || leading === "leading" ? -1 : 1);
   const main_term = ld * (pr * cos + px * sin);
   const quad_term = ld * ld * Math.pow(px * cos - pr * sin, 2) / 200;
   const vr_percent = main_term + quad_term;

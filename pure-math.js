@@ -29,8 +29,15 @@ export function awgToNumber(awg) {
   if (s === "3/0") return -2;
   if (s === "2/0") return -1;
   if (s === "1/0") return 0;
+  // The aught sizes written out. Until 2026-10-10 "0000" parsed as the number 0, which is 1/0:
+  // half the area of the 4/0 the caller named.
+  if (s === "0000") return -3;
+  if (s === "000") return -2;
+  if (s === "00") return -1;
   const n = Number(s);
-  if (!Number.isFinite(n)) throw new Error("Invalid AWG: " + awg);
+  // Gauge numbers are whole and run from 4/0 (-3) to 40. A kcmil size such as "250" is not a
+  // gauge; read as one it gave an area of 7e-21 cmil.
+  if (s === "" || !Number.isInteger(n) || n < -3 || n > 40) throw new Error("Invalid AWG: " + awg);
   return n;
 }
 

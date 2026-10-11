@@ -423,9 +423,11 @@ test("PoE budget: short Cat6A run is green", () => {
   assert.equal(r.flag, "green");
 });
 
-test("PoE budget: very long Cat5e bt4 run flips red", () => {
+test("PoE budget: a run past the 100 m channel limit is refused", () => {
+  // 500 ft used to flip red on power alone; since hardening slice 4 anything over 328 ft is an
+  // error, because the Ethernet channel is out of standard whatever the power budget says.
   const r = computePoEBudget({ poe_class: "bt4", category: "Cat5e", run_length_ft: 500, ambient_C: 60 });
-  assert.equal(r.flag, "red");
+  assert.ok(r.error);
 });
 
 test("PoE budget: unknown class returns error", () => {

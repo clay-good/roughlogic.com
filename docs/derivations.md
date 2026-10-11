@@ -2167,7 +2167,7 @@ cross-check.
 | calc-electrical.js | `computePoEBudget` | `{ poe_class = "at", category = "Cat6", run_length_ft = 100, ambient_C = 25 }` | _ | _ | _ |
 | calc-electrical.js | `computePowerTriangle` | `{ kw = null, kva = null, kvar = null, pf = null, angle_deg = null, sign = "la...` | _ | _ | _ |
 | calc-electrical.js | `computePullingTension` | `{ cable_weight_lb_per_ft = 0, run_length_ft = 0, lubricant = "polymer", strai...` | _ | _ | _ |
-| calc-electrical.js | `computeRooftopTempAdder` | `{ measured_ambient_f = 0, height_above_roof_in = 0, base_ampacity_a = 0 } = {}` | _ | _ | _ |
+| calc-electrical.js | `computeRooftopTempAdder` | `{ measured_ambient_f = null, height_above_roof_in = 0, base_ampacity_a = 0 } ...` | _ | _ | _ |
 | calc-electrical.js | `computeServiceLoad` | `{ area_ft2 = 0, small_appliance_circuits = 2, laundry_circuits = 1, fixed_app...` | _ | _ | _ |
 | calc-electrical.js | `computeServiceLoadOptional` | `{ area_ft2 = 0, small_appliance_circuits = 2, laundry_circuits = 1, fixed_app...` | _ | _ | _ |
 | calc-electrical.js | `computeServiceLoadStandard` | `{ area_ft2 = 0, small_appliance_circuits = 2, laundry_circuit = 1, fixed_appl...` | _ | _ | _ |
@@ -2181,7 +2181,7 @@ cross-check.
 | calc-electrical.js | `computeTransformerSize` | `{ load_kW, power_factor = 1, primary_V, secondary_V, phase = "three" }` | _ | _ | _ |
 | calc-electrical.js | `computeTransformerTurnsRatio` | `{ primary_voltage_v = 0, secondary_voltage_v = 0, secondary_current_a = 0, lo...` | _ | _ | _ |
 | calc-electrical.js | `computeTransformerVoltageRegulation` | `{ percent_r = 0, percent_x = 0, power_factor = 0.85, leading = false, load_fr...` | _ | _ | _ |
-| calc-electrical.js | `computeVoltageDrop` | `{ phase, material, awg, length_ft, current_A, source_voltage_V }` | _ | _ | _ |
+| calc-electrical.js | `computeVoltageDrop` | `{ phase = "single", material, awg, length_ft, current_A, source_voltage_V }` | _ | _ | _ |
 | calc-electrical.js | `computeVoltageDropReactance` | `{ system_voltage_v = 0, current_a = 0, length_ft = 0, r_ohm_per_kft = 0, x_oh...` | _ | _ | _ |
 | calc-electrical.js | `computeVoltageImbalance` | `{ V_a, V_b, V_c }` | _ | _ | _ |
 | calc-electrical.js | `computeWireAmpacity` | `{ awg, material, insulation_rating_C, ambient_C, bundle_count = 1 }` | _ | _ | _ |

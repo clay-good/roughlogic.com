@@ -14373,8 +14373,10 @@ test("bounds: calc-electrical computeConduitThermalExpansion pins delta_L, the 1
   const c = computeConduitThermalExpansion({ run_length_ft: 20, temp_change_f: 30, coeff_in_per_in_f: 0.0000338, trigger_in: 0.25 });
   assert.ok(Math.abs(c.delta_l_in - 0.2434) < 1e-3 && c.fitting_required === false);
   // A zero or negative swing yields zero movement (no fitting).
-  assert.ok(computeConduitThermalExpansion({ run_length_ft: 100, temp_change_f: 0, coeff_in_per_in_f: 0.0000338, trigger_in: 0.25 }).delta_l_in === 0);
-  assert.ok(computeConduitThermalExpansion({ run_length_ft: 100, temp_change_f: -50, coeff_in_per_in_f: 0.0000338, trigger_in: 0.25 }).delta_l_in === 0);
+  // Since hardening slice 4 the swing is a magnitude (a contraction moves the run as far as an
+  // expansion) and a zero or blank swing is an error; both used to return 0 in, "not required".
+  assert.ok("error" in computeConduitThermalExpansion({ run_length_ft: 100, temp_change_f: 0, coeff_in_per_in_f: 0.0000338, trigger_in: 0.25 }));
+  assert.ok(Math.abs(computeConduitThermalExpansion({ run_length_ft: 100, temp_change_f: -50, coeff_in_per_in_f: 0.0000338, trigger_in: 0.25 }).delta_l_in - 2.028) < 1e-9);
   // Error seams: run length <= 0, non-finite.
   assert.ok("error" in computeConduitThermalExpansion({ run_length_ft: 0, temp_change_f: 50 }));
   assert.ok("error" in computeConduitThermalExpansion({ run_length_ft: Infinity, temp_change_f: 50 }));
@@ -60063,4 +60065,98 @@ test("hardening slice 3 (concrete part 2, masonry, geotechnical): the reviewed d
   const mb = _s3Mortar({});
   near(mb.sand_shovels, mb.sand_cuft * 5, 1e-9);
   assert.ok(!/half a cubic foot per shovel/.test(mb.note) && /fifth of a cubic foot per shovel/.test(mb.note));
+});
+
+// Hardening slice 4 (2026-10-10): calc-electrical and calc-elecdesign, 85 calculators re-derived
+// and run by independent reviewers. One assertion per confirmed defect.
+import * as _s4E from "../../calc-electrical.js";
+import * as _s4D from "../../calc-elecdesign.js";
+import { awgToNumber as _s4Awg } from "../../pure-math.js";
+
+test("hardening slice 4 (electrical, electrical design): the reviewed defects stay fixed", () => {
+  const near = (a, b, tol) => assert.ok(Math.abs(a - b) <= tol, a + " vs " + b);
+  const err = (r) => assert.ok(r && typeof r.error === "string", JSON.stringify(r).slice(0, 120));
+  // Blank read as a real value.
+  err(_s4E.computeAmbientAmpacityAdjust({ base_ampacity_a: 75, ambient_c: null }));
+  near(_s4E.computeAmbientAmpacityAdjust({ base_ampacity_a: 75, ambient_c: 40 }).adjusted_ampacity_a, 66, 1e-9);
+  err(_s4E.computeRooftopTempAdder({ base_ampacity_a: 55 }));
+  err(_s4E.computeRooftopTempAdder({ base_ampacity_a: 55, measured_ambient_f: null }));
+  err(_s4E.computeConductorResistance({ material: "copper", awg: "12", length_ft: 1000 }));
+  err(_s4E.computeVoltageDrop({ phase: "single", material: "copper", awg: "12", current_A: 16, source_voltage_V: 120 }));
+  err(_s4E.computeWirewayFill({ width_in: 4, height_in: 4, ccc_count: 31 }));
+  err(_s4E.computeConduitThermalExpansion({ run_length_ft: 100 }));
+  assert.strictEqual(_s4D.computeSccrCombination({ component_sccrs_ka: "65, 5, 5, 10" }).compliant, null);
+  // The optional method's blank circuit counts are the 220.52 minimums, not zero.
+  const opt = { area_ft2: 2000, range_kw: 12, dryer_kw: 5 };
+  assert.deepStrictEqual(_s4E.computeServiceLoadOptional({ ...opt, small_appliance_circuits: null, laundry_circuits: null }).general_va, _s4E.computeServiceLoadOptional({ ...opt, small_appliance_circuits: 2, laundry_circuits: 1 }).general_va);
+  err(_s4E.computeServiceLoadOptional({ ...opt, small_appliance_circuits: -5, laundry_circuits: -5 }));
+
+  // Unknown option taken as the generous branch.
+  err(_s4E.computeMotorFLA({ hp: 10, voltage: 460 }));
+  err(_s4E.computeEGCSize({ ocpd_A: 100, material: "Aluminum" }));
+  err(_s4E.computeBondingJumper({ mode: "main", service_kcmil: 2000, ocpd_A: 15 }));
+  err(_s4E.computeShortCircuitPP({ utility_kVA: 1500, utility_Z_pct: 3.5, secondary_V: 480, phase: "3", C_value: 22185, length_ft: 50 }));
+  err(_s4E.computeTransformerKvaSizing({ loads: [{ watts: 100000, pf: 85 }] }));
+  err(_s4E.computeTransformerKvaSizing({ loads: [{ watts: 100000 }], phase: "3" }));
+  err(_s4E.computeMinConductorForVd({ phase: "3", current_A: 20, length_ft: 150, source_voltage_V: 120 }));
+  assert.strictEqual(_s4D.computePullBoxSizing({ pull_type: "u", largest_raceway_in: 3, other_raceways_in: 10 }).governing, 28);
+  err(_s4D.computePullBoxSizing({ pull_type: "Angle", largest_raceway_in: 3 }));
+  err(_s4D.computePullBoxSizing({ pull_type: "angle", largest_raceway_in: 3, other_raceways_in: "abc" }));
+  err(_s4D.computeNeutralGroundingResistor({ system_voltage_ll_v: 4160, target_fault_a: 400, duty: "LRG" }));
+  err(_s4D.computeEgressLightingCheck({ avg_fc: 1.2, min_fc: 0.15, max_fc: 3, mode: "emergency" }));
+  err(_s4E.computeGeneratorMotorStarting({ motors: [{ hp: 25 }], starts_per_hour: "Frequent" }));
+  err(_s4E.computeGeneratorMotorStarting({ motors: [{ hp: 25, lra_A: 400 }] }));
+
+  // Ladders that echoed the requirement past their top.
+  assert.strictEqual(_s4E.computeBreakerSize({ load_A: 330, continuous: true }).next_standard_A, 450);
+  assert.strictEqual(_s4E.computeBreakerSize({ load_A: 500, continuous: true }).next_standard_A, 700);
+  assert.strictEqual(_s4E.computeServiceLoad({ area_ft2: 5000, fixed_appliances_W: 40000, range_W: 16000, dryer_W: 6000, hvac_heating_W: 40000 }).next_standard_A, null);
+  assert.strictEqual(_s4E.computeServiceLoad({ area_ft2: 500 }).next_standard_A, 100); // 230.79(C)
+  err(_s4E.computeMotorBranchProtection({ flc_a: 3000, device_type: "nontime-delay fuse" }));
+  assert.strictEqual(_s4E.computeTransformerSize({ load_kW: 10.5, power_factor: 0.7, primary_V: 480, secondary_V: 208 }).next_standard_kVA, 15);
+
+  // Negative or out-of-range inputs that lowered the answer.
+  err(_s4E.computeServiceLoad({ area_ft2: 2000, range_W: -5000 }));
+  err(_s4E.computeServiceLoadStandard({ area_ft2: 2000, range_W: -12000 }));
+  err(_s4E.computeServiceLoadStandard({ area_ft2: 2000, service_voltage: -240 }));
+  err(_s4E.computeBreakerSize({ load_W: 10000, voltage_V: 208, power_factor: 1.5 }));
+  err(_s4E.computeMultiLoadVoltageDrop({ loads: [{ distance_ft: -50, current_A: 5 }] }));
+  err(_s4E.computeGeneratorSize({ items: [{ running_watts: -500 }, { running_watts: 1000 }] }));
+  err(_s4E.computeMotorEfficiencyUpgradeSavings({ hp: 50, load: 0.75, eff_standard: 0.945, eff_premium: 0.90, hours: 4000, rate_kwh: 0.1 }));
+  err(_s4E.computeMotorEfficiencyUpgradeSavings({ hp: 50, load: 0.75, eff_standard: 0.90, eff_premium: 0.945, hours: 20000, rate_kwh: 0.1 }));
+  err(_s4E.computePoEBudget({ poe_class: "af", category: "Cat6A", run_length_ft: 450 }));
+  err(_s4E.computeConductorShortCircuitWithstand({ area_cmil: 26240, fault_current_a: 10000, clearing_time_s: 0.1, t_initial_c: -234 }));
+  err(_s4E.computeConductorShortCircuitWithstand({ area_cmil: 26240, fault_current_a: 10000, clearing_time_s: 0.1, t_final_c: 5000 }));
+  err(_s4D.computeStepTouchVoltage({ clearing_time_s: 0.001, surface_resistivity: 3000, native_resistivity: 100, layer_thickness_m: 0.1 }));
+  err(_s4E.computeOhmsLaw({ P: -100, R: 10 }));
+  err(_s4E.computeOhmsLaw({ V: 120, R: 0 }));
+  err(_s4E.computePowerTriangle({ kw: 100, pf: 0 }));
+  err(_s4E.computePowerTriangle({ kw: 100, kva: 125, kvar: 10 }));
+  err(_s4E.computePullingTension({ cable_weight_lb_per_ft: 1.5, run_length_ft: 100, straight_run_ft: 500 }));
+  err(_s4E.computePullingTension({ cable_weight_lb_per_ft: 1.5, run_length_ft: 200, straight_run_ft: 100, bends: [null] }));
+
+  // AWG parsing.
+  assert.strictEqual(_s4Awg("0000"), -3); assert.strictEqual(_s4Awg("4/0"), -3); assert.strictEqual(_s4Awg("12"), 12);
+  assert.throws(() => _s4Awg("250")); assert.throws(() => _s4Awg("")); assert.throws(() => _s4Awg("12.5"));
+  near(_s4E.computeAwgWireGeometry({ awg: "0000" }).area_cmils, 211600, 1);
+  err(_s4E.computeConductorResistance({ material: "copper", awg: "250", length_ft: 1000, temperature_C: 20 }));
+
+  // Wrong numbers.
+  const bf = _s4E.computeBoxFill({ box_volume_in3: 22, conductors_by_size: { "10": 6 }, devices: 1, internal_clamps: true });
+  near(bf.fill_in3, 22.5, 1e-9); assert.strictEqual(bf.pass, false); // allowances on the 10 AWG present, not 14
+  near(_s4E.computeBoxFill({ box_volume_in3: 30, conductors_by_size: { "12": 6 }, grounding_conductors: 6 }).grounding_in3, 2.25 * 1.5, 1e-9);
+  assert.strictEqual(_s4E.computeConduitFill({ conduit: "EMT", trade_size: "1/2", conductors: [{ insulation: "THHN", awg: "6", count: "2" }] }).pass, _s4E.computeConduitFill({ conduit: "EMT", trade_size: "1/2", conductors: [{ insulation: "THHN", awg: "6", count: 2 }] }).pass);
+  near(_s4E.computeMotorBranchFromNameplate({ hp: 5, voltage_V: 230, phase: 1, eta: 0.875, power_factor: 0.78, nameplate_fla_A: "28" }).design_fla_A, 28, 1e-9);
+  near(_s4E.computeConduitThermalExpansion({ run_length_ft: 100, temp_change_f: -50 }).delta_l_in, 2.028, 1e-9);
+  near(_s4E.computeRooftopTempAdder({ measured_ambient_f: 98.6, height_above_roof_in: 0, base_ampacity_a: 55 }).correction, 0.58, 1e-9); // 37 + 33 = 70 C row
+  err(_s4E.computeConduitJamRatio({ conduit_id_in: 1, conductor_od_in: 0.9, n_conductors: 3 }));
+  const up = _s4E.computeEgcUpsizeProportional({ base_egc_cmil: 10380, base_phase_cmil: 6530, installed_phase_cmil: 10380 });
+  near(up.upsized_egc_cmil, 10380, 1e-9); assert.strictEqual(up.capped_at_phase, true);
+  err(_s4E.computeGroundingElectrodeResistance({ electrode_type: "driven_rod", soil_resistivity_ohm_cm: 10000, rod_length_ft: 0.02, rod_diameter_in: 1 }));
+  err(_s4D.computeEgressLightingCheck({ avg_fc: 5, min_fc: 0.1, max_fc: 0.2, mode: "emergency-initial" }));
+  assert.strictEqual(_s4D.computeEgressLightingCheck({ avg_fc: 1.2, min_fc: 0.15, max_fc: 3, mode: "emergency-initial" }).emergency, true);
+  assert.strictEqual(_s4D.computeEgressLightingCheck({ avg_fc: 50, min_fc: 1, max_fc: 100, mode: "normal" }).ratio_applies, false);
+  err(_s4D.computeSelectiveCoordinationScreen({ device_type: "breaker", upstream_rating_a: 100, downstream_rating_a: 100, available_fault_a: 500 }));
+  err(_s4D.computeSelectiveCoordinationScreen({ device_type: "fuse", upstream_rating_a: 100, downstream_rating_a: 100, published_ratio: 0.5, available_fault_a: 500 }));
+  err(_s4D.computeLightingUniformityRatio({ readings: [1, 2, 3], target_maxmin: -3 }));
 });

@@ -690,7 +690,8 @@ test("run_calculator: voltage-drop with an input left out is an error that names
   assert.ok(a.warnings.some((w) => w.rule === "missing" && w.key === "length_ft"));
   const noMaterial = { ...full }; delete noMaterial.material;
   const b = await run({ id: "voltage-drop", inputs: noMaterial });
-  assert.match(b.result.error, /could not run/);
+  // The tile names the problem itself since hardening slice 4 (it used to throw, and the door said "could not run").
+  assert.match(b.result.error, /could not run|Material must be/);
   // A complete call is unchanged and carries no missing warning.
   const c = await run({ id: "voltage-drop", inputs: full });
   assert.ok(Number.isFinite(c.result.drop_V));

@@ -560,7 +560,7 @@ export const BESPOKE_OUTPUT_UNITS = {
   "septic-tank-for-interval": {"tank_gal":{"prefix":"","suffix":" gal","digits":0},"working_gal":{"prefix":"","suffix":" gal","digits":0},"annual_accum_gal":{"prefix":"","suffix":" gal/yr","digits":0}},
   "serial-dilution": {"transfer_volume":{"prefix":"","suffix":" L","digits":6},"diluent_volume":{"prefix":"","suffix":" L","digits":6}},
   "service-conductor-sizing": {"A_req":{"prefix":"","suffix":" A","digits":1}},
-  "service-load": {"total_demand_W":{"prefix":"","suffix":" W","digits":0},"required_A":{"prefix":"","suffix":" A","digits":1},"next_standard_A":{"prefix":"","suffix":" A"}},
+  "service-load": {"total_demand_W":{"prefix":"","suffix":" W","digits":0},"required_A":{"prefix":"","suffix":" A","digits":1}},
   "service-load-optional": {"general_demand_va":{"prefix":"","suffix":" VA","digits":0},"optional_total_va":{"prefix":"","suffix":" VA","digits":0},"optional_demand_a":{"prefix":"","suffix":" A","digits":1}},
   "service-load-standard": {"total_VA":{"prefix":"","suffix":" VA","digits":0},"required_A":{"prefix":"","suffix":" A","digits":1},"breakdown":{"prefix":"","suffix":" VA"}},
   "sewage-force-main-velocity": {"d_max_scour_in":{"prefix":"","suffix":" in","digits":2}},

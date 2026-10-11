@@ -149,8 +149,6 @@ export const SIGNED_INPUTS = [
   "envelope-conduction-load::cltd_f",
   "wood-emc::temperature_F",
   "pipe-pressure-rating::y_coeff",
-  "conductor-short-circuit-withstand::t_initial_c",
-  "conduit-thermal-expansion::temp_change_f",
   "shrink-fit::ambient_f",
   "thermistor-steinhart-hart::coeff_a",
   "thermistor-steinhart-hart::coeff_c",

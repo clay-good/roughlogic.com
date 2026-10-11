@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "87c96c6b66519716",
+      "sha": "ee9417af2f1b73a6",
       "date": "2026-10-10"
     },
     "/tools/": {
@@ -3602,8 +3602,8 @@
       "date": "2026-09-29"
     },
     "/tools/grounding-electrode/": {
-      "sha": "f411fb0fba377bad",
-      "date": "2026-10-03"
+      "sha": "4f44695361f58c7d",
+      "date": "2026-10-10"
     },
     "/tools/grounding-electrode-conductor/": {
       "sha": "de61d515816b00e1",
@@ -6918,8 +6918,8 @@
       "date": "2026-09-29"
     },
     "/tools/service-load/": {
-      "sha": "4f04e5f8d461ac97",
-      "date": "2026-09-29"
+      "sha": "9a297648434e1219",
+      "date": "2026-10-10"
     },
     "/tools/service-load-optional/": {
       "sha": "51a1109a5df80348",
@@ -8326,8 +8326,8 @@
       "date": "2026-09-29"
     },
     "/tools/transformer-voltage-regulation/": {
-      "sha": "34ee81ceb6cba48d",
-      "date": "2026-09-29"
+      "sha": "731c5d1f351a24a1",
+      "date": "2026-10-10"
     },
     "/tools/transmitter-span-scaling/": {
       "sha": "af2d220c21841d37",
