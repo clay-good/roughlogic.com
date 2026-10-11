@@ -311,6 +311,8 @@ export function computeAcidWasteNeutralization({
   discharge_ph_min = 5.5, discharge_ph_max = 10, measured_ph = 0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (tank_volume_gal > 0 && slug_volume_gal >= tank_volume_gal) return { error: "The slug is as large as the tank or larger; it displaces the contents and passes through largely unreacted. Size the tank to the slug." };
+  if (discharge_ph_max > 14 || discharge_ph_min > 14) return { error: "pH limits are between 0 and 14." };
   if (!(peak_flow_gpm > 0)) return { error: "Peak drainage flow must be positive (gpm)." };
   if (!(retention_minutes > 0)) return { error: "Required retention time must be positive (minutes)." };
   if (slug_volume_gal < 0 || tank_volume_gal < 0 || measured_ph < 0) return { error: "Slug volume, tank volume and measured pH cannot be negative." };

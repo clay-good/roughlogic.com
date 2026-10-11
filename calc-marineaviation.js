@@ -127,6 +127,7 @@ export function computeMetacentricHeight({
   added_weight_lb = 0, added_kg_ft = 0, free_surface_moment_ftlb = 0, heel_angle_deg = 10,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (added_weight_lb > 0) { const v = arguments[0]?.added_kg_ft; if (v === undefined || v === null || v === "") return { error: "Enter the height of the added weight above the keel; left blank it was placed at the keel, the most favorable spot." }; }
   if (!(km_ft > 0)) return { error: "KM must be positive (ft) -- it comes off the hull's hydrostatic curves at the loaded draft." };
   if (!(kg_ft > 0)) return { error: "KG must be positive (ft)." };
   if (!(displacement_lb > 0)) return { error: "Displacement must be positive (lb)." };

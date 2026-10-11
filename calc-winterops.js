@@ -304,7 +304,11 @@ export function computeSnowStackingArea({ lot_area_ft2 = 0, accumulation_in = 0,
   const base_width_ft = 2 * pile_height_ft * side_slope_run_per_rise;
   const cross_section_ft2 = 0.5 * base_width_ft * pile_height_ft;
   const windrow_length_ft = pile_volume_ft3 / cross_section_ft2;
-  const footprint_ft2 = windrow_length_ft * base_width_ft;
+  // A small storm does not make a windrow at the height limit: the snow piles as a cone lower
+  // than the limit, and that cone covers MORE ground than a 12 ft ridge two feet long would.
+  // Until 2026-10-11 the ridge was assumed at any volume (58 sq ft where the pile takes 151).
+  const _cone_h = Math.cbrt(3 * pile_volume_ft3 / (Math.PI * side_slope_run_per_rise * side_slope_run_per_rise));
+  const footprint_ft2 = _cone_h < pile_height_ft ? Math.PI * Math.pow(side_slope_run_per_rise * _cone_h, 2) : windrow_length_ft * base_width_ft;
   const footprint_pct_of_lot = 100 * footprint_ft2 / lot_area_ft2;
   const spaces_lost = Math.ceil(footprint_ft2 / area_per_space_ft2 - 1e-9);
   const season_pile_volume_ft3 = pile_volume_ft3 * n;

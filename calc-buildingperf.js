@@ -326,6 +326,8 @@ export function computeVentilationRateProcedure({
   let critical = rows[0];
   for (const z of rows) if (z.zp > critical.zp) critical = z;
   const zp_max = critical.zp;
+  // A zone cannot be given more outdoor air than the primary air it receives.
+  if (zp_max > 1 + 1e-9) return { error: "Zone " + critical.label + " needs more outdoor air than its primary airflow supplies (Zp " + zp_max.toFixed(2) + "); raise that zone's primary air." };
   // The simplified 62.1 system ventilation efficiency.
   const ev = 1 + xs - zp_max;
   if (!(ev > 0)) return { error: "System ventilation efficiency is not positive -- the critical zone's outdoor air fraction exceeds what the system can deliver, and the design needs more primary air to that zone or a dedicated outdoor air path." };

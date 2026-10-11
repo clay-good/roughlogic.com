@@ -88,6 +88,7 @@ const _ACTUATOR_SIZES_IN_LB = [35, 70, 140, 180, 360];
 // dims: in { lower_range_value: dimensionless, upper_range_value: dimensionless, upper_range_limit: dimensionless, loop_ma: I, accuracy_pct: dimensionless, low_reading_value: dimensionless, alt_upper_range_value: dimensionless } out: { value_eng: dimensionless, span_eng: dimensionless, turndown: dimensionless, err_span_eng: dimensionless, err_url_eng: dimensionless }
 export function computeTransmitterSpanScaling({ lower_range_value = 0, upper_range_value = 0, upper_range_limit = 0, loop_ma = 12, accuracy_pct = 0.1, low_reading_value = 0, alt_upper_range_value = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (upper_range_limit > 0 && upper_range_value > upper_range_limit) return { error: "The upper range value is beyond the sensor's upper range limit." };
   if (!(upper_range_value > lower_range_value)) return { error: "Upper range value must exceed the lower range value." };
   if (!(upper_range_limit > 0)) return { error: "Sensor upper range limit must be positive." };
   if (!(accuracy_pct > 0)) return { error: "Quoted accuracy must be positive (percent)." };

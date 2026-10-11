@@ -375,6 +375,8 @@ WAREHOUSE_RENDERERS["stacking-aisle-width"] = _simpleRenderer({
 
 // dims: in { building_width_ft: L, building_depth_ft: L, clear_height_ft: L, module_pitch_in: L, rack_row_depth_in: L, rack_run_length_ft: L, bays_per_row: dimensionless, levels_per_bay: dimensionless, pallets_per_bay_level: dimensionless, pallet_width_in: L, pallet_depth_in: L, pallet_loaded_height_in: L, beam_pitch_in: L } out: { building_cube_ft3: L^3, pallet_positions: dimensionless, occupied_cube_ft3: L^3, cube_utilization_pct: dimensionless, aisle_floor_ft2: L^2, rack_floor_ft2: L^2 }
 export function computeWarehouseCubeUtilization({ building_width_ft = 0, building_depth_ft = 0, clear_height_ft = 0, module_pitch_in = 0, rack_row_depth_in = 0, rack_run_length_ft = 0, bays_per_row = 0, levels_per_bay = 0, pallets_per_bay_level = 0, pallet_width_in = 0, pallet_depth_in = 0, pallet_loaded_height_in = 0, beam_pitch_in = 0 } = {}) {
+  if (levels_per_bay > 0 && beam_pitch_in > 0 && clear_height_ft > 0 && levels_per_bay * beam_pitch_in / 12 > clear_height_ft) return { error: "That many levels at this beam pitch stand taller than the clear height." };
+  if (pallet_loaded_height_in > 0 && beam_pitch_in > 0 && pallet_loaded_height_in >= beam_pitch_in) return { error: "The loaded pallet is as tall as the beam pitch or taller; it does not fit the level." };
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   if (!(building_width_ft > 0) || !(building_depth_ft > 0) || !(clear_height_ft > 0)) return { error: "Building width, depth, and clear height must be positive." };
   if (!(module_pitch_in > 0) || !(rack_row_depth_in > 0) || !(rack_run_length_ft > 0)) return { error: "Module pitch, rack row depth, and rack run length must be positive." };
@@ -534,6 +536,9 @@ export function computeRackFlueSpace({ pallet_width_in = 0, pallet_depth_in = 0,
   // end gap to make ONE flue: Apex's compliant 92 in bay is 6 in between two
   // 40 in loads with 3 in at each end. So n gaps hold n - 1 flue widths. Until
   // 2026-10-01 every end gap was a full flue, asking 98 in where 92 in complies.
+  if (!(transverse_gap_total_in > 0)) return { error: "The pallets are as wide as the beam or wider; there is no room for flue space." };
+  // The model is a gap between each pair of loads and a half-flue at each upright: pallets + 1 gaps.
+  if (transverse_gaps !== pallets_per_bay + 1) return { error: "With " + pallets_per_bay + " pallets in the bay there are " + (pallets_per_bay + 1) + " transverse gaps (one between each pair and one at each upright)." };
   const flue_count = transverse_gaps >= 2 ? transverse_gaps - 1 : 1;
   const transverse_gap_each_in = transverse_gap_total_in / flue_count;
   const required_beam_length_in = pallet_run_in + flue_count * nominal_flue_in;

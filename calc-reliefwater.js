@@ -476,6 +476,7 @@ RELIEFWATER_RENDERERS["first-flush-diverter"] = _simpleRenderer({
 // dims: in { wet_well_shape: dimensionless, wet_well_diameter_ft: L, wet_well_length_ft: L, wet_well_width_ft: L, storage_depth_ft: L, sewer_length_ft: L, sewer_diameter_in: L, inflow_gpm: L^3 T^-1, detection_min: T, travel_min: T, hookup_min: T, outage_hr: T, truck_capacity_gal: L^3 } out: { wet_well_gal: L^3, sewer_gal: L^3, storage_gal: L^3, sewer_share_pct: dimensionless, time_to_overflow_min: T, response_min: T, margin_min: T, shortfall_gal: L^3, outage_inflow_gal: L^3, haul_volume_gal: L^3, truck_loads: dimensionless }
 export function computeLiftStationOutageStorage({ wet_well_shape = "round", wet_well_diameter_ft = 0, wet_well_length_ft = 0, wet_well_width_ft = 0, storage_depth_ft = 0, sewer_length_ft = 0, sewer_diameter_in = 0, inflow_gpm = 0, detection_min = 0, travel_min = 0, hookup_min = 0, outage_hr = 0, truck_capacity_gal = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(detection_min > 0) && !(travel_min > 0) && !(hookup_min > 0)) return { error: "Enter the response time (detection, travel and hookup); with none entered the response read as instant." };
   let area_ft2;
   if (wet_well_shape === "round") {
     if (!(wet_well_diameter_ft > 0)) return { error: "Wet-well diameter must be positive." };

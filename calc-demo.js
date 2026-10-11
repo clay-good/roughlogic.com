@@ -381,6 +381,7 @@ DEMO_RENDERERS["abatement-waste-containers"] = _simpleRenderer({
 // dims: in { lab_result_ug: M, wipe_area_ft2: L^2, clearance_limit_ug_ft2: M L^-2, rooms: dimensionless, surfaces_per_room: dimensionless, blanks_per_job: dimensionless } out: { dust_loading_ug_ft2: M L^-2, limit_margin_ug_ft2: M L^-2, loading_ratio: dimensionless, max_lab_result_ug: M, wipe_count: dimensionless, total_samples: dimensionless }
 export function computeLeadDustClearance({ lab_result_ug = 0, wipe_area_ft2 = 1, clearance_limit_ug_ft2 = 0, rooms = 0, surfaces_per_room = 3, blanks_per_job = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  for (const k of ["lab_result_ug"]) { const v = arguments[0]?.[k]; if (v === undefined || v === null || v === "") return { error: "Enter the laboratory result (micrograms); a blank result read as a pass at zero." }; }
   if (!(lab_result_ug >= 0)) return { error: "The laboratory result cannot be negative (micrograms)." };
   if (!(wipe_area_ft2 > 0)) return { error: "The wiped area must be positive (sq ft) -- it is measured with a template, commonly one square foot." };
   if (!(clearance_limit_ug_ft2 > 0)) return { error: "The clearance limit must be positive (micrograms per sq ft) -- floors, sills and troughs each have their own, and the limits have been tightened over time." };

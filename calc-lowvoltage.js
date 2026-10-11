@@ -120,6 +120,7 @@ LOWVOLTAGE_RENDERERS["fiber-loss-budget"] = _renderFiberLossBudget;
 // dims: in { distance_km: L, frequency_mhz: dimensionless, tx_power_dbm: dimensionless, tx_gain_dbi: dimensionless, rx_gain_dbi: dimensionless } out: { fspl_db: dimensionless, rx_power_dbm: dimensionless }
 export function computeWirelessFspl({ distance_km = 0, frequency_mhz = 0, tx_power_dbm = 20, tx_gain_dbi = 0, rx_gain_dbi = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (distance_km > 0 && frequency_mhz > 0 && distance_km * frequency_mhz < 0.0239) return { error: "That distance is inside the antenna's near field for this frequency (the free-space loss would be negative); check the units (km, MHz)." };
   const d = Number(distance_km);
   const f = Number(frequency_mhz);
   const pt = Number(tx_power_dbm);
@@ -219,6 +220,7 @@ LOWVOLTAGE_RENDERERS["fresnel-zone-clearance"] = _renderFresnelZoneClearance;
 // dims: in { tx_power_dbm: dimensionless, tx_gain_dbi: dimensionless, tx_cable_loss_db: dimensionless, distance_km: L, frequency_mhz: dimensionless, rx_gain_dbi: dimensionless, rx_cable_loss_db: dimensionless, rx_sensitivity_dbm: dimensionless } out: { eirp_dbm: dimensionless, fspl_db: dimensionless, rx_power_dbm: dimensionless, fade_margin_db: dimensionless }
 export function computeWirelessLinkBudget({ tx_power_dbm = 20, tx_gain_dbi = 0, tx_cable_loss_db = 0, distance_km = 0, frequency_mhz = 0, rx_gain_dbi = 0, rx_cable_loss_db = 0, rx_sensitivity_dbm = -80 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (distance_km > 0 && frequency_mhz > 0 && distance_km * frequency_mhz < 0.0239) return { error: "That distance is inside the antenna's near field for this frequency (the free-space loss would be negative); check the units (km, MHz)." };
   const pt = Number(tx_power_dbm), gt = Number(tx_gain_dbi), ltx = Number(tx_cable_loss_db);
   const d = Number(distance_km), f = Number(frequency_mhz);
   const gr = Number(rx_gain_dbi), lrx = Number(rx_cable_loss_db), sens = Number(rx_sensitivity_dbm);

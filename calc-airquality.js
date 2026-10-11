@@ -1024,6 +1024,8 @@ export function computeGaussianDispersionScreen({
   const s = sigmasAt(distance_km, cls);
   const sigma_y_m = s.y;
   const sigma_z_m = s.z;
+  // Martin's near-field fit goes negative within a few metres of the source.
+  if (!(sigma_z_m > 0) || !(s.y > 0)) return { error: "This distance is too close to the source for the dispersion coefficients (they are fitted from about 100 m out)." };
   const exponential_term = Math.exp(-(effective_height_m * effective_height_m) / (2 * sigma_z_m * sigma_z_m));
   const concentration_g_m3 = concAt(distance_km, cls);
   const concentration_ug_m3 = concentration_g_m3 * 1e6;

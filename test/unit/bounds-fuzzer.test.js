@@ -61099,3 +61099,23 @@ test("hardening slice 26 (sawmill, winter ops, controls, open channel, hygiene, 
   const lab = CN.computeLabContainmentPressure({ room_volume_ft3: 9600, required_ach: 8, hood_exhaust_cfm: 1200, general_exhaust_cfm: 80, supply_cfm: 480, hood_sash_closed_cfm: 400 });
   assert.equal(lab.positive_on_close, true);
 });
+
+test("hardening slice 27 (second pass over deferred findings)", async () => {
+  const WO = await import("../../calc-winterops.js");
+  const BP = await import("../../calc-buildingperf.js");
+  const WH = await import("../../calc-warehouse.js");
+  const MAV = await import("../../calc-marineaviation.js");
+  const CT = await import("../../calc-controls.js");
+  const LV = await import("../../calc-lowvoltage.js");
+  const WD = await import("../../calc-wind.js");
+  // a small storm piles as a cone, which covers more ground than a stub of full-height windrow
+  const sn = WO.computeSnowStackingArea({ lot_area_ft2: 5000, accumulation_in: 3 });
+  assert.ok(sn.footprint_ft2 > 140 && sn.footprint_ft2 < 160, "cone footprint " + sn.footprint_ft2);
+  assert.ok(BP.computeVentilationRateProcedure({ rp_cfm_per_person: 5, ra_cfm_per_ft2: 0, people_1: 100, primary_1_cfm: 400 }).error);
+  assert.ok(WH.computeWarehouseCubeUtilization({ building_width_ft: 200, building_depth_ft: 400, clear_height_ft: 32, module_pitch_in: 240, rack_row_depth_in: 42, rack_run_length_ft: 360, bays_per_row: 40, levels_per_bay: 30, pallets_per_bay_level: 2, pallet_width_in: 40, pallet_depth_in: 48, pallet_loaded_height_in: 50, beam_pitch_in: 58 }).error);
+  assert.ok(WH.computeRackFlueSpace({ pallet_width_in: 40, pallet_depth_in: 48, pallets_per_bay: 3, transverse_gaps: 3, nominal_flue_in: 6, beam_length_in: 132, frame_depth_in: 42, back_to_back_spacing_in: 12 }).error);
+  assert.ok(MAV.computeMetacentricHeight({ km_ft: 2.6, kg_ft: 2.1, displacement_lb: 42000, added_weight_lb: 900 }).error);
+  assert.ok(CT.computeTransmitterSpanScaling({ lower_range_value: 200, upper_range_value: 400, upper_range_limit: 250 }).error);
+  assert.ok(LV.computeWirelessLinkBudget({ distance_km: 1e-6, frequency_mhz: 100 }).error);
+  assert.ok(WD.computeTurbineDensityCorrection({ elevation_ft: 100000, measured_power_kw: 1000, curve_power_kw: 1500, wind_speed_mph: 20 }).error);
+});

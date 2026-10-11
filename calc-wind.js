@@ -357,6 +357,7 @@ WIND_RENDERERS["weibull-capacity-factor"] = _simpleRenderer({
 // dims: in { elevation_ft: L, air_temp_f: T, reference_density_pcf: M L^-3, measured_power_kw: M L^2 T^-3, curve_power_kw: M L^2 T^-3, wind_speed_mph: L T^-1, alt_air_temp_f: T } out: { site_density_pcf: M L^-3, density_ratio: dimensionless, corrected_curve_power_kw: M L^2 T^-3, iec_corrected_wind_mph: L T^-1 }
 export function computeTurbineDensityCorrection({ elevation_ft = 0, air_temp_f = 59, reference_density_pcf = _RHO_REF_PCF, measured_power_kw = 0, curve_power_kw = 0, wind_speed_mph = 0, alt_air_temp_f = 20 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (elevation_ft > 36089) return { error: "Elevation is above the troposphere relation this uses (36,089 ft); check the units." };
   if (!(elevation_ft >= 0)) return { error: "Elevation cannot be negative." };
   if (!(459.67 + air_temp_f > 0)) return { error: "Air temperature is below absolute zero." };
   if (!(459.67 + alt_air_temp_f > 0)) return { error: "The compared air temperature is below absolute zero." };
