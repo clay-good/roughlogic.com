@@ -61166,3 +61166,26 @@ test("hardening slice 30 (second pass: gel selection, frac-out limits)", async (
   assert.match(at.verdict, /both stations hold/);
   assert.match(TR.computeHddAnnularPressure({ ...inp, fluid_density_ppg: 20 }).verdict, /^BOTH stations are below/);
 });
+
+test("hardening slice 31 (second pass: coating mean, pile refusal, kill mud rounding, slack cable)", async () => {
+  const CO = await import("../../calc-corrosion.js");
+  const MR = await import("../../calc-marine.js");
+  const OG = await import("../../calc-oilgas.js");
+  // the mean of a capped breakdown line is its time-average, not its capped midpoint
+  const cbIn = { surface_sqft: 10000, bare_current_density_ma_per_sqft: 2, initial_breakdown_pct: 2, fast_degradation_pct: 12, design_life_years: 20 };
+  const capped = CO.computeCoatingBreakdownFactor({ ...cbIn, annual_degradation_pct: 10 });
+  assert.ok(!capped.error, capped.error);
+  assert.ok(Math.abs(capped.mean_breakdown - 0.7599) < 1e-3, "mean " + capped.mean_breakdown);
+  const slow = CO.computeCoatingBreakdownFactor({ ...cbIn, annual_degradation_pct: 1 });
+  assert.ok(Math.abs(slow.mean_breakdown - 0.12) < 1e-9);
+  // a criterion past the specification refusal is not a driving criterion
+  assert.ok(MR.computePileHammerBearing({ hammer_energy_ftlb: 42000, loss_constant_in: 0.1, required_capacity_tons: 220, refusal_blows_per_inch: 10, loose_set_in: 0.3, embedded_safety_factor: 6 }).error);
+  assert.ok(!MR.computePileHammerBearing({ hammer_energy_ftlb: 42000, loss_constant_in: 0.1, required_capacity_tons: 150, refusal_blows_per_inch: 10, loose_set_in: 0.3, embedded_safety_factor: 6 }).error);
+  // rounding into the safety margin is not an underbalanced well
+  const km = Object.values(OG).find((v) => v && v.inputs && "sidpp_psi" in v.inputs);
+  if (km) {
+    const base = OG.computeKillMudWeight({ ...km.inputs, safety_margin_ppg: 0.5, rounded_mw_ppg: 0 });
+    const r = OG.computeKillMudWeight({ ...km.inputs, safety_margin_ppg: 0.5, rounded_mw_ppg: Math.ceil(base.kill_mw_ppg * 10 + 0.5) / 10 });
+    assert.ok(!/underbalanced by that much/.test(JSON.stringify(r)), "still overbalanced");
+  }
+});

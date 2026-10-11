@@ -392,6 +392,8 @@ export function computePileHammerBearing({ hammer_energy_ftlb = 0, loss_constant
     return { error: "This hammer cannot reach the required capacity: the formula asks for a set at or below zero, which is past refusal." };
   }
   const refusal_set_in = 1 / refusal_blows_per_inch;
+  // A criterion tighter than the specification's refusal cannot be driven to: the hammer is too small.
+  if (set_in < refusal_set_in * (1 - 1e-3)) return { error: "The required capacity needs " + (1 / set_in).toFixed(1) + " blows per inch, past the specification refusal of " + refusal_blows_per_inch + "; this hammer reaches refusal before the capacity. A larger hammer is needed." };
   const refusal_capacity_lb = capacityFor(refusal_set_in);
   const loose_set_capacity_lb = capacityFor(loose_set_in);
   return {

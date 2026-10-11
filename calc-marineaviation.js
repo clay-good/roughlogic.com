@@ -657,7 +657,8 @@ export function computeControlCableTension({
   const has_service = service_temp_f !== ambient_temp_f;
   const service_difference_f = has_service ? service_temp_f - ambient_temp_f : 0;
   const service_change_lb = has_service ? alpha_difference * service_difference_f * cable_area_in2 * cable_modulus_psi : 0;
-  const tension_when_warm_lb = nominal_tension_lb + service_change_lb;
+  // A cable cannot carry less than nothing: past zero it is simply slack.
+  const tension_when_warm_lb = Math.max(0, nominal_tension_lb + service_change_lb);
   const over_tension = has_service && service_change_lb > 0;
   const error_verdict = !has_service
     ? "(service temperature equals the rigging temperature -- no change to check)"

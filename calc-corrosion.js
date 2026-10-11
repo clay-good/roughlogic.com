@@ -398,7 +398,11 @@ export function computeCoatingBreakdownFactor({ surface_sqft = 0, bare_current_d
   // A structure cannot become more than completely uncoated.
   const factorAt = (r, years) => Math.min(1, f0 + r * years);
   const f_final = factorAt(rate, design_life_years);
-  const f_mean = Math.min(1, f0 + rate * design_life_years / 2);
+  // The time-average of a line that is CAPPED at 1: once the coating is gone (at t_cap) the factor
+  // stays at 1, so the mean is the trapezoid up to the cap plus the flat remainder. Until
+  // 2026-10-11 the uncapped midpoint was capped instead, which read 100% where the average is 76%.
+  const _t_cap = rate > 0 ? (1 - f0) / rate : Infinity;
+  const f_mean = _t_cap >= design_life_years ? f0 + rate * design_life_years / 2 : (_t_cap * (f0 + 1) / 2 + (design_life_years - _t_cap)) / design_life_years;
   const bare_steel_current_a = surface_sqft * bare_current_density_ma_per_sqft / 1000;
   const currentAt = (f) => bare_steel_current_a * f;
   const initial_current_a = currentAt(f0);

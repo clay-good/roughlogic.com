@@ -861,7 +861,7 @@ export function computeKillMudWeight({
   const rounding_verdict = !has_rounded
     ? "(no rounded mud weight entered)"
     : rounded_is_below
-      ? "ROUNDED DOWN: " + fmt(rounded_mw_ppg, 2) + " ppg is BELOW the " + fmt(kill_mw_with_margin_ppg, 2) + " ppg required and gives up " + fmt(-rounded_bhp_change_psi, 0) + " psi of bottom-hole pressure -- the well would be underbalanced by that much and would flow again"
+      ? (rounded_mw_ppg >= kill_mw_ppg ? "ROUNDED INTO THE MARGIN: " + fmt(rounded_mw_ppg, 2) + " ppg is below the " + fmt(kill_mw_with_margin_ppg, 2) + " ppg with the safety margin but still at or above the " + fmt(kill_mw_ppg, 2) + " ppg balance weight -- the well stays overbalanced and only " + fmt(-rounded_bhp_change_psi, 0) + " psi of the margin is given up" : "ROUNDED DOWN: " + fmt(rounded_mw_ppg, 2) + " ppg is BELOW the " + fmt(kill_mw_with_margin_ppg, 2) + " ppg required and gives up " + fmt(-rounded_bhp_change_psi, 0) + " psi of bottom-hole pressure -- the well would be underbalanced by that much and would flow again")
       : "rounded up: " + fmt(rounded_mw_ppg, 2) + " ppg adds " + fmt(rounded_bhp_change_psi, 0) + " psi of bottom-hole pressure over the required " + fmt(kill_mw_with_margin_ppg, 2) + " ppg -- check that against the fracture gradient at the shoe before pumping it, because excessive kill weight turns a kick into an underground blowout";
   if (![kill_mw_ppg, formation_pressure_psi, icp_psi, fcp_psi, strokes_to_bit, minutes_to_bit, rounded_bhp_change_psi].every(Number.isFinite)) return { error: "Kill sheet math is not a finite value." };
   return {
