@@ -1454,7 +1454,10 @@ export function computeDesignFlowPeaking({ population = 0, per_capita_gpcd = 100
   const harmon_pf = 1 + 14 / (4 + Math.sqrt(Pth));
   const peak_flow_mgd = avg_flow_mgd * harmon_pf;
   const peak_flow_gpm = avg_flow_gpm * harmon_pf;
-  const gifft_min_ratio = 0.2 * Math.pow(Pth, 1 / 6);
+  // Both relations are drawn for about 1,000 to 1,000,000 people. Past that the
+  // Gifft ratio keeps climbing and crosses 1 (a minimum above the average) near
+  // 15.6 million, so it is held at 1 and the result is flagged.
+  const gifft_min_ratio = Math.min(1, 0.2 * Math.pow(Pth, 1 / 6));
   const min_flow_mgd = avg_flow_mgd * gifft_min_ratio;
   const min_flow_gpm = avg_flow_gpm * gifft_min_ratio;
   if (![avg_flow_mgd, avg_flow_gpm, peak_flow_mgd, peak_flow_gpm, min_flow_mgd, min_flow_gpm, harmon_pf, gifft_min_ratio].every(Number.isFinite)) {
@@ -1463,6 +1466,7 @@ export function computeDesignFlowPeaking({ population = 0, per_capita_gpcd = 100
   return {
     avg_flow_mgd, avg_flow_gpm, peak_flow_mgd, peak_flow_gpm, min_flow_mgd, min_flow_gpm, harmon_pf, gifft_min_ratio,
     small_system: Pth < 1,
+    large_system: Pth > 1000,
     note: "The design flow the rest of the water/wastewater bench takes as an input (flow_mgd) but no tile produced. The AVERAGE daily flow = population x per-capita flow (gpcd): the flow to feed the pounds-formula, population-equivalent, clarifier-loading, chemical-feed, and BOD/TSS tiles. The PEAK flow, which sizes the hydraulic units (sewers, pumps, clarifier surface area), = average x the Harmon peaking factor PF = 1 + 14/(4 + sqrt(P)), P the population in thousands; the peak factor falls as the system grows (2.26 at 50,000 people, 1.39 at 1,000,000) because diversity smooths the demand. The MINIMUM flow, which governs self-cleansing sewer velocity and low-flow channel design, = average x the Gifft ratio 0.2 x P^(1/6). A 50,000-person system at 100 gpcd averages 5.0 MGD, peaks at 11.3 MGD, and drops to 1.9 MGD. Domestic sanitary flow only: per-capita is the user's own basis (roughly 60-100 gpcd domestic; add infiltration/inflow and any industrial load separately), and the Harmon factor is drawn for populations of about 1,000 to 1,000,000. A design aid; Ten States Standards and the state design criteria and the engineer of record govern.",
   };
 }
@@ -1482,7 +1486,7 @@ function renderDesignFlowPeaking(inputRegion, outputRegion, citationEl) {
     const r = computeDesignFlowPeaking({ population: readNum(pop.input), per_capita_gpcd: readNum(gpcd.input) });
     if (r.error) { oAvg.textContent = r.error; oPeak.textContent = "-"; oMin.textContent = "-"; oNote.textContent = ""; return; }
     oAvg.textContent = fmt(r.avg_flow_mgd, 3) + " MGD (" + fmt(r.avg_flow_gpm, 0) + " gpm)";
-    oPeak.textContent = fmt(r.peak_flow_mgd, 3) + " MGD (" + fmt(r.peak_flow_gpm, 0) + " gpm) / PF " + fmt(r.harmon_pf, 2) + (r.small_system ? " -- below 1,000 people, outside the Harmon range" : "");
+    oPeak.textContent = fmt(r.peak_flow_mgd, 3) + " MGD (" + fmt(r.peak_flow_gpm, 0) + " gpm) / PF " + fmt(r.harmon_pf, 2) + (r.small_system ? " -- below 1,000 people, outside the Harmon range" : "") + (r.large_system ? " -- above 1,000,000 people, outside the Harmon and Gifft range" : "");
     oMin.textContent = fmt(r.min_flow_mgd, 3) + " MGD (" + fmt(r.min_flow_gpm, 0) + " gpm) / " + fmt(r.gifft_min_ratio, 2) + " x avg";
     oNote.textContent = r.note;
   }, DEBOUNCE_MS);

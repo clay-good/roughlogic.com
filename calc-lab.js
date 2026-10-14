@@ -245,7 +245,14 @@ function parseFormula(s) {
         return { error: "Unexpected number." };
       } else if (t.kind === "·") {
         pos++;
-        // Treat hydrate dot as concatenation.
+        // Water of hydration: an optional coefficient multiplies everything
+        // after the dot (CuSO4·5H2O). It used to stop at "Unexpected number".
+        let mult = 1;
+        if (pos < tokens.length && tokens[pos].kind === "num") { mult = tokens[pos].count; pos++; }
+        const rest = parseGroup(stopAtClose);
+        if (rest.error) return rest;
+        for (const [k, v] of Object.entries(rest.tally)) tally[k] = (tally[k] || 0) + v * mult;
+        return { tally };
       } else {
         return { error: "Unexpected token." };
       }
@@ -275,8 +282,10 @@ export function computeMolecularWeight({ formula = "" }) {
     if (w === undefined) return { error: "Unknown element symbol: " + sym };
     const contrib = w * n;
     mw += contrib;
+    if (!(n > 0)) return { error: "Element " + sym + " has a count of 0; check for a zero typed in place of a letter O." };
     breakdown.push({ symbol: sym, count: n, atomic_weight: w, contribution: contrib });
   }
+  if (breakdown.length === 0) return { error: "The formula has no elements in it." };
   return { formula, molecular_weight: mw, breakdown };
 }
 

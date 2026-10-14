@@ -66,6 +66,20 @@ export function computeAreaByCoordinates({ points } = {}) {
     signed2 += (a.e * b.n - b.e * a.n);
     perimeter += Math.hypot(b.n - a.n, b.e - a.e);
   }
+  // The shoelace sum of a boundary that crosses itself is the difference of
+  // its lobes (a bow-tie of a 100 ft square read 0 sq ft), so corners entered
+  // out of order are refused instead of measured.
+  const nSeg = ring.length - 1;
+  const orient = (p, q, r) => (q.e - p.e) * (r.n - p.n) - (q.n - p.n) * (r.e - p.e);
+  for (let i = 0; i < nSeg; i++) {
+    for (let k = i + 2; k < nSeg; k++) {
+      if (i === 0 && k === nSeg - 1) continue;
+      const a = ring[i], b = ring[i + 1], c = ring[k], d = ring[k + 1];
+      if (orient(a, b, c) * orient(a, b, d) < 0 && orient(c, d, a) * orient(c, d, b) < 0) {
+        return { error: "The boundary crosses itself between sides " + (i + 1) + " and " + (k + 1) + "; enter the corners in order around the parcel." };
+      }
+    }
+  }
   const signed = signed2 / 2;
   const area_ft2 = Math.abs(signed);
   if (!Number.isFinite(area_ft2) || !Number.isFinite(perimeter)) {
@@ -282,7 +296,10 @@ function renderDifferentialLeveling(inputRegion, outputRegion, citationEl) {
 SURVEY_RENDERERS["differential-leveling"] = renderDifferentialLeveling;
 
 // dims: in { elevs: dimensionless, dists: dimensionless, known_close: L } out: { misclosure: L, total_dist: L, last_adjusted: L }
-export function computeLevelLoopAdjustment({ elevs, dists, known_close = 0 } = {}) {
+export function computeLevelLoopAdjustment({ elevs, dists, known_close } = {}) {
+  // A blank closing elevation used to run as 0 ft, a misclosure of the whole elevation.
+  if (known_close === undefined || known_close === null || known_close === "") return { error: "Enter the known closing elevation (ft)." };
+  known_close = Number(known_close);
   const _g = _finiteGuard({ known_close }); if (_g) return _g;
   if (!Array.isArray(elevs) || !Array.isArray(dists)) return { error: "Elevations and distances must be lists." };
   if (elevs.length < 1) return { error: "Need at least one turning point." };
@@ -316,7 +333,7 @@ function renderLevelLoopAdjustment(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const eArr = parseNums(elevs.input.value), dArr = parseNums(dists.input.value);
     if (eArr === null || dArr === null) { oMis.textContent = "Each elevation and distance must be a finite number, one per line."; oAdj.textContent = "-"; oNote.textContent = "-"; return; }
-    const r = computeLevelLoopAdjustment({ elevs: eArr, dists: dArr, known_close: Number(kc.input.value) || 0 });
+    const r = computeLevelLoopAdjustment({ elevs: eArr, dists: dArr, known_close: kc.input.value });
     if (r.error) { oMis.textContent = r.error; oAdj.textContent = "-"; oNote.textContent = "-"; return; }
     oMis.textContent = fmt(r.misclosure, 3) + " ft over " + fmt(r.total_dist, 0) + " ft leveled";
     oAdj.textContent = r.adjusted.map((a) => fmt(a, 4)).join(", ") + " ft";

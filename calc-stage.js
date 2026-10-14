@@ -192,6 +192,7 @@ export function computeDMX({ fixtures = [] }) {
     if (ch < 1) return { error: "Channel count must be at least 1." };
     const universe = Number(f.universe) || 1;
     if (universe < 1) return { error: "Universe must be at least 1." };
+    if (!Number.isInteger(start) || !Number.isInteger(ch) || !Number.isInteger(universe)) return { error: "Start address, channel count and universe must be whole numbers." };
     max_universe = Math.max(max_universe, universe);
     const end = start + ch - 1;
     const overflow = end > 512 + 1e-9 * Math.abs(512);
@@ -217,8 +218,12 @@ export function computeDMX({ fixtures = [] }) {
     let used = 0;
     for (const r of list) used += (Math.min(r.raw_end, 512) - r.start + 1);
     utilization[u] = (used / 512) * 100;
+    // Every pair, not only neighbours: a fixture patched inside a long one
+    // overlaps it even with another fixture sorted between them.
     for (let i = 1; i < list.length; i++) {
-      if (list[i].start <= list[i - 1].end) conflicts.push("Conflict in universe " + u + ": " + list[i - 1].name + " ends at " + list[i - 1].end + ", " + list[i].name + " starts at " + list[i].start);
+      for (let k = 0; k < i; k++) {
+        if (list[i].start <= list[k].end) conflicts.push("Conflict in universe " + u + ": " + list[k].name + " ends at " + list[k].end + ", " + list[i].name + " starts at " + list[i].start);
+      }
     }
   }
   // Recommendation: split next available channels into a new universe when overflow.
@@ -1548,16 +1553,22 @@ export function computeCounterweightArborLoad({ batten_weight_lb = 0, attached_l
   if (purchase_ratio === null) return { error: "Purchase type must be single or double." };
   const required_cw_lb = (batten + load) * purchase_ratio;
   const out_of_weight_lb = required_cw_lb - existing;
-  const bricks = Math.ceil(Math.abs(out_of_weight_lb) / brick - 1e-9);
+  // Whole bricks cannot land on an arbitrary weight, so take the count that
+  // leaves the arbor closest to balance (rounding up on a tie). Rounding up
+  // always told a rigger 10 lb heavy to pull a 30 lb brick and go 20 lb light.
+  const exact = Math.abs(out_of_weight_lb) / brick;
+  const bricks = exact - Math.floor(exact + 1e-9) < 0.5 - 1e-9 ? Math.floor(exact + 1e-9) : Math.ceil(exact - 1e-9);
   const action = out_of_weight_lb > 1e-9 ? "add" : out_of_weight_lb < -1e-9 ? "remove" : "balanced";
+  // Arbor minus required once the bricks are moved: positive is arbor heavy.
+  const residual_lb = (bricks * brick - Math.abs(out_of_weight_lb)) * (action === "remove" ? -1 : 1);
   return {
-    required_cw_lb, out_of_weight_lb, bricks, purchase_ratio, action,
+    required_cw_lb, out_of_weight_lb, bricks, residual_lb, purchase_ratio, action,
     note: "A double-purchase system needs two pounds of counterweight per pound on the batten (and the arbor travels half as far), so reversing the ratio lets the pipe run away. Load the arbor only when the batten is at the loading rail - an out-of-weight batten is the classic fly-rail hazard. Arbor capacity is finite. The venue rigging inspection and the AHJ govern.",
   };
 }
 export const counterweightArborLoadExample = { inputs: { batten_weight_lb: 100, attached_load_lb: 400, purchase_type: "single", brick_weight_lb: 30, existing_cw_lb: 200 } };
 const renderCounterweightArborLoad = _r({
-  citation: "Notice: Load the arbor only when the batten is at the loading rail; the venue rigging inspection and the AHJ govern. Citation: theatrical counterweight rigging (single/double purchase), by name. required = (batten + load) x purchase_ratio (1 single, 2 double); out_of_weight = required - existing; bricks = ceil(|out_of_weight| / brick_weight). A double-purchase arbor needs twice the counterweight and travels half the distance.",
+  citation: "Notice: Load the arbor only when the batten is at the loading rail; the venue rigging inspection and the AHJ govern. Citation: theatrical counterweight rigging (single/double purchase), by name. required = (batten + load) x purchase_ratio (1 single, 2 double); out_of_weight = required - existing; bricks = the whole count nearest |out_of_weight| / brick_weight, with the weight left over shown. A double-purchase arbor needs twice the counterweight and travels half the distance.",
   example: counterweightArborLoadExample.inputs,
   fields: [
     { key: "batten_weight_lb", label: "Batten pipe weight (lb)", kind: "number" },
@@ -1569,7 +1580,7 @@ const renderCounterweightArborLoad = _r({
   outputs: [
     { key: "req", id: "cwa-out-req", label: "Required counterweight", value: (r) => fmt(r.required_cw_lb, 0) + " lb (" + (r.purchase_ratio === 2 ? "double 2:1" : "single 1:1") + ")" },
     { key: "oow", id: "cwa-out-oow", label: "Out of weight", value: (r) => (r.action === "balanced" ? "balanced" : fmt(Math.abs(r.out_of_weight_lb), 0) + " lb " + (r.action === "add" ? "light - add" : "heavy - remove")) },
-    { key: "b", id: "cwa-out-b", label: "Bricks to " + "add/remove", value: (r) => r.action === "balanced" ? "0" : fmt(r.bricks, 0) + " bricks to " + r.action },
+    { key: "b", id: "cwa-out-b", label: "Bricks to " + "add/remove", value: (r) => r.action === "balanced" ? "0" : (r.bricks === 0 ? "none: closer than half a brick" : fmt(r.bricks, 0) + " bricks to " + r.action) + (Math.abs(r.residual_lb) > 1e-6 ? ", leaving the arbor " + fmt(Math.abs(r.residual_lb), 0) + " lb " + (r.residual_lb > 0 ? "heavy" : "light") : "") },
     { key: "n", id: "cwa-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeCounterweightArborLoad,

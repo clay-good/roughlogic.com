@@ -13911,7 +13911,7 @@ export const CITATIONS = {
     ],
   },
   "counterweight-arbor-load": {
-    formula: "required = (batten_weight + attached_load) x purchase_ratio (1 single, 2 double); out_of_weight = required - existing; bricks = ceil(|out_of_weight| / brick_weight).",
+    formula: "required = (batten_weight + attached_load) x purchase_ratio (1 single, 2 double); out_of_weight = required - existing; bricks = the whole count nearest |out_of_weight| / brick_weight, with the weight left over reported.",
     edition: "Theatrical counterweight rigging (single / double purchase), by name.",
     freeAccess: "Standard stagecraft counterweight-balance relation; the venue rigging inspection and the AHJ govern.",
     governance: GOVERNANCE.general,
@@ -24811,11 +24811,11 @@ export const CITATIONS = {
     ],
   },
   "splice-loss-mismatch": {
-    formula: "MFD mismatch = -20 log10(2 w1 w2/(w1^2+w2^2)); lateral loss = 4.343(d/w)^2; angular loss = 4.343(pi n w theta/lambda)^2; small losses add approximately.",
+    formula: "MFD mismatch = -20 log10(2 w1 w2/(w1^2+w2^2)); lateral loss = 4.343 x 2 d^2/(w1^2+w2^2); angular loss = 4.343(pi n theta/lambda)^2 x 2 w1^2 w2^2/(w1^2+w2^2), which are 4.343(d/w)^2 and 4.343(pi n w theta/lambda)^2 for matched fibers; small losses add approximately.",
     edition: "Gaussian single-mode splice-loss approximations for mode-field mismatch and geometric misalignment.",
     freeAccess: "Three Gaussian coupling approximations.",
     governance: GOVERNANCE.general,
-    editionNote: "PREPARATION OUTWEIGHS ORDINARY FIBER MISMATCH. The worked 9.2/8.6 micron MFD mismatch costs 0.020 dB, a 1 micron offset costs 0.205 dB, and 2 degrees of axial tilt between the cores costs 0.991 dB. That tilt term models a mechanical joint or connector; a fusion splice does not tilt by the cleave's end angle, and STL's splice-loss note calls an end angle under 2 degrees acceptable, about 0.5 degree from a maintained cleaver.",
+    editionNote: "PREPARATION OUTWEIGHS ORDINARY FIBER MISMATCH. The worked 9.2/8.6 micron MFD mismatch costs 0.020 dB, a 1 micron offset costs 0.219 dB, and 2 degrees of axial tilt between the cores costs 0.925 dB. That tilt term models a mechanical joint or connector; a fusion splice does not tilt by the cleave's end angle, and STL's splice-loss note calls an end angle under 2 degrees acceptable, about 0.5 degree from a maintained cleaver.",
     assumptions: [
       { name: "Single-mode Gaussian approximation", value: "not applicable to multimode fiber", source: "the coupling model" },
       { name: "Independent small losses", value: "real fusion also depends on contamination, arc parameters and core geometry", source: "the splicer data" },

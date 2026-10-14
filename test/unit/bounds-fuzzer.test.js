@@ -61225,3 +61225,60 @@ test("hardening slice 34 (second pass: UTM zone exceptions)", async () => {
   assert.equal(F.computeUTM({ direction: "latlon_to_utm", lat_deg: 50, lon_deg: 5 }).zone, 31);
   assert.equal(F.computeUTM({ direction: "latlon_to_utm", lat_deg: 40, lon_deg: -105 }).zone, 13);
 });
+
+test("hardening slice 35 (second pass: cancellation, sig-fig zeros, nested DMX, bow-tie area, splice symmetry, hydrates)", async () => {
+  const E = await import("../../calc-edu.js");
+  const ST = await import("../../calc-stage.js");
+  const SV = await import("../../calc-survey.js");
+  const T = await import("../../calc-telecom.js");
+  const L = await import("../../calc-lab.js");
+  const TR = await import("../../calc-treatment.js");
+  // the small root of x^2 + 1e8 x + 1 is -1e-8, not the cancelled -7.45e-9
+  const q = E.computeQuadratic({ a: 1, b: 1e8, c: 1 });
+  assert.ok(Math.abs(q.roots[1] + 1e-8) < 1e-20 && Math.abs(q.roots[0] + 1e8) < 1e-6);
+  assert.deepEqual(E.computeQuadratic({ a: 1, b: -1e8, c: 1 }).roots.map((x) => Number(x.toPrecision(12))), [1e-8, 1e8]);
+  assert.deepEqual(E.computeQuadratic({ a: 1, b: -3, c: 2 }).roots, [1, 2]);
+  assert.deepEqual(E.computeQuadratic({ a: 1, b: 5, c: 0 }).roots, [-5, 0]);
+  // trailing zeros carry the precision
+  assert.equal(E.computeSigFigs({ value: "99.96", target_sig_figs: 3 }).rounded_text, "100.");
+  assert.equal(E.computeSigFigs({ value: "0.1049", target_sig_figs: 2 }).rounded_text, "0.10");
+  assert.equal(E.computeSigFigs({ value: "0.00347", target_sig_figs: 2 }).rounded_text, "0.0035");
+  assert.equal(E.countSigFigs(E.computeSigFigs({ value: "99.96", target_sig_figs: 3 }).rounded_text), 3);
+  assert.ok(E.computeSigFigs({ value: "5", target_sig_figs: 2.5 }).error);
+  // C sits inside A with B sorted between them
+  const dmx = ST.computeDMX({ fixtures: [{ name: "A", start: 1, channels: 100 }, { name: "B", start: 10, channels: 5 }, { name: "C", start: 50, channels: 5 }] });
+  assert.equal(dmx.conflicts.length, 2);
+  assert.ok(dmx.conflicts.some((c) => c.includes("C starts at 50")));
+  assert.equal(ST.computeDMX(ST.dmxExample.inputs).conflicts.length, 0);
+  assert.ok(ST.computeDMX({ fixtures: [{ start: 1.5, channels: 2 }] }).error);
+  // nearest whole brick, with the residual
+  const cw = (existing_cw_lb) => ST.computeCounterweightArborLoad({ batten_weight_lb: 100, attached_load_lb: 400, purchase_type: "single", brick_weight_lb: 30, existing_cw_lb });
+  assert.equal(cw(510).bricks, 0);
+  assert.ok(Math.abs(cw(510).residual_lb - 10) < 1e-9);
+  assert.equal(cw(190).bricks, 10);
+  assert.ok(Math.abs(cw(190).residual_lb + 10) < 1e-9);
+  assert.equal(cw(485).bricks, 1); // a tie still rounds up
+  assert.equal(cw(200).residual_lb, 0);
+  // a bow-tie is refused; a concave parcel entered in order is not
+  assert.ok(SV.computeAreaByCoordinates({ points: [{ n: 0, e: 0 }, { n: 100, e: 100 }, { n: 0, e: 100 }, { n: 100, e: 0 }] }).error);
+  assert.equal(SV.computeAreaByCoordinates({ points: [{ n: 0, e: 0 }, { n: 0, e: 100 }, { n: 50, e: 50 }, { n: 100, e: 100 }, { n: 100, e: 0 }] }).area_ft2, 7500);
+  // a blank closing elevation is missing, a typed 0 is not
+  assert.ok(SV.computeLevelLoopAdjustment({ elevs: [1], dists: [1] }).error);
+  assert.ok(SV.computeLevelLoopAdjustment({ elevs: [1], dists: [1], known_close: "" }).error);
+  assert.equal(SV.computeLevelLoopAdjustment({ elevs: [1], dists: [1], known_close: 0 }).misclosure, 1);
+  // the same two fibers lose the same whichever is entered first
+  const sp = (a, b) => T.computeSpliceLossMismatch({ mfd_1_um: a, mfd_2_um: b, lateral_offset_um: 1, cleave_angle_deg: 1, wavelength_nm: 1550, fiber_index: 1.468 });
+  assert.ok(Math.abs(sp(9.2, 8.6).total_loss_db - sp(8.6, 9.2).total_loss_db) < 1e-12);
+  assert.ok(Math.abs(sp(9.2, 8.6).lateral_offset_loss_db - 4.343 * 2 / (4.6 * 4.6 + 4.3 * 4.3)) < 1e-12);
+  assert.ok(Math.abs(sp(9.2, 9.2).lateral_offset_loss_db - 4.343 / (4.6 * 4.6)) < 1e-12);
+  // formulas
+  assert.ok(L.computeMolecularWeight({ formula: "H0" }).error);
+  assert.ok(L.computeMolecularWeight({ formula: "()" }).error);
+  assert.ok(Math.abs(L.computeMolecularWeight({ formula: "CuSO4·5H2O" }).molecular_weight - 249.68) < 0.01);
+  assert.ok(Math.abs(L.computeMolecularWeight({ formula: "MgSO4.7H2O" }).molecular_weight - 246.47) < 0.01);
+  // the minimum flow cannot exceed the average
+  const big = TR.computeDesignFlowPeaking({ population: 2e7 });
+  assert.equal(big.gifft_min_ratio, 1);
+  assert.equal(big.large_system, true);
+  assert.equal(TR.computeDesignFlowPeaking({ population: 50000 }).large_system, false);
+});

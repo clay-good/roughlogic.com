@@ -3705,7 +3705,7 @@ cross-check.
 | calc-survey.js | `computeEdmSlopeReduction` | `{ angle_mode, slope_distance_ft = 0, angle_deg = 0, hi_ft = 0, hr_ft = 0 } = {}` | _ | _ | _ |
 | calc-survey.js | `computeGradeRodCutFill` | `{ benchmark_elev_ft = 0, backsight_ft = 0, design_elev_ft = 0, ground_rod_ft ...` | _ | _ | _ |
 | calc-survey.js | `computeGridToGround` | `{ grid_distance_ft = 0, grid_scale_factor = 1, ellipsoid_height_ft = 0 } = {}` | _ | _ | _ |
-| calc-survey.js | `computeLevelLoopAdjustment` | `{ elevs, dists, known_close = 0 } = {}` | _ | _ | _ |
+| calc-survey.js | `computeLevelLoopAdjustment` | `{ elevs, dists, known_close } = {}` | _ | _ | _ |
 | calc-survey.js | `computeLevelingCurvatureRefraction` | `{ sight_distance_ft = 0 } = {}` | _ | _ | _ |
 | calc-survey.js | `computeLidarPointDensity` | `{ pulse_rate_khz = 0, scan_angle_deg = 0, flight_height_m = 0, ground_speed_m...` | _ | _ | _ |
 | calc-survey.js | `computeMassHaulOverhaul` | `{ cut_volume_cy = 0, shrinkage_factor = 0.9, fill_required_cy = 0, free_haul_...` | _ | _ | _ |

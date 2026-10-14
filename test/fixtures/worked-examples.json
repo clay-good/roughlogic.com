@@ -129661,10 +129661,10 @@
    "inputs": { "mfd_1_um": 9.2, "mfd_2_um": 8.6, "lateral_offset_um": 1, "cleave_angle_deg": 1, "wavelength_nm": 1550, "fiber_index": 1.468 },
    "outputs": {
     "mfd_mismatch_loss_db": { "value": 0.01973817456961525, "tolerance": { "pct": 0.5 } },
-    "lateral_offset_loss_db": { "value": 0.20524574669187148, "tolerance": { "pct": 0.5 } },
-    "angular_loss_db": { "value": 0.24782703904941103, "tolerance": { "pct": 0.5 } },
-    "angular_2deg_loss_db": { "value": 0.9913081561976441, "tolerance": { "pct": 0.5 } },
-    "total_loss_db": { "value": 0.47281096031089775, "tolerance": { "pct": 0.5 } }
+    "lateral_offset_loss_db": { "value": 0.21906683480453976, "tolerance": { "pct": 0.5 } },
+    "angular_loss_db": { "value": 0.2311385600011909, "tolerance": { "pct": 0.5 } },
+    "angular_2deg_loss_db": { "value": 0.9245542400047636, "tolerance": { "pct": 0.5 } },
+    "total_loss_db": { "value": 0.46994356937534587, "tolerance": { "pct": 0.5 } }
    }
   },
   {

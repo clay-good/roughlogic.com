@@ -372,7 +372,14 @@ export function computeQuadratic({ a, b, c }) {
     return {
       kind: "real-distinct",
       discriminant,
-      roots: [(-B - sqrtD) / (2 * A), (-B + sqrtD) / (2 * A)],
+      // -b +/- sqrt(D) cancels when b^2 >> 4ac (x^2 + 1e8 x + 1 gave -7.45e-9
+      // for the root at -1e-8). Take the sum that does not cancel, then the
+      // other root from the product of the roots, c / a.
+      roots: (() => {
+        const q = -(B + (B < 0 ? -sqrtD : sqrtD)) / 2;
+        const r1 = q / A + 0, r2 = (q !== 0 ? C / q : -B / A) + 0; // + 0 turns -0 into 0
+        return r1 <= r2 ? [r1, r2] : [r2, r1];
+      })(),
       vertex_x, vertex_y,
     };
   }
@@ -594,10 +601,18 @@ export function computeSigFigs({ value, target_sig_figs }) {
   if (target_sig_figs !== undefined && target_sig_figs !== null && String(target_sig_figs).trim() !== "") {
     const N = Number(target_sig_figs);
     if (!Number.isFinite(N) || N < 1 || N > 15) return { error: "Target sig figs must be 1-15." };
+    if (!Number.isInteger(N)) return { error: "Target sig figs must be a whole number." };
     target_n = N;
     rounded = roundToSigFigs(x, N);
   }
-  return { input_value: x, input_sig_figs, target_sig_figs: target_n, rounded_value: rounded };
+  // The number alone cannot carry its trailing zeros: 99.96 to 3 figures is
+  // 100. (not 100, which reads as one figure) and 0.1049 to 2 is 0.10.
+  let rounded_text = null;
+  if (rounded !== null) {
+    rounded_text = rounded.toPrecision(target_n);
+    if (/^-?\d*0$/.test(rounded_text) && rounded !== 0) rounded_text += ".";
+  }
+  return { input_value: x, input_sig_figs, target_sig_figs: target_n, rounded_value: rounded, rounded_text };
 }
 
 export const sigFigsExample = {
@@ -629,7 +644,7 @@ export function renderSigFigs(inputRegion, outputRegion, citationEl) {
     }
     oCount.textContent = String(r.input_sig_figs);
     oVal.textContent = String(r.input_value);
-    oRounded.textContent = r.rounded_value == null ? "(enter a target N above)" : String(r.rounded_value);
+    oRounded.textContent = r.rounded_value == null ? "(enter a target N above)" : r.rounded_text;
   }, DEBOUNCE_MS);
   for (const el of [V.input, N.input]) el.addEventListener("input", update);
 }

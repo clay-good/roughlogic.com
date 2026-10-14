@@ -485,8 +485,13 @@ export function computeSpliceLossMismatch({ mfd_1_um = 0, mfd_2_um = 0, lateral_
   if (!(mfd_1_um > 0) || !(mfd_2_um > 0) || !(wavelength_nm > 0) || !(fiber_index > 1)) return { error: "Mode-field diameters and wavelength must be positive, and fiber index must exceed 1." };
   if (!(lateral_offset_um >= 0) || !(cleave_angle_deg >= 0 && cleave_angle_deg < 90)) return { error: "Offset cannot be negative and cleave angle must be from 0 up to 90 degrees." };
   const mismatch = (a, b) => -20 * Math.log10(2 * a * b / (a * a + b * b));
-  const radius_um = mfd_1_um / 2;
-  const lateral = (offset) => 4.343 * Math.pow(offset / radius_um, 2);
+  // Two unequal Gaussian fields of radius w1 and w2 couple as
+  // (2 w1 w2 / (w1^2 + w2^2))^2 exp(-2 d^2 / (w1^2 + w2^2)), so the offset and
+  // tilt terms see the root-mean-square and harmonic radii of the pair. Fiber
+  // 1's radius alone made the loss depend on which fiber was entered first.
+  const w1 = mfd_1_um / 2, w2 = mfd_2_um / 2;
+  const lateral = (offset) => 4.343 * 2 * offset * offset / (w1 * w1 + w2 * w2);
+  const radius_um = Math.sqrt(2 * w1 * w1 * w2 * w2 / (w1 * w1 + w2 * w2));
   const angular = (degrees) => {
     const theta = degrees * Math.PI / 180;
     const wavelength_um = wavelength_nm / 1000;
@@ -506,7 +511,7 @@ export function computeSpliceLossMismatch({ mfd_1_um = 0, mfd_2_um = 0, lateral_
 
 const spliceExample = { mfd_1_um: 9.2, mfd_2_um: 8.6, lateral_offset_um: 1, cleave_angle_deg: 1, wavelength_nm: 1550, fiber_index: 1.468 };
 TELECOM_RENDERERS["splice-loss-mismatch"] = _simpleRenderer({
-  citation: "Citation: Gaussian single-mode approximations: MFD mismatch = -20 log10(2 w1 w2/(w1^2+w2^2)); lateral offset = 4.343(d/w)^2; angular loss = 4.343(pi n w theta/lambda)^2, with w the mode-field radius. Splicer and fiber data and acceptance standards govern.",
+  citation: "Citation: Gaussian single-mode approximations: MFD mismatch = -20 log10(2 w1 w2/(w1^2+w2^2)); lateral offset = 4.343 x 2 d^2/(w1^2+w2^2); angular loss = 4.343(pi n theta/lambda)^2 x 2 w1^2 w2^2/(w1^2+w2^2), with w1 and w2 the mode-field radii (4.343(d/w)^2 and 4.343(pi n w theta/lambda)^2 for matched fibers). Splicer and fiber data and acceptance standards govern.",
   example: spliceExample,
   fields: [
     { key: "mfd_1_um", label: "Fiber 1 mode-field diameter (microns)" },
