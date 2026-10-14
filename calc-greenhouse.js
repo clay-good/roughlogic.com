@@ -577,14 +577,18 @@ export function computeGreenhouseTranspirationWater({ floor_area_sqft = 0, daily
   const transpiration_gal_per_day = transpiration_lb_per_day / LB_PER_GAL_WATER;
   const applied_gal_per_day = transpiration_gal_per_day / (1 - leaching_fraction);
   const peak_lb_per_hour = peak_solar_btuh_per_sqft * latent_fraction * floor_area_sqft / LATENT_HEAT_BTU_PER_LB;
+  // The day's solar cannot exceed 24 hours at the peak rate.
+  if (daily_solar_btu_per_sqft > 24 * peak_solar_btuh_per_sqft * (1 + 1e-9)) return { error: "The daily solar total is more than 24 hours at the peak rate; check the two solar entries (BTU/sq ft a day, and BTU/h per sq ft at peak)." };
   const peak_gal_per_hour = peak_lb_per_hour / LB_PER_GAL_WATER;
+  // What the irrigation system has to deliver in that hour carries the leaching fraction, like the daily applied figure.
+  const peak_applied_gal_per_hour = peak_gal_per_hour / (1 - leaching_fraction);
   const average_gal_per_hour = transpiration_gal_per_day / irrigation_hours_per_day;
   return {
     daily_energy_btu, transpiration_lb_per_day, transpiration_gal_per_day,
     gal_per_sqft_per_day: transpiration_gal_per_day / floor_area_sqft,
     applied_gal_per_day,
     leached_gal_per_day: applied_gal_per_day - transpiration_gal_per_day,
-    peak_lb_per_hour, peak_gal_per_hour, average_gal_per_hour,
+    peak_lb_per_hour, peak_gal_per_hour, peak_applied_gal_per_hour, average_gal_per_hour,
     peak_to_average_ratio: peak_gal_per_hour / average_gal_per_hour,
     moisture_pints_per_day: transpiration_gal_per_day * PINTS_PER_GAL,
     note: "The energy route is a check on the water route and vice versa: UMass Extension sizes a greenhouse water SUPPLY at 0.3 to 0.4 gallons per square foot of growing area per day as the peak use on the warmest day, and says that matches evapotranspiration for most of the country. Treat it as a conservative supply rule: 0.3 gal is about 2,600 Btu of latent heat per square foot, more than a sunny day puts through the glazing, so the energy route normally lands well under it -- size a supply on the extension figure, not on this one. Irrigation must deliver the PEAK hour, not the daily average divided by the day length -- a system sized on the average is short by exactly that factor when the crop needs it most. And every pound transpired enters the house air: a ventilated house blows it outside without anyone noticing, while a sealed house has to REMOVE it, which is a dehumidification load larger than most people size for and the reason closed and indoor growing rooms fail on humidity before they fail on anything else. The crop's own stage and the irrigation designer govern.",
@@ -607,7 +611,7 @@ GREENHOUSE_RENDERERS["greenhouse-transpiration-water"] = _simpleRenderer({
     { key: "transpiration_gal_per_day", id: "gtw-water", label: "Crop transpiration", value: (r) => fmt(r.transpiration_gal_per_day, 0) + " gal/day (" + fmt(r.transpiration_lb_per_day, 0) + " lb/day)" },
     { key: "gal_per_sqft_per_day", id: "gtw-per", label: "Per square foot", value: (r) => fmt(r.gal_per_sqft_per_day, 4) + " gal/sq ft/day -- the UMass warmest-day peak is 0.3 to 0.4" },
     { key: "applied_gal_per_day", id: "gtw-applied", label: "Irrigation to apply", value: (r) => fmt(r.applied_gal_per_day, 0) + " gal/day including " + fmt(r.leached_gal_per_day, 0) + " gal of leachate" },
-    { key: "peak_gal_per_hour", id: "gtw-peak", label: "Peak hour demand", value: (r) => fmt(r.peak_gal_per_hour, 1) + " gal/h against a " + fmt(r.average_gal_per_hour, 1) + " gal/h average -- " + fmt(r.peak_to_average_ratio, 1) + "x" },
+    { key: "peak_gal_per_hour", id: "gtw-peak", label: "Peak hour demand", value: (r) => fmt(r.peak_gal_per_hour, 1) + " gal/h transpired" + (r.peak_applied_gal_per_hour > r.peak_gal_per_hour * (1 + 1e-9) ? " (" + fmt(r.peak_applied_gal_per_hour, 1) + " gal/h to apply with the leaching fraction)" : "") + " against a " + fmt(r.average_gal_per_hour, 1) + " gal/h average -- " + fmt(r.peak_to_average_ratio, 1) + "x" },
     { key: "moisture_pints_per_day", id: "gtw-moist", label: "Moisture into the house air", value: (r) => fmt(r.moisture_pints_per_day, 0) + " pints a day -- a sealed house has to remove all of it" },
     { key: "note", id: "gtw-note", label: "Use", value: (r) => r.note },
   ],

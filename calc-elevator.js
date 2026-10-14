@@ -401,6 +401,8 @@ ELEVATOR_RENDERERS["hoistway-venting"] = _simpleRenderer({
 // dims: in { input_power_kw: M L^2 T^-3, efficiency_pct: dimensionless, duty_cycle_pct: dimensionless, controller_standby_w: M L^2 T^-3, other_gains_btuh: M L^2 T^-3, room_volume_cuft: L^3, ambient_limit_f: T, starting_temp_f: T } out: { heat_running_btuh: M L^2 T^-3, heat_average_btuh: M L^2 T^-3, total_btuh: M L^2 T^-3, cooling_tons: M L^2 T^-3, temp_rise_f_per_hr: T }
 export function computeMachineRoomHeat({ input_power_kw = 0, efficiency_pct = 85, duty_cycle_pct = 40, controller_standby_w = 0, other_gains_btuh = 0, room_volume_cuft = 0, ambient_limit_f = 104, starting_temp_f = 80 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A cleared starting temperature means the stated 80 F default, not a room at 0 F (four times the warning).
+  if (starting_temp_f === null || starting_temp_f === "") starting_temp_f = 80;
   // Unit / range guard added 2026-09-26 after printed-example probing.
   if ([arguments[0]?.duty_cycle_pct].some((v) => Number(v) > 0 && Number(v) < 1)) return { error: "Enter the duty cycle as a percent (40 for 40%), not a fraction." };
   // An efficiency is a percent; 0 < value < 1 is a fraction typed into a percent field (added 2026-09-26).

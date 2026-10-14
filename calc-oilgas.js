@@ -1193,6 +1193,8 @@ export function computeTankVentApi2000({
     ? "no installed vent capacity was entered, so no margin is reported"
     : (pressure_short || vacuum_short)
       ? "THE INSTALLED VENT IS SHORT" + (pressure_short ? " on pressure by " + fmt(-pressure_margin_ft3h, 0) + " cu ft/h" : "") + (pressure_short && vacuum_short ? " and" : "") + (vacuum_short ? " on vacuum by " + fmt(-vacuum_margin_ft3h, 0) + " cu ft/h" : "")
+      : !(has_pressure_vent && has_vacuum_vent)
+      ? "the installed vent covers the " + (has_pressure_vent ? "PRESSURE direction with " + fmt(pressure_margin_ft3h, 0) + " cu ft/h of margin; no vacuum capacity was entered, so the side that destroys tanks is unchecked" : "VACUUM direction with " + fmt(vacuum_margin_ft3h, 0) + " cu ft/h of margin; no pressure capacity was entered, so that side is unchecked")
       : "the installed vent covers both directions, with " + (has_pressure_vent ? fmt(pressure_margin_ft3h, 0) + " cu ft/h of pressure margin" : "no pressure figure entered") + " and " + (has_vacuum_vent ? fmt(vacuum_margin_ft3h, 0) + " cu ft/h of vacuum margin" : "no vacuum figure entered");
   const fireVerdict = !has_fire
     ? "no fire case was entered. It is sized on WETTED SURFACE AREA from the API 2000 tables and it is a different order of magnitude from normal venting"

@@ -61401,3 +61401,50 @@ test("hardening slice 38 (deferred findings re-run: rigging legs, blank readings
   assert.ok(!DC.computeContainmentBypassAirflow(room).note.startsWith("CHECK"));
   assert.ok(DC.computeContainmentBypassAirflow({ ...room, exhaust_temp_f: 95 }).note.startsWith("CHECK THE TEMPERATURES"));
 });
+
+test("hardening slice 39 (deferred findings: spacer pass, shift length, permit hours, blank ambient, zone rating, cube, blank drop)", async () => {
+  const { computeCouplingAlignmentTolerance } = await import("../../calc-millwright.js");
+  const { computeSilicaVentilationScreen } = await import("../../calc-demo.js");
+  const AQ = await import("../../calc-airquality.js");
+  const { computeGreenhouseTranspirationWater } = await import("../../calc-greenhouse.js");
+  const { computeMachineRoomHeat } = await import("../../calc-elevator.js");
+  const { computeRailcarLoadLimit } = await import("../../calc-rail.js");
+  const { computeDuctStaticTotal } = await import("../../calc-metalair.js");
+  const { computeBranchReinforcement } = await import("../../calc-pipefit.js");
+  const { readFileSync } = await import("node:fs");
+  const rows = JSON.parse(readFileSync(new URL("../fixtures/worked-examples.json", import.meta.url), "utf8")).rows;
+  const ex = (id) => rows.find((r) => r.tile_id === id).inputs;
+  // a spacer over tolerance fails the coupling even with a tiny face offset
+  const cp = computeCouplingAlignmentTolerance({ ...ex("coupling-alignment-tolerance"), measured_offset_in: 0.001, measured_angularity_mils_per_in: 0.01, spacer_length_in: 10, spacer_end_offset_in: 0.01 });
+  assert.equal(cp.offset_passes && cp.angularity_passes, true);
+  assert.equal(cp.spacer_passes, false);
+  assert.equal(cp.passes, false);
+  // 600 min at the controlled level is not a 720 min shift
+  const sil = computeSilicaVentilationScreen({ ...ex("silica-ventilation-screen"), shift_minutes: 720, sample_minutes: 240, measured_concentration_ug_m3: 200 });
+  assert.ok(/could run 600 min/.test(sil.control_verdict), sil.control_verdict);
+  assert.ok(/full shift/.test(computeSilicaVentilationScreen(ex("silica-ventilation-screen")).control_verdict));
+  // permit hours
+  const pte = ex("stack-emission-pte");
+  const over = AQ.computeStackEmissionPte({ ...pte, permitted_hours_per_year: pte.actual_hours_per_year / 2, major_threshold_tpy: 10 });
+  if (over.limit_makes_minor) assert.ok(/ACTUAL HOURS ENTERED ARE OVER THAT LIMIT/.test(over.limit_verdict), over.limit_verdict);
+  assert.equal(AQ.computeStackEmissionPte({ ...pte, control_enforceable: "Yes", control_efficiency_pct: 90 }).control_counts, true);
+  assert.ok(AQ.computeStackEmissionPte({ ...pte, control_enforceable: "maybe" }).error);
+  // blank ambient
+  const plume = { ...ex("plume-rise-briggs") };
+  assert.ok(AQ.computePlumeRiseBriggs(plume).plume_rise_ft > 0);
+  delete plume.ambient_temp_f;
+  assert.ok(AQ.computePlumeRiseBriggs(plume).error);
+  // peak hour to apply
+  const gh = computeGreenhouseTranspirationWater({ floor_area_sqft: 2880, daily_solar_btu_per_sqft: 1500, latent_fraction: 0.5, leaching_fraction: 0.2, peak_solar_btuh_per_sqft: 188, irrigation_hours_per_day: 12 });
+  assert.ok(Math.abs(gh.peak_applied_gal_per_hour - gh.peak_gal_per_hour / 0.8) < 1e-9);
+  assert.ok(computeGreenhouseTranspirationWater({ floor_area_sqft: 2880, daily_solar_btu_per_sqft: 1500, latent_fraction: 0.5, leaching_fraction: 0.2, peak_solar_btuh_per_sqft: 50, irrigation_hours_per_day: 12 }).error);
+  // cleared field means the stated default
+  const mr = ex("machine-room-heat");
+  assert.equal(computeMachineRoomHeat({ ...mr, starting_temp_f: "" }).hours_to_limit, computeMachineRoomHeat({ ...mr, starting_temp_f: 80 }).hours_to_limit);
+  // rail
+  assert.ok(computeRailcarLoadLimit({ ...ex("railcar-load-limit"), route_gross_rail_load_lb: 50000 }).error);
+  // a listed component with no figure
+  assert.ok(computeDuctStaticTotal({ components: [{ label: "filter", drop_in_wc: 0.1 }, { label: "wet coil", drop_in_wc: "" }], rated_esp_in_wc: 0.5 }).error);
+  assert.ok(Math.abs(computeDuctStaticTotal({ components: [{ label: "filter", drop_in_wc: 0.1 }, { label: "coil", drop_in_wc: 0 }], rated_esp_in_wc: 0.5 }).total_esp_in_wc - 0.1) < 1e-12);
+  assert.ok(computeBranchReinforcement({ ...ex("branch-reinforcement"), branch_od_in: 8.625, branch_wall_in: 0.322 }).error);
+});

@@ -973,6 +973,7 @@ export function computeBranchReinforcement({ run_od_in = 0, run_wall_in = 0, run
   if (!(Th > 0) || !(Tb > 0)) return { error: "Nominal walls must be positive (in)." };
   if (!(trh >= 0) || !(trb >= 0)) return { error: "Required walls must be non-negative (in)." };
   if (!(trh < Th)) return { error: "Run required wall must be less than the nominal wall (no excess to credit)." };
+  if (bod > rod) return { error: "The branch is larger than the run; enter the larger pipe as the run." };
   // B31.3 304.3.1(b) limits the area-replacement rules to beta of at least 45
   // deg; a shallower branch needs special design. Until 2026-09-25 the tile
   // accepted any angle, and with no cap on d2 a 15 deg branch credited run

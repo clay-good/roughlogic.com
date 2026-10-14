@@ -262,6 +262,8 @@ export function computeDuctStaticTotal({ components = [], rated_esp_in_wc = 0 } 
   let total_esp_in_wc = 0;
   const breakdown = [];
   for (const c of components) {
+    // A component listed with no figure is a missing reading, not a 0 in. w.c. coil.
+    if (!c || c.drop_in_wc === null || c.drop_in_wc === undefined || c.drop_in_wc === "") return { error: "Every listed component needs its pressure drop (in. w.c.); remove the line or enter the figure." };
     const drop = Number(c && c.drop_in_wc);
     if (!Number.isFinite(drop) || drop < 0) return { error: "Each component drop must be a non-negative number (in. w.c.)." };
     total_esp_in_wc += drop;
@@ -296,8 +298,9 @@ function _renderDuctStaticTotal(inputRegion, outputRegion, citationEl) {
       const i = line.lastIndexOf(",");
       if (i < 0) return null;
       const label = line.slice(0, i).trim();
-      const drop = Number(line.slice(i + 1).trim());
-      if (!Number.isFinite(drop)) return null;
+      const dropText = line.slice(i + 1).trim();
+      const drop = Number(dropText);
+      if (dropText === "" || !Number.isFinite(drop)) return null;
       out.push({ label, drop_in_wc: drop });
     }
     return out;

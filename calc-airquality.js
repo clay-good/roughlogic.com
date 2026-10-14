@@ -145,7 +145,9 @@ export function computeStackEmissionPte({
   // Control counts toward PTE only when its operation is federally
   // enforceable. An installed baghouse that no permit condition requires is
   // not a reduction in potential to emit, and that is not a technicality.
-  const control_counts = control_enforceable === "yes" && control_efficiency_pct > 0;
+  const enforceable = String(control_enforceable ?? "").trim().toLowerCase();
+  if (enforceable !== "" && enforceable !== "yes" && enforceable !== "no") return { error: "Say whether the control is federally enforceable: yes or no." };
+  const control_counts = enforceable === "yes" && control_efficiency_pct > 0;
   const controlled_rate_lb_h = control_counts ? hourly_rate_lb_h * (1 - control_efficiency_pct / 100) : hourly_rate_lb_h;
   const actual_tpy = controlled_rate_lb_h * actual_hours_per_year / _AQ_LB_PER_TON;
   const pte_tpy = controlled_rate_lb_h * _AQ_HOURS_PER_YEAR / _AQ_LB_PER_TON;
@@ -173,7 +175,7 @@ export function computeStackEmissionPte({
       ? "no hours limit is needed: even at 8,760 hours the source stays under the threshold"
       : "a federally enforceable limit below " + fmt(hours_for_minor, 0) + " hours a year would make this a synthetic minor source -- the trade is that the limit is enforceable, with recordkeeping and reporting, and exceeding it is a violation rather than a busy month")
     : limit_makes_minor
-      ? "a permitted " + fmt(permitted_hours_per_year, 0) + " hours gives a potential to emit of " + fmt(pte_with_limit_tpy, 1) + " tons, under the threshold -- a synthetic minor source"
+      ? "a permitted " + fmt(permitted_hours_per_year, 0) + " hours gives a potential to emit of " + fmt(pte_with_limit_tpy, 1) + " tons, under the threshold -- a synthetic minor source" + (actual_hours_per_year > permitted_hours_per_year ? ". BUT THE " + fmt(actual_hours_per_year, 0) + " ACTUAL HOURS ENTERED ARE OVER THAT LIMIT: the source is operating in violation of it, at " + fmt(actual_tpy, 1) + " tons actual" : "")
       : "a permitted " + fmt(permitted_hours_per_year, 0) + " hours still gives " + fmt(pte_with_limit_tpy, 1) + " tons, at or above the threshold; the limit would have to fall below " + fmt(hours_for_minor, 0) + " hours to work";
   if (![actual_tpy, pte_tpy, pte_with_limit_tpy, hours_for_minor, controlled_rate_lb_h].every(Number.isFinite)) return { error: "Potential to emit math is not a finite value." };
   return {
@@ -895,7 +897,7 @@ AIRQUALITY_RENDERERS["carbon-bed-life"] = _simpleRenderer({
 // dims: in { stack_height_ft: L, stack_diameter_ft: L, exit_velocity_fps: L T^-1, exit_temp_f: T, ambient_temp_f: T, wind_mph: L T^-1, stability_class: dimensionless } out: { buoyancy_flux: L^4 T^-3, plume_rise_ft: L, effective_height_ft: L, height_ratio: dimensionless, concentration_factor: dimensionless }
 export function computePlumeRiseBriggs({
   stack_height_ft = 0, stack_diameter_ft = 0, exit_velocity_fps = 0,
-  exit_temp_f = 0, ambient_temp_f = 0, wind_mph = 0, stability_class = "D",
+  exit_temp_f = 0, ambient_temp_f, wind_mph = 0, stability_class = "D",
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const stab = String(stability_class || "D").toUpperCase();
@@ -905,6 +907,8 @@ export function computePlumeRiseBriggs({
   if (!(exit_velocity_fps > 0)) return { error: "Exit velocity must be positive (ft/s)." };
   if (!(wind_mph > 0)) return { error: "Wind speed must be positive (mph) -- plume rise goes as the reciprocal of wind, and calm conditions need a different treatment entirely." };
   const exit_k = _aqKelvin(exit_temp_f);
+  // A missing ambient ran as 0 F, which adds buoyancy the plume does not have (213 ft of rise against 185 at 60 F).
+  { const v = arguments[0]?.ambient_temp_f; if (v === undefined || v === null || v === "") return { error: "Enter the ambient air temperature (F)." }; }
   const ambient_k = _aqKelvin(ambient_temp_f);
   if (!(exit_k > 0) || !(ambient_k > 0)) return { error: "Temperatures must be above absolute zero." };
   if (!(exit_k > ambient_k)) return { error: "The stack gas must be warmer than ambient for a buoyant plume -- a cool plume rises on momentum alone, which this does not compute." };

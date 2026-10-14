@@ -517,7 +517,7 @@ DATACENTER_RENDERERS["server-inlet-envelope"] = _simpleRenderer({
     { key: "alternative_rh_pct", label: "Alternative relative humidity (%)", attrs: { step: "any", min: "0", max: "100" } },
   ],
   outputs: [
-    { key: "dew_point_f", id: "sie-dp", label: "Entered dew point", unit: "deg F", value: (r) => fmt(r.dew_point_f, 1) + " deg F -- " + (r.dew_point_pass ? "PASS" : "FAIL") },
+    { key: "dew_point_f", id: "sie-dp", label: "Entered dew point", unit: "deg F", value: (r) => fmt(r.dew_point_f, 1) + " deg F -- " + (r.dew_point_pass ? "PASS" : "FAIL") + (r.rh_pass ? "" : "; the relative humidity is OVER its limit, so the entered condition FAILS") },
     { key: "recommended_pass", id: "sie-dry", label: "Entered dry-bulb status", value: (r) => (r.recommended_pass ? "INSIDE recommended" : r.allowable_pass ? "OUTSIDE recommended; INSIDE allowable" : "OUTSIDE allowable") },
     { key: "dew_point_margin_f", id: "sie-margin", label: "Entered dew-point / RH margin", value: (r) => fmt(r.dew_point_margin_f, 1) + " deg F / " + fmt(r.rh_margin_pct, 1) + " points" },
     { key: "warm_same_rh_dew_point_f", id: "sie-warm", label: "Alternative temperature at original RH", unit: "deg F", value: (r) => fmt(r.warm_same_rh_dew_point_f, 1) + " deg F dew point; margin " + fmt(r.warm_same_rh_dew_point_margin_f, 1) + " deg F" },

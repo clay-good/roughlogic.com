@@ -644,7 +644,7 @@ export function computeMastClimberPlatformLoad({ platform_length_ft = 0, cantile
   const on_cantilever = cantilever_length_ft > 0 && load_centroid_ft > half_platform_ft - cantilever_length_ft;
   const zone_utilization_pct = zone_rated_capacity_lb > 0 ? load_lb / zone_rated_capacity_lb * 100 : null;
   const within_zone = zone_rated_capacity_lb > 0 ? load_lb <= zone_rated_capacity_lb + 1e-9 * Math.abs(zone_rated_capacity_lb) : null;
-  const max_load_at_position_lb = zone_rated_capacity_lb > 0 && on_cantilever ? zone_rated_capacity_lb : rated_capacity_lb;
+  const max_load_at_position_lb = zone_rated_capacity_lb > 0 && on_cantilever ? Math.min(zone_rated_capacity_lb, rated_capacity_lb) : rated_capacity_lb;
   // The moment ends up in the ties to the building at their spacing.
   const tie_force_lb = tie_spacing_ft > 0 ? moment_ft_lb / tie_spacing_ft : null;
   const tie_utilization_pct = (tie_force_lb !== null && tie_capacity_lb > 0) ? tie_force_lb / tie_capacity_lb * 100 : null;

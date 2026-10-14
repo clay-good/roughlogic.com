@@ -386,7 +386,8 @@ export function computeCouplingAlignmentTolerance({ rpm = 0, measured_offset_in 
     offset_pct_of_excellent, angularity_pct_of_excellent,
     offset_passes, angularity_passes, offset_over_by_in, angularity_over_by,
     spacer_slope_mils_per_in, spacer_passes, spacer_length_in,
-    passes: offset_passes && angularity_passes,
+    // A spacer whose slope is over tolerance fails the coupling even with both face readings inside.
+    passes: offset_passes && angularity_passes && spacer_passes !== false,
     offset_verdict: offset_passes
       ? fmt(offset_pct_of_acceptable, 0) + "% of the acceptable tolerance -- pass"
       : "FAIL at " + fmt(offset_pct_of_acceptable, 0) + "% of tolerance, over by " + fmt(offset_over_by_in * _MILS_PER_IN, 1) + " mils",

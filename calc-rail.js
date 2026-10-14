@@ -523,6 +523,7 @@ export function computeRailcarLoadLimit({ gross_rail_load_lb = 0, light_weight_l
   // The constraint that gets missed: the ROUTE's own limit, which is invisible
   // on the car and which the stencil knows nothing about.
   const route_load_limit_lb = route_gross_rail_load_lb > 0 ? route_gross_rail_load_lb - light_weight_lb : null;
+  if (route_load_limit_lb !== null && route_load_limit_lb <= 0) return { error: "The route's gross rail load is at or below the car's light weight, which leaves no lading at all; check the route limit (lb)." };
   const governing_load_limit_lb = route_load_limit_lb === null ? load_limit_lb : Math.min(load_limit_lb, route_load_limit_lb);
   const route_shortfall_lb = route_load_limit_lb === null ? null : load_limit_lb - route_load_limit_lb;
   const within_route = route_gross_rail_load_lb > 0 ? gross_on_rail_lb <= route_gross_rail_load_lb + 1e-9 * Math.abs(route_gross_rail_load_lb) : null;
@@ -534,7 +535,7 @@ export function computeRailcarLoadLimit({ gross_rail_load_lb = 0, light_weight_l
   const outs = [load_limit_lb, gross_on_rail_lb, remaining_capacity_lb];
   if (!outs.every(Number.isFinite)) return { error: "Load limit math is not a finite value." };
   const verdict = within_car
-    ? "INSIDE the car at " + fmt(gross_on_rail_lb, 0) + " lb on rail against " + fmt(gross_rail_load_lb, 0) + " lb, " + fmt(utilization_pct, 1) + "% of the load limit"
+    ? "INSIDE the car at " + fmt(gross_on_rail_lb, 0) + " lb on rail against " + fmt(gross_rail_load_lb, 0) + " lb, " + fmt(utilization_pct, 1) + "% of the load limit" + (cube_limited_weight_lb !== null && lading_net_lb > cube_limited_weight_lb * (1 + 1e-9) ? " -- BUT " + fmt(lading_net_lb, 0) + " lb of this lading is more than the " + fmt(cube_limited_weight_lb, 0) + " lb the car holds at the entered density; check the lading weight or the density" : "")
     : "OVERLOADED: " + fmt(gross_on_rail_lb, 0) + " lb on rail against a " + fmt(gross_rail_load_lb, 0) + " lb car, " + fmt(gross_on_rail_lb - gross_rail_load_lb, 0) + " lb over";
   const route_verdict = within_route === null
     ? "Enter the route's maximum gross rail load. It is frequently below the car's, and the difference is invisible on the car."
