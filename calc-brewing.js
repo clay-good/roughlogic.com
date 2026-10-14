@@ -105,6 +105,7 @@ export function computeMashStrikeWater({ grain_weight_lb = 0, mash_thickness_qt_
   // T_strike = T_mash + (c_grain / (lb water per qt x R)) x (T_mash - T_grain).
   const strike_ratio = grain_specific_heat / lb_water_per_qt;
   const strike_temp_f = target_mash_temp_f + strike_ratio * (target_mash_temp_f - grain_temp_f) / mash_thickness_qt_per_lb;
+  if (strike_temp_f > 212) return { error: "This mash would need strike water at " + fmt(strike_temp_f, 0) + " deg F, above boiling; raise the water-to-grain ratio, warm the grain, or lower the mash temperature." };
   const convention_strike_temp_f = target_mash_temp_f + 0.2 * (target_mash_temp_f - grain_temp_f) / mash_thickness_qt_per_lb;
   // The tun then takes heat from the WHOLE mash -- water AND grain -- to a
   // common equilibrium. spec-v1776 divides the tun's demand by the water's heat

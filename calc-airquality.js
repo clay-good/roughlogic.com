@@ -350,7 +350,7 @@ export function computeBaghouseCleaningInterval({
       ? "the cycle has shortened " + fmt(-cycle_change_pct, 0) + "%, from " + fmt(original_pulses_per_day, 0) + " to " + fmt(pulses_per_day, 0) + " pulses a day -- more compressed air, more fabric flexing, and shorter bag life, all as a consequence of the smaller working range"
       : "the cycle is at or longer than it was, at " + fmt(pulses_per_day, 0) + " pulses a day";
   // Over-cleaning, which is the opposite error and is what timers produce.
-  const is_timer = cleaning_mode === "timer";
+  const is_timer = String(cleaning_mode).toLowerCase() === "timer";
   const mode_verdict = is_timer
     ? "TIMER cleaning pulses bags that did not need it: the residual dust cake that does most of the fine filtration is removed, emissions rise briefly after each pulse, the fabric is flexed more often and fails sooner, and compressed air is spent for nothing. On-demand cleaning triggered by differential pressure avoids all four"
     : "ON-DEMAND cleaning triggered by differential pressure is the preferred mode, and it is what makes the baseline readable in the first place";
@@ -1045,6 +1045,10 @@ export function computeGaussianDispersionScreen({
     const c = concAt(x, cls) * 1e6;
     if (c > max_concentration_ug_m3) { max_concentration_ug_m3 = c; max_distance_km = x; }
   }
+  // The sweep runs 0.05 to 50 km. A point entered outside it can be higher than
+  // anything inside (a tall stack in stable air peaks beyond 50 km), and the
+  // "maximum" must not read lower than the figure printed beside it.
+  if (concentration_ug_m3 > max_concentration_ug_m3) { max_concentration_ug_m3 = concentration_ug_m3; max_distance_km = distance_km; }
   const at_max = distance_km >= max_distance_km * 0.9 && distance_km <= max_distance_km * 1.1;
   const max_verdict = "the maximum for class " + cls + " is " + fmt(max_concentration_ug_m3, 1)
     + " micrograms per cubic metre at about " + fmt(max_distance_km / 1.609344, 2) + " miles"
@@ -1142,6 +1146,8 @@ export function computeNoiseBarrierInsertionLoss({
   // Either enter the path difference, or the three legs it comes from.
   const has_geometry = source_to_top_ft > 0 && top_to_receiver_ft > 0 && source_to_receiver_ft > 0;
   const geometric_difference = has_geometry ? (source_to_top_ft + top_to_receiver_ft) - source_to_receiver_ft : 0;
+  // Three sides of a triangle: neither leg over the barrier can be longer than the other two put together.
+  if (has_geometry && (source_to_top_ft > top_to_receiver_ft + source_to_receiver_ft || top_to_receiver_ft > source_to_top_ft + source_to_receiver_ft || geometric_difference < 0)) return { error: "These three distances do not make a triangle; check the source-to-top, top-to-receiver and straight-line distances (ft)." };
   if (has_geometry && geometric_difference < 0) return { error: "The over-the-top path cannot be shorter than the direct path -- check the three distances." };
   const delta = has_geometry ? geometric_difference : path_difference_ft;
   if (!(delta >= 0)) return { error: "Enter a path difference, or the three distances it comes from." };

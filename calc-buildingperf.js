@@ -563,7 +563,7 @@ export function computeCazDepressurizationLimit({
   const governing_limit_pa = weakest.limit;
   const margin_pa = governing_limit_pa - measured;
   const passes = measured <= governing_limit_pa + 1e-9 * Math.abs(governing_limit_pa);
-  const per_appliance = present.map((a) => a.name + " " + fmt(a.limit, 1) + " Pa " + (measured <= a.limit ? "pass by " + fmt(a.limit - measured, 1) : "FAIL by " + fmt(measured - a.limit, 1))).join("; ");
+  const per_appliance = present.map((a) => a.name + " " + fmt(a.limit, 1) + " Pa " + (measured <= a.limit + 1e-9 ? "pass by " + fmt(a.limit - measured, 1) : "FAIL by " + fmt(measured - a.limit, 1))).join("; ");
   const verdict = passes
     ? "the zone PASSES: " + fmt(measured, 1) + " Pa against the governing " + fmt(governing_limit_pa, 1) + " Pa limit for the " + weakest.name + ", with " + fmt(margin_pa, 1) + " Pa of margin"
     : "the zone FAILS: " + fmt(measured, 1) + " Pa against the governing " + fmt(governing_limit_pa, 1) + " Pa limit for the " + weakest.name + ", over by " + fmt(-margin_pa, 1) + " Pa";

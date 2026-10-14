@@ -527,7 +527,7 @@ export function computeTrunkDecayStrength({ diameter_in = 0, shell_thick_in = 0 
   const hollow_d_in = D - 2 * t;
   const loss_pct = (Math.pow(hollow_d_in, 3) / Math.pow(D, 3)) * 100;
   const t_over_r = t / (D / 2);
-  const concern = t_over_r < 0.30;
+  const concern = t_over_r < 0.30 * (1 - 1e-9);
   // spec-v1695 trunk-strength-loss was CUT here rather than built: it is the
   // same screen in the other convention. Wagener's CUBE above is the named
   // arborist rule; the SECTION MODULUS of a hollow circle gives the fourth

@@ -437,7 +437,7 @@ export function computeCableJettingDistance({ duct_id_mm = 0, cable_od_mm = 0, f
   const base = solve(cable_od_mm);
   const optimal_cable_od_mm = duct_id_mm * optimal_fill_pct / 100;
   const optimal = solve(optimal_cable_od_mm);
-  const fill_status = base.fill_ratio_pct < fill_min_pct ? "BELOW WINDOW" : base.fill_ratio_pct > fill_max_pct ? "ABOVE WINDOW" : "IN WINDOW";
+  const fill_status = base.fill_ratio_pct < fill_min_pct * (1 - 1e-9) ? "BELOW WINDOW" : base.fill_ratio_pct > fill_max_pct * (1 + 1e-9) ? "ABOVE WINDOW" : "IN WINDOW";
   return {
     fill_ratio_pct: base.fill_ratio_pct,
     area_fill_pct: base.area_fill_pct,

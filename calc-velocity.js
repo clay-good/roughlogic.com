@@ -39,6 +39,7 @@ export function computeDuctVelocityPressure({ solve_for = "velocity", vp_inwc = 
   const kd = _v23hVelocityK(air_density_lb_ft3);
   if (!kd) return { error: _V23H_DENSITY_ERROR };
   const K = kd.K;
+  if (solve_for !== "vp" && solve_for !== "velocity") return { error: "Solve for velocity or vp." };
   if (solve_for === "vp") {
     const v = Number(velocity_fpm) || 0;
     if (!(v > 0 && Number.isFinite(v))) return { error: "Air velocity must be positive (fpm)." };

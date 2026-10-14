@@ -864,7 +864,7 @@ export function computeSpeakerImpedance({ topology, z_ohm, count, series_per_bra
   }
   if (!(z_total_ohm > 0)) return { error: "Computed network impedance is not positive." };
   let safe = null;
-  if (amp_min_ohm > 0) safe = z_total_ohm >= amp_min_ohm;
+  if (amp_min_ohm > 0) safe = z_total_ohm >= amp_min_ohm * (1 - 1e-9); // three 6.6 ohm boxes are 2.2 ohm, not 2.1999999999999997
   let per_driver_power_w = null;
   if (power_w > 0 && n_drivers >= 1) per_driver_power_w = power_w / n_drivers;
   return { z_total_ohm, n_drivers, safe, per_driver_power_w };

@@ -61492,3 +61492,36 @@ test("hardening slice 40 (deferred findings: vent relation range, grade float, R
   assert.ok(computePcrMix({ number_of_reactions: 8, components: [{ name: "a", per_reaction: -12.5 }] }).error);
   assert.ok(computePcrMix({ number_of_reactions: 8, components: [null] }).error);
 });
+
+test("hardening slice 41 (exact-limit verdicts, dispersion maximum, barrier triangle, strike above boiling)", async () => {
+  const { readFileSync } = await import("node:fs");
+  const rows = JSON.parse(readFileSync(new URL("../fixtures/worked-examples.json", import.meta.url), "utf8")).rows;
+  const { COMPUTE_MAP } = await import("../fixtures/compute-map.js");
+  const run = async (id, over = {}) => {
+    const reg = COMPUTE_MAP[id];
+    const fn = (await import(new URL(reg.module, new URL("../fixtures/", import.meta.url)).href))[reg.fn];
+    return fn({ ...rows.find((r) => r.tile_id === id).inputs, ...over });
+  };
+  // three 6.6 ohm boxes are 2.2 ohm
+  assert.equal((await run("speaker-impedance", { z_ohm: 6.6, count: 3, amp_min_ohm: 2.2 })).safe, true);
+  assert.equal((await run("speaker-impedance", { z_ohm: 6.6, count: 3, amp_min_ohm: 2.3 })).safe, false);
+  // exactly one lift per period is not over the rating
+  const hoist = await run("chain-hoist-lift-time", { lift_height_ft: 5.4, hoist_speed_fpm: 18, duty_cycle: 0.3, rating_period_min: 1 });
+  assert.ok(!/over the rating/.test(hoist.verdict), hoist.verdict);
+  assert.ok(/over the rating/.test((await run("chain-hoist-lift-time", { lift_height_ft: 6, hoist_speed_fpm: 18, duty_cycle: 0.3, rating_period_min: 1 })).verdict));
+  // an exact 80% fill is inside the window
+  assert.equal((await run("cable-jetting-distance", { duct_id_mm: 5.5, cable_od_mm: 4.4 })).fill_status, "IN WINDOW");
+  // t/R of exactly 0.30 is at the threshold, not under it
+  assert.equal((await run("trunk-decay-strength", { diameter_in: 6.7, shell_thick_in: 1.005 })).concern, false);
+  assert.equal((await run("trunk-decay-strength", { diameter_in: 6.7, shell_thick_in: 0.9 })).concern, true);
+  // the maximum is never below the entered point
+  const far = await run("gaussian-dispersion-screen", { effective_height_ft: 600, stability_class: "F", distance_mi: 60 });
+  assert.ok(far.max_concentration_ug_m3 >= far.concentration_ug_m3);
+  const near = await run("gaussian-dispersion-screen");
+  assert.ok(near.max_concentration_ug_m3 > near.concentration_ug_m3);
+  // errors
+  assert.ok((await run("noise-barrier-insertion-loss", { source_to_top_ft: 10, top_to_receiver_ft: 2, source_to_receiver_ft: 5 })).error);
+  assert.ok(!(await run("noise-barrier-insertion-loss")).error);
+  assert.ok((await run("mash-strike-water", { target_mash_temp_f: 205 })).error);
+  assert.ok((await run("duct-velocity-pressure", { solve_for: "bogus" })).error);
+});

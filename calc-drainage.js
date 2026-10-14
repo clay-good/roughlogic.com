@@ -379,7 +379,7 @@ export function computeSewageForceMainVelocity({ gpm = 0, id_in = 0 } = {}) {
   const velocity_fps = 0.4085 * q / (id * id);
   const d_max_scour_in = Math.sqrt(0.4085 * q / 2);
   return {
-    velocity_fps, d_max_scour_in, scours: velocity_fps >= 2.0,
+    velocity_fps, d_max_scour_in, scours: velocity_fps >= 2.0 * (1 - 1e-9),
     note: "Sewage force-main scour velocity: V = 0.4085 Q / d^2 (ft/s, Q in gpm, d in inches). A minimum of about 2 ft/s at the design flow is needed to scour the pipe and keep solids in suspension (Ten States Standards); below it grit and grease settle and the main fouls. The largest inside diameter that still holds 2 ft/s at this flow = sqrt(0.4085 Q / 2). An upper limit near 8 ft/s avoids high headloss and protects valves (Ten States 49.1). Ten States also sets a 4 in minimum for a raw-wastewater force main; a smaller main (like a 2 in grinder-pump line) is outside that rule. A design aid; the state design criteria and the pump curve govern.",
   };
 }
@@ -511,7 +511,7 @@ export function computeManningSlope({ pipe_diameter_in = 0, target_flow_gpm = 0,
   // whether it clears the entered scour requirement.
   const actual_slope = actual_slope_in_per_ft / 12;
   const actual_velocity_fps = actual_slope > 0 ? (1.486 / n) * Math.pow(R_ft, 2 / 3) * Math.sqrt(actual_slope) : 0;
-  const scours = actual_velocity_fps >= scour_velocity_fps;
+  const scours = actual_velocity_fps >= scour_velocity_fps * (1 - 1e-9); // its own self-cleansing slope gave 1.9999999999999998 ft/s
   const slope_shortfall_in_per_ft = Math.max(0, slope_self_cleansing * 12 - actual_slope_in_per_ft);
   return {
     slope_self_cleansing,
@@ -652,7 +652,7 @@ export function computePipePartialFlowDepth({ d_in = 0, slope = 0, flow_gpm = 0,
   const depth_in = depth_ft * 12;
   const d_over_d = depth_ft / d_ft;
   const v_fps = q_cfs / a_ft2;
-  const self_cleansing = v_fps >= 2;
+  const self_cleansing = v_fps >= 2 * (1 - 1e-9);
   // Tractive (boundary) shear stress: tau = gamma R S, gamma = 62.4 lb/ft^3.
   const shear_psf = 62.4 * r_ft * slope;
   return {

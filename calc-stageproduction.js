@@ -430,9 +430,9 @@ export function computeChainHoistLiftTime({ lift_height_ft = 0, hoist_speed_fpm 
   const set_hp = hoisting_hp * hoists;
   const allowed_on_time_min = duty_cycle * rating_period_min;
   const lifts_per_period = allowed_on_time_min / lift_time_min;
-  const verdict = lifts_per_period >= 2
+  const verdict = lifts_per_period >= 2 * (1 - 1e-9)
     ? "room to spare: the rating allows at least two full lifts per period"
-    : lifts_per_period >= 1
+    : lifts_per_period >= 1 - 1e-9
       ? "only " + lifts_per_period.toFixed(1) + " lifts per period and no margin: a rig that has to come in and out twice inside the period is asking the motor for more than its rating"
       : "over the rating: a single full-height lift exceeds the allowed on-time, so the motor cannot make the trim in one press without exceeding its duty cycle";
   if (![lift_time_min, hoisting_hp, set_hp, allowed_on_time_min, lifts_per_period].every(Number.isFinite)) return { error: "Chain-hoist duty math is not a finite value." };
