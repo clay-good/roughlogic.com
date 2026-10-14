@@ -61525,3 +61525,42 @@ test("hardening slice 41 (exact-limit verdicts, dispersion maximum, barrier tria
   assert.ok((await run("mash-strike-water", { target_mash_temp_f: 205 })).error);
   assert.ok((await run("duct-velocity-pressure", { solve_for: "bogus" })).error);
 });
+
+test("hardening slice 42 (fill capped at the body, fleet at the loads, shear exponent, droop float, option names)", async () => {
+  const { readFileSync } = await import("node:fs");
+  const rows = JSON.parse(readFileSync(new URL("../fixtures/worked-examples.json", import.meta.url), "utf8")).rows;
+  const { COMPUTE_MAP } = await import("../fixtures/compute-map.js");
+  const run = async (id, over = {}) => {
+    const reg = COMPUTE_MAP[id];
+    const fn = (await import(new URL(reg.module, new URL("../fixtures/", import.meta.url)).href))[reg.fn];
+    return fn({ ...rows.find((r) => r.tile_id === id).inputs, ...over });
+  };
+  // legal fill cannot exceed the body
+  const truck = await run("collection-vehicle-payload", { gvwr_lb: 60000 });
+  assert.equal(truck.legal_fill_cy, 25); // the 25 cy body, not 65 cy
+  assert.equal(truck.legal_fill_share_pct, 100);
+  // one trailer per load at most
+  const ts = await run("transfer-station-throughput", { trailer_round_trip_hr: 30 });
+  assert.ok(ts.trailer_fleet <= ts.trailer_loads_per_day);
+  assert.ok(!(await run("transfer-station-throughput")).error);
+  // sparge
+  assert.ok((await run("sparge-water-volume", { alternative_grain_weight_lb: 3000 })).error);
+  // shear exponent from levels too close together
+  assert.ok((await run("wind-shear-hub-height", { second_height_ft: 159 })).error);
+  assert.ok(!(await run("wind-shear-hub-height")).error);
+  // a unit at exactly no load is not motoring
+  assert.equal((await run("generator-droop-load-share", { load_kw: 80 })).verdict, "every unit within its rating");
+  assert.ok((await run("generator-droop-load-share", { unit2_no_load_hz: 70, load_kw: 100 })).error);
+  // option names
+  const L = await import("../../calc-layout.js");
+  assert.ok(L.computeThreadPitch({ thread_standard: "whitworth", tpi: 20 }).error);
+  assert.ok(L.computeThreadPitch({ tpi: 20, starts: 1.5 }).error);
+  assert.equal(L.computeThreadPitch({ tpi: 20 }).pitch_in, 0.05);
+  assert.ok(L.computeSineBar({ solve_for: "banana", stack_height_in: 1 }).error);
+  assert.ok(L.computeCenterOfGravity2Point({ mode: "banana", span_ft: 10, reading_1_lb: 5, reading_2_lb: 5 }).error);
+  assert.ok(L.computePolygonMiter({ sides: 6, size_mode: "banana", size_in: 5 }).error);
+  assert.equal(L.computePolygonMiter({ sides: 6, size_in: 5 }).side_in, 5);
+  assert.ok(L.computeEqualSpacing({ run_in: 100, item_width_in: 2, mode: "banana", max_gap_in: 4 }).error);
+  const { computeSerialDilution } = await import("../../calc-lab.js");
+  assert.ok(computeSerialDilution({ starting_concentration: 1, dilution_factor: 10, volume_per_tube: 1, number_of_steps: 2.5 }).error);
+});

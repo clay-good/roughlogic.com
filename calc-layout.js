@@ -49,6 +49,7 @@ export function computeCenterOfGravity2Point({ mode = "two-scale-weigh", reading
   const L = Number(span_ft);
   if (!(L > 0)) return { error: "Distance between the two points must be positive (ft)." };
 
+  if (!["two-scale-weigh", "pick-point-from-cg"].includes(String(mode))) return { error: "Unknown mode; use two-scale-weigh or pick-point-from-cg." };
   if (mode === "pick-point-from-cg") {
     const W = Number(total_weight_lb);
     const x = Number(cg_from_1_ft);
@@ -454,6 +455,7 @@ export function computeSineBar({ solve_for = "angle", bar_length_in = 5, stack_h
   const _g = _finiteGuard({ bar_length_in, stack_height_in, target_angle_deg }); if (_g) return _g;
   const L = Number(bar_length_in) || 0;
   if (!(L > 0)) return { error: "Sine bar length must be positive (in)." };
+  if (!["angle", "stack"].includes(String(solve_for))) return { error: "Unknown solve-for; use angle or stack." };
   const mode = String(solve_for) === "stack" ? "stack" : "angle";
   let angle_deg, stack_in;
   if (mode === "stack") {
@@ -513,7 +515,9 @@ const _V38_COS30 = Math.sqrt(3) / 2; // = 0.8660254037844386
 // dims: in { thread_standard: dimensionless, tpi: L^-1, pitch_mm: L, starts: dimensionless } out: { pitch_in: L, pitch_mm: L, tpi: L^-1, lead_in: L, lead_mm: L, sharp_v_height_in: L, sharp_v_height_mm: L }
 export function computeThreadPitch({ thread_standard = "inch", tpi = 0, pitch_mm = 0, starts = 1 } = {}) {
   const _g = _finiteGuard({ tpi, pitch_mm, starts }); if (_g) return _g;
+  if (!["inch", "metric"].includes(String(thread_standard))) return { error: "Unknown thread standard; use inch or metric." };
   const isMetric = String(thread_standard) === "metric";
+  if (!Number.isInteger(Number(starts) || 1)) return { error: "Number of thread starts must be a whole number." };
   const n = Math.round(Number(starts) || 1);
   if (!(n >= 1)) return { error: "Number of thread starts must be 1 or more." };
   let pitch_in, pmm, threadsPerInch;
@@ -797,6 +801,7 @@ export function computePolygonMiter({ sides = 0, size_mode = "side", size_in = 0
   if (N > 360) return { error: "Number of sides must be 360 or fewer." };
   const D = Number(size_in) || 0;
   if (!(D > 0)) return { error: "The size dimension must be positive (in)." };
+  if (!["side", "flats", "corners"].includes(String(size_mode))) return { error: "Unknown size mode; use side or flats or corners." };
   const mode = String(size_mode);
   const half = Math.PI / N;
   let side;
@@ -865,6 +870,7 @@ export function computeEqualSpacing({ run_in = 0, item_width_in = 0, mode = "max
   const w = Number(item_width_in) || 0;
   if (!(run > 0)) return { error: "Run length must be positive (in)." };
   if (w < 0) return { error: "Item width cannot be negative (use 0 for layout marks / division points)." };
+  if (!["max-gap", "count"].includes(String(mode))) return { error: "Unknown mode; use max-gap or count." };
   const m = String(mode) === "count" ? "count" : "max-gap";
   let N;
   if (m === "count") {

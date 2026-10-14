@@ -332,13 +332,14 @@ export function computeGeneratorDroopLoadShare({ unit1_kw = 0, unit1_droop_pct =
   const p = units.map(([, , fnl], i) => k[i] * (fnl - bus_hz));
   const pct = units.map(([kw], i) => 100 * p[i] / kw);
   const overloaded = units.map(([kw], i) => p[i] > kw * (1 + 1e-12));
-  const motoring = p.map((v) => v < 0);
+  const motoring = p.map((v, i) => v < -1e-9 * units[i][0]); // an exact no-load share computed -3.9e-13 kW
   // As load rises the bus frequency falls; the first unit to reach its rating
   // is the one whose full-load frequency is highest.
   const full_hz = units.map(([kw, , fnl], i) => fnl - kw / k[i]);
   const first_full_bus_hz = Math.max(...full_hz);
   const first_full_index = full_hz.indexOf(first_full_bus_hz);
   const first_full_load_kw = units.reduce((s, [, , fnl], i) => s + k[i] * (fnl - first_full_bus_hz), 0);
+  if (first_full_load_kw < 0) return { error: "These no-load frequencies are too far apart to share load: one unit reaches its rating while the other is still being driven. Bring the setpoints together." };
   const tied = full_hz.filter((f) => Math.abs(f - first_full_bus_hz) <= 1e-9 * first_full_bus_hz).length;
   // Matched comparison: every unit at the mean of the entered droops and the
   // no-load setpoint that gives rated frequency at full load.

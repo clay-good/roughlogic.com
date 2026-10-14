@@ -1191,7 +1191,7 @@ function renderSearchProbability(inputRegion, outputRegion, citationEl) {
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
     const list = String(pods.input.value).split(/[,;\s]+/).map((s) => s.trim()).filter(Boolean).map(Number).slice(0, 5);
-    const r = computeSearchProbability({ pod_list: list, poa_pct: readNum(poa.input) });
+    const r = computeSearchProbability({ pod_list: list, poa_pct: poa.input.value === "" ? 100 : readNum(poa.input) });
     if (r.error) { oCum.textContent = r.error; oPos.textContent = ""; oNote.textContent = ""; return; }
     oCum.textContent = fmt(r.cumulative_pod_pct, 1) + "% over " + r.passes + " pass(es)";
     oPos.textContent = fmt(r.pos_pct, 1) + "% (residual containment " + fmt(r.residual_pct, 1) + "%)";

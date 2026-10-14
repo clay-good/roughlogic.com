@@ -178,6 +178,8 @@ export function computeSpargeWaterVolume({ grain_weight_lb = 0, mash_thickness_q
   if (!(base.first_runnings_gal > 0)) return { error: "The grain absorbs all of the mash water; there are no first runnings at this thickness." };
   if (!(base.sparge_gal >= 0)) return { error: "The first runnings already exceed the pre-boil target; no sparge is needed and the mash is too thin for this volume." };
   const alt = volumesFor(alternative_grain_weight_lb);
+  if (!(alt.sparge_gal >= 0)) return { error: "At the alternative grain bill the first runnings already exceed the pre-boil target, leaving no sparge; lower the alternative grain weight." };
+  if (!(base.sparge_gal > 0)) return { error: "The first runnings exactly meet the pre-boil target, so there is no sparge to compare; this is a no-sparge mash." };
   return {
     grain_weight_lb, alternative_grain_weight_lb, preboil_volume_gal,
     mash_water_gal: base.mash_water_gal,

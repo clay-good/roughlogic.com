@@ -451,7 +451,8 @@ export function computeTransferStationThroughput({ daily_tons = 0, operating_hou
   const average_positions = Math.ceil(average_arrivals_per_hour * floor_time_min / MIN_PER_HOUR - 1e-9);
   const trailer_loads_per_day = Math.ceil(daily_tons / trailer_payload_tons - 1e-9);
   const loads_per_trailer = operating_hours / trailer_round_trip_hr;
-  const trailer_fleet = Math.ceil(trailer_loads_per_day / loads_per_trailer - 1e-9);
+  // A trailer away longer than the operating day still hauls one load, so the fleet never exceeds the loads (30 h trips read 111 trailers for 37 loads).
+  const trailer_fleet = Math.min(trailer_loads_per_day, Math.ceil(trailer_loads_per_day / loads_per_trailer - 1e-9));
   const surge_tons = average_tons_per_hour * loadout_delay_hr;
   const surge_cy = surge_tons * LB_PER_TON / loose_density_lb_per_cy;
   const surge_footprint_sqft = surge_cy * CU_FT_PER_CU_YD / pile_depth_ft;
@@ -743,8 +744,9 @@ export function computeCollectionVehiclePayload({ body_volume_cy = 0, loose_dens
     return {
       in_body_density_lb_per_cy, body_payload_lb, chassis_payload_lb, chassis_governs,
       governing_payload_lb: Math.min(body_payload_lb, chassis_payload_lb),
-      legal_fill_cy: chassis_payload_lb / in_body_density_lb_per_cy,
-      legal_fill_share_pct: 100 * (chassis_payload_lb / in_body_density_lb_per_cy) / body_cy,
+      // The body is the other limit: a light load fills it before the chassis is at weight (65 cy "legal" in a 25 cy body).
+      legal_fill_cy: Math.min(body_cy, chassis_payload_lb / in_body_density_lb_per_cy),
+      legal_fill_share_pct: 100 * Math.min(body_cy, chassis_payload_lb / in_body_density_lb_per_cy) / body_cy,
       overload_lb: Math.max(0, body_payload_lb - chassis_payload_lb),
       overload_pct_of_gvwr: 100 * Math.max(0, body_payload_lb - chassis_payload_lb) / gvwr,
       headroom_lb: Math.max(0, chassis_payload_lb - body_payload_lb),

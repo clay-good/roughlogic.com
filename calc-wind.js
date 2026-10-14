@@ -219,6 +219,8 @@ export function computeWindShearHubHeight({ measured_speed_mph = 0, measured_hei
   // Two anemometer levels on the same mast give the exponent by measurement,
   // which is worth far more than any table -- and is why met masts carry them.
   const derived_exponent = Math.log(second_speed_mph / measured_speed_mph) / Math.log(second_height_ft / measured_height_ft);
+  // Two levels a foot apart turn anemometer scatter into an exponent of 20 and a 38-million-mph hub speed.
+  if (Number.isFinite(derived_exponent) && Math.abs(derived_exponent) > 1) return { error: "The two anemometer levels give a shear exponent of " + fmt(derived_exponent, 1) + ", outside anything the atmosphere does (about 0.05 to 0.6); the heights are too close together or a reading is wrong." };
   const derived_hub_speed_mph = measured_speed_mph * Math.pow(height_ratio, derived_exponent);
   // Extrapolating much past twice the measurement height is not defensible.
   const extrapolation_ratio = height_ratio;

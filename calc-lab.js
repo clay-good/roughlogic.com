@@ -167,6 +167,7 @@ export function computeSerialDilution({
   if (!(dilution_factor > 1)) return { error: "Dilution factor must be > 1." };
   if (!(volume_per_tube > 0)) return { error: "Volume per tube must be positive." };
   if (!(number_of_steps >= 1)) return { error: "Need at least one step." };
+  if (!Number.isInteger(Number(number_of_steps))) return { error: "The number of steps must be a whole number." };
   // Bound the tube array: number_of_steps = Infinity would allocate without
   // limit and exhaust memory (v18 C-6/D-6). 1,000 steps is far beyond any
   // real serial dilution.
@@ -874,7 +875,7 @@ function renderVanDerWaals(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "vdw-out-note");
   const rd = (i) => (i.value === "" ? 0 : Number(i.value) || 0);
   const update = debounce(() => {
-    const r = computeVanDerWaals({ gas: gas.select.value, moles: rd(n.input), volume_l: rd(v.input), temperature_c: t.input.value === "" ? 0 : Number(t.input.value) });
+    const r = computeVanDerWaals({ gas: gas.select.value, moles: rd(n.input), volume_l: rd(v.input), temperature_c: t.input.value === "" ? 25 : Number(t.input.value) });
     if (r.error) { oReal.textContent = r.error; oIdeal.textContent = "-"; oZ.textContent = "-"; oNote.textContent = ""; return; }
     oReal.textContent = fmt(r.pressure_real_atm, 4) + " atm";
     oIdeal.textContent = fmt(r.pressure_ideal_atm, 4) + " atm";
