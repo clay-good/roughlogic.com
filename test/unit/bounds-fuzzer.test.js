@@ -3546,7 +3546,8 @@ test("bounds: calc-agriculture computeUniformity rejects < 4 readings / non-posi
 test("bounds: calc-agriculture computeBulkDensity pins density = dry_mass / core_volume and porosity = 1 - (bulk / particle), plus the per-texture compaction threshold", () => {
   // NRCS Soil Quality Indicators: Bulk Density, "restricts root growth" column.
   const thresholds = { sand: 1.80, sandy_loam: 1.80, loam: 1.80, silt_loam: 1.75, clay_loam: 1.75, silty_clay_loam: 1.65, clay: 1.47 };
-  for (const dry_mass_g of [100, 200, 400]) {
+  // 260 g, not 400: a core denser than its 2.65 g/cc particles is an error since 2026-10-13.
+  for (const dry_mass_g of [100, 200, 260]) {
     for (const core_volume_cc of [100, 150, 250]) {
       for (const [texture, threshold] of Object.entries(thresholds)) {
         const r = computeBulkDensity({ dry_mass_g, core_volume_cc, particle_density_pcc: 2.65, texture });
@@ -61312,4 +61313,35 @@ test("hardening slice 36 (comparison lines keep their direction when the alterna
   const { computeCarburizingCaseDepth } = await import("../../calc-inspection.js");
   const carb = text(computeCarburizingCaseDepth({ reference_case_in: 0.0707, reference_time_hr: 8, time_hr: 8, target_case_in: 0.1414, hotter_reference_case_in: 0.05 }));
   assert.ok(!neg.test(carb) && /% MORE, so the compared cycle is the slower one/.test(carb), carb);
+});
+
+test("hardening slice 37 (answers that cannot be negative)", async () => {
+  const H = await import("../../calc-hvac.js");
+  assert.ok(H.computeWetBulbPsychrometer({ dry_bulb_F: 160, wet_bulb_F: 67 }).error);
+  assert.ok(H.computeWetBulbPsychrometer({ dry_bulb_F: 80, wet_bulb_F: 67 }).GPP > 0);
+  assert.ok(H.computeOutdoorAirMix({ return_T_F: 375, return_RH_percent: 50, outdoor_T_F: 95, outdoor_RH_percent: 60, oa_fraction: 0.2 }).error);
+  assert.ok(H.computeOutdoorAirMix({ return_T_F: 75, return_RH_percent: 50, outdoor_T_F: 95, outdoor_RH_percent: 60, oa_fraction: 0.2 }).mixed_GPP > 0);
+  const { computeBulkDensity } = await import("../../calc-agriculture.js");
+  assert.ok(computeBulkDensity({ dry_mass_g: 1000, core_volume_cc: 150, particle_density_pcc: 2.65, texture: "loam" }).error);
+  assert.ok(computeBulkDensity({ dry_mass_g: 200, core_volume_cc: 150, particle_density_pcc: 2.65, texture: "loam" }).total_porosity > 0);
+  const { computeNitroxMod } = await import("../../calc-diving.js");
+  assert.ok(computeNitroxMod({ oxygen_fraction: 0.32, ppo2_limit: 0.28, contingency_ppo2_limit: 1.6, planned_depth_ft: 80 }).error);
+  // pure oxygen at 1.4 ata still has a depth: 33 x 0.4 = 13.2 ft
+  assert.ok(Math.abs(computeNitroxMod({ oxygen_fraction: 1, ppo2_limit: 1.4, contingency_ppo2_limit: 1.6, planned_depth_ft: 10, feet_per_atm: 33 }).mod_working_ft - 13.2) < 1e-9);
+  const { computeBlowdownHeatRecovery } = await import("../../calc-steamplant.js");
+  const bd = { steam_rate_lb_hr: 20000, cycles_of_concentration: 5, alt_cycles_of_concentration: 10, blowdown_liquid_enthalpy_btu_lb: 338.5, flash_liquid_enthalpy_btu_lb: 196.2, flash_latent_btu_lb: 960.2, makeup_temp_f: 60, heat_exchanger_effectiveness: 0.85, boiler_efficiency: 0.8, fuel_cost_per_mmbtu: 9, hours_per_year: 8000 };
+  assert.ok(computeBlowdownHeatRecovery({ ...bd, blowdown_liquid_enthalpy_btu_lb: 1692.5 }).error);
+  assert.ok(computeBlowdownHeatRecovery({ ...bd, blowdown_liquid_enthalpy_btu_lb: 150 }).error);
+  assert.ok(computeBlowdownHeatRecovery(bd).residual_liquid_lb_hr > 0);
+  const { computeRackFlueSpace } = await import("../../calc-warehouse.js");
+  const rack = { pallet_width_in: 48, pallet_depth_in: 48, pallets_per_bay: 2, transverse_gaps: 3, nominal_flue_in: 6, beam_length_in: 108, frame_depth_in: 42, back_to_back_spacing_in: 12, deeper_load_depth_in: 52 };
+  assert.ok(computeRackFlueSpace({ ...rack, pallet_depth_in: 96 }).error);
+  assert.equal(computeRackFlueSpace(rack).longitudinal_flue_in, 6);
+  const { computeVaporPressureDeficit } = await import("../../calc-greenhouse.js");
+  const vpd = { air_temp_f: 75, relative_humidity_pct: 65, leaf_offset_f: -2, alternative_leaf_offset_f: 3, alternative_humidity_pct: 80 };
+  assert.ok(computeVaporPressureDeficit({ ...vpd, leaf_offset_f: -20 }).error);
+  assert.ok(computeVaporPressureDeficit(vpd).leaf_vpd_kpa > 0);
+  const { computeConcreteEvaporationRate } = await import("../../calc-construction.js");
+  assert.equal(computeConcreteEvaporationRate({ air_temp_f: 180, concrete_temp_f: 90, rh_pct: 40, wind_mph: 15 }).E_us, 0);
+  assert.ok(computeConcreteEvaporationRate({ air_temp_f: 90, concrete_temp_f: 90, rh_pct: 40, wind_mph: 15 }).E_us > 0.2);
 });

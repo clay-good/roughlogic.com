@@ -1599,7 +1599,7 @@ function renderCulvertHeadwater(inputRegion, outputRegion, citationEl) {
     oGov.textContent = fmt(r.governing_hw_ft, 2) + " ft above the inlet invert (HW/D " + fmt(r.hw_over_d, Math.abs(r.hw_over_d - 1.5) < 0.005 && r.hw_over_d !== 1.5 ? 4 : 2) + (r.hw_over_d > 1.5 ? "; over 1.5 -- check the allowable headwater" : "") + ")";
     oCtl.textContent = r.control === "inlet" ? "INLET control governs (" + r.inlet_regime + ")" : "OUTLET control governs (barrel velocity " + fmt(r.outlet_velocity_fps, 1) + " fps)";
     oIn.textContent = fmt(r.inlet_hw_ft, 2) + " ft" + (r.control === "inlet" ? " (governs)" : "");
-    oOut.textContent = fmt(r.outlet_hw_ft, 2) + " ft" + (r.control === "outlet" ? " (governs)" : "");
+    oOut.textContent = r.outlet_hw_ft < 0 ? "below the inlet invert: the barrel falls further than it loses, so outlet control cannot govern" : fmt(r.outlet_hw_ft, 2) + " ft" + (r.control === "outlet" ? " (governs)" : "");
     oNote.textContent = r.note;
   }, DEBOUNCE_MS);
   for (const f of [dia, q, s, len, n, tw]) f.input.addEventListener("input", update);
@@ -1682,7 +1682,7 @@ function renderBoxCulvertHeadwater(inputRegion, outputRegion, citationEl) {
     oGov.textContent = fmt(r.governing_hw_ft, 2) + " ft above the inlet invert (HW/D " + fmt(r.hw_over_d, Math.abs(r.hw_over_d - 1.5) < 0.005 && r.hw_over_d !== 1.5 ? 4 : 2) + (r.hw_over_d > 1.5 ? "; over 1.5 -- check the allowable headwater" : "") + ")";
     oCtl.textContent = r.control === "inlet" ? "INLET control governs" : "OUTLET control governs (barrel velocity " + fmt(r.outlet_velocity_fps, 1) + " fps)";
     oIn.textContent = fmt(r.inlet_hw_ft, 2) + " ft" + (r.control === "inlet" ? " (governs)" : "");
-    oOut.textContent = fmt(r.outlet_hw_ft, 2) + " ft" + (r.control === "outlet" ? " (governs)" : "");
+    oOut.textContent = r.outlet_hw_ft < 0 ? "below the inlet invert: the barrel falls further than it loses, so outlet control cannot govern" : fmt(r.outlet_hw_ft, 2) + " ft" + (r.control === "outlet" ? " (governs)" : "");
     oNote.textContent = r.note;
   }, DEBOUNCE_MS);
   for (const f of [sp, ri, q, s, len, n, tw]) f.input.addEventListener("input", update);

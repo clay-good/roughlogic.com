@@ -246,6 +246,9 @@ export function computeNitroxMod({ oxygen_fraction = 0.32, ppo2_limit = 1.4, con
   if (!(contingency_ppo2_limit >= ppo2_limit)) return { error: "The contingency limit must be at or above the working limit." };
   if (!(planned_depth_ft > 0)) return { error: "Planned depth must be positive." };
   if (!(feet_per_atm > 0)) return { error: "Feet per atmosphere must be positive (33 seawater, 34 fresh)." };
+  // At the surface the mix is already at ppO2 = its own fraction, so a limit at or
+  // below that is a maximum operating depth above the water (0.28 ata on EAN32 read -4 ft).
+  if (!(ppo2_limit > oxygen_fraction)) return { error: "The working limit is at or below what this mix delivers at the surface; check the limit (ata) and the oxygen fraction." };
   const depth_ata = 1 + planned_depth_ft / feet_per_atm;
   const ppo2_at_depth = oxygen_fraction * depth_ata;
   const mod_working_ft = feet_per_atm * (ppo2_limit / oxygen_fraction - 1);

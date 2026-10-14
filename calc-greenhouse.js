@@ -380,6 +380,8 @@ export function computeVaporPressureDeficit({ air_temp_f = 0, relative_humidity_
   const leaf_saturation_kpa = _saturationKpa(_fToC(air_temp_f + leaf_offset_f));
   const leaf_vpd_kpa = leaf_saturation_kpa - actual_vapor_pressure_kpa;
   const air_vpd_kpa = air_saturation_kpa - actual_vapor_pressure_kpa;
+  // A leaf below the air's dew point has no deficit: water condenses on it.
+  if (leaf_vpd_kpa < -1e-12) return { error: "At this leaf temperature the leaf is below the air's dew point, so water condenses on it and there is no deficit to report. Check the leaf offset and the humidity." };
   const alternative_leaf_vpd_kpa = vpdAt(alternative_leaf_offset_f, actual_vapor_pressure_kpa);
   const humid_actual_kpa = air_saturation_kpa * alternative_humidity_pct / 100;
   const humid_leaf_vpd_kpa = leaf_saturation_kpa - humid_actual_kpa;
@@ -412,8 +414,8 @@ GREENHOUSE_RENDERERS["vapor-pressure-deficit"] = _simpleRenderer({
     { key: "air_vpd_kpa", id: "vpd-air", label: "What a room sensor would report", unit: "kPa", value: (r) => fmt(r.air_vpd_kpa, 4) + " kPa -- " + fmt(r.air_over_leaf_ratio, 2) + "x the leaf figure, " + fmt(r.air_over_leaf_pct, 0) + "% high" },
     { key: "air_saturation_kpa", id: "vpd-sat", label: "Saturation pressures", value: (r) => fmt(r.air_saturation_kpa, 4) + " kPa at air, " + fmt(r.leaf_saturation_kpa, 4) + " kPa at leaf" },
     { key: "actual_vapor_pressure_kpa", id: "vpd-act", label: "Actual vapour pressure", unit: "kPa", value: (r) => fmt(r.actual_vapor_pressure_kpa, 4) + " kPa" },
-    { key: "alternative_leaf_vpd_kpa", id: "vpd-alt", label: "At the alternative leaf offset", unit: "kPa", value: (r) => fmt(r.alternative_leaf_vpd_kpa, 4) + " kPa -- " + fmt(r.alternative_change_pct, 0) + "% change from a temperature the room sensor cannot see" },
-    { key: "humid_leaf_vpd_kpa", id: "vpd-hum", label: "At the alternative humidity", unit: "kPa", value: (r) => fmt(r.humid_leaf_vpd_kpa, 4) + " kPa -- " + fmt(r.humidity_change_pct, 0) + "% change; the humidity lever is the weaker one" },
+    { key: "alternative_leaf_vpd_kpa", id: "vpd-alt", label: "At the alternative leaf offset", unit: "kPa", value: (r) => r.alternative_leaf_vpd_kpa < 0 ? "no deficit: that leaf is below the dew point and condensation forms on it" : fmt(r.alternative_leaf_vpd_kpa, 4) + " kPa -- " + fmt(r.alternative_change_pct, 0) + "% change from a temperature the room sensor cannot see" },
+    { key: "humid_leaf_vpd_kpa", id: "vpd-hum", label: "At the alternative humidity", unit: "kPa", value: (r) => r.humid_leaf_vpd_kpa < 0 ? "no deficit: at that humidity the leaf is below the dew point and condensation forms on it" : fmt(r.humid_leaf_vpd_kpa, 4) + " kPa -- " + fmt(r.humidity_change_pct, 0) + "% change; the humidity lever is the weaker one" },
     { key: "note", id: "vpd-note", label: "Use", value: (r) => r.note },
   ],
   compute: computeVaporPressureDeficit,

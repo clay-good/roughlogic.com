@@ -296,8 +296,11 @@ test("Wet-bulb: returns numeric RH", () => {
 });
 
 test("Wet-bulb: RH bounded [0,100]", () => {
-  const r = computeWetBulbPsychrometer({ dry_bulb_F: 90, wet_bulb_F: 50 });
+  // 55 F, not 50: bone-dry 90 F air has a wet-bulb near 52.6 F, and a reading
+  // below it is an error since 2026-10-13 instead of RH 0 with a negative humidity ratio.
+  const r = computeWetBulbPsychrometer({ dry_bulb_F: 90, wet_bulb_F: 55 });
   assert.ok(r.RH_percent >= 0 && r.RH_percent <= 100);
+  assert.ok(computeWetBulbPsychrometer({ dry_bulb_F: 90, wet_bulb_F: 50 }).error);
 });
 
 // --- Utility 84: Insulation Thickness ---

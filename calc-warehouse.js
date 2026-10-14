@@ -547,6 +547,7 @@ export function computeRackFlueSpace({ pallet_width_in = 0, pallet_depth_in = 0,
   const deeper_load_overhang_in = overhangOf(deeper_load_depth_in);
   const longitudinal_flue_in = back_to_back_spacing_in - 2 * pallet_overhang_in;
   const deeper_load_longitudinal_flue_in = back_to_back_spacing_in - 2 * deeper_load_overhang_in;
+  if (longitudinal_flue_in < 0) return { error: "The loads overhang the frames by more than the row spacing allows: the two rows would overlap by " + fmt(-longitudinal_flue_in, 1) + " in. Check the pallet depth, the frame depth and the back-to-back spacing." };
   return {
     pallet_run_in, transverse_gaps, transverse_gap_total_in, transverse_gap_each_in,
     transverse_flue_pass: transverse_gap_each_in >= nominal_flue_in - 1e-9 * Math.abs(nominal_flue_in),
@@ -585,7 +586,7 @@ WAREHOUSE_RENDERERS["rack-flue-space"] = _simpleRenderer({
     { key: "flue_run_in", id: "rfs-run", label: "Beam length that is flue", unit: "in", value: (r) => fmt(r.flue_run_in, 0) + " in of every bay holds nothing at all -- which is what a flue is" },
     { key: "pallet_overhang_in", id: "rfs-over", label: "Overhang at each face", unit: "in", value: (r) => fmt(r.pallet_overhang_in, 1) + " in" },
     { key: "longitudinal_flue_in", id: "rfs-long", label: "Longitudinal flue", unit: "in", value: (r) => fmt(r.longitudinal_flue_in, 1) + " in -- " + (r.longitudinal_flue_pass ? "meets nominal" : fmt(r.longitudinal_flue_share_pct, 0) + "% of nominal") },
-    { key: "deeper_load_longitudinal_flue_in", id: "rfs-deep", label: "With the deeper load", unit: "in", value: (r) => fmt(r.deeper_load_longitudinal_flue_in, 1) + " in at " + fmt(r.deeper_load_overhang_in, 1) + " in overhang -- " + (r.deeper_load_flue_pass ? "still meets nominal" : fmt(r.deeper_load_flue_share_pct, 0) + "% of nominal") },
+    { key: "deeper_load_longitudinal_flue_in", id: "rfs-deep", label: "With the deeper load", unit: "in", value: (r) => r.deeper_load_longitudinal_flue_in < 0 ? "the deeper loads would overlap by " + fmt(-r.deeper_load_longitudinal_flue_in, 1) + " in across the rows -- they do not fit" : fmt(r.deeper_load_longitudinal_flue_in, 1) + " in at " + fmt(r.deeper_load_overhang_in, 1) + " in overhang -- " + (r.deeper_load_flue_pass ? "still meets nominal" : fmt(r.deeper_load_flue_share_pct, 0) + "% of nominal") },
     { key: "note", id: "rfs-note", label: "Use", value: (r) => r.note },
   ],
   compute: computeRackFlueSpace,

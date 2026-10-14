@@ -58,7 +58,6 @@ export const SIGNED_INPUTS = [
   "pv-string-sizing::record_high_C",
   "insulation-thickness::ambient_F",
   "psychrometric::temperature_F",
-  "wet-bulb-psychrometer::wet_bulb_F",
   "static-pressure-piping::elevation_change_ft",
   "cooling-curve::ambient_F",
   "utm-conversion::lat_deg",

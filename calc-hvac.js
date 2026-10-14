@@ -496,6 +496,9 @@ export function computeOutdoorAirMix({ return_T_F, return_RH_percent, outdoor_T_
   const oa_T_C = F_to_C(outdoor_T_F);
   const ra = psychrometric({ T_C: ra_T_C, RH_percent: return_RH_percent });
   const oa = psychrometric({ T_C: oa_T_C, RH_percent: outdoor_RH_percent });
+  // W = 0.622 e / (P - e) turns negative once the vapor pressure passes the
+  // barometer (375 F at 50% RH read -4,037 grains per pound).
+  if (![ra.W_kg_kg, oa.W_kg_kg].every((w) => Number.isFinite(w) && w >= 0)) return { error: "One of these air states has a vapor pressure above atmospheric, which moist air cannot hold; check the temperatures (F) and humidities." };
   const mixed_T_F = f * outdoor_T_F + (1 - f) * return_T_F;
   const mixed_W = f * oa.W_kg_kg + (1 - f) * ra.W_kg_kg;
   const mixed_GPP = mixed_W * 7000;
@@ -567,6 +570,8 @@ export function computeWetBulbPsychrometer({ dry_bulb_F, wet_bulb_F, P_hPa = 101
   const e_sw = saturationVaporPressure_hPa(Tw_C);
   const A = 0.000662; // 1/C
   const e = e_sw - A * P_hPa * (Td_C - Tw_C);
+  // 160 F dry over 67 F wet used to return -51 grains per pound and a dew point of -213 F.
+  if (!(e > 0)) return { error: "No air is that dry: a wet-bulb this far below the dry-bulb would need a negative vapor pressure. Check the two readings." };
   const e_sd = saturationVaporPressure_hPa(Td_C);
   const RH = Math.max(0, Math.min(100, (e / e_sd) * 100));
   // dew point from e:

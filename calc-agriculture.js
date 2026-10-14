@@ -319,6 +319,7 @@ export function computeBulkDensity({ dry_mass_g = 0, core_volume_cc = 0, particl
   if (!(particle_density_pcc > 0)) return { error: "Particle density must be positive." };
   const bulk_density = dry_mass_g / core_volume_cc;
   const total_porosity = 1 - (bulk_density / particle_density_pcc);
+  if (total_porosity < 0) return { error: "A bulk density of " + bulk_density.toFixed(2) + " g/cc is above the particle density, which leaves less than no pore space. Check the dry mass and the core volume." };
   const threshold = COMPACTION_THRESHOLDS_PCC[texture];
   if (!Number.isFinite(threshold)) return { error: "Unknown texture class." };
   const compacted = bulk_density > threshold;

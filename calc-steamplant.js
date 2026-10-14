@@ -366,6 +366,9 @@ export function computeBlowdownHeatRecovery({ steam_rate_lb_hr = 0, cycles_of_co
   // `flash-steam-pct`: the fraction is the enthalpy drop over the low-side
   // latent heat.
   const flash_fraction = (blowdown_liquid_enthalpy_btu_lb - flash_liquid_enthalpy_btu_lb) / flash_latent_btu_lb;
+  // More than all of the blowdown cannot flash, and less than none cannot either:
+  // a liquid enthalpy a latent heat above the flash tank's left -2,792 lb/hr of "liquid".
+  if (!(flash_fraction >= 0 && flash_fraction < 1)) return { error: "The flash fraction works out to " + fmt(flash_fraction * 100, 0) + "%. The blowdown liquid enthalpy must be at or above the flash-tank liquid enthalpy and less than one latent heat above it; check the three enthalpies (BTU/lb)." };
   const flash_steam_lb_hr = blowdown_lb_hr * flash_fraction;
   const flash_steam_enthalpy_btu_lb = flash_liquid_enthalpy_btu_lb + flash_latent_btu_lb;
   const flash_heat_btuh = flash_steam_lb_hr * (flash_steam_enthalpy_btu_lb - makeup_enthalpy_btu_lb);

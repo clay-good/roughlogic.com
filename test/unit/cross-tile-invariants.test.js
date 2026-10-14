@@ -3270,7 +3270,10 @@ test("monotonicity: computeBulkDensity bulk_density is strictly increasing in dr
   // dry mass. Pin both monotonicities AND the bulkDensityExample exact
   // identity: dry_mass=200 g / core_volume=150 cc -> bulk = 1.333... g/cc.
   let prev = -Infinity;
-  for (const m of [50, 100, 150, 200, 300, 500]) {
+  // The sweep stops at 390 g: 500 g in a 150 cc core is 3.33 g/cc, denser than
+  // the 2.65 g/cc particles themselves, which is an error since 2026-10-13
+  // (it used to report -26% porosity).
+  for (const m of [50, 100, 150, 200, 300, 390]) {
     const r = computeBulkDensity({ dry_mass_g: m, core_volume_cc: 150, particle_density_pcc: 2.65, texture: "loam" });
     assert.ok(Number.isFinite(r.bulk_density), `expected bulk at m=${m}: ${JSON.stringify(r)}`);
     assert.ok(r.bulk_density > prev, `bulk at m=${m} = ${r.bulk_density} not greater than prev=${prev}`);
@@ -3278,7 +3281,7 @@ test("monotonicity: computeBulkDensity bulk_density is strictly increasing in dr
   }
   // Inverse-in-volume sweep at fixed dry mass.
   let prevV = Infinity;
-  for (const v of [75, 100, 150, 200, 300, 500]) {
+  for (const v of [80, 100, 150, 200, 300, 500]) { // 80 cc, not 75: 200 g in 75 cc is denser than the particles
     const r = computeBulkDensity({ dry_mass_g: 200, core_volume_cc: v, particle_density_pcc: 2.65, texture: "loam" });
     assert.ok(r.bulk_density < prevV, `bulk at v=${v} = ${r.bulk_density} not less than prev=${prevV}`);
     prevV = r.bulk_density;
@@ -9038,7 +9041,11 @@ test("monotonicity: computeWetBulbPsychrometer RH_percent is strictly increasing
       `Td at WB=${wet_bulb_F} = ${r.dew_point_F}, expected < dry_bulb 80`);
   }
   // RH clamped to [0, 100] invariant.
-  for (const wet_bulb_F of [40, 50, 70, 79.9]) {
+  // 49 F, not 40: perfectly dry 80 F air has a wet-bulb near 48.6 F, and a
+  // reading below that is an error since 2026-10-13 (it used to return RH 0
+  // beside a negative humidity ratio and a dew point near -200 F).
+  assert.ok(computeWetBulbPsychrometer({ dry_bulb_F: 80, wet_bulb_F: 40 }).error);
+  for (const wet_bulb_F of [49, 50, 70, 79.9]) {
     const r = computeWetBulbPsychrometer({ dry_bulb_F: 80, wet_bulb_F });
     assert.ok(r.RH_percent >= 0 && r.RH_percent <= 100,
       `RH out of range at WB=${wet_bulb_F}: ${r.RH_percent}`);
