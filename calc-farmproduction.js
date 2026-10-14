@@ -544,6 +544,7 @@ export function computeTractorBallast({ power_hp = 180, weight_to_power_ratio = 
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(power_hp > 0)) return { error: "Engine / PTO power must be positive (hp)." };
   if (!(weight_to_power_ratio > 0)) return { error: "Weight-to-power ratio must be positive (lb/hp)." };
+  if (current_weight_lb === null || current_weight_lb === "") return { error: "Enter the tractor's current weight (lb)." };
   if (current_weight_lb < 0) return { error: "Current weight cannot be negative (lb)." };
   // Ballast to a target total weight = ratio x power; add (or, if negative, remove) to reach it.
   const target_weight_lb = weight_to_power_ratio * power_hp;

@@ -696,6 +696,7 @@ export function computeGateOperatorDuty({ gate_weight_lb = 0, rolling_coefficien
   const cycle_time_s = 2 * travel_time_s;
   const run_time_hr = cycles_per_day * cycle_time_s / 3600;
   const duty_cycle_pct = run_time_hr / operating_hours * 100;
+  if (duty_cycle_pct > 100 * (1 + 1e-9)) return { error: "These cycles need " + fmt(run_time_hr, 1) + " hours of running in a " + fmt(operating_hours, 1) + " hour day; check the cycles per day, the gate length and the operating hours." };
   const continuous_required = duty_cycle_pct > intermittent_duty_limit_pct * (1 + 1e-9); // exactly 10% computed 10.000000000000002
   return {
     rolling_force_lb, grade_force_lb, total_force_lb, force_margin_lb, force_ok,

@@ -753,6 +753,8 @@ export function computeProofGallonYield({ wash_volume_gal = 0, wash_abv_pct = 0,
     const wine_gallons = recovered_alcohol_gal / (proof / 200);
     return { wine_gallons, proof_gallons: wine_gallons * proof / 100 };
   };
+  // A still concentrates: spirit collected below the wash's own proof would be more liquid than went in.
+  if (collection_proof < 2 * wash_abv_pct || alternative_proof < 2 * wash_abv_pct) return { error: "A collection proof below the wash's own proof (" + fmt(2 * wash_abv_pct, 0) + ") is not a distillate; check the proof entries." };
   const collected = gaugeAt(collection_proof);
   const cut = gaugeAt(alternative_proof);
   const hearts_alcohol_gal = recovered_alcohol_gal * hearts_share_pct / 100;

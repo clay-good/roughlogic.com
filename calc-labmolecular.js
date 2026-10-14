@@ -42,6 +42,7 @@ export function computePrimerTm({ sequence = "", method = "auto" } = {}) {
   for (const b of cleaned) { if (b === "A") A++; else if (b === "T") T++; else if (b === "G") G++; else if (b === "C") C++; }
   const gc = G + C;
   const at = A + T;
+  if (!["auto", "wallace", "gc"].includes(method)) return { error: "Method must be auto, wallace, or gc." };
   let useMethod = method;
   if (method === "auto") useMethod = len <= 14 ? "wallace" : "gc";
   let tm;
@@ -196,7 +197,7 @@ export function computeNucleicAcidA260({ a260 = 0, na_type = "dsDNA", dilution_f
   const dil = Number(dilution_factor) || 0;
   const a2 = Number(a280) || 0;
   if (a < 0) return { error: "A260 must be non-negative." };
-  const factor = NUCLEIC_ACID_FACTORS[na_type];
+  const factor = Object.hasOwn(NUCLEIC_ACID_FACTORS, na_type) ? NUCLEIC_ACID_FACTORS[na_type] : undefined;
   if (!factor) return { error: "Nucleic-acid type must be dsDNA, ssDNA, oligo, or RNA." };
   if (!(dil > 0)) return { error: "Dilution factor must be positive." };
   const concentration_ng_ul = a * factor * dil;

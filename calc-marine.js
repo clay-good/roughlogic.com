@@ -252,6 +252,7 @@ export function computeBargeDraftDisplacement({ barge_length_ft = 0, beam_ft = 0
   // Draft in fresh water for the SAME displacement: the barge displaces the
   // same weight of a lighter fluid, so more of the hull goes under.
   const fresh_water_draft_ft = loaded_displacement_tons * LB_PER_TON / (waterplane_ft2 * fresh_water_density_pcf);
+  if (fresh_water_draft_ft > depth_ft) return { error: "At this load the barge draws " + fmt(fresh_water_draft_ft, 2) + " ft in fresh water, more than its " + fmt(depth_ft, 2) + " ft depth: the deck is under. Reduce the loaded draft." };
   return {
     waterplane_ft2, light_displacement_tons, loaded_displacement_tons, cargo_tons,
     tons_per_inch,

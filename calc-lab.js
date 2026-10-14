@@ -584,6 +584,10 @@ export function computePcrMix({
   if (!(number_of_reactions >= 1)) return { error: "Need at least one reaction." };
   if (!Array.isArray(components) || components.length === 0) return { error: "Provide at least one component." };
   if (!(fudge_factor_pct >= 0)) return { error: "Fudge factor cannot be negative." };
+  for (const c of components) {
+    if (!c || typeof c !== "object") return { error: "Each component needs a name and a per-reaction volume." };
+    if (Number(c.per_reaction) < 0) return { error: "A per-reaction volume cannot be negative." };
+  }
   const factor = number_of_reactions * (1 + fudge_factor_pct / 100);
   const rows = components.map((c) => ({
     name: c.name,

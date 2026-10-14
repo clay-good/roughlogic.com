@@ -117,7 +117,7 @@ Measured shapes for a split, 2026-08-29:
 
 Two constraints any split has to respect, both found by looking rather than by reasoning:
 
-- **`TOOLS` array order is load-bearing.** `constant-notes.js` decodes a bitmap positionally (`TOOLS.filter((t, i) => bit i)`), so 1,053 tiles' constant notes are keyed to catalog *position*, not id. An index shard preserves that; a per-group-only split would not. Reordering two tiles with different bits does flip the notes onto the wrong tiles, and `extract-constant-notes --check` correctly fails when it happens (verified by seeding exactly that swap; a swap between two tiles with the *same* bit correctly passes, because nothing changed).
+- **`TOOLS` array order is load-bearing.** `constant-notes.js` decodes a bitmap positionally (`TOOLS.filter((t, i) => bit i)`), so 1,620 tiles' constant notes are keyed to catalog *position*, not id. An index shard preserves that; a per-group-only split would not. Reordering two tiles with different bits does flip the notes onto the wrong tiles, and `extract-constant-notes --check` correctly fails when it happens (verified by seeding exactly that swap; a swap between two tiles with the *same* bit correctly passes, because nothing changed).
 - The largest group shard is 107 KB, so group E would want sub-shards the way `data/fields` already splits `e-1` / `e-2`.
 
 A third shape, measured 2026-08-30, that the group-shard analysis above did not try: **keep one catalog and put only the LEAD SENTENCE in it**, moving the rest of each description to the lazily-fetched shards.

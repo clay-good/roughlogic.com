@@ -166,6 +166,8 @@ export function computeRtdResistanceToTemp({ resistance_ohms = 119.397, r0_ohms 
       if (Math.abs(step) < 1e-12) break;
     }
   }
+  // IEC 60751 defines the curve from -200 to 850 C; 500 ohms on a Pt100 read 1,257 C.
+  if (temperature_c < -200.5 || temperature_c > 850.5) return { error: "That resistance is outside the -200 to 850 C range IEC 60751 defines for a platinum RTD; check the reading and R0 (100 or 1000)." };
   const temperature_f = temperature_c * 9 / 5 + 32;
   if (![temperature_c, temperature_f].every(Number.isFinite)) return { error: "RTD temperature math is not a finite value." };
   return {

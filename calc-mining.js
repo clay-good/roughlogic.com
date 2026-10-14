@@ -418,6 +418,7 @@ export function computeCrusherReductionRatio({ feed_size_in = 0, product_size_in
   if (!(product_size_in > 0)) return { error: "Product size must be positive." };
   if (!(feed_size_in > product_size_in)) return { error: "Feed size must exceed product size." };
   if (!(stages >= 1)) return { error: "Stage count must be at least 1." };
+  if (!Number.isInteger(Number(stages))) return { error: "Stage count must be a whole number." };
   if (!(machine_ratio_low > 1)) return { error: "The low end of the machine ratio range must exceed 1." };
   if (!(machine_ratio_high >= machine_ratio_low)) return { error: "The high end of the machine ratio range cannot be below the low end." };
   if (!(actual_intermediate_in > product_size_in)) return { error: "The measured intermediate size must exceed the product size." };
@@ -906,6 +907,9 @@ export function computeDustDeflagrationVentArea({ volume_cuft = 0, kst_bar_m_s =
   if (!(p_stat_psig > 0)) return { error: "Vent panel static activation pressure must be positive." };
   if (!(p_stat_psig < p_red_psig)) return { error: "The vent must open below the pressure the enclosure can hold." };
   if (!(length_to_diameter >= 1)) return { error: "Length-to-diameter ratio must be at least 1." };
+  // NFPA 68's dust relation is drawn for L/D up to 6 and a panel that opens at 0.75 bar or less.
+  if (length_to_diameter > 6) return { error: "The NFPA 68 vent relation covers length-to-diameter ratios up to 6; a longer enclosure needs a different method." };
+  if (p_stat_psig * _BAR_PER_PSI > 0.75 * (1 + 1e-9)) return { error: "The NFPA 68 vent relation covers panels that open at 0.75 bar (10.9 psig) or less." };
   if (!(stronger_p_red_psig > p_red_psig)) return { error: "The comparison strength must exceed the entered enclosure strength." };
   if (!(available_vent_area_sqft > 0)) return { error: "Available vent area must be positive." };
   const dust_class = kst_bar_m_s <= 200 ? "St1" : kst_bar_m_s <= 300 ? "St2" : "St3";

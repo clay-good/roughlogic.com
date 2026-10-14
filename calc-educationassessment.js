@@ -114,7 +114,9 @@ export function computeCategoryWeightedGrade({ categories = [] } = {}) {
   if (weightSum === 0) return { error: "No valid categories (each needs a positive weight and possible points)." };
   const overall = weightedSum / weightSum;
   let letter = "F";
-  if (overall >= 90) letter = "A"; else if (overall >= 80) letter = "B"; else if (overall >= 70) letter = "C"; else if (overall >= 60) letter = "D";
+  // 0.1 x 87 + 0.2 x 90 + 0.3 x 91 over 0.6 is 90 on paper and 89.99999999999999 in floats.
+  const band = overall + 1e-9;
+  if (band >= 90) letter = "A"; else if (band >= 80) letter = "B"; else if (band >= 70) letter = "C"; else if (band >= 60) letter = "D";
   return {
     overall_pct: Number.isFinite(overall) ? overall : null,
     letter,

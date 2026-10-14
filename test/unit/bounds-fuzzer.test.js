@@ -61448,3 +61448,47 @@ test("hardening slice 39 (deferred findings: spacer pass, shift length, permit h
   assert.ok(Math.abs(computeDuctStaticTotal({ components: [{ label: "filter", drop_in_wc: 0.1 }, { label: "coil", drop_in_wc: 0 }], rated_esp_in_wc: 0.5 }).total_esp_in_wc - 0.1) < 1e-12);
   assert.ok(computeBranchReinforcement({ ...ex("branch-reinforcement"), branch_od_in: 8.625, branch_wall_in: 0.322 }).error);
 });
+
+test("hardening slice 40 (deferred findings: vent relation range, grade float, RTD range, impossible drafts, duty, reflections)", async () => {
+  const { readFileSync } = await import("node:fs");
+  const rows = JSON.parse(readFileSync(new URL("../fixtures/worked-examples.json", import.meta.url), "utf8")).rows;
+  const { COMPUTE_MAP } = await import("../fixtures/compute-map.js");
+  const run = async (id, over = {}) => {
+    const reg = COMPUTE_MAP[id];
+    const fn = (await import(new URL(reg.module, new URL("../fixtures/", import.meta.url)).href))[reg.fn];
+    return fn({ ...rows.find((r) => r.tile_id === id).inputs, ...over });
+  };
+  // each example still answers, and each out-of-range entry is refused
+  for (const [id, over] of [
+    ["dust-deflagration-vent-area", { length_to_diameter: 20 }],
+    ["dust-deflagration-vent-area", { p_red_psig: 20, p_stat_psig: 15, stronger_p_red_psig: 30 }],
+    ["crusher-reduction-ratio", { stages: 2.5 }],
+    ["primer-tm", { method: "bogus" }],
+    ["nucleic-acid-a260", { na_type: "constructor" }],
+    ["proof-gallon-yield", { collection_proof: 10 }],
+    ["gate-operator-duty-cycle", { operating_hours: 1 }],
+    ["barge-draft-displacement", { loaded_draft_ft: 11.9 }],
+    ["optical-return-loss", { connector_count: 100, connector_reflectance_db: -10 }],
+    ["tractor-ballast", { current_weight_lb: null }],
+    ["rtd-resistance-to-temp", { resistance_ohms: 500 }],
+  ]) {
+    assert.ok(!(await run(id)).error, id + " example");
+    assert.ok((await run(id, over)).error, id + " " + JSON.stringify(over));
+  }
+  // the RTD curve's own ends still answer
+  const { computeRtdResistanceToTemp } = await import("../../calc-instrumentation.js");
+  assert.ok(Math.abs(computeRtdResistanceToTemp({ resistance_ohms: 390.481, r0_ohms: 100 }).temperature_c - 850) < 0.05);
+  assert.ok(Math.abs(computeRtdResistanceToTemp({ resistance_ohms: 18.52, r0_ohms: 100 }).temperature_c + 200) < 0.05);
+  // 90 on paper is an A
+  const { computeCategoryWeightedGrade } = await import("../../calc-educationassessment.js");
+  const g = computeCategoryWeightedGrade({ categories: [{ earned: 87, possible: 100, weight: 0.1 }, { earned: 90, possible: 100, weight: 0.2 }, { earned: 91, possible: 100, weight: 0.3 }] });
+  assert.ok(Math.abs(g.overall_pct - 90) < 1e-9);
+  assert.equal(g.letter, "A");
+  assert.equal(computeCategoryWeightedGrade({ categories: [{ earned: 89.9, possible: 100, weight: 1 }] }).letter, "B");
+  // a block cannot hold more readings than it has
+  const op = await run("opacity-six-minute", { peak_reading_pct: 10 });
+  assert.ok(op.readings_at_peak_allowed <= op.reading_count);
+  const { computePcrMix } = await import("../../calc-lab.js");
+  assert.ok(computePcrMix({ number_of_reactions: 8, components: [{ name: "a", per_reaction: -12.5 }] }).error);
+  assert.ok(computePcrMix({ number_of_reactions: 8, components: [null] }).error);
+});

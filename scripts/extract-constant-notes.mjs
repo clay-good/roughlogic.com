@@ -41,10 +41,14 @@ function noteOf(result) {
 // A tile whose worked example sits at a ceiling (lambda 1.0, an 80%
 // efficiency near 100%) errors when pushed up, so the downward twin
 // (0.73x + 0.01) is tried before giving up on it.
-function perturb(inputs, m = 1.37, c = 0.11) {
+//
+// A tile that takes a count (stages, legs, strings) rejects 2.85 of them, so a
+// last attempt keeps whole numbers whole: it would otherwise drop out of the
+// set the day it gained that guard, as crusher-reduction-ratio did.
+function perturb(inputs, m = 1.37, c = 0.11, keepWhole = false) {
   const out = {};
   for (const [k, v] of Object.entries(inputs || {})) {
-    if (typeof v === "number") out[k] = v * m + c;
+    if (typeof v === "number") out[k] = keepWhole && Number.isInteger(v) ? Math.round(v * m + c) : v * m + c;
     else if (Array.isArray(v)) out[k] = v.map((n) => (typeof n === "number" ? n * m + c : n));
     else out[k] = v;
   }
@@ -70,6 +74,7 @@ async function collect() {
       a = fn(inputs);
       b = fn(perturb(inputs));
       if (b && b.error) b = fn(perturb(inputs, 0.73, 0.01));
+      if (b && b.error) b = fn(perturb(inputs, 1.37, 0.11, true));
     } catch { continue; }
     const na = noteOf(a);
     const nb = noteOf(b);
