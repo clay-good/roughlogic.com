@@ -61282,3 +61282,34 @@ test("hardening slice 35 (second pass: cancellation, sig-fig zeros, nested DMX, 
   assert.equal(big.large_system, true);
   assert.equal(TR.computeDesignFlowPeaking({ population: 50000 }).large_system, false);
 });
+
+test("hardening slice 36 (comparison lines keep their direction when the alternative runs the other way)", async () => {
+  const { fmtDir } = await import("../../ui-fields.js");
+  assert.equal(fmtDir(33.3, 1, " %", "less", "more"), "33.3 % less");
+  assert.equal(fmtDir(-33.3, 1, " %", "less", "more"), "33.3 % more");
+  assert.equal(fmtDir(-0.3, 0, "%", "more", "less"), "0% less"); // never "-0%"
+  assert.equal(fmtDir(NaN, 0, "%", "more", "less"), "-");
+  // compute-side verdicts, each run with its alternative on the far side of the base case
+  const text = (r) => { assert.ok(r && !r.error, r && r.error); return Object.values(r).filter((v) => typeof v === "string").join(" | "); };
+  const neg = /(?:saving of|risen|overstates it by|extra|up|down) -\d|-\d[\d.]*% (?:more|less|thicker|longer|increase)/;
+  const { computeSpaDrainInterval } = await import("../../calc-pool.js");
+  const spa = text(computeSpaDrainInterval({ spa_gallons: 400, daily_bathers: 6, days_since_drain: 14, alternative_bathers: 12, fill_tds_ppm: 1250, current_tds_ppm: 1100, tds_limit_ppm: 1500 }));
+  assert.ok(!neg.test(spa) && /BELOW the 1250 ppm entered for the fill water/.test(spa), spa);
+  const { computeCastingPourYield, computeInjectionCoolingTime } = await import("../../calc-process.js");
+  const cast = text(computeCastingPourYield({ casting_weight_lb: 280, gating_weight_lb: 170, castings_per_mould: 1, melt_energy_btu_lb: 500, target_yield_pct: 50, annual_castings: 5000 }));
+  assert.ok(!neg.test(cast) && /dropping the yield to 50%/.test(cast) && /a cost of \d/.test(cast), cast);
+  const inj = text(computeInjectionCoolingTime({ wall_thickness_in: 0.1, alpha_in2_s: 0.00015, melt_temp_f: 450, mould_temp_f: 100, eject_temp_f: 180, alt_wall_thickness_in: 0.08, non_cooling_cycle_s: 8, annual_parts: 1000000 }));
+  assert.ok(!neg.test(inj) && /20% thinner/.test(inj) && /36% shorter/.test(inj), inj);
+  const { computeMarineShaftDiameter } = await import("../../calc-marineaviation.js");
+  const shaft = text(computeMarineShaftDiameter({ engine_hp: 350, shaft_rpm: 1200, shaft_diameter_in: 2, allowable_stress_psi: 12000, rule_factor: 3.4, repower_hp: 250 }));
+  assert.ok(!neg.test(shaft) && /dropping the engine to 250 hp/.test(shaft) && /29% less power/.test(shaft), shaft);
+  const { computeSilencerInsertionLoss } = await import("../../calc-hvacacoustics.js");
+  const sil = text(computeSilencerInsertionLoss({ airflow_cfm: 9000, face_width_in: 36, face_height_in: 24, reference_drop_in_wc: 0.35, reference_velocity_fpm: 1500, alt_face_width_in: 48, alt_face_height_in: 30, target_velocity_fpm: 1500, upstream_lw_db: 95, insertion_loss_db: 25, regenerated_lw_db: 72, fan_available_static_in_wc: 2.5 }));
+  assert.ok(!neg.test(sil) && /OPENING IT UP to 48 by 30 in/.test(sil), sil);
+  const { computeRadonFanStatic } = await import("../../calc-containment.js");
+  const radon = text(computeRadonFanStatic({ flow_cfm: 80, pipe_diameter_in: 4, pipe_length_ft: 30, fan_static_in_wc: 1.2, measured_vacuum_in_wc: 1, alt_pipe_diameter_in: 3 }));
+  assert.ok(!neg.test(radon) && /in wc MORE/.test(radon), radon);
+  const { computeCarburizingCaseDepth } = await import("../../calc-inspection.js");
+  const carb = text(computeCarburizingCaseDepth({ reference_case_in: 0.0707, reference_time_hr: 8, time_hr: 8, target_case_in: 0.1414, hotter_reference_case_in: 0.05 }));
+  assert.ok(!neg.test(carb) && /% MORE, so the compared cycle is the slower one/.test(carb), carb);
+});

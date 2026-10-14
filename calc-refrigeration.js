@@ -14,7 +14,7 @@
 
 import {
   DEBOUNCE_MS, debounce, makeNumber, makeSelect,
-  makeOutputLine, attachExampleButton, fmt,
+  makeOutputLine, attachExampleButton, fmt, fmtDir,
 } from "./ui-fields.js";
 const _finiteGuard = (o) => {
   if (o && typeof o === "object" && !Array.isArray(o)) {
@@ -678,7 +678,7 @@ REFRIGERATION_RENDERERS["secondary-glycol-loop"] = _simpleRenderer({
   ],
   outputs: [
     { key: "w", id: "sgl-out-w", label: "On a water basis", value: (r) => fmt(r.water_gpm, 0) + " gpm for " + fmt(r.tons, 0) + " tons at the entered delta-T" },
-    { key: "g", id: "sgl-out-g", label: "Corrected for the glycol", value: (r) => fmt(r.glycol_gpm, 0) + " gpm, " + fmt(r.flow_increase_pct, 1) + "% more" },
+    { key: "g", id: "sgl-out-g", label: "Corrected for the glycol", value: (r) => fmt(r.glycol_gpm, 0) + " gpm, " + fmtDir(r.flow_increase_pct, 1, "%", "more", "less") },
     { key: "f", id: "sgl-out-f", label: "Fluid factor", value: (r) => fmt(r.fluid_factor, 0) + " (500 x SG x cp), the factor a hydronic flow calculation asks for" },
     { key: "p", id: "sgl-out-p", label: "Pump power", value: (r) => r.pump_verdict },
     { key: "e", id: "sgl-out-e", label: "Annual pump energy", value: (r) => r.annual_kwh === 0 ? "(no head or hours entered)" : fmt(r.annual_kwh, 0) + " kWh, $" + fmt(r.annual_cost, 0) + " at the entered rate" },

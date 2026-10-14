@@ -16,7 +16,7 @@
 
 import {
   DEBOUNCE_MS, debounce, makeNumber,
-  makeOutputLine, attachExampleButton, fmt,
+  makeOutputLine, attachExampleButton, fmt, fmtDir,
 } from "./ui-fields.js";
 
 // v18 §7 contract guard: reject a non-finite numeric input (copied
@@ -130,7 +130,7 @@ FINISHING_RENDERERS["galvanize-coating-weight"] = _simpleRenderer({
     { key: "z", id: "gcw-out-z", label: "Zinc required", value: (r) => fmt(r.zinc_lb, 1) + " lb (" + fmt(r.zinc_lb_per_ton, 1) + " lb per ton)" },
     { key: "p", id: "gcw-out-p", label: "Zinc pickup", value: (r) => fmt(r.pickup_pct, 2) + " % of steel weight" },
     { key: "c", id: "gcw-out-c", label: "Comparison section", value: (r) => r.alt_zinc_lb_per_ton === null ? "not compared" : fmt(r.alt_zinc_lb_per_ton, 1) + " lb per ton, " + fmt(r.alt_pickup_pct, 2) + " % pickup" },
-    { key: "r", id: "gcw-out-r", label: "Zinc per ton ratio", value: (r) => r.zinc_ratio === null ? "not compared" : fmt(r.zinc_ratio, 2) + " x (" + fmt(r.zinc_delta_lb_per_ton, 1) + " lb per ton more)" },
+    { key: "r", id: "gcw-out-r", label: "Zinc per ton ratio", value: (r) => r.zinc_ratio === null ? "not compared" : fmt(r.zinc_ratio, 2) + " x (" + fmtDir(r.zinc_delta_lb_per_ton, 1, " lb per ton", "more", "less") + ")" },
     { key: "n", id: "gcw-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeGalvanizeCoatingWeight,

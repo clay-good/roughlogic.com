@@ -61,3 +61,17 @@ test("render text: the example button loads the worked example the page prints",
   // The exemption list may only shrink: a listed tile that now matches must come off it.
   assert.deepEqual(flagged, METRIC_FIXTURE_US_FORM);
 });
+
+// A comparison line is written for the direction its example runs: "1580 cfm
+// (33.3 % less)". Enter the alternative on the other side of the base case and
+// the fixed word stays while the figure goes negative: "-33.3 % less", "saving
+// -8.8 min", "up -5.46 ft". About 50 tiles did this until 2026-10-13. The sweep
+// scales each numeric input of every example by 0.2, 0.5, 2 and 5 and reads the
+// output lines for a minus sign beside a direction word; ui-fields.js fmtDir
+// writes the magnitude and picks the word.
+test("render text: no comparison prints a negative figure beside a fixed direction word", () => {
+  const sweep = fileURLToPath(new URL("../fixtures/render-direction-sweep.js", import.meta.url));
+  const report = JSON.parse(execFileSync(process.execPath, [sweep], { encoding: "utf8", maxBuffer: 1 << 24, stdio: ["ignore", "pipe", "ignore"] }));
+  assert.ok(report.withExample > 2000, `only ${report.withExample} tiles reached their example under the fake DOM`);
+  assert.deepEqual(report.hits, []);
+});

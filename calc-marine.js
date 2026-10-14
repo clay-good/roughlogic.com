@@ -11,7 +11,7 @@
 
 import {
   DEBOUNCE_MS, debounce, makeNumber,
-  makeOutputLine, attachExampleButton, fmt,
+  makeOutputLine, attachExampleButton, fmt, fmtDir,
 } from "./ui-fields.js";
 
 const G_FPS2 = 32.2;                 // gravity, ft/s^2
@@ -157,7 +157,7 @@ MARINE_RENDERERS["dredge-production-rate"] = _simpleRenderer({
     { key: "void_share_cy_per_hr", id: "dpr-void", label: "The void space, which is paid for", value: (r) => fmt(r.void_share_cy_per_hr, 0) + " cy/h of the production was voids in the bank" },
     { key: "production_cy_per_day", id: "dpr-day", label: "Production per day", unit: "cy", value: (r) => fmt(r.production_cy_per_day, 0) + " cy over the entered effective hours" },
     { key: "slurry_specific_gravity", id: "dpr-sg", label: "Density gauge should read", value: (r) => fmt(r.slurry_specific_gravity, 3) + " specific gravity" },
-    { key: "alternative_production_cy_per_hr", id: "dpr-alt", label: "At the alternative concentration", value: (r) => fmt(r.alternative_production_cy_per_hr, 0) + " cy/h, " + fmt(r.alternative_gain_cy_per_hr, 0) + " more (" + fmt(r.alternative_gain_pct, 0) + "%) at gauge " + fmt(r.alternative_slurry_specific_gravity, 3) },
+    { key: "alternative_production_cy_per_hr", id: "dpr-alt", label: "At the alternative concentration", value: (r) => fmt(r.alternative_production_cy_per_hr, 0) + " cy/h, " + fmtDir(r.alternative_gain_cy_per_hr, 0, "", "more", "less") + " (" + fmt(Math.abs(r.alternative_gain_pct), 0) + "%) at gauge " + fmt(r.alternative_slurry_specific_gravity, 3) },
     { key: "note", id: "dpr-note", label: "Use", value: (r) => r.note },
   ],
   compute: computeDredgeProductionRate,
@@ -221,7 +221,7 @@ MARINE_RENDERERS["slurry-critical-velocity"] = _simpleRenderer({
     { key: "root_term_fps", id: "scv-root", label: "The square-root term", value: (r) => fmt(r.root_term_fps, 2) + " ft/s -- the whole answer is then F_L times this" },
     { key: "coarser_critical_velocity_fps", id: "scv-low", label: "In a coarser layer", unit: "ft/s", value: (r) => fmt(r.coarser_critical_velocity_fps, 1) + " ft/s -- " + (r.coarser_runs ? "still runs, " + fmt(r.coarser_margin_pct, 0) + "% of margin left" : "does NOT run") },
     { key: "coarsest_critical_velocity_fps", id: "scv-high", label: "In the coarsest layer", unit: "ft/s", value: (r) => fmt(r.coarsest_critical_velocity_fps, 1) + " ft/s -- " + (r.coarsest_runs ? fmt(r.coarsest_margin_pct, 0) + "% of margin" : "does NOT run at this velocity; the solids deposit") },
-    { key: "relative_friction_head", id: "scv-fric", label: "Friction head against the threshold", value: (r) => fmt(r.relative_friction_head, 2) + "x -- " + fmt(r.excess_friction_pct, 0) + "% more than running at the threshold" },
+    { key: "relative_friction_head", id: "scv-fric", label: "Friction head against the threshold", value: (r) => fmt(r.relative_friction_head, 2) + "x -- " + fmtDir(r.excess_friction_pct, 0, "%", "more", "less") + " than running at the threshold" },
     { key: "upsized_critical_velocity_fps", id: "scv-up", label: "In the upsized pipe", unit: "ft/s", value: (r) => fmt(r.upsized_critical_velocity_fps, 1) + " ft/s -- a bigger line raises the threshold, it does not lower it" },
     { key: "note", id: "scv-note", label: "Use", value: (r) => r.note },
   ],
@@ -739,8 +739,8 @@ MARINE_RENDERERS["wave-height-fetch"] = _simpleRenderer({
     { key: "wave_height_ft", id: "whf-h", label: "Significant wave height", unit: "ft", value: (r) => fmt(r.wave_height_ft, 1) + " ft (" + fmt(r.wave_height_m, 2) + " m)" + (r.fully_developed ? " -- a fully developed sea; more fetch adds nothing" : "") },
     { key: "peak_period_s", id: "whf-tp", label: "Peak period", unit: "s", value: (r) => fmt(r.peak_period_s, 1) + " s -- a short, steep sea is what an enclosed water produces" },
     { key: "duration_required_hr", id: "whf-dur", label: "Wind duration required", unit: "hours", value: (r) => fmt(r.duration_required_hr, 2) + " hours of sustained wind before that height is reached" },
-    { key: "alternative_fetch_height_ft", id: "whf-fet", label: "At the alternative fetch", unit: "ft", value: (r) => fmt(r.alternative_fetch_height_ft, 1) + " ft -- " + fmt(r.alternative_fetch_increase_pct, 0) + "% taller for " + fmt(r.fetch_increase_pct, 0) + "% more fetch" },
-    { key: "alternative_wind_height_ft", id: "whf-wind", label: "At the alternative wind", unit: "ft", value: (r) => fmt(r.alternative_wind_height_ft, 1) + " ft -- " + fmt(r.alternative_wind_increase_pct, 0) + "% taller for " + fmt(r.wind_increase_pct, 0) + "% more wind" },
+    { key: "alternative_fetch_height_ft", id: "whf-fet", label: "At the alternative fetch", unit: "ft", value: (r) => fmt(r.alternative_fetch_height_ft, 1) + " ft -- " + fmtDir(r.alternative_fetch_increase_pct, 0, "%", "taller", "lower") + " for " + fmtDir(r.fetch_increase_pct, 0, "%", "more", "less") + " fetch" },
+    { key: "alternative_wind_height_ft", id: "whf-wind", label: "At the alternative wind", unit: "ft", value: (r) => fmt(r.alternative_wind_height_ft, 1) + " ft -- " + fmtDir(r.alternative_wind_increase_pct, 0, "%", "taller", "lower") + " for " + fmtDir(r.wind_increase_pct, 0, "%", "more", "less") + " wind" },
     { key: "note", id: "whf-note", label: "Use", value: (r) => r.note },
   ],
   compute: computeWaveHeightFetch,

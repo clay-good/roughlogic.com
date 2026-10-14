@@ -5,7 +5,7 @@
 
 import {
   DEBOUNCE_MS, debounce, makeNumber, makeSelect, makeCheckbox,
-  makeOutputLine, attachExampleButton, fmt,
+  makeOutputLine, attachExampleButton, fmt, fmtDir,
 } from "./ui-fields.js";
 
 const _finiteGuard = (o) => {
@@ -319,7 +319,7 @@ export function computeMarineShaftDiameter({
   const repower_diameter_in = has_repower && has_rule ? rule_factor * Math.cbrt(repower_hp / shaft_rpm) : 0;
   const repower_verdict = !has_repower
     ? "(no repower power entered)"
-    : "raising the engine to " + fmt(repower_hp, 0) + " hp at the same shaft speed is " + fmt((power_ratio - 1) * 100, 0) + "% more power and only " + fmt((diameter_ratio - 1) * 100, 1) + "% more shaft" + (has_rule ? ", a rule diameter of " + fmt(repower_diameter_in, 3) + " in" : "") + " -- which sounds small and is often a whole nominal size, and the coupling, stern tube, bearings and stuffing box all change with it";
+    : (power_ratio < 1 ? "dropping" : "raising") + " the engine to " + fmt(repower_hp, 0) + " hp at the same shaft speed is " + fmtDir((power_ratio - 1) * 100, 0, "%", "more", "less") + " power and only " + fmtDir((diameter_ratio - 1) * 100, 1, "%", "more", "less") + " shaft" + (has_rule ? ", a rule diameter of " + fmt(repower_diameter_in, 3) + " in" : "") + " -- which sounds small and is often a whole nominal size, and the coupling, stern tube, bearings and stuffing box all change with it";
   if (![torque_inlb, torsional_stress_psi, torsion_diameter_in, rule_diameter_in, repower_diameter_in].every(Number.isFinite)) return { error: "Shaft sizing math is not a finite value." };
   return {
     torque_inlb, has_shaft, torsional_stress_psi, has_allowable, torsion_diameter_in,

@@ -23,7 +23,7 @@
 
 import {
   DEBOUNCE_MS, debounce, makeNumber,
-  makeOutputLine, attachExampleButton, fmt,
+  makeOutputLine, attachExampleButton, fmt, fmtDir,
 } from "./ui-fields.js";
 
 // v18 §7 contract guard: reject a non-finite numeric input (copied verbatim
@@ -686,8 +686,8 @@ ELEVATOR_RENDERERS["governor-tripping-speed"] = _simpleRenderer({
   ],
   outputs: [
     { key: "m", id: "gts-out-m", label: "Minimum permitted mechanical trip", value: (r) => fmt(r.minimum_trip_fpm, 0) + " fpm" },
-    { key: "b", id: "gts-out-b", label: "Mechanical setting against the band", value: (r) => r.band_verdict + " (" + fmt(r.mechanical_margin_pct, 1) + "% over rated, " + fmt(r.headroom_fpm, 0) + " fpm of headroom)" },
-    { key: "e", id: "gts-out-e", label: "Electrical setting", value: (r) => fmt(r.electrical_margin_pct, 1) + "% over rated -- " + r.order_verdict },
+    { key: "b", id: "gts-out-b", label: "Mechanical setting against the band", value: (r) => r.band_verdict + " (" + fmtDir(r.mechanical_margin_pct, 1, "%", "over", "under") + " rated, " + fmt(r.headroom_fpm, 0) + " fpm of headroom)" },
+    { key: "e", id: "gts-out-e", label: "Electrical setting", value: (r) => fmtDir(r.electrical_margin_pct, 1, "%", "over", "under") + " rated -- " + r.order_verdict },
     { key: "s", id: "gts-out-s", label: "Buffer impact speed the mechanical trip implies", value: (r) => fmt(r.impact_speed_fps, 2) + " ft/s" },
     { key: "k", id: "gts-out-k", label: "Stroke a buffer strike at this mechanical trip would take at one gravity (A17.1 sizes the buffer itself on 115% of rated speed)", value: (r) => fmt(r.implied_buffer_stroke_in, 1) + " in" },
     { key: "n", id: "gts-out-n", label: "Note", value: (r) => r.note },

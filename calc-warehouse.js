@@ -12,7 +12,7 @@
 
 import {
   DEBOUNCE_MS, debounce, makeNumber,
-  makeOutputLine, attachExampleButton, fmt,
+  makeOutputLine, attachExampleButton, fmt, fmtDir,
 } from "./ui-fields.js";
 
 // Young's modulus for structural steel, the value the rack industry's
@@ -155,7 +155,7 @@ WAREHOUSE_RENDERERS["pallet-rack-beam-capacity"] = _simpleRenderer({
     { key: "deflection_in", id: "prb-def", label: "Deflection", unit: "in", value: (r) => fmt(r.deflection_in, 4) + " in against a " + fmt(r.deflection_limit_in, 4) + " in limit" },
     { key: "deflection_ratio", id: "prb-dr", label: "Deflection ratio", value: (r) => fmt(r.deflection_ratio, 2) + " -- " + (r.deflection_pass ? "PASS, " + fmt(r.deflection_margin_pct, 0) + "% to spare" : "FAIL, over by " + fmt(-r.deflection_margin_pct, 0) + "%") },
     { key: "governs", id: "prb-gov", label: "Which check governs", value: (r) => r.governs.toUpperCase() + " governs this beam" },
-    { key: "required_moment_of_inertia_in4", id: "prb-req", label: "Moment of inertia the limit needs", unit: "in^4", value: (r) => fmt(r.required_moment_of_inertia_in4, 2) + " in^4 (" + fmt(r.added_moment_of_inertia_pct, 0) + "% more; depth, not weight, buys stiffness)" },
+    { key: "required_moment_of_inertia_in4", id: "prb-req", label: "Moment of inertia the limit needs", unit: "in^4", value: (r) => fmt(r.required_moment_of_inertia_in4, 2) + " in^4 (" + fmtDir(r.added_moment_of_inertia_pct, 0, "%", "more", "less") + "; depth, not weight, buys stiffness)" },
     { key: "note", id: "prb-note", label: "Use", value: (r) => r.note },
   ],
   compute: computePalletRackBeamCapacity,
@@ -360,7 +360,7 @@ WAREHOUSE_RENDERERS["stacking-aisle-width"] = _simpleRenderer({
     { key: "turret_aisle_in", id: "saw-vna", label: "Turret / VNA aisle", unit: "in", value: (r) => fmt(r.turret_aisle_in, 0) + " in (" + fmt(r.turret_aisle_ft, 1) + " ft)" },
     { key: "counterbalanced_modules", id: "saw-mod", label: "Modules across the building", value: (r) => fmt(r.counterbalanced_modules, 0) + " counterbalanced, " + fmt(r.reach_modules, 0) + " reach, " + fmt(r.turret_modules, 0) + " turret" },
     { key: "turret_additional_rows", id: "saw-rows", label: "Rack rows the turret adds", value: (r) => fmt(r.turret_additional_rows, 0) + " more rows, " + fmt(r.turret_gain_pct, 0) + "% more than counterbalanced" },
-    { key: "reach_gain_pct", id: "saw-reach", label: "What the reach truck buys", value: (r) => fmt(r.reach_gain_pct, 0) + "% more modules than counterbalanced -- " + fmt(r.reach_share_of_turret_gain_pct, 0) + "% of the turret's gain, at a fraction of its constraint" },
+    { key: "reach_gain_pct", id: "saw-reach", label: "What the reach truck buys", value: (r) => fmtDir(r.reach_gain_pct, 0, "%", "more", "fewer") + " modules than counterbalanced -- " + fmt(r.reach_share_of_turret_gain_pct, 0) + "% of the turret's gain, at a fraction of its constraint" },
     { key: "note", id: "saw-note", label: "Use", value: (r) => r.note },
   ],
   compute: computeStackingAisleWidth,
@@ -645,8 +645,8 @@ WAREHOUSE_RENDERERS["dock-door-count-throughput"] = _simpleRenderer({
     { key: "doors_at_full_utilization", id: "ddc-full", label: "Doors at full utilisation", value: (r) => fmt(r.doors_at_full_utilization, 2) + " doors -- a figure no dock achieves" },
     { key: "doors_required", id: "ddc-req", label: "Doors on the daily average", value: (r) => fmt(r.doors_required, 0) + " doors" },
     { key: "peak_trucks", id: "ddc-peak", label: "The peak window", value: (r) => fmt(r.peak_trucks, 0) + " trucks, " + fmt(r.peak_door_hours, 1) + " door-hours" },
-    { key: "peak_doors_required", id: "ddc-pdr", label: "Doors the peak requires", value: (r) => fmt(r.peak_doors_required, 0) + " doors -- " + fmt(r.peak_shortfall_doors, 0) + " more than the daily average asks for" },
-    { key: "improved_peak_doors_required", id: "ddc-imp", label: "At the improved turn time", value: (r) => fmt(r.improved_peak_doors_required, 0) + " doors -- " + fmt(r.doors_saved_by_turn_time, 0) + " saved by " + fmt(r.turn_time_saved_min, 0) + " minutes of turn time" },
+    { key: "peak_doors_required", id: "ddc-pdr", label: "Doors the peak requires", value: (r) => fmt(r.peak_doors_required, 0) + " doors -- " + fmtDir(r.peak_shortfall_doors, 0, "", "more", "fewer") + " than the daily average asks for" },
+    { key: "improved_peak_doors_required", id: "ddc-imp", label: "At the improved turn time", value: (r) => fmt(r.improved_peak_doors_required, 0) + " doors -- " + (r.turn_time_saved_min < 0 ? fmt(-r.doors_saved_by_turn_time, 0) + " more for " + fmt(-r.turn_time_saved_min, 0) + " more minutes of turn time" : fmt(r.doors_saved_by_turn_time, 0) + " saved by " + fmt(r.turn_time_saved_min, 0) + " minutes of turn time") },
     { key: "note", id: "ddc-note", label: "Use", value: (r) => r.note },
   ],
   compute: computeDockDoorCountThroughput,

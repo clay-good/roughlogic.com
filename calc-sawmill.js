@@ -17,7 +17,7 @@
 
 import {
   DEBOUNCE_MS, debounce, makeNumber,
-  makeOutputLine, attachExampleButton, fmt,
+  makeOutputLine, attachExampleButton, fmt, fmtDir,
 } from "./ui-fields.js";
 
 // v18 §7 contract guard: reject a non-finite numeric input (copied verbatim
@@ -156,7 +156,7 @@ SAWMILL_RENDERERS["lumber-recovery-overrun"] = _simpleRenderer({
     { key: "o", id: "lro-out-o", label: "Overrun", value: (r) => fmt(r.overrun_pct, 1) + "%" },
     { key: "l", id: "lro-out-l", label: "Lumber recovery factor", value: (r) => fmt(r.recovery_bf_per_cuft, 2) + " board feet per cu ft, " + fmt(Math.abs(r.lrf_vs_benchmark_pct), 1) + "% " + (r.lrf_vs_benchmark_pct < 0 ? "below" : "above") + " the entered benchmark" },
     { key: "b", id: "lro-out-b", label: "Overrun from the scale rule alone at this diameter", value: (r) => fmt(r.scale_bias_overrun_pct, 1) + "% (Doyle " + fmt(r.doyle_bf, 0) + " board feet against International 1/4 " + fmt(r.international_bf, 0) + ") -- " + r.bias_verdict },
-    { key: "k", id: "lro-out-k", label: "Changing the kerf", value: (r) => fmt(r.kerf_gain_pct, 1) + "% more lumber from the same logs, " + fmt(r.kerf_gain_bf, 0) + " board feet on this tally" },
+    { key: "k", id: "lro-out-k", label: "Changing the kerf", value: (r) => fmtDir(r.kerf_gain_pct, 1, "%", "more", "less") + " lumber from the same logs, " + fmt(Math.abs(r.kerf_gain_bf), 0) + " board feet on this tally" },
     { key: "s", id: "lro-out-s", label: "Sawdust share of the wood cut", value: (r) => fmt(r.sawdust_share_pct, 1) + "% now, " + fmt(r.target_sawdust_share_pct, 1) + "% at the changed kerf" },
     { key: "n", id: "lro-out-n", label: "Note", value: (r) => r.note },
   ],
@@ -474,8 +474,8 @@ SAWMILL_RENDERERS["log-truck-payload"] = _simpleRenderer({
   outputs: [
     { key: "p", id: "ltp-out-p", label: "Available payload", value: (r) => fmt(r.payload_lb, 0) + " lb" },
     { key: "l", id: "ltp-out-l", label: "Legal load of this wood", value: (r) => fmt(r.legal_load_mbf, 2) + " MBF" },
-    { key: "a", id: "ltp-out-a", label: "Legal load of the heavier species", value: (r) => fmt(r.alt_legal_load_mbf, 2) + " MBF -- " + fmt(r.mbf_difference, 2) + " MBF less on the same truck and the same road" },
-    { key: "h", id: "ltp-out-h", label: "Loading it to the same stake height", value: (r) => fmt(r.overload_if_habit_lb, 0) + " lb over the payload" },
+    { key: "a", id: "ltp-out-a", label: "Legal load of the heavier species", value: (r) => fmt(r.alt_legal_load_mbf, 2) + " MBF -- " + fmtDir(r.mbf_difference, 2, " MBF", "less", "more") + " on the same truck and the same road" },
+    { key: "h", id: "ltp-out-h", label: "Loading it to the same stake height", value: (r) => fmtDir(r.overload_if_habit_lb, 0, " lb", "over", "under") + " the payload" },
     { key: "s", id: "ltp-out-s", label: "After decking through a dry season", value: (r) => fmt(r.seasoned_legal_load_mbf, 2) + " MBF of the decked heavier species becomes legal" },
     { key: "m", id: "ltp-out-m", label: "The load entered", value: (r) => fmt(r.entered_load_lb, 0) + " lb of wood, " + fmt(r.gross_with_load_lb, 0) + " lb gross -- " + r.load_verdict },
     { key: "n", id: "ltp-out-n", label: "Note", value: (r) => r.note },

@@ -2479,7 +2479,7 @@ KITCHEN_RENDERERS["kitchen-makeup-air-deficit"] = _simpleRenderer({
     { key: "door_closer_force_lbf", label: "Door closer force (lbf; counted inside the 30 lbf egress limit)", kind: "number", default: 8 },
   ],
   outputs: [
-    { key: "e", id: "kmad-out-e", label: "Exhaust against makeup", value: (r) => fmt(r.total_exhaust_cfm, 0) + " cfm out against " + fmt(r.dedicated_makeup_cfm, 0) + " cfm in -- a " + fmt(r.deficit_cfm, 0) + " cfm deficit, " + fmt(r.deficit_percent, 0) + "% of exhaust" },
+    { key: "e", id: "kmad-out-e", label: "Exhaust against makeup", value: (r) => fmt(r.total_exhaust_cfm, 0) + " cfm out against " + fmt(r.dedicated_makeup_cfm, 0) + " cfm in -- a " + fmt(Math.abs(r.deficit_cfm), 0) + (r.deficit_cfm < 0 ? " cfm SURPLUS, " : " cfm deficit, ") + fmt(Math.abs(r.deficit_percent), 0) + "% of exhaust" },
     { key: "b", id: "kmad-out-b", label: "Balance", value: (r) => r.balance_verdict },
     { key: "p", id: "kmad-out-p", label: "Negative pressure", value: (r) => r.pressure_pa === null ? "(no leakage coefficient entered)" : fmt(r.pressure_pa, 1) + " Pa from " + fmt(r.makeup_shortfall_cfm, 0) + " cfm through a building that leaks " + fmt(r.building_leakage_cfm_per_pa, 0) + " cfm per Pa" },
     { key: "d", id: "kmad-out-d", label: "Door opening force", value: (r) => r.door_verdict },

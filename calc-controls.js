@@ -289,7 +289,7 @@ CONTROLS_RENDERERS["trend-log-storage"] = _simpleRenderer({
     { key: "f", id: "tls-out-f", label: "At the faster interval", value: (r) => r.alt_storage_gb === null ? "not compared" : fmt(r.alt_storage_gb, 1) + " GB" },
     { key: "b", id: "tls-out-b", label: "Controller buffer", value: (r) => r.buffer_fill_min === null ? "no controller entered" : fmt(r.controller_samples_per_hour, 0) + " samples/hr, fills in " + fmt(r.buffer_fill_min, 0) + " min -- the maximum poll interval" },
     { key: "o", id: "tls-out-o", label: "Against the poll interval", value: (r) => r.buffer_verdict },
-    { key: "v", id: "tls-out-v", label: "Under change-of-value", value: (r) => r.cov_storage_gb === null ? "not compared" : fmt(r.cov_storage_gb, 1) + " GB, " + fmt(r.cov_reduction_pct, 0) + " % less -- and only because it is fewer than the " + fmt(r.periodic_samples_per_day, 0) + " periodic samples a day" },
+    { key: "v", id: "tls-out-v", label: "Under change-of-value", value: (r) => r.cov_storage_gb === null ? "not compared" : fmt(r.cov_storage_gb, 1) + " GB, " + (r.cov_reduction_pct < 0 ? fmt(-r.cov_reduction_pct, 0) + " % MORE, because it logs more than the " : fmt(r.cov_reduction_pct, 0) + " % less -- and only because it is fewer than the ") + fmt(r.periodic_samples_per_day, 0) + " periodic samples a day" },
     { key: "n", id: "tls-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeTrendLogStorage,

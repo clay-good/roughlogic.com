@@ -23,7 +23,7 @@
 
 import {
   DEBOUNCE_MS, debounce, makeNumber,
-  makeOutputLine, attachExampleButton, fmt,
+  makeOutputLine, attachExampleButton, fmt, fmtDir,
 } from "./ui-fields.js";
 
 // v18 §7 contract guard: reject a non-finite numeric input (copied verbatim
@@ -150,7 +150,7 @@ DIVING_RENDERERS["no-decompression-limit"] = _simpleRenderer({
   outputs: [
     { key: "a", id: "ndl-out-a", label: "Adjusted no-decompression limit", value: (r) => fmt(r.adjusted_ndl_min, 0) + " min, not the table's " + fmt(r.table_ndl_min, 0) + " -- residual nitrogen has taken " + fmt(r.residual_share_pct, 0) + "% of it" },
     { key: "c", id: "ndl-out-c", label: "Bottom time credited against the table", value: (r) => fmt(r.credited_bottom_time_min, 0) + " min -- " + r.verdict },
-    { key: "s", id: "ndl-out-s", label: "After the longer surface interval", value: (r) => fmt(r.alt_adjusted_ndl_min, 0) + " min, " + fmt(r.surface_interval_gain_min, 0) + " min more bottom time bought on the surface" },
+    { key: "s", id: "ndl-out-s", label: "After the longer surface interval", value: (r) => fmt(r.alt_adjusted_ndl_min, 0) + " min, " + fmtDir(r.surface_interval_gain_min, 0, " min", "more", "less") + " bottom time" + (r.surface_interval_gain_min < 0 ? " with the shorter interval" : " bought on the surface") },
     { key: "e", id: "ndl-out-e", label: "Equivalent air depth for this mix", value: (r) => fmt(r.equivalent_air_depth_ft, 1) + " ft -- enter the air table at the next GREATER depth it lists (Navy Table 10-1), which is where the extra time comes from" },
     { key: "n", id: "ndl-out-n", label: "Note", value: (r) => r.note },
   ],

@@ -22,7 +22,7 @@
 
 import {
   DEBOUNCE_MS, debounce, makeNumber, makeSelect,
-  makeOutputLine, attachExampleButton, fmt,
+  makeOutputLine, attachExampleButton, fmt, fmtDir,
 } from "./ui-fields.js";
 
 // Sensible heat of a seated adult at rest, Btu/h (spec-v1923).
@@ -319,7 +319,7 @@ OUTAGE_RENDERERS["pipe-freeze-time"] = _simpleRenderer({
   ],
   outputs: [
     { key: "c", id: "pft-out-c", label: "Heat capacity per foot", value: (r) => fmt(r.heat_capacity_btu_per_degf_ft, 3) + " Btu/degF-ft (" + fmt(r.water_lb_per_ft, 3) + " lb water/ft)" },
-    { key: "ua", id: "pft-out-ua", label: "Heat loss per foot per degree", value: (r) => "insulated " + fmt(r.ua_insulated_btuh_per_degf_ft, 3) + ", bare " + fmt(r.ua_bare_btuh_per_degf_ft, 3) + " Btu/h-degF-ft (" + fmt(r.loss_reduction_pct, 0) + "% less)" },
+    { key: "ua", id: "pft-out-ua", label: "Heat loss per foot per degree", value: (r) => "insulated " + fmt(r.ua_insulated_btuh_per_degf_ft, 3) + ", bare " + fmt(r.ua_bare_btuh_per_degf_ft, 3) + " Btu/h-degF-ft (" + fmtDir(r.loss_reduction_pct, 0, "%", "less", "more") + ")" },
     { key: "ins", id: "pft-out-ins", label: "Insulated: to 32 degF / frozen solid", value: (r) => r.freezes ? _hrs(r.onset_insulated_hours) + " / " + _hrs(r.solid_insulated_hours) : r.freeze_verdict },
     { key: "bare", id: "pft-out-bare", label: "Bare: to 32 degF / frozen solid", value: (r) => r.freezes ? _hrs(r.onset_bare_hours) + " / " + _hrs(r.solid_bare_hours) : r.freeze_verdict },
     { key: "ratio", id: "pft-out-ratio", label: "What the insulation buys", value: (r) => "x" + fmt(r.time_ratio, 2) + " the time -- " + r.freeze_verdict },

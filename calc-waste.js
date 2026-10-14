@@ -12,7 +12,7 @@
 
 import {
   DEBOUNCE_MS, debounce, makeNumber,
-  makeOutputLine, attachExampleButton, fmt,
+  makeOutputLine, attachExampleButton, fmt, fmtDir,
 } from "./ui-fields.js";
 
 const CU_FT_PER_CU_YD = 27;
@@ -637,7 +637,7 @@ WASTE_RENDERERS["diversion-rate-contamination"] = _simpleRenderer({
     { key: "true_diversion_pct", id: "drc-true", label: "True diversion", value: (r) => fmt(r.true_diversion_pct, 1) + "%" },
     { key: "overstatement_points", id: "drc-over", label: "The overstatement", value: (r) => fmt(r.overstatement_points, 1) + " percentage points -- " + fmt(r.overstatement_share_of_claim_pct, 1) + "% of the claimed figure, or " + fmt(r.overstatement_above_true_pct, 1) + "% above the true rate" },
     { key: "residual_cost", id: "drc-cost", label: "Double-handling cost of the residual", value: (r) => "$" + fmt(r.residual_cost, 0) + " a year to process and then bury it" },
-    { key: "improved_true_diversion_pct", id: "drc-imp", label: "At the improved contamination rate", value: (r) => fmt(r.improved_true_diversion_pct, 1) + "% true diversion -- " + fmt(r.improved_points_gained, 1) + " more points, no extra tonnage collected" },
+    { key: "improved_true_diversion_pct", id: "drc-imp", label: "At the improved contamination rate", value: (r) => fmt(r.improved_true_diversion_pct, 1) + "% true diversion -- " + fmtDir(r.improved_points_gained, 1, "", "more", "fewer") + " points, no extra tonnage collected" },
     { key: "improved_saving", id: "drc-save", label: "And the saving", value: (r) => "$" + fmt(r.improved_saving, 0) + " a year, from " + fmt(r.improved_residual_tons, 0) + " tons of residual instead of " + fmt(r.residual_tons, 0) },
     { key: "note", id: "drc-note", label: "Use", value: (r) => r.note },
   ],
@@ -798,7 +798,7 @@ WASTE_RENDERERS["collection-vehicle-payload"] = _simpleRenderer({
     { key: "legal_fill_cy", id: "cvp-fill", label: "Legal fill", unit: "cy", value: (r) => fmt(r.legal_fill_cy, 1) + " cy -- " + fmt(r.legal_fill_share_pct, 0) + "% of the body" },
     { key: "overload_lb", id: "cvp-over", label: "A full body would be", value: (r) => (r.overload_lb > 0 ? fmt(r.overload_lb, 0) + " lb over the rating -- " + fmt(r.overload_pct_of_gvwr, 0) + "% overweight, with no gauge and no warning" : "within the rating") },
     { key: "alternative_body_payload_tons", id: "cvp-alt", label: "The alternative configuration", value: (r) => fmt(r.alternative_body_payload_tons, 1) + " ton body against " + fmt(r.alternative_chassis_payload_tons, 1) + " tons of chassis -- " + (r.alternative_chassis_governs ? "the chassis still governs" : "the BODY governs, " + fmt(r.alternative_headroom_lb, 0) + " lb inside the rating") },
-    { key: "wet_legal_fill_cy", id: "cvp-wet", label: "In wet weather", value: (r) => fmt(r.wet_legal_fill_cy, 1) + " cy of legal fill -- " + fmt(r.wet_fill_reduction_pct, 0) + "% less body, with nothing about the truck changed" },
+    { key: "wet_legal_fill_cy", id: "cvp-wet", label: "In wet weather", value: (r) => fmt(r.wet_legal_fill_cy, 1) + " cy of legal fill -- " + fmtDir(r.wet_fill_reduction_pct, 0, "%", "less", "more") + " body, with nothing about the truck changed" },
     { key: "note", id: "cvp-note", label: "Use", value: (r) => r.note },
   ],
   compute: computeCollectionVehiclePayload,
@@ -877,7 +877,7 @@ WASTE_RENDERERS["working-face-cell-lift"] = _simpleRenderer({
     { key: "exposed_sqft", id: "wfc-exp", label: "Exposed surface", unit: "sq ft", value: (r) => fmt(r.exposed_sqft, 0) + " sq ft -- " + fmt(r.top_sqft, 0) + " top, " + fmt(r.face_sqft, 0) + " face" },
     { key: "cover_cy", id: "wfc-cov", label: "Cover to close it up", unit: "cy", value: (r) => fmt(r.cover_cy, 0) + " cy, " + fmt(r.cover_share_of_waste_pct, 1) + "% of the waste volume" },
     { key: "narrow_top_sqft", id: "wfc-narrow", label: "At the narrower face", value: (r) => fmt(r.narrow_advance_ft_per_day, 0) + " ft/day advance, top area " + fmt(r.narrow_top_sqft, 0) + " sq ft -- unchanged, because the advance doubled as the width halved" },
-    { key: "narrow_cover_cy", id: "wfc-save", label: "What the narrower face saves", value: (r) => fmt(r.narrow_cover_cy, 0) + " cy of cover, " + fmt(r.cover_reduction_pct, 0) + "% less, all of it off the sloped face" },
+    { key: "narrow_cover_cy", id: "wfc-save", label: "What the narrower face saves", value: (r) => fmt(r.narrow_cover_cy, 0) + " cy of cover, " + fmtDir(r.cover_reduction_pct, 0, "%", "less", "more") + ", all of it off the sloped face" },
     { key: "total_passes", id: "wfc-pass", label: "Compaction", value: (r) => fmt(r.layers, 0) + " layers at " + fmt(r.passes_per_layer, 0) + " passes -- " + fmt(r.total_passes, 0) + " passes over every part of the cell" },
     { key: "note", id: "wfc-note", label: "Use", value: (r) => r.note },
   ],

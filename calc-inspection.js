@@ -27,7 +27,7 @@
 // ramp rates", which is exactly what spec-v1674 supplies.
 import {
   DEBOUNCE_MS, debounce, makeNumber, makeSelect,
-  makeOutputLine, attachExampleButton, fmt,
+  makeOutputLine, attachExampleButton, fmt, fmtDir,
 } from "./ui-fields.js";
 const _finiteGuard = (o) => {
   if (o && typeof o === "object" && !Array.isArray(o)) {
@@ -632,7 +632,7 @@ export function computeHardnessTensileConversion({
     ? (case_estimated_uts_ksi / core_estimated_uts_ksi - 1) * 100 : 0;
   const surface_verdict = !has_case
     ? "(no case and core hardness entered -- and the surface trap is the error that matters most on a hardened part)"
-    : "THE SURFACE TRAP. A case reading of " + fmt(case_hardness_hb, 0) + " HB converts to " + fmt(case_estimated_uts_ksi, 0) + " ksi and a core of " + fmt(core_hardness_hb, 0) + " HB to " + fmt(core_estimated_uts_ksi, 0) + " ksi -- using the surface figure as the part's strength overstates it by " + fmt(overstatement_pct, 0) + "%. The case is thin and the CORE carries the load, so a carburised or induction-hardened part must be read on a prepared section or on an unhardened area, and a surface reading converted to strength is not a section property";
+    : "THE SURFACE TRAP. A case reading of " + fmt(case_hardness_hb, 0) + " HB converts to " + fmt(case_estimated_uts_ksi, 0) + " ksi and a core of " + fmt(core_hardness_hb, 0) + " HB to " + fmt(core_estimated_uts_ksi, 0) + " ksi -- using the surface figure as the part's strength " + (overstatement_pct < 0 ? "understates" : "overstates") + " it by " + fmt(Math.abs(overstatement_pct), 0) + "%. The case is thin and the CORE carries the load, so a carburised or induction-hardened part must be read on a prepared section or on an unhardened area, and a surface reading converted to strength is not a section property";
   const method_verdict = "AND CONVERSION BETWEEN HARDNESS SCALES IS ITSELF APPROXIMATE. The published tables are empirical, material-dependent, and diverge at the extremes of each scale, so a Rockwell reading converted to Brinell and then to tensile carries two approximations before the third. Where the strength matters, a tensile test is the measurement and this is the screen";
   if (![estimated_uts_ksi, case_estimated_uts_ksi, core_estimated_uts_ksi, overstatement_pct, estimate_error_pct].every(Number.isFinite)) return { error: "Hardness conversion math is not a finite value." };
   return {
@@ -699,7 +699,7 @@ export function computeCarburizingCaseDepth({
   const hotter_time_hr = has_hotter && has_target ? Math.pow(target_case_in / _kHot, 2) : 0;
   const temperature_verdict = !(has_hotter && has_target)
     ? "(no hotter-cycle reference case and target entered -- the temperature lever works by moving the whole curve)"
-    : "at a higher carburising temperature, where the same " + fmt(reference_time_hr, 1) + " hour reference reaches " + fmt(hotter_reference_case_in, 4) + " in instead of " + fmt(reference_case_in, 4) + ", the " + fmt(target_case_in, 4) + " in case takes " + fmt(hotter_time_hr, 1) + " hours instead of " + fmt(time_for_target_hr, 1) + " -- " + fmt((1 - hotter_time_hr / time_for_target_hr) * 100, 0) + "% less. THE COSTS ARE GRAIN COARSENING, more distortion to correct in grinding, and shorter fixture and furnace life, so it is a trade a heat treater makes deliberately rather than a free saving";
+    : "at a higher carburising temperature, where the same " + fmt(reference_time_hr, 1) + " hour reference reaches " + fmt(hotter_reference_case_in, 4) + " in instead of " + fmt(reference_case_in, 4) + ", the " + fmt(target_case_in, 4) + " in case takes " + fmt(hotter_time_hr, 1) + " hours instead of " + fmt(time_for_target_hr, 1) + " -- " + fmtDir((1 - hotter_time_hr / time_for_target_hr) * 100, 0, "%", "less", "MORE, so the compared cycle is the slower one, not a hotter one") + ". THE COSTS ARE GRAIN COARSENING, more distortion to correct in grinding, and shorter fixture and furnace life, so it is a trade a heat treater makes deliberately rather than a free saving";
   const specification_verdict = "AND THE SPECIFICATION TRAP. 'Case depth 0.030 in' is ambiguous: EFFECTIVE case depth, measured to a stated hardness such as 50 HRC, and TOTAL case depth, measured to where the case is metallurgically indistinguishable from the core, are different numbers on the same part, and the total is always the larger. A supplier quoting to one and a customer inspecting to the other disagree about a part that is exactly as specified, and the drawing has to say which -- along with the hardness the effective depth is measured to, because that changes the number as well";
   if (![case_depth_in, time_for_target_hr, time_ratio, depth_ratio, hotter_time_hr].every(Number.isFinite)) return { error: "Case depth math is not a finite value." };
   return {

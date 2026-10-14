@@ -18,7 +18,7 @@
 
 import {
   DEBOUNCE_MS, debounce, makeNumber,
-  makeOutputLine, attachExampleButton, fmt,
+  makeOutputLine, attachExampleButton, fmt, fmtDir,
 } from "./ui-fields.js";
 
 // v18 §7 contract guard: reject a non-finite numeric input (copied verbatim
@@ -248,7 +248,7 @@ WIND_RENDERERS["wind-shear-hub-height"] = _simpleRenderer({
   ],
   outputs: [
     { key: "v", id: "wsh-out-v", label: "Wind speed at hub height", value: (r) => fmt(r.hub_speed_mph, 2) + " mph, " + fmt(r.speed_ratio, 4) + " times the measured speed" },
-    { key: "e", id: "wsh-out-e", label: "Energy at the hub against the measurement height", value: (r) => fmt(r.energy_ratio, 3) + " times -- " + fmt((r.energy_ratio - 1) * 100, 0) + "% more energy from height alone" },
+    { key: "e", id: "wsh-out-e", label: "Energy at the hub against the measurement height", value: (r) => fmt(r.energy_ratio, 3) + " times -- " + fmtDir((r.energy_ratio - 1) * 100, 0, "%", "more", "less") + " energy from height alone" },
     { key: "a", id: "wsh-out-a", label: "At the compared exponent", value: (r) => fmt(r.alt_hub_speed_mph, 2) + " mph, worth " + fmt(r.alt_energy_vs_entered, 3) + " times the entered case -- " + fmt(Math.abs(1 - r.alt_energy_vs_entered) * 100, 0) + "% of the energy estimate on the exponent alone" },
     { key: "d", id: "wsh-out-d", label: "Exponent measured from the two anemometers", value: (r) => fmt(r.derived_exponent, 3) + ", giving " + fmt(r.derived_hub_speed_mph, 2) + " mph at the hub" },
     { key: "x", id: "wsh-out-x", label: "How far this extrapolates", value: (r) => fmt(r.extrapolation_ratio, 2) + " times the measurement height -- " + r.extrapolation_verdict },
@@ -412,7 +412,7 @@ WIND_RENDERERS["turbine-density-correction"] = _simpleRenderer({
     { key: "p", id: "tdc-out-p", label: "Density-corrected curve value", value: (r) => fmt(r.corrected_curve_power_kw, 0) + " kW, against " + fmt(r.curve_power_kw, 0) + " kW warranted" },
     { key: "m", id: "tdc-out-m", label: "How the machine is actually doing", value: (r) => fmt(r.measured_of_curve_pct, 0) + "% of the raw curve but " + fmt(r.measured_of_corrected_pct, 0) + "% of the corrected one -- " + r.performance_verdict },
     { key: "i", id: "tdc-out-i", label: "The IEC form, correcting the wind instead", value: (r) => fmt(r.iec_corrected_wind_mph, 2) + " mph reads against the standard curve (a cube-root factor of " + fmt(r.iec_speed_factor, 4) + ")" },
-    { key: "a", id: "tdc-out-a", label: "At the compared temperature", value: (r) => fmt(r.alt_density_pcf, 5) + " lb/cu ft -- " + fmt(r.alt_vs_entered * 100, 0) + "% of the entered day, so the same wind makes " + fmt((r.alt_vs_entered - 1) * 100, 0) + "% more power" },
+    { key: "a", id: "tdc-out-a", label: "At the compared temperature", value: (r) => fmt(r.alt_density_pcf, 5) + " lb/cu ft -- " + fmt(r.alt_vs_entered * 100, 0) + "% of the entered day, so the same wind makes " + fmtDir((r.alt_vs_entered - 1) * 100, 0, "%", "more", "less") + " power" },
     { key: "n", id: "tdc-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeTurbineDensityCorrection,

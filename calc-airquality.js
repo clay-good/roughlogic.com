@@ -1272,7 +1272,7 @@ export function computeCommunityNoiseLdn({
       : all_at_night
         ? "the activity is already entirely at night, and it is carrying the full 10 dB penalty -- moving all " + fmt(total_activity_hours, 1) + " hours into the day would drop the Ldn to " + fmt(10 * Math.log10((periodEnergy(12, Math.min(total_activity_hours, 12), 0) + periodEnergy(3, 0, 0) + periodEnergy(9, 0, 10)) / 24), 1) + " dB"
         : "moving the same " + fmt(total_activity_hours, 1) + " hours into the night period would raise the Ldn to "
-          + fmt(night_moved_ldn_db, 1) + " dB, up " + fmt(night_penalty_cost_db, 1)
+          + fmt(night_moved_ldn_db, 1) + " dB, " + (night_penalty_cost_db < 0 ? "down " : "up ") + fmt(Math.abs(night_penalty_cost_db), 1)
           + " dB with no change in equipment, level, or duration. The 10 decibels is a factor of ten in energy, so an hour at night is ten hours in the day, and no practical noise control recovers it";
   // Energy averaging means the loud activity dominates and the background does not.
   const halved_energy = total_activity_hours > 0
@@ -1287,7 +1287,7 @@ export function computeCommunityNoiseLdn({
   const lever_verdict = total_activity_hours === 0
     ? "(no activity hours entered)"
     : "halving the activity to " + fmt(total_activity_hours / 2, 2) + " hours gives " + fmt(halved_ldn_db, 1)
-      + " dB, down " + fmt(ldn_db - halved_ldn_db, 1) + " dB, while taking 10 dB off the BACKGROUND gives "
+      + " dB, down " + fmt(Math.max(0, ldn_db - halved_ldn_db), 1) + " dB, while taking 10 dB off the BACKGROUND gives "
       + fmt(quiet_background_ldn_db, 1) + " dB, down only " + fmt(ldn_db - quiet_background_ldn_db, 1)
       + " dB. Energy averaging means the loud activity dominates the day: shortening it is the lever, and quieting the background is close to wasted effort";
   if (![ldn_db, cnel_db, leq24_db, night_moved_ldn_db].every(Number.isFinite)) return { error: "Community noise math is not a finite value." };

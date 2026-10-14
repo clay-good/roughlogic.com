@@ -24,7 +24,7 @@
 
 import {
   DEBOUNCE_MS, debounce, makeNumber, makeText, makeSelect, makeTextarea,
-  makeOutputLine, attachExampleButton, fmt,
+  makeOutputLine, attachExampleButton, fmt, fmtDir,
 } from "./ui-fields.js";
 
 const _finiteGuard = (o) => {
@@ -3072,7 +3072,7 @@ SHOP_RENDERERS["cyclone-separator-sizing"] = _simpleRenderer({
   outputs: [
     { key: "d", id: "css-out-d", label: "Cut size d50", value: (r) => fmt(r.d50_micron, 2) + " microns (" + fmt(r.d50_ft, 7) + " ft) at 50% capture" },
     { key: "p", id: "css-out-p", label: "Pressure drop", value: (r) => fmt(r.pressure_drop_inwg, 2) + " in w.g. (" + fmt(r.pressure_drop_psf, 1) + " psf), " + fmt(r.fan_hp, 2) + " fan hp at this airflow" },
-    { key: "t", id: "css-out-t", label: "The trade at the comparison velocity", value: (r) => fmt(r.alt_d50_micron, 2) + " microns for " + fmt(r.alt_drop_inwg, 2) + " in w.g. -- " + fmt(r.cut_gain_pct, 0) + "% finer cut costs " + fmt(r.drop_rise_pct, 0) + "% more pressure" },
+    { key: "t", id: "css-out-t", label: "The trade at the comparison velocity", value: (r) => fmt(r.alt_d50_micron, 2) + " microns for " + fmt(r.alt_drop_inwg, 2) + " in w.g. -- " + (r.cut_gain_pct < 0 ? fmt(-r.cut_gain_pct, 0) + "% coarser cut for " + fmtDir(r.drop_rise_pct, 0, "%", "more", "less") + " pressure" : fmt(r.cut_gain_pct, 0) + "% finer cut costs " + fmtDir(r.drop_rise_pct, 0, "%", "more", "less") + " pressure") },
     { key: "n", id: "css-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeCycloneSeparatorSizing,

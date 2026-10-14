@@ -19,7 +19,7 @@
 
 import {
   DEBOUNCE_MS, debounce, makeNumber, makeSelect,
-  makeOutputLine, attachExampleButton, fmt,
+  makeOutputLine, attachExampleButton, fmt, fmtDir,
 } from "./ui-fields.js";
 
 const _finiteGuard = (o) => {
@@ -219,7 +219,7 @@ RELIEFPOWER_RENDERERS["generator-part-load-fuel"] = _simpleRenderer({
   ],
   outputs: [
     { key: "fuel_gph", id: "gplf-out-gph", label: "Fuel at this load", unit: "gph", value: (r) => fmt(r.fuel_gph, 3) + " gph (" + r.extrapolation_verdict + ")" },
-    { key: "kwh_per_gal", id: "gplf-out-eff", label: "Energy per gallon", value: (r) => fmt(r.kwh_per_gal, 2) + " kWh/gal against " + fmt(r.full_load_kwh_per_gal, 2) + " at full load (" + fmt(r.efficiency_penalty_pct, 1) + "% less)" },
+    { key: "kwh_per_gal", id: "gplf-out-eff", label: "Energy per gallon", value: (r) => fmt(r.kwh_per_gal, 2) + " kWh/gal against " + fmt(r.full_load_kwh_per_gal, 2) + " at full load (" + fmtDir(r.efficiency_penalty_pct, 1, "%", "less", "more") + ")" },
     { key: "load_pct_of_standby", id: "gplf-out-pct", label: "Load as a share of standby nameplate", value: (r) => fmt(r.load_pct_of_standby, 1) + "% (floor " + fmt(r.min_load_kw, 1) + " kW)" },
     { key: "load_bank_kw", id: "gplf-out-bank", label: "NFPA 110 minimum-load check", value: (r) => r.minimum_verdict + (r.load_bank_kw > 0 ? ": " + fmt(r.load_bank_kw, 1) + " kW" : "") },
     { key: "note", id: "gplf-out-note", label: "Note", value: (r) => r.note },

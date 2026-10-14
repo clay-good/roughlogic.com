@@ -21,7 +21,7 @@
 // header, not off the subject.
 import {
   DEBOUNCE_MS, debounce, makeNumber, makeSelect,
-  makeOutputLine, attachExampleButton, fmt,
+  makeOutputLine, attachExampleButton, fmt, fmtDir,
 } from "./ui-fields.js";
 const _finiteGuard = (o) => {
   if (o && typeof o === "object" && !Array.isArray(o)) {
@@ -279,7 +279,7 @@ export function computeInjectionCoolingTime({
   const time_ratio = has_alt ? thickness_ratio * thickness_ratio : 0;
   const square_verdict = !has_alt
     ? "(no alternative thickness entered -- the square law is the whole point of this calculation, so enter one)"
-    : "a " + fmt(alt_wall_thickness_in, 3) + " in wall is " + fmt((thickness_ratio - 1) * 100, 0) + "% thicker and cools in " + fmt(alt_cooling_time_s, 1) + " seconds -- " + fmt((time_ratio - 1) * 100, 0) + "% longer, because cooling goes with the SQUARE of the wall. That is why a stiffness change a designer makes without thinking of it as a cost change is one";
+    : "a " + fmt(alt_wall_thickness_in, 3) + " in wall is " + fmtDir((thickness_ratio - 1) * 100, 0, "%", "thicker", "thinner") + " and cools in " + fmt(alt_cooling_time_s, 1) + " seconds -- " + fmtDir((time_ratio - 1) * 100, 0, "%", "longer", "shorter") + ", because cooling goes with the SQUARE of the wall. That is why a stiffness change a designer makes without thinking of it as a cost change is one";
   // Coring: a solid section split into two walls of the entered thickness.
   const cored_time_s = has_alt ? _coolFor(alt_wall_thickness_in / 2) : 0;
   const coring_verdict = !has_alt
@@ -745,7 +745,7 @@ export function computeCastingPourYield({
   const saving_btu_per_lb = has_target ? btu_per_saleable_lb - target_btu_per_lb : 0;
   const target_verdict = !has_target
     ? "(no target yield and melt energy entered)"
-    : "raising the yield to " + fmt(target_yield_pct, 0) + "% means pouring " + fmt(target_poured_lb, 0) + " lb instead of " + fmt(poured_weight_lb, 0) + ", and takes the melt energy to " + fmt(target_btu_per_lb, 0) + " BTU per saleable pound -- a saving of " + fmt(saving_btu_per_lb, 0) + " BTU/lb";
+    : (saving_btu_per_lb < 0 ? "dropping" : "raising") + " the yield to " + fmt(target_yield_pct, 0) + "% means pouring " + fmt(target_poured_lb, 0) + " lb instead of " + fmt(poured_weight_lb, 0) + ", and takes the melt energy to " + fmt(target_btu_per_lb, 0) + " BTU per saleable pound -- " + (saving_btu_per_lb < 0 ? "a cost of " : "a saving of ") + fmt(Math.abs(saving_btu_per_lb), 0) + " BTU/lb";
   const has_annual = annual_castings > 0 && has_target;
   const annual_btu_saved = has_annual ? saving_btu_per_lb * saleable_lb * annual_castings / castings_per_mould : 0;
   const annual_verdict = !has_annual

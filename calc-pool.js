@@ -389,6 +389,8 @@ export function computeSpaDrainInterval({
   const over_tds = current_tds_ppm > 0 && tds_limit_ppm > 0 && current_tds_ppm > tds_limit_ppm + 1e-9 * Math.abs(tds_limit_ppm);
   const tds_verdict = !has_tds
     ? "(no fill and current TDS entered -- and a TDS reading is the measurement the interval rule stands in for)"
+    : tds_rise_ppm < 0
+    ? "the " + fmt(current_tds_ppm, 0) + " ppm reading is BELOW the " + fmt(fill_tds_ppm, 0) + " ppm entered for the fill water, which a spa in use cannot be: check the two readings"
     : "TDS has risen " + fmt(tds_rise_ppm, 0) + " ppm above the " + fmt(fill_tds_ppm, 0) + " ppm fill water, to " + fmt(current_tds_ppm, 0) + " ppm"
       + (over_tds
         ? " -- OVER the " + fmt(tds_limit_ppm, 0) + " ppm limit entered, so drain regardless of what the interval rule says. A measurement beats a convention"

@@ -6,7 +6,7 @@
 
 import {
   DEBOUNCE_MS, debounce, makeNumber, makeSelect,
-  makeOutputLine, attachExampleButton, fmt,
+  makeOutputLine, attachExampleButton, fmt, fmtDir,
 } from "./ui-fields.js";
 
 const _finiteGuard = (o) => {
@@ -310,6 +310,8 @@ export function computeSilencerInsertionLoss({
   const faceVerdict = "a " + fmt(face_width_in, 0) + " by " + fmt(face_height_in, 0) + " in face is " + fmt(face_area_ft2, 2) + " sq ft, so " + fmt(airflow_cfm, 0) + " cfm runs at " + fmt(face_velocity_fpm, 0) + " fpm and costs " + fmt(pressure_drop_in_wc, 2) + " in wc";
   const squeezeVerdict = !has_alt
     ? "no alternative face was entered. PRESSURE DROP RISES WITH THE SQUARE OF VELOCITY, so a silencer squeezed into a duct that is already undersized costs far more static than its catalogue figure suggests"
+    : alt_face_velocity_fpm < face_velocity_fpm
+    ? "OPENING IT UP to " + fmt(alt_face_width_in, 0) + " by " + fmt(alt_face_height_in, 0) + " in takes the velocity down to " + fmt(alt_face_velocity_fpm, 0) + " fpm -- a " + fmt(-velocity_increase_pct, 0) + "% decrease -- and the pressure drop to " + fmt(alt_pressure_drop_in_wc, 2) + " in wc, which is " + fmt(drop_ratio, 2) + " times as much. THE DROP GOES WITH THE SQUARE, so the larger face gives back " + fmt(-drop_increase_in_wc, 2) + " in wc of the fan's available static"
     : "SQUEEZING IT to " + fmt(alt_face_width_in, 0) + " by " + fmt(alt_face_height_in, 0) + " in takes the velocity to " + fmt(alt_face_velocity_fpm, 0) + " fpm -- a " + fmt(velocity_increase_pct, 0) + "% increase -- and the pressure drop to " + fmt(alt_pressure_drop_in_wc, 2) + " in wc, which is " + fmt(drop_ratio, 2) + " times as much. THE DROP GOES WITH THE SQUARE, so a 44% velocity increase roughly DOUBLES it, and that extra " + fmt(drop_increase_in_wc, 2) + " in wc comes out of the fan's available static";
   const targetVerdict = !has_target
     ? "no target face velocity was entered"
@@ -509,7 +511,7 @@ HVACACOUSTICS_RENDERERS["grille-neck-nc"] = _simpleRenderer({
   outputs: [
     { key: "neck_velocity_fpm", label: "Neck velocity", unit: "fpm", value: (r) => fmt(r.neck_velocity_fpm, 0) + " fpm" },
     { key: "effective_nc", label: "NC in this room", value: (r) => "NC " + fmt(r.effective_nc, 0) + (r.has_target ? (r.meets_target ? " -- meets the target" : " -- OVER by " + fmt(r.over_target_db, 1)) : "") },
-    { key: "next_velocity_fpm", label: "One size up", unit: "fpm", value: (r) => !r.has_next ? "not entered" : fmt(r.next_velocity_fpm, 0) + " fpm (" + fmt(r.velocity_drop_pct, 0) + "% slower)" },
+    { key: "next_velocity_fpm", label: "One size up", unit: "fpm", value: (r) => !r.has_next ? "not entered" : fmt(r.next_velocity_fpm, 0) + " fpm (" + fmtDir(r.velocity_drop_pct, 0, "%", "slower", "faster") + ")" },
     { key: "nc_change_db", label: "NC change one size up", unit: "dB", value: (r) => !r.has_next ? "not entered" : fmt(r.nc_change_db, 1) + " dB, to about NC " + fmt(r.next_nc, 0) },
     { key: "cfm_at_target", label: "Airflow this size meets the target at", unit: "cfm", value: (r) => !r.has_target ? "no target entered" : fmt(r.cfm_at_target, 0) + " cfm" },
     { key: "velocityVerdict", label: "Neck velocity", value: (r) => r.velocityVerdict },

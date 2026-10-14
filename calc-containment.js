@@ -179,7 +179,9 @@ export function computeRadonFanStatic({
   const alt_verdict = !has_alt
     ? "(no alternative pipe size entered)"
     : "going to " + fmt(alt_pipe_diameter_in, 0) + " in takes the velocity to " + fmt(alt_velocity_fpm, 0) + " fpm and the friction to " + fmt(alt_pipe_loss_in_wc, 3) + " in wc"
-      + (has_fan ? " -- a saving of " + fmt(pipe_loss_in_wc - alt_pipe_loss_in_wc, 3) + " in wc, or " + fmt((pipe_loss_in_wc - alt_pipe_loss_in_wc) / fan_static_in_wc * 100, 1) + "% of what the fan develops. That is the whole benefit of the upsize, and it is why it does not fix a system that is not extending its suction field" : "");
+      + (!has_fan ? "" : alt_pipe_loss_in_wc > pipe_loss_in_wc
+        ? " -- " + fmt(alt_pipe_loss_in_wc - pipe_loss_in_wc, 3) + " in wc MORE, or " + fmt((alt_pipe_loss_in_wc - pipe_loss_in_wc) / fan_static_in_wc * 100, 1) + "% of what the fan develops, taken from the suction field: the compared pipe is the smaller one"
+        : " -- a saving of " + fmt(pipe_loss_in_wc - alt_pipe_loss_in_wc, 3) + " in wc, or " + fmt((pipe_loss_in_wc - alt_pipe_loss_in_wc) / fan_static_in_wc * 100, 1) + "% of what the fan develops. That is the whole benefit of the upsize, and it is why it does not fix a system that is not extending its suction field");
   // The diagnostic that actually helps.
   const has_diagnostic = measured_vacuum_in_wc > 0 && fan_static_in_wc > 0;
   const vacuum_ratio = has_diagnostic ? measured_vacuum_in_wc / fan_static_in_wc : 0;

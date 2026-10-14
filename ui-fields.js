@@ -22,6 +22,14 @@ export function fmt(n, digits = 2) {
   return Number(n).toFixed(digits);
 }
 
+// A signed change as a magnitude and a direction word: fmtDir(-33.3, 1, "%",
+// "less", "more") is "33.3% more". A fixed word beside the signed figure read
+// "-33.3% less" whenever the comparison ran the other way.
+export function fmtDir(n, digits, unit, up, down) {
+  if (n === null || n === undefined || !Number.isFinite(Number(n))) return "-";
+  return fmt(Math.abs(Number(n)), digits) + unit + " " + (Number(n) < 0 ? down : up);
+}
+
 export function makeNumber(label, id, attrs = {}) {
   const wrap = document.createElement("div");
   wrap.className = "field";

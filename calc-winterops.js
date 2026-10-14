@@ -17,7 +17,7 @@
 // through spec-v1850.md.
 import {
   DEBOUNCE_MS, debounce, makeNumber,
-  makeOutputLine, attachExampleButton, fmt,
+  makeOutputLine, attachExampleButton, fmt, fmtDir,
 } from "./ui-fields.js";
 
 // v18 §7 contract guard: reject a non-finite numeric input (copied
@@ -218,7 +218,7 @@ WINTEROPS_RENDERERS["brine-batch-salinity"] = _simpleRenderer({
     { key: "m", id: "bbs-out-m", label: "Salometer target", value: (r) => fmt(r.salometer, 0) + " (percent of saturation, at the scale's reference temperature)" },
     { key: "f", id: "bbs-out-f", label: "Freezing point (above the eutectic: where salt drops out)", value: (r) => fmt(r.freeze_point_f, 1) + " degF" },
     { key: "v", id: "bbs-out-v", label: "Against the eutectic", value: (r) => r.target_verdict },
-    { key: "a", id: "bbs-out-a", label: "At the comparison mix", value: (r) => r.alt_salt_lb === null ? "not compared" : fmt(r.alt_salt_lb, 0) + " lb of salt (" + fmt(r.salt_difference_lb, 0) + " lb less) and a freezing point of " + fmt(r.alt_freeze_point_f, 1) + " degF, " + fmt(r.freeze_point_given_up_f, 1) + " degF higher" },
+    { key: "a", id: "bbs-out-a", label: "At the comparison mix", value: (r) => r.alt_salt_lb === null ? "not compared" : fmt(r.alt_salt_lb, 0) + " lb of salt (" + fmtDir(r.salt_difference_lb, 0, " lb", "less", "more") + ") and a freezing point of " + fmt(r.alt_freeze_point_f, 1) + " degF, " + fmtDir(r.freeze_point_given_up_f, 1, " degF", "higher", "lower") },
     { key: "n", id: "bbs-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeBrineBatchSalinity,
@@ -277,7 +277,7 @@ WINTEROPS_RENDERERS["plow-route-cycle-time"] = _simpleRenderer({
     { key: "a", id: "prc-out-a", label: "Accumulation between passes", value: (r) => fmt(r.accumulation_in, 1) + " in" },
     { key: "t", id: "prc-out-t", label: "At the cycle target", value: (r) => fmt(r.lane_miles_per_truck, 1) + " lane-miles per truck, " + r.trucks_required + " trucks, " + fmt(r.target_accumulation_in, 1) + " in on the ground" },
     { key: "x", id: "prc-out-x", label: "At the tighter target", value: (r) => r.alt_trucks_required === null ? "not compared" : fmt(r.alt_lane_miles_per_truck, 1) + " lane-miles per truck, " + r.alt_trucks_required + " trucks, " + fmt(r.alt_target_accumulation_in, 1) + " in on the ground" },
-    { key: "d", id: "prc-out-d", label: "What the tighter promise costs", value: (r) => r.extra_trucks === null ? "not compared" : r.extra_trucks + " more trucks (" + fmt(r.extra_trucks_pct, 0) + " % more fleet) to buy " + fmt(r.accumulation_bought_in, 1) + " in of accumulation" },
+    { key: "d", id: "prc-out-d", label: "What the tighter promise costs", value: (r) => r.extra_trucks === null ? "not compared" : (r.extra_trucks < 0 ? -r.extra_trucks + " fewer trucks (" + fmt(-r.extra_trucks_pct, 0) + " % less fleet) at the cost of " + fmt(-r.accumulation_bought_in, 1) + " in more accumulation" : r.extra_trucks + " more trucks (" + fmt(r.extra_trucks_pct, 0) + " % more fleet) to buy " + fmt(r.accumulation_bought_in, 1) + " in of accumulation") },
     { key: "n", id: "prc-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computePlowRouteCycleTime,
@@ -357,7 +357,7 @@ WINTEROPS_RENDERERS["snow-stacking-area"] = _simpleRenderer({
     { key: "f", id: "ssa-out-f", label: "Footprint after one event", value: (r) => fmt(r.footprint_ft2, 0) + " sq ft (" + fmt(r.footprint_pct_of_lot, 1) + " % of the lot), " + r.spaces_lost + " parking spaces" },
     { key: "s", id: "ssa-out-s", label: "After the entered events", value: (r) => fmt(r.season_footprint_ft2, 0) + " sq ft (" + fmt(r.season_footprint_pct_of_lot, 1) + " % of the lot), " + r.season_spaces_lost + " parking spaces over " + r.events + " event(s)" },
     { key: "h", id: "ssa-out-h", label: "Haul trigger", value: (r) => "allocation holds " + fmt(r.allocated_volume_ft3, 0) + " cu ft; " + (r.haul_volume_ft3 > 0 ? fmt(r.haul_volume_ft3, 0) + " cu ft (" + fmt(r.haul_cy, 0) + " cu yd) to haul" : "nothing to haul yet") },
-    { key: "c", id: "ssa-out-c", label: "As a free cone instead", value: (r) => fmt(r.cone_footprint_ft2, 0) + " sq ft standing " + fmt(r.cone_height_ft, 0) + " ft tall -- " + fmt(r.cone_saving_pct, 0) + " % less ground, which the height limit is what gives up" },
+    { key: "c", id: "ssa-out-c", label: "As a free cone instead", value: (r) => fmt(r.cone_footprint_ft2, 0) + " sq ft standing " + fmt(r.cone_height_ft, 0) + " ft tall -- " + (r.cone_saving_pct < 0 ? fmt(-r.cone_saving_pct, 0) + " % MORE ground: at this volume the free cone is the larger footprint" : fmt(r.cone_saving_pct, 0) + " % less ground, which the height limit is what gives up") },
     { key: "n", id: "ssa-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeSnowStackingArea,

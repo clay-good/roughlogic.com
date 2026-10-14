@@ -5077,7 +5077,7 @@ const renderMasonryCoursing = _simpleRenderer({
     { key: "ci", id: "mco-out-ci", label: "Course height", value: (r) => _fmtC(r.course_in, 4) + " in" },
     { key: "co", id: "mco-out-co", label: "Courses", value: (r) => String(r.courses) },
     { key: "bi", id: "mco-out-bi", label: "Built height", value: (r) => _fmtC(r.built_in, 3) + " in" },
-    { key: "m", id: "mco-out-m", label: "Course-out", value: (r) => r.on_module ? "on module (lands on a course)" : "NOT on module - off by " + _fmtC(r.off_in, 3) + " in (cut course or fattened joints)" },
+    { key: "m", id: "mco-out-m", label: "Course-out", value: (r) => r.on_module ? "on module (lands on a course)" : "NOT on module - " + _fmtC(Math.abs(r.off_in), 3) + " in " + (r.off_in < 0 ? "short of" : "past") + " a course (cut course or fattened joints)" },
     { key: "n", id: "mco-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeMasonryCoursing,

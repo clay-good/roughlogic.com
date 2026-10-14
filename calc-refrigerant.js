@@ -1588,7 +1588,7 @@ REFRIGERANT_RENDERERS["refrigerant-recovery-time"] = _simpleRenderer({
     { key: "v", id: "rfrt-out-v", label: "Vapor phase", value: (r) => fmt(r.vapor_min, 2) + " min" },
     { key: "t", id: "rfrt-out-t", label: "Total with evacuation", value: (r) => fmt(r.total_min, 2) + " min (" + fmt(r.recovery_min, 2) + " min of recovery)" },
     { key: "a", id: "rfrt-out-a", label: "All-vapor comparison", value: (r) => fmt(r.all_vapor_min, 2) + " min" },
-    { key: "s", id: "rfrt-out-s", label: "Speed-up from recovering liquid first", value: (r) => fmt(r.speedup_factor, 2) + " x, saving " + fmt(r.minutes_saved, 1) + " min" },
+    { key: "s", id: "rfrt-out-s", label: "Speed-up from recovering liquid first", value: (r) => fmt(r.speedup_factor, 2) + (r.minutes_saved < 0 ? " x, costing " : " x, saving ") + fmt(Math.abs(r.minutes_saved), 1) + " min" },
     { key: "c", id: "rfrt-out-c", label: "Cylinders the charge fills", value: (r) => r.cylinders === null ? "-" : String(r.cylinders) + " cylinder(s)" },
     { key: "n", id: "rfrt-out-n", label: "Note", value: (r) => r.note },
   ],

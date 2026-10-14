@@ -294,7 +294,7 @@ LINEWORKER_RENDERERS["conductor-sag-at-temperature"] = _simpleRenderer({
   outputs: [
     { key: "i", id: "cst-out-i", label: "Sag at the initial condition", value: (r) => fmt(r.sag1_ft, 2) + " ft at " + fmt(r.tension1_lb, 0) + " lb and " + fmt(r.temp1_f, 0) + " F" },
     { key: "t", id: "cst-out-t", label: "Tension at the final condition", value: (r) => fmt(r.tension2_lb, 0) + " lb -- " + fmt(r.tension_change_lb, 0) + " lb, " + fmt(r.tension_change_pct, 1) + "%" },
-    { key: "s", id: "cst-out-s", label: "Sag at the final condition", value: (r) => fmt(r.sag2_ft, 2) + " ft, up " + fmt(r.sag_increase_ft, 2) + " ft -- a " + fmt(r.sag_increase_pct, 0) + "% sag change from a " + fmt(Math.abs(r.tension_change_pct), 0) + "% tension change, because sag goes as 1/H" },
+    { key: "s", id: "cst-out-s", label: "Sag at the final condition", value: (r) => fmt(r.sag2_ft, 2) + " ft, " + (r.sag_increase_ft < 0 ? "down " : "up ") + fmt(Math.abs(r.sag_increase_ft), 2) + " ft -- a " + fmt(Math.abs(r.sag_increase_pct), 0) + "% sag change from a " + fmt(Math.abs(r.tension_change_pct), 0) + "% tension change, because sag goes as 1/H" },
     { key: "d", id: "cst-out-d", label: "Direction", value: (r) => r.direction },
     { key: "r", id: "cst-out-r", label: "Against rated strength", value: (r) => r.tension1_pct_rated === null ? "(no rated strength entered)" : fmt(r.tension1_pct_rated, 1) + "% initially, " + fmt(r.tension2_pct_rated, 1) + "% finally" },
     { key: "n", id: "cst-out-n", label: "Note", value: (r) => r.note },

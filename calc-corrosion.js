@@ -13,7 +13,7 @@
 
 import {
   DEBOUNCE_MS, debounce, makeNumber,
-  makeOutputLine, attachExampleButton, fmt,
+  makeOutputLine, attachExampleButton, fmt, fmtDir,
 } from "./ui-fields.js";
 
 const IN_PER_FT = 12;
@@ -702,7 +702,7 @@ CORROSION_RENDERERS["tank-bottom-anode-layout"] = _simpleRenderer({
     { key: "current_requirement_a", id: "tba-i", label: "Current requirement", unit: "A", value: (r) => fmt(r.current_requirement_a, 2) + " A over " + fmt(r.bottom_area_sqft, 0) + " sq ft" },
     { key: "grid_ribbon_ft", id: "tba-grid", label: "Grid ribbon", unit: "ft", value: (r) => fmt(r.grid_ribbon_ft, 0) + " ft in " + fmt(r.line_count, 0) + " lines at " + fmt(r.grid_spacing_ft, 0) + " ft" },
     { key: "grid_loading_ma_per_ft", id: "tba-gload", label: "Grid loading", value: (r) => fmt(r.grid_loading_ma_per_ft, 1) + " mA/ft -- " + (r.grid_passes_rating ? "within" : "OVER") + " the " + fmt(r.ribbon_rating_ma_per_ft, 0) + " mA/ft rating" },
-    { key: "ring_loading_ma_per_ft", id: "tba-rload", label: "Perimeter ring loading", value: (r) => fmt(r.ring_loading_ma_per_ft, 1) + " mA/ft on " + fmt(r.ring_ribbon_ft, 0) + " ft -- " + (r.ring_passes_rating ? "also passes" : "OVER the rating") + ", using " + fmt(r.ring_saving_pct, 0) + "% less anode" },
+    { key: "ring_loading_ma_per_ft", id: "tba-rload", label: "Perimeter ring loading", value: (r) => fmt(r.ring_loading_ma_per_ft, 1) + " mA/ft on " + fmt(r.ring_ribbon_ft, 0) + " ft -- " + (r.ring_passes_rating ? "also passes" : "OVER the rating") + ", using " + fmtDir(r.ring_saving_pct, 0, "%", "less", "more") + " anode" },
     { key: "ring_to_centre_ft", id: "tba-centre", label: "The check that passes and the one that does not", value: (r) => "the ring leaves the tank centre " + fmt(r.ring_to_centre_ft, 0) + " ft from any anode, against " + fmt(r.grid_to_farthest_ft, 0) + " ft for the grid -- and bottoms perforate in the middle" },
     { key: "note", id: "tba-note", label: "Use", value: (r) => r.note },
   ],

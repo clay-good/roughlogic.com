@@ -5,7 +5,7 @@
 
 import {
   DEBOUNCE_MS, debounce, makeNumber, makeSelect,
-  makeOutputLine, attachExampleButton, fmt,
+  makeOutputLine, attachExampleButton, fmt, fmtDir,
 } from "./ui-fields.js";
 
 const HOURS_PER_YEAR = 8760;
@@ -131,7 +131,7 @@ DATACENTER_RENDERERS["datacenter-pue"] = _simpleRenderer({
     { key: "annual_energy_kwh", id: "dcp-energy", label: "Annual facility energy", unit: "kWh", value: (r) => fmt(r.annual_energy_kwh, 0) + " kWh" },
     { key: "annual_cost", id: "dcp-cost", label: "Annual facility cost", unit: "$", value: (r) => "$" + fmt(r.annual_cost, 0) },
     { key: "target_annual_cost", id: "dcp-target", label: "At target PUE", unit: "$", value: (r) => fmt(r.target_total_kw, 1) + " kW; $" + fmt(r.target_annual_cost, 0) + "/yr; save $" + fmt(r.target_annual_savings, 0) },
-    { key: "reduced_pue", id: "dcp-reduced", label: "Reduced IT-load case", value: (r) => "PUE " + fmt(r.reduced_pue, 3) + "; " + fmt(r.reduced_total_kw, 1) + " kW; " + fmt(r.reduced_energy_savings_pct, 1) + " % less energy; save $" + fmt(r.reduced_annual_savings, 0) + "/yr" },
+    { key: "reduced_pue", id: "dcp-reduced", label: "Reduced IT-load case", value: (r) => "PUE " + fmt(r.reduced_pue, 3) + "; " + fmt(r.reduced_total_kw, 1) + " kW; " + fmtDir(r.reduced_energy_savings_pct, 1, " %", "less", "more") + " energy; " + (r.reduced_annual_savings < 0 ? "costs $" : "save $") + fmt(Math.abs(r.reduced_annual_savings), 0) + "/yr" },
     { key: "note", id: "dcp-note", label: "Use", value: (r) => r.note },
   ],
   compute: computeDatacenterPue,
@@ -178,7 +178,7 @@ DATACENTER_RENDERERS["rack-power-density-airflow"] = _simpleRenderer({
     { key: "standard_tiles_required", id: "rpa-tiles", label: "Standard tiles required", value: (r) => fmt(r.standard_tiles_required, 2) },
     { key: "comparison_required_cfm", id: "rpa-high", label: "Higher-density rack", value: (r) => fmt(r.comparison_required_cfm, 0) + " cfm; " + fmt(r.comparison_standard_tiles_required, 2) + " standard tiles" },
     { key: "comparison_high_flow_tiles_required", id: "rpa-hft", label: "With high-flow tiles", value: (r) => fmt(r.comparison_high_flow_tiles_required, 2) + " tiles" },
-    { key: "alternative_delta_t_cfm", id: "rpa-alt", label: "Airflow at alternative rise", unit: "cfm", value: (r) => fmt(r.alternative_delta_t_cfm, 0) + " cfm (" + fmt(r.alternative_airflow_reduction_pct, 1) + " % less)" },
+    { key: "alternative_delta_t_cfm", id: "rpa-alt", label: "Airflow at alternative rise", unit: "cfm", value: (r) => fmt(r.alternative_delta_t_cfm, 0) + " cfm (" + fmtDir(r.alternative_airflow_reduction_pct, 1, " %", "less", "more") + ")" },
     { key: "note", id: "rpa-note", label: "Use", value: (r) => r.note },
   ],
   compute: computeRackPowerDensityAirflow,
@@ -234,7 +234,7 @@ DATACENTER_RENDERERS["ups-module-redundancy"] = _simpleRenderer({
     { key: "required_modules", id: "umr-mod", label: "Module counts", value: (r) => "N " + r.required_modules + "; N+1 " + r.n_plus_one_modules + "; 2N " + r.two_n_modules },
     { key: "required_load_pct", id: "umr-load", label: "Module load fractions", value: (r) => "N " + fmt(r.required_load_pct, 1) + " %; N+1 " + fmt(r.n_plus_one_load_pct, 1) + " %; 2N " + fmt(r.two_n_load_pct, 1) + " %" },
     { key: "n_plus_one_loss_kw", id: "umr-loss1", label: "N+1 conversion loss", unit: "kW", value: (r) => fmt(r.n_plus_one_loss_kw, 1) + " kW" },
-    { key: "two_n_loss_kw", id: "umr-loss2", label: "2N conversion loss", unit: "kW", value: (r) => fmt(r.two_n_loss_kw, 1) + " kW (" + fmt(r.loss_delta_kw, 1) + " kW more)" },
+    { key: "two_n_loss_kw", id: "umr-loss2", label: "2N conversion loss", unit: "kW", value: (r) => fmt(r.two_n_loss_kw, 1) + " kW (" + fmtDir(r.loss_delta_kw, 1, " kW", "more", "less") + ")" },
     { key: "annual_metered_delta", id: "umr-meter", label: "Annual metered penalty", unit: "$", value: (r) => "$" + fmt(r.annual_metered_delta, 0) },
     { key: "annual_total_penalty_delta", id: "umr-total", label: "Annual 2N penalty including cooling", unit: "$", value: (r) => "$" + fmt(r.annual_total_penalty_delta, 0) + " (" + fmt(r.cooling_share_pct, 1) + " % cooling)" },
     { key: "note", id: "umr-note", label: "Use", value: (r) => r.note },
