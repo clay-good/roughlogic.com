@@ -183,6 +183,7 @@ export function computeLockBacksetLayout({ backset_in = 2.375, cross_bore_dia_in
   if (!(accessible_max_in > accessible_min_in)) return { error: "Accessible maximum must exceed the minimum." };
   const cross_bore_far_side_in = backset_in + cross_bore_dia_in / 2;
   const cross_bore_near_side_in = backset_in - cross_bore_dia_in / 2;
+  if (!(cross_bore_near_side_in > 0)) return { error: "At this backset the cross bore breaks out of the door edge; a " + fmt(cross_bore_dia_in, 3) + " in bore needs a backset over " + fmt(cross_bore_dia_in / 2, 4) + " in." };
   const min_stile_required_in = cross_bore_far_side_in;
   const stile_ok = stile_width_in >= min_stile_required_in - 1e-9 * Math.abs(min_stile_required_in);
   const edge_bore_center_from_face_in = door_thickness_in / 2;

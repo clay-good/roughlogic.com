@@ -177,7 +177,7 @@ STAGEPRODUCTION_RENDERERS["delay-tower-alignment"] = _r({
     { key: "distance_ft", label: "Main array to delay position (ft)", kind: "number" },
     { key: "temp_f", label: "Air temperature (F)", kind: "number", default: 70 },
     { key: "haas_offset_ms", label: "Haas offset (ms)", kind: "number", default: 15 },
-    { key: "compare_temp_f", label: "Comparison temperature (F)", kind: "number" },
+    { key: "compare_temp_f", label: "Comparison temperature (F)", kind: "number", default: 90 },
   ],
   outputs: [
     { key: "c", id: "dtal-out-c", label: "Speed of sound at this temperature", value: (r) => fmt(r.speed_ft_s, 1) + " ft/s" },

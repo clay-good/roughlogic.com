@@ -390,6 +390,7 @@ const _bcGcd = (a, b) => { a = Math.abs(a); b = Math.abs(b); while (b) { const t
 export function computeDecimalToFraction({ value_in = 0, denominator = 16 } = {}) {
   const _g = _finiteGuard({ value_in, denominator }); if (_g) return _g;
   const v = Number(value_in);
+  if (!Number.isFinite(v)) return { error: "Enter a decimal number of inches." };
   const den = Math.floor(Number(denominator) || 0);
   if (![2, 4, 8, 16, 32, 64].includes(den)) return { error: "Round to a binary tape-measure fraction: 2, 4, 8, 16, 32, or 64." };
   const sign = v < 0 ? -1 : 1;
@@ -404,7 +405,7 @@ export function computeDecimalToFraction({ value_in = 0, denominator = 16 } = {}
   const error_in = decimal_value_in - v;
   const feet = Math.floor(wholeInBase / 12 + 1e-9);
   const inch_in_ft = wholeInBase - feet * 12;
-  const sgn = sign < 0 ? "-" : "";
+  const sgn = sign < 0 && totalTicks > 0 ? "-" : ""; // -0.01 rounds to 0, not "-0 in"
   const fracPart = numerator === 0 ? "" : numerator + "/" + reduced_denominator;
   let fraction_text;
   if (numerator === 0) fraction_text = sgn + wholeInBase + " in";

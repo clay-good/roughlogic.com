@@ -735,6 +735,8 @@ export function computeCloseIntervalSurveyReadings({ survey_length_mi = 0, readi
   const test_station_readings = Math.floor(survey_length_mi / test_station_spacing_mi + 1e-9) + 1;
   const field_days = survey_length_mi / production_mi_per_day;
   const reading_hours = data_points / readings_per_station * seconds_per_reading / SEC_PER_HOUR;
+  if (test_station_readings > reading_count) return { error: "The test stations are closer together than the survey's own readings; check the station spacing (miles) and the reading interval (ft)." };
+  if (reading_hours > field_days * crew_day_hours * (1 + 1e-9)) return { error: "The readings alone take " + fmt(reading_hours, 1) + " hours, more than the " + fmt(field_days * crew_day_hours, 1) + " crew hours this production rate allows; lower the miles per day or the seconds per reading." };
   return {
     survey_length_mi, reading_interval_ft, alternative_interval_ft, seconds_per_reading,
     length_ft, reading_count, data_points,

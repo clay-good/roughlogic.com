@@ -61564,3 +61564,32 @@ test("hardening slice 42 (fill capped at the body, fleet at the loads, shear exp
   const { computeSerialDilution } = await import("../../calc-lab.js");
   assert.ok(computeSerialDilution({ starting_concentration: 1, dilution_factor: 10, volume_per_tube: 1, number_of_steps: 2.5 }).error);
 });
+
+test("hardening slice 43 (bore breakout, survey time, both ratings, exact 1-3/4 kW, fraction text)", async () => {
+  const { readFileSync } = await import("node:fs");
+  const rows = JSON.parse(readFileSync(new URL("../fixtures/worked-examples.json", import.meta.url), "utf8")).rows;
+  const { COMPUTE_MAP } = await import("../fixtures/compute-map.js");
+  const run = async (id, over = {}) => {
+    const reg = COMPUTE_MAP[id];
+    const fn = (await import(new URL(reg.module, new URL("../fixtures/", import.meta.url)).href))[reg.fn];
+    return fn({ ...rows.find((r) => r.tile_id === id).inputs, ...over });
+  };
+  for (const [id, over] of [
+    ["range-demand-220-55", { nameplate_kw: 1.75 }],
+    ["close-interval-survey-readings", { seconds_per_reading: 10 }],
+    ["close-interval-survey-readings", { test_station_spacing_mi: 0.0001 }],
+    ["lock-backset-strike-layout", { backset_in: 1 }],
+    ["bearing-conversion", { declination_deg: "abc" }],
+    ["slope-avalanche", { measured_angle_deg: 90 }],
+    ["hemocytometer", { dead_cells: -12 }],
+    ["decimal-to-fraction", { value_in: "abc" }],
+  ]) {
+    assert.ok(!(await run(id)).error, id + " example");
+    assert.ok((await run(id, over)).error, id + " " + JSON.stringify(over));
+  }
+  assert.equal((await run("decimal-to-fraction", { value_in: -0.01 })).fraction_text, "0 in");
+  assert.equal((await run("decimal-to-fraction", { value_in: -2.375 })).fraction_text, "-2-3/8 in");
+  assert.ok(!(await run("slope-avalanche", { measured_angle_deg: 89 })).error);
+  const both = (await run("gear-reducer-service-factor", { catalog_mechanical_hp: 30 })).verdict;
+  assert.ok(/FAILS BOTH RATINGS: 20\.0 hp short on the mechanical/.test(both) && /3\.0 hp short on the THERMAL/.test(both), both);
+});

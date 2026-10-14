@@ -78,6 +78,7 @@ export const pacingExample = { inputs: { calibration_distance_ft: 100, calibrati
 export function computeBearingConversion({ declination_deg = 0, bearing_deg = 0, direction = "magnetic_to_true" }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   declination_deg = Number(declination_deg); bearing_deg = Number(bearing_deg);
+  if (!Number.isFinite(declination_deg) || !Number.isFinite(bearing_deg)) return { error: "Declination and bearing must be numbers (degrees)." };
   if (declination_deg < -180 || declination_deg > 180) return { error: "Declination out of range." };
   if (bearing_deg < 0 || bearing_deg > 360) return { error: "Bearing out of range." };
   let result;
@@ -129,7 +130,7 @@ export function computeSlopeAvalanche({ rise_ft = 0, run_ft = 0, measured_angle_
   } else {
     return { error: "Provide either measured angle or rise + run." };
   }
-  if (angle < 0 || angle > 90) return { error: "Angle out of range." };
+  if (!(angle >= 0 && angle < 90)) return { error: "Slope angle must be at least 0 and under 90 degrees." };
   const percent = Math.tan((angle * Math.PI) / 180) * 100;
   const in_window = angle >= 30 && angle <= 45;
   return {

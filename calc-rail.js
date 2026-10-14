@@ -302,7 +302,7 @@ RAIL_RENDERERS["rail-wear-condemning-limit"] = _simpleRenderer({
     { key: "v", id: "rwl-out-v", label: "Verdict", value: (r) => r.verdict },
     { key: "a", id: "rwl-out-a", label: "Head area removed (rectangular screen)", value: (r) => fmt(r.head_area_loss_pct, 1) + "% (" + fmt(r.lost_area_in2, 3) + " sq in)" },
     { key: "w", id: "rwl-out-w", label: "Wear rate", value: (r) => fmt(r.wear_rate_in_per_mgt, 5) + " in per MGT" },
-    { key: "m", id: "rwl-out-m", label: "Tonnage to the limit", value: (r) => fmt(r.remaining_mgt, 0) + " MGT" },
+    { key: "m", id: "rwl-out-m", label: "Tonnage to the limit", value: (r) => r.unworn ? "no wear entered, so there is no wear rate to project from" : fmt(r.remaining_mgt, 0) + " MGT" },
     { key: "n", id: "rwl-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeRailWearLimit,

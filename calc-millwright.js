@@ -793,7 +793,9 @@ export function computeGearReducerServiceFactor({ transmitted_hp = 0, service_fa
     catalog_mechanical_hp, catalog_thermal_hp, nameplate_shortfall_pct,
     verdict: passes
       ? "PASSES with a margin of " + fmt(governing_margin, 2) + " on transmitted power, the " + (thermal_governs ? "THERMAL" : "mechanical") + " rating governing"
-      : "FAILS by " + fmt(shortfall_hp, 1) + " hp on the " + (!thermal_passes ? "THERMAL rating against the power actually transmitted" : "mechanical rating against transmitted power x the service factor"),
+      : (!thermal_passes && !mechanical_passes)
+        ? "FAILS BOTH RATINGS: " + fmt(required_hp - catalog_mechanical_hp, 1) + " hp short on the mechanical rating against transmitted power x the service factor, and " + fmt(transmitted_hp - catalog_thermal_hp, 1) + " hp short on the THERMAL rating"
+        : "FAILS by " + fmt(shortfall_hp, 1) + " hp on the " + (!thermal_passes ? "THERMAL rating against the power actually transmitted" : "mechanical rating against transmitted power x the service factor"),
     thermal_verdict: !has_thermal
       ? "(no thermal rating entered -- and on a continuously running unit it is frequently the LOWER of the two, so it is worth finding)"
       : !thermal_passes

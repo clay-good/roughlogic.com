@@ -395,7 +395,7 @@ export function computeRangeDemand22055({ num_ranges = 1, nameplate_kw = 0, supp
   // nameplates times the column's percentage for the count. Until 2026-10-07 a 3 kW range read
   // Column C's 8 kW, more than its own nameplate; until 2026-10-09 only one such appliance was carried.
   if (kw < 8.75) {
-    if (kw < 1.75) return { error: "Table 220.55 covers household cooking appliances rated over 1-3/4 kW; a smaller one is calculated at its nameplate." };
+    if (kw <= 1.75) return { error: "Table 220.55 covers household cooking appliances rated over 1-3/4 kW; a smaller one is calculated at its nameplate." };
     const colA = kw < 3.5;
     const pct = _rangeColABPct(n, colA);
     const demand_kw = n * kw * pct / 100;

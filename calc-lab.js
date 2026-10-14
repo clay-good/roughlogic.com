@@ -694,6 +694,7 @@ export function computeHemocytometer({
   if (!(squares_counted > 0)) return { error: "Need at least one square counted." };
   if (!(dilution_factor > 0)) return { error: "Dilution factor must be positive." };
   if (Number.isFinite(dead_cells) && dead_cells > total_cells_counted) return { error: "Dead cells cannot exceed the total cells counted." };
+  if (Number.isFinite(dead_cells) && dead_cells < 0) return { error: "Dead cell count cannot be negative." };
   const avg_per_square = total_cells_counted / squares_counted;
   const cells_per_mL = avg_per_square * 1e4 * dilution_factor;
   let viability_pct = null;
