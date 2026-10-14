@@ -61345,3 +61345,59 @@ test("hardening slice 37 (answers that cannot be negative)", async () => {
   assert.equal(computeConcreteEvaporationRate({ air_temp_f: 180, concrete_temp_f: 90, rh_pct: 40, wind_mph: 15 }).E_us, 0);
   assert.ok(computeConcreteEvaporationRate({ air_temp_f: 90, concrete_temp_f: 90, rh_pct: 40, wind_mph: 15 }).E_us > 0.2);
 });
+
+test("hardening slice 38 (deferred findings re-run: rigging legs, blank readings, PV bounds, MPPT window, mode names)", async () => {
+  const ST = await import("../../calc-stage.js");
+  const A = await import("../../calc-arborist.js");
+  const C = await import("../../calc-civil.js");
+  const S = await import("../../calc-solar.js");
+  const E = await import("../../calc-edu.js");
+  const D = await import("../../calc-drainage.js");
+  const DC = await import("../../calc-datacenter.js");
+  // four chokers carry no more evenly than a four-leg bridle
+  const rig = (configuration, n_legs) => ST.computeRiggingCheck({ hardware: "sling_5_8_steel", configuration, load_lb: 1500, n_legs });
+  assert.ok(Math.abs(rig("choker", 4).tension_per_leg_lb - rig("bridle", 4).tension_per_leg_lb) < 1e-9);
+  assert.ok(Math.abs(rig("choker", 2).tension_per_leg_lb - 1500 / (2 * Math.cos(Math.PI / 6))) < 1e-9);
+  assert.ok(rig("vertical", 2.5).error);
+  // blank is missing; a typed 0 is a reading
+  assert.ok(A.computeTreeHeightClinometer({ horizontal_distance_ft: 100, base_reading_pct: -4 }).error);
+  assert.equal(A.computeTreeHeightClinometer({ horizontal_distance_ft: 100, top_reading_pct: 0, base_reading_pct: -4 }).tree_height_ft, 4);
+  assert.ok(C.computeSlopeStakeCutFill({ design_elev_ft: 100, slope_ratio_h: 2 }).error);
+  assert.equal(C.computeSlopeStakeCutFill({ existing_elev_ft: 0, design_elev_ft: 100, slope_ratio_h: 2 }).catch_offset_ft, 200);
+  assert.ok(A.computeTreeAppraisalCtla({ dbh_in: 24, unit_cost_per_sq_in: 60 }).error);
+  assert.ok(Math.abs(A.computeTreeAppraisalCtla({ dbh_in: 24, unit_cost_per_sq_in: 60, species_pct: 80, condition_pct: 70, location_pct: 75 }).combined_factor - 0.42) < 1e-12);
+  // PV
+  const pv = { module_voc_V: 40, module_vmp_V: 33, voc_temp_coeff_pct_per_C: 0.30, record_low_C: -10, record_high_C: 45, inverter_mppt_min_V: 200, inverter_mppt_max_V: 480, inverter_vdc_max_V: 600 };
+  assert.ok(S.computePVStringSizing({ ...pv, voc_temp_coeff_pct_per_C: 30 }).error);
+  const inWindow = S.computePVStringSizing(pv);
+  assert.equal(inWindow.max_series, 13);
+  assert.equal(inWindow.above_mppt_window, false);
+  assert.ok(Math.abs(inWindow.cold_string_vmp_V - 13 * 33 * 1.105) < 1e-9);
+  const above = S.computePVStringSizing({ ...pv, inverter_mppt_max_V: 420 });
+  assert.equal(above.above_mppt_window, true);
+  assert.equal(above.max_series_in_mppt, 11); // floor(420 / 36.465)
+  assert.equal(S.computePVStringSizing({ ...pv, inverter_mppt_max_V: 0 }).above_mppt_window, false);
+  assert.ok(S.computePvMaxAmbientForPower({ target_power_W: 800, P_stc_W: 400, G_wm2: 800 }).error);
+  assert.ok(Number.isFinite(S.computePvMaxAmbientForPower({ target_power_W: 380, P_stc_W: 400, G_wm2: 800 }).max_ambient_C));
+  assert.ok(S.computeBatteryRuntime({ amp_hours: 100, system_V: 12, dod_percent: 80, load_W: 120, peukert_k: 0.8 }).error);
+  assert.ok(S.computePvCircuitAmpacity({ module_isc_a: 10, parallel_strings: 2.5 }).error);
+  // names that are not options
+  assert.ok(E.computeCurveGradeScaler({ method: "bell", raw_score: 49, param: 10 }).error);
+  assert.equal(E.computeCurveGradeScaler({ raw_score: 49, param: 10 }).curved, 59);
+  assert.ok(E.computeCodonTable({ sequence: "AUG", sequence_type: "bogus" }).error);
+  assert.ok(E.computeGPA({ courses: "A 5 __proto__\nB 3 regular" }).error);
+  assert.ok(C.computeSuperelevation({ mode: "x", V_mph: 60, R_ft: 1500, f: 0.12 }).error);
+  assert.ok(C.computeHorizontalSightlineOffset({ mode: "S", R_ft: 1000, M_ft: 15 }).error);
+  assert.ok(C.computeHorizontalCurve({ mode: "bogus", radius_ft: 500, delta_deg: 30 }).error);
+  assert.ok(C.computeCurveDeflectionStakeout({ mode: "bogus", radius_ft: 500, arc_length_ft: 100 }).error);
+  assert.equal(C.computeSuperelevation({ mode: "e", V_mph: 80, R_ft: 500, f: 0.12 }).exceeds_max_rate, true);
+  assert.equal(C.computeSuperelevation({ mode: "e", V_mph: 60, R_ft: 1500, f: 0.12 }).exceeds_max_rate, false);
+  // a steep barrel does not put the headwater below the invert
+  const inlet = D.computeCulvertInletControl({ diameter_in: 36, flow_cfs: 1, slope: 0.3, config: "concrete_square_headwall" });
+  assert.equal(inlet.hw_ft, 0);
+  assert.equal(inlet.hw_over_d, 0);
+  // the exhaust is fixed by the supply and the rise
+  const room = { it_load_kw: 500, equipment_delta_t_f: 20, unit_count: 8, airflow_per_unit_cfm: 12000, supply_temp_f: 65, exhaust_temp_f: 85, fan_power_per_unit_kw: 7.5, tariff_per_kwh: 0.1 };
+  assert.ok(!DC.computeContainmentBypassAirflow(room).note.startsWith("CHECK"));
+  assert.ok(DC.computeContainmentBypassAirflow({ ...room, exhaust_temp_f: 95 }).note.startsWith("CHECK THE TEMPERATURES"));
+});

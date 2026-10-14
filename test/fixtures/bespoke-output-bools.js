@@ -37,7 +37,6 @@ export const BESPOKE_OUTPUT_BOOLS = {
   "power-screw-torque": {"self_locking":{"t":"Yes - holds the load with no brake","f":"No - the load runs the screw back down"}},
   "pv-ballast-weight": {"pass":{"t":"PASS (at or under the allowable)","f":"OVER -- re-check with the engineer"}},
   "pv-interconnection-busbar": {"passes":{"t":"PASS","f":"FAIL"}},
-  "pv-string-sizing": {"flag":{"t":"Infeasible: min series exceeds max series.","f":"Feasible"}},
   "readability": {"reliable":{"t":"Reliable (>= 50 words)","f":"Approximate (< 50 words; formula derived for longer passages)"}},
   "silt-fence-drainage": {"slope_ok":{"t":"OK (within the AHJ slope-length limit)","f":"OVER the AHJ slope-length limit"}},
   "spore-io-ratio": {"pass":{"t":"Supportable -- indoor at/below outdoor, no marker","f":"Not supportable -- see ratio / marker"}},

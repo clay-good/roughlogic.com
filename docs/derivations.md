@@ -1500,9 +1500,9 @@ cross-check.
 | calc-arborist.js | `computeQuadraticMeanDiameter` | `{ tally = "" } = {}` | _ | _ | _ |
 | calc-arborist.js | `computeReinekeSdi` | `{ trees_per_acre = 0, qmd_in = 0, sdi_max = 0 } = {}` | _ | _ | _ |
 | calc-arborist.js | `computeThinningTargetTpa` | `{ sdi_max = 0, target_pct = 0, qmd_in = 0, current_tpa = 0 } = {}` | _ | _ | _ |
-| calc-arborist.js | `computeTreeAppraisalCtla` | `{ dbh_in = 0, unit_cost_per_sq_in = 0, species_pct = 100, condition_pct = 100...` | _ | _ | _ |
+| calc-arborist.js | `computeTreeAppraisalCtla` | `{ dbh_in = 0, unit_cost_per_sq_in = 0, species_pct, condition_pct, location_p...` | _ | _ | _ |
 | calc-arborist.js | `computeTreeCrzEncroachment` | `{ dbh_in = 0, radius_factor = 1.0, limit_distance_ft = 0, species_tolerance =...` | _ | _ | _ |
-| calc-arborist.js | `computeTreeHeightClinometer` | `{ horizontal_distance_ft = 0, top_reading_pct = 0, base_reading_pct = 0 } = {}` | _ | _ | _ |
+| calc-arborist.js | `computeTreeHeightClinometer` | `{ horizontal_distance_ft = 0, top_reading_pct, base_reading_pct = 0 } = {}` | _ | _ | _ |
 | calc-arborist.js | `computeTreeOpenCavity` | `{ diameter_in = 0, shell_thick_in = 0, opening_width_in = 0 } = {}` | _ | _ | _ |
 | calc-arborist.js | `computeTreeProtectionZone` | `{ dbh_in = 0, radius_factor = 1.0 } = {}` | _ | _ | _ |
 | calc-arborist.js | `computeTreeRiggingShock` | `{ static_weight_lb, drop_ft, rope_length_ft, elong_pct = 5 } = {}` | _ | _ | _ |

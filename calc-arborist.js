@@ -830,10 +830,12 @@ ARBORIST_RENDERERS["crown-pruning-dose"] = _v567renderCrownPruningDose;
 // eye level, - below), tree height H = D x (top% - base%)/100. The base reading
 // is negative when the tree base is below the observer's eye (add its height).
 // dims: in { horizontal_distance_ft: L, top_reading_pct: dimensionless, base_reading_pct: dimensionless } out: { tree_height_ft: L, above_eye_ft: L, below_eye_ft: L }
-export function computeTreeHeightClinometer({ horizontal_distance_ft = 0, top_reading_pct = 0, base_reading_pct = 0 } = {}) {
+export function computeTreeHeightClinometer({ horizontal_distance_ft = 0, top_reading_pct, base_reading_pct = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const D = Number(horizontal_distance_ft) || 0;
   if (!(D > 0)) return { error: "Horizontal distance to the tree must be positive (ft)." };
+  // A missing top reading ran as 0 (eye level): a tree read from a -4% base came out 4 ft tall.
+  if (arguments[0]?.top_reading_pct === undefined || arguments[0]?.top_reading_pct === null || arguments[0]?.top_reading_pct === "") return { error: "Enter the reading to the top of the tree (percent slope)." };
   const top = Number(top_reading_pct);
   const base = Number(base_reading_pct);
   if (!Number.isFinite(top) || !Number.isFinite(base)) return { error: "Readings must be numbers (percent slope; + above eye, - below)." };
@@ -859,7 +861,7 @@ function renderTreeHeightClinometer(inputRegion, outputRegion, citationEl) {
   const oB = makeOutputLine(outputRegion, "Base offset from eye level", "thc-out-b");
   const oNote = makeOutputLine(outputRegion, "Note", "thc-out-note");
   const update = debounce(() => {
-    const r = computeTreeHeightClinometer({ horizontal_distance_ft: Number(d.input.value) || 0, top_reading_pct: Number(top.input.value) || 0, base_reading_pct: Number(base.input.value) || 0 });
+    const r = computeTreeHeightClinometer({ horizontal_distance_ft: Number(d.input.value) || 0, top_reading_pct: top.input.value, base_reading_pct: Number(base.input.value) || 0 });
     if (r.error) { oH.textContent = r.error; oA.textContent = "-"; oB.textContent = "-"; oNote.textContent = ""; return; }
     oH.textContent = fmt(r.tree_height_ft, 1) + " ft";
     oA.textContent = fmt(r.above_eye_ft, 1) + " ft";
@@ -919,8 +921,10 @@ ARBORIST_RENDERERS["firewood-cord"] = renderFirewoodCord;
 // condition x location. Every factor here is an INPUT: the unit cost is regional and the three
 // percentages come from a regional plant appraisal committee guide, so no table is shipped.
 // dims: in { dbh_in: L, unit_cost_per_sq_in: dimensionless, species_pct: dimensionless, condition_pct: dimensionless, location_pct: dimensionless } out: { trunk_area_sq_in: L^2, basic_value: dimensionless, appraised_value: dimensionless }
-export function computeTreeAppraisalCtla({ dbh_in = 0, unit_cost_per_sq_in = 0, species_pct = 100, condition_pct = 100, location_pct = 100 } = {}) {
+export function computeTreeAppraisalCtla({ dbh_in = 0, unit_cost_per_sq_in = 0, species_pct, condition_pct, location_pct } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // The three ratings ARE the appraisal; left out they ran as 100% each and returned the undepreciated basic value.
+  for (const k of ["species_pct", "condition_pct", "location_pct"]) { const v = arguments[0]?.[k]; if (v === undefined || v === null || v === "") return { error: "Enter the species, condition and location ratings (0 to 100 percent each)." }; }
   const d = Number(dbh_in) || 0;
   const unit = Number(unit_cost_per_sq_in) || 0;
   const sp = Number(species_pct);
@@ -966,7 +970,7 @@ function renderTreeAppraisalCtla(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const r = computeTreeAppraisalCtla({
       dbh_in: Number(d.input.value), unit_cost_per_sq_in: Number(u.input.value),
-      species_pct: Number(s.input.value), condition_pct: Number(c.input.value), location_pct: Number(l.input.value),
+      species_pct: s.input.value, condition_pct: c.input.value, location_pct: l.input.value,
     });
     if (r.error) { oA.textContent = r.error; oB.textContent = "-"; oV.textContent = "-"; oN.textContent = "-"; return; }
     oA.textContent = fmt(r.trunk_area_sq_in, 1) + " sq in, measured " + r.measure_at;

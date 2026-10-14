@@ -306,6 +306,9 @@ export function computeContainmentBypassAirflow({ it_load_kw = 0, equipment_delt
   const matched_airflow_ratio = Math.min(1, it_airflow_cfm / supply_airflow_cfm);
   const matched_fan_power_kw = current_fan_power_kw * Math.pow(matched_airflow_ratio, 3);
   const fan_savings_kw = current_fan_power_kw - matched_fan_power_kw;
+  // The exhaust temperature is already fixed by the other two entries.
+  const implied_exhaust_temp_f = supply_temp_f + equipment_delta_t_f;
+  const exhaust_mismatch_f = exhaust_temp_f - implied_exhaust_temp_f;
   const one_failed_supply_cfm = Math.max(0, unit_count - 1) * airflow_per_unit_cfm;
   const two_failed_supply_cfm = Math.max(0, unit_count - 2) * airflow_per_unit_cfm;
   return {
@@ -317,7 +320,8 @@ export function computeContainmentBypassAirflow({ it_load_kw = 0, equipment_delt
     one_failed_margin_pct: 100 * (one_failed_supply_cfm - it_airflow_cfm) / it_airflow_cfm,
     two_failed_supply_cfm, two_failed_margin_cfm: two_failed_supply_cfm - it_airflow_cfm,
     two_failed_margin_pct: 100 * (two_failed_supply_cfm - it_airflow_cfm) / it_airflow_cfm,
-    note: "Bypass does not create extra cooling; it spends fan energy and failure margin while lowering return temperature. Whole-room averages can hide simultaneous local recirculation, so a rack-inlet survey and ASHRAE TC 9.9 limits govern.",
+    implied_exhaust_temp_f, exhaust_mismatch_f,
+    note: (Math.abs(exhaust_mismatch_f) > 1 ? "CHECK THE TEMPERATURES: a " + fmt(supply_temp_f, 0) + " F supply and a " + fmt(equipment_delta_t_f, 0) + " F equipment rise put the exhaust at " + fmt(implied_exhaust_temp_f, 0) + " F, not the " + fmt(exhaust_temp_f, 0) + " F entered, so the airflow and the return temperature below describe two different rooms. " : "") + "Bypass does not create extra cooling; it spends fan energy and failure margin while lowering return temperature. Whole-room averages can hide simultaneous local recirculation, so a rack-inlet survey and ASHRAE TC 9.9 limits govern.",
   };
 }
 

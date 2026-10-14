@@ -92,6 +92,7 @@ export const CIVIL_RENDERERS = {};
 // dims: in { radius_ft: L, degree_of_curve: dimensionless, delta_deg: dimensionless, pi_station_ft: L } out: { tangent_ft: L, curve_length_ft: L, external_ft: L, middle_ordinate_ft: L, long_chord_ft: L, degree_of_curve: dimensionless, pc_station_ft: L, pt_station_ft: L }
 export function computeHorizontalCurve({ mode, radius_ft, degree_of_curve, delta_deg, pi_station_ft } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (mode !== undefined && mode !== null && mode !== "" && !["radius", "degree"].includes(mode)) return { error: "Unknown mode; use radius or degree." };
   const delta = Number(delta_deg) || 0;
   if (!(delta > 0 && delta < 180)) return { error: "Deflection angle must be between 0 and 180 deg (exclusive)." };
   let R;
@@ -380,6 +381,7 @@ CIVIL_RENDERERS["reverse-curve"] = renderReverseCurve;
 // dims: in { radius_ft: L, degree_of_curve: dimensionless, arc_length_ft: L } out: { deflection_deg: dimensionless, chord_ft: L, radius_ft: L, degree_of_curve: dimensionless }
 export function computeCurveDeflectionStakeout({ mode, radius_ft, degree_of_curve, arc_length_ft } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (mode !== undefined && mode !== null && mode !== "" && !["radius", "degree"].includes(mode)) return { error: "Unknown mode; use radius or degree." };
   let R;
   if (mode === "degree") {
     const D = Number(degree_of_curve) || 0;
@@ -629,6 +631,7 @@ CIVIL_RENDERERS["earthwork-end-area"] = renderEarthworkEndArea;
 // dims: in { existing_elev_ft: L, design_elev_ft: L, slope_ratio_h: dimensionless, offset_at_hinge_ft: L } out: { cut_fill_ft: L, magnitude_ft: L, catch_offset_ft: L }
 export function computeSlopeStakeCutFill({ existing_elev_ft, design_elev_ft, slope_ratio_h, offset_at_hinge_ft } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  for (const k of ["existing_elev_ft", "design_elev_ft"]) { const v = arguments[0]?.[k]; if (v === undefined || v === null || v === "") return { error: "Enter both the existing ground elevation and the design elevation (ft)." }; }
   const existing = Number(existing_elev_ft) || 0;
   const design = Number(design_elev_ft) || 0;
   const slope = Number(slope_ratio_h) || 0;
@@ -662,8 +665,8 @@ function renderSlopeStakeCutFill(inputRegion, outputRegion, citationEl) {
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
     const r = computeSlopeStakeCutFill({
-      existing_elev_ft: readNum(existing.input),
-      design_elev_ft: readNum(design.input),
+      existing_elev_ft: existing.input.value === "" ? null : readNum(existing.input),
+      design_elev_ft: design.input.value === "" ? null : readNum(design.input),
       slope_ratio_h: readNum(slope.input),
       offset_at_hinge_ft: offset.input.value === "" ? null : readNum(offset.input),
     });
@@ -683,6 +686,7 @@ CIVIL_RENDERERS["slope-stake-cut-fill"] = renderSlopeStakeCutFill;
 // dims: in { V_mph: L T^-1, R_ft: L, e_max: dimensionless, f: dimensionless } out: { e_req: dimensionless, R_min_ft: L }
 export function computeSuperelevation({ mode, V_mph, R_ft, e_max, f } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (mode !== undefined && mode !== null && mode !== "" && !["e", "rmin"].includes(mode)) return { error: "Unknown mode; use e or rmin." };
   const V = Number(V_mph) || 0;
   if (!(V > 0)) return { error: "Design speed must be greater than zero." };
   const ff = Number(f) || 0;
@@ -697,7 +701,8 @@ export function computeSuperelevation({ mode, V_mph, R_ft, e_max, f } = {}) {
   if (!(R > 0)) return { error: "Curve radius must be greater than zero." };
   const e = (V * V) / (15 * R) - ff;
   if (!Number.isFinite(e)) return { error: "Required superelevation is not valid." };
-  return { mode: "e", e_req: e, no_bank: e <= 0, R_min_ft: null };
+  // AASHTO's highest maximum rate is 12%; more than that is not a bank to build.
+  return { mode: "e", e_req: e, no_bank: e <= 0, exceeds_max_rate: e > 0.12 + 1e-12, R_min_ft: null };
 }
 export const superelevationExample = { inputs: { mode: "e", V_mph: 60, R_ft: 1500, f: 0.12 } };
 
@@ -733,7 +738,7 @@ function renderSuperelevation(inputRegion, outputRegion, citationEl) {
     if (r.mode === "rmin") { oOut.textContent = "R_min " + fmt(r.R_min_ft, 1) + " ft (sharpest curve at this speed and bank)"; return; }
     oOut.textContent = r.no_bank
       ? "e = " + fmt(r.e_req, 4) + " -- no superelevation required (side friction alone holds the curve; a normal crown suffices)"
-      : "e = " + fmt(r.e_req, 4) + " (" + fmt(r.e_req * 100, 1) + "% superelevation)";
+      : "e = " + fmt(r.e_req, 4) + " (" + fmt(r.e_req * 100, 1) + "% superelevation)" + (r.exceeds_max_rate ? " -- ABOVE the 12% maximum rate: this radius is too sharp for the speed; solve for the minimum radius" : "");
   }, DEBOUNCE_MS);
   attachExampleButton(inputRegion, () => { mode.select.value = "e"; syncFields(); V.input.value = "60"; R.input.value = "1500"; em.input.value = ""; f.input.value = "0.12"; update(); });
   mode.select.addEventListener("input", () => { syncFields(); update(); });
@@ -916,6 +921,7 @@ CIVIL_RENDERERS["sag-vertical-curve-comfort"] = renderSagVerticalCurveComfort;
 // dims: in { R_ft: L, S_ft: L, M_ft: L } out: { M_ft: L, S_ft: L }
 export function computeHorizontalSightlineOffset({ mode, R_ft, S_ft, M_ft } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (mode !== undefined && mode !== null && mode !== "" && !["M", "maxS"].includes(mode)) return { error: "Unknown mode; use M or maxS." };
   if (mode !== "maxS" && Number(R_ft) > 0 && Number(S_ft) > Math.PI * Number(R_ft)) return { error: "The sight distance is longer than a half circle of this radius; the middle-ordinate relation does not apply." };
   const R = Number(R_ft) || 0;
   if (!(R > 0)) return { error: "Curve radius must be greater than zero." };

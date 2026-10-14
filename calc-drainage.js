@@ -1171,6 +1171,8 @@ export function computeCulvertInletControl({ diameter_in = 0, flow_cfs = 0, slop
   if (flowFactor <= 3.5) { hwD = hwUns; regime = "unsubmerged"; }
   else if (flowFactor >= 4.0) { hwD = hwSub; regime = "submerged"; }
   else { const w = (flowFactor - 3.5) / 0.5; hwD = (1 - w) * hwUns + w * hwSub; regime = "transition"; }
+  // The slope term can carry a trickle on a steep barrel below the invert; the headwater is not negative.
+  hwD = Math.max(0, hwD);
   const hw = hwD * D;
   if (![dc, hc, hwD, hw].every(Number.isFinite)) return { error: "Inlet-control headwater is not a finite value; check the inputs." };
   return {
@@ -1267,6 +1269,8 @@ export function computeBoxCulvertInletControl({ span_in = 0, rise_in = 0, flow_c
   if (flowFactor <= 3.5) { hwD = hwUns; regime = "unsubmerged"; }
   else if (flowFactor >= 4.0) { hwD = hwSub; regime = "submerged"; }
   else { const w = (flowFactor - 3.5) / 0.5; hwD = (1 - w) * hwUns + w * hwSub; regime = "transition"; }
+  // The slope term can carry a trickle on a steep barrel below the invert; the headwater is not negative.
+  hwD = Math.max(0, hwD);
   const hw = hwD * D;
   if (![dc, hc, hwD, hw].every(Number.isFinite)) return { error: "Inlet-control headwater is not a finite value; check the inputs." };
   return {

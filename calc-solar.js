@@ -61,6 +61,8 @@ export function computePVStringSizing({
   if (!(module_voc_V > 0) || !(module_vmp_V > 0)) return { error: "Module Voc and Vmp must be positive (V)." };
   if (!(Number(inverter_vdc_max_V) > 0) || !(Number(inverter_mppt_min_V) >= 0)) return { error: "Inverter maximum dc voltage must be positive and the MPPT minimum cannot be negative (V)." };
   const coeff = Math.abs(Number(voc_temp_coeff_pct_per_C) || 0);
+  // 30 typed for 0.30 gave a negative hot-day Vmp and a "feasible" string of one module.
+  if (coeff > 1.5) return { error: "The temperature coefficient is in % per C (about 0.30); " + coeff + " is not a real module." };
   const cold_voc = module_voc_V * (1 + coeff * (25 - record_low_C) / 100);
   // A module in full sun runs well above the air: about 25-35 C for rack and
   // roof mounts. Until 2026-09-18 the record-high AMBIENT was used as the cell
@@ -74,7 +76,15 @@ export function computePVStringSizing({
   const max_series = Math.floor((Number(inverter_vdc_max_V) || 0) / cold_voc + 1e-9);
   const min_series = Math.ceil((Number(inverter_mppt_min_V) || 0) / warm_vmp - 1e-9);
   const flag = min_series > max_series;
-  return { cold_voc_V: cold_voc, warm_vmp_V: warm_vmp, hot_cell_C, max_series, min_series, mppt_max_V: inverter_mppt_max_V, flag };
+  // The MPPT maximum was read and never used. A string that passes the Voc
+  // limit can still sit above the tracking window on a cold bright morning,
+  // where the inverter holds it off its maximum power point until the cells warm.
+  const cold_vmp = module_vmp_V * (1 + coeff * (25 - record_low_C) / 100);
+  const has_mppt_max = inverter_mppt_max_V > 0;
+  const max_series_in_mppt = has_mppt_max ? Math.floor(inverter_mppt_max_V / cold_vmp + 1e-9) : null;
+  const cold_string_vmp_V = max_series * cold_vmp;
+  const above_mppt_window = has_mppt_max && !flag && cold_string_vmp_V > inverter_mppt_max_V * (1 + 1e-9);
+  return { cold_voc_V: cold_voc, warm_vmp_V: warm_vmp, hot_cell_C, max_series, min_series, mppt_max_V: inverter_mppt_max_V, cold_vmp_V: cold_vmp, cold_string_vmp_V, max_series_in_mppt, above_mppt_window, flag };
 }
 
 export const pvStringSizingExample = {
@@ -106,6 +116,7 @@ export function computeBatteryRuntime({ amp_hours, system_V, dod_percent = 100, 
   const usable_Ah = Ah * dod;
   const usable_Wh = usable_Ah * V;
   const k = Number(peukert_k) || 1;
+  if (k < 1) return { error: "The Peukert exponent is 1 or more (1.0 ideal, about 1.1 to 1.3 lead-acid)." };
   // An AC load draws through the inverter, so the battery must supply load/eff.
   // The default 100% is the DC / ideal case and leaves the simple form unchanged.
   const battery_load_W = load / eff;
@@ -176,7 +187,9 @@ export function renderPVStringSizing(inputRegion, outputRegion, citationEl, para
     oWarm.textContent = fmt(r.warm_vmp_V, 2) + " V";
     oMax.textContent = String(r.max_series);
     oMin.textContent = String(r.min_series);
-    oFlag.textContent = r.flag ? "Infeasible: min series exceeds max series." : "Feasible";
+    oFlag.textContent = r.flag ? "Infeasible: min series exceeds max series."
+      : r.above_mppt_window ? "Feasible on voltage, but " + r.max_series + " in series runs at " + fmt(r.cold_string_vmp_V, 0) + " V at the record low, above the " + fmt(r.mppt_max_V, 0) + " V MPPT maximum: the inverter tracks off-peak until the cells warm. " + (r.max_series_in_mppt >= r.min_series ? r.max_series_in_mppt + " in series stays inside the window." : "No string length stays inside the window at both extremes.")
+      : "Feasible";
   }, DEBOUNCE_MS);
 
   for (const el of [voc.input, vmp.input, coeff.input, tlow.input, thigh.input, rise.input, mppt_min.input, mppt_max.input, vdc_max.input]) el.addEventListener("input", update);
@@ -619,6 +632,7 @@ export function computePvCircuitAmpacity({ module_isc_a = 0, parallel_strings = 
   const isc = Number(module_isc_a) || 0;
   if (!(isc > 0)) return { error: "Module short-circuit current must be positive (A)." };
   const strings = Number(parallel_strings) || 0;
+  if (!Number.isInteger(strings)) return { error: "Parallel strings must be a whole number." };
   if (!(strings >= 1)) return { error: "Parallel strings must be at least 1." };
   // 690.8(A)(1): maximum current = Isc x strings x 125%.
   const max_current_a = isc * strings * 1.25;
@@ -1147,7 +1161,7 @@ function renderPvCellTemperaturePower(inputRegion, outputRegion, citationEl) {
   const oLoss = makeOutputLine(outputRegion, "Temperature loss", "pctp-out-loss");
   const oNote = makeOutputLine(outputRegion, "Note", "pctp-out-note");
   const update = debounce(() => {
-    const r = computePvCellTemperaturePower({ T_amb_C: Number(Ta.input.value), G_wm2: Number(G.input.value) || 0, NOCT_C: Number(noct.input.value) || 0, P_stc_W: Number(Pstc.input.value) || 0, gamma: Number(g.input.value) });
+    const r = computePvCellTemperaturePower({ T_amb_C: Ta.input.value === "" ? "" : Number(Ta.input.value), G_wm2: Number(G.input.value) || 0, NOCT_C: Number(noct.input.value) || 0, P_stc_W: Number(Pstc.input.value) || 0, gamma: Number(g.input.value) });
     if (r.error) { oTc.textContent = r.error; oP.textContent = "-"; oLoss.textContent = "-"; oNote.textContent = ""; return; }
     oTc.textContent = fmt(r.T_cell_C, 1) + " C";
     oP.textContent = fmt(r.P_W, 0) + " W";
@@ -1177,8 +1191,11 @@ export function computePvMaxAmbientForPower({ target_power_W = 0, P_stc_W = 0, G
   if (!(noct > 0)) return { error: "NOCT must be positive (C)." };
   if (!(Number.isFinite(g) && g < 0)) return { error: "Power temperature coefficient must be negative (real modules lose power as they heat)." };
   if (g > -0.05) return { error: "Enter the power temperature coefficient in %/C (about -0.35), not as a fraction (-0.0035)." };
+  if (g < -2) return { error: "A power temperature coefficient below -2 %/C is not a real module; check the datasheet figure." };
   const max_cell_C = 25 + (Ptgt / Pstc - 1) * 100 / g;
   const max_ambient_C = max_cell_C - (noct - 20) * G / 800;
+  // 800 W from a 400 W module asked for -286 C, below absolute zero.
+  if (max_ambient_C < -90) return { error: "No ambient is cold enough: the target is more than this module makes at this irradiance in any weather on Earth. Check the target and the STC rating." };
   if (![max_cell_C, max_ambient_C].every(Number.isFinite)) return { error: "Max-ambient math is not a finite value." };
   return {
     max_ambient_C, max_cell_C,

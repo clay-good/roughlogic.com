@@ -683,6 +683,7 @@ function dnaToRna(seq) {
 // dims: in { sequence: dimensionless, type: dimensionless } out: { codons: dimensionless }
 export function computeCodonTable({ sequence, sequence_type }) {
   const type = String(sequence_type || "rna").toLowerCase();
+  if (type !== "rna" && type !== "dna") return { error: "Sequence type must be rna or dna." };
   const rna = type === "dna" ? dnaToRna(sequence) : String(sequence || "").toUpperCase();
   if (rna.length === 0) {
     return { sequence_type: type, rna_sequence: "", amino_acid_sequence: [], full_table: RNA_CODON_TABLE };
@@ -882,13 +883,13 @@ export function computeGPA({ courses }) {
   const detail = [];
   for (const r of rows) {
     if (r.error) return { error: r.error + " (line: '" + r.line + "')" };
-    if (!(r.letter in GPA_LETTER_POINTS)) {
+    if (!Object.hasOwn(GPA_LETTER_POINTS, r.letter)) {
       return { error: "Unknown letter grade '" + r.letter + "'. Use A, A-, B+, ..., F." };
     }
     if (!Number.isFinite(r.credits) || r.credits <= 0 || r.credits > 20) {
       return { error: "Credits must be a positive number up to 20 (got '" + r.credits + "')." };
     }
-    if (!(r.track in GPA_WEIGHT_BONUS)) {
+    if (!Object.hasOwn(GPA_WEIGHT_BONUS, r.track)) {
       return { error: "Track must be regular, honors, or ap (got '" + r.track + "')." };
     }
     const unw = GPA_LETTER_POINTS[r.letter];
@@ -2147,6 +2148,7 @@ export const EDU_RENDERERS = {
 export function computeCurveGradeScaler({ method = "flat", raw_score = 0, param = 0, class_mean = 0 } = {}) {
   const raw = Number(raw_score);
   if (!Number.isFinite(raw) || raw < 0) return { error: "Raw score must be a non-negative number." };
+  if (method !== undefined && method !== null && method !== "" && !["flat", "sqrt", "linear"].includes(method)) return { error: "Unknown curve method; use flat or sqrt or linear." };
   const clamp = (x) => Math.max(0, Math.min(100, x));
   if (method === "sqrt") {
     const curved = 10 * Math.sqrt(raw);

@@ -330,6 +330,7 @@ export function computeRiggingCheck({ hardware = "sling_5_8_steel", configuratio
   if (!h) return { error: "Unknown hardware." };
   if (!(load_lb >= 0)) return { error: "Load must be non-negative." };
   if (!(n_legs >= 1)) return { error: "At least one leg." };
+  if (!Number.isInteger(Number(n_legs))) return { error: "The number of legs must be a whole number." };
   let derate_factor = 1;
   let tension_per_leg;
   if (configuration === "vertical") tension_per_leg = load_lb / n_legs;
@@ -345,7 +346,9 @@ export function computeRiggingCheck({ hardware = "sling_5_8_steel", configuratio
     // The 0.75 choke derate reduces the RATED load once (below); it does not
     // also raise the leg tension (until 2026-09-19 it was applied twice).
     derate_factor = 0.75;
-    tension_per_leg = load_lb / (n_legs * Math.cos((included_angle_deg / 2) * Math.PI / 180));
+    // The same two-leg rule as the bridle: four chokers on a rigid load cannot
+    // be assumed to share it (four legs read half the tension of a 4-leg bridle).
+    tension_per_leg = load_lb / (Math.min(n_legs, 2) * Math.cos((included_angle_deg / 2) * Math.PI / 180));
   } else {
     return { error: "Unknown configuration." };
   }

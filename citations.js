@@ -1827,7 +1827,7 @@ export const CITATIONS = {
     ],
   },
   "pv-string-sizing": {
-    formula: "Max modules in series = floor(inverter max dc V / cold Voc), cold Voc = Voc(STC) × (1 + |coeff| × (25 − record low °C)/100) (NEC 690.7); min modules in series = ceil(MPPT min V / warm Vmp), warm Vmp = Vmp(STC) × (1 − |coeff| × (record high + cell rise − 25)/100), cell rise default 30 °C. Current (690.8) and OCP (690.9) sizing are not computed.",
+    formula: "Max modules in series = floor(inverter max dc V / cold Voc), cold Voc = Voc(STC) × (1 + |coeff| × (25 − record low °C)/100) (NEC 690.7); min modules in series = ceil(MPPT min V / warm Vmp), warm Vmp = Vmp(STC) × (1 − |coeff| × (record high + cell rise − 25)/100), cell rise default 30 °C. The longest string is also checked against the MPPT maximum at cold Vmp = Vmp(STC) × (1 + |coeff| × (25 − record low °C)/100), an energy-harvest note, not a code limit. Current (690.8) and OCP (690.9) sizing are not computed.",
     edition: NEC_2023 + " Article 690.",
     freeAccess: NEC_FREE,
     governance: GOVERNANCE.electrical,
