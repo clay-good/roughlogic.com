@@ -834,6 +834,8 @@ export function computeDisinfectionCT({
   pH = 7.0,
   log_target = 3,
 } = {}) {
+  // A cleared temperature box is not 0 C; an omitted key keeps the 5 C default.
+  if (temperature_C === null || temperature_C === "") return { error: "Enter the water temperature (C)." };
   const C = Number(chlorine_mg_l) || 0;
   const t10 = Number(t10_minutes) || 0;
   const T = Number(temperature_C);

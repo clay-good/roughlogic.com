@@ -67,7 +67,9 @@ function _simpleRenderer(spec) {
       const params = {};
       for (const f of spec.fields) {
         if (f.kind === "select") params[f.key] = fields[f.key].select.value;
-        else params[f.key] = Number(fields[f.key].input.value) || 0;
+        // A field marked `required` passes null when blank, so the compute can
+        // tell a cleared temperature from a typed 0.
+        else params[f.key] = f.required && fields[f.key].input.value === "" ? null : Number(fields[f.key].input.value) || 0;
       }
       const r = spec.compute(params);
       if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }
@@ -255,10 +257,12 @@ PROCESS_RENDERERS["shot-size-residence-time"] = _simpleRenderer({
 // =====================================================================
 // dims: in { wall_thickness_in: L, alpha_in2_s: L^2 T^-1, melt_temp_f: T, mould_temp_f: T, eject_temp_f: T, alt_wall_thickness_in: L, non_cooling_cycle_s: T, annual_parts: dimensionless } out: { cooling_time_s: T, alt_cooling_time_s: T, thickness_ratio: dimensionless, time_ratio: dimensionless, cycle_time_s: T, annual_machine_hours: T }
 export function computeInjectionCoolingTime({
-  wall_thickness_in = 0, alpha_in2_s = 0, melt_temp_f = 0, mould_temp_f = 0, eject_temp_f = 0,
+  wall_thickness_in = 0, alpha_in2_s = 0, melt_temp_f = 0, mould_temp_f = null, eject_temp_f = 0,
   alt_wall_thickness_in = 0, non_cooling_cycle_s = 0, annual_parts = 0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // The page passes a blank box as null, and Number(null) is 0 F; 0 F is a real reading, so a blank cannot stand in for it.
+  if ([mould_temp_f].some((x) => x === null || x === undefined || x === "")) return { error: "Enter the mould temperature (F)." };
   // Unit / range guard added 2026-09-26 after printed-example probing.
   if (Number(arguments[0]?.alpha_in2_s) > 0.01) return { error: "Enter the thermal diffusivity in in^2/s (about 0.00013), not mm^2/s." };
   if (!(wall_thickness_in > 0)) return { error: "Wall thickness must be positive (in)." };
@@ -312,7 +316,7 @@ PROCESS_RENDERERS["injection-cooling-time"] = _simpleRenderer({
     { key: "wall_thickness_in", label: "Maximum wall thickness (in)", kind: "number", attrs: { step: "any" } },
     { key: "alpha_in2_s", label: "Thermal diffusivity α (in²/s)", kind: "number", attrs: { step: "any" } },
     { key: "melt_temp_f", label: "Melt temperature (°F)", kind: "number", attrs: { step: "any" } },
-    { key: "mould_temp_f", label: "Mould temperature (°F)", kind: "number", attrs: { step: "any" } },
+    { key: "mould_temp_f", label: "Mould temperature (°F)", kind: "number", required: true, attrs: { step: "any" } },
     { key: "eject_temp_f", label: "Ejection temperature (°F)", kind: "number", attrs: { step: "any" } },
     { key: "alt_wall_thickness_in", label: "Alternative wall thickness (in, 0 to skip)", kind: "number", attrs: { step: "any" } },
     { key: "non_cooling_cycle_s", label: "Rest of the cycle (s, 0 to skip)", kind: "number", attrs: { step: "any" } },
@@ -644,6 +648,8 @@ export function computeThermoplasticTemperatureDerate({
   operating_pressure_psi = 0, max_rated_temp_f = 0, alt_derating_factor = 0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // The page passes a blank box as null, and Number(null) is 0 F; 0 F is a real reading, so a blank cannot stand in for it.
+  if ([operating_temp_f].some((x) => x === null || x === "")) return { error: "Enter the operating temperature (F)." };
   // Unit / range guard added 2026-09-26 after printed-example probing.
   if (Number(arguments[0]?.operating_temp_f) < -40) return { error: "Operating temperature below -40 deg F is outside the thermoplastic derating tables; check the unit." };
   if (!(rated_pressure_psi > 0)) return { error: "The pressure rating at 73 degF must be positive (psi)." };
@@ -695,7 +701,7 @@ PROCESS_RENDERERS["thermoplastic-temperature-derate"] = _simpleRenderer({
   example: thermoplasticTemperatureDerateExample.inputs,
   fields: [
     { key: "rated_pressure_psi", label: "Pressure rating at 73 °F (psi)", kind: "number", attrs: { step: "any" } },
-    { key: "operating_temp_f", label: "Operating temperature (°F)", kind: "number", default: 73, attrs: { step: "any" } },
+    { key: "operating_temp_f", label: "Operating temperature (°F)", kind: "number", default: 73, required: true, attrs: { step: "any" } },
     { key: "derating_factor", label: "Derating factor from the material table", kind: "number", attrs: { step: "any" } },
     { key: "operating_pressure_psi", label: "Operating pressure (psi, 0 to skip)", kind: "number", attrs: { step: "any" } },
     { key: "max_rated_temp_f", label: "Material maximum rated temperature (°F, 0 to skip)", kind: "number", attrs: { step: "any" } },

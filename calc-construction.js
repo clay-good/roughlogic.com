@@ -2056,7 +2056,9 @@ function _simpleRenderer(spec) {
       for (const f of spec.fields) {
         if (f.kind === "select") params[f.key] = fields[f.key].select.value;
         else if (f.blankUndefined && fields[f.key].input.value === "") params[f.key] = undefined;
-        else params[f.key] = Number(fields[f.key].input.value) || 0;
+        // A field marked `required` passes null when blank, so the compute can
+        // tell a cleared temperature from a typed 0.
+        else params[f.key] = f.required && fields[f.key].input.value === "" ? null : Number(fields[f.key].input.value) || 0;
       }
       const r = spec.compute(params);
       if (r.error) {
@@ -6417,6 +6419,8 @@ CONSTRUCTION_RENDERERS["concrete-washout-volume"] = _renderConcreteWashoutVolume
 // dims: in { air_temp_f: T, concrete_temp_f: T, rh_pct: dimensionless, wind_mph: L T^-1 } out: { E_metric: M L^-2 T^-1, E_us: M L^-2 T^-1 }
 export function computeConcreteEvaporationRate({ air_temp_f = 70, concrete_temp_f = null, rh_pct = 50, wind_mph = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // The page passes a blank box as null, and Number(null) is 0 F; 0 F is a real reading, so a blank cannot stand in for it.
+  if ([air_temp_f].some((x) => x === null || x === "")) return { error: "Enter the air temperature (F)." };
   const ct = (concrete_temp_f === null || concrete_temp_f === undefined || concrete_temp_f === "") ? air_temp_f : concrete_temp_f;
   if (!(rh_pct >= 0 && rh_pct <= 100)) return { error: "Relative humidity must be 0 to 100 percent." };
   if (wind_mph < 0) return { error: "Wind speed cannot be negative (mph)." };
@@ -6441,7 +6445,7 @@ const _renderConcreteEvaporationRate = _simpleRenderer({
   citation: "Citation: ACI 305 (Hot Weather Concreting) nomograph and the Menzel/NRMCA evaporation equation: E [kg/m^2/hr] = 5 x [(Tc + 18)^2.5 - (RH/100)(Ta + 18)^2.5](V + 4) x 10^-6, with Tc, Ta in C and V in km/h (converted from F and mph; 1 kg/m^2/hr = 0.2048 lb/ft^2/hr). Take precautions above 0.2 lb/ft^2/hr (~1.0 kg/m^2/hr); use the lower 0.1 lb/ft^2/hr caution for low-bleed mixes (low w/c, silica fume, high-early cement). The concrete temperature, not the air, drives the vapor term; a low-bleed mix cracks below the nominal threshold. A field screen, not a curing specification (curing follows ACI 308).",
   example: concreteEvaporationRateExample.inputs,
   fields: [
-    { key: "air_temp_f", label: "Air temperature (°F)", kind: "number", default: 70, attrs: { step: "any" } },
+    { key: "air_temp_f", label: "Air temperature (°F)", kind: "number", default: 70, required: true, attrs: { step: "any" } },
     { key: "concrete_temp_f", label: "Concrete temperature (°F; enter it, or use the air temperature if unknown)", kind: "number", attrs: { step: "any" }, blankUndefined: true },
     { key: "rh_pct", label: "Relative humidity (%)", kind: "number", default: 50 },
     { key: "wind_mph", label: "Wind speed (mph)", kind: "number" },
@@ -6504,6 +6508,8 @@ CONSTRUCTION_RENDERERS["concrete-strength-gain"] = _renderConcreteStrengthGain;
 // dims: in { concrete_temp_f: T, hours: T, datum_f: T, q_kelvin: T, ref_temp_f: T, target_ttf_c: T^2 } out: { M_c: T^2, M_f: T^2, age_factor: dimensionless, te_hours: T, te_days: T, target_hours: T, target_days: T }
 export function computeConcreteMaturity({ concrete_temp_f = 0, hours = 0, datum_f = 32, q_kelvin = 5000, ref_temp_f = 68, target_ttf_c = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // The page passes a blank box as null, and Number(null) is 0 F; 0 F is a real reading, so a blank cannot stand in for it.
+  if ([datum_f].some((x) => x === null || x === "")) return { error: "Enter the datum temperature T0 (F); 32 F, or 14 F for Type I cement by ASTM C1074." };
   if (!(Number(datum_f) >= 10 && Number(datum_f) <= 50)) return { error: "The datum temperature is between 10 and 50 degF (32 degF, or 14 degF for Type I cement by ASTM C1074)." };
   if (!(hours > 0)) return { error: "Elapsed time must be positive (hours)." };
   if (!(q_kelvin > 0)) return { error: "Activation constant Q must be positive (kelvin)." };
@@ -6538,7 +6544,7 @@ const _renderConcreteMaturity = _simpleRenderer({
   fields: [
     { key: "concrete_temp_f", label: "Average concrete temperature (°F)", kind: "number", attrs: { step: "any" } },
     { key: "hours", label: "Elapsed curing time (hours)", kind: "number", attrs: { step: "any" } },
-    { key: "datum_f", label: "Datum temperature T0 (°F)", kind: "number", default: 32, attrs: { step: "any" } },
+    { key: "datum_f", label: "Datum temperature T0 (°F)", kind: "number", default: 32, required: true, attrs: { step: "any" } },
     { key: "q_kelvin", label: "Arrhenius constant Q (K)", kind: "number" },
     { key: "ref_temp_f", label: "Reference temperature Tr (°F)", kind: "number", attrs: { step: "any" } },
     { key: "target_ttf_c", label: "Target TTF (°C-hr, 0 = none)", kind: "number" },

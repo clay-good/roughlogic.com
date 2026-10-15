@@ -2076,6 +2076,8 @@ KITCHEN_RENDERERS["tphc-window"] = _r({
 // dims: in { gallons: L^3, specific_gravity: dimensionless, specific_heat: L^2 T^-2, start_temp_f: T, final_temp_f: T, rated_input_btuh: M L^2 T^-3, jacket_efficiency: dimensionless, latent_heat_btu_lb: L^2 T^-2 } out: { mass_lb: M, heat_btu: M L^2 T^-2, heatup_min: T, steam_per_batch_lb: M, steam_rate_lb_hr: M T^-1 }
 export function computeSteamKettleHeatup({ gallons = 0, specific_gravity = 1.0, specific_heat = 1.0, start_temp_f = 60, final_temp_f = 200, rated_input_btuh = 0, jacket_efficiency = 0.85, latent_heat_btu_lb = 945.6 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // The page's cleared box is not 0 F; an omitted key keeps the 60 F default.
+  if (start_temp_f === null || start_temp_f === "") return { error: "Enter the starting temperature (F)." };
   // Unit / range guard added 2026-09-26 after printed-example probing.
   if (Number(arguments[0]?.final_temp_f) > 250) return { error: "A steam-jacketed kettle cannot take product past about 250 deg F; check the final temperature (deg F)." }; if (Number(arguments[0]?.rated_input_btuh) > 0 && Number(arguments[0]?.rated_input_btuh) < 1000) return { error: "Enter the rated input in Btu/hr (a 40 gal kettle is about 130,000), not kW." };
   if (!(gallons > 0)) return { error: "Kettle working volume must be positive." };
@@ -2118,7 +2120,7 @@ KITCHEN_RENDERERS["steam-kettle-heatup"] = _r({
     { key: "gallons", label: "Kettle working volume (gal)", kind: "number" },
     { key: "specific_gravity", label: "Product specific gravity", kind: "number" },
     { key: "specific_heat", label: "Product specific heat (BTU/lb-F)", kind: "number" },
-    { key: "start_temp_f", label: "Starting temperature (F)", kind: "number" },
+    { key: "start_temp_f", label: "Starting temperature (F)", kind: "number", required: true },
     { key: "final_temp_f", label: "Final temperature (F)", kind: "number" },
     { key: "rated_input_btuh", label: "Rated heat input (BTU/hr)", kind: "number" },
     { key: "jacket_efficiency", label: "Jacket efficiency (0-1)", kind: "number" },

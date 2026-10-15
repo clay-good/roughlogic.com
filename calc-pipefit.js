@@ -76,6 +76,8 @@ const _PIPE_ALPHA = {
 // dims: in { run_length_ft: L, install_temp_f: T, operating_temp_f: T, cold_spring_percent: dimensionless, alpha_per_f: T^-1 } out: { thermal_growth_in: L, cold_spring_gap_in: L, residual_movement_in: L, growth_per_100ft_in: L }
 export function computeColdSpring({ material = "steel", run_length_ft = 0, install_temp_f = 0, operating_temp_f = 0, cold_spring_percent = 50, alpha_per_f = null } = {}) {
   const _g = _finiteGuard({ run_length_ft, install_temp_f, operating_temp_f, cold_spring_percent }); if (_g) return _g;
+  // A blank temperature read as 0 F sized the cold-spring gap off a 0 F install or operating point.
+  if ([install_temp_f, operating_temp_f].some((x) => x === null || x === "")) return { error: "Enter the install and operating temperatures (F)." };
   const L = Number(run_length_ft);
   if (!(L > 0)) return { error: "Run length must be positive (ft)." };
   let alpha = Number(alpha_per_f);
@@ -117,7 +119,7 @@ function _renderColdSpring(inputRegion, outputRegion, citationEl) {
   const oRes = makeOutputLine(outputRegion, "Residual movement / per 100 ft", "cs-out-res");
   const oNote = makeOutputLine(outputRegion, "Notes", "cs-out-note");
   const update = debounce(() => {
-    const r = computeColdSpring({ material: mat.select.value, run_length_ft: Number(len.input.value) || 0, install_temp_f: Number(ti.input.value) || 0, operating_temp_f: Number(to.input.value) || 0, cold_spring_percent: Number(csp.input.value) || 0 });
+    const r = computeColdSpring({ material: mat.select.value, run_length_ft: Number(len.input.value) || 0, install_temp_f: ti.input.value === "" ? null : Number(ti.input.value), operating_temp_f: to.input.value === "" ? null : Number(to.input.value), cold_spring_percent: Number(csp.input.value) || 0 });
     if (r.error) { oGrow.textContent = r.error; oGap.textContent = "-"; oRes.textContent = "-"; oNote.textContent = ""; return; }
     oGrow.textContent = fmt(r.thermal_growth_in, 3) + " in (dT " + fmt(r.delta_t_f, 0) + " F)";
     oGap.textContent = fmt(r.cold_spring_gap_in, 3) + " in at " + fmt(r.cold_spring_percent, 0) + "%";
@@ -909,6 +911,8 @@ const _B16_5_GROUP_1_1 = {
 // dims: in { flange_class: dimensionless, temp_f: T } out: { mawp_psig: M L^-1 T^-2 }
 export function computeFlangeRating({ flange_class = 150, temp_f = 0 } = {}) {
   const _g = _finiteGuard({ flange_class, temp_f }); if (_g) return _g;
+  // A blank service temperature read as 0 F returned the -20..100 F rating with confidence.
+  if (temp_f === null || temp_f === "") return { error: "Enter the service temperature (F)." };
   const cls = Number(flange_class);
   const t = Number(temp_f);
   const row = _B16_5_GROUP_1_1[cls];
@@ -941,7 +945,7 @@ function _renderFlangeRating(inputRegion, outputRegion, citationEl) {
   attachExampleButton(inputRegion, () => { cls.select.value = "150"; t.input.value = "400"; update(); });
   const oRate = makeOutputLine(outputRegion, "Max allowable working pressure", "fr-out-rate");
   const update = debounce(() => {
-    const r = computeFlangeRating({ flange_class: Number(cls.select.value), temp_f: Number(t.input.value) || 0 });
+    const r = computeFlangeRating({ flange_class: Number(cls.select.value), temp_f: t.input.value === "" ? null : Number(t.input.value) });
     if (r.error) { oRate.textContent = r.error; return; }
     oRate.textContent = fmt(r.mawp_psig, 0) + " psig (Class " + r.flange_class + ", Group 1.1, at " + fmt(r.temp_f, 0) + " F)";
   }, DEBOUNCE_MS);

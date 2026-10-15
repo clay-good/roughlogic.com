@@ -58,7 +58,9 @@ function _simpleRenderer(spec) {
     }
     const update = debounce(() => {
       const params = {};
-      for (const f of spec.fields) params[f.key] = Number(fields[f.key].input.value) || 0;
+      // A field marked `required` passes null when blank, so the compute can
+      // tell a cleared temperature from a typed 0.
+      for (const f of spec.fields) params[f.key] = f.required && fields[f.key].input.value === "" ? null : Number(fields[f.key].input.value) || 0;
       const r = spec.compute(params);
       if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }
       for (const o of spec.outputs) outs[o.key].textContent = o.value(r);
@@ -359,6 +361,8 @@ WIND_RENDERERS["weibull-capacity-factor"] = _simpleRenderer({
 // dims: in { elevation_ft: L, air_temp_f: T, reference_density_pcf: M L^-3, measured_power_kw: M L^2 T^-3, curve_power_kw: M L^2 T^-3, wind_speed_mph: L T^-1, alt_air_temp_f: T } out: { site_density_pcf: M L^-3, density_ratio: dimensionless, corrected_curve_power_kw: M L^2 T^-3, iec_corrected_wind_mph: L T^-1 }
 export function computeTurbineDensityCorrection({ elevation_ft = 0, air_temp_f = 59, reference_density_pcf = _RHO_REF_PCF, measured_power_kw = 0, curve_power_kw = 0, wind_speed_mph = 0, alt_air_temp_f = 20 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // The page passes a blank box as null, and Number(null) is 0 F; 0 F is a real reading, so a blank cannot stand in for it.
+  if ([air_temp_f, alt_air_temp_f].some((x) => x === null || x === "")) return { error: "Enter the air temperature and the temperature to compare (F)." };
   if (elevation_ft > 36089) return { error: "Elevation is above the troposphere relation this uses (36,089 ft); check the units." };
   if (!(elevation_ft >= 0)) return { error: "Elevation cannot be negative." };
   if (!(459.67 + air_temp_f > 0)) return { error: "Air temperature is below absolute zero." };
@@ -402,12 +406,12 @@ WIND_RENDERERS["turbine-density-correction"] = _simpleRenderer({
   example: turbineDensityCorrectionExample.inputs,
   fields: [
     { key: "elevation_ft", label: "Site elevation (ft)", kind: "number" },
-    { key: "air_temp_f", label: "Air temperature (degF)", kind: "number", attrs: { step: "any" }, default: 59 },
+    { key: "air_temp_f", label: "Air temperature (degF)", kind: "number", attrs: { step: "any" }, default: 59, required: true },
     { key: "reference_density_pcf", label: "Power curve reference density (lb/cu ft)", kind: "number", default: 0.0765 },
     { key: "measured_power_kw", label: "Measured power (kW)", kind: "number" },
     { key: "curve_power_kw", label: "Power curve value at this wind (kW)", kind: "number" },
     { key: "wind_speed_mph", label: "Measured wind speed (mph)", kind: "number" },
-    { key: "alt_air_temp_f", label: "Temperature to compare (degF)", kind: "number", attrs: { step: "any" }, default: 20 },
+    { key: "alt_air_temp_f", label: "Temperature to compare (degF)", kind: "number", attrs: { step: "any" }, default: 20, required: true },
   ],
   outputs: [
     { key: "d", id: "tdc-out-d", label: "Site air density", value: (r) => fmt(r.site_density_pcf, 5) + " lb/cu ft, " + fmt(r.density_ratio * 100, 1) + "% of the curve's reference" },

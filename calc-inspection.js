@@ -73,7 +73,9 @@ function _simpleRenderer(spec) {
       const params = {};
       for (const f of spec.fields) {
         if (f.kind === "select") params[f.key] = fields[f.key].select.value;
-        else params[f.key] = Number(fields[f.key].input.value) || 0;
+        // A field marked `required` passes null when blank, so the compute can
+        // tell a cleared temperature from a typed 0.
+        else params[f.key] = f.required && fields[f.key].input.value === "" ? null : Number(fields[f.key].input.value) || 0;
       }
       const r = spec.compute(params);
       if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }
@@ -540,6 +542,8 @@ export function computePtDwellDevelopment({
   part_temp_f = 70, min_procedure_temp_f = 40, max_procedure_temp_f = 125,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // The page passes a blank box as null, and Number(null) is 0 F; 0 F is a real reading, so a blank cannot stand in for it.
+  if ([part_temp_f, min_procedure_temp_f].some((x) => x === null || x === "")) return { error: "Enter the part temperature and the procedure minimum temperature (F)." };
   if (!(penetration_dwell_min > 0)) return { error: "Penetration dwell must be positive (minutes)." };
   if (!(development_dwell_min > 0)) return { error: "Development dwell must be positive (minutes)." };
   if (!(evaluation_window_end_min > evaluation_window_start_min)) return { error: "The evaluation window must end after it starts." };
@@ -589,8 +593,8 @@ INSPECTION_RENDERERS["pt-dwell-development"] = _simpleRenderer({
     { key: "evaluation_window_start_min", label: "Evaluation window opens (min after developer)", kind: "number", default: 10, attrs: { step: "any" } },
     { key: "evaluation_window_end_min", label: "Evaluation window closes (min)", kind: "number", default: 60, attrs: { step: "any" } },
     { key: "evaluation_at_min", label: "Actually evaluated at (min, 0 to skip)", kind: "number", attrs: { step: "any" } },
-    { key: "part_temp_f", label: "Part temperature (°F)", kind: "number", default: 70, attrs: { step: "any" } },
-    { key: "min_procedure_temp_f", label: "Procedure minimum temperature (°F)", kind: "number", default: 40, attrs: { step: "any" } },
+    { key: "part_temp_f", label: "Part temperature (°F)", kind: "number", default: 70, required: true, attrs: { step: "any" } },
+    { key: "min_procedure_temp_f", label: "Procedure minimum temperature (°F)", kind: "number", default: 40, required: true, attrs: { step: "any" } },
     { key: "max_procedure_temp_f", label: "Procedure maximum temperature (°F)", kind: "number", default: 125, attrs: { step: "any" } },
   ],
   outputs: [
@@ -897,6 +901,8 @@ export function computePwhtHoldingTime({
   actual_heating_rate_f_hr = 0, alt_thickness_in = 0, p1_over_2in_rule = 1,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // The page passes a blank box as null, and Number(null) is 0 F; 0 F is a real reading, so a blank cannot stand in for it.
+  if ([rate_threshold_temp_f].some((x) => x === null || x === "")) return { error: "Enter the rate control threshold temperature (F)." };
   if (!(governing_thickness_in > 0)) return { error: "Governing thickness must be positive (in)." };
   if (!(hold_rate_hr_per_in > 0)) return { error: "The holding time rate must be positive (hours per inch)." };
   if (minimum_hold_hr < 0) return { error: "The minimum hold cannot be negative." };
@@ -961,7 +967,7 @@ INSPECTION_RENDERERS["pwht-holding-time"] = _simpleRenderer({
     { key: "hold_rate_hr_per_in", label: "Holding time rate (h per in)", kind: "number", default: 1, attrs: { step: "any" } },
     { key: "minimum_hold_hr", label: "Code minimum hold (h)", kind: "number", default: 0.25, attrs: { step: "any" } },
     { key: "holding_temp_f", label: "Holding temperature (°F)", kind: "number", attrs: { step: "any" } },
-    { key: "rate_threshold_temp_f", label: "Rate control threshold (°F)", kind: "number", default: 800, attrs: { step: "any" } },
+    { key: "rate_threshold_temp_f", label: "Rate control threshold (°F)", kind: "number", default: 800, required: true, attrs: { step: "any" } },
     { key: "heating_rate_constant_f_hr_in", label: "Heating rate constant (°F·in/h)", kind: "number", default: 400, attrs: { step: "any" } },
     { key: "cooling_rate_constant_f_hr_in", label: "Cooling rate constant (°F·in/h)", kind: "number", default: 500, attrs: { step: "any" } },
     { key: "rate_ceiling_f_hr", label: "Rate ceiling (°F/h)", kind: "number", default: 400, attrs: { step: "any" } },

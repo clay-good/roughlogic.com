@@ -64,7 +64,9 @@ function _simpleRenderer(spec) {
       const params = {};
       for (const f of spec.fields) {
         if (f.kind === "select") params[f.key] = fields[f.key].select.value;
-        else params[f.key] = Number(fields[f.key].input.value) || 0;
+        // A field marked `required` passes null when blank, so the compute can
+        // tell a cleared temperature from a typed 0.
+        else params[f.key] = f.required && fields[f.key].input.value === "" ? null : Number(fields[f.key].input.value) || 0;
       }
       const r = spec.compute(params);
       if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }
@@ -621,10 +623,13 @@ BUILDINGPERF_RENDERERS["caz-depressurization-limit"] = _simpleRenderer({
 // scaling the building tenfold changed nothing.
 // dims: in { height_ft: L, indoor_temp_f: T, outdoor_temp_f: T, neutral_plane_fraction: dimensionless, tall_building_height_ft: L } out: { total_pressure_pa: M L^-1 T^-2, total_pressure_inwc: M L^-1 T^-2, neutral_plane_ft: L, bottom_pressure_pa: M L^-1 T^-2, top_pressure_pa: M L^-1 T^-2, tall_pressure_pa: M L^-1 T^-2 }
 export function computeStackEffectNpp({
-  height_ft = 0, indoor_temp_f = 70, outdoor_temp_f = 0,
+  height_ft = 0, indoor_temp_f = 70, outdoor_temp_f = null,
   neutral_plane_fraction = 0.5, tall_building_height_ft = 0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A blank temperature read as 0 F drove the stack pressure off a reading nobody took.
+  if (indoor_temp_f === null || indoor_temp_f === "") return { error: "Enter the indoor temperature (F)." };
+  if (outdoor_temp_f === null || outdoor_temp_f === undefined || outdoor_temp_f === "") return { error: "Enter the outdoor temperature (F)." };
   if (!(height_ft > 0)) return { error: "The height from the lowest to the highest opening must be positive (ft)." };
   if (!(neutral_plane_fraction > 0 && neutral_plane_fraction < 1)) return { error: "The neutral plane fraction must be between 0 and 1 -- it sits at mid-height for symmetric leakage and moves toward the larger opening." };
   if (tall_building_height_ft < 0) return { error: "The comparison height cannot be negative (ft)." };
@@ -673,8 +678,8 @@ BUILDINGPERF_RENDERERS["stack-effect-npp"] = _simpleRenderer({
   example: stackEffectNppExample.inputs,
   fields: [
     { key: "height_ft", label: "Height, lowest to highest opening (ft)", kind: "number", attrs: { step: "any" } },
-    { key: "indoor_temp_f", label: "Indoor temperature (°F)", kind: "number", default: 70, attrs: { step: "any" } },
-    { key: "outdoor_temp_f", label: "Outdoor temperature (°F)", kind: "number", attrs: { step: "any" } },
+    { key: "indoor_temp_f", label: "Indoor temperature (°F)", kind: "number", required: true, default: 70, attrs: { step: "any" } },
+    { key: "outdoor_temp_f", label: "Outdoor temperature (°F)", kind: "number", required: true, attrs: { step: "any" } },
     { key: "neutral_plane_fraction", label: "Neutral plane, fraction of height (0-1)", kind: "number", default: 0.5, attrs: { step: "any" } },
     { key: "tall_building_height_ft", label: "Compare against a height of (ft, 0 to skip)", kind: "number", attrs: { step: "any" } },
   ],
@@ -701,6 +706,8 @@ export function computeBillDisaggregation({
   equipment_efficiency = 0.8, btu_per_unit = _BP_BTU_PER_THERM, balance_point_f = 65,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A blank page box read as 0 F; an omitted key keeps the conventional 65 F.
+  if (balance_point_f === null || balance_point_f === "") return { error: "Enter the fitted balance point (F)." };
   if (baseload_per_year < 0) return { error: "Baseload cannot be negative." };
   if (!(slope_per_degree_day > 0)) return { error: "The slope must be positive (energy per degree-day) -- a non-positive slope means the fit found no weather sensitivity at all." };
   if (!(degree_days > 0)) return { error: "Degree-days must be positive." };
@@ -738,7 +745,7 @@ BUILDINGPERF_RENDERERS["bill-disaggregation"] = _simpleRenderer({
     { key: "baseload_per_year", label: "Fitted baseload (units per year)", kind: "number", attrs: { step: "any" } },
     { key: "slope_per_degree_day", label: "Fitted slope (units per degree-day)", kind: "number", attrs: { step: "any" } },
     { key: "degree_days", label: "Degree-days for the period", kind: "number", attrs: { step: "any" } },
-    { key: "balance_point_f", label: "Fitted balance point (°F)", kind: "number", default: 65, attrs: { step: "any" } },
+    { key: "balance_point_f", label: "Fitted balance point (°F)", kind: "number", required: true, default: 65, attrs: { step: "any" } },
     { key: "equipment_efficiency", label: "Equipment efficiency (0-1)", kind: "number", default: 0.8, attrs: { step: "any" } },
     { key: "btu_per_unit", label: "BTU per unit (100,000 for a therm)", kind: "number", default: 100000 },
   ],
@@ -771,6 +778,8 @@ export function computeContinuousInsulationRatio({
   indoor_temp_f = 70, indoor_rh_pct = 0, outdoor_design_temp_f = 0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // With the physics in use, a blank temperature read as 0 F put the dew point check on a reading nobody took.
+  if (indoor_rh_pct > 0 && [indoor_temp_f, outdoor_design_temp_f].some((x) => x === null || x === "")) return { error: "Enter the indoor and outdoor temperatures (F)." };
   if (!(r_cavity > 0)) return { error: "Cavity R-value must be positive." };
   if (r_continuous < 0) return { error: "Continuous exterior R-value cannot be negative." };
   if (required_ratio < 0 || required_ratio >= 1) return { error: "The required ratio must be at least 0 and below 1." };
@@ -831,9 +840,9 @@ BUILDINGPERF_RENDERERS["continuous-insulation-ratio"] = _simpleRenderer({
     { key: "r_cavity", label: "Cavity insulation R-value", kind: "number", attrs: { step: "any" } },
     { key: "r_continuous", label: "Continuous exterior R-value", kind: "number", attrs: { step: "any" } },
     { key: "required_ratio", label: "Required ratio from the code table (0 to skip)", kind: "number", attrs: { step: "any" } },
-    { key: "indoor_temp_f", label: "Indoor temperature (°F)", kind: "number", default: 70, attrs: { step: "any" } },
+    { key: "indoor_temp_f", label: "Indoor temperature (°F)", kind: "number", required: true, default: 70, attrs: { step: "any" } },
     { key: "indoor_rh_pct", label: "Indoor relative humidity (%, 0 to skip the physics)", kind: "number", attrs: { step: "any" } },
-    { key: "outdoor_design_temp_f", label: "Outdoor temperature (°F; BSD-163 uses the average of the coldest three months, not the 99% design)", kind: "number", attrs: { step: "any" } },
+    { key: "outdoor_design_temp_f", label: "Outdoor temperature (°F; BSD-163 uses the average of the coldest three months, not the 99% design)", kind: "number", required: true, attrs: { step: "any" } },
   ],
   outputs: [
     { key: "r", id: "cir-out-r", label: "Against the requirement", value: (r) => r.ratio_verdict },

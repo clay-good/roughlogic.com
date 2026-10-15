@@ -59,7 +59,9 @@ function _simpleRenderer(spec) {
       const params = {};
       for (const f of spec.fields) {
         if (f.kind === "select") params[f.key] = fields[f.key].select.value;
-        else params[f.key] = Number(fields[f.key].input.value) || 0;
+        // A field marked `required` passes null when blank, so the compute can
+        // tell a cleared temperature from a typed 0.
+        else params[f.key] = f.required && fields[f.key].input.value === "" ? null : Number(fields[f.key].input.value) || 0;
       }
       const r = spec.compute(params);
       if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }
@@ -922,6 +924,8 @@ ELECDESIGN_RENDERERS["selective-coordination-screen"] = _simpleRenderer({
 // dims: in { conductor_cmil: L^2, initial_temp_c: T, damage_temp_c: T, duration_s: T, let_through_i2t: I^2 T, let_through_peak_a: I, equipment_peak_withstand_a: I } out: { withstand_a: I, withstand_i2t: I^2 T, margin: dimensionless }
 export function computeFuseLetThrough({ conductor_cmil = 0, initial_temp_c = 75, damage_temp_c = 250, duration_s = 0.01, let_through_i2t = 0, let_through_peak_a = 0, equipment_peak_withstand_a = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // The page's cleared box is not 0 C; an omitted key keeps the 75 C default.
+  if (initial_temp_c === null || initial_temp_c === "") return { error: "Enter the initial conductor temperature (C)." };
   if (!(conductor_cmil > 0)) return { error: "Conductor area must be positive (circular mils)." };
   if (!(damage_temp_c > initial_temp_c)) return { error: "The insulation damage temperature must exceed the initial temperature." };
   if (!(duration_s > 0)) return { error: "Fault duration must be positive." };
@@ -962,7 +966,7 @@ ELECDESIGN_RENDERERS["fuse-let-through"] = _simpleRenderer({
   example: fuseLetThroughExample.inputs,
   fields: [
     { key: "conductor_cmil", label: "Conductor area (circular mils)", kind: "number" },
-    { key: "initial_temp_c", label: "Initial conductor temperature (deg C)", kind: "number", default: 75, attrs: { step: "any" } },
+    { key: "initial_temp_c", label: "Initial conductor temperature (deg C)", kind: "number", default: 75, attrs: { step: "any" }, required: true },
     { key: "damage_temp_c", label: "Insulation damage temperature (deg C)", kind: "number" },
     { key: "duration_s", label: "Fault duration basis (s)", kind: "number" },
     { key: "let_through_i2t", label: "Device let-through I-squared-t (A2s, from the curve)", kind: "number" },

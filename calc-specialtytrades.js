@@ -52,7 +52,9 @@ function _simpleRenderer(spec) {
       const params = {};
       for (const f of spec.fields) {
         if (f.kind === "select") params[f.key] = fields[f.key].select.value;
-        else params[f.key] = Number(fields[f.key].input.value) || 0;
+        // A field marked `required` passes null when blank, so the compute can
+        // tell a cleared temperature from a typed 0.
+        else params[f.key] = f.required && fields[f.key].input.value === "" ? null : Number(fields[f.key].input.value) || 0;
       }
       const r = spec.compute(params);
       if (r.error) {
@@ -408,8 +410,11 @@ SPECIALTYTRADES_RENDERERS["window-film-shgc"] = _simpleRenderer({
 
 // ===================== spec-v1431: insulating glass U-factor and condensation =====================
 // dims: in { lites: dimensionless, r_per_lite: dimensionless, r_gap: dimensionless, r_indoor_film: dimensionless, r_outdoor_film: dimensionless, indoor_temp_f: T, outdoor_temp_f: T, indoor_rh_pct: dimensionless } out: { r_total: dimensionless, u_factor: M T^-4, surface_temp_f: T, dew_point_f: T }
-export function computeIguUFactor({ lites = 2, r_per_lite = 0.03, r_gap = 1.02, r_indoor_film = 0.68, r_outdoor_film = 0.17, indoor_temp_f = 70, outdoor_temp_f = 0, indoor_rh_pct = 40 } = {}) {
+export function computeIguUFactor({ lites = 2, r_per_lite = 0.03, r_gap = 1.02, r_indoor_film = 0.68, r_outdoor_film = 0.17, indoor_temp_f = 70, outdoor_temp_f = null, indoor_rh_pct = 40 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A blank temperature is not 0 F; the indoor one keeps its 70 F default when omitted.
+  if (outdoor_temp_f === null || outdoor_temp_f === undefined || outdoor_temp_f === "") return { error: "Enter the outdoor temperature (F)." };
+  if (indoor_temp_f === null || indoor_temp_f === "") return { error: "Enter the indoor temperature (F)." };
   if (!(lites >= 1)) return { error: "There must be at least one lite." };
   if (!(r_per_lite > 0)) return { error: "Resistance per lite must be positive." };
   if (!(r_gap > 0)) return { error: "Gap resistance must be positive." };
@@ -451,8 +456,8 @@ SPECIALTYTRADES_RENDERERS["igu-u-factor"] = _simpleRenderer({
     { key: "r_gap", label: "Resistance of each gap (hr-sq ft-F/BTU)", kind: "number" },
     { key: "r_indoor_film", label: "Indoor air film resistance", kind: "number" },
     { key: "r_outdoor_film", label: "Outdoor air film resistance", kind: "number" },
-    { key: "indoor_temp_f", label: "Indoor temperature (F)", kind: "number" },
-    { key: "outdoor_temp_f", label: "Outdoor temperature (F)", kind: "number", attrs: { step: "any" } },
+    { key: "indoor_temp_f", label: "Indoor temperature (F)", kind: "number", required: true },
+    { key: "outdoor_temp_f", label: "Outdoor temperature (F)", kind: "number", attrs: { step: "any" }, required: true },
     { key: "indoor_rh_pct", label: "Indoor relative humidity (%)", kind: "number" },
   ],
   outputs: [

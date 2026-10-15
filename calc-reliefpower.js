@@ -51,7 +51,9 @@ function _simpleRenderer(spec) {
       const params = {};
       for (const f of spec.fields) {
         const el = fields[f.key][f.kind === "select" ? "select" : "input"];
-        params[f.key] = f.kind === "select" ? el.value : Number(el.value) || 0;
+        // A field marked `required` passes null when blank, so the compute can
+        // tell a cleared temperature from a typed 0.
+        params[f.key] = f.kind === "select" ? el.value : f.required && el.value === "" ? null : Number(el.value) || 0;
       }
       const result = spec.compute(params);
       if (result.error) {
@@ -122,9 +124,11 @@ function _curveError(pts) {
 // ===================== spec-v1888: generator output derate for altitude and temperature =====================
 
 // dims: in { rated_kw: M L^2 T^-3, site_elevation_ft: L, site_ambient_f: T, altitude_threshold_ft: L, altitude_step_ft: L, altitude_rate_pct: dimensionless, temp_threshold_f: T, temp_step_f: T, temp_rate_pct: dimensionless } out: { altitude_derate_pct: dimensionless, temperature_derate_pct: dimensionless, total_derate_pct: dimensionless, multiplied_derate_pct: dimensionless, available_kw: M L^2 T^-3, available_multiplied_kw: M L^2 T^-3, lost_kw: M L^2 T^-3, method_difference_kw: M L^2 T^-3 }
-export function computeGeneratorAltitudeTempDerate({ rated_kw = 0, site_elevation_ft = 0, site_ambient_f = 0, altitude_threshold_ft = 0, altitude_step_ft = 0, altitude_rate_pct = 0, temp_threshold_f = 0, temp_step_f = 0, temp_rate_pct = 0 } = {}) {
+export function computeGeneratorAltitudeTempDerate({ rated_kw = 0, site_elevation_ft = 0, site_ambient_f = 0, altitude_threshold_ft = 0, altitude_step_ft = 0, altitude_rate_pct = 0, temp_threshold_f = null, temp_step_f = 0, temp_rate_pct = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   { const v = arguments[0]?.site_ambient_f; if (v === undefined || v === null || v === "") return { error: "Enter the site ambient temperature (F)." }; }
+  // A blank data-sheet threshold is not 0 F; ask for it.
+  { const v = arguments[0]?.temp_threshold_f; if (v === undefined || v === null || v === "") return { error: "Enter the data sheet temperature threshold (F)." }; }
   if (!(rated_kw > 0)) return { error: "Rated kW must be positive." };
   if (!(altitude_step_ft > 0) || !(temp_step_f > 0)) return { error: "The altitude and temperature derate steps must be positive." };
   if (!(altitude_rate_pct > 0) || !(temp_rate_pct > 0)) return { error: "The altitude and temperature derate rates must be positive." };
@@ -156,11 +160,11 @@ RELIEFPOWER_RENDERERS["generator-altitude-temp-derate"] = _simpleRenderer({
   fields: [
     { key: "rated_kw", label: "Rated output, standby or prime (kW)" },
     { key: "site_elevation_ft", label: "Site elevation (ft)", attrs: { step: "any" } },
-    { key: "site_ambient_f", label: "Site design ambient temperature (degF)", attrs: { step: "any" } },
+    { key: "site_ambient_f", label: "Site design ambient temperature (degF)", attrs: { step: "any" }, required: true },
     { key: "altitude_threshold_ft", label: "Data sheet altitude threshold (ft)", attrs: { step: "any" } },
     { key: "altitude_step_ft", label: "Altitude step (ft)" },
     { key: "altitude_rate_pct", label: "Derate per altitude step (%)" },
-    { key: "temp_threshold_f", label: "Data sheet temperature threshold (degF)", attrs: { step: "any" } },
+    { key: "temp_threshold_f", label: "Data sheet temperature threshold (degF)", attrs: { step: "any" }, required: true },
     { key: "temp_step_f", label: "Temperature step (degF)" },
     { key: "temp_rate_pct", label: "Derate per temperature step (%)" },
   ],

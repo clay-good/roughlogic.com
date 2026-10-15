@@ -32,7 +32,9 @@ function _rEnv(spec) {
     function fillExample(v) { for (const f of spec.fields) { if (v[f.key] === undefined) continue; fields[f.key].input.value = v[f.key]; } update(); }
     const update = debounce(() => {
       const params = {};
-      for (const f of spec.fields) params[f.key] = Number(fields[f.key].input.value) || 0;
+      // A field marked `required` passes null when blank, so the compute can
+      // tell a cleared temperature from a typed 0.
+      for (const f of spec.fields) params[f.key] = f.required && fields[f.key].input.value === "" ? null : Number(fields[f.key].input.value) || 0;
       const r = spec.compute(params);
       if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }
       for (const o of spec.outputs) outs[o.key].textContent = o.value(r);
@@ -342,6 +344,8 @@ HVACAIRSIDE_RENDERERS["isolator-deflection"] = _rEnv({
 // dims: in { elev_ft: L, T_F: T, acfm: L^3 T^-1, rated_sp: dimensionless } out: { DF: dimensionless, SCFM: L^3 T^-1, const_corr: dimensionless, sp_corr: dimensionless }
 export function computeAirDensityCorrection({ elev_ft = 0, T_F = 70, acfm = 0, rated_sp = 0 } = {}) {
   const _g = _finiteGuardEnv(arguments[0]); if (_g) return _g;
+  // A blank page box read as 0 F overstated the density; an omitted key keeps the 70 F default.
+  if (T_F === null || T_F === "") return { error: "Enter the air temperature (F)." };
   const elev = Number(elev_ft) || 0;
   const T = Number(T_F);
   if (!Number.isFinite(T)) return { error: "Enter a valid air temperature (F)." };
@@ -367,7 +371,7 @@ HVACAIRSIDE_RENDERERS["air-density-correction"] = _rEnv({
   example: airDensityCorrectionExample.inputs,
   fields: [
     { key: "elev_ft", label: "Site elevation (ft)", kind: "number" },
-    { key: "T_F", label: "Air temperature (°F)", kind: "number", default: 70 },
+    { key: "T_F", label: "Air temperature (°F)", kind: "number", default: 70, required: true },
     { key: "acfm", label: "Actual airflow ACFM (cfm, optional)", kind: "number" },
     { key: "rated_sp", label: "Sea-level rated fan static (in-wc, optional)", kind: "number" },
   ],
@@ -386,8 +390,10 @@ HVACAIRSIDE_RENDERERS["air-density-correction"] = _rEnv({
 // =====================================================================
 
 // dims: in { t_db_f: T, w_lb_lb: dimensionless } out: { h: L^2 T^-2, h_sensible: L^2 T^-2, h_latent: L^2 T^-2 }
-export function computeMoistAirEnthalpy({ t_db_f = 0, w_lb_lb = 0 } = {}) {
+export function computeMoistAirEnthalpy({ t_db_f = null, w_lb_lb = 0 } = {}) {
   const _g = _finiteGuardEnv(arguments[0]); if (_g) return _g;
+  // A blank dry-bulb read as 0 F printed the enthalpy of air nobody measured.
+  if (t_db_f === null || t_db_f === undefined || t_db_f === "") return { error: "Enter the dry-bulb temperature (F)." };
   const t = Number(t_db_f);
   const w = Number(w_lb_lb);
   if (w < 0) return { error: "Humidity ratio must be non-negative (lb water / lb dry air)." };
@@ -404,7 +410,7 @@ HVACAIRSIDE_RENDERERS["moist-air-enthalpy"] = _rEnv({
   citation: "Citation: Moist-air enthalpy (ASHRAE Handbook - Fundamentals): h = 0.240 t + W (1061 + 0.444 t) Btu per lb dry air, with t the dry-bulb (F) and W the humidity ratio (lb water / lb dry air). 0.240 = dry-air specific heat, 1061 = enthalpy of saturated vapor at 0 F (from liquid water at 32 F), 0.444 = water-vapor specific heat. Total heat content of one air state; pair with outdoor-air-mix or a psychrometric chart for W. Sea-level coefficients; a design aid, not a substitute for a measured chart state or equipment ratings.",
   example: moistAirEnthalpyExample.inputs,
   fields: [
-    { key: "t_db_f", label: "Dry-bulb temperature (°F)", kind: "number" },
+    { key: "t_db_f", label: "Dry-bulb temperature (°F)", kind: "number", required: true },
     { key: "w_lb_lb", label: "Humidity ratio W (lb water / lb dry air)", kind: "number" },
   ],
   outputs: [
@@ -501,7 +507,7 @@ HVACAIRSIDE_RENDERERS["coil-bypass-factor"] = _rEnv({
   fields: [
     { key: "t_ent_f", label: "Entering-air dry-bulb (°F)", kind: "number" },
     { key: "t_lvg_f", label: "Leaving-air dry-bulb (°F)", kind: "number" },
-    { key: "t_adp_f", label: "Apparatus dew point ADP (°F)", kind: "number" },
+    { key: "t_adp_f", label: "Apparatus dew point ADP (°F)", kind: "number", required: true },
   ],
   outputs: [
     { key: "bf", id: "cbf-out-bf", label: "Bypass factor BF", value: (r) => fmt(r.bf, 3) },

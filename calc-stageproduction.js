@@ -53,7 +53,9 @@ function _r(spec) {
       for (const f of spec.fields) {
         if (f.kind === "select") params[f.key] = fields[f.key].select.value;
         else if (f.kind === "checkbox") params[f.key] = fields[f.key].input.checked;
-        else params[f.key] = Number(fields[f.key].input.value) || 0;
+        // A field marked `required` passes null when blank, so the compute can
+        // tell a cleared temperature from a typed 0.
+        else params[f.key] = f.required && fields[f.key].input.value === "" ? null : Number(fields[f.key].input.value) || 0;
       }
       const r = spec.compute(params);
       if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }
@@ -143,6 +145,9 @@ STAGEPRODUCTION_RENDERERS["line-array-splay"] = _r({
 export function computeDelayTowerAlignment({ distance_ft = 0, temp_f = 70, haas_offset_ms = 15, compare_temp_f = 90 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(distance_ft > 0)) return { error: "Distance from the main array must be positive." };
+  // A blank page box would read as 0 F; the agent door that omits it keeps the 70 F default.
+  if (temp_f === null || temp_f === "") return { error: "Enter the air temperature (F)." };
+  if (compare_temp_f === null || compare_temp_f === "") return { error: "Enter the comparison temperature (F)." };
   if (!(temp_f > -459.67)) return { error: "Air temperature must be above absolute zero." };
   if (!(compare_temp_f > -459.67)) return { error: "Comparison temperature must be above absolute zero." };
   if (!(haas_offset_ms >= 0)) return { error: "Haas offset cannot be negative." };
@@ -175,9 +180,9 @@ STAGEPRODUCTION_RENDERERS["delay-tower-alignment"] = _r({
   example: delayTowerAlignmentExample.inputs,
   fields: [
     { key: "distance_ft", label: "Main array to delay position (ft)", kind: "number" },
-    { key: "temp_f", label: "Air temperature (F)", kind: "number", default: 70 },
+    { key: "temp_f", label: "Air temperature (F)", kind: "number", default: 70, required: true },
     { key: "haas_offset_ms", label: "Haas offset (ms)", kind: "number", default: 15 },
-    { key: "compare_temp_f", label: "Comparison temperature (F)", kind: "number", default: 90 },
+    { key: "compare_temp_f", label: "Comparison temperature (F)", kind: "number", default: 90, required: true },
   ],
   outputs: [
     { key: "c", id: "dtal-out-c", label: "Speed of sound at this temperature", value: (r) => fmt(r.speed_ft_s, 1) + " ft/s" },
@@ -198,6 +203,8 @@ export function computeCardioidSubArray({ spacing_ft = 0, elements = 4, temp_f =
   if (!Number.isInteger(Number(arguments[0]?.elements ?? 4))) return { error: "The element count must be a whole number." };
   if (!(spacing_ft > 0)) return { error: "Element spacing must be positive." };
   if (!(elements >= 2)) return { error: "An end-fire array needs at least 2 elements." };
+  // A blank page box would read as 0 F; the agent door that omits it keeps the 70 F default.
+  if (temp_f === null || temp_f === "") return { error: "Enter the air temperature (F)." };
   if (!(temp_f > -459.67)) return { error: "Air temperature must be above absolute zero." };
   if (!(target_freq_hz >= 0)) return { error: "Target rejection frequency cannot be negative." };
   // Rejection is deepest where the spacing is a QUARTER wavelength: that puts the rear
@@ -231,7 +238,7 @@ STAGEPRODUCTION_RENDERERS["cardioid-sub-array"] = _r({
   fields: [
     { key: "spacing_ft", label: "Element spacing, front to back (ft)", kind: "number" },
     { key: "elements", label: "Number of elements", kind: "number" },
-    { key: "temp_f", label: "Air temperature (F)", kind: "number", default: 70 },
+    { key: "temp_f", label: "Air temperature (F)", kind: "number", default: 70, required: true },
     { key: "target_freq_hz", label: "Target rejection frequency (Hz, 0 to skip)", kind: "number" },
   ],
   outputs: [
@@ -251,6 +258,8 @@ export function computeDriverSpacingLobing({ spacing_ft = 0, test_freq_hz = 0, t
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(spacing_ft > 0)) return { error: "Center-to-center spacing must be positive." };
   if (!(test_freq_hz > 0)) return { error: "Crossover or test frequency must be positive." };
+  // A blank page box would read as 0 F; the agent door that omits it keeps the 70 F default.
+  if (temp_f === null || temp_f === "") return { error: "Enter the air temperature (F)." };
   if (!(temp_f > -459.67)) return { error: "Air temperature must be above absolute zero." };
   // No null can exist anywhere below c / (2 x spacing), because even the worst-case path
   // difference -- the full spacing, 90 degrees off axis -- is under half a wavelength.
@@ -283,7 +292,7 @@ STAGEPRODUCTION_RENDERERS["driver-spacing-lobing"] = _r({
   fields: [
     { key: "spacing_ft", label: "Center-to-center spacing (ft)", kind: "number" },
     { key: "test_freq_hz", label: "Crossover or test frequency (Hz)", kind: "number" },
-    { key: "temp_f", label: "Air temperature (F)", kind: "number", default: 70 },
+    { key: "temp_f", label: "Air temperature (F)", kind: "number", default: 70, required: true },
   ],
   outputs: [
     { key: "c", id: "dslo-out-c", label: "Crossover ceiling", value: (r) => fmt(r.crossover_ceiling_hz, 1) + " Hz" },

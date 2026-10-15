@@ -89,7 +89,9 @@ function _simpleRenderer(spec) {
     }
     const update = debounce(() => {
       const params = {};
-      for (const f of spec.fields) params[f.key] = Number(fields[f.key].input.value) || 0;
+      // A field marked `required` passes null when blank, so the compute can
+      // tell a cleared temperature from a typed 0.
+      for (const f of spec.fields) params[f.key] = f.required && fields[f.key].input.value === "" ? null : Number(fields[f.key].input.value) || 0;
       const r = spec.compute(params);
       if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }
       for (const o of spec.outputs) outs[o.key].textContent = o.value(r);
@@ -237,6 +239,8 @@ MILLWRIGHT_RENDERERS["shaft-alignment-reverse-dial"] = _simpleRenderer({
 // dims: in { stationary_support_height_in: L, stationary_alpha_per_f: dimensionless, stationary_operating_temp_f: T, movable_support_height_in: L, movable_alpha_per_f: dimensionless, movable_operating_temp_f: T, ambient_temp_f: T, tolerance_offset_mils: L } out: { stationary_growth_in: L, movable_growth_in: L, relative_growth_in: L, cold_target_offset_in: L, tolerance_multiple: dimensionless }
 export function computeAlignmentThermalGrowth({ stationary_support_height_in = 0, stationary_alpha_per_f = 0.0000065, stationary_operating_temp_f = 70, movable_support_height_in = 0, movable_alpha_per_f = 0.0000065, movable_operating_temp_f = 70, ambient_temp_f = 70, tolerance_offset_mils = 2 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // The page passes a blank box as null, and Number(null) is 0 F; 0 F is a real reading, so a blank cannot stand in for it.
+  if ([stationary_operating_temp_f, movable_operating_temp_f, ambient_temp_f].some((x) => x === null || x === "")) return { error: "Enter both operating temperatures and the ambient temperature (F)." };
   // Unit / range guard added 2026-09-26 after printed-example probing.
   if ([arguments[0]?.stationary_alpha_per_f, arguments[0]?.movable_alpha_per_f].some((v) => Number(v) > 1e-4)) return { error: "Enter the expansion coefficient per degree F as a small number (0.0000063), not in micro-inches (6.3)." };
   if (!(stationary_support_height_in > 0)) return { error: "The stationary machine's support height must be positive (in)." };
@@ -277,11 +281,11 @@ MILLWRIGHT_RENDERERS["alignment-thermal-growth"] = _simpleRenderer({
   fields: [
     { key: "stationary_support_height_in", label: "Stationary machine support height (in)", kind: "number" },
     { key: "stationary_alpha_per_f", label: "Stationary support expansion coefficient (per F)", kind: "number", default: 0.0000065 },
-    { key: "stationary_operating_temp_f", label: "Stationary machine operating temperature (F)", kind: "number", default: 70 },
+    { key: "stationary_operating_temp_f", label: "Stationary machine operating temperature (F)", kind: "number", default: 70, required: true },
     { key: "movable_support_height_in", label: "Movable machine support height (in)", kind: "number" },
     { key: "movable_alpha_per_f", label: "Movable support expansion coefficient (per F)", kind: "number", default: 0.0000065 },
-    { key: "movable_operating_temp_f", label: "Movable machine operating temperature (F)", kind: "number", default: 70 },
-    { key: "ambient_temp_f", label: "Ambient temperature (F)", kind: "number", default: 70 },
+    { key: "movable_operating_temp_f", label: "Movable machine operating temperature (F)", kind: "number", default: 70, required: true },
+    { key: "ambient_temp_f", label: "Ambient temperature (F)", kind: "number", default: 70, required: true },
     { key: "tolerance_offset_mils", label: "Offset tolerance at operating speed (mils; 1.5 acceptable at 3,600 rpm per the VibrAlign table)", kind: "number", default: 2 },
   ],
   outputs: [

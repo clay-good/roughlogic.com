@@ -63,7 +63,9 @@ function _simpleRenderer(spec) {
     }
     const update = debounce(() => {
       const params = {};
-      for (const f of spec.fields) params[f.key] = Number(fields[f.key].input.value) || 0;
+      // A field marked `required` passes null when blank, so the compute can
+      // tell a cleared temperature from a typed 0.
+      for (const f of spec.fields) params[f.key] = f.required && fields[f.key].input.value === "" ? null : Number(fields[f.key].input.value) || 0;
       const r = spec.compute(params);
       if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }
       for (const o of spec.outputs) outs[o.key].textContent = o.value(r);
@@ -442,7 +444,7 @@ ELEVATOR_RENDERERS["machine-room-heat"] = _simpleRenderer({
     { key: "other_gains_btuh", label: "Lighting and envelope gains (BTU/h)", kind: "number" },
     { key: "room_volume_cuft", label: "Machine room volume (cu ft)", kind: "number" },
     { key: "ambient_limit_f", label: "Equipment maximum temperature (degF)", kind: "number", default: 104 },
-    { key: "starting_temp_f", label: "Room temperature when cooling is lost (degF)", kind: "number", default: 80, attrs: { step: "any" } },
+    { key: "starting_temp_f", label: "Room temperature when cooling is lost (degF)", kind: "number", default: 80, attrs: { step: "any" }, required: true },
   ],
   outputs: [
     { key: "r", id: "mrh-out-r", label: "Heat rejected while running", value: (r) => fmt(r.heat_running_btuh, 0) + " BTU/h" },

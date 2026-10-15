@@ -62,7 +62,9 @@ function _simpleRenderer(spec) {
     }
     const update = debounce(() => {
       const params = {};
-      for (const f of spec.fields) params[f.key] = Number(fields[f.key].input.value) || 0;
+      // A field marked `required` passes null when blank, so the compute can
+      // tell a cleared temperature from a typed 0.
+      for (const f of spec.fields) params[f.key] = f.required && fields[f.key].input.value === "" ? null : Number(fields[f.key].input.value) || 0;
       const r = spec.compute(params);
       if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }
       for (const o of spec.outputs) outs[o.key].textContent = o.value(r);
@@ -208,6 +210,8 @@ RAIL_RENDERERS["degree-of-curve"] = _simpleRenderer({
 // dims: in { rail_area_in2: L^2, modulus_psi: M L^-1 T^-2, alpha_per_degf: dimensionless, neutral_temp_f: T, air_temp_f: T, sun_adder_f: T } out: { force_per_degf_lb: M L T^-2, rail_temp_f: T, differential_f: T, force_per_rail_lb: M L T^-2, force_track_lb: M L T^-2 }
 export function computeCwrThermalForce({ rail_area_in2 = 0, modulus_psi = 30000000, alpha_per_degf = 0.0000065, neutral_temp_f = 95, air_temp_f = 95, sun_adder_f = 25 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // The page passes a blank box as null, and Number(null) is 0 F; 0 F is a real reading, so a blank cannot stand in for it.
+  if ([neutral_temp_f, air_temp_f].some((x) => x === null || x === "")) return { error: "Enter the rail neutral temperature and the air temperature (F)." };
   // Unit / range guard added 2026-09-26 after printed-example probing.
   if (Number(arguments[0]?.alpha_per_degf) > 1e-4) return { error: "Enter the expansion coefficient as 0.0000065 per F, not 6.5." }; if (Number(arguments[0]?.modulus_psi) > 0 && Number(arguments[0]?.modulus_psi) < 1e6) return { error: "Enter the modulus in psi (30,000,000), not ksi." };
   if (!(rail_area_in2 > 0)) return { error: "Rail section area must be positive." };
@@ -234,8 +238,8 @@ RAIL_RENDERERS["cwr-neutral-temperature"] = _simpleRenderer({
     { key: "rail_area_in2", label: "Rail section area (sq in)", kind: "number" },
     { key: "modulus_psi", label: "Modulus of elasticity (psi)", kind: "number", default: 30000000 },
     { key: "alpha_per_degf", label: "Coefficient of expansion (per degF)", kind: "number", default: 0.0000065 },
-    { key: "neutral_temp_f", label: "Rail neutral temperature (degF)", kind: "number", default: 95, attrs: { step: "any" } },
-    { key: "air_temp_f", label: "Air temperature (degF)", kind: "number", default: 95, attrs: { step: "any" } },
+    { key: "neutral_temp_f", label: "Rail neutral temperature (degF)", kind: "number", default: 95, required: true, attrs: { step: "any" } },
+    { key: "air_temp_f", label: "Air temperature (degF)", kind: "number", default: 95, required: true, attrs: { step: "any" } },
     { key: "sun_adder_f", label: "Sun adder, rail above air (degF)", kind: "number", default: 25 },
   ],
   outputs: [

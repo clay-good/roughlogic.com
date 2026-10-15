@@ -2570,7 +2570,9 @@ function _simpleRenderer(spec) {
       const params = {};
       for (const f of spec.fields) {
         if (f.kind === "select") params[f.key] = fields[f.key].select.value;
-        else params[f.key] = Number(fields[f.key].input.value) || 0;
+        // A field marked `required` passes null when blank, so the compute can
+        // tell a cleared temperature from a typed 0.
+        else params[f.key] = f.required && fields[f.key].input.value === "" ? null : Number(fields[f.key].input.value) || 0;
       }
       const r = spec.compute(params);
       if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }
@@ -3357,6 +3359,8 @@ SHOP_RENDERERS["plating-tank-current"] = _simpleRenderer({
 // dims: in { charge_weight_lb: M, section_thickness_in: L, soak_temp_f: T, start_temp_f: T, through_heat_rate_hr_per_in: T L^-1, soak_rate_hr_per_in: T L^-1, specific_heat: L^2 T^-2, furnace_efficiency: dimensionless } out: { total_at_temp_hr: T, charge_heat_btu: M L^2 T^-2, furnace_input_btu_hr: M L^2 T^-3 }
 export function computeHeatTreatSoakTime({ charge_weight_lb = 0, section_thickness_in = 0, soak_temp_f = 0, start_temp_f = 70, through_heat_rate_hr_per_in = 1, soak_rate_hr_per_in = 1, specific_heat = 0.12, furnace_efficiency = 0.6 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // The page passes a blank box as null, and Number(null) is 0 F; 0 F is a real reading, so a blank cannot stand in for it.
+  if ([start_temp_f].some((x) => x === null || x === "")) return { error: "Enter the starting temperature of the charge (F)." };
   if (!(charge_weight_lb > 0)) return { error: "Charge weight must be positive." };
   if (!(section_thickness_in > 0)) return { error: "Maximum section thickness must be positive." };
   if (!(soak_temp_f > start_temp_f)) return { error: "Soak temperature must be above the starting temperature." };
@@ -3389,7 +3393,7 @@ SHOP_RENDERERS["heat-treat-soak-time"] = _simpleRenderer({
     { key: "charge_weight_lb", label: "Charge weight (lb)", kind: "number" },
     { key: "section_thickness_in", label: "Maximum section thickness (in)", kind: "number" },
     { key: "soak_temp_f", label: "Soak temperature (F)", kind: "number" },
-    { key: "start_temp_f", label: "Starting temperature (F)", kind: "number", attrs: { step: "any" } },
+    { key: "start_temp_f", label: "Starting temperature (F)", kind: "number", required: true, attrs: { step: "any" } },
     { key: "through_heat_rate_hr_per_in", label: "Through-heat rate (hr per in)", kind: "number" },
     { key: "soak_rate_hr_per_in", label: "Soak rate (hr per in)", kind: "number" },
     { key: "specific_heat", label: "Specific heat (BTU/lb-F)", kind: "number" },

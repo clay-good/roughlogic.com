@@ -60,7 +60,9 @@ function _simpleRenderer(spec) {
       const params = {};
       for (const f of spec.fields) {
         if (f.kind === "select") params[f.key] = fields[f.key].select.value;
-        else params[f.key] = Number(fields[f.key].input.value) || 0;
+        // A field marked `required` passes null when blank, so the compute can
+        // tell a cleared temperature from a typed 0.
+        else params[f.key] = f.required && fields[f.key].input.value === "" ? null : Number(fields[f.key].input.value) || 0;
       }
       const r = spec.compute(params);
       if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }
@@ -458,12 +460,14 @@ REFRIGERATION_RENDERERS["freezer-underfloor-heat"] = _simpleRenderer({
 // which one the answer used.
 // dims: in { ambient_f: T, design_td_f: T, alternate_ambient_f: T, alternate_td_f: T, power_pct_per_deg_f: dimensionless, compressor_hp: M L^2 T^-3, annual_hours: T, energy_rate_per_kwh: dimensionless } out: { condensing_f: T, alternate_condensing_f: T, condensing_change_f: T, power_change_pct: dimensionless, annual_kwh_change: M L^2 T^-2, annual_cost_change: dimensionless }
 export function computeCondenserTdHeadPressure({
-  condenser_type = "air_cooled", ambient_f = 0, design_td_f = 0,
+  condenser_type = "air_cooled", ambient_f = null, design_td_f = 0,
   alternate_ambient_f = 0, alternate_td_f = 0,
   power_pct_per_deg_f = 1.75, compressor_hp = 0, annual_hours = 0, energy_rate_per_kwh = 0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (arguments[0]?.condenser_type !== undefined && !["air_cooled", "evaporative"].includes(arguments[0].condenser_type)) return { error: "Condenser type must be air_cooled or evaporative." };
+  // A blank design ambient read as 0 F set the condensing temperature to the TD alone.
+  if (ambient_f === null || ambient_f === undefined || ambient_f === "") return { error: "Enter the design ambient temperature (F)." };
   if (!(design_td_f > 0)) return { error: "Design TD must be positive (degF)." };
   if (power_pct_per_deg_f < 0) return { error: "Compressor power sensitivity cannot be negative (% per degF)." };
   if (compressor_hp < 0 || annual_hours < 0 || energy_rate_per_kwh < 0) return { error: "Compressor power, hours, and rate cannot be negative." };
@@ -515,7 +519,7 @@ REFRIGERATION_RENDERERS["condenser-td-head-pressure"] = _simpleRenderer({
   example: condenserTdHeadPressureExample.inputs,
   fields: [
     { key: "condenser_type", label: "Condenser type", kind: "select", options: [{ value: "air_cooled", label: "Air-cooled (TD from dry bulb)" }, { value: "evaporative", label: "Evaporative (TD from wet bulb)" }], default: "air_cooled" },
-    { key: "ambient_f", label: "Design ambient on that basis (°F)", kind: "number", attrs: { step: "any" } },
+    { key: "ambient_f", label: "Design ambient on that basis (°F)", kind: "number", required: true, attrs: { step: "any" } },
     { key: "design_td_f", label: "Design TD (°F)", kind: "number" },
     { key: "alternate_ambient_f", label: "Alternative ambient (°F, 0 to reuse the design ambient)", kind: "number", attrs: { step: "any" } },
     { key: "alternate_td_f", label: "Alternative TD (°F, 0 to reuse the design TD)", kind: "number", attrs: { step: "any" } },
@@ -698,8 +702,10 @@ REFRIGERATION_RENDERERS["secondary-glycol-loop"] = _simpleRenderer({
 // buys refrigerating effect and costs compressor work; the two cross, and the
 // crossing point is the optimum.
 // dims: in { ambient_f: T, gas_cooler_approach_f: T, evaporating_psig: M L^-1 T^-2 } out: { gc_outlet_f: T, gc_outlet_c: T, p_opt_bar: M L^-1 T^-2, p_opt_psia: M L^-1 T^-2, p_opt_psig: M L^-1 T^-2, pressure_ratio: dimensionless }
-export function computeCo2TranscriticalPressure({ ambient_f = 0, gas_cooler_approach_f = 0, evaporating_psig = 0 } = {}) {
+export function computeCo2TranscriticalPressure({ ambient_f = null, gas_cooler_approach_f = 0, evaporating_psig = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A blank ambient read as 0 F reported a subcritical gas cooler with confidence.
+  if (ambient_f === null || ambient_f === undefined || ambient_f === "") return { error: "Enter the ambient temperature (F)." };
   if (gas_cooler_approach_f < 0) return { error: "Gas cooler approach cannot be negative (degF)." };
   const gc_outlet_f = ambient_f + gas_cooler_approach_f;
   const gc_outlet_c = _refFtoC(gc_outlet_f);
@@ -734,7 +740,7 @@ REFRIGERATION_RENDERERS["co2-transcritical-pressure"] = _simpleRenderer({
   citation: "Citation: CO2's critical point at 87.8 °F and about 1,071 psia, with the widely used transcritical optimum-pressure correlation P_opt = 2.6 x T_gas-cooler-outlet + 7.54, published in bar and degC and converted here (1 bar = 100,000 Pa, 1 psi = 6,894.757293168361 Pa, both exact). The correlation applies only above the critical temperature and is withheld below it. Secondary sources disagree whether Kauf (1999) wrote it on the gas cooler outlet or on ambient with a 2.9 K approach (2.6 x 2.9 = 7.54); read on ambient, the optimum is about 7.5 bar (110 psi) lower. It does not compute COP, capacity, or discharge temperature, and does not model flash-gas bypass or ejectors; the equipment manufacturer's control algorithm governs.",
   example: co2TranscriticalPressureExample.inputs,
   fields: [
-    { key: "ambient_f", label: "Ambient temperature (°F)", kind: "number", attrs: { step: "any" } },
+    { key: "ambient_f", label: "Ambient temperature (°F)", kind: "number", required: true, attrs: { step: "any" } },
     { key: "gas_cooler_approach_f", label: "Gas cooler approach (°F)", kind: "number" },
     { key: "evaporating_psig", label: "Evaporating pressure (psig, 0 to skip the ratio)", kind: "number", attrs: { step: "any" } },
   ],

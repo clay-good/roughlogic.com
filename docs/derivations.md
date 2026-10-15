@@ -1527,7 +1527,7 @@ cross-check.
 | calc-buildingperf.js | `computeContinuousInsulationRatio` | `{ r_cavity = 0, r_continuous = 0, required_ratio = 0, indoor_temp_f = 70, ind...` | _ | _ | _ |
 | calc-buildingperf.js | `computeEffectiveLeakageArea` | `{ cfm50 = 0, floor_area_ft2 = 0, ceiling_height_ft = 8, storeys = 1, } = {}` | _ | _ | _ |
 | calc-buildingperf.js | `computeGroundLoopFlowAntifreeze` | `{ tons = 0, gpm_per_ton = 3.0, pipe_id_in = 0, fluid_density_lb_ft3 = 63.9, f...` | _ | _ | _ |
-| calc-buildingperf.js | `computeStackEffectNpp` | `{ height_ft = 0, indoor_temp_f = 70, outdoor_temp_f = 0, neutral_plane_fracti...` | _ | _ | _ |
+| calc-buildingperf.js | `computeStackEffectNpp` | `{ height_ft = 0, indoor_temp_f = 70, outdoor_temp_f = null, neutral_plane_fra...` | _ | _ | _ |
 | calc-buildingperf.js | `computeVentilationRateProcedure` | `{ rp_cfm_per_person = 0, ra_cfm_per_ft2 = 0, ez = 1, people_1 = 0, area_1_ft2...` | _ | _ | _ |
 | calc-buildingperf.js | `computeZonalAddAHole` | `{ house_pressure_pa = 50, hole_side = "house", zone_before_pa = 0, zone_after...` | _ | _ | _ |
 | calc-buildingperf.js | `computeZonalPressureDiagnostics` | `{ house_pressure_pa = 50, zone_a_pressure_pa = 0, zone_b_pressure_pa = 0, zon...` | _ | _ | _ |
@@ -2435,7 +2435,7 @@ cross-check.
 | calc-gas.js | `computePropaneFillOutage` | `{ water_capacity_gal = 0, fill_limit_pct = 80, current_gauge_pct = 0, btu_per...` | _ | _ | _ |
 | calc-gas.js | `computePropaneRegulatorSizing` | `{ connected_load_btuh = 0, btu_per_ft3 = 2500, capacity_at_min_inlet_cfh = 0,...` | _ | _ | _ |
 | calc-gas.js | `computePropaneRunTime` | `{ water_capacity_gal = 0, fill_limit_pct = 80, current_gauge_pct = 0, trigger...` | _ | _ | _ |
-| calc-gas.js | `computePropaneVaporizationRate` | `{ tank_diameter_ft = 0, tank_length_ft = 0, percent_full = 0, ambient_f = 0, ...` | _ | _ | _ |
+| calc-gas.js | `computePropaneVaporizationRate` | `{ tank_diameter_ft = 0, tank_length_ft = 0, percent_full = 0, ambient_f = nul...` | _ | _ | _ |
 | calc-gas.js | `computeWobbeIndex` | `{ hhv_btu_ft3 = 1000, specific_gravity = 0.60 } = {}` | _ | _ | _ |
 | calc-gas.js | `ifgcLowPressureFlow` | `{ d_in, dP_in_wc, cr, L_ft }` | _ | _ | _ |
 | calc-gas.js | `renderGasLeakRate` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
@@ -2582,7 +2582,7 @@ cross-check.
 | calc-hvacairside.js | `computeGrilleFaceVelocity` | `{ mode = "velocity", cfm = 0, ratio = 0.75, A_gross_ft2 = 0, V_target = 0 } = {}` | _ | _ | _ |
 | calc-hvacairside.js | `computeIsolatorDeflection` | `{ equipment_rpm = 0, target_efficiency = 0 } = {}` | _ | _ | _ |
 | calc-hvacairside.js | `computeManualDFrictionRate` | `{ blower_esp_inwg = 0, component_drop_inwg = 0, tel_ft = 0 } = {}` | _ | _ | _ |
-| calc-hvacairside.js | `computeMoistAirEnthalpy` | `{ t_db_f = 0, w_lb_lb = 0 } = {}` | _ | _ | _ |
+| calc-hvacairside.js | `computeMoistAirEnthalpy` | `{ t_db_f = null, w_lb_lb = 0 } = {}` | _ | _ | _ |
 | calc-hvacairside.js | `computeVibrationIsolation` | `{ equipment_rpm = 0, static_deflection_in = 0 } = {}` | _ | _ | _ |
 | calc-hvacservice.js | `computeAshrae622Ventilation` | `{ floor_area_ft2 = 0, bedrooms = 0, infil_credit_cfm = 0, system_type = "unba...` | _ | _ | _ |
 | calc-hvacservice.js | `computeBlowerDoorAch50` | `{ cfm50 = 0, volume_ft3 = 0, n_factor = 17, target_ach50 = 3, n_factor_low = ...` | _ | _ | _ |
@@ -3190,7 +3190,7 @@ cross-check.
 | calc-process.js | `computeExtrusionOutputRate` | `{ product_od_in = 0, wall_thickness_in = 0, line_speed_ft_min = 0, melt_densi...` | _ | _ | _ |
 | calc-process.js | `computeHdpeFusionPressureTime` | `{ pipe_od_in = 0, dimension_ratio = 0, wall_thickness_in = 0, cylinder_area_i...` | _ | _ | _ |
 | calc-process.js | `computeInjectionClampTonnage` | `{ cavities = 0, part_projected_area_in2 = 0, runner_projected_area_in2 = 0, c...` | _ | _ | _ |
-| calc-process.js | `computeInjectionCoolingTime` | `{ wall_thickness_in = 0, alpha_in2_s = 0, melt_temp_f = 0, mould_temp_f = 0, ...` | _ | _ | _ |
+| calc-process.js | `computeInjectionCoolingTime` | `{ wall_thickness_in = 0, alpha_in2_s = 0, melt_temp_f = 0, mould_temp_f = nul...` | _ | _ | _ |
 | calc-process.js | `computeMeltFurnaceEnergy` | `{ charge_weight_lb = 0, theoretical_btu_lb = 0, furnace_efficiency_pct = 0, e...` | _ | _ | _ |
 | calc-process.js | `computeMoldShrinkageDimension` | `{ part_dimension_in = 0, shrinkage_flow_in_in = 0, shrinkage_cross_in_in = 0,...` | _ | _ | _ |
 | calc-process.js | `computeRiserModulusFeeding` | `{ section_length_in = 0, section_width_in = 0, section_thickness_in = 0, modu...` | _ | _ | _ |
@@ -3311,8 +3311,8 @@ cross-check.
 | calc-refrigerant.js | `renderRefrigerantPT` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-refrigerant.js | `renderSuperheatSubcool` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-refrigeration.js | `computeAmmoniaChargeInventory` | `{ receiver_volume_gal = 0, receiver_fill_fraction = 0, receiver_density_lb_ft...` | _ | _ | _ |
-| calc-refrigeration.js | `computeCo2TranscriticalPressure` | `{ ambient_f = 0, gas_cooler_approach_f = 0, evaporating_psig = 0 } = {}` | _ | _ | _ |
-| calc-refrigeration.js | `computeCondenserTdHeadPressure` | `{ condenser_type = "air_cooled", ambient_f = 0, design_td_f = 0, alternate_am...` | _ | _ | _ |
+| calc-refrigeration.js | `computeCo2TranscriticalPressure` | `{ ambient_f = null, gas_cooler_approach_f = 0, evaporating_psig = 0 } = {}` | _ | _ | _ |
+| calc-refrigeration.js | `computeCondenserTdHeadPressure` | `{ condenser_type = "air_cooled", ambient_f = null, design_td_f = 0, alternate...` | _ | _ | _ |
 | calc-refrigeration.js | `computeFreezerUnderfloorHeat` | `{ floor_area_ft2 = 0, room_temp_f = 0, target_soil_temp_f = 0, u_factor = 0, ...` | _ | _ | _ |
 | calc-refrigeration.js | `computeMachineryRoomVentilation` | `{ largest_system_charge_lb = 0, room_length_ft = 0, room_width_ft = 0, room_h...` | _ | _ | _ |
 | calc-refrigeration.js | `computeReceiverPumpdownCapacity` | `{ receiver_volume_gal = 0, existing_liquid_gal = 0, fill_limit_fraction = 0.8...` | _ | _ | _ |

@@ -819,6 +819,8 @@ LINEWORKER_RENDERERS["nesc-district-loading"] = _simpleRenderer({
 // dims: in { creep_strain: dimensionless, alpha_per_f: T^-1, span_ft: L, area_in2: L^2, weight_lb_per_ft: M / L, modulus_psi: M L^-1 T^-2, tension1_lb: M L T^-2, design_temp_f: T } out: { equivalent_temp_rise_f: T, sag_design_ft: L, sag_after_creep_ft: L, creep_sag_increase_ft: L, initial_stringing_sag_ft: L }
 export function computeConductorCreepElongation({ creep_strain = 0, alpha_per_f = 0, span_ft = 0, area_in2 = 0, weight_lb_per_ft = 0, modulus_psi = 0, tension1_lb = 0, design_temp_f = 60 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // The page passes a blank box as null, and Number(null) is 0 F; 0 F is a real reading, so a blank cannot stand in for it.
+  if ([design_temp_f].some((x) => x === null || x === "")) return { error: "Enter the design temperature (F)." };
   if (!(creep_strain > 0)) return { error: "Creep strain must be positive (a few times 1e-4 over the life of an aluminium conductor)." };
   if (!(alpha_per_f > 0)) return { error: "Coefficient of thermal expansion must be positive (per degF)." };
   if (!(span_ft > 0)) return { error: "Span must be positive (ft)." };
@@ -876,7 +878,7 @@ LINEWORKER_RENDERERS["conductor-creep-elongation"] = _simpleRenderer({
     { key: "weight_lb_per_ft", label: "Conductor weight (lb/ft)", kind: "number" },
     { key: "modulus_psi", label: "Modulus of elasticity (psi)", kind: "number" },
     { key: "tension1_lb", label: "Tension at the design condition (lb)", kind: "number" },
-    { key: "design_temp_f", label: "Design temperature (F)", kind: "number", default: 60, attrs: { step: "any" } },
+    { key: "design_temp_f", label: "Design temperature (F)", kind: "number", default: 60, required: true, attrs: { step: "any" } },
   ],
   outputs: [
     { key: "e", id: "cce-out-e", label: "Equivalent temperature rise", value: (r) => fmt(r.equivalent_temp_rise_f, 1) + " F -- bigger than most seasonal swings, permanent, and running the SAME way as a hot day" },

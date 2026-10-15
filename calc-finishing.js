@@ -56,7 +56,9 @@ function _simpleRenderer(spec) {
     }
     const update = debounce(() => {
       const params = {};
-      for (const f of spec.fields) params[f.key] = Number(fields[f.key].input.value) || 0;
+      // A field marked `required` passes null when blank, so the compute can
+      // tell a cleared temperature from a typed 0.
+      for (const f of spec.fields) params[f.key] = f.required && fields[f.key].input.value === "" ? null : Number(fields[f.key].input.value) || 0;
       const r = spec.compute(params);
       if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }
       for (const o of spec.outputs) outs[o.key].textContent = o.value(r);
@@ -201,6 +203,8 @@ FINISHING_RENDERERS["pretreatment-bath-dragout"] = _simpleRenderer({
 // dims: in { lower_min: T, immerse_min: T, withdraw_min: T, travel_min: T, load_lb_per_lift: M, area_per_ton_ft2: L^2 M^-1, steel_specific_heat_btu_lb_f: L^2 T^-2, bath_temp_f: T, ambient_temp_f: T, burner_btu_hr: M L^2 T^-3 } out: { cycle_min: T, lifts_per_hour: T^-1, throughput_lb_hr: M T^-1, heat_demand_btu_hr: M L^2 T^-3, heat_limited_lb_hr: M T^-1 }
 export function computeGalvanizeKettleThroughput({ lower_min = 0, immerse_min = 0, withdraw_min = 0, travel_min = 0, load_lb_per_lift = 0, area_per_ton_ft2 = 0, steel_specific_heat_btu_lb_f = 0.12, bath_temp_f = 830, ambient_temp_f = 70, burner_btu_hr = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // The page's cleared box is not 0 F; an omitted key keeps the 70 F default.
+  if (ambient_temp_f === null || ambient_temp_f === "") return { error: "Enter the ambient steel temperature (F)." };
   if (!(lower_min > 0)) return { error: "Lowering time must be positive (min)." };
   if (!(immerse_min > 0)) return { error: "Immersion time must be positive (min)." };
   if (!(withdraw_min > 0)) return { error: "Withdrawal and drain time must be positive (min)." };
@@ -247,7 +251,7 @@ FINISHING_RENDERERS["galvanize-kettle-throughput"] = _simpleRenderer({
     { key: "area_per_ton_ft2", label: "Surface area per ton (sq ft/ton)", kind: "number" },
     { key: "steel_specific_heat_btu_lb_f", label: "Steel specific heat (Btu/lb-degF)", kind: "number", default: 0.12 },
     { key: "bath_temp_f", label: "Bath temperature (degF)", kind: "number", default: 830 },
-    { key: "ambient_temp_f", label: "Ambient steel temperature (degF)", kind: "number", default: 70, attrs: { step: "any" } },
+    { key: "ambient_temp_f", label: "Ambient steel temperature (degF)", kind: "number", default: 70, attrs: { step: "any" }, required: true },
     { key: "burner_btu_hr", label: "Burner heat delivered to the steel (Btu/hr)", kind: "number" },
   ],
   outputs: [

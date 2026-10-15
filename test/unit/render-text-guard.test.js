@@ -83,7 +83,9 @@ test("render text: no comparison prints a negative figure beside a fixed directi
 // 0 F is a real reading, so a blank cannot stand in for it. The sweep clears
 // each temperature box after the example and compares the output with the box
 // holding 0; the same answer twice is a hit. Found 2026-10-13 on about 120
-// tiles; the ones not yet fixed are listed, and the list may only shrink.
+// tiles and fixed by 2026-10-14; the boxes still listed are reviewed as
+// legitimate (a difference, a coefficient, a mode the example does not use),
+// each with its reason, and the list may only shrink.
 test("render text: a blank temperature is not read as 0 degrees", () => {
   const sweep = fileURLToPath(new URL("../fixtures/render-blank-temp-sweep.js", import.meta.url));
   const report = JSON.parse(execFileSync(process.execPath, [sweep], { encoding: "utf8", maxBuffer: 1 << 24, stdio: ["ignore", "pipe", "ignore"] }));

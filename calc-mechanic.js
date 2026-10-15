@@ -494,8 +494,9 @@ function _simpleRenderer(spec) {
         else if (f.kind === "checkbox") params[f.key] = fields[f.key].input.checked;
         else if (f.kind === "text") params[f.key] = fields[f.key].input.value;
         // A field marked `required` passes null when blank, so the compute can
-        // tell a cleared temperature from a typed 0.
-        else params[f.key] = f.required && fields[f.key].input.value === "" ? null : Number(fields[f.key].input.value) || 0;
+        // tell a cleared temperature from a typed 0. `blankAs` overrides that
+        // value where null already means something to the compute.
+        else params[f.key] = f.required && fields[f.key].input.value === "" ? (f.blankAs ?? null) : Number(fields[f.key].input.value) || 0;
       }
       const r = spec.compute(params);
       if (r.error) {
@@ -3359,6 +3360,8 @@ const _dcsGiven = (v) => v !== null && v !== undefined;
 // dims: in { observed_hp: M L^2 T^-3, baro_mbar: M L^-1 T^-2, baro_inhg: M L^-1 T^-2, air_temp_c: T, air_temp_f: T, humidity_pct: dimensionless } out: { vapor_mbar: M L^-1 T^-2, p_dry_mbar: M L^-1 T^-2, cf: dimensionless, corrected_hp: M L^2 T^-3, in_window: dimensionless }
 export function computeDynoCorrectionSae({ observed_hp = 0, baro_mbar = 0, baro_inhg = null, air_temp_c = 25, air_temp_f = null, humidity_pct = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // The page sends "" for a cleared box (null still means "use the Celsius key").
+  if (air_temp_f === "") return { error: "Enter the inlet air temperature (F)." };
   const p = Number(observed_hp) || 0;
   // spec-v593 US entry path: the page asks in Hg / deg F, the J1349 correlation
   // is published in mbar / deg C. Either family may be supplied; the US key
@@ -3398,7 +3401,7 @@ MECHANIC_RENDERERS["dyno-correction-sae"] = _simpleRenderer({
   fields: [
     { key: "observed_hp", label: "Observed power (hp)", kind: "number" },
     { key: "baro_inhg", label: "Barometric pressure (in Hg, absolute)", kind: "number", default: 28.94 },
-    { key: "air_temp_f", label: "Inlet air temperature (°F)", kind: "number", default: 86 },
+    { key: "air_temp_f", label: "Inlet air temperature (°F)", kind: "number", default: 86, required: true, blankAs: "" },
     { key: "humidity_pct", label: "Relative humidity (%)", kind: "number", default: 0 },
   ],
   outputs: [

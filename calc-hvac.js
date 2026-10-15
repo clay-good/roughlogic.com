@@ -3223,6 +3223,8 @@ HVAC_RENDERERS["bare-pipe-heat-loss"] = renderBarePipeHeatLoss;
 // r2 = r1*exp(...) and thickness = r2 - r1.
 // dims: in { od_in: L, k_value: dimensionless, hot_f: T, amb_f: T, target_q_per_ft_btuh: M*L*T^-3 } out: { thickness_in: L, r2_in: L }
 export function computeInsulationThicknessForHeatLoss({ od_in = 0, k_value = 0, hot_f = 0, amb_f = 0, target_q_per_ft_btuh = 0 } = {}) {
+  // A blank temperature read as 0 F sized insulation for a pipe in a 0 F room.
+  if ([hot_f, amb_f].some((x) => x === null || x === "")) return { error: "Enter the hot surface and ambient temperatures (F)." };
   const od = Number(od_in) || 0;
   const k = Number(k_value) || 0;
   const hot = Number(hot_f), amb = Number(amb_f);
@@ -3256,7 +3258,7 @@ function renderInsulationThicknessForHeatLoss(inputRegion, outputRegion, citatio
   const oR = makeOutputLine(outputRegion, "Outer radius over insulation", "itl-out-r");
   const oNote = makeOutputLine(outputRegion, "Note", "itl-out-n");
   const update = debounce(() => {
-    const r = computeInsulationThicknessForHeatLoss({ od_in: Number(od.input.value) || 0, k_value: Number(k.input.value) || 0, hot_f: Number(hot.input.value), amb_f: Number(amb.input.value), target_q_per_ft_btuh: Number(q.input.value) || 0 });
+    const r = computeInsulationThicknessForHeatLoss({ od_in: Number(od.input.value) || 0, k_value: Number(k.input.value) || 0, hot_f: hot.input.value === "" ? null : Number(hot.input.value), amb_f: amb.input.value === "" ? null : Number(amb.input.value), target_q_per_ft_btuh: Number(q.input.value) || 0 });
     if (r.error) { oTh.textContent = r.error; oR.textContent = "-"; oNote.textContent = ""; return; }
     oTh.textContent = fmt(r.thickness_in, 3) + " in";
     oR.textContent = fmt(r.r2_in, 3) + " in (" + fmt(r.r2_in * 2, 3) + " in OD over insulation)";
@@ -4036,6 +4038,8 @@ HVAC_RENDERERS["erv-sensible-recovery"] = _rEnv({
 // dims: in { cfm: L^3 T^-1, t_oa_F: T, t_target_F: T, eta: dimensionless, w_oa_gr: dimensionless, w_target_gr: dimensionless } out: { dT_F: T, Q_s_btuh: M L^2 T^-3, Q_l_btuh: M L^2 T^-3, Q_t_btuh: M L^2 T^-3, input_btuh: M L^2 T^-3 }
 export function computeMuaTemperingLoad({ cfm = 0, t_oa_F = 0, t_target_F = 0, eta = 0.80, w_oa_gr = 0, w_target_gr = 0 } = {}) {
   const _g = _finiteGuardEnv(arguments[0]); if (_g) return _g;
+  // A blank temperature read as 0 F tempered air nobody measured.
+  if ([t_oa_F, t_target_F].some((x) => x === null || x === "")) return { error: "Enter the outdoor air and target supply temperatures (F)." };
   if (!(cfm > 0)) return { error: "Makeup airflow must be positive (cfm)." };
   if (!(eta > 0 && eta <= 1)) return { error: "Thermal efficiency must be over 0 and up to 1." };
   if (w_oa_gr < 0 || w_target_gr < 0) return { error: "Humidity ratios must be non-negative (gr/lb)." };
@@ -4065,8 +4069,8 @@ HVAC_RENDERERS["mua-tempering-load"] = _rEnv({
   example: muaTemperingLoadExample.inputs,
   fields: [
     { key: "cfm", label: "Makeup airflow (cfm, = exhaust)", kind: "number" },
-    { key: "t_oa_F", label: "Outdoor air temperature (°F)", kind: "number" },
-    { key: "t_target_F", label: "Target supply temperature (°F)", kind: "number" },
+    { key: "t_oa_F", label: "Outdoor air temperature (°F)", kind: "number", required: true },
+    { key: "t_target_F", label: "Target supply temperature (°F)", kind: "number", required: true },
     { key: "eta", label: "Heater thermal efficiency (0-1)", kind: "number" },
     { key: "w_oa_gr", label: "Outdoor humidity ratio (gr/lb, optional)", kind: "number" },
     { key: "w_target_gr", label: "Target humidity ratio (gr/lb, optional)", kind: "number" },

@@ -62,7 +62,9 @@ function _simpleRenderer(spec) {
       const params = {};
       for (const f of spec.fields) {
         if (f.kind === "select") params[f.key] = fields[f.key].select.value;
-        else params[f.key] = Number(fields[f.key].input.value) || 0;
+        // A field marked `required` passes null when blank, so the compute can
+        // tell a cleared temperature from a typed 0.
+        else params[f.key] = f.required && fields[f.key].input.value === "" ? null : Number(fields[f.key].input.value) || 0;
       }
       const r = spec.compute(params);
       if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }
@@ -492,6 +494,8 @@ export function computeThermalOxidizerResidence({
   required_residence_s = 0.75, chamber_volume_ft3 = 0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // The page passes a blank box as null, and Number(null) is 0 F; 0 F is a real reading, so a blank cannot stand in for it.
+  if ([standard_temp_f].some((x) => x === null || x === "")) return { error: "Enter the standard reference temperature (F)." };
   // Unit / range guard added 2026-09-26 after printed-example probing.
   if (Number(arguments[0]?.required_residence_s ?? 0.75) > 10) return { error: "Enter the residence time in seconds (0.75), not milliseconds." };
   if (!(inlet_scfm > 0)) return { error: "Inlet flow must be positive (scfm)." };
@@ -537,7 +541,7 @@ AIRQUALITY_RENDERERS["thermal-oxidizer-residence"] = _simpleRenderer({
   fields: [
     { key: "inlet_scfm", label: "Inlet flow (scfm)", kind: "number" },
     { key: "chamber_temp_f", label: "Chamber operating temperature (°F)", kind: "number", attrs: { step: "any" } },
-    { key: "standard_temp_f", label: "Standard reference temperature (°F)", kind: "number", default: 70, attrs: { step: "any" } },
+    { key: "standard_temp_f", label: "Standard reference temperature (°F)", kind: "number", default: 70, required: true, attrs: { step: "any" } },
     { key: "required_residence_s", label: "Required residence time (seconds)", kind: "number", default: 0.75, attrs: { step: "any" } },
     { key: "chamber_volume_ft3", label: "Chamber volume (cu ft, 0 to skip the check)", kind: "number" },
   ],
@@ -963,7 +967,7 @@ AIRQUALITY_RENDERERS["plume-rise-briggs"] = _simpleRenderer({
     { key: "stack_diameter_ft", label: "Stack exit diameter (ft)", kind: "number", attrs: { step: "any" } },
     { key: "exit_velocity_fps", label: "Exit velocity (ft/s)", kind: "number", attrs: { step: "any" } },
     { key: "exit_temp_f", label: "Exit gas temperature (°F)", kind: "number", attrs: { step: "any" } },
-    { key: "ambient_temp_f", label: "Ambient temperature (°F)", kind: "number", attrs: { step: "any" } },
+    { key: "ambient_temp_f", label: "Ambient temperature (°F)", kind: "number", required: true, attrs: { step: "any" } },
     { key: "wind_mph", label: "Wind speed at stack top (mph)", kind: "number", attrs: { step: "any" } },
     { key: "stability_class", label: "Pasquill stability class", kind: "select", default: "D", options: [{ value: "A", label: "A (very unstable; neutral formula)" }, { value: "B", label: "B (unstable; neutral formula)" }, { value: "C", label: "C (slightly unstable; neutral formula)" }, { value: "D", label: "D (neutral)" }, { value: "E", label: "E (slightly stable; stable-air rise)" }, { value: "F", label: "F (stable; stable-air rise)" }] },
   ],

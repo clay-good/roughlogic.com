@@ -2003,6 +2003,8 @@ export function computeLivestockWaterRequirement({ method = "table", head = 1, t
     perHead = dmi * ratio / 8.345; // lb water / (lb/gal) = gal
     var outRange = false;
   } else {
+    // A blank temperature read as 0 F interpolated off a breakpoint nobody entered.
+    if ([temp_f, t_low_f, t_high_f].some((x) => x === null || x === "")) return { error: "Enter the air temperature and both breakpoint temperatures (F)." };
     const t = Number(temp_f), tl = Number(t_low_f), th = Number(t_high_f), gl = Number(gal_low), gh = Number(gal_high);
     if (![t, tl, th, gl, gh].every(Number.isFinite)) return { error: "Temperature and gallon breakpoints must be finite." };
     if (th <= tl) return { error: "High-temperature breakpoint must exceed the low breakpoint." };
@@ -2043,7 +2045,7 @@ function renderLivestockWaterRequirement(inputRegion, outputRegion, citationEl) 
   const oNote = makeOutputLine(outputRegion, "Note", "lwr-out-note");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeLivestockWaterRequirement({ method: method.select.value, head: readNum(head.input), temp_f: readNum(temp.input), t_low_f: readNum(tl.input), gal_low: readNum(gl.input), t_high_f: readNum(th.input), gal_high: readNum(gh.input), dmi_lb: readNum(dmi.input), water_per_dmi: ratio.input.value === "" ? 3.5 : readNum(ratio.input), lactating: lact.input.checked });
+    const r = computeLivestockWaterRequirement({ method: method.select.value, head: readNum(head.input), temp_f: temp.input.value === "" ? null : Number(temp.input.value), t_low_f: tl.input.value === "" ? null : Number(tl.input.value), gal_low: readNum(gl.input), t_high_f: th.input.value === "" ? null : Number(th.input.value), gal_high: readNum(gh.input), dmi_lb: readNum(dmi.input), water_per_dmi: ratio.input.value === "" ? 3.5 : readNum(ratio.input), lactating: lact.input.checked });
     if (r.error) { oPer.textContent = r.error; oHerd.textContent = ""; oNote.textContent = ""; return; }
     oPer.textContent = fmt(r.per_head_gpd, 1) + " gal/head/day";
     oHerd.textContent = fmt(r.herd_gpd, 0) + " gal/day";

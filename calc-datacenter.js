@@ -40,7 +40,9 @@ function _simpleRenderer(spec) {
       const params = {};
       for (const f of spec.fields) {
         const el = fields[f.key][f.kind === "select" ? "select" : "input"];
-        params[f.key] = f.kind === "select" ? el.value : Number(el.value) || 0;
+        // A field marked `required` passes null when blank, so the compute can
+        // tell a cleared temperature from a typed 0.
+        params[f.key] = f.kind === "select" ? el.value : f.required && el.value === "" ? null : Number(el.value) || 0;
       }
       const result = spec.compute(params);
       if (result.error) {
@@ -270,7 +272,7 @@ DATACENTER_RENDERERS["crac-sensible-derate"] = _simpleRenderer({
   example: cracExample,
   fields: [
     { key: "airflow_cfm", label: "Unit airflow (cfm)" },
-    { key: "supply_temp_f", label: "Supply air temperature (deg F)" },
+    { key: "supply_temp_f", label: "Supply air temperature (deg F)", required: true },
     { key: "return_temp_f", label: "Rated return air temperature (deg F)" },
     { key: "contained_return_temp_f", label: "Contained return air temperature (deg F)" },
     { key: "bypass_return_temp_f", label: "Bypassed return air temperature (deg F)" },
@@ -334,7 +336,7 @@ DATACENTER_RENDERERS["containment-bypass-airflow"] = _simpleRenderer({
     { key: "equipment_delta_t_f", label: "Temperature rise across equipment (deg F)" },
     { key: "unit_count", label: "Running cooling units", attrs: { step: "1", min: "1" } },
     { key: "airflow_per_unit_cfm", label: "Airflow per cooling unit (cfm)" },
-    { key: "supply_temp_f", label: "Supply air temperature (deg F)" },
+    { key: "supply_temp_f", label: "Supply air temperature (deg F)", required: true },
     { key: "exhaust_temp_f", label: "Server exhaust temperature (deg F)" },
     { key: "fan_power_per_unit_kw", label: "Fan power per unit (kW)" },
     { key: "tariff_per_kwh", label: "Electricity tariff ($/kWh)" },
@@ -440,7 +442,7 @@ DATACENTER_RENDERERS["chilled-water-ride-through"] = _simpleRenderer({
   fields: [
     { key: "loop_volume_gal", label: "Chilled-water loop volume (gal)" },
     { key: "it_load_kw", label: "IT equipment load (kW)" },
-    { key: "supply_temp_f", label: "Chilled-water supply temperature (deg F)" },
+    { key: "supply_temp_f", label: "Chilled-water supply temperature (deg F)", required: true },
     { key: "max_temp_f", label: "Highest tolerable water temperature (deg F)" },
     { key: "generator_transfer_min", label: "Generator start and transfer (min)" },
     { key: "chiller_restart_min", label: "Chiller restart and loading (min)" },

@@ -72,7 +72,9 @@ function _simpleRenderer(spec) {
       const params = {};
       for (const f of spec.fields) {
         if (f.kind === "select") params[f.key] = fields[f.key].select.value;
-        else params[f.key] = Number(fields[f.key].input.value) || 0;
+        // A field marked `required` passes null when blank, so the compute can
+        // tell a cleared temperature from a typed 0.
+        else params[f.key] = f.required && fields[f.key].input.value === "" ? null : Number(fields[f.key].input.value) || 0;
       }
       const r = spec.compute(params);
       if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }
@@ -855,13 +857,15 @@ function _lpWettedArea(radius_ft, length_ft, depth_ft) {
 // =====================================================================
 // dims: in { tank_diameter_ft: L, tank_length_ft: L, percent_full: dimensionless, ambient_f: T, liquid_temperature_f: T, reference_capacity_btuh: M L^2 T^-3, reference_percent_full: dimensionless, reference_ambient_f: T, connected_load_btuh: M L^2 T^-3 } out: { wetted_area_ft2: L^2, reference_wetted_area_ft2: L^2, capacity_btuh: M L^2 T^-3, margin_btuh: M L^2 T^-3, tanks_required: dimensionless }
 export function computePropaneVaporizationRate({
-  tank_diameter_ft = 0, tank_length_ft = 0, percent_full = 0, ambient_f = 0,
+  tank_diameter_ft = 0, tank_length_ft = 0, percent_full = 0, ambient_f = null,
   liquid_temperature_f = 0, reference_capacity_btuh = 0, reference_percent_full = 0,
-  reference_ambient_f = 0, connected_load_btuh = 0,
+  reference_ambient_f = null, connected_load_btuh = 0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // An omitted temperature used to be a real 0 degF.
   for (const k of ["liquid_temperature_f"]) if (arguments[0]?.[k] === undefined || arguments[0]?.[k] === null || arguments[0]?.[k] === "") return { error: "Enter the liquid (tank) temperature (degF); in steady cold weather it is the ambient." };
+  if (ambient_f === null || ambient_f === undefined || ambient_f === "") return { error: "Enter the ambient temperature (degF)." };
+  if (reference_ambient_f === null || reference_ambient_f === undefined || reference_ambient_f === "") return { error: "Enter the reference ambient from the table (degF)." };
   if (!(tank_diameter_ft > 0) || !(tank_length_ft > 0)) return { error: "Tank diameter and length must be greater than zero." };
   if (!(percent_full > 0) || percent_full > 100) return { error: "Percent full must be greater than zero and no more than 100." };
   if (!(reference_percent_full > 0) || reference_percent_full > 100) return { error: "Reference percent full must be greater than zero and no more than 100." };
@@ -1203,11 +1207,11 @@ GAS_RENDERERS["propane-vaporization-rate"] = _simpleRenderer({
     { key: "tank_diameter_ft", label: "Tank diameter (ft)" },
     { key: "tank_length_ft", label: "Tank length (ft)" },
     { key: "percent_full", label: "Percent full now (%)" },
-    { key: "ambient_f", label: "Ambient temperature (degF)", attrs: { step: "any" } },
-    { key: "liquid_temperature_f", label: "Liquid temperature (degF)", attrs: { step: "any" } },
+    { key: "ambient_f", label: "Ambient temperature (degF)", required: true, attrs: { step: "any" } },
+    { key: "liquid_temperature_f", label: "Liquid temperature (degF)", required: true, attrs: { step: "any" } },
     { key: "reference_capacity_btuh", label: "Table capacity at the reference condition (BTU/h)" },
     { key: "reference_percent_full", label: "Reference percent full (%)" },
-    { key: "reference_ambient_f", label: "Reference ambient (degF)", attrs: { step: "any" } },
+    { key: "reference_ambient_f", label: "Reference ambient (degF)", required: true, attrs: { step: "any" } },
     { key: "connected_load_btuh", label: "Connected load (BTU/h)" },
   ],
   outputs: [
@@ -1235,7 +1239,7 @@ GAS_RENDERERS["propane-fill-outage"] = _simpleRenderer({
     { key: "fill_limit_pct", label: "Filling limit (%)" },
     { key: "current_gauge_pct", label: "Current gauge reading (%)" },
     { key: "btu_per_gal", label: "Energy content (BTU/gal)" },
-    { key: "liquid_temperature_f", label: "Liquid temperature (degF)", attrs: { step: "any" } },
+    { key: "liquid_temperature_f", label: "Liquid temperature (degF)", required: true, attrs: { step: "any" } },
   ],
   outputs: [
     { key: "max_fill_gal", label: "Maximum fill (gal)", unit: "gal", value: (r) => fmt(r.max_fill_gal, 0) + " gal" },

@@ -57,7 +57,9 @@ function _simpleRenderer(spec) {
     }
     const update = debounce(() => {
       const params = {};
-      for (const f of spec.fields) params[f.key] = Number(fields[f.key].input.value) || 0;
+      // A field marked `required` passes null when blank, so the compute can
+      // tell a cleared temperature from a typed 0.
+      for (const f of spec.fields) params[f.key] = f.required && fields[f.key].input.value === "" ? null : Number(fields[f.key].input.value) || 0;
       const r = spec.compute(params);
       if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }
       for (const o of spec.outputs) outs[o.key].textContent = o.value(r);
@@ -373,6 +375,12 @@ export function computeIceMeltWorkingTemperature({ area_ft2 = 0, ice_thickness_i
   if (!(ice_density_lb_ft3 > 0)) return { error: "Ice density must be positive (lb per cu ft)." };
   if (!(capacity_lb_ice_per_lb > 0)) return { error: "Melting capacity must be positive (lb of ice per lb of product)." };
   if (alt_capacity_lb_ice_per_lb < 0) return { error: "Comparison melting capacity cannot be negative (lb of ice per lb of product)." };
+  // A blank page box read as 0 F put the pavement below the working limit; an omitted key keeps its default.
+  const _blank = (x) => x === null || x === "";
+  if (_blank(pavement_temp_f)) return { error: "Enter the pavement temperature (degF)." };
+  if (_blank(practical_limit_f)) return { error: "Enter the product's practical working limit (degF)." };
+  if (_blank(eutectic_f)) return { error: "Enter the product's eutectic temperature (degF)." };
+  if (alt_capacity_lb_ice_per_lb > 0 && _blank(alt_temp_f)) return { error: "Enter the colder temperature to compare (degF)." };
   const ice_volume_ft3 = area_ft2 * (ice_thickness_in / 12);
   const ice_mass_lb = ice_volume_ft3 * ice_density_lb_ft3;
   const product_lb = ice_mass_lb / capacity_lb_ice_per_lb;
@@ -401,12 +409,12 @@ WINTEROPS_RENDERERS["ice-melt-working-temperature"] = _simpleRenderer({
     { key: "area_ft2", label: "Area to treat (sq ft)", kind: "number" },
     { key: "ice_thickness_in", label: "Ice thickness (in)", kind: "number" },
     { key: "ice_density_lb_ft3", label: "Ice density (lb per cu ft)", kind: "number", default: 57.2 },
-    { key: "pavement_temp_f", label: "Pavement temperature (degF)", kind: "number", default: 30, attrs: { step: "any" } },
+    { key: "pavement_temp_f", label: "Pavement temperature (degF)", kind: "number", default: 30, required: true, attrs: { step: "any" } },
     { key: "capacity_lb_ice_per_lb", label: "Melting capacity at that temperature (lb ice per lb)", kind: "number" },
-    { key: "alt_temp_f", label: "Colder temperature to compare (degF)", kind: "number", default: 20, attrs: { step: "any" } },
+    { key: "alt_temp_f", label: "Colder temperature to compare (degF)", kind: "number", default: 20, required: true, attrs: { step: "any" } },
     { key: "alt_capacity_lb_ice_per_lb", label: "Melting capacity there (lb ice per lb, 0 to skip)", kind: "number" },
-    { key: "practical_limit_f", label: "Product practical working limit (degF)", kind: "number", default: 15, attrs: { step: "any" } },
-    { key: "eutectic_f", label: "Product eutectic temperature (degF)", kind: "number", default: -6, attrs: { step: "any" } },
+    { key: "practical_limit_f", label: "Product practical working limit (degF)", kind: "number", default: 15, required: true, attrs: { step: "any" } },
+    { key: "eutectic_f", label: "Product eutectic temperature (degF)", kind: "number", default: -6, required: true, attrs: { step: "any" } },
   ],
   outputs: [
     { key: "i", id: "imw-out-i", label: "Ice to be melted", value: (r) => fmt(r.ice_volume_ft3, 1) + " cu ft (" + fmt(r.ice_mass_lb, 0) + " lb)" },

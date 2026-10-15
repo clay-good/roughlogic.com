@@ -72,7 +72,9 @@ function _simpleRenderer(spec) {
     }
     const update = debounce(() => {
       const params = {};
-      for (const f of spec.fields) params[f.key] = Number(fields[f.key].input.value) || 0;
+      // A field marked `required` passes null when blank, so the compute can
+      // tell a cleared temperature from a typed 0.
+      for (const f of spec.fields) params[f.key] = f.required && fields[f.key].input.value === "" ? null : Number(fields[f.key].input.value) || 0;
       const r = spec.compute(params);
       if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }
       for (const o of spec.outputs) outs[o.key].textContent = o.value(r);
@@ -179,6 +181,8 @@ STEAMPLANT_RENDERERS["laundry-washer-turns"] = _simpleRenderer({
 // dims: in { lb_per_day: M, gal_per_lb: L^3 / M, water_rate_per_gal: dimensionless, sewer_rate_per_gal: dimensionless, incoming_temp_f: T, wash_temp_f: T, hot_fraction: dimensionless, heater_efficiency: dimensionless, fuel_cost_per_mmbtu: dimensionless, retained_moisture_fraction: dimensionless, improved_retained_moisture_fraction: dimensionless, dryer_efficiency: dimensionless, chem_cost_per_cwt: dimensionless, labor_hours_per_day: T, labor_rate_per_hour: dimensionless, days_per_year: dimensionless } out: { total_cost_per_lb: dimensionless, cost_per_cwt: dimensionless, annual_cost: dimensionless, energy_share_of_utilities_pct: dimensionless, extraction_saving_annual: dimensionless }
 export function computeLaundryCostPerPound({ lb_per_day = 0, gal_per_lb = 0, water_rate_per_gal = 0, sewer_rate_per_gal = 0, incoming_temp_f = 60, wash_temp_f = 140, hot_fraction = 0.6, heater_efficiency = 0.8, fuel_cost_per_mmbtu = 0, retained_moisture_fraction = 0.45, improved_retained_moisture_fraction = 0.35, dryer_efficiency = 0.7, chem_cost_per_cwt = 0, labor_hours_per_day = 0, labor_rate_per_hour = 0, days_per_year = 300 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // The page passes a blank box as null, and Number(null) is 0 F; 0 F is a real reading, so a blank cannot stand in for it.
+  if ([incoming_temp_f].some((x) => x === null || x === "")) return { error: "Enter the incoming water temperature (F)." };
   if (!(lb_per_day > 0)) return { error: "Pounds processed per day must be positive." };
   if (!(gal_per_lb > 0)) return { error: "Water use must be positive (gallons per pound)." };
   if (!(water_rate_per_gal >= 0)) return { error: "Water rate cannot be negative." };
@@ -243,7 +247,7 @@ STEAMPLANT_RENDERERS["laundry-cost-per-pound"] = _simpleRenderer({
     { key: "gal_per_lb", label: "Water use (gallons per pound)", kind: "number" },
     { key: "water_rate_per_gal", label: "Water rate ($ per gallon)", kind: "number" },
     { key: "sewer_rate_per_gal", label: "Sewer rate ($ per gallon)", kind: "number" },
-    { key: "incoming_temp_f", label: "Incoming water temperature (F)", kind: "number", default: 60, attrs: { step: "any" } },
+    { key: "incoming_temp_f", label: "Incoming water temperature (F)", kind: "number", default: 60, required: true, attrs: { step: "any" } },
     { key: "wash_temp_f", label: "Wash temperature (F)", kind: "number", default: 140 },
     { key: "hot_fraction", label: "Fraction of the water heated (0-1)", kind: "number", default: 0.6 },
     { key: "heater_efficiency", label: "Water heater efficiency (0-1)", kind: "number", default: 0.8 },
@@ -674,6 +678,8 @@ const _unWalther = (x) => _ssuFromCst(Math.pow(10, Math.pow(10, x)) - _WALTHER_O
 // dims: in { v1_ssu: L^2 / T, t1_f: T, v2_ssu: L^2 / T, t2_f: T, target_ssu: L^2 / T, pumping_limit_ssu: L^2 / T, check_temp_f: T } out: { slope_b: dimensionless, temp_for_target_f: T, temp_for_pumping_f: T, viscosity_at_check_ssu: L^2 / T, setpoint_spread_f: T }
 export function computeFuelOilAtomizingViscosity({ v1_ssu = 0, t1_f = 0, v2_ssu = 0, t2_f = 0, target_ssu = 150, pumping_limit_ssu = 4000, check_temp_f = 185 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // The page passes a blank box as null, and Number(null) is 0 F; 0 F is a real reading, so a blank cannot stand in for it.
+  if ([check_temp_f].some((x) => x === null || x === "")) return { error: "Enter the heater setpoint to check (F)." };
   for (const k of ["t1_f", "t2_f"]) { const v = arguments[0]?.[k]; if (v === undefined || v === null || v === "") return { error: "Enter the temperature of both viscosity points (F)." }; }
   if (!(v1_ssu >= 32)) return { error: "The first viscosity must be at least 32 SSU (the Saybolt scale's floor)." };
   if (!(v2_ssu >= 32)) return { error: "The second viscosity must be at least 32 SSU (the Saybolt scale's floor)." };
@@ -719,12 +725,12 @@ STEAMPLANT_RENDERERS["fuel-oil-atomizing-viscosity"] = _simpleRenderer({
   example: fuelOilAtomizingViscosityExample.inputs,
   fields: [
     { key: "v1_ssu", label: "Data sheet viscosity 1 (SSU)", kind: "number" },
-    { key: "t1_f", label: "Data sheet temperature 1 (F)", kind: "number", attrs: { step: "any" } },
+    { key: "t1_f", label: "Data sheet temperature 1 (F)", kind: "number", required: true, attrs: { step: "any" } },
     { key: "v2_ssu", label: "Data sheet viscosity 2 (SSU)", kind: "number" },
-    { key: "t2_f", label: "Data sheet temperature 2 (F)", kind: "number" },
+    { key: "t2_f", label: "Data sheet temperature 2 (F)", kind: "number", required: true },
     { key: "target_ssu", label: "Target atomizing viscosity (SSU)", kind: "number", default: 150 },
     { key: "pumping_limit_ssu", label: "Pumping viscosity limit (SSU)", kind: "number", default: 4000 },
-    { key: "check_temp_f", label: "Check a heater setpoint (F)", kind: "number", default: 185, attrs: { step: "any" } },
+    { key: "check_temp_f", label: "Check a heater setpoint (F)", kind: "number", default: 185, required: true, attrs: { step: "any" } },
   ],
   outputs: [
     { key: "a", id: "foa-out-a", label: "Atomizing setpoint at the burner", value: (r) => fmt(r.temp_for_target_f, 0) + " F to reach " + fmt(r.target_ssu, 0) + " SSU" },

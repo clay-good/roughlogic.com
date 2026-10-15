@@ -116,6 +116,8 @@ export const WIRE_AMPACITY_AMBIENT_PRESETS = [
 // dims: in { awg: dimensionless, material: dimensionless, insulation_rating_C: T, ambient_C: T, bundle_count: dimensionless } out: { ampacity_A: I }
 export function computeWireAmpacity({ awg, material, insulation_rating_C, ambient_C, bundle_count = 1 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A blank ambient read as 0 C overstated the ampacity of a conductor in a 30 C room.
+  if (ambient_C === null || ambient_C === undefined || ambient_C === "") return { error: "Enter the ambient temperature (C)." };
   const I = ampacityFromPhysics({ awg, material, insulation_rating_C, ambient_C, bundle_count });
   return { ampacity_A: I };
 }
@@ -633,9 +635,10 @@ export function renderWireAmpacity(inputRegion, outputRegion, citationEl, params
       awg: awg.select.value,
       material: mat.select.value,
       insulation_rating_C: Number(ins.select.value),
-      ambient_C: Number(amb.input.value),
+      ambient_C: amb.input.value === "" ? null : Number(amb.input.value),
       bundle_count: Number(bun.input.value) || 1,
     });
+    if (r.error) { out.textContent = r.error; outBasis.textContent = "-"; return; }
     out.textContent = fmt(r.ampacity_A, 1) + " A";
     outBasis.textContent = "Thermal-balance estimate, NOT NEC Table 310.16 - it reads high on larger conductors. Size from the table in the adopted NEC edition.";
   }, DEBOUNCE_MS);
@@ -982,8 +985,9 @@ export function renderConductorResistance(inputRegion, outputRegion, citationEl,
       material: mat.select.value,
       awg: awg.select.value,
       length_ft: Number(len.input.value) || 0,
-      temperature_C: Number(T.input.value),
+      temperature_C: T.input.value === "" ? null : Number(T.input.value),
     });
+    if (r.error) { outR.textContent = r.error; outKft.textContent = "-"; return; }
     outR.textContent = fmt(r.resistance_ohm, 4) + " ohm";
     outKft.textContent = fmt(r.resistance_ohm_per_kft, 4) + " ohm/kft";
   }, DEBOUNCE_MS);
@@ -2173,7 +2177,7 @@ function renderPoEBudget(inputRegion, outputRegion, citationEl, params) {
   const update = debounce(() => {
     const r = computePoEBudget({
       poe_class: cls.select.value, category: cat.select.value,
-      run_length_ft: Number(len.input.value) || 0, ambient_C: Number(amb.input.value) || 25,
+      run_length_ft: Number(len.input.value) || 0, ambient_C: amb.input.value === "" ? undefined : Number(amb.input.value),
     });
     if (r.error) { oP.textContent = r.error; oV.textContent = "-"; oL.textContent = "-"; oF.textContent = "-"; return; }
     oP.textContent = fmt(r.pd_available_W, 2) + " W (min " + fmt(r.pd_min_W, 2) + " W)";

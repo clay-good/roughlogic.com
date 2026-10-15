@@ -50,7 +50,9 @@ function _r(spec) {
       const params = {};
       for (const f of spec.fields) {
         if (f.kind === "select") params[f.key] = fields[f.key].select.value;
-        else params[f.key] = Number(fields[f.key].input.value) || 0;
+        // A field marked `required` passes null when blank, so the compute can
+        // tell a cleared temperature from a typed 0.
+        else params[f.key] = f.required && fields[f.key].input.value === "" ? null : Number(fields[f.key].input.value) || 0;
       }
       const r = spec.compute(params);
       if (r.error) {
@@ -882,8 +884,8 @@ FARMPRODUCTION_RENDERERS["reference-et0"] = _r({
       { value: "jul", label: "July" }, { value: "aug", label: "August" }, { value: "sep", label: "September" },
       { value: "oct", label: "October" }, { value: "nov", label: "November" }, { value: "dec", label: "December" },
     ] },
-    { key: "tmax_f", label: "Daily high Tmax (°F)", kind: "number", attrs: { step: "any" } },
-    { key: "tmin_f", label: "Daily low Tmin (°F)", kind: "number", attrs: { step: "any" } },
+    { key: "tmax_f", label: "Daily high Tmax (°F)", kind: "number", attrs: { step: "any" }, required: true },
+    { key: "tmin_f", label: "Daily low Tmin (°F)", kind: "number", attrs: { step: "any" }, required: true },
   ],
   outputs: [
     { key: "e", id: "et0-out-e", label: "Reference ET0", value: (r) => fmt(r.et0_in_day, 3) + " in/day (" + fmt(r.et0_mm_day, 2) + " mm/day)" },

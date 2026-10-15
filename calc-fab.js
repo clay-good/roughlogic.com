@@ -1908,7 +1908,9 @@ function _simpleRenderer(spec) {
       const params = {};
       for (const f of spec.fields) {
         if (f.kind === "select") params[f.key] = fields[f.key].select.value;
-        else params[f.key] = Number(fields[f.key].input.value) || 0;
+        // A field marked `required` passes null when blank, so the compute can
+        // tell a cleared temperature from a typed 0.
+        else params[f.key] = f.required && fields[f.key].input.value === "" ? null : Number(fields[f.key].input.value) || 0;
       }
       const r = spec.compute(params);
       if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }
@@ -1990,6 +1992,8 @@ FAB_RENDERERS["tube-bend-wall-thinning"] = _simpleRenderer({
 // dims: in { heat_input_kj_mm: M L T^-2, preheat_c: T, thickness_mm: L, f2: dimensionless, f3: dimensionless } out: { t85_3d_s: T, t85_2d_s: T, transition_mm: L, governing_s: T }
 export function computeWeldCoolingRateT85({ heat_input_kj_mm = 0, preheat_c = 20, thickness_mm = 0, f2 = 1.0, f3 = 1.0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // The page passes a blank box as null, and Number(null) is 0 C; 0 C is a real reading, so a blank cannot stand in for it.
+  if ([preheat_c].some((x) => x === null || x === "")) return { error: "Enter the preheat / interpass temperature (C)." };
   if (!(heat_input_kj_mm > 0)) return { error: "Heat input must be positive." };
   if (!(thickness_mm > 0)) return { error: "Plate thickness must be positive." };
   if (!(f2 > 0 && f3 > 0)) return { error: "Joint shape factors must be positive." };
@@ -2027,7 +2031,7 @@ FAB_RENDERERS["weld-cooling-rate-t85"] = _simpleRenderer({
   example: weldCoolingRateT85Example.inputs,
   fields: [
     { key: "heat_input_kj_mm", label: "Heat input Q (kJ/mm, after process efficiency)", kind: "number" },
-    { key: "preheat_c", label: "Preheat / interpass temperature (deg C)", kind: "number", default: 20, attrs: { step: "any" } },
+    { key: "preheat_c", label: "Preheat / interpass temperature (deg C)", kind: "number", default: 20, required: true, attrs: { step: "any" } },
     { key: "thickness_mm", label: "Plate thickness (mm, the t8/5 model is metric)", kind: "number" },
     { key: "f2", label: "Two-dimensional joint shape factor F2", kind: "number" },
     { key: "f3", label: "Three-dimensional joint shape factor F3", kind: "number" },
@@ -2099,6 +2103,8 @@ FAB_RENDERERS["weld-preheat-cet"] = _simpleRenderer({
 // dims: in { tau_min: T, ambient_f: T, preheat_min_f: T, interpass_max_f: T, current_temp_f: T, restart_temp_f: T, elapsed_min: T } out: { idle_allowance_min: T, required_wait_min: T, temp_at_elapsed_f: T }
 export function computeInterpassTemperatureControl({ tau_min = 0, ambient_f = 70, preheat_min_f = 0, interpass_max_f = 0, current_temp_f = 0, restart_temp_f = 0, elapsed_min = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // The page passes a blank box as null, and Number(null) is 0 F; 0 F is a real reading, so a blank cannot stand in for it.
+  if ([ambient_f].some((x) => x === null || x === "")) return { error: "Enter the ambient temperature (F)." };
   if (!(tau_min > 0)) return { error: "Joint time constant must be positive." };
   if (!Number.isFinite(ambient_f)) return { error: "Ambient temperature must be a finite number." };
   if (!(preheat_min_f > ambient_f)) return { error: "The preheat minimum must be above ambient, or the joint never falls below it." };
@@ -2142,7 +2148,7 @@ FAB_RENDERERS["interpass-temperature-control"] = _simpleRenderer({
   example: interpassTemperatureControlExample.inputs,
   fields: [
     { key: "tau_min", label: "Measured joint time constant tau (min)", kind: "number" },
-    { key: "ambient_f", label: "Ambient temperature (F)", kind: "number", default: 70, attrs: { step: "any" } },
+    { key: "ambient_f", label: "Ambient temperature (F)", kind: "number", default: 70, required: true, attrs: { step: "any" } },
     { key: "preheat_min_f", label: "Preheat minimum from the WPS (F)", kind: "number" },
     { key: "interpass_max_f", label: "Interpass maximum from the WPS (F)", kind: "number" },
     { key: "current_temp_f", label: "Current or post-pass joint temperature (F)", kind: "number" },

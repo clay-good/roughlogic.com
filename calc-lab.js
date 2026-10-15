@@ -414,6 +414,8 @@ export const vanDerWaalsExample = { inputs: { gas: "carbon-dioxide", moles: 1, v
 // dims: in { k1: dimensionless, temp1_c: T, k2: dimensionless, temp2_c: T } out: { ea_j_mol: dimensionless, ea_kj_mol: dimensionless, pre_exponential_a: dimensionless, q10: dimensionless }
 export function computeArrheniusEquation({ k1 = 0, temp1_c = 0, k2 = 0, temp2_c = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A blank temperature read as 0 C gave an activation energy off a temperature nobody entered.
+  if ([temp1_c, temp2_c].some((x) => x === null || x === "")) return { error: "Enter both temperatures (C)." };
   const R = 8.314; // J/(mol*K)
   const K1 = Number(k1) || 0;
   const K2 = Number(k2) || 0;
@@ -443,6 +445,8 @@ export const arrheniusEquationExample = { inputs: { k1: 1.0, temp1_c: 25, k2: 2.
 // dims: in { pressure1: dimensionless, temp1_c: T, pressure2: dimensionless, temp2_c: T } out: { enthalpy_j_mol: dimensionless, enthalpy_kj_mol: dimensionless }
 export function computeClausiusClapeyron({ pressure1 = 0, temp1_c = 0, pressure2 = 0, temp2_c = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A blank temperature read as 0 C gave an enthalpy off a temperature nobody entered.
+  if ([temp1_c, temp2_c].some((x) => x === null || x === "")) return { error: "Enter both temperatures (C)." };
   const R = 8.314; // J/(mol*K)
   const P1 = Number(pressure1) || 0;
   const P2 = Number(pressure2) || 0;
@@ -901,7 +905,7 @@ function renderArrheniusEquation(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "arr-out-note");
   const rd = (i) => (i.value === "" ? 0 : Number(i.value) || 0);
   const update = debounce(() => {
-    const r = computeArrheniusEquation({ k1: rd(k1.input), temp1_c: t1.input.value === "" ? 0 : Number(t1.input.value), k2: rd(k2.input), temp2_c: t2.input.value === "" ? 0 : Number(t2.input.value) });
+    const r = computeArrheniusEquation({ k1: rd(k1.input), temp1_c: t1.input.value === "" ? null : Number(t1.input.value), k2: rd(k2.input), temp2_c: t2.input.value === "" ? null : Number(t2.input.value) });
     if (r.error) { oEa.textContent = r.error; oA.textContent = "-"; oNote.textContent = ""; return; }
     oEa.textContent = fmt(r.ea_kj_mol, 2) + " kJ/mol (" + fmt(r.ea_j_mol, 0) + " J/mol)";
     oA.textContent = r.pre_exponential_a.toExponential(3) + " / Q10 " + fmt(r.q10, 3);
@@ -924,7 +928,7 @@ function renderClausiusClapeyron(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "cc-out-note");
   const rd = (i) => (i.value === "" ? 0 : Number(i.value) || 0);
   const update = debounce(() => {
-    const r = computeClausiusClapeyron({ pressure1: rd(p1.input), temp1_c: t1.input.value === "" ? 0 : Number(t1.input.value), pressure2: rd(p2.input), temp2_c: t2.input.value === "" ? 0 : Number(t2.input.value) });
+    const r = computeClausiusClapeyron({ pressure1: rd(p1.input), temp1_c: t1.input.value === "" ? null : Number(t1.input.value), pressure2: rd(p2.input), temp2_c: t2.input.value === "" ? null : Number(t2.input.value) });
     if (r.error) { oH.textContent = r.error; oS.textContent = "-"; oNote.textContent = ""; return; }
     oH.textContent = fmt(r.enthalpy_kj_mol, 2) + " kJ/mol (" + fmt(r.enthalpy_j_mol, 0) + " J/mol)";
     oS.textContent = fmt(r.slope_k, 1) + " K";
