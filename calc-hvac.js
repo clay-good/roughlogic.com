@@ -4793,6 +4793,9 @@ export function computeCompressedAirPressureDrop({ scfm = 0, pipe_id_in = 0, len
   const pct_of_line = pressure_drop_psi / pg * 100;
   const over_10pct = pct_of_line > 10;
   if (![density_lb_ft3, velocity_fps, reynolds, pressure_drop_psi].every(Number.isFinite)) return { error: "Compressed-air pressure-drop math did not produce a finite value." };
+  // A drop at or past the line pressure cannot happen: the far end would sit below atmosphere and the
+  // flow chokes first. Until 2026-10-14 a 0.21 in line printed a 10,351 psi drop on a 100 psig system.
+  if (pressure_drop_psi >= pg) return { error: "This pipe cannot carry " + q + " scfm: the computed drop (" + fmt(pressure_drop_psi, 0) + " psi) exceeds the " + pg + " psig line pressure, so the flow would choke long before. Use a larger pipe; this friction model holds only for drops under about 10% of line pressure." };
   return {
     p_abs_psia, density_lb_ft3, actual_cfm, velocity_fps, reynolds, friction_factor,
     pressure_drop_psi, drop_per_100ft_psi, pct_of_line, over_10pct,

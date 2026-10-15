@@ -1913,6 +1913,9 @@ export function computePumpImpellerTrim({
   if (!(required_flow_gpm <= current_flow_gpm)) return { error: "Required flow must be at or below the current flow -- trimming an impeller cannot increase it." };
   if (current_head_ft < 0 || required_head_ft < 0) return { error: "Heads cannot be negative (ft)." };
   if (max_diameter_in < 0) return { error: "Maximum casing diameter cannot be negative (in)." };
+  // An impeller larger than its casing maximum is a mistyped diameter; until 2026-10-14 it read
+  // "149.6% of the casing maximum, inside the 75% practical limit".
+  if (max_diameter_in > 0 && current_diameter_in > max_diameter_in * (1 + 1e-9)) return { error: "The current impeller diameter is larger than the casing maximum entered; check both diameters (in)." };
   if (!(min_trim_fraction > 0 && min_trim_fraction <= 1)) return { error: "The minimum trim fraction must be above 0 and at most 1." };
   if (motor_hp < 0 || annual_hours < 0 || energy_rate_per_kwh < 0) return { error: "Motor power, hours, and rate cannot be negative." };
   if (annual_hours > 8784) return { error: "Annual hours cannot exceed 8,784." };

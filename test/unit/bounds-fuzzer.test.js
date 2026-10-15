@@ -32836,8 +32836,11 @@ test("bounds: spec-v1033 computeCompressedAirPressureDrop pins the worked exampl
   assert.ok(_v1033({ ...base, pipe_id_in: 2.067 }).pressure_drop_psi < r.pressure_drop_psi);
   // Higher line pressure moves less actual volume, so the same scfm drops less.
   assert.ok(_v1033({ ...base, line_pressure_psig: 175 }).pressure_drop_psi < r.pressure_drop_psi);
-  // The 10% flag trips on an undersized line.
-  assert.ok(_v1033({ ...base, pipe_id_in: 0.5, scfm: 150 }).over_10pct === true);
+  // The 10% flag trips on an undersized line (38 psi on 100 psig).
+  assert.ok(_v1033({ ...base, pipe_id_in: 0.5, scfm: 60 }).over_10pct === true);
+  // 150 scfm through the same line computes 233 psi, past the line pressure itself: the flow chokes,
+  // so it is an error, not an over-10% answer (until 2026-10-14 it printed the 233).
+  assert.ok("error" in _v1033({ ...base, pipe_id_in: 0.5, scfm: 150 }));
   // Error seams.
   assert.ok("error" in _v1033({ ...base, scfm: 0 }));
   assert.ok("error" in _v1033({ ...base, pipe_id_in: 0 }));
@@ -61592,4 +61595,23 @@ test("hardening slice 43 (bore breakout, survey time, both ratings, exact 1-3/4 
   assert.ok(!(await run("slope-avalanche", { measured_angle_deg: 89 })).error);
   const both = (await run("gear-reducer-service-factor", { catalog_mechanical_hp: 30 })).verdict;
   assert.ok(/FAILS BOTH RATINGS: 20\.0 hp short on the mechanical/.test(both) && /3\.0 hp short on the THERMAL/.test(both), both);
+});
+
+test("hardening slice 49 (a drop past the line pressure, an impeller larger than its casing)", async () => {
+  const { readFileSync } = await import("node:fs");
+  const rows = JSON.parse(readFileSync(new URL("../fixtures/worked-examples.json", import.meta.url), "utf8")).rows;
+  const { COMPUTE_MAP } = await import("../fixtures/compute-map.js");
+  const run = async (id, over = {}) => {
+    const reg = COMPUTE_MAP[id];
+    const fn = (await import(new URL(reg.module, new URL("../fixtures/", import.meta.url)).href))[reg.fn];
+    return fn({ ...rows.find((r) => r.tile_id === id).inputs, ...over });
+  };
+  // 100 scfm through a 0.21 in line printed a 10,351 psi drop on a 100 psig system.
+  assert.ok(!(await run("compressed-air-pressure-drop")).error);
+  assert.match((await run("compressed-air-pressure-drop", { pipe_id_in: 0.2098 })).error, /cannot carry/);
+  // An impeller twice its casing maximum read "inside the 75% practical limit".
+  const trim = rows.find((r) => r.tile_id === "pump-impeller-trim").inputs;
+  assert.ok(!(await run("pump-impeller-trim")).error);
+  if (trim.max_diameter_in > 0) assert.match((await run("pump-impeller-trim", { current_diameter_in: trim.max_diameter_in * 2 })).error, /larger than the casing maximum/);
+  assert.ok(!(await run("pump-impeller-trim", { max_diameter_in: 0 })).error, "no casing maximum entered skips the check");
 });
