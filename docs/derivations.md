@@ -2297,7 +2297,7 @@ cross-check.
 | calc-feeder.js | `computeMotorFeederMultiple` | `{ motors = [], nonmotor_continuous_A = 0, nonmotor_noncontinuous_A = 0 } = {}` | _ | _ | _ |
 | calc-feeder.js | `computeTransformerConductorProtection` | `{ kva = 0, primary_v = 0, secondary_v = 0, phase = 3, secondary_protection = ...` | _ | _ | _ |
 | calc-field.js | `computeBackcountryNeeds` | `{ body_weight_lb = 0, ambient_band = "moderate", exertion = "moderate", trip_...` | _ | _ | _ |
-| calc-field.js | `computeBearingConversion` | `{ declination_deg = 0, bearing_deg = 0, direction = "magnetic_to_true" }` | _ | _ | _ |
+| calc-field.js | `computeBearingConversion` | `{ declination_deg = 0, bearing_deg = null, direction = "magnetic_to_true" }` | _ | _ | _ |
 | calc-field.js | `computeContourSlope` | `{ contour_interval_ft = 0, intervals_crossed = 0, map_distance_in = 0, repres...` | _ | _ | _ |
 | calc-field.js | `computeHelicopterLzSizing` | `{ rotor_diameter_ft = 0, size_factor = 2, measured_clear_ft = 0, ground_slope...` | _ | _ | _ |
 | calc-field.js | `computeHikingTime` | `{ distance = 0, distance_unit = "km", ascent = 0, ascent_unit = "m", speed = ...` | _ | _ | _ |
@@ -2308,8 +2308,8 @@ cross-check.
 | calc-field.js | `computePacing` | `{ calibration_distance_ft = 0, calibration_paces = 0, current_paces = 0, terr...` | _ | _ | _ |
 | calc-field.js | `computeSearchProbability` | `{ pod_list = [], poa_pct = 100 } = {}` | _ | _ | _ |
 | calc-field.js | `computeSlopeAvalanche` | `{ rise_ft = 0, run_ft = 0, measured_angle_deg = 0 }` | _ | _ | _ |
-| calc-field.js | `computeSolarTimes` | `{ lat_deg = 0, lon_deg = 0, date_iso = "", tz_offset_hours = 0 }` | _ | _ | _ |
-| calc-field.js | `computeUTM` | `{ direction = "latlon_to_utm", lat_deg = 0, lon_deg = 0, zone = 0, hemisphere...` | _ | _ | _ |
+| calc-field.js | `computeSolarTimes` | `{ lat_deg = null, lon_deg = null, date_iso = "", tz_offset_hours = null }` | _ | _ | _ |
+| calc-field.js | `computeUTM` | `{ direction = "latlon_to_utm", lat_deg = null, lon_deg = null, zone = 0, hemi...` | _ | _ | _ |
 | calc-field.js | `computeWMM` | `{ lat_deg, lon_deg, alt_km = 0, decimal_year, coefficients }` | _ | _ | _ |
 | calc-field.js | `decimalYearFromIso` | `iso` | _ | _ | _ |
 | calc-field.js | `encodeTimerState` | `t` | _ | _ | _ |
@@ -2894,7 +2894,7 @@ cross-check.
 | calc-mechanic.js | `computeChamberCcForCr` | `{ bore_in = 0, stroke_in = 0, target_cr = 0, gasket_bore_in = 0, gasket_thick...` | _ | _ | _ |
 | calc-mechanic.js | `computeClimbGradientRoc` | `{ climb_gradient_ft_per_nm = 200, ground_speed_kt = 0 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeCoolingSystemFlow` | `{ q_btuh = 0, dt_f = 0, coolant = "water" } = {}` | _ | _ | _ |
-| calc-mechanic.js | `computeCrosswindComponent` | `{ runway_heading_deg = 0, wind_dir_deg = 0, wind_speed_kt = 0, gust_kt = 0, m...` | _ | _ | _ |
+| calc-mechanic.js | `computeCrosswindComponent` | `{ runway_heading_deg = null, wind_dir_deg = null, wind_speed_kt = 0, gust_kt ...` | _ | _ | _ |
 | calc-mechanic.js | `computeCrouchHpForSpeed` | `{ target_speed_mph = 0, displacement_lb = 0, hull_constant = 190 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeCrouchPlaningSpeed` | `{ displacement_lb = 0, shaft_hp = 0, hull_constant = 190 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeDensityAltitude` | `{ field_elevation_ft = 0, altimeter_in_hg = 29.92, oat_f = 59, relative_humid...` | _ | _ | _ |
@@ -3593,8 +3593,8 @@ cross-check.
 | calc-solarfield.js | `computePvBallastWeight` | `{ modules = 30, module_wt_lb = 50, ballast_per_module_lb = 40, racking_wt_lb ...` | _ | _ | _ |
 | calc-solarfield.js | `computePvRailClampTakeoff` | `{ rows = 2, modules_per_row = 12, module_width_ft = 3.42, gap_ft = 0, rails_p...` | _ | _ | _ |
 | calc-solarfield.js | `computeShadowLength` | `{ object_height_ft = 0, sun_altitude_deg = 0 } = {}` | _ | _ | _ |
-| calc-solarfield.js | `computeSolarAltitude` | `{ latitude_deg = 0, day_of_year = 355, hours_from_solar_noon = 0 } = {}` | _ | _ | _ |
-| calc-solarfield.js | `computeSolarAzimuth` | `{ latitude_deg = 0, day_of_year = 172, hours_from_solar_noon = 0 } = {}` | _ | _ | _ |
+| calc-solarfield.js | `computeSolarAltitude` | `{ latitude_deg = null, day_of_year = 355, hours_from_solar_noon = 0 } = {}` | _ | _ | _ |
+| calc-solarfield.js | `computeSolarAzimuth` | `{ latitude_deg = null, day_of_year = 172, hours_from_solar_noon = 0 } = {}` | _ | _ | _ |
 | calc-solarfield.js | `computeSolarEgc69045` | `{ ocpd_rating_a = 0, pv_isc_a = 0, vd_upsized = "no" } = {}` | _ | _ | _ |
 | calc-solarfield.js | `computeSolarTimeCorrection` | `{ clock_hour = 12, clock_minute = 0, day_of_year = 1, longitude_deg = 0, utc_...` | _ | _ | _ |
 | calc-specialtytrades.js | `computeAwningCanopyLoad` | `{ projection_ft = 0, width_ft = 0, wind_speed_mph = 0, kz = 0.98, kzt = 1, kd...` | _ | _ | _ |
@@ -3697,8 +3697,8 @@ cross-check.
 | calc-steelpanelzone.js | `computeSteelPanelZoneAxial` | `{ fy_ksi = 50, col_depth_dc_in = 0, col_web_tw_in = 0, col_area_ag_in2 = 0, p...` | _ | _ | _ |
 | calc-steelpanelzone.js | `computeSteelPanelZoneShear` | `{ fy_ksi = 50, col_depth_dc_in = 0, col_web_tw_in = 0, col_flange_bcf_in = 0,...` | _ | _ | _ |
 | calc-survey.js | `computeAreaByCoordinates` | `{ points } = {}` | _ | _ | _ |
-| calc-survey.js | `computeAzimuthBearing` | `{ mode = "azimuth_to_bearing", azimuth_deg = 0, quadrant = "NE", quadrant_ang...` | _ | _ | _ |
-| calc-survey.js | `computeCogoForwardPoint` | `{ start_n = 0, start_e = 0, azimuth_deg = 0, distance_ft = 0 } = {}` | _ | _ | _ |
+| calc-survey.js | `computeAzimuthBearing` | `{ mode = "azimuth_to_bearing", azimuth_deg = null, quadrant = "NE", quadrant_...` | _ | _ | _ |
+| calc-survey.js | `computeCogoForwardPoint` | `{ start_n = 0, start_e = 0, azimuth_deg = null, distance_ft = 0 } = {}` | _ | _ | _ |
 | calc-survey.js | `computeCogoInverseLocate` | `{ start_n = 0, start_e = 0, end_n = 0, end_e = 0 } = {}` | _ | _ | _ |
 | calc-survey.js | `computeDifferentialLeveling` | `{ bm_elev = 0, bs, fs, known_close = null } = {}` | _ | _ | _ |
 | calc-survey.js | `computeDistanceDistanceIntersect` | `{ n0_ft = 0, e0_ft = 0, dist0_ft = 0, n1_ft = 0, e1_ft = 0, dist1_ft = 0 } = {}` | _ | _ | _ |

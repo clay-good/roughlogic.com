@@ -455,8 +455,10 @@ SURVEY_RENDERERS["taping-corrections"] = renderTapingCorrections;
 // azimuth (clockwise from north), and a distance, compute the new point.
 // latitude (dN) = D cos(Az), departure (dE) = D sin(Az); N2 = N1 + dN,
 // E2 = E1 + dE. The single forward step traverse-closure sums over a loop.
-export function computeCogoForwardPoint({ start_n = 0, start_e = 0, azimuth_deg = 0, distance_ft = 0 } = {}) {
+export function computeCogoForwardPoint({ start_n = 0, start_e = 0, azimuth_deg = null, distance_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A blank azimuth is not due north; the page passes it as null.
+  if (azimuth_deg === null || azimuth_deg === undefined || azimuth_deg === "") return { error: "Enter the azimuth (deg, clockwise from north)." };
   const az = Number(azimuth_deg);
   const d = Number(distance_ft);
   if (!(az >= 0 && az <= 360)) return { error: "Azimuth must be between 0 and 360 degrees (clockwise from north)." };
@@ -483,7 +485,7 @@ function renderCogoForwardPoint(inputRegion, outputRegion, citationEl) {
   const oN = makeOutputLine(outputRegion, "End northing N", "cf-out-n");
   const oE = makeOutputLine(outputRegion, "End easting E", "cf-out-e");
   const update = debounce(() => {
-    const r = computeCogoForwardPoint({ start_n: Number(n0.input.value) || 0, start_e: Number(e0.input.value) || 0, azimuth_deg: Number(az.input.value) || 0, distance_ft: Number(d.input.value) || 0 });
+    const r = computeCogoForwardPoint({ start_n: Number(n0.input.value) || 0, start_e: Number(e0.input.value) || 0, azimuth_deg: az.input.value === "" ? null : Number(az.input.value), distance_ft: Number(d.input.value) || 0 });
     if (r.error) { oDn.textContent = r.error; oDe.textContent = "-"; oN.textContent = "-"; oE.textContent = "-"; return; }
     oDn.textContent = fmt(r.delta_n, 3) + " ft";
     oDe.textContent = fmt(r.delta_e, 3) + " ft";
@@ -873,11 +875,13 @@ function _toDms(deg) {
   return D + "°" + pad(M) + "'" + pad(S) + "\"";
 }
 // dims: in { mode: dimensionless, azimuth_deg: dimensionless, quadrant: dimensionless, quadrant_angle_deg: dimensionless } out: { azimuth_deg: dimensionless, quadrant_angle_deg: dimensionless }
-export function computeAzimuthBearing({ mode = "azimuth_to_bearing", azimuth_deg = 0, quadrant = "NE", quadrant_angle_deg = 0 } = {}) {
+export function computeAzimuthBearing({ mode = "azimuth_to_bearing", azimuth_deg = null, quadrant = "NE", quadrant_angle_deg = 0 } = {}) {
   const _g = _finiteGuard({ azimuth_deg, quadrant_angle_deg }); if (_g) return _g;
   const m = String(mode || "").toLowerCase();
   let A;
   if (m === "azimuth_to_bearing") {
+    // A blank azimuth is not due north; the page passes it as null.
+    if (azimuth_deg === null || azimuth_deg === undefined || azimuth_deg === "") return { error: "Enter the azimuth (deg, clockwise from north)." };
     A = Number(azimuth_deg);
     if (!(A >= 0 && A <= 360)) return { error: "Azimuth must be between 0 and 360 degrees (clockwise from north)." };
   } else if (m === "bearing_to_azimuth") {
@@ -935,7 +939,7 @@ function renderAzimuthBearing(inputRegion, outputRegion, citationEl) {
   const oQuad = makeOutputLine(outputRegion, "Quadrant / bearing angle", "azb-out-quad");
   const oNote = makeOutputLine(outputRegion, "Note", "azb-out-note");
   const update = debounce(() => {
-    const r = computeAzimuthBearing({ mode: mode.select.value, azimuth_deg: Number(az.input.value) || 0, quadrant: quad.select.value, quadrant_angle_deg: Number(ang.input.value) || 0 });
+    const r = computeAzimuthBearing({ mode: mode.select.value, azimuth_deg: az.input.value === "" ? null : Number(az.input.value), quadrant: quad.select.value, quadrant_angle_deg: Number(ang.input.value) || 0 });
     if (r.error) { oAz.textContent = r.error; oBearing.textContent = "-"; oQuad.textContent = "-"; oNote.textContent = ""; return; }
     oAz.textContent = fmt(r.azimuth_deg, 4) + " deg (" + r.azimuth_dms + ")";
     oBearing.textContent = r.bearing_label;

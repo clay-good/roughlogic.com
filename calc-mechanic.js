@@ -2913,8 +2913,12 @@ MECHANIC_RENDERERS["true-airspeed"] = _simpleRenderer({
 // ===================== spec-v501: crosswind and headwind component =====================
 
 // dims: in { runway_heading_deg: dimensionless, wind_dir_deg: dimensionless, wind_speed_kt: L T^-1, gust_kt: L T^-1, max_demo_xwind_kt: L T^-1 } out: { angle_deg: dimensionless, crosswind_kt: L T^-1, headwind_kt: L T^-1, gust_xwind_kt: L T^-1, tailwind: dimensionless, exceeds: dimensionless }
-export function computeCrosswindComponent({ runway_heading_deg = 0, wind_dir_deg = 0, wind_speed_kt = 0, gust_kt = 0, max_demo_xwind_kt = 0 } = {}) {
+export function computeCrosswindComponent({ runway_heading_deg = null, wind_dir_deg = null, wind_speed_kt = 0, gust_kt = 0, max_demo_xwind_kt = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A blank runway heading is not due north; the page passes it as null.
+  if (runway_heading_deg === null || runway_heading_deg === undefined || runway_heading_deg === "") return { error: "Enter the runway heading (deg)." };
+  // Nor is a blank wind direction a wind from the north.
+  if (wind_dir_deg === null || wind_dir_deg === undefined || wind_dir_deg === "") return { error: "Enter the direction the wind is blowing FROM (deg)." };
   const rw = Number(runway_heading_deg);
   const wd = Number(wind_dir_deg);
   const sp = Number(wind_speed_kt) || 0;
@@ -2946,8 +2950,8 @@ MECHANIC_RENDERERS["crosswind-component"] = _simpleRenderer({
   citation: "Citation: runway wind-component resolution (FAA vector method / POH crosswind chart): angle = |wind dir - runway heading| folded to 0-180; crosswind = speed x sin(angle); headwind = speed x cos(angle), negative = tailwind. Check the crosswind limit against the gust, not the steady wind. A planning aid; the pilot in command and the flight manual govern.",
   example: crosswindComponentExample.inputs,
   fields: [
-    { key: "runway_heading_deg", label: "Runway heading (deg, e.g. 360 for runway 36)", kind: "number" },
-    { key: "wind_dir_deg", label: "Wind direction FROM (deg)", kind: "number" },
+    { key: "runway_heading_deg", label: "Runway heading (deg, e.g. 360 for runway 36)", kind: "number", required: true },
+    { key: "wind_dir_deg", label: "Wind direction FROM (deg)", kind: "number", required: true },
     { key: "wind_speed_kt", label: "Steady wind speed (kt)", kind: "number" },
     { key: "gust_kt", label: "Gust speed (kt, 0 = none)", kind: "number" },
     { key: "max_demo_xwind_kt", label: "Max demonstrated crosswind (kt, 0 = skip check)", kind: "number" },

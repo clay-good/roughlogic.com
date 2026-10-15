@@ -75,8 +75,10 @@ export const pacingExample = { inputs: { calibration_distance_ft: 100, calibrati
 //        out: { result_deg: dimensionless, memo: dimensionless }
 // (Plane angles in degrees / radians are dimensionless per the
 //  §7.1 convention. The direction toggle is a categorical token.)
-export function computeBearingConversion({ declination_deg = 0, bearing_deg = 0, direction = "magnetic_to_true" }) {
+export function computeBearingConversion({ declination_deg = 0, bearing_deg = null, direction = "magnetic_to_true" }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A blank bearing is not due north (0 deg); the page passes it as null.
+  if (bearing_deg === null || bearing_deg === undefined || bearing_deg === "") return { error: "Enter the bearing to convert (deg)." };
   declination_deg = Number(declination_deg); bearing_deg = Number(bearing_deg);
   if (!Number.isFinite(declination_deg) || !Number.isFinite(bearing_deg)) return { error: "Declination and bearing must be numbers (degrees)." };
   if (declination_deg < -180 || declination_deg > 180) return { error: "Declination out of range." };
@@ -277,9 +279,11 @@ export function utmToLatLon(zone, hemisphere, easting, northing) {
 //  Forward branch returns { zone, hemisphere, easting `L`,
 //  northing `L` }; inverse branch returns { lat_deg, lon_deg } as
 //  dimensionless angles. The direction toggle is categorical.)
-export function computeUTM({ direction = "latlon_to_utm", lat_deg = 0, lon_deg = 0, zone = 0, hemisphere = "N", easting = 0, northing = 0 }) {
+export function computeUTM({ direction = "latlon_to_utm", lat_deg = null, lon_deg = null, zone = 0, hemisphere = "N", easting = 0, northing = 0 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (direction === "latlon_to_utm") {
+    // A blank latitude is not the equator nor a blank longitude Greenwich; the page passes them as null.
+    if ([lat_deg, lon_deg].some((x) => x === null || x === undefined || x === "")) return { error: "Enter the latitude and the longitude." };
     if (lon_deg < -180 || lon_deg > 180) return { error: "Longitude out of range." };
     return latlonToUTM(lat_deg, lon_deg);
   }
@@ -313,7 +317,9 @@ function fractionalYear(date) {
 //  strings are categorical tokens (dimensionless). Time-zone
 //  offset, day-length, and equation-of-time intervals all carry
 //  the §7.1 base-token `T`.)
-export function computeSolarTimes({ lat_deg = 0, lon_deg = 0, date_iso = "", tz_offset_hours = 0 }) {
+export function computeSolarTimes({ lat_deg = null, lon_deg = null, date_iso = "", tz_offset_hours = null }) {
+  // A blank latitude is not the equator, a blank longitude Greenwich, nor a blank offset UTC; the page passes them as null.
+  if ([lat_deg, lon_deg, tz_offset_hours].some((x) => x === null || x === undefined || x === "")) return { error: "Enter the latitude, the longitude and the time-zone offset." };
   { const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(date_iso || "")); if (m) { const d = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3])); if (d.getUTCMonth() !== +m[2] - 1 || d.getUTCDate() !== +m[3]) return { error: "Invalid date." }; } else if (date_iso) return { error: "Invalid date; use YYYY-MM-DD." }; }
   if (!(lat_deg >= -89.5 && lat_deg <= 89.5)) return { error: "Latitude out of range." };
   if (!(lon_deg >= -180 && lon_deg <= 180)) return { error: "Longitude out of range." };
@@ -449,7 +455,9 @@ function _r(spec) {
       for (const f of spec.fields) {
         if (f.kind === "select") params[f.key] = fields[f.key].select.value;
         else if (f.kind === "text") params[f.key] = fields[f.key].input.value;
-        else params[f.key] = Number(fields[f.key].input.value) || 0;
+        // A field marked `required` passes null when blank, so the compute can
+        // tell a cleared box from a typed 0.
+        else params[f.key] = f.required && fields[f.key].input.value === "" ? null : Number(fields[f.key].input.value) || 0;
       }
       const r = spec.compute(params);
       if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }
@@ -492,7 +500,7 @@ const renderBearing = _r({
   example: bearingExample.inputs,
   fields: [
     { key: "declination_deg", label: "Declination (deg, +E / -W)", kind: "number" },
-    { key: "bearing_deg",     label: "Bearing (deg)",              kind: "number" },
+    { key: "bearing_deg",     label: "Bearing (deg)",              kind: "number", required: true },
     { key: "direction", label: "Direction", kind: "select", options: [{ value: "magnetic_to_true", label: "Magnetic -> True" }, { value: "true_to_magnetic", label: "True -> Magnetic" }] },
   ],
   outputs: [
@@ -561,8 +569,8 @@ function renderUTM(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const r = computeUTM({
       direction: dir.select.value,
-      lat_deg: Number(lat.input.value) || 0,
-      lon_deg: Number(lon.input.value) || 0,
+      lat_deg: lat.input.value === "" ? null : Number(lat.input.value),
+      lon_deg: lon.input.value === "" ? null : Number(lon.input.value),
       zone: Number(zone.input.value) || 0,
       hemisphere: hemi.select.value,
       easting: Number(east.input.value) || 0,
@@ -584,10 +592,10 @@ const renderSolar = _r({
   citation: "Citation: NOAA Solar Calculator algorithm by name only. Bundles no almanac data; the algorithm is deterministic from date and location.",
   example: solarExample.inputs,
   fields: [
-    { key: "lat_deg", label: "Latitude (deg)", kind: "number" },
-    { key: "lon_deg", label: "Longitude (deg)", kind: "number" },
+    { key: "lat_deg", label: "Latitude (deg)", kind: "number", required: true },
+    { key: "lon_deg", label: "Longitude (deg)", kind: "number", required: true },
     { key: "date_iso", label: "Date (YYYY-MM-DD)", kind: "text" },
-    { key: "tz_offset_hours", label: "Timezone offset (hr)", kind: "number" },
+    { key: "tz_offset_hours", label: "Timezone offset (hr)", kind: "number", required: true },
   ],
   outputs: [
     { key: "sr", id: "ss-out-sr", label: "Sunrise",          value: (r) => r.sunrise || (r.polar === "day" ? "none -- polar day, the sun stays up" : "none -- polar night, the sun stays down") },

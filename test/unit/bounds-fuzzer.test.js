@@ -61978,3 +61978,40 @@ test("hardening slice 52: kick tolerance splits the bottom-hole volume at the BH
   assert.ok(Math.abs(_s52kt({ ...ex, bha_length_ft: 5000 }).volume_at_bottom_bbl - whole.volume_at_bottom_bbl) < 1e-9);
   assert.ok("error" in _s52kt({ ...ex, kick_intensity_ppg: null }) && "error" in _s52kt({ ...ex, influx_gradient_psi_ft: "" }) && "error" in _s52kt({ ...ex, bha_length_ft: -1 }));
 });
+
+import { computeReferenceEt0 as _s53et0 } from "../../calc-farmproduction.js";
+import { computeUTM as _s53utm, computeSolarTimes as _s53st, computeBearingConversion as _s53bc } from "../../calc-field.js";
+import { computeSolarAzimuth as _s53sazi, computeSolarAltitude as _s53salt } from "../../calc-solarfield.js";
+import { computeCrosswindComponent as _s53cw } from "../../calc-mechanic.js";
+import { computeCogoForwardPoint as _s53cogo, computeAzimuthBearing as _s53azb } from "../../calc-survey.js";
+test("hardening slice 53 (blank latitude, longitude, offset and heading are not 0)", () => {
+  // Each blank (null from the page) is an "Enter the ..." error; a typed 0 (equator, Greenwich, UTC, due north) still runs.
+  const cases = [
+    [_s53et0, { latitude_deg: 45, month: "jul", tmax_f: 86, tmin_f: 59 }, ["latitude_deg"]],
+    [_s53utm, { direction: "latlon_to_utm", lat_deg: 40, lon_deg: -105 }, ["lat_deg", "lon_deg"]],
+    [_s53st, { lat_deg: 40, lon_deg: -105, date_iso: "2026-06-21", tz_offset_hours: -6 }, ["lat_deg", "lon_deg", "tz_offset_hours"]],
+    [_s53sazi, { latitude_deg: 40, day_of_year: 172, hours_from_solar_noon: -3 }, ["latitude_deg"]],
+    [_s53salt, { latitude_deg: 40, day_of_year: 355, hours_from_solar_noon: 0 }, ["latitude_deg"]],
+    [_s53cw, { runway_heading_deg: 360, wind_dir_deg: 30, wind_speed_kt: 20 }, ["runway_heading_deg"]],
+    [_s53cogo, { start_n: 5000, start_e: 5000, azimuth_deg: 45, distance_ft: 200 }, ["azimuth_deg"]],
+    [_s53azb, { mode: "azimuth_to_bearing", azimuth_deg: 138.5, quadrant: "NE" }, ["azimuth_deg"]],
+    [_s53bc, { declination_deg: 12, bearing_deg: 280, direction: "magnetic_to_true" }, ["bearing_deg"]],
+  ];
+  for (const [fn, ex, keys] of cases) {
+    assert.ok(!("error" in fn(ex)), fn.name + " example runs");
+    for (const k of keys) {
+      for (const blank of [null, ""]) assert.ok(/^Enter the /.test(fn({ ...ex, [k]: blank }).error || ""), fn.name + " " + k + "=" + JSON.stringify(blank));
+      const { [k]: _omit, ...rest } = ex;
+      assert.ok("error" in fn(rest), fn.name + " omitted " + k);
+      assert.ok(!("error" in fn({ ...ex, [k]: 0 })), fn.name + " " + k + "=0 runs");
+    }
+  }
+  // The azimuth is read only in the direction that uses it; latitude and longitude only for lat/lon -> UTM.
+  assert.ok(!("error" in _s53azb({ mode: "bearing_to_azimuth", quadrant: "SW", quadrant_angle_deg: 30 })));
+  assert.ok(!("error" in _s53utm({ direction: "utm_to_latlon", zone: 13, hemisphere: "N", easting: 500000, northing: 4427757 })));
+});
+test("hardening slice 53: a blank crosswind wind direction is not a north wind", async () => {
+  const { computeCrosswindComponent } = await import("../../calc-mechanic.js");
+  assert.ok("error" in computeCrosswindComponent({ runway_heading_deg: 90, wind_dir_deg: null, wind_speed_kt: 15 }));
+  assert.ok(!("error" in computeCrosswindComponent({ runway_heading_deg: 90, wind_dir_deg: 0, wind_speed_kt: 15 })));
+});

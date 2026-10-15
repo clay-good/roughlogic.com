@@ -125,8 +125,10 @@ SOLARFIELD_RENDERERS["shadow-length"] = renderShadowLength;
 // dec = 23.45 sin(360 (284 + n)/365) and the hour angle H = 15 (hours from solar noon). At solar noon
 // this reduces to altitude = 90 - |lat - dec|, the winter-design sun elevation the shading tiles need.
 // dims: in { latitude_deg: dimensionless, day_of_year: dimensionless, hours_from_solar_noon: dimensionless } out: { altitude_deg: dimensionless, declination_deg: dimensionless, hour_angle_deg: dimensionless }
-export function computeSolarAltitude({ latitude_deg = 0, day_of_year = 355, hours_from_solar_noon = 0 } = {}) {
+export function computeSolarAltitude({ latitude_deg = null, day_of_year = 355, hours_from_solar_noon = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A blank latitude is not the equator; the page passes it as null.
+  if (latitude_deg === null || latitude_deg === undefined || latitude_deg === "") return { error: "Enter the latitude." };
   const lat = Number(latitude_deg) || 0;
   const n = Number(day_of_year) || 0;
   const hrs = Number(hours_from_solar_noon) || 0;
@@ -156,7 +158,8 @@ function renderSolarAltitude(inputRegion, outputRegion, citationEl) {
   const oAlt = makeOutputLine(outputRegion, "Solar altitude (elevation)", "salt-out-alt");
   const oDec = makeOutputLine(outputRegion, "Declination / hour angle", "salt-out-dec");
   const oNote = makeOutputLine(outputRegion, "Note", "salt-out-n");
-  function readNum(i) { if (i.value === "") return 0; const v = Number(i.value); return Number.isFinite(v) ? v : 0; }
+  // A blank box reaches the compute as null: a cleared latitude is not the equator.
+  function readNum(i) { if (i.value === "") return null; const v = Number(i.value); return Number.isFinite(v) ? v : null; }
   const update = debounce(() => {
     const r = computeSolarAltitude({ latitude_deg: readNum(lat.input), day_of_year: readNum(doy.input), hours_from_solar_noon: readNum(hrs.input) });
     if (r.error) { oAlt.textContent = r.error; oDec.textContent = "-"; oNote.textContent = ""; return; }
@@ -251,8 +254,10 @@ SOLARFIELD_RENDERERS["solar-time-correction"] = renderSolarTimeCorrection;
 // from south (+west), then compass = 180 + gamma_s. Reduces to due south (180) at solar noon in the
 // northern hemisphere. NOAA / Duffie & Beckman spherical trig.
 // dims: in { latitude_deg: dimensionless, day_of_year: dimensionless, hours_from_solar_noon: dimensionless } out: { azimuth_deg: dimensionless, altitude_deg: dimensionless, declination_deg: dimensionless, hour_angle_deg: dimensionless }
-export function computeSolarAzimuth({ latitude_deg = 0, day_of_year = 172, hours_from_solar_noon = 0 } = {}) {
+export function computeSolarAzimuth({ latitude_deg = null, day_of_year = 172, hours_from_solar_noon = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A blank latitude is not the equator; the page passes it as null.
+  if (latitude_deg === null || latitude_deg === undefined || latitude_deg === "") return { error: "Enter the latitude." };
   const lat = Number(latitude_deg) || 0;
   const n = Number(day_of_year) || 0;
   const hrs = Number(hours_from_solar_noon) || 0;
@@ -288,7 +293,8 @@ function renderSolarAzimuth(inputRegion, outputRegion, citationEl) {
   const oAzi = makeOutputLine(outputRegion, "Solar azimuth (compass bearing)", "sazi-out-azi");
   const oAlt = makeOutputLine(outputRegion, "Solar altitude (for reference)", "sazi-out-alt");
   const oNote = makeOutputLine(outputRegion, "Note", "sazi-out-n");
-  function readNum(i) { if (i.value === "") return 0; const v = Number(i.value); return Number.isFinite(v) ? v : 0; }
+  // A blank box reaches the compute as null: a cleared latitude is not the equator.
+  function readNum(i) { if (i.value === "") return null; const v = Number(i.value); return Number.isFinite(v) ? v : null; }
   const update = debounce(() => {
     const r = computeSolarAzimuth({ latitude_deg: readNum(lat.input), day_of_year: readNum(doy.input), hours_from_solar_noon: readNum(hrs.input) });
     if (r.error) { oAzi.textContent = r.error; oAlt.textContent = "-"; oNote.textContent = ""; return; }

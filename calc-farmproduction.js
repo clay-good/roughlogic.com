@@ -877,7 +877,7 @@ FARMPRODUCTION_RENDERERS["reference-et0"] = _r({
   citation: "Citation: Hargreaves reference ET (Hargreaves & Samani 1985) as presented in FAO Irrigation & Drainage Paper 56 (Allen et al. 1998), by name: ET0 = 0.0023 (Tmean + 17.8) sqrt(Tmax - Tmin) Ra; extraterrestrial radiation Ra from the FAO-56 Annex 2 astronomical equations by latitude and day of year. Free at fao.org. A local station ET0 and the full Penman-Monteith method govern when full climate data exist.",
   example: referenceEt0Example.inputs,
   fields: [
-    { key: "latitude_deg", label: "Latitude (deg, + north / - south)", kind: "number", attrs: { step: "any" } },
+    { key: "latitude_deg", label: "Latitude (deg, + north / - south)", kind: "number", attrs: { step: "any" }, required: true },
     { key: "month", label: "Month", kind: "select", default: "jul", options: [
       { value: "jan", label: "January" }, { value: "feb", label: "February" }, { value: "mar", label: "March" },
       { value: "apr", label: "April" }, { value: "may", label: "May" }, { value: "jun", label: "June" },
