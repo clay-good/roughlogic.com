@@ -880,6 +880,108 @@ PROCESS_RENDERERS["riser-modulus-feeding"] = _simpleRenderer({
 });
 
 // =====================================================================
+// spec-v1963: riser feeding distance for a steel plate or bar section.
+// =====================================================================
+// The riser-modulus tile sizes a riser and says how far it reaches is a
+// separate limit. This is that limit: the end-effect feeding distance of a
+// single top riser from Carlson, Ou and Beckermann, "Feeding and Risering of
+// High Alloy Steel Castings" (SFSA T&O 2003, Paper 4.5), Eq. (1) and Table 2,
+// the Niyama-based rule built on the authors' carbon and low-alloy work
+// (Metall. Mater. Trans. B 33B, 2002). FD runs from the riser EDGE to the
+// furthest point of the section, for radiographic soundness at 2 pct.
+const _RFD_SAND = { furan: 1, green_sand: 1.09, zircon: 0.96, chromite: 0.88 };
+const _RFD_COOLING = { end_effect: 1, end_chill: 1.19, drag_chill: 0.95 };
+const _RFD_ALLOY = {
+  aisi_1025: 1, aisi_4125: 0.98, aisi_1522: 0.97, aisi_4135: 0.97, aisi_4330: 0.97, aisi_8620: 0.96, aisi_8630: 0.95, aisi_4340: 0.86,
+  cf8m_c008: 1.036, hh30: 0.985, cf8m_c006: 0.978, hk44: 0.965, ca15_c013: 0.943, hp37: 0.904, cf8m_c003: 0.9,
+};
+// Table 2 superheat multipliers by superheat in degrees C; the paper reads between
+// the rows linearly (100 C gives 1.08, 158 C "almost 1.2").
+const _RFD_SUPERHEAT_C = [[30, 0.94], [60, 1], [90, 1.06], [120, 1.12], [150, 1.18], [250, 1.38]];
+
+// dims: in { section_thickness_in: L, section_width_in: L, feeding_length_in: L, sand_mold: dimensionless, cooling: dimensionless, alloy: dimensionless, superheat_f: T } out: { w_over_t: dimensionless, fd_over_t_base: dimensionless, superheat_multiplier: dimensionless, multiplier_total: dimensionless, fd_over_t: dimensionless, fd_in: L }
+export function computeRiserFeedingDistance({
+  section_thickness_in = 0, section_width_in = 0, feeding_length_in = 0,
+  sand_mold = "furan", cooling = "end_effect", alloy = "aisi_1025", superheat_f = 108,
+} = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const T = Number(section_thickness_in), W = Number(section_width_in), FL = Number(feeding_length_in) || 0;
+  if (!(T > 0)) return { error: "Section thickness must be positive (in)." };
+  if (!(W > 0)) return { error: "Section width must be positive (in)." };
+  if (W < T * (1 - 1e-9)) return { error: "Enter the larger cross dimension as the width: the rule runs on W/T from 1 (a square bar) upward." };
+  if (FL < 0) return { error: "Feeding length cannot be negative (in); enter 0 to skip the check." };
+  const c_sand = _RFD_SAND[String(sand_mold).toLowerCase()];
+  const c_cool = _RFD_COOLING[String(cooling).toLowerCase()];
+  const c_alloy = _RFD_ALLOY[String(alloy).toLowerCase()];
+  if (c_sand === undefined) return { error: "Sand must be furan, green_sand, zircon or chromite." };
+  if (c_cool === undefined) return { error: "Cooling must be end_effect, end_chill or drag_chill." };
+  if (c_alloy === undefined) return { error: "Choose one of the listed steel grades." };
+  if (superheat_f === null || superheat_f === "") return { error: "Enter the pouring superheat (F above the liquidus)." };
+  const sh_c = Number(superheat_f) / 1.8; // a temperature DIFFERENCE: no 32 F offset
+  if (!(sh_c >= 30 - 1e-9 && sh_c <= 250 + 1e-9)) return { error: "The superheat multipliers run from 54 to 450 F (30 to 250 C) above the liquidus." };
+  let c_superheat = _RFD_SUPERHEAT_C[_RFD_SUPERHEAT_C.length - 1][1];
+  for (let i = 1; i < _RFD_SUPERHEAT_C.length; i++) {
+    const [c0, m0] = _RFD_SUPERHEAT_C[i - 1], [c1, m1] = _RFD_SUPERHEAT_C[i];
+    if (sh_c <= c1 + 1e-9) { c_superheat = m0 + (m1 - m0) * (Math.min(Math.max(sh_c, c0), c1) - c0) / (c1 - c0); break; }
+  }
+  const w_over_t = W / T;
+  // Eq. (1) holds to W/T = 15; past it FD/T stays at 9.0.
+  const x = w_over_t;
+  const fd_over_t_base = x > 15 ? 9 : -4.29e-4 * x ** 4 + 0.0174 * x ** 3 - 0.266 * x ** 2 + 1.99 * x + 1.97;
+  const multiplier_total = c_superheat * c_alloy * c_sand * c_cool;
+  const fd_over_t = fd_over_t_base * multiplier_total;
+  const fd_in = fd_over_t * T;
+  const in_thickness_range = T >= 1 - 1e-9 && T <= 12 + 1e-9;
+  const has_check = FL > 0;
+  const sound = has_check && FL <= fd_in * (1 + 1e-9);
+  const verdict = !has_check
+    ? "(no feeding length entered: lay out risers so no point of the section is farther than " + fmt(fd_in, 2) + " in from a riser's edge)"
+    : sound
+      ? "SOUND by the rule: the furthest point is " + fmt(FL, 2) + " in from the riser edge, inside the " + fmt(fd_in, 2) + " in feeding distance"
+      : "SHRINKAGE EXPECTED: the furthest point is " + fmt(FL, 2) + " in from the riser edge, " + fmt(FL - fd_in, 2) + " in past the " + fmt(fd_in, 2) + " in feeding distance -- add a riser, an end chill (x1.19), or shorten the section a riser must reach";
+  const range_note = in_thickness_range ? "" : " The rule was fitted to sections 1 to 12 in thick; at " + fmt(T, 2) + " in it is an extrapolation (thin sections feed farther when gated through the riser, which this does not credit).";
+  if (![w_over_t, fd_over_t_base, c_superheat, multiplier_total, fd_over_t, fd_in].every(Number.isFinite)) return { error: "Feeding distance math is not a finite value." };
+  return {
+    w_over_t, fd_over_t_base, superheat_multiplier: c_superheat, multiplier_total, fd_over_t, fd_in,
+    in_thickness_range, has_check, sound, verdict,
+    note: "End-effect feeding distance of a single top riser on a steel plate or bar, from the Niyama-based rule of Carlson, Ou and Beckermann (SFSA 2003): FD/T = -4.29e-4 (W/T)^4 + 0.0174 (W/T)^3 - 0.266 (W/T)^2 + 1.99 (W/T) + 1.97 to W/T = 15 and 9.0 beyond, for AISI 1025 in furan sand at 108 F (60 C) superheat, then scaled by the Table 2 multipliers for sand, end or drag chill, steel grade and superheat. FD is measured from the riser's EDGE to the furthest point it must feed, so a riser reaches a circle of radius FD plus its own radius; between two risers the lateral rule is shorter and is not computed here. These rules are about twice the 1973 Risering Steel Castings distances in most cases, which is the yield they buy; they assume the riser itself is big enough (the riser-modulus calculator) and a sound radiograph at 2 pct sensitivity is the standard." + range_note,
+  };
+}
+export const riserFeedingDistanceExample = { inputs: { section_thickness_in: 2, section_width_in: 8, feeding_length_in: 12, sand_mold: "furan", cooling: "end_effect", alloy: "aisi_1025", superheat_f: 108 } };
+PROCESS_RENDERERS["riser-feeding-distance"] = _simpleRenderer({
+  citation: "Citation: Carlson, Ou and Beckermann, Feeding and Risering of High Alloy Steel Castings, SFSA Technical and Operating Conference 2003, Paper 4.5, Eq. (1) and Table 2 (by name): FD/T = -4.29e-4 (W/T)^4 + 0.0174 (W/T)^3 - 0.266 (W/T)^2 + 1.99 (W/T) + 1.97 to W/T 15, then 9.0, times multipliers for sand, chills, grade and superheat. Valid 1 to 12 in thick. A methoding aid; the foundry's simulation and radiographs govern.",
+  example: riserFeedingDistanceExample.inputs,
+  fields: [
+    { key: "section_thickness_in", label: "Section thickness T (in)", kind: "number", attrs: { step: "any" } },
+    { key: "section_width_in", label: "Section width W, the larger cross dimension (in)", kind: "number", attrs: { step: "any" } },
+    { key: "feeding_length_in", label: "Furthest point from the riser edge (in, 0 to skip)", kind: "number", attrs: { step: "any" } },
+    { key: "sand_mold", label: "Mold sand", kind: "select", options: [
+      { value: "furan", label: "Furan (PUNB) - base" }, { value: "green_sand", label: "Green sand (x1.09)" },
+      { value: "zircon", label: "Zircon (x0.96)" }, { value: "chromite", label: "Chromite (x0.88)" },
+    ] },
+    { key: "cooling", label: "End of the section", kind: "select", options: [
+      { value: "end_effect", label: "Plain end effect - base" }, { value: "end_chill", label: "End chill (x1.19)" }, { value: "drag_chill", label: "Drag chill (x0.95)" },
+    ] },
+    { key: "alloy", label: "Steel grade", kind: "select", options: [
+      { value: "aisi_1025", label: "AISI 1025 - base" }, { value: "aisi_4125", label: "AISI 4125 (x0.98)" }, { value: "aisi_1522", label: "AISI 1522 (x0.97)" },
+      { value: "aisi_4135", label: "AISI 4135 (x0.97)" }, { value: "aisi_4330", label: "AISI 4330 (x0.97)" }, { value: "aisi_8620", label: "AISI 8620 (x0.96)" },
+      { value: "aisi_8630", label: "AISI 8630 (x0.95)" }, { value: "aisi_4340", label: "AISI 4340 (x0.86)" },
+      { value: "cf8m_c008", label: "CF-8M, 0.08 C (x1.036)" }, { value: "hh30", label: "HH30 (x0.985)" }, { value: "cf8m_c006", label: "CF-8M, 0.06 C (x0.978)" },
+      { value: "hk44", label: "HK44 (x0.965)" }, { value: "ca15_c013", label: "CA-15, 0.13 C (x0.943)" }, { value: "hp37", label: "HP37 (x0.904)" }, { value: "cf8m_c003", label: "CF-8M, 0.03 C (x0.900)" },
+    ] },
+    { key: "superheat_f", label: "Pouring superheat above liquidus (F, 54 to 450)", kind: "number", default: 108, required: true, attrs: { step: "any" } },
+  ],
+  outputs: [
+    { key: "fd", id: "rfd-out-fd", label: "Feeding distance from the riser edge", value: (r) => fmt(r.fd_in, 2) + " in (FD/T " + fmt(r.fd_over_t, 3) + ")" },
+    { key: "b", id: "rfd-out-b", label: "Base rule at this W/T", value: (r) => "W/T " + fmt(r.w_over_t, 2) + " gives FD/T " + fmt(r.fd_over_t_base, 3) + " for 1025 in furan at 108 F superheat" },
+    { key: "m", id: "rfd-out-m", label: "Combined multiplier", value: (r) => "x" + fmt(r.multiplier_total, 3) + " (superheat x" + fmt(r.superheat_multiplier, 3) + ")" },
+    { key: "v", id: "rfd-out-v", label: "Feeding check", value: (r) => r.verdict },
+    { key: "n", id: "rfd-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeRiserFeedingDistance,
+});
+
+// =====================================================================
 // spec-v1715: moulding sand permeability, gas evolution, and vent area.
 // =====================================================================
 //

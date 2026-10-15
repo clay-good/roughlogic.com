@@ -2109,6 +2109,7 @@ export const COMPUTE_MAP = {
   "thermoplastic-temperature-derate": { module: "../../calc-process.js", fn: "computeThermoplasticTemperatureDerate" },
   "casting-pour-yield": { module: "../../calc-process.js", fn: "computeCastingPourYield" },
   "riser-modulus-feeding": { module: "../../calc-process.js", fn: "computeRiserModulusFeeding" },
+  "riser-feeding-distance": { module: "../../calc-process.js", fn: "computeRiserFeedingDistance" },
   "sand-permeability-vent": { module: "../../calc-process.js", fn: "computeSandPermeabilityVent" },
   "melt-furnace-energy": { module: "../../calc-process.js", fn: "computeMeltFurnaceEnergy" },
   "weld-visual-acceptance": { module: "../../calc-inspection.js", fn: "computeWeldVisualAcceptance" },

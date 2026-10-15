@@ -171499,6 +171499,96 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "riser-feeding-distance",
+  "source_publisher": "Carlson, Ou and Beckermann (Steel Founders' Society of America)",
+  "source_title": "Feeding and Risering of High Alloy Steel Castings, Proceedings of the 57th SFSA Technical and Operating Conference, Paper 4.5",
+  "source_edition_or_year": "2003 (beckermann.lab.uiowa.edu, 2003-4.5 Feeding and Risering.pdf)",
+  "source_section_or_page": "Eq. (1), p. 12, base case (AISI 1025, furan, 60 C superheat, end effect), recomputed at W/T = 4: FD/T = -4.29e-4(256) + 0.0174(64) - 0.266(16) + 1.99(4) + 1.97 = 6.677776, so a 2 in section feeds 13.3556 in.",
+  "verified_by": "rl",
+  "verified_on": "2026-10-14",
+  "inputs": {
+   "section_thickness_in": 2,
+   "section_width_in": 8,
+   "feeding_length_in": 12,
+   "sand_mold": "furan",
+   "cooling": "end_effect",
+   "alloy": "aisi_1025",
+   "superheat_f": 108
+  },
+  "outputs": {
+   "fd_over_t_base": {
+    "value": 6.677776,
+    "tolerance": {
+     "pct": 0.01
+    }
+   },
+   "fd_in": {
+    "value": 13.355552,
+    "tolerance": {
+     "pct": 0.01
+    }
+   }
+  }
+ },
+ {
+  "tile_id": "riser-feeding-distance",
+  "source_publisher": "Carlson, Ou and Beckermann (Steel Founders' Society of America)",
+  "source_title": "Feeding and Risering of High Alloy Steel Castings, Proceedings of the 57th SFSA Technical and Operating Conference, Paper 4.5",
+  "source_edition_or_year": "2003 (beckermann.lab.uiowa.edu, 2003-4.5 Feeding and Risering.pdf)",
+  "source_section_or_page": "p. 13: the 1025 curve at 100 C (180 F) superheat is Eq. (1) times the superheat multiplier, which is C_superheat = 1.08 (between the Table 2 rows 90 C 1.06 and 120 C 1.12).",
+  "verified_by": "rl",
+  "verified_on": "2026-10-14",
+  "inputs": {
+   "section_thickness_in": 1,
+   "section_width_in": 5.5,
+   "feeding_length_in": 0,
+   "sand_mold": "furan",
+   "cooling": "end_effect",
+   "alloy": "aisi_1025",
+   "superheat_f": 180
+  },
+  "outputs": {
+   "superheat_multiplier": {
+    "value": 1.08,
+    "tolerance": {
+     "abs": 0.0005
+    }
+   }
+  }
+ },
+ {
+  "tile_id": "riser-feeding-distance",
+  "source_publisher": "Carlson, Ou and Beckermann (Steel Founders' Society of America)",
+  "source_title": "Feeding and Risering of High Alloy Steel Castings, Proceedings of the 57th SFSA Technical and Operating Conference, Paper 4.5",
+  "source_edition_or_year": "2003 (beckermann.lab.uiowa.edu, 2003-4.5 Feeding and Risering.pdf)",
+  "source_section_or_page": "p. 13: a 158 C (284 F) superheat, the trials' average, 'has a multiplier of almost 1.2' (Table 2: 150 C 1.18, 250 C 1.38, so 1.196); Table 2 CF-8M at 0.06 C is 0.978.",
+  "verified_by": "rl",
+  "verified_on": "2026-10-14",
+  "inputs": {
+   "section_thickness_in": 1,
+   "section_width_in": 8,
+   "feeding_length_in": 0,
+   "sand_mold": "furan",
+   "cooling": "end_effect",
+   "alloy": "cf8m_c006",
+   "superheat_f": 284.4
+  },
+  "outputs": {
+   "superheat_multiplier": {
+    "value": 1.196,
+    "tolerance": {
+     "pct": 0.4
+    }
+   },
+   "multiplier_total": {
+    "value": 1.1696879999999998,
+    "tolerance": {
+     "pct": 0.4
+    }
+   }
+  }
  }
  ]
 }

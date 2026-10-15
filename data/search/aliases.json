@@ -112765,7 +112765,27 @@
   },
   {
    "term": "feeding distance riser",
-   "target": "riser-modulus-feeding",
+   "target": "riser-feeding-distance",
+   "kind": "industry"
+  },
+  {
+   "term": "riser feeding distance steel",
+   "target": "riser-feeding-distance",
+   "kind": "industry"
+  },
+  {
+   "term": "how far will a riser feed",
+   "target": "riser-feeding-distance",
+   "kind": "industry"
+  },
+  {
+   "term": "centerline shrinkage plate casting",
+   "target": "riser-feeding-distance",
+   "kind": "industry"
+  },
+  {
+   "term": "end chill feeding distance",
+   "target": "riser-feeding-distance",
    "kind": "industry"
   },
   {

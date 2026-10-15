@@ -1633,7 +1633,8 @@ const RELATED = {
   "hdpe-fusion-pressure-time": ["thermoplastic-temperature-derate","extrusion-output-rate","pipe-volume"],
   "thermoplastic-temperature-derate": ["hdpe-fusion-pressure-time","water-hammer-surge","pipe-support-spacing"],
   "casting-pour-yield": ["riser-modulus-feeding","melt-furnace-energy","sand-permeability-vent"],
-  "riser-modulus-feeding": ["casting-pour-yield","sand-permeability-vent","melt-furnace-energy"],
+  "riser-modulus-feeding": ["riser-feeding-distance","casting-pour-yield","sand-permeability-vent"],
+  "riser-feeding-distance": ["riser-modulus-feeding","casting-pour-yield","sand-permeability-vent"],
   "sand-permeability-vent": ["riser-modulus-feeding","casting-pour-yield","melt-furnace-energy"],
   "melt-furnace-energy": ["casting-pour-yield","riser-modulus-feeding","sand-permeability-vent"],
   // spec-v1664..v1674: NDT and heat treatment band.

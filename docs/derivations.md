@@ -3193,6 +3193,7 @@ cross-check.
 | calc-process.js | `computeInjectionCoolingTime` | `{ wall_thickness_in = 0, alpha_in2_s = 0, melt_temp_f = 0, mould_temp_f = nul...` | _ | _ | _ |
 | calc-process.js | `computeMeltFurnaceEnergy` | `{ charge_weight_lb = 0, theoretical_btu_lb = 0, furnace_efficiency_pct = 0, e...` | _ | _ | _ |
 | calc-process.js | `computeMoldShrinkageDimension` | `{ part_dimension_in = 0, shrinkage_flow_in_in = 0, shrinkage_cross_in_in = 0,...` | _ | _ | _ |
+| calc-process.js | `computeRiserFeedingDistance` | `{ section_thickness_in = 0, section_width_in = 0, feeding_length_in = 0, sand...` | _ | _ | _ |
 | calc-process.js | `computeRiserModulusFeeding` | `{ section_length_in = 0, section_width_in = 0, section_thickness_in = 0, modu...` | _ | _ | _ |
 | calc-process.js | `computeSandPermeabilityVent` | `{ mould_sand_lb = 0, moisture_pct = 0, binder_lb = 0, binder_gas_cm3_g = 0, p...` | _ | _ | _ |
 | calc-process.js | `computeShotSizeResidenceTime` | `{ barrel_capacity_oz = 0, shot_weight_oz = 0, cycle_time_s = 0, min_pct = 20,...` | _ | _ | _ |
@@ -3936,7 +3937,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2520.
+Row count: 2521.
 
 <!-- END function-corpus-v14 -->
 
@@ -5418,7 +5419,7 @@ per spec-v14 §13.1 second paragraph.
 | `vacuum-lift-reading` | Vacuum Gauge to Drafting Lift Readout | IFSTA / NWCG fire-pump drafting practice; 10 in Hg at sea level -> 11.3 ft of head, 50% of the ~22.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `water-supply-duration` | Water-Supply Duration | Volume/flow continuity + NFPA 1142 co...; 3000 gal, 250 GPM, no resupply -> 12 min | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group G Cross-trade (167 tiles)
+### Group G Cross-trade (168 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -5540,6 +5541,7 @@ per spec-v14 §13.1 second paragraph.
 | `respirator-cartridge-life` | Respirator Cartridge Change Schedule | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `responder-camp-sanitation` | Responder Base Camp Sanitation and Water | Project (first-principles); (b)(2), (c)(2), (c)(4), (d)(5), (d)(6), (f)(1) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `retrieval-winch-force` | Confined Space Retrieval Winch Force | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `riser-feeding-distance` | Riser Feeding Distance (Steel Plate or Bar) | Carlson, Ou and Beckermann (Steel Fou...; Eq. (1), p. 12, base case (AISI 1025, furan, 60 C superhe... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `riser-modulus-feeding` | Riser Modulus and the Feeding Volume Check | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `rolled-blank` | Rolled Plate Blank Length | First-principles arc-length geometry ...; OD 12 in, T 0.25 in, k 0.5 -> neutral 11.75 in, L 36.9137... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `rolling-offset` | Rolling Offset | NCCER pipefitting / standard fitter's...; rise 12, roll 9 -> true offset 15; at 45 deg travel 21.21 in | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -6375,6 +6377,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 
-Tile count: 2266. Fixture-covered or reference-cadence: 2266 / 2266.
+Tile count: 2267. Fixture-covered or reference-cadence: 2267 / 2267.
 
 <!-- END tile-index-v14 -->

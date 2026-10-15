@@ -1366,7 +1366,7 @@ export const TOOL_MODULES = (() => {
     "injection-cooling-time", "mold-shrinkage-dimension",
     "extrusion-output-rate", "thermoforming-draw-ratio",
     "hdpe-fusion-pressure-time", "thermoplastic-temperature-derate",
-    "casting-pour-yield", "riser-modulus-feeding", "sand-permeability-vent",
+    "casting-pour-yield", "riser-modulus-feeding", "riser-feeding-distance", "sand-permeability-vent",
     "melt-furnace-energy",
   ]);
   // spec-v1664..v1674: the nondestructive examination and heat treatment

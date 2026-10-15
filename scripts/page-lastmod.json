@@ -2,100 +2,100 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "ededc5d211a04771",
-      "date": "2026-10-11"
+      "sha": "fc995f404dac7680",
+      "date": "2026-10-15"
     },
     "/tools/": {
-      "sha": "0f322118711f539c",
-      "date": "2026-10-11"
+      "sha": "a4ea21978a18f42b",
+      "date": "2026-10-15"
     },
     "/collections/disaster-response/": {
-      "sha": "51111c32a5d02f19",
-      "date": "2026-10-10"
+      "sha": "aad278afae6e899a",
+      "date": "2026-10-15"
     },
     "/groups/accounting/": {
-      "sha": "805f0eddf1f076cc",
-      "date": "2026-10-10"
+      "sha": "d058d35b69070342",
+      "date": "2026-10-15"
     },
     "/groups/agriculture/": {
-      "sha": "f0d7630e31c1698c",
-      "date": "2026-10-10"
+      "sha": "23c9878a731cecfc",
+      "date": "2026-10-15"
     },
     "/groups/construction/": {
-      "sha": "3da61a4dc23b1f7a",
-      "date": "2026-10-10"
+      "sha": "68a1acbcc260f509",
+      "date": "2026-10-15"
     },
     "/groups/cross-trade/": {
-      "sha": "fff4cf3f24712a64",
-      "date": "2026-10-10"
+      "sha": "a907db43fecacc5a",
+      "date": "2026-10-15"
     },
     "/groups/educators/": {
-      "sha": "f49b22caf704da7c",
-      "date": "2026-10-10"
+      "sha": "963b5554b19799c7",
+      "date": "2026-10-15"
     },
     "/groups/electrical/": {
-      "sha": "0ffcad32c2e41503",
-      "date": "2026-10-11"
+      "sha": "c80b7deed5d892ca",
+      "date": "2026-10-15"
     },
     "/groups/field/": {
-      "sha": "043d6c273f0824dd",
-      "date": "2026-10-10"
+      "sha": "6e25e79ef8104ab7",
+      "date": "2026-10-15"
     },
     "/groups/fire-ground/": {
-      "sha": "a68c8bd6f8d13ebd",
-      "date": "2026-10-10"
+      "sha": "b5d58423efd5b2d7",
+      "date": "2026-10-15"
     },
     "/groups/historical/": {
-      "sha": "42835e1a98160b20",
-      "date": "2026-10-10"
+      "sha": "b715b5ec0a05cce4",
+      "date": "2026-10-15"
     },
     "/groups/hvac/": {
-      "sha": "b5647bc273087e0b",
-      "date": "2026-10-10"
+      "sha": "d53a19bc05dd8f28",
+      "date": "2026-10-15"
     },
     "/groups/kitchen/": {
-      "sha": "f8866d6f3bb8bfe6",
-      "date": "2026-10-10"
+      "sha": "1111c4a71934b76f",
+      "date": "2026-10-15"
     },
     "/groups/lab/": {
-      "sha": "1ffbb0d2f3fab511",
-      "date": "2026-10-10"
+      "sha": "de74de5f1705fce3",
+      "date": "2026-10-15"
     },
     "/groups/mechanic/": {
-      "sha": "bf8536bc206adff5",
-      "date": "2026-10-10"
+      "sha": "e44be2105d2df40e",
+      "date": "2026-10-15"
     },
     "/groups/plumbing/": {
-      "sha": "7ae80c74f4bbbaff",
-      "date": "2026-10-10"
+      "sha": "895296ef7668db10",
+      "date": "2026-10-15"
     },
     "/groups/real-estate/": {
-      "sha": "9cdf6104244b8670",
-      "date": "2026-10-10"
+      "sha": "913acb001d4bc292",
+      "date": "2026-10-15"
     },
     "/groups/references/": {
-      "sha": "6bad5f84a6262650",
-      "date": "2026-10-10"
+      "sha": "20ab7a4ea37b116a",
+      "date": "2026-10-15"
     },
     "/groups/restoration/": {
-      "sha": "255637489dd2bf82",
-      "date": "2026-10-10"
+      "sha": "17f0984dc1b62d1f",
+      "date": "2026-10-15"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "38523666c8b73d0a",
-      "date": "2026-10-10"
+      "sha": "a1d50b57b6b5788f",
+      "date": "2026-10-15"
     },
     "/groups/stage/": {
-      "sha": "8b7b818d034c01d4",
-      "date": "2026-10-10"
+      "sha": "d4d29a9da62e8d74",
+      "date": "2026-10-15"
     },
     "/groups/trucking/": {
-      "sha": "553d94efb4e90337",
-      "date": "2026-10-10"
+      "sha": "35ca90393a7958b7",
+      "date": "2026-10-15"
     },
     "/groups/water/": {
-      "sha": "9bb7c2577dfc0260",
-      "date": "2026-10-10"
+      "sha": "a96ebeb2e392af9d",
+      "date": "2026-10-15"
     },
     "/tools/aav-install-check/": {
       "sha": "6124c721c9aa5eea",
@@ -126,8 +126,8 @@
       "date": "2026-09-29"
     },
     "/tools/access-control-power-supply/": {
-      "sha": "f8874db48cbc0fd7",
-      "date": "2026-10-03"
+      "sha": "501b493ec28be1f5",
+      "date": "2026-10-15"
     },
     "/tools/accessible-parking-count/": {
       "sha": "a46c1d9b6a00c63b",
@@ -542,8 +542,8 @@
       "date": "2026-09-30"
     },
     "/tools/battery-tou-arbitrage/": {
-      "sha": "b1252dd2929b3dd7",
-      "date": "2026-09-29"
+      "sha": "0c5d090c3afd22f9",
+      "date": "2026-10-15"
     },
     "/tools/battery-vent-max-current/": {
       "sha": "96aa2f1e3c18fcca",
@@ -598,8 +598,8 @@
       "date": "2026-09-29"
     },
     "/tools/belt-center-distance/": {
-      "sha": "b1391e0d0e43ce89",
-      "date": "2026-09-29"
+      "sha": "b64e04fdca53494c",
+      "date": "2026-10-15"
     },
     "/tools/belt-conveyor-tension-power/": {
       "sha": "0746ab3c7c93a455",
@@ -662,8 +662,8 @@
       "date": "2026-10-11"
     },
     "/tools/blast-burden-spacing/": {
-      "sha": "6708635b8a7f5324",
-      "date": "2026-10-07"
+      "sha": "c3bad5dd8079d1dc",
+      "date": "2026-10-15"
     },
     "/tools/blast-fume-clearance-time/": {
       "sha": "42b80316b4223e0b",
@@ -786,8 +786,8 @@
       "date": "2026-09-29"
     },
     "/tools/box-culvert-inlet-control/": {
-      "sha": "3d151705dc645831",
-      "date": "2026-09-29"
+      "sha": "ba82eeaace62ad16",
+      "date": "2026-10-15"
     },
     "/tools/box-culvert-outlet-control/": {
       "sha": "a1b18e2dcb8dfdd1",
@@ -1890,8 +1890,8 @@
       "date": "2026-09-29"
     },
     "/tools/counterweight-arbor-load/": {
-      "sha": "8bf4d1b3587eb4a8",
-      "date": "2026-09-29"
+      "sha": "9d3fa4336c79eb8c",
+      "date": "2026-10-15"
     },
     "/tools/counterweight-balance/": {
       "sha": "19283b74ecf843dd",
@@ -1942,8 +1942,8 @@
       "date": "2026-09-29"
     },
     "/tools/critical-load-shed-tiers/": {
-      "sha": "6ba5e523de211224",
-      "date": "2026-10-01"
+      "sha": "c6e4f3669f5f999d",
+      "date": "2026-10-15"
     },
     "/tools/crop-yield/": {
       "sha": "cbc7cf56d9e3db43",
@@ -2286,8 +2286,8 @@
       "date": "2026-10-03"
     },
     "/tools/door-closing-energy/": {
-      "sha": "96c95fc3a3eb607a",
-      "date": "2026-10-03"
+      "sha": "52b3b521e71065f1",
+      "date": "2026-10-15"
     },
     "/tools/door-maneuvering-clearance/": {
       "sha": "863165091e230cbe",
@@ -4858,8 +4858,8 @@
       "date": "2026-10-03"
     },
     "/tools/molecular-weight/": {
-      "sha": "ba9d61a9f63f01fe",
-      "date": "2026-10-03"
+      "sha": "3421c9f8dde13fa3",
+      "date": "2026-10-15"
     },
     "/tools/mooring-load-wind-current/": {
       "sha": "8a9d06499b9b0097",
@@ -5670,8 +5670,8 @@
       "date": "2026-10-03"
     },
     "/tools/pool-interior-finish-volume/": {
-      "sha": "4d9c1e6a835dd762",
-      "date": "2026-09-29"
+      "sha": "01fc2de3c7609750",
+      "date": "2026-10-15"
     },
     "/tools/pool-pump-speed-savings/": {
       "sha": "4e1fae3edf410872",
@@ -5986,8 +5986,8 @@
       "date": "2026-09-29"
     },
     "/tools/pv-string-sizing/": {
-      "sha": "46c2046e916e34f8",
-      "date": "2026-10-03"
+      "sha": "fce34d01bd279ac6",
+      "date": "2026-10-15"
     },
     "/tools/pwht-holding-time/": {
       "sha": "948f3974b53367fa",
@@ -6477,9 +6477,13 @@
       "sha": "7ed59bd043ad9698",
       "date": "2026-09-29"
     },
+    "/tools/riser-feeding-distance/": {
+      "sha": "1cf1d5a05f9d3588",
+      "date": "2026-10-15"
+    },
     "/tools/riser-modulus-feeding/": {
-      "sha": "dd5e6b75df78e402",
-      "date": "2026-09-29"
+      "sha": "db29c619161ff1a6",
+      "date": "2026-10-15"
     },
     "/tools/rlc-reactance-resonance/": {
       "sha": "87898e95ab3521b7",
@@ -7414,8 +7418,8 @@
       "date": "2026-09-29"
     },
     "/tools/splice-loss-mismatch/": {
-      "sha": "f222ca570f6e421c",
-      "date": "2026-10-01"
+      "sha": "733ba03ac15e2c86",
+      "date": "2026-10-15"
     },
     "/tools/split-phase-leg-balance/": {
       "sha": "185bcf0e5bdc86f5",

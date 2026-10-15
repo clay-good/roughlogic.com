@@ -61893,3 +61893,28 @@ test("hardening slice 50 group 2 (unknown modes, a blank suction, stemming past 
   assert.doesNotMatch((await run("shaft-alignment-reverse-dial", { tir_a_in: 0, tir_b_in: 0 })).direction_note, /OPPOSITE/);
   assert.doesNotMatch((await run("vibration-severity-zone", { previous_reading: 0.2 })).trend_verdict, /doubling inside zone B/);
 });
+
+import { computeRiserFeedingDistance as _rfd } from "../../calc-process.js";
+test("bounds: spec-v1963 computeRiserFeedingDistance pins Eq. (1), the Table 2 multipliers, the W/T 15 cap and the error seams", () => {
+  const base = { section_thickness_in: 2, section_width_in: 8, feeding_length_in: 12, sand_mold: "furan", cooling: "end_effect", alloy: "aisi_1025", superheat_f: 108 };
+  const r = _rfd(base);
+  assert.ok(Math.abs(r.fd_over_t_base - 6.677776) < 1e-9 && Math.abs(r.fd_in - 13.355552) < 1e-9 && r.sound === true);
+  // FD scales with T at a fixed W/T, and every multiplier is a straight product.
+  assert.ok(Math.abs(_rfd({ ...base, section_thickness_in: 4, section_width_in: 16 }).fd_in - 2 * r.fd_in) < 1e-9);
+  const g = _rfd({ ...base, sand_mold: "green_sand", cooling: "end_chill", alloy: "aisi_4340" });
+  assert.ok(Math.abs(g.fd_in - r.fd_in * 1.09 * 1.19 * 0.86) < 1e-9);
+  // Superheat reads linearly between the Table 2 rows: 100 C -> 1.08, 158 C -> 1.196 ("almost 1.2").
+  assert.ok(Math.abs(_rfd({ ...base, superheat_f: 180 }).superheat_multiplier - 1.08) < 1e-9);
+  assert.ok(Math.abs(_rfd({ ...base, superheat_f: 158 * 1.8 }).superheat_multiplier - 1.196) < 1e-9);
+  assert.ok(Math.abs(_rfd({ ...base, superheat_f: 54 }).superheat_multiplier - 0.94) < 1e-9 && Math.abs(_rfd({ ...base, superheat_f: 450 }).superheat_multiplier - 1.38) < 1e-9);
+  // Past W/T 15 FD/T stays at 9.0; Eq. (1) is within 0.03 of it at 15.
+  assert.equal(_rfd({ ...base, section_width_in: 40 }).fd_over_t_base, 9);
+  assert.ok(Math.abs(_rfd({ ...base, section_width_in: 30 }).fd_over_t_base - 9) < 0.03);
+  // A section past the feeding distance is flagged, and the note says so.
+  assert.ok(_rfd({ ...base, feeding_length_in: 14 }).sound === false && /SHRINKAGE EXPECTED/.test(_rfd({ ...base, feeding_length_in: 14 }).verdict));
+  assert.ok(_rfd({ ...base, section_thickness_in: 0.5, section_width_in: 2 }).in_thickness_range === false);
+  // Error seams.
+  for (const over of [{ section_thickness_in: 0 }, { section_width_in: 1 }, { feeding_length_in: -1 }, { sand_mold: "bogus" }, { cooling: "bogus" }, { alloy: "bogus" }, { superheat_f: 40 }, { superheat_f: 500 }, { superheat_f: null }, { section_width_in: Infinity }]) {
+    assert.ok("error" in _rfd({ ...base, ...over }), JSON.stringify(over));
+  }
+});

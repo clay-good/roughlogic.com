@@ -1708,6 +1708,7 @@ export const RENDERER_MAP = {
   "thermoplastic-temperature-derate": { module: "../../calc-process.js", exportName: "PROCESS_RENDERERS" },
   "casting-pour-yield": { module: "../../calc-process.js", exportName: "PROCESS_RENDERERS" },
   "riser-modulus-feeding": { module: "../../calc-process.js", exportName: "PROCESS_RENDERERS" },
+  "riser-feeding-distance": { module: "../../calc-process.js", exportName: "PROCESS_RENDERERS" },
   "sand-permeability-vent": { module: "../../calc-process.js", exportName: "PROCESS_RENDERERS" },
   "melt-furnace-energy": { module: "../../calc-process.js", exportName: "PROCESS_RENDERERS" },
   "weld-visual-acceptance": { module: "../../calc-inspection.js", exportName: "INSPECTION_RENDERERS" },

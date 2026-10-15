@@ -1187,6 +1187,7 @@ const _TILES = [
   ["thermoplastic-temperature-derate", "B"],
   ["casting-pour-yield", "G"],
   ["riser-modulus-feeding", "G"],
+  ["riser-feeding-distance", "G"],
   ["sand-permeability-vent", "G"],
   ["melt-furnace-energy", "G"],
   // spec-v1664..v1674 NDT and heat treatment band

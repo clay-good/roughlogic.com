@@ -23274,8 +23274,20 @@ export const CITATIONS = {
     editionNote: "This is TWO conditions and not one, and a riser sized on either alone is sized on whichever happened to be easier. A riser that satisfies the modulus condition and fails the volume one stays liquid and still runs out of metal, leaving porosity directly under it -- a defect that looks like a feeding failure and is a volume failure, and the two are corrected differently. Modulus is a shape argument rather than a size one, so the section needing feeding is not always the heaviest, and a riser placed on the heaviest section can leave a thinner one unfed. An insulating or exothermic sleeve raises the effective modulus without raising the size, which lifts the yield without giving up soundness.",
     assumptions: [
       { name: "Rectangular section, cylindrical riser", value: "real geometry needs a solidification simulation", source: "a casting simulation" },
-      { name: "Feeding DISTANCE is not computed", value: "how far a riser reaches along a section is a separate limit", source: "the methods engineer" },
+      { name: "Feeding DISTANCE is a separate limit", value: "how far a riser reaches along a section is the riser feeding-distance calculator", source: "the methods engineer" },
       { name: "The riser neck is not sized", value: "and is where feeding is most often lost", source: "the methoding drawing" },
+    ],
+  },
+  "riser-feeding-distance": {
+    formula: "end-effect feeding distance of a single top riser: FD/T = -4.29e-4 (W/T)^4 + 0.0174 (W/T)^3 - 0.266 (W/T)^2 + 1.99 (W/T) + 1.97 for W/T up to 15, and 9.0 beyond, measured from the riser edge; FD = T x (FD/T) x C_superheat x C_alloy x C_sand x C_cooling.",
+    edition: "Carlson, Ou and Beckermann, Feeding and Risering of High Alloy Steel Castings, Proceedings of the 57th SFSA Technical and Operating Conference, Paper 4.5 (2003), Eq. (1), Eq. (2) and Table 2, building on the carbon and low-alloy rules of Carlson, Ou, Hardin and Beckermann, Metall. Mater. Trans. B 33B (2002).",
+    freeAccess: "The paper is posted by the University of Iowa Solidification Lab (beckermann.lab.uiowa.edu).",
+    governance: GOVERNANCE.general,
+    editionNote: "The rule is the plate length at which the minimum Niyama value in the central plane falls to 0.1 (K s)^0.5/mm, which the authors' casting trials tie to a radiographically sound section at 2 pct sensitivity. Base case AISI 1025 in furan sand at 60 C (108 F) superheat; Table 2 multipliers: sand green 1.09, zircon 0.96, chromite 0.88; end chill 1.19, drag chill 0.95; grades 0.86 (4340) to 1.036 (CF-8M at 0.08 C); superheat 0.94 at 30 C to 1.38 at 250 C, read linearly between rows as the paper does (100 C gives 1.08). The new distances run about twice the 1973 Risering Steel Castings ones in most cases. Fitted to sections 1 to 12 in thick; lateral feeding between two risers and side risers follow separate rules not computed here.",
+    assumptions: [
+      { name: "Single top riser, end effect", value: "the lateral rule between two risers is shorter and is not computed", source: "the SFSA feeding and risering guidelines" },
+      { name: "Riser assumed adequate", value: "size it on modulus and volume first", source: "the riser-modulus calculator" },
+      { name: "Thin sections gated through the riser feed farther", value: "not credited; below 1 in the rule is an extrapolation", source: "the paper, section 3" },
     ],
   },
   "sand-permeability-vent": {
