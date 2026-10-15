@@ -61918,13 +61918,22 @@ test("bounds: spec-v1963 computeRiserFeedingDistance pins Eq. (1), the Table 2 m
     assert.ok("error" in _rfd({ ...base, ...over }), JSON.stringify(over));
   }
 });
-test("bounds: spec-v1963 riser-feeding-distance lateral rule is 0.48 x the end effect to W/T 7, and stops there", () => {
+test("bounds: spec-v1963 riser-feeding-distance lateral (Eq. A4) and riser/end zones (Eqs. A1, A2)", () => {
   const base = { section_thickness_in: 2, section_width_in: 8, feeding_length_in: 0, sand_mold: "green_sand", cooling: "end_chill", alloy: "aisi_4340", superheat_f: 180 };
   const r = _rfd(base);
+  const a4 = (x) => -8.587e-5 * x ** 4 + 3.408e-3 * x ** 3 - 0.0533 * x ** 2 + 0.6967 * x + 1.019;
   // The cooling multiplier belongs to the end, so the lateral figure carries every other one.
-  assert.ok(Math.abs(r.lateral_fd_in - 0.48 * r.fd_over_t_base * 1.08 * 0.86 * 1.09 * 2) < 1e-9);
-  assert.ok(_rfd({ ...base, section_width_in: 14 }).lateral_fd_in !== null);
-  assert.equal(_rfd({ ...base, section_width_in: 14.1 }).lateral_fd_in, null);
+  assert.ok(Math.abs(r.lateral_fd_in - a4(4) * 1.08 * 0.86 * 1.09 * 2) < 1e-9);
+  // Near small W/T it sits close to the paper's 0.48 x end-effect shortcut (within 10 pct at W/T 1).
+  const one = _rfd({ ...base, section_width_in: 2 });
+  assert.ok(Math.abs(one.lateral_fd_in / (0.48 * one.fd_over_t_base * 1.08 * 0.86 * 1.09 * 2) - 1) < 0.1);
+  assert.ok(_rfd({ ...base, section_width_in: 30 }).lateral_fd_in !== null);
+  assert.equal(_rfd({ ...base, section_width_in: 30.1 }).lateral_fd_in, null);
+  // Eqs. A1 and A2 land on the stated 3.05 T and 4.2 T plateaus at W/T 7, and hold them past it.
+  const z7 = _rfd({ ...base, section_width_in: 14 });
+  assert.ok(Math.abs(z7.rzl_in / 2 - 3.05) < 0.002 && Math.abs(z7.ezl_in / 2 - 4.2) < 0.002);
+  const z9 = _rfd({ ...base, section_width_in: 18 });
+  assert.ok(Math.abs(z9.rzl_in - 6.1) < 1e-9 && Math.abs(z9.ezl_in - 8.4) < 1e-9);
 });
 test("bounds: spec-v1963 riser-feeding-distance review fixes (drag chill, spacing wording, range note, input seams)", () => {
   const base = { section_thickness_in: 2, section_width_in: 8, feeding_length_in: 12, sand_mold: "furan", cooling: "end_effect", alloy: "aisi_1025", superheat_f: 108 };
