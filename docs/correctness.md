@@ -167,9 +167,9 @@ pattern.
 
 ### Where Phase B's independence does not hold
 
-Not every fixture row meets the promise above. As of 2026-09-18,
-**255 tiles'** only row is their own spec's worked example,
-recomputed (publisher `Project (first-principles)`, title "the
+Not every fixture row meets the promise above. As of 2026-10-15,
+**76 tiles'** only row is their own spec's worked example,
+recomputed (255 on 2026-09-18, before the rest gained an outside row) (publisher `Project (first-principles)`, title "the
 spec-vN worked example, recomputed"). A spec and a tile that
 share an error agree with each other, so these rows cannot catch
 one. Spec-v1784's glycol load is an example: the spec charged a
@@ -188,7 +188,9 @@ its spec did not write. That can be:
 
 | | Modules | Tiles |
 |---|---|---|
-| Covered | all 34 modules holding such tiles | all 255 |
+| Covered | all 31 modules holding such tiles | all 76 |
+
+[test/unit/spec-only-reference.test.js](../test/unit/spec-only-reference.test.js) holds that row: it fails when a tile whose only row is its own spec's example has no call in a `calc-*.test.js` suite. Six tiles that landed after 2026-09-18 had none until 2026-10-15. Their new suites found one more defect: square-to-round's sheet could not hold its own pattern.
 
 The suites found fourteen defects, each written up in
 [CHANGELOG.md](../CHANGELOG.md). In three cases the tile ran its

@@ -28,6 +28,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **Hardening slice 54: six tiles checked only against their own spec now have an independent check, which found the square-to-round sheet too small.** `docs/correctness.md` promised that every tile whose only worked example is its own spec's has a reference suite holding it to something the spec did not write. Six tiles that landed after the 2026-09-18 pass had none. They do now:
+  - **square-to-round-development:** a 3-D model and a triangle-by-triangle unfold.
+  - **masonry-cleaning-dilution:** a mass balance.
+  - **mast-climber-platform-load:** statics with a numerical integral.
+  - **grease-duct-cleaning-interval:** the NFPA 96 table and inch thresholds.
+  - **walk-in-door-infiltration:** the ASHRAE Gosney-Olama relation, computed in SI.
+  - **abatement-waste-containers:** a second unit route and a brute-force count.
+
+  The unfold found a real defect. `square-to-round-development` told you to cut the pattern from the square side by twice the longest element plus half the circumference, 21 by 61.2 in on its own example. The unfolded pattern does not fit that sheet at any angle; it needs 26.8 by 64.5 in plus seams. The sheet is now the smallest rectangle around the pattern the tile itself unfolds. A new gate, `test/unit/spec-only-reference.test.js`, fails if a spec-only tile ever lacks a suite again. Also, the deployment notes' home-payload figures (54,817 B, 98.9% JS) were stale; the live numbers are 54,625 B and 77.4%.
+
 - **Hardening slice 53: a blank latitude, longitude, UTC offset or heading is not zero.** The blank-box sweep was rerun on quantities where 0 is a real place or direction rather than a default. It found 88 raw hits; most are legitimate, since a blank angle, grade or gauge pressure falling back to 0 means straight, level or atmospheric, the documented default the agent door also uses. Thirteen were not:
   - **On the equator:** a cleared latitude on `reference-et0`, `utm-conversion`, `solar-times`, `solar-azimuth-angle` and `solar-altitude-angle`.
   - **At Greenwich or on UTC:** a cleared longitude on `utm-conversion` and `solar-times` (a sunrise at 22:31), and a cleared UTC offset on `solar-times`.

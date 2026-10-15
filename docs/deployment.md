@@ -94,8 +94,8 @@ infrastructure changes are required:
   effect on the next deploy. `scripts/check-dist.mjs` (Phase G.3)
   asserts every precached path exists in `dist/`.
 - Home-view payload remains under the 100 KB after-gzip budget
-  (currently 54,817 B / 53.5% of cap; JS sub-budget tightest at
-  98.9% of 40 KB). `npm run check:home-payload` continues to
+  (54,625 B / 53.3% of cap at 2026-10-15; the JS sub-budget is the
+  tightest at 77.4% of 40 KB). `npm run check:home-payload` continues to
   enforce this on every build.
 - Phase H (tiered data refresh) adds one new GitHub Actions
   workflow,

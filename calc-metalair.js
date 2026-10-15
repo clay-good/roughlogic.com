@@ -481,6 +481,44 @@ METALAIR_RENDERERS["duct-static-regain"] = _v960renderDuctStaticRegain;
 
 // ============ spec-v1679: square-to-round transition development ============
 
+// The one-piece flat pattern of a square-to-round, unfolded triangle by triangle
+// from true 3-D lengths (seam at a side midpoint), and the smallest rectangle
+// that holds it, found by rotating the outline. Until 2026-10-15 the sheet was
+// taken as the square side by twice the longest element plus half the
+// circumference, which on the worked piece (20 in square to 14 in round, 16 in
+// high) gave 20 x 60.2 in for a pattern that needs about 26.8 x 64.5.
+function _s2rPatternSheet(square_side_in, round_diameter_in, height_in, offset_in, n) {
+  const H = square_side_in / 2, R = round_diameter_in / 2;
+  const d3 = (p, q) => Math.hypot(p[0] - q[0], p[1] - q[1], p[2] - q[2]);
+  const circ = (k) => { const t = k * Math.PI / 2 / n; return [R * Math.cos(t), R * Math.sin(t), height_in]; };
+  const corners = [[1, 1], [-1, 1], [-1, -1], [1, -1]].map(([sx, sy]) => [sx * H + offset_in, sy * H, 0]);
+  const place = (A, fA, B, fB, P, side) => {
+    const dA = d3(A, P), dB = d3(B, P);
+    const dx = fB[0] - fA[0], dy = fB[1] - fA[1], L = Math.hypot(dx, dy);
+    const x = (dA * dA - dB * dB + L * L) / (2 * L);
+    const y = Math.sqrt(Math.max(0, dA * dA - x * x));
+    const ux = dx / L, uy = dy / L;
+    return [fA[0] + ux * x - uy * y * side, fA[1] + uy * x + ux * y * side];
+  };
+  const M0 = [H + offset_in, 0, 0];
+  let pB = M0, pT = circ(0), fB = [0, 0], fT = [0, d3(M0, pT)];
+  const pts = [fB, fT];
+  for (let k = 0; k < 4; k++) {
+    const C = corners[k];
+    fB = place(pB, fB, pT, fT, C, -1); pB = C; pts.push(fB);
+    for (let i = 1; i <= n; i++) { const P = circ(k * n + i); fT = place(pT, fT, pB, fB, P, 1); pT = P; pts.push(fT); }
+  }
+  pts.push(place(pB, fB, pT, fT, M0, -1));
+  // Smallest-area bounding rectangle over rotations (0.25 degree scan, then refined).
+  const box = (a) => { const c = Math.cos(a), si = Math.sin(a); let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+    for (const [x, y] of pts) { const u = x * c + y * si, v = -x * si + y * c; if (u < x0) x0 = u; if (u > x1) x1 = u; if (v < y0) y0 = v; if (v > y1) y1 = v; }
+    return [x1 - x0, y1 - y0]; };
+  let best = null, bestA = 0;
+  for (let i = 0; i < 720; i++) { const a = i * Math.PI / 720, [w, l] = box(a); if (!best || w * l < best[0] * best[1]) { best = [w, l]; bestA = a; } }
+  for (let step = Math.PI / 1440; step > 1e-7; step /= 2) for (const a of [bestA - step, bestA + step]) { const [w, l] = box(a); if (w * l < best[0] * best[1]) { best = [w, l]; bestA = a; } }
+  return { width: Math.min(best[0], best[1]), length: Math.max(best[0], best[1]) };
+}
+
 // dims: in { square_side_in: L, round_diameter_in: L, height_in: L, offset_in: L, elements_per_quadrant: dimensionless, seam_allowance_in: L } out: { corner_true_length_in: L, midpoint_true_length_in: L, fan_edge_true_length_in: L, plan_fan_edge_distance_in: L, plan_corner_distance_in: L, circumference_in: L, developed_arc_in: L, sheet_width_in: L }
 export function computeSquareToRoundDevelopment({ square_side_in = 0, round_diameter_in = 0, height_in = 0, offset_in = 0, elements_per_quadrant = 8, seam_allowance_in = 0.5 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
@@ -489,6 +527,9 @@ export function computeSquareToRoundDevelopment({ square_side_in = 0, round_diam
   if (!(height_in > 0)) return { error: "The transition height must be positive (in)." };
   if (offset_in < 0) return { error: "The offset between centres cannot be negative (in)." };
   if (!(elements_per_quadrant >= 2)) return { error: "Use at least two elements per quadrant; a curve cannot be triangulated with fewer." };
+  // The sheet comes from unfolding the pattern, so the division is bounded; past 100 per quadrant the chord
+  // error is under 0.003% and a finer division only costs layout time.
+  if (elements_per_quadrant > 100) return { error: "Use at most 100 elements per quadrant; shop practice is 3 to 12, and finer gains nothing measurable." };
   if (seam_allowance_in < 0) return { error: "The seam allowance cannot be negative (in)." };
   const half_side = square_side_in / 2;
   const radius = round_diameter_in / 2;
@@ -509,7 +550,7 @@ export function computeSquareToRoundDevelopment({ square_side_in = 0, round_diam
   // circle, which is the shortest element on a concentric transition.
   const plan_midpoint_distance_in = Math.abs(half_side - radius);
   const midpoint_true_length_in = trueLength(plan_midpoint_distance_in);
-  // The longest element on the piece, which sets the sheet: the corner's fan runs
+  // The longest element on the piece: the corner's fan runs
   // from the 45-degree element (its SHORTEST) out to the circle points in line
   // with each side (BCcampus Pattern Development, element A-1). Until 2026-10-01
   // the diagonal element was taken as the longest and the sheet came out short
@@ -527,8 +568,9 @@ export function computeSquareToRoundDevelopment({ square_side_in = 0, round_diam
   const developed_arc_in = chord_in * total_elements;
   const arc_shortfall_in = circumference_in - developed_arc_in;
   const arc_shortfall_pct = circumference_in > 0 ? arc_shortfall_in / circumference_in * 100 : 0;
-  const sheet_width_in = square_side_in + 2 * seam_allowance_in;
-  const sheet_length_in = 2 * longest_true_length_in + circumference_in / 2 + 2 * seam_allowance_in;
+  const pattern = _s2rPatternSheet(square_side_in, round_diameter_in, height_in, offset_in, n);
+  const sheet_width_in = pattern.width + 2 * seam_allowance_in;
+  const sheet_length_in = pattern.length + 2 * seam_allowance_in;
   const outs = [corner_true_length_in, midpoint_true_length_in, circumference_in, developed_arc_in, sheet_width_in];
   if (!outs.every(Number.isFinite)) return { error: "Transition development math is not a finite value." };
   return {
