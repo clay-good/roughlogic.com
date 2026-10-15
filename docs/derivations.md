@@ -1515,7 +1515,7 @@ cross-check.
 | calc-brewing.js | `computeFermenterGlycolLoad` | `{ batch_volume_gal = 0, original_gravity = 0, final_gravity = 0, heat_of_ferm...` | _ | _ | _ |
 | calc-brewing.js | `computeIbuTinseth` | `{ batch_volume_gal = 0, hop_weight_lb = 0, alpha_acid_pct = 0, boil_minutes =...` | _ | _ | _ |
 | calc-brewing.js | `computeKettleBoilOff` | `{ preboil_volume_gal = 0, preboil_gravity = 0, boiloff_pct_per_hour = 0, boil...` | _ | _ | _ |
-| calc-brewing.js | `computeMashStrikeWater` | `{ grain_weight_lb = 0, mash_thickness_qt_per_lb = 0, grain_temp_f = 0, target...` | _ | _ | _ |
+| calc-brewing.js | `computeMashStrikeWater` | `{ grain_weight_lb = 0, mash_thickness_qt_per_lb = 0, grain_temp_f = null, tar...` | _ | _ | _ |
 | calc-brewing.js | `computeMashTunGrainBed` | `{ tun_diameter_ft = 0, grain_weight_lb = 0, mash_thickness_qt_per_lb = 0, gra...` | _ | _ | _ |
 | calc-brewing.js | `computePackagingYieldLoss` | `{ brite_volume_gal = 0, transfer_loss_pct = 0, fill_loss_pct = 0, package_gal...` | _ | _ | _ |
 | calc-brewing.js | `computeProofGallonYield` | `{ wash_volume_gal = 0, wash_abv_pct = 0, recovery_pct = 0, collection_proof =...` | _ | _ | _ |

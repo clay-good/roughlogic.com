@@ -50,7 +50,9 @@ function _simpleRenderer(spec) {
     for (const o of spec.outputs) outs[o.key] = makeOutputLine(outputRegion, o.label, o.id);
     function update() {
       const params = {};
-      for (const f of spec.fields) params[f.key] = Number(fields[f.key].input.value) || 0;
+      // A field marked `required` passes null when blank, so the compute can
+      // tell a cleared temperature from a typed 0.
+      for (const f of spec.fields) params[f.key] = f.required && fields[f.key].input.value === "" ? null : Number(fields[f.key].input.value) || 0;
       const result = spec.compute(params);
       if (result.error) {
         for (const out of Object.values(outs)) out.textContent = "-";
@@ -90,8 +92,15 @@ export const BREWING_RENDERERS = {};
 // batch and vanish on a large one.
 
 // dims: in { grain_weight_lb: M, mash_thickness_qt_per_lb: L^3 M^-1, grain_temp_f: T, target_mash_temp_f: T, grain_specific_heat: L^2 T^-2, tun_weight_lb: M, tun_specific_heat: L^2 T^-2, tun_temp_f: T } out: { mash_water_gal: L^3, mash_weight_lb: M, strike_temp_f: T, convention_strike_temp_f: T, tun_drop_f: T }
-export function computeMashStrikeWater({ grain_weight_lb = 0, mash_thickness_qt_per_lb = 0, grain_temp_f = 0, target_mash_temp_f = 0, grain_specific_heat = 0, tun_weight_lb = 0, tun_specific_heat = 0, tun_temp_f = 0 } = {}) {
+export function computeMashStrikeWater({ grain_weight_lb = 0, mash_thickness_qt_per_lb = 0, grain_temp_f = null, target_mash_temp_f = 0, grain_specific_heat = 0, tun_weight_lb = 0, tun_specific_heat = 0, tun_temp_f = null } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
+  // 0 F is a real reading, so a blank temperature cannot stand in for it. The tun's
+  // temperature is needed only when the tun is counted (weight and specific heat both entered).
+  if (grain_temp_f === null || grain_temp_f === undefined || grain_temp_f === "") return { error: "Enter the grain temperature (F)." };
+  if (tun_temp_f === null || tun_temp_f === undefined || tun_temp_f === "") {
+    if (Number(tun_weight_lb) > 0 && Number(tun_specific_heat) > 0) return { error: "Enter the tun starting temperature (F), or 0 tun weight to leave the tun out." };
+    tun_temp_f = target_mash_temp_f;
+  }
   if (!(grain_weight_lb > 0)) return { error: "Grain weight must be positive." };
   if (!(mash_thickness_qt_per_lb > 0)) return { error: "Mash thickness must be positive." };
   if (!(target_mash_temp_f > grain_temp_f)) return { error: "The target mash temperature must be above the grain temperature." };
@@ -135,12 +144,12 @@ BREWING_RENDERERS["mash-strike-water"] = _simpleRenderer({
   fields: [
     { key: "grain_weight_lb", label: "Grain weight (lb)" },
     { key: "mash_thickness_qt_per_lb", label: "Mash thickness (qt per lb)" },
-    { key: "grain_temp_f", label: "Grain temperature (deg F)", attrs: { step: "any" } },
+    { key: "grain_temp_f", required: true, label: "Grain temperature (deg F)", attrs: { step: "any" } },
     { key: "target_mash_temp_f", label: "Target mash temperature (deg F)", attrs: { step: "any" } },
     { key: "grain_specific_heat", label: "Grain specific heat (Btu/lb-deg F)", attrs: { step: "any", min: "0", max: "1" } },
     { key: "tun_weight_lb", label: "Mash tun weight (lb, 0 to omit)" },
     { key: "tun_specific_heat", label: "Tun specific heat (Btu/lb-deg F)" },
-    { key: "tun_temp_f", label: "Tun starting temperature (deg F)", attrs: { step: "any" } },
+    { key: "tun_temp_f", required: true, label: "Tun starting temperature (deg F)", attrs: { step: "any" } },
   ],
   outputs: [
     { key: "mash_water_gal", id: "msw-water", label: "Mash water", unit: "gal", value: (r) => fmt(r.mash_water_gal, 1) + " gal (" + fmt(r.water_lb, 0) + " lb), " + fmt(r.mash_weight_lb, 0) + " lb of mash in the tun" },
@@ -646,9 +655,11 @@ BREWING_RENDERERS["carbonation-volumes-pressure"] = _simpleRenderer({
 // shortfall shows up as a crash that takes three days instead of one.
 
 // dims: in { batch_volume_gal: L^3, original_gravity: dimensionless, final_gravity: dimensionless, heat_of_fermentation_btu_per_lb: L^2 T^-2, peak_day_share_pct: dimensionless, crash_start_temp_f: T, crash_target_temp_f: T, crash_hours: T, tank_surface_sqft: L^2, tank_u_factor: M T^-4, cellar_temp_f: T, glycol_delta_t_f: T } out: { fermentation_heat_btu: M L^2 T^-2, adiabatic_rise_f: T, fermentation_load_btuh: M L^2 T^-3, crash_load_btuh: M L^2 T^-3, glycol_gpm: L^3 T^-1 }
-export function computeFermenterGlycolLoad({ batch_volume_gal = 0, original_gravity = 0, final_gravity = 0, heat_of_fermentation_btu_per_lb = 0, peak_day_share_pct = 0, crash_start_temp_f = 0, crash_target_temp_f = 0, crash_hours = 0, tank_surface_sqft = 0, tank_u_factor = 0, cellar_temp_f = 0, glycol_delta_t_f = 0 } = {}) {
+export function computeFermenterGlycolLoad({ batch_volume_gal = 0, original_gravity = 0, final_gravity = 0, heat_of_fermentation_btu_per_lb = 0, peak_day_share_pct = 0, crash_start_temp_f = 0, crash_target_temp_f = null, crash_hours = 0, tank_surface_sqft = 0, tank_u_factor = 0, cellar_temp_f = 0, glycol_delta_t_f = 0 } = {}) {
   if (original_gravity > 1.2 || final_gravity > 1.2) return { error: "Enter gravities as specific gravity (1.055), not points or degrees Plato." };
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
+  // 0 F is a real reading, so a blank temperature cannot stand in for it.
+  if ([crash_target_temp_f].some((x) => x === null || x === undefined || x === "")) return { error: "Enter the crash target temperature (F)." };
   // Unit / range guard added 2026-09-26 after printed-example probing.
   if ([arguments[0]?.peak_day_share_pct].some((v) => Number(v) > 0 && Number(v) < 1)) return { error: "Enter the peak-day share as a percent (40 for 40%), not a fraction." };
   if (!(batch_volume_gal > 0)) return { error: "The batch volume must be positive." };
@@ -713,7 +724,7 @@ BREWING_RENDERERS["fermenter-glycol-load"] = _simpleRenderer({
     { key: "heat_of_fermentation_btu_per_lb", label: "Heat of fermentation (Btu per lb extract)" },
     { key: "peak_day_share_pct", label: "Share released on the peak day (%)", attrs: { step: "any", min: "0", max: "100" } },
     { key: "crash_start_temp_f", label: "Crash start temperature (deg F)", attrs: { step: "any" } },
-    { key: "crash_target_temp_f", label: "Crash target temperature (deg F)", attrs: { step: "any" } },
+    { key: "crash_target_temp_f", required: true, label: "Crash target temperature (deg F)", attrs: { step: "any" } },
     { key: "crash_hours", label: "Hours allowed for the crash" },
     { key: "tank_surface_sqft", label: "Tank surface area (sq ft)" },
     { key: "tank_u_factor", label: "Tank shell U-factor (Btu/h-sq ft-deg F)" },

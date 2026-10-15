@@ -68,7 +68,9 @@ function _simpleRenderer(spec) {
         if (f.kind === "select") params[f.key] = fields[f.key].select.value;
         else if (f.kind === "checkbox") params[f.key] = fields[f.key].input.checked;
         else if (f.kind === "text") params[f.key] = fields[f.key].input.value;
-        else params[f.key] = Number(fields[f.key].input.value) || 0;
+        // A field marked `required` passes null when blank, so the compute can
+        // tell a cleared temperature from a typed 0.
+        else params[f.key] = f.required && fields[f.key].input.value === "" ? null : Number(fields[f.key].input.value) || 0;
       }
       const r = spec.compute(params);
       if (r.error) {
@@ -623,9 +625,11 @@ export function computeControlCableTension({
   nominal_tension_lb = 0, reference_temp_f = 70, ambient_temp_f = 70,
   cable_area_in2 = 0, cable_modulus_psi = 0,
   structure_alpha_per_f = 0.0000128, cable_alpha_per_f = 0.0000065,
-  service_temp_f = 0,
+  service_temp_f = null,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // The page passes a blank box as null; 0 F is a real reading, so a blank cannot stand in for it.
+  if ([reference_temp_f, ambient_temp_f].some((x) => x === null || x === "")) return { error: "Enter the reference and rigging temperatures (F)." };
   if (!(nominal_tension_lb > 0)) return { error: "The nominal rig tension must be positive (lb)." };
   if (!(cable_area_in2 > 0)) return { error: "Cable metallic area must be positive (sq in)." };
   if (!(cable_modulus_psi > 0)) return { error: "The cable's effective modulus must be positive (psi) -- a stranded cable's is well below solid steel's." };
@@ -654,6 +658,8 @@ export function computeControlCableTension({
   // 0 degF is a real cold-flight temperature, not a blank: until 2026-10-01 it
   // skipped the check and hid 36 lb of slack. The check is skipped only when the
   // service temperature equals the rigging temperature.
+  // A blank service box skips the check, as the rigging temperature does; until 2026-10-14 it ran as 0 F.
+  if (service_temp_f === null || service_temp_f === undefined || service_temp_f === "") service_temp_f = ambient_temp_f;
   const has_service = service_temp_f !== ambient_temp_f;
   const service_difference_f = has_service ? service_temp_f - ambient_temp_f : 0;
   const service_change_lb = has_service ? alpha_difference * service_difference_f * cable_area_in2 * cable_modulus_psi : 0;
@@ -679,13 +685,13 @@ MARINEAVIATION_RENDERERS["control-cable-tension"] = _simpleRenderer({
   example: controlCableTensionExample.inputs,
   fields: [
     { key: "nominal_tension_lb", label: "Nominal rig tension (lb)", kind: "number", attrs: { step: "any" } },
-    { key: "reference_temp_f", label: "Reference temperature (°F)", kind: "number", default: 70, attrs: { step: "any" } },
-    { key: "ambient_temp_f", label: "Temperature at rigging (°F)", kind: "number", default: 70, attrs: { step: "any" } },
+    { key: "reference_temp_f", required: true, label: "Reference temperature (°F)", kind: "number", default: 70, attrs: { step: "any" } },
+    { key: "ambient_temp_f", required: true, label: "Temperature at rigging (°F)", kind: "number", default: 70, attrs: { step: "any" } },
     { key: "cable_area_in2", label: "Cable metallic area (sq in)", kind: "number", attrs: { step: "any" } },
     { key: "cable_modulus_psi", label: "Cable effective modulus (psi)", kind: "number" },
     { key: "structure_alpha_per_f", label: "Structure expansion coefficient (per °F)", kind: "number", default: 0.0000128, attrs: { step: "any" } },
     { key: "cable_alpha_per_f", label: "Cable expansion coefficient (per °F)", kind: "number", default: 0.0000065, attrs: { step: "any" } },
-    { key: "service_temp_f", label: "Service temperature to check (°F; the rigging temperature to skip)", kind: "number", attrs: { step: "any" } },
+    { key: "service_temp_f", required: true, label: "Service temperature to check (°F; the rigging temperature to skip)", kind: "number", attrs: { step: "any" } },
   ],
   outputs: [
     { key: "d", id: "cct-out-d", label: "Temperature difference", value: (r) => fmt(r.temp_difference_f, 1) + " °F from the reference" },
@@ -805,6 +811,8 @@ export function computeAviationFuelWeight({
   fuel_temp_f = 59, density_change_pct_per_10f = 0.4, arm_in = 0, required_weight_lb = 0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // The page passes a blank box as null; 0 F is a real reading, so a blank cannot stand in for it.
+  if ([reference_temp_f, fuel_temp_f].some((x) => x === null || x === "")) return { error: "Enter the reference and actual fuel temperatures (F)." };
   if (!(gallons > 0)) return { error: "Fuel volume must be positive (gal)." };
   if (!(standard_density_lb_gal > 0)) return { error: "Standard density must be positive (lb/gal)." };
   if (density_change_pct_per_10f < 0) return { error: "The density change rate cannot be negative (% per 10 degF)." };
@@ -859,8 +867,8 @@ MARINEAVIATION_RENDERERS["aviation-fuel-weight"] = _simpleRenderer({
   fields: [
     { key: "gallons", label: "Fuel quantity (gal)", kind: "number", attrs: { step: "any" } },
     { key: "standard_density_lb_gal", label: "Density at the reference temperature (lb/gal)", kind: "number", default: 6.75, attrs: { step: "any" } },
-    { key: "reference_temp_f", label: "Reference temperature (°F)", kind: "number", default: 59, attrs: { step: "any" } },
-    { key: "fuel_temp_f", label: "Actual fuel temperature (°F)", kind: "number", default: 59, attrs: { step: "any" } },
+    { key: "reference_temp_f", required: true, label: "Reference temperature (°F)", kind: "number", default: 59, attrs: { step: "any" } },
+    { key: "fuel_temp_f", required: true, label: "Actual fuel temperature (°F)", kind: "number", default: 59, attrs: { step: "any" } },
     { key: "density_change_pct_per_10f", label: "Density change (% per 10 °F)", kind: "number", default: 0.4, attrs: { step: "any" } },
     { key: "arm_in", label: "Fuel arm for the moment (in, 0 to skip)", kind: "number", attrs: { step: "any" } },
     { key: "required_weight_lb", label: "Weight to load (lb, 0 to skip)", kind: "number", attrs: { step: "any" } },

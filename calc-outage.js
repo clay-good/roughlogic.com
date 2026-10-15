@@ -71,7 +71,9 @@ function _simpleRenderer(spec) {
       const params = {};
       for (const f of spec.fields) {
         const el = fields[f.key][f.kind === "select" ? "select" : "input"];
-        params[f.key] = f.kind === "select" ? el.value : Number(el.value) || 0;
+        // A field marked `required` passes null when blank, so the compute can
+        // tell a cleared temperature from a typed 0.
+        params[f.key] = f.kind === "select" ? el.value : f.required && el.value === "" ? null : Number(el.value) || 0;
       }
       const result = spec.compute(params);
       if (result.error) {
@@ -122,6 +124,8 @@ function _outageHoursTo(threshold, start_degf, equilibrium_degf, tau_hours, star
 // dims: in { envelope_ua_btuh_per_degf: M L^2 T^-3, capacitance_btu_per_degf: M L^2 T^-2, gypsum_lb: M, wood_lb: M, concrete_lb: M, water_lb: M, indoor_start_degf: T, outdoor_degf: T, occupants: dimensionless, other_gains_btuh: M L^2 T^-3, first_threshold_degf: T, second_threshold_degf: T } out: { total_capacitance_btu_per_degf: M L^2 T^-2, helper_capacitance_btu_per_degf: M L^2 T^-2, internal_gain_btuh: M L^2 T^-3, time_constant_hours: T, equilibrium_degf: T, hours_to_first: T, hours_to_second: T, temp_after_12h_degf: T, temp_after_24h_degf: T, temp_after_48h_degf: T }
 export function computeBuildingOutageCooldown({ envelope_ua_btuh_per_degf = 0, capacitance_btu_per_degf = 0, gypsum_lb = 0, wood_lb = 0, concrete_lb = 0, water_lb = 0, indoor_start_degf = 68, outdoor_degf = 10, occupants = 0, other_gains_btuh = 0, first_threshold_degf = 50, second_threshold_degf = 40 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // The page passes a blank box as null; 0 F is a real reading, so a blank cannot stand in for it.
+  if ([outdoor_degf, first_threshold_degf, second_threshold_degf].some((x) => x === null || x === "")) return { error: "Enter the outdoor temperature and both thresholds (F)." };
   if (!(envelope_ua_btuh_per_degf > 0)) return { error: "The envelope UA must be positive." };
   if (![capacitance_btu_per_degf, gypsum_lb, wood_lb, concrete_lb, water_lb].every((v) => v >= 0)) return { error: "Capacitance and material masses cannot be negative." };
   if (!(occupants >= 0) || !(other_gains_btuh >= 0)) return { error: "Occupants and internal gains cannot be negative." };
@@ -166,11 +170,11 @@ OUTAGE_RENDERERS["building-outage-cooldown"] = _simpleRenderer({
     { key: "concrete_lb", label: "Helper: interior concrete or masonry mass (lb, cp 0.2)" },
     { key: "water_lb", label: "Helper: stored water mass (lb, cp 1.0)" },
     { key: "indoor_start_degf", label: "Indoor temperature when heat is lost (degF)", default: 68, attrs: _SIGNED },
-    { key: "outdoor_degf", label: "Outdoor temperature (degF)", default: 10, attrs: _SIGNED },
+    { key: "outdoor_degf", required: true, label: "Outdoor temperature (degF)", default: 10, attrs: _SIGNED },
     { key: "occupants", label: "People inside (about 250 Btu/h each)" },
     { key: "other_gains_btuh", label: "Other internal gains still running (Btu/h)" },
-    { key: "first_threshold_degf", label: "First threshold, e.g. habitability (degF)", default: 50, attrs: _SIGNED },
-    { key: "second_threshold_degf", label: "Second threshold, e.g. pipe screening line (degF)", default: 40, attrs: _SIGNED },
+    { key: "first_threshold_degf", required: true, label: "First threshold, e.g. habitability (degF)", default: 50, attrs: _SIGNED },
+    { key: "second_threshold_degf", required: true, label: "Second threshold, e.g. pipe screening line (degF)", default: 40, attrs: _SIGNED },
   ],
   outputs: [
     { key: "tau", id: "boc-out-tau", label: "Time constant", unit: "h", value: (r) => fmt(r.time_constant_hours, 1) + " h (capacitance " + fmt(r.total_capacitance_btu_per_degf, 0) + " Btu/degF)" },
@@ -188,6 +192,8 @@ OUTAGE_RENDERERS["building-outage-cooldown"] = _simpleRenderer({
 // dims: in { entered_heat_gain_btuh: M L^2 T^-3, box_length_ft: L, box_width_ft: L, box_height_ft: L, panel_u_btuh_per_sqft_degf: M T^-3, ambient_degf: T, box_degf: T, infiltration_pct: dimensionless, product_lb: M, product_cp_btu_per_lb_degf: L^2 T^-2, product_start_degf: T, allowable_degf: T, outage_hours: T } out: { surface_sqft: L^2, transmission_btuh: M L^2 T^-3, heat_gain_btuh: M L^2 T^-3, reserve_btu: M L^2 T^-2, holdover_hours: T, dry_ice_lb_per_hour: M T^-1, dry_ice_lb_per_day: M T^-1, outage_dry_ice_lb: M, usda_check_leak_btuh: M L^2 T^-3 }
 export function computeRefrigerationOutageHoldover({ entered_heat_gain_btuh = 0, box_length_ft = 0, box_width_ft = 0, box_height_ft = 0, panel_u_btuh_per_sqft_degf = 0, ambient_degf = 90, box_degf = 38, infiltration_pct = 10, product_lb = 0, product_cp_btu_per_lb_degf = 0, product_start_degf = 35, allowable_degf = 41, outage_hours = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // The page passes a blank box as null; 0 F is a real reading, so a blank cannot stand in for it.
+  if ([box_degf].some((x) => x === null || x === "")) return { error: "Enter the box air temperature (F)." };
   if (!(entered_heat_gain_btuh >= 0)) return { error: "The entered box heat gain cannot be negative." };
   if (!(infiltration_pct >= 0)) return { error: "The closed-door infiltration allowance cannot be negative." };
   if (!(product_lb > 0)) return { error: "The product mass must be positive." };
@@ -233,7 +239,7 @@ OUTAGE_RENDERERS["refrigeration-outage-holdover"] = _simpleRenderer({
     { key: "box_height_ft", label: "Box height (ft)" },
     { key: "panel_u_btuh_per_sqft_degf", label: "Panel U-factor (Btu/h-sq ft-degF)" },
     { key: "ambient_degf", label: "Ambient temperature around the box (degF)", default: 90, attrs: _SIGNED },
-    { key: "box_degf", label: "Box air temperature (degF)", default: 38, attrs: _SIGNED },
+    { key: "box_degf", required: true, label: "Box air temperature (degF)", default: 38, attrs: _SIGNED },
     { key: "infiltration_pct", label: "Closed-door infiltration allowance (%)", default: 10 },
     { key: "product_lb", label: "Product mass in the box (lb)" },
     { key: "product_cp_btu_per_lb_degf", label: "Product specific heat above freezing (Btu/lb-degF)" },

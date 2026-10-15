@@ -1191,6 +1191,8 @@ export const GLYCOL_ATTRIBUTION = {
 // dims: in { system_volume_gal: L^3, target_burst_F: T, glycol_type: dimensionless, protection_mode: dimensionless } out: { glycol_gal: L^3, water_gal: L^3, percent: dimensionless, heat_transfer_penalty_pct: dimensionless }
 export function computeGlycolMix({ system_volume_gal = 0, target_burst_F = 32, glycol_type = "propylene", protection_mode = "freeze" }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // The page passes a blank box as null, and Number(null) is 0 F; 0 F is a real reading, so a blank cannot stand in for it.
+  if ([target_burst_F].some((x) => x === null || x === "")) return { error: "Enter the target protection temperature (F)." };
   if (!(system_volume_gal > 0)) return { error: "System volume must be positive." };
   const curve = GLYCOL_FREEZE_CURVES[glycol_type];
   if (!curve) return { error: "Unknown glycol type." };
@@ -1272,6 +1274,8 @@ function rhoAt(F) {
 // dims: in { system_volume_gal: L^3, fill_temperature_F: T, max_temperature_F: T, fill_pressure_psi: M L^-1 T^-2, relief_pressure_psi: M L^-1 T^-2 } out: { tank_gal: L^3 }
 export function computeExpansionTank({ system_volume_gal = 0, fill_temperature_F = 60, max_temperature_F = 200, fill_pressure_psi = 12, relief_pressure_psi = 30 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // The page passes a blank box as null, and Number(null) is 0 F; 0 F is a real reading, so a blank cannot stand in for it.
+  if ([fill_temperature_F, max_temperature_F].some((x) => x === null || x === "")) return { error: "Enter the fill and maximum temperatures (F)." };
   if (fill_pressure_psi === null || fill_pressure_psi === "") fill_pressure_psi = 12;
   relief_pressure_psi = Number(relief_pressure_psi);
   fill_pressure_psi = Number(fill_pressure_psi);
@@ -1481,7 +1485,7 @@ export function renderGlycolMix(inputRegion, outputRegion, citationEl) {
   const oA = makeOutputLine(outputRegion, "Source", "gm-out-a");
   function fillExample(v) { sv.input.value = v.system_volume_gal; tb.input.value = v.target_burst_F; gt.select.value = v.glycol_type; update(); }
   const update = debounce(() => {
-    const r = computeGlycolMix({ system_volume_gal: Number(sv.input.value) || 0, target_burst_F: Number(tb.input.value), glycol_type: gt.select.value, protection_mode: pm.select.value });
+    const r = computeGlycolMix({ system_volume_gal: Number(sv.input.value) || 0, target_burst_F: tb.input.value === "" ? null : Number(tb.input.value), glycol_type: gt.select.value, protection_mode: pm.select.value });
     if (r.error) { oP.textContent = r.error; oC.textContent = "-"; oH.textContent = "-"; oA.textContent = "-"; return; }
     oP.textContent = fmt(r.glycol_percent, 1) + " % (" + r.protection_mode + ")";
     oC.textContent = fmt(r.concentrate_gal, 1) + " gal";
@@ -1509,8 +1513,8 @@ export function renderExpansionTank(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const r = computeExpansionTank({
       system_volume_gal: Number(sv.input.value) || 0,
-      fill_temperature_F: Number(ft.input.value),
-      max_temperature_F: Number(mt.input.value),
+      fill_temperature_F: ft.input.value === "" ? null : Number(ft.input.value),
+      max_temperature_F: mt.input.value === "" ? null : Number(mt.input.value),
       fill_pressure_psi: Number(fp.input.value),
       relief_pressure_psi: Number(rp.input.value),
     });
@@ -2048,6 +2052,8 @@ export function computeRecircLoopSizing({
   fuel_price = null,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // The page passes a blank box as null, and Number(null) is 0 F; 0 F is a real reading, so a blank cannot stand in for it.
+  if ([ambient_F].some((x) => x === null || x === "")) return { error: "Enter the ambient temperature around the pipe (F)." };
   const L = Number(loop_length_ft) || 0;
   const t_ins = Math.max(0, Number(insulation_in) || 0);
   const T_h = Number(hot_supply_F);
@@ -2390,6 +2396,8 @@ export function computeWaterHeaterInput({
   setpoint_F = 120,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // The page passes a blank box as null, and Number(null) is 0 F; 0 F is a real reading, so a blank cannot stand in for it.
+  if ([incoming_F].some((x) => x === null || x === "")) return { error: "Enter the incoming water temperature (F)." };
   const isElectric = heater_type === "electric";
   const eff = efficiency != null && Number.isFinite(Number(efficiency))
     ? Number(efficiency)
@@ -2484,6 +2492,8 @@ export function computeWhExpansionTank({
   acceptance_factor = 0.46,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // The page passes a blank box as null, and Number(null) is 0 F; 0 F is a real reading, so a blank cannot stand in for it.
+  if ([incoming_F].some((x) => x === null || x === "")) return { error: "Enter the incoming water temperature (F)." };
   const vol = Number(water_heater_vol_gal) || 0;
   const Pi = Number(incoming_psi) || 0;
   const Pf = Number(relief_psi) || 0;
