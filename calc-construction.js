@@ -1297,7 +1297,7 @@ export function renderFootingArea(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const r = computeFootingArea({ column_load_lb: Number(P.input.value) || 0, soil_class: soil.select.value, applied_moment_lbft: Number(M.input.value) || 0 });
     if (r.error) { oA.textContent = r.error; oS.textContent = "-"; oR.textContent = "-"; oB.textContent = "-"; return; }
-    oA.textContent = fmt(r.required_area_ft2, 2) + " ft^2 @ " + r.allowable_psf + " psf";
+    oA.textContent = fmt(r.required_area_ft2, 2) + " ft^2 @ " + fmt(r.allowable_psf, 0) + " psf";
     oS.textContent = fmt(r.side_ft, 2) + " ft (" + fmt(r.side_ft * 12, 1) + " in)";
     oR.textContent = r.rounded_side_in + " in (" + fmt(r.rounded_side_ft, 2) + " ft)";
     oB.textContent = "q_max " + fmt(r.q_max_psf, 0) + " psf" + (r.eccentric_flag ? " / q_min " + fmt(r.q_min_psf, 0) + " psf (eccentric" + (r.uplift_flag ? ", UPLIFT at toe" : "") + ")" : " (uniform)") + " - " + (r.bearing_pass ? "PASS vs allowable" : "FAIL: exceeds allowable or uplift");
@@ -2096,10 +2096,10 @@ const renderDrywall = _simpleRenderer({
     { key: "waste_percent", label: "Waste (%)", kind: "number", default: 10 },
   ],
   outputs: [
-    { key: "sheets", id: "dr-out-s", label: "Sheets", value: (r) => String(r.sheets) },
+    { key: "sheets", id: "dr-out-s", label: "Sheets", value: (r) => _fmtC(r.sheets, 0) },
     { key: "mud", id: "dr-out-m", label: "Mud (gal)", value: (r) => _fmtC(r.mud_gal, 1) },
     { key: "tape", id: "dr-out-t", label: "Tape (lf)", value: (r) => _fmtC(r.tape_lf, 0) },
-    { key: "screws", id: "dr-out-c", label: "Screws", value: (r) => String(r.screws) },
+    { key: "screws", id: "dr-out-c", label: "Screws", value: (r) => _fmtC(r.screws, 0) },
   ],
   compute: computeDrywall,
 });
@@ -3494,7 +3494,7 @@ function _v15c_renderHeaderSizing(inputRegion, outputRegion, citationEl) {
     if (r.error) { oMember.textContent = r.error; oLoad.textContent = "-"; oVerify.textContent = "-"; oJack.textContent = "-"; oW.textContent = ""; return; }
     oMember.textContent = r.member_label + " (allowable span " + _v15c_fmt(r.allowable_span_ft, 2) + " ft, governed by " + r.governing + ")";
     oLoad.textContent = _v15c_fmt(r.w_plf, 0) + " plf (" + _v15c_fmt(r.total_load_psf, 0) + " psf on tributary)";
-    oVerify.textContent = "f_b " + _v15c_fmt(r.f_b_psi, 0) + " / " + r.F_b_psi + " psi " + (r.bending_ok ? "OK" : "OVER") + "; deflection " + _v15c_fmt(r.deflection_in, 3) + " / " + _v15c_fmt(r.allowable_deflection_in, 3) + " in " + (r.deflection_ok ? "OK" : "OVER");
+    oVerify.textContent = "f_b " + _v15c_fmt(r.f_b_psi, 0) + " / " + _v15c_fmt(r.F_b_psi, 0) + " psi " + (r.bending_ok ? "OK" : "OVER") + "; deflection " + _v15c_fmt(r.deflection_in, 3) + " / " + _v15c_fmt(r.allowable_deflection_in, 3) + " in " + (r.deflection_ok ? "OK" : "OVER");
     oJack.textContent = String(r.jack_studs_each_end) + " (end reaction " + _v15c_fmt(r.reaction_lb, 0) + " lb)";
     oW.textContent = r.warnings.length ? r.warnings.join(" ") : "Within the IRC R602.7 table range; the AHJ governs the final inspection.";
   }, _V15C_DEB);
@@ -3711,7 +3711,7 @@ function _v15c_renderDeckBeamPost(inputRegion, outputRegion, citationEl) {
     if (r.error) { oBeam.textContent = r.error; oPost.textContent = "-"; oFoot.textContent = "-"; oLedger.textContent = "-"; oW.textContent = ""; return; }
     oBeam.textContent = r.beam_label + " (allowable span " + _v15c_fmt(r.beam_allowable_span_ft, 2) + " ft, governed by " + r.beam_governing + "; " + _v15c_fmt(r.w_plf, 0) + " plf)";
     oPost.textContent = r.post_size + " (load " + _v15c_fmt(r.post_load_lb, 0) + " lb; capacity " + _v15c_fmt(r.post_allowable_load_lb, 0) + " lb at le/d " + _v15c_fmt(r.post_slenderness_le_d, 1) + ")";
-    oFoot.textContent = r.footing_side_in != null ? (r.footing_side_in + " in square on " + r.footing_soil_psf + " psf soil") : "-";
+    oFoot.textContent = r.footing_side_in != null ? (r.footing_side_in + " in square on " + _v15c_fmt(r.footing_soil_psf, 0) + " psf soil") : "-";
     oLedger.textContent = r.ledger === "attached" ? (r.ledger_spacing_in != null ? ("1/2 in lag / SDS at " + r.ledger_spacing_in + " in OC (IRC R507.9.1.3)") : "engineered connection required") : "freestanding: provide a beam and footings at the house side";
     oW.textContent = r.warnings.length ? r.warnings.join(" ") : "Within the IRC R507 prescriptive range; the AHJ governs the final inspection.";
   }, _V15C_DEB);
@@ -5275,9 +5275,9 @@ const renderRidgeCapFasteners = _simpleRenderer({
   ],
   outputs: [
     { key: "cb", id: "rcf-out-cb", label: "Cap bundles", value: (r) => String(r.cap_bundles) },
-    { key: "fn", id: "rcf-out-fn", label: "Field nails", value: (r) => String(r.field_nails) },
-    { key: "cn", id: "rcf-out-cn", label: "Cap nails", value: (r) => String(r.cap_nails) },
-    { key: "tn", id: "rcf-out-tn", label: "Total nails", value: (r) => String(r.total_nails) },
+    { key: "fn", id: "rcf-out-fn", label: "Field nails", value: (r) => _fmtC(r.field_nails, 0) },
+    { key: "cn", id: "rcf-out-cn", label: "Cap nails", value: (r) => _fmtC(r.cap_nails, 0) },
+    { key: "tn", id: "rcf-out-tn", label: "Total nails", value: (r) => _fmtC(r.total_nails, 0) },
     { key: "lb", id: "rcf-out-lb", label: "Nail weight (lb)", value: (r) => String(r.nail_lbs) },
   ],
   compute: computeRidgeCapFasteners,
@@ -12118,9 +12118,9 @@ CONSTRUCTION_RENDERERS["membrane-fastener-takeoff"] = _simpleRenderer({
   ],
   outputs: [
     { key: "s", id: "mft-out-s", label: "Seam length (the fastener rows)", value: (r) => fmt(r.seam_lf, 0) + " LF on a " + fmt(r.usable_w_ft, 2) + " ft usable width" },
-    { key: "f", id: "mft-out-f", label: "Fasteners (field / perimeter)", value: (r) => r.field_fasteners + " / " + r.perimeter_fasteners + " = " + r.base_fasteners + ", " + r.total_fasteners + " with waste" },
-    { key: "p", id: "mft-out-p", label: "Plates", value: (r) => r.plates + " (one per fastener)" },
-    { key: "t", id: "mft-out-t", label: "Cover tape", value: (r) => r.covered ? r.cover_tape_lf + " LF" : "none - all fasteners in welded laps" },
+    { key: "f", id: "mft-out-f", label: "Fasteners (field / perimeter)", value: (r) => fmt(r.field_fasteners, 0) + " / " + fmt(r.perimeter_fasteners, 0) + " = " + fmt(r.base_fasteners, 0) + ", " + fmt(r.total_fasteners, 0) + " with waste" },
+    { key: "p", id: "mft-out-p", label: "Plates", value: (r) => fmt(r.plates, 0) + " (one per fastener)" },
+    { key: "t", id: "mft-out-t", label: "Cover tape", value: (r) => r.covered ? fmt(r.cover_tape_lf, 0) + " LF" : "none - all fasteners in welded laps" },
     { key: "d", id: "mft-out-d", label: "Density check", value: (r) => fmt(r.fasteners_per_square, 1) + " per square, averaging " + fmt(r.avg_spacing_in, 1) + " in along the seam" },
     { key: "n", id: "mft-out-n", label: "Note", value: (r) => r.note },
   ],

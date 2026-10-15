@@ -441,8 +441,8 @@ export function renderRequiredFireFlow(inputRegion, outputRegion, citationEl) {
       volume_ft3: Number(Vol.input.value) || 0,
     });
     if (r.error) { oN.textContent = r.error; oC.textContent = "-"; oIowa.textContent = "-"; return; }
-    oN.textContent = String(r.needed_fire_flow_gpm) + " gpm";
-    oC.textContent = String(r.base_C_gpm) + " gpm";
+    oN.textContent = fmt(r.needed_fire_flow_gpm, 0) + " gpm";
+    oC.textContent = fmt(r.base_C_gpm, 0) + " gpm";
     oIowa.textContent = r.iowa_rate_gpm === null ? "(enter volume)" : fmt(r.iowa_rate_gpm, 0) + " gpm (ISO - Iowa divergence " + fmt(r.divergence_gpm, 0) + " gpm)";
   }, DEBOUNCE_MS);
   for (const el of [A.input, cls.select, O.input, X.input, Pf.input, Vol.input]) el.addEventListener("input", update);

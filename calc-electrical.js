@@ -1376,8 +1376,8 @@ export function renderGeneratorSize(inputRegion, outputRegion, citationEl, param
     const ls = Number(largeStart.input.value) || 0;
     const surge_excess = Math.max(0, ls - lr);
     const r = { running_W: tr, surge_W: tr + surge_excess };
-    outRun.textContent = fmt(r.running_W / 1000, 2) + " kW (" + r.running_W + " W)";
-    outSurge.textContent = fmt(r.surge_W / 1000, 2) + " kW (" + r.surge_W + " W)";
+    outRun.textContent = fmt(r.running_W / 1000, 2) + " kW (" + fmt(r.running_W, 0) + " W)";
+    outSurge.textContent = fmt(r.surge_W / 1000, 2) + " kW (" + fmt(r.surge_W, 0) + " W)";
   }, DEBOUNCE_MS);
 
   for (const el of [totalRun.input, largeRun.input, largeStart.input]) el.addEventListener("input", update);

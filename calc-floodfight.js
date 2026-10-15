@@ -419,7 +419,7 @@ export function computeBasementFloodPumpdown({ floor_area_sqft = 0, water_depth_
   const largest_day_gal = largest_day_ft * gal_per_ft;
   const largest_day_run_min = largest_day_gal / pump_gpm;
   const pump_keeps_up = largest_day_run_min <= 1440;
-  const schedule = steps.map((s, i) => "day " + (i + 1) + ": " + s.toFixed(2) + " ft (" + Math.round(s * gal_per_ft) + " gal)").join("; ");
+  const schedule = steps.map((s, i) => "day " + (i + 1) + ": " + fmt(s, 2) + " ft (" + fmt(s * gal_per_ft, 0) + " gal)").join("; ");
   const below_fema_rate = daily_drawdown_ft < 2;
   return {
     gal_per_ft, total_gal, days, largest_day_ft, largest_day_gal, largest_day_run_min, pump_keeps_up, below_fema_rate, schedule,

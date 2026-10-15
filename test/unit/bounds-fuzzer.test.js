@@ -4782,7 +4782,7 @@ test("bounds: spec-v656 computeBridgeFormulaMinSpacing solves the bridge formula
   // FHWA Figure 8, forward: axles 1-4 carry 57,000 lb within 57,500 at 23 ft; axles
   // 2-4 carry 45,000 lb over the 42,500 at 9 ft.
   const fig8 = computeBridgeFormula({ axle_weights_lb: [12000, 15000, 15000, 15000], axle_spacings_ft: [14, 4.5, 4.5] });
-  assert.deepStrictEqual(fig8.bridge_violations, ["axles 2-4: 45000 lb > 42500 lb formula max"]);
+  assert.deepStrictEqual(fig8.bridge_violations, ["axles 2-4: 45,000 lb > 42,500 lb formula max"]);
   // Cross-check against the array bridge-formula tile: a 2-axle group at 34,000 lb needs 4 ft,
   // and a [17000,17000] pair at exactly 4 ft has no bridge or tandem violation.
   const two = _v656({ target_weight_lb: 34000, num_axles: 2 });

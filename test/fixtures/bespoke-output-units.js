@@ -515,7 +515,7 @@ export const BESPOKE_OUTPUT_UNITS = {
   "rent-vs-buy": {"npv_buy":{"prefix":"$","suffix":"","digits":0},"npv_rent":{"prefix":"$","suffix":"","digits":0}},
   "rental-worksheet": {"gross_rent_annual":{"prefix":"$","suffix":"","digits":2},"effective_gross_income":{"prefix":"$","suffix":"","digits":2},"total_expenses":{"prefix":"$","suffix":"","digits":2},"NOI":{"prefix":"$","suffix":"","digits":2},"taxable_rental_income":{"prefix":"$","suffix":"","digits":2}},
   "required-face-rent": {"face_rent":{"prefix":"$","suffix":" per period","digits":2},"paid":{"prefix":"$","suffix":"","digits":2}},
-  "required-fire-flow": {"needed_fire_flow_gpm":{"prefix":"","suffix":" gpm"},"base_C_gpm":{"prefix":"","suffix":" gpm"}},
+  "required-fire-flow": {"needed_fire_flow_gpm":{"prefix":"","suffix":" gpm","digits":0},"base_C_gpm":{"prefix":"","suffix":" gpm","digits":0}},
   "residential-framing": {"total_bf":{"prefix":"","suffix":" bf total","digits":0}},
   "restrained-pipe-length": {"length_each_side_ft":{"prefix":"","suffix":" ft each side","digits":1},"thrust_lb":{"prefix":"","suffix":" lb","digits":0}},
   "retainage-tracker": {"retention_this":{"prefix":"$","suffix":"","digits":0},"net_payment":{"prefix":"$","suffix":"","digits":0},"cumulative_ret":{"prefix":"$","suffix":"","digits":0}},

@@ -440,7 +440,7 @@ export function computeBridgeFormula({ axle_weights_lb = [], axle_spacings_ft = 
         W = Math.max(W, 2 * tandem_max);
       }
       if (group_weight > W) {
-        bridge_violations.push("axles " + (i + 1) + "-" + (j + 1) + ": " + Math.round(group_weight) + " lb > " + Math.round(W) + " lb formula max");
+        bridge_violations.push("axles " + (i + 1) + "-" + (j + 1) + ": " + fmt(group_weight, 0) + " lb > " + fmt(W, 0) + " lb formula max");
       }
     }
   }

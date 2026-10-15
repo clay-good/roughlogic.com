@@ -4335,7 +4335,7 @@ MECHANIC_RENDERERS["gear-dynamic-tooth-stress"] = _simpleRenderer({
   outputs: [
     { key: "l", id: "gdt-out-l", label: "Tangential load and pitch-line speed", value: (r) => fmt(r.wt_lb, 1) + " lb at " + fmt(r.velocity_fpm, 0) + " ft/min (D = " + fmt(r.pitch_diameter_in, 3) + " in, T = " + fmt(r.torque_inlb, 1) + " in-lb)" },
     { key: "s", id: "gdt-out-s", label: "Static Lewis stress", value: (r) => fmt(r.static_stress_psi, 0) + " psi (Y = " + fmt(r.lewis_Y_diametral, 4) + ")" },
-    { key: "k", id: "gdt-out-k", label: "Barth velocity factor", value: (r) => fmt(r.kv, 4) + " = (" + r.kv_base + " + " + fmt(r.velocity_fpm, 0) + ") / " + r.kv_base + (r.idler ? ", plus the 1.42 idler factor" : "") },
+    { key: "k", id: "gdt-out-k", label: "Barth velocity factor", value: (r) => fmt(r.kv, 4) + " = (" + fmt(r.kv_base, 0) + " + " + fmt(r.velocity_fpm, 0) + ") / " + fmt(r.kv_base, 0) + (r.idler ? ", plus the 1.42 idler factor" : "") },
     { key: "d", id: "gdt-out-d", label: "Dynamic bending stress", value: (r) => fmt(r.dynamic_stress_psi, 0) + " psi (+" + fmt(r.dynamic_penalty_pct, 0) + "% over static)" },
     { key: "f", id: "gdt-out-f", label: "Against an Sut/3 allowable", value: (r) => r.allowable_psi === null ? "- (enter Sut)" : fmt(r.allowable_psi, 0) + " psi, safety factor " + fmt(r.safety_factor, 2) },
     { key: "n", id: "gdt-out-n", label: "Note", value: (r) => r.note },

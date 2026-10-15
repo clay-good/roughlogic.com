@@ -4824,9 +4824,9 @@ function renderCompressedAirPressureDrop(inputRegion, outputRegion, citationEl) 
       line_pressure_psig: Number(p.input.value), air_temp_f: t.input.value === "" ? null : Number(t.input.value), roughness_ft: Number(e.input.value),
     });
     if (r.error) { oDp.textContent = r.error; oV.textContent = ""; oRe.textContent = ""; oN.textContent = ""; return; }
-    oDp.textContent = r.pressure_drop_psi.toFixed(2) + " psi (" + r.drop_per_100ft_psi.toFixed(2) + " psi per 100 ft, " + r.pct_of_line.toFixed(1) + "% of line" + (r.over_10pct ? " - OVER the 10% rule of thumb" : "") + ")";
-    oV.textContent = r.actual_cfm.toFixed(1) + " actual cfm at " + r.density_lb_ft3.toFixed(4) + " lb/ft^3 - " + r.velocity_fps.toFixed(1) + " ft/s";
-    oRe.textContent = "Re " + r.reynolds.toFixed(0) + " / f " + r.friction_factor.toFixed(5);
+    oDp.textContent = fmt(r.pressure_drop_psi, 2) + " psi (" + fmt(r.drop_per_100ft_psi, 2) + " psi per 100 ft, " + fmt(r.pct_of_line, 1) + "% of line" + (r.over_10pct ? " - OVER the 10% rule of thumb" : "") + ")";
+    oV.textContent = fmt(r.actual_cfm, 1) + " actual cfm at " + fmt(r.density_lb_ft3, 4) + " lb/ft^3 - " + fmt(r.velocity_fps, 1) + " ft/s";
+    oRe.textContent = "Re " + fmt(r.reynolds, 0) + " / f " + fmt(r.friction_factor, 5);
     oN.textContent = r.note;
   };
   for (const f of [q, d, L, p, t, e]) f.input.addEventListener("input", sync);
