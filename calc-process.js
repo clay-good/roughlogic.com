@@ -905,7 +905,9 @@ export function computeRiserFeedingDistance({
   sand_mold = "furan", cooling = "end_effect", alloy = "aisi_1025", superheat_f = 108,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
-  const T = Number(section_thickness_in), W = Number(section_width_in), FL = Number(feeding_length_in) || 0;
+  const T = Number(section_thickness_in), W = Number(section_width_in);
+  const FL = feeding_length_in === null || feeding_length_in === undefined || feeding_length_in === "" ? 0 : Number(feeding_length_in);
+  if (!Number.isFinite(FL)) return { error: "Feeding length must be a number (in); enter 0 to skip the check." };
   if (!(T > 0)) return { error: "Section thickness must be positive (in)." };
   if (!(W > 0)) return { error: "Section width must be positive (in)." };
   if (W < T * (1 - 1e-9)) return { error: "Enter the larger cross dimension as the width: the rule runs on W/T from 1 (a square bar) upward." };
@@ -916,7 +918,7 @@ export function computeRiserFeedingDistance({
   if (c_sand === undefined) return { error: "Sand must be furan, green_sand, zircon or chromite." };
   if (c_cool === undefined) return { error: "Cooling must be end_effect, end_chill or drag_chill." };
   if (c_alloy === undefined) return { error: "Choose one of the listed steel grades." };
-  if (superheat_f === null || superheat_f === "") return { error: "Enter the pouring superheat (F above the liquidus)." };
+  if (superheat_f === null || String(superheat_f).trim() === "" || !Number.isFinite(Number(superheat_f))) return { error: "Enter the pouring superheat (F above the liquidus)." };
   const sh_c = Number(superheat_f) / 1.8; // a temperature DIFFERENCE: no 32 F offset
   if (!(sh_c >= 30 - 1e-9 && sh_c <= 250 + 1e-9)) return { error: "The superheat multipliers run from 54 to 450 F (30 to 250 C) above the liquidus." };
   let c_superheat = _RFD_SUPERHEAT_C[_RFD_SUPERHEAT_C.length - 1][1];
@@ -935,21 +937,24 @@ export function computeRiserFeedingDistance({
   // end-effect distance up to W/T 7 (Ou, Carlson, Hardin and Beckermann, MMTB 33B 2002, Eq. 1);
   // past 7 the paper gives only a chart, so nothing is computed there. The cooling multiplier
   // belongs to the section's END, not to the span between risers, so it is left out.
-  const lateral_fd_in = w_over_t <= 7 * (1 + 1e-9) ? 0.48 * fd_over_t_base * c_superheat * c_alloy * c_sand * T : null;
+  // With a drag chill between the risers that rule is replaced: the 0.95 x end-effect distance
+  // above runs from each riser's edge to the CHILL's edge (Part II, Eq. 5), so no 0.48 figure is given.
+  const drag = String(cooling).toLowerCase() === "drag_chill";
+  const lateral_fd_in = !drag && w_over_t <= 7 * (1 + 1e-9) ? 0.48 * fd_over_t_base * c_superheat * c_alloy * c_sand * T : null;
   const in_thickness_range = T >= 1 - 1e-9 && T <= 12 + 1e-9;
   const has_check = FL > 0;
   const sound = has_check && FL <= fd_in * (1 + 1e-9);
   const verdict = !has_check
     ? "(no feeding length entered: lay out risers so no point of the section is farther than " + fmt(fd_in, 2) + " in from a riser's edge)"
     : sound
-      ? "SOUND by the rule: the furthest point is " + fmt(FL, 2) + " in from the riser edge, inside the " + fmt(fd_in, 2) + " in feeding distance"
-      : "SHRINKAGE EXPECTED: the furthest point is " + fmt(FL, 2) + " in from the riser edge, " + fmt(FL - fd_in, 2) + " in past the " + fmt(fd_in, 2) + " in feeding distance -- add a riser, an end chill (x1.19), or shorten the section a riser must reach";
-  const range_note = in_thickness_range ? "" : " The rule was fitted to sections 1 to 12 in thick; at " + fmt(T, 2) + " in it is an extrapolation (thin sections feed farther when gated through the riser, which this does not credit).";
+      ? "SOUND by the rule: the furthest point " + (drag ? "short of the drag chill's edge " : "") + "is " + fmt(FL, 2) + " in from the riser edge, inside the " + fmt(fd_in, 2) + " in feeding distance"
+      : "SHRINKAGE EXPECTED: the furthest point " + (drag ? "short of the drag chill's edge " : "") + "is " + fmt(FL, 2) + " in from the riser edge, " + fmt(FL - fd_in, 2) + " in past the " + fmt(fd_in, 2) + " in feeding distance -- add a riser" + (String(cooling).toLowerCase() === "end_chill" ? "" : ", an end chill (x1.19)") + ", or shorten the section a riser must reach";
+  const range_note = in_thickness_range ? "" : " The rule was fitted to sections 1 to 12 in thick; at " + fmt(T, 2) + " in it is an extrapolation" + (T < 1 ? " (thin sections feed farther when gated through the riser, which this does not credit)." : ".");
   if (![w_over_t, fd_over_t_base, c_superheat, multiplier_total, fd_over_t, fd_in].every(Number.isFinite)) return { error: "Feeding distance math is not a finite value." };
   return {
     w_over_t, fd_over_t_base, superheat_multiplier: c_superheat, multiplier_total, fd_over_t, fd_in, lateral_fd_in,
-    in_thickness_range, has_check, sound, verdict,
-    note: "End-effect feeding distance of a single top riser on a steel plate or bar, from the Niyama-based rule of Carlson, Ou and Beckermann (SFSA 2003): FD/T = -4.29e-4 (W/T)^4 + 0.0174 (W/T)^3 - 0.266 (W/T)^2 + 1.99 (W/T) + 1.97 to W/T = 15 and 9.0 beyond, for AISI 1025 in furan sand at 108 F (60 C) superheat, then scaled by the Table 2 multipliers for sand, end or drag chill, steel grade and superheat. FD is measured from the riser's EDGE to the furthest point it must feed, so a riser reaches a circle of radius FD plus its own radius; between two top risers the lateral distance is about 48 pct of the end-effect one up to W/T 7 (Ou et al., Metall. Mater. Trans. B 33B, 2002), so two risers in line sit no more than twice that apart edge to edge; past W/T 7 that rule is a chart only, and a drag chill between them restores 95 pct of the end effect to the chill's edge (the drag-chill choice above). These rules are about twice the 1973 Risering Steel Castings distances in most cases, which is the yield they buy; they assume the riser itself is big enough (the riser-modulus calculator) and a sound radiograph at 2 pct sensitivity is the standard." + range_note,
+    in_thickness_range, has_check, sound, verdict, drag,
+    note: "End-effect feeding distance of a single top riser on a steel plate or bar, from the Niyama-based rule of Carlson, Ou and Beckermann (SFSA 2003): FD/T = -4.29e-4 (W/T)^4 + 0.0174 (W/T)^3 - 0.266 (W/T)^2 + 1.99 (W/T) + 1.97 to W/T = 15 and 9.0 beyond, for AISI 1025 in furan sand at 108 F (60 C) superheat, then scaled by the Table 2 multipliers for sand, end or drag chill, steel grade and superheat. FD is measured from the riser's EDGE to the furthest point it must feed, so a riser reaches a circle of radius FD plus its own radius; between two top risers the lateral distance is about 48 pct of the end-effect one up to W/T 7 (Ou et al., Metall. Mater. Trans. B 33B, 2002), measured from each riser's edge to the furthest point on the line midway between them -- for a wide section that point is the corner, so the spacing along the axis is shorter than twice it; past W/T 7 that rule is a chart only, and a drag chill between them restores 95 pct of the end effect to the chill's edge (the drag-chill choice above). These rules give longer distances than the 1973 Risering Steel Castings ones in most cases (1 to 2 T longer than Pellini's for plates), which is the yield they buy; they assume the riser itself is big enough (the riser-modulus calculator) and a sound radiograph at 2 pct sensitivity is the standard." + range_note,
   };
 }
 export const riserFeedingDistanceExample = { inputs: { section_thickness_in: 2, section_width_in: 8, feeding_length_in: 12, sand_mold: "furan", cooling: "end_effect", alloy: "aisi_1025", superheat_f: 108 } };
@@ -964,7 +969,7 @@ PROCESS_RENDERERS["riser-feeding-distance"] = _simpleRenderer({
       { value: "furan", label: "Furan (PUNB) - base" }, { value: "green_sand", label: "Green sand (x1.09)" },
       { value: "zircon", label: "Zircon (x0.96)" }, { value: "chromite", label: "Chromite (x0.88)" },
     ] },
-    { key: "cooling", label: "End of the section", kind: "select", options: [
+    { key: "cooling", label: "End chill, or a drag chill between risers", kind: "select", options: [
       { value: "end_effect", label: "Plain end effect - base" }, { value: "end_chill", label: "End chill (x1.19)" }, { value: "drag_chill", label: "Drag chill (x0.95)" },
     ] },
     { key: "alloy", label: "Steel grade", kind: "select", options: [
@@ -980,7 +985,7 @@ PROCESS_RENDERERS["riser-feeding-distance"] = _simpleRenderer({
     { key: "fd", id: "rfd-out-fd", label: "Feeding distance from the riser edge", value: (r) => fmt(r.fd_in, 2) + " in (FD/T " + fmt(r.fd_over_t, 3) + ")" },
     { key: "b", id: "rfd-out-b", label: "Base rule at this W/T", value: (r) => "W/T " + fmt(r.w_over_t, 2) + " gives FD/T " + fmt(r.fd_over_t_base, 3) + " for 1025 in furan at 108 F superheat" },
     { key: "m", id: "rfd-out-m", label: "Combined multiplier", value: (r) => "x" + fmt(r.multiplier_total, 3) + " (superheat x" + fmt(r.superheat_multiplier, 3) + ")" },
-    { key: "l", id: "rfd-out-l", label: "Between two risers (lateral, each side)", value: (r) => r.lateral_fd_in == null ? "not computed past W/T 7 (the published rule is a chart there); add a drag chill between them, or read the chart" : fmt(r.lateral_fd_in, 2) + " in from each riser's edge, so risers in line no more than " + fmt(2 * r.lateral_fd_in, 2) + " in apart edge to edge" },
+    { key: "l", id: "rfd-out-l", label: "Between two risers (lateral, each side)", value: (r) => r.lateral_fd_in != null ? fmt(r.lateral_fd_in, 2) + " in from each riser's edge to the furthest point on the line midway between them (the corner of a wide section, so the spacing along the axis is less than twice this)" : r.drag ? "with the drag chill between the risers, the feeding distance above runs from each riser's edge to the chill's edge" : "not computed past W/T 7 (the published rule is a chart there); a drag chill between the risers gives the distance above, to the chill's edge" },
     { key: "v", id: "rfd-out-v", label: "Feeding check", value: (r) => r.verdict },
     { key: "n", id: "rfd-out-n", label: "Note", value: (r) => r.note },
   ],

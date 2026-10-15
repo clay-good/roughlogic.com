@@ -400,12 +400,12 @@ export function computeMasonryAnchorBolt({ fm_psi = 1500, lbe_in = 0, ab_in2 = 0
   const masonry_governs = bab_lb <= bas_lb;
   return {
     apt_in2, bab_lb, bas_lb, ba_lb, masonry_governs,
-    note: "TMS 402 allowable-stress design of a headed anchor bolt in tension in grouted masonry: the allowable is the LESSER of masonry breakout Bab = 1.25 x Apt x sqrt(f'm), with Apt = pi x lbe^2 the projected area of the 45-degree tension breakout cone, and steel Bas = 0.6 x Ab x fy. A shallow anchor pulls a cone of block out (masonry governs); a deep enough anchor makes the steel yield first (steel governs). Edge distance or overlapping cones reduce Apt (the full-cone value is an upper bound); anchor shear (pryout) is a separate check. The strength-design coefficient is 4 x Apt x sqrt(f'm). A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
+    note: "TMS 402 allowable-stress design of a headed anchor bolt in tension in grouted masonry: the allowable is the LESSER of masonry breakout Bab = 1.25 x Apt x sqrt(f'm), with Apt = pi x lbe^2 the projected area of the 45-degree tension breakout cone, and steel Bas = 0.6 x Ab x fy. A shallow anchor pulls a cone of block out (masonry governs); a deep enough anchor makes the steel yield first (steel governs). Edge distance or overlapping cones reduce Apt (the full-cone value is an upper bound); anchor shear is the masonry anchor bolt shear calculator. The strength-design coefficient is 4 x Apt x sqrt(f'm). A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
   };
 }
 export const masonryAnchorBoltExample = { inputs: { fm_psi: 1500, lbe_in: 4, ab_in2: 0.334, fy_psi: 36000 } };
 MASONRY_RENDERERS["masonry-anchor-bolt"] = _simpleRenderer({
-  citation: "Citation: TMS 402 ASD headed anchor bolt tension: allowable = lesser of masonry breakout Bab = 1.25 x Apt x sqrt(f'm) (Apt = pi x lbe^2, the projected cone) and steel Bas = 0.6 x Ab x fy. Edge distance reduces Apt; shear is a separate check. A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
+  citation: "Citation: TMS 402 ASD headed anchor bolt tension: allowable = lesser of masonry breakout Bab = 1.25 x Apt x sqrt(f'm) (Apt = pi x lbe^2, the projected cone) and steel Bas = 0.6 x Ab x fy. Edge distance reduces Apt; shear is the masonry anchor bolt shear calculator. A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
   example: masonryAnchorBoltExample.inputs,
   fields: [
     { key: "fm_psi", label: "Masonry strength f'm (psi)", kind: "number" },
@@ -448,12 +448,12 @@ export function computeMasonryAnchorEmbedment({ required_tension_lb = 0, fm_psi 
   const below_min_embedment = lbe_in < 2;
   return {
     lbe_in, apt_in2, bas_lb, steel_adequate, below_min_embedment,
-    note: "The effective embedment lbe that makes the TMS 402 masonry-breakout capacity Bab = 1.25 x (pi lbe^2) x sqrt(f'm) equal the required tension, the inverse of masonry-anchor-bolt. Deeper embedment pulls a larger 45-degree cone and carries more load. The steel branch Bas = 0.6 x Ab x fy is a separate ceiling: if it is below the required tension the bolt yields no matter how deep it is set, so a larger-diameter or higher-grade bolt is needed. Edge distance or overlapping cones reduce the projected area Apt (this full-cone value is an upper bound, so the real required embedment is deeper); anchor shear (pryout) is a separate check. A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
+    note: "The effective embedment lbe that makes the TMS 402 masonry-breakout capacity Bab = 1.25 x (pi lbe^2) x sqrt(f'm) equal the required tension, the inverse of masonry-anchor-bolt. Deeper embedment pulls a larger 45-degree cone and carries more load. The steel branch Bas = 0.6 x Ab x fy is a separate ceiling: if it is below the required tension the bolt yields no matter how deep it is set, so a larger-diameter or higher-grade bolt is needed. Edge distance or overlapping cones reduce the projected area Apt (this full-cone value is an upper bound, so the real required embedment is deeper); anchor shear is the masonry anchor bolt shear calculator. A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
   };
 }
 export const masonryAnchorEmbedmentExample = { inputs: { required_tension_lb: 5000, fm_psi: 1500, ab_in2: 0.334, fy_psi: 36000 } };
 MASONRY_RENDERERS["masonry-anchor-embedment"] = _simpleRenderer({
-  citation: "Citation: TMS 402 ASD headed anchor bolt tension solved for the embedment: lbe = sqrt(T / (1.25 pi sqrt(f'm))) from the masonry breakout branch Bab = 1.25 x Apt x sqrt(f'm) (Apt = pi lbe^2). The steel branch Bas = 0.6 Ab fy is a separate ceiling. Edge distance reduces Apt; shear is a separate check. A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
+  citation: "Citation: TMS 402 ASD headed anchor bolt tension solved for the embedment: lbe = sqrt(T / (1.25 pi sqrt(f'm))) from the masonry breakout branch Bab = 1.25 x Apt x sqrt(f'm) (Apt = pi lbe^2). The steel branch Bas = 0.6 Ab fy is a separate ceiling. Edge distance reduces Apt; shear is the masonry anchor bolt shear calculator. A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
   example: masonryAnchorEmbedmentExample.inputs,
   fields: [
     { key: "required_tension_lb", label: "Required tension T (lb)", kind: "number" },

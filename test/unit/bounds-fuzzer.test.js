@@ -61926,3 +61926,20 @@ test("bounds: spec-v1963 riser-feeding-distance lateral rule is 0.48 x the end e
   assert.ok(_rfd({ ...base, section_width_in: 14 }).lateral_fd_in !== null);
   assert.equal(_rfd({ ...base, section_width_in: 14.1 }).lateral_fd_in, null);
 });
+test("bounds: spec-v1963 riser-feeding-distance review fixes (drag chill, spacing wording, range note, input seams)", () => {
+  const base = { section_thickness_in: 2, section_width_in: 8, feeding_length_in: 12, sand_mold: "furan", cooling: "end_effect", alloy: "aisi_1025", superheat_f: 108 };
+  // A drag chill replaces the 0.48 lateral rule; the distance runs to the chill's edge.
+  const d = _rfd({ ...base, cooling: "drag_chill" });
+  assert.equal(d.lateral_fd_in, null);
+  assert.ok(d.drag === true && /short of the drag chill's edge is/.test(d.verdict));
+  // No unsafe edge-to-edge spacing claim; LFD is to the furthest point midway (the corner).
+  assert.ok(!/apart edge to edge/.test(_rfd(base).note) && /furthest point on the line midway/.test(_rfd(base).note));
+  // Only a THIN section gets the gating remark.
+  assert.ok(!/thin sections/.test(_rfd({ ...base, section_thickness_in: 13, section_width_in: 52 }).note));
+  assert.ok(/thin sections/.test(_rfd({ ...base, section_thickness_in: 0.5, section_width_in: 2 }).note));
+  // An end chill already chosen is not advised again; no unsourced "twice" claim.
+  assert.ok(!/an end chill/.test(_rfd({ ...base, cooling: "end_chill", feeding_length_in: 40 }).verdict));
+  assert.ok(!/about twice/.test(_rfd(base).note));
+  assert.ok(/Enter the pouring superheat/.test(_rfd({ ...base, superheat_f: "abc" }).error));
+  assert.ok("error" in _rfd({ ...base, feeding_length_in: "abc" }));
+});

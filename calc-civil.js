@@ -1047,7 +1047,7 @@ export function computeSkipLineLayout({ stripe_length_ft = 0, gap_length_ft = 0,
 }
 const skipLineLayoutExample = { inputs: { stripe_length_ft: 10, gap_length_ft: 30, run_length_ft: 5280, start_offset_ft: 0, counted_stripes: 99, counted_length_ft: 3300 } };
 CIVIL_RENDERERS["skip-line-layout"] = _simpleRenderer({
-  citation: "Citation: the MUTCD broken-line cycle convention by name -- cycle = stripe + gap, stripes per mile = 5,280 / cycle, painted fraction = stripe / cycle -- inverted for maintenance as cycle = measured length / counted stripes. NO PATTERN IS SHIPPED: stripe and gap lengths, widths and colours are set by the MUTCD and the agency's standard drawings and vary by marking type and road class. Material quantity is a separate calculation that takes the painted length produced here. The adopted MUTCD and its state supplement, the agency's standard drawings, and the project specification govern.",
+  citation: "Citation: the MUTCD broken-line cycle convention by name -- cycle = stripe + gap, stripes per mile = 5,280 / cycle, painted fraction = stripe / cycle -- inverted for maintenance as cycle = measured length / counted stripes. NO PATTERN IS SHIPPED: stripe and gap lengths, widths and colours are set by the MUTCD and the agency's standard drawings and vary by marking type and road class. Material quantity takes the painted length produced here into the pavement marking paint calculator. The adopted MUTCD and its state supplement, the agency's standard drawings, and the project specification govern.",
   example: skipLineLayoutExample.inputs,
   fields: [
     { key: "stripe_length_ft", label: "Stripe length (ft)", kind: "number" },

@@ -28,6 +28,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **Hardening slice 51: an independent review of the new riser feeding-distance calculator, and notes that now name the calculator they point to.**
+  - **Review.** An independent re-derivation against both papers confirmed the equation, every Table 2 multiplier, the superheat interpolation and the lateral rule. It also found four wording defects, now fixed:
+    - The lateral line said two risers in line could sit "no more than twice that apart edge to edge". That is unsafe: the distance runs to the furthest point midway between the risers, the corner of a wide section, so the spacing along the axis is shorter. The line no longer gives a spacing.
+    - Choosing a drag chill still printed the 0.48 lateral rule. A drag chill replaces it, so the page now says the feeding distance runs to the chill's edge.
+    - A section thicker than 12 in got the thin-section gating remark, which applies only below 1 in.
+    - "About twice the 1973 distances" was not in either paper. It now says "longer in most cases (1 to 2 T longer than Pellini's for plates)".
+    - Also: the cooling select is relabelled "End chill, or a drag chill between risers"; an end chill already chosen is no longer advised again; and a text feeding length or superheat is now an error rather than being read as 0 or as out of range.
+  - **Pointer pass.** Eleven compute notes still called a calculation "separate" when the catalog already has it. They now name the calculator: pavement marking paint quantity, natural infiltration from the blower-door number, masonry anchor bolt shear, pipe partial-flow depth, culvert outlet and inlet control (circular and box), and secondary voltage drop.
+
 - **The 2027 Social Security wage base is bundled: $192,300.** SSA announced it on 2026-10-14 with the 3.6% COLA, up from $184,500 in 2026. The self-employment tax calculator now offers tax year 2027 and caps the Social Security portion there. The Additional Medicare thresholds are set by statute and not indexed, so they carry over unchanged. Read from the SSA 2027 COLA fact sheet in a browser, because ssa.gov refuses an automated fetch. The standards ledger records the check, and the 2026 figure was reconfirmed on the same page.
 
 - **Hardening slice 50: the deferred findings, re-run and cleared.** Every reviewer finding still on the deferred lists was re-run on 2026-10-14. About 41 had been fixed along the way. The 73 that still reproduced are fixed here, most serious first.
