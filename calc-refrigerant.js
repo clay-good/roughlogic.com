@@ -235,7 +235,7 @@ function _v8shScDiagnostic(value, mode) {
 }
 
 // dims: in { refrigerant: dimensionless, system_pressure_psig: M L^-1 T^-2, line_temperature_F: T, mode: dimensionless, indoor_wet_bulb_F: T, outdoor_dry_bulb_F: T, deadband_F: T } out: { value_F: T, sat_F: T, target_superheat_F: T }
-export function computeSuperheatSubcool({ refrigerant, system_pressure_psig, line_temperature_F, mode, indoor_wet_bulb_F = 0, outdoor_dry_bulb_F = 0, deadband_F = 5, target_subcool_F = 0 }) {
+export function computeSuperheatSubcool({ refrigerant, system_pressure_psig, line_temperature_F, mode, indoor_wet_bulb_F = 0, outdoor_dry_bulb_F = null, deadband_F = 5, target_subcool_F = 0 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const r = REFRIGERANTS[refrigerant];
   if (!r) return { error: "Unknown refrigerant." };
@@ -255,7 +255,9 @@ export function computeSuperheatSubcool({ refrigerant, system_pressure_psig, lin
     let target_superheat_F = null, charge_verdict = null;
     const iwb = Number(indoor_wet_bulb_F) || 0, odb = Number(outdoor_dry_bulb_F) || 0;
     let dead = Number(deadband_F); if (!Number.isFinite(dead) || dead < 0) dead = 5;
-    if (iwb > 0 && Number.isFinite(iwb) && Number.isFinite(odb)) {
+    // A blank outdoor dry-bulb is not 0 F: without one there is no target superheat.
+    const odbGiven = outdoor_dry_bulb_F !== null && outdoor_dry_bulb_F !== undefined && outdoor_dry_bulb_F !== "";
+    if (iwb > 0 && odbGiven && Number.isFinite(iwb) && Number.isFinite(odb)) {
       // Clamped to [5, 30] F, the same band refrigerant-pt applies, so the two agree.
       const tgt = Math.max(5, Math.min(30, (3 * iwb - 80 - odb) / 2));
       if (Number.isFinite(tgt)) {
@@ -431,11 +433,13 @@ function _interpRefSatT(refrigerant, psia, dew = false) {
 // dims: in { refrigerant: dimensionless, suction_pressure: M L^-1 T^-2, suction_unit: dimensionless, suction_line_temp_F: T, liquid_pressure: M L^-1 T^-2, liquid_unit: dimensionless, liquid_line_temp_F: T } out: { target_subcool_F: T, target_superheat_F: T }
 export function computeRefrigerantCharging({
   refrigerant = "R_410A",
-  suction_pressure = 0, suction_unit = "psig", suction_line_temp_F = 0,
-  liquid_pressure = 0, liquid_unit = "psig", liquid_line_temp_F = 0,
+  suction_pressure = 0, suction_unit = "psig", suction_line_temp_F = null,
+  liquid_pressure = 0, liquid_unit = "psig", liquid_line_temp_F = null,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!REFRIGERANT_PT_TABLES_v7[refrigerant]) return { error: "Unknown refrigerant." };
+  // 0 F is a real reading, so a blank line temperature cannot stand in for it.
+  if ([suction_line_temp_F, liquid_line_temp_F].some((x) => x === null || x === undefined || x === "")) return { error: "Enter the suction and liquid line temperatures (F)." };
   if (!(suction_pressure > 0) || !(liquid_pressure > 0)) return { error: "Pressures must be positive." };
   const suction_psia = suction_unit === "psig" ? suction_pressure + 14.696 : suction_pressure;
   const liquid_psia = liquid_unit === "psig" ? liquid_pressure + 14.696 : liquid_pressure;
@@ -553,11 +557,12 @@ export function renderSuperheatSubcool(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const r = computeSuperheatSubcool({
       refrigerant: ref.select.value,
-      system_pressure_psig: Number(press.input.value) || 0,
-      line_temperature_F: Number(temp.input.value) || 0,
+      // A blank pressure or line temperature reaches the compute as undefined, which it refuses.
+      system_pressure_psig: press.input.value === "" ? undefined : Number(press.input.value),
+      line_temperature_F: temp.input.value === "" ? undefined : Number(temp.input.value),
       mode: mode.select.value,
       indoor_wet_bulb_F: Number(iwb.input.value) || 0,
-      outdoor_dry_bulb_F: Number(odb.input.value) || 0,
+      outdoor_dry_bulb_F: odb.input.value === "" ? null : Number(odb.input.value),
       target_subcool_F: Number(tsc.input.value) || 0,
     });
     if (r.error) { oSat.textContent = r.error; oR.textContent = "-"; oD.textContent = "-"; oV.textContent = "-"; return; }
@@ -665,9 +670,9 @@ function renderRefrigerantCharging(inputRegion, outputRegion, citationEl) {
     const r = computeRefrigerantCharging({
       refrigerant: ref.select.value,
       suction_pressure: Number(sp.input.value) || 0, suction_unit: su.select.value,
-      suction_line_temp_F: Number(st.input.value) || 0,
+      suction_line_temp_F: st.input.value === "" ? null : Number(st.input.value),
       liquid_pressure: Number(lp.input.value) || 0, liquid_unit: lu.select.value,
-      liquid_line_temp_F: Number(lt.input.value) || 0,
+      liquid_line_temp_F: lt.input.value === "" ? null : Number(lt.input.value),
     });
     if (r.error) { oTSS.textContent = r.error; oTSL.textContent = "-"; oSH.textContent = "-"; oSC.textContent = "-"; return; }
     oTSS.textContent = fmt(r.T_sat_suction_F, 1) + " °F (" + fmt(r.suction_psia, 1) + " psia)";
@@ -730,8 +735,10 @@ function _v320renderRefrigerantMassFlow(inputRegion, outputRegion, citationEl) {
 REFRIGERANT_RENDERERS["refrigerant-mass-flow"] = _v320renderRefrigerantMassFlow;
 
 // dims: in { h1_btulb: L^2 T^-2, h2_btulb: L^2 T^-2, h4_btulb: L^2 T^-2, tevap_f: T, tcond_f: T } out: { cop: dimensionless, cop_carnot: dimensionless, eta_2nd: dimensionless, eer: dimensionless }
-export function computeRefrigerationCop({ h1_btulb = 0, h2_btulb = 0, h4_btulb = 0, tevap_f = 0, tcond_f = 0 } = {}) {
+export function computeRefrigerationCop({ h1_btulb = 0, h2_btulb = 0, h4_btulb = 0, tevap_f = null, tcond_f = null } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A blank evaporator temperature read as 0 F set the Carnot ceiling.
+  if ([tevap_f, tcond_f].some((x) => x === null || x === undefined || x === "")) return { error: "Enter the evaporator and condenser saturation temperatures (F)." };
   const re = h1_btulb - h4_btulb;
   const w = h2_btulb - h1_btulb;
   if (!(re > 0)) return { error: "The refrigeration effect must be positive (h1 must exceed h4)." };
@@ -765,7 +772,7 @@ function _v321renderRefrigerationCop(inputRegion, outputRegion, citationEl) {
   const oCarnot = makeOutputLine(outputRegion, "Carnot COP / second-law efficiency", "rc-out-carnot");
   const oNote = makeOutputLine(outputRegion, "Note", "rc-out-note");
   const update = debounce(() => {
-    const r = computeRefrigerationCop({ h1_btulb: Number(h1.input.value) || 0, h2_btulb: Number(h2.input.value) || 0, h4_btulb: Number(h4.input.value) || 0, tevap_f: Number(te.input.value) || 0, tcond_f: Number(tc.input.value) || 0 });
+    const r = computeRefrigerationCop({ h1_btulb: Number(h1.input.value) || 0, h2_btulb: Number(h2.input.value) || 0, h4_btulb: Number(h4.input.value) || 0, tevap_f: te.input.value === "" ? null : Number(te.input.value), tcond_f: tc.input.value === "" ? null : Number(tc.input.value) });
     if (r.error) { oCop.textContent = r.error; oCarnot.textContent = "-"; oNote.textContent = "-"; return; }
     oCop.textContent = fmt(r.cop, 2) + " (EER " + fmt(r.eer, 2) + ")";
     oCarnot.textContent = fmt(r.cop_carnot, 2) + " / " + fmt(r.eta_2nd * 100, 0) + "% of ideal";
@@ -925,8 +932,10 @@ function _v432renderWalkInCoolerLoad(inputRegion, outputRegion, citationEl) {
 REFRIGERANT_RENDERERS["walk-in-cooler-load"] = _v432renderWalkInCoolerLoad;
 
 // dims: in { mass_lb: M, cp_above: dimensionless, t_enter_f: T, t_storage_f: T, t_freeze_f: T, hif_btu_lb: dimensionless, cp_below: dimensionless, hours: T } out: { q_btu: M L^2 T^-2, rate_btuh: M L^2 T^-3 }
-export function computeProductPullDownLoad({ mass_lb = 0, cp_above = 0, t_enter_f = 0, t_storage_f = 0, t_freeze_f = 0, hif_btu_lb = 0, cp_below = 0, hours = 0 } = {}) {
+export function computeProductPullDownLoad({ mass_lb = 0, cp_above = 0, t_enter_f = null, t_storage_f = null, t_freeze_f = 0, hif_btu_lb = 0, cp_below = 0, hours = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // 0 F is a real storage temperature, so a blank cannot stand in for it.
+  if ([t_enter_f, t_storage_f].some((x) => x === null || x === undefined || x === "")) return { error: "Enter the entering and storage temperatures (F)." };
   // Freezing product needs all three of the freeze point, the latent heat and the frozen specific
   // heat; with one blank the load used to fall back to sensible-only, 60% short on the example.
   if (Number(t_storage_f) < 32 && Number(t_enter_f) > Number(t_storage_f) && (Number(t_freeze_f) !== 0 || Number(hif_btu_lb) > 0 || Number(cp_below) > 0) && !(Number(t_freeze_f) !== 0 && Number(hif_btu_lb) > 0 && Number(cp_below) > 0)) return { error: "Freezing a product needs its freeze point, latent heat and frozen specific heat; enter all three (or none for a load that stays unfrozen)." };
@@ -980,7 +989,7 @@ function _v433renderProductPullDownLoad(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "ppd-out-n");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeProductPullDownLoad({ mass_lb: readNum(mass.input), cp_above: readNum(cpa.input), t_enter_f: readNum(tEnter.input), t_storage_f: readNum(tStore.input), t_freeze_f: readNum(tFreeze.input), hif_btu_lb: readNum(hif.input), cp_below: readNum(cpb.input), hours: readNum(hrs.input) });
+    const r = computeProductPullDownLoad({ mass_lb: readNum(mass.input), cp_above: readNum(cpa.input), t_enter_f: tEnter.input.value === "" ? null : readNum(tEnter.input), t_storage_f: tStore.input.value === "" ? null : readNum(tStore.input), t_freeze_f: readNum(tFreeze.input), hif_btu_lb: readNum(hif.input), cp_below: readNum(cpb.input), hours: readNum(hrs.input) });
     if (r.error) { oQ.textContent = r.error; oR.textContent = "-"; oNote.textContent = ""; return; }
     oQ.textContent = fmt(r.q_btu, 0) + " Btu" + (r.latent_included ? " (incl. latent freezing)" : "");
     oR.textContent = fmt(r.rate_btuh, 0) + " Btu/hr";
@@ -995,7 +1004,7 @@ REFRIGERANT_RENDERERS["product-pull-down-load"] = _v433renderProductPullDownLoad
 // product load, the pull-down time is hours = Q / capacity. Q (with the freezer
 // latent branch) is reused from computeProductPullDownLoad at hours = 1.
 // dims: in { mass_lb: M, cp_above: dimensionless, t_enter_f: T, t_storage_f: T, t_freeze_f: T, hif_btu_lb: dimensionless, cp_below: dimensionless, capacity_btuh: M L^2 T^-3 } out: { hours: T, q_btu: M L^2 T^-2 }
-export function computeProductPullDownTime({ mass_lb = 0, cp_above = 0, t_enter_f = 0, t_storage_f = 0, t_freeze_f = 0, hif_btu_lb = 0, cp_below = 0, capacity_btuh = 0 } = {}) {
+export function computeProductPullDownTime({ mass_lb = 0, cp_above = 0, t_enter_f = null, t_storage_f = null, t_freeze_f = 0, hif_btu_lb = 0, cp_below = 0, capacity_btuh = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const cap = Number(capacity_btuh) || 0;
   if (!(cap > 0)) return { error: "Available refrigeration capacity must be positive (Btu/hr)." };
@@ -1026,7 +1035,7 @@ function _v698renderProductPullDownTime(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "ppt-out-n");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeProductPullDownTime({ mass_lb: readNum(mass.input), cp_above: readNum(cpa.input), t_enter_f: readNum(tEnter.input), t_storage_f: readNum(tStore.input), t_freeze_f: readNum(tFreeze.input), hif_btu_lb: readNum(hif.input), cp_below: readNum(cpb.input), capacity_btuh: readNum(cap.input) });
+    const r = computeProductPullDownTime({ mass_lb: readNum(mass.input), cp_above: readNum(cpa.input), t_enter_f: tEnter.input.value === "" ? null : readNum(tEnter.input), t_storage_f: tStore.input.value === "" ? null : readNum(tStore.input), t_freeze_f: readNum(tFreeze.input), hif_btu_lb: readNum(hif.input), cp_below: readNum(cpb.input), capacity_btuh: readNum(cap.input) });
     if (r.error) { oH.textContent = r.error; oQ.textContent = "-"; oNote.textContent = ""; return; }
     oH.textContent = fmt(r.hours, 1) + " hr";
     oQ.textContent = fmt(r.q_btu, 0) + " Btu" + (r.latent_included ? " (incl. latent freezing)" : "");
@@ -1037,8 +1046,10 @@ function _v698renderProductPullDownTime(inputRegion, outputRegion, citationEl) {
 REFRIGERANT_RENDERERS["product-pull-down-time"] = _v698renderProductPullDownTime;
 
 // dims: in { box_temp_f: T, sst_f: T } out: { dtd: T }
-export function computeEvaporatorTdDtd({ box_temp_f = 0, sst_f = 0, design_load_btuh = 0, coil_ua_btuh_f = 0, rating_td_f = 0 } = {}) {
+export function computeEvaporatorTdDtd({ box_temp_f = null, sst_f = null, design_load_btuh = 0, coil_ua_btuh_f = 0, rating_td_f = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // 0 F is a real box or suction temperature, so a blank cannot stand in for it.
+  if ([box_temp_f, sst_f].some((x) => x === null || x === undefined || x === "")) return { error: "Enter the box and saturated suction temperatures (F)." };
   const box = Number(box_temp_f);
   const sst = Number(sst_f);
   if (!Number.isFinite(box) || !Number.isFinite(sst)) return { error: "Enter valid temperatures (F)." };
@@ -1105,7 +1116,7 @@ function _v434renderEvaporatorTdDtd(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "etd-out-n");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeEvaporatorTdDtd({ box_temp_f: readNum(box.input), sst_f: readNum(sst.input), design_load_btuh: readNum(load.input), coil_ua_btuh_f: readNum(ua.input), rating_td_f: readNum(rtd.input) });
+    const r = computeEvaporatorTdDtd({ box_temp_f: box.input.value === "" ? null : readNum(box.input), sst_f: sst.input.value === "" ? null : readNum(sst.input), design_load_btuh: readNum(load.input), coil_ua_btuh_f: readNum(ua.input), rating_td_f: readNum(rtd.input) });
     if (r.error) { oD.textContent = r.error; oB.textContent = "-"; oC.textContent = "-"; oR.textContent = "-"; oNote.textContent = ""; return; }
     oD.textContent = fmt(r.dtd, 1) + " F";
     oB.textContent = r.band;
@@ -1336,7 +1347,9 @@ function _simpleRenderer(spec) {
       const params = {};
       for (const f of spec.fields) {
         if (f.kind === "select") params[f.key] = fields[f.key].select.value;
-        else params[f.key] = Number(fields[f.key].input.value) || 0;
+        // A field marked `required` passes null when blank, so the compute can
+        // tell a cleared temperature from a typed 0.
+        else params[f.key] = f.required && fields[f.key].input.value === "" ? null : Number(fields[f.key].input.value) || 0;
       }
       const r = spec.compute(params);
       if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }
@@ -1412,6 +1425,8 @@ REFRIGERANT_RENDERERS["txv-capacity-check"] = _simpleRenderer({
 // dims: in { frost_lb: M, coil_temp_f: T, coil_mass_lb: M, coil_specific_heat: L^2 T^-2, coil_temp_rise_f: T, heater_btuh: M L^2 T^-3, defrost_efficiency: dimensionless, drain_temp_f: T } out: { sensible_btu: M L^2 T^-2, latent_btu: M L^2 T^-2, meltwater_btu: M L^2 T^-2, total_btu: M L^2 T^-2, defrost_min: T }
 export function computeDefrostCycleSizing({ frost_lb = 0, coil_temp_f = -10, coil_mass_lb = 0, coil_specific_heat = 0.10, coil_temp_rise_f = 0, heater_btuh = 0, defrost_efficiency = 0.8, drain_temp_f = 32 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // The page passes a blank box as null; 0 F is a real reading, so a blank cannot stand in for it.
+  if ([coil_temp_f].some((x) => x === null || x === "")) return { error: "Enter the coil temperature at defrost start (F)." };
   if (Number(coil_temp_rise_f) > 0 && Number(coil_temp_f) + Number(coil_temp_rise_f) < 32) return { error: "The coil must rise past 32 F to melt the frost; the entered rise ends below freezing." };
   if (!(frost_lb > 0)) return { error: "Frost mass per cycle must be positive." };
   if (!(coil_temp_f < 32)) return { error: "The coil must start below 32 F, or there is no frost to melt." };
@@ -1458,7 +1473,7 @@ REFRIGERANT_RENDERERS["defrost-cycle-sizing"] = _simpleRenderer({
   example: defrostCycleSizingExample.inputs,
   fields: [
     { key: "frost_lb", label: "Frost mass per cycle (lb)", kind: "number" },
-    { key: "coil_temp_f", label: "Coil temperature at defrost start (F)", kind: "number", default: -10, attrs: { step: "any" } },
+    { key: "coil_temp_f", label: "Coil temperature at defrost start (F)", kind: "number", required: true, default: -10, attrs: { step: "any" } },
     { key: "coil_mass_lb", label: "Coil mass (lb)", kind: "number" },
     { key: "coil_specific_heat", label: "Coil specific heat (BTU/lb-F)", kind: "number" },
     { key: "coil_temp_rise_f", label: "Coil temperature rise during defrost (F)", kind: "number" },

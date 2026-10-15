@@ -189,6 +189,8 @@ const COOLING_BASE_MIN = {
 // temperature from time.)
 export function computeCoolingCurve({ start_F = 135, ambient_F = 70, container = "full_pan_4in", product_type = "thick_liquid" }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // The page passes a blank box as null; 0 F is a real reading, so a blank cannot stand in for it.
+  if ([start_F, ambient_F].some((x) => x === null || x === "")) return { error: "Enter the starting and ambient temperatures (F)." };
   // The ambient adjustment stops growing at 100 F, so a hotter room used to pass anyway.
   if (Number(ambient_F) > 100) return { error: "Cooling in a space above 100 F is outside this model and is not creditable; move the product to refrigeration, an ice bath or a blast chiller." };
   const tbl = COOLING_BASE_MIN[container];
@@ -315,7 +317,9 @@ function _r(spec) {
       for (const f of spec.fields) {
         if (f.kind === "select") params[f.key] = fields[f.key].select.value;
         else if (f.kind === "text") params[f.key] = fields[f.key].input.value;
-        else params[f.key] = Number(fields[f.key].input.value) || 0;
+        // A field marked `required` passes null when blank, so the compute can
+        // tell a cleared temperature from a typed 0.
+        else params[f.key] = f.required && fields[f.key].input.value === "" ? null : Number(fields[f.key].input.value) || 0;
       }
       const r = spec.compute(params);
       if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }
@@ -413,8 +417,8 @@ const renderCoolingCurve = _r({
   citation: "Notice: This is a planning aid. The thermometer on the food governs. Citation: per FDA Food Code 2022 §3-501.14(A) (135 F to 70 F within 2 hr, and 135 F to 41 F within a total of 6 hr). Local health code adopts and may modify. Free at fda.gov/food/retail-food-protection/fda-food-code.",
   example: coolingCurveExample.inputs,
   fields: [
-    { key: "start_F",      label: "Starting temp (F; confirms food is hot; cooling time shown is the FDA 135-to-70-to-41 window, not measured from this temp)", kind: "number", default: 165 },
-    { key: "ambient_F",    label: "Ambient temp (°F)", kind: "number", default: 70 },
+    { key: "start_F",      label: "Starting temp (F; confirms food is hot; cooling time shown is the FDA 135-to-70-to-41 window, not measured from this temp)", kind: "number", default: 165, required: true },
+    { key: "ambient_F",    label: "Ambient temp (°F)", kind: "number", default: 70, required: true },
     { key: "container",    label: "Container", kind: "select", options: Object.keys(COOLING_BASE_MIN).map((k) => ({ value: k, label: k.replace(/_/g, " ") })) },
     { key: "product_type", label: "Product type", kind: "select", options: [{ value: "thin_liquid", label: "Thin liquid" }, { value: "thick_liquid", label: "Thick liquid" }, { value: "dense_solid", label: "Dense solid" }] },
   ],
@@ -1273,6 +1277,8 @@ KITCHEN_RENDERERS["draft-beer-line-balance"] = renderDraftBeerLineBalance;
 // dims: in { desired_dough_temp_f: T, flour_temp_f: T, room_temp_f: T, friction_factor_f: T, preferment_temp_f: T } out: { water_temp_f: T, factor_count: dimensionless }
 export function computeDoughWaterTemperature({ desired_dough_temp_f = 75, flour_temp_f = 68, room_temp_f = 72, friction_factor_f = 24, preferment_temp_f = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // The page passes a blank box as null; 0 F is a real reading, so a blank cannot stand in for it.
+  if ([flour_temp_f, room_temp_f].some((x) => x === null || x === "")) return { error: "Enter the flour and room temperatures (F)." };
   if (!(desired_dough_temp_f > 0)) return { error: "Desired dough temperature must be positive (F)." };
   if (!(friction_factor_f >= 0)) return { error: "Friction factor cannot be negative (F)." };
   const usePreferment = preferment_temp_f > 0;
@@ -1297,8 +1303,8 @@ KITCHEN_RENDERERS["dough-water-temperature"] = _r({
   example: doughWaterTemperatureExample.inputs,
   fields: [
     { key: "desired_dough_temp_f", label: "Desired dough temp DDT (°F)", kind: "number" },
-    { key: "flour_temp_f", label: "Flour temp (°F)", kind: "number" },
-    { key: "room_temp_f", label: "Room temp (°F)", kind: "number" },
+    { key: "flour_temp_f", label: "Flour temp (°F)", kind: "number", required: true },
+    { key: "room_temp_f", label: "Room temp (°F)", kind: "number", required: true },
     { key: "friction_factor_f", label: "Friction factor (F, ~24-30 spiral, 0-5 hand)", kind: "number", default: 24 },
     { key: "preferment_temp_f", label: "Preferment temp (F, 0 if none)", kind: "number" },
   ],
@@ -1433,6 +1439,8 @@ KITCHEN_RENDERERS["ice-machine-sizing"] = _r({
 // dims: in { rinse_gpm: L^3 T^-1, supply_temp_f: T, rinse_temp_f: T, racks_per_hour: dimensionless, gal_per_rack: L^3, booster_efficiency: dimensionless } out: { delta_t_f: T, booster_btuh: M L^2 T^-3, booster_kw: M L^2 T^-3, gas_input_btuh: M L^2 T^-3, hourly_hot_water_gal: L^3 }
 export function computeWarewasherHotWater({ rinse_gpm = 0, supply_temp_f = 140, rinse_temp_f = 180, racks_per_hour = 0, gal_per_rack = 0, booster_efficiency = 0.8 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // The page passes a blank box as null; 0 F is a real reading, so a blank cannot stand in for it.
+  if ([supply_temp_f].some((x) => x === null || x === "")) return { error: "Enter the supply water temperature (F)." };
   // Unit / range guard added 2026-09-26 after printed-example probing.
   if (Number(arguments[0]?.rinse_gpm) > 20) return { error: "Enter the rinse flow in gallons per minute (a door machine is about 1 to 3), not gallons per hour." };
   if (!(rinse_gpm > 0)) return { error: "Final-rinse flow must be positive." };
@@ -1464,7 +1472,7 @@ KITCHEN_RENDERERS["warewasher-hot-water"] = _r({
   example: warewasherHotWaterExample.inputs,
   fields: [
     { key: "rinse_gpm", label: "Final-rinse flow (gpm)", kind: "number" },
-    { key: "supply_temp_f", label: "Supply water temperature (F)", kind: "number" },
+    { key: "supply_temp_f", label: "Supply water temperature (F)", kind: "number", required: true },
     { key: "rinse_temp_f", label: "Final-rinse temperature (F)", kind: "number" },
     { key: "racks_per_hour", label: "Racks per hour", kind: "number" },
     { key: "gal_per_rack", label: "Gallons per rack", kind: "number" },
@@ -1491,6 +1499,8 @@ export const PLANK_SHAPE_CONSTANTS = {
 // dims: in { a_ft: L, shape: dimensionless, density_pcf: M L^-3, latent_heat_btu_lb: L^2 T^-2, freezing_point_f: T, medium_temp_f: T, h_coeff: M T^-3, k_frozen: M L T^-3 } out: { freezing_time_hr: T, surface_term: dimensionless, internal_term: dimensionless, driving_term: dimensionless }
 export function computeFreezingTimePlank({ a_ft = 0, shape = "slab", density_pcf = 0, latent_heat_btu_lb = 0, freezing_point_f = 28, medium_temp_f = -10, h_coeff = 0, k_frozen = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // The page passes a blank box as null; 0 F is a real reading, so a blank cannot stand in for it.
+  if ([medium_temp_f].some((x) => x === null || x === "")) return { error: "Enter the freezing-medium temperature (F)." };
   const s = PLANK_SHAPE_CONSTANTS[shape];
   if (!s) return { error: "Shape must be slab, cylinder, or sphere." };
   if (!(a_ft > 0)) return { error: "Characteristic dimension must be positive." };
@@ -1527,7 +1537,7 @@ KITCHEN_RENDERERS["freezing-time-plank"] = _r({
     { key: "density_pcf", label: "Product density (lb/ft3)", kind: "number" },
     { key: "latent_heat_btu_lb", label: "Latent heat of the product (BTU/lb)", kind: "number" },
     { key: "freezing_point_f", label: "Initial freezing point (F)", kind: "number", default: 28 },
-    { key: "medium_temp_f", label: "Freezing-medium temperature (F)", kind: "number", default: -10 },
+    { key: "medium_temp_f", label: "Freezing-medium temperature (F)", kind: "number", required: true, default: -10 },
     { key: "h_coeff", label: "Surface coefficient h (BTU/hr-ft2-F)", kind: "number" },
     { key: "k_frozen", label: "Frozen conductivity k (BTU/hr-ft-F)", kind: "number" },
   ],
@@ -2005,6 +2015,8 @@ function _formatClock(minutes) {
 // dims: in { mark_time: dimensionless, window_option: dimensionless, start_temp_f: T, ambient_f: T, tau_hr: T } out: { window_hr: T, projected_temp_f: T, time_to_70_hr: T }
 export function computeTphcWindow({ mark_time = "10:30", window_option = "cold_6", start_temp_f = 41, ambient_f = 75, tau_hr = 4 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // The page passes a blank box as null; 0 F is a real reading, so a blank cannot stand in for it.
+  if ([start_temp_f, ambient_f].some((x) => x === null || x === "")) return { error: "Enter the starting product and ambient temperatures (F)." };
   const w = TPHC_WINDOWS[window_option];
   if (!w) return { error: "Window option must be the cold 4-hour, cold 6-hour, or hot 4-hour choice." };
   const marked = _parseClock(mark_time);
@@ -2046,8 +2058,8 @@ KITCHEN_RENDERERS["tphc-window"] = _r({
   fields: [
     { key: "mark_time", label: "Mark time (clock time, e.g. 10:30 am)", kind: "text" },
     { key: "window_option", label: "Window option", kind: "select", options: Object.keys(TPHC_WINDOWS).map((k) => ({ value: k, label: TPHC_WINDOWS[k].label })) },
-    { key: "start_temp_f", label: "Starting product temperature (F)", kind: "number" },
-    { key: "ambient_f", label: "Ambient temperature (F)", kind: "number", default: 75 },
+    { key: "start_temp_f", label: "Starting product temperature (F)", kind: "number", required: true },
+    { key: "ambient_f", label: "Ambient temperature (F)", kind: "number", required: true, default: 75 },
     { key: "tau_hr", label: "Product time constant tau (hr)", kind: "number" },
   ],
   outputs: [

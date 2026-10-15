@@ -2618,7 +2618,7 @@ cross-check.
 | calc-hvacsystems.js | `computeBufferTankLoopCredit` | `{ min_on_time_min = 0, source_min_btu = 0, zone_min_load_btu = 0, delta_t_f =...` | _ | _ | _ |
 | calc-hvacsystems.js | `computeChillerStagingPoint` | `{ machine_tons = 0, plant_load_tons = 0, kw_per_ton_100 = 0, kw_per_ton_75 = ...` | _ | _ | _ |
 | calc-hvacsystems.js | `computeChillerTons` | `{ gpm = 0, ewt_F = 54, lwt_F = 44, fluid = "water", nameplate_tons = null, } ...` | _ | _ | _ |
-| calc-hvacsystems.js | `computeCoilCapacityVerification` | `{ airflow_cfm = 0, entering_air_db_f = 0, leaving_air_db_f = 0, enthalpy_drop...` | _ | _ | _ |
+| calc-hvacsystems.js | `computeCoilCapacityVerification` | `{ airflow_cfm = 0, entering_air_db_f = null, leaving_air_db_f = null, enthalp...` | _ | _ | _ |
 | calc-hvacsystems.js | `computeCoilFaceArea` | `{ cfm = 0, target_fpm = 500 } = {}` | _ | _ | _ |
 | calc-hvacsystems.js | `computeCoilFaceVelocity` | `{ cfm = 0, face_width_in = 0, face_height_in = 0, threshold_fpm = 500 } = {}` | _ | _ | _ |
 | calc-hvacsystems.js | `computeCompressorShortCycle` | `{ system_type = "single", load_fraction_pct = 50, observed_cph = null, } = {}` | _ | _ | _ |
@@ -2639,7 +2639,7 @@ cross-check.
 | calc-hvacsystems.js | `computePlenumReturnDrop` | `{ return_cfm = 0, pinch_width_ft = 0, pinch_clear_in = 0, target_velocity_fpm...` | _ | _ | _ |
 | calc-hvacsystems.js | `computeProportionalBalanceRatio` | `{ design_1_cfm = 0, measured_1_cfm = 0, design_2_cfm = 0, measured_2_cfm = 0,...` | _ | _ | _ |
 | calc-hvacsystems.js | `computePumpImpellerTrim` | `{ current_diameter_in = 0, current_flow_gpm = 0, required_flow_gpm = 0, curre...` | _ | _ | _ |
-| calc-hvacsystems.js | `computeRefractoryShellTemperature` | `{ hot_face_f = 0, ambient_f = 0, film_coeff_btu_hr_ft2_f = 2.0, layer1_thickn...` | _ | _ | _ |
+| calc-hvacsystems.js | `computeRefractoryShellTemperature` | `{ hot_face_f = null, ambient_f = null, film_coeff_btu_hr_ft2_f = 2.0, layer1_...` | _ | _ | _ |
 | calc-hvacsystems.js | `computeValveActuatorCloseOff` | `{ seat_area_in2 = 0, design_differential_psi = 0, minimum_flow_differential_p...` | _ | _ | _ |
 | calc-hvacsystems.js | `computeValveAuthority` | `{ valve_pressure_drop_psi = 5, controlled_circuit_drop_psi = 3 } = {}` | _ | _ | _ |
 | calc-hvacsystems.js | `computeVariablePrimaryBypass` | `{ machine_design_gpm = 0, minimum_flow_fraction = 0.45, machines_running = 1,...` | _ | _ | _ |
@@ -3290,11 +3290,11 @@ cross-check.
 | calc-refrigerant.js | `computeCondenserCopForHeatRejection` | `{ q_evap = 0, target_thr = 0, unit_tons = 0 } = {}` | _ | _ | _ |
 | calc-refrigerant.js | `computeCondenserHeatRejection` | `{ q_evap = 0, unit_tons = 0, cop = 0 } = {}` | _ | _ | _ |
 | calc-refrigerant.js | `computeDefrostCycleSizing` | `{ frost_lb = 0, coil_temp_f = -10, coil_mass_lb = 0, coil_specific_heat = 0.1...` | _ | _ | _ |
-| calc-refrigerant.js | `computeEvaporatorTdDtd` | `{ box_temp_f = 0, sst_f = 0, design_load_btuh = 0, coil_ua_btuh_f = 0, rating...` | _ | _ | _ |
+| calc-refrigerant.js | `computeEvaporatorTdDtd` | `{ box_temp_f = null, sst_f = null, design_load_btuh = 0, coil_ua_btuh_f = 0, ...` | _ | _ | _ |
 | calc-refrigerant.js | `computeFlashGasSubcool` | `{ vertical_lift_ft = 0, friction_dp_psi = 0, static_gradient = 0.43, pt_slope...` | _ | _ | _ |
 | calc-refrigerant.js | `computeHeadPressureControl` | `{ refrigerant = "R_410A", evaporator_psig = 0, valve_dp_psi = 0, line_losses_...` | _ | _ | _ |
-| calc-refrigerant.js | `computeProductPullDownLoad` | `{ mass_lb = 0, cp_above = 0, t_enter_f = 0, t_storage_f = 0, t_freeze_f = 0, ...` | _ | _ | _ |
-| calc-refrigerant.js | `computeProductPullDownTime` | `{ mass_lb = 0, cp_above = 0, t_enter_f = 0, t_storage_f = 0, t_freeze_f = 0, ...` | _ | _ | _ |
+| calc-refrigerant.js | `computeProductPullDownLoad` | `{ mass_lb = 0, cp_above = 0, t_enter_f = null, t_storage_f = null, t_freeze_f...` | _ | _ | _ |
+| calc-refrigerant.js | `computeProductPullDownTime` | `{ mass_lb = 0, cp_above = 0, t_enter_f = null, t_storage_f = null, t_freeze_f...` | _ | _ | _ |
 | calc-refrigerant.js | `computeRefrigerantCharge` | `{ refrigerant, sections = [] }` | _ | _ | _ |
 | calc-refrigerant.js | `computeRefrigerantCharging` | `{ refrigerant = "R_410A", suction_pressure = 0, suction_unit = "psig", suctio...` | _ | _ | _ |
 | calc-refrigerant.js | `computeRefrigerantLeakRate` | `{ full_charge_lb = 0, pounds_added_lb = 0, period_months = 12, threshold_pct ...` | _ | _ | _ |
@@ -3302,7 +3302,7 @@ cross-check.
 | calc-refrigerant.js | `computeRefrigerantMassFlow` | `{ q = 0, unit_tons = 0, h1_btulb = 0, h4_btulb = 0 } = {}` | _ | _ | _ |
 | calc-refrigerant.js | `computeRefrigerantPT` | `{ refrigerant, pressure_psig = null, temperature_F = null, outdoor_F = null, ...` | _ | _ | _ |
 | calc-refrigerant.js | `computeRefrigerantRecoveryTime` | `{ total_charge_lb = 0, liquid_charge_lb = 0, liquid_rate_lb_min = 0, vapor_ra...` | _ | _ | _ |
-| calc-refrigerant.js | `computeRefrigerationCop` | `{ h1_btulb = 0, h2_btulb = 0, h4_btulb = 0, tevap_f = 0, tcond_f = 0 } = {}` | _ | _ | _ |
+| calc-refrigerant.js | `computeRefrigerationCop` | `{ h1_btulb = 0, h2_btulb = 0, h4_btulb = 0, tevap_f = null, tcond_f = null } ...` | _ | _ | _ |
 | calc-refrigerant.js | `computeSuperheatSubcool` | `{ refrigerant, system_pressure_psig, line_temperature_F, mode, indoor_wet_bul...` | _ | _ | _ |
 | calc-refrigerant.js | `computeTxvCapacityCheck` | `{ nominal_tons = 0, rated_dp_psi = 100, actual_dp_psi = 0, liquid_temp_factor...` | _ | _ | _ |
 | calc-refrigerant.js | `computeWalkInCoolerLoad` | `{ u_factor = 0, area_ft2 = 0, delta_t_f = 0, infiltration_btuh = 0, product_b...` | _ | _ | _ |

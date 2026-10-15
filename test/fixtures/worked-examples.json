@@ -85016,6 +85016,7 @@
     "mass_lb": 2000,
     "cp_above": 0.9,
     "t_enter_f": 80,
+    "t_storage_f": 0,
     "t_freeze_f": 28,
     "hif_btu_lb": 120,
     "cp_below": 0.45,

@@ -1478,6 +1478,9 @@ HVACSYSTEMS_RENDERERS["buffer-tank-loop-credit"] = _v623renderBufferTankLoopCred
 // dims: in { supply_design_f: T, supply_min_f: T, oa_design_f: T, oa_noheat_f: T, oa_current_f: T } out: { reset_ratio: dimensionless, supply_target_f: T, clamped: dimensionless }
 export function computeOutdoorResetRatio({ supply_design_f = 180, supply_min_f = 80, oa_design_f = 0, oa_noheat_f = 65, oa_current_f = 30 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // The page passes a blank box as null. A blank design outdoor temperature ran as 0 F and a blank
+  // current one as 30 F, an example value; neither is a standard to assume.
+  if ([oa_design_f, oa_current_f].some((x) => x === null || x === "")) return { error: "Enter the design and current outdoor temperatures (F)." };
   if (!(supply_design_f > supply_min_f)) return { error: "Design supply temperature must be above the minimum supply." };
   if (!(oa_noheat_f > oa_design_f)) return { error: "No-heat outdoor temperature must be above the design outdoor temperature." };
   // Reset ratio = supply rise per degree of outdoor drop, over the design span.
@@ -1511,8 +1514,8 @@ function _v915renderOutdoorResetRatio(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const r = computeOutdoorResetRatio({
       supply_design_f: sd.input.value === "" ? 180 : Number(sd.input.value), supply_min_f: sm.input.value === "" ? 80 : Number(sm.input.value),
-      oa_design_f: od.input.value === "" ? 0 : Number(od.input.value), oa_noheat_f: on.input.value === "" ? 65 : Number(on.input.value),
-      oa_current_f: oc.input.value === "" ? 30 : Number(oc.input.value),
+      oa_design_f: od.input.value === "" ? null : Number(od.input.value), oa_noheat_f: on.input.value === "" ? 65 : Number(on.input.value),
+      oa_current_f: oc.input.value === "" ? null : Number(oc.input.value),
     });
     if (r.error) { oRatio.textContent = r.error; oTarget.textContent = "-"; return; }
     oRatio.textContent = fmt(r.reset_ratio, 2) + " F supply per F outdoor";
@@ -2011,11 +2014,13 @@ HVACSYSTEMS_RENDERERS["pump-impeller-trim"] = _simpleRenderer({
 // with the arithmetic.
 // dims: in { airflow_cfm: L^3 T^-1, entering_air_db_f: T, leaving_air_db_f: T, enthalpy_drop_btu_lb: L^2 T^-2, water_gpm: L^3 T^-1, entering_water_f: T, leaving_water_f: T, fluid_factor: dimensionless, design_capacity_btuh: M L^2 T^-3, tolerance_pct: dimensionless } out: { air_sensible_btuh: M L^2 T^-3, air_total_btuh: M L^2 T^-3, water_btuh: M L^2 T^-3, balance_difference_pct: dimensionless, sensible_only_difference_pct: dimensionless }
 export function computeCoilCapacityVerification({
-  airflow_cfm = 0, entering_air_db_f = 0, leaving_air_db_f = 0, enthalpy_drop_btu_lb = 0,
-  water_gpm = 0, entering_water_f = 0, leaving_water_f = 0, fluid_factor = 500,
+  airflow_cfm = 0, entering_air_db_f = null, leaving_air_db_f = null, enthalpy_drop_btu_lb = 0,
+  water_gpm = 0, entering_water_f = null, leaving_water_f = null, fluid_factor = 500,
   design_capacity_btuh = 0, tolerance_pct = 10,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // 0 F is a real reading, so a blank temperature cannot stand in for it.
+  if ([entering_air_db_f, leaving_air_db_f, entering_water_f, leaving_water_f].some((x) => x === null || x === undefined || x === "")) return { error: "Enter the entering and leaving air and water temperatures (F)." };
   if (!(airflow_cfm > 0)) return { error: "Airflow must be positive (cfm)." };
   if (!(water_gpm > 0)) return { error: "Water flow must be positive (gpm)." };
   if (!(fluid_factor > 0)) return { error: "The fluid factor must be positive (500 for water)." };
@@ -2069,12 +2074,12 @@ HVACSYSTEMS_RENDERERS["coil-capacity-verification"] = _simpleRenderer({
   example: coilCapacityVerificationExample.inputs,
   fields: [
     { key: "airflow_cfm", label: "Airflow (cfm)", kind: "number" },
-    { key: "entering_air_db_f", label: "Entering air dry bulb (°F)", kind: "number", attrs: { step: "any" } },
-    { key: "leaving_air_db_f", label: "Leaving air dry bulb (°F)", kind: "number", attrs: { step: "any" } },
+    { key: "entering_air_db_f", required: true, label: "Entering air dry bulb (°F)", kind: "number", attrs: { step: "any" } },
+    { key: "leaving_air_db_f", required: true, label: "Leaving air dry bulb (°F)", kind: "number", attrs: { step: "any" } },
     { key: "enthalpy_drop_btu_lb", label: "Enthalpy change across the coil (BTU/lb, 0 for sensible only)", kind: "number" },
     { key: "water_gpm", label: "Water flow (gpm)", kind: "number" },
-    { key: "entering_water_f", label: "Entering water (°F)", kind: "number", attrs: { step: "any" } },
-    { key: "leaving_water_f", label: "Leaving water (°F)", kind: "number", attrs: { step: "any" } },
+    { key: "entering_water_f", required: true, label: "Entering water (°F)", kind: "number", attrs: { step: "any" } },
+    { key: "leaving_water_f", required: true, label: "Leaving water (°F)", kind: "number", attrs: { step: "any" } },
     { key: "fluid_factor", label: "Fluid factor (500 water, lower for glycol)", kind: "number", default: 500 },
     { key: "design_capacity_btuh", label: "Coil design capacity (BTU/h, 0 to skip)", kind: "number" },
     { key: "tolerance_pct", label: "Heat balance tolerance (%)", kind: "number", default: 10 },
@@ -2557,7 +2562,7 @@ const _refractoryShellFilm = (tsF, taF, heightFt, eps) => {
 };
 // dims: in { hot_face_f: T, ambient_f: T, film_coeff_btu_hr_ft2_f: M T^-3, layer1_thickness_in: L, layer1_k: M L T^-3, layer1_limit_f: T, layer2_thickness_in: L, layer2_k: M L T^-3, layer2_limit_f: T, layer3_thickness_in: L, layer3_k: M L T^-3, layer3_limit_f: T, shell_limit_f: T, acid_dew_point_f: T, film_mode: dimensionless, shell_emissivity: dimensionless, wall_height_ft: L } out: { film_used_btu_hr_ft2_f: M T^-3, total_resistance: dimensionless, flux_btu_hr_ft2: M T^-3, interface1_f: T, interface2_f: T, interface3_f: T, shell_temp_f: T }
 export function computeRefractoryShellTemperature({
-  hot_face_f = 0, ambient_f = 0, film_coeff_btu_hr_ft2_f = 2.0,
+  hot_face_f = null, ambient_f = null, film_coeff_btu_hr_ft2_f = 2.0,
   layer1_thickness_in = 0, layer1_k = 0, layer1_limit_f = 0,
   layer2_thickness_in = 0, layer2_k = 0, layer2_limit_f = 0,
   layer3_thickness_in = 0, layer3_k = 0, layer3_limit_f = 0,
@@ -2565,6 +2570,8 @@ export function computeRefractoryShellTemperature({
   film_mode = "entered", shell_emissivity = 0.8, wall_height_ft = 10,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // 0 F is a real reading, so a blank temperature cannot stand in for it.
+  if ([hot_face_f, ambient_f].some((x) => x === null || x === undefined || x === "")) return { error: "Enter the hot-face and ambient temperatures (F)." };
   if ([layer1_thickness_in, layer2_thickness_in, layer3_thickness_in].some((x) => Number(x) < 0)) return { error: "Layer thicknesses cannot be negative." };
   if (!(hot_face_f > ambient_f)) return { error: "The hot face must be above ambient." };
   if (film_mode !== "entered" && film_mode !== "computed") return { error: "The film coefficient must be entered or computed." };
@@ -2668,8 +2675,8 @@ HVACSYSTEMS_RENDERERS["refractory-shell-temperature"] = _simpleRenderer({
   example: refractoryShellTemperatureExample.inputs,
   citation: "Citation: one-dimensional steady-state plane-wall conduction -- each layer contributes thickness / conductivity and the outer film one / coefficient, the flux is the total drop over the total resistance, and each interface is the hot face less the flux times the resistance ahead of it. Conductivities are ENTERED because refractory k varies strongly with temperature and product; the manufacturer's k-versus-mean-temperature curve governs and a single value across a 2,000 degF drop is the largest approximation here. It does not address dry-out schedules, expansion joints, anchors and their thermal bridges, corners and penetrations, gas-side radiation, slag attack, or spalling. The refractory and insulation manufacturers' data and the furnace or boiler designer govern.",
   fields: [
-    { key: "hot_face_f", label: "Hot face temperature (°F)" },
-    { key: "ambient_f", label: "Ambient temperature (°F)", attrs: { step: "any" } },
+    { key: "hot_face_f", required: true, label: "Hot face temperature (°F)" },
+    { key: "ambient_f", required: true, label: "Ambient temperature (°F)", attrs: { step: "any" } },
     { key: "film_mode", label: "Outer film coefficient", kind: "select", default: "entered", options: [{ value: "entered", label: "Entered below" }, { value: "computed", label: "Computed: still-air convection on a vertical wall + radiation" }] },
     { key: "film_coeff_btu_hr_ft2_f", label: "Outer film coefficient (BTU/hr/sq ft/°F, when entered)" },
     { key: "shell_emissivity", label: "Shell emissivity (computed film; 0.8 oxidized or painted steel)", default: 0.8, attrs: { step: "any", min: "0", max: "1" } },
@@ -2827,6 +2834,8 @@ const _flatPlateNusselt = (Ra, Pr, orientation) => {
 // dims: in { orientation: dimensionless, side_a_ft: L, side_b_ft: L, surface_f: T, amb_f: T, emissivity: dimensionless } out: { conv_coefficient: M T^-3, rad_coefficient: M T^-3, flux_btu_hr_ft2: M T^-3, q_total_btuh: M L^2 T^-3, area_ft2: L^2, characteristic_length_ft: L, rayleigh: dimensionless, conv_share: dimensionless }
 export function computeFlatSurfaceHeatLoss({ orientation = "vertical", side_a_ft = 0, side_b_ft = 0, surface_f = null, amb_f = 70, emissivity = 0.9 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // The page passes a blank box as null; 0 F is a real reading, so a blank cannot stand in for it.
+  if ([amb_f].some((x) => x === null || x === "")) return { error: "Enter the air temperature (F)." };
   if (surface_f === null || surface_f === undefined || surface_f === "") return { error: "Enter the surface temperature (F)." };
   if (amb_f === null || amb_f === "") return { error: "Enter the surrounding air temperature (F)." };
   if (!["vertical", "up", "down"].includes(orientation)) return { error: "Orientation must be vertical, horizontal facing up, or horizontal facing down." };
@@ -2876,7 +2885,7 @@ HVACSYSTEMS_RENDERERS["flat-surface-heat-loss"] = _simpleRenderer({
     { key: "side_a_ft", label: "Height of a vertical surface, or one side of a horizontal one (ft)" },
     { key: "side_b_ft", label: "Width, or the other side (ft)" },
     { key: "surface_f", label: "Surface temperature (°F)", required: true, attrs: { step: "any" } },
-    { key: "amb_f", label: "Air temperature (°F)", default: 70, attrs: { step: "any" } },
+    { key: "amb_f", required: true, label: "Air temperature (°F)", default: 70, attrs: { step: "any" } },
     { key: "emissivity", label: "Surface emissivity (0.9 painted, 0.1 bright aluminum)", default: 0.9, attrs: { step: "any", min: "0", max: "1" } },
   ],
   outputs: [
