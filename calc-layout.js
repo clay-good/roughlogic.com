@@ -739,7 +739,10 @@ export function computeCircleFrom3Points({ x1 = 0, y1 = 0, x2 = 0, y2 = 0, x3 = 
   const bx = Number(x2) || 0, by = Number(y2) || 0;
   const cx = Number(x3) || 0, cy = Number(y3) || 0;
   const d = 2 * (ax * (by - cy) + bx * (cy - ay) + cx * (ay - by));
-  if (Math.abs(d) < 1e-9) return { error: "The three points are collinear (or coincident) - no unique circle passes through them." };
+  // Until 2026-10-14 the collinear test was an absolute |d| < 1e-9, so three points
+  // 0.00001 apart (a real right triangle) were refused. Now relative to the spacing.
+  const t1 = (bx - ax) * (cy - ay), t2 = (cx - ax) * (by - ay);
+  if (Math.abs(t1 - t2) <= 1e-12 * (Math.abs(t1) + Math.abs(t2))) return { error: "The three points are collinear (or coincident) - no unique circle passes through them." };
   const a2 = ax * ax + ay * ay, b2 = bx * bx + by * by, c2 = cx * cx + cy * cy;
   const center_x = (a2 * (by - cy) + b2 * (cy - ay) + c2 * (ay - by)) / d;
   const center_y = (a2 * (cx - bx) + b2 * (ax - cx) + c2 * (bx - ax)) / d;

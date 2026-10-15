@@ -92,10 +92,13 @@ export function computeColdSpring({ material = "steel", run_length_ft = 0, insta
   const residual_movement_in = thermal_growth_in - cold_spring_gap_in;
   const growth_per_100ft_in = alpha * 1200 * dT;
   const notes = [];
+  // Until 2026-10-14 cold service (operating below install) was also told to cut the run short.
+  const cold_service = Number(operating_temp_f) < Number(install_temp_f);
   if (dT === 0) notes.push("Install and operating temperatures are equal: no thermal growth, so no cold spring is needed.");
-  notes.push("Cut the run short by the cold-spring gap and spring it into place at the install temperature.");
+  else if (cold_service) notes.push("Cold service: the run SHRINKS in operation, so fabricate it LONG by the cold-spring gap and push it into place at the install temperature.");
+  else notes.push("Cut the run short by the cold-spring gap and spring it into place at the install temperature.");
   notes.push("Cold spring reduces the hot (operating) anchor and equipment-nozzle reactions but does NOT reduce the cyclic stress range, which ASME B31.1 §119.10 computes on the full expansion. B31.1 credits two-thirds of the cold spring in the reaction calculation. The piping engineer governs the flexibility analysis.");
-  return { material, alpha_per_f: alpha, delta_t_f: dT, run_length_ft: L, thermal_growth_in, cold_spring_percent: csp, cold_spring_gap_in, residual_movement_in, growth_per_100ft_in, notes };
+  return { material, alpha_per_f: alpha, delta_t_f: dT, cold_service, run_length_ft: L, thermal_growth_in, cold_spring_percent: csp, cold_spring_gap_in, residual_movement_in, growth_per_100ft_in, notes };
 }
 export const coldSpringExample = { inputs: { material: "steel", run_length_ft: 100, install_temp_f: 50, operating_temp_f: 250, cold_spring_percent: 50 } };
 
@@ -122,7 +125,7 @@ function _renderColdSpring(inputRegion, outputRegion, citationEl) {
     const r = computeColdSpring({ material: mat.select.value, run_length_ft: Number(len.input.value) || 0, install_temp_f: ti.input.value === "" ? null : Number(ti.input.value), operating_temp_f: to.input.value === "" ? null : Number(to.input.value), cold_spring_percent: Number(csp.input.value) || 0 });
     if (r.error) { oGrow.textContent = r.error; oGap.textContent = "-"; oRes.textContent = "-"; oNote.textContent = ""; return; }
     oGrow.textContent = fmt(r.thermal_growth_in, 3) + " in (dT " + fmt(r.delta_t_f, 0) + " F)";
-    oGap.textContent = fmt(r.cold_spring_gap_in, 3) + " in at " + fmt(r.cold_spring_percent, 0) + "%";
+    oGap.textContent = fmt(r.cold_spring_gap_in, 3) + " in at " + fmt(r.cold_spring_percent, 0) + "%" + (r.cold_service ? " (cold service: fabricate LONG by this)" : "");
     oRes.textContent = fmt(r.residual_movement_in, 3) + " in residual; " + fmt(r.growth_per_100ft_in, 3) + " in per 100 ft";
     oNote.textContent = r.notes.join(" ");
   }, DEBOUNCE_MS);
@@ -991,6 +994,10 @@ export function computeBranchReinforcement({ run_od_in = 0, run_wall_in = 0, run
   // the nominal walls were used with no c, so the tile's own example read
   // "adequate, no pad" where the code requires one.
   const Thm = Th * (1 - mt), Tbm = Tb * (1 - mt);
+  // Until 2026-10-14 a required wall thicker than the pipe's minimum wall was accepted
+  // (the excess clamped to 0), so a pipe failing its own pressure design got a pad answer.
+  if (trh > (Thm - c) * (1 + 1e-9)) return { error: "The run's required wall (" + fmt(trh, 3) + " in) exceeds its minimum wall less corrosion (" + fmt(Thm - c, 3) + " in): the run pipe itself fails the pressure design; pick a heavier wall." };
+  if (trb > (Tbm - c) * (1 + 1e-9)) return { error: "The branch's required wall (" + fmt(trb, 3) + " in) exceeds its minimum wall less corrosion (" + fmt(Tbm - c, 3) + " in): the branch pipe itself fails the pressure design; pick a heavier wall." };
   const sinB = Math.sin((beta * Math.PI) / 180);
   const d1 = (bod - 2 * (Tbm - c)) / sinB;               // effective opening in the run
   if (!(d1 > 0)) return { error: "Branch bore must be positive (check the branch OD and wall)." };

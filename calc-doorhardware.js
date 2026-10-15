@@ -65,7 +65,8 @@ function _simpleRenderer(spec) {
     }
     const update = debounce(() => {
       const params = {};
-      for (const f of spec.fields) params[f.key] = Number(fields[f.key].input.value) || 0;
+      // A required field sends a blank box as null so the compute can ask for it.
+      for (const f of spec.fields) params[f.key] = f.required && fields[f.key].input.value === "" ? null : Number(fields[f.key].input.value) || 0;
       const r = spec.compute(params);
       if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }
       for (const o of spec.outputs) outs[o.key].textContent = o.value(r);
@@ -611,6 +612,10 @@ DOORHARDWARE_RENDERERS["door-undercut-transfer-air"] = _simpleRenderer({
 // dims: in { head_in: L, hinge_jamb_in: L, strike_jamb_in: L, meeting_edge_in: L, bottom_in: L, perimeter_limit_in: L, meeting_limit_in: L, bottom_limit_in: L } out: { head_margin_in: L, hinge_margin_in: L, strike_margin_in: L, meeting_margin_in: L, bottom_margin_in: L }
 export function computeFireDoorClearance({ head_in = 0, hinge_jamb_in = 0, strike_jamb_in = 0, meeting_edge_in = 0, bottom_in = 0, perimeter_limit_in = 0.125, meeting_limit_in = 0.125, bottom_limit_in = 0.75 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Until 2026-10-14 the page read five blank clearances as 0 in and passed the door.
+  for (const [name, v] of [["head", head_in], ["hinge jamb", hinge_jamb_in], ["strike jamb", strike_jamb_in], ["meeting edge", meeting_edge_in], ["bottom", bottom_in]]) {
+    if (v === null || v === "") return { error: "Enter the measured " + name + " clearance (in)." };
+  }
   for (const [name, v] of [["head", head_in], ["hinge jamb", hinge_jamb_in], ["strike jamb", strike_jamb_in], ["meeting edge", meeting_edge_in], ["bottom", bottom_in]]) {
     if (!(v >= 0)) return { error: "The " + name + " clearance cannot be negative." };
   }
@@ -649,11 +654,11 @@ DOORHARDWARE_RENDERERS["fire-door-clearance"] = _simpleRenderer({
   citation: "Citation: the NFPA 80 fire door clearance limits by name -- ONE limit at the head, the jambs, and between the meeting stiles of a pair (steel doors and 20-minute wood doors 1/8 in plus or minus 1/16 in, so 3/16 in maximum; wood doors rated over 20 minutes 1/8 in maximum), and 3/4 in maximum from the bottom of the door to the floor -- with the assembly's own listing named as governing. Limits are entered because they differ by material, construction, listing, and adopted edition.",
   example: fireDoorExample.inputs,
   fields: [
-    { key: "head_in", label: "Measured clearance at the head (in)", kind: "number" },
-    { key: "hinge_jamb_in", label: "Measured clearance at the hinge jamb (in)", kind: "number" },
-    { key: "strike_jamb_in", label: "Measured clearance at the strike jamb (in)", kind: "number" },
-    { key: "meeting_edge_in", label: "Measured clearance at the meeting edges (in)", kind: "number" },
-    { key: "bottom_in", label: "Measured clearance at the bottom (in)", kind: "number" },
+    { key: "head_in", label: "Measured clearance at the head (in)", kind: "number", required: true },
+    { key: "hinge_jamb_in", label: "Measured clearance at the hinge jamb (in)", kind: "number", required: true },
+    { key: "strike_jamb_in", label: "Measured clearance at the strike jamb (in)", kind: "number", required: true },
+    { key: "meeting_edge_in", label: "Measured clearance at the meeting edges (in)", kind: "number", required: true },
+    { key: "bottom_in", label: "Measured clearance at the bottom (in)", kind: "number", required: true },
     { key: "perimeter_limit_in", label: "Head and jamb limit (in; 3/16 steel, 1/8 wood over 20 min)", kind: "number", default: 0.125 },
     { key: "meeting_limit_in", label: "Meeting edge limit (in; the same limit as head and jambs)", kind: "number", default: 0.125 },
     { key: "bottom_limit_in", label: "Bottom clearance limit (in)", kind: "number", default: 0.75 },
@@ -747,7 +752,8 @@ export function computeRevolvingDoorThroughput({ rpm = 0, wings = 0, people_per_
   if (!(building_population >= 1)) return { error: "Building population must be at least 1." };
   if (!(peak_fraction_pct > 0 && peak_fraction_pct <= 100)) return { error: "Peak fraction must be in (0, 100] percent." };
   if (!(peak_window_min > 0)) return { error: "Peak window must be positive." };
-  if (!(device_count >= 1)) return { error: "Device count must be at least 1." };
+  // Until 2026-10-14 4.6 doors ran and printed "SHORT by 0.40000000000000036".
+  if (!(device_count >= 1) || !Number.isInteger(device_count)) return { error: "Device count must be a whole number of doors or lanes, at least 1." };
   if (!(operating_hours > 0)) return { error: "Operating hours must be positive." };
   const theoretical_per_hour = rpm * wings * people_per_compartment * 60;
   const effective_per_hour = theoretical_per_hour * utilization_pct / 100;

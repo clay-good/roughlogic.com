@@ -531,7 +531,10 @@ export function computeStepChainTension({ total_load_lb = 0, incline_deg = 30, f
   const gravity_share_pct = gravity_lb / tension_lb * 100;
   // Descending loaded: gravity drives and friction resists, so the brake takes
   // the difference rather than the whole gravity component.
-  const descending_brake_lb = gravity_lb - friction_lb;
+  // Until 2026-10-14 a shallow, high-friction walk printed a negative brake
+  // force (-360 lb); when friction exceeds gravity the load does not drive the
+  // machine at all, so the brake absorbs nothing.
+  const descending_brake_lb = Math.max(0, gravity_lb - friction_lb);
   const alt = alternative_incline_deg * Math.PI / 180;
   const alt_gravity_lb = total_load_lb * Math.sin(alt);
   const alt_friction_lb = total_load_lb * Math.cos(alt) * friction_coefficient;
@@ -559,7 +562,7 @@ ELEVATOR_RENDERERS["step-chain-tension"] = _simpleRenderer({
     { key: "f", id: "sct-out-f", label: "Friction component", value: (r) => fmt(r.friction_lb, 0) + " lb" },
     { key: "t", id: "sct-out-t", label: "Total chain tension", value: (r) => fmt(r.tension_lb, 0) + " lb (" + fmt(r.per_chain_lb, 0) + " lb per chain)" },
     { key: "p", id: "sct-out-p", label: "Drive power at the entered speed", value: (r) => fmt(r.power_hp, 1) + " hp" },
-    { key: "d", id: "sct-out-d", label: "Force the brake absorbs running down loaded", value: (r) => fmt(r.descending_brake_lb, 0) + " lb" },
+    { key: "d", id: "sct-out-d", label: "Force the brake absorbs running down loaded", value: (r) => r.descending_brake_lb > 0 ? fmt(r.descending_brake_lb, 0) + " lb" : "none -- friction exceeds the gravity component, so the loaded run does not drive itself down" },
     { key: "a", id: "sct-out-a", label: "At the alternative incline", value: (r) => fmt(r.alt_gravity_lb, 0) + " lb gravity, " + fmt(r.alt_friction_lb, 0) + " lb friction, " + fmt(r.alt_tension_lb, 0) + " lb total" },
     { key: "n", id: "sct-out-n", label: "Note", value: (r) => r.note },
   ],

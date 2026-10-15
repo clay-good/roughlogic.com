@@ -287,7 +287,8 @@ function _v949renderLoopVoltageBudget(inputRegion, outputRegion, citationEl) {
     });
     if (r.error) { oV.textContent = r.error; oVat.textContent = "-"; oMax.textContent = "-"; return; }
     oV.textContent = r.verdict + " (" + (r.margin_v >= 0 ? "+" : "") + fmt(r.margin_v, 2) + " V margin)";
-    oVat.textContent = fmt(r.voltage_at_transmitter_v, 2) + " V (need " + fmt(Number(tv.input.value) || 10.5, 1) + " V)";
+    // Until 2026-10-14 a typed 0 V minimum printed "need 10.5 V" (the || fallback).
+    oVat.textContent = fmt(r.voltage_at_transmitter_v, 2) + " V (need " + fmt(tv.input.value === "" ? 10.5 : Number(tv.input.value), 1) + " V)";
     oMax.textContent = fmt(r.max_loop_resistance_ohms, 0) + " ohm ceiling (" + (r.headroom_ohms >= 0 ? "+" : "") + fmt(r.headroom_ohms, 0) + " ohm headroom)";
   }, DEBOUNCE_MS);
   for (const f of [sv, tv, lr, wr]) f.input.addEventListener("input", update);

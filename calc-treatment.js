@@ -315,6 +315,9 @@ export function computePoolChlorineDose({ ppm = 0, gallons = 0, product = "cal-h
   let av = product === "custom" ? (Number(avail) || 0) : _POOL_CL_PRODUCTS[product];
   if (av === undefined) return { error: "Unknown product." };
   if (!(av > 0 && av <= 100)) return { error: "Available chlorine must be between 0 and 100 percent." };
+  // A custom product is read as liquid at 15% or less and dry at 35% or more. Until 2026-10-14 15.01% silently
+  // switched to dry and cut the pounds from 2.06 to 1.67; no pool chlorine is sold between the two.
+  if (product === "custom" && av > 15 && av < 35) return { error: "No pool chlorine is sold between 15% and 35% available chlorine: liquids run up to 15% (trade), dry products 35% (lithium hypo) to 90% (trichlor). Check the label percentage." };
   const lb_cl = rise * (gal / 1e6) * 8.34;
   const dry_oz = lb_cl / (av / 100) * 16;
   // Liquid chlorine is sold by TRADE percent (g available chlorine per 100 mL):
@@ -715,9 +718,11 @@ export function computeTdsFromConductivity({ conductivity_us_cm = 0, k_factor = 
   if (!(ec > 0 && Number.isFinite(ec))) return { error: "Conductivity must be positive (uS/cm)." };
   if (!(k >= 0.4 && k <= 0.9)) return { error: "TDS/EC factor must be between 0.4 and 0.9." };
   const tds_mgl = k * ec;
+  const k_outside_band = k < 0.55 - 1e-9 || k > 0.75 + 1e-9;
   return {
-    tds_mgl, tds_low: 0.55 * ec, tds_high: 0.75 * ec,
-    note: "Total dissolved solids from electrical conductivity: TDS (mg/L) = k x EC (uS/cm at 25 C), with the correlation factor k commonly 0.55-0.75 (default 0.65) depending on the dominant ions. The result is an estimate, not a gravimetric measurement; the +/-15% band from the k range is shown so the number is not read as exact. Calibrate k against a lab TDS for the specific water. An operations aid; the operator of record and the primacy agency govern compliance.",
+    tds_mgl, tds_low: 0.55 * ec, tds_high: 0.75 * ec, k_outside_band: k_outside_band,
+    // Until 2026-10-14 a k of 0.9 printed 900 mg/L beside a 550-750 range with no word that it sat outside it.
+    note: (k_outside_band ? "The entered k of " + fmt(k, 2) + " is outside the common 0.55-0.75 range, so the " + fmt(tds_mgl, 0) + " mg/L estimate falls outside the range shown; use it only if that k was calibrated against a lab TDS for this water. " : "") + "Total dissolved solids from electrical conductivity: TDS (mg/L) = k x EC (uS/cm at 25 C), with the correlation factor k commonly 0.55-0.75 (default 0.65) depending on the dominant ions. The result is an estimate, not a gravimetric measurement; the +/-15% band from the k range is shown so the number is not read as exact. Calibrate k against a lab TDS for the specific water. An operations aid; the operator of record and the primacy agency govern compliance.",
   };
 }
 export const tdsFromConductivityExample = { inputs: { conductivity_us_cm: 1000, k_factor: 0.65 } };
@@ -936,6 +941,8 @@ export function computeFlocculationGValue({ power_input_w = 0, power_input_hp = 
   if (useHp && !(hp > 0 && Number.isFinite(hp))) return { error: "Power input must be positive (hp)." };
   if (useGal && !(gal > 0 && Number.isFinite(gal))) return { error: "Basin volume must be positive (gal)." };
   if (useF && (!Number.isFinite(tF) || tF < 32 || tF > 104)) return { error: "Water temperature must be between 32 and 104 F (the 0-40 C viscosity-table range)." };
+  // Until 2026-10-14 a blank water temperature (null) ran as 0 C, the most viscous water in the table.
+  if (!useF && (water_temp_c === null || water_temp_c === "")) return { error: "Enter the water temperature; viscosity, and so G, depends on it." };
   const p = useHp ? hp * _FGV_W_PER_HP : Number(power_input_w) || 0;
   const v = useGal ? gal * _FGV_M3_PER_GAL : Number(basin_volume_m3) || 0;
   const t = useF ? (tF - 32) * 5 / 9 : Number(water_temp_c);
@@ -997,6 +1004,8 @@ export function computeTaperedFlocculationG({ stage1_g_per_s = 0, stage2_g_per_s
   const gal = Number(stage_volume_gal), tF = Number(water_temp_f);
   if (useGal && !(gal > 0 && Number.isFinite(gal))) return { error: "Stage volume must be positive (gal)." };
   if (useF && (!Number.isFinite(tF) || tF < 32 || tF > 104)) return { error: "Water temperature must be between 32 and 104 F (the 0-40 C viscosity-table range)." };
+  // Until 2026-10-14 a blank water temperature (null) ran as 0 C, the most viscous water in the table.
+  if (!useF && (water_temp_c === null || water_temp_c === "")) return { error: "Enter the water temperature; viscosity, and so the stage power, depends on it." };
   const V = useGal ? gal * _FGV_M3_PER_GAL : Number(stage_volume_m3) || 0;
   const t = useF ? (tF - 32) * 5 / 9 : Number(water_temp_c);
   const tmin = Number(total_detention_min) || 0;
@@ -1054,6 +1063,8 @@ export function computeFlocculatorPaddlePower({ paddle_radius_ft = 0, wheel_rpm 
   const n = Number(wheel_rpm) || 0;
   const a = Number(paddle_area_ft2) || 0;
   const cd = Number(drag_coeff) || 0;
+  // Until 2026-10-14 a blank slip factor (null) ran as no slip and overstated the power about 2.4x.
+  if (slip_factor === null || slip_factor === "") return { error: "Enter the slip factor (about 0.25, typically 0.2 to 0.3; 0 only for no slip)." };
   const k = Number(slip_factor);
   if (!(r > 0)) return { error: "Paddle radius must be positive (ft)." };
   if (!(n > 0)) return { error: "Wheel speed must be positive (rpm)." };
@@ -1101,6 +1112,8 @@ const _CL_WITHDRAWAL_BASE = { cylinder: 40, ton: 400 }; // lb/day at ~70 F
 // dims: in { feed_rate_lb_day: M T^-1, container_type: dimensionless, room_temp_f: T } out: { per_container_lb_day: M T^-1, containers: dimensionless }
 export function computeChlorineCylinderWithdrawal({ feed_rate_lb_day = 0, container_type = "cylinder", room_temp_f = 70 } = {}) {
   const feed = Number(feed_rate_lb_day) || 0;
+  // Until 2026-10-14 a blank room temperature (null) ran as 0 F and tripled the container count.
+  if (room_temp_f === null || room_temp_f === "") return { error: "Enter the room temperature (F); the withdrawal ceiling depends on it (70 F is the reference room)." };
   const temp = Number(room_temp_f);
   if (!(feed > 0 && Number.isFinite(feed))) return { error: "Feed rate must be positive (lb/day)." };
   const base = _CL_WITHDRAWAL_BASE[container_type];

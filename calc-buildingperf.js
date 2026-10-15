@@ -218,6 +218,8 @@ export function computeBuildingTightnessLimit({
   if (!(n_factor > 0)) return { error: "The LBL N factor must be positive -- it runs roughly from 10 in a cold, windy, exposed, tall situation to over 30 in a mild, sheltered, single-storey one." };
   if (!(ceiling_height_ft > 0)) return { error: "Ceiling height must be positive (ft)." };
   if (planned_cfm50_reduction < 0) return { error: "A planned air-sealing reduction cannot be negative (cfm)." };
+  // Until 2026-10-14 a reduction past the measured leakage "took the house to -150" CFM50.
+  if (planned_cfm50_reduction >= cfm50) return { error: "A planned air-sealing reduction must be less than the measured CFM50 -- sealing cannot remove all of a house's leakage." };
   const required_cfm = _BP_622_AREA_COEFF * floor_area_ft2 + _BP_622_PERSON_COEFF * (bedrooms + 1);
   const tightness_limit_cfm50 = required_cfm * n_factor;
   const natural_cfm = cfm50 / n_factor;
@@ -814,7 +816,10 @@ export function computeContinuousInsulationRatio({
   // complement instead is an easy mistake near ratio 0.5 and reverses the
   // direction with humidity; the identity that the sheathing at this ratio
   // lands EXACTLY on the dew point is what catches it.
-  const ratio_from_dew_point = has_conditions
+  // Until 2026-10-14 an outdoor design temperature above the dew point printed a
+  // negative required ratio (-1.893); no exterior insulation is needed then.
+  const dry_outdoors = has_conditions && outdoor_design_temp_f >= dew_point_f;
+  const ratio_from_dew_point = has_conditions && !dry_outdoors
     ? (dew_point_f - outdoor_design_temp_f) / (indoor_temp_f - outdoor_design_temp_f)
     : 0;
   const sheathing_temp_f = has_conditions
@@ -822,7 +827,7 @@ export function computeContinuousInsulationRatio({
     : 0;
   const physics_verdict = !has_conditions
     ? "(no indoor humidity and outdoor design temperature entered)"
-    : "at " + fmt(indoor_temp_f, 0) + " degF and " + fmt(indoor_rh_pct, 0) + "% RH the dew point is " + fmt(dew_point_f, 1) + " degF, so against a " + fmt(outdoor_design_temp_f, 0) + " degF design temperature the ratio the physics requires is " + fmt(ratio_from_dew_point, 3) + ", and this assembly puts the sheathing at " + fmt(sheathing_temp_f, 1) + " degF -- " + (sheathing_temp_f >= dew_point_f ? "above the dew point, so it stays dry at design conditions" : "BELOW the dew point, so it condenses at design conditions") + ". The code table is nothing but this calculation solved once per climate zone at assumed indoor conditions, and a house run at a higher indoor humidity needs MORE continuous insulation than the table gives";
+    : "at " + fmt(indoor_temp_f, 0) + " degF and " + fmt(indoor_rh_pct, 0) + "% RH the dew point is " + fmt(dew_point_f, 1) + " degF, so against a " + fmt(outdoor_design_temp_f, 0) + " degF design temperature " + (dry_outdoors ? "-- already at or above the dew point -- the physics requires no continuous insulation at all (a ratio of 0)" : "the ratio the physics requires is " + fmt(ratio_from_dew_point, 3)) + ", and this assembly puts the sheathing at " + fmt(sheathing_temp_f, 1) + " degF -- " + (sheathing_temp_f >= dew_point_f ? "above the dew point, so it stays dry at design conditions" : "BELOW the dew point, so it condenses at design conditions") + ". The code table is nothing but this calculation solved once per climate zone at assumed indoor conditions, and a house run at a higher indoor humidity needs MORE continuous insulation than the table gives";
   if (![achieved_ratio, r_continuous_min, r_cavity_max, dew_point_f, ratio_from_dew_point, sheathing_temp_f].every(Number.isFinite)) return { error: "Insulation ratio math is not a finite value." };
   return {
     r_total, achieved_ratio, has_requirement, meets,

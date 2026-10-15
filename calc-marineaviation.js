@@ -193,7 +193,8 @@ MARINEAVIATION_RENDERERS["metacentric-height"] = _simpleRenderer({
     { key: "kg_ft", label: "KG, centre of gravity above keel (ft)", kind: "number", attrs: { step: "any" } },
     { key: "displacement_lb", label: "Displacement (lb)", kind: "number" },
     { key: "added_weight_lb", label: "Weight added (lb, 0 to skip)", kind: "number" },
-    { key: "added_kg_ft", label: "Its height above the keel (ft)", kind: "number", attrs: { step: "any" } },
+    // Until 2026-10-14 a blank height reached the compute as 0 and put the weight at the keel.
+    { key: "added_kg_ft", required: true, label: "Its height above the keel (ft)", kind: "number", attrs: { step: "any" } },
     { key: "free_surface_moment_ftlb", label: "Free surface moment (ft-lb, 0 to skip)", kind: "number" },
     { key: "heel_angle_deg", label: "Heel angle for the righting arm (degrees)", kind: "number", default: 10, attrs: { step: "any" } },
   ],
@@ -762,7 +763,8 @@ export function computePropellerTrackBalance({
     ? "(no readings entered)"
     : at_target
       ? "the trial run already reads " + fmt(result_ips, 3) + " IPS, at or below the " + fmt(target_ips, 2) + " IPS target"
-      : "the trial run reads " + fmt(result_ips, 3) + " IPS against a " + fmt(target_ips, 2) + " IPS target, so the correction above is the next move";
+      // Until 2026-10-14 a trial that changed nothing still pointed at "the correction above".
+      : "the trial run reads " + fmt(result_ips, 3) + " IPS against a " + fmt(target_ips, 2) + " IPS target, so " + (trial_useful ? "the correction above is the next move" : "rerun with the trial weight moved or increased");
   if (![track_margin_in, effect_ips, effect_phase_deg, correction_weight_g, correction_phase_deg].every(Number.isFinite)) return { error: "Track and balance math is not a finite value." };
   return {
     track_margin_in, track_ok, track_verdict,

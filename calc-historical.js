@@ -72,13 +72,16 @@ export function computePercentileBands({ points = [], lookback_months = 12 } = {
   const sorted = points.slice().sort((a, b) => (a.date < b.date ? -1 : 1));
   const window = sorted.slice(-lookback_months);
   if (window.length < 2) return { error: "Window has too few points; widen the lookback." };
-  const values = window.map((p) => Number(p.value)).filter((x) => Number.isFinite(x));
+  // Until 2026-10-14 a null value ran through Number() as 0, so a missing last
+  // month read as latest 0 and placed "low". A missing value is not a price.
+  const num = (x) => (x === null || x === undefined || x === "" ? NaN : Number(x));
+  const values = window.map((p) => num(p.value)).filter((x) => Number.isFinite(x));
   const p25 = quantile(values, 0.25);
   const p50 = quantile(values, 0.50);
   const p75 = quantile(values, 0.75);
   const p90 = quantile(values, 0.90);
   const latest = window[window.length - 1];
-  const v = Number(latest.value);
+  const v = num(latest.value);
   // DR-25 (D-1/C-1): the quantile set is filtered to finite values, but the
   // latest point is not re-checked. A malformed final value makes v = NaN, so
   // every v <= pXX is false and placement silently becomes "high" with

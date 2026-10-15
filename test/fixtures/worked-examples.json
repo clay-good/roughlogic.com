@@ -43005,7 +43005,7 @@
   {
    "tile_id": "branch-reinforcement",
    "source_publisher": "ASME B31.1 para 104.3.1 area replacement (B31.3 304.3 for process) (by name)",
-   "source_title": "Same fitting at a higher required wall t_rh 0.25 (12.5% mill tolerance) -> A_req 0.526 in^2, excess falls short, pad ~0.458 in^2 required",
+   "source_title": "Same fitting at a higher required wall t_rh 0.24 (12.5% mill tolerance) -> A_req 0.505 in^2, excess falls short, pad ~0.427 in^2 required (t_rh 0.25 until 2026-10-14, above the 0.245 in minimum wall)",
    "source_edition_or_year": "spec-v204 worked example (machine-verified, area balance)",
    "source_section_or_page": "spec-v204 section 2.1 cross-check",
    "verified_by": "rl",
@@ -43013,7 +43013,7 @@
    "inputs": {
     "run_od_in": 6.625,
     "run_wall_in": 0.28,
-    "run_treq_in": 0.25,
+    "run_treq_in": 0.24,
     "branch_od_in": 2.375,
     "branch_wall_in": 0.154,
     "branch_treq_in": 0.034,
@@ -43021,13 +43021,13 @@
    },
    "outputs": {
     "a_required_in2": {
-     "value": 0.526375,
+     "value": 0.50532,
      "tolerance": {
       "abs": 0.001
      }
     },
     "pad_area_in2": {
-     "value": 0.458495,
+     "value": 0.42691,
      "tolerance": {
       "abs": 0.001
      }
@@ -124583,7 +124583,7 @@
   {
    "tile_id": "riser-modulus-feeding",
    "source_publisher": "Project (first-principles)",
-   "source_title": "Riser Modulus and the Feeding Volume Check -- the spec-v1714 worked example, recomputed",
+   "source_title": "Riser Modulus and the Feeding Volume Check -- the spec-v1714 worked example, recomputed; feed volume beta Vc / (eta - beta) since 2026-10-14, the riser feeding its own shrinkage",
    "source_edition_or_year": "spec-v1714 of scope-trade-expansion-2, 2026-09-09",
    "source_section_or_page": "the standards named in the tile citation govern",
    "verified_by": "rl",
@@ -124635,7 +124635,7 @@
      }
     },
     "volume_needed_in3": {
-     "value": 19.2,
+     "value": 26.18182,
      "tolerance": {
       "pct": 0.5
      }

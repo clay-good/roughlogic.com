@@ -14204,9 +14204,10 @@ test("bounds: spec-v204 branch-reinforcement pins the adequate example + the pad
   assert.equal(a.adequate, true);
   assert.ok(Math.abs(a.pad_area_in2) < 1e-9);
   // raise the run required wall and the same opening flips to needing a pad.
-  const b = _v204({ run_od_in: 6.625, run_wall_in: 0.280, run_treq_in: 0.25, branch_od_in: 2.375, branch_wall_in: 0.154, branch_treq_in: 0.034, beta_deg: 90 });
+  // 2026-10-14: 0.25 in now errors (above the 0.245 in minimum wall), so the flip is pinned at 0.24.
+  const b = _v204({ run_od_in: 6.625, run_wall_in: 0.280, run_treq_in: 0.24, branch_od_in: 2.375, branch_wall_in: 0.154, branch_treq_in: 0.034, beta_deg: 90 });
   assert.equal(b.adequate, false);
-  assert.ok(Math.abs(b.a_required_in2 - 0.52638) < 0.001 && Math.abs(b.pad_area_in2 - 0.45849) < 0.001);
+  assert.ok(Math.abs(b.a_required_in2 - 0.50532) < 0.001 && Math.abs(b.pad_area_in2 - 0.42691) < 0.001);
   // A corrosion allowance flips the base case to needing a pad.
   assert.equal(_v204({ run_od_in: 6.625, run_wall_in: 0.280, run_treq_in: 0.10, branch_od_in: 2.375, branch_wall_in: 0.154, branch_treq_in: 0.034, beta_deg: 90, corrosion_in: 0.0625 }).adequate, false);
   assert.ok("error" in _v204({ run_od_in: 0, run_wall_in: 0.280, run_treq_in: 0.10, branch_od_in: 2.375, branch_wall_in: 0.154, branch_treq_in: 0.034 }));
@@ -51241,14 +51242,16 @@ test("bounds: spec-v1714 computeRiserModulusFeeding -- TWO conditions, not one",
   assert.ok(Math.abs(r.riser_diameter_in - 3.756) < 0.001);
   // The volume condition is a SECOND check, and this riser passes both.
   assert.ok(Math.abs(r.shrinkage_volume_in3 - 2.88) < 1e-12);
-  assert.ok(Math.abs(r.volume_needed_in3 - 19.2) < 1e-9);
+  // 2026-10-14: the riser feeds its own shrinkage too, beta Vc / (eta - beta) = 2.88 / 0.11 (was 2.88 / 0.15 = 19.2).
+  assert.ok(Math.abs(r.volume_needed_in3 - 2.88 / 0.11) < 1e-9);
   assert.equal(r.volume_ok, true);
-  assert.ok(r.riser_volume_in3 > r.volume_needed_in3 * 2);
+  assert.ok(r.riser_volume_in3 > r.volume_needed_in3 * 1.5); // 2026-10-14: was * 2 on the old beta Vc / eta need
   // IDENTITY: the volume-governed diameter holds exactly the volume needed.
   assert.ok(Math.abs(Math.PI / 4 * Math.pow(r.diameter_for_volume_in, 3) - r.volume_needed_in3) < 1e-9);
   // A riser can satisfy modulus and FAIL volume -- the failure that leaves
   // porosity directly under a riser that stayed liquid.
-  const thirsty = _v1714({ ...base, shrinkage_pct: 20, riser_efficiency_pct: 5 });
+  // 2026-10-14: 20% shrinkage at 5% efficiency can never feed and now errors; 12% at 14% fails volume.
+  const thirsty = _v1714({ ...base, shrinkage_pct: 12, riser_efficiency_pct: 14 });
   assert.equal(thirsty.volume_ok, false);
   assert.ok(Math.abs(thirsty.riser_diameter_in - r.riser_diameter_in) < 1e-12);
   // A 2x sleeve reaches the same modulus at half the diameter.
@@ -61614,4 +61617,279 @@ test("hardening slice 49 (a drop past the line pressure, an impeller larger than
   assert.ok(!(await run("pump-impeller-trim")).error);
   if (trim.max_diameter_in > 0) assert.match((await run("pump-impeller-trim", { current_diameter_in: trim.max_diameter_in * 2 })).error, /larger than the casing maximum/);
   assert.ok(!(await run("pump-impeller-trim", { max_diameter_in: 0 })).error, "no casing maximum entered skips the check");
+});
+
+test("hardening slice 50 group 1 (blank stations and temperatures, string lengths, ties, subnormals, k outside its band)", async () => {
+  const { readFileSync } = await import("node:fs");
+  const rows = JSON.parse(readFileSync(new URL("../fixtures/worked-examples.json", import.meta.url), "utf8")).rows;
+  const { COMPUTE_MAP } = await import("../fixtures/compute-map.js");
+  const run = async (id, over = {}) => {
+    const reg = COMPUTE_MAP[id];
+    const fn = (await import(new URL(reg.module, new URL("../fixtures/", import.meta.url)).href))[reg.fn];
+    return fn({ ...rows.find((r) => r.tile_id === id).inputs, ...over });
+  };
+  for (const [id, over] of [
+    ["earthwork-end-area", { areas: [100, "", 100] }],
+    ["vertical-curve-sight-distance", { C: -2158 }],
+    ["sample-size-for-margin", { proportion: 0 }],
+    ["sample-size-for-margin", { proportion: 1 }],
+    ["scientific-notation", { value: "0x1F" }],
+    ["standards-based-grade", { rows: "5.NBT.A.1 2.5 major" }],
+    ["standards-based-grade", { rows: "5.NBT.A.1 0x3 major" }],
+    ["chlorine-cylinder-withdrawal", { room_temp_f: null }],
+    ["flocculator-paddle-power", { slip_factor: null }],
+    ["flocculation-g-value", { water_temp_c: null }],
+    ["tapered-flocculation-g", { water_temp_c: null }],
+    ["pool-chlorine-dose", { product: "custom", avail: 15.01 }],
+  ]) {
+    assert.ok(!(await run(id)).error, id + " example");
+    assert.ok((await run(id, over)).error, id + " " + JSON.stringify(over));
+  }
+  // An omitted key still takes the published default.
+  assert.equal((await run("chlorine-cylinder-withdrawal", { room_temp_f: undefined })).containers, 3);
+  assert.ok(Math.abs((await run("flocculator-paddle-power", { slip_factor: undefined })).power_w - 267.13) < 0.01);
+  assert.equal((await run("base-converter", { value: 0, from_base: 10 })).converted, "0");
+  assert.equal((await run("scientific-notation", { value: "5e-324" })).rendered, "5 * 10^-324");
+  assert.equal((await run("azimuth-bearing-conversion", { azimuth_deg: 359.99999 })).azimuth_dms, "0°00'00\"");
+  assert.ok(Math.abs((await run("taping-corrections", { l_ft: "100" })).corrected_ft - (await run("taping-corrections")).corrected_ft) < 1e-12);
+  assert.ok(Math.abs((await run("differential-leveling", { bm_elev: "100" })).misclosure - (await run("differential-leveling")).misclosure) < 1e-12);
+  const tie = (await run("mass-haul-overhaul", { borrow_haul_ft: 2600 })).haul_verdict;
+  assert.ok(/A TIE on distance/.test(tie) && !/SHORTER/.test(tie), tie);
+  assert.ok(!/Enter a borrow haul distance/.test((await run("mass-haul-overhaul", { overhaul_volume_cy: 0 })).haul_verdict));
+  const tds = await run("tds-from-conductivity", { k_factor: 0.9 });
+  assert.ok(tds.k_outside_band && /outside the common 0\.55-0\.75 range/.test(tds.note), tds.note);
+  assert.ok(!(await run("tds-from-conductivity")).k_outside_band);
+});
+
+test("hardening slice 50 group 3 (sealing past the leakage, a dry outdoor design, rim lines, whole doors, blank clearances and hours, polar days, missing prices)", async () => {
+  const { readFileSync } = await import("node:fs");
+  const { spawnSync } = await import("node:child_process");
+  const rows = JSON.parse(readFileSync(new URL("../fixtures/worked-examples.json", import.meta.url), "utf8")).rows;
+  const { COMPUTE_MAP } = await import("../fixtures/compute-map.js");
+  const run = async (id, over = {}) => {
+    const reg = COMPUTE_MAP[id];
+    const fn = (await import(new URL(reg.module, new URL("../fixtures/", import.meta.url)).href))[reg.fn];
+    return fn({ ...rows.find((r) => r.tile_id === id).inputs, ...over });
+  };
+  for (const [id, over] of [
+    ["building-tightness-limit", { planned_cfm50_reduction: 2000 }],
+    ["revolving-door-throughput", { device_count: 4.6 }],
+    ["fire-door-clearance", { head_in: null }],
+    ["photoperiod-blackout-schedule", { blackout_pull_hour: null }],
+  ]) {
+    assert.ok(!(await run(id)).error, id + " example");
+    assert.ok((await run(id, over)).error, id + " " + JSON.stringify(over));
+  }
+  // An omitted pull hour or clearance still takes the published default of 0.
+  assert.ok(!(await run("photoperiod-blackout-schedule", { blackout_pull_hour: undefined })).error);
+  assert.ok(!(await run("fire-door-clearance", { head_in: undefined })).error);
+  // A 60 F design temperature above the dew point printed a required ratio of -1.893.
+  const ci = await run("continuous-insulation-ratio", { outdoor_design_temp_f: 60 });
+  assert.equal(ci.ratio_from_dew_point, 0);
+  assert.ok(!/-\d/.test(ci.physics_verdict), ci.physics_verdict);
+  // A line exactly on the rim was counted after float accumulation (36, not 34).
+  assert.equal((await run("tank-bottom-anode-layout", { tank_diameter_ft: 42, grid_spacing_ft: 1.2 })).line_count, 34);
+  assert.equal((await run("tank-bottom-anode-layout")).line_count, 10);
+  const sump = await run("sump-basin-sizing", { pump_gpm: 30, inflow_gpm: 1, drawdown_in: 14.80804116350843 });
+  assert.ok(sump.adequate && sump.verdict === "adequate", JSON.stringify(sump.verdict));
+  assert.equal((await run("step-chain-tension", { incline_deg: 4, friction_coefficient: 0.1 })).descending_brake_lb, 0);
+  assert.match((await run("helicopter-lz-sizing", { rotor_diameter_ft: 60.004 })).verdict, /0\.008 ft short of the required 120\.008 ft side/);
+  const day = await run("solar-times", { lat_deg: 80, date_iso: "2026-06-21" });
+  const night = await run("solar-times", { lat_deg: 80, date_iso: "2026-12-21" });
+  assert.ok(day.polar === "day" && day.daylight_minutes === 1440, JSON.stringify(day));
+  assert.ok(night.polar === "night" && night.daylight_minutes === 0, JSON.stringify(night));
+  assert.equal((await run("solar-times")).polar, null);
+  const dv = (await run("dilution-ventilation-solvent", { tlv_ppm: 0.4, mixing_factor: 2.5 })).health_verdict;
+  assert.ok(/mixing factor of 2\.5,/.test(dv) && /a 0\.4 ppm limit/.test(dv), dv);
+  // A null last month read as a price of 0 and placed "low".
+  const { computeHistorical } = await import("../../calc-historical.js");
+  const pts = Array.from({ length: 12 }, (_, i) => ({ date: "2025-" + String(i + 1).padStart(2, "0"), value: i === 11 ? null : 100 + i }));
+  assert.ok(computeHistorical({ commodity: "copper", shard: { points: pts } }).error);
+  // The pages, under the fake DOM in a child process (it installs globals).
+  const page = `
+    const F = ${JSON.stringify(new URL("../fixtures/", import.meta.url).href)};
+    const { installDocument, installTimers, flushTimers } = await import(F + "fake-dom.js");
+    const { RENDERER_MAP } = await import(F + "renderer-map.js");
+    installTimers(); const doc = installDocument(); const out = {};
+    for (const [id, ov] of ${JSON.stringify([
+      ["fire-door-clearance", { head_in: "", hinge_jamb_in: "", strike_jamb_in: "", meeting_edge_in: "", bottom_in: "" }],
+      ["photoperiod-blackout-schedule", { blackout_pull_hour: "" }],
+      ["plug-tray-cell-count", { germination_pct: "100", cull_pct: "0" }],
+      ["ac-induced-voltage-pipeline", { touch_limit_v: "1" }],
+      ["loop-voltage-budget", { "lvb-tv": "0" }],
+      ["solar-times", { lat_deg: "80", date_iso: "2026-12-21" }],
+      ["step-chain-tension", { incline_deg: "4", friction_coefficient: "0.1" }],
+    ])}) {
+      const reg = RENDERER_MAP[id];
+      const render = (await import(new URL(reg.module, F).href))[reg.exportName][id];
+      doc.body.replaceChildren();
+      const view = doc.createElement("section"), inputs = doc.createElement("div"), outputs = doc.createElement("div"), cite = doc.createElement("p");
+      view.append(inputs, outputs, cite); doc.body.appendChild(view);
+      await render(inputs, outputs, cite); flushTimers();
+      view.querySelectorAll("button").find((b) => b.classList.contains("example-btn")).click(); flushTimers();
+      const all = [...inputs.querySelectorAll("input"), ...inputs.querySelectorAll("select")];
+      for (const k in ov) { const el = all.find((e) => e.id === k); el.value = ov[k]; el.dispatchEvent(new Event("input", { bubbles: true })); el.dispatchEvent(new Event("change", { bubbles: true })); flushTimers(); }
+      out[id] = outputs.querySelectorAll("span").filter((x) => x.classList.contains("out-value")).map((x) => x.textContent).join(" | ");
+    }
+    process.stdout.write(JSON.stringify(out));`;
+  const child = spawnSync(process.execPath, ["--no-warnings", "--input-type=module", "-e", page], { encoding: "utf8" });
+  assert.equal(child.status, 0, child.stderr);
+  const txt = JSON.parse(child.stdout);
+  assert.match(txt["fire-door-clearance"], /^Enter the measured head clearance/);
+  assert.match(txt["photoperiod-blackout-schedule"], /^Enter the hours the blackout/);
+  assert.ok(/enough here, 96 to spare/.test(txt["plug-tray-cell-count"]) && !/short by -/.test(txt["plug-tray-cell-count"]), txt["plug-tray-cell-count"]);
+  assert.ok(/touch limit is the stricter one/.test(txt["ac-induced-voltage-pipeline"]) && !/0\.3 times more stringent/.test(txt["ac-induced-voltage-pipeline"]), txt["ac-induced-voltage-pipeline"]);
+  assert.match(txt["loop-voltage-budget"], /need 0\.0 V/);
+  assert.ok(/0 h \(polar night\)/.test(txt["solar-times"]) && !/n\/a/.test(txt["solar-times"]), txt["solar-times"]);
+  assert.ok(/friction exceeds the gravity component/.test(txt["step-chain-tension"]) && !/-\d+ lb/.test(txt["step-chain-tension"]), txt["step-chain-tension"]);
+});
+
+test("hardening slice 50 group 4 (short-primer GC%, tiny triangles, no-load batteries, thick required walls, the riser's own shrinkage, empty tiers, at-the-limit loads, blank appliances)", async () => {
+  const { readFileSync } = await import("node:fs");
+  const { spawnSync } = await import("node:child_process");
+  const rows = JSON.parse(readFileSync(new URL("../fixtures/worked-examples.json", import.meta.url), "utf8")).rows;
+  const { COMPUTE_MAP } = await import("../fixtures/compute-map.js");
+  const run = async (id, over = {}) => {
+    const reg = COMPUTE_MAP[id];
+    const fn = (await import(new URL(reg.module, new URL("../fixtures/", import.meta.url)).href))[reg.fn];
+    return fn({ ...rows.find((r) => r.tile_id === id).inputs, ...over });
+  };
+  for (const [id, over] of [
+    // "AAAA" forced onto the GC% formula printed a Tm of -103 C.
+    ["primer-tm", { sequence: "AAAA", method: "gc" }],
+    // No load at all sized 0 Ah and picked a 4 Ah battery.
+    ["standby-battery-sizing", { standby_current_a: 0, alarm_current_a: 0 }],
+    // 2.5 maglocks were rounded silently.
+    ["access-control-power-supply", { lock_count: 2.5 }],
+    // A required wall thicker than the pipe's minimum wall was credited 0 excess and answered.
+    ["branch-reinforcement", { branch_treq_in: 0.2 }],
+    ["branch-reinforcement", { run_treq_in: 0.27 }],
+    // A riser that shrinks as fast as it feeds can never feed.
+    ["riser-modulus-feeding", { shrinkage_pct: 15, riser_efficiency_pct: 15 }],
+  ]) {
+    assert.ok(!(await run(id)).error, id + " example");
+    assert.ok((await run(id, over)).error, id + " " + JSON.stringify(over));
+  }
+  // Points 0.00001 apart were refused as collinear; truly collinear points still are.
+  assert.ok(Math.abs((await run("circle-from-3-points", { x1: 0, y1: 0, x2: 1e-5, y2: 0, x3: 0, y3: 1e-5 })).radius - Math.SQRT2 * 5e-6) < 1e-15);
+  assert.ok((await run("circle-from-3-points", { x1: 0, y1: 0, x2: 0.1, y2: 0.1, x3: 0.3, y3: 0.3 })).error);
+  // 8% shrinkage passed a 41.6 in3 riser on beta Vc / eta = 38.4; the riser needs beta Vc / (eta - beta) = 82.
+  const riser = await run("riser-modulus-feeding", { shrinkage_pct: 8 });
+  assert.ok(Math.abs(riser.volume_needed_in3 - 72 * 0.08 / 0.07) < 1e-9 && riser.volume_ok === false, JSON.stringify(riser.volume_needed_in3));
+  // Cold service was told to cut the run short.
+  assert.match((await run("pipe-cold-spring", { operating_temp_f: -20 })).notes[0], /fabricate it LONG/);
+  // 200 ft/min made 3,767 lb/h past a 400 lb/h screw with nothing said.
+  const ext = await run("extrusion-output-rate", { line_speed_ft_min: 200 });
+  assert.ok(ext.speed_exceeds_capacity && /MORE than the line can make: the extruder is rated 400 lb\/h/.test(ext.speed_verdict), ext.speed_verdict);
+  // An identical trial run still pointed at "the correction above".
+  const ptb = rows.find((r) => r.tile_id === "propeller-track-balance").inputs;
+  const same = await run("propeller-track-balance", { result_ips: ptb.initial_ips, result_phase_deg: ptb.initial_phase_deg });
+  assert.ok(!same.trial_useful && !/correction above/.test(same.target_verdict), same.target_verdict);
+  // A 0 kW tier 4 was listed as shed (or served).
+  const shed = await run("critical-load-shed-tiers");
+  assert.ok(!/tier 4/.test(shed.shed_tiers + shed.served_tiers), shed.shed_tiers);
+  assert.ok(!/tier 4/.test((await run("critical-load-shed-tiers", { source_kw: 500 })).served_tiers));
+  // 0.015 lb over the gross read "OVER the gross limit by 0 lb".
+  assert.match((await run("log-truck-payload", { load_volume_mbf: 4.57143 })).load_verdict, /^AT the gross limit/);
+  // Blank appliance rows were counted as appliances.
+  assert.equal((await run("gas-appliance-demand", { appliances: [100000, null, "", 40000] })).appliance_count, 2);
+  // PV that alone filled the limit read "downsize the main to 0 A or less".
+  const bb = (await run("pv-interconnection-busbar", { pv_proposed_a: 240 })).recommendation;
+  assert.ok(!/0 A or less/.test(bb) && /supply-side tap/.test(bb), bb);
+  // A 900 lb point load with no deck rating read "no concentrated load entered".
+  assert.match((await run("stage-deck-live-load", { deck_point_rating_lb: 0 })).point_verdict, /900 lb concentrated load is entered but no deck point rating/);
+  // A peak below the minimum stable flow read "the peak is 0.9x above it".
+  const flare = await run("lfg-flare-capacity", { turndown_ratio: 1.1 });
+  assert.ok(flare.peak_below_minimum && /BELOW it/.test(flare.minimum_verdict), flare.minimum_verdict);
+  // The pages, under the fake DOM in a child process (it installs globals).
+  const page = `
+    const F = ${JSON.stringify(new URL("../fixtures/", import.meta.url).href)};
+    const { installDocument, installTimers, flushTimers } = await import(F + "fake-dom.js");
+    const { RENDERER_MAP } = await import(F + "renderer-map.js");
+    installTimers(); const doc = installDocument(); const out = {};
+    for (const [key, id, ov] of ${JSON.stringify([
+      ["mch", "metacentric-height", { added_kg_ft: "" }],
+      ["acp", "access-control-power-supply", { "acp-sh": "0" }],
+      ["kdt", "kiln-drying-time", { alt_thickness_in: "0.5" }],
+      ["lfa", "leach-field-aggregate", {}],
+      ["imw", "ice-melt-working-temperature", {}],
+      ["lfc", "lfg-flare-capacity", { turndown_ratio: "1.1" }],
+    ])}) {
+      const reg = RENDERER_MAP[id];
+      const render = (await import(new URL(reg.module, F).href))[reg.exportName][id];
+      doc.body.replaceChildren();
+      const view = doc.createElement("section"), inputs = doc.createElement("div"), outputs = doc.createElement("div"), cite = doc.createElement("p");
+      view.append(inputs, outputs, cite); doc.body.appendChild(view);
+      await render(inputs, outputs, cite); flushTimers();
+      view.querySelectorAll("button").find((b) => b.classList.contains("example-btn")).click(); flushTimers();
+      const all = [...inputs.querySelectorAll("input"), ...inputs.querySelectorAll("select")];
+      for (const k in ov) { const el = all.find((e) => e.id === k); el.value = ov[k]; el.dispatchEvent(new Event("input", { bubbles: true })); el.dispatchEvent(new Event("change", { bubbles: true })); flushTimers(); }
+      out[key] = outputs.querySelectorAll("span").filter((x) => x.classList.contains("out-value")).map((x) => x.textContent).join(" | ");
+    }
+    process.stdout.write(JSON.stringify(out));`;
+  const child = spawnSync(process.execPath, ["--no-warnings", "--input-type=module", "-e", page], { encoding: "utf8" });
+  assert.equal(child.status, 0, child.stderr);
+  const txt = JSON.parse(child.stdout);
+  assert.match(txt.mch, /^Enter the height of the added weight above the keel/);
+  assert.ok(/none \(0 hr standby entered\)/.test(txt.acp) && !/for 4 hr standby/.test(txt.acp), txt.acp);
+  assert.ok(/overquotes by 1\.74 times/.test(txt.kdt) && !/underquotes by 0\./.test(txt.kdt), txt.kdt);
+  assert.match(txt.lfa, /14\.7 cy \(396 ft\^3 with waste; 360 ft\^3 in the trenches\)/);
+  assert.match(txt.imw, /BELOW the product's practical working limit, so no quantity of it works there/);
+  assert.ok(/peak itself is BELOW it/.test(txt.lfc) && !/0\.9x above/.test(txt.lfc), txt.lfc);
+});
+
+test("hardening slice 50 group 2 (unknown modes, a blank suction, stemming past the hole, one-stage intermediates, derated headroom, equal readings, slack lines)", async () => {
+  const { readFileSync } = await import("node:fs");
+  const rows = JSON.parse(readFileSync(new URL("../fixtures/worked-examples.json", import.meta.url), "utf8")).rows;
+  const { COMPUTE_MAP } = await import("../fixtures/compute-map.js");
+  const run = async (id, over = {}) => {
+    const reg = COMPUTE_MAP[id];
+    const fn = (await import(new URL(reg.module, new URL("../fixtures/", import.meta.url)).href))[reg.fn];
+    return fn({ ...rows.find((r) => r.tile_id === id).inputs, ...over });
+  };
+  // Inputs the compute cannot answer now error instead of running as something else.
+  for (const [id, over] of [
+    ["baghouse-cleaning-interval", { cleaning_mode: "bogus" }],
+    ["compression-ratio-refrig", { suction_psig: null }],
+    ["groove-weld-strength", { weld_type: "bogus" }],
+    ["groove-weld-length-for-load", { method: "bogus" }],
+    ["standing-seam-takeoff", { perimeter_panels: 50 }],
+    ["blast-burden-spacing", { bench_height_ft: 3, stemming_ratio: 2 }],
+    ["tempering-temperature", { secondary_hardening: "bogus" }],
+  ]) {
+    assert.ok(!(await run(id)).error, id + " example");
+    assert.ok((await run(id, over)).error, id + " " + JSON.stringify(over));
+  }
+  // "lrfd" ran as ASD (21 ksi); "Yes" ran as a plain grade.
+  const lrfd = (await run("groove-weld-strength", { method: "LRFD" })).stress_ksi;
+  assert.equal((await run("groove-weld-strength", { method: "lrfd" })).stress_ksi, lrfd);
+  assert.equal((await run("groove-weld-length-for-load", { method: "lrfd" })).stress_ksi, (await run("groove-weld-length-for-load", { method: "LRFD" })).stress_ksi);
+  assert.equal((await run("tempering-temperature", { secondary_hardening: "Yes" })).is_secondary, true);
+  assert.equal((await run("baghouse-cleaning-interval", { cleaning_mode: "Timer" })).is_timer, true);
+  // A near miss printed "2.80 ... against a 2.80 lb/gal limit, over by 0.00".
+  const voc = (await run("coating-voc-compliance", { limit_lb_per_gal: 2.92 })).limit_verdict;
+  assert.ok(!/over by 0\.00 /.test(voc) && /2\.923 lb\/gal .* 2\.920 lb\/gal limit, over by 0\.003/.test(voc), voc);
+  // An entered path difference governs, as its label says; a capped second band says so.
+  const nb = await run("noise-barrier-insertion-loss", { source_to_top_ft: 50, top_to_receiver_ft: 52, source_to_receiver_ft: 100 });
+  assert.equal(nb.path_difference_ft, 0.5);
+  assert.match((await run("noise-barrier-insertion-loss", { second_frequency_hz: 8000 })).second_verdict, /reported as 20\.0 dB against the 20 dB practical ceiling/);
+  // One stage has no intermediate size or downstream machine.
+  const cr = await run("crusher-reduction-ratio", { stages: 1 });
+  assert.ok(!cr.error && cr.second_intermediate_in === null && cr.actual_downstream_ratio === null, JSON.stringify(cr).slice(0, 200));
+  // Headroom is on the bags still in service.
+  const dc = await run("dust-collector-air-to-cloth");
+  assert.ok(Math.abs(dc.airflow_headroom_cfm - (dc.derated_cloth_area_sqft * 5 - 12000)) < 1e-6 && dc.airflow_headroom_cfm < 0, String(dc.airflow_headroom_cfm));
+  // Direction words that were false for the case entered.
+  assert.doesNotMatch((await run("jominy-quench-severity", { alt_jominy_distance_sixteenths: 20 })).severity_verdict, /more severe quench puts/);
+  const ut = await run("ut-thickness-velocity", { actual_velocity_in_us: 0.232 });
+  assert.ok(!/conservative|retired early/.test(ut.limit_verdict) && /calibrated/.test(ut.nominal_verdict), ut.limit_verdict);
+  const lp = await run("liquid-pipeline-station-spacing", { elevation_change_ft: -1000, alternate_flow_bpd: 30000 });
+  assert.ok(/SLACK/.test(lp.alternate_verdict) && !/needs 0 station/.test(lp.alternate_verdict) && lp.elevation_share_pct >= 0, lp.alternate_verdict);
+  assert.doesNotMatch((await run("pig-batch-volume", { tool_max_fps: 0, tool_min_fps: 2 })).window_verdict, /to 0\.0 ft\/s/);
+  const tk = await run("tank-strapping-volume", { closing_gauge_ft: 14, closing_gauge_in: 6 });
+  assert.doesNotMatch(tk.movedVerdict, /ROSE|RECEIVED/);
+  assert.doesNotMatch((await run("shaft-alignment-rim-face", { rim_tir_in: 0, face_tir_in: 0 })).direction_note, /OPPOSITE/);
+  assert.doesNotMatch((await run("shaft-alignment-rim-face", { rim_tir_in: 0 })).direction_note, /offset dominates/);
+  assert.doesNotMatch((await run("shaft-alignment-reverse-dial", { tir_a_in: 0, tir_b_in: 0 })).direction_note, /OPPOSITE/);
+  assert.doesNotMatch((await run("vibration-severity-zone", { previous_reading: 0.2 })).trend_verdict, /doubling inside zone B/);
 });

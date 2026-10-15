@@ -139,7 +139,10 @@ export function computeDilutionVentilationSolvent({
   if (room_volume_ft3 < 0 || alt_mixing_factor < 0 || alt_mixing_factor > 10) return { error: "Room volume cannot be negative and the alternative mixing factor runs from 0 to 10." };
   const _healthFor = (K) => _DV_CONSTANT * evaporation_lb_hr * K / (molecular_weight * tlv_ppm);
   const health_cfm = _healthFor(mixing_factor);
-  const health_verdict = "for the exposure limit: " + fmt(health_cfm, 0) + " cfm at a mixing factor of " + fmt(mixing_factor, 0) + ", from " + fmt(evaporation_lb_hr, 2) + " lb/h of a molecular weight " + fmt(molecular_weight, 0) + " solvent against a " + fmt(tlv_ppm, 0) + " ppm limit";
+  // Until 2026-10-14 a 0.4 ppm limit printed as "a 0 ppm limit" and a mixing
+  // factor of 2.5 as "3"; a fractional entry keeps its digits now.
+  const _asEntered = (x) => (Number.isInteger(x) ? fmt(x, 0) : String(+x.toPrecision(3)));
+  const health_verdict = "for the exposure limit: " + fmt(health_cfm, 0) + " cfm at a mixing factor of " + _asEntered(mixing_factor) + ", from " + fmt(evaporation_lb_hr, 2) + " lb/h of a molecular weight " + fmt(molecular_weight, 0) + " solvent against a " + _asEntered(tlv_ppm) + " ppm limit";
   // The flammability requirement is a different and usually much larger number.
   const has_lel = lel_pct > 0;
   // LEL in ppm is lel_pct x 10,000; the target is a fraction of that.
@@ -165,7 +168,7 @@ export function computeDilutionVentilationSolvent({
   const alt_health_cfm = has_alt ? _healthFor(alt_mixing_factor) : 0;
   const mixing_verdict = !has_alt
     ? "(no alternative mixing factor entered)"
-    : "at a mixing factor of " + fmt(alt_mixing_factor, 0) + " the exposure requirement is " + fmt(alt_health_cfm, 0) + " cfm, " + fmt(alt_health_cfm / health_cfm, 2) + " times the entered case. K IS THE JUDGEMENT IN THIS CALCULATION and it swings the answer by a factor of ten across its range: 1 to 2 for a well-mixed room with the emission far from the worker, up toward 10 for poor mixing, a worker at the source, or a consequence severe enough that being wrong is not acceptable";
+    : "at a mixing factor of " + _asEntered(alt_mixing_factor) + " the exposure requirement is " + fmt(alt_health_cfm, 0) + " cfm, " + fmt(alt_health_cfm / health_cfm, 2) + " times the entered case. K IS THE JUDGEMENT IN THIS CALCULATION and it swings the answer by a factor of ten across its range: 1 to 2 for a well-mixed room with the emission far from the worker, up toward 10 for poor mixing, a worker at the source, or a consequence severe enough that being wrong is not acceptable";
   const limitation_verdict = "AND DILUTION DOES NOT PROTECT THE PERSON AT THE SOURCE. This computes a room AVERAGE, and the concentration in the breathing zone of someone standing over the tank is higher than the average before any mixing has occurred -- often by a large factor and always in the wrong direction. Dilution ventilation suits low-toxicity vapours released at a steady, modest rate away from workers. LOCAL EXHAUST that captures at the source is the control for anything else, and it moves a fraction of the air";
   if (![health_cfm, lel_cfm_exact, governing_cfm, room_ach, alt_health_cfm].every(Number.isFinite)) return { error: "Dilution ventilation math is not a finite value." };
   return {

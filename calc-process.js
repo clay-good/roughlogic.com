@@ -431,9 +431,16 @@ export function computeExtrusionOutputRate({
   const area_verdict = "the product is " + fmt(area_in2, 4) + " in2 of cross-section and weighs " + fmt(lb_per_ft, 4) + " lb per foot. (The thin-wall approximation pi x OD x wall gives " + fmt(thin_wall_area_in2, 4) + " in2, " + fmt((thin_wall_area_in2 / area_in2 - 1) * 100, 1) + "% high -- the exact annulus is used here)";
   const has_speed = line_speed_ft_min > 0;
   const output_at_speed_lb_h = has_speed ? lb_per_ft * line_speed_ft_min * 60 : 0;
+  // Until 2026-10-14 a 200 ft/min line speed printed 3,767 lb/h beside a 400 lb/h screw
+  // and a 500 lb/h bath with nothing saying the line cannot run there.
+  const _limits = [extruder_output_lb_h > 0 ? extruder_output_lb_h : Infinity, cooling_capacity_lb_h > 0 ? cooling_capacity_lb_h : Infinity];
+  const capacity_lb_h = Math.min(..._limits);
+  const speed_exceeds_capacity = has_speed && Number.isFinite(capacity_lb_h) && output_at_speed_lb_h > capacity_lb_h * (1 + 1e-9);
   const speed_verdict = !has_speed
     ? "(no line speed entered)"
-    : "at " + fmt(line_speed_ft_min, 1) + " ft/min that is " + fmt(output_at_speed_lb_h, 0) + " lb/h";
+    : "at " + fmt(line_speed_ft_min, 1) + " ft/min that is " + fmt(output_at_speed_lb_h, 0) + " lb/h" + (speed_exceeds_capacity
+      ? " -- MORE than the line can make: the " + (capacity_lb_h === extruder_output_lb_h ? "extruder is rated " : "bath supports ") + fmt(capacity_lb_h, 0) + " lb/h, which holds this product to " + fmt(capacity_lb_h / (lb_per_ft * 60), 1) + " ft/min"
+      : "");
   const has_output = extruder_output_lb_h > 0;
   const speed_at_output_ft_min = has_output ? extruder_output_lb_h / (lb_per_ft * 60) : 0;
   const output_verdict = !has_output
@@ -457,11 +464,11 @@ export function computeExtrusionOutputRate({
   const shift_pounds = has_speed ? output_at_speed_lb_h * shift_hours : 0;
   const consumption_verdict = !has_speed
     ? "(no line speed entered)"
-    : "that is " + fmt(shift_pounds, 0) + " lb of material over a " + fmt(shift_hours, 1) + " hour shift";
+    : "that is " + fmt(shift_pounds, 0) + " lb of material over a " + fmt(shift_hours, 1) + " hour shift" + (speed_exceeds_capacity ? ", at a line speed the extruder or bath cannot hold (see above)" : "");
   if (![area_in2, output_at_speed_lb_h, speed_at_output_ft_min, draw_down_ratio, lb_per_ft, shift_pounds].every(Number.isFinite)) return { error: "Extrusion rate math is not a finite value." };
   return {
     id_in, area_in2, thin_wall_area_in2, lb_per_ft, area_verdict,
-    has_speed, output_at_speed_lb_h, speed_verdict,
+    has_speed, output_at_speed_lb_h, speed_exceeds_capacity, speed_verdict,
     has_output, speed_at_output_ft_min, output_verdict,
     has_die, draw_down_ratio, draw_verdict,
     has_cooling, cooling_speed_ft_min, cooling_governs, cooling_verdict,
@@ -822,7 +829,12 @@ export function computeRiserModulusFeeding({
   const riser_volume_in3 = Math.PI / 4 * riser_diameter_in * riser_diameter_in * riser_diameter_in;
   const has_volume_check = shrinkage_pct > 0 && riser_efficiency_pct > 0;
   const shrinkage_volume_in3 = has_volume_check ? section_volume_in3 * shrinkage_pct / 100 : 0;
-  const volume_needed_in3 = has_volume_check ? shrinkage_volume_in3 / (riser_efficiency_pct / 100) : 0;
+  // The riser must feed its OWN shrinkage too: eta x Vr >= beta x (Vc + Vr), so
+  // Vr >= beta x Vc / (eta - beta) (the Caine / Wlodawer feeding equation).
+  // Until 2026-10-14 the riser volume used beta x Vc / eta and passed an 8% shrinkage
+  // alloy on a riser holding half the metal it needs.
+  if (has_volume_check && !(riser_efficiency_pct > shrinkage_pct)) return { error: "At " + fmt(riser_efficiency_pct, 0) + "% feeding efficiency a riser cannot feed " + fmt(shrinkage_pct, 1) + "% shrinkage at any size: it shrinks as fast as it can deliver metal. Use a sleeve or a higher-efficiency riser." };
+  const volume_needed_in3 = has_volume_check ? shrinkage_volume_in3 / ((riser_efficiency_pct - shrinkage_pct) / 100) : 0;
   const volume_ok = has_volume_check && riser_volume_in3 >= volume_needed_in3 - 1e-9 * Math.abs(volume_needed_in3);
   const volume_verdict = !has_volume_check
     ? "(no shrinkage and feeding efficiency entered -- and the volume check is a SECOND condition, not a restatement of the modulus one)"
@@ -846,7 +858,7 @@ export function computeRiserModulusFeeding({
 }
 export const riserModulusFeedingExample = { inputs: { section_length_in: 8, section_width_in: 6, section_thickness_in: 1.5, modulus_ratio: 1.2, shrinkage_pct: 4, riser_efficiency_pct: 15, sleeve_factor: 1 } };
 PROCESS_RENDERERS["riser-modulus-feeding"] = _simpleRenderer({
-  citation: "Citation: casting modulus = volume / cooling surface area; the riser must exceed it by a ratio commonly around 1.2, and a cylindrical riser of height equal to its diameter has a modulus of about d/6. The VOLUME condition runs alongside it: riser volume ≥ (casting volume × solidification shrinkage) / feeding efficiency. Both are checked, because a riser satisfying modulus and failing volume stays liquid and still runs out of metal. The ratio, shrinkage, feeding efficiency and any sleeve factor are ENTERED. It does not identify which sections need feeding, compute feeding DISTANCE, model directional solidification, chills or padding, or size the riser neck. A solidification simulation and the methods engineer govern.",
+  citation: "Citation: casting modulus = volume / cooling surface area; the riser must exceed it by a ratio commonly around 1.2, and a cylindrical riser of height equal to its diameter has a modulus of about d/6. The VOLUME condition runs alongside it: riser volume ≥ (casting volume × solidification shrinkage) / (feeding efficiency − shrinkage), since the riser must also feed its own shrinkage. Both are checked, because a riser satisfying modulus and failing volume stays liquid and still runs out of metal. The ratio, shrinkage, feeding efficiency and any sleeve factor are ENTERED. It does not identify which sections need feeding, compute feeding DISTANCE, model directional solidification, chills or padding, or size the riser neck. A solidification simulation and the methods engineer govern.",
   example: riserModulusFeedingExample.inputs,
   fields: [
     { key: "section_length_in", label: "Section length (in)", kind: "number", attrs: { step: "any" } },

@@ -236,6 +236,9 @@ SURVEY_RENDERERS["traverse-closure"] = renderTraverseClosure;
 
 // dims: in { bm_elev: L, bs: dimensionless, fs: dimensionless, known_close: L } out: { sum_bs: L, sum_fs: L, final_elev: L, misclosure: L }
 export function computeDifferentialLeveling({ bm_elev = 0, bs, fs, known_close = null } = {}) {
+  // Until 2026-10-14 a string bm_elev ("100") concatenated with the backsight (misclosure 899.97).
+  bm_elev = Number(bm_elev);
+  if (known_close !== null && known_close !== "") known_close = Number(known_close); else known_close = null;
   const _g = _finiteGuard({ bm_elev, known_close: known_close === null ? 0 : known_close }); if (_g) return _g;
   if (!Array.isArray(bs) || !Array.isArray(fs)) return { error: "Backsights and foresights must be lists." };
   if (bs.length < 1 || fs.length < 1) return { error: "Need at least one backsight and one foresight." };
@@ -393,6 +396,8 @@ SURVEY_RENDERERS["stadia-distance"] = renderStadiaDistance;
 
 // dims: in { l_ft: L, t_f: T, t0_f: T, h_ft: L, p_lb: M L T^-2, p0_lb: M L T^-2, a_in2: L^2, w_plf: M T^-2, alpha_f: dimensionless, e_psi: M L^-1 T^-2 } out: { ct_ft: L, ch_ft: L, cp_ft: L, cs_ft: L, corrected_ft: L }
 export function computeTapingCorrections({ l_ft = 0, t_f = 68, t0_f = 68, h_ft = 0, p_lb = 0, p0_lb = 0, a_in2 = 0, w_plf = 0, alpha_f = 6.45e-6, e_psi = 29e6 } = {}) {
+  // Until 2026-10-14 a string length ("100") concatenated into corrected_ft ("1000.017415-0.04500").
+  [l_ft, t_f, t0_f, h_ft, p_lb, p0_lb, a_in2, w_plf, alpha_f, e_psi] = [l_ft, t_f, t0_f, h_ft, p_lb, p0_lb, a_in2, w_plf, alpha_f, e_psi].map(Number);
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(l_ft > 0)) return { error: "Measured length must be positive (ft)." };
   const ct_ft = alpha_f * (t_f - t0_f) * l_ft;
@@ -902,7 +907,8 @@ export function computeAzimuthBearing({ mode = "azimuth_to_bearing", azimuth_deg
     quadrant_angle_deg: ang,
     quadrant: quad,
     bearing_label,
-    azimuth_dms: _toDms(A),
+    // Until 2026-10-14 an azimuth within half a second of 360 printed 360°00'00"; it wraps to 0.
+    azimuth_dms: _toDms(Math.round(A * 3600) >= 360 * 3600 ? 0 : A),
     note: "Azimuths (0 to 360 deg, clockwise from north) drive coordinate geometry, while deeds and plats are written as quadrant bearings (N or S, an angle from 0 to 90 deg, then E or W); the two name the same direction. An azimuth in the first quadrant reads N az E; in the second, S the supplement E; in the third, S the excess over 180 W; in the fourth, N the deficit from 360 W. The cardinal azimuths read as due north, east, south, or west. The bearing angle is shown to the nearest second. This is plane-direction bookkeeping: it does not apply magnetic declination (the bearing-conversion tile does) or a grid convergence. A computational aid; the recorded plat and the surveyor of record govern.",
   };
 }
@@ -1446,7 +1452,9 @@ export function computeMassHaulOverhaul({ cut_volume_cy = 0, shrinkage_factor = 
   const borrow_station_yards = (borrow_haul_ft > 0 && overhaul_volume_cy > 0)
     ? overhaul_volume_cy * Math.max(0, borrow_haul_ft - free_haul_ft) / FT_PER_STATION
     : null;
-  const borrow_cheaper = borrow_station_yards === null ? null : borrow_station_yards < overhaul_station_yards;
+  // A tie within float slack is not "shorter" either way (until 2026-10-14 it printed "SHORTER: 67200 against 67200").
+  const haul_tie = borrow_station_yards !== null && Math.abs(borrow_station_yards - overhaul_station_yards) <= 1e-9 * Math.max(1, borrow_station_yards, overhaul_station_yards);
+  const borrow_cheaper = borrow_station_yards === null ? null : !haul_tie && borrow_station_yards < overhaul_station_yards;
   const outs = [compacted_from_cut_cy, balance_cy, overhaul_station_yards, free_haul_stations, cut_needed_for_fill_cy];
   if (!outs.every(Number.isFinite)) return { error: "Mass haul math is not a finite value." };
   const balance_verdict = balanced
@@ -1455,7 +1463,12 @@ export function computeMassHaulOverhaul({ cut_volume_cy = 0, shrinkage_factor = 
       ? "SURPLUS of " + fmt(waste_cy, 0) + " cy: " + fmt(cut_volume_cy, 0) + " cy of cut yields " + fmt(compacted_from_cut_cy, 0) + " cy compacted against " + fmt(fill_required_cy, 0) + " cy needed, so that much is wasted or exported"
       : "DEFICIT of " + fmt(borrow_needed_cy, 0) + " cy: " + fmt(cut_volume_cy, 0) + " cy of cut yields only " + fmt(compacted_from_cut_cy, 0) + " cy compacted against " + fmt(fill_required_cy, 0) + " cy needed, so that much must be borrowed. It would take " + fmt(cut_needed_for_fill_cy, 0) + " cy of cut in place to make the fill";
   const haul_verdict = borrow_cheaper === null
-    ? "Enter a borrow haul distance to compare importing against hauling the length of the job."
+    ? (borrow_haul_ft > 0
+      // Until 2026-10-14 this asked for a borrow haul distance that was already entered.
+      ? "No volume beyond free haul is entered, so there is no overhaul to compare the " + fmt(borrow_haul_ft, 0) + " ft borrow haul against."
+      : "Enter a borrow haul distance to compare importing against hauling the length of the job.")
+    : haul_tie
+      ? "A TIE on distance: " + fmt(overhaul_station_yards, 0) + " station-yards either way, so the cost of the borrow material itself and of wasting what it displaces decides"
     : borrow_cheaper
       ? "BORROW IS CHEAPER on distance alone: " + fmt(borrow_station_yards, 0) + " station-yards against " + fmt(overhaul_station_yards, 0) + " to haul it along the alignment -- before the cost of the material itself and of wasting what it displaces"
       : "HAULING ALONG THE JOB IS SHORTER: " + fmt(overhaul_station_yards, 0) + " station-yards against " + fmt(borrow_station_yards, 0) + " from the borrow pit";

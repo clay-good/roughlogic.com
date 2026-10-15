@@ -633,6 +633,8 @@ export function computeStandbyBatterySizing({ standby_current_a = 0, standby_hou
   const standby_ah = Is * Hs;
   const alarm_ah = Ia * (Ma / 60);
   const required_ah = (standby_ah + alarm_ah) * d;
+  // Until 2026-10-14 no load at all sized a 0 Ah requirement and picked a 4 Ah battery.
+  if (!(required_ah > 0)) return { error: "Enter a standby current and period (or an alarm current and period); with no load there is no battery to size." };
   let next_standard_ah = null;
   // 1e-9: 0.4 A x 24 h + 4.8 A x 5 min at 1.2 is 12.000000000000002 in floating point and must still pick 12 Ah.
   for (const s of _BATTERY_STANDARD_AH) { if (s >= required_ah - 1e-9) { next_standard_ah = s; break; } }
@@ -1139,6 +1141,8 @@ LOWVOLTAGE_RENDERERS["cable-support-jhook"] = _v890renderCableSupportJhook;
 export function computeAccessControlPowerSupply({ lock_count = 4, lock_current_a = 0.5, reader_count = 2, reader_current_a = 0.15, other_load_a = 0.225, standby_hours = 4 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (lock_count < 0 || reader_count < 0) return { error: "Device counts cannot be negative." };
+  // Until 2026-10-14 a 2.5-lock count was rounded silently.
+  if (!Number.isInteger(Number(lock_count)) || !Number.isInteger(Number(reader_count))) return { error: "Lock and reader counts are whole numbers of devices." };
   if (lock_current_a < 0 || reader_current_a < 0 || other_load_a < 0) return { error: "Device currents cannot be negative (A)." };
   if (standby_hours < 0) return { error: "Standby hours cannot be negative." };
   const total_load_a = Math.round(lock_count) * lock_current_a + Math.round(reader_count) * reader_current_a + other_load_a;
@@ -1152,6 +1156,7 @@ export function computeAccessControlPowerSupply({ lock_count = 4, lock_current_a
     total_load_a,
     psu_min_a,
     battery_ah,
+    standby_hours: Number(standby_hours),
     note: "Access-control power supply and standby battery: total load = locks x hold current + readers + request-to-exit + controller; the supply is sized about 25% over the load (a design margin, not a figure NFPA 72 or UL 294 sets); the standby battery = load x standby hours x 1.25 for aging. FAIL-SAFE maglocks draw continuously (and drop on power loss -- egress), while FAIL-SECURE strikes draw only on unlock and hold on power loss, so a fail-secure system draws far less standby. NFPA 72 sets the standby time (often 4 to 24 hr) for a system tied to the fire alarm or required for egress. A sizing estimate; the listed panel, the door hardware datasheets, the AHJ, and the fire/life-safety interface govern.",
   };
 }
@@ -1180,7 +1185,8 @@ function _v929renderAccessControlPowerSupply(inputRegion, outputRegion, citation
     if (r.error) { oLoad.textContent = r.error; oPsu.textContent = "-"; oBat.textContent = "-"; return; }
     oLoad.textContent = fmt(r.total_load_a, 2) + " A";
     oPsu.textContent = fmt(r.psu_min_a, 2) + " A (1.25x load)";
-    oBat.textContent = fmt(r.battery_ah, 1) + " Ah for " + fmt(Number(sh.input.value) || 4, 0) + " hr standby";
+    // Until 2026-10-14 a 0-hr standby printed "0.0 Ah for 4 hr standby" (the hours fell back to the default).
+    oBat.textContent = r.standby_hours === 0 ? "none (0 hr standby entered)" : fmt(r.battery_ah, 1) + " Ah for " + fmt(r.standby_hours, 1) + " hr standby";
   }, DEBOUNCE_MS);
   for (const f of [lc, li, rc, ri, ol, sh]) f.input.addEventListener("input", update);
 }

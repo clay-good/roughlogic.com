@@ -59,7 +59,8 @@ function _simpleRenderer(spec) {
     for (const o of spec.outputs) outs[o.key] = makeOutputLine(outputRegion, o.label, o.id);
     function update() {
       const params = {};
-      for (const f of spec.fields) params[f.key] = Number(fields[f.key].input.value) || 0;
+      // A required field sends a blank box as null so the compute can ask for it.
+      for (const f of spec.fields) params[f.key] = f.required && fields[f.key].input.value === "" ? null : Number(fields[f.key].input.value) || 0;
       const result = spec.compute(params);
       if (result.error) {
         for (const out of Object.values(outs)) out.textContent = "-";
@@ -758,7 +759,7 @@ GREENHOUSE_RENDERERS["plug-tray-cell-count"] = _simpleRenderer({
     { key: "trays_to_sow", id: "ptc-trays", label: "Trays to sow", value: (r) => fmt(r.trays_to_sow, 0) + " trays, " + fmt(r.cells_sown, 0) + " cells" },
     { key: "seed_required", id: "ptc-seed", label: "Seed required", value: (r) => fmt(r.seed_required, 0) + " seeds" },
     { key: "finished_yield", id: "ptc-yield", label: "Finished plants the sowing yields", value: (r) => fmt(r.finished_yield, 0) + " -- a cushion of " + fmt(r.surplus, 0) + " (" + fmt(r.surplus_pct, 1) + "%)" },
-    { key: "naive_trays", id: "ptc-naive", label: "What order divided by cells would give", value: (r) => fmt(r.naive_trays, 0) + " trays, yielding " + fmt(r.naive_yield, 0) + " -- short by " + fmt(r.naive_shortfall, 0) + " plants (" + fmt(r.naive_shortfall_pct, 0) + "%)" },
+    { key: "naive_trays", id: "ptc-naive", label: "What order divided by cells would give", value: (r) => fmt(r.naive_trays, 0) + " trays, yielding " + fmt(r.naive_yield, 0) + " -- " + (r.naive_shortfall > 1e-9 * r.naive_yield ? "short by " + fmt(r.naive_shortfall, 0) + " plants (" + fmt(r.naive_shortfall_pct, 0) + "%)" : "enough here, " + fmt(-r.naive_shortfall, 0) + " to spare after the losses") }, // Until 2026-10-14 a lossless sowing printed "short by -96 plants (-1%)".
     { key: "bench_area_sqft", id: "ptc-bench", label: "Propagation bench", unit: "sq ft", value: (r) => fmt(r.bench_area_sqft, 0) + " sq ft before aisles" },
     { key: "note", id: "ptc-note", label: "Use", value: (r) => r.note },
   ],
@@ -836,6 +837,8 @@ GREENHOUSE_RENDERERS["substrate-container-volume"] = _simpleRenderer({
 // dims: in { blackout_pull_hour: T, blackout_open_hour: T, critical_dark_hours: T, long_photoperiod_hours: T, short_photoperiod_hours: T, ppfd_umol_m2_s: dimensionless, interruption_hours: T, interruption_ppfd_umol_m2_s: dimensionless } out: { dark_hours: T, light_hours: T, long_dli: dimensionless, short_dli: dimensionless, dli_given_up: dimensionless, interruption_dli: dimensionless }
 export function computePhotoperiodBlackoutSchedule({ blackout_pull_hour = 0, blackout_open_hour = 0, critical_dark_hours = 0, long_photoperiod_hours = 0, short_photoperiod_hours = 0, ppfd_umol_m2_s = 0, interruption_hours = 0, interruption_ppfd_umol_m2_s = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
+  // Until 2026-10-14 the page read a blank pull or open hour as midnight.
+  if ([blackout_pull_hour, blackout_open_hour].some((x) => x === null || x === "")) return { error: "Enter the hours the blackout is pulled and opened (0-23)." };
   if (!(blackout_pull_hour >= 0 && blackout_pull_hour < 24) || !(blackout_open_hour >= 0 && blackout_open_hour < 24)) {
     return { error: "Blackout pull and open hours must be between 0 and 24 on a 24 hour clock." };
   }
@@ -875,8 +878,8 @@ GREENHOUSE_RENDERERS["photoperiod-blackout-schedule"] = _simpleRenderer({
   citation: "Citation: the uninterrupted dark period from the blackout pull and open times, checked against the crop's critical dark period, with the daily light integral at each photoperiod from DLI = PPFD x hours x 3,600 / 1,000,000. Short-day crops generally need 12 to 13 hours of uninterrupted darkness. The crop's own published critical photoperiod and the cultivar's response group govern.",
   example: photoperiodExample,
   fields: [
-    { key: "blackout_pull_hour", label: "Blackout pulled at (0-23)", attrs: { step: "any", min: "0", max: "23" } },
-    { key: "blackout_open_hour", label: "Blackout opened at (0-23)", attrs: { step: "any", min: "0", max: "23" } },
+    { key: "blackout_pull_hour", label: "Blackout pulled at (0-23)", attrs: { step: "any", min: "0", max: "23" }, required: true },
+    { key: "blackout_open_hour", label: "Blackout opened at (0-23)", attrs: { step: "any", min: "0", max: "23" }, required: true },
     { key: "critical_dark_hours", label: "Crop critical dark period (hours)" },
     { key: "long_photoperiod_hours", label: "Long photoperiod to compare (hours)", attrs: { step: "any", min: "0", max: "24" } },
     { key: "short_photoperiod_hours", label: "Short photoperiod to compare (hours)", attrs: { step: "any", min: "0", max: "24" } },

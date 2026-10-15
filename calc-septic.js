@@ -544,7 +544,9 @@ function renderLeachFieldAggregate(inputRegion, outputRegion, citationEl) {
       waste_pct: ws.input.value === "" ? 10 : Number(ws.input.value),
     });
     if (r.error) { oCy.textContent = r.error; oTons.textContent = "-"; return; }
-    oCy.textContent = fmt(r.stone_cy, 1) + " cy (" + fmt(r.stone_cf, 0) + " ft^3)";
+    // Until 2026-10-14 the cy (with waste) sat beside the ft^3 without it: "14.7 cy (360 ft^3)".
+    const grossCf = r.stone_cy * 27;
+    oCy.textContent = fmt(r.stone_cy, 1) + " cy (" + fmt(grossCf, 0) + " ft^3" + (Math.abs(grossCf - r.stone_cf) > 1e-9 * r.stone_cf ? " with waste; " + fmt(r.stone_cf, 0) + " ft^3 in the trenches" : "") + ")";
     oTons.textContent = fmt(r.stone_tons, 1) + " tons";
   }, DEBOUNCE_MS);
   for (const f of [nt, tl, tw, sd, ws]) f.input.addEventListener("input", update);

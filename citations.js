@@ -798,7 +798,7 @@ export const CITATIONS = {
     edition: "Clarifier surface, weir, and solids loading rates, standard wastewater-operations practice (Ten States Standards / Metcalf & Eddy), by name.",
     freeAccess: "The overflow-rate and solids-loading relations are standard published wastewater results; the state design criteria govern the limits.",
     governance: GOVERNANCE.water,
-    editionNote: "The clarifier loading checks: the surface overflow rate = flow / surface area (gpd/ft^2), the weir overflow rate = flow / total weir length (gpd/ft), and the secondary-clarifier solids loading = (flow + return sludge flow) x MLSS x 8.34 / area (lb/ft^2/day). Typical design ceilings are roughly 700-1000 gpd/ft^2 SOR, 10,000-20,000 gpd/ft weir, and 20-30 lb/ft^2/day solids; exceeding the SOR carries floc over the weir. This returns the rates for comparison; the Ten States Standards and the state design criteria govern the actual limits. An operations aid; the operator of record and the primacy agency govern.",
+    editionNote: "The clarifier loading checks: the surface overflow rate = flow / surface area (gpd/ft^2), the weir overflow rate = flow / total weir length (gpd/ft), and the secondary-clarifier solids loading = (flow + return sludge flow) x MLSS x 8.34 / area (lb/ft^2/day). The Ten States (2014) ceilings the tile cites: 1,000 gpd/ft^2 SOR for primary tanks at design average flow (800-1,200 at peak hour for activated-sludge final tanks), 20,000 gpd/ft weir loading at 1 MGD or less and 30,000 above (72.43), and 35-40 lb/ft^2/day peak solids (72.232); exceeding the SOR carries floc over the weir. This returns the rates for comparison; the Ten States Standards and the state design criteria govern the actual limits. An operations aid; the operator of record and the primacy agency govern.",
     assumptions: [
       { name: "Surface overflow rate", value: "SOR = flow / surface area (gpd/ft^2)", source: "wastewater operations" },
       { name: "Weir and solids loading", value: "weir = flow / weir length; solids = (flow + return sludge flow) x MLSS x 8.34 / area", source: "Ten States Standards" },
@@ -23267,7 +23267,7 @@ export const CITATIONS = {
     ],
   },
   "riser-modulus-feeding": {
-    formula: "casting modulus = volume / cooling surface area; the riser modulus must exceed it by an entered ratio (commonly about 1.2), and a cylindrical riser of height equal to its diameter has a modulus of about d/6. The VOLUME condition runs alongside: riser volume >= casting volume x solidification shrinkage / feeding efficiency.",
+    formula: "casting modulus = volume / cooling surface area; the riser modulus must exceed it by an entered ratio (commonly about 1.2), and a cylindrical riser of height equal to its diameter has a modulus of about d/6. The VOLUME condition runs alongside: the riser must feed the casting's shrinkage and its own, so riser volume >= shrinkage x casting volume / (feeding efficiency - shrinkage).",
     edition: "Riser sizing on Chvorinov's modulus rule with the volume check that accompanies it. The modulus ratio, the alloy shrinkage, the feeding efficiency and any sleeve factor are all ENTERED.",
     freeAccess: "Two published rules and one geometric relation.",
     governance: GOVERNANCE.general,

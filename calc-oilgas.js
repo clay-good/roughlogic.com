@@ -352,7 +352,8 @@ export function computeLiquidPipelineStationSpacing({
   const head_used_per_station_ft = actual_spacing_mi * combined_gradient_ft_per_mi;
   // Elevation is head spent regardless of flow, so on a climb the static term
   // can exceed the friction term entirely. Report the split.
-  const elevation_share_pct = elevation_gradient_ft_per_mi / combined_gradient_ft_per_mi * 100;
+  // Until 2026-10-14 a falling line printed a negative share (-227%); a fall spends no head, so its share is 0.
+  const elevation_share_pct = Math.max(0, elevation_gradient_ft_per_mi) / combined_gradient_ft_per_mi * 100;
   const elevation_dominates = Math.abs(elevation_gradient_ft_per_mi) > friction_gradient_ft_per_mi;
   // Friction goes roughly as the SQUARE of flow, which is the whole shape of
   // the economics: the last increment of throughput is the most expensive.
@@ -360,11 +361,18 @@ export function computeLiquidPipelineStationSpacing({
   const flow_ratio = has_alternate ? alternate_flow_bpd / flow_bpd : 0;
   const alternate_gradient_ft_per_mi = has_alternate ? friction_gradient_ft_per_mi * flow_ratio * flow_ratio : 0;
   const alternate_combined = has_alternate ? alternate_gradient_ft_per_mi + elevation_gradient_ft_per_mi : 0;
-  const alternate_spacing_mi = has_alternate && alternate_combined > 0 ? available_head_ft / alternate_combined : 0;
-  const alternate_station_count = has_alternate && alternate_spacing_mi > 0 ? Math.max(1, Math.ceil(total_length_mi / alternate_spacing_mi - 1e-9)) : 0;
+  // Until 2026-10-14 a lower alternative flow on a falling line printed "spacing falls to 0 miles ... needs 0
+  // stations" and called the smaller friction gradient a rise; a slack line now says so.
+  const alternate_slack = has_alternate && !(alternate_combined > 0);
+  const alternate_spacing_mi = has_alternate && !alternate_slack ? available_head_ft / alternate_combined : null;
+  const alternate_station_count = has_alternate && !alternate_slack ? Math.max(1, Math.ceil(total_length_mi / alternate_spacing_mi - 1e-9)) : null;
+  const alt_moves = (a, b) => (a > b * (1 + 1e-9) ? "rises" : a < b * (1 - 1e-9) ? "falls" : "stays");
   const alternate_verdict = !has_alternate
     ? "(no throughput comparison entered)"
-    : "at " + fmt(alternate_flow_bpd, 0) + " bbl/day the friction gradient rises to " + fmt(alternate_gradient_ft_per_mi, 1) + " ft per mile (friction goes as the SQUARE of flow), spacing falls to " + fmt(alternate_spacing_mi, 0) + " miles, and the line needs " + fmt(alternate_station_count, 0) + " station" + (alternate_station_count === 1 ? "" : "s");
+    : "at " + fmt(alternate_flow_bpd, 0) + " bbl/day the friction gradient " + alt_moves(alternate_gradient_ft_per_mi, friction_gradient_ft_per_mi) + (alt_moves(alternate_gradient_ft_per_mi, friction_gradient_ft_per_mi) === "stays" ? " at " : " to ") + fmt(alternate_gradient_ft_per_mi, 1) + " ft per mile (friction goes as the SQUARE of flow)"
+      + (alternate_slack
+        ? ", no more than the line's " + fmt(-elevation_gradient_ft_per_mi, 1) + " ft per mile fall, so the line runs SLACK: gravity drives the flow, no station spacing applies, and holding the line packed is a back-pressure and surge question rather than a spacing one"
+        : ", spacing " + ({ rises: "grows", falls: "falls", stays: "stays" })[alt_moves(alternate_spacing_mi, max_spacing_mi)] + (alt_moves(alternate_spacing_mi, max_spacing_mi) === "stays" ? " at " : " to ") + fmt(alternate_spacing_mi, 0) + " miles, and the line needs " + fmt(alternate_station_count, 0) + " station" + (alternate_station_count === 1 ? "" : "s"));
   if (![available_head_ft, elevation_gradient_ft_per_mi, combined_gradient_ft_per_mi, max_spacing_mi, station_count, alternate_gradient_ft_per_mi].every(Number.isFinite)) return { error: "Station spacing math is not a finite value." };
   return {
     available_head_ft, elevation_gradient_ft_per_mi, combined_gradient_ft_per_mi,
@@ -389,7 +397,7 @@ OILGAS_RENDERERS["liquid-pipeline-station-spacing"] = _simpleRenderer({
   ],
   outputs: [
     { key: "h", id: "lps-out-h", label: "Head available per station", value: (r) => fmt(r.available_head_ft, 0) + " ft" },
-    { key: "g", id: "lps-out-g", label: "Combined gradient", value: (r) => fmt(r.combined_gradient_ft_per_mi, 2) + " ft per mile (" + fmt(r.elevation_gradient_ft_per_mi, 2) + " of it elevation, " + fmt(r.elevation_share_pct, 0) + "%" + (r.elevation_dominates ? " -- elevation is the LARGER term" : "") + ")" },
+    { key: "g", id: "lps-out-g", label: "Combined gradient", value: (r) => fmt(r.combined_gradient_ft_per_mi, 2) + " ft per mile (" + (r.elevation_gradient_ft_per_mi < 0 ? "the terrain falls " + fmt(-r.elevation_gradient_ft_per_mi, 2) + " ft per mile, giving back head against the friction" : fmt(r.elevation_gradient_ft_per_mi, 2) + " of it elevation, " + fmt(r.elevation_share_pct, 0) + "%" + (r.elevation_dominates ? " -- elevation is the LARGER term" : "")) + ")" },
     { key: "s", id: "lps-out-s", label: "Maximum station spacing", value: (r) => fmt(r.max_spacing_mi, 0) + " miles" },
     { key: "c", id: "lps-out-c", label: "Stations required", value: (r) => fmt(r.station_count, 0) + " at " + fmt(r.actual_spacing_mi, 0) + " mile spacing, using " + fmt(r.head_used_per_station_ft, 0) + " ft of the available head" },
     { key: "a", id: "lps-out-a", label: "At the alternative throughput", value: (r) => r.alternate_verdict },
@@ -440,7 +448,8 @@ export function computePigBatchVolume({
     : !has_window
       ? "(no tool velocity window entered)"
       : in_window
-        ? "INSIDE the window: " + fmt(velocity_fps, 2) + " ft/s against " + fmt(tool_min_fps, 1) + " to " + fmt(tool_max_fps, 1) + " ft/s"
+        // Until 2026-10-14 a window with one end blank read "against 2.0 to 0.0 ft/s".
+        ? "INSIDE the window: " + fmt(velocity_fps, 2) + " ft/s against " + (tool_max_fps > 0 ? (tool_min_fps > 0 ? fmt(tool_min_fps, 1) + " to " + fmt(tool_max_fps, 1) + " ft/s" : "a " + fmt(tool_max_fps, 1) + " ft/s maximum (no minimum entered)") : "a " + fmt(tool_min_fps, 1) + " ft/s minimum (no maximum entered)")
         : !above_min
           ? "BELOW the window: " + fmt(velocity_fps, 2) + " ft/s against a " + fmt(tool_min_fps, 1) + " ft/s minimum -- the run has to wait for throughput, or the line must move at least " + fmt(flow_for_min_bpd, 0) + " bbl/day"
           : "ABOVE the window: " + fmt(velocity_fps, 2) + " ft/s against a " + fmt(tool_max_fps, 1) + " ft/s maximum -- the tool's sensors cannot sample properly and the run would have to be repeated; hold the line at or below " + fmt(flow_for_max_bpd, 0) + " bbl/day";
@@ -1129,8 +1138,11 @@ export function computeTankStrappingVolume({
     ? "no closing gauge was entered, so the corrections below apply to the standing volume rather than to a run"
     : is_delivery
       ? "the gauge fell to " + fmt(closing_gauge_ft, 0) + " ft " + fmt(closing_gauge_in, 1) + " in, so the run moved " + fmt(moved_bbl, 1) + " barrels gross"
+      // Until 2026-10-14 equal gauges read "the gauge ROSE ... RECEIVED 0.0 barrels".
+      : Math.abs(opening_height_ft - closing_height_ft) <= 1e-9 * opening_height_ft
+        ? "the closing gauge equals the opening gauge, so nothing moved"
       : "the gauge ROSE to " + fmt(closing_gauge_ft, 0) + " ft " + fmt(closing_gauge_in, 1) + " in, so the tank RECEIVED " + fmt(-moved_bbl, 1) + " barrels gross";
-  const netVerdict = "applying a volume correction factor of " + fmt(volume_correction_factor, 4) + " and a " + fmt(sediment_water_pct, 2) + "% sediment and water deduction gives " + fmt(net_bbl, 1) + " barrels net -- a difference of " + fmt(correction_bbl, 1) + " barrels, or " + fmt(correction_pct, 2) + "%. THAT IS WHY THE CORRECTION IS ON THE TICKET AND NOT LEFT TO THE GAUGE";
+  const netVerdict = !(subject_bbl > 1e-9 * gross_bbl) ? "nothing moved, so there is no run volume to correct" : "applying a volume correction factor of " + fmt(volume_correction_factor, 4) + " and a " + fmt(sediment_water_pct, 2) + "% sediment and water deduction gives " + fmt(net_bbl, 1) + " barrels net -- a difference of " + fmt(correction_bbl, 1) + " barrels, or " + fmt(correction_pct, 2) + "%. THAT IS WHY THE CORRECTION IS ON THE TICKET AND NOT LEFT TO THE GAUGE";
   const strappingVerdict = "AND THE CERTIFIED STRAPPING TABLE IS THE LEGAL DOCUMENT, not this formula. Real tanks deviate from the ideal cylinder -- shell courses of different thickness, bottom deadwood, an out-of-round shell, tilt -- and the strapping table captures all of it, which is why it is MEASURED rather than computed. This is a sanity check and a planning number, and for custody transfer it is neither sufficient nor authoritative";
   const temperatureVerdict = "THE TEMPERATURE CORRECTION IS NOT A ROUNDING MATTER. Crude expands appreciably, so a warm tank gauged in the afternoon holds fewer standard barrels than the same height gauged at dawn, and the correction to 60 degF is what makes two measurements comparable. The factor is ENTERED from the applicable petroleum measurement tables for the observed temperature and gravity rather than modelled here";
 
@@ -1533,7 +1545,7 @@ OILGAS_RENDERERS["tank-strapping-volume"] = _simpleRenderer({
     { key: "bbl_per_ft", label: "Barrels per foot", unit: "bbl/ft", value: (r) => fmt(r.bbl_per_ft, 2) + " bbl/ft" },
     { key: "bbl_per_in", label: "Barrels per inch", unit: "bbl/in", value: (r) => fmt(r.bbl_per_in, 3) + " bbl/in" },
     { key: "gross_bbl", label: "Gross at the opening gauge", unit: "bbl", value: (r) => fmt(r.gross_bbl, 1) + " bbl" },
-    { key: "moved_bbl", label: "Moved on the run", unit: "bbl", value: (r) => !r.has_closing ? "no closing gauge" : (r.is_delivery ? fmt(r.moved_bbl, 1) + " bbl out" : fmt(-r.moved_bbl, 1) + " bbl in") },
+    { key: "moved_bbl", label: "Moved on the run", unit: "bbl", value: (r) => !r.has_closing ? "no closing gauge" : (r.is_delivery ? fmt(r.moved_bbl, 1) + " bbl out" : -r.moved_bbl > 1e-9 ? fmt(-r.moved_bbl, 1) + " bbl in" : "none (equal gauges)") },
     { key: "net_bbl", label: "Net after corrections", unit: "bbl", value: (r) => fmt(r.net_bbl, 1) + " bbl" },
     { key: "correction_bbl", label: "Gross minus net", unit: "bbl", value: (r) => fmt(r.correction_bbl, 1) + " bbl (" + fmt(r.correction_pct, 2) + "%)" },
     { key: "perInchVerdict", label: "Per inch", value: (r) => r.perInchVerdict },

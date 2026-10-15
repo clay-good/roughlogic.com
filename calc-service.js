@@ -57,7 +57,10 @@ export function computeGasApplianceDemand({ appliances = [], fuel = "natural_gas
   const hv = heating_value != null ? Number(heating_value) : (GAS_HEATING_VALUE[fuel] || GAS_HEATING_VALUE.natural_gas);
   if (!Number.isFinite(hv) || hv <= 0) return { error: "Heating value must be a positive finite number (BTU/ft^3)." };
   let total = 0;
-  for (const a of appliances) {
+  // Until 2026-10-14 a blank (null or "") entry was read as a 0 BTU/hr appliance and counted.
+  const entered = appliances.filter((a) => a !== null && a !== undefined && String(a).trim() !== "");
+  if (entered.length === 0) return { error: "Add at least one appliance input rating (BTU/hr)." };
+  for (const a of entered) {
     const v = Number(a);
     if (!Number.isFinite(v) || v < 0) return { error: "Each appliance input must be a non-negative finite number (BTU/hr)." };
     total += v;
@@ -69,7 +72,7 @@ export function computeGasApplianceDemand({ appliances = [], fuel = "natural_gas
     cfh,
     heating_value: hv,
     fuel: fuel === "propane" ? "propane" : "natural gas",
-    appliance_count: appliances.length,
+    appliance_count: entered.length,
     note: "Fuel-gas piping is sized for the full connected load unless the AHJ accepts a demand factor (IFGC 402.2). Propane delivers more energy per cubic foot, so the same BTU load is fewer CFH and sizes a smaller pipe for the same length. This CFH plus the longest run length feed gas-pipe-sizing - it is the demand, not the pipe size.",
   };
 }

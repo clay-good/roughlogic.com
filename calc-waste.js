@@ -529,6 +529,11 @@ export function computeLfgFlareCapacity({ peak_lfg_cfm = 0, methane_fraction_pct
     heat_release_mmbtu_per_hr: heat_release_btu_per_hr / 1e6,
     minimum_stable_scfm,
     turndown_headroom_ratio: peak_lfg_cfm / minimum_stable_scfm,
+    // Until 2026-10-14 a peak BELOW the minimum stable flow read "the peak is 0.9x above it".
+    peak_below_minimum: peak_lfg_cfm < minimum_stable_scfm * (1 - 1e-9),
+    minimum_verdict: peak_lfg_cfm < minimum_stable_scfm * (1 - 1e-9)
+      ? "the peak itself is BELOW it (" + fmt(peak_lfg_cfm / minimum_stable_scfm, 2) + "x): this flare cannot hold a stable flame even at the peak flow -- pick a flare with more turndown or less margin"
+      : "the peak is " + fmt(peak_lfg_cfm / minimum_stable_scfm, 1) + "x above it",
     // Heat content of the GAS, which is what a flame sees, not of the methane.
     design_btu_per_cf: methane_heating_value_btu_per_cf * methane_fraction_pct / 100,
     reduced_btu_per_cf: methane_heating_value_btu_per_cf * reduced_methane_fraction_pct / 100,
@@ -557,7 +562,7 @@ WASTE_RENDERERS["lfg-flare-capacity"] = _simpleRenderer({
   outputs: [
     { key: "rated_capacity_scfm", id: "lfc-rate", label: "Rated flare capacity", unit: "scfm", value: (r) => fmt(r.rated_capacity_scfm, 0) + " scfm for a " + fmt(r.peak_lfg_cfm, 0) + " cfm peak" },
     { key: "heat_release_mmbtu_per_hr", id: "lfc-heat", label: "Heat release at the peak", unit: "MMBtu/h", value: (r) => fmt(r.heat_release_mmbtu_per_hr, 1) + " MMBtu/h from " + fmt(r.methane_cfm, 0) + " cfm of methane" },
-    { key: "minimum_stable_scfm", id: "lfc-min", label: "Minimum stable flow", unit: "scfm", value: (r) => fmt(r.minimum_stable_scfm, 0) + " scfm -- the peak is " + fmt(r.turndown_headroom_ratio, 1) + "x above it" },
+    { key: "minimum_stable_scfm", id: "lfc-min", label: "Minimum stable flow", unit: "scfm", value: (r) => fmt(r.minimum_stable_scfm, 0) + " scfm -- " + r.minimum_verdict },
     { key: "design_btu_per_cf", id: "lfc-btu", label: "Heat content of the gas", value: (r) => fmt(r.design_btu_per_cf, 0) + " Btu/cu ft at the design methane fraction" },
     { key: "reduced_btu_per_cf", id: "lfc-red", label: "At the reduced methane fraction", value: (r) => fmt(r.reduced_btu_per_cf, 0) + " Btu/cu ft -- a " + fmt(r.methane_fraction_fall_pct, 0) + "% fall in methane content" + (r.methane_cfm / r.peak_lfg_cfm * (100 - r.methane_fraction_fall_pct) <= 20 + 1e-9 ? ", at or below the roughly 20% a flare needs, and this is what trips it" : ", still above the roughly 20% a flare needs to hold a flame") },
     { key: "methane_destroyed_tons", id: "lfc-dest", label: "Methane destroyed", unit: "tons/yr", value: (r) => fmt(r.methane_destroyed_tons, 0) + " short tons a year" },

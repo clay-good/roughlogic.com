@@ -7,7 +7,7 @@ export const BESPOKE_OUTPUT_LABELS = {
   "aav-install-check": {"passes":"Verdict","outdoor_vent_ok":"Outdoor vent still required (918.7)","drain_ok":"Placement","dfu_ok":"Capacity","note":"Note"},
   "abatement-containment": {"poly_sf":"Poly sheeting (incl. 10% laps)","req_cfm":"Required exhaust airflow","nam_count":"Negative-air machines","waste_bags":"Regulated-waste bags"},
   "abrasive-blast": {"cfm":"Nozzle air-flow","compressor_hp":"Compressor horsepower","abrasive_lb_hr":"Abrasive consumption","abrasive_lb":"Total abrasive for the area"},
-  "access-control-power-supply": {"total_load_a":"Total load","psu_min_a":"Minimum power supply","battery_ah":"Standby battery"},
+  "access-control-power-supply": {"total_load_a":"Total load","psu_min_a":"Minimum power supply","standby_hours":"Standby battery"},
   "accessible-toilet-compartment": {"passes":"Verdict","required_wheelchair_depth_in":"Wheelchair compartment","survives_mounting_swap":"If the water closet mounting changed","note":"Note"},
   "acme-thread-depth": {"crest_flat_in":"Crest flat width","note":"Note"},
   "acoustic-gain-pag-nag": {"margin_db":"Margin","verdict":"Verdict"},

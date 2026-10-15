@@ -689,8 +689,9 @@ export function computeStageDeckLiveLoad({ length_ft = 0, width_ft = 0, legs = 4
     : leg_utilization_pct > 85
       ? "TIGHT: inside the rating but with little margin"
       : "OK: real margin against the leg rating";
+  // Until 2026-10-14 a 900 lb point load with no deck rating entered read "no concentrated load entered".
   const point_verdict = point_utilization_pct === null
-    ? "no concentrated load entered"
+    ? (point_load_lb > 0 ? "a " + fmt(point_load_lb, 0) + " lb concentrated load is entered but no deck point rating to check it against -- enter the manufacturer's rated point load" : "no concentrated load entered")
     : point_utilization_pct > 100
       ? "OVER the deck's rated point load"
       : "inside the deck's rated point load";
@@ -730,7 +731,7 @@ STAGEPRODUCTION_RENDERERS["stage-deck-live-load"] = _r({
     { key: "u", id: "sdll-out-u", label: "Uniform live load", value: (r) => fmt(r.live_load_lb, 0) + " lb (total with deck " + fmt(r.total_load_lb, 0) + " lb)" },
     { key: "l", id: "sdll-out-l", label: "Load per leg", value: (r) => fmt(r.load_per_leg_lb, 1) + " lb" },
     { key: "p", id: "sdll-out-p", label: "Leg utilization", value: (r) => fmt(r.leg_utilization_pct, 1) + " % -- " + r.leg_verdict },
-    { key: "c", id: "sdll-out-c", label: "Concentrated load", value: (r) => r.point_utilization_pct === null ? r.point_verdict : fmt(r.point_utilization_pct, 1) + " % of the deck's point rating, " + r.point_verdict + (r.bearing_psi === null ? "" : " (" + fmt(r.bearing_psi, 1) + " psi bearing)") },
+    { key: "c", id: "sdll-out-c", label: "Concentrated load", value: (r) => r.point_utilization_pct === null ? r.point_verdict + (r.bearing_psi === null ? "" : " (" + fmt(r.bearing_psi, 1) + " psi bearing)") : fmt(r.point_utilization_pct, 1) + " % of the deck's point rating, " + r.point_verdict + (r.bearing_psi === null ? "" : " (" + fmt(r.bearing_psi, 1) + " psi bearing)") },
     { key: "z", id: "sdll-out-z", label: "Note", value: (r) => r.note },
   ],
   compute: computeStageDeckLiveLoad,

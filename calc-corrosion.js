@@ -646,11 +646,15 @@ export function computeTankBottomAnodeLayout({ tank_diameter_ft = 0, current_den
   const current_ma = bottom_area_sqft * current_density_ma_per_sqft;
   // Parallel lines at half-spacing offsets either side of the centreline, each
   // a chord of the circle.
+  // Until 2026-10-14 y was stepped by repeated float addition, so a line that
+  // lands exactly on the rim (42 ft at 1.2 ft) crept inside it and was counted
+  // (36 lines, not 34). Count the lines from an integer index instead.
+  const lines_per_side = Math.ceil((radius_ft - grid_spacing_ft / 2) / grid_spacing_ft - 1e-9);
   let grid_ribbon_ft = 0;
-  let line_count = 0;
-  for (let y = grid_spacing_ft / 2; y < radius_ft; y += grid_spacing_ft) {
-    grid_ribbon_ft += 2 * 2 * Math.sqrt(radius_ft * radius_ft - y * y);
-    line_count += 2;
+  const line_count = 2 * lines_per_side;
+  for (let k = 0; k < lines_per_side; k++) {
+    const y = grid_spacing_ft / 2 + k * grid_spacing_ft;
+    grid_ribbon_ft += 2 * 2 * Math.sqrt(Math.max(0, radius_ft * radius_ft - y * y));
   }
   // The farthest point of the bottom from any ribbon is midway between two
   // lines or on the rim, where the chords shorten: beyond the last line, and
@@ -833,7 +837,7 @@ CORROSION_RENDERERS["ac-induced-voltage-pipeline"] = _simpleRenderer({
     { key: "holiday_diameter_mm", id: "aci-d", label: "Equivalent holiday diameter", unit: "mm", value: (r) => fmt(r.holiday_diameter_mm, 1) + " mm" },
     { key: "ac_current_density_a_per_m2", id: "aci-j", label: "AC current density at the holiday", value: (r) => fmt(r.ac_current_density_a_per_m2, 1) + " A/m^2 -- " + fmt(r.threshold_multiple, 1) + " times the " + fmt(r.risk_threshold_a_per_m2, 0) + " A/m^2 threshold" },
     { key: "touch_margin_v", id: "aci-touch", label: "Against the personnel limit", value: (r) => (r.meets_touch_limit ? "meets it with " + fmt(r.touch_margin_v, 1) + " V to spare" : "EXCEEDS it by " + fmt(-r.touch_margin_v, 1) + " V") + " -- a separate question from the steel" },
-    { key: "voltage_for_threshold_v", id: "aci-need", label: "Voltage the steel actually needs", unit: "V", value: (r) => fmt(r.voltage_for_threshold_v, 2) + " V -- " + fmt(r.stringency_ratio, 1) + " times more stringent than the touch limit" },
+    { key: "voltage_for_threshold_v", id: "aci-need", label: "Voltage the steel actually needs", unit: "V", value: (r) => fmt(r.voltage_for_threshold_v, 2) + " V -- " + (Math.abs(r.stringency_ratio - 1) < 0.05 ? "about the same as the touch limit" : r.stringency_ratio > 1 ? fmt(r.stringency_ratio, 1) + " times more stringent than the touch limit" : "here the touch limit is the stricter one, " + fmt(1 / r.stringency_ratio, 1) + " times lower") }, // Until 2026-10-14 a ratio below 1 printed "0.3 times more stringent".
     { key: "alternative_current_density_a_per_m2", id: "aci-alt", label: "In the alternative soil", value: (r) => fmt(r.alternative_current_density_a_per_m2, 1) + " A/m^2 (" + fmt(r.alternative_change_pct, 0) + "%) at " + fmt(r.alternative_resistivity_ohm_m, 0) + " ohm-m" },
     { key: "note", id: "aci-note", label: "Use", value: (r) => r.note },
   ],

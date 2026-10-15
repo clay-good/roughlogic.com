@@ -458,6 +458,11 @@ export function renderQuadratic(inputRegion, outputRegion, citationEl) {
 
 // dims: in { value: dimensionless } out: { mantissa: dimensionless, exponent: dimensionless }
 export function computeScientificNotation({ value }) {
+  // Until 2026-10-14 "0x1F" read as 31 and a blank read as 0; only decimal or
+  // e-notation is accepted now.
+  if (!/^[+-]?(\d+\.?\d*|\.\d+)([eE][+-]?\d+)?$/.test(String(value == null ? "" : value).trim())) {
+    return { error: "Enter a finite number in decimal or scientific form (e.g. 0.00347 or 3.47e-3)." };
+  }
   const x = Number(value);
   if (!Number.isFinite(x)) {
     return { error: "Enter a finite number." };
@@ -467,8 +472,11 @@ export function computeScientificNotation({ value }) {
   }
   const sign = x < 0 ? -1 : 1;
   const ax = Math.abs(x);
-  const exponent = Math.floor(Math.log10(ax));
-  const mantissa = sign * (ax / Math.pow(10, exponent));
+  // Read m and n from toExponential: until 2026-10-14 ax / 10^n overflowed for
+  // subnormals ("5e-324" printed "- * 10^-324").
+  const [mStr, eStr] = ax.toExponential().split("e");
+  const exponent = Number(eStr);
+  const mantissa = sign * Number(mStr);
   // Significant figures by the same rule as the sig-figs tile (countSigFigs):
   // trailing zeros of an integer with no decimal point are ambiguous and not
   // counted, so "100" is 1 and "100." is 3. The mantissa prints to that
@@ -756,7 +764,8 @@ export function renderCodonTable(inputRegion, outputRegion, citationEl) {
 
 // dims: in { value: dimensionless, from_base: dimensionless, to_base: dimensionless } out: { converted: dimensionless }
 export function computeBaseConvert({ value, from_base, to_base }) {
-  const v = String(value || "").trim();
+  // Until 2026-10-14 a numeric 0 read as blank ("Enter a value to convert.").
+  const v = String(value == null ? "" : value).trim();
   if (v.length === 0) return { error: "Enter a value to convert." };
   const fromB = Math.floor(Number(from_base));
   const toB = Math.floor(Number(to_base));
@@ -1323,8 +1332,9 @@ function parseSBGLine(raw) {
     priority = pTokens.pop().toLowerCase();
   }
   const levelTok = pTokens.pop();
+  // Until 2026-10-14 a level of 2.5 or "0x3" was accepted; a level is a whole 1-4.
+  if (!/^[1-4]$/.test(levelTok)) return { error: "Mastery level must be 1, 2, 3, or 4." };
   const level = Number(levelTok);
-  if (!Number.isFinite(level) || level < 1 || level > 4) return { error: "Mastery level must be 1, 2, 3, or 4." };
   const standard = pTokens.join(" ");
   if (standard.length === 0) return { error: "Missing standard identifier." };
   return { standard, level, priority };
@@ -2049,6 +2059,8 @@ export function computeSampleSizeForMargin({ proportion, target_moe, confidence_
   const z = Z_CRITICAL[conf];
   const p = Number(proportion);
   if (!Number.isFinite(p) || p < 0 || p > 1) return { error: "Planning proportion must be between 0 and 1." };
+  // Until 2026-10-14 p = 0 or 1 zeroed p(1-p) and returned a sample of 1.
+  if (p === 0 || p === 1) return { error: "A planning proportion of exactly 0 or 1 assumes no variability and gives no usable sample size; enter your best estimate strictly between 0 and 1, or 0.5 when unknown (the worst case)." };
   const E = Number(target_moe);
   if (!Number.isFinite(E) || E <= 0) return { error: "Target margin of error must be greater than 0." };
   if (E >= 1) return { error: "Target margin of error must be less than 1 (it is a proportion)." };

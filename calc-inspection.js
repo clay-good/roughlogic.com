@@ -236,8 +236,13 @@ export function computeUtThicknessVelocity({
   // whatever thickness happened to be in the calibration example.
   const has_nominal = nominal_wall_in > 0 && has_actual;
   const error_on_nominal_in = has_nominal ? nominal_wall_in * error_pct / 100 : 0;
+  // Until 2026-10-14 a gauge set to the material's own velocity still printed "0%" of the allowance and
+  // "this error runs conservative ... retired early".
+  const calibrated = has_actual && Math.abs(error_pct) < 1e-9;
   const nominal_verdict = !has_nominal
     ? "(no nominal wall entered)"
+    : calibrated
+      ? "the gauge is calibrated for this material, so there is no velocity error on the " + fmt(nominal_wall_in, 3) + " in nominal wall"
     : "on a " + fmt(nominal_wall_in, 3) + " in nominal wall that percentage is " + fmt(Math.abs(error_on_nominal_in) * 1000, 1) + " thousandths -- " + fmt(Math.abs(error_on_nominal_in) / 0.0625 * 100, 0) + "% of a 1/16 in corrosion allowance. The error is a PERCENTAGE, so it scales with the wall: it must be evaluated at the thickness actually being inspected rather than carried across from another one";
   const has_limit = retirement_limit_in > 0 && has_actual;
   // The dangerous direction: a wall already below its limit that READS above it.
@@ -245,6 +250,8 @@ export function computeUtThicknessVelocity({
   const thinnest_passing_in = has_limit ? retirement_limit_in * actual_velocity_in_us / gauge_velocity_in_us : 0;
   const limit_verdict = !has_limit
     ? "(no retirement limit entered)"
+    : calibrated
+      ? "the gauge is calibrated for this material, so a wall at the " + fmt(retirement_limit_in, 4) + " in retirement limit reads at the limit, neither early nor late"
     : error_pct > 0
       ? "AND THIS IS THE DANGEROUS DIRECTION. Against a " + fmt(retirement_limit_in, 4) + " in retirement limit, a wall as thin as " + fmt(thinnest_passing_in, 4) + " in still READS at or above the limit on this gauge -- so the equipment stays in service " + fmt((retirement_limit_in - thinnest_passing_in) * 1000, 1) + " thousandths past where it should have been retired"
       : "against a " + fmt(retirement_limit_in, 4) + " in retirement limit this error runs conservative: a wall at the limit reads " + fmt(reading_at_limit_in, 4) + " in, below it, so the equipment is retired early rather than late. The opposite calibration error is the dangerous one";
@@ -774,13 +781,23 @@ export function computeJominyQuenchSeverity({
   const alt_jominy_distance_in = has_alt ? alt_jominy_distance_sixteenths / 16 : 0;
   const alt_margin_hrc = has_alt && has_requirement ? alt_hardness_hrc - required_core_hardness_hrc : 0;
   const alt_meets = has_alt && has_requirement && alt_margin_hrc >= -1e-9 * Math.abs(required_core_hardness_hrc);
+  // Until 2026-10-14 an alternative FARTHER down the bar was still called "the more severe quench".
+  const alt_severer = has_alt && alt_jominy_distance_sixteenths < jominy_distance_sixteenths;
   const severity_verdict = !has_alt
     ? "(no alternative quench entered -- and comparing two severities on the SAME bar is what this is for)"
+    : !alt_severer
+      ? "the alternative quench puts the same location at " + fmt(alt_jominy_distance_sixteenths, 1) + " sixteenths and " + fmt(alt_hardness_hrc, 1) + " HRC"
+        + (has_requirement ? (alt_meets ? ", which DOES make the requirement" : ", which does not make the requirement") : "")
+        + (alt_jominy_distance_sixteenths > jominy_distance_sixteenths
+          ? ". That is FARTHER from the quenched end, so it is a MILDER quench, not a more severe one: the section cools more slowly and behaves like material farther down the Jominy bar"
+          : ". That is the same position on the Jominy bar, so it is no more severe a quench")
     : "the more severe quench puts the same location at " + fmt(alt_jominy_distance_sixteenths, 1) + " sixteenths and " + fmt(alt_hardness_hrc, 1) + " HRC"
       + (has_requirement ? (alt_meets ? ", which DOES make the requirement" : ", which still does not make the requirement") : "")
       + ". A severer quench moves the equivalent position CLOSER to the quenched end, because the section cools faster and behaves like material nearer the end of the Jominy bar";
   const cost_verdict = !has_alt
     ? "(no alternative quench entered)"
+    : !alt_severer
+      ? "(the alternative is not a more severe quench, so it adds no distortion or quench-cracking risk)"
     : "AND THE SEVERITY LEVER HAS A COST. Moving from oil to water roughly triples the distortion and the quench-cracking risk on a part with section changes or sharp corners, and on many parts that is not an acceptable trade -- the answer is then a more hardenable steel rather than a harder quench";
   // The distinction the whole tile exists for.
   const has_surface = surface_hardness_hrc > 0;
@@ -847,7 +864,10 @@ export function computeTemperingTemperature({
   const embrittlement_verdict = !in_embrittlement
     ? fmt(curve_temp_f, 0) + " degF is outside the " + fmt(embrittlement_low_f, 0) + " to " + fmt(embrittlement_high_f, 0) + " degF temper embrittlement range entered. Where a grade is susceptible, that range is what the specification requires rapid cooling through"
     : "TEMPER EMBRITTLEMENT CHECK: " + fmt(curve_temp_f, 0) + " degF is INSIDE the " + fmt(embrittlement_low_f, 0) + " to " + fmt(embrittlement_high_f, 0) + " degF susceptible range. A susceptible grade tempered here and FURNACE-COOLED can come out at exactly the specified hardness with substantially reduced impact toughness -- and a hardness test will not find it. Where the grade is susceptible the specification will require cooling rapidly through the range, and that is a process requirement rather than an optional refinement";
-  const is_secondary = secondary_hardening === "yes";
+  // Until 2026-10-14 "Yes" (or a typo) ran as a plain grade that "softens in the ordinary way".
+  const sec = String(secondary_hardening ?? "").trim().toLowerCase();
+  if (sec !== "" && sec !== "yes" && sec !== "no") return { error: "Say whether the grade is secondary-hardening: yes or no." };
+  const is_secondary = sec === "yes";
   const secondary_verdict = is_secondary
     ? "SECONDARY HARDENING: this grade gets HARDER with tempering temperature over part of its range, because alloy carbides precipitate. The intuition from a 4140 -- hotter temper, softer part -- gets the direction wrong here, so the curve must be read rather than reasoned from. Secondary-hardening tool steels are also commonly double or triple tempered, because each temper transforms retained austenite that the next one then tempers, and a single temper leaves untempered martensite in the part"
     : "this grade softens with tempering temperature in the ordinary way. For contrast, a secondary-hardening tool steel such as H13 climbs back to a peak (about 54 HRC near 900 degF on the maker's curve, against 53 at 700) instead of softening steadily, because alloy carbides precipitate -- so the 4140 intuition gets the direction wrong on those grades, and they are also double or triple tempered to deal with retained austenite";

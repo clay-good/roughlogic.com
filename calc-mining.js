@@ -179,6 +179,9 @@ export function computeBlastBurdenSpacing({ hole_diameter_in = 0, burden_ratio =
   // applies. Until 2026-10-07 this took the ratio alone, so a 6 in hole at a 25 ratio was handed 8.75 ft
   // of stemming that the sibling tile calls 1.25 ft short.
   const stemming_ft = Math.max(stemming_ratio * burden_ft, 20 * hole_diameter_in / 12);
+  // Until 2026-10-14 stemming longer than the hole was accepted (14.58 ft of stemming in a 5.19 ft hole).
+  const hole_length_ft = bench_height_ft + subdrill_ft;
+  if (stemming_ft >= hole_length_ft * (1 - 1e-9)) return { error: "The stemming (" + fmt(stemming_ft, 2) + " ft) is at least as long as the " + fmt(hole_length_ft, 2) + " ft hole, leaving no room for a charge; use a smaller hole or a taller bench." };
   const stiffness_ratio = bench_height_ft / burden_ft;
   const stiff_ok = stiffness_ratio >= 2 - 1e-9 * Math.abs(2);
   const pattern_area_sqft = burden_ft * spacing_ft;
@@ -421,24 +424,27 @@ export function computeCrusherReductionRatio({ feed_size_in = 0, product_size_in
   if (!Number.isInteger(Number(stages))) return { error: "Stage count must be a whole number." };
   if (!(machine_ratio_low > 1)) return { error: "The low end of the machine ratio range must exceed 1." };
   if (!(machine_ratio_high >= machine_ratio_low)) return { error: "The high end of the machine ratio range cannot be below the low end." };
-  if (!(actual_intermediate_in > product_size_in)) return { error: "The measured intermediate size must exceed the product size." };
-  if (!(actual_intermediate_in < feed_size_in)) return { error: "The measured intermediate size must be smaller than the feed." };
+  // Until 2026-10-14 a one-stage circuit still read an intermediate size and printed a "downstream ratio"
+  // for a machine that does not exist; with one stage the intermediate is ignored.
+  const one_stage = Number(stages) === 1;
+  if (!one_stage && !(actual_intermediate_in > product_size_in)) return { error: "The measured intermediate size must exceed the product size." };
+  if (!one_stage && !(actual_intermediate_in < feed_size_in)) return { error: "The measured intermediate size must be smaller than the feed." };
   const total_ratio = feed_size_in / product_size_in;
   const per_stage_ratio = Math.pow(total_ratio, 1 / stages);
   const in_range = per_stage_ratio >= machine_ratio_low - 1e-9 * machine_ratio_low && per_stage_ratio <= machine_ratio_high + 1e-9 * machine_ratio_high;
   const first_intermediate_in = feed_size_in / per_stage_ratio;
-  const second_intermediate_in = first_intermediate_in / per_stage_ratio;
+  const second_intermediate_in = one_stage ? null : first_intermediate_in / per_stage_ratio;
   // Stages needed to keep every machine at the top of its range.
   const stages_required = Math.ceil(Math.log(total_ratio) / Math.log(machine_ratio_high) - 1e-9);
   const comfortable_ratio = Math.pow(total_ratio, 1 / stages_required);
   // The diagnostic: what the downstream machine is actually being asked for
   // when the upstream one is not reducing as planned.
-  const actual_downstream_ratio = actual_intermediate_in / product_size_in;
+  const actual_downstream_ratio = one_stage ? null : actual_intermediate_in / product_size_in;
   // That ratio is shared by every stage after the first: with 3 stages, two machines split it. Until 2026-09-26 the
   // whole downstream ratio was checked against ONE machine's range (Metso's 3 x 3 = 9 read as out of range).
   const downstream_stages = Math.max(1, stages - 1);
-  const downstream_per_stage_ratio = Math.pow(actual_downstream_ratio, 1 / downstream_stages);
-  const downstream_in_range = downstream_per_stage_ratio <= machine_ratio_high + 1e-9 * machine_ratio_high;
+  const downstream_per_stage_ratio = one_stage ? null : Math.pow(actual_downstream_ratio, 1 / downstream_stages);
+  const downstream_in_range = one_stage ? null : downstream_per_stage_ratio <= machine_ratio_high + 1e-9 * machine_ratio_high;
   return {
     total_ratio, per_stage_ratio, in_range, first_intermediate_in, second_intermediate_in,
     stages_required, comfortable_ratio, actual_downstream_ratio, downstream_per_stage_ratio, downstream_in_range,
@@ -447,7 +453,9 @@ export function computeCrusherReductionRatio({ feed_size_in = 0, product_size_in
       : per_stage_ratio > machine_ratio_high
         ? "OVER the entered machine range -- this circuit needs more stages"
         : "under the entered range, so a stage is doing less than it could",
-    diagnostic: downstream_in_range
+    diagnostic: one_stage
+      ? "(a one-stage circuit has no downstream machine, so the measured intermediate size is not used)"
+      : downstream_in_range
       ? "the downstream machine is inside its range at the measured intermediate size"
       : "the downstream machine is being asked for a ratio OUTSIDE its range -- the problem is upstream of it and no adjustment there fixes it",
     note: "Ratios MULTIPLY through a circuit, which is why a plant reducing two-foot feed to a three-quarter-inch product needs a total ratio in the thirties and cannot get there in one machine. Splitting it across two stages is workable for a jaw then a cone, but puts both machines at the top of their range, which means wear, heat, and no margin when the feed gets blocky. Across three stages every machine sits in the comfortable middle, which is why most aggregate plants are three-stage and why the third crusher usually pays for itself in liner life and uptime rather than in tonnage. The field value here is diagnostic rather than design. When a plant is not making spec or a machine is running hot and passing oversize, computing the ratio each machine is ACTUALLY being asked to perform usually identifies the offender in one line: a cone being fed material the jaw did not reduce enough is being asked for a ratio outside its range, and no adjustment at the cone fixes a problem upstream of it. This is reduction ratio arithmetic on 80 percent passing sizes. It does not size a crusher, predict capacity or power draw, or generate a product gradation -- those come from the manufacturer's capacity tables and closed-side-setting curves for the specific machine and material, and gradation depends strongly on rock friability and on whether the circuit is open or closed. Closed-circuit operation with recirculating load changes the effective ratio and the tonnage through the machine substantially and is not modelled here (circulating-load-ratio computes the load). It does not evaluate feed gradation, moisture, clay content, or the surge and screening capacity between stages, which is usually what actually limits a plant. The crusher manufacturer's selection data and the plant designer govern.",
@@ -468,9 +476,9 @@ MINING_RENDERERS["crusher-reduction-ratio"] = _simpleRenderer({
   outputs: [
     { key: "t", id: "crr-out-t", label: "Circuit reduction ratio", value: (r) => fmt(r.total_ratio, 2) + " to 1" },
     { key: "s", id: "crr-out-s", label: "Per stage at the entered stage count", value: (r) => fmt(r.per_stage_ratio, 2) + " to 1 -- " + r.stage_verdict },
-    { key: "i", id: "crr-out-i", label: "Intermediate sizes an even split implies", value: (r) => fmt(r.first_intermediate_in, 2) + " in, then " + fmt(r.second_intermediate_in, 2) + " in" },
+    { key: "i", id: "crr-out-i", label: "Intermediate sizes an even split implies", value: (r) => r.second_intermediate_in === null ? "none -- one stage crushes straight to the product" : fmt(r.first_intermediate_in, 2) + " in, then " + fmt(r.second_intermediate_in, 2) + " in" },
     { key: "n2", id: "crr-out-n2", label: "Stages the target actually needs", value: (r) => fmt(r.stages_required, 0) + " at " + fmt(r.comfortable_ratio, 2) + " to 1 each" },
-    { key: "d", id: "crr-out-d", label: "What the next machine is really being asked for", value: (r) => fmt(r.actual_downstream_ratio, 2) + " to 1 overall, " + fmt(r.downstream_per_stage_ratio, 2) + " to 1 per remaining stage -- " + r.diagnostic },
+    { key: "d", id: "crr-out-d", label: "What the next machine is really being asked for", value: (r) => r.actual_downstream_ratio === null ? r.diagnostic : fmt(r.actual_downstream_ratio, 2) + " to 1 overall, " + fmt(r.downstream_per_stage_ratio, 2) + " to 1 per remaining stage -- " + r.diagnostic },
     { key: "n", id: "crr-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeCrusherReductionRatio,
@@ -836,7 +844,7 @@ MINING_RENDERERS["belt-feeder-pull"] = _simpleRenderer({
 
 // ===================== spec-v1515: dust collector air-to-cloth ratio =====================
 
-// dims: in { airflow_cfm: L^3 T^-1, bag_count: dimensionless, bag_diameter_in: L, bag_length_ft: L, range_low: L T^-1, range_high: L T^-1, bags_out_of_service: dimensionless } out: { cloth_area_sqft: L^2, air_to_cloth: L T^-1, derated_cloth_area_sqft: L^2, derated_air_to_cloth: L T^-1, max_airflow_cfm: L^3 T^-1 }
+// dims: in { airflow_cfm: L^3 T^-1, bag_count: dimensionless, bag_diameter_in: L, bag_length_ft: L, range_low: L T^-1, range_high: L T^-1, bags_out_of_service: dimensionless } out: { cloth_area_sqft: L^2, air_to_cloth: L T^-1, derated_cloth_area_sqft: L^2, derated_air_to_cloth: L T^-1, max_airflow_cfm: L^3 T^-1, derated_max_airflow_cfm: L^3 T^-1 }
 export function computeDustCollectorAirToCloth({ airflow_cfm = 0, bag_count = 0, bag_diameter_in = 0, bag_length_ft = 0, range_low = 3, range_high = 5, bags_out_of_service = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(airflow_cfm > 0)) return { error: "System airflow must be positive." };
@@ -857,11 +865,14 @@ export function computeDustCollectorAirToCloth({ airflow_cfm = 0, bag_count = 0,
   const derated_increase_pct = (derated_air_to_cloth / air_to_cloth - 1) * 100;
   const derated_in_range = derated_air_to_cloth >= range_low && derated_air_to_cloth <= range_high;
   const max_airflow_cfm = cloth_area_sqft * range_high;
-  const airflow_headroom_cfm = max_airflow_cfm - airflow_cfm;
+  // Until 2026-10-14 the headroom used the full cloth area, printing "566 cfm of headroom" beside an
+  // OUT-of-range derated ratio; the bags in service are what carry the air.
+  const derated_max_airflow_cfm = derated_cloth_area_sqft * range_high;
+  const airflow_headroom_cfm = derated_max_airflow_cfm - airflow_cfm;
   return {
     area_per_bag_sqft, cloth_area_sqft, air_to_cloth, in_range,
     derated_cloth_area_sqft, derated_air_to_cloth, derated_increase_pct, derated_in_range,
-    max_airflow_cfm, airflow_headroom_cfm,
+    max_airflow_cfm, derated_max_airflow_cfm, airflow_headroom_cfm,
     verdict: in_range ? "inside the entered range for this cleaning type"
       : air_to_cloth > range_high
         ? "ABOVE the entered range -- the dust cake is being driven into the weave rather than sitting on it, and the blinding that follows is not recoverable by cleaning"
@@ -886,7 +897,7 @@ MINING_RENDERERS["dust-collector-air-to-cloth"] = _simpleRenderer({
     { key: "a", id: "dac-out-a", label: "Cloth area", value: (r) => fmt(r.cloth_area_sqft, 0) + " sq ft (" + fmt(r.area_per_bag_sqft, 2) + " sq ft per bag)" },
     { key: "r", id: "dac-out-r", label: "Air-to-cloth ratio", value: (r) => fmt(r.air_to_cloth, 2) + " ft/min -- " + r.verdict },
     { key: "o", id: "dac-out-o", label: "With the bags out of service", value: (r) => fmt(r.derated_air_to_cloth, 2) + " ft/min on " + fmt(r.derated_cloth_area_sqft, 0) + " sq ft, " + fmt(r.derated_increase_pct, 0) + "% harder per bag" + (r.derated_in_range ? "" : " -- and now OUT of range") },
-    { key: "m", id: "dac-out-m", label: "Airflow the collector supports at the range limit", value: (r) => fmt(r.max_airflow_cfm, 0) + " cfm (" + fmt(r.airflow_headroom_cfm, 0) + " cfm of headroom)" },
+    { key: "m", id: "dac-out-m", label: "Airflow the collector supports at the range limit", value: (r) => fmt(r.max_airflow_cfm, 0) + " cfm" + (r.derated_max_airflow_cfm < r.max_airflow_cfm ? " with every bag in service, " + fmt(r.derated_max_airflow_cfm, 0) + " cfm on the bags left" : "") + " (" + (r.airflow_headroom_cfm >= 0 ? fmt(r.airflow_headroom_cfm, 0) + " cfm of headroom)" : fmt(-r.airflow_headroom_cfm, 0) + " cfm OVER it)") },
     { key: "n", id: "dac-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeDustCollectorAirToCloth,

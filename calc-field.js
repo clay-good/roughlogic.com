@@ -371,10 +371,15 @@ export function computeSolarTimes({ lat_deg = 0, lon_deg = 0, date_iso = "", tz_
   // DR-27 (D-1/C-1): sunrise/sunset minutes are wrapped only at format time,
   // so a date/latitude near the day-length boundary can make sunset - sunrise
   // negative. Modulo-wrap the difference into [0, 1440).
+  // Until 2026-10-14 polar day and polar night both returned null daylight and
+  // printed "n/a"; tell them apart by which side of the horizon the sun stays.
+  const cosH0 = (Math.cos(90.833 * Math.PI / 180) - Math.sin(lat_rad) * Math.sin(decl)) / (Math.cos(lat_rad) * Math.cos(decl));
+  const polar = sunrise !== null && sunset !== null ? null : cosH0 < -1 ? "day" : "night";
   const daylight_minutes = (sunrise !== null && sunset !== null)
     ? (((sunset - sunrise) % 1440) + 1440) % 1440
-    : null;
+    : polar === "day" ? 1440 : 0;
   return {
+    polar,
     sunrise: fmtTime(sunrise),
     sunset: fmtTime(sunset),
     civil_dawn: fmtTime(civil_dawn),
@@ -585,12 +590,12 @@ const renderSolar = _r({
     { key: "tz_offset_hours", label: "Timezone offset (hr)", kind: "number" },
   ],
   outputs: [
-    { key: "sr", id: "ss-out-sr", label: "Sunrise",          value: (r) => r.sunrise || "n/a" },
-    { key: "ss", id: "ss-out-ss", label: "Sunset",           value: (r) => r.sunset || "n/a" },
+    { key: "sr", id: "ss-out-sr", label: "Sunrise",          value: (r) => r.sunrise || (r.polar === "day" ? "none -- polar day, the sun stays up" : "none -- polar night, the sun stays down") },
+    { key: "ss", id: "ss-out-ss", label: "Sunset",           value: (r) => r.sunset || (r.polar === "day" ? "none -- polar day, the sun stays up" : "none -- polar night, the sun stays down") },
     { key: "cd", id: "ss-out-cd", label: "Civil dawn / dusk",value: (r) => (r.civil_dawn || "-") + " / " + (r.civil_dusk || "-") },
     { key: "nd", id: "ss-out-nd", label: "Nautical dawn / dusk", value: (r) => (r.nautical_dawn || "-") + " / " + (r.nautical_dusk || "-") },
     { key: "ad", id: "ss-out-ad", label: "Astronomical dawn / dusk", value: (r) => (r.astro_dawn || "-") + " / " + (r.astro_dusk || "-") },
-    { key: "dl", id: "ss-out-dl", label: "Daylight",         value: (r) => r.daylight_minutes === null ? "n/a" : fmt(r.daylight_minutes, 0) + " min" },
+    { key: "dl", id: "ss-out-dl", label: "Daylight",         value: (r) => r.polar === "day" ? "24 h (polar day)" : r.polar === "night" ? "0 h (polar night)" : fmt(r.daylight_minutes, 0) + " min" },
     { key: "de", id: "ss-out-de", label: "Declination",      value: (r) => fmt(r.declination_deg, 2) + " deg" },
   ],
   compute: computeSolarTimes,
@@ -1407,7 +1412,10 @@ export function computeHelicopterLzSizing({ rotor_diameter_ft = 0, size_factor =
   const approach_length_ft = obstacle_height_ft * approach_ratio;
   const total_clear_ft = required_side_ft + 2 * approach_length_ft;
   const failures = [];
-  if (!area_ok) failures.push("area (" + fmt(required_side_ft - measured_clear_ft, 0) + " ft short of the required " + fmt(required_side_ft, 0) + " ft side)");
+  // Until 2026-10-14 a sub-foot shortfall printed as "0 ft short of the required 120 ft side".
+  const short_ft = required_side_ft - measured_clear_ft;
+  const short_dp = short_ft >= 1 ? 0 : short_ft >= 0.1 ? 1 : 3;
+  if (!area_ok) failures.push("area (" + fmt(short_ft, short_dp) + " ft short of the required " + fmt(required_side_ft, short_dp) + " ft side)");
   if (!slope_ok) failures.push("slope (" + fmt(ground_slope_deg, 1) + " deg against a " + fmt(slope_limit_deg, 1) + " deg limit)");
   const verdict = failures.length === 0
     ? "PASSES on area and slope; it still needs " + fmt(approach_length_ft, 0) + " ft of unobstructed approach beyond the tallest obstacle, and a second obstacle inside that distance fails the site from the air"

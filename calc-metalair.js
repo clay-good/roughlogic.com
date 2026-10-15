@@ -105,8 +105,11 @@ export function computeGrooveWeldStrength({ weld_type = "PJP", effective_throat_
   if (!Object.hasOwn(_FEXX, electrode)) return { error: "Unknown electrode classification; use one of " + Object.keys(_FEXX).join(", ") + "." };
   const Fexx = _FEXX[electrode];
   const L = Number(length_in);
-  const M = String(method) === "LRFD" ? "LRFD" : "ASD";
-  const type = String(weld_type).toUpperCase() === "CJP" ? "CJP" : "PJP";
+  // Until 2026-10-14 "lrfd" ran as ASD and an unknown weld type ran as PJP.
+  const M = String(method ?? "").trim().toUpperCase() || "ASD";
+  if (M !== "ASD" && M !== "LRFD") return { error: "Say whether the design method is ASD or LRFD." };
+  const type = String(weld_type ?? "").trim().toUpperCase() || "PJP";
+  if (type !== "CJP" && type !== "PJP") return { error: "Say whether the groove weld is CJP or PJP." };
   if (!(L > 0)) return { error: "Weld length must be positive (in)." };
   // Effective throat: CJP develops the thinner connected part; PJP uses the
   // user-supplied effective throat read off the qualified WPS (AWS D1.1 Table).
@@ -188,8 +191,11 @@ export function computeGrooveWeldLengthForLoad({ applied_load_lb = 0, weld_type 
   // An electrode not in the table used to be run as E70 (E60 came out 17% strong).
   if (!Object.hasOwn(_FEXX, electrode)) return { error: "Unknown electrode classification; use one of " + Object.keys(_FEXX).join(", ") + "." };
   const Fexx = _FEXX[electrode];
-  const M = String(method) === "LRFD" ? "LRFD" : "ASD";
-  const type = String(weld_type).toUpperCase() === "CJP" ? "CJP" : "PJP";
+  // Until 2026-10-14 "lrfd" ran as ASD and an unknown weld type ran as PJP.
+  const M = String(method ?? "").trim().toUpperCase() || "ASD";
+  if (M !== "ASD" && M !== "LRFD") return { error: "Say whether the design method is ASD or LRFD." };
+  const type = String(weld_type ?? "").trim().toUpperCase() || "PJP";
+  if (type !== "CJP" && type !== "PJP") return { error: "Say whether the groove weld is CJP or PJP." };
   const load = Number(applied_load_lb) || 0;
   if (!(load > 0)) return { error: "Applied load must be positive (lb)." };
   let throat_in;
@@ -324,6 +330,8 @@ METALAIR_RENDERERS["duct-static-pressure-total"] = _renderDuctStaticTotal;
 // dims: in { suction_psig: M L^-1 T^-2, discharge_psig: M L^-1 T^-2, atmospheric_psia: M L^-1 T^-2 } out: { suction_psia: M L^-1 T^-2, discharge_psia: M L^-1 T^-2, compression_ratio: dimensionless }
 export function computeCompressionRatio({ suction_psig = 0, discharge_psig = 0, atmospheric_psia = 14.696 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Until 2026-10-14 a blank suction box read as 0 psig and printed "18.69 : 1 (HIGH)" off a reading nobody took.
+  if ([suction_psig, discharge_psig].some((x) => x === null || x === "")) return { error: "Enter both the suction and discharge pressures (psig)." };
   const atm = Number(atmospheric_psia);
   if (!(atm > 0)) return { error: "Atmospheric pressure must be positive (psia)." };
   const suction_psia = Number(suction_psig) + atm;
@@ -351,7 +359,7 @@ function _renderCompressionRatio(inputRegion, outputRegion, citationEl) {
   const oAbs = makeOutputLine(outputRegion, "Absolute pressures", "cr-out-abs");
   const oNote = makeOutputLine(outputRegion, "Notes", "cr-out-note");
   const update = debounce(() => {
-    const r = computeCompressionRatio({ suction_psig: Number(suc.input.value) || 0, discharge_psig: Number(dis.input.value) || 0, atmospheric_psia: Number(atm.input.value) || 0 });
+    const r = computeCompressionRatio({ suction_psig: suc.input.value === "" ? null : Number(suc.input.value), discharge_psig: dis.input.value === "" ? null : Number(dis.input.value), atmospheric_psia: Number(atm.input.value) || 0 });
     if (r.error) { oRatio.textContent = r.error; oAbs.textContent = "-"; oNote.textContent = ""; return; }
     oRatio.textContent = fmt(r.compression_ratio, 2) + " : 1" + (r.high_ratio ? " (HIGH)" : "");
     oAbs.textContent = "suction " + fmt(r.suction_psia, 1) + " psia, discharge " + fmt(r.discharge_psia, 1) + " psia";
@@ -574,6 +582,8 @@ export function computeStandingSeamTakeoff({ building_width_ft = 0, run_length_f
   const IN_PER_FT_MA = 12;
   const width_in = building_width_ft * IN_PER_FT_MA;
   const panel_count = Math.ceil(width_in / coverage_width_in - 1e-9);
+  // Until 2026-10-14 more perimeter panels than the roof has were clipped anyway (50 of 32 gave 1,550 clips).
+  if (Math.round(perimeter_panels) > panel_count) return { error: "The roof takes only " + panel_count + " panels, so it cannot have " + Math.round(perimeter_panels) + " perimeter panels." };
   // The mistake the note names: ordering on the flat sheet width instead of
   // the coverage width, which comes up SHORT on every roof.
   const panels_if_ordered_on_sheet = sheet_width_in > 0 ? Math.ceil(width_in / sheet_width_in - 1e-9) : null;

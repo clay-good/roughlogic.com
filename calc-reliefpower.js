@@ -487,6 +487,9 @@ export function computeCriticalLoadShedTiers({ source_kw = 0, tier1_kw = 0, tier
   const cumulative = tiers.map((_, i) => tiers.slice(0, i + 1).reduce((s, v) => s + v, 0));
   const runtime = (kw) => (usable_kwh > 0 && kw > 0 ? usable_kwh / kw : null);
   const names = ["emergency (Art. 700)", "legally required standby (Art. 701)", "optional standby (Art. 702)", "user tier 4"];
+  // Until 2026-10-14 an empty (0 kW) tier was listed as served or shed; only loaded tiers are named now.
+  const servedNames = names.slice(0, tiers_served).filter((_, i) => tiers[i] > 0);
+  const shedNames = names.slice(tiers_served).filter((_, i) => tiers[tiers_served + i] > 0);
   return {
     total_kw, served_kw, shed_kw: total_kw - served_kw, tiers_served,
     served_pct: 100 * served_kw / total_kw,
@@ -497,8 +500,8 @@ export function computeCriticalLoadShedTiers({ source_kw = 0, tier1_kw = 0, tier
     runtime_tiers123_hours: runtime(cumulative[2]),
     runtime_all_hours: runtime(cumulative[3]),
     runtime_served_hours: runtime(served_kw),
-    served_tiers: tiers_served === 0 ? "none -- even the emergency tier exceeds the source" : names.slice(0, tiers_served).join(", "),
-    shed_tiers: tiers_served === 4 ? "none" : names.slice(tiers_served).join(", "),
+    served_tiers: servedNames.length === 0 ? "none -- even the " + (tiers[0] > 0 ? "emergency" : "first loaded") + " tier exceeds the source" : servedNames.join(", "),
+    shed_tiers: shedNames.length === 0 ? "none" : shedNames.join(", "),
     note: "The NEC ranks the loads an emergency source may carry, and when capacity runs short it ranks them for shedding too: emergency systems (Article 700) first, legally required standby (Article 701) next, optional standby (Article 702) last, with the selective load pickup and load shedding provision of 700.4(B) -- verify that numbering against the adopted edition. The tile takes the connected load in each tier and the source actually available, often the derated figure from generator-altitude-temp-derate, and sheds whole tiers rather than fractions, because that is how shedding schemes are wired: a tier is on a transfer switch or a shunt-tripped breaker and is either connected or not. Utilization is the served load over the source, and the headroom is what is left for motor starting and growth. For an energy-limited source -- a battery, or a fixed fuel supply converted to kWh -- the runtime at each shed level turns the order into a decision: how many hours the emergency tier alone buys against how many hours everything buys. Which loads belong to which article is the AHJ's classification. This does not design the shedding controls or selective coordination, address motor starting on the served tiers, or derate a battery for depth of discharge and temperature (off-grid-battery). The NEC as adopted and the AHJ govern.",
   };
 }

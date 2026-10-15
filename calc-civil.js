@@ -552,6 +552,8 @@ export function computeEarthworkEndArea({ areas, interval_ft, mid_area_ft2, swel
   if (!Array.isArray(areas) || areas.length < 2) return { error: "Provide at least two station end areas." };
   const A = [];
   for (const a of areas) {
+    // Until 2026-10-14 a blank station ("" or null) ran as 0 sq ft and halved the volume.
+    if (a == null || String(a).trim() === "") return { error: "Every station needs an end area; a blank station is not 0 sq ft (enter 0 only for a true zero area)." };
     const n = Number(a);
     if (!Number.isFinite(n)) return { error: "Every end area must be a finite number." };
     if (n < 0) return { error: "End areas must be non-negative (ft^2)." };
@@ -801,6 +803,8 @@ export function computeVerticalCurveSightDistance({ A_pct, S_ft, C } = {}) {
   if (!(A > 0)) return { error: "Algebraic grade difference A must be greater than zero." };
   const S = Number(S_ft) || 0;
   if (!(S > 0)) return { error: "Sight distance S must be greater than zero." };
+  // Until 2026-10-14 a negative C (e.g. -2158) silently ran as the 2158 default.
+  if (C != null && C !== "" && !(Number(C) >= 0)) return { error: "Sight constant C must be positive (2158 for stopping sight distance, 2800 for passing); leave it blank for 2158." };
   const c = Number(C) > 0 ? Number(C) : 2158;
   const L1 = (A * S * S) / c;
   const L = S <= L1 ? L1 : 2 * S - c / A;

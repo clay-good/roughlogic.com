@@ -352,7 +352,10 @@ export function computeBaghouseCleaningInterval({
       ? "the cycle has shortened " + fmt(-cycle_change_pct, 0) + "%, from " + fmt(original_pulses_per_day, 0) + " to " + fmt(pulses_per_day, 0) + " pulses a day -- more compressed air, more fabric flexing, and shorter bag life, all as a consequence of the smaller working range"
       : "the cycle is at or longer than it was, at " + fmt(pulses_per_day, 0) + " pulses a day";
   // Over-cleaning, which is the opposite error and is what timers produce.
-  const is_timer = String(cleaning_mode).toLowerCase() === "timer";
+  // Until 2026-10-14 any mode other than "timer" (a typo included) ran as on-demand.
+  const mode = String(cleaning_mode ?? "").trim().toLowerCase().replace(/[\s-]+/g, "_");
+  if (mode !== "" && mode !== "timer" && mode !== "on_demand") return { error: "Say whether cleaning is on demand (differential pressure) or on a timer." };
+  const is_timer = mode === "timer";
   const mode_verdict = is_timer
     ? "TIMER cleaning pulses bags that did not need it: the residual dust cake that does most of the fine filtration is removed, emissions rise briefly after each pulse, the fabric is flexed more often and fails sooner, and compressed air is spent for nothing. On-demand cleaning triggered by differential pressure avoids all four"
     : "ON-DEMAND cleaning triggered by differential pressure is the preferred mode, and it is what makes the baseline readable in the first place";
@@ -608,11 +611,15 @@ export function computeCoatingVocCompliance({
   const complies = has_limit && governing_voc <= limit_lb_per_gal + 1e-9 * Math.abs(limit_lb_per_gal);
   const margin_lb_per_gal = has_limit ? limit_lb_per_gal - governing_voc : 0;
   const label_would_pass = has_limit && voc_as_supplied <= limit_lb_per_gal + 1e-9 * Math.abs(limit_lb_per_gal);
+  // Until 2026-10-14 a near miss printed "2.80 ... against a 2.80 lb/gal limit, over by 0.00"; carry
+  // enough decimals that the two figures read differently when they are not the same number.
+  let vd = 2;
+  while (vd < 6 && Math.abs(margin_lb_per_gal) > 1e-9 * Math.abs(limit_lb_per_gal) && fmt(governing_voc, vd) === fmt(limit_lb_per_gal, vd)) vd++;
   const limit_verdict = !has_limit
     ? "(no limit entered)"
     : complies
-      ? "COMPLIES: " + fmt(governing_voc, 2) + " lb/gal " + (has_thinner ? "as applied " : "") + "less water against a " + fmt(limit_lb_per_gal, 2) + " lb/gal limit, with " + fmt(margin_lb_per_gal, 2) + " lb/gal of margin"
-      : "EXCEEDS: " + fmt(governing_voc, 2) + " lb/gal " + (has_thinner ? "as applied " : "") + "less water against a " + fmt(limit_lb_per_gal, 2) + " lb/gal limit, over by " + fmt(-margin_lb_per_gal, 2) + " lb/gal" + (label_would_pass ? " -- and the LABEL number of " + fmt(voc_as_supplied, 2) + " lb/gal would have suggested it passed" : "");
+      ? "COMPLIES: " + fmt(governing_voc, vd) + " lb/gal " + (has_thinner ? "as applied " : "") + "less water against a " + fmt(limit_lb_per_gal, vd) + " lb/gal limit, " + (Math.abs(margin_lb_per_gal) <= 1e-9 * Math.abs(limit_lb_per_gal) ? "exactly at the limit" : "with " + fmt(margin_lb_per_gal, vd) + " lb/gal of margin")
+      : "EXCEEDS: " + fmt(governing_voc, vd) + " lb/gal " + (has_thinner ? "as applied " : "") + "less water against a " + fmt(limit_lb_per_gal, vd) + " lb/gal limit, over by " + fmt(-margin_lb_per_gal, vd) + " lb/gal" + (label_would_pass ? " -- and the LABEL number of " + fmt(voc_as_supplied, 2) + " lb/gal would have suggested it passed" : "");
   if (![voc_as_supplied, voc_less_water, applied_voc_as_supplied, applied_voc_less_water, margin_lb_per_gal].every(Number.isFinite)) return { error: "Coating VOC math is not a finite value." };
   return {
     voc_as_supplied, less_water_gal, voc_less_water, basis_ratio, non_voc_gal, basis_verdict,
@@ -1148,11 +1155,14 @@ export function computeNoiseBarrierInsertionLoss({
   if (!(practical_ceiling_db > 0)) return { error: "The practical ceiling must be positive." };
   if (!(path_difference_ft >= 0)) return { error: "Path difference cannot be negative." };
   // Either enter the path difference, or the three legs it comes from.
-  const has_geometry = source_to_top_ft > 0 && top_to_receiver_ft > 0 && source_to_receiver_ft > 0;
-  const geometric_difference = has_geometry ? (source_to_top_ft + top_to_receiver_ft) - source_to_receiver_ft : 0;
+  const has_legs = source_to_top_ft > 0 && top_to_receiver_ft > 0 && source_to_receiver_ft > 0;
+  const geometric_difference = has_legs ? (source_to_top_ft + top_to_receiver_ft) - source_to_receiver_ft : 0;
   // Three sides of a triangle: neither leg over the barrier can be longer than the other two put together.
-  if (has_geometry && (source_to_top_ft > top_to_receiver_ft + source_to_receiver_ft || top_to_receiver_ft > source_to_top_ft + source_to_receiver_ft || geometric_difference < 0)) return { error: "These three distances do not make a triangle; check the source-to-top, top-to-receiver and straight-line distances (ft)." };
-  if (has_geometry && geometric_difference < 0) return { error: "The over-the-top path cannot be shorter than the direct path -- check the three distances." };
+  if (has_legs && (source_to_top_ft > top_to_receiver_ft + source_to_receiver_ft || top_to_receiver_ft > source_to_top_ft + source_to_receiver_ft || geometric_difference < 0)) return { error: "These three distances do not make a triangle; check the source-to-top, top-to-receiver and straight-line distances (ft)." };
+  if (has_legs && geometric_difference < 0) return { error: "The over-the-top path cannot be shorter than the direct path -- check the three distances." };
+  // Until 2026-10-14 the three distances overrode an entered path difference, although the
+  // field says "0 to use the three distances"; an entered difference now governs.
+  const has_geometry = has_legs && !(path_difference_ft > 0);
   const delta = has_geometry ? geometric_difference : path_difference_ft;
   if (!(delta >= 0)) return { error: "Enter a path difference, or the three distances it comes from." };
   const lossAt = (f) => {
@@ -1180,7 +1190,9 @@ export function computeNoiseBarrierInsertionLoss({
   const second_verdict = !has_second
     ? "(no second frequency entered)"
     : "at " + fmt(second_frequency_hz, 0) + " Hz the wavelength is " + fmt(b.lambda, 2) + " ft, the Fresnel number is "
-      + fmt(b.N, 2) + ", and the same barrier gives " + fmt(b.il, 1) + " dB -- "
+      + fmt(b.N, 2) + ", and the same barrier gives " + fmt(b.il, 1) + " dB"
+      // Until 2026-10-14 this printed the raw figure beside a capped second_insertion_loss_db.
+      + (b.il > practical_ceiling_db ? ", reported as " + fmt(second_insertion_loss_db, 1) + " dB against the " + fmt(practical_ceiling_db, 0) + " dB practical ceiling" : "") + " -- "
       + (b.il < raw_insertion_loss_db
         ? "LESS than at " + fmt(frequency_hz, 0) + " Hz, because a long wavelength diffracts around the top. High-frequency tyre noise is substantially reduced and low-frequency engine and exhaust rumble is barely touched, which is why residents report that the traffic sounds different and the loud part is still there"
         : "MORE than at " + fmt(frequency_hz, 0) + " Hz, because the shorter wavelength diffracts less around the top");

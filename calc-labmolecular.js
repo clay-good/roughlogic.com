@@ -45,6 +45,8 @@ export function computePrimerTm({ sequence = "", method = "auto" } = {}) {
   if (!["auto", "wallace", "gc"].includes(method)) return { error: "Method must be auto, wallace, or gc." };
   let useMethod = method;
   if (method === "auto") useMethod = len <= 14 ? "wallace" : "gc";
+  // Until 2026-10-14 forcing the GC% formula on "AAAA" printed a Tm of -103 C.
+  if (useMethod === "gc" && len < 14) return { error: "The basic GC% formula holds only for primers of 14 nt or more; use Wallace (or Auto) for a " + len + "-nt primer." };
   let tm;
   if (useMethod === "wallace") tm = 2 * at + 4 * gc;
   else tm = 64.9 + 41 * (gc - 16.4) / len;
