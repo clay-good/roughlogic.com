@@ -104,7 +104,7 @@
     {
       "file": "r.json",
       "name": "Field descriptors, r runtime shard (generated)",
-      "gzip_size_bytes": 2431
+      "gzip_size_bytes": 2436
     },
     {
       "file": "t.json",
@@ -147,7 +147,7 @@
     "o.json": "51d84c0c0cd8523a543243abcb8181ba24c35d342a6a5846774517a61ba6d9bb",
     "p.json": "813be632905bf6fb6920bb6f12a76faec0c046526d9ee8329f3c249f2c4a5bad",
     "q.json": "d7f5bff0b65c35d18e99145e14e1b5b40ca89a8a714c3453691c56f76a868a40",
-    "r.json": "8eb7b1837642d3b230d4b3a0291491f7c02c900ef63d026d99abf7b726fa2504",
+    "r.json": "a9e39b6882461159700eaa1985dbb41bb8cc03717fc43be878b8fab7fee931bc",
     "t.json": "aebe2d5ebfa50ee3373bb74a68591e6c0f13890f3caf17c4d4347cbad8ab0e24",
     "x.json": "4103e38cb4f806980b19ea05f94d3ced0d63ecd805739c4da7cd1c7defb00ce1",
     "y.json": "ffc6ac95ab2f8a582c4e22e6c4ff3e14285e20af792d714e7aa62c45c3e3e2e4",

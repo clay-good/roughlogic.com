@@ -1,6 +1,6 @@
 {
   "_comment": "v10 Phase A.1 source-cycle table. One row per cited standard listing the publishing body, the current edition, the cycle in years, the next-expected release date (best estimate), and a free-access URL. Used by scripts/check-citation-freshness.mjs to flag manifests whose 'edition' string is more than one cycle behind the current publication of that standard. spec-v22 CF-03: when 'next_expected' is in the past, the row must carry a 'last_verified' (ISO date >= next_expected) re-stamp -- the 'verified, not yet released' acknowledgement -- or the freshness gate fails. Update on each rollover (see docs/citation-freshness-ledger.md). Since 2026-09-02 the file also carries `annual_figures`: the bundled federal dollar figures that reprice every year on a known calendar (IRS mileage, Section 179, the SSA wage base, FHFA and HUD loan limits, GSA per-diem, HUD FMRs, Pub 15-T). Five of them were found stale on one day; nothing had ever asked when their publisher last spoke.",
-  "_updated": "2026-09-19",
+  "_updated": "2026-10-14",
   "standards": [
     {
       "id": "nec",
@@ -286,8 +286,8 @@
       "publishes_month": 10,
       "covers": "calendar year",
       "where": "data/accounting/se-tax-parameters.json; SE_TAX_PARAMETERS",
-      "last_verified": "2026-09-02",
-      "verification_note": "Announced with the annual COLA. 2026 is $184,500; the bundled value was $183,600 until 2026-09-02. ssa.gov 403s an automated fetch -- irs.gov/taxtopics/tc751 carries the same figure."
+      "last_verified": "2026-10-14",
+      "verification_note": "Announced with the annual COLA. The 2027 COLA fact sheet (ssa.gov/news/en/cola/factsheets/2027.html, read in a browser 2026-10-14) gives $192,300 for 2027 and $184,500 for 2026; the bundled 2026 value was $183,600 until 2026-09-02. ssa.gov 403s an automated fetch -- irs.gov/taxtopics/tc751 carries the same figure once updated."
     },
     {
       "id": "fhfa-conforming-loan-limit",

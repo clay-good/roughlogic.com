@@ -66,7 +66,9 @@ export const SE_TAX_PARAMETERS = {
   2023: { ss_wage_base: 160200, addl_medicare_threshold: { single: 200000, mfj: 250000, mfs: 125000, hoh: 200000 }, verified_on: "2024-02-01" },
   2024: { ss_wage_base: 168600, addl_medicare_threshold: { single: 200000, mfj: 250000, mfs: 125000, hoh: 200000 }, verified_on: "2024-02-01" },
   2025: { ss_wage_base: 176100, addl_medicare_threshold: { single: 200000, mfj: 250000, mfs: 125000, hoh: 200000 }, verified_on: "2025-02-01" },
-  2026: { ss_wage_base: 184500, addl_medicare_threshold: { single: 200000, mfj: 250000, mfs: 125000, hoh: 200000 }, verified_on: "2026-09-02" },
+  2026: { ss_wage_base: 184500, addl_medicare_threshold: { single: 200000, mfj: 250000, mfs: 125000, hoh: 200000 }, verified_on: "2026-10-14" },
+  // SSA 2027 COLA fact sheet (announced 2026-10-14): $192,300. The 0.9% thresholds are statutory, not indexed.
+  2027: { ss_wage_base: 192300, addl_medicare_threshold: { single: 200000, mfj: 250000, mfs: 125000, hoh: 200000 }, verified_on: "2026-10-14" },
 };
 
 // IRS standard mileage rate (business use) per year, cents/mile.

@@ -253,3 +253,10 @@ test("the split accounting renderer registries expose all 31 utilities", () => {
   assert.deepEqual(operationsIds.sort(), ["eoq-order-quantity", "reorder-point", "units-of-production-depr"]);
   for (const id of operationsIds) assert.equal(typeof OPERATIONS_FINANCE_RENDERERS[id], "function", id);
 });
+// SSA 2027 COLA fact sheet, 2026-10-14: the taxable maximum rises from $184,500 to $192,300.
+test("SE: 2027 wage base is $192,300 and caps the SS portion", () => {
+  assert.equal(SE_TAX_PARAMETERS[2027].ss_wage_base, 192300);
+  assert.equal(SE_TAX_PARAMETERS[2026].ss_wage_base, 184500);
+  const r = computeSETax({ net_se_earnings: 1000000, tax_year: 2027, filing_status: "single" });
+  assert.ok(close(r.ss_tax, 192300 * 0.124, 0.01), String(r.ss_tax));
+});

@@ -1500,6 +1500,7 @@ const SE_TAX_DATA_V5 = {
     "2024": { ss_wage_base_usd: 168600, addl_medicare_threshold: { single: 200000, mfj: 250000, mfs: 125000, hoh: 200000 } },
     "2025": { ss_wage_base_usd: 176100, addl_medicare_threshold: { single: 200000, mfj: 250000, mfs: 125000, hoh: 200000 } },
     "2026": { ss_wage_base_usd: 184500, addl_medicare_threshold: { single: 200000, mfj: 250000, mfs: 125000, hoh: 200000 } },
+    "2027": { ss_wage_base_usd: 192300, addl_medicare_threshold: { single: 200000, mfj: 250000, mfs: 125000, hoh: 200000 } },
   },
 };
 
