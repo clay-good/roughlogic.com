@@ -418,7 +418,7 @@ test("outputDisplays returns the string the calculator prints", async () => {
   const { outputDisplays } = await import("../../mcp/catalog.mjs");
   const ohm = await outputDisplays("ohms-law", { V: 120, I: 10, R: null, P: null });
   assert.equal(ohm.R, "12.00 ohm");
-  assert.equal(ohm.P, "1200.00 W");
+  assert.equal(ohm.P, "1,200.00 W");
   // A bespoke renderer has no format closure and reports nothing rather than
   // guessing.
   assert.deepEqual(await outputDisplays("abrasive-blast", {}), {});

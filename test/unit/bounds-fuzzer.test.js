@@ -61301,7 +61301,7 @@ test("hardening slice 36 (comparison lines keep their direction when the alterna
   const neg = /(?:saving of|risen|overstates it by|extra|up|down) -\d|-\d[\d.]*% (?:more|less|thicker|longer|increase)/;
   const { computeSpaDrainInterval } = await import("../../calc-pool.js");
   const spa = text(computeSpaDrainInterval({ spa_gallons: 400, daily_bathers: 6, days_since_drain: 14, alternative_bathers: 12, fill_tds_ppm: 1250, current_tds_ppm: 1100, tds_limit_ppm: 1500 }));
-  assert.ok(!neg.test(spa) && /BELOW the 1250 ppm entered for the fill water/.test(spa), spa);
+  assert.ok(!neg.test(spa) && /BELOW the 1,250 ppm entered for the fill water/.test(spa), spa);
   const { computeCastingPourYield, computeInjectionCoolingTime } = await import("../../calc-process.js");
   const cast = text(computeCastingPourYield({ casting_weight_lb: 280, gating_weight_lb: 170, castings_per_mould: 1, melt_energy_btu_lb: 500, target_yield_pct: 50, annual_castings: 5000 }));
   assert.ok(!neg.test(cast) && /dropping the yield to 50%/.test(cast) && /a cost of \d/.test(cast), cast);

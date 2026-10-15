@@ -192,6 +192,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **Large numbers print with thousands separators.** Every calculator's answer formatter (`fmt` in `ui-fields.js`, which the modules import under their own aliases) now groups the whole part in threes from 1,000 up: "26,180 lb", "1,200.00 W", "$1,234,567.89". Until now a 70,000-plus figure read as one run of digits. No calendar year, code or model number passes through the formatter, so nothing is split that should not be. A table exported as CSV quotes a grouped cell (RFC 4180), so it stays in one column, and nothing on the site parses a printed number back. The agent door's structured answers are unchanged: it returns raw numbers beside the display strings. 274 page shells that embed a worked answer were re-stamped. Two tests that pinned an ungrouped figure now expect the grouped one.
+
 - **Five more notes name the calculator for what they leave out.** `bearing-defect-frequencies` (bearing life: `bearing-l10-life`), `marine-shaft-diameter` (critical speed: `shaft-critical-speed-rayleigh`), `skip-line-layout` (paint quantity: `striping-paint-quantity`), `transverse-wind-load-conductor` (pole capacity: `pole-class-groundline-moment`) and `pit-dewatering-staging` (NPSH available: `npsh-a`) each said a calculation was separate or not computed while a calculator for it already existed.
 
 - **`blowdown-heat-recovery` and `deaerator-steam-demand` name the steam table calculator.** Both take enthalpies, a latent heat or a saturation temperature "from the steam tables"; their citations now point to `saturated-steam-properties`, which gives them at any pressure.

@@ -19,7 +19,12 @@ export function debounce(fn, ms = DEBOUNCE_MS) {
 
 export function fmt(n, digits = 2) {
   if (n === null || n === undefined || !Number.isFinite(Number(n))) return "-";
-  return Number(n).toFixed(digits);
+  const t = Number(n).toFixed(digits);
+  // Group the whole part in threes from 10,000 up ("26,180 lb"); four-digit figures stay
+  // plain so years, codes and model numbers that pass through fmt are not split.
+  const m = /^(-?)(\d+)(\.\d+)?$/.exec(t);
+  if (!m || m[2].length < 4) return t;
+  return m[1] + m[2].replace(/\B(?=(\d{3})+(?!\d))/g, ",") + (m[3] || "");
 }
 
 // A signed change as a magnitude and a direction word: fmtDir(-33.3, 1, "%",
