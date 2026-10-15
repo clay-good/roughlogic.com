@@ -69,7 +69,9 @@ function _simpleRenderer(spec) {
     const update = debounce(() => {
       const params = {};
       for (const f of spec.fields) {
-        params[f.key] = f.kind === "select" ? fields[f.key].select.value : Number(fields[f.key].input.value) || 0;
+        // A field marked `required` passes null when blank, so the compute can
+        // tell a cleared temperature from a typed 0.
+        params[f.key] = f.kind === "select" ? fields[f.key].select.value : f.required && fields[f.key].input.value === "" ? null : Number(fields[f.key].input.value) || 0;
       }
       const r = spec.compute(params);
       if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }
@@ -340,6 +342,8 @@ const _F_TO_R = 459.67;
 // dims: in { start_psig: M L^-1 T^-2, start_temp_F: T, end_temp_F: T, end_psig: M L^-1 T^-2, atm_psi: M L^-1 T^-2, tolerance_psi: M L^-1 T^-2 } out: { expected_psig: M L^-1 T^-2, leak_drop_psi: M L^-1 T^-2, gauge_change_psi: M L^-1 T^-2 }
 export function computeNitrogenPressureTest({ start_psig = 0, start_temp_F = null, end_temp_F = null, end_psig = 0, atm_psi = 14.7, tolerance_psi = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // The page passes a blank box as null; 0 F is a real reading, so a blank cannot stand in for it.
+  if ([start_temp_F, end_temp_F].some((x) => x === null || x === "")) return { error: "Enter the start and end temperatures (F)." };
   // A blank temperature used to be 0 F, which "explained" a real pressure loss as a cold night.
   if (start_temp_F === null || start_temp_F === "" || end_temp_F === null || end_temp_F === "") return { error: "Enter the line temperature at the start and at the end of the test (F)." };
   if (!(start_psig > 0)) return { error: "Starting test pressure must be positive (psig)." };
@@ -373,8 +377,8 @@ HVACSERVICE_RENDERERS["nitrogen-pressure-test"] = _simpleRenderer({
   example: nitrogenPressureExample.inputs,
   fields: [
     { key: "start_psig", label: "Test pressure at start (psig)", kind: "number" },
-    { key: "start_temp_F", label: "Temperature at start (°F)", kind: "number", attrs: { step: "any" } },
-    { key: "end_temp_F", label: "Temperature at end (°F)", kind: "number", attrs: { step: "any" } },
+    { key: "start_temp_F", required: true, label: "Temperature at start (°F)", kind: "number", attrs: { step: "any" } },
+    { key: "end_temp_F", required: true, label: "Temperature at end (°F)", kind: "number", attrs: { step: "any" } },
     { key: "end_psig", label: "Gauge pressure at end (psig)", kind: "number" },
     { key: "atm_psi", label: "Atmospheric pressure (psi)", kind: "number", default: 14.7 },
     { key: "tolerance_psi", label: "Leak tolerance (psi)", kind: "number", default: 1 },
@@ -481,8 +485,10 @@ const _SENSIBLE_HEAT_FACTOR = 1.08; // BTU/hr per CFM per F, sea level.
 // rating-plate range; derive airflow from the heat output via the sensible-heat
 // relation Qs = 1.08 x CFM x delta-T, solved for CFM.
 // dims: in { return_air_F: T, supply_air_F: T, input_btuh: M L^2 T^-3, efficiency_pct: dimensionless, rise_min_F: T, rise_max_F: T } out: { delta_T_F: T, output_btuh: M L^2 T^-3, cfm: L^3 T^-1 }
-export function computeFurnaceTempRise({ return_air_F = 0, supply_air_F = 0, input_btuh = 0, efficiency_pct = 80, rise_min_F = 40, rise_max_F = 70 } = {}) {
+export function computeFurnaceTempRise({ return_air_F = null, supply_air_F = 0, input_btuh = 0, efficiency_pct = 80, rise_min_F = 40, rise_max_F = 70 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // 0 F is a real reading, so a blank temperature cannot stand in for it.
+  if ([return_air_F].some((x) => x === null || x === undefined || x === "")) return { error: "Enter the return-air temperature (F)." };
   if (!(Number(rise_max_F) > 0) || Number(rise_min_F) > Number(rise_max_F)) return { error: "Enter the nameplate temperature-rise range (minimum and maximum, F), minimum below maximum." };
   // An efficiency is a percent; 0 < value < 1 is a fraction typed into a percent field (added 2026-09-26).
   if (["efficiency_pct"].some((k) => { const v = Number(arguments[0]?.[k]); return v > 0 && v < 1; })) return { error: "Enter efficiencies as a percent (85 for 85%), not a fraction." };
@@ -508,7 +514,7 @@ HVACSERVICE_RENDERERS["furnace-temp-rise"] = _simpleRenderer({
   citation: "Citation: first-principles sensible-heat relation Qs = 1.08 x CFM x delta-T solved for airflow, with output = input x efficiency (public); the 1.08 sea-level air factor is fixed; the efficiency (default 80%) is editable. The rating-plate temperature-rise range and the equipment manufacturer govern.",
   example: furnaceTempRiseExample.inputs,
   fields: [
-    { key: "return_air_F", label: "Return-air temp (°F)", kind: "number", attrs: { step: "any" } },
+    { key: "return_air_F", required: true, label: "Return-air temp (°F)", kind: "number", attrs: { step: "any" } },
     { key: "supply_air_F", label: "Supply-air temp (°F)", kind: "number" },
     { key: "input_btuh", label: "Furnace input (BTU/hr)", kind: "number" },
     { key: "efficiency_pct", label: "Efficiency (%)", kind: "number", default: 80 },
@@ -531,6 +537,8 @@ HVACSERVICE_RENDERERS["furnace-temp-rise"] = _simpleRenderer({
 // dims: in { input_btuh: M L^2 T^-3, efficiency_pct: dimensionless, cfm: L^3 T^-1, return_air_F: T, rise_min_F: T, rise_max_F: T } out: { output_btuh: M L^2 T^-3, delta_T_F: T, supply_air_F: T }
 export function computeFurnaceAirflowToRise({ input_btuh = 0, efficiency_pct = 80, cfm = 0, return_air_F = 70, rise_min_F = 40, rise_max_F = 70 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // The page passes a blank box as null; 0 F is a real reading, so a blank cannot stand in for it.
+  if ([return_air_F].some((x) => x === null || x === "")) return { error: "Enter the return-air temperature (F)." };
   // An efficiency is a percent; 0 < value < 1 is a fraction typed into a percent field (added 2026-09-26).
   if (["efficiency_pct"].some((k) => { const v = Number(arguments[0]?.[k]); return v > 0 && v < 1; })) return { error: "Enter efficiencies as a percent (85 for 85%), not a fraction." };
   return_air_F = Number(return_air_F);
@@ -559,7 +567,7 @@ HVACSERVICE_RENDERERS["furnace-airflow-to-rise"] = _simpleRenderer({
     { key: "input_btuh", label: "Furnace input (BTU/hr)", kind: "number" },
     { key: "efficiency_pct", label: "Efficiency (%)", kind: "number" },
     { key: "cfm", label: "Blower airflow (CFM)", kind: "number" },
-    { key: "return_air_F", label: "Return-air temp (°F)", kind: "number", default: 70, attrs: { step: "any" } },
+    { key: "return_air_F", required: true, label: "Return-air temp (°F)", kind: "number", default: 70, attrs: { step: "any" } },
     { key: "rise_min_F", label: "Plate min rise (°F)", kind: "number", default: 40 },
     { key: "rise_max_F", label: "Plate max rise (°F)", kind: "number", default: 70 },
   ],
@@ -730,8 +738,10 @@ HVACSERVICE_RENDERERS["infiltration-load"] = _simpleRenderer({
 // ===================== spec-v386: measured outside-air percent from mixed-air temperatures =====================
 
 // dims: in { t_ra_f: T, t_ma_f: T, t_oa_f: T } out: { pct_oa: dimensionless }
-export function computeOutsideAirPercentTemps({ t_ra_f = 0, t_ma_f = 0, t_oa_f = 0 } = {}) {
+export function computeOutsideAirPercentTemps({ t_ra_f = 0, t_ma_f = 0, t_oa_f = null } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // 0 F is a real reading, so a blank temperature cannot stand in for it.
+  if ([t_oa_f].some((x) => x === null || x === undefined || x === "")) return { error: "Enter the outdoor-air temperature (F)." };
   const ra = Number(t_ra_f), ma = Number(t_ma_f), oa = Number(t_oa_f);
   if (ra === oa) return { error: "Return and outdoor temperatures must differ (zero denominator)." };
   const lo = Math.min(ra, oa), hi = Math.max(ra, oa);
@@ -750,7 +760,7 @@ HVACSERVICE_RENDERERS["outside-air-percent-temps"] = _simpleRenderer({
   fields: [
     { key: "t_ra_f", label: "Return-air temperature T_ra (°F)", kind: "number" },
     { key: "t_ma_f", label: "Mixed-air temperature T_ma (°F)", kind: "number", attrs: { step: "any" } },
-    { key: "t_oa_f", label: "Outdoor-air temperature T_oa (°F)", kind: "number", attrs: { step: "any" } },
+    { key: "t_oa_f", required: true, label: "Outdoor-air temperature T_oa (°F)", kind: "number", attrs: { step: "any" } },
   ],
   outputs: [
     { key: "pct", id: "oapt-out-pct", label: "Outside-air fraction", value: (r) => fmt(r.pct_oa, 1) + "% OA" },
@@ -926,8 +936,10 @@ HVACSERVICE_RENDERERS["draft-hood-dilution"] = _v622renderDraftHoodDilution;
 // ===================== spec-v585 C: theoretical chimney draft =====================
 // D_t = 0.52*B*H*(1/T_o_R - 1/T_m_R), Rankine. D_net = factor*D_t.
 // dims: in { stack_height_ft: L, ambient_temp_f: T, mean_flue_temp_f: T, baro_psia: M L^-1 T^-2, net_factor: dimensionless } out: { draft_theoretical_inwc: M L^-1 T^-2, draft_net_inwc: M L^-1 T^-2 }
-export function computeChimneyDraft({ stack_height_ft = 0, ambient_temp_f = 0, mean_flue_temp_f = 0, baro_psia = 14.7, net_factor = 0.6 } = {}) {
+export function computeChimneyDraft({ stack_height_ft = 0, ambient_temp_f = null, mean_flue_temp_f = null, baro_psia = 14.7, net_factor = 0.6 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A blank ambient read as 0 F, a cold-day draft the chimney does not get most of the year.
+  if ([ambient_temp_f, mean_flue_temp_f].some((x) => x === null || x === undefined || x === "")) return { error: "Enter the ambient and mean flue-gas temperatures (F)." };
   if (Number(net_factor) > 1) return { error: "The net factor is the share of theoretical draft left after flow losses and cannot exceed 1." };
   const H = Number(stack_height_ft) || 0;
   const to_f = Number(ambient_temp_f);
@@ -963,7 +975,7 @@ function _v585renderChimneyDraft(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "chd-out-note");
   function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeChimneyDraft({ stack_height_ft: readNum(H.input), ambient_temp_f: readNum(to.input), mean_flue_temp_f: readNum(tm.input), baro_psia: B.input.value === "" ? 14.7 : readNum(B.input), net_factor: factor.input.value === "" ? 0.6 : readNum(factor.input) });
+    const r = computeChimneyDraft({ stack_height_ft: readNum(H.input), ambient_temp_f: to.input.value === "" ? null : readNum(to.input), mean_flue_temp_f: tm.input.value === "" ? null : readNum(tm.input), baro_psia: B.input.value === "" ? 14.7 : readNum(B.input), net_factor: factor.input.value === "" ? 0.6 : readNum(factor.input) });
     if (r.error) { oDt.textContent = r.error; oDnet.textContent = "-"; oNote.textContent = ""; return; }
     oDt.textContent = fmt(r.draft_theoretical_inwc, 3) + " in wc";
     oDnet.textContent = fmt(r.draft_net_inwc, 3) + " in wc";
@@ -976,8 +988,10 @@ HVACSERVICE_RENDERERS["chimney-draft"] = _v585renderChimneyDraft;
 // ===================== spec-v669 C: chimney height for a target draft (inverse of chimney-draft) =====================
 // H = D_net_target / (factor * 0.52 * B * (1/T_o_R - 1/T_m_R)), Rankine.
 // dims: in { target_draft_net_inwc: M L^-1 T^-2, ambient_temp_f: T, mean_flue_temp_f: T, baro_psia: M L^-1 T^-2, net_factor: dimensionless } out: { required_height_ft: L }
-export function computeChimneyHeightForDraft({ target_draft_net_inwc = 0, ambient_temp_f = 0, mean_flue_temp_f = 0, baro_psia = 14.7, net_factor = 0.6 } = {}) {
+export function computeChimneyHeightForDraft({ target_draft_net_inwc = 0, ambient_temp_f = null, mean_flue_temp_f = null, baro_psia = 14.7, net_factor = 0.6 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A blank ambient read as 0 F, a cold-day draft the chimney does not get most of the year.
+  if ([ambient_temp_f, mean_flue_temp_f].some((x) => x === null || x === undefined || x === "")) return { error: "Enter the ambient and mean flue-gas temperatures (F)." };
   if (Number(net_factor) > 1) return { error: "The net factor is the share of theoretical draft left after flow losses and cannot exceed 1." };
   const target = Number(target_draft_net_inwc) || 0;
   const to_f = Number(ambient_temp_f);
@@ -1014,7 +1028,7 @@ function renderChimneyHeightForDraft(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "chhd-out-note");
   function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeChimneyHeightForDraft({ target_draft_net_inwc: readNum(dt.input), ambient_temp_f: readNum(to.input), mean_flue_temp_f: readNum(tm.input), baro_psia: B.input.value === "" ? 14.7 : readNum(B.input), net_factor: factor.input.value === "" ? 0.6 : readNum(factor.input) });
+    const r = computeChimneyHeightForDraft({ target_draft_net_inwc: readNum(dt.input), ambient_temp_f: to.input.value === "" ? null : readNum(to.input), mean_flue_temp_f: tm.input.value === "" ? null : readNum(tm.input), baro_psia: B.input.value === "" ? 14.7 : readNum(B.input), net_factor: factor.input.value === "" ? 0.6 : readNum(factor.input) });
     if (r.error) { oH.textContent = r.error; oNote.textContent = ""; return; }
     oH.textContent = fmt(r.required_height_ft, 1) + " ft";
     oNote.textContent = r.note;

@@ -1922,7 +1922,7 @@ cross-check.
 | calc-cross.js | `computePerDiem` | `{ state, type = "lodging", as_of = "" }` | _ | _ | _ |
 | calc-cross.js | `computePulleyMA` | `{ rig = "block_2", efficiency = 0.95 }` | _ | _ | _ |
 | calc-cross.js | `computePumpTdh` | `{ flow_gpm = 0, internal_diameter_in = 0, hw_c = 150, static_suction_lift_ft ...` | _ | _ | _ |
-| calc-cross.js | `computeRadiantHeatExchange` | `{ area_ft2 = 0, emissivity = 0.9, surface_temp_f = 0, surroundings_temp_f = 0...` | _ | _ | _ |
+| calc-cross.js | `computeRadiantHeatExchange` | `{ area_ft2 = 0, emissivity = 0.9, surface_temp_f = null, surroundings_temp_f ...` | _ | _ | _ |
 | calc-cross.js | `computeRainwaterCatchmentArea` | `{ target_annual_gal = 0, annual_in = 0, efficiency = 0.85 } = {}` | _ | _ | _ |
 | calc-cross.js | `computeRainwaterYield` | `{ catchment_ft2 = 0, monthly_in = [], annual_in = null, efficiency = 0.85 }` | _ | _ | _ |
 | calc-cross.js | `computeRampSlope` | `{ rise_in = 0, run_in = 0 }` | _ | _ | _ |
@@ -1938,8 +1938,8 @@ cross-check.
 | calc-cross.js | `computeUpgradeROI` | `{ incremental_cost, annual_savings, discount_rate_percent = 0, years = 10 }` | _ | _ | _ |
 | calc-cross.js | `computeVbeltDrive` | `{ driver_rpm = 0, driven_rpm = 0, driver_hp = 0, driver_pitch_diameter_in = 0...` | _ | _ | _ |
 | calc-cross.js | `computeVehicleLoad` | `{ wheelbase_in = 0, payload_lb = 0, payload_position_from_cab_in = 0, gvwr_lb...` | _ | _ | _ |
-| calc-cross.js | `computeWindChill` | `{ T_F = 0, wind_mph = 0 }` | _ | _ | _ |
-| calc-cross.js | `computeWindChillWindSpeed` | `{ T_F = 0, target_wc_F = 0 } = {}` | _ | _ | _ |
+| calc-cross.js | `computeWindChill` | `{ T_F = null, wind_mph = 0 }` | _ | _ | _ |
+| calc-cross.js | `computeWindChillWindSpeed` | `{ T_F = null, target_wc_F = null } = {}` | _ | _ | _ |
 | calc-cross.js | `convertTemperature` | `{ value, from, to }` | _ | _ | _ |
 | calc-cross.js | `convertUnit` | `{ category, value, from, to }` | _ | _ | _ |
 | calc-cross.js | `renderDilution` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
@@ -2587,8 +2587,8 @@ cross-check.
 | calc-hvacservice.js | `computeAshrae622Ventilation` | `{ floor_area_ft2 = 0, bedrooms = 0, infil_credit_cfm = 0, system_type = "unba...` | _ | _ | _ |
 | calc-hvacservice.js | `computeBlowerDoorAch50` | `{ cfm50 = 0, volume_ft3 = 0, n_factor = 17, target_ach50 = 3, n_factor_low = ...` | _ | _ | _ |
 | calc-hvacservice.js | `computeChilledWaterDeltaT` | `{ load_btuh = 0, actual_gpm = 0, design_delta_t_f = 0 } = {}` | _ | _ | _ |
-| calc-hvacservice.js | `computeChimneyDraft` | `{ stack_height_ft = 0, ambient_temp_f = 0, mean_flue_temp_f = 0, baro_psia = ...` | _ | _ | _ |
-| calc-hvacservice.js | `computeChimneyHeightForDraft` | `{ target_draft_net_inwc = 0, ambient_temp_f = 0, mean_flue_temp_f = 0, baro_p...` | _ | _ | _ |
+| calc-hvacservice.js | `computeChimneyDraft` | `{ stack_height_ft = 0, ambient_temp_f = null, mean_flue_temp_f = null, baro_p...` | _ | _ | _ |
+| calc-hvacservice.js | `computeChimneyHeightForDraft` | `{ target_draft_net_inwc = 0, ambient_temp_f = null, mean_flue_temp_f = null, ...` | _ | _ | _ |
 | calc-hvacservice.js | `computeCoAirFree` | `{ measured_co_ppm = 0, measured_o2_pct = null } = {}` | _ | _ | _ |
 | calc-hvacservice.js | `computeCombustionLambda` | `{ fuel = "natural_gas", flue_o2_pct = 0 } = {}` | _ | _ | _ |
 | calc-hvacservice.js | `computeCondensateDrain` | `{ tons = 0, pints_per_ton_hr = 3, run_ft = 0, slope_in_per_ft = 0.125 } = {}` | _ | _ | _ |
@@ -2602,14 +2602,14 @@ cross-check.
 | calc-hvacservice.js | `computeFlueGasCombustionEff` | `{ fuel = "natural_gas", flue_o2_pct = 0, stack_temp_f = 0, air_temp_f = 0 } = {}` | _ | _ | _ |
 | calc-hvacservice.js | `computeFlueGasDewPoint` | `{ excess_air_pct = 15 } = {}` | _ | _ | _ |
 | calc-hvacservice.js | `computeFurnaceAirflowToRise` | `{ input_btuh = 0, efficiency_pct = 80, cfm = 0, return_air_F = 70, rise_min_F...` | _ | _ | _ |
-| calc-hvacservice.js | `computeFurnaceTempRise` | `{ return_air_F = 0, supply_air_F = 0, input_btuh = 0, efficiency_pct = 80, ri...` | _ | _ | _ |
+| calc-hvacservice.js | `computeFurnaceTempRise` | `{ return_air_F = null, supply_air_F = 0, input_btuh = 0, efficiency_pct = 80,...` | _ | _ | _ |
 | calc-hvacservice.js | `computeGasMeterClock` | `{ sec_per_rev = 0, dial_size_cf = 0, heating_value_btu_cf = 1030, nameplate_i...` | _ | _ | _ |
 | calc-hvacservice.js | `computeGasMeterClockTarget` | `{ target_input_btuh = 0, dial_size_cf = 0, heating_value_btu_cf = 1030 } = {}` | _ | _ | _ |
 | calc-hvacservice.js | `computeHvacEquipmentCircuit` | `{ compressor_rla_A = 0, fan_fla_A = 0, other_load_A = 0, installed_breaker_A ...` | _ | _ | _ |
 | calc-hvacservice.js | `computeInfiltrationLoad` | `{ cfm = 0, delta_t_f = 0, delta_gr = 0 } = {}` | _ | _ | _ |
 | calc-hvacservice.js | `computeNitrogenPressureTest` | `{ start_psig = 0, start_temp_F = null, end_temp_F = null, end_psig = 0, atm_p...` | _ | _ | _ |
 | calc-hvacservice.js | `computeOilBurnerFiringRate` | `{ output_btu_hr = 88000, steady_state_efficiency_pct = 85, heating_value_btu_...` | _ | _ | _ |
-| calc-hvacservice.js | `computeOutsideAirPercentTemps` | `{ t_ra_f = 0, t_ma_f = 0, t_oa_f = 0 } = {}` | _ | _ | _ |
+| calc-hvacservice.js | `computeOutsideAirPercentTemps` | `{ t_ra_f = 0, t_ma_f = 0, t_oa_f = null } = {}` | _ | _ | _ |
 | calc-hvacservice.js | `computeRecoveryCylinder` | `{ water_capacity_lb = 0, refrig_density_lb_gal = 0, current_net_lb = 0, fill_...` | _ | _ | _ |
 | calc-hvacservice.js | `computeRunCapacitorMicrofarad` | `{ rated_uf = 0, measured_volts_V = 0, measured_amps_A = 0, tolerance_pct = 6 ...` | _ | _ | _ |
 | calc-hvacservice.js | `computeVacuumDecayTest` | `{ start_micron = 0, end_micron = 0, hold_min = 0, pass_ceiling_micron = 500 }...` | _ | _ | _ |
@@ -3395,7 +3395,7 @@ cross-check.
 | calc-restoration.js | `computeSootCleaningTakeoff` | `{ affected_sf = 0, sponge_coverage_sf = 100, production_sf_per_hr = 150, seal...` | _ | _ | _ |
 | calc-restoration.js | `computeSporeIoRatio` | `{ indoor_spores_m3 = 0, outdoor_spores_m3 = 0, indoor_marker = 0 } = {}` | _ | _ | _ |
 | calc-restoration.js | `computeStandingWater` | `{ area_ft2, depth_in }` | _ | _ | _ |
-| calc-restoration.js | `computeSurfaceCondensationRisk` | `{ air_temp_f = 0, air_rh_pct = 0, surface_temp_f = 0 } = {}` | _ | _ | _ |
+| calc-restoration.js | `computeSurfaceCondensationRisk` | `{ air_temp_f = null, air_rh_pct = 0, surface_temp_f = null } = {}` | _ | _ | _ |
 | calc-restoration.js | `computeThermalDeltaTReference` | `` | _ | _ | _ |
 | calc-restoration.js | `computeThermalFogDeodorization` | `{ structure_volume_ft3 = 0, dose_oz_per_1000ft3 = 5, treatments = 1 } = {}` | _ | _ | _ |
 | calc-restoration.js | `computeWaterClassScreen` | `{ floor_wet_fraction = 0, wall_wet_fraction = 0, wick_height_ft = 0, low_evap...` | _ | _ | _ |

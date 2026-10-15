@@ -331,7 +331,7 @@ export function renderPsychrometric(inputRegion, outputRegion, citationEl) {
   const oGP = makeOutputLine(outputRegion, "Grains per pound", "py-out-gp");
   const oVP = makeOutputLine(outputRegion, "Vapor pressure", "py-out-vp");
   const update = debounce(() => {
-    const r = computePsychrometric({ temperature_F: Number(T.input.value) || 0, RH_percent: Number(RH.input.value) || 0, atmospheric_pressure_hPa: (Number(P.input.value) || 29.92) * 33.8638866667 });
+    const r = computePsychrometric({ temperature_F: T.input.value === "" ? null : Number(T.input.value), RH_percent: RH.input.value === "" ? null : Number(RH.input.value), atmospheric_pressure_hPa: (Number(P.input.value) || 29.92) * 33.8638866667 });
     if (r.error) { oDP.textContent = r.error; oGP.textContent = "-"; oVP.textContent = "-"; return; }
     oDP.textContent = fmt(r.dew_point_F, 1) + " F";
     oGP.textContent = fmt(r.GPP, 1);
@@ -358,11 +358,13 @@ export function renderDryingGoal(inputRegion, outputRegion, citationEl) {
   const trh = makeOutputLine(outputRegion, "Target indoor RH", "dg-out-trh");
   const update = debounce(() => {
     const r = computeDryingGoal({
-      outdoor_temperature_F: Number(oT.input.value) || 0,
-      outdoor_RH_percent: Number(oR.input.value) || 0,
-      indoor_temperature_F: Number(iT.input.value) || 72,
+      outdoor_temperature_F: oT.input.value === "" ? null : Number(oT.input.value),
+      outdoor_RH_percent: oR.input.value === "" ? null : Number(oR.input.value),
+      // A blank indoor box takes the compute's own default; a typed 0 is no longer replaced by it.
+      indoor_temperature_F: iT.input.value === "" ? undefined : Number(iT.input.value),
       margin_GPP: Number(m.input.value) || 10,
     });
+    if (r.error) { ogpp.textContent = r.error; tgpp.textContent = "-"; trh.textContent = "-"; return; }
     ogpp.textContent = fmt(r.outdoor_GPP, 1);
     tgpp.textContent = fmt(r.target_indoor_GPP, 1);
     trh.textContent = fmt(r.target_indoor_RH_percent, 1) + " %";
@@ -2879,8 +2881,10 @@ RESTORATION_RENDERERS["contents-packout-inventory"] = renderContentsPackoutInven
 // (The Magnus coefficients 17.625 and 243.04 degC and the degF/degC conversion
 //  are dimensioned constants; the dew point is a temperature `T`, the margin is
 //  a temperature difference `T`, and the condensing flag is dimensionless.)
-export function computeSurfaceCondensationRisk({ air_temp_f = 0, air_rh_pct = 0, surface_temp_f = 0 } = {}) {
+export function computeSurfaceCondensationRisk({ air_temp_f = null, air_rh_pct = 0, surface_temp_f = null } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // 0 F is a real surface reading, so a blank cannot stand in for it.
+  if ([air_temp_f, surface_temp_f].some((x) => x === null || x === undefined || x === "")) return { error: "Enter the chamber air and coldest surface temperatures (F)." };
   const tf = Number(air_temp_f), rh = Number(air_rh_pct), sf = Number(surface_temp_f);
   if (!(rh > 0 && rh <= 100)) return { error: "Relative humidity must be between 0 and 100 percent." };
   const tc = (tf - 32) * 5 / 9;
@@ -2907,7 +2911,7 @@ function renderSurfaceCondensationRisk(inputRegion, outputRegion, citationEl) {
   const oMargin = makeOutputLine(outputRegion, "Surface margin", "scr-out-margin");
   const oFlag = makeOutputLine(outputRegion, "Condensation", "scr-out-flag");
   const update = debounce(() => {
-    const r = computeSurfaceCondensationRisk({ air_temp_f: Number(at.input.value) || 0, air_rh_pct: Number(rh.input.value) || 0, surface_temp_f: Number(st.input.value) || 0 });
+    const r = computeSurfaceCondensationRisk({ air_temp_f: at.input.value === "" ? null : Number(at.input.value), air_rh_pct: Number(rh.input.value) || 0, surface_temp_f: st.input.value === "" ? null : Number(st.input.value) });
     if (r.error) { oDew.textContent = r.error; oMargin.textContent = "-"; oFlag.textContent = "-"; return; }
     oDew.textContent = fmt(r.dew_point_f, 1) + " degF";
     oMargin.textContent = fmt(r.margin_f, 1) + " degF";

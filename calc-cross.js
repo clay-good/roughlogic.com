@@ -1304,8 +1304,10 @@ export const heatStressExample = { inputs: { T_F: 95, RH_percent: 60, solar: fal
 // --- Utility 165: Wind Chill Exposure ---
 
 // dims: in { T_F: T, wind_mph: L T^-1 } out: { wind_chill_F: T, band: dimensionless }
-export function computeWindChill({ T_F = 0, wind_mph = 0 }) {
+export function computeWindChill({ T_F = null, wind_mph = 0 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // 0 F is a real reading, so a blank temperature cannot stand in for it.
+  if ([T_F].some((x) => x === null || x === undefined || x === "")) return { error: "Enter the ambient temperature (F)." };
   if (T_F > 50) return { error: "Wind chill formula valid for T <= 50 F." };
   if (wind_mph < 0) return { error: "Wind speed cannot be negative (mph)." };
   if (wind_mph < 3) return { wind_chill_F: T_F, frostbite_minutes: null, note: "Wind below 3 mph; ambient temperature applies." };
@@ -1330,8 +1332,10 @@ export const windChillExample = { inputs: { T_F: 10, wind_mph: 20 } };
 // w^0.16 = (WC - 35.74 - 0.6215 T) / (0.4275 T - 35.75), so w = [ ... ]^(1/0.16). Valid for T <= 50 F and the resulting
 // w >= 3 mph (the formula's domain).
 // dims: in { T_F: T, target_wc_F: T } out: { wind_mph: L T^-1 }
-export function computeWindChillWindSpeed({ T_F = 0, target_wc_F = 0 } = {}) {
+export function computeWindChillWindSpeed({ T_F = null, target_wc_F = null } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // 0 F is a real reading, so a blank temperature cannot stand in for it.
+  if ([T_F, target_wc_F].some((x) => x === null || x === undefined || x === "")) return { error: "Enter the ambient and target wind-chill temperatures (F)." };
   const T = Number(T_F);
   const WC = Number(target_wc_F);
   if (!Number.isFinite(T) || !Number.isFinite(WC)) return { error: "Temperatures must be finite (F)." };
@@ -1586,7 +1590,9 @@ function _simpleRendererG(spec) {
       for (const f of spec.fields) {
         if (f.kind === "select") params[f.key] = fields[f.key].select.value;
         else if (f.kind === "checkbox") params[f.key] = fields[f.key].input.checked;
-        else params[f.key] = Number(fields[f.key].input.value) || 0;
+        // A field marked `required` passes null when blank, so the compute can
+        // tell a cleared temperature from a typed 0.
+        else params[f.key] = f.required && fields[f.key].input.value === "" ? null : Number(fields[f.key].input.value) || 0;
       }
       const r = spec.compute(params);
       if (r.error) {
@@ -1652,7 +1658,7 @@ const renderHeatStress = _simpleRendererG({
   citation: "Citation: NWS Rothfusz heat index; WBGT public approximation; OSHA work/rest cycle guidance generally.",
   example: heatStressExample.inputs,
   fields: [
-    { key: "T_F", label: "Dry-bulb temp (°F)", kind: "number" },
+    { key: "T_F", required: true, label: "Dry-bulb temp (°F)", kind: "number" },
     { key: "RH_percent", label: "Relative humidity (%)", kind: "number" },
     { key: "solar", label: "Direct sun exposure", kind: "checkbox" },
   ],
@@ -1668,7 +1674,7 @@ const renderWindChill = _simpleRendererG({
   citation: "Citation: NWS 2001 wind chill formula; frostbite-time piecewise from public NWS exposure curves.",
   example: windChillExample.inputs,
   fields: [
-    { key: "T_F", label: "Ambient temp (°F)", kind: "number" },
+    { key: "T_F", required: true, label: "Ambient temp (°F)", kind: "number" },
     { key: "wind_mph", label: "Wind (mph)", kind: "number" },
   ],
   outputs: [
@@ -1682,8 +1688,8 @@ const renderWindChillWindSpeed = _simpleRendererG({
   citation: "Citation: NWS 2001 wind chill formula solved for the wind speed: w = [ (WC - 35.74 - 0.6215 T) / (0.4275 T - 35.75) ]^(1/0.16). Valid for T <= 50 F and w >= 3 mph. A reference estimate; the NWS advisory governs.",
   example: windChillWindSpeedExample.inputs,
   fields: [
-    { key: "T_F", label: "Ambient temp (F, <= 50)", kind: "number" },
-    { key: "target_wc_F", label: "Target / reported wind chill (°F)", kind: "number" },
+    { key: "T_F", required: true, label: "Ambient temp (F, <= 50)", kind: "number" },
+    { key: "target_wc_F", required: true, label: "Target / reported wind chill (°F)", kind: "number" },
   ],
   outputs: [
     { key: "w", id: "wcw-out-w", label: "Wind speed", value: (r) => _fmtG(r.wind_mph, 1) + " mph" },
@@ -3223,8 +3229,10 @@ CROSS_RENDERERS["swing-fall-geometry"] = renderSwingFallGeometry;
 // surroundings (1 for a small object fully enclosed by a large room). The T^4 dependence is why a hot surface
 // sheds heat far faster than a warm one and why emissivity dominates radiant panel and freeze-protection design.
 // First-principles / public (NIST). dims: in { area_ft2: L^2, emissivity: dimensionless, surface_temp_f: T, surroundings_temp_f: T, view_factor: dimensionless } out: { heat_rate_btu_hr: M L^2 T^-3, heat_rate_w: M L^2 T^-3, surface_temp_r: T, surroundings_temp_r: T }
-export function computeRadiantHeatExchange({ area_ft2 = 0, emissivity = 0.9, surface_temp_f = 0, surroundings_temp_f = 0, view_factor = 1 } = {}) {
+export function computeRadiantHeatExchange({ area_ft2 = 0, emissivity = 0.9, surface_temp_f = null, surroundings_temp_f = null, view_factor = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // 0 F is a real reading, so a blank temperature cannot stand in for it.
+  if ([surface_temp_f, surroundings_temp_f].some((x) => x === null || x === undefined || x === "")) return { error: "Enter the surface and surroundings temperatures (F)." };
   const A = Number(area_ft2), eps = Number(emissivity), F = Number(view_factor);
   const tsF = Number(surface_temp_f), tsurrF = Number(surroundings_temp_f);
   if (![A, eps, F, tsF, tsurrF].every(Number.isFinite)) return { error: "All inputs must be finite numbers." };
@@ -3250,8 +3258,8 @@ CROSS_RENDERERS["radiant-heat-exchange"] = _simpleRendererG({
   fields: [
     { key: "area_ft2", label: "Radiating surface area (ft²)", kind: "number" },
     { key: "emissivity", label: "Surface emissivity (shiny metal ~0.05, paint/nonmetal ~0.9)", kind: "number" },
-    { key: "surface_temp_f", label: "Surface temperature (°F)", kind: "number" },
-    { key: "surroundings_temp_f", label: "Surroundings / facing-surface temperature (°F)", kind: "number" },
+    { key: "surface_temp_f", required: true, label: "Surface temperature (°F)", kind: "number" },
+    { key: "surroundings_temp_f", required: true, label: "Surroundings / facing-surface temperature (°F)", kind: "number" },
     { key: "view_factor", label: "View factor to surroundings (1 = fully surrounded)", kind: "number" },
   ],
   outputs: [

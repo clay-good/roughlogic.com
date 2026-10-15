@@ -493,7 +493,9 @@ function _simpleRenderer(spec) {
         if (f.kind === "select") params[f.key] = fields[f.key].select.value;
         else if (f.kind === "checkbox") params[f.key] = fields[f.key].input.checked;
         else if (f.kind === "text") params[f.key] = fields[f.key].input.value;
-        else params[f.key] = Number(fields[f.key].input.value) || 0;
+        // A field marked `required` passes null when blank, so the compute can
+        // tell a cleared temperature from a typed 0.
+        else params[f.key] = f.required && fields[f.key].input.value === "" ? null : Number(fields[f.key].input.value) || 0;
       }
       const r = spec.compute(params);
       if (r.error) {
@@ -1855,6 +1857,8 @@ MECHANIC_RENDERERS["impact-load-factor"] = _simpleRenderer({
 // dims: in { accumulator_size_gal: L^3, precharge_psig: M L^-1 T^-2, min_pressure_psig: M L^-1 T^-2, max_pressure_psig: M L^-1 T^-2, gas_process: dimensionless, charge_temp_f: T, operating_temp_f: T } out: { usable_volume_gal: L^3, utilization_pct: dimensionless, precharge_op_psig: M L^-1 T^-2 }
 export function computeHydraulicAccumulatorVolume({ accumulator_size_gal = 0, precharge_psig = 0, min_pressure_psig = 0, max_pressure_psig = 0, gas_process = "isothermal", charge_temp_f = 70, operating_temp_f = 70 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // The page passes a blank box as null; 0 F is a real reading, so a blank cannot stand in for it.
+  if ([charge_temp_f, operating_temp_f].some((x) => x === null || x === "")) return { error: "Enter the precharge and operating gas temperatures (F)." };
   const V0 = Number(accumulator_size_gal) || 0;
   const P0g = Number(precharge_psig) || 0;
   const P1g = Number(min_pressure_psig) || 0;
@@ -1892,8 +1896,8 @@ MECHANIC_RENDERERS["hydraulic-accumulator-volume"] = _simpleRenderer({
       { value: "isothermal", label: "Isothermal (slow cycle, n = 1)" },
       { value: "adiabatic", label: "Adiabatic (fast cycle, n = 1.4)" },
     ] },
-    { key: "charge_temp_f", label: "Temperature when precharged (°F)", kind: "number", default: 70, attrs: { step: "any", value: "70" } },
-    { key: "operating_temp_f", label: "Operating gas temperature (°F)", kind: "number", default: 70, attrs: { step: "any", value: "70" } },
+    { key: "charge_temp_f", required: true, label: "Temperature when precharged (°F)", kind: "number", default: 70, attrs: { step: "any", value: "70" } },
+    { key: "operating_temp_f", required: true, label: "Operating gas temperature (°F)", kind: "number", default: 70, attrs: { step: "any", value: "70" } },
   ],
   outputs: [
     { key: "v", id: "hav-out-v", label: "Usable oil volume", value: (r) => fmt(r.usable_volume_gal, 4) + " gal (" + fmt(r.usable_volume_gal * 231, 1) + " in^3)" },
@@ -2814,6 +2818,8 @@ MECHANIC_RENDERERS["torque-adapter-correction"] = _simpleRenderer({
 // dims: in { field_elevation_ft: L, altimeter_in_hg: dimensionless, oat_f: T, relative_humidity_pct: dimensionless } out: { oat_c: T, pa_ft: L, isa_c: T, da_ft: L, humidity_add_ft: L }
 export function computeDensityAltitude({ field_elevation_ft = 0, altimeter_in_hg = 29.92, oat_f = 59, relative_humidity_pct = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // The page passes a blank box as null; 0 F is a real reading, so a blank cannot stand in for it.
+  if ([oat_f].some((x) => x === null || x === "")) return { error: "Enter the outside air temperature (F)." };
   if (!(Number(altimeter_in_hg) >= 25 && Number(altimeter_in_hg) <= 32)) return { error: "Altimeter setting is in inches of mercury, 25 to 32 (29.92 standard); hPa is not accepted here." };
   const elev = Number(field_elevation_ft) || 0;
   const alt = Number(altimeter_in_hg) || 0;
@@ -2851,7 +2857,7 @@ MECHANIC_RENDERERS["density-altitude"] = _simpleRenderer({
   fields: [
     { key: "field_elevation_ft", label: "Field / station elevation (ft)", kind: "number" },
     { key: "altimeter_in_hg", label: "Altimeter setting (in Hg)", kind: "number" },
-    { key: "oat_f", label: "Outside air temperature (°F)", kind: "number", default: 59 },
+    { key: "oat_f", required: true, label: "Outside air temperature (°F)", kind: "number", default: 59 },
     { key: "relative_humidity_pct", label: "Relative humidity (%, blank for dry air)", kind: "number", attrs: { step: "any", min: "0", max: "100" } },
   ],
   outputs: [
@@ -3154,7 +3160,7 @@ MECHANIC_RENDERERS["turbo-max-boost-for-charge-temp"] = _simpleRenderer({
   example: turboMaxBoostForChargeTempExample.inputs,
   fields: [
     { key: "max_charge_temp_f", label: "Charge-air temperature limit (°F)", kind: "number" },
-    { key: "inlet_temp_f", label: "Compressor inlet air temp (°F)", kind: "number" },
+    { key: "inlet_temp_f", required: true, label: "Compressor inlet air temp (°F)", kind: "number" },
     { key: "compressor_eff_pct", label: "Compressor isentropic efficiency (%)", kind: "number" },
     { key: "ambient_psia", label: "Ambient pressure (psia, 14.7 at sea level)", kind: "number" },
   ],
@@ -4352,6 +4358,8 @@ MECHANIC_RENDERERS["gear-dynamic-tooth-stress"] = _simpleRenderer({
 // dims: in { baseline_pressure_inhg: M L^-1 T^-2, baseline_temp_f: T, actual_pressure_inhg: M L^-1 T^-2, actual_temp_f: T, jet_flow_number: dimensionless, jet_diameter_in: L } out: { density_ratio: dimensionless, corrected_jet_number: dimensionless, corrected_jet_diameter_in: L }
 export function computeCarburetorAltitudeJetting({ baseline_pressure_inhg = 29.92, baseline_temp_f = 59, actual_pressure_inhg = 0, actual_temp_f = null, jet_flow_number = 0, jet_diameter_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // The page passes a blank box as null; 0 F is a real reading, so a blank cannot stand in for it.
+  if ([actual_temp_f].some((x) => x === null || x === undefined || x === "") || [baseline_temp_f].some((x) => x === null || x === "")) return { error: "Enter the baseline and actual temperatures (F)." };
   if (actual_temp_f === null || actual_temp_f === "") return { error: "Enter the actual air temperature (F)." };
   if (!(baseline_pressure_inhg > 0)) return { error: "Baseline absolute pressure must be positive." };
   if (!(actual_pressure_inhg > 0)) return { error: "Actual absolute pressure must be positive." };
@@ -4388,9 +4396,9 @@ MECHANIC_RENDERERS["carburetor-altitude-jetting"] = _simpleRenderer({
   example: carburetorAltitudeJettingExample.inputs,
   fields: [
     { key: "baseline_pressure_inhg", label: "Baseline absolute pressure (in Hg)", kind: "number" },
-    { key: "baseline_temp_f", label: "Baseline temperature (F)", kind: "number", default: 59, attrs: { step: "any" } },
+    { key: "baseline_temp_f", required: true, label: "Baseline temperature (F)", kind: "number", default: 59, attrs: { step: "any" } },
     { key: "actual_pressure_inhg", label: "Actual absolute pressure (in Hg)", kind: "number" },
-    { key: "actual_temp_f", label: "Actual temperature (F)", kind: "number", attrs: { step: "any" } },
+    { key: "actual_temp_f", required: true, label: "Actual temperature (F)", kind: "number", attrs: { step: "any" } },
     { key: "jet_flow_number", label: "Original jet flow number (0 to skip)", kind: "number" },
     { key: "jet_diameter_in", label: "Original jet diameter (in, 0 to skip)", kind: "number" },
   ],
