@@ -243,7 +243,7 @@ export const macrsExample = { inputs: { cost: 50000, class_life: 5, convention: 
 //  (dimensionless); business-use and bonus percents are
 //  dimensionless ratios. The tax-year shard lookup returns a
 //  categorical parameters object (dimensionless).)
-export function computeSection179({ cost = 0, business_use_pct = 100, taxable_income = 0, tax_year = 2025, bonus_pct = null }) {
+export function computeSection179({ cost = 0, business_use_pct = 100, taxable_income = 0, tax_year = 2026, bonus_pct = null }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // Section 179 is available only for property used MORE than half in business (IRC 179(d)(1), Pub 946).
   if (Number(business_use_pct) <= 50) return { error: "Section 179 requires more than 50% business use; at 50% or less the property is depreciated under ADS instead." };
@@ -288,7 +288,7 @@ export const section179Example = { inputs: { cost: 50000, business_use_pct: 100,
 //  monetary inputs and outputs are dimensionless dollar aggregates
 //  per the §7.1 monetary convention; filing status and tax year
 //  are categorical tokens.)
-export function computeSETax({ net_se_earnings = 0, w2_ss_wages = 0, w2_medicare_wages = null, tax_year = 2025, filing_status = "single" }) {
+export function computeSETax({ net_se_earnings = 0, w2_ss_wages = 0, w2_medicare_wages = null, tax_year = 2026, filing_status = "single" }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(net_se_earnings >= 0)) return { error: "Net SE earnings cannot be negative." };
   const params = SE_TAX_PARAMETERS[tax_year];
@@ -332,7 +332,7 @@ export const seTaxExample = { inputs: { net_se_earnings: 80000, w2_ss_wages: 0, 
 //  arrays are categorical (dimensionless).)
 export function computeEstimatedTax({
   projected_current_tax = 0, prior_year_tax = 0, current_withholding = 0,
-  prior_year_multiplier = 1.0, tax_year = 2025,
+  prior_year_multiplier = 1.0, tax_year = 2026,
 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (Number(current_withholding) < 0) return { error: "Withholding cannot be negative." };
@@ -426,7 +426,7 @@ const PAY_FREQ_PERIODS = { weekly: 52, biweekly: 26, semimonthly: 24, monthly: 1
 //  additional-Medicare percentages are dimensionless ratios.)
 export function computePayrollWithholding({
   gross_per_period = 0, pay_frequency = "biweekly", filing_status = "single",
-  tax_year = 2025, ytd_ss_wages = 0,
+  tax_year = 2026, ytd_ss_wages = 0,
 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(gross_per_period >= 0)) return { error: "Gross cannot be negative." };
@@ -655,7 +655,7 @@ export const cccExample = { inputs: { dso: 45, dio: 60, dpo: 30 } };
 //  per-length (`L^-1` against monetary aggregates); deductible
 //  amount = miles * rate stays a dimensionless dollar aggregate
 //  per the §7.1 monetary convention.)
-export function computeMileageRollup({ trips = [], tax_year = 2025 }) {
+export function computeMileageRollup({ trips = [], tax_year = 2026 }) {
   if (Array.isArray(trips) && trips.some((t) => !t || Number(t.miles) < 0 || !Number.isFinite(Number(t.miles ?? 0)))) return { error: "Each trip needs a mileage of zero or more." };
   if (!Array.isArray(trips)) return { error: "Trips must be an array." };
   const rate_row = STANDARD_MILEAGE_RATES[tax_year];
@@ -876,7 +876,7 @@ function renderSection179(inputRegion, outputRegion, citationEl) {
   const ti = makeNumber("Taxable income before the deduction (USD)", "s179-ti", { step: "any", min: "0" });
   const yr = makeSelect("Tax year", "s179-yr",
     Object.keys(SECTION_179_LIMITS).map((y) => ({ value: y, label: y })));
-  yr.select.value = "2025";
+  yr.select.value = "2026";
   for (const f of [cost, buPct, ti, yr]) inputRegion.appendChild(f.wrap);
   const s179Out = makeOutputLine(outputRegion, "Section 179 deduction", "s179-out-d");
   const bonusOut = makeOutputLine(outputRegion, "Bonus depreciation", "s179-out-b");
@@ -905,7 +905,7 @@ function renderSeTax(inputRegion, outputRegion, citationEl) {
   const w2m = makeNumber("W-2 Medicare wages, box 5 (USD; blank = same as SS wages)", "se-w2m", { step: "any", min: "0" });
   const yr = makeSelect("Tax year", "se-yr",
     Object.keys(SE_TAX_PARAMETERS).map((y) => ({ value: y, label: y })));
-  yr.select.value = "2025";
+  yr.select.value = "2026";
   const fs = makeSelect("Filing status", "se-fs", [
     { value: "single", label: "Single" }, { value: "mfj", label: "Married filing jointly" },
     { value: "mfs", label: "Married filing separately" }, { value: "hoh", label: "Head of household" },
@@ -948,7 +948,7 @@ function renderEstimatedTax(inputRegion, outputRegion, citationEl) {
   ]);
   const yr = makeSelect("Tax year", "et-yr",
     Object.keys(ESTIMATED_TAX_DUE_DATES).map((y) => ({ value: y, label: y })));
-  yr.select.value = "2025";
+  yr.select.value = "2026";
   for (const f of [proj, prior, wh, mult, yr]) inputRegion.appendChild(f.wrap);
   const reqOut = makeOutputLine(outputRegion, "Required annual payment", "et-out-r");
   const pqOut = makeOutputLine(outputRegion, "Per-quarter installment", "et-out-q");
@@ -1178,7 +1178,7 @@ function renderMileageRollup(inputRegion, outputRegion, citationEl) {
   inputRegion.appendChild(makeNotice(TAX_LAW_NOTICE));
   const yr = makeSelect("Tax year", "ml-yr",
     Object.keys(STANDARD_MILEAGE_RATES).map((y) => ({ value: y, label: y })));
-  yr.select.value = "2025";
+  yr.select.value = "2026";
   inputRegion.appendChild(yr.wrap);
   const ta = makeTextarea("Trips (date,miles,purpose; one per line)", "ml-trips", { rows: "4" });
   ta.input.placeholder = "2025-03-01,42,Client visit";

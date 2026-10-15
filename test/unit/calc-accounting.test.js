@@ -137,7 +137,7 @@ test("ET: due dates for 2025 has 4 entries", () => { const r = computeEstimatedT
 test("Payroll: example yields total period > 0", () => { const r = computePayrollWithholding(payrollExample.inputs); assert.ok(r.total_employee_period > 0); });
 test("Payroll: SS = 6.2% of gross under wage base", () => { const r = computePayrollWithholding({ gross_per_period: 1000, pay_frequency: "weekly", filing_status: "single" }); assert.ok(close(r.ss_tax_period, 62, 0.01)); });
 test("Payroll: Medicare = 1.45% of gross", () => { const r = computePayrollWithholding({ gross_per_period: 1000, pay_frequency: "weekly", filing_status: "single" }); assert.ok(close(r.medicare_period, 14.5, 0.01)); });
-test("Payroll: SS capped at YTD wage base", () => { const params = SE_TAX_PARAMETERS[2025]; const r = computePayrollWithholding({ gross_per_period: 5000, pay_frequency: "biweekly", filing_status: "single", ytd_ss_wages: params.ss_wage_base }); assert.equal(r.ss_tax_period, 0); });
+test("Payroll: SS capped at YTD wage base", () => { const params = SE_TAX_PARAMETERS[2025]; const r = computePayrollWithholding({ gross_per_period: 5000, pay_frequency: "biweekly", filing_status: "single", tax_year: 2025, ytd_ss_wages: params.ss_wage_base }); assert.equal(r.ss_tax_period, 0); });
 test("Payroll: unknown frequency errors", () => { assert.ok(computePayrollWithholding({ gross_per_period: 100, pay_frequency: "annual", filing_status: "single" }).error); });
 
 // 240 Amortization
