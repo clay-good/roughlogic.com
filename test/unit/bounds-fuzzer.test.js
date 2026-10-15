@@ -61918,3 +61918,11 @@ test("bounds: spec-v1963 computeRiserFeedingDistance pins Eq. (1), the Table 2 m
     assert.ok("error" in _rfd({ ...base, ...over }), JSON.stringify(over));
   }
 });
+test("bounds: spec-v1963 riser-feeding-distance lateral rule is 0.48 x the end effect to W/T 7, and stops there", () => {
+  const base = { section_thickness_in: 2, section_width_in: 8, feeding_length_in: 0, sand_mold: "green_sand", cooling: "end_chill", alloy: "aisi_4340", superheat_f: 180 };
+  const r = _rfd(base);
+  // The cooling multiplier belongs to the end, so the lateral figure carries every other one.
+  assert.ok(Math.abs(r.lateral_fd_in - 0.48 * r.fd_over_t_base * 1.08 * 0.86 * 1.09 * 2) < 1e-9);
+  assert.ok(_rfd({ ...base, section_width_in: 14 }).lateral_fd_in !== null);
+  assert.equal(_rfd({ ...base, section_width_in: 14.1 }).lateral_fd_in, null);
+});

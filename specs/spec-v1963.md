@@ -28,6 +28,7 @@ steel`, `how far will a riser feed`, `centerline shrinkage plate casting`, `end 
 | Sand | furan 1, green sand 1.09, zircon 0.96, chromite 0.88 |
 | Cooling | end effect 1, end chill 1.19, drag chill 0.95 |
 | Superheat | 30 C 0.94, 60 C 1, 90 C 1.06, 120 C 1.12, 150 C 1.18, 250 C 1.38, linear between rows |
+| Lateral (two top risers) | LFD = 0.48 FD (without the cooling multiplier) for W/T up to 7 (Ou et al., MMTB 33B 2002, Eq. 1); none past 7 |
 | Check | sound when the furthest point is within FD of the riser EDGE |
 
 Grades carry Table 2's eight carbon and low-alloy and seven high-alloy multipliers (0.86 to 1.036).
@@ -42,5 +43,5 @@ Grades carry Table 2's eight carbon and low-alloy and seven high-alloy multiplie
 
 ## 4. Not in scope
 
-Lateral feeding between two risers, side risers, and the thin-section credit for gating through the riser are
-separate rules in the SFSA guidelines and are named in the note, not computed.
+Lateral feeding past W/T 7 (a chart only), side risers, and the thin-section credit for gating through the riser are
+named in the note, not computed.
