@@ -72,6 +72,8 @@ export function manualJCooling({
 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if ([floor_area_ft2].some((x) => Number(x) < 0)) return { error: "Floor area cannot be negative." };
+  // A blank outdoor design temperature read as 0 F gave a zero conduction load.
+  if (outdoor_design_F === null || outdoor_design_F === undefined || outdoor_design_F === "") return { error: "Enter the outdoor design temperature (F)." };
   const dT = Math.max(0, outdoor_design_F - indoor_design_F);
   const Uw = U_FACTORS.wall[insulation_level];
   const Uc = U_FACTORS.ceiling[insulation_level];
@@ -140,6 +142,7 @@ export function manualJHeating({
 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if ([floor_area_ft2].some((x) => Number(x) < 0)) return { error: "Floor area cannot be negative." };
+  if (outdoor_design_F === null || outdoor_design_F === undefined || outdoor_design_F === "") return { error: "Enter the outdoor design temperature (F)." };
   const dT = Math.max(0, indoor_design_F - outdoor_design_F);
   const Uw = U_FACTORS.wall[insulation_level];
   const Uc = U_FACTORS.ceiling[insulation_level];
@@ -466,6 +469,8 @@ export function computeApproachDeltaT({
   delta_T_normal_low = 16, delta_T_normal_high = 22,
 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // 0 F is a real reading, so a blank temperature cannot stand in for it.
+  if (![outdoor_F, condenser_saturation_F, supply_F, return_F].every((x) => x !== null && x !== undefined && x !== "")) return { error: "Enter all four temperatures (F)." };
   const approach = condenser_saturation_F - outdoor_F;
   const delta_T = return_F - supply_F;
   return {
@@ -771,8 +776,9 @@ export const evaporativeCoolingExample = {
 // effectiveness: T_out = T_db - eff x (T_db - T_wb). The wet-bulb is the floor.
 export function computeEvaporativeCoolerEffectiveness({ dry_bulb_F, wet_bulb_F, effectiveness = 0.85 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
-  const db = Number(dry_bulb_F);
-  const wb = Number(wet_bulb_F);
+  // A blank (null) would read as 0 F; only a typed temperature counts.
+  const db = dry_bulb_F === null || dry_bulb_F === "" ? NaN : Number(dry_bulb_F);
+  const wb = wet_bulb_F === null || wet_bulb_F === "" ? NaN : Number(wet_bulb_F);
   const eff = Number(effectiveness);
   if (!Number.isFinite(db)) return { error: "Dry-bulb temperature must be a number (F)." };
   if (!Number.isFinite(wb)) return { error: "Wet-bulb temperature must be a number (F)." };
@@ -800,7 +806,7 @@ function renderEvaporativeCoolerEffectiveness(inputRegion, outputRegion, citatio
   const oW = makeOutputLine(outputRegion, "Wet-bulb depression (max drop)", "ece-out-w");
   const oNote = makeOutputLine(outputRegion, "Note", "ece-out-note");
   const update = debounce(() => {
-    const r = computeEvaporativeCoolerEffectiveness({ dry_bulb_F: Number(db.input.value), wet_bulb_F: Number(wb.input.value), effectiveness: Number(eff.input.value) });
+    const r = computeEvaporativeCoolerEffectiveness({ dry_bulb_F: db.input.value === "" ? null : Number(db.input.value), wet_bulb_F: wb.input.value === "" ? null : Number(wb.input.value), effectiveness: Number(eff.input.value) });
     if (r.error) { oT.textContent = r.error; oD.textContent = "-"; oW.textContent = "-"; oNote.textContent = ""; return; }
     oT.textContent = fmt(r.leaving_db_F, 1) + " F";
     oD.textContent = fmt(r.temp_drop_F, 1) + " F";
@@ -820,8 +826,8 @@ function renderEvaporativeCoolerEffectiveness(inputRegion, outputRegion, citatio
 // dims: in { dry_bulb_F: T, secondary_wet_bulb_F: T, effectiveness: dimensionless } out: { leaving_db_F: T, temp_drop_F: T, wet_bulb_depression_F: T }
 export function computeIndirectEvaporativeCooling({ dry_bulb_F, secondary_wet_bulb_F, effectiveness = 0.65 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
-  const db = Number(dry_bulb_F);
-  const wb = Number(secondary_wet_bulb_F);
+  const db = dry_bulb_F === null || dry_bulb_F === "" ? NaN : Number(dry_bulb_F);
+  const wb = secondary_wet_bulb_F === null || secondary_wet_bulb_F === "" ? NaN : Number(secondary_wet_bulb_F);
   const eff = Number(effectiveness);
   if (!Number.isFinite(db)) return { error: "Entering dry-bulb temperature must be a number (F)." };
   if (!Number.isFinite(wb)) return { error: "Secondary-stream wet-bulb temperature must be a number (F)." };
@@ -848,7 +854,7 @@ function renderIndirectEvaporativeCooling(inputRegion, outputRegion, citationEl)
   const oW = makeOutputLine(outputRegion, "Wet-bulb depression (max drop)", "iec-out-w");
   const oNote = makeOutputLine(outputRegion, "Note", "iec-out-note");
   const update = debounce(() => {
-    const r = computeIndirectEvaporativeCooling({ dry_bulb_F: Number(db.input.value), secondary_wet_bulb_F: Number(wb.input.value), effectiveness: Number(eff.input.value) });
+    const r = computeIndirectEvaporativeCooling({ dry_bulb_F: db.input.value === "" ? null : Number(db.input.value), secondary_wet_bulb_F: wb.input.value === "" ? null : Number(wb.input.value), effectiveness: Number(eff.input.value) });
     if (r.error) { oT.textContent = r.error; oD.textContent = "-"; oW.textContent = "-"; oNote.textContent = ""; return; }
     oT.textContent = fmt(r.leaving_db_F, 1) + " F";
     oD.textContent = fmt(r.temp_drop_F, 1) + " F";
@@ -876,11 +882,12 @@ export function renderApproachDeltaT(inputRegion, outputRegion, citationEl) {
   const oDB = makeOutputLine(outputRegion, "Delta-T band", "ad-out-db");
   const update = debounce(() => {
     const r = computeApproachDeltaT({
-      outdoor_F: Number(od.input.value) || 0,
-      condenser_saturation_F: Number(sat.input.value) || 0,
-      supply_F: Number(supply.input.value) || 0,
-      return_F: Number(ret.input.value) || 0,
+      outdoor_F: od.input.value === "" ? null : Number(od.input.value),
+      condenser_saturation_F: sat.input.value === "" ? null : Number(sat.input.value),
+      supply_F: supply.input.value === "" ? null : Number(supply.input.value),
+      return_F: ret.input.value === "" ? null : Number(ret.input.value),
     });
+    if (r.error) { oA.textContent = r.error; oAB.textContent = "-"; oD.textContent = "-"; oDB.textContent = "-"; return; }
     oA.textContent = fmt(r.approach_F, 1) + " F";
     oAB.textContent = r.approach_band;
     oD.textContent = fmt(r.delta_T_F, 1) + " F";
@@ -905,12 +912,13 @@ export function renderOutdoorAirMix(inputRegion, outputRegion, citationEl) {
   const oG = makeOutputLine(outputRegion, "Mixed grains", "om-out-g");
   const update = debounce(() => {
     const r = computeOutdoorAirMix({
-      return_T_F: Number(rt.input.value) || 0,
-      return_RH_percent: Number(rh.input.value) || 0,
-      outdoor_T_F: Number(ot.input.value) || 0,
-      outdoor_RH_percent: Number(oh.input.value) || 0,
-      oa_fraction: Number(f.input.value) || 0,
+      return_T_F: rt.input.value === "" ? null : Number(rt.input.value),
+      return_RH_percent: rh.input.value === "" ? null : Number(rh.input.value),
+      outdoor_T_F: ot.input.value === "" ? null : Number(ot.input.value),
+      outdoor_RH_percent: oh.input.value === "" ? null : Number(oh.input.value),
+      oa_fraction: f.input.value === "" ? null : Number(f.input.value),
     });
+    if (r.error) { oT.textContent = r.error; oG.textContent = "-"; return; }
     oT.textContent = fmt(r.mixed_T_F, 2) + " F";
     oG.textContent = fmt(r.mixed_GPP, 1) + " GPP";
   }, DEBOUNCE_MS);
@@ -1154,11 +1162,12 @@ export function renderManualJCooling(inputRegion, outputRegion, citationEl) {
       insulation_level: ins.select.value,
       window_type: wt.select.value,
       occupants: Number(occ.input.value) || 0,
-      outdoor_design_F: Number(od.input.value) || 0,
-      indoor_design_F: Number(id.input.value) || 75,
+      outdoor_design_F: od.input.value === "" ? null : Number(od.input.value),
+      indoor_design_F: id.input.value === "" ? undefined : Number(id.input.value),
       outdoor_RH_percent: Number(orh.input.value) || 50,
     };
     const r = await runInWorker({ kind: "cooling", inputs }, manualJCooling);
+    if (r.error) { oTotal.textContent = r.error; oTons.textContent = "-"; oSens.textContent = "-"; oLat.textContent = "-"; oBand.textContent = "-"; return; }
     oTotal.textContent = fmt(r.total_BTU_hr, 0) + " BTU/hr";
     oTons.textContent = fmt(r.tons, 2);
     oSens.textContent = fmt(r.sensible_BTU_hr, 0) + " BTU/hr";
@@ -1217,10 +1226,11 @@ export function renderManualJHeating(inputRegion, outputRegion, citationEl) {
       ceiling_area_ft2: Number(ca.input.value) || 0,
       insulation_level: ins.select.value,
       window_type: wt.select.value,
-      outdoor_design_F: Number(od.input.value) || 0,
-      indoor_design_F: Number(id.input.value) || 70,
+      outdoor_design_F: od.input.value === "" ? null : Number(od.input.value),
+      indoor_design_F: id.input.value === "" ? undefined : Number(id.input.value),
     };
     const r = await runInWorker({ kind: "heating", inputs }, manualJHeating);
+    if (r.error) { oTotal.textContent = r.error; oTons.textContent = "-"; oCond.textContent = "-"; oInf.textContent = "-"; oBand.textContent = "-"; return; }
     oTotal.textContent = fmt(r.total_BTU_hr, 0) + " BTU/hr";
     oTons.textContent = fmt(r.tons, 2) + " tons (1 ton = 12 000 BTU/hr)";
     oCond.textContent = fmt(r.conductive_BTU_hr, 0) + " BTU/hr";
@@ -1361,11 +1371,12 @@ export function renderBalancePoint(inputRegion, outputRegion, citationEl) {
   const oAux = makeOutputLine(outputRegion, "Supplemental heat at design", "bp-out-aux");
   const update = debounce(() => {
     const r = computeBalancePoint({
-      heating_capacity_btu_hr_at_design: Number(cap.input.value) || 0,
-      design_outdoor_F: Number(dT.input.value) || 0,
-      building_heat_loss_btu_hr: Number(load.input.value) || 0,
-      indoor_F: Number(indoor.input.value) || 65,
+      heating_capacity_btu_hr_at_design: cap.input.value === "" ? null : Number(cap.input.value),
+      design_outdoor_F: dT.input.value === "" ? null : Number(dT.input.value),
+      building_heat_loss_btu_hr: load.input.value === "" ? null : Number(load.input.value),
+      indoor_F: indoor.input.value === "" ? undefined : Number(indoor.input.value),
     });
+    if (r.error) { oBP.textContent = r.error; oAux.textContent = "-"; return; }
     oBP.textContent = fmt(r.balance_point_F, 1) + " F";
     oAux.textContent = r.aux_heat_btu_hr == null ? "-" : fmt(r.aux_heat_btu_hr, 0) + " BTU/hr (" + fmt(r.aux_strip_kw, 2) + " kW strip)";
   }, DEBOUNCE_MS);
@@ -1974,7 +1985,7 @@ function renderNPSHa(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const npshrVal = r.input.value === "" ? null : Number(r.input.value);
     const x = computeNPSHa({
-      elevation_ft: Number(e.input.value) || 0, water_temp_F: Number(w.input.value) || 60,
+      elevation_ft: Number(e.input.value) || 0, water_temp_F: w.input.value === "" ? undefined : Number(w.input.value),
       source_elevation_relative_ft: Number(s.input.value) || 0,
       friction_loss_ft: Number(f.input.value) || 0,
       npsh_required_ft: npshrVal,
@@ -2146,8 +2157,10 @@ export const ductFrictionStaticExample = {
 // --- 244: Cooling Tower Approach and Range ---
 
 // dims: in { T_in_F: T, T_out_F: T, T_wb_F: T, gpm: L^3 T^-1, fan_kW: M L^2 T^-3 } out: { range_F: T, approach_F: T, evaporation_gpm: L^3 T^-1 }
-export function computeCoolingTower({ T_in_F = 0, T_out_F = 0, T_wb_F = 0, gpm = 0, fan_kW = 0 } = {}) {
+export function computeCoolingTower({ T_in_F, T_out_F, T_wb_F, gpm = 0, fan_kW = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A blank wet-bulb read as 0 F reported an 85 F approach on a normal tower.
+  if (![T_in_F, T_out_F, T_wb_F].every((x) => x !== null && x !== undefined && x !== "")) return { error: "Enter the entering, leaving and wet-bulb temperatures (F)." };
   if (!(T_in_F > T_out_F)) return { error: "Entering temp must exceed leaving temp." };
   if (!(T_out_F > T_wb_F)) return { error: "Leaving temp must exceed wet-bulb." };
   if (!(gpm > 0)) return { error: "Flow gpm must be positive." };
@@ -2218,15 +2231,16 @@ function _filmCoeff(V_fpm, eps_jacket, T_surface_F, T_ambient_F, D_ft) {
 
 // dims: in { pipe_OD_in: L, surface_T_F: T, ambient_T_F: T, air_velocity_fpm: L T^-1, insulation: dimensionless, thickness_in: L, jacket_emissivity: dimensionless } out: { heat_loss_btuhr: M L^2 T^-3, surface_T_F: T }
 export function computeInsulationHeatLoss({
-  pipe_OD_in = 0, surface_T_F = 0, ambient_T_F = 0,
+  pipe_OD_in = 0, surface_T_F, ambient_T_F,
   air_velocity_fpm = 0, insulation = "fiberglass",
   thickness_in = 1.0, jacket_emissivity = 0.9,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(pipe_OD_in > 0)) return { error: "Pipe OD must be positive." };
   if (!(thickness_in >= 0)) return { error: "Thickness must be non-negative." };
-  if (!Number.isFinite(Number(surface_T_F))) return { error: "Provide a numeric surface temperature." };
-  if (!Number.isFinite(Number(ambient_T_F))) return { error: "Provide a numeric ambient temperature." };
+  // Number(null) is 0, so a blank temperature has to be caught before the finite check.
+  if (surface_T_F === null || surface_T_F === "" || !Number.isFinite(Number(surface_T_F))) return { error: "Provide a numeric surface temperature." };
+  if (ambient_T_F === null || ambient_T_F === "" || !Number.isFinite(Number(ambient_T_F))) return { error: "Provide a numeric ambient temperature." };
   const m = INSULATION_K_VALUES_v7[insulation];
   if (!m) return { error: "Unknown insulation type." };
   const r1 = (pipe_OD_in / 2) / 12;
@@ -2331,8 +2345,8 @@ function _v7h_renderCoolingTower(inputRegion, outputRegion, citationEl) {
   function fillExample(x) { tin.input.value = x.T_in_F; tout.input.value = x.T_out_F; twb.input.value = x.T_wb_F; gpm.input.value = x.gpm; fan.input.value = x.fan_kW; update(); }
   const update = _v7h_debounce(() => {
     const r = computeCoolingTower({
-      T_in_F: Number(tin.input.value) || 0, T_out_F: Number(tout.input.value) || 0,
-      T_wb_F: Number(twb.input.value) || 0, gpm: Number(gpm.input.value) || 0,
+      T_in_F: tin.input.value === "" ? null : Number(tin.input.value), T_out_F: tout.input.value === "" ? null : Number(tout.input.value),
+      T_wb_F: twb.input.value === "" ? null : Number(twb.input.value), gpm: Number(gpm.input.value) || 0,
       fan_kW: Number(fan.input.value) || 0,
     });
     if (r.error) { oR.textContent = r.error; oA.textContent = "-"; oEff.textContent = "-"; oH.textContent = "-"; oF.textContent = "-"; return; }
@@ -2369,7 +2383,7 @@ function _v7h_renderInsulationHeatLoss(inputRegion, outputRegion, citationEl) {
   const update = _v7h_debounce(() => {
     const r = computeInsulationHeatLoss({
       pipe_OD_in: Number(od.input.value) || 0,
-      surface_T_F: Number(ts.input.value) || 0, ambient_T_F: Number(ta.input.value) || 0,
+      surface_T_F: ts.input.value === "" ? null : Number(ts.input.value), ambient_T_F: ta.input.value === "" ? null : Number(ta.input.value),
       air_velocity_fpm: Number(v.input.value) || 0,
       insulation: ins.select.value, thickness_in: Number(t.input.value) || 0,
       jacket_emissivity: Number(eps.input.value) || 0.9,
@@ -2848,6 +2862,8 @@ export function computeSHRLatent({
   altitude_ft = 0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // The page passes a blank field as null, and Number(null) is 0 F.
+  if ([return_db_F, return_wb_F, supply_db_F].some((x) => x === null || x === "")) return { error: "Enter the return dry-bulb, return wet-bulb and supply dry-bulb (F)." };
   const Q_tot = Number(total_capacity_btu_hr) || 0;
   const T_ra = Number(return_db_F);
   const T_wb_ra = Number(return_wb_F);
@@ -3552,7 +3568,9 @@ function _rEnv(spec) {
     function fillExample(v) { for (const f of spec.fields) { if (v[f.key] === undefined) continue; fields[f.key].input.value = v[f.key]; } update(); }
     const update = debounce(() => {
       const params = {};
-      for (const f of spec.fields) params[f.key] = Number(fields[f.key].input.value) || 0;
+      // A field marked `required` passes null when blank, so the compute can
+      // tell a cleared temperature from a typed 0.
+      for (const f of spec.fields) params[f.key] = f.required && fields[f.key].input.value === "" ? null : Number(fields[f.key].input.value) || 0;
       const r = spec.compute(params);
       if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }
       for (const o of spec.outputs) outs[o.key].textContent = o.value(r);
@@ -3783,10 +3801,12 @@ HVAC_RENDERERS["dual-fuel-balance-point"] = _rEnv({
 });
 
 // dims: in { cap_47_btuh: M L^2 T^-3, cap_17_btuh: M L^2 T^-3, design_temp_f: T, design_load_btuh: M L^2 T^-3 } out: { slope: M L^2 T^-3, cap_design: M L^2 T^-3, shortfall: M L^2 T^-3, aux_kw: M L^2 T^-3 }
-export function computeHeatPumpColdCapacity({ cap_47_btuh = 0, cap_17_btuh = 0, design_temp_f = 0, design_load_btuh = 0 } = {}) {
+export function computeHeatPumpColdCapacity({ cap_47_btuh = 0, cap_17_btuh = 0, design_temp_f = null, design_load_btuh = 0 } = {}) {
   // Swapped rating points gave a unit whose capacity ROSE as it got colder.
   if (Number(cap_17_btuh) > Number(cap_47_btuh)) return { error: "The 17 F capacity cannot exceed the 47 F capacity; check that the two rating points are not swapped." };
   const _g = _finiteGuardEnv(arguments[0]); if (_g) return _g;
+  // 0 F is a real reading, so a blank temperature cannot stand in for it.
+  if (design_temp_f === null || design_temp_f === undefined || design_temp_f === "") return { error: "Enter the outdoor design temperature (F)." };
   if (!(cap_47_btuh > 0) || !(cap_17_btuh > 0)) return { error: "Rated capacities must be positive (Btu/h)." };
   if (!(design_load_btuh > 0)) return { error: "Design heating load must be positive (Btu/h)." };
   const slope = (cap_47_btuh - cap_17_btuh) / (47 - 17); // 47 and 17 are the fixed AHRI rating points
@@ -3807,7 +3827,7 @@ HVAC_RENDERERS["heat-pump-cold-capacity"] = _rEnv({
   fields: [
     { key: "cap_47_btuh", label: "Rated capacity at 47 F (Btu/h)", kind: "number" },
     { key: "cap_17_btuh", label: "Rated capacity at 17 F (Btu/h)", kind: "number" },
-    { key: "design_temp_f", label: "Outdoor design temp (°F)", kind: "number" },
+    { key: "design_temp_f", label: "Outdoor design temp (°F)", kind: "number", required: true },
     { key: "design_load_btuh", label: "Design heating load (Btu/h)", kind: "number" },
   ],
   outputs: [
@@ -3975,8 +3995,10 @@ HVAC_RENDERERS["air-pressure-setpoint-savings"] = _rEnv({
 // =====================================================================
 
 // dims: in { cfm: L^3 T^-1, t_oa_F: T, t_ra_F: T, eps_s: dimensionless } out: { dT_F: T, t_leave_F: T, Q_s_btuh: M L^2 T^-3, Q_noerv_btuh: M L^2 T^-3, Q_resid_btuh: M L^2 T^-3 }
-export function computeErvSensibleRecovery({ cfm = 0, t_oa_F = 0, t_ra_F = 0, eps_s = 0.75 } = {}) {
+export function computeErvSensibleRecovery({ cfm = 0, t_oa_F = null, t_ra_F = null, eps_s = 0.75 } = {}) {
   const _g = _finiteGuardEnv(arguments[0]); if (_g) return _g;
+  // 0 F is a real reading, so a blank temperature cannot stand in for it.
+  if ([t_oa_F, t_ra_F].some((x) => x === null || x === undefined || x === "")) return { error: "Enter the outdoor and return air temperatures (F)." };
   t_oa_F = Number(t_oa_F);
   if (!(cfm > 0)) return { error: "Ventilation airflow must be positive (cfm)." };
   if (!(eps_s >= 0 && eps_s <= 1)) return { error: "Sensible effectiveness must be between 0 and 1." };
@@ -3996,8 +4018,8 @@ HVAC_RENDERERS["erv-sensible-recovery"] = _rEnv({
   example: ervSensibleRecoveryExample.inputs,
   fields: [
     { key: "cfm", label: "Balanced ventilation airflow (cfm)", kind: "number" },
-    { key: "t_oa_F", label: "Outdoor air temperature (°F)", kind: "number" },
-    { key: "t_ra_F", label: "Return/exhaust air temperature (°F)", kind: "number" },
+    { key: "t_oa_F", label: "Outdoor air temperature (°F)", kind: "number", required: true },
+    { key: "t_ra_F", label: "Return/exhaust air temperature (°F)", kind: "number", required: true },
     { key: "eps_s", label: "Rated sensible effectiveness (0-1)", kind: "number", default: 0.75 },
   ],
   outputs: [
@@ -4351,8 +4373,10 @@ function _v330renderDegreeDayEnergy(inputRegion, outputRegion, citationEl) {
 HVAC_RENDERERS["degree-day-energy"] = _v330renderDegreeDayEnergy;
 
 // dims: in { r_inside: dimensionless, r_outside: dimensionless, t_in_f: T, t_out_f: T, rh_in_pct: dimensionless } out: { t_plane_f: T, t_dew_f: T, margin_f: T }
-export function computeWallCondensationGradient({ r_inside = 0, r_outside = 0, t_in_f = 0, t_out_f = 0, rh_in_pct = 0 } = {}) {
+export function computeWallCondensationGradient({ r_inside = 0, r_outside = 0, t_in_f = null, t_out_f = null, rh_in_pct = 0 } = {}) {
   const _g = _finiteGuardEnv(arguments[0]); if (_g) return _g;
+  // 0 F is a real reading, so a blank temperature cannot stand in for it.
+  if ([t_in_f, t_out_f].some((x) => x === null || x === undefined || x === "")) return { error: "Enter the indoor and outdoor air temperatures (F)." };
   if (!(r_inside > 0)) return { error: "The inside R-value (warm side to the plane) must be positive." };
   if (!(r_outside > 0)) return { error: "The outside R-value (beyond the plane) must be positive." };
   if (!(rh_in_pct > 0 && rh_in_pct <= 100)) return { error: "Indoor relative humidity must be over 0 and up to 100%." };
@@ -4378,8 +4402,8 @@ HVAC_RENDERERS["wall-condensation-gradient"] = _rEnv({
   fields: [
     { key: "r_inside", label: "R-value warm side to the plane", kind: "number" },
     { key: "r_outside", label: "R-value beyond the plane", kind: "number" },
-    { key: "t_in_f", label: "Indoor air temperature (°F)", kind: "number" },
-    { key: "t_out_f", label: "Outdoor air temperature (°F)", kind: "number" },
+    { key: "t_in_f", label: "Indoor air temperature (°F)", kind: "number", required: true },
+    { key: "t_out_f", label: "Outdoor air temperature (°F)", kind: "number", required: true },
     { key: "rh_in_pct", label: "Indoor relative humidity (%)", kind: "number" },
   ],
   outputs: [
@@ -4492,8 +4516,10 @@ HVAC_RENDERERS["radiant-floor-output"] = _v442renderRadiantFloorOutput;
 // ----- spec-v478: Hydronic Snowmelt Surface Load and Boiler Sizing (ASHRAE / Chapman) -----
 
 // dims: in { s_inhr: L T^-1, t_air_f: T, wind_mph: L T^-1, rh_pct: dimensionless, ar: dimensionless, area_ft2: L^2, back_loss_pct: dimensionless } out: { p_av_inhg: M L^-1 T^-2, q_s: M T^-3, q_m: M T^-3, q_h: M T^-3, q_e: M T^-3, q_o: M T^-3, boiler_btu_hr: M L^2 T^-3, t_m_f: T }
-export function computeSnowmeltLoad({ s_inhr = 0, t_air_f = 0, wind_mph = 0, rh_pct = 0, ar = 0.5, area_ft2 = 0, back_loss_pct = 20 } = {}) {
+export function computeSnowmeltLoad({ s_inhr = 0, t_air_f = null, wind_mph = 0, rh_pct = 0, ar = 0.5, area_ft2 = 0, back_loss_pct = 20 } = {}) {
   const _g = _finiteGuardEnv(arguments[0]); if (_g) return _g;
+  // 0 F is a real reading, so a blank temperature cannot stand in for it.
+  if (t_air_f === null || t_air_f === undefined || t_air_f === "") return { error: "Enter the design air temperature (F)." };
   const TF = 33; // melting film temperature, F (Chapman / ASHRAE)
   if (!(s_inhr > 0)) return { error: "Design snowfall rate must be positive (in/hr water equivalent)." };
   if (!(t_air_f <= TF)) return { error: "Design air temperature must be at or below the 33 F melting film (the correlation is for snowfall conditions)." };
@@ -4525,7 +4551,7 @@ HVAC_RENDERERS["snowmelt-load"] = _rEnv({
   example: snowmeltLoadExample.inputs,
   fields: [
     { key: "s_inhr", label: "Snowfall rate, water equiv (in/hr)", kind: "number", attrs: { step: "any", min: "0" } },
-    { key: "t_air_f", label: "Design air temperature (°F)", kind: "number", attrs: { step: "any" } },
+    { key: "t_air_f", label: "Design air temperature (°F)", kind: "number", required: true, attrs: { step: "any" } },
     { key: "wind_mph", label: "Design wind speed (mph)", kind: "number", attrs: { step: "any", min: "0" } },
     { key: "rh_pct", label: "Relative humidity (%)", kind: "number", attrs: { step: "any", min: "0" } },
     { key: "ar", label: "Snow-free area ratio A_r (0 / 0.5 / 1)", kind: "number", default: 0.5, attrs: { step: "any", min: "0" } },
@@ -4542,12 +4568,14 @@ HVAC_RENDERERS["snowmelt-load"] = _rEnv({
 });
 
 // dims: in { mode: dimensionless, h_outdoor: L^2 T^-2, h_return: L^2 T^-2, t_outdoor_f: T, setpoint_f: T } out: { enable: dimensionless, margin: dimensionless }
-export function computeEconomizerEnthalpyChangeover({ mode = "differential_enthalpy", h_outdoor = null, h_return = null, t_outdoor_f = 0, setpoint_f = 0 } = {}) {
+export function computeEconomizerEnthalpyChangeover({ mode = "differential_enthalpy", h_outdoor = null, h_return = null, t_outdoor_f = null, setpoint_f = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // An unknown mode used to run as differential enthalpy, and blank enthalpies returned ENABLE.
   if (!["differential_enthalpy", "fixed_drybulb", "differential_enthalpy_drybulb"].includes(mode)) return { error: "Mode must be differential_enthalpy, fixed_drybulb or differential_enthalpy_drybulb." };
   if (mode !== "fixed_drybulb" && [h_outdoor, h_return].some((x) => x === null || x === "")) return { error: "Enter the outdoor and return air enthalpies (Btu/lb)." };
   if (mode === "fixed_drybulb" && !(Number(setpoint_f) > 0)) return { error: "Enter the dry-bulb high-limit setpoint (F)." };
+  // A blank outdoor dry-bulb read as 0 F and enabled free cooling.
+  if (mode !== "differential_enthalpy" && (t_outdoor_f === null || t_outdoor_f === undefined || t_outdoor_f === "")) return { error: "Enter the outdoor dry-bulb temperature (F)." };
   if (mode === "fixed_drybulb") {
     const toa = Number(t_outdoor_f);
     const sp = Number(setpoint_f);
@@ -4598,7 +4626,8 @@ function _v443renderEconomizerEnthalpyChangeover(inputRegion, outputRegion, cita
   const oE = makeOutputLine(outputRegion, "Economizer", "eco-out-e");
   const oM = makeOutputLine(outputRegion, "Margin to changeover", "eco-out-m");
   const oNote = makeOutputLine(outputRegion, "Note", "eco-out-n");
-  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  // Blank reaches the compute as null: a cleared enthalpy or dry-bulb is not 0.
+  function readNum(i) { if (i.value === "") return null; const n = Number(i.value); return Number.isFinite(n) ? n : null; }
   function sync() { const m = mode.select.value; const en = m !== "fixed_drybulb"; const db = m !== "differential_enthalpy"; hoa.wrap.style.display = en ? "" : "none"; hra.wrap.style.display = en ? "" : "none"; toa.wrap.style.display = db ? "" : "none"; sp.wrap.style.display = db ? "" : "none"; }
   const update = debounce(() => {
     const r = computeEconomizerEnthalpyChangeover({ mode: mode.select.value, h_outdoor: readNum(hoa.input), h_return: readNum(hra.input), t_outdoor_f: readNum(toa.input), setpoint_f: readNum(sp.input) });
@@ -4626,6 +4655,8 @@ HVAC_RENDERERS["economizer-enthalpy-changeover"] = _v443renderEconomizerEnthalpy
 // dims: in { pipe_od_in: L, pipe_temp_F: T, ambient_F: T, ambient_rh_pct: dimensionless, k_btu_in_per_hr_ft2_F: M L^2 T^-3, outside_film_coeff_btu_hr_ft2_F: M T^-3, film_mode: dimensionless, jacket_emissivity: dimensionless } out: { dew_point_F: T, thickness_in: L, r2_in: L, film_used_btu_hr_ft2_F: M T^-3 }
 export function computePipeInsulationForCondensation({ pipe_od_in = 0, pipe_temp_F = 40, ambient_F = 75, ambient_rh_pct = 50, k_btu_in_per_hr_ft2_F = 0.27, outside_film_coeff_btu_hr_ft2_F = 1.65, film_mode = "entered", jacket_emissivity = 0.9 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // The page passes a blank field as null, and Number(null) is 0 F.
+  if (pipe_temp_F === null || pipe_temp_F === "" || ambient_F === null || ambient_F === "") return { error: "Enter the cold-pipe surface and ambient dry-bulb temperatures (F)." };
   const od = Number(pipe_od_in) || 0;
   const Tp = Number(pipe_temp_F);
   const Tamb = Number(ambient_F);
@@ -4700,7 +4731,7 @@ function renderPipeInsulationForCondensation(inputRegion, outputRegion, citation
   const oN = makeOutputLine(outputRegion, "Note", "pifc-out-n");
   const sync = () => {
     const r = computePipeInsulationForCondensation({
-      pipe_od_in: Number(od.input.value), pipe_temp_F: Number(tp.input.value), ambient_F: Number(ta.input.value),
+      pipe_od_in: Number(od.input.value), pipe_temp_F: tp.input.value === "" ? null : Number(tp.input.value), ambient_F: ta.input.value === "" ? null : Number(ta.input.value),
       ambient_rh_pct: Number(rh.input.value), k_btu_in_per_hr_ft2_F: Number(k.input.value),
       outside_film_coeff_btu_hr_ft2_F: Number(h.input.value),
       film_mode: fm.select.value,
@@ -4731,6 +4762,7 @@ const STD_TEMP_RANKINE = 527.67; // 68 F
 // dims: in { scfm: L^3 T^-1, pipe_id_in: L, length_ft: L, line_pressure_psig: M L^-1 T^-2, air_temp_f: T, roughness_ft: L } out: { velocity_fps: L T^-1, reynolds: dimensionless, pressure_drop_psi: M L^-1 T^-2, density_lb_ft3: M L^-3 }
 export function computeCompressedAirPressureDrop({ scfm = 0, pipe_id_in = 0, length_ft = 0, line_pressure_psig = 100, air_temp_f = 68, roughness_ft = 0.00015 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (air_temp_f === null || air_temp_f === "") return { error: "Enter the air temperature (F)." };
   const q = Number(scfm) || 0;
   const d = Number(pipe_id_in) || 0;
   const L = Number(length_ft) || 0;
@@ -4782,7 +4814,7 @@ function renderCompressedAirPressureDrop(inputRegion, outputRegion, citationEl) 
   const sync = () => {
     const r = computeCompressedAirPressureDrop({
       scfm: Number(q.input.value), pipe_id_in: Number(d.input.value), length_ft: Number(L.input.value),
-      line_pressure_psig: Number(p.input.value), air_temp_f: Number(t.input.value), roughness_ft: Number(e.input.value),
+      line_pressure_psig: Number(p.input.value), air_temp_f: t.input.value === "" ? null : Number(t.input.value), roughness_ft: Number(e.input.value),
     });
     if (r.error) { oDp.textContent = r.error; oV.textContent = ""; oRe.textContent = ""; oN.textContent = ""; return; }
     oDp.textContent = r.pressure_drop_psi.toFixed(2) + " psi (" + r.drop_per_100ft_psi.toFixed(2) + " psi per 100 ft, " + r.pct_of_line.toFixed(1) + "% of line" + (r.over_10pct ? " - OVER the 10% rule of thumb" : "") + ")";

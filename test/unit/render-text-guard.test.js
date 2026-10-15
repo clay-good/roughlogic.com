@@ -9,6 +9,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
+import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
 test("render text: no tile prints undefined, NaN, Infinity, or null after its example or a perturbation", () => {
@@ -74,4 +75,21 @@ test("render text: no comparison prints a negative figure beside a fixed directi
   const report = JSON.parse(execFileSync(process.execPath, [sweep], { encoding: "utf8", maxBuffer: 1 << 24, stdio: ["ignore", "pipe", "ignore"] }));
   assert.ok(report.withExample > 2000, `only ${report.withExample} tiles reached their example under the fake DOM`);
   assert.deepEqual(report.hits, []);
+});
+
+// A temperature box cleared by the reader reached the compute as 0 degrees and
+// came back as a confident answer: an 85 F cooling-tower approach from a blank
+// wet-bulb, a zero conduction load from a blank Manual J outdoor temperature.
+// 0 F is a real reading, so a blank cannot stand in for it. The sweep clears
+// each temperature box after the example and compares the output with the box
+// holding 0; the same answer twice is a hit. Found 2026-10-13 on about 120
+// tiles; the ones not yet fixed are listed, and the list may only shrink.
+test("render text: a blank temperature is not read as 0 degrees", () => {
+  const sweep = fileURLToPath(new URL("../fixtures/render-blank-temp-sweep.js", import.meta.url));
+  const report = JSON.parse(execFileSync(process.execPath, [sweep], { encoding: "utf8", maxBuffer: 1 << 24, stdio: ["ignore", "pipe", "ignore"] }));
+  assert.ok(report.withExample > 2000, `only ${report.withExample} tiles reached their example under the fake DOM`);
+  const listed = JSON.parse(readFileSync(new URL("../fixtures/blank-temp-remaining.json", import.meta.url), "utf8")).remaining;
+  assert.deepEqual(report.hits.filter((h) => !(h in listed)), [], "a temperature box reads blank as 0 degrees");
+  const hits = new Set(report.hits);
+  assert.deepEqual(Object.keys(listed).filter((k) => !hits.has(k)), [], "fixed or gone: remove these from test/fixtures/blank-temp-remaining.json");
 });
