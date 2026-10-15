@@ -5017,19 +5017,25 @@ export function computeCmuGroutVolume({ wall_len_ft = 0, wall_ht_ft = 0, core_sp
   if (!(core_spacing_in > 0)) return { error: "Core spacing must be positive (in)." };
   if (!(core_area_in2 > 0)) return { error: "Core cross-section must be positive (in^2)." };
   if (bond_area_in2 < 0) return { error: "Bond-beam cross-section must be zero or positive (in^2)." };
-  const cores = Math.floor(wall_len_ft * 12 / core_spacing_in + 1e-9) + 1;
+  // Cell centres in a run of 16 in two-cell units sit 4 in from each end and 8 in apart, so the
+  // span between the end cells is the wall length less 8 in. Until 2026-10-15 the whole length was
+  // used as the span: a fully grouted 20 ft wall read 31 cores (it has 30) and 32 in spacing read 8
+  // where grouting both ends needs 9.
+  const span_in = wall_len_ft * 12 - 8;
+  const cells = Math.max(1, Math.floor(wall_len_ft * 12 / 8 + 1e-9));
+  const cores = Math.min(cells, Math.max(1, Math.ceil(span_in / core_spacing_in - 1e-9) + 1));
   const vert_ft3 = cores * wall_ht_ft * (core_area_in2 / 144);
   const bond_ft3 = wall_len_ft * (bond_area_in2 / 144);
   const total_ft3 = vert_ft3 + bond_ft3;
   const total_yd3 = total_ft3 / 27;
   return {
     cores, vert_ft3, bond_ft3, total_ft3, total_yd3,
-    note: "Grouted cores = floor(wall length x 12 / core spacing) + 1 (both ends grouted). Vertical grout = cores x wall height x core cross-section / 144 (in^2 to ft^2). Bond-beam grout = wall length x bond cross-section / 144, one continuous top course (0 for none). Total in ft^3 and cubic yards (/27); order grout with a waste and pump allowance on top. The grouted-cell spacing and the cross-section areas come from the structural drawings and the unit data, and the engineer of record governs the reinforcement - this is a material takeoff, not a structural design.",
+    note: "Grouted cores = ceil((wall length x 12 - 8) / core spacing) + 1, both end cells grouted, with cell centres 4 in in from each end of a run of 16 in two-cell units, and never more than the wall's cells. Vertical grout = cores x wall height x core cross-section / 144 (in^2 to ft^2). Bond-beam grout = wall length x bond cross-section / 144, one continuous top course (0 for none). Total in ft^3 and cubic yards (/27); order grout with a waste and pump allowance on top. The grouted-cell spacing and the cross-section areas come from the structural drawings and the unit data, and the engineer of record governs the reinforcement - this is a material takeoff, not a structural design.",
   };
 }
 export const cmuGroutVolumeExample = { inputs: { wall_len_ft: 20, wall_ht_ft: 8, core_spacing_in: 24, core_area_in2: 24, bond_area_in2: 30 } };
 const renderCmuGroutVolume = _simpleRenderer({
-  citation: "Citation: first-principles core-count and grout-volume relations with TMS 602 / ACI 530.1 (Specification for Masonry Structures) and the NCMA TEK grout references (by name). cores = floor(len x 12 / spacing) + 1; vert = cores x ht x area/144; bond = len x area/144; total/27 = yd^3. The EOR governs the reinforcement; this is a material takeoff, not a structural design.",
+  citation: "Citation: first-principles core-count and grout-volume relations with TMS 602 / ACI 530.1 (Specification for Masonry Structures) and the NCMA TEK grout references (by name). cores = ceil((len x 12 - 8) / spacing) + 1; vert = cores x ht x area/144; bond = len x area/144; total/27 = yd^3. The EOR governs the reinforcement; this is a material takeoff, not a structural design.",
   example: cmuGroutVolumeExample.inputs,
   fields: [
     { key: "wall_len_ft", label: "Wall length (ft)", kind: "number" },

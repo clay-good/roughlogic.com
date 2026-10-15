@@ -16660,13 +16660,13 @@ export const CITATIONS = {
     ],
   },
   "cmu-grout-volume": {
-    formula: "cores = floor(wall_len_ft x 12 / core_spacing_in) + 1; vert_ft3 = cores x wall_ht_ft x (core_area_in2/144); bond_ft3 = wall_len_ft x (bond_area_in2/144); total_yd3 = (vert_ft3 + bond_ft3) / 27.",
+    formula: "cores = ceil((wall_len_ft x 12 - 8) / core_spacing_in) + 1, capped at the wall's cells (centres 4 in from each end of a run of 16 in two-cell units, 8 in apart); vert_ft3 = cores x wall_ht_ft x (core_area_in2/144); bond_ft3 = wall_len_ft x (bond_area_in2/144); total_yd3 = (vert_ft3 + bond_ft3) / 27.",
     edition: "First-principles core-count and grout-volume relations with TMS 602 / ACI 530.1 (Specification for Masonry Structures) and the NCMA TEK grout references (by name).",
     freeAccess: "The core-count and grout-volume relations are public masonry-takeoff geometry. TMS 602 / ACI 530.1 and the NCMA TEK references are named; the structural drawings supply the spacing and cross-sections.",
     governance: GOVERNANCE.general,
     editionNote: "Single-edition geometry (the core-count and grout-volume relations do not roll; TMS 602 / ACI 530.1 and the NCMA TEK references are named for the practice). The grouted-cell spacing and the cross-section areas come from the structural drawings and the unit data, grout is ordered with a waste and pump allowance on top, and the engineer of record governs the reinforcement.",
     assumptions: [
-      { name: "Core count", value: "cores = floor(wall length x 12 / spacing) + 1 (both ends grouted)", source: "first principles" },
+      { name: "Core count", value: "cores = ceil((wall length x 12 - 8) / spacing) + 1, both end cells grouted, never more than the cells (16 in two-cell units)", source: "first principles" },
       { name: "Grout volume", value: "vertical = cores x height x core area/144; bond beam = length x bond area/144 (one continuous top course)", source: "TMS 602 / ACI 530.1, NCMA TEK" },
       { name: "Cross-sections", value: "the grouted-core (~24 in^2 for an 8 in unit) and bond-beam (~30 in^2) areas come from the block manufacturer's data", source: "unit manufacturer data" },
     ],

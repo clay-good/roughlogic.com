@@ -125,3 +125,194 @@ test("drill-point: non-finite input errors", () => { assert.ok(computeDrillPoint
 // Renderers
 test("MECHANIC_RENDERERS: 7 ids", () => { for (const id of ["prop-slip","displacement-cr","bolt-stretch","driveshaft-crit","fuel-range","tire-gearing","brake-pad-life"]) assert.equal(typeof MECHANIC_RENDERERS[id], "function", id); });
 test("MACHINING_RENDERERS: cutting-speed-rpm + drill-point-depth present", () => { assert.equal(typeof MACHINING_RENDERERS["cutting-speed-rpm"], "function"); assert.equal(typeof MACHINING_RENDERERS["drill-point-depth"], "function"); });
+
+// ---------------------------------------------------------------------------
+// Independent checks (hardening 2026-10-15): each test below holds a tile to
+// something its own derivation did not write -- a published constant, a
+// re-derived unit constant, an independent numeric method, or an invariant.
+import {
+  computeDriveshaftMaxLength, computeAlternatorChargingLoad, computeFlywheelEnergy,
+  computeCrouchPlaningSpeed, computeCrouchHpForSpeed, computeDynoCorrectionSae,
+  computeWedgeForce, computeToggleMechanismForce, computeScotchYokeMotion,
+  computeSliderCrankPistonPosition,
+} from "../../calc-mechanic.js";
+
+const relClose = (a, b, rel) => Math.abs(a - b) <= rel * Math.abs(b);
+
+// driveshaft-max-length: Machinery's Handbook simply-supported hollow shaft,
+// N_crit = 4.76e6 sqrt(D^2 + d^2) / L^2 (rpm, in; steel E 30e6 psi, 0.283 lb/in^3).
+// Solve the safe length (0.65 x critical) from that printed constant.
+test("driveshaft-max-length: matches Machinery's Handbook 4.76e6 sqrt(D^2+d^2)/L^2 within 2%", () => {
+  for (const [od, wall, rpm] of [[3.5, 0.083, 3000], [4, 0.095, 4500], [3, 0.065, 2000]]) {
+    const id = od - 2 * wall;
+    const Lmh = Math.sqrt(0.65 * 4.76e6 * Math.sqrt(od * od + id * id) / rpm);
+    const r = computeDriveshaftMaxLength({ target_rpm: rpm, od_in: od, wall_in: wall, material: "steel" });
+    assert.ok(relClose(r.max_length_in, Lmh, 0.02), `${od}x${wall}@${rpm}: ${r.max_length_in} vs MH ${Lmh}`);
+    assert.ok(relClose(r.critical_rpm, rpm / 0.65, 1e-12));
+  }
+});
+test("driveshaft-max-length: aluminum re-derived in US units (E 10e6 psi, 0.0975 lb/in^3) within 2%", () => {
+  const od = 4, wall = 0.125, rpm = 3500, id = od - 2 * wall;
+  // omega = (pi/L)^2 sqrt(E I g /(w A)), I/A = (D^2+d^2)/16, in in/s
+  const c = Math.sqrt(10e6 * 386.0886 / 0.0975) * Math.sqrt(od * od + id * id) / 4; // in^2/s per... times pi^2/L^2
+  const Ncrit = (L) => (Math.PI * Math.PI / (L * L)) * c * 60 / (2 * Math.PI);
+  let lo = 1, hi = 1000; // bisect 0.65 Ncrit(L) = rpm
+  for (let i = 0; i < 200; i++) { const m = (lo + hi) / 2; if (0.65 * Ncrit(m) > rpm) lo = m; else hi = m; }
+  const r = computeDriveshaftMaxLength({ target_rpm: rpm, od_in: od, wall_in: wall, material: "aluminum" });
+  assert.ok(relClose(r.max_length_in, lo, 0.02), `${r.max_length_in} vs ${lo}`);
+});
+
+// alternator-charging-load: invariants -- the break-even load is exactly rating x fraction,
+// and the balance is linear in load with slope -1.
+test("alternator-charging-load: break-even load = rating x fraction; balance slope -1", () => {
+  const alt = 130, fi = 0.55, fc = 0.92;
+  const at = computeAlternatorChargingLoad({ total_load_a: alt * fi, alternator_a: alt, idle_frac: fi, cruise_frac: fc });
+  assert.equal(at.idle_ok, true);
+  const over = computeAlternatorChargingLoad({ total_load_a: alt * fi * 1.001, alternator_a: alt, idle_frac: fi, cruise_frac: fc });
+  assert.equal(over.idle_ok, false); assert.equal(over.cruise_ok, true);
+  const a = computeAlternatorChargingLoad({ total_load_a: 40, alternator_a: alt, idle_frac: fi, cruise_frac: fc });
+  const b = computeAlternatorChargingLoad({ total_load_a: 50, alternator_a: alt, idle_frac: fi, cruise_frac: fc });
+  assert.ok(close(a.idle_balance_a - b.idle_balance_a, 10, 1e-9));
+  assert.ok(close(a.cruise_balance_a - b.cruise_balance_a, 10, 1e-9));
+  assert.ok(close(a.cruise_balance_a - a.idle_balance_a, alt * (fc - fi), 1e-9));
+});
+
+// flywheel-energy: recompute in SI (lb->kg 0.45359237, ft 0.3048, J per ft-lbf 1.3558179483)
+// and check the speed swing against the exact identity dE = 1/2 I (wmax^2 - wmin^2) = I wmean^2 Cs.
+test("flywheel-energy: SI recomputation of 1/2 I w^2 agrees", () => {
+  for (const [W, k, n] of [[100, 1, 1000], [450, 1.75, 600], [12, 0.25, 3600]]) {
+    const r = computeFlywheelEnergy({ weight_lb: W, radius_of_gyration_ft: k, rpm: n });
+    const m = W * 0.45359237, kk = k * 0.3048, w = n * 2 * Math.PI / 60;
+    const J = 0.5 * m * kk * kk * w * w;
+    assert.ok(relClose(r.kinetic_energy_ftlb, J / 1.3558179483, 1e-4), `${r.kinetic_energy_ftlb} vs ${J / 1.3558179483}`);
+  }
+});
+test("flywheel-energy: speed swing equals (wmax - wmin)/wmean for the energy actually released", () => {
+  const W = 300, k = 1.2, nmax = 1050, nmin = 950, nmean = 1000;
+  const I = (W / 32.174) * k * k, wmax = nmax * Math.PI / 30, wmin = nmin * Math.PI / 30;
+  const dE = 0.5 * I * (wmax * wmax - wmin * wmin);
+  const r = computeFlywheelEnergy({ weight_lb: W, radius_of_gyration_ft: k, rpm: nmean, energy_fluctuation_ftlb: dE });
+  assert.ok(close(r.speed_fluctuation_pct, (nmax - nmin) / nmean * 100, 1e-9));
+});
+
+// crouch-planing-speed / crouch-hp-for-speed: fit the exponents numerically (speed ~ hp^0.5 W^-0.5,
+// hp ~ v^2 W^1) and round-trip the two independent computes against each other.
+test("crouch: fitted exponents are +0.5 (hp), -0.5 (weight), 1 (C); hp-for-speed is the exact inverse", () => {
+  const s = (W, P, C) => computeCrouchPlaningSpeed({ displacement_lb: W, shaft_hp: P, hull_constant: C }).speed_mph;
+  const slope = (f, a, b) => Math.log(f(b) / f(a)) / Math.log(b / a);
+  assert.ok(close(slope((P) => s(3000, P, 150), 100, 400), 0.5, 1e-12));
+  assert.ok(close(slope((W) => s(W, 200, 150), 2000, 8000), -0.5, 1e-12));
+  assert.ok(close(slope((C) => s(3000, 200, C), 150, 210), 1, 1e-12));
+  const h = (v, W) => computeCrouchHpForSpeed({ target_speed_mph: v, displacement_lb: W, hull_constant: 190 }).required_hp;
+  assert.ok(close(slope((v) => h(v, 4000), 30, 60), 2, 1e-12));
+  assert.ok(close(slope((W) => h(45, W), 2000, 6000), 1, 1e-12));
+  for (const [W, P, C] of [[3000, 200, 150], [5200, 450, 190], [1800, 300, 210]]) {
+    const v = s(W, P, C);
+    assert.ok(relClose(computeCrouchHpForSpeed({ target_speed_mph: v, displacement_lb: W, hull_constant: C }).required_hp, P, 1e-12));
+  }
+});
+
+// dyno-correction-sae: SAE J1349 reference day (25 C, 990 mbar dry) must give CF = 1 exactly;
+// saturation vapor pressure vs steam tables (3.1699 kPa at 25 C, 5.6291 kPa at 35 C);
+// 1 inHg = 3386.389 Pa (standard 29.9213 inHg = 1013.25 mbar).
+test("dyno-correction-sae: CF = 1 at the J1349 reference day; Magnus vs steam tables; inHg", () => {
+  const ref = computeDynoCorrectionSae({ observed_hp: 300, baro_mbar: 990, air_temp_c: 25, humidity_pct: 0 });
+  assert.ok(close(ref.cf, 1, 1e-12)); assert.ok(close(ref.corrected_hp, 300, 1e-9));
+  const v25 = computeDynoCorrectionSae({ observed_hp: 300, baro_mbar: 1000, air_temp_c: 25, humidity_pct: 100 });
+  assert.ok(close(v25.vapor_mbar, 31.699, 0.3), `${v25.vapor_mbar}`);
+  const v35 = computeDynoCorrectionSae({ observed_hp: 300, baro_mbar: 1000, air_temp_c: 35, humidity_pct: 100 });
+  assert.ok(close(v35.vapor_mbar, 56.291, 0.5), `${v35.vapor_mbar}`);
+  // humid reference: baro = 990 + vapor gives CF = 1 again (the DRY pressure is what counts)
+  const hum = computeDynoCorrectionSae({ observed_hp: 300, baro_mbar: 990 + v25.vapor_mbar * 0.5, air_temp_c: 25, humidity_pct: 50 });
+  assert.ok(close(hum.cf, 1, 1e-9));
+  const us = computeDynoCorrectionSae({ observed_hp: 300, baro_inhg: 29.9213, air_temp_f: 77, humidity_pct: 0 });
+  const si = computeDynoCorrectionSae({ observed_hp: 300, baro_mbar: 1013.25, air_temp_c: 25, humidity_pct: 0 });
+  assert.ok(close(us.cf, si.cf, 1e-5));
+  // hot, low-pressure day: CF rises above 1 and follows the J1349 temperature root
+  const hot = computeDynoCorrectionSae({ observed_hp: 300, baro_mbar: 990, air_temp_c: 35, humidity_pct: 0 });
+  assert.ok(close(hot.cf, 1.176 * Math.sqrt(308 / 298) - 0.176, 1e-12));
+});
+
+// wedge-force: solve the face equilibrium as vectors (normal + friction on each face, P along the
+// axis) and compare; Machinery's Handbook frictionless face force N = P / (2 sin(alpha/2)).
+test("wedge-force: vector equilibrium and MH frictionless face force agree", () => {
+  for (const [alpha, mu] of [[30, 0.3], [20, 0], [10, 0.1], [60, 0.25]]) {
+    const P = 1000, b = alpha / 2 * Math.PI / 180;
+    // right face: outward normal n = (cos b, sin b); the face slides into the work (wedge moves -y), friction on
+    // the wedge points +y along the face tangent t = (-sin b, cos b)... reaction on wedge = N(-n) + muN t'
+    const n = [-Math.cos(b), Math.sin(b)]; // force of the work on the wedge from the right face
+    const t = [Math.sin(b), Math.cos(b)];  // friction on the wedge, opposing its -y motion along the face
+    const fy = n[1] + mu * t[1];           // per unit N, upward
+    const N = P / (2 * fy);                // two faces balance the downward drive P
+    const spread = -N * (n[0] + mu * t[0]); // horizontal push the wedge puts on the work
+    const r = computeWedgeForce({ driving_force_lb: P, included_angle_deg: alpha, friction_coefficient: mu });
+    assert.ok(relClose(r.spreading_force_lb, spread, 1e-9), `${alpha}/${mu}: ${r.spreading_force_lb} vs ${spread}`);
+    if (mu === 0) assert.ok(relClose(r.spreading_force_lb, (P / (2 * Math.sin(b))) * Math.cos(b), 1e-12));
+    // self-locking: the force needed to pull it back out (friction reversed) is <= 0 exactly when it holds
+    const withdraw = 2 * (Math.sin(b) - mu * Math.cos(b));
+    assert.equal(r.self_locking, withdraw < 0);
+  }
+});
+
+// toggle-mechanism-force: virtual work on the actual linkage geometry by finite differences.
+test("toggle-mechanism-force: virtual-work finite difference on the link geometry", () => {
+  const l = 5;
+  for (const th of [3, 10, 25, 45, 70]) {
+    const t = th * Math.PI / 180, d = 1e-6;
+    const knee = (a) => l * Math.sin(a), span = (a) => 2 * l * Math.cos(a);
+    const ma = Math.abs((knee(t + d) - knee(t - d)) / (span(t + d) - span(t - d)));
+    const r = computeToggleMechanismForce({ input_force_lb: 50, toggle_angle_deg: th });
+    assert.ok(relClose(r.mechanical_advantage, ma, 1e-6), `${th}: ${r.mechanical_advantage} vs ${ma}`);
+    assert.ok(relClose(r.velocity_ratio * r.mechanical_advantage, 1, 1e-12));
+  }
+});
+
+// scotch-yoke-motion: differentiate the yoke position numerically (central differences in time).
+test("scotch-yoke-motion: numeric d/dt and d2/dt2 of the slot position match velocity and acceleration", () => {
+  const r = 2.5, N = 600, w = 2 * Math.PI * N / 60;
+  const xAt = (deg) => computeScotchYokeMotion({ crank_radius_in: r, crank_rpm: N, crank_angle_deg: deg }).position_in;
+  for (const deg of [20, 75, 90, 135, 200, 300]) {
+    const h = 1e-3; // degrees
+    const dt = (h * Math.PI / 180) / w;
+    const v = (xAt(deg + h) - xAt(deg - h)) / (2 * dt);
+    const a = (xAt(deg + h) - 2 * xAt(deg) + xAt(deg - h)) / (dt * dt);
+    const res = computeScotchYokeMotion({ crank_radius_in: r, crank_rpm: N, crank_angle_deg: deg });
+    assert.ok(close(res.velocity_ips, v, 1e-3 * r * w), `${deg}: v ${res.velocity_ips} vs ${v}`);
+    assert.ok(close(res.accel_g * 386.08858, a, 2e-3 * r * w * w), `${deg}: a ${res.accel_g * 386.08858} vs ${a}`);
+  }
+  // position from the crank-pin geometry: pin x-projection r cos(theta) measured from the theta=0 end
+  assert.ok(close(xAt(60), r - r * Math.cos(Math.PI / 3), 1e-12));
+});
+
+// slider-crank-piston-position: solve the pin-to-piston distance = L by bisection (no closed form),
+// then differentiate numerically; long-rod limit reduces to simple harmonic motion.
+test("slider-crank: bisection position + numeric derivatives match position, velocity, acceleration", () => {
+  const stroke = 3.48, L = 5.7, r = stroke / 2, rpm = 6000, w = 2 * Math.PI * rpm / 60;
+  const pistonFromTdc = (th) => {
+    const px = r * Math.sin(th), py = r * Math.cos(th);
+    let lo = py, hi = py + L; // piston on the axis above the pin: (y - py)^2 + px^2 = L^2
+    for (let i = 0; i < 200; i++) { const m = (lo + hi) / 2; if ((m - py) ** 2 + px * px < L * L) lo = m; else hi = m; }
+    return (r + L) - lo;
+  };
+  for (const deg of [15, 60, 90, 120, 170, 250]) {
+    const th = deg * Math.PI / 180, h = 1e-3, dt = h / w;
+    const res = computeSliderCrankPistonPosition({ stroke_in: stroke, rod_length_in: L, crank_angle_deg: deg, crank_rpm: rpm });
+    assert.ok(close(res.position_from_tdc_in, pistonFromTdc(th), 1e-9), `${deg}: pos`);
+    const v = (pistonFromTdc(th + h) - pistonFromTdc(th - h)) / (2 * dt) / 12;
+    const a = (pistonFromTdc(th + h) - 2 * pistonFromTdc(th) + pistonFromTdc(th - h)) / (dt * dt) / 386.08858;
+    assert.ok(close(res.velocity_fps, v, 1e-4 * r * w / 12), `${deg}: v ${res.velocity_fps} vs ${v}`);
+    assert.ok(close(res.accel_g, a, 2e-3 * r * w * w / 386.08858), `${deg}: a ${res.accel_g} vs ${a}`);
+  }
+  const tdc = computeSliderCrankPistonPosition({ stroke_in: stroke, rod_length_in: L, crank_angle_deg: 0, crank_rpm: rpm });
+  assert.ok(relClose(tdc.accel_g, tdc.tdc_accel_g, 1e-12));
+});
+test("slider-crank: infinitely long rod reduces to simple harmonic motion", () => {
+  const stroke = 4, r = 2, L = 2e6, rpm = 1200, w = 2 * Math.PI * rpm / 60;
+  for (const deg of [30, 90, 150, 220]) {
+    const th = deg * Math.PI / 180;
+    const res = computeSliderCrankPistonPosition({ stroke_in: stroke, rod_length_in: L, crank_angle_deg: deg, crank_rpm: rpm });
+    assert.ok(close(res.position_from_tdc_in, r * (1 - Math.cos(th)), 1e-4 * r));
+    assert.ok(close(res.velocity_fps, r * w * Math.sin(th) / 12, 1e-4 * r * w / 12));
+    assert.ok(close(res.accel_g, r * w * w * Math.cos(th) / 386.08858, 1e-4 * r * w * w / 386.08858));
+  }
+});
