@@ -1082,6 +1082,8 @@ const _caSaturatedW = (temp_f, pressure_psia) => { const pw = _caSatPsia(temp_f)
 // dims: in { flow_scfm: L^3 T^-1, inlet_temp_f: T, inlet_rh_pct: dimensionless, atmosphere_psia: M L^-1 T^-2, line_pressure_psig: M L^-1 T^-2, line_temp_f: T, dryer_dew_point_f: T } out: { intake_water_lb_hr: M T^-1, intake_humidity_ratio: dimensionless, line_humidity_ratio: dimensionless, condensed_lb_hr: M T^-1, condensed_gal_day: L^3 T^-1, dryer_removed_lb_hr: M T^-1, dryer_removed_gal_day: L^3 T^-1, remaining_vapor_lb_hr: M T^-1, total_liquid_gal_day: L^3 T^-1, atmospheric_dew_point_f: T }
 export function computeCompressedAirCondensate({ flow_scfm = 0, inlet_temp_f = 70, inlet_rh_pct = 50, atmosphere_psia = 14.696, line_pressure_psig = 100, line_temp_f = 100, dryer_dew_point_f = 38 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // The page passes a blank box as null; 0 F is a real reading, so a blank cannot stand in for it.
+  if ([inlet_rh_pct].some((x) => x === null || x === "")) return { error: "Enter the intake relative humidity (%); a blank is not 0% (dry air)." };
   if (!(flow_scfm > 0 && flow_scfm <= 1e6)) return { error: "Enter the compressor's delivered air flow (scfm)." };
   if (!(inlet_temp_f >= 32 && inlet_temp_f <= 130)) return { error: "Inlet air temperature must be between 32 and 130 F." };
   if (!(inlet_rh_pct >= 0 && inlet_rh_pct <= 100)) return { error: "Inlet relative humidity must be between 0 and 100%." };
@@ -1124,7 +1126,7 @@ MILLWRIGHT_RENDERERS["compressed-air-condensate"] = _simpleRenderer({
   fields: [
     { key: "flow_scfm", label: "Air delivered (scfm)", kind: "number" },
     { key: "inlet_temp_f", label: "Intake air temperature (F)", kind: "number", default: 70 },
-    { key: "inlet_rh_pct", label: "Intake relative humidity (%)", kind: "number", default: 50 },
+    { key: "inlet_rh_pct", required: true, label: "Intake relative humidity (%)", kind: "number", default: 50 },
     { key: "atmosphere_psia", label: "Atmospheric pressure (psia)", kind: "number", default: 14.696 },
     { key: "line_pressure_psig", label: "Line pressure (psig)", kind: "number", default: 100 },
     { key: "line_temp_f", label: "Compressed air temperature after cooling (F)", kind: "number", default: 100 },

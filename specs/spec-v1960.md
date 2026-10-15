@@ -31,8 +31,8 @@ Gm = 0.052 x mud weight; Gi = influx gradient; open hole = well TVD - shoe TVD.
 | Maximum allowable casing pressure | shoe limit - Gm x shoe TVD |
 | Formation pressure | 0.052 x (mud weight + kick intensity) x well TVD |
 | Tallest influx H, ft | (shoe limit - Pf + Gm x open hole) / (Gm - Gi), from 0 to the open hole |
-| Volume at the shoe, as shut in | H x drill pipe annulus x shoe limit / Pf |
-| Volume at bottom | H x bottom-hole assembly annulus |
+| Volume at the shoe, as shut in | H x drill pipe annulus x (shoe pressure with that influx below it) / Pf; equals the shoe limit unless H was capped at the open hole (corrected 2026-10-14) |
+| Volume at bottom | BHA length x BHA annulus + (H - BHA length) x drill pipe annulus; H x BHA annulus when no BHA length is entered (BHA split added 2026-10-14) |
 | Kick tolerance | the smaller of the two |
 | Largest kick with no influx, ppg | maximum allowable casing pressure / (0.052 x well TVD) |
 

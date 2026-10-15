@@ -61952,3 +61952,29 @@ test("bounds: spec-v1963 riser-feeding-distance review fixes (drag chill, spacin
   assert.ok(/Enter the pouring superheat/.test(_rfd({ ...base, superheat_f: "abc" }).error));
   assert.ok("error" in _rfd({ ...base, feeding_length_in: "abc" }));
 });
+
+import { computeZonalAddAHole as _s52zah } from "../../calc-buildingperf.js";
+import { computeTrainResistanceDavis as _s52trd } from "../../calc-rail.js";
+test("hardening slice 52 (review of v1955-v1962): blank zone readings and speed, exact-tenth caution", () => {
+  // A blank zone reading is not 0 Pa (a zone at outdoor pressure is a real 0).
+  assert.ok("error" in _s52zah({ house_pressure_pa: 50, hole_side: "outside", zone_before_pa: 20, zone_after_pa: null, cfm_before: 3000, cfm_after: 3400 }));
+  assert.ok(!("error" in _s52zah({ house_pressure_pa: 50, hole_side: "outside", zone_before_pa: 20, zone_after_pa: 0, cfm_before: 3000, cfm_after: 3400 })));
+  // A move of exactly a tenth of the house pressure is not "less than a tenth", either way round the float falls.
+  assert.equal(_s52zah({ house_pressure_pa: 3, hole_side: "house", zone_before_pa: 0.3, zone_after_pa: 0.6, cfm_before: 1000, cfm_after: 1100 }).small_change, false);
+  assert.equal(_s52zah({ house_pressure_pa: 50, hole_side: "house", zone_before_pa: 1.1, zone_after_pa: 6.1, cfm_before: 1000, cfm_after: 1100 }).small_change, false);
+  // A blank speed is not 0 mph; a typed 0 still runs.
+  assert.ok("error" in _s52trd({ car_weight_tons: 100, speed_mph: null }));
+  assert.ok(!("error" in _s52trd({ car_weight_tons: 100, speed_mph: 0 })));
+});
+import { computeKickTolerance as _s52kt } from "../../calc-oilgas.js";
+test("hardening slice 52: kick tolerance splits the bottom-hole volume at the BHA top and refuses blank intensity", () => {
+  const ex = { mud_weight_ppg: 10, shoe_emw_ppg: 14, shoe_tvd_ft: 3000, well_tvd_ft: 5000, kick_intensity_ppg: 0.5, influx_gradient_psi_ft: 0.1, annular_capacity_dp_bbl_ft: 0.0459, annular_capacity_bha_bbl_ft: 0.0292, safety_margin_psi: 0 };
+  const whole = _s52kt(ex), split = _s52kt({ ...ex, bha_length_ft: 600 });
+  // 0 keeps the old whole-height assumption and says so; a 600 ft BHA moves the limit to the shoe.
+  assert.ok(Math.abs(whole.kick_tolerance_bbl - 34.3) < 0.05 && whole.governed_by === "bottom" && /no BHA length entered/.test(whole.verdict));
+  assert.ok(Math.abs(split.kick_tolerance_bbl - 43.19) < 0.01 && split.governed_by === "shoe" && !/no BHA length/.test(split.verdict));
+  assert.ok(Math.abs(split.volume_at_bottom_bbl - (600 * 0.0292 + (split.max_influx_height_ft - 600) * 0.0459)) < 1e-9);
+  // A BHA longer than the influx holds the whole influx.
+  assert.ok(Math.abs(_s52kt({ ...ex, bha_length_ft: 5000 }).volume_at_bottom_bbl - whole.volume_at_bottom_bbl) < 1e-9);
+  assert.ok("error" in _s52kt({ ...ex, kick_intensity_ppg: null }) && "error" in _s52kt({ ...ex, influx_gradient_psi_ft: "" }) && "error" in _s52kt({ ...ex, bha_length_ft: -1 }));
+});

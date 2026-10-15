@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "fc995f404dac7680",
+      "sha": "5270bb3645600889",
       "date": "2026-10-15"
     },
     "/tools/": {
@@ -614,8 +614,8 @@
       "date": "2026-10-10"
     },
     "/tools/belt-feeder-pull/": {
-      "sha": "07c9747553f03a34",
-      "date": "2026-10-10"
+      "sha": "b890daa4d9e218e7",
+      "date": "2026-10-15"
     },
     "/tools/belt-hp-transmitted/": {
       "sha": "b266c6bab717a568",
@@ -4170,8 +4170,8 @@
       "date": "2026-09-29"
     },
     "/tools/kick-tolerance/": {
-      "sha": "24f58f554e20155f",
-      "date": "2026-10-10"
+      "sha": "c3fb7568cd7887eb",
+      "date": "2026-10-15"
     },
     "/tools/kill-mud-weight/": {
       "sha": "4922c89f9ee1c3b9",

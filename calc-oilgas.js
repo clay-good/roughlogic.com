@@ -915,12 +915,15 @@ OILGAS_RENDERERS["kill-mud-weight"] = _simpleRenderer({
 // This is that check, made before the kick: how much gas the open hole can take
 // before the pressure at the weak point under the last casing shoe reaches what
 // the leak-off test showed the formation holds. Hydrostatics and Boyle's law.
-// dims: in { mud_weight_ppg: M L^-3, shoe_emw_ppg: M L^-3, shoe_tvd_ft: L, well_tvd_ft: L, kick_intensity_ppg: M L^-3, influx_gradient_psi_ft: M L^-2 T^-2, annular_capacity_dp_bbl_ft: L^2, annular_capacity_bha_bbl_ft: L^2, safety_margin_psi: M L^-1 T^-2 } out: { maasp_psi: M L^-1 T^-2, formation_pressure_psi: M L^-1 T^-2, shoe_limit_psi: M L^-1 T^-2, max_influx_height_ft: L, volume_at_shoe_bbl: L^3, volume_at_shoe_as_shut_in_bbl: L^3, volume_at_bottom_bbl: L^3, kick_tolerance_bbl: L^3, max_kick_intensity_ppg: M L^-3 }
+// dims: in { mud_weight_ppg: M L^-3, shoe_emw_ppg: M L^-3, shoe_tvd_ft: L, well_tvd_ft: L, kick_intensity_ppg: M L^-3, influx_gradient_psi_ft: M L^-2 T^-2, annular_capacity_dp_bbl_ft: L^2, annular_capacity_bha_bbl_ft: L^2, safety_margin_psi: M L^-1 T^-2, bha_length_ft: L } out: { maasp_psi: M L^-1 T^-2, formation_pressure_psi: M L^-1 T^-2, shoe_limit_psi: M L^-1 T^-2, max_influx_height_ft: L, volume_at_shoe_bbl: L^3, volume_at_shoe_as_shut_in_bbl: L^3, volume_at_bottom_bbl: L^3, kick_tolerance_bbl: L^3, max_kick_intensity_ppg: M L^-3, bha_length_ft: L }
 export function computeKickTolerance({
   mud_weight_ppg = 0, shoe_emw_ppg = 0, shoe_tvd_ft = 0, well_tvd_ft = 0, kick_intensity_ppg = 0.5,
   influx_gradient_psi_ft = 0.1, annular_capacity_dp_bbl_ft = 0, annular_capacity_bha_bbl_ft = 0, safety_margin_psi = 0,
+  bha_length_ft = 0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // The page passes a blank box as null; 0 F is a real reading, so a blank cannot stand in for it.
+  if ([kick_intensity_ppg, influx_gradient_psi_ft].some((x) => x === null || x === "")) return { error: "Enter the kick intensity (ppg over the mud) and the influx gradient (psi/ft); a blank is not zero." };
   if (!(mud_weight_ppg > 0 && mud_weight_ppg <= 25)) return { error: "Mud weight must be between 0 and 25 ppg." };
   if (!(shoe_emw_ppg > mud_weight_ppg && shoe_emw_ppg <= 30)) return { error: "The leak-off (or formation integrity) equivalent mud weight at the shoe must be above the mud weight in the hole and no more than 30 ppg." };
   if (!(shoe_tvd_ft > 0)) return { error: "Enter the casing shoe depth (true vertical, ft)." };
@@ -931,6 +934,8 @@ export function computeKickTolerance({
   if (!(annular_capacity_dp_bbl_ft > 0 && annular_capacity_dp_bbl_ft <= 5)) return { error: "Enter the annular capacity around the drill pipe below the shoe (bbl/ft, up to 5)." };
   if (!(annular_capacity_bha_bbl_ft > 0 && annular_capacity_bha_bbl_ft <= 5)) return { error: "Enter the annular capacity around the bottom-hole assembly (bbl/ft, up to 5)." };
   if (safety_margin_psi < 0) return { error: "The safety margin cannot be negative (psi)." };
+  const bha_ft = bha_length_ft === null || bha_length_ft === "" ? 0 : Number(bha_length_ft);
+  if (!(bha_ft >= 0 && bha_ft <= 10000)) return { error: "Bottom-hole assembly length must be 0 to 10,000 ft (0 takes the whole influx around it)." };
   const fracture_pressure_psi = 0.052 * shoe_emw_ppg * shoe_tvd_ft;
   const maasp_psi = fracture_pressure_psi - mud_gradient * shoe_tvd_ft - safety_margin_psi;
   if (!(maasp_psi > 1e-9)) return { error: "The safety margin is as large as the whole margin between the mud and the leak-off at the shoe; there is no casing pressure to work with." };
@@ -951,17 +956,23 @@ export function computeKickTolerance({
   // at the open hole, so it is computed, not assumed to be the limit.
   const shoe_pressure_with_influx_psi = formation_pressure_psi - mud_gradient * (open_hole_ft - max_influx_height_ft) - influx_gradient_psi_ft * max_influx_height_ft;
   const volume_at_shoe_as_shut_in_bbl = volume_at_shoe_bbl * shoe_pressure_with_influx_psi / formation_pressure_psi;
-  const volume_at_bottom_bbl = max_influx_height_ft * annular_capacity_bha_bbl_ft;
+  // At bottom the influx sits around the BHA for its length and around the drill pipe above it
+  // (the single-bubble method as drillingformulas.com works it: 850 ft BHA under a 1,021 ft
+  // influx is 89.0 + 20.8 bbl). Until 2026-10-14 the whole height was taken around the BHA,
+  // which under-read the tolerance (34.3 bbl where a 600 ft BHA gives 43.2) and named the
+  // wrong governing case. A BHA length of 0 keeps that assumption, and the verdict says so.
+  const in_bha_ft = bha_ft > 0 ? Math.min(bha_ft, max_influx_height_ft) : max_influx_height_ft;
+  const volume_at_bottom_bbl = in_bha_ft * annular_capacity_bha_bbl_ft + (max_influx_height_ft - in_bha_ft) * annular_capacity_dp_bbl_ft;
   const kick_tolerance_bbl = Math.min(volume_at_shoe_as_shut_in_bbl, volume_at_bottom_bbl);
   const governed_by = none ? "none" : volume_at_shoe_as_shut_in_bbl <= volume_at_bottom_bbl ? "shoe" : "bottom";
   if (![maasp_psi, formation_pressure_psi, max_influx_height_ft, kick_tolerance_bbl, max_kick_intensity_ppg].every(Number.isFinite)) return { error: "Kick tolerance math is not a finite value." };
   const verdict = none
     ? "NO kick tolerance at a " + fmt(kick_intensity_ppg, 2) + " ppg kick: the shut-in pressure alone reaches the shoe limit before any gas enters. The most this shoe takes with no influx is " + fmt(max_kick_intensity_ppg, 2) + " ppg"
-    : fmt(kick_tolerance_bbl, 1) + " bbl at a " + fmt(kick_intensity_ppg, 2) + " ppg kick, set by the gas " + (governed_by === "shoe" ? "when its top reaches the shoe" : "as first shut in around the bottom-hole assembly") + (fills_open_hole ? "; the limit is not reached even with the whole open hole full of gas, so the height is capped at the open hole" : "");
+    : fmt(kick_tolerance_bbl, 1) + " bbl at a " + fmt(kick_intensity_ppg, 2) + " ppg kick, set by the gas " + (governed_by === "shoe" ? "when its top reaches the shoe" : "as first shut in around the bottom-hole assembly") + (fills_open_hole ? "; the limit is not reached even with the whole open hole full of gas, so the height is capped at the open hole" : "") + (none || bha_ft > 0 ? "" : " -- with no BHA length entered the whole influx is taken around the bottom-hole assembly, the smallest annulus, which can under-read the tolerance; enter the BHA length to split it");
   return {
     maasp_psi, formation_pressure_psi, shoe_limit_psi, fracture_pressure_psi, max_influx_height_ft,
     volume_at_shoe_bbl, volume_at_shoe_as_shut_in_bbl, volume_at_bottom_bbl, kick_tolerance_bbl, max_kick_intensity_ppg,
-    governed_by, fills_open_hole, verdict,
+    governed_by, fills_open_hole, verdict, bha_length_ft: bha_ft,
     note: "How big a gas kick the well can take and still be shut in and circulated out without breaking down the formation under the last casing shoe. The shoe is the weak point: the leak-off test showed what it holds, as an equivalent mud weight, and the mud already in the hole uses part of that. What is left is the maximum allowable casing pressure. A kick spends it two ways. The formation pressure that caused the kick raises the pressure everywhere in the well, which is the kick intensity, in ppg above the mud weight. And gas is much lighter than mud, so every foot of mud it displaces below the shoe takes hydrostatic away and the casing pressure has to rise to make it up. Setting the pressure at the shoe equal to its limit gives the tallest column of gas the open hole can hold. That height becomes a volume twice: around the bottom-hole assembly, where the gas first sits and the annulus is tight, and around the drill pipe just below the shoe, where the gas arrives larger because it has expanded. The second is brought back to bottom-hole conditions by Boyle's law so the two can be compared, and the SMALLER is the kick tolerance: the pit gain the crew must detect and shut in before reaching. Raising the mud weight to drill ahead lowers it, which is why this is recalculated for each hole section at its heaviest planned mud. The figure also reported is the largest kick intensity the shoe takes with no gas in the hole at all. This is the single-bubble method for a VERTICAL well: it treats the gas as one slug, ignores temperature, gas compressibility, migration and solution in oil-based mud, and takes no credit for dispersion; choke-line friction on a subsea stack and any trapped pressure come out of the margin and belong in the safety margin entered. The operator's well-control standard and a certified supervisor govern.",
   };
 }
@@ -974,11 +985,12 @@ OILGAS_RENDERERS["kick-tolerance"] = _simpleRenderer({
     { key: "shoe_emw_ppg", label: "Leak-off or FIT equivalent at the shoe (ppg)", kind: "number" },
     { key: "shoe_tvd_ft", label: "Casing shoe depth, true vertical (ft)", kind: "number" },
     { key: "well_tvd_ft", label: "Well depth, true vertical (ft)", kind: "number" },
-    { key: "kick_intensity_ppg", label: "Kick intensity over the mud weight (ppg)", kind: "number", default: 0.5 },
-    { key: "influx_gradient_psi_ft", label: "Influx gradient (psi/ft; dry gas 0.1)", kind: "number", default: 0.1 },
+    { key: "kick_intensity_ppg", required: true, label: "Kick intensity over the mud weight (ppg)", kind: "number", default: 0.5 },
+    { key: "influx_gradient_psi_ft", required: true, label: "Influx gradient (psi/ft; dry gas 0.1)", kind: "number", default: 0.1 },
     { key: "annular_capacity_dp_bbl_ft", label: "Annulus around drill pipe below the shoe (bbl/ft)", kind: "number" },
     { key: "annular_capacity_bha_bbl_ft", label: "Annulus around the bottom-hole assembly (bbl/ft)", kind: "number" },
     { key: "safety_margin_psi", label: "Safety margin off the casing pressure (psi)", kind: "number" },
+    { key: "bha_length_ft", label: "Bottom-hole assembly length (ft; 0 takes the whole influx around it)", kind: "number" },
   ],
   outputs: [
     { key: "k", id: "kt-out-k", label: "Kick tolerance", value: (r) => r.verdict },

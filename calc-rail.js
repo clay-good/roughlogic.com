@@ -670,8 +670,10 @@ RAIL_RENDERERS["tonnage-rating-grade"] = _simpleRenderer({
 // computes it: a constant, a per-axle journal term that falls with axle load, a
 // term linear in speed, and an air term that does not depend on weight at all.
 // dims: in { car_weight_tons: M, axles_per_car: dimensionless, speed_mph: L T^-1, air_coefficient: dimensionless, cars: dimensionless } out: { resistance_lb_per_ton: M L T^-2, axle_term_lb_per_ton: M L T^-2, speed_term_lb_per_ton: M L T^-2, air_term_lb_per_ton: M L T^-2, car_resistance_lb: M L T^-2, train_resistance_lb: M L T^-2, power_hp: M L^2 T^-3, equivalent_grade_pct: dimensionless, rp548_lb_per_ton: M L T^-2, davis_1926_lb_per_ton: M L T^-2 }
-export function computeTrainResistanceDavis({ car_weight_tons = 0, axles_per_car = 4, speed_mph = 0, air_coefficient = 0.07, cars = 1 } = {}) {
+export function computeTrainResistanceDavis({ car_weight_tons = 0, axles_per_car = 4, speed_mph = null, air_coefficient = 0.07, cars = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // 0 F is a real reading, so a blank temperature cannot stand in for it.
+  if ([speed_mph].some((x) => x === null || x === undefined || x === "")) return { error: "Enter the speed (mph); the Davis form is for a moving train, and starting resistance is a different figure." };
   if (!(car_weight_tons > 0 && car_weight_tons <= 400)) return { error: "Enter the gross weight of one car in tons (up to 400)." };
   if (!(Number.isInteger(axles_per_car) && axles_per_car >= 2 && axles_per_car <= 12)) return { error: "Axles per car must be a whole number from 2 to 12." };
   if (!(speed_mph >= 0 && speed_mph <= 150)) return { error: "Speed must be between 0 and 150 mph." };
@@ -707,7 +709,7 @@ RAIL_RENDERERS["train-resistance-davis"] = _simpleRenderer({
   fields: [
     { key: "car_weight_tons", label: "Gross weight of one car (tons)", kind: "number" },
     { key: "axles_per_car", label: "Axles per car", kind: "number", default: 4, attrs: { step: "1", min: "2", max: "12" } },
-    { key: "speed_mph", label: "Speed (mph)", kind: "number" },
+    { key: "speed_mph", required: true, label: "Speed (mph)", kind: "number" },
     { key: "air_coefficient", label: "Air coefficient K (0.07 conventional, 0.0935 container, 0.16 trailer)", kind: "number", default: 0.07 },
     { key: "cars", label: "Cars in the train", kind: "number", default: 1, attrs: { step: "1", min: "1", max: "1000" } },
   ],

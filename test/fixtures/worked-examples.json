@@ -171589,6 +171589,59 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "kick-tolerance",
+  "source_publisher": "DrillingFormulas.com",
+  "source_title": "Kick Tolerance Calculation (worked example)",
+  "source_edition_or_year": "web article, read 2026-10-15",
+  "source_section_or_page": "12.0 ppg mud, 14.7 ppg LOT at a 5,500 ft TVD shoe, 9,500 ft TVD, 0.5 ppg kick, 0.11 psi/ft gas, 12-1/4 in hole, 850 ft of 6.5 in BHA on 5 in pipe (annuli (12.25^2 - 6.5^2)/1029.4 and (12.25^2 - 5^2)/1029.4). Printed: MASICP 772 psi, H 1,021 ft, 109.8 bbl around the BHA (89.0 + 20.8), 124.1 bbl at the shoe, 84.5 bbl kick tolerance.",
+  "verified_by": "rl",
+  "verified_on": "2026-10-15",
+  "inputs": {
+   "mud_weight_ppg": 12,
+   "shoe_emw_ppg": 14.7,
+   "shoe_tvd_ft": 5500,
+   "well_tvd_ft": 9500,
+   "kick_intensity_ppg": 0.5,
+   "influx_gradient_psi_ft": 0.11,
+   "annular_capacity_dp_bbl_ft": 0.121491,
+   "annular_capacity_bha_bbl_ft": 0.104733,
+   "safety_margin_psi": 0,
+   "bha_length_ft": 850
+  },
+  "outputs": {
+   "maasp_psi": {
+    "value": 772.2,
+    "tolerance": {
+     "pct": 0.1
+    }
+   },
+   "max_influx_height_ft": {
+    "value": 1021,
+    "tolerance": {
+     "pct": 0.2
+    }
+   },
+   "volume_at_bottom_bbl": {
+    "value": 109.8,
+    "tolerance": {
+     "pct": 0.3
+    }
+   },
+   "volume_at_shoe_bbl": {
+    "value": 124.1,
+    "tolerance": {
+     "pct": 0.3
+    }
+   },
+   "kick_tolerance_bbl": {
+    "value": 84.5,
+    "tolerance": {
+     "pct": 0.3
+    }
+   }
+  }
  }
  ]
 }

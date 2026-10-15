@@ -466,10 +466,12 @@ BUILDINGPERF_RENDERERS["zonal-pressure-diagnostics"] = _simpleRenderer({
 // blower-door flow is that plane's flow change, C (dP_after^n - dP_before^n).
 // dims: in { house_pressure_pa: M L^-1 T^-2, zone_before_pa: M L^-1 T^-2, zone_after_pa: M L^-1 T^-2, cfm_before: L^3 T^-1, cfm_after: L^3 T^-1 } out: { flow_change_cfm: L^3 T^-1, path_flow_cfm: L^3 T^-1, path_share_pct: dimensionless, house_to_zone_cfm50: L^3 T^-1, zone_to_outside_cfm50: L^3 T^-1 }
 export function computeZonalAddAHole({
-  house_pressure_pa = 50, hole_side = "house", zone_before_pa = 0, zone_after_pa = 0,
+  house_pressure_pa = 50, hole_side = "house", zone_before_pa = null, zone_after_pa = null,
   cfm_before = 0, cfm_after = 0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // 0 F is a real reading, so a blank temperature cannot stand in for it.
+  if ([zone_before_pa, zone_after_pa].some((x) => x === null || x === undefined || x === "")) return { error: "Enter both zone-to-outside readings (Pa); 0 is a real reading, so type it if the zone sits at outdoor pressure." };
   if (hole_side !== "house" && hole_side !== "outside") return { error: "Choose which plane the hole was opened in: house to zone, or zone to outside." };
   if (!(house_pressure_pa > 0)) return { error: "The house-to-outside pressure must be positive (Pa)." };
   if (zone_before_pa < 0 || zone_after_pa < 0) return { error: "Zone pressures cannot be negative (Pa) -- enter the magnitude of the zone-to-outside difference." };
@@ -498,7 +500,8 @@ export function computeZonalAddAHole({
   if (![path_flow_cfm, house_to_zone_cfm50, zone_to_outside_cfm50].every(Number.isFinite)) return { error: "Add-a-hole math is not a finite value." };
   if (path_flow_cfm > cfm_before) return { error: "These readings put more air through the zone than the blower door moved before the hole. The zone pressure barely changed for the flow change entered -- recheck both readings or open a larger hole." };
   const path_share_pct = 100 * path_flow_cfm / cfm_before;
-  const small_change = Math.abs(zone_after_pa - zone_before_pa) < 0.1 * house_pressure_pa;
+  // A move of exactly a tenth is not "less than a tenth" (0.1 x 3 is 0.30000000000000004).
+  const small_change = Math.abs(zone_after_pa - zone_before_pa) < 0.1 * house_pressure_pa * (1 - 1e-9);
   return {
     flow_change_cfm, path_flow_cfm, path_share_pct, house_to_zone_cfm50, zone_to_outside_cfm50, small_change,
     caution: small_change
@@ -514,8 +517,8 @@ BUILDINGPERF_RENDERERS["zonal-add-a-hole"] = _simpleRenderer({
   fields: [
     { key: "house_pressure_pa", label: "House to outside (Pa)", kind: "number", default: 50, attrs: { step: "any" } },
     { key: "hole_side", label: "Hole opened between", kind: "select", default: "house", options: [{ value: "house", label: "House and zone (hatch, door)" }, { value: "outside", label: "Zone and outside (vent, overhead door)" }] },
-    { key: "zone_before_pa", label: "Zone to outside before (Pa)", kind: "number", attrs: { step: "any" } },
-    { key: "zone_after_pa", label: "Zone to outside after (Pa)", kind: "number", attrs: { step: "any" } },
+    { key: "zone_before_pa", required: true, label: "Zone to outside before (Pa)", kind: "number", attrs: { step: "any" } },
+    { key: "zone_after_pa", required: true, label: "Zone to outside after (Pa)", kind: "number", attrs: { step: "any" } },
     { key: "cfm_before", label: "Blower door flow before (CFM)", kind: "number", attrs: { step: "any" } },
     { key: "cfm_after", label: "Blower door flow after (CFM)", kind: "number", attrs: { step: "any" } },
   ],

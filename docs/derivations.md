@@ -1529,7 +1529,7 @@ cross-check.
 | calc-buildingperf.js | `computeGroundLoopFlowAntifreeze` | `{ tons = 0, gpm_per_ton = 3.0, pipe_id_in = 0, fluid_density_lb_ft3 = 63.9, f...` | _ | _ | _ |
 | calc-buildingperf.js | `computeStackEffectNpp` | `{ height_ft = 0, indoor_temp_f = 70, outdoor_temp_f = null, neutral_plane_fra...` | _ | _ | _ |
 | calc-buildingperf.js | `computeVentilationRateProcedure` | `{ rp_cfm_per_person = 0, ra_cfm_per_ft2 = 0, ez = 1, people_1 = 0, area_1_ft2...` | _ | _ | _ |
-| calc-buildingperf.js | `computeZonalAddAHole` | `{ house_pressure_pa = 50, hole_side = "house", zone_before_pa = 0, zone_after...` | _ | _ | _ |
+| calc-buildingperf.js | `computeZonalAddAHole` | `{ house_pressure_pa = 50, hole_side = "house", zone_before_pa = null, zone_af...` | _ | _ | _ |
 | calc-buildingperf.js | `computeZonalPressureDiagnostics` | `{ house_pressure_pa = 50, zone_a_pressure_pa = 0, zone_b_pressure_pa = 0, zon...` | _ | _ | _ |
 | calc-civil.js | `computeCompoundCurve` | `{ r1_ft = 0, r2_ft = 0, delta1_deg = 0, delta2_deg = 0 } = {}` | _ | _ | _ |
 | calc-civil.js | `computeCurveDeflectionStakeout` | `{ mode, radius_ft, degree_of_curve, arc_length_ft } = {}` | _ | _ | _ |
@@ -3209,7 +3209,7 @@ cross-check.
 | calc-rail.js | `computeTrackSuperelevation` | `{ degree_of_curve = 0, speed_mph = 0, actual_elevation_in = 0, allowable_unba...` | _ | _ | _ |
 | calc-rail.js | `computeTrackWarp` | `{ measured_a_in = 0, designed_a_in = 0, measured_b_in = 0, designed_b_in = 0,...` | _ | _ | _ |
 | calc-rail.js | `computeTrainBrakeReduction` | `{ charged_pressure_psi = 90, reduction_psi = 0, cylinder_ratio = 2.5, full_se...` | _ | _ | _ |
-| calc-rail.js | `computeTrainResistanceDavis` | `{ car_weight_tons = 0, axles_per_car = 4, speed_mph = 0, air_coefficient = 0....` | _ | _ | _ |
+| calc-rail.js | `computeTrainResistanceDavis` | `{ car_weight_tons = 0, axles_per_car = 4, speed_mph = null, air_coefficient =...` | _ | _ | _ |
 | calc-rail.js | `computeTurnoutFrogGeometry` | `{ frog_number = 0, distance_beyond_frog_ft = 0, required_separation_ft = 0, l...` | _ | _ | _ |
 | calc-realestate.js | `compute1031Timeline` | `{ sale_close_iso }` | _ | _ | _ |
 | calc-realestate.js | `computeAmortizationSchedule` | `{ principal, apr_percent, term_years, extra_monthly_principal }` | _ | _ | _ |
@@ -4996,7 +4996,7 @@ per spec-v14 §13.1 second paragraph.
 | `joist-notch-bore-limit` | Floor Joist Notching and Boring Limits (IRC R502.8.1) | floor joist notch/bore limits (IRC R5...; end = 9.25/4 = 2.3125; depth = 9.25/6 = 1.5417; length = ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `jominy-quench-severity` | Jominy Hardenability: How Deep the Hardness Reaches | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `key-cut-macs-check` | Key Bitting MACS and Adjacent Cut Check | Project (first-principles); the manufacturer's cut specification governs the value | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+4 more) |
-| `kick-tolerance` | Kick Tolerance at the Casing Shoe | Project (first-principles); shoe limit 0.052 x 14 x 3,000 = 2,184 psi; mud at the sho... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `kick-tolerance` | Kick Tolerance at the Casing Shoe | Project (first-principles); shoe limit 0.052 x 14 x 3,000 = 2,184 psi; mud at the sho... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `kill-mud-weight` | Well Control Kill Mud Weight and Circulating Pressure | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `knee-toe-clearance` | Knee and Toe Clearance (2010 ADA Standards 306) | US Department of Justice / US Access ...; 306.3.1: 'Space under an element between 9 inches and 27 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `landing-check` | Stairway and Exterior-Door Landing Check | International Code Council; 'Landings shall have a dimension of not less than 36 inch... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |

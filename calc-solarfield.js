@@ -181,6 +181,9 @@ const _clockText = (hours) => {
 // dims: in { clock_hour: T, clock_minute: T, day_of_year: dimensionless, longitude_deg: dimensionless, utc_offset_hours: T } out: { equation_of_time_min: T, longitude_correction_min: T, total_correction_min: T, solar_time_hours: T, hours_from_solar_noon: dimensionless, solar_noon_clock_hours: T }
 export function computeSolarTimeCorrection({ clock_hour = 12, clock_minute = 0, day_of_year = 1, longitude_deg = 0, utc_offset_hours = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // The page passes a blank box as null; 0 is a real hour, longitude and offset, so a blank cannot stand in for it.
+  if ([clock_hour, longitude_deg, utc_offset_hours].some((x) => x === null || x === "")) return { error: "Enter the clock hour, the longitude and the clock's UTC offset." };
+  if (clock_minute === null || clock_minute === "") clock_minute = 0;
   if (!(clock_hour >= 0 && clock_hour < 24)) return { error: "Clock hour must be from 0 to 23 (24-hour clock)." };
   if (!(clock_minute >= 0 && clock_minute < 60)) return { error: "Clock minute must be from 0 to 59." };
   if (!(day_of_year >= 1 && day_of_year <= 366)) return { error: "Day of year must be between 1 and 366." };
@@ -226,7 +229,8 @@ function renderSolarTimeCorrection(inputRegion, outputRegion, citationEl) {
   const oNoon = makeOutputLine(outputRegion, "Solar noon on the clock", "stc-out-noon");
   const oCor = makeOutputLine(outputRegion, "Equation of time / longitude correction", "stc-out-cor");
   const oNote = makeOutputLine(outputRegion, "Note", "stc-out-n");
-  function readNum(i) { if (i.value === "") return 0; const v = Number(i.value); return Number.isFinite(v) ? v : 0; }
+  // A blank box reaches the compute as null: a cleared hour is not midnight, nor a cleared longitude Greenwich.
+  function readNum(i) { if (i.value === "") return null; const v = Number(i.value); return Number.isFinite(v) ? v : null; }
   const update = debounce(() => {
     const r = computeSolarTimeCorrection({ clock_hour: readNum(hr.input), clock_minute: readNum(mn.input), day_of_year: readNum(doy.input), longitude_deg: readNum(lon.input), utc_offset_hours: readNum(utc.input) });
     if (r.error) { oSol.textContent = r.error; oHrs.textContent = "-"; oNoon.textContent = "-"; oCor.textContent = "-"; oNote.textContent = ""; return; }

@@ -28,6 +28,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **Hardening slice 52: independent review of the eight calculators added on 2026-10-10 (v1955-v1962).** Two reviewers re-derived each formula from its source and ran each across its inputs. The formulas held everywhere; these did not:
+  - **`kick-tolerance` (the one that matters).** The bottom-hole volume took the whole influx height around the bottom-hole assembly. The published single-bubble method takes the BHA's own length around it and the rest around the wider drill-pipe annulus. On the tile's own example, a 600 ft BHA raises the tolerance from 34.3 to 43.2 bbl, and the limit moves from the bottom hole to the shoe. A new BHA length input does the split. Left at 0, the old conservative assumption stays and the verdict now says so. The DrillingFormulas.com worked example is a registry row and reproduces: 772 psi, 1,021 ft, 109.8 bbl around the BHA, 84.5 bbl kick tolerance. The citation and spec still gave the shoe volume as "x shoe limit / Pf", which is wrong when the height is capped at the open hole; the code was already right. A cleared kick-intensity or gradient box ran as 0, 26% more tolerance than the 0.5 ppg default it replaced; it now asks.
+  - **Blanks read as zero.** `zonal-add-a-hole` read a blank zone reading as 0 Pa, `train-resistance-davis` a blank speed as 0 mph, `compressed-air-condensate` a blank humidity as 0% (dry air), and `solar-time-correction` a blank hour, longitude or UTC offset as midnight at Greenwich. Each now asks.
+  - **`zonal-add-a-hole`.** A move of exactly a tenth of the house pressure got opposite "less than a tenth" verdicts depending on float noise.
+  - **`belt-feeder-pull`.** The citation claimed a 0.04% match to the paper's example; the real match is 0.2%, because the paper prints q to three figures.
+
 - **Hardening slice 51: an independent review of the new riser feeding-distance calculator, and notes that now name the calculator they point to.**
   - **Review.** An independent re-derivation against both papers confirmed the equation, every Table 2 multiplier, the superheat interpolation and the lateral rule. It also found four wording defects, now fixed:
     - The lateral line said two risers in line could sit "no more than twice that apart edge to edge". That is unsafe: the distance runs to the furthest point midway between the risers, the corner of a wide section, so the spacing along the axis is shorter. The line no longer gives a spacing.
