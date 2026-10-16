@@ -13,6 +13,11 @@ import { dirname, resolve } from "node:path";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
 
+// A plain `includes` would count `computeFooXX` as a call to `computeFoo`, so
+// a rename in a suite could leave a tile silently uncovered. Match the name as
+// a whole identifier instead (seeded by renaming one call: the gate goes red).
+const callsFn = (suites, fn) => new RegExp(`\\b${fn}\\b(?![\\w$])`).test(suites);
+
 test("every spec-only tile is held by a per-module reference suite", async () => {
   const { rows } = JSON.parse(readFileSync(resolve(ROOT, "test/fixtures/worked-examples.json"), "utf8"));
   const { COMPUTE_MAP } = await import("../fixtures/compute-map.js");
@@ -22,7 +27,31 @@ test("every spec-only tile is held by a per-module reference suite", async () =>
     /Project \(first-principles\)/.test(r.source_publisher || "") && /spec-v\d+ worked example, recomputed/.test(r.source_title || ""))).map(([id]) => id);
   const suites = readdirSync(resolve(ROOT, "test/unit")).filter((f) => /^calc-.*\.test\.js$/.test(f))
     .map((f) => readFileSync(resolve(ROOT, "test/unit", f), "utf8")).join("\n");
-  const missing = specOnly.filter((id) => !COMPUTE_MAP[id] || !suites.includes(COMPUTE_MAP[id].fn));
+  const missing = specOnly.filter((id) => !COMPUTE_MAP[id] || !callsFn(suites, COMPUTE_MAP[id].fn));
   assert.ok(specOnly.length > 0, "the spec-only filter matched nothing; did the row titles change?");
   assert.deepEqual(missing, [], "spec-only tiles with no independent reference test");
+});
+
+// The same promise, widened on 2026-10-16: a tile whose every fixture row is
+// the project's own derivation or a recomputation -- not only the narrower
+// "its own spec's example" set above -- has nothing outside itself to disagree
+// with. These are the 360 tiles `check-worked-examples` calls derived-only.
+// 250 of them had no reference suite on 2026-10-15; slices 55 and 56 closed
+// that, and this holds the ratchet so a new landing cannot reopen it.
+test("every project-derived tile is held by a per-module reference suite", async () => {
+  const { rows } = JSON.parse(readFileSync(resolve(ROOT, "test/fixtures/worked-examples.json"), "utf8"));
+  const { COMPUTE_MAP } = await import("../fixtures/compute-map.js");
+  // The two predicates scripts/check-worked-examples.mjs uses for the same set.
+  const SELF_SOURCED = /^Project\b|first-principles/i;
+  const RECOMPUTED = /machine-verified|recomputed|\bspec-v\d+\b/i;
+  const byTile = new Map();
+  for (const r of rows) (byTile.get(r.tile_id) || byTile.set(r.tile_id, []).get(r.tile_id)).push(r);
+  const derivedOnly = [...byTile].filter(([, rs]) => rs.every((r) =>
+    SELF_SOURCED.test(r.source_publisher || "") ||
+    RECOMPUTED.test([r.source_edition_or_year, r.source_section_or_page, r.source_title].join(" ")))).map(([id]) => id);
+  const suites = readdirSync(resolve(ROOT, "test/unit")).filter((f) => /^calc-.*\.test\.js$/.test(f))
+    .map((f) => readFileSync(resolve(ROOT, "test/unit", f), "utf8")).join("\n");
+  const missing = derivedOnly.filter((id) => !COMPUTE_MAP[id] || !callsFn(suites, COMPUTE_MAP[id].fn));
+  assert.ok(derivedOnly.length > 300, `the derived-only filter matched only ${derivedOnly.length}; did the row fields change?`);
+  assert.deepEqual(missing, [], "project-derived tiles with no independent reference test");
 });

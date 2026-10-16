@@ -190,7 +190,7 @@ its spec did not write. That can be:
 |---|---|---|
 | Covered | all 31 modules holding such tiles | all 76 |
 
-[test/unit/spec-only-reference.test.js](../test/unit/spec-only-reference.test.js) holds that row: it fails when a tile whose only row is its own spec's example has no call in a `calc-*.test.js` suite. Six tiles that landed after 2026-09-18 had none until 2026-10-15. Their new suites found one more defect: square-to-round's sheet could not hold its own pattern.
+[test/unit/spec-only-reference.test.js](../test/unit/spec-only-reference.test.js) holds that row twice over: it fails when a tile whose only row is its own spec's example has no call in a `calc-*.test.js` suite, and, since 2026-10-16, when any of the 360 project-derived tiles does not. The call is matched as a whole identifier, so renaming one in a suite reopens the gap rather than hiding it. Six tiles that landed after 2026-09-18 had none until 2026-10-15. Their new suites found one more defect: square-to-round's sheet could not hold its own pattern.
 
 Beyond the spec-only set, **360 tiles** are checked only against
 the project's own derivation (every fixture row either
