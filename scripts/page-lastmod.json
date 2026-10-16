@@ -810,8 +810,8 @@
       "date": "2026-10-03"
     },
     "/tools/branch-circuit-wire-footage/": {
-      "sha": "394db96b00b37e74",
-      "date": "2026-10-03"
+      "sha": "85f80a1fef6eb1cb",
+      "date": "2026-10-16"
     },
     "/tools/branch-reinforcement/": {
       "sha": "f14c94285fc097b0",
@@ -4758,8 +4758,8 @@
       "date": "2026-10-10"
     },
     "/tools/metal-deck-takeoff/": {
-      "sha": "c857d79ef918048c",
-      "date": "2026-10-15"
+      "sha": "a73c528818a65da7",
+      "date": "2026-10-16"
     },
     "/tools/metal-roof-panels/": {
       "sha": "6f9d49f1f29469c8",
@@ -4938,8 +4938,8 @@
       "date": "2026-10-01"
     },
     "/tools/motor-run-hours-for-budget/": {
-      "sha": "c16de37ef853d341",
-      "date": "2026-09-29"
+      "sha": "020483c06e2f8f67",
+      "date": "2026-10-16"
     },
     "/tools/motor-shaft-torque/": {
       "sha": "2ba62657a752cf04",
@@ -7486,8 +7486,8 @@
       "date": "2026-09-29"
     },
     "/tools/sprinkler-head-layout/": {
-      "sha": "12e7f7aaeab57eb8",
-      "date": "2026-09-29"
+      "sha": "f90a232eb29b6cd8",
+      "date": "2026-10-16"
     },
     "/tools/sprinkler-k-factor/": {
       "sha": "de9edb55467a8ae4",
