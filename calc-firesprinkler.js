@@ -223,15 +223,24 @@ export function computeSprinklerHeadLayout({ room_length = 0, room_width = 0, ar
   const total_heads = heads_per_line * num_lines;
   const room_area = room_length * room_width;
   const achieved_area_per_head = room_area / total_heads;
+  // spacing / 2 is the NFPA 13 ALLOWABLE wall distance, not the one this grid
+  // lands on: the ceil puts a whole number of heads on each axis, so the two
+  // end gaps split whatever the lines do not fill, and that is smaller.
   const max_wall_distance = spacing / 2;
+  const wall_distance_length = (room_length - (heads_per_line - 1) * spacing) / 2;
+  const wall_distance_width = (room_width - (num_lines - 1) * spacing) / 2;
+  // Sized by construction: spacing <= sqrt(area per head) and the two ceils
+  // only add heads, so the achieved area is never over the cap. The flag is
+  // kept for callers; the page prints the headroom, which does move.
+  const area_per_head_cap = area_per_head;
   const coverage_ok = achieved_area_per_head <= area_per_head + 1e-9 * Math.abs(area_per_head);
-  return { spacing, heads_per_line, num_lines, total_heads, room_area, achieved_area_per_head, max_wall_distance, coverage_ok };
+  return { spacing, heads_per_line, num_lines, total_heads, room_area, achieved_area_per_head, area_per_head_cap, max_wall_distance, wall_distance_length, wall_distance_width, coverage_ok };
 }
 
 export const sprinklerHeadLayoutExample = { inputs: { room_length: 40, room_width: 30, area_per_head: 130, max_spacing: 15 } };
 
 FIRESPRINKLER_RENDERERS["sprinkler-head-layout"] = _simpleRenderer({
-  citation: "Citation: NFPA 13 (Standard for the Installation of Sprinkler Systems), 2022 protection-area and spacing caps for standard-spray upright / pendent heads: governing spacing = min(max spacing, sqrt(area per head)), heads per line = ceil(length / spacing), lines = ceil(width / spacing), total = heads per line x lines, achieved area per head = room area / total, max wall distance = spacing / 2. Hazard-class caps are editable: Light 225 ft^2 / 15 ft, Ordinary 130 ft^2 / 15 ft, Extra 100 ft^2 / 12 ft (hydraulically calculated). A rectangular-bay estimate -- obstructions, beams and the beam rule, sloped or high ceilings, small rooms, extended-coverage and residential heads, and ESFR / storage layouts each have their own spacing and clearance rules, and the minimum spacing between heads (typically 6 ft, to prevent cold-soldering) is a separate check. A takeoff aid, not a stamped sprinkler layout -- a qualified fire-protection designer and the AHJ govern.",
+  citation: "Citation: NFPA 13 (Standard for the Installation of Sprinkler Systems), 2022 protection-area and spacing caps for standard-spray upright / pendent heads: governing spacing = min(max spacing, sqrt(area per head)), heads per line = ceil(length / spacing), lines = ceil(width / spacing), total = heads per line x lines, achieved area per head = room area / total, allowable wall distance = spacing / 2 (the distance the grid lands on is the end gap the whole lines leave, which is smaller). Hazard-class caps are editable: Light 225 ft^2 / 15 ft, Ordinary 130 ft^2 / 15 ft, Extra 100 ft^2 / 12 ft (hydraulically calculated). A rectangular-bay estimate -- obstructions, beams and the beam rule, sloped or high ceilings, small rooms, extended-coverage and residential heads, and ESFR / storage layouts each have their own spacing and clearance rules, and the minimum spacing between heads (typically 6 ft, to prevent cold-soldering) is a separate check. A takeoff aid, not a stamped sprinkler layout -- a qualified fire-protection designer and the AHJ govern.",
   example: sprinklerHeadLayoutExample.inputs,
   fields: [
     { key: "room_length", label: "Room length (ft)", kind: "number" },
@@ -243,8 +252,8 @@ FIRESPRINKLER_RENDERERS["sprinkler-head-layout"] = _simpleRenderer({
     { key: "sp", id: "shl-out-sp", label: "Governing spacing", value: (r) => fmt(r.spacing, 2) + " ft" },
     { key: "gr", id: "shl-out-gr", label: "Heads per line x lines", value: (r) => r.heads_per_line + " x " + r.num_lines },
     { key: "th", id: "shl-out-th", label: "Total heads", value: (r) => String(r.total_heads) },
-    { key: "aa", id: "shl-out-aa", label: "Achieved area per head", value: (r) => fmt(r.achieved_area_per_head, 1) + " ft^2" + (r.coverage_ok ? " (OK)" : " (OVER)") },
-    { key: "wd", id: "shl-out-wd", label: "Max distance to walls", value: (r) => fmt(r.max_wall_distance, 2) + " ft" },
+    { key: "aa", id: "shl-out-aa", label: "Achieved area per head", value: (r) => fmt(r.achieved_area_per_head, 1) + " ft^2 of the " + fmt(r.area_per_head_cap, 0) + " ft^2 cap" },
+    { key: "wd", id: "shl-out-wd", label: "Distance to walls", value: (r) => fmt(r.wall_distance_length, 2) + " ft along the length, " + fmt(r.wall_distance_width, 2) + " ft along the width (NFPA 13 allows up to " + fmt(r.max_wall_distance, 2) + " ft)" },
   ],
   compute: computeSprinklerHeadLayout,
 });

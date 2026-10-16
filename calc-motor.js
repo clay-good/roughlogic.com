@@ -236,8 +236,11 @@ export function computeMotorRunHoursForBudget({ hp = 0, efficiency_pct = 93, loa
   const max_hours_per_year = cost_budget_usd / (input_kw * rate_usd_per_kwh);
   const annual_kwh = input_kw * max_hours_per_year;
   if (![input_kw, max_hours_per_year, annual_kwh].every(Number.isFinite)) return { error: "Run-hours math is not a finite value." };
+  // A year holds 8,760 hours, so a quotient above that is not a schedule the
+  // motor can run: the budget covers continuous operation with money left.
+  const exceeds_year = max_hours_per_year > 8760 + 1e-9 * 8760;
   return {
-    input_kw, max_hours_per_year, annual_kwh,
+    input_kw, max_hours_per_year, annual_kwh, exceeds_year,
     note: "max run-hours = budget / (input_kW x rate), input_kW = HP x 0.746 x load / efficiency. This is the energy charge only -- the utility tariff (demand charges, time-of-use, power-factor penalties) governs the full bill, so the real hours before a bill target are fewer. There are about 8,760 hours in a year; if this exceeds that, the budget covers continuous running with room to spare.",
   };
 }
@@ -263,7 +266,7 @@ function renderMotorRunHoursForBudget(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const r = computeMotorRunHoursForBudget({ hp: Number(hp.input.value) || 0, efficiency_pct: Number(eff.input.value) || 0, load_factor_pct: Number(load.input.value) || 0, rate_usd_per_kwh: Number(rate.input.value) || 0, cost_budget_usd: Number(budget.input.value) || 0 });
     if (r.error) { oHours.textContent = r.error; oKw.textContent = "-"; oKwh.textContent = "-"; oNote.textContent = "-"; return; }
-    oHours.textContent = fmt(r.max_hours_per_year, 0) + " hr/yr";
+    oHours.textContent = fmt(r.max_hours_per_year, 0) + " hr/yr" + (r.exceeds_year ? " -- more than the 8,760 hours in a year; the budget covers continuous running" : "");
     oKw.textContent = fmt(r.input_kw, 2) + " kW";
     oKwh.textContent = fmt(r.annual_kwh, 0) + " kWh/yr";
     oNote.textContent = r.note;

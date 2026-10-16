@@ -1121,6 +1121,9 @@ export function computeHddPullback({ eff_weight_plf = 5, length_ft = 800, fricti
   if (![pullback_lb, capstan_pullback_lb].every(Number.isFinite)) return { error: "Pullback math is not a finite value." };
   const utilization = pipe_safe_pull_lb > 0 ? pullback_lb / pipe_safe_pull_lb : null;
   const capstan_utilization = pipe_safe_pull_lb > 0 ? capstan_pullback_lb / pipe_safe_pull_lb : null;
+  // `utilization` is the lumped-factor pull against the PIPE alone. A caller
+  // that reads only that field would miss both a capstan pull above it and a
+  // rig rated below the pipe, so the governing ratio is returned as well.
   // The lower of the pipe's safe pull and the rig's rated pull is what the
   // pull actually has to fit inside.
   const limits = [];
@@ -1129,6 +1132,7 @@ export function computeHddPullback({ eff_weight_plf = 5, length_ft = 800, fricti
   limits.sort((a, b) => a.lb - b.lb);
   const governing_limit_lb = limits.length ? limits[0].lb : null;
   const governing_limit = limits.length ? limits[0].what : null;
+  const governing_utilization = governing_limit_lb ? governing_pullback_lb / governing_limit_lb : null;
   return {
     straight_drag_lb,
     pullback_lb,
@@ -1137,6 +1141,7 @@ export function computeHddPullback({ eff_weight_plf = 5, length_ft = 800, fricti
     governing_pullback_lb,
     utilization,
     capstan_utilization,
+    governing_utilization,
     governing_limit_lb,
     governing_limit,
     within_limit: governing_limit_lb === null ? null : governing_pullback_lb <= governing_limit_lb + 1e-9 * Math.abs(governing_limit_lb),

@@ -123,18 +123,27 @@ export function computeBranchCircuitWireFootage({ circuits = 20, avg_homerun_ft 
   if (makeup_ft < 0) return { error: "Makeup cannot be negative (ft)." };
   const total_ft = circuits * (avg_homerun_ft + makeup_ft) * conductors_per_circuit;
   const rolls = Math.ceil(total_ft / roll_ft - 1e-9);
-  if (![total_ft, rolls].every(Number.isFinite)) return { error: "Footage math is not a finite value." };
+  // Wire is bought per color, and each color rounds up on its own, so the
+  // rolls actually ordered are per-color x colors -- never fewer than `rolls`
+  // and usually more (3,600 ft of 3 colors is 6 rolls, not 4).
+  const ft_per_color = total_ft / conductors_per_circuit;
+  const rolls_per_color = Math.ceil(ft_per_color / roll_ft - 1e-9);
+  const rolls_bought = rolls_per_color * conductors_per_circuit;
+  if (![total_ft, rolls, ft_per_color, rolls_per_color, rolls_bought].every(Number.isFinite)) return { error: "Footage math is not a finite value." };
   return {
     total_ft,
     rolls,
-    note: "For individual conductors in conduit, each conductor is counted (set conductors-per-circuit). For cable (NM / romex), set conductors-per-circuit to 1 to tally the cable itself. The home run is panel-to-first-device; the makeup is the per-box slack summed. This is the total roll count across all conductors; wire is bought per color, so split the footage by color (total / conductors per circuit) and round each color up to whole rolls.",
+    ft_per_color,
+    rolls_per_color,
+    rolls_bought,
+    note: "For individual conductors in conduit, each conductor is counted (set conductors-per-circuit). For cable (NM / romex), set conductors-per-circuit to 1 to tally the cable itself. The home run is panel-to-first-device; the makeup is the per-box slack summed. The total roll count treats the footage as one pool; wire is bought per color, and each color rounds up on its own, so the rolls ordered are the per-color count times the number of colors -- never fewer, and usually more.",
   };
 }
 
 export const branchCircuitWireFootageExample = { inputs: { circuits: 20, avg_homerun_ft: 45, makeup_ft: 15, conductors_per_circuit: 3, roll_ft: 1000 } };
 
 function _v854renderBranchCircuitWireFootage(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: footage takeoff identity by name. total = circuits x (home run + makeup) x conductors; rolls = ceil(total / roll length). Each conductor is counted in conduit; set conductors to 1 for cable (NM / romex). The roll count is the total across all conductors; wire is bought per color.";
+  citationEl.textContent = "Citation: footage takeoff identity by name. total = circuits x (home run + makeup) x conductors; rolls = ceil(total / roll length). Each conductor is counted in conduit; set conductors to 1 for cable (NM / romex). Wire is bought per color, so each color rounds up on its own and the rolls ordered are the per-color count times the colors.";
   const c = makeNumber("Number of branch circuits", "bcw-c", { step: "any", min: "0" });
   const hr = makeNumber("Average home-run length (ft)", "bcw-hr", { step: "any", min: "0" });
   const mu = makeNumber("Box makeup / slack per circuit (ft)", "bcw-mu", { step: "any", min: "0" });
@@ -143,7 +152,7 @@ function _v854renderBranchCircuitWireFootage(inputRegion, outputRegion, citation
   for (const f of [c, hr, mu, cp, rf]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { c.input.value = "20"; hr.input.value = "45"; mu.input.value = "15"; cp.input.value = "3"; rf.input.value = "1000"; update(); });
   const oTotal = makeOutputLine(outputRegion, "Total conductor footage", "bcw-out-total");
-  const oRolls = makeOutputLine(outputRegion, "Rolls (all conductors)", "bcw-out-rolls");
+  const oRolls = makeOutputLine(outputRegion, "Rolls to buy", "bcw-out-rolls");
   const update = debounce(() => {
     const r = computeBranchCircuitWireFootage({
       circuits: c.input.value === "" ? 20 : Number(c.input.value), avg_homerun_ft: hr.input.value === "" ? 45 : Number(hr.input.value),
@@ -151,8 +160,8 @@ function _v854renderBranchCircuitWireFootage(inputRegion, outputRegion, citation
       roll_ft: rf.input.value === "" ? 1000 : Number(rf.input.value),
     });
     if (r.error) { oTotal.textContent = r.error; oRolls.textContent = "-"; return; }
-    oTotal.textContent = fmt(r.total_ft, 0) + " ft";
-    oRolls.textContent = fmt(r.rolls, 0) + " rolls";
+    oTotal.textContent = fmt(r.total_ft, 0) + " ft (" + fmt(r.ft_per_color, 0) + " ft per color)";
+    oRolls.textContent = fmt(r.rolls_bought, 0) + " rolls to buy -- " + fmt(r.rolls_per_color, 0) + " per color (" + fmt(r.rolls, 0) + " if the footage were one pool)";
   }, DEBOUNCE_MS);
   for (const f of [c, hr, mu, cp, rf]) f.input.addEventListener("input", update);
 }

@@ -1103,7 +1103,7 @@ export function computeCableSupportJhook({ run_ft = 400, spacing_ft = 4, num_cab
     hooks,
     load_per_hook_lb,
     utilization,
-    note: "TIA-569 non-continuous support runs about 4 to 5 ft on center. The bundle load is the cables times the weight per foot over one span. The bundle fill is also limited so the lower cables are not crushed (roughly 40 to 50 cables per hook). Distinct from the NEC power-raceway support-spacing.",
+    note: "TIA-569 non-continuous support runs about 4 to 5 ft on center. The count is one hook per span, ceil(run / spacing), which assumes the cable is already carried at the head of the run (a rack, a tray, or a sleeve); a pathway that needs its own hook at both free ends takes one more. The bundle load is the cables times the weight per foot over one span, so a last span shorter than the spacing is charged a full span. The bundle fill is also limited so the lower cables are not crushed (roughly 40 to 50 cables per hook). Distinct from the NEC power-raceway support-spacing.",
   };
 }
 

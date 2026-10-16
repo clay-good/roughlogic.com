@@ -192,6 +192,20 @@ its spec did not write. That can be:
 
 [test/unit/spec-only-reference.test.js](../test/unit/spec-only-reference.test.js) holds that row: it fails when a tile whose only row is its own spec's example has no call in a `calc-*.test.js` suite. Six tiles that landed after 2026-09-18 had none until 2026-10-15. Their new suites found one more defect: square-to-round's sheet could not hold its own pattern.
 
+Beyond the spec-only set, **360 tiles** are checked only against
+the project's own derivation (every fixture row either
+`Project (first-principles)` or a recomputation). On 2026-10-15,
+250 of those had no reference suite either. Batch 1 covered 74 of
+them, and on 2026-10-16 the remaining 176 gained one, in nine
+suites holding 420 tests. Six tiles printed a figure that was
+wrong for the reader who acts on it -- a seam length counting the
+free edge of the last strip, a roll count pooled across colors, a
+utilization measured against the pipe when the rig governed, a
+sprinkler wall distance quoting the allowable, a run-hours figure
+past the 8,760 a year holds, and two snow specs still writing the
+ASCE 7-16 rule their code had left behind. All 360 are now
+covered.
+
 The suites found fourteen defects, each written up in
 [CHANGELOG.md](../CHANGELOG.md). In three cases the tile ran its
 reference's relation past that reference's own limits:

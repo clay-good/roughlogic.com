@@ -9620,14 +9620,14 @@ export function computeMembraneRoofTakeoff({ roof_area_sf = 8000, roll_width_ft 
     usable_w_ft,
     rolls,
     seam_lf,
-    note: "The usable width nets out the side lap. The seam length sizes the hot-air welding or adhesive and the labor. Fasteners, plates, and cover tape are taken off separately. The membrane and lap are set by the manufacturer and the wind-uplift design; a wider sheet cuts both the rolls and the welding.",
+    note: "The usable width nets out the side lap. The seam length sizes the hot-air welding or adhesive and the labor; it is the total strip run, so the welded seams -- one fewer than the strips -- come to one strip-length less. Fasteners, plates, and cover tape are taken off separately. The membrane and lap are set by the manufacturer and the wind-uplift design; a wider sheet cuts both the rolls and the welding.",
   };
 }
 
 export const membraneRoofTakeoffExample = { inputs: { roof_area_sf: 8000, roll_width_ft: 10, roll_length_ft: 100, sidelap_in: 6, waste_pct: 5 } };
 
 const _v863renderMembraneRoofTakeoff = _simpleRenderer({
-  citation: "Citation: membrane-takeoff identity by name. usable width = roll width - side lap; rolls = ceil(area x (1 + waste) / (usable width x roll length)); seam = area / usable width. The usable width nets out the side lap; the seam sizes the welding.",
+  citation: "Citation: membrane-takeoff identity by name. usable width = roll width - side lap; rolls = ceil(area x (1 + waste) / (usable width x roll length)); seam = area / usable width. The usable width nets out the side lap; the seam is the total strip run, an upper bound on the welded seams, which are one strip-length shorter.",
   example: membraneRoofTakeoffExample.inputs,
   fields: [
     { key: "roof_area_sf", label: "Roof area (ft²)", kind: "number" },
@@ -9638,7 +9638,7 @@ const _v863renderMembraneRoofTakeoff = _simpleRenderer({
   ],
   outputs: [
     { key: "r", id: "mrt-out-r", label: "Membrane rolls", value: (r) => _fmtC(r.rolls, 0) + " rolls" },
-    { key: "s", id: "mrt-out-s", label: "Seam length to weld", value: (r) => _fmtC(r.seam_lf, 0) + " LF (" + _fmtC(r.usable_w_ft, 1) + " ft usable width)" },
+    { key: "s", id: "mrt-out-s", label: "Seam length to weld (upper bound)", value: (r) => _fmtC(r.seam_lf, 0) + " LF (" + _fmtC(r.usable_w_ft, 1) + " ft usable width) -- the total strip run; the welded seams between strips are one strip-length shorter" },
     { key: "note", id: "mrt-out-note", label: "Note", value: (r) => r.note },
   ],
   compute: computeMembraneRoofTakeoff,
@@ -10254,14 +10254,14 @@ export function computeMetalDeckTakeoff({ area_sf = 10000, cover_width_in = 36, 
     cover_sf,
     sheets,
     sidelap_lf,
-    note: "The cover width is the net coverage, not the overall sheet width. The side-lap and support fastening (button punch, screws, or welds with washers) follow the SDI and the drawings and are counted separately. Distinct from the exposed metal-roof-panels; a narrower sheet means more sheets and more fastening.",
+    note: "The cover width is the net coverage, not the overall sheet width. The side-lap run is the total sheet run, so the laps -- one fewer than the sheets across -- come to one sheet-run less. The side-lap and support fastening (button punch, screws, or welds with washers) follow the SDI and the drawings and are counted separately. Distinct from the exposed metal-roof-panels; a narrower sheet means more sheets and more fastening.",
   };
 }
 
 export const metalDeckTakeoffExample = { inputs: { area_sf: 10000, cover_width_in: 36, sheet_length_ft: 30, waste_pct: 5 } };
 
 const _v877renderMetalDeckTakeoff = _simpleRenderer({
-  citation: "Citation: deck-takeoff identity by name. cover area = cover width x sheet length; sheets = ceil(area x (1 + waste) / cover area); side lap = area / cover width. The cover width is the net coverage; the fastening follows the SDI and the drawings.",
+  citation: "Citation: deck-takeoff identity by name. cover area = cover width x sheet length; sheets = ceil(area x (1 + waste) / cover area); side lap = area / cover width. The cover width is the net coverage; the side-lap run is the total sheet run, an upper bound on the laps, which are one sheet-run shorter. The fastening follows the SDI and the drawings.",
   example: metalDeckTakeoffExample.inputs,
   fields: [
     { key: "area_sf", label: "Deck area (ft²)", kind: "number" },
@@ -10271,7 +10271,7 @@ const _v877renderMetalDeckTakeoff = _simpleRenderer({
   ],
   outputs: [
     { key: "s", id: "mdt-out-s", label: "Deck sheets", value: (r) => _fmtC(r.sheets, 0) + " sheets" },
-    { key: "l", id: "mdt-out-l", label: "Side-lap run (fastening)", value: (r) => _fmtC(r.sidelap_lf, 0) + " LF" },
+    { key: "l", id: "mdt-out-l", label: "Side-lap run, fastening (upper bound)", value: (r) => _fmtC(r.sidelap_lf, 0) + " LF -- the total sheet run; the laps between sheets are one sheet-run shorter" },
     { key: "note", id: "mdt-out-note", label: "Note", value: (r) => r.note },
   ],
   compute: computeMetalDeckTakeoff,

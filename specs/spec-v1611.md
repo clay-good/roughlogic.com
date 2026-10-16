@@ -57,7 +57,7 @@ the compromises, and they come from this same geometry.
 A classic 12 ft speed hump, 3 in high, parabolic:
 
 ```
-average approach slope = 3 in over 6 ft = 3.5%
+average approach slope = 3 in over 6 ft = 4.17%
 design speed           ~ 15 to 20 mph
 ```
 
@@ -65,7 +65,7 @@ Now a 22 ft speed table with a 10 ft flat top, also 3 in high:
 
 ```
 ramp length            = (22 - 10) / 2 = 6 ft each side
-approach slope         = 3 in over 6 ft = 3.5%   (the SAME ramp slope)
+approach slope         = 3 in over 6 ft = 4.17%  (the SAME ramp slope)
 design speed           ~ 25 to 30 mph
 ```
 
