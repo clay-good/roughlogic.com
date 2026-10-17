@@ -19,7 +19,7 @@
     {
       "file": "c.json",
       "name": "Tile descriptions after the opening sentence, c runtime shard (generated)",
-      "gzip_size_bytes": 62937
+      "gzip_size_bytes": 62958
     },
     {
       "file": "d.json",
@@ -39,7 +39,7 @@
     {
       "file": "g.json",
       "name": "Tile descriptions after the opening sentence, g runtime shard (generated)",
-      "gzip_size_bytes": 27511
+      "gzip_size_bytes": 27532
     },
     {
       "file": "h.json",
@@ -64,7 +64,7 @@
     {
       "file": "l.json",
       "name": "Tile descriptions after the opening sentence, l runtime shard (generated)",
-      "gzip_size_bytes": 20147
+      "gzip_size_bytes": 20169
     },
     {
       "file": "m.json",
@@ -135,16 +135,16 @@
   "hashes": {
     "a.json": "5184039623f1fcaf1d2fc5264a66cd375321f893fb930236306d8394e32775be",
     "b.json": "e4fee04565a894019d93ca87dc5ecc88708d6a4dfc53f06605533fab08c89b93",
-    "c.json": "19fe10718c1f8300da54dd9882b767a32762b948f394e615623b519dbfe6a078",
+    "c.json": "7eb7422fcc86eceda49e956a85e0f2fe5eb8942bc8d529125f71c07b3ceb3cba",
     "d.json": "facb69be7286373dcee54b3b2fe36411f8e300a3e2f60eb79bea1d8eaf7cf0d3",
     "e.json": "8055b63c2dc910362a0ee777de775c8a1c48eb3780280bea4f0df0cf57de12fb",
     "f.json": "050700e7659acf6e16e04512eca1f1000abbf52dbd4be4176514d8a040df98d6",
-    "g.json": "6e3faf2917935e2b6df4133f3ec7b719dce35cc30291c309a8949a927eb13d14",
+    "g.json": "d5d5e5eec523d540a8faa4ada1acc6d6809cd262433e254ed3e04466bccfa593",
     "h.json": "b06651f5f3989423fd84e5b19a3171aae0ca44dffa37281d85282c0dd752d95c",
     "i.json": "06fcc9606909c8901eab664bf8fa1aed49ef5b750c7573f1591d5e7fec8547b8",
     "j.json": "f5ed4f82111db1d3843a7bd30f8cdddc13ecb47a09bccdf96f9b39993bd7e253",
     "k.json": "922a5b28e6ca5a5e8f9d3e03831ea7018d90dff67babae6344f27e0064457063",
-    "l.json": "b48ae9d86f57cfafc5387326c95ce2ca5f66a26987c89ed49fa665bcb9a2b223",
+    "l.json": "dd1242f04a711c96db54e62026df30466f1e0d404ab6c85ae5d19339d01d5add",
     "m.json": "4ae739ac2825cd513bded3bf8005b32c393ab3d83c5ebd5d676fc6e328b87137",
     "n.json": "e2ae0436152f5f7f44abd8b30c8a71d2a8dd78505798d4741f260728c1842551",
     "o.json": "d61f0064b6371561e933c719893d6075da6ba7752ff67b47e6f1f8a433bad323",

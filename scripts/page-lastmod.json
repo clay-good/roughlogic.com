@@ -2,19 +2,19 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "3b1a0ab3a50ecdc2",
+      "sha": "fc699d47a253046f",
       "date": "2026-10-17"
     },
     "/tools/": {
-      "sha": "08861583bad3909b",
+      "sha": "4777de888c4047a0",
       "date": "2026-10-17"
     },
     "/errata/": {
-      "sha": "7c2b7ac73e1ae4b0",
+      "sha": "f0bf3772a232dd6d",
       "date": "2026-10-17"
     },
     "/collections/disaster-response/": {
-      "sha": "c68d9db92b9ca880",
+      "sha": "d9737e584bbe0cca",
       "date": "2026-10-17"
     },
     "/groups/accounting/": {
@@ -26,7 +26,7 @@
       "date": "2026-10-17"
     },
     "/groups/construction/": {
-      "sha": "bc601b4c204668c3",
+      "sha": "e3ac3508f452a801",
       "date": "2026-10-17"
     },
     "/groups/cross-trade/": {
@@ -462,7 +462,7 @@
       "date": "2026-10-17"
     },
     "/tools/baluster-picket-count/": {
-      "sha": "8e695e547baba791",
+      "sha": "419ddbe51bb10b96",
       "date": "2026-10-17"
     },
     "/tools/band-brake-torque/": {
@@ -1318,7 +1318,7 @@
       "date": "2026-10-17"
     },
     "/tools/co-alarm-placement/": {
-      "sha": "d0ccf172193fb20d",
+      "sha": "3cdd088e2b6ad366",
       "date": "2026-10-17"
     },
     "/tools/co2-enrichment-rate/": {
@@ -2630,11 +2630,11 @@
       "date": "2026-10-17"
     },
     "/tools/egress-window-check/": {
-      "sha": "303ed2969e0575b6",
+      "sha": "7967d6e9b97e687e",
       "date": "2026-10-17"
     },
     "/tools/egress-window-well/": {
-      "sha": "c0af802bb5f601b2",
+      "sha": "5dd8c6a54c7ecf36",
       "date": "2026-10-17"
     },
     "/tools/elastic-settlement-allowable-pressure/": {
@@ -3634,7 +3634,7 @@
       "date": "2026-10-17"
     },
     "/tools/guard-handrail-check/": {
-      "sha": "5a0b8f507b788bef",
+      "sha": "4f6f9ce3e3f33c0f",
       "date": "2026-10-17"
     },
     "/tools/guard-post-load/": {
@@ -4250,7 +4250,7 @@
       "date": "2026-10-17"
     },
     "/tools/landing-check/": {
-      "sha": "7aa5f911141fd17e",
+      "sha": "a99b300f91faff2c",
       "date": "2026-10-17"
     },
     "/tools/langelier-index/": {
@@ -7182,7 +7182,7 @@
       "date": "2026-10-17"
     },
     "/tools/smoke-alarm-placement/": {
-      "sha": "6683370b587d04ca",
+      "sha": "3dd17f6ffd147a31",
       "date": "2026-10-17"
     },
     "/tools/smoke-detector-spacing-count/": {
@@ -7578,19 +7578,19 @@
       "date": "2026-10-17"
     },
     "/tools/stair-code-check/": {
-      "sha": "30a5f3c05915360a",
+      "sha": "e4c5de3de4fe93b5",
       "date": "2026-10-17"
     },
     "/tools/stair-stringer/": {
-      "sha": "52d9fdec9b7f8788",
+      "sha": "05553e4f72059625",
       "date": "2026-10-17"
     },
     "/tools/stair-stringer-layout/": {
-      "sha": "a1f22d4db4cc041e",
+      "sha": "cfd0f3e322750628",
       "date": "2026-10-17"
     },
     "/tools/stairs/": {
-      "sha": "f461cc3711d75b7e",
+      "sha": "d34a33e00e2ae5eb",
       "date": "2026-10-17"
     },
     "/tools/stairwell-pressurization/": {

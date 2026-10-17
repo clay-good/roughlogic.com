@@ -255,7 +255,7 @@
     },
     "stairs": {
       "group": "calc-construction.js (Group E)",
-      "stamp": "Citation: per IRC 2021 §R311.7 (stair dimensions). Riser height = total rise / risers; default tread depth 10 in. AHJ governs final inspection. Free at codes.iccsafe.org."
+      "stamp": "Citation: per IRC 2024 §R318.7 [R311.7 in IRC 2021] (stair dimensions). Riser height = total rise / risers; default tread depth 10 in. AHJ governs final inspection. Free at codes.iccsafe.org."
     },
     "standpipe-friction": {
       "group": "calc-fire.js (Group F)",

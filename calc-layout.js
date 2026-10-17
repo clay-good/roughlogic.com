@@ -906,7 +906,7 @@ export function computeEqualSpacing({ run_in = 0, item_width_in = 0, mode = "max
     notes.push("The " + N + " items at " + fmt(w, 3) + " in wide do not fit in a " + fmt(run, 3) + " in run (they would need a negative gap). Reduce the count or the item width.");
   } else if (m === "max-gap") {
     notes.push("Smallest count whose gap stays at or below " + fmt(Number(max_gap_in) || 0, 3) + " in: " + N + " item(s), with " + (N + 1) + " equal gaps of " + fmt(gap_in, 4) + " in. Center-to-center pitch " + fmt(center_to_center_in, 4) + " in.");
-    notes.push("The gap limit is user-supplied. For a guard / railing the IRC R312.1.3 rule is that a 4 in sphere must not pass, so enter a max gap just under 4 in; the AHJ-adopted code governs.");
+    notes.push("The gap limit is user-supplied. For a guard / railing the IRC R321.1.3 [R312.1.3 in IRC 2021] rule is that a 4 in sphere must not pass, so enter a max gap just under 4 in; the AHJ-adopted code governs.");
   } else {
     notes.push((w > 0 ? N + " item(s)" : N + " mark(s)") + " split the run into " + (N + 1) + " equal gaps of " + fmt(gap_in, 4) + " in" + (w > 0 ? " (center-to-center " + fmt(center_to_center_in, 4) + " in)" : "") + ".");
     notes.push("Positions are measured to the item center (or the division point) from the start of the run. First-principles layout arithmetic; allow for your end conditions (posts, reveals) and mark from a single datum to avoid creep.");
@@ -916,7 +916,7 @@ export function computeEqualSpacing({ run_in = 0, item_width_in = 0, mode = "max
 export const equalSpacingExample = { inputs: { run_in: 60, item_width_in: 1.5, mode: "max-gap", max_gap_in: 4, count: 0 } };
 
 function _v57renderEqualSpacing(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Equal-spacing layout - N items of width w in a run R have N+1 equal gaps of (R - N x w)/(N+1) and a center-to-center pitch of gap + w; in max-gap mode the smallest N whose gap stays at or below the limit is ceil((R - gmax)/(w + gmax)) - first-principles arithmetic, public domain. The gap limit (for example the IRC R312.1.3 4-inch-sphere guard rule) is user-supplied; the adopted code governs.";
+  citationEl.textContent = "Citation: Equal-spacing layout - N items of width w in a run R have N+1 equal gaps of (R - N x w)/(N+1) and a center-to-center pitch of gap + w; in max-gap mode the smallest N whose gap stays at or below the limit is ceil((R - gmax)/(w + gmax)) - first-principles arithmetic, public domain. The gap limit (for example the IRC R321.1.3 [R312.1.3 in IRC 2021] 4-inch-sphere guard rule) is user-supplied; the adopted code governs.";
   const run = makeNumber("Total run (in)", "es-run", { step: "any", min: "0" });
   const w = makeNumber("Item width (in, 0 for marks)", "es-w", { step: "any", min: "0" });
   const mode = makeSelect("Solve for", "es-mode", [
