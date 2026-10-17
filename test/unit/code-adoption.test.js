@@ -40,7 +40,7 @@ test("each rule is seeded red", () => {
   // Sign-off rules.
   assert.ok(hits(seed((d) => { d.rows.GA.verified_on = TODAY; }), /GA: verified_on is set but verified_by is empty/), "a date without a signer");
   assert.ok(hits(seed((d) => { d.rows.GA.verified_by = "me"; }), /GA: verified_by is set but verified_on/), "a signer without a date");
-  assert.ok(hits(seed((d) => { Object.assign(d.rows.IL, { verified_by: "me", verified_on: TODAY }); }), /IL: signed, but its citation is not a primary source/), "signing a secondary citation");
+  assert.ok(hits(seed((d) => { Object.assign(d.rows.AZ, { verified_by: "me", verified_on: TODAY }); }), /AZ: signed, but its citation is not a primary source/), "signing a secondary citation");
   assert.ok(hits(seed((d) => { Object.assign(d.rows.GA, { verified_by: "me", verified_on: "2026-12-01" }); }), /GA: verified_on 2026-12-01 is in the future/), "a future sign-off");
   assert.ok(hits(seed((d) => { Object.assign(d.rows.GA, { verified_by: "me", verified_on: "2026-01-01" }); }), /GA: verified 289 days ago, two rechecks late/), "a forgotten recheck");
   const late = clone(base);

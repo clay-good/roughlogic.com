@@ -261,11 +261,11 @@
       ],
       "upcoming": [],
       "pending": null,
-      "scope": "Commercial occupancies outside local jurisdictions that have adoption authority; cities and counties adopt their own code elsewhere.",
-      "citation": "NFPA NEC enforcement map: NEC 2008 for commercial occupancies outside local jurisdictions (no Illinois rule located)",
-      "citation_primary": false,
-      "source_url": "https://www.iaei.org/page/nec-code-adoption",
-      "draft_note": "No primary Illinois citation found (rechecked 2026-10-17). Secondary tables name the Capital Development Board (state building commissioner) for commercial occupancies outside local adoption authority; find its rule before signing.",
+      "scope": "New commercial buildings in jurisdictions with no building code of their own; cities and counties adopt their own code elsewhere.",
+      "citation": "20 ILCS 3105/10.09-1 (Capital Development Board Act; P.A. 96-704): NEC 2008 or later",
+      "citation_primary": true,
+      "source_url": "https://ilga.gov/Legislation/publicacts/view/096-0704",
+      "draft_note": "Rechecked 2026-10-17: P.A. 96-704 added 20 ILCS 3105/10.09-1, requiring the 2008 or later NEC for new commercial construction in non-building-code jurisdictions (from 2011-07-01). The statute sets a floor, not a single edition.",
       "verified_by": null,
       "verified_on": null,
       "nfpa_2026_08_03": "2008 (7/1/11 - commercial occupancies for areas outside of local jurisdictions that have adoption authority)"
@@ -417,7 +417,7 @@
       "citation": "Maryland State Fire Prevention Code, COMAR 29.06.01 (NFPA 70 by reference)",
       "citation_primary": true,
       "source_url": "https://labor.maryland.gov/labor/build/buildcodematrix.pdf",
-      "draft_note": "SOURCES CONFLICT (three answers): NFPA lists NEC 2020 effective 2025-07-01; IAEI lists NEC 2023 effective 2025-03-01; the state's own building-code matrix lists NEC 2017 via the State Fire Prevention Code. COMAR 29.06.01 was replaced 2025-06-23; read the current text.",
+      "draft_note": "SOURCES CONFLICT (three answers): NFPA lists NEC 2020 (2025-07-01); IAEI lists NEC 2023 (2025-03-01); the state building-code matrix lists NEC 2017. The current COMAR 29.06.01 (2025-06-23) adopts NFPA 1 and 101 (2024) and names no NFPA 70 edition; find the rule that does.",
       "verified_by": null,
       "verified_on": null,
       "nfpa_2026_08_03": "2020 (7/1/2025) with MD amendments | 2023 update process underway (Effective date not established)"
@@ -569,7 +569,7 @@
         {
           "applies_to": "state-buildings",
           "edition": "2023",
-          "effective": "2025-07-01"
+          "effective": "2024-11-15"
         }
       ],
       "upcoming": [],
@@ -578,7 +578,7 @@
       "citation": "NAC 341.045 (State Public Works Board adopted codes)",
       "citation_primary": true,
       "source_url": "https://publicworks.nv.gov/uploadedFiles/publicworksnvgov/content/Documents/Permitting_Code_Enforcement/2024%20Adopted_Codes.pdf",
-      "draft_note": "SOURCES CONFLICT: NFPA lists NEC 2017 (2018-07-01); the 2024 SPWD list adopts NEC 2023, mandatory after the grace period ended 2025-06-30.",
+      "draft_note": "SOURCES CONFLICT: NFPA and older trackers list NEC 2017 (2018-07-01). LCB File R072-24 amends NAC 341.045 to NEC 2023, shown effective 2024-11-15 by up.codes; the SPWD 2024 list agrees. Confirm R072-24 was adopted.",
       "verified_by": null,
       "verified_on": null,
       "nfpa_2026_08_03": "2017 (7/1/18 - Nevada State Public Works Division)"
