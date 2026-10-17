@@ -33,7 +33,7 @@ From [Voltage Drop](https://roughlogic.com/tools/voltage-drop/):
 | Current (A) | 20 | | |
 | Source voltage (V) | 240 | | |
 
-Under every example the page names the published sources that calculator is checked against, or says plainly that none is on file. Every page has a **Details, formula, and sources** drop-down if you want to check the math. On most calculators a **Show the steps** panel under the answer goes further: every input as it was used and every intermediate value worked out on the way to the answer, so you can show an inspector how you got the number.
+Under every example the page names the published sources that calculator is checked against, or says plainly that none is on file. Every page has a **Details, formula, and sources** drop-down if you want to check the math; where a citation names a free official source, such as `nfpa.org/freeaccess` or a federal regulation like 29 CFR 1926.502, it links straight to it. On most calculators a **Show the steps** panel under the answer goes further: every input as it was used and every intermediate value worked out on the way to the answer, so you can show an inspector how you got the number.
 
 ## What's covered
 
