@@ -580,7 +580,7 @@ export function renderPressureConversion(inputRegion, outputRegion, citationEl) 
   attachExampleButton(inputRegion, () => { value.input.value = "1"; from.select.value = "atm"; to.select.value = "psi"; update(); });
   const oV = makeOutputLine(outputRegion, "Result", "pc-out");
   const update = debounce(() => {
-    const r = pressureConvert({ value: Number(value.input.value) || 0, from: from.select.value, to: to.select.value });
+    const r = pressureConvert({ value: Number(value.input.value) || 0, from: from.select.value, to: to.select.value }); stepsFor(outputRegion, inputRegion, ["value", "from", "to"], r);
     oV.textContent = r.error ? r.error : (fmt(r.value, 4) + " " + to.select.value);
   }, DEBOUNCE_MS);
   for (const el of [value.input, from.select, to.select]) el.addEventListener("input", update);
@@ -3105,7 +3105,7 @@ function _v23SimpleRenderer(spec) {
     const update = debounce(() => {
       const params = {};
       for (const f of spec.fields) params[f.key] = f.kind === "select" ? fields[f.key].select.value : (Number(fields[f.key].input.value) || 0);
-      const r = spec.compute(params);
+      const r = spec.compute(params); stepsFor(outputRegion, inputRegion, spec.fields, r, params);
       if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }
       for (const o of spec.outputs) outs[o.key].textContent = o.value(r);
     }, DEBOUNCE_MS);

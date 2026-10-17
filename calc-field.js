@@ -460,7 +460,7 @@ function _r(spec) {
         // tell a cleared box from a typed 0.
         else params[f.key] = f.required && fields[f.key].input.value === "" ? null : Number(fields[f.key].input.value) || 0;
       }
-      const r = spec.compute(params);
+      const r = spec.compute(params); stepsFor(outputRegion, inputRegion, spec.fields, r, params);
       if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }
       for (const o of spec.outputs) outs[o.key].textContent = o.value(r);
     }, DEBOUNCE_MS);
@@ -1126,7 +1126,7 @@ function renderMagneticDeclination(inputRegion, outputRegion, citationEl) {
     const date_iso = dateInput.value || new Date().toISOString().slice(0, 10);
     const decimal_year = decimalYearFromIso(date_iso);
     if (!Number.isFinite(decimal_year)) { clearOuts("Date must be YYYY-MM-DD."); return; }
-    const r = computeWMM({ lat_deg, lon_deg, alt_km, decimal_year, coefficients });
+    const r = computeWMM({ lat_deg, lon_deg, alt_km, decimal_year, coefficients }); stepsFor(outputRegion, inputRegion, ["lat_deg", "lon_deg", "alt_km", "decimal_year", "coefficients"], r);
     if (r.error) { clearOuts(r.error); return; }
     outs.d.textContent = fmt(r.D, Math.abs(r.D - 0) < 0.005 && r.D !== 0 ? 4 : 2) + " deg " + (r.D >= 0 ? "(east)" : "(west)");
     outs.i.textContent = fmt(r.I, 2) + " deg";

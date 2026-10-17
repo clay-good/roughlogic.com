@@ -4,7 +4,7 @@
 
 ## What it does for you
 
-Under the answer on **2,095 of the 2,267 calculators (92%)** there is now a collapsed **Show the steps** panel. Open it and you get the arithmetic behind the number. You see every input as the calculator actually used it, after defaults, and every intermediate value it worked out on the way to the answer. Each value has its label and unit. When an inspector asks how you got 106 in, the panel shows the steps without your redoing the math.
+Under the answer on **2,243 of the 2,267 calculators (98.9%)** there is now a collapsed **Show the steps** panel. Open it and you get the arithmetic behind the number. You see every input as the calculator actually used it, after defaults, and every intermediate value it worked out on the way to the answer. Each value has its label and unit. When an inspector asks how you got 106 in, the panel shows the steps without your redoing the math.
 
 ## What "the steps" means here
 
@@ -26,7 +26,9 @@ Formulas with the numbers substituted in ("q = 0.00256 x 1.0 x ... = 25.4 psf") 
 |---|---|---|---|
 | Declarative (`_simpleRenderer`, 76 module copies) | 1,014 | yes | two lines per copy, fed the field list |
 | Hand-written, one main compute call | 1,081 | yes | one `stepsFor` line after the call; inputs read off the page |
-| Hand-written, no single main call | 172 | no | input-free references (`gfci-afci-reference`, `pressure-conversion`), pages that run several computes (`duct-sizing`), and Manual J, which computes in a worker |
+| Other declarative factories (`_r`, `_rEnv`, `_rPool`, `_v23SimpleRenderer`, in 16 modules) | 145 | yes | one `stepsFor` line passing the factory's own field list and params |
+| Hand-wired one by one | 3 | yes | `pressure-conversion`, `serial-dilution`, `magnetic-declination` |
+| Left out | 24 | no | 18 input-free reference pages, where there are no steps to show; 3 that compute in a background worker (Manual J cooling and heating, duct sizing); 3 that compute inline from list inputs or several modes (`generator-sizing`, `panel-rebalance`, `unit-converter`) |
 
 The first landing (a4d1dd9a) covered the declarative tiles only. That landing counted 998 because it counted renderer instances; 1,014 tile ids use them. A hand-written renderer counts as having one main call if exactly one compute result is checked for `.error`, or if it has a single compute call outside any loop. The 172 left out need hand-written wiring, page by page.
 
@@ -41,6 +43,7 @@ The first landing (a4d1dd9a) covered the declarative tiles only. That landing co
 
 - Worked-value labels come from `humanizeKey`, the same captioner the agent door and the static shells already use. A few read awkwardly ("Fleet fuel 70 gal per (day)" for `fleet_fuel_70_gal_per_day`). Improving the captioner is a separate change, because it also rewrites every shell and the field index.
 - Every finite number the compute returns is listed, including ones already printed above. The panel is an audit trail, not a summary.
+- A result whose keys are single letters (the magnetic model's `D`, `I`, `H`) gets no worked values. `humanizeKey` will not guess a caption for them, so `magnetic-declination`'s panel shows its inputs only.
 
 ## Proof
 

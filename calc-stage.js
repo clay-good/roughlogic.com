@@ -413,7 +413,7 @@ function _r(spec) {
         // (a cleared 68 F air temperature used to compute at 0 F).
         else params[f.key] = fields[f.key].input.value === "" && f.default !== undefined ? f.default : Number(fields[f.key].input.value) || 0;
       }
-      const r = spec.compute(params);
+      const r = spec.compute(params); stepsFor(outputRegion, inputRegion, spec.fields, r, params);
       if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }
       for (const o of spec.outputs) outs[o.key].textContent = o.value(r);
     }, DEBOUNCE_MS);

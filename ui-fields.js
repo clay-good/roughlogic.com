@@ -196,9 +196,10 @@ function makeNoteLine(parent, label, valueId) {
 
 // Hand-written renderers have no field list: one line after their compute
 // call creates the panel on first use, reading the inputs from the page.
-// `keys` are the compute's argument names, left out of the worked values.
-export function stepsFor(out, inp, keys, r) {
-  (out._steps || (out._steps = makeStepsPanel(out, inp))).update(keys, null, r);
+// `keys` are the compute's argument names, left out of the worked values --
+// or, from a declarative factory, its field list, with `params` alongside.
+export function stepsFor(out, inp, keys, r, params) {
+  (out._steps || (out._steps = makeStepsPanel(out, inp))).update(keys, params || null, r);
 }
 
 // "Show the steps" (spec-v1964): a collapsed panel under the answer. Only the

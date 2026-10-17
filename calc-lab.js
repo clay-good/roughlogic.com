@@ -767,7 +767,7 @@ function renderSerialDilution(inputRegion, outputRegion, citationEl) {
     const r = computeSerialDilution({
       starting_concentration: Number(sc.input.value), dilution_factor: Number(df.input.value),
       volume_per_tube: Number(vp.input.value), number_of_steps: Number(ns.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["starting_concentration", "dilution_factor", "volume_per_tube", "number_of_steps"], r);
     while (tableWrap.firstChild) tableWrap.removeChild(tableWrap.firstChild);
     if (r.error) { tv.textContent = r.error; dv.textContent = ""; return; }
     tv.textContent = fmt(r.transfer_volume, 6) + " L";
@@ -1229,7 +1229,7 @@ function _v23SimpleRenderer(spec) {
     const update = debounce(() => {
       const params = {};
       for (const f of spec.fields) params[f.key] = f.kind === "select" ? fields[f.key].select.value : (Number(fields[f.key].input.value) || 0);
-      const r = spec.compute(params);
+      const r = spec.compute(params); stepsFor(outputRegion, inputRegion, spec.fields, r, params);
       if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }
       for (const o of spec.outputs) outs[o.key].textContent = o.value(r);
     }, DEBOUNCE_MS);

@@ -416,7 +416,7 @@ function _r(spec) {
         if (f.kind === "select") params[f.key] = fields[f.key].select.value;
         else params[f.key] = Number(fields[f.key].input.value) || 0;
       }
-      const r = spec.compute(params);
+      const r = spec.compute(params); stepsFor(outputRegion, inputRegion, spec.fields, r, params);
       if (r.error) {
         for (const k of Object.keys(outs)) outs[k].textContent = "-";
         outs[spec.outputs[0].key].textContent = r.error;
@@ -1799,7 +1799,7 @@ function _v23SimpleRenderer(spec) {
     const update = debounce(() => {
       const params = {};
       for (const f of spec.fields) params[f.key] = f.kind === "select" ? fields[f.key].select.value : (Number(fields[f.key].input.value) || 0);
-      const r = spec.compute(params);
+      const r = spec.compute(params); stepsFor(outputRegion, inputRegion, spec.fields, r, params);
       if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }
       for (const o of spec.outputs) outs[o.key].textContent = o.value(r);
     }, DEBOUNCE_MS);

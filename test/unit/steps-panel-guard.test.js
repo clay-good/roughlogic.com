@@ -154,3 +154,25 @@ test("hand-written renderers: inputs are read from the page, and argument names 
   assert.ok(text.includes("Total (ft)") && text.includes("3,600"), text);
   assert.ok(!text.includes("Circuits"), "an argument name is an input echo, not a worked value");
 });
+
+// The other declarative factories (_r, _rEnv, _rPool, _v23SimpleRenderer in 16
+// modules, about 145 tiles) call `spec.compute(params)` like _simpleRenderer
+// does and feed the panel through stepsFor with their field list. A factory
+// that stops doing so drops every tile it builds.
+test("every declarative factory that calls spec.compute feeds the steps panel", () => {
+  const close = (s, i) => { let d = 0; for (let k = i; k < s.length; k++) { if (s[k] === "{") d++; else if (s[k] === "}" && --d === 0) return k; } return -1; };
+  const missing = [];
+  let fed = 0;
+  for (const f of readdirSync(ROOT).filter((n) => /^calc-.*\.js$/.test(n))) {
+    const src = readFileSync(resolve(ROOT, f), "utf8");
+    for (const m of src.matchAll(/function (\w+)\(spec[^)]*\)\s*\{/g)) {
+      const b = m.index + m[0].length - 1;
+      const body = src.slice(b, close(src, b));
+      if (!body.includes("spec.compute(")) continue;
+      if (/_steps\.update\(spec\.fields, params, \w+\)|stepsFor\(outputRegion, inputRegion, spec\.fields, \w+, params\)/.test(body)) fed++;
+      else missing.push(`${f} ${m[1]}`);
+    }
+  }
+  assert.ok(fed >= 90, `only ${fed} factories feed the panel`);
+  assert.deepEqual(missing, [], "a declarative factory calls spec.compute but does not feed the steps panel");
+});
