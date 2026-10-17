@@ -171642,6 +171642,44 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "riser-feeding-distance",
+  "source_publisher": "Ou, Carlson, Hardin and Beckermann (Metallurgical and Materials Transactions B)",
+  "source_title": "Development of New Feeding-Distance Rules Using Casting Simulation: Part II. The New Rules",
+  "source_edition_or_year": "2002, vol. 33B, pp. 741-755 (beckermann.lab.uiowa.edu, FeedingPart2.pdf)",
+  "source_section_or_page": "Appendix Eqs. [A1], [A2], [A4], base case (AISI 1025, furan, 60 C superheat), recomputed at W/T = 4: RZL/T = 2.803e-4(256) - 2.874e-3(64) - 0.0355(16) + 0.5726(4) + 1.094 = 2.7042208; EZL/T = -1.269e-3(256) + 0.02856(64) - 0.276(16) + 1.446(4) + 0.852 = 3.722976; LFD/T = -8.587e-5(256) + 3.408e-3(64) - 0.0533(16) + 0.6967(4) + 1.019 = 3.149129. A 2 in section: 5.4084, 7.4460 and 6.2983 in.",
+  "verified_by": "rl",
+  "verified_on": "2026-10-17",
+  "inputs": {
+   "section_thickness_in": 2,
+   "section_width_in": 8,
+   "feeding_length_in": 0,
+   "sand_mold": "furan",
+   "cooling": "end_effect",
+   "alloy": "aisi_1025",
+   "superheat_f": 108
+  },
+  "outputs": {
+   "rzl_in": {
+    "value": 5.4084416,
+    "tolerance": {
+     "pct": 0.01
+    }
+   },
+   "ezl_in": {
+    "value": 7.445952,
+    "tolerance": {
+     "pct": 0.01
+    }
+   },
+   "lateral_fd_in": {
+    "value": 6.298258,
+    "tolerance": {
+     "pct": 0.01
+    }
+   }
+  }
  }
  ]
 }

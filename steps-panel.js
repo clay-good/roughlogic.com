@@ -27,7 +27,11 @@ export function stepRows(fields, params, r, humanize) {
     inputKeys.add(f.key);
     const v = params ? params[f.key] : undefined;
     if (v === undefined || v === null || v === "") continue;
-    const shown = typeof v === "number" ? (Number.isFinite(v) ? stepNum(v) : null) : String(v);
+    // A select's value is a code ("chlorine_gas", "B"); the reader chose the
+    // option's text ("Chlorine gas (Cl2)", "Type B"), so print that.
+    const opt = Array.isArray(f.options) ? f.options.find((o) => o && String(o.value) === String(v)) : null;
+    const shown = opt && opt.label != null ? String(opt.label)
+      : typeof v === "number" ? (Number.isFinite(v) ? stepNum(v) : null) : String(v);
     if (shown !== null) rows.push({ section: "in", label: String(f.label), value: shown });
   }
   for (const [k, v] of Object.entries(r)) {

@@ -61934,6 +61934,11 @@ test("bounds: spec-v1963 riser-feeding-distance lateral (Eq. A4) and riser/end z
   assert.ok(Math.abs(z7.rzl_in / 2 - 3.05) < 0.002 && Math.abs(z7.ezl_in / 2 - 4.2) < 0.002);
   const z9 = _rfd({ ...base, section_width_in: 18 });
   assert.ok(Math.abs(z9.rzl_in - 6.1) < 1e-9 && Math.abs(z9.ezl_in - 8.4) < 1e-9);
+  // Part II p. 754: the multipliers are only approximate for lateral feeding past W/T 7 -- said, not hidden.
+  assert.equal(r.lateral_multipliers_approx, false, "W/T 4 is inside the accurate range");
+  assert.equal(z9.lateral_multipliers_approx, true, "W/T 9 with non-base multipliers is approximate");
+  assert.equal(_rfd({ ...base, section_width_in: 18, sand_mold: "furan", alloy: "aisi_1025", superheat_f: 108 }).lateral_multipliers_approx, false, "the base case needs no multiplier");
+  assert.equal(_rfd({ ...base, section_width_in: 40 }).lateral_multipliers_approx, false, "no lateral figure past W/T 15, so nothing to qualify");
 });
 test("bounds: spec-v1963 riser-feeding-distance review fixes (drag chill, spacing wording, range note, input seams)", () => {
   const base = { section_thickness_in: 2, section_width_in: 8, feeding_length_in: 12, sand_mold: "furan", cooling: "end_effect", alloy: "aisi_1025", superheat_f: 108 };

@@ -46,6 +46,13 @@ test("the steps panel never prints undefined, NaN, Infinity or a bare null", asy
     const inRows = out.filter((x) => x.section === "in");
     const labels = new Set(fields.map((f) => String(f.label)));
     for (const x of inRows) if (!labels.has(x.label)) bad.push(`${id}: input row "${x.label}" is not one of the tile's fields`);
+    // A select prints the option the reader chose, never its internal code.
+    for (const f of fields) {
+      const opt = Array.isArray(f.options) && f.options.find((o) => String(o.value) === String(params[f.key]));
+      if (!opt || opt.label == null) continue;
+      const shown = inRows.find((x) => x.label === String(f.label));
+      if (shown && shown.value !== String(opt.label)) bad.push(`${id}: select "${f.label}" printed "${shown.value}", not its option "${opt.label}"`);
+    }
   }
   assert.ok(tiles > 900, `the guard reached only ${tiles} tiles; did the renderer map or schemas move?`);
   assert.ok(checked > tiles, "each tile's worked examples should run through the panel");
@@ -60,6 +67,10 @@ test("an error result shows no steps, and only finite numbers become worked valu
     ["in", "Length (ft)", "3"],
     ["out", humanizeKey("area_ft2"), "9"],
   ], "input echo, booleans, text, NaN, Infinity and an uncaptionable key are all left out");
+  const sel = [{ key: "soil", label: "Soil class", options: [{ value: "B", label: "Type B" }, { value: "C", label: "Type C" }] }, { key: "n", label: "Count", options: [{ value: 2, label: "Two" }] }];
+  assert.deepEqual(stepRows(sel, { soil: "C", n: "2" }, { depth_ft: 5 }, humanizeKey).filter((x) => x.section === "in").map((x) => x.value), ["Type C", "Two"],
+    "a select prints the chosen option's text, matching a numeric value given as a string");
+  assert.equal(stepRows(sel, { soil: "Z" }, { depth_ft: 5 }, humanizeKey)[0].value, "Z", "a value no option matches is printed as given");
   assert.equal(stepNum(0.010416), "0.0104");
   assert.equal(stepNum(26180.44), "26,180.4");
   assert.equal(stepNum(12.5), "12.5");

@@ -945,6 +945,9 @@ export function computeRiserFeedingDistance({
   const drag = String(cooling).toLowerCase() === "drag_chill";
   const lfd_over_t_base = -8.587e-5 * x ** 4 + 3.408e-3 * x ** 3 - 0.0533 * x ** 2 + 0.6967 * x + 1.019;
   const lateral_fd_in = !drag && w_over_t <= 15 * (1 + 1e-9) ? lfd_over_t_base * c_superheat * c_alloy * c_sand * T : null;
+  // Part II p. 754: the Table I multipliers carry over to lateral feeding "only accurate up to about
+  // W/T = 7. Beyond this point, they are only approximate."
+  const lateral_multipliers_approx = lateral_fd_in !== null && w_over_t > 7 * (1 + 1e-9) && Math.abs(c_superheat * c_alloy * c_sand - 1) > 1e-9;
   const zx = Math.min(x, 7);
   const rzl_in = (x > 7 ? 3.05 : 2.803e-4 * zx ** 4 - 2.874e-3 * zx ** 3 - 0.0355 * zx ** 2 + 0.5726 * zx + 1.094) * T;
   const ezl_in = (x > 7 ? 4.2 : -1.269e-3 * zx ** 4 + 0.02856 * zx ** 3 - 0.276 * zx ** 2 + 1.446 * zx + 0.852) * T;
@@ -960,7 +963,7 @@ export function computeRiserFeedingDistance({
   if (![w_over_t, fd_over_t_base, c_superheat, multiplier_total, fd_over_t, fd_in].every(Number.isFinite)) return { error: "Feeding distance math is not a finite value." };
   return {
     w_over_t, fd_over_t_base, superheat_multiplier: c_superheat, multiplier_total, fd_over_t, fd_in, lateral_fd_in, rzl_in, ezl_in,
-    in_thickness_range, has_check, sound, verdict, drag,
+    lateral_multipliers_approx, in_thickness_range, has_check, sound, verdict, drag,
     note: "End-effect feeding distance of a single top riser on a steel plate or bar, from the Niyama-based rule of Carlson, Ou and Beckermann (SFSA 2003): FD/T = -4.29e-4 (W/T)^4 + 0.0174 (W/T)^3 - 0.266 (W/T)^2 + 1.99 (W/T) + 1.97 to W/T = 15 and 9.0 beyond, for AISI 1025 in furan sand at 108 F (60 C) superheat, then scaled by the Table 2 multipliers for sand, end or drag chill, steel grade and superheat. FD is measured from the riser's EDGE to the furthest point it must feed, so a riser reaches a circle of radius FD plus its own radius; between two top risers the lateral distance follows the authors' 2002 curve (Ou et al., Metall. Mater. Trans. B 33B, Eq. A4, to W/T 15), about half the end-effect one, measured from each riser's edge to the furthest point on the line midway between them -- for a wide section that point is the corner, so the spacing along the axis is shorter than twice it; past W/T 15 it is not given, and a drag chill between them restores 95 pct of the end effect to the chill's edge (the drag-chill choice above). These rules give longer distances than the 1973 Risering Steel Castings ones in most cases (1 to 2 T longer than Pellini's for plates), which is the yield they buy; they assume the riser itself is big enough (the riser-modulus calculator) and a sound radiograph at 2 pct sensitivity is the standard." + range_note,
   };
 }
@@ -992,7 +995,7 @@ PROCESS_RENDERERS["riser-feeding-distance"] = _simpleRenderer({
     { key: "fd", id: "rfd-out-fd", label: "Feeding distance from the riser edge", value: (r) => fmt(r.fd_in, 2) + " in (FD/T " + fmt(r.fd_over_t, 3) + ")" },
     { key: "b", id: "rfd-out-b", label: "Base rule at this W/T", value: (r) => "W/T " + fmt(r.w_over_t, 2) + " gives FD/T " + fmt(r.fd_over_t_base, 3) + " for 1025 in furan at 108 F superheat" },
     { key: "m", id: "rfd-out-m", label: "Combined multiplier", value: (r) => "x" + fmt(r.multiplier_total, 3) + " (superheat x" + fmt(r.superheat_multiplier, 3) + ")" },
-    { key: "l", id: "rfd-out-l", label: "Between two risers (lateral, each side)", value: (r) => r.lateral_fd_in != null ? fmt(r.lateral_fd_in, 2) + " in from each riser's edge to the furthest point on the line midway between them (the corner of a wide section, so the spacing along the axis is less than twice this)" : r.drag ? "with the drag chill between the risers, the feeding distance above runs from each riser's edge to the chill's edge" : "not given past W/T 15; a drag chill between the risers gives the distance above, to the chill's edge" },
+    { key: "l", id: "rfd-out-l", label: "Between two risers (lateral, each side)", value: (r) => r.lateral_fd_in != null ? fmt(r.lateral_fd_in, 2) + " in from each riser's edge to the furthest point on the line midway between them (the corner of a wide section, so the spacing along the axis is less than twice this)" + (r.lateral_multipliers_approx ? "; past W/T 7 the sand, grade and superheat multipliers are only approximate for lateral feeding" : "") : r.drag ? "with the drag chill between the risers, the feeding distance above runs from each riser's edge to the chill's edge" : "not given past W/T 15; a drag chill between the risers gives the distance above, to the chill's edge" },
     { key: "z", id: "rfd-out-z", label: "Riser zone and end zone (base case)", value: (r) => "riser zone " + fmt(r.rzl_in, 2) + " in from the riser edge, end zone " + fmt(r.ezl_in, 2) + " in in from the end -- every point must sit in one or the other (1025, furan, 108 F)" },
     { key: "v", id: "rfd-out-v", label: "Feeding check", value: (r) => r.verdict },
     { key: "n", id: "rfd-out-n", label: "Note", value: (r) => r.note },
