@@ -615,7 +615,7 @@ export const TOOLS = [
   {"id":"recipe-scale","name":"Recipe Scaling","group":"O","trades":["kitchen"],"desc":"Scaled rows preserving units, with a gram weight for every cup measure of a listed ingredient and for any fractional egg (USDA reference weights)."},
   {"id":"yield-ep","name":"Yield Percentage and Edible Portion","group":"O","trades":["kitchen"],"desc":"Yield %, EP weight, and EP cost per lb from AP weight, trim, and cooking loss."},
   {"id":"as-purchased-quantity","name":"As-Purchased Quantity from Edible Portion","group":"O","trades":["kitchen"],"desc":"How much to BUY to end up with a needed amount of usable, edible-portion product.","more":1},
-  {"id":"cooling-curve","name":"Food Safety Cooling Curve","group":"O","trades":["kitchen"],"desc":"Estimated 135->70 F and 70->41 F cooling time with FDA Food Code 2022 pass/fail."},
+  {"id":"cooling-curve","name":"Food Safety Cooling Curve","group":"O","trades":["kitchen"],"desc":"Estimated 135->70 F and 70->41 F cooling time with FDA Food Code 2026 pass/fail."},
   {"id":"plate-cost","name":"Plate Cost and Menu Pricing","group":"O","trades":["kitchen"],"desc":"Plate cost, suggested menu price at target food-cost %, contribution margin, sanity flag."},
   {"id":"pan-conversion","name":"Steam Table and Pan Conversion","group":"O","trades":["kitchen"],"desc":"Pan capacity in qt, count of pans needed, servings per pan, cooling-depth warning."},
   {"id":"sous-vide-pasteurization","name":"Sous-Vide Pasteurization Time","group":"O","trades":["kitchen"],"desc":"Come-up + hold time from thickness, bath temp, and food category (poultry / pork / beef / fish / egg).","more":1},

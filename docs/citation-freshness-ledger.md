@@ -74,7 +74,7 @@ anything.
 | `ashrae-62-1` | ASHRAE 62.1 | 2022 | **2025 (published)** | 2026-09-01 | disclosed-lag |
 | `ashrae-62-2` | ASHRAE 62.2 | 2022 | **2025 (published)** | 2026-09-01 | disclosed-lag |
 | `ashrae-90-1` | ASHRAE 90.1 | 2022 | **2025 (published)** | 2026-09-01 | disclosed-lag |
-| `fda-food-code` | FDA Food Code | 2022 | 2022 | 2026-09-09 | current |
+| `fda-food-code` | FDA Food Code | 2026 | 2026 | 2026-10-17 | current |
 | `wmm` | NOAA World Magnetic Model | WMM2025 | WMM2025 (valid through 2029-12-31) | 2026-09-09 | current |
 | `iupac-atomic-weights` | IUPAC/CIAAW Standard Atomic Weights | 2024 | 2024 | 2026-09-09 | current |
 | `centrifuge-rotors` | Manufacturer centrifuge-rotor radii | current manufacturer catalogs | current manufacturer catalogs | 2026-09-09 | current |
@@ -138,6 +138,17 @@ anything.
   2017. Re-stamped `last_verified: 2026-09-02`. It still warns, correctly -- a
   re-stamp dated before `next_expected` cannot cover it -- and that warning is
   now a reminder to look in December rather than a row nobody had ever checked.
+- **FDA Food Code, 2026-10-17 (rolled 2022 -> 2026):** the warning did its job
+  two months early. fda.gov now says "The 2026 Food Code is the most recent full
+  edition published by FDA" (Summary of Changes dated 2026-09-17). FDA's Summary
+  of Changes was read against every provision the eight retail-food tiles cite
+  (3-401.11, 3-501.13, 3-501.14, 3-501.16, 3-501.19, 4-501.112, 4-501.114,
+  4-703.11): none moved a figure a tile uses. The one new number, a 75 F minimum
+  in 4-501.114(E), applies to sanitizers other than chlorine, iodine and quat,
+  which `kitchen-sanitizer-ppm` does not compute. So the roll is a citation-text
+  edit on `cooling-curve`, the only tile that named the year. The Summary is
+  FDA's own record but, in its words, not "an absolute comparison"; the figures
+  were not re-read from the 2026 PDF. Next due 2030-09.
 - **ICC I-codes, 2026-09-02 (no re-stamp, deliberately):** the six rows carry
   ICC's anticipated dates and the IBC / IFC are due within the month. The
   2026-09-02 pass re-confirmed the *schedule* (IBC / IFC September 2026, IECC

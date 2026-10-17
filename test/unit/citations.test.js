@@ -300,8 +300,8 @@ test("Group O citations all carry the food-service governance variant", () => {
   }
 });
 
-test("Group O cooling-curve cites FDA Food Code 2022 by section", () => {
-  assert.match(CITATIONS["cooling-curve"].edition, /FDA Food Code 2022.*3-501\.14/);
+test("Group O cooling-curve cites FDA Food Code 2026 by section", () => {
+  assert.match(CITATIONS["cooling-curve"].edition, /FDA Food Code 2026.*3-501\.14/);
 });
 
 test("Group O recipe-scale and yield-ep cite USDA FoodData Central by name", () => {

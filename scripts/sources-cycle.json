@@ -1,6 +1,6 @@
 {
   "_comment": "v10 Phase A.1 source-cycle table. One row per cited standard listing the publishing body, the current edition, the cycle in years, the next-expected release date (best estimate), and a free-access URL. Used by scripts/check-citation-freshness.mjs to flag manifests whose 'edition' string is more than one cycle behind the current publication of that standard. spec-v22 CF-03: when 'next_expected' is in the past, the row must carry a 'last_verified' (ISO date >= next_expected) re-stamp -- the 'verified, not yet released' acknowledgement -- or the freshness gate fails. Update on each rollover (see docs/citation-freshness-ledger.md). Since 2026-09-02 the file also carries `annual_figures`: the bundled federal dollar figures that reprice every year on a known calendar (IRS mileage, Section 179, the SSA wage base, FHFA and HUD loan limits, GSA per-diem, HUD FMRs, Pub 15-T). Five of them were found stale on one day; nothing had ever asked when their publisher last spoke.",
-  "_updated": "2026-10-14",
+  "_updated": "2026-10-17",
   "standards": [
     {
       "id": "nec",
@@ -146,19 +146,19 @@
     {
       "id": "fda-food-code",
       "name": "FDA Food Code",
-      "current_edition": "2022",
-      "current_release": "2022-12",
+      "current_edition": "2026",
+      "current_release": "2026-09",
       "cycle_years": 4,
-      "next_expected": "2026-12",
+      "next_expected": "2030-09",
       "free_access_url": "https://www.fda.gov/food/retail-food-protection/fda-food-code",
       "match_terms": [
         "FDA Food Code",
         "Food Code"
       ],
-      "last_verified": "2026-09-09",
-      "verification_note": "Re-verified 2026-09-09 at fda.gov/food/retail-food-protection/fda-food-code, which states verbatim that \"The 2022 Food Code is the most recent full edition published by FDA\" and whose Food Code by Year list ends at 2022. CORRECTION TO THE EARLIER NOTE: it said FDA \"has said a 2026 edition is coming later this year\". The page says no such thing. What it states is the POLICY -- that FDA moved to a four-year interval between complete editions with the support of the Conference for Food Protection -- from which a 2026 edition is an INFERENCE, not an announcement. The page also notes FDA may publish a Food Code Supplement between full editions; none is listed for the 2022 edition. This row had carried no last_verified at all before 2026-09-02, so the gate could only ever have failed on it. Recheck the same page when next_expected 2026-12 passes: either a 2026 edition has published, in which case advance the row, or it has not, in which case re-stamp on or after that date.",
+      "last_verified": "2026-10-17",
+      "verification_note": "Advanced 2026-10-17: fda.gov/food/retail-food-protection/fda-food-code now states verbatim that \"The 2026 Food Code is the most recent full edition published by FDA\", and its Food Code by Year list opens with Food Code 2026 (page content current as of 2026-09-30; the Summary of Changes page is dated 2026-09-17). FDA's Summary of Changes in the 2026 Food Code (fda.gov/food/fda-food-code/summary-changes-2026-fda-food-code) was read section by section against every provision the eight retail-food tiles cite: 3-401.11 (cooking and roast holding times), 3-501.13 (thawing; risk designation only), 3-501.14 (cooling), 3-501.16 (cold holding), 3-501.19 (time as a public health control; Annex references only), 4-501.112 (hot-water sanitizing), 4-501.114 (chlorine, iodine and quat concentrations; the change adds a 75 F minimum for OTHER chemical sanitizers, which no tile computes) and 4-703.11 (contact times) carry no change to a figure any tile uses. So this roll is a citation-text edit only (cooling-curve, the one tile that named the year); no value moved. FDA itself cautions that the Summary \"should not be relied upon as an absolute comparison\"; the figures were checked against the Summary, not re-read from the 2026 PDF, so a tile-by-tile reading of the PDF is the stronger check if one is ever wanted. Next full edition on the four-year interval: 2030. A Food Code Supplement may appear between editions; recheck this page when next_expected passes.",
       "citation_only": true,
-      "citation_only_reason": "No bundled shard holds Food Code data: the retail-food tiles cite it by section for holding temperatures and cooling times and compute from the cited figures inline. There is no manifest for it to appear in, so CF-06 exempts it. The citation text names Food Code 2022, which is the current edition, so nothing is behind today; the ask when a 2026 edition publishes is a citation-text edit, not a data refresh."
+      "citation_only_reason": "No bundled shard holds Food Code data: the retail-food tiles cite it by section for holding temperatures and cooling times and compute from the cited figures inline. There is no manifest for it to appear in, so CF-06 exempts it. The citation text names Food Code 2026, the current edition (rolled from 2022 on 2026-10-17 as a citation-text edit; no figure changed)."
     },
     {
       "id": "wmm",

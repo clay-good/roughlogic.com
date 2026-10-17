@@ -107,7 +107,7 @@ published and is the AHJ-relevant edition for at least one US state:
 
 ### FDA Food Code
 
-- Cycle: 4 years. Current 2022; next due 2026.
+- Cycle: 4 years. Current 2026 (published September 2026, rolled 2026-10-17 as a citation-text edit: FDA's Summary of Changes moved no figure a tile uses); next due 2030.
 - Free-access portal: fda.gov/food/retail-food-protection/fda-food-code.
 - Tiles affected: kitchen / food-service group (Group O).
 

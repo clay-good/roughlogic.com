@@ -417,7 +417,7 @@ const renderYieldEP = _r({
 });
 
 const renderCoolingCurve = _r({
-  citation: "Notice: This is a planning aid. The thermometer on the food governs. Citation: per FDA Food Code 2022 §3-501.14(A) (135 F to 70 F within 2 hr, and 135 F to 41 F within a total of 6 hr). Local health code adopts and may modify. Free at fda.gov/food/retail-food-protection/fda-food-code.",
+  citation: "Notice: This is a planning aid. The thermometer on the food governs. Citation: per FDA Food Code 2026 §3-501.14(A), unchanged from 2022 (135 F to 70 F within 2 hr, and 135 F to 41 F within a total of 6 hr). Local health code adopts and may modify. Free at fda.gov/food/retail-food-protection/fda-food-code.",
   example: coolingCurveExample.inputs,
   fields: [
     { key: "start_F",      label: "Starting temp (F; confirms food is hot; cooling time shown is the FDA 135-to-70-to-41 window, not measured from this temp)", kind: "number", default: 165, required: true },
@@ -1072,7 +1072,7 @@ KITCHEN_RENDERERS["menu-engineering"] = renderMenuEngineering;
 
 // --- spec-v538 O: 3-compartment sink sanitizer dilution (`kitchen-sanitizer-ppm`) ---
 // oz_per_gal = 128 x target_ppm / (active_pct x 10000). FDA Food Code 4-501.114 bands.
-// Contact times are FDA Food Code 2022 4-703.11(C). Until 2026-09-24 chlorine
+// Contact times are FDA Food Code 4-703.11(C) (2022; unchanged in 2026). Until 2026-09-24 chlorine
 // read "at least 7 seconds at 100 ppm"; 7 seconds is (C)(2)'s allowance for a
 // 50 ppm solution in warm water only, and at 100 ppm (C)(1) requires 10.
 const SANITIZER_BANDS = {

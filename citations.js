@@ -5480,7 +5480,7 @@ export const CITATIONS = {
   },
 
   // --- Group O: Kitchen and Food Service (priority 8 per spec §6) ---
-  // Tiles cite FDA Food Code 2022, USDA FoodData Central, NSF/ANSI 2 / 3 / 4
+  // Tiles cite FDA Food Code 2026 (rolled from 2022 on 2026-10-17), USDA FoodData Central, NSF/ANSI 2 / 3 / 4
   // (food equipment / pots and pans / commercial cooking equipment), and
   // GN (Gastronorm) pan conventions by name. The food-service governance
   // variant from spec §2.5 applies: "The thermometer on the food is the
@@ -5685,14 +5685,14 @@ export const CITATIONS = {
     ],
   },
   "cooling-curve": {
-    formula: "FDA Food Code 2022 §3-501.14: cooked TCS food must cool from 135 °F to 70 °F within 2 hours, and from 135 °F to 41 °F within a total of 6 hours, so the second stage gets whatever time the first left. The pass / fail flags are computed on the estimated stage times.",
-    edition: "FDA Food Code 2022 §3-501.14.",
+    formula: "FDA Food Code 2026 §3-501.14 (unchanged from the 2022 edition): cooked TCS food must cool from 135 °F to 70 °F within 2 hours, and from 135 °F to 41 °F within a total of 6 hours, so the second stage gets whatever time the first left. The pass / fail flags are computed on the estimated stage times.",
+    edition: "FDA Food Code 2026 §3-501.14 (the 2022 edition's rule, unchanged).",
     freeAccess: "Free at fda.gov (Food, Retail Food Protection, FDA Food Code).",
     governance: GOVERNANCE.food,
-    editionNote: "Editions available: FDA Food Code 2022 is the current published edition. State and local health departments adopt on their own cycle (some still on the 2017 edition); verify the edition adopted by your AHJ.",
+    editionNote: "Editions available: FDA Food Code 2026, published September 2026, is the current edition. FDA's Summary of Changes lists no change to the cooling times in §3-501.14, so a kitchen still under the 2022 or 2017 edition gets the same two-stage limits. The 2026 edition does add a cooling method to §3-501.15 and lets the regulatory authority approve an alternative cooling method. State and local health departments adopt on their own cycle; verify the edition adopted by your AHJ.",
     assumptions: [
-      { name: "TCS food", value: "true (Time/Temperature Control for Safety; non-TCS foods are not subject to §3-501.14)", source: "FDA Food Code 2022 §1-201.10" },
-      { name: "Container / depth / ambient", value: "user-supplied; deeper than 4 in or non-shallow pans materially extend cooling time", source: "FDA Food Code 2022 Annex 3" },
+      { name: "TCS food", value: "true (Time/Temperature Control for Safety; non-TCS foods are not subject to §3-501.14)", source: "FDA Food Code 2026 §1-201.10 (definition unchanged from 2022)" },
+      { name: "Container / depth / ambient", value: "user-supplied; deeper than 4 in or non-shallow pans materially extend cooling time", source: "FDA Food Code 2026 Annex 3" },
     ],
   },
   "plate-cost": {
