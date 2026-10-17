@@ -141,7 +141,7 @@ export function ifgcLowPressureFlow({ d_in, dP_in_wc, cr, L_ft }) {
   return Math.pow(19.17 * d_in * Math.pow(dP_in_wc / (cr * L_ft), 0.206), 1 / 0.381);
 }
 
-// dims: in { btu_load: M L^2 T^-3, length_ft: L, gas: dimensionless, dP_in_wc: M L^-1 T^-2, candidate_sizes: dimensionless } out: { recommended_size_in: L, candidates: dimensionless }
+// dims: in { btu_load: M L^2 T^-3, length_ft: L, gas: dimensionless, dP_in_wc: M L^-1 T^-2, candidate_sizes: dimensionless } out: { required_cfh: L^3 T^-1, capacity_cfh: L^3 T^-1 }
 export function computeGasPipeSizing({ btu_load, length_ft, gas, dP_in_wc = 0.5, candidate_sizes = ["0.5", "0.75", "1", "1.25", "1.5", "2"] }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(Number(btu_load) > 0)) return { error: "Connected load must be positive (BTU/h)." };
@@ -219,7 +219,7 @@ GAS_RENDERERS["gas-pipe-sizing"] = renderGasPipeSizing;
 
 // Orifice-equation constant for cfh from in^2 and psi: 25 sqrt(2 x 144 x 32.174 / 0.0764) = 8706.
 const _ORIFICE_CFH_K = 25 * Math.sqrt(2 * 144 * 32.174 / 0.0764);
-// dims: in { orifice_diameter_in: L, upstream_psi: M L^-1 T^-2, gas: dimensionless, c: dimensionless } out: { leak_rate_scfh: L^3 T^-1 }
+// dims: in { orifice_diameter_in: L, upstream_psi: M L^-1 T^-2, gas: dimensionless, c: dimensionless } out: { leak_rate_cfh: L^3 T^-1, orifice_area_in2: L^2, discharge_coefficient: dimensionless, specific_gravity: dimensionless }
 export function computeGasLeakRate({ orifice_diameter_in, upstream_psi, gas, c = 0.7 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // The coefficient was never checked: 0 or blank answered "no leak" for a real hole.

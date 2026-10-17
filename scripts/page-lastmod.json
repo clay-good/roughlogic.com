@@ -302,7 +302,7 @@
       "date": "2026-10-17"
     },
     "/tools/annular-velocity-cleaning/": {
-      "sha": "401a3662a2f975fc",
+      "sha": "7f1f3e2c3f76893f",
       "date": "2026-10-17"
     },
     "/tools/annulus-area/": {
@@ -1022,7 +1022,7 @@
       "date": "2026-10-17"
     },
     "/tools/casing-cement-volume/": {
-      "sha": "6c3800258f73034f",
+      "sha": "7b33818400d6d7be",
       "date": "2026-10-17"
     },
     "/tools/casting-pour-yield/": {
@@ -3722,7 +3722,7 @@
       "date": "2026-10-17"
     },
     "/tools/hdd-fluid-volume/": {
-      "sha": "5f94968cfd653e2d",
+      "sha": "b67efe0d8477409d",
       "date": "2026-10-17"
     },
     "/tools/hdd-pullback/": {
@@ -4174,7 +4174,7 @@
       "date": "2026-10-17"
     },
     "/tools/kick-tolerance/": {
-      "sha": "295735f079daa0e2",
+      "sha": "1f14dc58b294ede2",
       "date": "2026-10-17"
     },
     "/tools/kill-mud-weight/": {
@@ -5370,7 +5370,7 @@
       "date": "2026-10-17"
     },
     "/tools/phosphate-coating-weight/": {
-      "sha": "134c935ec80f63d4",
+      "sha": "18d4eae356475b7c",
       "date": "2026-10-17"
     },
     "/tools/photoperiod-blackout-schedule/": {
@@ -5390,7 +5390,7 @@
       "date": "2026-10-17"
     },
     "/tools/pig-batch-volume/": {
-      "sha": "9dd3ccd328d682ad",
+      "sha": "bdb44e7c2e27d9fb",
       "date": "2026-10-17"
     },
     "/tools/pile-axial-capacity/": {
@@ -5554,7 +5554,7 @@
       "date": "2026-10-17"
     },
     "/tools/plating-tank-current/": {
-      "sha": "4d3a2dd72e196887",
+      "sha": "b02b075d762c15b7",
       "date": "2026-10-17"
     },
     "/tools/plenum-return-drop/": {
@@ -6878,7 +6878,7 @@
       "date": "2026-10-17"
     },
     "/tools/separator-retention-sizing/": {
-      "sha": "6082206f4b3e69e3",
+      "sha": "56d9b98c939b17c5",
       "date": "2026-10-17"
     },
     "/tools/septic-dose-tank/": {
@@ -8798,7 +8798,7 @@
       "date": "2026-10-17"
     },
     "/tools/water-quality-volume/": {
-      "sha": "e414e8665a062b65",
+      "sha": "2996eb6b98ffa6fd",
       "date": "2026-10-17"
     },
     "/tools/water-service-pressure-check/": {
@@ -8822,7 +8822,7 @@
       "date": "2026-10-17"
     },
     "/tools/weibull-capacity-factor/": {
-      "sha": "7ed6d796da06ebea",
+      "sha": "1cbab61f9541604d",
       "date": "2026-10-17"
     },
     "/tools/weir-flow/": {
@@ -8910,7 +8910,7 @@
       "date": "2026-10-17"
     },
     "/tools/well-decline-reserves/": {
-      "sha": "ec72fe3319ef7db7",
+      "sha": "0e8b3684938c370d",
       "date": "2026-10-17"
     },
     "/tools/well-drawdown/": {
@@ -8978,7 +8978,7 @@
       "date": "2026-10-17"
     },
     "/tools/wind-power-density-betz/": {
-      "sha": "c6cc0fd5592cb07a",
+      "sha": "8c2546f4507d5cc1",
       "date": "2026-10-17"
     },
     "/tools/wind-pressure/": {

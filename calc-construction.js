@@ -128,7 +128,7 @@ export const rafterExample = {
 
 // --- Utility 43: Square Footage ---
 
-// dims: in { shape: dimensionless, dims: dimensionless } out: { area: L^2 }
+// dims: in { shape: dimensionless, dims: dimensionless } out: { area_ft2: L^2 }
 export function computeArea({ shape, ...dims }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // Until 2026-09-26 a negative entry here returned a negative quantity with no error.
@@ -147,7 +147,7 @@ export const areaExample = {
 
 // --- Utility 44: Lumber Board Footage ---
 
-// dims: in { thickness_in: L, width_in: L, length_ft: L, count: dimensionless } out: { board_feet: L^3, total_board_feet: L^3 }
+// dims: in { thickness_in: L, width_in: L, length_ft: L, count: dimensionless } out: { total_board_feet: L^3 }
 export function computeBoardFootage({ thickness_in, width_in, length_ft, count = 1 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // Until 2026-09-26 a negative entry here returned a negative quantity with no error.
@@ -166,7 +166,7 @@ export const boardFootageExample = {
 
 // --- Utility 45: Concrete Volume ---
 
-// dims: in { shape: dimensionless, waste_factor: dimensionless, length_ft: L, width_ft: L, thickness_in: L, diameter_in: L, height_ft: L, footing_thickness_in: L, footing_width_ft: L, stem_thickness_in: L, stem_height_ft: L } out: { volume_yd3: L^3, bags_60: dimensionless, bags_80: dimensionless }
+// dims: in { shape: dimensionless, waste_factor: dimensionless, length_ft: L, width_ft: L, thickness_in: L, diameter_in: L, height_ft: L, footing_thickness_in: L, footing_width_ft: L, stem_thickness_in: L, stem_height_ft: L } out: { cubic_feet: L^3, cubic_yards: L^3, cubic_yards_with_waste: L^3, bags_60lb: dimensionless, bags_80lb: dimensionless }
 export function computeConcreteVolume({ shape, waste_factor = 0.10, length_ft, width_ft, thickness_in, diameter_in, height_ft, footing_thickness_in, footing_width_ft, stem_thickness_in, stem_height_ft } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // Named inputs (was a ...rest) so the fixture-key check can see them; same values either way.
@@ -214,7 +214,7 @@ export const concreteExample = {
 
 // --- Utility 46: Rebar Spacing and Quantity ---
 
-// dims: in { length_ft: L, width_ft: L, spacing_in: L, edge_clearance_in: L, bar_size: dimensionless } out: { bars_count: dimensionless, total_length_ft: L }
+// dims: in { length_ft: L, width_ft: L, spacing_in: L, edge_clearance_in: L, bar_size: dimensionless } out: { total_length_ft: L }
 export function computeRebar({ length_ft, width_ft, spacing_in, edge_clearance_in = 3, bar_size = "#4" }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // Blank or tiny dimensions used to return a negative bar length.
@@ -287,7 +287,7 @@ export const LUMBER_NOMINAL_TO_ACTUAL = {
   "2x12": { b_in: 1.5, d_in: 11.25 },
 };
 
-// dims: in { species_grade: dimensionless, nominal_size: dimensionless, total_load_psf: M L^-1 T^-2, tributary_width_in: L, deflection_limit: dimensionless, live_load_psf: M L^-1 T^-2 } out: { max_span_ft: L, governing: dimensionless }
+// dims: in { species_grade: dimensionless, nominal_size: dimensionless, total_load_psf: M L^-1 T^-2, tributary_width_in: L, deflection_limit: dimensionless, live_load_psf: M L^-1 T^-2 } out: { governing: dimensionless, allowable_span_ft: L, by_bending_ft: L, by_deflection_ft: L, F_b_psi: M L^-1 T^-2, E_psi: M L^-1 T^-2, deflection_in: L, allowable_deflection_in: L }
 export function computeLumberSpan({ species_grade, nominal_size, total_load_psf, tributary_width_in = 16, deflection_limit = 360, live_load_psf = 0 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const props = LUMBER_SPECIES_GRADES[species_grade];
@@ -376,7 +376,7 @@ const SCREW_SHANK_DIA_IN = {
   "1/4": 0.250,
 };
 
-// dims: in { fastener_type: dimensionless, fastener_size: dimensionless, species: dimensionless, penetration_in: L } out: { withdrawal_lb: M L T^-2 }
+// dims: in { fastener_type: dimensionless, fastener_size: dimensionless, species: dimensionless, penetration_in: L } out: { specific_gravity: dimensionless, diameter_in: L }
 export function computePullout({ fastener_type, fastener_size, species, penetration_in }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // Until 2026-09-26 a negative entry here returned a negative quantity with no error.
@@ -408,7 +408,7 @@ export const pulloutExample = {
 
 // --- Utility 49: Beam Loading ---
 
-// dims: in { load_type: dimensionless, load_value: dimensionless, length_ft: L, E_psi: M L^-1 T^-2, b_in: L, d_in: L } out: { max_moment: M L^2 T^-2, deflection_in: L, max_stress_psi: M L^-1 T^-2 }
+// dims: in { load_type: dimensionless, load_value: dimensionless, length_ft: L, E_psi: M L^-1 T^-2, b_in: L, d_in: L } out: { M_lbft: M L^2 T^-2, delta_in: L }
 export function computeBeamLoading({ load_type, load_value, length_ft, E_psi, b_in, d_in }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   length_ft = Number(length_ft);
@@ -447,7 +447,7 @@ export const ASSEMBLY_DEFAULTS = {
   siding_lap_8in:  { coverage_ft2_per_unit: 25,  waste: 0.10, unit_label: "carton (25 ft²)" },
 };
 
-// dims: in { assembly: dimensionless, area_ft2: L^2 } out: { units: dimensionless }
+// dims: in { assembly: dimensionless, area_ft2: L^2 } out: { waste_factor: dimensionless }
 export function computeMaterialQuantity({ assembly, area_ft2 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const a = ASSEMBLY_DEFAULTS[assembly];
@@ -881,7 +881,7 @@ export const SOIL_BEARING_PSF = {
   silty_clay: 1500,
 };
 
-// dims: in { column_load_lb: M L T^-2, soil_class: dimensionless, applied_moment_lbft: M L^2 T^-2 } out: { area_ft2: L^2, side_ft: L, q_max_psf: M L^-1 T^-2, q_min_psf: M L^-1 T^-2 }
+// dims: in { column_load_lb: M L T^-2, soil_class: dimensionless, applied_moment_lbft: M L^2 T^-2 } out: { side_ft: L, q_max_psf: M L^-1 T^-2, q_min_psf: M L^-1 T^-2, required_area_ft2: L^2, rounded_side_in: L, rounded_side_ft: L, allowable_psf: M L^-1 T^-2 }
 export function computeFootingArea({ column_load_lb, soil_class, applied_moment_lbft = 0 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const P = Number(column_load_lb) || 0;
@@ -923,7 +923,7 @@ export const footingAreaExample = {
 
 // --- Utility 93: Tile Count and Grout Volume ---
 
-// dims: in { area_ft2: L^2, tile_width_in: L, tile_height_in: L, grout_joint_width_in: L, tile_thickness_in: L, waste_factor: dimensionless } out: { tiles: dimensionless, grout_volume_in3: L^3 }
+// dims: in { area_ft2: L^2, tile_width_in: L, tile_height_in: L, grout_joint_width_in: L, tile_thickness_in: L, waste_factor: dimensionless } out: { grout_volume_in3: L^3, tile_count: dimensionless, base_count: dimensionless, tile_face_in2: L^2 }
 export function computeTileCount({ area_ft2, tile_width_in, tile_height_in, grout_joint_width_in = 0.125, tile_thickness_in = 0.25, waste_factor = 0.10 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(Number(waste_factor) >= 0) || !(Number(grout_joint_width_in) >= 0)) return { error: "Waste factor and grout joint must be numbers, zero or more." };
@@ -955,7 +955,7 @@ export const tileCountExample = {
 
 export const PAINT_COVERAGE_FT2_PER_GAL = { smooth: 350, textured: 250, rough: 175 };
 
-// dims: in { area_ft2: L^2, coats: dimensionless, primer_needed: dimensionless, surface_porosity: dimensionless } out: { gallons: L^3 }
+// dims: in { area_ft2: L^2, coats: dimensionless, primer_needed: dimensionless, surface_porosity: dimensionless } out: { total_paint_gallons: L^3, primer_gallons: L^3 }
 export function computePaintCoverage({ area_ft2, coats = 2, primer_needed = false, surface_porosity = "smooth" }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(Number(coats) >= 1)) return { error: "Coats must be 1 or more." };
@@ -986,7 +986,7 @@ export const paintCoverageExample = {
 // by D / tan(angle) on each side. Total volume includes prism + wedges + the
 // four corner pyramids.
 
-// dims: in { length_ft: L, width_ft: L, depth_ft: L, side_slope_angle_deg: dimensionless } out: { volume_yd3: L^3 }
+// dims: in { length_ft: L, width_ft: L, depth_ft: L, side_slope_angle_deg: dimensionless } out: { volume_ft3: L^3, top_length_ft: L, top_width_ft: L, set_back_ft: L }
 export function computeExcavationVolume({ length_ft, width_ft, depth_ft, side_slope_angle_deg = 90 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (side_slope_angle_deg !== undefined && side_slope_angle_deg !== null && side_slope_angle_deg !== "" && !(Number(side_slope_angle_deg) >= 15 && Number(side_slope_angle_deg) <= 90)) return { error: "Side-slope angle is measured from horizontal and must be between 15 and 90 degrees (90 is a vertical cut)." };
@@ -1033,7 +1033,7 @@ export const MASONRY_UNIT_FACE_IN = {
   cmu_8x16x16: { w: 15.625, h: 15.625 },
 };
 
-// dims: in { wall_area_ft2: L^2, unit_type: dimensionless, mortar_joint_in: L, waste_factor: dimensionless } out: { units: dimensionless, mortar_ft3: L^3 }
+// dims: in { wall_area_ft2: L^2, unit_type: dimensionless, mortar_joint_in: L, waste_factor: dimensionless } out: { unit_count: dimensionless, base_count: dimensionless, face_ft2: L^2 }
 export function computeMasonryCount({ wall_area_ft2, unit_type, mortar_joint_in = 0.375, waste_factor = 0.05 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(Number(mortar_joint_in) >= 0) || !(Number(waste_factor) >= 0)) return { error: "Mortar joint and waste factor must be numbers, zero or more." };
@@ -1066,7 +1066,7 @@ export const WIND_PRESSURE_CP = {
   side: -0.7,
 };
 
-// dims: in { V_mph: L T^-1, exposure: dimensionless, Kz: dimensionless, Kzt: dimensionless, Kd: dimensionless, G: dimensionless } out: { q_psf: M L^-1 T^-2, windward_psf: M L^-1 T^-2, leeward_psf: M L^-1 T^-2, q_design_psf: M L^-1 T^-2 }
+// dims: in { V_mph: L T^-1, exposure: dimensionless, Kz: dimensionless, Kzt: dimensionless, Kd: dimensionless, G: dimensionless } out: { q_psf: M L^-1 T^-2, q_design_psf: M L^-1 T^-2 }
 export function computeWindPressure({ V_mph, exposure = "C", Kz = 0, Kzt = 1.0, Kd = 0.85, G = 0.85 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // An unknown exposure used to be C, which reads 15% low for a D site.
@@ -1660,7 +1660,7 @@ export const AGGREGATE_DENSITIES_PCF = {
   sand: 100, pea_gravel: 110, crushed_stone: 100, road_base: 130,
 };
 
-// dims: in { area_ft2: L^2, depth_in: L, material: dimensionless } out: { volume_yd3: L^3, tons: M }
+// dims: in { area_ft2: L^2, depth_in: L, material: dimensionless } out: { tons: M }
 export function computeAggregate({ area_ft2 = 0, depth_in = 0, material = "crushed_stone" }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(area_ft2 > 0)) return { error: "Area must be positive." };
@@ -1682,7 +1682,7 @@ export const aggregateExample = { inputs: { area_ft2: 1000, depth_in: 4, materia
 
 export const MORTAR_TYPES = ["N", "S", "M"];
 
-// dims: in { unit_count: dimensionless, unit_kind: dimensionless, joint_in: L, mortar_type: dimensionless } out: { bags_70: dimensionless, sand_ft3: L^3 }
+// dims: in { unit_count: dimensionless, unit_kind: dimensionless, joint_in: L, mortar_type: dimensionless } out: { bags: dimensionless, joint_factor: dimensionless }
 export function computeMortarMix({ unit_count = 0, unit_kind = "brick", joint_in = 0.375, mortar_type = "N" }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(Number(joint_in) > 0)) return { error: "Mortar joint thickness must be positive (in); 3/8 in is standard." };
@@ -1717,7 +1717,7 @@ export const ACI_211_W_C = {
   sulfate: { 2500: 0.50, 3000: 0.45, 3500: 0.42, 4000: 0.40, 5000: 0.38, 6000: 0.34 },
 };
 
-// dims: in { strength_psi: M L^-1 T^-2, exposure: dimensionless, max_aggregate_in: L, slump_in: L } out: { wc_ratio: dimensionless, cement_lb_per_yd3: M L^-3 }
+// dims: in { strength_psi: M L^-1 T^-2, exposure: dimensionless, max_aggregate_in: L, slump_in: L } out: { wc_ratio: dimensionless, cement_bags_yd3: L^3 }
 export function computeConcreteMixDesign({ strength_psi = 3000, exposure = "interior", max_aggregate_in = 1, slump_in = 4 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // Above the table the 6,000 psi mix used to be returned under the requested strength's name.
@@ -1796,7 +1796,7 @@ const BOLT_TENSILE_AREA_IN2 = {
   0.5625: 0.1820, 0.625: 0.2260, 0.75: 0.3340, 0.875: 0.4620, 1: 0.6060, 1.25: 0.9690, 1.5: 1.405,
 };
 
-// dims: in { grade: dimensionless, diameter_in: L, lubrication: dimensionless, preload_fraction: dimensionless } out: { torque_ft_lb: M L^2 T^-2, preload_lb: M L T^-2 }
+// dims: in { grade: dimensionless, diameter_in: L, lubrication: dimensionless, preload_fraction: dimensionless } out: { torque_ft_lb: M L^2 T^-2, F_lb: M L T^-2, torque_in_lb: M L^2 T^-2 }
 export function computeBoltTorque({ grade = "SAE_5", diameter_in = 0.5, lubrication = "dry", preload_fraction = 0.75 }) {
   const proof = BOLT_PROOF_LOADS_PSI[grade];
   if (!Number.isFinite(proof)) return { error: "Unknown bolt grade." };
@@ -1879,7 +1879,7 @@ export const SFM_TABLE = {
 // A twist drill has 2 cutting lips and a lathe tool is single-point; an end mill's flute
 // count is a tool property, so 2 is only a starting point there.
 export const TOOL_DEFAULT_FLUTES = { drill: 2, end_mill: 2, lathe: 1 };
-// dims: in { tool: dimensionless, material: dimensionless, diameter_in: L, flutes: dimensionless } out: { rpm: T^-1, feed_ipm: L T^-1 }
+// dims: in { tool: dimensionless, material: dimensionless, diameter_in: L, flutes: dimensionless } out: { rpm: T^-1, sfm: L T^-1 }
 export function computeSpeedsAndFeeds({ tool = "drill", material = "steel", diameter_in = 0, flutes }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const t = SFM_TABLE[tool];
@@ -1905,7 +1905,7 @@ export const WELD_GAS_FLOW_CFH = { SMAW: 0, GMAW: 35, FCAW: 35, GTAW: 20 };
 // near 4.5 to 7.5 lb/HOUR, so the old 4 lb/min default was about 40x high and reported a
 // 1.7 lb weld as 25 seconds of arc time.
 export const WELD_DEPOSITION_RATE_LB_PER_MIN = { SMAW: 0.06, GMAW: 0.12, FCAW: 0.20, GTAW: 0.03 };
-// dims: in { process: dimensionless, weld_cross_section_in2: L^2, weld_length_in: L, deposition_rate_lb_per_min: M T^-1 } out: { electrode_lb: M, arc_time_min: T }
+// dims: in { process: dimensionless, weld_cross_section_in2: L^2, weld_length_in: L, deposition_rate_lb_per_min: M T^-1 } out: { deposit_lb: M, gas_ft3: L^3, efficiency: dimensionless }
 export function computeWeldUsage({ process = "GMAW", weld_cross_section_in2 = 0, weld_length_in = 0, deposition_rate_lb_per_min }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const eff = WELD_DEPOSITION_EFFICIENCY[process];
@@ -1934,7 +1934,7 @@ export const weldUsageExample = { inputs: { process: "GMAW", weld_cross_section_
 export const DEMO_DEBRIS_PCF = { wood_frame: 18, mixed: 60, masonry: 110, concrete: 85 };
 export const DUMPSTER_SIZES_YD3 = [10, 20, 30, 40];
 
-// dims: in { structure_type: dimensionless, volume_yd3: L^3 } out: { debris_yd3: L^3, containers: dimensionless }
+// dims: in { structure_type: dimensionless, volume_yd3: L^3 } out: { volume_ft3: L^3, dumpster_yd3: L^3, dumpster_count: dimensionless }
 export function computeDemoDebris({ structure_type = "wood_frame", volume_yd3 = 0 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (volume_yd3 > 40) {
@@ -2423,7 +2423,7 @@ import {
 
 // --- 246: Stair Stringer Layout (code-check pass/fail) ---
 
-// dims: in { total_rise_in: L, target_rise_in: L, target_tread_in: L, nosing_in: L, stringer_thickness_in: L, code_max_rise_in: L, code_min_tread_in: L } out: { stringer_in: L, board_feet: L^3 }
+// dims: in { total_rise_in: L, target_rise_in: L, target_tread_in: L, nosing_in: L, stringer_thickness_in: L, code_max_rise_in: L, code_min_tread_in: L } out: { riser_count: dimensionless, exact_rise_in: L, tread_depth_in: L, tread_count: dimensionless, tread_board_depth_in: L, total_run_in: L, stringer_length_in: L, angle_deg: dimensionless, throat_in: L }
 export function computeStairStringerV7({
   total_rise_in = 0, target_rise_in = 7.0, target_tread_in = 11.0,
   nosing_in = 1, stringer_thickness_in = 11.25,
@@ -2465,7 +2465,7 @@ export const stairStringerExampleV7 = {
 
 // --- 247: Hip, Valley, and Jack Rafter Schedule ---
 
-// dims: in { run_ft: L, pitch: dimensionless, pitch_irregular: dimensionless, overhang_in: L, jack_oc_in: L } out: { hip_length_ft: L, valley_length_ft: L }
+// dims: in { run_ft: L, pitch: dimensionless, pitch_irregular: dimensionless, overhang_in: L, jack_oc_in: L } out: { hip_length_ft: L, common_length_ft: L, common_with_overhang_ft: L }
 export function computeHipValleyRafter({
   run_ft = 0, pitch = 6, pitch_irregular = 0,
   overhang_in = 12, jack_oc_in = 16,
@@ -2538,7 +2538,7 @@ const REBAR_BEND_ALLOWANCE_DIAMETERS = {
   bend_90: 6, bend_135: 6, bend_180: 4, stirrup: 14, hook: 6,
 };
 
-// dims: in { rows: dimensionless } out: { total_weight_lb: M, total_length_ft: L }
+// dims: in { rows: dimensionless } out: { total_weight_lb: M }
 export function computeRebarSchedule({ rows = [] } = {}) {
   if (!Array.isArray(rows) || rows.length === 0) return { error: "Provide at least one bar row." };
   const summary = {};
@@ -2590,7 +2590,7 @@ export const APA_SPAN_RATINGS = {
   "48/24": { roof: { spacing_in: 48, no_edge_span_in: 36, live_psf: 30, total_psf: 40, live_by_spacing: { 20: 270, 24: 175, 32: 95, 40: 45, 48: 30 } }, floor: { spacing_in: 24, total_psf: 100 } },
 };
 
-// dims: in { span_rating: dimensionless, panel_thickness_in: L, application: dimensionless, support_spacing_in: L, live_load_psf: M L^-1 T^-2, dead_load_psf: M L^-1 T^-2, edge_support: dimensionless } out: { max_span_in: L, deflection_in: L }
+// dims: in { span_rating: dimensionless, panel_thickness_in: L, application: dimensionless, support_spacing_in: L, live_load_psf: M L^-1 T^-2, dead_load_psf: M L^-1 T^-2, edge_support: dimensionless } out: { max_span_in: L, allowable_spacing_in: L }
 export function computePlywoodSpan({
   span_rating = "24/16", panel_thickness_in = 0,
   application = "roof", support_spacing_in = 0,
@@ -2647,7 +2647,7 @@ export const HELICAL_PILE_KT = {
   "3.5_inch_pipe":   { Kt: 7,  description: "3.5 inch round pipe shaft" },
 };
 
-// dims: in { shaft: dimensionless, torque_ft_lb: M L^2 T^-2, factor_of_safety: dimensionless } out: { capacity_lb: M L T^-2 }
+// dims: in { shaft: dimensionless, torque_ft_lb: M L^2 T^-2, factor_of_safety: dimensionless } out: { Kt: L^-1, ultimate_lb: M L T^-2, allowable_lb: M L T^-2 }
 export function computeHelicalPile({ shaft = "1.5_inch_solid", torque_ft_lb = 0, factor_of_safety = 2.0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const e = HELICAL_PILE_KT[shaft];
@@ -2688,7 +2688,7 @@ export const helicalPileTorqueExample = { inputs: { shaft: "1.5_inch_solid", tar
 
 // --- 251: Crane Lift Plan Quick-Math ---
 
-// dims: in { load_lb: M L T^-2, rigging_lb: M L T^-2, block_lb: M L T^-2, jib_deduct_lb: M L T^-2, sling_legs: dimensionless, sling_angle_deg: dimensionless, chart_capacity_lb: M L T^-2 } out: { radius_ft: L, capacity_lb: M L T^-2, utilization: dimensionless }
+// dims: in { load_lb: M L T^-2, rigging_lb: M L T^-2, block_lb: M L T^-2, jib_deduct_lb: M L T^-2, sling_legs: dimensionless, sling_angle_deg: dimensionless, chart_capacity_lb: M L T^-2 } out: { gross_load_lb: M L T^-2, per_leg_lb: M L T^-2, chart_capacity_lb: M L T^-2, percent_of_chart: dimensionless }
 export function computeCraneLiftCheck({
   load_lb = 0, rigging_lb = 0, block_lb = 0, jib_deduct_lb = 0,
   sling_legs = 1, sling_angle_deg = 90, chart_capacity_lb = 0,
@@ -2972,7 +2972,7 @@ CONSTRUCTION_RENDERERS["crane-lift-quick"] = _v7c_renderCraneLiftCheck;
 // + sole). 2x lumber section is 1.5 in × 3.5 in (S4S 2x4) or 1.5 × 5.5
 // (2x6); board feet uses nominal × actual length.
 
-// dims: in { footprint_ft2: L^2, perimeter_ft: L, wall_height_ft: L, stud_oc_in: L, joist_span_ft: L, joist_oc_in: L, rafter_oc_in: L, building_run_ft: L, pitch: dimensionless, stud_size: dimensionless, joist_size: dimensionless, rafter_size: dimensionless } out: { studs: dimensionless, plates_lf: L, sheathing_sheets: dimensionless }
+// dims: in { footprint_ft2: L^2, perimeter_ft: L, wall_height_ft: L, stud_oc_in: L, joist_span_ft: L, joist_oc_in: L, rafter_oc_in: L, building_run_ft: L, pitch: dimensionless, stud_size: dimensionless, joist_size: dimensionless, rafter_size: dimensionless } out: { studs: dimensionless, stud_count: dimensionless, plate_lf: L, joist_count: dimensionless, rafter_count: dimensionless, rafter_length_ft: L }
 export function computeResidentialFraming({
   footprint_ft2 = 0, perimeter_ft = 0, wall_height_ft = 8,
   stud_oc_in = 16,
@@ -3121,7 +3121,7 @@ const BENCH_HEIGHT_FT = 4;       // typical max bench height per OSHA Subpart P
 const BOTTOM_WIDTH_FT_DEFAULT = 2;
 const SURCHARGE_BUMP = 0.25;     // additive H:V increase under surcharge (engineering practice)
 
-// dims: in { depth_ft: L, soil_class: dimensionless, surcharge: dimensionless, length_ft: L, bottom_width_ft: L } out: { benches: dimensionless, total_volume_yd3: L^3 }
+// dims: in { depth_ft: L, soil_class: dimensionless, surcharge: dimensionless, length_ft: L, bottom_width_ft: L } out: { ratio_H_to_V: M L^2 T^-3 I^-1, top_width_ft: L, horizontal_offset_ft: L, cross_section_ft2: L^2, spoil_volume_yd3: L^3, footprint_ft2: L^2 }
 export function computeExcavationBenchPlan({
   depth_ft = 0,
   soil_class = "B",
@@ -15218,7 +15218,7 @@ CONSTRUCTION_RENDERERS["lavatory-tub-clearance"] = _simpleRenderer({
 // EDGE PROTECTION is either the floor surface extended 12 in beyond the handrail or a curb or
 // barrier that stops a 4 in sphere within 4 in of the surface - a rail alone is not edge
 // protection, because the hazard is at the wheel and not at the hand.
-// dims: in { clear_width_in: L, handrail_intrusion_in: L, landing_length_in: L, landing_width_in: L, run_width_in: L } out: { effective_width_in: L, width_deficit_in: L, required_landing_width_in: L, landing_deficit_in: L }
+// dims: in { clear_width_in: L, handrail_intrusion_in: L, landing_length_in: L, landing_width_in: L, run_width_in: L } out: { effective_width_in: L, width_deficit_in: L, required_landing_width_in: L, cross_slope_pct: dimensionless, width_needed_between_rails_in: L, required_landing_length_in: L, landing_length_deficit_in: L, landing_width_deficit_in: L }
 export function computeRampDetailCheck({ cross_slope_ratio = 48, clear_width_in = 0, handrails = "yes", handrail_intrusion_in = 0, landing_length_in = 0, landing_width_in = 0, run_width_in = 0, changes_direction = "no", edge_protection = "none" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const xs = Number(cross_slope_ratio) || 0;

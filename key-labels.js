@@ -53,20 +53,16 @@ const KEY_UNITS = new Map(Object.entries({
   // that is a unit in one trade and a word in another needs a per-tile
   // caption, not a catalog-wide rule.
   ohm: "ohm", lbf: "lbf", psia: "psia", kvar: "kVAR", lux: "lux", sec: "sec", oz: "oz", lf: "LF",
-  // Metric and cubic-yard areas and volumes, which read "Spoil volume yd3"
-  // and "Area m2" on the steps panel. `ug` and `cal` only ever appear as
-  // the top of a quotient ("Pel (µg/m³)", "Incident energy (cal/cm²)").
+  // Metric areas/volumes; `ug`, `cal` only ever top a quotient.
+  // Quotient tops: "(bbl/ft)". Not `mg` (milligrams or million gallons).
+  bbl: "bbl", kj: "kJ", lcy: "LCY", bcy: "BCY", ccy: "CCY",
   cuft: "ft\u00b3", yd3: "yd\u00b3", m2: "m\u00b2", m3: "m\u00b3", cm2: "cm\u00b2", cm3: "cm\u00b3", mm2: "mm\u00b2", ug: "\u00b5g", cal: "cal",
 }));
-// Before one of those areas or volumes, a count or a mass is the top of a
-// density, not part of the name: "Cement (bags/yd³)", "Indoor (spores/m³)",
-// "Coating (g/m²)". These words are units nowhere else, so they are only
-// read here.
-const AREA_VOLUME = new Set(["yd3", "m2", "m3", "cm2", "cm3", "mm2"]);
-const DENSITY_TOPS = new Map(Object.entries({ g: "g", mg: "mg", umol: "\u00b5mol", bags: "bags", spores: "spores" }));
-// And where the top is ambiguous, the key keeps printing itself: `mj` is
-// mJ in a UV dose and MJ in reference ET, `mw` likewise, and `m1_m2` is the
-// AISC end-moment ratio M1/M2, not an area.
+// Before an area or volume, these top a density: "Cement (bags/yd³)".
+const AREA_VOLUME = new Set(["yd3", "m2", "m3", "cm2", "cm3", "mm2", "ft2", "sqft", "in2", "ft3"]);
+// `w` is watts only over an area; alone it is a width (`aspect_w`).
+const DENSITY_TOPS = new Map(Object.entries({ g: "g", mg: "mg", umol: "\u00b5mol", bags: "bags", spores: "spores", w: "W" }));
+// Ambiguous tops keep the key: mJ or MJ, and AISC's M1/M2 ratio.
 const AREA_VOLUME_DECLINE = new Set(["mj", "mw", "m1"]);
 const KEY_UNITS_CASED = new Map(Object.entries({ A: "A", V: "V", F: "\u00b0F", C: "\u00b0C", W: "W", nT: "nT" }));
 // A denominator ("lb_hr" = lb/hr) is only ever the LAST token of a key.
@@ -82,17 +78,17 @@ const KEY_ACRONYMS = new Set([
   "srt", "hrt", "vslr", "sor", "wor", "apf", "uv", "led", "hvac", "pdp", "gpp", "wsfu", "dfu", "ach", "shr",
   "eer", "cop", "stc", "emt", "pvc", "rmc", "imc", "cmu", "srw", "spt", "cbr", "usc", "aashto", "asd", "lrfd",
   "asce", "aisc", "aci", "nds", "du",
-  // Added 2026-10-17 from the steps-panel captions ("Rated wll (lb)", "Pel
-  // (µg/m³)"); each is a whole underscore token in every key that has it.
+  // 2026-10-17, from steps-panel captions ("Rated wll (lb)").
   "wll", "udl", "pel", "twa", "lel", "ppfd", "hdd", "cfm"]);
 
-// A final `min` is minutes ("drain_time_min", "speed_ft_min") unless what
-// precedes it cannot be per-minute or names a bound: `idler_hp_min` is the
-// minimum horsepower, `cfm_min` the minimum airflow, `avg_min` the avg/min
-// ratio. A rate unit, an electrical or pressure unit, or one of these words
-// before it means minimum, and the key reads as plain words ("Idler hp min")
-// rather than claiming a unit. Held to the `// dims:` annotations by
+// A final `min` after these is a minimum ("Idler hp min"), else minutes.
+// Every rule below is held to the `// dims:` annotations by
 // shell-key-humanizer.test.js.
+const GREEK = new Set(["alpha", "beta", "gamma", "delta", "epsilon", "eps", "theta", "lambda", "mu", "nu", "rho", "sigma", "tau", "phi", "psi", "omega", "eta", "zeta", "xi", "kappa", "chi"]);
+// "cut-in", not inches (not `drop`: `threshold_drop_in` is inches).
+const IN_WORDS = new Set(["cut", "shut"]);
+// A top-only tail ends the read: `cumulative_to_years_bbl` is barrels.
+const TOP_ONLY = new Set(["bbl", "kj", "lcy", "bcy", "ccy"]);
 const MIN_AFTER_UNITS = new Set(["cfm", "scfm", "acfm", "gpm", "gph", "gpd", "cfh", "mgd", "hp", "kw", "kva", "kvar", "a", "amps", "v", "volts", "w", "psi", "psig", "psia", "psf", "ksi", "f", "c", "ohm", "ohms", "hz", "rpm", "fpm", "fps", "mph", "pct", "percent"]);
 const MIN_AFTER_WORDS = new Set(["max", "avg", "sigma", "q", "angle", "straight", "continuous", "closets", "fixture", "ph", "required", "allowed", "allowable"]);
 
@@ -116,6 +112,17 @@ export function humanizeKey(key) {
   // same despite already being on the list, because this early return never
   // consulted it. Check it first, for one word and for many.
   if (parts.length === 1 && KEY_ACRONYMS.has(parts[0].toLowerCase())) return parts[0].toUpperCase();
+  // Paired tails: acre-ft, m/s, g/s, 1/in, cut-in, phase I_C / V_B.
+  if (n >= 2) {
+    const last = parts[n - 1], prev = parts[n - 2].toLowerCase();
+    const headOf = (k) => { const h = k.length ? humanizeKey(k.join("_")) : null; if (h) return h; const r = k.join(" "); return r.charAt(0).toUpperCase() + r.slice(1); };
+    if (last.toLowerCase() === "ft" && (prev === "ac" || prev === "acre")) return n === 2 ? "Acre-ft" : `${headOf(parts.slice(0, -2))} (acre-ft)`;
+    const perSecond = { m: "m/s", g: "g/s", rad: "rad/s", umol: "\u00b5mol/s" }[prev];
+    if (last === "s" && perSecond && n > 2) return `${headOf(parts.slice(0, -2))} (${perSecond})`;
+    if (prev === "1" && n > 2 && KEY_UNITS.has(last.toLowerCase())) return `${headOf(parts.slice(0, -2))} (1/${KEY_UNITS.get(last.toLowerCase())})`;
+    for (let i = parts.length - 2; i >= 0; i--) if (parts[i + 1].toLowerCase() === "in" && IN_WORDS.has(parts[i].toLowerCase()) && (i === 0 || parts[i - 1].toLowerCase() !== "in")) parts.splice(i, 2, parts[i] + "-in");
+    if (/^[ABC]$/.test(last) && /^[IV]$/.test(parts[n - 2])) return n === 2 ? `${parts[0]} ${last}` : `${headOf(parts.slice(0, -2))} ${parts[n - 2]} ${last}`;
+  }
   // A one-word key is already English ("ratio", "efficiency"); it only needs
   // to be capitalized so it reads as a caption beside the others. Anything
   // shorter is a symbol ("df", "ka") and says more as itself.
@@ -134,18 +141,17 @@ export function humanizeKey(key) {
     if (u === undefined) break;
     units.unshift(u);
     parts.pop();
+    if (first && TOP_ONLY.has(raw.toLowerCase())) break;
     const top = parts.length > 1 && AREA_VOLUME.has(raw.toLowerCase()) ? DENSITY_TOPS.get(parts[parts.length - 1].toLowerCase()) : undefined;
     if (top) { units.unshift(top); parts.pop(); break; }
   }
+  // `gamma_s` is a subscript; any other `_s` is seconds.
+  if (units.length === 1 && units[0] === "s" && GREEK.has(parts[parts.length - 1].toLowerCase())) { parts.push("s"); units.length = 0; }
   // "Rimpull per ton, in lb": the name already spent the word `per`, so the
   // token before it belongs to the name and not to a quotient.
   if (units.length > 1 && parts[parts.length - 1] === "per") { parts.push(units.shift()); }
-  // `pitch_in_per_ft` spelled its own quotient. Read past the `per` with the
-  // same unit tables: "Pitch (in/ft)", not "Pitch in per (ft)" -- 216 worked
-  // values in the steps panel read that way. A name with no unit before the
-  // `per` keeps the word: "Cost per lb"; a key that is only units reads
-  // "CFM per ton". Two units before the `per` are a product ("Moment
-  // (lb-in/ft)"), and "cu ft" / "sq ft" are one unit.
+  // `pitch_in_per_ft` -> "Pitch (in/ft)"; "Cost per lb"; "CFM per ton";
+  // "Moment (lb-in/ft)"; "cu ft" is one unit.
   let perUnit = null, perWord = null;
   if (units.length === 1 && parts.length > 1 && parts[parts.length - 1] === "per") {
     const rest = parts.slice(0, -1), num = [];

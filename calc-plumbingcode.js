@@ -141,7 +141,7 @@ PLUMBINGCODE_RENDERERS["fixture-clearance-check"] = _v1132renderFixtureClearance
 // to 25 in is allowed if the area reaches 1,300 sq in. Both are measured from the FINISHED
 // interior at the top of the threshold, exclusive of valves, showerheads, soap dishes, and
 // grab bars, and the dimension has to hold up to 70 in above the drain.
-// dims: in { width_in: L, depth_in: L, base_min_area_sqin: L^2, base_min_dim_in: L, exception_min_area_sqin: L^2, exception_min_dim_in: L } out: { area_sqin: L^2, least_dim_in: L, area_needed_in: L^2, other_dim_needed_in: L }
+// dims: in { width_in: L, depth_in: L, base_min_area_sqin: L^2, base_min_dim_in: L, exception_min_area_sqin: L^2, exception_min_dim_in: L } out: { area_sqin: L^2, least_dim_in: L, greater_dim_in: L, exc_other_needed_in: L }
 export function computeShowerCompartmentCheck({ width_in = 0, depth_in = 0, base_min_area_sqin = 900, base_min_dim_in = 30, exception_min_area_sqin = 1300, exception_min_dim_in = 25 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const w = Number(width_in) || 0;

@@ -45,7 +45,7 @@ const _finiteGuard = (o) => {
 
 // --- Utility 74: Septic Tank Sizing ---
 
-// dims: in { bedrooms: dimensionless, gallons_per_day: L^3 T^-1 } out: { tank_gal: L^3 }
+// dims: in { bedrooms: dimensionless, gallons_per_day: L^3 T^-1 } out: { daily_flow_gpd: L^3, minimum_tank_gallons: L^3, floor_gallons: L^3 }
 export function computeSepticTank({ bedrooms, gallons_per_day }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const byFlow = Number(gallons_per_day) > 0;
@@ -79,7 +79,7 @@ export const septicTankExample = {
 // Required absorption area = daily_flow_gpd / application_rate_gpd_per_ft2.
 // Trench linear feet = required_area / trench_width_ft.
 
-// dims: in { design_flow_gpd: L^3 T^-1, application_rate_gpd_per_ft2: L T^-1, trench_width_ft: L } out: { area_ft2: L^2, length_ft: L }
+// dims: in { design_flow_gpd: L^3 T^-1, application_rate_gpd_per_ft2: L T^-1, trench_width_ft: L } out: { required_area_ft2: L^2 }
 export function computeSepticDrainfield({
   design_flow_gpd = 0,
   application_rate_gpd_per_ft2 = 0,

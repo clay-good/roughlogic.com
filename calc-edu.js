@@ -252,7 +252,7 @@ function parseNumberList(raw) {
   return out;
 }
 
-// dims: in { values: dimensionless } out: { mean: dimensionless, sd: dimensionless, count: dimensionless }
+// dims: in { values: dimensionless } out: { mean: dimensionless, count: dimensionless, min: dimensionless, max: dimensionless }
 export function computeStatistics({ values }) {
   const nums = Array.isArray(values) ? values.filter((v) => Number.isFinite(v)) : parseNumberList(values);
   if (nums.length === 0) {
@@ -598,7 +598,7 @@ export function roundToSigFigs(value, n) {
   return Math.sign(x) * Number(s);
 }
 
-// dims: in { value: dimensionless, target: dimensionless } out: { rounded: dimensionless, count: dimensionless }
+// dims: in { value: dimensionless, target: dimensionless } out: { rounded: dimensionless }
 export function computeSigFigs({ value, target_sig_figs }) {
   const raw = String(value == null ? "" : value).trim();
   if (raw.length === 0) return { error: "Enter a number." };
@@ -688,7 +688,7 @@ function dnaToRna(seq) {
   return String(seq || "").toUpperCase().replace(/T/g, "U");
 }
 
-// dims: in { sequence: dimensionless, type: dimensionless } out: { codons: dimensionless }
+// dims: in { sequence: dimensionless, type: dimensionless } out: { rna_sequence: dimensionless, amino_acid_sequence: dimensionless }
 export function computeCodonTable({ sequence, sequence_type }) {
   const type = String(sequence_type || "rna").toLowerCase();
   if (type !== "rna" && type !== "dna") return { error: "Sequence type must be rna or dna." };
@@ -881,7 +881,7 @@ function parseGpaCourseList(raw) {
   return out;
 }
 
-// dims: in { courses: dimensionless } out: { gpa: dimensionless, credits: dimensionless }
+// dims: in { courses: dimensionless } out: { credits: dimensionless, course_count: dimensionless }
 export function computeGPA({ courses }) {
   const rows = Array.isArray(courses) ? courses : parseGpaCourseList(courses);
   if (rows.length === 0) return { error: "Enter at least one course (letter and credits per line)." };
@@ -982,7 +982,7 @@ export function renderGPA(inputRegion, outputRegion, citationEl) {
 
 const Z_CRITICAL = { 80: 1.2816, 90: 1.6449, 95: 1.9600, 98: 2.3263, 99: 2.5758 };
 
-// dims: in { mode: dimensionless, n: dimensionless, proportion: dimensionless, mean: dimensionless, sd: dimensionless, confidence: dimensionless } out: { lower: dimensionless, upper: dimensionless, margin: dimensionless }
+// dims: in { mode: dimensionless, n: dimensionless, proportion: dimensionless, mean: dimensionless, sd: dimensionless, confidence: dimensionless } out: { confidence_pct: dimensionless }
 export function computeConfidenceInterval({ mode, n, proportion, mean, sd, confidence_pct }) {
   const conf = Math.round(Number(confidence_pct));
   if (Math.abs(Number(confidence_pct) - conf) > 1e-9) return { error: "Confidence must be one of 80, 90, 95, 98, 99." };
@@ -1253,7 +1253,7 @@ const LEXILE_BANDS = [
   { grade: "12", typical: "1185L - 1385L", stretch: "1185L - 1385L" },
 ];
 
-// dims: in { grade: dimensionless } out: { band: dimensionless }
+// dims: in { grade: dimensionless } out: { selected: dimensionless }
 export function computeLexileBand({ grade }) {
   if (grade == null || grade === "") {
     return { bands: LEXILE_BANDS, selected: null };
@@ -1340,7 +1340,7 @@ function parseSBGLine(raw) {
   return { standard, level, priority };
 }
 
-// dims: in { rows: dimensionless } out: { grade: dimensionless }
+// dims: in { rows: dimensionless } out: { standards_count: dimensionless }
 export function computeStandardsBasedGrade({ rows }) {
   const lines = String(rows || "").split(/\r?\n/);
   const parsed = [];

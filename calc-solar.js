@@ -99,7 +99,7 @@ export const pvStringSizingExample = {
 
 // --- Utility 68: Battery Runtime ---
 
-// dims: in { amp_hours: I T, system_V: M L^2 T^-3 I^-1, dod_percent: dimensionless, load_W: M L^2 T^-3, peukert_k: dimensionless, rated_hours: T } out: { usable_wh: M L^2 T^-3 T, hours: T }
+// dims: in { amp_hours: I T, system_V: M L^2 T^-3 I^-1, dod_percent: dimensionless, load_W: M L^2 T^-3, peukert_k: dimensionless, rated_hours: T } out: { hours: T, inverter_efficiency_pct: dimensionless }
 export function computeBatteryRuntime({ amp_hours, system_V, dod_percent = 100, load_W, peukert_k = 1, inverter_efficiency_pct = 100, rated_hours = 20 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (Number(dod_percent) > 100) return { error: "Depth of discharge cannot exceed 100%." };

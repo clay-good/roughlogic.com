@@ -422,8 +422,8 @@ const POLYMORPHIC_KEYS = new Map(Object.entries({
 // printed on every run rather than quietly waived.
 const POUND_CONVENTION_UNSETTLED = new Set([
   "actual_weight_lb", "capacity_lb", "charge_weight_lb", "displacement_lb", "force_lb",
-  "green_weight_lb", "guy_tension_lb", "gvw_lb", "load_lb", "margin_lb", "max_charge_lb",
-  "payload_lb", "preload_lb", "reaction_lb", "required_wll_lb", "total_lb",
+  "green_weight_lb", "guy_tension_lb", "load_lb", "margin_lb", "max_charge_lb",
+  "payload_lb", "reaction_lb", "required_wll_lb", "total_lb",
   "total_weight_lb", "tractive_effort_lb", "vehicle_weight_lb", "vs_fed_lb_day",
   "W_lb", "water_weight_lb", "wc_pcf", "weight_lb",
 ]);

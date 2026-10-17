@@ -484,7 +484,7 @@ export const MANNING_ROUGHNESS = {
   corrugated_metal: 0.024,
 };
 
-// dims: in { pipe_diameter_in: L, target_flow_gpm: L^3 T^-1, material: dimensionless } out: { slope_in_per_ft: dimensionless, slope_percent: dimensionless }
+// dims: in { pipe_diameter_in: L, target_flow_gpm: L^3 T^-1, material: dimensionless } out: { scour_velocity_fps: L T^-1, actual_velocity_fps: L T^-1, D_ft: L, R_ft: L, A_half_ft2: L^2 }
 export function computeManningSlope({ pipe_diameter_in = 0, target_flow_gpm = 0, material = "pvc", scour_velocity_fps = 2, actual_slope_in_per_ft = 0 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(pipe_diameter_in > 0)) return { error: "Pipe diameter must be positive." };

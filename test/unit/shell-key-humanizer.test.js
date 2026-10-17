@@ -185,3 +185,64 @@ test("a final `min` reads as minutes only where the dims annotation says time", 
   assert.equal(humanizeKey("drain_time_min"), "Drain time (min)");
   assert.equal(humanizeKey("rate_at_depth_cuft_min"), "Rate at depth (ft³/min)");
 });
+
+// The same ground truth for every caption that ends in a unit: "Casing
+// capacity bbl (ft)" called a capacity in bbl/ft a length, "Storage ac (ft)"
+// an acre-foot a length, "I (°C)" a phase current a temperature, and "Hours
+// below cut (in)" a cut-in speed an inch. A caption's closing unit must match
+// the key's `// dims:` declaration (dimension terms compared in any order;
+// temperatures are declared `T` by this repo's ASCII convention, and psf is
+// also the mass-per-area convention for surface masses).
+test("a caption's closing unit agrees with the key's dims annotation", () => {
+  const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
+  const U = {
+    ft: "L", in: "L", mm: "L", cm: "L", mi: "L", yd: "L", km: "L", "ft²": "L^2", "in²": "L^2", "m²": "L^2", "cm²": "L^2", "mm²": "L^2",
+    "ft³": "L^3", "in³": "L^3", "yd³": "L^3", "m³": "L^3", cy: "L^3", gal: "L^3", hr: "T", min: "T", sec: "T", s: "T", days: "T", yr: "T", months: "T",
+    psi: "M L^-1 T^-2", psig: "M L^-1 T^-2", psia: "M L^-1 T^-2", ksi: "M L^-1 T^-2", psf: "M L^-1 T^-2", ksf: "M L^-1 T^-2",
+    GPM: "L^3 T^-1", CFM: "L^3 T^-1", cfs: "L^3 T^-1", GPH: "L^3 T^-1", GPD: "L^3 T^-1", MGD: "L^3 T^-1", fpm: "L T^-1", fps: "L T^-1", mph: "L T^-1",
+    "°F": "Θ", "°C": "Θ", A: "I", hp: "M L^2 T^-3", kW: "M L^2 T^-3", W: "M L^2 T^-3", "Btu/h": "M L^2 T^-3",
+  };
+  const norm = (d) => d.trim().replace(/\*/g, " ").replace(/\s*\/\s*T$/, " T^-1").replace(/\s+/g, " ").trim().split(" ").sort().join(" ");
+  // Each is the ANNOTATION's or the key's problem, not the caption rule's.
+  const EXEMPT = new Map([
+    ["daily_manure_ft3", "a per-day volume named without its rate (check-dimensions UNIT_TAIL_EXEMPT)"],
+    ["wastewater_ft3", "a per-day volume named without its rate (check-dimensions UNIT_TAIL_EXEMPT)"],
+    ["bedding_ft3", "a per-day volume named without its rate (check-dimensions UNIT_TAIL_EXEMPT)"],
+    ["daily_flow_gpd", "declared as the day's volume, L^3, beside a GPD name"],
+    ["q_s", "a heat flux with subscript s; q is not on the Greek-letter subscript list"],
+    ["free_air_l_min", "litres per minute; the single letter l is deliberately not a unit"],
+    ["feed_ipm_in", "an input in in/min; inputs show their field label, never this caption"],
+    ["bag_yield_sf_in", "square feet at a depth in inches, a volume; an input, captioned by its field"],
+    ["dispersion_ps_nm_km", "ps/(nm km), a compound no caption rule spells"],
+    ["freezing_index_f_days", "a degree-day product, a compound no caption rule spells"],
+  ]);
+  const dims = new Map();
+  for (const f of readdirSync(ROOT).filter((n) => /^calc-.*\.js$/.test(n))) {
+    for (const line of readFileSync(resolve(ROOT, f), "utf8").split("\n")) {
+      if (!line.includes("// dims:")) continue;
+      for (const [, k, d] of line.split("// dims:")[1].matchAll(/(\w+): ([^,}]+)/g)) {
+        if (k === "in" || k === "out") continue;
+        if (!dims.has(k)) dims.set(k, new Set());
+        dims.get(k).add(norm(d));
+      }
+    }
+  }
+  const bad = [];
+  let checked = 0;
+  for (const [k, ds] of dims) {
+    const label = humanizeKey(k);
+    if (!label || / per /.test(label)) continue;
+    const m = /\(([^()]+)\)$/.exec(label);
+    if (!m || !U[m[1]]) continue;
+    checked++;
+    const want = norm(U[m[1]]);
+    if (ds.has(want) || EXEMPT.has(k)) continue;
+    if (want === "Θ" && ds.has("T")) continue;
+    if (/^(psf|ksf)$/.test(m[1]) && ds.has(norm("M L^-2"))) continue;
+    if ([...ds].every((d) => d === "dimensionless")) continue;
+    bad.push(`${k} reads "${label}" but is declared ${[...ds].join(" | ")}`);
+  }
+  assert.ok(checked > 3000, `only ${checked} captions checked; did the annotation format move?`);
+  assert.deepEqual(bad, []);
+  for (const k of EXEMPT.keys()) assert.ok(dims.has(k), `${k} is exempt but no longer annotated; drop the entry`);
+});

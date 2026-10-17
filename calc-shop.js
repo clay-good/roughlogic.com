@@ -3249,7 +3249,7 @@ SHOP_RENDERERS["spray-booth-airflow"] = _simpleRenderer({
 });
 
 // ===================== spec-v1440: powder coating coverage and reclaim =====================
-// dims: in { specific_gravity: dimensionless, film_thickness_mils: L, part_area_sqft: L^2, transfer_efficiency: dimensionless, reclaim_efficiency: dimensionless, price_per_lb: dimensionless } out: { theoretical_coverage_sqft_lb: L^2 M^-1, powder_required_lb: M }
+// dims: in { specific_gravity: dimensionless, film_thickness_mils: L, part_area_sqft: L^2, transfer_efficiency: dimensionless, reclaim_efficiency: dimensionless, price_per_lb: dimensionless } out: { theoretical_coverage_sqft_lb: L^2 M^-1, utilization: dimensionless, saving_pct: dimensionless }
 export function computePowderCoatingCoverage({ specific_gravity = 0, film_thickness_mils = 0, part_area_sqft = 0, transfer_efficiency = 0.6, reclaim_efficiency = 0, price_per_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(specific_gravity > 0)) return { error: "Powder specific gravity must be positive." };

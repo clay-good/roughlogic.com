@@ -2424,7 +2424,7 @@ MACHINING_RENDERERS["stub-acme-thread-depth"] = renderStubAcmeThreadDepth;
 //   Nmin = 2k / sin^2(phi)   -- the tooth count below which the cutter undercuts the root.
 //     Reproduces the classic published values exactly: 32 at 14.5 deg, 18 at 20, 12 at 25.
 //   B = 2 dC tan(phi)        -- backlash produced by opening the center distance by dC.
-// dims: in { pressure_angle_deg: dimensionless, teeth: dimensionless, addendum_coefficient: dimensionless, center_distance_change_in: L, diametral_pitch: L^-1 } out: { min_teeth: dimensionless, backlash_in: L, center_distance_for_backlash_in: L }
+// dims: in { pressure_angle_deg: dimensionless, teeth: dimensionless, addendum_coefficient: dimensionless, center_distance_change_in: L, diametral_pitch: L^-1 } out: { min_teeth: dimensionless, backlash_in: L, shortfall: M L^2 T^-3, circular_pitch_in: L }
 export function computeGearUndercutBacklash({ pressure_angle_deg = 20, teeth = 0, addendum_coefficient = 1.0, center_distance_change_in = 0, diametral_pitch = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const phi = Number(pressure_angle_deg) || 0;

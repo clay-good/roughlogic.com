@@ -1291,7 +1291,7 @@ export const ACCOUNTING_RENDERERS = {
 // --- v20 R.1: Declining-balance depreciation (`declining-balance-depreciation`) ---
 // DB_rate = factor*(1/life); dep = book_begin*DB_rate, floored so book never
 // drops below salvage; optional straight-line crossover.
-// dims: in { cost: dimensionless, salvage: dimensionless, life_yr: dimensionless, factor: dimensionless, year: dimensionless, sl_switch: dimensionless } out: { year_dep: dimensionless, book_value: dimensionless }
+// dims: in { cost: dimensionless, salvage: dimensionless, life_yr: dimensionless, factor: dimensionless, year: dimensionless, sl_switch: dimensionless } out: { book_value: dimensionless, year_depreciation: dimensionless, accumulated_depreciation: dimensionless }
 export function computeDecliningBalanceDepreciation({ cost = 0, salvage = 0, life_yr = 0, factor = 2, year = 1, sl_switch = true } = {}) {
   if (!Number.isInteger(Number(year)) || Number(year) < 1) return { error: "Year is a whole number, 1 or more." };
   if (Number(year) > Math.round(Number(life_yr)) && Number(life_yr) > 0) return { error: "Year " + year + " is past the asset's " + Math.round(Number(life_yr)) + "-year life; depreciation is $0." };

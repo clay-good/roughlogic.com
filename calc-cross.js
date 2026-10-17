@@ -321,7 +321,7 @@ export const salesTaxExample = {
 
 // --- Utility 64: Tip Out ---
 
-// dims: in { total_amount: dimensionless, members: dimensionless } out: { per_member: dimensionless }
+// dims: in { total_amount: dimensionless, members: dimensionless } out: { total_hours: T }
 export function computeTipOut({ total_amount, members }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   total_amount = Number(total_amount);
@@ -626,7 +626,7 @@ export const loanPaymentExample = {
 
 // --- Utility 106: Upgrade ROI / Payback ---
 
-// dims: in { incremental_cost: dimensionless, annual_savings: dimensionless, discount_rate_percent: dimensionless, years: T } out: { npv: dimensionless, payback_years: T, irr: dimensionless }
+// dims: in { incremental_cost: dimensionless, annual_savings: dimensionless, discount_rate_percent: dimensionless, years: T } out: { npv: dimensionless }
 export function computeUpgradeROI({ incremental_cost, annual_savings, discount_rate_percent = 0, years = 10 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(Number(discount_rate_percent) > -100)) return { error: "The discount rate must be above -100%." };
@@ -656,7 +656,7 @@ export const upgradeROIExample = {
 
 export const IRS_STANDARD_MILEAGE_RATE = 0.76;
 
-// dims: in { round_trip_miles: L, mpg: L^-2, fuel_price_per_gallon: dimensionless, irs_rate_per_mile: dimensionless } out: { fuel_cost: dimensionless, irs_deduction: dimensionless }
+// dims: in { round_trip_miles: L, mpg: L^-2, fuel_price_per_gallon: dimensionless, irs_rate_per_mile: dimensionless } out: { fuel_cost: dimensionless, gallons: L^3 }
 export function computeMileageCost({ round_trip_miles, mpg, fuel_price_per_gallon, irs_rate_per_mile = IRS_STANDARD_MILEAGE_RATE }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const miles = Number(round_trip_miles) || 0;
@@ -771,7 +771,7 @@ export const GSA_PERDIEM_RATES = {
 // table's own approximations and are unchanged.
 export const GSA_STANDARD_LODGING = { fy2026: 110, next: { fiscal_year: 2027, effective: "2026-10-01", lodging: 113 } };
 
-// dims: in { state: dimensionless, type: dimensionless, as_of: dimensionless } out: { rate: dimensionless }
+// dims: in { state: dimensionless, type: dimensionless, as_of: dimensionless } out: { rate_dollars: dimensionless }
 export function computePerDiem({ state, type = "lodging", as_of = "" }) {
   const r = GSA_PERDIEM_RATES[state];
   if (!r) return { error: "Unknown state." };
@@ -838,7 +838,7 @@ export const geometryExample = {
 
 // --- Utility 111: Dilution / Mixing Ratio ---
 
-// dims: in { concentrate_percent: dimensionless, target_percent: dimensionless, final_volume: L^3 } out: { concentrate_volume: L^3, water_volume: L^3 }
+// dims: in { concentrate_percent: dimensionless, target_percent: dimensionless, final_volume: L^3 } out: { concentrate_volume: L^3 }
 export function computeDilution({ concentrate_percent, target_percent, final_volume }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const C = Number(concentrate_percent) || 0;
@@ -858,7 +858,7 @@ export const dilutionExample = {
 
 // --- Utility 112: Slope from Digital Level ---
 
-// dims: in { value: dimensionless, from: dimensionless } out: { percent: dimensionless, degrees: dimensionless, ratio: dimensionless }
+// dims: in { value: dimensionless, from: dimensionless } out: { percent: dimensionless, degrees: dimensionless }
 export function computeSlopeFromLevel({ value, from }) {
   const v = Number(value);
   if (!Number.isFinite(v)) return { error: "Provide a numeric value." };
@@ -885,7 +885,7 @@ export const slopeFromLevelExample = {
 const EARTH_RADIUS_MI = 3958.8;
 const EARTH_RADIUS_KM = 6371.0088;
 
-// dims: in { lat1: dimensionless, lon1: dimensionless, lat2: dimensionless, lon2: dimensionless } out: { distance_mi: L, distance_km: L }
+// dims: in { lat1: dimensionless, lon1: dimensionless, lat2: dimensionless, lon2: dimensionless } out: { miles: L, initial_bearing_deg: dimensionless, final_bearing_deg: dimensionless, bearing_drift_deg: dimensionless }
 export function computeHaversineDistance({ lat1, lon1, lat2, lon2 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const phi1 = (Number(lat1) || 0) * Math.PI / 180;
@@ -1193,7 +1193,7 @@ export const TRENCH_SLOPES = {
   C: { ratio: "1.5:1", H_to_V: 1.5, label: "Type C (granular or wet)" },
 };
 
-// dims: in { depth_ft: L, soil_class: dimensionless, surcharge: dimensionless } out: { setback_ft: L, slope_ratio: dimensionless }
+// dims: in { depth_ft: L, soil_class: dimensionless, surcharge: dimensionless } out: { max_horizontal_ft: L, top_width_ft: L, bench_height_ft: L }
 export function computeTrenchSlope({ depth_ft = 0, soil_class = "B", surcharge = false }) {
   const sc = TRENCH_SLOPES[soil_class];
   if (!sc) return { error: "Unknown soil class." };
@@ -1228,7 +1228,7 @@ const NIOSH_FM_TABLE = [
   [15, [0.00, 0.28, 0.00, 0.00, 0.00, 0.00]],
 ];
 
-// dims: in { load_lb: M, h_in: L, v_in: L, d_in: L, a_deg: dimensionless, f: T^-1, c: dimensionless } out: { rwl_lb: M, li: dimensionless }
+// dims: in { load_lb: M, h_in: L, v_in: L, d_in: L, a_deg: dimensionless, f: T^-1, c: dimensionless } out: { RWL_lb: M L T^-2, LI: dimensionless }
 export function computeNIOSHLifting({
   weight_lb = 0, H_in = 10, V_in = 30, D_in = 0,
   asymmetry_deg = 0, frequency_per_min = 1, duration_hr = 1, coupling = "good",
@@ -1272,7 +1272,7 @@ export const nioshLiftingExample = {
 
 // --- Utility 164: Heat Stress (NWS Rothfusz heat index + WBGT approx + work/rest) ---
 
-// dims: in { T_F: T, RH_percent: dimensionless, solar: dimensionless } out: { heat_index_F: T, band: dimensionless }
+// dims: in { T_F: T, RH_percent: dimensionless, solar: dimensionless } out: { heat_index_F: T }
 export function computeHeatStress({ T_F = 0, RH_percent = 0, solar = false }) {
   if ([arguments[0]?.T_F, arguments[0]?.RH_percent].some((x) => x === undefined || x === null || x === "")) return { error: "Enter the air temperature (F) and the relative humidity (%)." };
   if (!(Number(RH_percent) >= 0 && Number(RH_percent) <= 100)) return { error: "Relative humidity is between 0 and 100%." };
@@ -1358,7 +1358,7 @@ export const windChillWindSpeedExample = { inputs: { T_F: 5, target_wc_F: -19 } 
 
 // --- Utility 166: Ladder Placement Angle ---
 
-// dims: in { ladder_length_ft: L, working_height_ft: L } out: { angle_deg: dimensionless, base_distance_ft: L }
+// dims: in { ladder_length_ft: L, working_height_ft: L } out: { base_distance_ft: L, set_angle_deg: dimensionless }
 export function computeLadderAngle({ ladder_length_ft = 0, working_height_ft = 0 }) {
   if (!(ladder_length_ft > 0) || !Number.isFinite(ladder_length_ft)) return { error: "Ladder length must be a positive, finite number." };
   if (!(working_height_ft >= 0 && working_height_ft <= ladder_length_ft)) return { error: "Working height must be 0..ladder length." };
@@ -1409,7 +1409,7 @@ export const pulleyMAExample = { inputs: { rig: "block_3", efficiency: 0.95 } };
 
 // --- Utility 168: Ramp Slope (ADA) ---
 
-// dims: in { rise_in: L, run_in: L } out: { slope_percent: dimensionless, slope_degrees: dimensionless, ratio: dimensionless }
+// dims: in { rise_in: L, run_in: L } out: { ratio: dimensionless, percent: dimensionless }
 export function computeRampSlope({ rise_in = 0, run_in = 0 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // Both rise and run must be strictly positive: a zero rise made the ratio
@@ -1474,7 +1474,7 @@ export const rainwaterCatchmentAreaExample = { inputs: { target_annual_gal: 1589
 
 // --- Utility 171: Daily Multi-Job Timesheet ---
 
-// dims: in { jobs: dimensionless, regular_rate: dimensionless, weekly_overtime_threshold_hr: T, irs_rate_per_mile: dimensionless } out: { gross_pay: dimensionless, overtime_pay: dimensionless, mileage_deduction: dimensionless }
+// dims: in { jobs: dimensionless, regular_rate: dimensionless, weekly_overtime_threshold_hr: T, irs_rate_per_mile: dimensionless } out: { gross_pay: dimensionless, total_hours: T, overtime_hours: T }
 export function computeTimesheet({ jobs = [], regular_rate = 0, weekly_overtime_threshold_hr = 40, irs_rate_per_mile = IRS_STANDARD_MILEAGE_RATE }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!Array.isArray(jobs) || jobs.length === 0) return { error: "Provide at least one job." };
@@ -1519,7 +1519,7 @@ export const timesheetExample = {
 
 // --- Utility 173: Vehicle Load Distribution ---
 
-// dims: in { wheelbase_in: L, payload_lb: M, payload_position_from_cab_in: L, gvwr_lb: M, front_gawr_lb: M, rear_gawr_lb: M, curb_front_lb: M, curb_rear_lb: M } out: { front_axle_lb: M, rear_axle_lb: M, gvw_lb: M, pass: dimensionless }
+// dims: in { wheelbase_in: L, payload_lb: M, payload_position_from_cab_in: L, gvwr_lb: M, front_gawr_lb: M, rear_gawr_lb: M, curb_front_lb: M, curb_rear_lb: M } out: { front_axle_lb: M, rear_axle_lb: M }
 export function computeVehicleLoad({ wheelbase_in = 0, payload_lb = 0, payload_position_from_cab_in = 0, gvwr_lb = null, front_gawr_lb = null, rear_gawr_lb = null, curb_front_lb = 0, curb_rear_lb = 0 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // Until 2026-09-26 a negative entry here returned a negative quantity with no error.
@@ -1917,7 +1917,7 @@ export const FALL_PROTECTION_DECEL = {
   "self-retracting-overhead":     { decel_ft: 3.5, free_fall_ft: 2, description: "Overhead SRL" },
 };
 
-// dims: in { connector: dimensionless, free_fall_ft_override: L, decel_ft_override: L, worker_height_ft: L, harness_stretch_ft: L, safety_factor_ft: L, actual_clearance_ft: L } out: { clearance_ft: L, pass: dimensionless }
+// dims: in { connector: dimensionless, free_fall_ft_override: L, decel_ft_override: L, worker_height_ft: L, harness_stretch_ft: L, safety_factor_ft: L, actual_clearance_ft: L } out: { free_fall_ft: L, decel_ft: L, required_clearance_ft: L, remaining_clearance_ft: L }
 export function computeFallProtectionClearance({
   connector = "shock-absorbing-lanyard-6ft",
   free_fall_ft_override = null,
@@ -2020,7 +2020,7 @@ CROSS_RENDERERS["fall-protection-clearance"] = _v7x_renderFallProtection;
 // without unbounded growth in the home-view payload. Total exposure
 // across all rows above 24 hours is rejected.
 
-// dims: in { rows: dimensionless } out: { dose_percent: dimensionless, twa_dba: dimensionless }
+// dims: in { rows: dimensionless } out: { total_dose_pct: dimensionless, total_hours: T }
 export function computeNoiseDose({ rows = [] } = {}) {
   if (!Array.isArray(rows) || rows.length === 0) {
     return { error: "Provide at least one exposure row (level dBA, hours)." };

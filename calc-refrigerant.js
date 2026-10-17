@@ -183,7 +183,7 @@ const _OUT_OF_TABLE = (refrigerant) => "Outside the bundled saturation tables fo
 
 // --- Utility 25: Refrigerant P-T Lookup ---
 
-// dims: in { refrigerant: dimensionless, pressure_psig: M L^-1 T^-2, temperature_F: T, outdoor_F: T, indoor_wb_F: T } out: { saturation_temp_F: T, pressure_psig: M L^-1 T^-2, target_superheat_F: T, target_subcool_F: T }
+// dims: in { refrigerant: dimensionless, pressure_psig: M L^-1 T^-2, temperature_F: T, outdoor_F: T, indoor_wb_F: T } out: { pressure_psig: M L^-1 T^-2, target_superheat_F: T }
 export function computeRefrigerantPT({ refrigerant, pressure_psig = null, temperature_F = null, outdoor_F = null, indoor_wb_F = null }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const r = REFRIGERANTS[refrigerant];
@@ -236,7 +236,7 @@ function _v8shScDiagnostic(value, mode) {
   return null;
 }
 
-// dims: in { refrigerant: dimensionless, system_pressure_psig: M L^-1 T^-2, line_temperature_F: T, mode: dimensionless, indoor_wet_bulb_F: T, outdoor_dry_bulb_F: T, deadband_F: T } out: { value_F: T, sat_F: T, target_superheat_F: T }
+// dims: in { refrigerant: dimensionless, system_pressure_psig: M L^-1 T^-2, line_temperature_F: T, mode: dimensionless, indoor_wet_bulb_F: T, outdoor_dry_bulb_F: T, deadband_F: T } out: { target_superheat_F: T }
 export function computeSuperheatSubcool({ refrigerant, system_pressure_psig, line_temperature_F, mode, indoor_wet_bulb_F = 0, outdoor_dry_bulb_F = null, deadband_F = 5, target_subcool_F = 0 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const r = REFRIGERANTS[refrigerant];
@@ -305,7 +305,7 @@ export const superheatSubcoolExample = {
 // surfaces the manufacturer attribution from data/hvac/refrigerants.json
 // (mirrored in REFRIGERANTS).
 
-// dims: in { refrigerant_a: dimensionless, refrigerant_b: dimensionless, pressure_psig: M L^-1 T^-2, temperature_F: T } out: { delta: dimensionless }
+// dims: in { refrigerant_a: dimensionless, refrigerant_b: dimensionless, pressure_psig: M L^-1 T^-2, temperature_F: T } out: { a: dimensionless, b: dimensionless }
 export function computeCompareRefrigerants({ refrigerant_a, refrigerant_b, pressure_psig = null, temperature_F = null }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const a = REFRIGERANTS[refrigerant_a];
@@ -346,7 +346,7 @@ export const CHARGE_OZ_PER_FT = {
   "R-407C": { "1/4": 0.28, "3/8": 0.58, "1/2": 0.92, "5/8": 1.25, "3/4": 1.60 },
 };
 
-// dims: in { refrigerant: dimensionless, sections: dimensionless } out: { total_charge_oz: M }
+// dims: in { refrigerant: dimensionless, sections: dimensionless } out: { total_oz: M, total_lb: M }
 export function computeRefrigerantCharge({ refrigerant, sections = [] }) {
   const table = CHARGE_OZ_PER_FT[refrigerant];
   if (!table) return { error: "Unknown refrigerant." };
@@ -432,7 +432,7 @@ function _interpRefSatT(refrigerant, psia, dew = false) {
   return NaN;
 }
 
-// dims: in { refrigerant: dimensionless, suction_pressure: M L^-1 T^-2, suction_unit: dimensionless, suction_line_temp_F: T, liquid_pressure: M L^-1 T^-2, liquid_unit: dimensionless, liquid_line_temp_F: T } out: { target_subcool_F: T, target_superheat_F: T }
+// dims: in { refrigerant: dimensionless, suction_pressure: M L^-1 T^-2, suction_unit: dimensionless, suction_line_temp_F: T, liquid_pressure: M L^-1 T^-2, liquid_unit: dimensionless, liquid_line_temp_F: T } out: { suction_psia: M L^-1 T^-2, liquid_psia: M L^-1 T^-2 }
 export function computeRefrigerantCharging({
   refrigerant = "R_410A",
   suction_pressure = 0, suction_unit = "psig", suction_line_temp_F = null,

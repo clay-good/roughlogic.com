@@ -359,7 +359,7 @@ DATACENTER_RENDERERS["containment-bypass-airflow"] = _simpleRenderer({
 
 // ===================== spec-v1805: PDU branch loading =====================
 
-// dims: in { line_voltage_v: I^-1 L^2 M T^-3, phase_configuration: dimensionless, breaker_rating_a: I, continuous_load_pct: dimensionless, power_factor: dimensionless, device_draw_w: L^2 M T^-3 } out: { usable_current_a: I, branch_capacity_kva: L^2 M T^-3, branch_capacity_kw: L^2 M T^-3, supported_device_count: dimensionless, survivor_current_a: I }
+// dims: in { line_voltage_v: I^-1 L^2 M T^-3, phase_configuration: dimensionless, breaker_rating_a: I, continuous_load_pct: dimensionless, power_factor: dimensionless, device_draw_w: L^2 M T^-3 } out: { usable_current_a: I, branch_capacity_kva: L^2 M T^-3, branch_capacity_kw: L^2 M T^-3, supported_device_count: dimensionless, naive_capacity_kw: M L^2 T^-3, naive_device_count: dimensionless, connected_load_w: M L^2 T^-3, failover_current_a: I, normal_breaker_utilization_pct: dimensionless, pair_filled_survivor_current_a: I, pair_filled_survivor_breaker_pct: dimensionless }
 export function computePduBranchLoading({ line_voltage_v = 0, phase_configuration = "three_phase", breaker_rating_a = 0, continuous_load_pct = 0, power_factor = 0, device_draw_w = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   if (!(line_voltage_v > 0) || !(breaker_rating_a > 0) || !(device_draw_w > 0)) return { error: "Voltage, breaker rating, and device draw must be positive." };
