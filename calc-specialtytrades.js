@@ -8,6 +8,7 @@ import {
   DEBOUNCE_MS as _DC, debounce as _debC, makeNumber as _mnC,
   makeSelect as _msC, makeOutputLine as _moC,
   attachExampleButton as _aeC, fmt as _fmtC, fmt,
+  makeStepsPanel,
 } from "./ui-fields.js";
 
 const _finiteGuard = (o) => {
@@ -40,6 +41,7 @@ function _simpleRenderer(spec) {
     }
     const outs = {};
     for (const o of spec.outputs) outs[o.key] = _moC(outputRegion, o.label, o.id);
+    const _steps = makeStepsPanel(outputRegion);
     function fillExample(v) {
       for (const f of spec.fields) {
         if (v[f.key] === undefined) continue;
@@ -56,7 +58,7 @@ function _simpleRenderer(spec) {
         // tell a cleared temperature from a typed 0.
         else params[f.key] = f.required && fields[f.key].input.value === "" ? null : Number(fields[f.key].input.value) || 0;
       }
-      const r = spec.compute(params);
+      const r = spec.compute(params); _steps.update(spec.fields, params, r);
       if (r.error) {
         for (const k of Object.keys(outs)) outs[k].textContent = "-";
         outs[spec.outputs[0].key].textContent = r.error;

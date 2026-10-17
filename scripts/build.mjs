@@ -35,6 +35,7 @@ const FILES = [
   "shell-meta.js",
   // The result-key humanizer, shared by the shell builder and the agent door.
   "key-labels.js",
+  "steps-panel.js",
   "hash-state.js",
   "data-stamp.js",
   "clipboard.js",

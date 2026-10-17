@@ -194,6 +194,36 @@ function makeNoteLine(parent, label, valueId) {
   return span;
 }
 
+// "Show the steps" (spec-v1964): a collapsed panel under the answer. Only the
+// empty box is built here; steps-panel.js and key-labels.js load the first
+// time it is opened, so a page where nobody opens it downloads neither.
+export function makeStepsPanel(parent) {
+  const box = document.createElement("details");
+  box.className = "note-row steps-row";
+  box.hidden = true;
+  const sum = document.createElement("summary");
+  sum.textContent = "Show the steps";
+  const body = document.createElement("div");
+  body.className = "note-value steps-body";
+  box.append(sum, body);
+  parent.appendChild(box);
+  let last = null;
+  const draw = async () => {
+    if (!box.open || !last) return;
+    const [{ drawSteps }, { humanizeKey }] = await Promise.all([import("./steps-panel.js"), import("./key-labels.js")]);
+    if (last) drawSteps(body, last, humanizeKey);
+  };
+  box.addEventListener("toggle", draw);
+  return {
+    update(fields, params, r) {
+      last = r && !r.error ? { fields, params, r } : null;
+      box.hidden = !last;
+      if (!last) body.textContent = "";
+      draw();
+    },
+  };
+}
+
 export function attachExampleButton(host, fillFn) {
   const btn = document.createElement("button");
   btn.type = "button";

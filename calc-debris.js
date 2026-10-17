@@ -19,6 +19,7 @@
 import {
   DEBOUNCE_MS, debounce, makeNumber, makeSelect,
   makeOutputLine, attachExampleButton, fmt,
+  makeStepsPanel,
 } from "./ui-fields.js";
 
 const _finiteGuard = (o) => {
@@ -46,13 +47,14 @@ function _simpleRenderer(spec) {
     }
     const outs = {};
     for (const o of spec.outputs) outs[o.key] = makeOutputLine(outputRegion, o.label, o.id);
+    const _steps = makeStepsPanel(outputRegion);
     function update() {
       const params = {};
       for (const f of spec.fields) {
         const el = fields[f.key][f.kind === "select" ? "select" : "input"];
         params[f.key] = f.kind === "select" ? el.value : Number(el.value) || 0;
       }
-      const result = spec.compute(params);
+      const result = spec.compute(params); _steps.update(spec.fields, params, result);
       if (result.error) {
         for (const out of Object.values(outs)) out.textContent = "-";
         outs[spec.outputs[0].key].textContent = result.error;

@@ -3,6 +3,7 @@
 import {
   DEBOUNCE_MS as _DG, debounce as _debG, makeNumber as _mnG, makeSelect as _msG, makeCheckbox as _mcG,
   makeOutputLine as _moG, attachExampleButton as _aeG, fmt,
+  makeStepsPanel,
 } from "./ui-fields.js";
 
 const _finiteGuard = (o) => {
@@ -34,6 +35,7 @@ function _simpleRendererG(spec) {
     }
     const outs = {};
     for (const o of spec.outputs) outs[o.key] = _moG(outputRegion, o.label, o.id);
+    const _steps = makeStepsPanel(outputRegion);
     function fillExample(v) {
       for (const f of spec.fields) {
         if (v[f.key] === undefined) continue;
@@ -50,7 +52,7 @@ function _simpleRendererG(spec) {
         else if (f.kind === "checkbox") params[f.key] = fields[f.key].input.checked;
         else params[f.key] = Number(fields[f.key].input.value) || 0;
       }
-      const result = spec.compute(params);
+      const result = spec.compute(params); _steps.update(spec.fields, params, result);
       if (result.error) {
         for (const key of Object.keys(outs)) outs[key].textContent = "-";
         outs[spec.outputs[0].key].textContent = result.error;

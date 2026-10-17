@@ -23,6 +23,7 @@
 import {
   DEBOUNCE_MS, debounce, makeNumber,
   makeOutputLine, attachExampleButton, fmt,
+  makeStepsPanel,
 } from "./ui-fields.js";
 
 // v18 §7 contract guard: reject a non-finite numeric input (copied
@@ -53,6 +54,7 @@ function _simpleRenderer(spec) {
     }
     const outs = {};
     for (const o of spec.outputs) outs[o.key] = makeOutputLine(outputRegion, o.label, o.id);
+    const _steps = makeStepsPanel(outputRegion);
     function fillExample(v) {
       for (const f of spec.fields) {
         if (v[f.key] === undefined) continue;
@@ -65,7 +67,7 @@ function _simpleRenderer(spec) {
       // A field marked `required` passes null when blank, so the compute can
       // tell a cleared temperature from a typed 0.
       for (const f of spec.fields) params[f.key] = f.required && fields[f.key].input.value === "" ? null : Number(fields[f.key].input.value) || 0;
-      const r = spec.compute(params);
+      const r = spec.compute(params); _steps.update(spec.fields, params, r);
       if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }
       for (const o of spec.outputs) outs[o.key].textContent = o.value(r);
     }, DEBOUNCE_MS);

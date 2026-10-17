@@ -8,6 +8,7 @@
 import {
   DEBOUNCE_MS, debounce, makeNumber, makeSelect,
   makeOutputLine, attachExampleButton, fmt,
+  makeStepsPanel,
 } from "./ui-fields.js";
 
 // v18 §7 contract guard: reject a non-finite numeric input. A renderer
@@ -2605,6 +2606,7 @@ function _simpleRenderer(spec) {
     }
     const outs = {};
     for (const o of spec.outputs) outs[o.key] = makeOutputLine(outputRegion, o.label, o.id);
+    const _steps = makeStepsPanel(outputRegion);
     function fillExample(v) {
       for (const f of spec.fields) {
         if (v[f.key] === undefined) continue;
@@ -2619,7 +2621,7 @@ function _simpleRenderer(spec) {
         if (f.kind === "select") params[f.key] = fields[f.key].select.value;
         else params[f.key] = Number(fields[f.key].input.value) || 0;
       }
-      const r = spec.compute(params);
+      const r = spec.compute(params); _steps.update(spec.fields, params, r);
       if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }
       for (const o of spec.outputs) outs[o.key].textContent = o.value(r);
     }, DEBOUNCE_MS);

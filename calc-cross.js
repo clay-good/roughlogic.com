@@ -347,6 +347,7 @@ export const tipOutExample = {
 import {
   DEBOUNCE_MS, debounce, makeNumber, makeText, makeSelect, makeCheckbox,
   makeOutputLine, attachExampleButton, fmt,
+  makeStepsPanel,
 } from "./ui-fields.js";
 import { hazenWilliamsFrictionLoss } from "./pure-math.js";
 import { renderLimitationBanner, getLimitationCopy } from "./limitation-banner.js";
@@ -1576,6 +1577,7 @@ function _simpleRendererG(spec) {
     }
     const outs = {};
     for (const o of spec.outputs) outs[o.key] = _moG(outputRegion, o.label, o.id);
+    const _steps = makeStepsPanel(outputRegion);
     function fillExample(v) {
       for (const f of spec.fields) {
         if (v[f.key] === undefined) continue;
@@ -1594,7 +1596,7 @@ function _simpleRendererG(spec) {
         // tell a cleared temperature from a typed 0.
         else params[f.key] = f.required && fields[f.key].input.value === "" ? null : Number(fields[f.key].input.value) || 0;
       }
-      const r = spec.compute(params);
+      const r = spec.compute(params); _steps.update(spec.fields, params, r);
       if (r.error) {
         for (const k of Object.keys(outs)) outs[k].textContent = "-";
         outs[spec.outputs[0].key].textContent = r.error;

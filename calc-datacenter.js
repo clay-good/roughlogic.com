@@ -6,6 +6,7 @@
 import {
   DEBOUNCE_MS, debounce, makeNumber, makeSelect,
   makeOutputLine, attachExampleButton, fmt, fmtDir,
+  makeStepsPanel,
 } from "./ui-fields.js";
 
 const HOURS_PER_YEAR = 8760;
@@ -36,6 +37,7 @@ function _simpleRenderer(spec) {
     }
     const outs = {};
     for (const o of spec.outputs) outs[o.key] = makeOutputLine(outputRegion, o.label, o.id);
+    const _steps = makeStepsPanel(outputRegion);
     function update() {
       const params = {};
       for (const f of spec.fields) {
@@ -44,7 +46,7 @@ function _simpleRenderer(spec) {
         // tell a cleared temperature from a typed 0.
         params[f.key] = f.kind === "select" ? el.value : f.required && el.value === "" ? null : Number(el.value) || 0;
       }
-      const result = spec.compute(params);
+      const result = spec.compute(params); _steps.update(spec.fields, params, result);
       if (result.error) {
         for (const out of Object.values(outs)) out.textContent = "-";
         outs[spec.outputs[0].key].textContent = result.error;

@@ -12,6 +12,7 @@
 import {
   DEBOUNCE_MS, debounce, makeNumber,
   makeOutputLine, attachExampleButton, fmt,
+  makeStepsPanel,
 } from "./ui-fields.js";
 
 const G_FPS2 = 32.2;
@@ -57,11 +58,12 @@ function _simpleRenderer(spec) {
     }
     const outs = {};
     for (const o of spec.outputs) outs[o.key] = makeOutputLine(outputRegion, o.label, o.id);
+    const _steps = makeStepsPanel(outputRegion);
     function update() {
       const params = {};
       // A required field sends a blank box as null so the compute can ask for it.
       for (const f of spec.fields) params[f.key] = f.required && fields[f.key].input.value === "" ? null : Number(fields[f.key].input.value) || 0;
-      const result = spec.compute(params);
+      const result = spec.compute(params); _steps.update(spec.fields, params, result);
       if (result.error) {
         for (const out of Object.values(outs)) out.textContent = "-";
         outs[spec.outputs[0].key].textContent = result.error;

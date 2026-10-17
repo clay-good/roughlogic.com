@@ -29,6 +29,7 @@ const SHELL_ASSETS = [
   "./text-lead.js",
   "./shell-meta.js",
   "./key-labels.js",
+  "./steps-panel.js",
   "./hash-state.js",
   "./data-stamp.js",
   "./clipboard.js",

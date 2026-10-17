@@ -8,6 +8,7 @@
 import {
   DEBOUNCE_MS, debounce, makeNumber, makeText,
   makeOutputLine, attachExampleButton, fmt,
+  makeStepsPanel,
 } from "./ui-fields.js";
 
 const _finiteGuard = (o) => {
@@ -35,6 +36,7 @@ function _simpleRenderer(spec) {
     }
     const outs = {};
     for (const o of spec.outputs) outs[o.key] = makeOutputLine(outputRegion, o.label, o.id);
+    const _steps = makeStepsPanel(outputRegion);
     function update() {
       const params = {};
       for (const f of spec.fields) {
@@ -42,7 +44,7 @@ function _simpleRenderer(spec) {
           ? fields[f.key].input.value
           : Number(fields[f.key].input.value) || 0;
       }
-      const result = spec.compute(params);
+      const result = spec.compute(params); _steps.update(spec.fields, params, result);
       if (result.error) {
         for (const out of Object.values(outs)) out.textContent = "-";
         outs[spec.outputs[0].key].textContent = result.error;

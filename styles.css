@@ -1007,6 +1007,12 @@ input[aria-invalid="true"] {
   padding-bottom: var(--space-2);
 }
 
+/* Show the steps (spec-v1964): label / value pairs, one per line on a phone,
+   the values in the answer face so a reader can match them to the output. */
+.steps-body dl { margin: var(--space-1) 0 var(--space-2); }
+.steps-body dt { color: var(--fg-muted); }
+.steps-body dd { margin: 0 0 var(--space-1); font-family: var(--font-mono, monospace); overflow-wrap: anywhere; }
+
 /* Relocated note prose reads as one more paragraph of the scope prose it now
    sits under, so it takes .view-detail's spacing and adds nothing of its own. */
 .view-detail-note {
