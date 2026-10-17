@@ -4377,7 +4377,7 @@ export const CITATIONS = {
     edition: NEC_2023 + " " + IPC_2021 + " IMC 2021. IRC 2021. All cited by section number only.",
     freeAccess: NEC_FREE + " IPC / IMC / IRC: " + ICC_FREE,
     governance: GOVERNANCE.general,
-    editionNote: "Editions available: NEC 2023, IPC 2021, IMC 2021, IRC 2021. Inspection points are stable across recent editions; section numbering may shift.",
+    editionNote: "Editions available: the checklist cites NEC 2023, IPC 2021, IMC 2021 and IRC 2021 by section. NEC 2026, IPC 2027, IMC 2027 and IRC 2024 are the current published editions. Inspection points are stable across recent editions; section numbering may shift, so verify the edition your AHJ adopted.",
     assumptions: [],
   },
   "emergency-contacts": {
