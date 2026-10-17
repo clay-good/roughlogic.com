@@ -4,6 +4,7 @@
 import {
   DEBOUNCE_MS, debounce, makeNumber, makeSelect,
   makeOutputLine, attachExampleButton, fmt,
+  stepsFor,
 } from "./ui-fields.js";
 
 const _finiteGuardPool = (o) => {
@@ -99,7 +100,7 @@ function renderWeirFlow(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "wf-out-note");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeWeirFlow({ weir_type: type.select.value, head_ft: readNum(H.input), crest_length_ft: readNum(L.input), coeff: readNum(coeff.input), approach_width_ft: readNum(B.input), weir_height_ft: readNum(P.input) });
+    const r = computeWeirFlow({ weir_type: type.select.value, head_ft: readNum(H.input), crest_length_ft: readNum(L.input), coeff: readNum(coeff.input), approach_width_ft: readNum(B.input), weir_height_ft: readNum(P.input) }); stepsFor(outputRegion, inputRegion, ["weir_type", "head_ft", "crest_length_ft", "coeff", "approach_width_ft", "weir_height_ft"], r);
     if (r.error) { oCfs.textContent = r.error; oGpm.textContent = ""; oNote.textContent = ""; return; }
     oCfs.textContent = fmt(r.flow_cfs, 3) + " cfs";
     oGpm.textContent = fmt(r.flow_gpm, 1) + " GPM (" + fmt(r.flow_mgd, 3) + " MGD)";
@@ -145,7 +146,7 @@ function renderCipollettiWeir(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "cip-out-note");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeCipollettiWeir({ crest_length_ft: readNum(L.input), head_ft: readNum(H.input), coeff: readNum(coeff.input) });
+    const r = computeCipollettiWeir({ crest_length_ft: readNum(L.input), head_ft: readNum(H.input), coeff: readNum(coeff.input) }); stepsFor(outputRegion, inputRegion, ["crest_length_ft", "head_ft", "coeff"], r);
     if (r.error) { oCfs.textContent = r.error; oGpm.textContent = ""; oNote.textContent = ""; return; }
     oCfs.textContent = fmt(r.flow_cfs, 3) + " cfs" + (r.low_accuracy ? " (head outside ~0.2 ft to L -- low accuracy)" : "");
     oGpm.textContent = fmt(r.flow_gpm, 1) + " GPM (" + fmt(r.flow_mgd, 3) + " MGD)";
@@ -198,7 +199,7 @@ function renderSluiceGateFlow(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "slg-out-note");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeSluiceGateFlow({ gate_opening_ft: readNum(a.input), gate_width_ft: readNum(b.input), upstream_depth_ft: readNum(y1.input), contraction_coeff: readNum(cc.input) });
+    const r = computeSluiceGateFlow({ gate_opening_ft: readNum(a.input), gate_width_ft: readNum(b.input), upstream_depth_ft: readNum(y1.input), contraction_coeff: readNum(cc.input) }); stepsFor(outputRegion, inputRegion, ["gate_opening_ft", "gate_width_ft", "upstream_depth_ft", "contraction_coeff"], r);
     if (r.error) { oCfs.textContent = r.error; oGpm.textContent = ""; oCd.textContent = "-"; oNote.textContent = ""; return; }
     oCfs.textContent = fmt(r.flow_cfs, 2) + " cfs";
     oGpm.textContent = fmt(r.flow_gpm, 0) + " GPM (" + fmt(r.flow_mgd, 2) + " MGD)";
@@ -250,7 +251,7 @@ function renderBroadCrestedWeir(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "bcw-out-note");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeBroadCrestedWeir({ crest_length_ft: readNum(L.input), head_ft: readNum(H.input), discharge_coeff: readNum(coeff.input) });
+    const r = computeBroadCrestedWeir({ crest_length_ft: readNum(L.input), head_ft: readNum(H.input), discharge_coeff: readNum(coeff.input) }); stepsFor(outputRegion, inputRegion, ["crest_length_ft", "head_ft", "discharge_coeff"], r);
     if (r.error) { oCfs.textContent = r.error; oGpm.textContent = ""; oC.textContent = "-"; oNote.textContent = ""; return; }
     oCfs.textContent = fmt(r.flow_cfs, 2) + " cfs";
     oGpm.textContent = fmt(r.flow_gpm, 0) + " GPM (" + fmt(r.flow_mgd, 2) + " MGD)";
@@ -317,7 +318,7 @@ function renderWeirHeadFromFlow(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "whf-out-note");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeWeirHeadFromFlow({ weir_type: type.select.value, target_flow_cfs: readNum(Q.input), crest_length_ft: readNum(L.input), coeff: readNum(coeff.input) });
+    const r = computeWeirHeadFromFlow({ weir_type: type.select.value, target_flow_cfs: readNum(Q.input), crest_length_ft: readNum(L.input), coeff: readNum(coeff.input) }); stepsFor(outputRegion, inputRegion, ["weir_type", "target_flow_cfs", "crest_length_ft", "coeff"], r);
     if (r.error) { oHead.textContent = r.error; oFlow.textContent = ""; oNote.textContent = ""; return; }
     oHead.textContent = fmt(r.head_ft, 3) + " ft";
     oFlow.textContent = fmt(r.flow_gpm, 1) + " GPM (" + fmt(r.flow_mgd, 3) + " MGD)";

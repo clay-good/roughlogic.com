@@ -15,6 +15,7 @@
 import {
   DEBOUNCE_MS, debounce, makeNumber, makeSelect, makeTextarea,
   makeOutputLine, attachExampleButton, fmt,
+  stepsFor,
 } from "./ui-fields.js";
 
 // v18 §7 contract guard: reject a non-finite numeric input. A renderer
@@ -104,7 +105,7 @@ function _v68renderLogLimbWeight(inputRegion, outputRegion, citationEl) {
   const oVol = makeOutputLine(outputRegion, "Piece volume", "ll-out-vol");
   const oWt = makeOutputLine(outputRegion, "Green weight (static load)", "ll-out-wt");
   const update = debounce(() => {
-    const r = computeLogLimbWeight({ butt_dia_in: Number(butt.input.value) || 0, top_dia_in: Number(top.input.value) || 0, length_ft: Number(length.input.value) || 0, species: species.select.value });
+    const r = computeLogLimbWeight({ butt_dia_in: Number(butt.input.value) || 0, top_dia_in: Number(top.input.value) || 0, length_ft: Number(length.input.value) || 0, species: species.select.value }); stepsFor(outputRegion, inputRegion, ["butt_dia_in", "top_dia_in", "length_ft", "species"], r);
     if (r.error) { oVol.textContent = r.error; oWt.textContent = "-"; return; }
     oVol.textContent = fmt(r.volume_ft3, 2) + " ft^3";
     oWt.textContent = fmt(r.weight_lb, 0) + " lb (" + fmt(r.density, 0) + " lb/ft^3 green)";
@@ -156,7 +157,7 @@ function _v68renderTreeRiggingShock(inputRegion, outputRegion, citationEl) {
   const oPeak = makeOutputLine(outputRegion, "Estimated peak load", "trs-out-peak");
   const oMult = makeOutputLine(outputRegion, "Dynamic multiplier over static", "trs-out-mult");
   const update = debounce(() => {
-    const r = computeTreeRiggingShock({ static_weight_lb: Number(stat.input.value) || 0, drop_ft: Number(drop.input.value) || 0, rope_length_ft: Number(rope.input.value) || 0, elong_pct: elong.input.value === "" ? 5 : Number(elong.input.value) });
+    const r = computeTreeRiggingShock({ static_weight_lb: Number(stat.input.value) || 0, drop_ft: Number(drop.input.value) || 0, rope_length_ft: Number(rope.input.value) || 0, elong_pct: elong.input.value === "" ? 5 : Number(elong.input.value) }); stepsFor(outputRegion, inputRegion, ["static_weight_lb", "drop_ft", "rope_length_ft", "elong_pct"], r);
     if (r.error) { oPeak.textContent = r.error; oMult.textContent = "-"; return; }
     oPeak.textContent = fmt(r.peak_load_lb, 0) + " lb (rope stretch " + fmt(r.stretch_ft, 2) + " ft)";
     oMult.textContent = fmt(r.multiplier, 2) + "x";
@@ -210,7 +211,7 @@ function _v68renderFellingNotchHinge(inputRegion, outputRegion, citationEl) {
   const oWidth = makeOutputLine(outputRegion, "Hinge width", "fn-out-width");
   const oFace = makeOutputLine(outputRegion, "Open-face angle", "fn-out-face");
   const update = debounce(() => {
-    const r = computeFellingNotchHinge({ cut_dia_in: Number(dia.input.value) || 0, notch_pct: notchPct.input.value === "" ? 22 : Number(notchPct.input.value), open_face: openFace.input.value === "" ? 70 : Number(openFace.input.value) });
+    const r = computeFellingNotchHinge({ cut_dia_in: Number(dia.input.value) || 0, notch_pct: notchPct.input.value === "" ? 22 : Number(notchPct.input.value), open_face: openFace.input.value === "" ? 70 : Number(openFace.input.value) }); stepsFor(outputRegion, inputRegion, ["cut_dia_in", "notch_pct", "open_face"], r);
     if (r.error) { oNotch.textContent = r.error; for (const o of [oThick, oWidth, oFace]) o.textContent = "-"; return; }
     oNotch.textContent = fmt(r.notch_depth_in, 2) + " in";
     oThick.textContent = fmt(r.hinge_thick_in, 2) + " in";
@@ -266,7 +267,7 @@ function _v68renderPortaWrapFriction(inputRegion, outputRegion, citationEl) {
   const o4 = makeOutputLine(outputRegion, "Hand force, 4 wraps", "pw-out-4");
   const oSel = makeOutputLine(outputRegion, "Selected wraps", "pw-out-sel");
   const update = debounce(() => {
-    const r = computePortaWrapFriction({ load_lb: Number(load.input.value) || 0, mu: mu.input.value === "" ? 0.20 : Number(mu.input.value), wraps: wraps.input.value === "" ? 3 : Number(wraps.input.value) });
+    const r = computePortaWrapFriction({ load_lb: Number(load.input.value) || 0, mu: mu.input.value === "" ? 0.20 : Number(mu.input.value), wraps: wraps.input.value === "" ? 3 : Number(wraps.input.value) }); stepsFor(outputRegion, inputRegion, ["load_lb", "mu", "wraps"], r);
     if (r.error) { o1.textContent = r.error; for (const o of [o2, o3, o4, oSel]) o.textContent = "-"; return; }
     o1.textContent = fmt(r.hold_1_lb, 1) + " lb";
     o2.textContent = fmt(r.hold_2_lb, 1) + " lb";
@@ -313,7 +314,7 @@ function _v68renderChipperDebris(inputRegion, outputRegion, citationEl) {
   const oVol = makeOutputLine(outputRegion, "Loose chip volume", "cd-out-vol");
   const oLoads = makeOutputLine(outputRegion, "Loads to haul", "cd-out-loads");
   const update = debounce(() => {
-    const r = computeChipperDebris({ green_weight_lb: Number(weight.input.value) || 0, chip_density_lcy: density.input.value === "" ? 550 : Number(density.input.value), box_capacity_cy: Number(box.input.value) || 0 });
+    const r = computeChipperDebris({ green_weight_lb: Number(weight.input.value) || 0, chip_density_lcy: density.input.value === "" ? 550 : Number(density.input.value), box_capacity_cy: Number(box.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["green_weight_lb", "chip_density_lcy", "box_capacity_cy"], r);
     if (r.error) { oVol.textContent = r.error; oLoads.textContent = "-"; return; }
     oVol.textContent = fmt(r.chip_volume_lcy, 1) + " loose cy";
     oLoads.textContent = r.loads + " loads";
@@ -356,7 +357,7 @@ function _v563renderBasalAreaPrism(inputRegion, outputRegion, citationEl) {
   const oTpa = makeOutputLine(outputRegion, "Trees per acre (one in-tree)", "bap-out-tpa");
   const oNote = makeOutputLine(outputRegion, "Note", "bap-out-note");
   const update = debounce(() => {
-    const r = computeBasalAreaPrism({ baf: Number(baf.input.value) || 0, in_tree_count: Number(count.input.value) || 0, dbh_in: Number(dbh.input.value) || 0 });
+    const r = computeBasalAreaPrism({ baf: Number(baf.input.value) || 0, in_tree_count: Number(count.input.value) || 0, dbh_in: Number(dbh.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["baf", "in_tree_count", "dbh_in"], r);
     if (r.error) { oBa.textContent = r.error; oPt.textContent = "-"; oTpa.textContent = "-"; oNote.textContent = ""; return; }
     oBa.textContent = fmt(r.basal_area_per_acre, 0) + " ft^2/ac";
     oPt.textContent = fmt(r.per_tree_ba, 3) + " ft^2";
@@ -407,7 +408,7 @@ function _v564renderReinekeSdi(inputRegion, outputRegion, citationEl) {
   const oPct = makeOutputLine(outputRegion, "Percent of maximum / zone", "sdi-out-pct");
   const oNote = makeOutputLine(outputRegion, "Note", "sdi-out-note");
   const update = debounce(() => {
-    const r = computeReinekeSdi({ trees_per_acre: Number(tpa.input.value) || 0, qmd_in: Number(qmd.input.value) || 0, sdi_max: Number(smax.input.value) || 0 });
+    const r = computeReinekeSdi({ trees_per_acre: Number(tpa.input.value) || 0, qmd_in: Number(qmd.input.value) || 0, sdi_max: Number(smax.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["trees_per_acre", "qmd_in", "sdi_max"], r);
     if (r.error) { oSdi.textContent = r.error; oPct.textContent = "-"; oNote.textContent = ""; return; }
     oSdi.textContent = fmt(r.sdi, 0);
     oPct.textContent = r.percent_max == null ? "(enter a maximum SDI)" : fmt(r.percent_max, 0) + "% -- " + r.zone;
@@ -453,7 +454,7 @@ function _v619renderThinningTargetTpa(inputRegion, outputRegion, citationEl) {
   const oC = makeOutputLine(outputRegion, "Trees to cut", "ttt-out-c");
   const oN = makeOutputLine(outputRegion, "Note", "ttt-out-n");
   const update = debounce(() => {
-    const r = computeThinningTargetTpa({ sdi_max: Number(smax.input.value) || 0, target_pct: Number(pct.input.value) || 0, qmd_in: Number(qmd.input.value) || 0, current_tpa: Number(cur.input.value) || 0 });
+    const r = computeThinningTargetTpa({ sdi_max: Number(smax.input.value) || 0, target_pct: Number(pct.input.value) || 0, qmd_in: Number(qmd.input.value) || 0, current_tpa: Number(cur.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["sdi_max", "target_pct", "qmd_in", "current_tpa"], r);
     if (r.error) { oT.textContent = r.error; oC.textContent = "-"; oN.textContent = ""; return; }
     oT.textContent = fmt(r.tpa_target, 1) + " TPA at SDI " + fmt(r.sdi_target, 0) + " (" + fmt(r.ba_target, 1) + " ft2/acre basal area)";
     oC.textContent = r.cut_tpa == null ? "(enter the current TPA)" : fmt(r.cut_tpa, 1) + " TPA to cut";
@@ -502,7 +503,7 @@ function _v598renderQuadraticMeanDiameter(inputRegion, outputRegion, citationEl)
   const oBa = makeOutputLine(outputRegion, "Total basal area (tallied trees)", "qmd-out-ba");
   const oNote = makeOutputLine(outputRegion, "Note", "qmd-out-note");
   const update = debounce(() => {
-    const r = computeQuadraticMeanDiameter({ tally: tally.input.value });
+    const r = computeQuadraticMeanDiameter({ tally: tally.input.value }); stepsFor(outputRegion, inputRegion, ["tally"], r);
     if (r.error) { oQmd.textContent = r.error; oMean.textContent = "-"; oN.textContent = "-"; oBa.textContent = "-"; oNote.textContent = ""; return; }
     oQmd.textContent = fmt(r.qmd_in, 2) + " in";
     oMean.textContent = fmt(r.arithmetic_mean_in, 2) + " in";
@@ -557,7 +558,7 @@ function _v565renderTrunkDecayStrength(inputRegion, outputRegion, citationEl) {
   const oConcern = makeOutputLine(outputRegion, "Mattheck concern?", "tds-out-concern");
   const oNote = makeOutputLine(outputRegion, "Note", "tds-out-note");
   const update = debounce(() => {
-    const r = computeTrunkDecayStrength({ diameter_in: Number(D.input.value) || 0, shell_thick_in: Number(t.input.value) || 0 });
+    const r = computeTrunkDecayStrength({ diameter_in: Number(D.input.value) || 0, shell_thick_in: Number(t.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["diameter_in", "shell_thick_in"], r);
     if (r.error) { oLoss.textContent = r.error; oSm.textContent = "-"; oTr.textContent = "-"; oConcern.textContent = "-"; oNote.textContent = ""; return; }
     oLoss.textContent = fmt(r.loss_pct, 1) + "% (hollow " + fmt(r.hollow_d_in, 1) + " in)";
     oSm.textContent = fmt(r.section_modulus_loss_pct, 1) + "% -- the mechanics derivation, always the smaller of the two. Say which convention an assessment quotes";
@@ -607,7 +608,7 @@ function _v730renderTrunkMinShellThickness(inputRegion, outputRegion, citationEl
   const oTr = makeOutputLine(outputRegion, "t/R at that shell", "tms-out-tr");
   const oNote = makeOutputLine(outputRegion, "Note", "tms-out-note");
   const update = debounce(() => {
-    const r = computeTrunkMinShellThickness({ diameter_in: Number(D.input.value) || 0, allow_loss_pct: Number(loss.input.value) || 0 });
+    const r = computeTrunkMinShellThickness({ diameter_in: Number(D.input.value) || 0, allow_loss_pct: Number(loss.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["diameter_in", "allow_loss_pct"], r);
     if (r.error) { oShell.textContent = r.error; oTr.textContent = "-"; oNote.textContent = ""; return; }
     oShell.textContent = fmt(r.min_shell_in, 2) + " in (hollow " + fmt(r.hollow_d_in, 1) + " in)";
     oTr.textContent = fmt(r.min_t_over_r, 3) + (r.below_mattheck ? " (below Mattheck 0.30)" : " (at/above Mattheck 0.30)");
@@ -655,7 +656,7 @@ function _v607renderTreeOpenCavity(inputRegion, outputRegion, citationEl) {
   const oPenalty = makeOutputLine(outputRegion, "Penalty for the opening", "toc-out-penalty");
   const oNote = makeOutputLine(outputRegion, "Note", "toc-out-note");
   const update = debounce(() => {
-    const r = computeTreeOpenCavity({ diameter_in: Number(D.input.value) || 0, shell_thick_in: Number(t.input.value) || 0, opening_width_in: Number(opening.input.value) || 0 });
+    const r = computeTreeOpenCavity({ diameter_in: Number(D.input.value) || 0, shell_thick_in: Number(t.input.value) || 0, opening_width_in: Number(opening.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["diameter_in", "shell_thick_in", "opening_width_in"], r);
     if (r.error) { oOpen.textContent = r.error; oClosed.textContent = "-"; oPenalty.textContent = "-"; oNote.textContent = ""; return; }
     oOpen.textContent = fmt(r.open_loss_pct, 1) + "%" + (r.over_concern ? " - at or past the ISA 33% concern line" : "");
     oClosed.textContent = fmt(r.closed_loss_pct, 1) + "% (R = " + fmt(r.opening_ratio, 3) + ")";
@@ -698,7 +699,7 @@ function _v566renderTreeProtectionZone(inputRegion, outputRegion, citationEl) {
   const oArea = makeOutputLine(outputRegion, "Fenced area", "tpz-out-area");
   const oNote = makeOutputLine(outputRegion, "Note", "tpz-out-note");
   const update = debounce(() => {
-    const r = computeTreeProtectionZone({ dbh_in: Number(dbh.input.value) || 0, radius_factor: Number(factor.select.value) || 0 });
+    const r = computeTreeProtectionZone({ dbh_in: Number(dbh.input.value) || 0, radius_factor: Number(factor.select.value) || 0 }); stepsFor(outputRegion, inputRegion, ["dbh_in", "radius_factor"], r);
     if (r.error) { oRad.textContent = r.error; oArea.textContent = "-"; oNote.textContent = ""; return; }
     oRad.textContent = fmt(r.radius_ft, 1) + " ft (from the trunk)";
     oArea.textContent = fmt(r.area_ft2, 0) + " ft^2";
@@ -762,7 +763,7 @@ function _v608renderTreeCrzEncroachment(inputRegion, outputRegion, citationEl) {
   const oVerdict = makeOutputLine(outputRegion, "Against species tolerance", "tce-out-verdict");
   const oNote = makeOutputLine(outputRegion, "Note", "tce-out-note");
   const update = debounce(() => {
-    const r = computeTreeCrzEncroachment({ dbh_in: Number(dbh.input.value) || 0, radius_factor: Number(factor.select.value) || 0, limit_distance_ft: Number(dist.input.value) || 0, species_tolerance: species.select.value });
+    const r = computeTreeCrzEncroachment({ dbh_in: Number(dbh.input.value) || 0, radius_factor: Number(factor.select.value) || 0, limit_distance_ft: Number(dist.input.value) || 0, species_tolerance: species.select.value }); stepsFor(outputRegion, inputRegion, ["dbh_in", "radius_factor", "limit_distance_ft", "species_tolerance"], r);
     if (r.error) { oEnc.textContent = r.error; oRad.textContent = "-"; oVerdict.textContent = "-"; oNote.textContent = ""; return; }
     oEnc.textContent = fmt(r.encroach_pct, 1) + "%";
     oRad.textContent = fmt(r.radius_ft, 1) + " ft (from the trunk)";
@@ -814,7 +815,7 @@ function _v567renderCrownPruningDose(inputRegion, outputRegion, citationEl) {
   const oCap = makeOutputLine(outputRegion, "Class cap / within standard?", "cpd-out-cap");
   const oNote = makeOutputLine(outputRegion, "Note", "cpd-out-note");
   const update = debounce(() => {
-    const r = computeCrownPruningDose({ live_foliage: Number(live.input.value) || 0, removed_foliage: Number(removed.input.value) || 0, maturity_class: cls.select.value });
+    const r = computeCrownPruningDose({ live_foliage: Number(live.input.value) || 0, removed_foliage: Number(removed.input.value) || 0, maturity_class: cls.select.value }); stepsFor(outputRegion, inputRegion, ["live_foliage", "removed_foliage", "maturity_class"], r);
     if (r.error) { oPct.textContent = r.error; oCap.textContent = "-"; oNote.textContent = ""; return; }
     oPct.textContent = fmt(r.removal_pct, 1) + "%";
     oCap.textContent = "cap " + fmt(r.cap_pct, 0) + "% -- " + (r.within ? "WITHIN the standard" : "OVER the limit; reduce the removal or defer");
@@ -861,7 +862,7 @@ function renderTreeHeightClinometer(inputRegion, outputRegion, citationEl) {
   const oB = makeOutputLine(outputRegion, "Base offset from eye level", "thc-out-b");
   const oNote = makeOutputLine(outputRegion, "Note", "thc-out-note");
   const update = debounce(() => {
-    const r = computeTreeHeightClinometer({ horizontal_distance_ft: Number(d.input.value) || 0, top_reading_pct: top.input.value, base_reading_pct: Number(base.input.value) || 0 });
+    const r = computeTreeHeightClinometer({ horizontal_distance_ft: Number(d.input.value) || 0, top_reading_pct: top.input.value, base_reading_pct: Number(base.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["horizontal_distance_ft", "top_reading_pct", "base_reading_pct"], r);
     if (r.error) { oH.textContent = r.error; oA.textContent = "-"; oB.textContent = "-"; oNote.textContent = ""; return; }
     oH.textContent = fmt(r.tree_height_ft, 1) + " ft";
     oA.textContent = fmt(r.above_eye_ft, 1) + " ft";
@@ -903,7 +904,7 @@ function renderFirewoodCord(inputRegion, outputRegion, citationEl) {
   const oV = makeOutputLine(outputRegion, "Stacked volume", "fwc-out-v");
   const oNote = makeOutputLine(outputRegion, "Note", "fwc-out-note");
   const update = debounce(() => {
-    const r = computeFirewoodCord({ length_ft: Number(l.input.value) || 0, height_ft: Number(h.input.value) || 0, depth_ft: Number(d.input.value) || 0 });
+    const r = computeFirewoodCord({ length_ft: Number(l.input.value) || 0, height_ft: Number(h.input.value) || 0, depth_ft: Number(d.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["length_ft", "height_ft", "depth_ft"], r);
     if (r.error) { oC.textContent = r.error; oV.textContent = "-"; oNote.textContent = ""; return; }
     oC.textContent = fmt(r.cords, 3) + " cord" + (Math.abs(r.cords - 1) < 1e-9 ? "" : "s");
     oV.textContent = fmt(r.volume_ft3, 1) + " ft^3";
@@ -971,7 +972,7 @@ function renderTreeAppraisalCtla(inputRegion, outputRegion, citationEl) {
     const r = computeTreeAppraisalCtla({
       dbh_in: Number(d.input.value), unit_cost_per_sq_in: Number(u.input.value),
       species_pct: s.input.value, condition_pct: c.input.value, location_pct: l.input.value,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["dbh_in", "unit_cost_per_sq_in", "species_pct", "condition_pct", "location_pct"], r);
     if (r.error) { oA.textContent = r.error; oB.textContent = "-"; oV.textContent = "-"; oN.textContent = "-"; return; }
     oA.textContent = fmt(r.trunk_area_sq_in, 1) + " sq in, measured " + r.measure_at;
     oB.textContent = "$" + fmt(r.basic_value, 0);

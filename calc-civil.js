@@ -21,6 +21,7 @@ import {
   DEBOUNCE_MS, debounce, makeNumber, makeSelect,
   makeOutputLine, attachExampleButton, fmt,
   makeStepsPanel,
+  stepsFor,
 } from "./ui-fields.js";
 
 // v18 §7 contract guard: reject a non-finite numeric input. A renderer
@@ -166,7 +167,7 @@ function renderHorizontalCurve(inputRegion, outputRegion, citationEl) {
       degree_of_curve: readNum(deg.input),
       delta_deg: readNum(delta.input),
       pi_station_ft: pi.input.value === "" ? null : readNum(pi.input),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["mode", "radius_ft", "degree_of_curve", "delta_deg", "pi_station_ft"], r);
     if (r.error) { oT.textContent = r.error; oL.textContent = ""; oC.textContent = ""; oD.textContent = ""; oS.textContent = ""; return; }
     oT.textContent = fmt(r.tangent_ft, 2) + " ft (R = " + fmt(r.radius_ft, 2) + " ft)";
     oL.textContent = fmt(r.curve_length_ft, 2) + " ft";
@@ -231,7 +232,7 @@ function renderSpiralCurve(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "sc-out-n");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeSpiralCurve({ radius_ft: readNum(rad.input), spiral_length_ft: readNum(ls.input), delta_deg: readNum(delta.input) });
+    const r = computeSpiralCurve({ radius_ft: readNum(rad.input), spiral_length_ft: readNum(ls.input), delta_deg: readNum(delta.input) }); stepsFor(outputRegion, inputRegion, ["radius_ft", "spiral_length_ft", "delta_deg"], r);
     if (r.error) { oTheta.textContent = r.error; oPK.textContent = "-"; oTs.textContent = "-"; oLen.textContent = "-"; oNote.textContent = ""; return; }
     oTheta.textContent = fmt(r.theta_s_deg, 3) + " deg / " + fmt(r.sc_deflection_deg, 3) + " deg";
     oPK.textContent = fmt(r.throw_p_ft, 3) + " ft / " + fmt(r.k_ft, 3) + " ft";
@@ -297,7 +298,7 @@ function renderCompoundCurve(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "cc-out-n");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeCompoundCurve({ r1_ft: readNum(r1.input), r2_ft: readNum(r2.input), delta1_deg: readNum(d1.input), delta2_deg: readNum(d2.input) });
+    const r = computeCompoundCurve({ r1_ft: readNum(r1.input), r2_ft: readNum(r2.input), delta1_deg: readNum(d1.input), delta2_deg: readNum(d2.input) }); stepsFor(outputRegion, inputRegion, ["r1_ft", "r2_ft", "delta1_deg", "delta2_deg"], r);
     if (r.error) { oT.textContent = r.error; oPI.textContent = "-"; oL.textContent = "-"; oNote.textContent = ""; return; }
     oT.textContent = fmt(r.arc1_tangent_ft, 2) + " ft / " + fmt(r.arc2_tangent_ft, 2) + " ft";
     oPI.textContent = fmt(r.back_tangent_ft, 2) + " ft / " + fmt(r.forward_tangent_ft, 2) + " ft";
@@ -361,7 +362,7 @@ function renderReverseCurve(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "rc-out-n");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeReverseCurve({ r1_ft: readNum(r1.input), r2_ft: readNum(r2.input), offset_ft: readNum(p.input) });
+    const r = computeReverseCurve({ r1_ft: readNum(r1.input), r2_ft: readNum(r2.input), offset_ft: readNum(p.input) }); stepsFor(outputRegion, inputRegion, ["r1_ft", "r2_ft", "offset_ft"], r);
     if (r.error) { oI.textContent = r.error; oT.textContent = "-"; oD.textContent = "-"; oL.textContent = "-"; oNote.textContent = ""; return; }
     oI.textContent = fmt(r.central_angle_deg, 3) + " deg";
     oT.textContent = fmt(r.arc1_tangent_ft, 2) + " ft / " + fmt(r.arc2_tangent_ft, 2) + " ft";
@@ -432,7 +433,7 @@ function renderCurveDeflectionStakeout(inputRegion, outputRegion, citationEl) {
     deg.wrap.style.display = isDeg ? "" : "none";
   }
   const update = debounce(() => {
-    const r = computeCurveDeflectionStakeout({ mode: mode.select.value, radius_ft: readNum(rad.input), degree_of_curve: readNum(deg.input), arc_length_ft: readNum(arc.input) });
+    const r = computeCurveDeflectionStakeout({ mode: mode.select.value, radius_ft: readNum(rad.input), degree_of_curve: readNum(deg.input), arc_length_ft: readNum(arc.input) }); stepsFor(outputRegion, inputRegion, ["mode", "radius_ft", "degree_of_curve", "arc_length_ft"], r);
     if (r.error) { oDef.textContent = r.error; oChord.textContent = ""; oD.textContent = ""; oNote.textContent = ""; return; }
     oDef.textContent = fmt(r.deflection_deg, 4) + " deg (R = " + fmt(r.radius_ft, 2) + " ft)";
     oChord.textContent = fmt(r.chord_ft, 3) + " ft";
@@ -528,7 +529,7 @@ function renderVerticalCurve(inputRegion, outputRegion, citationEl) {
       pvi_station_ft: readNum(pviSta.input),
       pvi_elevation_ft: readNum(pviElev.input),
       eval_station_ft: evalSta.input.value === "" ? null : readNum(evalSta.input),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["g1_pct", "g2_pct", "length_ft", "pvi_station_ft", "pvi_elevation_ft", "eval_station_ft"], r);
     if (r.error) { oBvc.textContent = r.error; oEvc.textContent = ""; oTurn.textContent = ""; oEval.textContent = ""; return; }
     oBvc.textContent = fmt(r.bvc_station_ft, 2) + " ft / " + fmt(r.bvc_elev_ft, 2) + " ft";
     oEvc.textContent = fmt(r.evc_station_ft, 2) + " ft / " + fmt(r.evc_elev_ft, 2) + " ft";
@@ -617,7 +618,7 @@ function renderEarthworkEndArea(inputRegion, outputRegion, citationEl) {
       interval_ft: readNum(interval.input),
       mid_area_ft2: mid.input.value === "" ? null : readNum(mid.input),
       swell_shrink_factor: swell.input.value === "" ? null : readNum(swell.input),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["areas", "interval_ft", "mid_area_ft2", "swell_shrink_factor"], r);
     if (r.error) { oTot.textContent = r.error; oPris.textContent = ""; oAdj.textContent = ""; return; }
     oTot.textContent = fmt(r.total_ft3, 2) + " ft^3 (" + fmt(r.total_yd3, 2) + " yd^3)";
     oPris.textContent = r.prismoidal_ft3 == null ? "(enter a middle area for the prismoidal pair)" : fmt(r.prismoidal_ft3, 2) + " ft^3 (diff vs end-area " + fmt(r.prismoidal_diff_ft3, 2) + " ft^3)";
@@ -673,7 +674,7 @@ function renderSlopeStakeCutFill(inputRegion, outputRegion, citationEl) {
       design_elev_ft: design.input.value === "" ? null : readNum(design.input),
       slope_ratio_h: readNum(slope.input),
       offset_at_hinge_ft: offset.input.value === "" ? null : readNum(offset.input),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["existing_elev_ft", "design_elev_ft", "slope_ratio_h", "offset_at_hinge_ft"], r);
     if (r.error) { oCf.textContent = r.error; oCatch.textContent = ""; return; }
     oCf.textContent = r.which === "on grade" ? "on grade (0.00 ft)" : fmt(r.magnitude_ft, 2) + " ft " + r.which;
     oCatch.textContent = fmt(r.catch_offset_ft, 2) + " ft from CL (hinge offset + H x depth)";
@@ -737,7 +738,7 @@ function renderSuperelevation(inputRegion, outputRegion, citationEl) {
       R_ft: readNum(R.input),
       e_max: readNum(em.input),
       f: readNum(f.input),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["mode", "V_mph", "R_ft", "e_max", "f"], r);
     if (r.error) { oOut.textContent = r.error; return; }
     if (r.mode === "rmin") { oOut.textContent = "R_min " + fmt(r.R_min_ft, 1) + " ft (sharpest curve at this speed and bank)"; return; }
     oOut.textContent = r.no_bank
@@ -785,7 +786,7 @@ function renderSuperelevationSafeCurveSpeed(inputRegion, outputRegion, citationE
   const oNote = makeOutputLine(outputRegion, "Note", "ses-out-n");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeSuperelevationSafeCurveSpeed({ R_ft: readNum(R.input), e: readNum(e.input), f: readNum(f.input) });
+    const r = computeSuperelevationSafeCurveSpeed({ R_ft: readNum(R.input), e: readNum(e.input), f: readNum(f.input) }); stepsFor(outputRegion, inputRegion, ["R_ft", "e", "f"], r);
     if (r.error) { oV.textContent = r.error; oNote.textContent = ""; return; }
     oV.textContent = fmt(r.v_mph, 1) + " mph";
     oNote.textContent = r.note;
@@ -826,7 +827,7 @@ function renderVerticalCurveSightDistance(inputRegion, outputRegion, citationEl)
   const oK = makeOutputLine(outputRegion, "Rate of vertical curvature K", "vcs-out-k");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeVerticalCurveSightDistance({ A_pct: readNum(A.input), S_ft: readNum(S.input), C: readNum(C.input) });
+    const r = computeVerticalCurveSightDistance({ A_pct: readNum(A.input), S_ft: readNum(S.input), C: readNum(C.input) }); stepsFor(outputRegion, inputRegion, ["A_pct", "S_ft", "C"], r);
     if (r.error) { oL.textContent = r.error; oK.textContent = ""; return; }
     oL.textContent = fmt(r.L_ft, 0) + " ft (" + r.branch + " branch governs)";
     oK.textContent = fmt(r.K_ft_per_pct, 0) + " ft/% (K = L/A)";
@@ -865,7 +866,7 @@ function renderSagVerticalCurve(inputRegion, outputRegion, citationEl) {
   const oK = makeOutputLine(outputRegion, "Rate of vertical curvature K", "svc-out-k");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeSagVerticalCurve({ A_pct: readNum(A.input), S_ft: readNum(S.input) });
+    const r = computeSagVerticalCurve({ A_pct: readNum(A.input), S_ft: readNum(S.input) }); stepsFor(outputRegion, inputRegion, ["A_pct", "S_ft"], r);
     if (r.error) { oL.textContent = r.error; oK.textContent = ""; return; }
     oL.textContent = fmt(r.L_ft, 0) + " ft (" + r.branch + " branch governs)";
     oK.textContent = fmt(r.K_ft_per_pct, 0) + " ft/% (K = L/A)";
@@ -909,7 +910,7 @@ function renderSagVerticalCurveComfort(inputRegion, outputRegion, citationEl) {
   const oD = makeOutputLine(outputRegion, "Drainage maximum length (K<=167)", "svcc-out-d");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeSagVerticalCurveComfort({ A_pct: readNum(A.input), V_mph: readNum(V.input) });
+    const r = computeSagVerticalCurveComfort({ A_pct: readNum(A.input), V_mph: readNum(V.input) }); stepsFor(outputRegion, inputRegion, ["A_pct", "V_mph"], r);
     if (r.error) { oL.textContent = r.error; oK.textContent = ""; oD.textContent = ""; return; }
     oL.textContent = fmt(r.L_ft, 0) + " ft (K = " + fmt(r.K_ft_per_pct, 1) + " ft/%)";
     oK.textContent = fmt(r.K_ft_per_pct, 1) + " ft/% (= V^2/46.5, comfort minimum)";
@@ -969,7 +970,7 @@ function renderHorizontalSightlineOffset(inputRegion, outputRegion, citationEl) 
   const update = debounce(() => {
     const r = computeHorizontalSightlineOffset({
       mode: mode.select.value, R_ft: readNum(R.input), S_ft: readNum(S.input), M_ft: readNum(M.input),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["mode", "R_ft", "S_ft", "M_ft"], r);
     if (r.error) { oOut.textContent = r.error; return; }
     oOut.textContent = r.mode === "maxS"
       ? "S = " + fmt(r.S_ft, 1) + " ft available at this cleared offset"

@@ -13,6 +13,7 @@ import {
   DEBOUNCE_MS, debounce, makeNumber, makeTextarea, makeSelect,
   makeOutputLine, attachExampleButton, fmt,
   makeStepsPanel,
+  stepsFor,
 } from "./ui-fields.js";
 
 // v18 §7 contract guard: reject a non-finite numeric input. A renderer
@@ -122,7 +123,7 @@ function renderAreaByCoordinates(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const pointList = parsePoints(pts.input.value);
     if (pointList === null) { oArea.textContent = "Each line must be N,E with finite numbers."; oPerim.textContent = "-"; oWind.textContent = "-"; return; }
-    const r = computeAreaByCoordinates({ points: pointList });
+    const r = computeAreaByCoordinates({ points: pointList }); stepsFor(outputRegion, inputRegion, ["points"], r);
     if (r.error) { oArea.textContent = r.error; oPerim.textContent = "-"; oWind.textContent = "-"; return; }
     oArea.textContent = fmt(r.area_ft2, 1) + " ft2 (" + fmt(r.area_acres, 4) + " ac / " + fmt(r.area_m2, 1) + " m2)";
     oPerim.textContent = fmt(r.perimeter_ft, 1) + " ft over " + r.distinct_points + " corners";
@@ -218,7 +219,7 @@ function renderTraverseClosure(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const list = parseCourses(courses.input.value);
     if (list === null) { oClosure.textContent = "Each line must be azimuth_deg,distance with finite numbers."; oComponents.textContent = "-"; oEnd.textContent = "-"; return; }
-    const r = computeTraverseClosure({ courses: list, n0: readNum(n0.input), e0: readNum(e0.input) });
+    const r = computeTraverseClosure({ courses: list, n0: readNum(n0.input), e0: readNum(e0.input) }); stepsFor(outputRegion, inputRegion, ["courses", "n0", "e0"], r);
     if (r.error) { oClosure.textContent = r.error; oComponents.textContent = "-"; oEnd.textContent = "-"; return; }
     oClosure.textContent = r.closure_note;
     oComponents.textContent = "sum lat " + fmt(r.sum_lat, 3) + " ft, sum dep " + fmt(r.sum_dep, 3) + " ft, misclosure " + fmt(r.linear_misclosure, 3) + " ft over " + r.courses_count + " courses";
@@ -288,7 +289,7 @@ function renderDifferentialLeveling(inputRegion, outputRegion, citationEl) {
     const bsArr = parseNums(bs.input.value), fsArr = parseNums(fs.input.value);
     if (bsArr === null || fsArr === null) { oFinal.textContent = "Each rod reading must be a finite number, one per line."; oSums.textContent = "-"; oMis.textContent = "-"; oNote.textContent = "-"; return; }
     const kcVal = kc.input.value.trim() === "" ? null : Number(kc.input.value);
-    const r = computeDifferentialLeveling({ bm_elev: Number(bm.input.value) || 0, bs: bsArr, fs: fsArr, known_close: kcVal });
+    const r = computeDifferentialLeveling({ bm_elev: Number(bm.input.value) || 0, bs: bsArr, fs: fsArr, known_close: kcVal }); stepsFor(outputRegion, inputRegion, ["bm_elev", "bs", "fs", "known_close"], r);
     if (r.error) { oFinal.textContent = r.error; oSums.textContent = "-"; oMis.textContent = "-"; oNote.textContent = "-"; return; }
     oFinal.textContent = fmt(r.final_elev, 2) + " ft";
     oSums.textContent = fmt(r.sum_bs, 2) + " - " + fmt(r.sum_fs, 2) + " = " + fmt(r.sum_bs - r.sum_fs, 2) + " ft rise";
@@ -337,7 +338,7 @@ function renderLevelLoopAdjustment(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const eArr = parseNums(elevs.input.value), dArr = parseNums(dists.input.value);
     if (eArr === null || dArr === null) { oMis.textContent = "Each elevation and distance must be a finite number, one per line."; oAdj.textContent = "-"; oNote.textContent = "-"; return; }
-    const r = computeLevelLoopAdjustment({ elevs: eArr, dists: dArr, known_close: kc.input.value });
+    const r = computeLevelLoopAdjustment({ elevs: eArr, dists: dArr, known_close: kc.input.value }); stepsFor(outputRegion, inputRegion, ["elevs", "dists", "known_close"], r);
     if (r.error) { oMis.textContent = r.error; oAdj.textContent = "-"; oNote.textContent = "-"; return; }
     oMis.textContent = fmt(r.misclosure, 3) + " ft over " + fmt(r.total_dist, 0) + " ft leveled";
     oAdj.textContent = r.adjusted.map((a) => fmt(a, 4)).join(", ") + " ft";
@@ -384,7 +385,7 @@ function renderStadiaDistance(inputRegion, outputRegion, citationEl) {
   const oElev = makeOutputLine(outputRegion, "Target elevation", "sd-out-elev");
   const oNote = makeOutputLine(outputRegion, "Note", "sd-out-note");
   const update = debounce(() => {
-    const r = computeStadiaDistance({ s_ft: Number(s.input.value) || 0, theta_deg: Number(th.input.value) || 0, k_f: Number(k.input.value) || 0, hi_ft: Number(hi.input.value) || 0, rod_ft: Number(rod.input.value) || 0, sta_elev: Number(sta.input.value) || 0, c_ft: Number(cc.input.value) || 0 });
+    const r = computeStadiaDistance({ s_ft: Number(s.input.value) || 0, theta_deg: Number(th.input.value) || 0, k_f: Number(k.input.value) || 0, hi_ft: Number(hi.input.value) || 0, rod_ft: Number(rod.input.value) || 0, sta_elev: Number(sta.input.value) || 0, c_ft: Number(cc.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["s_ft", "theta_deg", "k_f", "hi_ft", "rod_ft", "sta_elev", "c_ft"], r);
     if (r.error) { oH.textContent = r.error; oV.textContent = "-"; oElev.textContent = "-"; oNote.textContent = "-"; return; }
     oH.textContent = fmt(r.h_ft, 2) + " ft";
     oV.textContent = fmt(r.v_ft, 2) + " ft";
@@ -441,7 +442,7 @@ function renderTapingCorrections(inputRegion, outputRegion, citationEl) {
   const oBreak = makeOutputLine(outputRegion, "Corrections (temp / slope / tension / sag)", "tap-out-break");
   const oNote = makeOutputLine(outputRegion, "Note", "tap-out-note");
   const update = debounce(() => {
-    const r = computeTapingCorrections({ l_ft: Number(l.input.value) || 0, t_f: (t.input.value === "" ? 68 : Number(t.input.value)), t0_f: (t0.input.value === "" ? 68 : Number(t0.input.value)), h_ft: Number(h.input.value) || 0, p_lb: Number(p.input.value) || 0, p0_lb: Number(p0.input.value) || 0, a_in2: Number(a.input.value) || 0, w_plf: Number(w.input.value) || 0 });
+    const r = computeTapingCorrections({ l_ft: Number(l.input.value) || 0, t_f: (t.input.value === "" ? 68 : Number(t.input.value)), t0_f: (t0.input.value === "" ? 68 : Number(t0.input.value)), h_ft: Number(h.input.value) || 0, p_lb: Number(p.input.value) || 0, p0_lb: Number(p0.input.value) || 0, a_in2: Number(a.input.value) || 0, w_plf: Number(w.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["l_ft", "t_f", "t0_f", "h_ft", "p_lb", "p0_lb", "a_in2", "w_plf"], r);
     if (r.error) { oCorr.textContent = r.error; oBreak.textContent = "-"; oNote.textContent = "-"; return; }
     oCorr.textContent = fmt(r.corrected_ft, 3) + " ft";
     oBreak.textContent = fmt(r.ct_ft, 3) + " / " + fmt(r.ch_ft, 3) + " / " + fmt(r.cp_ft, 4) + " / " + fmt(r.cs_ft, 4) + " ft";
@@ -486,7 +487,7 @@ function renderCogoForwardPoint(inputRegion, outputRegion, citationEl) {
   const oN = makeOutputLine(outputRegion, "End northing N", "cf-out-n");
   const oE = makeOutputLine(outputRegion, "End easting E", "cf-out-e");
   const update = debounce(() => {
-    const r = computeCogoForwardPoint({ start_n: Number(n0.input.value) || 0, start_e: Number(e0.input.value) || 0, azimuth_deg: az.input.value === "" ? null : Number(az.input.value), distance_ft: Number(d.input.value) || 0 });
+    const r = computeCogoForwardPoint({ start_n: Number(n0.input.value) || 0, start_e: Number(e0.input.value) || 0, azimuth_deg: az.input.value === "" ? null : Number(az.input.value), distance_ft: Number(d.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["start_n", "start_e", "azimuth_deg", "distance_ft"], r);
     if (r.error) { oDn.textContent = r.error; oDe.textContent = "-"; oN.textContent = "-"; oE.textContent = "-"; return; }
     oDn.textContent = fmt(r.delta_n, 3) + " ft";
     oDe.textContent = fmt(r.delta_e, 3) + " ft";
@@ -544,7 +545,7 @@ function renderDistanceDistanceIntersect(inputRegion, outputRegion, citationEl) 
   const oD = makeOutputLine(outputRegion, "Between control points", "ddi-out-d");
   const oNote = makeOutputLine(outputRegion, "Note", "ddi-out-note");
   const update = debounce(() => {
-    const r = computeDistanceDistanceIntersect({ n0_ft: Number(n0.input.value) || 0, e0_ft: Number(e0.input.value) || 0, dist0_ft: Number(r0.input.value) || 0, n1_ft: Number(n1.input.value) || 0, e1_ft: Number(e1.input.value) || 0, dist1_ft: Number(r1.input.value) || 0 });
+    const r = computeDistanceDistanceIntersect({ n0_ft: Number(n0.input.value) || 0, e0_ft: Number(e0.input.value) || 0, dist0_ft: Number(r0.input.value) || 0, n1_ft: Number(n1.input.value) || 0, e1_ft: Number(e1.input.value) || 0, dist1_ft: Number(r1.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["n0_ft", "e0_ft", "dist0_ft", "n1_ft", "e1_ft", "dist1_ft"], r);
     if (r.error) { oSol1.textContent = r.error; oSol2.textContent = "-"; oD.textContent = "-"; oNote.textContent = ""; return; }
     oSol1.textContent = "N " + fmt(r.sol1_n_ft, 3) + ", E " + fmt(r.sol1_e_ft, 3) + " ft";
     oSol2.textContent = r.tangent ? "(tangent - single solution)" : "N " + fmt(r.sol2_n_ft, 3) + ", E " + fmt(r.sol2_e_ft, 3) + " ft";
@@ -607,7 +608,7 @@ function renderEdmSlopeReduction(inputRegion, outputRegion, citationEl) {
   const oE = makeOutputLine(outputRegion, "Elevation difference (with HI/HR)", "edm-out-e");
   const oNote = makeOutputLine(outputRegion, "Note", "edm-out-note");
   const update = debounce(() => {
-    const r = computeEdmSlopeReduction({ angle_mode: mode.select.value, slope_distance_ft: Number(s.input.value) || 0, angle_deg: Number(ang.input.value) || 0, hi_ft: Number(hi.input.value) || 0, hr_ft: Number(hr.input.value) || 0 });
+    const r = computeEdmSlopeReduction({ angle_mode: mode.select.value, slope_distance_ft: Number(s.input.value) || 0, angle_deg: Number(ang.input.value) || 0, hi_ft: Number(hi.input.value) || 0, hr_ft: Number(hr.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["angle_mode", "slope_distance_ft", "angle_deg", "hi_ft", "hr_ft"], r);
     if (r.error) { oH.textContent = r.error; oV.textContent = "-"; oE.textContent = "-"; oNote.textContent = ""; return; }
     oH.textContent = fmt(r.horizontal_ft, 3) + " ft";
     oV.textContent = fmt(r.vertical_ft, 3) + " ft";
@@ -652,7 +653,7 @@ function renderLevelingCurvatureRefraction(inputRegion, outputRegion, citationEl
   const oRef = makeOutputLine(outputRegion, "Refraction component", "lcr-out-ref");
   const oNote = makeOutputLine(outputRegion, "Note", "lcr-out-note");
   const update = debounce(() => {
-    const r = computeLevelingCurvatureRefraction({ sight_distance_ft: Number(d.input.value) || 0 });
+    const r = computeLevelingCurvatureRefraction({ sight_distance_ft: Number(d.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["sight_distance_ft"], r);
     if (r.error) { oC.textContent = r.error; oCurv.textContent = "-"; oRef.textContent = "-"; oNote.textContent = ""; return; }
     oC.textContent = fmt(r.correction_ft, 4) + " ft";
     oCurv.textContent = fmt(r.curvature_ft, 4) + " ft";
@@ -698,7 +699,7 @@ function renderGridToGround(inputRegion, outputRegion, citationEl) {
   const oEF = makeOutputLine(outputRegion, "Elevation factor", "g2g-out-ef");
   const oNote = makeOutputLine(outputRegion, "Note", "g2g-out-note");
   const update = debounce(() => {
-    const r = computeGridToGround({ grid_distance_ft: Number(grid.input.value) || 0, grid_scale_factor: Number(gsf.input.value) || 0, ellipsoid_height_ft: Number(h.input.value) || 0 });
+    const r = computeGridToGround({ grid_distance_ft: Number(grid.input.value) || 0, grid_scale_factor: Number(gsf.input.value) || 0, ellipsoid_height_ft: Number(h.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["grid_distance_ft", "grid_scale_factor", "ellipsoid_height_ft"], r);
     if (r.error) { oG.textContent = r.error; oCF.textContent = "-"; oEF.textContent = "-"; oNote.textContent = ""; return; }
     oG.textContent = fmt(r.ground_distance_ft, 3) + " ft";
     oCF.textContent = fmt(r.combined_factor, 7);
@@ -745,7 +746,7 @@ function renderCogoInverseLocate(inputRegion, outputRegion, citationEl) {
   const oDelta = makeOutputLine(outputRegion, "Latitude / departure (dN / dE)", "cil-out-delta");
   const oNote = makeOutputLine(outputRegion, "Note", "cil-out-note");
   const update = debounce(() => {
-    const r = computeCogoInverseLocate({ start_n: Number(n1.input.value), start_e: Number(e1.input.value), end_n: Number(n2.input.value), end_e: Number(e2.input.value) });
+    const r = computeCogoInverseLocate({ start_n: Number(n1.input.value), start_e: Number(e1.input.value), end_n: Number(n2.input.value), end_e: Number(e2.input.value) }); stepsFor(outputRegion, inputRegion, ["start_n", "start_e", "end_n", "end_e"], r);
     if (r.error) { oD.textContent = r.error; oA.textContent = "-"; oDelta.textContent = "-"; oNote.textContent = ""; return; }
     oD.textContent = fmt(r.distance_ft, 3) + " ft";
     oA.textContent = fmt(r.azimuth_deg, 4) + " deg";
@@ -845,7 +846,7 @@ function renderTapingNormalTension(inputRegion, outputRegion, citationEl) {
   const oApp = makeOutputLine(outputRegion, "At the pull you used: net error", "tnt-out-app");
   const oNote = makeOutputLine(outputRegion, "Note", "tnt-out-note");
   const update = debounce(() => {
-    const r = computeTapingNormalTension({ span_ft: Number(l.input.value) || 0, tape_weight_plf: Number(w.input.value) || 0, tape_area_in2: Number(a.input.value) || 0, standard_pull_lb: Number(p0.input.value) || 0, applied_pull_lb: Number(pa.input.value) || 0 });
+    const r = computeTapingNormalTension({ span_ft: Number(l.input.value) || 0, tape_weight_plf: Number(w.input.value) || 0, tape_area_in2: Number(a.input.value) || 0, standard_pull_lb: Number(p0.input.value) || 0, applied_pull_lb: Number(pa.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["span_ft", "tape_weight_plf", "tape_area_in2", "standard_pull_lb", "applied_pull_lb"], r);
     if (r.error) { oNt.textContent = r.error; oWt.textContent = "-"; oCanc.textContent = "-"; oApp.textContent = "-"; oNote.textContent = "-"; return; }
     oNt.textContent = fmt(r.normal_tension_lb, 1) + " lb";
     oWt.textContent = fmt(r.span_weight_lb, 2) + " lb";
@@ -940,7 +941,7 @@ function renderAzimuthBearing(inputRegion, outputRegion, citationEl) {
   const oQuad = makeOutputLine(outputRegion, "Quadrant / bearing angle", "azb-out-quad");
   const oNote = makeOutputLine(outputRegion, "Note", "azb-out-note");
   const update = debounce(() => {
-    const r = computeAzimuthBearing({ mode: mode.select.value, azimuth_deg: az.input.value === "" ? null : Number(az.input.value), quadrant: quad.select.value, quadrant_angle_deg: Number(ang.input.value) || 0 });
+    const r = computeAzimuthBearing({ mode: mode.select.value, azimuth_deg: az.input.value === "" ? null : Number(az.input.value), quadrant: quad.select.value, quadrant_angle_deg: Number(ang.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["mode", "azimuth_deg", "quadrant", "quadrant_angle_deg"], r);
     if (r.error) { oAz.textContent = r.error; oBearing.textContent = "-"; oQuad.textContent = "-"; oNote.textContent = ""; return; }
     oAz.textContent = fmt(r.azimuth_deg, 4) + " deg (" + r.azimuth_dms + ")";
     oBearing.textContent = r.bearing_label;

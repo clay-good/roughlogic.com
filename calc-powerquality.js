@@ -18,6 +18,7 @@
 import {
   DEBOUNCE_MS, debounce, makeNumber, makeSelect,
   makeOutputLine, attachExampleButton, fmt,
+  stepsFor,
 } from "./ui-fields.js";
 
 export const POWERQUALITY_RENDERERS = {};
@@ -104,7 +105,7 @@ function renderParallelConductorDerate(inputRegion, outputRegion, citationEl) {
       i_single_A: readNum(isingle.input), n_sets: readNum(nsets.input),
       total_ccc: readNum(ccc.input), ambient_factor: amb.input.value === "" ? 1 : readNum(amb.input),
       i_load_A: readNum(load.input), conductor_size: size.select.value,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["i_single_A", "n_sets", "total_ccc", "ambient_factor", "i_load_A", "conductor_size"], r);
     if (r.error) { oTotal.textContent = r.error; oFactor.textContent = ""; oSet.textContent = ""; oNote.textContent = ""; return; }
     oTotal.textContent = fmt(r.i_total_A, 0) + " A (" + fmt(r.per_set_ampacity_A, 0) + " A per set)";
     oFactor.textContent = fmt(r.adjustment_factor, 3) + " (CCC " + fmt(r.ccc_factor, 2) + " x ambient)";
@@ -164,7 +165,7 @@ function renderNeutralCurrent3ph(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "nc-out-note");
   function readNum(input) { if (input.value === "") return 0; const n = Number(input.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeNeutralCurrent3ph({ ia_A: readNum(ia.input), ib_A: readNum(ib.input), ic_A: readNum(ic.input), triplen_pct: readNum(trip.input) });
+    const r = computeNeutralCurrent3ph({ ia_A: readNum(ia.input), ib_A: readNum(ib.input), ic_A: readNum(ic.input), triplen_pct: readNum(trip.input) }); stepsFor(outputRegion, inputRegion, ["ia_A", "ib_A", "ic_A", "triplen_pct"], r);
     if (r.error) { oN.textContent = r.error; oH.textContent = ""; oNote.textContent = ""; return; }
     oN.textContent = fmt(r.neutral_A, 2) + " A";
     oH.textContent = r.harmonic_neutral_A != null ? fmt(r.harmonic_neutral_A, 1) + " A (~3 x triplen/phase)" : "Enter triplen % to estimate the harmonic neutral.";
@@ -248,7 +249,7 @@ function renderMotorVdStarting(inputRegion, outputRegion, citationEl) {
       source_voltage_V: readNum(v.input), length_ft: readNum(len.input), cmils: readNum(cm.input),
       lrc_A: readNum(lrc.input), phase: phase.select.value, k_const: Number(k.select.value), dip_limit_pct: readNum(limit.input),
       starting_pf: spf.input.value === "" ? 0.35 : Number(spf.input.value), reactance_ohm_per_kft: xr.input.value === "" ? 0.05 : Number(xr.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["source_voltage_V", "length_ft", "cmils", "lrc_A", "phase", "k_const", "dip_limit_pct", "starting_pf", "reactance_ohm_per_kft"], r);
     if (r.error) { oDrop.textContent = r.error; oTerm.textContent = ""; oDip.textContent = ""; oNote.textContent = ""; return; }
     oDrop.textContent = fmt(r.v_drop_V, 1) + " V";
     oTerm.textContent = fmt(r.v_terminal_V, 1) + " V";
@@ -317,7 +318,7 @@ function _v172renderMotorUnbalanceDerate(inputRegion, outputRegion, citationEl) 
   const oFlag = makeOutputLine(outputRegion, "Status", "mu-out-flag");
   const oNote = makeOutputLine(outputRegion, "Note", "mu-out-note");
   const update = debounce(() => {
-    const r = computeMotorUnbalanceDerate({ v_ab: Number(ab.input.value) || 0, v_bc: Number(bc.input.value) || 0, v_ca: Number(ca.input.value) || 0 });
+    const r = computeMotorUnbalanceDerate({ v_ab: Number(ab.input.value) || 0, v_bc: Number(bc.input.value) || 0, v_ca: Number(ca.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["v_ab", "v_bc", "v_ca"], r);
     if (r.error) { oUb.textContent = r.error; oDerate.textContent = "-"; oFlag.textContent = "-"; oNote.textContent = ""; return; }
     oUb.textContent = fmt(r.unbalance_pct, 2) + "% (avg " + fmt(r.v_avg, 1) + " V, max dev " + fmt(r.max_dev, 1) + " V)";
     oDerate.textContent = r.derate_factor === null ? "none -- do not operate above 5% unbalance" : fmt(r.derate_factor, 3) + " (load to ~" + fmt(r.allowable_pct, 0) + "% of nameplate)";
@@ -386,7 +387,7 @@ function _v183renderTransformerKFactor(inputRegion, outputRegion, citationEl) {
       i5: Number(fields.i5.input.value) || 0, i7: Number(fields.i7.input.value) || 0,
       i9: Number(fields.i9.input.value) || 0, i11: Number(fields.i11.input.value) || 0,
       i13: Number(fields.i13.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["i1", "i3", "i5", "i7", "i9", "i11", "i13"], r);
     if (r.error) { oK.textContent = r.error; oRating.textContent = "-"; oNote.textContent = ""; return; }
     oK.textContent = fmt(r.k_factor, 2);
     oRating.textContent = r.recommended_k_rating === 1 ? "K-1 (standard transformer)" : "K-" + r.recommended_k_rating;
@@ -433,7 +434,7 @@ function _v184renderMotorCapacitorMax(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "mcm-out-note");
 
   const update = debounce(() => {
-    const r = computeMotorCapacitorMax({ v_ll: Number(v.input.value) || 0, i_noload_a: Number(i.input.value) || 0, safety_factor: Number(sf.input.value) });
+    const r = computeMotorCapacitorMax({ v_ll: Number(v.input.value) || 0, i_noload_a: Number(i.input.value) || 0, safety_factor: Number(sf.input.value) }); stepsFor(outputRegion, inputRegion, ["v_ll", "i_noload_a", "safety_factor"], r);
     if (r.error) { oMag.textContent = r.error; oMax.textContent = "-"; oNote.textContent = ""; return; }
     oMag.textContent = fmt(r.magnetizing_kvar, 2) + " kVAR";
     oMax.textContent = fmt(r.max_capacitor_kvar, 2) + " kVAR";
@@ -475,7 +476,7 @@ function _v523renderHarmonicResonance(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "hr-out-n");
   function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeHarmonicResonance({ short_circuit_mva: readNum(sc.input), cap_bank_mvar: readNum(cap.input) });
+    const r = computeHarmonicResonance({ short_circuit_mva: readNum(sc.input), cap_bank_mvar: readNum(cap.input) }); stepsFor(outputRegion, inputRegion, ["short_circuit_mva", "cap_bank_mvar"], r);
     if (r.error) { oH.textContent = r.error; oNear.textContent = "-"; oNote.textContent = ""; return; }
     oH.textContent = fmt(r.h_resonant, 2) + "th order";
     oNear.textContent = r.near_harmonic === null ? "no (not within 0.5 of the 5/7/11/13th)" : "YES -- near the " + r.near_harmonic + "th harmonic, RESONANCE RISK";
@@ -514,7 +515,7 @@ function _v717renderCapacitorBankForResonanceOrder(inputRegion, outputRegion, ci
   const oNote = makeOutputLine(outputRegion, "Note", "cbr-out-n");
   function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeCapacitorBankForResonanceOrder({ short_circuit_mva: readNum(sc.input), target_resonant_order: readNum(h.input) });
+    const r = computeCapacitorBankForResonanceOrder({ short_circuit_mva: readNum(sc.input), target_resonant_order: readNum(h.input) }); stepsFor(outputRegion, inputRegion, ["short_circuit_mva", "target_resonant_order"], r);
     if (r.error) { oM.textContent = r.error; oNote.textContent = ""; return; }
     oM.textContent = fmt(r.max_cap_bank_mvar, 3) + " MVAR";
     oNote.textContent = r.note;
@@ -558,7 +559,7 @@ function _v524renderTddIeee519(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "tdd-out-n");
   function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeTddIeee519({ isc_a: readNum(isc.input), il_a: readNum(il.input), measured_tdd_pct: tdd.input.value === "" ? null : readNum(tdd.input) });
+    const r = computeTddIeee519({ isc_a: readNum(isc.input), il_a: readNum(il.input), measured_tdd_pct: tdd.input.value === "" ? null : readNum(tdd.input) }); stepsFor(outputRegion, inputRegion, ["isc_a", "il_a", "measured_tdd_pct"], r);
     if (r.error) { oRatio.textContent = r.error; oLimit.textContent = "-"; oPass.textContent = "-"; oNote.textContent = ""; return; }
     oRatio.textContent = fmt(r.ratio, 0);
     oLimit.textContent = fmt(r.limit_pct, 1) + "%";
@@ -620,7 +621,7 @@ function _v955renderRlcReactanceResonance(inputRegion, outputRegion, citationEl)
     const r = computeRlcReactanceResonance({
       frequency_hz: fr.input.value === "" ? 60 : Number(fr.input.value), resistance_ohm: rr.input.value === "" ? 10 : Number(rr.input.value),
       inductance_h: ll.input.value === "" ? 0.05 : Number(ll.input.value), capacitance_uf: cc.input.value === "" ? 50 : Number(cc.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["frequency_hz", "resistance_ohm", "inductance_h", "capacitance_uf"], r);
     if (r.error) { oX.textContent = r.error; oZ.textContent = "-"; oF.textContent = "-"; return; }
     oX.textContent = fmt(r.inductive_reactance_ohm, 2) + " / " + fmt(r.capacitive_reactance_ohm, 2) + " ohm (" + r.character + ")";
     oZ.textContent = fmt(r.impedance_ohm, 2) + " ohm, PF " + fmt(r.power_factor, 3);

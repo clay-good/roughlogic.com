@@ -3,6 +3,7 @@
 
 import {
   DEBOUNCE_MS, debounce, makeNumber, makeOutputLine, attachExampleButton, fmt,
+  stepsFor,
 } from "./ui-fields.js";
 
 const _finiteGuard = (o) => {
@@ -52,7 +53,7 @@ function renderEoqOrderQuantity(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "eoq-out-n");
   function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeEoqOrderQuantity({ annual_demand: readNum(d.input), order_cost: readNum(s.input), holding_cost: readNum(h.input) });
+    const r = computeEoqOrderQuantity({ annual_demand: readNum(d.input), order_cost: readNum(s.input), holding_cost: readNum(h.input) }); stepsFor(outputRegion, inputRegion, ["annual_demand", "order_cost", "holding_cost"], r);
     if (r.error) { oEoq.textContent = r.error; oOrders.textContent = "-"; oTotal.textContent = "-"; oNote.textContent = ""; return; }
     oEoq.textContent = fmt(r.eoq, 0) + " units per order";
     oOrders.textContent = fmt(r.orders_per_year, 1) + " orders/yr (every " + fmt(r.cycle_days, 0) + " days)";
@@ -111,7 +112,7 @@ function renderReorderPoint(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "rop-out-n");
   function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeReorderPoint({ avg_daily_demand: readNum(dd.input), lead_time_days: readNum(lt.input), demand_sd: readNum(sd.input), service_level_pct: sl.input.value === "" ? 95 : readNum(sl.input) });
+    const r = computeReorderPoint({ avg_daily_demand: readNum(dd.input), lead_time_days: readNum(lt.input), demand_sd: readNum(sd.input), service_level_pct: sl.input.value === "" ? 95 : readNum(sl.input) }); stepsFor(outputRegion, inputRegion, ["avg_daily_demand", "lead_time_days", "demand_sd", "service_level_pct"], r);
     if (r.error) { oSafety.textContent = r.error; oRop.textContent = "-"; oNote.textContent = ""; return; }
     oSafety.textContent = fmt(r.safety_stock, 0) + " units (z = " + fmt(r.z, 3) + ")";
     oRop.textContent = fmt(r.reorder_point, 0) + " units -- reorder when stock drops here";
@@ -163,7 +164,7 @@ function renderUnitsOfProductionDepr(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "upd-out-n");
   function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeUnitsOfProductionDepr({ cost_basis: readNum(cost.input), salvage_value: readNum(salvage.input), total_units: readNum(total.input), period_units: readNum(period.input), accumulated_units: readNum(accum.input) });
+    const r = computeUnitsOfProductionDepr({ cost_basis: readNum(cost.input), salvage_value: readNum(salvage.input), total_units: readNum(total.input), period_units: readNum(period.input), accumulated_units: readNum(accum.input) }); stepsFor(outputRegion, inputRegion, ["cost_basis", "salvage_value", "total_units", "period_units", "accumulated_units"], r);
     if (r.error) { oRate.textContent = r.error; oDep.textContent = "-"; oBook.textContent = "-"; oNote.textContent = ""; return; }
     oRate.textContent = "$" + fmt(r.rate, 4) + " per unit";
     oDep.textContent = "$" + fmt(r.period_depreciation, 2);

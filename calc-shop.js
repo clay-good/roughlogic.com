@@ -26,6 +26,7 @@ import {
   DEBOUNCE_MS, debounce, makeNumber, makeText, makeSelect, makeTextarea,
   makeOutputLine, attachExampleButton, fmt, fmtDir,
   makeStepsPanel,
+  stepsFor,
 } from "./ui-fields.js";
 
 const _finiteGuard = (o) => {
@@ -98,7 +99,7 @@ function _v40renderMachiningTime(inputRegion, outputRegion, citationEl) {
   const oTotal = makeOutputLine(outputRegion, "Total time", "mt-out-total");
   const oNote = makeOutputLine(outputRegion, "Notes", "mt-out-note");
   const update = debounce(() => {
-    const r = computeMachiningTime({ feed_mode: mode.select.value, cut_length_in: _readNum(len.input), rpm: _readNum(rpm.input), feed_ipr_in: _readNum(ipr.input), feed_ipm_in: _readNum(ipm.input), passes: _readNum(passes.input) });
+    const r = computeMachiningTime({ feed_mode: mode.select.value, cut_length_in: _readNum(len.input), rpm: _readNum(rpm.input), feed_ipr_in: _readNum(ipr.input), feed_ipm_in: _readNum(ipm.input), passes: _readNum(passes.input) }); stepsFor(outputRegion, inputRegion, ["feed_mode", "cut_length_in", "rpm", "feed_ipr_in", "feed_ipm_in", "passes"], r);
     if (r.error) { oFeed.textContent = r.error; oTime.textContent = "-"; oTotal.textContent = "-"; oNote.textContent = ""; return; }
     oFeed.textContent = fmt(r.feed_ipm, 4) + " IPM";
     oTime.textContent = fmt(r.time_min, 4) + " min (" + fmt(r.time_s, 2) + " s)";
@@ -169,7 +170,7 @@ function _v40renderMaterialRemovalRate(inputRegion, outputRegion, citationEl) {
   const oMrr = makeOutputLine(outputRegion, "Material removal rate", "mrr-out-mrr");
   const oNote = makeOutputLine(outputRegion, "Notes", "mrr-out-note");
   const update = debounce(() => {
-    const r = computeMaterialRemovalRate({ mode: mode.select.value, woc_in: _readNum(woc.input), doc_in: _readNum(doc.input), feed_ipm_in: _readNum(ipm.input), sfm: _readNum(sfm.input), feed_ipr_in: _readNum(ipr.input), drill_dia_in: _readNum(dia.input) });
+    const r = computeMaterialRemovalRate({ mode: mode.select.value, woc_in: _readNum(woc.input), doc_in: _readNum(doc.input), feed_ipm_in: _readNum(ipm.input), sfm: _readNum(sfm.input), feed_ipr_in: _readNum(ipr.input), drill_dia_in: _readNum(dia.input) }); stepsFor(outputRegion, inputRegion, ["mode", "woc_in", "doc_in", "feed_ipm_in", "sfm", "feed_ipr_in", "drill_dia_in"], r);
     if (r.error) { oMrr.textContent = r.error; oNote.textContent = ""; return; }
     oMrr.textContent = fmt(r.mrr_in3, 4) + " in3/min (" + fmt(r.mrr_cm3, 3) + " cm3/min)";
     oNote.textContent = r.notes.join(" ");
@@ -217,7 +218,7 @@ function _v40renderTurningSurfaceFinish(inputRegion, outputRegion, citationEl) {
   const oRa = makeOutputLine(outputRegion, "Estimated Ra", "tsf-out-ra");
   const oNote = makeOutputLine(outputRegion, "Notes", "tsf-out-note");
   const update = debounce(() => {
-    const r = computeTurningSurfaceFinish({ feed_ipr_in: _readNum(feed.input), nose_radius_in: _readNum(rad.input) });
+    const r = computeTurningSurfaceFinish({ feed_ipr_in: _readNum(feed.input), nose_radius_in: _readNum(rad.input) }); stepsFor(outputRegion, inputRegion, ["feed_ipr_in", "nose_radius_in"], r);
     if (r.error) { oRt.textContent = r.error; oRa.textContent = "-"; oNote.textContent = ""; return; }
     oRt.textContent = fmt(r.rt_uin, 1) + " uin (" + fmt(r.rt_um, 3) + " um)";
     oRa.textContent = fmt(r.ra_uin, 1) + " uin (" + fmt(r.ra_um, 3) + " um)";
@@ -263,7 +264,7 @@ function renderFeedForSurfaceFinish(inputRegion, outputRegion, citationEl) {
   const oFeed = makeOutputLine(outputRegion, "Max feed per rev", "ffsf-out-feed");
   const oNote = makeOutputLine(outputRegion, "Note", "ffsf-out-note");
   const update = debounce(() => {
-    const r = computeFeedForSurfaceFinish({ target_finish_uin: _readNum(target.input), finish_basis: basis.select.value, nose_radius_in: _readNum(rad.input) });
+    const r = computeFeedForSurfaceFinish({ target_finish_uin: _readNum(target.input), finish_basis: basis.select.value, nose_radius_in: _readNum(rad.input) }); stepsFor(outputRegion, inputRegion, ["target_finish_uin", "finish_basis", "nose_radius_in"], r);
     if (r.error) { oFeed.textContent = r.error; oNote.textContent = ""; return; }
     oFeed.textContent = fmt(r.max_feed_ipr, 4) + " IPR";
     oNote.textContent = r.note;
@@ -308,7 +309,7 @@ function _v40renderTaperCalc(inputRegion, outputRegion, citationEl) {
   const oIncl = makeOutputLine(outputRegion, "Included angle", "tc-out-incl");
   const oNote = makeOutputLine(outputRegion, "Notes", "tc-out-note");
   const update = debounce(() => {
-    const r = computeTaperCalc({ large_dia_in: _readNum(big.input), small_dia_in: _readNum(small.input), length_in: _readNum(len.input) });
+    const r = computeTaperCalc({ large_dia_in: _readNum(big.input), small_dia_in: _readNum(small.input), length_in: _readNum(len.input) }); stepsFor(outputRegion, inputRegion, ["large_dia_in", "small_dia_in", "length_in"], r);
     if (r.error) { oTpf.textContent = r.error; oAngle.textContent = "-"; oIncl.textContent = "-"; oNote.textContent = ""; return; }
     oTpf.textContent = fmt(r.tpf_in, 4) + " in/ft (" + fmt(r.tpi_in, 6) + " in/in)";
     oAngle.textContent = fmt(r.angle_per_side_deg, 5) + " deg";
@@ -363,7 +364,7 @@ function _v650renderTaperDiameter(inputRegion, outputRegion, citationEl) {
   const oAngle = makeOutputLine(outputRegion, "Angle per side (compound set)", "tdia-out-angle");
   const oNote = makeOutputLine(outputRegion, "Note", "tdia-out-note");
   const update = debounce(() => {
-    const r = computeTaperDiameter({ known_dia_in: _readNum(kd.input), known_end: end.select.value, taper_per_foot: _readNum(tpf.input), length_in: _readNum(len.input) });
+    const r = computeTaperDiameter({ known_dia_in: _readNum(kd.input), known_end: end.select.value, taper_per_foot: _readNum(tpf.input), length_in: _readNum(len.input) }); stepsFor(outputRegion, inputRegion, ["known_dia_in", "known_end", "taper_per_foot", "length_in"], r);
     if (r.error) { oMiss.textContent = r.error; oEnds.textContent = "-"; oAngle.textContent = "-"; oNote.textContent = ""; return; }
     oMiss.textContent = fmt(r.missing_dia_in, 4) + " in";
     oEnds.textContent = fmt(r.large_dia_in, 4) + " / " + fmt(r.small_dia_in, 4) + " in (drop " + fmt(r.change_in, 4) + " in)";
@@ -424,7 +425,7 @@ function renderDovetailOverPins(inputRegion, outputRegion, citationEl) {
   const oOffset = makeOutputLine(outputRegion, "Offset k = D(1 + cot(a/2))", "dvt-out-k");
   const oNote = makeOutputLine(outputRegion, "Note", "dvt-out-note");
   const update = debounce(() => {
-    const r = computeDovetailOverPins({ dovetail_type: type.select.value, known: known.select.value, dimension_in: _readNum(dim.input), pin_dia_in: _readNum(pin.input), angle_deg: _readNum(ang.input) });
+    const r = computeDovetailOverPins({ dovetail_type: type.select.value, known: known.select.value, dimension_in: _readNum(dim.input), pin_dia_in: _readNum(pin.input), angle_deg: _readNum(ang.input) }); stepsFor(outputRegion, inputRegion, ["dovetail_type", "known", "dimension_in", "pin_dia_in", "angle_deg"], r);
     if (r.error) { oResult.textContent = r.error; oOffset.textContent = "-"; oNote.textContent = ""; return; }
     oResult.textContent = "over-rods " + fmt(r.over_pins_in, 4) + " in / flat " + fmt(r.flat_in, 4) + " in";
     oOffset.textContent = fmt(r.offset_in, 4) + " in";
@@ -474,7 +475,7 @@ function _v805renderTailstockSetover(inputRegion, outputRegion, citationEl) {
   const oRate = makeOutputLine(outputRegion, "Setover per inch of length", "tso-out-rate");
   const oNote = makeOutputLine(outputRegion, "Note", "tso-out-note");
   const update = debounce(() => {
-    const r = computeTailstockSetover({ overall_length_in: _readNum(oal.input), large_dia_in: _readNum(big.input), small_dia_in: _readNum(small.input), taper_length_in: _readNum(len.input) });
+    const r = computeTailstockSetover({ overall_length_in: _readNum(oal.input), large_dia_in: _readNum(big.input), small_dia_in: _readNum(small.input), taper_length_in: _readNum(len.input) }); stepsFor(outputRegion, inputRegion, ["overall_length_in", "large_dia_in", "small_dia_in", "taper_length_in"], r);
     if (r.error) { oS.textContent = r.error; oRate.textContent = "-"; oNote.textContent = ""; return; }
     oS.textContent = fmt(r.setover_in, 4) + " in";
     oRate.textContent = fmt(r.per_inch_setover_in, 6) + " in/in";
@@ -563,7 +564,7 @@ function _v40renderDividingHead(inputRegion, outputRegion, citationEl) {
   const oPlate = makeOutputLine(outputRegion, "Plate settings", "dh-out-plate");
   const oNote = makeOutputLine(outputRegion, "Notes", "dh-out-note");
   const update = debounce(() => {
-    const r = computeDividingHead({ divisions: _readNum(div.input), worm_ratio: _readNum(ratio.input), circles: circles.input.value, index_by: by.select.value, angle_deg: _readNum(ang.input) });
+    const r = computeDividingHead({ divisions: _readNum(div.input), worm_ratio: _readNum(ratio.input), circles: circles.input.value, index_by: by.select.value, angle_deg: _readNum(ang.input) }); stepsFor(outputRegion, inputRegion, ["divisions", "worm_ratio", "circles", "index_by", "angle_deg"], r);
     if (r.error) { oTurns.textContent = r.error; oPlate.textContent = "-"; oNote.textContent = ""; return; }
     oTurns.textContent = (r.index_by === "angle" ? "for " + fmt(r.angle_deg, 4) + " degrees: " : "") + r.full_turns + " full turn" + (r.full_turns === 1 ? "" : "s") + (r.fraction > 0 ? " + " + fmt(r.fraction, 6) + " of a turn" : "");
     const usable = r.settings.filter((s) => s.whole);
@@ -642,7 +643,7 @@ function _v40renderThreadMeasureWire(inputRegion, outputRegion, citationEl) {
   const oM = makeOutputLine(outputRegion, "Measurement over 3 wires", "tmw-out-m");
   const oNote = makeOutputLine(outputRegion, "Notes", "tmw-out-note");
   const update = debounce(() => {
-    const r = computeThreadMeasureWire({ thread_standard: std.select.value, tpi: _readNum(tpi.input), pitch_mm: _readNum(pmm.input), pitch_diameter_in: _readNum(e.input), wire_dia_in: _readNum(wire.input) });
+    const r = computeThreadMeasureWire({ thread_standard: std.select.value, tpi: _readNum(tpi.input), pitch_mm: _readNum(pmm.input), pitch_diameter_in: _readNum(e.input), wire_dia_in: _readNum(wire.input) }); stepsFor(outputRegion, inputRegion, ["thread_standard", "tpi", "pitch_mm", "pitch_diameter_in", "wire_dia_in"], r);
     if (r.error) { oBest.textContent = r.error; oM.textContent = "-"; oNote.textContent = ""; return; }
     oBest.textContent = fmt(r.best_wire_in, 6) + " in (range " + fmt(r.wire_min_in, 6) + " to " + fmt(r.wire_max_in, 6) + " in)";
     oM.textContent = fmt(r.measurement_over_wires_in, 6) + " in (" + fmt(r.measurement_over_wires_mm, 4) + " mm)" + (r.wire_out_of_range ? " - wire out of range" : "");
@@ -709,7 +710,7 @@ function _v721renderThreadPitchDiaFromWires(inputRegion, outputRegion, citationE
   const oE = makeOutputLine(outputRegion, "Pitch diameter E", "tpd-out-e");
   const oNote = makeOutputLine(outputRegion, "Notes", "tpd-out-note");
   const update = debounce(() => {
-    const r = computeThreadPitchDiaFromWires({ thread_standard: std.select.value, tpi: _readNum(tpi.input), pitch_mm: _readNum(pmm.input), measurement_over_wires_in: _readNum(m.input), wire_dia_in: _readNum(wire.input) });
+    const r = computeThreadPitchDiaFromWires({ thread_standard: std.select.value, tpi: _readNum(tpi.input), pitch_mm: _readNum(pmm.input), measurement_over_wires_in: _readNum(m.input), wire_dia_in: _readNum(wire.input) }); stepsFor(outputRegion, inputRegion, ["thread_standard", "tpi", "pitch_mm", "measurement_over_wires_in", "wire_dia_in"], r);
     if (r.error) { oBest.textContent = r.error; oE.textContent = "-"; oNote.textContent = ""; return; }
     oBest.textContent = fmt(r.best_wire_in, 6) + " in (range " + fmt(r.wire_min_in, 6) + " to " + fmt(r.wire_max_in, 6) + " in)";
     oE.textContent = fmt(r.pitch_diameter_in, 6) + " in (" + fmt(r.pitch_diameter_in * 25.4, 4) + " mm)" + (r.wire_out_of_range ? " - wire out of range" : "");
@@ -759,7 +760,7 @@ function _v40renderPressBrakeTonnage(inputRegion, outputRegion, citationEl) {
   const oDie = makeOutputLine(outputRegion, "Die advisories", "pbt-out-die");
   const oNote = makeOutputLine(outputRegion, "Notes", "pbt-out-note");
   const update = debounce(() => {
-    const r = computePressBrakeTonnage({ thickness_in: _readNum(t.input), bend_length_ft: _readNum(len.input), die_opening_in: _readNum(v.input), uts_ksi: _readNum(uts.input) });
+    const r = computePressBrakeTonnage({ thickness_in: _readNum(t.input), bend_length_ft: _readNum(len.input), die_opening_in: _readNum(v.input), uts_ksi: _readNum(uts.input) }); stepsFor(outputRegion, inputRegion, ["thickness_in", "bend_length_ft", "die_opening_in", "uts_ksi"], r);
     if (r.error) { oPerFt.textContent = r.error; oTotal.textContent = "-"; oDie.textContent = "-"; oNote.textContent = ""; return; }
     oPerFt.textContent = fmt(r.tons_per_ft, 4) + " tons/ft";
     oTotal.textContent = fmt(r.total_tons, 3) + " tons";
@@ -807,7 +808,7 @@ function _v724renderPressBrakeMaxThickness(inputRegion, outputRegion, citationEl
   const oNote = makeOutputLine(outputRegion, "Notes", "pbm-out-note");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computePressBrakeMaxThickness({ available_tonnage_tons: readNum(tons.input), die_opening_in: readNum(v.input), bend_length_ft: readNum(len.input), uts_ksi: uts.input.value === "" ? 60 : readNum(uts.input) });
+    const r = computePressBrakeMaxThickness({ available_tonnage_tons: readNum(tons.input), die_opening_in: readNum(v.input), bend_length_ft: readNum(len.input), uts_ksi: uts.input.value === "" ? 60 : readNum(uts.input) }); stepsFor(outputRegion, inputRegion, ["available_tonnage_tons", "die_opening_in", "bend_length_ft", "uts_ksi"], r);
     if (r.error) { oT.textContent = r.error; oDie.textContent = "-"; oNote.textContent = ""; return; }
     oT.textContent = fmt(r.max_thickness_in, 4) + " in (" + fmt(r.max_thickness_in * 25.4, 2) + " mm)";
     oDie.textContent = fmt(r.recommended_die_in, 3) + " in";
@@ -873,7 +874,7 @@ function _v40renderPunchForce(inputRegion, outputRegion, citationEl) {
   const oStrip = makeOutputLine(outputRegion, "Stripping force (est.)", "pf-out-strip");
   const oNote = makeOutputLine(outputRegion, "Notes", "pf-out-note");
   const update = debounce(() => {
-    const r = computePunchForce({ shape: shape.select.value, diameter_in: _readNum(dia.input), side_a_in: _readNum(a.input), side_b_in: _readNum(b.input), perimeter_in: _readNum(perim.input), thickness_in: _readNum(t.input), shear_strength_psi: _readNum(tau.input) });
+    const r = computePunchForce({ shape: shape.select.value, diameter_in: _readNum(dia.input), side_a_in: _readNum(a.input), side_b_in: _readNum(b.input), perimeter_in: _readNum(perim.input), thickness_in: _readNum(t.input), shear_strength_psi: _readNum(tau.input) }); stepsFor(outputRegion, inputRegion, ["shape", "diameter_in", "side_a_in", "side_b_in", "perimeter_in", "thickness_in", "shear_strength_psi"], r);
     if (r.error) { oPerim.textContent = r.error; oForce.textContent = "-"; oStrip.textContent = "-"; oNote.textContent = ""; return; }
     oPerim.textContent = fmt(r.perimeter_in, 5) + " in";
     oForce.textContent = fmt(r.force_lb, 1) + " lb (" + fmt(r.force_tons, 4) + " US tons)";
@@ -930,7 +931,7 @@ function renderPunchCapacity(inputRegion, outputRegion, citationEl) {
   const oMax = makeOutputLine(outputRegion, "Max the press can punch", "pc-out-max");
   const oNote = makeOutputLine(outputRegion, "Note", "pc-out-note");
   const update = debounce(() => {
-    const r = computePunchCapacity({ capacity_tons: _readNum(cap.input), shear_strength_psi: _readNum(tau.input), solve_for: mode.select.value, diameter_in: _readNum(dia.input), thickness_in: _readNum(t.input) });
+    const r = computePunchCapacity({ capacity_tons: _readNum(cap.input), shear_strength_psi: _readNum(tau.input), solve_for: mode.select.value, diameter_in: _readNum(dia.input), thickness_in: _readNum(t.input) }); stepsFor(outputRegion, inputRegion, ["capacity_tons", "shear_strength_psi", "solve_for", "diameter_in", "thickness_in"], r);
     if (r.error) { oMax.textContent = r.error; oNote.textContent = ""; return; }
     oMax.textContent = r.solve_for === "thickness" ? (fmt(r.max_thickness_in, 4) + " in thick") : (fmt(r.max_diameter_in, 4) + " in diameter");
     oNote.textContent = r.note;
@@ -975,7 +976,7 @@ function _v40renderWeldDutyCycle(inputRegion, outputRegion, citationEl) {
   const oMax = makeOutputLine(outputRegion, "Max continuous (100%) amperage", "wdc-out-max");
   const oNote = makeOutputLine(outputRegion, "Notes", "wdc-out-note");
   const update = debounce(() => {
-    const r = computeWeldDutyCycle({ rated_amps: _readNum(a1.input), rated_duty_pct: _readNum(dc1.input), target_amps: _readNum(a2.input) });
+    const r = computeWeldDutyCycle({ rated_amps: _readNum(a1.input), rated_duty_pct: _readNum(dc1.input), target_amps: _readNum(a2.input) }); stepsFor(outputRegion, inputRegion, ["rated_amps", "rated_duty_pct", "target_amps"], r);
     if (r.error) { oDuty.textContent = r.error; oMax.textContent = "-"; oNote.textContent = ""; return; }
     oDuty.textContent = fmt(r.duty_at_target_pct, 2) + "%" + (r.capped ? " (continuous)" : "") + " = " + fmt(r.minutes_on, 3) + " min per 10 min";
     oMax.textContent = fmt(r.max_continuous_amps, 1) + " A";
@@ -1031,7 +1032,7 @@ function _v40renderCarbonEquivalent(inputRegion, outputRegion, citationEl) {
   const oBand = makeOutputLine(outputRegion, "Weldability / preheat screen", "ce-out-band");
   const oNote = makeOutputLine(outputRegion, "Notes", "ce-out-note");
   const update = debounce(() => {
-    const r = computeCarbonEquivalent({ c: _readNum(c.input), mn: _readNum(mn.input), si: _readNum(si.input), cr: _readNum(cr.input), mo: _readNum(mo.input), v: _readNum(v.input), ni: _readNum(ni.input), cu: _readNum(cu.input) });
+    const r = computeCarbonEquivalent({ c: _readNum(c.input), mn: _readNum(mn.input), si: _readNum(si.input), cr: _readNum(cr.input), mo: _readNum(mo.input), v: _readNum(v.input), ni: _readNum(ni.input), cu: _readNum(cu.input) }); stepsFor(outputRegion, inputRegion, ["c", "mn", "si", "cr", "mo", "v", "ni", "cu"], r);
     if (r.error) { oCe.textContent = r.error; oBand.textContent = "-"; oNote.textContent = ""; return; }
     oCe.textContent = fmt(r.carbon_equivalent, 5);
     oBand.textContent = r.band_label;
@@ -1118,7 +1119,7 @@ function _v41renderTapDrillSize(inputRegion, outputRegion, citationEl) {
   const oNear = makeOutputLine(outputRegion, "Nearest 1/64 in drill", "tds-out-near");
   const oNote = makeOutputLine(outputRegion, "Notes", "tds-out-note");
   const update = debounce(() => {
-    const r = computeTapDrillSize({ thread_standard: std.select.value, major_dia_in: _readNum(dia.input), tpi: _readNum(tpi.input), pitch_mm: _readNum(pmm.input), thread_percent: _readNum(pct.input) });
+    const r = computeTapDrillSize({ thread_standard: std.select.value, major_dia_in: _readNum(dia.input), tpi: _readNum(tpi.input), pitch_mm: _readNum(pmm.input), thread_percent: _readNum(pct.input) }); stepsFor(outputRegion, inputRegion, ["thread_standard", "major_dia_in", "tpi", "pitch_mm", "thread_percent"], r);
     if (r.error) { oDrill.textContent = r.error; oNear.textContent = "-"; oNote.textContent = ""; return; }
     oDrill.textContent = fmt(r.drill_dia_in, 4) + " in (" + fmt(r.drill_dia_mm, 3) + " mm) for " + fmt(r.thread_percent, 1) + "% thread";
     oNear.textContent = fmt(r.nearest_64th_in, 4) + " in (" + fmt(r.nearest_64th_mm, 3) + " mm) = " + fmt(r.nearest_64th_percent, 1) + "% thread";
@@ -1175,7 +1176,7 @@ function _v41renderRolledBlank(inputRegion, outputRegion, citationEl) {
   const oDia = makeOutputLine(outputRegion, "Neutral-axis diameter", "rb-out-dia");
   const oNote = makeOutputLine(outputRegion, "Notes", "rb-out-note");
   const update = debounce(() => {
-    const r = computeRolledBlank({ reference: ref.select.value, diameter_in: _readNum(dia.input), thickness_in: _readNum(t.input), k_factor: _readNum(k.input) });
+    const r = computeRolledBlank({ reference: ref.select.value, diameter_in: _readNum(dia.input), thickness_in: _readNum(t.input), k_factor: _readNum(k.input) }); stepsFor(outputRegion, inputRegion, ["reference", "diameter_in", "thickness_in", "k_factor"], r);
     if (r.error) { oLen.textContent = r.error; oDia.textContent = "-"; oNote.textContent = ""; return; }
     oLen.textContent = fmt(r.blank_length_in, 4) + " in (" + fmt(r.blank_length_mm, 2) + " mm)";
     oDia.textContent = fmt(r.neutral_dia_in, 4) + " in (k = " + fmt(r.k_factor, 3) + ")";
@@ -1226,7 +1227,7 @@ function _renderCompoundMiter(inputRegion, outputRegion, citationEl) {
   const oBevel = makeOutputLine(outputRegion, "Bevel angle (blade tilt)", "cm-out-bevel");
   const oNote = makeOutputLine(outputRegion, "Notes", "cm-out-note");
   const update = debounce(() => {
-    const r = computeCompoundMiter({ spring_angle_deg: _readNum(spring.input), corner_angle_deg: _readNum(corner.input) });
+    const r = computeCompoundMiter({ spring_angle_deg: _readNum(spring.input), corner_angle_deg: _readNum(corner.input) }); stepsFor(outputRegion, inputRegion, ["spring_angle_deg", "corner_angle_deg"], r);
     if (r.error) { oMiter.textContent = r.error; oBevel.textContent = "-"; oNote.textContent = ""; return; }
     oMiter.textContent = fmt(r.miter_angle_deg, 2) + " deg";
     oBevel.textContent = fmt(r.bevel_angle_deg, 2) + " deg";
@@ -1272,7 +1273,7 @@ function _v399renderToleranceStackRss(inputRegion, outputRegion, citationEl) {
   const oRss = makeOutputLine(outputRegion, "RSS tolerance / fit", "tsr-out-rss");
   const oNote = makeOutputLine(outputRegion, "Note", "tsr-out-n");
   const update = debounce(() => {
-    const r = computeToleranceStackRss({ nominal_gap_in: Number(gap.input.value), tolerances: tols.input.value });
+    const r = computeToleranceStackRss({ nominal_gap_in: Number(gap.input.value), tolerances: tols.input.value }); stepsFor(outputRegion, inputRegion, ["nominal_gap_in", "tolerances"], r);
     if (r.error) { oWc.textContent = r.error; oRss.textContent = "-"; oNote.textContent = ""; return; }
     oWc.textContent = "+/-" + fmt(r.tol_wc, 4) + " in (" + fmt(r.gap_wc_lo, 4) + " to " + fmt(r.gap_wc_hi, 4) + " in, " + r.n + " dims)";
     oRss.textContent = "+/-" + fmt(r.tol_rss, 4) + " in (" + fmt(r.gap_rss_lo, 4) + " to " + fmt(r.gap_rss_hi, 4) + " in)";
@@ -1307,7 +1308,7 @@ function _v400renderConeFlatPattern(inputRegion, outputRegion, citationEl) {
   const oS = makeOutputLine(outputRegion, "Sector sweep angle", "cfp-out-s");
   const oNote = makeOutputLine(outputRegion, "Note", "cfp-out-n");
   const update = debounce(() => {
-    const res = computeConeFlatPattern({ base_radius_in: Number(r.input.value) || 0, height_in: Number(h.input.value) || 0 });
+    const res = computeConeFlatPattern({ base_radius_in: Number(r.input.value) || 0, height_in: Number(h.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["base_radius_in", "height_in"], res);
     if (res.error) { oL.textContent = res.error; oS.textContent = "-"; oNote.textContent = ""; return; }
     oL.textContent = fmt(res.slant_L_in, 3) + " in";
     oS.textContent = fmt(res.sweep_deg, 1) + " deg";
@@ -1354,7 +1355,7 @@ function _v1312renderFrustumVolume(inputRegion, outputRegion, citationEl) {
   const oS = makeOutputLine(outputRegion, "Slant height / lateral area", "frv-out-s");
   const oNote = makeOutputLine(outputRegion, "Note", "frv-out-n");
   const update = debounce(() => {
-    const res = computeFrustumVolume({ large_diameter_ft: Number(D.input.value) || 0, small_diameter_ft: Number(d.input.value) || 0, height_ft: Number(h.input.value) || 0 });
+    const res = computeFrustumVolume({ large_diameter_ft: Number(D.input.value) || 0, small_diameter_ft: Number(d.input.value) || 0, height_ft: Number(h.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["large_diameter_ft", "small_diameter_ft", "height_ft"], res);
     if (res.error) { oV.textContent = res.error; oS.textContent = "-"; oNote.textContent = ""; return; }
     oV.textContent = fmt(res.volume_ft3, 2) + " ft^3 (" + fmt(res.volume_gal, 1) + " gal, " + fmt(res.volume_yd3, 3) + " yd^3)";
     oS.textContent = fmt(res.slant_height_ft, 3) + " ft slant, " + fmt(res.lateral_area_ft2, 2) + " ft^2 side";
@@ -1400,7 +1401,7 @@ function _v1313renderRegularPolygon(inputRegion, outputRegion, citationEl) {
   const oI = makeOutputLine(outputRegion, "Interior angle / area", "rpg-out-i");
   const oNote = makeOutputLine(outputRegion, "Note", "rpg-out-n");
   const update = debounce(() => {
-    const res = computeRegularPolygon({ num_sides: Number(n.input.value) || 0, side_length: Number(s.input.value) || 0 });
+    const res = computeRegularPolygon({ num_sides: Number(n.input.value) || 0, side_length: Number(s.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["num_sides", "side_length"], res);
     if (res.error) { oA.textContent = res.error; oR.textContent = "-"; oI.textContent = "-"; oNote.textContent = ""; return; }
     oA.textContent = fmt(res.across_flats, 4) + " across flats / " + fmt(res.across_corners, 4) + " across corners";
     oR.textContent = fmt(res.apothem, 4) + " apothem / " + fmt(res.circumradius, 4) + " circumradius (perimeter " + fmt(res.perimeter, 3) + ")";
@@ -1444,7 +1445,7 @@ function _v1314renderEllipseAreaPerimeter(inputRegion, outputRegion, citationEl)
   const oE = makeOutputLine(outputRegion, "Semi-axes / eccentricity", "elp-out-e");
   const oNote = makeOutputLine(outputRegion, "Note", "elp-out-n");
   const update = debounce(() => {
-    const res = computeEllipseAreaPerimeter({ major_axis: Number(M.input.value) || 0, minor_axis: Number(m.input.value) || 0 });
+    const res = computeEllipseAreaPerimeter({ major_axis: Number(M.input.value) || 0, minor_axis: Number(m.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["major_axis", "minor_axis"], res);
     if (res.error) { oA.textContent = res.error; oP.textContent = "-"; oE.textContent = "-"; oNote.textContent = ""; return; }
     oA.textContent = fmt(res.area, 4) + " (square units)";
     oP.textContent = fmt(res.perimeter, 4);
@@ -1489,7 +1490,7 @@ function _v1315renderSphericalCapVolume(inputRegion, outputRegion, citationEl) {
   const oF = makeOutputLine(outputRegion, "Full sphere / percent full", "scv-out-f");
   const oNote = makeOutputLine(outputRegion, "Note", "scv-out-n");
   const update = debounce(() => {
-    const res = computeSphericalCapVolume({ sphere_diameter_ft: Number(D.input.value) || 0, fill_depth_ft: Number(h.input.value) || 0 });
+    const res = computeSphericalCapVolume({ sphere_diameter_ft: Number(D.input.value) || 0, fill_depth_ft: Number(h.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["sphere_diameter_ft", "fill_depth_ft"], res);
     if (res.error) { oV.textContent = res.error; oF.textContent = "-"; oNote.textContent = ""; return; }
     oV.textContent = fmt(res.cap_volume_ft3, 3) + " ft^3 (" + fmt(res.cap_volume_gal, 1) + " gal)" + (res.is_hemisphere ? " - a hemisphere" : "");
     oF.textContent = fmt(res.full_sphere_ft3, 3) + " ft^3 full, " + fmt(res.percent_full, 1) + "% full";
@@ -1529,7 +1530,7 @@ function _v1316renderParabolicSegment(inputRegion, outputRegion, citationEl) {
   const oL = makeOutputLine(outputRegion, "Curved arc length", "pbs-out-l");
   const oNote = makeOutputLine(outputRegion, "Note", "pbs-out-n");
   const update = debounce(() => {
-    const res = computeParabolicSegment({ base_span: Number(b.input.value) || 0, rise_height: Number(h.input.value) || 0 });
+    const res = computeParabolicSegment({ base_span: Number(b.input.value) || 0, rise_height: Number(h.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["base_span", "rise_height"], res);
     if (res.error) { oA.textContent = res.error; oL.textContent = "-"; oNote.textContent = ""; return; }
     oA.textContent = fmt(res.area, 4) + " (square units, = 2/3 of the b x h box)";
     oL.textContent = fmt(res.arc_length, 4) + " over a " + fmt(res.chord, 3) + " chord";
@@ -1585,7 +1586,7 @@ function _v1317renderPyramidFrustumVolume(inputRegion, outputRegion, citationEl)
   const oA = makeOutputLine(outputRegion, "Bottom / top area", "pfv-out-a");
   const oNote = makeOutputLine(outputRegion, "Note", "pfv-out-n");
   const update = debounce(() => {
-    const res = computePyramidFrustumVolume({ bottom_length_ft: Number(Lb.input.value) || 0, bottom_width_ft: Number(Wb.input.value) || 0, top_length_ft: Number(Lt.input.value) || 0, top_width_ft: Number(Wt.input.value) || 0, height_ft: Number(h.input.value) || 0 });
+    const res = computePyramidFrustumVolume({ bottom_length_ft: Number(Lb.input.value) || 0, bottom_width_ft: Number(Wb.input.value) || 0, top_length_ft: Number(Lt.input.value) || 0, top_width_ft: Number(Wt.input.value) || 0, height_ft: Number(h.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["bottom_length_ft", "bottom_width_ft", "top_length_ft", "top_width_ft", "height_ft"], res);
     if (res.error) { oV.textContent = res.error; oA.textContent = "-"; oNote.textContent = ""; return; }
     oV.textContent = fmt(res.volume_ft3, 3) + " ft^3 (" + fmt(res.volume_yd3, 3) + " yd^3, " + fmt(res.volume_gal, 1) + " gal)";
     oA.textContent = fmt(res.bottom_area_ft2, 2) + " ft^2 bottom / " + fmt(res.top_area_ft2, 2) + " ft^2 top";
@@ -1628,7 +1629,7 @@ function _v1318renderTorusVolume(inputRegion, outputRegion, citationEl) {
   const oS = makeOutputLine(outputRegion, "Surface area", "trv-out-s");
   const oNote = makeOutputLine(outputRegion, "Note", "trv-out-n");
   const update = debounce(() => {
-    const res = computeTorusVolume({ center_diameter_in: Number(Dc.input.value) || 0, tube_diameter_in: Number(dt.input.value) || 0 });
+    const res = computeTorusVolume({ center_diameter_in: Number(Dc.input.value) || 0, tube_diameter_in: Number(dt.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["center_diameter_in", "tube_diameter_in"], res);
     if (res.error) { oV.textContent = res.error; oS.textContent = "-"; oNote.textContent = ""; return; }
     oV.textContent = fmt(res.volume_in3, 3) + " in^3 (" + fmt(res.volume_ft3, 4) + " ft^3, " + fmt(res.volume_gal, 3) + " gal)";
     oS.textContent = fmt(res.surface_area_in2, 2) + " in^2";
@@ -1672,7 +1673,7 @@ function _v1319renderEllipsoidVolume(inputRegion, outputRegion, citationEl) {
   const oH = makeOutputLine(outputRegion, "Half-ellipsoid (dome / head)", "elv-out-h");
   const oNote = makeOutputLine(outputRegion, "Note", "elv-out-n");
   const update = debounce(() => {
-    const res = computeEllipsoidVolume({ length_ft: Number(L.input.value) || 0, width_ft: Number(W.input.value) || 0, height_ft: Number(H.input.value) || 0 });
+    const res = computeEllipsoidVolume({ length_ft: Number(L.input.value) || 0, width_ft: Number(W.input.value) || 0, height_ft: Number(H.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["length_ft", "width_ft", "height_ft"], res);
     if (res.error) { oV.textContent = res.error; oH.textContent = "-"; oNote.textContent = ""; return; }
     oV.textContent = fmt(res.volume_ft3, 3) + " ft^3 (" + fmt(res.volume_gal, 1) + " gal)" + (res.is_sphere ? " - a sphere" : "");
     oH.textContent = fmt(res.half_volume_ft3, 3) + " ft^3";
@@ -1715,7 +1716,7 @@ function _v1320renderAnnulusArea(inputRegion, outputRegion, citationEl) {
   const oW = makeOutputLine(outputRegion, "Wall thickness", "ana-out-w");
   const oNote = makeOutputLine(outputRegion, "Note", "ana-out-n");
   const update = debounce(() => {
-    const res = computeAnnulusArea({ outer_diameter: Number(D.input.value) || 0, inner_diameter: Number(d.input.value) || 0 });
+    const res = computeAnnulusArea({ outer_diameter: Number(D.input.value) || 0, inner_diameter: Number(d.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["outer_diameter", "inner_diameter"], res);
     if (res.error) { oR.textContent = res.error; oB.textContent = "-"; oW.textContent = "-"; oNote.textContent = ""; return; }
     oR.textContent = fmt(res.ring_area, 4) + " (square units)";
     oB.textContent = fmt(res.outer_area, 4) + " outer / " + fmt(res.bore_area, 4) + " bore (flow area)";
@@ -1758,7 +1759,7 @@ function _v1321renderCircularSector(inputRegion, outputRegion, citationEl) {
   const oP = makeOutputLine(outputRegion, "Perimeter (arc + 2 radii)", "csec-out-p");
   const oNote = makeOutputLine(outputRegion, "Note", "csec-out-n");
   const update = debounce(() => {
-    const res = computeCircularSector({ radius: Number(r.input.value) || 0, angle_deg: Number(a.input.value) || 0 });
+    const res = computeCircularSector({ radius: Number(r.input.value) || 0, angle_deg: Number(a.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["radius", "angle_deg"], res);
     if (res.error) { oA.textContent = res.error; oL.textContent = "-"; oP.textContent = "-"; oNote.textContent = ""; return; }
     oA.textContent = fmt(res.area, 4) + " (square units)";
     oL.textContent = fmt(res.arc_length, 4) + " arc, " + fmt(res.chord, 4) + " chord";
@@ -1831,7 +1832,7 @@ function _v1322renderTankVolumeDishedHeads(inputRegion, outputRegion, citationEl
   const oF = makeOutputLine(outputRegion, "Full tank", "tvdh-out-f");
   const oNote = makeOutputLine(outputRegion, "Notes", "tvdh-out-n");
   const update = debounce(() => {
-    const res = computeTankVolumeDishedHeads({ diameter_ft: Number(D.input.value) || 0, shell_length_ft: Number(L.input.value) || 0, fill_depth_ft: Number(h.input.value) || 0, head_type: head.select.value });
+    const res = computeTankVolumeDishedHeads({ diameter_ft: Number(D.input.value) || 0, shell_length_ft: Number(L.input.value) || 0, fill_depth_ft: Number(h.input.value) || 0, head_type: head.select.value }); stepsFor(outputRegion, inputRegion, ["diameter_ft", "shell_length_ft", "fill_depth_ft", "head_type"], res);
     if (res.error) { oV.textContent = res.error; oP.textContent = "-"; oS.textContent = "-"; oF.textContent = "-"; oNote.textContent = ""; return; }
     oV.textContent = fmt(res.volume_gal, 1) + " gal (" + fmt(res.volume_ft3, 2) + " ft^3)";
     oP.textContent = fmt(res.percent_full, 1) + "%";
@@ -1877,7 +1878,7 @@ function _v1323renderSphericalZoneVolume(inputRegion, outputRegion, citationEl) 
   const oV = makeOutputLine(outputRegion, "Zone volume", "spz-out-v");
   const oNote = makeOutputLine(outputRegion, "Note", "spz-out-n");
   const update = debounce(() => {
-    const res = computeSphericalZoneVolume({ base_radius_1_ft: Number(r1.input.value) || 0, base_radius_2_ft: Number(r2.input.value) || 0, zone_height_ft: Number(h.input.value) || 0 });
+    const res = computeSphericalZoneVolume({ base_radius_1_ft: Number(r1.input.value) || 0, base_radius_2_ft: Number(r2.input.value) || 0, zone_height_ft: Number(h.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["base_radius_1_ft", "base_radius_2_ft", "zone_height_ft"], res);
     if (res.error) { oV.textContent = res.error; oNote.textContent = ""; return; }
     oV.textContent = fmt(res.volume_ft3, 3) + " ft^3 (" + fmt(res.volume_gal, 1) + " gal)" + (res.is_cap ? " - a spherical cap (one base is zero)" : "");
     oNote.textContent = res.note;
@@ -1941,7 +1942,7 @@ function _v1324renderOvalTankVolume(inputRegion, outputRegion, citationEl) {
   const oF = makeOutputLine(outputRegion, "Full tank", "ovt-out-f");
   const oNote = makeOutputLine(outputRegion, "Notes", "ovt-out-n");
   const update = debounce(() => {
-    const res = computeOvalTankVolume({ width_in: Number(W.input.value) || 0, height_in: Number(H.input.value) || 0, length_in: Number(L.input.value) || 0, depth_in: Number(d.input.value) || 0 });
+    const res = computeOvalTankVolume({ width_in: Number(W.input.value) || 0, height_in: Number(H.input.value) || 0, length_in: Number(L.input.value) || 0, depth_in: Number(d.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["width_in", "height_in", "length_in", "depth_in"], res);
     if (res.error) { oV.textContent = res.error; oP.textContent = "-"; oF.textContent = "-"; oNote.textContent = ""; return; }
     oV.textContent = fmt(res.volume_gal, 1) + " gal (" + fmt(res.volume_ft3, 2) + " ft^3)";
     oP.textContent = fmt(res.percent_full, 1) + "%";
@@ -2007,7 +2008,7 @@ function _v1325renderConeBottomTankVolume(inputRegion, outputRegion, citationEl)
   const oF = makeOutputLine(outputRegion, "Full tank", "cbt-out-f");
   const oNote = makeOutputLine(outputRegion, "Notes", "cbt-out-n");
   const update = debounce(() => {
-    const res = computeConeBottomTankVolume({ diameter_ft: Number(D.input.value) || 0, cone_height_ft: Number(Hc.input.value) || 0, cylinder_height_ft: Number(Hcyl.input.value) || 0, depth_ft: Number(d.input.value) || 0 });
+    const res = computeConeBottomTankVolume({ diameter_ft: Number(D.input.value) || 0, cone_height_ft: Number(Hc.input.value) || 0, cylinder_height_ft: Number(Hcyl.input.value) || 0, depth_ft: Number(d.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["diameter_ft", "cone_height_ft", "cylinder_height_ft", "depth_ft"], res);
     if (res.error) { oV.textContent = res.error; oP.textContent = "-"; oF.textContent = "-"; oNote.textContent = ""; return; }
     oV.textContent = fmt(res.volume_gal, 1) + " gal (" + fmt(res.volume_ft3, 2) + " ft^3)";
     oP.textContent = fmt(res.percent_full, 1) + "%";
@@ -2073,7 +2074,7 @@ function _v1326renderTaperedTankVolume(inputRegion, outputRegion, citationEl) {
   const oF = makeOutputLine(outputRegion, "Full tank", "ttk-out-f");
   const oNote = makeOutputLine(outputRegion, "Notes", "ttk-out-n");
   const update = debounce(() => {
-    const res = computeTaperedTankVolume({ bottom_diameter_ft: Number(D1.input.value) || 0, top_diameter_ft: Number(D2.input.value) || 0, height_ft: Number(H.input.value) || 0, depth_ft: Number(d.input.value) || 0 });
+    const res = computeTaperedTankVolume({ bottom_diameter_ft: Number(D1.input.value) || 0, top_diameter_ft: Number(D2.input.value) || 0, height_ft: Number(H.input.value) || 0, depth_ft: Number(d.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["bottom_diameter_ft", "top_diameter_ft", "height_ft", "depth_ft"], res);
     if (res.error) { oV.textContent = res.error; oP.textContent = "-"; oF.textContent = "-"; oNote.textContent = ""; return; }
     oV.textContent = fmt(res.volume_gal, 1) + " gal (" + fmt(res.volume_ft3, 2) + " ft^3)";
     oP.textContent = fmt(res.percent_full, 1) + "%";
@@ -2126,7 +2127,7 @@ function _v1329renderParaboloidVolume(inputRegion, outputRegion, citationEl) {
   const oR = makeOutputLine(outputRegion, "Liquid-surface radius at that depth", "pbv-out-r");
   const oNote = makeOutputLine(outputRegion, "Note", "pbv-out-n");
   const update = debounce(() => {
-    const res = computeParaboloidVolume({ base_diameter_ft: Number(D.input.value) || 0, height_ft: Number(H.input.value) || 0, fill_depth_ft: Number(y.input.value) || 0 });
+    const res = computeParaboloidVolume({ base_diameter_ft: Number(D.input.value) || 0, height_ft: Number(H.input.value) || 0, fill_depth_ft: Number(y.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["base_diameter_ft", "height_ft", "fill_depth_ft"], res);
     if (res.error) { oV.textContent = res.error; oFill.textContent = "-"; oR.textContent = "-"; oNote.textContent = ""; return; }
     oV.textContent = fmt(res.full_ft3, 3) + " ft^3 (" + fmt(res.full_gal, 1) + " gal)";
     oFill.textContent = fmt(res.fill_ft3, 3) + " ft^3 (" + fmt(res.fill_gal, 1) + " gal), " + fmt(res.percent_full, 1) + "% full";
@@ -2173,7 +2174,7 @@ function _v1330renderCylindricalWedgeVolume(inputRegion, outputRegion, citationE
   const oB = makeOutputLine(outputRegion, "Semicircular base area / percent of the full cylinder", "cwv-out-b");
   const oNote = makeOutputLine(outputRegion, "Note", "cwv-out-n");
   const update = debounce(() => {
-    const res = computeCylindricalWedgeVolume({ base_diameter_ft: Number(D.input.value) || 0, height_ft: Number(H.input.value) || 0 });
+    const res = computeCylindricalWedgeVolume({ base_diameter_ft: Number(D.input.value) || 0, height_ft: Number(H.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["base_diameter_ft", "height_ft"], res);
     if (res.error) { oV.textContent = res.error; oB.textContent = "-"; oNote.textContent = ""; return; }
     oV.textContent = fmt(res.volume_ft3, 3) + " ft^3 (" + fmt(res.volume_gal, 1) + " gal)";
     oB.textContent = fmt(res.base_area_ft2, 3) + " ft^2, " + fmt(res.percent_of_cylinder, 1) + "% of the enclosing cylinder";
@@ -2222,7 +2223,7 @@ function _v1331renderBarrelVolume(inputRegion, outputRegion, citationEl) {
   const oC = makeOutputLine(outputRegion, "Volume (circular-arc estimate)", "brl-out-c");
   const oNote = makeOutputLine(outputRegion, "Note", "brl-out-n");
   const update = debounce(() => {
-    const res = computeBarrelVolume({ bung_diameter_in: Number(D.input.value) || 0, head_diameter_in: Number(d.input.value) || 0, length_in: Number(L.input.value) || 0 });
+    const res = computeBarrelVolume({ bung_diameter_in: Number(D.input.value) || 0, head_diameter_in: Number(d.input.value) || 0, length_in: Number(L.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["bung_diameter_in", "head_diameter_in", "length_in"], res);
     if (res.error) { oV.textContent = res.error; oC.textContent = "-"; oNote.textContent = ""; return; }
     oV.textContent = fmt(res.parabolic_gal, 2) + " gal (" + fmt(res.parabolic_ft3, 3) + " ft^3, " + fmt(res.parabolic_in3, 0) + " in^3)";
     oC.textContent = fmt(res.circular_gal, 2) + " gal";
@@ -2273,7 +2274,7 @@ function _v511renderPressFitPressure(inputRegion, outputRegion, citationEl) {
   const oS = makeOutputLine(outputRegion, "Hub bore (hoop) stress", "pfp-out-s");
   const oNote = makeOutputLine(outputRegion, "Note", "pfp-out-n");
   const update = debounce(() => {
-    const r = computePressFitPressure({ shaft_dia_in: _readNum(d.input), interference_in: _readNum(i.input), hub_od_in: _readNum(dout.input), modulus_psi: _readNum(e.input), friction_coeff: _readNum(mu.input), engagement_in: _readNum(len.input) });
+    const r = computePressFitPressure({ shaft_dia_in: _readNum(d.input), interference_in: _readNum(i.input), hub_od_in: _readNum(dout.input), modulus_psi: _readNum(e.input), friction_coeff: _readNum(mu.input), engagement_in: _readNum(len.input) }); stepsFor(outputRegion, inputRegion, ["shaft_dia_in", "interference_in", "hub_od_in", "modulus_psi", "friction_coeff", "engagement_in"], r);
     if (r.error) { oP.textContent = r.error; oH.textContent = "-"; oS.textContent = "-"; oNote.textContent = ""; return; }
     oP.textContent = fmt(r.p_psi, 0) + " psi";
     oH.textContent = fmt(r.holding_lb, 0) + " lb";
@@ -2334,7 +2335,7 @@ function _v728renderPressFitInterferenceForForce(inputRegion, outputRegion, cita
   const oS = makeOutputLine(outputRegion, "Resulting hub bore (hoop) stress", "pfi-out-s");
   const oNote = makeOutputLine(outputRegion, "Note", "pfi-out-n");
   const update = debounce(() => {
-    const r = computePressFitInterferenceForForce({ target_holding_lb: _readNum(hold.input), shaft_dia_in: _readNum(d.input), hub_od_in: _readNum(dout.input), modulus_psi: _readNum(e.input), friction_coeff: _readNum(mu.input), engagement_in: _readNum(len.input), hub_yield_psi: _readNum(yld.input) });
+    const r = computePressFitInterferenceForForce({ target_holding_lb: _readNum(hold.input), shaft_dia_in: _readNum(d.input), hub_od_in: _readNum(dout.input), modulus_psi: _readNum(e.input), friction_coeff: _readNum(mu.input), engagement_in: _readNum(len.input), hub_yield_psi: _readNum(yld.input) }); stepsFor(outputRegion, inputRegion, ["target_holding_lb", "shaft_dia_in", "hub_od_in", "modulus_psi", "friction_coeff", "engagement_in", "hub_yield_psi"], r);
     if (r.error) { oI.textContent = r.error; oP.textContent = "-"; oS.textContent = "-"; oNote.textContent = ""; return; }
     oI.textContent = fmt(r.interference_in, 4) + " in";
     oP.textContent = fmt(r.p_psi, 0) + " psi";
@@ -2387,7 +2388,7 @@ function _v512renderRollerChainLength(inputRegion, outputRegion, citationEl) {
   const oC = makeOutputLine(outputRegion, "Corrected center distance", "rcl-out-c");
   const oNote = makeOutputLine(outputRegion, "Note", "rcl-out-n");
   const update = debounce(() => {
-    const r = computeRollerChainLength({ small_teeth_n1: _readNum(n1.input), large_teeth_n2: _readNum(n2.input), center_distance_in: _readNum(c.input), pitch_in: _readNum(p.input) });
+    const r = computeRollerChainLength({ small_teeth_n1: _readNum(n1.input), large_teeth_n2: _readNum(n2.input), center_distance_in: _readNum(c.input), pitch_in: _readNum(p.input) }); stepsFor(outputRegion, inputRegion, ["small_teeth_n1", "large_teeth_n2", "center_distance_in", "pitch_in"], r);
     if (r.error) { oL.textContent = r.error; oLe.textContent = "-"; oC.textContent = "-"; oNote.textContent = ""; return; }
     oL.textContent = fmt(r.length_pitches, 2) + " pitches";
     oLe.textContent = r.length_even + " pitches (even)";
@@ -2426,7 +2427,7 @@ function _v801renderSprocketPitchDiameter(inputRegion, outputRegion, citationEl)
   const oOd = makeOutputLine(outputRegion, "Max outside (tip) diameter", "spd-out-od");
   const oNote = makeOutputLine(outputRegion, "Note", "spd-out-n");
   const update = debounce(() => {
-    const r = computeSprocketPitchDiameter({ chain_pitch_in: _readNum(p.input), tooth_count_n: _readNum(n.input) });
+    const r = computeSprocketPitchDiameter({ chain_pitch_in: _readNum(p.input), tooth_count_n: _readNum(n.input) }); stepsFor(outputRegion, inputRegion, ["chain_pitch_in", "tooth_count_n"], r);
     if (r.error) { oPd.textContent = r.error; oOd.textContent = "-"; oNote.textContent = ""; return; }
     oPd.textContent = fmt(r.pitch_diameter_in, 4) + " in";
     oOd.textContent = fmt(r.outside_diameter_in, 4) + " in";
@@ -2518,7 +2519,7 @@ function _v1155renderCylinderStorageSeparation(inputRegion, outputRegion, citati
   const oV = makeOutputLine(outputRegion, "Verdict", "css-out-v");
   const oN = makeOutputLine(outputRegion, "Note", "css-out-n");
   const update = debounce(() => {
-    const r = computeCylinderStorageSeparation({ separation_ft: Number(sp.input.value) || 0, barrier_present: bp.select.value, barrier_height_ft: Number(bh.input.value) || 0, barrier_noncombustible: bn.select.value, barrier_rating_hr: Number(br.input.value) || 0, cylinders_upright: up.select.value, valve_caps_secured: vc.select.value });
+    const r = computeCylinderStorageSeparation({ separation_ft: Number(sp.input.value) || 0, barrier_present: bp.select.value, barrier_height_ft: Number(bh.input.value) || 0, barrier_noncombustible: bn.select.value, barrier_rating_hr: Number(br.input.value) || 0, cylinders_upright: up.select.value, valve_caps_secured: vc.select.value }); stepsFor(outputRegion, inputRegion, ["separation_ft", "barrier_present", "barrier_height_ft", "barrier_noncombustible", "barrier_rating_hr", "cylinders_upright", "valve_caps_secured"], r);
     if (r.error) { oD.textContent = r.error; oB.textContent = "-"; oS.textContent = "-"; oH.textContent = "-"; oV.textContent = "-"; oN.textContent = "-"; return; }
     oD.textContent = r.distance_ok ? "satisfied" : "short by " + fmt(r.separation_shortfall_ft, 1) + " ft";
     oB.textContent = !r.has_barrier ? "no barrier entered" : r.barrier_ok ? "all three conditions satisfied" : "FAILS: " + r.barrier_failures.join(", ");

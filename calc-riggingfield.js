@@ -8,6 +8,7 @@
 import {
   DEBOUNCE_MS, debounce, makeNumber, makeSelect,
   makeOutputLine, attachExampleButton, fmt,
+  stepsFor,
 } from "./ui-fields.js";
 
 const _finiteGuard = (o) => {
@@ -82,7 +83,7 @@ function _v938renderWireRopeClips(inputRegion, outputRegion, citationEl) {
   const oSpace = makeOutputLine(outputRegion, "Clip spacing (6 x diameter)", "wrc-out-space");
   const oTail = makeOutputLine(outputRegion, "Rope turnback from the thimble", "wrc-out-tail");
   const update = debounce(() => {
-    const r = computeWireRopeClips({ rope_diameter_in: Number(dia.input.value) || 0, clip_material: mat.select.value });
+    const r = computeWireRopeClips({ rope_diameter_in: Number(dia.input.value) || 0, clip_material: mat.select.value }); stepsFor(outputRegion, inputRegion, ["rope_diameter_in", "clip_material"], r);
     if (r.error) { oClips.textContent = r.error; oSpace.textContent = "-"; oTail.textContent = "-"; return; }
     oClips.textContent = fmt(r.clip_count, 0) + " clips";
     oSpace.textContent = fmt(r.spacing_in, 2) + " in on center";
@@ -142,7 +143,7 @@ function _v953renderCraneLoadRadiusBoom(inputRegion, outputRegion, citationEl) {
       boom_length_ft: bl.input.value === "" ? 30 : Number(bl.input.value), boom_angle_deg: ba.input.value === "" ? 60 : Number(ba.input.value),
       boom_foot_offset_ft: bo.input.value === "" ? 4 : Number(bo.input.value), boom_foot_height_ft: bh.input.value === "" ? 6 : Number(bh.input.value),
       target_radius_ft: tr.input.value === "" ? 25 : Number(tr.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["boom_length_ft", "boom_angle_deg", "boom_foot_offset_ft", "boom_foot_height_ft", "target_radius_ft"], r);
     if (r.error) { oR.textContent = r.error; oH.textContent = "-"; oA.textContent = "-"; return; }
     oR.textContent = fmt(r.load_radius_ft, 2) + " ft";
     oH.textContent = fmt(r.boom_tip_height_ft, 2) + " ft";
@@ -197,7 +198,7 @@ function _v991renderReevingPartsOfLine(inputRegion, outputRegion, citationEl) {
     const r = computeReevingPartsOfLine({
       load_lb: ld.input.value === "" ? 20000 : Number(ld.input.value), parts_of_line: np.input.value === "" ? 4 : Number(np.input.value),
       sheave_efficiency: ke.input.value === "" ? 0.98 : Number(ke.input.value), lead_sheave: Number(lsh.select.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["load_lb", "parts_of_line", "sheave_efficiency", "lead_sheave"], r);
     if (r.error) { oP.textContent = r.error; oE.textContent = "-"; return; }
     oP.textContent = fmt(r.hauling_line_pull_lb, 0) + " lb (frictionless " + fmt(r.frictionless_pull_lb, 0) + " lb)";
     oE.textContent = fmt(r.reeving_efficiency * 100, 1) + "%";
@@ -245,7 +246,7 @@ function _v996renderGuyWireTension(inputRegion, outputRegion, citationEl) {
     const r = computeGuyWireTension({
       horizontal_load_lb: hl.input.value === "" ? 500 : Number(hl.input.value), attachment_height_ft: ah.input.value === "" ? 20 : Number(ah.input.value),
       anchor_lead_ft: al.input.value === "" ? 20 : Number(al.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["horizontal_load_lb", "attachment_height_ft", "anchor_lead_ft"], r);
     if (r.error) { oT.textContent = r.error; oD.textContent = "-"; return; }
     oT.textContent = fmt(r.guy_tension_lb, 0) + " lb (guy at " + fmt(r.guy_angle_deg, 1) + " deg)";
     oD.textContent = fmt(r.mast_download_lb, 0) + " lb";
@@ -349,7 +350,7 @@ function _v1157renderCranePowerLineClearance(inputRegion, outputRegion, citation
   const oB = makeOutputLine(outputRegion, "Boom vs clearance", "cpc-out-b");
   const oN = makeOutputLine(outputRegion, "Note", "cpc-out-n");
   const update = debounce(() => {
-    const r = computeCranePowerLineClearance({ option: op.select.value, voltage_kv: Number(kv.input.value) || 0, actual_clearance_ft: Number(ac.input.value) || 0, boom_length_ft: Number(bl.input.value) || 0 });
+    const r = computeCranePowerLineClearance({ option: op.select.value, voltage_kv: Number(kv.input.value) || 0, actual_clearance_ft: Number(ac.input.value) || 0, boom_length_ft: Number(bl.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["option", "voltage_kv", "actual_clearance_ft", "boom_length_ft"], r);
     if (r.error) { oR.textContent = r.error; oV.textContent = "-"; oT.textContent = "-"; oD.textContent = "-"; oB.textContent = "-"; oN.textContent = "-"; return; }
     oR.textContent = r.required_clearance_ft === null ? "not a number - utility or qualified engineer sets it" : r.required_clearance_ft + " ft via " + r.route;
     oV.textContent = r.passes ? "PASSES the clearance entered" : r.clearance_ok === null ? "cannot be determined here" : "SHORT by " + fmt(r.clearance_shortfall_ft, 1) + " ft";

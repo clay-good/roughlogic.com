@@ -13,6 +13,7 @@ import {
   DEBOUNCE_MS, debounce, makeNumber, makeSelect, makeTextarea,
   makeOutputLine, attachExampleButton, fmt,
   makeStepsPanel,
+  stepsFor,
 } from "./ui-fields.js";
 
 // v18 §7 contract guard: reject a non-finite numeric input (copied
@@ -381,7 +382,7 @@ function _v366renderLightingUniformityRatio(inputRegion, outputRegion, citationE
   const oRatios = makeOutputLine(outputRegion, "avg/min, max/min, U0", "lur-out-ratios");
   const oPass = makeOutputLine(outputRegion, "Against target", "lur-out-pass");
   const update = debounce(() => {
-    const r = computeLightingUniformityRatio({ readings: readings.input.value, target_avgmin: Number(ta.input.value) || 0, target_maxmin: Number(tm.input.value) || 0 });
+    const r = computeLightingUniformityRatio({ readings: readings.input.value, target_avgmin: Number(ta.input.value) || 0, target_maxmin: Number(tm.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["readings", "target_avgmin", "target_maxmin"], r);
     if (r.error) { oStats.textContent = r.error; oRatios.textContent = "-"; oPass.textContent = "-"; return; }
     oStats.textContent = fmt(r.avg, 1) + " / " + fmt(r.min, 1) + " / " + fmt(r.max, 1) + " (" + r.n + " readings)";
     oRatios.textContent = fmt(r.avg_min, 2) + " avg/min, " + fmt(r.max_min, 2) + " max/min, U0 " + fmt(r.U0, 2);
@@ -642,7 +643,7 @@ function renderSccrCombination(inputRegion, outputRegion, citationEl) {
   const oComp = makeOutputLine(outputRegion, "Compliant with available fault?", "sccr-out-comp");
   const oNote = makeOutputLine(outputRegion, "Note", "sccr-out-note");
   const update = debounce(() => {
-    const r = computeSccrCombination({ component_sccrs_ka: comps.input.value, feeder_ir_ka: Number(feeder.input.value) || 0, available_fault_ka: Number(fault.input.value) || 0 });
+    const r = computeSccrCombination({ component_sccrs_ka: comps.input.value, feeder_ir_ka: Number(feeder.input.value) || 0, available_fault_ka: Number(fault.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["component_sccrs_ka", "feeder_ir_ka", "available_fault_ka"], r);
     if (r.error) { oSccr.textContent = r.error; oComp.textContent = "-"; oNote.textContent = ""; return; }
     oSccr.textContent = fmt(r.panel_sccr_ka, 1) + " kA (" + r.n + " components" + (r.governing_is_feeder ? ", feeder IR governs" : "") + ")";
     oComp.textContent = r.compliant === null ? "Enter the available fault current for a verdict" : r.compliant ? "PASS (>= " + fmt(Number(fault.input.value) || 0, 1) + " kA fault)" : "FAIL - below the " + fmt(Number(fault.input.value) || 0, 1) + " kA fault; raise the weakest component";

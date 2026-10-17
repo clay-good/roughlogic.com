@@ -313,6 +313,7 @@ import {
   DEBOUNCE_MS, debounce, makeNumber, makeTextarea, makeSelect, makeCheckbox,
   makeOutputLine, attachExampleButton, fmt,
   makeStepsPanel,
+  stepsFor,
 } from "./ui-fields.js";
 
 // dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
@@ -332,7 +333,7 @@ export function renderPsychrometric(inputRegion, outputRegion, citationEl) {
   const oGP = makeOutputLine(outputRegion, "Grains per pound", "py-out-gp");
   const oVP = makeOutputLine(outputRegion, "Vapor pressure", "py-out-vp");
   const update = debounce(() => {
-    const r = computePsychrometric({ temperature_F: T.input.value === "" ? null : Number(T.input.value), RH_percent: RH.input.value === "" ? null : Number(RH.input.value), atmospheric_pressure_hPa: (Number(P.input.value) || 29.92) * 33.8638866667 });
+    const r = computePsychrometric({ temperature_F: T.input.value === "" ? null : Number(T.input.value), RH_percent: RH.input.value === "" ? null : Number(RH.input.value), atmospheric_pressure_hPa: (Number(P.input.value) || 29.92) * 33.8638866667 }); stepsFor(outputRegion, inputRegion, ["temperature_F", "RH_percent", "atmospheric_pressure_hPa"], r);
     if (r.error) { oDP.textContent = r.error; oGP.textContent = "-"; oVP.textContent = "-"; return; }
     oDP.textContent = fmt(r.dew_point_F, 1) + " F";
     oGP.textContent = fmt(r.GPP, 1);
@@ -364,7 +365,7 @@ export function renderDryingGoal(inputRegion, outputRegion, citationEl) {
       // A blank indoor box takes the compute's own default; a typed 0 is no longer replaced by it.
       indoor_temperature_F: iT.input.value === "" ? undefined : Number(iT.input.value),
       margin_GPP: Number(m.input.value) || 10,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["outdoor_temperature_F", "outdoor_RH_percent", "margin_GPP"], r);
     if (r.error) { ogpp.textContent = r.error; tgpp.textContent = "-"; trh.textContent = "-"; return; }
     ogpp.textContent = fmt(r.outdoor_GPP, 1);
     tgpp.textContent = fmt(r.target_indoor_GPP, 1);
@@ -389,7 +390,7 @@ export function renderDehumidifier(inputRegion, outputRegion, citationEl) {
   // v8 §C.6: operational guidance ("one large LGR or two mid-range for redundancy") row.
   const oG = makeOutputLine(outputRegion, "Operational guidance", "dh-out-g");
   const update = debounce(() => {
-    const r = computeDehumidifierSize({ room_cubic_feet: Number(v.input.value) || 0, water_class: c.select.value });
+    const r = computeDehumidifierSize({ room_cubic_feet: Number(v.input.value) || 0, water_class: c.select.value }); stepsFor(outputRegion, inputRegion, ["room_cubic_feet", "water_class"], r);
     oA.textContent = fmt(r.aham_pints_per_day, 1);
     oF.textContent = fmt(r.field_pints_per_day, 1);
     oG.textContent = r.operational_guidance ?? "-";
@@ -417,7 +418,7 @@ export function renderAirMovers(inputRegion, outputRegion, citationEl) {
   const oP = makeOutputLine(outputRegion, "Placement pattern", "am-out-p");
   const oN = makeOutputLine(outputRegion, "Placement note", "am-out-n");
   const update = debounce(() => {
-    const r = computeAirMovers({ affected_area_ft2: Number(a.input.value) || 0, rooms: Number(rm.input.value) || 1, wall_ceiling_ft2: Number(wcf.input.value) || 0, insets: Number(ins.input.value) || 0, water_class: c.select.value });
+    const r = computeAirMovers({ affected_area_ft2: Number(a.input.value) || 0, rooms: Number(rm.input.value) || 1, wall_ceiling_ft2: Number(wcf.input.value) || 0, insets: Number(ins.input.value) || 0, water_class: c.select.value }); stepsFor(outputRegion, inputRegion, ["affected_area_ft2", "rooms", "wall_ceiling_ft2", "insets", "water_class"], r);
     if (r.error) { oC.textContent = r.error; oCFM.textContent = "-"; oP.textContent = "-"; oN.textContent = "-"; return; }
     oC.textContent = String(r.air_mover_count) + " to " + String(r.air_mover_count_high) + " (IICRC low and high range)";
     oCFM.textContent = fmt(r.total_cfm, 0) + " CFM";
@@ -432,7 +433,7 @@ export function renderAirMovers(inputRegion, outputRegion, citationEl) {
 // (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderWaterClasses(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Original plain-English summaries by the project author. References IICRC S500 by name; the standard text is not reproduced.";
-  const r = computeWaterReference();
+  const r = computeWaterReference(); stepsFor(outputRegion, inputRegion, null, r);
   const sec1 = document.createElement("section");
   const h1 = document.createElement("h2"); h1.textContent = "Categories"; sec1.appendChild(h1);
   const dl1 = document.createElement("dl");
@@ -462,7 +463,7 @@ export function renderDryingTimes(inputRegion, outputRegion, citationEl) {
   const oD = makeOutputLine(outputRegion, "Typical drying", "dt-out-d");
   const oN = makeOutputLine(outputRegion, "Notes", "dt-out-n");
   const update = debounce(() => {
-    const r = computeDryingTime({ material: m.select.value });
+    const r = computeDryingTime({ material: m.select.value }); stepsFor(outputRegion, inputRegion, ["material"], r);
     if (r.error) { oD.textContent = r.error; oN.textContent = "-"; return; }
     oD.textContent = r.typical_days + " days"; oN.textContent = r.notes;
   }, DEBOUNCE_MS);
@@ -481,7 +482,7 @@ export function renderMold(inputRegion, outputRegion, citationEl) {
   attachExampleButton(inputRegion, () => { rh.input.value = "80"; T.input.value = "75"; h.input.value = "60"; update(); });
   const oR = makeOutputLine(outputRegion, "Risk", "mr-out");
   const update = debounce(() => {
-    const r = computeMoldRisk({ rh_percent: Number(rh.input.value) || 0, temperature_F: Number(T.input.value) || 0, hours_elevated: Number(h.input.value) || 0 });
+    const r = computeMoldRisk({ rh_percent: Number(rh.input.value) || 0, temperature_F: Number(T.input.value) || 0, hours_elevated: Number(h.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["rh_percent", "temperature_F", "hours_elevated"], r);
     oR.textContent = r.risk;
   }, DEBOUNCE_MS);
   for (const el of [rh.input, T.input, h.input]) el.addEventListener("input", update);
@@ -500,7 +501,7 @@ export function renderPPE(inputRegion, outputRegion, citationEl) {
   const oP = makeOutputLine(outputRegion, "Recommended PPE", "ppe-out-p");
   const oN = makeOutputLine(outputRegion, "Notes", "ppe-out-n");
   const update = debounce(() => {
-    const r = computePPE({ category: c.select.value });
+    const r = computePPE({ category: c.select.value }); stepsFor(outputRegion, inputRegion, ["category"], r);
     if (r.error) { oP.textContent = r.error; oN.textContent = "-"; return; }
     oP.textContent = r.ppe; oN.textContent = r.notes;
   }, DEBOUNCE_MS);
@@ -688,7 +689,7 @@ export function renderStandingWater(inputRegion, outputRegion, citationEl) {
   const oC = makeOutputLine(outputRegion, "Cubic feet", "sw-out-c");
   const oW = makeOutputLine(outputRegion, "Weight", "sw-out-w");
   const update = debounce(() => {
-    const r = computeStandingWater({ area_ft2: Number(a.input.value) || 0, depth_in: Number(d.input.value) || 0 });
+    const r = computeStandingWater({ area_ft2: Number(a.input.value) || 0, depth_in: Number(d.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["area_ft2", "depth_in"], r);
     if (r.error) { oG.textContent = r.error; oC.textContent = "-"; oW.textContent = "-"; return; }
     oG.textContent = fmt(r.gallons, 1) + " gal";
     oC.textContent = fmt(r.cubic_feet, 2) + " ft^3";
@@ -726,7 +727,7 @@ export function renderNAMSizing(inputRegion, outputRegion, citationEl) {
       filter_loading_derate_pct: Number(derate.input.value) || 0,
       target_negative_wc: Number(negwc.input.value) || 0,
       makeup_opening_ft2: Number(makeup.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["room_volume_ft3", "target_ach", "filter_loading_derate_pct", "target_negative_wc", "makeup_opening_ft2"], r);
     if (r.error) { oC.textContent = r.error; o500.textContent = "-"; o1000.textContent = "-"; o2000.textContent = "-"; oRated.textContent = "-"; oNeg.textContent = "-"; return; }
     oC.textContent = fmt(r.required_cfm, 0) + " CFM";
     const get = (cfm) => r.recommendations.find((x) => x.unit_cfm === cfm);
@@ -772,7 +773,7 @@ export function renderHEPALife(inputRegion, outputRegion, citationEl) {
       particulate_category: cat.select.value,
       job_days: Number(jd.input.value) || 0,
       filter_cost_usd: Number(fc.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["cfm", "hours_per_day", "capacity_grams", "particulate_category", "job_days", "filter_cost_usd"], r);
     if (r.error) { oD.textContent = r.error; oG.textContent = "-"; oFJ.textContent = "-"; oTC.textContent = "-"; return; }
     oD.textContent = fmt(r.days, 1) + " days";
     oG.textContent = fmt(r.grams_per_day, 1) + " g/day";
@@ -891,7 +892,7 @@ function renderContainmentAirBalance(inputRegion, outputRegion, citationEl) {
     const r = computeContainmentAirBalance({
       target_dp_in_wc: Number(dp.input.value) || 0,
       leakage_area_in2: Number(a.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["target_dp_in_wc", "leakage_area_in2"], r);
     if (r.error) { oR.textContent = r.error; oU.textContent = "-"; return; }
     oR.textContent = _fmt3(r.required_cfm, 0) + " cfm";
     oU.textContent = r.recommendations.map((x) => x.units_needed + "x " + _fmt3(x.unit_cfm, 0) + " cfm").join(", ");
@@ -916,7 +917,7 @@ function renderChamberTurnover(inputRegion, outputRegion, citationEl) {
     const r = computeChamberTurnover({
       chamber_volume_ft3: Number(v.input.value) || 0, target_ach: Number(t.input.value) || 0,
       air_mover_total_cfm: Number(am.input.value) || 0, dehu_cfm: Number(dh.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["chamber_volume_ft3", "target_ach", "air_mover_total_cfm", "dehu_cfm"], r);
     if (r.error) { oA.textContent = r.error; oR.textContent = "-"; oG.textContent = "-"; return; }
     oA.textContent = _fmt3(r.actual_ach, 1) + " ACH";
     oR.textContent = _fmt3(r.required_cfm, 0) + " cfm";
@@ -1115,7 +1116,7 @@ function _v9d_renderDryingLog(inputRegion, outputRegion, citationEl) {
     const r = computeDryingLog({
       readings,
       drying_target_GPP: target.input.value === "" ? null : Number(target.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["readings", "drying_target_GPP"], r);
     if (r.error) {
       oBP.textContent = r.error;
       oSL.textContent = ""; oTG.textContent = ""; oDT.textContent = ""; oTbl.textContent = ""; oW.textContent = "";
@@ -1272,7 +1273,7 @@ function _v16d_renderEquipmentCircuitLoad(inputRegion, outputRegion, citationEl)
       other_amps: other.input.value === "" ? 0 : Number(other.input.value),
       breaker_A: Number(breaker.select.value),
       voltage: Number(volts.select.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["qty_lgr_dehu", "qty_air_mover", "qty_hepa_500", "qty_heat_dryer", "other_amps", "breaker_A", "voltage"], r);
     if (r.error) { oTotal.textContent = r.error; oLimit.textContent = "-"; oCirc.textContent = "-"; oNote.textContent = ""; return; }
     oTotal.textContent = fmt(r.total_amps, 1) + " A (" + fmt(r.total_va, 0) + " VA at " + r.voltage + " V)";
     oLimit.textContent = fmt(r.continuous_limit_A, 1) + " A (80% of " + r.breaker_A + " A)";
@@ -1411,7 +1412,7 @@ function renderGrainsRemoved(inputRegion, outputRegion, citationEl) {
   const oGal = makeOutputLine(outputRegion, "Total water over run", "gr-out-gal");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeGrainsRemoved({ cfm: readNum(cfm.input), inlet_gpp: readNum(inG.input), outlet_gpp: readNum(outG.input), hours: readNum(hrs.input) });
+    const r = computeGrainsRemoved({ cfm: readNum(cfm.input), inlet_gpp: readNum(inG.input), outlet_gpp: readNum(outG.input), hours: readNum(hrs.input) }); stepsFor(outputRegion, inputRegion, ["cfm", "inlet_gpp", "outlet_gpp", "hours"], r);
     if (r.error) { oDG.textContent = r.error; oRate.textContent = ""; oGal.textContent = ""; return; }
     oDG.textContent = fmt(r.grain_depression_gpp, 1) + " GPP";
     oRate.textContent = fmt(r.water_lb_hr, 2) + " lb/hr (" + fmt(r.water_pints_hr, 2) + " pints/hr)";
@@ -1469,7 +1470,7 @@ function renderEvaporationLoad(inputRegion, outputRegion, citationEl) {
   const oAHAM = makeOutputLine(outputRegion, "Suggested AHAM pints", "el-out-aham");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeEvaporationLoad({ area_ft2: readNum(area.input), water_class: Number(cls.select.value), load_factor: readNum(lf.input), first24_fraction: frac.input.value === "" ? 0.4 : readNum(frac.input), derating: der.input.value === "" ? 0.5 : readNum(der.input) });
+    const r = computeEvaporationLoad({ area_ft2: readNum(area.input), water_class: Number(cls.select.value), load_factor: readNum(lf.input), first24_fraction: frac.input.value === "" ? 0.4 : readNum(frac.input), derating: der.input.value === "" ? 0.5 : readNum(der.input) }); stepsFor(outputRegion, inputRegion, ["area_ft2", "water_class", "load_factor", "first24_fraction", "derating"], r);
     if (r.error) { oLoad.textContent = r.error; o24.textContent = ""; oAHAM.textContent = ""; return; }
     oLoad.textContent = fmt(r.load_gal, 1) + " gal (" + fmt(r.load_lb, 0) + " lb)";
     o24.textContent = fmt(r.first24_pints, 1) + " pints";
@@ -1552,7 +1553,7 @@ function renderMoldRemediationLevel(inputRegion, outputRegion, citationEl) {
     const r = computeMoldRemediationLevel({
       affected_area_ft2: Number(area.input.value) || 0,
       porous: porous.input.checked, hvac_involved: hvac.input.checked, vulnerable_occupant: vuln.input.checked,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["affected_area_ft2", "porous", "hvac_involved", "vulnerable_occupant"], r);
     if (r.error) { oBand.textContent = r.error; for (const o of [oLevel, oCont, oPPE, oIEP, oClr]) o.textContent = "-"; return; }
     oBand.textContent = r.band; oLevel.textContent = r.level; oCont.textContent = r.containment;
     oPPE.textContent = r.ppe_tier; oIEP.textContent = r.iep_assess; oClr.textContent = r.clearance;
@@ -1579,7 +1580,7 @@ export function computeMoldConditions() {
 
 function renderMoldConditions(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: IICRC S520-2024 (Standard for Professional Mold Remediation, licensed) Condition framework, named by section; original plain-English summaries by the project author. The standard text is not reproduced.";
-  const r = computeMoldConditions();
+  const r = computeMoldConditions(); stepsFor(outputRegion, inputRegion, null, r);
   const sec = document.createElement("section");
   const h = document.createElement("h2"); h.textContent = "IICRC S520 Conditions"; sec.appendChild(h);
   const dl = document.createElement("dl");
@@ -1675,7 +1676,7 @@ function renderAntimicrobialDilution(inputRegion, outputRegion, citationEl) {
       mode: mode.select.value,
       oz_per_gal: Number(oz.input.value) || 0,
       ratio_N: Number(ratio.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["affected_area_ft2", "coverage_ft2_per_gal", "tank_size_gal", "mode", "oz_per_gal", "ratio_N"], r);
     if (r.error) { oFin.textContent = r.error; for (const o of [oConc, oWater, oTank, oFills]) o.textContent = "-"; return; }
     oFin.textContent = fmt(r.finished_gal, 2) + " gal";
     oConc.textContent = fmt(r.concentrate_oz, 2) + " oz (" + fmt(r.conc_oz_per_gal, 2) + " oz/gal)";
@@ -1735,7 +1736,7 @@ function renderAirSampleVolume(inputRegion, outputRegion, citationEl) {
       flow_rate_lpm: Number(flow.input.value) || 0,
       target_volume_L: Number(vol.input.value) || 0,
       sample_count: Number(count.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["flow_rate_lpm", "target_volume_L", "sample_count"], r);
     if (r.error) { oRun.textContent = r.error; oTotVol.textContent = "-"; oTotTime.textContent = "-"; return; }
     oRun.textContent = fmt(r.run_time_min, 2) + " min (" + fmt(r.run_time_sec, 0) + " s)";
     oTotVol.textContent = fmt(r.total_volume_L, 0) + " L";
@@ -1786,7 +1787,7 @@ function renderWoodEmc(inputRegion, outputRegion, citationEl) {
   const oE = makeOutputLine(outputRegion, "Equilibrium moisture content", "emc-out-e");
   const oN = makeOutputLine(outputRegion, "Note", "emc-out-n");
   const update = debounce(() => {
-    const r = computeWoodEmc({ temperature_F: Number(temp.input.value) || 0, rh_pct: Number(rh.input.value) || 0 });
+    const r = computeWoodEmc({ temperature_F: Number(temp.input.value) || 0, rh_pct: Number(rh.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["temperature_F", "rh_pct"], r);
     if (r.error) { oE.textContent = r.error; oN.textContent = "-"; return; }
     oE.textContent = fmt(r.emc_pct, 1) + "%";
     oN.textContent = r.note;
@@ -1855,7 +1856,7 @@ function renderFloodCutTakeoff(inputRegion, outputRegion, citationEl) {
       removed_faces: Number(faces.input.value) || 0,
       has_insulation: ins.input.checked ? 1 : 0,
       has_baseboard: base.input.checked ? 1 : 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["wall_perimeter_ft", "cut_height_in", "removed_faces", "has_insulation", "has_baseboard"], r);
     if (r.error) { oCut.textContent = r.error; oBoard.textContent = "-"; oSheets.textContent = "-"; oIns.textContent = "-"; oBase.textContent = "-"; return; }
     oCut.textContent = fmt(r.cut_line_lf, 0) + " lf";
     oBoard.textContent = fmt(r.drywall_sf, 0) + " ft^2";
@@ -1907,7 +1908,7 @@ function renderCeilingWaterLoad(inputRegion, outputRegion, citationEl) {
       pooled_area_ft2: Number(area.input.value) || 0,
       avg_depth_in: Number(depth.input.value) || 0,
       threshold_psf: Number(thr.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["pooled_area_ft2", "avg_depth_in", "threshold_psf"], r);
     if (r.error) { oLoad.textContent = r.error; oWt.textContent = "-"; oVol.textContent = "-"; oFlag.textContent = "-"; return; }
     oLoad.textContent = fmt(r.load_psf, 1) + " lb/ft^2";
     oWt.textContent = fmt(r.water_weight_lb, 0) + " lb";
@@ -1959,7 +1960,7 @@ function renderDehumidifierDerate(inputRegion, outputRegion, citationEl) {
       aham_pints_per_day: Number(aham.input.value) || 0,
       derate_factor: Number(derate.input.value) || 0,
       required_pints_per_day: Number(demand.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["aham_pints_per_day", "derate_factor", "required_pints_per_day"], r);
     if (r.error) { oEff.textContent = r.error; oNom.textContent = "-"; oField.textContent = "-"; oShort.textContent = "-"; return; }
     oEff.textContent = fmt(r.effective_pints, 0) + " pints/day";
     oNom.textContent = r.units_by_nameplate + " unit(s)";
@@ -2045,7 +2046,7 @@ function renderWaterClassScreen(inputRegion, outputRegion, citationEl) {
       low_evap_materials: lowEvap.input.checked ? 1 : 0,
       ceiling_wet_fraction: Number(ceil.input.value) || 0,
       floor_area_ft2: Number(fa.input.value) || 0, wall_area_ft2: Number(wa.input.value) || 0, ceiling_area_ft2: Number(ca.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["floor_wet_fraction", "wall_wet_fraction", "wick_height_ft", "low_evap_materials", "ceiling_wet_fraction", "floor_area_ft2", "wall_area_ft2", "ceiling_area_ft2"], r);
     if (r.error) { oClass.textContent = r.error; oWhy.textContent = "-"; oFactor.textContent = "-"; return; }
     oClass.textContent = "Class " + r.water_class;
     oWhy.textContent = r.rationale;
@@ -2096,7 +2097,7 @@ function renderDesiccantAirflow(inputRegion, outputRegion, citationEl) {
       required_pints_per_day: Number(demand.input.value) || 0,
       design_grain_depression: Number(depression.input.value) || 0,
       nameplate_process_cfm: Number(nameplate.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["required_pints_per_day", "design_grain_depression", "nameplate_process_cfm"], r);
     if (r.error) { oRate.textContent = r.error; oCfm.textContent = "-"; oUnits.textContent = "-"; return; }
     oRate.textContent = fmt(r.lb_per_hr, 2) + " lb/hr";
     oCfm.textContent = fmt(r.process_cfm, 0) + " cfm";
@@ -2164,7 +2165,7 @@ function renderDryingBalance(inputRegion, outputRegion, citationEl) {
   const oRatio = makeOutputLine(outputRegion, "Capacity-to-load ratio", "db-out-ratio");
   const oVerdict = makeOutputLine(outputRegion, "Verdict", "db-out-verdict");
   const update = debounce(() => {
-    const r = computeDryingBalance({ evap_load_ppd: Number(evap.input.value) || 0, installed_ppd: Number(installed.input.value) || 0, target_margin: margin.input.value === "" ? 1.2 : Number(margin.input.value) });
+    const r = computeDryingBalance({ evap_load_ppd: Number(evap.input.value) || 0, installed_ppd: Number(installed.input.value) || 0, target_margin: margin.input.value === "" ? 1.2 : Number(margin.input.value) }); stepsFor(outputRegion, inputRegion, ["evap_load_ppd", "installed_ppd", "target_margin"], r);
     if (r.error) { oBal.textContent = r.error; oRatio.textContent = "-"; oVerdict.textContent = "-"; return; }
     oBal.textContent = fmt(r.balance_ppd, 0) + " ppd";
     oRatio.textContent = fmt(r.ratio, 2);
@@ -2211,7 +2212,7 @@ function renderBoundWater(inputRegion, outputRegion, citationEl) {
   const oLb = makeOutputLine(outputRegion, "Water to evaporate", "bw-out-lb");
   const oGal = makeOutputLine(outputRegion, "Water volume", "bw-out-gal");
   const update = debounce(() => {
-    const r = computeBoundWater({ material_volume_ft3: Number(vol.input.value) || 0, dry_density_lb_ft3: Number(density.input.value) || 0, mc_current_pct: Number(cur.input.value) || 0, mc_goal_pct: Number(goal.input.value) || 0 });
+    const r = computeBoundWater({ material_volume_ft3: Number(vol.input.value) || 0, dry_density_lb_ft3: Number(density.input.value) || 0, mc_current_pct: Number(cur.input.value) || 0, mc_goal_pct: Number(goal.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["material_volume_ft3", "dry_density_lb_ft3", "mc_current_pct", "mc_goal_pct"], r);
     if (r.error) { oMass.textContent = r.error; oLb.textContent = "-"; oGal.textContent = "-"; return; }
     oMass.textContent = fmt(r.dry_mass_lb, 0) + " lb";
     oLb.textContent = fmt(r.water_lb, 1) + " lb";
@@ -2259,7 +2260,7 @@ function renderDisinfectantDwell(inputRegion, outputRegion, citationEl) {
   const oClean = makeOutputLine(outputRegion, "Pre-clean rule", "dd-out-clean");
   const oAuth = makeOutputLine(outputRegion, "Authority", "dd-out-auth");
   const update = debounce(() => {
-    const r = computeDisinfectantDwell({ product_class: cls.select.value });
+    const r = computeDisinfectantDwell({ product_class: cls.select.value }); stepsFor(outputRegion, inputRegion, ["product_class"], r);
     if (r.error) { oContact.textContent = r.error; oWet.textContent = "-"; oClean.textContent = "-"; oAuth.textContent = "-"; return; }
     oContact.textContent = r.typical_contact_min;
     oWet.textContent = r.keep_wet_rule;
@@ -2326,7 +2327,7 @@ function renderCarpetRestoreReplace(inputRegion, outputRegion, citationEl) {
   const oDec = makeOutputLine(outputRegion, "Decision", "cr-out-dec");
   const oWhy = makeOutputLine(outputRegion, "Rationale", "cr-out-why");
   const update = debounce(() => {
-    const r = computeCarpetRestoreReplace({ water_category: cat.select.value, component: comp.select.value, delaminated: delam.input.checked ? 1 : 0 });
+    const r = computeCarpetRestoreReplace({ water_category: cat.select.value, component: comp.select.value, delaminated: delam.input.checked ? 1 : 0 }); stepsFor(outputRegion, inputRegion, ["water_category", "component", "delaminated"], r);
     if (r.error) { oDec.textContent = r.error; oWhy.textContent = "-"; return; }
     oDec.textContent = r.decision;
     oWhy.textContent = r.rationale;
@@ -2384,7 +2385,7 @@ function renderCategoryDeterioration(inputRegion, outputRegion, citationEl) {
   const oLikely = makeOutputLine(outputRegion, "Likely current category", "cd-out-likely");
   const oWhy = makeOutputLine(outputRegion, "Rationale", "cd-out-why");
   const update = debounce(() => {
-    const r = computeCategoryDeterioration({ origin_category: cat.select.value, elapsed_hours: Number(hours.input.value) || 0, warm_environment: warm.input.checked ? 1 : 0, contacted_contaminant: contaminant.input.checked ? 1 : 0 });
+    const r = computeCategoryDeterioration({ origin_category: cat.select.value, elapsed_hours: Number(hours.input.value) || 0, warm_environment: warm.input.checked ? 1 : 0, contacted_contaminant: contaminant.input.checked ? 1 : 0 }); stepsFor(outputRegion, inputRegion, ["origin_category", "elapsed_hours", "warm_environment", "contacted_contaminant"], r);
     if (r.error) { oLikely.textContent = r.error; oWhy.textContent = "-"; return; }
     oLikely.textContent = r.likely_category;
     oWhy.textContent = r.rationale;
@@ -2422,7 +2423,7 @@ function renderHydroxylSizing(inputRegion, outputRegion, citationEl) {
   const oUnits = makeOutputLine(outputRegion, "Hydroxyl generators needed", "hx-out-units");
   const oRun = makeOutputLine(outputRegion, "Run time", "hx-out-run");
   const update = debounce(() => {
-    const r = computeHydroxylSizing({ structure_volume_ft3: Number(vol.input.value) || 0, unit_coverage_ft3: Number(coverage.input.value) || 0, expected_days: days.input.value === "" ? 3 : Number(days.input.value) });
+    const r = computeHydroxylSizing({ structure_volume_ft3: Number(vol.input.value) || 0, unit_coverage_ft3: Number(coverage.input.value) || 0, expected_days: days.input.value === "" ? 3 : Number(days.input.value) }); stepsFor(outputRegion, inputRegion, ["structure_volume_ft3", "unit_coverage_ft3", "expected_days"], r);
     if (r.error) { oUnits.textContent = r.error; oRun.textContent = "-"; return; }
     oUnits.textContent = r.units + " unit(s)";
     oRun.textContent = (r.expected_days ? fmt(r.expected_days, 0) + " day(s), " : "") + "run continuously; occupied-safe.";
@@ -2470,7 +2471,7 @@ function renderCavityDryingSystem(inputRegion, outputRegion, citationEl) {
   const oPorts = makeOutputLine(outputRegion, "Injection ports", "cs-out-ports");
   const oSystems = makeOutputLine(outputRegion, "Air systems", "cs-out-sys");
   const update = debounce(() => {
-    const r = computeCavityDryingSystem({ affected_wall_ft: Number(wall.input.value) || 0, stud_spacing_in: spacing.input.value === "" ? 16 : Number(spacing.input.value), ports_per_bay: perBay.input.value === "" ? 1 : Number(perBay.input.value), ports_per_system: perSystem.input.value === "" ? 12 : Number(perSystem.input.value) });
+    const r = computeCavityDryingSystem({ affected_wall_ft: Number(wall.input.value) || 0, stud_spacing_in: spacing.input.value === "" ? 16 : Number(spacing.input.value), ports_per_bay: perBay.input.value === "" ? 1 : Number(perBay.input.value), ports_per_system: perSystem.input.value === "" ? 12 : Number(perSystem.input.value) }); stepsFor(outputRegion, inputRegion, ["affected_wall_ft", "stud_spacing_in", "ports_per_bay", "ports_per_system"], r);
     if (r.error) { oBays.textContent = r.error; oPorts.textContent = "-"; oSystems.textContent = "-"; return; }
     oBays.textContent = r.bays + " bays";
     oPorts.textContent = r.ports + " ports";
@@ -2519,7 +2520,7 @@ function renderDryTimeProjection(inputRegion, outputRegion, citationEl) {
   const oRem = makeOutputLine(outputRegion, "Remaining to goal", "dt-out-rem");
   const oDays = makeOutputLine(outputRegion, "Projected days to goal", "dt-out-days");
   const update = debounce(() => {
-    const r = computeDryTimeProjection({ current_mc_pct: Number(cur.input.value) || 0, goal_mc_pct: Number(goal.input.value) || 0, daily_drop_pct: Number(drop.input.value) || 0 });
+    const r = computeDryTimeProjection({ current_mc_pct: Number(cur.input.value) || 0, goal_mc_pct: Number(goal.input.value) || 0, daily_drop_pct: Number(drop.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["current_mc_pct", "goal_mc_pct", "daily_drop_pct"], r);
     if (r.error) { oRem.textContent = r.error; oDays.textContent = "-"; return; }
     oRem.textContent = fmt(r.remaining_pts, 1) + " points";
     oDays.textContent = r.progressing ? fmt(r.days_to_goal, 1) + " days (optimistic near goal)" : r.note;
@@ -2564,7 +2565,7 @@ function renderEquipmentHeatLoad(inputRegion, outputRegion, citationEl) {
   const oCfm = makeOutputLine(outputRegion, "Ventilation to hold the rise", "eh-out-cfm");
   const oRise = makeOutputLine(outputRegion, "Rise at the entered airflow", "eh-out-rise");
   const update = debounce(() => {
-    const r = computeEquipmentHeatLoad({ total_equipment_watts: Number(watts.input.value) || 0, target_temp_rise_f: rise.input.value === "" ? 10 : Number(rise.input.value), exhaust_cfm: Number(exhaust.input.value) || 0 });
+    const r = computeEquipmentHeatLoad({ total_equipment_watts: Number(watts.input.value) || 0, target_temp_rise_f: rise.input.value === "" ? 10 : Number(rise.input.value), exhaust_cfm: Number(exhaust.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["total_equipment_watts", "target_temp_rise_f", "exhaust_cfm"], r);
     if (r.error) { oHeat.textContent = r.error; oCfm.textContent = "-"; oRise.textContent = "-"; return; }
     oHeat.textContent = fmt(r.sensible_btu_hr, 0) + " BTU/hr";
     oCfm.textContent = fmt(r.required_cfm, 0) + " cfm";
@@ -2637,7 +2638,7 @@ function renderCharDepthCapacity(inputRegion, outputRegion, citationEl) {
       exposure_min: Number(t.input.value) || 0, nominal_width_in: Number(b.input.value) || 0, nominal_depth_in: Number(d.input.value) || 0,
       faces_across_width: fw.input.value === "" ? 2 : Number(fw.input.value), faces_across_depth: fd.input.value === "" ? 1 : Number(fd.input.value),
       char_rate_in_hr: rate.input.value === "" ? 1.5 : Number(rate.input.value), zero_strength_in: zs.input.value === "" ? 0 : Number(zs.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["exposure_min", "nominal_width_in", "nominal_depth_in", "faces_across_width", "faces_across_depth", "char_rate_in_hr", "zero_strength_in"], r);
     if (r.error) { oChar.textContent = r.error; oRes.textContent = "-"; oRatio.textContent = "-"; return; }
     oChar.textContent = fmt(r.effective_char_in, 2) + " in (char " + fmt(r.char_depth_in, 2) + " in x 1.2, NDS)";
     oRes.textContent = r.consumed ? "Consumed - no sound section remains" : fmt(r.residual_width_in, 2) + " x " + fmt(r.residual_depth_in, 2) + " in (" + fmt(r.residual_area_in2, 1) + " in^2)";
@@ -2686,7 +2687,7 @@ function renderSootCleaningTakeoff(inputRegion, outputRegion, citationEl) {
   const oLabor = makeOutputLine(outputRegion, "Dry-sponging labor", "st-out-labor");
   const oSealer = makeOutputLine(outputRegion, "Odor-seal primer", "st-out-sealer");
   const update = debounce(() => {
-    const r = computeSootCleaningTakeoff({ affected_sf: Number(area.input.value) || 0, sponge_coverage_sf: cov.input.value === "" ? 100 : Number(cov.input.value), production_sf_per_hr: prod.input.value === "" ? 150 : Number(prod.input.value), seal_coat: seal.input.checked ? 1 : 0, primer_sf_per_gal: primer.input.value === "" ? 300 : Number(primer.input.value) });
+    const r = computeSootCleaningTakeoff({ affected_sf: Number(area.input.value) || 0, sponge_coverage_sf: cov.input.value === "" ? 100 : Number(cov.input.value), production_sf_per_hr: prod.input.value === "" ? 150 : Number(prod.input.value), seal_coat: seal.input.checked ? 1 : 0, primer_sf_per_gal: primer.input.value === "" ? 300 : Number(primer.input.value) }); stepsFor(outputRegion, inputRegion, ["affected_sf", "sponge_coverage_sf", "production_sf_per_hr", "seal_coat", "primer_sf_per_gal"], r);
     if (r.error) { oSponges.textContent = r.error; oLabor.textContent = "-"; oSealer.textContent = "-"; return; }
     oSponges.textContent = r.dry_sponges + " sponges";
     oLabor.textContent = fmt(r.labor_hours, 1) + " hr";
@@ -2731,7 +2732,7 @@ function renderOzoneShockTreatment(inputRegion, outputRegion, citationEl) {
   const oLock = makeOutputLine(outputRegion, "Lockout", "oz-out-lock");
   const oReentry = makeOutputLine(outputRegion, "Before reentry", "oz-out-re");
   const update = debounce(() => {
-    const r = computeOzoneShockTreatment({ structure_volume_ft3: Number(vol.input.value) || 0, rated_volume_per_unit: rated.input.value === "" ? 2000 : Number(rated.input.value), treatment_time_hr: time.input.value === "" ? 24 : Number(time.input.value), aeration_min: aer.input.value === "" ? 120 : Number(aer.input.value) });
+    const r = computeOzoneShockTreatment({ structure_volume_ft3: Number(vol.input.value) || 0, rated_volume_per_unit: rated.input.value === "" ? 2000 : Number(rated.input.value), treatment_time_hr: time.input.value === "" ? 24 : Number(time.input.value), aeration_min: aer.input.value === "" ? 120 : Number(aer.input.value) }); stepsFor(outputRegion, inputRegion, ["structure_volume_ft3", "rated_volume_per_unit", "treatment_time_hr", "aeration_min"], r);
     if (r.error) { oGen.textContent = r.error; oLock.textContent = "-"; oReentry.textContent = "-"; return; }
     oGen.textContent = r.generators_needed + " unit(s) for " + fmt(r.treatment_time_hr, 0) + " hr";
     oLock.textContent = "Required: unoccupied + sealed (people, pets, plants out)";
@@ -2774,7 +2775,7 @@ function renderSmokeResidueMethod(inputRegion, outputRegion, citationEl) {
   const oAppear = makeOutputLine(outputRegion, "Appearance", "sr-out-appear");
   const oCaution = makeOutputLine(outputRegion, "Caution", "sr-out-caution");
   const update = debounce(() => {
-    const r = computeSmokeResidueMethod({ residue_type: sel.select.value });
+    const r = computeSmokeResidueMethod({ residue_type: sel.select.value }); stepsFor(outputRegion, inputRegion, ["residue_type"], r);
     if (r.error) { oMethod.textContent = r.error; oAppear.textContent = "-"; oCaution.textContent = "-"; return; }
     oMethod.textContent = r.method;
     oAppear.textContent = r.source + "; " + r.appearance;
@@ -2810,7 +2811,7 @@ function renderThermalFogDeodorization(inputRegion, outputRegion, citationEl) {
   const oOz = makeOutputLine(outputRegion, "Deodorant to mix", "tf-out-oz");
   const oGal = makeOutputLine(outputRegion, "Deodorant (gallons)", "tf-out-gal");
   const update = debounce(() => {
-    const r = computeThermalFogDeodorization({ structure_volume_ft3: Number(vol.input.value) || 0, dose_oz_per_1000ft3: dose.input.value === "" ? 5 : Number(dose.input.value), treatments: passes.input.value === "" ? 1 : Number(passes.input.value) });
+    const r = computeThermalFogDeodorization({ structure_volume_ft3: Number(vol.input.value) || 0, dose_oz_per_1000ft3: dose.input.value === "" ? 5 : Number(dose.input.value), treatments: passes.input.value === "" ? 1 : Number(passes.input.value) }); stepsFor(outputRegion, inputRegion, ["structure_volume_ft3", "dose_oz_per_1000ft3", "treatments"], r);
     if (r.error) { oOz.textContent = r.error; oGal.textContent = "-"; return; }
     oOz.textContent = fmt(r.deodorant_oz, 1) + " oz (unoccupied, fire watch)";
     oGal.textContent = fmt(r.deodorant_gal, 2) + " gal";
@@ -2859,7 +2860,7 @@ function renderContentsPackoutInventory(inputRegion, outputRegion, citationEl) {
   const oStorage = makeOutputLine(outputRegion, "Storage volume", "pk-out-storage");
   const oTruck = makeOutputLine(outputRegion, "Truck loads", "pk-out-truck");
   const update = debounce(() => {
-    const r = computeContentsPackoutInventory({ floor_area_ft2: Number(area.input.value) || 0, contents_ft3_per_ft2: density.input.value === "" ? 2 : Number(density.input.value), box_volume_ft3: box.input.value === "" ? 3 : Number(box.input.value), stacking_factor: stack.input.value === "" ? 1.5 : Number(stack.input.value), truck_volume_ft3: truck.input.value === "" ? 1000 : Number(truck.input.value) });
+    const r = computeContentsPackoutInventory({ floor_area_ft2: Number(area.input.value) || 0, contents_ft3_per_ft2: density.input.value === "" ? 2 : Number(density.input.value), box_volume_ft3: box.input.value === "" ? 3 : Number(box.input.value), stacking_factor: stack.input.value === "" ? 1.5 : Number(stack.input.value), truck_volume_ft3: truck.input.value === "" ? 1000 : Number(truck.input.value) }); stepsFor(outputRegion, inputRegion, ["floor_area_ft2", "contents_ft3_per_ft2", "box_volume_ft3", "stacking_factor", "truck_volume_ft3"], r);
     if (r.error) { oContents.textContent = r.error; oBoxes.textContent = "-"; oStorage.textContent = "-"; oTruck.textContent = "-"; return; }
     oContents.textContent = fmt(r.contents_volume_ft3, 0) + " ft^3";
     oBoxes.textContent = r.boxes + " boxes";
@@ -2912,7 +2913,7 @@ function renderSurfaceCondensationRisk(inputRegion, outputRegion, citationEl) {
   const oMargin = makeOutputLine(outputRegion, "Surface margin", "scr-out-margin");
   const oFlag = makeOutputLine(outputRegion, "Condensation", "scr-out-flag");
   const update = debounce(() => {
-    const r = computeSurfaceCondensationRisk({ air_temp_f: at.input.value === "" ? null : Number(at.input.value), air_rh_pct: Number(rh.input.value) || 0, surface_temp_f: st.input.value === "" ? null : Number(st.input.value) });
+    const r = computeSurfaceCondensationRisk({ air_temp_f: at.input.value === "" ? null : Number(at.input.value), air_rh_pct: Number(rh.input.value) || 0, surface_temp_f: st.input.value === "" ? null : Number(st.input.value) }); stepsFor(outputRegion, inputRegion, ["air_temp_f", "air_rh_pct", "surface_temp_f"], r);
     if (r.error) { oDew.textContent = r.error; oMargin.textContent = "-"; oFlag.textContent = "-"; return; }
     oDew.textContent = fmt(r.dew_point_f, 1) + " degF";
     oMargin.textContent = fmt(r.margin_f, 1) + " degF";
@@ -2957,7 +2958,7 @@ function renderSporeIoRatio(inputRegion, outputRegion, citationEl) {
   const oRatio = makeOutputLine(outputRegion, "Indoor/outdoor ratio", "sio-out-ratio");
   const oPass = makeOutputLine(outputRegion, "Clearance screen", "sio-out-pass");
   const update = debounce(() => {
-    const r = computeSporeIoRatio({ indoor_spores_m3: Number(ind.input.value) || 0, outdoor_spores_m3: Number(out.input.value) || 0, indoor_marker: mark.input.checked ? 1 : 0 });
+    const r = computeSporeIoRatio({ indoor_spores_m3: Number(ind.input.value) || 0, outdoor_spores_m3: Number(out.input.value) || 0, indoor_marker: mark.input.checked ? 1 : 0 }); stepsFor(outputRegion, inputRegion, ["indoor_spores_m3", "outdoor_spores_m3", "indoor_marker"], r);
     if (r.error) { oRatio.textContent = r.error; oPass.textContent = "-"; return; }
     oRatio.textContent = fmt(r.io_ratio, 2);
     oPass.textContent = r.pass ? "Supportable -- indoor at/below outdoor, no marker" : "Not supportable -- see ratio / marker";
@@ -3003,7 +3004,7 @@ function renderHardwoodFloorDryingMat(inputRegion, outputRegion, citationEl) {
   const oMats = makeOutputLine(outputRegion, "Mats needed", "hfm-out-mats");
   const oUnits = makeOutputLine(outputRegion, "Suction units", "hfm-out-units");
   const update = debounce(() => {
-    const r = computeHardwoodFloorDryingMat({ floor_area_ft2: Number(area.input.value) || 0, mat_coverage_ft2: cov.input.value === "" ? 6 : Number(cov.input.value), mats_per_unit: per.input.value === "" ? 16 : Number(per.input.value) });
+    const r = computeHardwoodFloorDryingMat({ floor_area_ft2: Number(area.input.value) || 0, mat_coverage_ft2: cov.input.value === "" ? 6 : Number(cov.input.value), mats_per_unit: per.input.value === "" ? 16 : Number(per.input.value) }); stepsFor(outputRegion, inputRegion, ["floor_area_ft2", "mat_coverage_ft2", "mats_per_unit"], r);
     if (r.error) { oMats.textContent = r.error; oUnits.textContent = "-"; return; }
     oMats.textContent = r.mats_needed + " mats";
     oUnits.textContent = r.suction_units + " unit(s)";
@@ -3050,7 +3051,7 @@ function renderMoldCleaningLabor(inputRegion, outputRegion, citationEl) {
   const oLabor = makeOutputLine(outputRegion, "Labor", "mcl-out-labor");
   const oCrew = makeOutputLine(outputRegion, "Crew calendar time", "mcl-out-crew");
   const update = debounce(() => {
-    const r = computeMoldCleaningLabor({ affected_sf: Number(area.input.value) || 0, production_sf_per_hr: prod.input.value === "" ? 100 : Number(prod.input.value), passes: pass.input.value === "" ? 2 : Number(pass.input.value), crew_size: crew.input.value === "" ? 2 : Number(crew.input.value) });
+    const r = computeMoldCleaningLabor({ affected_sf: Number(area.input.value) || 0, production_sf_per_hr: prod.input.value === "" ? 100 : Number(prod.input.value), passes: pass.input.value === "" ? 2 : Number(pass.input.value), crew_size: crew.input.value === "" ? 2 : Number(crew.input.value) }); stepsFor(outputRegion, inputRegion, ["affected_sf", "production_sf_per_hr", "passes", "crew_size"], r);
     if (r.error) { oLabor.textContent = r.error; oCrew.textContent = "-"; return; }
     oLabor.textContent = fmt(r.labor_hours, 1) + " labor-hr";
     oCrew.textContent = fmt(r.crew_hours, 1) + " hr on the clock";

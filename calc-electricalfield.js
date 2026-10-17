@@ -6,6 +6,7 @@
 import { conductorResistancePerKft } from "./pure-math.js";
 import {
   DEBOUNCE_MS, debounce, makeNumber, makeSelect, makeOutputLine, attachExampleButton, fmt,
+  stepsFor,
 } from "./ui-fields.js";
 
 const _finiteGuard = (o) => {
@@ -63,7 +64,7 @@ function _v849renderCableReelCapacity(inputRegion, outputRegion, citationEl) {
       flange_dia_in: fl.input.value === "" ? 30 : Number(fl.input.value), drum_dia_in: dr.input.value === "" ? 12 : Number(dr.input.value),
       traverse_width_in: tw.input.value === "" ? 18 : Number(tw.input.value), cable_od_in: od.input.value === "" ? 1 : Number(od.input.value),
       fill_factor: ff.input.value === "" ? 0.9 : Number(ff.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["flange_dia_in", "drum_dia_in", "traverse_width_in", "cable_od_in", "fill_factor"], r);
     if (r.error) { oLen.textContent = r.error; return; }
     oLen.textContent = fmt(r.length_ft, 0) + " ft";
   }, DEBOUNCE_MS);
@@ -104,7 +105,7 @@ function _v852renderWirePullingLubricant(inputRegion, outputRegion, citationEl) 
     const r = computeWirePullingLubricant({
       length_ft: l.input.value === "" ? 400 : Number(l.input.value), conduit_id_in: id.input.value === "" ? 3 : Number(id.input.value),
       k_factor: k.input.value === "" ? 0.0015 : Number(k.input.value), bend_factor: bf.input.value === "" ? 1.0 : Number(bf.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["length_ft", "conduit_id_in", "k_factor", "bend_factor"], r);
     if (r.error) { oGal.textContent = r.error; return; }
     oGal.textContent = fmt(r.gallons, 1) + " gal";
   }, DEBOUNCE_MS);
@@ -158,7 +159,7 @@ function _v854renderBranchCircuitWireFootage(inputRegion, outputRegion, citation
       circuits: c.input.value === "" ? 20 : Number(c.input.value), avg_homerun_ft: hr.input.value === "" ? 45 : Number(hr.input.value),
       makeup_ft: mu.input.value === "" ? 15 : Number(mu.input.value), conductors_per_circuit: cp.input.value === "" ? 3 : Number(cp.input.value),
       roll_ft: rf.input.value === "" ? 1000 : Number(rf.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["circuits", "avg_homerun_ft", "makeup_ft", "conductors_per_circuit", "roll_ft"], r);
     if (r.error) { oTotal.textContent = r.error; oRolls.textContent = "-"; return; }
     oTotal.textContent = fmt(r.total_ft, 0) + " ft (" + fmt(r.ft_per_color, 0) + " ft per color)";
     oRolls.textContent = fmt(r.rolls_bought, 0) + " rolls to buy -- " + fmt(r.rolls_per_color, 0) + " per color (" + fmt(r.rolls, 0) + " if the footage were one pool)";
@@ -199,7 +200,7 @@ function _v924renderMicroinverterBranchCount(inputRegion, outputRegion, citation
   const update = debounce(() => {
     const r = computeMicroinverterBranchCount({
       branch_ocpd_a: oc.input.value === "" ? 20 : Number(oc.input.value), unit_max_current_a: iu.input.value === "" ? 1.21 : Number(iu.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["branch_ocpd_a", "unit_max_current_a"], r);
     if (r.error) { oN.textContent = r.error; oLoad.textContent = "-"; return; }
     oN.textContent = fmt(r.max_microinverters, 0) + " units";
     oLoad.textContent = fmt(r.branch_load_a, 2) + " A of " + fmt(r.continuous_limit_a, 1) + " A allowed (80% of " + fmt(Number(oc.input.value) || 20, 0) + " A)";
@@ -270,7 +271,7 @@ function _v932renderWelderArcCircuitConductor(inputRegion, outputRegion, citatio
     const r = computeWelderArcCircuitConductor({
       primary_current_a: ip.input.value === "" ? 40 : Number(ip.input.value), duty_pct: dc.input.value === "" ? 50 : Number(dc.input.value),
       welder_type: wt.select.value,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["primary_current_a", "duty_pct", "welder_type"], r);
     if (r.error) { oEff.textContent = r.error; oOcpd.textContent = "-"; return; }
     oEff.textContent = fmt(r.effective_current_a, 1) + " A (" + fmt(r.duty_multiplier, 2) + "x nameplate)";
     oOcpd.textContent = fmt(r.ocpd_max_a, 0) + " A max (200% of " + fmt(Number(ip.input.value) || 40, 0) + " A)" + (r.ocpd_std_a ? "; largest standard size <= that: " + fmt(r.ocpd_std_a, 0) + " A" : "");
@@ -320,7 +321,7 @@ function _v933renderWelderResistanceCircuitConductor(inputRegion, outputRegion, 
   const update = debounce(() => {
     const r = computeWelderResistanceCircuitConductor({
       primary_current_a: ip.input.value === "" ? 100 : Number(ip.input.value), duty_pct: dc.input.value === "" ? 50 : Number(dc.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["primary_current_a", "duty_pct"], r);
     if (r.error) { oCond.textContent = r.error; oOcpd.textContent = "-"; return; }
     oCond.textContent = fmt(r.conductor_current_a, 1) + " A (" + fmt(r.duty_multiplier, 2) + "x nameplate)";
     oOcpd.textContent = fmt(r.ocpd_max_a, 0) + " A (300% of " + fmt(Number(ip.input.value) || 100, 0) + " A)";
@@ -369,7 +370,7 @@ function _v941renderBatteryInverterDcConductor(inputRegion, outputRegion, citati
     const r = computeBatteryInverterDcConductor({
       inverter_power_w: pw.input.value === "" ? 4000 : Number(pw.input.value), battery_voltage_v: bv.input.value === "" ? 48 : Number(bv.input.value),
       efficiency_pct: ef.input.value === "" ? 90 : Number(ef.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["inverter_power_w", "battery_voltage_v", "efficiency_pct"], r);
     if (r.error) { oI.textContent = r.error; oC.textContent = "-"; oO.textContent = "-"; return; }
     oI.textContent = fmt(r.dc_current_a, 1) + " A";
     oC.textContent = fmt(r.min_conductor_ampacity_a, 1) + " A";
@@ -418,7 +419,7 @@ function _v942renderPvAcOutputCircuit(inputRegion, outputRegion, citationEl) {
     const r = computePvAcOutputCircuit({
       ac_power_w: pw.input.value === "" ? 9600 : Number(pw.input.value), ac_voltage_v: vv.input.value === "" ? 240 : Number(vv.input.value),
       phases: ph.input.value === "" ? 1 : Number(ph.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["ac_power_w", "ac_voltage_v", "phases"], r);
     if (r.error) { oI.textContent = r.error; oC.textContent = "-"; oO.textContent = "-"; return; }
     oI.textContent = fmt(r.continuous_current_a, 1) + " A";
     oC.textContent = fmt(r.min_conductor_ampacity_a, 1) + " A";
@@ -459,7 +460,7 @@ function _v951renderSoilResistivityWenner(inputRegion, outputRegion, citationEl)
   const update = debounce(() => {
     const r = computeSoilResistivityWenner({
       probe_spacing_ft: sp.input.value === "" ? 10 : Number(sp.input.value), meter_resistance_ohm: rr.input.value === "" ? 5 : Number(rr.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["probe_spacing_ft", "meter_resistance_ohm"], r);
     if (r.error) { oM.textContent = r.error; oCm.textContent = "-"; return; }
     oM.textContent = fmt(r.resistivity_ohm_m, 1) + " ohm-m";
     oCm.textContent = fmt(r.resistivity_ohm_cm, 0) + " ohm-cm (feeds grounding-electrode)";
@@ -509,7 +510,7 @@ function _v981renderMaxCircuitLengthForVd(inputRegion, outputRegion, citationEl)
       source_voltage_v: sv.input.value === "" ? 120 : Number(sv.input.value), target_vd_pct: tp.input.value === "" ? 3 : Number(tp.input.value),
       current_a: cu.input.value === "" ? 20 : Number(cu.input.value), conductor_cmil: cm.input.value === "" ? 6530 : Number(cm.input.value),
       k_constant: kk.input.value === "" ? 12.9 : Number(kk.input.value), phases: ph.input.value === "" ? 1 : Number(ph.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["source_voltage_v", "target_vd_pct", "current_a", "conductor_cmil", "k_constant", "phases"], r);
     if (r.error) { oV.textContent = r.error; oL.textContent = "-"; return; }
     oV.textContent = fmt(r.vd_target_volts, 2) + " V (" + fmt(Number(tp.input.value) || 3, 1) + "%)";
     oL.textContent = fmt(r.max_length_ft, 1) + " ft one-way";
@@ -558,7 +559,7 @@ function _v985renderOpenDeltaTransformer(inputRegion, outputRegion, citationEl) 
   const update = debounce(() => {
     const r = computeOpenDeltaTransformer({
       transformer_kva_each: ke.input.value === "" ? 25 : Number(ke.input.value), required_load_kva: rl.input.value === "" ? 40 : Number(rl.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["transformer_kva_each", "required_load_kva"], r);
     if (r.error) { oA.textContent = r.error; oU.textContent = "-"; oV.textContent = "-"; return; }
     oA.textContent = fmt(r.available_3ph_kva, 1) + " kVA available";
     oU.textContent = fmt(r.per_transformer_kva, 2) + " kVA (" + fmt(r.utilization_pct, 1) + "% of rating)";
@@ -622,7 +623,7 @@ function _v989renderConduitNipple60Fill(inputRegion, outputRegion, citationEl) {
     const r = computeConduitNipple60Fill({
       conduit_area_sqin: ca.input.value === "" ? 0.864 : Number(ca.input.value), conductor_area_sqin: wa.input.value === "" ? 0.0211 : Number(wa.input.value),
       conductor_count: nc.input.value === "" ? 20 : Number(nc.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["conduit_area_sqin", "conductor_area_sqin", "conductor_count"], r);
     if (r.error) { oF.textContent = r.error; oM.textContent = "-"; oV.textContent = "-"; return; }
     oF.textContent = fmt(r.fill_area_sqin, 4) + " sq in (" + fmt(r.fill_pct, 1) + "%)";
     oM.textContent = r.nipple_max_conductors + " in a nipple (60%), " + r.normal_max_conductors + " normal (40%)";
@@ -718,7 +719,7 @@ function _v1109renderMwbcVoltageDrop(inputRegion, outputRegion, citationEl) {
       awg: aw.select.value, material: mt.select.value, one_way_length_ft: Number(ln.input.value),
       load_a_amps: Number(la.input.value), load_b_amps: Number(lb.input.value),
       source_volts: Number(sv.input.value), temperature_C: tc.input.value === "" ? undefined : Number(tc.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["awg", "material", "one_way_length_ft", "load_a_amps", "load_b_amps", "source_volts", "temperature_C"], r);
     if (r.error) { oN.textContent = r.error; oA.textContent = "-"; oB.textContent = "-"; oC.textContent = "-"; oZ.textContent = "-"; return; }
     oN.textContent = fmt(r.neutral_amps, 1) + " A";
     oA.textContent = fmt(r.vd_a_volts, 2) + " V (" + fmt(r.pct_a, 2) + "%) to " + fmt(r.volts_a, 1) + " V";

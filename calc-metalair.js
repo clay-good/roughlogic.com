@@ -24,6 +24,7 @@ import {
   DEBOUNCE_MS, debounce, makeNumber, makeTextarea, makeSelect,
   makeOutputLine, attachExampleButton, fmt,
   makeStepsPanel,
+  stepsFor,
 } from "./ui-fields.js";
 
 const _finiteGuard = (o) => {
@@ -171,7 +172,7 @@ function _renderGrooveWeldStrength(inputRegion, outputRegion, citationEl) {
   const oUtil = makeOutputLine(outputRegion, "Utilization", "gw-out-util");
   const oNote = makeOutputLine(outputRegion, "Notes", "gw-out-note");
   const update = debounce(() => {
-    const r = computeGrooveWeldStrength({ weld_type: type.select.value, effective_throat_in: Number(throat.input.value) || 0, base_thickness_in: Number(base.input.value) || 0, length_in: Number(len.input.value) || 0, electrode: elec.select.value, method: method.select.value, applied_load_lb: Number(load.input.value) || 0 , base_fy_ksi: Number(fy.input.value) || 0, base_fu_ksi: Number(fu.input.value) || 0 });
+    const r = computeGrooveWeldStrength({ weld_type: type.select.value, effective_throat_in: Number(throat.input.value) || 0, base_thickness_in: Number(base.input.value) || 0, length_in: Number(len.input.value) || 0, electrode: elec.select.value, method: method.select.value, applied_load_lb: Number(load.input.value) || 0 , base_fy_ksi: Number(fy.input.value) || 0, base_fu_ksi: Number(fu.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["weld_type", "effective_throat_in", "base_thickness_in", "length_in", "electrode", "method", "applied_load_lb", "base_fy_ksi", "base_fu_ksi"], r);
     if (r.error) { oCap.textContent = r.error; oThroat.textContent = "-"; oUtil.textContent = "-"; oNote.textContent = ""; return; }
     oCap.textContent = fmt(r.capacity_lb, 0) + " lb (" + r.method + ", " + r.electrode + ")";
     oThroat.textContent = fmt(r.throat_in, 3) + " in throat; " + fmt(r.strength_per_in_lb, 0) + " lb per in";
@@ -249,7 +250,7 @@ function _renderGrooveWeldLengthForLoad(inputRegion, outputRegion, citationEl) {
   const oU = makeOutputLine(outputRegion, "Effective throat / unit strength", "gwl-out-u");
   const oNote = makeOutputLine(outputRegion, "Notes", "gwl-out-note");
   const update = debounce(() => {
-    const r = computeGrooveWeldLengthForLoad({ weld_type: type.select.value, applied_load_lb: Number(load.input.value) || 0, effective_throat_in: Number(throat.input.value) || 0, base_thickness_in: Number(base.input.value) || 0, electrode: elec.select.value, method: method.select.value, base_fy_ksi: Number(fy.input.value) || 0, base_fu_ksi: Number(fu.input.value) || 0 });
+    const r = computeGrooveWeldLengthForLoad({ weld_type: type.select.value, applied_load_lb: Number(load.input.value) || 0, effective_throat_in: Number(throat.input.value) || 0, base_thickness_in: Number(base.input.value) || 0, electrode: elec.select.value, method: method.select.value, base_fy_ksi: Number(fy.input.value) || 0, base_fu_ksi: Number(fu.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["weld_type", "applied_load_lb", "effective_throat_in", "base_thickness_in", "electrode", "method", "base_fy_ksi", "base_fu_ksi"], r);
     if (r.error) { oL.textContent = r.error; oU.textContent = "-"; oNote.textContent = ""; return; }
     oL.textContent = fmt(r.required_length_in, 2) + " in (" + r.method + ", " + r.electrode + ")";
     oU.textContent = fmt(r.throat_in, 3) + " in throat; " + fmt(r.strength_per_in_lb, 0) + " lb per in";
@@ -316,7 +317,7 @@ function _renderDuctStaticTotal(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const components = parse(list.input.value);
     if (components === null) { oTotal.textContent = "Each line must be label,drop (a number)."; oRem.textContent = "-"; oNote.textContent = ""; return; }
-    const r = computeDuctStaticTotal({ components, rated_esp_in_wc: Number(rated.input.value) || 0 });
+    const r = computeDuctStaticTotal({ components, rated_esp_in_wc: Number(rated.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["components", "rated_esp_in_wc"], r);
     if (r.error) { oTotal.textContent = r.error; oRem.textContent = "-"; oNote.textContent = ""; return; }
     oTotal.textContent = fmt(r.total_esp_in_wc, 3) + " in. w.c. across " + r.breakdown.length + " components";
     oRem.textContent = r.remaining_in_wc === null ? "(enter the blower rating)" : (fmt(r.remaining_in_wc, 3) + " in. w.c. remaining - " + (r.within_rating ? "within rating" : "OVER rating"));
@@ -361,7 +362,7 @@ function _renderCompressionRatio(inputRegion, outputRegion, citationEl) {
   const oAbs = makeOutputLine(outputRegion, "Absolute pressures", "cr-out-abs");
   const oNote = makeOutputLine(outputRegion, "Notes", "cr-out-note");
   const update = debounce(() => {
-    const r = computeCompressionRatio({ suction_psig: suc.input.value === "" ? null : Number(suc.input.value), discharge_psig: dis.input.value === "" ? null : Number(dis.input.value), atmospheric_psia: Number(atm.input.value) || 0 });
+    const r = computeCompressionRatio({ suction_psig: suc.input.value === "" ? null : Number(suc.input.value), discharge_psig: dis.input.value === "" ? null : Number(dis.input.value), atmospheric_psia: Number(atm.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["suction_psig", "discharge_psig", "atmospheric_psia"], r);
     if (r.error) { oRatio.textContent = r.error; oAbs.textContent = "-"; oNote.textContent = ""; return; }
     oRatio.textContent = fmt(r.compression_ratio, 2) + " : 1" + (r.high_ratio ? " (HIGH)" : "");
     oAbs.textContent = "suction " + fmt(r.suction_psia, 1) + " psia, discharge " + fmt(r.discharge_psia, 1) + " psia";
@@ -410,7 +411,7 @@ function _renderDuctTransitionLength(inputRegion, outputRegion, citationEl) {
     const r = computeDuctTransitionLength({
       large_dim_in: lg.input.value === "" ? 20 : Number(lg.input.value), small_dim_in: sm.input.value === "" ? 12 : Number(sm.input.value),
       slope_deg: sl.input.value === "" ? 15 : Number(sl.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["large_dim_in", "small_dim_in", "slope_deg"], r);
     if (r.error) { oConc.textContent = r.error; oEcc.textContent = "-"; oRatio.textContent = "-"; return; }
     oConc.textContent = fmt(r.length_concentric_in, 2) + " in";
     oEcc.textContent = fmt(r.length_eccentric_in, 2) + " in";
@@ -461,7 +462,7 @@ function _v960renderDuctStaticRegain(inputRegion, outputRegion, citationEl) {
     const r = computeDuctStaticRegain({
       upstream_velocity_fpm: uv.input.value === "" ? 2000 : Number(uv.input.value), downstream_velocity_fpm: dv.input.value === "" ? 1500 : Number(dv.input.value),
       recovery_factor: rf.input.value === "" ? 0.75 : Number(rf.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["upstream_velocity_fpm", "downstream_velocity_fpm", "recovery_factor"], r);
     if (r.error) { oR.textContent = r.error; oV.textContent = "-"; return; }
     oR.textContent = fmt(r.static_regain_inwc, 4) + " in w.c." + (r.is_loss ? " (a static LOSS -- velocity increased)" : " recovered");
     oV.textContent = fmt(r.vp_upstream_inwc, 4) + " / " + fmt(r.vp_downstream_inwc, 4) + " in w.c.";

@@ -6,6 +6,7 @@
 import {
   DEBOUNCE_MS, debounce, makeNumber, makeSelect, makeOutputLine,
   attachExampleButton, fmt,
+  stepsFor,
 } from "./ui-fields.js";
 
 const _finiteGuard = (o) => {
@@ -65,7 +66,7 @@ function renderSolarEgc69045(inputRegion, outputRegion, citationEl) {
   const oEgc = makeOutputLine(outputRegion, "Required EGC (copper)", "segc-out-egc");
   const oNote = makeOutputLine(outputRegion, "Note", "segc-out-note");
   const update = debounce(() => {
-    const r = computeSolarEgc69045({ ocpd_rating_a: Number(ocpd.input.value) || 0, pv_isc_a: Number(isc.input.value) || 0, vd_upsized: vd.select.value });
+    const r = computeSolarEgc69045({ ocpd_rating_a: Number(ocpd.input.value) || 0, pv_isc_a: Number(isc.input.value) || 0, vd_upsized: vd.select.value }); stepsFor(outputRegion, inputRegion, ["ocpd_rating_a", "pv_isc_a", "vd_upsized"], r);
     if (r.error) { oBasis.textContent = r.error; oEgc.textContent = "-"; oNote.textContent = ""; return; }
     oBasis.textContent = fmt(r.basis_current_a, 1) + " A (" + (r.has_ocpd ? "OCPD rating" : "1.5625 x PV Isc - no OCPD") + ")";
     oEgc.textContent = r.egc_awg + " AWG" + (r.egc_awg === "14" ? " (14 AWG minimum)" : "");
@@ -106,7 +107,7 @@ function renderShadowLength(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "shad-out-n");
   function readNum(i) { if (i.value === "") return 0; const v = Number(i.value); return Number.isFinite(v) ? v : 0; }
   const update = debounce(() => {
-    const r = computeShadowLength({ object_height_ft: readNum(h.input), sun_altitude_deg: readNum(a.input) });
+    const r = computeShadowLength({ object_height_ft: readNum(h.input), sun_altitude_deg: readNum(a.input) }); stepsFor(outputRegion, inputRegion, ["object_height_ft", "sun_altitude_deg"], r);
     if (r.error) { oL.textContent = r.error; oR.textContent = "-"; oNote.textContent = ""; return; }
     oL.textContent = fmt(r.shadow_length_ft, 2) + " ft";
     oR.textContent = fmt(r.shadow_ratio, 2) + " x height";
@@ -161,7 +162,7 @@ function renderSolarAltitude(inputRegion, outputRegion, citationEl) {
   // A blank box reaches the compute as null: a cleared latitude is not the equator.
   function readNum(i) { if (i.value === "") return null; const v = Number(i.value); return Number.isFinite(v) ? v : null; }
   const update = debounce(() => {
-    const r = computeSolarAltitude({ latitude_deg: readNum(lat.input), day_of_year: readNum(doy.input), hours_from_solar_noon: readNum(hrs.input) });
+    const r = computeSolarAltitude({ latitude_deg: readNum(lat.input), day_of_year: readNum(doy.input), hours_from_solar_noon: readNum(hrs.input) }); stepsFor(outputRegion, inputRegion, ["latitude_deg", "day_of_year", "hours_from_solar_noon"], r);
     if (r.error) { oAlt.textContent = r.error; oDec.textContent = "-"; oNote.textContent = ""; return; }
     oAlt.textContent = fmt(r.altitude_deg, 1) + " deg" + (r.below_horizon ? " (sun below the horizon)" : "");
     oDec.textContent = fmt(r.declination_deg, 2) + " deg / " + fmt(r.hour_angle_deg, 1) + " deg";
@@ -235,7 +236,7 @@ function renderSolarTimeCorrection(inputRegion, outputRegion, citationEl) {
   // A blank box reaches the compute as null: a cleared hour is not midnight, nor a cleared longitude Greenwich.
   function readNum(i) { if (i.value === "") return null; const v = Number(i.value); return Number.isFinite(v) ? v : null; }
   const update = debounce(() => {
-    const r = computeSolarTimeCorrection({ clock_hour: readNum(hr.input), clock_minute: readNum(mn.input), day_of_year: readNum(doy.input), longitude_deg: readNum(lon.input), utc_offset_hours: readNum(utc.input) });
+    const r = computeSolarTimeCorrection({ clock_hour: readNum(hr.input), clock_minute: readNum(mn.input), day_of_year: readNum(doy.input), longitude_deg: readNum(lon.input), utc_offset_hours: readNum(utc.input) }); stepsFor(outputRegion, inputRegion, ["clock_hour", "clock_minute", "day_of_year", "longitude_deg", "utc_offset_hours"], r);
     if (r.error) { oSol.textContent = r.error; oHrs.textContent = "-"; oNoon.textContent = "-"; oCor.textContent = "-"; oNote.textContent = ""; return; }
     oSol.textContent = r.solar_time_text + " (clock " + (r.total_correction_min >= 0 ? "+" : "-") + fmt(Math.abs(r.total_correction_min), 1) + " min)";
     oHrs.textContent = fmt(r.hours_from_solar_noon, 2) + " h";
@@ -296,7 +297,7 @@ function renderSolarAzimuth(inputRegion, outputRegion, citationEl) {
   // A blank box reaches the compute as null: a cleared latitude is not the equator.
   function readNum(i) { if (i.value === "") return null; const v = Number(i.value); return Number.isFinite(v) ? v : null; }
   const update = debounce(() => {
-    const r = computeSolarAzimuth({ latitude_deg: readNum(lat.input), day_of_year: readNum(doy.input), hours_from_solar_noon: readNum(hrs.input) });
+    const r = computeSolarAzimuth({ latitude_deg: readNum(lat.input), day_of_year: readNum(doy.input), hours_from_solar_noon: readNum(hrs.input) }); stepsFor(outputRegion, inputRegion, ["latitude_deg", "day_of_year", "hours_from_solar_noon"], r);
     if (r.error) { oAzi.textContent = r.error; oAlt.textContent = "-"; oNote.textContent = ""; return; }
     oAzi.textContent = fmt(r.azimuth_deg, 1) + " deg (" + r.compass + ")";
     oAlt.textContent = fmt(r.altitude_deg, 1) + " deg" + (r.below_horizon ? " (sun below the horizon)" : "");
@@ -355,7 +356,7 @@ function _v896renderPvRailClampTakeoff(inputRegion, outputRegion, citationEl) {
       rows: rw.input.value === "" ? 2 : Number(rw.input.value), modules_per_row: mp.input.value === "" ? 12 : Number(mp.input.value),
       module_width_ft: mw.input.value === "" ? 3.42 : Number(mw.input.value), gap_ft: gp.input.value === "" ? 0 : Number(gp.input.value),
       rails_per_row: rp.input.value === "" ? 2 : Number(rp.input.value), rail_stock_ft: rs.input.value === "" ? 14 : Number(rs.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["rows", "modules_per_row", "module_width_ft", "gap_ft", "rails_per_row", "rail_stock_ft"], r);
     if (r.error) { oRail.textContent = r.error; oMid.textContent = "-"; oEnd.textContent = "-"; oSpl.textContent = "-"; return; }
     oRail.textContent = fmt(r.rail_lf, 1) + " LF (" + fmt(r.run_len_ft, 2) + " ft per run)";
     oMid.textContent = fmt(r.mid_clamps, 0) + " mid clamps";
@@ -408,7 +409,7 @@ function _v897renderPvBallastWeight(inputRegion, outputRegion, citationEl) {
       modules: mo.input.value === "" ? 30 : Number(mo.input.value), module_wt_lb: mw.input.value === "" ? 50 : Number(mw.input.value),
       ballast_per_module_lb: bl.input.value === "" ? 40 : Number(bl.input.value), racking_wt_lb: rk.input.value === "" ? 0 : Number(rk.input.value),
       array_area_sf: ar.input.value === "" ? 630 : Number(ar.input.value), allowable_psf: al.input.value === "" ? 5 : Number(al.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["modules", "module_wt_lb", "ballast_per_module_lb", "racking_wt_lb", "array_area_sf", "allowable_psf"], r);
     if (r.error) { oTotal.textContent = r.error; oPsf.textContent = "-"; oPass.textContent = "-"; return; }
     oTotal.textContent = fmt(r.total_wt_lb, 0) + " lb";
     oPsf.textContent = fmt(r.added_psf, 2) + " psf";
@@ -454,7 +455,7 @@ function _v963renderDcShuntSizing(inputRegion, outputRegion, citationEl) {
     const r = computeDcShuntSizing({
       rated_current_a: ir.input.value === "" ? 100 : Number(ir.input.value), rated_millivolt: mr.input.value === "" ? 50 : Number(mr.input.value),
       measured_millivolt: mm.input.value === "" ? 25 : Number(mm.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["rated_current_a", "rated_millivolt", "measured_millivolt"], r);
     if (r.error) { oR.textContent = r.error; oI.textContent = "-"; oP.textContent = "-"; return; }
     oR.textContent = fmt(r.shunt_resistance_ohm * 1000, 4) + " milliohm";
     oI.textContent = fmt(r.measured_current_a, 2) + " A";
@@ -499,7 +500,7 @@ function _v968renderEvRangePerHour(inputRegion, outputRegion, citationEl) {
     const r = computeEvRangePerHour({
       evse_power_kw: pw.input.value === "" ? 7.7 : Number(pw.input.value), charge_efficiency: ef.input.value === "" ? 0.88 : Number(ef.input.value),
       vehicle_efficiency_mi_per_kwh: ve.input.value === "" ? 3.5 : Number(ve.input.value), target_range_mi: tr.input.value === "" ? 100 : Number(tr.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["evse_power_kw", "charge_efficiency", "vehicle_efficiency_mi_per_kwh", "target_range_mi"], r);
     if (r.error) { oR.textContent = r.error; oH.textContent = "-"; return; }
     oR.textContent = fmt(r.range_added_mi_per_hr, 1) + " mi per hour of charging";
     oH.textContent = fmt(r.hours_to_add_target, 2) + " hr for " + fmt(Number(tr.input.value) || 100, 0) + " mi";
@@ -554,7 +555,7 @@ function _v972renderBatterySeriesParallel(inputRegion, outputRegion, citationEl)
       target_bus_v: tv.input.value === "" ? 48 : Number(tv.input.value), module_v: mv.input.value === "" ? 12.8 : Number(mv.input.value),
       module_ah: ma.input.value === "" ? 100 : Number(ma.input.value), parallel_strings: ps.input.value === "" ? 2 : Number(ps.input.value),
       depth_of_discharge: dd.input.value === "" ? 0.8 : Number(dd.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["target_bus_v", "module_v", "module_ah", "parallel_strings", "depth_of_discharge"], r);
     if (r.error) { oC.textContent = r.error; oB.textContent = "-"; oE.textContent = "-"; return; }
     oC.textContent = r.series_count + "S" + r.parallel_count + "P";
     oB.textContent = fmt(r.actual_bus_v, 1) + " V bus, " + fmt(r.total_ah, 0) + " Ah";
@@ -600,7 +601,7 @@ function _v983renderBifacialPvGain(inputRegion, outputRegion, citationEl) {
     const r = computeBifacialPvGain({
       front_poa_wm2: fp.input.value === "" ? 1000 : Number(fp.input.value), rear_poa_wm2: rp.input.value === "" ? 150 : Number(rp.input.value),
       bifaciality: bf.input.value === "" ? 0.75 : Number(bf.input.value), front_power_w: pw.input.value === "" ? 400 : Number(pw.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["front_poa_wm2", "rear_poa_wm2", "bifaciality", "front_power_w"], r);
     if (r.error) { oG.textContent = r.error; oP.textContent = "-"; return; }
     oG.textContent = fmt(r.bifacial_gain_pct, 2) + " %";
     oP.textContent = fmt(r.effective_power_w, 1) + " W";

@@ -23,6 +23,7 @@
 
 import {
   DEBOUNCE_MS, debounce, makeNumber, makeOutputLine, attachExampleButton, fmt,
+  stepsFor,
 } from "./ui-fields.js";
 
 export const PLUMBINGTAKEOFF_RENDERERS = {};
@@ -79,7 +80,7 @@ function _v856renderSolderJointQuantity(inputRegion, outputRegion, citationEl) {
       joints: j.input.value === "" ? 200 : Number(j.input.value), wire_in_per_joint: wj.input.value === "" ? 0.75 : Number(wj.input.value),
       wire_dia_in: wd.input.value === "" ? 0.125 : Number(wd.input.value), solder_density_lb_in3: dn.input.value === "" ? 0.265 : Number(dn.input.value),
       spool_lb: sp.input.value === "" ? 1 : Number(sp.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["joints", "wire_in_per_joint", "wire_dia_in", "solder_density_lb_in3", "spool_lb"], r);
     if (r.error) { oSolder.textContent = r.error; oSpools.textContent = "-"; return; }
     oSolder.textContent = fmt(r.solder_lb, 2) + " lb";
     oSpools.textContent = fmt(r.spools, 0) + " spools";
@@ -168,7 +169,7 @@ function _v857renderPipeInsulationTakeoff(inputRegion, outputRegion, citationEl)
       pipe_ft: p.input.value === "" ? 250 : Number(p.input.value), waste_pct: w.input.value === "" ? 5 : Number(w.input.value),
       num_fittings: nf.input.value === "" ? 12 : Number(nf.input.value), fitting_allow_ft: fa.input.value === "" ? 1 : Number(fa.input.value),
       section_len_ft: sl.input.value === "" ? 3 : Number(sl.input.value), insul_od_in: od.input.value === "" ? 4.5 : Number(od.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["pipe_ft", "waste_pct", "num_fittings", "fitting_allow_ft", "section_len_ft", "insul_od_in"], r);
     if (r.error) { oSections.textContent = r.error; oJacket.textContent = "-"; return; }
     oSections.textContent = fmt(r.sections, 0) + " sections (" + fmt(r.cut_ft, 1) + " ft cut)";
     oJacket.textContent = fmt(r.jacket_sf, 0) + " sf";
@@ -234,7 +235,7 @@ function _v858renderHeatTraceSizing(inputRegion, outputRegion, citationEl) {
       num_valves: nv.input.value === "" ? 1 : Number(nv.input.value), valve_allow_ft: va.input.value === "" ? 3 : Number(va.input.value),
       rated_w_per_ft: wf.input.value === "" ? 5 : Number(wf.input.value), voltage: v.input.value === "" ? 120 : Number(v.input.value),
       breaker_a: br.input.value === "" ? 20 : Number(br.input.value), start_factor: sf.input.value === "" ? 3 : Number(sf.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["pipe_ft", "allowance_pct", "num_valves", "valve_allow_ft", "rated_w_per_ft", "voltage", "breaker_a", "start_factor"], r);
     if (r.error) { oCable.textContent = r.error; oCircuit.textContent = "-"; return; }
     oCable.textContent = fmt(r.cable_ft, 0) + " ft (" + fmt(r.watts, 0) + " W)";
     oCircuit.textContent = fmt(r.amps, 1) + " A running, " + fmt(r.start_amps, 1) + " A at cold start - " + (r.breaker_ok ? "OK on one circuit" : "over the breaker (80% running or the cold-start current) - split the run");
@@ -280,7 +281,7 @@ function _v894renderPipePurgeVolume(inputRegion, outputRegion, citationEl) {
     const r = computePipePurgeVolume({
       pipe_id_in: id.input.value === "" ? 2.067 : Number(id.input.value), length_ft: ln.input.value === "" ? 100 : Number(ln.input.value),
       air_changes: ac.input.value === "" ? 5 : Number(ac.input.value), flow_scfh: fl.input.value === "" ? 60 : Number(fl.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["pipe_id_in", "length_ft", "air_changes", "flow_scfh"], r);
     if (r.error) { oPipe.textContent = r.error; oPurge.textContent = "-"; oTime.textContent = "-"; return; }
     oPipe.textContent = fmt(r.pipe_volume_ft3, 2) + " ft^3";
     oPurge.textContent = fmt(r.purge_volume_ft3, 2) + " ft^3";
@@ -332,7 +333,7 @@ function _v903renderHydronicSystemVolume(inputRegion, outputRegion, citationEl) 
       pipe_length_ft: pl.input.value === "" ? 500 : Number(pl.input.value), gal_per_ft: gf.input.value === "" ? 0.025 : Number(gf.input.value),
       terminal_gal: tg.input.value === "" ? 0 : Number(tg.input.value), boiler_tank_gal: bg.input.value === "" ? 0 : Number(bg.input.value),
       glycol_fraction: gc.input.value === "" ? 0.30 : Number(gc.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["pipe_length_ft", "gal_per_ft", "terminal_gal", "boiler_tank_gal", "glycol_fraction"], r);
     if (r.error) { oSystem.textContent = r.error; oGlycol.textContent = "-"; oWater.textContent = "-"; return; }
     oSystem.textContent = fmt(r.system_gal, 1) + " gal (" + fmt(r.pipe_gal, 1) + " gal in the pipe)";
     oGlycol.textContent = fmt(r.glycol_gal, 1) + " gal";
@@ -384,7 +385,7 @@ function _v906renderPexHomerunTakeoff(inputRegion, outputRegion, citationEl) {
     const r = computePexHomerunTakeoff({
       fixtures: fx.input.value === "" ? 8 : Number(fx.input.value), hot_fixtures: hf.input.value === "" ? 6 : Number(hf.input.value),
       avg_run_ft: ar.input.value === "" ? 35 : Number(ar.input.value), waste_pct: ws.input.value === "" ? 10 : Number(ws.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["fixtures", "hot_fixtures", "avg_run_ft", "waste_pct"], r);
     if (r.error) { oPorts.textContent = r.error; oTubing.textContent = "-"; return; }
     oPorts.textContent = fmt(r.total_ports, 0) + " ports (" + fmt(r.cold_ports, 0) + " cold, " + fmt(r.hot_ports, 0) + " hot)";
     oTubing.textContent = fmt(r.tubing_lf, 0) + " LF";
@@ -438,7 +439,7 @@ function _v987renderSolarThermalCollector(inputRegion, outputRegion, citationEl)
       optical_efficiency: oe.input.value === "" ? 0.70 : Number(oe.input.value), loss_coeff: lc.input.value === "" ? 0.85 : Number(lc.input.value),
       inlet_temp_f: it.input.value === "" ? 120 : Number(it.input.value), ambient_temp_f: at.input.value === "" ? 70 : Number(at.input.value),
       irradiance_btu: ir.input.value === "" ? 300 : Number(ir.input.value), area_sqft: ar.input.value === "" ? 40 : Number(ar.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["optical_efficiency", "loss_coeff", "inlet_temp_f", "ambient_temp_f", "irradiance_btu", "area_sqft"], r);
     if (r.error) { oE.textContent = r.error; oQ.textContent = "-"; return; }
     oE.textContent = fmt(r.efficiency * 100, 1) + "%";
     oQ.textContent = fmt(r.useful_btu_hr, 0) + " Btu/hr (" + fmt(r.useful_btu_per_sqft, 1) + " per sq ft)";

@@ -7,6 +7,7 @@
 import {
   DEBOUNCE_MS, debounce, makeNumber, makeSelect,
   makeOutputLine, attachExampleButton, fmt,
+  stepsFor,
 } from "./ui-fields.js";
 
 export const TREATMENT_RENDERERS = {};
@@ -70,7 +71,7 @@ function renderLangelierIndex(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "lsi-out-note");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeLangelierIndex({ ph: readNum(ph.input), temp: readNum(temp.input), temp_unit: unit.select.value, ca_mgl: readNum(ca.input), alk_mgl: readNum(alk.input), tds_mgl: readNum(tds.input) });
+    const r = computeLangelierIndex({ ph: readNum(ph.input), temp: readNum(temp.input), temp_unit: unit.select.value, ca_mgl: readNum(ca.input), alk_mgl: readNum(alk.input), tds_mgl: readNum(tds.input) }); stepsFor(outputRegion, inputRegion, ["ph", "temp", "temp_unit", "ca_mgl", "alk_mgl", "tds_mgl"], r);
     if (r.error) { oLSI.textContent = r.error; oInterp.textContent = ""; oNote.textContent = ""; return; }
     oLSI.textContent = fmt(r.lsi, 2) + " (pHs " + fmt(r.phs, 2) + ")";
     oInterp.textContent = r.interpretation;
@@ -126,7 +127,7 @@ function renderChemicalFeedPump(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "cfp-out-note");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeChemicalFeedPump({ flow_mgd: readNum(flow.input), dose_mgl: readNum(dose.input), strength_pct: readNum(strength.input), sg: readNum(sg.input), pump_max_gpd: readNum(pump.input) });
+    const r = computeChemicalFeedPump({ flow_mgd: readNum(flow.input), dose_mgl: readNum(dose.input), strength_pct: readNum(strength.input), sg: readNum(sg.input), pump_max_gpd: readNum(pump.input) }); stepsFor(outputRegion, inputRegion, ["flow_mgd", "dose_mgl", "strength_pct", "sg", "pump_max_gpd"], r);
     if (r.error) { oFeed.textContent = r.error; oSet.textContent = ""; oNote.textContent = ""; return; }
     oFeed.textContent = fmt(r.solution_gpd, 2) + " GPD (" + fmt(r.ml_min, 1) + " mL/min)";
     oSet.textContent = r.setting_pct != null ? fmt(r.setting_pct, 1) + "% of max" : "Enter pump max for the setting.";
@@ -354,7 +355,7 @@ function renderPoolChlorineDose(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "pcd-out-note");
   function syncFields() { av.wrap.style.display = prod.select.value === "custom" ? "" : "none"; }
   const update = debounce(() => {
-    const r = computePoolChlorineDose({ ppm: Number(ppm.input.value) || 0, gallons: Number(gal.input.value) || 0, product: prod.select.value, avail: Number(av.input.value) || 0 });
+    const r = computePoolChlorineDose({ ppm: Number(ppm.input.value) || 0, gallons: Number(gal.input.value) || 0, product: prod.select.value, avail: Number(av.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["ppm", "gallons", "product", "avail"], r);
     if (r.error) { oCl.textContent = r.error; oProd.textContent = "-"; oNote.textContent = ""; return; }
     oCl.textContent = fmt(r.lb_cl, 3) + " lb chlorine (" + fmt(r.avail_pct, 1) + "% product)";
     oProd.textContent = r.isLiquid ? fmt(r.liq_floz, 1) + " fl oz (" + fmt(r.lb_prod, 2) + " lb)" : fmt(r.dry_oz, 1) + " oz (" + fmt(r.lb_prod, 2) + " lb)";
@@ -514,7 +515,7 @@ function renderPoolVolume(inputRegion, outputRegion, citationEl) {
       diameter_ft: Number(dia.input.value) || 0,
       shallow_ft: Number(shallow.input.value) || 0,
       deep_ft: Number(deep.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["shape", "length_ft", "width_ft", "diameter_ft", "shallow_ft", "deep_ft"], r);
     if (r.error) { oGal.textContent = r.error; oArea.textContent = "-"; oAvg.textContent = "-"; oNote.textContent = ""; return; }
     oGal.textContent = fmt(r.gallons, 0) + " gal (" + fmt(r.volume_ft3, 0) + " ft^3)";
     oArea.textContent = fmt(r.area_ft2, 1) + " ft^2";
@@ -618,7 +619,7 @@ function renderClarifierSurfaceLoading(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "csl-out-n");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeClarifierSurfaceLoading({ flow_mgd: readNum(flow.input), surface_ft2: readNum(area.input), weir_len_ft: readNum(weir.input), mlss_mgl: readNum(mlss.input), ras_mgd: readNum(ras.input) });
+    const r = computeClarifierSurfaceLoading({ flow_mgd: readNum(flow.input), surface_ft2: readNum(area.input), weir_len_ft: readNum(weir.input), mlss_mgl: readNum(mlss.input), ras_mgd: readNum(ras.input) }); stepsFor(outputRegion, inputRegion, ["flow_mgd", "surface_ft2", "weir_len_ft", "mlss_mgl", "ras_mgd"], r);
     if (r.error) { oSor.textContent = r.error; oWeir.textContent = "-"; oSolids.textContent = "-"; oNote.textContent = ""; return; }
     oSor.textContent = fmt(r.sor_gpd_ft2, 0) + " gpd/ft^2" + (r.sor_overloaded ? " (OVER 1,000, the Ten States primary design-average and extended-aeration limit -- floc carryover risk)" : "");
     oWeir.textContent = fmt(r.weir_gpd_ft, 0) + " gpd/ft" + (r.weir_overloaded ? " (OVER the " + fmt(r.weir_limit_gpd_ft, 0) + " gpd/ft Ten States limit for this plant size -- add weir length)" : "");
@@ -658,7 +659,7 @@ function renderClarifierAreaForLoading(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "cal-out-n");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeClarifierAreaForLoading({ flow_mgd: readNum(flow.input), target_sor_gpd_ft2: readNum(sor.input) });
+    const r = computeClarifierAreaForLoading({ flow_mgd: readNum(flow.input), target_sor_gpd_ft2: readNum(sor.input) }); stepsFor(outputRegion, inputRegion, ["flow_mgd", "target_sor_gpd_ft2"], r);
     if (r.error) { oArea.textContent = r.error; oDia.textContent = "-"; oNote.textContent = ""; return; }
     oArea.textContent = fmt(r.required_area_ft2, 0) + " ft^2";
     oDia.textContent = fmt(r.equiv_diameter_ft, 1) + " ft (round circular clarifier)";
@@ -700,7 +701,7 @@ function renderBodTssLoadingRemoval(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "btl-out-n");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeBodTssLoadingRemoval({ flow_mgd: readNum(flow.input), influent_mgl: readNum(inf.input), effluent_mgl: readNum(eff.input) });
+    const r = computeBodTssLoadingRemoval({ flow_mgd: readNum(flow.input), influent_mgl: readNum(inf.input), effluent_mgl: readNum(eff.input) }); stepsFor(outputRegion, inputRegion, ["flow_mgd", "influent_mgl", "effluent_mgl"], r);
     if (r.error) { oInf.textContent = r.error; oRem.textContent = "-"; oPct.textContent = "-"; oNote.textContent = ""; return; }
     oInf.textContent = fmt(r.influent_lb_day, 0) + " / " + fmt(r.effluent_lb_day, 0) + " lb/day";
     oRem.textContent = fmt(r.removed_lb_day, 0) + " lb/day";
@@ -737,7 +738,7 @@ function renderTdsFromConductivity(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "tfc-out-n");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeTdsFromConductivity({ conductivity_us_cm: readNum(ec.input), k_factor: readNum(k.input) });
+    const r = computeTdsFromConductivity({ conductivity_us_cm: readNum(ec.input), k_factor: readNum(k.input) }); stepsFor(outputRegion, inputRegion, ["conductivity_us_cm", "k_factor"], r);
     if (r.error) { oTds.textContent = r.error; oBand.textContent = "-"; oNote.textContent = ""; return; }
     oTds.textContent = fmt(r.tds_mgl, 0) + " mg/L";
     oBand.textContent = fmt(r.tds_low, 0) + " to " + fmt(r.tds_high, 0) + " mg/L";
@@ -772,7 +773,7 @@ function renderConductivityFromTds(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "cft-out-n");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeConductivityFromTds({ tds_mgl: readNum(tds.input), k_factor: readNum(k.input) });
+    const r = computeConductivityFromTds({ tds_mgl: readNum(tds.input), k_factor: readNum(k.input) }); stepsFor(outputRegion, inputRegion, ["tds_mgl", "k_factor"], r);
     if (r.error) { oEc.textContent = r.error; oBand.textContent = "-"; oNote.textContent = ""; return; }
     oEc.textContent = fmt(r.conductivity_us_cm, 0) + " uS/cm";
     oBand.textContent = fmt(r.ec_low, 0) + " to " + fmt(r.ec_high, 0) + " uS/cm";
@@ -1096,7 +1097,7 @@ function renderFlocculatorPaddlePower(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "fpp-out-note");
   function readNum(x) { if (x.value === "") return 0; const v = Number(x.value); return Number.isFinite(v) ? v : 0; }
   const update = debounce(() => {
-    const res = computeFlocculatorPaddlePower({ paddle_radius_ft: readNum(r.input), wheel_rpm: readNum(n.input), paddle_area_ft2: readNum(a.input), drag_coeff: cd.input.value === "" ? 1.8 : readNum(cd.input), slip_factor: k.input.value === "" ? 0.25 : readNum(k.input) });
+    const res = computeFlocculatorPaddlePower({ paddle_radius_ft: readNum(r.input), wheel_rpm: readNum(n.input), paddle_area_ft2: readNum(a.input), drag_coeff: cd.input.value === "" ? 1.8 : readNum(cd.input), slip_factor: k.input.value === "" ? 0.25 : readNum(k.input) }); stepsFor(outputRegion, inputRegion, ["paddle_radius_ft", "wheel_rpm", "paddle_area_ft2", "drag_coeff", "slip_factor"], res);
     if (res.error) { oPower.textContent = res.error; oVel.textContent = "-"; oNote.textContent = ""; return; }
     oPower.textContent = fmt(res.power_w, 0) + " W (" + fmt(res.power_hp, 2) + " hp, " + fmt(res.power_ftlbs, 0) + " ft-lb/s)";
     oVel.textContent = fmt(res.v_tip_fps, 2) + " / " + fmt(res.v_rel_fps, 2) + " ft/s";
@@ -1147,7 +1148,7 @@ function renderChlorineCylinderWithdrawal(inputRegion, outputRegion, citationEl)
   const oNote = makeOutputLine(outputRegion, "Note", "ccw-out-note");
   function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeChlorineCylinderWithdrawal({ feed_rate_lb_day: readNum(feed.input), container_type: type.select.value, room_temp_f: temp.input.value === "" ? 70 : readNum(temp.input) });
+    const r = computeChlorineCylinderWithdrawal({ feed_rate_lb_day: readNum(feed.input), container_type: type.select.value, room_temp_f: temp.input.value === "" ? 70 : readNum(temp.input) }); stepsFor(outputRegion, inputRegion, ["feed_rate_lb_day", "container_type", "room_temp_f"], r);
     if (r.error) { oPer.textContent = r.error; oCont.textContent = "-"; oWarn.textContent = "-"; oNote.textContent = ""; return; }
     oPer.textContent = fmt(r.per_container_lb_day, 0) + " lb/day" + (r.derate < 0.999 ? " (derated " + fmt(r.derate * 100, 0) + "% for the room temp)" : "");
     oCont.textContent = r.containers + " (each draws " + fmt(r.per_container_draw, 0) + " lb/day)";
@@ -1201,7 +1202,7 @@ function _v898renderPoolTileCopingPerimeter(inputRegion, outputRegion, citationE
       length_ft: ln.input.value === "" ? 32 : Number(ln.input.value), width_ft: wd.input.value === "" ? 16 : Number(wd.input.value),
       tile_length_in: tl.input.value === "" ? 6 : Number(tl.input.value), courses: cs.input.value === "" ? 1 : Number(cs.input.value),
       coping_length_in: cl.input.value === "" ? 12 : Number(cl.input.value), waste_pct: ws.input.value === "" ? 10 : Number(ws.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["length_ft", "width_ft", "tile_length_in", "courses", "coping_length_in", "waste_pct"], r);
     if (r.error) { oPerim.textContent = r.error; oTiles.textContent = "-"; oCoping.textContent = "-"; return; }
     oPerim.textContent = fmt(r.perimeter_ft, 0) + " ft";
     oTiles.textContent = fmt(r.waterline_tiles, 0) + " tiles";
@@ -1253,7 +1254,7 @@ function _v899renderPoolInteriorFinishVolume(inputRegion, outputRegion, citation
       length_ft: ln.input.value === "" ? 30 : Number(ln.input.value), width_ft: wd.input.value === "" ? 15 : Number(wd.input.value),
       avg_depth_ft: dp.input.value === "" ? 5.5 : Number(dp.input.value), shell_thickness_in: sh.input.value === "" ? 8 : Number(sh.input.value),
       plaster_thickness_in: pl.input.value === "" ? 0.375 : Number(pl.input.value), waste_pct: ws.input.value === "" ? 15 : Number(ws.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["length_ft", "width_ft", "avg_depth_ft", "shell_thickness_in", "plaster_thickness_in", "waste_pct"], r);
     if (r.error) { oArea.textContent = r.error; oGunite.textContent = "-"; oPlaster.textContent = "-"; return; }
     oArea.textContent = fmt(r.interior_area_sf, 0) + " ft^2";
     oGunite.textContent = fmt(r.gunite_cy, 1) + " cy";
@@ -1326,7 +1327,7 @@ function _v943renderOilWaterSeparatorSizing(inputRegion, outputRegion, citationE
     const r = computeOilWaterSeparatorSizing({
       flow_gpm: q.input.value === "" ? 50 : Number(q.input.value), oil_sg: sg.input.value === "" ? 0.85 : Number(sg.input.value),
       droplet_micron: dm.input.value === "" ? 150 : Number(dm.input.value), water_viscosity_cp: mu.input.value === "" ? 1.1 : Number(mu.input.value), water_sg: ws.input.value === "" ? 1 : Number(ws.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["flow_gpm", "oil_sg", "droplet_micron", "water_viscosity_cp", "water_sg"], r);
     if (r.error) { oVt.textContent = r.error; oA.textContent = "-"; return; }
     oVt.textContent = fmt(r.rise_velocity_ftmin, 3) + " ft/min";
     oA.textContent = fmt(r.horizontal_area_ft2, 1) + " ft2";
@@ -1397,7 +1398,7 @@ function _v1271renderParticleSettlingVelocity(inputRegion, outputRegion, citatio
     const r = computeParticleSettlingVelocity({
       particle_diameter_mm: d.input.value === "" ? 0.05 : Number(d.input.value), particle_sg: sg.input.value === "" ? 2.65 : Number(sg.input.value),
       water_temp_f: tf.input.value === "" ? 68 : Number(tf.input.value), solids_volume_pct: cv.input.value === "" ? 0 : Number(cv.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["particle_diameter_mm", "particle_sg", "water_temp_f", "solids_volume_pct"], r);
     if (r.error) { oVs.textContent = r.error; oVsF.textContent = "-"; oRe.textContent = "-"; oReg.textContent = "-"; oH.textContent = "-"; return; }
     oVs.textContent = fmt(r.settling_velocity_mm_s, 3) + " mm/s";
     oVsF.textContent = fmt(r.settling_velocity_ft_min, 3) + " ft/min";
@@ -1496,7 +1497,7 @@ function renderDesignFlowPeaking(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "dfp-out-n");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeDesignFlowPeaking({ population: readNum(pop.input), per_capita_gpcd: readNum(gpcd.input) });
+    const r = computeDesignFlowPeaking({ population: readNum(pop.input), per_capita_gpcd: readNum(gpcd.input) }); stepsFor(outputRegion, inputRegion, ["population", "per_capita_gpcd"], r);
     if (r.error) { oAvg.textContent = r.error; oPeak.textContent = "-"; oMin.textContent = "-"; oNote.textContent = ""; return; }
     oAvg.textContent = fmt(r.avg_flow_mgd, 3) + " MGD (" + fmt(r.avg_flow_gpm, 0) + " gpm)";
     oPeak.textContent = fmt(r.peak_flow_mgd, 3) + " MGD (" + fmt(r.peak_flow_gpm, 0) + " gpm) / PF " + fmt(r.harmon_pf, 2) + (r.small_system ? " -- below 1,000 people, outside the Harmon range" : "") + (r.large_system ? " -- above 1,000,000 people, outside the Harmon and Gifft range" : "");

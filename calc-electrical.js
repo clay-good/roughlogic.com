@@ -523,6 +523,7 @@ export const egcSizeExample = {
 import {
   DEBOUNCE_MS, debounce, makeNumber, makeSelect, makeCheckbox,
   makeOutputLine, attachExampleButton, fmt, makeRowField,
+  stepsFor,
 } from "./ui-fields.js";
 
 // Each render function assumes the input/output regions have been cleared.
@@ -565,7 +566,7 @@ export function renderOhmsLaw(inputRegion, outputRegion, citationEl, params) {
       I: readNum(fields.I.input),
       R: readNum(fields.R.input),
       P: readNum(fields.P.input),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["V", "I", "R", "P"], r);
     if (r.error) {
       for (const k of Object.keys(out)) out[k].textContent = r.error;
       return;
@@ -637,7 +638,7 @@ export function renderWireAmpacity(inputRegion, outputRegion, citationEl, params
       insulation_rating_C: Number(ins.select.value),
       ambient_C: amb.input.value === "" ? null : Number(amb.input.value),
       bundle_count: Number(bun.input.value) || 1,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["awg", "material", "insulation_rating_C", "ambient_C", "bundle_count"], r);
     if (r.error) { out.textContent = r.error; outBasis.textContent = "-"; return; }
     out.textContent = fmt(r.ampacity_A, 1) + " A";
     outBasis.textContent = "Thermal-balance estimate, NOT NEC Table 310.16 - it reads high on larger conductors. Size from the table in the adopted NEC edition.";
@@ -695,7 +696,7 @@ export function renderVoltageDrop(inputRegion, outputRegion, citationEl, params)
       length_ft: Number(len.input.value) || 0,
       current_A: Number(cur.input.value) || 0,
       source_voltage_V: Number(src.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["phase", "material", "awg", "length_ft", "current_A", "source_voltage_V"], r);
     outV.textContent = fmt(r.drop_V, 2) + " V";
     outP.textContent = r.percent === null ? "-" : fmt(r.percent, 2) + " %";
     outAtLoad.textContent = r.voltage_at_load_V === null ? "-" : fmt(r.voltage_at_load_V, 2) + " V";
@@ -738,7 +739,7 @@ export function renderConduitFill(inputRegion, outputRegion, citationEl, params)
       conduit: conduit.select.value,
       trade_size: trade.select.value,
       conductors: [{ insulation: insulation.select.value, awg: awg.select.value, count: Number(count.input.value) || 0 }],
-    });
+    }); stepsFor(outputRegion, inputRegion, ["conduit", "trade_size", "conductors"], r);
     if (r.error) { outFill.textContent = r.error; outPct.textContent = "-"; outPass.textContent = "-"; return; }
     outFill.textContent = fmt(r.fill_in2, 4) + " in^2 (of " + fmt(r.conduit_area_in2, 3) + " in^2)";
     // v8 §C.1: lead with the PASS/FAIL badge before the percent + margin.
@@ -781,7 +782,7 @@ export function renderBoxFill(inputRegion, outputRegion, citationEl, params) {
       internal_clamps: clamps.input.checked,
       largest_awg_for_clamp_and_device: a,
       grounding_conductors: Number(egc.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["box_volume_in3", "conductors_by_size", "devices", "internal_clamps", "largest_awg_for_clamp_and_device", "grounding_conductors"], r);
     if (r.error) { outFill.textContent = r.error; outPass.textContent = "-"; return; }
     outFill.textContent = fmt(r.fill_in3, 2) + " in^3 (free " + fmt(r.free_in3, 2) + " in^3)";
     outPass.textContent = r.pass ? "Pass" : "Fail";
@@ -844,7 +845,7 @@ export function renderBreakerSize(inputRegion, outputRegion, citationEl, params)
       phase: phase.select.value,
       power_factor: Number(pf.input.value) || 1,
       continuous: continuous.input.checked,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["load_A", "load_W", "voltage_V", "phase", "power_factor", "continuous"], r);
     if (r.error) { outReq.textContent = r.error; outNext.textContent = "-"; outWA.textContent = "-"; return; }
     outReq.textContent = fmt(r.required_A, 2) + " A";
     outNext.textContent = r.next_standard_A + " A";
@@ -875,7 +876,7 @@ export function renderMotorFLA(inputRegion, outputRegion, citationEl, params) {
 
   function fillExample(v) { hp.select.value = String(v.hp); voltage.select.value = v.voltage; phase.select.value = v.phase; update(); }
   const update = debounce(() => {
-    const r = computeMotorFLA({ hp: Number(hp.select.value), voltage: Number(voltage.select.value), phase: phase.select.value });
+    const r = computeMotorFLA({ hp: Number(hp.select.value), voltage: Number(voltage.select.value), phase: phase.select.value }); stepsFor(outputRegion, inputRegion, ["hp", "voltage", "phase"], r);
     if (r.error) { outFLA.textContent = r.error; outSrc.textContent = "-"; return; }
     outFLA.textContent = fmt(r.fla_A, 1) + " A";
     outSrc.textContent = r.source;
@@ -914,7 +915,7 @@ export function renderTransformerSize(inputRegion, outputRegion, citationEl, par
       primary_V: Number(primary.input.value) || 0,
       secondary_V: Number(secondary.input.value) || 0,
       phase: phase.select.value,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["load_kW", "power_factor", "primary_V", "secondary_V", "phase"], r);
     if (r.error) {
       outKVA.textContent = r.error;
       outNext.textContent = "-";
@@ -953,7 +954,7 @@ export function renderThreePhase(inputRegion, outputRegion, citationEl, params) 
       V_LL: Number(V.input.value) || 0,
       I_L: Number(I.input.value) || 0,
       pf: Number(pf.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["V_LL", "I_L", "pf"], r);
     oP.textContent = fmt(r.kW, 2);
     oS.textContent = fmt(r.kVA, 2);
     oQ.textContent = fmt(r.kVAR, 2);
@@ -986,7 +987,7 @@ export function renderConductorResistance(inputRegion, outputRegion, citationEl,
       awg: awg.select.value,
       length_ft: Number(len.input.value) || 0,
       temperature_C: T.input.value === "" ? null : Number(T.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["material", "awg", "length_ft", "temperature_C"], r);
     if (r.error) { outR.textContent = r.error; outKft.textContent = "-"; return; }
     outR.textContent = fmt(r.resistance_ohm, 4) + " ohm";
     outKft.textContent = fmt(r.resistance_ohm_per_kft, 4) + " ohm/kft";
@@ -1011,7 +1012,7 @@ export function renderEGC(inputRegion, outputRegion, citationEl, params) {
     const r = computeEGCSize({
       ocpd_A: Number(ocpd.input.value) || 0,
       material: mat.select.value,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["ocpd_A", "material"], r);
     out.textContent = r.error ? r.error : (r.egc_awg + " AWG");
   }, DEBOUNCE_MS);
 
@@ -1334,7 +1335,7 @@ export function renderServiceLoad(inputRegion, outputRegion, citationEl, params)
       dryer_W: Number(dryer.input.value) || 0,
       hvac_cooling_W: Number(cool.input.value) || 0,
       hvac_heating_W: Number(heat.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["area_ft2", "small_appliance_circuits", "laundry_circuits", "fixed_appliances_W", "range_W", "dryer_W", "hvac_cooling_W", "hvac_heating_W"], r);
     outTotal.textContent = fmt(r.total_demand_W, 0) + " W";
     outAmps.textContent = fmt(r.required_A, 1) + " A";
     outNext.textContent = r.next_standard_A === null ? "none listed (over 400 A: an engineered service)" : r.next_standard_A + " A";
@@ -1407,7 +1408,7 @@ export function renderVoltageImbalance(inputRegion, outputRegion, citationEl, pa
       V_a: Number(a.input.value) || 0,
       V_b: Number(b.input.value) || 0,
       V_c: Number(c.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["V_a", "V_b", "V_c"], r);
     if (r.error) { oAvg.textContent = r.error; oImb.textContent = "-"; oDer.textContent = "-"; oNema.textContent = "-"; return; }
     oAvg.textContent = fmt(r.average_V, 2) + " V";
     oImb.textContent = fmt(r.imbalance_percent, 3) + " %";
@@ -1463,7 +1464,7 @@ export function renderLightingDensity(inputRegion, outputRegion, citationEl, par
     const r = computeLightingDensity({
       area_ft2: Number(area.input.value) || 0,
       occupancy_class: cls.select.value,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["area_ft2", "occupancy_class"], r);
     if (r.error) { oW.textContent = r.error; oRate.textContent = "-"; return; }
     oW.textContent = fmt(r.target_W, 0) + " W";
     oRate.textContent = fmt(r.w_per_ft2, 2) + " W/ft^2";
@@ -1922,7 +1923,7 @@ function renderPullingTension(inputRegion, outputRegion, citationEl, params) {
       lubricant: lub.select.value,
       straight_run_ft: Number(straight.input.value) || 0,
       bends,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["cable_weight_lb_per_ft", "run_length_ft", "lubricant", "straight_run_ft", "bends"], r);
     if (r.error) { oT.textContent = r.error; oS.textContent = "-"; oFlag.textContent = "-"; return; }
     oT.textContent = fmt(r.tension_lb, 0) + " lb";
     oS.textContent = fmt(r.max_sidewall_lb_per_ft, 0) + " lb/ft";
@@ -1946,7 +1947,7 @@ function renderBendRadius(inputRegion, outputRegion, citationEl, params) {
 
   function fillExample(v) { t.select.value = v.cable_type; od.input.value = v.cable_od_in; update(); }
   const update = debounce(() => {
-    const r = computeBendRadius({ cable_type: t.select.value, cable_od_in: Number(od.input.value) || 0 });
+    const r = computeBendRadius({ cable_type: t.select.value, cable_od_in: Number(od.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["cable_type", "cable_od_in"], r);
     if (r.error) { oR.textContent = r.error; oM.textContent = "-"; oA.textContent = "-"; return; }
     oR.textContent = fmt(r.min_radius_in, 2) + " in";
     oM.textContent = String(r.multiple) + "x OD";
@@ -1982,7 +1983,7 @@ function renderPFCorrection(inputRegion, outputRegion, citationEl, params) {
       pf2: Number(pf2.input.value) || 0,
       system_V: Number(v.input.value) || 0,
       phase: phase.select.value,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["kW", "pf1", "pf2", "system_V", "phase"], r);
     if (r.error) { oQ.textContent = r.error; oC.textContent = "-"; oCd.textContent = "-"; return; }
     oQ.textContent = fmt(r.kVAR, 2) + " kVAR";
     oC.textContent = fmt(r.capacitance_uF, 2) + " uF" + (r.capacitance_delta_uF == null ? "" : " (wye)");
@@ -2045,7 +2046,7 @@ function renderPhaseBalance(inputRegion, outputRegion, citationEl, params) {
       oTot.textContent = "-"; oImb.textContent = "-"; oFinal.textContent = "-"; oSwaps.textContent = "-";
       return;
     }
-    const r = computePhaseBalance({ circuits, threshold_percent: thr.input.value === "" ? 10 : Number(thr.input.value) });
+    const r = computePhaseBalance({ circuits, threshold_percent: thr.input.value === "" ? 10 : Number(thr.input.value) }); stepsFor(outputRegion, inputRegion, ["circuits", "threshold_percent"], r);
     if (r.error) { oTot.textContent = r.error; oImb.textContent = "-"; oFinal.textContent = "-"; oSwaps.textContent = "-"; return; }
     oTot.textContent = fmt(r.totals.A, 0) + " / " + fmt(r.totals.B, 0) + " / " + fmt(r.totals.C, 0) + " W";
     oImb.textContent = fmt(r.imbalance_percent, 2) + " %";
@@ -2098,7 +2099,7 @@ function renderMultiLoadVD(inputRegion, outputRegion, citationEl, params) {
     if (loads.length === 0) { oW.textContent = "-"; oV.textContent = "-"; oP.textContent = "-"; return; }
     const r = computeMultiLoadVoltageDrop({
       material: mat.select.value, awg: aw.select.value, source_voltage_V: Number(sv.input.value) || 120, loads,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["material", "awg", "source_voltage_V", "loads"], r);
     if (r.error) { oW.textContent = r.error; oV.textContent = "-"; oP.textContent = "-"; return; }
     oW.textContent = fmt(r.worst_drop_V, 3) + " V";
     oV.textContent = fmt(r.worst_voltage_V, 2) + " V";
@@ -2138,7 +2139,7 @@ function renderLVDCDrop(inputRegion, outputRegion, citationEl, params) {
       application: app.select.value,
       device_min_voltage_V: dmin.input.value === "" ? null : Number(dmin.input.value),
       worst_case_source_V: wsrc.input.value === "" ? null : Number(wsrc.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["system_V", "awg", "run_length_ft", "current_A", "application", "device_min_voltage_V", "worst_case_source_V"], r);
     if (r.error) { oD.textContent = r.error; oP.textContent = "-"; oA.textContent = "-"; oF.textContent = "-"; oNac.textContent = "-"; return; }
     oD.textContent = fmt(r.drop_V, 3) + " V";
     oP.textContent = fmt(r.percent, 2) + " %";
@@ -2178,7 +2179,7 @@ function renderPoEBudget(inputRegion, outputRegion, citationEl, params) {
     const r = computePoEBudget({
       poe_class: cls.select.value, category: cat.select.value,
       run_length_ft: Number(len.input.value) || 0, ambient_C: amb.input.value === "" ? undefined : Number(amb.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["poe_class", "category", "run_length_ft", "ambient_C"], r);
     if (r.error) { oP.textContent = r.error; oV.textContent = "-"; oL.textContent = "-"; oF.textContent = "-"; return; }
     oP.textContent = fmt(r.pd_available_W, 2) + " W (min " + fmt(r.pd_min_W, 2) + " W)";
     oV.textContent = fmt(r.voltage_at_pd_V, 2) + " V";
@@ -2521,7 +2522,7 @@ function _v7renderTransformerKvaSizing(inputRegion, outputRegion, citationEl) {
       secondary_V: Number(secondary.input.value) || 0,
       phase: phase.select.value,
       growth_reserve_pct: Number(reserve.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["loads", "primary_V", "secondary_V", "phase", "growth_reserve_pct"], r);
     if (r.error) { oC.textContent = r.error; oR.textContent = "-"; oRec.textContent = "-"; oP.textContent = "-"; oS.textContent = "-"; return; }
     oC.textContent = _v7fmt(r.connected_kVA, 2) + " kVA";
     oR.textContent = _v7fmt(r.required_kVA, 2) + " kVA";
@@ -2555,7 +2556,7 @@ function _v7renderShortCircuitPP(inputRegion, outputRegion, citationEl) {
       secondary_V: Number(v.input.value) || 0, phase: phase.select.value,
       C_value: Number(c.input.value) || 0, length_ft: Number(len.input.value) || 0,
       parallel_sets: Number(sets.input.value) || 1,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["utility_kVA", "utility_Z_pct", "secondary_V", "phase", "C_value", "length_ft", "parallel_sets"], r);
     if (r.error) { oS.textContent = r.error; oF.textContent = "-"; oM.textContent = "-"; oP.textContent = "-"; return; }
     oS.textContent = _v7fmt(r.I_sca_secondary_A, 0) + " A";
     oF.textContent = _v7fmt(r.f_factor, 4);
@@ -2608,7 +2609,7 @@ function _v7renderGeneratorMotorStarting(inputRegion, outputRegion, citationEl) 
       dip_factor: Number(dip.input.value) || 0.30,
       generator_xd: Number(xdIn.input.value) || 0.25,
       starts_per_hour: starts.select.value,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["motors", "dip_factor", "generator_xd", "starts_per_hour"], r);
     if (r.error) { oR.textContent = r.error; oS.textContent = "-"; oReq.textContent = "-"; oRec.textContent = "-"; return; }
     oR.textContent = _v7fmt(r.running_kW, 1) + " kW";
     oS.textContent = _v7fmt(r.worst_starting_kVA, 1) + " kVA";
@@ -2663,7 +2664,7 @@ function _v7renderServiceLoadStandard(inputRegion, outputRegion, citationEl) {
       hvac_cooling_W: Number(cool.input.value) || 0,
       hvac_heating_W: Number(heat.input.value) || 0,
       service_voltage: Number(v.input.value) || 240,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["area_ft2", "small_appliance_circuits", "laundry_circuit", "fixed_appliances_W", "fixed_appliance_count", "range_W", "dryer_W", "largest_motor_W", "hvac_cooling_W", "hvac_heating_W", "service_voltage"], r);
     if (r.error) { oT.textContent = r.error; oA.textContent = "-"; oRec.textContent = "-"; oG.textContent = "-"; oR.textContent = "-"; return; }
     oT.textContent = _v7fmt(r.total_VA, 0) + " VA";
     oA.textContent = _v7fmt(r.required_A, 1) + " A";
@@ -3016,7 +3017,7 @@ export function renderArcFlashScreen(inputRegion, outputRegion, citationEl) {
       clearing_time_s: readNum(t.input),
       working_distance_in: readNum(d.input),
       equipment_config: cfg.select.value,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["voltage_V", "bolted_fault_A", "clearing_time_s", "working_distance_in", "equipment_config"], r);
     if (r.error) {
       oE.textContent = r.error; oB.textContent = ""; oP.textContent = ""; oW.textContent = "";
       return;
@@ -3168,7 +3169,7 @@ export function renderMotorBranchFromNameplate(inputRegion, outputRegion, citati
       power_factor: readNum(pf.input),
       nameplate_fla_A: readNum(np.input),
       service_factor: readNum(sf.input),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["hp", "voltage_V", "phase", "eta", "power_factor", "nameplate_fla_A", "service_factor"], r);
     if (r.error) {
       oC.textContent = r.error; oN.textContent = ""; oD.textContent = "";
       oB.textContent = ""; oOL.textContent = ""; oW.textContent = "";
@@ -3363,7 +3364,7 @@ export function renderGroundingElectrode(inputRegion, outputRegion, citationEl) 
       plate_area_ft2: readNum(pA.input),
       plate_burial_depth_ft: readNum(pS.input),
       ufer_concrete_diameter_in: readNum(ucd.input),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["electrode_type", "soil_resistivity_ohm_cm", "rod_diameter_in", "rod_length_ft", "ring_diameter_ft", "ring_conductor_diameter_in", "ring_burial_depth_ft", "plate_area_ft2", "plate_burial_depth_ft", "ufer_concrete_diameter_in"], r);
     if (r.error) {
       oR.textContent = r.error; o25.textContent = ""; oS.textContent = ""; oW.textContent = "";
       return;
@@ -3504,7 +3505,7 @@ export function renderVoltageDropReactance(inputRegion, outputRegion, citationEl
       x_ohm_per_kft: readNum(x.input),
       power_factor: readNum(pf.input),
       phase: phase.select.value,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["system_voltage_v", "current_a", "length_ft", "r_ohm_per_kft", "x_ohm_per_kft", "power_factor", "phase"], res);
     if (res.error) {
       oVd.textContent = res.error; oPct.textContent = ""; oVl.textContent = ""; oAdv.textContent = ""; oW.textContent = "";
       return;
@@ -3686,7 +3687,7 @@ export function renderPowerTriangle(inputRegion, outputRegion, citationEl) {
     const r = computePowerTriangle({
       kw: readNum(kw.input), kva: readNum(kva.input), kvar: readNum(kvar.input),
       pf: readNum(pf.input), angle_deg: readNum(ang.input), sign: sign.select.value,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["kw", "kva", "kvar", "pf", "angle_deg", "sign"], r);
     if (r.error) {
       oKw.textContent = r.error; oKva.textContent = ""; oKvar.textContent = ""; oPf.textContent = ""; oAng.textContent = "";
       drawTriangle(null);
@@ -3828,7 +3829,7 @@ export function renderAmbientAmpacityAdjust(inputRegion, outputRegion, citationE
       temp_column: Number(col.select.value),
       ambient_c: readNum(amb.input),
       conductor_count: readNum(count.input),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["base_ampacity_a", "temp_column", "ambient_c", "conductor_count"], r);
     if (r.error) {
       oAmb.textContent = r.error; oFill.textContent = ""; oComb.textContent = ""; oAdj.textContent = ""; oW.textContent = "";
       return;
@@ -4039,7 +4040,7 @@ export function renderServiceLoadOptional(inputRegion, outputRegion, citationEl)
       hvac_cooling_kw: readNum(cool.input),
       ev_charger_a: readNum(ev.input),
       service_voltage: Number(volts.select.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["area_ft2", "small_appliance_circuits", "laundry_circuits", "fixed_appliances_kw", "range_kw", "dryer_kw", "water_heater_kw", "hvac_heating_kw", "heating_type", "hvac_cooling_kw", "ev_charger_a", "service_voltage"], r);
     if (r.error) {
       oGen.textContent = r.error; oTot.textContent = ""; oA.textContent = ""; oStd.textContent = ""; oRec.textContent = ""; oW.textContent = "";
       return;
@@ -4135,7 +4136,7 @@ export function renderLuxFootcandle(inputRegion, outputRegion, citationEl) {
       area_ft2: readNum(area.input),
       cu: readNum(cu.input),
       llf: readNum(llf.input),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["mode", "footcandles", "lux", "lumens", "area_ft2", "cu", "llf"], r);
     if (r.error) { oFc.textContent = r.error; oLx.textContent = ""; oNote.textContent = ""; return; }
     oFc.textContent = fmt(r.footcandles, 2) + " fc";
     oLx.textContent = fmt(r.lux, 1) + " lux";
@@ -4274,7 +4275,7 @@ function renderGroundingElectrodeConductor(inputRegion, outputRegion, citationEl
   const oCap = makeOutputLine(outputRegion, "Cap applied", "gec-out-cap");
   const oNote = makeOutputLine(outputRegion, "Note", "gec-out-note");
   const update = debounce(() => {
-    const r = computeGroundingElectrodeConductor({ service_kcmil: Number(kcmil.input.value) || 0, material: mat.select.value, electrode_type: electrode.select.value });
+    const r = computeGroundingElectrodeConductor({ service_kcmil: Number(kcmil.input.value) || 0, material: mat.select.value, electrode_type: electrode.select.value }); stepsFor(outputRegion, inputRegion, ["service_kcmil", "material", "electrode_type"], r);
     if (r.error) { oReq.textContent = r.error; oBase.textContent = "-"; oCap.textContent = "-"; oNote.textContent = "-"; return; }
     oReq.textContent = r.required_gec + " AWG/kcmil " + mat.select.value;
     oBase.textContent = r.base_gec + " AWG/kcmil";
@@ -4344,7 +4345,7 @@ function renderBondingJumper(inputRegion, outputRegion, citationEl) {
   const oRule = makeOutputLine(outputRegion, "Basis", "bj-out-rule");
   const oNote = makeOutputLine(outputRegion, "Note", "bj-out-note");
   const update = debounce(() => {
-    const r = computeBondingJumper({ mode: mode.select.value, material: mat.select.value, service_kcmil: Number(kcmil.input.value) || 0, ocpd_A: Number(ocpd.input.value) || 0, parallel_sets: Number(psets.input.value) || 1 });
+    const r = computeBondingJumper({ mode: mode.select.value, material: mat.select.value, service_kcmil: Number(kcmil.input.value) || 0, ocpd_A: Number(ocpd.input.value) || 0, parallel_sets: Number(psets.input.value) || 1 }); stepsFor(outputRegion, inputRegion, ["mode", "material", "service_kcmil", "ocpd_A", "parallel_sets"], r);
     if (r.error) { oReq.textContent = r.error; oRule.textContent = "-"; oNote.textContent = "-"; return; }
     oReq.textContent = r.required_jumper + " AWG/kcmil " + mat.select.value + (r.parallel_sets > 1 ? " in each of " + r.parallel_sets + " raceways" : "");
     oRule.textContent = r.rule;
@@ -4405,7 +4406,7 @@ function renderMinConductorForVd(inputRegion, outputRegion, citationEl) {
   const oAmp = makeOutputLine(outputRegion, "Ampacity", "mcvd-out-amp");
   const oNote = makeOutputLine(outputRegion, "Note", "mcvd-out-note");
   const update = debounce(() => {
-    const r = computeMinConductorForVd({ phase: phase.select.value, material: mat.select.value, current_A: Number(cur.input.value) || 0, length_ft: Number(len.input.value) || 0, source_voltage_V: Number(volt.input.value) || 0, target_percent: Number(target.input.value) || 0 });
+    const r = computeMinConductorForVd({ phase: phase.select.value, material: mat.select.value, current_A: Number(cur.input.value) || 0, length_ft: Number(len.input.value) || 0, source_voltage_V: Number(volt.input.value) || 0, target_percent: Number(target.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["phase", "material", "current_A", "length_ft", "source_voltage_V", "target_percent"], r);
     if (r.error) { oReq.textContent = r.error; oBoth.textContent = "-"; oDrop.textContent = "-"; oAmp.textContent = "-"; oNote.textContent = "-"; return; }
     const chosen = mat.select.value === "aluminum" ? r.min_awg_aluminum : r.min_awg_copper;
     oReq.textContent = chosen + " AWG " + mat.select.value;
@@ -4474,7 +4475,7 @@ function renderConductorShortCircuitWithstand(inputRegion, outputRegion, citatio
   const oMin = makeOutputLine(outputRegion, "Minimum size for the fault", "csw-out-min");
   const oNote = makeOutputLine(outputRegion, "Note", "csw-out-note");
   const update = debounce(() => {
-    const r = computeConductorShortCircuitWithstand({ area_cmil: Number(area.input.value) || 0, fault_current_a: Number(fault.input.value) || 0, clearing_time_s: Number(time.input.value) || 0, material: mat.select.value, t_initial_c: ti.input.value === "" ? undefined : Number(ti.input.value), t_final_c: tf.input.value === "" ? undefined : Number(tf.input.value) });
+    const r = computeConductorShortCircuitWithstand({ area_cmil: Number(area.input.value) || 0, fault_current_a: Number(fault.input.value) || 0, clearing_time_s: Number(time.input.value) || 0, material: mat.select.value, t_initial_c: ti.input.value === "" ? undefined : Number(ti.input.value), t_final_c: tf.input.value === "" ? undefined : Number(tf.input.value) }); stepsFor(outputRegion, inputRegion, ["area_cmil", "fault_current_a", "clearing_time_s", "material", "t_initial_c", "t_final_c"], r);
     if (r.error) { oWith.textContent = r.error; oVerdict.textContent = "-"; oMin.textContent = "-"; oNote.textContent = "-"; return; }
     oWith.textContent = fmt(r.withstand_a, 0) + " A";
     oVerdict.textContent = r.adequate ? "Adequate (withstand >= fault)" : "UNDERSIZED -- size up to the minimum below";
@@ -4519,7 +4520,7 @@ function renderConduitThermalExpansion(inputRegion, outputRegion, citationEl) {
   const oVerdict = makeOutputLine(outputRegion, "Expansion fitting", "cte-out-verdict");
   const oNote = makeOutputLine(outputRegion, "Note", "cte-out-note");
   const update = debounce(() => {
-    const r = computeConduitThermalExpansion({ run_length_ft: Number(len.input.value) || 0, temp_change_f: Number(dt.input.value) || 0, coeff_in_per_in_f: Number(coeff.input.value) || 0, trigger_in: Number(trig.input.value) || 0 });
+    const r = computeConduitThermalExpansion({ run_length_ft: Number(len.input.value) || 0, temp_change_f: Number(dt.input.value) || 0, coeff_in_per_in_f: Number(coeff.input.value) || 0, trigger_in: Number(trig.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["run_length_ft", "temp_change_f", "coeff_in_per_in_f", "trigger_in"], r);
     if (r.error) { oDelta.textContent = r.error; oVerdict.textContent = "-"; oNote.textContent = "-"; return; }
     oDelta.textContent = fmt(r.delta_l_in, 3) + " in";
     oVerdict.textContent = r.fitting_required ? "Required (sized for ~" + fmt(r.delta_l_in, 2) + " in of travel)" : "Not required (below the trigger)";
@@ -4562,7 +4563,7 @@ function renderConduitExpansionMaxRun(inputRegion, outputRegion, citationEl) {
   const oRun = makeOutputLine(outputRegion, "Max run before a fitting", "cxmr-out-run");
   const oNote = makeOutputLine(outputRegion, "Note", "cxmr-out-note");
   const update = debounce(() => {
-    const r = computeConduitExpansionMaxRun({ temp_change_f: Number(dt.input.value) || 0, coeff_in_per_in_f: Number(coeff.input.value) || 0, trigger_in: Number(trig.input.value) || 0 });
+    const r = computeConduitExpansionMaxRun({ temp_change_f: Number(dt.input.value) || 0, coeff_in_per_in_f: Number(coeff.input.value) || 0, trigger_in: Number(trig.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["temp_change_f", "coeff_in_per_in_f", "trigger_in"], r);
     if (r.error) { oRun.textContent = r.error; oNote.textContent = "-"; return; }
     oRun.textContent = fmt(r.max_run_ft, 1) + " ft";
     oNote.textContent = r.note;
@@ -4600,7 +4601,7 @@ function renderEgcUpsizeProportional(inputRegion, outputRegion, citationEl) {
   const oEgc = makeOutputLine(outputRegion, "Upsized EGC", "egu-out-egc");
   const oNote = makeOutputLine(outputRegion, "Note", "egu-out-note");
   const update = debounce(() => {
-    const r = computeEgcUpsizeProportional({ base_egc_cmil: Number(egc.input.value) || 0, base_phase_cmil: Number(basep.input.value) || 0, installed_phase_cmil: Number(inst.input.value) || 0 });
+    const r = computeEgcUpsizeProportional({ base_egc_cmil: Number(egc.input.value) || 0, base_phase_cmil: Number(basep.input.value) || 0, installed_phase_cmil: Number(inst.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["base_egc_cmil", "base_phase_cmil", "installed_phase_cmil"], r);
     if (r.error) { oRatio.textContent = r.error; oEgc.textContent = "-"; oNote.textContent = "-"; return; }
     oRatio.textContent = fmt(r.ratio, Math.abs(r.ratio - 1) < 0.0005 && r.ratio !== 1 ? 5 : 3) + (r.ratio <= 1 + 1e-9 ? " (no upsize -- EGC stays at table size)" : "");
     oEgc.textContent = fmt(r.upsized_egc_cmil, 0) + (r.capped_at_phase ? " cmil (capped at the installed phase conductor, 250.122(A))" : " cmil (select the next standard size up)");
@@ -4652,7 +4653,7 @@ function renderDeltaWyeLinePhase(inputRegion, outputRegion, citationEl) {
   const oW = makeOutputLine(outputRegion, "Real power", "dwl-out-w");
   const oNote = makeOutputLine(outputRegion, "Note", "dwl-out-note");
   const update = debounce(() => {
-    const r = computeDeltaWyeLinePhase({ configuration: config.select.value, line_voltage_v: Number(volt.input.value) || 0, line_current_a: Number(cur.input.value) || 0, power_factor: Number(pf.input.value) || 0 });
+    const r = computeDeltaWyeLinePhase({ configuration: config.select.value, line_voltage_v: Number(volt.input.value) || 0, line_current_a: Number(cur.input.value) || 0, power_factor: Number(pf.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["configuration", "line_voltage_v", "line_current_a", "power_factor"], r);
     if (r.error) { oPv.textContent = r.error; oPi.textContent = "-"; oVa.textContent = "-"; oW.textContent = "-"; oNote.textContent = "-"; return; }
     oPv.textContent = fmt(r.phase_voltage_v, 1) + " V";
     oPi.textContent = fmt(r.phase_current_a, 1) + " A";
@@ -4723,7 +4724,7 @@ function _v165renderBuckBoostSizing(inputRegion, outputRegion, citationEl) {
       supply_v: Number(sup.input.value) || 0,
       desired_v: Number(des.input.value) || 0,
       load_a: Number(amp.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["supply_v", "desired_v", "load_a"], r);
     if (r.error) { oBoost.textContent = r.error; oXfmr.textContent = "-"; oLoad.textContent = "-"; oNote.textContent = ""; return; }
     oBoost.textContent = fmt(r.boost_v, 1) + " V (" + r.direction + ")";
     oXfmr.textContent = fmt(r.xfmr_kva, 2) + " kVA (" + fmt(r.ratio_pct, 1) + "% of full load)";
@@ -4794,7 +4795,7 @@ function _v170renderWirewayFill(inputRegion, outputRegion, citationEl) {
       height_in: Number(h.input.value) || 0,
       conductor_area_in2: Number(ca.input.value) || 0,
       ccc_count: Number(n.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["width_in", "height_in", "conductor_area_in2", "ccc_count"], r);
     if (r.error) { oInt.textContent = r.error; oAllow.textContent = "-"; oUsed.textContent = "-"; oCount.textContent = "-"; oNote.textContent = ""; return; }
     oInt.textContent = fmt(r.interior_in2, 2) + " in^2";
     oAllow.textContent = fmt(r.allowed_in2, 2) + " in^2";
@@ -4869,7 +4870,7 @@ function _v174renderRooftopTempAdder(inputRegion, outputRegion, citationEl) {
       measured_ambient_f: amb.input.value === "" ? NaN : Number(amb.input.value),
       height_above_roof_in: Number(ht.input.value) || 0,
       base_ampacity_a: Number(base.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["measured_ambient_f", "height_above_roof_in", "base_ampacity_a"], r);
     if (r.error) { oAdder.textContent = r.error; oDesign.textContent = "-"; oCorr.textContent = "-"; oCorrected.textContent = "-"; oNote.textContent = ""; return; }
     oAdder.textContent = r.adder_f === 0 ? "0 deg-F (on standoffs, >= 7/8 in)" : "+" + fmt(r.adder_f, 0) + " deg-F (within 7/8 in of the roof)";
     oDesign.textContent = fmt(r.design_ambient_f, 0) + " deg-F (~" + fmt(r.design_ambient_c, 0) + " deg-C)";
@@ -4943,7 +4944,7 @@ function _v176renderWorkingSpace11026(inputRegion, outputRegion, citationEl) {
       nominal_v_to_ground: band.select.value,
       condition: Number(cond.select.value),
       equipment_width_in: Number(w.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["nominal_v_to_ground", "condition", "equipment_width_in"], r);
     if (r.error) { oDepth.textContent = r.error; oWidth.textContent = "-"; oHeight.textContent = "-"; oNote.textContent = ""; return; }
     oDepth.textContent = fmt(r.depth_ft, 1) + " ft";
     oWidth.textContent = fmt(r.width_in, 0) + " in (" + r.width_governed_by + ")";
@@ -5032,7 +5033,7 @@ function _v179renderMotorBranchProtection(inputRegion, outputRegion, citationEl)
   const oNote = makeOutputLine(outputRegion, "Note", "mbp-out-note");
 
   const update = debounce(() => {
-    const r = computeMotorBranchProtection({ flc_a: Number(flc.input.value) || 0, device_type: dev.select.value });
+    const r = computeMotorBranchProtection({ flc_a: Number(flc.input.value) || 0, device_type: dev.select.value }); stepsFor(outputRegion, inputRegion, ["flc_a", "device_type"], r);
     if (r.error) { oMult.textContent = r.error; oMax.textContent = "-"; oStd.textContent = "-"; oDisc.textContent = "-"; oNote.textContent = ""; return; }
     oMult.textContent = fmt(r.multiplier * 100, 0) + "% of FLC";
     oMax.textContent = fmt(r.max_ocpd_a, 1) + " A";
@@ -5091,7 +5092,7 @@ function _v185renderBendsBetweenPulls(inputRegion, outputRegion, citationEl) {
       bend1_deg: Number(fields[0].input.value) || 0, bend2_deg: Number(fields[1].input.value) || 0,
       bend3_deg: Number(fields[2].input.value) || 0, bend4_deg: Number(fields[3].input.value) || 0,
       bend5_deg: Number(fields[4].input.value) || 0, bend6_deg: Number(fields[5].input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["bend1_deg", "bend2_deg", "bend3_deg", "bend4_deg", "bend5_deg", "bend6_deg"], r);
     if (r.error) { oTotal.textContent = r.error; oQuarter.textContent = "-"; oVerdict.textContent = "-"; oNote.textContent = ""; return; }
     oTotal.textContent = fmt(r.total_deg, 0) + " deg";
     oQuarter.textContent = fmt(r.quarter_bends_eq, 2);
@@ -5153,7 +5154,7 @@ function _v186renderShockApproachBoundary(inputRegion, outputRegion, citationEl)
   const oNote = makeOutputLine(outputRegion, "Note", "sab-out-note");
 
   function refresh() {
-    const r = computeShockApproachBoundary({ nominal_v_ac: band.select.value });
+    const r = computeShockApproachBoundary({ nominal_v_ac: band.select.value }); stepsFor(outputRegion, inputRegion, ["nominal_v_ac"], r);
     if (r.error) { oMov.textContent = r.error; oFix.textContent = "-"; oRes.textContent = "-"; oNote.textContent = ""; return; }
     oMov.textContent = r.limited_movable;
     oFix.textContent = r.limited_fixed;
@@ -5205,7 +5206,7 @@ function _v374renderConduitJamRatio(inputRegion, outputRegion, citationEl) {
   const oVerdict = makeOutputLine(outputRegion, "Jam risk", "cjr-out-verdict");
   const oNote = makeOutputLine(outputRegion, "Note", "cjr-out-note");
   const update = debounce(() => {
-    const r = computeConduitJamRatio({ conduit_id_in: Number(id.input.value) || 0, conductor_od_in: Number(od.input.value) || 0, n_conductors: Number(n.input.value) || 0 });
+    const r = computeConduitJamRatio({ conduit_id_in: Number(id.input.value) || 0, conductor_od_in: Number(od.input.value) || 0, n_conductors: Number(n.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["conduit_id_in", "conductor_od_in", "n_conductors"], r);
     if (r.error) { oRatio.textContent = r.error; oVerdict.textContent = "-"; oNote.textContent = ""; return; }
     oRatio.textContent = fmt(r.ratio, 2) + (r.in_band ? " (in the 2.8-3.2 jam band)" : " (outside the 2.8-3.2 band)");
     oVerdict.textContent = r.jam_prone
@@ -5262,7 +5263,7 @@ function _v471renderMotorEfficiencyUpgradeSavings(inputRegion, outputRegion, cit
   const oNote = makeOutputLine(outputRegion, "Note", "meu-out-n");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeMotorEfficiencyUpgradeSavings({ hp: readNum(hp.input), load: readNum(ld.input), eff_standard: readNum(es.input), eff_premium: readNum(ep.input), hours: readNum(hr.input), rate_kwh: readNum(rate.input) });
+    const r = computeMotorEfficiencyUpgradeSavings({ hp: readNum(hp.input), load: readNum(ld.input), eff_standard: readNum(es.input), eff_premium: readNum(ep.input), hours: readNum(hr.input), rate_kwh: readNum(rate.input) }); stepsFor(outputRegion, inputRegion, ["hp", "load", "eff_standard", "eff_premium", "hours", "rate_kwh"], r);
     if (r.error) { oKw.textContent = r.error; oSave.textContent = "-"; oNote.textContent = ""; return; }
     oKw.textContent = fmt(r.kw_standard, 2) + " -> " + fmt(r.kw_premium, 2) + " kW (" + fmt(r.kw_saved, 2) + " kW saved)";
     oSave.textContent = "$" + fmt(r.annual_saving, 0) + "/yr (" + fmt(r.annual_kwh_saved, 0) + " kWh)";
@@ -5311,7 +5312,7 @@ function _v472renderTransformerLoadingEfficiency(inputRegion, outputRegion, cita
   const oNote = makeOutputLine(outputRegion, "Note", "tle-out-n");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeTransformerLoadingEfficiency({ kva_rating: readNum(kva.input), noload_w: readNum(nl.input), loadloss_w: readNum(ll.input), load: readNum(ld.input), pf: readNum(pf.input) });
+    const r = computeTransformerLoadingEfficiency({ kva_rating: readNum(kva.input), noload_w: readNum(nl.input), loadloss_w: readNum(ll.input), load: readNum(ld.input), pf: readNum(pf.input) }); stepsFor(outputRegion, inputRegion, ["kva_rating", "noload_w", "loadloss_w", "load", "pf"], r);
     if (r.error) { oEff.textContent = r.error; oLoss.textContent = "-"; oPeak.textContent = "-"; oNote.textContent = ""; return; }
     oEff.textContent = fmt(r.efficiency, 2) + "%";
     oLoss.textContent = fmt(r.output_kw, 2) + " kW out, " + fmt(r.losses_kw * 1000, 0) + " W loss";
@@ -5366,7 +5367,7 @@ function _v473renderEconomicConductorSizing(inputRegion, outputRegion, citationE
   const oNote = makeOutputLine(outputRegion, "Note", "ecs-out-n");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeEconomicConductorSizing({ current_a: readNum(I.input), r_small_ohm: readNum(rs.input), r_big_ohm: readNum(rb.input), hours: readNum(hr.input), rate_kwh: readNum(rate.input), upsize_cost: readNum(cost.input) });
+    const r = computeEconomicConductorSizing({ current_a: readNum(I.input), r_small_ohm: readNum(rs.input), r_big_ohm: readNum(rb.input), hours: readNum(hr.input), rate_kwh: readNum(rate.input), upsize_cost: readNum(cost.input) }); stepsFor(outputRegion, inputRegion, ["current_a", "r_small_ohm", "r_big_ohm", "hours", "rate_kwh", "upsize_cost"], r);
     if (r.error) { oLoss.textContent = r.error; oSave.textContent = "-"; oNote.textContent = ""; return; }
     oLoss.textContent = fmt(r.loss_small_kw, 2) + " kW -> " + fmt(r.loss_big_kw, 2) + " kW";
     oSave.textContent = "$" + fmt(r.annual_saving, 0) + "/yr, payback " + (r.payback_yr === null ? "n/a" : fmt(r.payback_yr, 1) + " yr");
@@ -5420,7 +5421,7 @@ function _v487renderGeneratorFuelRuntime(inputRegion, outputRegion, citationEl) 
   const oNote = makeOutputLine(outputRegion, "Note", "gfr-out-n");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeGeneratorFuelRuntime({ tank_capacity_gal: readNum(tank.input), consumption_gph: readNum(gph.input), usable_pct: usable.input.value === "" ? 90 : readNum(usable.input), target_runtime_hr: readNum(target.input) });
+    const r = computeGeneratorFuelRuntime({ tank_capacity_gal: readNum(tank.input), consumption_gph: readNum(gph.input), usable_pct: usable.input.value === "" ? 90 : readNum(usable.input), target_runtime_hr: readNum(target.input) }); stepsFor(outputRegion, inputRegion, ["tank_capacity_gal", "consumption_gph", "usable_pct", "target_runtime_hr"], r);
     if (r.error) { oRun.textContent = r.error; oUsable.textContent = "-"; oTarget.textContent = "-"; oNote.textContent = ""; return; }
     oRun.textContent = fmt(r.runtime_hr, 1) + " hr (" + fmt(r.runtime_days, 2) + " days)";
     oUsable.textContent = fmt(r.usable_gallons, 1) + " gal";
@@ -5475,7 +5476,7 @@ function _v494renderTransformerVoltageRegulation(inputRegion, outputRegion, cita
   const oNote = makeOutputLine(outputRegion, "Note", "tvr-out-n");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeTransformerVoltageRegulation({ percent_r: readNum(pr.input), percent_x: readNum(px.input), power_factor: pf.input.value === "" ? 0.85 : readNum(pf.input), leading: lead.select.value === "leading", load_fraction: ld.input.value === "" ? 1.0 : readNum(ld.input) });
+    const r = computeTransformerVoltageRegulation({ percent_r: readNum(pr.input), percent_x: readNum(px.input), power_factor: pf.input.value === "" ? 0.85 : readNum(pf.input), leading: lead.select.value === "leading", load_fraction: ld.input.value === "" ? 1.0 : readNum(ld.input) }); stepsFor(outputRegion, inputRegion, ["percent_r", "percent_x", "power_factor", "leading", "load_fraction"], r);
     if (r.error) { oVr.textContent = r.error; oMain.textContent = "-"; oNote.textContent = ""; return; }
     oVr.textContent = (r.vr_percent >= 0 ? "+" : "") + fmt(r.vr_percent, Math.abs(r.vr_percent - 0) < 0.005 && r.vr_percent !== 0 ? 4 : 2) + "%" + (r.vr_percent < 0 ? " (voltage RISES above nominal)" : " (voltage sags)");
     oMain.textContent = fmt(r.main_term, 3) + "% + " + fmt(r.quad_term, 3) + "%";
@@ -5534,7 +5535,7 @@ function _v495renderCapacitorDischargeTime(inputRegion, outputRegion, citationEl
   const oNote = makeOutputLine(outputRegion, "Note", "cdt-out-n");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const res = computeCapacitorDischargeTime({ capacitance_uf: readNum(cap.input), initial_voltage: readNum(v0.input), safe_voltage: vs.input.value === "" ? 50 : readNum(vs.input), time_limit_s: readNum(tl.input), resistor_ohm: readNum(r.input), rated_voltage_v: readNum(rv.input) });
+    const res = computeCapacitorDischargeTime({ capacitance_uf: readNum(cap.input), initial_voltage: readNum(v0.input), safe_voltage: vs.input.value === "" ? 50 : readNum(vs.input), time_limit_s: readNum(tl.input), resistor_ohm: readNum(r.input), rated_voltage_v: readNum(rv.input) }); stepsFor(outputRegion, inputRegion, ["capacitance_uf", "initial_voltage", "safe_voltage", "time_limit_s", "resistor_ohm", "rated_voltage_v"], res);
     if (res.error) { oR.textContent = res.error; oT.textContent = "-"; oP.textContent = "-"; oM.textContent = "-"; oNote.textContent = ""; return; }
     const rk = res.r_used_ohm >= 1e6 ? fmt(res.r_used_ohm / 1e6, 2) + " Mohm" : res.r_used_ohm >= 1000 ? fmt(res.r_used_ohm / 1000, 1) + " kohm" : fmt(res.r_used_ohm, 0) + " ohm";
     oR.textContent = rk + (readNum(r.input) > 0 ? " (chosen)" : " (R_max for the " + fmt(res.limit_s, 0) + " s limit)");
@@ -5582,7 +5583,7 @@ function _v496renderAsymmetricalFaultXr(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "afx-out-n");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeAsymmetricalFaultXr({ isym_ka: readNum(isym.input), x_over_r: readNum(xr.input) });
+    const r = computeAsymmetricalFaultXr({ isym_ka: readNum(isym.input), x_over_r: readNum(xr.input) }); stepsFor(outputRegion, inputRegion, ["isym_ka", "x_over_r"], r);
     if (r.error) { oPeak.textContent = r.error; oAsym.textContent = "-"; oNote.textContent = ""; return; }
     oPeak.textContent = fmt(r.i_peak_ka, 1) + " kA (" + fmt(r.peak_factor, 2) + "x symmetrical)";
     oAsym.textContent = fmt(r.i_asym_ka, 1) + " kA (" + fmt(r.mf_rms, 3) + "x symmetrical)";
@@ -5628,7 +5629,7 @@ function _v518renderBatteryHydrogenVent(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "bhv-out-n");
   function readNum(x) { if (x.value === "") return 0; const v = Number(x.value); return Number.isFinite(v) ? v : 0; }
   const update = debounce(() => {
-    const r = computeBatteryHydrogenVent({ cell_count: readNum(n.input), charge_current_a: readNum(i.input), room_volume_ft3: readNum(vol.input), h2_limit_pct: lim.input.value === "" ? 1 : readNum(lim.input) });
+    const r = computeBatteryHydrogenVent({ cell_count: readNum(n.input), charge_current_a: readNum(i.input), room_volume_ft3: readNum(vol.input), h2_limit_pct: lim.input.value === "" ? 1 : readNum(lim.input) }); stepsFor(outputRegion, inputRegion, ["cell_count", "charge_current_a", "room_volume_ft3", "h2_limit_pct"], r);
     if (r.error) { oQ.textContent = r.error; oACH.textContent = "-"; oNote.textContent = ""; return; }
     oQ.textContent = fmt(r.q_cfm, 1) + " cfm";
     oACH.textContent = fmt(r.ach, 1) + " ACH";
@@ -5667,7 +5668,7 @@ function renderBatteryVentMaxCurrent(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "bvmc-out-n");
   function readNum(x) { if (x.value === "") return 0; const v = Number(x.value); return Number.isFinite(v) ? v : 0; }
   const update = debounce(() => {
-    const r = computeBatteryVentMaxCurrent({ available_cfm: readNum(q.input), cell_count: readNum(n.input) });
+    const r = computeBatteryVentMaxCurrent({ available_cfm: readNum(q.input), cell_count: readNum(n.input) }); stepsFor(outputRegion, inputRegion, ["available_cfm", "cell_count"], r);
     if (r.error) { oI.textContent = r.error; oNote.textContent = ""; return; }
     oI.textContent = fmt(r.max_charge_current_a, 1) + " A";
     oNote.textContent = r.note;
@@ -5716,7 +5717,7 @@ function _v520renderTransformerInrushPoint(inputRegion, outputRegion, citationEl
   const oNote = makeOutputLine(outputRegion, "Note", "tip-out-n");
   function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeTransformerInrushPoint({ kva: readNum(kva.input), primary_voltage_v: readNum(v.input), phase: Number(ph.select.value), inrush_multiple: mult.input.value === "" ? 12 : readNum(mult.input), duration_s: dur.input.value === "" ? 0.1 : readNum(dur.input) });
+    const r = computeTransformerInrushPoint({ kva: readNum(kva.input), primary_voltage_v: readNum(v.input), phase: Number(ph.select.value), inrush_multiple: mult.input.value === "" ? 12 : readNum(mult.input), duration_s: dur.input.value === "" ? 0.1 : readNum(dur.input) }); stepsFor(outputRegion, inputRegion, ["kva", "primary_voltage_v", "phase", "inrush_multiple", "duration_s"], r);
     if (r.error) { oFla.textContent = r.error; oIn.textContent = "-"; oNote.textContent = ""; return; }
     oFla.textContent = fmt(r.fla_a, 1) + " A";
     oIn.textContent = fmt(r.inrush_point_a, 0) + " A at " + fmt(r.duration_s, 3) + " s";
@@ -5787,7 +5788,7 @@ function _v562renderTerminationTempAmpacity(inputRegion, outputRegion, citationE
   const oNote = makeOutputLine(outputRegion, "Note", "tta-out-note");
   function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeTerminationTempAmpacity({ amp_90c: readNum(a90.input), amp_75c: readNum(a75.input), amp_60c: readNum(a60.input), termination_rating: Number(tr.select.value), over_100a: over.select.value === "yes", derate_factor: d.input.value === "" ? 1.0 : readNum(d.input) });
+    const r = computeTerminationTempAmpacity({ amp_90c: readNum(a90.input), amp_75c: readNum(a75.input), amp_60c: readNum(a60.input), termination_rating: Number(tr.select.value), over_100a: over.select.value === "yes", derate_factor: d.input.value === "" ? 1.0 : readNum(d.input) }); stepsFor(outputRegion, inputRegion, ["amp_90c", "amp_75c", "amp_60c", "termination_rating", "over_100a", "derate_factor"], r);
     if (r.error) { oTerm.textContent = r.error; oDer.textContent = "-"; oGov.textContent = "-"; oNote.textContent = ""; return; }
     oTerm.textContent = fmt(r.termination_ampacity_a, 0) + " A" + (r.below_nec_default ? " (60 C-marked termination governs even above 100 A, where 75 C would otherwise be the default)" : "");
     oDer.textContent = fmt(r.derated_90c_a, 0) + " A";
@@ -5828,7 +5829,7 @@ function _v804renderAwgWireGeometry(inputRegion, outputRegion, citationEl) {
   const oMm2 = makeOutputLine(outputRegion, "Area (mm²)", "awgg-out-mm2");
   const oNote = makeOutputLine(outputRegion, "Note", "awgg-out-n");
   const update = debounce(() => {
-    const r = computeAwgWireGeometry({ awg: awg.select.value });
+    const r = computeAwgWireGeometry({ awg: awg.select.value }); stepsFor(outputRegion, inputRegion, ["awg"], r);
     if (r.error) { oDin.textContent = r.error; oCm.textContent = "-"; oMm2.textContent = "-"; oNote.textContent = ""; return; }
     oDin.textContent = fmt(r.diameter_in, 4) + " in (" + fmt(r.diameter_mm, 3) + " mm)";
     oCm.textContent = fmt(r.area_cmils, 0) + " cmil";
@@ -5875,7 +5876,7 @@ function _v806renderTransformerTurnsRatio(inputRegion, outputRegion, citationEl)
   const oZp = makeOutputLine(outputRegion, "Reflected primary impedance", "ttr-out-zp");
   const oNote = makeOutputLine(outputRegion, "Note", "ttr-out-note");
   const update = debounce(() => {
-    const r = computeTransformerTurnsRatio({ primary_voltage_v: Number(vp.input.value) || 0, secondary_voltage_v: Number(vs.input.value) || 0, secondary_current_a: Number(is.input.value) || 0, load_impedance_ohm: Number(zs.input.value) || 0 });
+    const r = computeTransformerTurnsRatio({ primary_voltage_v: Number(vp.input.value) || 0, secondary_voltage_v: Number(vs.input.value) || 0, secondary_current_a: Number(is.input.value) || 0, load_impedance_ohm: Number(zs.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["primary_voltage_v", "secondary_voltage_v", "secondary_current_a", "load_impedance_ohm"], r);
     if (r.error) { oA.textContent = r.error; oIp.textContent = "-"; oZp.textContent = "-"; oNote.textContent = ""; return; }
     oA.textContent = fmt(r.turns_ratio, 4) + " : 1 (" + r.step + ")";
     oIp.textContent = r.primary_current_a === null ? "(enter secondary current)" : fmt(r.primary_current_a, 3) + " A";
@@ -5935,7 +5936,7 @@ function _v1111renderEgcParallelRaceways(inputRegion, outputRegion, citationEl) 
   const oW = makeOutputLine(outputRegion, "The common mistake", "egcp-out-w");
   const oN = makeOutputLine(outputRegion, "Note", "egcp-out-n");
   const update = debounce(() => {
-    const r = computeEgcParallelRaceways({ ocpd_A: Number(oc.input.value), raceway_count: Number(rc.input.value), material: mt.select.value });
+    const r = computeEgcParallelRaceways({ ocpd_A: Number(oc.input.value), raceway_count: Number(rc.input.value), material: mt.select.value }); stepsFor(outputRegion, inputRegion, ["ocpd_A", "raceway_count", "material"], r);
     if (r.error) { oE.textContent = r.error; oW.textContent = "-"; oN.textContent = "-"; return; }
     oE.textContent = r.total_egc_count + " runs of " + r.egc_per_raceway_awg + " AWG " + mt.select.value + " (one per raceway, sized to the full " + r.ocpd_A + " A)";
     oW.textContent = r.same_either_way

@@ -13,7 +13,7 @@
 // underwriting; appraiser governs final value") in citations.js.
 
 import { verifyShard } from "./integrity.js";
-import { DEBOUNCE_MS, debounce, makeNumber, makeText, makeSelect, makeOutputLine, attachExampleButton, fmt } from "./ui-fields.js";
+import { DEBOUNCE_MS, debounce, makeNumber, makeText, makeSelect, makeOutputLine, attachExampleButton, fmt, stepsFor } from "./ui-fields.js";
 
 // v18 §7 contract guard: reject a non-finite numeric input. A renderer
 // coerces an empty number field to 0 (Number("") === 0), so a NaN or
@@ -90,7 +90,7 @@ export function renderLTV(inputRegion, outputRegion, citationEl) {
   const oPMI = makeOutputLine(outputRegion, "PMI required?", "ltv-out-pmi");
   const oBand = makeOutputLine(outputRegion, "Band", "ltv-out-band");
   const update = debounce(() => {
-    const r = computeLTV({ loan_amount: L.input.value, value: V.input.value });
+    const r = computeLTV({ loan_amount: L.input.value, value: V.input.value }); stepsFor(outputRegion, inputRegion, ["loan_amount", "value"], r);
     if (r.error) {
       oLTV.textContent = r.error; oPMI.textContent = "-"; oBand.textContent = "-";
       return;
@@ -178,7 +178,7 @@ export function renderDTI(inputRegion, outputRegion, citationEl) {
       gross_monthly_income: I.input.value,
       housing_payment: H.input.value,
       other_monthly_debts: D.input.value,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["gross_monthly_income", "housing_payment", "other_monthly_debts"], r);
     if (r.error) {
       oFront.textContent = r.error;
       for (const o of [oBack, oConv, oFHA, oVA]) o.textContent = "-";
@@ -310,7 +310,7 @@ export function renderPITI(inputRegion, outputRegion, citationEl) {
       annual_insurance: ins.input.value,
       monthly_hoa: hoa.input.value,
       monthly_pmi: pmi.input.value,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["principal", "apr_percent", "term_years", "annual_property_tax", "annual_insurance", "monthly_hoa", "monthly_pmi"], r);
     if (r.error) {
       oPI.textContent = r.error;
       for (const o of [oTax, oIns, oHOA, oPMI, oPITI, oTotal, oAnn]) o.textContent = "-";
@@ -424,7 +424,7 @@ export function render1031Timeline(inputRegion, outputRegion, citationEl) {
   const oEarliest = makeOutputLine(outputRegion, "Earliest replacement deadline (governs)", "ex1031-out-earliest");
   const oNote = makeOutputLine(outputRegion, "April-15 / 180-day interaction", "ex1031-out-note");
   const update = debounce(() => {
-    const r = compute1031Timeline({ sale_close_iso: D.input.value || "" });
+    const r = compute1031Timeline({ sale_close_iso: D.input.value || "" }); stepsFor(outputRegion, inputRegion, ["sale_close_iso"], r);
     if (r.error) {
       oId.textContent = r.error;
       for (const o of [oEx, oEarliest, oNote]) o.textContent = "-";
@@ -556,7 +556,7 @@ export function renderSection121(inputRegion, outputRegion, citationEl) {
       sale_price: S.input.value, selling_costs: SC.input.value,
       purchase_price: P.input.value, improvements: I.input.value,
       meets_two_of_five: T.select.value, has_nonqualified_use: N.select.value,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["filing_status", "sale_price", "selling_costs", "purchase_price", "improvements", "meets_two_of_five", "has_nonqualified_use"], r);
     if (r.error) {
       oRealized.textContent = r.error;
       for (const o of [oBasis, oGain, oCap, oExc, oTax, oFlags]) o.textContent = "-";
@@ -640,7 +640,7 @@ export function renderPropertyTax(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const r = computePropertyTax({
       assessed_value: AV.input.value, mill_rate: MR.input.value, homestead_exemption: HE.input.value,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["assessed_value", "mill_rate", "homestead_exemption"], r);
     if (r.error) {
       oTaxable.textContent = r.error;
       for (const o of [oAnnual, oMonthly, oEff]) o.textContent = "-";
@@ -772,7 +772,7 @@ export function renderCapRateDSCR(inputRegion, outputRegion, citationEl) {
       noi_annual: N.input.value, property_value: V.input.value, annual_debt_service: D.input.value,
       loan_amount: Number(LA.input.value) || 0, loan_rate_pct: Number(LR.input.value) || 0, amort_years: Number(LY.input.value) || 0,
       operating_expenses_annual: Number(OE.input.value) || 0, potential_gross_income: Number(PG.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["noi_annual", "property_value", "annual_debt_service", "loan_amount", "loan_rate_pct", "amort_years", "operating_expenses_annual", "potential_gross_income"], r);
     if (r.error) {
       oCap.textContent = r.error;
       for (const o of [oCapBand, oDS, oDSCR, oDSCRBand, oBE]) o.textContent = "-";
@@ -851,7 +851,7 @@ export function renderCashOnCash(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const r = computeCashOnCash({
       cash_invested: I.input.value, annual_pretax_cashflow: C.input.value,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["cash_invested", "annual_pretax_cashflow"], r);
     if (r.error) {
       oCoC.textContent = r.error; oBand.textContent = "-"; oPayback.textContent = "-";
       return;
@@ -963,7 +963,7 @@ export function renderCommissionSplit(inputRegion, outputRegion, citationEl) {
       side_share_percent: SS.input.value,
       brokerage_split_to_agent_percent: BS.input.value,
       brokerage_flat_fee: F.input.value,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["sale_price", "total_commission_percent", "side_share_percent", "brokerage_split_to_agent_percent", "brokerage_flat_fee"], r);
     if (r.error) {
       oGross.textContent = r.error;
       for (const o of [oSide, oOther, oPre, oBrk, oFlat, oNet]) o.textContent = "-";
@@ -1072,7 +1072,7 @@ export function renderAmortizationSchedule(inputRegion, outputRegion, citationEl
     const r = computeAmortizationSchedule({
       principal: P.input.value, apr_percent: apr.input.value,
       term_years: yrs.input.value, extra_monthly_principal: ex.input.value,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["principal", "apr_percent", "term_years", "extra_monthly_principal"], r);
     if (r.error) {
       oPI.textContent = r.error;
       for (const o of [oActual, oTI, oTotal, oSaved, oSample]) o.textContent = "-";
@@ -1172,7 +1172,7 @@ export function renderCostOfWaiting(inputRegion, outputRegion, citationEl) {
     const r = computeCostOfWaiting({
       principal: P.input.value, current_rate_percent: r1.input.value,
       future_rate_percent: r2.input.value, term_years: yrs.input.value,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["principal", "current_rate_percent", "future_rate_percent", "term_years"], r);
     if (r.error) {
       oNow.textContent = r.error;
       for (const o of [oFut, oDelta, oTIDelta, oRD]) o.textContent = "-";
@@ -1312,7 +1312,7 @@ export function renderClosingCosts(inputRegion, outputRegion, citationEl) {
     const r = computeClosingCosts({
       purchase_price: PP.input.value, loan_amount: LA.input.value,
       transfer_tax_rate_pct: TTR.input.value, note_rate_pct: NR.input.value,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["purchase_price", "loan_amount", "transfer_tax_rate_pct", "note_rate_pct"], r);
     if (r.error) {
       oTotalMid.textContent = r.error;
       for (const o of [oTotalRange, oPct, oItems]) o.textContent = "-";
@@ -1502,7 +1502,7 @@ export function renderRentalWorksheet(inputRegion, outputRegion, citationEl) {
       market_grm: MG.input.value,
     };
     for (const ef of expenseFields) inputObj[ef.key] = ef.field.input.value;
-    const r = computeRentalWorksheet(inputObj);
+    const r = computeRentalWorksheet(inputObj); stepsFor(outputRegion, inputRegion, null, r);
     if (r.error) {
       oGross.textContent = r.error;
       for (const o of [oEGI, oExp, oNOI, oTax, oCap, oCoC, oER, oGRM, oVMG]) o.textContent = "-";
@@ -1627,7 +1627,7 @@ export function renderLoanLimits(inputRegion, outputRegion, citationEl) {
   const update = debounce(async () => {
     const shard = await loadShard("loan-limits.json");
     if (!shard) { oCounty.textContent = "Shard load failed (check connectivity)."; return; }
-    const r = computeLoanLimits({ shard, state: S.input.value, county_fips: F.input.value, county_name: N.input.value });
+    const r = computeLoanLimits({ shard, state: S.input.value, county_fips: F.input.value, county_name: N.input.value }); stepsFor(outputRegion, inputRegion, ["shard", "state", "county_fips", "county_name"], r);
     if (r.error) { oCounty.textContent = r.error; for (const o of [oConforming, oFha, oVa, oNote]) o.textContent = "-"; return; }
     oCounty.textContent = (r.county || "?") + " (" + r.state + ", FIPS " + (r.county_fips || "n/a") + ") - " + r.kind;
     oConforming.textContent = "$" + r.conforming_one_unit_usd.toLocaleString("en-US");
@@ -1729,7 +1729,7 @@ export function renderHudFmr(inputRegion, outputRegion, citationEl) {
   const update = debounce(async () => {
     const shard = await loadShard("hud-fmr.json");
     if (!shard) { oArea.textContent = "Shard load failed (check connectivity)."; return; }
-    const r = computeHudFmr({ shard, state: S.input.value, fips: F.input.value, area_name: N.input.value });
+    const r = computeHudFmr({ shard, state: S.input.value, fips: F.input.value, area_name: N.input.value }); stepsFor(outputRegion, inputRegion, ["shard", "state", "fips", "area_name"], r);
     if (r.error) { oArea.textContent = r.error; for (const o of [o0, o1, o2, o3, o4, oNote]) o.textContent = "-"; return; }
     if (r.kind === "unknown") {
       oArea.textContent = "FY" + r.fiscal_year + " - unknown FMR area";
@@ -1845,7 +1845,7 @@ export function renderMortgagePointBreakeven(inputRegion, outputRegion, citation
     const r = computeMortgagePointBreakeven({
       loan_amount: P.input.value, base_rate_pct: rb.input.value, points_rate_pct: rp.input.value,
       point_cost_pct: c.input.value, term_years: yrs.input.value, holding_years: hold.input.value,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["loan_amount", "base_rate_pct", "points_rate_pct", "point_cost_pct", "term_years", "holding_years"], r);
     if (r.error) { oBase.textContent = r.error; for (const o of [oPts, oSave, oCost, oBE, oVerdict]) o.textContent = "-"; return; }
     oBase.textContent = "$" + fmt(r.payment_base, 2);
     oPts.textContent = "$" + fmt(r.payment_points, 2);
@@ -1935,7 +1935,7 @@ export function renderPerDiemInterest(inputRegion, outputRegion, citationEl) {
     const r = computePerDiemInterest({
       loan_amount: P.input.value, annual_rate_pct: rate.input.value,
       closing_date_iso: D.input.value || "", day_count: C.select.value,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["loan_amount", "annual_rate_pct", "closing_date_iso", "day_count"], r);
     if (r.error) { oDaily.textContent = r.error; for (const o of [oDays, oPrepaid]) o.textContent = "-"; return; }
     oDaily.textContent = "$" + fmt(r.daily_interest, 4) + " / day (" + r.conv_label + ")";
     oDays.textContent = r.days_to_eom + " day" + (r.days_to_eom === 1 ? "" : "s");
@@ -2017,7 +2017,7 @@ export function renderMortgageReserves(inputRegion, outputRegion, citationEl) {
     const r = computeMortgageReserves({
       piti_monthly: piti.input.value, reserves_months: months.input.value, liquid_assets: liquid.input.value,
       retirement_balance: ret.input.value, retirement_allowable_pct: retPct.input.value,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["piti_monthly", "reserves_months", "liquid_assets", "retirement_balance", "retirement_allowable_pct"], r);
     if (r.error) { oReq.textContent = r.error; for (const o of [oElig, oDelta, oCovered]) o.textContent = "-"; return; }
     oReq.textContent = "$" + fmt(r.required, 2);
     oElig.textContent = "$" + fmt(r.eligible, 2) + " (incl. $" + fmt(r.eligible_retirement, 2) + " retirement)";
@@ -2249,7 +2249,7 @@ export function renderRentVsBuy(inputRegion, outputRegion, citationEl) {
       hoa_monthly: hoa.input.value, maintenance_pct: maint.input.value, appreciation_pct: appr.input.value,
       rent_monthly: rent.input.value, rent_inflation_pct: rentInfl.input.value, investment_return_pct: ret.input.value,
       holding_years: hold.input.value, selling_cost_pct: sell.input.value,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["purchase_price", "down_payment", "mortgage_rate_pct", "term_years", "property_tax_pct", "insurance_annual", "hoa_monthly", "maintenance_pct", "appreciation_pct", "rent_monthly", "rent_inflation_pct", "investment_return_pct", "holding_years", "selling_cost_pct"], r);
     if (r.error) { oBuy.textContent = r.error; for (const o of [oRent, oDiff, oBE, oSale, oVerdict]) o.textContent = "-"; return; }
     oBuy.textContent = "$" + fmt(r.npv_buy, 0);
     oRent.textContent = "$" + fmt(r.npv_rent, 0);
@@ -2463,7 +2463,7 @@ function renderGrossRentMultiplier(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "grm-out-note");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeGrossRentMultiplier({ price: readNum(price.input), gross_rent: readNum(rent.input), rent_basis: basis.select.value, market_grm: readNum(mgrm.input) });
+    const r = computeGrossRentMultiplier({ price: readNum(price.input), gross_rent: readNum(rent.input), rent_basis: basis.select.value, market_grm: readNum(mgrm.input) }); stepsFor(outputRegion, inputRegion, ["price", "gross_rent", "rent_basis", "market_grm"], r);
     if (r.error) { oGrm.textContent = r.error; oYield.textContent = ""; oNote.textContent = ""; return; }
     oGrm.textContent = fmt(r.grm_annual, 2) + " annual, " + fmt(r.grm_monthly, 1) + " monthly";
     oYield.textContent = fmt(r.gross_yield_pct, 1) + "% gross yield" + (r.implied_value != null ? ", implied value $" + fmt(r.implied_value, 0) : "");
@@ -2524,7 +2524,7 @@ function renderPmiCancellationDate(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "pmi-out-note");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computePmiCancellationDate({ value: readNum(value.input), loan: readNum(loan.input), rate_pct: readNum(rate.input), term_months: readNum(term.input) });
+    const r = computePmiCancellationDate({ value: readNum(value.input), loan: readNum(loan.input), rate_pct: readNum(rate.input), term_months: readNum(term.input) }); stepsFor(outputRegion, inputRegion, ["value", "loan", "rate_pct", "term_months"], r);
     if (r.error) { o80.textContent = r.error; o78.textContent = ""; oNote.textContent = ""; return; }
     o80.textContent = r.month_80 != null ? "Month " + r.month_80 + " (balance $" + fmt(r.balance_80, 0) + ")" : "Not reached in term";
     o78.textContent = r.month_78 != null ? "Month " + r.month_78 + " (balance $" + fmt(r.balance_78, 0) + "); midpoint backstop month " + r.backstop_month + (r.month_78 > r.backstop_month ? " (the midpoint backstop ends PMI first)" : "") : "Not reached in term";
@@ -2590,7 +2590,7 @@ function renderSellerNetSheet(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "sns-out-note");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeSellerNetSheet({ price: readNum(price.input), payoff: readNum(payoff.input), commission_pct: readNum(comm.input), transfer_tax_pct: readNum(tt.input), fees: readNum(fees.input), concessions: readNum(conc.input), annual_tax: readNum(annualTax.input), days_seller_owes: readNum(days.input), other: readNum(other.input) });
+    const r = computeSellerNetSheet({ price: readNum(price.input), payoff: readNum(payoff.input), commission_pct: readNum(comm.input), transfer_tax_pct: readNum(tt.input), fees: readNum(fees.input), concessions: readNum(conc.input), annual_tax: readNum(annualTax.input), days_seller_owes: readNum(days.input), other: readNum(other.input) }); stepsFor(outputRegion, inputRegion, ["price", "payoff", "commission_pct", "transfer_tax_pct", "fees", "concessions", "annual_tax", "days_seller_owes", "other"], r);
     if (r.error) { oNet.textContent = r.error; oCosts.textContent = ""; oNote.textContent = ""; return; }
     oNet.textContent = "$" + fmt(r.net_proceeds, 0);
     oCosts.textContent = "$" + fmt(r.commission, 0) + " / $" + fmt(r.transfer_tax, 0) + " / " + fmt(r.cost_of_sale_pct, 1) + "%";
@@ -2657,7 +2657,7 @@ function renderDebtYield(inputRegion, outputRegion, citationEl) {
     tgt.wrap.style.display = isMax ? "" : "none";
   }
   const update = debounce(() => {
-    const r = computeDebtYield({ mode: mode.select.value, noi: readNum(noi.input), loan: readNum(loan.input), dy_target: readNum(tgt.input) });
+    const r = computeDebtYield({ mode: mode.select.value, noi: readNum(noi.input), loan: readNum(loan.input), dy_target: readNum(tgt.input) }); stepsFor(outputRegion, inputRegion, ["mode", "noi", "loan", "dy_target"], r);
     if (r.error) { oOut.textContent = r.error; oBand.textContent = "-"; return; }
     if (r.mode === "maxloan") { oOut.textContent = "Max loan " + fmt(r.max_loan, 0) + " $ at the target debt yield"; oBand.textContent = "-"; return; }
     oOut.textContent = fmt(r.debt_yield_pct, 2) + "% debt yield";
@@ -2703,7 +2703,7 @@ function renderBreakEvenOccupancy(inputRegion, outputRegion, citationEl) {
   const oCush = makeOutputLine(outputRegion, "Cushion to market occupancy", "beo-out-cush");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeBreakEvenOccupancy({ opex: readNum(opex.input), debt_svc: readNum(debt.input), pgi: readNum(pgi.input), target_occ: readNum(occ.input) });
+    const r = computeBreakEvenOccupancy({ opex: readNum(opex.input), debt_svc: readNum(debt.input), pgi: readNum(pgi.input), target_occ: readNum(occ.input) }); stepsFor(outputRegion, inputRegion, ["opex", "debt_svc", "pgi", "target_occ"], r);
     if (r.error) { oBEO.textContent = r.error; oCush.textContent = "-"; return; }
     oBEO.textContent = fmt(r.beo_pct, 1) + "%";
     oCush.textContent = r.cushion_pts == null ? "(enter a market occupancy for the cushion)"
@@ -2751,7 +2751,7 @@ function renderMaxOffer70Rule(inputRegion, outputRegion, citationEl) {
   const oSpread = makeOutputLine(outputRegion, "Gross spread (costs + profit)", "mao-out-spread");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeMaxOffer70Rule({ arv: readNum(arv.input), repairs: readNum(rep.input), rule_pct: pct.input.value === "" ? 70 : readNum(pct.input), fee: readNum(fee.input) });
+    const r = computeMaxOffer70Rule({ arv: readNum(arv.input), repairs: readNum(rep.input), rule_pct: pct.input.value === "" ? 70 : readNum(pct.input), fee: readNum(fee.input) }); stepsFor(outputRegion, inputRegion, ["arv", "repairs", "rule_pct", "fee"], r);
     if (r.error) { oMAO.textContent = r.error; oSpread.textContent = "-"; return; }
     oMAO.textContent = r.no_deal ? "no deal (offer would be " + fmt(r.mao, 0) + " $ -- at or below zero)" : fmt(r.mao, 0) + " $";
     oSpread.textContent = fmt(r.spread, 0) + " $";
@@ -2804,7 +2804,7 @@ function renderFixFlipProfit(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "ffp-out-n");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeFixFlipProfit({ arv_usd: readNum(arv.input), purchase_usd: readNum(buy.input), rehab_usd: readNum(rehab.input), holding_usd: readNum(hold.input), financing_usd: readNum(fin.input), selling_pct: readNum(sell.input), cash_invested_usd: readNum(cash.input), hold_months: readNum(months.input) });
+    const r = computeFixFlipProfit({ arv_usd: readNum(arv.input), purchase_usd: readNum(buy.input), rehab_usd: readNum(rehab.input), holding_usd: readNum(hold.input), financing_usd: readNum(fin.input), selling_pct: readNum(sell.input), cash_invested_usd: readNum(cash.input), hold_months: readNum(months.input) }); stepsFor(outputRegion, inputRegion, ["arv_usd", "purchase_usd", "rehab_usd", "holding_usd", "financing_usd", "selling_pct", "cash_invested_usd", "hold_months"], r);
     if (r.error) { oProfit.textContent = r.error; oAllIn.textContent = "-"; oRoi.textContent = "-"; oNote.textContent = ""; return; }
     oProfit.textContent = "$" + fmt(r.profit_usd, 0) + " (" + fmt(r.margin * 100, 1) + "% of ARV)";
     oAllIn.textContent = "$" + fmt(r.all_in_usd, 0) + " (selling $" + fmt(r.selling_usd, 0) + ")";
@@ -2854,7 +2854,7 @@ function renderBrrrrRefi(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "brr-out-n");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeBrrrrRefi({ arv_usd: readNum(arv.input), total_invested_usd: readNum(inv.input), refi_ltv_pct: readNum(ltv.input), existing_payoff_usd: readNum(payoff.input), annual_cash_flow_usd: readNum(cf.input) });
+    const r = computeBrrrrRefi({ arv_usd: readNum(arv.input), total_invested_usd: readNum(inv.input), refi_ltv_pct: readNum(ltv.input), existing_payoff_usd: readNum(payoff.input), annual_cash_flow_usd: readNum(cf.input) }); stepsFor(outputRegion, inputRegion, ["arv_usd", "total_invested_usd", "refi_ltv_pct", "existing_payoff_usd", "annual_cash_flow_usd"], r);
     if (r.error) { oLoan.textContent = r.error; oLeft.textContent = "-"; oCoc.textContent = "-"; oNote.textContent = ""; return; }
     oLoan.textContent = "$" + fmt(r.new_loan_usd, 0) + " / $" + fmt(r.cash_returned_usd, 0) + " returned";
     oLeft.textContent = r.all_recovered ? "all capital recovered ($" + fmt(-r.capital_left_usd, 0) + " cash-out surplus)" : "$" + fmt(r.capital_left_usd, 0);
@@ -2899,7 +2899,7 @@ function renderRentalTotalReturn(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "rtr-out-n");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeRentalTotalReturn({ cash_invested_usd: readNum(cash.input), annual_cash_flow_usd: readNum(cf.input), principal_paydown_usd: readNum(pay.input), appreciation_usd: readNum(appr.input), tax_savings_usd: readNum(tax.input) });
+    const r = computeRentalTotalReturn({ cash_invested_usd: readNum(cash.input), annual_cash_flow_usd: readNum(cf.input), principal_paydown_usd: readNum(pay.input), appreciation_usd: readNum(appr.input), tax_savings_usd: readNum(tax.input) }); stepsFor(outputRegion, inputRegion, ["cash_invested_usd", "annual_cash_flow_usd", "principal_paydown_usd", "appreciation_usd", "tax_savings_usd"], r);
     if (r.error) { oTotal.textContent = r.error; oBreak.textContent = "-"; oNote.textContent = ""; return; }
     oTotal.textContent = "$" + fmt(r.total_usd, 0) + " (" + fmt(r.total_pct, 1) + "% of cash)";
     oBreak.textContent = "cash " + fmt(r.cf_pct, 1) + "% + paydown " + fmt(r.paydown_pct, 1) + "% + appreciation " + fmt(r.appr_pct, 1) + "% + tax " + fmt(r.tax_pct, 1) + "%";
@@ -2947,7 +2947,7 @@ function renderNetEffectiveRent(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "ner-out-n");
   function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeNetEffectiveRent({ face_rent: readNum(face.input), term_periods: readNum(term.input), free_periods: readNum(free.input), one_time_credit: readNum(credit.input) });
+    const r = computeNetEffectiveRent({ face_rent: readNum(face.input), term_periods: readNum(term.input), free_periods: readNum(free.input), one_time_credit: readNum(credit.input) }); stepsFor(outputRegion, inputRegion, ["face_rent", "term_periods", "free_periods", "one_time_credit"], r);
     if (r.error) { oNer.textContent = r.error; oSave.textContent = "-"; oDisc.textContent = "-"; oNote.textContent = ""; return; }
     oNer.textContent = "$" + fmt(r.ner, 2) + " per period";
     oSave.textContent = "$" + fmt(r.total_saving, 2);
@@ -2994,7 +2994,7 @@ function renderRequiredFaceRent(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "rfr-out-n");
   function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeRequiredFaceRent({ target_ner: readNum(ner.input), term_periods: readNum(term.input), free_periods: readNum(free.input), one_time_credit: readNum(credit.input) });
+    const r = computeRequiredFaceRent({ target_ner: readNum(ner.input), term_periods: readNum(term.input), free_periods: readNum(free.input), one_time_credit: readNum(credit.input) }); stepsFor(outputRegion, inputRegion, ["target_ner", "term_periods", "free_periods", "one_time_credit"], r);
     if (r.error) { oFace.textContent = r.error; oPaid.textContent = "-"; oDisc.textContent = "-"; oNote.textContent = ""; return; }
     oFace.textContent = "$" + fmt(r.face_rent, 2) + " per period";
     oPaid.textContent = "$" + fmt(r.paid, 2);
@@ -3041,7 +3041,7 @@ function renderCommercialLoadFactor(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "clf-out-n");
   function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeCommercialLoadFactor({ usable_sf: readNum(usable.input), common_area_factor: readNum(caf.input), base_rent: readNum(rent.input) });
+    const r = computeCommercialLoadFactor({ usable_sf: readNum(usable.input), common_area_factor: readNum(caf.input), base_rent: readNum(rent.input) }); stepsFor(outputRegion, inputRegion, ["usable_sf", "common_area_factor", "base_rent"], r);
     if (r.error) { oRent.textContent = r.error; oAnnual.textContent = "-"; oCost.textContent = "-"; oNote.textContent = ""; return; }
     oRent.textContent = fmt(r.rentable_sf, 0) + " SF (load factor " + fmt(r.load_factor, 3) + ")";
     oAnnual.textContent = "$" + fmt(r.annual_rent, 0) + "/yr";
@@ -3088,7 +3088,7 @@ function renderBlendedMortgageRate(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "bmr-out-n");
   function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeBlendedMortgageRate({ balance_1: readNum(b1.input), rate_1: readNum(r1.input), balance_2: readNum(b2.input), rate_2: readNum(r2.input) });
+    const r = computeBlendedMortgageRate({ balance_1: readNum(b1.input), rate_1: readNum(r1.input), balance_2: readNum(b2.input), rate_2: readNum(r2.input) }); stepsFor(outputRegion, inputRegion, ["balance_1", "rate_1", "balance_2", "rate_2"], r);
     if (r.error) { oBlend.textContent = r.error; oComb.textContent = "-"; oInt.textContent = "-"; oNote.textContent = ""; return; }
     oBlend.textContent = fmt(r.blended_rate, 2) + "% (refinance below this to win)";
     oComb.textContent = "$" + fmt(r.combined, 0);
@@ -3134,7 +3134,7 @@ function renderFloorAreaRatio(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "far-out-n");
   function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeFloorAreaRatio({ building_floor_area_sf: readNum(bldg.input), lot_area_sf: readNum(lot.input), far_limit: readNum(limit.input) });
+    const r = computeFloorAreaRatio({ building_floor_area_sf: readNum(bldg.input), lot_area_sf: readNum(lot.input), far_limit: readNum(limit.input) }); stepsFor(outputRegion, inputRegion, ["building_floor_area_sf", "lot_area_sf", "far_limit"], r);
     if (r.error) { oFar.textContent = r.error; oMax.textContent = "-"; oRem.textContent = "-"; oNote.textContent = ""; return; }
     oFar.textContent = fmt(r.far, 3) + (r.has_limit ? (r.within ? " (within the " + fmt(r.far_limit, 2) + " limit)" : " -- EXCEEDS the " + fmt(r.far_limit, 2) + " limit") : "");
     oMax.textContent = r.has_limit ? fmt(r.max_buildable_sf, 0) + " SF (at FAR " + fmt(r.far_limit, 2) + ")" : "enter a FAR limit to size the cap";

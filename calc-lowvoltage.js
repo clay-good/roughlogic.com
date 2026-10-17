@@ -18,6 +18,7 @@
 import {
   DEBOUNCE_MS, debounce, makeNumber, makeTextarea, makeSelect,
   makeOutputLine, attachExampleButton, fmt,
+  stepsFor,
 } from "./ui-fields.js";
 
 const _finiteGuard = (o) => {
@@ -100,7 +101,7 @@ function _renderFiberLossBudget(inputRegion, outputRegion, citationEl) {
   const oBreak = makeOutputLine(outputRegion, "Breakdown", "flb-out-break");
   const oNote = makeOutputLine(outputRegion, "Notes", "flb-out-note");
   const update = debounce(() => {
-    const r = computeFiberLossBudget({ length_m: Number(len.input.value) || 0, attenuation_db_km: Number(att.input.value) || 0, connector_count: Number(nc.input.value) || 0, loss_per_connector_db: Number(lpc.input.value) || 0, splice_count: Number(ns.input.value) || 0, loss_per_splice_db: Number(lps.input.value) || 0, max_channel_loss_db: Number(maxch.input.value) || 0 });
+    const r = computeFiberLossBudget({ length_m: Number(len.input.value) || 0, attenuation_db_km: Number(att.input.value) || 0, connector_count: Number(nc.input.value) || 0, loss_per_connector_db: Number(lpc.input.value) || 0, splice_count: Number(ns.input.value) || 0, loss_per_splice_db: Number(lps.input.value) || 0, max_channel_loss_db: Number(maxch.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["length_m", "attenuation_db_km", "connector_count", "loss_per_connector_db", "splice_count", "loss_per_splice_db", "max_channel_loss_db"], r);
     if (r.error) { oTotal.textContent = r.error; oMargin.textContent = "-"; oBreak.textContent = "-"; oNote.textContent = ""; return; }
     oTotal.textContent = fmt(r.total_loss_db, 2) + " dB";
     oMargin.textContent = r.margin_db === null ? "(enter max channel loss)" : (fmt(r.margin_db, 2) + " dB - " + (r.pass ? "PASS" : "FAIL"));
@@ -152,7 +153,7 @@ function _renderWirelessFspl(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "fspl-out-n");
   function readNum(i) { if (i.value === "") return 0; const v = Number(i.value); return Number.isFinite(v) ? v : 0; }
   const update = debounce(() => {
-    const r = computeWirelessFspl({ distance_km: readNum(d.input), frequency_mhz: readNum(f.input), tx_power_dbm: readNum(pt.input), tx_gain_dbi: readNum(gt.input), rx_gain_dbi: readNum(gr.input) });
+    const r = computeWirelessFspl({ distance_km: readNum(d.input), frequency_mhz: readNum(f.input), tx_power_dbm: readNum(pt.input), tx_gain_dbi: readNum(gt.input), rx_gain_dbi: readNum(gr.input) }); stepsFor(outputRegion, inputRegion, ["distance_km", "frequency_mhz", "tx_power_dbm", "tx_gain_dbi", "rx_gain_dbi"], r);
     if (r.error) { oFspl.textContent = r.error; oRx.textContent = "-"; oNote.textContent = ""; return; }
     oFspl.textContent = fmt(r.fspl_db, 2) + " dB";
     oRx.textContent = fmt(r.rx_power_dbm, 1) + " dBm";
@@ -202,7 +203,7 @@ function _renderFresnelZoneClearance(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "frz-out-n");
   function readNum(i) { if (i.value === "") return 0; const v = Number(i.value); return Number.isFinite(v) ? v : 0; }
   const update = debounce(() => {
-    const r = computeFresnelZoneClearance({ frequency_ghz: readNum(f.input), d1_km: readNum(d1.input), d2_km: readNum(d2.input), zone_number: readNum(n.input) });
+    const r = computeFresnelZoneClearance({ frequency_ghz: readNum(f.input), d1_km: readNum(d1.input), d2_km: readNum(d2.input), zone_number: readNum(n.input) }); stepsFor(outputRegion, inputRegion, ["frequency_ghz", "d1_km", "d2_km", "zone_number"], r);
     if (r.error) { oR.textContent = r.error; oC.textContent = "-"; oNote.textContent = ""; return; }
     oR.textContent = fmt(r.radius_m, 2) + " m (first zone " + fmt(r.first_zone_radius_m, 2) + " m, over " + fmt(r.total_distance_km, 2) + " km)";
     oC.textContent = fmt(r.clearance_60pct_m, 2) + " m";
@@ -258,7 +259,7 @@ function _renderWirelessLinkBudget(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "wlb-out-n");
   function readNum(i) { if (i.value === "") return 0; const v = Number(i.value); return Number.isFinite(v) ? v : 0; }
   const update = debounce(() => {
-    const r = computeWirelessLinkBudget({ tx_power_dbm: readNum(pt.input), tx_gain_dbi: readNum(gt.input), tx_cable_loss_db: readNum(ltx.input), distance_km: readNum(d.input), frequency_mhz: readNum(f.input), rx_gain_dbi: readNum(gr.input), rx_cable_loss_db: readNum(lrx.input), rx_sensitivity_dbm: readNum(sens.input) });
+    const r = computeWirelessLinkBudget({ tx_power_dbm: readNum(pt.input), tx_gain_dbi: readNum(gt.input), tx_cable_loss_db: readNum(ltx.input), distance_km: readNum(d.input), frequency_mhz: readNum(f.input), rx_gain_dbi: readNum(gr.input), rx_cable_loss_db: readNum(lrx.input), rx_sensitivity_dbm: readNum(sens.input) }); stepsFor(outputRegion, inputRegion, ["tx_power_dbm", "tx_gain_dbi", "tx_cable_loss_db", "distance_km", "frequency_mhz", "rx_gain_dbi", "rx_cable_loss_db", "rx_sensitivity_dbm"], r);
     if (r.error) { oEirp.textContent = r.error; oRx.textContent = "-"; oFade.textContent = "-"; oNote.textContent = ""; return; }
     oEirp.textContent = fmt(r.eirp_dbm, 1) + " dBm EIRP, " + fmt(r.fspl_db, 2) + " dB path loss";
     oRx.textContent = fmt(r.rx_power_dbm, 1) + " dBm";
@@ -318,7 +319,7 @@ function _renderFiberMaxLength(inputRegion, outputRegion, citationEl) {
   const oLen = makeOutputLine(outputRegion, "Max fiber length", "fml-out-len");
   const oNote = makeOutputLine(outputRegion, "Note", "fml-out-note");
   const update = debounce(() => {
-    const r = computeFiberMaxLength({ max_channel_loss_db: Number(maxch.input.value) || 0, attenuation_db_km: Number(att.input.value) || 0, connector_count: Number(nc.input.value) || 0, loss_per_connector_db: Number(lpc.input.value) || 0, splice_count: Number(ns.input.value) || 0, loss_per_splice_db: Number(lps.input.value) || 0 });
+    const r = computeFiberMaxLength({ max_channel_loss_db: Number(maxch.input.value) || 0, attenuation_db_km: Number(att.input.value) || 0, connector_count: Number(nc.input.value) || 0, loss_per_connector_db: Number(lpc.input.value) || 0, splice_count: Number(ns.input.value) || 0, loss_per_splice_db: Number(lps.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["max_channel_loss_db", "attenuation_db_km", "connector_count", "loss_per_connector_db", "splice_count", "loss_per_splice_db"], r);
     if (r.error) { oLen.textContent = r.error; oNote.textContent = ""; return; }
     oLen.textContent = fmt(r.max_length_m, 0) + " m (" + fmt(r.max_length_ft, 0) + " ft)";
     oNote.textContent = r.note;
@@ -423,7 +424,7 @@ function _renderCableTrayFill(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const cables = parseCables(list.input.value);
     if (cables === null) { oFill.textContent = "Each line must be count,diameter,large|small."; oPct.textContent = "-"; oNote.textContent = ""; return; }
-    const r = computeCableTrayFill({ tray_type: type.select.value, tray_width_in: Number(width.input.value) || 0, cables });
+    const r = computeCableTrayFill({ tray_type: type.select.value, tray_width_in: Number(width.input.value) || 0, cables }); stepsFor(outputRegion, inputRegion, ["tray_type", "tray_width_in", "cables"], r);
     if (r.error) { oFill.textContent = r.error; oPct.textContent = "-"; oNote.textContent = ""; return; }
     const unit = r.basis.startsWith("sum-of-diameters") ? " in" : " in2";
     oFill.textContent = fmt(r.fill_value, 2) + unit + " of " + fmt(r.allowable, 2) + unit + " (" + r.basis + ")";
@@ -484,7 +485,7 @@ function _renderCctvStorage(inputRegion, outputRegion, citationEl) {
   const oPer = makeOutputLine(outputRegion, "Per-camera per day", "cs-out-per");
   const oNote = makeOutputLine(outputRegion, "Notes", "cs-out-note");
   const update = debounce(() => {
-    const r = computeCctvStorage({ camera_count: Number(n.input.value) || 0, bitrate_mbps: Number(br.input.value) || 0, recording_mode: mode.select.value, motion_duty_percent: Number(duty.input.value) || 0, retention_days: Number(days.input.value) || 0 });
+    const r = computeCctvStorage({ camera_count: Number(n.input.value) || 0, bitrate_mbps: Number(br.input.value) || 0, recording_mode: mode.select.value, motion_duty_percent: Number(duty.input.value) || 0, retention_days: Number(days.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["camera_count", "bitrate_mbps", "recording_mode", "motion_duty_percent", "retention_days"], r);
     if (r.error) { oTot.textContent = r.error; oBw.textContent = "-"; oPer.textContent = "-"; oNote.textContent = ""; return; }
     oTot.textContent = fmt(r.total_storage_gb, 0) + " GB (" + fmt(r.total_storage_tb, 2) + " TB)";
     oBw.textContent = fmt(r.aggregate_bandwidth_mbps, 1) + " Mbps";
@@ -535,7 +536,7 @@ function _renderCctvRetentionDays(inputRegion, outputRegion, citationEl) {
   const oBw = makeOutputLine(outputRegion, "Aggregate bandwidth", "cr-out-bw");
   const oNote = makeOutputLine(outputRegion, "Notes", "cr-out-note");
   const update = debounce(() => {
-    const r = computeCctvRetentionDays({ disk_capacity_gb: Number(cap.input.value) || 0, camera_count: Number(n.input.value) || 0, bitrate_mbps: Number(br.input.value) || 0, recording_mode: mode.select.value, motion_duty_percent: Number(duty.input.value) || 0 });
+    const r = computeCctvRetentionDays({ disk_capacity_gb: Number(cap.input.value) || 0, camera_count: Number(n.input.value) || 0, bitrate_mbps: Number(br.input.value) || 0, recording_mode: mode.select.value, motion_duty_percent: Number(duty.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["disk_capacity_gb", "camera_count", "bitrate_mbps", "recording_mode", "motion_duty_percent"], r);
     if (r.error) { oDays.textContent = r.error; oDaily.textContent = "-"; oBw.textContent = "-"; oNote.textContent = ""; return; }
     oDays.textContent = fmt(r.retention_days, 1) + " days (" + fmt(r.retention_weeks, 1) + " weeks)";
     oDaily.textContent = fmt(r.daily_total_gb, 1) + " GB/day (" + fmt(r.per_camera_day_gb, 2) + " GB/day/camera, " + fmt(r.recording_hours_per_day, 1) + " h)";
@@ -606,7 +607,7 @@ function _renderSpeaker70vLine(inputRegion, outputRegion, citationEl) {
   const oTaps = makeOutputLine(outputRegion, "Taps remaining / line loss", "s70-out-taps");
   const oNote = makeOutputLine(outputRegion, "Notes", "s70-out-note");
   const update = debounce(() => {
-    const r = computeSpeaker70vLine({ amp_rated_w: Number(amp.input.value) || 0, headroom_percent: Number(head.input.value) || 0, tap_watts: Number(tw.input.value) || 0, tap_count: Number(tc.input.value) || 0, line_voltage_v: Number(volt.select.value), run_length_ft: Number(len.input.value) || 0, wire_ohms_per_1000ft: Number(ohms.input.value) || 0 });
+    const r = computeSpeaker70vLine({ amp_rated_w: Number(amp.input.value) || 0, headroom_percent: Number(head.input.value) || 0, tap_watts: Number(tw.input.value) || 0, tap_count: Number(tc.input.value) || 0, line_voltage_v: Number(volt.select.value), run_length_ft: Number(len.input.value) || 0, wire_ohms_per_1000ft: Number(ohms.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["amp_rated_w", "headroom_percent", "tap_watts", "tap_count", "line_voltage_v", "run_length_ft", "wire_ohms_per_1000ft"], r);
     if (r.error) { oLoad.textContent = r.error; oZ.textContent = "-"; oTaps.textContent = "-"; oNote.textContent = ""; return; }
     oLoad.textContent = fmt(r.total_tap_w, 1) + " W of " + fmt(r.budget_limit_w, 1) + " W - " + (r.within_budget ? "within budget" : "OVER budget");
     oZ.textContent = r.reflected_impedance_ohm === null ? "(open line)" : fmt(r.reflected_impedance_ohm, 1) + " ohm";
@@ -661,7 +662,7 @@ function _renderStandbyBatterySizing(inputRegion, outputRegion, citationEl) {
   const oStd = makeOutputLine(outputRegion, "Next standard battery", "sb-out-std");
   const oNote = makeOutputLine(outputRegion, "Notes", "sb-out-note");
   const update = debounce(() => {
-    const r = computeStandbyBatterySizing({ standby_current_a: Number(is.input.value) || 0, standby_hours: Number(hs.input.value) || 0, alarm_current_a: Number(ia.input.value) || 0, alarm_minutes: Number(ma.input.value) || 0, derate: Number(d.input.value) || 0 });
+    const r = computeStandbyBatterySizing({ standby_current_a: Number(is.input.value) || 0, standby_hours: Number(hs.input.value) || 0, alarm_current_a: Number(ia.input.value) || 0, alarm_minutes: Number(ma.input.value) || 0, derate: Number(d.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["standby_current_a", "standby_hours", "alarm_current_a", "alarm_minutes", "derate"], r);
     if (r.error) { oReq.textContent = r.error; oParts.textContent = "-"; oStd.textContent = "-"; oNote.textContent = ""; return; }
     oReq.textContent = fmt(r.required_ah, 2) + " Ah";
     oParts.textContent = "standby " + fmt(r.standby_ah, 2) + " Ah + alarm " + fmt(r.alarm_ah, 3) + " Ah, x " + fmt(r.derate, 2) + " derate";
@@ -710,7 +711,7 @@ function _renderStandbyBatteryRuntime(inputRegion, outputRegion, citationEl) {
   const oHrs = makeOutputLine(outputRegion, "Standby time supported", "sbr-out-hrs");
   const oNote = makeOutputLine(outputRegion, "Note", "sbr-out-note");
   const update = debounce(() => {
-    const r = computeStandbyBatteryRuntime({ battery_ah: Number(ah.input.value) || 0, standby_current_a: Number(is.input.value) || 0, alarm_current_a: Number(ia.input.value) || 0, alarm_minutes: Number(ma.input.value) || 0, derate: Number(d.input.value) || 0 });
+    const r = computeStandbyBatteryRuntime({ battery_ah: Number(ah.input.value) || 0, standby_current_a: Number(is.input.value) || 0, alarm_current_a: Number(ia.input.value) || 0, alarm_minutes: Number(ma.input.value) || 0, derate: Number(d.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["battery_ah", "standby_current_a", "alarm_current_a", "alarm_minutes", "derate"], r);
     if (r.error) { oHrs.textContent = r.error; oNote.textContent = ""; return; }
     oHrs.textContent = fmt(r.standby_hours, 1) + " h";
     oNote.textContent = r.note;
@@ -773,7 +774,7 @@ function _renderCoaxRgLoss(inputRegion, outputRegion, citationEl) {
   const oEnd = makeOutputLine(outputRegion, "End-of-run level", "coax-out-end");
   const oNote = makeOutputLine(outputRegion, "Notes", "coax-out-note");
   const update = debounce(() => {
-    const r = computeCoaxRgLoss({ mode: mode.select.value, loss_per_100ft_db: Number(lp.input.value) || 0, length_ft: Number(len.input.value) || 0, source_level: src.input.value === "" ? null : Number(src.input.value), target_level: tgt.input.value === "" ? null : Number(tgt.input.value) });
+    const r = computeCoaxRgLoss({ mode: mode.select.value, loss_per_100ft_db: Number(lp.input.value) || 0, length_ft: Number(len.input.value) || 0, source_level: src.input.value === "" ? null : Number(src.input.value), target_level: tgt.input.value === "" ? null : Number(tgt.input.value) }); stepsFor(outputRegion, inputRegion, ["mode", "loss_per_100ft_db", "length_ft", "source_level", "target_level"], r);
     if (r.error) { oLoss.textContent = r.error; oEnd.textContent = "-"; oNote.textContent = ""; return; }
     if (r.mode === "max-run") { oLoss.textContent = fmt(r.max_run_ft, 1) + " ft max run"; oEnd.textContent = "to reach " + fmt(r.target_level, 1) + " from " + fmt(r.source_level, 1); }
     else { oLoss.textContent = fmt(r.total_loss_db, 2) + " dB"; oEnd.textContent = r.end_level === null ? "(enter source level)" : fmt(r.end_level, 2); }
@@ -819,7 +820,7 @@ function _renderCameraLensFov(inputRegion, outputRegion, citationEl) {
   const oPpf = makeOutputLine(outputRegion, "Pixel density / DORI", "clf-out-ppf");
   const oNote = makeOutputLine(outputRegion, "Note", "clf-out-n");
   const update = debounce(() => {
-    const r = computeCameraLensFov({ sensor_width_mm: Number(sw.input.value) || 0, focal_length_mm: Number(fl.input.value) || 0, distance_ft: Number(di.input.value) || 0, h_pixels: Number(px.input.value) || 0 });
+    const r = computeCameraLensFov({ sensor_width_mm: Number(sw.input.value) || 0, focal_length_mm: Number(fl.input.value) || 0, distance_ft: Number(di.input.value) || 0, h_pixels: Number(px.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["sensor_width_mm", "focal_length_mm", "distance_ft", "h_pixels"], r);
     if (r.error) { oFov.textContent = r.error; oPpf.textContent = "-"; oNote.textContent = ""; return; }
     oFov.textContent = fmt(r.fov_deg, 1) + " deg over " + fmt(r.scene_ft, 1) + " ft";
     oPpf.textContent = fmt(r.ppf, 1) + " ppf -- " + r.dori;
@@ -867,7 +868,7 @@ function _renderCameraMaxDistanceForPpf(inputRegion, outputRegion, citationEl) {
   const oScene = makeOutputLine(outputRegion, "Scene width / FOV at that distance", "cmd-out-scene");
   const oNote = makeOutputLine(outputRegion, "Note", "cmd-out-n");
   const update = debounce(() => {
-    const r = computeCameraMaxDistanceForPpf({ sensor_width_mm: Number(sw.input.value) || 0, focal_length_mm: Number(fl.input.value) || 0, h_pixels: Number(px.input.value) || 0, target_ppf: Number(tp.input.value) || 0 });
+    const r = computeCameraMaxDistanceForPpf({ sensor_width_mm: Number(sw.input.value) || 0, focal_length_mm: Number(fl.input.value) || 0, h_pixels: Number(px.input.value) || 0, target_ppf: Number(tp.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["sensor_width_mm", "focal_length_mm", "h_pixels", "target_ppf"], r);
     if (r.error) { oDist.textContent = r.error; oScene.textContent = "-"; oNote.textContent = ""; return; }
     oDist.textContent = fmt(r.max_distance_ft, 1) + " ft (" + r.band + ")";
     oScene.textContent = fmt(r.scene_ft, 1) + " ft wide, " + fmt(r.fov_deg, 1) + " deg FOV";
@@ -917,7 +918,7 @@ function _renderCeilingSpeakerCoverage(inputRegion, outputRegion, citationEl) {
   const oCount = makeOutputLine(outputRegion, "Speaker count", "csc-out-count");
   const oNote = makeOutputLine(outputRegion, "Note", "csc-out-n");
   const update = debounce(() => {
-    const r = computeCeilingSpeakerCoverage({ ceiling_ft: Number(ch.input.value) || 0, ear_ft: Number(ea.input.value) || 0, coverage_deg: Number(co.input.value) || 0, room_area_ft2: Number(ar.input.value) || 0, layout: ly.select.value });
+    const r = computeCeilingSpeakerCoverage({ ceiling_ft: Number(ch.input.value) || 0, ear_ft: Number(ea.input.value) || 0, coverage_deg: Number(co.input.value) || 0, room_area_ft2: Number(ar.input.value) || 0, layout: ly.select.value }); stepsFor(outputRegion, inputRegion, ["ceiling_ft", "ear_ft", "coverage_deg", "room_area_ft2", "layout"], r);
     if (r.error) { oDia.textContent = r.error; oCount.textContent = "-"; oNote.textContent = ""; return; }
     oDia.textContent = fmt(r.diameter_ft, 1) + " ft dia, " + fmt(r.spacing_ft, 1) + " ft spacing (" + (r.overlap ? "minimum overlap" : "edge-to-edge") + ")";
     oCount.textContent = r.count + " speaker(s)";
@@ -962,7 +963,7 @@ function _renderCeilingSpeakerCoverageAngle(inputRegion, outputRegion, citationE
   const oAngle = makeOutputLine(outputRegion, "Required coverage angle", "csa-out-angle");
   const oNote = makeOutputLine(outputRegion, "Note", "csa-out-n");
   const update = debounce(() => {
-    const r = computeCeilingSpeakerCoverageAngle({ ceiling_ft: Number(ch.input.value) || 0, ear_ft: Number(ea.input.value) || 0, target_diameter_ft: Number(dia.input.value) || 0 });
+    const r = computeCeilingSpeakerCoverageAngle({ ceiling_ft: Number(ch.input.value) || 0, ear_ft: Number(ea.input.value) || 0, target_diameter_ft: Number(dia.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["ceiling_ft", "ear_ft", "target_diameter_ft"], r);
     if (r.error) { oAngle.textContent = r.error; oNote.textContent = ""; return; }
     oAngle.textContent = fmt(r.coverage_deg, 1) + " deg (drop " + fmt(r.drop_ft, 1) + " ft)";
     oNote.textContent = r.note;
@@ -1027,7 +1028,7 @@ function _renderStructuredCablingChannel(inputRegion, outputRegion, citationEl) 
   const oCh = makeOutputLine(outputRegion, "Channel vs 100 m", "scc-out-ch");
   const oNote = makeOutputLine(outputRegion, "Note", "scc-out-n");
   const update = debounce(() => {
-    const r = computeStructuredCablingChannel({ permanent_link_m: Number(pl.input.value) || 0, cords_m: Number(cd.input.value) || 0, temp_c: tc.input.value === "" ? 20 : Number(tc.input.value), derate_per_c: Number(dr.input.value) || 0.004 });
+    const r = computeStructuredCablingChannel({ permanent_link_m: Number(pl.input.value) || 0, cords_m: Number(cd.input.value) || 0, temp_c: tc.input.value === "" ? 20 : Number(tc.input.value), derate_per_c: Number(dr.input.value) || 0.004 }); stepsFor(outputRegion, inputRegion, ["permanent_link_m", "cords_m", "temp_c", "derate_per_c"], r);
     if (r.error) { oPl.textContent = r.error; oCh.textContent = "-"; oNote.textContent = ""; return; }
     oPl.textContent = fmt(r.max_pl_m, 1) + " m max -- link " + (r.pl_ok ? "OK" : "TOO LONG");
     oCh.textContent = fmt(r.channel_m, 1) + " m -- channel " + (r.chan_ok ? "OK" : "OVER 100 m") + (r.cords_ok ? "" : "; cords over the 10 m TIA total");
@@ -1077,7 +1078,7 @@ function _v855renderLvCablePullFootage(inputRegion, outputRegion, citationEl) {
     const r = computeLvCablePullFootage({
       drops: d.input.value === "" ? 48 : Number(d.input.value), avg_run_ft: ar.input.value === "" ? 120 : Number(ar.input.value),
       slack_ft: sl.input.value === "" ? 15 : Number(sl.input.value), box_ft: bx.input.value === "" ? 1000 : Number(bx.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["drops", "avg_run_ft", "slack_ft", "box_ft"], r);
     if (r.error) { oTotal.textContent = r.error; oBoxes.textContent = "-"; return; }
     oTotal.textContent = fmt(r.total_ft, 0) + " ft";
     oBoxes.textContent = fmt(r.boxes, 0) + " boxes";
@@ -1126,7 +1127,7 @@ function _v890renderCableSupportJhook(inputRegion, outputRegion, citationEl) {
       run_ft: rn.input.value === "" ? 400 : Number(rn.input.value), spacing_ft: sp.input.value === "" ? 4 : Number(sp.input.value),
       num_cables: nc.input.value === "" ? 50 : Number(nc.input.value), cable_lb_per_ft: cw.input.value === "" ? 0.035 : Number(cw.input.value),
       hook_wll_lb: hw.input.value === "" ? 0 : Number(hw.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["run_ft", "spacing_ft", "num_cables", "cable_lb_per_ft", "hook_wll_lb"], r);
     if (r.error) { oHooks.textContent = r.error; oLoad.textContent = "-"; oUtil.textContent = "-"; return; }
     oHooks.textContent = fmt(r.hooks, 0) + " hooks";
     oLoad.textContent = fmt(r.load_per_hook_lb, 1) + " lb/hook";
@@ -1181,7 +1182,7 @@ function _v929renderAccessControlPowerSupply(inputRegion, outputRegion, citation
       lock_count: lc.input.value === "" ? 4 : Number(lc.input.value), lock_current_a: li.input.value === "" ? 0.5 : Number(li.input.value),
       reader_count: rc.input.value === "" ? 2 : Number(rc.input.value), reader_current_a: ri.input.value === "" ? 0.15 : Number(ri.input.value),
       other_load_a: ol.input.value === "" ? 0.225 : Number(ol.input.value), standby_hours: sh.input.value === "" ? 4 : Number(sh.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["lock_count", "lock_current_a", "reader_count", "reader_current_a", "other_load_a", "standby_hours"], r);
     if (r.error) { oLoad.textContent = r.error; oPsu.textContent = "-"; oBat.textContent = "-"; return; }
     oLoad.textContent = fmt(r.total_load_a, 2) + " A";
     oPsu.textContent = fmt(r.psu_min_a, 2) + " A (1.25x load)";
@@ -1245,7 +1246,7 @@ function _v937renderFireAlarmNacVoltageDrop(inputRegion, outputRegion, citationE
       nominal_voltage_v: nv.input.value === "" ? 24 : Number(nv.input.value), total_current_a: ic.input.value === "" ? 0.8 : Number(ic.input.value),
       run_length_ft: rl.input.value === "" ? 250 : Number(rl.input.value), resistance_per_1000ft: rr.input.value === "" ? 3.14 : Number(rr.input.value),
       device_min_v: dm.input.value === "" ? 16 : Number(dm.input.value), panel_min_output_v: Number(po.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["nominal_voltage_v", "total_current_a", "run_length_ft", "resistance_per_1000ft", "device_min_v", "panel_min_output_v"], r);
     if (r.error) { oV.textContent = r.error; oEol.textContent = "-"; oDrop.textContent = "-"; return; }
     oV.textContent = r.verdict + " (" + (r.margin_v >= 0 ? "+" : "") + fmt(r.margin_v, 2) + " V margin)";
     oEol.textContent = fmt(r.eol_voltage_v, 2) + " V (need " + fmt(Number(dm.input.value) || 16, 1) + " V)";

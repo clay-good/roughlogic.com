@@ -27,6 +27,7 @@ import {
   DEBOUNCE_MS, debounce, makeNumber, makeSelect, makeTextarea,
   makeOutputLine, attachExampleButton, fmt,
   makeStepsPanel,
+  stepsFor,
 } from "./ui-fields.js";
 
 const _finiteGuard = (o) => {
@@ -111,7 +112,7 @@ function _v26renderPipeFittingTakeout(inputRegion, outputRegion, citationEl) {
       makeup_b_in: Number(muB.input.value) || 0,
       weld_gap_a_in: Number(gapA.input.value) || 0,
       weld_gap_b_in: Number(gapB.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["reference", "dimension_in", "takeout_a_in", "takeout_b_in", "makeup_a_in", "makeup_b_in", "weld_gap_a_in", "weld_gap_b_in"], r);
     if (r.error) { oCut.textContent = r.error; oTerms.textContent = "-"; oNote.textContent = ""; return; }
     oCut.textContent = fmt(r.cut_length_in, 3) + " in" + (r.impractical ? " (impractical)" : "");
     oTerms.textContent = "dim " + fmt(r.dimension_in, 2) + " - take-out " + fmt(r.takeout_total_in, 2) + " + make-up " + fmt(r.makeup_total_in, 2) + " - weld gap " + fmt(r.weld_gap_total_in, 3) + " in";
@@ -188,7 +189,7 @@ function _v26renderPipeMiterCut(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Notes", "pmc-out-note");
 
   const update = debounce(() => {
-    const res = computePipeMiterCut({ total_angle_deg: Number(a.input.value) || 0, pieces: Number(n.input.value) || 0, outside_diameter_in: Number(od.input.value) || 0, centerline_radius_in: Number(r.input.value) || 0 });
+    const res = computePipeMiterCut({ total_angle_deg: Number(a.input.value) || 0, pieces: Number(n.input.value) || 0, outside_diameter_in: Number(od.input.value) || 0, centerline_radius_in: Number(r.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["total_angle_deg", "pieces", "outside_diameter_in", "centerline_radius_in"], res);
     if (res.error) { oAng.textContent = res.error; oWelds.textContent = "-"; oCut.textContent = "-"; oGore.textContent = "-"; oNote.textContent = ""; return; }
     oAng.textContent = fmt(res.miter_angle_deg, 3) + " deg";
     oWelds.textContent = String(res.n_welds);
@@ -245,7 +246,7 @@ function _v26renderPipeTemplateWrap(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Notes", "ptw-out-note");
 
   const update = debounce(() => {
-    const r = computePipeTemplateWrap({ outside_diameter_in: Number(od.input.value) || 0, cut_angle_deg: Number(ang.input.value) || 0, stations: Number(st.select.value) });
+    const r = computePipeTemplateWrap({ outside_diameter_in: Number(od.input.value) || 0, cut_angle_deg: Number(ang.input.value) || 0, stations: Number(st.select.value) }); stepsFor(outputRegion, inputRegion, ["outside_diameter_in", "cut_angle_deg", "stations"], r);
     if (r.error) { oCirc.textContent = r.error; oMax.textContent = "-"; oTable.textContent = "-"; oNote.textContent = ""; return; }
     oCirc.textContent = fmt(r.circumference_in, 3) + " in";
     oMax.textContent = fmt(r.max_ordinate_in, 3) + " in";
@@ -362,7 +363,7 @@ function _v26renderFlangeBoltTorque(inputRegion, outputRegion, citationEl) {
       target_percent_yield: Number(pct.input.value) || 0,
       yield_ksi: Number(yld.input.value) || 0,
       nut_factor_k: Number(k.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["bolt_diameter_in", "thread_series", "bolt_count", "tensile_area_in2", "target_percent_yield", "yield_ksi", "nut_factor_k"], r);
     if (r.error) { oPre.textContent = r.error; oTq.textContent = "-"; oStress.textContent = "-"; oSeq.textContent = "-"; oNote.textContent = ""; return; }
     oPre.textContent = fmt(r.preload_lb, 0) + " lb (A_t " + fmt(r.tensile_area_in2, 4) + " in^2)";
     oTq.textContent = fmt(r.torque_ftlb, 1) + " ft-lb (" + fmt(r.torque_nm, 1) + " N-m)";
@@ -428,7 +429,7 @@ function renderConduitOffset(inputRegion, outputRegion, citationEl) {
   const oMult = makeOutputLine(outputRegion, "Multiplier / shrink per inch", "co-out-mult");
   function readNum(input) { if (input.value === "") return 0; const n = Number(input.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeConduitOffset({ offset_in: readNum(offset.input), angle_deg: Number(angle.select.value) });
+    const r = computeConduitOffset({ offset_in: readNum(offset.input), angle_deg: Number(angle.select.value) }); stepsFor(outputRegion, inputRegion, ["offset_in", "angle_deg"], r);
     if (r.error) { oSpace.textContent = r.error; oShrink.textContent = ""; oMult.textContent = ""; return; }
     oSpace.textContent = fmt(r.mark_spacing_in, 2) + " in";
     oShrink.textContent = fmt(r.shrink_in, 3) + " in";
@@ -506,7 +507,7 @@ function renderConduitSaddle(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "cs-out-note");
   function readNum(input) { if (input.value === "") return 0; const n = Number(input.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeConduitSaddle({ mode: mode.select.value, depth_in: readNum(depth.input), preset: preset.select.value, width_in: readNum(width.input) });
+    const r = computeConduitSaddle({ mode: mode.select.value, depth_in: readNum(depth.input), preset: preset.select.value, width_in: readNum(width.input) }); stepsFor(outputRegion, inputRegion, ["mode", "depth_in", "preset", "width_in"], r);
     if (r.error) { oSpace.textContent = r.error; oShrink.textContent = ""; oBends.textContent = ""; oNote.textContent = ""; return; }
     if (r.mode === "four-point") {
       oSpace.textContent = fmt(r.mark_spacing_in, 3) + " in per leg from each center";
@@ -598,7 +599,7 @@ function renderConduit90Stub(inputRegion, outputRegion, citationEl) {
     const r = computeConduit90Stub({
       mode: mode.select.value, height_in: readNum(height.input), deduct_in: Number(deduct.select.value),
       back_to_back_in: readNum(b2b.input), radius_in: readNum(radius.input), per_shot_deg: readNum(perShot.input),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["mode", "height_in", "deduct_in", "back_to_back_in", "radius_in", "per_shot_deg"], r);
     if (r.error) { oMark.textContent = r.error; oSecond.textContent = ""; oNote.textContent = ""; return; }
     if (r.mode === "segment-90") {
       oMark.textContent = r.n_shots + " shots";
@@ -761,7 +762,7 @@ function _v85renderShieldingGasRuntime(inputRegion, outputRegion, citationEl) {
       arc_on_min: Number(arcOn.input.value) || 0,
       cylinder_ft3: Number(cyl.input.value) || 0,
       gas_cost: cost.input.value === "" ? 0 : Number(cost.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["flow_cfh", "arc_on_min", "cylinder_ft3", "gas_cost"], r);
     if (r.error) { oUsed.textContent = r.error; for (const o of [oRun, oCyl, oCost]) o.textContent = "-"; return; }
     oUsed.textContent = fmt(r.gas_used_ft3, 1) + " ft3";
     oRun.textContent = fmt(r.runtime_hr_per_cyl, 1) + " hr";
@@ -797,7 +798,7 @@ function _v85renderOxyfuelCuttingGas(inputRegion, outputRegion, citationEl) {
       cut_speed_ipm: Number(cutSpeed.input.value) || 0,
       oxygen_cyl_ft3: oxyCyl.input.value === "" ? 244 : Number(oxyCyl.input.value),
       fuel_cyl_ft3: fuelCyl.input.value === "" ? 330 : Number(fuelCyl.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["oxygen_cfh", "fuel_cfh", "cut_length_in", "cut_speed_ipm", "oxygen_cyl_ft3", "fuel_cyl_ft3"], r);
     if (r.error) { oTime.textContent = r.error; for (const o of [oOx, oFuel, oOxRun, oFuelRun]) o.textContent = "-"; return; }
     oTime.textContent = fmt(r.cut_time_min, 1) + " min";
     oOx.textContent = fmt(r.oxygen_used_ft3, 1) + " ft3";
@@ -829,7 +830,7 @@ function _v85renderWeldPreheatFuel(inputRegion, outputRegion, citationEl) {
       start_temp_F: start.input.value === "" ? 70 : Number(start.input.value),
       preheat_temp_F: Number(preheat.input.value) || 0,
       efficiency_pct: eff.input.value === "" ? 25 : Number(eff.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["steel_lb", "start_temp_F", "preheat_temp_F", "efficiency_pct"], r);
     if (r.error) { oHeat.textContent = r.error; for (const o of [oFuel, oLb, oGal]) o.textContent = "-"; return; }
     oHeat.textContent = fmt(r.heat_needed_btu, 0) + " Btu";
     oFuel.textContent = fmt(r.fuel_btu, 0) + " Btu";
@@ -867,7 +868,7 @@ function _v85renderWeldCostPerFoot(inputRegion, outputRegion, citationEl) {
       operating_factor_pct: opFactor.input.value === "" ? 30 : Number(opFactor.input.value),
       labor_rate_per_hr: Number(laborRate.input.value) || 0,
       gas_cost_per_ft: gas.input.value === "" ? 0 : Number(gas.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["deposit_lb_per_ft", "deposition_eff_pct", "filler_cost_per_lb", "deposition_rate_lb_hr", "operating_factor_pct", "labor_rate_per_hr", "gas_cost_per_ft"], r);
     if (r.error) { oCons.textContent = r.error; for (const o of [oFiller, oLabor, oTotal]) o.textContent = "-"; return; }
     oCons.textContent = fmt(r.consumable_lb_per_ft, 3) + " lb/ft";
     oFiller.textContent = "$" + fmt(r.filler_cost_ft, 2) + "/ft";
@@ -948,7 +949,7 @@ function _v129renderWeldMetalVolume(inputRegion, outputRegion, citationEl) {
       length_in: Number(length.input.value) || 0,
       deposition_eff: eff.input.value === "" ? 0.90 : Number(eff.input.value),
       max_pass_area_in2: maxPass.input.value === "" ? 0.05 : Number(maxPass.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["joint_type", "fillet_leg_in", "groove_area_in2", "length_in", "deposition_eff", "max_pass_area_in2"], r);
     if (r.error) { oArea.textContent = r.error; for (const o of [oDep, oFill, oPass]) o.textContent = "-"; return; }
     oArea.textContent = fmt(r.weld_area_in2, 4) + " in2";
     oDep.textContent = fmt(r.deposit_lb, 2) + " lb (" + fmt(r.deposit_in3, 2) + " in3)";
@@ -998,7 +999,7 @@ function _v130renderWireFeedDeposition(inputRegion, outputRegion, citationEl) {
       wfs_in_min: Number(wfs.input.value) || 0,
       wire_dia_in: Number(dia.input.value) || 0,
       deposition_eff: eff.input.value === "" ? 0.92 : Number(eff.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["wfs_in_min", "wire_dia_in", "deposition_eff"], r);
     if (r.error) { oArea.textContent = r.error; for (const o of [oMelt, oDep]) o.textContent = "-"; return; }
     oArea.textContent = fmt(r.wire_area_in2, 6) + " in2";
     oMelt.textContent = fmt(r.melt_lb_hr, 2) + " lb/hr";
@@ -1048,7 +1049,7 @@ function _v737renderWireFeedSpeedForDeposition(inputRegion, outputRegion, citati
       target_deposit_lb_hr: Number(dep.input.value) || 0,
       wire_dia_in: Number(dia.input.value) || 0,
       deposition_eff: eff.input.value === "" ? 0.92 : Number(eff.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["target_deposit_lb_hr", "wire_dia_in", "deposition_eff"], r);
     if (r.error) { oWfs.textContent = r.error; oMelt.textContent = "-"; oNote.textContent = ""; return; }
     oWfs.textContent = fmt(r.wfs_in_min, 0) + " in/min";
     oMelt.textContent = fmt(r.melt_lb_hr, 2) + " lb/hr";
@@ -1102,7 +1103,7 @@ function _v131renderWeldTransverseShrinkage(inputRegion, outputRegion, citationE
       thickness_in: Number(thickness.input.value) || 0,
       weld_count: count.input.value === "" ? 1 : Number(count.input.value),
       root_opening_in: Number(rootIn.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["weld_area_in2", "thickness_in", "weld_count", "root_opening_in"], r);
     if (r.error) { oPer.textContent = r.error; for (const o of [oTotal, oPreset]) o.textContent = "-"; return; }
     oPer.textContent = fmt(r.shrink_per_weld_in, 3) + " in";
     oTotal.textContent = fmt(r.total_shrink_in, 3) + " in";
@@ -1170,7 +1171,7 @@ function _v132renderWeldGroupEccentric(inputRegion, outputRegion, citationEl) {
       weld_len_in: Number(len.input.value) || 0,
       separation_in: Number(sep.input.value) || 0,
       allow_per_16: allow.input.value === "" ? 928 : Number(allow.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["load_lb", "ecc_in", "weld_len_in", "separation_in", "allow_per_16"], r);
     if (r.error) { oJ.textContent = r.error; for (const o of [oFd, oFr, oLeg]) o.textContent = "-"; return; }
     oJ.textContent = fmt(r.polar_moment_in3, 1) + " in3";
     oFd.textContent = fmt(r.direct_shear_lb_in, 0) + " lb/in";
@@ -1211,7 +1212,7 @@ function _v133renderMinBendRadius(inputRegion, outputRegion, citationEl) {
     const r = computeMinBendRadius({
       thickness_in: Number(thickness.input.value) || 0,
       elongation_pct: Number(elong.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["thickness_in", "elongation_pct"], r);
     if (r.error) { oRt.textContent = r.error; oR.textContent = "-"; return; }
     oRt.textContent = fmt(r.r_over_t, 2) + " T";
     oR.textContent = fmt(r.r_min_in, 3) + " in";
@@ -1268,7 +1269,7 @@ function _v134renderShrinkFit(inputRegion, outputRegion, citationEl) {
       clearance_in: clearance.input.value === "" ? 0 : Number(clearance.input.value),
       alpha_per_f: alpha.input.value === "" ? 0.0000065 : Number(alpha.input.value),
       ambient_f: ambient.input.value === "" ? 70 : Number(ambient.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["nominal_dia_in", "interference_in", "clearance_in", "alpha_per_f", "ambient_f"], r);
     if (r.error) { oDt.textContent = r.error; for (const o of [oHeat, oChill]) o.textContent = "-"; return; }
     oDt.textContent = fmt(r.delta_t_f, 0) + " degF";
     oHeat.textContent = fmt(r.heat_to_f, 0) + " degF";
@@ -1308,7 +1309,7 @@ function _v356renderWeldDilution(inputRegion, outputRegion, citationEl) {
   const oFill = makeOutputLine(outputRegion, "Filler share", "wd-out-fill");
   const oNote = makeOutputLine(outputRegion, "Note", "wd-out-note");
   const update = debounce(() => {
-    const r = computeWeldDilution({ A_base: Number(ab.input.value) || 0, A_filler: Number(af.input.value) || 0 });
+    const r = computeWeldDilution({ A_base: Number(ab.input.value) || 0, A_filler: Number(af.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["A_base", "A_filler"], r);
     if (r.error) { oDil.textContent = r.error; oFill.textContent = "-"; oNote.textContent = ""; return; }
     oDil.textContent = fmt(r.dilution_pct, 1) + "%";
     oFill.textContent = fmt(r.filler_share_pct, 1) + "%";
@@ -1361,7 +1362,7 @@ function renderWeldDepositComposition(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "wdc-out-note");
   const rd = (i) => (i.value === "" ? 0 : Number(i.value) || 0);
   const update = debounce(() => {
-    const r = computeWeldDepositComposition({ dilution_pct: rd(dil.input), base_pct: rd(base.input), filler_pct: rd(filler.input) });
+    const r = computeWeldDepositComposition({ dilution_pct: rd(dil.input), base_pct: rd(base.input), filler_pct: rd(filler.input) }); stepsFor(outputRegion, inputRegion, ["dilution_pct", "base_pct", "filler_pct"], r);
     if (r.error) { oDep.textContent = r.error; oSplit.textContent = "-"; oShift.textContent = "-"; oNote.textContent = ""; return; }
     oDep.textContent = fmt(r.deposit_pct, 3) + "%";
     oSplit.textContent = fmt(r.base_contribution_pct, 3) + "% / " + fmt(r.filler_contribution_pct, 3) + "%";
@@ -1415,7 +1416,7 @@ function _v357renderWeldPassesArcTime(inputRegion, outputRegion, citationEl) {
   const oTotal = makeOutputLine(outputRegion, "Total shop time", "wpa-out-t");
   const oNote = makeOutputLine(outputRegion, "Note", "wpa-out-note");
   const update = debounce(() => {
-    const r = computeWeldPassesArcTime({ A_groove: Number(ag.input.value) || 0, length_in: Number(len.input.value) || 0, a_pass: Number(ap.input.value) || 0, dep_rate: Number(dr.input.value) || 0, density: Number(dens.input.value) || 0, op_factor: Number(of.input.value) || 0 });
+    const r = computeWeldPassesArcTime({ A_groove: Number(ag.input.value) || 0, length_in: Number(len.input.value) || 0, a_pass: Number(ap.input.value) || 0, dep_rate: Number(dr.input.value) || 0, density: Number(dens.input.value) || 0, op_factor: Number(of.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["A_groove", "length_in", "a_pass", "dep_rate", "density", "op_factor"], r);
     if (r.error) { oPasses.textContent = r.error; oWeight.textContent = "-"; oArc.textContent = "-"; oTotal.textContent = "-"; oNote.textContent = ""; return; }
     oPasses.textContent = String(r.passes);
     oWeight.textContent = fmt(r.weight_lb, 3) + " lb";
@@ -1465,7 +1466,7 @@ function _v358renderWeldTravelSpeed(inputRegion, outputRegion, citationEl) {
   const oTS = makeOutputLine(outputRegion, "Travel speed (at or above)", "wts-out-ts");
   const oNote = makeOutputLine(outputRegion, "Note", "wts-out-note");
   const update = debounce(() => {
-    const r = computeWeldTravelSpeed({ V_volts: Number(v.input.value) || 0, I_amps: Number(i.input.value) || 0, eta: Number(e.input.value) || 0, HI_kjin: Number(hi.input.value) || 0 });
+    const r = computeWeldTravelSpeed({ V_volts: Number(v.input.value) || 0, I_amps: Number(i.input.value) || 0, eta: Number(e.input.value) || 0, HI_kjin: Number(hi.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["V_volts", "I_amps", "eta", "HI_kjin"], r);
     if (r.error) { oTS.textContent = r.error; oNote.textContent = ""; return; }
     oTS.textContent = fmt(r.travel_speed_ipm, 2) + " in/min";
     oNote.textContent = r.note;
@@ -1509,7 +1510,7 @@ function _v802renderCoilLength(inputRegion, outputRegion, citationEl) {
   const oIn = makeOutputLine(outputRegion, "Coil length (in)", "coil-out-in");
   const oNote = makeOutputLine(outputRegion, "Note", "coil-out-n");
   const update = debounce(() => {
-    const r = computeCoilLength({ outside_diameter_in: Number(od.input.value) || 0, inside_diameter_in: Number(id.input.value) || 0, material_thickness_in: Number(t.input.value) || 0 });
+    const r = computeCoilLength({ outside_diameter_in: Number(od.input.value) || 0, inside_diameter_in: Number(id.input.value) || 0, material_thickness_in: Number(t.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["outside_diameter_in", "inside_diameter_in", "material_thickness_in"], r);
     if (r.error) { oFt.textContent = r.error; oIn.textContent = "-"; oNote.textContent = ""; return; }
     oFt.textContent = fmt(r.length_ft, 1) + " ft";
     oIn.textContent = fmt(r.length_in, 0) + " in";
@@ -1565,7 +1566,7 @@ function _v909renderBarstockCutlist(inputRegion, outputRegion, citationEl) {
     const r = computeBarstockCutlist({
       stock_length_in: sl.input.value === "" ? 240 : Number(sl.input.value), piece_length_in: pl.input.value === "" ? 14.5 : Number(pl.input.value),
       kerf_in: kf.input.value === "" ? 0.125 : Number(kf.input.value), pieces_needed: pn.input.value === "" ? 100 : Number(pn.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["stock_length_in", "piece_length_in", "kerf_in", "pieces_needed"], r);
     if (r.error) { oPer.textContent = r.error; oSticks.textContent = "-"; oDrop.textContent = "-"; oYield.textContent = "-"; return; }
     oPer.textContent = fmt(r.pieces_per_stick, 0) + " per stick";
     oSticks.textContent = fmt(r.sticks_needed, 0) + " sticks";
@@ -1625,7 +1626,7 @@ function _v912renderVesselHeadVolume(inputRegion, outputRegion, citationEl) {
     const r = computeVesselHeadVolume({
       inside_diameter_in: dia.input.value === "" ? 48 : Number(dia.input.value), head_type: ht.select.value,
       straight_flange_in: sf.input.value === "" ? 0 : Number(sf.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["inside_diameter_in", "head_type", "straight_flange_in"], r);
     if (r.error) { oHead.textContent = r.error; oTotal.textContent = "-"; oDepth.textContent = "-"; return; }
     oHead.textContent = fmt(r.head_volume_gal, 2) + " gal (" + fmt(r.head_volume_in3, 0) + " in3)";
     oTotal.textContent = fmt(r.total_volume_gal, 2) + " gal";
@@ -1678,7 +1679,7 @@ function _v962renderBendSpringback(inputRegion, outputRegion, citationEl) {
     const r = computeBendSpringback({
       tool_radius_in: rr.input.value === "" ? 1.0 : Number(rr.input.value), thickness_in: tt.input.value === "" ? 0.1 : Number(tt.input.value),
       yield_strength_psi: yy.input.value === "" ? 50000 : Number(yy.input.value), modulus_psi: ee.input.value === "" ? 29000000 : Number(ee.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["tool_radius_in", "thickness_in", "yield_strength_psi", "modulus_psi"], r);
     if (r.error) { oK.textContent = r.error; oR.textContent = "-"; return; }
     oK.textContent = fmt(r.springback_factor_ks, 4) + " (Ri/Rf)";
     oR.textContent = fmt(r.final_radius_in, 4) + " in (from " + fmt(Number(rr.input.value) || 1, 3) + " in tool, +" + fmt(r.radius_growth_pct, 1) + "%)";
@@ -1791,7 +1792,7 @@ function _v1127renderBarNesting(inputRegion, outputRegion, citationEl) {
   const oPat = makeOutputLine(outputRegion, "Cutting patterns", "bn-out-pat");
   const oNote = makeOutputLine(outputRegion, "Note", "bn-out-note");
   const update = debounce(() => {
-    const r = computeBarNesting({ cut_list: list.input.value, stock_length_in: Number(stock.input.value) || 0, kerf_in: Number(kerf.input.value) || 0, end_trim_in: Number(trim.input.value) || 0 });
+    const r = computeBarNesting({ cut_list: list.input.value, stock_length_in: Number(stock.input.value) || 0, kerf_in: Number(kerf.input.value) || 0, end_trim_in: Number(trim.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["cut_list", "stock_length_in", "kerf_in", "end_trim_in"], r);
     if (r.error) { oSticks.textContent = r.error; oYield.textContent = "-"; oSplit.textContent = "-"; oDrop.textContent = "-"; oPat.textContent = "-"; oNote.textContent = "-"; return; }
     oSticks.textContent = r.sticks + " (" + r.total_pieces + " pieces in " + r.size_count + " sizes)" + (r.at_theoretical_min ? " - at the material lower bound" : ", lower bound " + r.theoretical_min_sticks);
     oYield.textContent = fmt(r.yield_pct, 1) + "%";
@@ -1860,7 +1861,7 @@ function _renderSheetMetalGauge(inputRegion, outputRegion, citationEl) {
   const oIn = makeOutputLine(outputRegion, "Decimal thickness", "smg-out-in");
   const oNote = makeOutputLine(outputRegion, "Note", "smg-out-note");
   const update = debounce(() => {
-    const r = computeSheetMetalGauge({ gauge: Number(g.input.value) || 0, material: mat.select.value });
+    const r = computeSheetMetalGauge({ gauge: Number(g.input.value) || 0, material: mat.select.value }); stepsFor(outputRegion, inputRegion, ["gauge", "material"], r);
     if (r.error) { oIn.textContent = r.error; oNote.textContent = ""; return; }
     oIn.textContent = fmt(r.thickness_in, 4) + " in (" + fmt(r.thickness_mm, 2) + " mm)";
     oNote.textContent = r.note;

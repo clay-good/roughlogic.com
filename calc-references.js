@@ -4,7 +4,7 @@
 // author. Code documents (NEC, IPC, IRC, NFPA, etc.) are referenced by
 // section number only; no code text is reproduced.
 
-import { DEBOUNCE_MS, debounce, makeNumber, makeSelect, makeOutputLine, attachExampleButton, fmt } from "./ui-fields.js";
+import { DEBOUNCE_MS, debounce, makeNumber, makeSelect, makeOutputLine, attachExampleButton, fmt, stepsFor } from "./ui-fields.js";
 
 // --- Utility 114: Wire / Pipe / Gas Color Codes ---
 
@@ -586,7 +586,7 @@ function renderSalesTaxNexus(inputRegion, outputRegion, citationEl) {
   const out = document.createElement("dl"); outputRegion.appendChild(out);
   function refresh() {
     while (out.firstChild) out.removeChild(out.firstChild);
-    const r = computeSalesTaxNexus({ state: sel.select.value });
+    const r = computeSalesTaxNexus({ state: sel.select.value }); stepsFor(outputRegion, inputRegion, ["state"], r);
     if (r.error) { const dt = document.createElement("dt"); dt.textContent = r.error; out.appendChild(dt); return; }
     const rows = [
       ["Sales threshold", "$" + r.sales_threshold_usd.toLocaleString()],

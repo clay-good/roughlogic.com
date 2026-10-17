@@ -14,6 +14,7 @@ import {
   DEBOUNCE_MS, debounce, makeNumber, makeSelect,
   makeOutputLine, attachExampleButton, fmt,
   makeStepsPanel,
+  stepsFor,
 } from "./ui-fields.js";
 
 // v18 §7 contract guard (copied per-module; non-exported, no derivation-corpus row).
@@ -175,7 +176,7 @@ function renderRoofDrainSizing(inputRegion, outputRegion, citationEl) {
   const oLeader = makeOutputLine(outputRegion, "Vertical leader", "rd-out-leader");
   const oHoriz = makeOutputLine(outputRegion, "Horizontal storm drain", "rd-out-horiz");
   const update = debounce(() => {
-    const r = computeRoofDrainSizing({ roof_area: Number(area.input.value) || 0, rainfall_rate: Number(rain.input.value) || 0, drain_slope: slope.select.value });
+    const r = computeRoofDrainSizing({ roof_area: Number(area.input.value) || 0, rainfall_rate: Number(rain.input.value) || 0, drain_slope: slope.select.value }); stepsFor(outputRegion, inputRegion, ["roof_area", "rainfall_rate", "drain_slope"], r);
     if (r.error) { oGpm.textContent = r.error; oLeader.textContent = "-"; oHoriz.textContent = "-"; return; }
     oGpm.textContent = fmt(r.gpm, 1) + " GPM";
     oLeader.textContent = r.leader_in + " in" + (r.leader_over ? " (over table - increase pipe / split drains)" : "");
@@ -271,7 +272,7 @@ function renderSumpBasinSizing(inputRegion, outputRegion, citationEl) {
       pump_gpm: Number(pump.input.value) || 0,
       min_run_s: minRun.input.value === "" ? 60 : Number(minRun.input.value),
       discharge_in: Number(dis.select.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["basin_dia", "drawdown_in", "inflow_gpm", "pump_gpm", "min_run_s", "discharge_in"], r);
     if (r.error) { oVol.textContent = r.error; for (const o of [oRun, oFill, oCycles, oVerdict, oIpc]) o.textContent = "-"; return; }
     oVol.textContent = fmt(r.drawdown_gal, 1) + " gal";
     oRun.textContent = fmt(r.run_time_s, 1) + " s";
@@ -318,7 +319,7 @@ function renderOverflowScupperSizing(inputRegion, outputRegion, citationEl) {
   const oQ = makeOutputLine(outputRegion, "Capacity (suppressed: only an opening spanning the full channel width)", "oss-out-q");
   const oNote = makeOutputLine(outputRegion, "Note", "oss-out-n");
   const update = debounce(() => {
-    const r = computeOverflowScupperSizing({ length_in: Number(len.input.value) || 0, head_in: Number(head.input.value) || 0 });
+    const r = computeOverflowScupperSizing({ length_in: Number(len.input.value) || 0, head_in: Number(head.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["length_in", "head_in"], r);
     if (r.error) { oC.textContent = r.error; oQ.textContent = "-"; oNote.textContent = ""; return; }
     oQ.textContent = fmt(r.q_gpm, 0) + " gpm (" + fmt(r.q_cfs, 3) + " cfs)";
     oC.textContent = fmt(r.q_gpm_contracted, 0) + " gpm";
@@ -362,7 +363,7 @@ function renderScupperWidthForFlow(inputRegion, outputRegion, citationEl) {
   const oC = makeOutputLine(outputRegion, "Width (contracted / narrow scupper)", "swf-out-c");
   const oNote = makeOutputLine(outputRegion, "Note", "swf-out-n");
   const update = debounce(() => {
-    const r = computeScupperWidthForFlow({ required_gpm: Number(gpm.input.value) || 0, head_in: Number(head.input.value) || 0 });
+    const r = computeScupperWidthForFlow({ required_gpm: Number(gpm.input.value) || 0, head_in: Number(head.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["required_gpm", "head_in"], r);
     if (r.error) { oS.textContent = r.error; oC.textContent = "-"; oNote.textContent = ""; return; }
     oS.textContent = fmt(r.width_suppressed_in, 1) + " in (" + fmt(r.q_cfs, 3) + " cfs)";
     oC.textContent = fmt(r.width_contracted_in, 1) + " in";
@@ -397,7 +398,7 @@ function renderSewageForceMainVelocity(inputRegion, outputRegion, citationEl) {
   const oD = makeOutputLine(outputRegion, "Largest ID holding 2 ft/s", "sfm-out-d");
   const oNote = makeOutputLine(outputRegion, "Note", "sfm-out-n");
   const update = debounce(() => {
-    const r = computeSewageForceMainVelocity({ gpm: Number(q.input.value) || 0, id_in: Number(id.input.value) || 0 });
+    const r = computeSewageForceMainVelocity({ gpm: Number(q.input.value) || 0, id_in: Number(id.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["gpm", "id_in"], r);
     if (r.error) { oV.textContent = r.error; oD.textContent = "-"; oNote.textContent = ""; return; }
     oV.textContent = fmt(r.velocity_fps, 2) + " ft/s" + (r.scours ? " (scours -- OK)" : " (below 2 ft/s -- solids settle)");
     oD.textContent = fmt(r.d_max_scour_in, 2) + " in";
@@ -446,7 +447,7 @@ function _v976renderDrywellInfiltration(inputRegion, outputRegion, citationEl) {
     const r = computeDrywellInfiltration({
       runoff_volume_ft3: rv.input.value === "" ? 200 : Number(rv.input.value), void_ratio: vr.input.value === "" ? 0.35 : Number(vr.input.value),
       trench_depth_ft: td.input.value === "" ? 4 : Number(td.input.value), infiltration_rate_in_hr: ir.input.value === "" ? 0.5 : Number(ir.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["runoff_volume_ft3", "void_ratio", "trench_depth_ft", "infiltration_rate_in_hr"], r);
     if (r.error) { oE.textContent = r.error; oF.textContent = "-"; oD.textContent = "-"; return; }
     oE.textContent = fmt(r.excavation_volume_ft3, 0) + " ft^3 of stone-filled pit";
     oF.textContent = fmt(r.footprint_sf, 0) + " sf";
@@ -554,7 +555,7 @@ export function renderManningSlope(inputRegion, outputRegion, citationEl) {
       pipe_diameter_in: Number(d.input.value) || 0, target_flow_gpm: Number(f.input.value) || 0, material: m.select.value,
       scour_velocity_fps: sv.input.value === "" ? 2 : Number(sv.input.value),
       actual_slope_in_per_ft: as.input.value === "" ? 0 : Number(as.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["pipe_diameter_in", "target_flow_gpm", "material", "scour_velocity_fps", "actual_slope_in_per_ft"], r);
     if (r.error) { oSC.textContent = r.error; oFL.textContent = "-"; oAB.textContent = "-"; return; }
     oSC.textContent = fmt(r.slope_self_cleansing_in_per_ft, 4) + " in/ft at " + fmt(r.scour_velocity_fps, 2) + " ft/s";
     oFL.textContent = r.slope_for_flow_in_per_ft !== null ? fmt(r.slope_for_flow_in_per_ft, 4) + " in/ft" : "-";
@@ -597,7 +598,7 @@ function renderManningPipeCapacity(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "mpc-out-n");
   function fillExample(v) { d.input.value = v.d_in; s.input.value = v.slope; m.select.value = v.material; update(); }
   const update = debounce(() => {
-    const r = computeManningPipeCapacity({ d_in: Number(d.input.value) || 0, slope: Number(s.input.value) || 0, material: m.select.value });
+    const r = computeManningPipeCapacity({ d_in: Number(d.input.value) || 0, slope: Number(s.input.value) || 0, material: m.select.value }); stepsFor(outputRegion, inputRegion, ["d_in", "slope", "material"], r);
     if (r.error) { oQ.textContent = r.error; oV.textContent = "-"; oNote.textContent = "-"; return; }
     oQ.textContent = fmt(r.q_cfs, 2) + " cfs (" + fmt(r.q_gpm, 0) + " gpm)";
     oV.textContent = fmt(r.v_fps, 2) + " ft/s";
@@ -692,7 +693,7 @@ function _v1011renderPipePartialFlowDepth(inputRegion, outputRegion, citationEl)
       slope: Number(s.input.value) || 0,
       flow_gpm: Number(q.input.value) || 0,
       material: m.select.value,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["d_in", "slope", "flow_gpm", "material"], r);
     if (r.error) {
       oY.textContent = r.error;
       for (const o of [oDD, oV, oSC, oSH, oCap, oNote]) o.textContent = "-";
@@ -812,7 +813,7 @@ function renderTr55TimeOfConcentration(inputRegion, outputRegion, citationEl) {
       sheet_n: rd(sN.input), sheet_length_ft: rd(sL.input), p2_in: rd(p2.input), sheet_slope: rd(sS.input),
       shallow_surface: shSurf.select.value, shallow_length_ft: rd(shL.input), shallow_slope: rd(shS.input),
       channel_n: rd(cN.input), channel_hyd_radius_ft: rd(cR.input), channel_length_ft: rd(cL.input), channel_slope: rd(cS.input),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["sheet_n", "sheet_length_ft", "p2_in", "sheet_slope", "shallow_surface", "shallow_length_ft", "shallow_slope", "channel_n", "channel_hyd_radius_ft", "channel_length_ft", "channel_slope"], r);
     if (r.error) { oTc.textContent = r.error; oSeg.textContent = "-"; oVel.textContent = "-"; oNote.textContent = ""; return; }
     oTc.textContent = fmt(r.tc_min, 1) + " min (" + fmt(r.tc_hr, 3) + " hr)" + (r.sheet_over_100 ? " -- sheet length is over TR-55's 100 ft limit; this tc uses the full length, uncapped" : "");
     oSeg.textContent = fmt(r.tt_sheet_min, 1) + " / " + fmt(r.tt_shallow_min, 1) + " / " + fmt(r.tt_channel_min, 1) + " min";
@@ -871,7 +872,7 @@ function renderCurveNumberRunoff(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "cnr-out-note");
   const rd = (i) => (i.value === "" ? 0 : Number(i.value) || 0);
   const update = debounce(() => {
-    const r = computeCurveNumberRunoff({ rainfall_in: rd(p.input), curve_number: rd(cn.input), area_acres: rd(ac.input) });
+    const r = computeCurveNumberRunoff({ rainfall_in: rd(p.input), curve_number: rd(cn.input), area_acres: rd(ac.input) }); stepsFor(outputRegion, inputRegion, ["rainfall_in", "curve_number", "area_acres"], r);
     if (r.error) { oQ.textContent = r.error; oSIa.textContent = "-"; oVol.textContent = "-"; oNote.textContent = ""; return; }
     oQ.textContent = fmt(r.runoff_in, 3) + " in (" + fmt(r.runoff_coefficient * 100, 0) + "% of the " + fmt(rd(p.input), 2) + " in storm)";
     oSIa.textContent = fmt(r.retention_s_in, 3) + " in / " + fmt(r.initial_abstraction_in, 3) + " in";
@@ -977,7 +978,7 @@ function renderTr55GraphicalPeakDischarge(inputRegion, outputRegion, citationEl)
   const oNote = makeOutputLine(outputRegion, "Note", "tpd-out-note");
   const rd = (i) => (i.value === "" ? 0 : Number(i.value) || 0);
   const update = debounce(() => {
-    const r = computeTr55GraphicalPeakDischarge({ tc_hr: rd(tc.input), curve_number: rd(cn.input), rainfall_in: rd(p.input), area_mi2: rd(area.input), rainfall_type: type.select.value, pond_pct: rd(pond.input) });
+    const r = computeTr55GraphicalPeakDischarge({ tc_hr: rd(tc.input), curve_number: rd(cn.input), rainfall_in: rd(p.input), area_mi2: rd(area.input), rainfall_type: type.select.value, pond_pct: rd(pond.input) }); stepsFor(outputRegion, inputRegion, ["tc_hr", "curve_number", "rainfall_in", "area_mi2", "rainfall_type", "pond_pct"], r);
     if (r.error) { oQp.textContent = r.error; oQu.textContent = "-"; oIaP.textContent = "-"; oNote.textContent = ""; return; }
     oQp.textContent = fmt(r.qp_cfs, 0) + " cfs" + (r.runoff_in === 0 ? " (no runoff: storm below Ia)" : "");
     oQu.textContent = fmt(r.qu_csm_in, 0) + " csm/in / " + fmt(r.runoff_in, 2) + " in" + (r.tc_clamped ? " (Tc held at the 0.1-10 hr limit)" : "");
@@ -1045,7 +1046,7 @@ function renderTr55DetentionStorage(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "tds-out-note");
   const rd = (i) => (i.value === "" ? 0 : Number(i.value) || 0);
   const update = debounce(() => {
-    const r = computeTr55DetentionStorage({ qi_cfs: rd(qi.input), qo_cfs: rd(qo.input), runoff_in: rd(q.input), area_mi2: rd(area.input), rainfall_type: type.select.value });
+    const r = computeTr55DetentionStorage({ qi_cfs: rd(qi.input), qo_cfs: rd(qo.input), runoff_in: rd(q.input), area_mi2: rd(area.input), rainfall_type: type.select.value }); stepsFor(outputRegion, inputRegion, ["qi_cfs", "qo_cfs", "runoff_in", "area_mi2", "rainfall_type"], r);
     if (r.error) { oVs.textContent = r.error; oRatio.textContent = "-"; oVr.textContent = "-"; oNote.textContent = ""; return; }
     oVs.textContent = fmt(r.vs_acreft, 2) + " acre-ft (" + fmt(r.vs_ft3, 0) + " ft^3)" + (r.out_of_range ? " -- qo/qi outside the 0.1-0.8 chart range" : "");
     oRatio.textContent = fmt(r.vs_vr, 3) + " / " + fmt(r.qo_qi, 3);
@@ -1104,7 +1105,7 @@ function renderCompositeCurveNumber(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "ccn-out-note");
   const rd = (i) => (i.value === "" ? 0 : Number(i.value) || 0);
   const update = debounce(() => {
-    const r = computeCompositeCurveNumber({ pervious_cn: rd(cnp.input), impervious_pct: rd(pimp.input), connection: conn.select.value, unconnected_ratio: rd(rr.input) });
+    const r = computeCompositeCurveNumber({ pervious_cn: rd(cnp.input), impervious_pct: rd(pimp.input), connection: conn.select.value, unconnected_ratio: rd(rr.input) }); stepsFor(outputRegion, inputRegion, ["pervious_cn", "impervious_pct", "connection", "unconnected_ratio"], r);
     if (r.error) { oCN.textContent = r.error; oAdd.textContent = "-"; oNote.textContent = ""; return; }
     oCN.textContent = fmt(r.composite_cn, 1) + (r.unconnected_out_of_range ? " -- WARNING: figure 2-4 needs impervious under 30%; treat as connected" : "");
     oAdd.textContent = "+" + fmt(r.impervious_add, 1) + " CN (from " + fmt(r.pervious_cn, 0) + " pervious)";
@@ -1207,7 +1208,7 @@ function renderCulvertInletControl(inputRegion, outputRegion, citationEl) {
       flow_cfs: Number(q.input.value) || 0,
       slope: s.input.value === "" ? 0 : Number(s.input.value) || 0,
       config: cfg.select.value,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["diameter_in", "flow_cfs", "slope", "config"], r);
     if (r.error) {
       oHW.textContent = r.error;
       for (const o of [oHWD, oReg, oDc, oNote]) o.textContent = "-";
@@ -1307,7 +1308,7 @@ function renderBoxCulvertInletControl(inputRegion, outputRegion, citationEl) {
       flow_cfs: Number(q.input.value) || 0,
       slope: s.input.value === "" ? 0 : Number(s.input.value) || 0,
       config: cfg.select.value,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["span_in", "rise_in", "flow_cfs", "slope", "config"], r);
     if (r.error) {
       oHW.textContent = r.error;
       for (const o of [oHWD, oReg, oDc, oNote]) o.textContent = "-";
@@ -1422,7 +1423,7 @@ function renderCulvertOutletControl(inputRegion, outputRegion, citationEl) {
       manning_n: Number(n.input.value) || 0,
       tw_ft: tw.input.value === "" ? 0 : Number(tw.input.value) || 0,
       config: cfg.select.value,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["diameter_in", "flow_cfs", "length_ft", "slope", "manning_n", "tw_ft", "config"], r);
     if (r.error) {
       oHW.textContent = r.error;
       for (const o of [oH, oV, oHo, oNote]) o.textContent = "-";
@@ -1523,7 +1524,7 @@ function renderBoxCulvertOutletControl(inputRegion, outputRegion, citationEl) {
       manning_n: Number(n.input.value) || 0,
       tw_ft: tw.input.value === "" ? 0 : Number(tw.input.value) || 0,
       config: cfg.select.value,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["span_in", "rise_in", "flow_cfs", "length_ft", "slope", "manning_n", "tw_ft", "config"], r);
     if (r.error) {
       oHW.textContent = r.error;
       for (const o of [oH, oV, oHo, oNote]) o.textContent = "-";
@@ -1597,7 +1598,7 @@ function renderCulvertHeadwater(inputRegion, outputRegion, citationEl) {
       manning_n: Number(n.input.value) || 0,
       tw_ft: tw.input.value === "" ? 0 : Number(tw.input.value) || 0,
       config: cfg.select.value,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["diameter_in", "flow_cfs", "slope", "length_ft", "manning_n", "tw_ft", "config"], r);
     if (r.error) {
       oGov.textContent = r.error;
       for (const o of [oCtl, oIn, oOut, oNote]) o.textContent = "-";
@@ -1680,7 +1681,7 @@ function renderBoxCulvertHeadwater(inputRegion, outputRegion, citationEl) {
       manning_n: Number(n.input.value) || 0,
       tw_ft: tw.input.value === "" ? 0 : Number(tw.input.value) || 0,
       config: cfg.select.value,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["span_in", "rise_in", "flow_cfs", "slope", "length_ft", "manning_n", "tw_ft", "config"], r);
     if (r.error) {
       oGov.textContent = r.error;
       for (const o of [oCtl, oIn, oOut, oNote]) o.textContent = "-";

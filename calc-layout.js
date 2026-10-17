@@ -21,6 +21,7 @@
 import {
   DEBOUNCE_MS, debounce, makeNumber, makeSelect,
   makeOutputLine, attachExampleButton, fmt,
+  stepsFor,
 } from "./ui-fields.js";
 
 const _finiteGuard = (o) => {
@@ -105,7 +106,7 @@ function _v27renderCenterOfGravity2Point(inputRegion, outputRegion, citationEl) 
       span_ft: Number(span.input.value) || 0,
       total_weight_lb: Number(w.input.value) || 0,
       cg_from_1_ft: Number(cg.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["mode", "reading_1_lb", "reading_2_lb", "span_ft", "total_weight_lb", "cg_from_1_ft"], r);
     if (r.error) { oW.textContent = r.error; oCG.textContent = "-"; oPct.textContent = "-"; oNote.textContent = ""; return; }
     oW.textContent = fmt(r.total_weight_lb, 1) + " lb";
     oCG.textContent = fmt(r.cg_from_point_1_ft, 3) + " ft";
@@ -155,7 +156,7 @@ function renderTriangleSas(inputRegion, outputRegion, citationEl) {
   const oR = makeOutputLine(outputRegion, "Area", "tsas-out-r");
   const oNote = makeOutputLine(outputRegion, "Note", "tsas-out-note");
   const update = debounce(() => {
-    const r = computeTriangleSas({ side_a: Number(a.input.value) || 0, side_b: Number(b.input.value) || 0, included_angle_deg: Number(C.input.value) || 0 });
+    const r = computeTriangleSas({ side_a: Number(a.input.value) || 0, side_b: Number(b.input.value) || 0, included_angle_deg: Number(C.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["side_a", "side_b", "included_angle_deg"], r);
     if (r.error) { oC.textContent = r.error; oA.textContent = "-"; oR.textContent = "-"; oNote.textContent = ""; return; }
     oC.textContent = fmt(r.side_c, 4) + (r.is_right ? " (right angle: Pythagorean)" : "");
     oA.textContent = fmt(r.angle_a_deg, 2) + " deg opposite a / " + fmt(r.angle_b_deg, 2) + " deg opposite b";
@@ -208,7 +209,7 @@ function renderTriangleSss(inputRegion, outputRegion, citationEl) {
   const oS = makeOutputLine(outputRegion, "Square corner?", "tsss-out-s");
   const oNote = makeOutputLine(outputRegion, "Note", "tsss-out-note");
   const update = debounce(() => {
-    const r = computeTriangleSss({ side_a: Number(a.input.value) || 0, side_b: Number(b.input.value) || 0, side_c: Number(c.input.value) || 0 });
+    const r = computeTriangleSss({ side_a: Number(a.input.value) || 0, side_b: Number(b.input.value) || 0, side_c: Number(c.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["side_a", "side_b", "side_c"], r);
     if (r.error) { oA.textContent = r.error; oR.textContent = "-"; oS.textContent = "-"; oNote.textContent = ""; return; }
     oA.textContent = fmt(r.angle_a_deg, 2) + " / " + fmt(r.angle_b_deg, 2) + " / " + fmt(r.angle_c_deg, 2) + " deg (opposite a / b / c)";
     oR.textContent = fmt(r.area, 4) + " (square units)";
@@ -256,7 +257,7 @@ function renderTriangleAsa(inputRegion, outputRegion, citationEl) {
   const oR = makeOutputLine(outputRegion, "Area", "tasa-out-r");
   const oNote = makeOutputLine(outputRegion, "Note", "tasa-out-note");
   const update = debounce(() => {
-    const r = computeTriangleAsa({ angle_a_deg: Number(A.input.value) || 0, angle_b_deg: Number(B.input.value) || 0, included_side_c: Number(c.input.value) || 0 });
+    const r = computeTriangleAsa({ angle_a_deg: Number(A.input.value) || 0, angle_b_deg: Number(B.input.value) || 0, included_side_c: Number(c.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["angle_a_deg", "angle_b_deg", "included_side_c"], r);
     if (r.error) { oC.textContent = r.error; oS.textContent = "-"; oR.textContent = "-"; oNote.textContent = ""; return; }
     oC.textContent = fmt(r.angle_c_deg, 2) + " deg";
     oS.textContent = fmt(r.side_a, 4) + " opposite A / " + fmt(r.side_b, 4) + " opposite B";
@@ -315,7 +316,7 @@ function renderTriangleSsa(inputRegion, outputRegion, citationEl) {
   const oR = makeOutputLine(outputRegion, "Area", "tssa-out-r");
   const oNote = makeOutputLine(outputRegion, "Note", "tssa-out-note");
   const update = debounce(() => {
-    const r = computeTriangleSsa({ angle_a_deg: Number(A.input.value) || 0, side_a: Number(a.input.value) || 0, side_b: Number(b.input.value) || 0 });
+    const r = computeTriangleSsa({ angle_a_deg: Number(A.input.value) || 0, side_a: Number(a.input.value) || 0, side_b: Number(b.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["angle_a_deg", "side_a", "side_b"], r);
     if (r.error) { oN.textContent = r.error; o1.textContent = "-"; o2.textContent = "-"; oR.textContent = "-"; oNote.textContent = ""; return; }
     oN.textContent = r.solutions === 2 ? "2 (ambiguous: height " + fmt(r.height, 4) + " < a < b)" : "1";
     o1.textContent = fmt(r.angle_b_deg, 2) + " / " + fmt(r.angle_c_deg, 2) + " deg, third side " + fmt(r.side_c, 4);
@@ -372,7 +373,7 @@ function _v32renderBoltCircle(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Notes", "bc-out-note");
   function readNum(i) { if (i.value === "") return 0; const v = Number(i.value); return Number.isFinite(v) ? v : 0; }
   const update = debounce(() => {
-    const r = computeBoltCircle({ bolt_circle_dia_in: readNum(dia.input), num_holes: readNum(n.input), start_angle_deg: readNum(start.input), center_x_in: readNum(cx.input), center_y_in: readNum(cy.input) });
+    const r = computeBoltCircle({ bolt_circle_dia_in: readNum(dia.input), num_holes: readNum(n.input), start_angle_deg: readNum(start.input), center_x_in: readNum(cx.input), center_y_in: readNum(cy.input) }); stepsFor(outputRegion, inputRegion, ["bolt_circle_dia_in", "num_holes", "start_angle_deg", "center_x_in", "center_y_in"], r);
     if (r.error) { oSpacing.textContent = r.error; oCoords.textContent = "-"; oNote.textContent = ""; return; }
     oSpacing.textContent = fmt(r.angular_spacing_deg, 3) + " deg apart; chord " + (r.chord_in === null ? "(single hole)" : fmt(r.chord_in, 3) + " in") + " (R " + fmt(r.radius_in, 3) + " in)";
     oCoords.textContent = r.holes.map((h) => h.n + ": (" + fmt(h.x_in, 3) + ", " + fmt(h.y_in, 3) + ")").join("   ");
@@ -435,7 +436,7 @@ function _v33renderDecimalToFraction(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Notes", "d2f-out-note");
   const update = debounce(() => {
     const v = value.input.value === "" ? NaN : Number(value.input.value);
-    const r = computeDecimalToFraction({ value_in: Number.isFinite(v) ? v : NaN, denominator: Number(den.select.value) });
+    const r = computeDecimalToFraction({ value_in: Number.isFinite(v) ? v : NaN, denominator: Number(den.select.value) }); stepsFor(outputRegion, inputRegion, ["value_in", "denominator"], r);
     if (r.error) { oFrac.textContent = r.error; oFeet.textContent = "-"; oErr.textContent = "-"; oNote.textContent = ""; return; }
     oFrac.textContent = r.fraction_text;
     oFeet.textContent = r.feet_inch_text;
@@ -495,7 +496,7 @@ function _v37renderSineBar(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Notes", "sb-out-note");
   function readNum(i) { if (i.value === "") return 0; const v = Number(i.value); return Number.isFinite(v) ? v : 0; }
   const update = debounce(() => {
-    const r = computeSineBar({ solve_for: mode.select.value, bar_length_in: readNum(len.input), stack_height_in: readNum(stack.input), target_angle_deg: readNum(angle.input) });
+    const r = computeSineBar({ solve_for: mode.select.value, bar_length_in: readNum(len.input), stack_height_in: readNum(stack.input), target_angle_deg: readNum(angle.input) }); stepsFor(outputRegion, inputRegion, ["solve_for", "bar_length_in", "stack_height_in", "target_angle_deg"], r);
     if (r.error) { oAngle.textContent = r.error; oStack.textContent = "-"; oNote.textContent = ""; return; }
     oAngle.textContent = fmt(r.angle_deg, 4) + " deg";
     oStack.textContent = fmt(r.stack_height_in, 4) + " in";
@@ -568,7 +569,7 @@ function _v38renderThreadPitch(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Notes", "tp-out-note");
   function readNum(i) { if (i.value === "") return 0; const v = Number(i.value); return Number.isFinite(v) ? v : 0; }
   const update = debounce(() => {
-    const r = computeThreadPitch({ thread_standard: std.select.value, tpi: readNum(tpi.input), pitch_mm: readNum(pmm.input), starts: readNum(starts.input) });
+    const r = computeThreadPitch({ thread_standard: std.select.value, tpi: readNum(tpi.input), pitch_mm: readNum(pmm.input), starts: readNum(starts.input) }); stepsFor(outputRegion, inputRegion, ["thread_standard", "tpi", "pitch_mm", "starts"], r);
     if (r.error) { oPitch.textContent = r.error; oTpi.textContent = "-"; oLead.textContent = "-"; oHeight.textContent = "-"; oNote.textContent = ""; return; }
     oPitch.textContent = fmt(r.pitch_in, 5) + " in / " + fmt(r.pitch_mm, 4) + " mm";
     oTpi.textContent = fmt(r.tpi, 3) + " TPI";
@@ -623,7 +624,7 @@ function renderCircularArc(inputRegion, outputRegion, citationEl) {
   const oAngle = makeOutputLine(outputRegion, "Central angle", "ca-out-angle");
   const oNote = makeOutputLine(outputRegion, "Notes", "ca-out-note");
   const update = debounce(() => {
-    const r = computeCircularArc({ chord_in: Number(chord.input.value) || 0, rise_in: Number(rise.input.value) || 0 });
+    const r = computeCircularArc({ chord_in: Number(chord.input.value) || 0, rise_in: Number(rise.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["chord_in", "rise_in"], r);
     if (r.error) { oRad.textContent = r.error; oArc.textContent = "-"; oAngle.textContent = "-"; oNote.textContent = ""; return; }
     oRad.textContent = fmt(r.radius_in, 4) + " in (diameter " + fmt(r.diameter_in, 4) + " in)";
     oArc.textContent = fmt(r.arc_length_in, 4) + " in";
@@ -666,7 +667,7 @@ function renderCircularSegmentArea(inputRegion, outputRegion, citationEl) {
   const oRad = makeOutputLine(outputRegion, "Radius / central angle", "cs-out-rad");
   const oNote = makeOutputLine(outputRegion, "Note", "cs-out-note");
   const update = debounce(() => {
-    const r = computeCircularSegmentArea({ chord_in: Number(chord.input.value) || 0, rise_in: Number(rise.input.value) || 0 });
+    const r = computeCircularSegmentArea({ chord_in: Number(chord.input.value) || 0, rise_in: Number(rise.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["chord_in", "rise_in"], r);
     if (r.error) { oArea.textContent = r.error; oRad.textContent = "-"; oNote.textContent = ""; return; }
     oArea.textContent = fmt(r.segment_area_in2, 3) + " in^2";
     oRad.textContent = fmt(r.radius_in, 4) + " in / " + fmt(r.central_angle_deg, 3) + " deg";
@@ -712,7 +713,7 @@ function renderCircularArcRiseFromRadius(inputRegion, outputRegion, citationEl) 
   const oAngle = makeOutputLine(outputRegion, "Central angle", "car-out-angle");
   const oNote = makeOutputLine(outputRegion, "Notes", "car-out-note");
   const update = debounce(() => {
-    const r = computeCircularArcRiseFromRadius({ chord_in: Number(chord.input.value) || 0, radius_in: Number(radius.input.value) || 0 });
+    const r = computeCircularArcRiseFromRadius({ chord_in: Number(chord.input.value) || 0, radius_in: Number(radius.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["chord_in", "radius_in"], r);
     if (r.error) { oRise.textContent = r.error; oArc.textContent = "-"; oAngle.textContent = "-"; oNote.textContent = ""; return; }
     oRise.textContent = fmt(r.rise_in, 4) + " in";
     oArc.textContent = fmt(r.arc_length_in, 4) + " in";
@@ -774,7 +775,7 @@ function renderCircleFrom3Points(inputRegion, outputRegion, citationEl) {
       x1: Number(x1.input.value) || 0, y1: Number(y1.input.value) || 0,
       x2: Number(x2.input.value) || 0, y2: Number(y2.input.value) || 0,
       x3: Number(x3.input.value) || 0, y3: Number(y3.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["x1", "y1", "x2", "y2", "x3", "y3"], r);
     if (r.error) { oCenter.textContent = r.error; oRad.textContent = "-"; oCirc.textContent = "-"; oNote.textContent = ""; return; }
     oCenter.textContent = "(" + fmt(r.center_x, 4) + ", " + fmt(r.center_y, 4) + ")";
     oRad.textContent = fmt(r.radius, 4);
@@ -843,7 +844,7 @@ function _v55renderPolygonMiter(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Notes", "pm-out-note");
   function readNum(i) { if (i.value === "") return 0; const v = Number(i.value); return Number.isFinite(v) ? v : 0; }
   const update = debounce(() => {
-    const r = computePolygonMiter({ sides: readNum(n.input), size_mode: mode.select.value, size_in: readNum(size.input) });
+    const r = computePolygonMiter({ sides: readNum(n.input), size_mode: mode.select.value, size_in: readNum(size.input) }); stepsFor(outputRegion, inputRegion, ["sides", "size_mode", "size_in"], r);
     if (r.error) { oMiter.textContent = r.error; oSide.textContent = "-"; oSize.textContent = "-"; oArea.textContent = "-"; oNote.textContent = ""; return; }
     oMiter.textContent = fmt(r.miter_angle_deg, 3) + " deg miter (off square) at each end; interior " + fmt(r.interior_angle_deg, 3) + " deg";
     oSide.textContent = fmt(r.side_in, 4) + " in x " + r.sides + " pieces";
@@ -932,7 +933,7 @@ function _v57renderEqualSpacing(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Notes", "es-out-note");
   function readNum(i) { if (i.value === "") return 0; const v = Number(i.value); return Number.isFinite(v) ? v : 0; }
   const update = debounce(() => {
-    const r = computeEqualSpacing({ run_in: readNum(run.input), item_width_in: readNum(w.input), mode: mode.select.value, max_gap_in: readNum(gmax.input), count: readNum(count.input) });
+    const r = computeEqualSpacing({ run_in: readNum(run.input), item_width_in: readNum(w.input), mode: mode.select.value, max_gap_in: readNum(gmax.input), count: readNum(count.input) }); stepsFor(outputRegion, inputRegion, ["run_in", "item_width_in", "mode", "max_gap_in", "count"], r);
     if (r.error) { oCount.textContent = r.error; oCC.textContent = "-"; oPos.textContent = "-"; oNote.textContent = ""; return; }
     oCount.textContent = r.count + (r.item_width_in > 0 ? " item(s)" : " mark(s)") + ", gap " + fmt(r.gap_in, 4) + " in" + (r.fits ? "" : " (does not fit)");
     oCC.textContent = r.item_width_in > 0 ? fmt(r.center_to_center_in, 4) + " in pitch" : "(marks only)";

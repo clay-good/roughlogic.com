@@ -348,6 +348,7 @@ import {
   DEBOUNCE_MS, debounce, makeNumber, makeText, makeSelect, makeCheckbox,
   makeOutputLine, attachExampleButton, fmt,
   makeStepsPanel,
+  stepsFor,
 } from "./ui-fields.js";
 import { hazenWilliamsFrictionLoss } from "./pure-math.js";
 import { renderLimitationBanner, getLimitationCopy } from "./limitation-banner.js";
@@ -429,7 +430,7 @@ export function renderMaterialCost(inputRegion, outputRegion, citationEl) {
       quantity: Number(q.input.value) || 0,
       tax_rate_percent: Number(t.input.value) || 0,
       delivery_fee: Number(d.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["unit_price", "quantity", "tax_rate_percent", "delivery_fee"], r);
     if (r.error) { oS.textContent = r.error; oT.textContent = "-"; oTotal.textContent = "-"; return; }
     oS.textContent = "$" + fmt(r.subtotal, 2);
     oT.textContent = "$" + fmt(r.tax, 2);
@@ -455,7 +456,7 @@ export function renderMarkup(inputRegion, outputRegion, citationEl) {
   const oMar = makeOutputLine(outputRegion, "Margin", "mu-out-mar");
   const oProf = makeOutputLine(outputRegion, "Profit", "mu-out-prof");
   const update = debounce(() => {
-    const r = computeMarkup({ cost: Number(c.input.value) || 0, mode: mode.select.value, value: Number(v.input.value) || 0 });
+    const r = computeMarkup({ cost: Number(c.input.value) || 0, mode: mode.select.value, value: Number(v.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["cost", "mode", "value"], r);
     if (r.error) { oP.textContent = r.error; oM.textContent = "-"; oMar.textContent = "-"; oProf.textContent = "-"; return; }
     oP.textContent = "$" + fmt(r.selling_price, 2);
     oM.textContent = fmt(r.markup_percent, 2) + " %";
@@ -490,7 +491,7 @@ export function renderTimeAndMaterials(inputRegion, outputRegion, citationEl) {
       material_cost: Number(m.input.value) || 0,
       overhead_percent: Number(o.input.value) || 0,
       profit_percent: Number(pr.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["hours", "labor_rate_per_hour", "material_cost", "overhead_percent", "profit_percent"], x);
     oL.textContent = "$" + fmt(x.labor, 2);
     oM.textContent = "$" + fmt(x.material_cost, 2);
     oOv.textContent = "$" + fmt(x.overhead, 2);
@@ -517,7 +518,7 @@ export function renderSalesTax(inputRegion, outputRegion, citationEl) {
       state: st.select.value,
       subtotal: Number(sub.input.value) || 0,
       custom_rate_percent: cust.input.value === "" ? null : Number(cust.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["state", "subtotal", "custom_rate_percent"], r);
     if (r.error) { oR.textContent = r.error; oT.textContent = "-"; oTotal.textContent = "-"; return; }
     oR.textContent = fmt(r.rate_percent, 3) + " %";
     oT.textContent = "$" + fmt(r.tax, 2);
@@ -567,7 +568,7 @@ export function renderTipOut(inputRegion, outputRegion, citationEl) {
   function update() {
     while (summary.firstChild) summary.removeChild(summary.firstChild);
     const members = rows.map((r) => ({ name: r.name.value, hours: Number(r.hours.value) || 0 }));
-    const r = computeTipOut({ total_amount: Number(total.input.value) || 0, members });
+    const r = computeTipOut({ total_amount: Number(total.input.value) || 0, members }); stepsFor(outputRegion, inputRegion, ["total_amount", "members"], r);
     if (r.error) {
       const p = document.createElement("p"); p.textContent = r.error; summary.appendChild(p); return;
     }
@@ -938,7 +939,7 @@ export function renderLoanPayment(inputRegion, outputRegion, citationEl) {
   const oM = makeOutputLine(outputRegion, "Monthly payment", "lp-out-m");
   const oI = makeOutputLine(outputRegion, "Total interest", "lp-out-i");
   const update = debounce(() => {
-    const r = computeLoanPayment({ principal: Number(P.input.value) || 0, apr_percent: Number(apr.input.value) || 0, term_months: Number(n.input.value) || 0 });
+    const r = computeLoanPayment({ principal: Number(P.input.value) || 0, apr_percent: Number(apr.input.value) || 0, term_months: Number(n.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["principal", "apr_percent", "term_months"], r);
     if (r.error) { oM.textContent = r.error; oI.textContent = "-"; return; }
     oM.textContent = "$" + fmt(r.monthly_payment, 2);
     oI.textContent = "$" + fmt(r.total_interest, 2);
@@ -965,7 +966,7 @@ export function renderUpgradeROI(inputRegion, outputRegion, citationEl) {
       annual_savings: Number(s.input.value) || 0,
       discount_rate_percent: Number(d.input.value) || 0,
       years: Number(y.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["incremental_cost", "annual_savings", "discount_rate_percent", "years"], r);
     if (r.error) { oP.textContent = r.error; oN.textContent = "-"; return; }
     oP.textContent = fmt(r.simple_payback_yr, 2) + " yr";
     oN.textContent = "$" + fmt(r.npv_dollars, 2) + " over " + Math.floor(Number(y.input.value) || 0) + " years";
@@ -992,7 +993,7 @@ export function renderMileageCost(inputRegion, outputRegion, citationEl) {
       mpg: Number(mpg.input.value) || 0,
       fuel_price_per_gallon: Number(p.input.value) || 0,
       irs_rate_per_mile: Number(irs.input.value) || IRS_STANDARD_MILEAGE_RATE,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["round_trip_miles", "mpg", "fuel_price_per_gallon", "irs_rate_per_mile"], r);
     if (r.error) { oG.textContent = r.error; oC.textContent = "-"; oR.textContent = "-"; return; }
     oG.textContent = fmt(r.gallons, 3) + " gal";
     oC.textContent = "$" + fmt(r.fuel_cost, 2);
@@ -1025,7 +1026,7 @@ export function renderOvertime(inputRegion, outputRegion, citationEl) {
       overtime_multiplier: Number(om.input.value) || 1.5,
       double_time_multiplier: Number(dm.input.value) || 2.0,
       double_time_threshold_hr: Number(dt.input.value) || 60,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["total_hours", "regular_rate", "overtime_multiplier", "double_time_multiplier", "double_time_threshold_hr"], x);
     if (x.error) { oR.textContent = x.error; oO.textContent = "-"; oD.textContent = "-"; oG.textContent = "-"; return; }
     oR.textContent = "$" + fmt(x.regular_pay, 2) + " (" + fmt(x.regular_hours, 1) + " hr)";
     oO.textContent = "$" + fmt(x.overtime_pay, 2) + " (" + fmt(x.overtime_hours, 1) + " hr)";
@@ -1047,7 +1048,7 @@ export function renderPerDiem(inputRegion, outputRegion, citationEl) {
   attachExampleButton(inputRegion, () => { s.select.value = "TX"; t.select.value = "m_and_ie"; update(); });
   const oR = makeOutputLine(outputRegion, "Per-diem rate", "pd-out-r");
   const update = debounce(() => {
-    const r = computePerDiem({ state: s.select.value, type: t.select.value });
+    const r = computePerDiem({ state: s.select.value, type: t.select.value }); stepsFor(outputRegion, inputRegion, ["state", "type"], r);
     if (r.error) { oR.textContent = r.error; return; }
     oR.textContent = "$" + fmt(r.rate_dollars, 0) + " per day (" + r.type + ", " + r.state + ")";
   }, DEBOUNCE_MS);
@@ -1082,7 +1083,7 @@ export function renderGeometry(inputRegion, outputRegion, citationEl) {
     else if (sh === "hexagon") args = { side: aV };
     else if (sh === "sphere") args = { radius: aV };
     else args = {};
-    const r = computeGeometry({ shape: sh, ...args });
+    const r = computeGeometry({ shape: sh, ...args }); stepsFor(outputRegion, inputRegion, null, r);
     if (r.error) { o1.textContent = r.error; o2.textContent = "-"; o3.textContent = "-"; return; }
     if (sh === "circle") {
       o1.textContent = "Circumference " + fmt(r.circumference, 3);
@@ -1120,7 +1121,7 @@ export function renderDilution(inputRegion, outputRegion, citationEl) {
       concentrate_percent: Number(c.input.value) || 0,
       target_percent: Number(t.input.value) || 0,
       final_volume: Number(v.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["concentrate_percent", "target_percent", "final_volume"], r);
     if (r.error) { oC.textContent = r.error; oD.textContent = "-"; return; }
     oC.textContent = fmt(r.concentrate_volume, 4);
     oD.textContent = fmt(r.diluent_volume, 4);
@@ -1143,7 +1144,7 @@ export function renderSlopeFromLevel(inputRegion, outputRegion, citationEl) {
   const oP = makeOutputLine(outputRegion, "Percent", "sl-out-p");
   const oI = makeOutputLine(outputRegion, "Inches per foot", "sl-out-i");
   const update = debounce(() => {
-    const r = computeSlopeFromLevel({ value: Number(v.input.value), from: f.select.value });
+    const r = computeSlopeFromLevel({ value: Number(v.input.value), from: f.select.value }); stepsFor(outputRegion, inputRegion, ["value", "from"], r);
     if (r.error) { oD.textContent = r.error; oP.textContent = "-"; oI.textContent = "-"; return; }
     oD.textContent = fmt(r.degrees, 4);
     oP.textContent = fmt(r.percent, 4);
@@ -1169,7 +1170,7 @@ export function renderHaversineDistance(inputRegion, outputRegion, citationEl) {
     const r = computeHaversineDistance({
       lat1: Number(a1.input.value) || 0, lon1: Number(o1.input.value) || 0,
       lat2: Number(a2.input.value) || 0, lon2: Number(o2.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["lat1", "lon1", "lat2", "lon2"], r);
     oM.textContent = fmt(r.miles, 2);
     oK.textContent = fmt(r.kilometers, 2);
     oB.textContent = fmt(r.initial_bearing_deg, 2);
@@ -1760,7 +1761,7 @@ function renderRainwaterYield(inputRegion, outputRegion, citationEl) {
     update();
   }
   const update = _debG(() => {
-    const r = computeRainwaterYield({ catchment_ft2: Number(a.input.value) || 0, efficiency: Number(e.input.value) || 0.85, annual_in: Number(an.input.value) || 0 });
+    const r = computeRainwaterYield({ catchment_ft2: Number(a.input.value) || 0, efficiency: Number(e.input.value) || 0.85, annual_in: Number(an.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["catchment_ft2", "efficiency", "annual_in"], r);
     if (r.error) { oA.textContent = r.error; return; }
     oA.textContent = _fmtG(r.annual_gal, 0) + " gal";
   }, _DG);
@@ -1778,7 +1779,7 @@ function renderRainwaterCatchmentArea(inputRegion, outputRegion, citationEl) {
   const oA = _moG(outputRegion, "Catchment area needed", "rwca-out-a");
   const oN = _moG(outputRegion, "Note", "rwca-out-n");
   const update = _debG(() => {
-    const r = computeRainwaterCatchmentArea({ target_annual_gal: Number(g.input.value) || 0, annual_in: Number(an.input.value) || 0, efficiency: e.input.value === "" ? 0.85 : Number(e.input.value) });
+    const r = computeRainwaterCatchmentArea({ target_annual_gal: Number(g.input.value) || 0, annual_in: Number(an.input.value) || 0, efficiency: e.input.value === "" ? 0.85 : Number(e.input.value) }); stepsFor(outputRegion, inputRegion, ["target_annual_gal", "annual_in", "efficiency"], r);
     if (r.error) { oA.textContent = r.error; oN.textContent = ""; return; }
     oA.textContent = _fmtG(r.catchment_ft2, 0) + " ft^2";
     oN.textContent = r.note;
@@ -1822,7 +1823,7 @@ function renderTimesheet(inputRegion, outputRegion, citationEl) {
   function update() {
     const jobs = rows.map((r) => ({ start_hr: Number(r.s.value) || 0, end_hr: Number(r.e.value) || 0, lunch_min: Number(r.l.value) || 0, miles: Number(r.m.value) || 0 })).filter((j) => j.end_hr > j.start_hr);
     if (jobs.length === 0) { oH.textContent = "-"; oR.textContent = "-"; oP.textContent = "-"; oM.textContent = "-"; return; }
-    const r = computeTimesheet({ jobs, regular_rate: Number(rate.input.value) || 0 });
+    const r = computeTimesheet({ jobs, regular_rate: Number(rate.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["jobs", "regular_rate"], r);
     if (r.error) { oH.textContent = r.error; return; }
     oH.textContent = _fmtG(r.total_hours, 2) + " hr";
     oR.textContent = _fmtG(r.regular_hours, 2) + " / " + _fmtG(r.overtime_hours, 2) + " hr";
@@ -1984,7 +1985,7 @@ function _v7x_renderFallProtection(inputRegion, outputRegion, citationEl) {
       harness_stretch_ft: (hs.input.value === "" ? 1 : Number(hs.input.value)),
       safety_factor_ft: (sf.input.value === "" ? 1 : Number(sf.input.value)),
       actual_clearance_ft: Number(ac.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["connector", "free_fall_ft_override", "decel_ft_override", "worker_height_ft", "harness_stretch_ft", "safety_factor_ft", "actual_clearance_ft"], r);
     if (r.error) { oR.textContent = r.error; oRem.textContent = "-"; oF.textContent = "-"; return; }
     oR.textContent = _v7x_fmt(r.required_clearance_ft, 1) + " ft (free-fall " + _v7x_fmt(r.free_fall_ft, 1) + " + decel " + _v7x_fmt(r.decel_ft, 1) + ")";
     oRem.textContent = _v7x_fmt(r.remaining_clearance_ft, 1) + " ft";
@@ -2140,7 +2141,7 @@ function renderNoiseDose(inputRegion, outputRegion, citationEl) {
       oD.textContent = "(enter at least one row)"; oTWA.textContent = ""; oAL.textContent = ""; oPEL.textContent = ""; oW.textContent = "";
       return;
     }
-    const r = computeNoiseDose({ rows });
+    const r = computeNoiseDose({ rows }); stepsFor(outputRegion, inputRegion, ["rows"], r);
     if (r.error) {
       oD.textContent = r.error; oTWA.textContent = ""; oAL.textContent = ""; oPEL.textContent = ""; oW.textContent = "";
       return;
@@ -2277,7 +2278,7 @@ function renderPumpTdh(inputRegion, outputRegion, citationEl) {
       suction_length_ft: readNum(sLen.input),
       discharge_length_ft: readNum(dLen.input),
       fittings_equiv_length_ft: readNum(fLen.input),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["flow_gpm", "internal_diameter_in", "hw_c", "static_suction_lift_ft", "static_discharge_head_ft", "suction_length_ft", "discharge_length_ft", "fittings_equiv_length_ft"], r);
     if (r.error) {
       oTdh.textContent = r.error; oStatic.textContent = ""; oFric.textContent = ""; oVel.textContent = ""; oW.textContent = "";
       return;
@@ -2400,7 +2401,7 @@ function renderHydraulicCylinder(inputRegion, outputRegion, citationEl) {
       flow_gpm: readNum(flow.input),
       direction: dir.select.value,
       stroke_in: readNum(stroke.input),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["bore_in", "rod_in", "pressure_psi", "flow_gpm", "direction", "stroke_in"], r);
     if (r.error) {
       oForce.textContent = r.error; oArea.textContent = ""; oSpeed.textContent = ""; oOil.textContent = ""; oCycle.textContent = ""; oW.textContent = "";
       return;
@@ -2538,7 +2539,7 @@ function renderVbeltDrive(inputRegion, outputRegion, citationEl) {
       center_distance_in: readNum(C.input),
       belt_section: sect.select.value,
       service_factor: readNum(sf.input),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["driver_rpm", "driven_rpm", "driver_hp", "driver_pitch_diameter_in", "center_distance_in", "belt_section", "service_factor"], r);
     if (r.error) {
       oRatio.textContent = r.error; oD2.textContent = ""; oLen.textContent = ""; oHp.textContent = ""; oBelts.textContent = ""; oW.textContent = "";
       return;
@@ -2611,7 +2612,7 @@ function renderBeltCenterDistance(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "bcd-out-n");
   function readNum(input) { if (input.value === "") return null; const n = Number(input.value); return Number.isFinite(n) ? n : null; }
   const update = debounce(() => {
-    const r = computeBeltCenterDistance({ large_pitch_diameter_in: readNum(D.input), small_pitch_diameter_in: readNum(d.input), belt_pitch_length_in: readNum(L.input) });
+    const r = computeBeltCenterDistance({ large_pitch_diameter_in: readNum(D.input), small_pitch_diameter_in: readNum(d.input), belt_pitch_length_in: readNum(L.input) }); stepsFor(outputRegion, inputRegion, ["large_pitch_diameter_in", "small_pitch_diameter_in", "belt_pitch_length_in"], r);
     if (r.error) { oC.textContent = r.error; oW.textContent = ""; oNote.textContent = ""; return; }
     oC.textContent = fmt(r.center_distance_in, 3) + " in";
     oW.textContent = fmt(r.wrap_small_deg, 1) + " deg / " + fmt(r.wrap_large_deg, 1) + " deg" + (r.warnings.length ? " - " + r.warnings.join(" ") : "");
@@ -2663,7 +2664,7 @@ function renderBeltHpTransmitted(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "bht-out-note");
   function readNum(input) { if (input.value === "") return null; const n = Number(input.value); return Number.isFinite(n) ? n : null; }
   const update = debounce(() => {
-    const r = computeBeltHpTransmitted({ tight_side_tension_lb: readNum(t1.input), slack_side_tension_lb: readNum(t2.input), sheave_diameter_in: readNum(d.input), sheave_rpm: readNum(n.input) });
+    const r = computeBeltHpTransmitted({ tight_side_tension_lb: readNum(t1.input), slack_side_tension_lb: readNum(t2.input), sheave_diameter_in: readNum(d.input), sheave_rpm: readNum(n.input) }); stepsFor(outputRegion, inputRegion, ["tight_side_tension_lb", "slack_side_tension_lb", "sheave_diameter_in", "sheave_rpm"], r);
     if (r.error) { oP.textContent = r.error; oV.textContent = "-"; oTe.textContent = "-"; oNote.textContent = ""; return; }
     oP.textContent = fmt(r.power_hp, 2) + " HP";
     oV.textContent = fmt(r.belt_speed_fpm, 0) + " ft/min";
@@ -2778,7 +2779,7 @@ function renderGearCascade(inputRegion, outputRegion, citationEl) {
       input_rpm: readNum(rpm.input),
       input_torque: readNum(tq.input),
       efficiency: readNum(eta.input),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["stages", "input_rpm", "input_torque", "efficiency"], r);
     if (r.error) {
       oOverall.textContent = r.error; oStages.textContent = ""; oRpm.textContent = ""; oTq.textContent = ""; oW.textContent = "";
       return;
@@ -2843,7 +2844,7 @@ function renderRollingOffset(inputRegion, outputRegion, citationEl) {
       rise_in: Number(rise.input.value) || 0,
       roll_in: Number(roll.input.value) || 0,
       angle_deg: Number(angle.select.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["rise_in", "roll_in", "angle_deg"], r);
     if (r.error) {
       oTrue.textContent = r.error; oTravel.textContent = "-"; oRun.textContent = "-"; oMult.textContent = "-"; oNote.textContent = "";
       return;
@@ -2933,7 +2934,7 @@ function renderTankVolume(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Notes", "tv-out-note");
   function readNum(input) { if (input.value === "") return 0; const n = Number(input.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeTankVolume({ orientation: orient.select.value, linear_unit: unit.select.value, diameter: readNum(dia.input), length: readNum(len.input), depth: readNum(depth.input) });
+    const r = computeTankVolume({ orientation: orient.select.value, linear_unit: unit.select.value, diameter: readNum(dia.input), length: readNum(len.input), depth: readNum(depth.input) }); stepsFor(outputRegion, inputRegion, ["orientation", "linear_unit", "diameter", "length", "depth"], r);
     if (r.error) { oVol.textContent = r.error; oPct.textContent = "-"; oFull.textContent = "-"; oNote.textContent = ""; return; }
     oVol.textContent = fmt(r.volume_gal, 2) + " gal (" + fmt(r.volume_l, 1) + " L, " + fmt(r.volume_ft3, 3) + " ft^3)";
     oPct.textContent = fmt(r.percent_full, 1) + "%";
@@ -2989,7 +2990,7 @@ function renderLinearInterpolation(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const vals = { x1: readNum(x1.input), y1: readNum(y1.input), x2: readNum(x2.input), y2: readNum(y2.input), x: readNum(x.input) };
     if (Object.values(vals).some((v) => Number.isNaN(v))) { oY.textContent = "Enter all five values."; oSlope.textContent = "-"; oNote.textContent = ""; return; }
-    const r = computeLinearInterpolation(vals);
+    const r = computeLinearInterpolation(vals); stepsFor(outputRegion, inputRegion, null, r);
     if (r.error) { oY.textContent = r.error; oSlope.textContent = "-"; oNote.textContent = ""; return; }
     oY.textContent = fmt(r.y, 5) + (r.extrapolated ? " (extrapolated)" : "");
     oSlope.textContent = fmt(r.slope, 6);
@@ -3032,7 +3033,7 @@ function renderCrossConnectionAirGap(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "ccag-out-note");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeCrossConnectionAirGap({ opening_in: readNum(op.input), near_wall: nw.input.checked, measured_in: readNum(me.input) });
+    const r = computeCrossConnectionAirGap({ opening_in: readNum(op.input), near_wall: nw.input.checked, measured_in: readNum(me.input) }); stepsFor(outputRegion, inputRegion, ["opening_in", "near_wall", "measured_in"], r);
     if (r.error) { oReq.textContent = r.error; oBoth.textContent = "-"; oPass.textContent = "-"; oNote.textContent = ""; return; }
     oReq.textContent = fmt(r.required_in, 2) + " in" + (r.near_wall ? " (near a wall, Table 608.16.1)" : " (standard, Table 608.16.1)");
     oBoth.textContent = fmt(r.air_gap_in, 2) + " in / " + fmt(r.air_gap_wall_in, 2) + " in";
@@ -3098,7 +3099,7 @@ function renderBoltProofLoad(inputRegion, outputRegion, citationEl) {
   const oClamp = makeOutputLine(outputRegion, "Recommended clamp (75% of proof)", "bpl-out-clamp");
   function readNum(i) { if (i.value === "") return 0; const v = Number(i.value); return Number.isFinite(v) ? v : 0; }
   const update = debounce(() => {
-    const r = computeBoltProofLoad({ nominal_diameter_in: readNum(d.input), threads_per_inch: readNum(n.input), grade: grade.select.value });
+    const r = computeBoltProofLoad({ nominal_diameter_in: readNum(d.input), threads_per_inch: readNum(n.input), grade: grade.select.value }); stepsFor(outputRegion, inputRegion, ["nominal_diameter_in", "threads_per_inch", "grade"], r);
     if (r.error) { oAt.textContent = r.error; oProof.textContent = "-"; oYield.textContent = "-"; oTens.textContent = "-"; oClamp.textContent = "-"; return; }
     oAt.textContent = fmt(r.at_in2, 4) + " in^2 (" + r.grade_label + ")";
     oProof.textContent = fmt(r.proof_load_lb, 0) + " lb";

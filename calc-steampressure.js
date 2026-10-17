@@ -8,6 +8,7 @@
 import {
   DEBOUNCE_MS, debounce, makeNumber, makeSelect,
   makeOutputLine, attachExampleButton, fmt,
+  stepsFor,
 } from "./ui-fields.js";
 
 const _finiteGuard = (o) => {
@@ -64,7 +65,7 @@ function _renderSteamPrvNapier(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "spn-out-note");
   function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeSteamPrvNapier({ orifice_area_in2: readNum(A.input), upstream_p_psia: readNum(P1.input), downstream_p_psia: readNum(P2.input), discharge_coeff: Cd.input.value === "" ? 0.9 : readNum(Cd.input) });
+    const r = computeSteamPrvNapier({ orifice_area_in2: readNum(A.input), upstream_p_psia: readNum(P1.input), downstream_p_psia: readNum(P2.input), discharge_coeff: Cd.input.value === "" ? 0.9 : readNum(Cd.input) }); stepsFor(outputRegion, inputRegion, ["orifice_area_in2", "upstream_p_psia", "downstream_p_psia", "discharge_coeff"], r);
     if (r.error) { oChoke.textContent = r.error; oCap.textContent = "-"; oNote.textContent = ""; return; }
     oChoke.textContent = r.choked ? "Choked (P2 < " + fmt(r.choke_threshold_psia, 1) + " psia) - capacity set by upstream only" : "Subcritical (P2 >= " + fmt(r.choke_threshold_psia, 1) + " psia) - apply a subcritical correction";
     oCap.textContent = r.steam_capacity_lb_hr === null ? "not choked: less than " + fmt(r.choked_capacity_lb_hr, 0) + " lb/hr -- Napier does not give subcritical flow" : fmt(r.steam_capacity_lb_hr, 0) + " lb/hr (saturated)";
@@ -108,7 +109,7 @@ function _renderSteamPrvAreaForCapacity(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "spa-out-note");
   function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeSteamPrvAreaForCapacity({ required_capacity_lb_hr: readNum(W.input), upstream_p_psia: readNum(P1.input), discharge_coeff: Cd.input.value === "" ? 0.9 : readNum(Cd.input) });
+    const r = computeSteamPrvAreaForCapacity({ required_capacity_lb_hr: readNum(W.input), upstream_p_psia: readNum(P1.input), discharge_coeff: Cd.input.value === "" ? 0.9 : readNum(Cd.input) }); stepsFor(outputRegion, inputRegion, ["required_capacity_lb_hr", "upstream_p_psia", "discharge_coeff"], r);
     if (r.error) { oA.textContent = r.error; oT.textContent = "-"; oNote.textContent = ""; return; }
     oA.textContent = fmt(r.required_area_in2, 3) + " in^2";
     oT.textContent = fmt(r.choke_threshold_psia, 1) + " psia (choked below this downstream)";
@@ -155,7 +156,7 @@ function _v954renderSteamBoilerBlowdown(inputRegion, outputRegion, citationEl) {
     const r = computeSteamBoilerBlowdown({
       steam_rate_lb_hr: sr.input.value === "" ? 10000 : Number(sr.input.value), feedwater_tds_ppm: fw.input.value === "" ? 100 : Number(fw.input.value),
       max_boiler_tds_ppm: bw.input.value === "" ? 3500 : Number(bw.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["steam_rate_lb_hr", "feedwater_tds_ppm", "max_boiler_tds_ppm"], r);
     if (r.error) { oC.textContent = r.error; oR.textContent = "-"; oP.textContent = "-"; return; }
     oC.textContent = fmt(r.cycles_of_concentration, 1) + " cycles";
     oR.textContent = fmt(r.blowdown_rate_lb_hr, 0) + " lb/hr";
@@ -198,7 +199,7 @@ function _v990renderRadiatorEdrOutput(inputRegion, outputRegion, citationEl) {
     const r = computeRadiatorEdrOutput({
       edr_sqft: ed.input.value === "" ? 320 : Number(ed.input.value), system_k: sk.input.value === "" ? 240 : Number(sk.input.value),
       pickup_factor: pf.input.value === "" ? 0.33 : Number(pf.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["edr_sqft", "system_k", "pickup_factor"], r);
     if (r.error) { oH.textContent = r.error; oG.textContent = "-"; return; }
     oH.textContent = fmt(r.heat_output_btu_hr, 0) + " BTU/hr";
     oG.textContent = fmt(r.gross_boiler_btu_hr, 0) + " BTU/hr (with pickup)";
@@ -280,7 +281,7 @@ function _v1113renderAsmeShellThickness(inputRegion, outputRegion, citationEl) {
       design_pressure_psi: Number(p.input.value), inside_radius_in: Number(r.input.value),
       allowable_stress_psi: Number(s.input.value), joint_efficiency: Number(e.input.value),
       corrosion_allowance_in: Number(c.input.value), geometry: g.select.value,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["design_pressure_psi", "inside_radius_in", "allowable_stress_psi", "joint_efficiency", "corrosion_allowance_in", "geometry"], res);
     if (res.error) { oT.textContent = res.error; oV.textContent = "-"; oM.textContent = "-"; oN.textContent = "-"; return; }
     oT.textContent = fmt(res.t_required_in, 4) + " in by strength, " + fmt(res.t_with_allowance_in, 4) + " in with the corrosion allowance";
     oV.textContent = res.outside_ug27
@@ -392,7 +393,7 @@ function _renderAsmeHeadThickness(inputRegion, outputRegion, citationEl) {
       ellipse_ratio: ar.input.value === "" ? null : Number(ar.input.value),
       crown_ratio: lr.input.value === "" ? null : Number(lr.input.value),
       knuckle_ratio: kr.input.value === "" ? null : Number(kr.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["design_pressure_psi", "inside_diameter_in", "allowable_stress_psi", "joint_efficiency", "corrosion_allowance_in", "head_type", "ellipse_ratio", "crown_ratio", "knuckle_ratio"], res);
     if (res.error) { oT.textContent = res.error; oM.textContent = "-"; oN.textContent = "-"; return; }
     oT.textContent = fmt(res.t_required_in, 4) + " in by strength, " + fmt(res.t_with_allowance_in, 4) + " in with the corrosion allowance";
     oM.textContent = fmt(res.mawp_psi, 1) + " psi (S x E = " + fmt(res.se, 0) + " psi)";

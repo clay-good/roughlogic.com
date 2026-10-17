@@ -27,6 +27,7 @@ import {
   DEBOUNCE_MS, debounce, makeNumber, makeSelect,
   makeOutputLine, attachExampleButton, fmt,
   makeStepsPanel,
+  stepsFor,
 } from "./ui-fields.js";
 import { hazenWilliamsFrictionLoss } from "./pure-math.js";
 
@@ -231,7 +232,7 @@ function _v16h_renderChillerTons(inputRegion, outputRegion, citationEl) {
       lwt_F: _v16h_readNum(lwt.input),
       fluid: fluid.select.value,
       nameplate_tons: _v16h_readNum(np.input),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["gpm", "ewt_F", "lwt_F", "fluid", "nameplate_tons"], r);
     if (r.error) { oDt.textContent = r.error; oTons.textContent = "-"; oReq.textContent = "-"; oNote.textContent = ""; return; }
     oDt.textContent = fmt(r.delta_T_F, 1) + " F (factor " + r.factor + ")";
     oTons.textContent = fmt(r.tons, 1) + " tons (" + fmt(r.q_btu_hr, 0) + " BTU/hr, " + fmt(r.kw, 1) + " kW)";
@@ -379,7 +380,7 @@ function _v16h_renderHxLmtdNtu(inputRegion, outputRegion, citationEl) {
       tc_in_F: _v16h_readNum(tci.input), tc_out_F: _v16h_readNum(tco.input),
       hot_gpm: _v16h_readNum(hg.input), cold_gpm: _v16h_readNum(cg.input),
       hot_fluid: hf.select.value, cold_fluid: cf.select.value,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["config", "th_in_F", "th_out_F", "tc_in_F", "tc_out_F", "hot_gpm", "cold_gpm", "hot_fluid", "cold_fluid"], r);
     if (r.error) { oLmtd.textContent = r.error; oQ.textContent = "-"; oUa.textContent = "-"; oEff.textContent = "-"; oNote.textContent = ""; return; }
     oLmtd.textContent = fmt(r.lmtd_F, 2) + " F";
     oQ.textContent = r.q_btu_hr != null ? fmt(r.q_btu_hr, 0) + " BTU/hr" : "enter a flow";
@@ -498,7 +499,7 @@ function _v16h_renderAirChangesPerHour(inputRegion, outputRegion, citationEl) {
       supply_cfm: _v16h_readNum(supply.input),
       return_cfm: _v16h_readNum(ret.input),
       occupancy: occ.select.value,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["volume_ft3", "supply_cfm", "return_cfm", "occupancy"], r);
     if (r.error) { oAch.textContent = r.error; oNet.textContent = "-"; oBand.textContent = "-"; oNote.textContent = ""; return; }
     oAch.textContent = fmt(r.ach, 2) + " ACH";
     oNet.textContent = fmt(r.net_ach, 2) + " net ACH; " + r.pressure_state;
@@ -655,7 +656,7 @@ function _v16h_renderBoilerPipeSizing(inputRegion, outputRegion, citationEl) {
       material: mat.select.value,
       max_velocity_fps: _v16h_readNum(vmax.input),
       length_ft: _v16h_readNum(len.input),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["boiler_btu_hr", "delta_T_F", "material", "max_velocity_fps", "length_ft"], r);
     if (r.error) { oGpm.textContent = r.error; oSize.textContent = "-"; oVel.textContent = "-"; oFric.textContent = "-"; oNote.textContent = ""; return; }
     oGpm.textContent = fmt(r.gpm, 1) + " GPM";
     oSize.textContent = r.recommended_size + " in " + r.material_label + " (ID " + fmt(r.recommended_id_in, 3) + " in)";
@@ -774,7 +775,7 @@ function _v16h_renderCompressorShortCycle(inputRegion, outputRegion, citationEl)
       system_type: sys.select.value,
       load_fraction_pct: _v16h_readNum(lf.input),
       observed_cph: _v16h_readNum(obs.input),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["system_type", "load_fraction_pct", "observed_cph"], r);
     if (r.error) { oCph.textContent = r.error; oOn.textContent = "-"; oMin.textContent = "-"; oNote.textContent = ""; return; }
     oCph.textContent = r.cph_estimated != null ? fmt(r.cph_estimated, 2) + " cph (ceiling " + r.max_cph + ")" : "modulates (no fixed ceiling)";
     oOn.textContent = r.on_time_min != null ? fmt(r.on_time_min, 1) + " min on / " + fmt(r.off_time_min, 1) + " min off" : "-";
@@ -890,7 +891,7 @@ function _v16h_renderHumidifierCapacity(inputRegion, outputRegion, citationEl) {
       entering_rh_pct: _v16h_readNum(rin.input),
       target_rh_pct: _v16h_readNum(rtg.input),
       altitude_ft: _v16h_readNum(alt.input),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["cfm", "supply_db_F", "entering_rh_pct", "target_rh_pct", "altitude_ft"], r);
     if (r.error) { oAdd.textContent = r.error; oGpd.textContent = "-"; oLat.textContent = "-"; oNote.textContent = ""; return; }
     oAdd.textContent = fmt(r.addition_lb_hr, 1) + " lb/hr (delta-W " + fmt(r.delta_W * 7000, 1) + " gr/lb)";
     oGpd.textContent = fmt(r.gpd, 1) + " gal/day";
@@ -1043,7 +1044,7 @@ function _v16h_renderFilterPressureDrop(inputRegion, outputRegion, citationEl) {
       fan_total_efficiency: _v16h_readNum(eff.input),
       runtime_hr_per_year: _v16h_readNum(rt.input),
       energy_cost_per_kwh: _v16h_readNum(cost.input),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["filter_type", "face_area_ft2", "face_velocity_fpm", "clean_dp_override", "final_dp_override", "fan_total_efficiency", "runtime_hr_per_year", "energy_cost_per_kwh"], r);
     if (r.error) { oFlow.textContent = r.error; oDp.textContent = "-"; oFan.textContent = "-"; oEnergy.textContent = "-"; oNote.textContent = ""; return; }
     oFlow.textContent = fmt(r.airflow_cfm, 0) + " CFM at " + fmt(r.face_velocity_fpm, 0) + " fpm";
     oDp.textContent = fmt(r.clean_dp_in_wc, 2) + " -> " + fmt(r.final_dp_in_wc, 2) + " in WC (avg " + fmt(r.avg_dp_in_wc, 2) + ")";
@@ -1089,7 +1090,7 @@ function _v16h_renderWindowSolarHeatGain(inputRegion, outputRegion, citationEl) 
   const oTotal = makeOutputLine(outputRegion, "Total (a cooling load only when the factor entered is a load factor)", "wsh-out-total");
   const oNote = makeOutputLine(outputRegion, "Note", "wsh-out-note");
   const update = debounce(() => {
-    const r = computeWindowSolarHeatGain({ area_ft2: Number(area.input.value) || 0, shgc: Number(shgc.input.value) || 0, psf: Number(psf.input.value) || 0, u_factor: Number(u.input.value) || 0, cltd_f: Number(cltd.input.value) || 0 });
+    const r = computeWindowSolarHeatGain({ area_ft2: Number(area.input.value) || 0, shgc: Number(shgc.input.value) || 0, psf: Number(psf.input.value) || 0, u_factor: Number(u.input.value) || 0, cltd_f: Number(cltd.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["area_ft2", "shgc", "psf", "u_factor", "cltd_f"], r);
     if (r.error) { oSolar.textContent = r.error; oCond.textContent = "-"; oTotal.textContent = "-"; oNote.textContent = ""; return; }
     oSolar.textContent = fmt(r.q_solar, 0) + " Btu/h";
     oCond.textContent = fmt(r.q_cond, 0) + " Btu/h";
@@ -1159,7 +1160,7 @@ function _v1012renderWindowOverhangShade(inputRegion, outputRegion, citationEl) 
       glass_height_in: Number(h.input.value) || 0,
       solar_altitude_deg: Number(a.input.value) || 0,
       surface_solar_azimuth_deg: Number(z.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["projection_in", "gap_in", "glass_height_in", "solar_altitude_deg", "surface_solar_azimuth_deg"], r);
     if (r.error) {
       oPa.textContent = r.error;
       for (const o of [oSl, oSh, oFr, oNote]) o.textContent = "-";
@@ -1213,7 +1214,7 @@ function _v16h_renderInternalHeatGains(inputRegion, outputRegion, citationEl) {
   const oBreak = makeOutputLine(outputRegion, "People / lighting / equipment", "ihg-out-break");
   const oNote = makeOutputLine(outputRegion, "Note", "ihg-out-note");
   const update = debounce(() => {
-    const r = computeInternalHeatGains({ occupants: Number(occ.input.value) || 0, sens_per_person: Number(sens.input.value) || 0, lat_per_person: Number(lat.input.value) || 0, lighting_w: Number(light.input.value) || 0, equipment_w: Number(equip.input.value) || 0, use_factor: Number(use.input.value) || 0 });
+    const r = computeInternalHeatGains({ occupants: Number(occ.input.value) || 0, sens_per_person: Number(sens.input.value) || 0, lat_per_person: Number(lat.input.value) || 0, lighting_w: Number(light.input.value) || 0, equipment_w: Number(equip.input.value) || 0, use_factor: Number(use.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["occupants", "sens_per_person", "lat_per_person", "lighting_w", "equipment_w", "use_factor"], r);
     if (r.error) { oSensible.textContent = r.error; oLatent.textContent = "-"; oTotal.textContent = "-"; oBreak.textContent = "-"; oNote.textContent = ""; return; }
     oSensible.textContent = fmt(r.q_sensible, 0) + " Btu/h";
     oLatent.textContent = fmt(r.q_latent, 0) + " Btu/h";
@@ -1248,7 +1249,7 @@ function _v16h_renderEnvelopeConductionLoad(inputRegion, outputRegion, citationE
   const oCond = makeOutputLine(outputRegion, "Conduction cooling load", "ecl-out-cond");
   const oNote = makeOutputLine(outputRegion, "Note", "ecl-out-note");
   const update = debounce(() => {
-    const r = computeEnvelopeConductionLoad({ area_ft2: Number(area.input.value) || 0, u_factor: Number(u.input.value) || 0, cltd_f: Number(cltd.input.value) || 0 });
+    const r = computeEnvelopeConductionLoad({ area_ft2: Number(area.input.value) || 0, u_factor: Number(u.input.value) || 0, cltd_f: Number(cltd.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["area_ft2", "u_factor", "cltd_f"], r);
     if (r.error) { oCond.textContent = r.error; oNote.textContent = ""; return; }
     oCond.textContent = fmt(r.q_cond, 0) + " Btu/h";
     oNote.textContent = r.note;
@@ -1289,7 +1290,7 @@ function _v409renderCoilFaceVelocity(inputRegion, outputRegion, citationEl) {
   const oA = makeOutputLine(outputRegion, "Face area", "cfv-out-a");
   const oNote = makeOutputLine(outputRegion, "Note", "cfv-out-note");
   const update = debounce(() => {
-    const r = computeCoilFaceVelocity({ cfm: Number(cfm.input.value) || 0, face_width_in: Number(w.input.value) || 0, face_height_in: Number(h.input.value) || 0, threshold_fpm: Number(thr.input.value) || 0 });
+    const r = computeCoilFaceVelocity({ cfm: Number(cfm.input.value) || 0, face_width_in: Number(w.input.value) || 0, face_height_in: Number(h.input.value) || 0, threshold_fpm: Number(thr.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["cfm", "face_width_in", "face_height_in", "threshold_fpm"], r);
     if (r.error) { oV.textContent = r.error; oA.textContent = ""; oNote.textContent = ""; return; }
     oV.textContent = fmt(r.face_velocity_fpm, 0) + " fpm" + (r.carryover ? " (OVER " + fmt(r.threshold_fpm, 0) + " -- carryover risk)" : " (below threshold)");
     oA.textContent = fmt(r.face_area_ft2, 2) + " ft^2";
@@ -1328,7 +1329,7 @@ function _v701renderCoilFaceArea(inputRegion, outputRegion, citationEl) {
   const oS = makeOutputLine(outputRegion, "Square face (approx)", "cfa-out-s");
   const oNote = makeOutputLine(outputRegion, "Note", "cfa-out-note");
   const update = debounce(() => {
-    const r = computeCoilFaceArea({ cfm: Number(cfm.input.value) || 0, target_fpm: Number(v.input.value) || 0 });
+    const r = computeCoilFaceArea({ cfm: Number(cfm.input.value) || 0, target_fpm: Number(v.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["cfm", "target_fpm"], r);
     if (r.error) { oA.textContent = r.error; oS.textContent = ""; oNote.textContent = ""; return; }
     oA.textContent = fmt(r.face_area_ft2, 2) + " ft^2 (" + fmt(r.face_area_in2, 0) + " in^2)";
     oS.textContent = "~" + fmt(r.square_side_in, 1) + " in x " + fmt(r.square_side_in, 1) + " in at " + fmt(r.target_fpm, 0) + " fpm";
@@ -1370,7 +1371,7 @@ function _v410renderVavBoxAirflow(inputRegion, outputRegion, citationEl) {
   const oMin = makeOutputLine(outputRegion, "Minimum airflow", "vav-out-min");
   const oNote = makeOutputLine(outputRegion, "Note", "vav-out-note");
   const update = debounce(() => {
-    const r = computeVavBoxAirflow({ zone_sensible_btuh: Number(load.input.value) || 0, supply_dt_f: Number(dt.input.value) || 0, ventilation_cfm: Number(vent.input.value) || 0, turndown: td.input.value === "" ? 0.30 : Number(td.input.value) });
+    const r = computeVavBoxAirflow({ zone_sensible_btuh: Number(load.input.value) || 0, supply_dt_f: Number(dt.input.value) || 0, ventilation_cfm: Number(vent.input.value) || 0, turndown: td.input.value === "" ? 0.30 : Number(td.input.value) }); stepsFor(outputRegion, inputRegion, ["zone_sensible_btuh", "supply_dt_f", "ventilation_cfm", "turndown"], r);
     if (r.error) { oMax.textContent = r.error; oMin.textContent = ""; oNote.textContent = ""; return; }
     oMax.textContent = fmt(r.cfm_max, 0) + " cfm";
     oMin.textContent = fmt(r.cfm_min, 0) + " cfm (" + r.min_governed_by + " governs)";
@@ -1413,7 +1414,7 @@ function _v587renderHydronicBufferTank(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "hbt-out-note");
   function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeHydronicBufferTank({ min_on_time_min: readNum(t.input), source_min_btu: readNum(qMin.input), zone_min_load_btu: readNum(qLoad.input), delta_t_f: readNum(dt.input) });
+    const r = computeHydronicBufferTank({ min_on_time_min: readNum(t.input), source_min_btu: readNum(qMin.input), zone_min_load_btu: readNum(qLoad.input), delta_t_f: readNum(dt.input) }); stepsFor(outputRegion, inputRegion, ["min_on_time_min", "source_min_btu", "zone_min_load_btu", "delta_t_f"], r);
     if (r.error) { oV.textContent = r.error; oNote.textContent = ""; return; }
     oV.textContent = r.no_buffer ? "0 gal - no buffer required" : fmt(r.buffer_volume_gal, 1) + " gal";
     oNote.textContent = r.note;
@@ -1465,7 +1466,7 @@ function _v623renderBufferTankLoopCredit(inputRegion, outputRegion, citationEl) 
   const oNote = makeOutputLine(outputRegion, "Note", "btlc-out-note");
   function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeBufferTankLoopCredit({ min_on_time_min: readNum(t.input), source_min_btu: readNum(qMin.input), zone_min_load_btu: readNum(qLoad.input), delta_t_f: readNum(dt.input), pipe_id_in: readNum(d.input), loop_length_ft: readNum(L.input) });
+    const r = computeBufferTankLoopCredit({ min_on_time_min: readNum(t.input), source_min_btu: readNum(qMin.input), zone_min_load_btu: readNum(qLoad.input), delta_t_f: readNum(dt.input), pipe_id_in: readNum(d.input), loop_length_ft: readNum(L.input) }); stepsFor(outputRegion, inputRegion, ["min_on_time_min", "source_min_btu", "zone_min_load_btu", "delta_t_f", "pipe_id_in", "loop_length_ft"], r);
     if (r.error) { oGross.textContent = r.error; oLoop.textContent = ""; oNet.textContent = ""; oNote.textContent = ""; return; }
     oGross.textContent = r.no_buffer ? "0 gal - no buffer required" : fmt(r.gross_buffer_gal, 1) + " gal";
     oLoop.textContent = fmt(r.loop_volume_gal, 1) + " gal";
@@ -1518,7 +1519,7 @@ function _v915renderOutdoorResetRatio(inputRegion, outputRegion, citationEl) {
       supply_design_f: sd.input.value === "" ? 180 : Number(sd.input.value), supply_min_f: sm.input.value === "" ? 80 : Number(sm.input.value),
       oa_design_f: od.input.value === "" ? null : Number(od.input.value), oa_noheat_f: on.input.value === "" ? 65 : Number(on.input.value),
       oa_current_f: oc.input.value === "" ? null : Number(oc.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["supply_design_f", "supply_min_f", "oa_design_f", "oa_noheat_f", "oa_current_f"], r);
     if (r.error) { oRatio.textContent = r.error; oTarget.textContent = "-"; return; }
     oRatio.textContent = fmt(r.reset_ratio, 2) + " F supply per F outdoor";
     oTarget.textContent = fmt(r.supply_target_f, 1) + " F" + (r.clamped ? " (clamped to the min/design supply)" : "");
@@ -1563,7 +1564,7 @@ function _v956renderHydronicInjectionMixing(inputRegion, outputRegion, citationE
     const r = computeHydronicInjectionMixing({
       secondary_gpm: sg.input.value === "" ? 10 : Number(sg.input.value), secondary_supply_f: ss.input.value === "" ? 110 : Number(ss.input.value),
       secondary_return_f: sr.input.value === "" ? 90 : Number(sr.input.value), primary_supply_f: ps.input.value === "" ? 180 : Number(ps.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["secondary_gpm", "secondary_supply_f", "secondary_return_f", "primary_supply_f"], r);
     if (r.error) { oI.textContent = r.error; oP.textContent = "-"; return; }
     oI.textContent = fmt(r.injection_gpm, 2) + " gpm" + (r.reachable ? "" : " (target unreachable: primary cooler than the required supply)");
     oP.textContent = fmt(r.injection_pct_of_secondary, 1) + "% of secondary flow";
@@ -1601,7 +1602,7 @@ function _v980renderValveAuthority(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const r = computeValveAuthority({
       valve_pressure_drop_psi: vd.input.value === "" ? 5 : Number(vd.input.value), controlled_circuit_drop_psi: cd.input.value === "" ? 3 : Number(cd.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["valve_pressure_drop_psi", "controlled_circuit_drop_psi"], r);
     if (r.error) { oA.textContent = r.error; return; }
     oA.textContent = fmt(r.valve_authority, 3) + " -- " + r.verdict;
   }, DEBOUNCE_MS);

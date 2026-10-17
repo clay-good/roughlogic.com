@@ -12,7 +12,7 @@
 // every datapoint via the bundled shard.
 
 import { verifyShard } from "./integrity.js";
-import { DEBOUNCE_MS, debounce, makeSelect, makeNumber, fmt, attachExampleButton } from "./ui-fields.js";
+import { DEBOUNCE_MS, debounce, makeSelect, makeNumber, fmt, attachExampleButton, stepsFor } from "./ui-fields.js";
 
 // Catalog of bundled commodity series. The `file` is the same-origin shard
 // under data/historical/commodities/. Each entry repeats the federal series
@@ -223,7 +223,7 @@ function renderHistoricalPricing(inputRegion, outputRegion, citationEl) {
       summary.textContent = "Could not load history for " + cat.label + ".";
       return;
     }
-    const r = computeHistorical({ commodity: id, lookback_months: lb, shard });
+    const r = computeHistorical({ commodity: id, lookback_months: lb, shard }); stepsFor(outputRegion, inputRegion, ["commodity", "lookback_months", "shard"], r);
     clear();
     if (r.error) { summary.textContent = r.error; return; }
     summary.textContent = cat.label + " - latest " + r.latest_date + ": " + fmt(r.latest, 2) + " " + r.units + " (" + r.placement + ")";

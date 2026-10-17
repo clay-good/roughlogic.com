@@ -24,6 +24,7 @@
 import {
   DEBOUNCE_MS, debounce, makeNumber, makeSelect,
   makeOutputLine, attachExampleButton, fmt,
+  stepsFor,
 } from "./ui-fields.js";
 import { saturatedSteam } from "./steam-tables.js";
 
@@ -122,7 +123,7 @@ function _renderColdSpring(inputRegion, outputRegion, citationEl) {
   const oRes = makeOutputLine(outputRegion, "Residual movement / per 100 ft", "cs-out-res");
   const oNote = makeOutputLine(outputRegion, "Notes", "cs-out-note");
   const update = debounce(() => {
-    const r = computeColdSpring({ material: mat.select.value, run_length_ft: Number(len.input.value) || 0, install_temp_f: ti.input.value === "" ? null : Number(ti.input.value), operating_temp_f: to.input.value === "" ? null : Number(to.input.value), cold_spring_percent: Number(csp.input.value) || 0 });
+    const r = computeColdSpring({ material: mat.select.value, run_length_ft: Number(len.input.value) || 0, install_temp_f: ti.input.value === "" ? null : Number(ti.input.value), operating_temp_f: to.input.value === "" ? null : Number(to.input.value), cold_spring_percent: Number(csp.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["material", "run_length_ft", "install_temp_f", "operating_temp_f", "cold_spring_percent"], r);
     if (r.error) { oGrow.textContent = r.error; oGap.textContent = "-"; oRes.textContent = "-"; oNote.textContent = ""; return; }
     oGrow.textContent = fmt(r.thermal_growth_in, 3) + " in (dT " + fmt(r.delta_t_f, 0) + " F)";
     oGap.textContent = fmt(r.cold_spring_gap_in, 3) + " in at " + fmt(r.cold_spring_percent, 0) + "%" + (r.cold_service ? " (cold service: fabricate LONG by this)" : "");
@@ -174,7 +175,7 @@ function _renderRacewayExpansion(inputRegion, outputRegion, citationEl) {
   const oReq = makeOutputLine(outputRegion, "Fitting required / count", "rx-out-req");
   const oNote = makeOutputLine(outputRegion, "Notes", "rx-out-note");
   const update = debounce(() => {
-    const r = computeRacewayExpansion({ run_length_ft: Number(len.input.value) || 0, temp_range_f: Number(dT.input.value) || 0, fitting_travel_in: Number(travel.input.value) || 0 });
+    const r = computeRacewayExpansion({ run_length_ft: Number(len.input.value) || 0, temp_range_f: Number(dT.input.value) || 0, fitting_travel_in: Number(travel.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["run_length_ft", "temp_range_f", "fitting_travel_in"], r);
     if (r.error) { oChange.textContent = r.error; oReq.textContent = "-"; oNote.textContent = ""; return; }
     oChange.textContent = fmt(r.length_change_in, 3) + " in (" + fmt(r.per_100ft_in, 3) + " in per 100 ft)";
     oReq.textContent = r.requires_fitting ? ("required - " + (r.fittings_needed === null ? "enter travel" : r.fittings_needed + " fitting(s)")) : "not required (< " + fmt(r.threshold_in, 2) + " in)";
@@ -226,7 +227,7 @@ function _renderPipeSpacingRack(inputRegion, outputRegion, citationEl) {
   const oFit = makeOutputLine(outputRegion, "Fit on rack", "psr-out-fit");
   const oNote = makeOutputLine(outputRegion, "Notes", "psr-out-note");
   const update = debounce(() => {
-    const r = computePipeSpacingRack({ pipe_od_in: Number(od.input.value) || 0, insulation_thickness_in: Number(ins.input.value) || 0, clearance_in: Number(gap.input.value) || 0, pipe_count: Number(n.input.value) || 0, rack_width_in: Number(rack.input.value) || 0 });
+    const r = computePipeSpacingRack({ pipe_od_in: Number(od.input.value) || 0, insulation_thickness_in: Number(ins.input.value) || 0, clearance_in: Number(gap.input.value) || 0, pipe_count: Number(n.input.value) || 0, rack_width_in: Number(rack.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["pipe_od_in", "insulation_thickness_in", "clearance_in", "pipe_count", "rack_width_in"], r);
     if (r.error) { oCtc.textContent = r.error; oBundle.textContent = "-"; oFit.textContent = "-"; oNote.textContent = ""; return; }
     oCtc.textContent = fmt(r.center_to_center_in, 3) + " in";
     oBundle.textContent = fmt(r.total_bundle_width_in, 2) + " in for " + r.pipe_count + " pipes (insulated OD " + fmt(r.insulated_od_in, 3) + " in)";
@@ -292,7 +293,7 @@ function _renderFlashSteamPct(inputRegion, outputRegion, citationEl) {
   const oPct = makeOutputLine(outputRegion, "Flash steam", "fs-out-pct");
   const oUsed = makeOutputLine(outputRegion, "Steam-table values used", "fs-out-used");
   const update = debounce(() => {
-    const r = computeFlashSteamPct({ hf_high: Number(hfH.input.value) || 0, hf_low: Number(hfL.input.value) || 0, hfg_low: Number(hfg.input.value) || 0, steam_basis: basis.select.value, high_pressure_psig: _numOrNull(pHigh.input), low_pressure_psig: _numOrNull(pLow.input) });
+    const r = computeFlashSteamPct({ hf_high: Number(hfH.input.value) || 0, hf_low: Number(hfL.input.value) || 0, hfg_low: Number(hfg.input.value) || 0, steam_basis: basis.select.value, high_pressure_psig: _numOrNull(pHigh.input), low_pressure_psig: _numOrNull(pLow.input) }); stepsFor(outputRegion, inputRegion, ["hf_high", "hf_low", "hfg_low", "steam_basis", "high_pressure_psig", "low_pressure_psig"], r);
     if (r.error) { oPct.textContent = r.error; oUsed.textContent = "-"; return; }
     oPct.textContent = fmt(r.flash_pct, 1) + "% of the condensate flashes to steam";
     oUsed.textContent = "hf " + fmt(r.hf_high_used_btulb, 1) + " high, " + fmt(r.hf_low_used_btulb, 1) + " low; hfg " + fmt(r.hfg_low_used_btulb, 1) + " Btu/lb";
@@ -358,7 +359,7 @@ function _renderSteamPipeVelocity(inputRegion, outputRegion, citationEl) {
   const oVel = makeOutputLine(outputRegion, "Actual velocity in it", "sv-out-vel");
   const oSv = makeOutputLine(outputRegion, "Steam specific volume used", "sv-out-sv");
   const update = debounce(() => {
-    const r = computeSteamPipeVelocity({ steam_flow_lbhr: Number(flow.input.value) || 0, spec_vol_ft3lb: Number(sv.input.value) || 0, vel_ceiling_fpm: Number(vc.input.value) || 0, steam_basis: basis.select.value, steam_pressure_psig: _numOrNull(psig.input) });
+    const r = computeSteamPipeVelocity({ steam_flow_lbhr: Number(flow.input.value) || 0, spec_vol_ft3lb: Number(sv.input.value) || 0, vel_ceiling_fpm: Number(vc.input.value) || 0, steam_basis: basis.select.value, steam_pressure_psig: _numOrNull(psig.input) }); stepsFor(outputRegion, inputRegion, ["steam_flow_lbhr", "spec_vol_ft3lb", "vel_ceiling_fpm", "steam_basis", "steam_pressure_psig"], r);
     if (r.error) { oReq.textContent = r.error; oSize.textContent = "-"; oVel.textContent = "-"; oSv.textContent = "-"; return; }
     oReq.textContent = fmt(r.req_area_in2, 2) + " in^2 (" + fmt(r.req_dia_in, 2) + " in dia)";
     oSize.textContent = r.chosen_nps + " in (ID " + fmt(r.chosen_id_in, 3) + " in)";
@@ -408,7 +409,7 @@ function _renderSteamPipeCapacity(inputRegion, outputRegion, citationEl) {
   const oArea = makeOutputLine(outputRegion, "Internal area", "sc-out-area");
   const oSv = makeOutputLine(outputRegion, "Steam specific volume used", "sc-out-sv");
   const update = debounce(() => {
-    const r = computeSteamPipeCapacity({ nps: size.select.value, spec_vol_ft3lb: Number(sv.input.value) || 0, vel_ceiling_fpm: Number(vc.input.value) || 0, steam_basis: basis.select.value, steam_pressure_psig: _numOrNull(psig.input) });
+    const r = computeSteamPipeCapacity({ nps: size.select.value, spec_vol_ft3lb: Number(sv.input.value) || 0, vel_ceiling_fpm: Number(vc.input.value) || 0, steam_basis: basis.select.value, steam_pressure_psig: _numOrNull(psig.input) }); stepsFor(outputRegion, inputRegion, ["nps", "spec_vol_ft3lb", "vel_ceiling_fpm", "steam_basis", "steam_pressure_psig"], r);
     if (r.error) { oCap.textContent = r.error; oArea.textContent = "-"; oSv.textContent = "-"; return; }
     oCap.textContent = fmt(r.capacity_lbhr, 0) + " lb/hr";
     oArea.textContent = fmt(r.area_in2, 2) + " in^2 (ID " + fmt(r.id_in, 3) + " in)";
@@ -462,7 +463,7 @@ function _renderSteamTrapSizing(inputRegion, outputRegion, citationEl) {
   const oCap = makeOutputLine(outputRegion, "Required trap capacity", "st-out-cap");
   const oHfg = makeOutputLine(outputRegion, "Latent heat used", "st-out-hfg");
   const update = debounce(() => {
-    const r = computeSteamTrapSizing({ heat_duty_btuhr: Number(q.input.value) || 0, hfg_btulb: Number(hfg.input.value) || 0, safety_factor: Number(sf.input.value) || 0, steam_basis: basis.select.value, steam_pressure_psig: _numOrNull(psig.input) });
+    const r = computeSteamTrapSizing({ heat_duty_btuhr: Number(q.input.value) || 0, hfg_btulb: Number(hfg.input.value) || 0, safety_factor: Number(sf.input.value) || 0, steam_basis: basis.select.value, steam_pressure_psig: _numOrNull(psig.input) }); stepsFor(outputRegion, inputRegion, ["heat_duty_btuhr", "hfg_btulb", "safety_factor", "steam_basis", "steam_pressure_psig"], r);
     if (r.error) { oLoad.textContent = r.error; oCap.textContent = "-"; oHfg.textContent = "-"; return; }
     oLoad.textContent = fmt(r.condensate_lbhr, 0) + " lb/hr";
     oCap.textContent = fmt(r.req_capacity_lbhr, 0) + " lb/hr at the operating differential";
@@ -497,7 +498,7 @@ function _renderBoilerHorsepower(inputRegion, outputRegion, citationEl) {
   const oSteam = makeOutputLine(outputRegion, "Steam output (from and at 212 F)", "bhp-out-steam");
   const oEdr = makeOutputLine(outputRegion, "Equivalent direct radiation", "bhp-out-edr");
   const update = debounce(() => {
-    const r = computeBoilerHorsepower({ output_btuhr: Number(out.input.value) || 0 });
+    const r = computeBoilerHorsepower({ output_btuhr: Number(out.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["output_btuhr"], r);
     if (r.error) { oHp.textContent = r.error; oSteam.textContent = "-"; oEdr.textContent = "-"; return; }
     oHp.textContent = fmt(r.boiler_hp, 2) + " BHP";
     oSteam.textContent = fmt(r.steam_lbhr, 0) + " lb/hr";
@@ -588,7 +589,7 @@ function _renderPipePressureRating(inputRegion, outputRegion, citationEl) {
       y_coeff: Number(y.input.value) || 0, mill_tol_frac: Number(mt.input.value) || 0,
       allowance_in: Number(A.input.value) || 0, design_p: Number(dp.input.value) || 0,
       mode: mode.select.value, weld_strength_reduction: Number(Wf.input.value) || 1,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["od_in", "wall_in", "allow_stress", "joint_factor", "y_coeff", "mill_tol_frac", "allowance_in", "design_p", "mode", "weld_strength_reduction"], r);
     if (r.error) { oOut.textContent = r.error; oWall.textContent = "-"; return; }
     if (r.mode === "required_wall") {
       oOut.textContent = "Minimum wall " + fmt(r.t_min, 4) + " in";
@@ -654,7 +655,7 @@ function _renderPipeFilledSupportLoad(inputRegion, outputRegion, citationEl) {
       pipe_density: (pd.input.value === "" ? 490 : Number(pd.input.value)), fluid_density: (fd.input.value === "" ? 62.4 : Number(fd.input.value)),
       insul_thk_in: Number(thk.input.value) || 0, insul_density: Number(idns.input.value) || 0,
       spacing_ft: Number(spacing.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["od_in", "wall_in", "pipe_density", "fluid_density", "insul_thk_in", "insul_density", "spacing_ft"], r);
     if (r.error) { oFt.textContent = r.error; oBreak.textContent = "-"; oHanger.textContent = "-"; return; }
     oFt.textContent = fmt(r.filled_lbft, 2) + " lb/ft";
     oBreak.textContent = fmt(r.empty_lbft, 2) + " / " + fmt(r.fluid_lbft, 2) + " / " + fmt(r.insul_lbft, 2) + " lb/ft";
@@ -693,7 +694,7 @@ function _renderHangerRodSizing(inputRegion, outputRegion, citationEl) {
   const oRod = makeOutputLine(outputRegion, "Minimum rod diameter", "hr-out-rod");
   const oUtil = makeOutputLine(outputRegion, "Rated load / utilization", "hr-out-util");
   const update = debounce(() => {
-    const r = computeHangerRodSizing({ load_lb: Number(load.input.value) || 0, temp_derate: derate.input.value === "" ? 1 : Number(derate.input.value) });
+    const r = computeHangerRodSizing({ load_lb: Number(load.input.value) || 0, temp_derate: derate.input.value === "" ? 1 : Number(derate.input.value) }); stepsFor(outputRegion, inputRegion, ["load_lb", "temp_derate"], r);
     if (r.error) { oRod.textContent = r.error; oUtil.textContent = "-"; return; }
     oRod.textContent = r.rod_dia + " in";
     oUtil.textContent = fmt(r.rated_lb, 0) + " lb rated, " + fmt(r.utilization_pct, 0) + "% utilized";
@@ -763,7 +764,7 @@ function _renderCondensateReturnSizing(inputRegion, outputRegion, citationEl) {
   const oSize = makeOutputLine(outputRegion, "Smallest Sch 40 return", "cr-out-size");
   const oUsed = makeOutputLine(outputRegion, "Flash fraction / specific volume used", "cr-out-used");
   const update = debounce(() => {
-    const r = computeCondensateReturnSizing({ condensate_lbhr: Number(load.input.value) || 0, flash_fraction: Number(ff.input.value) || 0, spec_vol_ft3lb: Number(sv.input.value) || 0, vel_ceiling_fpm: Number(vc.input.value) || 0, steam_basis: basis.select.value, supply_pressure_psig: _numOrNull(pSupply.input), return_pressure_psig: _numOrNull(pReturn.input) });
+    const r = computeCondensateReturnSizing({ condensate_lbhr: Number(load.input.value) || 0, flash_fraction: Number(ff.input.value) || 0, spec_vol_ft3lb: Number(sv.input.value) || 0, vel_ceiling_fpm: Number(vc.input.value) || 0, steam_basis: basis.select.value, supply_pressure_psig: _numOrNull(pSupply.input), return_pressure_psig: _numOrNull(pReturn.input) }); stepsFor(outputRegion, inputRegion, ["condensate_lbhr", "flash_fraction", "spec_vol_ft3lb", "vel_ceiling_fpm", "steam_basis", "supply_pressure_psig", "return_pressure_psig"], r);
     if (r.error) { oFlash.textContent = r.error; oReq.textContent = "-"; oSize.textContent = "-"; oUsed.textContent = "-"; return; }
     oFlash.textContent = fmt(r.flash_lbhr, 0) + " lb/hr flash (" + fmt(r.vol_cfm, 1) + " cfm)";
     oReq.textContent = fmt(r.req_area_in2, 2) + " in^2 (" + fmt(r.req_dia_in, 2) + " in dia)";
@@ -817,7 +818,7 @@ function _renderBranchSaddleCutback(inputRegion, outputRegion, citationEl) {
   const oMax = makeOutputLine(outputRegion, "Maximum cutback (at the sides)", "bs-out-max");
   const oTab = makeOutputLine(outputRegion, "Ordinates (angle: cutback, in)", "bs-out-tab");
   const update = debounce(() => {
-    const r = computeBranchSaddleCutback({ branch_od_in: Number(bod.input.value) || 0, run_od_in: Number(rod.input.value) || 0, stations: Number(st.input.value) || 6 });
+    const r = computeBranchSaddleCutback({ branch_od_in: Number(bod.input.value) || 0, run_od_in: Number(rod.input.value) || 0, stations: Number(st.input.value) || 6 }); stepsFor(outputRegion, inputRegion, ["branch_od_in", "run_od_in", "stations"], r);
     if (r.error) { oMax.textContent = r.error; oTab.textContent = "-"; return; }
     oMax.textContent = fmt(r.max_cutback_in, 3) + " in (r " + fmt(r.r_in, 3) + ", R " + fmt(r.R_in, 3) + ")";
     oTab.textContent = r.ordinates.map((o) => fmt(o.angle_deg, 0) + "°: " + fmt(o.cutback_in, 3)).join(", ");
@@ -882,7 +883,7 @@ function _renderReducerOffset(inputRegion, outputRegion, citationEl) {
   const oCont = makeOutputLine(outputRegion, "Continuous surface", "ro-out-cont");
   const oNote = makeOutputLine(outputRegion, "Note", "ro-out-note");
   const update = debounce(() => {
-    const r = computeReducerOffset({ large_od_in: Number(D.input.value) || 0, small_od_in: Number(d.input.value) || 0, lay_length_in: Number(lay.input.value) || 0, type: type.select.value });
+    const r = computeReducerOffset({ large_od_in: Number(D.input.value) || 0, small_od_in: Number(d.input.value) || 0, lay_length_in: Number(lay.input.value) || 0, type: type.select.value }); stepsFor(outputRegion, inputRegion, ["large_od_in", "small_od_in", "lay_length_in", "type"], r);
     if (r.error) { oOff.textContent = r.error; oCont.textContent = "-"; oNote.textContent = ""; return; }
     oOff.textContent = fmt(r.centerline_offset_in, 4) + " in" + (r.lay_length_in > 0 ? " (lay " + fmt(r.lay_length_in, 2) + " in)" : "");
     oCont.textContent = r.continuous_surface;
@@ -948,7 +949,7 @@ function _renderFlangeRating(inputRegion, outputRegion, citationEl) {
   attachExampleButton(inputRegion, () => { cls.select.value = "150"; t.input.value = "400"; update(); });
   const oRate = makeOutputLine(outputRegion, "Max allowable working pressure", "fr-out-rate");
   const update = debounce(() => {
-    const r = computeFlangeRating({ flange_class: Number(cls.select.value), temp_f: t.input.value === "" ? null : Number(t.input.value) });
+    const r = computeFlangeRating({ flange_class: Number(cls.select.value), temp_f: t.input.value === "" ? null : Number(t.input.value) }); stepsFor(outputRegion, inputRegion, ["flange_class", "temp_f"], r);
     if (r.error) { oRate.textContent = r.error; return; }
     oRate.textContent = fmt(r.mawp_psig, 0) + " psig (Class " + r.flange_class + ", Group 1.1, at " + fmt(r.temp_f, 0) + " F)";
   }, DEBOUNCE_MS);
@@ -1050,7 +1051,7 @@ function _renderBranchReinforcement(inputRegion, outputRegion, citationEl) {
       branch_od_in: Number(bod.input.value) || 0, branch_wall_in: Number(bwall.input.value) || 0, branch_treq_in: Number(btreq.input.value) || 0,
       beta_deg: Number(beta.input.value) || 0,
       mill_tol_frac: mtol.input.value === "" ? 0.125 : Number(mtol.input.value), corrosion_in: Number(corr.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["run_od_in", "run_wall_in", "run_treq_in", "branch_od_in", "branch_wall_in", "branch_treq_in", "beta_deg", "mill_tol_frac", "corrosion_in"], r);
     if (r.error) { oReq.textContent = r.error; oAvail.textContent = "-"; oVerdict.textContent = "-"; return; }
     oReq.textContent = fmt(r.a_required_in2, 3) + " in^2 (opening d1 " + fmt(r.d1_in, 3) + " in)";
     oAvail.textContent = fmt(r.a_available_in2, 3) + " in^2 (run " + fmt(r.a_run_in2, 3) + " + branch " + fmt(r.a_branch_in2, 3) + ")";
@@ -1098,7 +1099,7 @@ function _renderExpansionGuideSpacing(inputRegion, outputRegion, citationEl) {
   const oFirst = makeOutputLine(outputRegion, "First guide (from the joint)", "eg-out-first");
   const oSecond = makeOutputLine(outputRegion, "Second guide (past the first)", "eg-out-second");
   const update = debounce(() => {
-    const r = computeExpansionGuideSpacing({ pipe_od_in: Number(od.input.value) || 0, d1_mult: Number(m1.input.value) || 0, d2_mult: Number(m2.input.value) || 0 });
+    const r = computeExpansionGuideSpacing({ pipe_od_in: Number(od.input.value) || 0, d1_mult: Number(m1.input.value) || 0, d2_mult: Number(m2.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["pipe_od_in", "d1_mult", "d2_mult"], r);
     if (r.error) { oFirst.textContent = r.error; oSecond.textContent = "-"; return; }
     oFirst.textContent = fmt(r.first_guide_in, 1) + " in (" + fmt(r.first_guide_ft, 2) + " ft)";
     oSecond.textContent = fmt(r.second_guide_in, 1) + " in (" + fmt(r.second_guide_ft, 2) + " ft) - " + fmt(r.guide2_from_joint_in, 1) + " in from the joint";

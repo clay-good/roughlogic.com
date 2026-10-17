@@ -5,6 +5,7 @@ import {
   DEBOUNCE_MS, debounce, makeNumber, makeSelect,
   makeOutputLine, attachExampleButton, fmt, makeRowField, makeText,
   makeStepsPanel,
+  stepsFor,
 } from "./ui-fields.js";
 
 // v18 §7 contract guard: reject a non-finite numeric input. A renderer
@@ -384,7 +385,7 @@ function renderRecipeScale(inputRegion, outputRegion, citationEl) {
   function update() {
     const inputRows = rows.map((r) => ({ ingredient: r.ing.value, quantity: Number(r.qty.value) || 0, unit: r.unit.value })).filter((r) => r.quantity > 0);
     if (inputRows.length === 0) { oF.textContent = "-"; oR.textContent = "-"; return; }
-    const r = computeRecipeScale({ rows: inputRows, original_yield: Number(orig.input.value) || 0, target_yield: Number(targ.input.value) || 0 });
+    const r = computeRecipeScale({ rows: inputRows, original_yield: Number(orig.input.value) || 0, target_yield: Number(targ.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["rows", "original_yield", "target_yield"], r);
     if (r.error) { oF.textContent = r.error; oR.textContent = "-"; return; }
     oF.textContent = fmt(r.factor, 3);
     oR.textContent = r.rows.map((row) => {
@@ -466,7 +467,7 @@ function renderPlateCost(inputRegion, outputRegion, citationEl) {
   function update() {
     const ingredients = rows.map((r) => ({ name: r.n.value, lbs: Number(r.lbs.value) || 0, cost_per_lb: Number(r.c.value) || 0 })).filter((i) => i.lbs > 0);
     if (ingredients.length === 0) { for (const o of [oP, oS, oM, oF]) o.textContent = "-"; return; }
-    const r = computePlateCost({ ingredients, target_food_cost_pct: Number(fc.input.value) || 30 });
+    const r = computePlateCost({ ingredients, target_food_cost_pct: Number(fc.input.value) || 30 }); stepsFor(outputRegion, inputRegion, ["ingredients", "target_food_cost_pct"], r);
     if (r.error) { oP.textContent = r.error; for (const o of [oS, oM, oF]) o.textContent = "-"; return; }
     oP.textContent = "$" + fmt(r.plate_cost, 2);
     oS.textContent = "$" + fmt(r.suggested_price, 2);
@@ -686,7 +687,7 @@ function renderSousVidePasteurization(inputRegion, outputRegion, citationEl) {
       thickness_in: readNum(th.input),
       bath_temperature_F: readNum(tb.input),
       initial_temperature_F: readNum(ti.input),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["category", "thickness_in", "bath_temperature_F", "initial_temperature_F"], r);
     if (r.error) {
       oCU.textContent = r.error; oH.textContent = ""; oT.textContent = ""; oW.textContent = "";
       return;
@@ -803,7 +804,7 @@ function renderBrineCure(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "bc-out-note");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeBrineCure({ mode: mode.select.value, water_g: readNum(water.input), salt_g: readNum(salt.input), meat_g: readNum(meat.input), cure_g: readNum(cure.input), target_pct: readNum(target.input), product: prod.select.value });
+    const r = computeBrineCure({ mode: mode.select.value, water_g: readNum(water.input), salt_g: readNum(salt.input), meat_g: readNum(meat.input), cure_g: readNum(cure.input), target_pct: readNum(target.input), product: prod.select.value }); stepsFor(outputRegion, inputRegion, ["mode", "water_g", "salt_g", "meat_g", "cure_g", "target_pct", "product"], r);
     if (r.error) { oConc.textContent = r.error; oNitrite.textContent = ""; oNote.textContent = ""; return; }
     oConc.textContent = fmt(r.concentration_pct, 2) + "% salt" + (r.salt_to_add_g != null ? " (add " + fmt(r.salt_to_add_g, 1) + " g for target)" : "");
     oNitrite.textContent = r.nitrite_ppm > 0 ? fmt(r.nitrite_ppm, 0) + " ppm nitrite" + (r.nitrite_over_max ? " (AT/OVER MAX)" : "") : "No cure entered";
@@ -871,7 +872,7 @@ function renderBakersPercentage(inputRegion, outputRegion, citationEl) {
   const oPiece = makeOutputLine(outputRegion, "Per piece", "bp-out-piece");
   const oNote = makeOutputLine(outputRegion, "Notes", "bp-out-note");
   const update = debounce(() => {
-    const r = computeBakersPercentage({ flour_g: Number(flour.input.value) || 0, hydration_pct: Number(hyd.input.value) || 0, salt_pct: Number(salt.input.value) || 0, yeast_pct: Number(yeast.input.value) || 0, other_pct: Number(other.input.value) || 0, pieces: Number(pieces.input.value) || 0 });
+    const r = computeBakersPercentage({ flour_g: Number(flour.input.value) || 0, hydration_pct: Number(hyd.input.value) || 0, salt_pct: Number(salt.input.value) || 0, yeast_pct: Number(yeast.input.value) || 0, other_pct: Number(other.input.value) || 0, pieces: Number(pieces.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["flour_g", "hydration_pct", "salt_pct", "yeast_pct", "other_pct", "pieces"], r);
     if (r.error) { oIng.textContent = r.error; oTotal.textContent = "-"; oPiece.textContent = "-"; oNote.textContent = ""; return; }
     let ing = "flour " + fmt(r.flour_g, 1) + " g, water " + fmt(r.water_g, 1) + " g, salt " + fmt(r.salt_g, 1) + " g, yeast " + fmt(r.yeast_g, 1) + " g";
     if (r.other_g > 0) ing += ", other " + fmt(r.other_g, 1) + " g";
@@ -2246,7 +2247,7 @@ function renderHotHoldingEnergy(inputRegion, outputRegion, citationEl) {
       diversity_factor: Number(dv.input.value) || 0,
       voltage: Number(vt.input.value) || 0,
       phase: ph.select.value,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["equipment", "diversity_factor", "voltage", "phase"], r);
     if (r.error) { oC.textContent = r.error; for (const o of [oD, oA, oH, oN]) o.textContent = "-"; return; }
     oC.textContent = fmt(r.connected_kw, 3) + " kW";
     oD.textContent = fmt(r.demand_kw, 3) + " kW";

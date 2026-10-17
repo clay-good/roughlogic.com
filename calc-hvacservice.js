@@ -20,6 +20,7 @@ import {
   DEBOUNCE_MS, debounce, makeNumber, makeSelect,
   makeOutputLine, attachExampleButton, fmt,
   makeStepsPanel,
+  stepsFor,
 } from "./ui-fields.js";
 
 // v18 §7 contract guard: reject a non-finite numeric input (copied
@@ -843,7 +844,7 @@ function _v583renderExcessAirO2(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "eao-out-note");
   function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeExcessAirO2({ measured_o2_pct: readNum(o2.input), measured_co2_pct: readNum(co2.input), co2max_pct: co2max.input.value === "" ? 11.7 : readNum(co2max.input) });
+    const r = computeExcessAirO2({ measured_o2_pct: readNum(o2.input), measured_co2_pct: readNum(co2.input), co2max_pct: co2max.input.value === "" ? 11.7 : readNum(co2max.input) }); stepsFor(outputRegion, inputRegion, ["measured_o2_pct", "measured_co2_pct", "co2max_pct"], r);
     if (r.error) { oEA.textContent = r.error; oBand.textContent = "-"; oNote.textContent = ""; return; }
     oEA.textContent = fmt(r.excess_air_pct, 1) + "% (" + r.method + " method)";
     oBand.textContent = r.in_band ? "YES - well-tuned" : "NO - " + (r.excess_air_pct < 15 ? "too little air, risks CO" : "too much air, wastes flue heat");
@@ -885,7 +886,7 @@ function _v584renderCoAirFree(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "caf-out-note");
   function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeCoAirFree({ measured_co_ppm: readNum(co.input), measured_o2_pct: readNum(o2.input) });
+    const r = computeCoAirFree({ measured_co_ppm: readNum(co.input), measured_o2_pct: readNum(o2.input) }); stepsFor(outputRegion, inputRegion, ["measured_co_ppm", "measured_o2_pct"], r);
     if (r.error) { oCO.textContent = r.error; oFlag.textContent = "-"; oNote.textContent = ""; return; }
     oCO.textContent = fmt(r.co_air_free_ppm, 0) + " ppm (air-free)";
     oFlag.textContent = r.over_ansi ? "OVER the 400 ppm ANSI limit - shut down / red-tag per policy" : (r.over_field ? "Over the 100 ppm field target - investigate" : "Under the 100 ppm field target - acceptable, worth watching");
@@ -925,7 +926,7 @@ function _v622renderDraftHoodDilution(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "dhd-out-note");
   function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeDraftHoodDilution({ appliance_o2_pct: readNum(oa.input), diluted_o2_pct: readNum(od.input) });
+    const r = computeDraftHoodDilution({ appliance_o2_pct: readNum(oa.input), diluted_o2_pct: readNum(od.input) }); stepsFor(outputRegion, inputRegion, ["appliance_o2_pct", "diluted_o2_pct"], r);
     if (r.error) { oR.textContent = r.error; oF.textContent = "-"; oNote.textContent = ""; return; }
     oR.textContent = fmt(r.dilution_ratio, 2) + "x (total flue to combustion products)";
     oF.textContent = fmt(r.dilution_air_fraction_pct, 1) + "% room air - a CO reading here shows " + fmt(r.co_read_fraction_pct, 0) + "% of the true flue value";
@@ -977,7 +978,7 @@ function _v585renderChimneyDraft(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "chd-out-note");
   function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeChimneyDraft({ stack_height_ft: readNum(H.input), ambient_temp_f: to.input.value === "" ? null : readNum(to.input), mean_flue_temp_f: tm.input.value === "" ? null : readNum(tm.input), baro_psia: B.input.value === "" ? 14.7 : readNum(B.input), net_factor: factor.input.value === "" ? 0.6 : readNum(factor.input) });
+    const r = computeChimneyDraft({ stack_height_ft: readNum(H.input), ambient_temp_f: to.input.value === "" ? null : readNum(to.input), mean_flue_temp_f: tm.input.value === "" ? null : readNum(tm.input), baro_psia: B.input.value === "" ? 14.7 : readNum(B.input), net_factor: factor.input.value === "" ? 0.6 : readNum(factor.input) }); stepsFor(outputRegion, inputRegion, ["stack_height_ft", "ambient_temp_f", "mean_flue_temp_f", "baro_psia", "net_factor"], r);
     if (r.error) { oDt.textContent = r.error; oDnet.textContent = "-"; oNote.textContent = ""; return; }
     oDt.textContent = fmt(r.draft_theoretical_inwc, 3) + " in wc";
     oDnet.textContent = fmt(r.draft_net_inwc, 3) + " in wc";
@@ -1030,7 +1031,7 @@ function renderChimneyHeightForDraft(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "chhd-out-note");
   function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeChimneyHeightForDraft({ target_draft_net_inwc: readNum(dt.input), ambient_temp_f: to.input.value === "" ? null : readNum(to.input), mean_flue_temp_f: tm.input.value === "" ? null : readNum(tm.input), baro_psia: B.input.value === "" ? 14.7 : readNum(B.input), net_factor: factor.input.value === "" ? 0.6 : readNum(factor.input) });
+    const r = computeChimneyHeightForDraft({ target_draft_net_inwc: readNum(dt.input), ambient_temp_f: to.input.value === "" ? null : readNum(to.input), mean_flue_temp_f: tm.input.value === "" ? null : readNum(tm.input), baro_psia: B.input.value === "" ? 14.7 : readNum(B.input), net_factor: factor.input.value === "" ? 0.6 : readNum(factor.input) }); stepsFor(outputRegion, inputRegion, ["target_draft_net_inwc", "ambient_temp_f", "mean_flue_temp_f", "baro_psia", "net_factor"], r);
     if (r.error) { oH.textContent = r.error; oNote.textContent = ""; return; }
     oH.textContent = fmt(r.required_height_ft, 1) + " ft";
     oNote.textContent = r.note;
@@ -1089,7 +1090,7 @@ function _v594renderFlueGasCombustionEff(inputRegion, outputRegion, citationEl) 
   const oNote = makeOutputLine(outputRegion, "Note", "fgce-out-note");
   function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeFlueGasCombustionEff({ fuel: fuel.select.value, flue_o2_pct: readNum(o2.input), stack_temp_f: readNum(ts.input), air_temp_f: ta.input.value === "" ? 70 : readNum(ta.input) });
+    const r = computeFlueGasCombustionEff({ fuel: fuel.select.value, flue_o2_pct: readNum(o2.input), stack_temp_f: readNum(ts.input), air_temp_f: ta.input.value === "" ? 70 : readNum(ta.input) }); stepsFor(outputRegion, inputRegion, ["fuel", "flue_o2_pct", "stack_temp_f", "air_temp_f"], r);
     if (r.error) { oCo2.textContent = r.error; oQa.textContent = "-"; oNet.textContent = "-"; oGross.textContent = "-"; oNote.textContent = ""; return; }
     oCo2.textContent = fmt(r.co2_pct, 2) + "%";
     oQa.textContent = fmt(r.stack_loss_pct, 2) + "%";
@@ -1139,7 +1140,7 @@ function _v609renderCombustionLambda(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "clam-out-note");
   function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeCombustionLambda({ fuel: fuel.select.value, flue_o2_pct: readNum(o2.input) });
+    const r = computeCombustionLambda({ fuel: fuel.select.value, flue_o2_pct: readNum(o2.input) }); stepsFor(outputRegion, inputRegion, ["fuel", "flue_o2_pct"], r);
     if (r.error) { oLambda.textContent = r.error; oEA.textContent = "-"; oAfr.textContent = "-"; oNote.textContent = ""; return; }
     oLambda.textContent = fmt(r.lambda, 3);
     oEA.textContent = fmt(r.excess_air_pct, 1) + "%";

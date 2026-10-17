@@ -5,6 +5,7 @@
 
 import {
   DEBOUNCE_MS, debounce, makeNumber, makeSelect, makeOutputLine, attachExampleButton, fmt,
+  stepsFor,
 } from "./ui-fields.js";
 
 const _finiteGuard = (o) => {
@@ -117,7 +118,7 @@ function renderMulchTopsoilVolume(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "mtv-out-n");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeMulchTopsoilVolume({ area_ft2: readNum(area.input), depth_in: readNum(depth.input), bulk_density: readNum(dens.input), bag_ft3: readNum(bag.input), load_yd3: readNum(load.input), waste_pct: readNum(waste.input) });
+    const r = computeMulchTopsoilVolume({ area_ft2: readNum(area.input), depth_in: readNum(depth.input), bulk_density: readNum(dens.input), bag_ft3: readNum(bag.input), load_yd3: readNum(load.input), waste_pct: readNum(waste.input) }); stepsFor(outputRegion, inputRegion, ["area_ft2", "depth_in", "bulk_density", "bag_ft3", "load_yd3", "waste_pct"], r);
     if (r.error) { oYd.textContent = r.error; oBags.textContent = ""; oNote.textContent = ""; return; }
     oYd.textContent = fmt(r.yd3, 2) + " yd^3";
     oBags.textContent = r.bags + " bags / " + fmt(r.tons, 1) + " tons / " + r.loads + " load(s)";
@@ -168,7 +169,7 @@ function renderGrainDryingEnergy(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "gde-out-n");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeGrainDryingEnergy({ bushels: readNum(bu.input), lb_per_bushel: readNum(lbbu.input), mi_percent: readNum(mi.input), mf_percent: readNum(mf.input), btu_per_lb: readNum(btu.input), price_per_gal: readNum(price.input) });
+    const r = computeGrainDryingEnergy({ bushels: readNum(bu.input), lb_per_bushel: readNum(lbbu.input), mi_percent: readNum(mi.input), mf_percent: readNum(mf.input), btu_per_lb: readNum(btu.input), price_per_gal: readNum(price.input) }); stepsFor(outputRegion, inputRegion, ["bushels", "lb_per_bushel", "mi_percent", "mf_percent", "btu_per_lb", "price_per_gal"], r);
     if (r.error) { oWater.textContent = r.error; oEnergy.textContent = ""; oCost.textContent = ""; oNote.textContent = ""; return; }
     oWater.textContent = fmt(r.water_lb, 0) + " lb (of " + fmt(r.weight_lb, 0) + " lb)";
     oEnergy.textContent = fmt(r.energy_btu / 1e6, 2) + " million Btu, " + fmt(r.propane_gal, 0) + " gal propane";
@@ -215,7 +216,7 @@ function renderManureNutrientApplication(inputRegion, outputRegion, citationEl) 
   const oNote = makeOutputLine(outputRegion, "Note", "mna-out-n");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeManureNutrientApplication({ crop_n_need_lb_acre: readNum(need.input), total_n_lb_ton: readNum(totalN.input), availability_pct: readNum(avail.input), p2o5_lb_ton: readNum(p2o5.input), k2o_lb_ton: readNum(k2o.input) });
+    const r = computeManureNutrientApplication({ crop_n_need_lb_acre: readNum(need.input), total_n_lb_ton: readNum(totalN.input), availability_pct: readNum(avail.input), p2o5_lb_ton: readNum(p2o5.input), k2o_lb_ton: readNum(k2o.input) }); stepsFor(outputRegion, inputRegion, ["crop_n_need_lb_acre", "total_n_lb_ton", "availability_pct", "p2o5_lb_ton", "k2o_lb_ton"], r);
     if (r.error) { oRate.textContent = r.error; oPK.textContent = ""; oNote.textContent = ""; return; }
     oRate.textContent = fmt(r.rate_ton_acre, 1) + " ton/acre (" + fmt(r.avail_n_per_ton, 2) + " lb available N/ton)";
     oPK.textContent = (r.p2o5_applied == null ? "P2O5 -" : fmt(r.p2o5_applied, 0) + " lb P2O5") + " / " + (r.k2o_applied == null ? "K2O -" : fmt(r.k2o_applied, 0) + " lb K2O") + " per acre";
@@ -264,7 +265,7 @@ function _v568renderCenterPivotRuntime(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "cpr-out-note");
   function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeCenterPivotRuntime({ system_flow_gpm: readNum(flow.input), area_acres: readNum(area.input), target_depth_in: readNum(depth.input), efficiency_pct: eff.input.value === "" ? 85 : readNum(eff.input) });
+    const r = computeCenterPivotRuntime({ system_flow_gpm: readNum(flow.input), area_acres: readNum(area.input), target_depth_in: readNum(depth.input), efficiency_pct: eff.input.value === "" ? 85 : readNum(eff.input) }); stepsFor(outputRegion, inputRegion, ["system_flow_gpm", "area_acres", "target_depth_in", "efficiency_pct"], r);
     if (r.error) { oHours.textContent = r.error; oGross.textContent = "-"; oNet.textContent = "-"; oNote.textContent = ""; return; }
     oHours.textContent = fmt(r.hours, 1) + " hr (" + fmt(r.hours / 24, 1) + " days)";
     oGross.textContent = fmt(r.gross_gpm_per_acre, 1) + " gpm/ac";
@@ -316,7 +317,7 @@ function _v602renderPivotApplicationRate(inputRegion, outputRegion, citationEl) 
   const oNote = makeOutputLine(outputRegion, "Note", "par-out-note");
   function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computePivotApplicationRate({ pass_depth_in: readNum(D.input), pivot_length_ft: readNum(L.input), revolution_hr: readNum(T.input), wetted_band_ft: readNum(W.input), soil_intake_in_hr: readNum(intake.input) });
+    const r = computePivotApplicationRate({ pass_depth_in: readNum(D.input), pivot_length_ft: readNum(L.input), revolution_hr: readNum(T.input), wetted_band_ft: readNum(W.input), soil_intake_in_hr: readNum(intake.input) }); stepsFor(outputRegion, inputRegion, ["pass_depth_in", "pivot_length_ft", "revolution_hr", "wetted_band_ft", "soil_intake_in_hr"], r);
     if (r.error) { oRate.textContent = r.error; oWet.textContent = "-"; oCheck.textContent = "-"; oNote.textContent = ""; return; }
     oRate.textContent = fmt(r.app_rate_in_hr, 2) + " in/hr";
     oWet.textContent = fmt(r.wetting_min, 1) + " min (" + fmt(r.speed_ft_min, 1) + " ft/min at the end tower)";
@@ -363,7 +364,7 @@ function _v604renderPivotTimerDepth(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "ptd-out-note");
   function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computePivotTimerDepth({ system_flow_gpm: readNum(Q.input), area_acres: readNum(A.input), revolution_100_hr: readNum(T100.input), timer_pct: readNum(timer.input) });
+    const r = computePivotTimerDepth({ system_flow_gpm: readNum(Q.input), area_acres: readNum(A.input), revolution_100_hr: readNum(T100.input), timer_pct: readNum(timer.input) }); stepsFor(outputRegion, inputRegion, ["system_flow_gpm", "area_acres", "revolution_100_hr", "timer_pct"], r);
     if (r.error) { oRev.textContent = r.error; oDepth.textContent = "-"; oDays.textContent = "-"; oNote.textContent = ""; return; }
     oRev.textContent = fmt(r.revolution_hr, 1) + " hr";
     oDepth.textContent = fmt(r.depth_in, 3) + " in";
@@ -404,7 +405,7 @@ function _v569renderGrainAerationAirflow(inputRegion, outputRegion, citationEl) 
   const oNote = makeOutputLine(outputRegion, "Note", "gaa-out-note");
   function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeGrainAerationAirflow({ bin_capacity_bu: readNum(bu.input), airflow_rate: readNum(rate.input) });
+    const r = computeGrainAerationAirflow({ bin_capacity_bu: readNum(bu.input), airflow_rate: readNum(rate.input) }); stepsFor(outputRegion, inputRegion, ["bin_capacity_bu", "airflow_rate"], r);
     if (r.error) { oCfm.textContent = r.error; oHours.textContent = "-"; oNote.textContent = ""; return; }
     oCfm.textContent = fmt(r.required_cfm, 0) + " cfm";
     oHours.textContent = fmt(r.cooling_hours, 0) + " hr per cooling front (" + r.mode + ")";
@@ -467,7 +468,7 @@ function _v582renderManureStorageVolume(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "msv-out-note");
   function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeManureStorageVolume({ daily_manure_ft3: readNum(manure.input), wastewater_ft3: readNum(ww.input), bedding_ft3: readNum(bed.input), storage_days: readNum(days.input), surface_area_ft2: readNum(area.input), net_precip_in: readNum(precip.input), storm_in: readNum(storm.input), freeboard_in: readNum(fb.input) });
+    const r = computeManureStorageVolume({ daily_manure_ft3: readNum(manure.input), wastewater_ft3: readNum(ww.input), bedding_ft3: readNum(bed.input), storage_days: readNum(days.input), surface_area_ft2: readNum(area.input), net_precip_in: readNum(precip.input), storm_in: readNum(storm.input), freeboard_in: readNum(fb.input) }); stepsFor(outputRegion, inputRegion, ["daily_manure_ft3", "wastewater_ft3", "bedding_ft3", "storage_days", "surface_area_ft2", "net_precip_in", "storm_in", "freeboard_in"], r);
     if (r.error) { oManure.textContent = r.error; oPrecip.textContent = "-"; oFree.textContent = "-"; oTotal.textContent = "-"; oNote.textContent = ""; return; }
     oManure.textContent = fmt(r.manure_volume_ft3, 0) + " ft3";
     oPrecip.textContent = fmt(r.precip_storm_ft3, 0) + " ft3";
@@ -529,7 +530,7 @@ function _v606renderManureCoverSavings(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "mcs-out-note");
   function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeManureCoverSavings({ daily_manure_ft3: readNum(manure.input), wastewater_ft3: readNum(ww.input), bedding_ft3: readNum(bed.input), storage_days: readNum(days.input), surface_area_ft2: readNum(area.input), net_precip_in: readNum(precip.input), storm_in: readNum(storm.input), freeboard_in: readNum(fb.input) });
+    const r = computeManureCoverSavings({ daily_manure_ft3: readNum(manure.input), wastewater_ft3: readNum(ww.input), bedding_ft3: readNum(bed.input), storage_days: readNum(days.input), surface_area_ft2: readNum(area.input), net_precip_in: readNum(precip.input), storm_in: readNum(storm.input), freeboard_in: readNum(fb.input) }); stepsFor(outputRegion, inputRegion, ["daily_manure_ft3", "wastewater_ft3", "bedding_ft3", "storage_days", "surface_area_ft2", "net_precip_in", "storm_in", "freeboard_in"], r);
     if (r.error) { oOpen.textContent = r.error; oCovered.textContent = "-"; oSave.textContent = "-"; oNote.textContent = ""; return; }
     oOpen.textContent = fmt(r.open_ft3, 0) + " ft3";
     oCovered.textContent = fmt(r.covered_ft3, 0) + " ft3";
@@ -574,7 +575,7 @@ function _v914renderTractorBallast(inputRegion, outputRegion, citationEl) {
     const r = computeTractorBallast({
       power_hp: hp.input.value === "" ? 180 : Number(hp.input.value), weight_to_power_ratio: rt.input.value === "" ? 125 : Number(rt.input.value),
       current_weight_lb: cw.input.value === "" ? 18000 : Number(cw.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["power_hp", "weight_to_power_ratio", "current_weight_lb"], r);
     if (r.error) { oTarget.textContent = r.error; oChange.textContent = "-"; return; }
     oTarget.textContent = fmt(r.target_weight_lb, 0) + " lb";
     oChange.textContent = (r.ballast_change_lb >= 0 ? "add " : "remove ") + fmt(Math.abs(r.ballast_change_lb), 0) + " lb";
@@ -615,7 +616,7 @@ function _v940renderAnhydrousAmmoniaRate(inputRegion, outputRegion, citationEl) 
   const update = debounce(() => {
     const r = computeAnhydrousAmmoniaRate({
       n_target_lb_per_ac: nt.input.value === "" ? 180 : Number(nt.input.value), tank_gal: tk.input.value === "" ? 1000 : Number(tk.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["n_target_lb_per_ac", "tank_gal"], r);
     if (r.error) { oRate.textContent = r.error; oAcres.textContent = "-"; return; }
     oRate.textContent = fmt(r.product_lb_per_ac, 1) + " lb/acre (" + fmt(r.product_gal_per_ac, 1) + " gal/acre)";
     oAcres.textContent = r.acres_per_tank === null ? "- (enter tank size)" : fmt(r.acres_per_tank, 1) + " acres/tank";
@@ -665,7 +666,7 @@ function _v964renderMadIrrigationTrigger(inputRegion, outputRegion, citationEl) 
       field_capacity: fc.input.value === "" ? 0.30 : Number(fc.input.value), wilting_point: wp.input.value === "" ? 0.12 : Number(wp.input.value),
       root_depth_in: rd.input.value === "" ? 24 : Number(rd.input.value), mad_fraction: md.input.value === "" ? 0.5 : Number(md.input.value),
       etc_in_day: et.input.value === "" ? 0.25 : Number(et.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["field_capacity", "wilting_point", "root_depth_in", "mad_fraction", "etc_in_day"], r);
     if (r.error) { oT.textContent = r.error; oR.textContent = "-"; oI.textContent = "-"; return; }
     oT.textContent = fmt(r.taw_in, 2) + " in in the root zone";
     oR.textContent = fmt(r.raw_in, 2) + " in";
@@ -710,7 +711,7 @@ function _v974renderFertigationInjectionRate(inputRegion, outputRegion, citation
     const r = computeFertigationInjectionRate({
       product_rate_gal_per_acre: pr.input.value === "" ? 5 : Number(pr.input.value), area_acres: ac.input.value === "" ? 40 : Number(ac.input.value),
       set_time_hours: st.input.value === "" ? 6 : Number(st.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["product_rate_gal_per_acre", "area_acres", "set_time_hours"], r);
     if (r.error) { oT.textContent = r.error; oI.textContent = "-"; return; }
     oT.textContent = fmt(r.total_product_gal, 1) + " gal for the field";
     oI.textContent = fmt(r.injection_rate_gph, 2) + " gph (" + fmt(r.injection_rate_gpm, 3) + " gpm)";

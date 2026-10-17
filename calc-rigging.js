@@ -22,6 +22,7 @@
 import {
   DEBOUNCE_MS, debounce, makeNumber, makeSelect,
   makeOutputLine, attachExampleButton, fmt,
+  stepsFor,
 } from "./ui-fields.js";
 
 const _finiteGuard = (o) => {
@@ -85,7 +86,7 @@ function renderCgLoadShare(inputRegion, outputRegion, citationEl) {
   const oImb = makeOutputLine(outputRegion, "Imbalance", "cls-out-imb");
   const oVerdict = makeOutputLine(outputRegion, "CG position", "cls-out-verdict");
   const update = debounce(() => {
-    const r = computeCgLoadShare({ total_weight_lb: Number(w.input.value) || 0, span_in: Number(span.input.value) || 0, cg_from_p1_in: _numOrNaN(d1.input) });
+    const r = computeCgLoadShare({ total_weight_lb: Number(w.input.value) || 0, span_in: Number(span.input.value) || 0, cg_from_p1_in: _numOrNaN(d1.input) }); stepsFor(outputRegion, inputRegion, ["total_weight_lb", "span_in", "cg_from_p1_in"], r);
     if (r.error) { oP1.textContent = r.error; for (const o of [oP2, oImb, oVerdict]) o.textContent = "-"; return; }
     oP1.textContent = fmt(r.load_p1, 0) + " lb";
     oP2.textContent = fmt(r.load_p2, 0) + " lb";
@@ -163,7 +164,7 @@ function renderCraneNetCapacity(inputRegion, outputRegion, citationEl) {
       wire_rope_lb: Number(wire.input.value) || 0,
       below_hook_lb: Number(below.input.value) || 0,
       load_weight_lb: Number(load.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["gross_chart_lb", "hook_block_lb", "jib_attach_lb", "wire_rope_lb", "below_hook_lb", "load_weight_lb"], r);
     if (r.error) { oNet.textContent = r.error; for (const o of [oHook, oPct, oFlag]) o.textContent = "-"; return; }
     oNet.textContent = fmt(r.net_capacity_lb, 0) + " lb";
     oHook.textContent = fmt(r.total_hook_lb, 0) + " lb";
@@ -215,7 +216,7 @@ function renderCraneGroundBearing(inputRegion, outputRegion, citationEl) {
   const oReq = makeOutputLine(outputRegion, "Area required to pass", "cgb-out-req");
   const oMat = makeOutputLine(outputRegion, "Square mat side", "cgb-out-mat");
   const update = debounce(() => {
-    const r = computeCraneGroundBearing({ reaction_lb: Number(reaction.input.value) || 0, bearing_area_ft2: Number(area.input.value) || 0, allowable_psf: Number(allowable.input.value) || 0 });
+    const r = computeCraneGroundBearing({ reaction_lb: Number(reaction.input.value) || 0, bearing_area_ft2: Number(area.input.value) || 0, allowable_psf: Number(allowable.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["reaction_lb", "bearing_area_ft2", "allowable_psf"], r);
     if (r.error) { oGbp.textContent = r.error; for (const o of [oVerdict, oReq, oMat]) o.textContent = "-"; return; }
     oGbp.textContent = fmt(r.gbp_psf, 0) + " psf";
     oVerdict.textContent = r.verdict;
@@ -284,7 +285,7 @@ function renderSlingDdEfficiency(inputRegion, outputRegion, citationEl) {
   const oEff = makeOutputLine(outputRegion, "Bend efficiency", "sdd-out-eff");
   const oWll = makeOutputLine(outputRegion, "Reduced WLL", "sdd-out-wll");
   const update = debounce(() => {
-    const r = computeSlingDdEfficiency({ rated_wll_lb: Number(rated.input.value) || 0, bend_dia_in: Number(bend.input.value) || 0, sling_dia_in: Number(sling.input.value) || 0 });
+    const r = computeSlingDdEfficiency({ rated_wll_lb: Number(rated.input.value) || 0, bend_dia_in: Number(bend.input.value) || 0, sling_dia_in: Number(sling.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["rated_wll_lb", "bend_dia_in", "sling_dia_in"], r);
     if (r.error) { oRatio.textContent = r.error; oEff.textContent = "-"; oWll.textContent = "-"; return; }
     oRatio.textContent = fmt(r.ratio, 2);
     oEff.textContent = fmt(r.efficiency * 100, 1) + "%";
@@ -342,7 +343,7 @@ function renderWindOnLoad(inputRegion, outputRegion, citationEl) {
       wind_mph: Number(wind.input.value) || 0,
       shape_coef: shape.input.value === "" ? 1.6 : Number(shape.input.value),
       load_weight_lb: Number(weight.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["sail_area_ft2", "wind_mph", "shape_coef", "load_weight_lb"], r);
     if (r.error) { oQ.textContent = r.error; oForce.textContent = "-"; oSwing.textContent = "-"; return; }
     oQ.textContent = fmt(r.q_psf, 3) + " psf";
     oForce.textContent = fmt(r.wind_lb, 1) + " lb";
@@ -396,7 +397,7 @@ function renderMaxWindSpeedForLift(inputRegion, outputRegion, citationEl) {
       load_weight_lb: Number(weight.input.value) || 0,
       sail_area_ft2: Number(area.input.value) || 0,
       shape_coef: shape.input.value === "" ? 1.6 : Number(shape.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["max_swing_deg", "load_weight_lb", "sail_area_ft2", "shape_coef"], r);
     if (r.error) { oV.textContent = r.error; oF.textContent = "-"; oN.textContent = "-"; return; }
     oV.textContent = fmt(r.max_wind_mph, 1) + " mph";
     oF.textContent = fmt(r.wind_lb, 1) + " lb";
@@ -449,7 +450,7 @@ function renderTaglineForce(inputRegion, outputRegion, citationEl) {
       lateral_force_lb: Number(force.input.value) || 0,
       tagline_angle_deg: Number(angle.input.value) || 0,
       per_person_lb: perPerson.input.value === "" ? 50 : Number(perPerson.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["lateral_force_lb", "tagline_angle_deg", "per_person_lb"], r);
     if (r.error) { oTension.textContent = r.error; oHandlers.textContent = "-"; oVerdict.textContent = "-"; return; }
     oTension.textContent = fmt(r.tag_tension_lb, 1) + " lb";
     oHandlers.textContent = r.handlers + " handlers";
@@ -525,7 +526,7 @@ function renderTandemLiftShare(inputRegion, outputRegion, citationEl) {
       derate_pct: derate.input.value === "" ? 75 : Number(derate.input.value),
       c1_chart_lb: Number(c1.input.value) || 0,
       c2_chart_lb: Number(c2.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["total_weight_lb", "span_in", "cg_from_c1_in", "derate_pct", "c1_chart_lb", "c2_chart_lb"], r);
     if (r.error) { oS1.textContent = r.error; oS2.textContent = "-"; oVerdict.textContent = "-"; return; }
     oS1.textContent = fmt(r.share_c1, 0) + " / " + fmt(r.allow_c1, 0) + " lb " + (r.pass_c1 ? "(ok)" : "(over)");
     oS2.textContent = fmt(r.share_c2, 0) + " / " + fmt(r.allow_c2, 0) + " lb " + (r.pass_c2 ? "(ok)" : "(over)");
@@ -611,7 +612,7 @@ function renderShackleEyeboltWll(inputRegion, outputRegion, citationEl) {
   const oCap = makeOutputLine(outputRegion, "Derated capacity", "se-out-cap");
   const oVerdict = makeOutputLine(outputRegion, "Verdict", "se-out-verdict");
   const update = debounce(() => {
-    const r = computeShackleEyeboltWll({ leg_load_lb: Number(leg.input.value) || 0, rated_wll_lb: Number(rated.input.value) || 0, angle_deg: Number(angle.input.value) || 0, hardware: hardware.select.value });
+    const r = computeShackleEyeboltWll({ leg_load_lb: Number(leg.input.value) || 0, rated_wll_lb: Number(rated.input.value) || 0, angle_deg: Number(angle.input.value) || 0, hardware: hardware.select.value }); stepsFor(outputRegion, inputRegion, ["leg_load_lb", "rated_wll_lb", "angle_deg", "hardware"], r);
     if (r.error) { oReq.textContent = r.error; for (const o of [oDerate, oCap, oVerdict]) o.textContent = "-"; return; }
     oReq.textContent = fmt(r.required_wll_lb, 0) + " lb catalog WLL needed at this angle (this one: MBS at 5:1 " + fmt(r.mbs_lb, 0) + " lb)";
     oDerate.textContent = fmt(r.derate * 100, 0) + "% (" + r.hardware + ")";
@@ -669,7 +670,7 @@ function renderSpreaderBeam(inputRegion, outputRegion, citationEl) {
   const oMoment = makeOutputLine(outputRegion, "Lifting beam moment", "sb-out-moment");
   const oHead = makeOutputLine(outputRegion, "Headroom consumed", "sb-out-head");
   const update = debounce(() => {
-    const r = computeSpreaderBeam({ load_lb: Number(load.input.value) || 0, bar_length_ft: Number(bar.input.value) || 0, top_height_ft: Number(top.input.value) || 0 });
+    const r = computeSpreaderBeam({ load_lb: Number(load.input.value) || 0, bar_length_ft: Number(bar.input.value) || 0, top_height_ft: Number(top.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["load_lb", "bar_length_ft", "top_height_ft"], r);
     if (r.error) { oAngle.textContent = r.error; for (const o of [oTop, oBar, oMoment, oHead]) o.textContent = "-"; return; }
     oAngle.textContent = fmt(r.sling_angle_deg, 1) + " deg" + (r.below_30_deg ? " -- BELOW 30 deg: ASME B30.9 does not permit it without a qualified person's approval" : "");
     oTop.textContent = fmt(r.top_sling_tension_lb, 0) + " lb";
@@ -725,7 +726,7 @@ function renderSpreaderBeamMinHeight(inputRegion, outputRegion, citationEl) {
   const oBar = makeOutputLine(outputRegion, "Spreader bar compression", "sbm-out-bar");
   const oNote = makeOutputLine(outputRegion, "Note", "sbm-out-note");
   const update = debounce(() => {
-    const r = computeSpreaderBeamMinHeight({ load_lb: Number(load.input.value) || 0, bar_length_ft: Number(bar.input.value) || 0, sling_wll_lb: Number(wll.input.value) || 0 });
+    const r = computeSpreaderBeamMinHeight({ load_lb: Number(load.input.value) || 0, bar_length_ft: Number(bar.input.value) || 0, sling_wll_lb: Number(wll.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["load_lb", "bar_length_ft", "sling_wll_lb"], r);
     if (r.error) { oHeight.textContent = r.error; for (const o of [oAngle, oBar, oNote]) o.textContent = o === oNote ? "" : "-"; return; }
     oHeight.textContent = fmt(r.min_top_height_ft, 2) + " ft";
     oAngle.textContent = fmt(r.sling_angle_deg, 1) + " deg" + (r.angle_floor_governs ? " (the B30.9 30 deg floor governs, not the sling WLL)" : "");
@@ -781,7 +782,7 @@ function renderForkliftCapacityDerate(inputRegion, outputRegion, citationEl) {
   const oMargin = makeOutputLine(outputRegion, "Margin", "fk-out-margin");
   const oVerdict = makeOutputLine(outputRegion, "Verdict", "fk-out-verdict");
   const update = debounce(() => {
-    const r = computeForkliftCapacityDerate({ rated_cap_lb: Number(ratedCap.input.value) || 0, rated_lc_in: Number(ratedLc.input.value) || 0, actual_lc_in: Number(actualLc.input.value) || 0, load_lb: Number(load.input.value) || 0 });
+    const r = computeForkliftCapacityDerate({ rated_cap_lb: Number(ratedCap.input.value) || 0, rated_lc_in: Number(ratedLc.input.value) || 0, actual_lc_in: Number(actualLc.input.value) || 0, load_lb: Number(load.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["rated_cap_lb", "rated_lc_in", "actual_lc_in", "load_lb"], r);
     if (r.error) { oNet.textContent = r.error; oMargin.textContent = "-"; oVerdict.textContent = "-"; return; }
     oNet.textContent = fmt(r.net_capacity_lb, 0) + " lb";
     oMargin.textContent = fmt(r.margin_pct, 1) + "%";
@@ -840,7 +841,7 @@ function renderRollerJackForce(inputRegion, outputRegion, citationEl) {
   const oBreak = makeOutputLine(outputRegion, "Breakaway push", "rj-out-break");
   const oSkates = makeOutputLine(outputRegion, "Skates by capacity", "rj-out-skates");
   const update = debounce(() => {
-    const r = computeRollerJackForce({ load_lb: Number(load.input.value) || 0, roll_coef: coef.input.value === "" ? 0.03 : Number(coef.input.value), incline_deg: Number(incline.input.value) || 0, skate_cap_lb: Number(skateCap.input.value) || 0 });
+    const r = computeRollerJackForce({ load_lb: Number(load.input.value) || 0, roll_coef: coef.input.value === "" ? 0.03 : Number(coef.input.value), incline_deg: Number(incline.input.value) || 0, skate_cap_lb: Number(skateCap.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["load_lb", "roll_coef", "incline_deg", "skate_cap_lb"], r);
     if (r.error) { oRoll.textContent = r.error; for (const o of [oPush, oBreak, oSkates]) o.textContent = "-"; return; }
     oRoll.textContent = fmt(r.roll_force_lb, 0) + " lb (grade " + fmt(r.grade_force_lb, 0) + " lb)";
     oPush.textContent = fmt(r.push_steady_lb, 0) + " lb";
@@ -896,7 +897,7 @@ function renderChainLeverHoist(inputRegion, outputRegion, citationEl) {
   const oTravel = makeOutputLine(outputRegion, "Hand-chain travel for the lift", "ch-out-travel");
   const oVerdict = makeOutputLine(outputRegion, "Verdict vs rated WLL", "ch-out-verdict");
   const update = debounce(() => {
-    const r = computeChainLeverHoist({ load_lb: Number(load.input.value) || 0, rated_wll_lb: Number(rated.input.value) || 0, mech_adv: Number(ma.input.value) || 0, efficiency: eff.input.value === "" ? 0.85 : Number(eff.input.value), lift_ft: Number(lift.input.value) || 0 });
+    const r = computeChainLeverHoist({ load_lb: Number(load.input.value) || 0, rated_wll_lb: Number(rated.input.value) || 0, mech_adv: Number(ma.input.value) || 0, efficiency: eff.input.value === "" ? 0.85 : Number(eff.input.value), lift_ft: Number(lift.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["load_lb", "rated_wll_lb", "mech_adv", "efficiency", "lift_ft"], r);
     if (r.error) { oPull.textContent = r.error; oTravel.textContent = "-"; oVerdict.textContent = "-"; return; }
     oPull.textContent = fmt(r.hand_pull_lb, 1) + " lb";
     oTravel.textContent = fmt(r.hand_chain_travel_ft, 0) + " ft";
@@ -936,7 +937,7 @@ function renderBlockRedirectLoad(inputRegion, outputRegion, citationEl) {
   const oResultant = makeOutputLine(outputRegion, "Resultant on the block / anchor", "br-out-resultant");
   const oAngle = makeOutputLine(outputRegion, "Direction change", "br-out-angle");
   const update = debounce(() => {
-    const r = computeBlockRedirectLoad({ line_tension_lb: Number(tension.input.value) || 0, direction_chg_deg: Number(angle.input.value) || 0 });
+    const r = computeBlockRedirectLoad({ line_tension_lb: Number(tension.input.value) || 0, direction_chg_deg: Number(angle.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["line_tension_lb", "direction_chg_deg"], r);
     if (r.error) { oResultant.textContent = r.error; oAngle.textContent = "-"; return; }
     oResultant.textContent = fmt(r.resultant_lb, 0) + " lb";
     oAngle.textContent = fmt(r.direction_chg_deg, 0) + " deg";
@@ -978,7 +979,7 @@ function renderBlockRedirectMaxAngle(inputRegion, outputRegion, citationEl) {
   const oResultant = makeOutputLine(outputRegion, "Resultant at that angle", "bra-out-resultant");
   const oNote = makeOutputLine(outputRegion, "Note", "bra-out-note");
   const update = debounce(() => {
-    const r = computeBlockRedirectMaxAngle({ line_tension_lb: Number(tension.input.value) || 0, block_wll_lb: Number(wll.input.value) || 0 });
+    const r = computeBlockRedirectMaxAngle({ line_tension_lb: Number(tension.input.value) || 0, block_wll_lb: Number(wll.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["line_tension_lb", "block_wll_lb"], r);
     if (r.error) { oAngle.textContent = r.error; oResultant.textContent = "-"; oNote.textContent = ""; return; }
     oAngle.textContent = fmt(r.max_angle_deg, 1) + " deg" + (r.unlimited ? " (any turn up to 180 deg is within rating)" : "");
     oResultant.textContent = fmt(r.resultant_at_max_lb, 0) + " lb";
@@ -1030,7 +1031,7 @@ function renderMultiLegSling(inputRegion, outputRegion, citationEl) {
   const oF = makeOutputLine(outputRegion, "Load factor (1/sin)", "mls-out-f");
   const oN = makeOutputLine(outputRegion, "Note", "mls-out-n");
   const update = debounce(() => {
-    const r = computeMultiLegSling({ total_load_lb: Number(load.input.value) || 0, num_legs: Number(legs.select.value) || 0, horizontal_angle_deg: Number(angle.input.value) || 0 });
+    const r = computeMultiLegSling({ total_load_lb: Number(load.input.value) || 0, num_legs: Number(legs.select.value) || 0, horizontal_angle_deg: Number(angle.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["total_load_lb", "num_legs", "horizontal_angle_deg"], r);
     if (r.error) { oT.textContent = r.error; oE.textContent = "-"; oF.textContent = "-"; oN.textContent = "-"; return; }
     oT.textContent = fmt(r.tension_per_leg_lb, 0) + " lb (over " + r.share_legs + " legs)";
     oE.textContent = fmt(r.equal_share_lb, 0) + " lb";
@@ -1068,7 +1069,7 @@ function renderWireRopeStrength(inputRegion, outputRegion, citationEl) {
   const oW = makeOutputLine(outputRegion, "Working load limit", "wrs-out-w");
   const oN = makeOutputLine(outputRegion, "Note", "wrs-out-n");
   const update = debounce(() => {
-    const r = computeWireRopeStrength({ diameter_in: Number(dia.input.value) || 0, construction_factor: Number(cf.input.value) || 0, design_factor: Number(df.input.value) || 0 });
+    const r = computeWireRopeStrength({ diameter_in: Number(dia.input.value) || 0, construction_factor: Number(cf.input.value) || 0, design_factor: Number(df.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["diameter_in", "construction_factor", "design_factor"], r);
     if (r.error) { oM.textContent = r.error; oW.textContent = "-"; oN.textContent = "-"; return; }
     oM.textContent = fmt(r.mbs_tons, 2) + " tons";
     oW.textContent = fmt(r.wll_tons, 2) + " tons";
@@ -1113,7 +1114,7 @@ function renderWireRopeDiameterForWll(inputRegion, outputRegion, citationEl) {
   const oS = makeOutputLine(outputRegion, "Next standard size", "wrd-out-s");
   const oN = makeOutputLine(outputRegion, "Note", "wrd-out-n");
   const update = debounce(() => {
-    const r = computeWireRopeDiameterForWll({ wll_required_tons: Number(wll.input.value) || 0, construction_factor: Number(cf.input.value) || 0, design_factor: Number(df.input.value) || 0 });
+    const r = computeWireRopeDiameterForWll({ wll_required_tons: Number(wll.input.value) || 0, construction_factor: Number(cf.input.value) || 0, design_factor: Number(df.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["wll_required_tons", "construction_factor", "design_factor"], r);
     if (r.error) { oD.textContent = r.error; oS.textContent = "-"; oN.textContent = "-"; return; }
     oD.textContent = fmt(r.diameter_in, 3) + " in";
     oS.textContent = r.selected_diameter_in ? fmt(r.selected_diameter_in, 4) + " in (WLL " + fmt(r.selected_wll_tons, 2) + " tons)" : "over 1-1/2 in -- use the manufacturer's table";
@@ -1164,7 +1165,7 @@ function renderWireRopeStretch(inputRegion, outputRegion, citationEl) {
   const oP = makeOutputLine(outputRegion, "Stretch (% of length)", "wrs-out-p");
   const oN = makeOutputLine(outputRegion, "Note", "wrs-out-n");
   const update = debounce(() => {
-    const r = computeWireRopeStretch({ load_lb: Number(P.input.value) || 0, length_ft: Number(L.input.value) || 0, rope_diameter_in: Number(d.input.value) || 0, effective_modulus_psi: Number(E.input.value) || 0, metallic_area_factor: Number(F.input.value) || 0 });
+    const r = computeWireRopeStretch({ load_lb: Number(P.input.value) || 0, length_ft: Number(L.input.value) || 0, rope_diameter_in: Number(d.input.value) || 0, effective_modulus_psi: Number(E.input.value) || 0, metallic_area_factor: Number(F.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["load_lb", "length_ft", "rope_diameter_in", "effective_modulus_psi", "metallic_area_factor"], r);
     if (r.error) { oS.textContent = r.error; oP.textContent = "-"; oN.textContent = "-"; return; }
     oS.textContent = fmt(r.stretch_in, 2) + " in (metallic area " + fmt(r.metallic_area_in2, 4) + " in^2)";
     oP.textContent = fmt(r.stretch_pct, 3) + "% (plus ~0.25% one-time seating on new IWRC rope at normal load)";
@@ -1226,7 +1227,7 @@ function renderSpanlineSagTension(inputRegion, outputRegion, citationEl) {
   const oRatio = makeOutputLine(outputRegion, "Sag ratio", "sst-out-ratio");
   const oNote = makeOutputLine(outputRegion, "Note", "sst-out-note");
   const update = debounce(() => {
-    const r = computeSpanlineSagTension({ span_ft: Number(span.input.value) || 0, load_lb_per_ft: Number(load.input.value) || 0, sag_ft: Number(sag.input.value) || 0, point_load_lb: Number(point.input.value) || 0 });
+    const r = computeSpanlineSagTension({ span_ft: Number(span.input.value) || 0, load_lb_per_ft: Number(load.input.value) || 0, sag_ft: Number(sag.input.value) || 0, point_load_lb: Number(point.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["span_ft", "load_lb_per_ft", "sag_ft", "point_load_lb"], r);
     if (r.error) { oH.textContent = r.error; oT.textContent = "-"; oLen.textContent = "-"; oRatio.textContent = "-"; oNote.textContent = "-"; return; }
     oH.textContent = fmt(r.horizontal_tension_lb, 1) + " lb";
     oT.textContent = fmt(r.support_tension_lb, 1) + " lb";
@@ -1288,7 +1289,7 @@ function renderSpanlineSagForTension(inputRegion, outputRegion, citationEl) {
   const oRatio = makeOutputLine(outputRegion, "Sag ratio", "ssft-out-ratio");
   const oNote = makeOutputLine(outputRegion, "Note", "ssft-out-note");
   const update = debounce(() => {
-    const r = computeSpanlineSagForTension({ span_ft: Number(span.input.value) || 0, load_lb_per_ft: Number(load.input.value) || 0, allowable_tension_lb: Number(tension.input.value) || 0, point_load_lb: Number(point.input.value) || 0 });
+    const r = computeSpanlineSagForTension({ span_ft: Number(span.input.value) || 0, load_lb_per_ft: Number(load.input.value) || 0, allowable_tension_lb: Number(tension.input.value) || 0, point_load_lb: Number(point.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["span_ft", "load_lb_per_ft", "allowable_tension_lb", "point_load_lb"], r);
     if (r.error) { oSag.textContent = r.error; oH.textContent = "-"; oRatio.textContent = "-"; oNote.textContent = "-"; return; }
     oSag.textContent = fmt(r.min_sag_ft, 3) + " ft";
     oH.textContent = fmt(r.horizontal_tension_lb, 1) + " lb";
@@ -1338,7 +1339,7 @@ function renderBridleLegTension(inputRegion, outputRegion, citationEl) {
   const oT2 = makeOutputLine(outputRegion, "Leg 2 tension / angle", "blt-out-t2");
   const oH = makeOutputLine(outputRegion, "Horizontal beam reaction", "blt-out-h");
   const update = debounce(() => {
-    const r = computeBridleLegTension({ apex_load_lb: Number(w.input.value) || 0, run1_ft: Number(r1.input.value) || 0, rise1_ft: Number(h1.input.value) || 0, run2_ft: Number(r2.input.value) || 0, rise2_ft: Number(h2.input.value) || 0 });
+    const r = computeBridleLegTension({ apex_load_lb: Number(w.input.value) || 0, run1_ft: Number(r1.input.value) || 0, rise1_ft: Number(h1.input.value) || 0, run2_ft: Number(r2.input.value) || 0, rise2_ft: Number(h2.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["apex_load_lb", "run1_ft", "rise1_ft", "run2_ft", "rise2_ft"], r);
     if (r.error) { oT1.textContent = r.error; for (const o of [oT2, oH]) o.textContent = "-"; return; }
     oT1.textContent = fmt(r.t1_lb, 0) + " lb at " + fmt(r.angle1_deg, 0) + " deg (" + fmt(r.l1_ft, 2) + " ft)" + (r.t1_lb > (Number(w.input.value) || 0) ? " - over the load" : "");
     oT2.textContent = fmt(r.t2_lb, 0) + " lb at " + fmt(r.angle2_deg, 0) + " deg (" + fmt(r.l2_ft, 2) + " ft)" + (r.t2_lb > (Number(w.input.value) || 0) ? " - over the load" : "");
@@ -1395,7 +1396,7 @@ function renderWinchDrumLinePull(inputRegion, outputRegion, citationEl) {
   const oP = makeOutputLine(outputRegion, "Pull at layer", "wdl-out-p");
   const oS = makeOutputLine(outputRegion, "Speed / wraps per layer", "wdl-out-s");
   const update = debounce(() => {
-    const r = computeWinchDrumLinePull({ rated_pull_lb: Number(p.input.value) || 0, drum_dia_in: Number(d.input.value) || 0, rope_dia_in: Number(rr.input.value) || 0, barrel_width_in: Number(bw.input.value) || 0, target_layer: Number(n.input.value) || 0 });
+    const r = computeWinchDrumLinePull({ rated_pull_lb: Number(p.input.value) || 0, drum_dia_in: Number(d.input.value) || 0, rope_dia_in: Number(rr.input.value) || 0, barrel_width_in: Number(bw.input.value) || 0, target_layer: Number(n.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["rated_pull_lb", "drum_dia_in", "rope_dia_in", "barrel_width_in", "target_layer"], r);
     if (r.error) { oM.textContent = r.error; for (const o of [oP, oS]) o.textContent = "-"; return; }
     oM.textContent = fmt(r.mean_dia_in, 2) + " in";
     oP.textContent = fmt(r.pull_at_layer_lb, 0) + " lb (" + fmt(r.derate_pct, 0) + "% below rated)";
@@ -1462,7 +1463,7 @@ function renderCraneOutriggerReaction(inputRegion, outputRegion, citationEl) {
   const oM = makeOutputLine(outputRegion, "Net overturning moment", "cor-out-m");
   const oR = makeOutputLine(outputRegion, "Max outrigger reaction (over corner)", "cor-out-r");
   const update = debounce(() => {
-    const x = computeCraneOutriggerReaction({ gross_load_kip: Number(w.input.value) || 0, counterweight_kip: Number(wc.input.value) || 0, load_radius_ft: Number(r.input.value) || 0, cw_radius_ft: Number(rc.input.value) || 0, outrigger_spread_ft: Number(sp.input.value) || 0 });
+    const x = computeCraneOutriggerReaction({ gross_load_kip: Number(w.input.value) || 0, counterweight_kip: Number(wc.input.value) || 0, load_radius_ft: Number(r.input.value) || 0, cw_radius_ft: Number(rc.input.value) || 0, outrigger_spread_ft: Number(sp.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["gross_load_kip", "counterweight_kip", "load_radius_ft", "cw_radius_ft", "outrigger_spread_ft"], x);
     if (x.error) { oE.textContent = x.error; for (const o of [oM, oR]) o.textContent = "-"; return; }
     oE.textContent = fmt(x.even_share_kip, 1) + " kip";
     oM.textContent = fmt(x.overturning_kipft, 0) + " kip-ft";
@@ -1543,7 +1544,7 @@ function renderLiftingLugDesign(inputRegion, outputRegion, citationEl) {
   const oGov = makeOutputLine(outputRegion, "Governing mode / capacity", "llg-out-gov");
   const oDcr = makeOutputLine(outputRegion, "Demand / capacity", "llg-out-dcr");
   const update = debounce(() => {
-    const r = computeLiftingLugDesign({ applied_load_kip: Number(P.input.value) || 0, plate_thick_in: Number(t.input.value) || 0, hole_dia_in: Number(Dh.input.value) || 0, pin_dia_in: Number(Dp.input.value) || 0, edge_dist_in: Number(a.input.value) || 0, plate_width_in: Number(w.input.value) || 0, fy_ksi: Number(fy.input.value) || 0, fu_ksi: Number(fu.input.value) || 0, design_factor: Number(nd.input.value) || 0 });
+    const r = computeLiftingLugDesign({ applied_load_kip: Number(P.input.value) || 0, plate_thick_in: Number(t.input.value) || 0, hole_dia_in: Number(Dh.input.value) || 0, pin_dia_in: Number(Dp.input.value) || 0, edge_dist_in: Number(a.input.value) || 0, plate_width_in: Number(w.input.value) || 0, fy_ksi: Number(fy.input.value) || 0, fu_ksi: Number(fu.input.value) || 0, design_factor: Number(nd.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["applied_load_kip", "plate_thick_in", "hole_dia_in", "pin_dia_in", "edge_dist_in", "plate_width_in", "fy_ksi", "fu_ksi", "design_factor"], r);
     if (r.error) { oCap.textContent = r.error; for (const o of [oGov, oDcr]) o.textContent = "-"; return; }
     oCap.textContent = fmt(r.bearing_kip, 1) + " / " + fmt(r.tension_kip, 1) + " / " + fmt(r.tearout_kip, 1) + " / " + fmt(r.fracture_kip, 1) + " kip";
     oGov.textContent = r.governing_mode + " at " + fmt(r.governing_kip, 1) + " kip";
@@ -1622,7 +1623,7 @@ function renderThreePointBridle(inputRegion, outputRegion, citationEl) {
       e1_ft: Number(e1.input.value) || 0, n1_ft: Number(n1.input.value) || 0, r1_ft: Number(r1.input.value) || 0,
       e2_ft: Number(e2.input.value) || 0, n2_ft: Number(n2.input.value) || 0, r2_ft: Number(r2.input.value) || 0,
       e3_ft: Number(e3.input.value) || 0, n3_ft: Number(n3.input.value) || 0, r3_ft: Number(r3.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["apex_load_lb", "e1_ft", "n1_ft", "r1_ft", "e2_ft", "n2_ft", "r2_ft", "e3_ft", "n3_ft", "r3_ft"], r);
     if (r.error) { oT1.textContent = r.error; oT2.textContent = "-"; oT3.textContent = "-"; return; }
     const W = Number(w.input.value) || 0;
     oT1.textContent = fmt(r.t1_lb, 0) + " lb at " + fmt(r.angle1_deg, 0) + " deg (" + fmt(r.len1_ft, 2) + " ft)" + (r.t1_lb > W ? " - over the load" : "");
@@ -1680,7 +1681,7 @@ function renderBeamClampSidePull(inputRegion, outputRegion, citationEl) {
   const oH = makeOutputLine(outputRegion, "Horizontal (side pull)", "bcs-out-h");
   const oN = makeOutputLine(outputRegion, "Verdict", "bcs-out-n");
   const update = debounce(() => {
-    const r = computeBeamClampSidePull({ leg_tension_lb: Number(t.input.value) || 0, leg_angle_deg: Number(a.input.value) || 0, vertical_wll_lb: Number(vc.input.value) || 0, side_pull_lb: Number(hc.input.value) || 0 });
+    const r = computeBeamClampSidePull({ leg_tension_lb: Number(t.input.value) || 0, leg_angle_deg: Number(a.input.value) || 0, vertical_wll_lb: Number(vc.input.value) || 0, side_pull_lb: Number(hc.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["leg_tension_lb", "leg_angle_deg", "vertical_wll_lb", "side_pull_lb"], r);
     if (r.error) { oV.textContent = r.error; oH.textContent = "-"; oN.textContent = "-"; return; }
     oV.textContent = fmt(r.vertical_lb, 1) + " lb (" + fmt(r.vertical_util_pct, 1) + "% of the WLL)";
     oH.textContent = fmt(r.horizontal_lb, 1) + " lb" + (r.horizontal_rated ? " (" + fmt(r.horizontal_util_pct, 1) + "% of the side-pull rating)" : " - no side-pull rating") + ", pulling " + fmt(r.pull_from_vertical_deg, 1) + " deg off vertical";

@@ -806,7 +806,7 @@ function renderEvaporativeCoolerEffectiveness(inputRegion, outputRegion, citatio
   const oW = makeOutputLine(outputRegion, "Wet-bulb depression (max drop)", "ece-out-w");
   const oNote = makeOutputLine(outputRegion, "Note", "ece-out-note");
   const update = debounce(() => {
-    const r = computeEvaporativeCoolerEffectiveness({ dry_bulb_F: db.input.value === "" ? null : Number(db.input.value), wet_bulb_F: wb.input.value === "" ? null : Number(wb.input.value), effectiveness: Number(eff.input.value) });
+    const r = computeEvaporativeCoolerEffectiveness({ dry_bulb_F: db.input.value === "" ? null : Number(db.input.value), wet_bulb_F: wb.input.value === "" ? null : Number(wb.input.value), effectiveness: Number(eff.input.value) }); stepsFor(outputRegion, inputRegion, ["dry_bulb_F", "wet_bulb_F", "effectiveness"], r);
     if (r.error) { oT.textContent = r.error; oD.textContent = "-"; oW.textContent = "-"; oNote.textContent = ""; return; }
     oT.textContent = fmt(r.leaving_db_F, 1) + " F";
     oD.textContent = fmt(r.temp_drop_F, 1) + " F";
@@ -854,7 +854,7 @@ function renderIndirectEvaporativeCooling(inputRegion, outputRegion, citationEl)
   const oW = makeOutputLine(outputRegion, "Wet-bulb depression (max drop)", "iec-out-w");
   const oNote = makeOutputLine(outputRegion, "Note", "iec-out-note");
   const update = debounce(() => {
-    const r = computeIndirectEvaporativeCooling({ dry_bulb_F: db.input.value === "" ? null : Number(db.input.value), secondary_wet_bulb_F: wb.input.value === "" ? null : Number(wb.input.value), effectiveness: Number(eff.input.value) });
+    const r = computeIndirectEvaporativeCooling({ dry_bulb_F: db.input.value === "" ? null : Number(db.input.value), secondary_wet_bulb_F: wb.input.value === "" ? null : Number(wb.input.value), effectiveness: Number(eff.input.value) }); stepsFor(outputRegion, inputRegion, ["dry_bulb_F", "secondary_wet_bulb_F", "effectiveness"], r);
     if (r.error) { oT.textContent = r.error; oD.textContent = "-"; oW.textContent = "-"; oNote.textContent = ""; return; }
     oT.textContent = fmt(r.leaving_db_F, 1) + " F";
     oD.textContent = fmt(r.temp_drop_F, 1) + " F";
@@ -886,7 +886,7 @@ export function renderApproachDeltaT(inputRegion, outputRegion, citationEl) {
       condenser_saturation_F: sat.input.value === "" ? null : Number(sat.input.value),
       supply_F: supply.input.value === "" ? null : Number(supply.input.value),
       return_F: ret.input.value === "" ? null : Number(ret.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["outdoor_F", "condenser_saturation_F", "supply_F", "return_F"], r);
     if (r.error) { oA.textContent = r.error; oAB.textContent = "-"; oD.textContent = "-"; oDB.textContent = "-"; return; }
     oA.textContent = fmt(r.approach_F, 1) + " F";
     oAB.textContent = r.approach_band;
@@ -917,7 +917,7 @@ export function renderOutdoorAirMix(inputRegion, outputRegion, citationEl) {
       outdoor_T_F: ot.input.value === "" ? null : Number(ot.input.value),
       outdoor_RH_percent: oh.input.value === "" ? null : Number(oh.input.value),
       oa_fraction: f.input.value === "" ? null : Number(f.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["return_T_F", "return_RH_percent", "outdoor_T_F", "outdoor_RH_percent", "oa_fraction"], r);
     if (r.error) { oT.textContent = r.error; oG.textContent = "-"; return; }
     oT.textContent = fmt(r.mixed_T_F, 2) + " F";
     oG.textContent = fmt(r.mixed_GPP, 1) + " GPP";
@@ -950,7 +950,7 @@ export function renderEquivalentLength(inputRegion, outputRegion, citationEl) {
     const r = computeEquivalentLength({
       items: [{ type: type.select.value, diameter: dia.select.value, count: Number(cnt.input.value) || 0 }]
         .concat(type2.select.value && Number(cnt2.input.value) > 0 ? [{ type: type2.select.value, diameter: dia2.select.value, count: Number(cnt2.input.value) }] : []),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["items"], r);
     if (r.error) { oT.textContent = r.error; oE.textContent = "-"; return; }
     oT.textContent = fmt(r.total_equivalent_ft, 2) + " ft";
     oE.textContent = r.items.length ? fmt(r.items[0].equivalent_ft_each, 2) + " ft" : "-";
@@ -972,7 +972,7 @@ export function renderWetBulbPsychrometer(inputRegion, outputRegion, citationEl)
     const r = computeWetBulbPsychrometer({
       dry_bulb_F: Number(td.input.value) || 0,
       wet_bulb_F: Number(tw.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["dry_bulb_F", "wet_bulb_F"], r);
     if (r.error) { oRH.textContent = r.error; oDP.textContent = "-"; oG.textContent = "-"; return; }
     oRH.textContent = fmt(r.RH_percent, 1) + " %";
     oDP.textContent = fmt(r.dew_point_F, 1) + " F";
@@ -1025,7 +1025,7 @@ export function renderInsulationThickness(inputRegion, outputRegion, citationEl)
       film_mode: fm.select.value,
       jacket_emissivity: Number(je.input.value) || 0,
       wind_mph: Number(wind.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["pipe_od_in", "surface_temp_F", "ambient_F", "surface_limit_F", "k_btu_in_per_hr_ft2_F", "outside_film_coeff_btu_hr_ft2_F", "at_thickness_in", "alt_film_coeff_btu_hr_ft2_F", "film_mode", "jacket_emissivity", "wind_mph"], r);
     if (r.error) { oT.textContent = r.error; oA.textContent = ""; oF.textContent = ""; oN.textContent = ""; return; }
     oT.textContent = fmt(r.thickness_in, 3) + " in" + (r.film_computed ? " (computed film " + fmt(r.film_used_btu_hr_ft2_F, 2) + " BTU/hr-ft2-F at the jacket)" : "");
     oA.textContent = r.at_thickness_verdict;
@@ -1050,7 +1050,7 @@ export function renderEvaporativeCooling(inputRegion, outputRegion, citationEl) 
     const r = computeEvaporativeCooling({
       evaporation_rate_lb_hr: Number(m.input.value) || 0,
       hfg_btu_per_lb: Number(h.input.value) || HFG_WATER_BTU_PER_LB,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["evaporation_rate_lb_hr", "hfg_btu_per_lb"], r);
     if (r.error) { oQ.textContent = r.error; oT.textContent = "-"; return; }
     oQ.textContent = fmt(r.cooling_btu_hr, 0) + " BTU/hr";
     oT.textContent = fmt(r.cooling_tons, 3) + " tons";
@@ -1063,6 +1063,7 @@ export function renderEvaporativeCooling(inputRegion, outputRegion, citationEl) 
 import {
   DEBOUNCE_MS, debounce, makeNumber, makeText, makeSelect, makeCheckbox, makeTextarea,
   makeOutputLine, attachExampleButton, fmt, makeRowField,
+  stepsFor,
 } from "./ui-fields.js";
 // v8 §D.2 shared context-band helper.
 import { formatContextBand } from "./context-band.js";
@@ -1328,7 +1329,7 @@ export function renderStaticPressureHvac(inputRegion, outputRegion, citationEl) 
   const oT = makeOutputLine(outputRegion, "Total external static pressure", "sp-out-t");
   const update = debounce(() => {
     const list = elements.map((e) => ({ name: e.label, dp_in_wc: Number(inputs[e.id].value) || 0 }));
-    const r = computeStaticPressureHvac({ elements: list });
+    const r = computeStaticPressureHvac({ elements: list }); stepsFor(outputRegion, inputRegion, ["elements"], r);
     oT.textContent = fmt(r.total_in_wc, 3) + " in w.c.";
   }, DEBOUNCE_MS);
   for (const el of Object.values(inputs)) el.addEventListener("input", update);
@@ -1349,7 +1350,7 @@ export function renderSeerEer(inputRegion, outputRegion, citationEl) {
   const oOut = makeOutputLine(outputRegion, "Result", "se-out");
   const oAnnual = makeOutputLine(outputRegion, "Annual energy (if load + hours)", "se-out-annual");
   const update = debounce(() => {
-    const r = computeSeerEer({ value: Number(value.input.value) || 0, from: from.select.value, cooling_load_btu_hr: Number(load.input.value) || 0, annual_hours: Number(hrs.input.value) || 0, electricity_rate: Number(rate.input.value) || 0 });
+    const r = computeSeerEer({ value: Number(value.input.value) || 0, from: from.select.value, cooling_load_btu_hr: Number(load.input.value) || 0, annual_hours: Number(hrs.input.value) || 0, electricity_rate: Number(rate.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["value", "from", "cooling_load_btu_hr", "annual_hours", "electricity_rate"], r);
     if (r.error) { oOut.textContent = r.error; oAnnual.textContent = "-"; return; }
     oOut.textContent = Object.entries(r).filter(([k]) => k !== "annual_kwh" && k !== "annual_cost_usd").map(([k, v]) => k + " " + fmt(v, 2)).join(", ");
     oAnnual.textContent = r.annual_kwh == null ? "(enter cooling load + annual hours)" : (fmt(r.annual_kwh, 0) + " kWh/yr" + (r.annual_cost_usd == null ? "" : " (~$" + fmt(r.annual_cost_usd, 0) + "/yr)"));
@@ -1375,7 +1376,7 @@ export function renderBalancePoint(inputRegion, outputRegion, citationEl) {
       design_outdoor_F: dT.input.value === "" ? null : Number(dT.input.value),
       building_heat_loss_btu_hr: load.input.value === "" ? null : Number(load.input.value),
       indoor_F: indoor.input.value === "" ? undefined : Number(indoor.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["heating_capacity_btu_hr_at_design", "design_outdoor_F", "building_heat_loss_btu_hr", "indoor_F"], r);
     if (r.error) { oBP.textContent = r.error; oAux.textContent = "-"; return; }
     oBP.textContent = fmt(r.balance_point_F, 1) + " F";
     oAux.textContent = r.aux_heat_btu_hr == null ? "-" : fmt(r.aux_heat_btu_hr, 0) + " BTU/hr (" + fmt(r.aux_strip_kw, 2) + " kW strip)";
@@ -1392,7 +1393,7 @@ export function renderSHR(inputRegion, outputRegion, citationEl) {
   attachExampleButton(inputRegion, () => { sens.input.value = "24000"; total.input.value = "30000"; update(); });
   const oS = makeOutputLine(outputRegion, "SHR", "shr-out");
   const update = debounce(() => {
-    const r = computeSHR({ sensible_btu_hr: Number(sens.input.value) || 0, total_btu_hr: Number(total.input.value) || 0 });
+    const r = computeSHR({ sensible_btu_hr: Number(sens.input.value) || 0, total_btu_hr: Number(total.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["sensible_btu_hr", "total_btu_hr"], r);
     oS.textContent = r.error ? r.error : fmt(r.SHR, 3);
   }, DEBOUNCE_MS);
   for (const el of [sens.input, total.input]) el.addEventListener("input", update);
@@ -1413,7 +1414,7 @@ export function renderCfmPerTon(inputRegion, outputRegion, citationEl) {
   // v8 §C.3: surface the climate label + one-line latent-removal hint.
   const oH = makeOutputLine(outputRegion, "Climate hint", "cpt-out-h");
   const update = debounce(() => {
-    const r = computeCfmPerTon({ tons: Number(tons.input.value) || 0, climate: climate.select.value });
+    const r = computeCfmPerTon({ tons: Number(tons.input.value) || 0, climate: climate.select.value }); stepsFor(outputRegion, inputRegion, ["tons", "climate"], r);
     if (r.error) { oC.textContent = r.error; oT.textContent = "-"; oH.textContent = "-"; return; }
     oC.textContent = String(r.cfm_per_ton);
     oT.textContent = fmt(r.total_cfm, 0);
@@ -1434,7 +1435,7 @@ export function renderCombustionAir(inputRegion, outputRegion, citationEl) {
   const oOut = makeOutputLine(outputRegion, "Outdoor opening", "ca-out-out");
   const oIn = makeOutputLine(outputRegion, "Indoor opening", "ca-out-in");
   const update = debounce(() => {
-    const r = computeCombustionAir({ btu_input: Number(btu.input.value) || 0, room_volume_ft3: Number(vol.input.value) || 0 });
+    const r = computeCombustionAir({ btu_input: Number(btu.input.value) || 0, room_volume_ft3: Number(vol.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["btu_input", "room_volume_ft3"], r);
     oReq.textContent = fmt(r.required_volume_ft3, 0) + " ft^3";
     oAd.textContent = r.adequate_by_volume ? "Yes" : "No (combustion air opening required)";
     oOut.textContent = fmt(r.opening_outdoor_in2, 1) + " in^2";
@@ -1452,7 +1453,7 @@ export function renderCombustionAirMaxInput(inputRegion, outputRegion, citationE
   const oMax = makeOutputLine(outputRegion, "Max appliance input (by volume)", "cam-out-max");
   const oNote = makeOutputLine(outputRegion, "Note", "cam-out-note");
   const update = debounce(() => {
-    const r = computeCombustionAirMaxInput({ room_volume_ft3: Number(vol.input.value) || 0 });
+    const r = computeCombustionAirMaxInput({ room_volume_ft3: Number(vol.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["room_volume_ft3"], r);
     if (r.error) { oMax.textContent = r.error; oNote.textContent = ""; return; }
     oMax.textContent = fmt(r.max_btu_input, 0) + " BTU/hr (" + fmt(r.max_kbtu_input, 1) + " kBTU/hr)";
     oNote.textContent = r.note;
@@ -1811,7 +1812,7 @@ function renderAffinityLaws(inputRegion, outputRegion, citationEl) {
       baseline_RPM: Number(r.input.value) || 0, baseline_CFM: Number(c.input.value) || 0,
       baseline_SP_in_wc: Number(s.input.value) || 0, baseline_kW: Number(k.input.value) || 0,
       target_kind: tk.select.value, target_value: Number(tv.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["baseline_RPM", "baseline_CFM", "baseline_SP_in_wc", "baseline_kW", "target_kind", "target_value"], x);
     if (x.error) { oR.textContent = x.error; oC.textContent = "-"; oS.textContent = "-"; oK.textContent = "-"; return; }
     oR.textContent = fmt(x.RPM, 0);
     oC.textContent = fmt(x.CFM, 0);
@@ -1837,7 +1838,7 @@ function renderBeltAndPulley(inputRegion, outputRegion, citationEl) {
     const r = computeBeltAndPulley({
       drive_dia_in: Number(dr.input.value) || 0, driven_dia_in: Number(dn.input.value) || 0,
       center_distance_in: Number(c.input.value) || 0, motor_rpm: Number(m.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["drive_dia_in", "driven_dia_in", "center_distance_in", "motor_rpm"], r);
     if (r.error) { oL.textContent = r.error; oR.textContent = "-"; oS.textContent = "-"; return; }
     oL.textContent = fmt(r.belt_length_in, 2) + " in";
     oR.textContent = r.driven_rpm !== null ? fmt(r.driven_rpm, 0) + " rpm" : "-";
@@ -1880,7 +1881,7 @@ function renderAirReceiver(inputRegion, outputRegion, citationEl) {
     const r = computeAirReceiver({
       tools, pump_scfm: Number(ps.input.value) || 0, p_high_psi: Number(ph.input.value) || 0,
       p_low_psi: Number(pl.input.value) || 0, drawdown_minutes: Number(dr.input.value) || 1,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["tools", "pump_scfm", "p_high_psi", "p_low_psi", "drawdown_minutes"], r);
     if (r.error) { oD.textContent = r.error; oG.textContent = "-"; oC.textContent = "-"; return; }
     oD.textContent = fmt(r.demand_scfm, 2) + " scfm";
     oG.textContent = fmt(r.receiver_gal, 1) + " gal";
@@ -1905,7 +1906,7 @@ function renderGeothermalLoop(inputRegion, outputRegion, citationEl) {
     const r = computeGeothermalLoop({
       heating_btu: Number(h.input.value) || 0, cooling_btu: Number(cl.input.value) || 0,
       soil: s.select.value, loop_type: lt.select.value,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["heating_btu", "cooling_btu", "soil", "loop_type"], r);
     if (r.error) { oF.textContent = r.error; oL.textContent = "-"; return; }
     oF.textContent = fmt(r.btu_per_ft, 0) + " BTU/ft";
     oL.textContent = fmt(r.length_ft, 0) + " ft";
@@ -1929,7 +1930,7 @@ function renderBaseboardOutput(inputRegion, outputRegion, citationEl) {
     const r = computeBaseboardOutput({
       water_temp_F: Number(t.input.value) || 0, flow_gpm: Number(fw.input.value) || 1,
       length_ft: Number(l.input.value) || 0, model: m.select.value,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["water_temp_F", "flow_gpm", "length_ft", "model"], r);
     if (r.error) { oP.textContent = r.error; oT.textContent = "-"; oA.textContent = "-"; return; }
     oP.textContent = fmt(r.btu_per_ft, 0);
     oT.textContent = fmt(r.btu_total, 0) + " BTU/hr";
@@ -1950,7 +1951,7 @@ function renderBaseboardLengthForLoad(inputRegion, outputRegion, citationEl) {
   const oP = makeOutputLine(outputRegion, "BTU/ft at this temp", "bll-out-p");
   const oNote = makeOutputLine(outputRegion, "Note", "bll-out-n");
   const update = debounce(() => {
-    const r = computeBaseboardLengthForLoad({ target_btuhr: Number(q.input.value) || 0, water_temp_F: Number(t.input.value) || 0, flow_gpm: Number(fw.input.value) || 1, model: m.select.value });
+    const r = computeBaseboardLengthForLoad({ target_btuhr: Number(q.input.value) || 0, water_temp_F: Number(t.input.value) || 0, flow_gpm: Number(fw.input.value) || 1, model: m.select.value }); stepsFor(outputRegion, inputRegion, ["target_btuhr", "water_temp_F", "flow_gpm", "model"], r);
     if (r.error) { oL.textContent = r.error; oP.textContent = "-"; oNote.textContent = ""; return; }
     oL.textContent = fmt(r.length_ft, 1) + " ft";
     oP.textContent = fmt(r.btu_per_ft, 0) + " BTU/ft";
@@ -1990,7 +1991,7 @@ function renderNPSHa(inputRegion, outputRegion, citationEl) {
       friction_loss_ft: Number(f.input.value) || 0,
       npsh_required_ft: npshrVal,
       target_margin_ft: tm.input.value === "" ? 3 : Number(tm.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["elevation_ft", "water_temp_F", "source_elevation_relative_ft", "friction_loss_ft", "npsh_required_ft", "target_margin_ft"], x);
     if (x.error) { oA.textContent = x.error; oV.textContent = "-"; oN.textContent = "-"; oC.textContent = "-"; oM.textContent = "-"; oF.textContent = "-"; oS.textContent = "-"; return; }
     oA.textContent = fmt(x.H_atm_ft, 2) + " ft";
     oV.textContent = fmt(x.H_vapor_ft, 2) + " ft";
@@ -2315,7 +2316,7 @@ function _v7h_renderDuctFrictionStatic(inputRegion, outputRegion, citationEl) {
       cfm: Number(cfm.input.value) || 0,
       length_ft: Number(len.input.value) || 0,
       fittings,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["shape", "D_in", "W_in", "H_in", "material", "cfm", "length_ft", "fittings"], r);
     if (r.error) { oV.textContent = r.error; oVP.textContent = "-"; oF.textContent = "-"; oFr.textContent = "-"; oS.textContent = "-"; oFi.textContent = "-"; oT.textContent = "-"; return; }
     oV.textContent = _v7h_fmt(r.velocity_fpm, 0) + " fpm";
     oVP.textContent = _v7h_fmt(r.velocity_pressure_in_wc, 4) + " in WC";
@@ -2348,7 +2349,7 @@ function _v7h_renderCoolingTower(inputRegion, outputRegion, citationEl) {
       T_in_F: tin.input.value === "" ? null : Number(tin.input.value), T_out_F: tout.input.value === "" ? null : Number(tout.input.value),
       T_wb_F: twb.input.value === "" ? null : Number(twb.input.value), gpm: Number(gpm.input.value) || 0,
       fan_kW: Number(fan.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["T_in_F", "T_out_F", "T_wb_F", "gpm", "fan_kW"], r);
     if (r.error) { oR.textContent = r.error; oA.textContent = "-"; oEff.textContent = "-"; oH.textContent = "-"; oF.textContent = "-"; return; }
     oR.textContent = _v7h_fmt(r.range_F, 1) + " °F (" + r.range_flag + ")";
     oA.textContent = _v7h_fmt(r.approach_F, 1) + " °F (" + r.approach_flag + ")";
@@ -2387,7 +2388,7 @@ function _v7h_renderInsulationHeatLoss(inputRegion, outputRegion, citationEl) {
       air_velocity_fpm: Number(v.input.value) || 0,
       insulation: ins.select.value, thickness_in: Number(t.input.value) || 0,
       jacket_emissivity: Number(eps.input.value) || 0.9,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["pipe_OD_in", "surface_T_F", "ambient_T_F", "air_velocity_fpm", "insulation", "thickness_in", "jacket_emissivity"], r);
     if (r.error) { oB.textContent = r.error; oI.textContent = "-"; oS.textContent = "-"; oE.textContent = "-"; return; }
     oB.textContent = _v7h_fmt(r.Q_bare_BTU_hr_ft, 1) + " BTU/hr·ft";
     oI.textContent = _v7h_fmt(r.Q_insulated_BTU_hr_ft, 1) + " BTU/hr·ft";
@@ -2490,7 +2491,7 @@ function _v8h_renderDuctLeakage(inputRegion, outputRegion, citationEl) {
       design_cfm: Number(dc.input.value) || 0, measured_cfm: Number(mc.input.value) || 0,
       duct_surface_ft2: Number(sf.input.value) || 0, test_pressure_inwc: Number(tp.input.value) || 0,
       design_class: Number(cl.select.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["design_cfm", "measured_cfm", "duct_surface_ft2", "test_pressure_inwc", "design_class"], r);
     if (r.error) { oL.textContent = r.error; oP.textContent = "-"; oC.textContent = "-"; oF.textContent = "-"; return; }
     oL.textContent = _v7h_fmt(r.leakage_cfm, 1) + " CFM (" + _v7h_fmt(r.leak_per_100ft2, 1) + " CFM per 100 ft² at 1 in WC)";
     oP.textContent = _v7h_fmt(r.leakage_pct, 2) + " %";
@@ -2638,7 +2639,7 @@ export function renderOutdoorAirVentilation(inputRegion, outputRegion, citationE
       people: readNum(ppl.input),
       floor_area_ft2: readNum(area.input),
       Ez: readNum(ez.input),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["Rp_cfm_per_person", "Ra_cfm_per_ft2", "people", "floor_area_ft2", "Ez"], r);
     if (r.error) {
       oVbz.textContent = r.error; oVoz.textContent = ""; oPP.textContent = ""; oPF.textContent = ""; oW.textContent = "";
       return;
@@ -2797,7 +2798,7 @@ function renderHoodExhaust(inputRegion, outputRegion, citationEl) {
       length_ft: readNum(len.input),
       width_ft: readNum(wid.input),
       duct_velocity_fpm: readNum(vel.input),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["hood_class", "hood_type", "duty", "length_ft", "width_ft", "duct_velocity_fpm"], r);
     if (r.error) {
       oQ.textContent = r.error; oC.textContent = ""; oM.textContent = ""; oA.textContent = ""; oS.textContent = ""; oW.textContent = "";
       return;
@@ -2964,7 +2965,7 @@ function renderSHRLatent(inputRegion, outputRegion, citationEl) {
       supply_db_F: readNum(tsa.input),
       cfm: readNum(cfm.input),
       altitude_ft: readNum(alt.input),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["total_capacity_btu_hr", "return_db_F", "return_wb_F", "supply_db_F", "cfm", "altitude_ft"], r);
     if (r.error) {
       oQs.textContent = r.error;
       oQl.textContent = ""; oSHR.textContent = ""; oWra.textContent = ""; oWsa.textContent = "";
@@ -3027,7 +3028,7 @@ function renderEconomizerSavingsHours(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "esh-out-note");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeEconomizerSavingsHours({ cfm: readNum(cfm.input), delta_t_f: readNum(dt.input), hours: readNum(hrs.input) });
+    const r = computeEconomizerSavingsHours({ cfm: readNum(cfm.input), delta_t_f: readNum(dt.input), hours: readNum(hrs.input) }); stepsFor(outputRegion, inputRegion, ["cfm", "delta_t_f", "hours"], r);
     if (r.error) { oQ.textContent = r.error; oTH.textContent = ""; oNote.textContent = ""; return; }
     oQ.textContent = fmt(r.q_sens_btuh, 0) + " BTU/hr (" + fmt(r.tons, 2) + " tons)";
     oTH.textContent = fmt(r.ton_hours, 0) + " ton-hours";
@@ -3122,7 +3123,7 @@ function renderPipeHeatLossRadial(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "phlr-out-note");
   function readNum(i) { if (i.value === "") return NaN; const n = Number(i.value); return Number.isFinite(n) ? n : NaN; }
   const update = debounce(() => {
-    const r = computePipeHeatLossRadial({ od_in: readNum(od.input), thickness_in: readNum(th.input), k_value: readNum(k.input), hot_f: readNum(hot.input), amb_f: readNum(amb.input), length_ft: readNum(len.input), film_coeff_btu_hr_ft2_f: readNum(film.input), film_mode: fm.select.value, jacket_emissivity: readNum(je.input), wind_mph: readNum(wind.input) });
+    const r = computePipeHeatLossRadial({ od_in: readNum(od.input), thickness_in: readNum(th.input), k_value: readNum(k.input), hot_f: readNum(hot.input), amb_f: readNum(amb.input), length_ft: readNum(len.input), film_coeff_btu_hr_ft2_f: readNum(film.input), film_mode: fm.select.value, jacket_emissivity: readNum(je.input), wind_mph: readNum(wind.input) }); stepsFor(outputRegion, inputRegion, ["od_in", "thickness_in", "k_value", "hot_f", "amb_f", "length_ft", "film_coeff_btu_hr_ft2_f", "film_mode", "jacket_emissivity", "wind_mph"], r);
     if (r.error) { oPF.textContent = r.error; oT.textContent = ""; oS.textContent = ""; oNote.textContent = ""; return; }
     oPF.textContent = fmt(r.q_per_ft_btuh, 1) + " BTU/hr-ft";
     oT.textContent = fmt(r.q_total_btuh, 1) + " BTU/hr";
@@ -3204,7 +3205,7 @@ function renderBarePipeHeatLoss(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "bphl-out-note");
   function readNum(i, d) { if (i.value === "") return d; const n = Number(i.value); return Number.isFinite(n) ? n : NaN; }
   const update = debounce(() => {
-    const r = computeBarePipeHeatLoss({ od_in: readNum(od.input, 0), surface_f: readNum(ts.input, NaN), amb_f: readNum(ta.input, 70), emissivity: readNum(eps.input, 0.8), length_ft: readNum(len.input, 1), wind_mph: readNum(wind.input, 0) });
+    const r = computeBarePipeHeatLoss({ od_in: readNum(od.input, 0), surface_f: readNum(ts.input, NaN), amb_f: readNum(ta.input, 70), emissivity: readNum(eps.input, 0.8), length_ft: readNum(len.input, 1), wind_mph: readNum(wind.input, 0) }); stepsFor(outputRegion, inputRegion, ["od_in", "surface_f", "amb_f", "emissivity", "length_ft", "wind_mph"], r);
     if (r.error) { oPF.textContent = r.error; oT.textContent = "-"; oH.textContent = "-"; oNote.textContent = ""; return; }
     oPF.textContent = fmt(r.q_per_ft_btuh, 1) + " BTU/hr-ft" + (r.gain ? " (negative: a heat GAIN)" : "");
     oT.textContent = fmt(r.q_total_btuh, 0) + " BTU/hr";
@@ -3258,7 +3259,7 @@ function renderInsulationThicknessForHeatLoss(inputRegion, outputRegion, citatio
   const oR = makeOutputLine(outputRegion, "Outer radius over insulation", "itl-out-r");
   const oNote = makeOutputLine(outputRegion, "Note", "itl-out-n");
   const update = debounce(() => {
-    const r = computeInsulationThicknessForHeatLoss({ od_in: Number(od.input.value) || 0, k_value: Number(k.input.value) || 0, hot_f: hot.input.value === "" ? null : Number(hot.input.value), amb_f: amb.input.value === "" ? null : Number(amb.input.value), target_q_per_ft_btuh: Number(q.input.value) || 0 });
+    const r = computeInsulationThicknessForHeatLoss({ od_in: Number(od.input.value) || 0, k_value: Number(k.input.value) || 0, hot_f: hot.input.value === "" ? null : Number(hot.input.value), amb_f: amb.input.value === "" ? null : Number(amb.input.value), target_q_per_ft_btuh: Number(q.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["od_in", "k_value", "hot_f", "amb_f", "target_q_per_ft_btuh"], r);
     if (r.error) { oTh.textContent = r.error; oR.textContent = "-"; oNote.textContent = ""; return; }
     oTh.textContent = fmt(r.thickness_in, 3) + " in";
     oR.textContent = fmt(r.r2_in, 3) + " in (" + fmt(r.r2_in * 2, 3) + " in OD over insulation)";
@@ -3311,7 +3312,7 @@ function renderFanMotorBhp(inputRegion, outputRegion, citationEl) {
   const oN = makeOutputLine(outputRegion, "Next standard motor HP", "fmb-out-n");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeFanMotorBhp({ cfm: readNum(cfm.input), tsp_inwc: readNum(tsp.input), eta_fan: readNum(ef.input), eta_drive: readNum(ed.input) });
+    const r = computeFanMotorBhp({ cfm: readNum(cfm.input), tsp_inwc: readNum(tsp.input), eta_fan: readNum(ef.input), eta_drive: readNum(ed.input) }); stepsFor(outputRegion, inputRegion, ["cfm", "tsp_inwc", "eta_fan", "eta_drive"], r);
     if (r.error) { oA.textContent = r.error; oB.textContent = ""; oN.textContent = ""; return; }
     oA.textContent = fmt(r.ahp, 3) + " HP";
     oB.textContent = fmt(r.bhp, 3) + " BHP";
@@ -3359,7 +3360,7 @@ function renderFanMotorMaxAirflow(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "fma-out-n");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeFanMotorMaxAirflow({ power_hp: readNum(power.input), power_basis: basis.select.value, tsp_inwc: readNum(tsp.input), eta_fan: readNum(ef.input), eta_drive: readNum(ed.input) });
+    const r = computeFanMotorMaxAirflow({ power_hp: readNum(power.input), power_basis: basis.select.value, tsp_inwc: readNum(tsp.input), eta_fan: readNum(ef.input), eta_drive: readNum(ed.input) }); stepsFor(outputRegion, inputRegion, ["power_hp", "power_basis", "tsp_inwc", "eta_fan", "eta_drive"], r);
     if (r.error) { oCfm.textContent = r.error; oNote.textContent = ""; return; }
     oCfm.textContent = fmt(r.max_cfm, 0) + " CFM (" + fmt(r.bhp, 2) + " BHP)";
     oNote.textContent = r.note;
@@ -3442,7 +3443,7 @@ function _v27renderRoundToRectDuct(inputRegion, outputRegion, citationEl) {
       side_a_in: Number(a.input.value) || 0,
       side_b_in: Number(b.input.value) || 0,
       known_side_in: Number(known.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["mode", "round_diameter_in", "side_a_in", "side_b_in", "known_side_in"], r);
     if (r.error) { oDe.textContent = r.error; oAspect.textContent = "-"; oNote.textContent = ""; return; }
     if (r.mode === "rect-to-round") oDe.textContent = "D_e " + _v27hFmt(r.equivalent_diameter_in, 2) + " in";
     else oDe.textContent = "other side " + _v27hFmt(r.other_side_in, 2) + " in (D_e " + _v27hFmt(r.equivalent_diameter_in, 2) + " in)";
@@ -3488,7 +3489,7 @@ function _renderFlatOvalDuct(inputRegion, outputRegion, citationEl) {
   const oAP = _v27hMakeOut(outputRegion, "Area / perimeter", "fov-out-ap");
   const oNote = _v27hMakeOut(outputRegion, "Notes", "fov-out-note");
   const update = _v27hDebounce(() => {
-    const r = computeFlatOvalDuct({ major_axis_in: Number(a.input.value) || 0, minor_axis_in: Number(b.input.value) || 0 });
+    const r = computeFlatOvalDuct({ major_axis_in: Number(a.input.value) || 0, minor_axis_in: Number(b.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["major_axis_in", "minor_axis_in"], r);
     if (r.error) { oDe.textContent = r.error; oAP.textContent = "-"; oNote.textContent = ""; return; }
     oDe.textContent = "D_e " + _v27hFmt(r.equivalent_diameter_in, 2) + " in";
     oAP.textContent = _v27hFmt(r.area_in2, 1) + " in^2 / " + _v27hFmt(r.perimeter_in, 1) + " in";
@@ -3528,7 +3529,7 @@ function _renderFixedOrificeTargetSuperheat(inputRegion, outputRegion, citationE
   const oT = _v27hMakeOut(outputRegion, "Target superheat", "tsh-out-t");
   const oNote = _v27hMakeOut(outputRegion, "Note", "tsh-out-note");
   const update = _v27hDebounce(() => {
-    const r = computeFixedOrificeTargetSuperheat({ indoor_wetbulb_f: Number(idwb.input.value) || 0, outdoor_drybulb_f: Number(odt.input.value) || 0 });
+    const r = computeFixedOrificeTargetSuperheat({ indoor_wetbulb_f: Number(idwb.input.value) || 0, outdoor_drybulb_f: Number(odt.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["indoor_wetbulb_f", "outdoor_drybulb_f"], r);
     if (r.error) { oT.textContent = r.error; oNote.textContent = ""; return; }
     oT.textContent = _v27hFmt(r.target_superheat_f, 1) + " F" + (r.out_of_range ? " (at/below zero -- do not charge by superheat)" : r.low_ambient ? " (outdoor < 55 F -- do not charge by superheat)" : "");
     oNote.textContent = r.note;
@@ -4306,7 +4307,7 @@ function _v329renderBuildingUa(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const list = parse(asm.input.value);
     if (list === null) { oCond.textContent = "Each line must be area_ft2,R-value with finite numbers."; oUa.textContent = "-"; oLoad.textContent = "-"; oNote.textContent = "-"; return; }
-    const r = computeBuildingUa({ assemblies: list, cfm_inf: Number(cfm.input.value) || 0, dt_f: Number(dt.input.value) || 0 });
+    const r = computeBuildingUa({ assemblies: list, cfm_inf: Number(cfm.input.value) || 0, dt_f: Number(dt.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["assemblies", "cfm_inf", "dt_f"], r);
     if (r.error) { oCond.textContent = r.error; oUa.textContent = "-"; oLoad.textContent = "-"; oNote.textContent = "-"; return; }
     oCond.textContent = fmt(r.cond, 1) + " + " + fmt(r.ua_inf, 1) + " Btu/h-F";
     oUa.textContent = fmt(r.ua, 1) + " Btu/h-F";
@@ -4364,7 +4365,7 @@ function _v330renderDegreeDayEnergy(inputRegion, outputRegion, citationEl) {
   const oCost = makeOutputLine(outputRegion, "Annual cost", "dde-out-cost");
   const oNote = makeOutputLine(outputRegion, "Note", "dde-out-note");
   const update = debounce(() => {
-    const r = computeDegreeDayEnergy({ ua_btuhf: Number(ua.input.value) || 0, hdd: Number(hdd.input.value) || 0, eff: eff.input.value === "" ? undefined : Number(eff.input.value), fuel: fuel.select.value, price: Number(price.input.value) || 0 });
+    const r = computeDegreeDayEnergy({ ua_btuhf: Number(ua.input.value) || 0, hdd: Number(hdd.input.value) || 0, eff: eff.input.value === "" ? undefined : Number(eff.input.value), fuel: fuel.select.value, price: Number(price.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["ua_btuhf", "hdd", "eff", "fuel", "price"], r);
     if (r.error) { oQ.textContent = r.error; oFuel.textContent = "-"; oCost.textContent = "-"; oNote.textContent = "-"; return; }
     oQ.textContent = fmt(r.q_mmbtu, 1) + " MMBtu/yr";
     oFuel.textContent = fmt(r.fuel_units, 0) + " " + r.unit_label + "/yr";
@@ -4504,7 +4505,7 @@ function _v442renderRadiantFloorOutput(inputRegion, outputRegion, citationEl) {
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   function sync() { const inv = mode.select.value === "q_to_surface"; surf.wrap.style.display = inv ? "none" : ""; qt.wrap.style.display = inv ? "" : "none"; }
   const update = debounce(() => {
-    const r = computeRadiantFloorOutput({ mode: mode.select.value, t_surface_f: readNum(surf.input), t_room_f: readNum(room.input), q_target: readNum(qt.input) });
+    const r = computeRadiantFloorOutput({ mode: mode.select.value, t_surface_f: readNum(surf.input), t_room_f: readNum(room.input), q_target: readNum(qt.input) }); stepsFor(outputRegion, inputRegion, ["mode", "t_surface_f", "t_room_f", "q_target"], r);
     if (r.error) { oQ.textContent = r.error; oS.textContent = "-"; oNote.textContent = ""; return; }
     oQ.textContent = fmt(r.q_btuh_ft2, 1) + " Btu/hr-ft^2";
     oS.textContent = fmt(r.t_surface_out_f, 1) + " F" + (r.comfort_ok ? " (within 85 F comfort limit)" : " -- OVER the 85 F comfort limit");
@@ -4634,7 +4635,7 @@ function _v443renderEconomizerEnthalpyChangeover(inputRegion, outputRegion, cita
   function readNum(i) { if (i.value === "") return null; const n = Number(i.value); return Number.isFinite(n) ? n : null; }
   function sync() { const m = mode.select.value; const en = m !== "fixed_drybulb"; const db = m !== "differential_enthalpy"; hoa.wrap.style.display = en ? "" : "none"; hra.wrap.style.display = en ? "" : "none"; toa.wrap.style.display = db ? "" : "none"; sp.wrap.style.display = db ? "" : "none"; }
   const update = debounce(() => {
-    const r = computeEconomizerEnthalpyChangeover({ mode: mode.select.value, h_outdoor: readNum(hoa.input), h_return: readNum(hra.input), t_outdoor_f: readNum(toa.input), setpoint_f: readNum(sp.input) });
+    const r = computeEconomizerEnthalpyChangeover({ mode: mode.select.value, h_outdoor: readNum(hoa.input), h_return: readNum(hra.input), t_outdoor_f: readNum(toa.input), setpoint_f: readNum(sp.input) }); stepsFor(outputRegion, inputRegion, ["mode", "h_outdoor", "h_return", "t_outdoor_f", "setpoint_f"], r);
     if (r.error) { oE.textContent = r.error; oM.textContent = "-"; oNote.textContent = ""; return; }
     oE.textContent = r.enable ? "ENABLE free cooling" : "LOCK OUT (mechanical cooling)";
     oM.textContent = (r.margin >= 0 ? "+" : "") + fmt(r.margin, 1) + " " + r.unit + (r.enable ? " below the limit" : " over the limit");
@@ -4740,7 +4741,7 @@ function renderPipeInsulationForCondensation(inputRegion, outputRegion, citation
       outside_film_coeff_btu_hr_ft2_F: Number(h.input.value),
       film_mode: fm.select.value,
       jacket_emissivity: Number(je.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["pipe_od_in", "pipe_temp_F", "ambient_F", "ambient_rh_pct", "k_btu_in_per_hr_ft2_F", "outside_film_coeff_btu_hr_ft2_F", "film_mode", "jacket_emissivity"], r);
     if (r.error) { oD.textContent = r.error; oT.textContent = ""; oN.textContent = ""; return; }
     oD.textContent = r.dew_point_F.toFixed(1) + " F";
     oT.textContent = r.no_risk ? "0 in (surface already above the dew point)" : r.thickness_in.toFixed(2) + " in (outer radius " + r.r2_in.toFixed(2) + " in" + (r.film_computed ? ", computed film " + r.film_used_btu_hr_ft2_F.toFixed(2) + " BTU/hr-ft2-F" : "") + ")";
@@ -4822,7 +4823,7 @@ function renderCompressedAirPressureDrop(inputRegion, outputRegion, citationEl) 
     const r = computeCompressedAirPressureDrop({
       scfm: Number(q.input.value), pipe_id_in: Number(d.input.value), length_ft: Number(L.input.value),
       line_pressure_psig: Number(p.input.value), air_temp_f: t.input.value === "" ? null : Number(t.input.value), roughness_ft: Number(e.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["scfm", "pipe_id_in", "length_ft", "line_pressure_psig", "air_temp_f", "roughness_ft"], r);
     if (r.error) { oDp.textContent = r.error; oV.textContent = ""; oRe.textContent = ""; oN.textContent = ""; return; }
     oDp.textContent = fmt(r.pressure_drop_psi, 2) + " psi (" + fmt(r.drop_per_100ft_psi, 2) + " psi per 100 ft, " + fmt(r.pct_of_line, 1) + "% of line" + (r.over_10pct ? " - OVER the 10% rule of thumb" : "") + ")";
     oV.textContent = fmt(r.actual_cfm, 1) + " actual cfm at " + fmt(r.density_lb_ft3, 4) + " lb/ft^3 - " + fmt(r.velocity_fps, 1) + " ft/s";
@@ -4900,7 +4901,7 @@ function renderFanSheaveForTargetCfm(inputRegion, outputRegion, citationEl) {
       current_cfm: Number(q1.input.value), target_cfm: Number(q2.input.value), current_fan_rpm: Number(n1.input.value),
       motor_rpm: Number(nm.input.value), drive_sheave_in: Number(ds.input.value), current_bhp: Number(bh.input.value),
       motor_hp: Number(mh.input.value), current_sp_inwg: Number(sp.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["current_cfm", "target_cfm", "current_fan_rpm", "motor_rpm", "drive_sheave_in", "current_bhp", "motor_hp", "current_sp_inwg"], r);
     if (r.error) { oR.textContent = r.error; oS.textContent = ""; oP.textContent = ""; oN.textContent = ""; return; }
     oR.textContent = r.ratio.toFixed(4) + " -- " + r.required_fan_rpm.toFixed(0) + " rpm" + (r.over_motor_rpm ? " (EXCEEDS motor speed)" : "");
     oS.textContent = r.new_drive_sheave_in.toFixed(2) + " in (from " + Number(ds.input.value).toFixed(2) + "; fan sheave stays " + r.driven_sheave_in.toFixed(2) + " in)";
@@ -4994,7 +4995,7 @@ function renderEconomicInsulationThickness(inputRegion, outputRegion, citationEl
       operating_hours: Number(hr.input.value), energy_cost_per_mmbtu: Number(en.input.value),
       system_efficiency: Number(ef.input.value), installed_cost_per_in_sf: Number(pr.input.value),
       life_years: Number(lf.input.value), discount_rate: Number(dr.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["delta_t_f", "bare_r_value", "k_btu_in", "operating_hours", "energy_cost_per_mmbtu", "system_efficiency", "installed_cost_per_in_sf", "life_years", "discount_rate"], r);
     if (r.error) { oT.textContent = r.error; oC.textContent = ""; oS.textContent = ""; oN.textContent = ""; return; }
     oT.textContent = r.optimum_thickness_in.toFixed(2) + " in (R " + r.r_at_optimum.toFixed(2) + ")" + (r.not_justified ? " - not economically justified" : "");
     oC.textContent = "$" + r.total_annual_cost.toFixed(3) + "/ft^2-yr = $" + r.annual_energy_cost.toFixed(3) + " energy + $" + r.annual_capital_cost.toFixed(3) + " capital (CRF " + r.crf.toFixed(4) + ")";

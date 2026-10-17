@@ -12,6 +12,7 @@
 import {
   DEBOUNCE_MS, debounce, makeNumber, makeSelect, makeText, makeTextarea,
   makeOutputLine, attachExampleButton, fmt,
+  stepsFor,
 } from "./ui-fields.js";
 import { attachCsvExport, attachGlossaryTooltip } from "./v5-platform.js";
 
@@ -739,7 +740,7 @@ function renderDilution(inputRegion, outputRegion, citationEl) {
     const r = computeDilution({
       c1: Number(c1.input.value) || 0, v1: Number(v1.input.value) || 0,
       c2: Number(c2.input.value) || 0, v2: Number(v2.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["c1", "v1", "c2", "v2"], r);
     if (r.error) { out.textContent = r.error; dil.textContent = ""; return; }
     out.textContent = "C1 " + fmt(r.c1, 4) + " M / V1 " + fmt(r.v1, 4) + " L / C2 " + fmt(r.c2, 4) + " M / V2 " + fmt(r.v2, 4) + " L";
     dil.textContent = r.diluent_volume === null ? r.flag : fmt(r.diluent_volume, 4) + " L";
@@ -796,7 +797,7 @@ function renderMolecularWeight(inputRegion, outputRegion, citationEl) {
   const mwOut = makeOutputLine(outputRegion, "Molecular weight", "mw-out-w");
   const breakOut = document.createElement("p"); outputRegion.appendChild(breakOut);
   const update = debounce(() => {
-    const r = computeMolecularWeight({ formula: f.input.value });
+    const r = computeMolecularWeight({ formula: f.input.value }); stepsFor(outputRegion, inputRegion, ["formula"], r);
     if (r.error) { mwOut.textContent = r.error; breakOut.textContent = ""; return; }
     mwOut.textContent = fmt(r.molecular_weight, 4) + " g/mol";
     breakOut.textContent = r.breakdown.map((b) => b.symbol + " x " + b.count + " (" + b.atomic_weight + ")").join("; ");
@@ -814,7 +815,7 @@ function renderMassMoles(inputRegion, outputRegion, citationEl) {
   for (const fl of [mass, moles, mw]) inputRegion.appendChild(fl.wrap);
   const out = makeOutputLine(outputRegion, "Result", "mm-out");
   const update = debounce(() => {
-    const r = computeMassMoles({ mass_g: Number(mass.input.value) || 0, moles: Number(moles.input.value) || 0, molecular_weight: Number(mw.input.value) || 0 });
+    const r = computeMassMoles({ mass_g: Number(mass.input.value) || 0, moles: Number(moles.input.value) || 0, molecular_weight: Number(mw.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["mass_g", "moles", "molecular_weight"], r);
     if (r.error) { out.textContent = r.error; return; }
     out.textContent = fmt(r.mass_g, 4) + " g = " + fmt(r.moles, 6) + " mol (MW " + fmt(r.molecular_weight, 4) + " g/mol)";
   }, DEBOUNCE_MS);
@@ -841,7 +842,7 @@ function renderIdealGasLaw(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "igl-out-note");
   const rd = (i) => (i.value === "" ? 0 : Number(i.value) || 0);
   const update = debounce(() => {
-    const r = computeIdealGasLaw({ solve_for: solve.select.value, pressure_atm: rd(p.input), volume_l: rd(v.input), moles: rd(n.input), temperature_c: t.input.value === "" ? 25 : Number(t.input.value) });
+    const r = computeIdealGasLaw({ solve_for: solve.select.value, pressure_atm: rd(p.input), volume_l: rd(v.input), moles: rd(n.input), temperature_c: t.input.value === "" ? 25 : Number(t.input.value) }); stepsFor(outputRegion, inputRegion, ["solve_for", "pressure_atm", "volume_l", "moles", "temperature_c"], r);
     if (r.error) { oRes.textContent = r.error; oMv.textContent = "-"; oNote.textContent = ""; return; }
     const sf = solve.select.value;
     if (sf === "moles") oRes.textContent = fmt(r.moles, 5) + " mol";
@@ -880,7 +881,7 @@ function renderVanDerWaals(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "vdw-out-note");
   const rd = (i) => (i.value === "" ? 0 : Number(i.value) || 0);
   const update = debounce(() => {
-    const r = computeVanDerWaals({ gas: gas.select.value, moles: rd(n.input), volume_l: rd(v.input), temperature_c: t.input.value === "" ? 25 : Number(t.input.value) });
+    const r = computeVanDerWaals({ gas: gas.select.value, moles: rd(n.input), volume_l: rd(v.input), temperature_c: t.input.value === "" ? 25 : Number(t.input.value) }); stepsFor(outputRegion, inputRegion, ["gas", "moles", "volume_l", "temperature_c"], r);
     if (r.error) { oReal.textContent = r.error; oIdeal.textContent = "-"; oZ.textContent = "-"; oNote.textContent = ""; return; }
     oReal.textContent = fmt(r.pressure_real_atm, 4) + " atm";
     oIdeal.textContent = fmt(r.pressure_ideal_atm, 4) + " atm";
@@ -905,7 +906,7 @@ function renderArrheniusEquation(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "arr-out-note");
   const rd = (i) => (i.value === "" ? 0 : Number(i.value) || 0);
   const update = debounce(() => {
-    const r = computeArrheniusEquation({ k1: rd(k1.input), temp1_c: t1.input.value === "" ? null : Number(t1.input.value), k2: rd(k2.input), temp2_c: t2.input.value === "" ? null : Number(t2.input.value) });
+    const r = computeArrheniusEquation({ k1: rd(k1.input), temp1_c: t1.input.value === "" ? null : Number(t1.input.value), k2: rd(k2.input), temp2_c: t2.input.value === "" ? null : Number(t2.input.value) }); stepsFor(outputRegion, inputRegion, ["k1", "temp1_c", "k2", "temp2_c"], r);
     if (r.error) { oEa.textContent = r.error; oA.textContent = "-"; oNote.textContent = ""; return; }
     oEa.textContent = fmt(r.ea_kj_mol, 2) + " kJ/mol (" + fmt(r.ea_j_mol, 0) + " J/mol)";
     oA.textContent = r.pre_exponential_a.toExponential(3) + " / Q10 " + fmt(r.q10, 3);
@@ -928,7 +929,7 @@ function renderClausiusClapeyron(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "cc-out-note");
   const rd = (i) => (i.value === "" ? 0 : Number(i.value) || 0);
   const update = debounce(() => {
-    const r = computeClausiusClapeyron({ pressure1: rd(p1.input), temp1_c: t1.input.value === "" ? null : Number(t1.input.value), pressure2: rd(p2.input), temp2_c: t2.input.value === "" ? null : Number(t2.input.value) });
+    const r = computeClausiusClapeyron({ pressure1: rd(p1.input), temp1_c: t1.input.value === "" ? null : Number(t1.input.value), pressure2: rd(p2.input), temp2_c: t2.input.value === "" ? null : Number(t2.input.value) }); stepsFor(outputRegion, inputRegion, ["pressure1", "temp1_c", "pressure2", "temp2_c"], r);
     if (r.error) { oH.textContent = r.error; oS.textContent = "-"; oNote.textContent = ""; return; }
     oH.textContent = fmt(r.enthalpy_kj_mol, 2) + " kJ/mol (" + fmt(r.enthalpy_j_mol, 0) + " J/mol)";
     oS.textContent = fmt(r.slope_k, 1) + " K";
@@ -950,7 +951,7 @@ function renderOsmolarity(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "osm-out-note");
   const rd = (x) => (x.value === "" ? 0 : Number(x.value) || 0);
   const update = debounce(() => {
-    const r = computeOsmolarity({ concentration_mol_l: rd(c.input), vant_hoff_i: rd(i.input), temperature_c: t.input.value === "" ? 37 : Number(t.input.value) });
+    const r = computeOsmolarity({ concentration_mol_l: rd(c.input), vant_hoff_i: rd(i.input), temperature_c: t.input.value === "" ? 37 : Number(t.input.value) }); stepsFor(outputRegion, inputRegion, ["concentration_mol_l", "vant_hoff_i", "temperature_c"], r);
     if (r.error) { oOsm.textContent = r.error; oPi.textContent = "-"; oNote.textContent = ""; return; }
     oOsm.textContent = fmt(r.osmolarity_osmol_l, 4) + " Osmol/L (" + fmt(r.osmolarity_mosmol_l, 0) + " mOsm/L)";
     oPi.textContent = fmt(r.osmotic_pressure_atm, 2) + " atm";
@@ -973,7 +974,7 @@ function renderNernstEquation(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "ns-out-note");
   const rd = (i) => (i.value === "" ? 0 : Number(i.value) || 0);
   const update = debounce(() => {
-    const r = computeNernstEquation({ standard_potential_v: e0.input.value === "" ? 0 : Number(e0.input.value), electrons_n: rd(n.input), reaction_quotient: rd(q.input), temperature_c: t.input.value === "" ? 25 : Number(t.input.value) });
+    const r = computeNernstEquation({ standard_potential_v: e0.input.value === "" ? 0 : Number(e0.input.value), electrons_n: rd(n.input), reaction_quotient: rd(q.input), temperature_c: t.input.value === "" ? 25 : Number(t.input.value) }); stepsFor(outputRegion, inputRegion, ["standard_potential_v", "electrons_n", "reaction_quotient", "temperature_c"], r);
     if (r.error) { oE.textContent = r.error; oS.textContent = "-"; oNote.textContent = ""; return; }
     oE.textContent = fmt(r.cell_potential_v, 4) + " V";
     oS.textContent = fmt(r.nernst_slope_v * 1000, 2) + " mV/decade";
@@ -999,7 +1000,7 @@ function renderRcf(inputRegion, outputRegion, citationEl) {
     if (v) r.input.value = v.radius_mm;
   });
   const update = debounce(() => {
-    const res = computeRcf({ rotor_radius_mm: Number(r.input.value), rpm: Number(rpm.input.value) || 0, rcf: Number(rcf.input.value) || 0 });
+    const res = computeRcf({ rotor_radius_mm: Number(r.input.value), rpm: Number(rpm.input.value) || 0, rcf: Number(rcf.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["rotor_radius_mm", "rpm", "rcf"], res);
     if (res.error) { out.textContent = res.error; return; }
     out.textContent = "RPM " + fmt(res.rpm, 0) + " | RCF " + fmt(res.rcf, 0) + " g (radius " + fmt(res.rotor_radius_mm, 1) + " mm)";
   }, DEBOUNCE_MS);
@@ -1016,7 +1017,7 @@ function renderResuspend(inputRegion, outputRegion, citationEl) {
   for (const f of [m, t]) inputRegion.appendChild(f.wrap);
   const out = makeOutputLine(outputRegion, "Diluent volume", "rs-out");
   const update = debounce(() => {
-    const r = computeResuspension({ mass_g: Number(m.input.value), target_concentration: Number(t.input.value) });
+    const r = computeResuspension({ mass_g: Number(m.input.value), target_concentration: Number(t.input.value) }); stepsFor(outputRegion, inputRegion, ["mass_g", "target_concentration"], r);
     if (r.error) { out.textContent = r.error; return; }
     out.textContent = fmt(r.volume, 6) + " L (" + fmt(r.volume * 1000, 3) + " mL)";
   }, DEBOUNCE_MS);
@@ -1038,7 +1039,7 @@ function renderPcrMix(inputRegion, outputRegion, citationEl) {
   const totOut = makeOutputLine(outputRegion, "Total master mix volume (uL)", "pcr-out-t");
   const update = debounce(() => {
     const components = String(ta.input.value || "").split("\n").map((s) => s.split(",").map((x) => x.trim())).filter((p) => p.length === 2 && p[0]).map((p) => ({ name: p[0], per_reaction: Number(p[1]) }));
-    const r = computePcrMix({ number_of_reactions: Number(n.input.value), fudge_factor_pct: Number(ff.input.value), components });
+    const r = computePcrMix({ number_of_reactions: Number(n.input.value), fudge_factor_pct: Number(ff.input.value), components }); stepsFor(outputRegion, inputRegion, ["number_of_reactions", "fudge_factor_pct", "components"], r);
     while (tableWrap.firstChild) tableWrap.removeChild(tableWrap.firstChild);
     if (r.error) { totOut.textContent = r.error; return; }
     const t = document.createElement("table");
@@ -1077,7 +1078,7 @@ function renderBeerLambert(inputRegion, outputRegion, citationEl) {
   for (const f of [a, l, e]) inputRegion.appendChild(f.wrap);
   const out = makeOutputLine(outputRegion, "Concentration", "bl-out");
   const update = debounce(() => {
-    const r = computeBeerLambert({ absorbance: Number(a.input.value), path_length_cm: Number(l.input.value), epsilon: Number(e.input.value) });
+    const r = computeBeerLambert({ absorbance: Number(a.input.value), path_length_cm: Number(l.input.value), epsilon: Number(e.input.value) }); stepsFor(outputRegion, inputRegion, ["absorbance", "path_length_cm", "epsilon"], r);
     if (r.error) { out.textContent = r.error; return; }
     out.textContent = r.concentration.toExponential(4) + " M";
   }, DEBOUNCE_MS);
@@ -1103,7 +1104,7 @@ function renderHendersonHasselbalch(inputRegion, outputRegion, citationEl) {
     const r = computeHendersonHasselbalch({
       pKa: Number(pKa.input.value), target_pH: Number(pH.input.value),
       total_buffer_concentration: Number(cT.input.value), total_volume: Number(vT.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["pKa", "target_pH", "total_buffer_concentration", "total_volume"], r);
     if (r.error) { ratio.textContent = r.error; baseOut.textContent = acidOut.textContent = ""; return; }
     ratio.textContent = fmt(r.ratio_base_acid, 4);
     baseOut.textContent = fmt(r.moles_base, 6) + " mol";
@@ -1131,7 +1132,7 @@ function renderHemocytometer(inputRegion, outputRegion, citationEl) {
     const r = computeHemocytometer({
       total_cells_counted: Number(cnt.input.value), squares_counted: Number(sq.input.value),
       dilution_factor: Number(df.input.value), dead_cells: dead.input.value === "" ? null : Number(dead.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["total_cells_counted", "squares_counted", "dilution_factor", "dead_cells"], r);
     if (r.error) { out.textContent = r.error; via.textContent = ""; return; }
     out.textContent = r.cells_per_mL.toExponential(3);
     via.textContent = r.viability_pct == null ? "-" : fmt(r.viability_pct, 1) + "%";
@@ -1193,7 +1194,7 @@ export function renderOd600CellCount(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Linear-range note", "odc-out-note");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeOd600CellCount({ od600: readNum(od.input), factor_cells_per_od: readNum(factor.input), dilution: readNum(dil.input) });
+    const r = computeOd600CellCount({ od600: readNum(od.input), factor_cells_per_od: readNum(factor.input), dilution: readNum(dil.input) }); stepsFor(outputRegion, inputRegion, ["od600", "factor_cells_per_od", "dilution"], r);
     if (r.error) { oCells.textContent = r.error; oNote.textContent = ""; return; }
     oCells.textContent = r.cells_per_ml.toExponential(2) + " cells/mL";
     oNote.textContent = r.note;

@@ -11,6 +11,7 @@ import {
   makeOutputLine,
   attachExampleButton,
   fmt,
+  stepsFor,
 } from "./ui-fields.js";
 import { tcdf, chi2Cdf, betainc, normCdf } from "./pure-math.js";
 
@@ -81,7 +82,7 @@ function renderFinalGradeNeeded(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "fgn-out-note");
   function readNum(i) { if (i.value === "") return NaN; const n = Number(i.value); return Number.isFinite(n) ? n : NaN; }
   const update = debounce(() => {
-    const r = computeFinalGradeNeeded({ current_pct: readNum(current.input), final_weight_pct: readNum(fw.input), target_pct: readNum(target.input) });
+    const r = computeFinalGradeNeeded({ current_pct: readNum(current.input), final_weight_pct: readNum(fw.input), target_pct: readNum(target.input) }); stepsFor(outputRegion, inputRegion, ["current_pct", "final_weight_pct", "target_pct"], r);
     if (r.error) { oNeeded.textContent = r.error; oRange.textContent = ""; oNote.textContent = ""; return; }
     oNeeded.textContent = fmt(r.needed_pct, 1) + "% (" + r.status + ")";
     oRange.textContent = "max " + fmt(r.max_pct, 1) + "%, min " + fmt(r.min_pct, 1) + "%";
@@ -138,7 +139,7 @@ function renderCategoryWeightedGrade(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "cwg-out-note");
   function parse(s) { return String(s).split(/[,;\n]+/).map((p) => p.trim()).filter(Boolean).map((p) => { const [pct, weight] = p.split("/"); return { earned: Number(pct), possible: 100, weight: Number(weight) }; }); }
   const update = debounce(() => {
-    const r = computeCategoryWeightedGrade({ categories: parse(data.input.value) });
+    const r = computeCategoryWeightedGrade({ categories: parse(data.input.value) }); stepsFor(outputRegion, inputRegion, ["categories"], r);
     if (r.error) { oOverall.textContent = r.error; oCheck.textContent = ""; oNote.textContent = ""; return; }
     // Truncated, not rounded: until 2026-10-08 an 89.996% overall printed as "90.00% (B)".
     oOverall.textContent = fmt(r.overall_pct === null ? null : Math.floor(r.overall_pct * 100 + 1e-9) / 100, 2) + "% (" + r.letter + ")";
@@ -197,7 +198,7 @@ function renderTwoSampleTTest(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "tt-out-note");
   function readNum(i) { if (i.value === "") return NaN; const n = Number(i.value); return Number.isFinite(n) ? n : NaN; }
   const update = debounce(() => {
-    const r = computeTwoSampleTTest({ mean1: readNum(m1.input), sd1: readNum(s1.input), n1: readNum(n1.input), mean2: readNum(m2.input), sd2: readNum(s2.input), n2: readNum(n2.input), tail: tail.select.value });
+    const r = computeTwoSampleTTest({ mean1: readNum(m1.input), sd1: readNum(s1.input), n1: readNum(n1.input), mean2: readNum(m2.input), sd2: readNum(s2.input), n2: readNum(n2.input), tail: tail.select.value }); stepsFor(outputRegion, inputRegion, ["mean1", "sd1", "n1", "mean2", "sd2", "n2", "tail"], r);
     if (r.error) { oT.textContent = r.error; oP.textContent = ""; oNote.textContent = ""; return; }
     oT.textContent = "t = " + fmt(r.t_stat, 3) + ", df = " + fmt(r.df, 1);
     oP.textContent = "p = " + fmt(r.p_value, 4) + " (" + (r.significant ? "significant" : "not significant") + " at alpha)";
@@ -249,7 +250,7 @@ function renderPairedTTest(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "ptt-out-note");
   function readNum(i) { if (i.value === "") return NaN; const v = Number(i.value); return Number.isFinite(v) ? v : NaN; }
   const update = debounce(() => {
-    const r = computePairedTTest({ mean_diff: readNum(md.input), sd_diff: readNum(sd.input), n_pairs: readNum(n.input), tail: tail.select.value });
+    const r = computePairedTTest({ mean_diff: readNum(md.input), sd_diff: readNum(sd.input), n_pairs: readNum(n.input), tail: tail.select.value }); stepsFor(outputRegion, inputRegion, ["mean_diff", "sd_diff", "n_pairs", "tail"], r);
     if (r.error) { oT.textContent = r.error; oP.textContent = ""; oNote.textContent = ""; return; }
     oT.textContent = "t = " + fmt(r.t_stat, 3) + ", df = " + r.df;
     oP.textContent = "p = " + fmt(r.p_value, 4) + " (" + (r.significant ? "significant" : "not significant") + " at alpha)";
@@ -303,7 +304,7 @@ function renderOneSampleTTest(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "ostt-out-note");
   function readNum(i) { if (i.value === "") return NaN; const v = Number(i.value); return Number.isFinite(v) ? v : NaN; }
   const update = debounce(() => {
-    const r = computeOneSampleTTest({ sample_mean: readNum(xb.input), sample_sd: readNum(sd.input), n: readNum(n.input), hypothesized_mean: readNum(mu0.input), tail: tail.select.value });
+    const r = computeOneSampleTTest({ sample_mean: readNum(xb.input), sample_sd: readNum(sd.input), n: readNum(n.input), hypothesized_mean: readNum(mu0.input), tail: tail.select.value }); stepsFor(outputRegion, inputRegion, ["sample_mean", "sample_sd", "n", "hypothesized_mean", "tail"], r);
     if (r.error) { oT.textContent = r.error; oP.textContent = ""; oNote.textContent = ""; return; }
     oT.textContent = "t = " + fmt(r.t_stat, 3) + ", df = " + r.df;
     oP.textContent = "p = " + fmt(r.p_value, 4) + " (" + (r.significant ? "significant" : "not significant") + " at alpha)";
@@ -366,7 +367,7 @@ function renderOneWayAnova(inputRegion, outputRegion, citationEl) {
   const oE = makeOutputLine(outputRegion, "Effect size (eta squared)", "anova-out-e");
   const oNote = makeOutputLine(outputRegion, "Note", "anova-out-note");
   const update = debounce(() => {
-    const r = computeOneWayAnova({ groups_text: t.input.value });
+    const r = computeOneWayAnova({ groups_text: t.input.value }); stepsFor(outputRegion, inputRegion, ["groups_text"], r);
     if (r.error) { oF.textContent = r.error; oP.textContent = ""; oE.textContent = ""; oNote.textContent = ""; return; }
     oF.textContent = "F = " + fmt(r.f_stat, 3) + " (df " + r.df_between + ", " + r.df_within + "); " + r.groups + " groups, N = " + r.n_total;
     oP.textContent = "p = " + fmt(r.p_value, 4) + " (" + (r.significant ? "significant" : "not significant") + " at 0.05)";
@@ -432,7 +433,7 @@ function renderChiSquareIndependence(inputRegion, outputRegion, citationEl) {
   const oW = makeOutputLine(outputRegion, "Warnings", "chi2i-out-w");
   const oNote = makeOutputLine(outputRegion, "Note", "chi2i-out-note");
   const update = debounce(() => {
-    const rr = computeChiSquareIndependence({ table_text: t.input.value });
+    const rr = computeChiSquareIndependence({ table_text: t.input.value }); stepsFor(outputRegion, inputRegion, ["table_text"], rr);
     if (rr.error) { oC.textContent = rr.error; oP.textContent = ""; oV.textContent = ""; oW.textContent = ""; oNote.textContent = ""; return; }
     oC.textContent = "chi2 = " + fmt(rr.chi_square, 3) + " (df " + rr.df + "); " + rr.rows + "x" + rr.cols + " table, N = " + rr.n_total;
     oP.textContent = "p = " + fmt(rr.p_value, 4) + " (" + (rr.significant ? "significant" : "not significant") + " at 0.05)";
@@ -514,7 +515,7 @@ function renderSpearman(inputRegion, outputRegion, citationEl) {
   const oW = makeOutputLine(outputRegion, "Warnings", "spr-out-w");
   const oNote = makeOutputLine(outputRegion, "Note", "spr-out-note");
   const update = debounce(() => {
-    const rr = computeSpearman({ x_values: X.input.value || "", y_values: Y.input.value || "" });
+    const rr = computeSpearman({ x_values: X.input.value || "", y_values: Y.input.value || "" }); stepsFor(outputRegion, inputRegion, ["x_values", "y_values"], rr);
     if (rr.error) { oR.textContent = rr.error; oP.textContent = ""; oW.textContent = ""; oNote.textContent = ""; return; }
     oR.textContent = "rho = " + fmt(rr.rho, 4) + " (" + rr.direction + ", " + rr.strength + "); n = " + rr.n;
     oP.textContent = rr.perfect_fit ? "p = 0 (perfect monotonic fit)" : "p = " + fmt(rr.p_value, 4) + " (" + (rr.significant ? "significant" : "not significant") + " at 0.05)";
@@ -579,7 +580,7 @@ function renderTwoProportionZTest(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "tp-out-note");
   function readNum(i) { if (i.value === "") return NaN; const n = Number(i.value); return Number.isFinite(n) ? n : NaN; }
   const update = debounce(() => {
-    const r = computeTwoProportionZTest({ x1: readNum(x1.input), n1: readNum(n1.input), x2: readNum(x2.input), n2: readNum(n2.input), tail: tail.select.value });
+    const r = computeTwoProportionZTest({ x1: readNum(x1.input), n1: readNum(n1.input), x2: readNum(x2.input), n2: readNum(n2.input), tail: tail.select.value }); stepsFor(outputRegion, inputRegion, ["x1", "n1", "x2", "n2", "tail"], r);
     if (r.error) { oP.textContent = r.error; oZ.textContent = ""; oCI.textContent = ""; oW.textContent = ""; oNote.textContent = ""; return; }
     oP.textContent = fmt(r.p1, 4) + " / " + fmt(r.p2, 4) + " / " + fmt(r.diff, 4);
     oZ.textContent = "z = " + fmt(r.z_stat, 3) + ", p = " + fmt(r.p_value, 4) + " (" + (r.significant ? "significant" : "not significant") + " at alpha)";

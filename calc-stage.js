@@ -4,6 +4,7 @@
 import {
   DEBOUNCE_MS, debounce, makeNumber, makeSelect, makeCheckbox,
   makeOutputLine, attachExampleButton, fmt, makeRowField,
+  stepsFor,
 } from "./ui-fields.js";
 
 // v18 §7 contract guard: reject a non-finite numeric input. A renderer
@@ -463,7 +464,7 @@ function renderTrussCapacity(inputRegion, outputRegion, citationEl) {
   }
   function update() {
     const point_loads = rows.map((r) => ({ weight_lb: Number(r.w.value) || 0, position_ft: Number(r.p.value) || 0 })).filter((p) => p.weight_lb > 0);
-    const r = computeTrussCapacity({ truss_model: model.select.value, span_ft: Number(span.input.value) || 0, point_loads });
+    const r = computeTrussCapacity({ truss_model: model.select.value, span_ft: Number(span.input.value) || 0, point_loads }); stepsFor(outputRegion, inputRegion, ["truss_model", "span_ft", "point_loads"], r);
     if (r.error) { oU.textContent = r.error; for (const o of [oR, oE, oS, oP, oA]) o.textContent = "-"; return; }
     oU.textContent = fmt(r.udl_max_lb_per_ft, 0) + " lb/ft (" + fmt(r.total_uniform_capacity_lb, 0) + " lb total)";
     oR.textContent = fmt(r.reaction_a_lb, 0) + " / " + fmt(r.reaction_b_lb, 0) + " lb";
@@ -528,7 +529,7 @@ function renderDMX(inputRegion, outputRegion, citationEl) {
   function update() {
     const fixtures = rows.map((r) => ({ name: r.n.value, universe: Number(r.u.value) || 1, start: Number(r.s.value) || 0, channels: Number(r.c.value) || 0 })).filter((f) => f.start > 0 && f.channels > 0);
     if (fixtures.length === 0) { for (const o of [oR, oU, oC, oS]) o.textContent = "-"; return; }
-    const r = computeDMX({ fixtures });
+    const r = computeDMX({ fixtures }); stepsFor(outputRegion, inputRegion, ["fixtures"], r);
     if (r.error) { oR.textContent = r.error; for (const o of [oU, oC, oS]) o.textContent = "-"; return; }
     oR.textContent = r.ranges.map((x) => x.name + ": U" + x.universe + " " + x.start + "-" + x.raw_end + (x.overflow ? " OVERFLOW" : "")).join("; ");
     oU.textContent = Object.entries(r.utilization).map(([u, p]) => "U" + u + ": " + fmt(p, 1) + "%").join(", ");
@@ -758,7 +759,7 @@ function renderSPLAtmospheric(inputRegion, outputRegion, citationEl) {
       temperature_C: tempF === null ? null : (tempF - 32) * 5 / 9,
       RH_percent: readNum(rh.input),
       pressure_kPa: inHg === null ? null : inHg * 3.38638866667,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["source_SPL_dB", "d_ref_m", "d_far_m", "temperature_C", "RH_percent", "pressure_kPa"], r);
     if (r.error) {
       oISL.textContent = r.error; oSPL.textContent = ""; oA.textContent = ""; oBands.textContent = ""; oW.textContent = "";
       return;
@@ -824,7 +825,7 @@ function renderPowerDistro(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "pd-out-note");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computePowerDistro({ watts: readNum(w.input), voltage_v: readNum(v.input), phase: phase.select.value, rating_a: readNum(rating.input), pf: readNum(pf.input), derate: readNum(der.input) });
+    const r = computePowerDistro({ watts: readNum(w.input), voltage_v: readNum(v.input), phase: phase.select.value, rating_a: readNum(rating.input), pf: readNum(pf.input), derate: readNum(der.input) }); stepsFor(outputRegion, inputRegion, ["watts", "voltage_v", "phase", "rating_a", "pf", "derate"], r);
     if (r.error) { oAmps.textContent = r.error; oPct.textContent = ""; oNote.textContent = ""; return; }
     oAmps.textContent = fmt(r.amps_per_leg, 1) + " A/leg (" + fmt(r.headroom_a, 1) + " A headroom)";
     oPct.textContent = fmt(r.pct_load, 1) + "% of rating - " + (r.pass ? "PASS (within the " + fmt(r.derate * 100, 0) + "% continuous target)" : "FAIL (over continuous limit)");
@@ -902,7 +903,7 @@ function renderSpeakerImpedance(inputRegion, outputRegion, citationEl) {
       branches: readNum(branches.input),
       amp_min_ohm: readNum(ampMin.input),
       power_w: readNum(power.input),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["topology", "z_ohm", "count", "series_per_branch", "branches", "amp_min_ohm", "power_w"], r);
     if (r.error) { oZ.textContent = r.error; oSafe.textContent = ""; oPower.textContent = ""; return; }
     oZ.textContent = fmt(r.z_total_ohm, 2) + " Ohm (" + r.n_drivers + " drivers)";
     oSafe.textContent = r.safe === null ? "No amp minimum entered" : (r.safe ? "SAFE (at or above amp minimum)" : "BELOW amp minimum - check amp spec");
@@ -997,7 +998,7 @@ function renderDecibelConverter(inputRegion, outputRegion, citationEl) {
       level_db: readNum(level.input),
       ref_type: ref.select.value,
       levels: lv === null ? null : lv,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["mode", "p1", "p2", "v1", "v2", "level_db", "ref_type", "levels"], r);
     if (r.error) { oResult.textContent = r.error; return; }
     if (typeof r.db === "number") oResult.textContent = fmt(r.db, 4) + " dB";
     else oResult.textContent = fmt(r.linear_value, 4) + " " + r.unit;
@@ -1061,7 +1062,7 @@ function renderAmpPowerSpl(inputRegion, outputRegion, citationEl) {
       crest_db: readNum(crest.input),
       target_spl_db: readNum(target.input),
       max_spl_db: readNum(maxSpl.input),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["sensitivity_db", "power_w", "distance_m", "crest_db", "target_spl_db", "max_spl_db"], r);
     if (r.error) { oSpl.textContent = r.error; oPeak.textContent = ""; oInv.textContent = ""; return; }
     oSpl.textContent = fmt(r.spl_db, 2) + " dB";
     oPeak.textContent = r.peak_spl_db === null ? "No crest factor entered" : fmt(r.peak_spl_db, 2) + " dB";
@@ -1146,7 +1147,7 @@ function renderLightingBeam(inputRegion, outputRegion, citationEl) {
   const oCd = makeOutputLine(outputRegion, "Center intensity", "lb-out-cd");
   const oNote = makeOutputLine(outputRegion, "Notes", "lb-out-note");
   const update = debounce(() => {
-    const r = computeLightingBeam({ beam_angle_deg: Number(ang.input.value) || 0, throw_distance: Number(thr.input.value) || 0, distance_unit: unit.select.value, source: src.select.value, candela: Number(cd.input.value) || 0, lumens: Number(lm.input.value) || 0 });
+    const r = computeLightingBeam({ beam_angle_deg: Number(ang.input.value) || 0, throw_distance: Number(thr.input.value) || 0, distance_unit: unit.select.value, source: src.select.value, candela: Number(cd.input.value) || 0, lumens: Number(lm.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["beam_angle_deg", "throw_distance", "distance_unit", "source", "candela", "lumens"], r);
     if (r.error) { oDia.textContent = r.error; oIll.textContent = "-"; oCd.textContent = "-"; oNote.textContent = ""; return; }
     oDia.textContent = fmt(r.beam_diameter_ft, 2) + " ft (" + fmt(r.beam_diameter_m, 2) + " m)";
     oIll.textContent = fmt(r.illuminance_fc, 1) + " fc (" + fmt(r.illuminance_lux, 0) + " lux)";
@@ -1760,7 +1761,7 @@ function renderLightingThrowForPool(inputRegion, outputRegion, citationEl) {
   const oT = makeOutputLine(outputRegion, "Throw distance needed", "ltp-out-t");
   const oNote = makeOutputLine(outputRegion, "Note", "ltp-out-n");
   const update = debounce(() => {
-    const r = computeLightingThrowForPool({ target_pool_diameter: Number(dia.input.value) || 0, beam_angle_deg: Number(ang.input.value) || 0, distance_unit: unit.select.value });
+    const r = computeLightingThrowForPool({ target_pool_diameter: Number(dia.input.value) || 0, beam_angle_deg: Number(ang.input.value) || 0, distance_unit: unit.select.value }); stepsFor(outputRegion, inputRegion, ["target_pool_diameter", "beam_angle_deg", "distance_unit"], r);
     if (r.error) { oT.textContent = r.error; oNote.textContent = ""; return; }
     oT.textContent = fmt(r.throw_distance, 2) + " " + r.distance_unit;
     oNote.textContent = r.note;
@@ -1803,7 +1804,7 @@ function renderWinchFleetAngle(inputRegion, outputRegion, citationEl) {
   const oS = makeOutputLine(outputRegion, "Against the guideline", "wfa-out-s");
   const oNote = makeOutputLine(outputRegion, "Note", "wfa-out-n");
   const update = debounce(() => {
-    const r = computeWinchFleetAngle({ lateral_offset: Number(offset.input.value) || 0, lead_distance: Number(lead.input.value) || 0 });
+    const r = computeWinchFleetAngle({ lateral_offset: Number(offset.input.value) || 0, lead_distance: Number(lead.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["lateral_offset", "lead_distance"], r);
     if (r.error) { oA.textContent = r.error; oS.textContent = "-"; oNote.textContent = ""; return; }
     oA.textContent = fmt(r.fleet_angle_deg, 2) + " deg";
     oS.textContent = r.status;
@@ -1861,7 +1862,7 @@ function _v1003renderAcousticGainPagNag(inputRegion, outputRegion, citationEl) {
       ds_ft: ds.input.value === "" ? 2 : Number(ds.input.value), d0_ft: d0.input.value === "" ? 30 : Number(d0.input.value),
       d1_ft: d1.input.value === "" ? 8 : Number(d1.input.value), d2_ft: d2.input.value === "" ? 12 : Number(d2.input.value),
       open_mics: nm.input.value === "" ? 1 : Number(nm.input.value), ead_ft: ea.input.value === "" ? 6 : Number(ea.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["ds_ft", "d0_ft", "d1_ft", "d2_ft", "open_mics", "ead_ft"], r);
     if (r.error) { oP.textContent = r.error; oM.textContent = "-"; oV.textContent = "-"; return; }
     oP.textContent = fmt(r.pag_db, 1) + " dB PAG / " + fmt(r.nag_db, 1) + " dB NAG";
     oM.textContent = fmt(r.margin_db, 1) + " dB";

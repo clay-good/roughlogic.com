@@ -17,6 +17,7 @@
 import {
   DEBOUNCE_MS, debounce, makeNumber, makeSelect,
   makeOutputLine, attachExampleButton, fmt,
+  stepsFor,
 } from "./ui-fields.js";
 
 export const MOTOR_RENDERERS = {};
@@ -68,7 +69,7 @@ function renderMotorSyncSlip(inputRegion, outputRegion, citationEl) {
   const oRotor = makeOutputLine(outputRegion, "Rotor (slip) frequency", "mss-out-rotor");
   const oNote = makeOutputLine(outputRegion, "Note", "mss-out-note");
   const update = debounce(() => {
-    const r = computeMotorSyncSlip({ line_freq_hz: Number(freq.input.value) || 0, poles: Number(poles.input.value) || 0, rated_rpm: Number(rpm.input.value) || 0 });
+    const r = computeMotorSyncSlip({ line_freq_hz: Number(freq.input.value) || 0, poles: Number(poles.input.value) || 0, rated_rpm: Number(rpm.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["line_freq_hz", "poles", "rated_rpm"], r);
     if (r.error) { oSync.textContent = r.error; oSlip.textContent = "-"; oRotor.textContent = "-"; oNote.textContent = "-"; return; }
     oSync.textContent = fmt(r.sync_rpm, 0) + " rpm";
     oSlip.textContent = fmt(r.slip_pct, 2) + " % (slip " + fmt(r.slip, 4) + ")";
@@ -112,7 +113,7 @@ function renderMotorPoleIdentification(inputRegion, outputRegion, citationEl) {
   const oSlip = makeOutputLine(outputRegion, "Full-load slip", "mpi-out-slip");
   const oNote = makeOutputLine(outputRegion, "Note", "mpi-out-note");
   const update = debounce(() => {
-    const r = computeMotorPoleIdentification({ rated_rpm: Number(rpm.input.value) || 0, line_freq_hz: Number(freq.input.value) || 0 });
+    const r = computeMotorPoleIdentification({ rated_rpm: Number(rpm.input.value) || 0, line_freq_hz: Number(freq.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["rated_rpm", "line_freq_hz"], r);
     if (r.error) { oPoles.textContent = r.error; oSlip.textContent = "-"; oNote.textContent = "-"; return; }
     oPoles.textContent = fmt(r.poles, 0) + "-pole (Ns " + fmt(r.sync_rpm, 0) + " rpm)";
     oSlip.textContent = r.at_or_above_sync ? fmt(r.slip_pct, 2) + " % - at/above synchronous, recheck the rpm/frequency" : fmt(r.slip_pct, 2) + " % (slip " + fmt(r.slip, 4) + ")";
@@ -157,7 +158,7 @@ function renderMotorShaftTorque(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "mst-out-note");
   const readNum = (input) => (input.value === "" ? null : (Number.isFinite(Number(input.value)) ? Number(input.value) : null));
   const update = debounce(() => {
-    const r = computeMotorShaftTorque({ rpm: Number(rpm.input.value) || 0, hp: readNum(hp.input), torque_lbft: readNum(torque.input) });
+    const r = computeMotorShaftTorque({ rpm: Number(rpm.input.value) || 0, hp: readNum(hp.input), torque_lbft: readNum(torque.input) }); stepsFor(outputRegion, inputRegion, ["rpm", "hp", "torque_lbft"], r);
     if (r.error) { oTorque.textContent = r.error; oHp.textContent = "-"; oNote.textContent = "-"; return; }
     oTorque.textContent = fmt(r.torque_lbft, 2) + " lb-ft";
     oHp.textContent = fmt(r.hp, 2) + " HP";
@@ -207,7 +208,7 @@ function renderMotorOperatingCost(inputRegion, outputRegion, citationEl) {
   const oCost = makeOutputLine(outputRegion, "Annual energy cost", "moc-out-cost");
   const oNote = makeOutputLine(outputRegion, "Note", "moc-out-note");
   const update = debounce(() => {
-    const r = computeMotorOperatingCost({ hp: Number(hp.input.value) || 0, efficiency_pct: Number(eff.input.value) || 0, load_factor_pct: Number(load.input.value) || 0, hours_per_year: Number(hours.input.value) || 0, rate_usd_per_kwh: Number(rate.input.value) || 0 });
+    const r = computeMotorOperatingCost({ hp: Number(hp.input.value) || 0, efficiency_pct: Number(eff.input.value) || 0, load_factor_pct: Number(load.input.value) || 0, hours_per_year: Number(hours.input.value) || 0, rate_usd_per_kwh: Number(rate.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["hp", "efficiency_pct", "load_factor_pct", "hours_per_year", "rate_usd_per_kwh"], r);
     if (r.error) { oKw.textContent = r.error; oKwh.textContent = "-"; oCost.textContent = "-"; oNote.textContent = "-"; return; }
     oKw.textContent = fmt(r.input_kw, 2) + " kW";
     oKwh.textContent = fmt(r.annual_kwh, 0) + " kWh/yr";
@@ -264,7 +265,7 @@ function renderMotorRunHoursForBudget(inputRegion, outputRegion, citationEl) {
   const oKwh = makeOutputLine(outputRegion, "Energy at that budget", "mrh-out-kwh");
   const oNote = makeOutputLine(outputRegion, "Note", "mrh-out-note");
   const update = debounce(() => {
-    const r = computeMotorRunHoursForBudget({ hp: Number(hp.input.value) || 0, efficiency_pct: Number(eff.input.value) || 0, load_factor_pct: Number(load.input.value) || 0, rate_usd_per_kwh: Number(rate.input.value) || 0, cost_budget_usd: Number(budget.input.value) || 0 });
+    const r = computeMotorRunHoursForBudget({ hp: Number(hp.input.value) || 0, efficiency_pct: Number(eff.input.value) || 0, load_factor_pct: Number(load.input.value) || 0, rate_usd_per_kwh: Number(rate.input.value) || 0, cost_budget_usd: Number(budget.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["hp", "efficiency_pct", "load_factor_pct", "rate_usd_per_kwh", "cost_budget_usd"], r);
     if (r.error) { oHours.textContent = r.error; oKw.textContent = "-"; oKwh.textContent = "-"; oNote.textContent = "-"; return; }
     oHours.textContent = fmt(r.max_hours_per_year, 0) + " hr/yr" + (r.exceeds_year ? " -- more than the 8,760 hours in a year; the budget covers continuous running" : "");
     oKw.textContent = fmt(r.input_kw, 2) + " kW";
@@ -321,7 +322,7 @@ function renderMultiMotorFeeder(inputRegion, outputRegion, citationEl) {
   const oStd = makeOutputLine(outputRegion, "Standard OCPD (round down)", "mmf-out-std");
   const oNote = makeOutputLine(outputRegion, "Note", "mmf-out-note");
   const update = debounce(() => {
-    const r = computeMultiMotorFeeder({ largest_flc_a: Number(largest.input.value) || 0, sum_other_flc_a: Number(others.input.value) || 0, largest_branch_ocpd_a: Number(ocpd.input.value) || 0, ocpd_motor_flc_a: ocpdFlc.input.value === "" ? null : Number(ocpdFlc.input.value) });
+    const r = computeMultiMotorFeeder({ largest_flc_a: Number(largest.input.value) || 0, sum_other_flc_a: Number(others.input.value) || 0, largest_branch_ocpd_a: Number(ocpd.input.value) || 0, ocpd_motor_flc_a: ocpdFlc.input.value === "" ? null : Number(ocpdFlc.input.value) }); stepsFor(outputRegion, inputRegion, ["largest_flc_a", "sum_other_flc_a", "largest_branch_ocpd_a", "ocpd_motor_flc_a"], r);
     if (r.error) { oAmp.textContent = r.error; oMax.textContent = "-"; oStd.textContent = "-"; oNote.textContent = "-"; return; }
     oAmp.textContent = fmt(r.min_feeder_ampacity_a, 1) + " A (size conductors at 75 C >= this)";
     oMax.textContent = fmt(r.max_feeder_ocpd_a, 1) + " A ceiling";
@@ -404,7 +405,7 @@ function renderMotorOverloadSizing(inputRegion, outputRegion, citationEl) {
   const oMax = makeOutputLine(outputRegion, "430.32(C) maximum (will not start)", "mos-out-max");
   const oNote = makeOutputLine(outputRegion, "Note", "mos-out-note");
   const update = debounce(() => {
-    const r = computeMotorOverloadSizing({ fla_A: Number(fla.input.value) || 0, sf: Number(sf.input.value) || 0, rise_C: Number(rise.input.value) || 0, protection: prot.select.value, motor_size: size.select.value });
+    const r = computeMotorOverloadSizing({ fla_A: Number(fla.input.value) || 0, sf: Number(sf.input.value) || 0, rise_C: Number(rise.input.value) || 0, protection: prot.select.value, motor_size: size.select.value }); stepsFor(outputRegion, inputRegion, ["fla_A", "sf", "rise_C", "protection", "motor_size"], r);
     if (r.error) { oClass.textContent = r.error; oOl.textContent = "-"; oMax.textContent = "-"; oNote.textContent = "-"; return; }
     if (r.no_ceiling) {
       oClass.textContent = "430.32(B)(2) thermal protector: no percentage ceiling";
@@ -476,7 +477,7 @@ function renderMotorLockedRotorKva(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "mlr-out-n");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeMotorLockedRotorKva({ horsepower: readNum(hp.input), code_letter: code.select.value, voltage_v: readNum(v.input), phase: Number(ph.select.value) });
+    const r = computeMotorLockedRotorKva({ horsepower: readNum(hp.input), code_letter: code.select.value, voltage_v: readNum(v.input), phase: Number(ph.select.value) }); stepsFor(outputRegion, inputRegion, ["horsepower", "code_letter", "voltage_v", "phase"], r);
     if (r.error) { oKva.textContent = r.error; oLra.textContent = "-"; oNote.textContent = ""; return; }
     oKva.textContent = fmt(r.locked_rotor_kva, 1) + " kVA (" + fmt(r.kva_per_hp, 2) + " kVA/hp)";
     oLra.textContent = fmt(r.lra_a, 1) + " A";
@@ -526,7 +527,7 @@ function _v722renderMotorMaxHpForStartingCurrent(inputRegion, outputRegion, cita
   const oNote = makeOutputLine(outputRegion, "Note", "mmh-out-n");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeMotorMaxHpForStartingCurrent({ max_starting_current_a: readNum(lra.input), code_letter: code.select.value, voltage_v: readNum(v.input), phase: Number(ph.select.value) });
+    const r = computeMotorMaxHpForStartingCurrent({ max_starting_current_a: readNum(lra.input), code_letter: code.select.value, voltage_v: readNum(v.input), phase: Number(ph.select.value) }); stepsFor(outputRegion, inputRegion, ["max_starting_current_a", "code_letter", "voltage_v", "phase"], r);
     if (r.error) { oHp.textContent = r.error; oLra.textContent = "-"; oNote.textContent = ""; return; }
     oHp.textContent = fmt(r.max_horsepower, 1) + " hp (" + fmt(r.kva_per_hp, 2) + " kVA/hp)";
     oLra.textContent = fmt(r.lra_per_hp_a, 1) + " A/hp";
@@ -569,7 +570,7 @@ function renderMotorFaultContribution(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "mfc-out-n");
   function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeMotorFaultContribution({ motor_fla_a: readNum(fla.input), x_subtransient_pu: xd.input.value === "" ? 0.167 : readNum(xd.input), utility_fault_a: readNum(util.input) });
+    const r = computeMotorFaultContribution({ motor_fla_a: readNum(fla.input), x_subtransient_pu: xd.input.value === "" ? 0.167 : readNum(xd.input), utility_fault_a: readNum(util.input) }); stepsFor(outputRegion, inputRegion, ["motor_fla_a", "x_subtransient_pu", "utility_fault_a"], r);
     if (r.error) { oC.textContent = r.error; oT.textContent = "-"; oNote.textContent = ""; return; }
     oC.textContent = fmt(r.contribution_a, 0) + " A (" + fmt(r.multiple, 1) + "x FLA)";
     oT.textContent = fmt(r.total_a, 0) + " A";
@@ -632,7 +633,7 @@ function renderReducedVoltageStarter(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "rvs-out-n");
   function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeReducedVoltageStarter({ across_line_lra_a: readNum(lra.input), across_line_lrt_pct: lrt.input.value === "" ? 100 : readNum(lrt.input), starter_type: type.select.value, tap_fraction: tap.input.value === "" ? 0.65 : readNum(tap.input) });
+    const r = computeReducedVoltageStarter({ across_line_lra_a: readNum(lra.input), across_line_lrt_pct: lrt.input.value === "" ? 100 : readNum(lrt.input), starter_type: type.select.value, tap_fraction: tap.input.value === "" ? 0.65 : readNum(tap.input) }); stepsFor(outputRegion, inputRegion, ["across_line_lra_a", "across_line_lrt_pct", "starter_type", "tap_fraction"], r);
     if (r.error) { oM.textContent = r.error; oL.textContent = "-"; oT.textContent = "-"; oNote.textContent = ""; return; }
     oM.textContent = fmt(r.motor_current_a, 0) + " A";
     oL.textContent = fmt(r.line_current_a, 0) + " A";
@@ -690,7 +691,7 @@ function renderVfdReflectedWave(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "rw-out-n");
   function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeVfdReflectedWave({ rise_time_us: readNum(rt.input), velocity_pct: readNum(vp.input), system_voltage_v: readNum(Vll.input), run_length_ft: readNum(run.input) });
+    const r = computeVfdReflectedWave({ rise_time_us: readNum(rt.input), velocity_pct: readNum(vp.input), system_voltage_v: readNum(Vll.input), run_length_ft: readNum(run.input) }); stepsFor(outputRegion, inputRegion, ["rise_time_us", "velocity_pct", "system_voltage_v", "run_length_ft"], r);
     if (r.error) { oL.textContent = r.error; oV.textContent = "-"; oLim.textContent = "-"; oNote.textContent = ""; return; }
     oL.textContent = fmt(r.l_crit_ft, 1) + " ft (run " + (readNum(run.input) > r.l_crit_ft ? "past - reflection develops" : "under - partial reflection") + ")";
     oV.textContent = fmt(r.v_peak_v, 0) + " V (bus " + fmt(r.v_bus_v, 0) + " V)";
@@ -737,7 +738,7 @@ function _v925renderRotaryPhaseConverter(inputRegion, outputRegion, citationEl) 
     const r = computeRotaryPhaseConverter({
       largest_motor_hp: lg.input.value === "" ? 10 : Number(lg.input.value), total_running_hp: tot.input.value === "" ? 15 : Number(tot.input.value),
       start_factor: sf.input.value === "" ? 2 : Number(sf.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["largest_motor_hp", "total_running_hp", "start_factor"], r);
     if (r.error) { oIdler.textContent = r.error; oGov.textContent = "-"; return; }
     oIdler.textContent = fmt(r.idler_hp_min, 1) + " HP idler";
     oGov.textContent = r.governed_by + " (start " + fmt(r.start_demand_hp, 1) + " HP vs run " + fmt(Number(tot.input.value) || 15, 1) + " HP)";
@@ -776,7 +777,7 @@ function _v944renderMotorAccelerationTime(inputRegion, outputRegion, citationEl)
     const r = computeMotorAccelerationTime({
       inertia_lbft2: wk.input.value === "" ? 100 : Number(wk.input.value), speed_change_rpm: dn.input.value === "" ? 1750 : Number(dn.input.value),
       net_accel_torque_lbft: tq.input.value === "" ? 50 : Number(tq.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["inertia_lbft2", "speed_change_rpm", "net_accel_torque_lbft"], r);
     if (r.error) { oTime.textContent = r.error; return; }
     oTime.textContent = fmt(r.accel_time_s, 2) + " s to reach speed";
   }, DEBOUNCE_MS);
@@ -826,7 +827,7 @@ function _v945renderMotorRmsHp(inputRegion, outputRegion, citationEl) {
       hp_run: hr.input.value === "" ? 20 : Number(hr.input.value), run_time_s: tr.input.value === "" ? 10 : Number(tr.input.value),
       hp_idle: hi.input.value === "" ? 0 : Number(hi.input.value), idle_time_s: ti.input.value === "" ? 20 : Number(ti.input.value),
       cooling_factor: cf.input.value === "" ? 3 : Number(cf.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["hp_run", "run_time_s", "hp_idle", "idle_time_s", "cooling_factor"], r);
     if (r.error) { oRms.textContent = r.error; return; }
     oRms.textContent = fmt(r.rms_hp, 2) + " HP continuous (size the motor at or above this)";
   }, DEBOUNCE_MS);

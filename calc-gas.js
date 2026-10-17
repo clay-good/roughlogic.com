@@ -25,6 +25,7 @@ import {
   DEBOUNCE_MS, debounce, makeNumber, makeSelect,
   makeOutputLine, attachExampleButton, fmt,
   makeStepsPanel,
+  stepsFor,
 } from "./ui-fields.js";
 
 const _finiteGuard = (o) => {
@@ -196,7 +197,7 @@ export function renderGasPipeSizing(inputRegion, outputRegion, citationEl) {
     const r = computeGasPipeSizing({
       btu_load: Number(btu.input.value) || 0, length_ft: Number(length.input.value) || 0,
       gas: gas.select.value, dP_in_wc: Number(dP.input.value) || 0.5,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["btu_load", "length_ft", "gas", "dP_in_wc"], r);
     if (r.error) { oR.textContent = r.error; oS.textContent = "-"; oD.textContent = "-"; return; }
     oR.textContent = fmt(r.required_cfh, 1) + " ft^3/hr";
     oS.textContent = String(r.recommended_size).includes("larger") ? r.recommended_size : (r.recommended_size + "\"");
@@ -267,7 +268,7 @@ export function renderGasLeakRate(inputRegion, outputRegion, citationEl) {
       upstream_psi: Number(psi.input.value) || 0,
       c: Number(c.input.value) || 0.7,
       gas: gas.select.value,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["orifice_diameter_in", "upstream_psi", "c", "gas"], r);
     if (r.error) { oQ.textContent = r.error; oA.textContent = "-"; return; }
     oQ.textContent = fmt(r.leak_rate_cfh, 2) + " ft^3/hr";
     oA.textContent = fmt(r.orifice_area_in2, 5) + " in^2";
@@ -328,7 +329,7 @@ function renderGasLeakHoleDiameter(inputRegion, outputRegion, citationEl) {
       upstream_psi: Number(psi.input.value) || 0,
       c: Number(c.input.value) || 0.7,
       gas: gas.select.value,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["leak_rate_cfh", "upstream_psi", "c", "gas"], r);
     if (r.error) { oD.textContent = r.error; oA.textContent = "-"; oN.textContent = ""; return; }
     oD.textContent = fmt(r.orifice_diameter_in, 4) + " in";
     oA.textContent = fmt(r.orifice_area_in2, 5) + " in^2";
@@ -383,7 +384,7 @@ function renderGasPipePressureDrop(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "gpd-out-note");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeGasPipePressureDrop({ flow_cfh: readNum(q.input), id_in: readNum(d.input), length_ft: readNum(len.input), sg: readNum(sg.input) });
+    const r = computeGasPipePressureDrop({ flow_cfh: readNum(q.input), id_in: readNum(d.input), length_ft: readNum(len.input), sg: readNum(sg.input) }); stepsFor(outputRegion, inputRegion, ["flow_cfh", "id_in", "length_ft", "sg"], r);
     if (r.error) { oDrop.textContent = r.error; oVel.textContent = ""; oNote.textContent = ""; return; }
     oDrop.textContent = fmt(r.drop_inwc, 2) + " in w.c." + (r.exceeds_low_pressure ? " (exceeds low-pressure range)" : "");
     oVel.textContent = fmt(r.velocity_fpm, 0) + " fpm";
@@ -438,7 +439,7 @@ function renderGasPipeMaxFlow(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "gmf-out-note");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeGasPipeMaxFlow({ drop_inwc: readNum(dh.input), id_in: readNum(d.input), length_ft: readNum(len.input), sg: readNum(sg.input) });
+    const r = computeGasPipeMaxFlow({ drop_inwc: readNum(dh.input), id_in: readNum(d.input), length_ft: readNum(len.input), sg: readNum(sg.input) }); stepsFor(outputRegion, inputRegion, ["drop_inwc", "id_in", "length_ft", "sg"], r);
     if (r.error) { oFlow.textContent = r.error; oVel.textContent = ""; oNote.textContent = ""; return; }
     oFlow.textContent = fmt(r.flow_cfh, 0) + " CFH" + (r.exceeds_low_pressure ? " (drop exceeds low-pressure range)" : "");
     oVel.textContent = fmt(r.velocity_fpm, 0) + " fpm";
@@ -499,7 +500,7 @@ function renderGasAltitudeDerate(inputRegion, outputRegion, citationEl) {
     const r = computeGasAltitudeDerate({
       nameplate_input_btuh: Number(input.input.value) || 0, elevation_ft: Number(elev.input.value) || 0,
       derate_pct_per_1000: Number(pct.input.value) || 0, threshold_ft: Number(thr.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["nameplate_input_btuh", "elevation_ft", "derate_pct_per_1000", "threshold_ft"], r);
     if (r.error) { oF.textContent = r.error; oP.textContent = "-"; oK.textContent = "-"; oN.textContent = "-"; return; }
     oF.textContent = fmt(r.derated_input_btuh, 0) + " BTU/hr";
     oP.textContent = fmt(r.factor * 100, 1) + "% of nameplate (" + fmt(r.steps_1000, 2) + " steps)";
@@ -584,7 +585,7 @@ function renderGasFuelConversion(inputRegion, outputRegion, citationEl) {
       hv_from: Number(hvFrom.input.value) || 0, hv_to: Number(hvTo.input.value) || 0,
       sg_from: Number(sgFrom.input.value) || 0, sg_to: Number(sgTo.input.value) || 0,
       p_from: Number(pFrom.input.value) || 0, p_to: Number(pTo.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["appliance_input_btuh", "hv_from", "hv_to", "sg_from", "sg_to", "p_from", "p_to"], r);
     if (r.error) { oCf.textContent = r.error; oCt.textContent = "-"; oR.textContent = "-"; oD.textContent = "-"; oN.textContent = "-"; return; }
     oCf.textContent = fmt(r.cfh_from, 2) + " cfh";
     oCt.textContent = fmt(r.cfh_to, 2) + " cfh";
@@ -636,7 +637,7 @@ function renderMedgasDemand(inputRegion, outputRegion, citationEl) {
   const oConn = makeOutputLine(outputRegion, "Connected flow (all stations)", "mg-out-conn");
   const oDesign = makeOutputLine(outputRegion, "System design flow (sized for)", "mg-out-design");
   const update = debounce(() => {
-    const r = computeMedgasDemand({ stations: Number(st.input.value) || 0, per_station_scfm: Number(q.input.value) || 0, diversity: Number(div.input.value) || 0 });
+    const r = computeMedgasDemand({ stations: Number(st.input.value) || 0, per_station_scfm: Number(q.input.value) || 0, diversity: Number(div.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["stations", "per_station_scfm", "diversity"], r);
     if (r.error) { oConn.textContent = r.error; oDesign.textContent = "-"; return; }
     oConn.textContent = fmt(r.connected_scfm, 2) + " scfm";
     oDesign.textContent = fmt(r.design_scfm, 2) + " scfm";
@@ -672,7 +673,7 @@ function _v977renderWobbeIndex(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const r = computeWobbeIndex({
       hhv_btu_ft3: hv.input.value === "" ? 1000 : Number(hv.input.value), specific_gravity: sg.input.value === "" ? 0.60 : Number(sg.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["hhv_btu_ft3", "specific_gravity"], r);
     if (r.error) { oW.textContent = r.error; return; }
     oW.textContent = fmt(r.wobbe_index_btu_ft3, 0) + " BTU/ft^3 (NG ~1,291, propane ~2,040)";
   }, DEBOUNCE_MS);
@@ -765,7 +766,7 @@ function _v1145renderGasApplianceConnection(inputRegion, outputRegion, citationE
   const oC = makeOutputLine(outputRegion, "Connector (411.1.3.1)", "gac-out-c");
   const oNote = makeOutputLine(outputRegion, "Note", "gac-out-note");
   const update = debounce(() => {
-    const r = computeGasApplianceConnection({ appliance: ap.select.value, shutoff_same_room: sr.select.value, shutoff_distance_ft: Number(sd.input.value) || 0, shutoff_upstream: su.select.value, trap_present: tp.select.value, trap_in_appliance: ti.select.value, connector_length_ft: Number(cl.input.value) || 0 });
+    const r = computeGasApplianceConnection({ appliance: ap.select.value, shutoff_same_room: sr.select.value, shutoff_distance_ft: Number(sd.input.value) || 0, shutoff_upstream: su.select.value, trap_present: tp.select.value, trap_in_appliance: ti.select.value, connector_length_ft: Number(cl.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["appliance", "shutoff_same_room", "shutoff_distance_ft", "shutoff_upstream", "trap_present", "trap_in_appliance", "connector_length_ft"], r);
     if (r.error) { oV.textContent = r.error; oS.textContent = "-"; oT.textContent = "-"; oC.textContent = "-"; oNote.textContent = "-"; return; }
     oV.textContent = r.passes ? "PASSES the items entered" : "DOES NOT PASS";
     oS.textContent = r.shutoff_ok ? "OK" : "FAILS" + (r.distance_ok ? "" : " - over 6 ft by " + fmt(r.shutoff_distance_deficit_ft, 1));

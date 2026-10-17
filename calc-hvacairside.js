@@ -6,6 +6,7 @@
 import {
   DEBOUNCE_MS, debounce, makeNumber, makeSelect, makeOutputLine,
   attachExampleButton, fmt,
+  stepsFor,
 } from "./ui-fields.js";
 
 const _finiteGuardEnv = (o) => {
@@ -148,7 +149,7 @@ function _renderGrilleFaceVelocity(inputRegion, outputRegion, citationEl) {
     agr.wrap.style.display = isSize ? "none" : "";
   }
   const update = debounce(() => {
-    const r = computeGrilleFaceVelocity({ mode: mode.select.value, cfm: readNum(cfm.input), ratio: readNum(ratio.input), A_gross_ft2: readNum(agr.input), V_target: readNum(vtar.input) });
+    const r = computeGrilleFaceVelocity({ mode: mode.select.value, cfm: readNum(cfm.input), ratio: readNum(ratio.input), A_gross_ft2: readNum(agr.input), V_target: readNum(vtar.input) }); stepsFor(outputRegion, inputRegion, ["mode", "cfm", "ratio", "A_gross_ft2", "V_target"], r);
     if (r.error) { oOut.textContent = r.error; oBand.textContent = "-"; return; }
     if (r.mode === "size") { oOut.textContent = fmt(r.A_gross_req_ft2, 2) + " ft^2 gross (" + fmt(r.A_gross_req_in2, 0) + " in^2)"; oBand.textContent = "-"; return; }
     oOut.textContent = fmt(r.V_face, 0) + " fpm face velocity";
@@ -238,7 +239,7 @@ function _renderAdpiSelection(inputRegion, outputRegion, citationEl) {
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   function syncFields() { load.wrap.style.display = type.select.value === "perforated" ? "none" : ""; }
   const update = debounce(() => {
-    const r = computeAdpiSelection({ diffuser_type: type.select.value, cooling_load: load.select.value, throw_ft: readNum(thr.input), char_length_ft: readNum(clen.input) });
+    const r = computeAdpiSelection({ diffuser_type: type.select.value, cooling_load: load.select.value, throw_ft: readNum(thr.input), char_length_ft: readNum(clen.input) }); stepsFor(outputRegion, inputRegion, ["diffuser_type", "cooling_load", "throw_ft", "char_length_ft"], r);
     if (r.error) { oRatio.textContent = r.error; oOpt.textContent = "-"; oAdpi.textContent = "-"; oBand.textContent = "-"; oTarget.textContent = "-"; oNote.textContent = ""; return; }
     oRatio.textContent = fmt(r.ratio, 2);
     oOpt.textContent = fmt(r.opt_ratio, 2);
@@ -294,7 +295,7 @@ function _renderVibrationIsolation(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "vib-out-note");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeVibrationIsolation({ equipment_rpm: readNum(rpm.input), static_deflection_in: readNum(defl.input) });
+    const r = computeVibrationIsolation({ equipment_rpm: readNum(rpm.input), static_deflection_in: readNum(defl.input) }); stepsFor(outputRegion, inputRegion, ["equipment_rpm", "static_deflection_in"], r);
     if (r.error) { oFn.textContent = r.error; oFd.textContent = "-"; oR.textContent = "-"; oT.textContent = "-"; oEff.textContent = "-"; oNote.textContent = ""; return; }
     oFn.textContent = fmt(r.fn_hz, 2) + " Hz (" + fmt(r.fn_cpm, 0) + " cpm)";
     oFd.textContent = fmt(r.disturbing_hz, 2) + " Hz";

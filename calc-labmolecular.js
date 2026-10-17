@@ -10,6 +10,7 @@ import {
   makeOutputLine,
   attachExampleButton,
   fmt,
+  stepsFor,
 } from "./ui-fields.js";
 
 const _finiteGuard = (o) => {
@@ -76,7 +77,7 @@ function renderPrimerTm(inputRegion, outputRegion, citationEl) {
   const oLen = makeOutputLine(outputRegion, "Length / GC content", "ptm-out-len");
   const oNote = makeOutputLine(outputRegion, "Note", "ptm-out-note");
   const update = debounce(() => {
-    const r = computePrimerTm({ sequence: seq.input.value, method: method.select.value });
+    const r = computePrimerTm({ sequence: seq.input.value, method: method.select.value }); stepsFor(outputRegion, inputRegion, ["sequence", "method"], r);
     if (r.error) { oTm.textContent = r.error; oLen.textContent = ""; oNote.textContent = ""; return; }
     oTm.textContent = fmt(r.tm_c, 1) + " C (" + r.method_used + ")";
     oLen.textContent = r.length_nt + " nt, " + fmt(r.gc_content_pct, 0) + "% GC";
@@ -125,7 +126,7 @@ function renderCfuPlateCount(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "cfu-out-note");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeCfuPlateCount({ colonies: readNum(col.input), dilution_factor: readNum(df.input), volume_ml: readNum(vol.input) });
+    const r = computeCfuPlateCount({ colonies: readNum(col.input), dilution_factor: readNum(df.input), volume_ml: readNum(vol.input) }); stepsFor(outputRegion, inputRegion, ["colonies", "dilution_factor", "volume_ml"], r);
     if (r.error) { oCfu.textContent = r.error; oRange.textContent = ""; oNote.textContent = ""; return; }
     oCfu.textContent = r.cfu_per_ml.toExponential(2) + " CFU/mL";
     oRange.textContent = r.in_countable_range ? "Within countable range" : "Outside countable range";
@@ -179,7 +180,7 @@ function renderMolarityFromStock(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "mfs-out-note");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeMolarityFromStock({ purity_pct: readNum(purity.input), density_g_ml: readNum(density.input), mol_weight: readNum(mw.input), target_m: readNum(target.input), final_volume_ml: readNum(finalVol.input) });
+    const r = computeMolarityFromStock({ purity_pct: readNum(purity.input), density_g_ml: readNum(density.input), mol_weight: readNum(mw.input), target_m: readNum(target.input), final_volume_ml: readNum(finalVol.input) }); stepsFor(outputRegion, inputRegion, ["purity_pct", "density_g_ml", "mol_weight", "target_m", "final_volume_ml"], r);
     if (r.error) { oStock.textContent = r.error; oDraw.textContent = ""; oNote.textContent = ""; return; }
     oStock.textContent = fmt(r.stock_m, 2) + " mol/L";
     oDraw.textContent = r.volume_to_draw_ml !== null ? fmt(r.volume_to_draw_ml, 1) + " mL (into water)" : "- (enter a target molarity and final volume)";
@@ -238,7 +239,7 @@ function renderNucleicAcidA260(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "na260-out-note");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeNucleicAcidA260({ a260: readNum(a260.input), na_type: type.select.value, dilution_factor: readNum(dil.input), a280: readNum(a280.input) });
+    const r = computeNucleicAcidA260({ a260: readNum(a260.input), na_type: type.select.value, dilution_factor: readNum(dil.input), a280: readNum(a280.input) }); stepsFor(outputRegion, inputRegion, ["a260", "na_type", "dilution_factor", "a280"], r);
     if (r.error) { oConc.textContent = r.error; oPurity.textContent = ""; oNote.textContent = ""; return; }
     oConc.textContent = fmt(r.concentration_ng_ul, 1) + " ng/uL (factor " + r.factor + ")";
     oPurity.textContent = r.purity_260_280 !== null ? fmt(r.purity_260_280, 2) + (r.clean ? " - clean" : " - below threshold, protein/phenol carryover") : "- (enter A280)";
@@ -287,7 +288,7 @@ function renderLigationMolarRatio(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "lmr-out-note");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeLigationMolarRatio({ vector_ng: readNum(vng.input), vector_length_bp: readNum(vlen.input), insert_length_bp: readNum(ilen.input), molar_ratio: readNum(ratio.input) });
+    const r = computeLigationMolarRatio({ vector_ng: readNum(vng.input), vector_length_bp: readNum(vlen.input), insert_length_bp: readNum(ilen.input), molar_ratio: readNum(ratio.input) }); stepsFor(outputRegion, inputRegion, ["vector_ng", "vector_length_bp", "insert_length_bp", "molar_ratio"], r);
     if (r.error) { oInsert.textContent = r.error; oPmol.textContent = ""; oNote.textContent = ""; return; }
     oInsert.textContent = fmt(r.insert_ng, 1) + " ng of insert";
     oPmol.textContent = "vector " + fmt(r.vector_pmol, 4) + " pmol, insert " + fmt(r.insert_pmol, 4) + " pmol";
@@ -334,7 +335,7 @@ function renderDoublingTime(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "dt-out-note");
   function readNum(i) { if (i.value === "") return 0; const v = Number(i.value); return Number.isFinite(v) ? v : 0; }
   const update = debounce(() => {
-    const r = computeDoublingTime({ initial_count: readNum(n0.input), final_count: readNum(n.input), elapsed_time: readNum(t.input) });
+    const r = computeDoublingTime({ initial_count: readNum(n0.input), final_count: readNum(n.input), elapsed_time: readNum(t.input) }); stepsFor(outputRegion, inputRegion, ["initial_count", "final_count", "elapsed_time"], r);
     if (r.error) { oTd.textContent = r.error; oMu.textContent = ""; oNote.textContent = ""; return; }
     oTd.textContent = fmt(r.doubling_time, 2) + " h";
     oMu.textContent = fmt(r.growth_rate, 3) + " /h, " + fmt(r.doublings, 2) + " doublings";
@@ -377,7 +378,7 @@ function renderGrowthProjectedCount(inputRegion, outputRegion, citationEl) {
   const oD = makeOutputLine(outputRegion, "Doublings / fold increase", "gpc-out-d");
   const oNote = makeOutputLine(outputRegion, "Note", "gpc-out-note");
   const update = debounce(() => {
-    const r = computeGrowthProjectedCount({ initial_count: Number(n0.input.value) || 0, doubling_time: Number(td.input.value) || 0, elapsed_time: Number(t.input.value) || 0 });
+    const r = computeGrowthProjectedCount({ initial_count: Number(n0.input.value) || 0, doubling_time: Number(td.input.value) || 0, elapsed_time: Number(t.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["initial_count", "doubling_time", "elapsed_time"], r);
     if (r.error) { oN.textContent = r.error; oD.textContent = "-"; oNote.textContent = ""; return; }
     oN.textContent = fmt(r.final_count, r.final_count >= 1e6 ? 0 : 1) + (r.final_count >= 1e6 ? " (" + r.final_count.toExponential(2) + ")" : "");
     oD.textContent = fmt(r.doublings, 2) + " doublings, " + fmt(r.fold_increase, 1) + "x";
@@ -422,7 +423,7 @@ function renderMichaelisMenten(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "mm-out-note");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeMichaelisMenten({ vmax: readNum(vmax.input), km: readNum(km.input), substrate: readNum(sub.input) });
+    const r = computeMichaelisMenten({ vmax: readNum(vmax.input), km: readNum(km.input), substrate: readNum(sub.input) }); stepsFor(outputRegion, inputRegion, ["vmax", "km", "substrate"], r);
     if (r.error) { oV.textContent = r.error; oPct.textContent = ""; oNote.textContent = ""; return; }
     oV.textContent = fmt(r.velocity, 3) + (r.at_half ? " (exactly Vmax/2 at [S]=Km)" : "");
     oPct.textContent = fmt(r.percent_vmax, 1) + "% of Vmax";
@@ -460,7 +461,7 @@ function renderSubstrateForVelocity(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "sfv-out-note");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeSubstrateForVelocity({ km: readNum(km.input), target_percent: readNum(pct.input) });
+    const r = computeSubstrateForVelocity({ km: readNum(km.input), target_percent: readNum(pct.input) }); stepsFor(outputRegion, inputRegion, ["km", "target_percent"], r);
     if (r.error) { oS.textContent = r.error; oFold.textContent = ""; oNote.textContent = ""; return; }
     oS.textContent = fmt(r.substrate, 3) + (r.at_half ? " (= Km, the half-Vmax definition)" : "");
     oFold.textContent = fmt(r.fold_km, 2) + " x Km";

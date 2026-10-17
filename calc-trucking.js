@@ -11,6 +11,7 @@ import {
   DEBOUNCE_MS, debounce, makeNumber, makeSelect, makeCheckbox,
   makeOutputLine, attachExampleButton, fmt, makeRowField,
   makeStepsPanel,
+  stepsFor,
 } from "./ui-fields.js";
 
 // v18 §7 contract guard: reject a non-finite numeric input. A renderer
@@ -767,7 +768,7 @@ function renderHOS(inputRegion, outputRegion, citationEl) {
       events,
       weekly_on_duty_used_hr: Number(weekly.input.value) || 0,
       current_time_iso: ct.input.value.trim() || null,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["profile", "events", "weekly_on_duty_used_hr", "current_time_iso"], r);
     if (r.error) { oD.textContent = r.error; oW.textContent = "-"; oWk.textContent = "-"; oB.textContent = "-"; oNT.textContent = "-"; return; }
     oD.textContent = fmt(r.drive_used, 2) + " / " + fmt(r.drive_remaining, 2) + " hr";
     oW.textContent = fmt(r.on_duty_remaining, 2) + " hr";
@@ -810,7 +811,7 @@ function renderBridgeFormula(inputRegion, outputRegion, citationEl) {
     const weights = rows.map((r) => Number(r.aw.value) || 0).filter((w) => w > 0);
     const spacings = rows.map((r) => Number(r.ag.value) || 0).slice(0, Math.max(0, weights.length - 1));
     if (weights.length === 0) { oT.textContent = "-"; oV.textContent = "-"; oB.textContent = "-"; return; }
-    const r = computeBridgeFormula({ axle_weights_lb: weights, axle_spacings_ft: spacings });
+    const r = computeBridgeFormula({ axle_weights_lb: weights, axle_spacings_ft: spacings }); stepsFor(outputRegion, inputRegion, ["axle_weights_lb", "axle_spacings_ft"], r);
     if (r.error) { oT.textContent = r.error; oV.textContent = "-"; oB.textContent = "-"; return; }
     oT.textContent = fmt(r.total_weight_lb, 0) + " lb" + (r.over_interstate ? " (OVER 80,000)" : "");
     oV.textContent = r.axle_violations.length === 0 ? "ok" : r.axle_violations.join("; ");
@@ -1052,7 +1053,7 @@ export function renderStoppingSightDistance(inputRegion, outputRegion, citationE
       friction: readNum(f.input),
       grade: readNum(g.input),
       available_distance_ft: readNum(avail.input) ?? 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["speed_mph", "reaction_time_s", "friction", "grade", "available_distance_ft"], r);
     if (r.error) {
       oPR.textContent = r.error; oBR.textContent = ""; oT.textContent = ""; oA.textContent = ""; oW.textContent = "";
       return;
@@ -1086,7 +1087,7 @@ export function renderSsdDesignSpeed(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "sds-out-note");
   function readNum(input) { if (input.value === "") return null; const n = Number(input.value); return Number.isFinite(n) ? n : null; }
   const update = debounce(() => {
-    const r = computeSsdDesignSpeed({ sight_distance_ft: readNum(d.input), reaction_time_s: readNum(tpr.input), friction: readNum(f.input), grade: readNum(g.input) });
+    const r = computeSsdDesignSpeed({ sight_distance_ft: readNum(d.input), reaction_time_s: readNum(tpr.input), friction: readNum(f.input), grade: readNum(g.input) }); stepsFor(outputRegion, inputRegion, ["sight_distance_ft", "reaction_time_s", "friction", "grade"], r);
     if (r.error) { oSpeed.textContent = r.error; oNote.textContent = ""; return; }
     oSpeed.textContent = fmt(r.design_speed_mph, 1) + " mph";
     oNote.textContent = (r.warnings.length ? r.warnings.join(" ") + " " : "") + r.note;
@@ -1128,7 +1129,7 @@ function renderTruckOffTracking(inputRegion, outputRegion, citationEl) {
   const oWB = makeOutputLine(outputRegion, "Effective wheelbase", "tot-out-wb");
   const oNote = makeOutputLine(outputRegion, "Note", "tot-out-note");
   const update = debounce(() => {
-    const r = computeTruckOffTracking({ turn_radius_ft: Number(R.input.value) || 0, wheelbase1_ft: Number(l1.input.value) || 0, wheelbase2_ft: Number(l2.input.value) || 0 });
+    const r = computeTruckOffTracking({ turn_radius_ft: Number(R.input.value) || 0, wheelbase1_ft: Number(l1.input.value) || 0, wheelbase2_ft: Number(l2.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["turn_radius_ft", "wheelbase1_ft", "wheelbase2_ft"], r);
     if (r.error) { oOT.textContent = r.error; oWB.textContent = "-"; oNote.textContent = ""; return; }
     oOT.textContent = fmt(r.off_tracking_ft, 2) + " ft";
     oWB.textContent = fmt(r.effective_wheelbase_ft, 2) + " ft";
@@ -1180,7 +1181,7 @@ function renderTruckSweptPathWidth(inputRegion, outputRegion, citationEl) {
   const oOT = makeOutputLine(outputRegion, "Off-tracking (rear inside front)", "tsp-out-ot");
   const oNote = makeOutputLine(outputRegion, "Note", "tsp-out-note");
   const update = debounce(() => {
-    const r = computeTruckSweptPathWidth({ turn_radius_ft: Number(R.input.value) || 0, wheelbase1_ft: Number(l1.input.value) || 0, wheelbase2_ft: Number(l2.input.value) || 0, vehicle_width_ft: Number(w.input.value) || 0, front_swingout_ft: Number(fs.input.value) || 0 });
+    const r = computeTruckSweptPathWidth({ turn_radius_ft: Number(R.input.value) || 0, wheelbase1_ft: Number(l1.input.value) || 0, wheelbase2_ft: Number(l2.input.value) || 0, vehicle_width_ft: Number(w.input.value) || 0, front_swingout_ft: Number(fs.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["turn_radius_ft", "wheelbase1_ft", "wheelbase2_ft", "vehicle_width_ft", "front_swingout_ft"], r);
     if (r.error) { oSPW.textContent = r.error; oOT.textContent = "-"; oNote.textContent = ""; return; }
     oSPW.textContent = fmt(r.swept_path_width_ft, 2) + " ft";
     oOT.textContent = fmt(r.off_tracking_ft, 2) + " ft";
@@ -1357,7 +1358,7 @@ function renderCostPerMile(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "cpm-out-note");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeCostPerMile({ fixed_monthly: readNum(fixed.input), miles_month: readNum(miles.input), fuel_price: readNum(price.input), mpg: readNum(mpg.input), maint_cpm: readNum(maint.input), driver_cpm: readNum(driver.input) });
+    const r = computeCostPerMile({ fixed_monthly: readNum(fixed.input), miles_month: readNum(miles.input), fuel_price: readNum(price.input), mpg: readNum(mpg.input), maint_cpm: readNum(maint.input), driver_cpm: readNum(driver.input) }); stepsFor(outputRegion, inputRegion, ["fixed_monthly", "miles_month", "fuel_price", "mpg", "maint_cpm", "driver_cpm"], r);
     if (r.error) { oTotal.textContent = r.error; oBreak.textContent = ""; oNote.textContent = ""; return; }
     oTotal.textContent = "$" + fmt(r.total_cpm, 3) + "/mi (break-even)";
     oBreak.textContent = "$" + fmt(r.fixed_cpm, 3) + " fixed + $" + fmt(r.fuel_cpm, 3) + " fuel + $" + fmt(r.maint_cpm, 3) + " maint + $" + fmt(r.driver_cpm, 3) + " driver";
@@ -1407,7 +1408,7 @@ function renderDeadheadPercent(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "dh-out-note");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeDeadheadPercent({ loaded_mi: readNum(loaded.input), deadhead_mi: readNum(dead.input), revenue: readNum(rev.input), surcharge: readNum(sur.input) });
+    const r = computeDeadheadPercent({ loaded_mi: readNum(loaded.input), deadhead_mi: readNum(dead.input), revenue: readNum(rev.input), surcharge: readNum(sur.input) }); stepsFor(outputRegion, inputRegion, ["loaded_mi", "deadhead_mi", "revenue", "surcharge"], r);
     if (r.error) { oPct.textContent = r.error; oRate.textContent = ""; oNote.textContent = ""; return; }
     oPct.textContent = fmt(r.deadhead_pct, 1) + "% (" + fmt(r.total_miles, 0) + " total mi)";
     oRate.textContent = "$" + fmt(r.rate_loaded, 2) + "/loaded mi, $" + fmt(r.rate_total, 2) + "/total mi";
@@ -1479,7 +1480,7 @@ function renderAxleLoadDistribution(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "ald-out-note");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeAxleLoadDistribution({ drive_lb: readNum(drive.input), trailer_lb: readNum(trailer.input), kingpin_to_tandem_in: readNum(L.input), hole_spacing_in: readNum(spacing.input), tandem_cap: readNum(cap.input) });
+    const r = computeAxleLoadDistribution({ drive_lb: readNum(drive.input), trailer_lb: readNum(trailer.input), kingpin_to_tandem_in: readNum(L.input), hole_spacing_in: readNum(spacing.input), tandem_cap: readNum(cap.input) }); stepsFor(outputRegion, inputRegion, ["drive_lb", "trailer_lb", "kingpin_to_tandem_in", "hole_spacing_in", "tandem_cap"], r);
     if (r.error) { oShift.textContent = r.error; oHoles.textContent = ""; oProj.textContent = ""; oNote.textContent = ""; return; }
     oShift.textContent = fmt(r.shift_per_hole_lb, 0) + " lb/hole";
     oHoles.textContent = r.holes + " hole(s) " + (r.direction === "none" ? "(within limits)" : r.direction);

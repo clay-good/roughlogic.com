@@ -4,7 +4,7 @@
 // formulas, fields, outputs, citations, examples, and Group A assignments
 // are unchanged.
 
-import { makeNumber, makeSelect, makeOutputLine, attachExampleButton, fmt } from "./ui-fields.js";
+import { makeNumber, makeSelect, makeOutputLine, attachExampleButton, fmt, stepsFor } from "./ui-fields.js";
 
 // =====================================================================
 // spec-v177 - Group A: NEC Table 300.5 minimum cover-depth reference.
@@ -68,7 +68,7 @@ function renderBurialDepth3005(inputRegion, outputRegion, citationEl) {
   const oCover = makeOutputLine(outputRegion, "Minimum cover", "bd-out-cover");
   const oNote = makeOutputLine(outputRegion, "Note", "bd-out-note");
   function refresh() {
-    const r = computeBurialDepth3005({ wiring_method: method.select.value, location: loc.select.value });
+    const r = computeBurialDepth3005({ wiring_method: method.select.value, location: loc.select.value }); stepsFor(outputRegion, inputRegion, ["wiring_method", "location"], r);
     if (r.error) { oCover.textContent = r.error; oNote.textContent = ""; return; }
     oCover.textContent = fmt(r.min_cover_in, 0) + " in";
     oNote.textContent = r.note;
@@ -138,7 +138,7 @@ function renderSupportSpacing(inputRegion, outputRegion, citationEl) {
   const oInterval = makeOutputLine(outputRegion, "Maximum support interval", "ss-out-interval");
   const oNote = makeOutputLine(outputRegion, "Note", "ss-out-note");
   function refresh() {
-    const r = computeSupportSpacing({ wiring_method: method.select.value, trade_size_in: Number(size.input.value) || 0 });
+    const r = computeSupportSpacing({ wiring_method: method.select.value, trade_size_in: Number(size.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["wiring_method", "trade_size_in"], r);
     if (r.error) { oSecure.textContent = r.error; oInterval.textContent = ""; oNote.textContent = ""; return; }
     oSecure.textContent = fmt(r.secure_within_in, 0) + " in";
     oInterval.textContent = fmt(r.max_interval_ft, 1) + " ft" + (r.size_dependent ? " (at this trade size)" : "");
@@ -204,7 +204,7 @@ function renderPoolBonding68026(inputRegion, outputRegion, citationEl) {
   const oCond = makeOutputLine(outputRegion, "Bonding conductor", "pb-out-cond");
   const oNote = makeOutputLine(outputRegion, "Note", "pb-out-note");
   function refresh() {
-    const r = computePoolBonding68026({ pool_type: type.select.value });
+    const r = computePoolBonding68026({ pool_type: type.select.value }); stepsFor(outputRegion, inputRegion, ["pool_type"], r);
     if (r.error) { oItems.textContent = r.error; oCond.textContent = "-"; oNote.textContent = ""; return; }
     oItems.textContent = r.items.join("  •  ");
     oCond.textContent = r.conductor;

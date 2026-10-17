@@ -21,6 +21,7 @@ import { ampacityFromPhysics } from "./pure-math.js";
 import {
   DEBOUNCE_MS, debounce, makeNumber, makeSelect, makeCheckbox,
   makeOutputLine, attachExampleButton, fmt,
+  stepsFor,
 } from "./ui-fields.js";
 
 // v18 §7 contract guard: reject a non-finite numeric input. A renderer
@@ -181,7 +182,7 @@ export function renderPVStringSizing(inputRegion, outputRegion, citationEl, para
       inverter_mppt_min_V: Number(mppt_min.input.value) || 0,
       inverter_mppt_max_V: Number(mppt_max.input.value) || 0,
       inverter_vdc_max_V: Number(vdc_max.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["module_voc_V", "module_vmp_V", "voc_temp_coeff_pct_per_C", "record_low_C", "record_high_C", "cell_temp_rise_C", "inverter_mppt_min_V", "inverter_mppt_max_V", "inverter_vdc_max_V"], r);
     if (r.error) { oCold.textContent = r.error; oWarm.textContent = "-"; oMax.textContent = "-"; oMin.textContent = "-"; oFlag.textContent = "-"; return; }
     oCold.textContent = fmt(r.cold_voc_V, 2) + " V";
     oWarm.textContent = fmt(r.warm_vmp_V, 2) + " V";
@@ -229,7 +230,7 @@ export function renderBatteryRuntime(inputRegion, outputRegion, citationEl, para
       load_W: Number(load.input.value) || 0,
       peukert_k: Number(k.input.value) || 1,
       rated_hours: Number(rh.input.value) || 20,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["amp_hours", "system_V", "dod_percent", "inverter_efficiency_pct", "load_W", "peukert_k", "rated_hours"], r);
     if (r.error) { oH.textContent = r.error; oM.textContent = "-"; oWh.textContent = "-"; return; }
     oH.textContent = fmt(r.hours, 2) + " hr";
     oM.textContent = fmt(r.minutes, 0) + " min";
@@ -367,7 +368,7 @@ export function renderPvInterconnectionBusbar(inputRegion, outputRegion, citatio
       pv_existing_a: readNum(pvE.input),
       pv_proposed_a: readNum(pvP.input),
       method: method.select.value,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["main_breaker_a", "busbar_rating_a", "pv_existing_a", "pv_proposed_a", "method"], r);
     if (r.error) {
       oSum.textContent = r.error; oLim.textContent = ""; oPass.textContent = ""; oRec.textContent = "";
       return;
@@ -486,7 +487,7 @@ export function renderOffGridBattery(inputRegion, outputRegion, citationEl) {
       system_voltage_v: Number(volts.select.value),
       round_trip_efficiency: readNum(eta.input),
       temperature_derate: readNum(derate.input),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["daily_load_wh", "days_autonomy", "dod_limit", "system_voltage_v", "round_trip_efficiency", "temperature_derate"], r);
     if (r.error) {
       oUse.textContent = r.error; oNp.textContent = ""; oAh.textContent = ""; oW.textContent = "";
       return;
@@ -611,7 +612,7 @@ export function renderEvChargerLoad(inputRegion, outputRegion, citationEl) {
       existing_load_a: readNum(existing.input),
       busbar_rating_a: readNum(busbar.input),
       load_managed: managed.input.checked,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["charger_amps", "main_breaker_a", "existing_load_a", "busbar_rating_a", "load_managed"], r);
     if (r.error) {
       oCirc.textContent = r.error; oBrk.textContent = ""; oCond.textContent = ""; oLoad.textContent = ""; oHead.textContent = ""; oW.textContent = "";
       return;
@@ -676,7 +677,7 @@ function renderPvCircuitAmpacity(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "pca-out-note");
 
   const update = debounce(() => {
-    const r = computePvCircuitAmpacity({ module_isc_a: Number(isc.input.value) || 0, parallel_strings: Number(strings.input.value) || 0, ocpd_a: Number(ocpd.input.value) || 0 });
+    const r = computePvCircuitAmpacity({ module_isc_a: Number(isc.input.value) || 0, parallel_strings: Number(strings.input.value) || 0, ocpd_a: Number(ocpd.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["module_isc_a", "parallel_strings", "ocpd_a"], r);
     if (r.error) { oMax.textContent = r.error; oMin.textContent = "-"; oFactor.textContent = "-"; oOcpd.textContent = "-"; oNote.textContent = ""; return; }
     oMax.textContent = fmt(r.max_current_a, 2) + " A";
     oMin.textContent = fmt(r.min_ampacity_a, 2) + " A";
@@ -718,7 +719,7 @@ function renderPvEnergyYield(inputRegion, outputRegion, citationEl) {
   const oMonthly = makeOutputLine(outputRegion, "Monthly average", "pey-out-monthly");
   const oNote = makeOutputLine(outputRegion, "Note", "pey-out-note");
   const update = debounce(() => {
-    const r = computePvEnergyYield({ dc_kw: Number(dc.input.value) || 0, psh: Number(psh.input.value) || 0, perf_ratio: Number(pr.input.value) || 0 });
+    const r = computePvEnergyYield({ dc_kw: Number(dc.input.value) || 0, psh: Number(psh.input.value) || 0, perf_ratio: Number(pr.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["dc_kw", "psh", "perf_ratio"], r);
     if (r.error) { oAnnual.textContent = r.error; oYield.textContent = "-"; oCf.textContent = "-"; oMonthly.textContent = "-"; oNote.textContent = ""; return; }
     oAnnual.textContent = fmt(r.annual_kwh, 0) + " kWh/yr";
     oYield.textContent = fmt(r.specific_yield, 0) + " kWh/kWp";
@@ -757,7 +758,7 @@ function renderPvArraySizing(inputRegion, outputRegion, citationEl) {
   const oMonthly = makeOutputLine(outputRegion, "Target monthly average", "pas-out-monthly");
   const oNote = makeOutputLine(outputRegion, "Note", "pas-out-note");
   const update = debounce(() => {
-    const r = computePvArraySizing({ target_annual_kwh: Number(kwh.input.value) || 0, psh: Number(psh.input.value) || 0, perf_ratio: Number(pr.input.value) || 0 });
+    const r = computePvArraySizing({ target_annual_kwh: Number(kwh.input.value) || 0, psh: Number(psh.input.value) || 0, perf_ratio: Number(pr.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["target_annual_kwh", "psh", "perf_ratio"], r);
     if (r.error) { oDc.textContent = r.error; oYield.textContent = "-"; oMonthly.textContent = "-"; oNote.textContent = ""; return; }
     oDc.textContent = fmt(r.dc_kw, 2) + " kW DC";
     oYield.textContent = fmt(r.specific_yield, 0) + " kWh/kWp";
@@ -800,7 +801,7 @@ function renderPvRowSpacing(inputRegion, outputRegion, citationEl) {
   const oRiseBase = makeOutputLine(outputRegion, "Rise / footprint", "prs-out-rb");
   const oNote = makeOutputLine(outputRegion, "Note", "prs-out-note");
   const update = debounce(() => {
-    const r = computePvRowSpacing({ module_length_ft: Number(len.input.value) || 0, tilt_deg: Number(tilt.input.value) || 0, profile_angle_deg: Number(prof.input.value) || 0 });
+    const r = computePvRowSpacing({ module_length_ft: Number(len.input.value) || 0, tilt_deg: Number(tilt.input.value) || 0, profile_angle_deg: Number(prof.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["module_length_ft", "tilt_deg", "profile_angle_deg"], r);
     if (r.error) { oPitch.textContent = r.error; oGap.textContent = "-"; oGcr.textContent = "-"; oRiseBase.textContent = "-"; oNote.textContent = ""; return; }
     oPitch.textContent = fmt(r.pitch_ft, 2) + " ft";
     oGap.textContent = fmt(r.gap_ft, 2) + " ft";
@@ -850,7 +851,7 @@ function renderPvRowShadeAngle(inputRegion, outputRegion, citationEl) {
   const oGeom = makeOutputLine(outputRegion, "Footprint / clear gap", "prsa-out-geom");
   const oNote = makeOutputLine(outputRegion, "Note", "prsa-out-note");
   const update = debounce(() => {
-    const r = computePvRowShadeAngle({ module_length_ft: Number(len.input.value) || 0, tilt_deg: Number(tilt.input.value) || 0, row_pitch_ft: Number(pitch.input.value) || 0 });
+    const r = computePvRowShadeAngle({ module_length_ft: Number(len.input.value) || 0, tilt_deg: Number(tilt.input.value) || 0, row_pitch_ft: Number(pitch.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["module_length_ft", "tilt_deg", "row_pitch_ft"], r);
     if (r.error) { oProf.textContent = r.error; oGcr.textContent = "-"; oGeom.textContent = "-"; oNote.textContent = ""; return; }
     oProf.textContent = fmt(r.profile_angle_deg, 1) + "° solar elevation";
     oGcr.textContent = fmt(r.gcr, 3);
@@ -894,7 +895,7 @@ function renderPvInverterRatio(inputRegion, outputRegion, citationEl) {
   const oFrac = makeOutputLine(outputRegion, "Clipping onset (% of nameplate)", "pir-out-frac");
   const oNote = makeOutputLine(outputRegion, "Note", "pir-out-note");
   const update = debounce(() => {
-    const r = computePvInverterRatio({ dc_kw: Number(dc.input.value) || 0, ac_kw: Number(ac.input.value) || 0, inv_eff: Number(eff.input.value) || 0 });
+    const r = computePvInverterRatio({ dc_kw: Number(dc.input.value) || 0, ac_kw: Number(ac.input.value) || 0, inv_eff: Number(eff.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["dc_kw", "ac_kw", "inv_eff"], r);
     if (r.error) { oIlr.textContent = r.error; oVerdict.textContent = "-"; oClip.textContent = "-"; oFrac.textContent = "-"; oNote.textContent = ""; return; }
     oIlr.textContent = fmt(r.ilr, 2);
     oVerdict.textContent = r.verdict;
@@ -941,7 +942,7 @@ function renderBatteryTouArbitrage(inputRegion, outputRegion, citationEl) {
   const oBreak = makeOutputLine(outputRegion, "Break-even price ratio", "bta-out-break");
   const oNote = makeOutputLine(outputRegion, "Note", "bta-out-note");
   const update = debounce(() => {
-    const r = computeBatteryTouArbitrage({ nameplate_kwh: Number(kwh.input.value) || 0, dod: Number(dod.input.value) || 0, rte: Number(rte.input.value) || 0, peak_price: Number(peak.input.value) || 0, offpeak_price: Number(off.input.value) || 0, cycles_per_year: Number(cyc.input.value) || 0 });
+    const r = computeBatteryTouArbitrage({ nameplate_kwh: Number(kwh.input.value) || 0, dod: Number(dod.input.value) || 0, rte: Number(rte.input.value) || 0, peak_price: Number(peak.input.value) || 0, offpeak_price: Number(off.input.value) || 0, cycles_per_year: Number(cyc.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["nameplate_kwh", "dod", "rte", "peak_price", "offpeak_price", "cycles_per_year"], r);
     if (r.error) { oUsable.textContent = r.error; oDaily.textContent = "-"; oAnnual.textContent = "-"; oBreak.textContent = "-"; oNote.textContent = ""; return; }
     oUsable.textContent = fmt(r.usable_kwh, 2) + " kWh";
     oDaily.textContent = "$" + fmt(r.daily_value, 2) + "/day";
@@ -987,7 +988,7 @@ function renderBatteryPeakShaving(inputRegion, outputRegion, citationEl) {
   const oAnnual = makeOutputLine(outputRegion, "Annual demand savings", "bps-out-annual");
   const oNote = makeOutputLine(outputRegion, "Note", "bps-out-note");
   const update = debounce(() => {
-    const r = computeBatteryPeakShaving({ nameplate_kwh: Number(kwh.input.value) || 0, dod: Number(dod.input.value) || 0, event_duration_h: Number(dur.input.value) || 0, target_shave_kw: Number(tgt.input.value) || 0, demand_per_kw_mo: Number(demand.input.value) || 0 });
+    const r = computeBatteryPeakShaving({ nameplate_kwh: Number(kwh.input.value) || 0, dod: Number(dod.input.value) || 0, event_duration_h: Number(dur.input.value) || 0, target_shave_kw: Number(tgt.input.value) || 0, demand_per_kw_mo: Number(demand.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["nameplate_kwh", "dod", "event_duration_h", "target_shave_kw", "demand_per_kw_mo"], r);
     if (r.error) { oUsable.textContent = r.error; oSust.textContent = "-"; oActual.textContent = "-"; oAnnual.textContent = "-"; oNote.textContent = ""; return; }
     oUsable.textContent = fmt(r.usable_kwh, 1) + " kWh";
     oSust.textContent = fmt(r.sustainable_kw, 1) + " kW";
@@ -1031,7 +1032,7 @@ function renderBatteryCRate(inputRegion, outputRegion, citationEl) {
   const oTime = makeOutputLine(outputRegion, "Discharge time at deliverable", "bcr-out-time");
   const oNote = makeOutputLine(outputRegion, "Note", "bcr-out-note");
   const update = debounce(() => {
-    const r = computeBatteryCRate({ nameplate_kwh: Number(kwh.input.value) || 0, c_rate: Number(c.input.value) || 0, dod: Number(dod.input.value) || 0, inverter_kw: Number(inv.input.value) || 0 });
+    const r = computeBatteryCRate({ nameplate_kwh: Number(kwh.input.value) || 0, c_rate: Number(c.input.value) || 0, dod: Number(dod.input.value) || 0, inverter_kw: Number(inv.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["nameplate_kwh", "c_rate", "dod", "inverter_kw"], r);
     if (r.error) { oCPower.textContent = r.error; oDeliv.textContent = "-"; oUsable.textContent = "-"; oTime.textContent = "-"; oNote.textContent = ""; return; }
     oCPower.textContent = fmt(r.c_rate_power_kw, 1) + " kW";
     oDeliv.textContent = fmt(r.deliverable_kw, 1) + " kW" + (r.inverter_limited ? " (inverter-limited)" : "");
@@ -1088,7 +1089,7 @@ function renderEvChargeTime(inputRegion, outputRegion, citationEl) {
   const oTime = makeOutputLine(outputRegion, "Charge time", "ect-out-time");
   const oNote = makeOutputLine(outputRegion, "Note", "ect-out-note");
   const update = debounce(() => {
-    const r = computeEvChargeTime({ battery_capacity_kwh: Number(cap.input.value) || 0, start_soc_pct: Number(start.input.value) || 0, target_soc_pct: Number(target.input.value) || 0, evse_power_kw: Number(evse.input.value) || 0, onboard_charger_kw: Number(onboard.input.value) || 0, efficiency_pct: eff.input.value === "" ? 88 : Number(eff.input.value) });
+    const r = computeEvChargeTime({ battery_capacity_kwh: Number(cap.input.value) || 0, start_soc_pct: Number(start.input.value) || 0, target_soc_pct: Number(target.input.value) || 0, evse_power_kw: Number(evse.input.value) || 0, onboard_charger_kw: Number(onboard.input.value) || 0, efficiency_pct: eff.input.value === "" ? 88 : Number(eff.input.value) }); stepsFor(outputRegion, inputRegion, ["battery_capacity_kwh", "start_soc_pct", "target_soc_pct", "evse_power_kw", "onboard_charger_kw", "efficiency_pct"], r);
     if (r.error) { oEnergy.textContent = r.error; oPower.textContent = "-"; oTime.textContent = "-"; oNote.textContent = ""; return; }
     oEnergy.textContent = fmt(r.energy_needed_kwh, 1) + " kWh";
     oPower.textContent = fmt(r.charge_power_kw, 1) + " kW" + (r.onboard_limited ? " (onboard-charger limited -- EVSE oversized)" : "");
@@ -1167,7 +1168,7 @@ function renderPvCellTemperaturePower(inputRegion, outputRegion, citationEl) {
   const oLoss = makeOutputLine(outputRegion, "Temperature loss", "pctp-out-loss");
   const oNote = makeOutputLine(outputRegion, "Note", "pctp-out-note");
   const update = debounce(() => {
-    const r = computePvCellTemperaturePower({ T_amb_C: Ta.input.value === "" ? "" : Number(Ta.input.value), G_wm2: Number(G.input.value) || 0, NOCT_C: Number(noct.input.value) || 0, P_stc_W: Number(Pstc.input.value) || 0, gamma: Number(g.input.value) });
+    const r = computePvCellTemperaturePower({ T_amb_C: Ta.input.value === "" ? "" : Number(Ta.input.value), G_wm2: Number(G.input.value) || 0, NOCT_C: Number(noct.input.value) || 0, P_stc_W: Number(Pstc.input.value) || 0, gamma: Number(g.input.value) }); stepsFor(outputRegion, inputRegion, ["T_amb_C", "G_wm2", "NOCT_C", "P_stc_W", "gamma"], r);
     if (r.error) { oTc.textContent = r.error; oP.textContent = "-"; oLoss.textContent = "-"; oNote.textContent = ""; return; }
     oTc.textContent = fmt(r.T_cell_C, 1) + " C";
     oP.textContent = fmt(r.P_W, 0) + " W";
@@ -1222,7 +1223,7 @@ function renderPvMaxAmbientForPower(inputRegion, outputRegion, citationEl) {
   const oTc = makeOutputLine(outputRegion, "Cell temperature at that point", "pma-out-tc");
   const oNote = makeOutputLine(outputRegion, "Note", "pma-out-note");
   const update = debounce(() => {
-    const r = computePvMaxAmbientForPower({ target_power_W: Number(Ptgt.input.value) || 0, P_stc_W: Number(Pstc.input.value) || 0, G_wm2: Number(G.input.value) || 0, NOCT_C: Number(noct.input.value) || 0, gamma: Number(g.input.value) });
+    const r = computePvMaxAmbientForPower({ target_power_W: Number(Ptgt.input.value) || 0, P_stc_W: Number(Pstc.input.value) || 0, G_wm2: Number(G.input.value) || 0, NOCT_C: Number(noct.input.value) || 0, gamma: Number(g.input.value) }); stepsFor(outputRegion, inputRegion, ["target_power_W", "P_stc_W", "G_wm2", "NOCT_C", "gamma"], r);
     if (r.error) { oTa.textContent = r.error; oTc.textContent = "-"; oNote.textContent = ""; return; }
     oTa.textContent = fmt(r.max_ambient_C, 1) + " C (" + fmt(r.max_ambient_C * 9 / 5 + 32, 0) + " F)";
     oTc.textContent = fmt(r.max_cell_C, 1) + " C";
@@ -1292,7 +1293,7 @@ function renderPvPerformanceRatio(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const params = {};
     for (const [key] of fields) params[key] = Number(inp[key].input.value) || 0;
-    const r = computePvPerformanceRatio(params);
+    const r = computePvPerformanceRatio(params); stepsFor(outputRegion, inputRegion, null, r);
     if (r.error) { oPR.textContent = r.error; oLoss.textContent = "-"; oNote.textContent = ""; return; }
     oPR.textContent = fmt(r.pr, 3);
     oLoss.textContent = fmt(r.total_loss_pct, 1) + "%";
@@ -1338,7 +1339,7 @@ function renderPvStringFusing(inputRegion, outputRegion, citationEl) {
   const oReqd = makeOutputLine(outputRegion, "Fuses required?", "psf-out-reqd");
   const oNote = makeOutputLine(outputRegion, "Note", "psf-out-note");
   const update = debounce(() => {
-    const r = computePvStringFusing({ Isc_A: Number(isc.input.value) || 0, max_fuse_A: Number(maxf.input.value) || 0, n_strings: Number(n.input.value) || 0 });
+    const r = computePvStringFusing({ Isc_A: Number(isc.input.value) || 0, max_fuse_A: Number(maxf.input.value) || 0, n_strings: Number(n.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["Isc_A", "max_fuse_A", "n_strings"], r);
     if (r.error) { oReq.textContent = r.error; oFuse.textContent = "-"; oComp.textContent = "-"; oReqd.textContent = "-"; oNote.textContent = ""; return; }
     oReq.textContent = fmt(r.req_A, 2) + " A";
     oFuse.textContent = fmt(r.fuse_A, 0) + " A";
@@ -1395,7 +1396,7 @@ function renderEvChargeCost(inputRegion, outputRegion, citationEl) {
   const oPerMile = makeOutputLine(outputRegion, "Cost per mile", "ecc-out-permile");
   const oNote = makeOutputLine(outputRegion, "Note", "ecc-out-note");
   const update = debounce(() => {
-    const r = computeEvChargeCost({ battery_capacity_kwh: Number(cap.input.value) || 0, start_soc_pct: Number(start.input.value) || 0, target_soc_pct: Number(target.input.value) || 0, electricity_rate: Number(rate.input.value) || 0, efficiency_pct: eff.input.value === "" ? 88 : Number(eff.input.value), miles_per_kwh: Number(mpk.input.value) || 0 });
+    const r = computeEvChargeCost({ battery_capacity_kwh: Number(cap.input.value) || 0, start_soc_pct: Number(start.input.value) || 0, target_soc_pct: Number(target.input.value) || 0, electricity_rate: Number(rate.input.value) || 0, efficiency_pct: eff.input.value === "" ? 88 : Number(eff.input.value), miles_per_kwh: Number(mpk.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["battery_capacity_kwh", "start_soc_pct", "target_soc_pct", "electricity_rate", "efficiency_pct", "miles_per_kwh"], r);
     if (r.error) { oEnergy.textContent = r.error; oGrid.textContent = "-"; oCost.textContent = "-"; oPerKwh.textContent = "-"; oPerMile.textContent = "-"; oNote.textContent = ""; return; }
     oEnergy.textContent = fmt(r.energy_to_battery_kwh, 1) + " kWh";
     oGrid.textContent = fmt(r.grid_energy_kwh, 1) + " kWh";
@@ -1456,7 +1457,7 @@ function renderEvDcfcTime(inputRegion, outputRegion, citationEl) {
   const oTotal = makeOutputLine(outputRegion, "Total time", "edt-out-total");
   const oNote = makeOutputLine(outputRegion, "Note", "edt-out-note");
   const update = debounce(() => {
-    const r = computeEvDcfcTime({ usable_capacity_kwh: Number(cap.input.value) || 0, start_soc_pct: Number(start.input.value) || 0, target_soc_pct: Number(target.input.value) || 0, charger_power_kw: Number(charger.input.value) || 0, acceptance_kw: Number(accept.input.value) || 0 });
+    const r = computeEvDcfcTime({ usable_capacity_kwh: Number(cap.input.value) || 0, start_soc_pct: Number(start.input.value) || 0, target_soc_pct: Number(target.input.value) || 0, charger_power_kw: Number(charger.input.value) || 0, acceptance_kw: Number(accept.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["usable_capacity_kwh", "start_soc_pct", "target_soc_pct", "charger_power_kw", "acceptance_kw"], r);
     if (r.error) { oPower.textContent = r.error; oFast.textContent = "-"; oBand2.textContent = "-"; oBand3.textContent = "-"; oTotal.textContent = "-"; oNote.textContent = ""; return; }
     oPower.textContent = fmt(r.cc_power_kw, 0) + " kW" + (r.cc_power_kw < Number(charger.input.value) ? " (vehicle-acceptance limited)" : "");
     oFast.textContent = fmt(r.time_to_80_hr * 60, 1) + " min";

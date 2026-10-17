@@ -5,6 +5,7 @@ import {
   DEBOUNCE_MS, debounce, makeNumber, makeSelect, makeCheckbox,
   makeOutputLine, attachExampleButton, fmt,
   makeStepsPanel,
+  stepsFor,
 } from "./ui-fields.js";
 
 // v18 §7 contract guard: reject a non-finite numeric input. A renderer
@@ -2098,7 +2099,7 @@ function renderHpFromTorque(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "hpt-out-note");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeHpFromTorque({ solve_for: solve.select.value, torque_lbft: readNum(t.input), rpm: readNum(n.input), hp: readNum(hp.input) });
+    const r = computeHpFromTorque({ solve_for: solve.select.value, torque_lbft: readNum(t.input), rpm: readNum(n.input), hp: readNum(hp.input) }); stepsFor(outputRegion, inputRegion, ["solve_for", "torque_lbft", "rpm", "hp"], r);
     if (r.error) { oOut.textContent = r.error; oKw.textContent = ""; oNote.textContent = ""; return; }
     oOut.textContent = solve.select.value === "torque" ? fmt(r.torque_lbft, 1) + " lb-ft" : solve.select.value === "rpm" ? fmt(r.rpm, 0) + " RPM" : fmt(r.hp, 1) + " HP";
     oKw.textContent = r.kw != null ? fmt(r.kw, 2) + " kW" : "";
@@ -2148,7 +2149,7 @@ function renderVolumetricEfficiency(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "ve-out-note");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeVolumetricEfficiency({ displacement_ci: readNum(disp.input), rpm: readNum(rpm.input), cycle: cycle.select.value, actual_cfm: readNum(actual.input), ve_pct: readNum(vep.input) });
+    const r = computeVolumetricEfficiency({ displacement_ci: readNum(disp.input), rpm: readNum(rpm.input), cycle: cycle.select.value, actual_cfm: readNum(actual.input), ve_pct: readNum(vep.input) }); stepsFor(outputRegion, inputRegion, ["displacement_ci", "rpm", "cycle", "actual_cfm", "ve_pct"], r);
     if (r.error) { oTheo.textContent = r.error; oVE.textContent = ""; oNote.textContent = ""; return; }
     oTheo.textContent = fmt(r.theoretical_cfm, 1) + " CFM";
     oVE.textContent = r.ve_pct != null ? fmt(r.actual_cfm, 1) + " CFM @ " + fmt(r.ve_pct, 1) + "% VE" : "Enter measured CFM or target VE.";
@@ -2206,7 +2207,7 @@ function renderGearMphRpm(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "gmr-out-note");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeGearMphRpm({ solve_for: solve.select.value, rpm: readNum(rpm.input), trans_ratio: readNum(trans.input), axle_ratio: readNum(axle.input), tire_dia_in: readNum(dia.input), mph: readNum(mph.input) });
+    const r = computeGearMphRpm({ solve_for: solve.select.value, rpm: readNum(rpm.input), trans_ratio: readNum(trans.input), axle_ratio: readNum(axle.input), tire_dia_in: readNum(dia.input), mph: readNum(mph.input) }); stepsFor(outputRegion, inputRegion, ["solve_for", "rpm", "trans_ratio", "axle_ratio", "tire_dia_in", "mph"], r);
     if (r.error) { oOut.textContent = r.error; oRev.textContent = ""; oNote.textContent = ""; return; }
     oOut.textContent = solve.select.value === "rpm" ? fmt(r.rpm, 0) + " RPM" : fmt(r.mph, 1) + " MPH (" + fmt(r.wheel_rpm, 0) + " wheel RPM)";
     oRev.textContent = fmt(r.revs_per_mile, 1) + " revs/mile";
@@ -2296,7 +2297,7 @@ function renderInjectorSize(inputRegion, outputRegion, citationEl) {
   const oInj = makeOutputLine(outputRegion, "Per-injector flow", "inj-out-inj");
   const oNote = makeOutputLine(outputRegion, "Note", "inj-out-note");
   const update = debounce(() => {
-    const r = computeInjectorSize({ hp: Number(hp.input.value) || 0, bsfc: Number(bsfc.input.value) || 0, n_cyl: Number(n.input.value) || 0, duty: Number(duty.input.value) || 0 });
+    const r = computeInjectorSize({ hp: Number(hp.input.value) || 0, bsfc: Number(bsfc.input.value) || 0, n_cyl: Number(n.input.value) || 0, duty: Number(duty.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["hp", "bsfc", "n_cyl", "duty"], r);
     if (r.error) { oTotal.textContent = r.error; oInj.textContent = "-"; oNote.textContent = "-"; return; }
     oTotal.textContent = fmt(r.total_lbh, 1) + " lb/h";
     oInj.textContent = fmt(r.inj_lbh, 1) + " lb/h (" + fmt(r.inj_ccmin, 0) + " cc/min)";
@@ -2371,7 +2372,7 @@ function renderMeanPistonSpeed(inputRegion, outputRegion, citationEl) {
   const oReg = makeOutputLine(outputRegion, "Regime reading", "mps-out-reg");
   const oNote = makeOutputLine(outputRegion, "Note", "mps-out-note");
   const update = debounce(() => {
-    const r = computeMeanPistonSpeed({ stroke_in: Number(stroke.input.value) || 0, rpm: Number(rpm.input.value) || 0 });
+    const r = computeMeanPistonSpeed({ stroke_in: Number(stroke.input.value) || 0, rpm: Number(rpm.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["stroke_in", "rpm"], r);
     if (r.error) { oMps.textContent = r.error; oReg.textContent = "-"; oNote.textContent = "-"; return; }
     oMps.textContent = fmt(r.mps_fpm, 0) + " ft/min (" + fmt(r.mps_ms, 1) + " m/s)";
     oReg.textContent = r.regime;
@@ -2434,7 +2435,7 @@ function renderTrapSpeedHorsepower(inputRegion, outputRegion, citationEl) {
   const oEt = makeOutputLine(outputRegion, "Companion 1/4-mile ET", "tsh-out-et");
   const oNote = makeOutputLine(outputRegion, "Note", "tsh-out-note");
   const update = debounce(() => {
-    const r = computeTrapSpeedHorsepower({ weight_lb: Number(w.input.value) || 0, trap_mph: Number(trap.input.value) || 0 });
+    const r = computeTrapSpeedHorsepower({ weight_lb: Number(w.input.value) || 0, trap_mph: Number(trap.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["weight_lb", "trap_mph"], r);
     if (r.error) { oHp.textContent = r.error; oEt.textContent = "-"; oNote.textContent = "-"; return; }
     oHp.textContent = fmt(r.hp, 0) + " hp (flywheel / crank; Hale)";
     oEt.textContent = fmt(r.et_s, 1) + " s";
@@ -3892,7 +3893,7 @@ function _v959renderUjointOperatingAngle(inputRegion, outputRegion, citationEl) 
   const update = debounce(() => {
     const r = computeUjointOperatingAngle({
       input_angle_deg: ia.input.value === "" ? null : Number(ia.input.value), output_angle_deg: oa.input.value === "" ? null : Number(oa.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["input_angle_deg", "output_angle_deg"], r);
     if (r.error) { oV.textContent = r.error; oF.textContent = "-"; return; }
     oV.textContent = r.verdict + " (delta " + fmt(r.angle_difference_deg, 1) + " deg)";
     oF.textContent = "first " + fmt(r.first_joint_variation_pct, 2) + "%, second " + fmt(r.second_joint_variation_pct, 2) + "% peak-to-peak";

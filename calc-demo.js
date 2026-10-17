@@ -13,6 +13,7 @@ import {
   DEBOUNCE_MS, debounce, makeNumber, makeCheckbox, makeSelect,
   makeOutputLine, attachExampleButton, fmt,
   makeStepsPanel,
+  stepsFor,
 } from "./ui-fields.js";
 
 // v18 §7 contract guard: reject a non-finite numeric input. A renderer
@@ -151,7 +152,7 @@ function renderMoistureDryGoal(inputRegion, outputRegion, citationEl) {
   const oGo = makeOutputLine(outputRegion, "Points still to remove", "mdg-out-go");
   function readNum(i) { if (i.value === "") return NaN; const n = Number(i.value); return Number.isFinite(n) ? n : NaN; }
   const update = debounce(() => {
-    const r = computeMoistureDryGoal({ reference_reading: readNum(ref.input), affected_reading: readNum(aff.input), acceptable_delta: allow.input.value === "" ? 4 : Number(allow.input.value) });
+    const r = computeMoistureDryGoal({ reference_reading: readNum(ref.input), affected_reading: readNum(aff.input), acceptable_delta: allow.input.value === "" ? 4 : Number(allow.input.value) }); stepsFor(outputRegion, inputRegion, ["reference_reading", "affected_reading", "acceptable_delta"], r);
     if (r.error) { oDelta.textContent = r.error; oVerdict.textContent = "-"; oGo.textContent = "-"; return; }
     oDelta.textContent = fmt(r.delta, 1);
     oVerdict.textContent = r.verdict;
@@ -212,7 +213,7 @@ function renderFloodCutQuantity(inputRegion, outputRegion, citationEl) {
       wall_run_lf: Number(run.input.value) || 0,
       cut_height_in: cut.input.value === "" ? 24 : Number(cut.input.value),
       two_sided: two.input.checked, insulated: ins.input.checked,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["wall_run_lf", "cut_height_in", "two_sided", "insulated"], r);
     if (r.error) { oDry.textContent = r.error; for (const o of [oSheets, oBase, oIns]) o.textContent = "-"; return; }
     oDry.textContent = fmt(r.drywall_ft2, 0) + " ft^2";
     oSheets.textContent = String(r.sheets_4x8);
@@ -293,7 +294,7 @@ function _v69renderAbatementContainment(inputRegion, outputRegion, citationEl) {
   const oNam = makeOutputLine(outputRegion, "Negative-air machines", "ac-out-nam");
   const oBags = makeOutputLine(outputRegion, "Regulated-waste bags", "ac-out-bags");
   const update = debounce(() => {
-    const r = computeAbatementContainment({ room_len_ft: Number(len.input.value) || 0, room_wid_ft: Number(wid.input.value) || 0, room_ht_ft: Number(ht.input.value) || 0, ach_target: ach.input.value === "" ? 4 : Number(ach.input.value), nam_cfm: nam.input.value === "" ? 1500 : Number(nam.input.value), debris_cy: debris.input.value === "" ? 0 : Number(debris.input.value) });
+    const r = computeAbatementContainment({ room_len_ft: Number(len.input.value) || 0, room_wid_ft: Number(wid.input.value) || 0, room_ht_ft: Number(ht.input.value) || 0, ach_target: ach.input.value === "" ? 4 : Number(ach.input.value), nam_cfm: nam.input.value === "" ? 1500 : Number(nam.input.value), debris_cy: debris.input.value === "" ? 0 : Number(debris.input.value) }); stepsFor(outputRegion, inputRegion, ["room_len_ft", "room_wid_ft", "room_ht_ft", "ach_target", "nam_cfm", "debris_cy"], r);
     if (r.error) { oPoly.textContent = r.error; for (const o of [oCfm, oNam, oBags]) o.textContent = "-"; return; }
     oPoly.textContent = fmt(r.poly_sf, 0) + " ft^2";
     oCfm.textContent = fmt(r.req_cfm, 0) + " cfm";

@@ -9,7 +9,7 @@ import assert from "node:assert/strict";
 import { readFileSync, readdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
-import { stepRows, stepNum } from "../../steps-panel.js";
+import { stepRows, stepNum, domFields, drawSteps } from "../../steps-panel.js";
 import { humanizeKey } from "../../key-labels.js";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
@@ -78,4 +78,79 @@ test("every _simpleRenderer copy creates the steps panel and feeds it each resul
     if (created !== 1 || fed !== 1) missing.push(`${f}: created ${created}, fed ${fed}`);
   }
   assert.deepEqual(missing, [], "a _simpleRenderer copy without the steps panel leaves its tiles unexplained");
+});
+
+// The hand-written renderers (spec-v1964 extension): each gets one line after
+// its main compute call, `stepsFor(outputRegion, inputRegion, keys, r)`. A
+// renderer with one main call -- `const X = computeY(...)` followed by a check
+// of `X.error`, or its only compute call outside any loop -- that does not
+// feed the panel leaves its tile unexplained. Renderers with no such call (input-free references, multi-mode
+// pages) are not counted.
+test("every hand-written renderer with one main compute call feeds the steps panel", () => {
+  const FN = /function (\w*)\(inputRegion,\s*outputRegion[^)]*\)\s*\{/g;
+  const CALL = /const (\w+) = (compute\w+)\(/g;
+  const close = (s, i, o, c) => { let d = 0; for (let k = i; k < s.length; k++) { if (s[k] === o) d++; else if (s[k] === c && --d === 0) return k; } return -1; };
+  const missing = [];
+  let fed = 0;
+  for (const f of readdirSync(ROOT).filter((n) => /^calc-.*\.js$/.test(n))) {
+    const src = readFileSync(resolve(ROOT, f), "utf8");
+    for (const m of src.matchAll(FN)) {
+      const b = m.index + m[0].length - 1;
+      const body = src.slice(b, close(src, b, "{", "}"));
+      if (body.includes("_steps")) continue; // a _simpleRenderer copy, checked above
+      // The main call is the one whose result is checked for .error; failing
+      // that, a renderer's only compute call (outside any loop) is its main one.
+      const all = [...body.matchAll(CALL)];
+      const mains = all.filter((c) => {
+        const pe = close(body, c.index + c[0].length - 1, "(", ")");
+        return pe > 0 && new RegExp("\\b" + c[1] + "\\.error\\b").test(body.slice(pe, pe + 400));
+      });
+      const inLoop = (c) => /\b(for|while)\s*\([^)]*\)\s*\{[^}]*$/.test(body.slice(0, c.index));
+      const hookable = mains.length === 1 || (mains.length === 0 && all.length === 1 && !inLoop(all[0]));
+      if (!hookable) continue;
+      const n = (body.match(/stepsFor\(outputRegion, inputRegion, /g) || []).length;
+      if (n === 1) fed++; else missing.push(`${f} ${m[1] || "(anonymous)"}: stepsFor x${n}`);
+    }
+  }
+  assert.ok(fed > 1000, `only ${fed} hand-written renderers feed the panel; did the hook move?`);
+  assert.deepEqual(missing, [], "a hand-written renderer with one main compute call does not feed the steps panel");
+});
+
+// A hand-written renderer has no field list, so the inputs come off the page:
+// each control's own <label for> caption and the value it shows.
+function stubRegion(controls) {
+  const labels = new Map(controls.map((c) => [c.id, c.label]));
+  return {
+    querySelectorAll: () => controls.map((c) => ({ id: c.id, type: c.type || "number", tagName: c.tag || "INPUT", value: c.value ?? "", checked: !!c.checked,
+      options: c.options || [], selectedIndex: c.selectedIndex ?? 0, closest: () => (c.hidden ? {} : null) })),
+    querySelector: (sel) => { const id = /for="([^"]+)"/.exec(sel)?.[1]; return labels.get(id) ? { textContent: labels.get(id) } : null; },
+  };
+}
+
+test("hand-written renderers: inputs are read from the page, and argument names stay out of the worked values", () => {
+  const region = stubRegion([
+    { id: "bcw-c", label: "Number of branch circuits", value: "20" },
+    { id: "bcw-mat", label: "Material", tag: "SELECT", type: "select-one", options: [{ text: "Copper", value: "cu" }], selectedIndex: 0 },
+    { id: "bcw-gfci", label: "GFCI", type: "checkbox", checked: true },
+    { id: "bcw-blank", label: "Optional limit", value: "" },
+    { id: "bcw-hid", label: "Hidden one", value: "5", hidden: true },
+    { id: "bcw-nolabel", label: "", value: "3" },
+  ]);
+  const { fields, params } = domFields(region);
+  assert.deepEqual(fields.map((f) => [f.label, params[f.key]]), [
+    ["Number of branch circuits", 20],
+    ["Material", "Copper"],
+    ["GFCI", "yes"],
+  ], "a blank, a hidden and an unlabelled control are left out; a select shows its option text");
+  assert.ok(fields.every((f) => f.key.startsWith("\u0000")), "page keys can never collide with a result key");
+  // drawSteps on the hand-written path: `circuits` was a compute argument, so it
+  // is an input echo and does not repeat under Worked values.
+  const made = [];
+  const el = () => ({ textContent: "", append(...c) { made.push(...c); }, appendChild(c) { made.push(c); } });
+  globalThis.document ??= { createElement: el };
+  const body = { textContent: "", append(...c) { made.push(...c); } };
+  drawSteps(body, { fields: ["circuits"], params: null, r: { circuits: 20, total_ft: 3600, rolls: 4 } }, (k) => ({ total_ft: "Total (ft)", rolls: "Rolls", circuits: "Circuits" })[k], region);
+  const text = JSON.stringify(made.map((m) => m.textContent));
+  assert.ok(text.includes("Total (ft)") && text.includes("3,600"), text);
+  assert.ok(!text.includes("Circuits"), "an argument name is an input echo, not a worked value");
 });

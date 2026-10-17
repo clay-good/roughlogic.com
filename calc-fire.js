@@ -298,7 +298,7 @@ function renderFoamMaxCoverageArea(inputRegion, outputRegion, citationEl) {
       application_rate_gpm_per_ft2: Number(r.input.value) || 0,
       foam_percentage: Number(pct.input.value) || 0,
       duration_min: Number(dur.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["available_concentrate_gal", "application_rate_gpm_per_ft2", "foam_percentage", "duration_min"], x);
     if (x.error) { oA.textContent = x.error; oN.textContent = "-"; return; }
     oA.textContent = fmt(x.max_area_ft2, 0) + " ft^2";
     oN.textContent = x.note;
@@ -337,6 +337,7 @@ import {
   DEBOUNCE_MS, debounce, makeNumber, makeText, makeSelect, makeCheckbox,
   makeOutputLine, attachExampleButton, fmt,
   makeStepsPanel,
+  stepsFor,
 } from "./ui-fields.js";
 
 // dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
@@ -352,7 +353,7 @@ export function renderFireFriction(inputRegion, outputRegion, citationEl) {
   const oFL = makeOutputLine(outputRegion, "Friction loss", "ff-out-fl");
   const oC = makeOutputLine(outputRegion, "Coefficient C", "ff-out-c");
   const update = debounce(() => {
-    const r = computeFireFriction({ hose_diameter: dia.select.value, gpm: Number(gpm.input.value) || 0, length_ft: Number(len.input.value) || 0 });
+    const r = computeFireFriction({ hose_diameter: dia.select.value, gpm: Number(gpm.input.value) || 0, length_ft: Number(len.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["hose_diameter", "gpm", "length_ft"], r);
     if (r.error) { oFL.textContent = r.error; oC.textContent = "-"; return; }
     oFL.textContent = fmt(r.friction_loss_psi, 1) + " psi";
     oC.textContent = String(r.coefficient);
@@ -383,7 +384,7 @@ export function renderPDP(inputRegion, outputRegion, citationEl) {
       friction_loss_psi: Number(FL.input.value) || 0,
       elevation_ft: Number(E.input.value) || 0,
       appliance_loss_psi: Number(A.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["nozzle_pressure_psi", "friction_loss_psi", "elevation_ft", "appliance_loss_psi"], r);
     oP.textContent = fmt(r.pdp_psi, 1) + " psi";
     oE.textContent = fmt(r.elevation_psi, 1) + " psi";
   }, DEBOUNCE_MS);
@@ -405,7 +406,7 @@ export function renderHydrantFlow(inputRegion, outputRegion, citationEl) {
   const oQ = makeOutputLine(outputRegion, "Flow", "hf-out");
   const oNR = makeOutputLine(outputRegion, "Nozzle reaction (smooth bore)", "hf-out-nr");
   const update = debounce(() => {
-    const r = computeHydrantFlow({ pitot_psi: Number(P.input.value) || 0, outlet_diameter_in: Number(d.input.value) || 0, c: Number(c.input.value) || 0.9 });
+    const r = computeHydrantFlow({ pitot_psi: Number(P.input.value) || 0, outlet_diameter_in: Number(d.input.value) || 0, c: Number(c.input.value) || 0.9 }); stepsFor(outputRegion, inputRegion, ["pitot_psi", "outlet_diameter_in", "c"], r);
     oQ.textContent = fmt(r.flow_gpm, 0) + " gpm";
     oNR.textContent = r.reaction_lb === null ? "-" : fmt(r.reaction_lb, 1) + " lb (NR = 1.57 d^2 NP)";
   }, DEBOUNCE_MS);
@@ -440,7 +441,7 @@ export function renderRequiredFireFlow(inputRegion, outputRegion, citationEl) {
       exposure_factor: Number(X.input.value) || 0,
       communication_factor: Number(Pf.input.value) || 0,
       volume_ft3: Number(Vol.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["structure_area_ft2", "construction_class", "occupancy_factor", "exposure_factor", "communication_factor", "volume_ft3"], r);
     if (r.error) { oN.textContent = r.error; oC.textContent = "-"; oIowa.textContent = "-"; return; }
     oN.textContent = fmt(r.needed_fire_flow_gpm, 0) + " gpm";
     oC.textContent = fmt(r.base_C_gpm, 0) + " gpm";
@@ -461,7 +462,7 @@ export function renderMasterStream(inputRegion, outputRegion, citationEl) {
   const oR = makeOutputLine(outputRegion, "Typical reach", "ms-out");
   const oNR = makeOutputLine(outputRegion, "Nozzle reaction (smooth bore)", "ms-out-nr");
   const update = debounce(() => {
-    const r = computeMasterStreamReach({ nozzle_type: t.select.value, nozzle_pressure_psi: Number(p.input.value) || 0 });
+    const r = computeMasterStreamReach({ nozzle_type: t.select.value, nozzle_pressure_psi: Number(p.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["nozzle_type", "nozzle_pressure_psi"], r);
     if (r.error) { oR.textContent = r.error; oNR.textContent = "-"; return; }
     oR.textContent = fmt(r.typical_reach_ft, 1) + " ft";
     oNR.textContent = r.reaction_lb === null ? "fog: use the fire-stream-reaction tile" : fmt(r.reaction_lb, 1) + " lb (NR = 1.57 d^2 NP)";
@@ -481,7 +482,7 @@ export function renderAerialLadder(inputRegion, outputRegion, citationEl) {
   const oH = makeOutputLine(outputRegion, "Horizontal reach", "al-out-h");
   const oV = makeOutputLine(outputRegion, "Vertical reach", "al-out-v");
   const update = debounce(() => {
-    const r = computeAerialLadderReach({ angle_deg: Number(a.input.value) || 0, extension_ft: Number(L.input.value) || 0 });
+    const r = computeAerialLadderReach({ angle_deg: Number(a.input.value) || 0, extension_ft: Number(L.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["angle_deg", "extension_ft"], r);
     oH.textContent = fmt(r.horizontal_reach_ft, 1) + " ft";
     oV.textContent = fmt(r.vertical_reach_ft, 1) + " ft";
   }, DEBOUNCE_MS);
@@ -511,7 +512,7 @@ export function renderFoam(inputRegion, outputRegion, citationEl) {
       application_rate_gpm_per_ft2: Number(r.input.value) || 0,
       foam_percentage: Number(pct.input.value) || 0,
       duration_min: Number(dur.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["fire_area_ft2", "application_rate_gpm_per_ft2", "foam_percentage", "duration_min"], x);
     oS.textContent = fmt(x.total_solution_gpm, 1) + " gpm";
     oC.textContent = fmt(x.concentrate_gpm, 2) + " gpm concentrate";
     oT.textContent = fmt(x.total_concentrate_gallons, 1) + " gal";
@@ -744,7 +745,7 @@ export function renderReverseLayFriction(inputRegion, outputRegion, citationEl) 
       gpm: Number(gpm.input.value) || 0,
       length_ft: Number(len.input.value) || 0,
       n_pumps: Number(np.input.value) || 1,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["hose_diameter", "gpm", "length_ft", "n_pumps"], r);
     if (r.error) { oS.textContent = r.error; oP.textContent = "-"; oN.textContent = "-"; return; }
     oS.textContent = fmt(r.single_pump_psi, 1) + " psi";
     oP.textContent = fmt(r.per_pump_psi, 1) + " psi";
@@ -773,7 +774,7 @@ export function renderSprinklerDensity(inputRegion, outputRegion, citationEl) {
       area_of_operation_ft2: Number(a.input.value) || 0,
       density_gpm_per_ft2: Number(d.input.value) || 0,
       hazard_category: cat.select.value || null,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["area_of_operation_ft2", "density_gpm_per_ft2", "hazard_category"], r);
     if (r.error) { oG.textContent = r.error; oM.textContent = "-"; return; }
     oG.textContent = fmt(r.total_gpm, 1) + " gpm @ " + fmt(r.density_gpm_per_ft2, 2) + " gpm/ft^2";
     oM.textContent = r.meets_minimum === null ? "n/a" : (r.meets_minimum ? "yes" : "no (" + r.hazard_minimum_density + " gpm/ft^2 over at least " + r.hazard_minimum_area_ft2 + " ft^2 minimum)");
@@ -805,7 +806,7 @@ export function renderStandpipeFriction(inputRegion, outputRegion, citationEl) {
       gpm_per_outlet: Number(q.input.value) || 0,
       outlet_length_ft: Number(L.input.value) || 0,
       hose_diameter: dia.select.value,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["riser_height_ft", "outlet_count", "gpm_per_outlet", "outlet_length_ft", "hose_diameter"], r);
     if (r.error) { oE.textContent = r.error; oF.textContent = "-"; oQ.textContent = "-"; oT.textContent = "-"; return; }
     oE.textContent = fmt(r.elevation_psi, 1) + " psi";
     oF.textContent = fmt(r.friction_total_psi, 1) + " psi";
@@ -836,7 +837,7 @@ export function renderLadderPipeReach(inputRegion, outputRegion, citationEl) {
       extension_ft: Number(L.input.value) || 0,
       nozzle_type: t.select.value,
       nozzle_pressure_psi: Number(p.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["angle_deg", "extension_ft", "nozzle_type", "nozzle_pressure_psi"], r);
     if (r.error) { oH.textContent = r.error; oV.textContent = "-"; oS.textContent = "-"; oT.textContent = "-"; return; }
     oH.textContent = fmt(r.horizontal_ladder_ft, 1) + " ft";
     oV.textContent = fmt(r.vertical_ladder_ft, 1) + " ft";
@@ -868,7 +869,7 @@ export function renderBrakingDistance(inputRegion, outputRegion, citationEl) {
       friction_coefficient: Number(mu.input.value) || 0,
       grade_percent: Number(g.input.value) || 0,
       reaction_time_s: Number(t.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["speed_mph", "friction_coefficient", "grade_percent", "reaction_time_s"], r);
     if (r.error) { oB.textContent = r.error; oR.textContent = "-"; oT.textContent = "-"; return; }
     oB.textContent = fmt(r.braking_distance_ft, 1) + " ft";
     oR.textContent = fmt(r.reaction_distance_ft, 1) + " ft";
@@ -1019,7 +1020,7 @@ function _v7f_renderIsoNFF(inputRegion, outputRegion, citationEl) {
       exposure_communication_factor: Number(p.input.value) || 0,
       vertical_openings: vo.select.value,
       exposure_factor_x: xf.input.value === "" ? null : Number(xf.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["area_ft2", "stories", "construction_class", "occupancy_factor", "exposure_distance_ft", "exposure_communication_factor", "vertical_openings", "exposure_factor_x"], r);
     if (r.error) { oCi.textContent = r.error; oX.textContent = "-"; oNFF.textContent = "-"; return; }
     oCi.textContent = _v7f_fmt(r.Ci_capped, 0) + " (raw " + _v7f_fmt(r.Ci_raw, 0) + ")";
     oX.textContent = _v7f_fmt(r.X_exposure, 2);
@@ -1145,7 +1146,7 @@ export function renderScbaCylinder(inputRegion, outputRegion, citationEl) {
       P_start_psi: readNum(ps.input),
       P_alarm_psi: readNum(pa.input),
       consumption_lpm: readNum(cs.input),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["V_rated_scf", "P_rated_psi", "P_start_psi", "P_alarm_psi", "consumption_lpm"], r);
     if (r.error) {
       oA.textContent = r.error; oE.textContent = ""; oSa.textContent = ""; oW.textContent = "";
       return;
@@ -1306,7 +1307,7 @@ function renderNFPA1142(inputRegion, outputRegion, citationEl) {
       construction_class: con.select.value,
       exposure_within_50_ft: exp.select.value === "true",
       sprinkler_listed: spr.select.value === "true",
-    });
+    }); stepsFor(outputRegion, inputRegion, ["volume_ft3", "occupancy_class", "construction_class", "exposure_within_50_ft", "sprinkler_listed"], r);
     if (r.error) {
       oQ.textContent = r.error; o1000.textContent = ""; o2000.textContent = ""; o3000.textContent = ""; oW.textContent = "";
       return;
@@ -1433,7 +1434,7 @@ function _v9f_renderConfinedSpaceVent(inputRegion, outputRegion, citationEl) {
       blower_cfm: readNum(cfm.input),
       contaminant: ct.select.value,
       target_purges: N.input.value === "" ? null : readNum(N.input),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["length_ft", "width_ft", "height_ft", "blower_cfm", "contaminant", "target_purges"], r);
     if (r.error) {
       oV.textContent = r.error; oM.textContent = ""; oA.textContent = ""; oT.textContent = ""; oC.textContent = ""; oW.textContent = "";
       return;
@@ -1572,7 +1573,7 @@ function _v15f_renderStandpipePDP(inputRegion, outputRegion, citationEl) {
       supply_hose_length_ft: readNum(slen.input),
       supply_hose_diameter: sdia.select.value,
       building_height_ft: readNum(bh.input),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["standpipe_class", "highest_outlet_elevation_ft", "nozzle_pressure_psi", "design_gpm", "appliance_loss_psi", "supply_hose_length_ft", "supply_hose_diameter", "building_height_ft"], r);
     if (r.error) { oPdp.textContent = r.error; oBreak.textContent = "-"; oW.textContent = ""; return; }
     oPdp.textContent = _v15f_fmt(r.pdp_psi, 0) + " psi";
     oBreak.textContent = _v15f_fmt(r.nozzle_pressure_psi, 0) + " + " + _v15f_fmt(r.supply_friction_psi, 1) + " + " + _v15f_fmt(r.appliance_loss_psi, 0) + " + " + _v15f_fmt(r.elevation_loss_psi, 1) + " psi";
@@ -1682,7 +1683,7 @@ function _v15f_renderSmokeEjector(inputRegion, outputRegion, citationEl) {
       fan_cfm: readNum(fan.input),
       exhaust_opening_ft2: readNum(ex.input),
       entry_opening_ft2: readNum(en.input),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["length_ft", "width_ft", "height_ft", "target_ach", "fan_cfm", "exhaust_opening_ft2", "entry_opening_ft2"], r);
     if (r.error) { oReq.textContent = r.error; oFans.textContent = "-"; oTime.textContent = "-"; oRatio.textContent = "-"; oW.textContent = ""; return; }
     oReq.textContent = _v15f_fmt(r.cfm_required, 0) + " CFM (" + _v15f_fmt(r.volume_ft3, 0) + " ft^3)";
     oFans.textContent = String(r.fans) + " (" + _v15f_fmt(r.cfm_actual, 0) + " CFM actual)";
@@ -1748,7 +1749,7 @@ export function renderFireStreamReaction(inputRegion, outputRegion, citationEl) 
   const oStaff = _v23f_makeOut(outputRegion, "Staffing note", "fsr-out-staff");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = _v23f_debounce(() => {
-    const r = computeFireStreamReaction({ nozzle_type: type.select.value, bore_in: readNum(bore.input), flow_gpm: readNum(flow.input), nozzle_pressure_psi: readNum(np.input) });
+    const r = computeFireStreamReaction({ nozzle_type: type.select.value, bore_in: readNum(bore.input), flow_gpm: readNum(flow.input), nozzle_pressure_psi: readNum(np.input) }); stepsFor(outputRegion, inputRegion, ["nozzle_type", "bore_in", "flow_gpm", "nozzle_pressure_psi"], r);
     if (r.error) { oNR.textContent = r.error; oStaff.textContent = ""; return; }
     oNR.textContent = _v23f_fmt(r.reaction_lb, 1) + " lb";
     oStaff.textContent = r.staffing;
@@ -1799,7 +1800,7 @@ export function renderSprinklerKFactor(inputRegion, outputRegion, citationEl) {
   const oOut = _v23f_makeOut(outputRegion, "Result", "skf-out");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = _v23f_debounce(() => {
-    const r = computeSprinklerKFactor({ solve_for: mode.select.value, flow_gpm: readNum(q.input), pressure_psi: readNum(p.input), k_factor: readNum(k.input) });
+    const r = computeSprinklerKFactor({ solve_for: mode.select.value, flow_gpm: readNum(q.input), pressure_psi: readNum(p.input), k_factor: readNum(k.input) }); stepsFor(outputRegion, inputRegion, ["solve_for", "flow_gpm", "pressure_psi", "k_factor"], r);
     if (r.error) { oOut.textContent = r.error; return; }
     if (r.solve_for === "pressure") oOut.textContent = _v23f_fmt(r.pressure_psi, 2) + " psi";
     else if (r.solve_for === "k") oOut.textContent = "K = " + _v23f_fmt(r.k_factor, 2);
@@ -1852,7 +1853,7 @@ function renderElevationPressureLoss(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "epl-out-note");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeElevationPressureLoss({ mode: mode.select.value, value: readNum(val.input), floor_height_ft: readNum(fh.input), direction: dir.select.value });
+    const r = computeElevationPressureLoss({ mode: mode.select.value, value: readNum(val.input), floor_height_ft: readNum(fh.input), direction: dir.select.value }); stepsFor(outputRegion, inputRegion, ["mode", "value", "floor_height_ft", "direction"], r);
     if (r.error) { oExact.textContent = r.error; oRule.textContent = ""; oNote.textContent = ""; return; }
     oExact.textContent = fmt(r.exact_psi, 1) + " psi " + (r.is_gain ? "(gain)" : "(loss)");
     oRule.textContent = fmt(r.rule_psi, 1) + " psi " + (r.is_gain ? "(gain)" : "(loss)");
@@ -1899,7 +1900,7 @@ function renderWaterSupplyDuration(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "wsd-out-note");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeWaterSupplyDuration({ volume_gal: readNum(vol.input), flow_gpm: readNum(flow.input), resupply_gpm: readNum(re.input) });
+    const r = computeWaterSupplyDuration({ volume_gal: readNum(vol.input), flow_gpm: readNum(flow.input), resupply_gpm: readNum(re.input) }); stepsFor(outputRegion, inputRegion, ["volume_gal", "flow_gpm", "resupply_gpm"], r);
     if (r.error) { oDur.textContent = r.error; oNet.textContent = ""; oNote.textContent = ""; return; }
     oDur.textContent = r.sustained ? "Effectively sustained" : fmt(r.duration_min, 1) + " min";
     oNet.textContent = r.sustained ? "Sustainable flow " + fmt(r.sustainable_flow_gpm, 0) + " GPM" : "Net drain " + fmt(r.net_drain_gpm, 0) + " GPM";
@@ -1940,7 +1941,7 @@ function renderSmoothBoreFlow(inputRegion, outputRegion, citationEl) {
   const oR = makeOutputLine(outputRegion, "Nozzle reaction", "sbf-out-r");
   const oN = makeOutputLine(outputRegion, "Note", "sbf-out-n");
   const update = debounce(() => {
-    const r = computeSmoothBoreFlow({ bore_in: Number(bore.input.value) || 0, nozzle_pressure_psi: Number(np.input.value) || 0 });
+    const r = computeSmoothBoreFlow({ bore_in: Number(bore.input.value) || 0, nozzle_pressure_psi: Number(np.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["bore_in", "nozzle_pressure_psi"], r);
     if (r.error) { oG.textContent = r.error; oR.textContent = "-"; oN.textContent = "-"; return; }
     oG.textContent = fmt(r.gpm, 0) + " gpm";
     oR.textContent = fmt(r.reaction_lb, 0) + " lb";
@@ -1981,7 +1982,7 @@ function renderSmoothBoreDiameterForFlow(inputRegion, outputRegion, citationEl) 
   const oR = makeOutputLine(outputRegion, "Nozzle reaction at that tip", "sbd-out-r");
   const oN = makeOutputLine(outputRegion, "Note", "sbd-out-n");
   const update = debounce(() => {
-    const r = computeSmoothBoreDiameterForFlow({ target_gpm: Number(gpm.input.value) || 0, nozzle_pressure_psi: Number(np.input.value) || 0 });
+    const r = computeSmoothBoreDiameterForFlow({ target_gpm: Number(gpm.input.value) || 0, nozzle_pressure_psi: Number(np.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["target_gpm", "nozzle_pressure_psi"], r);
     if (r.error) { oB.textContent = r.error; oR.textContent = "-"; oN.textContent = "-"; return; }
     oB.textContent = fmt(r.bore_in, 3) + " in";
     oR.textContent = fmt(r.reaction_lb, 0) + " lb";
@@ -2063,7 +2064,7 @@ function _v1143renderExtinguisherCoverage(inputRegion, outputRegion, citationEl)
   const oW = makeOutputLine(outputRegion, "Which limit governs", "exc-out-w");
   const oNote = makeOutputLine(outputRegion, "Note", "exc-out-note");
   const update = debounce(() => {
-    const r = computeExtinguisherCoverage({ floor_area_sf: Number(a.input.value) || 0, hazard_class: hc.select.value, travel_distance_ft: Number(td.input.value) || 0, area_cap_sf: Number(cp.input.value) || 0 });
+    const r = computeExtinguisherCoverage({ floor_area_sf: Number(a.input.value) || 0, hazard_class: hc.select.value, travel_distance_ft: Number(td.input.value) || 0, area_cap_sf: Number(cp.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["floor_area_sf", "hazard_class", "travel_distance_ft", "area_cap_sf"], r);
     if (r.error) { oN.textContent = r.error; oG.textContent = "-"; oW.textContent = "-"; oNote.textContent = "-"; return; }
     oN.textContent = r.required_extinguishers + " (a FLOOR - walk the paths before trusting it)";
     oG.textContent = fmt(r.grid_spacing_ft, 1) + " ft spacing, " + fmt(r.area_per_unit_sf, 0) + " sq ft per unit at " + fmt(r.travel_used_ft, 0) + " ft of travel" + (r.cap_matches_geometry ? " - exactly the area cap" : "");

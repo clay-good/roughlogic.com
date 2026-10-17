@@ -8,6 +8,7 @@
 import {
   DEBOUNCE_MS, debounce, makeNumber,
   makeOutputLine, attachExampleButton, fmt,
+  stepsFor,
 } from "./ui-fields.js";
 
 const _finiteGuard = (o) => {
@@ -65,7 +66,7 @@ function _v946renderLoopSignalScaling(inputRegion, outputRegion, citationEl) {
     const r = computeLoopSignalScaling({
       signal_ma: ma.input.value === "" ? 12 : Number(ma.input.value),
       range_low: lo.input.value === "" ? 0 : Number(lo.input.value), range_high: hi.input.value === "" ? 100 : Number(hi.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["signal_ma", "range_low", "range_high"], r);
     if (r.error) { oVal.textContent = r.error; oPct.textContent = "-"; oStatus.textContent = "-"; return; }
     oVal.textContent = fmt(r.engineering_value, 3);
     oPct.textContent = fmt(r.percent_of_span, 2) + "%";
@@ -130,7 +131,7 @@ function renderDpFlowSignalScaling(inputRegion, outputRegion, citationEl) {
       flow_low: lo.input.value === "" ? 0 : Number(lo.input.value),
       flow_high: hi.input.value === "" ? 500 : Number(hi.input.value),
       low_flow_cutoff_pct: cut.input.value === "" ? 0 : Number(cut.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["signal_ma", "flow_low", "flow_high", "low_flow_cutoff_pct"], r);
     if (r.error) { oVal.textContent = r.error; oPct.textContent = "-"; oStatus.textContent = "-"; oNote.textContent = ""; return; }
     oVal.textContent = fmt(r.flow_value, 2);
     oPct.textContent = fmt(r.flow_percent, 2) + "% (linear would read " + fmt(r.linear_percent, 2) + "%)";
@@ -190,7 +191,7 @@ function _v947renderRtdResistanceToTemp(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const r = computeRtdResistanceToTemp({
       resistance_ohms: rm.input.value === "" ? 119.397 : Number(rm.input.value), r0_ohms: r0.input.value === "" ? 100 : Number(r0.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["resistance_ohms", "r0_ohms"], r);
     if (r.error) { oC.textContent = r.error; oF.textContent = "-"; return; }
     oC.textContent = fmt(r.temperature_c, 2) + " C";
     oF.textContent = fmt(r.temperature_f, 2) + " F";
@@ -229,7 +230,7 @@ function _v948renderPulseFlowmeterRate(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const r = computePulseFlowmeterRate({
       frequency_hz: fr.input.value === "" ? 100 : Number(fr.input.value), k_factor_pulses_per_gal: kf.input.value === "" ? 200 : Number(kf.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["frequency_hz", "k_factor_pulses_per_gal"], r);
     if (r.error) { oGpm.textContent = r.error; oGph.textContent = "-"; return; }
     oGpm.textContent = fmt(r.flow_gpm, 2) + " gpm";
     oGph.textContent = fmt(r.flow_gph, 1) + " gph";
@@ -284,7 +285,7 @@ function _v949renderLoopVoltageBudget(inputRegion, outputRegion, citationEl) {
     const r = computeLoopVoltageBudget({
       supply_v: sv.input.value === "" ? 24 : Number(sv.input.value), transmitter_min_v: tv.input.value === "" ? 10.5 : Number(tv.input.value),
       load_resistance_ohms: lr.input.value === "" ? 250 : Number(lr.input.value), wire_resistance_ohms: wr.input.value === "" ? 50 : Number(wr.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["supply_v", "transmitter_min_v", "load_resistance_ohms", "wire_resistance_ohms"], r);
     if (r.error) { oV.textContent = r.error; oVat.textContent = "-"; oMax.textContent = "-"; return; }
     oV.textContent = r.verdict + " (" + (r.margin_v >= 0 ? "+" : "") + fmt(r.margin_v, 2) + " V margin)";
     // Until 2026-10-14 a typed 0 V minimum printed "need 10.5 V" (the || fallback).
@@ -334,7 +335,7 @@ function _v950renderThermistorBetaTemp(inputRegion, outputRegion, citationEl) {
     const r = computeThermistorBetaTemp({
       resistance_ohms: rm.input.value === "" ? 20000 : Number(rm.input.value), r0_ohms: r0.input.value === "" ? 10000 : Number(r0.input.value),
       beta_k: bk.input.value === "" ? 3950 : Number(bk.input.value), ref_temp_c: rt.input.value === "" ? 25 : Number(rt.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["resistance_ohms", "r0_ohms", "beta_k", "ref_temp_c"], r);
     if (r.error) { oC.textContent = r.error; oF.textContent = "-"; return; }
     oC.textContent = fmt(r.temperature_c, 2) + " C";
     oF.textContent = fmt(r.temperature_f, 2) + " F";
@@ -388,7 +389,7 @@ function renderThermistorSteinhartHart(inputRegion, outputRegion, citationEl) {
       // Blank C means the two-constant form (C = 0) once A and B are your own; all three
       // blank uses the bundled 10k NTC set.
       coeff_c: c.input.value === "" ? (a.input.value === "" && b.input.value === "" ? 0.000000085663516 : 0) : Number(c.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["resistance_ohms", "coeff_a", "coeff_b"], r);
     if (r.error) { oC.textContent = r.error; oF.textContent = "-"; oNote.textContent = ""; return; }
     oC.textContent = fmt(r.temperature_c, 2) + " C";
     oF.textContent = fmt(r.temperature_f, 2) + " F";
@@ -436,7 +437,7 @@ function _v958renderDpLevelHydrostatic(inputRegion, outputRegion, citationEl) {
     const r = computeDpLevelHydrostatic({
       measured_pressure_psi: pp.input.value === "" ? 4.33 : Number(pp.input.value), specific_gravity: sg.input.value === "" ? 1.0 : Number(sg.input.value),
       max_level_ft: ml.input.value === "" ? 20 : Number(ml.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["measured_pressure_psi", "specific_gravity", "max_level_ft"], r);
     if (r.error) { oL.textContent = r.error; oP.textContent = "-"; oS.textContent = "-"; return; }
     oL.textContent = fmt(r.level_ft, 2) + " ft (" + fmt(r.level_in, 1) + " in)";
     oP.textContent = fmt(r.level_pct, 1) + "% of span";
@@ -488,7 +489,7 @@ function _v961renderPidTuningZieglerNichols(inputRegion, outputRegion, citationE
   const update = debounce(() => {
     const r = computePidTuningZieglerNichols({
       ultimate_gain_ku: ku.input.value === "" ? 4 : Number(ku.input.value), ultimate_period_tu_sec: tu.input.value === "" ? 2 : Number(tu.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["ultimate_gain_ku", "ultimate_period_tu_sec"], r);
     if (r.error) { oPid.textContent = r.error; oPb.textContent = "-"; oPi.textContent = "-"; return; }
     oPid.textContent = fmt(r.pid_kp, 3) + " / " + fmt(r.pid_ti_sec, 3) + " s / " + fmt(r.pid_td_sec, 3) + " s";
     oPb.textContent = fmt(r.proportional_band_pct, 1) + "% (PB = 100/Kp)";

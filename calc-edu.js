@@ -22,7 +22,7 @@
 // self-contained. The module is dynamic-imported on first navigation
 // to a Group Y tile per the spec-v10 §H.1 per-tile-cap discipline.
 
-import { DEBOUNCE_MS, debounce, makeNumber, makeText, makeSelect, makeTextarea, makeOutputLine, attachExampleButton, fmt } from "./ui-fields.js";
+import { DEBOUNCE_MS, debounce, makeNumber, makeText, makeSelect, makeTextarea, makeOutputLine, attachExampleButton, fmt, stepsFor } from "./ui-fields.js";
 import { tcdf, chi2Cdf, betainc, normCdf } from "./pure-math.js";
 
 // --- Tokenizers ---
@@ -194,7 +194,7 @@ export function renderReadability(inputRegion, outputRegion, citationEl) {
   const oReliable = makeOutputLine(outputRegion, "Reliability", "rd-out-reliable");
 
   const update = debounce(() => {
-    const r = computeReadability({ text: T.input.value || "" });
+    const r = computeReadability({ text: T.input.value || "" }); stepsFor(outputRegion, inputRegion, ["text"], r);
     if (r.error) {
       for (const o of [oFKGL, oFRE, oWords, oSentences, oSyllables, oWPS, oSPW, oReliable]) o.textContent = "-";
       oReliable.textContent = r.error;
@@ -321,7 +321,7 @@ export function renderStatistics(inputRegion, outputRegion, citationEl) {
   const oSDs = makeOutputLine(outputRegion, "Sample standard deviation (n-1)", "st-out-sds");
   const oSDp = makeOutputLine(outputRegion, "Population standard deviation (n)", "st-out-sdp");
   const update = debounce(() => {
-    const r = computeStatistics({ values: V.input.value || "" });
+    const r = computeStatistics({ values: V.input.value || "" }); stepsFor(outputRegion, inputRegion, ["values"], r);
     if (r.error) {
       for (const o of [oCount, oSum, oMean, oMedian, oMode, oMin, oMax, oRange, oSDs, oSDp]) o.textContent = "-";
       oCount.textContent = r.error;
@@ -427,7 +427,7 @@ export function renderQuadratic(inputRegion, outputRegion, citationEl) {
   const oRoots = makeOutputLine(outputRegion, "Roots", "qd-out-roots");
   const oVertex = makeOutputLine(outputRegion, "Vertex (x, y)", "qd-out-vertex");
   const update = debounce(() => {
-    const r = computeQuadratic({ a: A.input.value, b: B.input.value, c: C.input.value });
+    const r = computeQuadratic({ a: A.input.value, b: B.input.value, c: C.input.value }); stepsFor(outputRegion, inputRegion, ["a", "b", "c"], r);
     if (r.error) {
       oKind.textContent = r.error;
       oDisc.textContent = "-"; oRoots.textContent = "-"; oVertex.textContent = "-";
@@ -504,7 +504,7 @@ export function renderScientificNotation(inputRegion, outputRegion, citationEl) 
   const oRendered = makeOutputLine(outputRegion, "Scientific form", "sn-out-rendered");
   const oSig = makeOutputLine(outputRegion, "Significant figures (from input string)", "sn-out-sig");
   const update = debounce(() => {
-    const r = computeScientificNotation({ value: V.input.value || "" });
+    const r = computeScientificNotation({ value: V.input.value || "" }); stepsFor(outputRegion, inputRegion, ["value"], r);
     if (r.error) {
       oMant.textContent = r.error;
       oExp.textContent = "-"; oRendered.textContent = "-"; oSig.textContent = "-";
@@ -645,7 +645,7 @@ export function renderSigFigs(inputRegion, outputRegion, citationEl) {
   const oVal = makeOutputLine(outputRegion, "Input parsed as", "sf-out-val");
   const oRounded = makeOutputLine(outputRegion, "Rounded to target sig figs", "sf-out-rounded");
   const update = debounce(() => {
-    const r = computeSigFigs({ value: V.input.value || "", target_sig_figs: N.input.value || "" });
+    const r = computeSigFigs({ value: V.input.value || "", target_sig_figs: N.input.value || "" }); stepsFor(outputRegion, inputRegion, ["value", "target_sig_figs"], r);
     if (r.error) {
       oCount.textContent = r.error; oVal.textContent = "-"; oRounded.textContent = "-";
       return;
@@ -739,7 +739,7 @@ export function renderCodonTable(inputRegion, outputRegion, citationEl) {
   const oTrans = makeOutputLine(outputRegion, "Amino acids", "cd-out-aa");
   const oCount = makeOutputLine(outputRegion, "Codon count", "cd-out-count");
   const update = debounce(() => {
-    const r = computeCodonTable({ sequence: S.input.value || "", sequence_type: T.select.value });
+    const r = computeCodonTable({ sequence: S.input.value || "", sequence_type: T.select.value }); stepsFor(outputRegion, inputRegion, ["sequence", "sequence_type"], r);
     if (r.error) {
       oRna.textContent = r.error; oTrans.textContent = "-"; oCount.textContent = "-";
       return;
@@ -823,7 +823,7 @@ export function renderBaseConvert(inputRegion, outputRegion, citationEl) {
   const oOct = makeOutputLine(outputRegion, "Octal", "bc-out-oct");
   const oHex = makeOutputLine(outputRegion, "Hexadecimal", "bc-out-hex");
   const update = debounce(() => {
-    const r = computeBaseConvert({ value: V.input.value || "", from_base: F.input.value, to_base: T.input.value });
+    const r = computeBaseConvert({ value: V.input.value || "", from_base: F.input.value, to_base: T.input.value }); stepsFor(outputRegion, inputRegion, ["value", "from_base", "to_base"], r);
     if (r.error) {
       oConv.textContent = r.error;
       for (const o of [oDec, oBin, oOct, oHex]) o.textContent = "-";
@@ -947,7 +947,7 @@ export function renderGPA(inputRegion, outputRegion, citationEl) {
   const oCr = makeOutputLine(outputRegion, "Total credits", "gpa-out-cr");
   const oN = makeOutputLine(outputRegion, "Course count", "gpa-out-n");
   const update = debounce(() => {
-    const r = computeGPA({ courses: C.input.value || "" });
+    const r = computeGPA({ courses: C.input.value || "" }); stepsFor(outputRegion, inputRegion, ["courses"], r);
     if (r.error) {
       oUnw.textContent = r.error;
       for (const o of [oW, oCr, oN]) o.textContent = "-";
@@ -1090,7 +1090,7 @@ export function renderConfidenceInterval(inputRegion, outputRegion, citationEl) 
       mean: X.input.value,
       sd: S.input.value,
       confidence_pct: C.select.value,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["mode", "n", "proportion", "mean", "sd", "confidence_pct"], r);
     if (r.error) {
       oZ.textContent = r.error;
       for (const o of [oSE, oMOE, oLo, oHi, oFlag]) o.textContent = "-";
@@ -1193,7 +1193,7 @@ export function renderLinearSystem2x2(inputRegion, outputRegion, citationEl) {
     const r = computeLinearSystem2x2({
       a1: A1.input.value, b1: B1.input.value, c1: C1.input.value,
       a2: A2.input.value, b2: B2.input.value, c2: C2.input.value,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["a1", "b1", "c1", "a2", "b2", "c2"], r);
     if (r.error) {
       oDet.textContent = r.error;
       for (const o of [oKind, oX, oY, oMsg]) o.textContent = "-";
@@ -1279,7 +1279,7 @@ export function renderLexileBand(inputRegion, outputRegion, citationEl) {
   const oSel = makeOutputLine(outputRegion, "Selected grade band", "lex-out-sel");
   const oTable = makeOutputLine(outputRegion, "All grades K to 12", "lex-out-table");
   const update = debounce(() => {
-    const r = computeLexileBand({ grade: G.input.value || "" });
+    const r = computeLexileBand({ grade: G.input.value || "" }); stepsFor(outputRegion, inputRegion, ["grade"], r);
     if (r.error) { oSel.textContent = r.error; oTable.textContent = "-"; return; }
     oSel.textContent = r.selected
       ? "Grade " + r.selected.grade + ": typical " + r.selected.typical + "; CCSS stretch " + r.selected.stretch
@@ -1397,7 +1397,7 @@ export function renderStandardsBasedGrade(inputRegion, outputRegion, citationEl)
   const oCount = makeOutputLine(outputRegion, "Standards count", "sbg-out-count");
   const oLevels = makeOutputLine(outputRegion, "Level counts (1 / 2 / 3 / 4)", "sbg-out-levels");
   const update = debounce(() => {
-    const r = computeStandardsBasedGrade({ rows: T.input.value || "" });
+    const r = computeStandardsBasedGrade({ rows: T.input.value || "" }); stepsFor(outputRegion, inputRegion, ["rows"], r);
     if (r.error) {
       oOverall.textContent = r.error;
       for (const o of [oLetter, oCount, oLevels]) o.textContent = "-";
@@ -1488,7 +1488,7 @@ export function renderBellCurve(inputRegion, outputRegion, citationEl) {
   const oL = makeOutputLine(outputRegion, "Curve letter", "bc-out-l");
   const oN = makeOutputLine(outputRegion, "Band note", "bc-out-n");
   const update = debounce(() => {
-    const r = computeBellCurve({ raw_score: X.input.value, mean: MU.input.value, sd: SD.input.value });
+    const r = computeBellCurve({ raw_score: X.input.value, mean: MU.input.value, sd: SD.input.value }); stepsFor(outputRegion, inputRegion, ["raw_score", "mean", "sd"], r);
     if (r.error) { oZ.textContent = r.error; for (const o of [oP, oL, oN]) o.textContent = "-"; return; }
     oZ.textContent = fmt(r.z_score, 3);
     oP.textContent = fmt(r.percentile, 2) + " %";
@@ -1579,7 +1579,7 @@ export function renderAlternateReadability(inputRegion, outputRegion, citationEl
   const oCounts = makeOutputLine(outputRegion, "Counts (words / sentences / polysyllables / letters)", "rd2-out-counts");
   const oReliable = makeOutputLine(outputRegion, "Reliable (>= 100 words for SMOG-derived)", "rd2-out-rel");
   const update = debounce(() => {
-    const r = computeAlternateReadability({ text: T.input.value || "" });
+    const r = computeAlternateReadability({ text: T.input.value || "" }); stepsFor(outputRegion, inputRegion, ["text"], r);
     if (r.error) { oSMOG.textContent = r.error; for (const o of [oCL, oFog, oARI, oCounts, oReliable]) o.textContent = "-"; return; }
     if (r.smog == null) { oSMOG.textContent = r.note; for (const o of [oCL, oFog, oARI, oCounts, oReliable]) o.textContent = "-"; return; }
     oSMOG.textContent = fmt(r.smog, 2);
@@ -1691,7 +1691,7 @@ export function renderPeriodicElement(inputRegion, outputRegion, citationEl) {
   const oEC = makeOutputLine(outputRegion, "Electron configuration", "pe-out-ec");
   const oOx = makeOutputLine(outputRegion, "Common oxidation states", "pe-out-ox");
   const update = debounce(() => {
-    const r = computePeriodicElement({ query: Q.input.value || "" });
+    const r = computePeriodicElement({ query: Q.input.value || "" }); stepsFor(outputRegion, inputRegion, ["query"], r);
     if (r.error) { oZ.textContent = r.error; for (const o of [oCoord, oEN, oEC, oOx]) o.textContent = "-"; return; }
     oZ.textContent = "Z=" + r.atomic_number + " " + r.symbol + " (" + r.name + ")";
     oCoord.textContent = "Period " + r.period + " / Group " + r.group + " / Block " + r.block;
@@ -1815,7 +1815,7 @@ export function renderLinearRegression(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Notes", "lr-out-note");
 
   const update = debounce(() => {
-    const r = computeLinearRegression({ x_values: X.input.value || "", y_values: Y.input.value || "", predict_x: P.input.value, alpha: Number(A.select.value) });
+    const r = computeLinearRegression({ x_values: X.input.value || "", y_values: Y.input.value || "", predict_x: P.input.value, alpha: Number(A.select.value) }); stepsFor(outputRegion, inputRegion, ["x_values", "y_values", "predict_x", "alpha"], r);
     if (r.error) { oEq.textContent = r.error; oFit.textContent = "-"; oSlope.textContent = "-"; oPred.textContent = "-"; oNote.textContent = ""; return; }
     oEq.textContent = "y = " + fmt(r.slope, 4) + " x " + (r.intercept >= 0 ? "+ " : "- ") + fmt(Math.abs(r.intercept), 4) + " (n = " + r.n + ")";
     oFit.textContent = "R^2 " + fmt(r.r2, 4) + " (r " + fmt(r.r, 4) + "), residual std error " + fmt(r.rse, 4);
@@ -1930,7 +1930,7 @@ export function renderPearson(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Notes", "pc-out-note");
 
   const update = debounce(() => {
-    const r = computePearson({ x_values: X.input.value || "", y_values: Y.input.value || "", alpha: Number(A.select.value) });
+    const r = computePearson({ x_values: X.input.value || "", y_values: Y.input.value || "", alpha: Number(A.select.value) }); stepsFor(outputRegion, inputRegion, ["x_values", "y_values", "alpha"], r);
     if (r.error) { oR.textContent = r.error; oT.textContent = "-"; oP.textContent = "-"; oNote.textContent = ""; return; }
     oR.textContent = fmt(r.r, 4) + " (R^2 " + fmt(r.r2, 4) + "), " + r.strength + " " + r.direction + " (n = " + r.n + ")";
     oT.textContent = Number.isFinite(r.t) ? fmt(r.t, 3) + " on " + r.df + " df" : "perfect correlation (t not defined)";
@@ -2038,7 +2038,7 @@ export function renderChiSquareGof(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Notes", "cs-out-note");
 
   const update = debounce(() => {
-    const r = computeChiSquareGof({ observed: O.input.value || "", expected: E.input.value || "", expected_type: T.select.value, alpha: Number(A.select.value) });
+    const r = computeChiSquareGof({ observed: O.input.value || "", expected: E.input.value || "", expected_type: T.select.value, alpha: Number(A.select.value) }); stepsFor(outputRegion, inputRegion, ["observed", "expected", "expected_type", "alpha"], r);
     if (r.error) { oChi.textContent = r.error; oP.textContent = "-"; oNote.textContent = ""; return; }
     oChi.textContent = fmt(r.chi_square, 4) + " on " + r.df + " df (" + r.k + " categories)";
     oP.textContent = fmt(r.p_value, 5) + " -> " + (r.significant ? "reject H0: the observed counts differ from expected" : "fail to reject H0 (consistent with the expected distribution)") + " at alpha " + r.alpha;
@@ -2111,7 +2111,7 @@ export function renderSampleSizeForMargin(inputRegion, outputRegion, citationEl)
       proportion: P.input.value,
       target_moe: E.input.value,
       confidence_pct: C.select.value,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["proportion", "target_moe", "confidence_pct"], r);
     if (r.error) {
       oN.textContent = r.error;
       for (const o of [oExact, oZ]) o.textContent = "-";
@@ -2199,7 +2199,7 @@ export function renderCurveGradeScaler(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "cgs-out-note");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeCurveGradeScaler({ method: method.select.value, raw_score: readNum(raw.input), param: readNum(param.input), class_mean: readNum(mean.input) });
+    const r = computeCurveGradeScaler({ method: method.select.value, raw_score: readNum(raw.input), param: readNum(param.input), class_mean: readNum(mean.input) }); stepsFor(outputRegion, inputRegion, ["method", "raw_score", "param", "class_mean"], r);
     if (r.error) { oCurved.textContent = r.error; oNote.textContent = ""; return; }
     oCurved.textContent = fmt(r.curved, 1);
     oNote.textContent = r.method === "linear" ? r.note + " (slope " + fmt(r.slope, 3) + ", intercept " + fmt(r.intercept, 1) + ")" : r.note;

@@ -13,6 +13,7 @@ import {
   makeNumber as _v26makeNumber, makeSelect as _v26makeSelect, makeTextarea as _v26makeTextarea,
   makeOutputLine as _v26makeOut, attachExampleButton as _v26attachEx,
   debounce as _v26debounce, DEBOUNCE_MS as _V26_DEB, fmt as _v26fmt,
+  stepsFor,
 } from "./ui-fields.js";
 
 // v18 §7 contract guard (copied per-module; non-exported, no derivation-corpus row).
@@ -127,7 +128,7 @@ function _v26renderMotorFeederMultiple(inputRegion, outputRegion, citationEl) {
   const update = _v26debounce(() => {
     const motors = parseMotors(list.input.value);
     if (motors === null) { oCond.textContent = "Each line must be FLC,device with finite numbers."; oDev.textContent = "-"; oLargest.textContent = "-"; oNote.textContent = ""; return; }
-    const r = computeMotorFeederMultiple({ motors, nonmotor_continuous_A: Number(nmC.input.value) || 0, nonmotor_noncontinuous_A: Number(nmN.input.value) || 0 });
+    const r = computeMotorFeederMultiple({ motors, nonmotor_continuous_A: Number(nmC.input.value) || 0, nonmotor_noncontinuous_A: Number(nmN.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["motors", "nonmotor_continuous_A", "nonmotor_noncontinuous_A"], r);
     if (r.error) { oCond.textContent = r.error; oDev.textContent = "-"; oLargest.textContent = "-"; oNote.textContent = ""; return; }
     oCond.textContent = _v26fmt(r.conductor_min_A, 1) + " A";
     oDev.textContent = r.feeder_ocpd_max_A + " A (raw max " + _v26fmt(r.feeder_ocpd_raw_A, 1) + " A)";
@@ -244,7 +245,7 @@ function _v26renderTransformerConductorProtection(inputRegion, outputRegion, cit
       secondary_v: Number(vs.input.value) || 0,
       phase: Number(ph.select.value),
       secondary_protection: sp.select.value === "both",
-    });
+    }); stepsFor(outputRegion, inputRegion, ["kva", "primary_v", "secondary_v", "phase", "secondary_protection"], r);
     if (r.error) { oP.textContent = r.error; oS.textContent = "-"; oPO.textContent = "-"; oSO.textContent = "-"; oSC.textContent = "-"; oNote.textContent = ""; return; }
     oP.textContent = _v26fmt(r.primary_fla_A, 2) + " A";
     oS.textContent = _v26fmt(r.secondary_fla_A, 2) + " A";
@@ -325,7 +326,7 @@ function _v164renderFeederTapRule(inputRegion, outputRegion, citationEl) {
       feeder_ocpd_a: Number(ocpd.input.value) || 0,
       tap_length_ft: Number(len.input.value) || 0,
       tap_ampacity_a: Number(amp.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["feeder_ocpd_a", "tap_length_ft", "tap_ampacity_a"], r);
     if (r.error) { oRule.textContent = r.error; oMin.textContent = "-"; oVerdict.textContent = "-"; oNote.textContent = ""; return; }
     oRule.textContent = r.rule;
     if (!r.within_short_tap_rule) {
@@ -388,7 +389,7 @@ function _v280renderContinuousLoadOcpd(inputRegion, outputRegion, citationEl) {
   const oDev = _v26makeOut(outputRegion, "Overcurrent device (240.6(A))", "clo-out-dev");
   const oNote = _v26makeOut(outputRegion, "Note", "clo-out-note");
   const update = _v26debounce(() => {
-    const r = computeContinuousLoadOcpd({ l_cont_A: Number(lc.input.value) || 0, l_noncont_A: Number(ln.input.value) || 0, rated_100: rated.select.value === "yes" });
+    const r = computeContinuousLoadOcpd({ l_cont_A: Number(lc.input.value) || 0, l_noncont_A: Number(ln.input.value) || 0, rated_100: rated.select.value === "yes" }); stepsFor(outputRegion, inputRegion, ["l_cont_A", "l_noncont_A", "rated_100"], r);
     if (r.error) { oMin.textContent = r.error; oDev.textContent = "-"; oNote.textContent = "-"; return; }
     oMin.textContent = _v26fmt(r.A_min, 1) + " A (" + _v26fmt(r.mult * 100, 0) + "% of continuous + 100% of noncontinuous)";
     oDev.textContent = _v26fmt(r.ocpd_A, 0) + " A";
@@ -454,7 +455,7 @@ function _v493renderGeneratorConductor445(inputRegion, outputRegion, citationEl)
   const oReq = _v26makeOut(outputRegion, "Required conductor ampacity", "gc4-out-req");
   const oNote = _v26makeOut(outputRegion, "Note", "gc4-out-note");
   const update = _v26debounce(() => {
-    const r = computeGeneratorConductor445({ nameplate_current_a: Number(np.input.value) || 0, gen_kw: Number(kw.input.value) || 0, voltage_v: Number(v.input.value) || 0, phase: Number(ph.select.value), power_factor: pf.input.value === "" ? 0.8 : Number(pf.input.value), overload_limited: ol.select.value === "yes" });
+    const r = computeGeneratorConductor445({ nameplate_current_a: Number(np.input.value) || 0, gen_kw: Number(kw.input.value) || 0, voltage_v: Number(v.input.value) || 0, phase: Number(ph.select.value), power_factor: pf.input.value === "" ? 0.8 : Number(pf.input.value), overload_limited: ol.select.value === "yes" }); stepsFor(outputRegion, inputRegion, ["nameplate_current_a", "gen_kw", "voltage_v", "phase", "power_factor", "overload_limited"], r);
     if (r.error) { oNp.textContent = r.error; oBasis.textContent = "-"; oReq.textContent = "-"; oNote.textContent = "-"; return; }
     oNp.textContent = _v26fmt(r.nameplate_a, 1) + " A";
     oBasis.textContent = _v26fmt(r.basis * 100, 0) + "% of nameplate";
@@ -504,7 +505,7 @@ function _v519renderExistingLoad22087(inputRegion, outputRegion, citationEl) {
   const oHead = _v26makeOut(outputRegion, "Headroom under the service", "el2-out-head");
   const oNote = _v26makeOut(outputRegion, "Note", "el2-out-note");
   const update = _v26debounce(() => {
-    const r = computeExistingLoad22087({ recorded_peak_a: Number(peak.input.value) || 0, new_load_a: Number(nl.input.value) || 0, service_rating_a: Number(rating.input.value) || 0, pv_or_peakshave: pv.select.value === "yes" });
+    const r = computeExistingLoad22087({ recorded_peak_a: Number(peak.input.value) || 0, new_load_a: Number(nl.input.value) || 0, service_rating_a: Number(rating.input.value) || 0, pv_or_peakshave: pv.select.value === "yes" }); stepsFor(outputRegion, inputRegion, ["recorded_peak_a", "new_load_a", "service_rating_a", "pv_or_peakshave"], r);
     if (r.error) { oBasis.textContent = r.error; oTotal.textContent = "-"; oHead.textContent = "-"; oNote.textContent = "-"; return; }
     oBasis.textContent = _v26fmt(r.basis_a, 1) + " A";
     oTotal.textContent = _v26fmt(r.total_a, 1) + " A";
@@ -557,7 +558,7 @@ function _v561renderEvLoadManagementEms(inputRegion, outputRegion, citationEl) {
   const oFree = _v26makeOut(outputRegion, "Freed headroom", "evems-out-free");
   const oNote = _v26makeOut(outputRegion, "Note", "evems-out-note");
   const update = _v26debounce(() => {
-    const r = computeEvLoadManagementEms({ charger_count: Number(n.input.value) || 0, per_charger_a: Number(per.input.value) || 0, evems_limit_a: Number(limit.input.value) || 0, apply_125_setpoint: sp.select.value === "yes" });
+    const r = computeEvLoadManagementEms({ charger_count: Number(n.input.value) || 0, per_charger_a: Number(per.input.value) || 0, evems_limit_a: Number(limit.input.value) || 0, apply_125_setpoint: sp.select.value === "yes" }); stepsFor(outputRegion, inputRegion, ["charger_count", "per_charger_a", "evems_limit_a", "apply_125_setpoint"], r);
     if (r.error) { oSum.textContent = r.error; oDem.textContent = "-"; oFree.textContent = "-"; oNote.textContent = "-"; return; }
     oSum.textContent = _v26fmt(r.unmanaged_sum_a, 1) + " A";
     oDem.textContent = _v26fmt(r.managed_demand_a, 1) + " A" + (r.managed ? " (EVEMS aggregate)" : " (no management - full sum)");
@@ -601,7 +602,7 @@ function _v611renderEvChargerThrottle(inputRegion, outputRegion, citationEl) {
   const oFull = _v26makeOut(outputRegion, "Chargers that can run at full rate", "evt-out-full");
   const oNote = _v26makeOut(outputRegion, "Note", "evt-out-note");
   const update = _v26debounce(() => {
-    const r = computeEvChargerThrottle({ aggregate_limit_a: Number(limit.input.value) || 0, charger_max_a: Number(cmax.input.value) || 0, active_chargers: Number(active.input.value) || 0 });
+    const r = computeEvChargerThrottle({ aggregate_limit_a: Number(limit.input.value) || 0, charger_max_a: Number(cmax.input.value) || 0, active_chargers: Number(active.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["aggregate_limit_a", "charger_max_a", "active_chargers"], r);
     if (r.error) { oThrottle.textContent = r.error; oFull.textContent = "-"; oNote.textContent = "-"; return; }
     oThrottle.textContent = _v26fmt(r.throttled_a, 1) + " A" + (r.all_full ? " (full rate - budget fits)" : " (throttled from " + _v26fmt(cmax.input.value, 0) + " A)");
     oFull.textContent = r.full_rate_count + " at once (of " + Number(active.input.value) + " active)";

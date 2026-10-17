@@ -23,6 +23,7 @@
 import {
   DEBOUNCE_MS, debounce, makeNumber, makeSelect,
   makeOutputLine, attachExampleButton, fmt,
+  stepsFor,
 } from "./ui-fields.js";
 
 export const PLUMBINGCODE_RENDERERS = {};
@@ -120,7 +121,7 @@ function _v1132renderFixtureClearanceCheck(inputRegion, outputRegion, citationEl
   const oW = makeOutputLine(outputRegion, "Minimum wall-to-wall width for this row", "fcc-out-w");
   const oNote = makeOutputLine(outputRegion, "Note", "fcc-out-note");
   const update = debounce(() => {
-    const res = computeFixtureClearanceCheck({ center_to_left_in: Number(l.input.value) || 0, center_to_right_in: Number(r.input.value) || 0, front_clearance_in: Number(f.input.value) || 0, adjacent_center_in: Number(a.input.value) || 0, fixture_count: Number(n.input.value) || 0, compartment_width_in: Number(cw.input.value) || 0, compartment_depth_in: Number(cd.input.value) || 0, min_side_in: Number(ms.input.value) || 0, min_center_in: Number(mc.input.value) || 0, min_front_in: Number(mf.input.value) || 0 });
+    const res = computeFixtureClearanceCheck({ center_to_left_in: Number(l.input.value) || 0, center_to_right_in: Number(r.input.value) || 0, front_clearance_in: Number(f.input.value) || 0, adjacent_center_in: Number(a.input.value) || 0, fixture_count: Number(n.input.value) || 0, compartment_width_in: Number(cw.input.value) || 0, compartment_depth_in: Number(cd.input.value) || 0, min_side_in: Number(ms.input.value) || 0, min_center_in: Number(mc.input.value) || 0, min_front_in: Number(mf.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["center_to_left_in", "center_to_right_in", "front_clearance_in", "adjacent_center_in", "fixture_count", "compartment_width_in", "compartment_depth_in", "min_side_in", "min_center_in", "min_front_in"], res);
     if (res.error) { oV.textContent = res.error; oS.textContent = "-"; oF.textContent = "-"; oW.textContent = "-"; oNote.textContent = "-"; return; }
     oV.textContent = res.passes ? "PASSES the IPC 405.3.1 clearances entered" : "DOES NOT PASS";
     oS.textContent = (res.left_ok ? "left OK" : "left SHORT") + ", " + (res.right_ok ? "right OK" : "right SHORT") + (res.has_adjacent ? ", adjacent centers " + (res.center_ok ? "OK" : "SHORT by " + fmt(res.center_deficit_in, 1) + " in") : "");
@@ -207,7 +208,7 @@ function _v1134renderShowerCompartmentCheck(inputRegion, outputRegion, citationE
   const oN = makeOutputLine(outputRegion, "What the other side would have to reach", "scc-out-n");
   const oNote = makeOutputLine(outputRegion, "Note", "scc-out-note");
   const update = debounce(() => {
-    const r = computeShowerCompartmentCheck({ width_in: Number(w.input.value) || 0, depth_in: Number(d.input.value) || 0, base_min_area_sqin: Number(a0.input.value) || 0, base_min_dim_in: Number(d0.input.value) || 0, exception_min_area_sqin: Number(a1.input.value) || 0, exception_min_dim_in: Number(d1.input.value) || 0 });
+    const r = computeShowerCompartmentCheck({ width_in: Number(w.input.value) || 0, depth_in: Number(d.input.value) || 0, base_min_area_sqin: Number(a0.input.value) || 0, base_min_dim_in: Number(d0.input.value) || 0, exception_min_area_sqin: Number(a1.input.value) || 0, exception_min_dim_in: Number(d1.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["width_in", "depth_in", "base_min_area_sqin", "base_min_dim_in", "exception_min_area_sqin", "exception_min_dim_in"], r);
     if (r.error) { oV.textContent = r.error; oA.textContent = "-"; oB.textContent = "-"; oE.textContent = "-"; oN.textContent = "-"; oNote.textContent = "-"; return; }
     oV.textContent = r.passes ? "PASSES via " + r.path : "FAILS both paths";
     oA.textContent = fmt(r.area_sqin, 0) + " sq in, least dimension " + fmt(r.least_dim_in, 2) + " in - a 30 in disc " + (r.disc_fits ? "fits" : "does NOT fit");
@@ -322,7 +323,7 @@ function _v1135renderVentTerminalCheck(inputRegion, outputRegion, citationEl) {
   const oL = makeOutputLine(outputRegion, "Location (IPC 903.5)", "vtc-out-l");
   const oNote = makeOutputLine(outputRegion, "Note", "vtc-out-note");
   const update = debounce(() => {
-    const r = computeVentTerminalCheck({ height_above_roof_in: Number(h.input.value) || 0, roof_minimum_in: rm.input.value === "" ? 6 : Number(rm.input.value), snow_accumulation_in: Number(sn.input.value) || 0, roof_other_use: ru.select.value, design_temp_f: Number(dt.input.value), vent_diameter_in: Number(di.input.value) || 0, increase_inside_envelope_in: Number(ic.input.value) || 0, horizontal_to_opening_ft: Number(hz.input.value) || 0, height_above_opening_ft: Number(ab.input.value) || 0 });
+    const r = computeVentTerminalCheck({ height_above_roof_in: Number(h.input.value) || 0, roof_minimum_in: rm.input.value === "" ? 6 : Number(rm.input.value), snow_accumulation_in: Number(sn.input.value) || 0, roof_other_use: ru.select.value, design_temp_f: Number(dt.input.value), vent_diameter_in: Number(di.input.value) || 0, increase_inside_envelope_in: Number(ic.input.value) || 0, horizontal_to_opening_ft: Number(hz.input.value) || 0, height_above_opening_ft: Number(ab.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["height_above_roof_in", "roof_minimum_in", "snow_accumulation_in", "roof_other_use", "design_temp_f", "vent_diameter_in", "increase_inside_envelope_in", "horizontal_to_opening_ft", "height_above_opening_ft"], r);
     if (r.error) { oV.textContent = r.error; oH.textContent = "-"; oF.textContent = "-"; oL.textContent = "-"; oNote.textContent = "-"; return; }
     oV.textContent = r.passes ? "PASSES all three rules" : "DOES NOT PASS";
     oH.textContent = "needs " + fmt(r.required_height_in, 1) + " in" + (r.snow_governs ? " (snow governs)" : r.other_use ? " (roof in use)" : "") + " - " + (r.height_ok ? "OK" : "short by " + fmt(r.height_deficit_in, 1) + " in");
@@ -405,7 +406,7 @@ function _v1136renderAavInstallCheck(inputRegion, outputRegion, citationEl) {
   const oC = makeOutputLine(outputRegion, "Capacity", "aav-out-c");
   const oNote = makeOutputLine(outputRegion, "Note", "aav-out-note");
   const update = debounce(() => {
-    const r = computeAavInstallCheck({ height_above_drain_in: Number(hd.input.value) || 0, height_above_insulation_in: Number(hi.input.value) || 0, has_outdoor_vent: ov.select.value, ventilated_space: vs.select.value, accessible: ac.select.value, dfu_served: Number(df.input.value) || 0, valve_dfu_rating: Number(vr.input.value) || 0 });
+    const r = computeAavInstallCheck({ height_above_drain_in: Number(hd.input.value) || 0, height_above_insulation_in: Number(hi.input.value) || 0, has_outdoor_vent: ov.select.value, ventilated_space: vs.select.value, accessible: ac.select.value, dfu_served: Number(df.input.value) || 0, valve_dfu_rating: Number(vr.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["height_above_drain_in", "height_above_insulation_in", "has_outdoor_vent", "ventilated_space", "accessible", "dfu_served", "valve_dfu_rating"], r);
     if (r.error) { oV.textContent = r.error; oO.textContent = "-"; oP.textContent = "-"; oC.textContent = "-"; oNote.textContent = "-"; return; }
     oV.textContent = r.passes ? "PASSES the checks entered" : "DOES NOT PASS";
     oO.textContent = r.outdoor_vent_ok ? "present - OK" : "MISSING; an AAV relieves negative pressure only and cannot substitute";
@@ -501,7 +502,7 @@ function _v1137renderGrabBarLayout(inputRegion, outputRegion, citationEl) {
   const oL = makeOutputLine(outputRegion, "Blocking load path (609.8)", "gbl-out-l");
   const oNote = makeOutputLine(outputRegion, "Note", "gbl-out-note");
   const update = debounce(() => {
-    const r = computeGrabBarLayout({ bar_height_in: Number(h.input.value) || 0, side_bar_length_in: Number(sl.input.value) || 0, side_bar_from_rear_in: Number(sf.input.value) || 0, rear_bar_length_in: Number(rl.input.value) || 0, rear_toward_side_in: Number(rs.input.value) || 0, rear_toward_open_in: Number(ro.input.value) || 0, load_lb: Number(ld.input.value) || 0, standoff_in: Number(so.input.value) || 0, fastener_spacing_in: Number(fs.input.value) || 0 });
+    const r = computeGrabBarLayout({ bar_height_in: Number(h.input.value) || 0, side_bar_length_in: Number(sl.input.value) || 0, side_bar_from_rear_in: Number(sf.input.value) || 0, rear_bar_length_in: Number(rl.input.value) || 0, rear_toward_side_in: Number(rs.input.value) || 0, rear_toward_open_in: Number(ro.input.value) || 0, load_lb: Number(ld.input.value) || 0, standoff_in: Number(so.input.value) || 0, fastener_spacing_in: Number(fs.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["bar_height_in", "side_bar_length_in", "side_bar_from_rear_in", "rear_bar_length_in", "rear_toward_side_in", "rear_toward_open_in", "load_lb", "standoff_in", "fastener_spacing_in"], r);
     if (r.error) { oV.textContent = r.error; oS.textContent = "-"; oR.textContent = "-"; oL.textContent = "-"; oNote.textContent = "-"; return; }
     oV.textContent = (r.layout_ok ? "PASSES" : "DOES NOT PASS") + "; height " + (r.height_ok ? "OK" : "out of the 33-36 in range");
     oS.textContent = (r.side_length_ok ? "42 in length OK" : "TOO SHORT") + ", " + (r.side_position_ok ? "within 12 in of the rear wall" : "TOO FAR from the rear wall") + ", " + (r.side_reach_ok ? "reaches 54 in" : "reaches only " + fmt(r.side_reach_in, 0) + " in of the 54 required");
@@ -599,7 +600,7 @@ function _v1140renderCleanoutLayout(inputRegion, outputRegion, citationEl) {
   const oA = makeOutputLine(outputRegion, "Access", "clo-out-a");
   const oNote = makeOutputLine(outputRegion, "Note", "clo-out-note");
   const update = debounce(() => {
-    const r = computeCleanoutLayout({ horizontal_run_ft: Number(L.input.value) || 0, max_spacing_ft: Number(sp.input.value) || 0, direction_changes: Number(dc.input.value) || 0, changes_grouped_away: Number(gp.input.value) || 0, stack_count: Number(st.input.value) || 0, pipe_size_in: Number(ps.input.value) || 0, clear_space_in: Number(cs.input.value) || 0, crawl_height_in: Number(ch.input.value) || 0 });
+    const r = computeCleanoutLayout({ horizontal_run_ft: Number(L.input.value) || 0, max_spacing_ft: Number(sp.input.value) || 0, direction_changes: Number(dc.input.value) || 0, changes_grouped_away: Number(gp.input.value) || 0, stack_count: Number(st.input.value) || 0, pipe_size_in: Number(ps.input.value) || 0, clear_space_in: Number(cs.input.value) || 0, crawl_height_in: Number(ch.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["horizontal_run_ft", "max_spacing_ft", "direction_changes", "changes_grouped_away", "stack_count", "pipe_size_in", "clear_space_in", "crawl_height_in"], r);
     if (r.error) { oT.textContent = r.error; oS.textContent = "-"; oC.textContent = "-"; oB.textContent = "-"; oA.textContent = "-"; oNote.textContent = "-"; return; }
     oT.textContent = r.total_cleanouts + "";
     oS.textContent = r.spacing_cleanouts + " intermediate along the run";
@@ -690,7 +691,7 @@ function _v1146renderWaterServicePressureCheck(inputRegion, outputRegion, citati
   const oE = makeOutputLine(outputRegion, "Closed system and expansion (607.3)", "wsp-out-e");
   const oNote = makeOutputLine(outputRegion, "Note", "wsp-out-note");
   const update = debounce(() => {
-    const r = computeWaterServicePressureCheck({ static_pressure_psi: Number(sp.input.value) || 0, prv_setpoint_psi: Number(ps.input.value) || 0, min_fixture_pressure_psi: (mf.input.value === "" ? 20 : Number(mf.input.value)), has_check_or_backflow: cb.select.value, has_storage_water_heater: wh.select.value, expansion_control_present: ec.select.value });
+    const r = computeWaterServicePressureCheck({ static_pressure_psi: Number(sp.input.value) || 0, prv_setpoint_psi: Number(ps.input.value) || 0, min_fixture_pressure_psi: (mf.input.value === "" ? 20 : Number(mf.input.value)), has_check_or_backflow: cb.select.value, has_storage_water_heater: wh.select.value, expansion_control_present: ec.select.value }); stepsFor(outputRegion, inputRegion, ["static_pressure_psi", "prv_setpoint_psi", "min_fixture_pressure_psi", "has_check_or_backflow", "has_storage_water_heater", "expansion_control_present"], r);
     if (r.error) { oV.textContent = r.error; oP.textContent = "-"; oF.textContent = "-"; oE.textContent = "-"; oNote.textContent = "-"; return; }
     oV.textContent = r.passes ? "PASSES the items entered" : "DOES NOT PASS";
     oP.textContent = r.prv_required ? "over 80 psi by " + fmt(r.over_by_psi, 1) + " - a PRV is required" + (r.setpoint_ok === false ? ", and the setpoint entered is itself over 80" : "") : "within the 80 psi cap";
@@ -801,7 +802,7 @@ function _v1160renderAccessibleToiletCompartment(inputRegion, outputRegion, cita
   const oS = makeOutputLine(outputRegion, "If the water closet mounting changed", "atc-out-s");
   const oNote = makeOutputLine(outputRegion, "Note", "atc-out-note");
   const update = debounce(() => {
-    const r = computeAccessibleToiletCompartment({ compartment_count: Number(nStall.input.value) || 0, water_closet_count: Number(nWc.input.value) || 0, urinal_count: Number(nUr.input.value) || 0, wc_mounting: mount.select.value, wheelchair_width_in: Number(wW.input.value) || 0, wheelchair_depth_in: Number(wD.input.value) || 0, ambulatory_provided: ambP.select.value, ambulatory_width_in: Number(aW.input.value) || 0, ambulatory_depth_in: Number(aD.input.value) || 0 });
+    const r = computeAccessibleToiletCompartment({ compartment_count: Number(nStall.input.value) || 0, water_closet_count: Number(nWc.input.value) || 0, urinal_count: Number(nUr.input.value) || 0, wc_mounting: mount.select.value, wheelchair_width_in: Number(wW.input.value) || 0, wheelchair_depth_in: Number(wD.input.value) || 0, ambulatory_provided: ambP.select.value, ambulatory_width_in: Number(aW.input.value) || 0, ambulatory_depth_in: Number(aD.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["compartment_count", "water_closet_count", "urinal_count", "wc_mounting", "wheelchair_width_in", "wheelchair_depth_in", "ambulatory_provided", "ambulatory_width_in", "ambulatory_depth_in"], r);
     if (r.error) { oV.textContent = r.error; oT.textContent = "-"; oW.textContent = "-"; oA.textContent = "-"; oS.textContent = "-"; oNote.textContent = "-"; return; }
     oV.textContent = r.passes ? "PASSES the items entered" : "DOES NOT PASS";
     oT.textContent = "1 wheelchair compartment" + (r.ambulatory_required ? " + 1 ambulatory (triggered by " + (r.fixtures_alone_trigger ? r.fixture_total + " fixtures, not by the compartment count" : r.by_compartments && r.by_fixtures ? "both the compartment and fixture counts" : "the compartment count") + ")" : "; no ambulatory required at this count");

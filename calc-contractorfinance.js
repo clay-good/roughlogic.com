@@ -9,6 +9,7 @@ import {
   makeOutputLine,
   attachExampleButton,
   fmt,
+  stepsFor,
 } from "./ui-fields.js";
 
 const _finiteGuard = (o) => {
@@ -67,7 +68,7 @@ function renderLaborBurdenRate(inputRegion, outputRegion, citationEl) {
   const oRate = makeOutputLine(outputRegion, "Fully-burdened rate", "lbr-out-r");
   const oNote = makeOutputLine(outputRegion, "Note", "lbr-out-note");
   const update = debounce(() => {
-    const r = computeLaborBurdenRate({ wage: Number(wage.input.value) || 0, payroll_pct: Number(pr.input.value) || 0, wc_pct: Number(wc.input.value) || 0, liab_pct: Number(li.input.value) || 0, benefits: Number(ben.input.value) || 0, productivity: Number(prod.input.value) || 0 });
+    const r = computeLaborBurdenRate({ wage: Number(wage.input.value) || 0, payroll_pct: Number(pr.input.value) || 0, wc_pct: Number(wc.input.value) || 0, liab_pct: Number(li.input.value) || 0, benefits: Number(ben.input.value) || 0, productivity: Number(prod.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["wage", "payroll_pct", "wc_pct", "liab_pct", "benefits", "productivity"], r);
     if (r.error) { oBurden.textContent = r.error; oRate.textContent = "-"; oNote.textContent = ""; return; }
     oBurden.textContent = "$" + fmt(r.burden_hr, 2) + "/hr";
     oRate.textContent = "$" + fmt(r.burdened_hr, 2) + "/hr (" + fmt(r.burden_pct, 1) + "% over wage)";
@@ -127,7 +128,7 @@ function renderEquipmentHourlyRate(inputRegion, outputRegion, citationEl) {
   const oTot = makeOutputLine(outputRegion, "Total hourly rate", "ehr-out-tot");
   const oNote = makeOutputLine(outputRegion, "Note", "ehr-out-note");
   const update = debounce(() => {
-    const r = computeEquipmentHourlyRate({ purchase: Number(pur.input.value) || 0, salvage: Number(sal.input.value) || 0, life_hr: Number(life.input.value) || 0, annual_hr: Number(ann.input.value) || 0, iit_pct: Number(iit.input.value) || 0, fuel_gph: Number(fg.input.value) || 0, fuel_price: Number(fp.input.value) || 0, maint_hr: Number(mh.input.value) || 0, wear_hr: Number(wh.input.value) || 0 });
+    const r = computeEquipmentHourlyRate({ purchase: Number(pur.input.value) || 0, salvage: Number(sal.input.value) || 0, life_hr: Number(life.input.value) || 0, annual_hr: Number(ann.input.value) || 0, iit_pct: Number(iit.input.value) || 0, fuel_gph: Number(fg.input.value) || 0, fuel_price: Number(fp.input.value) || 0, maint_hr: Number(mh.input.value) || 0, wear_hr: Number(wh.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["purchase", "salvage", "life_hr", "annual_hr", "iit_pct", "fuel_gph", "fuel_price", "maint_hr", "wear_hr"], r);
     if (r.error) { oOwn.textContent = r.error; oOp.textContent = "-"; oTot.textContent = "-"; oNote.textContent = ""; return; }
     oOwn.textContent = "$" + fmt(r.owning_hr, 2) + "/hr (deprec $" + fmt(r.deprec_hr, 2) + " + IIT $" + fmt(r.iit_hr, 2) + ")";
     oOp.textContent = "$" + fmt(r.operating_hr, 2) + "/hr";
@@ -183,7 +184,7 @@ function renderOverheadRecoveryRate(inputRegion, outputRegion, citationEl) {
     jd.wrap.style.display = isMarkup ? "" : "none";
   }
   const update = debounce(() => {
-    const r = computeOverheadRecoveryRate({ annual_overhead: Number(oh.input.value) || 0, basis: basis.select.value, billable_hours: Number(bh.input.value) || 0, annual_direct: Number(ad.input.value) || 0, job_direct: Number(jd.input.value) || 0 });
+    const r = computeOverheadRecoveryRate({ annual_overhead: Number(oh.input.value) || 0, basis: basis.select.value, billable_hours: Number(bh.input.value) || 0, annual_direct: Number(ad.input.value) || 0, job_direct: Number(jd.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["annual_overhead", "basis", "billable_hours", "annual_direct", "job_direct"], r);
     if (r.error) { oRate.textContent = r.error; oJob.textContent = "-"; oNote.textContent = ""; return; }
     if (r.basis === "markup") {
       oRate.textContent = fmt(r.overhead_pct, 1) + "% markup on direct cost";
@@ -248,7 +249,7 @@ function renderWipPercentComplete(inputRegion, outputRegion, citationEl) {
   const oOU = makeOutputLine(outputRegion, "Over / under billing", "wip-out-ou");
   const oNote = makeOutputLine(outputRegion, "Note", "wip-out-n");
   const update = debounce(() => {
-    const r = computeWipPercentComplete({ contract_usd: Number(contract.input.value) || 0, cost_to_date_usd: Number(cost.input.value) || 0, est_total_cost_usd: Number(est.input.value) || 0, billed_to_date_usd: Number(billed.input.value) || 0 });
+    const r = computeWipPercentComplete({ contract_usd: Number(contract.input.value) || 0, cost_to_date_usd: Number(cost.input.value) || 0, est_total_cost_usd: Number(est.input.value) || 0, billed_to_date_usd: Number(billed.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["contract_usd", "cost_to_date_usd", "est_total_cost_usd", "billed_to_date_usd"], r);
     if (r.error) { oPct.textContent = r.error; oEarn.textContent = "-"; oOU.textContent = "-"; oNote.textContent = ""; return; }
     oPct.textContent = fmt(r.pct_complete, 1) + "%" + (r.overrun ? " (cost past estimate -- overrun)" : "");
     oEarn.textContent = "$" + fmt(r.earned_revenue, 0);
@@ -293,7 +294,7 @@ function renderChangeOrderMarkup(inputRegion, outputRegion, citationEl) {
   const oNew = makeOutputLine(outputRegion, "New contract total", "com-out-new");
   const oNote = makeOutputLine(outputRegion, "Note", "com-out-n");
   const update = debounce(() => {
-    const r = computeChangeOrderMarkup({ direct_cost_usd: Number(direct.input.value) || 0, overhead_pct: Number(oh.input.value) || 0, profit_pct: Number(profit.input.value) || 0, current_contract_usd: Number(current.input.value) || 0 });
+    const r = computeChangeOrderMarkup({ direct_cost_usd: Number(direct.input.value) || 0, overhead_pct: Number(oh.input.value) || 0, profit_pct: Number(profit.input.value) || 0, current_contract_usd: Number(current.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["direct_cost_usd", "overhead_pct", "profit_pct", "current_contract_usd"], r);
     if (r.error) { oPrice.textContent = r.error; oMarkup.textContent = "-"; oNew.textContent = "-"; oNote.textContent = ""; return; }
     oPrice.textContent = "$" + fmt(r.price, 0) + " (additive method $" + fmt(r.additive_price, 0) + ")";
     oMarkup.textContent = "$" + fmt(r.markup, 0) + " (" + fmt(r.margin_pct, 1) + "% gross margin)";
@@ -334,7 +335,7 @@ function renderRetainageTracker(inputRegion, outputRegion, citationEl) {
   const oCum = makeOutputLine(outputRegion, "Cumulative retention", "ret-out-cum");
   const oNote = makeOutputLine(outputRegion, "Note", "ret-out-n");
   const update = debounce(() => {
-    const r = computeRetainageTracker({ work_this_period_usd: Number(work.input.value) || 0, retainage_pct: Number(rate.input.value) || 0, prior_retained_usd: Number(prior.input.value) || 0 });
+    const r = computeRetainageTracker({ work_this_period_usd: Number(work.input.value) || 0, retainage_pct: Number(rate.input.value) || 0, prior_retained_usd: Number(prior.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["work_this_period_usd", "retainage_pct", "prior_retained_usd"], r);
     if (r.error) { oRet.textContent = r.error; oNet.textContent = "-"; oCum.textContent = "-"; oNote.textContent = ""; return; }
     oRet.textContent = "$" + fmt(r.retention_this, 0);
     oNet.textContent = "$" + fmt(r.net_payment, 0);
@@ -380,7 +381,7 @@ function renderSuretyBondPremium(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "sbp-out-n");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeSuretyBondPremium({ contract_usd: readNum(c.input), rate1_per_k: readNum(r1.input), rate2_per_k: readNum(r2.input), rate3_per_k: readNum(r3.input) });
+    const r = computeSuretyBondPremium({ contract_usd: readNum(c.input), rate1_per_k: readNum(r1.input), rate2_per_k: readNum(r2.input), rate3_per_k: readNum(r3.input) }); stepsFor(outputRegion, inputRegion, ["contract_usd", "rate1_per_k", "rate2_per_k", "rate3_per_k"], r);
     if (r.error) { oP.textContent = r.error; oR.textContent = "-"; oNote.textContent = ""; return; }
     oP.textContent = "$" + fmt(r.premium_usd, 0);
     oR.textContent = fmt(r.effective_rate * 100, 2) + "% of the contract";
@@ -423,7 +424,7 @@ function renderWorkersCompEmrPremium(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "wce-out-n");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeWorkersCompEmrPremium({ payroll_usd: readNum(p.input), class_rate: readNum(rate.input), emr: readNum(emr.input) });
+    const r = computeWorkersCompEmrPremium({ payroll_usd: readNum(p.input), class_rate: readNum(rate.input), emr: readNum(emr.input) }); stepsFor(outputRegion, inputRegion, ["payroll_usd", "class_rate", "emr"], r);
     if (r.error) { oM.textContent = r.error; oS.textContent = "-"; oNote.textContent = ""; return; }
     oM.textContent = "$" + fmt(r.manual_premium, 0) + " -> $" + fmt(r.modified_premium, 0) + " ($" + fmt(r.cost_per_100, 2) + "/$100)";
     oS.textContent = r.emr_swing === 0 ? "none (EMR 1.0)" : (r.credit ? "$" + fmt(r.emr_swing, 0) + " credit (EMR < 1.0)" : "$" + fmt(-r.emr_swing, 0) + " debit (EMR > 1.0)");
@@ -467,7 +468,7 @@ function renderPrevailingWageFringe(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "pwf-out-n");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computePrevailingWageFringe({ base_wage_hr: readNum(base.input), fringe_hr: readNum(fringe.input), payroll_tax: readNum(tax.input) });
+    const r = computePrevailingWageFringe({ base_wage_hr: readNum(base.input), fringe_hr: readNum(fringe.input), payroll_tax: readNum(tax.input) }); stepsFor(outputRegion, inputRegion, ["base_wage_hr", "fringe_hr", "payroll_tax"], r);
     if (r.error) { oP.textContent = r.error; oC.textContent = "-"; oS.textContent = "-"; oNote.textContent = ""; return; }
     oP.textContent = "$" + fmt(r.package_hr, 2) + "/hr (base + fringe)";
     oC.textContent = "$" + fmt(r.cash_cost_hr, 3) + " cash vs $" + fmt(r.plan_cost_hr, 3) + " plan, per hour";

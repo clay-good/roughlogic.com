@@ -13,6 +13,7 @@
 import {
   DEBOUNCE_MS, debounce, makeNumber, makeTextarea, makeSelect,
   makeOutputLine, attachExampleButton, fmt,
+  stepsFor,
 } from "./ui-fields.js";
 
 // v18 §7 contract guard: reject a non-finite numeric input. A renderer
@@ -115,7 +116,7 @@ function renderGasApplianceDemand(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const parsed = parseAppliances(list.input.value);
     if (parsed === null || parsed.vals.length === 0) { oTotal.textContent = "Each line needs a finite BTU/hr value."; oCfh.textContent = "-"; oList.textContent = "-"; return; }
-    const r = computeGasApplianceDemand({ appliances: parsed.vals, fuel: fuel.select.value, heating_value: hv.input.value === "" ? null : Number(hv.input.value) });
+    const r = computeGasApplianceDemand({ appliances: parsed.vals, fuel: fuel.select.value, heating_value: hv.input.value === "" ? null : Number(hv.input.value) }); stepsFor(outputRegion, inputRegion, ["appliances", "fuel", "heating_value"], r);
     if (r.error) { oTotal.textContent = r.error; oCfh.textContent = "-"; oList.textContent = "-"; return; }
     oTotal.textContent = fmt(r.total_btuh, 0) + " BTU/hr";
     oCfh.textContent = fmt(r.cfh, 1) + " CFH (" + r.fuel + ", " + fmt(r.heating_value, 0) + " BTU/ft^3)";
@@ -182,7 +183,7 @@ function renderTprDischarge(inputRegion, outputRegion, citationEl) {
   const oDisch = makeOutputLine(outputRegion, "Minimum discharge pipe", "tpr-out-disch");
   const oList = makeOutputLine(outputRegion, "IPC 504.6 discharge checklist", "tpr-out-list");
   const update = debounce(() => {
-    const r = computeTprDischarge({ heater_input: Number(input.input.value) || 0, valve_rating: Number(rating.input.value) || 0, outlet_size: Number(outlet.select.value) });
+    const r = computeTprDischarge({ heater_input: Number(input.input.value) || 0, valve_rating: Number(rating.input.value) || 0, outlet_size: Number(outlet.select.value) }); stepsFor(outputRegion, inputRegion, ["heater_input", "valve_rating", "outlet_size"], r);
     if (r.error) { oVerdict.textContent = r.error; oDisch.textContent = "-"; oList.textContent = "-"; return; }
     oVerdict.textContent = r.verdict + " (valve " + fmt(r.valve_rating, 0) + " vs input " + fmt(r.heater_input, 0) + " BTU/hr; margin " + fmt(r.rating_margin_btuh, 0) + ")";
     oDisch.textContent = (TPR_OUTLET_LABEL[r.discharge_in] || fmt(r.discharge_in, 2)) + " in (full outlet, no reduction)";
@@ -265,7 +266,7 @@ function renderPipeSupportSpacing(inputRegion, outputRegion, citationEl) {
   const oSpacing = makeOutputLine(outputRegion, "Maximum support spacing", "pss-out-spacing");
   const oHangers = makeOutputLine(outputRegion, "Hangers for the run", "pss-out-hangers");
   const update = debounce(() => {
-    const r = computePipeSupportSpacing({ material: material.select.value, pipe_size: Number(size.input.value) || 0, run_length: Number(run.input.value) || 0, orientation: orient.select.value });
+    const r = computePipeSupportSpacing({ material: material.select.value, pipe_size: Number(size.input.value) || 0, run_length: Number(run.input.value) || 0, orientation: orient.select.value }); stepsFor(outputRegion, inputRegion, ["material", "pipe_size", "run_length", "orientation"], r);
     if (r.error) { oSpacing.textContent = r.error; oHangers.textContent = "-"; return; }
     oSpacing.textContent = fmt(r.max_spacing_ft, 2) + " ft (" + r.material + ", " + r.orientation + ")";
     oHangers.textContent = r.hangers + " hangers";
@@ -346,7 +347,7 @@ function renderSoftenerSizing(inputRegion, outputRegion, citationEl) {
       iron_ppm: iron.input.value === "" ? 0 : Number(iron.input.value),
       capacity: Number(cap.input.value) || 0,
       salt_per_regen: salt.input.value === "" ? null : Number(salt.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["people", "use_per_cap", "hardness_gpg", "iron_ppm", "capacity", "salt_per_regen"], r);
     if (r.error) { oComp.textContent = r.error; for (const o of [oLoad, oDays, oSalt]) o.textContent = "-"; return; }
     oComp.textContent = fmt(r.comp_hardness, 1) + " gpg (" + fmt(r.daily_gal, 0) + " gal/day)";
     oLoad.textContent = fmt(r.grain_load, 0) + " grains/day";
@@ -435,7 +436,7 @@ function _v167renderRangeDemand(inputRegion, outputRegion, citationEl) {
   const oDemand = makeOutputLine(outputRegion, "Demand load", "rd-out-demand");
   const oNote = makeOutputLine(outputRegion, "Note", "rd-out-note");
   const update = debounce(() => {
-    const r = computeRangeDemand22055({ num_ranges: Number(n.input.value) || 0, nameplate_kw: Number(kw.input.value) || 0, supply_v: Number(v.input.value) || 0 });
+    const r = computeRangeDemand22055({ num_ranges: Number(n.input.value) || 0, nameplate_kw: Number(kw.input.value) || 0, supply_v: Number(v.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["num_ranges", "nameplate_kw", "supply_v"], r);
     if (r.error) { oCol.textContent = r.error; oDemand.textContent = "-"; oNote.textContent = ""; return; }
     oCol.textContent = r.col_c_kw === null ? "n/a (under 8.75 kW: Column " + r.column + ", " + r.column_pct + "% of the summed nameplates)" : fmt(r.col_c_kw, 0) + " kW" + (r.increase_pct > 0 ? " (+" + fmt(r.increase_pct, 0) + "% over-12 kW adder)" : "");
     oDemand.textContent = fmt(r.demand_kw, 2) + " kW = " + fmt(r.demand_a, 1) + " A";
@@ -501,7 +502,7 @@ function _v168renderDryerDemand(inputRegion, outputRegion, citationEl) {
   const oDemand = makeOutputLine(outputRegion, "Demand load", "dd-out-demand");
   const oNote = makeOutputLine(outputRegion, "Note", "dd-out-note");
   const update = debounce(() => {
-    const r = computeDryerDemand22054({ num_dryers: Number(n.input.value) || 0, nameplate_w: Number(w.input.value) || 0, supply_v: Number(v.input.value) || 0 });
+    const r = computeDryerDemand22054({ num_dryers: Number(n.input.value) || 0, nameplate_w: Number(w.input.value) || 0, supply_v: Number(v.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["num_dryers", "nameplate_w", "supply_v"], r);
     if (r.error) { oPer.textContent = r.error; oFactor.textContent = "-"; oDemand.textContent = "-"; oNote.textContent = ""; return; }
     oPer.textContent = fmt(r.per_dryer_w, 0) + " W x " + Math.round(r.connected_w / r.per_dryer_w) + " = " + fmt(r.connected_w, 0) + " W connected";
     oFactor.textContent = fmt(r.demand_factor * 100, 1) + "%";
@@ -555,7 +556,7 @@ function _v169renderNeutralDemand(inputRegion, outputRegion, citationEl) {
   const oDemand = makeOutputLine(outputRegion, "Neutral demand (A)", "nd-out-demand");
   const oNote = makeOutputLine(outputRegion, "Note", "nd-out-note");
   const update = debounce(() => {
-    const r = computeNeutralDemand22061({ max_unbalanced_a: Number(load.input.value) || 0, nonlinear_excluded: Number(excl.select.value) });
+    const r = computeNeutralDemand22061({ max_unbalanced_a: Number(load.input.value) || 0, nonlinear_excluded: Number(excl.select.value) }); stepsFor(outputRegion, inputRegion, ["max_unbalanced_a", "nonlinear_excluded"], r);
     if (r.error) { oFirst.textContent = r.error; oDemand.textContent = "-"; oNote.textContent = ""; return; }
     oFirst.textContent = r.nonlinear_excluded ? "(no reduction - full load)" : fmt(r.first_200_a, 0) + " A at 100% + " + fmt(r.excess_a, 0) + " A at 70%";
     oDemand.textContent = fmt(r.neutral_demand_a, 1) + " A";
@@ -630,7 +631,7 @@ function _v180renderCommercialLightingLoad(inputRegion, outputRegion, citationEl
       floor_area_ft2: Number(area.input.value) || 0, unit_load_va_ft2: Number(unit.input.value) || 0,
       receptacle_count: Number(count.input.value) || 0, supply_v: Number(volt.input.value) || 0,
       phases: Number(phase.select.value) || 3,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["floor_area_ft2", "unit_load_va_ft2", "receptacle_count", "supply_v", "phases"], r);
     if (r.error) { oLight.textContent = r.error; oRecep.textContent = "-"; oDemand.textContent = "-"; oTotal.textContent = "-"; oAmps.textContent = "-"; oNote.textContent = ""; return; }
     oLight.textContent = fmt(r.lighting_va, 0) + " VA";
     oRecep.textContent = fmt(r.recep_va, 0) + " VA";
@@ -685,7 +686,7 @@ function _v181renderNoncoincidentLoad(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "ncl-out-note");
 
   const update = debounce(() => {
-    const r = computeNoncoincidentLoad({ load_a_va: Number(a.input.value) || 0, load_b_va: Number(b.input.value) || 0, both_can_run: Number(both.select.value) || 0 });
+    const r = computeNoncoincidentLoad({ load_a_va: Number(a.input.value) || 0, load_b_va: Number(b.input.value) || 0, both_can_run: Number(both.select.value) || 0 }); stepsFor(outputRegion, inputRegion, ["load_a_va", "load_b_va", "both_can_run"], r);
     if (r.error) { oCounted.textContent = r.error; oOmitted.textContent = "-"; oNote.textContent = ""; return; }
     oCounted.textContent = fmt(r.counted_va, 0) + " VA";
     oOmitted.textContent = fmt(r.omitted_va, 0) + " VA";
@@ -744,7 +745,7 @@ function renderVfdEnergySavings(inputRegion, outputRegion, citationEl) {
   const oUsd = makeOutputLine(outputRegion, "Dollars saved", "vfd-out-usd");
   const oNote = makeOutputLine(outputRegion, "Note", "vfd-out-note");
   const update = debounce(() => {
-    const r = computeVfdEnergySavings({ full_load_kw: Number(kw.input.value) || 0, frac_a: fa.input.value === "" ? 1 : Number(fa.input.value), hours_a: Number(ha.input.value) || 0, frac_b: fb.input.value === "" ? 0.75 : Number(fb.input.value), hours_b: Number(hb.input.value) || 0, frac_c: fc.input.value === "" ? 0.5 : Number(fc.input.value), hours_c: Number(hc.input.value) || 0, rate_kwh: Number(rate.input.value) || 0 });
+    const r = computeVfdEnergySavings({ full_load_kw: Number(kw.input.value) || 0, frac_a: fa.input.value === "" ? 1 : Number(fa.input.value), hours_a: Number(ha.input.value) || 0, frac_b: fb.input.value === "" ? 0.75 : Number(fb.input.value), hours_b: Number(hb.input.value) || 0, frac_c: fc.input.value === "" ? 0.5 : Number(fc.input.value), hours_c: Number(hc.input.value) || 0, rate_kwh: Number(rate.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["full_load_kw", "frac_a", "hours_a", "frac_b", "hours_b", "frac_c", "hours_c", "rate_kwh"], r);
     if (r.error) { oFull.textContent = r.error; oVfd.textContent = "-"; oSaved.textContent = "-"; oUsd.textContent = "-"; oNote.textContent = ""; return; }
     oFull.textContent = fmt(r.full_kwh, 0) + " kWh/yr";
     oVfd.textContent = fmt(r.vfd_kwh, 0) + " kWh/yr";
@@ -801,7 +802,7 @@ function renderLightingRetrofitSavings(inputRegion, outputRegion, citationEl) {
   const oPayback = makeOutputLine(outputRegion, "Simple payback", "lrs-out-payback");
   const oNote = makeOutputLine(outputRegion, "Note", "lrs-out-note");
   const update = debounce(() => {
-    const r = computeLightingRetrofitSavings({ fixtures: Number(fixtures.input.value) || 0, watts_existing: Number(we.input.value) || 0, watts_new: Number(wn.input.value) || 0, annual_hours: Number(hours.input.value) || 0, rate_kwh: Number(rate.input.value) || 0, demand_per_kw_mo: Number(demand.input.value) || 0, install_cost: Number(cost.input.value) || 0 });
+    const r = computeLightingRetrofitSavings({ fixtures: Number(fixtures.input.value) || 0, watts_existing: Number(we.input.value) || 0, watts_new: Number(wn.input.value) || 0, annual_hours: Number(hours.input.value) || 0, rate_kwh: Number(rate.input.value) || 0, demand_per_kw_mo: Number(demand.input.value) || 0, install_cost: Number(cost.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["fixtures", "watts_existing", "watts_new", "annual_hours", "rate_kwh", "demand_per_kw_mo", "install_cost"], r);
     if (r.error) { oKw.textContent = r.error; for (const o of [oKwh, oEnergy, oDemand, oAnnual, oPayback]) o.textContent = "-"; oNote.textContent = ""; return; }
     oKw.textContent = fmt(r.kw_saved, 2) + " kW";
     oKwh.textContent = fmt(r.kwh_saved, 0) + " kWh/yr";
@@ -856,7 +857,7 @@ function renderPowerFactorBillingSavings(inputRegion, outputRegion, citationEl) 
   const oPayback = makeOutputLine(outputRegion, "Simple payback", "pfb-out-payback");
   const oNote = makeOutputLine(outputRegion, "Note", "pfb-out-note");
   const update = debounce(() => {
-    const r = computePowerFactorBillingSavings({ real_power_kw: Number(kw.input.value) || 0, pf_existing: Number(pfe.input.value) || 0, pf_target: Number(pft.input.value) || 0, demand_per_kva_mo: Number(demand.input.value) || 0, capacitor_cost: Number(cost.input.value) || 0 });
+    const r = computePowerFactorBillingSavings({ real_power_kw: Number(kw.input.value) || 0, pf_existing: Number(pfe.input.value) || 0, pf_target: Number(pft.input.value) || 0, demand_per_kva_mo: Number(demand.input.value) || 0, capacitor_cost: Number(cost.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["real_power_kw", "pf_existing", "pf_target", "demand_per_kva_mo", "capacitor_cost"], r);
     if (r.error) { oBefore.textContent = r.error; for (const o of [oAfter, oRed, oKvar, oAnnual, oPayback]) o.textContent = "-"; oNote.textContent = ""; return; }
     oBefore.textContent = fmt(r.kva_existing, 1) + " kVA";
     oAfter.textContent = fmt(r.kva_target, 1) + " kVA";
@@ -924,7 +925,7 @@ function renderServiceConductorSizing(inputRegion, outputRegion, citationEl) {
   const oSize = makeOutputLine(outputRegion, "Service-entrance conductor", "scs-out-size");
   const oNote = makeOutputLine(outputRegion, "Note", "scs-out-note");
   const update = debounce(() => {
-    const r = computeServiceConductorSizing({ service_A: Number(svc.input.value) || 0, material: mat.select.value });
+    const r = computeServiceConductorSizing({ service_A: Number(svc.input.value) || 0, material: mat.select.value }); stepsFor(outputRegion, inputRegion, ["service_A", "material"], r);
     if (r.error) { oReq.textContent = r.error; oSize.textContent = "-"; oNote.textContent = "-"; return; }
     oReq.textContent = fmt(r.A_req, 1) + " A";
     oSize.textContent = r.size + " (" + fmt(r.size_ampacity_A, 0) + " A at 75 degC)";
@@ -975,7 +976,7 @@ function _v957renderInsulationResistancePi(inputRegion, outputRegion, citationEl
       // A CLEARED field is a missing reading, not the worked example's (which built a PI on a phantom 4,160 Mohm).
       ir_30s_mohm: t30.input.value === "" ? NaN : Number(t30.input.value), ir_1min_mohm: t60.input.value === "" ? NaN : Number(t60.input.value),
       ir_10min_mohm: t600.input.value === "" ? NaN : Number(t600.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["ir_1min_mohm", "ir_10min_mohm"], r);
     if (r.error) { oPi.textContent = r.error; oDar.textContent = "-"; return; }
     oPi.textContent = fmt(r.polarization_index, 2) + " -- " + r.pi_verdict;
     oDar.textContent = fmt(r.dar, 2) + " -- " + r.dar_verdict;

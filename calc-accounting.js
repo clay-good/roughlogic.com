@@ -11,6 +11,7 @@
 import {
   DEBOUNCE_MS, debounce, makeNumber, makeSelect, makeTextarea, makeCheckbox,
   makeOutputLine, attachExampleButton, fmt,
+  stepsFor,
 } from "./ui-fields.js";
 import { attachCsvExport, attachGlossaryTooltip } from "./v5-platform.js";
 
@@ -796,7 +797,7 @@ function renderStraightLine(inputRegion, outputRegion, citationEl) {
     const r = computeStraightLine({
       cost: Number(cost.input.value), salvage: Number(salvage.input.value),
       life_years: Number(life.input.value), year_of_interest: Number(yoi.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["cost", "salvage", "life_years", "year_of_interest"], r);
     if (r.error) { annual.textContent = r.error; accum.textContent = ""; book.textContent = ""; return; }
     annual.textContent = "$" + fmt(r.annual_depreciation, 2);
     accum.textContent = "$" + fmt(r.accumulated_depreciation, 2);
@@ -836,7 +837,7 @@ function renderMacrs(inputRegion, outputRegion, citationEl) {
     const r = computeMacrs({
       cost: Number(cost.input.value), class_life: Number(cls.select.value),
       convention: "half_year", year_of_interest: Number(yoi.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["cost", "class_life", "convention", "year_of_interest"], r);
     while (tableWrap.firstChild) tableWrap.removeChild(tableWrap.firstChild);
     if (r.error) { yearOut.textContent = r.error; accumOut.textContent = ""; bookOut.textContent = ""; return; }
     yearOut.textContent = "$" + fmt(r.year_depreciation, 2);
@@ -885,7 +886,7 @@ function renderSection179(inputRegion, outputRegion, citationEl) {
     const r = computeSection179({
       cost: Number(cost.input.value), business_use_pct: Number(buPct.input.value),
       taxable_income: Number(ti.input.value), tax_year: Number(yr.select.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["cost", "business_use_pct", "taxable_income", "tax_year"], r);
     if (r.error) { s179Out.textContent = r.error; bonusOut.textContent = ""; remOut.textContent = ""; return; }
     s179Out.textContent = "$" + fmt(r.section_179_deduction, 2);
     bonusOut.textContent = "$" + fmt(r.bonus_depreciation, 2) + " (" + r.bonus_pct + "%)" + (r.bonus_note ? " -- " + r.bonus_note : "");
@@ -921,7 +922,7 @@ function renderSeTax(inputRegion, outputRegion, citationEl) {
       net_se_earnings: Number(ne.input.value), w2_ss_wages: Number(w2.input.value),
       w2_medicare_wages: w2m.input.value === "" ? null : Number(w2m.input.value),
       tax_year: Number(yr.select.value), filing_status: fs.select.value,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["net_se_earnings", "w2_ss_wages", "w2_medicare_wages", "tax_year", "filing_status"], r);
     if (r.error) { seTot.textContent = r.error; ssOut.textContent = medOut.textContent = addlOut.textContent = dedOut.textContent = ""; return; }
     if (r.message) { seTot.textContent = r.message; return; }
     seTot.textContent = "$" + fmt(r.se_tax, 2);
@@ -958,7 +959,7 @@ function renderEstimatedTax(inputRegion, outputRegion, citationEl) {
       projected_current_tax: Number(proj.input.value), prior_year_tax: Number(prior.input.value),
       current_withholding: Number(wh.input.value), prior_year_multiplier: Number(mult.select.value),
       tax_year: Number(yr.select.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["projected_current_tax", "prior_year_tax", "current_withholding", "prior_year_multiplier", "tax_year"], r);
     if (r.error) { reqOut.textContent = r.error; pqOut.textContent = ddOut.textContent = ""; return; }
     reqOut.textContent = "$" + fmt(r.required_annual_payment, 2);
     pqOut.textContent = "$" + fmt(r.per_quarter, 2);
@@ -996,7 +997,7 @@ function renderPayroll(inputRegion, outputRegion, citationEl) {
     const r = computePayrollWithholding({
       gross_per_period: Number(gross.input.value), pay_frequency: freq.select.value,
       filing_status: fs.select.value, ytd_ss_wages: Number(ytdSs.input.value), tax_year: Number(yr.select.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["gross_per_period", "pay_frequency", "filing_status", "ytd_ss_wages", "tax_year"], r);
     if (r.error) { fedOut.textContent = r.error; ssOut.textContent = medOut.textContent = totOut.textContent = ""; return; }
     fedOut.textContent = "$" + fmt(r.fed_income_tax_period, 2);
     ssOut.textContent = "$" + fmt(r.ss_tax_period, 2);
@@ -1027,7 +1028,7 @@ function renderAmortization(inputRegion, outputRegion, citationEl) {
     const r = computeAmortization({
       principal: Number(principal.input.value), annual_rate_pct: Number(rate.input.value),
       term_months: Number(term.input.value), extra_principal: Number(extra.input.value || 0),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["principal", "annual_rate_pct", "term_months", "extra_principal"], r);
     while (tableWrap.firstChild) tableWrap.removeChild(tableWrap.firstChild);
     if (r.error) { pmt.textContent = r.error; ti.textContent = po.textContent = ""; return; }
     pmt.textContent = "$" + fmt(r.payment, 2);
@@ -1077,7 +1078,7 @@ function renderBreakeven(inputRegion, outputRegion, citationEl) {
     const r = computeBreakeven({
       fixed_costs: Number(fc.input.value), variable_cost_per_unit: Number(vc.input.value),
       sale_price_per_unit: Number(sp.input.value), target_units: Number(tu.input.value || 0),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["fixed_costs", "variable_cost_per_unit", "sale_price_per_unit", "target_units"], r);
     if (r.error) { beU.textContent = r.error; beR.textContent = cm.textContent = cmr.textContent = mos.textContent = ""; return; }
     beU.textContent = fmt(r.breakeven_units, 2);
     beR.textContent = "$" + fmt(r.breakeven_revenue, 2);
@@ -1104,7 +1105,7 @@ function renderSalesTaxCompound(inputRegion, outputRegion, citationEl) {
     const r = computeSalesTaxCompound({
       pre_tax: Number(pre.input.value || 0), post_tax: Number(post.input.value || 0),
       rate1_pct: Number(r1.input.value || 0), rate2_pct: Number(r2.input.value || 0),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["pre_tax", "post_tax", "rate1_pct", "rate2_pct"], r);
     if (r.error) { taxOut.textContent = r.error; totOut.textContent = ""; return; }
     taxOut.textContent = "$" + fmt(r.tax, 2);
     totOut.textContent = "$" + fmt(r.pre_tax, 2) + " / $" + fmt(r.post_tax, 2);
@@ -1133,7 +1134,7 @@ function renderInventoryTurnover(inputRegion, outputRegion, citationEl) {
       cogs: Number(cogs.input.value), beginning_inventory: Number(bi.input.value),
       ending_inventory: Number(ei.input.value), period_days: Number(days.input.value),
       industry_key: ind.select.value || null,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["cogs", "beginning_inventory", "ending_inventory", "period_days", "industry_key"], r);
     if (r.error) { tn.textContent = r.error; dsi.textContent = cmp.textContent = ""; return; }
     tn.textContent = fmt(r.turnover, 2) + "x";
     dsi.textContent = r.days_sales_of_inventory === null ? "n/a (no COGS in period)" : fmt(r.days_sales_of_inventory, 1) + " days";
@@ -1162,7 +1163,7 @@ function renderCcc(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const r = computeCashConversionCycle({
       dso: Number(dso.input.value), dio: Number(dio.input.value), dpo: Number(dpo.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["dso", "dio", "dpo"], r);
     if (r.error) { out.textContent = r.error; breakdown.textContent = ""; return; }
     out.textContent = fmt(r.ccc_days, 1) + " days";
     breakdown.textContent = "DIO " + fmt(r.dio, 1) + " + DSO " + fmt(r.dso, 1) + " - DPO " + fmt(r.dpo, 1);
@@ -1195,7 +1196,7 @@ function renderMileageRollup(inputRegion, outputRegion, citationEl) {
       const parts = line.split(",").map((s) => s.trim());
       return { date: parts[0] || "", business_miles: Number(parts[1]) || 0, purpose: parts[2] || "" };
     }).filter((t) => t.business_miles > 0);
-    const r = computeMileageRollup({ trips, tax_year: Number(yr.select.value) });
+    const r = computeMileageRollup({ trips, tax_year: Number(yr.select.value) }); stepsFor(outputRegion, inputRegion, ["trips", "tax_year"], r);
     while (tableWrap.firstChild) tableWrap.removeChild(tableWrap.firstChild);
     if (r.error) { milesOut.textContent = r.error; dedOut.textContent = rateOut.textContent = ""; return; }
     milesOut.textContent = fmt(r.business_miles, 1);
@@ -1257,7 +1258,7 @@ function renderHomeOffice(inputRegion, outputRegion, citationEl) {
       office_ft2: readNum(office.input),
       home_ft2: readNum(home.input),
       total_home_expenses: readNum(expenses.input),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["office_ft2", "home_ft2", "total_home_expenses"], r);
     if (r.error) { oSimplified.textContent = r.error; oActual.textContent = "-"; oRec.textContent = "-"; oNote.textContent = ""; return; }
     oSimplified.textContent = "$" + fmt(r.simplified_deduction, 0) + " (" + fmt(Math.min(r.office_ft2, 300), 0) + " ft^2 x $5)";
     oActual.textContent = "$" + fmt(r.actual_deduction, 0) + " (" + fmt(r.office_use_pct, 1) + "% of $" + fmt(r.total_home_expenses, 0) + ")";
@@ -1346,7 +1347,7 @@ function renderDecliningBalanceDepreciation(inputRegion, outputRegion, citationE
   const oNote = makeOutputLine(outputRegion, "Note", "dbd-out-note");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeDecliningBalanceDepreciation({ cost: readNum(cost.input), salvage: readNum(salvage.input), life_yr: readNum(life.input), factor: Number(factor.select.value), year: readNum(year.input), sl_switch: sw.input.checked });
+    const r = computeDecliningBalanceDepreciation({ cost: readNum(cost.input), salvage: readNum(salvage.input), life_yr: readNum(life.input), factor: Number(factor.select.value), year: readNum(year.input), sl_switch: sw.input.checked }); stepsFor(outputRegion, inputRegion, ["cost", "salvage", "life_yr", "factor", "year", "sl_switch"], r);
     if (r.error) { oDep.textContent = r.error; oBook.textContent = ""; oNote.textContent = ""; return; }
     oDep.textContent = "$" + fmt(r.year_depreciation, 2);
     oBook.textContent = "$" + fmt(r.accumulated_depreciation, 2) + " accumulated, $" + fmt(r.book_value, 2) + " book";
@@ -1406,7 +1407,7 @@ function renderSumOfYearsDigitsDepreciation(inputRegion, outputRegion, citationE
   const oNote = makeOutputLine(outputRegion, "Note", "syd-out-note");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeSumOfYearsDigitsDepreciation({ cost: readNum(cost.input), salvage: readNum(salvage.input), life_yr: readNum(life.input), year: readNum(year.input) });
+    const r = computeSumOfYearsDigitsDepreciation({ cost: readNum(cost.input), salvage: readNum(salvage.input), life_yr: readNum(life.input), year: readNum(year.input) }); stepsFor(outputRegion, inputRegion, ["cost", "salvage", "life_yr", "year"], r);
     if (r.error) { oDep.textContent = r.error; oBook.textContent = ""; oNote.textContent = ""; return; }
     oDep.textContent = "$" + fmt(r.year_depreciation, 2);
     oBook.textContent = "$" + fmt(r.accumulated_depreciation, 2) + " accumulated, $" + fmt(r.book_value, 2) + " book";
@@ -1465,7 +1466,7 @@ function renderFutureValueOfAnnuity(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "fva-out-note");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeFutureValueOfAnnuity({ payment: readNum(pmt.input), rate_pct: readNum(rate.input), periods: readNum(periods.input), timing: timing.select.value });
+    const r = computeFutureValueOfAnnuity({ payment: readNum(pmt.input), rate_pct: readNum(rate.input), periods: readNum(periods.input), timing: timing.select.value }); stepsFor(outputRegion, inputRegion, ["payment", "rate_pct", "periods", "timing"], r);
     if (r.error) { oFv.textContent = r.error; oPv.textContent = ""; oInt.textContent = ""; oNote.textContent = ""; return; }
     oFv.textContent = "$" + fmt(r.future_value, 2);
     oPv.textContent = "$" + fmt(r.present_value, 2);
@@ -1516,7 +1517,7 @@ function renderEffectiveAnnualRate(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "ear-out-note");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeEffectiveAnnualRate({ apr_pct: readNum(apr.input), compounding: comp.select.value });
+    const r = computeEffectiveAnnualRate({ apr_pct: readNum(apr.input), compounding: comp.select.value }); stepsFor(outputRegion, inputRegion, ["apr_pct", "compounding"], r);
     if (r.error) { oEar.textContent = r.error; oPer.textContent = ""; oNote.textContent = ""; return; }
     oEar.textContent = fmt(r.ear_pct, 4) + "%";
     oPer.textContent = r.continuous ? "continuous (no discrete period)" : fmt(r.periodic_rate_pct, 4) + "% per period (" + r.periods_per_year + "/yr)";
@@ -1576,7 +1577,7 @@ function renderMarkupVsMargin(inputRegion, outputRegion, citationEl) {
   const oProfit = makeOutputLine(outputRegion, "Gross profit", "mvm-out-profit");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeMarkupVsMargin({ cost: readNum(cost.input), price: readNum(price.input), markup_pct: readNum(markup.input), margin_pct: readNum(margin.input), units: readNum(units.input) });
+    const r = computeMarkupVsMargin({ cost: readNum(cost.input), price: readNum(price.input), markup_pct: readNum(markup.input), margin_pct: readNum(margin.input), units: readNum(units.input) }); stepsFor(outputRegion, inputRegion, ["cost", "price", "markup_pct", "margin_pct", "units"], r);
     if (r.error) { oPrice.textContent = r.error; oPct.textContent = ""; oProfit.textContent = ""; return; }
     oPrice.textContent = r.price != null ? "$" + fmt(r.price, 2) + " price, $" + fmt(r.cost, 2) + " cost" : "";
     oPct.textContent = fmt(r.markup_pct, 1) + "% markup, " + fmt(r.margin_pct, 1) + "% margin";
@@ -1634,7 +1635,7 @@ function renderEmployerPayrollTax(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "ept-out-note");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeEmployerPayrollTax({ wages: readNum(wages.input), ss_base: readNum(ssBase.input), futa_rate_pct: readNum(futaRate.input), suta_rate_pct: readNum(sutaRate.input), suta_base: readNum(sutaBase.input) });
+    const r = computeEmployerPayrollTax({ wages: readNum(wages.input), ss_base: readNum(ssBase.input), futa_rate_pct: readNum(futaRate.input), suta_rate_pct: readNum(sutaRate.input), suta_base: readNum(sutaBase.input) }); stepsFor(outputRegion, inputRegion, ["wages", "ss_base", "futa_rate_pct", "suta_rate_pct", "suta_base"], r);
     if (r.error) { oTotal.textContent = r.error; oBreak.textContent = ""; oNote.textContent = ""; return; }
     oTotal.textContent = "$" + fmt(r.total_employer_tax, 2) + " (loaded cost $" + fmt(r.loaded_cost, 0) + ")";
     oBreak.textContent = "$" + fmt(r.employer_ss, 0) + " / $" + fmt(r.employer_medicare, 0) + " / $" + fmt(r.futa, 0) + " / $" + fmt(r.suta, 0);

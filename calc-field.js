@@ -5,6 +5,7 @@ import { verifyShard } from "./integrity.js";
 import {
   DEBOUNCE_MS, debounce, makeNumber, makeSelect, makeText, makeTextarea,
   makeOutputLine, attachExampleButton, fmt,
+  stepsFor,
 } from "./ui-fields.js";
 import { renderLimitationBanner, getLimitationCopy } from "./limitation-banner.js";
 
@@ -575,7 +576,7 @@ function renderUTM(inputRegion, outputRegion, citationEl) {
       hemisphere: hemi.select.value,
       easting: Number(east.input.value) || 0,
       northing: Number(north.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["direction", "lat_deg", "lon_deg", "zone", "hemisphere", "easting", "northing"], r);
     if (r.error) { oA.textContent = r.error; oB.textContent = "-"; return; }
     if (dir.select.value === "latlon_to_utm") {
       oA.textContent = "Zone " + r.zone + r.hemisphere;
@@ -852,7 +853,7 @@ function renderLightning(inputRegion, outputRegion, citationEl) {
 
   const update = debounce(() => {
     const v = Number(sec.input.value) || 0;
-    const r = computeLightningCountdown({ flash_to_bang_s: v });
+    const r = computeLightningCountdown({ flash_to_bang_s: v }); stepsFor(outputRegion, inputRegion, ["flash_to_bang_s"], r);
     if (r.error) {
       outs.mi.textContent = r.error;
       outs.km.textContent = outs.ss.textContent = outs.b.textContent = "-";
@@ -1205,7 +1206,7 @@ function renderSearchProbability(inputRegion, outputRegion, citationEl) {
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
     const list = String(pods.input.value).split(/[,;\s]+/).map((s) => s.trim()).filter(Boolean).map(Number).slice(0, 5);
-    const r = computeSearchProbability({ pod_list: list, poa_pct: poa.input.value === "" ? 100 : readNum(poa.input) });
+    const r = computeSearchProbability({ pod_list: list, poa_pct: poa.input.value === "" ? 100 : readNum(poa.input) }); stepsFor(outputRegion, inputRegion, ["pod_list", "poa_pct"], r);
     if (r.error) { oCum.textContent = r.error; oPos.textContent = ""; oNote.textContent = ""; return; }
     oCum.textContent = fmt(r.cumulative_pod_pct, 1) + "% over " + r.passes + " pass(es)";
     oPos.textContent = fmt(r.pos_pct, 1) + "% (residual containment " + fmt(r.residual_pct, 1) + "%)";
@@ -1280,7 +1281,7 @@ function renderHikingTime(inputRegion, outputRegion, citationEl) {
   const oBreak = makeOutputLine(outputRegion, "Breakdown", "ht-out-break");
   const oNote = makeOutputLine(outputRegion, "Notes", "ht-out-note");
   const update = debounce(() => {
-    const r = computeHikingTime({ distance: Number(dist.input.value) || 0, distance_unit: dunit.select.value, ascent: Number(asc.input.value) || 0, ascent_unit: aunit.select.value, speed: Number(spd.input.value) || 0, factor: Number(fac.input.value) || 0 });
+    const r = computeHikingTime({ distance: Number(dist.input.value) || 0, distance_unit: dunit.select.value, ascent: Number(asc.input.value) || 0, ascent_unit: aunit.select.value, speed: Number(spd.input.value) || 0, factor: Number(fac.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["distance", "distance_unit", "ascent", "ascent_unit", "speed", "factor"], r);
     if (r.error) { oTotal.textContent = r.error; oBreak.textContent = "-"; oNote.textContent = ""; return; }
     oTotal.textContent = r.total_h + " h " + r.total_min + " min (" + fmt(r.total_hours, 2) + " hr)";
     oBreak.textContent = "flat " + fmt(r.base_hours, 2) + " hr + ascent " + fmt(r.ascent_hours, 2) + " hr" + (r.factor !== 1 ? " x " + fmt(r.factor, 2) + " factor" : "") + (r.defaulted_speed ? " (default pace " + (dunit.select.value === "mi" ? fmt(r.speed_kmh / 1.609344, 1) + " mph" : fmt(r.speed_kmh, 1) + " km/h") + ")" : "");

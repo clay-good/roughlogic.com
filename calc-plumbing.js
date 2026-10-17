@@ -410,6 +410,7 @@ export const backflowExample = { inputs: {} };
 import {
   DEBOUNCE_MS, debounce, makeNumber, makeText, makeSelect, makeCheckbox,
   makeOutputLine, attachExampleButton, fmt,
+  stepsFor,
 } from "./ui-fields.js";
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
@@ -443,7 +444,7 @@ export function renderPipeSizing(inputRegion, outputRegion, citationEl) {
   const oDr = makeOutputLine(outputRegion, "Recommended drainage size", "ps-out-dr");
   const update = debounce(() => {
     const fx = rows.map((r) => ({ fixture: r.key, count: Number(r.input.value) || 0 })).filter((f) => f.count > 0);
-    const r = computePipeSizing({ fixtures: fx, slope_in_per_ft: Number(slope.select.value) });
+    const r = computePipeSizing({ fixtures: fx, slope_in_per_ft: Number(slope.select.value) }); stepsFor(outputRegion, inputRegion, ["fixtures", "slope_in_per_ft"], r);
     if (r.error) { oWSFU.textContent = r.error; return; }
     oWSFU.textContent = fmt(r.total_wsfu, 1);
     oGPM.textContent = fmt(r.estimated_demand_gpm, 1) + " gpm";
@@ -483,7 +484,7 @@ export function renderFrictionLoss(inputRegion, outputRegion, citationEl) {
       nominal_size: size.select.value,
       length_ft: Number(length.input.value) || 0,
       flow_gpm: Number(flow.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["method", "material", "nominal_size", "length_ft", "flow_gpm"], r);
     if (r.error) { oH.textContent = r.error; oP.textContent = "-"; oVel.textContent = "-"; oVelFlag.textContent = "-"; return; }
     oH.textContent = fmt(r.headLoss_ft, 2) + " ft of head";
     oP.textContent = fmt(r.pressureLoss_psi, 2) + " psi";
@@ -503,7 +504,7 @@ export function renderPipeVolume(inputRegion, outputRegion, citationEl) {
   const oG = makeOutputLine(outputRegion, "Volume", "pv-out-g");
   const oPF = makeOutputLine(outputRegion, "Per foot", "pv-out-pf");
   const update = debounce(() => {
-    const r = computePipeVolume({ nominal_size: size.select.value, length_ft: Number(length.input.value) || 0 });
+    const r = computePipeVolume({ nominal_size: size.select.value, length_ft: Number(length.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["nominal_size", "length_ft"], r);
     if (r.error) { oG.textContent = r.error; return; }
     oG.textContent = fmt(r.gallons, 2) + " gal (" + fmt(r.cubic_feet, 3) + " ft^3)";
     oPF.textContent = fmt(r.gallons_per_ft, 4) + " gal/ft";
@@ -523,7 +524,7 @@ export function renderPumpSizing(inputRegion, outputRegion, citationEl) {
   const oH = makeOutputLine(outputRegion, "Hydraulic hp", "pm-out-h");
   const oS = makeOutputLine(outputRegion, "Shaft hp", "pm-out-s");
   const update = debounce(() => {
-    const r = computePumpSize({ flow_gpm: Number(flow.input.value) || 0, total_dynamic_head_ft: Number(tdh.input.value) || 0, efficiency: Number(eff.input.value) || 0.65 });
+    const r = computePumpSize({ flow_gpm: Number(flow.input.value) || 0, total_dynamic_head_ft: Number(tdh.input.value) || 0, efficiency: Number(eff.input.value) || 0.65 }); stepsFor(outputRegion, inputRegion, ["flow_gpm", "total_dynamic_head_ft", "efficiency"], r);
     oH.textContent = fmt(r.hydraulic_hp, 2);
     oS.textContent = r.shaft_hp === null ? "-" : fmt(r.shaft_hp, 2);
   }, DEBOUNCE_MS);
@@ -541,7 +542,7 @@ export function renderStaticPressurePiping(inputRegion, outputRegion, citationEl
   const oE = makeOutputLine(outputRegion, "Elevation loss", "sp-out-e");
   const oT = makeOutputLine(outputRegion, "Total", "sp-out-t");
   const update = debounce(() => {
-    const r = computeStaticPressureLossPiping({ elevation_change_ft: Number(elev.input.value) || 0, friction_loss_psi: Number(fric.input.value) || 0 });
+    const r = computeStaticPressureLossPiping({ elevation_change_ft: Number(elev.input.value) || 0, friction_loss_psi: Number(fric.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["elevation_change_ft", "friction_loss_psi"], r);
     oE.textContent = fmt(r.elevation_loss_psi, 2) + " psi";
     oT.textContent = fmt(r.total_psi, 2) + " psi";
   }, DEBOUNCE_MS);
@@ -561,7 +562,7 @@ export function renderSlope(inputRegion, outputRegion, citationEl) {
   const oP = makeOutputLine(outputRegion, "Percent", "sl-out-p");
   const oD = makeOutputLine(outputRegion, "Degrees", "sl-out-d");
   const update = debounce(() => {
-    const r = computeSlope({ rise: Number(rise.input.value) || 0, run: Number(run.input.value) || 0, units: "rise_run" });
+    const r = computeSlope({ rise: Number(rise.input.value) || 0, run: Number(run.input.value) || 0, units: "rise_run" }); stepsFor(outputRegion, inputRegion, ["rise", "run", "units"], r);
     if (r.error) { oI.textContent = r.error; oP.textContent = "-"; oD.textContent = "-"; return; }
     oI.textContent = fmt(r.in_per_ft, 3); oP.textContent = fmt(r.percent, 2) + " %"; oD.textContent = fmt(r.degrees, 2);
   }, DEBOUNCE_MS);
@@ -863,7 +864,7 @@ export function renderWaterHammerArrestor(inputRegion, outputRegion, citationEl)
       length_ft: Number(length.input.value) || 0,
       internal_diameter_in: Number(dia.input.value) || 0,
       system_pressure_psi: Number(sp.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["wsfu", "length_ft", "internal_diameter_in", "system_pressure_psi"], r);
     if (r.error) { oD.textContent = r.error; oF.textContent = "-"; oPC.textContent = "-"; oPN.textContent = "-"; return; }
     oD.textContent = r.designation;
     oF.textContent = r.long_branch_flag ? "Branch length over 20 ft; consider an arrestor at each fixture group." : "Standard branch length.";
@@ -900,7 +901,7 @@ export function renderRecircPumpHead(inputRegion, outputRegion, citationEl) {
       target_flow_gpm: Number(flow.input.value) || 0,
       internal_diameter_in: Number(dia.input.value) || 0,
       material: mat.select.value,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["pipe_length_ft", "fittings_count", "equivalent_length_per_fitting_ft", "target_flow_gpm", "internal_diameter_in", "material"], r);
     if (r.error) { oH.textContent = r.error; oP.textContent = "-"; oE.textContent = "-"; return; }
     oH.textContent = fmt(r.head_ft, 3) + " ft";
     oP.textContent = fmt(r.pressure_psi, 3) + " psi";
@@ -924,7 +925,7 @@ export function renderTrapArm(inputRegion, outputRegion, citationEl) {
     const r = computeTrapArm({
       pipe_diameter_in: dia.select.value,
       slope_in_per_ft: Number(slope.input.value) || 0.25,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["pipe_diameter_in", "slope_in_per_ft"], r);
     if (r.error) { oM.textContent = r.error; oT.textContent = "-"; return; }
     oM.textContent = fmt(r.max_length_ft, 2) + " ft";
     oT.textContent = fmt(r.table_max_ft, 2) + " ft";
@@ -947,7 +948,7 @@ export function renderPipeExpansion(inputRegion, outputRegion, citationEl) {
       material: mat.select.value,
       length_ft: Number(len.input.value) || 0,
       delta_T_F: Number(dT.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["material", "length_ft", "delta_T_F"], r);
     if (r.error) { oL.textContent = r.error; oA.textContent = "-"; return; }
     oL.textContent = fmt(r.delta_L_in, 3) + " in";
     oA.textContent = r.alpha_per_F.toExponential(2) + " 1/F";
@@ -986,7 +987,7 @@ export function renderTanklessGPM(inputRegion, outputRegion, citationEl) {
       target_gpm: Number(tgpm.input.value) || 0,
       inlet_override_F: Number(ovr.input.value) || 0,
       thermal_efficiency: Number(eff.input.value) || 0.82,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["kbtu_input", "climate_zone", "target_outlet_F", "solve_for", "target_gpm", "inlet_override_F", "thermal_efficiency"], r);
     if (r.error) { oG.textContent = r.error; oI.textContent = "-"; oD.textContent = "-"; return; }
     oG.textContent = r.solve_for === "kbtu" ? (fmt(r.kbtu_input, 1) + " kBTU/hr") : r.solve_for === "dt" ? (fmt(r.delta_T_F, 1) + " F rise") : (fmt(r.gpm, 2) + " gpm");
     oI.textContent = fmt(r.inlet_F, 0) + " F";
@@ -1372,7 +1373,7 @@ export function renderStormwaterRational(inputRegion, outputRegion, citationEl) 
   const oGpm = makeOutputLine(outputRegion, "Peak flow", "sw-out-gpm");
   function fillExample(v) { a.input.value = v.area_ft2; s.select.value = v.surface; r.input.value = v.rainfall_in_per_hr; update(); }
   const update = debounce(() => {
-    const x = computeStormwaterRational({ area_ft2: Number(a.input.value) || 0, surface: s.select.value, rainfall_in_per_hr: Number(r.input.value) || 0 });
+    const x = computeStormwaterRational({ area_ft2: Number(a.input.value) || 0, surface: s.select.value, rainfall_in_per_hr: Number(r.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["area_ft2", "surface", "rainfall_in_per_hr"], x);
     if (x.error) { oC.textContent = x.error; oCfs.textContent = "-"; oGpm.textContent = "-"; return; }
     oC.textContent = fmt(x.runoff_coefficient, 2);
     oCfs.textContent = fmt(x.peak_flow_cfs, 3) + " cfs";
@@ -1393,7 +1394,7 @@ function renderStormwaterMaxDrainageArea(inputRegion, outputRegion, citationEl) 
   const oN = makeOutputLine(outputRegion, "Note", "swm-out-n");
   function fillExample(v) { q.input.value = v.allowable_flow_cfs; s.select.value = v.surface; r.input.value = v.rainfall_in_per_hr; update(); }
   const update = debounce(() => {
-    const x = computeStormwaterMaxDrainageArea({ allowable_flow_cfs: Number(q.input.value) || 0, surface: s.select.value, rainfall_in_per_hr: Number(r.input.value) || 0 });
+    const x = computeStormwaterMaxDrainageArea({ allowable_flow_cfs: Number(q.input.value) || 0, surface: s.select.value, rainfall_in_per_hr: Number(r.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["allowable_flow_cfs", "surface", "rainfall_in_per_hr"], x);
     if (x.error) { oC.textContent = x.error; oFt2.textContent = "-"; oN.textContent = "-"; return; }
     oC.textContent = fmt(x.runoff_coefficient, 2);
     oFt2.textContent = fmt(x.max_area_ft2, 0) + " ft^2 (" + fmt(x.max_area_acres, 3) + " acres)";
@@ -1416,7 +1417,7 @@ export function renderHydrostaticTest(inputRegion, outputRegion, citationEl) {
   const oN = makeOutputLine(outputRegion, "Acceptable leak", "ht-out-n");
   function fillExample(v) { wp.input.value = v.working_pressure_psi; sv.input.value = v.system_volume_gal; mat.select.value = v.material; update(); }
   const update = debounce(() => {
-    const r = computeHydrostaticTest({ working_pressure_psi: Number(wp.input.value) || 0, system_volume_gal: Number(sv.input.value) || 0, material: mat.select.value });
+    const r = computeHydrostaticTest({ working_pressure_psi: Number(wp.input.value) || 0, system_volume_gal: Number(sv.input.value) || 0, material: mat.select.value }); stepsFor(outputRegion, inputRegion, ["working_pressure_psi", "system_volume_gal", "material"], r);
     if (r.error) { oP.textContent = r.error; oM.textContent = "-"; oH.textContent = "-"; oN.textContent = "-"; return; }
     oP.textContent = fmt(r.test_pressure_psi, 1) + " psi";
     oM.textContent = String(r.multiplier);
@@ -1440,7 +1441,7 @@ export function renderGreaseTrap(inputRegion, outputRegion, citationEl) {
   const oR = makeOutputLine(outputRegion, "Recommended nominal", "gt-out-r");
   function fillExample(v) { pf.input.value = v.peak_flow_gpm; rt.input.value = v.retention_minutes; lf.input.value = v.loading_factor; update(); }
   const update = debounce(() => {
-    const r = computeGreaseTrap({ peak_flow_gpm: Number(pf.input.value) || 0, retention_minutes: Number(rt.input.value) || 30, loading_factor: Number(lf.input.value) || 1.25 });
+    const r = computeGreaseTrap({ peak_flow_gpm: Number(pf.input.value) || 0, retention_minutes: Number(rt.input.value) || 30, loading_factor: Number(lf.input.value) || 1.25 }); stepsFor(outputRegion, inputRegion, ["peak_flow_gpm", "retention_minutes", "loading_factor"], r);
     if (r.error) { oV.textContent = r.error; oR.textContent = "-"; return; }
     oV.textContent = fmt(r.volume_gal, 0) + " gal";
     oR.textContent = String(r.recommended_nominal_gal) + " gal" + (r.exceeds_standard ? " -- the required volume EXCEEDS the largest listed size; multiple or engineered interceptors required" : "");
@@ -1461,7 +1462,7 @@ function renderGreaseInterceptorFlowCapacity(inputRegion, outputRegion, citation
   const oN = makeOutputLine(outputRegion, "Note", "gifc-out-n");
   function fillExample(v) { vol.input.value = v.interceptor_volume_gal; rt.input.value = v.retention_minutes; lf.input.value = v.loading_factor; update(); }
   const update = debounce(() => {
-    const r = computeGreaseInterceptorFlowCapacity({ interceptor_volume_gal: Number(vol.input.value) || 0, retention_minutes: Number(rt.input.value) || 30, loading_factor: Number(lf.input.value) || 1.25 });
+    const r = computeGreaseInterceptorFlowCapacity({ interceptor_volume_gal: Number(vol.input.value) || 0, retention_minutes: Number(rt.input.value) || 30, loading_factor: Number(lf.input.value) || 1.25 }); stepsFor(outputRegion, inputRegion, ["interceptor_volume_gal", "retention_minutes", "loading_factor"], r);
     if (r.error) { oF.textContent = r.error; oN.textContent = "-"; return; }
     oF.textContent = fmt(r.peak_flow_gpm, 1) + " gpm";
     oN.textContent = r.note;
@@ -1485,7 +1486,7 @@ export function renderGlycolMix(inputRegion, outputRegion, citationEl) {
   const oA = makeOutputLine(outputRegion, "Source", "gm-out-a");
   function fillExample(v) { sv.input.value = v.system_volume_gal; tb.input.value = v.target_burst_F; gt.select.value = v.glycol_type; update(); }
   const update = debounce(() => {
-    const r = computeGlycolMix({ system_volume_gal: Number(sv.input.value) || 0, target_burst_F: tb.input.value === "" ? null : Number(tb.input.value), glycol_type: gt.select.value, protection_mode: pm.select.value });
+    const r = computeGlycolMix({ system_volume_gal: Number(sv.input.value) || 0, target_burst_F: tb.input.value === "" ? null : Number(tb.input.value), glycol_type: gt.select.value, protection_mode: pm.select.value }); stepsFor(outputRegion, inputRegion, ["system_volume_gal", "target_burst_F", "glycol_type", "protection_mode"], r);
     if (r.error) { oP.textContent = r.error; oC.textContent = "-"; oH.textContent = "-"; oA.textContent = "-"; return; }
     oP.textContent = fmt(r.glycol_percent, 1) + " % (" + r.protection_mode + ")";
     oC.textContent = fmt(r.concentrate_gal, 1) + " gal";
@@ -1517,7 +1518,7 @@ export function renderExpansionTank(inputRegion, outputRegion, citationEl) {
       max_temperature_F: mt.input.value === "" ? null : Number(mt.input.value),
       fill_pressure_psi: Number(fp.input.value),
       relief_pressure_psi: Number(rp.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["system_volume_gal", "fill_temperature_F", "max_temperature_F", "fill_pressure_psi", "relief_pressure_psi"], r);
     if (r.error) { oV.textContent = r.error; oP.textContent = "-"; oN.textContent = "-"; return; }
     oV.textContent = fmt(r.tank_volume_gal, 2) + " gal";
     oP.textContent = fmt(r.precharge_psi, 1) + " psi";
@@ -1538,7 +1539,7 @@ export function renderBackflowLoss(inputRegion, outputRegion, citationEl) {
   const oA = makeOutputLine(outputRegion, "Source", "bl-out-a");
   function fillExample(v) { dc.select.value = v.device_class; f.input.value = v.flow_gpm; ps.select.value = String(v.pipe_size_in); update(); }
   const update = debounce(() => {
-    const r = computeBackflowLoss({ device_class: dc.select.value, flow_gpm: Number(f.input.value) || 0, pipe_size_in: ps.select.value });
+    const r = computeBackflowLoss({ device_class: dc.select.value, flow_gpm: Number(f.input.value) || 0, pipe_size_in: ps.select.value }); stepsFor(outputRegion, inputRegion, ["device_class", "flow_gpm", "pipe_size_in"], r);
     if (r.error) { oL.textContent = r.error; oA.textContent = "-"; return; }
     oL.textContent = fmt(r.pressure_loss_psi, 2) + " psi";
     oA.textContent = r.attribution;
@@ -1822,7 +1823,7 @@ function _v7p_renderWaterHammer(inputRegion, outputRegion, citationEl) {
       material: mat.select.value, pipe_size: sz.select.value,
       velocity_fps: Number(v.input.value) || 0, closure_time_s: Number(tc.input.value) || 0,
       run_length_ft: Number(len.input.value) || 0, fluid: fluid.select.value,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["material", "pipe_size", "velocity_fps", "closure_time_s", "run_length_ft", "fluid"], r);
     if (r.error) { oC.textContent = r.error; oS.textContent = "-"; oR.textContent = "-"; oF.textContent = "-"; return; }
     oC.textContent = _v7p_fmt(r.celerity_fps, 0) + " fps";
     oS.textContent = _v7p_fmt(r.surge_psi, 1) + " psi";
@@ -1921,7 +1922,7 @@ function _v7p_renderPumpOperatingPoint(inputRegion, outputRegion, citationEl) {
       pump: pump.select.value,
       static_head_ft: Number(stat.input.value) || 0,
       k_friction: Number(k.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["pump", "static_head_ft", "k_friction"], r);
     if (r.error) { oQ.textContent = r.error; oH.textContent = "-"; oE.textContent = "-"; oA.textContent = "-"; return; }
     oQ.textContent = _v7p_fmt(r.operating_gpm, 1) + " gpm";
     oH.textContent = _v7p_fmt(r.head_ft, 1) + " ft";
@@ -1955,7 +1956,7 @@ function _v7p_renderPipeExpansionLoop(inputRegion, outputRegion, citationEl) {
       length_ft: Number(len.input.value) || 0,
       delta_T_F: Number(dT.input.value) || 0,
       pipe_OD_in: Number(od.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["material", "length_ft", "delta_T_F", "pipe_OD_in"], r);
     if (r.error) { oDL.textContent = r.error; oA.textContent = "-"; oLoopIn.textContent = "-"; return; }
     oDL.textContent = _v7p_fmt(r.delta_L_in, 3) + " in";
     oA.textContent = _v7p_fmt(r.alpha_per_F * 1e6, 2) + " × 10⁻⁶ /°F (" + r.material_label + ")";
@@ -2199,7 +2200,7 @@ function _v9p_renderRecircLoopSizing(inputRegion, outputRegion, citationEl) {
       heater_efficiency: readNum(eff.input),
       runtime_hr_per_year: readNum(runtime.input),
       fuel_price: readNum(price.input),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["loop_length_ft", "nominal_size_in", "insulation_in", "hot_supply_F", "ambient_F", "set_point_delta_F", "fuel", "heater_efficiency", "runtime_hr_per_year", "fuel_price"], r);
     if (r.error) {
       oQft.textContent = r.error;
       oQt.textContent = ""; oGPM.textContent = ""; oH.textContent = ""; oP.textContent = ""; oHP.textContent = ""; oCost.textContent = ""; oW.textContent = "";
@@ -2373,7 +2374,7 @@ function _v16p_renderWaterHeaterRecovery(inputRegion, outputRegion, citationEl) 
       setpoint_F: _v16p_readNum(tset.input),
       tank_gal: _v16p_readNum(tank.input),
       peak_demand_gph: _v16p_readNum(peak.input),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["heater_type", "input_btu_hr", "input_kw", "efficiency", "incoming_F", "setpoint_F", "tank_gal", "peak_demand_gph"], r);
     if (r.error) { oRise.textContent = r.error; oRec.textContent = "-"; oFhr.textContent = "-"; oPeak.textContent = "-"; oNote.textContent = ""; return; }
     oRise.textContent = fmt(r.delta_T_F, 0) + " F (" + fmt(r.q_useful_btu_hr, 0) + " BTU/hr useful)";
     oRec.textContent = fmt(r.recovery_gph, 1) + " gph";
@@ -2445,7 +2446,7 @@ function renderWaterHeaterInput(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "whi-out-n");
   const update = debounce(() => {
     const effVal = eff.input.value === "" ? null : _v16p_readNum(eff.input);
-    const r = computeWaterHeaterInput({ heater_type: type.select.value, target_recovery_gph: _v16p_readNum(rec.input), efficiency: effVal, incoming_F: _v16p_readNum(tin.input), setpoint_F: _v16p_readNum(tset.input) });
+    const r = computeWaterHeaterInput({ heater_type: type.select.value, target_recovery_gph: _v16p_readNum(rec.input), efficiency: effVal, incoming_F: _v16p_readNum(tin.input), setpoint_F: _v16p_readNum(tset.input) }); stepsFor(outputRegion, inputRegion, ["heater_type", "target_recovery_gph", "efficiency", "incoming_F", "setpoint_F"], r);
     if (r.error) { oInput.textContent = r.error; oNote.textContent = ""; return; }
     oInput.textContent = r.isElectric ? (fmt(r.input_kw, 2) + " kW (" + fmt(r.input_btu_hr, 0) + " BTU/hr)") : (fmt(r.input_btu_hr, 0) + " BTU/hr (" + fmt(r.input_kw, 2) + " kW)");
     oNote.textContent = (r.warnings.length ? r.warnings.join(" ") + " " : "") + r.note;
@@ -2578,7 +2579,7 @@ function _v16p_renderWhExpansionTank(inputRegion, outputRegion, citationEl) {
       incoming_F: _v16p_readNum(tin.input),
       setpoint_F: _v16p_readNum(tset.input),
       acceptance_factor: _v16p_readNum(af.input),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["water_heater_vol_gal", "incoming_psi", "relief_psi", "incoming_F", "setpoint_F", "acceptance_factor"], r);
     if (r.error) { oExp.textContent = r.error; oTank.textContent = "-"; oRec.textContent = "-"; oPre.textContent = "-"; oNote.textContent = ""; return; }
     oExp.textContent = fmt(r.v_expansion_gal, 3) + " gal (factor " + fmt(r.expansion_factor * 100, 2) + "%)";
     oTank.textContent = fmt(r.v_tank_gal, 3) + " gal";
@@ -2799,7 +2800,7 @@ function _v16p_renderSanitaryDfu(inputRegion, outputRegion, citationEl) {
       config: config.select.value,
       slope_in_per_ft: Number(slope.select.value),
       branch_intervals: Number(intervals.input.value) || 3,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["fixtures", "config", "slope_in_per_ft", "branch_intervals"], r);
     if (r.error) { oDfu.textContent = r.error; oSize.textContent = "-"; oNote.textContent = ""; return; }
     oDfu.textContent = fmt(r.total_dfu, 1) + " DFU";
     oSize.textContent = r.min_size_in != null
@@ -2917,7 +2918,7 @@ function _v16p_renderTrapPrimer(inputRegion, outputRegion, citationEl) {
       prime_method: method.select.value,
       prime_volume_oz: _v16p_readNum(vol.input),
       cycles_per_day: _v16p_readNum(cyc.input),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["floor_drain_count", "zone", "prime_method", "prime_volume_oz", "cycles_per_day"], r);
     if (r.error) { oPrimers.textContent = r.error; oWater.textContent = "-"; oComp.textContent = "-"; oNote.textContent = ""; return; }
     oPrimers.textContent = String(r.primers_needed) + " (" + r.drains_per_unit + " drains each)";
     oWater.textContent = fmt(r.water_gal_per_year, 1) + " gal/yr";
@@ -3064,7 +3065,7 @@ function _v16p_renderBackflowSizing(inputRegion, outputRegion, citationEl) {
       pipe_size_in: size.select.value,
       upstream_pressure_psi: _v16p_readNum(up.input),
       min_residual_psi: _v16p_readNum(minRes.input),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["service_flow_gpm", "hazard", "assembly_type", "pipe_size_in", "upstream_pressure_psi", "min_residual_psi"], r);
     if (r.error) { oReq.textContent = r.error; oLoss.textContent = "-"; oDown.textContent = "-"; oComp.textContent = "-"; oNote.textContent = ""; return; }
     oReq.textContent = r.required_assembly + (r.overridden ? " (overridden from " + r.selected_assembly + " for high hazard)" : "") + " at " + r.pipe_size_in + " in";
     oLoss.textContent = fmt(r.head_loss_psi, 1) + " psi";
@@ -3255,7 +3256,7 @@ function renderThermalExpansionVolume(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "tev-out-note");
   function readNum(i) { if (i.value === "") return NaN; const n = Number(i.value); return Number.isFinite(n) ? n : NaN; }
   const update = debounce(() => {
-    const r = computeThermalExpansionVolume({ volume_gal: readNum(vol.input), cold_f: readNum(cold.input), hot_f: readNum(hot.input), closed_system: sys.select.value === "closed" });
+    const r = computeThermalExpansionVolume({ volume_gal: readNum(vol.input), cold_f: readNum(cold.input), hot_f: readNum(hot.input), closed_system: sys.select.value === "closed" }); stepsFor(outputRegion, inputRegion, ["volume_gal", "cold_f", "hot_f", "closed_system"], r);
     if (r.error) { oV.textContent = r.error; oP.textContent = ""; oNote.textContent = ""; return; }
     oV.textContent = fmt(r.expansion_gal, 3) + " gal";
     oP.textContent = fmt(r.expansion_pct, 2) + "%";
@@ -3315,7 +3316,7 @@ function renderVentSizingStack(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "vss-out-note");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeVentSizingStack({ vent_dia_in: readNum(d.input), connected_dfu: readNum(dfu.input), developed_length_ft: readNum(len.input), table_dfu: readNum(tdfu.input), table_max_length_ft: readNum(tmax.input), drain_dia_in: readNum(drain.input) });
+    const r = computeVentSizingStack({ vent_dia_in: readNum(d.input), connected_dfu: readNum(dfu.input), developed_length_ft: readNum(len.input), table_dfu: readNum(tdfu.input), table_max_length_ft: readNum(tmax.input), drain_dia_in: readNum(drain.input) }); stepsFor(outputRegion, inputRegion, ["vent_dia_in", "connected_dfu", "developed_length_ft", "table_dfu", "table_max_length_ft", "drain_dia_in"], r);
     if (r.error) { oVerdict.textContent = r.error; oPct.textContent = ""; oNote.textContent = ""; return; }
     oVerdict.textContent = r.pass ? "PASS (DFU and length within limits)" : "FAIL";
     oPct.textContent = fmt(r.length_used_pct, 1) + "% used, " + fmt(r.length_margin_ft, 1) + " ft margin";
@@ -3424,7 +3425,7 @@ function _v26renderMixedWaterTemp(inputRegion, outputRegion, citationEl) {
       hot_gpm: Number(qh.input.value) || 0,
       cold_gpm: Number(qc.input.value) || 0,
       target_temp_F: Number(tt.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["mode", "hot_temp_F", "cold_temp_F", "hot_gpm", "cold_gpm", "target_temp_F"], r);
     if (r.error) { oOut.textContent = r.error; oPct.textContent = "-"; oNote.textContent = ""; return; }
     if (r.mode === "find-blend") oOut.textContent = fmt(r.blend_temp_F, 1) + " F blended (" + fmt(r.total_gpm, 2) + " gpm total)";
     else if (r.mode === "find-mix-ratio") oOut.textContent = "hot fraction " + fmt(r.hot_fraction, 4) + " (hot:cold " + fmt(r.hot_cold_ratio, 3) + ")";
@@ -3520,7 +3521,7 @@ function _v26renderPressureTankDrawdown(inputRegion, outputRegion, citationEl) {
       precharge_psi: pre.input.value === "" ? null : Number(pre.input.value),
       pump_gpm: Number(gpm.input.value) || 0,
       target_drawdown_gal: Number(td.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["mode", "tank_volume_gal", "cut_in_psi", "cut_out_psi", "precharge_psi", "pump_gpm", "target_drawdown_gal"], r);
     if (r.error) { oDD.textContent = r.error; oTank.textContent = "-"; oRun.textContent = "-"; oCyc.textContent = "-"; oNote.textContent = ""; return; }
     oDD.textContent = fmt(r.drawdown_gal, 2) + " gal";
     oTank.textContent = fmt(r.tank_volume_gal, 1) + " gal";
@@ -3621,7 +3622,7 @@ function _v26renderPipeVelocity(inputRegion, outputRegion, citationEl) {
       material: mat.select.value,
       service: svc.select.value,
       target_velocity_fps: Number(vt.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["mode", "flow_gpm", "diameter_in", "material", "service", "target_velocity_fps"], r);
     if (r.error) { oV.textContent = r.error; oVerdict.textContent = "-"; oNote.textContent = ""; return; }
     if (r.mode === "max-flow-for-velocity") { oV.textContent = fmt(r.max_flow_gpm, 2) + " gpm at " + fmt(r.target_velocity_fps, 2) + " ft/s"; oVerdict.textContent = "ceiling " + r.ceiling_fps + " ft/s (" + r.material + " " + r.service + ")"; }
     else { oV.textContent = fmt(r.velocity_fps, 2) + " ft/s (ceiling " + r.ceiling_fps + " ft/s)"; oVerdict.textContent = r.verdict; }
@@ -3695,7 +3696,7 @@ function renderWsfuDemand(inputRegion, outputRegion, citationEl) {
   const oBracket = makeOutputLine(outputRegion, "Curve bracket", "wd-out-bracket");
   const oCurve = makeOutputLine(outputRegion, "Curve", "wd-out-curve");
   const update = debounce(() => {
-    const r = computeWsfuDemand({ wsfu: Number(fu.input.value) || 0, system_type: sys.select.value });
+    const r = computeWsfuDemand({ wsfu: Number(fu.input.value) || 0, system_type: sys.select.value }); stepsFor(outputRegion, inputRegion, ["wsfu", "system_type"], r);
     if (r.error) { oGpm.textContent = r.error; oBracket.textContent = "-"; oCurve.textContent = "-"; return; }
     oGpm.textContent = fmt(r.gpm, 1) + " GPM" + (r.extrapolated ? " (extrapolated)" : "");
     oBracket.textContent = r.bracket_low_wsfu + " WSFU (" + r.bracket_low_gpm + " GPM) to " + r.bracket_high_wsfu + " WSFU (" + r.bracket_high_gpm + " GPM)";
@@ -3770,7 +3771,7 @@ function renderSupplyPressureBudget(inputRegion, outputRegion, citationEl) {
       bfp_loss: bfp.input.value === "" ? 0 : Number(bfp.input.value),
       friction_loss: Number(friction.input.value) || 0,
       fixture_min: fmin.input.value === "" ? 8 : Number(fmin.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["street_pressure", "fixture_height", "meter_loss", "bfp_loss", "friction_loss", "fixture_min"], r);
     if (r.error) { oElev.textContent = r.error; for (const o of [oAvail, oHead, oVerdict]) o.textContent = "-"; return; }
     oElev.textContent = fmt(r.elevation_loss, 1) + " psi";
     oAvail.textContent = fmt(r.available, 1) + " psi";
@@ -3837,7 +3838,7 @@ function renderWaterHeaterStorageSizing(inputRegion, outputRegion, citationEl) {
       tank_gal: Number(tank.input.value) || 0, input_btuh: Number(input.input.value) || 0,
       efficiency_pct: Number(eff.input.value) || 0, rise_F: Number(rise.input.value) || 0,
       usable_fraction: Number(usable.input.value) || 0, peak_hour_gal: Number(peak.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["tank_gal", "input_btuh", "efficiency_pct", "rise_F", "usable_fraction", "peak_hour_gal"], r);
     if (r.error) { oRec.textContent = r.error; oFhr.textContent = "-"; oVer.textContent = "-"; oN.textContent = "-"; return; }
     oRec.textContent = fmt(r.recovery_gph, 1) + " gph";
     oFhr.textContent = fmt(r.fhr_gph, 1) + " gph";
@@ -3912,7 +3913,7 @@ export function renderDrainageInvert(inputRegion, outputRegion, citationEl) {
       pipe_od_in: Number(od.input.value) || 0,
       surface_out_ft: surf.input.value === "" ? null : Number(surf.input.value),
       min_cover_ft: minCov.input.value === "" ? null : Number(minCov.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["invert_in_ft", "slope", "slope_units", "run_ft", "pipe_od_in", "surface_out_ft", "min_cover_ft"], r);
     if (r.error) { oFall.textContent = r.error; oInv.textContent = "-"; oTop.textContent = "-"; oCov.textContent = "-"; return; }
     oFall.textContent = fmt(r.total_fall_ft, 2) + " ft";
     oInv.textContent = fmt(r.invert_out_ft, 2) + " ft";
@@ -3969,7 +3970,7 @@ function renderRadiantLoopSizing(inputRegion, outputRegion, citationEl) {
   const oLoops = makeOutputLine(outputRegion, "Loops / length each", "rl-out-loops");
   const oFlow = makeOutputLine(outputRegion, "Total flow / per loop", "rl-out-flow");
   const update = debounce(() => {
-    const r = computeRadiantLoopSizing({ floor_area_ft2: Number(area.input.value) || 0, spacing_in: Number(spacing.input.value) || 0, load_btuhr: Number(load.input.value) || 0, max_loop_ft: Number(maxLoop.input.value) || 0, design_dt: Number(dt.input.value) || 0 });
+    const r = computeRadiantLoopSizing({ floor_area_ft2: Number(area.input.value) || 0, spacing_in: Number(spacing.input.value) || 0, load_btuhr: Number(load.input.value) || 0, max_loop_ft: Number(maxLoop.input.value) || 0, design_dt: Number(dt.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["floor_area_ft2", "spacing_in", "load_btuhr", "max_loop_ft", "design_dt"], r);
     if (r.error) { oTube.textContent = r.error; oLoops.textContent = "-"; oFlow.textContent = "-"; return; }
     oTube.textContent = fmt(r.tube_ft, 0) + " ft";
     oLoops.textContent = fmt(r.loops, 0) + " loop(s), " + fmt(r.per_loop_ft, 0) + " ft each";
@@ -4015,7 +4016,7 @@ function _v302renderTimeOfConcentration(inputRegion, outputRegion, citationEl) {
   const oTc = makeOutputLine(outputRegion, "Time of concentration", "toc-out-tc");
   const oNote = makeOutputLine(outputRegion, "Note", "toc-out-n");
   const update = debounce(() => {
-    const r = computeTimeOfConcentration({ l_ft: Number(l.input.value) || 0, s_slope: Number(s.input.value) || 0 });
+    const r = computeTimeOfConcentration({ l_ft: Number(l.input.value) || 0, s_slope: Number(s.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["l_ft", "s_slope"], r);
     if (r.error) { oTc.textContent = r.error; oNote.textContent = "-"; return; }
     oTc.textContent = fmt(r.tc_min, 1) + " min (" + fmt(r.tc_hr, 3) + " hr)";
     oNote.textContent = r.note;
@@ -4054,7 +4055,7 @@ function _v303renderOrificeFlow(inputRegion, outputRegion, citationEl) {
   const oQ = makeOutputLine(outputRegion, "Discharge", "orf-out-q");
   const oNote = makeOutputLine(outputRegion, "Note", "orf-out-n");
   const update = debounce(() => {
-    const r = computeOrificeFlow({ d_in: Number(d.input.value) || 0, h_ft: Number(h.input.value) || 0, cd: Number(cd.input.value) || 0 });
+    const r = computeOrificeFlow({ d_in: Number(d.input.value) || 0, h_ft: Number(h.input.value) || 0, cd: Number(cd.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["d_in", "h_ft", "cd"], r);
     if (r.error) { oA.textContent = r.error; oQ.textContent = "-"; oNote.textContent = "-"; return; }
     oA.textContent = fmt(r.a_ft2, 3) + " ft^2";
     oQ.textContent = fmt(r.q_cfs, 2) + " cfs (" + fmt(r.q_gpm, 0) + " gpm)";
@@ -4092,7 +4093,7 @@ function _v639renderOrificeDiameterForFlow(inputRegion, outputRegion, citationEl
   const oA = makeOutputLine(outputRegion, "Orifice area", "ord-out-a");
   const oNote = makeOutputLine(outputRegion, "Note", "ord-out-n");
   const update = debounce(() => {
-    const r = computeOrificeDiameterForFlow({ q_cfs: Number(q.input.value) || 0, h_ft: Number(h.input.value) || 0, cd: Number(cd.input.value) || 0 });
+    const r = computeOrificeDiameterForFlow({ q_cfs: Number(q.input.value) || 0, h_ft: Number(h.input.value) || 0, cd: Number(cd.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["q_cfs", "h_ft", "cd"], r);
     if (r.error) { oD.textContent = r.error; oA.textContent = "-"; oNote.textContent = "-"; return; }
     oD.textContent = fmt(r.d_in, 2) + " in";
     oA.textContent = fmt(r.a_ft2, 3) + " ft^2";
@@ -4137,7 +4138,7 @@ function _v630renderTankDrainTime(inputRegion, outputRegion, citationEl) {
   const oA = makeOutputLine(outputRegion, "Orifice area", "tdt-out-a");
   const oNote = makeOutputLine(outputRegion, "Note", "tdt-out-n");
   const update = debounce(() => {
-    const r = computeTankDrainTime({ tank_area_ft2: Number(at.input.value) || 0, d_in: Number(d.input.value) || 0, cd: Number(cd.input.value) || 0, h1_ft: Number(h1.input.value) || 0, h2_ft: Number(h2.input.value) || 0 });
+    const r = computeTankDrainTime({ tank_area_ft2: Number(at.input.value) || 0, d_in: Number(d.input.value) || 0, cd: Number(cd.input.value) || 0, h1_ft: Number(h1.input.value) || 0, h2_ft: Number(h2.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["tank_area_ft2", "d_in", "cd", "h1_ft", "h2_ft"], r);
     if (r.error) { oT.textContent = r.error; oA.textContent = "-"; oNote.textContent = "-"; return; }
     oT.textContent = fmt(r.t_s, 0) + " s (" + fmt(r.t_min, 1) + " min)";
     oA.textContent = fmt(r.a_o_ft2, 3) + " ft^2";
@@ -4178,7 +4179,7 @@ function _v304renderChannelFroudeNumber(inputRegion, outputRegion, citationEl) {
   const oYc = makeOutputLine(outputRegion, "Critical depth yc", "cfn-out-yc");
   const oNote = makeOutputLine(outputRegion, "Note", "cfn-out-n");
   const update = debounce(() => {
-    const r = computeChannelFroudeNumber({ b_ft: Number(b.input.value) || 0, q_cfs: Number(q.input.value) || 0, y_ft: Number(y.input.value) || 0 });
+    const r = computeChannelFroudeNumber({ b_ft: Number(b.input.value) || 0, q_cfs: Number(q.input.value) || 0, y_ft: Number(y.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["b_ft", "q_cfs", "y_ft"], r);
     if (r.error) { oV.textContent = r.error; oFr.textContent = "-"; oYc.textContent = "-"; oNote.textContent = "-"; return; }
     oV.textContent = fmt(r.v_fps, 2) + " ft/s";
     oFr.textContent = fmt(r.fr, 2) + " - " + r.regime;
@@ -4230,7 +4231,7 @@ function _v641renderChannelNormalDepth(inputRegion, outputRegion, citationEl) {
   const oYc = makeOutputLine(outputRegion, "Critical depth yc / slope class", "cnd-out-yc");
   const oNote = makeOutputLine(outputRegion, "Note", "cnd-out-n");
   const update = debounce(() => {
-    const r = computeChannelNormalDepth({ b_ft: Number(b.input.value) || 0, q_cfs: Number(q.input.value) || 0, n: Number(nn.input.value) || 0, s_slope: Number(s.input.value) || 0 });
+    const r = computeChannelNormalDepth({ b_ft: Number(b.input.value) || 0, q_cfs: Number(q.input.value) || 0, n: Number(nn.input.value) || 0, s_slope: Number(s.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["b_ft", "q_cfs", "n", "s_slope"], r);
     if (r.error) { oYn.textContent = r.error; oV.textContent = "-"; oYc.textContent = "-"; oNote.textContent = "-"; return; }
     oYn.textContent = fmt(r.yn_ft, 3) + " ft";
     oV.textContent = fmt(r.v_fps, 2) + " ft/s - Fr " + fmt(r.fr, 2) + " " + r.regime;
@@ -4277,7 +4278,7 @@ function _v632renderHydraulicJump(inputRegion, outputRegion, citationEl) {
   const oDE = makeOutputLine(outputRegion, "Energy loss / efficiency", "hj-out-de");
   const oNote = makeOutputLine(outputRegion, "Note", "hj-out-n");
   const update = debounce(() => {
-    const r = computeHydraulicJump({ b_ft: Number(b.input.value) || 0, q_cfs: Number(q.input.value) || 0, y1_ft: Number(y1.input.value) || 0 });
+    const r = computeHydraulicJump({ b_ft: Number(b.input.value) || 0, q_cfs: Number(q.input.value) || 0, y1_ft: Number(y1.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["b_ft", "q_cfs", "y1_ft"], r);
     if (r.error) { oFr1.textContent = r.error; oY2.textContent = "-"; oDE.textContent = "-"; oNote.textContent = "-"; return; }
     oFr1.textContent = fmt(r.fr1, 2) + " - " + r.jump_type;
     oY2.textContent = fmt(r.y2_ft, 2) + " ft (rise " + fmt(r.height_ft, 2) + " ft), Fr2 " + fmt(r.fr2, 2);
@@ -4326,7 +4327,7 @@ function _v637renderSpecificEnergy(inputRegion, outputRegion, citationEl) {
   const oAlt = makeOutputLine(outputRegion, "Alternate depth (same E)", "spe-out-alt");
   const oNote = makeOutputLine(outputRegion, "Note", "spe-out-n");
   const update = debounce(() => {
-    const r = computeSpecificEnergy({ b_ft: Number(b.input.value) || 0, q_cfs: Number(q.input.value) || 0, y_ft: Number(y.input.value) || 0 });
+    const r = computeSpecificEnergy({ b_ft: Number(b.input.value) || 0, q_cfs: Number(q.input.value) || 0, y_ft: Number(y.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["b_ft", "q_cfs", "y_ft"], r);
     if (r.error) { oV.textContent = r.error; oE.textContent = "-"; oYc.textContent = "-"; oAlt.textContent = "-"; oNote.textContent = "-"; return; }
     oV.textContent = fmt(r.v_fps, 2) + " ft/s";
     oE.textContent = fmt(r.e_ft, 3) + " ft - Fr " + fmt(r.fr, 2) + " " + r.regime;
@@ -4369,7 +4370,7 @@ function _v371renderVelocityHead(inputRegion, outputRegion, citationEl) {
   const oQ = makeOutputLine(outputRegion, "Dynamic pressure", "vh-out-q");
   const oNote = makeOutputLine(outputRegion, "Note", "vh-out-n");
   const update = debounce(() => {
-    const r = computeVelocityHead({ V_fps: Number(V.input.value) || 0, rho: Number(rho.input.value) || 0 });
+    const r = computeVelocityHead({ V_fps: Number(V.input.value) || 0, rho: Number(rho.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["V_fps", "rho"], r);
     if (r.error) { oHv.textContent = r.error; oQ.textContent = "-"; oNote.textContent = ""; return; }
     oHv.textContent = fmt(r.h_v_ft, 2) + " ft of fluid";
     oQ.textContent = fmt(r.q_psf, 1) + " lb/ft^2 (" + fmt(r.q_psi, 2) + " psi)";
@@ -4406,7 +4407,7 @@ function _v372renderFlowContinuity(inputRegion, outputRegion, citationEl) {
   const oV2 = makeOutputLine(outputRegion, "Downstream velocity", "fc-out-v2");
   const oNote = makeOutputLine(outputRegion, "Note", "fc-out-n");
   const update = debounce(() => {
-    const r = computeFlowContinuity({ V1_fps: Number(V1.input.value) || 0, D1_in: Number(D1.input.value) || 0, D2_in: Number(D2.input.value) || 0 });
+    const r = computeFlowContinuity({ V1_fps: Number(V1.input.value) || 0, D1_in: Number(D1.input.value) || 0, D2_in: Number(D2.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["V1_fps", "D1_in", "D2_in"], r);
     if (r.error) { oV2.textContent = r.error; oNote.textContent = ""; return; }
     oV2.textContent = fmt(r.V2_fps, 2) + " ft/s (" + fmt(r.ratio, 2) + "x, " + (r.reducing ? "reducing/accelerating" : "expanding/slowing") + ")";
     oNote.textContent = r.note;
@@ -4447,7 +4448,7 @@ function _v373renderBernoulliHead(inputRegion, outputRegion, citationEl) {
   const oH = makeOutputLine(outputRegion, "Total head", "bh-out-h");
   const oNote = makeOutputLine(outputRegion, "Note", "bh-out-n");
   const update = debounce(() => {
-    const r = computeBernoulliHead({ P_psi: Number(P.input.value), V_fps: Number(V.input.value) || 0, z_ft: Number(z.input.value), gamma: Number(g.input.value) || 0 });
+    const r = computeBernoulliHead({ P_psi: Number(P.input.value), V_fps: Number(V.input.value) || 0, z_ft: Number(z.input.value), gamma: Number(g.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["P_psi", "V_fps", "z_ft", "gamma"], r);
     if (r.error) { oComp.textContent = r.error; oH.textContent = "-"; oNote.textContent = ""; return; }
     oComp.textContent = fmt(r.h_press_ft, 2) + " + " + fmt(r.h_vel_ft, 2) + " + " + fmt(r.z_ft, 2) + " ft";
     oH.textContent = fmt(r.H_ft, 2) + " ft of fluid";
@@ -4496,7 +4497,7 @@ function _v388renderThrustBlockSizing(inputRegion, outputRegion, citationEl) {
   const oA = makeOutputLine(outputRegion, "Required bearing area", "tbs-out-a");
   const oN = makeOutputLine(outputRegion, "Note", "tbs-out-n");
   const update = debounce(() => {
-    const r = computeThrustBlockSizing({ pressure_psi: Number(P.input.value) || 0, od_in: Number(od.input.value) || 0, bend_deg: Number(bend.input.value) || 0, soil_bearing_psf: Number(soil.input.value) || 0, safety_factor: sf.input.value === "" ? 1.5 : Number(sf.input.value) });
+    const r = computeThrustBlockSizing({ pressure_psi: Number(P.input.value) || 0, od_in: Number(od.input.value) || 0, bend_deg: Number(bend.input.value) || 0, soil_bearing_psf: Number(soil.input.value) || 0, safety_factor: sf.input.value === "" ? 1.5 : Number(sf.input.value) }); stepsFor(outputRegion, inputRegion, ["pressure_psi", "od_in", "bend_deg", "soil_bearing_psf", "safety_factor"], r);
     if (r.error) { oT.textContent = r.error; oA.textContent = "-"; oN.textContent = ""; return; }
     oT.textContent = fmt(r.thrust_lb, 0) + " lb (pipe area " + fmt(r.area_in2, 1) + " in^2)";
     oA.textContent = fmt(r.bearing_area_ft2, 2) + " ft^2";
@@ -4547,7 +4548,7 @@ function _v745renderThrustBlockMaxPressure(inputRegion, outputRegion, citationEl
   const oT = makeOutputLine(outputRegion, "Max thrust the soil takes", "tbm-out-t");
   const oN = makeOutputLine(outputRegion, "Note", "tbm-out-n");
   const update = debounce(() => {
-    const r = computeThrustBlockMaxPressure({ bearing_area_ft2: Number(Ab.input.value) || 0, od_in: Number(od.input.value) || 0, bend_deg: Number(bend.input.value) || 0, soil_bearing_psf: Number(soil.input.value) || 0, safety_factor: sf.input.value === "" ? 1.5 : Number(sf.input.value) });
+    const r = computeThrustBlockMaxPressure({ bearing_area_ft2: Number(Ab.input.value) || 0, od_in: Number(od.input.value) || 0, bend_deg: Number(bend.input.value) || 0, soil_bearing_psf: Number(soil.input.value) || 0, safety_factor: sf.input.value === "" ? 1.5 : Number(sf.input.value) }); stepsFor(outputRegion, inputRegion, ["bearing_area_ft2", "od_in", "bend_deg", "soil_bearing_psf", "safety_factor"], r);
     if (r.error) { oP.textContent = r.error; oT.textContent = "-"; oN.textContent = ""; return; }
     oP.textContent = fmt(r.max_pressure_psi, 0) + " psi (pipe area " + fmt(r.area_in2, 1) + " in^2)";
     oT.textContent = fmt(r.max_thrust_lb, 0) + " lb";
@@ -4596,7 +4597,7 @@ function _v428renderStormwaterDetentionVolume(inputRegion, outputRegion, citatio
   const oV = makeOutputLine(outputRegion, "Required storage", "sdv-out-v");
   const oNote = makeOutputLine(outputRegion, "Note", "sdv-out-n");
   const update = debounce(() => {
-    const r = computeStormwaterDetentionVolume({ runoff_c: Number(c.input.value) || 0, intensity_in_hr: Number(i.input.value) || 0, area_ac: Number(area.input.value) || 0, q_allow_cfs: Number(qa.input.value) || 0, duration_min: Number(dur.input.value) || 0 });
+    const r = computeStormwaterDetentionVolume({ runoff_c: Number(c.input.value) || 0, intensity_in_hr: Number(i.input.value) || 0, area_ac: Number(area.input.value) || 0, q_allow_cfs: Number(qa.input.value) || 0, duration_min: Number(dur.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["runoff_c", "intensity_in_hr", "area_ac", "q_allow_cfs", "duration_min"], r);
     if (r.error) { oQ.textContent = r.error; oV.textContent = "-"; oNote.textContent = ""; return; }
     oQ.textContent = fmt(r.q_in_cfs, 2) + " cfs";
     oV.textContent = fmt(r.storage_cf, 0) + " ft^3 (" + fmt(r.storage_ac_ft, 3) + " acre-ft, " + fmt(r.storage_gal, 0) + " gal)";
@@ -4632,7 +4633,7 @@ function _v452renderHydronicFillPressure(inputRegion, outputRegion, citationEl) 
   const oStatic = makeOutputLine(outputRegion, "Static lift (height/2.31)", "hfp-out-static");
   const oNote = makeOutputLine(outputRegion, "Note", "hfp-out-n");
   const update = debounce(() => {
-    const r = computeHydronicFillPressure({ height_ft: Number(h.input.value) || 0, margin_psi: (m.input.value === "" ? 4 : Number(m.input.value)) });
+    const r = computeHydronicFillPressure({ height_ft: Number(h.input.value) || 0, margin_psi: (m.input.value === "" ? 4 : Number(m.input.value)) }); stepsFor(outputRegion, inputRegion, ["height_ft", "margin_psi"], r);
     if (r.error) { oFill.textContent = r.error; oStatic.textContent = "-"; oNote.textContent = ""; return; }
     oFill.textContent = fmt(r.fill_psi, 1) + " psi (" + fmt(r.top_static_psi, 1) + " psi left at the top)";
     oStatic.textContent = fmt(r.static_psi, 1) + " psi";
@@ -4710,7 +4711,7 @@ function _v1031renderTrapezoidalChannelFlow(inputRegion, outputRegion, citationE
   const oT = makeOutputLine(outputRegion, "Top width / hydraulic depth", "tcf-out-t");
   const oNote = makeOutputLine(outputRegion, "Note", "tcf-out-n");
   const update = debounce(() => {
-    const r = computeTrapezoidalChannelFlow({ bottom_width_ft: Number(b.input.value) || 0, side_slope_z: Number(z.input.value) || 0, depth_ft: Number(y.input.value) || 0, n: Number(nn.input.value) || 0, s_slope: Number(s.input.value) || 0 });
+    const r = computeTrapezoidalChannelFlow({ bottom_width_ft: Number(b.input.value) || 0, side_slope_z: Number(z.input.value) || 0, depth_ft: Number(y.input.value) || 0, n: Number(nn.input.value) || 0, s_slope: Number(s.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["bottom_width_ft", "side_slope_z", "depth_ft", "n", "s_slope"], r);
     if (r.error) { oQ.textContent = r.error; oV.textContent = "-"; oA.textContent = "-"; oT.textContent = "-"; oNote.textContent = "-"; return; }
     oQ.textContent = fmt(r.flow_cfs, 2) + " cfs (" + fmt(r.flow_gpm, 0) + " gpm)";
     oV.textContent = fmt(r.velocity_fps, 2) + " ft/s - Fr " + fmt(r.froude, 2) + " " + r.regime;

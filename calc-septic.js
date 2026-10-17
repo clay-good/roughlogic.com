@@ -18,6 +18,7 @@ import {
   DEBOUNCE_MS as _V7P_DEB, debounce as _v7p_debounce, fmt as _v7p_fmt,
   makeNumber as _v7p_makeNumber, attachExampleButton as _v7p_attachEx,
   makeOutputLine as _v7p_makeOut,
+  stepsFor,
 } from "./ui-fields.js";
 import { renderLimitationBanner, getLimitationCopy } from "./limitation-banner.js";
 
@@ -259,7 +260,7 @@ export function renderSepticTank(inputRegion, outputRegion, citationEl) {
     const r = computeSepticTank({
       bedrooms: Number(beds.input.value) || 0,
       gallons_per_day: Number(gpd.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["bedrooms", "gallons_per_day"], r);
     if (r.error) { oG.textContent = r.error; oT.textContent = "-"; return; }
     oG.textContent = fmt(r.daily_flow_gpd, 0) + " gpd";
     oT.textContent = fmt(r.minimum_tank_gallons, 0) + " gal";
@@ -285,7 +286,7 @@ function _v7p_renderSepticDrainfield(inputRegion, outputRegion, citationEl) {
       design_flow_gpd: Number(flow.input.value) || 0,
       application_rate_gpd_per_ft2: Number(rate.input.value) || 0,
       trench_width_ft: Number(wid.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["design_flow_gpd", "application_rate_gpd_per_ft2", "trench_width_ft"], r);
     if (r.error) { oA.textContent = r.error; oT.textContent = "-"; return; }
     oA.textContent = _v7p_fmt(r.required_area_ft2, 0) + " ft²";
     oT.textContent = _v7p_fmt(r.trench_feet, 1) + " ft";
@@ -314,7 +315,7 @@ function _v7p_renderSepticDrainfieldCapacity(inputRegion, outputRegion, citation
       application_rate_gpd_per_ft2: Number(rate.input.value) || 0,
       trench_width_ft: Number(wid.input.value) || 0,
       gpd_per_bedroom: perBed.input.value === "" ? 150 : Number(perBed.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["available_trench_ft", "application_rate_gpd_per_ft2", "trench_width_ft", "gpd_per_bedroom"], r);
     if (r.error) { oF.textContent = r.error; oA.textContent = "-"; oB.textContent = "-"; return; }
     oF.textContent = _v7p_fmt(r.design_flow_gpd, 0) + " gpd";
     oA.textContent = _v7p_fmt(r.absorption_area_ft2, 0) + " ft²";
@@ -344,7 +345,7 @@ function renderSepticDoseTank(inputRegion, outputRegion, citationEl) {
       doses_per_day: doses.input.value === "" ? 4 : Number(doses.input.value),
       drainback_gal: drainback.input.value === "" ? 0 : Number(drainback.input.value),
       network_volume_gal: network.input.value === "" ? 0 : Number(network.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["daily_flow_gpd", "doses_per_day", "drainback_gal", "network_volume_gal"], r);
     if (r.error) { oNet.textContent = r.error; for (const o of [oPer, oDay, oRatio]) o.textContent = "-"; return; }
     oNet.textContent = fmt(r.net_dose_gal, 1) + " gal";
     oPer.textContent = fmt(r.pumped_per_dose, 1) + " gal";
@@ -373,7 +374,7 @@ function renderSepticPumpoutInterval(inputRegion, outputRegion, citationEl) {
       people: Number(people.input.value) || 0,
       accum_gal_pp_yr: accum.input.value === "" ? 30 : Number(accum.input.value),
       fill_fraction: fill.input.value === "" ? 0.33 : Number(fill.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["tank_gal", "people", "accum_gal_pp_yr", "fill_fraction"], r);
     if (r.error) { oYears.textContent = r.error; for (const o of [oAllowed, oAnnual]) o.textContent = "-"; return; }
     oYears.textContent = fmt(r.years, 1) + " yr";
     oAllowed.textContent = fmt(r.allowed_gal, 0) + " gal";
@@ -403,7 +404,7 @@ function renderSepticTankForInterval(inputRegion, outputRegion, citationEl) {
       people: Number(people.input.value) || 0,
       accum_gal_pp_yr: accum.input.value === "" ? 30 : Number(accum.input.value),
       fill_fraction: fill.input.value === "" ? 0.33 : Number(fill.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["target_years", "people", "accum_gal_pp_yr", "fill_fraction"], r);
     if (r.error) { oTank.textContent = r.error; for (const o of [oWork, oAnnual, oNote]) o.textContent = "-"; return; }
     oTank.textContent = fmt(r.tank_gal, 0) + " gal";
     oWork.textContent = fmt(r.working_gal, 0) + " gal";
@@ -436,7 +437,7 @@ function renderSepticLppOrifice(inputRegion, outputRegion, citationEl) {
       cd: cd.input.value === "" ? 0.6 : Number(cd.input.value),
       orifices_per_lateral: Number(perLat.input.value) || 0,
       num_laterals: Number(laterals.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["orifice_dia_in", "squirt_ft", "cd", "orifices_per_lateral", "num_laterals"], r);
     if (r.error) { oPer.textContent = r.error; for (const o of [oTot, oSys, oPsi]) o.textContent = "-"; return; }
     oPer.textContent = fmt(r.per_orifice_gpm, 2) + " gpm";
     oTot.textContent = fmt(r.total_orifices, 0);
@@ -482,7 +483,7 @@ function renderSepticLppSquirtHead(inputRegion, outputRegion, citationEl) {
   const oP = makeOutputLine(outputRegion, "Squirt pressure", "lsh-out-p");
   const oN = makeOutputLine(outputRegion, "Note", "lsh-out-n");
   const update = debounce(() => {
-    const r = computeSepticLppSquirtHead({ per_orifice_gpm: Number(q.input.value) || 0, orifice_dia_in: Number(dia.input.value) || 0, cd: Number(cd.input.value) || 0 });
+    const r = computeSepticLppSquirtHead({ per_orifice_gpm: Number(q.input.value) || 0, orifice_dia_in: Number(dia.input.value) || 0, cd: Number(cd.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["per_orifice_gpm", "orifice_dia_in", "cd"], r);
     if (r.error) { oH.textContent = r.error; oP.textContent = "-"; oN.textContent = ""; return; }
     oH.textContent = fmt(r.squirt_ft, 2) + " ft" + (r.in_lpp_band ? " (within the LPP 2.5-5 ft band)" : " (outside the LPP 2.5-5 ft band)");
     oP.textContent = fmt(r.squirt_psi, 2) + " psi";
@@ -542,7 +543,7 @@ function renderLeachFieldAggregate(inputRegion, outputRegion, citationEl) {
       num_trenches: nt.input.value === "" ? 3 : Number(nt.input.value), trench_length_ft: tl.input.value === "" ? 60 : Number(tl.input.value),
       trench_width_in: tw.input.value === "" ? 24 : Number(tw.input.value), stone_depth_in: sd.input.value === "" ? 12 : Number(sd.input.value),
       waste_pct: ws.input.value === "" ? 10 : Number(ws.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["num_trenches", "trench_length_ft", "trench_width_in", "stone_depth_in", "waste_pct"], r);
     if (r.error) { oCy.textContent = r.error; oTons.textContent = "-"; return; }
     // Until 2026-10-14 the cy (with waste) sat beside the ft^3 without it: "14.7 cy (360 ft^3)".
     const grossCf = r.stone_cy * 27;

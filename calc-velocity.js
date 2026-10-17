@@ -15,6 +15,7 @@ import {
   makeNumber as _v23h_makeNumber, makeSelect as _v23h_makeSelect,
   attachExampleButton as _v23h_attachEx, makeOutputLine as _v23h_makeOut,
   makeTextarea as _v23h_makeTextarea,
+  stepsFor,
 } from "./ui-fields.js";
 
 export const VELOCITY_RENDERERS = {};
@@ -71,7 +72,7 @@ export function renderDuctVelocityPressure(inputRegion, outputRegion, citationEl
   const oNote = _v23h_makeOut(outputRegion, "Note", "dvp-out-note");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = _v23h_debounce(() => {
-    const r = computeDuctVelocityPressure({ solve_for: mode.select.value, vp_inwc: readNum(vp.input), velocity_fpm: readNum(vel.input), air_density_lb_ft3: readNum(rho.input) });
+    const r = computeDuctVelocityPressure({ solve_for: mode.select.value, vp_inwc: readNum(vp.input), velocity_fpm: readNum(vel.input), air_density_lb_ft3: readNum(rho.input) }); stepsFor(outputRegion, inputRegion, ["solve_for", "vp_inwc", "velocity_fpm", "air_density_lb_ft3"], r);
     if (r.error) { oOut.textContent = r.error; oNote.textContent = ""; return; }
     oOut.textContent = r.solve_for === "vp" ? _v23h_fmt(r.vp_inwc, 4) + " in. w.c." : _v23h_fmt(r.velocity_fpm, 0) + " fpm";
     oNote.textContent = "Velocity constant " + _v23h_fmt(r.velocity_constant, 0) + " at " + _v23h_fmt(r.air_density_lb_ft3, 4) + " lb/ft3 (4005 for standard air, scaled by sqrt(0.075/density)); air-density-correction gives the density at altitude or temperature.";
@@ -126,7 +127,7 @@ export function renderRefrigerantVelocity(inputRegion, outputRegion, citationEl)
   const oVerdict = _v23h_makeOut(outputRegion, "Oil-return verdict", "rv-out-verdict");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = _v23h_debounce(() => {
-    const r = computeRefrigerantVelocity({ mass_flow_lb_hr: readNum(mf.input), line_id_in: readNum(id.input), specific_volume_ft3_lb: readNum(sv.input), orientation: orient.select.value });
+    const r = computeRefrigerantVelocity({ mass_flow_lb_hr: readNum(mf.input), line_id_in: readNum(id.input), specific_volume_ft3_lb: readNum(sv.input), orientation: orient.select.value }); stepsFor(outputRegion, inputRegion, ["mass_flow_lb_hr", "line_id_in", "specific_volume_ft3_lb", "orientation"], r);
     if (r.error) { oV.textContent = r.error; oVerdict.textContent = ""; return; }
     oV.textContent = _v23h_fmt(r.velocity_fpm, 0) + " fpm";
     oVerdict.textContent = r.verdict + " (min ~ " + r.oil_return_min_fpm + " fpm)";
@@ -172,7 +173,7 @@ export function renderRefrigerantLineSize(inputRegion, outputRegion, citationEl)
   const oNote = _v23h_makeOut(outputRegion, "Note", "rls-out-note");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = _v23h_debounce(() => {
-    const r = computeRefrigerantLineSize({ mass_flow_lb_hr: readNum(mf.input), specific_volume_ft3_lb: readNum(sv.input), target_velocity_fpm: Number(orient.select.value) });
+    const r = computeRefrigerantLineSize({ mass_flow_lb_hr: readNum(mf.input), specific_volume_ft3_lb: readNum(sv.input), target_velocity_fpm: Number(orient.select.value) }); stepsFor(outputRegion, inputRegion, ["mass_flow_lb_hr", "specific_volume_ft3_lb", "target_velocity_fpm"], r);
     if (r.error) { oD.textContent = r.error; oNote.textContent = ""; return; }
     oD.textContent = _v23h_fmt(r.line_id_in, 3) + " in (at " + _v23h_fmt(r.target_velocity_fpm, 0) + " fpm)";
     oNote.textContent = r.note;
@@ -215,7 +216,7 @@ export function renderPitotTraverseCfm(inputRegion, outputRegion, citationEl) {
   const oCfm = _v23h_makeOut(outputRegion, "Airflow", "ptc-out-cfm");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = _v23h_debounce(() => {
-    const r = computePitotTraverseCfm({ vp_avg_inwc: readNum(vp.input), w_in: readNum(w.input), h_in: readNum(h.input), air_density_lb_ft3: readNum(rho.input) });
+    const r = computePitotTraverseCfm({ vp_avg_inwc: readNum(vp.input), w_in: readNum(w.input), h_in: readNum(h.input), air_density_lb_ft3: readNum(rho.input) }); stepsFor(outputRegion, inputRegion, ["vp_avg_inwc", "w_in", "h_in", "air_density_lb_ft3"], r);
     if (r.error) { oVel.textContent = r.error; oArea.textContent = ""; oCfm.textContent = ""; return; }
     oVel.textContent = _v23h_fmt(r.v_fpm, 0) + " fpm (velocity constant " + _v23h_fmt(r.velocity_constant, 0) + ")";
     oArea.textContent = _v23h_fmt(r.area_ft2, 2) + " ft^2";
@@ -288,7 +289,7 @@ export function renderPitotTraverseAverage(inputRegion, outputRegion, citationEl
   const update = _v23h_debounce(() => {
     const list = parseNums(reads.input.value);
     if (list === null) { oV.textContent = "Each velocity pressure must be a finite number, one per line."; oCfm.textContent = "-"; oShortcut.textContent = "-"; oNote.textContent = ""; return; }
-    const r = computePitotTraverseAverage({ vp_readings: list, w_in: readNum(w.input), h_in: readNum(h.input), air_density_lb_ft3: readNum(rho.input) });
+    const r = computePitotTraverseAverage({ vp_readings: list, w_in: readNum(w.input), h_in: readNum(h.input), air_density_lb_ft3: readNum(rho.input) }); stepsFor(outputRegion, inputRegion, ["vp_readings", "w_in", "h_in", "air_density_lb_ft3"], r);
     if (r.error) { oV.textContent = r.error; oCfm.textContent = "-"; oShortcut.textContent = "-"; oNote.textContent = ""; return; }
     oV.textContent = _v23h_fmt(r.v_avg_fpm, 0) + " fpm over " + r.point_count + " points (" + _v23h_fmt(r.area_ft2, 2) + " ft^2)";
     oCfm.textContent = _v23h_fmt(r.cfm, 0) + " CFM";
@@ -380,7 +381,7 @@ export function renderDpFlowMeter(inputRegion, outputRegion, citationEl) {
   const oNote = _v23h_makeOut(outputRegion, "Note", "dpf-out-n");
   function readNum(i) { if (i.value === "") return NaN; const n = Number(i.value); return Number.isFinite(n) ? n : NaN; }
   const update = _v23h_debounce(() => {
-    const r = computeDpFlowMeter({ pipe_id_in: readNum(D.input), bore_in: readNum(d.input), dp_psi: readNum(dp.input), cd: readNum(cd.input), fluid_density_lb_ft3: readNum(rho.input), cd_mode: mode.select.value, viscosity_cst: readNum(nu.input) });
+    const r = computeDpFlowMeter({ pipe_id_in: readNum(D.input), bore_in: readNum(d.input), dp_psi: readNum(dp.input), cd: readNum(cd.input), fluid_density_lb_ft3: readNum(rho.input), cd_mode: mode.select.value, viscosity_cst: readNum(nu.input) }); stepsFor(outputRegion, inputRegion, ["pipe_id_in", "bore_in", "dp_psi", "cd", "fluid_density_lb_ft3", "cd_mode", "viscosity_cst"], r);
     if (r.error) { oQ.textContent = r.error; oV.textContent = "-"; oB.textContent = "-"; oC.textContent = "-"; oNote.textContent = ""; return; }
     oC.textContent = _v23h_fmt(r.cd_used, 4) + (r.cd_computed ? " (computed at Re " + _v23h_fmt(r.reynolds_number, 0) + ")" : " (entered)");
     oQ.textContent = _v23h_fmt(r.flow_gpm, 1) + " gpm";
@@ -493,7 +494,7 @@ export function renderGasDpFlowMeter(inputRegion, outputRegion, citationEl) {
   const oNote = _v23h_makeOut(outputRegion, "Note", "gdpf-out-n");
   function readNum(i) { if (i.value === "") return NaN; const n = Number(i.value); return Number.isFinite(n) ? n : NaN; }
   const update = _v23h_debounce(() => {
-    const r = computeGasDpFlowMeter({ pipe_id_in: readNum(D.input), bore_in: readNum(d.input), p1_psia: readNum(p1.input), dp_psi: readNum(dp.input), temp_f: readNum(tF.input), gas_sg: readNum(sg.input), kappa: readNum(kap.input), cd: readNum(cd.input), cd_mode: mode.select.value, viscosity_cp: readNum(mu.input) });
+    const r = computeGasDpFlowMeter({ pipe_id_in: readNum(D.input), bore_in: readNum(d.input), p1_psia: readNum(p1.input), dp_psi: readNum(dp.input), temp_f: readNum(tF.input), gas_sg: readNum(sg.input), kappa: readNum(kap.input), cd: readNum(cd.input), cd_mode: mode.select.value, viscosity_cp: readNum(mu.input) }); stepsFor(outputRegion, inputRegion, ["pipe_id_in", "bore_in", "p1_psia", "dp_psi", "temp_f", "gas_sg", "kappa", "cd", "cd_mode", "viscosity_cp"], r);
     if (r.error) { oE.textContent = r.error; oS.textContent = "-"; oM.textContent = "-"; oB.textContent = "-"; oC.textContent = "-"; oNote.textContent = ""; return; }
     oC.textContent = _v23h_fmt(r.cd_used, 4) + (r.cd_computed ? " (computed at Re " + _v23h_fmt(r.reynolds_number, 0) + ")" : " (entered)");
     oE.textContent = _v23h_fmt(r.expansion_factor, 4);
@@ -555,7 +556,7 @@ export function renderOrificePressureLoss(inputRegion, outputRegion, citationEl)
   const oNote = _v23h_makeOut(outputRegion, "Note", "opl-out-n");
   function readNum(i) { if (i.value === "") return NaN; const n = Number(i.value); return Number.isFinite(n) ? n : NaN; }
   const update = _v23h_debounce(() => {
-    const r = computeOrificePressureLoss({ pipe_id_in: readNum(D.input), bore_in: readNum(d.input), dp_psi: readNum(dp.input), cd: readNum(cd.input) });
+    const r = computeOrificePressureLoss({ pipe_id_in: readNum(D.input), bore_in: readNum(d.input), dp_psi: readNum(dp.input), cd: readNum(cd.input) }); stepsFor(outputRegion, inputRegion, ["pipe_id_in", "bore_in", "dp_psi", "cd"], r);
     if (r.error) { oL.textContent = r.error; oF.textContent = "-"; oR.textContent = "-"; oB.textContent = "-"; oNote.textContent = ""; return; }
     oL.textContent = _v23h_fmt(r.permanent_loss_psi, 3) + " psi (" + _v23h_fmt(r.permanent_loss_inwc, 1) + " in w.c.)";
     oF.textContent = _v23h_fmt(r.loss_fraction * 100, 1) + "% lost";
@@ -653,7 +654,7 @@ export function renderOrificeDischargeCoefficient(inputRegion, outputRegion, cit
   const oNote = _v23h_makeOut(outputRegion, "Note", "odc-out-n");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : NaN; }
   const update = _v23h_debounce(() => {
-    const r = computeOrificeDischargeCoefficient({ pipe_id_in: readNum(D.input), bore_in: readNum(d.input), taps: taps.select.value, reynolds_mode: mode.select.value, reynolds_number: readNum(re.input), flow_gpm: readNum(q.input), viscosity_cst: readNum(nu.input) });
+    const r = computeOrificeDischargeCoefficient({ pipe_id_in: readNum(D.input), bore_in: readNum(d.input), taps: taps.select.value, reynolds_mode: mode.select.value, reynolds_number: readNum(re.input), flow_gpm: readNum(q.input), viscosity_cst: readNum(nu.input) }); stepsFor(outputRegion, inputRegion, ["pipe_id_in", "bore_in", "taps", "reynolds_mode", "reynolds_number", "flow_gpm", "viscosity_cst"], r);
     if (r.error) { oC.textContent = r.error; oK.textContent = "-"; oB.textContent = "-"; oI.textContent = "-"; oR.textContent = "-"; oNote.textContent = ""; return; }
     oC.textContent = _v23h_fmt(r.discharge_coefficient, 4);
     oK.textContent = _v23h_fmt(r.flow_coefficient, 4);

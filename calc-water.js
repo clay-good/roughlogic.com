@@ -5,6 +5,7 @@ import {
   DEBOUNCE_MS, debounce, makeNumber, makeSelect,
   makeOutputLine, attachExampleButton, fmt,
   makeStepsPanel,
+  stepsFor,
 } from "./ui-fields.js";
 
 // v18 §7 contract guard: reject a non-finite numeric input. A renderer
@@ -496,7 +497,7 @@ function renderDilution(inputRegion, outputRegion, citationEl) {
       c1: Number(c1.input.value) || 0, v1: Number(v1.input.value) || 0,
       c2: Number(c2.input.value) || 0, v2: Number(v2.input.value) || 0,
       mode: mode.select.value, steps: Number(steps.input.value) || 1, dilution_factor: Number(df.input.value) || 10,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["c1", "v1", "c2", "v2", "mode", "steps", "dilution_factor"], r);
     if (r.error) { oC1.textContent = r.error; oV1.textContent = "-"; oC2.textContent = "-"; oV2.textContent = "-"; oD.textContent = "-"; return; }
     if (r.mode === "serial") {
       oC1.textContent = "(serial)"; oV1.textContent = "-"; oC2.textContent = "-"; oV2.textContent = "-";
@@ -622,7 +623,7 @@ function _v8w_renderCoagulantDose(inputRegion, outputRegion, citationEl) {
     const r = computeCoagulantDose({
       flow_mgd: Number(f.input.value) || 0, jar_test_dose_mg_l: Number(d.input.value) || 0,
       product: p.select.value,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["flow_mgd", "jar_test_dose_mg_l", "product"], r);
     if (r.error) { oP.textContent = r.error; oF.textContent = "-"; oG.textContent = "-"; return; }
     oP.textContent = _v8w_fmt(r.pure_lb_day, 1) + " lb/day";
     oF.textContent = _v8w_fmt(r.product_lb_day, 1) + " lb/day (" + r.product_strength_pct + "%)";
@@ -718,7 +719,7 @@ function renderSVI(inputRegion, outputRegion, citationEl) {
     const r = computeSVI({
       sv30_ml_per_l: readNum(sv.input),
       mlss_mg_per_l: readNum(ml.input),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["sv30_ml_per_l", "mlss_mg_per_l"], r);
     if (r.error) {
       oSVI.textContent = r.error; oB.textContent = ""; oSF.textContent = ""; oW.textContent = "";
       return;
@@ -962,7 +963,7 @@ function renderDisinfectionCT(inputRegion, outputRegion, citationEl) {
       temperature_C: readNum(t.input),
       pH: readNum(p.input),
       log_target: Number(lt.select.value) || 3,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["chlorine_mg_l", "t10_minutes", "temperature_C", "pH", "log_target"], r);
     if (r.error) {
       oA.textContent = r.error; oR.textContent = ""; oReq.textContent = ""; oL.textContent = ""; oG.textContent = ""; oV.textContent = ""; oW.textContent = "";
       return;
@@ -1091,7 +1092,7 @@ function _v16w_renderPoolTurnover(inputRegion, outputRegion, citationEl) {
       turnover_hr: _v16w_readNum(hr.input),
       chlorine_ppm: _v16w_readNum(ppm.input),
       chlorine_type: type.select.value,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["pool_volume_gal", "turnover_hr", "chlorine_ppm", "chlorine_type"], r);
     if (r.error) { oGpm.textContent = r.error; oCl.textContent = "-"; oNote.textContent = ""; return; }
     oGpm.textContent = fmt(r.turnover_gpm, 1) + " GPM";
     oCl.textContent = fmt(r.chlorine_product_lb, 3) + " lb " + r.chlorine_label + " (" + fmt(r.dose_pure_lb, 3) + " lb available Cl)";
@@ -1224,7 +1225,7 @@ function _v16w_renderWellDrawdown(inputRegion, outputRegion, citationEl) {
       pump_offset_ft: _v16w_readNum(offset.input),
       delta_s_per_log_ft: _v16w_readNum(ds.input),
       recovery_level_ft: _v16w_readNum(rec.input),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["static_level_ft", "pumping_level_ft", "discharge_gpm", "pump_offset_ft", "delta_s_per_log_ft", "recovery_level_ft"], r);
     if (r.error) { oDraw.textContent = r.error; oSc.textContent = "-"; oSet.textContent = "-"; oT.textContent = "-"; oNote.textContent = ""; return; }
     oDraw.textContent = fmt(r.drawdown_ft, 1) + " ft" + (r.residual_drawdown_ft == null ? "" : " (residual " + fmt(r.residual_drawdown_ft, 1) + " ft)");
     oSc.textContent = fmt(r.specific_capacity_gpm_ft, 2) + " GPM per ft of drawdown";
@@ -1263,7 +1264,7 @@ function _renderWellMaxYield(inputRegion, outputRegion, citationEl) {
   const oY = makeOutputLine(outputRegion, "Max sustainable yield", "wmy-out-y");
   const oNote = makeOutputLine(outputRegion, "Note", "wmy-out-note");
   const update = debounce(() => {
-    const r = computeWellMaxYield({ specific_capacity_gpm_ft: _v16w_readNum(sc.input), allowable_drawdown_ft: _v16w_readNum(s.input) });
+    const r = computeWellMaxYield({ specific_capacity_gpm_ft: _v16w_readNum(sc.input), allowable_drawdown_ft: _v16w_readNum(s.input) }); stepsFor(outputRegion, inputRegion, ["specific_capacity_gpm_ft", "allowable_drawdown_ft"], r);
     if (r.error) { oY.textContent = r.error; oNote.textContent = ""; return; }
     oY.textContent = fmt(r.max_yield_gpm, 1) + " GPM" + (r.marginal ? " (marginal well - specific capacity below 0.5 GPM/ft)" : "");
     oNote.textContent = r.note;
@@ -1353,7 +1354,7 @@ function _v16w_renderCoolingWaterMakeup(inputRegion, outputRegion, citationEl) {
       delta_T_F: _v16w_readNum(dT.input),
       coc: _v16w_readNum(coc.input),
       drift_fraction: _v16w_readNum(drift.input),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["recirculation_gpm", "delta_T_F", "coc", "drift_fraction"], r);
     if (r.error) { oFlows.textContent = r.error; oMakeup.textContent = "-"; oNote.textContent = ""; return; }
     oFlows.textContent = fmt(r.evaporation_gpm, 2) + " / " + fmt(r.blowdown_gpm, 2) + " / " + fmt(r.drift_gpm, 2) + " GPM";
     oMakeup.textContent = fmt(r.makeup_gpm, 2) + " GPM";
@@ -1439,7 +1440,7 @@ function _v16w_renderChlorineDecay(inputRegion, outputRegion, citationEl) {
       time_hr: _v16w_readNum(t.input),
       target_mg_l: _v16w_readNum(target.input),
       velocity_fps: _v16w_readNum(vel.input),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["initial_mg_l", "decay_k_per_hr", "time_hr", "target_mg_l", "velocity_fps"], r);
     if (r.error) { oRes.textContent = r.error; oTtt.textContent = "-"; oDist.textContent = "-"; oNote.textContent = ""; return; }
     oRes.textContent = fmt(r.residual_mg_l, 3) + " mg/L" + (r.below_target ? " (below target)" : "");
     oTtt.textContent = r.time_to_target_hr > 0 ? fmt(r.time_to_target_hr, 1) + " hr" : "already at or below target";
@@ -1507,7 +1508,7 @@ function _v16w_renderChlorineDecayConstant(inputRegion, outputRegion, citationEl
       initial_mg_l: _v16w_readNum(c0.input),
       residual_mg_l: _v16w_readNum(c.input),
       time_hr: _v16w_readNum(t.input),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["initial_mg_l", "residual_mg_l", "time_hr"], r);
     if (r.error) { oK.textContent = r.error; oHl.textContent = "-"; oNote.textContent = ""; return; }
     oK.textContent = fmt(r.decay_k_per_hr, 3) + " 1/hr";
     oHl.textContent = fmt(r.half_life_hr, 1) + " hr";
@@ -1988,7 +1989,7 @@ function _v926renderRoRecoveryConcentration(inputRegion, outputRegion, citationE
     const r = computeRoRecoveryConcentration({
       feed_gpm: fd.input.value === "" ? 10 : Number(fd.input.value), permeate_gpm: pm.input.value === "" ? 7.5 : Number(pm.input.value),
       feed_tds_mgl: td.input.value === "" ? 500 : Number(td.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["feed_gpm", "permeate_gpm", "feed_tds_mgl"], r);
     if (r.error) { oR.textContent = r.error; oC.textContent = "-"; oCF.textContent = "-"; return; }
     oR.textContent = fmt(r.recovery_pct, 1) + "%";
     oC.textContent = fmt(r.concentrate_gpm, 2) + " gpm";
@@ -2036,7 +2037,7 @@ function _v927renderIronManganeseChlorineDose(inputRegion, outputRegion, citatio
       fe_mgl: fe.input.value === "" ? 3.0 : Number(fe.input.value), mn_mgl: mn.input.value === "" ? 0.5 : Number(mn.input.value),
       extra_demand_mgl: dm.input.value === "" ? 0.5 : Number(dm.input.value), target_residual_mgl: rs.input.value === "" ? 0.3 : Number(rs.input.value),
       flow_mgd: fl.input.value === "" ? 0.05 : Number(fl.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["fe_mgl", "mn_mgl", "extra_demand_mgl", "target_residual_mgl", "flow_mgd"], r);
     if (r.error) { oDose.textContent = r.error; oLb.textContent = "-"; return; }
     oDose.textContent = fmt(r.dose_mgl, 2) + " mg/L";
     oLb.textContent = fmt(r.dose_lb_day, 2) + " lb/day";
@@ -2077,7 +2078,7 @@ function _v935renderCisternStorageDays(inputRegion, outputRegion, citationEl) {
     const r = computeCisternStorageDays({
       usable_storage_gal: st.input.value === "" ? 2500 : Number(st.input.value), daily_demand_gpd: dd.input.value === "" ? 150 : Number(dd.input.value),
       target_days: td.input.value === "" ? 30 : Number(td.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["usable_storage_gal", "daily_demand_gpd", "target_days"], r);
     if (r.error) { oDays.textContent = r.error; oReq.textContent = "-"; return; }
     oDays.textContent = fmt(r.reserve_days, 1) + " days";
     oReq.textContent = fmt(r.required_gal_for_target, 0) + " gal (for " + fmt(Number(td.input.value) || 30, 0) + " days)";
@@ -2121,7 +2122,7 @@ function _v971renderDechlorinationDose(inputRegion, outputRegion, citationEl) {
     const r = computeDechlorinationDose({
       chlorine_residual_mg_l: cr.input.value === "" ? 2 : Number(cr.input.value), flow_mgd: fl.input.value === "" ? 5 : Number(fl.input.value),
       stoich_ratio: sr.input.value === "" ? 1.46 : Number(sr.input.value), purity_pct: pu.input.value === "" ? 100 : Number(pu.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["chlorine_residual_mg_l", "flow_mgd", "stoich_ratio", "purity_pct"], r);
     if (r.error) { oD.textContent = r.error; oF.textContent = "-"; return; }
     oD.textContent = fmt(r.reagent_dose_mg_l, 2) + " mg/L";
     oF.textContent = fmt(r.feed_lb_day, 1) + " lb/day";
@@ -2172,7 +2173,7 @@ function _v973renderFloatMethodFlow(inputRegion, outputRegion, citationEl) {
       float_distance_ft: fd.input.value === "" ? 20 : Number(fd.input.value), travel_time_s: tt.input.value === "" ? 10 : Number(tt.input.value),
       channel_width_ft: cw.input.value === "" ? 4 : Number(cw.input.value), mean_depth_ft: md.input.value === "" ? 1.5 : Number(md.input.value),
       float_coefficient: fc.input.value === "" ? 0.85 : Number(fc.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["float_distance_ft", "travel_time_s", "channel_width_ft", "mean_depth_ft", "float_coefficient"], r);
     if (r.error) { oV.textContent = r.error; oQ.textContent = "-"; return; }
     oV.textContent = fmt(r.surface_velocity_fps, 2) + " ft/s (area " + fmt(r.cross_area_ft2, 1) + " ft^2)";
     oQ.textContent = fmt(r.flow_cfs, 2) + " cfs (" + fmt(r.flow_gpm, 0) + " gpm)";
@@ -2222,7 +2223,7 @@ function _v984renderFluorideFeedDose(inputRegion, outputRegion, citationEl) {
       target_dose_mg_l: td.input.value === "" ? 0.7 : Number(td.input.value), raw_fluoride_mg_l: rf.input.value === "" ? 0.1 : Number(rf.input.value),
       flow_mgd: fl.input.value === "" ? 2 : Number(fl.input.value), afi_fraction: af.input.value === "" ? 0.792 : Number(af.input.value),
       purity_fraction: pu.input.value === "" ? 0.25 : Number(pu.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["target_dose_mg_l", "raw_fluoride_mg_l", "flow_mgd", "afi_fraction", "purity_fraction"], r);
     if (r.error) { oF.textContent = r.error; oP.textContent = "-"; return; }
     oF.textContent = fmt(r.feed_lb_day, 2) + " lb/day of product";
     oP.textContent = fmt(r.pure_fluoride_lb_day, 2) + " lb/day fluoride ion";
@@ -2280,7 +2281,7 @@ function _v992renderTwoSourceBlend(inputRegion, outputRegion, citationEl) {
       flow1_gpm: f1.input.value === "" ? 500 : Number(f1.input.value), conc1: c1.input.value === "" ? 4 : Number(c1.input.value),
       flow2_gpm: f2.input.value === "" ? 300 : Number(f2.input.value), conc2: c2.input.value === "" ? 12 : Number(c2.input.value),
       target_conc: tc.input.value === "" ? 8 : Number(tc.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["flow1_gpm", "conc1", "flow2_gpm", "conc2", "target_conc"], r);
     if (r.error) { oB.textContent = r.error; oT.textContent = "-"; return; }
     oB.textContent = fmt(r.blended_conc, 2) + " mg/L";
     oT.textContent = r.target_note;

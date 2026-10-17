@@ -55,7 +55,39 @@ function section(body, title, rows) {
   body.append(h, dl);
 }
 
-export function drawSteps(body, { fields, params, r }, humanize) {
+// A hand-written renderer passes its compute's argument names instead of a
+// field list; the inputs are then read from the page -- each control's own
+// <label for> caption and the value it shows, so the row says what the reader
+// typed or chose.
+export function domFields(region) {
+  const fields = [], params = {};
+  if (!region) return { fields, params };
+  for (const el of region.querySelectorAll("input, select, textarea")) {
+    if (!el.id || el.type === "button" || el.type === "hidden" || el.closest("[hidden]")) continue;
+    const lab = region.querySelector('label[for="' + el.id + '"]');
+    const label = lab ? lab.textContent.trim() : "";
+    if (!label) continue;
+    let v = el.type === "checkbox" ? (el.checked ? "yes" : "no")
+      : el.tagName === "SELECT" ? (el.options[el.selectedIndex] || {}).text || el.value
+      : el.value.trim();
+    if (v === "") continue;
+    if (el.type === "number" && Number.isFinite(Number(v))) v = Number(v);
+    fields.push({ key: "\u0000" + el.id, label });
+    params["\u0000" + el.id] = v;
+  }
+  return { fields, params };
+}
+
+export function drawSteps(body, { fields, params, r }, humanize, region) {
+  if (!fields || typeof fields[0] !== "object") {
+    // Leave the compute's own argument names out of the worked values, as the
+    // declarative path does with its field keys.
+    const echo = new Set(fields || []);
+    const dom = domFields(region);
+    r = Object.fromEntries(Object.entries(r).filter(([k]) => !echo.has(k)));
+    fields = dom.fields;
+    params = dom.params;
+  }
   const rows = stepRows(fields, params, r, humanize);
   body.textContent = "";
   section(body, "Inputs used", rows.filter((x) => x.section === "in"));

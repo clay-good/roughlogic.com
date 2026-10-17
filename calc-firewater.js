@@ -5,6 +5,7 @@
 
 import {
   DEBOUNCE_MS, debounce, makeNumber, makeOutputLine, attachExampleButton, fmt,
+  stepsFor,
 } from "./ui-fields.js";
 
 const _finiteGuard = (o) => {
@@ -54,7 +55,7 @@ function renderHydrantAvailableFlow(inputRegion, outputRegion, citationEl) {
   const oC = makeOutputLine(outputRegion, "Hydrant class", "haf-out-c");
   const oN = makeOutputLine(outputRegion, "Note", "haf-out-n");
   const update = debounce(() => {
-    const r = computeHydrantAvailableFlow({ static_psi: Number(s.input.value) || 0, residual_psi: Number(res.input.value) || 0, qf_gpm: Number(qf.input.value) || 0 });
+    const r = computeHydrantAvailableFlow({ static_psi: Number(s.input.value) || 0, residual_psi: Number(res.input.value) || 0, qf_gpm: Number(qf.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["static_psi", "residual_psi", "qf_gpm"], r);
     if (r.error) { oQ.textContent = r.error; oC.textContent = "-"; oN.textContent = ""; return; }
     oQ.textContent = fmt(r.qr_gpm, 0) + " gpm (test drop " + fmt(r.hf_psi, 0) + " psi; " + fmt(r.hr_psi, 0) + " psi drop to the 20 psi rated residual)";
     oC.textContent = "Class " + r.hydrant_class;
@@ -104,7 +105,7 @@ function renderNfaFiregroundFlow(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "nfa-out-note");
   function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeNfaFiregroundFlow({ length_ft: readNum(L.input), width_ft: readNum(W.input), percent_involved: readNum(pct.input), floors_involved: floors.input.value === "" ? 1 : readNum(floors.input), exposures: readNum(exp.input) });
+    const r = computeNfaFiregroundFlow({ length_ft: readNum(L.input), width_ft: readNum(W.input), percent_involved: readNum(pct.input), floors_involved: floors.input.value === "" ? 1 : readNum(floors.input), exposures: readNum(exp.input) }); stepsFor(outputRegion, inputRegion, ["length_ft", "width_ft", "percent_involved", "floors_involved", "exposures"], r);
     if (r.error) { oBase.textContent = r.error; oExp.textContent = "-"; oValid.textContent = "-"; oNote.textContent = ""; return; }
     oBase.textContent = fmt(r.base_gpm, 0) + " gpm";
     oExp.textContent = "+" + fmt(r.exposure_gpm, 0) + " gpm exposures -> " + fmt(r.total_gpm, 0) + " gpm total";
@@ -148,7 +149,7 @@ function renderIowaRateOfFlow(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "iowa-out-note");
   function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeIowaRateOfFlow({ length_ft: readNum(L.input), width_ft: readNum(W.input), height_ft: readNum(H.input) });
+    const r = computeIowaRateOfFlow({ length_ft: readNum(L.input), width_ft: readNum(W.input), height_ft: readNum(H.input) }); stepsFor(outputRegion, inputRegion, ["length_ft", "width_ft", "height_ft"], r);
     if (r.error) { oVol.textContent = r.error; oGal.textContent = "-"; oRate.textContent = "-"; oNote.textContent = ""; return; }
     oVol.textContent = fmt(r.volume_ft3, 0) + " ft^3";
     oGal.textContent = fmt(r.total_gal, 0) + " gal";
@@ -199,7 +200,7 @@ function renderRelayPumpDistance(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "relay-out-note");
   function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeRelayPumpDistance({ target_flow_gpm: readNum(Q.input), hose_coefficient: readNum(C.input), max_discharge_psi: readNum(maxD.input), intake_residual_psi: intake.input.value === "" ? 20 : readNum(intake.input), elevation_ft: readNum(elev.input) });
+    const r = computeRelayPumpDistance({ target_flow_gpm: readNum(Q.input), hose_coefficient: readNum(C.input), max_discharge_psi: readNum(maxD.input), intake_residual_psi: intake.input.value === "" ? 20 : readNum(intake.input), elevation_ft: readNum(elev.input) }); stepsFor(outputRegion, inputRegion, ["target_flow_gpm", "hose_coefficient", "max_discharge_psi", "intake_residual_psi", "elevation_ft"], r);
     if (r.error) { oBudget.textContent = r.error; oFL.textContent = "-"; oDist.textContent = "-"; oNote.textContent = ""; return; }
     oBudget.textContent = fmt(r.budget_psi, 1) + " psi";
     oFL.textContent = fmt(r.fl_per_100_psi, 1) + " psi per 100 ft";
@@ -242,7 +243,7 @@ function renderDraftLiftMax(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "draft-out-note");
   function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeDraftLiftMax({ site_elevation_ft: readNum(elev.input), pump_factor: factor.input.value === "" ? 0.667 : readNum(factor.input), suction_losses_ft: readNum(loss.input) });
+    const r = computeDraftLiftMax({ site_elevation_ft: readNum(elev.input), pump_factor: factor.input.value === "" ? 0.667 : readNum(factor.input), suction_losses_ft: readNum(loss.input) }); stepsFor(outputRegion, inputRegion, ["site_elevation_ft", "pump_factor", "suction_losses_ft"], r);
     if (r.error) { oTheo.textContent = r.error; oAtt.textContent = "-"; oNote.textContent = ""; return; }
     oTheo.textContent = fmt(r.theoretical_lift_ft, 1) + " ft";
     oAtt.textContent = fmt(r.attainable_lift_ft, 1) + " ft below the pump";
@@ -290,7 +291,7 @@ function renderVacuumLiftReading(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "vlr-out-note");
   function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeVacuumLiftReading({ vacuum_inhg: readNum(vac.input), site_elevation_ft: readNum(elev.input), pump_factor: factor.input.value === "" ? 0.667 : readNum(factor.input) });
+    const r = computeVacuumLiftReading({ vacuum_inhg: readNum(vac.input), site_elevation_ft: readNum(elev.input), pump_factor: factor.input.value === "" ? 0.667 : readNum(factor.input) }); stepsFor(outputRegion, inputRegion, ["vacuum_inhg", "site_elevation_ft", "pump_factor"], r);
     if (r.error) { oHead.textContent = r.error; oCeil.textContent = "-"; oMargin.textContent = "-"; oNote.textContent = ""; return; }
     oHead.textContent = fmt(r.suction_head_ft, 1) + " ft (" + (r.pct_of_attainable !== null ? fmt(r.pct_of_attainable, 0) + "% of ceiling" : "-") + ")";
     oCeil.textContent = fmt(r.attainable_ceiling_ft, 1) + " ft";
@@ -335,7 +336,7 @@ function renderTankerShuttleFlow(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "shuttle-out-note");
   function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeTankerShuttleFlow({ nominal_tank_gal: readNum(nom.input), usable_fraction: frac.input.value === "" ? 0.9 : readNum(frac.input), tanker_count: readNum(count.input), cycle_time_min: readNum(cycle.input) });
+    const r = computeTankerShuttleFlow({ nominal_tank_gal: readNum(nom.input), usable_fraction: frac.input.value === "" ? 0.9 : readNum(frac.input), tanker_count: readNum(count.input), cycle_time_min: readNum(cycle.input) }); stepsFor(outputRegion, inputRegion, ["nominal_tank_gal", "usable_fraction", "tanker_count", "cycle_time_min"], r);
     if (r.error) { oUse.textContent = r.error; oFlow.textContent = "-"; oNote.textContent = ""; return; }
     oUse.textContent = fmt(r.usable_gal, 0) + " gal";
     oFlow.textContent = fmt(r.shuttle_flow_gpm, 0) + " gpm sustained";
@@ -386,7 +387,7 @@ function renderTankerShuttleCycle(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "tsc-out-note");
   function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeTankerShuttleCycle({ tank_gal: readNum(tank.input), fill_gpm: readNum(fill.input), dump_gpm: readNum(dump.input), distance_mi: readNum(dist.input), speed_mph: readNum(speed.input) });
+    const r = computeTankerShuttleCycle({ tank_gal: readNum(tank.input), fill_gpm: readNum(fill.input), dump_gpm: readNum(dump.input), distance_mi: readNum(dist.input), speed_mph: readNum(speed.input) }); stepsFor(outputRegion, inputRegion, ["tank_gal", "fill_gpm", "dump_gpm", "distance_mi", "speed_mph"], r);
     if (r.error) { oBreak.textContent = r.error; oCycle.textContent = "-"; oSingle.textContent = "-"; oNote.textContent = ""; return; }
     oBreak.textContent = fmt(r.fill_min, 1) + " / " + fmt(r.dump_min, 1) + " / " + fmt(r.travel_min, 1) + " min";
     oCycle.textContent = fmt(r.cycle_min, 1) + " min";
@@ -441,7 +442,7 @@ function renderTankerFleetSize(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "tfs-out-note");
   function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeTankerFleetSize({ tank_gal: readNum(tank.input), fill_gpm: readNum(fill.input), dump_gpm: readNum(dump.input), distance_mi: readNum(dist.input), speed_mph: readNum(speed.input) });
+    const r = computeTankerFleetSize({ tank_gal: readNum(tank.input), fill_gpm: readNum(fill.input), dump_gpm: readNum(dump.input), distance_mi: readNum(dist.input), speed_mph: readNum(speed.input) }); stepsFor(outputRegion, inputRegion, ["tank_gal", "fill_gpm", "dump_gpm", "distance_mi", "speed_mph"], r);
     if (r.error) { oFleet.textContent = r.error; oFlow.textContent = "-"; oBottle.textContent = "-"; oNote.textContent = ""; return; }
     oFleet.textContent = r.fleet_for_max + " tankers (a further tanker just queues)";
     oFlow.textContent = fmt(r.site_limited_flow_gpm, 0) + " gpm";
@@ -494,7 +495,7 @@ function renderFoamEductorLimit(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "fe-out-note");
   function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeFoamEductorLimit({ inlet_pressure_psi: readNum(inlet.input), eductor_flow_gpm: readNum(Q.input), hose_coefficient: readNum(C.input), nozzle_pressure_psi: readNum(nozzle.input), elevation_ft: readNum(elev.input) });
+    const r = computeFoamEductorLimit({ inlet_pressure_psi: readNum(inlet.input), eductor_flow_gpm: readNum(Q.input), hose_coefficient: readNum(C.input), nozzle_pressure_psi: readNum(nozzle.input), elevation_ft: readNum(elev.input) }); stepsFor(outputRegion, inputRegion, ["inlet_pressure_psi", "eductor_flow_gpm", "hose_coefficient", "nozzle_pressure_psi", "elevation_ft"], r);
     if (r.error) { oBP.textContent = r.error; oFL.textContent = "-"; oLen.textContent = "-"; oNote.textContent = ""; return; }
     oBP.textContent = fmt(r.max_back_pressure_psi, 0) + " psi (65% of inlet)";
     oFL.textContent = fmt(r.fl_per_100_psi, 1) + " psi per 100 ft";

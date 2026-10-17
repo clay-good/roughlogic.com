@@ -194,10 +194,17 @@ function makeNoteLine(parent, label, valueId) {
   return span;
 }
 
+// Hand-written renderers have no field list: one line after their compute
+// call creates the panel on first use, reading the inputs from the page.
+// `keys` are the compute's argument names, left out of the worked values.
+export function stepsFor(out, inp, keys, r) {
+  (out._steps || (out._steps = makeStepsPanel(out, inp))).update(keys, null, r);
+}
+
 // "Show the steps" (spec-v1964): a collapsed panel under the answer. Only the
 // empty box is built here; steps-panel.js and key-labels.js load the first
 // time it is opened, so a page where nobody opens it downloads neither.
-export function makeStepsPanel(parent) {
+export function makeStepsPanel(parent, region) {
   const box = document.createElement("details");
   box.className = "note-row steps-row";
   box.hidden = true;
@@ -211,13 +218,16 @@ export function makeStepsPanel(parent) {
   const draw = async () => {
     if (!box.open || !last) return;
     const [{ drawSteps }, { humanizeKey }] = await Promise.all([import("./steps-panel.js"), import("./key-labels.js")]);
-    if (last) drawSteps(body, last, humanizeKey);
+    if (last) drawSteps(body, last, humanizeKey, region);
   };
   box.addEventListener("toggle", draw);
   return {
     update(fields, params, r) {
       last = r && !r.error ? { fields, params, r } : null;
       box.hidden = !last;
+      // A renderer that rebuilds its outputs would leave the panel detached or
+      // mid-list; keep it attached and last.
+      if (parent.lastElementChild !== box) parent.appendChild(box);
       if (!last) body.textContent = "";
       draw();
     },

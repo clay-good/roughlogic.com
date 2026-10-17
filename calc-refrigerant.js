@@ -34,6 +34,7 @@ import {
   DEBOUNCE_MS, debounce, makeNumber, makeSelect,
   makeOutputLine, attachExampleButton, fmt,
   makeStepsPanel,
+  stepsFor,
 } from "./ui-fields.js";
 
 // v18 §7 contract guard: reject a non-finite numeric input. A renderer
@@ -525,7 +526,7 @@ export function renderRefrigerantPT(inputRegion, outputRegion, citationEl) {
       inputs.outdoor_F = oatVal;
       inputs.indoor_wb_F = wbVal;
     }
-    const r = computeRefrigerantPT(inputs);
+    const r = computeRefrigerantPT(inputs); stepsFor(outputRegion, inputRegion, null, r);
     if (r.error) { oT.textContent = r.error; oS.textContent = "-"; oTSH.textContent = "-"; return; }
     if (r.saturated_temperature_F !== undefined) oT.textContent = fmt(r.saturated_temperature_F, 1) + " F";
     else oT.textContent = fmt(r.saturated_pressure_psig, 1) + " psig";
@@ -565,7 +566,7 @@ export function renderSuperheatSubcool(inputRegion, outputRegion, citationEl) {
       indoor_wet_bulb_F: Number(iwb.input.value) || 0,
       outdoor_dry_bulb_F: odb.input.value === "" ? null : Number(odb.input.value),
       target_subcool_F: Number(tsc.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["refrigerant", "line_temperature_F", "mode", "indoor_wet_bulb_F", "outdoor_dry_bulb_F", "target_subcool_F"], r);
     if (r.error) { oSat.textContent = r.error; oR.textContent = "-"; oD.textContent = "-"; oV.textContent = "-"; return; }
     oSat.textContent = fmt(r.saturated_temperature_F, 1) + " F";
     oR.textContent = mode.select.value === "superheat"
@@ -601,7 +602,7 @@ export function renderCompareRefrigerants(inputRegion, outputRegion, citationEl)
     const num = Number(v.input.value);
     const args = { refrigerant_a: a.select.value, refrigerant_b: b.select.value };
     if (mode.select.value === "pressure") args.pressure_psig = num; else args.temperature_F = num;
-    const r = computeCompareRefrigerants(args);
+    const r = computeCompareRefrigerants(args); stepsFor(outputRegion, inputRegion, null, r);
     if (r.error) { oA.textContent = r.error; oAttrA.textContent = "-"; oB.textContent = "-"; oAttrB.textContent = "-"; return; }
     const fmtSide = (side) => side.saturated_temperature_F !== undefined
       ? fmt(side.saturated_temperature_F, 2) + " F"
@@ -638,7 +639,7 @@ export function renderRefrigerantCharge(inputRegion, outputRegion, citationEl) {
       refrigerant: ref.select.value,
       sections: [{ diameter: dia.select.value, length_ft: Number(len.input.value) || 0 }]
         .concat(dia2.select.value && Number(len2.input.value) > 0 ? [{ diameter: dia2.select.value, length_ft: Number(len2.input.value) }] : []),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["refrigerant", "sections"], r);
     if (r.error) { oOz.textContent = r.error; oLb.textContent = "-"; return; }
     oOz.textContent = fmt(r.total_oz, 2) + " oz";
     oLb.textContent = fmt(r.total_lb, 3) + " lb";
@@ -674,7 +675,7 @@ function renderRefrigerantCharging(inputRegion, outputRegion, citationEl) {
       suction_line_temp_F: st.input.value === "" ? null : Number(st.input.value),
       liquid_pressure: Number(lp.input.value) || 0, liquid_unit: lu.select.value,
       liquid_line_temp_F: lt.input.value === "" ? null : Number(lt.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["refrigerant", "suction_pressure", "suction_unit", "suction_line_temp_F", "liquid_pressure", "liquid_unit", "liquid_line_temp_F"], r);
     if (r.error) { oTSS.textContent = r.error; oTSL.textContent = "-"; oSH.textContent = "-"; oSC.textContent = "-"; return; }
     oTSS.textContent = fmt(r.T_sat_suction_F, 1) + " °F (" + fmt(r.suction_psia, 1) + " psia)";
     oTSL.textContent = fmt(r.T_sat_liquid_F, 1) + " °F (" + fmt(r.liquid_psia, 1) + " psia)";
@@ -725,7 +726,7 @@ function _v320renderRefrigerantMassFlow(inputRegion, outputRegion, citationEl) {
   const oM = makeOutputLine(outputRegion, "Refrigerant mass flow", "rmf-out-m");
   const oNote = makeOutputLine(outputRegion, "Note", "rmf-out-note");
   const update = debounce(() => {
-    const r = computeRefrigerantMassFlow({ q: Number(q.input.value) || 0, unit_tons: Number(unit.select.value), h1_btulb: Number(h1.input.value) || 0, h4_btulb: Number(h4.input.value) || 0 });
+    const r = computeRefrigerantMassFlow({ q: Number(q.input.value) || 0, unit_tons: Number(unit.select.value), h1_btulb: Number(h1.input.value) || 0, h4_btulb: Number(h4.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["q", "unit_tons", "h1_btulb", "h4_btulb"], r);
     if (r.error) { oRe.textContent = r.error; oM.textContent = "-"; oNote.textContent = "-"; return; }
     oRe.textContent = fmt(r.re_btulb, 1) + " Btu/lb";
     oM.textContent = fmt(r.m_dot_lbmin, 1) + " lb/min (" + fmt(r.m_dot_lbh, 0) + " lb/h)";
@@ -773,7 +774,7 @@ function _v321renderRefrigerationCop(inputRegion, outputRegion, citationEl) {
   const oCarnot = makeOutputLine(outputRegion, "Carnot COP / second-law efficiency", "rc-out-carnot");
   const oNote = makeOutputLine(outputRegion, "Note", "rc-out-note");
   const update = debounce(() => {
-    const r = computeRefrigerationCop({ h1_btulb: Number(h1.input.value) || 0, h2_btulb: Number(h2.input.value) || 0, h4_btulb: Number(h4.input.value) || 0, tevap_f: te.input.value === "" ? null : Number(te.input.value), tcond_f: tc.input.value === "" ? null : Number(tc.input.value) });
+    const r = computeRefrigerationCop({ h1_btulb: Number(h1.input.value) || 0, h2_btulb: Number(h2.input.value) || 0, h4_btulb: Number(h4.input.value) || 0, tevap_f: te.input.value === "" ? null : Number(te.input.value), tcond_f: tc.input.value === "" ? null : Number(tc.input.value) }); stepsFor(outputRegion, inputRegion, ["h1_btulb", "h2_btulb", "h4_btulb", "tevap_f", "tcond_f"], r);
     if (r.error) { oCop.textContent = r.error; oCarnot.textContent = "-"; oNote.textContent = "-"; return; }
     oCop.textContent = fmt(r.cop, 2) + " (EER " + fmt(r.eer, 2) + ")";
     oCarnot.textContent = fmt(r.cop_carnot, 2) + " / " + fmt(r.eta_2nd * 100, 0) + "% of ideal";
@@ -812,7 +813,7 @@ function _v322renderCondenserHeatRejection(inputRegion, outputRegion, citationEl
   const oFactor = makeOutputLine(outputRegion, "Heat-rejection factor", "chr-out-factor");
   const oNote = makeOutputLine(outputRegion, "Note", "chr-out-note");
   const update = debounce(() => {
-    const r = computeCondenserHeatRejection({ q_evap: Number(q.input.value) || 0, unit_tons: Number(unit.select.value), cop: Number(cop.input.value) || 0 });
+    const r = computeCondenserHeatRejection({ q_evap: Number(q.input.value) || 0, unit_tons: Number(unit.select.value), cop: Number(cop.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["q_evap", "unit_tons", "cop"], r);
     if (r.error) { oW.textContent = r.error; oThr.textContent = "-"; oFactor.textContent = "-"; oNote.textContent = "-"; return; }
     oW.textContent = fmt(r.w_comp_btuh, 0) + " Btu/h";
     oThr.textContent = fmt(r.thr_btuh, 0) + " Btu/h (" + fmt(r.thr_tons, 2) + " tons)";
@@ -860,7 +861,7 @@ function _renderCondenserCopForHeatRejection(inputRegion, outputRegion, citation
   const oFactor = makeOutputLine(outputRegion, "Heat-rejection factor", "ccp-out-factor");
   const oNote = makeOutputLine(outputRegion, "Note", "ccp-out-note");
   const update = debounce(() => {
-    const r = computeCondenserCopForHeatRejection({ q_evap: Number(q.input.value) || 0, target_thr: Number(thr.input.value) || 0, unit_tons: Number(unit.select.value) });
+    const r = computeCondenserCopForHeatRejection({ q_evap: Number(q.input.value) || 0, target_thr: Number(thr.input.value) || 0, unit_tons: Number(unit.select.value) }); stepsFor(outputRegion, inputRegion, ["q_evap", "target_thr", "unit_tons"], r);
     if (r.error) { oCop.textContent = r.error; oW.textContent = "-"; oFactor.textContent = "-"; oNote.textContent = "-"; return; }
     oCop.textContent = fmt(r.cop, 2);
     oW.textContent = fmt(r.w_comp_btuh, 0) + " Btu/h";
@@ -921,7 +922,7 @@ function _v432renderWalkInCoolerLoad(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "wic-out-n");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeWalkInCoolerLoad({ u_factor: readNum(u.input), area_ft2: readNum(area.input), delta_t_f: readNum(dt.input), infiltration_btuh: readNum(infil.input), product_btuh: readNum(prod.input), internal_btuh: readNum(internal.input), safety: readNum(sf.input), run_hours: readNum(rh.input) });
+    const r = computeWalkInCoolerLoad({ u_factor: readNum(u.input), area_ft2: readNum(area.input), delta_t_f: readNum(dt.input), infiltration_btuh: readNum(infil.input), product_btuh: readNum(prod.input), internal_btuh: readNum(internal.input), safety: readNum(sf.input), run_hours: readNum(rh.input) }); stepsFor(outputRegion, inputRegion, ["u_factor", "area_ft2", "delta_t_f", "infiltration_btuh", "product_btuh", "internal_btuh", "safety", "run_hours"], r);
     if (r.error) { oT.textContent = r.error; oTot.textContent = "-"; oEq.textContent = "-"; oNote.textContent = ""; return; }
     oT.textContent = fmt(r.transmission_btuh, 0) + " Btu/hr";
     oTot.textContent = fmt(r.total_btuh, 0) + " Btu/hr (" + fmt(r.tons, 2) + " tons)";
@@ -990,7 +991,7 @@ function _v433renderProductPullDownLoad(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "ppd-out-n");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeProductPullDownLoad({ mass_lb: readNum(mass.input), cp_above: readNum(cpa.input), t_enter_f: tEnter.input.value === "" ? null : readNum(tEnter.input), t_storage_f: tStore.input.value === "" ? null : readNum(tStore.input), t_freeze_f: readNum(tFreeze.input), hif_btu_lb: readNum(hif.input), cp_below: readNum(cpb.input), hours: readNum(hrs.input) });
+    const r = computeProductPullDownLoad({ mass_lb: readNum(mass.input), cp_above: readNum(cpa.input), t_enter_f: tEnter.input.value === "" ? null : readNum(tEnter.input), t_storage_f: tStore.input.value === "" ? null : readNum(tStore.input), t_freeze_f: readNum(tFreeze.input), hif_btu_lb: readNum(hif.input), cp_below: readNum(cpb.input), hours: readNum(hrs.input) }); stepsFor(outputRegion, inputRegion, ["mass_lb", "cp_above", "t_enter_f", "t_storage_f", "t_freeze_f", "hif_btu_lb", "cp_below", "hours"], r);
     if (r.error) { oQ.textContent = r.error; oR.textContent = "-"; oNote.textContent = ""; return; }
     oQ.textContent = fmt(r.q_btu, 0) + " Btu" + (r.latent_included ? " (incl. latent freezing)" : "");
     oR.textContent = fmt(r.rate_btuh, 0) + " Btu/hr";
@@ -1036,7 +1037,7 @@ function _v698renderProductPullDownTime(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "ppt-out-n");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeProductPullDownTime({ mass_lb: readNum(mass.input), cp_above: readNum(cpa.input), t_enter_f: tEnter.input.value === "" ? null : readNum(tEnter.input), t_storage_f: tStore.input.value === "" ? null : readNum(tStore.input), t_freeze_f: readNum(tFreeze.input), hif_btu_lb: readNum(hif.input), cp_below: readNum(cpb.input), capacity_btuh: readNum(cap.input) });
+    const r = computeProductPullDownTime({ mass_lb: readNum(mass.input), cp_above: readNum(cpa.input), t_enter_f: tEnter.input.value === "" ? null : readNum(tEnter.input), t_storage_f: tStore.input.value === "" ? null : readNum(tStore.input), t_freeze_f: readNum(tFreeze.input), hif_btu_lb: readNum(hif.input), cp_below: readNum(cpb.input), capacity_btuh: readNum(cap.input) }); stepsFor(outputRegion, inputRegion, ["mass_lb", "cp_above", "t_enter_f", "t_storage_f", "t_freeze_f", "hif_btu_lb", "cp_below", "capacity_btuh"], r);
     if (r.error) { oH.textContent = r.error; oQ.textContent = "-"; oNote.textContent = ""; return; }
     oH.textContent = fmt(r.hours, 1) + " hr";
     oQ.textContent = fmt(r.q_btu, 0) + " Btu" + (r.latent_included ? " (incl. latent freezing)" : "");
@@ -1117,7 +1118,7 @@ function _v434renderEvaporatorTdDtd(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "etd-out-n");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeEvaporatorTdDtd({ box_temp_f: box.input.value === "" ? null : readNum(box.input), sst_f: sst.input.value === "" ? null : readNum(sst.input), design_load_btuh: readNum(load.input), coil_ua_btuh_f: readNum(ua.input), rating_td_f: readNum(rtd.input) });
+    const r = computeEvaporatorTdDtd({ box_temp_f: box.input.value === "" ? null : readNum(box.input), sst_f: sst.input.value === "" ? null : readNum(sst.input), design_load_btuh: readNum(load.input), coil_ua_btuh_f: readNum(ua.input), rating_td_f: readNum(rtd.input) }); stepsFor(outputRegion, inputRegion, ["box_temp_f", "sst_f", "design_load_btuh", "coil_ua_btuh_f", "rating_td_f"], r);
     if (r.error) { oD.textContent = r.error; oB.textContent = "-"; oC.textContent = "-"; oR.textContent = "-"; oNote.textContent = ""; return; }
     oD.textContent = fmt(r.dtd, 1) + " F";
     oB.textContent = r.band;
@@ -1166,7 +1167,7 @@ function _v586renderFlashGasSubcool(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "fgs-out-note");
   function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeFlashGasSubcool({ vertical_lift_ft: readNum(lift.input), friction_dp_psi: readNum(friction.input), static_gradient: grad.input.value === "" ? 0.43 : readNum(grad.input), pt_slope: slope.input.value === "" ? 5 : readNum(slope.input) });
+    const r = computeFlashGasSubcool({ vertical_lift_ft: readNum(lift.input), friction_dp_psi: readNum(friction.input), static_gradient: grad.input.value === "" ? 0.43 : readNum(grad.input), pt_slope: slope.input.value === "" ? 5 : readNum(slope.input) }); stepsFor(outputRegion, inputRegion, ["vertical_lift_ft", "friction_dp_psi", "static_gradient", "pt_slope"], r);
     if (r.error) { oLift.textContent = r.error; oTotal.textContent = "-"; oSub.textContent = "-"; oNote.textContent = ""; return; }
     oLift.textContent = fmt(r.dp_lift_psi, 1) + " psi";
     oTotal.textContent = fmt(r.dp_total_psi, 1) + " psi";
@@ -1214,7 +1215,7 @@ function _v792renderCompressorDisplacement(inputRegion, outputRegion, citationEl
   const oNote = makeOutputLine(outputRegion, "Note", "cdisp-out-n");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeCompressorDisplacement({ bore_in: readNum(bore.input), stroke_in: readNum(stroke.input), cylinders: readNum(cyl.input), rpm: readNum(rpm.input) });
+    const r = computeCompressorDisplacement({ bore_in: readNum(bore.input), stroke_in: readNum(stroke.input), cylinders: readNum(cyl.input), rpm: readNum(rpm.input) }); stepsFor(outputRegion, inputRegion, ["bore_in", "stroke_in", "cylinders", "rpm"], r);
     if (r.error) { oR.textContent = r.error; oC.textContent = "-"; oNote.textContent = ""; return; }
     oR.textContent = fmt(r.displacement_cid_per_rev, 2) + " in^3/rev";
     oC.textContent = fmt(r.displacement_cfm, 2) + " CFM (" + fmt(r.displacement_cid_per_min, 0) + " in^3/min) at 100% VE";
@@ -1255,7 +1256,7 @@ function _v861renderRefrigerantLinesetChargeAdjust(inputRegion, outputRegion, ci
     const r = computeRefrigerantLinesetChargeAdjust({
       lineset_length_ft: ll.input.value === "" ? 60 : Number(ll.input.value), factory_charge_length_ft: fl.input.value === "" ? 15 : Number(fl.input.value),
       rate_oz_per_ft: rt.input.value === "" ? 0.6 : Number(rt.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["lineset_length_ft", "factory_charge_length_ft", "rate_oz_per_ft"], r);
     if (r.error) { oOz.textContent = r.error; return; }
     oOz.textContent = fmt(r.extra_oz, 1) + " oz (" + fmt(r.extra_lb, 2) + " lb)";
   }, DEBOUNCE_MS);
@@ -1300,7 +1301,7 @@ function _v978renderCompressorVolumetricEfficiency(inputRegion, outputRegion, ci
     const r = computeCompressorVolumetricEfficiency({
       clearance_ratio: cl.input.value === "" ? 0.045 : Number(cl.input.value), suction_pressure_psia: sp.input.value === "" ? 70 : Number(sp.input.value),
       discharge_pressure_psia: dp.input.value === "" ? 300 : Number(dp.input.value), polytropic_exponent: nn.input.value === "" ? 1.11 : Number(nn.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["clearance_ratio", "suction_pressure_psia", "discharge_pressure_psia", "polytropic_exponent"], r);
     if (r.error) { oC.textContent = r.error; oV.textContent = "-"; return; }
     oC.textContent = fmt(r.compression_ratio, 2) + ":1";
     oV.textContent = fmt(r.volumetric_efficiency_pct, 1) + "% (clearance only; actual is lower)";

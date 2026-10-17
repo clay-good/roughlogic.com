@@ -474,6 +474,7 @@ import {
   DEBOUNCE_MS, debounce, makeNumber, makeText, makeSelect, makeCheckbox,
   makeOutputLine, attachExampleButton, fmt,
   makeStepsPanel,
+  stepsFor,
 } from "./ui-fields.js";
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
@@ -489,7 +490,7 @@ export function renderStairs(inputRegion, outputRegion, citationEl) {
   const oH = makeOutputLine(outputRegion, "Riser height", "st-out-h");
   const oRun = makeOutputLine(outputRegion, "Total run", "st-out-run");
   const update = debounce(() => {
-    const r = computeStairs({ total_rise_in: Number(tr.input.value) || 0, preferred_riser_height_in: Number(pref.input.value) || 7.5 });
+    const r = computeStairs({ total_rise_in: Number(tr.input.value) || 0, preferred_riser_height_in: Number(pref.input.value) || 7.5 }); stepsFor(outputRegion, inputRegion, ["total_rise_in", "preferred_riser_height_in"], r);
     if (r.error) { oR.textContent = r.error; return; }
     oR.textContent = String(r.risers); oT.textContent = String(r.treads);
     oH.textContent = fmt(r.riser_height_in, 3) + " in";
@@ -510,7 +511,7 @@ export function renderRoofPitch(inputRegion, outputRegion, citationEl) {
   const oPct = makeOutputLine(outputRegion, "Percent", "rp-out-pct");
   const oD = makeOutputLine(outputRegion, "Degrees", "rp-out-d");
   const update = debounce(() => {
-    const r = computeRoofPitch({ rise: Number(rise.input.value) || 0, run: Number(run.input.value) || 12, mode: "rise_run" });
+    const r = computeRoofPitch({ rise: Number(rise.input.value) || 0, run: Number(run.input.value) || 12, mode: "rise_run" }); stepsFor(outputRegion, inputRegion, ["rise", "run", "mode"], r);
     if (r.error) { oP.textContent = r.error; oPct.textContent = "-"; oD.textContent = "-"; return; }
     oP.textContent = fmt(r.pitch_in_per_ft, 2);
     oPct.textContent = fmt(r.percent, 2) + " %";
@@ -535,7 +536,7 @@ export function renderRafter(inputRegion, outputRegion, citationEl) {
       horizontal_span_ft: Number(span.input.value) || 0,
       pitch_rise_per_12: Number(pitch.input.value) || 0,
       overhang_ft: Number(overhang.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["horizontal_span_ft", "pitch_rise_per_12", "overhang_ft"], r);
     oR.textContent = fmt(r.rafter_length_ft, 3) + " ft";
     oM.textContent = fmt(r.multiplier, 4);
   }, DEBOUNCE_MS);
@@ -571,7 +572,7 @@ export function renderArea(inputRegion, outputRegion, citationEl) {
   function update() {
     const dims = {};
     for (const [k, el] of Object.entries(inputs)) dims[k] = Number(el.value) || 0;
-    const r = computeArea({ shape: shape.select.value, ...dims });
+    const r = computeArea({ shape: shape.select.value, ...dims }); stepsFor(outputRegion, inputRegion, null, r);
     oA.textContent = r.error ? r.error : fmt(r.area_ft2, 2) + " ft^2";
   }
   shape.select.addEventListener("input", () => { refreshDims(); update(); });
@@ -591,7 +592,7 @@ export function renderBoardFootage(inputRegion, outputRegion, citationEl) {
   const oE = makeOutputLine(outputRegion, "Per piece", "bf-out-e");
   const oT = makeOutputLine(outputRegion, "Total", "bf-out-t");
   const update = debounce(() => {
-    const r = computeBoardFootage({ thickness_in: Number(t.input.value) || 0, width_in: Number(w.input.value) || 0, length_ft: Number(l.input.value) || 0, count: Number(c.input.value) || 1 });
+    const r = computeBoardFootage({ thickness_in: Number(t.input.value) || 0, width_in: Number(w.input.value) || 0, length_ft: Number(l.input.value) || 0, count: Number(c.input.value) || 1 }); stepsFor(outputRegion, inputRegion, ["thickness_in", "width_in", "length_ft", "count"], r);
     oE.textContent = fmt(r.board_feet_each, 2) + " bf";
     oT.textContent = fmt(r.total_board_feet, 2) + " bf";
   }, DEBOUNCE_MS);
@@ -636,7 +637,7 @@ export function renderConcrete(inputRegion, outputRegion, citationEl) {
   attachExampleButton(inputRegion, () => { shape.select.value = "slab"; refreshDims(); inputs.length_ft.value = "10"; inputs.width_ft.value = "10"; inputs.thickness_in.value = "4"; waste.input.value = "0.10"; update(); });
   function update() {
     const d = {}; for (const [k, el] of Object.entries(inputs)) d[k] = Number(el.value) || 0;
-    const r = computeConcreteVolume({ shape: shape.select.value, waste_factor: Number(waste.input.value) || 0, ...d });
+    const r = computeConcreteVolume({ shape: shape.select.value, waste_factor: Number(waste.input.value) || 0, ...d }); stepsFor(outputRegion, inputRegion, null, r);
     if (r.error) { oCF.textContent = r.error; oCY.textContent = "-"; oCYW.textContent = "-"; oBags60.textContent = "-"; oBags80.textContent = "-"; return; }
     oCF.textContent = fmt(r.cubic_feet, 2);
     oCY.textContent = fmt(r.cubic_yards, 3);
@@ -665,7 +666,7 @@ export function renderRebar(inputRegion, outputRegion, citationEl) {
   const oB = makeOutputLine(outputRegion, "Bars (along width)", "rb-out-b");
   const oT = makeOutputLine(outputRegion, "Total linear feet", "rb-out-t");
   const update = debounce(() => {
-    const r = computeRebar({ length_ft: Number(l.input.value) || 0, width_ft: Number(w.input.value) || 0, spacing_in: Number(sp.input.value) || 12, edge_clearance_in: ec.input.value === "" ? 3 : Number(ec.input.value), bar_size: size.select.value });
+    const r = computeRebar({ length_ft: Number(l.input.value) || 0, width_ft: Number(w.input.value) || 0, spacing_in: Number(sp.input.value) || 12, edge_clearance_in: ec.input.value === "" ? 3 : Number(ec.input.value), bar_size: size.select.value }); stepsFor(outputRegion, inputRegion, ["length_ft", "width_ft", "spacing_in", "edge_clearance_in", "bar_size"], r);
     if (r.error) { oA.textContent = r.error; oB.textContent = "-"; oT.textContent = "-"; return; }
     oA.textContent = String(r.bars_along_length);
     oB.textContent = String(r.bars_along_width);
@@ -701,7 +702,7 @@ export function renderLumberSpans(inputRegion, outputRegion, citationEl) {
       tributary_width_in: Number(tw.input.value) || 0,
       deflection_limit: Number(dl.input.value) || 360,
       live_load_psf: Number(ll.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["species_grade", "nominal_size", "total_load_psf", "tributary_width_in", "deflection_limit", "live_load_psf"], r);
     if (r.error) { oS.textContent = r.error; oB.textContent = "-"; oD.textContent = "-"; oG.textContent = "-"; oDef.textContent = "-"; return; }
     oS.textContent = fmt(r.allowable_span_ft, 2) + " ft";
     oB.textContent = fmt(r.by_bending_ft, 2) + " ft";
@@ -735,7 +736,7 @@ export function renderPullout(inputRegion, outputRegion, citationEl) {
   const oPI = makeOutputLine(outputRegion, "Withdrawal per inch", "po-out-pi");
   const oT = makeOutputLine(outputRegion, "Total withdrawal", "po-out-t");
   function update() {
-    const r = computePullout({ fastener_type: ftype.select.value, fastener_size: sizeSel ? sizeSel.value : "", species: species.select.value, penetration_in: Number(pen.input.value) || 0 });
+    const r = computePullout({ fastener_type: ftype.select.value, fastener_size: sizeSel ? sizeSel.value : "", species: species.select.value, penetration_in: Number(pen.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["fastener_type", "fastener_size", "species", "penetration_in"], r);
     if (r.error) { oPI.textContent = r.error; oT.textContent = "-"; return; }
     oPI.textContent = fmt(r.withdrawal_per_inch_lb, 1) + " lb/in";
     oT.textContent = fmt(r.total_withdrawal_lb, 1) + " lb";
@@ -768,7 +769,7 @@ export function renderBeamLoading(inputRegion, outputRegion, citationEl) {
       E_psi: Number(E.input.value) || 0,
       b_in: Number(b.input.value) || 0,
       d_in: Number(d.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["load_type", "load_value", "length_ft", "E_psi", "b_in", "d_in"], r);
     if (r.error) { oM.textContent = r.error; oD.textContent = "-"; return; }
     oM.textContent = fmt(r.M_lbft, 0) + " lb*ft";
     oD.textContent = fmt(r.delta_in, 3) + " in";
@@ -787,7 +788,7 @@ export function renderMaterialQuantity(inputRegion, outputRegion, citationEl) {
   const oR = makeOutputLine(outputRegion, "Raw units", "mq-out-r");
   const oC = makeOutputLine(outputRegion, "Coverage / waste", "mq-out-c");
   const update = debounce(() => {
-    const r = computeMaterialQuantity({ assembly: a.select.value, area_ft2: Number(area.input.value) || 0 });
+    const r = computeMaterialQuantity({ assembly: a.select.value, area_ft2: Number(area.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["assembly", "area_ft2"], r);
     if (r.error) { oU.textContent = r.error; oR.textContent = "-"; oC.textContent = "-"; return; }
     oU.textContent = String(r.units_with_waste) + " " + r.unit_label;
     oR.textContent = fmt(r.units_raw, 2);
@@ -1132,7 +1133,7 @@ function renderWindSpeedFromVelocityPressure(inputRegion, outputRegion, citation
   const oV = makeOutputLine(outputRegion, "Equivalent basic wind speed", "wsv-out-v");
   const oN = makeOutputLine(outputRegion, "Note", "wsv-out-n");
   const update = debounce(() => {
-    const r = computeWindSpeedFromVelocityPressure({ velocity_pressure_psf: Number(q.input.value) || 0 });
+    const r = computeWindSpeedFromVelocityPressure({ velocity_pressure_psf: Number(q.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["velocity_pressure_psf"], r);
     if (r.error) { oV.textContent = r.error; oN.textContent = "-"; return; }
     oV.textContent = fmt(r.wind_speed_mph, 1) + " mph";
     oN.textContent = r.note;
@@ -1246,7 +1247,7 @@ export function renderStairStringer(inputRegion, outputRegion, citationEl) {
   const oF = makeOutputLine(outputRegion, "Stringer feet", "ss-out-f");
   const oB = makeOutputLine(outputRegion, "Board feet (2x12 stringer)", "ss-out-b");
   const update = debounce(() => {
-    const r = computeStairStringer({ total_rise_in: Number(rise.input.value) || 0, total_run_in: Number(run.input.value) || 0 });
+    const r = computeStairStringer({ total_rise_in: Number(rise.input.value) || 0, total_run_in: Number(run.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["total_rise_in", "total_run_in"], r);
     if (r.error) { oI.textContent = r.error; oF.textContent = "-"; oB.textContent = "-"; return; }
     oI.textContent = fmt(r.stringer_in, 2) + " in";
     oF.textContent = fmt(r.stringer_ft, 2) + " ft";
@@ -1273,7 +1274,7 @@ export function renderJoistDeflection(inputRegion, outputRegion, citationEl) {
       span_ft: Number(L.input.value) || 0,
       E_psi: Number(E.input.value) || 0,
       I_in4: Number(I.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["uniform_load_plf", "span_ft", "E_psi", "I_in4"], r);
     if (r.error) { oD.textContent = r.error; o360.textContent = "-"; o240.textContent = "-"; return; }
     oD.textContent = fmt(r.deflection_in, 4) + " in";
     o360.textContent = fmt(r.limit_L_over_360_in, 3) + " in (" + (r.pass_L_over_360 ? "pass" : "fail") + ")";
@@ -1296,7 +1297,7 @@ export function renderFootingArea(inputRegion, outputRegion, citationEl) {
   const oR = makeOutputLine(outputRegion, "Rounded side (next 6 in)", "fa-out-r");
   const oB = makeOutputLine(outputRegion, "Bearing pressure check", "fa-out-b");
   const update = debounce(() => {
-    const r = computeFootingArea({ column_load_lb: Number(P.input.value) || 0, soil_class: soil.select.value, applied_moment_lbft: Number(M.input.value) || 0 });
+    const r = computeFootingArea({ column_load_lb: Number(P.input.value) || 0, soil_class: soil.select.value, applied_moment_lbft: Number(M.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["column_load_lb", "soil_class", "applied_moment_lbft"], r);
     if (r.error) { oA.textContent = r.error; oS.textContent = "-"; oR.textContent = "-"; oB.textContent = "-"; return; }
     oA.textContent = fmt(r.required_area_ft2, 2) + " ft^2 @ " + fmt(r.allowable_psf, 0) + " psf";
     oS.textContent = fmt(r.side_ft, 2) + " ft (" + fmt(r.side_ft * 12, 1) + " in)";
@@ -1327,7 +1328,7 @@ export function renderTileCount(inputRegion, outputRegion, citationEl) {
       tile_height_in: Number(h.input.value) || 0,
       grout_joint_width_in: Number(j.input.value) || 0,
       tile_thickness_in: Number(t.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["area_ft2", "tile_width_in", "tile_height_in", "grout_joint_width_in", "tile_thickness_in"], r);
     if (r.error) { oC.textContent = r.error; oG.textContent = "-"; return; }
     oC.textContent = String(r.tile_count);
     oG.textContent = fmt(r.grout_volume_in3, 1) + " in^3";
@@ -1357,7 +1358,7 @@ export function renderPaintCoverage(inputRegion, outputRegion, citationEl) {
       coats: Number(c.input.value) || 1,
       primer_needed: prim.input.checked,
       surface_porosity: sp.select.value,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["area_ft2", "coats", "primer_needed", "surface_porosity"], r);
     if (r.error) { oG.textContent = r.error; oP.textContent = "-"; return; }
     oG.textContent = fmt(r.total_paint_gallons, 2) + " gal";
     oP.textContent = fmt(r.primer_gallons, 2) + " gal";
@@ -1384,7 +1385,7 @@ export function renderExcavation(inputRegion, outputRegion, citationEl) {
       width_ft: Number(W.input.value) || 0,
       depth_ft: Number(D.input.value) || 0,
       side_slope_angle_deg: Number(ang.input.value) || 90,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["length_ft", "width_ft", "depth_ft", "side_slope_angle_deg"], r);
     if (r.error) { oV.textContent = r.error; oY.textContent = "-"; oT.textContent = "-"; return; }
     oV.textContent = fmt(r.volume_ft3, 1) + " ft^3";
     oY.textContent = fmt(r.cubic_yards, 2) + " cy";
@@ -1409,7 +1410,7 @@ export function renderMasonryCount(inputRegion, outputRegion, citationEl) {
       wall_area_ft2: Number(a.input.value) || 0,
       unit_type: u.select.value,
       mortar_joint_in: Number(m.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["wall_area_ft2", "unit_type", "mortar_joint_in"], r);
     if (r.error) { oC.textContent = r.error; oF.textContent = "-"; return; }
     oC.textContent = String(r.unit_count);
     oF.textContent = fmt(r.face_ft2, 3) + " ft^2";
@@ -1441,7 +1442,7 @@ export function renderWindPressure(inputRegion, outputRegion, citationEl) {
       V_mph: Number(V.input.value) || 0,
       exposure: exp.select.value,
       Kz: Number(kz.input.value) || 0, Kzt: Number(kzt.input.value) || 1, Kd: Number(kd.input.value) || 0.85, G: Number(g.input.value) || 0.85,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["V_mph", "exposure", "Kz", "Kzt", "Kd", "G"], r);
     if (r.error) { oQ.textContent = r.error; oZ.textContent = "-"; oW.textContent = "-"; oL.textContent = "-"; oD.textContent = "-"; return; }
     oQ.textContent = fmt(r.q_psf, 2) + " psf";
     oZ.textContent = fmt(r.qz_at_30ft_psf, 2) + " psf";
@@ -1477,7 +1478,7 @@ export function renderSnowLoad(inputRegion, outputRegion, citationEl) {
       Cs: Number(Cs.input.value) || 1,
       drift_upwind_length_ft: Number(lu.input.value) || 0,
       w2: Number(w2.input.value) || SNOW_W2_DEFAULT,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["Pg_psf", "Ce", "Ct", "Cs", "drift_upwind_length_ft", "w2"], r);
     if (r.error) { oP.textContent = r.error; oPs.textContent = "-"; oDr.textContent = "-"; return; }
     oP.textContent = fmt(r.Pf_psf, 2) + " psf";
     oPs.textContent = fmt(r.Ps_psf, 2) + " psf (Cs " + fmt(r.Cs, 2) + ")";
@@ -1507,7 +1508,7 @@ export function renderAnchorEmbedment(inputRegion, outputRegion, citationEl) {
       fc_psi: Number(fc.input.value) || 0,
       cracked: cracked.select.value === "cracked",
       edge_distance_in: Number(edge.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["uplift_lb", "bolt_diameter_in", "fc_psi", "cracked", "edge_distance_in"], r);
     if (r.error) { oI.textContent = r.error; oF.textContent = "-"; oE.textContent = "-"; return; }
     const req_in = r.cracked ? r.embedment_cracked_in : r.embedment_in;
     oI.textContent = fmt(req_in, 2) + " in (" + (r.cracked ? "cracked" : "uncracked") + " concrete breakout; steel, pullout and code minimums checked separately)";
@@ -2757,7 +2758,7 @@ function _v7c_renderStairStringer(inputRegion, outputRegion, citationEl) {
       target_tread_in: Number(t.input.value) || 0, nosing_in: Number(n.input.value) || 0,
       stringer_thickness_in: Number(sk.input.value) || 0,
       code_max_rise_in: Number(cr.input.value) || 0, code_min_tread_in: Number(ct.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["total_rise_in", "target_rise_in", "target_tread_in", "nosing_in", "stringer_thickness_in", "code_max_rise_in", "code_min_tread_in"], x);
     if (x.error) { oC.textContent = x.error; for (const o of [oR, oT, oRun, oSL, oTh, oP]) o.textContent = "-"; return; }
     oC.textContent = x.riser_count;
     oR.textContent = _v7c_fmt(x.exact_rise_in, 3) + " in";
@@ -2793,7 +2794,7 @@ function _v7c_renderHipValleyRafter(inputRegion, outputRegion, citationEl) {
     const r = computeHipValleyRafter({
       run_ft: Number(run.input.value) || 0, pitch: Number(p.input.value) || 0,
       pitch_irregular: Number(p2.input.value) || 0, overhang_in: Number(oh.input.value) || 0, jack_oc_in: Number(oc.input.value) || 16,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["run_ft", "pitch", "pitch_irregular", "overhang_in", "jack_oc_in"], r);
     if (r.error) { oM.textContent = r.error; for (const o of [oH, oCL, oCO, oHL, oN, oI]) o.textContent = "-"; return; }
     oM.textContent = _v7c_fmt(r.common_run_multiplier, 4);
     oH.textContent = _v7c_fmt(r.hip_run_multiplier, 4) + " (16.97/12 at 0 pitch)";
@@ -2833,7 +2834,7 @@ function _v7c_renderRebarSchedule(inputRegion, outputRegion, citationEl) {
   }
   const update = _v7c_debounce(() => {
     const bends = bend.select.value ? [bend.select.value] : [];
-    const r = computeRebarSchedule({ rows: [{ size: size.select.value, straight_ft: Number(sl.input.value) || 0, bends, pieces: Number(pcs.input.value) || 1 }] });
+    const r = computeRebarSchedule({ rows: [{ size: size.select.value, straight_ft: Number(sl.input.value) || 0, bends, pieces: Number(pcs.input.value) || 1 }] }); stepsFor(outputRegion, inputRegion, ["rows"], r);
     if (r.error) { oCl.textContent = r.error; oW.textContent = "-"; oTotal.textContent = "-"; return; }
     const d = r.detailed[0];
     oCl.textContent = _v7c_fmt(d.cut_length_ft, 3) + " ft (+" + _v7c_fmt(d.bend_allowance_in, 2) + " in for bends)";
@@ -2865,7 +2866,7 @@ function _v7c_renderPlywoodSpan(inputRegion, outputRegion, citationEl) {
       application: app.select.value, support_spacing_in: Number(sp.input.value) || 0,
       live_load_psf: Number(ll.input.value) || 0, dead_load_psf: Number(dl.input.value) || 0,
       edge_support: eg.select.value,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["span_rating", "panel_thickness_in", "application", "support_spacing_in", "live_load_psf", "dead_load_psf", "edge_support"], r);
     if (r.error) { oS.textContent = r.error; oL.textContent = "-"; oTL.textContent = "-"; oP.textContent = "-"; return; }
     oS.textContent = r.allowable_spacing_in + " in OC";
     oL.textContent = r.allowable_live_psf === null ? "(table doesn't list live)" : r.allowable_live_psf + " psf";
@@ -2887,7 +2888,7 @@ function _v7c_renderHelicalPile(inputRegion, outputRegion, citationEl) {
   const oA = _v7c_makeOut(outputRegion, "Allowable capacity", "hp-out-a");
   function fillExample(x) { sh.select.value = x.shaft; tq.input.value = x.torque_ft_lb; fs.input.value = x.factor_of_safety; update(); }
   const update = _v7c_debounce(() => {
-    const r = computeHelicalPile({ shaft: sh.select.value, torque_ft_lb: Number(tq.input.value) || 0, factor_of_safety: Number(fs.input.value) || 2.0 });
+    const r = computeHelicalPile({ shaft: sh.select.value, torque_ft_lb: Number(tq.input.value) || 0, factor_of_safety: Number(fs.input.value) || 2.0 }); stepsFor(outputRegion, inputRegion, ["shaft", "torque_ft_lb", "factor_of_safety"], r);
     if (r.error) { oU.textContent = r.error; oA.textContent = "-"; return; }
     oU.textContent = _v7c_fmt(r.ultimate_lb, 0) + " lb (Kt=" + r.Kt + ")";
     oA.textContent = _v7c_fmt(r.allowable_lb, 0) + " lb";
@@ -2907,7 +2908,7 @@ function renderHelicalPileTorque(inputRegion, outputRegion, citationEl) {
   const oT = _v7c_makeOut(outputRegion, "Required installation torque", "hpt-out-t");
   const oN = _v7c_makeOut(outputRegion, "Note", "hpt-out-n");
   const update = _v7c_debounce(() => {
-    const r = computeHelicalPileTorque({ shaft: sh.select.value, target_capacity_lb: Number(cap.input.value) || 0, capacity_basis: basis.select.value, factor_of_safety: Number(fs.input.value) || 2.0 });
+    const r = computeHelicalPileTorque({ shaft: sh.select.value, target_capacity_lb: Number(cap.input.value) || 0, capacity_basis: basis.select.value, factor_of_safety: Number(fs.input.value) || 2.0 }); stepsFor(outputRegion, inputRegion, ["shaft", "target_capacity_lb", "capacity_basis", "factor_of_safety"], r);
     if (r.error) { oT.textContent = r.error; oN.textContent = ""; return; }
     oT.textContent = _v7c_fmt(r.torque_ft_lb, 0) + " ft-lb (Kt=" + r.Kt + ", ultimate " + _v7c_fmt(r.ultimate_lb, 0) + " lb)";
     oN.textContent = r.note;
@@ -2939,7 +2940,7 @@ function _v7c_renderCraneLiftCheck(inputRegion, outputRegion, citationEl) {
       block_lb: Number(bk.input.value) || 0, jib_deduct_lb: Number(jb.input.value) || 0,
       sling_legs: Number(sl.input.value) || 1, sling_angle_deg: Number(ang.input.value) || 90,
       chart_capacity_lb: Number(cap.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["load_lb", "rigging_lb", "block_lb", "jib_deduct_lb", "sling_legs", "sling_angle_deg", "chart_capacity_lb"], r);
     if (r.error) { oG.textContent = r.error; oS.textContent = "-"; oP.textContent = "-"; oF.textContent = "-"; return; }
     oG.textContent = _v7c_fmt(r.gross_load_lb, 0) + " lb";
     oS.textContent = _v7c_fmt(r.per_leg_lb, 0) + " lb";
@@ -3074,7 +3075,7 @@ function _v8c_renderResidentialFraming(inputRegion, outputRegion, citationEl) {
       joist_span_ft: Number(js.input.value) || 0, joist_oc_in: Number(jo.input.value) || 0,
       rafter_oc_in: Number(ro.input.value) || 0,
       building_run_ft: Number(br.input.value) || 0, pitch: Number(p.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["footprint_ft2", "perimeter_ft", "wall_height_ft", "stud_oc_in", "joist_span_ft", "joist_oc_in", "rafter_oc_in", "building_run_ft", "pitch"], r);
     if (r.error) { oS.textContent = r.error; for (const o of [oPl, oJ, oR, oT]) o.textContent = "-"; return; }
     oS.textContent = r.stud_count + " studs (" + _v7c_fmt(r.stud_bf, 0) + " bf)";
     oPl.textContent = r.plate_lf + " lf (" + _v7c_fmt(r.plate_bf, 0) + " bf)";
@@ -3237,7 +3238,7 @@ function _v9c_renderExcavationBenchPlan(inputRegion, outputRegion, citationEl) {
       surcharge: sur.select.value === "true",
       length_ft: readNum(L.input),
       bottom_width_ft: readNum(bw.input),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["depth_ft", "soil_class", "surcharge", "length_ft", "bottom_width_ft"], r);
     if (r.error) {
       oR.textContent = r.error; oTW.textContent = ""; oV.textContent = ""; oF.textContent = ""; oB.textContent = ""; oW.textContent = "";
       return;
@@ -3492,7 +3493,7 @@ function _v15c_renderHeaderSizing(inputRegion, outputRegion, citationEl) {
       floors_above: Number(floors.select.value),
       ground_snow_psf: readNum(snow.input),
       species_grade: sp.select.value,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["header_span_ft", "tributary_width_ft", "floors_above", "ground_snow_psf", "species_grade"], r);
     if (r.error) { oMember.textContent = r.error; oLoad.textContent = "-"; oVerify.textContent = "-"; oJack.textContent = "-"; oW.textContent = ""; return; }
     oMember.textContent = r.member_label + " (allowable span " + _v15c_fmt(r.allowable_span_ft, 2) + " ft, governed by " + r.governing + ")";
     oLoad.textContent = _v15c_fmt(r.w_plf, 0) + " plf (" + _v15c_fmt(r.total_load_psf, 0) + " psf on tributary)";
@@ -3709,7 +3710,7 @@ function _v15c_renderDeckBeamPost(inputRegion, outputRegion, citationEl) {
       soil_class: soil.select.value,
       deck_height_in: readNum(deckH.input),
       ledger: ledger.select.value,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["joist_span_ft", "beam_span_ft", "post_height_ft", "live_load_psf", "dead_load_psf", "species_grade", "soil_class", "deck_height_in", "ledger"], r);
     if (r.error) { oBeam.textContent = r.error; oPost.textContent = "-"; oFoot.textContent = "-"; oLedger.textContent = "-"; oW.textContent = ""; return; }
     oBeam.textContent = r.beam_label + " (allowable span " + _v15c_fmt(r.beam_allowable_span_ft, 2) + " ft, governed by " + r.beam_governing + "; " + _v15c_fmt(r.w_plf, 0) + " plf)";
     oPost.textContent = r.post_size + " (load " + _v15c_fmt(r.post_load_lb, 0) + " lb; capacity " + _v15c_fmt(r.post_allowable_load_lb, 0) + " lb at le/d " + _v15c_fmt(r.post_slenderness_le_d, 1) + ")";
@@ -3884,7 +3885,7 @@ function renderPointLoadBearing(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "plb-out-note");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computePointLoadBearing({ load_lb: readNum(p.input), width_in: readNum(w.input), fc_perp_psi: readNum(fc.input), cb: cb.input.value === "" ? 1 : readNum(cb.input), provided_length_in: readNum(prov.input) });
+    const r = computePointLoadBearing({ load_lb: readNum(p.input), width_in: readNum(w.input), fc_perp_psi: readNum(fc.input), cb: cb.input.value === "" ? 1 : readNum(cb.input), provided_length_in: readNum(prov.input) }); stepsFor(outputRegion, inputRegion, ["load_lb", "width_in", "fc_perp_psi", "cb", "provided_length_in"], r);
     if (r.error) { oReq.textContent = r.error; oStress.textContent = ""; oNote.textContent = ""; return; }
     oReq.textContent = fmt(r.req_length_in, 3) + " in (" + fmt(r.req_area_in2, 2) + " in2)";
     oStress.textContent = r.actual_stress_psi != null ? fmt(r.actual_stress_psi, 0) + " psi - " + (r.pass ? "PASS" : "FAIL") : "Enter a provided length to check stress.";
@@ -3946,7 +3947,7 @@ function renderColumnBucklingWood(inputRegion, outputRegion, citationEl) {
   const oCap = makeOutputLine(outputRegion, "Allowable axial capacity", "cbw-out-cap");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeColumnBucklingWood({ b_in: readNum(b.input), d_in: readNum(d.input), le_in: readNum(le.input), fc_star_psi: readNum(fc.input), emin_psi: readNum(emin.input), ke: ke.input.value === "" ? 1 : readNum(ke.input) });
+    const r = computeColumnBucklingWood({ b_in: readNum(b.input), d_in: readNum(d.input), le_in: readNum(le.input), fc_star_psi: readNum(fc.input), emin_psi: readNum(emin.input), ke: ke.input.value === "" ? 1 : readNum(ke.input) }); stepsFor(outputRegion, inputRegion, ["b_in", "d_in", "le_in", "fc_star_psi", "emin_psi", "ke"], r);
     if (r.error) { oSlen.textContent = r.error; oCp.textContent = ""; oCap.textContent = ""; return; }
     oSlen.textContent = fmt(r.slenderness_ratio, 2);
     oCp.textContent = fmt(r.cp, 4) + " (Fc' " + fmt(r.fc_prime_psi, 0) + " psi)";
@@ -4007,7 +4008,7 @@ function renderBeamReactions(inputRegion, outputRegion, citationEl) {
   const oM = makeOutputLine(outputRegion, "Max bending moment", "br-out-m");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeBeamReactions({ span_ft: readNum(span.input), w_plf: readNum(w.input), point_lb: readNum(p.input), a_ft: readNum(a.input) });
+    const r = computeBeamReactions({ span_ft: readNum(span.input), w_plf: readNum(w.input), point_lb: readNum(p.input), a_ft: readNum(a.input) }); stepsFor(outputRegion, inputRegion, ["span_ft", "w_plf", "point_lb", "a_ft"], r);
     if (r.error) { oR.textContent = r.error; oV.textContent = ""; oM.textContent = ""; return; }
     oR.textContent = fmt(r.r_left_lb, 0) + " lb / " + fmt(r.r_right_lb, 0) + " lb";
     oV.textContent = fmt(r.max_shear_lb, 0) + " lb";
@@ -4095,7 +4096,7 @@ function renderWeldHeatInput(inputRegion, outputRegion, citationEl) {
       efficiency: eff.input.value === "" ? null : readNum(eff.input),
       wps_min_kj_in: wmin.input.value === "" ? null : readNum(wmin.input),
       wps_max_kj_in: wmax.input.value === "" ? null : readNum(wmax.input),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["process", "voltage_V", "current_A", "travel_in_min", "efficiency", "wps_min_kj_in", "wps_max_kj_in"], r);
     if (r.error) { oArc.textContent = r.error; oHi.textContent = ""; oPass.textContent = ""; return; }
     oArc.textContent = fmt(r.arc_energy_j_in, 0) + " J/in";
     oHi.textContent = fmt(r.heat_input_kj_in, 2) + " kJ/in (" + fmt(r.heat_input_kj_mm, 3) + " kJ/mm)";
@@ -4233,7 +4234,7 @@ function renderMetalWeight(inputRegion, outputRegion, citationEl) {
       length_in: readNum(len.input),
       quantity: readNum(qty.input),
       density_lb_in3: readNum(dens.input),
-    });
+    }); stepsFor(outputRegion, inputRegion, null, r);
     if (r.error) { oArea.textContent = r.error; oEach.textContent = ""; oTot.textContent = ""; return; }
     oArea.textContent = fmt(r.cross_section_area_in2, 4) + " in^2";
     oEach.textContent = fmt(r.weight_per_piece_lb, 2) + " lb";
@@ -4368,7 +4369,7 @@ function renderLayoutSquaring(inputRegion, outputRegion, citationEl) {
       tolerance: tol ? readNum(tol.input) : 0,
       sym_left: symL ? readNum(symL.input) : 0,
       sym_right: symR ? readNum(symR.input) : 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["mode", "side_a", "side_b", "diag1", "diag2", "tolerance", "sym_left", "sym_right"], r);
     if (r.error) { oIdeal.textContent = r.error; oTriple.textContent = ""; oOut.textContent = ""; oCorner.textContent = ""; oTol.textContent = ""; oSym.textContent = ""; return; }
     oIdeal.textContent = fmt(r.ideal_diagonal, 4);
     if (r.mode === "find-diagonal") {
@@ -4497,7 +4498,7 @@ function _v27renderFilletWeldStrength(inputRegion, outputRegion, citationEl) {
       mode: mode.select.value, method: method.select.value, electrode: elec.select.value,
       leg_in: Number(leg.input.value) || 0, length_in: Number(len.input.value) || 0,
       base_thickness_in: Number(thk.input.value) || 0, applied_load_lb: Number(load.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["mode", "method", "electrode", "leg_in", "length_in", "base_thickness_in", "applied_load_lb"], r);
     if (r.error) { oThroat.textContent = r.error; oCap.textContent = "-"; oRange.textContent = "-"; oUtil.textContent = "-"; oNote.textContent = ""; return; }
     if (r.mode === "size-from-load") {
       oThroat.textContent = "(size-from-load)";
@@ -4607,7 +4608,7 @@ function _v69renderCoatingCoverageDft(inputRegion, outputRegion, citationEl) {
   const oRed = makeOutputLine(outputRegion, "After reduction", "cc-out-red");
   const oWet = makeOutputLine(outputRegion, "Dry build from the gauge reading", "cc-out-wet");
   const update = debounce(() => {
-    const r = computeCoatingCoverageDft({ vol_solids_pct: Number(solids.input.value) || 0, dft_mils: Number(dft.input.value) || 0, area_ft2: Number(area.input.value) || 0, loss_pct: loss.input.value === "" ? 35 : Number(loss.input.value), reduction_pct: Number(reduction.input.value) || 0, wet_reading_mils: Number(wetReading.input.value) || 0 });
+    const r = computeCoatingCoverageDft({ vol_solids_pct: Number(solids.input.value) || 0, dft_mils: Number(dft.input.value) || 0, area_ft2: Number(area.input.value) || 0, loss_pct: loss.input.value === "" ? 35 : Number(loss.input.value), reduction_pct: Number(reduction.input.value) || 0, wet_reading_mils: Number(wetReading.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["vol_solids_pct", "dft_mils", "area_ft2", "loss_pct", "reduction_pct", "wet_reading_mils"], r);
     if (r.error) { oTheo.textContent = r.error; for (const o of [oPrac, oGal, oWft, oRed, oWet]) o.textContent = "-"; return; }
     oTheo.textContent = fmt(r.theoretical_cov_ft2_gal, 1) + " ft^2/gal";
     oPrac.textContent = fmt(r.practical_cov_ft2_gal, 1) + " ft^2/gal";
@@ -4689,7 +4690,7 @@ function _v69renderAbrasiveBlast(inputRegion, outputRegion, citationEl) {
   const oLbHr = makeOutputLine(outputRegion, "Abrasive consumption", "ab-out-lbhr");
   const oTotal = makeOutputLine(outputRegion, "Total abrasive for the area", "ab-out-total");
   const update = debounce(() => {
-    const r = computeAbrasiveBlast({ nozzle_bore_in: Number(bore.select.value), pressure_psi: pressure.input.value === "" ? 100 : Number(pressure.input.value), area_ft2: Number(area.input.value) || 0, lb_per_ft2: lbPerFt2.input.value === "" ? 8 : Number(lbPerFt2.input.value) });
+    const r = computeAbrasiveBlast({ nozzle_bore_in: Number(bore.select.value), pressure_psi: pressure.input.value === "" ? 100 : Number(pressure.input.value), area_ft2: Number(area.input.value) || 0, lb_per_ft2: lbPerFt2.input.value === "" ? 8 : Number(lbPerFt2.input.value) }); stepsFor(outputRegion, inputRegion, ["nozzle_bore_in", "pressure_psi", "area_ft2", "lb_per_ft2"], r);
     if (r.error) { oCfm.textContent = r.error; for (const o of [oHp, oLbHr, oTotal]) o.textContent = "-"; return; }
     oCfm.textContent = fmt(r.cfm, 0) + " cfm";
     oHp.textContent = fmt(r.compressor_hp, 1) + " hp";
@@ -5573,7 +5574,7 @@ function _renderSeismicVerticalDistribution(inputRegion, outputRegion, citationE
       const parts = t.split(",");
       stories.push({ w: Number(parts[0]), h: Number(parts[1]) });
     }
-    const r = computeSeismicVerticalDistribution({ base_shear_kip: Number(vIn.input.value) || 0, period_s: Number(tIn.input.value) || 0, stories });
+    const r = computeSeismicVerticalDistribution({ base_shear_kip: Number(vIn.input.value) || 0, period_s: Number(tIn.input.value) || 0, stories }); stepsFor(outputRegion, inputRegion, ["base_shear_kip", "period_s", "stories"], r);
     if (r.error) { oK.textContent = r.error; oF.textContent = "-"; oS.textContent = "-"; oC.textContent = "-"; return; }
     oK.textContent = _fmtC(r.k, 2);
     oF.textContent = r.per_level.map((l) => _fmtC(l.fx_kip, 1)).join(" / ");
@@ -5656,7 +5657,7 @@ function _renderSeismicOverturningMoment(inputRegion, outputRegion, citationEl) 
       const parts = t.split(",");
       stories.push({ w: Number(parts[0]), h: Number(parts[1]) });
     }
-    const r = computeSeismicOverturningMoment({ base_shear_kip: Number(vIn.input.value) || 0, period_s: Number(tIn.input.value) || 0, stories });
+    const r = computeSeismicOverturningMoment({ base_shear_kip: Number(vIn.input.value) || 0, period_s: Number(tIn.input.value) || 0, stories }); stepsFor(outputRegion, inputRegion, ["base_shear_kip", "period_s", "stories"], r);
     if (r.error) { oK.textContent = r.error; oF.textContent = "-"; oM.textContent = "-"; oB.textContent = "-"; oR.textContent = "-"; return; }
     oK.textContent = _fmtC(r.k, 2);
     oF.textContent = r.per_level.map((l) => _fmtC(l.fx_kip, 1)).join(" / ");
@@ -5735,7 +5736,7 @@ function _renderOccupantLoad(inputRegion, outputRegion, citationEl) {
       if (area > 0 && olf > 0) spaces.push({ area, olf });
     }
     if (spaces.length === 0) { oT.textContent = "Enter at least one space."; oB.textContent = "-"; return; }
-    const r = computeOccupantLoad({ spaces });
+    const r = computeOccupantLoad({ spaces }); stepsFor(outputRegion, inputRegion, ["spaces"], r);
     if (r.error) { oT.textContent = r.error; oB.textContent = "-"; return; }
     oT.textContent = r.total_load + " occupants";
     oB.textContent = r.per_space.map((s) => s.load).join(" + ") + " = " + r.total_load;
@@ -5808,7 +5809,7 @@ function _renderEgressCapacity(inputRegion, outputRegion, citationEl) {
   const oG = _moC(outputRegion, "Governed by", "egc-out-g");
   function fillExample(x) { ol.input.value = x.occupant_load; sp.select.value = x.sprinklered ? "yes" : "no"; pa.select.value = x.path; md.input.value = x.min_door_in; update(); }
   const update = _debC(() => {
-    const r = computeEgressCapacity({ occupant_load: Number(ol.input.value) || 0, sprinklered: sp.select.value, path: pa.select.value, min_door_in: Number(md.input.value) || 0, occupancy_group: og.select.value, story: st.select.value });
+    const r = computeEgressCapacity({ occupant_load: Number(ol.input.value) || 0, sprinklered: sp.select.value, path: pa.select.value, min_door_in: Number(md.input.value) || 0, occupancy_group: og.select.value, story: st.select.value }); stepsFor(outputRegion, inputRegion, ["occupant_load", "sprinklered", "path", "min_door_in", "occupancy_group", "story"], r);
     if (r.error) { oE.textContent = r.error; oT.textContent = "-"; oP.textContent = "-"; oG.textContent = "-"; return; }
     oE.textContent = String(r.exits_required);
     oT.textContent = _fmtC(r.total_width_in, 1) + " in";
@@ -6708,7 +6709,7 @@ function _renderExteriorOpeningProtection(inputRegion, outputRegion, citationEl)
   const oR = _moC(outputRegion, "Proposed openings", "eop-out-r");
   function fillExample(x) { fsd.input.value = x.fsd_ft; wa.input.value = x.wall_area; pr.select.value = x.protected ? "yes" : "no"; ao.input.value = x.actual_opening; update(); }
   const update = _debC(() => {
-    const r = computeExteriorOpeningProtection({ fsd_ft: Number(fsd.input.value) || 0, wall_area: Number(wa.input.value) || 0, protected: pr.select.value, actual_opening: Number(ao.input.value) || 0 });
+    const r = computeExteriorOpeningProtection({ fsd_ft: Number(fsd.input.value) || 0, wall_area: Number(wa.input.value) || 0, protected: pr.select.value, actual_opening: Number(ao.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["fsd_ft", "wall_area", "protected", "actual_opening"], r);
     if (r.error) { oP.textContent = r.error; oA.textContent = "-"; oR.textContent = "-"; return; }
     oP.textContent = r.no_limit ? "no limit" : _fmtC(r.allowable_pct, 0) + "%";
     oA.textContent = r.no_limit ? "no limit" : _fmtC(r.allowable_area, 0) + " ft^2";

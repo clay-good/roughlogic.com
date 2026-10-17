@@ -9,6 +9,7 @@ import {
   DEBOUNCE_MS, debounce, makeNumber, makeSelect,
   makeOutputLine, attachExampleButton, fmt,
   makeStepsPanel,
+  stepsFor,
 } from "./ui-fields.js";
 
 // v18 §7 contract guard: reject a non-finite numeric input. A renderer
@@ -69,7 +70,7 @@ function renderCuttingSpeed(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Notes", "csr-out-note");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeCuttingSpeed({ surface_speed_sfm: readNum(sfm.input), diameter_in: readNum(dia.input), num_flutes: readNum(flutes.input), chip_load_in: readNum(ipt.input) });
+    const r = computeCuttingSpeed({ surface_speed_sfm: readNum(sfm.input), diameter_in: readNum(dia.input), num_flutes: readNum(flutes.input), chip_load_in: readNum(ipt.input) }); stepsFor(outputRegion, inputRegion, ["surface_speed_sfm", "diameter_in", "num_flutes", "chip_load_in"], r);
     if (r.error) { oRpm.textContent = r.error; oFeed.textContent = "-"; oNote.textContent = ""; return; }
     oRpm.textContent = fmt(r.rpm, 0) + " RPM";
     oFeed.textContent = r.feed_ipm === null ? "(enter flutes + chip load)" : fmt(r.feed_ipm, 3) + " in/min (IPM)";
@@ -113,7 +114,7 @@ function renderDrillPointDepth(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Notes", "dpd-out-note");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeDrillPointDepth({ diameter_in: readNum(dia.input), point_angle_deg: readNum(ang.input), full_depth_in: readNum(depth.input) });
+    const r = computeDrillPointDepth({ diameter_in: readNum(dia.input), point_angle_deg: readNum(ang.input), full_depth_in: readNum(depth.input) }); stepsFor(outputRegion, inputRegion, ["diameter_in", "point_angle_deg", "full_depth_in"], r);
     if (r.error) { oPoint.textContent = r.error; oDrill.textContent = "-"; oNote.textContent = ""; return; }
     oPoint.textContent = fmt(r.point_length_in, 4) + " in (about " + fmt(r.point_length_in / r.diameter_in, 2) + " x diameter)";
     oDrill.textContent = r.drill_to_depth_in === null ? "(enter a full-diameter depth)" : fmt(r.drill_to_depth_in, 4) + " in tip depth";
@@ -161,7 +162,7 @@ function renderDrillPointAngleFromLength(inputRegion, outputRegion, citationEl) 
   const oNote = makeOutputLine(outputRegion, "Notes", "dpa-out-note");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeDrillPointAngleFromLength({ diameter_in: readNum(dia.input), point_length_in: readNum(plen.input) });
+    const r = computeDrillPointAngleFromLength({ diameter_in: readNum(dia.input), point_length_in: readNum(plen.input) }); stepsFor(outputRegion, inputRegion, ["diameter_in", "point_length_in"], r);
     if (r.error) { oAngle.textContent = r.error; oHalf.textContent = "-"; oNote.textContent = ""; return; }
     oAngle.textContent = fmt(r.point_angle_deg, 1) + " deg (tip about " + fmt(r.length_per_diameter, 2) + " x diameter)";
     oHalf.textContent = fmt(r.half_angle_deg, 1) + " deg from the axis";
@@ -202,7 +203,7 @@ function renderCuttingDiameterForRpm(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Notes", "cdr-out-note");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeCuttingDiameterForRpm({ surface_speed_sfm: readNum(sfm.input), target_rpm: readNum(rpm.input) });
+    const r = computeCuttingDiameterForRpm({ surface_speed_sfm: readNum(sfm.input), target_rpm: readNum(rpm.input) }); stepsFor(outputRegion, inputRegion, ["surface_speed_sfm", "target_rpm"], r);
     if (r.error) { oDia.textContent = r.error; oNote.textContent = ""; return; }
     oDia.textContent = fmt(r.diameter_in, 4) + " in (" + fmt(r.diameter_in * 25.4, 2) + " mm)";
     oNote.textContent = r.notes.join(" ");
@@ -252,7 +253,7 @@ function renderCuttingFluidConcentration(inputRegion, outputRegion, citationEl) 
   const oAdd = makeOutputLine(outputRegion, "Add", "cfc-out-add");
   const oNote = makeOutputLine(outputRegion, "Note", "cfc-out-note");
   const update = debounce(() => {
-    const r = computeCuttingFluidConcentration({ brix_reading: Number(brix.input.value) || 0, refractometer_factor: Number(factor.input.value) || 0, sump_volume_gal: Number(sump.input.value) || 0, target_pct: Number(target.input.value) || 0 });
+    const r = computeCuttingFluidConcentration({ brix_reading: Number(brix.input.value) || 0, refractometer_factor: Number(factor.input.value) || 0, sump_volume_gal: Number(sump.input.value) || 0, target_pct: Number(target.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["brix_reading", "refractometer_factor", "sump_volume_gal", "target_pct"], r);
     if (r.error) { oCur.textContent = r.error; oAct.textContent = "-"; oAdd.textContent = "-"; oNote.textContent = ""; return; }
     oCur.textContent = fmt(r.current_pct, 2) + "%";
     oAct.textContent = r.action;
@@ -310,7 +311,7 @@ function renderSpindlePowerTorque(inputRegion, outputRegion, citationEl) {
       unit_power_hp: unitPower.input.value === "" ? 1.0 : Number(unitPower.input.value),
       efficiency_pct: eff.input.value === "" ? 80 : Number(eff.input.value),
       rpm: Number(rpm.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["mrr_in3_min", "unit_power_hp", "efficiency_pct", "rpm"], r);
     if (r.error) { oCut.textContent = r.error; for (const o of [oMotor, oTorque]) o.textContent = "-"; return; }
     oCut.textContent = fmt(r.cutting_hp, 2) + " hp";
     oMotor.textContent = fmt(r.motor_hp, 2) + " hp";
@@ -358,7 +359,7 @@ function renderSpindleMaxMrr(inputRegion, outputRegion, citationEl) {
       available_motor_hp: Number(motor.input.value) || 0,
       unit_power_hp: unitPower.input.value === "" ? 1.0 : Number(unitPower.input.value),
       efficiency_pct: eff.input.value === "" ? 80 : Number(eff.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["available_motor_hp", "unit_power_hp", "efficiency_pct"], r);
     if (r.error) { oMrr.textContent = r.error; oCut.textContent = "-"; oNote.textContent = ""; return; }
     oMrr.textContent = fmt(r.max_mrr_in3_min, 2) + " in3/min";
     oCut.textContent = fmt(r.cutting_hp, 2) + " hp";
@@ -407,7 +408,7 @@ function renderRadialChipThinning(inputRegion, outputRegion, citationEl) {
   const oFz = makeOutputLine(outputRegion, "Compensated feed per tooth", "rct-out-fz");
   const oNote = makeOutputLine(outputRegion, "Note", "rct-out-note");
   const update = debounce(() => {
-    const r = computeRadialChipThinning({ ae_in: Number(ae.input.value) || 0, d_in: Number(d.input.value) || 0, fz_target: Number(fz.input.value) || 0 });
+    const r = computeRadialChipThinning({ ae_in: Number(ae.input.value) || 0, d_in: Number(d.input.value) || 0, fz_target: Number(fz.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["ae_in", "d_in", "fz_target"], r);
     if (r.error) { oRctf.textContent = r.error; oFz.textContent = "-"; oNote.textContent = "-"; return; }
     oRctf.textContent = fmt(r.rctf, 3) + " (ae/D " + fmt(r.ratio, 3) + ")";
     oFz.textContent = fmt(r.fz_prog, 4) + " in/tooth";
@@ -447,7 +448,7 @@ function renderBoringBarDeflection(inputRegion, outputRegion, citationEl) {
   const oLd = makeOutputLine(outputRegion, "L/d ratio", "bbd-out-ld");
   const oNote = makeOutputLine(outputRegion, "Note", "bbd-out-note");
   const update = debounce(() => {
-    const r = computeBoringBarDeflection({ d_in: Number(d.input.value) || 0, l_in: Number(l.input.value) || 0, f_lb: Number(f.input.value) || 0, e_psi: Number(e.input.value) || 0 });
+    const r = computeBoringBarDeflection({ d_in: Number(d.input.value) || 0, l_in: Number(l.input.value) || 0, f_lb: Number(f.input.value) || 0, e_psi: Number(e.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["d_in", "l_in", "f_lb", "e_psi"], r);
     if (r.error) { oDelta.textContent = r.error; oLd.textContent = "-"; oNote.textContent = "-"; return; }
     oDelta.textContent = fmt(r.delta_in, 4) + " in (" + fmt(r.delta_in * 1000, 1) + " mil)";
     oLd.textContent = fmt(r.ld, 1) + " - " + r.verdict;
@@ -493,7 +494,7 @@ function renderBoringBarMaxOverhang(inputRegion, outputRegion, citationEl) {
   const oLd = makeOutputLine(outputRegion, "L/d at that overhang", "bbmo-out-ld");
   const oNote = makeOutputLine(outputRegion, "Note", "bbmo-out-note");
   const update = debounce(() => {
-    const r = computeBoringBarMaxOverhang({ d_in: Number(d.input.value) || 0, f_lb: Number(f.input.value) || 0, allowable_deflection_in: Number(delta.input.value) || 0, e_psi: e.input.value === "" ? 30e6 : Number(e.input.value) });
+    const r = computeBoringBarMaxOverhang({ d_in: Number(d.input.value) || 0, f_lb: Number(f.input.value) || 0, allowable_deflection_in: Number(delta.input.value) || 0, e_psi: e.input.value === "" ? 30e6 : Number(e.input.value) }); stepsFor(outputRegion, inputRegion, ["d_in", "f_lb", "allowable_deflection_in", "e_psi"], r);
     if (r.error) { oL.textContent = r.error; oLd.textContent = "-"; oNote.textContent = "-"; return; }
     oL.textContent = fmt(r.max_overhang_in, 3) + " in";
     oLd.textContent = fmt(r.ld, 1) + " - " + r.chatter_note;
@@ -545,7 +546,7 @@ function renderBallnoseScallopHeight(inputRegion, outputRegion, citationEl) {
   const oOut = makeOutputLine(outputRegion, "Result", "bsh-out-res");
   const oNote = makeOutputLine(outputRegion, "Note", "bsh-out-note");
   const update = debounce(() => {
-    const res = computeBallnoseScallopHeight({ r_in: Number(r.input.value) || 0, mode: mode.select.value, s_in: Number(s.input.value) || 0, h_in: Number(h.input.value) || 0 });
+    const res = computeBallnoseScallopHeight({ r_in: Number(r.input.value) || 0, mode: mode.select.value, s_in: Number(s.input.value) || 0, h_in: Number(h.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["r_in", "mode", "s_in", "h_in"], res);
     if (res.error) { oOut.textContent = res.error; oNote.textContent = "-"; return; }
     if (res.out_kind === "scallop") oOut.textContent = "Scallop height " + fmt(res.out_in, 5) + " in (" + fmt(res.out_in * 1000, 2) + " mil)";
     else oOut.textContent = "Stepover " + fmt(res.out_in, 4) + " in";
@@ -596,7 +597,7 @@ function renderSpurGearGeometry(inputRegion, outputRegion, citationEl) {
   const oCd = makeOutputLine(outputRegion, "Center distance (with mate)", "sgg-out-cd");
   const oNote = makeOutputLine(outputRegion, "Note", "sgg-out-n");
   const update = debounce(() => {
-    const r = computeSpurGearGeometry({ diametral_pitch: Number(pd.input.value) || 0, teeth: Number(n.input.value) || 0, mating_teeth: Number(nm.input.value) || 0 });
+    const r = computeSpurGearGeometry({ diametral_pitch: Number(pd.input.value) || 0, teeth: Number(n.input.value) || 0, mating_teeth: Number(nm.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["diametral_pitch", "teeth", "mating_teeth"], r);
     if (r.error) { oPd.textContent = r.error; oDepth.textContent = "-"; oRoot.textContent = "-"; oCd.textContent = "-"; oNote.textContent = ""; return; }
     oPd.textContent = fmt(r.pitch_dia_in, 3) + " in / " + fmt(r.outside_dia_in, 3) + " in";
     oDepth.textContent = fmt(r.addendum_in, 3) + " / " + fmt(r.dedendum_in, 3) + " / " + fmt(r.whole_depth_in, 3) + " in";
@@ -652,7 +653,7 @@ function renderWormGearGeometry(inputRegion, outputRegion, citationEl) {
   const oWheel = makeOutputLine(outputRegion, "Wheel pitch dia / center distance", "wgg-out-wheel");
   const oNote = makeOutputLine(outputRegion, "Note", "wgg-out-n");
   const update = debounce(() => {
-    const r = computeWormGearGeometry({ axial_pitch_in: Number(px.input.value) || 0, worm_starts: Number(nw.input.value) || 0, worm_pitch_dia_in: Number(dw.input.value) || 0, wheel_teeth: Number(ng.input.value) || 0 });
+    const r = computeWormGearGeometry({ axial_pitch_in: Number(px.input.value) || 0, worm_starts: Number(nw.input.value) || 0, worm_pitch_dia_in: Number(dw.input.value) || 0, wheel_teeth: Number(ng.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["axial_pitch_in", "worm_starts", "worm_pitch_dia_in", "wheel_teeth"], r);
     if (r.error) { oLead.textContent = r.error; oRatio.textContent = "-"; oWheel.textContent = "-"; oNote.textContent = ""; return; }
     oLead.textContent = fmt(r.lead_in, 3) + " in / " + fmt(r.lead_angle_deg, 2) + " deg" + (r.self_locking ? " (self-locking)" : " (back-drivable)");
     oRatio.textContent = fmt(r.gear_ratio, 2) + " : 1";
@@ -697,7 +698,7 @@ function renderGearIdentification(inputRegion, outputRegion, citationEl) {
   const oMod = makeOutputLine(outputRegion, "Metric module equivalent", "gid-out-mod");
   const oNote = makeOutputLine(outputRegion, "Note", "gid-out-n");
   const update = debounce(() => {
-    const r = computeGearIdentification({ teeth: Number(n.input.value) || 0, outside_dia_in: Number(od.input.value) || 0 });
+    const r = computeGearIdentification({ teeth: Number(n.input.value) || 0, outside_dia_in: Number(od.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["teeth", "outside_dia_in"], r);
     if (r.error) { oPd.textContent = r.error; oDia.textContent = "-"; oMod.textContent = "-"; oNote.textContent = ""; return; }
     oPd.textContent = fmt(r.pd, 2) + " teeth/in (nearest standard " + fmt(r.nearest_std_pd, 2) + ", " + fmt(r.pct_off, 1) + "% off)";
     oDia.textContent = fmt(r.pitch_dia_in, 3) + " in";
@@ -740,7 +741,7 @@ function renderGearChordalThickness(inputRegion, outputRegion, citationEl) {
   const oArc = makeOutputLine(outputRegion, "Arc tooth thickness (reference)", "gct-out-arc");
   const oNote = makeOutputLine(outputRegion, "Note", "gct-out-note");
   const update = debounce(() => {
-    const r = computeGearChordalThickness({ diametral_pitch: Number(pd.input.value) || 0, teeth: Number(n.input.value) || 0 });
+    const r = computeGearChordalThickness({ diametral_pitch: Number(pd.input.value) || 0, teeth: Number(n.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["diametral_pitch", "teeth"], r);
     if (r.error) { oTc.textContent = r.error; oAc.textContent = "-"; oArc.textContent = "-"; oNote.textContent = ""; return; }
     oTc.textContent = fmt(r.chordal_thickness_in, 4) + " in";
     oAc.textContent = fmt(r.chordal_addendum_in, 4) + " in";
@@ -790,7 +791,7 @@ function renderBearingL10Life(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "bl10-out-n");
   function readNum(i) { if (i.value === "") return 0; const v = Number(i.value); return Number.isFinite(v) ? v : 0; }
   const update = debounce(() => {
-    const r = computeBearingL10Life({ dynamic_rating_lbf: readNum(c.input), equivalent_load_lbf: readNum(p.input), speed_rpm: readNum(rpm.input), bearing_type: type.select.value });
+    const r = computeBearingL10Life({ dynamic_rating_lbf: readNum(c.input), equivalent_load_lbf: readNum(p.input), speed_rpm: readNum(rpm.input), bearing_type: type.select.value }); stepsFor(outputRegion, inputRegion, ["dynamic_rating_lbf", "equivalent_load_lbf", "speed_rpm", "bearing_type"], r);
     if (r.error) { oRev.textContent = r.error; oHr.textContent = "-"; oNote.textContent = ""; return; }
     oRev.textContent = fmt(r.l10_rev / 1e6, 1) + " million rev (p = " + fmt(r.p_exp, 3) + ")";
     oHr.textContent = fmt(r.l10_hr, 0) + " hr";
@@ -839,7 +840,7 @@ function renderBearingMaxLoad(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "bml-out-n");
   function readNum(i) { if (i.value === "") return 0; const v = Number(i.value); return Number.isFinite(v) ? v : 0; }
   const update = debounce(() => {
-    const r = computeBearingMaxLoad({ dynamic_rating_lbf: readNum(c.input), target_life_hr: readNum(hr.input), speed_rpm: readNum(rpm.input), bearing_type: type.select.value });
+    const r = computeBearingMaxLoad({ dynamic_rating_lbf: readNum(c.input), target_life_hr: readNum(hr.input), speed_rpm: readNum(rpm.input), bearing_type: type.select.value }); stepsFor(outputRegion, inputRegion, ["dynamic_rating_lbf", "target_life_hr", "speed_rpm", "bearing_type"], r);
     if (r.error) { oLoad.textContent = r.error; oNote.textContent = ""; return; }
     oLoad.textContent = fmt(r.max_equivalent_load_lbf, 0) + " lbf (p = " + fmt(r.p_exp, 3) + ")";
     oNote.textContent = r.note;
@@ -917,7 +918,7 @@ function renderBearingEquivalentLoad(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "beq-out-n");
   function readNum(i) { if (i.value === "") return 0; const v = Number(i.value); return Number.isFinite(v) ? v : 0; }
   const update = debounce(() => {
-    const r = computeBearingEquivalentLoad({ radial_load_lbf: readNum(fr.input), thrust_load_lbf: readNum(fa.input), static_rating_lbf: readNum(c0.input) });
+    const r = computeBearingEquivalentLoad({ radial_load_lbf: readNum(fr.input), thrust_load_lbf: readNum(fa.input), static_rating_lbf: readNum(c0.input) }); stepsFor(outputRegion, inputRegion, ["radial_load_lbf", "thrust_load_lbf", "static_rating_lbf"], r);
     if (r.error) { oP.textContent = r.error; oXY.textContent = "-"; oNote.textContent = ""; return; }
     oP.textContent = fmt(r.equivalent_load_lbf, 0) + " lbf";
     oXY.textContent = "X = " + fmt(r.x_factor, 2) + ", Y = " + fmt(r.y_factor, 2) + ", e = " + fmt(r.e_ratio, 3) + (r.thrust_governs ? " (thrust governs)" : " (radial governs, P = Fr)");
@@ -992,7 +993,7 @@ function renderFatigueSafetyFactor(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "fat-out-note");
   function readNum(i) { if (i.value === "") return 0; const v = Number(i.value); return Number.isFinite(v) ? v : 0; }
   const update = debounce(() => {
-    const r = computeFatigueSafetyFactor({ alternating_stress_psi: readNum(sa.input), mean_stress_psi: readNum(sm.input), endurance_limit_psi: readNum(se.input), ultimate_strength_psi: readNum(sut.input), yield_strength_psi: readNum(sy.input), criterion: crit.select.value });
+    const r = computeFatigueSafetyFactor({ alternating_stress_psi: readNum(sa.input), mean_stress_psi: readNum(sm.input), endurance_limit_psi: readNum(se.input), ultimate_strength_psi: readNum(sut.input), yield_strength_psi: readNum(sy.input), criterion: crit.select.value }); stepsFor(outputRegion, inputRegion, ["alternating_stress_psi", "mean_stress_psi", "endurance_limit_psi", "ultimate_strength_psi", "yield_strength_psi", "criterion"], r);
     if (r.error) { oN.textContent = r.error; oNy.textContent = "-"; oGov.textContent = "-"; oNote.textContent = ""; return; }
     oN.textContent = fmt(r.fatigue_n, 2);
     oNy.textContent = fmt(r.langer_ny, 2);
@@ -1081,7 +1082,7 @@ function renderEnduranceLimitMarin(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "elm-out-note");
   function readNum(i) { if (i.value === "") return 0; const v = Number(i.value); return Number.isFinite(v) ? v : 0; }
   const update = debounce(() => {
-    const r = computeEnduranceLimitMarin({ ultimate_strength_psi: readNum(sut.input), surface_finish: surf.select.value, diameter_in: readNum(d.input), load_type: load.select.value, reliability_pct: rel.select.value, temperature_factor_kd: readNum(kd.input) });
+    const r = computeEnduranceLimitMarin({ ultimate_strength_psi: readNum(sut.input), surface_finish: surf.select.value, diameter_in: readNum(d.input), load_type: load.select.value, reliability_pct: rel.select.value, temperature_factor_kd: readNum(kd.input) }); stepsFor(outputRegion, inputRegion, ["ultimate_strength_psi", "surface_finish", "diameter_in", "load_type", "reliability_pct", "temperature_factor_kd"], r);
     if (r.error) { oSe.textContent = r.error; oFac.textContent = "-"; oNote.textContent = ""; return; }
     oSe.textContent = fmt(r.endurance_limit_psi, 0) + " psi (from Se' = " + fmt(r.uncorrected_se_psi, 0) + " psi)";
     oFac.textContent = "ka = " + fmt(r.ka, 3) + ", kb = " + fmt(r.kb, 3) + ", kc = " + fmt(r.kc, 2) + ", kd = " + fmt(r.kd, 2) + ", ke = " + fmt(r.ke, 3);
@@ -1144,7 +1145,7 @@ function renderFatigueFiniteLife(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "ffl-out-note");
   function readNum(i) { if (i.value === "") return 0; const v = Number(i.value); return Number.isFinite(v) ? v : 0; }
   const update = debounce(() => {
-    const r = computeFatigueFiniteLife({ ultimate_strength_psi: readNum(sut.input), endurance_limit_psi: readNum(se.input), fatigue_fraction: readNum(f.input), cycles: readNum(n.input), alternating_stress_psi: readNum(sa.input) });
+    const r = computeFatigueFiniteLife({ ultimate_strength_psi: readNum(sut.input), endurance_limit_psi: readNum(se.input), fatigue_fraction: readNum(f.input), cycles: readNum(n.input), alternating_stress_psi: readNum(sa.input) }); stepsFor(outputRegion, inputRegion, ["ultimate_strength_psi", "endurance_limit_psi", "fatigue_fraction", "cycles", "alternating_stress_psi"], r);
     if (r.error) { oL.textContent = r.error; oS.textContent = "-"; oN.textContent = "-"; oNote.textContent = ""; return; }
     oL.textContent = "Sf = " + fmt(r.coefficient_a_psi, 0) + " N^" + fmt(r.exponent_b, 4) + " psi (f = " + fmt(r.f_used, 3) + (r.f_entered ? ", entered" : ", Shigley fit") + ")";
     oS.textContent = r.has_cycles ? fmt(r.strength_at_cycles_psi, 0) + " psi" : "enter cycles to find it";
@@ -1201,7 +1202,7 @@ function renderFatigueNotchSensitivity(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "fns-out-note");
   function readNum(i) { if (i.value === "") return 0; const v = Number(i.value); return Number.isFinite(v) ? v : 0; }
   const update = debounce(() => {
-    const r = computeFatigueNotchSensitivity({ kt: readNum(kt.input), notch_radius_in: readNum(rad.input), ultimate_strength_psi: readNum(sut.input), load_type: lt.select.value });
+    const r = computeFatigueNotchSensitivity({ kt: readNum(kt.input), notch_radius_in: readNum(rad.input), ultimate_strength_psi: readNum(sut.input), load_type: lt.select.value }); stepsFor(outputRegion, inputRegion, ["kt", "notch_radius_in", "ultimate_strength_psi", "load_type"], r);
     if (r.error) { oK.textContent = r.error; oQ.textContent = "-"; oA.textContent = "-"; oNote.textContent = ""; return; }
     oK.textContent = fmt(r.kf, 3) + (r.load_type === "torsion" ? " (Kfs, torsion)" : " (Kf, bending or axial)");
     oQ.textContent = fmt(r.notch_sensitivity_q, 3);
@@ -1262,7 +1263,7 @@ function renderFatigueMinerDamage(inputRegion, outputRegion, citationEl) {
   function readNum(i) { if (i.value === "") return 0; const v = Number(i.value); return Number.isFinite(v) ? v : 0; }
   const life = (n) => (n > 0 ? fmt(n, 0) : "no damage (at or below Se)");
   const update = debounce(() => {
-    const r = computeFatigueMinerDamage({ ultimate_strength_psi: readNum(sut.input), endurance_limit_psi: readNum(se.input), fatigue_fraction: readNum(f.input), stress_1_psi: readNum(s1.input), cycles_1: readNum(n1.input), stress_2_psi: readNum(s2.input), cycles_2: readNum(n2.input), stress_3_psi: readNum(s3.input), cycles_3: readNum(n3.input) });
+    const r = computeFatigueMinerDamage({ ultimate_strength_psi: readNum(sut.input), endurance_limit_psi: readNum(se.input), fatigue_fraction: readNum(f.input), stress_1_psi: readNum(s1.input), cycles_1: readNum(n1.input), stress_2_psi: readNum(s2.input), cycles_2: readNum(n2.input), stress_3_psi: readNum(s3.input), cycles_3: readNum(n3.input) }); stepsFor(outputRegion, inputRegion, ["ultimate_strength_psi", "endurance_limit_psi", "fatigue_fraction", "stress_1_psi", "cycles_1", "stress_2_psi", "cycles_2", "stress_3_psi", "cycles_3"], r);
     if (r.error) { oD.textContent = r.error; oL.textContent = "-"; oT.textContent = "-"; oNote.textContent = ""; return; }
     oD.textContent = fmt(r.blocks_to_failure, 3) + " (damage per block D = " + fmt(r.damage, 5) + (r.fails_in_block ? "; FAILS within one block" : "") + ")";
     if (r.infinite) oD.textContent = "unlimited: every block is at or below Se";
@@ -1328,7 +1329,7 @@ function renderFatigueCombinedLoading(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "fcl-out-note");
   function readNum(i, d) { if (i.value === "") return d; const v = Number(i.value); return Number.isFinite(v) ? v : d; }
   const update = debounce(() => {
-    const r = computeFatigueCombinedLoading({ bending_alt_psi: readNum(sab.input, 0), bending_mean_psi: readNum(smb.input, 0), axial_alt_psi: readNum(saa.input, 0), axial_mean_psi: readNum(sma.input, 0), torsion_alt_psi: readNum(ta.input, 0), torsion_mean_psi: readNum(tm.input, 0), kf_bending: readNum(kb.input, 1), kf_axial: readNum(ka.input, 1), kfs_torsion: readNum(kt.input, 1) });
+    const r = computeFatigueCombinedLoading({ bending_alt_psi: readNum(sab.input, 0), bending_mean_psi: readNum(smb.input, 0), axial_alt_psi: readNum(saa.input, 0), axial_mean_psi: readNum(sma.input, 0), torsion_alt_psi: readNum(ta.input, 0), torsion_mean_psi: readNum(tm.input, 0), kf_bending: readNum(kb.input, 1), kf_axial: readNum(ka.input, 1), kfs_torsion: readNum(kt.input, 1) }); stepsFor(outputRegion, inputRegion, ["bending_alt_psi", "bending_mean_psi", "axial_alt_psi", "axial_mean_psi", "torsion_alt_psi", "torsion_mean_psi", "kf_bending", "kf_axial", "kfs_torsion"], r);
     if (r.error) { oA.textContent = r.error; oM.textContent = "-"; oX.textContent = "-"; oNote.textContent = ""; return; }
     oA.textContent = fmt(r.vm_alt_psi, 0) + " psi (sigma_a for the Goodman check)";
     oM.textContent = fmt(r.vm_mean_psi, 0) + " psi (sigma_m)";
@@ -1406,7 +1407,7 @@ function renderPowerScrewTorque(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "pst-out-note");
   function readNum(i) { if (i.value === "") return 0; const v = Number(i.value); return Number.isFinite(v) ? v : 0; }
   const update = debounce(() => {
-    const r = computePowerScrewTorque({ axial_load_lbf: readNum(F.input), mean_diameter_in: readNum(dm.input), lead_in: readNum(l.input), thread_friction: readNum(mu.input), collar_friction: readNum(muc.input), collar_diameter_in: readNum(dc.input), thread_form: form.select.value });
+    const r = computePowerScrewTorque({ axial_load_lbf: readNum(F.input), mean_diameter_in: readNum(dm.input), lead_in: readNum(l.input), thread_friction: readNum(mu.input), collar_friction: readNum(muc.input), collar_diameter_in: readNum(dc.input), thread_form: form.select.value }); stepsFor(outputRegion, inputRegion, ["axial_load_lbf", "mean_diameter_in", "lead_in", "thread_friction", "collar_friction", "collar_diameter_in", "thread_form"], r);
     if (r.error) { oR.textContent = r.error; oL.textContent = "-"; oE.textContent = "-"; oS.textContent = "-"; oNote.textContent = ""; return; }
     oR.textContent = fmt(r.raise_torque_in_lbf, 1) + " in-lbf";
     oL.textContent = fmt(r.lower_torque_in_lbf, Math.abs(r.lower_torque_in_lbf - 0) < 0.05 && r.lower_torque_in_lbf !== 0 ? 3 : 1) + " in-lbf" + (r.lower_torque_in_lbf < 0 ? " (negative: the load back-drives the screw)" : "");
@@ -1466,7 +1467,7 @@ function renderDiskClutchTorque(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "dct-out-note");
   function readNum(i) { if (i.value === "") return 0; const v = Number(i.value); return Number.isFinite(v) ? v : 0; }
   const update = debounce(() => {
-    const r = computeDiskClutchTorque({ clamp_force_lbf: readNum(F.input), friction_coefficient: readNum(mu.input), outer_radius_in: readNum(ro.input), inner_radius_in: readNum(ri.input), friction_surfaces: readNum(N.input) });
+    const r = computeDiskClutchTorque({ clamp_force_lbf: readNum(F.input), friction_coefficient: readNum(mu.input), outer_radius_in: readNum(ro.input), inner_radius_in: readNum(ri.input), friction_surfaces: readNum(N.input) }); stepsFor(outputRegion, inputRegion, ["clamp_force_lbf", "friction_coefficient", "outer_radius_in", "inner_radius_in", "friction_surfaces"], r);
     if (r.error) { oW.textContent = r.error; oP.textContent = "-"; oPr.textContent = "-"; oNote.textContent = ""; return; }
     oW.textContent = fmt(r.uniform_wear_torque_in_lbf, 1) + " in-lbf (" + fmt(r.uniform_wear_torque_in_lbf / 12, 1) + " ft-lbf)";
     oP.textContent = fmt(r.uniform_pressure_torque_in_lbf, 1) + " in-lbf";
@@ -1533,7 +1534,7 @@ function renderClutchEngagementEnergy(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "cee-out-note");
   function readNum(i, d) { if (i.value === "") return d; const v = Number(i.value); return Number.isFinite(v) ? v : d; }
   const update = debounce(() => {
-    const r = computeClutchEngagementEnergy({ driver_wr2_lbft2: readNum(wr1.input, 0), driven_wr2_lbft2: readNum(wr2.input, 0), driver_rpm: readNum(n1.input, 0), driven_rpm: readNum(n2.input, 0), slip_torque_lbft: readNum(tq.input, 0), absorbing_weight_lb: readNum(mass.input, 0), specific_heat_btu_lbf: readNum(cp.input, 0.12), engagements_per_hour: readNum(cph.input, 0) });
+    const r = computeClutchEngagementEnergy({ driver_wr2_lbft2: readNum(wr1.input, 0), driven_wr2_lbft2: readNum(wr2.input, 0), driver_rpm: readNum(n1.input, 0), driven_rpm: readNum(n2.input, 0), slip_torque_lbft: readNum(tq.input, 0), absorbing_weight_lb: readNum(mass.input, 0), specific_heat_btu_lbf: readNum(cp.input, 0.12), engagements_per_hour: readNum(cph.input, 0) }); stepsFor(outputRegion, inputRegion, ["driver_wr2_lbft2", "driven_wr2_lbft2", "driver_rpm", "driven_rpm", "slip_torque_lbft", "absorbing_weight_lb", "specific_heat_btu_lbf", "engagements_per_hour"], r);
     if (r.error) { oE.textContent = r.error; oN.textContent = "-"; oT.textContent = "-"; oD.textContent = "-"; oH.textContent = "-"; oNote.textContent = ""; return; }
     oE.textContent = fmt(r.energy_ftlb, 0) + " ft-lb (" + fmt(r.energy_btu, 2) + " BTU)";
     oN.textContent = fmt(r.final_rpm, 0) + " rpm";
@@ -1611,7 +1612,7 @@ function renderEulerJohnsonColumn(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "ejc-out-note");
   function readNum(i) { if (i.value === "") return 0; const v = Number(i.value); return Number.isFinite(v) ? v : 0; }
   const update = debounce(() => {
-    const r = computeEulerJohnsonColumn({ modulus_psi: readNum(E.input), yield_strength_psi: readNum(Sy.input), moment_of_inertia_in4: readNum(I.input), area_in2: readNum(A.input), length_in: readNum(L.input), end_condition: end.select.value });
+    const r = computeEulerJohnsonColumn({ modulus_psi: readNum(E.input), yield_strength_psi: readNum(Sy.input), moment_of_inertia_in4: readNum(I.input), area_in2: readNum(A.input), length_in: readNum(L.input), end_condition: end.select.value }); stepsFor(outputRegion, inputRegion, ["modulus_psi", "yield_strength_psi", "moment_of_inertia_in4", "area_in2", "length_in", "end_condition"], r);
     if (r.error) { oP.textContent = r.error; oS.textContent = "-"; oSR.textContent = "-"; oNote.textContent = ""; return; }
     oP.textContent = fmt(r.critical_load_lbf, 0) + " lbf (" + r.mode + ")";
     oS.textContent = fmt(r.critical_stress_psi, 0) + " psi";
@@ -1693,7 +1694,7 @@ function renderColumnSecantFormula(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "csf-out-note");
   function readNum(i) { if (i.value === "") return 0; const v = Number(i.value); return Number.isFinite(v) ? v : 0; }
   const update = debounce(() => {
-    const r = computeColumnSecantFormula({ load_lbf: readNum(P.input), eccentricity_in: readNum(e.input), extreme_fiber_in: readNum(c.input), modulus_psi: readNum(E.input), yield_strength_psi: readNum(Sy.input), moment_of_inertia_in4: readNum(I.input), area_in2: readNum(A.input), length_in: readNum(L.input), end_condition: end.select.value });
+    const r = computeColumnSecantFormula({ load_lbf: readNum(P.input), eccentricity_in: readNum(e.input), extreme_fiber_in: readNum(c.input), modulus_psi: readNum(E.input), yield_strength_psi: readNum(Sy.input), moment_of_inertia_in4: readNum(I.input), area_in2: readNum(A.input), length_in: readNum(L.input), end_condition: end.select.value }); stepsFor(outputRegion, inputRegion, ["load_lbf", "eccentricity_in", "extreme_fiber_in", "modulus_psi", "yield_strength_psi", "moment_of_inertia_in4", "area_in2", "length_in", "end_condition"], r);
     if (r.error) { oS.textContent = r.error; oY.textContent = "-"; oP.textContent = "-"; oF.textContent = "-"; oNote.textContent = ""; return; }
     oS.textContent = fmt(r.max_stress_psi, 0) + " psi (secant " + fmt(r.secant_term, 3) + ", eccentricity ratio " + fmt(r.eccentricity_ratio, 3) + ")";
     oY.textContent = fmt(r.max_deflection_in, 3) + " in";
@@ -1749,7 +1750,7 @@ function renderThickWallCylinderStress(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "twc-out-note");
   function readNum(i) { if (i.value === "") return 0; const v = Number(i.value); return Number.isFinite(v) ? v : 0; }
   const update = debounce(() => {
-    const r = computeThickWallCylinderStress({ pressure_psi: readNum(P.input), inner_radius_in: readNum(ri.input), wall_thickness_in: readNum(t.input) });
+    const r = computeThickWallCylinderStress({ pressure_psi: readNum(P.input), inner_radius_in: readNum(ri.input), wall_thickness_in: readNum(t.input) }); stepsFor(outputRegion, inputRegion, ["pressure_psi", "inner_radius_in", "wall_thickness_in"], r);
     if (r.error) { oH.textContent = r.error; oL.textContent = "-"; oT.textContent = "-"; oNote.textContent = ""; return; }
     oH.textContent = fmt(r.hoop_bore_psi, 0) + " / " + fmt(r.hoop_outer_psi, 0) + " psi (max at the bore)";
     oL.textContent = fmt(r.longitudinal_psi, 0) + " psi longitudinal, " + fmt(r.radial_bore_psi, 0) + " psi radial";
@@ -1803,7 +1804,7 @@ function renderRackAndPinion(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "rap-out-note");
   function readNum(i) { if (i.value === "") return 0; const v = Number(i.value); return Number.isFinite(v) ? v : 0; }
   const update = debounce(() => {
-    const r = computeRackAndPinion({ pinion_teeth: readNum(N.input), diametral_pitch_1_in: readNum(Pd.input), pinion_torque_in_lb: readNum(T.input), pinion_rpm: readNum(rpm.input) });
+    const r = computeRackAndPinion({ pinion_teeth: readNum(N.input), diametral_pitch_1_in: readNum(Pd.input), pinion_torque_in_lb: readNum(T.input), pinion_rpm: readNum(rpm.input) }); stepsFor(outputRegion, inputRegion, ["pinion_teeth", "diametral_pitch_1_in", "pinion_torque_in_lb", "pinion_rpm"], r);
     if (r.error) { oPD.textContent = r.error; oTr.textContent = "-"; oV.textContent = "-"; oF.textContent = "-"; oNote.textContent = ""; return; }
     oPD.textContent = fmt(r.pitch_diameter_in, 3) + " in";
     oTr.textContent = fmt(r.travel_per_rev_in, 3) + " in/rev, " + fmt(r.travel_per_tooth_in, 4) + " in/tooth";
@@ -1857,7 +1858,7 @@ function renderPlainBearingPressurePv(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "pbp-out-note");
   function readNum(i) { if (i.value === "") return 0; const v = Number(i.value); return Number.isFinite(v) ? v : 0; }
   const update = debounce(() => {
-    const r = computePlainBearingPressurePv({ radial_load_lbf: readNum(W.input), journal_diameter_in: readNum(D.input), bearing_length_in: readNum(L.input), speed_rpm: readNum(N.input) });
+    const r = computePlainBearingPressurePv({ radial_load_lbf: readNum(W.input), journal_diameter_in: readNum(D.input), bearing_length_in: readNum(L.input), speed_rpm: readNum(N.input) }); stepsFor(outputRegion, inputRegion, ["radial_load_lbf", "journal_diameter_in", "bearing_length_in", "speed_rpm"], r);
     if (r.error) { oP.textContent = r.error; oV.textContent = "-"; oPV.textContent = "-"; oNote.textContent = ""; return; }
     oP.textContent = fmt(r.projected_pressure_psi, 1) + " psi";
     oV.textContent = fmt(r.surface_velocity_fpm, 1) + " ft/min";
@@ -1907,7 +1908,7 @@ function renderFlangeCouplingTorque(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "fct-out-note");
   function readNum(i) { if (i.value === "") return 0; const v = Number(i.value); return Number.isFinite(v) ? v : 0; }
   const update = debounce(() => {
-    const r = computeFlangeCouplingTorque({ bolt_count: readNum(n.input), bolt_diameter_in: readNum(d.input), allowable_shear_psi: readNum(tau.input), bolt_circle_diameter_in: readNum(bcd.input) });
+    const r = computeFlangeCouplingTorque({ bolt_count: readNum(n.input), bolt_diameter_in: readNum(d.input), allowable_shear_psi: readNum(tau.input), bolt_circle_diameter_in: readNum(bcd.input) }); stepsFor(outputRegion, inputRegion, ["bolt_count", "bolt_diameter_in", "allowable_shear_psi", "bolt_circle_diameter_in"], r);
     if (r.error) { oT.textContent = r.error; oB.textContent = "-"; oNote.textContent = ""; return; }
     oT.textContent = fmt(r.torque_capacity_in_lb, 0) + " in-lbf (" + fmt(r.torque_capacity_ft_lb, 0) + " ft-lbf)";
     oB.textContent = fmt(r.shear_per_bolt_lbf, 1) + " lbf (bolt shear area " + fmt(r.shear_area_per_bolt_in2, 4) + " in^2)";
@@ -1957,7 +1958,7 @@ function renderCountersinkDepth(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "csd-out-n");
   function readNum(i) { if (i.value === "") return 0; const v = Number(i.value); return Number.isFinite(v) ? v : 0; }
   const update = debounce(() => {
-    const r = computeCountersinkDepth({ countersink_dia_in: readNum(d.input), included_angle_deg: Number(ang.select.value), pilot_hole_dia_in: readNum(hole.input) });
+    const r = computeCountersinkDepth({ countersink_dia_in: readNum(d.input), included_angle_deg: Number(ang.select.value), pilot_hole_dia_in: readNum(hole.input) }); stepsFor(outputRegion, inputRegion, ["countersink_dia_in", "included_angle_deg", "pilot_hole_dia_in"], r);
     if (r.error) { oZ.textContent = r.error; oZf.textContent = "-"; oNote.textContent = ""; return; }
     oZ.textContent = fmt(r.z_in, 4) + " in";
     oZf.textContent = fmt(r.z_full_in, 4) + " in";
@@ -2011,7 +2012,7 @@ function renderCountersinkDiameterFromDepth(inputRegion, outputRegion, citationE
   const oNote = makeOutputLine(outputRegion, "Note", "cdd-out-n");
   function readNum(i) { if (i.value === "") return 0; const v = Number(i.value); return Number.isFinite(v) ? v : 0; }
   const update = debounce(() => {
-    const r = computeCountersinkDiameterFromDepth({ plunge_depth_in: readNum(z.input), included_angle_deg: Number(ang.select.value), pilot_hole_dia_in: readNum(hole.input) });
+    const r = computeCountersinkDiameterFromDepth({ plunge_depth_in: readNum(z.input), included_angle_deg: Number(ang.select.value), pilot_hole_dia_in: readNum(hole.input) }); stepsFor(outputRegion, inputRegion, ["plunge_depth_in", "included_angle_deg", "pilot_hole_dia_in"], r);
     if (r.error) { oD.textContent = r.error; oC.textContent = "-"; oNote.textContent = ""; return; }
     oD.textContent = fmt(r.countersink_dia_in, 4) + " in";
     oC.textContent = fmt(r.cone_dia_in, 4) + " in";
@@ -2086,7 +2087,7 @@ function renderKeyseatKeySize(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "kks-out-n");
   function readNum(i) { if (i.value === "") return 0; const v = Number(i.value); return Number.isFinite(v) ? v : 0; }
   const update = debounce(() => {
-    const r = computeKeyseatKeySize({ shaft_diameter_in: readNum(d.input), torque_in_lb: readNum(t.input), key_length_in: readNum(len.input) });
+    const r = computeKeyseatKeySize({ shaft_diameter_in: readNum(d.input), torque_in_lb: readNum(t.input), key_length_in: readNum(len.input) }); stepsFor(outputRegion, inputRegion, ["shaft_diameter_in", "torque_in_lb", "key_length_in"], r);
     if (r.error) { oW.textContent = r.error; oDepth.textContent = "-"; oShear.textContent = "-"; oBear.textContent = "-"; oNote.textContent = ""; return; }
     oW.textContent = fmt(r.key_width_in, 4) + " x " + fmt(r.key_height_in, 4) + " in";
     oDepth.textContent = fmt(r.shaft_keyseat_depth_in, 4) + " in";
@@ -2133,7 +2134,7 @@ function _v910renderKnurlBlankDiameter(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const r = computeKnurlBlankDiameter({
       target_diameter_in: td.input.value === "" ? 0.75 : Number(td.input.value), knurl_tpi: tp.input.value === "" ? 21 : Number(tp.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["target_diameter_in", "knurl_tpi"], r);
     if (r.error) { oTeeth.textContent = r.error; oBlank.textContent = "-"; oAdj.textContent = "-"; return; }
     oTeeth.textContent = fmt(r.teeth, 0) + " teeth";
     oBlank.textContent = fmt(r.blank_diameter_in, 4) + " in";
@@ -2182,7 +2183,7 @@ function _v911renderGrindingWheelRpm(inputRegion, outputRegion, citationEl) {
     const r = computeGrindingWheelRpm({
       wheel_diameter_in: wd.input.value === "" ? 7 : Number(wd.input.value), rated_max_sfpm: rs.input.value === "" ? 6500 : Number(rs.input.value),
       grinder_rpm: gr.input.value === "" ? 3450 : Number(gr.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["wheel_diameter_in", "rated_max_sfpm", "grinder_rpm"], r);
     if (r.error) { oVerdict.textContent = r.error; oMax.textContent = "-"; oAct.textContent = "-"; return; }
     oVerdict.textContent = r.verdict + " (" + (r.margin_rpm >= 0 ? "+" : "") + fmt(r.margin_rpm, 0) + " RPM margin)";
     oMax.textContent = fmt(r.max_rpm, 0) + " RPM";
@@ -2227,7 +2228,7 @@ function _v917renderReamingDrillAllowance(inputRegion, outputRegion, citationEl)
   const update = debounce(() => {
     const r = computeReamingDrillAllowance({
       reamer_diameter_in: rd.input.value === "" ? 0.5 : Number(rd.input.value), allowance_override_in: ov.input.value === "" ? 0 : Number(ov.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["reamer_diameter_in", "allowance_override_in"], r);
     if (r.error) { oDrill.textContent = r.error; oAllow.textContent = "-"; return; }
     oDrill.textContent = fmt(r.drill_diameter_in, 4) + " in";
     oAllow.textContent = fmt(r.allowance_used_in, 4) + " in on the diameter";
@@ -2271,7 +2272,7 @@ function _v952renderTaylorToolLife(inputRegion, outputRegion, citationEl) {
     const r = computeTaylorToolLife({
       taylor_c: cc.input.value === "" ? 300 : Number(cc.input.value), taylor_n: nn.input.value === "" ? 0.2 : Number(nn.input.value),
       cutting_speed_sfm: vv.input.value === "" ? 200 : Number(vv.input.value), target_life_min: tl.input.value === "" ? 15 : Number(tl.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["taylor_c", "taylor_n", "cutting_speed_sfm", "target_life_min"], r);
     if (r.error) { oLife.textContent = r.error; oSpeed.textContent = "-"; return; }
     oLife.textContent = fmt(r.tool_life_min, 2) + " min at " + fmt(Number(vv.input.value) || 200, 0) + " sfm";
     oSpeed.textContent = fmt(r.speed_for_target_life_sfm, 1) + " sfm for " + fmt(Number(tl.input.value) || 15, 0) + " min";
@@ -2308,7 +2309,7 @@ function _v1006renderThreadSingleDepth(inputRegion, outputRegion, citationEl) {
   const oD = makeOutputLine(outputRegion, "Radial (single) depth", "tsd-out-d");
   const oC = makeOutputLine(outputRegion, "Compound infeed (29.5 deg)", "tsd-out-c");
   const update = debounce(() => {
-    const r = computeThreadSingleDepth({ tpi: tp.input.value === "" ? 13 : Number(tp.input.value) });
+    const r = computeThreadSingleDepth({ tpi: tp.input.value === "" ? 13 : Number(tp.input.value) }); stepsFor(outputRegion, inputRegion, ["tpi"], r);
     if (r.error) { oD.textContent = r.error; oC.textContent = "-"; return; }
     oD.textContent = fmt(r.single_depth_in, 4) + " in (pitch " + fmt(r.pitch_in, 4) + " in)";
     oC.textContent = fmt(r.compound_infeed_in, 4) + " in";
@@ -2359,7 +2360,7 @@ function renderAcmeThreadDepth(inputRegion, outputRegion, citationEl) {
   const oFlat = makeOutputLine(outputRegion, "Crest flat width", "acme-out-flat");
   const oNote = makeOutputLine(outputRegion, "Note", "acme-out-n");
   const update = debounce(() => {
-    const r = computeAcmeThreadDepth({ major_dia_in: Number(D.input.value) || 0, tpi: Number(tp.input.value) || 0 });
+    const r = computeAcmeThreadDepth({ major_dia_in: Number(D.input.value) || 0, tpi: Number(tp.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["major_dia_in", "tpi"], r);
     if (r.error) { oDepth.textContent = r.error; oDia.textContent = "-"; oFlat.textContent = "-"; oNote.textContent = ""; return; }
     oDepth.textContent = fmt(r.thread_depth_in, 4) + " in (pitch " + fmt(r.pitch_in, 4) + " in)";
     oDia.textContent = fmt(r.pitch_dia_in, 4) + " in / " + fmt(r.minor_dia_in, 4) + " in";
@@ -2406,7 +2407,7 @@ function renderStubAcmeThreadDepth(inputRegion, outputRegion, citationEl) {
   const oFlat = makeOutputLine(outputRegion, "Crest flat width", "stacme-out-flat");
   const oNote = makeOutputLine(outputRegion, "Note", "stacme-out-n");
   const update = debounce(() => {
-    const r = computeStubAcmeThreadDepth({ major_dia_in: Number(D.input.value) || 0, tpi: Number(tp.input.value) || 0 });
+    const r = computeStubAcmeThreadDepth({ major_dia_in: Number(D.input.value) || 0, tpi: Number(tp.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["major_dia_in", "tpi"], r);
     if (r.error) { oDepth.textContent = r.error; oDia.textContent = "-"; oFlat.textContent = "-"; oNote.textContent = ""; return; }
     oDepth.textContent = fmt(r.thread_depth_in, 4) + " in (pitch " + fmt(r.pitch_in, 4) + " in)";
     oDia.textContent = fmt(r.pitch_dia_in, 4) + " in / " + fmt(r.minor_dia_in, 4) + " in";
@@ -2475,7 +2476,7 @@ function renderGearUndercutBacklash(inputRegion, outputRegion, citationEl) {
     const r = computeGearUndercutBacklash({
       pressure_angle_deg: Number(pa.input.value), teeth: Number(n.input.value), addendum_coefficient: Number(k.input.value),
       center_distance_change_in: Number(dc.input.value), diametral_pitch: Number(pd.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["pressure_angle_deg", "teeth", "addendum_coefficient", "center_distance_change_in", "diametral_pitch"], r);
     if (r.error) { oM.textContent = r.error; oV.textContent = "-"; oB.textContent = "-"; oN.textContent = "-"; return; }
     oM.textContent = r.min_teeth + " teeth (exact " + fmt(r.min_teeth_exact, 3) + ")";
     oV.textContent = r.undercut ? "UNDERCUT - short by " + r.shortfall + " teeth" : "clears the minimum";
@@ -2566,7 +2567,7 @@ function _v1128renderBallnoseFeedCusp(inputRegion, outputRegion, citationEl) {
   const oFeed = makeOutputLine(outputRegion, "Feedrate", "bfc-out-feed");
   const oNote = makeOutputLine(outputRegion, "Note", "bfc-out-note");
   const update = debounce(() => {
-    const res = computeBallnoseFeedCusp({ r_in: Number(r.input.value) || 0, stepover_in: Number(s.input.value) || 0, feed_per_tooth_in: Number(fz.input.value) || 0, rpm: Number(n.input.value) || 0, flutes: Number(z.input.value) || 0 });
+    const res = computeBallnoseFeedCusp({ r_in: Number(r.input.value) || 0, stepover_in: Number(s.input.value) || 0, feed_per_tooth_in: Number(fz.input.value) || 0, rpm: Number(n.input.value) || 0, flutes: Number(z.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["r_in", "stepover_in", "feed_per_tooth_in", "rpm", "flutes"], res);
     if (res.error) { oAcross.textContent = res.error; oAlong.textContent = "-"; oGov.textContent = "-"; oBal.textContent = "-"; oFeed.textContent = "-"; oNote.textContent = "-"; return; }
     oAcross.textContent = fmt(res.stepover_cusp_in, 6) + " in";
     oAlong.textContent = fmt(res.feed_cusp_in, 6) + " in";

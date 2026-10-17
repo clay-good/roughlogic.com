@@ -7,6 +7,7 @@ import {
   DEBOUNCE_MS, debounce, makeNumber, makeSelect, makeCheckbox,
   makeOutputLine, attachExampleButton, fmt, makeRowField,
   makeStepsPanel,
+  stepsFor,
 } from "./ui-fields.js";
 
 const _finiteGuard = (o) => {
@@ -495,7 +496,7 @@ function renderHazmatPlacardThreshold(inputRegion, outputRegion, citationEl) {
       .filter((m) => m.gross_lb > 0);
     const outs = [oA, oT, oC, oV, oN];
     if (materials.length === 0 && !t1.input.checked) { for (const o of outs) o.textContent = "-"; return; }
-    const r = computeHazmatPlacardThreshold({ materials: materials.length ? materials : [{ name: "", hazard_class: "", gross_lb: 0, table1: false }], table1_present: t1.input.checked });
+    const r = computeHazmatPlacardThreshold({ materials: materials.length ? materials : [{ name: "", hazard_class: "", gross_lb: 0, table1: false }], table1_present: t1.input.checked }); stepsFor(outputRegion, inputRegion, ["materials", "table1_present"], r);
     if (r.error) { oA.textContent = r.error; for (const o of [oT, oC, oV, oN]) o.textContent = "-"; return; }
     oA.textContent = fmt(r.table2_aggregate_lb, 0) + " lb";
     oT.textContent = r.threshold_met ? "at or above 1,001 lb" : fmt(r.margin_lb, 0) + " lb short of 1,001 lb";

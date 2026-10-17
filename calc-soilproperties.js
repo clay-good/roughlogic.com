@@ -5,6 +5,7 @@
 
 import {
   DEBOUNCE_MS, debounce, makeNumber, makeSelect, makeOutputLine, attachExampleButton, fmt,
+  stepsFor,
 } from "./ui-fields.js";
 
 const _finiteGuard = (o) => {
@@ -57,7 +58,7 @@ function _v326renderRelativeCompaction(inputRegion, outputRegion, citationEl) {
   const oRc = makeOutputLine(outputRegion, "Relative compaction", "rc-out-rc");
   const oNote = makeOutputLine(outputRegion, "Note", "rc-out-note");
   const update = debounce(() => {
-    const r = computeRelativeCompaction({ wet_pcf: Number(wet.input.value) || 0, w_pct: Number(w.input.value) || 0, max_pcf: Number(max.input.value) || 0, spec_pct: Number(spec.input.value) || 0 });
+    const r = computeRelativeCompaction({ wet_pcf: Number(wet.input.value) || 0, w_pct: Number(w.input.value) || 0, max_pcf: Number(max.input.value) || 0, spec_pct: Number(spec.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["wet_pcf", "w_pct", "max_pcf", "spec_pct"], r);
     if (r.error) { oGd.textContent = r.error; oRc.textContent = "-"; oNote.textContent = "-"; return; }
     oGd.textContent = fmt(r.gd_field, 1) + " pcf";
     oRc.textContent = fmt(r.rc_pct, 1) + "% - " + (r.pass ? "PASS" : "FAIL") + " (spec " + fmt(Number(spec.input.value) || 0, 0) + "%)";
@@ -112,7 +113,7 @@ function _v1014renderSoilRelativeDensity(inputRegion, outputRegion, citationEl) 
       w_pct: Number(w.input.value) || 0,
       gamma_dmin_pcf: Number(dmin.input.value) || 0,
       gamma_dmax_pcf: Number(dmax.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["field_wet_pcf", "w_pct", "gamma_dmin_pcf", "gamma_dmax_pcf"], r);
     if (r.error) {
       oGd.textContent = r.error;
       for (const o of [oDr, oSt, oNote]) o.textContent = "-";
@@ -162,7 +163,7 @@ function _v327renderSoilPhaseRelations(inputRegion, outputRegion, citationEl) {
   const oS = makeOutputLine(outputRegion, "Degree of saturation", "spr-out-s");
   const oNote = makeOutputLine(outputRegion, "Note", "spr-out-note");
   const update = debounce(() => {
-    const r = computeSoilPhaseRelations({ gamma_pcf: Number(g.input.value) || 0, w_pct: Number(w.input.value) || 0, gs: Number(gs.input.value) || 0 });
+    const r = computeSoilPhaseRelations({ gamma_pcf: Number(g.input.value) || 0, w_pct: Number(w.input.value) || 0, gs: Number(gs.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["gamma_pcf", "w_pct", "gs"], r);
     if (r.error) { oGd.textContent = r.error; oEn.textContent = "-"; oS.textContent = "-"; oNote.textContent = "-"; return; }
     oGd.textContent = fmt(r.gamma_d_pcf, 1) + " pcf";
     oEn.textContent = "e = " + fmt(r.e_ratio, 3) + " / n = " + fmt(r.n_porosity, 3);
@@ -247,7 +248,7 @@ function _v1260renderSoilPermeability(inputRegion, outputRegion, citationEl) {
     const r = computeSoilPermeability({
       method: method.select.value, q_cm3: readNum(q.input), head_cm: readNum(h.input), t_s: readNum(t.input),
       l_cm: readNum(l.input), a_sample_cm2: readNum(a.input), a_pipe_cm2: readNum(ap.input), h1_cm: readNum(h1.input), h2_cm: readNum(h2.input),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["method", "q_cm3", "head_cm", "t_s", "l_cm", "a_sample_cm2", "a_pipe_cm2", "h1_cm", "h2_cm"], r);
     if (r.error) { oK.textContent = r.error; oKf.textContent = "-"; oC.textContent = "-"; oNote.textContent = ""; return; }
     oK.textContent = r.k_cm_s.toExponential(3) + " cm/s";
     oKf.textContent = fmt(r.k_ft_day, 3) + " ft/day";
@@ -296,7 +297,7 @@ function _v328renderAtterbergIndices(inputRegion, outputRegion, citationEl) {
   const oLi = makeOutputLine(outputRegion, "Liquidity index", "att-out-li");
   const oNote = makeOutputLine(outputRegion, "Note", "att-out-note");
   const update = debounce(() => {
-    const r = computeAtterbergIndices({ ll: Number(ll.input.value) || 0, pl: Number(pl.input.value) || 0, w_pct: Number(w.input.value) || 0 });
+    const r = computeAtterbergIndices({ ll: Number(ll.input.value) || 0, pl: Number(pl.input.value) || 0, w_pct: Number(w.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["ll", "pl", "w_pct"], r);
     if (r.error) { oPi.textContent = r.error; oGroup.textContent = "-"; oLi.textContent = "-"; oNote.textContent = "-"; return; }
     oPi.textContent = fmt(r.pi, 1) + " (A-line " + fmt(r.aline, 1) + ", " + (r.above_a ? "above" : "below") + ")";
     oGroup.textContent = r.group;
@@ -346,7 +347,7 @@ function _v1196renderSoilActivity(inputRegion, outputRegion, citationEl) {
   const oPi = makeOutputLine(outputRegion, "Plasticity index PI", "act-out-pi");
   const oNote = makeOutputLine(outputRegion, "Note", "act-out-note");
   const update = debounce(() => {
-    const r = computeSoilActivity({ ll: Number(ll.input.value) || 0, pl: Number(pl.input.value) || 0, clay_fraction_pct: Number(cf.input.value) || 0 });
+    const r = computeSoilActivity({ ll: Number(ll.input.value) || 0, pl: Number(pl.input.value) || 0, clay_fraction_pct: Number(cf.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["ll", "pl", "clay_fraction_pct"], r);
     if (r.error) { oAct.textContent = r.error; oClass.textContent = "-"; oPi.textContent = "-"; oNote.textContent = "-"; return; }
     oAct.textContent = fmt(r.activity, 2);
     oClass.textContent = r.activity_class + " (" + r.mineral + ")";
@@ -393,7 +394,7 @@ function _v799renderFinenessModulus(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "fm-out-note");
   const update = debounce(() => {
     const args = {}; for (const [key] of defs) args[key] = Number(fields[key].input.value) || 0;
-    const r = computeFinenessModulus(args);
+    const r = computeFinenessModulus(args); stepsFor(outputRegion, inputRegion, null, r);
     if (r.error) { oFm.textContent = r.error; oBand.textContent = "-"; oNote.textContent = "-"; return; }
     oFm.textContent = fmt(r.fm, 2);
     oBand.textContent = r.band;
@@ -481,7 +482,7 @@ function _v1195renderFineAggregateGrading(inputRegion, outputRegion, citationEl)
   const oNote = makeOutputLine(outputRegion, "Note", "fag-out-note");
   const update = debounce(() => {
     const args = {}; for (const [key] of defs) args[key] = Number(fields[key].input.value) || 0;
-    const r = computeFineAggregateGrading(args);
+    const r = computeFineAggregateGrading(args); stepsFor(outputRegion, inputRegion, null, r);
     if (r.error) { oVerdict.textContent = r.error; oBand.textContent = "-"; oGap.textContent = "-"; oFm.textContent = "-"; oNote.textContent = "-"; return; }
     oVerdict.textContent = r.verdict;
     oBand.textContent = r.band_ok ? "all 7 sieves within band" : r.band_detail;
@@ -580,7 +581,7 @@ function _v1018renderSoilGradationCoefficients(inputRegion, outputRegion, citati
       d60_mm: Number(d60.input.value) || 0,
       pct_coarse_passing_no4: p4.input.value === "" ? null : Number(p4.input.value) || 0,
       pct_fines: Number(pf.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["d10_mm", "d30_mm", "d60_mm", "pct_coarse_passing_no4", "pct_fines"], r);
     if (r.error) { for (const o of [oCu, oCc, oGrade, oSym, oK, oNote]) o.textContent = "-"; oCu.textContent = r.error; return; }
     oCu.textContent = fmt(r.cu, 2) + " (well-graded " + r.coarse_type + " needs >= " + r.cu_threshold + ")" + (r.cu_ok ? " OK" : " FAILS");
     oCc.textContent = fmt(r.cc, 2) + " (needs 1 to 3)" + (r.cc_ok ? " OK" : " FAILS");

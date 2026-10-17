@@ -17,6 +17,7 @@
 import {
   DEBOUNCE_MS as _DF, debounce as _debF, makeNumber as _mnF, makeSelect as _msF,
   makeOutputLine as _moF, attachExampleButton as _aeF, fmt as _fmtF,
+  stepsFor,
 } from "./ui-fields.js";
 
 // v18 §7 contract guard: reject a non-finite numeric input. A renderer
@@ -207,7 +208,7 @@ function renderConfinedSpacePurge(inputRegion, outputRegion, citationEl) {
   const oM = _moF(outputRegion, "Minutes to purge", "cs-out-m");
   function fillExample(x) { v.input.value = x.volume_ft3; c.input.value = x.blower_cfm; n.input.value = x.target_purges; update(); }
   const update = _debF(() => {
-    const r = computeConfinedSpacePurge({ volume_ft3: Number(v.input.value) || 0, blower_cfm: Number(c.input.value) || 0, target_purges: Number(n.input.value) || 0 });
+    const r = computeConfinedSpacePurge({ volume_ft3: Number(v.input.value) || 0, blower_cfm: Number(c.input.value) || 0, target_purges: Number(n.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["volume_ft3", "blower_cfm", "target_purges"], r);
     if (r.error) { oM.textContent = r.error; return; }
     oM.textContent = _fmtF(r.minutes, 1) + " min";
   }, _DF);
@@ -227,7 +228,7 @@ function renderRopeMA(inputRegion, outputRegion, citationEl) {
   const oH = _moF(outputRegion, "Haul force", "rm-out-h");
   function fillExample(x) { r.select.value = x.rig; e.input.value = x.efficiency; l.input.value = x.load_lb; update(); }
   const update = _debF(() => {
-    const x = computeRopeMA({ rig: r.select.value, efficiency: Number(e.input.value) || 0, load_lb: Number(l.input.value) || 0 });
+    const x = computeRopeMA({ rig: r.select.value, efficiency: Number(e.input.value) || 0, load_lb: Number(l.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["rig", "efficiency", "load_lb"], x);
     if (x.error) { oT.textContent = x.error; oA.textContent = "-"; oH.textContent = "-"; return; }
     oT.textContent = String(x.theoretical_ma);
     oA.textContent = _fmtF(x.actual_ma, 2);
@@ -254,7 +255,7 @@ function renderSlingAngle(inputRegion, outputRegion, citationEl) {
   const oHaz = _moF(outputRegion, "Angle factor", "sa-out-haz");
   function fillExample(x) { w.input.value = x.load_lb; c.select.value = x.sling_config; a.input.value = x.included_angle_deg; n.input.value = x.n_legs; cap.input.value = ""; dd.input.value = ""; update(); }
   const update = _debF(() => {
-    const r = computeSlingAngle({ load_lb: Number(w.input.value) || 0, sling_config: c.select.value, included_angle_deg: Number(a.input.value) || 0, n_legs: Number(n.input.value) || 1, sling_rated_capacity_lb: Number(cap.input.value) || 0, dd_ratio: Number(dd.input.value) || 0 });
+    const r = computeSlingAngle({ load_lb: Number(w.input.value) || 0, sling_config: c.select.value, included_angle_deg: Number(a.input.value) || 0, n_legs: Number(n.input.value) || 1, sling_rated_capacity_lb: Number(cap.input.value) || 0, dd_ratio: Number(dd.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["load_lb", "sling_config", "included_angle_deg", "n_legs", "sling_rated_capacity_lb", "dd_ratio"], r);
     if (r.error) { oT.textContent = r.error; oReq.textContent = "-"; oHaz.textContent = "-"; return; }
     oT.textContent = _fmtF(r.tension_per_leg_lb, 0) + " lb";
     if (r.angle_ignored) oT.textContent += " for legs hanging straight down. THE ANGLE ENTERED IS NOT USED for a vertical hitch: legs spread at that angle carry " + _fmtF(r.spread_tension_per_leg_lb, 0) + " lb each -- choose bridle or basket if they spread";
@@ -302,7 +303,7 @@ function renderSearchTrackSpacing(inputRegion, outputRegion, citationEl) {
   const oS = _moF(outputRegion, "Spacing for target POD", "sts-out-s");
   function fillExample(x) { w.input.value = (x.sweep_width_m * 3.280839895).toFixed(1); s.input.value = (x.track_spacing_m * 3.280839895).toFixed(1); t.input.value = x.target_pod; update(); }
   const update = _debF(() => {
-    const r = computeSearchTrackSpacing({ sweep_width_m: (Number(w.input.value) || 0) * 0.3048, track_spacing_m: (Number(s.input.value) || 0) * 0.3048, target_pod: Number(t.input.value) || 0 });
+    const r = computeSearchTrackSpacing({ sweep_width_m: (Number(w.input.value) || 0) * 0.3048, track_spacing_m: (Number(s.input.value) || 0) * 0.3048, target_pod: Number(t.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["sweep_width_m", "track_spacing_m", "target_pod"], r);
     if (r.error) { oC.textContent = r.error; oP.textContent = "-"; oS.textContent = "-"; return; }
     oC.textContent = r.coverage !== null ? _fmtF(r.coverage, 2) : "- (enter a track spacing)";
     oP.textContent = r.pod !== null ? _fmtF(r.pod * 100, 1) + "%" : "-";
@@ -355,7 +356,7 @@ function renderSweatRateHydration(inputRegion, outputRegion, citationEl) {
   const oR = _moF(outputRegion, "Rehydration target", "swr-out-r");
   function fillExample(x) { pre.input.value = x.pre_weight_lb; post.input.value = x.post_weight_lb; fluid.input.value = x.fluid_oz; urine.input.value = x.urine_oz; dur.input.value = x.duration_hr; update(); }
   const update = _debF(() => {
-    const r = computeSweatRateHydration({ pre_weight_lb: Number(pre.input.value) || 0, post_weight_lb: Number(post.input.value) || 0, fluid_oz: Number(fluid.input.value) || 0, urine_oz: Number(urine.input.value) || 0, duration_hr: Number(dur.input.value) || 0 });
+    const r = computeSweatRateHydration({ pre_weight_lb: Number(pre.input.value) || 0, post_weight_lb: Number(post.input.value) || 0, fluid_oz: Number(fluid.input.value) || 0, urine_oz: Number(urine.input.value) || 0, duration_hr: Number(dur.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["pre_weight_lb", "post_weight_lb", "fluid_oz", "urine_oz", "duration_hr"], r);
     if (r.error) { oL.textContent = r.error; oP.textContent = "-"; oR.textContent = "-"; return; }
     oL.textContent = _fmtF(r.sweat_loss_oz, 0) + " oz (" + _fmtF(r.sweat_rate_oz_hr, 0) + " oz/hr)";
     oP.textContent = _fmtF(r.pct_bw_loss, 1) + "%" + (r.over_2pct ? " - at or past the 2% performance-loss line" : "");
@@ -403,7 +404,7 @@ function renderSearcherHours(inputRegion, outputRegion, citationEl) {
   const oN = _moF(outputRegion, "Note", "shr-out-n");
   function fillExample(x) { a.input.value = x.area_acres; s.input.value = x.track_spacing_ft; v.input.value = x.speed_mph; n.input.value = x.searchers; update(); }
   const update = _debF(() => {
-    const r = computeSearcherHours({ area_acres: Number(a.input.value) || 0, track_spacing_ft: Number(s.input.value) || 0, speed_mph: Number(v.input.value) || 0, searchers: n.input.value === "" ? 1 : Number(n.input.value) || 0 });
+    const r = computeSearcherHours({ area_acres: Number(a.input.value) || 0, track_spacing_ft: Number(s.input.value) || 0, speed_mph: Number(v.input.value) || 0, searchers: n.input.value === "" ? 1 : Number(n.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["area_acres", "track_spacing_ft", "speed_mph", "searchers"], r);
     if (r.error) { oT.textContent = r.error; oE.textContent = "-"; oC.textContent = "-"; oN.textContent = ""; return; }
     oT.textContent = _fmtF(r.track_line_mi, 1) + " mi";
     oE.textContent = _fmtF(r.searcher_hours, 1) + " searcher-hours";
@@ -451,7 +452,7 @@ function renderSweepWidthCorrection(inputRegion, outputRegion, citationEl) {
   const oN = _moF(outputRegion, "Note", "swc-out-n");
   function fillExample(x) { w.input.value = x.uncorrected_width_ft; fw.input.value = x.weather_factor; fv.input.value = x.speed_factor; ff.input.value = x.fatigue_factor; update(); }
   const update = _debF(() => {
-    const r = computeSweepWidthCorrection({ uncorrected_width_ft: Number(w.input.value) || 0, weather_factor: Number(fw.input.value) || 0, speed_factor: fv.input.value === "" ? 1 : Number(fv.input.value) || 0, fatigue_factor: ff.input.value === "" ? 1 : Number(ff.input.value) || 0 });
+    const r = computeSweepWidthCorrection({ uncorrected_width_ft: Number(w.input.value) || 0, weather_factor: Number(fw.input.value) || 0, speed_factor: fv.input.value === "" ? 1 : Number(fv.input.value) || 0, fatigue_factor: ff.input.value === "" ? 1 : Number(ff.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["uncorrected_width_ft", "weather_factor", "speed_factor", "fatigue_factor"], r);
     if (r.error) { oW.textContent = r.error; oF.textContent = "-"; oN.textContent = ""; return; }
     oW.textContent = _fmtF(r.corrected_width_ft, 1) + " ft";
     oF.textContent = _fmtF(r.total_factor, 2) + " (" + _fmtF(r.reduction_pct, 0) + "% reduction)";
@@ -518,7 +519,7 @@ function renderFallArrestClearance(inputRegion, outputRegion, citationEl) {
   const oN = _moF(outputRegion, "Note", "fac-out-n");
   function fillExample(x) { ffd.input.value = x.free_fall_distance_ft; up.input.value = "0"; dd.input.value = x.deceleration_distance_ft; hh.input.value = x.worker_height_ft; sf.input.value = x.safety_margin_ft; av.input.value = x.available_clearance_ft; update(); }
   const update = _debF(() => {
-    const r = computeFallArrestClearance({ free_fall_distance_ft: Number(ffd.input.value) || 0, deceleration_distance_ft: Number(dd.input.value) || 0, worker_height_ft: Number(hh.input.value) || 0, safety_margin_ft: Number(sf.input.value) || 0, available_clearance_ft: Number(av.input.value) || 0, anchor_above_dring_ft: Number(up.input.value) || 0 });
+    const r = computeFallArrestClearance({ free_fall_distance_ft: Number(ffd.input.value) || 0, deceleration_distance_ft: Number(dd.input.value) || 0, worker_height_ft: Number(hh.input.value) || 0, safety_margin_ft: Number(sf.input.value) || 0, available_clearance_ft: Number(av.input.value) || 0, anchor_above_dring_ft: Number(up.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["free_fall_distance_ft", "deceleration_distance_ft", "worker_height_ft", "safety_margin_ft", "available_clearance_ft", "anchor_above_dring_ft"], r);
     if (r.error) { oR.textContent = r.error; oM.textContent = "-"; oF.textContent = "-"; oN.textContent = ""; return; }
     oR.textContent = _fmtF(r.required_clearance_ft, 1) + " ft";
     oF.textContent = _fmtF(r.clearance_below_feet_ft, 1) + " ft below the surface the worker stands on";
@@ -623,7 +624,7 @@ function _v1150renderFallArrestAnchorage(inputRegion, outputRegion, citationEl) 
   const oV = _moF(outputRegion, "Verdict", "faa-out-v");
   const oN = _moF(outputRegion, "Note", "faa-out-n");
   const update = _debF(() => {
-    const r = computeFallArrestAnchorage({ workers_attached: Number(wk.input.value) || 0, anchorage_capacity_lb: Number(cp.input.value) || 0, design_route: rt.select.value, design_load_lb: Number(dl.input.value) || 0, arresting_force_lb: Number(af.input.value) || 0, deceleration_distance_ft: Number(dd.input.value) || 0, free_fall_ft: Number(ff.input.value) || 0 });
+    const r = computeFallArrestAnchorage({ workers_attached: Number(wk.input.value) || 0, anchorage_capacity_lb: Number(cp.input.value) || 0, design_route: rt.select.value, design_load_lb: Number(dl.input.value) || 0, arresting_force_lb: Number(af.input.value) || 0, deceleration_distance_ft: Number(dd.input.value) || 0, free_fall_ft: Number(ff.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["workers_attached", "anchorage_capacity_lb", "design_route", "design_load_lb", "arresting_force_lb", "deceleration_distance_ft", "free_fall_ft"], r);
     if (r.error) { oA.textContent = r.error; oC.textContent = "-"; oS.textContent = "-"; oV.textContent = "-"; oN.textContent = "-"; return; }
     oA.textContent = _fmtF(r.required_anchorage_lb, 0) + " lb" + (r.engineered ? " (twice the design load)" : " (5,000 per employee attached)");
     oC.textContent = r.anchorage_ok === null ? "- (enter a capacity)" : r.anchorage_ok ? "OK" + (r.achieved_safety_factor === null ? "" : ", safety factor " + _fmtF(r.achieved_safety_factor, 2)) : "SHORT by " + _fmtF(r.anchorage_shortfall_lb, 0) + " lb";

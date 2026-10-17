@@ -43,6 +43,7 @@
 
 import {
   DEBOUNCE_MS, debounce, makeNumber, makeSelect, makeOutputLine, attachExampleButton, fmt,
+  stepsFor,
 } from "./ui-fields.js";
 
 // v18 §7 contract guard (copied from calc-construction.js; non-exported, so
@@ -106,7 +107,7 @@ function _v67renderSoilSwellShrink(inputRegion, outputRegion, citationEl) {
   const oComp = makeOutputLine(outputRegion, "Compacted (placed) volume", "ss-out-comp");
   const oShort = makeOutputLine(outputRegion, "Bank-to-compacted shortfall", "ss-out-short");
   const update = debounce(() => {
-    const r = computeSoilSwellShrink({ bank_cy: Number(bank.input.value) || 0, swell_pct: swell.input.value === "" ? 25 : Number(swell.input.value), shrink_pct: shrink.input.value === "" ? 15 : Number(shrink.input.value) });
+    const r = computeSoilSwellShrink({ bank_cy: Number(bank.input.value) || 0, swell_pct: swell.input.value === "" ? 25 : Number(swell.input.value), shrink_pct: shrink.input.value === "" ? 15 : Number(shrink.input.value) }); stepsFor(outputRegion, inputRegion, ["bank_cy", "swell_pct", "shrink_pct"], r);
     if (r.error) { oLoose.textContent = r.error; for (const o of [oLf, oComp, oShort]) o.textContent = "-"; return; }
     oLoose.textContent = fmt(r.loose_cy, 1) + " cy";
     oLf.textContent = fmt(r.load_factor, 3);
@@ -186,7 +187,7 @@ function _v67renderHaulCycleProduction(inputRegion, outputRegion, citationEl) {
       haul_min: Number(haul.input.value) || 0, dump_min: Number(dump.input.value) || 0,
       return_min: Number(ret.input.value) || 0, spot_min: spot.input.value === "" ? 0.5 : Number(spot.input.value),
       eff_min_per_hr: eff.input.value === "" ? 50 : Number(eff.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["truck_cap_lcy", "load_min", "haul_min", "dump_min", "return_min", "spot_min", "eff_min_per_hr"], r);
     if (r.error) { oCycle.textContent = r.error; for (const o of [oProd, oTrucks, oFleet, oLoader]) o.textContent = "-"; return; }
     oCycle.textContent = fmt(r.cycle_min, 1) + " min (" + fmt(r.loads_per_hour, 2) + " loads/hr)";
     oProd.textContent = fmt(r.production_lcy_hr, 1) + " lcy/hr";
@@ -254,7 +255,7 @@ function _v809renderLoaderProduction(inputRegion, outputRegion, citationEl) {
       bucket_cap_lcy: Number(cap.input.value) || 0, fill_factor: fill.input.value === "" ? 0.95 : Number(fill.input.value),
       cycle_min: Number(cycle.input.value) || 0, eff_min_per_hr: eff.input.value === "" ? 50 : Number(eff.input.value),
       hours_per_day: hours.input.value === "" ? 8 : Number(hours.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["bucket_cap_lcy", "fill_factor", "cycle_min", "eff_min_per_hr", "hours_per_day"], r);
     if (r.error) { oPayload.textContent = r.error; for (const o of [oProd, oDaily]) o.textContent = "-"; return; }
     oPayload.textContent = fmt(r.bucket_payload_lcy, 3) + " lcy (" + fmt(r.cycles_per_hour, 1) + " cycles/hr)";
     oProd.textContent = fmt(r.production_lcy_hr, 1) + " lcy/hr";
@@ -318,7 +319,7 @@ function _v810renderDozerProduction(inputRegion, outputRegion, citationEl) {
       push_speed_fpm: Number(pushSpeed.input.value) || 0, return_speed_fpm: Number(retSpeed.input.value) || 0,
       fixed_min: fixed.input.value === "" ? 0.05 : Number(fixed.input.value),
       eff_min_per_hr: eff.input.value === "" ? 50 : Number(eff.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["blade_cap_lcy", "push_dist_ft", "push_speed_fpm", "return_speed_fpm", "fixed_min", "eff_min_per_hr"], r);
     if (r.error) { oCycle.textContent = r.error; oProd.textContent = "-"; return; }
     oCycle.textContent = fmt(r.cycle_min, 2) + " min (" + fmt(r.cycles_per_hour, 1) + " cycles/hr)";
     oProd.textContent = fmt(r.production_lcy_hr, 1) + " lcy/hr";
@@ -377,7 +378,7 @@ function _v813renderCompactionRollerProduction(inputRegion, outputRegion, citati
       drum_width_ft: Number(width.input.value) || 0, speed_mph: Number(speed.input.value) || 0,
       lift_in: Number(lift.input.value) || 0, passes: Number(passes.input.value) || 0,
       efficiency: eff.input.value === "" ? 0.75 : Number(eff.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["drum_width_ft", "speed_mph", "lift_in", "passes", "efficiency"], r);
     if (r.error) { oArea.textContent = r.error; oProd.textContent = "-"; return; }
     oArea.textContent = fmt(r.area_sf_hr, 0) + " sf/hr (" + fmt(r.area_sy_hr, 0) + " sy/hr)";
     oProd.textContent = fmt(r.production_ccy_hr, 1) + " compacted cy/hr";
@@ -439,7 +440,7 @@ function _v820renderRipperProduction(inputRegion, outputRegion, citationEl) {
       spacing_ft: Number(spacing.input.value) || 0, penetration_ft: Number(pen.input.value) || 0,
       speed_fpm: Number(speed.input.value) || 0, efficiency: eff.input.value === "" ? 0.75 : Number(eff.input.value),
       pass_length_ft: Number(passLen.input.value) || 0, turn_min: Number(turn.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["spacing_ft", "penetration_ft", "speed_fpm", "efficiency", "pass_length_ft", "turn_min"], r);
     if (r.error) { oCross.textContent = r.error; oProd.textContent = "-"; return; }
     oCross.textContent = fmt(r.cross_section_ft2, 2) + " ft^2";
     oProd.textContent = fmt(r.production_bcy_hr, 0) + " bank cy/hr";
@@ -496,7 +497,7 @@ function _v821renderWaterForCompaction(inputRegion, outputRegion, citationEl) {
     const r = computeWaterForCompaction({
       volume_bcy: Number(vol.input.value) || 0, dry_density_pcf: Number(dd.input.value) || 0,
       omc_pct: omc.input.value === "" ? NaN : Number(omc.input.value), field_pct: field.input.value === "" ? NaN : Number(field.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["volume_bcy", "dry_density_pcf", "omc_pct", "field_pct"], r);
     if (r.error) { oWater.textContent = r.error; oDry.textContent = "-"; return; }
     if (r.needs_drying) {
       oWater.textContent = "Aerate and dry (field moisture is above optimum by " + fmt(-(r.water_lb) / (r.dry_weight_lb) * 100, 1) + "%)";
@@ -557,7 +558,7 @@ function _v822renderRusleSoilLoss(inputRegion, outputRegion, citationEl) {
       r_factor: Number(r.input.value) || 0, k_factor: Number(k.input.value) || 0, ls_factor: Number(ls.input.value) || 0,
       c_factor: c.input.value === "" ? NaN : Number(c.input.value), p_factor: p.input.value === "" ? NaN : Number(p.input.value),
       acres: Number(ac.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["r_factor", "k_factor", "ls_factor", "c_factor", "p_factor", "acres"], res);
     if (res.error) { oA.textContent = res.error; oSite.textContent = "-"; return; }
     oA.textContent = fmt(res.a_tons_ac_yr, 1) + " tons/acre/yr";
     oSite.textContent = fmt(res.site_tons_yr, 0) + " tons/yr";
@@ -611,7 +612,7 @@ function _v823renderRiprapD50(inputRegion, outputRegion, citationEl) {
     const r = computeRiprapD50({
       velocity_fps: Number(v.input.value) || 0, specific_gravity: ss.input.value === "" ? 2.65 : Number(ss.input.value),
       turbulence_coeff: c.input.value === "" ? 0.86 : Number(c.input.value), safety_factor: sf.input.value === "" ? 1.2 : Number(sf.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["velocity_fps", "specific_gravity", "turbulence_coeff", "safety_factor"], r);
     if (r.error) { oD50.textContent = r.error; oLayer.textContent = "-"; return; }
     oD50.textContent = fmt(r.d50_in, 1) + " in (" + fmt(r.d50_ft, 3) + " ft)";
     oLayer.textContent = fmt(r.d50_in * 1.5, 1) + " in";
@@ -658,7 +659,7 @@ function _v824renderRiprapTonnage(inputRegion, outputRegion, citationEl) {
     const r = computeRiprapTonnage({
       area_sf: Number(area.input.value) || 0, thickness_ft: Number(thick.input.value) || 0,
       unit_wt_pcf: uw.input.value === "" ? 165 : Number(uw.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["area_sf", "thickness_ft", "unit_wt_pcf"], r);
     if (r.error) { oTons.textContent = r.error; oVol.textContent = "-"; return; }
     oTons.textContent = fmt(r.tons, 1) + " tons";
     oVol.textContent = fmt(r.volume_cy, 1) + " cy";
@@ -710,7 +711,7 @@ function _v825renderSiltFenceDrainage(inputRegion, outputRegion, citationEl) {
     const r = computeSiltFenceDrainage({
       tributary_area_ac: Number(area.input.value) || 0, fence_length_ft: Number(fence.input.value) || 0,
       slope_length_ft: Number(slope.input.value) || 0, max_slope_length_ft: maxSlope.input.value === "" ? 100 : Number(maxSlope.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["tributary_area_ac", "fence_length_ft", "slope_length_ft", "max_slope_length_ft"], r);
     if (r.error) { oLen.textContent = r.error; oSlope.textContent = "-"; return; }
     oLen.textContent = fmt(r.required_fence_len_ft, 0) + " ft (" + (r.length_adequate ? "provided fence OK, catches up to " + fmt(r.max_area_ac, 3) + " acre" : "PROVIDED FENCE SHORT") + ")";
     oSlope.textContent = r.slope_ok ? "OK (within the AHJ slope-length limit)" : "OVER the AHJ slope-length limit";
@@ -755,7 +756,7 @@ function _v826renderCheckDamSpacing(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const r = computeCheckDamSpacing({
       dam_height_ft: Number(h.input.value) || 0, channel_slope_pct: Number(s.input.value) || 0, reach_length_ft: Number(reach.input.value) || 0,
-    });
+    }); stepsFor(outputRegion, inputRegion, ["dam_height_ft", "channel_slope_pct", "reach_length_ft"], r);
     if (r.error) { oSpacing.textContent = r.error; oDams.textContent = "-"; return; }
     oSpacing.textContent = fmt(r.spacing_ft, 1) + " ft";
     oDams.textContent = r.dams + " dams";
@@ -803,7 +804,7 @@ function _v827renderSedimentBasinVolume(inputRegion, outputRegion, citationEl) {
     const r = computeSedimentBasinVolume({
       disturbed_ac: Number(ac.input.value) || 0, storage_rule_cf_per_ac: rule.input.value === "" ? 3600 : Number(rule.input.value),
       basin_depth_ft: depth.input.value === "" ? 3 : Number(depth.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["disturbed_ac", "storage_rule_cf_per_ac", "basin_depth_ft"], r);
     if (r.error) { oVol.textContent = r.error; oSurf.textContent = "-"; return; }
     oVol.textContent = fmt(r.required_cf, 0) + " cf (" + fmt(r.required_cy, 0) + " cy)";
     oSurf.textContent = fmt(r.surface_area_sf, 0) + " sf";
@@ -858,7 +859,7 @@ function _v828renderErosionBlanketCoverage(inputRegion, outputRegion, citationEl
       area_sf: Number(area.input.value) || 0, overlap_pct: overlap.input.value === "" ? 10 : Number(overlap.input.value),
       roll_width_ft: w.input.value === "" ? 8 : Number(w.input.value), roll_length_ft: l.input.value === "" ? 112.5 : Number(l.input.value),
       staples_per_sy: sr.input.value === "" ? 1.5 : Number(sr.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["area_sf", "overlap_pct", "roll_width_ft", "roll_length_ft", "staples_per_sy"], r);
     if (r.error) { oRolls.textContent = r.error; oStaples.textContent = "-"; return; }
     oRolls.textContent = r.rolls + " rolls (" + fmt(r.coverage_sy, 0) + " sy slope, " + fmt(r.roll_sy, 0) + " sy/roll)";
     oStaples.textContent = fmt(r.staples, 0) + " staples";
@@ -918,7 +919,7 @@ function _v829renderHydroseedMix(inputRegion, outputRegion, citationEl) {
       area_ac: Number(ac.input.value) || 0, seed_rate_lb_ac: seed.input.value === "" ? 5 : Number(seed.input.value),
       mulch_rate_lb_ac: mulch.input.value === "" ? 2000 : Number(mulch.input.value), tackifier_rate_lb_ac: tack.input.value === "" ? 50 : Number(tack.input.value),
       tank_gal: tank.input.value === "" ? 3000 : Number(tank.input.value), max_load_lb_per_gal: load.input.value === "" ? 0.4 : Number(load.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["area_ac", "seed_rate_lb_ac", "mulch_rate_lb_ac", "tackifier_rate_lb_ac", "tank_gal", "max_load_lb_per_gal"], r);
     if (r.error) { oTanks.textContent = r.error; oSolids.textContent = "-"; return; }
     oTanks.textContent = r.tanks + " tank loads";
     oSolids.textContent = fmt(r.total_solids_lb, 0) + " lb (mulch " + fmt(r.mulch_lb, 0) + " lb, seed " + fmt(r.seed_lb, 0) + " lb, tackifier " + fmt(r.tackifier_lb, 0) + " lb)";
@@ -962,7 +963,7 @@ function _v830renderRockConstructionEntrance(inputRegion, outputRegion, citation
     const r = computeRockConstructionEntrance({
       length_ft: l.input.value === "" ? 50 : Number(l.input.value), width_ft: w.input.value === "" ? 14 : Number(w.input.value),
       depth_in: d.input.value === "" ? 6 : Number(d.input.value), unit_wt_pcf: uw.input.value === "" ? 100 : Number(uw.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["length_ft", "width_ft", "depth_in", "unit_wt_pcf"], r);
     if (r.error) { oTons.textContent = r.error; oVol.textContent = "-"; return; }
     oTons.textContent = fmt(r.tons, 1) + " tons";
     oVol.textContent = fmt(r.volume_cy, 1) + " cy";
@@ -1023,7 +1024,7 @@ function _v831renderPipeFlotation(inputRegion, outputRegion, citationEl) {
       pipe_od_in: od.input.value === "" ? NaN : Number(od.input.value), pipe_weight_plf: pw.input.value === "" ? NaN : Number(pw.input.value),
       backfill_weight_plf: bw.input.value === "" ? NaN : Number(bw.input.value), target_fs: tf.input.value === "" ? 1.5 : Number(tf.input.value),
       water_unit_wt_pcf: uw.input.value === "" ? 62.4 : Number(uw.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["pipe_od_in", "pipe_weight_plf", "backfill_weight_plf", "target_fs", "water_unit_wt_pcf"], r);
     if (r.error) { oFs.textContent = r.error; oUplift.textContent = "-"; oReq.textContent = "-"; return; }
     oFs.textContent = fmt(r.fs, 2) + " - " + (r.pass ? "PASS" : "FAIL") + " (target " + fmt(Number(tf.input.value) || 1.5, 2) + ")";
     oUplift.textContent = fmt(r.uplift_plf, 0) + " lb/ft";
@@ -1081,7 +1082,7 @@ function _v832renderRestrainedPipeLength(inputRegion, outputRegion, citationEl) 
       pipe_od_in: od.input.value === "" ? NaN : Number(od.input.value), pressure_psi: p.input.value === "" ? NaN : Number(p.input.value),
       bend_angle_deg: ba.input.value === "" ? 90 : Number(ba.input.value), unit_resistance_plf: ur.input.value === "" ? NaN : Number(ur.input.value),
       safety_factor: sfx.input.value === "" ? 1.5 : Number(sfx.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["pipe_od_in", "pressure_psi", "bend_angle_deg", "unit_resistance_plf", "safety_factor"], r);
     if (r.error) { oLen.textContent = r.error; oThrust.textContent = "-"; return; }
     oLen.textContent = fmt(r.length_each_side_ft, 1) + " ft each side";
     oThrust.textContent = fmt(r.thrust_lb, 0) + " lb";
@@ -1172,7 +1173,7 @@ function _v833renderHddPullback(inputRegion, outputRegion, citationEl) {
       total_bend_deg: tb.input.value === "" ? 0 : Number(tb.input.value),
       fluid_drag_lb: fd.input.value === "" ? 0 : Number(fd.input.value), pipe_safe_pull_lb: sp.input.value === "" ? 0 : Number(sp.input.value),
       rig_rated_pull_lb: rp.input.value === "" ? 0 : Number(rp.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["eff_weight_plf", "length_ft", "friction_coeff", "bend_factor", "total_bend_deg", "fluid_drag_lb", "pipe_safe_pull_lb", "rig_rated_pull_lb"], r);
     if (r.error) { oPull.textContent = r.error; oCap.textContent = "-"; oUtil.textContent = "-"; oGov.textContent = "-"; return; }
     oPull.textContent = fmt(r.pullback_lb, 0) + " lb";
     oCap.textContent = fmt(r.capstan_pullback_lb, 0) + " lb at a capstan factor of " + fmt(r.capstan_factor, 2);
@@ -1234,7 +1235,7 @@ function _v836renderDustControlWater(inputRegion, outputRegion, citationEl) {
       length_ft: l.input.value === "" ? 2000 : Number(l.input.value), width_ft: w.input.value === "" ? 20 : Number(w.input.value),
       rate_gal_per_sy: rt.input.value === "" ? 0.5 : Number(rt.input.value), truck_cap_gal: tc.input.value === "" ? 4000 : Number(tc.input.value),
       applications_per_day: ap.input.value === "" ? 6 : Number(ap.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["length_ft", "width_ft", "rate_gal_per_sy", "truck_cap_gal", "applications_per_day"], r);
     if (r.error) { oApp.textContent = r.error; oDaily.textContent = "-"; return; }
     oApp.textContent = fmt(r.gal_per_app, 0) + " gal (" + fmt(r.trips_per_app, 0) + " trip" + (r.trips_per_app === 1 ? "" : "s") + ")";
     oDaily.textContent = fmt(r.daily_gal, 0) + " gal/day over " + fmt(r.daily_trips, 0) + " trips";
@@ -1282,7 +1283,7 @@ function _v844renderHaulRoadResistance(inputRegion, outputRegion, citationEl) {
       gvw_lb: g.input.value === "" ? 150000 : Number(g.input.value),
       grade_pct: gr.input.value === "" ? 5 : Number(gr.input.value),
       rolling_resistance_pct: rr.input.value === "" ? 4 : Number(rr.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["gvw_lb", "grade_pct", "rolling_resistance_pct"], r);
     if (r.error) { oRimpull.textContent = r.error; oTotal.textContent = "-"; return; }
     oRimpull.textContent = fmt(r.required_rimpull_lb, Math.abs(r.required_rimpull_lb - 0) < 0.5 && r.required_rimpull_lb !== 0 ? 2 : 0) + " lb (" + fmt(r.rimpull_per_ton_lb, 0) + " lb/ton)" + (r.required_rimpull_lb < 0 ? " - downhill, on the retarder" : "");
     oTotal.textContent = fmt(r.total_resistance_pct, 1) + "% (grade + rolling)";
@@ -1334,7 +1335,7 @@ function _v845renderDumpTruckLoads(inputRegion, outputRegion, citationEl) {
     const r = computeDumpTruckLoads({
       total_lcy: t.input.value === "" ? 625 : Number(t.input.value), box_vol_cy: b.input.value === "" ? 12 : Number(b.input.value),
       weight_limit_lb: wl.input.value === "" ? 40000 : Number(wl.input.value), material_density_lb_per_lcy: d.input.value === "" ? 2800 : Number(d.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["total_lcy", "box_vol_cy", "weight_limit_lb", "material_density_lb_per_lcy"], r);
     if (r.error) { oLoads.textContent = r.error; oPayload.textContent = "-"; return; }
     oLoads.textContent = fmt(r.loads, 0) + " loads";
     oPayload.textContent = fmt(r.payload_cy, 2) + " cy per truck (" + r.governs + " governs)";
@@ -1386,7 +1387,7 @@ function _v846renderUnitCostEarthwork(inputRegion, outputRegion, citationEl) {
       equipment_rate_per_hr: eq.input.value === "" ? 150 : Number(eq.input.value), operator_rate_per_hr: op.input.value === "" ? 65 : Number(op.input.value),
       support_rate_per_hr: su.input.value === "" ? 0 : Number(su.input.value), production_cy_per_hr: pr.input.value === "" ? 656 : Number(pr.input.value),
       total_cy: tc.input.value === "" ? 0 : Number(tc.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["equipment_rate_per_hr", "operator_rate_per_hr", "support_rate_per_hr", "production_cy_per_hr", "total_cy"], r);
     if (r.error) { oUnit.textContent = r.error; oTotal.textContent = "-"; return; }
     oUnit.textContent = "$" + fmt(r.unit_cost_per_cy, 3) + "/cy (at $" + fmt(r.hourly_cost, 0) + "/hr)";
     oTotal.textContent = r.total_cost === null ? "- (enter a quantity to total)" : "$" + fmt(r.total_cost, 0);
@@ -1434,7 +1435,7 @@ function _v847renderSoilStabilizationQuantity(inputRegion, outputRegion, citatio
     const r = computeSoilStabilizationQuantity({
       application_pct: ap.input.value === "" ? 6 : Number(ap.input.value), soil_density_pcf: d.input.value === "" ? 110 : Number(d.input.value),
       depth_in: dp.input.value === "" ? 8 : Number(dp.input.value), area_sy: a.input.value === "" ? 10000 : Number(a.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["application_pct", "soil_density_pcf", "depth_in", "area_sy"], r);
     if (r.error) { oTons.textContent = r.error; oSpread.textContent = "-"; return; }
     oTons.textContent = fmt(r.tons, 1) + " tons";
     oSpread.textContent = fmt(r.spread_lb_per_sy, 1) + " lb/sy";
@@ -1491,7 +1492,7 @@ function _v848renderFlexiblePipeDeflection(inputRegion, outputRegion, citationEl
       deflection_lag: dl.input.value === "" ? 1.5 : Number(dl.input.value), bedding_constant: k.input.value === "" ? 0.1 : Number(k.input.value),
       pipe_stiffness_psi: ps.input.value === "" ? NaN : Number(ps.input.value), soil_modulus_psi: em.input.value === "" ? NaN : Number(em.input.value),
       allowable_pct: al.input.value === "" ? 5 : Number(al.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["cover_ft", "soil_density_pcf", "deflection_lag", "bedding_constant", "pipe_stiffness_psi", "soil_modulus_psi", "allowable_pct"], r);
     if (r.error) { oDefl.textContent = r.error; oLoad.textContent = "-"; return; }
     oDefl.textContent = fmt(r.deflection_pct, 2) + "% - " + (r.pass ? "PASS" : "FAIL") + " (allowable " + fmt(Number(al.input.value) || 5, 1) + "%)";
     oLoad.textContent = fmt(r.soil_load_psi, 2) + " psi";
@@ -1555,7 +1556,7 @@ function _v67renderDewateringRate(inputRegion, outputRegion, citationEl) {
       pit_len_ft: Number(len.input.value) || 0, pit_wid_ft: Number(wid.input.value) || 0,
       drawdown_ft: Number(draw.input.value) || 0, drawdown_min: Number(drawMin.input.value) || 0,
       inflow_gpm: inflow.input.value === "" ? 0 : Number(inflow.input.value), safety_pct: safety.input.value === "" ? 25 : Number(safety.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["pit_len_ft", "pit_wid_ft", "drawdown_ft", "drawdown_min", "inflow_gpm", "safety_pct"], r);
     if (r.error) { oGal.textContent = r.error; oPump.textContent = "-"; oSized.textContent = "-"; return; }
     oGal.textContent = fmt(r.drawdown_gal, 0) + " gal";
     oPump.textContent = fmt(r.pump_gpm, 1) + " gpm";
@@ -1610,7 +1611,7 @@ function _v67renderSpoilSetback(inputRegion, outputRegion, citationEl) {
   const oSet = makeOutputLine(outputRegion, "Governing setback", "sp-out-set");
   const oClear = makeOutputLine(outputRegion, "Total clear from trench edge", "sp-out-clear");
   const update = debounce(() => {
-    const r = computeSpoilSetback({ trench_depth_ft: Number(depth.input.value) || 0, spoil_height_ft: Number(height.input.value) || 0, repose_deg: repose.input.value === "" ? 34 : Number(repose.input.value), min_setback_ft: minSetback.input.value === "" ? 2 : Number(minSetback.input.value) });
+    const r = computeSpoilSetback({ trench_depth_ft: Number(depth.input.value) || 0, spoil_height_ft: Number(height.input.value) || 0, repose_deg: repose.input.value === "" ? 34 : Number(repose.input.value), min_setback_ft: minSetback.input.value === "" ? 2 : Number(minSetback.input.value) }); stepsFor(outputRegion, inputRegion, ["trench_depth_ft", "spoil_height_ft", "repose_deg", "min_setback_ft"], r);
     if (r.error) { oBase.textContent = r.error; oSet.textContent = "-"; oClear.textContent = "-"; return; }
     oBase.textContent = fmt(r.base_halfwidth_ft, 2) + " ft";
     oSet.textContent = fmt(r.setback_ft, 2) + " ft" + (r.surcharge_governs ? " (surcharge governs)" : " (code minimum)");
@@ -1678,7 +1679,7 @@ function _v67renderPipeBeddingBackfill(inputRegion, outputRegion, citationEl) {
       trench_width_ft: Number(width.input.value) || 0, pipe_od_in: Number(odIn.input.value) || 0,
       bedding_depth_in: Number(bedding.input.value) || 0, cover_ft: Number(cover.input.value) || 0,
       length_ft: Number(length.input.value) || 0, stone_density_tcy: density.input.value === "" ? 1.4 : Number(density.input.value),
-    });
+    }); stepsFor(outputRegion, inputRegion, ["trench_width_ft", "pipe_od_in", "bedding_depth_in", "cover_ft", "length_ft", "stone_density_tcy"], r);
     if (r.error) { oBed.textContent = r.error; oEmbed.textContent = "-"; oBack.textContent = "-"; return; }
     oBed.textContent = fmt(r.bedding_cy, 2) + " cy (" + fmt(r.bedding_tons, 2) + " tons)";
     oEmbed.textContent = fmt(r.embedment_cy, 2) + " cy";
