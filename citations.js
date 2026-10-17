@@ -3746,7 +3746,7 @@ export const CITATIONS = {
     edition: "ASHRAE 62.1-2022 (ventilation for acceptable indoor air quality) by name; ASHRAE 170-2021 (ventilation of health care facilities) by name.",
     freeAccess: "ASHRAE standard TOCs free at ashrae.org; full standards licensed.",
     governance: GOVERNANCE.mechanical,
-    editionNote: "The residential, office, classroom and lab bands are comparison ranges; the patient-room and operating-room entries are ASHRAE 170 Table 7-1 minimums with no ceiling. The AHJ and the governing standard's full procedure govern.",
+    editionNote: "The residential, office, classroom and lab bands are comparison ranges; the patient-room and operating-room entries are ASHRAE 170 Table 7-1 minimums with no ceiling. The AHJ and the governing standard's full procedure govern. ANSI/ASHRAE/ASHE 170-2025 is the current edition; the Table 7-1 minimums here follow 170-2021 and have not yet been re-checked against 2025.",
     assumptions: [
       { name: "Residential band", value: "0.35-1 ACH", source: "the older ASHRAE 62-1989 0.35 ACH figure (62.2 sets a cfm rate instead)" },
       { name: "Classroom band", value: "4-6 ACH", source: "ASHRAE 62.1 typical" },
@@ -3798,7 +3798,7 @@ export const CITATIONS = {
     edition: "ASHRAE 52.2-2017 (Method of Testing General Ventilation Air-Cleaning Devices for Removal Efficiency by Particle Size) by name; manufacturer published cut sheets for the pressure-drop values.",
     freeAccess: "ASHRAE 52.2 TOC free at ashrae.org; full standard licensed; manufacturer cut sheets free at each vendor site.",
     governance: GOVERNANCE.mechanical,
-    editionNote: "Clean / change-out drops are representative cut-sheet values for 2-4 in pleated media at a 300 fpm reference velocity, user-overridable; the MERV rating is defined by ASHRAE 52.2, but the cut sheet (not the test method) publishes the drop. The dust-loading change interval depends on the site dust load and is not modeled; the tile reports the pressure-drop schedule and its fan-energy cost.",
+    editionNote: "Clean / change-out drops are representative cut-sheet values for 2-4 in pleated media at a 300 fpm reference velocity, user-overridable; the MERV rating is defined by ASHRAE 52.2, but the cut sheet (not the test method) publishes the drop. The dust-loading change interval depends on the site dust load and is not modeled; the tile reports the pressure-drop schedule and its fan-energy cost. ASHRAE 52.2-2025 is the current edition of the test method; the citation above names 52.2-2017, and the pressure drops come from cut sheets either way.",
     assumptions: [
       { name: "Air horsepower constant", value: "AHP = CFM × dp(in. WC) / 6356", source: "fan engineering identity" },
       { name: "Velocity scaling", value: "dp ∝ face velocity (first-order Darcy regime)", source: "fibrous-media engineering practice" },

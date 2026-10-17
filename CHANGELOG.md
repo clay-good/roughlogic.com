@@ -245,6 +245,7 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **`air-changes-hour` and `filter-pressure-drop` name ASHRAE 170-2025 and 52.2-2025 as current.** The first takes its patient-room and operating-room minimums from 170-2021 Table 7-1 and now says they are not yet re-checked against 2025 (confirmed on ASHE's 170-2025 page); the second names 52.2-2017 for the MERV test method, whose 2025 edition NAFA's 2026 guide cites. ANSI/ASSP Z359.13-2013 was checked the same day and is current (reaffirmed 2022).
 - **`inspection-checklist` names the current editions of the four codes it cites by section** (NEC 2026, IPC 2027, IMC 2027, IRC 2024); it listed only the 2021 and 2023 editions it cites.
 - **Four more citations name the current edition beside an older one.** `battery-hydrogen-vent` and `battery-vent-max-current` (IEEE/ASHRAE 1635-2022 is current; the Annex A rate is from 2018), `machinery-room-ventilation` (ASHRAE 15-2024 is current; its table reference is to 15-2022) and `color-codes`, which said "ASME A13.1 was last updated in 2020" (A13.1-2023 is current) and listed NEC 2023 without noting NEC 2026. Each now says which edition is current and that its figures have not yet been re-checked against it. Editions confirmed from IEEE Xplore, ASHRAE's published addenda to 15-2024, and the ANSI listing for A13.1-2023.
 
