@@ -10914,7 +10914,10 @@ export function computeRoofInsulationFasteners({ field_boards = 100, field_per_b
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const vals = { field_boards, field_per_board, perimeter_boards, perimeter_per_board, corner_boards, corner_per_board };
   for (const [k, v] of Object.entries(vals)) if (v < 0) return { error: k + " cannot be negative." };
-  const fasteners = field_boards * field_per_board + perimeter_boards * perimeter_per_board + corner_boards * corner_per_board;
+  // A takeoff can yield part boards (10.5 field boards), which left a part
+  // fastener in the total until 2026-10-16. Fasteners come in whole units, so
+  // the total rounds up; whole-number entries are unchanged.
+  const fasteners = Math.ceil(field_boards * field_per_board + perimeter_boards * perimeter_per_board + corner_boards * corner_per_board - 1e-9);
   const plates = fasteners;
   if (![fasteners, plates].every(Number.isFinite)) return { error: "Fastener math is not a finite value." };
   return {

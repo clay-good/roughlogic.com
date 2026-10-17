@@ -1033,15 +1033,27 @@ export function computeSkipLineLayout({ stripe_length_ft = 0, gap_length_ft = 0,
   const tail_ft = run_length_ft - last_stripe_end_ft;
   // The maintenance inversion: a counted stripe count over a measured length
   // gives the cycle in place, which is the pattern new work has to match.
+  // Two ways a crew tapes N stripes: start of the first to start of the stripe
+  // after the last (N whole cycles), or start of the first to END of the last
+  // ((N - 1) cycles plus one stripe). Until 2026-10-16 only the first was
+  // tried, against a fixed 0.5 ft: it passed on a 40 ft cycle by luck and told
+  // a 15/85 run taped the second way (132 stripes, 13,115 ft) that it was "NOT
+  // the pattern you entered" when it was exactly that pattern.
   const implied_cycle_ft = (counted_stripes > 0 && counted_length_ft > 0) ? counted_length_ft / counted_stripes : null;
-  const matches_counted = implied_cycle_ft === null ? null : Math.abs(implied_cycle_ft - cycle_length_ft) <= 0.5;
+  const implied_cycle_to_end_ft = (counted_stripes > 1 && counted_length_ft > 0) ? (counted_length_ft - stripe_length_ft) / (counted_stripes - 1) : null;
+  const near = (c) => c !== null && Math.abs(c - cycle_length_ft) <= 0.5;
+  const matched_convention = implied_cycle_ft === null ? null
+    : near(implied_cycle_ft) ? "start to start"
+    : near(implied_cycle_to_end_ft) ? "start of the first to the end of the last"
+    : null;
+  const matches_counted = implied_cycle_ft === null ? null : matched_convention !== null;
   const outs = [cycle_length_ft, stripes_in_run, stripes_per_mile, painted_length_ft, painted_fraction_pct];
   if (!outs.every(Number.isFinite)) return { error: "Skip-line math is not a finite value." };
   return {
     stripe_length_ft, gap_length_ft, run_length_ft, start_offset_ft, cycle_length_ft,
     stripes_in_run, stripes_per_mile, painted_length_ft, painted_per_mile_ft,
     painted_fraction_pct, first_stripe_start_ft, last_stripe_start_ft, last_stripe_end_ft,
-    tail_ft, counted_stripes, counted_length_ft, implied_cycle_ft, matches_counted,
+    tail_ft, counted_stripes, counted_length_ft, implied_cycle_ft, implied_cycle_to_end_ft, matched_convention, matches_counted,
     note: "Skip line is laid out on a cycle -- one stripe plus one gap -- and the count for a run is a division that decides how much paint goes on the truck. The arithmetic is trivial and the field consequences are not. On the common 10 ft stripe with a 30 ft gap the cycle is 40 ft, a mile carries 132 stripes and 1,320 feet of paint, and exactly a quarter of the run is painted -- which is a useful mental check on any pattern. Change to the 15 ft stripe and 25 ft gap some agencies use and the cycle is STILL 40 ft, the mile still carries 132 stripes, and the paint goes to 1,980 feet: half again the material for a line a driver would struggle to tell apart. Over a twelve mile job that is nearly eight thousand additional feet of stripe, which has to be on the estimate and is a reason to confirm the agency's pattern before ordering. THE LAYOUT REFERENCE MATTERS MORE THAN THE ARITHMETIC. A skip line laid out from wherever the truck happened to start puts a stripe in the middle of an intersection or across a driveway, and once a run is laid the whole pattern is fixed behind it. Laying out from a fixed point -- a joint, a station, the last stripe of the adjoining section -- is what keeps a pattern consistent across a project and across years of maintenance, and the offset here is that reference. For a maintenance crew the useful inversion runs the other way: count the stripes on an existing run, measure its length, and the division gives the cycle in place, which is the pattern the new work should match rather than defaulting to 40 ft. Layout arithmetic for a uniform skip pattern, and nothing else. Marking patterns, stripe and gap lengths, widths and colours are set by the MUTCD and by the agency's own standard drawings and vary by marking type and road class: a lane line, a centre line, an edge line and a dotted extension through an intersection are different patterns with different rules, and this does not choose among them. It does not lay out no-passing zones, arrows, symbols or transverse markings, and it does not compute material quantity -- that takes the painted length produced here, the stripe width and the coverage rate, and striping-paint-quantity computes it. Retroreflectivity, bead application, surface preparation, temperature and moisture limits, and the removal of conflicting existing markings are all outside it. The adopted MUTCD and its state supplement, the agency's standard drawings, and the project specification govern.",
   };
 }
@@ -1062,7 +1074,7 @@ CIVIL_RENDERERS["skip-line-layout"] = _simpleRenderer({
     { key: "s", id: "sll-out-s", label: "Stripes in this run", value: (r) => fmt(r.stripes_in_run, 0) + " from " + fmt(r.first_stripe_start_ft, 1) + " ft to " + fmt(r.last_stripe_end_ft, 1) + " ft, leaving " + fmt(r.tail_ft, 1) + " ft of tail" },
     { key: "p", id: "sll-out-p", label: "Painted length", value: (r) => fmt(r.painted_length_ft, 0) + " ft in the run, " + fmt(r.painted_per_mile_ft, 0) + " ft per mile -- feed THIS to the paint quantity, not the run length" },
     { key: "f", id: "sll-out-f", label: "Painted fraction", value: (r) => fmt(r.painted_fraction_pct, 1) + "% of the run is stripe" },
-    { key: "m", id: "sll-out-m", label: "Cycle in place from a count", value: (r) => r.implied_cycle_ft === null ? "(no counted run entered)" : fmt(r.implied_cycle_ft, 2) + " ft from " + fmt(r.counted_stripes, 0) + " stripes over " + fmt(r.counted_length_ft, 0) + " ft -- " + (r.matches_counted ? "the same pattern you entered" : "NOT the pattern you entered; match the run in place rather than defaulting") },
+    { key: "m", id: "sll-out-m", label: "Cycle in place from a count", value: (r) => r.implied_cycle_ft === null ? "(no counted run entered)" : fmt(r.implied_cycle_ft, 2) + " ft from " + fmt(r.counted_stripes, 0) + " stripes over " + fmt(r.counted_length_ft, 0) + " ft -- " + (r.matches_counted ? "the same pattern you entered (taped " + r.matched_convention + ")" : "NOT the pattern you entered, whether taped start to start or to the end of the last stripe; match the run in place rather than defaulting") },
     { key: "n", id: "sll-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeSkipLineLayout,

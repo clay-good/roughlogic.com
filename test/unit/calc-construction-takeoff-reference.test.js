@@ -469,8 +469,11 @@ test("rain-on-snow: the ground-snow cap is the risk-category table, 25 / 30 / 35
 });
 
 test("rain-on-snow: the ASCE 7-16 case is reproducible by entering its 5 psf surcharge", () => {
-  // SUSPECTED DEFECT (reported, not asserted as wrong): the tile defaults the
-  // surcharge to 8 psf for ASCE 7-22, where 7-16 and earlier used 5 psf. A
+  // CONFIRMED 2026-10-16: ASCE 7-22 Section 7.10 raised the rain-on-snow
+  // surcharge from 5 psf to 8 psf and moved the trigger from pg < 20 psf to
+  // pg <= pm,max (Nucor Building Systems engineering note, Jan 2026; Tekla
+  // Structural Designer ASCE 7-22 update notes). The tile's 8 psf default and
+  // pm,max trigger are right; 7-16 is reachable by entering 5 psf. A
   // 7-16 check is only reachable by overriding the field, and only the slope
   // trigger is shared -- 7-16 also capped the trigger at a flat pg <= 20 psf
   // rather than at pm,max, so 20 < pg <= pm,max is a 7-22-only surcharge.
@@ -515,10 +518,9 @@ test("minimum roof snow: the design value is the greater of the minimum and the 
 });
 
 test("minimum roof snow: the ASCE 7-16 Is-based minimum differs only in the 20 to pm,max band", () => {
-  // SUSPECTED DEFECT (reported, not asserted as wrong): the spec (v470) writes
-  // the ASCE 7-16 rule Pm = Is x Pg for Pg <= 20 psf and Pm = 20 x Is above,
-  // while the tile implements the ASCE 7-22 rule Pm = min(Pg, pm,max) with no
-  // importance factor. At Is = 1.0 the two agree for Pg <= 20 psf; they part
+  // RESOLVED 2026-10-16: spec-v470 wrote the ASCE 7-16 rule Pm = Is x Pg for
+  // Pg <= 20 psf and Pm = 20 x Is above; it now states the ASCE 7-22 rule the
+  // tile implements, Pm = min(Pg, pm,max) with no importance factor. At Is = 1.0 the two agree for Pg <= 20 psf; they part
   // above it, where 7-16 gives a flat 20 psf.
   for (const pg of [5, 12, 20]) {
     within(computeMinimumRoofSnow({ pg_psf: pg, risk_category: "II" }).pm_psf, Math.min(pg, 20), 1e-9, `7-16 and 7-22 agree at Pg = ${pg}`);

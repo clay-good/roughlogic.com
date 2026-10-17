@@ -62049,3 +62049,24 @@ test("hardening slice 58: an unrun check is null, not a pass; snow governs a ven
   assert.equal(computeVentTerminalCheck({ ...ex, roof_other_use: "yes", snow_accumulation_in: 10, roof_minimum_in: 6 }).snow_governs, false);
   assert.equal(computeVentTerminalCheck({ ...ex, roof_other_use: "no", snow_accumulation_in: 10, roof_minimum_in: 6 }).snow_governs, true);
 });
+test("hardening slice 59: skip-line matches either tape convention; part boards round fasteners up", async () => {
+  const { computeSkipLineLayout } = await import("../../calc-civil.js");
+  // 132 stripes of a 15 ft / 85 ft pattern taped start of the first to the END
+  // of the last: (131 x 100) + 15 = 13,115 ft. It IS the entered pattern.
+  const end = computeSkipLineLayout({ stripe_length_ft: 15, gap_length_ft: 85, run_length_ft: 14000, counted_stripes: 132, counted_length_ft: 13115 });
+  assert.equal(end.matches_counted, true);
+  assert.equal(end.matched_convention, "start of the first to the end of the last");
+  assert.ok(Math.abs(end.implied_cycle_to_end_ft - 100) < 1e-9);
+  // The same count taped start to start (132 whole cycles) also matches.
+  assert.equal(computeSkipLineLayout({ stripe_length_ft: 15, gap_length_ft: 85, run_length_ft: 14000, counted_stripes: 132, counted_length_ft: 13200 }).matched_convention, "start to start");
+  // A genuinely different pattern still reads as one, under either convention.
+  const off = computeSkipLineLayout({ stripe_length_ft: 10, gap_length_ft: 30, run_length_ft: 5280, counted_stripes: 99, counted_length_ft: 3300 });
+  assert.equal(off.matches_counted, false);
+  assert.equal(off.matched_convention, null);
+  const { computeRoofInsulationFasteners } = await import("../../calc-construction.js");
+  // 10.5 field boards at 7.5 per board is 78.75 fasteners; you cannot buy 0.75.
+  const part = computeRoofInsulationFasteners({ field_boards: 10.5, field_per_board: 7.5, perimeter_boards: 0, corner_boards: 0 });
+  assert.equal(part.fasteners, 79);
+  assert.equal(part.plates, 79);
+  assert.equal(computeRoofInsulationFasteners({}).fasteners, 1120, "whole-number default unchanged");
+});

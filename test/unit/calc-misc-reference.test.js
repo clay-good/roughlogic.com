@@ -239,11 +239,15 @@ test("skip line: a counted existing run that IS the 40 ft pattern reads back as 
   const taped = computeSkipLineLayout({ stripe_length_ft: 10, gap_length_ft: 30, run_length_ft: 5280, counted_stripes: 132, counted_length_ft: 5250 });
   within(taped.implied_cycle_ft, 5250 / 132, 1e-9, "tape-line measurement reads 0.23 ft short");
   assert.equal(taped.matches_counted, true, "still recognised as the 40 ft pattern");
-  // The window is half a foot either way and is not a percentage, so a long
-  // cycle taped the same way falls outside it: 132 stripes of a 15 ft stripe /
-  // 85 ft gap pattern tape 13,100 ft, an implied 99.24 ft against 100 ft.
+  // A long cycle taped the same way falls outside a fixed half-foot window
+  // (132 stripes of 15 ft / 85 ft tape (131 x 100) + 15 = 13,115 ft, an implied
+  // 99.36 ft). Until 2026-10-16 that read "NOT the pattern you entered"; the
+  // tile now also tries the to-the-end convention, (L - stripe) / (N - 1) =
+  // 100.00 ft, and names which one matched.
   const longCycle = computeSkipLineLayout({ stripe_length_ft: 15, gap_length_ft: 85, run_length_ft: 13200, counted_stripes: 132, counted_length_ft: 13115 });
-  assert.equal(longCycle.matches_counted, false, "a 0.64 ft shortfall on a 100 ft cycle is called a different pattern");
+  within(longCycle.implied_cycle_to_end_ft, 100, 1e-9, "to-the-end convention recovers the cycle exactly");
+  assert.equal(longCycle.matches_counted, true, "the entered pattern, taped to the end of the last stripe");
+  assert.equal(longCycle.matched_convention, "start of the first to the end of the last");
 });
 
 test("skip line: a run with no room for a full cycle or a full stripe is refused rather than guessed", () => {

@@ -113,11 +113,10 @@ test("generator fleet fuel: an entered burn rate displaces the rule, and a bigge
   within(r.size1_unit_gph, 8, 1e-9, "the entered burn is used, not 0.07 x 100 = 7");
   within(r.fleet_fuel_gal_per_day, 2 * 8 * 24, 1e-9, "384 gal/day");
   assert.equal(r.trips_per_day, 1, "384 gal fits one 500 gal truck");
-  // SUSPECTED DEFECT: the 70% comparison line always uses the USACE rule even
-  // where actual burn rates were entered, so here it reports 0.7 x 0.07 x 200 x
-  // 24 = 235 gal/day against an entered-rate figure of 384 -- the two lines are
-  // not the same fleet. The output label says "rule scaled linearly", so the
-  // current behavior is asserted rather than changed.
+  // By design (stated in the label and note since 2026-10-16): the 70% line is
+  // always the USACE rule at 70% of rating, a stocking comparison, not 70% of
+  // entered burn rates -- those are already at each unit's real load. So here
+  // it reports 0.7 x 0.07 x 200 x 24 = 235 gal/day beside the entered 384.
   within(r.fleet_fuel_70_gal_per_day, 0.7 * 0.07 * 200 * 24, 1e-9, "the 70% line ignores entered burn rates");
   // Monotone in truck size: trips cannot rise when the truck grows.
   let prev = Infinity;
