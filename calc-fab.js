@@ -52,7 +52,7 @@ export const FAB_RENDERERS = {};
 // pipe-expansion-loop.
 // =====================================================================
 
-// dims: in { center_to_center_in: L, takeout_a_in: L, takeout_b_in: L, makeup_a_in: L, makeup_b_in: L, weld_gap_a_in: L, weld_gap_b_in: L } out: { cut_length_in: L }
+// dims: in { reference: dimensionless, dimension_in: L, takeout_a_in: L, takeout_b_in: L, makeup_a_in: L, makeup_b_in: L, weld_gap_a_in: L, weld_gap_b_in: L } out: { cut_length_in: L }
 export function computePipeFittingTakeout({ reference = "center-to-center", dimension_in = 0, takeout_a_in = 0, takeout_b_in = 0, makeup_a_in = 0, makeup_b_in = 0, weld_gap_a_in = 0, weld_gap_b_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const dim = Number(dimension_in);

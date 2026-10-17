@@ -1867,7 +1867,7 @@ AGRICULTURE_RENDERERS["pesticide-rei-phi"] = renderPesticideReiPhi;
 // --- v20 L.1: Growing degree days (`growing-degree-days`) ---
 // GDD = ((min(Tmax,cutoff) + Tmin_adj)/2) - base, floored at 0. Modified
 // method caps Tmax at cutoff AND floors Tmin at base before averaging.
-// dims: in { tmax_series: dimensionless, tmin_series: dimensionless, base_f: T, cutoff_f: T, method: dimensionless } out: { accumulated_gdd: dimensionless, days: dimensionless }
+// dims: in { days_series: dimensionless, base_f: T, cutoff_f: T, method: dimensionless } out: { accumulated_gdd: dimensionless, days: dimensionless }
 export function computeGrowingDegreeDays({ days_series = [], base_f = 50, cutoff_f = 0, method = "standard" } = {}) {
   if (method !== "standard" && method !== "modified") return { error: "Method must be standard or modified." };
   if (!Number.isFinite(Number(base_f))) return { error: "Base temperature must be a number (F)." };

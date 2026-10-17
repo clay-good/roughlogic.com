@@ -598,7 +598,7 @@ export function roundToSigFigs(value, n) {
   return Math.sign(x) * Number(s);
 }
 
-// dims: in { value: dimensionless, target: dimensionless } out: { rounded: dimensionless }
+// dims: in { value: dimensionless, target_sig_figs: dimensionless } out: { rounded: dimensionless }
 export function computeSigFigs({ value, target_sig_figs }) {
   const raw = String(value == null ? "" : value).trim();
   if (raw.length === 0) return { error: "Enter a number." };
@@ -982,7 +982,7 @@ export function renderGPA(inputRegion, outputRegion, citationEl) {
 
 const Z_CRITICAL = { 80: 1.2816, 90: 1.6449, 95: 1.9600, 98: 2.3263, 99: 2.5758 };
 
-// dims: in { mode: dimensionless, n: dimensionless, proportion: dimensionless, mean: dimensionless, sd: dimensionless, confidence: dimensionless } out: { confidence_pct: dimensionless }
+// dims: in { mode: dimensionless, n: dimensionless, proportion: dimensionless, mean: dimensionless, sd: dimensionless, confidence_pct: dimensionless } out: { confidence_pct: dimensionless }
 export function computeConfidenceInterval({ mode, n, proportion, mean, sd, confidence_pct }) {
   const conf = Math.round(Number(confidence_pct));
   if (Math.abs(Number(confidence_pct) - conf) > 1e-9) return { error: "Confidence must be one of 80, 90, 95, 98, 99." };

@@ -99,7 +99,7 @@ function _international14Bf(D, L) {
   if (rem > 0) bf += sec(D + 0.5 * n) * rem / 4;
   return Math.max(0, bf);
 }
-// dims: in { scaled_bf: dimensionless, actual_bf: dimensionless, log_volume_cuft: L^3, benchmark_recovery_bf_per_cuft: L^-3, avg_log_diameter_in: L, log_length_ft: L, kerf_in: L, target_kerf_in: L, board_thickness_in: L } out: { overrun_pct: dimensionless, recovery_bf_per_cuft: L^-3, scale_bias_overrun_pct: dimensionless, kerf_gain_bf: dimensionless, sawdust_share_pct: dimensionless }
+// dims: in { scaled_bf: dimensionless, actual_bf: dimensionless, log_volume_cuft: L^3, benchmark_lrf: L^-3, avg_log_diameter_in: L, log_length_ft: L, kerf_in: L, target_kerf_in: L, board_thickness_in: L } out: { overrun_pct: dimensionless, recovery_bf_per_cuft: L^-3, scale_bias_overrun_pct: dimensionless, kerf_gain_bf: dimensionless, sawdust_share_pct: dimensionless }
 export function computeLumberRecoveryOverrun({ scaled_bf = 0, actual_bf = 0, log_volume_cuft = 0, benchmark_lrf = 7, avg_log_diameter_in = 0, log_length_ft = 16, kerf_in = 0, target_kerf_in = 0, board_thickness_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(scaled_bf > 0)) return { error: "Scaled board feet must be positive." };

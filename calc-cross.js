@@ -1228,7 +1228,7 @@ const NIOSH_FM_TABLE = [
   [15, [0.00, 0.28, 0.00, 0.00, 0.00, 0.00]],
 ];
 
-// dims: in { load_lb: M, h_in: L, v_in: L, d_in: L, a_deg: dimensionless, f: T^-1, c: dimensionless } out: { RWL_lb: M L T^-2, LI: dimensionless }
+// dims: in { weight_lb: M L T^-2, H_in: L, V_in: L, D_in: L, asymmetry_deg: dimensionless, frequency_per_min: T^-1, duration_hr: T, coupling: dimensionless } out: { RWL_lb: M L T^-2, LI: dimensionless }
 export function computeNIOSHLifting({
   weight_lb = 0, H_in = 10, V_in = 30, D_in = 0,
   asymmetry_deg = 0, frequency_per_min = 1, duration_hr = 1, coupling = "good",

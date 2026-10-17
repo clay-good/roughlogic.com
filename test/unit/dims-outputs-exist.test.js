@@ -60,3 +60,37 @@ test("every output a tile compute's dims annotation declares is one it returns",
   assert.ok(checked > 5000, `only ${checked} declared outputs checked; did the annotation format or the compute map move?`);
   assert.deepEqual(bad, []);
 });
+
+// The input side of the same claim. computeNIOSHLifting declared `load_lb`,
+// `h_in`, `a_deg`, `f` and `c` while taking `weight_lb`, `H_in`,
+// `asymmetry_deg`, `frequency_per_min` and `coupling`, so the dimension check
+// ran on parameter names that do not exist (six computes, 13 inputs, fixed
+// 2026-10-17). Every declared input must be a name the compute uses.
+test("every input a tile compute's dims annotation declares is one it takes", async () => {
+  const { COMPUTE_MAP } = await import("../fixtures/compute-map.js");
+  const sources = new Map();
+  const seen = new Set();
+  const bad = [];
+  let checked = 0;
+  for (const { module, fn } of Object.values(COMPUTE_MAP)) {
+    const rel = module.replace("../../", "");
+    if (seen.has(rel + ":" + fn)) continue;
+    seen.add(rel + ":" + fn);
+    if (!sources.has(rel)) sources.set(rel, readFileSync(resolve(ROOT, rel), "utf8").split("\n"));
+    const lines = sources.get(rel);
+    const at = lines.findIndex((l) => new RegExp("^export function " + fn + "\\(").test(l));
+    if (at < 1 || !lines[at - 1].includes("// dims:")) continue;
+    const inp = /in\s*\{([^}]*)\}/.exec(lines[at - 1]);
+    if (!inp) continue;
+    let end = at;
+    while (end < lines.length && lines[end].trimEnd() !== "}") end++;
+    const body = lines.slice(at, end + 1).join("\n");
+    for (const [, key] of inp[1].matchAll(/(\w+):/g)) {
+      if (key === "args") continue; // the stub form check-dimensions budgets separately
+      checked++;
+      if (!new RegExp("\\b" + key + "\\b").test(body)) bad.push(`${rel}: ${fn} declares input \`${key}\`, which it never uses`);
+    }
+  }
+  assert.ok(checked > 8000, `only ${checked} declared inputs checked`);
+  assert.deepEqual(bad, []);
+});
