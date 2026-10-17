@@ -81,7 +81,10 @@ const KEY_ACRONYMS = new Set([
   "awg", "nec", "ada", "ocpd", "fla", "mca", "mocp", "rh", "cg", "tds", "bod", "tss",
   "srt", "hrt", "vslr", "sor", "wor", "apf", "uv", "led", "hvac", "pdp", "gpp", "wsfu", "dfu", "ach", "shr",
   "eer", "cop", "stc", "emt", "pvc", "rmc", "imc", "cmu", "srw", "spt", "cbr", "usc", "aashto", "asd", "lrfd",
-  "asce", "aisc", "aci", "nds", "du"]);
+  "asce", "aisc", "aci", "nds", "du",
+  // Added 2026-10-17 from the steps-panel captions ("Rated wll (lb)", "Pel
+  // (µg/m³)"); each is a whole underscore token in every key that has it.
+  "wll", "udl", "pel", "twa", "lel", "ppfd", "hdd", "cfm"]);
 
 // Read a machine field name back as English. This claims nothing the key does
 // not already say -- it only spaces the words out and spells the unit -- so it

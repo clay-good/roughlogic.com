@@ -10,7 +10,7 @@ import { exampleValue, exampleRows } from "../../scripts/build-shells.mjs";
 test("an array of flat rows reads as prose, not JSON", () => {
   assert.equal(
     exampleValue([{ cfm: 4, duty_cycle: 0.5 }, { cfm: 3, duty_cycle: 0.4 }]),
-    "cfm 4, duty cycle 0.5; cfm 3, duty cycle 0.4");
+    "CFM 4, duty cycle 0.5; CFM 3, duty cycle 0.4");
   // AWG, not awg: `humanizeKey` consults the acronym list on a one-word key
   // as of 2026-09-01. This assertion pinned the older "awg", which was the
   // raw key falling through because the one-word path returned null for a
