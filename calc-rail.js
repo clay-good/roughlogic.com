@@ -536,10 +536,18 @@ export function computeRailcarLoadLimit({ gross_rail_load_lb = 0, light_weight_l
   // load limit, dense lading reaches the limit with the car half empty.
   const cube_limited_weight_lb = (cubic_capacity_ft3 > 0 && lading_density_pcf > 0) ? cubic_capacity_ft3 * lading_density_pcf : null;
   const cube_governs = cube_limited_weight_lb === null ? null : cube_limited_weight_lb < governing_load_limit_lb;
+  // The utilization above is against the CAR's stencil. When the route's limit
+  // is the lower one, that is not the number the shipper is loading to: a car
+  // at 97% of its stencil can be 109% of what the route allows. Report the
+  // ratio against whichever limit governs, so the headline cannot read "inside"
+  // on the wrong limit.
+  const governing_utilization_pct = lading_net_lb > 0 ? lading_net_lb / governing_load_limit_lb * 100 : 0;
+  const governing_remaining_capacity_lb = governing_load_limit_lb - lading_net_lb;
   const outs = [load_limit_lb, gross_on_rail_lb, remaining_capacity_lb];
   if (!outs.every(Number.isFinite)) return { error: "Load limit math is not a finite value." };
   const verdict = within_car
-    ? "INSIDE the car at " + fmt(gross_on_rail_lb, 0) + " lb on rail against " + fmt(gross_rail_load_lb, 0) + " lb, " + fmt(utilization_pct, 1) + "% of the load limit" + (cube_limited_weight_lb !== null && lading_net_lb > cube_limited_weight_lb * (1 + 1e-9) ? " -- BUT " + fmt(lading_net_lb, 0) + " lb of this lading is more than the " + fmt(cube_limited_weight_lb, 0) + " lb the car holds at the entered density; check the lading weight or the density" : "")
+    ? "INSIDE the car at " + fmt(gross_on_rail_lb, 0) + " lb on rail against " + fmt(gross_rail_load_lb, 0) + " lb, " + fmt(utilization_pct, 1) + "% of the car's load limit"
+      + (route_governs ? " -- but " + fmt(governing_utilization_pct, 1) + "% of the " + fmt(governing_load_limit_lb, 0) + " lb the ROUTE allows, which is the limit that governs" : "") + (cube_limited_weight_lb !== null && lading_net_lb > cube_limited_weight_lb * (1 + 1e-9) ? " -- BUT " + fmt(lading_net_lb, 0) + " lb of this lading is more than the " + fmt(cube_limited_weight_lb, 0) + " lb the car holds at the entered density; check the lading weight or the density" : "")
     : "OVERLOADED: " + fmt(gross_on_rail_lb, 0) + " lb on rail against a " + fmt(gross_rail_load_lb, 0) + " lb car, " + fmt(gross_on_rail_lb - gross_rail_load_lb, 0) + " lb over";
   const route_verdict = within_route === null
     ? "Enter the route's maximum gross rail load. It is frequently below the car's, and the difference is invisible on the car."
@@ -554,6 +562,7 @@ export function computeRailcarLoadLimit({ gross_rail_load_lb = 0, light_weight_l
   return {
     gross_rail_load_lb, light_weight_lb, load_limit_lb, lading_net_lb, gross_on_rail_lb,
     utilization_pct, remaining_capacity_lb, within_car, route_gross_rail_load_lb,
+    governing_utilization_pct, governing_remaining_capacity_lb,
     route_load_limit_lb, governing_load_limit_lb, route_shortfall_lb, within_route,
     route_governs, cubic_capacity_ft3, lading_density_pcf, cube_limited_weight_lb,
     cube_governs, verdict, route_verdict, governs_verdict,
