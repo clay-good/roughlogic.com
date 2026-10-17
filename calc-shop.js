@@ -3174,7 +3174,8 @@ export function computeSprayBoothAirflow({ opening_width_ft = 0, opening_height_
   const has_measured = measured_face_velocity_fpm > 0;
   const measured_cfm = has_measured ? opening_sqft * measured_face_velocity_fpm : 0;
   const velocity_shortfall_pct = has_measured ? (1 - measured_face_velocity_fpm / face_velocity_fpm) * 100 : 0;
-  const velocity_compliant = has_measured ? measured_face_velocity_fpm >= face_velocity_fpm - 1e-9 * Math.abs(face_velocity_fpm) : true;
+  // No measured face velocity means nothing was checked: null, not compliant.
+  const velocity_compliant = has_measured ? measured_face_velocity_fpm >= face_velocity_fpm - 1e-9 * Math.abs(face_velocity_fpm) : null;
   const velocity_verdict = !has_measured
     ? "(no measured face velocity entered)"
     : velocity_compliant

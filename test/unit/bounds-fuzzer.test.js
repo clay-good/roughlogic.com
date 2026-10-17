@@ -62015,3 +62015,37 @@ test("hardening slice 53: a blank crosswind wind direction is not a north wind",
   assert.ok("error" in computeCrosswindComponent({ runway_heading_deg: 90, wind_dir_deg: null, wind_speed_kt: 15 }));
   assert.ok(!("error" in computeCrosswindComponent({ runway_heading_deg: 90, wind_dir_deg: 0, wind_speed_kt: 15 })));
 });
+test("hardening slice 57: railcar utilization is reported against the governing limit", async () => {
+  const { computeRailcarLoadLimit } = await import("../../calc-rail.js");
+  // 286k car, 65k light weight, 215k lading, on a 263k route: inside the car,
+  // over the route. The car's stencil allows 221k, the route 198k.
+  const r = computeRailcarLoadLimit({ gross_rail_load_lb: 286000, light_weight_lb: 65000, lading_net_lb: 215000, route_gross_rail_load_lb: 263000 });
+  assert.equal(r.governing_load_limit_lb, 198000);
+  assert.ok(Math.abs(r.utilization_pct - 215000 / 221000 * 100) < 1e-9, "the car's own stencil, kept");
+  assert.ok(Math.abs(r.governing_utilization_pct - 215000 / 198000 * 100) < 1e-9, "against the route that governs");
+  assert.equal(r.governing_remaining_capacity_lb, -17000);
+  assert.ok(/108\.6% of the 198,000 lb the ROUTE allows/.test(r.verdict), r.verdict);
+  // With no route entered, the car governs and the two ratios agree.
+  const c = computeRailcarLoadLimit({ gross_rail_load_lb: 286000, light_weight_lb: 65000, lading_net_lb: 215000 });
+  assert.ok(Math.abs(c.governing_utilization_pct - c.utilization_pct) < 1e-12);
+  assert.ok(!/ROUTE allows/.test(c.verdict));
+});
+test("hardening slice 58: an unrun check is null, not a pass; snow governs a vent on a used roof", async () => {
+  const { computePipelineMaoBarlow } = await import("../../calc-oilgas.js");
+  const base = { od_in: 12.75, wall_in: 0.25, smys_psi: 52000, class_location: "class_1", joint_factor: 1.0, temperature_factor: 1.0 };
+  const none = computePipelineMaoBarlow({ ...base, operating_pressure_psig: 0, target_pressure_psig: 0 });
+  assert.equal(none.within_maop, null, "no operating pressure entered: no MAOP check ran");
+  assert.equal(none.wall_adequate, null, "no target pressure entered: no wall check ran");
+  const both = computePipelineMaoBarlow({ ...base, operating_pressure_psig: 1000, target_pressure_psig: 1440 });
+  assert.equal(both.within_maop, true);
+  assert.equal(both.wall_adequate, true);
+  const { computeVentTerminalCheck, ventTerminalCheckExample } = await import("../../calc-plumbingcode.js");
+  const ex = (ventTerminalCheckExample || {}).inputs || {};
+  // A used roof's floor is 84 in. 100 in of snow puts the snow line at 106 in,
+  // above it, so the snow governs; 10 in of snow (16 in) does not.
+  const deep = computeVentTerminalCheck({ ...ex, roof_other_use: "yes", snow_accumulation_in: 100, roof_minimum_in: 6 });
+  assert.equal(deep.required_height_in, 106);
+  assert.equal(deep.snow_governs, true);
+  assert.equal(computeVentTerminalCheck({ ...ex, roof_other_use: "yes", snow_accumulation_in: 10, roof_minimum_in: 6 }).snow_governs, false);
+  assert.equal(computeVentTerminalCheck({ ...ex, roof_other_use: "no", snow_accumulation_in: 10, roof_minimum_in: 6 }).snow_governs, true);
+});

@@ -259,7 +259,11 @@ export function computeVentTerminalCheck({ height_above_roof_in = 6, snow_accumu
   const required_height_in = otherUse ? Math.max(84, roofMin, snow + 6) : Math.max(roofMin, snow + 6);
   const height_ok = h >= required_height_in - 1e-9 * Math.abs(required_height_in);
   const height_deficit_in = Math.max(0, required_height_in - h);
-  const snow_governs = !otherUse && snow + 6 > roofMin;
+  // Snow governs whenever its 6-in clearance is above every other floor -- on a
+  // roof in use that floor is the 84 in, not nothing. Until 2026-10-16 the flag
+  // was forced false on a used roof, so 100 in of snow set a 106 in extension
+  // that the page labelled "(roof in use)".
+  const snow_governs = snow + 6 > (otherUse ? Math.max(84, roofMin) : roofMin);
 
   // Frost closure: IPC 903.2 / IRC P3103.2
   const frost_zone = t <= 0;
@@ -278,7 +282,7 @@ export function computeVentTerminalCheck({ height_above_roof_in = 6, snow_accumu
   const passes = height_ok && (frost_ok !== false) && location_ok;
 
   const note = "IPC 903 puts three independent rules on the same pipe, and satisfying two of them is not compliance. "
-    + "HEIGHT (IRC P3103.1.1; IPC 903.1.1 leaves the number to the adopting jurisdiction): " + (otherUse ? "this roof is used as a promenade, deck, or for a similar purpose, so the extension must run at least 7 ft - 84 in - above it (IPC 903.1.2). " : "at least " + roofMin + " in above the roof or 6 in above the anticipated snow accumulation, whichever is greater; with " + snow + " in of snow that is " + required_height_in + " in" + (snow_governs ? " and the SNOW governs, not the " + roofMin + " in floor. " : ". "))
+    + "HEIGHT (IRC P3103.1.1; IPC 903.1.1 leaves the number to the adopting jurisdiction): " + (otherUse ? "this roof is used as a promenade, deck, or for a similar purpose, so the extension must run at least 7 ft - 84 in - above it (IPC 903.1.2)" + (snow_governs ? ", and with " + snow + " in of snow the 6 in above the snow governs instead, at " + required_height_in + " in. " : ". ") : "at least " + roofMin + " in above the roof or 6 in above the anticipated snow accumulation, whichever is greater; with " + snow + " in of snow that is " + required_height_in + " in" + (snow_governs ? " and the SNOW governs, not the " + roofMin + " in floor. " : ". "))
     + "This terminal is " + h + " in: " + (height_ok ? "OK. " : "SHORT by " + height_deficit_in.toFixed(1) + " in. ")
     + "FROST CLOSURE (IPC 903.2): the 97.5% outdoor design temperature entered is " + t + " F, "
     + (frost_zone
