@@ -205,7 +205,7 @@ anything.
 
 These sources were audited and found current or correctly disclosed, are cited
 by edition inline, and are **not** tracked rows in `sources-cycle.json`:
-NFPA 14-2024 (disclosed) and IICRC S520-2024.
+NFPA 14-2024 (disclosed) and IICRC S520-2024; and, disclosed as behind since 2026-10-17 (NFPA's own pages read), NFPA 13, 20 and 72 (2022 bundled, 2025 current), NFPA 1142 (2022 bundled, 2027 current) and NFPA 1981 (since folded into NFPA 1970-2025).
 
 Five entries that used to sit in this list have since become tracked rows and
 were moved out of it (**NFPA 70E** on 2026-10-17, when NFPA's page showed the
