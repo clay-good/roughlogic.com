@@ -2,19 +2,19 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "f23a736e323925ac",
+      "sha": "7e475b67bbf9911d",
       "date": "2026-10-17"
     },
     "/tools/": {
-      "sha": "4777de888c4047a0",
+      "sha": "3da4730f486515bf",
       "date": "2026-10-17"
     },
     "/errata/": {
-      "sha": "c163a06082a6a4d3",
+      "sha": "742a68afa89cd04a",
       "date": "2026-10-17"
     },
     "/collections/disaster-response/": {
-      "sha": "d9737e584bbe0cca",
+      "sha": "586ea7e08a47dbed",
       "date": "2026-10-17"
     },
     "/groups/accounting/": {
@@ -26,7 +26,7 @@
       "date": "2026-10-17"
     },
     "/groups/construction/": {
-      "sha": "e3ac3508f452a801",
+      "sha": "041ec7e684b30578",
       "date": "2026-10-17"
     },
     "/groups/cross-trade/": {
@@ -166,7 +166,7 @@
       "date": "2026-10-17"
     },
     "/tools/ada-ramp-slope/": {
-      "sha": "e3b05cd3da41e9fa",
+      "sha": "caae69886444886e",
       "date": "2026-10-17"
     },
     "/tools/ada-stair-check/": {
@@ -254,7 +254,7 @@
       "date": "2026-10-17"
     },
     "/tools/allowable-area/": {
-      "sha": "f0b6530b96307c58",
+      "sha": "129a57d013362e4a",
       "date": "2026-10-17"
     },
     "/tools/alternate-readability/": {
@@ -2618,15 +2618,15 @@
       "date": "2026-10-17"
     },
     "/tools/egress-capacity/": {
-      "sha": "9a24bcd74791193b",
+      "sha": "af6af714071b4539",
       "date": "2026-10-17"
     },
     "/tools/egress-lighting-check/": {
-      "sha": "aaca6c38b0433140",
+      "sha": "d9ee5de1a0c6f257",
       "date": "2026-10-17"
     },
     "/tools/egress-travel-distance/": {
-      "sha": "ae9c714a7004961a",
+      "sha": "5e7cf8622b6f7ec6",
       "date": "2026-10-17"
     },
     "/tools/egress-window-check/": {
@@ -2650,7 +2650,7 @@
       "date": "2026-10-17"
     },
     "/tools/elevator-handling-capacity/": {
-      "sha": "f8970495673eec19",
+      "sha": "65f37ef55a7e18f4",
       "date": "2026-10-17"
     },
     "/tools/ellipse-area-perimeter/": {
@@ -2734,7 +2734,7 @@
       "date": "2026-10-17"
     },
     "/tools/escalator-capacity/": {
-      "sha": "123167300d365cb1",
+      "sha": "bf21d98b97223cad",
       "date": "2026-10-17"
     },
     "/tools/esp-deutsch-efficiency/": {
@@ -2834,11 +2834,11 @@
       "date": "2026-10-17"
     },
     "/tools/exterior-opening-protection/": {
-      "sha": "553dc7dc36a19eb8",
+      "sha": "636d53263043e384",
       "date": "2026-10-17"
     },
     "/tools/extinguisher-coverage/": {
-      "sha": "1effe55470cf580b",
+      "sha": "59ead4a4c6f1463d",
       "date": "2026-10-17"
     },
     "/tools/extrusion-output-rate/": {
@@ -3634,7 +3634,7 @@
       "date": "2026-10-17"
     },
     "/tools/guard-handrail-check/": {
-      "sha": "4f6f9ce3e3f33c0f",
+      "sha": "875201f9968bd946",
       "date": "2026-10-17"
     },
     "/tools/guard-post-load/": {
@@ -5094,7 +5094,7 @@
       "date": "2026-10-17"
     },
     "/tools/occupant-load/": {
-      "sha": "087b7cd38951f8d2",
+      "sha": "e0473a55dba83733",
       "date": "2026-10-17"
     },
     "/tools/od600-cell-count/": {
@@ -5570,7 +5570,7 @@
       "date": "2026-10-17"
     },
     "/tools/plumbing-fixture-count/": {
-      "sha": "e981bbfd063122a6",
+      "sha": "6fdb1bf150739d93",
       "date": "2026-10-17"
     },
     "/tools/plume-rise-briggs/": {
@@ -6646,7 +6646,7 @@
       "date": "2026-10-17"
     },
     "/tools/safe-room-capacity/": {
-      "sha": "549f061214f7a314",
+      "sha": "f459b377416f03eb",
       "date": "2026-10-17"
     },
     "/tools/safety-valve-capacity/": {
@@ -7014,7 +7014,7 @@
       "date": "2026-10-17"
     },
     "/tools/shelter-capacity-sanitation/": {
-      "sha": "fecda8b759d07c2a",
+      "sha": "a8e21ed57a27ea7e",
       "date": "2026-10-17"
     },
     "/tools/shielding-gas-runtime/": {
@@ -7186,7 +7186,7 @@
       "date": "2026-10-17"
     },
     "/tools/smoke-detector-spacing-count/": {
-      "sha": "42d397c637c8785d",
+      "sha": "8aafb250583be28f",
       "date": "2026-10-17"
     },
     "/tools/smoke-ejector-cfm/": {
@@ -7578,7 +7578,7 @@
       "date": "2026-10-17"
     },
     "/tools/stair-code-check/": {
-      "sha": "e4c5de3de4fe93b5",
+      "sha": "a53e2c35fa25470e",
       "date": "2026-10-17"
     },
     "/tools/stair-stringer/": {

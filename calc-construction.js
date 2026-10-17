@@ -5681,7 +5681,7 @@ CONSTRUCTION_RENDERERS["seismic-overturning-moment"] = _renderSeismicOverturning
 // aid, not a code-official determination. Lazy-loaded, absent from the home paint.
 // ===================================================================================
 
-// ----- spec-v242: Building Occupant Load from Area and Use (IBC 2021 §1004.5) -----
+// ----- spec-v242: Building Occupant Load from Area and Use (IBC 2027 §1004.4; §1004.5 in 2021) -----
 
 // dims: in { spaces: dimensionless } out: { total_load: dimensionless, space_count: dimensionless }
 export function computeOccupantLoad({ spaces = [] } = {}) {
@@ -5709,7 +5709,7 @@ export const occupantLoadExample = {
 
 // Custom renderer: three space rows (area + occupant-load factor), summed.
 function _renderOccupantLoad(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: IBC 2021 §1004.5 and Table 1004.5 (occupant load = sum over spaces of ceil(area / occupant-load factor)); each space rounded up to a whole person (conservative practice; §1004.2 covers cumulative loads, not rounding). Representative factors (ft^2/occ): assembly standing 5 net, chairs-only 7 net, tables-and-chairs 15 net, business 150 gross, mercantile 60 gross, classroom 20 net, commercial kitchen 200 gross, industrial 100 gross, storage/stock/shipping 300 gross, warehouse 500 gross, residential 200 gross. The factor and its net-vs-gross basis come from the AHJ-adopted code edition and the actual use, not the tenant's label; a mezzanine or accessory use is its own line. A design aid, not a code-official determination.";
+  citationEl.textContent = "Citation: IBC 2027 §1004.4 and Table 1004.4 [§1004.5 and Table 1004.5 in IBC 2021] (occupant load = sum over spaces of ceil(area / occupant-load factor)); each space rounded up to a whole person (conservative practice; §1004.2 covers cumulative loads, not rounding). Representative factors (ft^2/occ): assembly standing 5 net, chairs-only 7 net, tables-and-chairs 15 net, business 150 gross, mercantile 60 gross, classroom 20 net, commercial kitchen 200 gross, industrial 100 gross, storage/stock/shipping 300 gross, warehouse 500 gross, residential 200 gross. The factor and its net-vs-gross basis come from the AHJ-adopted code edition and the actual use, not the tenant's label; a mezzanine or accessory use is its own line. A design aid, not a code-official determination.";
   _aeC(inputRegion, () => fillExample(occupantLoadExample.inputs));
   const rows = [];
   for (let i = 1; i <= 3; i++) {
@@ -5745,9 +5745,9 @@ function _renderOccupantLoad(inputRegion, outputRegion, citationEl) {
 }
 CONSTRUCTION_RENDERERS["occupant-load"] = _renderOccupantLoad;
 
-// ----- spec-v243: Egress Capacity, Exit Count, and Required Width (IBC 2021 §1005.3 / §1006.2 / §1010.1.1) -----
+// ----- spec-v243: Egress Capacity, Exit Count, and Required Width (IBC 2027 §1005.3 / §1006.2 / §1010.1.1.1) -----
 
-// IBC Table 1006.3.4(2): the most occupants a story may have with ONE exit
+// IBC 2027 Table 1006.3.3(2) (1006.3.4(2) in IBC 2021): the most occupants a story may have with ONE exit
 // (with a 75 ft common path; 25 ft for H-2 / H-3). Until 2026-09-19 every
 // occupancy got the A / B / E / F / M / U figure of 49.
 const _SINGLE_EXIT_MAX = { "A-B-E-F-M-U": 49, "B-F-M": 49, "S": 29, "I1-I3-I4-R1-R4": 10, "H4-H5": 10, "I-R1-R4-H4-H5": 10, "H2-H3": 3 };
@@ -5756,7 +5756,11 @@ const _SINGLE_EXIT_MAX = { "A-B-E-F-M-U": 49, "B-F-M": 49, "S": 29, "I1-I3-I4-R1
 // 2026-09-25 the first-story limits applied at every story, so a 40-person second-story A, B or E
 // space was told one exit would do.
 const _SECOND_STORY_SINGLE_EXIT_MAX = { "B-F-M": 29, "S": 29 };
-const _singleExitMax = (group, story) => (story === "first" ? _SINGLE_EXIT_MAX[group] : story === "second" ? (_SECOND_STORY_SINGLE_EXIT_MAX[group] || 0) : 0);
+// IBC 2027 1006.3.3 item 4 (1006.3.4 item 3 in 2021): Group R-3 and R-4 may have one exit from
+// any story, whatever the occupant load. Until 2026-10-17 R-4 sat in the 10-occupant row, which
+// neither edition's table lists it in, so an R-4 story of 11 or more was told it needed two exits.
+const _SINGLE_EXIT_ANY = new Set(["R3-R4"]);
+const _singleExitMax = (group, story) => (_SINGLE_EXIT_ANY.has(group) ? null : story === "first" ? _SINGLE_EXIT_MAX[group] : story === "second" ? (_SECOND_STORY_SINGLE_EXIT_MAX[group] || 0) : 0);
 // IBC 1005.3.1 / 1005.3.2: the sprinklered 0.2 / 0.15 factors are for "other than Group H and
 // I-2". The legacy mixed bucket holds I-2 and H-4 / H-5, so it takes the unsprinklered factor.
 const _NO_SPRINKLER_REDUCTION = new Set(["H2-H3", "H4-H5", "I-R1-R4-H4-H5"]);
@@ -5772,10 +5776,10 @@ export function computeEgressCapacity({ occupant_load = 0, sprinklered = true, p
   const isStair = path === "stair";
   const reduced = sprk && !_NO_SPRINKLER_REDUCTION.has(occupancy_group);
   const factor = isStair ? (reduced ? 0.2 : 0.3) : (reduced ? 0.15 : 0.2);
-  if (_SINGLE_EXIT_MAX[occupancy_group] === undefined) return { error: "Occupancy group must be one of A-B-E-F-M-U, B-F-M, S, I1-I3-I4-R1-R4, H4-H5, I-R1-R4-H4-H5, or H2-H3 (R-2 dwelling-unit stories follow Table 1006.3.4(1))." };
+  if (_SINGLE_EXIT_MAX[occupancy_group] === undefined && !_SINGLE_EXIT_ANY.has(occupancy_group)) return { error: "Occupancy group must be one of A-B-E-F-M-U, B-F-M, S, I1-I3-I4-R1-R4, R3-R4, H4-H5, I-R1-R4-H4-H5, or H2-H3 (R-2 dwelling-unit stories follow IBC 2027 Table 1006.3.3(1), 1006.3.4(1) in 2021)." };
   if (!["first", "second", "third_plus"].includes(story)) return { error: "Story must be first, second, or third_plus (above or below grade plane)." };
   const single_max = _singleExitMax(occupancy_group, story);
-  const exits_required = occupant_load <= single_max ? 1 : occupant_load <= 500 ? 2 : occupant_load <= 1000 ? 3 : 4;
+  const exits_required = single_max === null || occupant_load <= single_max ? 1 : occupant_load <= 500 ? 2 : occupant_load <= 1000 ? 3 : 4;
   const total_width_in = occupant_load * factor;
   // A stairway has its own floor: IBC 1011.2, 44 in, or 36 in serving fewer than 50 occupants.
   // Until 2026-10-10 a stair was held only to the 32 in door-leaf minimum.
@@ -5790,18 +5794,18 @@ export const egressCapacityExample = {
 };
 
 function _renderEgressCapacity(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: IBC 2021 §1005.3 (egress width = occupant load x capacity factor), Table 1006.3.4(2) (one exit allowed on the first story up to 49 for A/B/E/F/M, 29 for S, 10 for I/R-1/R-2 sleeping units/H-4/H-5, 3 for H-2/H-3; on the second story only B/F/M/S, up to 29; none from the third story up) and Table 1006.3.3 (2 exits to 500, 3 to 1,000, 4 beyond), §1010.1.1 (32 in minimum door clear width). Capacity factors: sprinklered-with-alarm 0.2 in/occ stairs, 0.15 in/occ level; non-sprinklered 0.3 / 0.2, and Groups H and I-2 take 0.3 / 0.2 even when sprinklered. The reduced factors require the §1005.3.1/.2 sprinkler and emergency-communication conditions; the width is divided among the required exits; the door-leaf minimum and §1005.7 projections can govern. A design aid, not a code-official determination.";
+  citationEl.textContent = "Citation: IBC 2027 §1005.3 (egress width = occupant load x capacity factor), Table 1006.3.3(2) [1006.3.4(2) in IBC 2021] (one exit allowed on the first story up to 49 for A/B/E/F/M, 29 for S, 10 for H-4/H-5/I/R-1, 3 for H-2/H-3; on the second story only B/F/M/S, up to 29; none from the third story up; R-2 dwelling-unit stories follow Table 1006.3.3(1)), 1006.3.3 item 4 (R-3 and R-4 may always have one exit), and Table 1006.3.2 [1006.3.3 in IBC 2021] (2 exits to 500, 3 to 1,000, 4 beyond), §1010.1.1.1 [1010.1.1 in IBC 2021] (32 in minimum door clear width). Capacity factors: sprinklered-with-alarm 0.2 in/occ stairs, 0.15 in/occ level; non-sprinklered 0.3 / 0.2, and Groups H and I-2 take 0.3 / 0.2 even when sprinklered. The reduced factors require the §1005.3.1/.2 sprinkler and emergency-communication conditions; the width is divided among the required exits; the door-leaf minimum and §1005.7 projections can govern. A design aid, not a code-official determination.";
   _aeC(inputRegion, () => fillExample(egressCapacityExample.inputs));
   const ol = _mnC("Occupant load (persons)", "egc-ol", { step: "any", min: "0" });
   const sp = _msC("Sprinklered AND emergency voice/alarm system (1005.3.1/.2 exceptions)", "egc-sp", [{ value: "yes", label: "Yes" }, { value: "no", label: "No" }]);
   const pa = _msC("Egress component", "egc-pa", [{ value: "level", label: "Level (doors, corridors, ramps)" }, { value: "stair", label: "Stairway" }]);
   const md = _mnC("Minimum door clear width (in)", "egc-md", { step: "any", min: "0" });
   md.input.value = "32";
-  const og = _msC("Occupancy group (single-exit limit, Table 1006.3.4(2))", "egc-og", [
+  const og = _msC("Occupancy group (single-exit limit, Table 1006.3.3(2))", "egc-og", [
     { value: "A-B-E-F-M-U", label: "A, E, or mixed A/B/E/F/M (49 first story; none above)" }, { value: "B-F-M", label: "B, F, M (49 first story, 29 second)" }, { value: "S", label: "S (29 first and second story)" },
-    { value: "I1-I3-I4-R1-R4", label: "I-1, I-3, I-4, R-1, R-4 (10)" }, { value: "H4-H5", label: "H-4, H-5 (10, no sprinkler reduction)" }, { value: "I-R1-R4-H4-H5", label: "I-2, or group not split out (10, no sprinkler reduction)" }, { value: "H2-H3", label: "H-2, H-3 (3)" },
+    { value: "I1-I3-I4-R1-R4", label: "I-1, I-3, I-4, R-1 (10)" }, { value: "R3-R4", label: "R-3, R-4 (one exit at any load, 1006.3.3 item 4)" }, { value: "H4-H5", label: "H-4, H-5 (10, no sprinkler reduction)" }, { value: "I-R1-R4-H4-H5", label: "I-2, or group not split out (10, no sprinkler reduction)" }, { value: "H2-H3", label: "H-2, H-3 (3)" },
   ]);
-  const st = _msC("Story (Table 1006.3.4(2))", "egc-st", [{ value: "first", label: "First story above or below grade plane" }, { value: "second", label: "Second story above grade plane" }, { value: "third_plus", label: "Third story above grade plane or higher" }]);
+  const st = _msC("Story (Table 1006.3.3(2))", "egc-st", [{ value: "first", label: "First story above or below grade plane" }, { value: "second", label: "Second story above grade plane" }, { value: "third_plus", label: "Third story above grade plane or higher" }]);
   for (const f of [ol, sp, pa, md, og, st]) inputRegion.appendChild(f.wrap);
   const oE = _moC(outputRegion, "Exits required", "egc-out-e");
   const oT = _moC(outputRegion, "Total egress width", "egc-out-t");

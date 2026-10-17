@@ -403,16 +403,20 @@ export function computeEgressLightingCheck({ avg_fc = 0, min_fc = 0, max_fc = 0,
   if (!(max >= min)) return { error: "Maximum must be at least the minimum (fc)." };
   // An average outside its own minimum and maximum is not a set of readings.
   if (!(avg >= min && avg <= max)) return { error: "The average must lie between the minimum and the maximum (fc)." };
-  if (mode !== "normal" && mode !== "emergency-initial" && mode !== "emergency-90min-end") return { error: "Mode must be normal, emergency-initial or emergency-90min-end." };
+  if (mode !== "normal" && mode !== "stairway" && mode !== "emergency-initial" && mode !== "emergency-90min-end") return { error: "Mode must be normal, stairway, emergency-initial or emergency-90min-end." };
   // Normal egress lighting (IBC 1008.2.1, NFPA 101 7.8.1.3) is at least
   // 1 fc at EVERY point of the walking surface. The 1.0 average / 0.1
   // minimum pair is the EMERGENCY initial requirement (NFPA 101 7.9.2.1),
   // falling to 0.6 / 0.06 at the end of 90 minutes, with max/min <= 40:1.
   // Until 2026-09-19 "normal" used the emergency-initial pair, passing a
   // path with a 0.1 fc dark spot 10x below the normal minimum.
+  // IBC 1008.2.1 also sets a stairway level under normal power: 10 fc along interior exit
+  // stairways and their landings when the stairway is in use, an AVERAGE in IBC 2027 (in 2021 a
+  // level along exit access and exit stairways). Added 2026-10-17; the tile had only the 1 fc rule.
+  const stair = mode === "stairway";
   const emergency = mode === "emergency-90min-end";
   const emergencyInitial = mode === "emergency-initial";
-  const avg_thr = emergency ? 0.6 : 1.0;
+  const avg_thr = stair ? 10 : emergency ? 0.6 : 1.0;
   const min_thr = emergency ? 0.06 : emergencyInitial ? 0.1 : 1.0;
   const max_min = max / min;
   const avg_ok = avg >= avg_thr - 1e-9 * Math.abs(avg_thr);
@@ -421,12 +425,12 @@ export function computeEgressLightingCheck({ avg_fc = 0, min_fc = 0, max_fc = 0,
   const pass = avg_ok && min_ok && ratio_ok;
   return {
     max_min, avg_thr, min_thr, avg_ok, min_ok, ratio_ok, pass, emergency: emergency || emergencyInitial, ratio_applies: emergency || emergencyInitial,
-    note: "Egress/means-of-egress lighting check per NFPA 101 / IBC: normal lighting puts at least 1 fc on every point of the walking surface; emergency lighting starts at 1.0 fc average with a 0.1 fc minimum and, at the end of the 90-minute emergency (battery/generator) period the floor drops to 0.6 fc average and 0.06 fc minimum, and the maximum-to-minimum ratio must not exceed 40:1 (no over-bright spot beside a dark one). A single dark spot below the minimum fails the path even when the average holds - the reason a spot check, not just an average, is required. A design aid; the adopted NFPA 101 / IBC edition and the AHJ govern.",
+    note: (stair ? "Stairway mode: IBC 2027 1008.2.1 asks for an average of at least 10 fc along an interior exit stairway and its landings while the stairway is in use (IBC 2021 1008.2.1 set 10 fc along exit access and exit stairways), and the 1 fc floor still applies at every point. " : "") + "Egress/means-of-egress lighting check per NFPA 101 / IBC: normal lighting puts at least 1 fc on every point of the walking surface; emergency lighting starts at 1.0 fc average with a 0.1 fc minimum and, at the end of the 90-minute emergency (battery/generator) period the floor drops to 0.6 fc average and 0.06 fc minimum, and the maximum-to-minimum ratio must not exceed 40:1 (no over-bright spot beside a dark one). A single dark spot below the minimum fails the path even when the average holds - the reason a spot check, not just an average, is required. A design aid; the adopted NFPA 101 / IBC edition and the AHJ govern.",
   };
 }
 export const egressLightingCheckExample = { inputs: { avg_fc: 1.2, min_fc: 0.15, max_fc: 3.0, mode: "emergency-initial" } };
 ELECDESIGN_RENDERERS["egress-lighting-check"] = _simpleRenderer({
-  citation: "Citation: egress lighting minimums per NFPA 101 / IBC: normal at least 1 fc at every point (IBC 1008.2.1, NFPA 101 7.8.1.3); emergency initial 1.0 fc avg / 0.1 fc min and 90-min end 0.6 fc avg / 0.06 fc min, max/min <= 40:1 (NFPA 101 7.9.2.1). The adopted NFPA 101 / IBC edition and the AHJ govern.",
+  citation: "Citation: egress lighting minimums per NFPA 101 / IBC: normal at least 1 fc at every point (IBC 2027 1008.2.1, NFPA 101 7.8.1.3), and at least 10 fc average along interior exit stairways and landings in use (IBC 2027 1008.2.1; 2021 applied 10 fc to exit access and exit stairways); emergency initial 1.0 fc avg / 0.1 fc min and 90-min end 0.6 fc avg / 0.06 fc min, max/min <= 40:1 (NFPA 101 7.9.2.1). The adopted NFPA 101 / IBC edition and the AHJ govern.",
   example: egressLightingCheckExample.inputs,
   fields: [
     { key: "avg_fc", label: "Average illuminance (fc)", kind: "number" },
@@ -434,6 +438,7 @@ ELECDESIGN_RENDERERS["egress-lighting-check"] = _simpleRenderer({
     { key: "max_fc", label: "Maximum illuminance (fc)", kind: "number" },
     { key: "mode", label: "Mode", kind: "select", options: [
       { value: "normal", label: "Normal (at least 1 fc at every point)" },
+      { value: "stairway", label: "Interior exit stairway in use (10 fc average, 1 fc every point)" },
       { value: "emergency-initial", label: "Emergency, initial (1.0 fc avg / 0.1 fc min)" },
       { value: "emergency-90min-end", label: "Emergency, 90-min end (0.6 / 0.06)" },
     ] },
