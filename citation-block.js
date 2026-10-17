@@ -20,7 +20,8 @@
 // a tradesperson can tap straight through to the source, while leaving the
 // surrounding prose as plain text. The TLD set is whitelisted to the
 // authorities that actually appear in CITATIONS so version tokens like
-// "802.3", "B31", or "29 CFR 1910.146" never match. textContent of the
+// "802.3" or "B31" never match. ("29 CFR 1910.146" is linked, to eCFR, by
+// CFR_RE below.) textContent of the
 // host element is preserved (link text === the domain), so the existing
 // citation unit tests that assert on textContent still hold.
 const CITATION_LINK_RE =
@@ -37,19 +38,39 @@ function appendPlainText(host, text) {
   }
 }
 
+// A Code of Federal Regulations reference ("29 CFR 1926.502", "49 CFR 213",
+// "29 CFR § 1910.134(f)") links to that section or part on eCFR, the
+// government's free current text (spec-v1969). The link text stays the
+// citation's own words; only the target is built, and only from the title,
+// part and section numbers. A paragraph like "(f)" is left as text. Titles
+// run 1 to 50.
+const CFR_RE = /\b([1-9]|[1-4][0-9]|50) CFR (?:\u00a7\u00a7? ?|Parts? )?(\d{1,4})(?:\.(\d{1,4}[a-z]?))?\b/g;
+
+export function cfrHref(title, part, section) {
+  return section
+    ? `https://www.ecfr.gov/current/title-${title}/section-${part}.${section}`
+    : `https://www.ecfr.gov/current/title-${title}/part-${part}`;
+}
+
 // The matching itself, as plain data, so the static shells (spec-v1966) link
 // exactly what the live block links: [{ text }] and [{ text, href }] pieces whose
 // texts joined are the input unchanged.
 export function citationSegments(value) {
   const str = typeof value === "string" ? value : "";
   const out = [];
-  CITATION_LINK_RE.lastIndex = 0;
-  let last = 0;
+  const hits = [];
   let m;
-  while ((m = CITATION_LINK_RE.exec(str)) !== null) {
-    if (m.index > last) out.push({ text: str.slice(last, m.index) });
-    out.push({ text: m[0], href: "https://" + m[0] });
-    last = m.index + m[0].length;
+  CITATION_LINK_RE.lastIndex = 0;
+  while ((m = CITATION_LINK_RE.exec(str)) !== null) hits.push({ at: m.index, text: m[0], href: "https://" + m[0] });
+  CFR_RE.lastIndex = 0;
+  while ((m = CFR_RE.exec(str)) !== null) hits.push({ at: m.index, text: m[0], href: cfrHref(m[1], m[2], m[3]) });
+  hits.sort((a, b) => a.at - b.at);
+  let last = 0;
+  for (const h of hits) {
+    if (h.at < last) continue;
+    if (h.at > last) out.push({ text: str.slice(last, h.at) });
+    out.push({ text: h.text, href: h.href });
+    last = h.at + h.text.length;
   }
   if (last < str.length) out.push({ text: str.slice(last) });
   return out;

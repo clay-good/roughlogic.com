@@ -106,7 +106,7 @@
       "date": "2026-10-17"
     },
     "/tools/abatement-containment/": {
-      "sha": "a25492ff8ec1862e",
+      "sha": "c6635e649e2c2ffa",
       "date": "2026-10-17"
     },
     "/tools/abatement-waste-containers/": {
@@ -270,11 +270,11 @@
       "date": "2026-10-17"
     },
     "/tools/ammonia-charge-inventory/": {
-      "sha": "6b024472ec609e41",
+      "sha": "c08dd18e19ea0a96",
       "date": "2026-10-17"
     },
     "/tools/amortization-schedule/": {
-      "sha": "d42ecfc691a126d9",
+      "sha": "c68de7c9e4474091",
       "date": "2026-10-17"
     },
     "/tools/amp-power-spl/": {
@@ -410,7 +410,7 @@
       "date": "2026-10-17"
     },
     "/tools/axle-load-distribution/": {
-      "sha": "cd0aaf8c71396b03",
+      "sha": "9db481db2cc5526f",
       "date": "2026-10-17"
     },
     "/tools/azimuth-bearing-conversion/": {
@@ -854,11 +854,11 @@
       "date": "2026-10-17"
     },
     "/tools/bridge-formula/": {
-      "sha": "6e65ad5152f20ae6",
+      "sha": "a087c3fb68272d48",
       "date": "2026-10-17"
     },
     "/tools/bridge-formula-min-spacing/": {
-      "sha": "a9ea2ae9be5cb700",
+      "sha": "4a0eb1711a9e5116",
       "date": "2026-10-17"
     },
     "/tools/bridle-leg-tension/": {
@@ -870,7 +870,7 @@
       "date": "2026-10-17"
     },
     "/tools/brine-cure/": {
-      "sha": "651fafc654e11990",
+      "sha": "a57dfc02fa309584",
       "date": "2026-10-17"
     },
     "/tools/broad-crested-weir/": {
@@ -998,7 +998,7 @@
       "date": "2026-10-17"
     },
     "/tools/cargo-securement-wll/": {
-      "sha": "ffde5208efa6c4df",
+      "sha": "298f031e8c46dfa9",
       "date": "2026-10-17"
     },
     "/tools/carpet-restore-replace/": {
@@ -1290,7 +1290,7 @@
       "date": "2026-10-17"
     },
     "/tools/closing-costs/": {
-      "sha": "d23d4b4e08c03361",
+      "sha": "e695145d1ca1204d",
       "date": "2026-10-17"
     },
     "/tools/clutch-engagement-energy/": {
@@ -1762,11 +1762,11 @@
       "date": "2026-10-17"
     },
     "/tools/confined-space-purge/": {
-      "sha": "1eaf197681a5ed25",
+      "sha": "89300bad608675cb",
       "date": "2026-10-17"
     },
     "/tools/confined-space-vent/": {
-      "sha": "5ff4df224d06c95e",
+      "sha": "1d859280b3e632c6",
       "date": "2026-10-17"
     },
     "/tools/consolidation-degree/": {
@@ -1918,11 +1918,11 @@
       "date": "2026-10-17"
     },
     "/tools/crane-ground-bearing/": {
-      "sha": "0c2cdbcb15324b5c",
+      "sha": "9f9727dd5203c498",
       "date": "2026-10-17"
     },
     "/tools/crane-lift-quick/": {
-      "sha": "6dc420ab9cf63e29",
+      "sha": "88982715bd8dbbcf",
       "date": "2026-10-17"
     },
     "/tools/crane-load-radius-boom/": {
@@ -1930,7 +1930,7 @@
       "date": "2026-10-17"
     },
     "/tools/crane-net-capacity/": {
-      "sha": "2711af12606cfdb2",
+      "sha": "4b5721424802f095",
       "date": "2026-10-17"
     },
     "/tools/crane-outrigger-reaction/": {
@@ -1938,7 +1938,7 @@
       "date": "2026-10-17"
     },
     "/tools/crane-power-line-clearance/": {
-      "sha": "e42a598d3f2ce4dc",
+      "sha": "6c50fd1189364563",
       "date": "2026-10-17"
     },
     "/tools/crawl-space-ventilation/": {
@@ -2038,7 +2038,7 @@
       "date": "2026-10-17"
     },
     "/tools/cwr-neutral-temperature/": {
-      "sha": "8d88103c9fae50ad",
+      "sha": "61dbf1169120a516",
       "date": "2026-10-17"
     },
     "/tools/cyclone-separator-sizing/": {
@@ -2046,7 +2046,7 @@
       "date": "2026-10-17"
     },
     "/tools/cylinder-storage-separation/": {
-      "sha": "2acc58e7787abf5b",
+      "sha": "a2dbfcc48e2b4330",
       "date": "2026-10-17"
     },
     "/tools/cylindrical-wedge-volume/": {
@@ -2150,7 +2150,7 @@
       "date": "2026-10-17"
     },
     "/tools/degree-of-curve/": {
-      "sha": "d6390df82ec25a80",
+      "sha": "df2d9e1d046010e0",
       "date": "2026-10-17"
     },
     "/tools/dehumidifier/": {
@@ -2190,7 +2190,7 @@
       "date": "2026-10-17"
     },
     "/tools/detention-basin-volume/": {
-      "sha": "0ce4535942cb61fa",
+      "sha": "f6a57da384c8d949",
       "date": "2026-10-17"
     },
     "/tools/detention-demurrage-billing/": {
@@ -2198,7 +2198,7 @@
       "date": "2026-10-17"
     },
     "/tools/detention-time/": {
-      "sha": "9643f6696a377d3b",
+      "sha": "e1dc7e23154f5cfa",
       "date": "2026-10-17"
     },
     "/tools/dewatering-rate/": {
@@ -2598,7 +2598,7 @@
       "date": "2026-10-17"
     },
     "/tools/effective-annual-rate/": {
-      "sha": "dbf39783aa9946de",
+      "sha": "3d8681326c752f31",
       "date": "2026-10-17"
     },
     "/tools/effective-leakage-area/": {
@@ -2798,15 +2798,15 @@
       "date": "2026-10-17"
     },
     "/tools/excavation/": {
-      "sha": "c558b03465b474d4",
+      "sha": "31dcee2bf4835ffb",
       "date": "2026-10-17"
     },
     "/tools/excavation-bench-plan/": {
-      "sha": "67f787a57624c019",
+      "sha": "b3efdca8bced1ec6",
       "date": "2026-10-17"
     },
     "/tools/excavation-protection-trigger/": {
-      "sha": "edf53cd483f541cf",
+      "sha": "f873334da57c7c57",
       "date": "2026-10-17"
     },
     "/tools/excess-air-o2/": {
@@ -2850,7 +2850,7 @@
       "date": "2026-10-17"
     },
     "/tools/fall-arrest-anchorage/": {
-      "sha": "e5ae6f4eb6807730",
+      "sha": "09a0dc5404c67a9f",
       "date": "2026-10-17"
     },
     "/tools/fall-arrest-clearance/": {
@@ -2858,7 +2858,7 @@
       "date": "2026-10-17"
     },
     "/tools/fall-protection-clearance/": {
-      "sha": "0f9df18c7b3a77df",
+      "sha": "cd42faa1cc08f053",
       "date": "2026-10-17"
     },
     "/tools/fan-affinity-laws/": {
@@ -3034,7 +3034,7 @@
       "date": "2026-10-17"
     },
     "/tools/fixed-ladder-fall-protection/": {
-      "sha": "bbdbff5343b64dc1",
+      "sha": "c92728c7297895e1",
       "date": "2026-10-17"
     },
     "/tools/fixed-orifice-target-superheat/": {
@@ -3046,7 +3046,7 @@
       "date": "2026-10-17"
     },
     "/tools/flammable-cabinet-storage/": {
-      "sha": "8d7801ed3a745759",
+      "sha": "12878c0b1bfcba3c",
       "date": "2026-10-17"
     },
     "/tools/flange-bolt-torque/": {
@@ -3122,7 +3122,7 @@
       "date": "2026-10-17"
     },
     "/tools/flood-opening-area/": {
-      "sha": "c18945324efa7935",
+      "sha": "bbded064559b01ab",
       "date": "2026-10-17"
     },
     "/tools/flood-uplift-cover-slab/": {
@@ -3290,7 +3290,7 @@
       "date": "2026-10-17"
     },
     "/tools/future-value-of-annuity/": {
-      "sha": "38b2823911aab0e8",
+      "sha": "8e351e240b66f528",
       "date": "2026-10-17"
     },
     "/tools/galvanic-area-ratio/": {
@@ -3378,7 +3378,7 @@
       "date": "2026-10-17"
     },
     "/tools/gcwr-check/": {
-      "sha": "695a6cc3c8dc8f8d",
+      "sha": "f2436544f2606370",
       "date": "2026-10-17"
     },
     "/tools/gear-cascade/": {
@@ -3530,7 +3530,7 @@
       "date": "2026-10-17"
     },
     "/tools/grain-bin-capacity/": {
-      "sha": "1a5abc7d8ed5428f",
+      "sha": "868c790a8d800d1d",
       "date": "2026-10-17"
     },
     "/tools/grain-bin-height-for-capacity/": {
@@ -3662,7 +3662,7 @@
       "date": "2026-10-17"
     },
     "/tools/hand-signals/": {
-      "sha": "624dafaaa0c9c566",
+      "sha": "cad398f37207dd25",
       "date": "2026-10-17"
     },
     "/tools/handrail-geometry/": {
@@ -3710,7 +3710,7 @@
       "date": "2026-10-17"
     },
     "/tools/hazmat-placard-threshold/": {
-      "sha": "2edc982ca3ca0aba",
+      "sha": "7112f074ec252a1b",
       "date": "2026-10-17"
     },
     "/tools/hdd-annular-pressure/": {
@@ -3742,7 +3742,7 @@
       "date": "2026-10-17"
     },
     "/tools/hearing-protector-nrr/": {
-      "sha": "f6554a13e42aa478",
+      "sha": "90b89d5abf613150",
       "date": "2026-10-17"
     },
     "/tools/heat-pump-cold-capacity/": {
@@ -3810,7 +3810,7 @@
       "date": "2026-10-17"
     },
     "/tools/hoist-rope-safety-factor/": {
-      "sha": "ef2df6e351edba98",
+      "sha": "1dc20c9432d420a7",
       "date": "2026-10-17"
     },
     "/tools/hoistway-venting/": {
@@ -3842,7 +3842,7 @@
       "date": "2026-10-17"
     },
     "/tools/hos-math/": {
-      "sha": "f21ae417073a94ff",
+      "sha": "69e99ae6b24aab63",
       "date": "2026-10-17"
     },
     "/tools/hose-lay-section-count/": {
@@ -3866,7 +3866,7 @@
       "date": "2026-10-17"
     },
     "/tools/hud-fmr/": {
-      "sha": "4739a03d9dd70493",
+      "sha": "ca664ffd736cc95f",
       "date": "2026-10-17"
     },
     "/tools/hull-displacement/": {
@@ -4222,7 +4222,7 @@
       "date": "2026-10-17"
     },
     "/tools/lab-safety-quickread/": {
-      "sha": "a846f507a187681f",
+      "sha": "0e535cdbd6c42472",
       "date": "2026-10-17"
     },
     "/tools/labor-burden-rate/": {
@@ -4230,7 +4230,7 @@
       "date": "2026-10-17"
     },
     "/tools/ladder-angle/": {
-      "sha": "b93a0b5cf4dbaae3",
+      "sha": "1c04461416d070e3",
       "date": "2026-10-17"
     },
     "/tools/ladder-pipe-reach/": {
@@ -4242,7 +4242,7 @@
       "date": "2026-10-17"
     },
     "/tools/landfill-gas-generation/": {
-      "sha": "8ae013b89de854ce",
+      "sha": "121f5d841e66d6a9",
       "date": "2026-10-17"
     },
     "/tools/landfill-settlement-airspace/": {
@@ -4330,7 +4330,7 @@
       "date": "2026-10-17"
     },
     "/tools/lifeline-tension/": {
-      "sha": "2eca02a84058c4ce",
+      "sha": "4bd72feab2a74ce9",
       "date": "2026-10-17"
     },
     "/tools/lift-bag-sizing/": {
@@ -4402,7 +4402,7 @@
       "date": "2026-10-17"
     },
     "/tools/liquid-pipeline-station-spacing/": {
-      "sha": "c9bb0701d8ceda3c",
+      "sha": "e1ee1145c979402c",
       "date": "2026-10-17"
     },
     "/tools/litter-carry-team/": {
@@ -4466,7 +4466,7 @@
       "date": "2026-10-17"
     },
     "/tools/loto-steps/": {
-      "sha": "b0f58234eeea1b8d",
+      "sha": "cdb09f2f9bf0468d",
       "date": "2026-10-17"
     },
     "/tools/louver-free-area/": {
@@ -4574,7 +4574,7 @@
       "date": "2026-10-17"
     },
     "/tools/manufactured-home-anchor-count/": {
-      "sha": "517a79d944683ada",
+      "sha": "30be781a85c6a1ab",
       "date": "2026-10-17"
     },
     "/tools/manure-application-rate/": {
@@ -4650,7 +4650,7 @@
       "date": "2026-10-17"
     },
     "/tools/masonry-limited-access-zone/": {
-      "sha": "eb607cd801f378df",
+      "sha": "035fc7a7a1ea72b3",
       "date": "2026-10-17"
     },
     "/tools/masonry-lintel-bearing/": {
@@ -4706,7 +4706,7 @@
       "date": "2026-10-17"
     },
     "/tools/material-stacking-limits/": {
-      "sha": "4a21d7130ae580d2",
+      "sha": "1ec791ec35a38848",
       "date": "2026-10-17"
     },
     "/tools/max-circuit-length-for-vd/": {
@@ -4878,7 +4878,7 @@
       "date": "2026-10-17"
     },
     "/tools/mortgage-point-breakeven/": {
-      "sha": "30135b0362fc4446",
+      "sha": "443842ff837e45f5",
       "date": "2026-10-17"
     },
     "/tools/mortgage-reserves/": {
@@ -5070,7 +5070,7 @@
       "date": "2026-10-17"
     },
     "/tools/noise-dose/": {
-      "sha": "ec9c2497011174f9",
+      "sha": "56c4d65aaf3c5372",
       "date": "2026-10-17"
     },
     "/tools/noncoincident-load/": {
@@ -5130,7 +5130,7 @@
       "date": "2026-10-17"
     },
     "/tools/opacity-six-minute/": {
-      "sha": "911640e3ab617fb0",
+      "sha": "240d5f9501d74ea0",
       "date": "2026-10-17"
     },
     "/tools/open-delta-transformer/": {
@@ -5162,15 +5162,15 @@
       "date": "2026-10-17"
     },
     "/tools/osha-recordkeeping/": {
-      "sha": "bfc1047f2cf4eff4",
+      "sha": "a2bdcca0ebd9bb89",
       "date": "2026-10-17"
     },
     "/tools/osha-timber-trench-shoring/": {
-      "sha": "ea1328ae8765953e",
+      "sha": "066d82a5bec6b861",
       "date": "2026-10-17"
     },
     "/tools/osha-toilet-count/": {
-      "sha": "a1b49c0952957874",
+      "sha": "a0a1ce3b89d24d53",
       "date": "2026-10-17"
     },
     "/tools/osha-top10/": {
@@ -5222,7 +5222,7 @@
       "date": "2026-10-17"
     },
     "/tools/overrun-percent/": {
-      "sha": "14cd97603aedd5aa",
+      "sha": "934f755f36dcf8cb",
       "date": "2026-10-17"
     },
     "/tools/oversize-permit-screen/": {
@@ -5230,7 +5230,7 @@
       "date": "2026-10-17"
     },
     "/tools/overtime/": {
-      "sha": "ce1830135d5fa4d2",
+      "sha": "3c525326a1cda8b7",
       "date": "2026-10-17"
     },
     "/tools/oxyfuel-cutting-gas/": {
@@ -5346,7 +5346,7 @@
       "date": "2026-10-17"
     },
     "/tools/per-diem-interest/": {
-      "sha": "568fdf6a6007ebff",
+      "sha": "8592f8128bc8bea1",
       "date": "2026-10-17"
     },
     "/tools/periodic-element/": {
@@ -5354,7 +5354,7 @@
       "date": "2026-10-17"
     },
     "/tools/pesticide-rei-phi/": {
-      "sha": "803931bf0b740bec",
+      "sha": "ac1bbfe50ff68d38",
       "date": "2026-10-17"
     },
     "/tools/pex-homerun-takeoff/": {
@@ -5502,7 +5502,7 @@
       "date": "2026-10-17"
     },
     "/tools/pipeline-mao-barlow/": {
-      "sha": "f90eaad700bc573b",
+      "sha": "74a1c6223be93a16",
       "date": "2026-10-17"
     },
     "/tools/pipeline-potential-attenuation/": {
@@ -5706,7 +5706,7 @@
       "date": "2026-10-17"
     },
     "/tools/portable-ladder-setup/": {
-      "sha": "2bd74b8a0d625410",
+      "sha": "df82c2bd9117b587",
       "date": "2026-10-17"
     },
     "/tools/post-hole-concrete/": {
@@ -5750,7 +5750,7 @@
       "date": "2026-10-17"
     },
     "/tools/ppe/": {
-      "sha": "65cd43c72a33f6ee",
+      "sha": "512fb708189609f5",
       "date": "2026-10-17"
     },
     "/tools/ppfd-daily-light-integral/": {
@@ -5826,7 +5826,7 @@
       "date": "2026-10-17"
     },
     "/tools/proof-gallon-yield/": {
-      "sha": "b9e5a4fb4e440683",
+      "sha": "0ed366ff28e55b3f",
       "date": "2026-10-17"
     },
     "/tools/prop-pitch-selection/": {
@@ -6074,7 +6074,7 @@
       "date": "2026-10-17"
     },
     "/tools/rail-wear-condemning-limit/": {
-      "sha": "6e65f7483746de90",
+      "sha": "826b967940da85c1",
       "date": "2026-10-17"
     },
     "/tools/railcar-load-limit/": {
@@ -6294,7 +6294,7 @@
       "date": "2026-10-17"
     },
     "/tools/refrigerant-leak-rate/": {
-      "sha": "19d60af86f9c0513",
+      "sha": "65f5ec16710ec1b6",
       "date": "2026-10-17"
     },
     "/tools/refrigerant-line-size/": {
@@ -6406,11 +6406,11 @@
       "date": "2026-10-17"
     },
     "/tools/respirator-cartridge-life/": {
-      "sha": "2df021029deb72c8",
+      "sha": "7cfa38a047f8e84f",
       "date": "2026-10-17"
     },
     "/tools/responder-camp-sanitation/": {
-      "sha": "33727acf0e398b46",
+      "sha": "4e65a296dc9696d0",
       "date": "2026-10-17"
     },
     "/tools/restrained-pipe-length/": {
@@ -6434,7 +6434,7 @@
       "date": "2026-10-17"
     },
     "/tools/retrieval-winch-force/": {
-      "sha": "dd5115d04f32f89f",
+      "sha": "625f5f376286d2aa",
       "date": "2026-10-17"
     },
     "/tools/reverse-curve/": {
@@ -6614,7 +6614,7 @@
       "date": "2026-10-17"
     },
     "/tools/rtcr-coliform-samples/": {
-      "sha": "c920f190946118cd",
+      "sha": "898f55b12031384b",
       "date": "2026-10-17"
     },
     "/tools/rtd-resistance-to-temp/": {
@@ -6710,7 +6710,7 @@
       "date": "2026-10-17"
     },
     "/tools/scaffold-guardrail-check/": {
-      "sha": "895ef781c3aa7b4f",
+      "sha": "ce3ca124d90bc34b",
       "date": "2026-10-17"
     },
     "/tools/scaffold-leg-load/": {
@@ -6722,7 +6722,7 @@
       "date": "2026-10-17"
     },
     "/tools/scaffold-platform-check/": {
-      "sha": "448da2df2468fa75",
+      "sha": "b53b0c68cfde393e",
       "date": "2026-10-17"
     },
     "/tools/scaffold-takeoff/": {
@@ -6730,11 +6730,11 @@
       "date": "2026-10-17"
     },
     "/tools/scaffold-tie-spacing/": {
-      "sha": "38e21585749ea3ef",
+      "sha": "86043a1cb96cb31d",
       "date": "2026-10-17"
     },
     "/tools/scba-cylinder-time/": {
-      "sha": "9ca81e491089c535",
+      "sha": "62fddf93e7f68a5a",
       "date": "2026-10-17"
     },
     "/tools/sccr-combination/": {
@@ -6826,7 +6826,7 @@
       "date": "2026-10-17"
     },
     "/tools/seer-eer/": {
-      "sha": "67ea0f0bcde291de",
+      "sha": "0f19c2ae99776c81",
       "date": "2026-10-17"
     },
     "/tools/seismic-approximate-period/": {
@@ -6874,7 +6874,7 @@
       "date": "2026-10-17"
     },
     "/tools/seller-net-sheet/": {
-      "sha": "0742a114708171ef",
+      "sha": "dd7f33396d4b8c0e",
       "date": "2026-10-17"
     },
     "/tools/separator-retention-sizing/": {
@@ -7086,11 +7086,11 @@
       "date": "2026-10-17"
     },
     "/tools/silica-table-1/": {
-      "sha": "f7c8d0f68f556a89",
+      "sha": "df6981d4c235577c",
       "date": "2026-10-17"
     },
     "/tools/silica-ventilation-screen/": {
-      "sha": "a770ce92b9b67f4e",
+      "sha": "b24da871f740bfcb",
       "date": "2026-10-17"
     },
     "/tools/sill-plate-anchor-count/": {
@@ -7126,7 +7126,7 @@
       "date": "2026-10-17"
     },
     "/tools/sling-angle/": {
-      "sha": "b28ca9313d6050b4",
+      "sha": "2d283efb86ae3e42",
       "date": "2026-10-17"
     },
     "/tools/sling-d-d-efficiency/": {
@@ -7430,7 +7430,7 @@
       "date": "2026-10-17"
     },
     "/tools/spoil-setback/": {
-      "sha": "7181d636eb879d69",
+      "sha": "9701d768c303eb56",
       "date": "2026-10-17"
     },
     "/tools/spore-io-ratio/": {
@@ -7442,7 +7442,7 @@
       "date": "2026-10-17"
     },
     "/tools/spray-drift-buffer/": {
-      "sha": "0001926828bed4b1",
+      "sha": "d35c27cf466f5606",
       "date": "2026-10-17"
     },
     "/tools/spray-foam-board-feet/": {
@@ -7854,7 +7854,7 @@
       "date": "2026-10-17"
     },
     "/tools/substantial-improvement-check/": {
-      "sha": "5f8d26107742c2f8",
+      "sha": "e09fe127ddd2945b",
       "date": "2026-10-17"
     },
     "/tools/substrate-container-volume/": {
@@ -7910,7 +7910,7 @@
       "date": "2026-10-17"
     },
     "/tools/suspended-scaffold-counterweight/": {
-      "sha": "8c4afff690100622",
+      "sha": "8cd8f4988f695e28",
       "date": "2026-10-17"
     },
     "/tools/svi-sludge-index/": {
@@ -8046,7 +8046,7 @@
       "date": "2026-10-17"
     },
     "/tools/temporary-stairway-check/": {
-      "sha": "00bcd3c1b5777fbb",
+      "sha": "047d55548cdd7f7d",
       "date": "2026-10-17"
     },
     "/tools/terminal-velocity/": {
@@ -8162,7 +8162,7 @@
       "date": "2026-10-17"
     },
     "/tools/tiedown-count/": {
-      "sha": "51a2f62e7ec68bb0",
+      "sha": "bff572fbb6a78525",
       "date": "2026-10-17"
     },
     "/tools/tile-count/": {
@@ -8214,7 +8214,7 @@
       "date": "2026-10-17"
     },
     "/tools/tire-load-check/": {
-      "sha": "581fc932bf4bf14a",
+      "sha": "8081c419beb5c71f",
       "date": "2026-10-17"
     },
     "/tools/toggle-mechanism-force/": {
@@ -8230,7 +8230,7 @@
       "date": "2026-10-17"
     },
     "/tools/tool-maintenance/": {
-      "sha": "42d7907d1a1cd02b",
+      "sha": "5575a9155efc2c2b",
       "date": "2026-10-17"
     },
     "/tools/torque-adapter-correction/": {
@@ -8266,11 +8266,11 @@
       "date": "2026-10-17"
     },
     "/tools/track-superelevation/": {
-      "sha": "ddaf2458a06284e5",
+      "sha": "805d89bfe661e0ec",
       "date": "2026-10-17"
     },
     "/tools/track-warp-fra-class/": {
-      "sha": "f8df0a2e35817dac",
+      "sha": "fb5b8fcf2cf952cd",
       "date": "2026-10-17"
     },
     "/tools/traction-roping-ratio/": {
@@ -8290,7 +8290,7 @@
       "date": "2026-10-17"
     },
     "/tools/train-brake-reduction/": {
-      "sha": "dc9a6c13cf1f3196",
+      "sha": "0ceac561c714b6ff",
       "date": "2026-10-17"
     },
     "/tools/train-resistance-davis/": {
@@ -8402,7 +8402,7 @@
       "date": "2026-10-17"
     },
     "/tools/trench-slope/": {
-      "sha": "de5f1b846328f653",
+      "sha": "6fce9ee573825787",
       "date": "2026-10-17"
     },
     "/tools/trend-log-storage/": {
@@ -8490,7 +8490,7 @@
       "date": "2026-10-17"
     },
     "/tools/turnout-frog-lead/": {
-      "sha": "7caba4eba5388c9e",
+      "sha": "1f4066535c7cbea1",
       "date": "2026-10-17"
     },
     "/tools/two-proportion-z-test/": {
@@ -8642,7 +8642,7 @@
       "date": "2026-10-17"
     },
     "/tools/vehicle-load/": {
-      "sha": "3c205d91d40024f8",
+      "sha": "cbe5cefd399536b9",
       "date": "2026-10-17"
     },
     "/tools/vehicle-road-load-power/": {
@@ -8782,11 +8782,11 @@
       "date": "2026-10-17"
     },
     "/tools/water-heater-input/": {
-      "sha": "0b3d70a909339935",
+      "sha": "9fab8cf527a6cfae",
       "date": "2026-10-17"
     },
     "/tools/water-heater-recovery/": {
-      "sha": "321f1c48bae02070",
+      "sha": "918280a50c599a80",
       "date": "2026-10-17"
     },
     "/tools/water-heater-storage-sizing/": {
@@ -9038,7 +9038,7 @@
       "date": "2026-10-17"
     },
     "/tools/wire-rope-clips/": {
-      "sha": "3c2e3754f0003ce9",
+      "sha": "cb48baaa79bb44b6",
       "date": "2026-10-17"
     },
     "/tools/wire-rope-diameter-for-wll/": {
