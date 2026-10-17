@@ -37,26 +37,36 @@ function appendPlainText(host, text) {
   }
 }
 
-export function fillCitationText(host, value) {
+// The matching itself, as plain data, so the static shells (spec-v1966) link
+// exactly what the live block links: [{ text }] and [{ text, href }] pieces whose
+// texts joined are the input unchanged.
+export function citationSegments(value) {
   const str = typeof value === "string" ? value : "";
+  const out = [];
   CITATION_LINK_RE.lastIndex = 0;
   let last = 0;
-  let matched = false;
   let m;
   while ((m = CITATION_LINK_RE.exec(str)) !== null) {
-    matched = true;
-    if (m.index > last) appendPlainText(host, str.slice(last, m.index));
-    const token = m[0];
+    if (m.index > last) out.push({ text: str.slice(last, m.index) });
+    out.push({ text: m[0], href: "https://" + m[0] });
+    last = m.index + m[0].length;
+  }
+  if (last < str.length) out.push({ text: str.slice(last) });
+  return out;
+}
+
+export function fillCitationText(host, value) {
+  const segs = citationSegments(value);
+  if (!segs.some((x) => x.href)) { host.textContent = typeof value === "string" ? value : ""; return; }
+  for (const x of segs) {
+    if (!x.href) { appendPlainText(host, x.text); continue; }
     const a = document.createElement("a");
-    a.textContent = token;
-    a.setAttribute("href", "https://" + token);
+    a.textContent = x.text;
+    a.setAttribute("href", x.href);
     a.setAttribute("rel", "noopener noreferrer");
     a.className = "citation-link";
     host.appendChild(a);
-    last = m.index + token.length;
   }
-  if (!matched) { host.textContent = str; return; }
-  if (last < str.length) appendPlainText(host, str.slice(last));
 }
 
 // --- Reference-block renderer (spec-v6.md §3) ---

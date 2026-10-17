@@ -29,6 +29,7 @@ import { leadSentence, restOfDescription } from "../text-lead.js";
 import { normalizeQuery, rankTools } from "../search-discovery.js";
 import { humanizeKey } from "../key-labels.js";
 import { COLLECTIONS } from "../collections.js";
+import { citationSegments } from "../citation-block.js";
 // The tile <title> and <meta name="description"> rules moved to the repo root
 // so app.js can import the SAME code on a tile route. See shell-meta.js: the
 // SPA claimed since spec-v13 §5.5 to match this shell's head and diverged on
@@ -170,6 +171,16 @@ export async function loadCheckedAgainst() {
     lines.set(id, checkedAgainstLine(rs, derivedOnly));
   }
   return lines;
+}
+
+// spec-v1966 (spec-v106 pillar 2): the shell's citation lines link the official
+// free sources they name, exactly as the live reference block does -- the same
+// citationSegments matcher, so the two surfaces cannot disagree about what is a
+// link. Text stays escaped; the link text is the citation's own words.
+export function linkedCitationHtml(value) {
+  return citationSegments(value).map((x) => x.href
+    ? `<a class="citation-link" href="${escapeHtml(x.href)}" rel="noopener noreferrer">${escapeHtml(x.text)}</a>`
+    : escapeHtml(x.text)).join("");
 }
 
 // One tile's registry row is a WIRING STUB by design, and the page paid for it.
@@ -1029,10 +1040,10 @@ function tileShell(tool, tools, groupNames, relatedByTile, examples, labels, out
       '  <details class="shell-proof" aria-label="Details, formula, and sources">',
       '    <summary>Details, formula, and sources</summary>',
       detail ? `    <p class="shell-detail"><span class="shell-proof-label">Scope</span>${escapeHtml(detail)}</p>` : '',
-      citation ? `    <p class="shell-formula"><span class="shell-proof-label">Formula or table</span>${escapeHtml(citation.formula)}</p>` : '',
-      citation ? `    <p class="shell-source"><span class="shell-proof-label">Source and edition</span>${escapeHtml(citation.edition)}</p>` : '',
-      citation && citation.freeAccess ? `    <p class="shell-source"><span class="shell-proof-label">Free access</span>${escapeHtml(citation.freeAccess)}</p>` : '',
-      citation && citation.governance ? `    <p class="shell-source"><span class="shell-proof-label">What governs</span>${escapeHtml(citation.governance)}</p>` : '',
+      citation ? `    <p class="shell-formula"><span class="shell-proof-label">Formula or table</span>${linkedCitationHtml(citation.formula)}</p>` : '',
+      citation ? `    <p class="shell-source"><span class="shell-proof-label">Source and edition</span>${linkedCitationHtml(citation.edition)}</p>` : '',
+      citation && citation.freeAccess ? `    <p class="shell-source"><span class="shell-proof-label">Free access</span>${linkedCitationHtml(citation.freeAccess)}</p>` : '',
+      citation && citation.governance ? `    <p class="shell-source"><span class="shell-proof-label">What governs</span>${linkedCitationHtml(citation.governance)}</p>` : '',
       namedKeys.length ? `    <p class="shell-source"><span class="shell-proof-label">API field names</span>${namedKeys.map((k) => `<code>${escapeHtml(k)}</code>`).join(", ")}</p>` : '',
       assumptionRows ? '    <ul class="shell-io shell-assume">' : '',
       assumptionRows,
