@@ -74,6 +74,7 @@ anything.
 | `ashrae-62-1` | ASHRAE 62.1 | 2022 | **2025 (published)** | 2026-09-01 | disclosed-lag |
 | `ashrae-62-2` | ASHRAE 62.2 | 2022 | **2025 (published)** | 2026-09-01 | disclosed-lag |
 | `ashrae-90-1` | ASHRAE 90.1 | 2022 | **2025 (published)** | 2026-09-01 | disclosed-lag |
+| `nfpa-70e` | NFPA 70E | 2024 | **2027 (published)** | 2026-10-17 | disclosed-lag |
 | `fda-food-code` | FDA Food Code | 2026 | 2026 | 2026-10-17 | current |
 | `wmm` | NOAA World Magnetic Model | WMM2025 | WMM2025 (valid through 2029-12-31) | 2026-09-09 | current |
 | `iupac-atomic-weights` | IUPAC/CIAAW Standard Atomic Weights | 2024 | 2024 | 2026-09-09 | current |
@@ -204,10 +205,11 @@ anything.
 
 These sources were audited and found current or correctly disclosed, are cited
 by edition inline, and are **not** tracked rows in `sources-cycle.json`:
-NFPA 14-2024 (disclosed), NFPA 70E-2024, and IICRC S520-2024.
+NFPA 14-2024 (disclosed) and IICRC S520-2024.
 
-Four entries that used to sit in this list have since become tracked rows and
-were moved out of it, because a reader scanning this section for *what nothing
+Five entries that used to sit in this list have since become tracked rows and
+were moved out of it (**NFPA 70E** on 2026-10-17, when NFPA's page showed the
+2027 edition current while three tiles cited 2024 without saying so), because a reader scanning this section for *what nothing
 watches* was getting the wrong answer: **FDA Food Code** and the **NOAA World
 Magnetic Model** are now rows in `standards`, and the **FHFA / HUD loan limits**
 and the **IRS current-year publications** are rows in `annual_figures`. They are

@@ -3576,7 +3576,7 @@ export const CITATIONS = {
     edition: "NFPA 70E-2024 §130.5 governs the arc-flash risk assessment. IEEE 1584-2018 is the study-grade method.",
     freeAccess: NEC_FREE + " for NFPA 70E TOC and Annex D.",
     governance: GOVERNANCE.electrical,
-    editionNote: "Editions available: bundled PPE bands follow NFPA 70E-2024 Table 130.7(C)(15)(c) and the IEEE 1584-2018 method. Jurisdictions / employers on NFPA 70E-2021 differ at the margins; verify the edition adopted by your electrical-safety program.",
+    editionNote: "Editions available: bundled PPE bands follow NFPA 70E-2024 Table 130.7(C)(15)(c) and the IEEE 1584-2018 method. NFPA 70E-2027, released May 2026, is the current edition, and these bands have not yet been re-checked against it. Jurisdictions / employers on NFPA 70E-2021 or 2027 differ at the margins; verify the edition adopted by your electrical-safety program.",
     assumptions: [
       { name: "Equation source", value: "Ralph Lee 1982 closed-form, pre-IEEE-1584", source: "Lee, R.H., 'The Other Electrical Hazard: Electric Arc Blast Burns', IEEE Trans. on Industry Applications, 1982" },
       { name: "Second-degree threshold", value: "1.2 cal/cm^2", source: "NFPA 70E hazard threshold" },
@@ -9491,7 +9491,7 @@ export const CITATIONS = {
     edition: "AC shock approach boundaries, NFPA 70E-2024 Table 130.4, by name.",
     freeAccess: "NFPA 70E is free to read at nfpa.org/freeaccess. These are shock boundaries only; the arc-flash boundary is a separate determination. Crossing the restricted approach requires a qualified person, an energized-work permit, and shock PPE.",
     governance: GOVERNANCE.electrical,
-    editionNote: "Single-edition (NFPA 70E-2024 Table 130.4; refresh on the next 70E cycle).",
+    editionNote: "Bundled values follow NFPA 70E-2024 Table 130.4. NFPA 70E-2027, released May 2026, is the current edition, and these distances have not yet been re-checked against it; verify the edition your electrical-safety program adopts.",
     assumptions: [
       { name: "Limited approach", value: "the boundary an unqualified person must not cross; the larger distance applies to an exposed movable conductor, the smaller to an exposed fixed circuit part", source: "NFPA 70E Table 130.4" },
       { name: "Restricted approach", value: "the boundary requiring a qualified person, an energized-work permit, and shock PPE to cross", source: "NFPA 70E Table 130.4" },

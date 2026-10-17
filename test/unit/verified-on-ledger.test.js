@@ -644,6 +644,7 @@ test("the untracked section does not name a source the cycle file tracks", async
     ["wmm", "WMM"],
     ["fhfa-conforming-loan-limit", "FHFA"],
     ["irs-standard-mileage", "IRS current-year"],
+    ["nfpa-70e", "NFPA 70E"],
   ];
   const ids = new Set([...cycle.standards, ...(cycle.annual_figures || [])].map((r) => r.id));
   for (const [id, token] of tracked) {
@@ -654,9 +655,9 @@ test("the untracked section does not name a source the cycle file tracks", async
     );
   }
 
-  // The three that genuinely are not tracked must still be listed, or the
+  // The two that genuinely are not tracked must still be listed, or the
   // section has quietly stopped telling anyone what is unwatched.
-  for (const token of ["NFPA 14", "NFPA 70E", "IICRC S520"]) {
+  for (const token of ["NFPA 14", "IICRC S520"]) {
     assert.ok(claim.includes(token), "the untracked section no longer lists " + token);
   }
 });

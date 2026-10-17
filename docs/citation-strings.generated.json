@@ -15,7 +15,7 @@
     },
     "arc-flash-screen": {
       "group": "calc-electrical.js (Group A)",
-      "stamp": "Citation: Ralph Lee (1982) closed-form, public, pre-IEEE-1584. NFPA 70E-2024 §130.5 requires an arc-flash risk assessment by a qualified person before energized work. Free at nfpa.org/freeaccess for NFPA 70E TOC and Annex D."
+      "stamp": "Citation: Ralph Lee (1982) closed-form, public, pre-IEEE-1584. NFPA 70E-2024 §130.5 (2027 is now the current edition) requires an arc-flash risk assessment by a qualified person before energized work. Free at nfpa.org/freeaccess for NFPA 70E TOC and Annex D."
     },
     "bell-curve-zscore": {
       "group": "calc-edu.js (Group Y, v12 §9)",

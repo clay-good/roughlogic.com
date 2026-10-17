@@ -144,6 +144,22 @@
       ]
     },
     {
+      "id": "nfpa-70e",
+      "name": "NFPA 70E",
+      "current_edition": "2027",
+      "current_release": "2026-05",
+      "cycle_years": 3,
+      "next_expected": "2029-05",
+      "free_access_url": "https://www.nfpa.org/for-professionals/codes-and-standards/list-of-codes-and-standards/free-access",
+      "match_terms": [
+        "NFPA 70E"
+      ],
+      "last_verified": "2026-10-17",
+      "verification_note": "Verified 2026-10-17 on NFPA's own standard-development page (nfpa.org/codes-and-standards/nfpa-70e-standard-development/70e), which reads \"Current Edition: 2027\"; trade sources date its release in NFPA LiNK to 2026-05-06. The three tiles that cite it (arc-flash-screen, shock-approach-boundary, arc-rated-clothing-selection) bundle NFPA 70E-2024 values (Table 130.4 approach boundaries, Table 130.7(C)(15)(c) PPE bands) and now say so beside the 2027 edition. The 2027 table values were NOT read: NFPA's free access requires an account, which this project does not create. Re-checking those tables against 2027 is the value refresh this row discloses.",
+      "citation_only": true,
+      "citation_only_reason": "No bundled shard holds NFPA 70E data: the three tiles cite it by table for approach boundaries and PPE bands and compute inline. There is no manifest for it to appear in. Their citations name 70E-2024 as bundled and 2027 as current, a disclosed lag."
+    },
+    {
       "id": "fda-food-code",
       "name": "FDA Food Code",
       "current_edition": "2026",

@@ -2979,7 +2979,7 @@ export const arcFlashScreenExample = {
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderArcFlashScreen(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Ralph Lee (1982) closed-form, public, pre-IEEE-1584. NFPA 70E-2024 §130.5 requires an arc-flash risk assessment by a qualified person before energized work. Free at nfpa.org/freeaccess for NFPA 70E TOC and Annex D.";
+  citationEl.textContent = "Citation: Ralph Lee (1982) closed-form, public, pre-IEEE-1584. NFPA 70E-2024 §130.5 (2027 is now the current edition) requires an arc-flash risk assessment by a qualified person before energized work. Free at nfpa.org/freeaccess for NFPA 70E TOC and Annex D.";
   // v10 §B.3: render the simplified-screening limitation banner above
   // the inputs (canonical copy in limitation-banner.js).
   renderLimitationBanner(inputRegion, getLimitationCopy("arc-flash-screen"));
@@ -5137,7 +5137,7 @@ export const shockApproachBoundaryExample = { inputs: { nominal_v_ac: "151-750 V
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 function _v186renderShockApproachBoundary(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: NFPA 70E-2024 Table 130.4 (AC shock approach boundaries) - limited approach (movable vs fixed) and restricted approach by nominal voltage. Shock boundaries only; the arc-flash boundary is separate. The employer's electrical safety program and 70E govern. Free at nfpa.org/freeaccess.";
+  citationEl.textContent = "Citation: NFPA 70E-2024 Table 130.4 (AC shock approach boundaries; 70E-2027 is now current, values not yet re-checked against it) - limited approach (movable vs fixed) and restricted approach by nominal voltage. Shock boundaries only; the arc-flash boundary is separate. The employer's electrical safety program and 70E govern. Free at nfpa.org/freeaccess.";
   const band = makeSelect("Nominal voltage (phase-to-phase, AC)", "sab-band", [
     { value: "<50 V", label: "<50 V" },
     { value: "50-150 V", label: "50-150 V" },
