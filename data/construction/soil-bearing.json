@@ -1,7 +1,8 @@
 {
-  "source": "U.S. Geological Survey soil engineering references and IBC Table 1806.2 mirrored values; soil-class allowable bearing pressures.",
+  "source": "IBC Table 1806.2 presumptive load-bearing values (identical in IBC 2021 and IBC 2027); soil-class allowable bearing pressures.",
   "allowable_psf": {
-    "rock": 12000,
+    "rock": 4000,
+    "crystalline_bedrock": 12000,
     "sandy_gravel": 3000,
     "sand": 2000,
     "silty_sand": 2000,

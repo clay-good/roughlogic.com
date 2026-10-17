@@ -1285,7 +1285,7 @@ export function renderJoistDeflection(inputRegion, outputRegion, citationEl) {
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderFootingArea(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: per IRC 2021 §R401-R403 (foundations); allowable soil-bearing values per IBC 2021 Table 1806.2. required_area = load / allowable_bearing. AHJ governs. Free at codes.iccsafe.org.";
+  citationEl.textContent = "Citation: per IRC 2021 §R401-R403 (foundations); allowable soil-bearing values per IBC 2027 Table 1806.2 (identical to 2021). required_area = load / allowable_bearing. AHJ governs. Free at codes.iccsafe.org.";
   const P = makeNumber("Column load (lb)", "fa-p", { step: "any", min: "0" });
   const soil = makeSelect("Soil class", "fa-s", Object.keys(SOIL_BEARING_PSF).map((k) => ({ value: k, label: k === "rock" ? "sedimentary or foliated rock" : k.replace(/_/g, " ") })));
   // v23 EN.10: optional applied moment for the eccentric bearing-pressure check.
@@ -4960,7 +4960,7 @@ export function computeStairCodeCheck({ occupancy = "commercial", riser_height_i
     return { error: "Riser, tread, and width must be non-negative (in)." };
   }
   const isCommercial = occupancy === "commercial";
-  // IBC 2021 §1011.5.2 / §1011.2 (commercial) vs IRC 2021 R311.7.5 / R311.7.1 (residential).
+  // IBC 2027 §1011.5.2 / §1011.2 (commercial) vs IRC 2024 R318.7.5 / R318.7.1 (residential).
   const max_riser = isCommercial ? 7.0 : 7.75;
   const min_riser = isCommercial ? 4.0 : 0;
   const min_tread = isCommercial ? 11.0 : 10.0;
@@ -4977,12 +4977,12 @@ export function computeStairCodeCheck({ occupancy = "commercial", riser_height_i
   const all_pass = riser_ok && tread_ok && width_ok;
   return {
     max_riser, min_riser, min_tread, min_width, riser_ok, tread_ok, width_ok, two_r_plus_t, comfort_ok, all_pass,
-    note: "Dimensional stair limits for the selected occupancy: IBC 2021 §1011.5.2 caps the commercial riser at 7 in (4 in minimum) and floors the tread at 11 in, with §1011.2 requiring 44 in of width (36 in where the occupant load is under 50); IRC 2024 R318.7.5 [R311.7.5 in IRC 2021] allows a 7-3/4 in residential riser and a 10 in tread at 36 in of width (R318.7.1 [R311.7.1 in IRC 2021]). The tread is the horizontal run excluding the nosing. 2R + T between 24 and 25 in is a design comfort rule of thumb, not a code pass/fail. The 3/8 in riser/tread uniformity limit over a flight, the nosing profile, the landings, and winder/spiral geometry are separate checks; the egress width the occupant load requires is the egress-capacity tile. A design aid, not a code-official determination; the AHJ and the adopted code and edition govern.",
+    note: "Dimensional stair limits for the selected occupancy: IBC 2027 §1011.5.2 (unchanged from 2021) caps the commercial riser at 7 in (4 in minimum) and floors the tread at 11 in, with §1011.2 requiring 44 in of width (36 in where the occupant load is under 50); IRC 2024 R318.7.5 [R311.7.5 in IRC 2021] allows a 7-3/4 in residential riser and a 10 in tread at 36 in of width (R318.7.1 [R311.7.1 in IRC 2021]). The tread is the horizontal run excluding the nosing. 2R + T between 24 and 25 in is a design comfort rule of thumb, not a code pass/fail. The 3/8 in riser/tread uniformity limit over a flight, the nosing profile, the landings, and winder/spiral geometry are separate checks; the egress width the occupant load requires is the egress-capacity tile. A design aid, not a code-official determination; the AHJ and the adopted code and edition govern.",
   };
 }
 export const stairCodeCheckExample = { inputs: { occupancy: "commercial", riser_height_in: 7, tread_depth_in: 11, stair_width_in: 44 } };
 const renderStairCodeCheck = _simpleRenderer({
-  citation: "Citation: IBC 2021 §1011.5.2 (commercial riser 4-7 in, tread 11 in min) / §1011.2 (44 in width, 36 in where occupant load under 50) and IRC 2024 R318.7.5 [R311.7.5 in IRC 2021] (residential riser 7-3/4 in max, tread 10 in min) / R318.7.1 [R311.7.1 in IRC 2021] (36 in width), by section. 2R + T of 24-25 in is a comfort rule of thumb, not code. Uniformity, nosing, landings, and winders are separate checks; the AHJ governs. Free at codes.iccsafe.org.",
+  citation: "Citation: IBC 2027 §1011.5.2 (unchanged from 2021) (commercial riser 4-7 in, tread 11 in min) / §1011.2 (44 in width, 36 in where occupant load under 50) and IRC 2024 R318.7.5 [R311.7.5 in IRC 2021] (residential riser 7-3/4 in max, tread 10 in min) / R318.7.1 [R311.7.1 in IRC 2021] (36 in width), by section. 2R + T of 24-25 in is a comfort rule of thumb, not code. Uniformity, nosing, landings, and winders are separate checks; the AHJ governs. Free at codes.iccsafe.org.",
   example: stairCodeCheckExample.inputs,
   fields: [
     { key: "occupancy", label: "Occupancy / code", kind: "select", options: [{ value: "commercial", label: "Commercial (IBC)" }, { value: "residential", label: "Residential (IRC)" }] },
@@ -5824,7 +5824,7 @@ function _renderEgressCapacity(inputRegion, outputRegion, citationEl) {
 }
 CONSTRUCTION_RENDERERS["egress-capacity"] = _renderEgressCapacity;
 
-// ----- spec-v244: Required Plumbing Fixture Count by Occupancy (IBC 2021 §2902 / Table 2902.1) -----
+// ----- spec-v244: Required Plumbing Fixture Count by Occupancy (IBC 2027 §2902 / Table 2902.1.1; Table 2902.1 in 2021) -----
 
 // dims: in { occupant_load: dimensionless, wc_ratio: dimensionless, wc_ratio_over: dimensionless, wc_tier: dimensionless, lav_ratio: dimensionless, lav_ratio_over: dimensionless, lav_tier: dimensionless, fountain_ratio: dimensionless, distribution: dimensionless } out: { wc_total: dimensionless, lav_total: dimensionless, fountains: dimensionless, service_sinks: dimensionless }
 export function computePlumbingFixtureCount({ occupant_load = 0, wc_ratio = 25, wc_ratio_over = 50, wc_tier = 50, lav_ratio = 40, lav_ratio_over = 0, lav_tier = 0, fountain_ratio = 100, distribution = 0.5 } = {}) {
@@ -5867,7 +5867,7 @@ export const plumbingFixtureCountExample = {
 };
 
 const _renderPlumbingFixtureCount = _simpleRenderer({
-  citation: "Citation: IBC 2021 §2902 and Table 2902.1 (mirrored in IPC Table 403.1): fixtures = ceil(occupants-per-sex / ratio), each rounded up per §2902.1.1; the load splits evenly between two sexes unless a distribution override is given. Representative ratios: business water closet 1:25 first-50 then 1:50, lavatory 1:40 first-80 then 1:80; restaurant (A-2) water closet 1:75, lavatory 1:200; drinking fountain 1:100 business / 1:500 assembly; service sink minimum 1. The ratios, net-vs-gross basis, even-split assumption, and any single-user/family-restroom reductions come from the AHJ-adopted code edition and the actual occupancy. A design aid, not a code-official determination.",
+  citation: "Citation: IBC 2027 §2902 and Table 2902.1.1 [Table 2902.1 in IBC 2021] (mirrored in IPC 2027 Table 403.1.1 [403.1 in IPC 2021]): fixtures = ceil(occupants-per-sex / ratio), each rounded up, with the load divided in half between the sexes (§2902.1.1) unless a distribution override is given. The representative ratios below are identical in the 2021 and 2027 tables. Representative ratios: business water closet 1:25 first-50 then 1:50, lavatory 1:40 first-80 then 1:80; restaurant (A-2) water closet 1:75, lavatory 1:200; drinking fountain 1:100 business / 1:500 assembly; service sink minimum 1. The ratios, net-vs-gross basis, even-split assumption, and any single-user/family-restroom reductions come from the AHJ-adopted code edition and the actual occupancy. A design aid, not a code-official determination.",
   example: plumbingFixtureCountExample.inputs,
   fields: [
     { key: "occupant_load", label: "Occupant load (persons)", kind: "number" },
@@ -6657,7 +6657,7 @@ export const egressTravelDistanceExample = {
 };
 
 const _renderEgressTravelDistance = _simpleRenderer({
-  citation: "Citation: IBC 2021 §1017 / Table 1017.2 (maximum exit-access travel distance), §1006.2.1 / Table 1006.2.1 (common path of egress travel), §1020.5 (dead-end corridor). Defaults are a sprinklered Group B floor (travel 300 ft, common path 100 ft, dead-end 50 ft). Each limit depends on the occupancy group and whether the building is sprinklered per §903.3.1.1; travel distance is measured along the natural path of travel around obstructions, not in a straight line; common-path and dead-end limits tighten for higher-hazard uses and above the §1006.2.1 occupant-load thresholds. A design aid, not a code-official determination.",
+  citation: "Citation: IBC 2027 §1017 (limits and numbers unchanged from 2021) / Table 1017.2 (maximum exit-access travel distance), §1006.2.1 / Table 1006.2.1 (common path of egress travel), §1020.5 (dead-end corridor). Defaults are a sprinklered Group B floor (travel 300 ft, common path 100 ft, dead-end 50 ft). Each limit depends on the occupancy group and whether the building is sprinklered per §903.3.1.1; travel distance is measured along the natural path of travel around obstructions, not in a straight line; common-path and dead-end limits tighten for higher-hazard uses and above the §1006.2.1 occupant-load thresholds. A design aid, not a code-official determination.",
   example: egressTravelDistanceExample.inputs,
   fields: [
     { key: "travel_ft", label: "Measured travel distance (ft)", kind: "number" },

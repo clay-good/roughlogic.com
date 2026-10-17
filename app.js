@@ -87,7 +87,7 @@ const TOOL_DATA_SOURCES = {
   "equivalent-length": { folder: "hvac", shard: "equivalent-lengths.json", label: "Fitting equivalent lengths" },
   "insulation-thickness": { folder: "hvac", shard: "insulation.json", label: "Insulation conductivity references" },
   "thermal-delta-t": { folder: "summaries", shard: "v2-references.json", label: "Thermal imager delta-T reference (original summaries)" },
-  "footing-area": { folder: "construction", shard: "soil-bearing.json", label: "Soil bearing capacities (USGS-derived)" },
+  "footing-area": { folder: "construction", shard: "soil-bearing.json", label: "Soil bearing capacities (IBC Table 1806.2)" },
   "wind-pressure": { folder: "construction", shard: "wind-snow-zones.json", label: "Wind / snow design data (NOAA / public ASCE 7 formula)" },
   "snow-load": { folder: "construction", shard: "wind-snow-zones.json", label: "Wind / snow design data (NOAA / public ASCE 7 formula)" },
   "mileage-cost": { folder: "crosswalks", shard: "irs-mileage.json", label: "IRS standard mileage rate" },

@@ -777,9 +777,13 @@ const SPAN_DERIVATIONS = {
 
 // Construction v2: soil bearing capacities (USGS-derived).
 const SOIL_BEARING = {
-  source: "U.S. Geological Survey soil engineering references and IBC Table 1806.2 mirrored values; soil-class allowable bearing pressures.",
+  source: "IBC Table 1806.2 presumptive load-bearing values (identical in IBC 2021 and IBC 2027); soil-class allowable bearing pressures.",
+  // "rock" is the table's sedimentary and foliated rock row; only crystalline
+  // bedrock takes 12,000 psf. Matches SOIL_BEARING_PSF in calc-construction.js,
+  // which was corrected 2026-10-03; this shard kept 12,000 for "rock" until 2026-10-17.
   allowable_psf: {
-    rock: 12000,
+    rock: 4000,
+    crystalline_bedrock: 12000,
     sandy_gravel: 3000,
     sand: 2000,
     silty_sand: 2000,

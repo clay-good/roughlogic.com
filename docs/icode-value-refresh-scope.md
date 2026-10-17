@@ -1,6 +1,6 @@
 # Scope: moving I-code values off the 2021 editions
 
-> Scoping report, 2026-10-17. Nothing here has been changed in the calculators; every I-code tile still bundles 2021 values and says so (status `disclosed-lag` in [citation-freshness-ledger.md](citation-freshness-ledger.md)).
+> Scoping report, 2026-10-17. The Progress table below records what has landed since; tiles not listed there still bundle 2021 values and say so (status `disclosed-lag` in [citation-freshness-ledger.md](citation-freshness-ledger.md)).
 
 ## Bottom line
 
@@ -40,7 +40,8 @@ Tile lists per code are reproducible with the scan described under "Method".
 | IPC supply (Tables 308.5, 604.3, 608.16.1, E103.3(3); 5 tiles) | Landed 2026-10-17. Every value identical. Table 403.1 is not bundled (`plumbing-fixture-count` takes the ratios as inputs) and goes with the IBC slice. |
 | IBC Chapter 10 egress (Tables 1004.4, 1006.2.1, 1006.3.2, 1006.3.3(2), 1017.2; sections 1005.3, 1008, 1010, 1011, 1012, 1015, 1020; 7 tiles) | Landed 2026-10-17. Every bundled value identical; section numbers moved (1004.5 → 1004.4, 1006.3.3 → 1006.3.2, 1006.3.4 → 1006.3.3, 1010.1.1 → 1010.1.1.1, 1008.3.5 → 1008.3.2). Two defects found on the way, neither an edition change: R-4 was given a 10-occupant single-exit limit (the code allows one exit at any load for R-3 and R-4), and the egress-lighting tile lacked the 10 fc stairway level. |
 | IBC Tables 506.3.3 and 705.8 (2 tiles) | Landed 2026-10-17. Values identical. **IBC 2027 deletes Table 506.3.3 footnote a (interpolation)**, so `allowable-area` now defaults to the printed column and offers 2021 / 2024 interpolation as an edition input. Table 705.8 became **705.10** (705.8.x → 705.10.x). Table 506.2 is not bundled (the tile takes At and NS as inputs). |
-| IBC remaining tables (1607.1, 1806.2 shard, 1807, 2113, 2902.1 / IPC 403.1, 3004.3) | Not started. |
+| IBC Tables 1607.1, 1806.2 (shard), 2902.1 / IPC 403.1; §1807.3, §2113.16.1 (5 tiles) | Landed 2026-10-17. Every value identical. Table 2902.1 is **2902.1.1** in IBC 2027 (IPC 403.1 → **403.1.1**); the per-sex split was cited to §2902.2 and is §2902.1.1 in both editions. The `soil-bearing.json` shard still read "rock" 12,000 psf (the compute was fixed to 4,000 on 2026-10-03) and now matches, with a parity test. 3004.3 is cited only as the legacy (through 2018) rule. |
+| **IBC slice complete.** Remaining I-code work: IFGC / IMC (sections only), and IRC 2027 when ICC publishes it (expected February 2027). | |
 
 Read the **current printing** (the site offers to switch from a historical one, e.g. `IRC2024P2` to `IRC2024V2.1`); the first Chapter 3 pass used P2 and the re-read caught the smoke-alarm change.
 

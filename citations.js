@@ -4914,13 +4914,13 @@ export const CITATIONS = {
     ],
   },
   "footing-area": {
-    formula: "Required bearing area A = P / q_allow. Allowable bearing pressure q_allow from IBC 2021 Table 1806.2 keyed to soil class.",
-    edition: IBC_2021 + " Table 1806.2.",
+    formula: "Required bearing area A = P / q_allow. Allowable bearing pressure q_allow from IBC Table 1806.2 keyed to soil class (IBC 2027 Table 1806.2, values and number identical to 2021).",
+    edition: "IBC 2027 Table 1806.2 (identical to IBC 2021 Table 1806.2).",
     freeAccess: ICC_FREE,
     governance: GOVERNANCE.structural,
-    editionNote: IBC_DISCLOSURE,
+    editionNote: "Checked against the IBC 2027 printing on 2026-10-17: Table 1806.2 vertical foundation pressures are unchanged (crystalline bedrock 12,000 psf; sedimentary and foliated rock 4,000; sandy gravel and gravel 3,000; sand, silty sand, clayey sand, silty and clayey gravel 2,000; clays and silts 1,500). The data shard named as this tile's source mapped \"rock\" to 12,000 until the same date; the compute had used 4,000 since 2026-10-03.",
     assumptions: [
-      { name: "Bearing-capacity table", value: "data/construction/soil-bearing.json keyed to soil class (USGS / IBC-mirrored)", source: "IBC 2021 Table 1806.2" },
+      { name: "Bearing-capacity table", value: "data/construction/soil-bearing.json keyed to soil class (IBC Table 1806.2 values)", source: "IBC 2027 Table 1806.2" },
     ],
   },
   "header-sizing": {
@@ -20349,14 +20349,14 @@ export const CITATIONS = {
   },
   "plumbing-fixture-count": {
     formula: "per_sex = ol x distribution; wc(sex) = (wc_tier > 0 and wc_ratio_over > 0) ? ceil(min(per_sex, wc_tier) / wc_ratio) + ceil(max(per_sex - wc_tier, 0) / wc_ratio_over) : ceil(per_sex / wc_ratio); lav(sex) the same form with lav_tier / lav_ratio / lav_ratio_over; fountains = ceil(ol / fountain_ratio); service = 1.",
-    edition: "IBC 2021 §2902 and Table 2902.1 (minimum plumbing fixtures by occupancy, mirrored in IPC Table 403.1) and §2902.1.1 (round each ratio up), by name.",
-    freeAccess: "The fixture-count relation is stated in the published IBC §2902 / Table 2902.1; the arithmetic is public. The ratios are the table values for the occupancy.",
+    edition: "IBC 2027 §2902 and Table 2902.1.1 [Table 2902.1 in IBC 2021] (minimum plumbing fixtures by occupancy, mirrored in IPC 2027 Table 403.1.1 [403.1 in IPC 2021]) and §2902.1.1 (divide the load in half by sex, round each ratio up), by name.",
+    freeAccess: "The fixture-count relation is stated in the published IBC §2902 / Table 2902.1.1 (2902.1 in 2021); the arithmetic is public. The ratios are the table values for the occupancy.",
     governance: GOVERNANCE.general,
-    editionNote: "IBC 2021 §2902 and Table 2902.1: per sex, fixtures = ceil(occupants-per-sex / ratio), each rounded up per §2902.1.1, with two-tier business water-closet and lavatory schedules; drinking fountains and service sinks are counted on the total load. Bundled representative ratios (editable): business water closet 1:25 first-50 then 1:50 and lavatory 1:40 first-80 then 1:80; assembly-restaurant water closet 1:75 and lavatory 1:200; drinking fountain 1:100 business / 1:500 assembly; service sink minimum 1. The ratios, the net-vs-gross basis, the even-sex-split assumption, and any single-user / family-restroom or reduction allowances come from the AHJ-adopted code edition and the actual occupancy; employee and customer loads may be counted separately. A design aid, not a code-official determination.",
+    editionNote: "IBC 2027 §2902 and Table 2902.1.1 [Table 2902.1 in IBC 2021]: per sex, fixtures = ceil(occupants-per-sex / ratio), each rounded up per §2902.1.1, with two-tier business water-closet and lavatory schedules; drinking fountains and service sinks are counted on the total load. Bundled representative ratios (editable): business water closet 1:25 first-50 then 1:50 and lavatory 1:40 first-80 then 1:80; assembly-restaurant water closet 1:75 and lavatory 1:200; drinking fountain 1:100 business / 1:500 assembly; service sink minimum 1. The ratios, the net-vs-gross basis, the even-sex-split assumption, and any single-user / family-restroom or reduction allowances come from the AHJ-adopted code edition and the actual occupancy; employee and customer loads may be counted separately. A design aid, not a code-official determination. Checked in the IBC 2021 and 2027 printings on 2026-10-17: every bundled ratio is identical; the table was renumbered, and 2027 gives ambulatory care its own row (lavatory 1:50, a service sink per floor), which the business defaults do not cover. Until the same date the even split was cited to §2902.2, which is separate facilities in 2021 and toilet facilities in 2027; it is §2902.1.1 in both.",
     assumptions: [
-      { name: "Per sex", value: "the occupant load splits evenly between two sexes (0.5 each) unless a distribution override is supplied", source: "IBC 2021 §2902.2" },
-      { name: "Round up", value: "each fixture ratio rounds up per §2902.1.1, so the 1:25 first tier undercounts on a naive per-50 read", source: "IBC 2021 §2902.1.1" },
-      { name: "Ratio source", value: "the bundled ratios are representative; the occupancy class and the AHJ-adopted edition set the governing ratios", source: "IBC 2021 Table 2902.1" },
+      { name: "Per sex", value: "the occupant load splits evenly between two sexes (0.5 each) unless a distribution override is supplied", source: "IBC 2027 §2902.1.1 (also 2021)" },
+      { name: "Round up", value: "each fixture ratio rounds up per §2902.1.1, so the 1:25 first tier undercounts on a naive per-50 read", source: "IBC 2027 §2902.1.1" },
+      { name: "Ratio source", value: "the bundled ratios are representative; the occupancy class and the AHJ-adopted edition set the governing ratios", source: "IBC 2027 Table 2902.1.1 [2902.1 in IBC 2021]" },
     ],
   },
   "shore-post-load": {

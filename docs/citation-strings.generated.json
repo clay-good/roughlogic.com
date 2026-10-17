@@ -87,7 +87,7 @@
     },
     "footing-area": {
       "group": "calc-construction.js (Group E)",
-      "stamp": "Citation: per IRC 2021 §R401-R403 (foundations); allowable soil-bearing values per IBC 2021 Table 1806.2. required_area = load / allowable_bearing. AHJ governs. Free at codes.iccsafe.org."
+      "stamp": "Citation: per IRC 2021 §R401-R403 (foundations); allowable soil-bearing values per IBC 2027 Table 1806.2 (identical to 2021). required_area = load / allowable_bearing. AHJ governs. Free at codes.iccsafe.org."
     },
     "friction-loss": {
       "group": "calc-plumbing.js (Group B)",

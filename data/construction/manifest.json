@@ -24,7 +24,7 @@
     {
       "file": "soil-bearing.json",
       "name": "Soil bearing capacities",
-      "gzip_size_bytes": 260
+      "gzip_size_bytes": 271
     },
     {
       "file": "wind-snow-zones.json",
@@ -71,7 +71,7 @@
     "lumber-properties.json": "947041f4cb75814aa707ed283fa6dcd65885aec3c69362c004f6c9c80729b015",
     "concrete-mixes.json": "4c302a4012faa2b2e034dc826accbcab49860ed23dc204f68071d70372f5a45f",
     "span-derivations.json": "71a2f3150a4375a1071dea3779d8c36fa7f9818522b8e4ca5df4cc207f845fef",
-    "soil-bearing.json": "7ead0f1a38b8dafdb8c649bde509818f0908e41c0e27a39c2265f52d888610e9",
+    "soil-bearing.json": "a757623cfa441880a29623e8ff73e39fd084427046fd66e6f4608535986de96e",
     "wind-snow-zones.json": "4b7d5d2b3094f721fb8f59625ae96ab4f8d948768800a5b9cdd29715cd99ee9e",
     "aci-211-curves.json": "bb85e0973fb931d12489c2509428985b9495df214430270081f7fe9649f0dbec",
     "bolt-grades.json": "7cc9bd9089798ef9b8308e809850d8c46b4422e612a6d294854157c91a900434",

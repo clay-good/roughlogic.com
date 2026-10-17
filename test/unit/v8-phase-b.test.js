@@ -152,9 +152,9 @@ test("B.5 stair-riser/tread cites IRC 2024 §R318.7 with the 2021 number beside 
   const t = await readCalc("calc-construction.js");
   assertCitationContains(t, ["IRC 2024 §R318.7", "R311.7 in IRC 2021", "codes.iccsafe.org"], "stairs");
 });
-test("B.5 footing-area cites IRC 2021 §R401-R403 + IBC 2021 Table 1806.2", async () => {
+test("B.5 footing-area cites IRC 2021 §R401-R403 + IBC 2027 Table 1806.2", async () => {
   const t = await readCalc("calc-construction.js");
-  assertCitationContains(t, ["IRC 2021 §R401-R403", "IBC 2021 Table 1806.2", "codes.iccsafe.org"], "footing-area");
+  assertCitationContains(t, ["IRC 2021 §R401-R403", "IBC 2027 Table 1806.2", "codes.iccsafe.org"], "footing-area");
 });
 
 // --- Cross-cutting (spec §B.6) ---
