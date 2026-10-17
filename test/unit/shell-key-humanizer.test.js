@@ -6,6 +6,9 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { humanizeKey } from "../../scripts/build-shells.mjs";
+import { readFileSync, readdirSync } from "node:fs";
+import { resolve, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 
 test("a key with a trailing unit reads as a caption", () => {
   assert.equal(humanizeKey("tank_volume_gal"), "Tank volume (gal)");
@@ -142,4 +145,43 @@ test("no mixed-case symbol was swept into the acronym list", () => {
     const v = humanizeKey(k);
     assert.notEqual(v, k.toUpperCase(), `${k} was upper-cased; it is not an unambiguous acronym`);
   }
+});
+
+// A final `min` is minutes or a minimum, and only the key's `// dims:`
+// annotation says which. `idler_hp_min` printed "Idler (hp/min)" and
+// `water_closets_min` "Water closets (min)" -- a horsepower per minute and a
+// count of minutes, where both are minimums. Every annotated `_min` key is held
+// to its annotation: a time (T) reads "(min)"; anything else never does.
+test("a final `min` reads as minutes only where the dims annotation says time", () => {
+  const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
+  // Not judged by the annotation, each for a stated reason.
+  const EXEMPT = new Map([
+    ["speed_ft_min", "annotated dimensionless as filler; it is a speed in ft/min and reads so"],
+    ["typical_contact_min", "a text value (\"10 min\"), never captioned from the key"],
+    ["free_air_l_min", "litres per minute; the single letter l is deliberately not a unit"],
+  ]);
+  const dims = new Map();
+  for (const f of readdirSync(ROOT).filter((n) => /^calc-.*\.js$/.test(n))) {
+    for (const line of readFileSync(resolve(ROOT, f), "utf8").split("\n")) {
+      if (!line.includes("// dims:")) continue;
+      for (const [, k, d] of line.matchAll(/(\w+_min): ([^,}]+)/g)) {
+        if (!dims.has(k)) dims.set(k, new Set());
+        dims.get(k).add(d.trim());
+      }
+    }
+  }
+  assert.ok(dims.size > 150, `only ${dims.size} annotated _min keys found; did the annotation format move?`);
+  const bad = [];
+  for (const [k, ds] of dims) {
+    if (EXEMPT.has(k)) continue;
+    const label = humanizeKey(k) || "";
+    const time = [...ds].every((d) => d === "T");
+    if (time && !/\(min\)/.test(label)) bad.push(`${k} is a time but reads "${label}"`);
+    if (![...ds].some((d) => d === "T") && /\(min\)/.test(label)) bad.push(`${k} [${[...ds].join("|")}] is not a time but reads "${label}"`);
+  }
+  assert.deepEqual(bad, []);
+  assert.equal(humanizeKey("idler_hp_min"), "Idler hp min");
+  assert.equal(humanizeKey("water_closets_min"), "Water closets min");
+  assert.equal(humanizeKey("drain_time_min"), "Drain time (min)");
+  assert.equal(humanizeKey("rate_at_depth_cuft_min"), "Rate at depth (ft³/min)");
 });

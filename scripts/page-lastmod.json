@@ -1122,7 +1122,7 @@
       "date": "2026-10-17"
     },
     "/tools/chamber-gas-volume/": {
-      "sha": "be077f510f6d837f",
+      "sha": "c4fe5963460ac7f7",
       "date": "2026-10-17"
     },
     "/tools/chamber-turnover/": {
@@ -1802,7 +1802,7 @@
       "date": "2026-10-17"
     },
     "/tools/continuous-insulation-ratio/": {
-      "sha": "692f329af935918f",
+      "sha": "e7045d5c7bda8aff",
       "date": "2026-10-17"
     },
     "/tools/continuous-load-ocpd/": {
@@ -2622,7 +2622,7 @@
       "date": "2026-10-17"
     },
     "/tools/egress-lighting-check/": {
-      "sha": "be88063de18d16d9",
+      "sha": "aaca6c38b0433140",
       "date": "2026-10-17"
     },
     "/tools/egress-travel-distance/": {
@@ -4370,7 +4370,7 @@
       "date": "2026-10-17"
     },
     "/tools/lighting-uniformity-ratio/": {
-      "sha": "d8a6a7dc8df4c3d9",
+      "sha": "0693553cdba28259",
       "date": "2026-10-17"
     },
     "/tools/lightning-countdown/": {
@@ -4482,7 +4482,7 @@
       "date": "2026-10-17"
     },
     "/tools/lumber-recovery-overrun/": {
-      "sha": "7259c93e1cb1f61d",
+      "sha": "b2893af5cb10c3f7",
       "date": "2026-10-17"
     },
     "/tools/lumber-spans/": {
@@ -4870,7 +4870,7 @@
       "date": "2026-10-17"
     },
     "/tools/mortar-batch-c270/": {
-      "sha": "0469fb46a5fc1ff4",
+      "sha": "7315bad66244939b",
       "date": "2026-10-17"
     },
     "/tools/mortar-mix/": {
@@ -5710,7 +5710,7 @@
       "date": "2026-10-17"
     },
     "/tools/post-hole-concrete/": {
-      "sha": "22f88878b440ef28",
+      "sha": "5355540d324a49f1",
       "date": "2026-10-17"
     },
     "/tools/post-tension-elongation/": {
@@ -6430,7 +6430,7 @@
       "date": "2026-10-17"
     },
     "/tools/retaining-wall-stability/": {
-      "sha": "fc69112ef96c0a18",
+      "sha": "2e06ceace167000e",
       "date": "2026-10-17"
     },
     "/tools/retrieval-winch-force/": {
@@ -7898,7 +7898,7 @@
       "date": "2026-10-17"
     },
     "/tools/surface-air-consumption/": {
-      "sha": "a46ae3b1c279b395",
+      "sha": "cd6821252bb8c96f",
       "date": "2026-10-17"
     },
     "/tools/surface-condensation-risk/": {
@@ -8490,7 +8490,7 @@
       "date": "2026-10-17"
     },
     "/tools/turnout-frog-lead/": {
-      "sha": "1f4066535c7cbea1",
+      "sha": "ce0932c1177e2039",
       "date": "2026-10-17"
     },
     "/tools/two-proportion-z-test/": {
@@ -8526,7 +8526,7 @@
       "date": "2026-10-17"
     },
     "/tools/umbilical-air-supply/": {
-      "sha": "eed9285b38dfdd8b",
+      "sha": "785bee971c35a312",
       "date": "2026-10-17"
     },
     "/tools/unit-converter/": {

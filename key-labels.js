@@ -56,7 +56,7 @@ const KEY_UNITS = new Map(Object.entries({
   // Metric and cubic-yard areas and volumes, which read "Spoil volume yd3"
   // and "Area m2" on the steps panel. `ug` and `cal` only ever appear as
   // the top of a quotient ("Pel (µg/m³)", "Incident energy (cal/cm²)").
-  yd3: "yd\u00b3", m2: "m\u00b2", m3: "m\u00b3", cm2: "cm\u00b2", cm3: "cm\u00b3", mm2: "mm\u00b2", ug: "\u00b5g", cal: "cal",
+  cuft: "ft\u00b3", yd3: "yd\u00b3", m2: "m\u00b2", m3: "m\u00b3", cm2: "cm\u00b2", cm3: "cm\u00b3", mm2: "mm\u00b2", ug: "\u00b5g", cal: "cal",
 }));
 // Before one of those areas or volumes, a count or a mass is the top of a
 // density, not part of the name: "Cement (bags/yd³)", "Indoor (spores/m³)",
@@ -86,6 +86,16 @@ const KEY_ACRONYMS = new Set([
   // (µg/m³)"); each is a whole underscore token in every key that has it.
   "wll", "udl", "pel", "twa", "lel", "ppfd", "hdd", "cfm"]);
 
+// A final `min` is minutes ("drain_time_min", "speed_ft_min") unless what
+// precedes it cannot be per-minute or names a bound: `idler_hp_min` is the
+// minimum horsepower, `cfm_min` the minimum airflow, `avg_min` the avg/min
+// ratio. A rate unit, an electrical or pressure unit, or one of these words
+// before it means minimum, and the key reads as plain words ("Idler hp min")
+// rather than claiming a unit. Held to the `// dims:` annotations by
+// shell-key-humanizer.test.js.
+const MIN_AFTER_UNITS = new Set(["cfm", "scfm", "acfm", "gpm", "gph", "gpd", "cfh", "mgd", "hp", "kw", "kva", "kvar", "a", "amps", "v", "volts", "w", "psi", "psig", "psia", "psf", "ksi", "f", "c", "ohm", "ohms", "hz", "rpm", "fpm", "fps", "mph", "pct", "percent"]);
+const MIN_AFTER_WORDS = new Set(["max", "avg", "sigma", "q", "angle", "straight", "continuous", "closets", "fixture", "ph", "required", "allowed", "allowable"]);
+
 // Read a machine field name back as English. This claims nothing the key does
 // not already say -- it only spaces the words out and spells the unit -- so it
 // is safe where a real caption is missing. Returns null when the key is too
@@ -93,6 +103,13 @@ const KEY_ACRONYMS = new Set([
 // printing the key itself rather than a worse guess.
 export function humanizeKey(key) {
   const parts = String(key).split("_").filter(Boolean);
+  const n = parts.length;
+  if (n >= 2 && parts[n - 1] === "min" && (MIN_AFTER_UNITS.has(parts[n - 2].toLowerCase()) || MIN_AFTER_WORDS.has(parts[n - 2].toLowerCase()))) {
+    const head = humanizeKey(parts.slice(0, -1).join("_"));
+    if (head) return head.replace(/ \(([^)]+)\)$/, " $1") + " min";
+    const raw = parts.slice(0, -1).join(" ");
+    return (raw === raw.toLowerCase() ? raw.charAt(0).toUpperCase() + raw.slice(1) : raw) + " min";
+  }
   // An acronym is an acronym whether or not it has company. The one-word path
   // below title-cases, so `afci` came out "Afci" and `scfm` came out "Scfm" on
   // the two pages that print them as labels -- and `vslr` and `wsfu` did the
