@@ -94,6 +94,8 @@ const IMC_2021 = "IMC 2021 (International Mechanical Code).";
 // Plumbing / gas common phrasing (Group B audit, priority 2 per spec §6).
 const IPC_2021 = "IPC 2021 (International Plumbing Code).";
 const IFGC_2021 = "IFGC 2021 (International Fuel Gas Code) / NFPA 54.";
+const IFGC_2027 = "IFGC 2027 (International Fuel Gas Code) / NFPA 54.";
+const IFGC_CHECKED = " Checked against the IFGC 2027 printing on 2026-10-17: Sections 304.5 / 304.5.3 / 304.6 (50 ft^3 per 1,000 Btu/h; 1 in^2 per 1,000 Btu/h indoor, 100 in^2 minimum; 1 in^2 per 4,000 / 2,000 / 3,000 Btu/h outdoor), 402.2, Equation 4-1 and the Table 402.4 Cr factors (0.6094 natural gas, 1.2462 propane), 406.4.1 (1.5 x working pressure, 3 psig minimum), 406.4.2 (10 minutes minimum) and 411.1.3.1 (6 ft connectors) are unchanged from 2021, with the same section numbers.";
 const ICC_FREE = "Free read-only access at codes.iccsafe.org.";
 const NFPA54_FREE = "Free read-only access at nfpa.org/freeaccess.";
 const IPC_DISCLOSURE = "Editions available: bundled values follow IPC 2021. IPC 2027 is the current published edition and 2024 preceded it; jurisdictions on IPC 2018, 2021, 2024 or 2027 differ in fixture-unit values and vent-sizing tables; verify the edition adopted by your AHJ. UPC-jurisdictions (CA, IN, MA, NV, parts of NJ) use the Uniform Plumbing Code instead.";
@@ -2887,17 +2889,17 @@ export const CITATIONS = {
   },
 
   "hood-exhaust": {
-    formula: "Type I: Q = duty_multiplier * L. Wall-canopy duty multipliers (light 200, medium 300, heavy 400, extra-heavy 550 cfm/ft) per IMC 2021 §507.5.1-507.5.4. Single-island canopy (400 / 500 / 600 / 700). Double-island (250 / 300 / 400 / 550). Backshelf / proximity / pass-over (250 / 300 / 400; extra-heavy not allowed). Type II: Q = 100 * L (IMC 507.5.5). Makeup = 0.80 * Q (IMC 508 balance check). Duct area (in^2) = Q / V * 144.",
-    edition: "IMC 2021 §507.5.1-507.5.4 (Type I) and §507.5.5 (Type II). NFPA 96-2024 governs grease-handling exhaust system design.",
+    formula: "Type I: Q = duty_multiplier * L. Wall-canopy duty multipliers (light 200, medium 300, heavy 400, extra-heavy 550 cfm/ft) per IMC 2027 §507.2.10.1-507.2.10.3 (Type I) and §507.3.4.1 (light duty) [§507.5.1-507.5.4 in IMC 2021]. Single-island canopy (400 / 500 / 600 / 700). Double-island (250 / 300 / 400 / 550). Backshelf / proximity / pass-over (250 / 300 / 400; extra-heavy not allowed). Type II: dishwashing Q = 100 * L (IMC 2027 507.3.4.2 [507.5.5 in 2021]); light-duty cooking or food preparation Q = light-duty rate for the hood type * L (IMC 2027 507.3.4.1 [507.5.4 in 2021]). Makeup = 0.80 * Q (IMC 508 balance check). Duct area (in^2) = Q / V * 144.",
+    edition: "IMC 2027 §507.2.10 (Type I) and §507.3.4 (Type II) [§507.5 in IMC 2021; rates unchanged]. NFPA 96-2024 governs grease-handling exhaust system design.",
     freeAccess: "codes.iccsafe.org for IMC TOC; nfpa.org/freeaccess for NFPA 96 TOC.",
     governance: GOVERNANCE.mechanical,
-    editionNote: "Duty multipliers are formula coefficients per the published IMC; not a code-table reproduction. AHJ governs final equipment selection.",
+    editionNote: "Duty multipliers are formula coefficients per the published IMC; not a code-table reproduction. AHJ governs final equipment selection. Checked against the IMC 2027 printing on 2026-10-17: every rate is unchanged from 2021. IMC 2027 moved the capacity rules into the hood sections: Type I (507.2.10) covers medium, heavy and extra-heavy duty, and the light-duty row now sits under Type II hoods (507.3.4.1), which 507.3 requires over light-duty appliances. In 2021 the light-duty rate (507.5.4) already applied to any hood over light-duty appliances, so until 2026-10-17 the tile was wrong under both editions to give every Type II hood the 100 cfm/ft dishwashing rate and say the code set no other.",
     assumptions: [
-      { name: "Hood-type x duty matrix", value: "wall-canopy / single-island / double-island / backshelf / proximity / pass-over, each with light / medium / heavy / extra-heavy multipliers", source: "IMC 2021 §507.5.1-507.5.4" },
-      { name: "Type II rate", value: "100 cfm per linear foot for Type II hoods over dishwashing appliances; the code sets no rate for other Type II hoods", source: "IMC 2021 §507.5.5" },
-      { name: "Makeup air", value: "80% of exhaust as a balance-check rule of thumb; AHJ governs final balance", source: "IMC 2021 §508" },
+      { name: "Hood-type x duty matrix", value: "wall-canopy / single-island / double-island / backshelf / proximity / pass-over, each with light / medium / heavy / extra-heavy multipliers", source: "IMC 2027 §507.2.10 / 507.3.4.1 [507.5.1-507.5.4 in 2021]" },
+      { name: "Type II rate", value: "100 cfm per linear foot over dishwashing appliances; the light-duty rate for the hood type over light-duty cooking or food preparation", source: "IMC 2027 §507.3.4.2 / 507.3.4.1 [507.5.5 / 507.5.4 in 2021]" },
+      { name: "Makeup air", value: "80% of exhaust as a balance-check rule of thumb; AHJ governs final balance", source: "IMC 2027 §508" },
       { name: "Duct velocity range", value: "Type I grease-duct velocity 500-2000 fpm to keep grease suspended", source: "NFPA 96-2024 §8.2.1.1" },
-      { name: "Grease-duct slope", value: "1/4 in per ft minimum slope back to the hood", source: "IMC 2021 §506.3" },
+      { name: "Grease-duct slope", value: "1/4 in per ft minimum slope back to the hood", source: "IMC 2027 §506.3.7 (also 2021)" },
     ],
   },
 
@@ -3909,14 +3911,14 @@ export const CITATIONS = {
     ],
   },
   "gas-pipe-sizing": {
-    formula: "IFGC Equation 4-1 (low pressure, under 1.5 psi), D = Q^0.381 / (19.17 (dH / (Cr L))^0.206), solved for Q -- the relation Tables 402.4(1)-(36) are generated from -- sizing a SINGLE run of the entered length: it picks the smallest listed diameter whose capacity meets the load. Cr 0.6094 natural gas, 1.2462 undiluted propane. This is a single-segment estimate, NOT the full IFGC 2021 Section 402.4 / Tables 402.4(1)-(36) longest-length network method; a multi-branch system is sized on the single longest run to the most remote appliance, which the AHJ and the tables govern.",
-    edition: IFGC_2021 + " Section 402.4 and capacity tables.",
+    formula: "IFGC Equation 4-1 (low pressure, under 1.5 psi), D = Q^0.381 / (19.17 (dH / (Cr L))^0.206), solved for Q -- the relation Tables 402.4(1)-(36) are generated from -- sizing a SINGLE run of the entered length: it picks the smallest listed diameter whose capacity meets the load. Cr 0.6094 natural gas, 1.2462 undiluted propane. This is a single-segment estimate, NOT the full IFGC 2027 Section 402.4 / Tables 402.4(1)-(36) longest-length network method; a multi-branch system is sized on the single longest run to the most remote appliance, which the AHJ and the tables govern.",
+    edition: IFGC_2027 + " Section 402.4 and capacity tables.",
     freeAccess: ICC_FREE + " NFPA 54: " + NFPA54_FREE,
     governance: GOVERNANCE.plumbing,
-    editionNote: IFGC_DISCLOSURE,
+    editionNote: IFGC_DISCLOSURE + IFGC_CHECKED,
     assumptions: [
-      { name: "Pressure-drop allowance", value: "0.5 in WC (low-pressure) / 1.0 psig (medium-pressure) unless user supplies", source: "IFGC 2021 Section 402.3" },
-      { name: "Gas factor Cr", value: "0.6094 natural gas (SG 0.60) / 1.2462 undiluted propane (SG 1.52)", source: "IFGC 2021 Table 402.4" },
+      { name: "Pressure-drop allowance", value: "0.5 in WC (low-pressure) / 1.0 psig (medium-pressure) unless user supplies", source: "IFGC 2027 Section 402.3" },
+      { name: "Gas factor Cr", value: "0.6094 natural gas (SG 0.60) / 1.2462 undiluted propane (SG 1.52)", source: "IFGC 2027 Table 402.4" },
     ],
   },
   "slope": {
@@ -4264,13 +4266,13 @@ export const CITATIONS = {
     ],
   },
   "hydrostatic-test": {
-    formula: "Test pressure: at least the working pressure for water systems (IPC 2021 Section 312.5; 1.5x is common engineering practice, not an IPC rule), and at least 1.5x the maximum working pressure but not less than 3 psig for fuel-gas systems (IFGC 2021 Section 406.4.1); recommended hold time scales with system volume.",
-    edition: IPC_2021 + " Section 312; " + IFGC_2021 + " Section 406.4.",
+    formula: "Test pressure: at least the working pressure for water systems (IPC 2021 Section 312.5; 1.5x is common engineering practice, not an IPC rule), and at least 1.5x the maximum working pressure but not less than 3 psig for fuel-gas systems (IFGC 2027 Section 406.4.1); recommended hold time scales with system volume.",
+    edition: IPC_2021 + " Section 312; " + IFGC_2027 + " Section 406.4.",
     freeAccess: ICC_FREE,
     governance: GOVERNANCE.plumbing,
-    editionNote: IPC_DISCLOSURE + " " + IFGC_DISCLOSURE,
+    editionNote: IPC_DISCLOSURE + " " + IFGC_DISCLOSURE + IFGC_CHECKED,
     assumptions: [
-      { name: "Default hold time", value: "≥ 15 min for plumbing tests; ≥ 10 min for fuel-gas tests", source: "IPC 2021 Section 312.5 / IFGC 2021 Section 406.4.2" },
+      { name: "Default hold time", value: "≥ 15 min for plumbing tests; ≥ 10 min for fuel-gas tests", source: "IPC 2021 Section 312.5 / IFGC 2027 Section 406.4.2" },
     ],
   },
   "grease-trap": {
@@ -4573,23 +4575,23 @@ export const CITATIONS = {
     ],
   },
   "combustion-air": {
-    formula: "Required combustion-air opening per IFGC 2021 §304 (standard method): 1 sq inch per 4000 BTU/hr for outdoor air (two openings), and the larger 1 sq inch per 1000 BTU/hr for indoor communicating air.",
-    edition: IFGC_2021 + " §304.",
+    formula: "Required combustion-air opening per IFGC 2027 §304 (standard method): 1 sq inch per 4000 BTU/hr for outdoor air (two openings), and the larger 1 sq inch per 1000 BTU/hr for indoor communicating air.",
+    edition: IFGC_2027 + " §304.",
     freeAccess: ICC_FREE,
     governance: GOVERNANCE.mechanical,
-    editionNote: IFGC_DISCLOSURE,
+    editionNote: IFGC_DISCLOSURE + IFGC_CHECKED,
     assumptions: [
-      { name: "Standard method", value: "IFGC §304.5; the known-air-infiltration-rate method (§304.5.2) is not applied unless user supplies; outdoor openings are §304.6", source: "IFGC 2021" },
+      { name: "Standard method", value: "IFGC §304.5; the known-air-infiltration-rate method (§304.5.2) is not applied unless user supplies; outdoor openings are §304.6", source: "IFGC 2027" },
     ],
   },
   "combustion-air-max-input": {
-    formula: "Standard volume method solved for input (inverse of combustion-air): max appliance BTU/hr = (room_volume_ft3 / 50) * 1000, since IFGC 2021 §304.5 treats a space as adequate at 50 ft^3 per 1000 BTU/hr.",
-    edition: IFGC_2021 + " §304.",
+    formula: "Standard volume method solved for input (inverse of combustion-air): max appliance BTU/hr = (room_volume_ft3 / 50) * 1000, since IFGC 2027 §304.5 treats a space as adequate at 50 ft^3 per 1000 BTU/hr.",
+    edition: IFGC_2027 + " §304.",
     freeAccess: ICC_FREE,
     governance: GOVERNANCE.mechanical,
-    editionNote: IFGC_DISCLOSURE,
+    editionNote: IFGC_DISCLOSURE + IFGC_CHECKED,
     assumptions: [
-      { name: "Standard method", value: "IFGC §304.5 volume rule; above the returned input the space is confined and needs openings, or use the known-air-infiltration-rate method (§304.5.2), or outdoor openings (§304.6)", source: "IFGC 2021" },
+      { name: "Standard method", value: "IFGC §304.5 volume rule; above the returned input the space is confined and needs openings, or use the known-air-infiltration-rate method (§304.5.2), or outdoor openings (§304.6)", source: "IFGC 2027" },
     ],
   },
   "compare-refrigerants": {
@@ -9661,13 +9663,13 @@ export const CITATIONS = {
   },
   "gas-appliance-demand": {
     formula: "total_btuh = sum(appliance input ratings); cfh = total_btuh / heating_value. Default heating values: 1,000 BTU/ft^3 natural gas, 2,516 BTU/ft^3 propane (editable).",
-    edition: "IFGC 2021 Section 402 (402.2 connected load) and NFPA 54 (National Fuel Gas Code) by name; first-principles energy-to-volume conversion.",
-    freeAccess: "IFGC 2021 free read-only at codes.iccsafe.org; NFPA 54 free read-only at nfpa.org/freeaccess. Heating values are public physical data.",
+    edition: "IFGC 2027 Section 402 (402.2 connected load) and NFPA 54 (National Fuel Gas Code) by name; first-principles energy-to-volume conversion.",
+    freeAccess: "IFGC 2027 free read-only at codes.iccsafe.org; NFPA 54 free read-only at nfpa.org/freeaccess. Heating values are public physical data.",
     governance: GOVERNANCE.general,
-    editionNote: "Fuel-gas piping is sized for the full connected load (no diversity) unless the AHJ accepts a demand factor (IFGC 402.2). The default heating values are editable; propane delivers more energy per cubic foot, so the same BTU load is fewer CFH.",
+    editionNote: "Fuel-gas piping is sized for the full connected load (no diversity) unless the AHJ accepts a demand factor (IFGC 402.2). The default heating values are editable; propane delivers more energy per cubic foot, so the same BTU load is fewer CFH." + IFGC_CHECKED,
     assumptions: [
       { name: "Heating value", value: "1,000 BTU/ft^3 natural gas, 2,516 BTU/ft^3 propane (editable)", source: "IFGC / NFPA 54 standard values" },
-      { name: "Full connected load", value: "no diversity unless an approved demand factor applies", source: "IFGC 2021 Section 402.2" },
+      { name: "Full connected load", value: "no diversity unless an approved demand factor applies", source: "IFGC 2027 Section 402.2" },
     ],
   },
   "tpr-discharge": {
@@ -15965,17 +15967,17 @@ export const CITATIONS = {
     ],
   },
   "gas-appliance-connection": {
-    formula: "shutoff passes when it is in the same room, within 6 ft of the appliance, and upstream of the union or connector; a sediment trap is required unless the appliance type is excepted or a trap is incorporated in the appliance; connector length limit is 6 ft for every appliance (IFGC 2021; earlier editions gave 3 ft except ranges and dryers).",
+    formula: "shutoff passes when it is in the same room, within 6 ft of the appliance, and upstream of the union or connector; a sediment trap is required unless the appliance type is excepted or a trap is incorporated in the appliance; connector length limit is 6 ft for every appliance (IFGC 2021 and 2027; earlier editions gave 3 ft except ranges and dryers).",
     edition: "IFGC 409.5.1 (appliance shutoff valve location, and the allowance treating a shutoff behind a movable appliance as accessible), IFGC 408.4 (sediment trap, with its exception list), and IFGC 411.1.3.1 (maximum connector length).",
     freeAccess: "All three are short prescriptive sentences reproduced in municipal adoptions and inspection checklists. No table is reproduced.",
     governance: GOVERNANCE.general,
-    editionNote: "Three separate sections govern the last three feet of gas piping, and the useful observation is that one category cuts across all of them. Ranges and domestic clothes dryers are on 408.4\'s sediment-trap exception list and are the appliances 409.5.1 has in mind when it deems a shutoff installed behind them to be accessible. The code has a coherent idea of a MOVABLE appliance - one that gets pulled out to clean behind - and once that is visible both answers follow from the category. The tile demonstrates it directly: the same installation that fails as a furnace, on a missing trap, passes as a dryer. The 2021 connector limit is 6 ft for every appliance (411.1.3.1); earlier editions allowed 3 ft except for ranges and dryers. Two details are worth stating rather than assuming. The shutoff must be UPSTREAM of the union, connector, or quick-disconnect it serves, because a valve downstream of the connector cannot isolate the connector - which is the component most likely to fail and the one most likely to be replaced. And a sediment trap has to be DOWNSTREAM of the shutoff: a drip leg on the wrong side protects nothing once the valve is closed for service, and it is a common field error that looks right in a photograph. 408.4 also applies only where a trap is not already incorporated as part of the appliance, so a built-in trap satisfies it. Not checked: whether the connector is listed and of an approved type; connectors passing through walls, floors, ceilings, or partitions, which is prohibited; reuse of an old connector, which is not permitted; the size and pressure of the piping feeding the valve; appliance clearances, venting, and combustion air; CSST bonding; leak testing; and whether the appliance is approved for the fuel and the altitude. A screen; the adopted code, the appliance listing, and the AHJ govern.",
+    editionNote: "Three separate sections govern the last three feet of gas piping, and the useful observation is that one category cuts across all of them. Ranges and domestic clothes dryers are on 408.4\'s sediment-trap exception list and are the appliances 409.5.1 has in mind when it deems a shutoff installed behind them to be accessible. The code has a coherent idea of a MOVABLE appliance - one that gets pulled out to clean behind - and once that is visible both answers follow from the category. The tile demonstrates it directly: the same installation that fails as a furnace, on a missing trap, passes as a dryer. The 2021 connector limit is 6 ft for every appliance (411.1.3.1); earlier editions allowed 3 ft except for ranges and dryers. Two details are worth stating rather than assuming. The shutoff must be UPSTREAM of the union, connector, or quick-disconnect it serves, because a valve downstream of the connector cannot isolate the connector - which is the component most likely to fail and the one most likely to be replaced. And a sediment trap has to be DOWNSTREAM of the shutoff: a drip leg on the wrong side protects nothing once the valve is closed for service, and it is a common field error that looks right in a photograph. 408.4 also applies only where a trap is not already incorporated as part of the appliance, so a built-in trap satisfies it. Not checked: whether the connector is listed and of an approved type; connectors passing through walls, floors, ceilings, or partitions, which is prohibited; reuse of an old connector, which is not permitted; the size and pressure of the piping feeding the valve; appliance clearances, venting, and combustion air; CSST bonding; leak testing; and whether the appliance is approved for the fuel and the altitude. A screen; the adopted code, the appliance listing, and the AHJ govern." + IFGC_CHECKED,
     assumptions: [
       { name: "Shutoff location", value: "same room, within 6 ft, upstream of the union or connector", source: "IFGC 409.5" },
       { name: "Movable-appliance access", value: "a shutoff behind a range or dryer is considered accessible", source: "IFGC 409.5" },
       { name: "Sediment trap", value: "downstream of the shutoff, as close to the inlet as practical", source: "IFGC 408.4" },
       { name: "Trap exceptions", value: "illuminating appliances, ranges, dryers, decorative vented appliances, gas fireplaces, outdoor grills", source: "IFGC 408.4" },
-      { name: "Connector length", value: "6 ft overall for every appliance, one connector per appliance", source: "IFGC 2021 411.1.3.1" },
+      { name: "Connector length", value: "6 ft overall for every appliance, one connector per appliance", source: "IFGC 2027 411.1.3.1" },
       { name: "Not checked", value: "connector listing and routing, reuse, upstream piping, venting, combustion air, CSST bonding, leak test", source: "stated scope limit" },
     ],
   },

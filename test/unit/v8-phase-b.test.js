@@ -83,9 +83,9 @@ test("B.2 pipe-sizing cites its UPC-style WSFU basis against IPC Appendix E, IPC
   const t = await readCalc("calc-plumbing.js");
   assertCitationContains(t, ["Table E103.3(2)", "Table 709.1", "Hunter", "codes.iccsafe.org"], "pipe-sizing");
 });
-test("B.2 gas-pipe-sizing cites IFGC 2021 Table 402.4 (NFPA 54)", async () => {
+test("B.2 gas-pipe-sizing cites IFGC 2027 Table 402.4 (NFPA 54)", async () => {
   const t = await readCalc("calc-gas.js"); // relocated from calc-plumbing.js (spec-v42 split)
-  assertCitationContains(t, ["IFGC 2021 Table 402.4", "NFPA 54", "codes.iccsafe.org"], "gas-pipe-sizing");
+  assertCitationContains(t, ["IFGC 2027 Table 402.4", "NFPA 54", "codes.iccsafe.org"], "gas-pipe-sizing");
 });
 test("B.2 friction-loss cites Hazen-Williams 1905 + IPC 2021", async () => {
   const t = await readCalc("calc-plumbing.js");
@@ -114,9 +114,9 @@ test("B.3 refrigerant-pt cites ASHRAE 15-2022", async () => {
   const t = await readCalc("calc-refrigerant.js"); // spec-v89 relocation
   assertCitationContains(t, ["ASHRAE 15-2022", "ashrae.org"], "refrigerant-pt");
 });
-test("B.3 combustion-air cites IFGC 2021 §304.5 (IMC 701.1 defers gas combustion air to the IFGC)", async () => {
+test("B.3 combustion-air cites IFGC 2027 §304.5 (IMC 701.1 defers gas combustion air to the IFGC)", async () => {
   const t = await readCalc("calc-hvac.js");
-  assertCitationContains(t, ["IFGC 2021 §304.5", "codes.iccsafe.org"], "combustion-air");
+  assertCitationContains(t, ["IFGC 2027 §304.5", "codes.iccsafe.org"], "combustion-air");
 });
 
 // --- Fire (spec §B.4) ---

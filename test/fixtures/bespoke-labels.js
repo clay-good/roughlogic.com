@@ -449,7 +449,7 @@ export const BESPOKE_LABELS = {
   "hiking-time": {"distance":"Horizontal distance","distance_unit":"Distance unit","ascent":"Total ascent (climb)","ascent_unit":"Ascent unit","speed":"Flat pace (per hour, blank = 3 mph or 5 km/h)","factor":"Terrain / fatigue factor"},
   "hip-valley-rafter": {"run_ft":"Building run (ft, half-width)","pitch":"Pitch (rise per 12 in)","pitch_irregular":"Irregular-hip second pitch (optional)","overhang_in":"Overhang (in)","jack_oc_in":"Jack OC (in)"},
   "home-office": {"office_ft2":"Home-office area (ft²)","home_ft2":"Total home area (ft²)","total_home_expenses":"Total home expenses ($/yr)"},
-  "hood-exhaust": {"hood_type":"Type I hood type (ignored for Type II)","hood_class":"Hood class","duty":"Cooking-appliance duty","length_ft":"Hood length (ft)","width_ft":"Hood width (ft; for the record only: both hood types size by length)","duct_velocity_fpm":"Duct velocity (fpm; default 1500)"},
+  "hood-exhaust": {"hood_type":"Hood type (Type I; Type II light-duty)","hood_class":"Hood class","duty":"Cooking-appliance duty","type_ii_use":"Type II hood serves (Type II only)","length_ft":"Hood length (ft)","width_ft":"Hood width (ft; for the record only: both hood types size by length)","duct_velocity_fpm":"Duct velocity (fpm; default 1500)"},
   "horizontal-curve": {"mode":"Definition mode","radius_ft":"Radius R (ft)","degree_of_curve":"Degree of curve D","delta_deg":"Deflection angle delta (deg)","pi_station_ft":"PI station (ft, optional)"},
   "horizontal-sightline-offset": {"mode":"Solve for","R_ft":"Curve radius R to inside-lane CL (ft)","S_ft":"Sight distance S (ft)","M_ft":"Cleared offset M (ft)"},
   "hos-math": {"profile":"Profile","weekly_on_duty_used_hr":"Weekly on-duty already used (hr)"},

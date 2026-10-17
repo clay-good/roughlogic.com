@@ -127,7 +127,7 @@ export function spitzglassFlow({ d_in, dP_in_wc, specific_gravity, L_ft }) {
 export const GAS_RENDERERS = {};
 
 // =====================================================================
-// gas-pipe-sizing (Group B) - IFGC 2021 Table 402.4 (NFPA 54) sizing via
+// gas-pipe-sizing (Group B) - IFGC 2027 Table 402.4 (NFPA 54; identical to 2021) sizing via
 // IFGC Equation 4-1, the low-pressure (< 1.5 psi) relation the tables are
 // generated from: D = Q^0.381 / (19.17 (dH / (Cr L))^0.206), solved for Q.
 // Until 2026-09-18 this tile computed Spitzglass while citing the table and
@@ -179,7 +179,7 @@ export const gasPipeSizingExample = {
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderGasPipeSizing(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: per IFGC 2021 Table 402.4 (NFPA 54), via IFGC Equation 4-1 (low pressure), D = Q^0.381 / (19.17 (dH / (Cr L))^0.206), the relation the tables are built from; Cr 0.6094 natural gas, 1.2462 propane. AHJ governs. Free at codes.iccsafe.org.";
+  citationEl.textContent = "Citation: per IFGC 2027 Table 402.4 (NFPA 54; Equation 4-1 and Cr unchanged from 2021), via IFGC Equation 4-1 (low pressure), D = Q^0.381 / (19.17 (dH / (Cr L))^0.206), the relation the tables are built from; Cr 0.6094 natural gas, 1.2462 propane. AHJ governs. Free at codes.iccsafe.org.";
   const btu = makeNumber("BTU load (BTU/hr)", "gp-btu", { step: "any", min: "0" });
   const length = makeNumber("Pipe length (ft)", "gp-len", { step: "any", min: "0" });
   const dP = makeNumber("Allowable pressure drop (in w.c.)", "gp-dp", { step: "any", min: "0", value: "0.5" });
@@ -707,7 +707,7 @@ export function computeGasApplianceConnection({ appliance = "furnace", shutoff_s
   if (dist < 0) return { error: "Shutoff distance cannot be negative (ft)." };
   if (conn < 0) return { error: "Connector length cannot be negative (ft)." };
 
-  // IFGC 2021 411.1.3.1: "Connectors shall have an overall length not to exceed 6 feet" for every
+  // IFGC 2021 and 2027 411.1.3.1: "Connectors shall have an overall length not to exceed 6 feet" for every
   // appliance. The 3 ft limit with a 6 ft allowance for ranges and dryers is older-edition wording; this
   // tile used it until 2026-09-25, failing 3-6 ft connectors on furnaces, water heaters and boilers.
   const MAX_DIST = 6, CONN_LIMIT = 6;
@@ -745,7 +745,7 @@ export function computeGasApplianceConnection({ appliance = "furnace", shutoff_s
 export const gasApplianceConnectionExample = { inputs: { appliance: "furnace", shutoff_same_room: "yes", shutoff_distance_ft: 4, shutoff_upstream: "yes", trap_present: "no", trap_in_appliance: "no", connector_length_ft: 4 } };
 
 function _v1145renderGasApplianceConnection(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: IFGC 409.5 - the appliance shutoff valve located in the same room as the appliance, within 6 ft of it, and installed upstream of the union, connector, or quick-disconnect device it serves, with shutoff valves serving movable appliances such as cooking appliances and clothes dryers considered accessible where installed behind them. IFGC 408.4 - where a sediment trap is not incorporated as part of the appliance, a sediment trap installed downstream of the appliance shutoff valve as close to the inlet of the appliance as practical, with illuminating appliances, ranges, clothes dryers, decorative vented appliances for installation in vented fireplaces, gas fireplaces, and outdoor grills excepted. IFGC 2021 411.1.3.1 - connectors with an overall length not to exceed 6 ft for every appliance (earlier editions: 3 ft, except range and domestic clothes dryer connectors at 6 ft). Not checked: connector listing and type, connectors passing through building elements, connector reuse, upstream piping size and pressure, clearances, venting, combustion air, CSST bonding, leak testing, or fuel and altitude approval. A screen; the adopted code, the appliance listing, and the AHJ govern.";
+  citationEl.textContent = "Citation: IFGC 409.5 - the appliance shutoff valve located in the same room as the appliance, within 6 ft of it, and installed upstream of the union, connector, or quick-disconnect device it serves, with shutoff valves serving movable appliances such as cooking appliances and clothes dryers considered accessible where installed behind them. IFGC 408.4 - where a sediment trap is not incorporated as part of the appliance, a sediment trap installed downstream of the appliance shutoff valve as close to the inlet of the appliance as practical, with illuminating appliances, ranges, clothes dryers, decorative vented appliances for installation in vented fireplaces, gas fireplaces, and outdoor grills excepted. IFGC 2027 411.1.3.1 (unchanged from 2021) - connectors with an overall length not to exceed 6 ft for every appliance (earlier editions: 3 ft, except range and domestic clothes dryer connectors at 6 ft). Not checked: connector listing and type, connectors passing through building elements, connector reuse, upstream piping size and pressure, clearances, venting, combustion air, CSST bonding, leak testing, or fuel and altitude approval. A screen; the adopted code, the appliance listing, and the AHJ govern.";
   const ap = makeSelect("Appliance", "gac-ap", [
     { value: "furnace", label: "Furnace", selected: true }, { value: "water-heater", label: "Water heater" }, { value: "boiler", label: "Boiler" },
     { value: "range", label: "Range / cooking appliance" }, { value: "dryer", label: "Clothes dryer" }, { value: "illuminating", label: "Illuminating appliance" },

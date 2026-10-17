@@ -43,7 +43,7 @@
     },
     "combustion-air": {
       "group": "calc-hvac.js (Group C)",
-      "stamp": "Citation: per IFGC 2021 §304.5 (indoor, 50 ft^3 per 1000 BTU/hr) and §304.6 (outdoor openings) -- IMC 701.1 defers gas-appliance combustion air to the IFGC. 50 ft^3 per 1000 BTU/hr by volume; outdoor opening 1 in^2 per 4000 BTU/hr or the larger indoor opening 1 in^2 per 1000 BTU/hr. This is the FREE AREA; each opening's smallest dimension must also be at least 3 in (IFGC 304.6 -- a long narrow opening is blocked by leaves and lint), which a free-area figure cannot enforce. AHJ governs. Free at codes.iccsafe.org."
+      "stamp": "Citation: per IFGC 2027 §304.5 (unchanged from 2021; indoor, 50 ft^3 per 1000 BTU/hr) and §304.6 (outdoor openings) -- IMC 701.1 defers gas-appliance combustion air to the IFGC. 50 ft^3 per 1000 BTU/hr by volume; outdoor opening 1 in^2 per 4000 BTU/hr or the larger indoor opening 1 in^2 per 1000 BTU/hr. This is the FREE AREA; each opening's smallest dimension must also be at least 3 in (IFGC 304.6 -- a long narrow opening is blocked by leaves and lint), which a free-area figure cannot enforce. AHJ governs. Free at codes.iccsafe.org."
     },
     "conduit-fill": {
       "group": "calc-electrical.js (Group A)",
@@ -95,7 +95,7 @@
     },
     "gas-pipe-sizing": {
       "group": "calc-plumbing.js (Group B)",
-      "stamp": "Citation: per IFGC 2021 Table 402.4 (NFPA 54), via IFGC Equation 4-1 (low pressure), D = Q^0.381 / (19.17 (dH / (Cr L))^0.206), the relation the tables are built from; Cr 0.6094 natural gas, 1.2462 propane. AHJ governs. Free at codes.iccsafe.org."
+      "stamp": "Citation: per IFGC 2027 Table 402.4 (NFPA 54; Equation 4-1 and Cr unchanged from 2021), via IFGC Equation 4-1 (low pressure), D = Q^0.381 / (19.17 (dH / (Cr L))^0.206), the relation the tables are built from; Cr 0.6094 natural gas, 1.2462 propane. AHJ governs. Free at codes.iccsafe.org."
     },
     "gfci-afci-reference": {
       "group": "calc-electrical.js (Group A)",
@@ -115,7 +115,7 @@
     },
     "hood-exhaust": {
       "group": "calc-electrical.js (Group A)",
-      "stamp": "Citation: Per IMC 2021 §507.5.1-507.5.4 (Type I grease hoods) and §507.5.5 (Type II vapor-only hoods). Duty multipliers (200 / 300 / 400 / 550 cfm/ft for wall-canopy) are formula coefficients per the published IMC. NFPA 96-2024 governs grease-handling exhaust system design. Makeup air per IMC 508. AHJ governs final equipment selection. Free at codes.iccsafe.org for IMC TOC and at nfpa.org/freeaccess for NFPA 96 TOC."
+      "stamp": "Citation: Per IMC 2027 §507.2.10.1-507.2.10.3 (Type I grease hoods; medium, heavy and extra-heavy duty) and §507.3.4.1-507.3.4.2 (Type II hoods: light-duty cooking and food preparation by hood type, dishwashing 100 cfm/ft) [§507.5.1-507.5.5 in IMC 2021; rates unchanged]. Duty multipliers (200 / 300 / 400 / 550 cfm/ft for wall-canopy) are formula coefficients per the published IMC. NFPA 96-2024 governs grease-handling exhaust system design. Makeup air per IMC 508. AHJ governs final equipment selection. Free at codes.iccsafe.org for IMC TOC and at nfpa.org/freeaccess for NFPA 96 TOC."
     },
     "hos-math": {
       "group": "calc-kitchen.js, calc-trucking.js, calc-mechanic.js (Groups O, J, K)",

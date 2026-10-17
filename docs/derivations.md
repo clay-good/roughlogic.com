@@ -2523,7 +2523,7 @@ cross-check.
 | calc-hvac.js | `computeGeothermalLoop` | `{ heating_btu = 0, cooling_btu = 0, soil = "clay", loop_type = "vertical" }` | _ | _ | _ |
 | calc-hvac.js | `computeHeatPumpColdCapacity` | `{ cap_47_btuh = 0, cap_17_btuh = 0, design_temp_f = null, design_load_btuh = ...` | _ | _ | _ |
 | calc-hvac.js | `computeHeatPumpSeasonalEnergy` | `{ seasonal_load_mmbtu = 0, hspf = 0, rate_kwh = 0, afue = 0.95, rate_therm = ...` | _ | _ | _ |
-| calc-hvac.js | `computeHoodExhaust` | `{ hood_type = "wall-canopy", hood_class = "I", duty = "medium", length_ft = 0...` | _ | _ | _ |
+| calc-hvac.js | `computeHoodExhaust` | `{ hood_type = "wall-canopy", hood_class = "I", duty = "medium", type_ii_use =...` | _ | _ | _ |
 | calc-hvac.js | `computeHydronicGpmDeltat` | `{ load = 0, unit_tons = 0, dt_f = 0, factor = 500 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeIndirectEvaporativeCooling` | `{ dry_bulb_F, secondary_wet_bulb_F, effectiveness = 0.65 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeInsulationHeatLoss` | `{ pipe_OD_in = 0, surface_T_F, ambient_T_F, air_velocity_fpm = 0, insulation ...` | _ | _ | _ |

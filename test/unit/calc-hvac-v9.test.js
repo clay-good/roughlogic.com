@@ -119,6 +119,19 @@ test("hood-exhaust: Type II sizes by length alone (IMC 507.5.5, 100 cfm per ft);
   assert.equal(r.Q_exhaust_cfm, 1000);
 });
 
+// IMC 2027 507.3.4.1 (507.5.4 in 2021): a Type II hood over light-duty cooking or food
+// preparation takes the light-duty row by hood type. Until 2026-10-17 every Type II hood got
+// the 100 cfm/ft dishwashing rate.
+test("hood-exhaust: Type II over light-duty cooking takes the light-duty rate by hood type", () => {
+  const wall = computeHoodExhaust({ hood_class: "II", type_ii_use: "light-duty", hood_type: "wall-canopy", length_ft: 10 });
+  assert.equal(wall.cfm_per_ft, 200);
+  assert.equal(wall.Q_exhaust_cfm, 2000);
+  assert.equal(computeHoodExhaust({ hood_class: "II", type_ii_use: "light-duty", hood_type: "single-island", length_ft: 10 }).cfm_per_ft, 400);
+  assert.equal(computeHoodExhaust({ hood_class: "II", type_ii_use: "light-duty", hood_type: "double-island", length_ft: 10 }).cfm_per_ft, 500); // 250 per side
+  assert.equal(computeHoodExhaust({ hood_class: "II", type_ii_use: "dishwashing", length_ft: 10 }).cfm_per_ft, 100);
+  assert.ok(computeHoodExhaust({ hood_class: "II", type_ii_use: "grease", length_ft: 10 }).error);
+});
+
 test("hood-exhaust: length below 4 ft and above 16 ft warned", () => {
   const r1 = computeHoodExhaust({ hood_class: "I", hood_type: "wall-canopy", duty: "medium", length_ft: 3 });
   assert.ok(r1.warnings.some((w) => /below 4 ft/i.test(w)));

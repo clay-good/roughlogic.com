@@ -126,7 +126,7 @@ export function computeCondensateDrain({ tons = 0, pints_per_ton_hr = 3, run_ft 
 }
 export const condensateDrainExample = { inputs: { tons: 3, pints_per_ton_hr: 3, run_ft: 20, slope_in_per_ft: 0.125 } };
 HVACSERVICE_RENDERERS["condensate-drain"] = _simpleRenderer({
-  citation: "Citation: IMC 2021 Table 307.2.2 condensate drain size by capacity (manifolded drains, up to 250 tons; 3/4 in minimum for any drain) and the 307.2.1 not-less-than-1/8-in-per-foot slope (by name); 8 pints per gallon. The per-ton condensate rate is an editable field estimate, not a code value.",
+  citation: "Citation: IMC 2027 Table 307.2.2 (identical to 2021) condensate drain size by capacity (manifolded drains, up to 250 tons; 3/4 in minimum for any drain) and the 307.2.1 not-less-than-1/8-in-per-foot slope (by name); 8 pints per gallon. The per-ton condensate rate is an editable field estimate, not a code value.",
   example: condensateDrainExample.inputs,
   fields: [
     { key: "tons", label: "Cooling capacity (tons)", kind: "number" },

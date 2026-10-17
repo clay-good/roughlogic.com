@@ -70,7 +70,7 @@ test("Group B citations cite IPC / IFGC by section number and edition", () => {
   // Spot-check that the IPC / IFGC editions are named at least once where
   // expected (gas-pipe-sizing must name IFGC; pipe-sizing must name IPC).
   assert.match(CITATIONS["pipe-sizing"].edition, /IPC 2021/);
-  assert.match(CITATIONS["gas-pipe-sizing"].edition, /IFGC 2021/);
+  assert.match(CITATIONS["gas-pipe-sizing"].edition, /IFGC 2027/);
   assert.match(CITATIONS["trap-arm"].edition, /IPC 2021.*Section 909/);
 });
 
@@ -444,7 +444,7 @@ test("Group C Manual J tiles disclose the simplified-estimator caveat", () => {
 test("Group C tiles cite ACCA / ASHRAE / IFGC by edition where relevant", () => {
   assert.match(CITATIONS["manual-j-cooling"].edition, /ACCA Manual J/);
   assert.match(CITATIONS["duct-sizing"].edition, /ACCA Manual D/);
-  assert.match(CITATIONS["combustion-air"].edition, /IFGC 2021/);
+  assert.match(CITATIONS["combustion-air"].edition, /IFGC 2027/);
   assert.match(CITATIONS["outdoor-air-mix"].edition, /ASHRAE 62\.1-2022/);
 });
 

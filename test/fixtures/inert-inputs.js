@@ -56,6 +56,7 @@ export const INERT_INPUTS = {
   "hazard-tree-stump-screen::root_ball_exposed_pct": "moves the answer once another input changes (1,500 randomized settings)",
   "hdd-pullback::rig_rated_pull_lb": "moves the answer once another input changes (1,500 randomized settings)",
   "hearing-protector-nrr::dual_bonus_db": "moves the answer once another input changes (1,500 randomized settings)",
+  "hood-exhaust::type_ii_use": "read only for a Type II hood",
   "housewrap-rolls::overlap_waste_pct": "moves the answer once another input changes (1,500 randomized settings)",
   "hydrostatic-test::system_volume_gal": "moves the answer once another input changes (1,500 randomized settings)",
   "ice-barrier-coverage::side_lap_in": "moves the answer once another input changes (1,500 randomized settings)",

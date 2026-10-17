@@ -84,7 +84,7 @@ export const gasApplianceDemandExample = {
 };
 
 function renderGasApplianceDemand(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: IFGC 2021 Section 402 / NFPA 54 (National Fuel Gas Code) by name. cfh = total connected BTU/hr / heating value; default heating values (1,000 BTU/ft^3 natural gas, 2,516 BTU/ft^3 propane) are editable.";
+  citationEl.textContent = "Citation: IFGC 2027 Section 402 (unchanged from 2021) / NFPA 54 (National Fuel Gas Code) by name. cfh = total connected BTU/hr / heating value; default heating values (1,000 BTU/ft^3 natural gas, 2,516 BTU/ft^3 propane) are editable.";
   const DEFAULT = "furnace,100000\nwater heater,40000\nrange,65000\ndryer,35000";
   const list = makeTextarea("Appliances, one per line as name,BTU/hr (or just BTU/hr)", "gad-list", { rows: "4" });
   list.input.value = DEFAULT;

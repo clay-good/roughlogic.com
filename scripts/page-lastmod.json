@@ -10,7 +10,7 @@
       "date": "2026-10-17"
     },
     "/errata/": {
-      "sha": "bcda3a885ec49ae0",
+      "sha": "cd25ae4a801af239",
       "date": "2026-10-17"
     },
     "/collections/disaster-response/": {
@@ -1430,11 +1430,11 @@
       "date": "2026-10-17"
     },
     "/tools/combustion-air/": {
-      "sha": "c71806cf22af86f5",
+      "sha": "d896e0576d17eb6c",
       "date": "2026-10-17"
     },
     "/tools/combustion-air-max-input/": {
-      "sha": "0088b0f41f34f905",
+      "sha": "b9e5e355ed8e2ff4",
       "date": "2026-10-17"
     },
     "/tools/combustion-lambda/": {
@@ -3314,11 +3314,11 @@
       "date": "2026-10-17"
     },
     "/tools/gas-appliance-connection/": {
-      "sha": "136b31be92d81e59",
+      "sha": "24ae386598200580",
       "date": "2026-10-17"
     },
     "/tools/gas-appliance-demand/": {
-      "sha": "c2af3888b5835b16",
+      "sha": "7611e58bdbdf71e0",
       "date": "2026-10-17"
     },
     "/tools/gas-dp-flow-meter/": {
@@ -3354,7 +3354,7 @@
       "date": "2026-10-17"
     },
     "/tools/gas-pipe-sizing/": {
-      "sha": "ee5f23cc0fb1bc36",
+      "sha": "5539290cc1d8d219",
       "date": "2026-10-17"
     },
     "/tools/gas-pipeline-flow/": {
@@ -3822,7 +3822,7 @@
       "date": "2026-10-17"
     },
     "/tools/hood-exhaust/": {
-      "sha": "6fcd7e8b3cfa27b1",
+      "sha": "5c323bf9aaba7a3c",
       "date": "2026-10-17"
     },
     "/tools/hoop-stress-mawp/": {
@@ -3974,7 +3974,7 @@
       "date": "2026-10-17"
     },
     "/tools/hydrostatic-test/": {
-      "sha": "b17e88ac4b5c5de1",
+      "sha": "9a73c3d27439bc0d",
       "date": "2026-10-17"
     },
     "/tools/hydroxyl-sizing/": {
