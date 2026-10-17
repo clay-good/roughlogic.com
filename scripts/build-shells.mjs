@@ -107,6 +107,71 @@ export async function loadWorkedExamples() {
   return byTile;
 }
 
+// spec-v1965 (spec-v106 pillar 4): where each worked example comes from. The
+// shell's example never said, though the registry records a publisher for every
+// row and the runner asserts each one on every test run. These predicates are
+// check-worked-examples.mjs's own: a self-sourced or recomputed row is the
+// project's derivation, never an outside source. A publisher must also START
+// like a name (capital, digit or parenthesis); the 50 rows that begin in
+// lowercase name a method ("one-way ANOVA (hand-computed, ...)"), and listing a
+// method as a publisher would overstate the evidence.
+const _SELF_SOURCED = /^Project\b|first-principles/i;
+const _RECOMPUTED = /machine-verified|recomputed|\bspec-v\d+\b/i;
+export function namedPublishers(rows) {
+  const out = [];
+  for (const r of rows || []) {
+    // "; " separates publishers in the line, so one inside a publisher (71 of
+    // them, often two sources in one entry) reads as a comma instead.
+    const pub = String(r.source_publisher || "").trim().replace(/\s*;\s*/g, ", ");
+    if (!pub || _SELF_SOURCED.test(pub)) continue;
+    if (_RECOMPUTED.test([r.source_edition_or_year, r.source_section_or_page, r.source_title].join(" "))) continue;
+    if (!/^[A-Z0-9(]/.test(pub)) continue;
+    if (!out.includes(pub)) out.push(pub);
+  }
+  return out;
+}
+
+// One plain-text line for the Example section. `derivedOnly` marks the tiles
+// spec-only-reference.test.js holds to an independent reference suite, the only
+// ones allowed to claim one.
+export function checkedAgainstLine(rows, derivedOnly) {
+  const pubs = namedPublishers(rows);
+  if (pubs.length) {
+    // A long publisher is cut at a word, before any parenthesis it would leave
+    // open, and marked with an ellipsis; the sentence then takes no extra stop.
+    const clip = (p) => {
+      if (p.length <= 90) return p;
+      let t = p.slice(0, 87).replace(/\s+\S*$/, "");
+      const open = t.lastIndexOf("(");
+      if (open > 0 && t.indexOf(")", open) < 0) t = t.slice(0, open);
+      return t.replace(/[\s,;:.(-]+$/, "") + "...";
+    };
+    const shown = pubs.slice(0, 3).map(clip);
+    const more = pubs.length - shown.length;
+    const body = shown.join("; ") + (more > 0 ? "; and " + more + " more" : "");
+    // "Inc." or a clipped "..." already ends the sentence; no second stop.
+    return "Checked against published worked examples from: " + body + (body.endsWith(".") ? "" : ".");
+  }
+  return "No published worked example is on file for this calculation. It is checked against a hand-worked derivation of its method"
+    + (derivedOnly ? " and an independent reference test." : ".");
+}
+
+// Every registry row per tile (loadWorkedExamples keeps only the first), plus the
+// derived-only set: every row self-sourced or recomputed, as check-worked-examples
+// defines it.
+export async function loadCheckedAgainst() {
+  const raw = JSON.parse(await readFile(resolve(ROOT, "test/fixtures/worked-examples.json"), "utf8"));
+  const rows = Array.isArray(raw) ? raw : (raw.examples || raw.rows || []);
+  const byTile = new Map();
+  for (const r of rows) if (r && r.tile_id) (byTile.get(r.tile_id) || byTile.set(r.tile_id, []).get(r.tile_id)).push(r);
+  const lines = new Map();
+  for (const [id, rs] of byTile) {
+    const derivedOnly = rs.every((r) => _SELF_SOURCED.test(r.source_publisher || "") || _RECOMPUTED.test([r.source_edition_or_year, r.source_section_or_page, r.source_title].join(" ")));
+    lines.set(id, checkedAgainstLine(rs, derivedOnly));
+  }
+  return lines;
+}
+
 // One tile's registry row is a WIRING STUB by design, and the page paid for it.
 //
 // `magnetic-declination` computes from the World Magnetic Model, which means
@@ -856,7 +921,7 @@ function shellFooter(depth = 2) {
   ].join("\n");
 }
 
-function tileShell(tool, tools, groupNames, relatedByTile, examples, labels, outLabels, outDisplays, outUnits, outBools, refContent) {
+function tileShell(tool, tools, groupNames, relatedByTile, examples, labels, outLabels, outDisplays, outUnits, outBools, refContent, checked) {
   const professionNoun = PROFESSION_NOUN[tool.trades[0]] || "Trades";
   const groupLabel = groupNames[tool.group] || tool.group;
   const groupSlug = GROUP_SLUG[tool.group] || tool.group.toLowerCase();
@@ -943,14 +1008,16 @@ function tileShell(tool, tools, groupNames, relatedByTile, examples, labels, out
       outputRows ? '    <ul class="shell-io">' : '',
       outputRows,
       outputRows ? '    </ul>' : '',
+      (checked && checked.get(tool.id)) ? `    <p class="shell-checked">${escapeHtml(checked.get(tool.id))}</p>` : '',
       '  </section>',
     ].filter(Boolean).join("\n") : '',
     (!inputRows && refContent) ? [
       '  <section class="shell-section" aria-label="Reference">',
       '    <h2>Reference</h2>',
       refContent,
+      (checked && checked.get(tool.id)) ? `    <p class="shell-checked">${escapeHtml(checked.get(tool.id))}</p>` : '',
       '  </section>',
-    ].join("\n") : '',
+    ].filter(Boolean).join("\n") : '',
     // ONE disclosure holds everything the reader may want after the answer:
     // the scope prose, the formula, the source lines, the API field names, and
     // the assumptions. It used to be two adjacent <details> -- "More about
@@ -1511,6 +1578,7 @@ async function main() {
   // One pass over the catalog so no tile page ends up with zero inbound links.
   const relatedByTile = relatedGraph(tools, relatedMap);
   const examples = await loadWorkedExamples();
+  const checked = await loadCheckedAgainst();
   // The field labels the browser prints above each input, resolved through the
   // same MCP catalog layer the agent surface reads, so the label on a shell and
   // the label in the calculator can never drift. ~140 ms for the whole catalog.
@@ -1555,7 +1623,7 @@ async function main() {
         refContent = "";
       }
     }
-    const html = tileShell(tool, tools, groupNames, relatedByTile, examples, labels, outLabels, outDisplays, outUnits, outBools, refContent);
+    const html = tileShell(tool, tools, groupNames, relatedByTile, examples, labels, outLabels, outDisplays, outUnits, outBools, refContent, checked);
     const out = resolve(DIST, "tools", tool.id, "index.html");
     await mkdir(dirname(out), { recursive: true });
     await writeFile(out, html, "utf8");

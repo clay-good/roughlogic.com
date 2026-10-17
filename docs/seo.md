@@ -75,6 +75,7 @@ prose describing the page outlived the page by four months.
 | The cited formula (spec-v45) | `class="shell-formula"` |
 | The source stamp behind it | `class="shell-source"` |
 | One disclosure holding the details, formula and sources | `aria-label="Details, formula, and sources"` |
+| Where the worked example comes from ([spec-v1965](../specs/spec-v1965.md)): the published sources it is checked against, or a plain statement that none is on file | `class="shell-checked"` |
 | Related tiles | `class="shell-related"` |
 | Footer with the inline disclaimer | `class="shell-disclaimer"` |
 
