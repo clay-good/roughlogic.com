@@ -814,3 +814,46 @@ test("Small Area FMR rows carry the advisory the renderer prints", async () => {
   assert.match(shard.safmr_message, /per ZIP Code/);
   assert.match(shard.safmr_partial_message, /opted into Small Area FMRs/);
 });
+
+// A sentence that says which edition is CURRENT is a claim about the ledger,
+// wherever it is written. outdoor-air-mix said "ASHRAE 62.1-2022 is the current
+// published edition" for months after the ledger recorded 62.1-2025, and
+// docs/data-sources.md quoted a manifest line naming IMC 2024 as current after
+// the manifest itself moved to 2027: the disclosure test above reads only the
+// *_DISCLOSURE constants. So every tracked standard named inside an "is / are
+// the current" clause, in any citation, calculator module, manifest or living
+// doc, must carry the edition sources-cycle.json records.
+test("every 'is the current edition' claim names the ledger's current edition", async () => {
+  const cycle = await readJson("scripts/sources-cycle.json");
+  const cur = Object.fromEntries(cycle.standards.map((r) => [r.id, String(r.current_edition)]));
+  const NAMES = [
+    ["nec", /\bNEC (\d{4})\b/g], ["ipc", /\bIPC (\d{4})\b/g], ["irc", /\bIRC (\d{4})\b/g], ["ibc", /\bIBC (\d{4})\b/g],
+    ["imc", /\bIMC (\d{4})\b/g], ["ifc", /\bIFC (\d{4})\b/g], ["ifgc", /\bIFGC (\d{4})\b/g],
+    ["ashrae-62-1", /\b62\.1-(\d{4})\b/g], ["ashrae-62-2", /\b62\.2-(\d{4})\b/g], ["ashrae-90-1", /\b90\.1-(\d{4})\b/g],
+    ["fda-food-code", /\bFood Code (\d{4})\b/g], ["nfpa-70e", /\b70E-(\d{4})\b/g],
+  ];
+  const { readdir } = await import("node:fs/promises");
+  const files = ["citations.js", "README.md", "docs/data-sources.md", "docs/how-it-works.md", "docs/correctness.md", "docs/edition-rollover.md"];
+  for (const f of await readdir(ROOT)) if (/^calc-.*\.js$/.test(f)) files.push(f);
+  for (const d of await readdir(resolve(ROOT, "data"), { withFileTypes: true })) if (d.isDirectory()) files.push("data/" + d.name + "/manifest.json");
+  const bad = [];
+  let claims = 0;
+  for (const f of files) {
+    let text;
+    try { text = await readFile(resolve(ROOT, f), "utf8"); } catch { continue; }
+    for (const m of text.matchAll(/\b(?:is|are) the current(?: published)? edition/g)) {
+      // The clause: back to the nearest sentence or parenthesis start.
+      const before = text.slice(Math.max(0, m.index - 220), m.index);
+      const start = Math.max(before.lastIndexOf(". "), before.lastIndexOf("("), before.lastIndexOf(";"), before.lastIndexOf("\n"), before.lastIndexOf("\""));
+      const clause = before.slice(start + 1);
+      for (const [id, re] of NAMES) {
+        for (const n of clause.matchAll(re)) {
+          claims++;
+          if (n[1] !== cur[id]) bad.push(`${f}: "${clause.trim().slice(-120)} ..." names ${n[0]} as current; the ledger records ${cur[id]}`);
+        }
+      }
+    }
+  }
+  assert.ok(claims > 20, `only ${claims} current-edition claims found; did the wording change?`);
+  assert.deepEqual(bad, []);
+});

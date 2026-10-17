@@ -23,7 +23,7 @@ A folder's `manifest.json` carries an `edition` string that names the same kind 
 
 [`scripts/sources-cycle.json`](../scripts/sources-cycle.json) tracks the published edition of every standard this site cites. `check-citation-freshness` compares those rows against the `edition` string of each folder manifest, so **a row is only checked if some manifest names it** -- and six rows named nothing, which is why four superseded editions went undisclosed. Where a bundled value follows an older edition on purpose, the manifest says so in these words:
 
-> IMC 2021 cited by section number (IMC 2024 is the current published edition; bundled values follow 2021 and the tile citations disclose it)
+> IMC 2021 cited by section number (ASHRAE 62.1-2025 / 62.2-2025 / 90.1-2025 and IMC 2027 are the current published editions; bundled values follow the editions named here and the tile citations disclose it)
 
 A standard the tiles cite but no shard holds data from has no manifest to appear in. Those rows carry `citation_only: true` and a `citation_only_reason`, and the gate fails if the reason is missing. Adding a row without either a manifest mention or that exemption fails the build rather than passing silently.
 

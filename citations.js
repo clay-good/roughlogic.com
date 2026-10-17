@@ -4610,7 +4610,7 @@ export const CITATIONS = {
     edition: ASHRAE_62_1,
     freeAccess: ASHRAE_FREE,
     governance: GOVERNANCE.mechanical,
-    editionNote: "Editions available: ASHRAE 62.1-2022 is the current published edition; ASHRAE 62.1-2019 is widely adopted in jurisdictions on IECC 2018.",
+    editionNote: "Editions available: ASHRAE 62.1-2025 is the current published edition; the minimums here follow 62.1-2022, and 62.1-2019 is widely adopted in jurisdictions on IECC 2018.",
     assumptions: [
       { name: "OA fraction", value: "user-entered; ASHRAE 62.1 sets the minimum", source: "ASHRAE 62.1-2022" },
     ],
