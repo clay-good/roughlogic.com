@@ -13,14 +13,16 @@
 // them break the promise a reader is trusting. So this spec drives real
 // journeys, then reads what the browser was left holding.
 //
-// The one permitted key is `rl-theme`, written only when the reader toggles
-// the theme (the system-preference path persists nothing). Turnstile is the
+// The permitted keys are `rl-theme`, written only when the reader toggles
+// the theme (the system-preference path persists nothing), and `rl-state`,
+// written only when the reader picks a state on an NEC calculator (spec-v1968;
+// these journeys do not). Turnstile is the
 // one third-party origin the CSP allows, and it loads only after the problem-
 // report dialog is opened, which these journeys deliberately do not do.
 
 import { test, expect } from "@playwright/test";
 
-const ALLOWED_LOCAL_STORAGE_KEYS = ["rl-theme"];
+const ALLOWED_LOCAL_STORAGE_KEYS = ["rl-theme", "rl-state"];
 
 // Every journey a reader takes that does not open the report dialog.
 async function walkTheSite(page) {

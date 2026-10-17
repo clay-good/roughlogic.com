@@ -64,7 +64,7 @@ Per spec.md section 14 step 22. This is the written report. Items are categorize
 | CSP blocks third-party connections | gate | `connect-src 'self'` enforced both in `_headers` and the `<meta>` tag in `index.html`. Verify in browser DevTools console after first deploy. |
 | Service worker caches shell and shards | pass | [sw.js](../sw.js) precaches the shell + per-folder manifests; data shards are cached on first fetch. Cache name keyed to `BUILD_HASH`. |
 | Service worker offline behavior | gate | Verify by loading once, going offline, reloading. The navigation fallback returns `index.html`. |
-| Client-side storage minimized | pass | No sessionStorage / cookies / IndexedDB. localStorage holds one key (`rl-theme`, value `"light"`, `"dark"`, or `"high-contrast"`) for theme persistence; no tool data is written there. State for pinned tiles and calculator inputs lives in the URL hash. (Recents and Big Buttons mode were retired in spec-v11.) |
+| Client-side storage minimized | pass | No sessionStorage / cookies / IndexedDB. localStorage holds two preference keys: `rl-theme` (value `"light"` or `"dark"`) for theme persistence and `rl-state` (a state code, spec-v1968) for the NEC edition row; no tool data is written there. State for pinned tiles and calculator inputs lives in the URL hash. (Recents and Big Buttons mode were retired in spec-v11.) |
 | No outbound network calls at runtime | pass | No `fetch` of cross-origin URLs. CSP enforces same-origin. |
 | `innerHTML` forbidden | pass | ESLint rule + grep check both fail the build on detection. |
 
@@ -142,8 +142,9 @@ versus the v0.1.0 checklist:
 - **Behavior**: No telemetry. No A/B testing. No feature flags. No
   account, no email capture, no notifications. The Bundle feature
   keeps all tool-data state in the URL hash; the only client-side
-  storage is the single localStorage key `rl-theme` for the persisted
-  light/dark/high-contrast theme preference. No sessionStorage, cookies,
+  storage is two localStorage keys: `rl-theme` for the persisted
+  light/dark theme preference and `rl-state` for the reader's state on
+  NEC calculators (spec-v1968). No sessionStorage, cookies,
   or IndexedDB. (Recents was retired in spec-v11.)
 
 Ready to deploy v0.2.0 once the items above and the original gate list
@@ -427,8 +428,8 @@ than sitting here misinforming a reader for three months.
 
 | Figure | Live |
 | --- | --- |
-| Static gates in the `npm run lint` chain | **64 live lint gates** |
-| Unit-test suite files under `test/unit/` | **243 live unit suites** |
+| Static gates in the `npm run lint` chain | **65 live lint gates** |
+| Unit-test suite files under `test/unit/` | **244 live unit suites** |
 | Playwright spec files under `test/integration/` | **27 live integration specs** |
 
 CI runs three jobs per push: `test` (lint, unit tests, data-integrity

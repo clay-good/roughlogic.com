@@ -14,7 +14,7 @@ npm run audit
 That single command runs the canonical chain (lint -> unit tests -> build ->
 `check:dist` -> `check:shells` -> `check:module-sizes` -> `check:shell-values`
 -> `check:lastmod` -> `data:verify` -> `check:data-stamps`). `npm run lint`
-alone is 64 static gates, of which 63 run here: `check-ngrams` compares text
+alone is 65 static gates, of which 64 run here: `check-ngrams` compares text
 against a private hash list of licensed code spans that is deliberately not in
 this repository, so it skips with a message and passes.
 If you changed layout or type, also run `npm run check:shell-mobile`; it drives
@@ -42,7 +42,7 @@ These are not preferences. A change that breaks one of them will fail a gate.
 | **Zero runtime dependencies** | The site ships as static files. Dev tooling is locked in `package-lock.json`; the shipped bundle has no third-party code. |
 | **No network at build time** | Every value in `data/` is an in-tree constant transcribed by a maintainer and reviewable in a diff. `check-build-hermetic` fails on any undeclared fetch. |
 | **No new remote write path** | The one hosted write is the bounded, user-initiated problem-report queue. Anything else needs its own approved spec. |
-| **No new storage key** beyond `rl-theme` | No accounts, no analytics, no tracking. |
+| **No new storage key** beyond `rl-theme` and `rl-state` | No accounts, no analytics, no tracking. |
 | **US standards only** | See [specs/](specs/) for the scope charter. Metric-only or non-US-code calculators are out of scope. |
 | **Plain ASCII in shipped strings** | No emoji, no em-dashes, no decorative icons. `grep-checks` enforces it. |
 | **Every answer cites a real, dated source** | `check-citation-coverage` and `check-derivation-coverage` both fail without one. |

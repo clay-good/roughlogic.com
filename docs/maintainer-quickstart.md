@@ -276,7 +276,7 @@ For every minor or patch release:
   The sole hosted write path is the isolated, user-initiated report Worker;
   persisted invocation logs are disabled and D1 records expire after 30 days.
 - No localStorage / sessionStorage / cookies / IndexedDB beyond
-  `rl-theme`. URL hash is the only state mechanism. (The
+  `rl-theme` and `rl-state` (spec-v1968). URL hash is the only state mechanism. (The
   `rl-bigbuttons` key was retired in spec-v11.)
 - CSP `default-src 'self'`, `connect-src 'self'`,
   `worker-src 'self'`.

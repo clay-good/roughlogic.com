@@ -8,7 +8,10 @@
 The URL fragment (everything after `#`) is the only state mechanism
 the site uses. No cookies, no sessionStorage, no IndexedDB, and one
 localStorage key: `rl-theme`, written only when the reader works the
-theme toggle -- following the system preference persists nothing. (The
+theme toggle -- following the system preference persists nothing.
+A second preference key, `rl-state`, holds the reader's state for the
+NEC edition row (spec-v1968) and is written only when they pick one;
+no calculator input is ever stored there. (The
 `rl-bigbuttons` key was retired in spec-v11 along with Big Buttons
 mode.) This sentence used to read "no IndexedDB beyond `rl-theme`",
 which named the wrong mechanism for the one key there is.

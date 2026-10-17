@@ -1,0 +1,1092 @@
+{
+  "code": "nec",
+  "cadence_days": 92,
+  "about": "Draft per-state NEC adoption rows (spec-v1968). Each row's citation is the source of truth; the NFPA column is a cross-check only. A row ships to data/legal/code-adoption.json only after a maintainer reads its citation and sets verified_by and verified_on.",
+  "rows": {
+    "AL": {
+      "name": "Alabama",
+      "status": "limited",
+      "editions": [
+        {
+          "applies_to": "state-buildings",
+          "edition": "2020",
+          "effective": "2022-07-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": "State buildings, schools, hotels and motels, and motion picture theaters; cities and counties adopt their own code elsewhere.",
+      "citation": "Ala. Code 41-9-140 et seq. (former Alabama Building Commission, now Division of Construction Management) adopted codes",
+      "citation_primary": true,
+      "source_url": "https://dcm.alabama.gov/",
+      "draft_note": "Rule section adopting NFPA 70 not located; Mike Holt lists effective 2023-07-01, IAEI and NFPA list 2022-07-01. Confirm the DCM adopted-codes rule.",
+      "verified_by": null,
+      "verified_on": null,
+      "nfpa_2026_08_03": "2020 (7/1/2022), Alabama Division of Construction Management"
+    },
+    "AK": {
+      "name": "Alaska",
+      "status": "statewide",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2020",
+          "effective": "2022-04-16"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": null,
+      "citation": "8 AAC 70.025 (minimum electrical standards)",
+      "citation_primary": true,
+      "source_url": "https://www.law.cornell.edu/regulations/alaska/8-AAC-70.025",
+      "draft_note": "Rule history shows am 4/16/2022; NFPA lists 2020-04-16. Effective date taken from the rule history.",
+      "verified_by": null,
+      "verified_on": null,
+      "nfpa_2026_08_03": "2020 (4/16/2020)"
+    },
+    "AZ": {
+      "name": "Arizona",
+      "status": "local",
+      "editions": [],
+      "upcoming": [],
+      "pending": null,
+      "scope": "No statewide NEC; each city and county adopts and amends its own edition.",
+      "citation": "No state adoption: Arizona has no statewide electrical code; cities and counties adopt the NEC under their own building-code authority",
+      "citation_primary": false,
+      "source_url": "https://www.iaei.org/page/arizona-electrical-ceus",
+      "draft_note": "An absence has no adopting rule to cite. NFPA and IAEI agree: local adoption only. Signer: confirm no state rule exists.",
+      "verified_by": null,
+      "verified_on": null,
+      "nfpa_2026_08_03": "Local adoption only"
+    },
+    "AR": {
+      "name": "Arkansas",
+      "status": "statewide-amended",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2020",
+          "effective": "2022-08-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": "A newer edition is in rulemaking (a 2024 Board notice proposed NEC 2023; NFPA reports a 2026 update underway). No effective date set.",
+      "scope": null,
+      "citation": "Ark. Board of Electrical Examiners Rule 010.13-008 (The National Electrical Code)",
+      "citation_primary": true,
+      "source_url": "https://labor.arkansas.gov/wp-content/uploads/Public-Notice-Electrical-2024.pdf",
+      "draft_note": "Confirm whether the 2024 proposal to adopt NEC 2023 was finalized.",
+      "verified_by": null,
+      "verified_on": null,
+      "nfpa_2026_08_03": "2020 with AR amendments (8/1/2022) | 2026 update process underway (Effective date not established)"
+    },
+    "CA": {
+      "name": "California",
+      "status": "statewide-amended",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2023",
+          "effective": "2026-01-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": null,
+      "citation": "Cal. Code Regs. tit. 24, pt. 3 (2025 California Electrical Code)",
+      "citation_primary": true,
+      "source_url": "https://www.dgs.ca.gov/bsc/codes",
+      "draft_note": null,
+      "verified_by": null,
+      "verified_on": null,
+      "nfpa_2026_08_03": "2023 with CA amendments (1/1/2026)"
+    },
+    "CO": {
+      "name": "Colorado",
+      "status": "statewide",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2026",
+          "effective": "2026-08-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": null,
+      "citation": "3 CCR 710-1, Rule 1.2 (State Electrical Board); C.R.S. 12-115-107",
+      "citation_primary": true,
+      "source_url": "https://www.sos.state.co.us/CCR/",
+      "draft_note": "2026 edition and 2026-08-01 date from NFPA only; the 2023 cycle was effective 2023-08-01. Confirm the 2026 rule filing.",
+      "verified_by": null,
+      "verified_on": null,
+      "nfpa_2026_08_03": "2026 (8/1/2026)"
+    },
+    "CT": {
+      "name": "Connecticut",
+      "status": "statewide-amended",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2020",
+          "effective": "2022-10-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": "NEC 2023 update in process; no effective date set.",
+      "scope": null,
+      "citation": "Conn. Gen. Stat. 29-252; 2022 Connecticut State Building Code, amendments to NFPA 70-2020",
+      "citation_primary": true,
+      "source_url": "https://portal.ct.gov/das/office-of-state-building-inspector/connecticut-state-building-code/regulations",
+      "draft_note": "Applies to permit applications filed on or after 2022-10-01.",
+      "verified_by": null,
+      "verified_on": null,
+      "nfpa_2026_08_03": "2020 with CT amendments (10/1/2022) | 2023 update process underway (Effective date not established)"
+    },
+    "DE": {
+      "name": "Delaware",
+      "status": "statewide",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2023",
+          "effective": "2026-01-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": null,
+      "citation": "Delaware State Fire Prevention Regulations (State Fire Prevention Commission, 16 Del. C. ch. 66)",
+      "citation_primary": true,
+      "source_url": "https://www.iaei.org/page/delaware-electrical-ceus",
+      "draft_note": "Regulation section adopting NFPA 70 not located; IAEI and NFPA agree on NEC 2023 effective 2026-01-01. Confirm in the Delaware Register.",
+      "verified_by": null,
+      "verified_on": null,
+      "nfpa_2026_08_03": "2023 (1/1/2026)"
+    },
+    "FL": {
+      "name": "Florida",
+      "status": "statewide",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2020",
+          "effective": "2023-12-31"
+        }
+      ],
+      "upcoming": [],
+      "pending": "NEC 2023 update in process (next Florida Building Code edition); no effective date set.",
+      "scope": null,
+      "citation": "Fla. Stat. 553.73; Fla. Admin. Code R. 61G20-1.001 (Florida Building Code 8th Ed. (2023), ch. 27)",
+      "citation_primary": true,
+      "source_url": "https://floridabuilding.org/",
+      "draft_note": null,
+      "verified_by": null,
+      "verified_on": null,
+      "nfpa_2026_08_03": "2020 (12/31/2023) | 2023 update process underway (Effective date not established)"
+    },
+    "GA": {
+      "name": "Georgia",
+      "status": "statewide",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2023",
+          "effective": "2025-01-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": null,
+      "citation": "Ga. Comp. R. & Regs. 110-11-1-.31; O.C.G.A. 8-2-20 et seq.",
+      "citation_primary": true,
+      "source_url": "https://www.law.cornell.edu/regulations/georgia/Ga-Comp-R-Regs-R-110-11-1-.31",
+      "draft_note": "Adopted with no Georgia amendments.",
+      "verified_by": null,
+      "verified_on": null,
+      "nfpa_2026_08_03": "2023 (1/1/2025)"
+    },
+    "HI": {
+      "name": "Hawaii",
+      "status": "statewide-amended",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2020",
+          "effective": "2023-03-14"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": "State Electrical Code; each county adopts it with amendments (it applied as the interim county code after 2024-03-14).",
+      "citation": "Haw. Admin. R. ch. 3-182 (State Electrical Code); HRS ch. 107, pt. II",
+      "citation_primary": true,
+      "source_url": "https://ags.hawaii.gov/bcc/",
+      "draft_note": "2023-03-14 is the state-building compliance date; county editions can differ.",
+      "verified_by": null,
+      "verified_on": null,
+      "nfpa_2026_08_03": "2020 (3/14/2023)"
+    },
+    "ID": {
+      "name": "Idaho",
+      "status": "statewide-amended",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2023",
+          "effective": "2023-07-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": null,
+      "citation": "IDAPA 24.39.10 (Rules of the Idaho Electrical Board); Idaho Code 54-1001 et seq.",
+      "citation_primary": true,
+      "source_url": "https://dopl.idaho.gov/ele/ele-statutes-rules-and-guidance/",
+      "draft_note": "Adopted through temporary rules; NFPA notes they permitted the 2017 NEC with Idaho amendments. Confirm the permanent rule.",
+      "verified_by": null,
+      "verified_on": null,
+      "nfpa_2026_08_03": "2023 (7/1/2023) with ID amendments (temporary rules permit use of 2017 NEC w/ID amendments)"
+    },
+    "IL": {
+      "name": "Illinois",
+      "status": "limited",
+      "editions": [
+        {
+          "applies_to": "commercial",
+          "edition": "2008",
+          "effective": "2011-07-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": "Commercial occupancies outside local jurisdictions that have adoption authority; cities and counties adopt their own code elsewhere.",
+      "citation": "NFPA NEC enforcement map: NEC 2008 for commercial occupancies outside local jurisdictions (no Illinois rule located)",
+      "citation_primary": false,
+      "source_url": "https://www.iaei.org/page/nec-code-adoption",
+      "draft_note": "No primary Illinois citation found; cannot be signed until the adopting statute or rule is identified.",
+      "verified_by": null,
+      "verified_on": null,
+      "nfpa_2026_08_03": "2008 (7/1/11 - commercial occupancies for areas outside of local jurisdictions that have adoption authority)"
+    },
+    "IN": {
+      "name": "Indiana",
+      "status": "statewide-amended",
+      "editions": [
+        {
+          "applies_to": "commercial",
+          "edition": "2008",
+          "effective": "2009-08-26"
+        },
+        {
+          "applies_to": "one-two-family",
+          "edition": "2017",
+          "effective": "2019-12-26"
+        }
+      ],
+      "upcoming": [],
+      "pending": "675 IAC 17-1.9 (Indiana Electrical Code, 2026 Edition, based on NEC 2023) is in rulemaking; no effective date set.",
+      "scope": null,
+      "citation": "675 IAC 17-1.8 (Indiana Electrical Code, 2009 Ed.); Indiana Residential Code (675 IAC 14) for one- and two-family dwellings",
+      "citation_primary": true,
+      "source_url": "https://www.in.gov/dhs/fire-and-building-safety/fpbsc-rules/",
+      "draft_note": "Residential rule section not confirmed.",
+      "verified_by": null,
+      "verified_on": null,
+      "nfpa_2026_08_03": "2008 Commercial with IN amendments (8/26/2009); 2017 (2018 IRC) One- and two-family dwellings with IN amendments (12/26/2019) | 2023 Update process underway (Effective date not established)"
+    },
+    "IA": {
+      "name": "Iowa",
+      "status": "statewide-amended",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2023",
+          "effective": "2025-07-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": "NEC 2026 update in process; no effective date set.",
+      "scope": null,
+      "citation": "Iowa Admin. Code 661 (ARC 9033C, Electrical Inspection Program); Iowa Code ch. 103",
+      "citation_primary": true,
+      "source_url": "https://dial.iowa.gov/electrical-permits-inspections",
+      "draft_note": "Chapter that carries the 2023 adoption text not confirmed (ch. 504 rescinded 2025-07-01).",
+      "verified_by": null,
+      "verified_on": null,
+      "nfpa_2026_08_03": "2023 with IA amendments (7/1/2025) | 2026 update process underway (Effective date not established)"
+    },
+    "KS": {
+      "name": "Kansas",
+      "status": "limited",
+      "editions": [
+        {
+          "applies_to": "state-buildings",
+          "edition": "2008",
+          "effective": "2011-02-04"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": "State-owned buildings (State Fire Marshal); cities and counties adopt their own code elsewhere.",
+      "citation": "K.A.R. 22-1-3 (State Fire Marshal adopted codes)",
+      "citation_primary": true,
+      "source_url": "https://www.iaei.org/page/kansas-electrical-ceus",
+      "draft_note": "Regulation text not retrieved; secondary sources agree on NEC 2008 effective 2011-02-04.",
+      "verified_by": null,
+      "verified_on": null,
+      "nfpa_2026_08_03": "2008 (2/4/11 - State Fire Marshal)"
+    },
+    "KY": {
+      "name": "Kentucky",
+      "status": "statewide",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2023",
+          "effective": "2025-01-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": "NEC 2026 update in process; no effective date set.",
+      "scope": null,
+      "citation": "815 KAR 7:120 (Kentucky Building Code) and 815 KAR 7:125 (Kentucky Residential Code), NFPA 70-2023 referenced standard",
+      "citation_primary": true,
+      "source_url": "https://dhbc.ky.gov/Documents/2023%20NEC%20Update%20Announcement.pdf",
+      "draft_note": "For dwellings, 210.52(C), 230.67 and 314.27(C) were delayed to 2026-07-15 (now in force).",
+      "verified_by": null,
+      "verified_on": null,
+      "nfpa_2026_08_03": "2023 (1/1/2025) | 2026 update process underway (Effective date not established)"
+    },
+    "LA": {
+      "name": "Louisiana",
+      "status": "statewide-amended",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2020",
+          "effective": "2023-01-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": null,
+      "citation": "La. Admin. Code tit. 17, pt. I, sec. 115 (formerly LAC 55:VI.301.A.7); La. R.S. 40:1730.28",
+      "citation_primary": true,
+      "source_url": "https://regulations.justia.com/states/louisiana/title-17/part-i/chapter-1/section-i-115",
+      "draft_note": "Amends 210.8: no GFCI required on HVAC equipment.",
+      "verified_by": null,
+      "verified_on": null,
+      "nfpa_2026_08_03": "2020 (1/1/2023)"
+    },
+    "ME": {
+      "name": "Maine",
+      "status": "statewide-amended",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2026",
+          "effective": "2026-07-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": null,
+      "citation": "02-318 C.M.R. ch. 120 (Electrical Installation Standards)",
+      "citation_primary": true,
+      "source_url": "https://www.maine.gov/pfr/professionallicensing/professions/electricians/index.html",
+      "draft_note": "Installations commencing on or after 2026-07-01.",
+      "verified_by": null,
+      "verified_on": null,
+      "nfpa_2026_08_03": "2026 with ME amendments (7/1/2026)"
+    },
+    "MD": {
+      "name": "Maryland",
+      "status": "statewide-amended",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2020",
+          "effective": "2025-07-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": "NEC 2023 update in process; no effective date set.",
+      "scope": null,
+      "citation": "Maryland State Fire Prevention Code, COMAR 29.06.01 (NFPA 70 by reference)",
+      "citation_primary": true,
+      "source_url": "https://www.iaei.org/page/maryland-electrical-ceus",
+      "draft_note": "SOURCES CONFLICT: NFPA lists NEC 2020 effective 2025-07-01; IAEI lists NEC 2023 effective 2025-03-01. COMAR section not confirmed.",
+      "verified_by": null,
+      "verified_on": null,
+      "nfpa_2026_08_03": "2020 (7/1/2025) with MD amendments | 2023 update process underway (Effective date not established)"
+    },
+    "MA": {
+      "name": "Massachusetts",
+      "status": "statewide-amended",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2026",
+          "effective": "2026-04-24"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": null,
+      "citation": "527 CMR 12.00 (Massachusetts Electrical Code)",
+      "citation_primary": true,
+      "source_url": "https://www.mass.gov/doc/527-cmr-1200-massachusetts-electrical-code-effective-42426/download",
+      "draft_note": "Applies to permits granted after 2026-04-24.",
+      "verified_by": null,
+      "verified_on": null,
+      "nfpa_2026_08_03": "2026 with MA amendments (4/24/2026)"
+    },
+    "MI": {
+      "name": "Michigan",
+      "status": "statewide-amended",
+      "editions": [
+        {
+          "applies_to": "other-than-one-two-family",
+          "edition": "2023",
+          "effective": "2024-03-12"
+        },
+        {
+          "applies_to": "one-two-family",
+          "edition": "2014",
+          "effective": "2016-02-08"
+        }
+      ],
+      "upcoming": [],
+      "pending": "NEC 2026 update in process for buildings other than one- and two-family dwellings; no effective date set.",
+      "scope": null,
+      "citation": "Mich. Admin. Code R 408.30801 (Part 8, Michigan Electrical Code); Michigan Residential Code for one- and two-family dwellings",
+      "citation_primary": true,
+      "source_url": "https://www.law.cornell.edu/regulations/michigan/Mich-Admin-Code-R-408-30801",
+      "draft_note": "Residential rule section for the 2014 edition not confirmed.",
+      "verified_by": null,
+      "verified_on": null,
+      "nfpa_2026_08_03": "2023 Commercial (3/12/2024); 2014 One- and two-family dwellings (2/8/2016) | 2026 update process underway (Commercial effective date not established)"
+    },
+    "MN": {
+      "name": "Minnesota",
+      "status": "statewide",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2026",
+          "effective": "2026-08-17"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": null,
+      "citation": "Minn. R. 1315.0200; Minn. Stat. 326B.35",
+      "citation_primary": true,
+      "source_url": "https://www.revisor.mn.gov/rules/1315.0200/",
+      "draft_note": "2026-08-17 from NFPA and study guides; DLI docket showed TBD when read. Confirm in the State Register.",
+      "verified_by": null,
+      "verified_on": null,
+      "nfpa_2026_08_03": "2026 (8/17/2026)"
+    },
+    "MS": {
+      "name": "Mississippi",
+      "status": "local",
+      "editions": [],
+      "upcoming": [],
+      "pending": null,
+      "scope": "No statewide NEC; each city and county adopts its own edition.",
+      "citation": "No state adoption: Mississippi has no statewide electrical code; cities and counties incorporate the NEC by reference",
+      "citation_primary": false,
+      "source_url": "https://www.iaei.org/page/mississippi-electrical-ceus",
+      "draft_note": "An absence has no adopting rule to cite. NFPA and IAEI agree: local adoption only.",
+      "verified_by": null,
+      "verified_on": null,
+      "nfpa_2026_08_03": "Local incorporation by reference only"
+    },
+    "MO": {
+      "name": "Missouri",
+      "status": "local",
+      "editions": [],
+      "upcoming": [],
+      "pending": null,
+      "scope": "No statewide NEC; each city and county adopts its own edition.",
+      "citation": "No state adoption: Missouri has no statewide electrical code; cities and counties adopt codes by ordinance (RSMo 67.280)",
+      "citation_primary": false,
+      "source_url": "https://www.iaei.org/page/nec-code-adoption",
+      "draft_note": "RSMo 67.280 not read; NFPA lists local incorporation by reference only.",
+      "verified_by": null,
+      "verified_on": null,
+      "nfpa_2026_08_03": "Local incorporation by reference only"
+    },
+    "MT": {
+      "name": "Montana",
+      "status": "statewide-amended",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2020",
+          "effective": "2022-06-10"
+        }
+      ],
+      "upcoming": [],
+      "pending": "NEC 2023 update in process (NFPA projected 2026-09); not confirmed adopted.",
+      "scope": null,
+      "citation": "Admin. R. Mont. 24.301.401",
+      "citation_primary": true,
+      "source_url": "https://bsd.dli.mt.gov/building-codes-permits/current-codes",
+      "draft_note": "State page lists 2022-06-11; NFPA lists 2022-06-10. The projected 2026-09 update is past due: confirm.",
+      "verified_by": null,
+      "verified_on": null,
+      "nfpa_2026_08_03": "2020 with MT amendments (6/10/2022) | 2023 update process underway (Projected 9/2026)"
+    },
+    "NE": {
+      "name": "Nebraska",
+      "status": "statewide-amended",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2023",
+          "effective": "2024-08-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": "NEC 2026 update in process; no effective date set.",
+      "scope": null,
+      "citation": "Neb. Rev. Stat. 81-2104 (as amended by LB716, 2024)",
+      "citation_primary": true,
+      "source_url": "https://electrical.nebraska.gov/2023-code-adoption",
+      "draft_note": "Statute keeps the 2017 text for 210.8(A), 210.8(A)(3), 210.8(A)(5), 230.67(A) and 230.85.",
+      "verified_by": null,
+      "verified_on": null,
+      "nfpa_2026_08_03": "2023 (8/1/2024) | 2026 update process underway (Effective date not established)"
+    },
+    "NV": {
+      "name": "Nevada",
+      "status": "limited",
+      "editions": [
+        {
+          "applies_to": "state-buildings",
+          "edition": "2023",
+          "effective": "2025-07-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": "State buildings (State Public Works Division); cities and counties adopt their own code elsewhere.",
+      "citation": "NAC 341.045 (State Public Works Board adopted codes)",
+      "citation_primary": true,
+      "source_url": "https://publicworks.nv.gov/uploadedFiles/publicworksnvgov/content/Documents/Permitting_Code_Enforcement/2024%20Adopted_Codes.pdf",
+      "draft_note": "SOURCES CONFLICT: NFPA lists NEC 2017 (2018-07-01); the 2024 SPWD list adopts NEC 2023, mandatory after the grace period ended 2025-06-30.",
+      "verified_by": null,
+      "verified_on": null,
+      "nfpa_2026_08_03": "2017 (7/1/18 - Nevada State Public Works Division)"
+    },
+    "NH": {
+      "name": "New Hampshire",
+      "status": "statewide-amended",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2023",
+          "effective": "2025-07-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": null,
+      "citation": "RSA 155-A:1, IV (State Building Code)",
+      "citation_primary": true,
+      "source_url": "https://www.iccsafe.org/new-hampshire",
+      "draft_note": "SOURCES CONFLICT on the date: NFPA lists 2025-07-01 with a 6-month grace period; a town notice says 2026-07-01. Confirm the enacted session law.",
+      "verified_by": null,
+      "verified_on": null,
+      "nfpa_2026_08_03": "2023 with NH amendments (7/1/2025 with 6-month grace period permitting use of prior edition that was in effect)"
+    },
+    "NJ": {
+      "name": "New Jersey",
+      "status": "statewide-amended",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2020",
+          "effective": "2022-09-06"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": null,
+      "citation": "N.J.A.C. 5:23-3.16 (electrical subcode)",
+      "citation_primary": true,
+      "source_url": "https://www.nj.gov/dca/codes/codreg/current.shtml",
+      "draft_note": null,
+      "verified_by": null,
+      "verified_on": null,
+      "nfpa_2026_08_03": "2020 with NJ amendments (9/6/2022)"
+    },
+    "NM": {
+      "name": "New Mexico",
+      "status": "statewide-amended",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2020",
+          "effective": "2023-03-28"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": null,
+      "citation": "14.10.4 NMAC (2020 New Mexico Electrical Code)",
+      "citation_primary": true,
+      "source_url": "https://www.srca.nm.gov/parts/title14/14.010.0004.pdf",
+      "draft_note": null,
+      "verified_by": null,
+      "verified_on": null,
+      "nfpa_2026_08_03": "2020 (3/28/2023)"
+    },
+    "NY": {
+      "name": "New York",
+      "status": "statewide",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2023",
+          "effective": "2025-12-31"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": "New York City enforces its own Electrical Code.",
+      "citation": "19 NYCRR ch. XXXIII (2025 Uniform Code), NFPA 70-2023 referenced standard",
+      "citation_primary": true,
+      "source_url": "https://dos.ny.gov/notice-adoption",
+      "draft_note": "NEC 2023 from NFPA; the Uniform Code notices read did not name the NEC edition. Confirm the referenced-standards chapter.",
+      "verified_by": null,
+      "verified_on": null,
+      "nfpa_2026_08_03": "2023 (12/31/2025)"
+    },
+    "NC": {
+      "name": "North Carolina",
+      "status": "statewide-amended",
+      "editions": [
+        {
+          "applies_to": "other-than-one-two-family",
+          "edition": "2020",
+          "effective": "2021-11-01"
+        },
+        {
+          "applies_to": "one-two-family",
+          "edition": "2017",
+          "effective": null
+        }
+      ],
+      "upcoming": [],
+      "pending": "The 2023 State Electrical Code is on indefinite delay (S.L. 2025-2, sec. 5.12).",
+      "scope": null,
+      "citation": "N.C. Gen. Stat. 143-138; North Carolina State Electrical Code (2020 NEC with NC amendments)",
+      "citation_primary": true,
+      "source_url": "https://www.ncosfm.gov/codes/state-electrical-division/state-electrical-code-and-interpretations",
+      "draft_note": "One- and two-family dwellings stay on the 2017 State Electrical Code (the NFPA map lists only the 2020 scope); its effective date not located.",
+      "verified_by": null,
+      "verified_on": null,
+      "nfpa_2026_08_03": "2020 with NC amendments for other than one- and two-family dwellings (11/1/21)"
+    },
+    "ND": {
+      "name": "North Dakota",
+      "status": "statewide",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2026",
+          "effective": "2026-07-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": null,
+      "citation": "N.D. Admin. Code art. 24.1-06 (Electrical Wiring Standards); N.D.C.C. ch. 43-09",
+      "citation_primary": true,
+      "source_url": "https://ndlegis.gov/api/acdata/html/title24.1.html",
+      "draft_note": "SOURCES CONFLICT: NFPA lists NEC 2026 effective 2026-07-01; the latest board notice found adopts NEC 2023 effective 2024-07-01.",
+      "verified_by": null,
+      "verified_on": null,
+      "nfpa_2026_08_03": "2026 (7/1/2026)"
+    },
+    "OH": {
+      "name": "Ohio",
+      "status": "statewide-amended",
+      "editions": [
+        {
+          "applies_to": "commercial",
+          "edition": "2023",
+          "effective": "2024-03-01"
+        },
+        {
+          "applies_to": "one-two-family",
+          "edition": "2023",
+          "effective": "2024-04-15"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": null,
+      "citation": "Ohio Adm. Code 4101:1-27-01 (Ohio Building Code); 4101:8-34-01 (Residential Code of Ohio)",
+      "citation_primary": true,
+      "source_url": "https://codes.ohio.gov/ohio-administrative-code/chapter-4101:1-27",
+      "draft_note": "Residential applies to one-, two- and three-family dwellings.",
+      "verified_by": null,
+      "verified_on": null,
+      "nfpa_2026_08_03": "2023 Commercial (3/1/2024); Residential with OH amendments (4/15/2024)"
+    },
+    "OK": {
+      "name": "Oklahoma",
+      "status": "statewide-amended",
+      "editions": [
+        {
+          "applies_to": "commercial",
+          "edition": "2023",
+          "effective": "2024-09-14"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": "Statewide minimum code for commercial electrical construction.",
+      "citation": "Okla. Admin. Code 748:20-10; 59 O.S. 1000.23",
+      "citation_primary": true,
+      "source_url": "https://oklahoma.gov/content/dam/ok/en/oubcc/documents/rules/2022%2009%2014%20NEC%202023%20Permanent%20Rule.pdf",
+      "draft_note": "Residential electrical edition not checked.",
+      "verified_by": null,
+      "verified_on": null,
+      "nfpa_2026_08_03": "2023 (9/14/2024)"
+    },
+    "OR": {
+      "name": "Oregon",
+      "status": "statewide-amended",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2023",
+          "effective": "2023-10-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": "2026 OESC update in process (NFPA projected 2026-10-01); not confirmed adopted.",
+      "scope": null,
+      "citation": "Or. Admin. R. 918-305-0100 (Oregon Electrical Specialty Code)",
+      "citation_primary": true,
+      "source_url": "https://www.oregon.gov/bcd/codes-stand/pages/adopted-codes.aspx",
+      "draft_note": "The projected 2026-10-01 update is now past: confirm whether the 2026 OESC took effect.",
+      "verified_by": null,
+      "verified_on": null,
+      "nfpa_2026_08_03": "2023 with OR amendments (10/1/2023) | 2026 update process underway (Projected 10/1/2026)"
+    },
+    "PA": {
+      "name": "Pennsylvania",
+      "status": "statewide",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2020",
+          "effective": "2026-01-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": "Philadelphia adopts its own code.",
+      "citation": "34 Pa. Code ch. 403 (Uniform Construction Code), NFPA 70-2020 via the 2021 I-codes; 35 P.S. 7210.101 et seq.",
+      "citation_primary": true,
+      "source_url": "https://www.yorkcity.org/2021ucc",
+      "draft_note": "Sources differ on the transition: mandatory 2026-07-01 per one notice.",
+      "verified_by": null,
+      "verified_on": null,
+      "nfpa_2026_08_03": "2020 (1/1/2026)"
+    },
+    "RI": {
+      "name": "Rhode Island",
+      "status": "statewide-amended",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2023",
+          "effective": "2025-12-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": null,
+      "citation": "510-RICR-00-00-5 (RISBC-5 Rhode Island Electrical Code)",
+      "citation_primary": true,
+      "source_url": "https://rules.sos.ri.gov/Regulations/part/510-00-00-5",
+      "draft_note": "Rule page read still showed 2020 adoption text; confirm the 2025-12-01 version.",
+      "verified_by": null,
+      "verified_on": null,
+      "nfpa_2026_08_03": "2023 (12/1/2025)"
+    },
+    "SC": {
+      "name": "South Carolina",
+      "status": "statewide-amended",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2020",
+          "effective": "2023-01-01"
+        }
+      ],
+      "upcoming": [
+        {
+          "applies_to": "all",
+          "edition": "2023",
+          "effective": "2027-01-01"
+        }
+      ],
+      "pending": null,
+      "scope": null,
+      "citation": "S.C. Code Ann. 6-9-50; S.C. Building Codes Council modifications",
+      "citation_primary": true,
+      "source_url": "https://www.llr.sc.gov/BCC/PDFfiles/Building%20Codes%20in%20Effect%20for%20South%20Carolina.pdf",
+      "draft_note": "NEC 2023 adopted 2025-08-26; the 2027-01-01 date is from NFPA and not confirmed (joint resolution S.1077).",
+      "verified_by": null,
+      "verified_on": null,
+      "nfpa_2026_08_03": "2020 with SC amendments (1/1/2023) | 2023 update process complete (Effective 1/1/2027)"
+    },
+    "SD": {
+      "name": "South Dakota",
+      "status": "statewide-amended",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2023",
+          "effective": "2024-11-12"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": null,
+      "citation": "ARSD 20:44:22:01",
+      "citation_primary": true,
+      "source_url": "https://sdlegislature.gov/Rules/Administrative/20:44:22:01",
+      "draft_note": "Three GFCI exceptions to 210.8.",
+      "verified_by": null,
+      "verified_on": null,
+      "nfpa_2026_08_03": "2023 (11/12/2024) with SD amendments"
+    },
+    "TN": {
+      "name": "Tennessee",
+      "status": "statewide-amended",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2017",
+          "effective": "2018-10-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": null,
+      "citation": "Tenn. Comp. R. & Regs. 0780-02-01-.02",
+      "citation_primary": true,
+      "source_url": "https://www.tn.gov/commerce/fire/codes-enforcement/history.html",
+      "draft_note": null,
+      "verified_by": null,
+      "verified_on": null,
+      "nfpa_2026_08_03": "2017 (10/1/2018) with TN amendments"
+    },
+    "TX": {
+      "name": "Texas",
+      "status": "statewide-amended",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2026",
+          "effective": "2026-09-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": null,
+      "citation": "16 Tex. Admin. Code 73.100; Tex. Occ. Code 1305.101",
+      "citation_primary": true,
+      "source_url": "https://www.tdlr.texas.gov/news/rulemaking/2026/09/01/commission-adopts-rules-12/",
+      "draft_note": "NFPA (read 2026-08-03) still listed NEC 2023; TDLR adopted NEC 2026 effective 2026-09-01 (51 TexReg 5776), with a GFCI exception for certain outdoor outlets.",
+      "verified_by": null,
+      "verified_on": null,
+      "nfpa_2026_08_03": "2023 (9/1/2023)"
+    },
+    "UT": {
+      "name": "Utah",
+      "status": "statewide-amended",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2023",
+          "effective": "2025-01-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": null,
+      "citation": "Utah Code 15A-2-103(1)(g)",
+      "citation_primary": true,
+      "source_url": "https://le.utah.gov/xcode/Title15A/Chapter2/C15A-2-S103_2025070120250507.html",
+      "draft_note": "Date from NFPA; the statute version naming NEC 2023 reads effective 2025-07-01 (H.B. 313, 2025). Confirm.",
+      "verified_by": null,
+      "verified_on": null,
+      "nfpa_2026_08_03": "2023 (1/1/2025)"
+    },
+    "VT": {
+      "name": "Vermont",
+      "status": "statewide-amended",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2023",
+          "effective": "2025-11-05"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": null,
+      "citation": "Vermont Electrical Safety Rules, 2025 Edition (Electricians' Licensing Board, rule 25P023)",
+      "citation_primary": true,
+      "source_url": "https://firesafety.vermont.gov/node/141",
+      "draft_note": "NFPA (read 2026-08-03) still listed NEC 2020 with a 2023 update underway; the Division of Fire Safety lists the 2025 rules (NEC 2023) effective 2025-11-05.",
+      "verified_by": null,
+      "verified_on": null,
+      "nfpa_2026_08_03": "2020 (1/1/2023) | 2023 update process underway"
+    },
+    "VA": {
+      "name": "Virginia",
+      "status": "statewide-amended",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2020",
+          "effective": "2024-01-18"
+        }
+      ],
+      "upcoming": [],
+      "pending": "NEC 2023 update in process (next USBC); no effective date set.",
+      "scope": null,
+      "citation": "13VAC5-63 (Virginia Uniform Statewide Building Code); Va. Code 36-98",
+      "citation_primary": true,
+      "source_url": "https://law.lis.virginia.gov/admincodeexpand/title13/agency5/chapter63/",
+      "draft_note": "Optional until 2025-01-18, mandatory after.",
+      "verified_by": null,
+      "verified_on": null,
+      "nfpa_2026_08_03": "2020 (1/18/2024) | 2023 update process underway (Effective date not established)"
+    },
+    "WA": {
+      "name": "Washington",
+      "status": "statewide-amended",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2023",
+          "effective": "2024-04-01"
+        }
+      ],
+      "upcoming": [
+        {
+          "applies_to": "all",
+          "edition": "2026",
+          "effective": "2026-12-31"
+        }
+      ],
+      "pending": null,
+      "scope": null,
+      "citation": "WAC 296-46B-010 (WSR 25-23-069)",
+      "citation_primary": true,
+      "source_url": "https://lawfilesext.leg.wa.gov/law/wsr/2025/23/25-23-069.htm",
+      "draft_note": null,
+      "verified_by": null,
+      "verified_on": null,
+      "nfpa_2026_08_03": "2023 (4/1/2024) | 2026 update process underway (Projected 12/31/2026)"
+    },
+    "WV": {
+      "name": "West Virginia",
+      "status": "statewide-amended",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2020",
+          "effective": "2022-08-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": null,
+      "citation": "W. Va. Code R. 87-1 (State Fire Code), NFPA 70 by reference",
+      "citation_primary": true,
+      "source_url": "https://www.iaei.org/page/west-virginia-electrical-ceus",
+      "draft_note": "Date from IAEI and NFPA only; the rule section that adopts NFPA 70-2020 was not confirmed (87CSR4 is the State Building Code).",
+      "verified_by": null,
+      "verified_on": null,
+      "nfpa_2026_08_03": "2020 with WV amendments (8/1/2022)"
+    },
+    "WI": {
+      "name": "Wisconsin",
+      "status": "statewide-amended",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2023",
+          "effective": "2026-09-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": null,
+      "citation": "Wis. Admin. Code ch. SPS 316 (Electrical Code)",
+      "citation_primary": true,
+      "source_url": "https://dsps.wi.gov/Documents/RulesStatutes/SPS316EIA.pdf",
+      "draft_note": "Replaced NEC 2017 (commercial 2018-08-01, residential 2020-01-01).",
+      "verified_by": null,
+      "verified_on": null,
+      "nfpa_2026_08_03": "2017 Commercial (8/1/2018); Residential (1/1/2020) | 2023 update process complete (Effective 9/1/2026)"
+    },
+    "WY": {
+      "name": "Wyoming",
+      "status": "statewide",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2026",
+          "effective": "2026-07-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": null,
+      "citation": "Wyo. Stat. tit. 35, ch. 9 (Department of Fire Prevention and Electrical Safety) and its electrical rules",
+      "citation_primary": true,
+      "source_url": "https://wsfm.wyo.gov/electrical-safety/rules-statutes-and-jurisdictions",
+      "draft_note": "SOURCES CONFLICT: NFPA lists NEC 2026 effective 2026-07-01; the state page read says NEC 2023 adopted 2023-07-01.",
+      "verified_by": null,
+      "verified_on": null,
+      "nfpa_2026_08_03": "2026 (7/1/2026)"
+    },
+    "DC": {
+      "name": "District of Columbia",
+      "status": "statewide-amended",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2014",
+          "effective": "2020-05-29"
+        }
+      ],
+      "upcoming": [],
+      "pending": "DOB plans new construction codes by the end of 2027.",
+      "scope": null,
+      "citation": "12-C DCMR (2017 District of Columbia Electrical Code Supplement)",
+      "citation_primary": true,
+      "source_url": "https://dob.dc.gov/node/1613981",
+      "draft_note": "The 2017 DC Electrical Code is the 2014 NEC as amended. Not on the NFPA map.",
+      "verified_by": null,
+      "verified_on": null,
+      "nfpa_2026_08_03": null
+    }
+  }
+}

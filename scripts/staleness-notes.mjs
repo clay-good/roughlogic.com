@@ -47,6 +47,12 @@ export function stalenessNote(folder, rowStamps) {
 
 export const STALENESS_NOTE_FOLDERS = Object.keys(BODIES);
 
+// Shards whose rows the folder note does NOT describe. legal's note is worded
+// for the post-Wayfair nexus rows; spec-v1968's NEC adoption rows sit in the
+// same folder but carry their own recheck cadence, enforced row by row in
+// scripts/check-code-adoption.mjs and at display time.
+export const NOTE_EXCLUDED_SHARDS = new Set(["legal/code-adoption.json"]);
+
 /**
  * Collect every per-row `verified_on` ISO date in a shard body. Both callers
  * use this one traversal so the generator and the gate can never disagree

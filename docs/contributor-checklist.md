@@ -226,7 +226,7 @@ phase docs ([edition-rollover.md](edition-rollover.md),
 - [ ] `npm run build` clean (dist/ produced).
 - [ ] No new third-party runtime dependency or outbound network call beyond the
   reviewed, lazy Turnstile/reporting exception in spec-v1348. No new storage key
-  beyond `rl-theme`, and no new remote write path without its own approved spec.
+  beyond `rl-theme` and `rl-state`, and no new remote write path without its own approved spec.
 - [ ] No emoji, no em-dash, no decorative icon in shipped
   strings.
 - [ ] CHANGELOG updated if the change is user-visible.

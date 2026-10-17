@@ -1676,7 +1676,8 @@ const GLOSSARY_DATA_V5 = {
 // the sales-tax-nexus tile lives in the reference group (calc-references.js). ---
 
 import { SALES_TAX_NEXUS } from "../calc-references.js";
-import { stalenessNote, collectRowStamps } from "./staleness-notes.mjs";
+import { stalenessNote, collectRowStamps, NOTE_EXCLUDED_SHARDS } from "./staleness-notes.mjs";
+import { loadRows as loadCodeAdoptionRows, buildCodeAdoptionShard } from "./code-adoption.mjs";
 import { lintProseInShard } from "./prose-lint-keys.mjs";
 
 function buildSalesTaxNexusShard() {
@@ -1848,11 +1849,15 @@ const DATASETS = [
       { file: "inventory-benchmarks.json", body: INVENTORY_BENCH_DATA_V5, name: "Industry-median inventory turnover (Census ARTS / SBA)" },
       { file: "pub-15-t-tables.json", body: PUB_15T_DATA_V5, name: "IRS Pub 15-T percentage-method brackets (single-filer)" },
     ] },
-  // Legal folder: only the post-Wayfair sales-tax-nexus shard survives
-  // spec-v107 (Legal group retired). Its tile lives in the reference group;
-  // the shard builds from the runtime module (calc-references.js).
+  // Legal folder: the post-Wayfair sales-tax-nexus shard survived spec-v107
+  // (Legal group retired). Its tile lives in the reference group; the shard
+  // builds from the runtime module (calc-references.js). spec-v1968 added the
+  // NEC adoption rows beside it.
   { folder: "legal", edition: "Post-Wayfair sales-tax-nexus thresholds from each state's department of revenue. Verified " + EDITION_VERIFIED.legal + ".", shards: [
       { file: "sales-tax-nexus.json", body: buildSalesTaxNexusShard(), name: "Per-state post-Wayfair economic-nexus thresholds" },
+      // spec-v1968: the NEC edition each state enforces. Built from
+      // docs/code-adoption-rows.json; only rows a maintainer signed off ship.
+      { file: "code-adoption.json", body: buildCodeAdoptionShard(loadCodeAdoptionRows(), TODAY), name: "Per-state NEC adoption (signed-off rows only)" },
     ] },
   // v5 Group T: Bench Science and Laboratory Math (utilities 255-264).
   { folder: "lab", edition: "IUPAC/CIAAW Abridged Standard Atomic Weights 2024. Common laboratory buffer pKa values, Good 1966 / PanReac AppliChem IP-022EN / CRC 95th (Good named the buffers and tabulates at 20 C; the bundled 25 C values are IP-022EN, and Tris, phosphate, acetate and bicarbonate are CRC). Manufacturer rotor specifications, current manufacturer catalogs (Eppendorf, Beckman Coulter, Thermo Fisher). Verified " + EDITION_VERIFIED.lab + ".", shards: [
@@ -1976,7 +1981,9 @@ async function buildAll() {
     // Written after the shard loop so it describes the bytes actually emitted,
     // including any ledger override applied above.
     const rowStamps = [];
-    for (const shard of ds.shards) collectRowStamps(shard.body, rowStamps);
+    for (const shard of ds.shards) {
+      if (!NOTE_EXCLUDED_SHARDS.has(ds.folder + "/" + shard.file)) collectRowStamps(shard.body, rowStamps);
+    }
     const note = stalenessNote(ds.folder, rowStamps);
     if (note) manifest.staleness_note = note;
 

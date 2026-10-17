@@ -2427,3 +2427,7 @@ textarea.is-autofilled {
 html[data-route="tool"] main {
   min-height: 100vh;
 }
+/* spec-v1968: the "Your state's edition" row in the reference block. */
+.state-edition-select { max-width: 100%; }
+.state-edition-line { margin: var(--space-1) 0 0; overflow-wrap: anywhere; }
+.state-edition-line:empty { display: none; }

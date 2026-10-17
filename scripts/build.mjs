@@ -36,6 +36,7 @@ const FILES = [
   // The result-key humanizer, shared by the shell builder and the agent door.
   "key-labels.js",
   "steps-panel.js",
+  "code-adoption.js",
   "hash-state.js",
   "data-stamp.js",
   "clipboard.js",

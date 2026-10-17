@@ -310,7 +310,7 @@ X-Content-Type-Options nosniff. X-Frame-Options DENY. Referrer-Policy no-referre
 
 innerHTML is forbidden in the codebase, enforced by ESLint and CI grep.
 
-No sessionStorage, cookies, or IndexedDB. localStorage is used by `theme.js` for one key (`rl-theme`, value `"light"` or `"dark"`) so the chosen theme survives reloads without a flash of the wrong palette; no calculator inputs, pinned set, recents ring, or bundle data is written there. The service worker cache holds only same-origin static shell files and bundled data shards.
+No sessionStorage, cookies, or IndexedDB. localStorage is used by `theme.js` for one key (`rl-theme`, value `"light"` or `"dark"`) so the chosen theme survives reloads without a flash of the wrong palette, and by `code-adoption.js` for one key (`rl-state`, a state code, spec-v1968) so an NEC calculator remembers the reader's state; no calculator inputs, pinned set, recents ring, or bundle data is written there. The service worker cache holds only same-origin static shell files and bundled data shards.
 
 A startup integrity check verifies the SHA-256 hash of each data manifest matches the hash recorded in `data/integrity.json` (a build-time sidecar produced by `scripts/build-data.mjs`).
 
@@ -384,7 +384,7 @@ Every calculator input is reachable by Tab in visual order. Numeric inputs use a
 
 ### 11.5 Hash-Based Pinning and Calculator State
 
-URL hash carries pinned-tile state and calculator input state. No cookies. The only localStorage key is `rl-theme` for the persisted light/dark theme preference; no tool data is stored there. Pinned format: `#p=ohms-law,wire-ampacity,refrigerant-pt`. Calculator state format: `#duct-sizing?cfm=400&friction=0.08`. Bookmarkable. Shareable. Updates via history.replaceState.
+URL hash carries pinned-tile state and calculator input state. No cookies. The localStorage keys are `rl-theme` for the persisted light/dark theme preference and `rl-state` for the reader's state on NEC calculators (spec-v1968); no tool data is stored there. Pinned format: `#p=ohms-law,wire-ampacity,refrigerant-pt`. Calculator state format: `#duct-sizing?cfm=400&friction=0.08`. Bookmarkable. Shareable. Updates via history.replaceState.
 
 ### 11.6 Inline Citations and Test With Example Buttons
 

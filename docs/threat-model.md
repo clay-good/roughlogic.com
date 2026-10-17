@@ -141,7 +141,7 @@ Threat: User input or activity is logged to a third party.
 Controls:
 - No analytics, telemetry, or tracking of any kind.
 - No sessionStorage, cookies, or IndexedDB.
-- localStorage is used by `theme.js` for a single key (`rl-theme`) holding the literal string `"light"` or `"dark"` so the user's chosen theme survives reloads without a flash of incorrect color -- and only once the reader works the toggle; following the system preference persists nothing. (A stored `"high-contrast"`, which this line listed as a third value until 2026-09-02, is migrated to `"dark"` on read and can no longer be written.) No other client-side storage mechanism is used. No calculator inputs, pinned set, or bundle data is written to localStorage; all of that lives in the URL hash only (spec.md section 11.5). (The `rl-bigbuttons` key was retired in spec-v11 along with Big Buttons mode.)
+- localStorage is used by `theme.js` for a single key (`rl-theme`) holding the literal string `"light"` or `"dark"` so the user's chosen theme survives reloads without a flash of incorrect color -- and only once the reader works the toggle; following the system preference persists nothing. (A stored `"high-contrast"`, which this line listed as a third value until 2026-09-02, is migrated to `"dark"` on read and can no longer be written.) A second key, `rl-state` (a two-letter state code, written only when the reader picks a state on an NEC calculator; spec-v1968), lets the "Your state's edition" row remember the reader's state; it is never sent anywhere. No other client-side storage mechanism is used. No calculator inputs, pinned set, or bundle data is written to localStorage; all of that lives in the URL hash only (spec.md section 11.5). (The `rl-bigbuttons` key was retired in spec-v11 along with Big Buttons mode.)
 - **Measured, not asserted:** `test/integration/no-tracking.test.js` walks a full journey -- search, a calculator typed into, a worked example, a tile page, a group hub, the catalog, the 404 -- then reads every storage the browser offers and checks that every request went to this origin.
 - Service worker cache holds only same-origin static shell files and bundled data shards.
 - The hash-based pinning and calculator state keep state in the URL only; the user controls when and where it is shared. (Recents was retired in spec-v11.)
@@ -194,7 +194,7 @@ Controls:
 - `routing.js` filters every id through the same valid-id set as the bundle path.
 - `parseHashRoute` falls back to home for unknown tool ids.
 - `example=1` only programmatically clicks the renderer's "Test with example" button and never executes attacker-supplied script.
-- The URL hash is the only state mechanism for tool data. The single localStorage key `rl-theme` carries the theme preference and nothing else; no sessionStorage, cookies, or IndexedDB is used.
+- The URL hash is the only state mechanism for tool data. localStorage holds two preference keys and nothing else: `rl-theme` (the theme) and `rl-state` (the reader's state for the NEC edition row, spec-v1968); no sessionStorage, cookies, or IndexedDB is used.
 
 ### T12. Abuse of the report endpoint (2026-09-04)
 

@@ -783,6 +783,11 @@ function renderToolView(id, params) {
         }
       });
       block.appendChild(copyBtn);
+      // spec-v1968: on a tile that cites the NEC, the edition the reader's
+      // state enforces (signed-off rows only; nothing shows until one is).
+      if (/\bNEC\b|NFPA 70(?![0-9A-Z])/.test(entry.edition || "")) {
+        import("./code-adoption.js").then((m) => m.mountStatePicker(block, entry)).catch(() => {});
+      }
     }
   }).catch(() => { /* citation block is opt-in per tile; missing map is fine */ });
 

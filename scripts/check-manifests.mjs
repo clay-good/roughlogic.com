@@ -17,7 +17,7 @@ import { readFile, readdir } from "node:fs/promises";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { existsSync } from "node:fs";
-import { stalenessNote, collectRowStamps } from "./staleness-notes.mjs";
+import { stalenessNote, collectRowStamps, NOTE_EXCLUDED_SHARDS } from "./staleness-notes.mjs";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const DATA = resolve(ROOT, "data");
@@ -146,7 +146,7 @@ async function main() {
     for (const f of await shardFiles(resolve(DATA, folder))) {
       const body = JSON.parse(await readFile(f, "utf8"));
       stamps(body, all);
-      collectRowStamps(body, rowStamps);
+      if (!NOTE_EXCLUDED_SHARDS.has(folder + "/" + f.slice(f.lastIndexOf("/") + 1))) collectRowStamps(body, rowStamps);
     }
     // The note is the one thing that downgrades a four-rechecks-late folder from
     // an error to a warning, and for a year it was hand-written prose nobody

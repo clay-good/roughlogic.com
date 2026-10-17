@@ -121,7 +121,7 @@ A startup integrity check (integrity.js) verifies the SHA-256 hash of each per-f
 
 ## Persistence
 
-There is no sessionStorage, cookies, or IndexedDB. localStorage is used by `theme.js` for a single key (`rl-theme`) holding the literal string `"light"`, `"dark"`, or `"high-contrast"` so the user's chosen theme survives reloads without a flash of incorrect color. No other client-side storage mechanism is used. Pinned tiles and calculator state live in the URL hash. (The Recents ring and the `rl-bigbuttons` localStorage key were retired in spec-v11.) The service worker cache is the only other client-side persistence and it holds only the same-origin static shell and shards.
+There is no sessionStorage, cookies, or IndexedDB. localStorage is used by `theme.js` for a single key (`rl-theme`) holding the literal string `"light"`, `"dark"`, or `"high-contrast"` so the user's chosen theme survives reloads without a flash of incorrect color, and by `code-adoption.js` for `rl-state` (a two-letter state code, written only when the reader picks a state on an NEC calculator; spec-v1968). No other client-side storage mechanism is used. Pinned tiles and calculator state live in the URL hash. (The Recents ring and the `rl-bigbuttons` localStorage key were retired in spec-v11.) The service worker cache is the only other client-side persistence and it holds only the same-origin static shell and shards.
 
 ## v2 module layout
 
