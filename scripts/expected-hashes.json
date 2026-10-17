@@ -15,7 +15,7 @@
     "electrical/conductor-c-values.json": "d791e1bdee6de7266b2bc7b553465ca06c07e0dd29d24d82176fbe596d22cd43",
     "electrical/nema-mg1-code-letters.json": "ee7832404dab8a9f8a1621a84dc194a4344f34bfd6ce70613d05693aad8338d9",
     "electrical/dwelling-demand.json": "7e49f0ef7184c83bb365214ac19d8461efa74ef40313343302fe926ec049698c",
-    "electrical/manifest.json": "b8ada9eedaf86be295fb097335e2e0c410b9d45ba9a03a3c61677d19fa557a80",
+    "electrical/manifest.json": "2efdd8e45c5eecd0e4e2915aa9b37062b61bc419a33727dbdd0a2e0d7e3121bc",
     "plumbing/pipe-properties.json": "2f210896085237d74667de6933632c8cc3a68509fe68b4f7bc4da9d26295aeb8",
     "plumbing/fixture-units.json": "ce46ba45e86a4439864676c4bf09608e6682f6dada0fe224d94f5ebfdf5a4edd",
     "plumbing/gas-pipe-capacity.json": "d3b332e0d44fd9cbdaf50fda30b485993cd8558e443b63f98a1b71cb296844b1",
@@ -61,7 +61,7 @@
     "construction/rebar-unit-weights.json": "aa9d90af63d3d735986b52af4d5a7ae3f50d1db89de02b5e22c0cba22f0ecc35",
     "construction/apa-span-ratings.json": "2fc73082e7a4068250c74664df666fef56aa7ed65c74687cab7d7c81c5c087be",
     "construction/helical-pile-kt.json": "dbc1a7421f3ced6964933569faf525bf4e6f93ae57e4ef3f30c35cc52b32c7a8",
-    "construction/manifest.json": "6195a6a5522a553d66bc40bfedfe05e23258d4167697aad172422e7c763801f9",
+    "construction/manifest.json": "904c4a26b6c495e7323ee79110268522577ba4c5bd2b2d873f3ca8a81487e9f5",
     "fire/hose-friction.json": "61ea899b59206ed16946e9627de0a0ef2c77fccbb1673bdbe25d9a7145014a41",
     "fire/fire-flow-formulas.json": "b1aa15700e69905bb68e90419a26b59b8e01bdfeb928230e19272ea536404782",
     "fire/iso-nff.json": "b2ca30cd7a44da3b5e07b9796ba3c90ad12dc6ae60addc362e4492993bc5a002",
@@ -121,7 +121,7 @@
     "fields/manifest.json": "065133332f139f102c3eb6b2841857f35b3ea991f43a0f30f8d4e2a02f9f3029",
     "search/manifest.json": "5a0fbbc1312c295d1317e6cb5e0f3bdf80dd7652fc31583d6068c4bde78cfb59",
     "desc/manifest.json": "6d7093eaefadf8f97ad420a6325e26051de6e9bf2790ddaf9476a2b6e3595290",
-    "citations/manifest.json": "93c69360ae18397ebbcad90e2c9b459ac24149fcc43947bf9bfe0ca91544e608",
+    "citations/manifest.json": "ec65b39e44c795eeb9ac06765669a410b98e5928a11beca06f86a37bb8e55ef8",
     "legal/code-adoption.json": "fcc7037a9c63cf5139c0a527c4b8077dafdc72748ecf7d71d588d07dacdca557"
   }
 }

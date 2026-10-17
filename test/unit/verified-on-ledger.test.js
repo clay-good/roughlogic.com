@@ -831,6 +831,7 @@ test("every 'is the current edition' claim names the ledger's current edition", 
     ["imc", /\bIMC (\d{4})\b/g], ["ifc", /\bIFC (\d{4})\b/g], ["ifgc", /\bIFGC (\d{4})\b/g],
     ["ashrae-62-1", /\b62\.1-(\d{4})\b/g], ["ashrae-62-2", /\b62\.2-(\d{4})\b/g], ["ashrae-90-1", /\b90\.1-(\d{4})\b/g],
     ["fda-food-code", /\bFood Code (\d{4})\b/g], ["nfpa-70e", /\b70E-(\d{4})\b/g], ["nds", /\bNDS[- ](\d{4})\b/g],
+    ["aci-318", /\b318-(\d{2})\b/g], ["tms-402", /\b402(?:\/602)?-(\d{2})\b/g], ["iecc", /\bIECC (\d{4})\b/g],
   ];
   const { readdir } = await import("node:fs/promises");
   const files = ["citations.js", "README.md", "docs/data-sources.md", "docs/how-it-works.md", "docs/correctness.md", "docs/edition-rollover.md"];
@@ -849,7 +850,7 @@ test("every 'is the current edition' claim names the ledger's current edition", 
       for (const [id, re] of NAMES) {
         for (const n of clause.matchAll(re)) {
           claims++;
-          if (n[1] !== cur[id]) bad.push(`${f}: "${clause.trim().slice(-120)} ..." names ${n[0]} as current; the ledger records ${cur[id]}`);
+          if (n[1] !== cur[id] && n[1] !== cur[id].slice(-2)) bad.push(`${f}: "${clause.trim().slice(-120)} ..." names ${n[0]} as current; the ledger records ${cur[id]}`);
         }
       }
     }

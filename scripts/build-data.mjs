@@ -1741,7 +1741,7 @@ const DATASETS = [
       { file: "constants.json", body: PHYSICAL_CONSTANTS, name: "NIST physical constants" },
       { file: "material-properties.json", body: MATERIAL_PROPERTIES, name: "Material properties" },
     ] },
-  { folder: "electrical", edition: "NEC 2023 (NFPA 70); IEEE 802.3bt-2018 PoE; ANSI/IEEE C57 (transformer step series); NEMA MG-1 (motor code letters); IECC 2021 Table C405.3.2(1) (lighting power density); Eaton/Bussmann SPD (point-to-point C-values); manufacturer cable specs as of " + EDITION_VERIFIED.electrical + ".", shards: [
+  { folder: "electrical", edition: "NEC 2023 (NFPA 70); IEEE 802.3bt-2018 PoE; ANSI/IEEE C57 (transformer step series); NEMA MG-1 (motor code letters); IECC 2021 Table C405.3.2(1) (lighting power density; IECC 2024 is the current published edition); Eaton/Bussmann SPD (point-to-point C-values); manufacturer cable specs as of " + EDITION_VERIFIED.electrical + ".", shards: [
       { file: "conductor-properties.json", body: buildConductorProperties(), name: "Conductor properties (AWG)" },
       { file: "ampacity-physics.json", body: AMPACITY_PHYSICS, name: "Ampacity physics methodology" },
       { file: "motor-fla.json", body: MOTOR_FLA, name: "Motor full-load amps" },
@@ -1793,7 +1793,7 @@ const DATASETS = [
       { file: "mold-conditions.json", body: MOLD_CONDITIONS, name: "Mold growth conditions" },
       { file: "hepa-loading.json", body: HEPA_LOADING, name: "HEPA scrubber loading rates" },
     ] },
-  { folder: "construction", edition: "IRC 2021 / IBC 2021 cited by section number (IRC 2024 and IBC 2027 are the current published editions; bundled values follow 2021 and the tile citations disclose it); ASCE 7 formulas applied (no licensed text reproduced); ACI 211 / ACI 318 / ACI 347 cited by name; ASTM A615 + CRSI rebar values; APA span-rating tables (technical-bulletin reuse); ICC-ES AC358 helical-pile Kt; ASME B30.5 / B30.9 + OSHA 29 CFR 1926 Subpart CC for crane-lift; ASTM/SAE bolt grades; AWS deposition; lumber properties from public engineering references; verified " + EDITION_VERIFIED.construction + ".", shards: [
+  { folder: "construction", edition: "IRC 2021 / IBC 2021 cited by section number (IRC 2024 and IBC 2027 are the current published editions; bundled values follow 2021 and the tile citations disclose it); ASCE 7 formulas applied (no licensed text reproduced); ACI 211 / ACI 318 / ACI 347 cited by name (ACI 318 provisions follow 318-19; ACI CODE-318-25, published 2025, is the current edition); ASTM A615 + CRSI rebar values; APA span-rating tables (technical-bulletin reuse); ICC-ES AC358 helical-pile Kt; ASME B30.5 / B30.9 + OSHA 29 CFR 1926 Subpart CC for crane-lift; ASTM/SAE bolt grades; AWS deposition; lumber properties from public engineering references; verified " + EDITION_VERIFIED.construction + ".", shards: [
       { file: "lumber-properties.json", body: LUMBER_PROPERTIES, name: "Lumber material properties" },
       { file: "concrete-mixes.json", body: CONCRETE_MIXES, name: "Concrete mixes" },
       { file: "span-derivations.json", body: SPAN_DERIVATIONS, name: "Span derivations" },

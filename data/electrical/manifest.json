@@ -2,7 +2,7 @@
   "name": "electrical",
   "version": "2026-09-24",
   "fetched": "2026-09-24",
-  "edition": "NEC 2023 (NFPA 70); IEEE 802.3bt-2018 PoE; ANSI/IEEE C57 (transformer step series); NEMA MG-1 (motor code letters); IECC 2021 Table C405.3.2(1) (lighting power density); Eaton/Bussmann SPD (point-to-point C-values); manufacturer cable specs as of 2026-09-02.",
+  "edition": "NEC 2023 (NFPA 70); IEEE 802.3bt-2018 PoE; ANSI/IEEE C57 (transformer step series); NEMA MG-1 (motor code letters); IECC 2021 Table C405.3.2(1) (lighting power density; IECC 2024 is the current published edition); Eaton/Bussmann SPD (point-to-point C-values); manufacturer cable specs as of 2026-09-02.",
   "asOf": "2026-09-24",
   "refresh_cadence": "annual",
   "shards": [

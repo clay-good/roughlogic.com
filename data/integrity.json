@@ -2,11 +2,11 @@
   "generated": "2026-09-09",
   "manifests": {
     "physical-constants": "f39664f647623799109d1d52f20086a21a890ffb9edaf8a27ab65d76fd74da1e",
-    "electrical": "b8ada9eedaf86be295fb097335e2e0c410b9d45ba9a03a3c61677d19fa557a80",
+    "electrical": "2efdd8e45c5eecd0e4e2915aa9b37062b61bc419a33727dbdd0a2e0d7e3121bc",
     "plumbing": "709de5b3075e7f44886be4a1376961f51ea4a61f7d613f2ba6452cd41540ecb5",
     "hvac": "0f81728b66f165c78d6edc9f31fadcbf0da0b09d5ae8a652be86cccf383a2d62",
     "restoration": "aa8cf63e4fa2459632fe0cb380353f6391cbe19d21289dcf7a814622f8528e3c",
-    "construction": "6195a6a5522a553d66bc40bfedfe05e23258d4167697aad172422e7c763801f9",
+    "construction": "904c4a26b6c495e7323ee79110268522577ba4c5bd2b2d873f3ca8a81487e9f5",
     "fire": "2eeecc4b0b5797cd1006c987571dfebc9ef36eb38f094a322ef01c4a997f0c76",
     "crosswalks": "bcc4ffbf33cec77380ebd522e0671591f584303a704a792cabed4f2ee41dc663",
     "summaries": "28dad1505acf61111a969aa1f7062182f8d224cd6babd0ddfead0abcbcac7922",
@@ -21,6 +21,6 @@
     "fields": "065133332f139f102c3eb6b2841857f35b3ea991f43a0f30f8d4e2a02f9f3029",
     "search": "5a0fbbc1312c295d1317e6cb5e0f3bdf80dd7652fc31583d6068c4bde78cfb59",
     "desc": "6d7093eaefadf8f97ad420a6325e26051de6e9bf2790ddaf9476a2b6e3595290",
-    "citations": "b3efae1d0641afad4b28c555859f47ddb4af96fd9fd0f8dd2957dfbd8bc8b0b6"
+    "citations": "ec65b39e44c795eeb9ac06765669a410b98e5928a11beca06f86a37bb8e55ef8"
   }
 }

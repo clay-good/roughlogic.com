@@ -144,6 +144,44 @@
       ]
     },
     {
+      "id": "aci-318",
+      "name": "ACI 318 Building Code for Structural Concrete",
+      "current_edition": "2025",
+      "current_release": "2025-03",
+      "cycle_years": 6,
+      "next_expected": "2031-03",
+      "free_access_url": "https://www.concrete.org/store/productdetail.aspx?ItemID=31825",
+      "match_terms": ["ACI 318"],
+      "last_verified": "2026-10-17",
+      "verification_note": "Verified 2026-10-17 on ACI's own store listing for ACI CODE-318-25 (\"Publication Year: 2025\"); ACI announced the release in early 2025, print and digital in spring 2025. 46 tiles bundle ACI 318-19 provisions: rc-headed-bar-development already gave the 318-25 change, and the other 45 now name 318-25 as current and say their provisions follow 318-19, not yet re-checked. ACI 318 has run on a six-year cycle since 2014 (2014, 2019, 2025); the next date is an estimate."
+    },
+    {
+      "id": "tms-402",
+      "name": "TMS 402/602 Building Code Requirements and Specification for Masonry Structures",
+      "current_edition": "2022",
+      "current_release": "2022-01",
+      "cycle_years": 3,
+      "next_expected": "2028-01",
+      "free_access_url": "https://masonrysociety.org/?p=50546",
+      "match_terms": ["TMS 402"],
+      "last_verified": "2026-10-17",
+      "verification_note": "Verified 2026-10-17 on The Masonry Society's product page for TMS 402/602-22, the edition the 2024 IBC references. cmu-shear-wall already gave a 402-22 change; cmu-wall-flexure, cmu-wall-axial and masonry-anchor-shear cited 402-16 and now name 402-22 as current and say they are not yet re-checked against it. The next edition date is an estimate (TMS skipped a 2019 edition).",
+      "citation_only": true,
+      "citation_only_reason": "No bundled shard holds TMS 402 data: the masonry tiles cite it by section and compute inline. Their citations name the older edition as bundled and 402-22 as current, a disclosed lag."
+    },
+    {
+      "id": "iecc",
+      "name": "International Energy Conservation Code",
+      "current_edition": "2024",
+      "current_release": "2023-09",
+      "cycle_years": 3,
+      "next_expected": "2027-01",
+      "free_access_url": "https://codes.iccsafe.org/codes/i-codes",
+      "match_terms": ["IECC"],
+      "last_verified": "2026-10-17",
+      "verification_note": "Verified 2026-10-17: ICC's 2027 I-Codes page lists eleven released 2027 titles and not the IECC, whose 2027 edition ICC anticipated for 2026-12-31 (see the IPC row); IECC 2024 remains current. lighting-density and blower-door-ach50 cite IECC 2021 values and now name 2024 as current and say they are not yet re-checked against it. Recheck the 2027-icodes page when next_expected passes."
+    },
+    {
       "id": "nds",
       "name": "AWC National Design Specification (NDS) for Wood Construction",
       "current_edition": "2024",
