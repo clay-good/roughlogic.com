@@ -30,6 +30,23 @@ test("a per-unit denominator is only ever the last token", () => {
   assert.equal(humanizeKey("theta_s_deg"), "Theta s (deg)");
 });
 
+test("a key that spells its own `per` reads as one quotient, never \"X per (unit)\"", () => {
+  assert.equal(humanizeKey("pitch_in_per_ft"), "Pitch (in/ft)");
+  assert.equal(humanizeKey("loading_gpm_per_ft2"), "Loading (GPM/ft²)");
+  assert.equal(humanizeKey("glazed_btuh_per_ft2"), "Glazed (Btu/h/ft²)");
+  // A same-unit quotient keeps both halves; the dedupe for `lb_lb` must not eat it.
+  assert.equal(humanizeKey("angularity_in_per_in"), "Angularity (in/in)");
+  assert.equal(humanizeKey("moment_lb_in_per_ft"), "Moment (lb-in/ft)", "two units before the per are a product");
+  assert.equal(humanizeKey("cost_per_lb"), "Cost per lb", "no unit before the per keeps the word");
+  assert.equal(humanizeKey("work_min_per_hr"), "Work min per hr", "min is still a minimum, never a unit");
+  assert.equal(humanizeKey("w_per_ft2"), "W per ft²");
+  assert.equal(humanizeKey("cfm_per_ton"), "CFM per ton");
+  assert.equal(humanizeKey("tons_per_ft"), "Tons per ft", "a key that is only units keeps its own word");
+  assert.equal(humanizeKey("kva_per_hp"), "kVA per hp");
+  assert.equal(humanizeKey("cu_ft_per_day"), "Cubic feet per day");
+  assert.equal(humanizeKey("rimpull_per_ton_lb"), "Rimpull per ton (lb)", "a per that is not last is unchanged");
+});
+
 test("in_lb and ft_lb are torques, not quotients", () => {
   assert.equal(humanizeKey("torque_in_lb"), "Torque (in-lb)");
   assert.equal(humanizeKey("torque_ft_lb"), "Torque (ft-lb)");

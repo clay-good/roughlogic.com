@@ -103,8 +103,39 @@ export function humanizeKey(key) {
   // "Rimpull per ton, in lb": the name already spent the word `per`, so the
   // token before it belongs to the name and not to a quotient.
   if (units.length > 1 && parts[parts.length - 1] === "per") { parts.push(units.shift()); }
+  // `pitch_in_per_ft` spelled its own quotient. Read past the `per` with the
+  // same unit tables: "Pitch (in/ft)", not "Pitch in per (ft)" -- 216 worked
+  // values in the steps panel read that way. A name with no unit before the
+  // `per` keeps the word: "Cost per lb"; a key that is only units reads
+  // "CFM per ton". Two units before the `per` are a product ("Moment
+  // (lb-in/ft)"), and "cu ft" / "sq ft" are one unit.
+  let perUnit = null, perWord = null;
+  if (units.length === 1 && parts.length > 1 && parts[parts.length - 1] === "per") {
+    const rest = parts.slice(0, -1), num = [];
+    while (rest.length) {
+      const raw = rest[rest.length - 1];
+      const u = KEY_UNITS.get(raw.toLowerCase());
+      if (u === undefined) break;
+      num.unshift(u);
+      rest.pop();
+    }
+    const cu = rest.length && num[0] === "ft" ? { cu: "ft³", sq: "ft²" }[rest[rest.length - 1].toLowerCase()] : undefined;
+    if (cu) { num[0] = cu; rest.pop(); }
+    if (!num.length || rest[rest.length - 1] === "per") {
+      perWord = units[0];
+      parts.pop();
+    } else if (!rest.length) {
+      if (cu) return `${cu === "ft\u00b3" ? "Cubic" : "Square"} feet per ${units[0]}`;
+      const n = num.length === 1 && num[0].toLowerCase() !== parts[0].toLowerCase() ? parts[0] : num.join("-");
+      return `${n === n.toLowerCase() ? n.charAt(0).toUpperCase() + n.slice(1) : n} per ${units[0]}`;
+    } else {
+      perUnit = `${num.join("-")}/${units[0]}`;
+      parts.length = rest.length;
+    }
+    units.length = 0;
+  }
   if (!parts.length) return null;
-  let unit = units.filter((u, i) => i === 0 || u !== units[i - 1]).join("/");
+  let unit = perUnit || units.filter((u, i) => i === 0 || u !== units[i - 1]).join("/");
   // in_lb / ft_lb is a torque, not a quotient.
   if (unit === "in/lb") unit = "in-lb";
   if (unit === "ft/lb") unit = "ft-lb";
@@ -125,6 +156,7 @@ export function humanizeKey(key) {
   const base = words.join(" ");
   // A symbol alone says nothing ("fc"), but a symbol with its unit does:
   // "Fc (psi)" beats "fc_psi", so a spelled unit lowers the bar.
-  if (base.length < (unit ? 1 : 3)) return null;
+  if (base.length < (unit || perWord ? 1 : 3)) return null;
+  if (perWord) return `${base} per ${perWord}`;
   return unit ? `${base} (${unit})` : base;
 }

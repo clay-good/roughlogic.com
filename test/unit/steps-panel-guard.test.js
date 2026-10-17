@@ -41,6 +41,8 @@ test("the steps panel never prints undefined, NaN, Infinity or a bare null", asy
     const out = stepRows(fields, params, r, humanizeKey);
     for (const x of out) {
       if (BAD.test(x.label) || BAD.test(x.value) || x.label === "" || x.value === "") bad.push(`${id}: ${x.section} "${x.label}" = "${x.value}"`);
+      // `pitch_in_per_ft` once read "Pitch in per (ft)" on 216 worked values.
+      if (/ per \(/.test(x.label)) bad.push(`${id}: caption "${x.label}" splits its own quotient`);
     }
     // Every input row must name a real field, in field order, with the value passed.
     const inRows = out.filter((x) => x.section === "in");
