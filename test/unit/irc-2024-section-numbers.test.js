@@ -8,7 +8,7 @@
 //
 // A 2021 number written bare now points at the wrong section of the current
 // code (2024 R312 is minimum room areas, R314 mezzanines, R315 sleeping lofts),
-// so this fails on any of them outside that bracketed form. R311 and R311.3
+// so this fails on any of them outside that bracketed form or an explicit "IRC 2021 R314.3.1". R311 and R311.3
 // are left out: both are also valid 2024 numbers (carbon monoxide alarms).
 import { test } from "node:test";
 import assert from "node:assert/strict";
@@ -17,7 +17,8 @@ import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
-const STALE = /(?<![\w.[])(R310\.[24](?:\.\d+)*|R311\.7(?:\.\d+)*|R312(?:\.\d+)*|R314(?:\.\d+)*|R315(?:\.\d+)*)(?![\w]|\.\d)(?! in IRC 2021\])/g;
+// A number written straight after "IRC 2021" names its own edition and is fine.
+const STALE = /(?<![\w.[])(?<!IRC 2021 )(R310\.[24](?:\.\d+)*|R311\.7(?:\.\d+)*|R312(?:\.\d+)*|R314(?:\.\d+)*|R315(?:\.\d+)*)(?![\w]|\.\d)(?! in IRC 2021\])/g;
 
 test("IRC Chapter 3 is cited by its 2024 section numbers, with the 2021 number only in brackets", () => {
   const files = ["citations.js", "tools-data.js", ...readdirSync(ROOT).filter((f) => /^calc-.*\.js$/.test(f))];

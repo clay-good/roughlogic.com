@@ -3462,7 +3462,7 @@ export const headerSizingExample = {
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 function _v15c_renderHeaderSizing(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: per IRC 2021 §R602.7 (headers). Member sized from first-principles simple-span mechanics (M = wL^2/8; sigma = M/S; delta = 5wL^4/384EI) with AWC NDS-2018 reference design values bundled per the lumber-spans tile. Jack studs from the end reaction over the NDS F_c-perp bearing. Allowable spans verified against IRC Table R602.7(1) by physics; the AHJ governs the adopted code. Free at codes.iccsafe.org and awc.org.";
+  citationEl.textContent = "Citation: per IRC 2024 §R602.7 (headers; same section, Table R602.7(1) and R602.7.5 numbering as IRC 2021). Member sized from first-principles simple-span mechanics (M = wL^2/8; sigma = M/S; delta = 5wL^4/384EI) with AWC NDS-2018 reference design values bundled per the lumber-spans tile. Jack studs from the end reaction over the NDS F_c-perp bearing. Allowable spans verified against IRC Table R602.7(1) by physics; the AHJ governs the adopted code. Free at codes.iccsafe.org and awc.org.";
   const span = _v15c_makeNumber("Header clear span (ft)", "hdr-span", { step: "any", min: "0"});
   const trib = _v15c_makeNumber("Tributary width (ft; half the building width)", "hdr-trib", { step: "any", min: "0"});
   const floors = _v15c_makeSelect("Floors supported above", "hdr-floors", [
@@ -3669,7 +3669,7 @@ export const deckBeamPostExample = {
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 function _v15c_renderDeckBeamPost(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: per IRC 2021 §R507 (decks). Beam and post sized from first-principles mechanics (M = wL^2/8; L/360 deflection; NDS column C_P stability factor) with AWC NDS-2018 reference values bundled. Footing from the soil-bearing tile (IRC Table R401.4.1). Ledger fastener spacing per the public IRC Table R507.9.1.3(1). AHJ governs. Free at codes.iccsafe.org and awc.org.";
+  citationEl.textContent = "Citation: per IRC 2024 §R507 (decks; Table R507.9.1.3(1) identical to IRC 2021). Beam and post sized from first-principles mechanics (M = wL^2/8; L/360 deflection; NDS column C_P stability factor) with AWC NDS-2018 reference values bundled. Footing from the soil-bearing tile (IRC Table R401.4.1). Ledger fastener spacing per the public IRC Table R507.9.1.3(1). AHJ governs. Free at codes.iccsafe.org and awc.org.";
   const joist = _v15c_makeNumber("Joist span / deck depth (ft)", "dk-joist", { step: "any", min: "0"});
   const beamSpan = _v15c_makeNumber("Beam span / post spacing (ft)", "dk-beam", { step: "any", min: "0"});
   const postH = _v15c_makeNumber("Post height (ft)", "dk-posth", { step: "any", min: "0"});
@@ -3750,7 +3750,7 @@ export function computeWallBracingLength({ wall_line_length_ft = 0, bracing_perc
 export const wallBracingLengthExample = { inputs: { wall_line_length_ft: 40, bracing_percent: 20, provided_length_ft: 9, method: "cs-wsp" } };
 
 const renderWallBracingLength = _simpleRenderer({
-  citation: "Citation: Per the IRC R602.10 wall-bracing provisions. The required bracing percent is user-supplied from the adopted IRC table (it depends on method, seismic design category, and wind exposure). The AHJ-adopted edition governs. Free read-only at codes.iccsafe.org.",
+  citation: "Citation: Per the IRC R602.10 wall-bracing provisions. The required bracing percent is user-supplied from the adopted IRC table (it depends on method, seismic design category, and wind exposure). The table is identical in IRC 2021 and IRC 2024 (checked 2026-10-17). The AHJ-adopted edition governs. Free read-only at codes.iccsafe.org.",
   example: wallBracingLengthExample.inputs,
   fields: [
     { key: "method", label: "Bracing method", kind: "select", options: [
@@ -3783,7 +3783,7 @@ CONSTRUCTION_RENDERERS["wall-bracing-length"] = renderWallBracingLength;
 //
 // IRC Table R507.9.1.3(1), maximum on-center spacing (in) by joist span column (<= 6, 8, 10, 12, 14, 16, 18 ft),
 // 40 psf live, 10 psf dead, 40 psf snow: 1/2 in lag screws with up to 1/2 in sheathing, and 1/2 in bolts with
-// up to 3/8 in sheathing. Corroborated by ICC's own deck article (14 ft span -> 13 in lags) and JLC (15 ft -> 11 in).
+// up to 1/2 in sheathing (the table's column heading in both 2021 and 2024). Corroborated by ICC's own deck article (14 ft span -> 13 in lags) and JLC (15 ft -> 11 in).
 const _R507_LEDGER_SPANS = [6, 8, 10, 12, 14, 16, 18];
 const _R507_LEDGER_MAX_OC = { lag: [30, 23, 18, 15, 13, 11, 10], bolt: [36, 36, 34, 29, 24, 21, 19] };
 // dims: in { joist_span_ft: L, spacing_in: L, ledger_length_ft: L, fastener: dimensionless } out: { spacing_in: L, fastener_count: dimensionless, joist_span_ft: L, pass: dimensionless, table_max_in: L }
@@ -3817,7 +3817,7 @@ export function computeDeckLedgerFasteners({ joist_span_ft = 0, spacing_in, ledg
 export const deckLedgerFastenersExample = { inputs: { joist_span_ft: 15, ledger_length_ft: 16, fastener: "lag" } };
 
 const renderDeckLedgerFasteners = _simpleRenderer({
-  citation: "Citation: Per the IRC R507.9 deck ledger connection provisions; Table R507.9.1.3(1) maximum on-center spacing for 1/2 in lag screws (up to 1/2 in sheathing) and 1/2 in bolts (up to 3/8 in sheathing) at 40 psf live, 10 psf dead, 40 psf snow, by joist span; a proprietary screw takes the spacing from its evaluation report. Bolt edge-distance and stagger apply; bottom-of-ledger spacing excluded. The AHJ-adopted edition governs. Free read-only at codes.iccsafe.org.",
+  citation: "Citation: Per the IRC R507.9 deck ledger connection provisions; Table R507.9.1.3(1) maximum on-center spacing for 1/2 in lag screws (up to 1/2 in sheathing) and 1/2 in bolts (up to 1/2 in sheathing) at 40 psf live, 10 psf dead, 40 psf snow, by joist span; a proprietary screw takes the spacing from its evaluation report. Bolt edge-distance and stagger apply; bottom-of-ledger spacing excluded. The AHJ-adopted edition governs. Free read-only at codes.iccsafe.org.",
   example: deckLedgerFastenersExample.inputs,
   fields: [
     { key: "fastener", label: "Fastener type", kind: "select", options: [
@@ -11277,13 +11277,13 @@ export function computeJoistCantileverCheck({ backspan_ft = 10, overhang_ft = 2,
     joist_size,
     species,
     verdict: !permitted ? "NOT PERMITTED (Table R507.6: NP at this backspan)" : within_limit ? "WITHIN LIMIT" : "EXCEEDS",
-    note: "Deck-joist cantilever per IRC 2021 Table R507.6 (40 psf live load): the table follows the 1:4 ratio -- a joist may overhang by no more than a quarter of its backspan -- at short backspans, then caps the overhang or marks it NP (not permitted) by joist size and species, because a long backspan puts the joist near its own span limit. A 10 ft backspan of 2x10 southern pine allows 2.5 ft; the same backspan of 2x6 is NP. Between tabulated backspans this reads the next longer column, which is never less restrictive. Heavier ground snow loads have their own, tighter rows. For a FLOOR joist, IRC R502.3.3 limits the cantilever to the nominal joist depth unless Table R502.3.3(1) (bearing wall and roof) or R502.3.3(2) (balcony) applies. The prescriptive tables assume uniform load; a beam, roof, or hot tub on the tip is an engineered case.",
+    note: "Deck-joist cantilever per IRC 2024 Table R507.6, identical in IRC 2021 (40 psf live load): the table follows the 1:4 ratio -- a joist may overhang by no more than a quarter of its backspan -- at short backspans, then caps the overhang or marks it NP (not permitted) by joist size and species, because a long backspan puts the joist near its own span limit. A 10 ft backspan of 2x10 southern pine allows 2.5 ft; the same backspan of 2x6 is NP. Between tabulated backspans this reads the next longer column, which is never less restrictive. Heavier ground snow loads have their own, tighter rows. For a FLOOR joist, IRC R502.3.3 limits the cantilever to the nominal joist depth unless Table R502.3.3(1) (bearing wall and roof) or R502.3.3(2) (balcony) applies. The prescriptive tables assume uniform load; a beam, roof, or hot tub on the tip is an engineered case.",
   };
 }
 export const joistCantileverCheckExample = { inputs: { backspan_ft: 10, overhang_ft: 3, joist_size: "2x10", species: "southern_pine" } };
 
 CONSTRUCTION_RENDERERS["joist-cantilever-check"] = _simpleRenderer({
-  citation: "Citation: IRC 2021 Table R507.6 maximum deck-joist cantilever (40 psf live load) by joist size, species and backspan, capped at backspan / 4; NP where the table forbids a cantilever. A floor cantilever is limited to the nominal joist depth under R502.3.3 unless its Tables R502.3.3(1)/(2) apply. The tip load and the AHJ-adopted code govern; a beam/roof on the tip is an engineered case.",
+  citation: "Citation: IRC 2024 Table R507.6 (identical in IRC 2021) maximum deck-joist cantilever (40 psf live load) by joist size, species and backspan, capped at backspan / 4; NP where the table forbids a cantilever. A floor cantilever is limited to the nominal joist depth under R502.3.3 unless its Tables R502.3.3(1)/(2) apply. The tip load and the AHJ-adopted code govern; a beam/roof on the tip is an engineered case.",
   example: joistCantileverCheckExample.inputs,
   fields: [
     { key: "backspan_ft", label: "Backspan (ft, support to next support)", kind: "number" },
@@ -12556,8 +12556,12 @@ CONSTRUCTION_RENDERERS["dryer-duct-length"] = _simpleRenderer({
 // cooking nuisance alarms. That is a better than three-to-one spread, and in an open plan
 // it is often the only thing that lets a required alarm sit where the code puts it.
 // Separately, 3 ft horizontally from the door or opening of a bathroom with a tub or shower.
-// dims: in { sleeping_rooms: dimensionless, sleeping_areas: dimensionless, additional_stories: dimensionless, alarm_type: dimensionless, distance_to_cooking_ft: L, distance_to_bath_door_ft: L } out: { required_alarms: dimensionless, required_cooking_ft: L, cooking_deficit_ft: L, bath_deficit_ft: L }
-export function computeSmokeAlarmPlacement({ sleeping_rooms = 0, sleeping_areas = 1, additional_stories = 0, alarm_type = "ionization", distance_to_cooking_ft = 0, distance_to_bath_door_ft = 0 } = {}) {
+// That spread is IRC 2021. The 2024 IRC (R310.3.1, read 2026-10-17) drops the sensing types:
+// every smoke alarm sits not less than 10 ft from a permanently installed cooking appliance,
+// and 6 ft is permitted only where 10 ft would prevent a location R310.3 requires. Both
+// editions are offered; 2024 is the default.
+// dims: in { sleeping_rooms: dimensionless, sleeping_areas: dimensionless, additional_stories: dimensionless, alarm_type: dimensionless, distance_to_cooking_ft: L, distance_to_bath_door_ft: L, code_edition: dimensionless } out: { required_alarms: dimensionless, required_cooking_ft: L, exception_min_ft: L, cooking_deficit_ft: L, bath_deficit_ft: L }
+export function computeSmokeAlarmPlacement({ sleeping_rooms = 0, sleeping_areas = 1, additional_stories = 0, alarm_type = "ionization", distance_to_cooking_ft = 0, distance_to_bath_door_ft = 0, code_edition = "2024" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (sleeping_areas === null || sleeping_areas === "") sleeping_areas = 1;
   const rooms = Number(sleeping_rooms) || 0;
@@ -12570,9 +12574,15 @@ export function computeSmokeAlarmPlacement({ sleeping_rooms = 0, sleeping_areas 
   if (!Number.isInteger(stories) || stories < 0) return { error: "Additional story count must be a whole number of 0 or more." };
   if (dCook < 0 || dBath < 0) return { error: "Distances cannot be negative (ft)." };
 
+  const ed = String(code_edition);
+  if (ed !== "2024" && ed !== "2021") return { error: "Code edition must be 2024 or 2021." };
   const COOKING = { ionization: 20, "ionization-silencing": 10, photoelectric: 6, "nuisance-listed": 6 };
-  const required_cooking_ft = COOKING[alarm_type];
-  if (required_cooking_ft === undefined) return { error: "Alarm type must be ionization, ionization-silencing, photoelectric, or nuisance-listed." };
+  if (COOKING[alarm_type] === undefined) return { error: "Alarm type must be ionization, ionization-silencing, photoelectric, or nuisance-listed." };
+  // IRC 2024 R310.3.1: one distance for every sensing type, and a 6 ft floor where 10 ft would
+  // keep an alarm out of a location R310.3 requires. IRC 2021 R314.3.1: by sensing type.
+  const is2024 = ed === "2024";
+  const required_cooking_ft = is2024 ? 10 : COOKING[alarm_type];
+  const exception_min_ft = is2024 ? 6 : null;
 
   const required_alarms = rooms + areas + stories;
   const cooking_ok = dCook >= required_cooking_ft - 1e-9 * Math.abs(required_cooking_ft);
@@ -12582,41 +12592,49 @@ export function computeSmokeAlarmPlacement({ sleeping_rooms = 0, sleeping_areas 
   const bath_ok = bath_entered ? dBath >= BATH_MIN - 1e-9 * Math.abs(BATH_MIN) : null;
   const bath_deficit_ft = bath_entered ? Math.max(0, BATH_MIN - dBath) : 0;
   const passes = cooking_ok && (bath_ok !== false);
-  // What a change of sensing type would buy, since it is usually the cheapest fix.
+  // 2024: the 6 ft exception, which applies only where 10 ft would block a required location.
+  const exception_ok = is2024 ? dCook >= 6 - 1e-9 * 6 : null;
+  // 2021: what a change of sensing type would buy, since it is usually the cheapest fix. In 2024
+  // the type no longer changes the distance, so there is nothing to buy.
   const best_required_ft = 6;
-  const would_pass_photoelectric = dCook >= best_required_ft - 1e-9 * Math.abs(best_required_ft);
-  const type_would_fix = !cooking_ok && would_pass_photoelectric;
+  const would_pass_photoelectric = is2024 ? null : dCook >= best_required_ft - 1e-9 * Math.abs(best_required_ft);
+  const type_would_fix = is2024 ? false : !cooking_ok && would_pass_photoelectric;
 
   const note = "COUNT (R310.3 [R314.3 in IRC 2021]) is additive and people undercount it: one in each sleeping room, one OUTSIDE each separate sleeping area in the immediate vicinity of the bedrooms, and one on each additional story including basements and habitable attics. Here that is " + rooms + " + " + areas + " + " + stories + " = " + required_alarms + " alarm" + (required_alarms === 1 ? "" : "s") + " as a minimum, before any interconnection or power requirements. The story count excludes crawl spaces and uninhabitable attics. "
-    + "COOKING CLEARANCE (R310.3.1 [R314.3.1 in IRC 2021]) depends entirely on the SENSING TYPE, and the spread is better than three to one: an ionization alarm wants 20 ft horizontally from a permanently installed cooking appliance, an ionization alarm with a silencing switch 10 ft, and a photoelectric alarm - or one marked as helping to reduce cooking nuisance alarms - only 6 ft. "
-    + "This alarm needs " + required_cooking_ft + " ft and has " + dCook + " ft: " + (cooking_ok ? "OK. " : "SHORT by " + cooking_deficit_ft.toFixed(1) + " ft. ")
-    + (type_would_fix ? "But it would clear at 6 ft, so CHANGING THE SENSING TYPE fixes this without moving anything - in an open plan that is often the only way a required alarm can sit where the code puts it, and it is far cheaper than relocating a required location. " : "")
-    + (!cooking_ok && !would_pass_photoelectric ? "Even a photoelectric alarm needs 6 ft, so this location fails on every type and the alarm has to move. " : "")
+    + (is2024
+      ? "COOKING CLEARANCE (IRC 2024 R310.3.1): not less than 10 ft horizontally from a permanently installed cooking appliance, whatever the sensing type, and not less than 6 ft only where 10 ft would prevent placing an alarm in a location R310.3 requires. "
+        + "This alarm has " + dCook + " ft: " + (cooking_ok ? "OK. " : exception_ok ? "SHORT of 10 ft by " + cooking_deficit_ft.toFixed(1) + " ft, but at or past 6 ft - acceptable ONLY where 10 ft would keep the alarm out of a required location, and that should be documented. " : "SHORT by " + cooking_deficit_ft.toFixed(1) + " ft and inside even the 6 ft exception, so the alarm has to move. ")
+        + "(Under IRC 2021 R314.3.1 the distance depended on the sensing type: 20 ft ionization, 10 ft ionization with a silencing switch, 6 ft photoelectric or nuisance-listed. Choose the 2021 edition if that is what your jurisdiction enforces.) "
+      : "COOKING CLEARANCE (IRC 2021 R314.3.1) depends entirely on the SENSING TYPE, and the spread is better than three to one: an ionization alarm wants 20 ft horizontally from a permanently installed cooking appliance, an ionization alarm with a silencing switch 10 ft, and a photoelectric alarm - or one marked as helping to reduce cooking nuisance alarms - only 6 ft. (IRC 2024 R310.3.1 replaced this with 10 ft for every type, 6 ft where necessary.) "
+        + "This alarm needs " + required_cooking_ft + " ft and has " + dCook + " ft: " + (cooking_ok ? "OK. " : "SHORT by " + cooking_deficit_ft.toFixed(1) + " ft. ")
+        + (type_would_fix ? "But it would clear at 6 ft, so CHANGING THE SENSING TYPE fixes this without moving anything - in an open plan that is often the only way a required alarm can sit where the code puts it, and it is far cheaper than relocating a required location. " : "")
+        + (!cooking_ok && !would_pass_photoelectric ? "Even a photoelectric alarm needs 6 ft, so this location fails on every type and the alarm has to move. " : ""))
     + (bath_entered ? "BATHROOM: not less than 3 ft horizontally from the door or opening of a bathroom containing a bathtub or shower - " + dBath + " ft here, " + (bath_ok ? "OK. " : "SHORT by " + bath_deficit_ft.toFixed(1) + " ft. ") : "No bathroom distance entered; the 3 ft rule applies to the door or opening of any bathroom with a tub or shower. ")
-    + "Both the bathroom rule and the cooking distances carry the same escape: they do not apply where observing them would PREVENT placing an alarm in a location R310.3 [R314.3 in IRC 2021] requires. A required location wins over a nuisance separation - but that is a last resort to be documented, not a default, and changing the sensing type usually removes the conflict first. "
+    + "Both the bathroom rule and the cooking distances carry the same escape: they do not apply where observing them would PREVENT placing an alarm in a location R310.3 [R314.3 in IRC 2021] requires. A required location wins over a nuisance separation - but that is a last resort to be documented, not a default" + (is2024 ? ". " : ", and changing the sensing type usually removes the conflict first. ")
     + (passes ? "The separations entered PASS. " : "The separations entered DO NOT pass. ")
     + "Not checked: carbon monoxide alarms, which are a separate section with their own locations; interconnection so that all alarms sound together; primary power from the building wiring with battery backup and the conditions under which battery-only alarms are permitted in existing construction; alarms in existing dwellings undergoing alterations, repairs, or additions; ceiling and wall mounting geometry and the sloped, peaked, and tray ceiling rules; listing and the 10-year sealed-battery requirements some states add; or heat detection where it substitutes. A screen; the adopted code, the alarm's listing, and the AHJ govern.";
 
-  return { required_alarms, required_cooking_ft, cooking_ok, cooking_deficit_ft, bath_entered, bath_ok, bath_deficit_ft, passes, would_pass_photoelectric, type_would_fix, note };
+  return { code_edition: ed, required_alarms, required_cooking_ft, exception_min_ft, exception_ok, cooking_ok, cooking_deficit_ft, bath_entered, bath_ok, bath_deficit_ft, passes, would_pass_photoelectric, type_would_fix, note };
 }
 
 export const smokeAlarmPlacementExample = { inputs: { sleeping_rooms: 3, sleeping_areas: 1, additional_stories: 1, alarm_type: "ionization", distance_to_cooking_ft: 8, distance_to_bath_door_ft: 4 } };
 
 CONSTRUCTION_RENDERERS["smoke-alarm-placement"] = _simpleRenderer({
-  citation: "Citation: IRC R310.3 [R314.3 in IRC 2021] Location - smoke alarms in each sleeping room, outside each separate sleeping area in the immediate vicinity of the bedrooms, and on each additional story of the dwelling including basements and habitable attics but not crawl spaces or uninhabitable attics; and not less than 3 ft horizontally from the door or opening of a bathroom that contains a bathtub or shower. IRC R310.3.1 [R314.3.1 in IRC 2021] - not less than 20 ft horizontally from a permanently installed cooking appliance for an ionization smoke alarm, 10 ft for an ionization alarm with an alarm-silencing switch, and 6 ft for a photoelectric alarm or an alarm marked as helping to reduce cooking nuisance alarms. Both separations carry the exception that they do not apply where observing them would prevent placement in a location R310.3 [R314.3 in IRC 2021] requires. Not checked: carbon monoxide alarms, interconnection, power source and battery backup, existing-dwelling alteration triggers, ceiling and wall mounting geometry, sloped and tray ceilings, state sealed-battery rules, or heat detection. A screen; the adopted code, the alarm's listing, and the AHJ govern.",
+  citation: "Citation: IRC R310.3 [R314.3 in IRC 2021] Location - smoke alarms in each sleeping room, outside each separate sleeping area in the immediate vicinity of the bedrooms, and on each additional story of the dwelling including basements and habitable attics but not crawl spaces or uninhabitable attics; and not less than 3 ft horizontally from the door or opening of a bathroom that contains a bathtub or shower. IRC 2024 R310.3.1 - not less than 10 ft horizontally from a permanently installed cooking appliance for any smoke alarm, and not less than 6 ft where necessary to place an alarm R310.3 requires. IRC 2021 R314.3.1 (selectable) set the distance by sensing type instead: 20 ft for an ionization smoke alarm, 10 ft for an ionization alarm with an alarm-silencing switch, and 6 ft for a photoelectric alarm or an alarm marked as helping to reduce cooking nuisance alarms. The bathroom separation does not apply where observing it would prevent placement in a location R310.3 [R314.3 in IRC 2021] requires. Not checked: carbon monoxide alarms, interconnection, power source and battery backup, existing-dwelling alteration triggers, ceiling and wall mounting geometry, sloped and tray ceilings, state sealed-battery rules, or heat detection. A screen; the adopted code, the alarm's listing, and the AHJ govern.",
   example: smokeAlarmPlacementExample.inputs,
   fields: [
     { key: "sleeping_rooms", label: "Sleeping rooms", kind: "number" },
     { key: "sleeping_areas", label: "Separate sleeping areas (one alarm outside each)", kind: "number" },
     { key: "additional_stories", label: "Additional stories, incl. basements and habitable attics", kind: "number" },
-    { key: "alarm_type", label: "Sensing type", kind: "select", options: [{ value: "ionization", label: "Ionization (20 ft from cooking)", selected: true }, { value: "ionization-silencing", label: "Ionization with silencing switch (10 ft)" }, { value: "photoelectric", label: "Photoelectric (6 ft)" }, { value: "nuisance-listed", label: "Marked to reduce cooking nuisance alarms (6 ft)" }] },
+    { key: "code_edition", label: "IRC edition", kind: "select", options: [{ value: "2024", label: "IRC 2024 (10 ft from cooking, any type)", selected: true }, { value: "2021", label: "IRC 2021 (distance by sensing type)" }] },
+    { key: "alarm_type", label: "Sensing type (sets the distance under IRC 2021)", kind: "select", options: [{ value: "ionization", label: "Ionization (2021: 20 ft)", selected: true }, { value: "ionization-silencing", label: "Ionization with silencing switch (2021: 10 ft)" }, { value: "photoelectric", label: "Photoelectric (2021: 6 ft)" }, { value: "nuisance-listed", label: "Marked to reduce cooking nuisance alarms (2021: 6 ft)" }] },
     { key: "distance_to_cooking_ft", label: "Horizontal distance to the cooking appliance (ft)", kind: "number" },
     { key: "distance_to_bath_door_ft", label: "Horizontal distance to a tub/shower bathroom door (ft; 0 to skip)", kind: "number", default: 0 },
   ],
   outputs: [
     { key: "c", id: "sap-out-c", label: "Minimum alarm count", value: (r) => r.required_alarms + " (sleeping rooms + outside each sleeping area + each additional story)" },
-    { key: "k", id: "sap-out-k", label: "Cooking clearance", value: (r) => "needs " + r.required_cooking_ft + " ft - " + (r.cooking_ok ? "OK" : "SHORT by " + fmt(r.cooking_deficit_ft, 1) + " ft") },
-    { key: "t", id: "sap-out-t", label: "Would a different sensing type fix it?", value: (r) => r.cooking_ok ? "not needed" : r.type_would_fix ? "YES - a photoelectric or nuisance-listed alarm needs only 6 ft" : "no - even 6 ft is not met, the alarm has to move" },
+    { key: "k", id: "sap-out-k", label: "Cooking clearance", value: (r) => "needs " + r.required_cooking_ft + " ft (IRC " + r.code_edition + ") - " + (r.cooking_ok ? "OK" : "SHORT by " + fmt(r.cooking_deficit_ft, 1) + " ft") },
+    { key: "t", id: "sap-out-t", label: "Relief", value: (r) => r.cooking_ok ? "not needed" : r.code_edition === "2024" ? (r.exception_ok ? "the 6 ft exception, ONLY where 10 ft would keep the alarm out of a required location" : "none - inside even 6 ft, the alarm has to move") : r.type_would_fix ? "YES - a photoelectric or nuisance-listed alarm needs only 6 ft" : "no - even 6 ft is not met, the alarm has to move" },
     { key: "b", id: "sap-out-b", label: "Bathroom separation", value: (r) => r.bath_ok === null ? "- (enter a distance)" : r.bath_ok ? "3 ft OK" : "SHORT by " + fmt(r.bath_deficit_ft, 1) + " ft" },
     { key: "n", id: "sap-out-n", label: "Note", value: (r) => r.note },
   ],

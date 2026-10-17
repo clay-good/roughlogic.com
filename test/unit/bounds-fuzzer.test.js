@@ -35278,7 +35278,9 @@ test("bounds: spec-v1140 computeCleanoutLayout pins the two additive code trigge
 import { computeSmokeAlarmPlacement as _v1141 } from "../../calc-construction.js";
 
 test("bounds: spec-v1141 computeSmokeAlarmPlacement pins the additive count, the four cooking clearances, the type-change fix, and error seams", () => {
-  const base = { sleeping_rooms: 3, sleeping_areas: 1, additional_stories: 1, alarm_type: "ionization", distance_to_cooking_ft: 8, distance_to_bath_door_ft: 4 };
+  // The sensing-type spread below is IRC 2021 R314.3.1, so these pins name that edition; the
+  // 2024 rule (one 10 ft distance, a 6 ft exception) is pinned after them.
+  const base = { sleeping_rooms: 3, sleeping_areas: 1, additional_stories: 1, alarm_type: "ionization", distance_to_cooking_ft: 8, distance_to_bath_door_ft: 4, code_edition: "2021" };
   const r = _v1141(base);
   assert.ok(r.required_alarms === 5 && r.required_cooking_ft === 20 && !r.cooking_ok && r.cooking_deficit_ft === 12);
   assert.ok(r.bath_ok && r.bath_deficit_ft === 0 && !r.passes && r.type_would_fix);
@@ -35326,6 +35328,19 @@ test("bounds: spec-v1141 computeSmokeAlarmPlacement pins the additive count, the
   assert.ok("error" in _v1141({ ...base, distance_to_bath_door_ft: -1 }));
   assert.ok("error" in _v1141({ ...base, alarm_type: "nope" }));
   assert.ok("error" in _v1141({ ...base, distance_to_cooking_ft: Infinity }));
+  assert.ok("error" in _v1141({ ...base, code_edition: "2018" }));
+  // IRC 2024 R310.3.1 (the default): 10 ft for EVERY sensing type, 6 ft only where 10 ft would
+  // block a required location -- so the type no longer fixes anything.
+  const e24 = { ...base, code_edition: "2024" };
+  for (const t of Object.keys(types)) {
+    const x = _v1141({ ...e24, alarm_type: t });
+    assert.ok(x.required_cooking_ft === 10 && x.exception_min_ft === 6 && !x.cooking_ok && x.cooking_deficit_ft === 2 && x.exception_ok === true && x.type_would_fix === false, "2024 ignores sensing type: " + t);
+  }
+  assert.ok(_v1141({ ...e24, distance_to_cooking_ft: 10 }).cooking_ok);
+  assert.ok(!_v1141({ ...e24, distance_to_cooking_ft: 9.9 }).cooking_ok);
+  assert.ok(_v1141({ ...e24, distance_to_cooking_ft: 6 }).exception_ok && !_v1141({ ...e24, distance_to_cooking_ft: 5.9 }).exception_ok);
+  assert.ok(/has to move/.test(_v1141({ ...e24, distance_to_cooking_ft: 4 }).note));
+  assert.strictEqual(_v1141({ ...base, code_edition: undefined }).required_cooking_ft, 10, "2024 is the default edition");
 });
 
 import { computeCoAlarmPlacement as _v1142 } from "../../calc-construction.js";

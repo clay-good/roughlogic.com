@@ -67,6 +67,8 @@ const AWC_NDS = "AWC NDS-2018 (National Design Specification for Wood Constructi
 const IRC_2024 = "IRC 2024 (International Residential Code).";
 // Appended to the Chapter 3 tiles re-cited to IRC 2024 on 2026-10-17.
 const IRC_CH3_2024 = " Checked against the IRC 2024 text on 2026-10-17: these requirements are unchanged from 2021, and only the section numbers moved (stairs and landings R311 to R318, emergency escape openings R310 to R319, handrails to R320, guards R312 to R321, smoke alarms R314 to R310, carbon monoxide alarms R315 to R311). The bracketed numbers are the 2021 sections.";
+// Appended to the deck and header tiles checked against IRC 2024 on 2026-10-17.
+const IRC_DECK_2024 = " Checked against the current IRC 2024 printing on 2026-10-17: Table R507.6 cantilevers and Table R507.9.1.3(1) ledger spacings are identical to IRC 2021, and R507, R507.9, R602.7, Table R602.7(1) and R602.7.5 keep their numbers.";
 const IRC_DISCLOSURE = "Editions available: bundled values follow IRC 2021. Jurisdictions on IRC 2018 / 2024 differ at the margins; verify the edition adopted by your AHJ.";
 // Appended to the IRC disclosure on the four IRC tiles whose span / deflection
 // values come from the NDS (2026-10-17).
@@ -3421,7 +3423,7 @@ export const CITATIONS = {
     edition: "IRC §R507.9 deck ledger connection provisions, by name.",
     freeAccess: "Free read-only at codes.iccsafe.org; the AHJ-adopted edition governs.",
     governance: GOVERNANCE.structural,
-    editionNote: "Single-edition (the count follows from the on-center spacing, which is user-supplied from the AHJ-adopted IRC R507.9 table for the fastener type / joist-span row).",
+    editionNote: "Single-edition (the count follows from the on-center spacing, which is user-supplied from the AHJ-adopted IRC R507.9 table for the fastener type / joist-span row)." + IRC_DECK_2024,
     assumptions: [
       { name: "Spacing", value: "user-supplied from the adopted IRC R507.9 table; bolt edge-distance and stagger apply; bottom-of-ledger spacing excluded", source: "IRC R507.9" },
     ],
@@ -4922,11 +4924,11 @@ export const CITATIONS = {
     edition: IRC_2021 + " §R602.7 (headers). " + AWC_NDS + " reference design values, load-duration C_D and size factor C_F.",
     freeAccess: ICC_FREE + " AWC NDS free at awc.org.",
     governance: GOVERNANCE.structural,
-    editionNote: IRC_DISCLOSURE + NDS_LAG,
+    editionNote: IRC_DISCLOSURE + NDS_LAG + IRC_DECK_2024,
     assumptions: [
       { name: "Load assembly", value: "roof = max(ground snow, 20 psf roof live) + 15 psf dead; each floor above = 40 psf live + 10 psf dead", source: "IRC 2021 typical residential" },
       { name: "Load-duration factor C_D", value: "1.15 snow (roof-only) / 1.0 occupancy (floors above)", source: "AWC NDS-2018 Table 2.3.2" },
-      { name: "Cross-check", value: "allowable spans verified against IRC Table R602.7(1) by physics; discrepancies flagged", source: "IRC 2021 Table R602.7(1)" },
+      { name: "Cross-check", value: "allowable spans verified against IRC Table R602.7(1) by physics; discrepancies flagged", source: "IRC 2024 Table R602.7(1) (same number as 2021)" },
     ],
   },
   "stud-notch-bore-limit": {
@@ -4953,12 +4955,12 @@ export const CITATIONS = {
   },
   "joist-cantilever-check": {
     formula: "table_limit_ft = IRC 2021 Table R507.6 maximum cantilever for the joist size and species at the tabulated backspan column at or above backspan_ft (NP = not permitted); ratio_limit_ft = backspan_ft / 4; cantilever_max_ft = min(table_limit_ft, ratio_limit_ft); within_limit when overhang_ft <= cantilever_max_ft; margin_ft = cantilever_max_ft - overhang_ft.",
-    edition: "IRC 2021 Table R507.6 (deck joist spans and cantilevers, 40 psf live load), by name; backspan columns 4 to 18 ft. The AHJ-adopted IRC edition governs.",
+    edition: "IRC 2024 Table R507.6 (deck joist spans and cantilevers, 40 psf live load; every cantilever value identical to IRC 2021, checked 2026-10-17), by name; backspan columns 4 to 18 ft. The AHJ-adopted IRC edition governs.",
     freeAccess: "IRC Table R507.6 is a prescriptive table (many jurisdictions post the adopted IRC); the tile reads its cantilever columns for the entered joist size, species, and backspan.",
     governance: GOVERNANCE.general,
-    editionNote: "Deck-joist cantilever per IRC 2021 Table R507.6: the table lets a joist overhang by about a quarter of its backspan at short backspans, then caps the overhang or marks it NP (not permitted) by joist size and species as the backspan grows -- a Southern pine 2x10 on a 14 ft backspan may cantilever 3 ft 4 in, less than the 3 ft 6 in a bare 1:4 rule would allow. Between tabulated columns the tile reads the longer (more restrictive) column. A floor cantilever is a different check: R502.3.3 limits it to the nominal joist depth unless its own tables apply. Until 2026-09-25 this citation still described a bare backspan / 4 rule after the code had moved to the table.",
+    editionNote: "Deck-joist cantilever per IRC 2024 Table R507.6 (identical in IRC 2021): the table lets a joist overhang by about a quarter of its backspan at short backspans, then caps the overhang or marks it NP (not permitted) by joist size and species as the backspan grows -- a Southern pine 2x10 on a 14 ft backspan may cantilever 3 ft 4 in, less than the 3 ft 6 in a bare 1:4 rule would allow. Between tabulated columns the tile reads the longer (more restrictive) column. A floor cantilever is a different check: R502.3.3 limits it to the nominal joist depth unless its own tables apply. Until 2026-09-25 this citation still described a bare backspan / 4 rule after the code had moved to the table." + IRC_DECK_2024,
     assumptions: [
-      { name: "Table R507.6 cantilever", value: "maximum cantilever by joist size, species, and backspan column (4-18 ft), never more than backspan / 4; NP where the table forbids one", source: "IRC 2021 Table R507.6" },
+      { name: "Table R507.6 cantilever", value: "maximum cantilever by joist size, species, and backspan column (4-18 ft), never more than backspan / 4; NP where the table forbids one", source: "IRC 2024 Table R507.6 (identical in 2021)" },
       { name: "Tip load is engineered", value: "a beam / wall / roof bearing on the cantilever tip is an engineered condition, not prescriptive", source: "IRC / engineering" },
     ],
   },
@@ -4967,11 +4969,11 @@ export const CITATIONS = {
     edition: IRC_2021 + " §R507 (decks). " + AWC_NDS + " reference values; IRC Table R507.9.1.3(1) ledger fasteners.",
     freeAccess: ICC_FREE + " AWC NDS free at awc.org.",
     governance: GOVERNANCE.structural,
-    editionNote: IRC_DISCLOSURE + NDS_LAG,
+    editionNote: IRC_DISCLOSURE + NDS_LAG + IRC_DECK_2024,
     assumptions: [
       { name: "Deck loads", value: "40 psf live + 10 psf dead per IRC R507 default", source: "IRC 2021 §R507" },
       { name: "Column stability", value: "pinned-pinned (K_e = 1), c = 0.8 for sawn lumber, E_min and F_c for the 4x4 from NDS Supplement Table 4A/4B No.2 dimension lumber and for the 6x6 from Table 4D No.2 Posts and Timbers (5x5 and larger)", source: "AWC NDS-2018" },
-      { name: "Ledger schedule", value: "1/2 in lag / approved fastener spacing by joist span, attached decks only", source: "IRC 2021 Table R507.9.1.3(1)" },
+      { name: "Ledger schedule", value: "1/2 in lag / approved fastener spacing by joist span, attached decks only", source: "IRC 2024 Table R507.9.1.3(1) (identical in 2021)" },
     ],
   },
   "tile-count": {
@@ -16144,17 +16146,18 @@ export const CITATIONS = {
     ],
   },
   "smoke-alarm-placement": {
-    formula: "minimum alarms = sleeping rooms + separate sleeping areas + additional stories; required cooking clearance = 20 ft (ionization), 10 ft (ionization with a silencing switch), or 6 ft (photoelectric, or marked to reduce cooking nuisance alarms); bathroom separation = 3 ft horizontally from the door or opening of a bathroom with a tub or shower.",
-    edition: "IRC R310.3 [R314.3 in IRC 2021] Location and R310.3.1 [R314.3.1 in IRC 2021] Installation near cooking appliances.",
+    formula: "minimum alarms = sleeping rooms + separate sleeping areas + additional stories; required cooking clearance = 10 ft for any sensing type, or 6 ft where 10 ft would prevent a required location (IRC 2024, the default); under IRC 2021, 20 ft (ionization), 10 ft (ionization with a silencing switch), or 6 ft (photoelectric, or marked to reduce cooking nuisance alarms); bathroom separation = 3 ft horizontally from the door or opening of a bathroom with a tub or shower.",
+    edition: "IRC 2024 R310.3 [R314.3 in IRC 2021] Location and R310.3.1 [R314.3.1 in IRC 2021] Installation near cooking appliances; the IRC 2021 cooking distances are selectable.",
     freeAccess: "Both provisions are short prescriptive sentences reproduced in state adoptions and building-department bulletins. No table is reproduced.",
     governance: GOVERNANCE.general,
-    editionNote: "Two halves, and they get confused with each other. The COUNT under R310.3 [R314.3 in IRC 2021] is additive and is routinely undercounted: one alarm in each sleeping room, one OUTSIDE each separate sleeping area in the immediate vicinity of the bedrooms, and one on each additional story including basements and habitable attics but not crawl spaces or uninhabitable attics. Three bedrooms with one sleeping area and one extra story is five alarms as a floor, before interconnection or power requirements enter. The CLEARANCE under R310.3.1 [R314.3.1 in IRC 2021] is the half worth understanding, because it depends entirely on the SENSING TYPE and the spread is better than three to one - 20 ft horizontally from a permanently installed cooking appliance for an ionization alarm, 10 ft for an ionization alarm with an alarm-silencing switch, and 6 ft for a photoelectric alarm or one marked as helping to reduce cooking nuisance alarms. The practical consequence is the tile\'s most useful output: an alarm 8 ft from a range fails as ionization and passes as photoelectric, so in an open plan changing the sensing type is often the only way a location the code REQUIRES can also satisfy the nuisance separation - and it is far cheaper than relocating a required alarm. The tile says explicitly when a type change would fix a failure and when even 6 ft is not met, in which case the alarm simply has to move. Both separations carry the same exception: they do not apply where observing them would prevent placement in a location R310.3 [R314.3 in IRC 2021] requires. A required location wins over a nuisance separation, but that is a documented last resort rather than a default, and a type change usually removes the conflict first. Not checked: carbon monoxide alarms, which are a separate section with their own locations; interconnection so all alarms sound together; primary power from the building wiring with battery backup and the conditions permitting battery-only alarms in existing construction; the alteration, repair, and addition triggers for existing dwellings; ceiling and wall mounting geometry including sloped, peaked, and tray ceilings; state sealed-battery requirements; and heat detection where it substitutes. A screen; the adopted code, the alarm\'s listing, and the AHJ govern." + IRC_CH3_2024,
+    editionNote: "Two halves, and they get confused with each other. The COUNT under R310.3 [R314.3 in IRC 2021] is additive and is routinely undercounted: one alarm in each sleeping room, one OUTSIDE each separate sleeping area in the immediate vicinity of the bedrooms, and one on each additional story including basements and habitable attics but not crawl spaces or uninhabitable attics. Three bedrooms with one sleeping area and one extra story is five alarms as a floor, before interconnection or power requirements enter. The CLEARANCE from a permanently installed cooking appliance is where the editions part. IRC 2024 R310.3.1, the tile's default, sets one distance for every sensing type: not less than 10 ft, and not less than 6 ft only where 10 ft would prevent placing an alarm in a location R310.3 requires - so an alarm 8 ft from a range is short of 10 ft and acceptable only as that documented exception. IRC 2021 R314.3.1, still enforced in many jurisdictions and selectable here, set the distance by SENSING TYPE instead, a better than three-to-one spread: 20 ft for an ionization alarm, 10 ft for an ionization alarm with an alarm-silencing switch, and 6 ft for a photoelectric alarm or one marked as helping to reduce cooking nuisance alarms. Under 2021 the same 8 ft alarm fails as ionization and passes as photoelectric, so changing the type was often the cheapest fix; under 2024 the type changes nothing. The bathroom separation does not apply where observing it would prevent placement in a location R310.3 [R314.3 in IRC 2021] requires. A required location wins over a nuisance separation, but that is a documented last resort rather than a default. Not checked: carbon monoxide alarms, which are a separate section with their own locations; interconnection so all alarms sound together; primary power from the building wiring with battery backup and the conditions permitting battery-only alarms in existing construction; the alteration, repair, and addition triggers for existing dwellings; ceiling and wall mounting geometry including sloped, peaked, and tray ceilings; state sealed-battery requirements; and heat detection where it substitutes. A screen; the adopted code, the alarm\'s listing, and the AHJ govern." + " Checked against the IRC 2024 text on 2026-10-17: the count, story and bathroom rules are unchanged and moved from IRC 2021 R314 to R310, but the cooking distance CHANGED - 2024 R310.3.1 sets 10 ft for every sensing type (6 ft where 10 ft would block a required location) in place of 2021's 20 / 10 / 6 ft by type. The tile defaults to 2024 and keeps 2021 selectable.",
     assumptions: [
       { name: "Count", value: "each sleeping room + outside each separate sleeping area + each additional story", source: "IRC R310.3 [R314.3 in IRC 2021]" },
       { name: "Story exclusions", value: "crawl spaces and uninhabitable attics do not count", source: "IRC R310.3 [R314.3 in IRC 2021]" },
-      { name: "Cooking clearance", value: "20 ft ionization, 10 ft ionization with silencing, 6 ft photoelectric or nuisance-listed", source: "IRC R310.3.1 [R314.3.1 in IRC 2021]" },
+      { name: "Cooking clearance (IRC 2024, default)", value: "10 ft for any sensing type; 6 ft only where 10 ft would prevent a location R310.3 requires", source: "IRC 2024 R310.3.1" },
+      { name: "Cooking clearance (IRC 2021, selectable)", value: "20 ft ionization, 10 ft ionization with silencing, 6 ft photoelectric or nuisance-listed", source: "IRC 2021 R314.3.1" },
       { name: "Bathroom", value: "3 ft horizontally from the door or opening of a bathroom with a tub or shower", source: "IRC R310.3 [R314.3 in IRC 2021]" },
-      { name: "Exception", value: "separations yield where they would prevent a required location - a documented last resort", source: "IRC R310.3 [R314.3 in IRC 2021] / R310.3.1 [R314.3.1 in IRC 2021]" },
+      { name: "Exception", value: "the bathroom separation (and, under 2021, the cooking distances) yield where they would prevent a required location - a documented last resort", source: "IRC R310.3 [R314.3 in IRC 2021] / IRC 2021 R314.3.1" },
       { name: "Not checked", value: "CO alarms, interconnection, power and battery backup, mounting geometry, existing-dwelling triggers", source: "stated scope limit" },
     ],
   },

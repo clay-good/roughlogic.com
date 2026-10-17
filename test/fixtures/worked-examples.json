@@ -98663,7 +98663,7 @@
    "tile_id": "smoke-alarm-placement",
    "source_publisher": "International Code Council",
    "source_title": "IRC R314 -- an ionization alarm 8 ft from the range fails by 12 ft (spec-v1141)",
-   "source_edition_or_year": "IRC R314.3 / R314.3.1",
+   "source_edition_or_year": "IRC 2021 R314.3 / R314.3.1",
    "source_section_or_page": "R314.3 requires an alarm in each sleeping room, outside each separate sleeping area, and on each additional story: 3 + 1 + 1 = 5 minimum. R314.3.1 requires an ionization alarm to be not less than 20 ft horizontally from a permanently installed cooking appliance; at 8 ft this one is 12 ft short. The 4 ft to the tub/shower bathroom door clears the 3 ft rule. The useful finding is that the same location clears at 6 ft for a photoelectric alarm, so a sensing-type change fixes it without relocating a required alarm.",
    "verified_by": "rl",
    "verified_on": "2026-07-27",
@@ -98673,7 +98673,8 @@
     "additional_stories": 1,
     "alarm_type": "ionization",
     "distance_to_cooking_ft": 8,
-    "distance_to_bath_door_ft": 4
+    "distance_to_bath_door_ft": 4,
+    "code_edition": "2021"
    },
    "outputs": {
     "required_alarms": {
@@ -98706,7 +98707,7 @@
    "tile_id": "smoke-alarm-placement",
    "source_publisher": "International Code Council",
    "source_title": "cross-check: the same spot passes as a photoelectric alarm -- the type, not the location",
-   "source_edition_or_year": "IRC R314.3.1",
+   "source_edition_or_year": "IRC 2021 R314.3.1",
    "source_section_or_page": "'Photoelectric smoke alarms shall not be installed less than 6 feet horizontally from a permanently installed cooking appliance.' The identical 8 ft location clears the 6 ft photoelectric requirement with room to spare, while the count stays at 5 because R314.3 is independent of sensing type. Better than a three-to-one spread between 20 ft and 6 ft is why an open-plan house often has exactly one compliant option.",
    "verified_by": "rl",
    "verified_on": "2026-07-27",
@@ -98716,7 +98717,8 @@
     "additional_stories": 1,
     "alarm_type": "photoelectric",
     "distance_to_cooking_ft": 8,
-    "distance_to_bath_door_ft": 4
+    "distance_to_bath_door_ft": 4,
+    "code_edition": "2021"
    },
    "outputs": {
     "required_alarms": {
@@ -171677,6 +171679,56 @@
     "value": 6.298258,
     "tolerance": {
      "pct": 0.01
+    }
+   }
+  }
+ },
+ {
+  "tile_id": "smoke-alarm-placement",
+  "source_publisher": "International Code Council",
+  "source_title": "IRC 2024 R310.3.1 -- the same ionization alarm 8 ft from the range is 2 ft short of 10 ft and clears the 6 ft exception",
+  "source_edition_or_year": "IRC 2024 R310.3 / R310.3.1",
+  "source_section_or_page": "IRC 2024 (current printing, read on codes.iccsafe.org 2026-10-17) R310.3 keeps the additive count: 3 sleeping rooms + 1 sleeping area + 1 additional story = 5. R310.3.1 replaces the 2021 sensing-type distances with one rule: not less than 10 ft horizontally from a permanently installed cooking appliance, and not less than 6 ft where necessary to comply with R310.3. At 8 ft this alarm is 2 ft short of 10 ft and clears the 6 ft exception; the sensing type no longer changes either distance.",
+  "verified_by": "rl",
+  "verified_on": "2026-10-17",
+  "inputs": {
+   "sleeping_rooms": 3,
+   "sleeping_areas": 1,
+   "additional_stories": 1,
+   "alarm_type": "ionization",
+   "distance_to_cooking_ft": 8,
+   "distance_to_bath_door_ft": 4,
+   "code_edition": "2024"
+  },
+  "outputs": {
+   "required_alarms": {
+    "value": 5,
+    "tolerance": {
+     "abs": 0
+    }
+   },
+   "required_cooking_ft": {
+    "value": 10,
+    "tolerance": {
+     "abs": 0.0001
+    }
+   },
+   "exception_min_ft": {
+    "value": 6,
+    "tolerance": {
+     "abs": 0.0001
+    }
+   },
+   "cooking_deficit_ft": {
+    "value": 2,
+    "tolerance": {
+     "abs": 0.0001
+    }
+   },
+   "bath_deficit_ft": {
+    "value": 0,
+    "tolerance": {
+     "abs": 0.0001
     }
    }
   }

@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "fc699d47a253046f",
+      "sha": "9019b27ac4f608b9",
       "date": "2026-10-17"
     },
     "/tools/": {
@@ -10,7 +10,7 @@
       "date": "2026-10-17"
     },
     "/errata/": {
-      "sha": "f0bf3772a232dd6d",
+      "sha": "de7e53e854be8b78",
       "date": "2026-10-17"
     },
     "/collections/disaster-response/": {
@@ -2114,7 +2114,7 @@
       "date": "2026-10-17"
     },
     "/tools/deck-beam-post/": {
-      "sha": "b0f76610095f0863",
+      "sha": "64b16d6c7f1cdfd7",
       "date": "2026-10-17"
     },
     "/tools/deck-board-takeoff/": {
@@ -3738,7 +3738,7 @@
       "date": "2026-10-17"
     },
     "/tools/header-sizing/": {
-      "sha": "91cb8dfd0c053ede",
+      "sha": "bcc3fe93db1fab01",
       "date": "2026-10-17"
     },
     "/tools/hearing-protector-nrr/": {
@@ -4138,7 +4138,7 @@
       "date": "2026-10-17"
     },
     "/tools/joist-cantilever-check/": {
-      "sha": "9433338d1cc884fb",
+      "sha": "c9fc7ec84460f794",
       "date": "2026-10-17"
     },
     "/tools/joist-deflection/": {
@@ -7182,7 +7182,7 @@
       "date": "2026-10-17"
     },
     "/tools/smoke-alarm-placement/": {
-      "sha": "3dd17f6ffd147a31",
+      "sha": "b618fe10e9d1441e",
       "date": "2026-10-17"
     },
     "/tools/smoke-detector-spacing-count/": {

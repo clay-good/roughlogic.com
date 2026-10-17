@@ -8,7 +8,7 @@ The refresh is smaller and more feasible than "a large research job" suggested:
 
 - **92 calculators** cite an I-code section or table by number. Their values are **constants in the calculator code**, not data shards. The one exception is the soil-bearing shard, which mirrors IBC Table 1806.2.
 - **The newer text is free to read.** ICC's Digital Codes read-only view shows the 2024 IRC and the 2027 IBC/IPC as plain text, tables included. It needs no account, but a browser is required: the pages render in JavaScript, and scripted fetches get a 403.
-- **Every value sampled is unchanged:** IRC 2024 riser 7¾ in, tread 10 in, guard sphere 4 in, egress opening 5.7 ft², and all four southern-pine rows of Table R507.6. The 2027 IPC Table 709.1 drainage fixture units (bathtub 2, bathroom group 5/6, washers 2/3) also match.
+- **Every value sampled in the first pass was unchanged** (one later turned out to differ; see Progress): IRC 2024 riser 7¾ in, tread 10 in, guard sphere 4 in, egress opening 5.7 ft², and all four southern-pine rows of Table R507.6. The 2027 IPC Table 709.1 drainage fixture units (bathtub 2, bathroom group 5/6, washers 2/3) also match.
 - **The certain cost is renumbering, not values.** The 2024 IRC reorganized Chapter 3: stairs moved from R311 to **R318**, emergency escape openings from R310 to **R319**, and guards from R312 to **R321**, while R311 is now carbon-monoxide alarms. Every IRC Chapter 3 citation in the catalog now points at the wrong section of the current code.
 
 ## Inventory
@@ -29,6 +29,16 @@ Tile lists per code are reproducible with the scan described under "Method".
 1. **One comparator script.** For each cited table: read the current edition's page in the browser pane, parse the table text, and diff it against the bundled constant. For each cited section: diff the numbers in its text. Record a per-table result row with source, edition and verified date, the same pattern as `worked-examples.json`.
 2. **Unchanged values:** re-cite the current edition and section number, and note "unchanged from 2021". This is most of the work, and it is mechanical.
 3. **Changed values:** follow the dual-edition window in [edition-rollover.md](edition-rollover.md) (spec-v10 §F.3). Default to the current edition and print the 2021 value beside it, because many states still enforce 2021.
+
+## Progress
+
+| Slice | Status |
+|---|---|
+| IRC Chapter 3 (stairs, guards, landings, egress windows, alarms; 12 tiles) | Landed 2026-10-17. Renumbered only, except **smoke-alarm cooking clearance, which changed** (2024 R310.3.1: 10 ft for every type, 6 ft exception, in place of 2021's 20 / 10 / 6 ft by type); the tile now offers both editions. |
+| IRC R507 decks and R602.7 headers (4 tiles) | Landed 2026-10-17. Every bundled value identical; numbers unchanged. |
+| IPC drainage tables, IBC tables | Not started. |
+
+Read the **current printing** (the site offers to switch from a historical one, e.g. `IRC2024P2` to `IRC2024V2.1`); the first Chapter 3 pass used P2 and the re-read caught the smoke-alarm change.
 
 ## Recommended first slice
 
