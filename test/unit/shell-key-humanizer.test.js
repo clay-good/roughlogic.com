@@ -47,6 +47,22 @@ test("a key that spells its own `per` reads as one quotient, never \"X per (unit
   assert.equal(humanizeKey("rimpull_per_ton_lb"), "Rimpull per ton (lb)", "a per that is not last is unchanged");
 });
 
+test("metric and cubic-yard areas and volumes are units, and a count or mass before one is a density", () => {
+  assert.equal(humanizeKey("spoil_volume_yd3"), "Spoil volume (yd³)");
+  assert.equal(humanizeKey("area_m2"), "Area (m²)");
+  assert.equal(humanizeKey("water_lb_yd3"), "Water (lb/yd³)");
+  assert.equal(humanizeKey("pel_ug_m3"), "Pel (µg/m³)");
+  assert.equal(humanizeKey("incident_energy_cal_cm2"), "Incident energy (cal/cm²)");
+  assert.equal(humanizeKey("cement_bags_yd3"), "Cement (bags/yd³)", "bags per yard, not a volume of bags");
+  assert.equal(humanizeKey("indoor_spores_m3"), "Indoor (spores/m³)");
+  assert.equal(humanizeKey("coating_g_m2"), "Coating (g/m²)");
+  assert.equal(humanizeKey("supplemental_ppfd_umol_m2_s"), "Supplemental ppfd (µmol/m²/s)");
+  // Ambiguous tops keep printing the key: mJ or MJ, and AISC's M1/M2 ratio.
+  assert.equal(humanizeKey("dose_mj_cm2"), "Dose mj cm2");
+  assert.equal(humanizeKey("ra_mj_m2_day"), "Ra mj m2 (day)");
+  assert.equal(humanizeKey("m1_m2"), "M1 m2");
+});
+
 test("in_lb and ft_lb are torques, not quotients", () => {
   assert.equal(humanizeKey("torque_in_lb"), "Torque (in-lb)");
   assert.equal(humanizeKey("torque_ft_lb"), "Torque (ft-lb)");

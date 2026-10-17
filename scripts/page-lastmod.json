@@ -110,7 +110,7 @@
       "date": "2026-10-17"
     },
     "/tools/abatement-waste-containers/": {
-      "sha": "73e663c87fa513b8",
+      "sha": "e792dec9f32806c6",
       "date": "2026-10-17"
     },
     "/tools/abrasive-blast/": {
@@ -326,7 +326,7 @@
       "date": "2026-10-17"
     },
     "/tools/arc-rated-clothing-selection/": {
-      "sha": "6dc583a405424cc0",
+      "sha": "453da72a531c474f",
       "date": "2026-10-17"
     },
     "/tools/area-by-coordinates/": {
@@ -1298,7 +1298,7 @@
       "date": "2026-10-17"
     },
     "/tools/cmu-grout-volume/": {
-      "sha": "0df60ed864be17ad",
+      "sha": "574734d62260bc52",
       "date": "2026-10-17"
     },
     "/tools/cmu-shear-wall/": {
@@ -1602,7 +1602,7 @@
       "date": "2026-10-17"
     },
     "/tools/concrete-mix-design/": {
-      "sha": "9ea0bf0f77e10bdb",
+      "sha": "01089219c3ea8789",
       "date": "2026-10-17"
     },
     "/tools/concrete-modulus-of-rupture/": {
@@ -1658,7 +1658,7 @@
       "date": "2026-10-17"
     },
     "/tools/concrete-yield/": {
-      "sha": "01427fea2ff1c2fb",
+      "sha": "a606b83f59a12f7c",
       "date": "2026-10-17"
     },
     "/tools/condensate-drain/": {
@@ -2170,7 +2170,7 @@
       "date": "2026-10-17"
     },
     "/tools/demo-debris/": {
-      "sha": "c5cae8ed384bdc79",
+      "sha": "17c63720a1924cb8",
       "date": "2026-10-17"
     },
     "/tools/density-altitude/": {
@@ -2562,7 +2562,7 @@
       "date": "2026-10-17"
     },
     "/tools/dust-deflagration-vent-area/": {
-      "sha": "60eeda875cb3f326",
+      "sha": "bbd62b31de18774c",
       "date": "2026-10-17"
     },
     "/tools/dynamic-compression-ratio/": {
@@ -2574,7 +2574,7 @@
       "date": "2026-10-17"
     },
     "/tools/earthwork-end-area/": {
-      "sha": "96e4887ae1457a42",
+      "sha": "336adcb2ad0fd943",
       "date": "2026-10-17"
     },
     "/tools/economic-conductor-sizing/": {
@@ -3098,7 +3098,7 @@
       "date": "2026-10-17"
     },
     "/tools/flocculation-g-value/": {
-      "sha": "cb56fc857c178b9a",
+      "sha": "808f876640794175",
       "date": "2026-10-17"
     },
     "/tools/flocculator-paddle-power/": {
@@ -3374,7 +3374,7 @@
       "date": "2026-10-17"
     },
     "/tools/gaussian-dispersion-screen/": {
-      "sha": "f850d53ce3b0e24d",
+      "sha": "05ec21328970032e",
       "date": "2026-10-17"
     },
     "/tools/gcwr-check/": {
@@ -3622,7 +3622,7 @@
       "date": "2026-10-17"
     },
     "/tools/grow-light-fixture-count/": {
-      "sha": "361b177e758e0c14",
+      "sha": "b47689c12137ac6f",
       "date": "2026-10-17"
     },
     "/tools/growing-degree-days/": {
@@ -4294,7 +4294,7 @@
       "date": "2026-10-17"
     },
     "/tools/lead-dust-clearance/": {
-      "sha": "ee38d0c993f276da",
+      "sha": "f8a1db30a502fe7e",
       "date": "2026-10-17"
     },
     "/tools/led-tape-max-run/": {
@@ -4326,7 +4326,7 @@
       "date": "2026-10-17"
     },
     "/tools/lidar-point-density/": {
-      "sha": "209e88362b1d0ffb",
+      "sha": "6a01e1ada6fe5953",
       "date": "2026-10-17"
     },
     "/tools/lifeline-tension/": {
@@ -4702,7 +4702,7 @@
       "date": "2026-10-17"
     },
     "/tools/material-removal-rate/": {
-      "sha": "829af95f398b0de2",
+      "sha": "49d6efdfc567df68",
       "date": "2026-10-17"
     },
     "/tools/material-stacking-limits/": {
@@ -5370,7 +5370,7 @@
       "date": "2026-10-17"
     },
     "/tools/phosphate-coating-weight/": {
-      "sha": "62cefc0ae2908971",
+      "sha": "134c935ec80f63d4",
       "date": "2026-10-17"
     },
     "/tools/photoperiod-blackout-schedule/": {
@@ -5554,7 +5554,7 @@
       "date": "2026-10-17"
     },
     "/tools/plating-tank-current/": {
-      "sha": "3f5af6158e7139f2",
+      "sha": "4d3a2dd72e196887",
       "date": "2026-10-17"
     },
     "/tools/plenum-return-drop/": {
@@ -5998,7 +5998,7 @@
       "date": "2026-10-17"
     },
     "/tools/pyramid-frustum-volume/": {
-      "sha": "23497e5639d115e5",
+      "sha": "3ebf2875bab39836",
       "date": "2026-10-17"
     },
     "/tools/quadratic-formula/": {
@@ -6202,7 +6202,7 @@
       "date": "2026-10-17"
     },
     "/tools/ready-mix-concrete-order/": {
-      "sha": "080da69c3e6dcea0",
+      "sha": "d03f76defc497da8",
       "date": "2026-10-17"
     },
     "/tools/reaming-drill-allowance/": {
@@ -7086,11 +7086,11 @@
       "date": "2026-10-17"
     },
     "/tools/silica-table-1/": {
-      "sha": "4e7460302b75bccd",
+      "sha": "ffbd681eb4580610",
       "date": "2026-10-17"
     },
     "/tools/silica-ventilation-screen/": {
-      "sha": "2d55da64add42802",
+      "sha": "9e7d1c7ae358b08c",
       "date": "2026-10-17"
     },
     "/tools/sill-plate-anchor-count/": {
@@ -7858,7 +7858,7 @@
       "date": "2026-10-17"
     },
     "/tools/substrate-container-volume/": {
-      "sha": "34c39d85857dbd34",
+      "sha": "8e3a8fec0eef70e8",
       "date": "2026-10-17"
     },
     "/tools/substrate-for-velocity/": {
@@ -8006,7 +8006,7 @@
       "date": "2026-10-17"
     },
     "/tools/tapered-flocculation-g/": {
-      "sha": "c17821e0573023c6",
+      "sha": "266e68b8ad9adc39",
       "date": "2026-10-17"
     },
     "/tools/tapered-roof-insulation/": {
@@ -8206,7 +8206,7 @@
       "date": "2026-10-17"
     },
     "/tools/tire-contact-patch/": {
-      "sha": "1c16e7f96c7f0adf",
+      "sha": "6d53e5963769740b",
       "date": "2026-10-17"
     },
     "/tools/tire-gearing/": {

@@ -53,7 +53,21 @@ const KEY_UNITS = new Map(Object.entries({
   // that is a unit in one trade and a word in another needs a per-tile
   // caption, not a catalog-wide rule.
   ohm: "ohm", lbf: "lbf", psia: "psia", kvar: "kVAR", lux: "lux", sec: "sec", oz: "oz", lf: "LF",
+  // Metric and cubic-yard areas and volumes, which read "Spoil volume yd3"
+  // and "Area m2" on the steps panel. `ug` and `cal` only ever appear as
+  // the top of a quotient ("Pel (µg/m³)", "Incident energy (cal/cm²)").
+  yd3: "yd\u00b3", m2: "m\u00b2", m3: "m\u00b3", cm2: "cm\u00b2", cm3: "cm\u00b3", mm2: "mm\u00b2", ug: "\u00b5g", cal: "cal",
 }));
+// Before one of those areas or volumes, a count or a mass is the top of a
+// density, not part of the name: "Cement (bags/yd³)", "Indoor (spores/m³)",
+// "Coating (g/m²)". These words are units nowhere else, so they are only
+// read here.
+const AREA_VOLUME = new Set(["yd3", "m2", "m3", "cm2", "cm3", "mm2"]);
+const DENSITY_TOPS = new Map(Object.entries({ g: "g", mg: "mg", umol: "\u00b5mol", bags: "bags", spores: "spores" }));
+// And where the top is ambiguous, the key keeps printing itself: `mj` is
+// mJ in a UV dose and MJ in reference ET, `mw` likewise, and `m1_m2` is the
+// AISC end-moment ratio M1/M2, not an area.
+const AREA_VOLUME_DECLINE = new Set(["mj", "mw", "m1"]);
 const KEY_UNITS_CASED = new Map(Object.entries({ A: "A", V: "V", F: "\u00b0F", C: "\u00b0C", W: "W", nT: "nT" }));
 // A denominator ("lb_hr" = lb/hr) is only ever the LAST token of a key.
 const KEY_PER_UNITS = new Map(Object.entries({ min: "min", day: "day", s: "s", hr: "hr", sf: "ft\u00b2", yr: "yr" }));
@@ -96,9 +110,12 @@ export function humanizeKey(key) {
     // A per-unit denominator reached anywhere but the end is an ordinary word:
     // `conductor_min_A` is a minimum in amps, `theta_s_deg` is the variable.
     if (u === undefined && first) u = KEY_PER_UNITS.get(raw.toLowerCase());
+    if (u !== undefined && AREA_VOLUME.has(raw.toLowerCase()) && AREA_VOLUME_DECLINE.has(String(parts[parts.length - 2]).toLowerCase())) break;
     if (u === undefined) break;
     units.unshift(u);
     parts.pop();
+    const top = parts.length > 1 && AREA_VOLUME.has(raw.toLowerCase()) ? DENSITY_TOPS.get(parts[parts.length - 1].toLowerCase()) : undefined;
+    if (top) { units.unshift(top); parts.pop(); break; }
   }
   // "Rimpull per ton, in lb": the name already spent the word `per`, so the
   // token before it belongs to the name and not to a quotient.
