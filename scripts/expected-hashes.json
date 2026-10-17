@@ -28,7 +28,7 @@
     "plumbing/pipe-elastic-properties.json": "70e8ee39a251faa435a606de8f2f8e9bc35388d769a345735c4959c4c7b7f11e",
     "plumbing/pump-curves.json": "79b96ce4cfeb8ea5cc35d277fe84436eed7093fa14cd62a257d5101395f888b2",
     "plumbing/thermal-expansion-coefficients.json": "900b61a8add706d0f21e9cf94f53c87b3ca76f388325b846017200b7af13e66d",
-    "plumbing/manifest.json": "e900e7aa34bcc07277c1e6ed69bb48b289a4c91c559d8ed3e809cc1620d5b012",
+    "plumbing/manifest.json": "709de5b3075e7f44886be4a1376961f51ea4a61f7d613f2ba6452cd41540ecb5",
     "hvac/refrigerants.json": "b31aac3059f4bde2617b4a7cceaa353ba0b73282e2f3f0f87888f1f0a61f4e23",
     "hvac/duct-friction.json": "6125423dd611cc820a8a7052385b5889480f172607512f46cca72bf9fb000bdb",
     "hvac/climate-data.json": "f6ba8aad7d059a3ebe307ac7b69300204cf1eab811798d9c8564a255a4b14310",
@@ -61,11 +61,11 @@
     "construction/rebar-unit-weights.json": "aa9d90af63d3d735986b52af4d5a7ae3f50d1db89de02b5e22c0cba22f0ecc35",
     "construction/apa-span-ratings.json": "2fc73082e7a4068250c74664df666fef56aa7ed65c74687cab7d7c81c5c087be",
     "construction/helical-pile-kt.json": "dbc1a7421f3ced6964933569faf525bf4e6f93ae57e4ef3f30c35cc52b32c7a8",
-    "construction/manifest.json": "26e5b5e2c98987e022966b889fcc56c61f90dd97d1dfca70069377ea1684dae9",
+    "construction/manifest.json": "6195a6a5522a553d66bc40bfedfe05e23258d4167697aad172422e7c763801f9",
     "fire/hose-friction.json": "61ea899b59206ed16946e9627de0a0ef2c77fccbb1673bdbe25d9a7145014a41",
     "fire/fire-flow-formulas.json": "b1aa15700e69905bb68e90419a26b59b8e01bdfeb928230e19272ea536404782",
     "fire/iso-nff.json": "b2ca30cd7a44da3b5e07b9796ba3c90ad12dc6ae60addc362e4492993bc5a002",
-    "fire/manifest.json": "53d630ef7598ec2ed7bc4d5f28df2bacc179be7821164d12880b04a69364dea9",
+    "fire/manifest.json": "2eeecc4b0b5797cd1006c987571dfebc9ef36eb38f094a322ef01c4a997f0c76",
     "crosswalks/unit-conversions.json": "9a30ff3dd2f47b0d62f28cf4bc72363741156cb82f2f19a16289d59afaabf5b1",
     "crosswalks/state-tax-rates.json": "ac863ffef34e3e8b758090502869b2fbe57a717972e33f2a224559e52248f6ed",
     "crosswalks/irs-mileage.json": "c383b0739291d724c2ea679fe63d5fad2e5593a4a0c3216574d1fb761323c435",
@@ -121,7 +121,7 @@
     "fields/manifest.json": "065133332f139f102c3eb6b2841857f35b3ea991f43a0f30f8d4e2a02f9f3029",
     "search/manifest.json": "5a0fbbc1312c295d1317e6cb5e0f3bdf80dd7652fc31583d6068c4bde78cfb59",
     "desc/manifest.json": "6d7093eaefadf8f97ad420a6325e26051de6e9bf2790ddaf9476a2b6e3595290",
-    "citations/manifest.json": "9aa81bf977f51dfffc7f05336301c881bcc7c67c0ea4dba38949cfa3c99c3793",
+    "citations/manifest.json": "b1394b2d60af5146725a88060cbda5b57c7c23505757d59c3d91fd0821eea762",
     "legal/code-adoption.json": "fcc7037a9c63cf5139c0a527c4b8077dafdc72748ecf7d71d588d07dacdca557"
   }
 }

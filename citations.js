@@ -65,7 +65,7 @@ const IBC_2021 = "IBC 2021 (International Building Code).";
 const ASCE_7 = "ASCE 7-22 (Minimum Design Loads for Buildings and Other Structures).";
 const AWC_NDS = "AWC NDS-2018 (National Design Specification for Wood Construction).";
 const IRC_DISCLOSURE = "Editions available: bundled values follow IRC 2021. Jurisdictions on IRC 2018 / 2024 differ at the margins; verify the edition adopted by your AHJ.";
-const IBC_DISCLOSURE = "Editions available: bundled values follow IBC 2021 and ASCE 7-22 referenced formulas. IBC 2024 is the current published edition and the one that references ASCE 7-22; IBC 2021 references ASCE 7-16, and older IBC editions reference ASCE 7-16 / 7-10. ASCE 7-22 snow is strength-level and 7-16 snow service-level, so the two are not interchangeable; verify the edition adopted by your AHJ.";
+const IBC_DISCLOSURE = "Editions available: bundled values follow IBC 2021 and ASCE 7-22 referenced formulas. IBC 2027 is the current published edition (ICC released it in October 2026); IBC 2024 preceded it and references ASCE 7-22; IBC 2021 references ASCE 7-16, and older IBC editions reference ASCE 7-16 / 7-10. ASCE 7-22 snow is strength-level and 7-16 snow service-level, so the two are not interchangeable; verify the edition adopted by your AHJ.";
 
 // HVAC common phrasing (Group C audit, priority 4 per spec §6).
 const ASHRAE_62_1 = "ASHRAE 62.1-2022 (Ventilation for Acceptable Indoor Air Quality).";
@@ -79,7 +79,7 @@ const IPC_2021 = "IPC 2021 (International Plumbing Code).";
 const IFGC_2021 = "IFGC 2021 (International Fuel Gas Code) / NFPA 54.";
 const ICC_FREE = "Free read-only access at codes.iccsafe.org.";
 const NFPA54_FREE = "Free read-only access at nfpa.org/freeaccess.";
-const IPC_DISCLOSURE = "Editions available: bundled values follow IPC 2021. Jurisdictions on IPC 2018 / 2024 differ in fixture-unit values and vent-sizing tables; verify the edition adopted by your AHJ. UPC-jurisdictions (CA, IN, MA, NV, parts of NJ) use the Uniform Plumbing Code instead.";
+const IPC_DISCLOSURE = "Editions available: bundled values follow IPC 2021. IPC 2027 is the current published edition and 2024 preceded it; jurisdictions on IPC 2018, 2021, 2024 or 2027 differ in fixture-unit values and vent-sizing tables; verify the edition adopted by your AHJ. UPC-jurisdictions (CA, IN, MA, NV, parts of NJ) use the Uniform Plumbing Code instead.";
 const IFGC_DISCLOSURE = "Editions available: bundled values follow IFGC 2021 / NFPA 54-2021. IFGC 2027 is the current published edition and 2024 preceded it; jurisdictions on any of these differ at the margins; verify the edition adopted by your AHJ.";
 
 // Group A - Electrical. Priority-1 audit per spec-v6.md §6.

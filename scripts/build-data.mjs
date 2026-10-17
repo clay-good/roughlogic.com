@@ -1755,7 +1755,7 @@ const DATASETS = [
       { file: "nema-mg1-code-letters.json", body: NEMA_MG1_CODE_LETTERS_DATA, name: "NEMA MG-1 code-letter starting kVA per HP" },
       { file: "dwelling-demand.json", body: DWELLING_DEMAND_DATA, name: "Dwelling demand-factor parameters (NEC 2023 Article 220)" },
     ] },
-  { folder: "plumbing", edition: "IPC 2021; IFGC 2021 (IPC 2024 and IFGC 2027 are the current published editions; bundled values follow 2021 and the tile citations disclose it); Hazen-Williams (AWWA M11, 5th ed.); Manning (USGS WSP-2339, public domain); ASME B31.1 / B31.9 (guided-cantilever expansion-loop method); Joukowsky (1898) / ASCE MOP-49; Hydraulic Institute pump engineering practice; manufacturer specs as of " + EDITION_VERIFIED.plumbing + ".", shards: [
+  { folder: "plumbing", edition: "IPC 2021; IFGC 2021 (IPC 2027 and IFGC 2027 are the current published editions; bundled values follow 2021 and the tile citations disclose it); Hazen-Williams (AWWA M11, 5th ed.); Manning (USGS WSP-2339, public domain); ASME B31.1 / B31.9 (guided-cantilever expansion-loop method); Joukowsky (1898) / ASCE MOP-49; Hydraulic Institute pump engineering practice; manufacturer specs as of " + EDITION_VERIFIED.plumbing + ".", shards: [
       { file: "pipe-properties.json", body: PIPE_PROPERTIES, name: "Pipe properties" },
       { file: "fixture-units.json", body: FIXTURE_UNITS, name: "Fixture units" },
       { file: "gas-pipe-capacity.json", body: GAS_PIPE_CAPACITY, name: "Gas pipe capacity" },
@@ -1793,7 +1793,7 @@ const DATASETS = [
       { file: "mold-conditions.json", body: MOLD_CONDITIONS, name: "Mold growth conditions" },
       { file: "hepa-loading.json", body: HEPA_LOADING, name: "HEPA scrubber loading rates" },
     ] },
-  { folder: "construction", edition: "IRC 2021 / IBC 2021 cited by section number (IRC 2024 / IBC 2024 are the current published editions; bundled values follow 2021 and the tile citations disclose it); ASCE 7 formulas applied (no licensed text reproduced); ACI 211 / ACI 318 / ACI 347 cited by name; ASTM A615 + CRSI rebar values; APA span-rating tables (technical-bulletin reuse); ICC-ES AC358 helical-pile Kt; ASME B30.5 / B30.9 + OSHA 29 CFR 1926 Subpart CC for crane-lift; ASTM/SAE bolt grades; AWS deposition; lumber properties from public engineering references; verified " + EDITION_VERIFIED.construction + ".", shards: [
+  { folder: "construction", edition: "IRC 2021 / IBC 2021 cited by section number (IRC 2024 and IBC 2027 are the current published editions; bundled values follow 2021 and the tile citations disclose it); ASCE 7 formulas applied (no licensed text reproduced); ACI 211 / ACI 318 / ACI 347 cited by name; ASTM A615 + CRSI rebar values; APA span-rating tables (technical-bulletin reuse); ICC-ES AC358 helical-pile Kt; ASME B30.5 / B30.9 + OSHA 29 CFR 1926 Subpart CC for crane-lift; ASTM/SAE bolt grades; AWS deposition; lumber properties from public engineering references; verified " + EDITION_VERIFIED.construction + ".", shards: [
       { file: "lumber-properties.json", body: LUMBER_PROPERTIES, name: "Lumber material properties" },
       { file: "concrete-mixes.json", body: CONCRETE_MIXES, name: "Concrete mixes" },
       { file: "span-derivations.json", body: SPAN_DERIVATIONS, name: "Span derivations" },
@@ -1808,7 +1808,7 @@ const DATASETS = [
       { file: "apa-span-ratings.json", body: APA_SPAN_RATINGS_DATA, name: "APA plywood / OSB span-rating tables" },
       { file: "helical-pile-kt.json", body: HELICAL_PILE_KT_DATA, name: "Helical-pile Kt benchmarks (manufacturer-attributed)" },
     ] },
-  { folder: "fire", edition: "NFA hose-friction training materials (U.S. government, public domain); ISO Public Protection Classification fire-flow formulas + NFF construction-class table; IFC 2021 Table B105.1 cited by section number (IFC 2024 is the current published edition; bundled values follow 2021 and the tile citations disclose it); verified " + EDITION_VERIFIED.fire + ".", shards: [
+  { folder: "fire", edition: "NFA hose-friction training materials (U.S. government, public domain); ISO Public Protection Classification fire-flow formulas + NFF construction-class table; IFC 2021 Table B105.1 cited by section number (IFC 2027 is the current published edition; bundled values follow 2021 and the tile citations disclose it); verified " + EDITION_VERIFIED.fire + ".", shards: [
       { file: "hose-friction.json", body: HOSE_FRICTION, name: "Fire hose friction coefficients (NFA)" },
       { file: "fire-flow-formulas.json", body: FIRE_FLOW_FORMULAS, name: "Fire flow formulas" },
       // v7 utility 252.

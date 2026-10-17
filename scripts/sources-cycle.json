@@ -20,12 +20,12 @@
     {
       "id": "ipc",
       "name": "International Plumbing Code",
-      "current_edition": "2024",
-      "current_release": "2023-09",
+      "current_edition": "2027",
+      "current_release": "2026-10",
       "cycle_years": 3,
-      "next_expected": "2027-01",
-      "last_verified": "2026-09-01",
-      "verification_note": "2027 I-Code final vote completed August 2026; the editions publish in stages. Publication schedule re-confirmed 2026-09-02 against ICC's announced dates: IBC, IFC and IWUIC anticipated September 2026; IECC 2026-12-31; IRC February 2027. The IPC / IMC / IFGC dates in this file remain estimates. last_verified stays 2026-09-01, the last date non-publication was actually confirmed -- the 2026-09-02 pass reached only the anticipated schedule (shop.iccsafe.org 404s and codes.iccsafe.org 403s an automated fetch), and an anticipated date is not a verification. IBC and IFC are due within the month: when next_expected passes, confirm at shop.iccsafe.org and either advance the row to 2027 or re-stamp last_verified on or after next_expected.",
+      "next_expected": "2029-10",
+      "last_verified": "2026-10-17",
+      "verification_note": "Verified 2026-10-17 against the publisher's own Digital Codes site (codes.iccsafe.org/codes/i-codes/2027-icodes), read in a browser because it renders its catalogue in JavaScript. The 2027 International Plumbing Code is listed there and marked NEW, beside the 2027 IBC, IFC, IPC, IMC, IFGC, IPSDC, IPMC, ISPSC, IWUIC and IZC, so the 2027 edition has published. Earlier readings of the same page in September 2026 (2026-09-03, and 2026-09-09 for the IBC and IFC) did not list it, so it was released after them and by 2026-10-17; the release month is recorded as the month it was observed available, as for the IMC and IFGC rows, because ICC prints no publication date on that page. The bundled values still follow the 2021 edition and the folder manifest and tile disclosures say so; the value refresh is its own future data pass.",
       "free_access_url": "https://codes.iccsafe.org/codes/i-codes",
       "match_terms": [
         "IPC "
@@ -48,12 +48,12 @@
     {
       "id": "ibc",
       "name": "International Building Code",
-      "current_edition": "2024",
-      "current_release": "2023-09",
+      "current_edition": "2027",
+      "current_release": "2026-10",
       "cycle_years": 3,
-      "next_expected": "2027-01",
-      "last_verified": "2026-09-10",
-      "verification_note": "Verified 2026-09-10 against ICC's own newsroom announcement (iccsafe.org/about/periodicals-and-newsroom/2027-international-codes-add-provisions-to-accelerate-off-site-construction-and-support-housing-affordability/), dated 2026-08-24, which states that the 2027 International Codes will be published later this year and gives NO month. That corroborates the 2026-09-09 Digital Codes reading -- the International Building Code is still not among the released 2027 titles -- from a second, fetchable publisher surface, and it settles what the earlier note could only infer: ICC no longer publishes an anticipated MONTH for this title, only a year-end window. next_expected therefore moves 2026-10 to 2027-01 rather than being nudged a month at a time. 2026-10 was a guess left over from the September date that came and went; keeping it would have reddened main at UTC midnight on 2026-10-01 for a code whose publisher had not claimed an October release, and a CF-03 red takes accessibility and integration down with it (both need: test). 2027-01 is the first month after ICC's own stated window closes, and it deliberately does not share 2026-12 with the FDA Food Code row -- rows stacked on one date arrive as several errors at once after months of quiet, which is how the 2026-09-01 six-row red happened. The site cites 2021 here against a current 2024, a lag already disclosed, so this defers TRACKING of the next edition, not a citation change. Recheck codes.iccsafe.org/codes/i-codes/2027-icodes in a BROWSER (it 403s an automated fetch and is JS-rendered) and either advance the row to 2027 or re-stamp last_verified on or after the due date.",
+      "next_expected": "2029-10",
+      "last_verified": "2026-10-17",
+      "verification_note": "Verified 2026-10-17 against the publisher's own Digital Codes site (codes.iccsafe.org/codes/i-codes/2027-icodes), read in a browser because it renders its catalogue in JavaScript. The 2027 International Building Code is listed there and marked NEW, beside the 2027 IBC, IFC, IPC, IMC, IFGC, IPSDC, IPMC, ISPSC, IWUIC and IZC, so the 2027 edition has published. Earlier readings of the same page in September 2026 (2026-09-03, and 2026-09-09 for the IBC and IFC) did not list it, so it was released after them and by 2026-10-17; the release month is recorded as the month it was observed available, as for the IMC and IFGC rows, because ICC prints no publication date on that page. The bundled values still follow the 2021 edition and the folder manifest and tile disclosures say so; the value refresh is its own future data pass.",
       "free_access_url": "https://codes.iccsafe.org/codes/i-codes",
       "match_terms": [
         "IBC "
@@ -76,12 +76,12 @@
     {
       "id": "ifc",
       "name": "International Fire Code",
-      "current_edition": "2024",
-      "current_release": "2023-09",
+      "current_edition": "2027",
+      "current_release": "2026-10",
       "cycle_years": 3,
-      "next_expected": "2027-01",
-      "last_verified": "2026-09-10",
-      "verification_note": "Verified 2026-09-10 against ICC's own newsroom announcement (iccsafe.org/about/periodicals-and-newsroom/2027-international-codes-add-provisions-to-accelerate-off-site-construction-and-support-housing-affordability/), dated 2026-08-24, which states that the 2027 International Codes will be published later this year and gives NO month. That corroborates the 2026-09-09 Digital Codes reading -- the International Fire Code is still not among the released 2027 titles -- from a second, fetchable publisher surface, and it settles what the earlier note could only infer: ICC no longer publishes an anticipated MONTH for this title, only a year-end window. next_expected therefore moves 2026-10 to 2027-01 rather than being nudged a month at a time. 2026-10 was a guess left over from the September date that came and went; keeping it would have reddened main at UTC midnight on 2026-10-01 for a code whose publisher had not claimed an October release, and a CF-03 red takes accessibility and integration down with it (both need: test). 2027-01 is the first month after ICC's own stated window closes, and it deliberately does not share 2026-12 with the FDA Food Code row -- rows stacked on one date arrive as several errors at once after months of quiet, which is how the 2026-09-01 six-row red happened. The site cites 2021 here against a current 2024, a lag already disclosed, so this defers TRACKING of the next edition, not a citation change. Recheck codes.iccsafe.org/codes/i-codes/2027-icodes in a BROWSER (it 403s an automated fetch and is JS-rendered) and either advance the row to 2027 or re-stamp last_verified on or after the due date.",
+      "next_expected": "2029-10",
+      "last_verified": "2026-10-17",
+      "verification_note": "Verified 2026-10-17 against the publisher's own Digital Codes site (codes.iccsafe.org/codes/i-codes/2027-icodes), read in a browser because it renders its catalogue in JavaScript. The 2027 International Fire Code is listed there and marked NEW, beside the 2027 IBC, IFC, IPC, IMC, IFGC, IPSDC, IPMC, ISPSC, IWUIC and IZC, so the 2027 edition has published. Earlier readings of the same page in September 2026 (2026-09-03, and 2026-09-09 for the IBC and IFC) did not list it, so it was released after them and by 2026-10-17; the release month is recorded as the month it was observed available, as for the IMC and IFGC rows, because ICC prints no publication date on that page. The bundled values still follow the 2021 edition and the folder manifest and tile disclosures say so; the value refresh is its own future data pass.",
       "free_access_url": "https://codes.iccsafe.org/codes/i-codes",
       "match_terms": [
         "IFC "
@@ -183,8 +183,8 @@
       "current_release": "2018-10",
       "cycle_years": 7,
       "next_expected": "2027-01",
-      "last_verified": "2026-09-01",
-      "verification_note": "Verified 2026-09-01: the 8th edition is NOT yet published. NCHRP 07-29, the research project developing it, was scheduled to complete 2026-03-31, so publication follows that rather than precedes it. The 2018 7th edition remains current; bundled geometric-design defaults follow it and the citation discloses it. 2026-09-09, free_access_url only: the row pointed at store.transportation.org/Item/PublicationDetail?ID=4642, which now SOFT-404s -- it answers HTTP 200 while redirecting to /Common/NotFound, so a status-code probe called it healthy. Repointed at the store root, which resolves to itself. NOTE FOR WHOEVER RECHECKS THE EDITION: AASHTO's store states that it prohibits the use of AASHTO content with any artificial-intelligence tool, so the Green Book edition has to be confirmed by a person, not by an agent reading that site. last_verified stays 2026-09-01: repointing a link is not a verification of the edition.",
+      "last_verified": "2026-10-17",
+      "verification_note": "Verified 2026-09-01: the 8th edition is NOT yet published. NCHRP 07-29, the research project developing it, was scheduled to complete 2026-03-31, so publication follows that rather than precedes it. The 2018 7th edition remains current; bundled geometric-design defaults follow it and the citation discloses it. 2026-09-09, free_access_url only: the row pointed at store.transportation.org/Item/PublicationDetail?ID=4642, which now SOFT-404s -- it answers HTTP 200 while redirecting to /Common/NotFound, so a status-code probe called it healthy. Repointed at the store root, which resolves to itself. NOTE FOR WHOEVER RECHECKS THE EDITION: AASHTO's store states that it prohibits the use of AASHTO content with any artificial-intelligence tool, so the Green Book edition has to be confirmed by a person, not by an agent reading that site. last_verified stays 2026-09-01: repointing a link is not a verification of the edition. Re-verified 2026-10-17: a search of the AASHTO Store (store.transportation.org) for \"geometric design\" returns only \"A Policy on Geometric Design of Highways and Streets, 7th Edition\", and a web search found no announcement of the 8th, so the 7th remains current. next_expected stays 2027-01.",
       "free_access_url": "https://store.transportation.org/",
       "match_terms": [
         "AASHTO Green Book",

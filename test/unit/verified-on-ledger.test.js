@@ -602,9 +602,11 @@ test("the human ledger table agrees with the cycle file", async () => {
   // silently revert to claiming they had not.
   assert.ok(row("imc").currentEdition.startsWith("2027"));
   assert.ok(row("ifgc").currentEdition.startsWith("2027"));
-  // ...and the two that genuinely had not, as of 2026-09-09.
-  assert.ok(row("ibc").currentEdition.startsWith("2024"));
-  assert.ok(row("ifc").currentEdition.startsWith("2024"));
+  // The IBC, IFC and IPC had not as of 2026-09-09 and had by 2026-10-17
+  // (ICC Digital Codes lists all three 2027 titles as NEW).
+  for (const id of ["ibc", "ifc", "ipc"]) assert.ok(row(id).currentEdition.startsWith("2027"), id);
+  // ...and the IRC genuinely has not (ICC anticipates February 2027).
+  assert.ok(row("irc").currentEdition.startsWith("2024"));
 
   // A substring test would pass this string. startsWith must not.
   assert.ok(!"2024 (2027 voted, not published)".startsWith("2027"));
@@ -691,7 +693,7 @@ test("each I-code disclosure names the current published edition", async () => {
   }
 
   // The two that were wrong, pinned by name so they cannot regress quietly.
-  assert.match(disclosure("IBC"), /IBC 2024 is the current published edition/);
+  assert.match(disclosure("IBC"), /IBC 2027 is the current published edition/);
   assert.match(disclosure("IFGC"), /IFGC 2027 is the current published edition/);
 });
 

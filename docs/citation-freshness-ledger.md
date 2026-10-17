@@ -65,11 +65,11 @@ anything.
 | id | source | edition cited (bundled) | current edition | last verified | status |
 |----|--------|-------------------------|-----------------|---------------|--------|
 | `nec` | NEC (NFPA 70) | 2023 | 2026 | 2026-06-05 | disclosed-lag |
-| `ipc` | International Plumbing Code | 2021 | 2024 (2027 voted, not published) | 2026-09-01 | disclosed-lag |
+| `ipc` | International Plumbing Code | 2021 | **2027 (published)** | 2026-10-17 | disclosed-lag |
 | `irc` | International Residential Code | 2021 | 2024 (2027 voted, not published) | 2026-09-01 | disclosed-lag |
-| `ibc` | International Building Code | 2021 | 2024 (2027 not yet published) | 2026-09-10 | disclosed-lag |
+| `ibc` | International Building Code | 2021 | **2027 (published)** | 2026-10-17 | disclosed-lag |
 | `imc` | International Mechanical Code | 2021 | **2027 (published)** | 2026-09-03 | disclosed-lag |
-| `ifc` | International Fire Code | 2021 | 2024 (2027 not yet published) | 2026-09-10 | disclosed-lag |
+| `ifc` | International Fire Code | 2021 | **2027 (published)** | 2026-10-17 | disclosed-lag |
 | `ifgc` | International Fuel Gas Code | 2021 | **2027 (published)** | 2026-09-03 | disclosed-lag |
 | `ashrae-62-1` | ASHRAE 62.1 | 2022 | **2025 (published)** | 2026-09-01 | disclosed-lag |
 | `ashrae-62-2` | ASHRAE 62.2 | 2022 | **2025 (published)** | 2026-09-01 | disclosed-lag |
@@ -80,7 +80,7 @@ anything.
 | `centrifuge-rotors` | Manufacturer centrifuge-rotor radii | current manufacturer catalogs | current manufacturer catalogs | 2026-09-09 | current |
 | `buffer-pka` | Laboratory buffer pKa values | Good 1966 / PanReac AppliChem IP-022EN / CRC 95th | Good 1966 / PanReac AppliChem IP-022EN / CRC 95th | 2026-09-09 | current |
 | `inventory-benchmarks` | Industry inventory-turnover benchmarks | ARTS 2022 (benchmarked) | ARTS 2022 (benchmarked) | 2026-09-09 | current |
-| `aashto-greenbook` | AASHTO Green Book | 2018 (7th ed.) | 2018 (7th ed.), 8th in development | 2026-09-01 | acknowledged-stale |
+| `aashto-greenbook` | AASHTO Green Book | 2018 (7th ed.) | 2018 (7th ed.), 8th in development | 2026-10-17 | acknowledged-stale |
 
 ## Dispositions (spec-v22 §2)
 
@@ -138,6 +138,14 @@ anything.
   2017. Re-stamped `last_verified: 2026-09-02`. It still warns, correctly -- a
   re-stamp dated before `next_expected` cannot cover it -- and that warning is
   now a reminder to look in December rather than a row nobody had ever checked.
+- **ICC I-codes, 2026-10-17: the 2027 IBC, IFC and IPC have published.** ICC's
+  Digital Codes page for the 2027 I-Codes, read in a browser, now lists all
+  three marked NEW; the September readings did not. The rows advance to 2027
+  (release month recorded as observed, 2026-10, as for the IMC and IFGC), and
+  the construction, fire and plumbing manifests and the IBC and IPC tile
+  disclosures now name 2027 as current. Bundled values still follow 2021, so the
+  status stays disclosed-lag; the value refresh is its own data pass. The IRC is
+  not yet listed (ICC anticipates February 2027) and its row is unchanged.
 - **FDA Food Code, 2026-10-17 (rolled 2022 -> 2026):** the warning did its job
   two months early. fda.gov now says "The 2026 Food Code is the most recent full
   edition published by FDA" (Summary of Changes dated 2026-09-17). FDA's Summary
