@@ -69,6 +69,8 @@ const IRC_2024 = "IRC 2024 (International Residential Code).";
 const IRC_CH3_2024 = " Checked against the IRC 2024 text on 2026-10-17: these requirements are unchanged from 2021, and only the section numbers moved (stairs and landings R311 to R318, emergency escape openings R310 to R319, handrails to R320, guards R312 to R321, smoke alarms R314 to R310, carbon monoxide alarms R315 to R311). The bracketed numbers are the 2021 sections.";
 // Appended to the deck and header tiles checked against IRC 2024 on 2026-10-17.
 const IRC_DECK_2024 = " Checked against the current IRC 2024 printing on 2026-10-17: Table R507.6 cantilevers and Table R507.9.1.3(1) ledger spacings are identical to IRC 2021, and R507, R507.9, R602.7, Table R602.7(1) and R602.7.5 keep their numbers.";
+// Appended to the IPC drainage tiles checked against IPC 2027 on 2026-10-17.
+const IPC_DRAIN_2027 = " Checked against the current IPC 2027 printing on 2026-10-17: Tables 704.1, 710.1(1), 710.1(2), 712.4.2 and 909.1 and Section 909.2 are identical to IPC 2021, and Table 709.1 is identical except the drinking fountain (1/2 DFU in 2021 and 2024, 0 in 2027), which these tiles now follow.";
 const IRC_DISCLOSURE = "Editions available: bundled values follow IRC 2021. Jurisdictions on IRC 2018 / 2024 differ at the margins; verify the edition adopted by your AHJ.";
 // Appended to the IRC disclosure on the four IRC tiles whose span / deflection
 // values come from the NDS (2026-10-17).
@@ -3852,11 +3854,11 @@ export const CITATIONS = {
   // every constant the tile applies that the user does not supply.
 
   "pipe-sizing": {
-    formula: "WSFU from UPC-style private-use fixture-unit values (above IPC Appendix E Table E103.3(2)); Hunter's Curve converts total WSFU to gpm; DFU per IPC 2021 Table 709.1; supply size from the bundled gpm thresholds; drain size is the smallest IPC 2021 Table 710.1(1) building drain that carries the DFU at the chosen slope, and 3 in minimum with a water closet (Table 709.1 outlet, 704.2).",
+    formula: "WSFU from UPC-style private-use fixture-unit values (above IPC Appendix E Table E103.3(2)); Hunter's Curve converts total WSFU to gpm; DFU per IPC 2027 Table 709.1 (unchanged from 2021 except the drinking fountain, now 0); supply size from the bundled gpm thresholds; drain size is the smallest IPC 2021 Table 710.1(1) building drain that carries the DFU at the chosen slope, and 3 in minimum with a water closet (Table 709.1 outlet, 704.2).",
     edition: IPC_2021 + " Tables 709.1 and 710.1(1) and Appendix E by name; Hunter's Curve (NBS BMS65).",
     freeAccess: ICC_FREE,
     governance: GOVERNANCE.plumbing,
-    editionNote: IPC_DISCLOSURE,
+    editionNote: IPC_DISCLOSURE + IPC_DRAIN_2027,
     assumptions: [
       { name: "Pressure head at most-distant fixture", value: "not checked here (IPC 604.6 sets an 8 psi minimum)", source: "IPC 2021 Section 604.6" },
       { name: "Maximum velocity", value: "not checked here (8 fps water supply / 5 fps hot water is common practice)", source: "IPC 2021 Section 604.4" },
@@ -3916,13 +3918,13 @@ export const CITATIONS = {
     ],
   },
   "slope": {
-    formula: "Slope expressed as fraction (1/4 inch per foot), degrees, and percent. Standard horizontal-drainage slopes per IPC 2021 Table 704.1.",
+    formula: "Slope expressed as fraction (1/4 inch per foot), degrees, and percent. Standard horizontal-drainage slopes per IPC 2027 Table 704.1 (identical in 2021).",
     edition: IPC_2021 + " Section 704, Table 704.1.",
     freeAccess: ICC_FREE,
     governance: GOVERNANCE.plumbing,
-    editionNote: IPC_DISCLOSURE,
+    editionNote: IPC_DISCLOSURE + IPC_DRAIN_2027,
     assumptions: [
-      { name: "Minimum slope rule", value: "1/4 in per ft for ≤ 2-1/2 in; 1/8 in per ft for 3 to 6 in; 1/16 in per ft for 8 in and larger", source: "IPC 2021 Table 704.1" },
+      { name: "Minimum slope rule", value: "1/4 in per ft for ≤ 2-1/2 in; 1/8 in per ft for 3 to 6 in; 1/16 in per ft for 8 in and larger", source: "IPC 2027 Table 704.1 (identical in 2021)" },
     ],
   },
   "pressure-conversion": {
@@ -4033,11 +4035,11 @@ export const CITATIONS = {
     edition: IPC_2021 + " Section 710; DFU values per IPC Table 709.1; capacities per Tables 710.1(1) and 710.1(2).",
     freeAccess: ICC_FREE,
     governance: GOVERNANCE.plumbing,
-    editionNote: "Bundled DFU and capacity tables follow IPC 2021. Jurisdictions on UPC or an older IPC edition differ at the margins; verify the edition adopted by your AHJ.",
+    editionNote: "Bundled DFU and capacity tables follow IPC 2021. Jurisdictions on UPC or an older IPC edition differ at the margins; verify the edition adopted by your AHJ." + IPC_DRAIN_2027,
     assumptions: [
-      { name: "DFU values", value: "IPC Table 709.1 (private WC 3, public WC 4, lavatory 1, bath 2, shower 2, kitchen sink 2, urinal 4, floor drain 2, ...)", source: "IPC 2021 Table 709.1" },
-      { name: "Branch / stack capacity", value: "IPC Table 710.1(2) max DFU by nominal size", source: "IPC 2021 Table 710.1(2)" },
-      { name: "Building-drain capacity", value: "IPC Table 710.1(1) max DFU by size and slope (1/8 / 1/4 / 1/2 in per ft)", source: "IPC 2021 Table 710.1(1)" },
+      { name: "DFU values", value: "IPC Table 709.1 (private WC 3, public WC 4, lavatory 1, bath 2, shower 2, kitchen sink 2, urinal 4, floor drain 2, ...)", source: "IPC 2027 Table 709.1 (identical in 2021 except the drinking fountain, 1/2 DFU then, 0 now)" },
+      { name: "Branch / stack capacity", value: "IPC Table 710.1(2) max DFU by nominal size", source: "IPC 2027 Table 710.1(2) (identical in 2021)" },
+      { name: "Building-drain capacity", value: "IPC Table 710.1(1) max DFU by size and slope (1/8 / 1/4 / 1/2 in per ft)", source: "IPC 2027 Table 710.1(1) (identical in 2021)" },
     ],
   },
   "trap-primer": {
@@ -4127,9 +4129,9 @@ export const CITATIONS = {
     edition: IPC_2021 + " Section 909, Table 909.1.",
     freeAccess: ICC_FREE,
     governance: GOVERNANCE.plumbing,
-    editionNote: IPC_DISCLOSURE,
+    editionNote: IPC_DISCLOSURE + IPC_DRAIN_2027,
     assumptions: [
-      { name: "Trap-arm slope and fall", value: "1/4 in per ft for 2 in and smaller, 1/8 in per ft for 3 and 4 in (Table 909.1); total fall not more than 1 pipe diameter (909.2)", source: "IPC 2021 Table 909.1 / 909.2" },
+      { name: "Trap-arm slope and fall", value: "1/4 in per ft for 2 in and smaller, 1/8 in per ft for 3 and 4 in (Table 909.1); total fall not more than 1 pipe diameter (909.2)", source: "IPC 2027 Table 909.1 / 909.2 (identical in 2021)" },
     ],
   },
   "pipe-expansion": {
@@ -9647,11 +9649,11 @@ export const CITATIONS = {
     edition: "IPC 2021 Section 712 (Sumps and Ejectors) and the Hydraulic Institute pump-cycling guidance by name; first-principles basin geometry and cycle math.",
     freeAccess: "IPC 2021 free read-only at codes.iccsafe.org; the 7.48 gal/ft^3 constant is public.",
     governance: GOVERNANCE.general,
-    editionNote: "The pump must out-pace the inflow (the tile errors if it does not). A longer run time per cycle is gentler on the motor. A sewage ejector must pass 2 in solids and carries a vent, neither of which this tile sizes (IPC 712.3-712.4); the optional discharge-size select checks the IPC Table 712.4.2 minimum capacity.",
+    editionNote: "The pump must out-pace the inflow (the tile errors if it does not). A longer run time per cycle is gentler on the motor. A sewage ejector must pass 2 in solids and carries a vent, neither of which this tile sizes (IPC 712.3-712.4); the optional discharge-size select checks the IPC Table 712.4.2 minimum capacity." + IPC_DRAIN_2027,
     assumptions: [
       { name: "Volume constant", value: "7.48 gal per ft^3", source: "physical fact" },
       { name: "Minimum run default", value: "60 s per cycle (Hydraulic Institute cycling guidance)", source: "Hydraulic Institute / pump manufacturer" },
-      { name: "Ejector minimum capacity", value: "21 / 30 / 46 gpm for a 2 / 2-1/2 / 3 in discharge, each about 2 ft/s in that pipe (added 2026-10-09)", source: "IPC 2021 Table 712.4.2" },
+      { name: "Ejector minimum capacity", value: "21 / 30 / 46 gpm for a 2 / 2-1/2 / 3 in discharge, each about 2 ft/s in that pipe (added 2026-10-09)", source: "IPC 2027 Table 712.4.2 (identical in 2021)" },
     ],
   },
   "gas-appliance-demand": {

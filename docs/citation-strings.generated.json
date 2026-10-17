@@ -279,7 +279,7 @@
     },
     "trap-arm": {
       "group": "calc-plumbing.js (Group B)",
-      "stamp": "Citation: IPC 2021 Table 909.1 (1-1/4 in 5 ft, 1-1/2 in 6 ft, 2 in 8 ft at 1/4 in/ft; 3 in 12 ft, 4 in 16 ft at 1/8 in/ft) and IPC 909.2 (total fall not more than one pipe diameter, vent connection not below the trap weir)."
+      "stamp": "Citation: IPC 2027 Table 909.1, identical in IPC 2021 (1-1/4 in 5 ft, 1-1/2 in 6 ft, 2 in 8 ft at 1/4 in/ft; 3 in 12 ft, 4 in 16 ft at 1/8 in/ft) and IPC 909.2 (total fall not more than one pipe diameter, vent connection not below the trap weir)."
     },
     "wire-ampacity": {
       "group": "calc-electrical.js (Group A)",

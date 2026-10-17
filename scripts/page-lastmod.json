@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "9019b27ac4f608b9",
+      "sha": "61ec60ea39ad5e54",
       "date": "2026-10-17"
     },
     "/tools/": {
@@ -10,7 +10,7 @@
       "date": "2026-10-17"
     },
     "/errata/": {
-      "sha": "de7e53e854be8b78",
+      "sha": "c163a06082a6a4d3",
       "date": "2026-10-17"
     },
     "/collections/disaster-response/": {
@@ -5478,7 +5478,7 @@
       "date": "2026-10-17"
     },
     "/tools/pipe-sizing/": {
-      "sha": "6d49466c4a89ba38",
+      "sha": "04a3ae03afea24a9",
       "date": "2026-10-17"
     },
     "/tools/pipe-spacing-rack/": {
@@ -6698,7 +6698,7 @@
       "date": "2026-10-17"
     },
     "/tools/sanitary-dfu/": {
-      "sha": "6e6988a13e0d29f0",
+      "sha": "838ebc1e3a7ecdd2",
       "date": "2026-10-17"
     },
     "/tools/saturated-steam-properties/": {
@@ -7138,7 +7138,7 @@
       "date": "2026-10-17"
     },
     "/tools/slope/": {
-      "sha": "d5e5b4b7d0db868c",
+      "sha": "58ac86403498ce8f",
       "date": "2026-10-17"
     },
     "/tools/slope-avalanche/": {
@@ -7870,7 +7870,7 @@
       "date": "2026-10-17"
     },
     "/tools/sump-basin-sizing/": {
-      "sha": "203c0b76d9004abc",
+      "sha": "d69485de12078e50",
       "date": "2026-10-17"
     },
     "/tools/superelevation/": {
@@ -8346,7 +8346,7 @@
       "date": "2026-10-17"
     },
     "/tools/trap-arm/": {
-      "sha": "27eb314355eb490c",
+      "sha": "501571e9ff79c5f9",
       "date": "2026-10-17"
     },
     "/tools/trap-primer/": {

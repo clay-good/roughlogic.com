@@ -36,7 +36,8 @@ Tile lists per code are reproducible with the scan described under "Method".
 |---|---|
 | IRC Chapter 3 (stairs, guards, landings, egress windows, alarms; 12 tiles) | Landed 2026-10-17. Renumbered only, except **smoke-alarm cooking clearance, which changed** (2024 R310.3.1: 10 ft for every type, 6 ft exception, in place of 2021's 20 / 10 / 6 ft by type); the tile now offers both editions. |
 | IRC R507 decks and R602.7 headers (4 tiles) | Landed 2026-10-17. Every bundled value identical; numbers unchanged. |
-| IPC drainage tables, IBC tables | Not started. |
+| IPC drainage (Tables 704.1, 709.1, 710.1(1), 710.1(2), 712.4.2, 909.1; 5 tiles) | Landed 2026-10-17. Identical to 2021 except **drinking fountain DFU, 1/2 in 2021 and 2024, 0 in 2027**; the tile follows 2027 and states the 2021/2024 adjustment. |
+| IPC supply tables (308.5, 403.1, 604.3, 608.16.1, E103.3(3)), IBC tables | Not started. |
 
 Read the **current printing** (the site offers to switch from a historical one, e.g. `IRC2024P2` to `IRC2024V2.1`); the first Chapter 3 pass used P2 and the re-read caught the smoke-alarm change.
 

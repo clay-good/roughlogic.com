@@ -338,3 +338,16 @@ test("v16 plumbing renderers are registered in PLUMBING_RENDERERS", () => {
     assert.strictEqual(typeof PLUMBING_RENDERERS[id], "function", id + " renderer missing");
   }
 });
+
+// IPC 2027 Table 709.1 rates a drinking fountain at 0 DFU; IPC 2021 and 2024 rated it 1/2.
+// Every other row the tile carries is unchanged (checked against the current printing
+// 2026-10-17). The tile follows 2027 and states the 2021/2024 adjustment.
+test("sanitary-dfu: a drinking fountain is 0 DFU per IPC 2027, with the 2021/2024 adjustment stated", () => {
+  assert.strictEqual(SANITARY_DFU_VALUES.drinking_fountain, 0);
+  const r = computeSanitaryDfu({ fixtures: { lavatory: 2, drinking_fountain: 3 } });
+  assert.strictEqual(r.total_dfu, 2);
+  assert.ok(r.warnings.some((w) => /0 DFU per IPC 2027/.test(w) && /adds 1\.5 DFU/.test(w)));
+  const only = computeSanitaryDfu({ fixtures: { drinking_fountain: 1 } });
+  assert.ok(/0 drainage fixture units in IPC 2027/.test(only.error));
+  assert.ok(!computeSanitaryDfu({ fixtures: { lavatory: 2 } }).warnings.some((w) => /fountain/i.test(w)));
+});

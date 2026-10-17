@@ -914,7 +914,7 @@ export function renderRecircPumpHead(inputRegion, outputRegion, citationEl) {
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderTrapArm(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: IPC 2021 Table 909.1 (1-1/4 in 5 ft, 1-1/2 in 6 ft, 2 in 8 ft at 1/4 in/ft; 3 in 12 ft, 4 in 16 ft at 1/8 in/ft) and IPC 909.2 (total fall not more than one pipe diameter, vent connection not below the trap weir).";
+  citationEl.textContent = "Citation: IPC 2027 Table 909.1, identical in IPC 2021 (1-1/4 in 5 ft, 1-1/2 in 6 ft, 2 in 8 ft at 1/4 in/ft; 3 in 12 ft, 4 in 16 ft at 1/8 in/ft) and IPC 909.2 (total fall not more than one pipe diameter, vent connection not below the trap weir).";
   const dia = makeSelect("Pipe diameter (in)", "ta-d", Object.keys(TRAP_ARM_MAX_FT).map((s) => ({ value: s, label: s + "\""})));
   const slope = makeNumber("Slope (in/ft)", "ta-s", { step: "any", min: "0" });
   for (const f of [dia, slope]) inputRegion.appendChild(f.wrap);
@@ -2593,7 +2593,9 @@ PLUMBING_RENDERERS["wh-expansion-tank"] = _v16p_renderWhExpansionTank;
 
 // --- B.5 Sanitary stack / branch DFU sizing --------------------------
 
-// Drainage fixture units (DFU) per fixture, IPC 2021 Table 709.1. Until
+// Drainage fixture units (DFU) per fixture, IPC 2027 Table 709.1 (checked against the current
+// printing 2026-10-17: every value below is unchanged from 2021 except the drinking fountain,
+// 1/2 DFU in IPC 2021 and 2024 and 0 in 2027; the tile says so when one is entered). Until
 // 2026-09-24 a bar sink was 1 DFU (the table's sink row is 2) and the clothes
 // washer was the COMMERCIAL row (3); residential is 2 and commercial is now its
 // own entry.
@@ -2610,7 +2612,7 @@ export const SANITARY_DFU_VALUES = {
   laundry_tub: 2,
   floor_drain: 2,
   urinal: 4,
-  drinking_fountain: 0.5,
+  drinking_fountain: 0,
   bar_sink: 2,
   bidet: 1,
 };
@@ -2662,7 +2664,8 @@ export function computeSanitaryDfu({
     if (dfu == null && n > 0) return { error: "Unknown fixture type '" + type + "'. Use one of: " + Object.keys(SANITARY_DFU_VALUES).join(", ") + "." };
     if (dfu != null && n > 0) total_dfu += dfu * n;
   }
-  if (!(total_dfu > 0)) return { error: "Enter at least one fixture count." };
+  const fountains = Number(fixtures.drinking_fountain) || 0;
+  if (!(total_dfu > 0)) return { error: fountains > 0 ? "A drinking fountain carries 0 drainage fixture units in IPC 2027 Table 709.1 (1/2 in IPC 2021 and 2024), so the fixtures entered add no load; its 1-1/4 in trap sets the drain size." : "Enter at least one fixture count." };
 
   let min_size_in = null;
   let capacity_at_size = null;
@@ -2683,6 +2686,7 @@ export function computeSanitaryDfu({
   }
 
   const warnings = [];
+  if (fountains > 0) warnings.push("Drinking fountains are counted at 0 DFU per IPC 2027 Table 709.1; IPC 2021 and 2024 rate each at 1/2 DFU, so a jurisdiction on those editions adds " + (fountains / 2) + " DFU.");
   // A water closet's outlet is 3 in (IPC Table 709.1), and a drain may not
   // shrink in the direction of flow (IPC 704.2), so any line carrying one is
   // at least 3 in whatever its DFU total. Until 2026-09-18 a bathroom group
@@ -2755,7 +2759,7 @@ const _v16p_DFU_LABELS = {
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 function _v16p_renderSanitaryDfu(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: total DFU = sum(fixture count x DFU value); minimum pipe size from the max-DFU table. Per IPC 2021 §710 with DFU values per IPC Table 709.1 and capacities per Tables 710.1(1) and 710.1(2). AHJ governs the adopted code. Free at codes.iccsafe.org.";
+  citationEl.textContent = "Citation: total DFU = sum(fixture count x DFU value); minimum pipe size from the max-DFU table. Per IPC 2027 §710 with DFU values per IPC Table 709.1 and capacities per Tables 710.1(1) and 710.1(2), all identical to IPC 2021 except the drinking fountain (1/2 DFU in 2021 and 2024, 0 in 2027). AHJ governs the adopted code. Free at codes.iccsafe.org.";
   const config = makeSelect("Configuration", "dfu-config", [
     { value: "horizontal_branch", label: "Horizontal fixture branch", selected: true },
     { value: "stack", label: "Vertical stack" },
