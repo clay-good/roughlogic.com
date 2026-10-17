@@ -7,8 +7,8 @@
   "license": "MIT",
   "devDependencies": {
     "@axe-core/playwright": "4.13.0",
-    "@playwright/test": "1.63.0",
-    "wrangler": "^4.147.0"
+    "@playwright/test": "1.64.0",
+    "wrangler": "^4.149.0"
   },
   "engines": {
     "node": ">=20"
@@ -55,8 +55,5 @@
     "data:refresh": "node scripts/build-data.mjs",
     "data:verify": "node scripts/verify-integrity.mjs",
     "clean": "node -e \"import('node:fs').then(f => f.rmSync('dist', { recursive: true, force: true }))\""
-  },
-  "overrides": {
-    "sharp": "0.35.5"
   }
 }
