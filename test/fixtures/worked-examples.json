@@ -54837,7 +54837,8 @@
     "frontage_ft": 625,
     "perimeter_ft": 815,
     "open_width_ft": 27,
-    "actual_area": 41013
+    "actual_area": 41013,
+    "code_edition": "2021"
    },
    "outputs": {
     "frontage_if": {
@@ -54868,7 +54869,8 @@
     "frontage_ft": 625,
     "perimeter_ft": 815,
     "open_width_ft": 27,
-    "actual_area": 41013
+    "actual_area": 41013,
+    "code_edition": "2021"
    },
    "outputs": {
     "frontage_if": {

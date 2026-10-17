@@ -2,15 +2,15 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "7e475b67bbf9911d",
+      "sha": "6b9b1ade29fcc500",
       "date": "2026-10-17"
     },
     "/tools/": {
-      "sha": "3da4730f486515bf",
+      "sha": "17c97d0496625d14",
       "date": "2026-10-17"
     },
     "/errata/": {
-      "sha": "742a68afa89cd04a",
+      "sha": "603b6314bcbca837",
       "date": "2026-10-17"
     },
     "/collections/disaster-response/": {
@@ -26,7 +26,7 @@
       "date": "2026-10-17"
     },
     "/groups/construction/": {
-      "sha": "041ec7e684b30578",
+      "sha": "d923b971d734d192",
       "date": "2026-10-17"
     },
     "/groups/cross-trade/": {
@@ -254,7 +254,7 @@
       "date": "2026-10-17"
     },
     "/tools/allowable-area/": {
-      "sha": "129a57d013362e4a",
+      "sha": "2c12201bc8c35e3a",
       "date": "2026-10-17"
     },
     "/tools/alternate-readability/": {
@@ -2834,7 +2834,7 @@
       "date": "2026-10-17"
     },
     "/tools/exterior-opening-protection/": {
-      "sha": "636d53263043e384",
+      "sha": "7e23020511e327be",
       "date": "2026-10-17"
     },
     "/tools/extinguisher-coverage/": {

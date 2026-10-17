@@ -39,7 +39,8 @@ Tile lists per code are reproducible with the scan described under "Method".
 | IPC drainage (Tables 704.1, 709.1, 710.1(1), 710.1(2), 712.4.2, 909.1; 5 tiles) | Landed 2026-10-17. Identical to 2021 except **drinking fountain DFU, 1/2 in 2021 and 2024, 0 in 2027**; the tile follows 2027 and states the 2021/2024 adjustment. |
 | IPC supply (Tables 308.5, 604.3, 608.16.1, E103.3(3); 5 tiles) | Landed 2026-10-17. Every value identical. Table 403.1 is not bundled (`plumbing-fixture-count` takes the ratios as inputs) and goes with the IBC slice. |
 | IBC Chapter 10 egress (Tables 1004.4, 1006.2.1, 1006.3.2, 1006.3.3(2), 1017.2; sections 1005.3, 1008, 1010, 1011, 1012, 1015, 1020; 7 tiles) | Landed 2026-10-17. Every bundled value identical; section numbers moved (1004.5 → 1004.4, 1006.3.3 → 1006.3.2, 1006.3.4 → 1006.3.3, 1010.1.1 → 1010.1.1.1, 1008.3.5 → 1008.3.2). Two defects found on the way, neither an edition change: R-4 was given a 10-occupant single-exit limit (the code allows one exit at any load for R-3 and R-4), and the egress-lighting tile lacked the 10 fc stairway level. |
-| IBC remaining tables (506.2, 506.3.3, 705.8, 1607.1, 1806.2 shard, 1807, 2113, 2902.1 / IPC 403.1, 3004.3) | Not started. |
+| IBC Tables 506.3.3 and 705.8 (2 tiles) | Landed 2026-10-17. Values identical. **IBC 2027 deletes Table 506.3.3 footnote a (interpolation)**, so `allowable-area` now defaults to the printed column and offers 2021 / 2024 interpolation as an edition input. Table 705.8 became **705.10** (705.8.x → 705.10.x). Table 506.2 is not bundled (the tile takes At and NS as inputs). |
+| IBC remaining tables (1607.1, 1806.2 shard, 1807, 2113, 2902.1 / IPC 403.1, 3004.3) | Not started. |
 
 Read the **current printing** (the site offers to switch from a historical one, e.g. `IRC2024P2` to `IRC2024V2.1`); the first Chapter 3 pass used P2 and the re-read caught the smoke-alarm change.
 

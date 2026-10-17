@@ -16227,7 +16227,10 @@ test("bounds: spec-v251 computeAllowableArea pins the frontage factor, allowable
   assert.ok(Math.abs(r.frontage_if - 0.5) < 1e-9);
   assert.strictEqual(r.allowable, 31500);
   // AWC/ICC 2024 Code Conforming Wood Design, 2021 IBC: F/P 625/815, W 27 ft -> 0.678 interpolated.
-  assert.ok(Math.abs(_v251({ tabular_area: 9000, ns_area: 9000, frontage_ft: 625, perimeter_ft: 815, open_width_ft: 27 }).frontage_if - 0.678) < 1e-9);
+  assert.ok(Math.abs(_v251({ tabular_area: 9000, ns_area: 9000, frontage_ft: 625, perimeter_ft: 815, open_width_ft: 27, code_edition: "2021" }).frontage_if - 0.678) < 1e-9);
+  // IBC 2027 deleted footnote a: the same building reads the printed 25-to-30 ft column, 0.63.
+  assert.ok(Math.abs(_v251({ tabular_area: 9000, ns_area: 9000, frontage_ft: 625, perimeter_ft: 815, open_width_ft: 27 }).frontage_if - 0.63) < 1e-9);
+  assert.ok("error" in _v251({ tabular_area: 9000, perimeter_ft: 815, code_edition: "2018" }));
   // Open space 20 to 25 ft interpolates the first two columns; 20 ft on the 25-50% row is 0.17.
   assert.ok(Math.abs(_v251({ tabular_area: 10000, ns_area: 10000, frontage_ft: 120, perimeter_ft: 400, open_width_ft: 20 }).frontage_if - 0.17) < 1e-9);
   assert.strictEqual(r.pass, true);

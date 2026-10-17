@@ -6572,10 +6572,10 @@ const _renderConcreteMaturity = _simpleRenderer({
 });
 CONSTRUCTION_RENDERERS["concrete-maturity"] = _renderConcreteMaturity;
 
-// ----- spec-v251: Allowable Building Area per Story (IBC 2021 Chapter 5) -----
+// ----- spec-v251: Allowable Building Area per Story (IBC 2027 Chapter 5) -----
 
-// dims: in { tabular_area: L^2, ns_area: L^2, frontage_ft: L, perimeter_ft: L, open_width_ft: L, actual_area: L^2 } out: { frontage_if: dimensionless, allowable: L^2 }
-export function computeAllowableArea({ tabular_area = 0, ns_area = 0, frontage_ft = 0, perimeter_ft = 0, open_width_ft = 30, actual_area = 0 } = {}) {
+// dims: in { tabular_area: L^2, ns_area: L^2, frontage_ft: L, perimeter_ft: L, open_width_ft: L, actual_area: L^2, code_edition: dimensionless } out: { frontage_if: dimensionless, allowable: L^2 }
+export function computeAllowableArea({ tabular_area = 0, ns_area = 0, frontage_ft = 0, perimeter_ft = 0, open_width_ft = 30, actual_area = 0, code_edition = "2027" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(tabular_area > 0)) return { error: "Tabular area At must be positive (ft^2)." };
   if (!(perimeter_ft > 0)) return { error: "Building perimeter must be positive (ft)." };
@@ -6583,21 +6583,27 @@ export function computeAllowableArea({ tabular_area = 0, ns_area = 0, frontage_f
   if (frontage_ft > perimeter_ft) return { error: "Frontage F cannot exceed the perimeter P." };
   const w_eff = Math.min(open_width_ft, 30);
   const ratio = frontage_ft / perimeter_ft;
-  // IBC 2021 Table 506.3.3 (and 2024): the row is the bracket of qualifying perimeter
+  // IBC Table 506.3.3 (2021, 2024 and 2027 print the same values): the row is the bracket of qualifying perimeter
   // (25-50%, 50-75%, 75-100%) and the column the smallest open space (20, 25, 30+ ft);
   // interpolation is permitted (footnote a), taken here across the open-space columns
   // between the printed values. Until 2026-09-25 this used the 2018 equation
   // If = (F/P - 0.25) W/30, which the 2021 code replaced: AWC/ICC's 2021 example
   // (F/P 0.767, W 27 ft) reads 0.678 from the table and 0.465 from the old equation.
+  // IBC 2027 deletes footnote a, so the 2027 factor is the printed column for the band W falls
+  // in (0.63 on that example, the figure AWC reads "from the table"); 2021 and 2024 still
+  // permit the interpolation. Checked in the three printings 2026-10-17.
+  const ed = String(code_edition);
+  if (ed !== "2027" && ed !== "2024" && ed !== "2021") return { error: "IBC edition must be 2027, 2024 or 2021." };
   const IF_ROWS = [[0.25, [0.17, 0.21, 0.25]], [0.50, [0.33, 0.42, 0.50]], [0.75, [0.50, 0.63, 0.75]]];
   let frontage_if = 0;
   if (ratio >= 0.25 && open_width_ft >= 20) {
     const vals = IF_ROWS.filter(([lo]) => ratio >= lo).pop()[1];
     const W = Math.min(open_width_ft, 30);
-    frontage_if = W <= 25 ? vals[0] + (vals[1] - vals[0]) * (W - 20) / 5 : vals[1] + (vals[2] - vals[1]) * (W - 25) / 5;
+    frontage_if = ed === "2027" ? vals[W < 25 ? 0 : W < 30 ? 1 : 2]
+      : W <= 25 ? vals[0] + (vals[1] - vals[0]) * (W - 20) / 5 : vals[1] + (vals[2] - vals[1]) * (W - 25) / 5;
   }
   const allowable = tabular_area + ns_area * frontage_if;
-  return { w_eff, ratio, frontage_if, allowable, pass: actual_area <= allowable, margin: allowable - actual_area };
+  return { code_edition: ed, w_eff, ratio, frontage_if, allowable, pass: actual_area <= allowable, margin: allowable - actual_area };
 }
 
 export const allowableAreaExample = {
@@ -6605,7 +6611,7 @@ export const allowableAreaExample = {
 };
 
 const _renderAllowableArea = _simpleRenderer({
-  citation: "Citation: IBC 2021 §506.2 (Aa = At + NS x If), §506.3.1 (If = 0 unless F/P >= 0.25 on open space 20 ft or wider), Table 506.3.3 (If by the percentage of qualifying perimeter, 25 / 50 / 75%, and the smallest open space, 20 / 25 / 30+ ft, interpolated across the open-space columns as footnote a permits; the 2018 equation [F/P - 0.25] x W/30 no longer applies). At and NS come from Table 506.2 for the actual occupancy group and construction type in the correct sprinkler column (NS nonsprinklered, S1 single-story sprinklered, SM multistory). A mixed-occupancy or multistory building uses the §506.2.2 / §508.4 sum-of-ratios and the §506.2.3 story multiplier instead of this single-occupancy single-story form. A feasibility aid, not a code-official determination.",
+  citation: "Citation: IBC 2027 §506.2 (Aa = At + NS x If), §506.3.1 (If = 0 unless F/P >= 0.25 on open space 20 ft or wider), Table 506.3.3 (If by the percentage of qualifying perimeter, 25 / 50 / 75%, and the smallest open space, 20 / 25 / 30+ ft; values unchanged from 2021. IBC 2027 reads the printed column for the band W falls in; IBC 2021 and 2024 footnote a permits interpolating across the open-space columns, which 2027 deleted; the 2018 equation [F/P - 0.25] x W/30 no longer applies). At and NS come from Table 506.2 for the actual occupancy group and construction type in the correct sprinkler column (NS nonsprinklered, S1 single-story sprinklered, SM multistory). A mixed-occupancy or multistory building uses the §506.2.2 / §508.4 sum-of-ratios and the §506.2.3 story multiplier instead of this single-occupancy single-story form. A feasibility aid, not a code-official determination.",
   example: allowableAreaExample.inputs,
   fields: [
     { key: "tabular_area", label: "Tabular area At (ft², correct column)", kind: "number" },
@@ -6614,9 +6620,10 @@ const _renderAllowableArea = _simpleRenderer({
     { key: "perimeter_ft", label: "Total perimeter P (ft)", kind: "number" },
     { key: "open_width_ft", label: "Open-space width W (ft)", kind: "number" },
     { key: "actual_area", label: "Proposed story area (ft²)", kind: "number" },
+    { key: "code_edition", label: "IBC edition", kind: "select", options: [{ value: "2027", label: "IBC 2027 (printed column, no interpolation)", selected: true }, { value: "2024", label: "IBC 2024 (interpolation permitted)" }, { value: "2021", label: "IBC 2021 (interpolation permitted)" }] },
   ],
   outputs: [
-    { key: "if", id: "ala-out-if", label: "Frontage factor If", value: (r) => _fmtC(r.frontage_if, 3) },
+    { key: "if", id: "ala-out-if", label: "Frontage factor If", value: (r) => _fmtC(r.frontage_if, 3) + " (IBC " + r.code_edition + ")" },
     { key: "aa", id: "ala-out-aa", label: "Allowable area / story", value: (r) => _fmtC(r.allowable, 0) + " ft^2" },
     { key: "pf", id: "ala-out-pf", label: "Proposed area", value: (r) => r.pass ? "PASS (" + _fmtC(r.margin, 0) + " ft^2 to spare)" : "FAIL (over by " + _fmtC(-r.margin, 0) + " ft^2)" },
   ],
@@ -6670,7 +6677,7 @@ const _renderEgressTravelDistance = _simpleRenderer({
 });
 CONSTRUCTION_RENDERERS["egress-travel-distance"] = _renderEgressTravelDistance;
 
-// ----- spec-v253: Exterior Wall Opening Protection by Fire Separation Distance (IBC 2021 Table 705.8) -----
+// ----- spec-v253: Exterior Wall Opening Protection by Fire Separation Distance (IBC 2027 Table 705.10; 705.8 in 2021) -----
 
 // dims: in { fsd_ft: L, wall_area: L^2, actual_opening: L^2 } out: { allowable_pct: dimensionless, allowable_area: L^2 }
 export function computeExteriorOpeningProtection({ fsd_ft = 0, wall_area = 0, protected: prot = false, actual_opening = 0 } = {}) {
@@ -6701,7 +6708,7 @@ export const exteriorOpeningProtectionExample = {
 };
 
 function _renderExteriorOpeningProtection(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: IBC 2021 Table 705.8 (maximum area of exterior wall openings), keyed by fire separation distance and by protection / sprinkler status: <3 ft none; 3 to <5 ft 15% protected else none; 5 to <10 ft 25% / 10%; 10 to <15 ft 45% / 15%; 15 to <20 ft 75% / 25%; 20 to <25 ft no limit / 45%; 25 to <30 ft no limit / 70%; >=30 ft no limit. The FSD is measured per §705.3 to the lot line, the centerline of a public way, or an imaginary line between buildings; unprotected openings in a sprinklered building take the protected allowance (Note a). The §705.8.5 vertical-separation and §705.8.6 rules can further govern. A design aid, not a code-official determination.";
+  citationEl.textContent = "Citation: IBC 2027 Table 705.10 [Table 705.8 in IBC 2021; values unchanged] (maximum area of exterior wall openings), keyed by fire separation distance and by protection / sprinkler status: <3 ft none; 3 to <5 ft 15% protected else none; 5 to <10 ft 25% / 10%; 10 to <15 ft 45% / 15%; 15 to <20 ft 75% / 25%; 20 to <25 ft no limit / 45%; 25 to <30 ft no limit / 70%; >=30 ft no limit. The FSD is measured per §705.3 to the lot line, the centerline of a public way, or an imaginary line between buildings; unprotected openings in a sprinklered building take the protected allowance (the UP, S row; footnote i excludes Groups H-1, H-2 and H-3), and footnotes d to j set other limits for Group R-3, H-2 / H-3, open parking garages and Group U garages. The §705.10.5 [705.8.5 in IBC 2021] vertical-separation and §705.10.6 [705.8.6] vertical-exposure rules can further govern. A design aid, not a code-official determination.";
   _aeC(inputRegion, () => fillExample(exteriorOpeningProtectionExample.inputs));
   const fsd = _mnC("Fire separation distance (ft)", "eop-fsd", { step: "any", min: "0" });
   const wa = _mnC("Exterior wall area (ft^2)", "eop-wa", { step: "any", min: "0" });
