@@ -57,13 +57,14 @@ async function liveCounts() {
   const { COLLECTIONS } = await import(pathToFileURL(resolve(ROOT, "collections.js")).href);
   const collections = COLLECTIONS.length;
   // sitemap = one URL per tile + one per active group + home + the
-  // spec-v1345 catalog hub at /tools/ + one per spec-v1926 collection.
-  const sitemap = tiles + groups + 2 + collections;
+  // spec-v1345 catalog hub at /tools/ + the spec-v1967 corrections log at
+  // /errata/ + one per spec-v1926 collection.
+  const sitemap = tiles + groups + 3 + collections;
   // The static shells themselves: every sitemap URL except home, which is the
   // SPA and not a generated shell. docs/architecture.md and docs/deployment.md
   // both state this to explain why the service worker does not precache them,
   // and it moves with every tile added.
-  const shells = tiles + groups + 1 + collections;
+  const shells = tiles + groups + 2 + collections;
   // The README tells a reader how many gates stand between a change and a
   // landing. That is the `npm run lint` chain itself, so read it rather than
   // trusting a number someone typed once.

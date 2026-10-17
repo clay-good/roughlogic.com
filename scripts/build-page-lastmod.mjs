@@ -50,6 +50,8 @@ export async function hashPages() {
 
   pages.set("/tools/", sha(await read(resolve(DIST, "tools", "index.html"))));
 
+  // spec-v1967: the corrections log.
+  if (existsSync(resolve(DIST, "errata", "index.html"))) pages.set("/errata/", sha(await read(resolve(DIST, "errata", "index.html"))));
   // spec-v1926: curated collections at /collections/<slug>/.
   if (existsSync(resolve(DIST, "collections"))) {
     for (const slug of (await readdir(resolve(DIST, "collections"), { withFileTypes: true }))

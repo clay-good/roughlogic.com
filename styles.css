@@ -1905,6 +1905,10 @@ input[aria-invalid="true"] {
   font-weight: 600;
   margin: var(--space-3) 0 var(--space-2);
 }
+/* spec-v1967: the corrections log. */
+.shell-page .errata-list { padding-left: 1.5em; display: grid; gap: var(--space-3); }
+.shell-page .errata-entry p { margin: 0; }
+.shell-page .errata-tiles, .shell-page .errata-date { color: var(--fg-muted); overflow-wrap: anywhere; }
 /* spec-v1965: where the worked example comes from, under the answer. */
 .shell-page .shell-checked {
   margin: var(--space-3) 0 0;

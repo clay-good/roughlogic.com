@@ -376,6 +376,8 @@ function lintShellNoScript(html, where, errors) {
 // The tile ids parseHashRoute will route. Populated in main() before any
 // shell is linted.
 const routableIds = new Set();
+// Ids per target page, read once, for cross-page anchors (spec-v1967).
+const _anchorIds = new Map();
 
 async function lintShell(path, kind, errors, tool) {
   const html = await readFile(path, "utf8");
@@ -530,6 +532,22 @@ async function lintShell(path, kind, errors, tool) {
     if (doc === "") {
       if (frag && !idsInDoc.has(frag)) {
         errors.push(where + ': in-page anchor "#' + frag + '" matches no id in this document.');
+      }
+      continue;
+    }
+    // A path that resolves to some page OTHER than the home document is an
+    // ordinary anchor into that page (spec-v1967: a tile's "Corrections" row
+    // links /errata/#fix-N), so its fragment has to be an id in THAT page.
+    // Only the home document routes hashes through parseHashRoute.
+    const target = resolve(dirname(path), doc.replace(/[?].*$/, ""), doc.endsWith("/") || doc === "" ? "index.html" : "");
+    const targetFile = target.endsWith(".html") ? target : resolve(target, "index.html");
+    if (targetFile !== resolve(DIST, "index.html")) {
+      if (!_anchorIds.has(targetFile)) {
+        const text = existsSync(targetFile) ? await readFile(targetFile, "utf8") : "";
+        _anchorIds.set(targetFile, new Set([...text.matchAll(/\sid="([^"]+)"/g)].map((x) => x[1])));
+      }
+      if (frag && !_anchorIds.get(targetFile).has(frag)) {
+        errors.push(where + ': link "' + href + '" names anchor "#' + frag + '", which matches no id in ' + targetFile.slice(DIST.length + 1) + ".");
       }
       continue;
     }

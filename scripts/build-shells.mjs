@@ -918,6 +918,10 @@ function shellFooter(depth = 2) {
     `    <a class="footer-badge" href="${prefix}tools/" aria-label="Browse all calculators">`,
     '      <span>All calculators</span>',
     '    </a>',
+    // spec-v1967: the corrections log, one click from every page.
+    `    <a class="footer-badge" href="${prefix}errata/">`,
+    '      <span>Corrections log</span>',
+    '    </a>',
     '    <a class="footer-badge" href="https://claygood.com" rel="noopener">',
     '      <span>Made with </span>',
     '      <span class="footer-badge-heart" aria-hidden="true">&#9829;</span>',
@@ -1493,6 +1497,104 @@ export function collectionShell(collection, tools, groupNames) {
   return [head, styles, jsonld, '</head>', body].join("\n");
 }
 
+// spec-v1967 (spec-v106 pillar 6): the corrections log. An entry is a bullet
+// under a `### Fixed` heading in CHANGELOG.md that names at least one live
+// calculator id in backticks -- a mechanical rule, so the log never judges which
+// fixes matter. It is deliberately described as "fixes that name a calculator",
+// not "corrections to that calculator": a bullet can name a tile it checked and
+// found right, or fix a search or page behaviour around it, and the CHANGELOG
+// does not record which tiles a fix changed. So no per-tile "corrected N times"
+// claim is made anywhere; the log says what each entry NAMES.
+// Entries are numbered from the OLDEST, so a new correction takes the next
+// number and every existing #fix-N anchor stays put; they are listed newest
+// first, the CHANGELOG's own order. A heading's date, where it has one, is the
+// entry's date; "Unreleased" entries carry none, and none is invented.
+export function parseCorrections(changelog, liveIds) {
+  const live = liveIds instanceof Set ? liveIds : new Set(liveIds);
+  const found = [];
+  let ver = null, date = null, inFixed = false, cur = null;
+  const flush = () => { if (cur) { found.push(cur); cur = null; } };
+  for (const line of String(changelog).split("\n")) {
+    let m;
+    if ((m = line.match(/^## (Unreleased|v[\d.]+)(?: - (\d{4}-\d{2}-\d{2}))?/))) { flush(); ver = m[1]; date = m[2] || null; inFixed = false; continue; }
+    if ((m = line.match(/^### (\w+)/))) { flush(); inFixed = m[1] === "Fixed"; continue; }
+    if (inFixed && line.startsWith("- ")) { flush(); cur = { version: ver, date, text: line.slice(2) }; continue; }
+    if (cur && line.startsWith("  ")) { cur.text += " " + line.trim(); continue; }
+    if (cur && line.trim() !== "") flush();
+  }
+  flush();
+  const entries = [];
+  for (const e of found) {
+    const tiles = [...new Set([...e.text.matchAll(/`([a-z0-9-]+)`/g)].map((x) => x[1]).filter((t) => live.has(t)))];
+    if (!tiles.length) continue;
+    const t = e.text.match(/^\*\*(.+?)\*\*/);
+    entries.push({ title: (t ? t[1] : e.text.slice(0, 160)).trim(), tiles, version: e.version, date: e.date });
+  }
+  // found is newest-first; number from the oldest.
+  entries.forEach((e, i) => { e.n = entries.length - i; });
+  return entries;
+}
+
+// A title keeps its inline `code`; everything is escaped.
+function inlineCode(text) {
+  return String(text).split(/(`[^`]+`)/).map((part) => /^`[^`]+`$/.test(part)
+    ? `<code>${escapeHtml(part.slice(1, -1))}</code>`
+    : escapeHtml(part.replace(/\*\*/g, ""))).join("");
+}
+
+export function errataShell(entries, tools) {
+  const byId = new Map(tools.map((t) => [t.id, t]));
+  const canonical = `${SITE_URL}/errata/`;
+  const tileCount = new Set(entries.flatMap((e) => e.tiles)).size;
+  const title = "Corrections Log - Rough Logic";
+  let description = `Every fix in the Rough Logic changelog that names a calculator, newest first: ${commaNumber(entries.length)} entries naming ${commaNumber(tileCount)} calculators, with links to the full write-ups.`;
+  if (escapeHtml(description).length > DESCRIPTION_CAP) description = capDescription(description);
+  const jsonld = jsonLdBlock([
+    { "@context": "https://schema.org", "@type": "CollectionPage", name: title, description, url: canonical },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL + "/" },
+        { "@type": "ListItem", position: 2, name: "Corrections log", item: canonical },
+      ],
+    },
+  ]);
+  const head = shellHead({ title, description, canonical, ogType: "website" });
+  const styles = shellStylesAndIcons(1);
+  const items = entries.map((e) => [
+    `      <li id="fix-${e.n}" class="errata-entry">`,
+    `        <p class="errata-title"><strong>${inlineCode(e.title)}</strong>${e.date ? ` <span class="errata-date">${escapeHtml(e.date)}</span>` : ""}</p>`,
+    `        <p class="errata-tiles">Calculators named: ${e.tiles.map((id) => `<a href="../tools/${escapeHtml(id)}/">${escapeHtml((byId.get(id) || { name: id }).name)}</a>`).join(", ")}</p>`,
+    "      </li>",
+  ].join("\n")).join("\n");
+  const body = [
+    '<body class="shell-page">',
+    shellHeader(1),
+    '<main id="main" class="shell-main">',
+    '  <nav class="shell-breadcrumb" aria-label="Breadcrumb">',
+    "    <ol>",
+    '      <li><a href="../">Home</a></li>',
+    '      <li aria-current="page">Corrections log</li>',
+    "    </ol>",
+    "  </nav>",
+    '  <h1 class="shell-h1">Corrections log</h1>',
+    `  <p class="shell-lead">Every fix in the changelog that names a calculator, newest first: ${commaNumber(entries.length)} entries naming ${commaNumber(tileCount)} calculators. A wrong number is worth admitting and fixing in the open.</p>`,
+    '  <p class="shell-detail">This is the whole record, not a selection. It includes mistakes in a formula, a citation, a label, or in how a page or search behaved. An entry can also name a calculator it checked and found right, so a calculator appearing here is not by itself a sign its answer was wrong. The full write-up of each entry -- what was wrong, how it was fixed, and how the fix was proved -- is in the project\'s <a href="https://github.com/clay-good/roughlogic.com/blob/main/CHANGELOG.md" rel="noopener noreferrer">CHANGELOG</a>, whose history also has the exact date of every change.</p>',
+    '  <section class="shell-section" aria-label="Corrections">',
+    '    <ol class="errata-list" reversed>',
+    items,
+    "    </ol>",
+    "  </section>",
+    "</main>",
+    shellFooter(1),
+    "</body>",
+    "</html>",
+    "",
+  ].join("\n");
+  return [head, styles, jsonld, "</head>", body].join("\n");
+}
+
 // The landed subset of each collection, and the ids it had to leave out.
 export function landedCollections(collections, tools) {
   const live = new Set(tools.map((t) => t.id));
@@ -1542,6 +1644,13 @@ function buildSitemap(tools, groups, builtIso, lastmodByPath) {
   lines.push('    <changefreq>weekly</changefreq>');
   lines.push('    <priority>0.9</priority>');
   lines.push('  </url>');
+  // spec-v1967: the corrections log.
+  lines.push('  <url>');
+  lines.push(`    <loc>${SITE_URL}/errata/</loc>`);
+  lines.push(`    <lastmod>${lastmodFor("/errata/")}</lastmod>`);
+  lines.push('    <changefreq>weekly</changefreq>');
+  lines.push('    <priority>0.5</priority>');
+  lines.push('  </url>');
   // spec-v1926: curated collections.
   for (const c of COLLECTIONS) {
     lines.push('  <url>');
@@ -1590,6 +1699,7 @@ async function main() {
   const relatedByTile = relatedGraph(tools, relatedMap);
   const examples = await loadWorkedExamples();
   const checked = await loadCheckedAgainst();
+  const errata = parseCorrections(await readFile(resolve(ROOT, "CHANGELOG.md"), "utf8"), new Set(tools.map((t) => t.id)));
   // The field labels the browser prints above each input, resolved through the
   // same MCP catalog layer the agent surface reads, so the label on a shell and
   // the label in the calculator can never drift. ~140 ms for the whole catalog.
@@ -1666,6 +1776,11 @@ async function main() {
     await writeFile(out, collectionShell(collection, tools, groupNames), "utf8");
   }
 
+  // spec-v1967: the corrections log.
+  const errataOut = resolve(DIST, "errata", "index.html");
+  await mkdir(dirname(errataOut), { recursive: true });
+  await writeFile(errataOut, errataShell(errata, tools), "utf8");
+
   // Regenerate sitemap.xml at dist/ root from the live TOOLS + groups.
   const stampPath = resolve(DIST, "build-info.json");
   let builtIso = new Date().toISOString();
@@ -1684,8 +1799,8 @@ async function main() {
 
   console.log(
     "build-shells: " + shellCount + " tile shells, " +
-    groupCount + " group shells, 1 catalog hub, " + COLLECTIONS.length + " collection(s), sitemap with " +
-    (2 + COLLECTIONS.length + groups.length + tools.length) + " URLs."
+    groupCount + " group shells, 1 catalog hub, " + COLLECTIONS.length + " collection(s), 1 corrections log, sitemap with " +
+    (3 + COLLECTIONS.length + groups.length + tools.length) + " URLs."
   );
 }
 

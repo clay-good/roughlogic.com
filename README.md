@@ -51,6 +51,8 @@ Claude, Cursor, and other agents can run every calculator through a small local 
 
 Please [open an issue](https://github.com/clay-good/roughlogic.com/issues/new/choose) with your inputs and the source that disagrees. It's the most useful report you can send.
 
+Every fix is recorded in the open. The site's [corrections log](https://roughlogic.com/errata/) lists each changelog fix that names a calculator, newest first, with a link to the full write-up.
+
 ## For developers
 
 ```bash

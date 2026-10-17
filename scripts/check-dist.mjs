@@ -212,6 +212,10 @@ async function main() {
     // spec-v1926: curated collection pages, sitemap-listed shells like the hubs
     // (check-shells lints them and checks every tile link resolves).
     if (rel.startsWith("collections/") && rel.endsWith("/index.html")) continue;
+    // spec-v1967: the corrections log, a sitemap-listed shell like the hubs;
+    // every shell's footer links it by directory, which this scan does not map
+    // to index.html (the same reason tiles/groups/collections are exempt).
+    if (rel === "errata/index.html") continue;
     if (!referenced.has(rel)) orphans.push(rel);
   }
   if (orphans.length > 0) {
