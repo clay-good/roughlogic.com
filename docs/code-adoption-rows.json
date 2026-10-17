@@ -118,7 +118,7 @@
       "citation": "3 CCR 710-1, Rule 1.2 (State Electrical Board); C.R.S. 12-115-107",
       "citation_primary": true,
       "source_url": "https://www.sos.state.co.us/CCR/",
-      "draft_note": "2026 edition and 2026-08-01 date from NFPA only; the 2023 cycle was effective 2023-08-01. Confirm the 2026 rule filing.",
+      "draft_note": "Rechecked 2026-10-17: Denver reports the State Electrical Board approved NEC 2026 on 2026-05-27 and the state adopted it 2026-08-01, matching NFPA. Confirm Rule 1.2 text in the CCR.",
       "verified_by": null,
       "verified_on": null,
       "nfpa_2026_08_03": "2026 (8/1/2026)"
@@ -265,7 +265,7 @@
       "citation": "NFPA NEC enforcement map: NEC 2008 for commercial occupancies outside local jurisdictions (no Illinois rule located)",
       "citation_primary": false,
       "source_url": "https://www.iaei.org/page/nec-code-adoption",
-      "draft_note": "No primary Illinois citation found; cannot be signed until the adopting statute or rule is identified.",
+      "draft_note": "No primary Illinois citation found (rechecked 2026-10-17). Secondary tables name the Capital Development Board (state building commissioner) for commercial occupancies outside local adoption authority; find its rule before signing.",
       "verified_by": null,
       "verified_on": null,
       "nfpa_2026_08_03": "2008 (7/1/11 - commercial occupancies for areas outside of local jurisdictions that have adoption authority)"
@@ -416,8 +416,8 @@
       "scope": null,
       "citation": "Maryland State Fire Prevention Code, COMAR 29.06.01 (NFPA 70 by reference)",
       "citation_primary": true,
-      "source_url": "https://www.iaei.org/page/maryland-electrical-ceus",
-      "draft_note": "SOURCES CONFLICT: NFPA lists NEC 2020 effective 2025-07-01; IAEI lists NEC 2023 effective 2025-03-01. COMAR section not confirmed.",
+      "source_url": "https://labor.maryland.gov/labor/build/buildcodematrix.pdf",
+      "draft_note": "SOURCES CONFLICT (three answers): NFPA lists NEC 2020 effective 2025-07-01; IAEI lists NEC 2023 effective 2025-03-01; the state's own building-code matrix lists NEC 2017 via the State Fire Prevention Code. COMAR 29.06.01 was replaced 2025-06-23; read the current text.",
       "verified_by": null,
       "verified_on": null,
       "nfpa_2026_08_03": "2020 (7/1/2025) with MD amendments | 2023 update process underway (Effective date not established)"
@@ -531,12 +531,12 @@
         }
       ],
       "upcoming": [],
-      "pending": "NEC 2023 update in process (NFPA projected 2026-09); not confirmed adopted.",
+      "pending": "NEC 2023 proposed in a DLI draft rule notice; not adopted when rechecked 2026-10-17.",
       "scope": null,
       "citation": "Admin. R. Mont. 24.301.401",
       "citation_primary": true,
       "source_url": "https://bsd.dli.mt.gov/building-codes-permits/current-codes",
-      "draft_note": "State page lists 2022-06-11; NFPA lists 2022-06-10. The projected 2026-09 update is past due: confirm.",
+      "draft_note": "Rechecked 2026-10-17: ARM 24.301.401 and the state's Current Codes page still adopt NEC 2020 (effective 2022-06-11; NFPA lists 2022-06-10). NFPA's projected 2026-09 update did not appear; commercial sites claiming NEC 2023 cite no rule.",
       "verified_by": null,
       "verified_on": null,
       "nfpa_2026_08_03": "2020 with MT amendments (6/10/2022) | 2023 update process underway (Projected 9/2026)"
@@ -596,10 +596,10 @@
       "upcoming": [],
       "pending": null,
       "scope": null,
-      "citation": "RSA 155-A:1, IV (State Building Code)",
+      "citation": "RSA 155-A:1, IV, as amended by 2025 N.H. Laws ch. 135 (HB 134)",
       "citation_primary": true,
-      "source_url": "https://www.iccsafe.org/new-hampshire",
-      "draft_note": "SOURCES CONFLICT on the date: NFPA lists 2025-07-01 with a 6-month grace period; a town notice says 2026-07-01. Confirm the enacted session law.",
+      "source_url": "https://legiscan.com/NH/text/HB134/id/3040024",
+      "draft_note": "Rechecked 2026-10-17: HB 134 (ch. 135, signed 2025-06-23) adopts NEC 2023 effective 2025-07-01 with 19 NH amendments; towns note a six-month concurrency period to 2026-01-01.",
       "verified_by": null,
       "verified_on": null,
       "nfpa_2026_08_03": "2023 with NH amendments (7/1/2025 with 6-month grace period permitting use of prior edition that was in effect)"
@@ -706,10 +706,10 @@
       "upcoming": [],
       "pending": null,
       "scope": null,
-      "citation": "N.D. Admin. Code art. 24.1-06 (Electrical Wiring Standards); N.D.C.C. ch. 43-09",
+      "citation": "N.D. Admin. Code 24.1-06-01-10 (NFPA 70-2026); N.D.C.C. ch. 43-09",
       "citation_primary": true,
-      "source_url": "https://ndlegis.gov/api/acdata/html/title24.1.html",
-      "draft_note": "SOURCES CONFLICT: NFPA lists NEC 2026 effective 2026-07-01; the latest board notice found adopts NEC 2023 effective 2024-07-01.",
+      "source_url": "https://www.ndseb.com/laws-rules/",
+      "draft_note": "Rechecked 2026-10-17: the Board's 2026 Laws, Rules, Wiring and Conveyance Standards and the Administrative Code history both adopt NFPA 70-2026 effective 2026-07-01, matching NFPA. The earlier 2023 notice was the prior cycle.",
       "verified_by": null,
       "verified_on": null,
       "nfpa_2026_08_03": "2026 (7/1/2026)"
@@ -767,17 +767,17 @@
       "editions": [
         {
           "applies_to": "all",
-          "edition": "2023",
-          "effective": "2023-10-01"
+          "edition": "2026",
+          "effective": "2026-10-01"
         }
       ],
       "upcoming": [],
-      "pending": "2026 OESC update in process (NFPA projected 2026-10-01); not confirmed adopted.",
+      "pending": null,
       "scope": null,
       "citation": "Or. Admin. R. 918-305-0100 (Oregon Electrical Specialty Code)",
       "citation_primary": true,
-      "source_url": "https://www.oregon.gov/bcd/codes-stand/pages/adopted-codes.aspx",
-      "draft_note": "The projected 2026-10-01 update is now past: confirm whether the 2026 OESC took effect.",
+      "source_url": "https://www.oregon.gov/bcd/codes-stand/pages/oesc-adoption.aspx",
+      "draft_note": "Rechecked 2026-10-17: the 2026 OESC (NEC 2026 with Oregon amendments, OAR 918-305-0105 Table 1-E) is effective 2026-10-01 per the Secretary of State filing, replacing the 2023 OESC (2023-10-01). NFPA projected this date.",
       "verified_by": null,
       "verified_on": null,
       "nfpa_2026_08_03": "2023 with OR amendments (10/1/2023) | 2026 update process underway (Projected 10/1/2026)"
@@ -1061,8 +1061,8 @@
       "scope": null,
       "citation": "Wyo. Stat. tit. 35, ch. 9 (Department of Fire Prevention and Electrical Safety) and its electrical rules",
       "citation_primary": true,
-      "source_url": "https://wsfm.wyo.gov/electrical-safety/rules-statutes-and-jurisdictions",
-      "draft_note": "SOURCES CONFLICT: NFPA lists NEC 2026 effective 2026-07-01; the state page read says NEC 2023 adopted 2023-07-01.",
+      "source_url": "https://wsfm.wyo.gov/fire-prevention/plan-review",
+      "draft_note": "Rechecked 2026-10-17: the State Fire Marshal's plan-review page says the 2026 NEC is in effect from 2026-07-01, adopted without modification, matching NFPA. Adopting rule section not located.",
       "verified_by": null,
       "verified_on": null,
       "nfpa_2026_08_03": "2026 (7/1/2026)"

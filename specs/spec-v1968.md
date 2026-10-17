@@ -16,7 +16,7 @@ On the 101 calculators whose citation names the NEC, the reference block gains a
 
 ## Why nothing shows until a row is signed
 
-Telling an electrician the wrong enforced edition is worse than saying nothing, and the public compilations disagree with each other. Drafting found five rows where good sources conflict outright: MD, ND, NH, NV and WY. It also found Texas and Vermont adopting editions after NFPA's map was read. So:
+Telling an electrician the wrong enforced edition is worse than saying nothing, and the public compilations disagree with each other. Drafting found five rows where good sources conflicted outright: MD, ND, NH, NV and WY. A recheck against state sources on 2026-10-17 settled ND, NH and WY, leaving MD (three answers: 2017, 2020, 2023) and NV. Drafting also found Texas, Vermont and Oregon adopting editions after NFPA's map was read. So:
 
 - **Each row cites its state's own statute or rule, and that citation is the source of truth.** NFPA's enforcement map is stored beside each row as a cross-check only.
 - **"Local adoption" is a real answer.** Arizona, Mississippi and Missouri have no statewide NEC, so the row says your city or county sets the edition.
