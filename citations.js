@@ -65,6 +65,9 @@ const IBC_2021 = "IBC 2021 (International Building Code).";
 const ASCE_7 = "ASCE 7-22 (Minimum Design Loads for Buildings and Other Structures).";
 const AWC_NDS = "AWC NDS-2018 (National Design Specification for Wood Construction).";
 const IRC_DISCLOSURE = "Editions available: bundled values follow IRC 2021. Jurisdictions on IRC 2018 / 2024 differ at the margins; verify the edition adopted by your AHJ.";
+// Appended to the IRC disclosure on the four IRC tiles whose span / deflection
+// values come from the NDS (2026-10-17).
+const NDS_LAG = " AWC NDS-2024 is the current published edition (the one the 2024 IBC references); the NDS design values and relations here follow NDS-2018 and have not yet been re-checked against it.";
 const IBC_DISCLOSURE = "Editions available: bundled values follow IBC 2021 and ASCE 7-22 referenced formulas. IBC 2027 is the current published edition (ICC released it in October 2026); IBC 2024 preceded it and references ASCE 7-22; IBC 2021 references ASCE 7-16, and older IBC editions reference ASCE 7-16 / 7-10. ASCE 7-22 snow is strength-level and 7-16 snow service-level, so the two are not interchangeable; verify the edition adopted by your AHJ.";
 
 // HVAC common phrasing (Group C audit, priority 4 per spec §6).
@@ -4842,7 +4845,7 @@ export const CITATIONS = {
     edition: AWC_NDS + " " + IRC_2021 + " §R301.7, R502.3, R802.4.",
     freeAccess: "AWC NDS free at awc.org/codes-standards. " + ICC_FREE,
     governance: GOVERNANCE.structural,
-    editionNote: IRC_DISCLOSURE,
+    editionNote: IRC_DISCLOSURE + NDS_LAG,
     assumptions: [
       { name: "Species / grade design values", value: "data/construction/lumber-properties.json keyed to species / grade", source: "AWC NDS / lumber-grading agency" },
       { name: "Default deflection limit", value: "L/360 live, L/240 total", source: "IRC 2021 §R301.7" },
@@ -4863,7 +4866,7 @@ export const CITATIONS = {
     edition: "Classical mechanics of materials; AWC NDS-2018 design values for wood.",
     freeAccess: "Mechanics-of-materials texts free at university OCW. AWC NDS free at awc.org.",
     governance: GOVERNANCE.structural,
-    editionNote: "Single-edition (physics + AWC NDS-2018).",
+    editionNote: "Single-edition (physics + AWC NDS-2018). AWC NDS-2024 is the current published edition (the one the 2024 IBC references); the NDS relations and values here follow NDS-2018 and have not yet been re-checked against it.",
     assumptions: [
       { name: "Support condition", value: "simply supported", source: "calculation convention" },
     ],
@@ -4891,7 +4894,7 @@ export const CITATIONS = {
     edition: AWC_NDS + " " + IRC_2021 + " §R301.7.",
     freeAccess: "Free at awc.org. " + ICC_FREE,
     governance: GOVERNANCE.structural,
-    editionNote: IRC_DISCLOSURE,
+    editionNote: IRC_DISCLOSURE + NDS_LAG,
     assumptions: [
       { name: "Section properties", value: "S4S actual dimensions per AWC NDS Supplement", source: "AWC NDS-2018" },
     ],
@@ -4911,7 +4914,7 @@ export const CITATIONS = {
     edition: IRC_2021 + " §R602.7 (headers). " + AWC_NDS + " reference design values, load-duration C_D and size factor C_F.",
     freeAccess: ICC_FREE + " AWC NDS free at awc.org.",
     governance: GOVERNANCE.structural,
-    editionNote: IRC_DISCLOSURE,
+    editionNote: IRC_DISCLOSURE + NDS_LAG,
     assumptions: [
       { name: "Load assembly", value: "roof = max(ground snow, 20 psf roof live) + 15 psf dead; each floor above = 40 psf live + 10 psf dead", source: "IRC 2021 typical residential" },
       { name: "Load-duration factor C_D", value: "1.15 snow (roof-only) / 1.0 occupancy (floors above)", source: "AWC NDS-2018 Table 2.3.2" },
@@ -4956,7 +4959,7 @@ export const CITATIONS = {
     edition: IRC_2021 + " §R507 (decks). " + AWC_NDS + " reference values; IRC Table R507.9.1.3(1) ledger fasteners.",
     freeAccess: ICC_FREE + " AWC NDS free at awc.org.",
     governance: GOVERNANCE.structural,
-    editionNote: IRC_DISCLOSURE,
+    editionNote: IRC_DISCLOSURE + NDS_LAG,
     assumptions: [
       { name: "Deck loads", value: "40 psf live + 10 psf dead per IRC R507 default", source: "IRC 2021 §R507" },
       { name: "Column stability", value: "pinned-pinned (K_e = 1), c = 0.8 for sawn lumber, E_min and F_c for the 4x4 from NDS Supplement Table 4A/4B No.2 dimension lumber and for the 6x6 from Table 4D No.2 Posts and Timbers (5x5 and larger)", source: "AWC NDS-2018" },
@@ -17627,7 +17630,7 @@ export const CITATIONS = {
     edition: "ANSI/AWC NDS (2018) 12.3.1 yield-limit equations, Table 12.3.3 dowel bearing strength, Appendix I bending yield strengths, and 12.5.4 toe-nail provisions, by name; as tabulated in AWC Design Aid No. 2, Toe-Nail Connections (free at awc.org).",
     freeAccess: "The NDS is free to view at awc.org; AWC Design Aid No. 2 is a free PDF; the yield model is also in the USDA Forest Products Laboratory Wood Handbook, chapter 8.",
     governance: GOVERNANCE.general,
-    editionNote: "Checked against AWC Design Aid No. 2 (toe-nailed, both members of the same G, Ctn 0.83 included): a 16d common (0.162 x 3.5 in) lists 153 / 128 / 117 / 114 / 108 / 101 / 99 / 82 / 80 lb at G 0.67 / 0.55 / 0.50 / 0.49 / 0.46 / 0.43 / 0.42 / 0.37 / 0.36; this computes 152.9 / 127.5 / 116.8 / 114.6 / 108.2 / 101.6 / 99.4 / 82.5 / 79.3. An 8d common (0.131 x 2.5 in) at G 0.50 lists 80 lb; this computes 79.6. The design aid appears to use the NDS table's dowel bearing strengths, which round Fe to 50 psi.",
+    editionNote: "Checked against AWC Design Aid No. 2 (toe-nailed, both members of the same G, Ctn 0.83 included): a 16d common (0.162 x 3.5 in) lists 153 / 128 / 117 / 114 / 108 / 101 / 99 / 82 / 80 lb at G 0.67 / 0.55 / 0.50 / 0.49 / 0.46 / 0.43 / 0.42 / 0.37 / 0.36; this computes 152.9 / 127.5 / 116.8 / 114.6 / 108.2 / 101.6 / 99.4 / 82.5 / 79.3. An 8d common (0.131 x 2.5 in) at G 0.50 lists 80 lb; this computes 79.6. The design aid appears to use the NDS table's dowel bearing strengths, which round Fe to 50 psi. AWC NDS-2024 is the current published edition (the one the 2024 IBC references); the NDS relations and values here follow NDS-2018 and have not yet been re-checked against it.",
     assumptions: [
       { name: "Reduction term", value: "Rd = KD = 2.2 for D <= 0.17 in, 10 D + 0.5 to 0.25 in", source: "NDS 2018 Table 12.3.1B" },
       { name: "Fyb", value: "100,000 psi to 0.142 in, 90,000 to 0.177, 80,000 to 0.236, 70,000 to 0.273 unless entered", source: "NDS 2018 Appendix I, Table I1" },
@@ -17640,7 +17643,7 @@ export const CITATIONS = {
     edition: "The NDS 2018 12.2.3 reference nail/spike withdrawal design value and the toenail factor, by name; the 1,380 empirical constant is named.",
     freeAccess: "The NDS is free to view at awc.org (ANSI/AWC NDS); the 12.2.3 withdrawal equation and the 12.5.4 toenail factor are in the published standard.",
     governance: GOVERNANCE.general,
-    editionNote: "The NDS 2018 12.2.3 reference withdrawal W = 1,380 G^(5/2) D (lb/in) with G the holding member's specific gravity and D the fastener diameter, the capacity W x p_pen, the toenail factor Ctn = 0.67 (12.5.4), the wet service factor CM (Table 11.3.3: 0.25 when nails are driven in green lumber that then dries, or in dry lumber that then gets wet), and the rule that withdrawal from end grain is not permitted (12.2.3.4). This returns the reference nail-withdrawal design value and capacity - it applies to a nail loaded in withdrawal from side grain (not end grain), uses the holding member's specific gravity, multiplies by the entered CD, CM, and Ctn, and does not cover lateral (shear) loading, the head pull-through, or combined withdrawal-plus-lateral. A design aid, not a substitute for the structural engineer of record's stamped design.",
+    editionNote: "The NDS 2018 12.2.3 reference withdrawal W = 1,380 G^(5/2) D (lb/in) with G the holding member's specific gravity and D the fastener diameter, the capacity W x p_pen, the toenail factor Ctn = 0.67 (12.5.4), the wet service factor CM (Table 11.3.3: 0.25 when nails are driven in green lumber that then dries, or in dry lumber that then gets wet), and the rule that withdrawal from end grain is not permitted (12.2.3.4). This returns the reference nail-withdrawal design value and capacity - it applies to a nail loaded in withdrawal from side grain (not end grain), uses the holding member's specific gravity, multiplies by the entered CD, CM, and Ctn, and does not cover lateral (shear) loading, the head pull-through, or combined withdrawal-plus-lateral. A design aid, not a substitute for the structural engineer of record's stamped design. AWC NDS-2024 is the current published edition (the one the 2024 IBC references); the NDS relations and values here follow NDS-2018 and have not yet been re-checked against it.",
     assumptions: [
       { name: "Withdrawal value", value: "W = 1,380 G^(5/2) D per inch of penetration into the holding member", source: "NDS 2018 12.2.3" },
       { name: "Toenail factor", value: "Ctn = 0.67 for a toenailed connection (12.5.4)", source: "NDS 2018 12.5.4" },
@@ -17652,7 +17655,7 @@ export const CITATIONS = {
     edition: "The NDS 2018 12.2.1 reference lag-screw withdrawal design value and the end-grain factor, by name; the 1,800 empirical constant is named.",
     freeAccess: "The NDS is free to view at awc.org (ANSI/AWC NDS); the 12.2.1 lag-withdrawal equation is in the published standard.",
     governance: GOVERNANCE.general,
-    editionNote: "The NDS 2018 12.2.1 reference withdrawal W = 1,800 G^(3/2) D^(3/4) (lb/in of thread penetration) with G the holding member's specific gravity and D the shank diameter, the capacity W x p_thread, the load-duration CD, and the end-grain factor Ceg = 0.75. This returns the axial (withdrawal) lag design value - withdrawal scales only with the 3/4 power of diameter, so more or deeper lags beat one fat lag - and it does not cover the lateral yield-limit connection or the head/washer bearing. A design aid, not a substitute for the structural engineer of record's stamped design.",
+    editionNote: "The NDS 2018 12.2.1 reference withdrawal W = 1,800 G^(3/2) D^(3/4) (lb/in of thread penetration) with G the holding member's specific gravity and D the shank diameter, the capacity W x p_thread, the load-duration CD, and the end-grain factor Ceg = 0.75. This returns the axial (withdrawal) lag design value - withdrawal scales only with the 3/4 power of diameter, so more or deeper lags beat one fat lag - and it does not cover the lateral yield-limit connection or the head/washer bearing. A design aid, not a substitute for the structural engineer of record's stamped design. AWC NDS-2024 is the current published edition (the one the 2024 IBC references); the NDS relations and values here follow NDS-2018 and have not yet been re-checked against it.",
     assumptions: [
       { name: "Withdrawal value", value: "W = 1,800 G^(3/2) D^(3/4) per inch of thread penetration", source: "NDS 2018 12.2.1" },
       { name: "End-grain factor", value: "Ceg = 0.75 for a lag installed into end grain", source: "NDS 2018 12.2.1" },
@@ -17664,7 +17667,7 @@ export const CITATIONS = {
     edition: "The NDS 2018 12.2.2 reference wood-screw withdrawal design value, by name; the 2,850 empirical constant is named.",
     freeAccess: "The NDS is free to view at awc.org (ANSI/AWC NDS); the 12.2.2 wood-screw-withdrawal equation is in the published standard.",
     governance: GOVERNANCE.general,
-    editionNote: "The NDS 2018 12.2.2 reference withdrawal W = 2,850 G^2 D (lb/in) with G the holding member's specific gravity and D the screw diameter, the capacity W x thread penetration, and the load-duration CD. This returns the axial (withdrawal) wood-screw design value - withdrawal scales with the square of the specific gravity, so a screw that holds in Douglas Fir-Larch (G 0.50) can strip in a softer spruce (G 0.42) - and it does not cover the lateral connection or the head pull-through. A design aid, not a substitute for the structural engineer of record's stamped design.",
+    editionNote: "The NDS 2018 12.2.2 reference withdrawal W = 2,850 G^2 D (lb/in) with G the holding member's specific gravity and D the screw diameter, the capacity W x thread penetration, and the load-duration CD. This returns the axial (withdrawal) wood-screw design value - withdrawal scales with the square of the specific gravity, so a screw that holds in Douglas Fir-Larch (G 0.50) can strip in a softer spruce (G 0.42) - and it does not cover the lateral connection or the head pull-through. A design aid, not a substitute for the structural engineer of record's stamped design. AWC NDS-2024 is the current published edition (the one the 2024 IBC references); the NDS relations and values here follow NDS-2018 and have not yet been re-checked against it.",
     assumptions: [
       { name: "Withdrawal value", value: "W = 2,850 G^2 D per inch of penetration", source: "NDS 2018 12.2.2" },
       { name: "G^2 sensitivity", value: "the square-of-specific-gravity law makes species the dominant variable", source: "NDS 2018 12.2.2" },
@@ -17676,7 +17679,7 @@ export const CITATIONS = {
     edition: "The NDS 2018 3.10.2 compression-perpendicular-to-grain bearing check and the 3.10.4 bearing-area factor Cb = (lb + 0.375)/lb for a bearing under 6 in and not within 3 in of the member end, by name.",
     freeAccess: "The NDS is free to view at awc.org (ANSI/AWC NDS); the 3.10 bearing provisions and the Cb factor are in the published standard.",
     governance: GOVERNANCE.general,
-    editionNote: "The NDS 2018 3.10.2 bearing stress fc_perp = R/(b lb) against Fc_perp' = Fc_perp x Cb, and the 3.10.4 bearing-area factor Cb = (lb + 0.375)/lb for bearings under 6 in and not within 3 in of the end. This checks compression perpendicular to grain at a bearing - it uses the reference Fc_perp (already adjusted for wet service CM and temperature Ct if entered as such; Fc_perp is not adjusted by CD load duration), applies Cb only within its geometric limits, and does not cover angle-to-grain bearing (the Hankinson formula), the member's bending or shear, or the 0.04 in deformation-limit alternative. A design aid, not a substitute for the structural engineer of record's stamped design.",
+    editionNote: "The NDS 2018 3.10.2 bearing stress fc_perp = R/(b lb) against Fc_perp' = Fc_perp x Cb, and the 3.10.4 bearing-area factor Cb = (lb + 0.375)/lb for bearings under 6 in and not within 3 in of the end. This checks compression perpendicular to grain at a bearing - it uses the reference Fc_perp (already adjusted for wet service CM and temperature Ct if entered as such; Fc_perp is not adjusted by CD load duration), applies Cb only within its geometric limits, and does not cover angle-to-grain bearing (the Hankinson formula), the member's bending or shear, or the 0.04 in deformation-limit alternative. A design aid, not a substitute for the structural engineer of record's stamped design. AWC NDS-2024 is the current published edition (the one the 2024 IBC references); the NDS relations and values here follow NDS-2018 and have not yet been re-checked against it.",
     assumptions: [
       { name: "Bearing check", value: "fc_perp = R/(b lb) at the support against the adjusted Fc_perp'", source: "NDS 2018 3.10.2" },
       { name: "Bearing-area factor", value: "Cb = (lb + 0.375)/lb, only for lb < 6 in and bearings not within 3 in of the member end", source: "NDS 2018 3.10.4" },
@@ -17688,7 +17691,7 @@ export const CITATIONS = {
     edition: "The NDS 2018 3.8.1 tension-parallel-to-grain check on the net section, with the load-duration CD and size CF adjustment factors, by name.",
     freeAccess: "The NDS is free to view at awc.org (ANSI/AWC NDS); the 3.8 tension provisions and the adjustment-factor table are in the published standard.",
     governance: GOVERNANCE.general,
-    editionNote: "The NDS 2018 3.8.1 tension check ft = T/An <= Ft', the net area An = b d - nh dh b, and the adjusted value Ft' = Ft x CD x CF (with the other applicable factors folded into the entered values). This checks tension parallel to grain on the net section - it takes the reference Ft and the entered CD and CF (the user supplies the remaining CM, Ct, Ci if they apply), deducts holes in a single transverse line (no staggered-row chain), and does not cover perpendicular-to-grain tension (avoid it), the fastener/connection yield, or the row/group tear-out. A design aid, not a substitute for the structural engineer of record's stamped design.",
+    editionNote: "The NDS 2018 3.8.1 tension check ft = T/An <= Ft', the net area An = b d - nh dh b, and the adjusted value Ft' = Ft x CD x CF (with the other applicable factors folded into the entered values). This checks tension parallel to grain on the net section - it takes the reference Ft and the entered CD and CF (the user supplies the remaining CM, Ct, Ci if they apply), deducts holes in a single transverse line (no staggered-row chain), and does not cover perpendicular-to-grain tension (avoid it), the fastener/connection yield, or the row/group tear-out. A design aid, not a substitute for the structural engineer of record's stamped design. AWC NDS-2024 is the current published edition (the one the 2024 IBC references); the NDS relations and values here follow NDS-2018 and have not yet been re-checked against it.",
     assumptions: [
       { name: "Net section", value: "An deducts the fastener holes at the section in one transverse line", source: "NDS 2018 3.1.2 / 3.8.1" },
       { name: "Adjusted value", value: "Ft' = Ft x CD x CF with the remaining applicable factors entered by the user", source: "NDS 2018 Table 4.3.1" },
@@ -17700,7 +17703,7 @@ export const CITATIONS = {
     edition: "ANSI/AWC NDS (2018) Appendix E, local stresses in fastener groups (Eq. E.2-1, E.3-2, E.3-3, E.4-1), by name, as worked in AWC Wood Design Focus, Winter 2002, \"Is Your Wood Connection All Stressed Out? It Needn't Be: Appendix E Provisions\".",
     freeAccess: "The NDS is free to view at awc.org; the Wood Design Focus article with its worked examples is a free PDF at awc.org.",
     governance: GOVERNANCE.general,
-    editionNote: "Checked against Wood Design Focus Example 1: a 3-1/8 x 12 in Combination 3 Douglas fir glulam, Fv' 240 psi, Ft' 1,450 psi, eight 1 in bolts in 1-1/16 in holes in three staggered rows (3, 2, 3) at 2.5 in row spacing, 7 in end distance and 4 in spacing, n Z' 35,040 lb: Z'NT 39,930 lb, Z'RT 24,000 lb, Z'GT 22,030 lb, group tear-out governs; this computes 39,932, 24,000 and 22,027 lb. Also reproduces the 2015 NDS splice in STRUCTURE magazine (Design of Bolted Connections per the 2015 NDS): 2x12 No. 2 Southern Pine, two rows of three 1 in bolts, Fv' 218.75 psi, Ft' 562.5 psi, s_critical 4 in: Z'RT 7,875 lb and Z'GT 6,416 lb against the printed 6,418 (the article rounds A_group-net to 4.41 sq in).",
+    editionNote: "Checked against Wood Design Focus Example 1: a 3-1/8 x 12 in Combination 3 Douglas fir glulam, Fv' 240 psi, Ft' 1,450 psi, eight 1 in bolts in 1-1/16 in holes in three staggered rows (3, 2, 3) at 2.5 in row spacing, 7 in end distance and 4 in spacing, n Z' 35,040 lb: Z'NT 39,930 lb, Z'RT 24,000 lb, Z'GT 22,030 lb, group tear-out governs; this computes 39,932, 24,000 and 22,027 lb. Also reproduces the 2015 NDS splice in STRUCTURE magazine (Design of Bolted Connections per the 2015 NDS): 2x12 No. 2 Southern Pine, two rows of three 1 in bolts, Fv' 218.75 psi, Ft' 562.5 psi, s_critical 4 in: Z'RT 7,875 lb and Z'GT 6,416 lb against the printed 6,418 (the article rounds A_group-net to 4.41 sq in). AWC NDS-2024 is the current published edition (the one the 2024 IBC references); the NDS relations and values here follow NDS-2018 and have not yet been re-checked against it.",
     assumptions: [
       { name: "Shear lines", value: "two per row at an apparent stress of Fv'/2 over the shortest clear length", source: "NDS Appendix E.3" },
       { name: "Net section", value: "one hole deducted per row, conservative for a staggered pattern", source: "NDS Appendix E.2" },
@@ -17712,7 +17715,7 @@ export const CITATIONS = {
     edition: "The NDS 2018 3.9.1 bending-and-axial-tension interaction, Eq. 3.9-1 and 3.9-2, by name.",
     freeAccess: "The NDS is free to view at awc.org (ANSI/AWC NDS); the worked check is a free Missouri S&T course solution (CE 5260, Problem 7-5).",
     governance: GOVERNANCE.general,
-    editionNote: "Checked against the Missouri S&T CE 5260 Problem 7-5 solution: a 2x6 No. 1 DF-L truss bottom chord (A 8.25 sq in, S 7.563 cu in), D+S case, T 5,640 lb, M 3,000 in-lb, Ft' 1,009 psi, Fb' 1,495 psi (CD 1.15, CF 1.3, CL 1.0): 684/1,009 + 397/1,495 = 0.943 and (397 - 684)/1,495 = -0.192. This computes 0.9429 and -0.1920.",
+    editionNote: "Checked against the Missouri S&T CE 5260 Problem 7-5 solution: a 2x6 No. 1 DF-L truss bottom chord (A 8.25 sq in, S 7.563 cu in), D+S case, T 5,640 lb, M 3,000 in-lb, Ft' 1,009 psi, Fb' 1,495 psi (CD 1.15, CF 1.3, CL 1.0): 684/1,009 + 397/1,495 = 0.943 and (397 - 684)/1,495 = -0.192. This computes 0.9429 and -0.1920. AWC NDS-2024 is the current published edition (the one the 2024 IBC references); the NDS relations and values here follow NDS-2018 and have not yet been re-checked against it.",
     assumptions: [
       { name: "Fb*", value: "Fb' with every applicable factor except the beam stability factor CL", source: "NDS 2018 3.9.1" },
       { name: "Fb**", value: "Fb' with every applicable factor except the volume factor CV; blank uses Fb*", source: "NDS 2018 3.9.1" },
@@ -17724,7 +17727,7 @@ export const CITATIONS = {
     edition: "The NDS 2018 3.9.2 combined bending and axial compression interaction with the Euler stress FcE = 0.822 Emin'/(le/d)^2 and the 1 - fc/FcE P-delta moment magnifier, by name.",
     freeAccess: "The NDS is free to view at awc.org (ANSI/AWC NDS); the 3.9.2 interaction equation is in the published standard.",
     governance: GOVERNANCE.general,
-    editionNote: "The NDS 2018 3.9.2 combined bending-and-axial-compression interaction (fc/Fc')^2 + fb/[Fb'(1 - fc/FcE)] <= 1.0, with FcE = 0.822 Emin'/(le/d)^2 and the 1 - fc/FcE P-delta amplifier. This checks uniaxial bending plus concentric axial compression - it takes the already-adjusted Fc' (including Cp) and Fb' (including CL) as entered (compute them in the wood column and beam tiles), uses the bending axis whose d and le are supplied, and does not cover biaxial bending, the eccentric-load fc(6e/d) term, or tension-plus-bending (NDS 3.9.1). A design aid, not a substitute for the structural engineer of record's stamped design.",
+    editionNote: "The NDS 2018 3.9.2 combined bending-and-axial-compression interaction (fc/Fc')^2 + fb/[Fb'(1 - fc/FcE)] <= 1.0, with FcE = 0.822 Emin'/(le/d)^2 and the 1 - fc/FcE P-delta amplifier. This checks uniaxial bending plus concentric axial compression - it takes the already-adjusted Fc' (including Cp) and Fb' (including CL) as entered (compute them in the wood column and beam tiles), uses the bending axis whose d and le are supplied, and does not cover biaxial bending, the eccentric-load fc(6e/d) term, or tension-plus-bending (NDS 3.9.1). A design aid, not a substitute for the structural engineer of record's stamped design. AWC NDS-2024 is the current published edition (the one the 2024 IBC references); the NDS relations and values here follow NDS-2018 and have not yet been re-checked against it.",
     assumptions: [
       { name: "Interaction", value: "the squared axial term plus the amplified bending term must not exceed 1.0", source: "NDS 2018 Eq. 3.9-3" },
       { name: "P-delta amplifier", value: "the bending term divides by 1 - fc/FcE, growing without bound as fc approaches the Euler stress", source: "NDS 2018 3.9.2" },
@@ -20533,7 +20536,7 @@ export const CITATIONS = {
     edition: "NDS 2018 (National Design Specification for Wood Construction) §5.3.6, the glulam volume factor Cv, by name; the reference bending value and factors come from the NDS Supplement.",
     freeAccess: "The Cv equation is stated in NDS 5.3.6, published free read-only by AWC at awc.org; the (21/L)^(1/x) arithmetic is public.",
     governance: GOVERNANCE.general,
-    editionNote: "NDS 2018 §5.3.6 gives the glued-laminated volume factor Cv = (21/L)^(1/x) x (12/d)^(1/x) x (5.125/b)^(1/x), capped at 1.0, where L is the length between points of zero moment in feet, d and b the depth and width in inches, and x = 10 for all species except Southern Pine (x = 20). The loading-condition factor KL of NDS 1997 is not in the current equation; the tile keeps it as an optional multiplier that defaults to 1.0. Until 2026-09-26 this note credited KL to NDS 2018. A larger stressed volume is more likely to contain a strength-limiting defect, so the reference bending value Fb is reduced. The allowable bending value uses the LESSER of Cv and the beam-stability factor CL (NDS 3.3.3) - they are not multiplied together. Cv applies to glulam bending about the x-x (strong) axis, not to sawn lumber and not to weak-axis bending. A design aid, not a substitute for the engineer of record.",
+    editionNote: "NDS 2018 §5.3.6 gives the glued-laminated volume factor Cv = (21/L)^(1/x) x (12/d)^(1/x) x (5.125/b)^(1/x), capped at 1.0, where L is the length between points of zero moment in feet, d and b the depth and width in inches, and x = 10 for all species except Southern Pine (x = 20). The loading-condition factor KL of NDS 1997 is not in the current equation; the tile keeps it as an optional multiplier that defaults to 1.0. Until 2026-09-26 this note credited KL to NDS 2018. A larger stressed volume is more likely to contain a strength-limiting defect, so the reference bending value Fb is reduced. The allowable bending value uses the LESSER of Cv and the beam-stability factor CL (NDS 3.3.3) - they are not multiplied together. Cv applies to glulam bending about the x-x (strong) axis, not to sawn lumber and not to weak-axis bending. A design aid, not a substitute for the engineer of record. AWC NDS-2024 is the current published edition (the one the 2024 IBC references); the NDS relations and values here follow NDS-2018 and have not yet been re-checked against it.",
     assumptions: [
       { name: "Volume factor", value: "Cv = (21/L)^(1/x) x (12/d)^(1/x) x (5.125/b)^(1/x), capped at 1.0; L between points of zero moment", source: "NDS 2018 §5.3.6 (Eq. 5.3-1)" },
       { name: "Species exponent", value: "x = 10 for all species except Southern Pine, where x = 20", source: "NDS 2018 §5.3.6" },

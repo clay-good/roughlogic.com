@@ -144,6 +144,22 @@
       ]
     },
     {
+      "id": "nds",
+      "name": "AWC National Design Specification (NDS) for Wood Construction",
+      "current_edition": "2024",
+      "current_release": "2023-10",
+      "cycle_years": 3,
+      "next_expected": "2027-10",
+      "free_access_url": "https://awc.org/publications/2024-nds/",
+      "match_terms": [
+        "NDS"
+      ],
+      "last_verified": "2026-10-17",
+      "verification_note": "Verified 2026-10-17 at awc.org/publications/2024-nds/: the 2024 NDS was approved by ANSI on 2023-10-16 and is the edition the 2024 IBC references; AWC offers a free view-only copy. Seventeen wood tiles cite NDS-2018: fastener-pullout states its relations carry over to 2024, wood-beam-compression-notch gives the 2024 equation numbering, and the other fifteen now name 2024 as current and say they have not yet been re-checked against it. The NDS has followed the IBC (2015, 2018, 2024), so the next edition is expected with the 2027 IBC; the date is an estimate.",
+      "citation_only": true,
+      "citation_only_reason": "No bundled shard holds NDS data: the wood tiles cite NDS sections and equations by name and compute inline (lumber design values are user-entered or come from the construction folder's public engineering references, which do not name the NDS). Their citations name NDS-2018 as bundled and NDS-2024 as current, a disclosed lag."
+    },
+    {
       "id": "nfpa-70e",
       "name": "NFPA 70E",
       "current_edition": "2027",

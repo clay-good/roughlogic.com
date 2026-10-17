@@ -74,6 +74,7 @@ anything.
 | `ashrae-62-1` | ASHRAE 62.1 | 2022 | **2025 (published)** | 2026-09-01 | disclosed-lag |
 | `ashrae-62-2` | ASHRAE 62.2 | 2022 | **2025 (published)** | 2026-09-01 | disclosed-lag |
 | `ashrae-90-1` | ASHRAE 90.1 | 2022 | **2025 (published)** | 2026-09-01 | disclosed-lag |
+| `nds` | AWC NDS | 2018 | **2024 (published)** | 2026-10-17 | disclosed-lag |
 | `nfpa-70e` | NFPA 70E | 2024 | **2027 (published)** | 2026-10-17 | disclosed-lag |
 | `fda-food-code` | FDA Food Code | 2026 | 2026 | 2026-10-17 | current |
 | `wmm` | NOAA World Magnetic Model | WMM2025 | WMM2025 (valid through 2029-12-31) | 2026-09-09 | current |

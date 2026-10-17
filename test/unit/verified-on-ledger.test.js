@@ -830,7 +830,7 @@ test("every 'is the current edition' claim names the ledger's current edition", 
     ["nec", /\bNEC (\d{4})\b/g], ["ipc", /\bIPC (\d{4})\b/g], ["irc", /\bIRC (\d{4})\b/g], ["ibc", /\bIBC (\d{4})\b/g],
     ["imc", /\bIMC (\d{4})\b/g], ["ifc", /\bIFC (\d{4})\b/g], ["ifgc", /\bIFGC (\d{4})\b/g],
     ["ashrae-62-1", /\b62\.1-(\d{4})\b/g], ["ashrae-62-2", /\b62\.2-(\d{4})\b/g], ["ashrae-90-1", /\b90\.1-(\d{4})\b/g],
-    ["fda-food-code", /\bFood Code (\d{4})\b/g], ["nfpa-70e", /\b70E-(\d{4})\b/g],
+    ["fda-food-code", /\bFood Code (\d{4})\b/g], ["nfpa-70e", /\b70E-(\d{4})\b/g], ["nds", /\bNDS[- ](\d{4})\b/g],
   ];
   const { readdir } = await import("node:fs/promises");
   const files = ["citations.js", "README.md", "docs/data-sources.md", "docs/how-it-works.md", "docs/correctness.md", "docs/edition-rollover.md"];
