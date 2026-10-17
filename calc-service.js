@@ -202,7 +202,7 @@ SERVICE_RENDERERS["tpr-discharge"] = renderTprDischarge;
 // max_spacing = lookup(table, material, size, orientation);
 // hangers = ceil(run_length / max_spacing) + 1 (both ends plus interior).
 // The bundled table is editable [material, max_size_in, horiz_ft, vert_ft]
-// breakpoints from IPC 2021 Table 308.5 (copper = tubing; copper_pipe = the
+// breakpoints from IPC 2027 Table 308.5 (identical in 2021) (copper = tubing; copper_pipe = the
 // 12 ft copper-pipe row). MSS SP-58 is named for context. Helpers sit
 // ABOVE the dims block so the v14 lint associates it with the export.
 const SUPPORT_SPACING_TABLE = [
@@ -251,7 +251,7 @@ export const pipeSupportSpacingExample = {
 };
 
 function renderPipeSupportSpacing(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: IPC 2021 Table 308.5 (hanger spacing) and MSS SP-58 by name; the spacing table ships as editable breakpoints by material and size (PEX 32 in to 1 in, 4 ft from 1-1/4 in). hangers = ceil(run / max_spacing) + 1.";
+  citationEl.textContent = "Citation: IPC 2027 Table 308.5 (identical in 2021) (hanger spacing) and MSS SP-58 by name; the spacing table ships as editable breakpoints by material and size (PEX 32 in to 1 in, 4 ft from 1-1/4 in). hangers = ceil(run / max_spacing) + 1.";
   const material = makeSelect("Pipe material", "pss-mat", [
     { value: "copper", label: "Copper tube", selected: true }, { value: "copper_pipe", label: "Copper pipe (threaded)" }, { value: "steel", label: "Steel" }, { value: "cpvc", label: "CPVC" },
     { value: "pvc", label: "PVC" }, { value: "pex", label: "PEX" }, { value: "cast_iron", label: "Cast iron" },

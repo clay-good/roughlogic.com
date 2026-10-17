@@ -3689,7 +3689,7 @@ export const wsfuDemandExample = {
 };
 
 function renderWsfuDemand(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Hunter's curve (NBS BMS65, Methods of Estimating Loads in Plumbing Systems) and IPC 2021 Appendix E (Table E103.3(3)) by name; the demand curve carries that table's printed rows as editable breakpoints, linearly interpolated.";
+  citationEl.textContent = "Citation: Hunter's curve (NBS BMS65, Methods of Estimating Loads in Plumbing Systems) and IPC 2027 Appendix E (Table E103.3(3), identical in 2021) by name; the demand curve carries that table's printed rows as editable breakpoints, linearly interpolated.";
   const fu = makeNumber("Total water-supply fixture units (WSFU)", "wd-fu", { step: "any", min: "0" });
   const sys = makeSelect("System type", "wd-sys", [
     { value: "flush_tank", label: "Flush tank (gravity)", selected: true }, { value: "flush_valve", label: "Flush valve (flushometer)" },
@@ -3742,7 +3742,7 @@ export function computeSupplyPressureBudget({ street_pressure, fixture_height = 
     headroom,
     adequate: headroom >= -1e-9,
     verdict: headroom >= -1e-9 ? "adequate" : "short",
-    note: "Use the minimum recorded street pressure (a residual sized at peak-day low pressure protects the worst case). IPC 2021 Table 604.3 minimum flow pressures: 8 psi for lavatories, sinks, showers, laundry trays and hose bibbs; 20 psi for a tank or flushometer-tank water closet and for thermostatic or pressure-balance shower and tub valves; 25 psi for a urinal flush valve; 35 psi for a siphonic and 45 psi for a blowout flushometer-valve water closet. The 8 psi default is for the simplest fixtures; enter the governing fixture's figure. IPC 604 caps static pressure at 80 psi, requiring a PRV above it (which adds its own downstream loss).",
+    note: "Use the minimum recorded street pressure (a residual sized at peak-day low pressure protects the worst case). IPC 2027 Table 604.3 (identical in 2021) minimum flow pressures: 8 psi for lavatories, sinks, showers, laundry trays and hose bibbs; 20 psi for a tank or flushometer-tank water closet and for thermostatic or pressure-balance shower and tub valves; 25 psi for a urinal flush valve; 35 psi for a siphonic and 45 psi for a blowout flushometer-valve water closet. The 8 psi default is for the simplest fixtures; enter the governing fixture's figure. IPC 604 caps static pressure at 80 psi, requiring a PRV above it (which adds its own downstream loss).",
   };
 }
 

@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "61ec60ea39ad5e54",
+      "sha": "f23a736e323925ac",
       "date": "2026-10-17"
     },
     "/tools/": {
@@ -1954,7 +1954,7 @@
       "date": "2026-10-17"
     },
     "/tools/cross-connection-air-gap/": {
-      "sha": "92e3fc1052078a52",
+      "sha": "59dab6909fe14d5b",
       "date": "2026-10-17"
     },
     "/tools/crosswind-component/": {
@@ -5486,7 +5486,7 @@
       "date": "2026-10-17"
     },
     "/tools/pipe-support-spacing/": {
-      "sha": "9131ec1091eee0de",
+      "sha": "3fae65c92c91688f",
       "date": "2026-10-17"
     },
     "/tools/pipe-template-wrap/": {
@@ -7886,7 +7886,7 @@
       "date": "2026-10-17"
     },
     "/tools/supply-pressure-budget/": {
-      "sha": "40438801a8733bda",
+      "sha": "39b525cb24b48a5a",
       "date": "2026-10-17"
     },
     "/tools/support-spacing/": {
@@ -9146,7 +9146,7 @@
       "date": "2026-10-17"
     },
     "/tools/wsfu-demand/": {
-      "sha": "2b18c3c6db1134b5",
+      "sha": "f778278d94d45574",
       "date": "2026-10-17"
     },
     "/tools/yaw-error-loss/": {

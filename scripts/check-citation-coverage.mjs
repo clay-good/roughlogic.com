@@ -57,6 +57,14 @@ const SOURCE_PATTERNS = [
   { re: /\bIRC[\s-]*2024\b/i, name: "IRC 2024" },
   { re: /\bIBC[\s-]*2021\b/i, name: "IBC 2021" },
   { re: /\bIPC[\s-]*2021\b/i, name: "IPC 2021" },
+  // The current editions, added 2026-10-17 when the I-code refresh began re-citing
+  // tiles to them: without these a tile that moved from "IPC 2021" to "IPC 2027"
+  // silently fell out of the tracked set.
+  { re: /\bIPC[\s-]*2024\b/i, name: "IPC 2024" },
+  { re: /\bIPC[\s-]*2027\b/i, name: "IPC 2027" },
+  { re: /\bIBC[\s-]*2024\b/i, name: "IBC 2024" },
+  { re: /\bIBC[\s-]*2027\b/i, name: "IBC 2027" },
+  { re: /\bIFGC[\s-]*2027\b/i, name: "IFGC 2027" },
   { re: /\bIFGC[\s-]*2021\b/i, name: "IFGC 2021" },
   { re: /\bASHRAE[\s-]*62\.1\b/i, name: "ASHRAE 62.1" },
   { re: /\bASHRAE[\s-]*Fundamentals\b/i, name: "ASHRAE Fundamentals" },

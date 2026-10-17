@@ -71,6 +71,8 @@ const IRC_CH3_2024 = " Checked against the IRC 2024 text on 2026-10-17: these re
 const IRC_DECK_2024 = " Checked against the current IRC 2024 printing on 2026-10-17: Table R507.6 cantilevers and Table R507.9.1.3(1) ledger spacings are identical to IRC 2021, and R507, R507.9, R602.7, Table R602.7(1) and R602.7.5 keep their numbers.";
 // Appended to the IPC drainage tiles checked against IPC 2027 on 2026-10-17.
 const IPC_DRAIN_2027 = " Checked against the current IPC 2027 printing on 2026-10-17: Tables 704.1, 710.1(1), 710.1(2), 712.4.2 and 909.1 and Section 909.2 are identical to IPC 2021, and Table 709.1 is identical except the drinking fountain (1/2 DFU in 2021 and 2024, 0 in 2027), which these tiles now follow.";
+// Appended to the IPC supply tiles checked against IPC 2027 on 2026-10-17.
+const IPC_SUPPLY_2027 = " Checked against the current IPC 2027 printing on 2026-10-17: Tables 308.5, 604.3 and 608.16.1 and Appendix E Table E103.3(3) are identical to IPC 2021 in every row this tile uses.";
 const IRC_DISCLOSURE = "Editions available: bundled values follow IRC 2021. Jurisdictions on IRC 2018 / 2024 differ at the margins; verify the edition adopted by your AHJ.";
 // Appended to the IRC disclosure on the four IRC tiles whose span / deflection
 // values come from the NDS (2026-10-17).
@@ -4339,12 +4341,12 @@ export const CITATIONS = {
 
   "cross-connection-air-gap": {
     formula: "Table 608.16.1: opening <= 1/2 in -> 1 in (1-1/2 in close to a wall); <= 3/4 -> 1-1/2 (2-1/2); <= 1 -> 2 (3); over 1 in -> 2x (3x) the opening; required = near_wall ? air_gap_wall : air_gap; passes = measured >= required.",
-    edition: "IPC 2021 §608.16.1 and Table 608.16.1 (air gaps; 608.15.1 in the 2018 numbering) and ASME A112.1.2 (Air Gaps in Plumbing Systems) by name.",
+    edition: "IPC 2027 §608.16.1 and Table 608.16.1 (identical in 2021) (air gaps; 608.15.1 in the 2018 numbering) and ASME A112.1.2 (Air Gaps in Plumbing Systems) by name.",
     freeAccess: ICC_FREE,
     governance: GOVERNANCE.plumbing,
-    editionNote: IPC_DISCLOSURE + " IPC 2021 Table 608.16.1 sets the minimum air gap by the effective opening (the diameter of the least cross-sectional area of the supply outlet): 1, 1-1/2 or 2 in up to 1/2, 3/4 or 1 in, then twice the opening; close to a wall (within three diameters of one wall, four of two walls meeting) 1-1/2, 2-1/2, 3 in, then three times the opening and never less than 1.5 in for openings up to 1/2 in (ASME A112.1.2 Table 1). The air gap is the vertical distance between the supply outlet and the flood-level rim of the fixture it discharges into and is the most positive cross-connection protection there is -- unlike a mechanical assembly it cannot fail or be defeated. This returns the minimum air gap for indirect-waste and tank-fill protection and checks a measured gap against it; the AHJ's adopted plumbing code governs.",
+    editionNote: IPC_DISCLOSURE + IPC_SUPPLY_2027 + " IPC 2027 Table 608.16.1 (identical in 2021) sets the minimum air gap by the effective opening (the diameter of the least cross-sectional area of the supply outlet): 1, 1-1/2 or 2 in up to 1/2, 3/4 or 1 in, then twice the opening; close to a wall (within three diameters of one wall, four of two walls meeting) 1-1/2, 2-1/2, 3 in, then three times the opening and never less than 1.5 in for openings up to 1/2 in (ASME A112.1.2 Table 1). The air gap is the vertical distance between the supply outlet and the flood-level rim of the fixture it discharges into and is the most positive cross-connection protection there is -- unlike a mechanical assembly it cannot fail or be defeated. This returns the minimum air gap for indirect-waste and tank-fill protection and checks a measured gap against it; the AHJ's adopted plumbing code governs.",
     assumptions: [
-      { name: "Air gap table", value: "stepped 1 / 1-1/2 / 2 in (close to a wall 1-1/2 / 2-1/2 / 3) up to 1 in openings, 2x / 3x above", source: "IPC 2021 Table 608.16.1 / ASME A112.1.2" },
+      { name: "Air gap table", value: "stepped 1 / 1-1/2 / 2 in (close to a wall 1-1/2 / 2-1/2 / 3) up to 1 in openings, 2x / 3x above", source: "IPC 2027 Table 608.16.1 (identical in 2021) / ASME A112.1.2" },
       { name: "Effective opening", value: "the diameter of the least cross-sectional area of the supply outlet", source: "ASME A112.1.2" },
       { name: "AHJ governs", value: "the adopted plumbing code and the AHJ govern the required gap", source: "scope of this tile" },
     ],
@@ -9555,12 +9557,12 @@ export const CITATIONS = {
   },
   "wsfu-demand": {
     formula: "gpm = interpolate(curve, wsfu): piecewise-linear between published [WSFU, GPM] breakpoints for the selected system type (flush tank or flush valve). Flush-valve systems peak higher at low WSFU.",
-    edition: "Hunter's curve (NBS BMS65, Methods of Estimating Loads in Plumbing Systems) and IPC 2021 Appendix E (Table E103.3(3)) by name; the curve ships as editable breakpoints read from that table.",
+    edition: "Hunter's curve (NBS BMS65, Methods of Estimating Loads in Plumbing Systems) and IPC 2027 Appendix E (Table E103.3(3), identical in 2021) by name; the curve ships as editable breakpoints read from that table.",
     freeAccess: "IPC 2021 free read-only at codes.iccsafe.org; NBS BMS65 is public-domain (US government). The bundled curve carries the Table E103.3(3) values as editable breakpoints.",
     governance: GOVERNANCE.general,
-    editionNote: "The bundled flush-tank and flush-valve curves carry the IPC Table E103.3(3) values (Hunter's curve) as editable breakpoints, linearly interpolated between rows. The output is the design demand, not a metered actual.",
+    editionNote: "The bundled flush-tank and flush-valve curves carry the IPC Table E103.3(3) values (Hunter's curve) as editable breakpoints, linearly interpolated between rows. The output is the design demand, not a metered actual." + IPC_SUPPLY_2027,
     assumptions: [
-      { name: "Demand curve", value: "editable [WSFU, GPM] breakpoints per system type, read from IPC Table E103.3(3)", source: "Hunter's curve / IPC 2021 Appendix E" },
+      { name: "Demand curve", value: "editable [WSFU, GPM] breakpoints per system type, read from IPC Table E103.3(3)", source: "Hunter's curve / IPC 2027 Appendix E (identical in 2021)" },
     ],
   },
   "supply-pressure-budget": {
@@ -9568,10 +9570,10 @@ export const CITATIONS = {
     edition: "IPC 2021 Section 604 and the ASPE Plumbing Engineering Design Handbook Vol. 2 by name; first-principles pressure budget.",
     freeAccess: "IPC 2021 free read-only at codes.iccsafe.org; the 0.433 psi/ft water-column constant is public.",
     governance: GOVERNANCE.general,
-    editionNote: "Use the minimum recorded street pressure. IPC 2021 Table 604.3 minimum flow pressures: 8 psi for lavatories, sinks, showers, laundry trays and hose bibbs; 20 psi for a tank or flushometer-tank water closet and for thermostatic or pressure-balance shower and tub valves; 25 psi for a urinal flush valve; 35 psi for a siphonic and 45 psi for a blowout flushometer-valve water closet. IPC 604 caps static pressure at 80 psi (a PRV is required above it and adds its own loss).",
+    editionNote: "Use the minimum recorded street pressure. IPC 2027 Table 604.3 (identical in 2021) minimum flow pressures: 8 psi for lavatories, sinks, showers, laundry trays and hose bibbs; 20 psi for a tank or flushometer-tank water closet and for thermostatic or pressure-balance shower and tub valves; 25 psi for a urinal flush valve; 35 psi for a siphonic and 45 psi for a blowout flushometer-valve water closet. IPC 604 caps static pressure at 80 psi (a PRV is required above it and adds its own loss)." + IPC_SUPPLY_2027,
     assumptions: [
       { name: "Water column", value: "0.433 psi per foot of elevation", source: "physical fact (water density)" },
-      { name: "Fixture minimum default", value: "8 psi (lavatory, sink, shower); tank water closet 20, urinal valve 25, siphonic flushometer valve 35, blowout flushometer valve 45 psi", source: "IPC 2021 Table 604.3" },
+      { name: "Fixture minimum default", value: "8 psi (lavatory, sink, shower); tank water closet 20, urinal valve 25, siphonic flushometer valve 35, blowout flushometer valve 45 psi", source: "IPC 2027 Table 604.3 (identical in 2021)" },
     ],
   },
   "roof-drain-sizing": {
@@ -9680,12 +9682,12 @@ export const CITATIONS = {
   },
   "pipe-support-spacing": {
     formula: "max_spacing = lookup(table, material, size, orientation); hangers = ceil(run_length / max_spacing) + 1 (both ends plus interior supports).",
-    edition: "IPC 2021 Table 308.5 (hanger spacing) and MSS SP-58 by name; the spacing table ships as editable breakpoints by material and size.",
-    freeAccess: "IPC 2021 free read-only at codes.iccsafe.org. The spacing values are IPC 2021 Table 308.5 (editable for another edition).",
+    edition: "IPC 2027 Table 308.5 (identical in 2021) (hanger spacing) and MSS SP-58 by name; the spacing table ships as editable breakpoints by material and size.",
+    freeAccess: "IPC 2021 free read-only at codes.iccsafe.org. The spacing values are IPC 2027 Table 308.5 (identical in 2021) (editable for another edition).",
     governance: GOVERNANCE.general,
-    editionNote: "Plastic pipe supports closer than metal and needs continuous support or mid-story guides on vertical runs. The table values are maximums - closer is always allowed and required near valves, heavy fittings, and changes of direction. Vertical piping is also supported at each floor/story (IPC 308.5).",
+    editionNote: "Plastic pipe supports closer than metal and needs continuous support or mid-story guides on vertical runs. The table values are maximums - closer is always allowed and required near valves, heavy fittings, and changes of direction. Vertical piping is also supported at each floor/story (IPC 308.5)." + IPC_SUPPLY_2027,
     assumptions: [
-      { name: "Spacing table", value: "editable [material, max_size_in, horiz_ft, vert_ft] per IPC Table 308.5: copper tubing 6 ft to 1-1/4 in and 10 ft above, copper pipe 12 ft, PEX 32 in to 1 in and 4 ft from 1-1/4 in", source: "IPC 2021 Table 308.5 / MSS SP-58" },
+      { name: "Spacing table", value: "editable [material, max_size_in, horiz_ft, vert_ft] per IPC Table 308.5: copper tubing 6 ft to 1-1/4 in and 10 ft above, copper pipe 12 ft, PEX 32 in to 1 in and 4 ft from 1-1/4 in", source: "IPC 2027 Table 308.5 (identical in 2021) / MSS SP-58" },
       { name: "Hanger count", value: "ceil(run / max_spacing) + 1 (both ends plus interior)", source: "first-principles" },
     ],
   },
