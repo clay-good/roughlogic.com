@@ -2323,7 +2323,7 @@ cross-check.
 | calc-finish.js | `computeCementBoardTakeoff` | `{ area_sf = 120, sheet_area_sf = 15, waste_pct = 10, screws_per_sheet = 35 } ...` | _ | _ | _ |
 | calc-finish.js | `computeClosetShelfTakeoff` | `{ single_hang_ft = 0, double_hang_ft = 0, linen_wall_ft = 0, linen_shelf_coun...` | _ | _ | _ |
 | calc-finish.js | `computeCountertopOverhangSupport` | `{ overhang_in = 0, total_depth_in = 25.5, thickness_cm = 3, run_length_ft = 0...` | _ | _ | _ |
-| calc-finish.js | `computeCrawlSpaceVentilation` | `{ floor_area_sf = 0, base_ratio_denominator = 150, vapor_retarder = "no", ven...` | _ | _ | _ |
+| calc-finish.js | `computeCrawlSpaceVentilation` | `{ floor_area_sf = 0, base_ratio_denominator = 150, vapor_retarder = "no", cro...` | _ | _ | _ |
 | calc-finish.js | `computeDeckBoardTakeoff` | `{ deck_width_ft = 0, deck_length_ft = 0, board_face_width_in = 5.5, gap_in = ...` | _ | _ | _ |
 | calc-finish.js | `computeDripEdgeTakeoff` | `{ eave_length_ft = 0, rake_run_ft = 0, rake_count = 0, pitch_rise_per_12 = 0,...` | _ | _ | _ |
 | calc-finish.js | `computeFlooringTakeoff` | `{ room_length_ft = 0, room_width_ft = 0, box_coverage_sqft = 20, pattern = "s...` | _ | _ | _ |

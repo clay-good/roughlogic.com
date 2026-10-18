@@ -140,21 +140,21 @@ test("B.4 standpipe-friction cites NFPA 14-2024 (there is no 2022 edition)", asy
 
 // --- Construction (spec §B.5) ---
 
-test("B.5 lumber-spans cites IRC 2021 Tables R502.5, R602.5 + AWC NDS-2018", async () => {
+test("B.5 lumber-spans cites IRC 2024 Table R502.3.1 + AWC NDS-2018", async () => {
   const t = await readCalc("calc-construction.js");
-  assertCitationContains(t, ["IRC 2021 Tables R502.5, R602.5", "AWC NDS-2018", "codes.iccsafe.org", "awc.org"], "lumber-spans");
+  assertCitationContains(t, ["IRC 2024 Tables R502.3.1(1)-(2)", "AWC NDS-2018", "codes.iccsafe.org", "awc.org"], "lumber-spans");
 });
-test("B.5 rafter cites IRC 2021 Table R802.5.1", async () => {
+test("B.5 rafter cites IRC 2024 Table R802.4.1 (rafter spans)", async () => {
   const t = await readCalc("calc-construction.js");
-  assertCitationContains(t, ["IRC 2021 Table R802.5.1", "codes.iccsafe.org"], "rafter");
+  assertCitationContains(t, ["IRC 2024 Table R802.4.1(1)-(2)", "codes.iccsafe.org"], "rafter");
 });
 test("B.5 stair-riser/tread cites IRC 2024 §R318.7 with the 2021 number beside it", async () => {
   const t = await readCalc("calc-construction.js");
   assertCitationContains(t, ["IRC 2024 §R318.7", "R311.7 in IRC 2021", "codes.iccsafe.org"], "stairs");
 });
-test("B.5 footing-area cites IRC 2021 §R401-R403 + IBC 2027 Table 1806.2", async () => {
+test("B.5 footing-area cites IRC 2024 §R401-R403 + IBC 2027 Table 1806.2", async () => {
   const t = await readCalc("calc-construction.js");
-  assertCitationContains(t, ["IRC 2021 §R401-R403", "IBC 2027 Table 1806.2", "codes.iccsafe.org"], "footing-area");
+  assertCitationContains(t, ["IRC 2024 §R401-R403", "IBC 2027 Table 1806.2", "codes.iccsafe.org"], "footing-area");
 });
 
 // --- Cross-cutting (spec §B.6) ---

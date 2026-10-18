@@ -87,7 +87,7 @@
     },
     "footing-area": {
       "group": "calc-construction.js (Group E)",
-      "stamp": "Citation: per IRC 2021 §R401-R403 (foundations); allowable soil-bearing values per IBC 2027 Table 1806.2 (identical to 2021). required_area = load / allowable_bearing. AHJ governs. Free at codes.iccsafe.org."
+      "stamp": "Citation: per IRC 2024 §R401-R403 (foundations; unchanged from 2021); allowable soil-bearing values per IBC 2027 Table 1806.2 (identical to 2021). required_area = load / allowable_bearing. AHJ governs. Free at codes.iccsafe.org."
     },
     "friction-loss": {
       "group": "calc-plumbing.js (Group B)",
@@ -147,7 +147,7 @@
     },
     "lumber-spans": {
       "group": "calc-construction.js (Group E)",
-      "stamp": "Citation: per IRC 2021 Tables R502.5, R602.5 (joist / header / framing spans); AWC NDS-2018 governs by reference. M = w*L^2/8; sigma = Mc/I; delta = 5wL^4/(384*E*I). AHJ governs. Free at codes.iccsafe.org and awc.org."
+      "stamp": "Citation: per IRC 2024 Tables R502.3.1(1)-(2) (joist spans) and R602.7(1) (headers), with the R301.7 deflection limits (all unchanged from 2021; the tile cited R502.5 and R602.5, girders and nonbearing walls, until 2026-10-17); AWC NDS-2018 governs by reference. M = w*L^2/8; sigma = Mc/I; delta = 5wL^4/(384*E*I). AHJ governs. Free at codes.iccsafe.org and awc.org."
     },
     "manual-j-cooling": {
       "group": "calc-hvac.js (Group C)",
@@ -195,7 +195,7 @@
     },
     "rafter": {
       "group": "calc-construction.js (Group E)",
-      "stamp": "Citation: per IRC 2021 Table R802.5.1 (rafter spans). Rafter = horizontal span * sqrt(1 + (rise/run)^2) by Pythagoras. AHJ governs. Free at codes.iccsafe.org."
+      "stamp": "Citation: per IRC 2024 Table R802.4.1(1)-(2) (rafter spans; Table R802.5.1, cited here until 2026-10-17, is ceiling joists), unchanged from 2021. Rafter = horizontal span * sqrt(1 + (rise/run)^2) by Pythagoras. AHJ governs. Free at codes.iccsafe.org."
     },
     "readability": {
       "group": "calc-edu.js (Group Y, v12 §9)",

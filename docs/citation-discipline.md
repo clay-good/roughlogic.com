@@ -104,10 +104,10 @@ The structured §3 reference block in `citations.js` is the deeper source - this
 
 | Tile | Source-stamp |
 | --- | --- |
-| lumber-spans | "Citation: per IRC 2021 Tables R502.5, R602.5 (joist / header / framing spans); AWC NDS-2018 governs by reference. M = w*L^2/8; sigma = Mc/I; delta = 5wL^4/(384*E*I). AHJ governs. Free at codes.iccsafe.org and awc.org." |
-| rafter | "Citation: per IRC 2021 Table R802.5.1 (rafter spans). Rafter = horizontal span * sqrt(1 + (rise/run)^2) by Pythagoras. AHJ governs. Free at codes.iccsafe.org." |
+| lumber-spans | "Citation: per IRC 2024 Tables R502.3.1(1)-(2) (joist spans) and R602.7(1) (headers), with the R301.7 deflection limits (all unchanged from 2021; the tile cited R502.5 and R602.5, girders and nonbearing walls, until 2026-10-17); AWC NDS-2018 governs by reference. M = w*L^2/8; sigma = Mc/I; delta = 5wL^4/(384*E*I). AHJ governs. Free at codes.iccsafe.org and awc.org." |
+| rafter | "Citation: per IRC 2024 Table R802.4.1(1)-(2) (rafter spans; Table R802.5.1, cited here until 2026-10-17, is ceiling joists), unchanged from 2021. Rafter = horizontal span * sqrt(1 + (rise/run)^2) by Pythagoras. AHJ governs. Free at codes.iccsafe.org." |
 | stairs | "Citation: per IRC 2024 §R318.7 [R311.7 in IRC 2021] (stair dimensions). Riser height = total rise / risers; default tread depth 10 in. AHJ governs final inspection. Free at codes.iccsafe.org." |
-| footing-area | "Citation: per IRC 2021 §R401-R403 (foundations); allowable soil-bearing values per IBC 2027 Table 1806.2 (identical to 2021). required_area = load / allowable_bearing. AHJ governs. Free at codes.iccsafe.org." |
+| footing-area | "Citation: per IRC 2024 §R401-R403 (foundations; unchanged from 2021); allowable soil-bearing values per IBC 2027 Table 1806.2 (identical to 2021). required_area = load / allowable_bearing. AHJ governs. Free at codes.iccsafe.org." |
 
 ### calc-kitchen.js, calc-trucking.js, calc-mechanic.js (Groups O, J, K)
 

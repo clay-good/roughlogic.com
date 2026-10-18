@@ -522,7 +522,7 @@ export function renderRoofPitch(inputRegion, outputRegion, citationEl) {
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderRafter(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: per IRC 2021 Table R802.5.1 (rafter spans). Rafter = horizontal span * sqrt(1 + (rise/run)^2) by Pythagoras. AHJ governs. Free at codes.iccsafe.org.";
+  citationEl.textContent = "Citation: per IRC 2024 Table R802.4.1(1)-(2) (rafter spans; Table R802.5.1, cited here until 2026-10-17, is ceiling joists), unchanged from 2021. Rafter = horizontal span * sqrt(1 + (rise/run)^2) by Pythagoras. AHJ governs. Free at codes.iccsafe.org.";
   const span = makeNumber("Horizontal run (ft; half the building span on a gable)", "rf-s", { step: "any", min: "0" });
   const pitch = makeNumber("Pitch (rise per 12)", "rf-p", { step: "any", min: "0" });
   const overhang = makeNumber("Overhang (ft)", "rf-o", { step: "any", min: "0", value: "0" });
@@ -677,7 +677,7 @@ export function renderRebar(inputRegion, outputRegion, citationEl) {
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderLumberSpans(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: per IRC 2021 Tables R502.5, R602.5 (joist / header / framing spans); AWC NDS-2018 governs by reference. M = w*L^2/8; sigma = Mc/I; delta = 5wL^4/(384*E*I). AHJ governs. Free at codes.iccsafe.org and awc.org.";
+  citationEl.textContent = "Citation: per IRC 2024 Tables R502.3.1(1)-(2) (joist spans) and R602.7(1) (headers), with the R301.7 deflection limits (all unchanged from 2021; the tile cited R502.5 and R602.5, girders and nonbearing walls, until 2026-10-17); AWC NDS-2018 governs by reference. M = w*L^2/8; sigma = Mc/I; delta = 5wL^4/(384*E*I). AHJ governs. Free at codes.iccsafe.org and awc.org.";
   const sp = makeSelect("Species and grade", "ls-sp", Object.keys(LUMBER_SPECIES_GRADES).map((k) => ({ value: k, label: k })));
   const sz = makeSelect("Nominal size", "ls-sz", Object.keys(LUMBER_NOMINAL_TO_ACTUAL).map((k) => ({ value: k, label: k })));
   const tl = makeNumber("Total load (psf)", "ls-tl", { step: "any", min: "0" });
@@ -1285,7 +1285,7 @@ export function renderJoistDeflection(inputRegion, outputRegion, citationEl) {
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderFootingArea(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: per IRC 2021 §R401-R403 (foundations); allowable soil-bearing values per IBC 2027 Table 1806.2 (identical to 2021). required_area = load / allowable_bearing. AHJ governs. Free at codes.iccsafe.org.";
+  citationEl.textContent = "Citation: per IRC 2024 §R401-R403 (foundations; unchanged from 2021); allowable soil-bearing values per IBC 2027 Table 1806.2 (identical to 2021). required_area = load / allowable_bearing. AHJ governs. Free at codes.iccsafe.org.";
   const P = makeNumber("Column load (lb)", "fa-p", { step: "any", min: "0" });
   const soil = makeSelect("Soil class", "fa-s", Object.keys(SOIL_BEARING_PSF).map((k) => ({ value: k, label: k === "rock" ? "sedimentary or foliated rock" : k.replace(/_/g, " ") })));
   // v23 EN.10: optional applied moment for the eccentric bearing-pressure check.
@@ -3038,7 +3038,7 @@ export const residentialFramingExample = {
 };
 
 function _v8c_renderResidentialFraming(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: per IRC 2021 Tables R502.5 (joist spans), R602.5 (stud schedules), R802.5.1 (rafter spans). AHJ governs. Free at codes.iccsafe.org. Board-feet conventions per WWPA standard grading rules.";
+  citationEl.textContent = "Citation: per IRC 2024 Tables R502.3.1(1)-(2) (joist spans), R602.3(5) (stud size and spacing), R802.4.1(1)-(2) (rafter spans), unchanged from 2021 (cited as R502.5, R602.5 and R802.5.1, which are girders, nonbearing walls and ceiling joists, until 2026-10-17). AHJ governs. Free at codes.iccsafe.org. Board-feet conventions per WWPA standard grading rules.";
   _v7c_attachEx(inputRegion, () => fillExample(residentialFramingExample.inputs));
   const fp = _v7c_makeNumber("Footprint (ft²)", "rf-fp", { step: "any", min: "0" });
   const per = _v7c_makeNumber("Wall perimeter (ft)", "rf-per", { step: "any", min: "0" });
@@ -5158,16 +5158,21 @@ export function computeIceBarrierCoverage({ eave_length_ft = 0, overhang_in = 0,
   if (!(pitch_rise >= 0 && pitch_rise <= 24)) return { error: "Pitch rise must be 0-24 inches per 12." };
   if (side_lap_in >= roll_width_in) return { error: "Side lap must be less than the roll width (no net coverage per course)." };
   // IRC R905.1.2: ice barrier from the eave to 24 in inside the exterior wall
-  // line, measured up the slope -> multiply the run by the slope factor.
+  // line, measured up the slope -> multiply the run by the slope factor. On a
+  // roof of 8:12 or steeper it must also reach at least 36 in along the slope
+  // from the eave edge (IRC 2021 and 2024; until 2026-10-17 the tile omitted it,
+  // so a steep roof with a short overhang got 28.8 in at 8:12 with no overhang).
   const slope_factor = Math.sqrt(pitch_rise * pitch_rise + 144) / 12;
-  const coverage_in = (overhang_in + 24) * slope_factor;
+  const wall_line_in = (overhang_in + 24) * slope_factor;
+  const steep_min_applies = pitch_rise >= 8;
+  const coverage_in = steep_min_applies ? Math.max(wall_line_in, 36) : wall_line_in;
   const effective_course = roll_width_in - side_lap_in; // net width each course beyond the first adds
   const courses = coverage_in <= roll_width_in
     ? 1
     : 1 + Math.ceil((coverage_in - roll_width_in) / effective_course - 1e-9);
   const roll_lf = courses * eave_length_ft;
   const rolls = Math.ceil(roll_lf / roll_len_ft - 1e-9);
-  return { slope_factor, coverage_in, courses, roll_lf, rolls };
+  return { slope_factor, coverage_in, wall_line_in, steep_min_applies, courses, roll_lf, rolls };
 }
 
 export const iceBarrierCoverageExample = {
@@ -5175,7 +5180,7 @@ export const iceBarrierCoverageExample = {
 };
 
 const renderIceBarrierCoverage = _simpleRenderer({
-  citation: "Citation: IRC R905.1.2 (ice barrier from the eave to 24 in inside the exterior wall line, measured up the slope) and ASTM D1970 self-adhering membrane. slope_factor = sqrt(rise^2 + 144) / 12; coverage = (overhang + 24) * slope_factor; courses = coverage <= roll width ? 1 : 1 + ceil((coverage - roll width) / (roll width - side lap)); rolls = ceil(courses * eave / roll length). Required only where the AHJ has adopted it; valley and low-slope-transition coverage is a separate manual add. A material takeoff, not a flashing plan.",
+  citation: "Citation: IRC R905.1.2 (ice barrier from the eave to 24 in inside the exterior wall line, measured up the slope, and on a roof of 8:12 or steeper not less than 36 in along the slope from the eave edge; IRC 2021 and 2024 alike) and ASTM D1970 self-adhering membrane. slope_factor = sqrt(rise^2 + 144) / 12; coverage = (overhang + 24) * slope_factor; courses = coverage <= roll width ? 1 : 1 + ceil((coverage - roll width) / (roll width - side lap)); rolls = ceil(courses * eave / roll length). Required only where the AHJ has adopted it; valley and low-slope-transition coverage is a separate manual add. A material takeoff, not a flashing plan.",
   example: iceBarrierCoverageExample.inputs,
   fields: [
     { key: "eave_length_ft", label: "Eave run to protect (ft, all eaves)", kind: "number" },

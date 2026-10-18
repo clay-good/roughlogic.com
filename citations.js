@@ -60,7 +60,6 @@ const NEC_FREE = "Free read-only access at nfpa.org/freeaccess.";
 const NEC_DISCLOSURE = "Editions available: bundled values follow NEC 2023. NEC 2026 is the current published edition; jurisdictions on NEC 2017 / 2020 / 2023 / 2026 use slightly different ambient corrections and ampacity ranges; verify the edition adopted by your AHJ.";
 
 // Carpentry / construction common phrasing (Group E audit, priority 5).
-const IRC_2021 = "IRC 2021 (International Residential Code).";
 const IBC_2021 = "IBC 2021 (International Building Code).";
 const ASCE_7 = "ASCE 7-22 (Minimum Design Loads for Buildings and Other Structures).";
 const AWC_NDS = "AWC NDS-2018 (National Design Specification for Wood Construction).";
@@ -73,9 +72,8 @@ const IRC_DECK_2024 = " Checked against the current IRC 2024 printing on 2026-10
 const IPC_DRAIN_2027 = " Checked against the current IPC 2027 printing on 2026-10-17: Tables 704.1, 710.1(1), 710.1(2), 712.4.2 and 909.1 and Section 909.2 are identical to IPC 2021, and Table 709.1 is identical except the drinking fountain (1/2 DFU in 2021 and 2024, 0 in 2027), which these tiles now follow.";
 // Appended to the IPC supply tiles checked against IPC 2027 on 2026-10-17.
 const IPC_SUPPLY_2027 = " Checked against the current IPC 2027 printing on 2026-10-17: Tables 308.5, 604.3 and 608.16.1 and Appendix E Table E103.3(3) are identical to IPC 2021 in every row this tile uses.";
-const IRC_DISCLOSURE = "Editions available: bundled values follow IRC 2021. Jurisdictions on IRC 2018 / 2024 differ at the margins; verify the edition adopted by your AHJ.";
-// For IRC tiles whose every bundled IRC value was read against IRC 2024 (2026-10-17).
-const IRC_CHECKED_DISCLOSURE = "Editions available: bundled values follow IRC 2024. IRC 2024 is the current published edition, and the IRC values this tile uses were read against it on 2026-10-17 (see below); unless noted they are identical in IRC 2021. IRC 2027 is expected in early 2027; verify the edition adopted by your AHJ.";
+// Every tile that bundles an IRC value was read against IRC 2024 (current printing) on 2026-10-17.
+const IRC_DISCLOSURE = "Editions available: bundled values follow IRC 2024. IRC 2024 is the current published edition, and the IRC values these tiles use were read against it on 2026-10-17 (see below); they are identical in IRC 2021 except the smoke-alarm cooking clearance, which that tile offers by edition. IRC 2027 is expected in early 2027; verify the edition adopted by your AHJ.";
 // Appended to the IRC disclosure on the four IRC tiles whose span / deflection
 // values come from the NDS (2026-10-17).
 const NDS_LAG = " AWC NDS-2024 is the current published edition (the one the 2024 IBC references); the NDS design values and relations here follow NDS-2018 and have not yet been re-checked against it.";
@@ -2242,14 +2240,14 @@ export const CITATIONS = {
   },
   "residential-framing": {
     formula: "Stud count = ceil(perimeter / stud_oc) + 8 (corner/T allowance). Plate lf = ceil(perimeter × 3 × 1.10) (sole + 2 top + 10% waste). Joist count = ceil(footprint / (joist_span × joist_oc)) + 2. Rafter count derived from approx_length / rafter_oc × 2 (both sides) + 2 (ridge ends). Rafter length = building_run × m_common where m_common = sqrt(P² + 144) / 12. Board feet per ft per nominal: 2x4 = 0.667, 2x6 = 1.0, 2x8 = 1.333, 2x10 = 1.667, 2x12 = 2.0.",
-    edition: IRC_2021 + " Tables R502.5 (joists), R602.5 (studs), R802.5.1 (rafters). WWPA standard grading rules for board-feet conversions.",
+    edition: IRC_2024 + " Tables R502.3.1(1)-(2) (joist spans), R602.3(5) (stud size and spacing) and R802.4.1(1)-(2) (rafter spans), unchanged from 2021. Until 2026-10-17 this cited R502.5, R602.5 and R802.5.1, which are girder and header spans, nonbearing walls and ceiling joists. WWPA standard grading rules for board-feet conversions.",
     freeAccess: ICC_FREE,
     governance: GOVERNANCE.structural,
     editionNote: IRC_DISCLOSURE,
     assumptions: [
       { name: "Corner / T allowance", value: "+8 studs for a simple rectangle (engineering practice)", source: "framing convention" },
       { name: "Plate waste factor", value: "10%", source: "engineering practice" },
-      { name: "Sizes", value: "stud 2x4 / joist 2x10 / rafter 2x8 (fixed in the page; selectable only through the API)", source: "IRC 2021 typical residential" },
+      { name: "Sizes", value: "stud 2x4 / joist 2x10 / rafter 2x8 (fixed in the page; selectable only through the API)", source: "typical residential sizes (not an IRC value)" },
     ],
   },
   "coagulant-dose": {
@@ -3612,10 +3610,10 @@ export const CITATIONS = {
     edition: IRC_2024 + " §R318.7 [R311.7 in IRC 2021] referenced by name; the user supplies the AHJ's adopted max rise and min tread (the tile does not bundle code values).",
     freeAccess: ICC_FREE,
     governance: GOVERNANCE.structural,
-    editionNote: IRC_CHECKED_DISCLOSURE + IRC_CH3_2024 + " The tool deliberately does not bundle a per-jurisdiction max-rise / min-tread shard; the user enters the values from local code.",
+    editionNote: IRC_DISCLOSURE + IRC_CH3_2024 + " The tool deliberately does not bundle a per-jurisdiction max-rise / min-tread shard; the user enters the values from local code.",
     assumptions: [
       { name: "Default target rise / tread", value: "7.0 in / 11.0 in (engineering practice typical)", source: "engineering practice" },
-      { name: "Default code max rise / min tread", value: "7.75 in / 10.0 in (IRC 2024 §R318.7 [R311.7 in IRC 2021] typical; verify your AHJ)", source: "IRC 2021 default" },
+      { name: "Default code max rise / min tread", value: "7.75 in / 10.0 in (IRC 2024 §R318.7 [R311.7 in IRC 2021] typical; verify your AHJ)", source: "IRC 2024 R318.7 default (unchanged from 2021)" },
     ],
   },
   "hip-valley-rafter": {
@@ -3653,7 +3651,7 @@ export const CITATIONS = {
   },
   "plywood-span": {
     formula: "Roof: allowable spacing = APA E30 Table 33 max span for the rating (with or without edge support: clips, blocking or T&G); allowable live = the Table 33 value at the next tabulated spacing at or above the actual spacing; allowable total = live + 10 psf dead. Floor: allowable spacing and total load from the rating. Pass/fail = (support_spacing ≤ allowable_spacing) AND (live_load ≤ allowable_live) AND (live + dead ≤ allowable_total).",
-    edition: "APA - The Engineered Wood Association published span-rating tables by name. Cited by APA name only; numeric tables shipped under APA's technical-bulletin reuse policy. " + IRC_2021 + " §R503 / §R803 references the APA tables.",
+    edition: "APA - The Engineered Wood Association published span-rating tables by name. Cited by APA name only; numeric tables shipped under APA's technical-bulletin reuse policy. " + IRC_2024 + " §R503 / §R803 references the APA tables (unchanged from 2021).",
     freeAccess: "APA technical bulletins free at apawood.org/publications.",
     governance: GOVERNANCE.structural,
     editionNote: IRC_DISCLOSURE + " APA span-rating values are stable across editions.",
@@ -4783,7 +4781,7 @@ export const CITATIONS = {
     edition: IRC_2024 + " §R318.7 [R311.7 in IRC 2021].",
     freeAccess: ICC_FREE,
     governance: GOVERNANCE.structural,
-    editionNote: IRC_CHECKED_DISCLOSURE + IRC_CH3_2024,
+    editionNote: IRC_DISCLOSURE + IRC_CH3_2024,
     assumptions: [
       { name: "Standard riser max", value: "7-3/4 in residential per IRC §R318.7.5.1 [R311.7.5.1 in IRC 2021]", source: "IRC 2024" },
       { name: "Standard tread min", value: "10 in residential per IRC §R318.7.5.2 [R311.7.5.2 in IRC 2021]", source: "IRC 2024" },
@@ -4791,25 +4789,25 @@ export const CITATIONS = {
   },
   "roof-pitch": {
     formula: "Pitch = rise / run, expressed as N/12 (carpenter form), degrees (atan2), and percent. Conversions for fall over distance.",
-    edition: "Classical geometry; IRC 2021 §R905 references for slope minimums by roof-cover class.",
+    edition: "Classical geometry; IRC 2024 §R905 slope minimums by roof-cover class (asphalt shingles 2:12 with double underlayment below 4:12, R905.2.2), unchanged from 2021.",
     freeAccess: ICC_FREE,
     governance: GOVERNANCE.structural,
     editionNote: IRC_DISCLOSURE,
     assumptions: [],
   },
   "rafter": {
-    formula: "Rafter length = (horizontal run + overhang) x sqrt(P^2 + 144)/12; no ridge or plumb-cut allowance. Birdsmouth depth limited to 1/3 rafter depth per IRC 2021 §R802.5.",
-    edition: IRC_2021 + " §R802.5.",
+    formula: "Rafter length = (horizontal run + overhang) x sqrt(P^2 + 144)/12; no ridge or plumb-cut allowance. Birdsmouth (seat-cut) depth: IRC R802.7.1 applies the R502.8.1 notch limits, so a notch at the bearing end may not exceed 1/4 of the rafter depth (R802.7.1.1 allows a deeper notch on a cantilevered tail that keeps 3-1/2 in); the 1/3 often quoted is a rule of thumb, not the IRC, and this tile computes length only.",
+    edition: IRC_2024 + " §R802.4 (rafters) and §R802.7.1 (notching), unchanged from 2021. Until 2026-10-17 this cited R802.5, which is ceiling joists.",
     freeAccess: ICC_FREE,
     governance: GOVERNANCE.structural,
     editionNote: IRC_DISCLOSURE,
     assumptions: [
-      { name: "Heel-cut depth limit", value: "≤ 1/3 of rafter depth", source: "IRC 2021 §R802.5" },
+      { name: "Heel-cut depth limit", value: "end notch ≤ 1/4 of rafter depth (≤ 1/3 is a rule of thumb, not the IRC)", source: "IRC 2024 §R802.7.1 / R502.8.1" },
     ],
   },
   "square-footage": {
     formula: "Area = length × width (rectangle) and triangle / circle / sector for non-rectangular plans.",
-    edition: "Classical geometry; IRC 2021 / IBC 2021 occupancy area definitions.",
+    edition: "Classical geometry; the IRC / IBC floor-area definitions by name (no code value enters the area).",
     freeAccess: ICC_FREE,
     governance: GOVERNANCE.general,
     editionNote: "Single-edition (geometry).",
@@ -4859,13 +4857,13 @@ export const CITATIONS = {
   },
   "lumber-spans": {
     formula: "Allowable simple-beam span: deflection-limited L = cbrt(384 × E × I / (5 × w × n)) (5wL⁴/384EI = L/n), w the live load when entered, else the total; strength-limited from M_allow = Fb' × S, with Fb' = Fb × C_F × C_r (C_F the size factor, 1.0 for Southern Pine; C_r = 1.15 at 24 in on center or closer). F_b and E from AWC NDS-2018 design values; deflection limit L/360 (live) or L/240 (total) per IRC §R301.7.",
-    edition: AWC_NDS + " " + IRC_2021 + " §R301.7, R502.3, R802.4.",
+    edition: AWC_NDS + " " + IRC_2024 + " §R301.7, R502.3, R802.4 (unchanged from 2021).",
     freeAccess: "AWC NDS free at awc.org/codes-standards. " + ICC_FREE,
     governance: GOVERNANCE.structural,
     editionNote: IRC_DISCLOSURE + NDS_LAG,
     assumptions: [
       { name: "Species / grade design values", value: "data/construction/lumber-properties.json keyed to species / grade", source: "AWC NDS / lumber-grading agency" },
-      { name: "Default deflection limit", value: "L/360 live, L/240 total", source: "IRC 2021 §R301.7" },
+      { name: "Default deflection limit", value: "L/360 live, L/240 total", source: "IRC 2024 §R301.7 (unchanged from 2021)" },
     ],
   },
   "fastener-pullout": {
@@ -4903,12 +4901,12 @@ export const CITATIONS = {
     edition: IRC_2024 + " §R318.7 [R311.7 in IRC 2021].",
     freeAccess: ICC_FREE,
     governance: GOVERNANCE.structural,
-    editionNote: IRC_CHECKED_DISCLOSURE + IRC_CH3_2024,
+    editionNote: IRC_DISCLOSURE + IRC_CH3_2024,
     assumptions: [],
   },
   "joist-deflection": {
     formula: "Mid-span deflection Δ = 5 × w × L⁴ / (384 × E × I) for uniformly loaded simple span. E and I are entered (take them from the AWC NDS Supplement design values and section properties for the species, grade and size).",
-    edition: AWC_NDS + " " + IRC_2021 + " §R301.7.",
+    edition: AWC_NDS + " " + IRC_2024 + " §R301.7 (Table R301.7 unchanged from 2021).",
     freeAccess: "Free at awc.org. " + ICC_FREE,
     governance: GOVERNANCE.structural,
     editionNote: IRC_DISCLOSURE + NDS_LAG,
@@ -4931,9 +4929,9 @@ export const CITATIONS = {
     edition: IRC_2024 + " §R602.7 (headers). " + AWC_NDS + " reference design values, load-duration C_D and size factor C_F.",
     freeAccess: ICC_FREE + " AWC NDS free at awc.org.",
     governance: GOVERNANCE.structural,
-    editionNote: IRC_CHECKED_DISCLOSURE + NDS_LAG + IRC_DECK_2024,
+    editionNote: IRC_DISCLOSURE + NDS_LAG + IRC_DECK_2024,
     assumptions: [
-      { name: "Load assembly", value: "roof = max(ground snow, 20 psf roof live) + 15 psf dead; each floor above = 40 psf live + 10 psf dead", source: "IRC 2021 typical residential" },
+      { name: "Load assembly", value: "roof = max(ground snow, 20 psf roof live) + 15 psf dead; each floor above = 40 psf live + 10 psf dead", source: "IRC 2024 Tables R301.5 / R301.6 live loads (unchanged from 2021); dead loads typical" },
       { name: "Load-duration factor C_D", value: "1.15 snow (roof-only) / 1.0 occupancy (floors above)", source: "AWC NDS-2018 Table 2.3.2" },
       { name: "Cross-check", value: "allowable spans verified against IRC Table R602.7(1) by physics; discrepancies flagged", source: "IRC 2024 Table R602.7(1) (same number as 2021)" },
     ],
@@ -4976,9 +4974,9 @@ export const CITATIONS = {
     edition: IRC_2024 + " §R507 (decks). " + AWC_NDS + " reference values; IRC Table R507.9.1.3(1) ledger fasteners.",
     freeAccess: ICC_FREE + " AWC NDS free at awc.org.",
     governance: GOVERNANCE.structural,
-    editionNote: IRC_CHECKED_DISCLOSURE + NDS_LAG + IRC_DECK_2024,
+    editionNote: IRC_DISCLOSURE + NDS_LAG + IRC_DECK_2024,
     assumptions: [
-      { name: "Deck loads", value: "40 psf live + 10 psf dead per IRC R507 default", source: "IRC 2021 §R507" },
+      { name: "Deck loads", value: "40 psf live + 10 psf dead per IRC R507 default", source: "IRC 2024 §R507 (unchanged from 2021)" },
       { name: "Column stability", value: "pinned-pinned (K_e = 1), c = 0.8 for sawn lumber, E_min and F_c for the 4x4 from NDS Supplement Table 4A/4B No.2 dimension lumber and for the 6x6 from Table 4D No.2 Posts and Timbers (5x5 and larger)", source: "AWC NDS-2018" },
       { name: "Ledger schedule", value: "1/2 in lag / approved fastener spacing by joist span, attached decks only", source: "IRC 2024 Table R507.9.1.3(1) (identical in 2021)" },
     ],
@@ -5079,7 +5077,7 @@ export const CITATIONS = {
   },
   "roofing-squares": {
     formula: "Squares = roof_area / 100 ft² + pitch-based waste factor; bundles = squares × bundles_per_square (typically 3 for 3-tab, 3-4 for architectural). Underlayment + drip edge from linear quantities.",
-    edition: "ARMA (Asphalt Roofing Manufacturers Association) Residential Asphalt Roofing Manual by name. " + IRC_2021 + " §R905.",
+    edition: "ARMA (Asphalt Roofing Manufacturers Association) Residential Asphalt Roofing Manual by name. " + IRC_2024 + " §R905 (unchanged from 2021).",
     freeAccess: "ARMA manuals free at asphaltroofing.org. " + ICC_FREE,
     governance: GOVERNANCE.general,
     editionNote: IRC_DISCLOSURE,
@@ -14193,15 +14191,15 @@ export const CITATIONS = {
     ],
   },
   "crawl-space-ventilation": {
-    formula: "required net free area = under-floor area / ratio, with ratio = the base denominator (IRC 150) or 1500 when an approved Class I vapor retarder covers the ground and the openings are placed for cross ventilation; sq in = sq ft x 144; vents by area = ceil(required sq in / net free area per vent); vents required = max(vents by area, corner count).",
+    formula: "required net free area = under-floor area / ratio, with ratio = the base denominator (IRC 150) or 1500 when an approved Class I vapor retarder covers the ground (R408.2 exception 1); with the retarder, openings placed for cross ventilation lift the corner rule (exception 2), leaving at least two openings; sq in = sq ft x 144; vents by area = ceil(required sq in / net free area per vent); vents required = max(vents by area, corner count).",
     edition: "IRC R408.1 / R408.2, under-floor space ventilation. Washington\'s adopted WAC 51-51-0408 amends the base ratio to 1/300, which is why the base denominator is an editable input here rather than a fixed 150.",
     freeAccess: "The ratio, the 1/1500 exception, the corner rule, and the permitted opening coverings are short prescriptive provisions reproduced in state adoptions and building-department handouts; the 1/1500 exception language and the covering list were read from Washington\'s adopted text. No table is reproduced.",
     governance: GOVERNANCE.general,
-    editionNote: "The vapor retarder is the whole story. Going from 1/150 to 1/1500 is a TEN-fold reduction in required opening area, and it is available for the price of covering the ground - which is where nearly all of a crawl space\'s moisture comes from in the first place. A 1,500 sq ft crawl space needs 1,440 sq in and 29 typical vents bare, and 144 sq in and four vents with the retarder, at which point the CORNER rule governs rather than the area: the code wants an opening within 3 ft of each corner regardless of how little area the ratio asks for, so a small or well-sealed crawl space is set by its corners. Both conditions of the exception have to be met - an approved Class I vapor retarder over the ground AND openings placed to provide cross ventilation - not just the plastic. Two further cautions. First, the areas are NET FREE area: a vent\'s mesh, louver, and frame consume a large share of the rough opening, and only the net free area printed on the product counts, so sizing off the hole overstates the ventilation. The code\'s permitted coverings carry minimum sizes of their own (hardware cloth of 0.035 in wire or heavier, corrosion-resistant wire mesh no finer than 1/8 in, and the listed perforated and expanded metal thicknesses), because finer mesh clogs and stops ventilating. Second, the base ratio is genuinely not universal - the base IRC says 1/150 and Washington says 1/300 - so it is an input and the note says to check the adopted code rather than trust a remembered number. An unvented, conditioned crawl space built to R408.3 (continuous sealed Class I vapor retarder lapped 6 in and carried up the stem wall, with conditioned air or a dehumidifier) is a different and often better assembly, and this tile does not size it. A screen; the adopted code and the AHJ govern.",
+    editionNote: "The vapor retarder is the whole story. Going from 1/150 to 1/1500 is a TEN-fold reduction in required opening area, and it is available for the price of covering the ground - which is where nearly all of a crawl space\'s moisture comes from in the first place. A 1,500 sq ft crawl space needs 1,440 sq in and 29 typical vents bare, and 144 sq in and four vents with the retarder, at which point the CORNER rule governs rather than the area: the code wants an opening within 3 ft of each corner regardless of how little area the ratio asks for, so a small or well-sealed crawl space is set by its corners. The 1/1500 reduction needs only the approved Class I vapor retarder over the ground (R408.2 exception 1); cross ventilation is a separate exception that, with the retarder, lifts the opening-within-3-ft-of-each-corner rule (exception 2). Read in the IRC 2021 and 2024 printings on 2026-10-17, which read alike; until that date this note said the reduction needed both conditions and the tile always required a vent per corner. Two further cautions. First, the areas are NET FREE area: a vent\'s mesh, louver, and frame consume a large share of the rough opening, and only the net free area printed on the product counts, so sizing off the hole overstates the ventilation. The code\'s permitted coverings carry minimum sizes of their own (hardware cloth of 0.035 in wire or heavier, corrosion-resistant wire mesh no finer than 1/8 in, and the listed perforated and expanded metal thicknesses), because finer mesh clogs and stops ventilating. Second, the base ratio is genuinely not universal - the base IRC says 1/150 and Washington says 1/300 - so it is an input and the note says to check the adopted code rather than trust a remembered number. An unvented, conditioned crawl space built to R408.3 (continuous sealed Class I vapor retarder lapped 6 in and carried up the stem wall, with conditioned air or a dehumidifier) is a different and often better assembly, and this tile does not size it. A screen; the adopted code and the AHJ govern.",
     assumptions: [
-      { name: "Base ratio", value: "1 sq ft per 150 sq ft of under-floor area; editable, as jurisdictions amend it", source: "IRC R408.1; WAC 51-51-0408 uses 1/300" },
-      { name: "Vapor-retarder reduction", value: "1/1500, requiring BOTH an approved Class I retarder and cross ventilation", source: "IRC R408.1 exception" },
-      { name: "Corner rule", value: "an opening within 3 ft of each corner, a floor on the vent count", source: "IRC R408.1 / R408.2" },
+      { name: "Base ratio", value: "1 sq ft per 150 sq ft of under-floor area; editable, as jurisdictions amend it", source: "IRC 2024 R408.2 (unchanged from 2021); WAC 51-51-0408 uses 1/300" },
+      { name: "Vapor-retarder reduction", value: "1/1500 where an approved Class I vapor retarder covers the ground", source: "IRC 2024 R408.2 exception 1" },
+      { name: "Corner rule", value: "an opening within 3 ft of each corner, a floor on the vent count, waived with the retarder when the openings cross-ventilate (then at least two)", source: "IRC 2024 R408.2 and exception 2" },
       { name: "Net free area", value: "product data off the vent, much less than the rough opening", source: "stated scope limit" },
       { name: "Covering minimums", value: "hardware cloth 0.035 in wire or heavier; wire mesh no finer than 1/8 in", source: "code list of permitted coverings" },
       { name: "Unvented alternative", value: "R408.3 conditioned crawl space is a different assembly, not sized here", source: "stated scope limit" },
@@ -16730,12 +16728,12 @@ export const CITATIONS = {
   },
   "ice-barrier-coverage": {
     formula: "slope_factor = sqrt(pitch_rise^2 + 144) / 12; coverage_in = (overhang_in + 24) x slope_factor; courses = coverage_in <= roll_width_in ? 1 : 1 + ceil((coverage_in - roll_width_in) / (roll_width_in - side_lap_in)); roll_lf = courses x eave_length_ft; rolls = ceil(roll_lf / roll_len_ft).",
-    edition: "IRC R905.1.2 (the ice-barrier extent: from the eave to 24 in inside the exterior wall line) and ASTM D1970 (self-adhering polymer-modified membrane), by name; the coverage-and-roll relations are first-principles geometry.",
+    edition: "IRC R905.1.2 (the ice-barrier extent: from the eave to 24 in inside the exterior wall line, and at least 36 in along the slope from the eave on a roof of 8:12 or steeper) and ASTM D1970 (self-adhering polymer-modified membrane), by name; the coverage-and-roll relations are first-principles geometry.",
     freeAccess: "The ice-barrier extent is stated in the published IRC R905.1.2; the slope-factor and roll relations are public roofing-takeoff arithmetic. The membrane standard is ASTM D1970.",
     governance: GOVERNANCE.general,
-    editionNote: "IRC R905.1.2 sets the ice-barrier extent (from the lowest roof edge to 24 in inside the exterior wall line, measured up the slope); ASTM D1970 is the self-adhering polymer-modified membrane standard. The ice barrier is required only where the AHJ has adopted it (a history of ice forming at the eaves); the 24 in is measured to the inside of the exterior wall line; valley and low-slope-transition coverage is a separate manual add. A material takeoff, not an installation detail.",
+    editionNote: "IRC R905.1.2 sets the ice-barrier extent (from the lowest roof edge to 24 in inside the exterior wall line, measured up the slope, and on a roof of 8:12 or steeper not less than 36 in along the slope from the eave edge); ASTM D1970 is the self-adhering polymer-modified membrane standard. The ice barrier is required only where the AHJ has adopted it (a history of ice forming at the eaves); the 24 in is measured to the inside of the exterior wall line; valley and low-slope-transition coverage is a separate manual add. Read in the IRC 2021 and 2024 printings on 2026-10-17, which read alike; until that date the tile omitted the 36 in steep-roof minimum, so an 8:12 roof with no overhang got 28.8 in. A material takeoff, not an installation detail.",
     assumptions: [
-      { name: "Coverage extent", value: "coverage = (overhang + 24 in) measured up the slope: the slope factor sqrt(rise^2 + 144)/12 converts the horizontal run to the on-slope distance", source: "IRC R905.1.2" },
+      { name: "Coverage extent", value: "coverage = (overhang + 24 in) measured up the slope, and at least 36 in on 8:12 or steeper: the slope factor sqrt(rise^2 + 144)/12 converts the horizontal run to the on-slope distance", source: "IRC R905.1.2" },
       { name: "Courses", value: "the first roll covers one roll width; each later course nets (roll width - side lap), so courses = 1 + ceil((coverage - roll width) / (roll width - side lap)) once coverage exceeds one width", source: "first principles" },
       { name: "Rolls", value: "roll_lf = courses x eave length; rolls = ceil(roll_lf / roll length); the roll dimensions are the product's stated size", source: "first principles" },
     ],

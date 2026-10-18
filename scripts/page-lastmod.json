@@ -10,7 +10,7 @@
       "date": "2026-10-18"
     },
     "/errata/": {
-      "sha": "40b9088a8037a271",
+      "sha": "76fcd0fe22c54b7c",
       "date": "2026-10-18"
     },
     "/collections/disaster-response/": {
@@ -1942,8 +1942,8 @@
       "date": "2026-10-17"
     },
     "/tools/crawl-space-ventilation/": {
-      "sha": "a6f5f53091041a8f",
-      "date": "2026-10-17"
+      "sha": "339a3229d1cd22ba",
+      "date": "2026-10-18"
     },
     "/tools/critical-load-shed-tiers/": {
       "sha": "a924da46a27f9e94",
@@ -2114,7 +2114,7 @@
       "date": "2026-10-17"
     },
     "/tools/deck-beam-post/": {
-      "sha": "17077575c65068fc",
+      "sha": "a6ab20ff1421ec9e",
       "date": "2026-10-18"
     },
     "/tools/deck-board-takeoff/": {
@@ -3738,7 +3738,7 @@
       "date": "2026-10-17"
     },
     "/tools/header-sizing/": {
-      "sha": "15f7e6a5a8761133",
+      "sha": "ecd9f5093f69295a",
       "date": "2026-10-18"
     },
     "/tools/hearing-protector-nrr/": {
@@ -3986,8 +3986,8 @@
       "date": "2026-10-17"
     },
     "/tools/ice-barrier-coverage/": {
-      "sha": "0b12b5478e681214",
-      "date": "2026-10-17"
+      "sha": "fcc7fa18be466392",
+      "date": "2026-10-18"
     },
     "/tools/ice-machine-sizing/": {
       "sha": "035e0b0cad435827",
@@ -4142,8 +4142,8 @@
       "date": "2026-10-18"
     },
     "/tools/joist-deflection/": {
-      "sha": "3fdddac47383be8e",
-      "date": "2026-10-17"
+      "sha": "5adc16dd76830e9b",
+      "date": "2026-10-18"
     },
     "/tools/joist-hanger-count/": {
       "sha": "079ef22b1afe5d75",
@@ -4486,8 +4486,8 @@
       "date": "2026-10-17"
     },
     "/tools/lumber-spans/": {
-      "sha": "c06775eee9fb37ff",
-      "date": "2026-10-17"
+      "sha": "c50db996648fc1ab",
+      "date": "2026-10-18"
     },
     "/tools/lumen-method/": {
       "sha": "63ae48d2eae021f3",
@@ -5578,8 +5578,8 @@
       "date": "2026-10-17"
     },
     "/tools/plywood-span/": {
-      "sha": "8853e45330fd02f9",
-      "date": "2026-10-17"
+      "sha": "21f89bb71b131439",
+      "date": "2026-10-18"
     },
     "/tools/pmi-cancellation-date/": {
       "sha": "09e4d305000094fe",
@@ -6070,8 +6070,8 @@
       "date": "2026-10-17"
     },
     "/tools/rafter/": {
-      "sha": "496797be0cd6a5d4",
-      "date": "2026-10-17"
+      "sha": "ba61d9083244ed38",
+      "date": "2026-10-18"
     },
     "/tools/rail-wear-condemning-limit/": {
       "sha": "826b967940da85c1",
@@ -6402,8 +6402,8 @@
       "date": "2026-10-17"
     },
     "/tools/residential-framing/": {
-      "sha": "95c078d77914b86f",
-      "date": "2026-10-17"
+      "sha": "2c84a66c26decaad",
+      "date": "2026-10-18"
     },
     "/tools/respirator-cartridge-life/": {
       "sha": "7cfa38a047f8e84f",
@@ -6542,8 +6542,8 @@
       "date": "2026-10-17"
     },
     "/tools/roof-pitch/": {
-      "sha": "5ff228e4f0325c3a",
-      "date": "2026-10-17"
+      "sha": "75b8e7d87718385a",
+      "date": "2026-10-18"
     },
     "/tools/roof-snow-ice-weight/": {
       "sha": "ca3c2dcf8487b2b5",
@@ -6554,8 +6554,8 @@
       "date": "2026-10-17"
     },
     "/tools/roofing-squares/": {
-      "sha": "07938caf30677d2f",
-      "date": "2026-10-17"
+      "sha": "f65d17c92cf853e3",
+      "date": "2026-10-18"
     },
     "/tools/rooftop-curb-uplift/": {
       "sha": "d015bbf3640d2e79",
@@ -7534,8 +7534,8 @@
       "date": "2026-10-17"
     },
     "/tools/square-footage/": {
-      "sha": "c873bbec866bfe01",
-      "date": "2026-10-17"
+      "sha": "aed0488ece15934e",
+      "date": "2026-10-18"
     },
     "/tools/square-to-round-development/": {
       "sha": "d72e56980d97313f",
@@ -7586,8 +7586,8 @@
       "date": "2026-10-17"
     },
     "/tools/stair-stringer-layout/": {
-      "sha": "cfd0f3e322750628",
-      "date": "2026-10-17"
+      "sha": "c326840d6ac7cda0",
+      "date": "2026-10-18"
     },
     "/tools/stairs/": {
       "sha": "5caba7d28e51f1b4",
