@@ -180,6 +180,8 @@ async function main() {
   }
 
   // Future-proof: data/legal/* per-entry verifiedOn check.
+  // Shards whose page prints "Not verified" for a row with verified_on null.
+  const UNVERIFIED_LABELED = new Set(["code-adoption.json"]);
   const legalDir = resolve(DATA, "legal");
   if (existsSync(legalDir)) {
     const files = await readdir(legalDir);
@@ -198,6 +200,10 @@ async function main() {
         const rowStamps = [];
         for (const [k, entry] of Object.entries(rows)) {
           if (!entry || typeof entry !== "object" || Array.isArray(entry)) continue;
+          // code-adoption.json ships unsigned NEC rows on purpose (maintainer
+          // decision 2026-10-18) and the page labels each one "Not verified";
+          // such a row says so with an explicit null, never a guessed date.
+          if (UNVERIFIED_LABELED.has(f) && entry.verified_on === null && entry.verified_by === null) continue;
           if (!isIsoDate(entry.verified_on)) {
             errors.push(
               "data/legal/" + f + " " + mapKey + "." + k + " is missing a per-entry 'verified_on' " +

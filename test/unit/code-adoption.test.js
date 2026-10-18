@@ -49,16 +49,23 @@ test("each rule is seeded red", () => {
   assert.ok(validateRows(late, TODAY).warnings.some((w) => /GA: verified 138 days ago, past its 92-day recheck/.test(w)), "one recheck late warns");
 });
 
-test("the shipped shard carries the signed rows only, and matches the rows file", () => {
+// User decision 2026-10-18: every drafted row ships, unsigned ones labeled
+// "not verified" on the page, in place of withholding them until signed.
+test("the shipped shard carries every row with its review flag, and matches the rows file", () => {
   const doc = loadRows();
   const shard = JSON.parse(readFileSync(resolve(ROOT, "data/legal/code-adoption.json"), "utf8"));
   assert.deepEqual(shard, buildCodeAdoptionShard(doc, shard.fetched));
   assert.equal(Object.keys(shard.names).length, 51);
+  assert.equal(Object.keys(shard.by_state).filter((k) => k !== "verifiedOn").length, 51);
+  const flagged = (f) => Object.keys(shard.by_state).filter((k) => shard.by_state[k].review === f).sort();
+  assert.deepEqual(flagged("conflict"), ["MD", "NV"]);
+  assert.deepEqual(flagged("secondary"), ["AZ", "MO", "MS"]);
+  assert.equal(shard.by_state.GA.verified_on, null);
   const signed = clone(doc);
   Object.assign(signed.rows.GA, { verified_by: "me", verified_on: TODAY });
   const built = buildCodeAdoptionShard(signed, TODAY);
-  assert.deepEqual(Object.keys(built.by_state), ["GA", "verifiedOn"]);
   assert.equal(built.by_state.verifiedOn, TODAY);
+  assert.equal(built.by_state.GA.verified_by, "me");
   for (const f of ["draft_note", "nfpa_2026_08_03", "citation_primary"]) assert.ok(!(f in built.by_state.GA), f + " must not ship");
 });
 
@@ -73,19 +80,28 @@ test("the edition in force is resolved as of the day, scope by scope", () => {
   assert.equal(on("NC", TODAY), "other-than-one-two-family:2020,one-two-family:2017");
 });
 
-test("an unsigned, missing or stale row never shows an edition", () => {
-  const { rows } = loadRows();
-  const ga = { ...rows.GA, verified_by: "me", verified_on: "2026-10-01" };
+test("a signed row reads as verified; unsigned and stale rows say Not verified; missing and conflicting rows show no edition", () => {
+  const doc = loadRows();
+  const { rows } = doc;
+  const shard = buildCodeAdoptionShard(doc, TODAY).by_state;
+  const ga = { ...shard.GA, verified_by: "me", verified_on: "2026-10-01" };
   const shown = adoptionLine("Georgia", ga, "2023", TODAY, 92);
   assert.equal(shown.verified, true);
   assert.equal(shown.text, "Georgia enforces NEC 2023 (since Jan 1, 2025). This calculator follows NEC 2023.");
   assert.equal(shown.source.href, ga.source_url);
-  for (const [why, row, day] of [["unsigned", rows.GA, TODAY], ["missing", undefined, TODAY], ["stale", ga, "2027-01-02"]]) {
-    const r = adoptionLine("Georgia", row, "2023", day, 92);
+  const unsigned = adoptionLine("Georgia", shard.GA, "2023", TODAY, 92);
+  assert.equal(unsigned.verified, false);
+  assert.match(unsigned.text, /^Not verified \(drafted from the state's own rule and not yet checked by a person\): Georgia enforces NEC 2023/);
+  assert.match(unsigned.text, /electrical inspector can tell you which edition applies\.$/);
+  const stale = adoptionLine("Georgia", ga, "2023", "2027-01-02", 92);
+  assert.match(stale.text, /^Not verified \(past its quarterly recheck\)/);
+  assert.match(adoptionLine("Arizona", shard.AZ, null, TODAY, 92).text, /^Not verified \(drafted from secondary sources/);
+  for (const [why, row] of [["missing", undefined], ["conflict", shard.MD]]) {
+    const r = adoptionLine("Maryland", row, "2023", TODAY, 92);
     assert.equal(r.verified, false, why);
     assert.ok(!/NEC 20\d\d/.test(r.text), why + " row printed an edition: " + r.text);
-    assert.equal(r.source, undefined, why);
   }
+  assert.ok(rows.MD.draft_note.includes("SOURCES CONFLICT"));
   assert.equal(isFresh(ga, "2027-01-01", 92), true);
   assert.equal(isFresh(ga, "2027-01-02", 92), false);
 });
@@ -112,15 +128,20 @@ test("which tiles get the row, and the edition each follows", async () => {
   assert.equal(citesNec("NFPA 70E-2024"), false);
 });
 
-test("no picker appears until a row is signed", async () => {
-  const made = [];
-  globalThis.document = { createElement: () => { const el = { children: [], appendChild(c) { this.children.push(c); } }; made.push(el); return el; } };
+test("the picker appears with no row signed, and lists all 51 jurisdictions", async () => {
+  const el = () => ({ children: [], attrs: {}, value: "", textContent: "", appendChild(c) { this.children.push(c); }, setAttribute(k, v) { this.attrs[k] = v; }, addEventListener() {} });
+  globalThis.document = { createElement: el, createTextNode: (t) => ({ text: t }) };
   try {
-    const block = { querySelector: () => null };
+    const dl = el();
+    const block = { querySelector: (q) => (q === ".v6-reference-list" ? dl : null) };
     const entry = { edition: "NEC 2023 (NFPA 70)." };
     const shard = buildCodeAdoptionShard(loadRows(), TODAY);
-    assert.equal(await mountStatePicker(block, entry, shard), null);
-    assert.equal(made.length, 0, "nothing is built when no row is signed");
+    const row = await mountStatePicker(block, entry, shard);
+    assert.ok(row, "a picker is built from unsigned rows");
+    assert.equal(dl.children.length, 1);
+    const select = row.children[1].children[0];
+    assert.equal(select.children.length, 52, "a blank option plus 51 jurisdictions");
+    assert.equal(await mountStatePicker(block, { edition: "NFPA 72" }, shard), null, "a tile that does not cite the NEC gets nothing");
   } finally {
     delete globalThis.document;
   }

@@ -584,8 +584,8 @@ A standard the tiles cite but no shard holds data from has no manifest to appear
 ### data/legal/code-adoption.json (spec-v1968)
 
 - Source: each state's own statute or administrative rule adopting NFPA 70 (NEC), one citation per row. NFPA's NEC enforcement map is stored beside each draft row as a cross-check only, never as the source.
-- Rows are drafted in [code-adoption-rows.json](code-adoption-rows.json) (all 50 states and DC). Only rows a maintainer has signed off (`verified_by`, `verified_on`) ship in the shard; as of 2026-10-17, 0 of 51 are signed. Sign from [code-adoption-signoff.md](code-adoption-signoff.md), then run `node scripts/check-code-adoption.mjs --write`.
-- Cadence: quarterly, 92 days per row. A signed row past its recheck is withheld from the page, a warning in lint, and an error at two rechecks late. These rows are kept out of the legal folder's nexus-worded `staleness_note` (`NOTE_EXCLUDED_SHARDS`); `check-code-adoption` checks each one instead.
+- Rows are drafted in [code-adoption-rows.json](code-adoption-rows.json) (all 50 states and DC). Every row ships (since 2026-10-18); a row without `verified_by` / `verified_on` is shown labeled "not verified", and a row whose sources conflict (`review: "conflict"`, MD and NV) shows no edition. As of 2026-10-18, 0 of 51 are signed. Sign from [code-adoption-signoff.md](code-adoption-signoff.md), then run `node scripts/check-code-adoption.mjs --write`.
+- Cadence: quarterly, 92 days per row. A signed row past its recheck reads as not verified on the page, a warning in lint, and an error at two rechecks late. These rows are kept out of the legal folder's nexus-worded `staleness_note` (`NOTE_EXCLUDED_SHARDS`); `check-code-adoption` checks each one instead.
 - License: state and federal government publications, public domain; no code text is reproduced, only edition years, dates and citations.
 
 ### data/lab/*.json (v5, utilities 255-264)

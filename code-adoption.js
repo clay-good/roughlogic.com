@@ -5,12 +5,12 @@
 // next to the edition the tile follows. The state is kept in one localStorage
 // key (`rl-state`), written only when the reader picks one; nothing is sent.
 //
-// Telling an electrician the wrong enforced edition is worse than saying
-// nothing, so this shows ONLY rows a maintainer has signed off (they are the
-// only rows data/legal/code-adoption.json carries; scripts/code-adoption.mjs
-// builds it from docs/code-adoption-rows.json) and withholds a signed row once
-// it is older than its recheck cadence. Until at least one row is signed, the
-// picker does not appear at all.
+// Every drafted row ships (scripts/code-adoption.mjs builds
+// data/legal/code-adoption.json from docs/code-adoption-rows.json). A row a
+// maintainer has signed within its recheck cadence reads as verified; any other
+// row is shown with a plain "not verified" label and the advice to confirm with
+// the inspector, and a row whose sources conflict shows no edition at all
+// (user decision 2026-10-18; until then unsigned rows were withheld).
 //
 // The functions above mountStatePicker are pure, so test/unit/code-adoption
 // runs them without a DOM.
@@ -80,16 +80,30 @@ function editionPhrase(e) {
   return "NEC " + e.edition + (scope ? " for " + scope : "") + (e.effective ? " (since " + prettyDate(e.effective) + ")" : "");
 }
 
-// The sentence the row shows for one state, or a plain "not verified" sentence.
-// Returns { text, verified, source?: { text, href } }. A row that is unsigned,
-// missing, or past its cadence never yields an edition.
+const INSPECTOR = " Your state or local electrical inspector can tell you which edition applies.";
+
+// The sentence the row shows for one state. Returns { text, verified,
+// source?: { text, href } }. A signed row within its recheck cadence is
+// verified; an unsigned or past-recheck row is shown labeled "not verified";
+// a missing row or one whose sources conflict never yields an edition.
 export function adoptionLine(name, row, tileEdition, today, cadenceDays) {
   if (!row) {
-    return { verified: false, text: name + "'s NEC adoption has not been verified here yet, so no edition is shown. Your state or local electrical inspector can tell you which edition applies." };
+    return { verified: false, text: name + "'s NEC adoption has not been drafted here yet, so no edition is shown." + INSPECTOR };
   }
-  if (!isFresh(row, today, cadenceDays)) {
-    return { verified: false, text: name + "'s NEC adoption is past its quarterly recheck, so it is not shown until it is verified again. Your state or local electrical inspector can tell you which edition applies." };
+  const fresh = isFresh(row, today, cadenceDays);
+  if (!fresh && row.review === "conflict") {
+    return { verified: false, source: { text: row.citation, href: row.source_url },
+      text: "Not verified: the sources we found disagree about which NEC edition " + name + " enforces, so none is shown." + INSPECTOR };
   }
+  const line = verifiedLine(name, row, tileEdition, today);
+  if (fresh) return line;
+  const why = row.verified_on ? "past its quarterly recheck"
+    : row.review === "secondary" ? "drafted from secondary sources, since there is no state rule to cite, and not yet checked by a person"
+    : "drafted from the state's own rule and not yet checked by a person";
+  return { verified: false, source: line.source, text: "Not verified (" + why + "): " + line.text + INSPECTOR };
+}
+
+function verifiedLine(name, row, tileEdition, today) {
   const tile = tileEdition
     ? " This calculator follows NEC " + tileEdition + "."
     : " This calculator cites NEC sections by name; check them against that edition.";
@@ -127,13 +141,13 @@ function loadShard() {
 }
 
 // Adds the "Your state" row under the reference block's "Source and edition"
-// row. Does nothing when the tile does not cite the NEC or no row is signed.
+// row. Does nothing when the tile does not cite the NEC or the shard has no rows.
 export async function mountStatePicker(block, entry, shard) {
   if (!block || !entry || !citesNec(entry.edition)) return null;
   const data = shard || (await loadShard());
   const rows = (data && data.by_state) || {};
-  const signed = Object.keys(rows).filter((k) => k !== "verifiedOn");
-  if (!data || !data.names || signed.length === 0) return null;
+  const drafted = Object.keys(rows).filter((k) => k !== "verifiedOn");
+  if (!data || !data.names || drafted.length === 0) return null;
 
   const row = document.createElement("div");
   row.className = "v6-reference-row v6-reference-row-state";

@@ -88,5 +88,6 @@ if (errors.length) {
   console.error("check-code-adoption: " + errors.length + " problem(s):\n  " + errors.join("\n  "));
   process.exit(1);
 }
-const signed = Object.keys(shard.by_state).filter((k) => k !== "verifiedOn").length;
-console.log("check-code-adoption OK: " + Object.keys(doc.rows).length + " jurisdictions drafted, each cited; " + signed + " signed off and shipped; the shard matches the rows.");
+const shipped = Object.keys(shard.by_state).filter((k) => k !== "verifiedOn");
+const signed = shipped.filter((k) => shard.by_state[k].verified_on).length;
+console.log("check-code-adoption OK: " + Object.keys(doc.rows).length + " jurisdictions drafted, each cited; " + shipped.length + " shipped, " + signed + " signed off (the rest show as not verified); the shard matches the rows.");
