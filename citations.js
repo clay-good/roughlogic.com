@@ -93,16 +93,14 @@ const ACCA_DISCLOSURE = "Editions available: ACCA Manual J 8th ed. is the curren
 const IMC_2021 = "IMC 2021 (International Mechanical Code).";
 
 // Plumbing / gas common phrasing (Group B audit, priority 2 per spec §6).
-const IPC_2021 = "IPC 2021 (International Plumbing Code).";
 const IPC_2027 = "IPC 2027 (International Plumbing Code).";
 const IFGC_2027 = "IFGC 2027 (International Fuel Gas Code) / NFPA 54.";
 const IFGC_CHECKED = " Checked against the IFGC 2027 printing on 2026-10-17: Sections 304.5 / 304.5.3 / 304.6 (50 ft^3 per 1,000 Btu/h; 1 in^2 per 1,000 Btu/h indoor, 100 in^2 minimum; 1 in^2 per 4,000 / 2,000 / 3,000 Btu/h outdoor), 402.2, Equation 4-1 and the Table 402.4 Cr factors (0.6094 natural gas, 1.2462 propane), 406.4.1 (1.5 x working pressure, 3 psig minimum), 406.4.2 (10 minutes minimum) and 411.1.3.1 (6 ft connectors) are unchanged from 2021, with the same section numbers.";
 const ICC_FREE = "Free read-only access at codes.iccsafe.org.";
 const NFPA54_FREE = "Free read-only access at nfpa.org/freeaccess.";
-const IPC_DISCLOSURE = "Editions available: bundled values follow IPC 2021. IPC 2027 is the current published edition and 2024 preceded it; jurisdictions on IPC 2018, 2021, 2024 or 2027 differ in fixture-unit values and vent-sizing tables; verify the edition adopted by your AHJ. UPC-jurisdictions (CA, IN, MA, NV, parts of NJ) use the Uniform Plumbing Code instead.";
+// Every tile that bundles an IPC value was read against IPC 2027 on 2026-10-17.
+const IPC_DISCLOSURE = "Editions available: bundled values follow IPC 2027. IPC 2027 is the current published edition, and the values this tile uses were read against it on 2026-10-17 (see below); unless noted they are identical in IPC 2021 and 2024. UPC jurisdictions (CA, IN, MA, NV, parts of NJ) use the Uniform Plumbing Code instead; verify the edition adopted by your AHJ.";
 const IFGC_DISCLOSURE = "Editions available: bundled values follow IFGC 2027. IFGC 2027 is the current published edition, and the values this tile uses were read against it on 2026-10-17 (see below); they are identical in IFGC 2021. NFPA 54 (National Fuel Gas Code) carries the same requirements and is cited by name; verify the edition adopted by your AHJ.";
-// For IPC tiles whose every bundled value was read against IPC 2027 (2026-10-17).
-const IPC_CHECKED_DISCLOSURE = "Editions available: bundled values follow IPC 2027. IPC 2027 is the current published edition, and the values this tile uses were read against it on 2026-10-17 (see below); unless noted they are identical in IPC 2021 and 2024. UPC jurisdictions (CA, IN, MA, NV, parts of NJ) use the Uniform Plumbing Code instead; verify the edition adopted by your AHJ.";
 
 // Group A - Electrical. Priority-1 audit per spec-v6.md §6.
 // Citations cite NEC by section number and edition only; no NEC table text
@@ -3865,10 +3863,10 @@ export const CITATIONS = {
     edition: IPC_2027 + " Tables 709.1 and 710.1(1) and Appendix E by name; Hunter's Curve (NBS BMS65).",
     freeAccess: ICC_FREE,
     governance: GOVERNANCE.plumbing,
-    editionNote: IPC_CHECKED_DISCLOSURE + IPC_DRAIN_2027,
+    editionNote: IPC_DISCLOSURE + IPC_DRAIN_2027,
     assumptions: [
-      { name: "Pressure head at most-distant fixture", value: "not checked here (IPC 604.6 sets an 8 psi minimum)", source: "IPC 2021 Section 604.6" },
-      { name: "Maximum velocity", value: "not checked here (8 fps water supply / 5 fps hot water is common practice)", source: "IPC 2021 Section 604.4" },
+      { name: "Pressure head at most-distant fixture", value: "not checked here (IPC Table 604.3 sets the flow pressure at each outlet: 8 psi for most fixtures, 20 psi for thermostatic or pressure-balancing mixing valves, more for flush valves)", source: "IPC 2027 Table 604.3 (cited as 604.6, variable street pressures, until 2026-10-17)" },
+      { name: "Maximum velocity", value: "not checked here (8 fps water supply / 5 fps hot water is common practice)", source: "engineering practice, not an IPC rule (604.4, cited here until 2026-10-17, limits fixture flow rates)" },
     ],
   },
   "friction-loss": {
@@ -3929,7 +3927,7 @@ export const CITATIONS = {
     edition: IPC_2027 + " Section 704, Table 704.1.",
     freeAccess: ICC_FREE,
     governance: GOVERNANCE.plumbing,
-    editionNote: IPC_CHECKED_DISCLOSURE + IPC_DRAIN_2027,
+    editionNote: IPC_DISCLOSURE + IPC_DRAIN_2027,
     assumptions: [
       { name: "Minimum slope rule", value: "1/4 in per ft for ≤ 2-1/2 in; 1/8 in per ft for 3 to 6 in; 1/16 in per ft for 8 in and larger", source: "IPC 2027 Table 704.1 (identical in 2021)" },
     ],
@@ -3945,11 +3943,11 @@ export const CITATIONS = {
     ],
   },
   "backflow": {
-    formula: "(reference page; no compute) Common backflow hazards mapped to typical preventer types (RP, DCV, PVB, AVB, AG) per the cross-connection categories described in IPC 2021 Section 608 / AWWA M14.",
-    edition: IPC_2021 + " Section 608. AWWA M14 by name.",
+    formula: "(reference page; no compute) Common backflow hazards mapped to typical preventer types (RP, DCV, PVB, AVB, AG) per the cross-connection categories described in IPC 2027 Section 608 / AWWA M14.",
+    edition: IPC_2027 + " Section 608. AWWA M14 by name.",
     freeAccess: ICC_FREE + " AWWA M14 licensed; cross-connection program guides free at most state primacy agency sites.",
     governance: GOVERNANCE.plumbing,
-    editionNote: IPC_DISCLOSURE,
+    editionNote: IPC_DISCLOSURE + " Read against the IPC 2027 and 2021 printings on 2026-10-17: Section 608 and the hazard-to-device mapping of Table 608.1 are unchanged; 2027 widens two size ranges (double check from 1/4 in, double check detector from 1 in) that this page does not list.",
     assumptions: [],
   },
   "water-hammer-arrestor": {
@@ -4027,7 +4025,7 @@ export const CITATIONS = {
   },
   "wh-expansion-tank": {
     formula: "expansion factor = (rho_cold − rho_hot) / rho_hot from public steam-table densities; V_expansion = heater volume × factor; V_tank = V_expansion / acceptance factor; pre-charge = incoming pressure. Recommended size = smallest standard diaphragm tank (2 / 4.4 / 8.5 / 14 / 20 gal) ≥ required volume.",
-    edition: "ASPE Plumbing Engineering Design Handbook (2nd ed.) Chapter 6; ASME B40.1 steam tables. IPC 2021 §604.8 (PRV) and §607 (thermal expansion control).",
+    edition: "ASPE Plumbing Engineering Design Handbook (2nd ed.) Chapter 6; ASME B40.1 steam tables. IPC 2027 §604.8 (PRV, 80 psi) and §607.3 (thermal expansion control), both unchanged from 2021 (read 2026-10-17).",
     freeAccess: "Free at aspe.org for table-of-contents excerpts; codes.iccsafe.org for the IPC TOC.",
     governance: GOVERNANCE.plumbing,
     editionNote: "Densities interpolated from bundled steam-table values (40-212 F). Acceptance factor defaults to 0.46 for diaphragm types; the manufacturer's value governs. AHJ governs.",
@@ -4042,7 +4040,7 @@ export const CITATIONS = {
     edition: IPC_2027 + " Section 710; DFU values per IPC Table 709.1; capacities per Tables 710.1(1) and 710.1(2).",
     freeAccess: ICC_FREE,
     governance: GOVERNANCE.plumbing,
-    editionNote: IPC_CHECKED_DISCLOSURE + IPC_DRAIN_2027,
+    editionNote: IPC_DISCLOSURE + IPC_DRAIN_2027,
     assumptions: [
       { name: "DFU values", value: "IPC Table 709.1 (private WC 3, public WC 4, lavatory 1, bath 2, shower 2, kitchen sink 2, urinal 4, floor drain 2, ...)", source: "IPC 2027 Table 709.1 (identical in 2021 except the drinking fountain, 1/2 DFU then, 0 now)" },
       { name: "Branch / stack capacity", value: "IPC Table 710.1(2) max DFU by nominal size", source: "IPC 2027 Table 710.1(2) (identical in 2021)" },
@@ -4051,14 +4049,14 @@ export const CITATIONS = {
   },
   "trap-primer": {
     formula: "primers = ceil(floor-drain count / drains-per-distribution-unit). Annual water = drains × (delivery oz per cycle / 128) × cycles per day × 365. Trap seals subject to evaporation, and emergency floor drain traps, are protected by one of the IPC 1002.4.1.1-1002.4.1.5 methods.",
-    edition: IPC_2021 + " Section 1002.4 (trap seal depth) and 1002.4.1 (trap seal protection). Manufacturer flow rates per published cut sheets (Precision Plumbing Products / Sioux Chief / Mifab).",
+    edition: IPC_2027 + " Section 1002.4 (trap seal depth) and 1002.4.1 (trap seal protection). Manufacturer flow rates per published cut sheets (Precision Plumbing Products / Sioux Chief / Mifab).",
     freeAccess: ICC_FREE,
     governance: GOVERNANCE.plumbing,
-    editionNote: "Drains-per-unit (electronic / pressure-drop / pump-discharge feed up to 4 drains via a distribution unit; manual serves 1) and delivery volume follow manufacturer cut sheets; the cut sheet governs. AHJ governs.",
+    editionNote: "Drains-per-unit (electronic / pressure-drop / pump-discharge feed up to 4 drains via a distribution unit; manual serves 1) and delivery volume follow manufacturer cut sheets; the cut sheet governs. AHJ governs. Read against the IPC 2027 and 2021 printings on 2026-10-17: 1002.4 (2 to 4 in seal) and the five 1002.4.1.1-1002.4.1.5 protection methods are unchanged.",
     assumptions: [
       { name: "Drains per distribution unit", value: "4 for electronic / pressure-drop / pump-discharge; 1 for manual", source: "PPP / Sioux Chief / Mifab distribution-unit cut sheets" },
       { name: "Default delivery", value: "8 fl oz per cycle, one cycle per day, unless the user enters the manufacturer value", source: "manufacturer cut-sheet typical" },
-      { name: "Protection rule", value: "an emergency floor drain trap, or any trap seal subject to evaporation, needs one of the 1002.4.1 methods (a potable-water or reclaimed-water primer valve, a wastewater-supplied primer device, an ASSE 1072 barrier device, or a lavatory or hand-sink drain connection); manual priming is not one, and the code has no mechanical-space exception", source: "IPC 2021 §1002.4.1" },
+      { name: "Protection rule", value: "an emergency floor drain trap, or any trap seal subject to evaporation, needs one of the 1002.4.1 methods (a potable-water or reclaimed-water primer valve, a wastewater-supplied primer device, an ASSE 1072 barrier device, or a lavatory or hand-sink drain connection); manual priming is not one, and the code has no mechanical-space exception", source: "IPC 2027 §1002.4.1 (unchanged from 2021)" },
     ],
   },
   "septic-tank": {
@@ -4136,7 +4134,7 @@ export const CITATIONS = {
     edition: IPC_2027 + " Section 909, Table 909.1.",
     freeAccess: ICC_FREE,
     governance: GOVERNANCE.plumbing,
-    editionNote: IPC_CHECKED_DISCLOSURE + IPC_DRAIN_2027,
+    editionNote: IPC_DISCLOSURE + IPC_DRAIN_2027,
     assumptions: [
       { name: "Trap-arm slope and fall", value: "1/4 in per ft for 2 in and smaller, 1/8 in per ft for 3 and 4 in (Table 909.1); total fall not more than 1 pipe diameter (909.2)", source: "IPC 2027 Table 909.1 / 909.2 (identical in 2021)" },
     ],
@@ -4259,31 +4257,31 @@ export const CITATIONS = {
   },
   "drainage-invert": {
     formula: "Total fall = slope x run; invert-out = invert-in - fall; top of pipe = invert-out + OD; cover = surface - top of pipe. Slope entered as in/ft or percent, normalized to ft/ft.",
-    edition: IPC_2021 + " Section 704 (drainage piping slope minimums).",
+    edition: IPC_2027 + " Section 704 (drainage piping slope minimums).",
     freeAccess: ICC_FREE,
     governance: GOVERNANCE.general,
-    editionNote: IPC_DISCLOSURE + " The minimum-cover and maximum-depth limits, the local frost depth, and the live-load bury requirement are set by the adopted code and the engineer/survey of record; the minimum cover compared against is the user-supplied governing value.",
+    editionNote: IPC_DISCLOSURE + IPC_DRAIN_2027 + " The minimum-cover and maximum-depth limits, the local frost depth, and the live-load bury requirement are set by the adopted code and the engineer/survey of record; the minimum cover compared against is the user-supplied governing value.",
     assumptions: [
       { name: "Cover datum", value: "cover measured from finished grade to the top of the pipe (invert-out + OD / 12)", source: "standard trench-section geometry" },
       { name: "Sign convention", value: "a negative cover (pipe crown above grade) is flagged, not rejected", source: "spec-v163 output contract" },
     ],
   },
   "hydrostatic-test": {
-    formula: "Test pressure: at least the working pressure for water systems (IPC 2021 Section 312.5; 1.5x is common engineering practice, not an IPC rule), and at least 1.5x the maximum working pressure but not less than 3 psig for fuel-gas systems (IFGC 2027 Section 406.4.1); recommended hold time scales with system volume.",
-    edition: IPC_2021 + " Section 312; " + IFGC_2027 + " Section 406.4.",
+    formula: "Test pressure: at least the working pressure for water systems (IPC 2027 Section 312.6 [312.5 in IPC 2021]; 1.5x is common engineering practice, not an IPC rule), and at least 1.5x the maximum working pressure but not less than 3 psig for fuel-gas systems (IFGC 2027 Section 406.4.1); recommended hold time scales with system volume.",
+    edition: IPC_2027 + " Section 312; " + IFGC_2027 + " Section 406.4.",
     freeAccess: ICC_FREE,
     governance: GOVERNANCE.plumbing,
-    editionNote: IPC_DISCLOSURE + " " + IFGC_DISCLOSURE + IFGC_CHECKED,
+    editionNote: IPC_DISCLOSURE + " " + IFGC_DISCLOSURE + IFGC_CHECKED + " Read against the IPC 2027 and 2021 printings on 2026-10-17: the water supply test (working pressure, or 50 psi air for piping other than plastic, held 15 minutes) is unchanged and moved from 312.5 to 312.6.",
     assumptions: [
-      { name: "Default hold time", value: "≥ 15 min for plumbing tests; ≥ 10 min for fuel-gas tests", source: "IPC 2021 Section 312.5 / IFGC 2027 Section 406.4.2" },
+      { name: "Default hold time", value: "≥ 15 min for plumbing tests; ≥ 10 min for fuel-gas tests", source: "IPC 2027 Section 312.6 [312.5 in 2021] / IFGC 2027 Section 406.4.2" },
     ],
   },
   "grease-trap": {
-    formula: "Volume = peak GPM × retention time × loading factor. Recommended nominal size is the next typical commercial trap size (20 to 3,000 gal). IPC 2021 Section 1003 governs interceptor selection.",
-    edition: "PDI G101 by name; " + IPC_2021 + " Section 1003.",
+    formula: "Volume = peak GPM × retention time × loading factor. Recommended nominal size is the next typical commercial trap size (20 to 3,000 gal). IPC 2027 Section 1003 governs interceptor selection, and for a gravity interceptor 1003.3.11.1 adds grease storage = meals/day x Table 1003.3.8 lb/meal x service days (at most 90) / 6.4 lb/gal to the separation volume.",
+    edition: "PDI G101 by name; " + IPC_2027 + " Section 1003 (1003.3.11.1 and Table 1003.3.8 for grease storage).",
     freeAccess: ICC_FREE + " PDI G101 licensed; manufacturer (Schier, Thermaco, Rockford) sizing tools free.",
     governance: GOVERNANCE.plumbing,
-    editionNote: IPC_DISCLOSURE,
+    editionNote: IPC_DISCLOSURE + " Read against the IPC 2027 and 2021 printings on 2026-10-17: IPC 2027 adds the meals-based grease-storage sizing (1003.3.7-1003.3.11, Table 1003.3.8), which IPC 2021 did not have; the tile adds it when meals per day are entered (added 2026-10-17). The hydromechanical retention table (Table 1003.3.4.1, 1003.3.5.1 in 2021) is unchanged.",
     assumptions: [
       { name: "Retention time", value: "30 min unless user supplies", source: "PDI G101 by name" },
       { name: "Loading factor", value: "1.25 unless user supplies a job-specific factor", source: "engineering practice" },
@@ -4291,10 +4289,10 @@ export const CITATIONS = {
   },
   "grease-interceptor-flow-capacity": {
     formula: "peak_flow_gpm = interceptor_volume_gal / (retention_minutes × loading_factor), the PDI G101 / IPC sizing relation Volume = peak GPM × retention × loading solved for the flow.",
-    edition: "PDI G101 by name; " + IPC_2021 + " Section 1003.",
+    edition: "PDI G101 by name; " + IPC_2027 + " Section 1003.",
     freeAccess: ICC_FREE + " PDI G101 licensed; manufacturer (Schier, Thermaco, Rockford) sizing tools free.",
     governance: GOVERNANCE.plumbing,
-    editionNote: "The inverse of grease-trap: the peak fixture flow an existing interceptor is rated to serve. Compare it to the drainage-fixture-unit peak flow of the connected sinks and dishwasher; if the fixtures can deliver more, the interceptor is undersized. The retention time (commonly 30 min) and the loading factor come from the code and the AHJ. " + IPC_DISCLOSURE,
+    editionNote: "The inverse of grease-trap: the peak fixture flow an existing interceptor is rated to serve. Compare it to the drainage-fixture-unit peak flow of the connected sinks and dishwasher; if the fixtures can deliver more, the interceptor is undersized. The retention time (commonly 30 min) and the loading factor come from the code and the AHJ. " + IPC_DISCLOSURE + " Read against the IPC 2027 and 2021 printings on 2026-10-17: the 30-minute gravity retention and the retention table (1003.3.4.1, 1003.3.5.1 in 2021) are unchanged; 2027 adds a grease-storage volume for gravity interceptors (see grease-trap), so an interceptor sized to 2027 serves less flow than this volume-only inverse shows.",
     assumptions: [
       { name: "Retention time", value: "30 min unless user supplies", source: "PDI G101 by name" },
       { name: "Loading factor", value: "1.25 unless user supplies adjustment for high-grease use", source: "engineering practice" },
@@ -4333,14 +4331,14 @@ export const CITATIONS = {
   },
   "backflow-sizing": {
     formula: "Required assembly from the hazard category (high / health hazard requires a reduced-pressure principle assembly). Head loss at design flow interpolated from the bundled assembly curves; downstream pressure = upstream supply pressure − head loss; flag when downstream is below the minimum residual.",
-    edition: "IPC 2021 §312 (cross-connection control) and AWWA M14 (Backflow Prevention and Cross-Connection Control) by name; IPC 2021 §312.10.2 (testing at installation and at least annually) and §608.1 / Table 608.1 (assembly by hazard) by section. Head-loss curves from data/plumbing/backflow-curves.json (Watts technical bulletins, representative).",
+    edition: "IPC 2027 §312 (cross-connection control) and AWWA M14 (Backflow Prevention and Cross-Connection Control) by name; IPC 2027 §312.11.2 [312.10.2 in IPC 2021] (testing at installation and at least annually) and §608.1 / Table 608.1 (assembly by hazard) by section. Head-loss curves from data/plumbing/backflow-curves.json (Watts technical bulletins, representative).",
     freeAccess: ICC_FREE,
     governance: GOVERNANCE.plumbing,
-    editionNote: "High (health) hazard requires an RP assembly regardless of the user's selection; PVB / AVB protect against back-siphonage only. The bundled Watts curves are representative; the specific assembly's cut sheet and the USC FCCCHR approved-assembly list govern the actual head loss.",
+    editionNote: "High (health) hazard requires an RP assembly regardless of the user's selection; PVB / AVB protect against back-siphonage only. The bundled Watts curves are representative; the specific assembly's cut sheet and the USC FCCCHR approved-assembly list govern the actual head loss. Read against the IPC 2027 and 2021 printings on 2026-10-17: the hazard-to-assembly rule (Table 608.1) and the annual-test rule are unchanged; the testing section moved from 312.10.2 to 312.11.2.",
     assumptions: [
       { name: "High-hazard rule", value: "reduced-pressure principle (RP) assembly required", source: "IPC 2021 §608.1 / Table 608.1" },
       { name: "Minimum residual", value: "20 psi default (user-adjustable)", source: "engineering practice" },
-      { name: "Annual test", value: "tested at installation and at least annually", source: "IPC 2021 §312.10.2 / AWWA M14" },
+      { name: "Annual test", value: "tested at installation and at least annually", source: "IPC 2027 §312.11.2 [312.10.2 in 2021] / AWWA M14" },
     ],
   },
 
@@ -4349,7 +4347,7 @@ export const CITATIONS = {
     edition: "IPC 2027 §608.16.1 and Table 608.16.1 (identical in 2021) (air gaps; 608.15.1 in the 2018 numbering) and ASME A112.1.2 (Air Gaps in Plumbing Systems) by name.",
     freeAccess: ICC_FREE,
     governance: GOVERNANCE.plumbing,
-    editionNote: IPC_CHECKED_DISCLOSURE + IPC_SUPPLY_2027 + " IPC 2027 Table 608.16.1 (identical in 2021) sets the minimum air gap by the effective opening (the diameter of the least cross-sectional area of the supply outlet): 1, 1-1/2 or 2 in up to 1/2, 3/4 or 1 in, then twice the opening; close to a wall (within three diameters of one wall, four of two walls meeting) 1-1/2, 2-1/2, 3 in, then three times the opening and never less than 1.5 in for openings up to 1/2 in (ASME A112.1.2 Table 1). The air gap is the vertical distance between the supply outlet and the flood-level rim of the fixture it discharges into and is the most positive cross-connection protection there is -- unlike a mechanical assembly it cannot fail or be defeated. This returns the minimum air gap for indirect-waste and tank-fill protection and checks a measured gap against it; the AHJ's adopted plumbing code governs.",
+    editionNote: IPC_DISCLOSURE + IPC_SUPPLY_2027 + " IPC 2027 Table 608.16.1 (identical in 2021) sets the minimum air gap by the effective opening (the diameter of the least cross-sectional area of the supply outlet): 1, 1-1/2 or 2 in up to 1/2, 3/4 or 1 in, then twice the opening; close to a wall (within three diameters of one wall, four of two walls meeting) 1-1/2, 2-1/2, 3 in, then three times the opening and never less than 1.5 in for openings up to 1/2 in (ASME A112.1.2 Table 1). The air gap is the vertical distance between the supply outlet and the flood-level rim of the fixture it discharges into and is the most positive cross-connection protection there is -- unlike a mechanical assembly it cannot fail or be defeated. This returns the minimum air gap for indirect-waste and tank-fill protection and checks a measured gap against it; the AHJ's adopted plumbing code governs.",
     assumptions: [
       { name: "Air gap table", value: "stepped 1 / 1-1/2 / 2 in (close to a wall 1-1/2 / 2-1/2 / 3) up to 1 in openings, 2x / 3x above", source: "IPC 2027 Table 608.16.1 (identical in 2021) / ASME A112.1.2" },
       { name: "Effective opening", value: "the diameter of the least cross-sectional area of the supply outlet", source: "ASME A112.1.2" },
@@ -9583,14 +9581,14 @@ export const CITATIONS = {
     ],
   },
   "roof-drain-sizing": {
-    formula: "gpm = roof_area x rainfall_rate x 0.0104 (GPM per ft^2 per in/hr); leader_in = smallest pipe in the vertical-leader table with capacity >= gpm; horiz_in = smallest pipe in the slope table with capacity >= gpm.",
-    edition: "IPC 2021 Section 1106 (Table 1106.3 vertical leaders, with the vertical-drain column of Table 1106.2 for 10-15 in; Table 1106.2 horizontal storm drains by slope) by name; the capacity tables carry the published values as editable breakpoints.",
-    freeAccess: "IPC 2021 free read-only at codes.iccsafe.org; the 0.0104 GPM-per-(ft^2 x in/hr) constant is public. The bundled capacity tables carry the published IPC 2021 values as editable breakpoints.",
+    formula: "gpm = roof_area x rainfall_rate x 0.0104 (GPM per ft^2 per in/hr); leader_in = smallest pipe in the vertical-leader table with capacity >= gpm; horiz_in = smallest pipe in the horizontal table for the pipe material and slope with capacity >= gpm (IPC 2027 Tables 1106.2.3.1(1)-(3)), or in the IPC 2021 single Table 1106.2.",
+    edition: "IPC 2027 Section 1106 (Table 1106.3 vertical leaders, with Table 1106.2.4 vertical storm drain values for 10-15 in; Tables 1106.2.3.1(1) PVC, (2) cast iron aged and (3) cast iron new for horizontal storm drains by slope) by name, with IPC 2021 Table 1106.2 as an edition option; the capacity tables carry the published values as editable breakpoints.",
+    freeAccess: "IPC 2027 and 2021 free read-only at codes.iccsafe.org; the 0.0104 GPM-per-(ft^2 x in/hr) constant is public. The bundled capacity tables carry the published values as editable breakpoints.",
     governance: GOVERNANCE.general,
-    editionNote: "Rainfall rate is the locale-specific 100-year / 1-hour value from IPC Figure 1106.1, not a national default. Sloped, vertical, and parapet walls add contributing area per IPC 1106.4. Overflow drains and scuppers (IPC 1107) are a separate required path this tile does not size; overflow-scupper-sizing sizes them.",
+    editionNote: "Rainfall rate is the locale-specific 100-year / 1-hour value from IPC Figure 1106.1, not a national default. Sloped, vertical, and parapet walls add contributing area per IPC 1106.4. Overflow drains and scuppers (IPC 1107) are a separate required path this tile does not size; overflow-scupper-sizing sizes them. Read in the IPC 2021 and 2027 printings on 2026-10-17: the leader table (1106.3) is unchanged, but IPC 2027 replaced the single horizontal Table 1106.2 with one table per pipe material and moved the vertical-drain column to Table 1106.2.4 (a few gpm lower at 5, 6, 8, 12 and 15 in). Aged cast iron carries about two thirds of the 2021 figure (4 in at 1/4 in/ft: 105 gpm against 163), so a drain that was 4 in under 2021 can need 5 in under 2027. Until 2026-10-17 the tile used only the 2021 table.",
     assumptions: [
-      { name: "Storm-flow constant", value: "0.0104 GPM per ft^2 per in/hr of design rainfall", source: "IPC 2021 Section 1106 basis" },
-      { name: "Capacity tables", value: "editable [size, GPM] breakpoints for the vertical leader (Table 1106.3) and the horizontal storm drain at each slope (Table 1106.2), at the published values", source: "IPC 2021 Section 1106" },
+      { name: "Storm-flow constant", value: "0.0104 GPM per ft^2 per in/hr of design rainfall", source: "IPC Section 1106 basis (2021 and 2027)" },
+      { name: "Capacity tables", value: "editable [size, GPM] breakpoints for the vertical leader (Table 1106.3) and the horizontal storm drain at each slope (Tables 1106.2.3.1(1)-(3) by material, or the 2021 Table 1106.2), at the published values", source: "IPC 2027 Section 1106" },
     ],
   },
   "scupper-width-for-flow": {
@@ -9677,13 +9675,13 @@ export const CITATIONS = {
   },
   "tpr-discharge": {
     formula: "rating_ok = valve_rating >= heater_input; discharge_in = valve outlet (never reduced). Output is a pass/fail and the IPC 504.6 discharge checklist, not a continuous quantity.",
-    edition: "IPC 2021 Section 504 (504.5 valve relieving capacity vs heater input, 504.6 discharge piping) and ANSI Z21.22 / CSA 4.4 by name; first-principles comparison.",
-    freeAccess: "IPC 2021 free read-only at codes.iccsafe.org. The discharge requirements are public code text.",
+    edition: "IPC 2027 Section 504 (504.5 valve relieving capacity vs heater input, 504.6 discharge piping) and ANSI Z21.22 / CSA 4.4 by name; first-principles comparison.",
+    freeAccess: "IPC 2027 and 2021 free read-only at codes.iccsafe.org. The discharge requirements are public code text.",
     governance: GOVERNANCE.general,
-    editionNote: "An undersized or missing T&P valve is the top water-heater safety failure. The discharge pipe is the full valve outlet, never reduced, and serves no other relief device (IPC 504.6). The relieving capacity must equal or exceed the heater input, with the valve set at not more than 210 F and 150 psi (IPC 504.5). A replacement valve must match the heater's input and working pressure (ANSI Z21.22).",
+    editionNote: "An undersized or missing T&P valve is the top water-heater safety failure. The discharge pipe is the full valve outlet, never reduced, and serves no other relief device (IPC 504.6). The relieving capacity must equal or exceed the heater input, with the valve set at not more than 210 F and at not more than 150 psi or the heater's rated working pressure, whichever is less (IPC 504.5). A replacement valve must match the heater's input and working pressure (ANSI Z21.22). Read against the IPC 2027 and 2021 printings on 2026-10-17: 504.5 and the fourteen 504.6 discharge rules are unchanged. Until 2026-10-17 this note gave the pressure limit as a flat 150 psi; both editions cap it at the lower of 150 psi and the heater's rated working pressure.",
     assumptions: [
-      { name: "Discharge size", value: "the full valve outlet (typ. 3/4 in), never reduced", source: "IPC 2021 Section 504.6" },
-      { name: "Rating rule", value: "valve marked relief capacity >= heater input rating", source: "IPC 2021 Section 504.5 / ANSI Z21.22" },
+      { name: "Discharge size", value: "the full valve outlet (typ. 3/4 in), never reduced", source: "IPC 2027 Section 504.6 (unchanged from 2021)" },
+      { name: "Rating rule", value: "valve marked relief capacity >= heater input rating", source: "IPC 2027 Section 504.5 (unchanged from 2021) / ANSI Z21.22" },
     ],
   },
   "pipe-support-spacing": {
@@ -20253,12 +20251,12 @@ export const CITATIONS = {
     edition: "IPC 708 - horizontal drains provided with cleanouts not more than 100 ft apart; a cleanout at each change of horizontal direction greater than 45 degrees, with the cleanout at the first change serving all changes occurring within 40 ft of developed length; not less than 18 in of clear space at the opening of cleanouts 6 in and smaller; and not less than 24 in of unobstructed pathway height where a cleanout is located in a crawl space.",
     freeAccess: "All four provisions are short prescriptive sentences reproduced in state and municipal adoptions and trade commentary. No table is reproduced and the spacing limit is an editable input.",
     governance: GOVERNANCE.general,
-    editionNote: "The two code triggers are additive and independent, which is the arithmetic people get wrong: a run counted only by the 100 ft spacing rule misses the bends, and a run counted bend-by-bend overshoots. IPC 2021 section 708 has no base-of-stack cleanout rule; stack bases are reported separately as practice. The grouping allowance is the interesting one. Because the cleanout at the FIRST change of direction over 45 degrees serves every such change within 40 ft of developed length, the change-driven count can never exceed ceil(run / 40) however many elbows appear on the drawing - so a 240 ft run is capped at six change cleanouts even with nine bends, and the tile reports the cap next to the entered count and says which governed. That allowance is what keeps a tightly routed drain from needing a fitting at every elbow, and it is routinely forgotten in both directions. The spacing count assumes the run BEGINS at a cleanout - a stack base, an upstream cleanout, or wherever the code otherwise puts one - and the note says to add one at the head if it does not. Access is treated as a requirement rather than a courtesy because it is where cleanouts get value-engineered into uselessness: an 18 in clear space at the opening for cleanouts 6 in and smaller, and a 24 in unobstructed pathway height in a crawl space. A cleanout that cannot be reached and turned does not count as one, and the tile says so. Cleanouts larger than 6 in carry their own larger clearance requirement, which is not checked. Also not checked: cleanout SIZE relative to the pipe, whether a fitting or a fixture may serve as the cleanout, the building drain and building sewer junction, manholes on large sewers, the direction the cleanout must face, concealed piping and access covers, and cleanout material and thread type. A screen; the adopted code and the AHJ govern.",
+    editionNote: "The two code triggers are additive and independent, which is the arithmetic people get wrong: a run counted only by the 100 ft spacing rule misses the bends, and a run counted bend-by-bend overshoots. IPC 2021 and 2027 section 708 have no base-of-stack cleanout rule; stack bases are reported separately as practice. The grouping allowance is the interesting one. Because the cleanout at the FIRST change of direction over 45 degrees serves every such change within 40 ft of developed length, the change-driven count can never exceed ceil(run / 40) however many elbows appear on the drawing - so a 240 ft run is capped at six change cleanouts even with nine bends, and the tile reports the cap next to the entered count and says which governed. That allowance is what keeps a tightly routed drain from needing a fitting at every elbow, and it is routinely forgotten in both directions. The spacing count assumes the run BEGINS at a cleanout - a stack base, an upstream cleanout, or wherever the code otherwise puts one - and the note says to add one at the head if it does not. Access is treated as a requirement rather than a courtesy because it is where cleanouts get value-engineered into uselessness: an 18 in clear space at the opening for cleanouts 6 in and smaller, and a 24 in unobstructed pathway height in a crawl space. A cleanout that cannot be reached and turned does not count as one, and the tile says so. Cleanouts larger than 6 in carry their own larger clearance requirement, which is not checked. Also not checked: cleanout SIZE relative to the pipe, whether a fitting or a fixture may serve as the cleanout, the building drain and building sewer junction, manholes on large sewers, the direction the cleanout must face, concealed piping and access covers, and cleanout material and thread type. A screen; the adopted code and the AHJ govern. Read against the IPC 2027 and 2021 printings on 2026-10-17: 708.1.1 (100 ft), 708.1.4 (45 degrees, 40 ft) and 708.1.10-708.1.11 (18 in clearance, 24 in crawl-space height) are unchanged.",
     assumptions: [
       { name: "Spacing", value: "not more than 100 ft apart on horizontal drains; editable", source: "IPC 708.1.1" },
       { name: "Changes of direction", value: "one per change greater than 45 degrees", source: "IPC 708.1.4" },
       { name: "Grouping allowance", value: "the first change serves all within 40 ft, capping the count at ceil(run/40)", source: "IPC 708" },
-      { name: "Stack bases", value: "reported as practice only; IPC 2021 708.1.1-708.1.12 has no base-of-stack cleanout rule, so it is not in the code total", source: "IPC 2021 708 (absence)" },
+      { name: "Stack bases", value: "reported as practice only; IPC 2021 and 2027 708.1.1-708.1.12 have no base-of-stack cleanout rule, so it is not in the code total", source: "IPC 2027 708 (absence; also 2021)" },
       { name: "Access", value: "18 in clear at the opening for 6 in and smaller; 24 in pathway height in a crawl space", source: "IPC 708" },
       { name: "Run starts at a cleanout", value: "stated assumption; add one at the head if it does not", source: "stated assumption" },
     ],
@@ -20295,10 +20293,10 @@ export const CITATIONS = {
   },
   "vent-terminal-check": {
     formula: "required height = 84 in where the roof is used as a promenade, deck or similar, otherwise max(roof minimum -- IRC 6 in, or the number the jurisdiction wrote into IPC 903.1.1 -- , snow accumulation + 6 in); frost closure applies when the 97.5% outdoor design temperature <= 0 degF, requiring diameter >= 3 in and any size increase made >= 12 in inside the thermal envelope; location passes when the terminal is >= 10 ft horizontally from a door, openable window, or air intake OR >= 3 ft above it.",
-    edition: "IRC P3103.1.1 (vent terminal height; IPC 2021 903.1.1 leaves the number to the adopting jurisdiction), IPC 903.1.2 (7 ft for a roof used as a promenade, deck or similar), IPC 903.2 (frost closure), and IPC 903.5 (vent terminal location relative to doors, openable windows, and air intakes of the building or of an adjacent building).",
+    edition: "IRC P3103.1.1 (vent terminal height; IPC 2027 903.1.1, like 2021, leaves the number to the adopting jurisdiction), IPC 903.1.2 (7 ft for a roof used as a promenade, deck or similar), IPC 903.2 (frost closure), and IPC 903.5 (vent terminal location relative to doors, openable windows, and air intakes of the building or of an adjacent building).",
     freeAccess: "All three are short prescriptive provisions reproduced in state and municipal adoptions and code-viewer sites. No table is reproduced; the snow accumulation and the design temperature are local figures entered by the user.",
     governance: GOVERNANCE.general,
-    editionNote: "Three independent rules land on the same pipe and a plumber can satisfy any two and still fail, which is why they belong in one check. On height, the snow clause is the one that moves the answer: the code says 6 in above the roof OR 6 in above the ANTICIPATED snow accumulation, whichever is greater, so 18 in of snow makes the requirement 24 in and the 6 in figure people remember is only the floor. A roof used for any purpose other than weather protection jumps to 7 ft, an order-of-magnitude change that a deck or a mechanical platform quietly triggers. On frost closure, the diameter is the part everyone knows and the increaser location is the part everyone misses: the increase must be made not less than 1 ft INSIDE the thermal envelope, because a fitting made up in a cold attic frosts shut exactly like the small pipe it replaced, and an installation with a correct 3 in terminal and a badly placed increaser is non-compliant and will still close. On location, the neighbour counts as much as you do - the section says this building or an ADJACENT one, which is what surprises people on a tight lot - and the 3 ft-above allowance is a genuine alternative to the 10 ft separation rather than an additional requirement, so a terminal inside 10 ft can comply by going up. A terminal directly beneath an opening is prohibited outright. Snow accumulation and the 97.5% design temperature are local figures; the code says anticipated, not a national number, so use what the AHJ or the local design data gives. Not checked: the vent SIZE from drainage fixture units and developed length, whether a vent is required at all, the connection and grade of the branch below, roof flashing and the sleeve, wall terminations and their own separations, or combustion and fuel-gas venting, which is a different chapter entirely. A screen, not a code-official determination; the adopted code and the AHJ govern.",
+    editionNote: "Three independent rules land on the same pipe and a plumber can satisfy any two and still fail, which is why they belong in one check. On height, the snow clause is the one that moves the answer: the code says 6 in above the roof OR 6 in above the ANTICIPATED snow accumulation, whichever is greater, so 18 in of snow makes the requirement 24 in and the 6 in figure people remember is only the floor. A roof used for any purpose other than weather protection jumps to 7 ft, an order-of-magnitude change that a deck or a mechanical platform quietly triggers. On frost closure, the diameter is the part everyone knows and the increaser location is the part everyone misses: the increase must be made not less than 1 ft INSIDE the thermal envelope, because a fitting made up in a cold attic frosts shut exactly like the small pipe it replaced, and an installation with a correct 3 in terminal and a badly placed increaser is non-compliant and will still close. On location, the neighbour counts as much as you do - the section says this building or an ADJACENT one, which is what surprises people on a tight lot - and the 3 ft-above allowance is a genuine alternative to the 10 ft separation rather than an additional requirement, so a terminal inside 10 ft can comply by going up. A terminal directly beneath an opening is prohibited outright. Snow accumulation and the 97.5% design temperature are local figures; the code says anticipated, not a national number, so use what the AHJ or the local design data gives. Not checked: the vent SIZE from drainage fixture units and developed length, whether a vent is required at all, the connection and grade of the branch below, roof flashing and the sleeve, wall terminations and their own separations, or combustion and fuel-gas venting, which is a different chapter entirely. A screen, not a code-official determination; the adopted code and the AHJ govern. Read against the IPC 2027 and 2021 printings on 2026-10-17: 903.1.2 (7 ft), 903.2 (3 in where the 97.5% design temperature is 0 F or less, increaser 1 ft inside the envelope) and 903.5 (10 ft horizontally unless 3 ft above) are unchanged.",
     assumptions: [
       { name: "Height", value: "6 in above the roof or 6 in above anticipated snow, whichever is greater", source: "IRC P3103.1.1 (IPC 903.1.1: jurisdiction number, default 6)" },
       { name: "Roof in use", value: "7 ft where the roof is used as a promenade, restaurant, bar, sunbathing or observation deck, or similar", source: "IPC 903.1.2" },

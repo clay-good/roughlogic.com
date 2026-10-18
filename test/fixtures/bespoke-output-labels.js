@@ -422,7 +422,7 @@ export const BESPOKE_OUTPUT_LABELS = {
   "grain-shrink-moisture": {"W_net_lb":"Net market weight","bushels":"Net market bushels","total_shrink_pct":"Shrink"},
   "grains-removed": {"grain_depression_gpp":"Grain depression","water_lb_hr":"Water removal rate","water_gal":"Total water over run"},
   "grease-interceptor-flow-capacity": {"peak_flow_gpm":"Peak flow served","note":"Note"},
-  "grease-trap": {"volume_gal":"Required volume","recommended_nominal_gal":"Recommended nominal"},
+  "grease-trap": {"volume_gal":"Required volume","note":"Basis","recommended_nominal_gal":"Recommended nominal"},
   "grid-to-ground": {"ground_distance_ft":"Ground distance","combined_factor":"Combined factor","elevation_factor":"Elevation factor","note":"Note"},
   "grille-face-velocity": {"band":"Velocity band"},
   "grinding-wheel-rpm": {"verdict":"Verdict","max_rpm":"Max RPM for this wheel","actual_sfpm":"Surface speed at grinder RPM"},

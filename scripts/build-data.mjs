@@ -1767,7 +1767,7 @@ const DATASETS = [
       { file: "nema-mg1-code-letters.json", body: NEMA_MG1_CODE_LETTERS_DATA, name: "NEMA MG-1 code-letter starting kVA per HP" },
       { file: "dwelling-demand.json", body: DWELLING_DEMAND_DATA, name: "Dwelling demand-factor parameters (NEC 2023 Article 220)" },
     ] },
-  { folder: "plumbing", edition: "IPC 2021 (IPC 2027 is the current published edition; the tiles re-checked against it on 2026-10-17 cite 2027, and the rest disclose the 2021 basis); IFGC 2027 (every bundled IFGC value re-checked 2026-10-17 and identical to 2021); Hazen-Williams (AWWA M11, 5th ed.); Manning (USGS WSP-2339, public domain); ASME B31.1 / B31.9 (guided-cantilever expansion-loop method); Joukowsky (1898) / ASCE MOP-49; Hydraulic Institute pump engineering practice; manufacturer specs as of " + EDITION_VERIFIED.plumbing + ".", shards: [
+  { folder: "plumbing", edition: "IPC 2027 (every bundled IPC value re-checked 2026-10-17; identical to 2021 except the drinking-fountain DFU, the storm-drain tables now given per pipe material, and the new grease-interceptor storage sizing, each with a 2021 option); IFGC 2027 (every bundled IFGC value re-checked 2026-10-17 and identical to 2021); Hazen-Williams (AWWA M11, 5th ed.); Manning (USGS WSP-2339, public domain); ASME B31.1 / B31.9 (guided-cantilever expansion-loop method); Joukowsky (1898) / ASCE MOP-49; Hydraulic Institute pump engineering practice; manufacturer specs as of " + EDITION_VERIFIED.plumbing + ".", shards: [
       { file: "pipe-properties.json", body: PIPE_PROPERTIES, name: "Pipe properties" },
       { file: "fixture-units.json", body: FIXTURE_UNITS, name: "Fixture units" },
       { file: "gas-pipe-capacity.json", body: GAS_PIPE_CAPACITY, name: "Gas pipe capacity" },

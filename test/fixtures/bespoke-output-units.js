@@ -276,7 +276,6 @@ export const BESPOKE_OUTPUT_UNITS = {
   "grain-shrink-moisture": {"bushels":{"prefix":"","suffix":" bu","digits":1}},
   "grains-removed": {"grain_depression_gpp":{"prefix":"","suffix":" GPP","digits":1},"water_gal":{"prefix":"","suffix":" gal","digits":1}},
   "grease-interceptor-flow-capacity": {"peak_flow_gpm":{"prefix":"","suffix":" gpm","digits":1}},
-  "grease-trap": {"volume_gal":{"prefix":"","suffix":" gal","digits":0}},
   "grid-to-ground": {"ground_distance_ft":{"prefix":"","suffix":" ft","digits":3}},
   "grinding-wheel-rpm": {"max_rpm":{"prefix":"","suffix":" RPM","digits":0}},
   "grounding-electrode": {"resistance_ohms":{"prefix":"","suffix":" ohms","digits":2}},

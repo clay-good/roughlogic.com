@@ -223,7 +223,7 @@ PLUMBINGCODE_RENDERERS["shower-compartment-check"] = _v1134renderShowerCompartme
 
 // --- spec-v1135: vent terminal height, frost closure, and location (IPC 903) ---
 // Three independent rules that all land on the same pipe, and a plumber can satisfy any two
-// and still fail. IRC P3103.1.1 (IPC 2021 903.1.1 leaves the number to the adopting jurisdiction): terminate at least 6 in above the roof OR 6 in above the
+// and still fail. IRC P3103.1.1 (IPC 2027 903.1.1, like 2021, leaves the number to the adopting jurisdiction): terminate at least 6 in above the roof OR 6 in above the
 // anticipated snow accumulation, whichever is greater - and at least 7 FT where the roof is
 // used as a promenade, deck or for a similar purpose (903.1.2). 903.2: where the 97.5% outdoor
 // design temperature is 0 F or less the extension must be not less than 3 in in diameter,
@@ -253,7 +253,7 @@ export function computeVentTerminalCheck({ height_above_roof_in = 6, snow_accumu
   if (horiz < 0) return { error: "Horizontal distance to the nearest opening cannot be negative (ft)." };
   if (above < 0) return { error: "Height above the opening cannot be negative (ft) - a terminal below an opening is the condition the code prohibits outright." };
 
-  // Height: IRC P3103.1.1 (6 in, or 6 in over the anticipated snow); IPC 2021 903.1.1 leaves the
+  // Height: IRC P3103.1.1 (6 in, or 6 in over the anticipated snow); IPC 2027 903.1.1 (as 2021) leaves the
   // number to the adopting jurisdiction (Connecticut writes 12). Until 2026-09-25 this was credited
   // to IPC 903.1 with the 6 in hard-coded, so a 12 in jurisdiction passed a 6 in vent.
   // A roof in use raises the requirement to 7 ft; it never lowers one the snow already sets higher.
@@ -304,7 +304,7 @@ export function computeVentTerminalCheck({ height_above_roof_in = 6, snow_accumu
 export const ventTerminalCheckExample = { inputs: { height_above_roof_in: 6, snow_accumulation_in: 18, roof_other_use: "no", design_temp_f: -10, vent_diameter_in: 2, increase_inside_envelope_in: 6, horizontal_to_opening_ft: 4, height_above_opening_ft: 1 } };
 
 function _v1135renderVentTerminalCheck(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: IRC P3103.1.1 - open vent pipes extending through a roof terminated not less than 6 in above the roof or 6 in above the anticipated snow accumulation, whichever is greater (IPC 2021 903.1.1 leaves the height to the adopting jurisdiction, entered here); not less than 7 ft where the roof is used as a promenade, deck, or for a similar purpose (IPC 903.1.2). IPC 903.2 - where the 97.5-percent value for outdoor design temperature is 0 degF or less, vent extensions through a roof or wall not less than 3 in in diameter, with any increase in the size of the vent made not less than 1 ft inside the thermal envelope of the building. IPC 903.5 - an open vent terminal not located directly beneath any door, openable window, or other air intake of the building or of an adjacent building, and not within 10 ft horizontally of such an opening unless it is 3 ft above it. Anticipated snow accumulation and the design temperature are local figures. Not checked: the vent SIZE from drainage fixture units and developed length, whether a vent is required, the branch below, flashing, wall terminations, or fuel-gas venting. A screen, not a code-official determination; the adopted code and the AHJ govern.";
+  citationEl.textContent = "Citation: IRC P3103.1.1 - open vent pipes extending through a roof terminated not less than 6 in above the roof or 6 in above the anticipated snow accumulation, whichever is greater (IPC 2027 903.1.1, like 2021, leaves the height to the adopting jurisdiction, entered here); not less than 7 ft where the roof is used as a promenade, deck, or for a similar purpose (IPC 903.1.2). IPC 903.2 - where the 97.5-percent value for outdoor design temperature is 0 degF or less, vent extensions through a roof or wall not less than 3 in in diameter, with any increase in the size of the vent made not less than 1 ft inside the thermal envelope of the building. IPC 903.5 - an open vent terminal not located directly beneath any door, openable window, or other air intake of the building or of an adjacent building, and not within 10 ft horizontally of such an opening unless it is 3 ft above it. Anticipated snow accumulation and the design temperature are local figures. Not checked: the vent SIZE from drainage fixture units and developed length, whether a vent is required, the branch below, flashing, wall terminations, or fuel-gas venting. A screen, not a code-official determination; the adopted code and the AHJ govern.";
   const h = makeNumber("Height above the roof (in)", "vtc-h", { step: "any", min: "0" });
   const sn = makeNumber("Anticipated snow accumulation (in)", "vtc-sn", { step: "any", min: "0" });
   const rm = makeNumber("Minimum height above the roof (in; IRC 6, or the IPC 903.1.1 number adopted)", "vtc-rm", { step: "any", min: "0", value: "6" });
@@ -551,7 +551,7 @@ export function computeCleanoutLayout({ horizontal_run_ft = 0, max_spacing_ft = 
   const change_claimed = changes - grouped;
   const change_cleanouts = Math.min(change_claimed, change_cap);
   const cap_governs = change_claimed > change_cap;
-  // IPC 2021 708.1.1-708.1.12 has no base-of-stack cleanout rule (older codes did). The count is
+  // IPC 2021 and 2027 708.1.1-708.1.12 have no base-of-stack cleanout rule (older codes did). The count is
   // reported as practice but kept OUT of the code total; until 2026-09-25 it was added, and
   // credited to IPC 708.
   const stack_cleanouts = stacks;
@@ -568,7 +568,7 @@ export function computeCleanoutLayout({ horizontal_run_ft = 0, max_spacing_ft = 
     + "CHANGES OF DIRECTION (708.1.4): a cleanout at every change of horizontal direction greater than 45 degrees - but where more than one such change occurs within 40 ft of developed length, the cleanout at the FIRST change serves all of them. That caps the change-driven count at ceil(" + L + "/40) = " + change_cap + " for this run no matter how many bends are drawn. "
     + "You entered " + changes + " change" + (changes === 1 ? "" : "s") + (grouped > 0 ? " with " + grouped + " grouped away" : "") + ", giving " + change_cleanouts + (cap_governs ? " - the 40 ft grouping CAP governs here, not your count, which is the allowance that keeps a bendy run from needing a fitting at every elbow. " : ". ")
     + "TOTAL " + total_cleanouts + " by the code. "
-    + (stack_cleanouts > 0 ? "STACK BASES: IPC 2021 section 708 no longer requires a cleanout at the base of a stack (older codes did); " + stack_cleanouts + " there would be good practice and come on top of the code count. " : "")
+    + (stack_cleanouts > 0 ? "STACK BASES: IPC 2021 and 2027 section 708 no longer require a cleanout at the base of a stack (older codes did); " + stack_cleanouts + " there would be good practice and come on top of the code count. " : "")
     + "ACCESS is a requirement, not a courtesy, and it is where cleanouts get valued-engineered into uselessness. "
     + (small_bore ? "For a cleanout " + size + " in and smaller the opening needs at least 18 in of clear space in front - " + clear + " in entered, " + (clear_ok ? "OK. " : "SHORT. ") : "This is over 6 in, and larger cleanouts carry their own larger clearance requirement which this tile does not check - read the section. ")
     + (in_crawl ? "In a crawl space the unobstructed height along the pathway to the cleanout must be at least 24 in - " + crawl + " in entered, " + (crawl_ok ? "OK. " : "TOO LOW, so the cleanout is not accessible even if it exists. ") : "")
@@ -582,7 +582,7 @@ export function computeCleanoutLayout({ horizontal_run_ft = 0, max_spacing_ft = 
 export const cleanoutLayoutExample = { inputs: { horizontal_run_ft: 240, max_spacing_ft: 100, direction_changes: 9, changes_grouped_away: 0, stack_count: 2, pipe_size_in: 4, clear_space_in: 18, crawl_height_in: 30 } };
 
 function _v1140renderCleanoutLayout(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: IPC 708 - horizontal drains provided with cleanouts located not more than 100 ft apart; a cleanout where a horizontal drainage pipe, building drain, or building sewer has a change of horizontal direction greater than 45 degrees, with the allowance that where more than one such change occurs within 40 ft of developed length the cleanout at the first change serves all of them (a stack-base cleanout is good practice but not an IPC 2021 708 requirement and is not in the total); a clear space of not less than 18 in at the opening of cleanouts 6 in and smaller; and, where a cleanout is in a crawl space, an unobstructed pathway height of not less than 24 in. Larger cleanouts carry their own clearance requirement, not checked here. Also not checked: cleanout size relative to the pipe, fittings or fixtures serving as cleanouts, the building drain and sewer junction, manholes, cleanout orientation, concealed piping and access covers, or material and threads. A screen; the adopted code and the AHJ govern.";
+  citationEl.textContent = "Citation: IPC 708 - horizontal drains provided with cleanouts located not more than 100 ft apart; a cleanout where a horizontal drainage pipe, building drain, or building sewer has a change of horizontal direction greater than 45 degrees, with the allowance that where more than one such change occurs within 40 ft of developed length the cleanout at the first change serves all of them (a stack-base cleanout is good practice but not an IPC 2021 or 2027 708 requirement and is not in the total); a clear space of not less than 18 in at the opening of cleanouts 6 in and smaller; and, where a cleanout is in a crawl space, an unobstructed pathway height of not less than 24 in. Larger cleanouts carry their own clearance requirement, not checked here. Also not checked: cleanout size relative to the pipe, fittings or fixtures serving as cleanouts, the building drain and sewer junction, manholes, cleanout orientation, concealed piping and access covers, or material and threads. A screen; the adopted code and the AHJ govern.";
   const L = makeNumber("Horizontal drain run (ft)", "clo-l", { step: "any", min: "0" });
   const sp = makeNumber("Maximum cleanout spacing (ft; IPC 100)", "clo-sp", { step: "any", min: "0" });
   const dc = makeNumber("Changes of horizontal direction over 45 degrees", "clo-dc", { step: "1", min: "0" });

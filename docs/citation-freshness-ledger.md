@@ -65,7 +65,7 @@ anything.
 | id | source | edition cited (bundled) | current edition | last verified | status |
 |----|--------|-------------------------|-----------------|---------------|--------|
 | `nec` | NEC (NFPA 70) | 2023 | 2026 | 2026-06-05 | disclosed-lag |
-| `ipc` | International Plumbing Code | 2021 | **2027 (published)** | 2026-10-17 | disclosed-lag |
+| `ipc` | International Plumbing Code | 2027 | **2027 (published)** | 2026-10-17 | current |
 | `irc` | International Residential Code | 2021 | 2024 (2027 voted, not published) | 2026-09-01 | disclosed-lag |
 | `ibc` | International Building Code | 2021 | **2027 (published)** | 2026-10-17 | disclosed-lag |
 | `imc` | International Mechanical Code | 2027 | **2027 (published)** | 2026-10-17 | current |

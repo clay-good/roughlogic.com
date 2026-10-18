@@ -2010,7 +2010,7 @@ cross-check.
 | calc-drainage.js | `computeManningSlope` | `{ pipe_diameter_in = 0, target_flow_gpm = 0, material = "pvc", scour_velocity...` | _ | _ | _ |
 | calc-drainage.js | `computeOverflowScupperSizing` | `{ length_in = 0, head_in = 0 } = {}` | _ | _ | _ |
 | calc-drainage.js | `computePipePartialFlowDepth` | `{ d_in = 0, slope = 0, flow_gpm = 0, material = "pvc" } = {}` | _ | _ | _ |
-| calc-drainage.js | `computeRoofDrainSizing` | `{ roof_area, rainfall_rate, drain_slope = "1/4", leader_table = null, horiz_t...` | _ | _ | _ |
+| calc-drainage.js | `computeRoofDrainSizing` | `{ roof_area, rainfall_rate, drain_slope = "1/4", pipe_material = "pvc", code_...` | _ | _ | _ |
 | calc-drainage.js | `computeScupperWidthForFlow` | `{ required_gpm = 0, head_in = 0 } = {}` | _ | _ | _ |
 | calc-drainage.js | `computeSeepageTravelTime` | `{ hydraulic_conductivity_ft_day = 0, head_difference_ft = 0, flow_path_ft = 0...` | _ | _ | _ |
 | calc-drainage.js | `computeSewageForceMainVelocity` | `{ gpm = 0, id_in = 0 } = {}` | _ | _ | _ |
@@ -3087,7 +3087,7 @@ cross-check.
 | calc-plumbing.js | `computeFrictionLoss` | `{ method, material, nominal_size, length_ft, flow_gpm, internal_diameter_in }` | _ | _ | _ |
 | calc-plumbing.js | `computeGlycolMix` | `{ system_volume_gal = 0, target_burst_F = 32, glycol_type = "propylene", prot...` | _ | _ | _ |
 | calc-plumbing.js | `computeGreaseInterceptorFlowCapacity` | `{ interceptor_volume_gal = 0, retention_minutes = 30, loading_factor = 1.25 }...` | _ | _ | _ |
-| calc-plumbing.js | `computeGreaseTrap` | `{ peak_flow_gpm = 0, retention_minutes = 30, loading_factor = 1.25 }` | _ | _ | _ |
+| calc-plumbing.js | `computeGreaseTrap` | `{ peak_flow_gpm = 0, retention_minutes = 30, loading_factor = 1.25, meals_per...` | _ | _ | _ |
 | calc-plumbing.js | `computeHydraulicJump` | `{ b_ft = 0, q_cfs = 0, y1_ft = 0 } = {}` | _ | _ | _ |
 | calc-plumbing.js | `computeHydronicFillPressure` | `{ height_ft = 0, margin_psi = 4 } = {}` | _ | _ | _ |
 | calc-plumbing.js | `computeHydrostaticTest` | `{ working_pressure_psi = 0, system_volume_gal = 0, material = "water", multip...` | _ | _ | _ |

@@ -11681,6 +11681,17 @@ test("bounds: calc-plumbing v62 roof-drain-sizing + sump-basin-sizing pin storm 
   assert.strictEqual(r2.horiz_in, 6);
   // The 1/16 in/ft column exists: 208 GPM needs 6 in (243).
   assert.strictEqual(_v62b1({ roof_area: 5000, rainfall_rate: 4, drain_slope: "1/16" }).horiz_in, 6);
+  // IPC 2027 Tables 1106.2.3.1(1)-(3): the same 208 GPM at 1/4 in/ft is 5 in in PVC (5 in carries 290)
+  // and in new cast iron (240), but 6 in in aged cast iron (5 in carries only 190); the 2021 table gives 5 in.
+  assert.strictEqual(_v62b1({ roof_area: 5000, rainfall_rate: 4, drain_slope: "1/4", pipe_material: "cast-iron-new" }).horiz_in, 5);
+  assert.strictEqual(_v62b1({ roof_area: 5000, rainfall_rate: 4, drain_slope: "1/4", pipe_material: "cast-iron-aged" }).horiz_in, 6);
+  assert.strictEqual(_v62b1({ roof_area: 5000, rainfall_rate: 4, drain_slope: "1/4", code_edition: "2021" }).horiz_in, 5);
+  // 150 GPM at 1/4 in/ft: 4 in under 2021 (163) and in PVC (160), 5 in in aged cast iron (105 < 150).
+  assert.strictEqual(_v62b1({ roof_area: 150 / 0.0104, rainfall_rate: 1, drain_slope: "1/4", code_edition: "2021" }).horiz_in, 4);
+  assert.strictEqual(_v62b1({ roof_area: 150 / 0.0104, rainfall_rate: 1, drain_slope: "1/4", pipe_material: "pvc" }).horiz_in, 4);
+  assert.strictEqual(_v62b1({ roof_area: 150 / 0.0104, rainfall_rate: 1, drain_slope: "1/4", pipe_material: "cast-iron-aged" }).horiz_in, 5);
+  assert.ok("error" in _v62b1({ roof_area: 5000, rainfall_rate: 4, pipe_material: "steel" }));
+  assert.ok("error" in _v62b1({ roof_area: 5000, rainfall_rate: 4, code_edition: "2018" }));
   assert.ok("error" in _v62b1({ roof_area: -1, rainfall_rate: 4 })); // non-positive area
   assert.ok("error" in _v62b1({ roof_area: 5000, rainfall_rate: 0 })); // non-positive rainfall
   assert.ok("error" in _v62b1({ roof_area: Infinity, rainfall_rate: 4 })); // non-finite

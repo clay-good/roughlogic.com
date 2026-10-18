@@ -458,7 +458,7 @@ export function renderPipeSizing(inputRegion, outputRegion, citationEl) {
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderFrictionLoss(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: Hazen-Williams (1905, public domain). IPC 2021 referenced for application. Darcy-Weisbach with Colebrook-White for general fluid use. Free at codes.iccsafe.org.";
+  citationEl.textContent = "Citation: Hazen-Williams (1905, public domain). IPC referenced for application (no IPC value enters the loss). Darcy-Weisbach with Colebrook-White for general fluid use. Free at codes.iccsafe.org.";
   const method = makeSelect("Method", "fl-method", [
     { value: "hazen-williams", label: "Hazen-Williams (water)" },
     { value: "darcy-weisbach", label: "Darcy-Weisbach (water)" },
@@ -1109,19 +1109,42 @@ export const hydrostaticTestExample = {
 //
 // Volume = peak_gpm * retention_minutes * loading_factor. PDI G101 cited by name.
 
-// dims: in { peak_flow_gpm: L^3 T^-1, retention_minutes: T, loading_factor: dimensionless } out: { volume_gal: L^3, recommended_nominal_gal: L^3 }
-export function computeGreaseTrap({ peak_flow_gpm = 0, retention_minutes = 30, loading_factor = 1.25 }) {
+// IPC 2027 Table 1003.3.8 fats, oils and grease discharge per meal (lb/meal), without / with
+// flatware. IPC 2027 1003.3.11.1 sizes a gravity interceptor as the separation volume (peak
+// flow x 30 min) PLUS the grease stored over the designed service interval (at most 90 days),
+// meals/day x lb/meal x days, converted at 6.4 lb/gal (Equation 10-6). IPC 2021 sized on the
+// separation volume alone. Read in both printings 2026-10-17.
+export const FOG_LB_PER_MEAL = {
+  low: [0.005, 0.0065], medium: [0.025, 0.0325], high: [0.035, 0.0455], "very-high": [0.058, 0.075],
+};
+// dims: in { peak_flow_gpm: L^3 T^-1, retention_minutes: T, loading_factor: dimensionless, meals_per_day: T^-1, grease_class: dimensionless, with_flatware: dimensionless, service_days: T } out: { volume_gal: L^3, separation_gal: L^3, fog_storage_gal: L^3, recommended_nominal_gal: L^3 }
+export function computeGreaseTrap({ peak_flow_gpm = 0, retention_minutes = 30, loading_factor = 1.25, meals_per_day = 0, grease_class = "high", with_flatware = "no", service_days = 90 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(peak_flow_gpm > 0)) return { error: "Peak flow must be positive." };
   if (!(retention_minutes > 0)) return { error: "Retention time must be positive." };
   if (!(loading_factor > 0)) return { error: "Loading factor must be positive." };
-  const volume_gal = peak_flow_gpm * retention_minutes * loading_factor;
+  const meals = Number(meals_per_day) || 0;
+  const days = Number(service_days) || 0;
+  if (meals < 0) return { error: "Meals per day must not be negative." };
+  if (!Object.hasOwn(FOG_LB_PER_MEAL, String(grease_class))) return { error: "Grease class must be low, medium, high or very-high (IPC Table 1003.3.8)." };
+  if (meals > 0 && !(days > 0)) return { error: "Service interval must be positive (days)." };
+  const separation_gal = peak_flow_gpm * retention_minutes * loading_factor;
+  const lb_per_meal = FOG_LB_PER_MEAL[grease_class][with_flatware === "yes" || with_flatware === true ? 1 : 0];
+  const fog_lb = meals * lb_per_meal * days;
+  const fog_storage_gal = fog_lb / 6.4;
+  const volume_gal = separation_gal + fog_storage_gal;
+  const interval_over = meals > 0 && days > 90 + 1e-9 * 90;
   // Typical commercial trap nominal sizes (gallons).
   const standardSizes = [20, 35, 50, 75, 100, 150, 200, 300, 500, 750, 1000, 1500, 2000, 3000];
   const largest = standardSizes[standardSizes.length - 1];
   const exceeds_standard = volume_gal > largest + 1e-9 * Math.abs(largest);
   const recommended = standardSizes.find((s) => s >= volume_gal - 1e-9 * Math.abs(volume_gal)) || largest;
-  return { volume_gal, recommended_nominal_gal: recommended, exceeds_standard };
+  return {
+    volume_gal, separation_gal, fog_storage_gal, fog_lb, lb_per_meal, recommended_nominal_gal: recommended, exceeds_standard, interval_over,
+    note: meals > 0
+      ? "Total = separation volume (peak flow x retention x loading) + grease storage: " + fmt(meals, 0) + " meals/day x " + lb_per_meal + " lb/meal x " + fmt(days, 0) + " days = " + fmt(fog_lb, 0) + " lb, / 6.4 lb/gal = " + fmt(fog_storage_gal, 0) + " gal (IPC 2027 1003.3.11.1 and Table 1003.3.8)." + (interval_over ? " The designed service interval may not exceed 90 days (30 for a concrete interceptor; IPC 2027 1003.3.9)." : "")
+      : "Separation volume only. IPC 2027 1003.3.11.1 adds the grease stored between pump-outs for a gravity interceptor (meals per day x lb per meal x service days / 6.4); enter meals per day to include it. IPC 2021 sized on the separation volume alone.",
+  };
 }
 
 export const greaseTrapExample = {
@@ -1429,28 +1452,39 @@ export function renderHydrostaticTest(inputRegion, outputRegion, citationEl) {
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderGreaseTrap(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: per IPC 2021 Section 1003.3 (grease interceptors; Table 1003.3.5.1 rates capacity in pounds of grease, not volume) and PDI G101 by name. Volume = peak_flow * retention * loading_factor. AHJ governs. Free at codes.iccsafe.org.";
+  citationEl.textContent = "Citation: per IPC 2027 Section 1003.3 (grease interceptors; Table 1003.3.4.1 [1003.3.5.1 in IPC 2021] rates hydromechanical capacity in pounds of grease, not volume; 1003.3.11.1 sizes a gravity interceptor as peak flow x 30 min plus the grease stored over the service interval, meals/day x Table 1003.3.8 lb/meal x days / 6.4) and PDI G101 by name. Separation volume = peak_flow * retention * loading_factor. AHJ governs. Free at codes.iccsafe.org.";
   attachExampleButton(inputRegion, () => fillExample(greaseTrapExample.inputs));
   const pf = makeNumber("Peak fixture flow (gpm)", "gt-pf", { step: "any", min: "0" });
   const rt = makeNumber("Retention time (min)", "gt-rt", { step: "any", min: "0", value: "30" });
   rt.input.value = "30";
   const lf = makeNumber("Loading factor", "gt-lf", { step: "any", min: "0", value: "1.25" });
   lf.input.value = "1.25";
-  for (const f of [pf, rt, lf]) inputRegion.appendChild(f.wrap);
+  const ml = makeNumber("Meals per day (0 = separation volume only)", "gt-ml", { step: "any", min: "0" });
+  const gc = makeSelect("Grease producer (IPC Table 1003.3.8)", "gt-gc", [
+    { value: "low", label: "Low (deli, cafeteria, carryout pizza)" }, { value: "medium", label: "Medium (cafe, coffee shop, convenience store)" },
+    { value: "high", label: "High (family dining, burgers, Italian)", selected: true }, { value: "very-high", label: "Very high (BBQ, fried chicken, Chinese, steak)" },
+  ]);
+  const fw = makeSelect("Served with flatware", "gt-fw", [{ value: "no", label: "No", selected: true }, { value: "yes", label: "Yes" }]);
+  const sd = makeNumber("Designed service interval (days, at most 90)", "gt-sd", { step: "any", min: "0", value: "90" });
+  sd.input.value = "90";
+  for (const f of [pf, rt, lf, ml, gc, fw, sd]) inputRegion.appendChild(f.wrap);
   const oV = makeOutputLine(outputRegion, "Required volume", "gt-out-v");
   const oR = makeOutputLine(outputRegion, "Recommended nominal", "gt-out-r");
-  function fillExample(v) { pf.input.value = v.peak_flow_gpm; rt.input.value = v.retention_minutes; lf.input.value = v.loading_factor; update(); }
+  const oN = makeOutputLine(outputRegion, "Basis", "gt-out-n");
+  function fillExample(v) { pf.input.value = v.peak_flow_gpm; rt.input.value = v.retention_minutes; lf.input.value = v.loading_factor; ml.input.value = v.meals_per_day || ""; update(); }
   const update = debounce(() => {
-    const r = computeGreaseTrap({ peak_flow_gpm: Number(pf.input.value) || 0, retention_minutes: Number(rt.input.value) || 30, loading_factor: Number(lf.input.value) || 1.25 }); stepsFor(outputRegion, inputRegion, ["peak_flow_gpm", "retention_minutes", "loading_factor"], r);
-    if (r.error) { oV.textContent = r.error; oR.textContent = "-"; return; }
-    oV.textContent = fmt(r.volume_gal, 0) + " gal";
+    const r = computeGreaseTrap({ peak_flow_gpm: Number(pf.input.value) || 0, retention_minutes: Number(rt.input.value) || 30, loading_factor: Number(lf.input.value) || 1.25, meals_per_day: Number(ml.input.value) || 0, grease_class: gc.select.value, with_flatware: fw.select.value, service_days: Number(sd.input.value) || 90 }); stepsFor(outputRegion, inputRegion, ["peak_flow_gpm", "retention_minutes", "loading_factor", "meals_per_day", "grease_class", "with_flatware", "service_days"], r);
+    if (r.error) { oV.textContent = r.error; oR.textContent = "-"; oN.textContent = ""; return; }
+    oV.textContent = fmt(r.volume_gal, 0) + " gal" + (r.fog_storage_gal > 0 ? " (" + fmt(r.separation_gal, 0) + " separation + " + fmt(r.fog_storage_gal, 0) + " grease storage)" : "");
+    oN.textContent = r.note;
     oR.textContent = String(r.recommended_nominal_gal) + " gal" + (r.exceeds_standard ? " -- the required volume EXCEEDS the largest listed size; multiple or engineered interceptors required" : "");
   }, DEBOUNCE_MS);
-  for (const el of [pf.input, rt.input, lf.input]) el.addEventListener("input", update);
+  for (const el of [pf.input, rt.input, lf.input, ml.input, sd.input]) el.addEventListener("input", update);
+  for (const el of [gc.select, fw.select]) el.addEventListener("change", update);
 }
 
 function renderGreaseInterceptorFlowCapacity(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: per IPC 2021 Section 1003.3 (grease interceptors; Table 1003.3.5.1 rates capacity in pounds of grease, not volume) and PDI G101 by name, the sizing relation volume = peak_flow x retention x loading solved for the flow: peak_flow = volume / (retention x loading). Compare to the connected fixtures' DFU peak flow. AHJ governs. Free at codes.iccsafe.org.";
+  citationEl.textContent = "Citation: per IPC 2027 Section 1003.3 (grease interceptors; Table 1003.3.4.1 [1003.3.5.1 in IPC 2021] rates capacity in pounds of grease, not volume) and PDI G101 by name, the sizing relation volume = peak_flow x retention x loading solved for the flow: peak_flow = volume / (retention x loading). Compare to the connected fixtures' DFU peak flow. AHJ governs. Free at codes.iccsafe.org.";
   attachExampleButton(inputRegion, () => fillExample(greaseInterceptorFlowCapacityExample.inputs));
   const vol = makeNumber("Interceptor volume (gal)", "gifc-v", { step: "any", min: "0" });
   const rt = makeNumber("Retention time (min)", "gifc-rt", { step: "any", min: "0", value: "30" });
@@ -2855,7 +2889,7 @@ export function computeTrapPrimer({
   let compliant = true;
   if (zone === "occupied" && prime_method === "manual") {
     compliant = false;
-    warnings.push("Manual priming is not one of the trap-seal protection methods of IPC 2021 §1002.4.1 (a potable-water or reclaimed-water primer valve, a wastewater-supplied primer device, an ASSE 1072 barrier device, or a lavatory or hand-sink drain connection); a floor drain whose seal is subject to evaporation needs one of them.");
+    warnings.push("Manual priming is not one of the trap-seal protection methods of IPC 2027 §1002.4.1 (unchanged from 2021) (a potable-water or reclaimed-water primer valve, a wastewater-supplied primer device, an ASSE 1072 barrier device, or a lavatory or hand-sink drain connection); a floor drain whose seal is subject to evaporation needs one of them.");
   }
   if (zone === "parking" && prime_method === "manual") {
     compliant = false;
@@ -2889,7 +2923,7 @@ export const trapPrimerExample = {
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 function _v16p_renderTrapPrimer(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: primers = ceil(floor drains / drains-per-distribution-unit); annual water = drains x (oz per cycle / 128) x cycles per year. Per IPC 2021 §1002.4 (trap seal depth) and §1002.4.1 (protection of emergency floor drain traps and trap seals subject to evaporation, by one of the methods in 1002.4.1.1-1002.4.1.5), with manufacturer flow rates from published cut sheets (Precision Plumbing Products / Sioux Chief / Mifab). AHJ governs. Free at codes.iccsafe.org.";
+  citationEl.textContent = "Citation: primers = ceil(floor drains / drains-per-distribution-unit); annual water = drains x (oz per cycle / 128) x cycles per year. Per IPC 2027 §1002.4 (trap seal depth; unchanged from 2021) and §1002.4.1 (protection of emergency floor drain traps and trap seals subject to evaporation, by one of the methods in 1002.4.1.1-1002.4.1.5), with manufacturer flow rates from published cut sheets (Precision Plumbing Products / Sioux Chief / Mifab). AHJ governs. Free at codes.iccsafe.org.";
   const drains = makeNumber("Floor-drain count", "tp-drains", { step: "1", min: "0" });
   const zone = makeSelect("Building zone", "tp-zone", [
     { value: "occupied", label: "Occupied space", selected: true },
@@ -3015,7 +3049,7 @@ export function computeBackflowSizing({
     min_residual_psi: minRes,
     low_pressure,
     attribution: loss.attribution,
-    compliance_note: "Testing at installation and at least annually is required by IPC 2021 §312.10.2 (and AWWA M14 and most local cross-connection control programs). AHJ governs.",
+    compliance_note: "Testing at installation and at least annually is required by IPC 2027 §312.11.2 [312.10.2 in IPC 2021] (and AWWA M14 and most local cross-connection control programs). AHJ governs.",
     warnings,
   };
 }
@@ -3752,7 +3786,7 @@ export const supplyPressureBudgetExample = {
 };
 
 function renderSupplyPressureBudget(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: IPC 2021 Section 604 and the ASPE Plumbing Engineering Design Handbook Vol. 2 by name. Elevation loss = 0.433 psi per foot of water column. Use the minimum recorded street pressure.";
+  citationEl.textContent = "Citation: IPC 2027 Section 604 (unchanged from 2021) and the ASPE Plumbing Engineering Design Handbook Vol. 2 by name. Elevation loss = 0.433 psi per foot of water column. Use the minimum recorded street pressure.";
   const street = makeNumber("Street pressure (psi, use the low)", "spb-street", { step: "any", min: "0" });
   const height = makeNumber("Critical fixture height above main (ft)", "spb-height", { step: "any", min: "0" });
   const meter = makeNumber("Meter loss (psi)", "spb-meter", { step: "any", min: "0" });
@@ -3856,7 +3890,7 @@ PLUMBING_RENDERERS["water-heater-storage-sizing"] = renderWaterHeaterStorageSizi
 // --- spec-v163 Drainage Invert Elevation, Drop, and Cover ---
 // Carries a gravity run from its slope to the field elevations: total fall over
 // the run, the downstream invert-out, the top-of-pipe, and the resulting cover
-// against the governing minimum. Slope minimums per IPC 2021 Section 704; the
+// against the governing minimum. Slope minimums per IPC 2027 Section 704 (Table 704.1 identical to 2021); the
 // minimum cover, frost depth, and live-load bury are set by the adopted code and
 // the engineer/survey of record (the minimum-cover compared against is supplied
 // by the user). A non-finite input, a non-positive run, or a negative slope
@@ -3891,7 +3925,7 @@ export const drainageInvertExample = {
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderDrainageInvert(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: invert-out = invert-in - slope x run; cover = surface - (invert-out + OD). Slope minimums per IPC 2021 Section 704; minimum cover, frost depth, and live-load bury are set by the adopted code and the engineer/survey of record.";
+  citationEl.textContent = "Citation: invert-out = invert-in - slope x run; cover = surface - (invert-out + OD). Slope minimums per IPC 2027 Section 704 (Table 704.1 identical to 2021); minimum cover, frost depth, and live-load bury are set by the adopted code and the engineer/survey of record.";
   const invIn = makeNumber("Invert-in elevation (ft)", "di-in", { step: "any" });
   const slope = makeNumber("Slope", "di-s", { step: "any", min: "0" });
   const units = makeSelect("Slope units", "di-u", [{ value: "in_per_ft", label: "in/ft" }, { value: "percent", label: "%" }]);

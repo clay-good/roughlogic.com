@@ -91,7 +91,7 @@
     },
     "friction-loss": {
       "group": "calc-plumbing.js (Group B)",
-      "stamp": "Citation: Hazen-Williams (1905, public domain). IPC 2021 referenced for application. Darcy-Weisbach with Colebrook-White for general fluid use. Free at codes.iccsafe.org."
+      "stamp": "Citation: Hazen-Williams (1905, public domain). IPC referenced for application (no IPC value enters the loss). Darcy-Weisbach with Colebrook-White for general fluid use. Free at codes.iccsafe.org."
     },
     "gas-pipe-sizing": {
       "group": "calc-plumbing.js (Group B)",
@@ -107,7 +107,7 @@
     },
     "grease-trap": {
       "group": "calc-plumbing.js (Group B)",
-      "stamp": "Citation: per IPC 2021 Section 1003.3 (grease interceptors; Table 1003.3.5.1 rates capacity in pounds of grease, not volume) and PDI G101 by name. Volume = peak_flow * retention * loading_factor. AHJ governs. Free at codes.iccsafe.org."
+      "stamp": "Citation: per IPC 2027 Section 1003.3 (grease interceptors; Table 1003.3.4.1 [1003.3.5.1 in IPC 2021] rates hydromechanical capacity in pounds of grease, not volume; 1003.3.11.1 sizes a gravity interceptor as peak flow x 30 min plus the grease stored over the service interval, meals/day x Table 1003.3.8 lb/meal x days / 6.4) and PDI G101 by name. Separation volume = peak_flow * retention * loading_factor. AHJ governs. Free at codes.iccsafe.org."
     },
     "grounding-electrode": {
       "group": "calc-electrical.js (Group A)",

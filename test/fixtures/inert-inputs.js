@@ -107,6 +107,7 @@ export const INERT_INPUTS = {
   "refrigerated-case-load::defrost_w": "moves the answer once another input changes (1,500 randomized settings)",
   "relief-commodity-truckloads::tarps_per_truck_count": "read only with damaged homes entered",
   "rf-antenna-cable-loss::loss_per_connector_db": "multiplies the connector count, 0 in the examples",
+  "roof-drain-sizing::pipe_material": "read only under IPC 2027; the worked example is the IPC 2021 single table",
   "roof-snow-ice-weight::entered_weight_pcf": "moves the answer once another input changes (1,500 randomized settings)",
   "roof-snow-ice-weight::ground_snow_psf": "read only for a layer typed by the ASCE 7 density",
   "roof-snow-ice-weight::layer3_type": "moves the answer once another input changes (1,500 randomized settings)",

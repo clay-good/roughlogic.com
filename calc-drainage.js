@@ -96,7 +96,7 @@ export const DRAINAGE_RENDERERS = {};
 // in/hr -- 1 in/hr over 1 ft^2 = 0.623 gal/min ... = 0.0104 GPM per the IPC
 // basis). The vertical leader and the sloped horizontal storm drain are then
 // sized to the smallest pipe whose capacity >= gpm against editable
-// breakpoint tables. The bundled tables are IPC 2021 Table 1106.3 (vertical
+// breakpoint tables. The 2021 tables are IPC 2021 Table 1106.3 (vertical
 // leader sizing, round leaders to 8 in, then the vertical-drain column of
 // Table 1106.2 for 10-15 in) and Table 1106.2 (storm drain pipe sizing,
 // horizontal, by slope). Until 2026-09-24 they were "conservative
@@ -111,6 +111,20 @@ const ROOF_HORIZ_TABLE = [
   [6, 243, 344, 487, 689], [8, 505, 714, 1010, 1429], [10, 927, 1311, 1855, 2623],
   [12, 1480, 2093, 2960, 4187], [15, 2508, 3546, 5016, 7093],
 ];
+// IPC 2027 replaced Table 1106.2 with one horizontal table per pipe material,
+// Tables 1106.2.3.1(1) PVC, (2) cast iron aged and (3) cast iron new, and moved
+// the vertical-drain column to Table 1106.2.4 (10 / 12 / 15 in: 2,050 / 3,270 /
+// 5,540 gpm). Read in both printings 2026-10-17. The 2021 single table above is
+// kept for code_edition "2021"; aged cast iron carries about two thirds of it.
+const ROOF_HORIZ_2027 = {
+  pvc: [[2, 12, 17, 25, 35], [3, 37, 50, 74, 105], [4, 80, 110, 160, 225], [5, 145, 205, 290, 410], [6, 235, 330, 470, 665],
+    [8, 505, 715, 1015, 1435], [10, 920, 1300, 1845, 2605], [12, 1500, 2120, 3000, 4240], [15, 2720, 3845, 5440, 7690]],
+  "cast-iron-aged": [[2, 8, 11, 15, 23], [3, 24, 35, 49, 69], [4, 53, 75, 105, 150], [5, 95, 135, 190, 270], [6, 155, 220, 310, 440],
+    [8, 335, 475, 670, 950], [10, 610, 860, 1220, 1725], [12, 990, 1405, 1985, 2810], [15, 1800, 2545, 3600, 5095]],
+  "cast-iron-new": [[2, 10, 14, 21, 29], [3, 30, 40, 60, 85], [4, 65, 90, 130, 185], [5, 120, 170, 240, 340], [6, 195, 275, 390, 555],
+    [8, 420, 600, 845, 1200], [10, 765, 1085, 1535, 2170], [12, 1250, 1765, 2500, 3535], [15, 2265, 3205, 4530, 6410]],
+};
+const ROOF_LEADER_2027 = [[2, 30], [2.5, 54], [3, 92], [4, 192], [5, 360], [6, 563], [8, 1208], [10, 2050], [12, 3270], [15, 5540]];
 const ROOF_SLOPE_COL = { "1/16": 1, "1/8": 2, "1/4": 3, "1/2": 4 };
 const _roofMonotonic = (table, col) => {
   for (let i = 1; i < table.length; i++) {
@@ -126,11 +140,11 @@ const _roofSmallestPipe = (table, col, gpm) => {
   return { size: table[table.length - 1][0], over: true };
 };
 
-// dims: in { roof_area: L^2, rainfall_rate: L T^-1, drain_slope: dimensionless } out: { gpm: L^3 T^-1, leader_in: L, horiz_in: L }
+// dims: in { roof_area: L^2, rainfall_rate: L T^-1, drain_slope: dimensionless, pipe_material: dimensionless, code_edition: dimensionless } out: { gpm: L^3 T^-1, leader_in: L, horiz_in: L }
 // (Roof area L^2 times rainfall L T^-1 times the 0.0104 GPM-per-(ft^2 x in/hr)
 //  unit constant gives a volumetric flow L^3 T^-1; the leader and horizontal
 //  storm-drain sizes are lengths L read from the capacity tables.)
-export function computeRoofDrainSizing({ roof_area, rainfall_rate, drain_slope = "1/4", leader_table = null, horiz_table = null } = {}) {
+export function computeRoofDrainSizing({ roof_area, rainfall_rate, drain_slope = "1/4", pipe_material = "pvc", code_edition = "2027", leader_table = null, horiz_table = null } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const area = Number(roof_area);
   const rain = Number(rainfall_rate);
@@ -138,8 +152,11 @@ export function computeRoofDrainSizing({ roof_area, rainfall_rate, drain_slope =
   if (!Number.isFinite(rain) || rain <= 0) return { error: "Rainfall rate must be a positive finite number (in/hr)." };
   const col = ROOF_SLOPE_COL[drain_slope];
   if (col == null) return { error: "Drain slope must be 1/16, 1/8, 1/4, or 1/2 in per ft." };
-  const lead = Array.isArray(leader_table) ? leader_table : ROOF_LEADER_TABLE;
-  const horiz = Array.isArray(horiz_table) ? horiz_table : ROOF_HORIZ_TABLE;
+  const ed = String(code_edition);
+  if (ed !== "2027" && ed !== "2021") return { error: "IPC edition must be 2027 or 2021." };
+  if (!Object.hasOwn(ROOF_HORIZ_2027, String(pipe_material))) return { error: "Pipe material must be pvc, cast-iron-new or cast-iron-aged." };
+  const lead = Array.isArray(leader_table) ? leader_table : ed === "2021" ? ROOF_LEADER_TABLE : ROOF_LEADER_2027;
+  const horiz = Array.isArray(horiz_table) ? horiz_table : ed === "2021" ? ROOF_HORIZ_TABLE : ROOF_HORIZ_2027[pipe_material];
   if (lead.length < 2 || horiz.length < 2) return { error: "Capacity tables must have at least two breakpoints." };
   if (!_roofMonotonic(lead, 1)) return { error: "Vertical-leader capacity table must be strictly increasing." };
   if (!_roofMonotonic(horiz, col)) return { error: "Horizontal storm-drain capacity table must be strictly increasing." };
@@ -154,36 +171,42 @@ export function computeRoofDrainSizing({ roof_area, rainfall_rate, drain_slope =
     leader_over: leader.over,
     horiz_over: horizontal.over,
     drain_slope,
-    note: "Rainfall rate is the locale-specific 100-year / 1-hour value from IPC Figure 1106.1 (not a national default). Sloped, vertical, and parapet walls add their contributing area per IPC 1106.4. Overflow drains and scuppers (IPC 1107) are a separate required path this tile does not size; overflow-scupper-sizing sizes them. The capacity tables carry the published IPC 2021 values (Table 1106.3 vertical leaders, with the Table 1106.2 vertical column for 10-15 in; Table 1106.2 horizontal storm drains by slope) as editable breakpoints.",
+    code_edition: ed,
+    pipe_material: ed === "2021" ? null : pipe_material,
+    note: "Horizontal storm drain capacity follows " + (ed === "2021" ? "IPC 2021 Table 1106.2 (one table for every material)" : "IPC 2027 Table 1106.2.3.1 for " + pipe_material.replace(/-/g, " ") + " (2027 gives each material its own table; aged cast iron carries about two thirds of the 2021 figure)") + ". Rainfall rate is the locale-specific 100-year / 1-hour value from IPC Figure 1106.1 (not a national default). Sloped, vertical, and parapet walls add their contributing area per IPC 1106.4. Overflow drains and scuppers (IPC 1107) are a separate required path this tile does not size; overflow-scupper-sizing sizes them. The capacity tables carry the published IPC 2021 values (Table 1106.3 vertical leaders, with the Table 1106.2 vertical column for 10-15 in; Table 1106.2 horizontal storm drains by slope) as editable breakpoints.",
   };
 }
 
 export const roofDrainSizingExample = {
-  inputs: { roof_area: 5000, rainfall_rate: 4, drain_slope: "1/4" },
+  inputs: { roof_area: 5000, rainfall_rate: 4, drain_slope: "1/4", code_edition: "2021" },
   expectedRange: { gpm: { min: 207.9, max: 208.1 } },
 };
 
 function renderRoofDrainSizing(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: IPC 2021 Section 1106: Table 1106.2 (storm drain pipe sizing, horizontal by slope and vertical) and Table 1106.3 (vertical leader sizing), bundled as published and still editable. Storm flow gpm = area x rainfall x 0.0104.";
+  citationEl.textContent = "Citation: IPC 2027 Section 1106: Tables 1106.2.3.1(1)-(3) (horizontal storm drain capacity by slope, for PVC, new cast iron and aged cast iron), Table 1106.2.4 (vertical storm drain) and Table 1106.3 (vertical leader sizing); IPC 2021 Table 1106.2, one table for every material, is an edition option. Storm flow gpm = area x rainfall x 0.0104.";
   const area = makeNumber("Roof area served (ft², horizontally projected)", "rd-area", { step: "any", min: "0" });
   const rain = makeNumber("Design rainfall, 100-yr / 1-hr (in/hr)", "rd-rain", { step: "any", min: "0" });
   const slope = makeSelect("Horizontal storm-drain slope", "rd-slope", [
     { value: "1/16", label: "1/16 in per ft" }, { value: "1/8", label: "1/8 in per ft" }, { value: "1/4", label: "1/4 in per ft", selected: true }, { value: "1/2", label: "1/2 in per ft" },
   ]);
-  for (const f of [area, rain, slope]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { area.input.value = "5000"; rain.input.value = "4"; slope.select.value = "1/4"; update(); });
+  const mat = makeSelect("Storm drain pipe material", "rd-mat", [
+    { value: "pvc", label: "PVC", selected: true }, { value: "cast-iron-new", label: "Cast iron, new" }, { value: "cast-iron-aged", label: "Cast iron, aged" },
+  ]);
+  const ed = makeSelect("IPC edition", "rd-ed", [{ value: "2027", label: "IPC 2027 (table by material)", selected: true }, { value: "2021", label: "IPC 2021 (one table)" }]);
+  for (const f of [area, rain, slope, mat, ed]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { area.input.value = "5000"; rain.input.value = "4"; slope.select.value = "1/4"; mat.select.value = "pvc"; ed.select.value = "2021"; update(); });
   const oGpm = makeOutputLine(outputRegion, "Storm flow", "rd-out-gpm");
   const oLeader = makeOutputLine(outputRegion, "Vertical leader", "rd-out-leader");
   const oHoriz = makeOutputLine(outputRegion, "Horizontal storm drain", "rd-out-horiz");
   const update = debounce(() => {
-    const r = computeRoofDrainSizing({ roof_area: Number(area.input.value) || 0, rainfall_rate: Number(rain.input.value) || 0, drain_slope: slope.select.value }); stepsFor(outputRegion, inputRegion, ["roof_area", "rainfall_rate", "drain_slope"], r);
+    const r = computeRoofDrainSizing({ roof_area: Number(area.input.value) || 0, rainfall_rate: Number(rain.input.value) || 0, drain_slope: slope.select.value, pipe_material: mat.select.value, code_edition: ed.select.value }); stepsFor(outputRegion, inputRegion, ["roof_area", "rainfall_rate", "drain_slope", "pipe_material", "code_edition"], r);
     if (r.error) { oGpm.textContent = r.error; oLeader.textContent = "-"; oHoriz.textContent = "-"; return; }
     oGpm.textContent = fmt(r.gpm, 1) + " GPM";
     oLeader.textContent = r.leader_in + " in" + (r.leader_over ? " (over table - increase pipe / split drains)" : "");
-    oHoriz.textContent = r.horiz_in + " in at " + r.drain_slope + " in/ft" + (r.horiz_over ? " (over table - increase pipe / split drains)" : "");
+    oHoriz.textContent = r.horiz_in + " in at " + r.drain_slope + " in/ft" + (r.pipe_material ? ", " + r.pipe_material.replace(/-/g, " ") : "") + " (IPC " + r.code_edition + ")" + (r.horiz_over ? " (over table - increase pipe / split drains)" : "");
   }, DEBOUNCE_MS);
   for (const el of [area.input, rain.input]) el.addEventListener("input", update);
-  slope.select.addEventListener("change", update);
+  for (const el of [slope.select, mat.select, ed.select]) el.addEventListener("change", update);
 }
 DRAINAGE_RENDERERS["roof-drain-sizing"] = renderRoofDrainSizing;
 
@@ -243,7 +266,7 @@ export const sumpBasinSizingExample = {
 };
 
 function renderSumpBasinSizing(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: IPC 2021 Section 712 (Sumps and Ejectors) and the Hydraulic Institute pump-cycling guidance by name. drawdown_gal = (PI/4)(dia/12)^2 x (band/12) x 7.48 gal/ft^3; run and fill times are volume over rate.";
+  citationEl.textContent = "Citation: IPC 2027 Section 712 (Sumps and Ejectors; unchanged from 2021) and the Hydraulic Institute pump-cycling guidance by name. drawdown_gal = (PI/4)(dia/12)^2 x (band/12) x 7.48 gal/ft^3; run and fill times are volume over rate.";
   const dia = makeNumber("Basin inside diameter (in)", "sb-dia", { step: "any", min: "0" });
   const band = makeNumber("Drawdown band, pump-off to pump-on (in)", "sb-band", { step: "any", min: "0" });
   const inflow = makeNumber("Design inflow (GPM)", "sb-inflow", { step: "any", min: "0" });

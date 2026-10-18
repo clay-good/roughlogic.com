@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "72502837531341ab",
+      "sha": "be35748a2005b656",
       "date": "2026-10-18"
     },
     "/tools/": {
@@ -10,7 +10,7 @@
       "date": "2026-10-18"
     },
     "/errata/": {
-      "sha": "698e357c7871e35a",
+      "sha": "40b9088a8037a271",
       "date": "2026-10-18"
     },
     "/collections/disaster-response/": {
@@ -70,8 +70,8 @@
       "date": "2026-10-17"
     },
     "/groups/plumbing/": {
-      "sha": "6d004037554a9a98",
-      "date": "2026-10-17"
+      "sha": "b3133465bdb935b6",
+      "date": "2026-10-18"
     },
     "/groups/real-estate/": {
       "sha": "1f0b1a3a6f0058c1",
@@ -422,16 +422,16 @@
       "date": "2026-10-17"
     },
     "/tools/backflow/": {
-      "sha": "3c8031b59f2262ef",
-      "date": "2026-10-17"
+      "sha": "1b6c31acaecca52d",
+      "date": "2026-10-18"
     },
     "/tools/backflow-loss/": {
       "sha": "3a2a479e218cd601",
       "date": "2026-10-17"
     },
     "/tools/backflow-sizing/": {
-      "sha": "3a092681f22db0d2",
-      "date": "2026-10-17"
+      "sha": "587ee69f9deff77f",
+      "date": "2026-10-18"
     },
     "/tools/backflow-test-psi/": {
       "sha": "0279f6b28bd37a64",
@@ -1270,8 +1270,8 @@
       "date": "2026-10-17"
     },
     "/tools/cleanout-layout/": {
-      "sha": "44117525200f541e",
-      "date": "2026-10-17"
+      "sha": "f13b5f6a257da22d",
+      "date": "2026-10-18"
     },
     "/tools/clearance-plate-envelope/": {
       "sha": "32f80f99d0ff8408",
@@ -2350,8 +2350,8 @@
       "date": "2026-10-17"
     },
     "/tools/drainage-invert/": {
-      "sha": "d4ce53e47bb1e67e",
-      "date": "2026-10-17"
+      "sha": "15386942daf340a4",
+      "date": "2026-10-18"
     },
     "/tools/drawbar-power/": {
       "sha": "bf1b1c447f370881",
@@ -3554,12 +3554,12 @@
       "date": "2026-10-17"
     },
     "/tools/grease-interceptor-flow-capacity/": {
-      "sha": "e6db5ed47f66261e",
-      "date": "2026-10-17"
+      "sha": "9807ceca5dff99d1",
+      "date": "2026-10-18"
     },
     "/tools/grease-trap/": {
-      "sha": "bc230cacd8188f6e",
-      "date": "2026-10-17"
+      "sha": "c027823130ee0c0f",
+      "date": "2026-10-18"
     },
     "/tools/greenhouse-transpiration-water/": {
       "sha": "7004bdee80198c9d",
@@ -3974,8 +3974,8 @@
       "date": "2026-10-17"
     },
     "/tools/hydrostatic-test/": {
-      "sha": "9a73c3d27439bc0d",
-      "date": "2026-10-17"
+      "sha": "66df33d1a7a16002",
+      "date": "2026-10-18"
     },
     "/tools/hydroxyl-sizing/": {
       "sha": "e0ff0ebe0abce4c1",
@@ -5478,7 +5478,7 @@
       "date": "2026-10-17"
     },
     "/tools/pipe-sizing/": {
-      "sha": "ef2657d022fd5615",
+      "sha": "f804c88417620d0c",
       "date": "2026-10-18"
     },
     "/tools/pipe-spacing-rack/": {
@@ -6534,8 +6534,8 @@
       "date": "2026-10-17"
     },
     "/tools/roof-drain-sizing/": {
-      "sha": "611b1a419ad6d69e",
-      "date": "2026-10-17"
+      "sha": "3badc57267ac9a62",
+      "date": "2026-10-18"
     },
     "/tools/roof-insulation-fasteners/": {
       "sha": "30ebb6c7fe3508cc",
@@ -8250,8 +8250,8 @@
       "date": "2026-10-17"
     },
     "/tools/tpr-discharge/": {
-      "sha": "b6ed105fe7f2c41b",
-      "date": "2026-10-17"
+      "sha": "aac7b42c30b4fba4",
+      "date": "2026-10-18"
     },
     "/tools/tr55-detention-storage/": {
       "sha": "e8cae7635000c85b",
@@ -8350,8 +8350,8 @@
       "date": "2026-10-18"
     },
     "/tools/trap-primer/": {
-      "sha": "b8e0044f4e2a6363",
-      "date": "2026-10-17"
+      "sha": "b7ad0e33bd6b2488",
+      "date": "2026-10-18"
     },
     "/tools/trap-seal-loss/": {
       "sha": "f5aba5c86a5a5924",
@@ -8658,8 +8658,8 @@
       "date": "2026-10-17"
     },
     "/tools/vent-terminal-check/": {
-      "sha": "ec2bec4cafe00051",
-      "date": "2026-10-17"
+      "sha": "3990caddb870b9b9",
+      "date": "2026-10-18"
     },
     "/tools/ventilation-rate-procedure/": {
       "sha": "ea2813a9eb43df58",
@@ -8938,8 +8938,8 @@
       "date": "2026-10-17"
     },
     "/tools/wh-expansion-tank/": {
-      "sha": "cd7d1ddf0d088467",
-      "date": "2026-10-17"
+      "sha": "51f40f331d3547fe",
+      "date": "2026-10-18"
     },
     "/tools/wheel-offset-backspacing/": {
       "sha": "11d2bf9fce0c8688",

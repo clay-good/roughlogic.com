@@ -129,7 +129,7 @@ SERVICE_RENDERERS["gas-appliance-demand"] = renderGasApplianceDemand;
 // --- tpr-discharge: Water-Heater Relief Valve and Discharge Check ---
 //
 // rating_ok = valve_rating >= heater_input; the discharge line is the full valve
-// outlet, never reduced. IPC 2021 504.5 sets the rating rule (and the valve
+// outlet, never reduced. IPC 2027 (and 2021) 504.5 sets the rating rule (and the valve
 // settings, 210 F and 150 psi maximum); 504.6 the discharge piping. Output is a verdict plus the IPC 504.6 discharge
 // checklist, not a continuous quantity.
 const TPR_OUTLET_LABEL = { 0.75: "3/4", 1: "1" };
@@ -161,7 +161,7 @@ export function computeTprDischarge({ heater_input, valve_rating, outlet_size = 
     heater_input: input,
     valve_rating: rating,
     checklist: TPR_CHECKLIST,
-    note: "An undersized or missing T&P valve is the top water-heater safety failure. The discharge pipe must be the full outlet size, may not serve any other valve, and follows IPC 504.6. The valve's relieving capacity must equal or exceed the heater input, set at not more than 210 F and 150 psi (IPC 504.5). A replacement valve must match the heater's input and working pressure (ANSI Z21.22 / CSA 4.4).",
+    note: "An undersized or missing T&P valve is the top water-heater safety failure. The discharge pipe must be the full outlet size, may not serve any other valve, and follows IPC 504.6. The valve's relieving capacity must equal or exceed the heater input, set at not more than 210 F and at not more than 150 psi or the heater's rated working pressure, whichever is less (IPC 504.5). A replacement valve must match the heater's input and working pressure (ANSI Z21.22 / CSA 4.4).",
   };
 }
 
@@ -171,7 +171,7 @@ export const tprDischargeExample = {
 };
 
 function renderTprDischarge(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: IPC 2021 Section 504 (504.5 valve relieving capacity vs heater input, 504.6 discharge piping) and ANSI Z21.22 / CSA 4.4 by name. The discharge line is the full valve outlet, never reduced.";
+  citationEl.textContent = "Citation: IPC 2027 Section 504 (504.5 valve relieving capacity vs heater input, 504.6 discharge piping; both unchanged from 2021) and ANSI Z21.22 / CSA 4.4 by name. The discharge line is the full valve outlet, never reduced.";
   const input = makeNumber("Heater input rating (BTU/hr)", "tpr-input", { step: "any", min: "0" });
   const rating = makeNumber("T&P valve marked relief capacity (BTU/hr)", "tpr-rating", { step: "any", min: "0" });
   const outlet = makeSelect("Valve discharge-outlet size", "tpr-outlet", [
