@@ -74,6 +74,8 @@ const IPC_DRAIN_2027 = " Checked against the current IPC 2027 printing on 2026-1
 // Appended to the IPC supply tiles checked against IPC 2027 on 2026-10-17.
 const IPC_SUPPLY_2027 = " Checked against the current IPC 2027 printing on 2026-10-17: Tables 308.5, 604.3 and 608.16.1 and Appendix E Table E103.3(3) are identical to IPC 2021 in every row this tile uses.";
 const IRC_DISCLOSURE = "Editions available: bundled values follow IRC 2021. Jurisdictions on IRC 2018 / 2024 differ at the margins; verify the edition adopted by your AHJ.";
+// For IRC tiles whose every bundled IRC value was read against IRC 2024 (2026-10-17).
+const IRC_CHECKED_DISCLOSURE = "Editions available: bundled values follow IRC 2024. IRC 2024 is the current published edition, and the IRC values this tile uses were read against it on 2026-10-17 (see below); unless noted they are identical in IRC 2021. IRC 2027 is expected in early 2027; verify the edition adopted by your AHJ.";
 // Appended to the IRC disclosure on the four IRC tiles whose span / deflection
 // values come from the NDS (2026-10-17).
 const NDS_LAG = " AWC NDS-2024 is the current published edition (the one the 2024 IBC references); the NDS design values and relations here follow NDS-2018 and have not yet been re-checked against it.";
@@ -92,13 +94,15 @@ const IMC_2021 = "IMC 2021 (International Mechanical Code).";
 
 // Plumbing / gas common phrasing (Group B audit, priority 2 per spec §6).
 const IPC_2021 = "IPC 2021 (International Plumbing Code).";
-const IFGC_2021 = "IFGC 2021 (International Fuel Gas Code) / NFPA 54.";
+const IPC_2027 = "IPC 2027 (International Plumbing Code).";
 const IFGC_2027 = "IFGC 2027 (International Fuel Gas Code) / NFPA 54.";
 const IFGC_CHECKED = " Checked against the IFGC 2027 printing on 2026-10-17: Sections 304.5 / 304.5.3 / 304.6 (50 ft^3 per 1,000 Btu/h; 1 in^2 per 1,000 Btu/h indoor, 100 in^2 minimum; 1 in^2 per 4,000 / 2,000 / 3,000 Btu/h outdoor), 402.2, Equation 4-1 and the Table 402.4 Cr factors (0.6094 natural gas, 1.2462 propane), 406.4.1 (1.5 x working pressure, 3 psig minimum), 406.4.2 (10 minutes minimum) and 411.1.3.1 (6 ft connectors) are unchanged from 2021, with the same section numbers.";
 const ICC_FREE = "Free read-only access at codes.iccsafe.org.";
 const NFPA54_FREE = "Free read-only access at nfpa.org/freeaccess.";
 const IPC_DISCLOSURE = "Editions available: bundled values follow IPC 2021. IPC 2027 is the current published edition and 2024 preceded it; jurisdictions on IPC 2018, 2021, 2024 or 2027 differ in fixture-unit values and vent-sizing tables; verify the edition adopted by your AHJ. UPC-jurisdictions (CA, IN, MA, NV, parts of NJ) use the Uniform Plumbing Code instead.";
-const IFGC_DISCLOSURE = "Editions available: bundled values follow IFGC 2021 / NFPA 54-2021. IFGC 2027 is the current published edition and 2024 preceded it; jurisdictions on any of these differ at the margins; verify the edition adopted by your AHJ.";
+const IFGC_DISCLOSURE = "Editions available: bundled values follow IFGC 2027. IFGC 2027 is the current published edition, and the values this tile uses were read against it on 2026-10-17 (see below); they are identical in IFGC 2021. NFPA 54 (National Fuel Gas Code) carries the same requirements and is cited by name; verify the edition adopted by your AHJ.";
+// For IPC tiles whose every bundled value was read against IPC 2027 (2026-10-17).
+const IPC_CHECKED_DISCLOSURE = "Editions available: bundled values follow IPC 2027. IPC 2027 is the current published edition, and the values this tile uses were read against it on 2026-10-17 (see below); unless noted they are identical in IPC 2021 and 2024. UPC jurisdictions (CA, IN, MA, NV, parts of NJ) use the Uniform Plumbing Code instead; verify the edition adopted by your AHJ.";
 
 // Group A - Electrical. Priority-1 audit per spec-v6.md §6.
 // Citations cite NEC by section number and edition only; no NEC table text
@@ -3610,7 +3614,7 @@ export const CITATIONS = {
     edition: IRC_2024 + " §R318.7 [R311.7 in IRC 2021] referenced by name; the user supplies the AHJ's adopted max rise and min tread (the tile does not bundle code values).",
     freeAccess: ICC_FREE,
     governance: GOVERNANCE.structural,
-    editionNote: IRC_DISCLOSURE + IRC_CH3_2024 + " The tool deliberately does not bundle a per-jurisdiction max-rise / min-tread shard; the user enters the values from local code.",
+    editionNote: IRC_CHECKED_DISCLOSURE + IRC_CH3_2024 + " The tool deliberately does not bundle a per-jurisdiction max-rise / min-tread shard; the user enters the values from local code.",
     assumptions: [
       { name: "Default target rise / tread", value: "7.0 in / 11.0 in (engineering practice typical)", source: "engineering practice" },
       { name: "Default code max rise / min tread", value: "7.75 in / 10.0 in (IRC 2024 §R318.7 [R311.7 in IRC 2021] typical; verify your AHJ)", source: "IRC 2021 default" },
@@ -3857,11 +3861,11 @@ export const CITATIONS = {
   // every constant the tile applies that the user does not supply.
 
   "pipe-sizing": {
-    formula: "WSFU from UPC-style private-use fixture-unit values (above IPC Appendix E Table E103.3(2)); Hunter's Curve converts total WSFU to gpm; DFU per IPC 2027 Table 709.1 (unchanged from 2021 except the drinking fountain, now 0); supply size from the bundled gpm thresholds; drain size is the smallest IPC 2021 Table 710.1(1) building drain that carries the DFU at the chosen slope, and 3 in minimum with a water closet (Table 709.1 outlet, 704.2).",
-    edition: IPC_2021 + " Tables 709.1 and 710.1(1) and Appendix E by name; Hunter's Curve (NBS BMS65).",
+    formula: "WSFU from UPC-style private-use fixture-unit values (above IPC Appendix E Table E103.3(2)); Hunter's Curve converts total WSFU to gpm; DFU per IPC 2027 Table 709.1 (unchanged from 2021 except the drinking fountain, now 0); supply size from the bundled gpm thresholds; drain size is the smallest IPC 2027 Table 710.1(1) building drain that carries the DFU at the chosen slope, and 3 in minimum with a water closet (Table 709.1 outlet, 704.2).",
+    edition: IPC_2027 + " Tables 709.1 and 710.1(1) and Appendix E by name; Hunter's Curve (NBS BMS65).",
     freeAccess: ICC_FREE,
     governance: GOVERNANCE.plumbing,
-    editionNote: IPC_DISCLOSURE + IPC_DRAIN_2027,
+    editionNote: IPC_CHECKED_DISCLOSURE + IPC_DRAIN_2027,
     assumptions: [
       { name: "Pressure head at most-distant fixture", value: "not checked here (IPC 604.6 sets an 8 psi minimum)", source: "IPC 2021 Section 604.6" },
       { name: "Maximum velocity", value: "not checked here (8 fps water supply / 5 fps hot water is common practice)", source: "IPC 2021 Section 604.4" },
@@ -3922,10 +3926,10 @@ export const CITATIONS = {
   },
   "slope": {
     formula: "Slope expressed as fraction (1/4 inch per foot), degrees, and percent. Standard horizontal-drainage slopes per IPC 2027 Table 704.1 (identical in 2021).",
-    edition: IPC_2021 + " Section 704, Table 704.1.",
+    edition: IPC_2027 + " Section 704, Table 704.1.",
     freeAccess: ICC_FREE,
     governance: GOVERNANCE.plumbing,
-    editionNote: IPC_DISCLOSURE + IPC_DRAIN_2027,
+    editionNote: IPC_CHECKED_DISCLOSURE + IPC_DRAIN_2027,
     assumptions: [
       { name: "Minimum slope rule", value: "1/4 in per ft for ≤ 2-1/2 in; 1/8 in per ft for 3 to 6 in; 1/16 in per ft for 8 in and larger", source: "IPC 2027 Table 704.1 (identical in 2021)" },
     ],
@@ -4035,10 +4039,10 @@ export const CITATIONS = {
   },
   "sanitary-dfu": {
     formula: "total DFU = sum(fixture count × DFU value). Minimum pipe size = smallest size whose table maximum ≥ total DFU: horizontal branch and stack per IPC Table 710.1(2); building drain per IPC Table 710.1(1) (slope-dependent).",
-    edition: IPC_2021 + " Section 710; DFU values per IPC Table 709.1; capacities per Tables 710.1(1) and 710.1(2).",
+    edition: IPC_2027 + " Section 710; DFU values per IPC Table 709.1; capacities per Tables 710.1(1) and 710.1(2).",
     freeAccess: ICC_FREE,
     governance: GOVERNANCE.plumbing,
-    editionNote: "Bundled DFU and capacity tables follow IPC 2021. Jurisdictions on UPC or an older IPC edition differ at the margins; verify the edition adopted by your AHJ." + IPC_DRAIN_2027,
+    editionNote: IPC_CHECKED_DISCLOSURE + IPC_DRAIN_2027,
     assumptions: [
       { name: "DFU values", value: "IPC Table 709.1 (private WC 3, public WC 4, lavatory 1, bath 2, shower 2, kitchen sink 2, urinal 4, floor drain 2, ...)", source: "IPC 2027 Table 709.1 (identical in 2021 except the drinking fountain, 1/2 DFU then, 0 now)" },
       { name: "Branch / stack capacity", value: "IPC Table 710.1(2) max DFU by nominal size", source: "IPC 2027 Table 710.1(2) (identical in 2021)" },
@@ -4128,11 +4132,11 @@ export const CITATIONS = {
     ],
   },
   "trap-arm": {
-    formula: "Trap-arm horizontal length capped per IPC 2021 Section 909.1, Table 909.1 keyed to trap-arm size.",
-    edition: IPC_2021 + " Section 909, Table 909.1.",
+    formula: "Trap-arm horizontal length capped per IPC 2027 Section 909.1, Table 909.1 keyed to trap-arm size.",
+    edition: IPC_2027 + " Section 909, Table 909.1.",
     freeAccess: ICC_FREE,
     governance: GOVERNANCE.plumbing,
-    editionNote: IPC_DISCLOSURE + IPC_DRAIN_2027,
+    editionNote: IPC_CHECKED_DISCLOSURE + IPC_DRAIN_2027,
     assumptions: [
       { name: "Trap-arm slope and fall", value: "1/4 in per ft for 2 in and smaller, 1/8 in per ft for 3 and 4 in (Table 909.1); total fall not more than 1 pipe diameter (909.2)", source: "IPC 2027 Table 909.1 / 909.2 (identical in 2021)" },
     ],
@@ -4345,7 +4349,7 @@ export const CITATIONS = {
     edition: "IPC 2027 §608.16.1 and Table 608.16.1 (identical in 2021) (air gaps; 608.15.1 in the 2018 numbering) and ASME A112.1.2 (Air Gaps in Plumbing Systems) by name.",
     freeAccess: ICC_FREE,
     governance: GOVERNANCE.plumbing,
-    editionNote: IPC_DISCLOSURE + IPC_SUPPLY_2027 + " IPC 2027 Table 608.16.1 (identical in 2021) sets the minimum air gap by the effective opening (the diameter of the least cross-sectional area of the supply outlet): 1, 1-1/2 or 2 in up to 1/2, 3/4 or 1 in, then twice the opening; close to a wall (within three diameters of one wall, four of two walls meeting) 1-1/2, 2-1/2, 3 in, then three times the opening and never less than 1.5 in for openings up to 1/2 in (ASME A112.1.2 Table 1). The air gap is the vertical distance between the supply outlet and the flood-level rim of the fixture it discharges into and is the most positive cross-connection protection there is -- unlike a mechanical assembly it cannot fail or be defeated. This returns the minimum air gap for indirect-waste and tank-fill protection and checks a measured gap against it; the AHJ's adopted plumbing code governs.",
+    editionNote: IPC_CHECKED_DISCLOSURE + IPC_SUPPLY_2027 + " IPC 2027 Table 608.16.1 (identical in 2021) sets the minimum air gap by the effective opening (the diameter of the least cross-sectional area of the supply outlet): 1, 1-1/2 or 2 in up to 1/2, 3/4 or 1 in, then twice the opening; close to a wall (within three diameters of one wall, four of two walls meeting) 1-1/2, 2-1/2, 3 in, then three times the opening and never less than 1.5 in for openings up to 1/2 in (ASME A112.1.2 Table 1). The air gap is the vertical distance between the supply outlet and the flood-level rim of the fixture it discharges into and is the most positive cross-connection protection there is -- unlike a mechanical assembly it cannot fail or be defeated. This returns the minimum air gap for indirect-waste and tank-fill protection and checks a measured gap against it; the AHJ's adopted plumbing code governs.",
     assumptions: [
       { name: "Air gap table", value: "stepped 1 / 1-1/2 / 2 in (close to a wall 1-1/2 / 2-1/2 / 3) up to 1 in openings, 2x / 3x above", source: "IPC 2027 Table 608.16.1 (identical in 2021) / ASME A112.1.2" },
       { name: "Effective opening", value: "the diameter of the least cross-sectional area of the supply outlet", source: "ASME A112.1.2" },
@@ -4388,11 +4392,11 @@ export const CITATIONS = {
     assumptions: [],
   },
   "inspection-checklist": {
-    formula: "(reference page; no compute) Per-trade rough-in and final inspection checklists organized by inspection point: electrical (NEC 2023), plumbing (IPC 2021), mechanical (IMC 2021), and structural framing (IRC 2021).",
-    edition: NEC_2023 + " " + IPC_2021 + " IMC 2021. IRC 2021. All cited by section number only.",
+    formula: "(reference page; no compute) Five generic rough-in and final inspection points per trade: electrical, plumbing, HVAC and carpentry. No code section number or value is listed.",
+    edition: "No code section or value is cited; the items are generic inspection points that the AHJ-adopted NEC, IPC, IMC and IRC govern.",
     freeAccess: NEC_FREE + " IPC / IMC / IRC: " + ICC_FREE,
     governance: GOVERNANCE.general,
-    editionNote: "Editions available: the checklist cites NEC 2023, IPC 2021, IMC 2021 and IRC 2021 by section. NEC 2026, IPC 2027, IMC 2027 and IRC 2024 are the current published editions. Inspection points are stable across recent editions; section numbering may shift, so verify the edition your AHJ adopted.",
+    editionNote: "Edition-independent: the checklist names no section number or code value, so it does not follow any one edition. Until 2026-10-17 this note said it cited NEC 2023, IPC 2021, IMC 2021 and IRC 2021 by section; it never did. Verify each point against the edition your AHJ adopted.",
     assumptions: [],
   },
   "emergency-contacts": {
@@ -4781,10 +4785,10 @@ export const CITATIONS = {
     edition: IRC_2024 + " §R318.7 [R311.7 in IRC 2021].",
     freeAccess: ICC_FREE,
     governance: GOVERNANCE.structural,
-    editionNote: IRC_DISCLOSURE + IRC_CH3_2024,
+    editionNote: IRC_CHECKED_DISCLOSURE + IRC_CH3_2024,
     assumptions: [
-      { name: "Standard riser max", value: "7-3/4 in residential per IRC §R318.7.5.1 [R311.7.5.1 in IRC 2021]", source: "IRC 2021" },
-      { name: "Standard tread min", value: "10 in residential per IRC §R318.7.5.2 [R311.7.5.2 in IRC 2021]", source: "IRC 2021" },
+      { name: "Standard riser max", value: "7-3/4 in residential per IRC §R318.7.5.1 [R311.7.5.1 in IRC 2021]", source: "IRC 2024" },
+      { name: "Standard tread min", value: "10 in residential per IRC §R318.7.5.2 [R311.7.5.2 in IRC 2021]", source: "IRC 2024" },
     ],
   },
   "roof-pitch": {
@@ -4901,7 +4905,7 @@ export const CITATIONS = {
     edition: IRC_2024 + " §R318.7 [R311.7 in IRC 2021].",
     freeAccess: ICC_FREE,
     governance: GOVERNANCE.structural,
-    editionNote: IRC_DISCLOSURE + IRC_CH3_2024,
+    editionNote: IRC_CHECKED_DISCLOSURE + IRC_CH3_2024,
     assumptions: [],
   },
   "joist-deflection": {
@@ -4926,10 +4930,10 @@ export const CITATIONS = {
   },
   "header-sizing": {
     formula: "Tributary uniform load w (plf) = total area load (psf) × supported width (ft); roof = the greater of ground snow and the 20 psf roof live load, + 15 psf dead, each floor adds 50 psf. Smallest built-up member with min(L_bending, L_deflection) ≥ span, where Fb is adjusted by load-duration C_D and size factor C_F. Jack studs each end = ceil(end reaction / (F_c-perp × 5.25 in²)).",
-    edition: IRC_2021 + " §R602.7 (headers). " + AWC_NDS + " reference design values, load-duration C_D and size factor C_F.",
+    edition: IRC_2024 + " §R602.7 (headers). " + AWC_NDS + " reference design values, load-duration C_D and size factor C_F.",
     freeAccess: ICC_FREE + " AWC NDS free at awc.org.",
     governance: GOVERNANCE.structural,
-    editionNote: IRC_DISCLOSURE + NDS_LAG + IRC_DECK_2024,
+    editionNote: IRC_CHECKED_DISCLOSURE + NDS_LAG + IRC_DECK_2024,
     assumptions: [
       { name: "Load assembly", value: "roof = max(ground snow, 20 psf roof live) + 15 psf dead; each floor above = 40 psf live + 10 psf dead", source: "IRC 2021 typical residential" },
       { name: "Load-duration factor C_D", value: "1.15 snow (roof-only) / 1.0 occupancy (floors above)", source: "AWC NDS-2018 Table 2.3.2" },
@@ -4959,7 +4963,7 @@ export const CITATIONS = {
     ],
   },
   "joist-cantilever-check": {
-    formula: "table_limit_ft = IRC 2021 Table R507.6 maximum cantilever for the joist size and species at the tabulated backspan column at or above backspan_ft (NP = not permitted); ratio_limit_ft = backspan_ft / 4; cantilever_max_ft = min(table_limit_ft, ratio_limit_ft); within_limit when overhang_ft <= cantilever_max_ft; margin_ft = cantilever_max_ft - overhang_ft.",
+    formula: "table_limit_ft = IRC 2024 Table R507.6 (identical to 2021) maximum cantilever for the joist size and species at the tabulated backspan column at or above backspan_ft (NP = not permitted); ratio_limit_ft = backspan_ft / 4; cantilever_max_ft = min(table_limit_ft, ratio_limit_ft); within_limit when overhang_ft <= cantilever_max_ft; margin_ft = cantilever_max_ft - overhang_ft.",
     edition: "IRC 2024 Table R507.6 (deck joist spans and cantilevers, 40 psf live load; every cantilever value identical to IRC 2021, checked 2026-10-17), by name; backspan columns 4 to 18 ft. The AHJ-adopted IRC edition governs.",
     freeAccess: "IRC Table R507.6 is a prescriptive table (many jurisdictions post the adopted IRC); the tile reads its cantilever columns for the entered joist size, species, and backspan.",
     governance: GOVERNANCE.general,
@@ -4971,10 +4975,10 @@ export const CITATIONS = {
   },
   "deck-beam-post": {
     formula: "Tributary width to beam = joist span / 2; beam load w (plf) = (live + dead) psf × tributary. Smallest built-up beam with min(L_bending, L_deflection) ≥ post spacing. Post axial load = w × post spacing; NDS column capacity = F_c × C_P × A with C_P from F_cE = 0.822 E_min / (le/d)². Footing from soil bearing; ledger fastener spacing from IRC Table R507.9.1.3(1).",
-    edition: IRC_2021 + " §R507 (decks). " + AWC_NDS + " reference values; IRC Table R507.9.1.3(1) ledger fasteners.",
+    edition: IRC_2024 + " §R507 (decks). " + AWC_NDS + " reference values; IRC Table R507.9.1.3(1) ledger fasteners.",
     freeAccess: ICC_FREE + " AWC NDS free at awc.org.",
     governance: GOVERNANCE.structural,
-    editionNote: IRC_DISCLOSURE + NDS_LAG + IRC_DECK_2024,
+    editionNote: IRC_CHECKED_DISCLOSURE + NDS_LAG + IRC_DECK_2024,
     assumptions: [
       { name: "Deck loads", value: "40 psf live + 10 psf dead per IRC R507 default", source: "IRC 2021 §R507" },
       { name: "Column stability", value: "pinned-pinned (K_e = 1), c = 0.8 for sawn lumber, E_min and F_c for the 4x4 from NDS Supplement Table 4A/4B No.2 dimension lumber and for the 6x6 from Table 4D No.2 Posts and Timbers (5x5 and larger)", source: "AWC NDS-2018" },
@@ -9560,7 +9564,7 @@ export const CITATIONS = {
   "wsfu-demand": {
     formula: "gpm = interpolate(curve, wsfu): piecewise-linear between published [WSFU, GPM] breakpoints for the selected system type (flush tank or flush valve). Flush-valve systems peak higher at low WSFU.",
     edition: "Hunter's curve (NBS BMS65, Methods of Estimating Loads in Plumbing Systems) and IPC 2027 Appendix E (Table E103.3(3), identical in 2021) by name; the curve ships as editable breakpoints read from that table.",
-    freeAccess: "IPC 2021 free read-only at codes.iccsafe.org; NBS BMS65 is public-domain (US government). The bundled curve carries the Table E103.3(3) values as editable breakpoints.",
+    freeAccess: "IPC 2027 free read-only at codes.iccsafe.org; NBS BMS65 is public-domain (US government). The bundled curve carries the Table E103.3(3) values as editable breakpoints.",
     governance: GOVERNANCE.general,
     editionNote: "The bundled flush-tank and flush-valve curves carry the IPC Table E103.3(3) values (Hunter's curve) as editable breakpoints, linearly interpolated between rows. The output is the design demand, not a metered actual." + IPC_SUPPLY_2027,
     assumptions: [
@@ -9569,8 +9573,8 @@ export const CITATIONS = {
   },
   "supply-pressure-budget": {
     formula: "elevation_loss = fixture_height * 0.433; available = street_pressure - elevation_loss - meter_loss - bfp_loss - friction_loss; headroom = available - fixture_min; adequate = headroom >= 0. 0.433 psi per foot of water column.",
-    edition: "IPC 2021 Section 604 and the ASPE Plumbing Engineering Design Handbook Vol. 2 by name; first-principles pressure budget.",
-    freeAccess: "IPC 2021 free read-only at codes.iccsafe.org; the 0.433 psi/ft water-column constant is public.",
+    edition: "IPC 2027 Section 604 and the ASPE Plumbing Engineering Design Handbook Vol. 2 by name; first-principles pressure budget.",
+    freeAccess: "IPC 2027 free read-only at codes.iccsafe.org; the 0.433 psi/ft water-column constant is public.",
     governance: GOVERNANCE.general,
     editionNote: "Use the minimum recorded street pressure. IPC 2027 Table 604.3 (identical in 2021) minimum flow pressures: 8 psi for lavatories, sinks, showers, laundry trays and hose bibbs; 20 psi for a tank or flushometer-tank water closet and for thermostatic or pressure-balance shower and tub valves; 25 psi for a urinal flush valve; 35 psi for a siphonic and 45 psi for a blowout flushometer-valve water closet. IPC 604 caps static pressure at 80 psi (a PRV is required above it and adds its own loss)." + IPC_SUPPLY_2027,
     assumptions: [
@@ -9650,8 +9654,8 @@ export const CITATIONS = {
   },
   "sump-basin-sizing": {
     formula: "area_ft2 = (PI/4)(basin_dia/12)^2; drawdown_gal = area_ft2 x (drawdown_in/12) x 7.48; run_time_s = drawdown_gal / (pump_gpm - inflow_gpm) x 60; fill_time_s = drawdown_gal / inflow_gpm x 60; cycles_per_hr = 3600 / (run + fill); adequate = run_time_s >= min_run_s; optional sewage discharge check against IPC Table 712.4.2 (2 in 21 gpm, 2-1/2 in 30 gpm, 3 in 46 gpm) with velocity = gpm / (448.83 x (PI/4)(d/12)^2), 448.83 = 60 x 1728/231.",
-    edition: "IPC 2021 Section 712 (Sumps and Ejectors) and the Hydraulic Institute pump-cycling guidance by name; first-principles basin geometry and cycle math.",
-    freeAccess: "IPC 2021 free read-only at codes.iccsafe.org; the 7.48 gal/ft^3 constant is public.",
+    edition: "IPC 2027 Section 712 (Sumps and Ejectors) and the Hydraulic Institute pump-cycling guidance by name; first-principles basin geometry and cycle math.",
+    freeAccess: "IPC 2027 free read-only at codes.iccsafe.org; the 7.48 gal/ft^3 constant is public.",
     governance: GOVERNANCE.general,
     editionNote: "The pump must out-pace the inflow (the tile errors if it does not). A longer run time per cycle is gentler on the motor. A sewage ejector must pass 2 in solids and carries a vent, neither of which this tile sizes (IPC 712.3-712.4); the optional discharge-size select checks the IPC Table 712.4.2 minimum capacity." + IPC_DRAIN_2027,
     assumptions: [
@@ -9685,7 +9689,7 @@ export const CITATIONS = {
   "pipe-support-spacing": {
     formula: "max_spacing = lookup(table, material, size, orientation); hangers = ceil(run_length / max_spacing) + 1 (both ends plus interior supports).",
     edition: "IPC 2027 Table 308.5 (identical in 2021) (hanger spacing) and MSS SP-58 by name; the spacing table ships as editable breakpoints by material and size.",
-    freeAccess: "IPC 2021 free read-only at codes.iccsafe.org. The spacing values are IPC 2027 Table 308.5 (identical in 2021) (editable for another edition).",
+    freeAccess: "IPC 2027 free read-only at codes.iccsafe.org. The spacing values are IPC 2027 Table 308.5 (identical in 2021) (editable for another edition).",
     governance: GOVERNANCE.general,
     editionNote: "Plastic pipe supports closer than metal and needs continuous support or mid-story guides on vertical runs. The table values are maximums - closer is always allowed and required near valves, heavy fittings, and changes of direction. Vertical piping is also supported at each floor/story (IPC 308.5)." + IPC_SUPPLY_2027,
     assumptions: [

@@ -28,7 +28,7 @@
     "plumbing/pipe-elastic-properties.json": "70e8ee39a251faa435a606de8f2f8e9bc35388d769a345735c4959c4c7b7f11e",
     "plumbing/pump-curves.json": "79b96ce4cfeb8ea5cc35d277fe84436eed7093fa14cd62a257d5101395f888b2",
     "plumbing/thermal-expansion-coefficients.json": "900b61a8add706d0f21e9cf94f53c87b3ca76f388325b846017200b7af13e66d",
-    "plumbing/manifest.json": "709de5b3075e7f44886be4a1376961f51ea4a61f7d613f2ba6452cd41540ecb5",
+    "plumbing/manifest.json": "289a1fd469068982eb11c5469a9e438c0359b912b75d9c99abe1e6d9531b3a64",
     "hvac/refrigerants.json": "b31aac3059f4bde2617b4a7cceaa353ba0b73282e2f3f0f87888f1f0a61f4e23",
     "hvac/duct-friction.json": "6125423dd611cc820a8a7052385b5889480f172607512f46cca72bf9fb000bdb",
     "hvac/climate-data.json": "f6ba8aad7d059a3ebe307ac7b69300204cf1eab811798d9c8564a255a4b14310",
@@ -42,7 +42,7 @@
     "hvac/duct-fittings.json": "a55e7eddff68eb4ae21bbca54f65d4af7e2753c8c9c30b13e58608e87aeab38a",
     "hvac/refrigerant-pt-tables.json": "dd58cb1347ef142b81097b7d9c598f28fade946adcf45501852ff14fdfe12b87",
     "hvac/insulation-k-values.json": "c76675be762242c84f70fecab94fea277341365cd99a93681335b0fc02a5364d",
-    "hvac/manifest.json": "0f81728b66f165c78d6edc9f31fadcbf0da0b09d5ae8a652be86cccf383a2d62",
+    "hvac/manifest.json": "097e45c50ae9f40ce52efbe1a38bd20fcb6decc2bcf8908b8071fa4d7a833e7a",
     "restoration/psychrometrics.json": "077cbd12541565200b9c12c27535dfe6b6468013a9c168a9bb7f55aaff9bb24e",
     "restoration/water-classes.json": "fc092bcf7ae3ebb79b650447ad38f8e7ba6ee3af557dc90eb6232fa895a78d4c",
     "restoration/drying-times.json": "7b74eda4574af0aa378ce7bbbbb50ad1933e5a760f348ae843cc678b4cc26562",
@@ -121,7 +121,7 @@
     "fields/manifest.json": "744e989db8f698dd79d493f3495eb9fb94106b916de9b4062c0fcfe6864d157b",
     "search/manifest.json": "5a0fbbc1312c295d1317e6cb5e0f3bdf80dd7652fc31583d6068c4bde78cfb59",
     "desc/manifest.json": "bfa61b93af1fd85d7a6c7959a01f7078b71005cd3c1fdebf325f9e82a1a753fa",
-    "citations/manifest.json": "0a16119d92f73b2d7b00896c41d2d874ecd6a7187a2e737af2a6686e7154a0a5",
+    "citations/manifest.json": "0c5e94fa2136b7cbe0fe3f08348759a9656df26b8dc401e3eb7e0233b83438fc",
     "legal/code-adoption.json": "fcc7037a9c63cf5139c0a527c4b8077dafdc72748ecf7d71d588d07dacdca557"
   }
 }

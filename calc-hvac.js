@@ -1260,7 +1260,7 @@ export const DUCT_FRICTION_PRESETS = [
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderDuctSizing(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: per IMC 2021 §603 and Darcy-Weisbach with Colebrook-White friction factor on standard galvanized-steel duct. Equivalent rectangular diameter per Huebscher. AHJ governs. Free at codes.iccsafe.org.";
+  citationEl.textContent = "Citation: per IMC §603 (duct construction, by name; no IMC value enters the sizing) and Darcy-Weisbach with Colebrook-White friction factor on standard galvanized-steel duct. Equivalent rectangular diameter per Huebscher. AHJ governs. Free at codes.iccsafe.org.";
   const cfm = makeNumber("CFM", "ds-cfm", { step: "any", min: "0" });
   const fr = makeNumber("Friction rate (in w.c. / 100 ft)", "ds-fr", { step: "any", min: "0", value: "0.08" });
   fr.input.value = "0.08";
@@ -1425,7 +1425,7 @@ export function renderCfmPerTon(inputRegion, outputRegion, citationEl) {
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderCombustionAir(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: per IFGC 2027 §304.5 (unchanged from 2021; indoor, 50 ft^3 per 1000 BTU/hr) and §304.6 (outdoor openings) -- IMC 701.1 defers gas-appliance combustion air to the IFGC. 50 ft^3 per 1000 BTU/hr by volume; outdoor opening 1 in^2 per 4000 BTU/hr or the larger indoor opening 1 in^2 per 1000 BTU/hr. This is the FREE AREA; each opening's smallest dimension must also be at least 3 in (IFGC 304.6 -- a long narrow opening is blocked by leaves and lint), which a free-area figure cannot enforce. AHJ governs. Free at codes.iccsafe.org.";
+  citationEl.textContent = "Citation: per IFGC 2027 §304.5 (unchanged from 2021; indoor, 50 ft^3 per 1000 BTU/hr) and §304.6 (outdoor openings) -- IMC 2027 702.3 [701.1 in IMC 2021] defers gas-appliance combustion air to the IFGC. 50 ft^3 per 1000 BTU/hr by volume; outdoor opening 1 in^2 per 4000 BTU/hr or the larger indoor opening 1 in^2 per 1000 BTU/hr. This is the FREE AREA; each opening's smallest dimension must also be at least 3 in (IFGC 304.6 -- a long narrow opening is blocked by leaves and lint), which a free-area figure cannot enforce. AHJ governs. Free at codes.iccsafe.org.";
   const btu = makeNumber("Appliance BTU input", "ca-b", { step: "any", min: "0" });
   const vol = makeNumber("Room volume (ft³)", "ca-v", { step: "any", min: "0" });
   for (const f of [btu, vol]) inputRegion.appendChild(f.wrap);
@@ -1446,7 +1446,7 @@ export function renderCombustionAir(inputRegion, outputRegion, citationEl) {
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderCombustionAirMaxInput(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: per IFGC 2027 §304.5 (unchanged from 2021; indoor, 50 ft^3 per 1000 BTU/hr) and §304.6 (outdoor openings) -- IMC 701.1 defers gas-appliance combustion air to the IFGC, the standard volume method solved for input. A space is adequate by volume at 50 ft^3 per 1000 BTU/hr, so the max appliance input is (room volume / 50) * 1000; above it, combustion-air openings are required. AHJ governs. Free at codes.iccsafe.org.";
+  citationEl.textContent = "Citation: per IFGC 2027 §304.5 (unchanged from 2021; indoor, 50 ft^3 per 1000 BTU/hr) and §304.6 (outdoor openings) -- IMC 2027 702.3 [701.1 in IMC 2021] defers gas-appliance combustion air to the IFGC, the standard volume method solved for input. A space is adequate by volume at 50 ft^3 per 1000 BTU/hr, so the max appliance input is (room volume / 50) * 1000; above it, combustion-air openings are required. AHJ governs. Free at codes.iccsafe.org.";
   const vol = makeNumber("Room volume (ft³)", "cam-v", { step: "any", min: "0" });
   inputRegion.appendChild(vol.wrap);
   attachExampleButton(inputRegion, () => { vol.input.value = "4000"; update(); });

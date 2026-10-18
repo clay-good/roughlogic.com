@@ -69,9 +69,9 @@ test("Group B audit coverage: every plumbing/gas tile id has a CITATIONS entry",
 test("Group B citations cite IPC / IFGC by section number and edition", () => {
   // Spot-check that the IPC / IFGC editions are named at least once where
   // expected (gas-pipe-sizing must name IFGC; pipe-sizing must name IPC).
-  assert.match(CITATIONS["pipe-sizing"].edition, /IPC 2021/);
+  assert.match(CITATIONS["pipe-sizing"].edition, /IPC 2027/);
   assert.match(CITATIONS["gas-pipe-sizing"].edition, /IFGC 2027/);
-  assert.match(CITATIONS["trap-arm"].edition, /IPC 2021.*Section 909/);
+  assert.match(CITATIONS["trap-arm"].edition, /IPC 2027.*Section 909/);
 });
 
 // Helper: pull tile ids from one of tools-data.js' "// Group X:" blocks.

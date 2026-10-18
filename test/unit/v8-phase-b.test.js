@@ -106,15 +106,15 @@ test("B.3 manual-j-cooling cites ACCA Manual J 8th ed.", async () => {
   const t = await readCalc("calc-hvac.js");
   assertCitationContains(t, ["ACCA Manual J", "8th ed.", "codes.iccsafe.org"], "manual-j-cooling");
 });
-test("B.3 duct-sizing cites IMC 2021 §603 + Darcy-Weisbach", async () => {
+test("B.3 duct-sizing cites IMC §603 + Darcy-Weisbach", async () => {
   const t = await readCalc("calc-hvac.js");
-  assertCitationContains(t, ["IMC 2021 §603", "Darcy-Weisbach", "codes.iccsafe.org"], "duct-sizing");
+  assertCitationContains(t, ["IMC §603", "Darcy-Weisbach", "codes.iccsafe.org"], "duct-sizing");
 });
 test("B.3 refrigerant-pt cites ASHRAE 15-2022", async () => {
   const t = await readCalc("calc-refrigerant.js"); // spec-v89 relocation
   assertCitationContains(t, ["ASHRAE 15-2022", "ashrae.org"], "refrigerant-pt");
 });
-test("B.3 combustion-air cites IFGC 2027 §304.5 (IMC 701.1 defers gas combustion air to the IFGC)", async () => {
+test("B.3 combustion-air cites IFGC 2027 §304.5 (IMC 2027 702.3 defers gas combustion air to the IFGC)", async () => {
   const t = await readCalc("calc-hvac.js");
   assertCitationContains(t, ["IFGC 2027 §304.5", "codes.iccsafe.org"], "combustion-air");
 });

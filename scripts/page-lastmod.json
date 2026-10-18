@@ -2114,8 +2114,8 @@
       "date": "2026-10-17"
     },
     "/tools/deck-beam-post/": {
-      "sha": "64b16d6c7f1cdfd7",
-      "date": "2026-10-17"
+      "sha": "17077575c65068fc",
+      "date": "2026-10-18"
     },
     "/tools/deck-board-takeoff/": {
       "sha": "1c07e0790b2598e3",
@@ -3738,8 +3738,8 @@
       "date": "2026-10-17"
     },
     "/tools/header-sizing/": {
-      "sha": "bcc3fe93db1fab01",
-      "date": "2026-10-17"
+      "sha": "15f7e6a5a8761133",
+      "date": "2026-10-18"
     },
     "/tools/hearing-protector-nrr/": {
       "sha": "90b89d5abf613150",
@@ -4050,8 +4050,8 @@
       "date": "2026-10-17"
     },
     "/tools/inspection-checklist/": {
-      "sha": "3f4eff529ed1cee8",
-      "date": "2026-10-17"
+      "sha": "6dc50ab3116b2293",
+      "date": "2026-10-18"
     },
     "/tools/instant-off-ir-drop/": {
       "sha": "49a0953fd9a58506",
@@ -4138,8 +4138,8 @@
       "date": "2026-10-17"
     },
     "/tools/joist-cantilever-check/": {
-      "sha": "c9fc7ec84460f794",
-      "date": "2026-10-17"
+      "sha": "a3a60aaf9dd7508b",
+      "date": "2026-10-18"
     },
     "/tools/joist-deflection/": {
       "sha": "3fdddac47383be8e",
@@ -5478,16 +5478,16 @@
       "date": "2026-10-17"
     },
     "/tools/pipe-sizing/": {
-      "sha": "04a3ae03afea24a9",
-      "date": "2026-10-17"
+      "sha": "ef2657d022fd5615",
+      "date": "2026-10-18"
     },
     "/tools/pipe-spacing-rack/": {
       "sha": "58b0f501e9652442",
       "date": "2026-10-17"
     },
     "/tools/pipe-support-spacing/": {
-      "sha": "3fae65c92c91688f",
-      "date": "2026-10-17"
+      "sha": "004e3b3564343a10",
+      "date": "2026-10-18"
     },
     "/tools/pipe-template-wrap/": {
       "sha": "eee6315430e57b6f",
@@ -6698,8 +6698,8 @@
       "date": "2026-10-17"
     },
     "/tools/sanitary-dfu/": {
-      "sha": "838ebc1e3a7ecdd2",
-      "date": "2026-10-17"
+      "sha": "f53a0db980a981cd",
+      "date": "2026-10-18"
     },
     "/tools/saturated-steam-properties/": {
       "sha": "891ed8b326ec8a0f",
@@ -7138,8 +7138,8 @@
       "date": "2026-10-17"
     },
     "/tools/slope/": {
-      "sha": "58ac86403498ce8f",
-      "date": "2026-10-17"
+      "sha": "585e61b2f9fd3ffe",
+      "date": "2026-10-18"
     },
     "/tools/slope-avalanche/": {
       "sha": "f3073380f376fe96",
@@ -7590,8 +7590,8 @@
       "date": "2026-10-17"
     },
     "/tools/stairs/": {
-      "sha": "d34a33e00e2ae5eb",
-      "date": "2026-10-17"
+      "sha": "5caba7d28e51f1b4",
+      "date": "2026-10-18"
     },
     "/tools/stairwell-pressurization/": {
       "sha": "c754f4058b53d818",
@@ -7870,8 +7870,8 @@
       "date": "2026-10-17"
     },
     "/tools/sump-basin-sizing/": {
-      "sha": "d69485de12078e50",
-      "date": "2026-10-17"
+      "sha": "2365a2ba27e6a765",
+      "date": "2026-10-18"
     },
     "/tools/superelevation/": {
       "sha": "1b84bffa778925c3",
@@ -7886,8 +7886,8 @@
       "date": "2026-10-17"
     },
     "/tools/supply-pressure-budget/": {
-      "sha": "39b525cb24b48a5a",
-      "date": "2026-10-17"
+      "sha": "75b11f07df0c8e3c",
+      "date": "2026-10-18"
     },
     "/tools/support-spacing/": {
       "sha": "c6e2494386be9bfc",
@@ -8346,8 +8346,8 @@
       "date": "2026-10-17"
     },
     "/tools/trap-arm/": {
-      "sha": "501571e9ff79c5f9",
-      "date": "2026-10-17"
+      "sha": "af33dc6399fc0f02",
+      "date": "2026-10-18"
     },
     "/tools/trap-primer/": {
       "sha": "b8e0044f4e2a6363",
@@ -9146,8 +9146,8 @@
       "date": "2026-10-17"
     },
     "/tools/wsfu-demand/": {
-      "sha": "f778278d94d45574",
-      "date": "2026-10-17"
+      "sha": "84b2186d7f66454a",
+      "date": "2026-10-18"
     },
     "/tools/yaw-error-loss/": {
       "sha": "84c4614d2a2ffdf8",

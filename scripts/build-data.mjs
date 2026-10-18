@@ -1767,7 +1767,7 @@ const DATASETS = [
       { file: "nema-mg1-code-letters.json", body: NEMA_MG1_CODE_LETTERS_DATA, name: "NEMA MG-1 code-letter starting kVA per HP" },
       { file: "dwelling-demand.json", body: DWELLING_DEMAND_DATA, name: "Dwelling demand-factor parameters (NEC 2023 Article 220)" },
     ] },
-  { folder: "plumbing", edition: "IPC 2021; IFGC 2021 (IPC 2027 and IFGC 2027 are the current published editions; bundled values follow 2021 and the tile citations disclose it); Hazen-Williams (AWWA M11, 5th ed.); Manning (USGS WSP-2339, public domain); ASME B31.1 / B31.9 (guided-cantilever expansion-loop method); Joukowsky (1898) / ASCE MOP-49; Hydraulic Institute pump engineering practice; manufacturer specs as of " + EDITION_VERIFIED.plumbing + ".", shards: [
+  { folder: "plumbing", edition: "IPC 2021 (IPC 2027 is the current published edition; the tiles re-checked against it on 2026-10-17 cite 2027, and the rest disclose the 2021 basis); IFGC 2027 (every bundled IFGC value re-checked 2026-10-17 and identical to 2021); Hazen-Williams (AWWA M11, 5th ed.); Manning (USGS WSP-2339, public domain); ASME B31.1 / B31.9 (guided-cantilever expansion-loop method); Joukowsky (1898) / ASCE MOP-49; Hydraulic Institute pump engineering practice; manufacturer specs as of " + EDITION_VERIFIED.plumbing + ".", shards: [
       { file: "pipe-properties.json", body: PIPE_PROPERTIES, name: "Pipe properties" },
       { file: "fixture-units.json", body: FIXTURE_UNITS, name: "Fixture units" },
       { file: "gas-pipe-capacity.json", body: GAS_PIPE_CAPACITY, name: "Gas pipe capacity" },
@@ -1782,7 +1782,7 @@ const DATASETS = [
       { file: "pump-curves.json", body: PUMP_CURVES_DATA, name: "Pump curves (manufacturer-attributed where redistributable)" },
       { file: "thermal-expansion-coefficients.json", body: THERMAL_EXPANSION_COEFFS_DATA, name: "Pipe thermal-expansion coefficients and guided-cantilever stress allowables" },
     ] },
-  { folder: "hvac", edition: "ASHRAE 62.1-2022; ASHRAE 62.2-2019; ASHRAE 90.1-2022; IMC 2021 cited by section number (ASHRAE 62.1-2025 / 62.2-2025 / 90.1-2025 and IMC 2027 are the current published editions; bundled values follow the editions named here and the tile citations disclose it); ASHRAE Handbook Fundamentals chapter 21 (duct design) and chapter 25 (insulation); ACCA Manual J 8th ed.; CTI cooling-tower engineering practice; manufacturer P-T tables (DuPont / Honeywell / Chemours / Arkema) and insulation k-values as of " + EDITION_VERIFIED.hvac + ".", shards: [
+  { folder: "hvac", edition: "ASHRAE 62.1-2022; ASHRAE 62.2-2019; ASHRAE 90.1-2022; IMC 2027 cited by section number (every bundled IMC value re-checked 2026-10-17 and identical to 2021); ASHRAE 62.1-2025 / 62.2-2025 / 90.1-2025 are the current published editions (bundled values follow the ASHRAE editions named here and the tile citations disclose it); ASHRAE Handbook Fundamentals chapter 21 (duct design) and chapter 25 (insulation); ACCA Manual J 8th ed.; CTI cooling-tower engineering practice; manufacturer P-T tables (DuPont / Honeywell / Chemours / Arkema) and insulation k-values as of " + EDITION_VERIFIED.hvac + ".", shards: [
       { file: "refrigerants.json", body: REFRIGERANTS, name: "Refrigerant P-T tables" },
       { file: "duct-friction.json", body: DUCT_FRICTION, name: "Duct friction inputs" },
       { file: "climate-data.json", body: CLIMATE_DATA, name: "Climate design temperatures" },

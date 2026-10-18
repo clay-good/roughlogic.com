@@ -698,6 +698,30 @@ test("each I-code disclosure names the current published edition", async () => {
   assert.match(disclosure("IFGC"), /IFGC 2027 is the current published edition/);
 });
 
+// The ledger's "edition cited (bundled)" column is typed by hand, and no gate read
+// it: on 2026-10-17 the I-code refresh re-checked every IFGC and IMC value
+// against 2027 while the ledger still said 2021 / disclosed-lag. Where a code has
+// a *_DISCLOSURE constant, the year it says is bundled is the ledger's bundled
+// column, and a row is "current" exactly when that year is the current edition.
+test("the ledger's bundled edition and status agree with each I-code disclosure", async () => {
+  const cycle = await readJson("scripts/sources-cycle.json");
+  const citations = await readFile(resolve(ROOT, "citations.js"), "utf8");
+  const ledger = await readFile(resolve(ROOT, "docs/citation-freshness-ledger.md"), "utf8");
+  const byId = Object.fromEntries(cycle.standards.map((r) => [r.id, r]));
+  let checked = 0;
+  for (const [id, constName] of [["irc", "IRC"], ["ibc", "IBC"], ["ipc", "IPC"], ["ifgc", "IFGC"], ["nec", "NEC"]]) {
+    const d = citations.match(new RegExp("^const " + constName + "_DISCLOSURE = \"Editions available: bundled values follow " + constName + " (\\d{4})", "m"));
+    assert.ok(d, constName + "_DISCLOSURE does not open with the bundled edition");
+    const row = ledger.match(new RegExp("^\\| `" + id + "` \\|[^|]*\\| (\\d{4}) \\|[^|]*\\|[^|]*\\| ([a-z-]+) \\|$", "m"));
+    assert.ok(row, "no parsable ledger row for " + id);
+    assert.equal(row[1], d[1], id + ": the ledger says " + row[1] + " is bundled, the disclosure says " + d[1]);
+    const current = String(byId[id].current_edition);
+    assert.equal(row[2], d[1] === current ? "current" : "disclosed-lag", id + ": status does not match bundled " + d[1] + " vs current " + current);
+    checked++;
+  }
+  assert.equal(checked, 5);
+});
+
 // docs/data-sources.md described the sales-tax nexus re-verification in two
 // adjacent bullets. The 2026-09-03 bullet said "the remaining 33 rows keep
 // verified_on: 2025-01-15" and pointed the next maintainer at seven rows. A

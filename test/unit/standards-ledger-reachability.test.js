@@ -41,7 +41,9 @@ test("a superseded edition cited on a tile is disclosed in its folder manifest",
   // other was not.
   const editions = await manifestEditions();
   const hvac = editions.get("hvac");
-  for (const named of ["IMC 2021", "ASHRAE 62.2-2019", "ASHRAE 90.1-2022"]) {
+  // IMC is no longer here: every bundled IMC value was re-checked against IMC 2027
+  // on 2026-10-17, so the manifest names 2027 as the bundled edition (asserted below).
+  for (const named of ["ASHRAE 62.2-2019", "ASHRAE 90.1-2022"]) {
     assert.ok(hvac.includes(named), "hvac manifest must name the bundled edition " + named);
   }
   // Read the current editions from the ledger rather than restating them. This

@@ -43,7 +43,7 @@
     },
     "combustion-air": {
       "group": "calc-hvac.js (Group C)",
-      "stamp": "Citation: per IFGC 2027 §304.5 (unchanged from 2021; indoor, 50 ft^3 per 1000 BTU/hr) and §304.6 (outdoor openings) -- IMC 701.1 defers gas-appliance combustion air to the IFGC. 50 ft^3 per 1000 BTU/hr by volume; outdoor opening 1 in^2 per 4000 BTU/hr or the larger indoor opening 1 in^2 per 1000 BTU/hr. This is the FREE AREA; each opening's smallest dimension must also be at least 3 in (IFGC 304.6 -- a long narrow opening is blocked by leaves and lint), which a free-area figure cannot enforce. AHJ governs. Free at codes.iccsafe.org."
+      "stamp": "Citation: per IFGC 2027 §304.5 (unchanged from 2021; indoor, 50 ft^3 per 1000 BTU/hr) and §304.6 (outdoor openings) -- IMC 2027 702.3 [701.1 in IMC 2021] defers gas-appliance combustion air to the IFGC. 50 ft^3 per 1000 BTU/hr by volume; outdoor opening 1 in^2 per 4000 BTU/hr or the larger indoor opening 1 in^2 per 1000 BTU/hr. This is the FREE AREA; each opening's smallest dimension must also be at least 3 in (IFGC 304.6 -- a long narrow opening is blocked by leaves and lint), which a free-area figure cannot enforce. AHJ governs. Free at codes.iccsafe.org."
     },
     "conduit-fill": {
       "group": "calc-electrical.js (Group A)",
@@ -71,7 +71,7 @@
     },
     "duct-sizing": {
       "group": "calc-hvac.js (Group C)",
-      "stamp": "Citation: per IMC 2021 §603 and Darcy-Weisbach with Colebrook-White friction factor on standard galvanized-steel duct. Equivalent rectangular diameter per Huebscher. AHJ governs. Free at codes.iccsafe.org."
+      "stamp": "Citation: per IMC §603 (duct construction, by name; no IMC value enters the sizing) and Darcy-Weisbach with Colebrook-White friction factor on standard galvanized-steel duct. Equivalent rectangular diameter per Huebscher. AHJ governs. Free at codes.iccsafe.org."
     },
     "egc-sizing": {
       "group": "calc-electrical.js (Group A)",
