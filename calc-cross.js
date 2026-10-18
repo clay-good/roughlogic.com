@@ -300,10 +300,15 @@ export const STATE_TAX_RATE_CHANGES = {
 // dims: in { state: dimensionless, subtotal: dimensionless, custom_rate_percent: dimensionless, as_of: dimensionless } out: { tax: dimensionless, total: dimensionless }
 export function computeSalesTax({ state, subtotal, custom_rate_percent = null, as_of = "" }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A missing subtotal gave an empty tax, a blank custom rate was read as 0%, and a
+  // negative rate or subtotal gave a negative tax, all without an error (2026-10-18).
+  if (subtotal === undefined || subtotal === null || subtotal === "" || !Number.isFinite(Number(subtotal))) return { error: "Subtotal must be a number." };
   subtotal = Number(subtotal);
+  if (subtotal < 0) return { error: "Subtotal cannot be negative." };
   let rate;
-  if (custom_rate_percent !== null && custom_rate_percent !== undefined) {
-    rate = custom_rate_percent;
+  if (custom_rate_percent !== null && custom_rate_percent !== undefined && custom_rate_percent !== "") {
+    rate = Number(custom_rate_percent);
+    if (!Number.isFinite(rate) || rate < 0) return { error: "Custom rate must be a percentage of 0 or more." };
   } else {
     rate = STATE_TAX_RATES[state];
     if (rate === undefined) return { error: "Unknown state." };

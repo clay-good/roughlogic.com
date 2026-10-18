@@ -343,11 +343,18 @@ export const staticPressurePipingExample = {
 // dims: in { rise: L, run: L, units: dimensionless } out: { percent: dimensionless, degrees: dimensionless, fraction: dimensionless }
 export function computeSlope({ rise, run, units = "in_per_ft" }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
-  if (run === 0) return { error: "Run cannot be zero." };
+  // A missing rise (or, in rise/run mode, a missing run) used to come back as empty
+  // numbers rather than an error, and in inches-per-foot mode a run of 0 was refused
+  // though that mode never reads it (2026-10-18).
+  if (units !== "in_per_ft" && units !== "rise_run") return { error: "Unknown units." };
+  if (!Number.isFinite(Number(rise)) || rise === null || rise === "") return { error: "Rise must be a number." };
+  rise = Number(rise);
   let in_per_ft;
   if (units === "in_per_ft") in_per_ft = rise; // rise is already in inches per foot
-  else if (units === "rise_run") in_per_ft = (rise / run) * 12; // rise and run in same units
-  else return { error: "Unknown units." };
+  else {
+    if (!Number.isFinite(Number(run)) || run === null || run === "" || Number(run) === 0) return { error: "Run must be a nonzero number." };
+    in_per_ft = (rise / Number(run)) * 12; // rise and run in same units
+  }
   const fraction = in_per_ft / 12;
   const percent = fraction * 100;
   const degrees = Math.atan(fraction) * (180 / Math.PI);

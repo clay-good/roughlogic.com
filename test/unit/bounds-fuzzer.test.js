@@ -62104,3 +62104,27 @@ test("hardening slice 59: skip-line matches either tape convention; part boards 
   assert.equal(part.plates, 79);
   assert.equal(computeRoofInsulationFasteners({}).fasteners, 1120, "whole-number default unchanged");
 });
+
+// 2026-10-18 coverage audit: slope and sales-tax were the only two of 2,267 tiles with
+// no bounds row. Probing them found missing inputs returning empty numbers, a blank
+// custom tax rate read as 0%, and negative inputs passing silently.
+import { computeSlope as _cov1 } from "../../calc-plumbing.js";
+import { computeSalesTax as _cov2 } from "../../calc-cross.js";
+test("bounds: computeSlope pins both unit modes and rejects missing or zero inputs", () => {
+  const a = _cov1({ rise: 0.25, units: "in_per_ft" });
+  assert.ok(Math.abs(a.percent - 2.0833333333) < 1e-9);
+  assert.ok(Math.abs(_cov1({ rise: 3, run: 12, units: "rise_run" }).in_per_ft - 3) < 1e-12);
+  assert.ok(!("error" in _cov1({ rise: 0.25, run: 0, units: "in_per_ft" })), "in/ft mode never reads run");
+  for (const bad of [{ rise: 3, units: "rise_run" }, { rise: 3, run: 0, units: "rise_run" }, { units: "in_per_ft" }, { rise: "", units: "in_per_ft" }, { rise: 1, run: 12, units: "deg" }, { rise: NaN, units: "in_per_ft" }, { rise: Infinity, units: "in_per_ft" }]) {
+    assert.ok("error" in _cov1(bad), JSON.stringify(bad));
+  }
+});
+test("bounds: computeSalesTax pins a state rate, falls back from a blank custom rate, and rejects negatives", () => {
+  const tx = _cov2({ state: "TX", subtotal: 100, as_of: "2026-10-18" });
+  assert.equal(tx.tax, 6.25);
+  assert.deepEqual(_cov2({ state: "TX", subtotal: 100, custom_rate_percent: "", as_of: "2026-10-18" }), tx);
+  assert.equal(_cov2({ state: "TX", subtotal: 100, custom_rate_percent: 0 }).tax, 0);
+  for (const bad of [{ state: "TX" }, { state: "TX", subtotal: -1 }, { state: "TX", subtotal: 100, custom_rate_percent: -5 }, { state: "ZZ", subtotal: 100 }, { state: "TX", subtotal: Infinity }]) {
+    assert.ok("error" in _cov2(bad), JSON.stringify(bad));
+  }
+});
