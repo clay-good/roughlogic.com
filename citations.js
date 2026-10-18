@@ -26133,7 +26133,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.water,
     editionNote: "The routine count is a lookup and the repeat count is a multiplier, and both must be right the first time because a missed repeat is itself a Level 1 trigger. The Level 1 trigger changes character at 40 samples a month: a large system is judged on a percentage, a small one on a count, so 2 positives in a 15-sample system trigger where 2 in a 50-sample system do not. The table's bands are regulatory choices, not a curve: 10 samples at 12,900 people and 15 at 12,901. States with primacy may be more stringent, may extend the 24-hour repeat deadline, and set their own return-to-service and boil-water-notice requirements after an emergency.",
     assumptions: [
-      { name: "Community-system table", value: "the 141.857(b) population table; systems serving 1,000 or fewer follow 141.854 and are routed there", source: "40 CFR 141.857(b)" },
+      { name: "Community-system table", value: "the 141.857(b) population table; systems serving 1,000 or fewer follow 141.854 (non-community ground water), 141.855 (community ground water) or 141.856 (surface water) and are routed there; until 2026-10-17 all were sent to 141.854", source: "40 CFR 141.857(b); 141.854-141.856 checked on ecfr.gov 2026-10-17" },
       { name: "Percentage includes repeats", value: "TC-positive routine and repeat samples over all samples taken in the month", source: "40 CFR 141.859(a)(1)(i)" },
       { name: "Every repeat is required", value: "failing to collect any required repeat is a Level 1 trigger regardless of results", source: "40 CFR 141.859(a)(1)(iii)" },
     ],

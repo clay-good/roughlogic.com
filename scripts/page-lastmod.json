@@ -10,7 +10,7 @@
       "date": "2026-10-18"
     },
     "/errata/": {
-      "sha": "c1804e2513aa46a2",
+      "sha": "72344187f5f91fec",
       "date": "2026-10-18"
     },
     "/collections/disaster-response/": {
@@ -6614,8 +6614,8 @@
       "date": "2026-10-17"
     },
     "/tools/rtcr-coliform-samples/": {
-      "sha": "898f55b12031384b",
-      "date": "2026-10-17"
+      "sha": "00d49978c18bfb3e",
+      "date": "2026-10-18"
     },
     "/tools/rtd-resistance-to-temp/": {
       "sha": "2a50f159ad8c11e3",
