@@ -81,7 +81,6 @@ const NDS_LAG = " AWC NDS-2024 is the current published edition (the one the 202
 // standard the site tracks (2026-10-17; see scripts/sources-cycle.json).
 const ACI_LAG = " ACI CODE-318-25 is the current edition; the provisions and figures here follow ACI 318-19 and have not yet been re-checked against 318-25.";
 const TMS_LAG = " TMS 402/602-22 is the current edition (the one the 2024 IBC references); the provisions here follow the older TMS 402 edition named above and have not yet been re-checked against it.";
-const IECC_LAG = " IECC 2024 is the current published edition; the figures here follow IECC 2021 and have not yet been re-checked against it.";
 const IBC_DISCLOSURE = "Editions available: bundled values follow IBC 2021 and ASCE 7-22 referenced formulas. IBC 2027 is the current published edition (ICC released it in October 2026); IBC 2024 preceded it and references ASCE 7-22; IBC 2021 references ASCE 7-16, and older IBC editions reference ASCE 7-16 / 7-10. ASCE 7-22 snow is strength-level and 7-16 snow service-level, so the two are not interchangeable; verify the edition adopted by your AHJ.";
 
 // HVAC common phrasing (Group C audit, priority 4 per spec §6).
@@ -1898,12 +1897,12 @@ export const CITATIONS = {
   },
   "lighting-density": {
     formula: "Interior lighting power allowance = area × LPD of the building area type (Building Area Method). An energy-code limit on installed lighting, not the NEC Table 220.42(A) unit load used to size the service.",
-    edition: "IECC 2021 Table C405.3.2(1) (values identical to ASHRAE 90.1-2019 Table 9.5.1; 90.1-2022 lowers several, e.g. parking garage 0.18 -> 0.17).",
+    edition: "IECC 2024 Table C405.3.2(1), with the IECC 2021 table (identical to ASHRAE 90.1-2019 Table 9.5.1) as an edition option.",
     freeAccess: NEC_FREE + " IECC free read-only at codes.iccsafe.org. ASHRAE 90.1 read-only at ashrae.org.",
     governance: GOVERNANCE.electrical,
-    editionNote: NEC_DISCLOSURE + IECC_LAG,
+    editionNote: NEC_DISCLOSURE + " Read in the IECC 2021 and 2024 printings on 2026-10-17: IECC 2024 lowered office 0.64 -> 0.62, retail 0.84 -> 0.78, school/university 0.72 -> 0.70 and parking garage 0.18 -> 0.17 W/ft^2; warehouse 0.45 and manufacturing 0.82 are unchanged. The tile defaults to 2024 and keeps 2021 as an edition input.",
     assumptions: [
-      { name: "LPD edition", value: "IECC 2021 / ASHRAE 90.1-2019 Building Area Method", source: "data/electrical/lighting-density.json" },
+      { name: "LPD edition", value: "IECC 2024 Building Area Method by default; IECC 2021 / ASHRAE 90.1-2019 on request", source: "data/electrical/lighting-density.json" },
     ],
   },
   "pulling-tension": {
@@ -2228,14 +2227,14 @@ export const CITATIONS = {
     ],
   },
   "duct-leakage-cfm25": {
-    formula: "normalized = leakage_cfm25 / cfa_ft2 x 100; passes = normalized <= limit (default 4 CFM25 per 100 ft^2).",
-    edition: "IECC (International Energy Conservation Code) §R403.3.5 (duct testing) and §R403.3.6 (leakage limits: 4 / 3 rough-in without air handler / 8 with all ducts inside the envelope) and RESNET / ANSI 380 duct-leakage test methods, by name.",
+    formula: "normalized = leakage_cfm25 / cfa_ft2 x 100; limit from IECC 2024 Table R403.3.8 by configuration and ducted returns (3 / 4 / 6 / 8 per 100 ft^2 with fewer than 3 returns, 4 / 6 / 8 / 12 with 3 or more), or IECC 2021 R403.3.6 (3 / 4 / 8), or a custom limit; a system serving 1,000 ft^2 or less passes on total leakage <= 30 / 40 / 60 / 80 CFM25 under 2024.",
+    edition: "IECC 2024 §R403.3.7 (duct testing) and Table R403.3.8 (maximum total duct leakage) [§R403.3.5 / §R403.3.6 in IECC 2021], and the RESNET / ANSI 380 duct-leakage test method, by name.",
     freeAccess: "IECC is viewable through the ICC public-access reader; the leakage / area x 100 normalization is public arithmetic.",
     governance: GOVERNANCE.mechanical,
-    editionNote: "IECC §R403.3.5 requires the duct system be tested for total leakage with a duct pressurization tester at 25 Pa (0.1 in WC); the result is normalized to the conditioned floor area, CFM25 per 100 ft^2 = leakage / area x 100, and compared to the code limit. The common limits are 4 CFM25 per 100 ft^2 for a post-construction total-leakage test or a rough-in test with the air handler installed, and 3 for a rough-in test without the air handler; some editions and the leakage-to-outdoors path differ, so the limit is an editable input. These section numbers and limits are the 2021 IECC; the 2024 IECC moved them to R403.3.8, raised the per-area limits for systems with three or more ducted returns, and set absolute CFM25 limits for systems serving 1,000 ft^2 or less (EEBA 2024 IECC summary), so enter the adopted edition's limit. A tighter system loses less conditioned air to unconditioned spaces. Distinct from the SMACNA leakage-class test for commercial duct (see duct-leakage). A field aid; the adopted IECC edition, the required test type, and the rater's calibrated equipment govern.",
+    editionNote: "IECC 2024 §R403.3.7 requires each duct system be tested for total leakage at 25 Pa (0.1 in WC); the result is normalized to the conditioned floor area. Read in the IECC 2021 and 2024 printings on 2026-10-17: 2021 R403.3.6 allowed 4 CFM25 per 100 ft^2 post-construction or at rough-in with the air handler, 3 at rough-in without it, and 8 with all ducts and air handlers inside the thermal envelope; 2024 Table R403.3.8 keeps 3 / 4 for fewer than 3 ducted returns, allows 4 / 6 with 3 or more, sets 6 / 8 for a rough-in and 8 / 12 for a finished system with the ducts entirely in conditioned space, and holds a system serving 1,000 ft^2 or less to 30 / 40 / 60 / 80 CFM25 total. Until 2026-10-17 the tile took only a typed limit and cited the 2021 numbers, so a three-return house at 5 CFM25 per 100 ft^2 failed a check it passes under 2024. Distinct from the SMACNA leakage-class test for commercial duct (see duct-leakage). A field aid; the adopted IECC edition, the required test type, and the rater's calibrated equipment govern.",
     assumptions: [
-      { name: "Normalization", value: "CFM25 per 100 ft^2 = leakage / conditioned floor area x 100", source: "IECC §R403.3.5" },
-      { name: "Limit editable", value: "4 total / post-construction, 3 rough-in without the air handler; the edition and test type set it", source: "IECC / RESNET" },
+      { name: "Normalization", value: "CFM25 per 100 ft^2 = leakage / conditioned floor area x 100", source: "IECC 2024 §R403.3.7 [R403.3.5 in 2021]" },
+      { name: "Limit by configuration", value: "IECC 2024 Table R403.3.8 by configuration, ducted returns and system size, IECC 2021 R403.3.6, or a custom limit", source: "IECC 2024 Table R403.3.8" },
       { name: "Rater governs", value: "the required test type and the rater's calibrated duct tester govern the official result", source: "scope of this tile" },
     ],
   },
@@ -16765,13 +16764,13 @@ export const CITATIONS = {
   },
   "blower-door-ach50": {
     formula: "ach50 = cfm50 x 60 / volume_ft3; verdict = ach50 <= target_ach50 (PASS) else FAIL; ach_nat = ach50 / n_factor; cfm_nat = ach_nat x volume_ft3 / 60.",
-    edition: "The ACH50 normalization (CFM50 x 60 / conditioned volume) and the LBL natural-infiltration divide-by-N rule, by name; IECC 2021 R402.4.1.3 states the prescriptive air-leakage limit in ACH50 (<= 3 in climate zones 3-8, <= 5 in zones 0-2), and R402.4.1.2 caps every compliance path at 5.0; ASTM E779 / E1827 are the blower-door test methods.",
-    freeAccess: "The air-leakage limit is in the published IECC 2021 R402.4.1.2-R402.4.1.3; the normalization and infiltration relations are public building-science arithmetic. The blower-door test methods are ASTM E779 / E1827.",
+    edition: "The ACH50 normalization (CFM50 x 60 / conditioned volume) and the LBL natural-infiltration divide-by-N rule, by name; IECC 2024 R402.5.1.3 [R402.4.1.3 in IECC 2021] sets the prescriptive limit at 4.0 ACH50 in climate zones 0-2, 3.0 in zones 3-5 and 2.5 in zones 6-8 (2021: 5.0 in zones 0-2, 3.0 in 3-8), and the performance paths at 4.0 ACH50 or 0.22 cfm/ft^2 of envelope (2021 R402.4.1.2: 5.0 or 0.28); ASTM E779 / E1827 are the blower-door test methods.",
+    freeAccess: "The air-leakage limit is in the published IECC 2024 R402.5.1.3 (R402.4.1.2-R402.4.1.3 in 2021); the normalization and infiltration relations are public building-science arithmetic. The blower-door test methods are ASTM E779 / E1827.",
     governance: GOVERNANCE.general,
-    editionNote: "IECC 2021 R402.4.1.3 sets the prescriptive air-leakage limit, stated in ACH50, with the <= 3 (CZ 3-8) and <= 5 (CZ 0-2) thresholds the user pins as the target; ASTM E779 / E1827 are the blower-door test methods that produce CFM50; the LBL / ASHRAE Fundamentals infiltration model is the N-factor that divides ACH50 down to the annual-average natural ACH. The N-factor depends on climate zone, building height, and wind shielding (a single-story sheltered house and an exposed three-story house differ by roughly a factor of two); the code threshold is the AHJ-adopted IECC edition and climate zone; the volume is the conditioned volume, not the floor area. A field normalization, not a code certificate." + IECC_LAG,
+    editionNote: "IECC 2024 R402.5.1.3 [R402.4.1.3 in IECC 2021] sets the prescriptive limit at 4.0 ACH50 in climate zones 0-2, 3.0 in zones 3-5 and 2.5 in zones 6-8 (2021: 5.0 in zones 0-2, 3.0 in 3-8), and the performance paths at 4.0 ACH50 or 0.22 cfm/ft^2 of envelope (2021 R402.4.1.2: 5.0 or 0.28); the user pins the applicable value as the target; ASTM E779 / E1827 are the blower-door test methods that produce CFM50; the LBL / ASHRAE Fundamentals infiltration model is the N-factor that divides ACH50 down to the annual-average natural ACH. The N-factor depends on climate zone, building height, and wind shielding (a single-story sheltered house and an exposed three-story house differ by roughly a factor of two); the code threshold is the AHJ-adopted IECC edition and climate zone; the volume is the conditioned volume, not the floor area. A field normalization, not a code certificate. Read in the IECC 2021 and 2024 printings on 2026-10-17: 2024 tightened zones 0-2 (5.0 -> 4.0) and 6-8 (3.0 -> 2.5).",
     assumptions: [
       { name: "ACH50", value: "ach50 = CFM50 x 60 / conditioned volume normalizes the gauge reading to air changes per hour at 50 Pa", source: "first principles" },
-      { name: "Code check", value: "verdict compares ACH50 to the editable target (IECC 2021 R402.4.1.3: <= 3 ACH50 in CZ 3-8, <= 5 in CZ 0-2)", source: "IECC 2021 R402.4.1.3" },
+      { name: "Code check", value: "verdict compares ACH50 to the editable target (IECC 2024 R402.5.1.3: 4.0 ACH50 in CZ 0-2, 3.0 in CZ 3-5, 2.5 in CZ 6-8; 2021 R402.4.1.3: 5.0 and 3.0)", source: "IECC 2024 R402.5.1.3" },
       { name: "Natural infiltration", value: "ach_nat = ach50 / N (LBL N-factor, default 17); cfm_nat = ach_nat x volume / 60 feeds the 62.2 ventilation and the infiltration load", source: "LBL / ASHRAE Fundamentals" },
     ],
   },

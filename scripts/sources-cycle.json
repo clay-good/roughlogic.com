@@ -179,7 +179,7 @@
       "free_access_url": "https://codes.iccsafe.org/codes/i-codes",
       "match_terms": ["IECC"],
       "last_verified": "2026-10-17",
-      "verification_note": "Verified 2026-10-17: ICC's 2027 I-Codes page lists eleven released 2027 titles and not the IECC, whose 2027 edition ICC anticipated for 2026-12-31 (see the IPC row); IECC 2024 remains current. lighting-density and blower-door-ach50 cite IECC 2021 values and now name 2024 as current and say they are not yet re-checked against it. Recheck the 2027-icodes page when next_expected passes."
+      "verification_note": "Verified 2026-10-17: ICC's 2027 I-Codes page lists eleven released 2027 titles and not the IECC, whose 2027 edition ICC anticipated for 2026-12-31 (see the IPC row); IECC 2024 remains current. Re-checked 2026-10-17 in the IECC 2021 (P1) and 2024 (V1.2, current printing) texts: lighting-density (Table C405.3.2(1); 2024 lowered office, retail, school and parking garage), blower-door-ach50 (R402.5.1.3, tightened in zones 0-2 and 6-8) and duct-leakage-cfm25 (Table R403.3.8, now by ducted returns and system size) default to 2024 and keep 2021 as an option. Recheck the 2027-icodes page when next_expected passes."
     },
     {
       "id": "nds",

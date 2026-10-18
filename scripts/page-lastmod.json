@@ -2,16 +2,16 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "e7ceefafe7eb0352",
-      "date": "2026-10-17"
+      "sha": "72502837531341ab",
+      "date": "2026-10-18"
     },
     "/tools/": {
-      "sha": "8f78eac2b18bb3ed",
-      "date": "2026-10-17"
+      "sha": "4347a3b3157eb916",
+      "date": "2026-10-18"
     },
     "/errata/": {
-      "sha": "cd25ae4a801af239",
-      "date": "2026-10-17"
+      "sha": "698e357c7871e35a",
+      "date": "2026-10-18"
     },
     "/collections/disaster-response/": {
       "sha": "9b7b116e3c55c94d",
@@ -54,8 +54,8 @@
       "date": "2026-10-17"
     },
     "/groups/hvac/": {
-      "sha": "3fc32af2973039e8",
-      "date": "2026-10-17"
+      "sha": "5e4152fa4e24ccbe",
+      "date": "2026-10-18"
     },
     "/groups/kitchen/": {
       "sha": "7fdc2023194803a7",
@@ -702,8 +702,8 @@
       "date": "2026-10-17"
     },
     "/tools/blower-door-ach50/": {
-      "sha": "d6ba7c9bb52b0536",
-      "date": "2026-10-17"
+      "sha": "81b131e976310494",
+      "date": "2026-10-18"
     },
     "/tools/blown-insulation-coverage/": {
       "sha": "4ab250a233c1d85c",
@@ -2506,12 +2506,12 @@
       "date": "2026-10-17"
     },
     "/tools/duct-leakage/": {
-      "sha": "f3771e61152b08b4",
-      "date": "2026-10-17"
+      "sha": "7a10974ef9410f99",
+      "date": "2026-10-18"
     },
     "/tools/duct-leakage-cfm25/": {
-      "sha": "4c1fd6c284168726",
-      "date": "2026-10-17"
+      "sha": "c3642d9638af0508",
+      "date": "2026-10-18"
     },
     "/tools/duct-metal-weight/": {
       "sha": "d264f105827c5239",
@@ -4354,8 +4354,8 @@
       "date": "2026-10-17"
     },
     "/tools/lighting-density/": {
-      "sha": "8b7f0a441ce908ef",
-      "date": "2026-10-17"
+      "sha": "7d656f0f6c761f3b",
+      "date": "2026-10-18"
     },
     "/tools/lighting-light-loss-factor/": {
       "sha": "81cb3348710d831b",

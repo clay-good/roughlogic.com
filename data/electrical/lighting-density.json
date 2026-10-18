@@ -1,6 +1,14 @@
 {
-  "source": "IECC 2021 Table C405.3.2(1), Building Area Method (values identical to ASHRAE 90.1-2019 Table 9.5.1), as reprinted in the DOE Building Energy Codes Program 90.1-2019 lighting training.",
+  "source": "IECC 2024 Table C405.3.2(1), Building Area Method; the IECC 2021 table (identical to ASHRAE 90.1-2019 Table 9.5.1) is kept for jurisdictions on 2021. Both read on codes.iccsafe.org 2026-10-17.",
   "benchmark_W_per_ft2": {
+    "office": 0.62,
+    "warehouse": 0.45,
+    "retail": 0.78,
+    "classroom": 0.7,
+    "industrial": 0.82,
+    "parking_garage": 0.17
+  },
+  "benchmark_2021_W_per_ft2": {
     "office": 0.64,
     "warehouse": 0.45,
     "retail": 0.84,
@@ -8,5 +16,5 @@
     "industrial": 0.82,
     "parking_garage": 0.18
   },
-  "notes": "classroom = School/university; industrial = Manufacturing facility. 90.1-2022 lowers several values; the AHJ-adopted edition of the energy code governs."
+  "notes": "classroom = School/university; industrial = Manufacturing facility. The AHJ-adopted edition of the energy code governs."
 }

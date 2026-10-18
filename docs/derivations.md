@@ -2152,7 +2152,7 @@ cross-check.
 | calc-electrical.js | `computeGroundingElectrodeConductor` | `{ service_kcmil = 0, material = "copper", electrode_type = "rod-pipe-plate" }...` | _ | _ | _ |
 | calc-electrical.js | `computeGroundingElectrodeResistance` | `{ electrode_type = "driven_rod", soil_resistivity_ohm_cm = 0, rod_diameter_in...` | _ | _ | _ |
 | calc-electrical.js | `computeLVDCDrop` | `{ system_V = 12, awg = "10", run_length_ft = 0, current_A = 0, application = ...` | _ | _ | _ |
-| calc-electrical.js | `computeLightingDensity` | `{ area_ft2, occupancy_class }` | _ | _ | _ |
+| calc-electrical.js | `computeLightingDensity` | `{ area_ft2, occupancy_class, code_edition = "2024" }` | _ | _ | _ |
 | calc-electrical.js | `computeLuxFootcandle` | `{ mode = "convert", lux = 0, footcandles = 0, lumens = 0, area_ft2 = 0, cu = ...` | _ | _ | _ |
 | calc-electrical.js | `computeMinConductorForVd` | `{ phase = "single", material = "copper", current_A = 0, length_ft = 0, source...` | _ | _ | _ |
 | calc-electrical.js | `computeMotorBranchFromNameplate` | `{ hp = 0, voltage_V = 0, phase = 1, eta = 0.90, power_factor = 0.85, nameplat...` | _ | _ | _ |
@@ -2597,7 +2597,7 @@ cross-check.
 | calc-hvacservice.js | `computeCondensingFlueCondensate` | `{ input_btu_hr = 100000, water_lb_per_therm = 9.4, condensing_fraction = 0.85...` | _ | _ | _ |
 | calc-hvacservice.js | `computeDamperAuthority` | `{ damper_dp_inwg = 0, branch_dp_inwg = 0, face_area_sqft = 0, leakage_class_c...` | _ | _ | _ |
 | calc-hvacservice.js | `computeDraftHoodDilution` | `{ appliance_o2_pct = 0, diluted_o2_pct = 0 } = {}` | _ | _ | _ |
-| calc-hvacservice.js | `computeDuctLeakageCfm25` | `{ leakage_cfm25 = 0, cfa_ft2 = 0, limit = 4 } = {}` | _ | _ | _ |
+| calc-hvacservice.js | `computeDuctLeakageCfm25` | `{ leakage_cfm25 = 0, cfa_ft2 = 0, limit = 4, configuration, ducted_returns = ...` | _ | _ | _ |
 | calc-hvacservice.js | `computeExcessAirO2` | `{ measured_o2_pct = 0, measured_co2_pct = 0, co2max_pct = 11.7 } = {}` | _ | _ | _ |
 | calc-hvacservice.js | `computeFlueGasCombustionEff` | `{ fuel = "natural_gas", flue_o2_pct = 0, stack_temp_f = 0, air_temp_f = 0 } = {}` | _ | _ | _ |
 | calc-hvacservice.js | `computeFlueGasDewPoint` | `{ excess_air_pct = 15 } = {}` | _ | _ | _ |
@@ -4513,7 +4513,7 @@ per spec-v14 §13.1 second paragraph.
 | `duct-friction-static` | Duct Friction Loss and Static Pressure | ASHRAE Fundamentals Darcy-Weisbach + ...; 1200 cfm in 12 in round galvanised duct, 60 ft, with 4 sm... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `duct-heat-gain` | Duct Heat Gain/Loss Through Unconditioned Space | ASHRAE Fundamentals; spec-v347 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `duct-leakage` | Duct Leakage Test-and-Balance | SMACNA HVAC Air Duct Leakage Test Man...; 1000 design cfm / 990 measured / 300 ft^2 / 1.0 in WC -> ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
-| `duct-leakage-cfm25` | Residential Duct Leakage CFM25 (IECC R403.3.5) | IECC 2021 R403.3.5 (test) / R403.3.6 ...; spec-v461 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
+| `duct-leakage-cfm25` | Residential Duct Leakage CFM25 (IECC Table R403.3.8) | IECC 2021 R403.3.5 (test) / R403.3.6 ...; spec-v461 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `duct-sizing` | Duct Sizing | ACCA Manual D / ASHRAE Fundamentals; 400 cfm @ 0.08 in WC / 100 ft -> 10.14 in round (9.28 in ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `duct-static-pressure-total` | Total External Static Pressure | ACCA Manual D / SMACNA (by name); filter 0.10 + registers 0.03 + grille 0.03 + coil 0.30 + ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `duct-static-regain` | Duct Static Regain at a Velocity Decrease | Duct static-regain method (SMACNA / A...; VP_up = (2000/4005)^2 = 0.2494; VP_dn = (1500/4005)^2 = 0... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |

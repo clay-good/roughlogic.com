@@ -1239,8 +1239,10 @@ export const gfciReferenceExample = {
 // --- Utility 71: Lighting Density (W/ft^2) ---
 //
 // Interior lighting power allowance by the Building Area Method: area times
-// the LPD of the building area type, IECC 2021 Table C405.3.2(1), whose
-// values are ASHRAE 90.1-2019 Table 9.5.1's. Until 2026-09-24 this table held
+// the LPD of the building area type, IECC 2024 Table C405.3.2(1). IECC 2024 lowered
+// four of the six types bundled here (office 0.64 -> 0.62, retail 0.84 -> 0.78,
+// school 0.72 -> 0.70, parking garage 0.18 -> 0.17; read in both printings
+// 2026-10-17); code_edition "2021" keeps the 2021 table (= ASHRAE 90.1-2019 9.5.1). Until 2026-09-24 this table held
 // older, higher "benchmarks" (office 1.0, retail 1.2, parking 0.2) under a
 // citation to 90.1-2022 Table 9.5.1, so it allowed an office 56% more light
 // than the code it named. 90.1-2022 lowered several types again (parking
@@ -1251,11 +1253,20 @@ export const gfciReferenceExample = {
 // gives dwelling units a lamp-efficacy requirement, not a W/ft^2 allowance.
 
 export const LIGHTING_DENSITY_W_PER_FT2 = {
+  office: 0.62,
+  warehouse: 0.45,
+  retail: 0.78,
+  classroom: 0.70, // School/university
+  industrial: 0.82, // Manufacturing facility
+  parking_garage: 0.17,
+};
+
+export const LIGHTING_DENSITY_2021_W_PER_FT2 = {
   office: 0.64,
   warehouse: 0.45,
   retail: 0.84,
-  classroom: 0.72, // School/university
-  industrial: 0.82, // Manufacturing facility
+  classroom: 0.72,
+  industrial: 0.82,
   parking_garage: 0.18,
 };
 
@@ -1273,20 +1284,23 @@ const LIGHTING_DENSITY_REMOVED = {
   residential: "Dwelling units have no W/ft^2 lighting allowance; the energy code sets a lamp-efficacy requirement for them instead.",
 };
 
-// dims: in { area_ft2: L^2, occupancy_class: dimensionless } out: { target_W: M L^2 T^-3 }
-export function computeLightingDensity({ area_ft2, occupancy_class }) {
+// dims: in { area_ft2: L^2, occupancy_class: dimensionless, code_edition: dimensionless } out: { target_W: M L^2 T^-3 }
+export function computeLightingDensity({ area_ft2, occupancy_class, code_edition = "2024" }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const a = Number(area_ft2) || 0;
-  const w_per_ft2 = Object.hasOwn(LIGHTING_DENSITY_W_PER_FT2, String(occupancy_class)) ? LIGHTING_DENSITY_W_PER_FT2[occupancy_class] : undefined;
+  const ed = String(code_edition);
+  if (ed !== "2024" && ed !== "2021") return { error: "IECC edition must be 2024 or 2021." };
+  const table = ed === "2021" ? LIGHTING_DENSITY_2021_W_PER_FT2 : LIGHTING_DENSITY_W_PER_FT2;
+  const w_per_ft2 = Object.hasOwn(table, String(occupancy_class)) ? table[occupancy_class] : undefined;
   if (w_per_ft2 === undefined) return { error: LIGHTING_DENSITY_REMOVED[occupancy_class] || "Unknown occupancy class." };
   if (a <= 0) return { error: "Area must be positive." };
   const target_W = a * w_per_ft2;
-  return { target_W, w_per_ft2, area_ft2: a };
+  return { code_edition: ed, target_W, w_per_ft2, area_ft2: a };
 }
 
 export const lightingDensityExample = {
   inputs: { area_ft2: 1000, occupancy_class: "office" },
-  expected: { target_W: 640, w_per_ft2: 0.64 },
+  expected: { target_W: 620, w_per_ft2: 0.62 },
 };
 
 // --- v2 view renderers ---
@@ -1449,28 +1463,30 @@ export function renderGFCIReference(inputRegion, outputRegion, citationEl, param
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderLightingDensity(inputRegion, outputRegion, citationEl, params) {
-  citationEl.textContent = "Citation: per IECC 2021 Table C405.3.2(1), Building Area Method (the same values as ASHRAE 90.1-2019 Table 9.5.1; 90.1-2022 lowers some). AHJ governs adopted edition. Free at codes.iccsafe.org and ashrae.org/technical-resources/standards-and-guidelines/read-only-versions-of-ashrae-standards.";
+  citationEl.textContent = "Citation: per IECC 2024 Table C405.3.2(1), Building Area Method (lower than IECC 2021 for office, retail, school and parking garage; the IECC 2021 values, the same as ASHRAE 90.1-2019 Table 9.5.1, are an edition option). AHJ governs adopted edition. Free at codes.iccsafe.org and ashrae.org/technical-resources/standards-and-guidelines/read-only-versions-of-ashrae-standards.";
   attachExampleButton(inputRegion, () => fillExample(lightingDensityExample.inputs));
 
   const area = makeNumber("Area (ft²)", "ld-area", { step: "any", min: "0" });
   const cls = makeSelect("Occupancy class", "ld-cls", Object.keys(LIGHTING_DENSITY_W_PER_FT2).map((k) => ({ value: k, label: LIGHTING_DENSITY_LABELS[k] })));
-  for (const f of [area, cls]) inputRegion.appendChild(f.wrap);
+  const ed = makeSelect("IECC edition", "ld-ed", [{ value: "2024", label: "IECC 2024" }, { value: "2021", label: "IECC 2021 (= ASHRAE 90.1-2019)" }]);
+  for (const f of [area, cls, ed]) inputRegion.appendChild(f.wrap);
 
   const oW = makeOutputLine(outputRegion, "Interior lighting power allowance", "ld-out-w");
   const oRate = makeOutputLine(outputRegion, "Allowance", "ld-out-rate");
 
-  function fillExample(v) { area.input.value = v.area_ft2; cls.select.value = v.occupancy_class; update(); }
+  function fillExample(v) { area.input.value = v.area_ft2; cls.select.value = v.occupancy_class; ed.select.value = v.code_edition || "2024"; update(); }
   const update = debounce(() => {
     const r = computeLightingDensity({
       area_ft2: Number(area.input.value) || 0,
       occupancy_class: cls.select.value,
-    }); stepsFor(outputRegion, inputRegion, ["area_ft2", "occupancy_class"], r);
+      code_edition: ed.select.value,
+    }); stepsFor(outputRegion, inputRegion, ["area_ft2", "occupancy_class", "code_edition"], r);
     if (r.error) { oW.textContent = r.error; oRate.textContent = "-"; return; }
     oW.textContent = fmt(r.target_W, 0) + " W";
-    oRate.textContent = fmt(r.w_per_ft2, 2) + " W/ft^2";
+    oRate.textContent = fmt(r.w_per_ft2, 2) + " W/ft^2 (IECC " + r.code_edition + ")";
   }, DEBOUNCE_MS);
 
-  for (const el of [area.input, cls.select]) el.addEventListener("input", update);
+  for (const el of [area.input, cls.select, ed.select]) el.addEventListener("input", update);
 }
 
 // =====================================================================

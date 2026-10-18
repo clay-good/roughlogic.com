@@ -329,7 +329,7 @@ export const BESPOKE_OUTPUT_UNITS = {
   "level-loop-adjustment": {"adjusted":{"prefix":"","suffix":" ft"}},
   "leveling-curvature-refraction": {"correction_ft":{"prefix":"","suffix":" ft","digits":4},"curvature_ft":{"prefix":"","suffix":" ft","digits":4},"refraction_ft":{"prefix":"","suffix":" ft","digits":4}},
   "ligation-molar-ratio": {"insert_ng":{"prefix":"","suffix":" ng of insert","digits":1}},
-  "lighting-density": {"target_W":{"prefix":"","suffix":" W","digits":0},"w_per_ft2":{"prefix":"","suffix":" W/ft^2","digits":2}},
+  "lighting-density": {"target_W":{"prefix":"","suffix":" W","digits":0}},
   "lighting-retrofit-savings": {"kw_saved":{"prefix":"","suffix":" kW","digits":2},"kwh_saved":{"prefix":"","suffix":" kWh/yr","digits":0},"energy_usd":{"prefix":"$","suffix":"/yr","digits":0},"demand_usd":{"prefix":"$","suffix":"/yr","digits":0},"annual_usd":{"prefix":"$","suffix":"/yr","digits":0}},
   "livestock-water-requirement": {"per_head_gpd":{"prefix":"","suffix":" gal/head/day","digits":1},"herd_gpd":{"prefix":"","suffix":" gal/day","digits":0}},
   "loader-production": {"production_lcy_hr":{"prefix":"","suffix":" lcy/hr","digits":1},"daily_lcy":{"prefix":"","suffix":" lcy/day","digits":0}},

@@ -31,6 +31,7 @@ export const INERT_INPUTS = {
   "door-closing-energy::ke_limit_normal_ftlb": "moves the answer once another input changes (1,500 randomized settings)",
   "dough-ball-scaling::length_in": "read only for a rectangular pan",
   "dough-ball-scaling::width_in": "read only for a rectangular pan",
+  "duct-leakage-cfm25::ducted_returns": "read only for an IECC 2024 table configuration, not a custom limit",
   "economizer-enthalpy-changeover::setpoint_f": "moves the answer once another input changes (1,500 randomized settings)",
   "economizer-enthalpy-changeover::t_outdoor_f": "moves the answer once another input changes (1,500 randomized settings)",
   "ev-dcfc-time::charger_power_kw": "moves the answer once another input changes (1,500 randomized settings)",

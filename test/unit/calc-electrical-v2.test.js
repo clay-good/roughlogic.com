@@ -11,6 +11,7 @@ import {
   STANDARD_SERVICE_AMPACITIES,
   GFCI_AFCI_AREAS,
   LIGHTING_DENSITY_W_PER_FT2,
+  LIGHTING_DENSITY_2021_W_PER_FT2,
   serviceLoadExample,
   generatorSizeExample,
   voltageImbalanceExample,
@@ -418,10 +419,11 @@ test("GFCI reference: gfci and afci texts are non-trivial", () => {
 
 // --- Utility 71: Lighting Density ---
 
-test("Lighting density: example 1000 ft^2 office -> 640 W (IECC 2021 Table C405.3.2(1))", () => {
+test("Lighting density: example 1000 ft^2 office -> 620 W (IECC 2024 Table C405.3.2(1))", () => {
   const r = computeLightingDensity(lightingDensityExample.inputs);
-  assert.equal(r.target_W, 640);
-  assert.equal(r.w_per_ft2, 0.64);
+  assert.equal(r.target_W, 620);
+  assert.equal(r.w_per_ft2, 0.62);
+  assert.equal(r.code_edition, "2024");
 });
 
 test("Lighting density: warehouse less than office for same area", () => {
@@ -446,11 +448,17 @@ test("Lighting density: scales linearly with area", () => {
   assert.ok(close(b.target_W, 3 * a.target_W));
 });
 
-test("Lighting density: every value is the IECC 2021 / 90.1-2019 Building Area Method LPD", () => {
-  // DOE Building Energy Codes Program, 90.1-2019 lighting training: Table 9.5.1.
+test("Lighting density: every value is the IECC 2024 Building Area Method LPD, and 2021 stays an option", () => {
+  // IECC 2024 Table C405.3.2(1), read 2026-10-17.
   assert.deepEqual(LIGHTING_DENSITY_W_PER_FT2, {
+    office: 0.62, warehouse: 0.45, retail: 0.78, classroom: 0.70, industrial: 0.82, parking_garage: 0.17,
+  });
+  // IECC 2021 Table C405.3.2(1) = ASHRAE 90.1-2019 Table 9.5.1.
+  assert.deepEqual(LIGHTING_DENSITY_2021_W_PER_FT2, {
     office: 0.64, warehouse: 0.45, retail: 0.84, classroom: 0.72, industrial: 0.82, parking_garage: 0.18,
   });
+  assert.equal(computeLightingDensity({ area_ft2: 1000, occupancy_class: "office", code_edition: "2021" }).target_W, 640);
+  assert.ok(computeLightingDensity({ area_ft2: 1000, occupancy_class: "office", code_edition: "2018" }).error);
 });
 
 test("Lighting density: corridor and residential explain why they have no allowance", () => {
@@ -464,9 +472,9 @@ test("Lighting density: every benchmark is positive and at most 2", () => {
   }
 });
 
-test("Lighting density: school/university 1000 ft^2 -> 720 W", () => {
+test("Lighting density: school/university 1000 ft^2 -> 700 W", () => {
   const r = computeLightingDensity({ area_ft2: 1000, occupancy_class: "classroom" });
-  assert.equal(r.target_W, 720);
+  assert.equal(r.target_W, 700);
 });
 
 test("Lighting density: result preserves inputs", () => {

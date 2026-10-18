@@ -497,7 +497,7 @@ export const BESPOKE_LABELS = {
   "lifting-lug-design": {"applied_load_kip":"Applied load (kip)","plate_thick_in":"Plate thickness t (in)","hole_dia_in":"Hole diameter Dh (in)","pin_dia_in":"Pin diameter Dp (in)","edge_dist_in":"Hole-center to edge a (in)","plate_width_in":"Plate width at hole w (in)","fy_ksi":"Yield Fy (ksi)","fu_ksi":"Ultimate Fu (ksi)","design_factor":"Design factor Nd"},
   "ligation-molar-ratio": {"vector_ng":"Vector mass (ng)","vector_length_bp":"Vector length (bp)","insert_length_bp":"Insert length (bp)","molar_ratio":"Insert:vector molar ratio"},
   "lighting-beam": {"beam_angle_deg":"Beam angle (full cone, deg)","throw_distance":"Throw distance","distance_unit":"Distance unit","source":"Intensity source","candela":"Center-beam intensity (candela)","lumens":"Luminous flux (lumens)"},
-  "lighting-density": {"area_ft2":"Area (ft²)","occupancy_class":"Occupancy class"},
+  "lighting-density": {"area_ft2":"Area (ft²)","occupancy_class":"Occupancy class","code_edition":"IECC edition"},
   "lighting-retrofit-savings": {"fixtures":"Fixtures retrofitted","watts_existing":"Existing watts/fixture","watts_new":"New watts/fixture","annual_hours":"Annual operating hours","rate_kwh":"Energy rate ($/kWh; energy-only if you also enter a demand charge)","demand_per_kw_mo":"Demand charge ($/kW-month, optional)","install_cost":"Installed cost ($, optional)"},
   "lighting-throw-for-pool": {"target_pool_diameter":"Target beam (pool) diameter","beam_angle_deg":"Beam angle (full cone, deg)","distance_unit":"Distance unit"},
   "lighting-uniformity-ratio": {"readings":"Illuminance readings (fc or lux, comma or space separated)","target_avgmin":"Target avg/min (optional)","target_maxmin":"Target max/min (optional, e.g. 3)"},

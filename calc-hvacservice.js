@@ -627,12 +627,12 @@ export function computeBlowerDoorAch50({ cfm50 = 0, volume_ft3 = 0, n_factor = 1
     has_range, cfm_nat_low_n, cfm_nat_high_n, spread_ratio, range_verdict,
     has_hdd, infiltration_btu_per_year, infiltration_btu_low_n, infiltration_btu_high_n,
     energy_verdict, seasonal_verdict,
-    note: "ACH50 = CFM50 x 60 / conditioned volume normalizes the blower-door reading to air changes per hour at 50 Pa; the IECC 2021 R402.4.1.3 prescriptive limit is <= 3 ACH50 in climate zones 3-8 and <= 5 in zones 0-2, and R402.4.1.2 caps every compliance path at 5.0 (the editable target). The natural air change divides ACH50 by the LBL N-factor (default 17), which depends on climate zone, building height, and wind shielding. Entering a plausible LOW and HIGH N shows the spread that single figure hides: N runs from roughly 10 in a cold, windy, exposed, taller situation to over 30 in a mild, sheltered, single-storey one, so the SAME measured CFM50 can mean a threefold range of real infiltration depending purely on where the building stands, and a natural-infiltration figure quoted without its N is close to meaningless. That range is the reason for the caution attached to the figure. Natural infiltration estimated this way is a seasonal average, wrong on any given day by a wide margin -- a still mild day gives almost nothing, a windy cold night gives multiples of the average -- so it must not be read as an hourly or design-condition rate. Entering heating degree days converts it to the seasonal energy the leakage costs, which is the use of the figure current practice endorses; using it instead to claim a house is adequately ventilated is the error the tightness limit exists to police. The model does not distinguish WHERE the leakage sits in the envelope, which matters because leakage concentrated at the top and bottom drives far more stack flow than the same leakage spread evenly, and it does not account for mechanical system operation, duct leakage to outdoors, or exhaust fan use. Volume is the conditioned volume, not the floor area. A field normalization, not a rater's signed test report. ASTM E779 / E1827 are the test methods; ASHRAE Fundamentals, RESNET or BPI protocols, and the adopted energy code govern.",
+    note: "ACH50 = CFM50 x 60 / conditioned volume normalizes the blower-door reading to air changes per hour at 50 Pa; the IECC 2024 R402.5.1.3 [R402.4.1.3 in IECC 2021] sets the prescriptive limit at 4.0 ACH50 in climate zones 0-2, 3.0 in zones 3-5 and 2.5 in zones 6-8 (2021: 5.0 in zones 0-2, 3.0 in 3-8), and the performance paths at 4.0 ACH50 or 0.22 cfm/ft^2 of envelope (2021 R402.4.1.2: 5.0 or 0.28) -- the editable target. The natural air change divides ACH50 by the LBL N-factor (default 17), which depends on climate zone, building height, and wind shielding. Entering a plausible LOW and HIGH N shows the spread that single figure hides: N runs from roughly 10 in a cold, windy, exposed, taller situation to over 30 in a mild, sheltered, single-storey one, so the SAME measured CFM50 can mean a threefold range of real infiltration depending purely on where the building stands, and a natural-infiltration figure quoted without its N is close to meaningless. That range is the reason for the caution attached to the figure. Natural infiltration estimated this way is a seasonal average, wrong on any given day by a wide margin -- a still mild day gives almost nothing, a windy cold night gives multiples of the average -- so it must not be read as an hourly or design-condition rate. Entering heating degree days converts it to the seasonal energy the leakage costs, which is the use of the figure current practice endorses; using it instead to claim a house is adequately ventilated is the error the tightness limit exists to police. The model does not distinguish WHERE the leakage sits in the envelope, which matters because leakage concentrated at the top and bottom drives far more stack flow than the same leakage spread evenly, and it does not account for mechanical system operation, duct leakage to outdoors, or exhaust fan use. Volume is the conditioned volume, not the floor area. A field normalization, not a rater's signed test report. ASTM E779 / E1827 are the test methods; ASHRAE Fundamentals, RESNET or BPI protocols, and the adopted energy code govern.",
   };
 }
 export const blowerDoorAch50Example = { inputs: { cfm50: 960, volume_ft3: 12800, n_factor: 17, target_ach50: 3, n_factor_low: 11, n_factor_high: 25, heating_degree_days: 5400 } };
 HVACSERVICE_RENDERERS["blower-door-ach50"] = _simpleRenderer({
-  citation: "Citation: ACH50 = CFM50 x 60 / conditioned volume (the blower-door normalization) and the LBL natural-infiltration divide-by-N rule (by name); IECC 2021 R402.4.1.3 sets the prescriptive air-leakage limit in ACH50 (<= 3 in CZ 3-8, <= 5 in CZ 0-2) and R402.4.1.2 caps every path at 5.0; ASTM E779 / E1827 are the test methods. The N-factor varies with climate zone, building height, and wind shielding -- roughly 10 in a cold, windy, exposed, taller situation to over 30 in a mild, sheltered, single-storey one -- so entering a low and high N shows the threefold spread a single figure hides. Natural infiltration on this model is a SEASONAL AVERAGE, not an hourly or design-condition rate; the seasonal energy uses the standard 1.08 x cfm x 24 x heating degree days. A field normalization, not a rater's signed report.",
+  citation: "Citation: ACH50 = CFM50 x 60 / conditioned volume (the blower-door normalization) and the LBL natural-infiltration divide-by-N rule (by name); IECC 2024 R402.5.1.3 [R402.4.1.3 in IECC 2021] sets the prescriptive limit at 4.0 ACH50 in climate zones 0-2, 3.0 in zones 3-5 and 2.5 in zones 6-8 (2021: 5.0 in zones 0-2, 3.0 in 3-8), and the performance paths at 4.0 ACH50 or 0.22 cfm/ft^2 of envelope (2021 R402.4.1.2: 5.0 or 0.28); ASTM E779 / E1827 are the test methods. The N-factor varies with climate zone, building height, and wind shielding -- roughly 10 in a cold, windy, exposed, taller situation to over 30 in a mild, sheltered, single-storey one -- so entering a low and high N shows the threefold spread a single figure hides. Natural infiltration on this model is a SEASONAL AVERAGE, not an hourly or design-condition rate; the seasonal energy uses the standard 1.08 x cfm x 24 x heating degree days. A field normalization, not a rater's signed report.",
   example: blowerDoorAch50Example.inputs,
   fields: [
     { key: "cfm50", label: "Blower-door reading CFM50 (cfm)", kind: "number" },
@@ -773,36 +773,68 @@ HVACSERVICE_RENDERERS["outside-air-percent-temps"] = _simpleRenderer({
   compute: computeOutsideAirPercentTemps,
 });
 
-// ===================== spec-v461: residential duct leakage CFM25 (IECC R403.3.5) =====================
-// dims: in { leakage_cfm25: L^3 T^-1, cfa_ft2: L^2, limit: dimensionless } out: { normalized: dimensionless }
-export function computeDuctLeakageCfm25({ leakage_cfm25 = 0, cfa_ft2 = 0, limit = 4 } = {}) {
+// ===================== spec-v461: residential duct leakage CFM25 (IECC R403.3.7 / R403.3.8) =====================
+// IECC 2024 Table R403.3.8 (read 2026-10-17): per 100 ft^2 over 1,000 ft^2 of conditioned floor
+// area, by configuration and by fewer than 3 / 3 or more ducted returns; an absolute cfm cap at
+// 1,000 ft^2 or less. IECC 2021 R403.3.6 had one per-area limit per configuration (3 / 4 / 8).
+// Until 2026-10-17 the tile took only a typed limit and cited the 2021 numbers.
+export const DUCT_LEAKAGE_LIMITS_2024 = {
+  "rough-in": { lt3: 3, ge3: 4, small_cfm: 30 },
+  installed: { lt3: 4, ge3: 6, small_cfm: 40 },
+  "rough-in-inside": { lt3: 6, ge3: 8, small_cfm: 60 },
+  "installed-inside": { lt3: 8, ge3: 12, small_cfm: 80 },
+};
+export const DUCT_LEAKAGE_LIMITS_2021 = { "rough-in": 3, installed: 4, "rough-in-inside": 8, "installed-inside": 8 };
+// dims: in { leakage_cfm25: L^3 T^-1, cfa_ft2: L^2, limit: dimensionless, configuration: dimensionless, ducted_returns: dimensionless, code_edition: dimensionless } out: { normalized: dimensionless }
+export function computeDuctLeakageCfm25({ leakage_cfm25 = 0, cfa_ft2 = 0, limit = 4, configuration, ducted_returns = "fewer-than-3", code_edition = "2024" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const leak = Number(leakage_cfm25) || 0;
   const cfa = Number(cfa_ft2) || 0;
-  const lim = Number(limit) || 0;
+  // A caller that types a limit and names no configuration keeps that limit, as before.
+  const cfg = configuration || (arguments[0] && Object.hasOwn(arguments[0], "limit") ? "custom" : "installed");
+  const ed = String(code_edition);
   if (!(leak >= 0)) return { error: "Measured leakage must be non-negative (CFM25)." };
   if (!(cfa > 0)) return { error: "Conditioned floor area must be positive (ft^2)." };
-  if (!(lim > 0)) return { error: "Leakage limit must be positive (CFM25 per 100 ft^2)." };
+  if (cfg !== "custom" && !Object.hasOwn(DUCT_LEAKAGE_LIMITS_2024, cfg)) return { error: "Configuration must be rough-in, installed, rough-in-inside, installed-inside or custom." };
+  if (ed !== "2024" && ed !== "2021") return { error: "IECC edition must be 2024 or 2021." };
+  if (ducted_returns !== "fewer-than-3" && ducted_returns !== "3-or-more") return { error: "Ducted returns must be fewer-than-3 or 3-or-more." };
   const normalized = leak / cfa * 100;
+  let lim;
+  let limit_cfm = null;
+  if (cfg === "custom") lim = Number(limit) || 0;
+  else if (ed === "2021") lim = DUCT_LEAKAGE_LIMITS_2021[cfg];
+  else {
+    const row = DUCT_LEAKAGE_LIMITS_2024[cfg];
+    lim = row[ducted_returns === "3-or-more" ? "ge3" : "lt3"];
+    if (cfa <= 1000) limit_cfm = row.small_cfm;
+  }
+  if (!(lim > 0)) return { error: "Leakage limit must be positive (CFM25 per 100 ft^2)." };
   // 1e-9: 64.2 CFM25 on 2,140 ft^2 is 3.0000000000000004, which failed a limit of 3 it meets.
-  const passes = normalized <= lim * (1 + 1e-9);
+  const passes = limit_cfm != null ? leak <= limit_cfm * (1 + 1e-9) : normalized <= lim * (1 + 1e-9);
+  const basis = cfg === "custom" ? "the entered limit"
+    : limit_cfm != null ? "IECC 2024 Table R403.3.8, " + limit_cfm + " CFM25 total for a duct system serving 1,000 ft^2 or less"
+    : ed === "2021" ? "IECC 2021 R403.3.6"
+    : "IECC 2024 Table R403.3.8 (" + (ducted_returns === "3-or-more" ? "3 or more" : "fewer than 3") + " ducted returns)";
   return {
-    normalized, passes, limit: lim,
-    note: "Residential duct leakage (IECC R403.3.5): a blower (duct blaster) pressurizes the duct system to 25 Pa and the leakage is normalized to the conditioned floor area, CFM25 per 100 ft^2 = leakage / area x 100. The IECC total-leakage limit is 4 CFM25 per 100 ft^2 for a rough-in test with the air handler installed, or the post-construction total; a rough-in test without the air handler is limited to 3, and where all ducts and the air handler sit inside the building thermal envelope the limit is 8.0 (IECC 2021 R403.3.6; R403.3.5 is the test method; verify the test type and the code edition adopted). A tighter system wastes less conditioned air into attics and crawlspaces. A field aid; the adopted energy code, the required test type, and the rater govern.",
+    normalized, passes, limit: lim, limit_cfm, configuration: cfg, code_edition: ed, basis,
+    note: "Residential duct leakage: a blower (duct blaster) pressurizes the duct system to 25 Pa and the total leakage is normalized to the conditioned floor area, CFM25 per 100 ft^2 = leakage / area x 100. IECC 2024 Table R403.3.8 [R403.3.6 in IECC 2021] sets the limit by configuration: equipment not yet installed 3 (4 with 3 or more ducted returns), all components installed 4 (6), rough-in with the ductwork entirely in conditioned space 6 (8), installed and entirely in conditioned space 8 (12); a system serving 1,000 ft^2 or less is held to a total of 30 / 40 / 60 / 80 CFM25 instead. IECC 2021 used 3 / 4 / 8 per 100 ft^2 with no return or small-system rule. R403.3.7 [R403.3.5 in 2021] is the test method. A tighter system wastes less conditioned air into attics and crawlspaces. A field aid; the adopted energy code, the required test type, and the rater govern.",
   };
 }
 export const ductLeakageCfm25Example = { inputs: { leakage_cfm25: 80, cfa_ft2: 2000, limit: 4 } };
 HVACSERVICE_RENDERERS["duct-leakage-cfm25"] = _simpleRenderer({
-  citation: "Citation: Residential duct leakage (IECC R403.3.5): normalized = leakage CFM25 / conditioned floor area x 100, compared to the IECC 2021 R403.3.6 limit (4 CFM25 per 100 ft^2 total / post-construction, 3 for a rough-in without the air handler, 8 with all ducts inside the thermal envelope). A field aid; the adopted energy code, the required test type, and the rater govern.",
+  citation: "Citation: Residential duct leakage (IECC 2024 R403.3.7 test, Table R403.3.8 limits [R403.3.5 / R403.3.6 in IECC 2021]): normalized = leakage CFM25 / conditioned floor area x 100, compared to the table limit for the configuration and the number of ducted returns (4 CFM25 per 100 ft^2 with all components installed and fewer than 3 returns), or to a total of 30 to 80 CFM25 for a system serving 1,000 ft^2 or less. IECC 2021 used 3 / 4 / 8 per 100 ft^2. A field aid; the adopted energy code, the required test type, and the rater govern.",
   example: ductLeakageCfm25Example.inputs,
   fields: [
     { key: "leakage_cfm25", label: "Measured total leakage at 25 Pa (CFM25)", kind: "number" },
     { key: "cfa_ft2", label: "Conditioned floor area (ft²)", kind: "number" },
-    { key: "limit", label: "Limit (CFM25 per 100 ft², default 4)", kind: "number", default: 4 },
+    { key: "configuration", label: "Test configuration", kind: "select", options: [{ value: "installed", label: "All components installed", selected: true }, { value: "custom", label: "Custom limit (enter below)" }, { value: "rough-in", label: "Rough-in, equipment not installed" }, { value: "installed-inside", label: "Installed, ducts entirely in conditioned space" }, { value: "rough-in-inside", label: "Rough-in, ducts entirely in conditioned space" }] },
+    { key: "ducted_returns", label: "Ducted returns", kind: "select", options: [{ value: "fewer-than-3", label: "Fewer than 3", selected: true }, { value: "3-or-more", label: "3 or more" }] },
+    { key: "code_edition", label: "IECC edition", kind: "select", options: [{ value: "2024", label: "IECC 2024", selected: true }, { value: "2021", label: "IECC 2021" }] },
+    { key: "limit", label: "Custom limit (CFM25 per 100 ft², Custom configuration only)", kind: "number" },
   ],
   outputs: [
     { key: "norm", id: "dlc-out-norm", label: "Normalized leakage", value: (r) => fmt(r.normalized, 2) + " CFM25 / 100 ft^2" },
-    { key: "pass", id: "dlc-out-pass", label: "Result", value: (r) => r.passes ? "PASS (<= " + fmt(r.limit, 1) + ")" : "FAIL (> " + fmt(r.limit, 1) + ")" },
+    { key: "pass", id: "dlc-out-pass", label: "Result", value: (r) => (r.passes ? "PASS" : "FAIL") + (r.limit_cfm != null ? " (" + (r.passes ? "<= " : "> ") + fmt(r.limit_cfm, 0) + " CFM25 total)" : " (" + (r.passes ? "<= " : "> ") + fmt(r.limit, 1) + " per 100 ft^2)") + " -- " + r.basis },
     { key: "n", id: "dlc-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeDuctLeakageCfm25,

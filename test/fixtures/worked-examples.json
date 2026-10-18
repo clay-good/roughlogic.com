@@ -7784,7 +7784,8 @@
    "verified_on": "2026-09-24",
    "inputs": {
     "area_ft2": 1000,
-    "occupancy_class": "office"
+    "occupancy_class": "office",
+    "code_edition": "2021"
    },
    "outputs": {
     "target_W": {

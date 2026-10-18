@@ -76,7 +76,7 @@ anything.
 | `ashrae-90-1` | ASHRAE 90.1 | 2022 | **2025 (published)** | 2026-09-01 | disclosed-lag |
 | `aci-318` | ACI 318 | 2019 | **2025 (published)** | 2026-10-17 | disclosed-lag |
 | `tms-402` | TMS 402/602 | 2016 | **2022 (published)** | 2026-10-17 | disclosed-lag |
-| `iecc` | IECC | 2021 | 2024 (2027 not yet published) | 2026-10-17 | disclosed-lag |
+| `iecc` | IECC | 2024 | 2024 (2027 not yet published) | 2026-10-17 | current |
 | `nds` | AWC NDS | 2018 | **2024 (published)** | 2026-10-17 | disclosed-lag |
 | `nfpa-70e` | NFPA 70E | 2024 | **2027 (published)** | 2026-10-17 | disclosed-lag |
 | `fda-food-code` | FDA Food Code | 2026 | 2026 | 2026-10-17 | current |
