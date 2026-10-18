@@ -375,17 +375,17 @@ A standard the tiles cite but no shard holds data from has no manifest to appear
 
 ### data/construction/soil-bearing.json (v2)
 
-- Source: U.S. Geological Survey soil engineering references and IBC Table 1806.2 mirrored values.
-- License: U.S. government / engineering-practice consensus.
+- Source: IBC Table 1806.2 presumptive load-bearing values (identical in IBC 2021 and 2027), with crystalline bedrock and sedimentary rock as separate rows.
+- License: Numeric code values, cited by table.
 - Cadence: Annual review.
 - Shard layout: Object keyed by soil class with allowable psf.
 
 ### data/construction/wind-snow-zones.json (v2)
 
-- Source: NOAA basic wind speeds and ground snow loads (public domain). Public ASCE 7 formulas q = 0.00256 * V^2 and Pf = 0.7 * Ce * Ct * Is * Pg.
-- License: U.S. government data; public formulas.
-- Cadence: Annual review.
-- Shard layout: Object with basic wind speeds (mph) and ground snow loads (psf) keyed by region.
+- Source: ASCE 7-22 formulas, applied without reproducing licensed text: qz = 0.00256 Kz Kzt Ke V^2 and pf = 0.7 Ce Ct pg (no importance factor in 7-22). Site values V and pg come from the ASCE Hazard Tool for the risk category.
+- License: Public formulas.
+- Cadence: Reviewed with each ASCE 7 edition.
+- Shard layout: The two formulas and a pointer to the site values. Until 2026-10-17 it held one wind speed and one ground snow load per broad region, attributed to NOAA; no calculator used them and they were not design values.
 
 ### data/construction/concrete-mixes.json
 

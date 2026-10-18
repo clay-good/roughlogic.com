@@ -68,8 +68,8 @@ The pipeline never runs in production. It runs in CI on a tiered schedule per sp
 - `data/construction/lumber-properties.json` — Allowable bending stress and modulus of elasticity from public engineering references and lumber grading agency basic-design values.
 - `data/construction/concrete-mixes.json` — Standard concrete mix proportions and yields from public engineering references.
 - `data/construction/span-derivations.json` — First-principles outputs of the lumber-spans calculator using bundled material properties.
-- `data/construction/soil-bearing.json` (v2) — USGS / IBC-mirrored allowable soil bearing values.
-- `data/construction/wind-snow-zones.json` (v2) — NOAA basic wind speeds and ground snow loads. Public domain; public ASCE 7 formulas applied.
+- `data/construction/soil-bearing.json` (v2) — IBC Table 1806.2 presumptive load-bearing values (identical in IBC 2021 and 2027).
+- `data/construction/wind-snow-zones.json` (v2) — ASCE 7-22 wind and snow formulas; site values from the ASCE Hazard Tool (the regional table it once held was removed 2026-10-17).
 - `data/fire/hose-friction.json` — National Fire Academy hydraulics training materials. U.S. government, public domain.
 - `data/fire/fire-flow-formulas.json` — ISO Public Protection Classification published formulas.
 - `data/crosswalks/unit-conversions.json` — NIST SP 811. Public domain.

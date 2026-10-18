@@ -804,22 +804,13 @@ const SOIL_BEARING = {
 // Construction v2: wind / snow zones (NOAA basic wind speeds; ASCE 7
 // formula applied; the table text is not reproduced).
 const WIND_SNOW_ZONES = {
-  source: "NOAA basic wind speeds and ground snow loads by region (public domain). Public ASCE 7 formulas q = 0.00256 * V^2 and Pf = 0.7 * Ce * Ct * Is * Pg.",
-  basic_wind_speeds_mph: {
-    inland_low_risk: 90,
-    coastal_atlantic: 130,
-    coastal_gulf: 140,
-    coastal_pacific: 100,
+  "source": "ASCE 7-22 formulas applied without reproducing licensed text: velocity pressure qz = 0.00256 Kz Kzt Ke V^2 (Section 26.10) and flat-roof snow load pf = 0.7 Ce Ct pg (Eq. 7.3-1; 7-22 has no importance factor here). V and pg are site- and risk-category-specific: read them from the ASCE Hazard Tool (ascehazardtool.org), not from a regional table.",
+  "formulas": {
+    "velocity_pressure_psf": "qz = 0.00256 * Kz * Kzt * Ke * V^2 (V in mph)",
+    "flat_roof_snow_psf": "pf = 0.7 * Ce * Ct * pg"
   },
-  ground_snow_loads_psf: {
-    deep_south: 5,
-    mid_atlantic: 25,
-    great_lakes: 40,
-    rocky_mountains: 60,
-    new_england: 50,
-    upper_midwest: 50,
-    pacific_northwest: 25,
-  },
+  "site_values": "Basic wind speed V and ground snow load pg are entered per site for the building's risk category.",
+  "notes": "Until 2026-10-17 this shard listed one wind speed and one ground snow load per broad region, attributed to NOAA, with the ASCE 7-16 snow formula; no calculator used them, and a regional figure is not a design value."
 };
 
 // Fire-ground.

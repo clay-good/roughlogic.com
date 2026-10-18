@@ -5023,13 +5023,13 @@ export const CITATIONS = {
   },
   "wind-pressure": {
     formula: "Design velocity pressure q = 0.00256 × V² × Kz × Kzt × Kd (psf), with Kd folded into q as ASCE 7-16 wrote it; ASCE 7-22 writes qz = 0.00256 Kz Kzt Ke V² and applies Kd in the pressure equations, giving the same pressure. Ke (ground elevation) is taken as 1.0, which is conservative. V from the ASCE Hazard Tool.",
-    edition: ASCE_7 + " Section 26.10. Public formula; licensed text not reproduced. NOAA basic wind speeds (public domain).",
-    freeAccess: "ASCE 7 licensed; ASCE-7 hazard tool free at asce7hazardtool.online (per ASCE outreach). NOAA wind data free at hazards.atcouncil.org.",
+    edition: ASCE_7 + " Section 26.10. Public formula; licensed text not reproduced. Basic wind speed V from the ASCE Hazard Tool for the site and risk category.",
+    freeAccess: "ASCE 7 licensed; ASCE-7 hazard tool free at asce7hazardtool.online (per ASCE outreach). ATC Hazards by Location (hazards.atcouncil.org) also reports the ASCE 7 values.",
     governance: GOVERNANCE.structural,
     editionNote: IBC_DISCLOSURE,
     assumptions: [
       { name: "Air-density factor 0.00256", value: "ASCE 7-22 Section 26.10", source: "ASCE 7-22 by name" },
-      { name: "Exposure / Kz / Kzt / Kd / Ke", value: "user-supplied or from data/construction/wind-snow-zones.json", source: "ASCE 7-22" },
+      { name: "Exposure / Kz / Kzt / Kd / Ke", value: "user-supplied (data/construction/wind-snow-zones.json states the formula only; until 2026-10-17 this said the factors could come from it, which they could not)", source: "ASCE 7-22" },
     ],
   },
   "wind-speed-from-velocity-pressure": {
@@ -5046,7 +5046,7 @@ export const CITATIONS = {
   "snow-load": {
     formula: "Flat-roof snow load Pf = 0.7 × Ce × Ct × Pg (psf), ASCE 7-22 Eq. 7.3-1; Pg is the ground snow load for the risk category (7-22 removed the importance factor Is). Optional leeward drift hd = 1.5 sqrt(pg^0.74 lu^0.70 W2^1.7 / gamma), Eq. 7.6-1.",
     edition: ASCE_7 + " Section 7.3.",
-    freeAccess: "ASCE 7 licensed; principles free in published structural texts. NOAA ground-snow data free at hazards.atcouncil.org.",
+    freeAccess: "ASCE 7 licensed; principles free in published structural texts. ground snow loads by risk category free from the ASCE Hazard Tool and ATC Hazards by Location (hazards.atcouncil.org).",
     governance: GOVERNANCE.structural,
     editionNote: IBC_DISCLOSURE,
     assumptions: [

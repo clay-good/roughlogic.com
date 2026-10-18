@@ -53,7 +53,7 @@
     "construction/concrete-mixes.json": "4c302a4012faa2b2e034dc826accbcab49860ed23dc204f68071d70372f5a45f",
     "construction/span-derivations.json": "71a2f3150a4375a1071dea3779d8c36fa7f9818522b8e4ca5df4cc207f845fef",
     "construction/soil-bearing.json": "a757623cfa441880a29623e8ff73e39fd084427046fd66e6f4608535986de96e",
-    "construction/wind-snow-zones.json": "4b7d5d2b3094f721fb8f59625ae96ab4f8d948768800a5b9cdd29715cd99ee9e",
+    "construction/wind-snow-zones.json": "c595680fe26d86d17e3ead00c4a18967a823c3c8c67bc09210025906ca2066b4",
     "construction/aci-211-curves.json": "bb85e0973fb931d12489c2509428985b9495df214430270081f7fe9649f0dbec",
     "construction/bolt-grades.json": "7cc9bd9089798ef9b8308e809850d8c46b4422e612a6d294854157c91a900434",
     "construction/sfm-table.json": "c91bd6e512ce9cf5b6a78477ae1ccb6f30be08424a0f6cbff7f8a78441dff921",
@@ -61,7 +61,7 @@
     "construction/rebar-unit-weights.json": "aa9d90af63d3d735986b52af4d5a7ae3f50d1db89de02b5e22c0cba22f0ecc35",
     "construction/apa-span-ratings.json": "2fc73082e7a4068250c74664df666fef56aa7ed65c74687cab7d7c81c5c087be",
     "construction/helical-pile-kt.json": "dbc1a7421f3ced6964933569faf525bf4e6f93ae57e4ef3f30c35cc52b32c7a8",
-    "construction/manifest.json": "8801f0992792cd978938119cd1502c78b131d455db2f4755bc6160609c4a1044",
+    "construction/manifest.json": "55f9d3ad5287ef006e6fccfc06a9a5838af8e64e976011ab97e7dad75431df5c",
     "fire/hose-friction.json": "61ea899b59206ed16946e9627de0a0ef2c77fccbb1673bdbe25d9a7145014a41",
     "fire/fire-flow-formulas.json": "b1aa15700e69905bb68e90419a26b59b8e01bdfeb928230e19272ea536404782",
     "fire/iso-nff.json": "b2ca30cd7a44da3b5e07b9796ba3c90ad12dc6ae60addc362e4492993bc5a002",
@@ -121,7 +121,7 @@
     "fields/manifest.json": "6471f9621076a8919ac0315652497859e3d7a71c589b9d30d40c5c451c95113d",
     "search/manifest.json": "5a0fbbc1312c295d1317e6cb5e0f3bdf80dd7652fc31583d6068c4bde78cfb59",
     "desc/manifest.json": "98494a7b5a0f0b69b3b888a5e9414307c203e7e59078730db5ece9325c6235dd",
-    "citations/manifest.json": "4523e20f60f322a00391f354bbbfadc6cb719fd16ad0221ac04dea3fb4da6ae4",
+    "citations/manifest.json": "74d192c29f4ae0b943ab8bc9022cd98803676710541b4562146f1156a7515a34",
     "legal/code-adoption.json": "fcc7037a9c63cf5139c0a527c4b8077dafdc72748ecf7d71d588d07dacdca557"
   }
 }

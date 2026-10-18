@@ -10,7 +10,7 @@
       "date": "2026-10-18"
     },
     "/errata/": {
-      "sha": "76fcd0fe22c54b7c",
+      "sha": "c1804e2513aa46a2",
       "date": "2026-10-18"
     },
     "/collections/disaster-response/": {
@@ -7218,8 +7218,8 @@
       "date": "2026-10-17"
     },
     "/tools/snow-load/": {
-      "sha": "19ec1477cca29d78",
-      "date": "2026-10-17"
+      "sha": "6624f321cacfd31b",
+      "date": "2026-10-18"
     },
     "/tools/snow-stacking-area/": {
       "sha": "a01b283a61920093",
@@ -8982,8 +8982,8 @@
       "date": "2026-10-17"
     },
     "/tools/wind-pressure/": {
-      "sha": "480d58829c5e65ee",
-      "date": "2026-10-17"
+      "sha": "fe093bf6beeb7b96",
+      "date": "2026-10-18"
     },
     "/tools/wind-shear-hub-height/": {
       "sha": "78b44de008bfc626",
