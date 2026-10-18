@@ -1,0 +1,28 @@
+{
+ "_comment": "Every U.S. Code section the catalog cites, as 'N USC sec' or as an Internal Revenue Code 'IRC \u00a7sec' / 'IRC sec' (title 26), with its heading as read on law.cornell.edu (LII) on 2026-10-17; uscode.house.gov was in a temporary format and returned no section pages that day. test/unit/usc-citations-verified.test.js fails on a citation not listed here. The building code is also abbreviated IRC; its sections start with R and are not matched.",
+ "verified_on": "2026-10-17",
+ "headings": {
+  "12 USC 1709": "Insurance of mortgages",
+  "12 USC 4901": "Definitions (Homeowners Protection Act)",
+  "12 USC 4910": "Construction (Homeowners Protection Act)",
+  "26 USC 1": "Tax imposed",
+  "26 USC 121": "Exclusion of gain from sale of principal residence",
+  "26 USC 168": "Accelerated cost recovery system",
+  "26 USC 179": "Election to expense certain depreciable business assets",
+  "26 USC 280A": "Disallowance of certain expenses in connection with business use of home, rental of vacation homes, etc.",
+  "26 USC 469": "Passive activity losses and credits limited",
+  "26 USC 1031": "Exchange of real property held for productive use or investment",
+  "26 USC 1245": "Gain from dispositions of certain depreciable property",
+  "26 USC 1250": "Gain from dispositions of certain depreciable realty",
+  "26 USC 1401": "Rate of tax (self-employment)",
+  "26 USC 1402": "Definitions (self-employment)",
+  "26 USC 3101": "Rate of tax (FICA, employee)",
+  "26 USC 3111": "Rate of tax (FICA, employer)",
+  "26 USC 3121": "Definitions (FICA)",
+  "26 USC 3301": "Rate of tax (FUTA)",
+  "26 USC 3306": "Definitions (FUTA)",
+  "26 USC 6654": "Failure by individual to pay estimated income tax",
+  "29 USC 207": "Maximum hours (FLSA)",
+  "40 USC 3141": "Definitions (Davis-Bacon)"
+ }
+}
