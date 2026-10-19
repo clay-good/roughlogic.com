@@ -1466,7 +1466,7 @@ cross-check.
 | calc-agriculture.js | `computeSprinklerPrecipRate` | `{ zone_gpm = 0, zone_ft2 = 0 } = {}` | _ | _ | _ |
 | calc-agriculture.js | `computeStockingRate` | `{ area_acres = 0, forage_lb_per_acre = 0, utilization_pct = 40, animal_class ...` | _ | _ | _ |
 | calc-agriculture.js | `computeTHI` | `{ temperature = null, unit = "F", rh_percent = null, animal = "dairy-cow", ve...` | _ | _ | _ |
-| calc-agriculture.js | `computeTankMix` | `{ tank_gal = 0, spray_volume_gpa = 0, product_rate_per_acre = 0, product_unit...` | _ | _ | _ |
+| calc-agriculture.js | `computeTankMix` | `{ tank_gal = 0, spray_volume_gpa = 0, liquid_rate_per_acre = 0, dry_rate_per_...` | _ | _ | _ |
 | calc-agriculture.js | `computeTimberCruise` | `{ small_end_dib_in = 0, log_length_ft = 16, rule = "doyle", price_per_bf = 0 }` | _ | _ | _ |
 | calc-agriculture.js | `computeTwoStrokeMix` | `{ ratio = 50, fuel_amount = 0, fuel_unit = "gallon" } = {}` | _ | _ | _ |
 | calc-agriculture.js | `computeTwoStrokeMixRatioCheck` | `{ fuel_amount = 0, fuel_unit = "gallon", oil_amount = 0, target_ratio = 50 } ...` | _ | _ | _ |
@@ -2672,7 +2672,7 @@ cross-check.
 | calc-instrumentation.js | `computeThermistorBetaTemp` | `{ resistance_ohms = 10000, r0_ohms = 10000, beta_k = 3950, ref_temp_c = 25 } ...` | _ | _ | _ |
 | calc-instrumentation.js | `computeThermistorSteinhartHart` | `{ resistance_ohms = 10000, coeff_a = 0.001125308852122, coeff_b = 0.000234711...` | _ | _ | _ |
 | calc-kitchen.js | `computeAbvFromGravity` | `{ original_gravity = 1.055, final_gravity = 1.012 } = {}` | _ | _ | _ |
-| calc-kitchen.js | `computeAsPurchasedQuantity` | `{ ep_quantity_needed = 20, yield_pct = 75, unit_weight = 0 } = {}` | _ | _ | _ |
+| calc-kitchen.js | `computeAsPurchasedQuantity` | `{ ep_quantity_needed = 20, yield_pct = 75, purchase_unit_size = 0 } = {}` | _ | _ | _ |
 | calc-kitchen.js | `computeBakersPercentage` | `{ flour_g = 0, hydration_pct = 0, salt_pct = 0, yeast_pct = 0, other_pct = 0,...` | _ | _ | _ |
 | calc-kitchen.js | `computeBeverageCo2Duration` | `{ cylinder_lb = 0, lb_co2_per_keg = 1.2, kegs_per_day = 0, reserve_fraction =...` | _ | _ | _ |
 | calc-kitchen.js | `computeBrineCure` | `{ mode = "brine", water_g = 0, salt_g = 0, meat_g = 0, cure_g = 0, target_pct...` | _ | _ | _ |

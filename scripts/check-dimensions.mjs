@@ -492,32 +492,20 @@ function checkKeyAgreement(keyDims, errors) {
 // 20 more functions take a single opaque argument and are not counted: there,
 // `args` is the honest name of what the function receives.
 //
-// DRAINED 241 -> 3 over fifteen tranches, 2026-09-10. The three that remain are
-// NOT a backlog -- each takes a parameter whose dimension is chosen at runtime
-// by a sibling selector, so no single declaration is right and the fix is the
-// INPUT, not the comment:
-//
-//   calc-hvac.js       computeAffinityLaws        `target_value` is an rpm, a
-//                                                 CFM or a static pressure,
-//                                                 per `target_kind`.
-//   calc-agriculture.js computeTankMix            `product_rate_per_acre` is a
-//                                                 length (gal/acre) or an
-//                                                 `M L^-2` (lb/acre), per
-//                                                 `product_unit`.
-//   calc-kitchen.js    computeAsPurchasedQuantity `unit_weight` is `M` here and
-//                                                 `M L^-3` everywhere else --
-//                                                 declaring it adds a name
-//                                                 collision. Rename the field
-//                                                 key to fix it.
-//
-// Splitting those three inputs, or renaming that key, is a live-tile change and
-// takes the budget to 0. Nothing else here is drainable by editing a comment.
+// DRAINED 241 -> 3 over fifteen tranches, 2026-09-10; 3 -> 0 on 2026-10-19.
+// The last three each took a parameter whose dimension was chosen at runtime
+// by a sibling selector, so no declaration could be right and the fix was the
+// INPUT: affinity-laws' `target_value` became target_RPM / target_CFM /
+// target_SP_in_wc / target_kW, tank-mix's `product_rate_per_acre` became
+// liquid_rate_per_acre / dry_rate_per_acre, and as-purchased-quantity's
+// `unit_weight` (M L^-3 everywhere else) became purchase_unit_size. A tile that
+// needs a mode-dependent input gets one typed input per mode instead.
 // ---------------------------------------------------------------------------
 
 const STUB_INPUT_NAMES = new Set(["args", "input", "opts", "options", "params", "o", "obj"]);
 
 // Lower this as stubs are drained. It may never rise.
-const STUB_BUDGET = 3;
+const STUB_BUDGET = 0;
 
 function isStubAnnotation(fn) {
   if (!fn.parse || !fn.parse.ok) return false;

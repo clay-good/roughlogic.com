@@ -1625,24 +1625,27 @@ const DRY_OZ_PER = { oz: 1, lb: 16 };
 const ML_PER_FL_OZ = 29.5735295625;
 const G_PER_OZ = 28.349523125;
 
-// dims: in { args: dimensionless } out: { acres_per_tank: L^2, product_per_tank_unit: dimensionless, tanks_needed: dimensionless, total_carrier_water_gal: L^3 }
+// dims: in { tank_gal: L^3, spray_volume_gpa: L, liquid_rate_per_acre: L, dry_rate_per_acre: M L^-2, product_unit: dimensionless, field_area_acres: L^2 } out: { acres_per_tank: L^2, product_per_tank_unit: dimensionless, tanks_needed: dimensionless, total_carrier_water_gal: L^3 }
+// A liquid rate (volume per acre) and a dry rate (weight per acre) are separate inputs;
+// product_unit says which one is read. Until 2026-10-19 one product_rate_per_acre was either.
 export function computeTankMix({
   tank_gal = 0,
   spray_volume_gpa = 0,
-  product_rate_per_acre = 0,
+  liquid_rate_per_acre = 0,
+  dry_rate_per_acre = 0,
   product_unit = "fl_oz",
   field_area_acres = 0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const tank = Number(tank_gal);
   const gpa = Number(spray_volume_gpa);
-  const rate = Number(product_rate_per_acre);
   const isLiquid = Object.prototype.hasOwnProperty.call(FL_OZ_PER, product_unit);
   const isDry = Object.prototype.hasOwnProperty.call(DRY_OZ_PER, product_unit);
   if (!isLiquid && !isDry) return { error: "Unknown product unit '" + product_unit + "'." };
+  const rate = Number(isLiquid ? liquid_rate_per_acre : dry_rate_per_acre);
   if (!(tank > 0)) return { error: "Enter a positive tank capacity (gal)." };
   if (!(gpa > 0)) return { error: "Enter a positive spray volume (GPA)." };
-  if (!(rate > 0)) return { error: "Enter a positive product rate per acre." };
+  if (!(rate > 0)) return { error: "Enter a positive " + (isLiquid ? "liquid" : "dry") + " product rate per acre." };
   const area = Math.max(0, Number(field_area_acres) || 0);
 
   const acres_per_tank = tank / gpa;
@@ -1693,14 +1696,15 @@ export const tankMixExample = {
   // 300 gal tank, 15 GPA carrier, 1.5 pt/acre product, 80-acre field.
   // acres/tank = 300/15 = 20; product/tank = 20*1.5 = 30 pt = 3.75 gal;
   // tanks = ceil(80/20) = 4; total product = 120 pt = 15 gal; water = 1,200 gal.
-  inputs: { tank_gal: 300, spray_volume_gpa: 15, product_rate_per_acre: 1.5, product_unit: "pt", field_area_acres: 80 },
+  inputs: { tank_gal: 300, spray_volume_gpa: 15, liquid_rate_per_acre: 1.5, product_unit: "pt", field_area_acres: 80 },
 };
 
 function renderTankMix(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: The EPA pesticide label is the law (FIFRA); follow its rate, carrier volume, REI, and PPE. Tank-mix math first-principles: acres/tank = tank gal / GPA; product/tank = acres/tank x rate. NRCS Agronomy Technical Note 5 for spray calibration. The separate nozzle-output (GPA) calibration is the Chemical Application Rate (GPA) tile. Free at epa.gov/pesticide-labels.";
   const tank = makeNumber("Tank capacity (gal)", "tm-tank", { step: "any", min: "0" });
   const gpa = makeNumber("Spray volume (GPA)", "tm-gpa", { step: "any", min: "0" });
-  const rate = makeNumber("Product rate per acre", "tm-rate", { step: "any", min: "0" });
+  const rate = makeNumber("Liquid product rate per acre (in the unit above)", "tm-rate", { step: "any", min: "0" });
+  const dryRate = makeNumber("Dry product rate per acre (in the unit above)", "tm-dry-rate", { step: "any", min: "0" });
   const unit = makeSelect("Product unit", "tm-unit", [
     { value: "fl_oz", label: "fluid ounces (liquid)" },
     { value: "pt", label: "pints (liquid)", selected: true },
@@ -1710,10 +1714,11 @@ function renderTankMix(inputRegion, outputRegion, citationEl) {
     { value: "lb", label: "pounds (dry)" },
   ]);
   const area = makeNumber("Field area (acres; optional)", "tm-area", { step: "any", min: "0" });
-  for (const f of [tank, gpa, rate, unit, area]) inputRegion.appendChild(f.wrap);
+  for (const f of [tank, gpa, unit, rate, dryRate, area]) inputRegion.appendChild(f.wrap);
+  function sync() { const liquid = Object.prototype.hasOwnProperty.call(FL_OZ_PER, unit.select.value); rate.wrap.style.display = liquid ? "" : "none"; dryRate.wrap.style.display = liquid ? "none" : ""; }
   attachExampleButton(inputRegion, () => {
-    tank.input.value = "300"; gpa.input.value = "15"; rate.input.value = "1.5";
-    unit.select.value = "pt"; area.input.value = "80"; update();
+    tank.input.value = "300"; gpa.input.value = "15"; rate.input.value = "1.5"; dryRate.input.value = "";
+    unit.select.value = "pt"; area.input.value = "80"; sync(); update();
   });
 
   const oAcres = makeOutputLine(outputRegion, "Acres per tank", "tm-out-acres");
@@ -1727,10 +1732,11 @@ function renderTankMix(inputRegion, outputRegion, citationEl) {
     const r = computeTankMix({
       tank_gal: readNum(tank.input),
       spray_volume_gpa: readNum(gpa.input),
-      product_rate_per_acre: readNum(rate.input),
+      liquid_rate_per_acre: readNum(rate.input),
+      dry_rate_per_acre: readNum(dryRate.input),
       product_unit: unit.select.value,
       field_area_acres: readNum(area.input),
-    }); stepsFor(outputRegion, inputRegion, ["tank_gal", "spray_volume_gpa", "product_rate_per_acre", "product_unit", "field_area_acres"], r);
+    }); stepsFor(outputRegion, inputRegion, ["tank_gal", "spray_volume_gpa", "liquid_rate_per_acre", "dry_rate_per_acre", "product_unit", "field_area_acres"], r);
     if (r.error) { oAcres.textContent = r.error; oProduct.textContent = "-"; oField.textContent = "-"; oNote.textContent = ""; return; }
     oAcres.textContent = fmt(r.acres_per_tank, 2) + " acres (" + fmt(r.tank_gal, 0) + " gal / " + fmt(r.spray_volume_gpa, 0) + " GPA)";
     if (r.liquid) {
@@ -1746,8 +1752,9 @@ function renderTankMix(inputRegion, outputRegion, citationEl) {
     }
     oNote.textContent = r.warnings.length ? r.warnings.join(" ") : "The EPA label is the law: follow its rate, REI, and PPE. Product volume displaces a negligible share of the carrier at label rates.";
   }, DEBOUNCE_MS);
-  for (const el of [tank.input, gpa.input, rate.input, area.input]) el.addEventListener("input", update);
-  unit.select.addEventListener("change", update);
+  for (const el of [tank.input, gpa.input, rate.input, dryRate.input, area.input]) el.addEventListener("input", update);
+  unit.select.addEventListener("change", () => { sync(); update(); });
+  sync();
 }
 
 export const AGRICULTURE_RENDERERS = {

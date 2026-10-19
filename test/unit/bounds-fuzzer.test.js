@@ -1218,7 +1218,7 @@ test("bounds: spec-v780 evaporative-cooler-effectiveness pins T_out = T_db - eff
 test("bounds: calc-hvac computeAffinityLaws obeys Q ~ N, SP ~ N^2, kW ~ N^3 exactly across the RPM-target sweep", () => {
   const base = { baseline_RPM: 1750, baseline_CFM: 5000, baseline_SP_in_wc: 1.0, baseline_kW: 5.0 };
   for (const target_value of [875, 1400, 1750, 2100, 3500]) {
-    const r = computeAffinityLaws({ ...base, target_kind: "RPM", target_value });
+    const r = computeAffinityLaws({ ...base, target_kind: "RPM", target_RPM: target_value });
     assert.ok(!r.error, `RPM=${target_value}: ${JSON.stringify(r)}`);
     const ratio = target_value / base.baseline_RPM;
     assert.ok(Math.abs(r.ratio - ratio) < 1e-12, `ratio`);
@@ -1228,19 +1228,19 @@ test("bounds: calc-hvac computeAffinityLaws obeys Q ~ N, SP ~ N^2, kW ~ N^3 exac
     assert.ok(Math.abs(r.kW - base.baseline_kW * ratio * ratio * ratio) < 1e-9, `kW ~ ratio^3`);
   }
   // SP-target inverts to ratio = sqrt(SP_target / SP_base); kW-target to ratio = cbrt.
-  const spr = computeAffinityLaws({ ...base, target_kind: "SP", target_value: 4.0 });
+  const spr = computeAffinityLaws({ ...base, target_kind: "SP", target_SP_in_wc: 4.0 });
   assert.ok(Math.abs(spr.ratio - Math.sqrt(4.0 / 1.0)) < 1e-12, `SP inverse ratio`);
-  const kwr = computeAffinityLaws({ ...base, target_kind: "kW", target_value: 40.0 });
+  const kwr = computeAffinityLaws({ ...base, target_kind: "kW", target_kW: 40.0 });
   assert.ok(Math.abs(kwr.ratio - Math.cbrt(40.0 / 5.0)) < 1e-12, `kW inverse ratio`);
 });
 
 test("bounds: calc-hvac computeAffinityLaws rejects non-positive baselines / targets and unknown target kind (documented)", () => {
-  assert.ok("error" in computeAffinityLaws({ baseline_RPM: 0, target_kind: "RPM", target_value: 1500 }));
-  assert.ok("error" in computeAffinityLaws({ baseline_RPM: 1750, target_kind: "RPM", target_value: 0 }));
-  assert.ok("error" in computeAffinityLaws({ baseline_RPM: 1750, target_kind: "CFM", target_value: 4000, baseline_CFM: 0 }));
-  assert.ok("error" in computeAffinityLaws({ baseline_RPM: 1750, target_kind: "SP", target_value: 4, baseline_SP_in_wc: 0 }));
-  assert.ok("error" in computeAffinityLaws({ baseline_RPM: 1750, target_kind: "kW", target_value: 40, baseline_kW: 0 }));
-  assert.ok("error" in computeAffinityLaws({ baseline_RPM: 1750, target_kind: "not-a-kind", target_value: 1 }));
+  assert.ok("error" in computeAffinityLaws({ baseline_RPM: 0, target_kind: "RPM", target_RPM: 1500 }));
+  assert.ok("error" in computeAffinityLaws({ baseline_RPM: 1750, target_kind: "RPM", target_RPM: 0 }));
+  assert.ok("error" in computeAffinityLaws({ baseline_RPM: 1750, target_kind: "CFM", target_CFM: 4000, baseline_CFM: 0 }));
+  assert.ok("error" in computeAffinityLaws({ baseline_RPM: 1750, target_kind: "SP", target_SP_in_wc: 4, baseline_SP_in_wc: 0 }));
+  assert.ok("error" in computeAffinityLaws({ baseline_RPM: 1750, target_kind: "kW", target_kW: 40, baseline_kW: 0 }));
+  assert.ok("error" in computeAffinityLaws({ baseline_RPM: 1750, target_kind: "not-a-kind", target_RPM: 1 }));
 });
 
 test("bounds: calc-hvac computeOutdoorAirMix pins the mass-balance temperature mix at every OA fraction", () => {
@@ -3770,7 +3770,7 @@ test("bounds: calc-agriculture computeNpkBlend pins recommendation = max(0, dema
 });
 
 test("bounds: calc-agriculture computeTankMix pins acres/tank = tank/GPA, product/tank = acres*rate, field tanks (ceil) and totals, and unit conversions", () => {
-  const r = computeTankMix({ tank_gal: 300, spray_volume_gpa: 15, product_rate_per_acre: 1.5, product_unit: "pt", field_area_acres: 80 });
+  const r = computeTankMix({ tank_gal: 300, spray_volume_gpa: 15, liquid_rate_per_acre: 1.5, product_unit: "pt", field_area_acres: 80 });
   assert.ok(Math.abs(r.acres_per_tank - 20) < 1e-9);
   assert.ok(Math.abs(r.product_per_tank_unit - 30) < 1e-9);
   assert.ok(Math.abs(r.liquid.gal - 30 / 8) < 1e-9); // 30 pt = 3.75 gal
@@ -3779,14 +3779,19 @@ test("bounds: calc-agriculture computeTankMix pins acres/tank = tank/GPA, produc
   assert.ok(Math.abs(r.total_product_unit - 120) < 1e-9);
   assert.ok(Math.abs(r.total_carrier_water_gal - 1200) < 1e-9);
   // A partial last tank rounds up.
-  const partial = computeTankMix({ tank_gal: 300, spray_volume_gpa: 15, product_rate_per_acre: 1.5, product_unit: "pt", field_area_acres: 85 });
+  const partial = computeTankMix({ tank_gal: 300, spray_volume_gpa: 15, liquid_rate_per_acre: 1.5, product_unit: "pt", field_area_acres: 85 });
   assert.equal(partial.tanks_needed, 5); // ceil(85/20)
   // Dry unit path converts to lb/g; GPA band warning; rejections.
-  const dry = computeTankMix({ tank_gal: 200, spray_volume_gpa: 20, product_rate_per_acre: 8, product_unit: "oz" });
+  const dry = computeTankMix({ tank_gal: 200, spray_volume_gpa: 20, dry_rate_per_acre: 8, product_unit: "oz" });
   assert.ok(Math.abs(dry.dry.lb - dry.product_per_tank_unit / 16) < 1e-9);
-  assert.ok(computeTankMix({ tank_gal: 100, spray_volume_gpa: 3, product_rate_per_acre: 1, product_unit: "pt" }).warnings.some((w) => /GPA/.test(w)));
-  assert.ok("error" in computeTankMix({ tank_gal: 100, spray_volume_gpa: 15, product_rate_per_acre: 1, product_unit: "furlong" }));
-  assert.ok("error" in computeTankMix({ tank_gal: 0, spray_volume_gpa: 15, product_rate_per_acre: 1, product_unit: "pt" }));
+  // product_unit picks which rate is read: a liquid unit ignores the dry rate, and a blank selected rate is an error.
+  const both = { tank_gal: 200, spray_volume_gpa: 20, liquid_rate_per_acre: 2, dry_rate_per_acre: 8 };
+  assert.ok(Math.abs(computeTankMix({ ...both, product_unit: "pt" }).product_per_tank_unit - 20) < 1e-9);
+  assert.ok(Math.abs(computeTankMix({ ...both, product_unit: "lb" }).product_per_tank_unit - 80) < 1e-9);
+  assert.match(computeTankMix({ ...both, dry_rate_per_acre: 0, product_unit: "lb" }).error, /dry product rate/);
+  assert.ok(computeTankMix({ tank_gal: 100, spray_volume_gpa: 3, liquid_rate_per_acre: 1, product_unit: "pt" }).warnings.some((w) => /GPA/.test(w)));
+  assert.ok("error" in computeTankMix({ tank_gal: 100, spray_volume_gpa: 15, liquid_rate_per_acre: 1, product_unit: "furlong" }));
+  assert.ok("error" in computeTankMix({ tank_gal: 0, spray_volume_gpa: 15, liquid_rate_per_acre: 1, product_unit: "pt" }));
 });
 
 test("bounds: calc-agriculture computeTHI pins the USDA-ARS identity THI = T_F - (0.55 - 0.0055*RH) * (T_F - 58) across the species x ventilation sweep", () => {
@@ -31200,21 +31205,21 @@ test("bounds: spec-v1000 computeDoughWaterTemperature pins the DDT water calc", 
 import { computeAsPurchasedQuantity as _v1001 } from "../../calc-kitchen.js";
 
 test("bounds: spec-v1001 computeAsPurchasedQuantity pins AP = EP / yield", () => {
-  const r = _v1001({ ep_quantity_needed: 20, yield_pct: 75, unit_weight: 0 });
+  const r = _v1001({ ep_quantity_needed: 20, yield_pct: 75, purchase_unit_size: 0 });
   assert.ok(Math.abs(r.ap_quantity - 26.6667) < 1e-3); // 20/0.75
   assert.strictEqual(r.ap_units, null);
-  assert.ok(Math.abs(_v1001({ ep_quantity_needed: 10, yield_pct: 88, unit_weight: 0 }).ap_quantity - 11.3636) < 1e-3);
+  assert.ok(Math.abs(_v1001({ ep_quantity_needed: 10, yield_pct: 88, purchase_unit_size: 0 }).ap_quantity - 11.3636) < 1e-3);
   // The AP always exceeds the EP; a lower yield buys more; a 50% yield doubles it.
   assert.ok(r.ap_quantity > 20);
-  assert.ok(_v1001({ ep_quantity_needed: 20, yield_pct: 50, unit_weight: 0 }).ap_quantity > r.ap_quantity);
-  assert.ok(Math.abs(_v1001({ ep_quantity_needed: 20, yield_pct: 50, unit_weight: 0 }).ap_quantity - 40) < 1e-9);
-  // Unit weight gives units to order.
-  assert.ok(Math.abs(_v1001({ ep_quantity_needed: 20, yield_pct: 75, unit_weight: 5 }).ap_units - 5.3333) < 1e-3); // 26.67/5
+  assert.ok(_v1001({ ep_quantity_needed: 20, yield_pct: 50, purchase_unit_size: 0 }).ap_quantity > r.ap_quantity);
+  assert.ok(Math.abs(_v1001({ ep_quantity_needed: 20, yield_pct: 50, purchase_unit_size: 0 }).ap_quantity - 40) < 1e-9);
+  // The purchase unit size (same unit as the EP quantity) gives units to order.
+  assert.ok(Math.abs(_v1001({ ep_quantity_needed: 20, yield_pct: 75, purchase_unit_size: 5 }).ap_units - 5.3333) < 1e-3); // 26.67/5
   // Error seams.
-  assert.ok("error" in _v1001({ ep_quantity_needed: 0, yield_pct: 75, unit_weight: 0 }));
-  assert.ok("error" in _v1001({ ep_quantity_needed: 20, yield_pct: 0, unit_weight: 0 }));
-  assert.ok("error" in _v1001({ ep_quantity_needed: 20, yield_pct: 120, unit_weight: 0 }));
-  assert.ok("error" in _v1001({ ep_quantity_needed: Infinity, yield_pct: 75, unit_weight: 0 }));
+  assert.ok("error" in _v1001({ ep_quantity_needed: 0, yield_pct: 75, purchase_unit_size: 0 }));
+  assert.ok("error" in _v1001({ ep_quantity_needed: 20, yield_pct: 0, purchase_unit_size: 0 }));
+  assert.ok("error" in _v1001({ ep_quantity_needed: 20, yield_pct: 120, purchase_unit_size: 0 }));
+  assert.ok("error" in _v1001({ ep_quantity_needed: Infinity, yield_pct: 75, purchase_unit_size: 0 }));
 });
 
 import { computeAbvFromGravity as _v1002 } from "../../calc-kitchen.js";

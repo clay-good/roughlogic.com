@@ -3577,7 +3577,7 @@ test("monotonicity: computeAffinityLaws CFM is strictly increasing in target RPM
   let prevKW = -Infinity;
   const baseline = { baseline_RPM: 1750, baseline_CFM: 5000, baseline_SP_in_wc: 1.0, baseline_kW: 5.0 };
   for (const target_value of [1000, 1250, 1500, 1750, 2000, 2250, 2500]) {
-    const r = computeAffinityLaws({ ...baseline, target_kind: "RPM", target_value });
+    const r = computeAffinityLaws({ ...baseline, target_kind: "RPM", target_RPM: target_value });
     assert.ok(Number.isFinite(r.CFM) && r.CFM > 0, `affinity at RPM=${target_value}: ${JSON.stringify(r)}`);
     assert.ok(r.CFM > prevCFM, `CFM at RPM=${target_value} = ${r.CFM} not greater than prev=${prevCFM}`);
     assert.ok(r.SP_in_wc > prevSP, `SP at RPM=${target_value} = ${r.SP_in_wc} not greater than prev=${prevSP}`);
@@ -3587,7 +3587,7 @@ test("monotonicity: computeAffinityLaws CFM is strictly increasing in target RPM
     prevKW = r.kW;
   }
   // Closed-form pin from affinityLawsExample: ratio = 1500 / 1750.
-  const ref = computeAffinityLaws({ ...baseline, target_kind: "RPM", target_value: 1500 });
+  const ref = computeAffinityLaws({ ...baseline, target_kind: "RPM", target_RPM: 1500 });
   const ratio = 1500 / 1750;
   assert.ok(Math.abs(ref.ratio - ratio) < 1e-12, `ratio = ${ref.ratio}, expected ${ratio}`);
   assert.ok(Math.abs(ref.CFM - 5000 * ratio) < 1e-9, `CFM = ${ref.CFM}, expected ${5000 * ratio}`);
@@ -3596,7 +3596,7 @@ test("monotonicity: computeAffinityLaws CFM is strictly increasing in target RPM
   assert.ok(Math.abs(ref.kW - 5.0 * ratio * ratio * ratio) < 1e-9,
     `kW = ${ref.kW}, expected ${5.0 * ratio * ratio * ratio}`);
   // Doubling-RPM pin: 2x RPM -> 2x CFM, 4x SP, 8x kW exactly.
-  const dbl = computeAffinityLaws({ ...baseline, target_kind: "RPM", target_value: 3500 });
+  const dbl = computeAffinityLaws({ ...baseline, target_kind: "RPM", target_RPM: 3500 });
   assert.ok(Math.abs(dbl.CFM - 2 * baseline.baseline_CFM) < 1e-9,
     `2x RPM: CFM = ${dbl.CFM} != ${2 * baseline.baseline_CFM}`);
   assert.ok(Math.abs(dbl.SP_in_wc - 4 * baseline.baseline_SP_in_wc) < 1e-9,

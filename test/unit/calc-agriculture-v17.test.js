@@ -241,7 +241,7 @@ test("tank-mix: 300 gal / 15 GPA, 1.5 pt/acre, 80 acres -> 20 acres/tank, 30 pt/
 });
 
 test("tank-mix: acres per tank = tank capacity / GPA", () => {
-  const r = computeTankMix({ tank_gal: 500, spray_volume_gpa: 20, product_rate_per_acre: 2, product_unit: "fl_oz" });
+  const r = computeTankMix({ tank_gal: 500, spray_volume_gpa: 20, liquid_rate_per_acre: 2, product_unit: "fl_oz" });
   assert.ok(close(r.acres_per_tank, 25, 1e-9));
   assert.ok(close(r.product_per_tank_unit, 50, 1e-9));
 });
@@ -258,7 +258,7 @@ test("tank-mix: liquid product converts to gallons and millilitres", () => {
 });
 
 test("tank-mix: dry product converts to pounds and grams", () => {
-  const r = computeTankMix({ tank_gal: 200, spray_volume_gpa: 20, product_rate_per_acre: 8, product_unit: "oz", field_area_acres: 40 });
+  const r = computeTankMix({ tank_gal: 200, spray_volume_gpa: 20, dry_rate_per_acre: 8, product_unit: "oz", field_area_acres: 40 });
   assert.ok(close(r.dry.lb, r.product_per_tank_unit / 16, 1e-9));
   // The avoirdupois ounce is exact by definition: 1 lb = 453.59237 g. Written
   // as the definition rather than as 28.3495, which is what this line said
@@ -269,7 +269,7 @@ test("tank-mix: dry product converts to pounds and grams", () => {
 });
 
 test("tank-mix: a partial last tank rounds the tank count up", () => {
-  const r = computeTankMix({ tank_gal: 300, spray_volume_gpa: 15, product_rate_per_acre: 1.5, product_unit: "pt", field_area_acres: 85 });
+  const r = computeTankMix({ tank_gal: 300, spray_volume_gpa: 15, liquid_rate_per_acre: 1.5, product_unit: "pt", field_area_acres: 85 });
   assert.equal(r.tanks_needed, 5); // ceil(85/20)
 });
 
@@ -281,16 +281,16 @@ test("tank-mix: field totals scale by area (product and carrier water)", () => {
 });
 
 test("tank-mix: omitting field area yields per-tank figures without tank count", () => {
-  const r = computeTankMix({ tank_gal: 300, spray_volume_gpa: 15, product_rate_per_acre: 1.5, product_unit: "pt" });
+  const r = computeTankMix({ tank_gal: 300, spray_volume_gpa: 15, liquid_rate_per_acre: 1.5, product_unit: "pt" });
   assert.ok(close(r.acres_per_tank, 20, 1e-9));
   assert.equal(r.tanks_needed, undefined);
 });
 
 test("tank-mix: a GPA outside 5-30 warns; unknown unit and non-positive inputs are rejected", () => {
-  assert.ok(computeTankMix({ tank_gal: 100, spray_volume_gpa: 3, product_rate_per_acre: 1, product_unit: "pt" }).warnings.some((w) => /GPA/.test(w)));
-  assert.ok("error" in computeTankMix({ tank_gal: 100, spray_volume_gpa: 15, product_rate_per_acre: 1, product_unit: "furlong" }));
-  assert.ok("error" in computeTankMix({ tank_gal: 0, spray_volume_gpa: 15, product_rate_per_acre: 1, product_unit: "pt" }));
-  assert.ok("error" in computeTankMix({ tank_gal: 100, spray_volume_gpa: 15, product_rate_per_acre: 0, product_unit: "pt" }));
+  assert.ok(computeTankMix({ tank_gal: 100, spray_volume_gpa: 3, liquid_rate_per_acre: 1, product_unit: "pt" }).warnings.some((w) => /GPA/.test(w)));
+  assert.ok("error" in computeTankMix({ tank_gal: 100, spray_volume_gpa: 15, liquid_rate_per_acre: 1, product_unit: "furlong" }));
+  assert.ok("error" in computeTankMix({ tank_gal: 0, spray_volume_gpa: 15, liquid_rate_per_acre: 1, product_unit: "pt" }));
+  assert.ok("error" in computeTankMix({ tank_gal: 100, spray_volume_gpa: 15, liquid_rate_per_acre: 0, product_unit: "pt" }));
 });
 
 // --- Wiring sentinel -------------------------------------------------

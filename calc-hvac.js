@@ -1469,14 +1469,19 @@ export function renderCombustionAirMaxInput(inputRegion, outputRegion, citationE
 //
 // Q ~ N, P ~ N^2, kW ~ N^3 with N = RPM.
 
-// dims: in { args: dimensionless } out: { ratio: dimensionless, kW: M L^2 T^-3 }
+// dims: in { baseline_RPM: T^-1, baseline_CFM: L^3 T^-1, baseline_SP_in_wc: M L^-1 T^-2, baseline_kW: M L^2 T^-3, target_kind: dimensionless, target_RPM: T^-1, target_CFM: L^3 T^-1, target_SP_in_wc: M L^-1 T^-2, target_kW: M L^2 T^-3 } out: { ratio: dimensionless, RPM: T^-1, CFM: L^3 T^-1, SP_in_wc: M L^-1 T^-2, kW: M L^2 T^-3 }
+// One typed target per kind; target_kind picks which one is read. Until 2026-10-19 a single
+// target_value was an rpm, a CFM, a static pressure or a kW depending on target_kind.
 export function computeAffinityLaws({
   baseline_RPM = 0, baseline_CFM = 0, baseline_SP_in_wc = 0, baseline_kW = 0,
-  target_kind = "RPM", target_value = 0,
+  target_kind = "RPM", target_RPM = 0, target_CFM = 0, target_SP_in_wc = 0, target_kW = 0,
 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const targets = { RPM: target_RPM, CFM: target_CFM, SP: target_SP_in_wc, kW: target_kW };
+  if (!Object.hasOwn(targets, target_kind)) return { error: "Unknown target kind." };
+  const target_value = targets[target_kind];
   if (!(baseline_RPM > 0)) return { error: "Baseline RPM must be positive." };
-  if (!(target_value > 0)) return { error: "Target value must be positive." };
+  if (!(target_value > 0)) return { error: "Target " + target_kind + " must be positive." };
   let ratio;
   switch (target_kind) {
     case "RPM": ratio = target_value / baseline_RPM; break;
@@ -1489,7 +1494,6 @@ export function computeAffinityLaws({
     case "kW":
       if (!(baseline_kW > 0)) return { error: "Baseline kW required." };
       ratio = Math.cbrt(target_value / baseline_kW); break;
-    default: return { error: "Unknown target kind." };
   }
   return {
     ratio,
@@ -1501,7 +1505,7 @@ export function computeAffinityLaws({
 }
 
 export const affinityLawsExample = {
-  inputs: { baseline_RPM: 1750, baseline_CFM: 5000, baseline_SP_in_wc: 1.0, baseline_kW: 5.0, target_kind: "RPM", target_value: 1500 },
+  inputs: { baseline_RPM: 1750, baseline_CFM: 5000, baseline_SP_in_wc: 1.0, baseline_kW: 5.0, target_kind: "RPM", target_RPM: 1500 },
 };
 
 // --- Utility 140: Belt Length and Pulley Speed ---
@@ -1800,26 +1804,32 @@ function renderAffinityLaws(inputRegion, outputRegion, citationEl) {
   const s = makeNumber("Baseline SP (in wc)", "af-s", { step: "any", min: "0" });
   const k = makeNumber("Baseline kW", "af-k", { step: "any", min: "0" });
   const tk = makeSelect("Target", "af-tk", [{ value: "RPM", label: "RPM", selected: true }, { value: "CFM", label: "CFM" }, { value: "SP", label: "SP" }, { value: "kW", label: "kW" }]);
-  const tv = makeNumber("Target value", "af-tv", { step: "any", min: "0" });
-  for (const f of [r, c, s, k, tk, tv]) inputRegion.appendChild(f.wrap);
+  const tr = makeNumber("Target RPM", "af-tr", { step: "any", min: "0" });
+  const tc = makeNumber("Target CFM", "af-tc", { step: "any", min: "0" });
+  const ts = makeNumber("Target SP (in wc)", "af-ts", { step: "any", min: "0" });
+  const tw = makeNumber("Target kW", "af-tw", { step: "any", min: "0" });
+  for (const f of [r, c, s, k, tk, tr, tc, ts, tw]) inputRegion.appendChild(f.wrap);
+  function sync() { const m = tk.select.value; tr.wrap.style.display = m === "RPM" ? "" : "none"; tc.wrap.style.display = m === "CFM" ? "" : "none"; ts.wrap.style.display = m === "SP" ? "" : "none"; tw.wrap.style.display = m === "kW" ? "" : "none"; }
   const oR = makeOutputLine(outputRegion, "RPM", "af-out-r");
   const oC = makeOutputLine(outputRegion, "CFM", "af-out-c");
   const oS = makeOutputLine(outputRegion, "SP", "af-out-s");
   const oK = makeOutputLine(outputRegion, "kW", "af-out-k");
-  function fillExample(v) { r.input.value = v.baseline_RPM; c.input.value = v.baseline_CFM; s.input.value = v.baseline_SP_in_wc; k.input.value = v.baseline_kW; tk.select.value = v.target_kind; tv.input.value = v.target_value; update(); }
+  function fillExample(v) { r.input.value = v.baseline_RPM; c.input.value = v.baseline_CFM; s.input.value = v.baseline_SP_in_wc; k.input.value = v.baseline_kW; tk.select.value = v.target_kind; tr.input.value = v.target_RPM ?? ""; tc.input.value = v.target_CFM ?? ""; ts.input.value = v.target_SP_in_wc ?? ""; tw.input.value = v.target_kW ?? ""; sync(); update(); }
   const update = debounce(() => {
     const x = computeAffinityLaws({
       baseline_RPM: Number(r.input.value) || 0, baseline_CFM: Number(c.input.value) || 0,
       baseline_SP_in_wc: Number(s.input.value) || 0, baseline_kW: Number(k.input.value) || 0,
-      target_kind: tk.select.value, target_value: Number(tv.input.value) || 0,
-    }); stepsFor(outputRegion, inputRegion, ["baseline_RPM", "baseline_CFM", "baseline_SP_in_wc", "baseline_kW", "target_kind", "target_value"], x);
+      target_kind: tk.select.value, target_RPM: Number(tr.input.value) || 0, target_CFM: Number(tc.input.value) || 0,
+      target_SP_in_wc: Number(ts.input.value) || 0, target_kW: Number(tw.input.value) || 0,
+    }); stepsFor(outputRegion, inputRegion, ["baseline_RPM", "baseline_CFM", "baseline_SP_in_wc", "baseline_kW", "target_kind", "target_RPM", "target_CFM", "target_SP_in_wc", "target_kW"], x);
     if (x.error) { oR.textContent = x.error; oC.textContent = "-"; oS.textContent = "-"; oK.textContent = "-"; return; }
     oR.textContent = fmt(x.RPM, 0);
     oC.textContent = fmt(x.CFM, 0);
     oS.textContent = fmt(x.SP_in_wc, 3) + " in wc";
     oK.textContent = fmt(x.kW, 3) + " kW";
   }, DEBOUNCE_MS);
-  for (const el of [r.input, c.input, s.input, k.input, tk.select, tv.input]) el.addEventListener("input", update);
+  tk.select.addEventListener("change", sync); sync();
+  for (const el of [r.input, c.input, s.input, k.input, tk.select, tr.input, tc.input, ts.input, tw.input]) el.addEventListener("input", update);
 }
 
 function renderBeltAndPulley(inputRegion, outputRegion, citationEl) {

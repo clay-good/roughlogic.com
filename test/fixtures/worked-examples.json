@@ -3264,7 +3264,7 @@
     "baseline_SP_in_wc": 1,
     "baseline_kW": 5,
     "target_kind": "RPM",
-    "target_value": 1500
+    "target_RPM": 1500
    },
    "outputs": {
     "ratio": {
@@ -17604,7 +17604,7 @@
    "inputs": {
     "tank_gal": 300,
     "spray_volume_gpa": 15,
-    "product_rate_per_acre": 1.5,
+    "liquid_rate_per_acre": 1.5,
     "product_unit": "pt",
     "field_area_acres": 80
    },

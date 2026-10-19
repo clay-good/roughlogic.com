@@ -1319,32 +1319,34 @@ KITCHEN_RENDERERS["dough-water-temperature"] = _r({
 });
 
 // ===================== spec-v1001: as-purchased quantity from edible-portion needed =====================
-// dims: in { args: dimensionless } out: { ap_quantity: dimensionless, ap_units: dimensionless }
-export function computeAsPurchasedQuantity({ ep_quantity_needed = 20, yield_pct = 75, unit_weight = 0 } = {}) {
+// dims: in { ep_quantity_needed: dimensionless, yield_pct: dimensionless, purchase_unit_size: dimensionless } out: { ap_quantity: dimensionless, ap_units: dimensionless }
+// purchase_unit_size is in the same unit as ep_quantity_needed (lb or each), so ap_units is a pure count.
+// Until 2026-10-19 it was keyed unit_weight, a name that means M L^-3 everywhere else in the catalog.
+export function computeAsPurchasedQuantity({ ep_quantity_needed = 20, yield_pct = 75, purchase_unit_size = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(ep_quantity_needed > 0)) return { error: "Edible-portion quantity needed must be positive." };
   if (!(yield_pct > 0 && yield_pct <= 100)) return { error: "Yield percent must be between 0 and 100." };
-  if (!(unit_weight >= 0)) return { error: "Unit weight cannot be negative." };
-  // Buy MORE than you serve: AP = EP needed / yield. Optional AP units = AP quantity / weight per unit.
+  if (!(purchase_unit_size >= 0)) return { error: "Purchase unit size cannot be negative." };
+  // Buy MORE than you serve: AP = EP needed / yield. Optional AP units = AP quantity / amount per purchase unit.
   const ap_quantity = ep_quantity_needed / (yield_pct / 100);
-  const ap_units = unit_weight > 0 ? ap_quantity / unit_weight : null;
+  const ap_units = purchase_unit_size > 0 ? ap_quantity / purchase_unit_size : null;
   if (!Number.isFinite(ap_quantity)) return { error: "As-purchased-quantity math is not a finite value." };
   return {
     ap_quantity,
     ap_units,
-    note: "How much to BUY (as-purchased) to end up with a needed amount of usable, edible-portion product -- the purchasing inverse of the yield tile, which runs the other way from as-purchased to edible-portion. Trimming, peeling, boning, and cooking loss all shrink a raw ingredient, and the yield percentage is the fraction that survives to the plate, so the as-purchased quantity is the edible-portion amount DIVIDED by the yield (never multiplied): AP = EP needed / yield. To serve 20 lb of trimmed beef tenderloin at a 75% yield you must buy 20 / 0.75 = 26.67 lb; 10 lb of diced onion at an 88% yield needs 10 / 0.88 = 11.36 lb as purchased. Because you always divide by a number less than one, the purchase is always larger than what you serve, and the lower the yield the bigger the gap -- a 50% yield doubles the buy. If a unit weight is given (the weight of one case, bag, or each), dividing the AP quantity by it gives the number of units to order, rounded up in practice. A purchasing estimate; the actual yield varies with the grade, the season, and the cook's trimming, so a yield TEST on the real product governs the order.",
+    note: "How much to BUY (as-purchased) to end up with a needed amount of usable, edible-portion product -- the purchasing inverse of the yield tile, which runs the other way from as-purchased to edible-portion. Trimming, peeling, boning, and cooking loss all shrink a raw ingredient, and the yield percentage is the fraction that survives to the plate, so the as-purchased quantity is the edible-portion amount DIVIDED by the yield (never multiplied): AP = EP needed / yield. To serve 20 lb of trimmed beef tenderloin at a 75% yield you must buy 20 / 0.75 = 26.67 lb; 10 lb of diced onion at an 88% yield needs 10 / 0.88 = 11.36 lb as purchased. Because you always divide by a number less than one, the purchase is always larger than what you serve, and the lower the yield the bigger the gap -- a 50% yield doubles the buy. If a purchase unit size is given (the amount in one case, bag, or each, in the same unit as the edible-portion quantity), dividing the AP quantity by it gives the number of units to order, rounded up in practice. A purchasing estimate; the actual yield varies with the grade, the season, and the cook's trimming, so a yield TEST on the real product governs the order.",
   };
 }
 
-export const asPurchasedQuantityExample = { inputs: { ep_quantity_needed: 20, yield_pct: 75, unit_weight: 0 } };
+export const asPurchasedQuantityExample = { inputs: { ep_quantity_needed: 20, yield_pct: 75, purchase_unit_size: 0 } };
 
 KITCHEN_RENDERERS["as-purchased-quantity"] = _r({
-  citation: "Citation: as-purchased quantity from edible-portion needed (standard culinary math; CIA The Professional Chef, On Cooking), by name. AP = EP needed / yield (always divide, so the buy exceeds what you serve); AP units = AP / unit weight. The purchasing inverse of the yield-ep tile. The actual yield varies with grade, season, and trimming, so a yield test on the real product governs.",
+  citation: "Citation: as-purchased quantity from edible-portion needed (standard culinary math; CIA The Professional Chef, On Cooking), by name. AP = EP needed / yield (always divide, so the buy exceeds what you serve); AP units = AP / purchase unit size. The purchasing inverse of the yield-ep tile. The actual yield varies with grade, season, and trimming, so a yield test on the real product governs.",
   example: asPurchasedQuantityExample.inputs,
   fields: [
     { key: "ep_quantity_needed", label: "Edible-portion quantity needed (lb or each)", kind: "number" },
     { key: "yield_pct", label: "Yield (%)", kind: "number" },
-    { key: "unit_weight", label: "Weight per purchase unit (0 to skip)", kind: "number" },
+    { key: "purchase_unit_size", label: "Amount per purchase unit, in the EP unit (0 to skip)", kind: "number" },
   ],
   outputs: [
     { key: "q", id: "apq-out-q", label: "As-purchased quantity", value: (r) => fmt(r.ap_quantity, 2) },

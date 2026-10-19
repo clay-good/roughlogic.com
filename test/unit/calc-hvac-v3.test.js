@@ -34,49 +34,59 @@ test("Affinity: example RPM 1750->1500 cube root SP", () => {
 });
 
 test("Affinity: doubling RPM doubles CFM, 4x SP, 8x kW", () => {
-  const r = computeAffinityLaws({ baseline_RPM: 1000, baseline_CFM: 1000, baseline_SP_in_wc: 1, baseline_kW: 1, target_kind: "RPM", target_value: 2000 });
+  const r = computeAffinityLaws({ baseline_RPM: 1000, baseline_CFM: 1000, baseline_SP_in_wc: 1, baseline_kW: 1, target_kind: "RPM", target_RPM: 2000 });
   assert.ok(close(r.CFM, 2000, 0.001));
   assert.ok(close(r.SP_in_wc, 4, 0.001));
   assert.ok(close(r.kW, 8, 0.001));
 });
 
 test("Affinity: target by CFM", () => {
-  const r = computeAffinityLaws({ baseline_RPM: 1000, baseline_CFM: 1000, baseline_SP_in_wc: 1, baseline_kW: 1, target_kind: "CFM", target_value: 500 });
+  const r = computeAffinityLaws({ baseline_RPM: 1000, baseline_CFM: 1000, baseline_SP_in_wc: 1, baseline_kW: 1, target_kind: "CFM", target_CFM: 500 });
   assert.ok(close(r.RPM, 500, 0.001));
 });
 
 test("Affinity: target by SP uses sqrt", () => {
-  const r = computeAffinityLaws({ baseline_RPM: 1000, baseline_CFM: 1000, baseline_SP_in_wc: 1, baseline_kW: 1, target_kind: "SP", target_value: 4 });
+  const r = computeAffinityLaws({ baseline_RPM: 1000, baseline_CFM: 1000, baseline_SP_in_wc: 1, baseline_kW: 1, target_kind: "SP", target_SP_in_wc: 4 });
   assert.ok(close(r.RPM, 2000, 0.001));
 });
 
 test("Affinity: target by kW uses cbrt", () => {
-  const r = computeAffinityLaws({ baseline_RPM: 1000, baseline_CFM: 1000, baseline_SP_in_wc: 1, baseline_kW: 1, target_kind: "kW", target_value: 8 });
+  const r = computeAffinityLaws({ baseline_RPM: 1000, baseline_CFM: 1000, baseline_SP_in_wc: 1, baseline_kW: 1, target_kind: "kW", target_kW: 8 });
   assert.ok(close(r.RPM, 2000, 0.001));
 });
 
 test("Affinity: zero baseline RPM returns error", () => {
-  const r = computeAffinityLaws({ baseline_RPM: 0, baseline_CFM: 1000, baseline_SP_in_wc: 1, baseline_kW: 1, target_kind: "RPM", target_value: 2000 });
+  const r = computeAffinityLaws({ baseline_RPM: 0, baseline_CFM: 1000, baseline_SP_in_wc: 1, baseline_kW: 1, target_kind: "RPM", target_RPM: 2000 });
   assert.ok(r.error);
 });
 
 test("Affinity: zero target returns error", () => {
-  const r = computeAffinityLaws({ baseline_RPM: 1000, baseline_CFM: 1000, baseline_SP_in_wc: 1, baseline_kW: 1, target_kind: "RPM", target_value: 0 });
+  const r = computeAffinityLaws({ baseline_RPM: 1000, baseline_CFM: 1000, baseline_SP_in_wc: 1, baseline_kW: 1, target_kind: "RPM", target_RPM: 0 });
   assert.ok(r.error);
 });
 
 test("Affinity: target by SP without baseline SP errors", () => {
-  const r = computeAffinityLaws({ baseline_RPM: 1000, baseline_CFM: 1000, baseline_SP_in_wc: 0, baseline_kW: 1, target_kind: "SP", target_value: 4 });
+  const r = computeAffinityLaws({ baseline_RPM: 1000, baseline_CFM: 1000, baseline_SP_in_wc: 0, baseline_kW: 1, target_kind: "SP", target_SP_in_wc: 4 });
   assert.ok(r.error);
 });
 
 test("Affinity: unknown kind errors", () => {
-  const r = computeAffinityLaws({ baseline_RPM: 1000, baseline_CFM: 1000, baseline_SP_in_wc: 1, baseline_kW: 1, target_kind: "spam", target_value: 1 });
+  const r = computeAffinityLaws({ baseline_RPM: 1000, baseline_CFM: 1000, baseline_SP_in_wc: 1, baseline_kW: 1, target_kind: "spam", target_RPM: 1 });
   assert.ok(r.error);
 });
 
+test("Affinity: target_kind reads only its own typed target", () => {
+  const base = { baseline_RPM: 1000, baseline_CFM: 1000, baseline_SP_in_wc: 1, baseline_kW: 1, target_RPM: 2000, target_CFM: 500, target_SP_in_wc: 9, target_kW: 27 };
+  assert.ok(close(computeAffinityLaws({ ...base, target_kind: "RPM" }).RPM, 2000, 0.001));
+  assert.ok(close(computeAffinityLaws({ ...base, target_kind: "CFM" }).RPM, 500, 0.001));
+  assert.ok(close(computeAffinityLaws({ ...base, target_kind: "SP" }).RPM, 3000, 0.001));
+  assert.ok(close(computeAffinityLaws({ ...base, target_kind: "kW" }).RPM, 3000, 0.001));
+  // The selected kind's own field is blank: an error, never a fall-back to another field.
+  assert.match(computeAffinityLaws({ ...base, target_kind: "CFM", target_CFM: 0 }).error, /Target CFM/);
+});
+
 test("Affinity: ratio 1 returns baseline", () => {
-  const r = computeAffinityLaws({ baseline_RPM: 1750, baseline_CFM: 5000, baseline_SP_in_wc: 1, baseline_kW: 5, target_kind: "RPM", target_value: 1750 });
+  const r = computeAffinityLaws({ baseline_RPM: 1750, baseline_CFM: 5000, baseline_SP_in_wc: 1, baseline_kW: 5, target_kind: "RPM", target_RPM: 1750 });
   assert.ok(close(r.CFM, 5000, 0.001));
   assert.ok(close(r.kW, 5, 0.001));
 });
