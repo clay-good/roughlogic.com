@@ -1,6 +1,6 @@
 # spec-v1972.md -- Show the steps on the agent door
 
-> **Status: PROPOSED (2026-10-19). Platform spec, no tile added. Part of [scope-product-expansion](scope-product-expansion.md). Extends roadmap pillar 3 of [spec-v106](spec-v106.md) section 7, landed for the website as [spec-v1964](spec-v1964.md), to the second of the three doors.** Catalog stays at **2,267**.
+> **Status: LANDED (2026-10-19). Platform spec, no tile added. As built: `stepRows` is imported from steps-panel.js unchanged, because the calc modules the server already loads import ui-fields.js under Node, so no DOM-free move was needed. The empty-steps set is the tiles that take no inputs (20 reference pages); the Manual J and multi-mode tiles the website panel skips do get steps here, because the door runs their compute directly. `check-both-doors` is unchanged; `test/unit/mcp-steps.test.js` holds all 2,267 tiles to the rules below, and a seeded dropped row turns it red. `mcp-surface.json` did not change: it pins whether each tool has an output schema, not the fields inside it. Part of [scope-product-expansion](scope-product-expansion.md). Extends roadmap pillar 3 of [spec-v106](spec-v106.md) section 7, landed for the website as [spec-v1964](spec-v1964.md), to the second of the three doors.** Catalog stays at **2,267**.
 
 ## What it does for you
 

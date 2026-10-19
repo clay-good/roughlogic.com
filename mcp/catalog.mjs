@@ -25,6 +25,8 @@ import { getLimitationCopy } from "../limitation-banner.js";
 // The shared result-key humanizer: the same fallback the static pages use, so
 // a tile that captions nothing still names its answers on both doors.
 import { humanizeKey } from "../key-labels.js";
+// spec-v1972: the website's "Show the steps" rows, built by the same pure function.
+import { stepRows } from "../steps-panel.js";
 import { COMMODITIES } from "../calc-historical.js";
 // spec-v1185: the curated per-tile cross-links the browser shows as "related
 // tiles". Build-time data; a missing/unreadable module degrades to no related.
@@ -1277,8 +1279,31 @@ export async function run({ id, inputs } = {}) {
         new Set((await describe({ id })).inputs?.map((f) => f.name ?? f.key) || []),
       ),
     );
+  const steps = await stepsFor(id, schema, args, result);
+  if (steps) out.steps = steps;
   out.limitation = getLimitationCopy(id) || null;
   return out;
+}
+
+// spec-v1972: "Show the steps" on the agent door. The rows are the website
+// panel's own (steps-panel.js stepRows): the inputs as the compute received
+// them, under their field labels, then every finite number the compute
+// returned that humanizeKey can caption. A tile with a consistent renderer
+// schema uses its field list, as the declarative panel does; any other tile
+// labels the inputs it was given from the same captions describe() reports,
+// which is the door's equivalent of the hand-written panel reading <label for>
+// off the page. An error result has no steps, and a key with no caption is
+// left out rather than guessed.
+async function stepsFor(id, schema, args, result) {
+  if (!result || typeof result !== "object" || result.error) return null;
+  let fields = schema ? schema.inputs : null;
+  if (!fields) {
+    const labels = await inputLabels(id);
+    fields = Object.keys(args || {})
+      .filter((k) => typeof labels[k] === "string" && labels[k].trim())
+      .map((k) => ({ key: k, label: labels[k].trim() }));
+  }
+  return stepRows(fields, args || {}, result, humanizeKey);
 }
 
 // spec-v1344: answer a plain-language question in ONE call.
