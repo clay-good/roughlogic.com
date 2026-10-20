@@ -172342,6 +172342,115 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "chimney-termination-height",
+  "source_publisher": "ICC",
+  "source_title": "International Residential Code 2024, Section R1003.9, applied to the spec-v1984 chimney",
+  "source_edition_or_year": "IRC 2024 (codes.iccsafe.org, read 2026-10-19)",
+  "source_section_or_page": "6 in 12, ridge 14 ft away: roof rise within 10 ft = 6 x 10 / 12 = 5 ft; required max(3, 2 + 5) = 7 ft above the high side; low side 7 + 6 x (32/12) / 12 = 8.333 ft.",
+  "verified_by": "rl",
+  "verified_on": "2026-10-19",
+  "inputs": {
+   "pitch_in12": 6,
+   "ridge_distance_ft": 14,
+   "other_height_ft": 0,
+   "chimney_width_in": 32,
+   "measured_ft": 6
+  },
+  "outputs": {
+   "roof_rise_ft": {
+    "value": 5,
+    "tolerance": {
+     "abs": 1e-9
+    }
+   },
+   "required_ft": {
+    "value": 7,
+    "tolerance": {
+     "abs": 1e-9
+    }
+   },
+   "low_side_ft": {
+    "value": 8.333333,
+    "tolerance": {
+     "pct": 0.01
+    }
+   }
+  }
+ },
+ {
+  "tile_id": "chimney-termination-height",
+  "source_publisher": "ICC",
+  "source_title": "International Residential Code 2024, Section R1003.9",
+  "source_edition_or_year": "IRC 2024 (codes.iccsafe.org, read 2026-10-19)",
+  "source_section_or_page": "4 in 12, ridge 30 ft away: rise within 10 ft = 4 x 10 / 12 = 3.333 ft; required 5.333 ft.",
+  "verified_by": "rl",
+  "verified_on": "2026-10-19",
+  "inputs": {
+   "pitch_in12": 4,
+   "ridge_distance_ft": 30,
+   "other_height_ft": 0,
+   "chimney_width_in": 24,
+   "measured_ft": null
+  },
+  "outputs": {
+   "roof_rise_ft": {
+    "value": 3.333333,
+    "tolerance": {
+     "pct": 0.01
+    }
+   },
+   "required_ft": {
+    "value": 5.333333,
+    "tolerance": {
+     "pct": 0.01
+    }
+   }
+  }
+ },
+ {
+  "tile_id": "fireplace-clearance-check",
+  "source_publisher": "ICC",
+  "source_title": "International Residential Code 2024, Section R1001.11, applied to the spec-v1992 fireplace",
+  "source_edition_or_year": "IRC 2024 (codes.iccsafe.org, read 2026-10-19)",
+  "source_section_or_page": "Exception 4: a mantel 9 in from the opening may project 9 / 8 = 1.125 in; a 1.5 in projection needs 8 x 1.5 = 12 in. Framing 2 in / 4 in and sheathing 8 in from the lining pass.",
+  "verified_by": "rl",
+  "verified_on": "2026-10-19",
+  "inputs": {
+   "framing_front_in": 2,
+   "framing_back_in": 4,
+   "opening_area_class": "under_6",
+   "sheathing_from_lining_in": 8,
+   "mantel_distance_in": 9,
+   "mantel_projection_in": 1.5
+  },
+  "outputs": {
+   "allowed_projection_in": {
+    "value": 1.125,
+    "tolerance": {
+     "abs": 1e-9
+    }
+   },
+   "distance_needed_in": {
+    "value": 12,
+    "tolerance": {
+     "abs": 1e-9
+    }
+   },
+   "checks_failed": {
+    "value": 1,
+    "tolerance": {
+     "abs": 0
+    }
+   },
+   "checks_run": {
+    "value": 4,
+    "tolerance": {
+     "abs": 0
+    }
+   }
+  }
  }
  ]
 }

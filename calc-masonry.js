@@ -1208,3 +1208,145 @@ MASONRY_RENDERERS["hearth-extension-check"] = _simpleRenderer({
   ],
   compute: computeHearthExtensionCheck,
 });
+
+// ===================== spec-v1984: chimney termination height (the 3-2-10 rule) =====================
+// IRC 2024 R1003.9 (the same in IRC 2021; both read 2026-10-19): a chimney extends
+// at least 2 ft higher than any portion of a building within 10 ft, and at least
+// 3 ft above the highest point where it passes through the roof. On a pitched roof
+// the roof itself, rising upslope, is usually the "portion within 10 ft".
+const _ctNum = (v, what, opt) => {
+  const blank = v === null || v === undefined || (typeof v === "string" && v.trim() === "");
+  if (blank) return opt ? { v: null } : { error: "Enter the " + what + "." };
+  const ok = typeof v === "number" || (typeof v === "string" && /^\s*[+-]?(\d+\.?\d*|\.\d+)\s*$/.test(v));
+  if (!ok || !Number.isFinite(Number(v))) return { error: "The " + what + " must be a number." };
+  if (Number(v) < 0) return { error: "The " + what + " cannot be negative." };
+  return { v: Number(v) };
+};
+
+// dims: in { pitch_in12: dimensionless, ridge_distance_ft: L, other_height_ft: L, chimney_width_in: L, measured_ft: L } out: { roof_rise_ft: L, rule1_ft: L, rule2_roof_ft: L, rule2_other_ft: L, required_ft: L, low_side_ft: L }
+export function computeChimneyTerminationHeight({ pitch_in12, ridge_distance_ft, other_height_ft = 0, chimney_width_in, measured_ft = null } = {}) {
+  const P = _ctNum(pitch_in12, "roof pitch (in per 12)"); if (P.error) return { error: P.error };
+  const D = _ctNum(ridge_distance_ft, "distance to the ridge (ft)"); if (D.error) return { error: D.error };
+  const O = _ctNum(other_height_ft, "height of other building portions within 10 ft (ft)", true); if (O.error) return { error: O.error };
+  const Wd = _ctNum(chimney_width_in, "chimney width along the slope (in)"); if (Wd.error) return { error: Wd.error };
+  const M = _ctNum(measured_ft, "measured chimney height (ft)", true); if (M.error) return { error: M.error };
+  const p = P.v, other = O.v === null ? 0 : O.v;
+  if (p > 24) return { error: "Roof pitch above 24 in 12 is outside this check." };
+  if (!(Wd.v > 0)) return { error: "Chimney width along the slope must be positive (in)." };
+  if (D.v > 1000 || other > 200 || Wd.v > 240) return { error: "Distances above 1,000 ft, portions above 200 ft or chimneys over 240 in wide are outside this check." };
+  // The roof is highest within 10 ft at the ridge or 10 ft upslope, whichever is nearer.
+  const reach_ft = Math.min(10, D.v);
+  const roof_rise_ft = p * reach_ft / 12;
+  const rule1_ft = 3;
+  const rule2_roof_ft = 2 + roof_rise_ft;
+  const rule2_other_ft = other > 0 ? 2 + other : null;
+  const required_ft = Math.max(rule1_ft, rule2_roof_ft, rule2_other_ft || 0);
+  const governs = rule1_ft >= rule2_roof_ft && rule1_ft >= (rule2_other_ft || 0) ? "3 ft above the roof penetration"
+    : (rule2_other_ft || 0) > rule2_roof_ft ? "2 ft above the other building portion within 10 ft"
+      : "2 ft above the roof within 10 ft upslope";
+  const low_side_ft = required_ft + p * (Wd.v / 12) / 12;
+  const has_check = M.v !== null;
+  const passes = has_check ? M.v >= required_ft - 1e-9 : null;
+  const verdict = !has_check
+    ? "(no measured height entered: build to at least " + fmt(required_ft, 2) + " ft above the high side, " + fmt(low_side_ft, 2) + " ft on the low side)"
+    : passes ? "PASSES: " + fmt(M.v, 2) + " ft above the high side meets the " + fmt(required_ft, 2) + " ft required"
+      : "FAILS: " + fmt(M.v, 2) + " ft above the high side, " + fmt(required_ft - M.v, 2) + " ft short of the " + fmt(required_ft, 2) + " ft required (" + governs + ")";
+  if (![roof_rise_ft, required_ft, low_side_ft].every(Number.isFinite)) return { error: "Chimney height math is not a finite value." };
+  return {
+    roof_rise_ft, rule1_ft, rule2_roof_ft, rule2_other_ft, required_ft, governs, low_side_ft, has_check, passes, verdict,
+    note: "IRC 2024 R1003.9: chimneys extend not less than 2 ft higher than any portion of a building within 10 ft, and not less than 3 ft above the highest point where the chimney passes through the roof. On a pitched roof the roof surface rises p x d / 12 over d ft upslope, so the highest roof within 10 ft is at the ridge or 10 ft upslope, whichever is nearer, and the chimney must top it by 2 ft; 3 ft governs only where the pitch times min(10, distance to the ridge) is 12 or less: a flat or very low-slope roof, or a chimney close to the ridge. Heights are above the HIGH (upslope) side of the penetration; the chimney's own width adds p x width / 12 on the low side, which is what a tape on the downslope face reads. Enter a dormer, parapet, taller wall or neighbouring roof within 10 ft as its height above the penetration's high side. A factory-built chimney follows its listing, and an appliance whose manufacturer lists another termination follows that; draft, spark arrestors and caps are separate.",
+  };
+}
+export const chimneyTerminationHeightExample = { inputs: { pitch_in12: 6, ridge_distance_ft: 14, other_height_ft: 0, chimney_width_in: 32, measured_ft: 6 } };
+
+MASONRY_RENDERERS["chimney-termination-height"] = _simpleRenderer({
+  citation: "Citation: IRC 2024 R1003.9 (the same in IRC 2021), by name; free at codes.iccsafe.org, read 2026-10-19. A chimney extends at least 2 ft higher than any portion of a building within 10 ft and at least 3 ft above the highest point where it passes through the roof (the 3-2-10 rule); on a pitch of p in 12 the roof within 10 ft rises p x min(10, distance to ridge) / 12. The adopted code, the appliance or chimney listing and the AHJ govern.",
+  example: chimneyTerminationHeightExample.inputs,
+  fields: [
+    { key: "pitch_in12", label: "Roof pitch (in of rise per 12 in; 0 for flat)", kind: "number", required: true, attrs: { step: "any", min: "0", max: "24" } },
+    { key: "ridge_distance_ft", label: "Horizontal distance from the chimney's upslope face to the ridge (ft)", kind: "number", required: true, attrs: { step: "any", min: "0" } },
+    { key: "other_height_ft", label: "Height of any other building portion within 10 ft, above the penetration (ft, 0 if none)", kind: "number", attrs: { step: "any", min: "0" } },
+    { key: "chimney_width_in", label: "Chimney width along the slope (in)", kind: "number", required: true, attrs: { step: "any", min: "0" } },
+    { key: "measured_ft", label: "Measured height above the high side of the penetration (ft, blank to skip)", kind: "number", required: true, attrs: { step: "any", min: "0" } },
+  ],
+  outputs: [
+    { key: "r", id: "cth-out-r", label: "Required height above the high side", value: (r) => fmt(r.required_ft, 2) + " ft (" + r.governs + ")" },
+    { key: "s", id: "cth-out-s", label: "Each rule", value: (r) => "3 ft above the roof: 3.00 ft; 2 ft above the roof within 10 ft (it rises " + fmt(r.roof_rise_ft, 2) + " ft): " + fmt(r.rule2_roof_ft, 2) + " ft" + (r.rule2_other_ft === null ? "" : "; 2 ft above the other portion: " + fmt(r.rule2_other_ft, 2) + " ft") },
+    { key: "l", id: "cth-out-l", label: "Same height measured on the low side", value: (r) => fmt(r.low_side_ft, 2) + " ft" },
+    { key: "v", id: "cth-out-v", label: "Check", value: (r) => r.verdict },
+    { key: "n", id: "cth-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeChimneyTerminationHeight,
+});
+
+// ===================== spec-v1992: fireplace clearance to combustibles and mantel projection =====================
+// IRC 2024 R1001.11 and its Exceptions 3 and 4 (the same in IRC 2021; both read
+// 2026-10-19). Framing stays 2 in off the front faces and sides and 4 in off the
+// back. Combustible sheathing edges and trim may abut the sidewalls and hearth
+// extension only 8 in or more from the inside of the firebox lining (12 in for an
+// opening of 6 sq ft or more). Mantels and trim on the fireplace front stay 6 in
+// from the opening, and within 12 in project no more than 1/8 in per inch of distance.
+const _fccNum = (v, what) => {
+  const blank = v === null || v === undefined || (typeof v === "string" && v.trim() === "");
+  if (blank) return { v: null };
+  const ok = typeof v === "number" || (typeof v === "string" && /^\s*[+-]?(\d+\.?\d*|\.\d+)\s*$/.test(v));
+  if (!ok || !Number.isFinite(Number(v))) return { error: "The " + what + " must be a number (in)." };
+  if (Number(v) < 0) return { error: "The " + what + " cannot be negative (in)." };
+  return { v: Number(v) };
+};
+
+// dims: in { framing_front_in: L, framing_back_in: L, opening_area_class: dimensionless, sheathing_from_lining_in: L, mantel_distance_in: L, mantel_projection_in: L } out: { allowed_projection_in: L, distance_needed_in: L, sheathing_required_in: L, checks_failed: dimensionless }
+export function computeFireplaceClearanceCheck({
+  framing_front_in = null, framing_back_in = null, opening_area_class = "under_6", sheathing_from_lining_in = null, mantel_distance_in = null, mantel_projection_in = null,
+} = {}) {
+  const cls = String(opening_area_class ?? "under_6");
+  if (cls !== "under_6" && cls !== "6_or_more") return { error: "Opening area class must be under_6 or 6_or_more." };
+  const vals = {};
+  for (const [k, v, w] of [["ff", framing_front_in, "framing clearance at the front and sides"], ["fb", framing_back_in, "framing clearance at the back"], ["sh", sheathing_from_lining_in, "sheathing distance from the firebox lining"], ["md", mantel_distance_in, "mantel or trim distance from the opening"], ["mp", mantel_projection_in, "mantel or trim projection"]]) {
+    const r = _fccNum(v, w); if (r.error) return { error: r.error }; vals[k] = r.v;
+  }
+  if (Object.values(vals).some((x) => x !== null && x > 600)) return { error: "Distances above 600 in are outside this check." };
+  if ((vals.md === null) !== (vals.mp === null)) return { error: "Enter both the mantel or trim distance from the opening and its projection, or neither." };
+  const sheathing_required_in = cls === "6_or_more" ? 12 : 8;
+  // Exception 4: none within 6 in; within 12 in (inclusive) project at most d / 8.
+  const allowed_projection_in = vals.md === null ? null : vals.md < 6 - 1e-9 ? 0 : vals.md <= 12 + 1e-9 ? vals.md / 8 : null;
+  const distance_needed_in = vals.mp === null ? null : vals.mp <= 0.75 + 1e-9 ? 6 : vals.mp <= 1.5 + 1e-9 ? 8 * vals.mp : null;
+  const checks = [];
+  if (vals.ff !== null) checks.push({ label: "framing at the front and sides " + fmt(vals.ff, 2) + " in (2 in minimum)", ok: vals.ff >= 2 - 1e-9 });
+  if (vals.fb !== null) checks.push({ label: "framing at the back " + fmt(vals.fb, 2) + " in (4 in minimum)", ok: vals.fb >= 4 - 1e-9 });
+  if (vals.sh !== null) checks.push({ label: "sheathing or trim abutting the sidewall " + fmt(vals.sh, 2) + " in from the firebox lining (" + sheathing_required_in + " in minimum)", ok: vals.sh >= sheathing_required_in - 1e-9 });
+  if (vals.md !== null) {
+    const ok = vals.md >= 6 - 1e-9 && (vals.md > 12 + 1e-9 || vals.mp <= vals.md / 8 + 1e-9);
+    const why = vals.md < 6 - 1e-9 ? "inside the 6 in no-combustible band" : vals.md > 12 + 1e-9 ? "more than 12 in out, so the projection rule does not apply" : "allowed " + fmt(vals.md / 8, 3) + " in";
+    checks.push({ label: "mantel or trim " + fmt(vals.md, 2) + " in from the opening projecting " + fmt(vals.mp, 3) + " in (" + why + ")", ok });
+  }
+  const failed = checks.filter((c) => !c.ok);
+  const verdict = !checks.length ? "(nothing measured entered: framing 2 in front and sides, 4 in back; sheathing " + sheathing_required_in + " in from the firebox lining; mantels 6 in from the opening and 1/8 in of projection per inch within 12 in)"
+    : failed.length ? "FAILS: " + failed.map((c) => c.label).join("; ") : "PASSES: " + checks.map((c) => c.label).join("; ");
+  return {
+    allowed_projection_in, distance_needed_in, sheathing_required_in, checks, mantel_entered: vals.md !== null, checks_failed: failed.length, checks_run: checks.length, verdict,
+    note: "IRC 2024 R1001.11: wood beams, joists, studs and other combustibles keep not less than 2 in from the front faces and sides and 4 in from the back faces of a masonry fireplace, and the air space is not filled except with noncombustible material or fireblocking (IRC 2021: fireblocking only). Exception 3: exposed combustible trim and the edges of sheathing such as siding, flooring and gypsum board may abut the fireplace sidewalls and hearth extension when they are not less than 8 in from the inside surface of the nearest firebox lining, or 12 in where the opening is 6 sq ft or larger. Exception 4: combustible mantels and trim on the fireplace front stay out of the 6 in around the opening, and within 12 in of it project no more than 1/8 in for each inch of distance, so 1 in proud at 8 in, 1.5 in at 12 in, and anything thicker more than 12 in away. A UL 127 listed masonry fireplace may have combustibles in contact (Exception 1), and a fireplace that is part of a masonry or concrete wall keeps combustibles off the wall within 12 in of the firebox lining (Exception 2); factory-built fireplaces and stoves follow their listings.",
+  };
+}
+export const fireplaceClearanceCheckExample = { inputs: { framing_front_in: 2, framing_back_in: 4, opening_area_class: "under_6", sheathing_from_lining_in: 8, mantel_distance_in: 9, mantel_projection_in: 1.5 } };
+
+MASONRY_RENDERERS["fireplace-clearance-check"] = _simpleRenderer({
+  citation: "Citation: IRC 2024 R1001.11 and its Exceptions 1 to 4 (the same values in IRC 2021), by name; free at codes.iccsafe.org, read 2026-10-19. Combustible framing 2 in from the front faces and sides and 4 in from the back of a masonry fireplace; sheathing edges and trim may abut the sidewalls and hearth extension 8 in or more from the firebox lining (12 in for an opening of 6 sq ft or more); mantels and trim on the front not within 6 in of the opening, and within 12 in projecting no more than 1/8 in per inch of distance. The adopted code and the AHJ govern.",
+  example: fireplaceClearanceCheckExample.inputs,
+  fields: [
+    { key: "framing_front_in", label: "Framing clearance at the front faces and sides (in, blank to skip)", kind: "number", required: true, attrs: { step: "any", min: "0" } },
+    { key: "framing_back_in", label: "Framing clearance at the back face (in, blank to skip)", kind: "number", required: true, attrs: { step: "any", min: "0" } },
+    { key: "opening_area_class", label: "Fireplace opening area", kind: "select", default: "under_6", options: [{ value: "under_6", label: "Under 6 sq ft" }, { value: "6_or_more", label: "6 sq ft or more" }] },
+    { key: "sheathing_from_lining_in", label: "Sheathing or trim abutting the sidewall: distance from the firebox lining (in, blank to skip)", kind: "number", required: true, attrs: { step: "any", min: "0" } },
+    { key: "mantel_distance_in", label: "Mantel or front trim: distance from the opening (in, blank to skip)", kind: "number", required: true, attrs: { step: "any", min: "0" } },
+    { key: "mantel_projection_in", label: "Mantel or front trim: projection from the masonry face (in)", kind: "number", required: true, attrs: { step: "any", min: "0" } },
+  ],
+  outputs: [
+    { key: "v", id: "fcc-out-v", label: "Check", value: (r) => r.verdict },
+    { key: "p", id: "fcc-out-p", label: "Mantel projection allowed at its distance", value: (r) => (!r.mantel_entered ? "- (no mantel entered)" : r.allowed_projection_in === null ? "- (more than 12 in from the opening: no projection limit)" : r.allowed_projection_in === 0 ? "none: within 6 in of the opening" : fmt(r.allowed_projection_in, 3) + " in") },
+    { key: "d", id: "fcc-out-d", label: "Distance its projection needs", value: (r) => (!r.mantel_entered ? "-" : r.distance_needed_in === null ? "more than 12 in (projection over 1.5 in)" : fmt(r.distance_needed_in, 2) + " in from the opening") },
+    { key: "s", id: "fcc-out-s", label: "Sheathing edge from the firebox lining", value: (r) => "at least " + r.sheathing_required_in + " in" },
+    { key: "n", id: "fcc-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeFireplaceClearanceCheck,
+});

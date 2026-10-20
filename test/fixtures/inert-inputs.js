@@ -24,6 +24,7 @@ export const INERT_INPUTS = {
   "cooling-curve::start_F": "reviewed guard-only input (scripts/guard-only-inputs-allowlist.json)",
   "crane-power-line-clearance::boom_length_ft": "moves the answer once another input changes (1,500 randomized settings)",
   "cylinder-storage-separation::barrier_rating_hr": "moves the answer once another input changes (1,500 randomized settings)",
+  "chimney-termination-height::ridge_distance_ft": "clamped at 10 ft: R1003.9 looks only 10 ft out, so a ridge farther away (the example's 14 ft) no longer moves the answer",
   "decibel-converter::ref_type": "read only in the reference-level mode",
   "safety-glazing-check::door_relation": "read only when the glazing is beside a door (R324.4.2)",
   "declining-balance-depreciation::sl_switch": "moves the answer once another input changes (1,500 randomized settings)",

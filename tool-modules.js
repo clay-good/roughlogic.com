@@ -931,6 +931,7 @@ export const TOOL_MODULES = (() => {
     "masonry-wall-weight", "brick-veneer-anchor-spacing", "brick-veneer-weep-count", "masonry-joint-reinforcement", "masonry-lintel-loading", "masonry-lintel-bearing", "fireplace-flue-area", "masonry-limited-access-zone",
     "masonry-anchor-bolt", "masonry-anchor-embedment", "masonry-anchor-shear", "masonry-prism-fm",
     "hearth-extension-check",
+    "chimney-termination-height", "fireplace-clearance-check",
   ]);
   // spec-v272..v274 SDPWS wood lateral-force-resisting-system trio: a new
   // lazy Group E cluster closing the load path from seismic-base-shear /

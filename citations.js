@@ -26736,6 +26736,28 @@ export const CITATIONS = {
       { name: "Masonry fireplace", value: "factory-built fireplaces follow their listing (R1004)", source: "IRC R1004" },
     ],
   },
+  "chimney-termination-height": {
+    formula: "roof rise within 10 ft = pitch x min(10, distance to ridge) / 12; required above the high side of the penetration = max(3, 2 + roof rise, 2 + other portion height); low side = required + pitch x (chimney width / 12) / 12.",
+    edition: IRC_2024 + " Section R1003.9 (the same section and values in IRC 2021), read at codes.iccsafe.org on 2026-10-19.",
+    freeAccess: "Free to read at codes.iccsafe.org.",
+    governance: GOVERNANCE.structural,
+    editionNote: "R1003.9: chimneys shall extend not less than 2 ft higher than any portion of a building within 10 ft, but shall be not less than 3 ft above the highest point where the chimney passes through the roof. The slope geometry is this calculator's reading of 'any portion of a building' on a pitched roof: the roof surface within 10 ft horizontally, highest at the ridge or 10 ft upslope. R1003.9.1 to R1003.9.3 (caps, spark arrestors, rain caps) are not checked. IRC 2027 is expected in early 2027; verify the edition adopted by your AHJ.",
+    assumptions: [
+      { name: "10 ft measured horizontally from the chimney's upslope face", value: "the roof's highest point within that reach is at the ridge or 10 ft upslope", source: "reading of IRC R1003.9 on a pitched roof" },
+      { name: "Masonry chimney", value: "factory-built chimneys and appliances with listed terminations follow their listings", source: "IRC R1005 and the listing" },
+    ],
+  },
+  "fireplace-clearance-check": {
+    formula: "framing >= 2 in at the front faces and sides, >= 4 in at the back; sheathing edge or trim abutting the sidewall >= 8 in from the firebox lining (>= 12 in for an opening of 6 sq ft or more); mantel or trim on the front: none within 6 in of the opening, projection <= distance / 8 within 12 in (inclusive), no limit beyond 12 in; distance needed = max(6, 8 x projection) for a projection up to 1.5 in.",
+    edition: IRC_2024 + " Section R1001.11 and its Exceptions 1 to 4 (the same values in IRC 2021), read at codes.iccsafe.org on 2026-10-19.",
+    freeAccess: "Free to read at codes.iccsafe.org.",
+    governance: GOVERNANCE.structural,
+    editionNote: "R1001.11: wood beams, joists, studs and other combustible material keep a clearance of not less than 2 in from the front faces and sides and 4 in from the back faces of masonry fireplaces, and the airspace is not filled except with noncombustible material or fireblocking (IRC 2021: except to provide fireblocking). Exception 1: UL 127 listed masonry fireplaces may contact combustibles. Exception 2: a fireplace that is part of a masonry or concrete wall keeps combustibles off the wall within 12 in of the firebox lining. Exception 3: exposed combustible trim and sheathing edges may abut the sidewalls and hearth extension not less than 8 in from the inside surface of the nearest firebox lining, 12 in where the opening is 6 sq ft or larger. Exception 4: combustible mantels or trim on the fireplace front not within 6 in of the opening; within 12 in, no more than 1/8 in of projection per 1 in of distance. 'Within 12 inches' is read as including 12 in. IRC 2027 is expected in early 2027.",
+    assumptions: [
+      { name: "Exactly 12 in is within 12 in", value: "a 1.5 in projection is allowed at 12 in; thicker needs more than 12 in", source: "reading of R1001.11 Exception 4" },
+      { name: "Masonry fireplace", value: "factory-built fireplaces, inserts and stoves follow their listings", source: "IRC R1004" },
+    ],
+  },
 };
 
 // --- Reference block and copy text ---

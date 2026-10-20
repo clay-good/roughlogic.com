@@ -62300,3 +62300,39 @@ test("bounds: spec-v1983 computeHearthExtensionCheck pins the 6 sq ft step, the 
     assert.ok("error" in _hec(bad), JSON.stringify(bad));
   }
 });
+
+// spec-v1984 / spec-v1992: IRC 2024 R1003.9 and R1001.11 (read 2026-10-19).
+import { computeChimneyTerminationHeight as _cth, computeFireplaceClearanceCheck as _fcc } from "../../calc-masonry.js";
+test("bounds: spec-v1984 computeChimneyTerminationHeight pins the 3-2-10 rule on a slope, the low side, other portions and the error seams", () => {
+  const r = _cth({ pitch_in12: 6, ridge_distance_ft: 14, chimney_width_in: 32, measured_ft: 6 });
+  assert.equal(r.roof_rise_ft, 5); assert.equal(r.required_ft, 7); assert.equal(r.passes, false);
+  assert.ok(Math.abs(r.low_side_ft - (7 + 6 * (32 / 12) / 12)) < 1e-12);
+  assert.equal(_cth({ pitch_in12: 12, ridge_distance_ft: 6, chimney_width_in: 24 }).required_ft, 8);
+  assert.equal(_cth({ pitch_in12: 0, ridge_distance_ft: 40, chimney_width_in: 24 }).required_ft, 3, "flat roof: 3 ft governs");
+  assert.equal(_cth({ pitch_in12: 6, ridge_distance_ft: 0, chimney_width_in: 24 }).required_ft, 3, "at the ridge: 3 ft governs");
+  assert.equal(_cth({ pitch_in12: 12, ridge_distance_ft: 1, chimney_width_in: 24 }).required_ft, 3, "2 + 1 = 3 ties");
+  assert.equal(_cth({ pitch_in12: 6, ridge_distance_ft: 2, other_height_ft: 4, chimney_width_in: 24 }).required_ft, 6);
+  assert.equal(_cth({ pitch_in12: 6, ridge_distance_ft: 14, chimney_width_in: 32, measured_ft: 7 }).passes, true);
+  assert.equal(_cth({ pitch_in12: 6, ridge_distance_ft: 14, chimney_width_in: 32 }).passes, null);
+  for (const bad of [{ ridge_distance_ft: 14, chimney_width_in: 32 }, { pitch_in12: 25, ridge_distance_ft: 14, chimney_width_in: 32 }, { pitch_in12: -1, ridge_distance_ft: 14, chimney_width_in: 32 }, { pitch_in12: 6, ridge_distance_ft: 14, chimney_width_in: 0 }, { pitch_in12: 6, ridge_distance_ft: "x", chimney_width_in: 32 }, { pitch_in12: 6, ridge_distance_ft: 14, chimney_width_in: 32, measured_ft: -1 }, { pitch_in12: true, ridge_distance_ft: 14, chimney_width_in: 32 }]) {
+    assert.ok("error" in _cth(bad), JSON.stringify(bad));
+  }
+});
+test("bounds: spec-v1992 computeFireplaceClearanceCheck pins the 2/4 in framing, the 8/12 in sheathing, the 6 in band and the 1/8 in per inch rule", () => {
+  const r = _fcc({ framing_front_in: 2, framing_back_in: 4, sheathing_from_lining_in: 8, mantel_distance_in: 9, mantel_projection_in: 1.5 });
+  assert.equal(r.allowed_projection_in, 1.125); assert.equal(r.distance_needed_in, 12); assert.equal(r.checks_failed, 1); assert.equal(r.checks_run, 4);
+  assert.equal(_fcc({ mantel_distance_in: 12, mantel_projection_in: 1.5 }).checks_failed, 0, "12 in is within 12 in and allows 1.5 in");
+  assert.equal(_fcc({ mantel_distance_in: 12.01, mantel_projection_in: 6 }).checks_failed, 0, "beyond 12 in there is no projection limit");
+  assert.equal(_fcc({ mantel_distance_in: 5.99, mantel_projection_in: 0.01 }).checks_failed, 1, "nothing within 6 in");
+  assert.equal(_fcc({ mantel_distance_in: 6, mantel_projection_in: 0.75 }).checks_failed, 0);
+  assert.equal(_fcc({ mantel_projection_in: 0.5, mantel_distance_in: 20 }).distance_needed_in, 6, "thin trim still needs the 6 in band");
+  assert.equal(_fcc({ mantel_projection_in: 1.6, mantel_distance_in: 20 }).distance_needed_in, null, "over 1.5 in needs more than 12 in");
+  assert.equal(_fcc({ sheathing_from_lining_in: 10, opening_area_class: "6_or_more" }).checks_failed, 1);
+  assert.equal(_fcc({ sheathing_from_lining_in: 12, opening_area_class: "6_or_more" }).checks_failed, 0);
+  assert.equal(_fcc({ framing_front_in: 1.99 }).checks_failed, 1);
+  assert.equal(_fcc({ framing_back_in: 3.99 }).checks_failed, 1);
+  assert.equal(_fcc({}).checks_run, 0);
+  for (const bad of [{ framing_front_in: -1 }, { mantel_distance_in: 9 }, { mantel_projection_in: 1 }, { opening_area_class: "big" }, { framing_back_in: "x" }, { sheathing_from_lining_in: 1e4 }]) {
+    assert.ok("error" in _fcc(bad), JSON.stringify(bad));
+  }
+});

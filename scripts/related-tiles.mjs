@@ -2425,7 +2425,10 @@ const RELATED = {
   // spec-v1982: safety glazing hazardous location check (calc-construction.js).
   "safety-glazing-check": ["egress-window-check","guard-handrail-check","glass-thickness-wind","stair-code-check"],
   // spec-v1983: hearth extension size and thickness (calc-masonry.js).
-  "hearth-extension-check": ["fireplace-flue-area","mortar-mix","masonry-wall-weight"],
+  "hearth-extension-check": ["fireplace-flue-area","chimney-termination-height","fireplace-clearance-check","mortar-mix"],
+  // spec-v1984 and spec-v1992: chimney termination height and fireplace clearance (calc-masonry.js).
+  "chimney-termination-height": ["hearth-extension-check","fireplace-clearance-check","fireplace-flue-area","chimney-height-for-draft"],
+  "fireplace-clearance-check": ["hearth-extension-check","chimney-termination-height","fireplace-flue-area","mortar-mix"],
 };
 
 export { RELATED };

@@ -2282,4 +2282,6 @@ export const RENDERER_MAP = {
   "bath-exhaust-fan-sizing": { module: "../../calc-hvacservice.js", exportName: "HVACSERVICE_RENDERERS" },
   "safety-glazing-check": { module: "../../calc-construction.js", exportName: "CONSTRUCTION_RENDERERS" },
   "hearth-extension-check": { module: "../../calc-masonry.js", exportName: "MASONRY_RENDERERS" },
+  "chimney-termination-height": { module: "../../calc-masonry.js", exportName: "MASONRY_RENDERERS" },
+  "fireplace-clearance-check": { module: "../../calc-masonry.js", exportName: "MASONRY_RENDERERS" },
 };

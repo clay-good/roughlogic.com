@@ -2868,9 +2868,11 @@ cross-check.
 | calc-marineaviation.js | `computeTravelLiftSlingPlacement` | `{ displacement_lb = 0, sling_spacing_ft = 0, cg_from_fwd_ft = 0, sling_wll_lb...` | _ | _ | _ |
 | calc-masonry.js | `computeBrickVeneerAnchorSpacing` | `{ area_ft2 = 0, area_per = 2.67, max_horiz_in = 32, max_vert_in = 25 } = {}` | _ | _ | _ |
 | calc-masonry.js | `computeBrickVeneerWeepCount` | `{ wall_length_ft = 30, max_spacing_in = 33, flashing_lines = 1 } = {}` | _ | _ | _ |
+| calc-masonry.js | `computeChimneyTerminationHeight` | `{ pitch_in12, ridge_distance_ft, other_height_ft = 0, chimney_width_in, measu...` | _ | _ | _ |
 | calc-masonry.js | `computeCmuShearWall` | `{ fm_psi = 1500, b_in = 0, dv_in = 0, p_lb = 0, mvd = 0.5, av_in2 = 0, s_in =...` | _ | _ | _ |
 | calc-masonry.js | `computeCmuWallAxial` | `{ fm_psi = 2000, an_in2 = 0, ast_in2 = 0, h_in = 0, r_in = 0, fs_psi = 32000 ...` | _ | _ | _ |
 | calc-masonry.js | `computeCmuWallFlexure` | `{ fm_psi = 2000, as_in2 = 0, d_in = 0, b_in = 12, fs_psi = 32000 } = {}` | _ | _ | _ |
+| calc-masonry.js | `computeFireplaceClearanceCheck` | `{ framing_front_in = null, framing_back_in = null, opening_area_class = "unde...` | _ | _ | _ |
 | calc-masonry.js | `computeFireplaceFlueArea` | `{ opening_width_in = 0, opening_height_in = 0, flue_shape = "rectangular", fl...` | _ | _ | _ |
 | calc-masonry.js | `computeGroutLiftPourHeight` | `{ pour_height_ft = 0, lift_height_ft = 0, max_pour_height_ft = 0, max_lift_he...` | _ | _ | _ |
 | calc-masonry.js | `computeHearthExtensionCheck` | `{ opening_width_in = 0, opening_height_in = 0, front_in = null, side_in = nul...` | _ | _ | _ |
@@ -3944,7 +3946,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2528.
+Row count: 2530.
 
 <!-- END function-corpus-v14 -->
 
@@ -4732,7 +4734,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-extraction-rate` | Water Extraction Volume, Time, and Waste-Tank Dumps | Project (first-principles); standing + absorbed; wand time = total / gpm | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+4 more) |
 
-### Group E Construction (633 tiles)
+### Group E Construction (635 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4802,6 +4804,7 @@ per spec-v14 §13.1 second paragraph.
 | `cement-board-takeoff` | Cement Board (Tile Backer) Sheet and Screw Takeoff | cement-board takeoff (ANSI A108 / TCNA); sheets = ceil(120*1.10/15) = ceil(8.8) = 9; screws = 9*35... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `chain-link-fence-takeoff` | Chain-Link Fabric, Post, and Tension-Band Takeoff | Chain-link takeoff identity (first-pr...; fabric=200-4=196; terminals=4+2=6; posts=ceil(200/10)=20;... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `check-dam-spacing` | Rock Check Dam Spacing | Crest-to-toe check-dam spacing identi...; spacing = 2 / 0.04 = 50 ft; dams = ceil(300/50) = 6 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
+| `chimney-termination-height` | Chimney Termination Height (IRC R1003.9, the 3-2-10 Rule) | ICC; 6 in 12, ridge 14 ft away: roof rise within 10 ft = 6 x 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `chip-seal-mcleod` | Chip Seal Design by the McLeod Method | McLeod method (state DOT test procedure); M 0.375 in, FI 18, W 95 pcf, G 2.65, E 1.05, T 0.75, S 0.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `cipp-fully-deteriorated` | CIPP Liner Thickness, Fully Deteriorated Host (ASTM F1216) | Iowa Statewide Urban Design and Speci...; Steps 1-5: 12 in VCP, 5 ft of 120 pcf clay cover, water t... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `cipp-liner-thickness` | CIPP Liner Thickness for Groundwater Buckling (ASTM F1216) | Project (first-principles); the fully deteriorated case is a different relation and i... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+4 more) |
@@ -4936,6 +4939,7 @@ per spec-v14 §13.1 second paragraph.
 | `fine-aggregate-grading` | Fine Aggregate Grading Check (ASTM C33) | ASTM C33/C33M §6 (fine-aggregate grad...; passing 100/98/85/68/45/18/5 -> retained 2/15/32/55/82/95... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `fineness-modulus` | Aggregate Fineness Modulus (ASTM C136) | ASTM C136 / C125 (aggregate fineness ...; cumulative retained 2/12/32/57/82/95 -> sum 280 -> FM 2.8... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `fire-door-clearance` | Fire Door Clearance Check (NFPA 80 Annual Inspection) | Project (first-principles); the assembly's own listing governs | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `fireplace-clearance-check` | Fireplace Clearance to Combustibles and Mantel Projection (IRC R1001.11) | ICC; Exception 4: a mantel 9 in from the opening may project 9... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `fireplace-flue-area` | Masonry Fireplace Flue Area (IRC R1003.15.1) | International Code Council; 'Square chimney flues shall have a minimum net cross-sect... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `flammable-cabinet-storage` | Flammable Liquid Cabinet Storage (OSHA 1926.152(b)) | Occupational Safety and Health Admini...; 'Not more than 60 gallons of Category 1, 2 and/or 3 flamm... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `flat-top-stockpile-volume` | Flat-Top (Truncated-Cone) Stockpile Volume and Tonnage | Project (first-principles); truncated cone (frustum) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -6391,6 +6395,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 
-Tile count: 2274. Fixture-covered or reference-cadence: 2274 / 2274.
+Tile count: 2276. Fixture-covered or reference-cadence: 2276 / 2276.
 
 <!-- END tile-index-v14 -->

@@ -72,3 +72,21 @@ test("hearth-extension-check: every opening from 12 to 60 in wide and 12 to 48 i
     assert.equal(r.footprint_width_in, w + (big ? 24 : 16));
   }
 });
+
+// spec-v1984: build the roof profile point by point instead of using min(10, ridge).
+import { computeChimneyTerminationHeight as _chimney, computeFireplaceClearanceCheck as _clear } from "../../calc-masonry.js";
+test("chimney-termination-height: the required height tops every roof point within 10 ft by 2 ft and the penetration by 3 ft", () => {
+  for (const p of [0, 3, 6, 9, 12, 18]) for (const ridge of [0, 2, 5, 10, 14, 30]) {
+    let highest = 0;
+    for (let d = 0; d <= 10 + 1e-9; d += 0.05) highest = Math.max(highest, (p / 12) * Math.min(d, ridge)); // the roof falls away past the ridge
+    const r = _chimney({ pitch_in12: p, ridge_distance_ft: ridge, chimney_width_in: 24 });
+    assert.ok(Math.abs(r.required_ft - Math.max(3, highest + 2)) < 1e-6, JSON.stringify({ p, ridge }));
+  }
+});
+test("fireplace-clearance-check: the allowed projection is 1/8 in per inch from 6 to 12 in and the needed distance inverts it", () => {
+  for (let d = 6; d <= 12; d += 0.5) {
+    const r = _clear({ mantel_distance_in: d, mantel_projection_in: d / 8 });
+    assert.equal(r.checks_failed, 0); assert.ok(Math.abs(r.distance_needed_in - d) < 1e-9);
+    assert.equal(_clear({ mantel_distance_in: d, mantel_projection_in: d / 8 + 0.01 }).checks_failed, 1);
+  }
+});

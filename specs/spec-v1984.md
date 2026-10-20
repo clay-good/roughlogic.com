@@ -1,6 +1,6 @@
 # roughlogic.com Specification v1984 -- Chimney Termination Height (IRC R1003.9, the 3-2-10 Rule) (`calc-masonry.js`, Group E Carpentry and Construction, masonry, 1 New Tile)
 
-> **Status: PROPOSED 2026-10-19. Single-tile spec.** Part of [scope-product-expansion](scope-product-expansion.md). In scope under the
+> **Status: LANDED 2026-10-19 (proposed 2026-10-19). Single-tile spec. As built from the IRC 2024 and 2021 R1003.9 text read on 2026-10-19 (identical). NFPA 211 and IBC 2113.9 are not cited: they were not read. The measured height is optional; blank skips the check.** Part of [scope-product-expansion](scope-product-expansion.md). In scope under the
 > spec-v106 trades-only charter: Group E, the masonry chimney bench in `calc-masonry.js` beside `fireplace-flue-area`,
 > with `chimney-draft` and `chimney-height-for-draft` in `calc-hvac.js` as the draft-side siblings, no new dependency
 > and no network call.

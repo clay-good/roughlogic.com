@@ -117442,6 +117442,56 @@
   "term": "R1001.10 hearth",
   "target": "hearth-extension-check",
   "kind": "industry"
+ },
+ {
+  "term": "3 2 10 rule chimney",
+  "target": "chimney-termination-height",
+  "kind": "industry"
+ },
+ {
+  "term": "how tall does a chimney have to be above the roof",
+  "target": "chimney-termination-height",
+  "kind": "question"
+ },
+ {
+  "term": "chimney height 2 feet above within 10 feet",
+  "target": "chimney-termination-height",
+  "kind": "industry"
+ },
+ {
+  "term": "R1003.9 chimney termination",
+  "target": "chimney-termination-height",
+  "kind": "industry"
+ },
+ {
+  "term": "chimney too short for the ridge",
+  "target": "chimney-termination-height",
+  "kind": "industry"
+ },
+ {
+  "term": "mantel clearance above fireplace opening",
+  "target": "fireplace-clearance-check",
+  "kind": "industry"
+ },
+ {
+  "term": "how far above the firebox can the mantel be",
+  "target": "fireplace-clearance-check",
+  "kind": "question"
+ },
+ {
+  "term": "1/8 inch per inch mantel projection rule",
+  "target": "fireplace-clearance-check",
+  "kind": "industry"
+ },
+ {
+  "term": "combustible clearance to masonry fireplace 2 inches",
+  "target": "fireplace-clearance-check",
+  "kind": "industry"
+ },
+ {
+  "term": "R1001.11 fireplace clearance",
+  "target": "fireplace-clearance-check",
+  "kind": "industry"
  }
  ]
 }

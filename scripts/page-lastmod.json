@@ -2,11 +2,11 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "aa266e1014a960b1",
+      "sha": "7da3a6d8799459ed",
       "date": "2026-10-20"
     },
     "/tools/": {
-      "sha": "6891d565cd2d8d44",
+      "sha": "38c3273033b165a0",
       "date": "2026-10-20"
     },
     "/errata/": {
@@ -14,91 +14,91 @@
       "date": "2026-10-18"
     },
     "/collections/disaster-response/": {
-      "sha": "1adaf307704596cb",
+      "sha": "a0960b108bbdb1ef",
       "date": "2026-10-20"
     },
     "/groups/accounting/": {
-      "sha": "2df97e4ed2e68adb",
+      "sha": "f535332cce79a549",
       "date": "2026-10-20"
     },
     "/groups/agriculture/": {
-      "sha": "0763ae9e0379d191",
+      "sha": "95ea793e9a9997d0",
       "date": "2026-10-20"
     },
     "/groups/construction/": {
-      "sha": "749fe8ae23d37b53",
+      "sha": "462c3e73a49565b6",
       "date": "2026-10-20"
     },
     "/groups/cross-trade/": {
-      "sha": "4c54eca1b52a58f7",
+      "sha": "ddeb3b5abe4a1f49",
       "date": "2026-10-20"
     },
     "/groups/educators/": {
-      "sha": "3ded3eae68b1cd57",
+      "sha": "74bf7e6801eb0aa3",
       "date": "2026-10-20"
     },
     "/groups/electrical/": {
-      "sha": "71570607b46dd7cd",
+      "sha": "24ff528b2abae700",
       "date": "2026-10-20"
     },
     "/groups/field/": {
-      "sha": "1c8f159b09e13ba5",
+      "sha": "1d796cc82739397e",
       "date": "2026-10-20"
     },
     "/groups/fire-ground/": {
-      "sha": "b3b9601d14341432",
+      "sha": "da26fca05ba01922",
       "date": "2026-10-20"
     },
     "/groups/historical/": {
-      "sha": "ab01568cec987cc1",
+      "sha": "3897e917eb1d60af",
       "date": "2026-10-20"
     },
     "/groups/hvac/": {
-      "sha": "6d9f89fb90bfa4fa",
+      "sha": "9217502d320b8e78",
       "date": "2026-10-20"
     },
     "/groups/kitchen/": {
-      "sha": "f77befa0098dcb1e",
+      "sha": "df62765e541a1e71",
       "date": "2026-10-20"
     },
     "/groups/lab/": {
-      "sha": "c499506813459b10",
+      "sha": "9f7fa83ad50f4878",
       "date": "2026-10-20"
     },
     "/groups/mechanic/": {
-      "sha": "550e49af1c11cfe3",
+      "sha": "2bc6e3cd0a3c2904",
       "date": "2026-10-20"
     },
     "/groups/plumbing/": {
-      "sha": "8f7a909848a8329f",
+      "sha": "0d92447ff3152bde",
       "date": "2026-10-20"
     },
     "/groups/real-estate/": {
-      "sha": "2b462f9eab35878c",
+      "sha": "8dfca52fdbf16771",
       "date": "2026-10-20"
     },
     "/groups/references/": {
-      "sha": "9358abe1a78630f4",
+      "sha": "dcaadbc19ee4ba3b",
       "date": "2026-10-20"
     },
     "/groups/restoration/": {
-      "sha": "c117e91dcbb973d9",
+      "sha": "906031f21d1a745f",
       "date": "2026-10-20"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "5a14c189507ab993",
+      "sha": "db5f4e60adc92f67",
       "date": "2026-10-20"
     },
     "/groups/stage/": {
-      "sha": "601e64aeac1153e8",
+      "sha": "0660a4230b94bba7",
       "date": "2026-10-20"
     },
     "/groups/trucking/": {
-      "sha": "cf58c49d26eccc15",
+      "sha": "500a33bfd1fb2fa5",
       "date": "2026-10-20"
     },
     "/groups/water/": {
-      "sha": "3666cd4c47f53600",
+      "sha": "7e1f7eeec890781e",
       "date": "2026-10-20"
     },
     "/tools/aav-install-check/": {
@@ -1188,6 +1188,10 @@
     "/tools/chimney-height-for-draft/": {
       "sha": "1db6faae6f2111bc",
       "date": "2026-10-17"
+    },
+    "/tools/chimney-termination-height/": {
+      "sha": "2ae8503f207ccafa",
+      "date": "2026-10-20"
     },
     "/tools/chip-seal-mcleod/": {
       "sha": "8f3586c8af7e6c4c",
@@ -3033,8 +3037,12 @@
       "sha": "0922a413d440f1aa",
       "date": "2026-10-17"
     },
+    "/tools/fireplace-clearance-check/": {
+      "sha": "17c818e8d05325af",
+      "date": "2026-10-20"
+    },
     "/tools/fireplace-flue-area/": {
-      "sha": "ee481fb9a32759df",
+      "sha": "b2c26f1c9ef9fb48",
       "date": "2026-10-20"
     },
     "/tools/firewood-cord/": {
@@ -3762,7 +3770,7 @@
       "date": "2026-10-17"
     },
     "/tools/hearth-extension-check/": {
-      "sha": "8a2a974b32f07472",
+      "sha": "09118164cfa71661",
       "date": "2026-10-20"
     },
     "/tools/heat-pump-cold-capacity/": {

@@ -2381,6 +2381,8 @@ export const COMPUTE_MAP = {
   "bath-exhaust-fan-sizing": { module: "../../calc-hvacservice.js", fn: "computeBathExhaustFanSizing" },
   "safety-glazing-check": { module: "../../calc-construction.js", fn: "computeSafetyGlazingCheck" },
   "hearth-extension-check": { module: "../../calc-masonry.js", fn: "computeHearthExtensionCheck" },
+  "chimney-termination-height": { module: "../../calc-masonry.js", fn: "computeChimneyTerminationHeight" },
+  "fireplace-clearance-check": { module: "../../calc-masonry.js", fn: "computeFireplaceClearanceCheck" },
 };
 
 // Resolve a COMPUTE_MAP module path (relative to this file) and import it.

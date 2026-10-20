@@ -1521,6 +1521,9 @@ const _TILES = [
   ["safety-glazing-check", "E"],
   // spec-v1983: hearth extension size and thickness (calc-masonry.js).
   ["hearth-extension-check", "E"],
+  // spec-v1984 and spec-v1992: chimney termination height and fireplace clearance (calc-masonry.js).
+  ["chimney-termination-height", "E"],
+  ["fireplace-clearance-check", "E"],
 ];
 
 

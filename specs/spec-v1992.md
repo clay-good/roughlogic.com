@@ -1,6 +1,6 @@
 # roughlogic.com Specification v1992 -- Fireplace Clearance to Combustibles and Mantel Projection (IRC R1001.11) (`calc-masonry.js`, Group E Carpentry and Construction, masonry, 1 New Tile)
 
-> **Status: PROPOSED 2026-10-19. Single-tile spec.** Part of [scope-product-expansion](scope-product-expansion.md). In scope under the
+> **Status: LANDED 2026-10-19 (proposed 2026-10-19). Single-tile spec. As built from the IRC 2024 and 2021 R1001.11 text read on 2026-10-19: this spec merged two exceptions into one trim rule. Exception 3 lets sheathing edges and trim abut the sidewalls and hearth extension 8 in or more from the inside of the firebox lining (12 in for an opening of 6 sq ft or more); Exception 4 keeps mantels and trim on the fireplace front out of the 6 in around the opening, with the 1/8 in per inch projection limit within 12 in. The tile checks them separately and reads 'within 12 inches' as including 12 (a 1.5 in projection passes at 12 in). IRC 2024 also permits noncombustible fill in the framing airspace.** Part of [scope-product-expansion](scope-product-expansion.md). In scope under the
 > spec-v106 trades-only charter: Group E, the masonry fireplace bench in `calc-masonry.js` beside
 > `hearth-extension-check` ([spec-v1983](spec-v1983.md)), no new dependency and no network call.
 >
