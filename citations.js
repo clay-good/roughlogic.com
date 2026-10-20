@@ -97,7 +97,7 @@ const IFGC_CHECKED = " Checked against the IFGC 2027 printing on 2026-10-17: Sec
 const ICC_FREE = "Free read-only access at codes.iccsafe.org.";
 const NFPA54_FREE = "Free read-only access at nfpa.org/freeaccess.";
 // Every tile that bundles an IPC value was read against IPC 2027 on 2026-10-17.
-const IPC_DISCLOSURE = "Editions available: bundled values follow IPC 2027. IPC 2027 is the current published edition, and the values this tile uses were read against it on 2026-10-17 (see below); unless noted they are identical in IPC 2021 and 2024. UPC jurisdictions (CA, IN, MA, NV, parts of NJ) use the Uniform Plumbing Code instead; verify the edition adopted by your AHJ.";
+const IPC_DISCLOSURE = "Editions available: bundled values follow IPC 2027. IPC 2027 is the current published edition, and the values this tile uses were read against it on 2026-10-17 (see below); unless noted they are identical in IPC 2021 and 2024. Many states enforce another plumbing code instead: 15 the Uniform Plumbing Code (among them CA, MN, OR and WA) and 5 a code of their own (IL, KY, MA, NJ, WI), per the state rows drafted 2026-10-20; the \"Your state's edition\" row names yours. Verify the edition adopted by your AHJ.";
 const IFGC_DISCLOSURE = "Editions available: bundled values follow IFGC 2027. IFGC 2027 is the current published edition, and the values this tile uses were read against it on 2026-10-17 (see below); they are identical in IFGC 2021. NFPA 54 (National Fuel Gas Code) carries the same requirements and is cited by name; verify the edition adopted by your AHJ.";
 
 // Group A - Electrical. Priority-1 audit per spec-v6.md §6.

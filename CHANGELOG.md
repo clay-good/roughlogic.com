@@ -38,6 +38,7 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **The plumbing tiles named the wrong states as Uniform Plumbing Code states.** Their shared edition note said "UPC jurisdictions (CA, IN, MA, NV, parts of NJ)". Indiana enforces the IPC (2006), Massachusetts and New Jersey have plumbing codes of their own (248 CMR; the National Standard Plumbing Code), and the UPC states are fifteen, among them Minnesota, Oregon and Washington, which the note left out. It now gives the counts from the drafted state rows and points to the "Your state's edition" row.
 - **Montana's NEC row said NEC 2020; Montana has enforced NEC 2023 since Sep 26, 2026.** The state's Current Codes page, read 2026-10-20, lists the 2023 edition adopted by ARM Title 24, Chapter 301; the 2026-10-17 recheck predated the page's update. Found while drafting the IRC rows, which the same page lists as IRC 2024 on the same date.
 - **Hardening slice 59: the sixteen tiles and the feet-and-inches entry landed 2026-10-19/20, each re-derived from its rule and run by an independent reviewer.** Ten tiles had no defect. Fixed:
   - `foundation-grade-slope-check`: a patio or walk measured over more than 10 ft passed on its average, so a paving flat for its first 10 ft could pass R401.3's 2 percent "within 10 feet." Every run past 10 ft is now refused, for paving as for ground, and the label says to measure the first 10 ft. A slope exactly at the limit no longer prints "-0.00 in to spare."
