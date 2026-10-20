@@ -1374,6 +1374,10 @@ function bindSearch() {
       // typed numbers map onto the tile's slots.
       if (i === 0 && lastRanked) schedulePreview(tool, query, item);
     });
+    // spec-v1971 follow-up: a typed search that found the wrong tiles is a request
+    // too, and its top three ids tell a ranker miss from a catalog gap. The
+    // empty-box browse list is not a search, so it gets no row.
+    if (String(query || "").trim()) list.appendChild(requestRow(query, matches.slice(0, 3).map((t) => t.id), "Not the one you need? Request a calculator"));
     setExpanded(true);
     // A reader who has arrowed to a row has made a deliberate choice, and the
     // alias shards can land a moment later. Resetting here threw that choice

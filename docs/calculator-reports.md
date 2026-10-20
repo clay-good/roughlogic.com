@@ -170,9 +170,10 @@ put durable fix rationale in the public spec, tests, and changelog.
 ## Calculator requests (spec-v1971)
 
 When the home search finds nothing, the no-match list offers "Can't find it?
-Request a calculator". A request is a row with `kind = 'request'`,
+Request a calculator"; under a typed search's results the last row offers "Not
+the one you need? Request a calculator". A request is a row with `kind = 'request'`,
 `calculator_id = '-'`, the search text as the single input row `query`, the
-ids of up to three results shown in `outputs_json` (the form is offered only when the search matched nothing, so this is empty today; the field is there for a later entry point under a result list), and the reader's
+ids of the top three results shown in `outputs_json` (empty when nothing matched), and the reader's
 one sentence in `note`. It uses the same Turnstile check, rate limits,
 retention and privacy rules as a problem report.
 
