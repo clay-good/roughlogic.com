@@ -162,6 +162,24 @@ requireMatch(hardeningMigration, /CREATE TABLE report_attempt_limits/,
 requireMatch(hardeningMigration, /calculator_reports_created_at/,
   "D1 hardening migration is missing the retention index");
 
+// spec-v1971: request a calculator. One mount, in the home search's no-match
+// state; the query cap stated equally by the client and the Worker; and the
+// request kind present in all three layers (client payload, Worker, D1 CHECK).
+const kindMigration = await read("migrations/0003_report_kind.sql");
+const requestMounts = app.match(/className\s*=\s*"request-trigger"/g) || [];
+if (requestMounts.length !== 1) errors.push(`app.js must mount exactly one request-trigger in the search no-match state; found ${requestMounts.length}`);
+requireMatch(app, /search-request[\s\S]{0,1200}openRequestDialog/,
+  "app.js no-match state no longer opens the request dialog");
+requireMatch(client, /export async function openRequestDialog/,
+  "report client no longer exports the request dialog");
+requireMatch(client, /kind:\s*"request"/, "report client no longer sends kind: \"request\"");
+requireMatch(worker, /payload\.kind !== "request"/, "Worker no longer validates the request kind");
+requireMatch(kindMigration, /kind TEXT NOT NULL DEFAULT 'problem' CHECK \(kind IN \('problem', 'request'\)\)/,
+  "D1 migration 0003 is missing the kind column and its CHECK");
+const clientQuery = Number((client.match(/\bQUERY_LIMIT\s*=\s*(\d+)/) || [])[1]);
+const workerQuery = Number((worker.match(/\bMAX_QUERY_LENGTH\s*=\s*(\d+)/) || [])[1]);
+if (!clientQuery || clientQuery !== workerQuery) errors.push(`request query cap disagrees: report-feedback.js QUERY_LIMIT ${clientQuery}, report-worker.mjs MAX_QUERY_LENGTH ${workerQuery}`);
+
 requireMatch(wrangler, /"main"\s*:\s*"report-worker\.mjs"/,
   "wrangler must use the report Worker entry");
 requireMatch(wrangler, /"workers_dev"\s*:\s*false/,

@@ -153,7 +153,59 @@ function makeButton(label, className) {
 }
 
 export async function openReportDialog({ tool, inputRegion, outputRegion, trigger, host }) {
-  if (!tool || !trigger || trigger.dataset.reportSent === "true" || reportDialogOpen) return;
+  if (!tool) return;
+  return feedbackDialog({
+    trigger, host,
+    titleText: "Report a problem",
+    contextText: tool.name + ": we will attach this calculator's URL, inputs, and results.",
+    noteLabel: "What did you expect instead? (optional)",
+    placeholder: "Example: I expected about 3% voltage drop.",
+    noteRequired: false,
+    sendLabel: "Send report",
+    sentText: "Report sent",
+    noun: "report",
+    buildPayload: (note, token) => buildReportPayload({ tool, inputRegion, outputRegion, note, token }),
+  });
+}
+
+// spec-v1971: when a search finds nothing, a reader can ask for the calculator.
+// It travels the same bounded, Turnstile-checked, no-account path as a problem
+// report: the search text, the top result ids the ranker showed (a ranker miss
+// and a catalog gap look identical from outside), and one sentence.
+export const QUERY_LIMIT = 200;
+export function buildRequestPayload({ query, topIds, note, token, origin }) {
+  return {
+    kind: "request",
+    calculator_id: "-",
+    calculator_name: "request",
+    page_url: new URL("/", origin || window.location.origin).href,
+    note: bounded(note, NOTE_LIMIT),
+    // Bidi and control characters pasted with a query would be refused by the
+    // Worker; drop them so the request is not lost to an invisible mark.
+    inputs: [{ label: "query", value: bounded(String(query == null ? "" : query).replace(/[\u0000-\u001f\u007f-\u009f\u200e\u200f\u202a-\u202e\u2066-\u2069]/g, ""), QUERY_LIMIT) }],
+    outputs: { values: (topIds || []).slice(0, 3).map((id) => ({ label: "result", value: String(id) })), text: "", truncated: false },
+    turnstile_token: token,
+  };
+}
+
+export async function openRequestDialog({ query, topIds, trigger, host }) {
+  return feedbackDialog({
+    trigger, host,
+    titleText: "Request a calculator",
+    contextText: "We will send what you searched for" + (query ? " (\u201c" + bounded(query, QUERY_LIMIT) + "\u201d)" : "") + " with your sentence. Nothing else about you is sent.",
+    noteLabel: "What were you trying to work out?",
+    placeholder: "Example: how many sheets of drywall for a stairwell.",
+    noteRequired: true,
+    sendLabel: "Send request",
+    sentText: "Request sent",
+    noun: "request",
+    buildPayload: (note, token) => buildRequestPayload({ query, topIds, note, token }),
+  });
+}
+
+async function feedbackDialog({ trigger, host, titleText, contextText, noteLabel, placeholder, noteRequired, sendLabel, sentText, noun, buildPayload }) {
+  const Noun = noun[0].toUpperCase() + noun.slice(1);
+  if (!trigger || trigger.dataset.reportSent === "true" || reportDialogOpen) return;
   reportDialogOpen = true;
   trigger.disabled = true;
 
@@ -163,12 +215,12 @@ export async function openReportDialog({ tool, inputRegion, outputRegion, trigge
 
   const title = document.createElement("h2");
   title.id = "report-dialog-title";
-  title.textContent = "Report a problem";
+  title.textContent = titleText;
   dialog.appendChild(title);
 
   const context = document.createElement("p");
   context.className = "report-context";
-  context.textContent = tool.name + ": we will attach this calculator's URL, inputs, and results.";
+  context.textContent = contextText;
   dialog.appendChild(context);
 
   const privacy = document.createElement("p");
@@ -178,7 +230,7 @@ export async function openReportDialog({ tool, inputRegion, outputRegion, trigge
 
   const label = document.createElement("label");
   label.htmlFor = "report-note";
-  label.textContent = "What did you expect instead? (optional)";
+  label.textContent = noteLabel;
   dialog.appendChild(label);
 
   const note = document.createElement("textarea");
@@ -186,16 +238,14 @@ export async function openReportDialog({ tool, inputRegion, outputRegion, trigge
   note.maxLength = NOTE_LIMIT;
   note.rows = 3;
   note.autocomplete = "off";
-  note.placeholder = "Example: I expected about 3% voltage drop.";
+  note.placeholder = placeholder;
+  if (noteRequired) note.required = true;
   dialog.appendChild(note);
 
   const count = document.createElement("div");
   count.className = "report-count";
   count.textContent = NOTE_LIMIT + " characters remaining";
   dialog.appendChild(count);
-  note.addEventListener("input", () => {
-    count.textContent = (NOTE_LIMIT - note.value.length) + " characters remaining";
-  });
 
   const turnstileHost = document.createElement("div");
   turnstileHost.className = "report-turnstile";
@@ -211,7 +261,7 @@ export async function openReportDialog({ tool, inputRegion, outputRegion, trigge
   const actions = document.createElement("div");
   actions.className = "report-actions";
   const cancel = makeButton("Cancel", "report-cancel");
-  const submit = makeButton("Send report", "report-submit");
+  const submit = makeButton(sendLabel, "report-submit");
   submit.disabled = true;
   actions.appendChild(cancel);
   actions.appendChild(submit);
@@ -222,6 +272,12 @@ export async function openReportDialog({ tool, inputRegion, outputRegion, trigge
   let token = "";
   let widgetId = null;
   let api = null;
+  // A request needs its sentence; a problem report may go without one.
+  const ready = () => Boolean(token) && (!noteRequired || note.value.trim().length > 0);
+  note.addEventListener("input", () => {
+    count.textContent = (NOTE_LIMIT - note.value.length) + " characters remaining";
+    if (token) submit.disabled = !ready();
+  });
 
   const close = () => {
     if (api && widgetId !== null) {
@@ -250,8 +306,8 @@ export async function openReportDialog({ tool, inputRegion, outputRegion, trigge
       theme: "auto",
       callback: (value) => {
         token = value;
-        submit.disabled = false;
-        status.textContent = "Ready to send.";
+        submit.disabled = !ready();
+        status.textContent = ready() ? "Ready to send." : "Write one sentence, then send.";
       },
       "expired-callback": () => {
         token = "";
@@ -271,12 +327,12 @@ export async function openReportDialog({ tool, inputRegion, outputRegion, trigge
   }
 
   submit.addEventListener("click", async () => {
-    if (!token || submit.disabled) return;
+    if (!ready() || submit.disabled) return;
     submit.disabled = true;
     cancel.disabled = true;
-    status.textContent = "Sending report...";
+    status.textContent = "Sending " + noun + "...";
     try {
-      const payload = buildReportPayload({ tool, inputRegion, outputRegion, note: note.value, token });
+      const payload = buildPayload(note.value, token);
       const response = await fetch(REPORT_URL, {
         method: "POST",
         credentials: "same-origin",
@@ -284,14 +340,14 @@ export async function openReportDialog({ tool, inputRegion, outputRegion, trigge
         body: JSON.stringify(payload),
       });
       if (!response.ok) throw new Error("report rejected");
-      status.textContent = "Thanks. Report saved.";
+      status.textContent = "Thanks. " + Noun + " saved.";
       trigger.dataset.reportSent = "true";
-      trigger.textContent = "Report sent";
+      trigger.textContent = sentText;
       setTimeout(close, 900);
     } catch {
       token = "";
       cancel.disabled = false;
-      status.textContent = "Report not sent. Please try again later.";
+      status.textContent = Noun + " not sent. Please try again later.";
       if (api && widgetId !== null) {
         try { api.reset(widgetId); } catch { /* leave submit disabled */ }
       }

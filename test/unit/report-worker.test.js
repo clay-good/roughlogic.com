@@ -292,3 +292,97 @@ test("non-report requests cannot reach Pages assets through the API Worker", asy
   const response = await handleRequest(new Request("https://roughlogic.com/styles.css"), {});
   assert.equal(response.status, 404);
 });
+
+// spec-v1971: request a calculator. Same path, its own shape, refused otherwise.
+function validRequest() {
+  return {
+    kind: "request",
+    calculator_id: "-",
+    calculator_name: "request",
+    page_url: "https://roughlogic.com/",
+    note: "How many sheets of drywall for a stairwell.",
+    inputs: [{ label: "query", value: "stairwell drywall sheets" }],
+    outputs: { values: [{ label: "result", value: "drywall" }], text: "", truncated: false },
+    turnstile_token: "test-token",
+  };
+}
+
+test("request validation accepts the home-search shape and stores no calculator", () => {
+  const result = validateReportPayload(validRequest());
+  assert.equal(result.ok, true);
+  assert.equal(result.value.kind, "request");
+  assert.equal(result.value.calculatorId, "-");
+  assert.deepEqual(result.value.inputs, [{ label: "query", value: "stairwell drywall sheets" }]);
+  const none = validRequest(); none.outputs.values = [];
+  assert.equal(validateReportPayload(none).ok, true, "a no-match search has no result ids");
+});
+
+test("request validation refuses a tile id, extra outputs, a sentence-less request, a tile page, and an unknown kind", () => {
+  const cases = [
+    (p) => { p.calculator_id = "ohms-law"; },
+    (p) => { p.outputs.values = ["drywall", "ohms-law", "box-fill", "voltage-drop"].map((value) => ({ label: "result", value })); },
+    (p) => { p.outputs.values = [{ label: "result", value: "not-a-tile" }]; },
+    (p) => { p.outputs.text = "Power: 1,200 W"; },
+    (p) => { p.note = "   "; },
+    (p) => { p.inputs = [{ label: "query", value: "x".repeat(201) }]; },
+    (p) => { p.inputs.push({ label: "Voltage", value: "120" }); },
+    (p) => { p.page_url = "https://roughlogic.com/#ohms-law"; },
+    (p) => { p.page_url = "https://example.com/"; },
+    (p) => { p.kind = "problem"; },
+    (p) => { p.kind = "wish"; },
+    (p) => { p.extra = 1; },
+  ];
+  for (const mutate of cases) {
+    const p = validRequest(); mutate(p);
+    assert.equal(validateReportPayload(p).ok, false, String(mutate));
+  }
+});
+
+test("a problem report keeps its shape: no kind is sent, and its validation is unchanged", () => {
+  const p = validPayload();
+  assert.equal(Object.hasOwn(p, "kind"), false);
+  assert.equal(validateReportPayload(p).ok, true);
+});
+
+test("a stored request writes kind = 'request'; a stored problem leaves the column to its default", async () => {
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () => new Response(JSON.stringify({
+    success: true, action: "calculator-report", hostname: "roughlogic.com",
+  }), { status: 200, headers: { "Content-Type": "application/json" } });
+  try {
+    for (const [payload, wantsKind] of [[validRequest(), true], [validPayload(), false]]) {
+      const db = fakeDb();
+      const response = await handleRequest(new Request("https://roughlogic.com/api/reports", {
+        method: "POST",
+        headers: { Origin: "https://roughlogic.com", "Content-Type": "application/json", "CF-Connecting-IP": "192.0.2.1" },
+        body: JSON.stringify(payload),
+      }), { REPORTS_DB: db, TURNSTILE_SITE_KEY: "public-key", TURNSTILE_SECRET_KEY: "private-key", REPORT_HASH_SECRET: "x".repeat(32) });
+      assert.equal(response.status, 202);
+      const insert = db.batches[0][5].sql;
+      assert.equal(/, kind\b/.test(insert), wantsKind, insert);
+    }
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("the browser's request payload passes the Worker's request validation", async () => {
+  globalThis.window = globalThis.window || { location: { origin: "https://roughlogic.com", href: "https://roughlogic.com/" } };
+  const { buildRequestPayload, QUERY_LIMIT } = await import("../../report-feedback.js");
+  const { MAX_QUERY_LENGTH } = await import("../../report-worker.mjs");
+  assert.equal(QUERY_LIMIT, MAX_QUERY_LENGTH);
+  const p = buildRequestPayload({ query: "stairwell drywall sheets", topIds: ["drywall", "ohms-law", "box-fill", "voltage-drop"], note: "How many sheets.", token: "t", origin: "https://roughlogic.com" });
+  assert.equal(p.outputs.values.length, 3, "at most three result ids ride along");
+  assert.equal(validateReportPayload(p).ok, true);
+});
+
+test("request review fixes: /index.html stores as /, duplicate ids are refused, pasted bidi marks are dropped by the client", async () => {
+  const p = validRequest(); p.page_url = "https://roughlogic.com/index.html";
+  assert.equal(validateReportPayload(p).value.pageUrl, "https://roughlogic.com/");
+  const d = validRequest(); d.outputs.values = [{ label: "result", value: "drywall" }, { label: "result", value: "drywall" }];
+  assert.equal(validateReportPayload(d).ok, false);
+  const { buildRequestPayload } = await import("../../report-feedback.js");
+  const b = buildRequestPayload({ query: "drywall‮ sheets", topIds: [], note: "x", token: "t", origin: "https://roughlogic.com" });
+  assert.equal(b.inputs[0].value, "drywall sheets");
+  assert.equal(validateReportPayload(b).ok, true);
+});

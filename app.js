@@ -1273,6 +1273,24 @@ function bindSearch() {
   // `fromData` marks a re-render caused by lazily-loaded search data arriving,
   // rather than by the reader typing. The difference matters: a new query
   // invalidates any row the reader had chosen, but data landing must not.
+  // spec-v1971: the "request a calculator" row. The request rides the problem
+  // report's bounded path, carrying the search text and the ids shown.
+  function requestRow(query, topIds, text) {
+    const ask = document.createElement("li");
+    ask.className = "search-empty search-request";
+    ask.setAttribute("role", "presentation");
+    const askBtn = document.createElement("button");
+    askBtn.type = "button";
+    askBtn.className = "request-trigger";
+    askBtn.textContent = text;
+    askBtn.addEventListener("mousedown", (e) => e.preventDefault());
+    askBtn.addEventListener("click", () => {
+      import("./report-feedback.js").then((m) => m.openRequestDialog({ query, topIds, trigger: askBtn }));
+    });
+    ask.appendChild(askBtn);
+    return ask;
+  }
+
   function render(query, fromData) {
     clearChildren(list);
     matches = searchTools(query);
@@ -1295,6 +1313,7 @@ function bindSearch() {
       link.textContent = "Browse all " + GROUPS.length + " trades";
       browse.appendChild(link);
       list.appendChild(browse);
+      list.appendChild(requestRow(query, [], "Can't find it? Request a calculator"));
       setExpanded(true);
       setActive(-1);
       return;

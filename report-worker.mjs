@@ -7,6 +7,10 @@ export const REPORT_PATH = "/api/reports";
 export const CONFIG_PATH = "/api/reports/config";
 export const MAX_BODY_BYTES = 24 * 1024;
 export const MAX_NOTE_LENGTH = 160;
+// spec-v1971: a calculator request carries the search text and up to three
+// result ids; the client caps the query at the same number.
+export const MAX_QUERY_LENGTH = 200;
+const MAX_REQUEST_RESULTS = 3;
 export const DAILY_LIMIT_CEILING = 200;
 export const REPORTER_LIMIT_CEILING = 5;
 export const DAILY_ATTEMPT_LIMIT = 400;
@@ -83,7 +87,60 @@ function urlIdentifiesCalculator(url, calculatorId) {
   return url.pathname === "/tools/" + calculatorId + "/";
 }
 
+// A request from the home search: no calculator, no inputs beyond the query,
+// no outputs beyond the ranked ids, and the home page as its URL.
+function validateRequestPayload(payload, origins) {
+  const keys = ["kind", "calculator_id", "calculator_name", "page_url", "note", "inputs", "outputs", "turnstile_token"];
+  if (!exactKeys(payload, keys)) return { ok: false, status: 400 };
+  if (payload.calculator_id !== "-" || payload.calculator_name !== "request") return { ok: false, status: 400 };
+  if (!safeStoredText(payload.page_url) || payload.page_url.length > MAX_URL_LENGTH) return { ok: false, status: 400 };
+  let pageUrl;
+  try { pageUrl = new URL(payload.page_url); } catch { return { ok: false, status: 400 }; }
+  if (pageUrl.username || pageUrl.password || pageUrl.search || pageUrl.hash
+    || !origins.includes(pageUrl.origin) || !["/", "/index.html"].includes(pageUrl.pathname)) {
+    return { ok: false, status: 403 };
+  }
+  if (!safeStoredText(payload.note) || payload.note.trim().length === 0 || payload.note.length > MAX_NOTE_LENGTH) {
+    return { ok: false, status: 400 };
+  }
+  const rows = payload.inputs;
+  if (!Array.isArray(rows) || rows.length !== 1 || !exactKeys(rows[0], ["label", "value"]) || rows[0].label !== "query"
+    || !safeStoredText(rows[0].value) || rows[0].value.trim().length === 0 || rows[0].value.length > MAX_QUERY_LENGTH) {
+    return { ok: false, status: 400 };
+  }
+  const out = payload.outputs;
+  if (!exactKeys(out, ["values", "text", "truncated"]) || out.text !== "" || out.truncated !== false
+    || !Array.isArray(out.values) || out.values.length > MAX_REQUEST_RESULTS
+    || !out.values.every((r) => exactKeys(r, ["label", "value"]) && r.label === "result" && TOOL_BY_ID.has(r.value))
+    || new Set(out.values.map((r) => r.value)).size !== out.values.length) {
+    return { ok: false, status: 400 };
+  }
+  if (typeof payload.turnstile_token !== "string" || payload.turnstile_token.length < 1 || payload.turnstile_token.length > 2048) {
+    return { ok: false, status: 400 };
+  }
+  return {
+    ok: true,
+    value: {
+      kind: "request",
+      calculatorId: "-",
+      calculatorName: "request",
+      // "/" and "/index.html" are the same page; store one so dedupe sees one.
+      pageUrl: pageUrl.origin + "/",
+      note: payload.note.trim(),
+      inputs: [{ label: "query", value: rows[0].value.trim() }],
+      outputs: { values: out.values, text: "", truncated: false },
+      turnstileToken: payload.turnstile_token,
+    },
+  };
+}
+
 export function validateReportPayload(payload, origins = ["https://roughlogic.com"]) {
+  // spec-v1971: a request names its kind. A problem report keeps the shape it has
+  // always had, so a site and a Worker deployed at different times cannot break it.
+  if (payload && typeof payload === "object" && !Array.isArray(payload) && Object.hasOwn(payload, "kind")) {
+    if (payload.kind !== "request") return { ok: false, status: 400 };
+    return validateRequestPayload(payload, origins);
+  }
   const topKeys = [
     "calculator_id", "calculator_name", "page_url", "note", "inputs", "outputs", "turnstile_token",
   ];
@@ -258,6 +315,7 @@ export async function storeReport(db, report, env, reporter, now = new Date()) {
   const dailyLimit = configuredLimit(env.REPORT_DAILY_LIMIT, DAILY_LIMIT_CEILING, DAILY_LIMIT_CEILING);
   const reporterLimit = configuredLimit(env.REPORT_REPORTER_DAILY_LIMIT, REPORTER_LIMIT_CEILING, REPORTER_LIMIT_CEILING);
   const dedupeSource = storagePayload({
+    ...(report.kind === "request" ? { kind: "request" } : {}),
     calculator_id: report.calculatorId,
     page_url: report.pageUrl,
     note: report.note,
@@ -287,12 +345,15 @@ export async function storeReport(db, report, env, reporter, now = new Date()) {
     ON CONFLICT (bucket, scope, subject) DO UPDATE SET count = count + 1
   `).bind(day, reporter);
 
+  // A request writes its kind (migration 0003); a problem row leaves the column
+  // to its 'problem' default, so problem reports work before the migration too.
+  const isRequest = report.kind === "request";
   const insert = db.prepare(`
     INSERT OR IGNORE INTO calculator_reports (
       id, created_at, calculator_id, calculator_name, page_url, note,
-      inputs_json, outputs_json, output_text, output_truncated, dedupe_key
+      inputs_json, outputs_json, output_text, output_truncated, dedupe_key${isRequest ? ", kind" : ""}
     )
-    SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+    SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?${isRequest ? ", 'request'" : ""}
     WHERE COALESCE((
       SELECT count FROM report_limits
       WHERE bucket = ? AND scope = 'global' AND subject = 'all'

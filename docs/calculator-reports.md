@@ -167,6 +167,30 @@ verified writes: all reports expire after 30 days and both accepted/attempt
 counter buckets expire after 14 days. Do not use D1 as a permanent archive;
 put durable fix rationale in the public spec, tests, and changelog.
 
+## Calculator requests (spec-v1971)
+
+When the home search finds nothing, the no-match list offers "Can't find it?
+Request a calculator". A request is a row with `kind = 'request'`,
+`calculator_id = '-'`, the search text as the single input row `query`, the
+ids of up to three results shown in `outputs_json` (the form is offered only when the search matched nothing, so this is empty today; the field is there for a later entry point under a result list), and the reader's
+one sentence in `note`. It uses the same Turnstile check, rate limits,
+retention and privacy rules as a problem report.
+
+Apply migration `0003_report_kind.sql` (the `migrations apply` step above runs
+it) before deploying a Worker that stores requests. Problem reports keep their
+old shape and never write `kind`, so they work on either side of the migration;
+a request sent before the Worker is deployed is refused with 400, and one sent after the Worker but before the migration fails its insert and is answered 503 (the transaction rolls back its rate counters). The `\$` in the query below is escaped for a double-quoted shell argument.
+
+List open requests grouped by what was searched:
+
+```sh
+npx --no-install wrangler d1 execute roughlogic-reports --remote --command "SELECT json_extract(inputs_json, '\$[0].value') AS query, COUNT(*) AS n, group_concat(note, ' | ') AS notes, group_concat(outputs_json, ' ') AS top_results FROM calculator_reports WHERE kind = 'request' AND status = 'open' GROUP BY query ORDER BY n DESC;"
+```
+
+A request whose top results include the calculator the reader wanted is a ranker
+miss: add an alias row. A request with no plausible result is a catalog gap:
+write a spec. Resolve it with the spec number in `resolution_note`.
+
 ## Triage targets
 
 The operational target is to review reports within 72 hours when practical,
