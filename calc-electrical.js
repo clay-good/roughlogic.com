@@ -2340,7 +2340,7 @@ export const NEMA_MG1_CODE_LETTERS = {
 
 const GENERATOR_KW_STEPS = [15, 22, 35, 50, 60, 80, 100, 125, 150, 175, 200, 230, 275, 300, 400, 500, 600, 750, 1000];
 
-// dims: in { motors: dimensionless, non_motor_kW: M L^2 T^-3, dip_factor: dimensionless, starts_per_hour: dimensionless } out: { recommended_kW: M L^2 T^-3, running_kW: M L^2 T^-3, worst_starting_kVA: M L^2 T^-3, required_starting_kVA: M L^2 T^-3, required_kW: M L^2 T^-3 }
+// dims: in { motors: dimensionless, non_motor_kW: M L^2 T^-3, dip_factor: dimensionless, starts_per_hour: T^-1 } out: { recommended_kW: M L^2 T^-3, running_kW: M L^2 T^-3, worst_starting_kVA: M L^2 T^-3, required_starting_kVA: M L^2 T^-3, required_kW: M L^2 T^-3 }
 export function computeGeneratorMotorStarting({
   motors = [],
   non_motor_kW = 0,

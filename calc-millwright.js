@@ -1147,7 +1147,7 @@ MILLWRIGHT_RENDERERS["compressed-air-condensate"] = _simpleRenderer({
 
 // ============ spec-v1483: vacuum pump evacuation time ============
 
-// dims: in { chamber_volume_ft3: L^3, pump_speed_cfm: L^3 / T, start_pressure_torr: M L^-1 T^-2, target_pressure_torr: M L^-1 T^-2, leak_rate_torr_cfm: dimensionless, conductance_efficiency: dimensionless } out: { evacuation_minutes: T, minutes_per_decade: T, decades: dimensionless, ultimate_pressure_torr: M L^-1 T^-2, effective_speed_cfm: L^3 / T }
+// dims: in { chamber_volume_ft3: L^3, pump_speed_cfm: L^3 / T, start_pressure_torr: M L^-1 T^-2, target_pressure_torr: M L^-1 T^-2, leak_rate_torr_cfm: M L^2 T^-3, conductance_efficiency: dimensionless } out: { evacuation_minutes: T, minutes_per_decade: T, decades: dimensionless, ultimate_pressure_torr: M L^-1 T^-2, effective_speed_cfm: L^3 / T, blocking_leak_torr_cfm: M L^2 T^-3 }
 export function computeVacuumEvacuationTime({ chamber_volume_ft3 = 0, pump_speed_cfm = 0, start_pressure_torr = 760, target_pressure_torr = 0, leak_rate_torr_cfm = 0, conductance_efficiency = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(chamber_volume_ft3 > 0)) return { error: "Chamber volume must be positive (cu ft)." };

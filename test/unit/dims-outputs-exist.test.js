@@ -174,3 +174,48 @@ test("a key named for a per-time rate is never declared dimensionless", () => {
   assert.ok(seen > 100, `only ${seen} rate-named keys found; did the annotation format move?`);
   assert.deepEqual(bad, []);
 });
+
+// The spelled-out form of the same rule. `cycles_per_day`, `doses_per_day`
+// and `trucks_per_hour` were declared `dimensionless` while 39 siblings
+// (`cycles_per_hour`, `meals_per_day`) were `T^-1`, and `lb_per_day`,
+// `water_gal_per_year`, `area_ft2_per_day` and `heat_btu_per_day` were
+// declared as the bare amount -- a mass, a volume, an energy -- with the time
+// dropped (60 declarations fixed 2026-10-20). A `<thing>_per_<time>` key must
+// carry a negative time exponent. Not held: a time per time (`hours_per_day`,
+// `eff_min_per_hr`, a repo convention), money rates (money is dimensionless
+// here, by convention), and temperatures, which this grammar writes with the
+// same `T` as time.
+test("a <thing>_per_<time> key is declared with the time in its denominator", () => {
+  const timeExponent = (expr) => {
+    if (expr.trim() === "dimensionless") return 0;
+    let t = 0, sign = 1;
+    for (const tok of expr.trim().split(/(\s+|\*|\/)/)) {
+      if (!tok || /^\s+$/.test(tok)) continue;
+      if (tok === "/") { sign = -1; continue; }
+      if (tok === "*") { sign = 1; continue; }
+      const m = tok.match(/^([A-Za-z]+)(?:\^(-?\d+))?$/);
+      if (m && m[1] === "T") t += (m[2] ? Number(m[2]) : 1) * sign;
+      sign = 1;
+    }
+    return t;
+  };
+  const TIME_NUMERATOR = /(^|_)(hours?|hrs?|minutes?|mins?|days?|weeks?|months?|years?|yrs?|seconds?|secs?|shifts?|runtime)(_|$)/;
+  const MONEY = /(cost|usd|price|wage|rate_per|labor_rate|fee|dollar|fixed_per|revenue)/;
+  const NOT_HELD = /(temp|_f_per|deg|hdd|cdd|baseload)/;
+  const bad = [];
+  let seen = 0;
+  for (const f of readdirSync(ROOT).filter((n) => /^calc-.*\.js$/.test(n))) {
+    for (const line of readFileSync(resolve(ROOT, f), "utf8").split("\n")) {
+      if (!/^\s*\/\/.*(dims:|out:)/.test(line)) continue;
+      for (const m of line.matchAll(/\b([A-Za-z0-9_]+)\s*:\s*([A-Za-z][^,}:{]*)/g)) {
+        const key = m[1].toLowerCase();
+        const per = key.match(/^(.*)_per_(day|hr|hour|min|minute|week|month|year|yr|sec|second|shift)$/);
+        if (!per || TIME_NUMERATOR.test(per[1]) || MONEY.test(key) || NOT_HELD.test(key)) continue;
+        seen++;
+        if (timeExponent(m[2]) >= 0) bad.push(`${f}: \`${m[1]}\` is per ${per[2]} but declared \`${m[2].trim()}\``);
+      }
+    }
+  }
+  assert.ok(seen > 100, `only ${seen} per-time keys found; did the annotation format move?`);
+  assert.deepEqual(bad, []);
+});

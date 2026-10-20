@@ -20,7 +20,7 @@ const _finiteGuard = (o) => {
 export const OPERATIONS_FINANCE_RENDERERS = {};
 
 // ===================== spec-v529: economic order quantity (Wilson EOQ) =====================
-// dims: in { annual_demand: dimensionless, order_cost: dimensionless, holding_cost: dimensionless } out: { eoq: dimensionless, orders_per_year: dimensionless, cycle_days: T, total_annual: dimensionless }
+// dims: in { annual_demand: dimensionless, order_cost: dimensionless, holding_cost: dimensionless } out: { eoq: dimensionless, orders_per_year: T^-1, cycle_days: T, total_annual: dimensionless }
 export function computeEoqOrderQuantity({ annual_demand = 0, order_cost = 0, holding_cost = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const d = Number(annual_demand) || 0;

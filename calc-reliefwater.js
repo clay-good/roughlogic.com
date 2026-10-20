@@ -307,7 +307,7 @@ const _RTCR_TABLE = [
   [1520000, 330], [1850000, 360], [2270000, 390], [3020000, 420], [3960000, 450], [Infinity, 480],
 ];
 
-// dims: in { population_served: dimensionless, tc_positive_count: dimensionless, positive_repeat_count: dimensionless, routine_samples_taken: dimensionless } out: { routine_samples_per_month: dimensionless, routine_samples_counted: dimensionless, repeat_samples_required: dimensionless, repeat_deadline_hr: T, ecoli_analyses_required: dimensionless, total_samples: dimensionless, total_positives: dimensionless, tc_positive_pct: dimensionless, tc_positive_pct_routine: dimensionless }
+// dims: in { population_served: dimensionless, tc_positive_count: dimensionless, positive_repeat_count: dimensionless, routine_samples_taken: dimensionless } out: { routine_samples_per_month: T^-1, routine_samples_counted: dimensionless, repeat_samples_required: dimensionless, repeat_deadline_hr: T, ecoli_analyses_required: dimensionless, total_samples: dimensionless, total_positives: dimensionless, tc_positive_pct: dimensionless, tc_positive_pct_routine: dimensionless }
 export function computeRtcrColiformSamples({ population_served = 0, tc_positive_count = 0, positive_repeat_count = 0, routine_samples_taken = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(population_served > 0) || !Number.isInteger(population_served)) return { error: "Population served must be a positive whole number." };

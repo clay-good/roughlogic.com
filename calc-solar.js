@@ -908,7 +908,7 @@ function renderPvInverterRatio(inputRegion, outputRegion, citationEl) {
 
 // ===================== spec-v236: battery time-of-use arbitrage value =====================
 
-// dims: in { nameplate_kwh: M L^2 T^-2, dod: dimensionless, rte: dimensionless, peak_price: dimensionless, offpeak_price: dimensionless, cycles_per_year: dimensionless } out: { usable_kwh: M L^2 T^-2, charge_kwh: M L^2 T^-2, daily_value: dimensionless, annual_value: dimensionless, breakeven_ratio: dimensionless }
+// dims: in { nameplate_kwh: M L^2 T^-2, dod: dimensionless, rte: dimensionless, peak_price: dimensionless, offpeak_price: dimensionless, cycles_per_year: T^-1 } out: { usable_kwh: M L^2 T^-2, charge_kwh: M L^2 T^-2, daily_value: dimensionless, annual_value: dimensionless, breakeven_ratio: dimensionless }
 export function computeBatteryTouArbitrage({ nameplate_kwh = 0, dod = 0.90, rte = 0.86, peak_price = 0, offpeak_price = 0, cycles_per_year = 365 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(nameplate_kwh > 0)) return { error: "Battery nameplate energy must be positive (kWh)." };

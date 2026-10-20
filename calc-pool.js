@@ -98,7 +98,7 @@ export const POOL_RENDERERS = {};
 const _POOL_GAL_PER_CU_FT = 1728 / 231;
 const _POOL_LB_PER_GAL = 8.34;
 const _POOL_LATENT_BTU_PER_LB = 1046;
-// dims: in { surface_area_ft2: L^2, evaporation_in_day: L T^-1, cover_effectiveness_pct: dimensionless, cover_hours_per_day: T, heater_efficiency_pct: dimensionless, fuel_cost_per_mmbtu: dimensionless, season_days: T } out: { gallons_per_day: L^3 T^-1, pounds_per_day: M T^-1, mmbtu_per_day: L^2 M T^-2, cover_saving_mmbtu_day: L^2 M T^-2, season_saving_mmbtu: L^2 M T^-2, season_saving_cost: dimensionless, cover_fraction: dimensionless }
+// dims: in { surface_area_ft2: L^2, evaporation_in_day: L T^-1, cover_effectiveness_pct: dimensionless, cover_hours_per_day: T, heater_efficiency_pct: dimensionless, fuel_cost_per_mmbtu: dimensionless, season_days: T } out: { gallons_per_day: L^3 T^-1, pounds_per_day: M T^-1, mmbtu_per_day: M L^2 T^-3, cover_saving_mmbtu_day: L^2 M T^-2, season_saving_mmbtu: L^2 M T^-2, season_saving_cost: dimensionless, cover_fraction: dimensionless }
 export function computePoolCoverEvaporation({
   surface_area_ft2 = 0, evaporation_in_day = 0, cover_effectiveness_pct = 90,
   cover_hours_per_day = 0, heater_efficiency_pct = 82, fuel_cost_per_mmbtu = 0, season_days = 180,

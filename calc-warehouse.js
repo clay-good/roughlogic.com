@@ -600,7 +600,7 @@ WAREHOUSE_RENDERERS["rack-flue-space"] = _simpleRenderer({
 // statistic it has. The peak is what the doors have to serve, and turn time is
 // the whole time a trailer occupies the door, not the handling alone.
 
-// dims: in { trucks_per_day: dimensionless, operating_hours: T, turn_time_min: T, utilization_pct: dimensionless, peak_arrival_share_pct: dimensionless, peak_window_hours: T, improved_turn_time_min: T } out: { door_hours: T, doors_at_full_utilization: dimensionless, doors_required: dimensionless, peak_door_hours: T, peak_doors_required: dimensionless, improved_peak_doors_required: dimensionless }
+// dims: in { trucks_per_day: T^-1, operating_hours: T, turn_time_min: T, utilization_pct: dimensionless, peak_arrival_share_pct: dimensionless, peak_window_hours: T, improved_turn_time_min: T } out: { door_hours: T, doors_at_full_utilization: dimensionless, doors_required: dimensionless, peak_door_hours: T, peak_doors_required: dimensionless, improved_peak_doors_required: dimensionless }
 export function computeDockDoorCountThroughput({ trucks_per_day = 0, operating_hours = 0, turn_time_min = 0, utilization_pct = 0, peak_arrival_share_pct = 0, peak_window_hours = 0, improved_turn_time_min = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   if (!(trucks_per_day > 0) || !(operating_hours > 0)) return { error: "Trucks per day and the operating window must be positive." };

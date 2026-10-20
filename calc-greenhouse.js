@@ -567,7 +567,7 @@ GREENHOUSE_RENDERERS["shade-cloth-transmission"] = _simpleRenderer({
 // outside without anyone noticing; a sealed house has to remove it, which is
 // why closed and indoor rooms fail on humidity before anything else.
 
-// dims: in { floor_area_sqft: L^2, daily_solar_btu_per_sqft: M T^-2, latent_fraction: dimensionless, leaching_fraction: dimensionless, peak_solar_btuh_per_sqft: M T^-3, irrigation_hours_per_day: T } out: { transpiration_lb_per_day: M, transpiration_gal_per_day: L^3, gal_per_sqft_per_day: L, applied_gal_per_day: L^3, peak_gal_per_hour: L^3 T^-1, moisture_pints_per_day: L^3 }
+// dims: in { floor_area_sqft: L^2, daily_solar_btu_per_sqft: M T^-2, latent_fraction: dimensionless, leaching_fraction: dimensionless, peak_solar_btuh_per_sqft: M T^-3, irrigation_hours_per_day: T } out: { transpiration_lb_per_day: M T^-1, transpiration_gal_per_day: L^3 T^-1, gal_per_sqft_per_day: L T^-1, applied_gal_per_day: L^3 T^-1, peak_gal_per_hour: L^3 T^-1, moisture_pints_per_day: L^3 T^-1 }
 export function computeGreenhouseTranspirationWater({ floor_area_sqft = 0, daily_solar_btu_per_sqft = 0, latent_fraction = 0, leaching_fraction = 0, peak_solar_btuh_per_sqft = 0, irrigation_hours_per_day = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   if (!(floor_area_sqft > 0)) return { error: "Floor area must be positive." };

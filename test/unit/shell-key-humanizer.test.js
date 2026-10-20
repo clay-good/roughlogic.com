@@ -208,7 +208,6 @@ test("a caption's closing unit agrees with the key's dims annotation", () => {
     ["daily_manure_ft3", "a per-day volume named without its rate (check-dimensions UNIT_TAIL_EXEMPT)"],
     ["wastewater_ft3", "a per-day volume named without its rate (check-dimensions UNIT_TAIL_EXEMPT)"],
     ["bedding_ft3", "a per-day volume named without its rate (check-dimensions UNIT_TAIL_EXEMPT)"],
-    ["daily_flow_gpd", "declared as the day's volume, L^3, beside a GPD name"],
     ["q_s", "a heat flux with subscript s; q is not on the Greek-letter subscript list"],
     ["free_air_l_min", "litres per minute; the single letter l is deliberately not a unit"],
     ["feed_ipm_in", "an input in in/min; inputs show their field label, never this caption"],

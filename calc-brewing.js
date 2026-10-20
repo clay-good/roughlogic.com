@@ -523,7 +523,7 @@ BREWING_RENDERERS["yeast-pitch-rate"] = _simpleRenderer({
 // smaller beer, and topping up to volume cancels the two errors rather than
 // fixing either.
 
-// dims: in { preboil_volume_gal: L^3, preboil_gravity: dimensionless, boiloff_pct_per_hour: dimensionless, boil_hours: T, shrinkage_pct: dimensionless, hard_boiloff_pct_per_hour: dimensionless } out: { evaporated_gal: L^3, hot_volume_gal: L^3, cooled_volume_gal: L^3, cooled_og_points: dimensionless, hard_cooled_volume_gal: L^3, hard_og_points: dimensionless, extract_point_gallons: L^3, hard_volume_short_gal: L^3, hard_volume_short_pct: dimensionless, preboil_volume_gal: L^3, shrinkage_gal: L^3, volume_removed_gal: L^3 }
+// dims: in { preboil_volume_gal: L^3, preboil_gravity: dimensionless, boiloff_pct_per_hour: T^-1, boil_hours: T, shrinkage_pct: dimensionless, hard_boiloff_pct_per_hour: T^-1 } out: { evaporated_gal: L^3, hot_volume_gal: L^3, cooled_volume_gal: L^3, cooled_og_points: dimensionless, hard_cooled_volume_gal: L^3, hard_og_points: dimensionless, extract_point_gallons: L^3, hard_volume_short_gal: L^3, hard_volume_short_pct: dimensionless, preboil_volume_gal: L^3, shrinkage_gal: L^3, volume_removed_gal: L^3 }
 export function computeKettleBoilOff({ preboil_volume_gal = 0, preboil_gravity = 0, boiloff_pct_per_hour = 0, boil_hours = 0, shrinkage_pct = 0, hard_boiloff_pct_per_hour = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   // Unit / range guard added 2026-09-26 after printed-example probing.

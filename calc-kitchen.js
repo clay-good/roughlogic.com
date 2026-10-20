@@ -1398,7 +1398,7 @@ KITCHEN_RENDERERS["abv-from-gravity"] = _r({
 // ===========================================================================
 
 // ===================== spec-v1350: ice machine capacity and bin sizing =====================
-// dims: in { covers_per_day: dimensionless, lb_per_cover: M, derate_factor: dimensionless, utilization: dimensionless, peak_fraction: dimensionless } out: { daily_demand_lb: M, required_nameplate_lb: M, bin_capacity_lb: M }
+// dims: in { covers_per_day: T^-1, lb_per_cover: M, derate_factor: dimensionless, utilization: dimensionless, peak_fraction: dimensionless } out: { daily_demand_lb: M, required_nameplate_lb: M, bin_capacity_lb: M }
 export function computeIceMachineSizing({ covers_per_day = 0, lb_per_cover = 0, derate_factor = 0.8, utilization = 0.9, peak_fraction = 0.4 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(covers_per_day > 0)) return { error: "Covers per day must be positive." };
@@ -1441,7 +1441,7 @@ KITCHEN_RENDERERS["ice-machine-sizing"] = _r({
 });
 
 // ===================== spec-v1351: warewasher hot-water demand and booster sizing =====================
-// dims: in { rinse_gpm: L^3 T^-1, supply_temp_f: T, rinse_temp_f: T, racks_per_hour: dimensionless, gal_per_rack: L^3, booster_efficiency: dimensionless } out: { delta_t_f: T, booster_btuh: M L^2 T^-3, booster_kw: M L^2 T^-3, gas_input_btuh: M L^2 T^-3, hourly_hot_water_gal: L^3 }
+// dims: in { rinse_gpm: L^3 T^-1, supply_temp_f: T, rinse_temp_f: T, racks_per_hour: T^-1, gal_per_rack: L^3, booster_efficiency: dimensionless } out: { delta_t_f: T, booster_btuh: M L^2 T^-3, booster_kw: M L^2 T^-3, gas_input_btuh: M L^2 T^-3, hourly_hot_water_gal: L^3 }
 export function computeWarewasherHotWater({ rinse_gpm = 0, supply_temp_f = 140, rinse_temp_f = 180, racks_per_hour = 0, gal_per_rack = 0, booster_efficiency = 0.8 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // The page passes a blank box as null; 0 F is a real reading, so a blank cannot stand in for it.
@@ -2268,7 +2268,7 @@ KITCHEN_RENDERERS["hot-holding-energy"] = renderHotHoldingEnergy;
 
 // ============ spec-v1637: grease duct buildup and cleaning interval ============
 
-// dims: in { inspection_interval_months: T, months_since_inspection: T, measured_thickness_um: L, cleaning_trigger_um: L, inspection_point_trigger_um: L, is_designated_point: dimensionless } out: { months_overdue: T, next_inspection_months: T, thickness_margin_um: L, applicable_trigger_um: L, thickness_ratio: dimensionless, inspections_per_year: dimensionless, measured_thickness_in: L, trigger_thickness_in: L }
+// dims: in { inspection_interval_months: T, months_since_inspection: T, measured_thickness_um: L, cleaning_trigger_um: L, inspection_point_trigger_um: L, is_designated_point: dimensionless } out: { months_overdue: T, next_inspection_months: T, thickness_margin_um: L, applicable_trigger_um: L, thickness_ratio: dimensionless, inspections_per_year: T^-1, measured_thickness_in: L, trigger_thickness_in: L }
 export function computeGreaseDuctCleaningInterval({ inspection_interval_months = 0, months_since_inspection = 0, measured_thickness_um = 0, cleaning_trigger_um = 2000, inspection_point_trigger_um = 3175, is_designated_point = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(inspection_interval_months > 0)) return { error: "The inspection interval must be positive (months) -- monthly for solid fuel, quarterly for high volume, semiannually for moderate, annually for low volume." };

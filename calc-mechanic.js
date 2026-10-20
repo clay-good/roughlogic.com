@@ -4423,7 +4423,7 @@ MECHANIC_RENDERERS["carburetor-altitude-jetting"] = _simpleRenderer({
 });
 
 // ===================== spec-v1659: spray gun transfer efficiency and material usage =====================
-// dims: in { applied_material_qt: L^3, transfer_efficiency: dimensionless, alt_transfer_efficiency: dimensionless, price_per_qt: dimensionless, jobs_per_year: dimensionless } out: { material_sprayed_qt: L^3, overspray_qt: L^3, overspray_fraction: dimensionless, alt_material_sprayed_qt: L^3, saving_per_job_qt: L^3, annual_saving_usd: dimensionless }
+// dims: in { applied_material_qt: L^3, transfer_efficiency: dimensionless, alt_transfer_efficiency: dimensionless, price_per_qt: dimensionless, jobs_per_year: T^-1 } out: { material_sprayed_qt: L^3, overspray_qt: L^3, overspray_fraction: dimensionless, alt_material_sprayed_qt: L^3, saving_per_job_qt: L^3, annual_saving_usd: dimensionless }
 export function computeSprayTransferEfficiency({ applied_material_qt = 0, transfer_efficiency = 0, alt_transfer_efficiency = 0, price_per_qt = 0, jobs_per_year = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(applied_material_qt > 0)) return { error: "The applied material a job needs must be positive." };

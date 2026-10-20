@@ -308,7 +308,7 @@ AIRQUALITY_RENDERERS["opacity-six-minute"] = _simpleRenderer({
 //
 // The BASELINE is the diagnostic, not the peak. The trigger sets the peak, so
 // a blinding baghouse shows nothing wrong at the top of the cycle for months.
-// dims: in { baseline_inwc: M L^-1 T^-2, trigger_inwc: M L^-1 T^-2, cycle_minutes: T, original_baseline_inwc: M L^-1 T^-2, original_cycle_minutes: T, elapsed_months: T, operating_hours_per_day: T } out: { baseline_rise_inwc: M L^-1 T^-2, baseline_rise_pct: dimensionless, cycle_change_pct: dimensionless, pulses_per_day: dimensionless, months_to_trigger: T, range_lost_pct: dimensionless }
+// dims: in { baseline_inwc: M L^-1 T^-2, trigger_inwc: M L^-1 T^-2, cycle_minutes: T, original_baseline_inwc: M L^-1 T^-2, original_cycle_minutes: T, elapsed_months: T, operating_hours_per_day: T } out: { baseline_rise_inwc: M L^-1 T^-2, baseline_rise_pct: dimensionless, cycle_change_pct: dimensionless, pulses_per_day: T^-1, months_to_trigger: T, range_lost_pct: dimensionless }
 export function computeBaghouseCleaningInterval({
   baseline_inwc = 0, trigger_inwc = 0, cycle_minutes = 0,
   original_baseline_inwc = 0, original_cycle_minutes = 0, elapsed_months = 0,

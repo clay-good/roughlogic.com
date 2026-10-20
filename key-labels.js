@@ -25,7 +25,7 @@ const KEY_UNITS = new Map(Object.entries({
   psi: "psi", psig: "psig", psid: "psid", psf: "psf", ksi: "ksi", ksf: "ksf", pcf: "pcf", plf: "plf", klf: "klf",
   lb: "lb", lbs: "lb", kip: "kip", kips: "kip", ton: "ton", tons: "ton", kg: "kg",
   hp: "hp", kw: "kW", kwh: "kWh", kva: "kVA", btuh: "Btu/h", btu: "Btu", mbh: "MBH",
-  amps: "A", volts: "V", ohms: "ohms", hz: "Hz",
+  amps: "A", volts: "V", ohms: "ohms", hz: "Hz", torr: "torr",
   deg: "deg", pct: "%", percent: "%",
   hr: "hr", hrs: "hr", yr: "yr", years: "yr", months: "months", days: "days",
   ft2: "ft\u00b2", ft3: "ft\u00b3", sqin: "sq in", sqft: "ft\u00b2", in2: "in\u00b2", in3: "in\u00b3", in4: "in\u2074",
@@ -190,6 +190,8 @@ export function humanizeKey(key) {
   // SI), never ohms per centimetre.
   if (unit === "ohm/cm") unit = "ohm-cm";
   if (unit === "ohm/m") unit = "ohm-m";
+  // A vacuum leak rate is torr TIMES cfm.
+  if (unit === "torr/CFM") unit = "torr-cfm";
   const words = parts.map((p, i) => {
     const l = p.toLowerCase();
     if (KEY_ACRONYMS.has(l)) return l.toUpperCase();

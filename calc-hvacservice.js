@@ -586,7 +586,7 @@ HVACSERVICE_RENDERERS["furnace-airflow-to-rise"] = _simpleRenderer({
 
 // ===================== spec-v218: blower-door air-tightness (ACH50) =====================
 
-// dims: in { cfm50: L^3 T^-1, volume_ft3: L^3, n_factor: dimensionless, target_ach50: dimensionless, n_factor_low: dimensionless, n_factor_high: dimensionless, heating_degree_days: dimensionless } out: { ach50: T^-1, ach_nat: T^-1, cfm_nat: L^3 T^-1, cfm_nat_low_n: L^3 T^-1, cfm_nat_high_n: L^3 T^-1, spread_ratio: dimensionless, infiltration_btu_per_year: L^2 M T^-2 }
+// dims: in { cfm50: L^3 T^-1, volume_ft3: L^3, n_factor: dimensionless, target_ach50: dimensionless, n_factor_low: dimensionless, n_factor_high: dimensionless, heating_degree_days: dimensionless } out: { ach50: T^-1, ach_nat: T^-1, cfm_nat: L^3 T^-1, cfm_nat_low_n: L^3 T^-1, cfm_nat_high_n: L^3 T^-1, spread_ratio: dimensionless, infiltration_btu_per_year: M L^2 T^-3 }
 export function computeBlowerDoorAch50({ cfm50 = 0, volume_ft3 = 0, n_factor = 17, target_ach50 = 3, n_factor_low = 0, n_factor_high = 0, heating_degree_days = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(cfm50 > 0)) return { error: "Measured CFM50 must be positive (cfm)." };

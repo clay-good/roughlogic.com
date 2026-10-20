@@ -123,7 +123,7 @@ EARTHWORK_RENDERERS["soil-swell-shrink"] = _v67renderSoilSwellShrink;
 // cycle = load + haul + dump + return + spot; loads/hr = eff_min / cycle;
 // production = cap x loads/hr; trucks = ceil(cycle / load);
 // fleet = min(production x trucks, cap x eff_min / load), the loader's ceiling.
-// dims: in { truck_cap_lcy: L^3, load_min: T, haul_min: T, dump_min: T, return_min: T, spot_min: T, eff_min_per_hr: T } out: { cycle_min: T, loads_per_hour: dimensionless, production_lcy_hr: L^3 T^-1, trucks_to_match: dimensionless, fleet_production_lcy_hr: L^3 T^-1, loader_capacity_lcy_hr: L^3 T^-1 }
+// dims: in { truck_cap_lcy: L^3, load_min: T, haul_min: T, dump_min: T, return_min: T, spot_min: T, eff_min_per_hr: T } out: { cycle_min: T, loads_per_hour: T^-1, production_lcy_hr: L^3 T^-1, trucks_to_match: dimensionless, fleet_production_lcy_hr: L^3 T^-1, loader_capacity_lcy_hr: L^3 T^-1 }
 // (Truck capacity is L^3; every time is T; production is a volume-rate L^3 T^-1
 //  and the loads-per-hour and truck count are dimensionless.)
 export function computeHaulCycleProduction({ truck_cap_lcy, load_min, haul_min = 0, dump_min = 0, return_min = 0, spot_min = 0.5, eff_min_per_hr = 50 } = {}) {
@@ -1195,7 +1195,7 @@ EARTHWORK_RENDERERS["hdd-pullback"] = _v833renderHddPullback;
 //   area_sy = length_ft x width_ft / 9; gal_per_app = area_sy x rate_gal_per_sy
 //   trips_per_app = ceil(gal_per_app / truck_cap_gal)
 //   daily_gal = gal_per_app x applications_per_day
-// dims: in { length_ft: L, width_ft: L, rate_gal_per_sy: L, truck_cap_gal: L^3, applications_per_day: dimensionless } out: { area_sy: L^2, gal_per_app: L^3, trips_per_app: dimensionless, daily_gal: L^3, daily_trips: dimensionless }
+// dims: in { length_ft: L, width_ft: L, rate_gal_per_sy: L, truck_cap_gal: L^3, applications_per_day: T^-1 } out: { area_sy: L^2, gal_per_app: L^3, trips_per_app: dimensionless, daily_gal: L^3, daily_trips: dimensionless }
 export function computeDustControlWater({ length_ft = 2000, width_ft = 20, rate_gal_per_sy = 0.5, truck_cap_gal = 4000, applications_per_day = 6 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(length_ft > 0)) return { error: "Length must be positive (ft)." };

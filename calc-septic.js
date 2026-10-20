@@ -45,7 +45,7 @@ const _finiteGuard = (o) => {
 
 // --- Utility 74: Septic Tank Sizing ---
 
-// dims: in { bedrooms: dimensionless, gallons_per_day: L^3 T^-1 } out: { daily_flow_gpd: L^3, minimum_tank_gallons: L^3, floor_gallons: L^3 }
+// dims: in { bedrooms: dimensionless, gallons_per_day: L^3 T^-1 } out: { daily_flow_gpd: L^3 T^-1, minimum_tank_gallons: L^3, floor_gallons: L^3 }
 export function computeSepticTank({ bedrooms, gallons_per_day }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const byFlow = Number(gallons_per_day) > 0;
@@ -137,7 +137,7 @@ export const septicDrainfieldCapacityExample = {
 // Onsite Wastewater Treatment Systems Manual (EPA/625/R-00/008), university
 // onsite-wastewater extension guidance, and the orifice-discharge equation.
 
-// dims: in { daily_flow_gpd: L^3, doses_per_day: dimensionless, drainback_gal: L^3, network_volume_gal: L^3 } out: { net_dose_gal: L^3, pumped_per_dose: L^3, pumped_per_day: L^3, doses_per_day: dimensionless, void_ratio: dimensionless }
+// dims: in { daily_flow_gpd: L^3 T^-1, doses_per_day: T^-1, drainback_gal: L^3, network_volume_gal: L^3 } out: { net_dose_gal: L^3, pumped_per_dose: L^3, pumped_per_day: L^3 T^-1, doses_per_day: T^-1, void_ratio: dimensionless }
 export function computeSepticDoseTank({ daily_flow_gpd, doses_per_day = 4, drainback_gal = 0, network_volume_gal = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const flow = Number(daily_flow_gpd);

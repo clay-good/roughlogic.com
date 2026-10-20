@@ -209,7 +209,7 @@ HYGIENE_RENDERERS["dilution-ventilation-solvent"] = _simpleRenderer({
 // =====================================================================
 // spec-v1732: respirator cartridge service life and change schedule.
 // =====================================================================
-// dims: in { estimated_life_hr: T, safety_fraction: dimensionless, shift_hours: T, concentration_ppm: dimensionless, worst_case_ppm: dimensionless, humidity_pct: dimensionless, humidity_derate_above_65: dimensionless } out: { schedule_hr: T, changes_per_shift: dimensionless, worst_case_life_hr: T, worst_case_schedule_hr: T, humidity_adjusted_hr: T, governing_schedule_hr: T, governing_changes_per_shift: dimensionless }
+// dims: in { estimated_life_hr: T, safety_fraction: dimensionless, shift_hours: T, concentration_ppm: dimensionless, worst_case_ppm: dimensionless, humidity_pct: dimensionless, humidity_derate_above_65: dimensionless } out: { schedule_hr: T, changes_per_shift: T^-1, worst_case_life_hr: T, worst_case_schedule_hr: T, humidity_adjusted_hr: T, governing_schedule_hr: T, governing_changes_per_shift: T^-1 }
 export function computeRespiratorCartridgeLife({
   estimated_life_hr = 0, safety_fraction = 0.5, shift_hours = 8,
   concentration_ppm = 0, worst_case_ppm = 0, humidity_pct = 50, humidity_derate_above_65 = 0.5,

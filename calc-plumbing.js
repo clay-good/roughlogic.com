@@ -2872,7 +2872,7 @@ export const TRAP_PRIMER_DRAINS_PER_UNIT = {
   pump_discharge: 4,
 };
 
-// dims: in { floor_drain_count: dimensionless, zone: dimensionless, prime_method: dimensionless, prime_volume_oz: L^3, cycles_per_day: dimensionless } out: { primers_needed: dimensionless, water_gal_per_year: L^3, floor_drain_count: dimensionless }
+// dims: in { floor_drain_count: dimensionless, zone: dimensionless, prime_method: dimensionless, prime_volume_oz: L^3, cycles_per_day: T^-1 } out: { primers_needed: dimensionless, water_gal_per_year: L^3 T^-1, floor_drain_count: dimensionless }
 export function computeTrapPrimer({
   floor_drain_count = 0,
   zone = "occupied",

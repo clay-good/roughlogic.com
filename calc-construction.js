@@ -8607,7 +8607,7 @@ CONSTRUCTION_RENDERERS["welded-wire-mesh"] = _v819renderWeldedWireMesh;
 // The placement-logistics complement to formwork-pressure, which takes the rate
 // of rise as an input this tile produces from the crew's placement rate and the
 // form footprint, plus the pour duration and the ready-mix delivery cadence.
-// dims: in { placement_rate_cyhr: L^3 T^-1, form_plan_area_ft2: L^2, total_volume_cy: L^3, truck_load_cy: L^3 } out: { rate_of_rise_ft_hr: L T^-1, pour_hours: T, trucks_per_hour: dimensionless }
+// dims: in { placement_rate_cyhr: L^3 T^-1, form_plan_area_ft2: L^2, total_volume_cy: L^3, truck_load_cy: L^3 } out: { rate_of_rise_ft_hr: L T^-1, pour_hours: T, trucks_per_hour: T^-1 }
 export function computeConcretePourRate({ placement_rate_cyhr = 0, form_plan_area_ft2 = 0, total_volume_cy = 0, truck_load_cy = 10 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(placement_rate_cyhr > 0)) return { error: "Placement rate must be positive (cy/hr)." };

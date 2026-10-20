@@ -155,7 +155,7 @@ export const EXERTION_KCAL_FACTOR = {
 };
 
 // dims: in { body_weight_lb: M, ambient_band: dimensionless, exertion: dimensionless, trip_days: dimensionless, group_size: dimensionless }
-//        out: { water_per_day_l: L^3, kcal_per_day: M L^2 T^-2, trip_water_l: L^3, trip_kcal: M L^2 T^-2 }
+//        out: { water_per_day_l: L^3, kcal_per_day: M L^2 T^-3, trip_water_l: L^3, trip_kcal: M L^2 T^-2 }
 // (Body weight is mass `M`; ambient / exertion / count inputs are
 //  dimensionless. Water in liters is volume `L^3`. Caloric energy
 //  in kcal is energy `M L^2 T^-2` (kcal = 4184 J = 4184 m^2 kg/s^2).

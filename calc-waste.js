@@ -160,7 +160,7 @@ WASTE_RENDERERS["landfill-airspace-density"] = _simpleRenderer({
 // which is why these projects are built in modules that come out as the gas
 // falls rather than as one engine that never runs full again.
 
-// dims: in { annual_tons: M, placement_years: T, methane_yield_m3_per_mg: L^3, decay_constant_per_year: T^-1, methane_fraction_pct: dimensionless, collection_efficiency_pct: dimensionless, methane_heating_value_btu_per_cf: M L^-1 T^-2, generator_efficiency_pct: dimensionless } out: { methane_m3_per_year: L^3, methane_cfm: L^3 T^-1, landfill_gas_cfm: L^3 T^-1, heat_rate_mmbtu_per_hr: M L^2 T^-3, gross_capacity_kw: M L^2 T^-3, collected_capacity_kw: M L^2 T^-3, capacity_10yr_kw: M L^2 T^-3, capacity_10yr_pct: dimensionless, capacity_20yr_kw: M L^2 T^-3, capacity_20yr_pct: dimensionless, uncollected_capacity_kw: M L^2 T^-3 }
+// dims: in { annual_tons: M, placement_years: T, methane_yield_m3_per_mg: L^3, decay_constant_per_year: T^-1, methane_fraction_pct: dimensionless, collection_efficiency_pct: dimensionless, methane_heating_value_btu_per_cf: M L^-1 T^-2, generator_efficiency_pct: dimensionless } out: { methane_m3_per_year: L^3 T^-1, methane_cfm: L^3 T^-1, landfill_gas_cfm: L^3 T^-1, heat_rate_mmbtu_per_hr: M L^2 T^-3, gross_capacity_kw: M L^2 T^-3, collected_capacity_kw: M L^2 T^-3, capacity_10yr_kw: M L^2 T^-3, capacity_10yr_pct: dimensionless, capacity_20yr_kw: M L^2 T^-3, capacity_20yr_pct: dimensionless, uncollected_capacity_kw: M L^2 T^-3 }
 export function computeLandfillGasGeneration({ annual_tons = 0, placement_years = 0, methane_yield_m3_per_mg = 0, decay_constant_per_year = 0, methane_fraction_pct = 0, collection_efficiency_pct = 0, methane_heating_value_btu_per_cf = 0, generator_efficiency_pct = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   // An efficiency is a percent; 0 < value < 1 is a fraction typed into a percent field (added 2026-09-26).
@@ -234,7 +234,7 @@ WASTE_RENDERERS["landfill-gas-generation"] = _simpleRenderer({
 // every acre it caps takes it away. Storage rides out the peak; treatment
 // capacity cannot.
 
-// dims: in { open_acres: L^2, annual_precip_in: L, runoff_coefficient: dimensionless, evapotranspiration_coefficient: dimensionless, capped_infiltration_in_per_year: L, design_storm_in: L } out: { infiltration_in_per_year: L, leachate_gal_per_year: L^3, leachate_gpd: L^3 T^-1, gpd_per_acre: L T^-1, capped_gal_per_year: L^3, storm_volume_gal: L^3, area_sqft: L^2, capped_gpd: L^3 T^-1, capping_reduction_pct: dimensionless, deferred_cap_gpd: L^3 T^-1, infiltration_fraction: dimensionless }
+// dims: in { open_acres: L^2, annual_precip_in: L, runoff_coefficient: dimensionless, evapotranspiration_coefficient: dimensionless, capped_infiltration_in_per_year: L T^-1, design_storm_in: L } out: { infiltration_in_per_year: L T^-1, leachate_gal_per_year: L^3 T^-1, leachate_gpd: L^3 T^-1, gpd_per_acre: L T^-1, capped_gal_per_year: L^3 T^-1, storm_volume_gal: L^3, area_sqft: L^2, capped_gpd: L^3 T^-1, capping_reduction_pct: dimensionless, deferred_cap_gpd: L^3 T^-1, infiltration_fraction: dimensionless }
 export function computeLeachateWaterBalance({ open_acres = 0, annual_precip_in = 0, runoff_coefficient = 0, evapotranspiration_coefficient = 0, capped_infiltration_in_per_year = 0, design_storm_in = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   if (!(open_acres > 0)) return { error: "The open area must be positive." };
@@ -295,7 +295,7 @@ WASTE_RENDERERS["leachate-water-balance"] = _simpleRenderer({
 // is the case for alternative daily cover -- but the cover is doing a job, and
 // an alternative has to be APPROVED as meeting those purposes first.
 
-// dims: in { face_length_ft: L, face_width_ft: L, cover_depth_in: L, operating_days: T, airspace_value_per_cy: dimensionless, annual_tons: M, in_place_density_lb_per_cy: M L^-3, alternative_cover_annual_cost: dimensionless } out: { cover_cy_per_day: L^3, cover_cy_per_year: L^3, cover_share_pct: dimensionless, cover_airspace_value: dimensionless, net_saving: dimensionless, face_area_sqft: L^2, total_airspace_cy: L^3, waste_airspace_cy: L^3 }
+// dims: in { face_length_ft: L, face_width_ft: L, cover_depth_in: L, operating_days: T, airspace_value_per_cy: dimensionless, annual_tons: M, in_place_density_lb_per_cy: M L^-3, alternative_cover_annual_cost: dimensionless } out: { cover_cy_per_day: L^3 T^-1, cover_cy_per_year: L^3 T^-1, cover_share_pct: dimensionless, cover_airspace_value: dimensionless, net_saving: dimensionless, face_area_sqft: L^2, total_airspace_cy: L^3, waste_airspace_cy: L^3 }
 export function computeDailyCoverVolume({ face_length_ft = 0, face_width_ft = 0, cover_depth_in = 0, operating_days = 0, airspace_value_per_cy = 0, annual_tons = 0, in_place_density_lb_per_cy = 0, alternative_cover_annual_cost = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   if (!(face_length_ft > 0) || !(face_width_ft > 0)) return { error: "Working face dimensions must be positive." };
@@ -434,7 +434,7 @@ WASTE_RENDERERS["collection-route-productivity"] = _simpleRenderer({
 // the trailers can be late, which is a judgement about the highway rather than
 // about the waste.
 
-// dims: in { daily_tons: M, operating_hours: T, peak_hour_share_pct: dimensionless, collection_payload_tons: M, floor_time_min: T, trailer_payload_tons: M, trailer_round_trip_hr: T, loose_density_lb_per_cy: M L^-3, pile_depth_ft: L, manoeuvring_factor: dimensionless, loadout_delay_hr: T } out: { peak_hour_tons: M, peak_arrivals_per_hour: T^-1, unloading_positions: dimensionless, trailer_loads_per_day: dimensionless, trailer_fleet: dimensionless, surge_floor_sqft: L^2, surge_cy: L^3, surge_footprint_sqft: L^2 }
+// dims: in { daily_tons: M, operating_hours: T, peak_hour_share_pct: dimensionless, collection_payload_tons: M, floor_time_min: T, trailer_payload_tons: M, trailer_round_trip_hr: T, loose_density_lb_per_cy: M L^-3, pile_depth_ft: L, manoeuvring_factor: dimensionless, loadout_delay_hr: T } out: { peak_hour_tons: M, peak_arrivals_per_hour: T^-1, unloading_positions: dimensionless, trailer_loads_per_day: T^-1, trailer_fleet: dimensionless, surge_floor_sqft: L^2, surge_cy: L^3, surge_footprint_sqft: L^2 }
 export function computeTransferStationThroughput({ daily_tons = 0, operating_hours = 0, peak_hour_share_pct = 0, collection_payload_tons = 0, floor_time_min = 0, trailer_payload_tons = 0, trailer_round_trip_hr = 0, loose_density_lb_per_cy = 0, pile_depth_ft = 0, manoeuvring_factor = 0, loadout_delay_hr = 0 } = {}) {
   if (operating_hours > 0 && peak_hour_share_pct > 0 && peak_hour_share_pct < 100 / operating_hours - 1e-9) return { error: "The peak hour cannot carry less than an average hour (" + (100 / operating_hours).toFixed(1) + "% of the day here)." };
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
@@ -820,7 +820,7 @@ WASTE_RENDERERS["collection-vehicle-payload"] = _simpleRenderer({
 // whether the face can still be worked, because density lost to a crowded face
 // costs far more airspace than the cover ever saves.
 
-// dims: in { daily_tons: M, in_place_density_lb_per_cy: M L^-3, face_width_ft: L, lift_height_ft: L, face_slope_run: dimensionless, cover_depth_in: L, layer_thickness_ft: L, passes_per_layer: dimensionless, narrow_face_width_ft: L } out: { daily_volume_cy: L^3, advance_ft_per_day: L, slope_length_ft: L, exposed_sqft: L^2, cover_cy: L^3, total_passes: dimensionless, cover_reduction_pct: dimensionless, cover_share_of_waste_pct: dimensionless, exposed_reduction_pct: dimensionless, face_sqft: L^2, narrow_cover_cy: L^3, narrow_exposed_sqft: L^2, narrow_face_sqft: L^2, narrow_top_sqft: L^2, top_sqft: L^2 }
+// dims: in { daily_tons: M, in_place_density_lb_per_cy: M L^-3, face_width_ft: L, lift_height_ft: L, face_slope_run: dimensionless, cover_depth_in: L, layer_thickness_ft: L, passes_per_layer: dimensionless, narrow_face_width_ft: L } out: { daily_volume_cy: L^3, advance_ft_per_day: L T^-1, slope_length_ft: L, exposed_sqft: L^2, cover_cy: L^3, total_passes: dimensionless, cover_reduction_pct: dimensionless, cover_share_of_waste_pct: dimensionless, exposed_reduction_pct: dimensionless, face_sqft: L^2, narrow_cover_cy: L^3, narrow_exposed_sqft: L^2, narrow_face_sqft: L^2, narrow_top_sqft: L^2, top_sqft: L^2 }
 export function computeWorkingFaceCellLift({ daily_tons = 0, in_place_density_lb_per_cy = 0, face_width_ft = 0, lift_height_ft = 0, face_slope_run = 0, cover_depth_in = 0, layer_thickness_ft = 0, passes_per_layer = 0, narrow_face_width_ft = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   if (!(daily_tons > 0) || !(in_place_density_lb_per_cy > 0)) return { error: "Daily tonnage and in-place density must be positive." };
