@@ -2,7 +2,7 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "a71e935f931cbe4d",
+      "sha": "e463df6408850015",
       "date": "2026-10-20"
     },
     "/tools/": {
@@ -10,8 +10,8 @@
       "date": "2026-10-20"
     },
     "/errata/": {
-      "sha": "0312a4d1611f6171",
-      "date": "2026-10-18"
+      "sha": "44f91a53d13c6c42",
+      "date": "2026-10-20"
     },
     "/collections/disaster-response/": {
       "sha": "4b520075bada167a",
@@ -522,7 +522,7 @@
       "date": "2026-10-17"
     },
     "/tools/bath-exhaust-fan-sizing/": {
-      "sha": "de694a50bbff8723",
+      "sha": "f7af11c6ab24f90e",
       "date": "2026-10-20"
     },
     "/tools/battery-c-rate/": {
@@ -3038,7 +3038,7 @@
       "date": "2026-10-17"
     },
     "/tools/fireplace-clearance-check/": {
-      "sha": "17c818e8d05325af",
+      "sha": "b1a1d5eef0f28655",
       "date": "2026-10-20"
     },
     "/tools/fireplace-flue-area/": {
@@ -3230,7 +3230,7 @@
       "date": "2026-10-17"
     },
     "/tools/foundation-grade-slope-check/": {
-      "sha": "3c616c56d589de47",
+      "sha": "c89bd56a37d170ab",
       "date": "2026-10-20"
     },
     "/tools/foundation-waterproofing-takeoff/": {
