@@ -1,6 +1,6 @@
 # spec-v1976.md -- Search in Spanish
 
-> **Status: PROPOSED (2026-10-19). Platform spec, no tile added. Part of [scope-product-expansion](scope-product-expansion.md). In scope under the spec-v106 trades-only charter: the same US tradesperson, the same calculators, one more language in the search box.** Catalog stays at **2,267**.
+> **Status: LANDED 2026-10-20 (proposed 2026-10-19), mechanism only; Spanish rows await review. Platform spec, no tile added. Built: diacritic folding in the tokenizer (which until now dropped accented letters entirely), the Spanish unit spellings, a `calibre 12` rewrite, the `es` alias kind gated on `reviewed_by` in `check-alias-targets`, and a 40-row machine draft in `docs/aliases-es-draft.json`. Not done, by this spec's own rule: no row is shipped until a Spanish-speaking tradesperson or the maintainer reviews it, so the 20 Spanish questions with numbers cannot fill fields yet; `search-es.test.js` already holds every shipped `es` row to ranking its tile first, so reviewed rows are tested the moment they land. Part of [scope-product-expansion](scope-product-expansion.md). In scope under the spec-v106 trades-only charter: the same US tradesperson, the same calculators, one more language in the search box.** Catalog stays at **2,267**.
 
 ## What it does for you
 

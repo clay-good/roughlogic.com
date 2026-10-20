@@ -66,6 +66,17 @@ for (const row of master.aliases || []) {
     errors.push(`  "${row.term}" has kind "${row.kind}", which the file's own _schema does not name (${[...declaredKinds].join(", ")})`);
   }
 }
+// spec-v1976: a Spanish row ships only once a Spanish-speaking tradesperson or
+// the maintainer has checked it; the machine-drafted queue lives in
+// docs/aliases-es-draft.json, which nothing ships.
+let spanish = 0;
+for (const row of master.aliases || []) {
+  if (!row || row.kind !== "es") continue;
+  spanish++;
+  if (typeof row.reviewed_by !== "string" || !row.reviewed_by.trim()) {
+    errors.push(`  "${row.term}" is a Spanish (es) row with no reviewed_by; leave it in docs/aliases-es-draft.json until someone who reads Spanish checks it`);
+  }
+}
 for (const row of master.aliases || []) {
   if (!row || typeof row.term !== "string" || typeof row.target !== "string") continue;
   if (!byId.has(row.target)) continue; // build-alias-shards --check owns dangling targets
@@ -86,4 +97,4 @@ if (errors.length) {
   console.error("Fix the row in data/search/aliases.json (re-point the target, or use a kind the _schema names) and rerun scripts/build-alias-shards.mjs.");
   process.exit(1);
 }
-console.log(`check-alias-targets OK: ${constrained} of ${(master.aliases || []).length} alias terms name a tile exactly and every one targets it; every row carries one of the ${declaredKinds.size} kinds the file declares.`);
+console.log(`check-alias-targets OK: ${constrained} of ${(master.aliases || []).length} alias terms name a tile exactly and every one targets it; every row carries one of the ${declaredKinds.size} kinds the file declares; ${spanish} reviewed Spanish row(s).`);

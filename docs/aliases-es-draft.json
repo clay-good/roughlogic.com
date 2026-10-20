@@ -1,0 +1,246 @@
+{
+ "_comment": "spec-v1976 draft queue of Spanish search aliases. Machine-drafted 2026-10-20 and NOT shipped: a row moves to data/search/aliases.json as kind 'es' only after a Spanish-speaking tradesperson or the maintainer checks it and adds reviewed_by. Terms are written without accents because the search folds them.",
+ "drafted_on": "2026-10-20",
+ "rows": [
+  {
+   "term": "caida de voltaje",
+   "target": "voltage-drop",
+   "kind": "es",
+   "drafted_by": "machine"
+  },
+  {
+   "term": "cuanta caida de voltaje tiene mi cable",
+   "target": "voltage-drop",
+   "kind": "es",
+   "drafted_by": "machine"
+  },
+  {
+   "term": "amperaje del cable",
+   "target": "wire-ampacity",
+   "kind": "es",
+   "drafted_by": "machine"
+  },
+  {
+   "term": "cuantos amperios aguanta un cable calibre 12",
+   "target": "wire-ampacity",
+   "kind": "es",
+   "drafted_by": "machine"
+  },
+  {
+   "term": "ley de ohm",
+   "target": "ohms-law",
+   "kind": "es",
+   "drafted_by": "machine"
+  },
+  {
+   "term": "llenado de caja electrica",
+   "target": "box-fill",
+   "kind": "es",
+   "drafted_by": "machine"
+  },
+  {
+   "term": "llenado de tubo conduit",
+   "target": "conduit-fill",
+   "kind": "es",
+   "drafted_by": "machine"
+  },
+  {
+   "term": "cuantos enchufes necesita un cuarto",
+   "target": "wall-receptacle-count",
+   "kind": "es",
+   "drafted_by": "machine"
+  },
+  {
+   "term": "enchufes en la encimera de la cocina",
+   "target": "countertop-receptacle-count",
+   "kind": "es",
+   "drafted_by": "machine"
+  },
+  {
+   "term": "doblez de offset en tubo conduit",
+   "target": "conduit-offset",
+   "kind": "es",
+   "drafted_by": "machine"
+  },
+  {
+   "term": "cuantas yardas de concreto",
+   "target": "concrete",
+   "kind": "es",
+   "drafted_by": "machine"
+  },
+  {
+   "term": "volumen de concreto",
+   "target": "concrete",
+   "kind": "es",
+   "drafted_by": "machine"
+  },
+  {
+   "term": "diseno de mezcla de concreto",
+   "target": "concrete-mix-design",
+   "kind": "es",
+   "drafted_by": "machine"
+  },
+  {
+   "term": "cuantas hojas de tablaroca",
+   "target": "drywall",
+   "kind": "es",
+   "drafted_by": "machine"
+  },
+  {
+   "term": "tornillos para tablaroca",
+   "target": "drywall-fastener-takeoff",
+   "kind": "es",
+   "drafted_by": "machine"
+  },
+  {
+   "term": "pendiente del techo",
+   "target": "roof-pitch",
+   "kind": "es",
+   "drafted_by": "machine"
+  },
+  {
+   "term": "cuadros de techo para tejas",
+   "target": "roofing-squares",
+   "kind": "es",
+   "drafted_by": "machine"
+  },
+  {
+   "term": "calculadora de escaleras",
+   "target": "stairs",
+   "kind": "es",
+   "drafted_by": "machine"
+  },
+  {
+   "term": "zanca de escalera",
+   "target": "stair-stringer",
+   "kind": "es",
+   "drafted_by": "machine"
+  },
+  {
+   "term": "claro maximo de vigas de madera",
+   "target": "lumber-spans",
+   "kind": "es",
+   "drafted_by": "machine"
+  },
+  {
+   "term": "cuanta pintura necesito",
+   "target": "paint-coverage",
+   "kind": "es",
+   "drafted_by": "machine"
+  },
+  {
+   "term": "cuantos azulejos necesito",
+   "target": "tile-count",
+   "kind": "es",
+   "drafted_by": "machine"
+  },
+  {
+   "term": "donde empezar a colocar azulejo",
+   "target": "tile-layout-cut-balance",
+   "kind": "es",
+   "drafted_by": "machine"
+  },
+  {
+   "term": "desnivel entre azulejos permitido",
+   "target": "tile-flatness-lippage-check",
+   "kind": "es",
+   "drafted_by": "machine"
+  },
+  {
+   "term": "mortero para base de regadera",
+   "target": "shower-pan-mortar-bed",
+   "kind": "es",
+   "drafted_by": "machine"
+  },
+  {
+   "term": "tamano de tuberia de agua",
+   "target": "pipe-sizing",
+   "kind": "es",
+   "drafted_by": "machine"
+  },
+  {
+   "term": "tamano de tuberia de gas",
+   "target": "gas-pipe-sizing",
+   "kind": "es",
+   "drafted_by": "machine"
+  },
+  {
+   "term": "carga de refrigerante",
+   "target": "refrigerant-charge",
+   "kind": "es",
+   "drafted_by": "machine"
+  },
+  {
+   "term": "extractor de bano cuantos cfm",
+   "target": "bath-exhaust-fan-sizing",
+   "kind": "es",
+   "drafted_by": "machine"
+  },
+  {
+   "term": "necesita vidrio templado esta ventana",
+   "target": "safety-glazing-check",
+   "kind": "es",
+   "drafted_by": "machine"
+  },
+  {
+   "term": "extension del hogar de la chimenea",
+   "target": "hearth-extension-check",
+   "kind": "es",
+   "drafted_by": "machine"
+  },
+  {
+   "term": "altura de la chimenea sobre el techo",
+   "target": "chimney-termination-height",
+   "kind": "es",
+   "drafted_by": "machine"
+  },
+  {
+   "term": "pendiente del terreno junto a la cimentacion",
+   "target": "foundation-grade-slope-check",
+   "kind": "es",
+   "drafted_by": "machine"
+  },
+  {
+   "term": "cuanta grava necesito",
+   "target": "aggregate",
+   "kind": "es",
+   "drafted_by": "machine"
+  },
+  {
+   "term": "postes y vigas para terraza",
+   "target": "deck-beam-post",
+   "kind": "es",
+   "drafted_by": "machine"
+  },
+  {
+   "term": "calcular pendiente",
+   "target": "slope",
+   "kind": "es",
+   "drafted_by": "machine"
+  },
+  {
+   "term": "espesor de aislamiento",
+   "target": "insulation-thickness",
+   "kind": "es",
+   "drafted_by": "machine"
+  },
+  {
+   "term": "carga de nieve en el techo",
+   "target": "snow-load",
+   "kind": "es",
+   "drafted_by": "machine"
+  },
+  {
+   "term": "conector contra huracanes para armadura",
+   "target": "truss-uplift-connector",
+   "kind": "es",
+   "drafted_by": "machine"
+  },
+  {
+   "term": "prueba de cloruro de calcio en losa",
+   "target": "mver-calcium-chloride",
+   "kind": "es",
+   "drafted_by": "machine"
+  }
+ ]
+}

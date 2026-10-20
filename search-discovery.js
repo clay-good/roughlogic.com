@@ -254,9 +254,17 @@ export const TOKEN_SYNONYMS = new Map([
 // on whitespace. Compound tokens ("three-phase", "kw/ton") also emit their
 // separator-split parts. `keepCompound` keeps the unsplit compound in the
 // output (used for the corpus side so both shapes are matchable).
+// spec-v1976: fold accented vowels, the tilde n and the diaeresis u to their
+// base letters, so "caída", "caida" and "CAIDA" meet. Until it was added the
+// tokenizer below dropped an accented letter outright ("ca da"). English text
+// has nothing to fold.
+export function foldDiacritics(text) {
+  return String(text).normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+}
+
 function tokenize(text, keepCompound) {
   if (typeof text !== "string" || !text) return [];
-  const rough = text.toLowerCase().replace(/[^a-z0-9\-/.]+/g, " ").split(" ");
+  const rough = foldDiacritics(text).toLowerCase().replace(/[^a-z0-9\-/.]+/g, " ").split(" ");
   const out = [];
   for (const tok of rough) {
     const t = tok.replace(/^[-/.]+|[-/.]+$/g, "");

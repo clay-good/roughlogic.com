@@ -76,6 +76,8 @@ const REWRITES = [
   // emits only `12 awg` and lets the rule below add the name, so a query
   // containing `#12` does not come out as `wire size wire size 12 awg`.
   [/#\s*(\d+)\b/g, (m, n) => `${n} awg`],
+  // spec-v1976: Spanish names the gauge first ("calibre 12").
+  [/\bcalibre\s*(\d+)\b/g, (m, n) => `${n} awg`],
   [/\b(\d+)\s*(?:awg|ga|gauge)\b/g, (m, n) => `wire size ${n} awg`],
   // A dual voltage names the higher leg, which is the one a calculation wants.
   [/\b(\d+)\s*\/\s*(\d+)\s*v(?:ac|olts?)?\b/g,

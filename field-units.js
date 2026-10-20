@@ -31,8 +31,11 @@
 // what a person types into the search box ("150 feet", "12 awg", "20 amps").
 const UNIT_SPELLINGS = {
   // length
-  in: ["in", "inch", "inches", '"'],
-  ft: ["ft", "foot", "feet", "'"],
+  // spec-v1976: the Spanish spellings a reader types (pie, pulgada, libra...),
+  // compared after diacritics are folded. Metro/metros are deliberately absent:
+  // a metric length is refused, as it is in English.
+  in: ["in", "inch", "inches", '"', "pulg", "pulgada", "pulgadas"],
+  ft: ["ft", "foot", "feet", "'", "pie", "pies"],
   yd: ["yd", "yard", "yards"],
   mi: ["mi", "mile", "miles"],
   mm: ["mm", "millimeter", "millimeters"],
@@ -50,11 +53,11 @@ const UNIT_SPELLINGS = {
   ft3: ["ft³", "ft3", "cu ft", "cuft", "cubic feet", "cubic foot"],
   yd3: ["yd³", "yd3", "cu yd", "cubic yards"],
   cy: ["cy", "cubic yard", "cubic yards"],
-  gal: ["gal", "gallon", "gallons"],
+  gal: ["gal", "gallon", "gallons", "galon", "galones"],
   l: ["l", "liter", "liters", "litre", "litres"],
   ml: ["ml", "milliliter", "milliliters"],
   // mass / force
-  lb: ["lb", "lbs", "pound", "pounds"],
+  lb: ["lb", "lbs", "pound", "pounds", "libra", "libras"],
   kg: ["kg", "kilogram", "kilograms"],
   g: ["g", "gram", "grams"],
   oz: ["oz", "ounce", "ounces"],
@@ -93,16 +96,16 @@ const UNIT_SPELLINGS = {
   mgd: ["mgd"],
   lpm: ["lpm", "l/min"],
   // electrical
-  v: ["v", "volt", "volts", "vac", "vdc"],
-  a: ["a", "amp", "amps", "ampere", "amperes"],
-  w: ["w", "watt", "watts"],
+  v: ["v", "volt", "volts", "vac", "vdc", "voltio", "voltios"],
+  a: ["a", "amp", "amps", "ampere", "amperes", "amperio", "amperios"],
+  w: ["w", "watt", "watts", "vatio", "vatios"],
   kw: ["kw", "kilowatt", "kilowatts"],
   kwh: ["kwh"],
   kva: ["kva"],
   va: ["va"],
   hp: ["hp", "horsepower"],
   ohm: ["ohm", "ohms"],
-  awg: ["awg", "ga", "gauge"],
+  awg: ["awg", "ga", "gauge", "calibre"],
   // heat
   btu: ["btu"],
   btuh: ["btu/hr", "btu/h", "btuh", "btu/hour"],
@@ -132,7 +135,7 @@ for (const [canon, spellings] of Object.entries(UNIT_SPELLINGS)) {
 }
 
 function tidy(token) {
-  return String(token || "").toLowerCase().replace(/\s+/g, " ").trim();
+  return String(token || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/\s+/g, " ").trim();
 }
 
 // Resolve one token to its canonical unit, or null when it is not a unit we
