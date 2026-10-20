@@ -1524,6 +1524,8 @@ const _TILES = [
   // spec-v1984 and spec-v1992: chimney termination height and fireplace clearance (calc-masonry.js).
   ["chimney-termination-height", "E"],
   ["fireplace-clearance-check", "E"],
+  // spec-v1985: truss and rafter uplift connector demand (calc-construction.js).
+  ["truss-uplift-connector", "E"],
 ];
 
 

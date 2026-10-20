@@ -2429,6 +2429,8 @@ const RELATED = {
   // spec-v1984 and spec-v1992: chimney termination height and fireplace clearance (calc-masonry.js).
   "chimney-termination-height": ["hearth-extension-check","fireplace-clearance-check","fireplace-flue-area","chimney-height-for-draft"],
   "fireplace-clearance-check": ["hearth-extension-check","chimney-termination-height","fireplace-flue-area","mortar-mix"],
+  // spec-v1985: truss and rafter uplift connector demand (calc-construction.js).
+  "truss-uplift-connector": ["asce7-load-combinations","wind-cc-pressure","wood-nail-withdrawal","anchor-embedment"],
 };
 
 export { RELATED };

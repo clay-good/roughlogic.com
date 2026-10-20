@@ -559,3 +559,16 @@ test("safety-glazing-check: near water, hazardous exactly when the bottom is und
     assert.equal(r.hazardous, bottom_in < 60 && distance_in <= 60);
   }
 });
+
+// spec-v1985: take moments about the far bearing with the load chopped into strips.
+import { computeTrussUpliftConnector } from "../../calc-construction.js";
+test("truss-uplift-connector: the near reaction from summing strip moments about the far bearing matches", () => {
+  for (const [s, L, o, p, d] of [[24, 32, 0, 28.4, 12], [16, 24, 1.5, 40, 15], [24, 40, 2, 60, 8]]) {
+    const w = (s / 12) * (0.6 * p - 0.6 * d), n = 20000, len = L + o;
+    let m = 0;
+    for (let i = 0; i < n; i++) { const x = -o + len * (i + 0.5) / n; m += w * (len / n) * (L - x); } // x from the near bearing
+    const r = computeTrussUpliftConnector({ spacing_in: s, span_ft: L, overhang_ft: o, uplift_psf: p, dead_psf: d, allowable_lb: 1000, connectors: 2 });
+    assert.ok(Math.abs(r.net_uplift_lb - Math.max(0, m / L)) < 1e-6, JSON.stringify([s, L, o, p, d]));
+    assert.ok(Math.abs(r.per_connector_lb * 2 - r.net_uplift_lb) < 1e-9);
+  }
+});

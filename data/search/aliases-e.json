@@ -6463,6 +6463,11 @@
     {"term":"how far above the firebox can the mantel be","target":"fireplace-clearance-check","kind":"question"},
     {"term":"1/8 inch per inch mantel projection rule","target":"fireplace-clearance-check","kind":"industry"},
     {"term":"combustible clearance to masonry fireplace 2 inches","target":"fireplace-clearance-check","kind":"industry"},
-    {"term":"R1001.11 fireplace clearance","target":"fireplace-clearance-check","kind":"industry"}
+    {"term":"R1001.11 fireplace clearance","target":"fireplace-clearance-check","kind":"industry"},
+    {"term":"hurricane tie uplift load","target":"truss-uplift-connector","kind":"industry"},
+    {"term":"truss uplift per end","target":"truss-uplift-connector","kind":"industry"},
+    {"term":"how much uplift does a rafter tie need","target":"truss-uplift-connector","kind":"question"},
+    {"term":"net uplift on a truss connector","target":"truss-uplift-connector","kind":"industry"},
+    {"term":"H2.5 enough for this uplift","target":"truss-uplift-connector","kind":"industry"}
   ]
 }

@@ -172451,6 +172451,88 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "truss-uplift-connector",
+  "source_publisher": "Project (first-principles)",
+  "source_title": "spec-v1985 worked example, recomputed",
+  "source_edition_or_year": "2026",
+  "source_section_or_page": "A = 24/12 x 32/2 = 32 sq ft; W = 28.4 x 32 = 908.8 lb; D = 12 x 32 = 384 lb; U = 0.6 x 908.8 - 0.6 x 384 = 314.88 lb; 314.88 / 585 = 0.538.",
+  "verified_by": "rl",
+  "verified_on": "2026-10-19",
+  "inputs": {
+   "spacing_in": 24,
+   "span_ft": 32,
+   "overhang_ft": 0,
+   "uplift_psf": 28.4,
+   "dead_psf": 12,
+   "allowable_lb": 585,
+   "connectors": 1
+  },
+  "outputs": {
+   "tributary_sqft": {
+    "value": 32,
+    "tolerance": {
+     "abs": 1e-9
+    }
+   },
+   "net_uplift_lb": {
+    "value": 314.88,
+    "tolerance": {
+     "abs": 0.000001
+    }
+   },
+   "utilization": {
+    "value": 0.538256,
+    "tolerance": {
+     "pct": 0.01
+    }
+   },
+   "connectors_needed": {
+    "value": 1,
+    "tolerance": {
+     "abs": 0
+    }
+   }
+  }
+ },
+ {
+  "tile_id": "truss-uplift-connector",
+  "source_publisher": "Project (first-principles)",
+  "source_title": "spec-v1985 second example, recomputed",
+  "source_edition_or_year": "2026",
+  "source_section_or_page": "45 psf, 36 ft span, 10 psf roof: A = 36 sq ft; U = 0.6 x 1,620 - 0.6 x 360 = 756 lb; 756 / 585 = 1.292; two ties needed.",
+  "verified_by": "rl",
+  "verified_on": "2026-10-19",
+  "inputs": {
+   "spacing_in": 24,
+   "span_ft": 36,
+   "overhang_ft": 0,
+   "uplift_psf": 45,
+   "dead_psf": 10,
+   "allowable_lb": 585,
+   "connectors": 1
+  },
+  "outputs": {
+   "net_uplift_lb": {
+    "value": 756,
+    "tolerance": {
+     "abs": 0.000001
+    }
+   },
+   "utilization": {
+    "value": 1.292308,
+    "tolerance": {
+     "pct": 0.01
+    }
+   },
+   "connectors_needed": {
+    "value": 2,
+    "tolerance": {
+     "abs": 0
+    }
+   }
+  }
  }
  ]
 }

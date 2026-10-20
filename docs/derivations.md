@@ -1815,6 +1815,7 @@ cross-check.
 | calc-construction.js | `computeTileCount` | `{ area_ft2, tile_width_in, tile_height_in, grout_joint_width_in = 0.125, tile...` | _ | _ | _ |
 | calc-construction.js | `computeTrafficTaperLength` | `{ offset_width_ft = 12, speed_mph = 55, device_spacing_ft = 40 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeTrimLinearFootage` | `{ perimeter_ft = 0, openings_ft = 0, waste_pct = 10, stock_len_ft = 16, sprin...` | _ | _ | _ |
+| calc-construction.js | `computeTrussUpliftConnector` | `{ spacing_in, span_ft, overhang_ft = 0, uplift_psf, dead_psf, allowable_lb, c...` | _ | _ | _ |
 | calc-construction.js | `computeTurningAndClearFloorSpace` | `{ cfs_width_in = 0, cfs_depth_in = 0, approach = "forward", alcove_depth_in =...` | _ | _ | _ |
 | calc-construction.js | `computeVaporBarrierRolls` | `{ area_sf = 3000, roll_coverage_sf = 1000, overlap_waste_pct = 10, roll_width...` | _ | _ | _ |
 | calc-construction.js | `computeWallBracingLength` | `{ wall_line_length_ft = 0, bracing_percent = 0, provided_length_ft = 0, metho...` | _ | _ | _ |
@@ -3946,7 +3947,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2530.
+Row count: 2531.
 
 <!-- END function-corpus-v14 -->
 
@@ -4734,7 +4735,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-extraction-rate` | Water Extraction Volume, Time, and Waste-Tank Dumps | Project (first-principles); standing + absorbed; wand time = total / gpm | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+4 more) |
 
-### Group E Construction (635 tiles)
+### Group E Construction (636 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -5310,6 +5311,7 @@ per spec-v14 §13.1 second paragraph.
 | `traction-roping-ratio` | Elevator Traction Roping Ratio, Torque, and Rope Tension | Project (first-principles); ASME A17.1 and the equipment manufacturer named | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `traffic-taper-length` | Work-Zone Merging Taper Length and Device Count (MUTCD) | MUTCD merging-taper identity (public-...; S >= 45: L = 12*55 = 660 ft; devices = ceil(660/40)+1 = 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `trim-linear-footage` | Trim Linear Footage and Miters | finish-carpentry practice; spec-v440 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
+| `truss-uplift-connector` | Truss and Rafter Uplift Connector Demand | Project (first-principles); A = 24/12 x 32/2 = 32 sq ft; W = 28.4 x 32 = 908.8 lb; D ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `tube-bend-wall-thinning` | Tube Bend Wall Thinning and Bend Ratio | Project (first-principles); wall x CLR / (CLR + OD/2) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `turning-clear-floor-space` | Turning Space and Clear Floor Space (2010 ADA Standards 304, 305) | US Department of Justice / US Access ...; 305.3 gives 30 in by 48 in and 305.5 requires it 'positio... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `turnout-frog-lead` | Turnout Frog Angle, Separation, and Clearance Point | Project (first-principles); lead entered from the railroad's standard plan | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -6395,6 +6397,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 
-Tile count: 2276. Fixture-covered or reference-cadence: 2276 / 2276.
+Tile count: 2277. Fixture-covered or reference-cadence: 2277 / 2277.
 
 <!-- END tile-index-v14 -->

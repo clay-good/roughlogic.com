@@ -620,6 +620,7 @@ export const TOOL_MODULES = (() => {
     // spec-v553
     "snow-unbalanced-gable",
     "safety-glazing-check",
+    "truss-uplift-connector",
   ]);
   // spec-v1871 cap-relief split: the specialty-building and temporary-works
   // tail moved intact from calc-construction.js. All 11 tiles keep Group E

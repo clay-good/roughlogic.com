@@ -2383,6 +2383,7 @@ export const COMPUTE_MAP = {
   "hearth-extension-check": { module: "../../calc-masonry.js", fn: "computeHearthExtensionCheck" },
   "chimney-termination-height": { module: "../../calc-masonry.js", fn: "computeChimneyTerminationHeight" },
   "fireplace-clearance-check": { module: "../../calc-masonry.js", fn: "computeFireplaceClearanceCheck" },
+  "truss-uplift-connector": { module: "../../calc-construction.js", fn: "computeTrussUpliftConnector" },
 };
 
 // Resolve a COMPUTE_MAP module path (relative to this file) and import it.

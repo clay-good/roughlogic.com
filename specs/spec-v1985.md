@@ -1,6 +1,6 @@
 # roughlogic.com Specification v1985 -- Truss and Rafter Uplift Connector Demand (`calc-construction.js`, Group E Carpentry and Construction, 1 New Tile)
 
-> **Status: PROPOSED 2026-10-19. Single-tile spec.** Part of [scope-product-expansion](scope-product-expansion.md). In scope under the
+> **Status: LANDED 2026-10-19 (proposed 2026-10-19). Single-tile spec. As built: `asce7-load-combinations` already returns the 0.6D + 0.6W net uplift from loads the reader has totaled; this tile adds the tributary area and the connector check, and its note points to that calculator. The area carried is the statical reaction (L + o)^2 / 2L x spacing rather than this spec's (L/2 + o) x spacing, which understates it by o^2 / 2L when there is an overhang. Inputs are capped at residential ranges (spacing to 96 in, span to 100 ft, overhang to 10 ft).** Part of [scope-product-expansion](scope-product-expansion.md). In scope under the
 > spec-v106 trades-only charter: Group E, the wind-load bench in `calc-construction.js` beside `wind-cc-pressure`,
 > `asce7-load-combinations` and `rooftop-curb-uplift`, no new dependency and no network call.
 >

@@ -62336,3 +62336,22 @@ test("bounds: spec-v1992 computeFireplaceClearanceCheck pins the 2/4 in framing,
     assert.ok("error" in _fcc(bad), JSON.stringify(bad));
   }
 });
+
+// spec-v1985: 0.6D + 0.6W net uplift on one bearing end and the connector check.
+import { computeTrussUpliftConnector as _tuc } from "../../calc-construction.js";
+test("bounds: spec-v1985 computeTrussUpliftConnector pins the tributary area, the 0.6 factors, the zero floor, the connector count and the error seams", () => {
+  const b = { spacing_in: 24, span_ft: 32, overhang_ft: 0, uplift_psf: 28.4, dead_psf: 12, allowable_lb: 585, connectors: 1 };
+  const r = _tuc(b);
+  assert.equal(r.tributary_sqft, 32); assert.ok(Math.abs(r.net_uplift_lb - 314.88) < 1e-9); assert.equal(r.passes, true);
+  assert.ok(Math.abs(_tuc({ ...b, overhang_ft: 2 }).tributary_sqft - 2 * 34 ** 2 / 64) < 1e-9, "the overhang levers on the bearing: (L + o)^2 / 2L");
+  const big = _tuc({ ...b, span_ft: 36, uplift_psf: 45, dead_psf: 10 });
+  assert.equal(big.net_uplift_lb, 756); assert.equal(big.passes, false); assert.equal(big.connectors_needed, 2);
+  assert.equal(_tuc({ ...b, span_ft: 36, uplift_psf: 45, dead_psf: 10, connectors: 2 }).passes, true);
+  assert.equal(_tuc({ ...b, uplift_psf: 10, dead_psf: 20 }).net_uplift_lb, 0, "dead load outweighs wind: no net uplift");
+  assert.equal(_tuc({ ...b, uplift_psf: 10, dead_psf: 10 }).net_uplift_lb, 0);
+  // Exactly at the allowable passes.
+  assert.equal(_tuc({ ...b, allowable_lb: 314.88 }).passes, true);
+  for (const bad of [{ ...b, spacing_in: 0 }, { ...b, span_ft: -1 }, { ...b, uplift_psf: undefined }, { ...b, allowable_lb: 0 }, { ...b, connectors: 5 }, { ...b, connectors: 1.5 }, { ...b, dead_psf: "x" }, { ...b, overhang_ft: -1 }, { ...b, uplift_psf: 1e6 }, { ...b, spacing_in: true }]) {
+    assert.ok("error" in _tuc(bad), JSON.stringify(bad));
+  }
+});

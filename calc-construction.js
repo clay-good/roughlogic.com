@@ -15533,3 +15533,71 @@ CONSTRUCTION_RENDERERS["safety-glazing-check"] = _simpleRenderer({
   ],
   compute: computeSafetyGlazingCheck,
 });
+
+// ===================== spec-v1985: truss and rafter uplift connector demand =====================
+// What a hurricane tie at one bearing end carries: the wind uplift on its
+// tributary area less the roof dead load, both at 0.6 under the ASCE 7-22
+// Section 2.4.1 ASD combination 0.6D + 0.6W. The pressure entered is strength
+// level (ASCE 7-10 and later); the allowable is the connector's ESR value.
+const _tucNum = (v, what) => {
+  const blank = v === null || v === undefined || (typeof v === "string" && v.trim() === "");
+  if (blank) return { error: "Enter the " + what + "." };
+  const ok = typeof v === "number" || (typeof v === "string" && /^\s*[+-]?(\d+\.?\d*|\.\d+)\s*$/.test(v));
+  if (!ok || !Number.isFinite(Number(v))) return { error: "The " + what + " must be a number." };
+  if (Number(v) < 0) return { error: "The " + what + " cannot be negative." };
+  return { v: Number(v) };
+};
+
+// dims: in { spacing_in: L, span_ft: L, overhang_ft: L, uplift_psf: M L^-1 T^-2, dead_psf: M L^-1 T^-2, allowable_lb: M L T^-2, connectors: dimensionless } out: { tributary_sqft: L^2, wind_lb: M L T^-2, dead_lb: M L T^-2, net_uplift_lb: M L T^-2, per_connector_lb: M L T^-2, utilization: dimensionless, connectors_needed: dimensionless }
+export function computeTrussUpliftConnector({ spacing_in, span_ft, overhang_ft = 0, uplift_psf, dead_psf, allowable_lb, connectors = 1 } = {}) {
+  const v = {};
+  for (const [k, x, w] of [["s", spacing_in, "truss or rafter spacing (in)"], ["L", span_ft, "span (ft)"], ["o", overhang_ft ?? 0, "overhang (ft)"], ["p", uplift_psf, "net design uplift pressure (psf)"], ["d", dead_psf, "roof dead load (psf)"], ["a", allowable_lb, "connector allowable uplift (lb)"], ["n", connectors ?? 1, "number of connectors per end"]]) {
+    const r = _tucNum(x, w); if (r.error) return { error: r.error }; v[k] = r.v;
+  }
+  if (!(v.s > 0) || !(v.L > 0)) return { error: "Spacing and span must be positive." };
+  if (!(v.a > 0)) return { error: "The connector allowable uplift must be positive (lb)." };
+  if (!Number.isInteger(v.n) || v.n < 1 || v.n > 4) return { error: "Connectors per end must be a whole number from 1 to 4." };
+  if (v.s > 96 || v.L > 100 || v.o > 10 || v.p > 300 || v.d > 100 || v.a > 20000) return { error: "An input is outside a residential truss or rafter connection (spacing to 96 in, span to 100 ft, overhang to 10 ft, uplift to 300 psf, dead load to 100 psf, allowable to 20,000 lb)." };
+  // Near-end reaction of a uniform load over the span plus an overhang on that end:
+  // (L + o)^2 / (2 L) of member length, a little more than L / 2 + o.
+  const tributary_sqft = (v.s / 12) * (v.L + v.o) ** 2 / (2 * v.L);
+  const wind_lb = v.p * tributary_sqft;
+  const dead_lb = v.d * tributary_sqft;
+  const net_uplift_lb = Math.max(0, 0.6 * wind_lb - 0.6 * dead_lb);
+  const per_connector_lb = net_uplift_lb / v.n;
+  const utilization = per_connector_lb / v.a;
+  const passes = utilization <= 1 + 1e-9;
+  const connectors_needed = Math.ceil(net_uplift_lb / v.a - 1e-9);
+  if (![tributary_sqft, wind_lb, dead_lb, net_uplift_lb, per_connector_lb, utilization].every(Number.isFinite)) return { error: "Uplift math is not a finite value." };
+  const verdict = net_uplift_lb === 0
+    ? "NO NET UPLIFT: 0.6 of the dead load (" + fmt(0.6 * dead_lb, 0) + " lb) equals or outweighs 0.6 of the wind (" + fmt(0.6 * wind_lb, 0) + " lb); the code's minimum roof-to-wall connection still applies"
+    : passes ? "OK: " + fmt(per_connector_lb, 0) + " lb per connector against " + fmt(v.a, 0) + " lb allowable (utilization " + fmt(utilization, 2) + ")"
+      : "OVERSTRESSED: " + fmt(per_connector_lb, 0) + " lb per connector against " + fmt(v.a, 0) + " lb allowable (utilization " + fmt(utilization, 2) + "); use " + connectors_needed + " of these where the evaluation report allows doubling them, or one rated " + fmt(net_uplift_lb, 0) + " lb or more";
+  return {
+    tributary_sqft, wind_lb, dead_lb, net_uplift_lb, per_connector_lb, utilization, passes, connectors_needed, verdict,
+    note: "Net uplift at one bearing end of a simple-span truss or rafter under the ASCE 7-22 Section 2.4.1 ASD combination 0.6D + 0.6W: the end carries the reaction of the load on the span and its overhang, spacing x (span + overhang)^2 / (2 x span) of roof (a little more than half the span plus the overhang, because the overhang levers on the bearing), wind = pressure x that area, dead = roof dead load x area, net = 0.6 W - 0.6 D. Only 0.6 of the dead load may resist uplift, so a 12 psf roof resists as 7.2 psf, and the overhang is the part most often left out. The pressure must be the strength-level (ultimate) net uplift from ASCE 7-10 or later (the wind components and cladding calculator gives it); a pressure already at ASD level would be reduced twice. ASCE 7 Chapter 30 gives a roof overhang its own, higher pressure (its underside is loaded too): enter that larger pressure when the overhang is a large share of the area. The allowable is the connector manufacturer's ASD uplift value from its evaluation report, already matched to species, fasteners and load duration. Only the tie at the top of the wall is checked: the rest of the load path (plate to stud, stud to sill, sill to foundation) needs its own connectors, and combined uplift and lateral load follows the report's interaction rule. The ASCE 7 ASD load combinations calculator covers the other combinations.",
+  };
+}
+export const trussUpliftConnectorExample = { inputs: { spacing_in: 24, span_ft: 32, overhang_ft: 0, uplift_psf: 28.4, dead_psf: 12, allowable_lb: 585, connectors: 1 } };
+
+CONSTRUCTION_RENDERERS["truss-uplift-connector"] = _simpleRenderer({
+  citation: "Citation: ASCE 7-22 Section 2.4.1 ASD load combination 0.6D + 0.6W, by name (ASCE 7 is sold, not free to read); area carried by the near bearing = spacing x (span + overhang)^2 / (2 x span), the statical reaction of a member with its overhang on that end. The pressure is the reader's strength-level net uplift (ASCE 7 Chapter 30) and the allowable is the connector's evaluation-report value. The engineer of record and the evaluation report govern.",
+  example: trussUpliftConnectorExample.inputs,
+  fields: [
+    { key: "spacing_in", label: "Truss or rafter spacing (in)", kind: "number", required: true, attrs: { step: "any", min: "0" } },
+    { key: "span_ft", label: "Span, bearing to bearing (ft)", kind: "number", required: true, attrs: { step: "any", min: "0" } },
+    { key: "overhang_ft", label: "Overhang beyond this bearing, this end only (ft)", kind: "number", attrs: { step: "any", min: "0" } },
+    { key: "uplift_psf", label: "Net design uplift pressure, strength level (psf)", kind: "number", required: true, attrs: { step: "any", min: "0" } },
+    { key: "dead_psf", label: "Roof dead load (psf)", kind: "number", required: true, attrs: { step: "any", min: "0" } },
+    { key: "allowable_lb", label: "Connector allowable uplift from its evaluation report (lb)", kind: "number", required: true, attrs: { step: "any", min: "0" } },
+    { key: "connectors", label: "Connectors per end (1 to 4)", kind: "number", default: 1, attrs: { step: "1", min: "1", max: "4" } },
+  ],
+  outputs: [
+    { key: "u", id: "tuc-out-u", label: "Net ASD uplift at the end", value: (r) => fmt(r.net_uplift_lb, 1) + " lb = 0.6 x " + fmt(r.wind_lb, 1) + " - 0.6 x " + fmt(r.dead_lb, 1) + " lb" },
+    { key: "a", id: "tuc-out-a", label: "Roof area the end carries", value: (r) => fmt(r.tributary_sqft, 2) + " sq ft" },
+    { key: "v", id: "tuc-out-v", label: "Connector check", value: (r) => r.verdict },
+    { key: "c", id: "tuc-out-c", label: "Connectors of this rating needed", value: (r) => (r.connectors_needed === 0 ? "0 for uplift (the code's minimum connection still applies)" : String(r.connectors_needed)) },
+    { key: "n", id: "tuc-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeTrussUpliftConnector,
+});

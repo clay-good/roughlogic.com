@@ -26758,6 +26758,18 @@ export const CITATIONS = {
       { name: "Masonry fireplace", value: "factory-built fireplaces, inserts and stoves follow their listings", source: "IRC R1004" },
     ],
   },
+  "truss-uplift-connector": {
+    formula: "area carried by the near bearing = (spacing / 12) x (span + overhang)^2 / (2 x span) (the reaction of a uniform load on a simple span with the overhang on that end); W = pressure x area; D = dead load x area; net ASD uplift = max(0, 0.6 W - 0.6 D); per connector = net / n; utilization = per connector / allowable; connectors needed = ceil(net / allowable).",
+    edition: "ASCE 7-22 Section 2.4.1, basic ASD load combination 0.6D + 0.6W, by name; the net design uplift pressure (ASCE 7 Chapter 30) and the connector allowable (manufacturer's ICC-ES evaluation report) are the reader's entries.",
+    freeAccess: "ASCE 7 is sold, not free to read; connector evaluation reports are free at icc-es.org and from the manufacturers.",
+    governance: GOVERNANCE.structural,
+    editionNote: "ASD combination 0.6D + 0.6W pairs the wind with 0.6 of the dead load, so the roof's weight resists only in part. The pressure must be strength level (ultimate), as ASCE 7-10 and later produce it; an ASD-level pressure would be reduced twice. The area is the statical reaction of a simple span with the overhang on the bearing being checked: (L + o)^2 / (2L), which exceeds L/2 + o by o^2 / (2L) because the overhang levers on that bearing. Connector allowables in evaluation reports are already ASD values for a stated species, fastener schedule and load duration. The engineer of record, the evaluation report and the AHJ govern.",
+    assumptions: [
+      { name: "Simple span, overhang on the checked end", value: "length carried = (span + overhang)^2 / (2 x span)", source: "statics" },
+      { name: "Strength-level pressure entered", value: "ASCE 7-10 or later net uplift, before the 0.6 factor", source: "ASCE 7-22 Section 2.4.1" },
+      { name: "Top-of-wall tie only", value: "plate to stud, stud to sill and sill to foundation need their own connectors", source: "continuous load path practice" },
+    ],
+  },
 };
 
 // --- Reference block and copy text ---

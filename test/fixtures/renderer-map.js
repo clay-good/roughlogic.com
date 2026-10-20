@@ -2284,4 +2284,5 @@ export const RENDERER_MAP = {
   "hearth-extension-check": { module: "../../calc-masonry.js", exportName: "MASONRY_RENDERERS" },
   "chimney-termination-height": { module: "../../calc-masonry.js", exportName: "MASONRY_RENDERERS" },
   "fireplace-clearance-check": { module: "../../calc-masonry.js", exportName: "MASONRY_RENDERERS" },
+  "truss-uplift-connector": { module: "../../calc-construction.js", exportName: "CONSTRUCTION_RENDERERS" },
 };
