@@ -15686,3 +15686,71 @@ CONSTRUCTION_RENDERERS["foundation-grade-slope-check"] = _simpleRenderer({
   ],
   compute: computeFoundationGradeSlopeCheck,
 });
+
+// ===================== spec-v1991: work zone longitudinal buffer space and activity area =====================
+// MUTCD 11th Edition (FHWA, December 2023 printing, read 2026-10-19): Section
+// 6B.06 para 11 and Table 6B-2 size an optional longitudinal buffer by stopping
+// sight distance; Table 6B-3 holds the downstream taper to 50-100 ft; Table 6B-4
+// gives the merging taper L = W S^2 / 60 (40 mph or less) or W S (45 or more);
+// Section 6K.01 para 4 spaces channelizing devices at no more than 1 x the speed
+// limit (taper) and 2 x (tangent), in feet.
+const _WZB_SSD = [[20, 115], [25, 155], [30, 200], [35, 250], [40, 305], [45, 360], [50, 425], [55, 495], [60, 570], [65, 645], [70, 730], [75, 820]];
+const _wzbNum = (v, what, opt) => {
+  const blank = v === null || v === undefined || (typeof v === "string" && v.trim() === "");
+  if (blank) return opt ? { v: null } : { error: "Enter the " + what + "." };
+  const ok = typeof v === "number" || (typeof v === "string" && /^\s*[+-]?(\d+\.?\d*|\.\d+)\s*$/.test(v));
+  if (!ok || !Number.isFinite(Number(v))) return { error: "The " + what + " must be a number." };
+  if (Number(v) < 0) return { error: "The " + what + " cannot be negative." };
+  return { v: Number(v) };
+};
+
+// dims: in { speed_mph: L T^-1, work_length_ft: L, taper_ft: L, lane_width_ft: L, downstream_taper_ft: L, shadow_offset_ft: L } out: { buffer_ft: L, tangent_spacing_ft: L, taper_spacing_ft: L, merging_taper_ft: L, activity_area_ft: L, closure_ft: L, buffer_devices: dimensionless, work_devices: dimensionless }
+export function computeWorkZoneBufferSpace({ speed_mph, work_length_ft, taper_ft = null, lane_width_ft = 12, downstream_taper_ft = 50, shadow_offset_ft = 0 } = {}) {
+  const v = {};
+  for (const [k, x, w, opt] of [["S", speed_mph, "speed (mph)"], ["wk", work_length_ft, "work space length (ft)"], ["L", taper_ft, "merging taper (ft)", true], ["W", lane_width_ft ?? 12, "lane width (ft)"], ["dt", downstream_taper_ft ?? 50, "downstream taper (ft)"], ["sh", shadow_offset_ft ?? 0, "shadow vehicle offset (ft)"]]) {
+    const r = _wzbNum(x, w, opt); if (r.error) return { error: r.error }; v[k] = r.v;
+  }
+  if (v.S < 20 - 1e-9 || v.S > 75 + 1e-9) return { error: "Table 6B-2 covers 20 to 75 mph." };
+  if (v.dt < 50 - 1e-9 || v.dt > 100 + 1e-9) return { error: "The downstream taper is 50 ft minimum and 100 ft maximum (Table 6B-3)." };
+  if (v.wk > 52800 || v.sh > 2000 || (v.L ?? 0) > 5000 || v.W > 24) return { error: "An input is outside a work zone layout (work space to 10 mi, shadow offset to 2,000 ft, taper to 5,000 ft, lane to 24 ft)." };
+  // A speed between rows takes the next higher row.
+  const row = _WZB_SSD.find(([s]) => s >= v.S - 1e-9);
+  const buffer_ft = row[1];
+  const taper_from_table = v.L === null;
+  if (taper_from_table && !(v.W > 0)) return { error: "Enter the merging taper, or a lane width to compute it." };
+  if (!taper_from_table && !(v.L > 0)) return { error: "A merging taper must be longer than 0 ft (leave it blank to compute it from the lane width)." };
+  const merging_taper_ft = taper_from_table ? (v.S <= 40 + 1e-9 ? v.W * v.S * v.S / 60 : v.W * v.S) : v.L;
+  const tangent_spacing_ft = 2 * v.S, taper_spacing_ft = v.S;
+  const buffer_devices = Math.ceil(buffer_ft / tangent_spacing_ft - 1e-9) + 1;
+  // Devices continue past the buffer through any shadow-vehicle gap and the work space.
+  const work_devices = v.sh + v.wk > 0 ? Math.ceil((v.sh + v.wk) / tangent_spacing_ft - 1e-9) : 0;
+  const activity_area_ft = buffer_ft + v.sh + v.wk;
+  const closure_ft = merging_taper_ft + activity_area_ft + v.dt;
+  if (![merging_taper_ft, activity_area_ft, closure_ft].every(Number.isFinite)) return { error: "Work zone math is not a finite value." };
+  return {
+    buffer_ft, row_speed_mph: row[0], merging_taper_ft, taper_from_table, tangent_spacing_ft, taper_spacing_ft, buffer_devices, work_devices, activity_area_ft, closure_ft,
+    note: "MUTCD 11th Edition Section 6B.06: a longitudinal buffer space is optional, and if one is used, Table 6B-2 (stopping sight distance as a function of speed) may set its length; the speed is the posted speed, the off-peak 85th-percentile speed before work starts, or the anticipated operating speed, and a speed between rows is read at the next row up. Nothing is stored or worked in the buffer. When a shadow vehicle, arrow board or changeable message sign sits in the closed lane ahead of the work, only the area upstream of it is buffer (6B.06 para 13), so its offset is added between the buffer and the work space. Section 6K.01: channelizing devices no more than 1 x the speed limit apart (in feet) along a taper and 2 x along a tangent, extended 2 x the speed limit past the transition where they could lead traffic out of the intended space. The merging taper, when not entered, is Table 6B-4's L = W S^2 / 60 at 40 mph or less and W S at 45 mph or more; the table gives no formula between them, so from 41 to 44 mph the longer W S is used. Device spacing uses the speed entered, which may be higher than the speed limit 6K.01 names. The agency's traffic control plan governs.",
+  };
+}
+export const workZoneBufferSpaceExample = { inputs: { speed_mph: 35, work_length_ft: 400, taper_ft: null, lane_width_ft: 12, downstream_taper_ft: 50, shadow_offset_ft: 0 } };
+
+CONSTRUCTION_RENDERERS["work-zone-buffer-space"] = _simpleRenderer({
+  citation: "Citation: MUTCD 11th Edition (FHWA, December 2023 printing, public domain at mutcd.fhwa.dot.gov), read 2026-10-19: Section 6B.06 paras 11 and 13 and Table 6B-2 (buffer by stopping sight distance, 115 ft at 20 mph to 820 ft at 75 mph), Table 6B-3 (downstream taper 50 to 100 ft), Table 6B-4 (merging taper), Section 6K.01 para 4 (device spacing 1 x and 2 x the speed). The agency's traffic control plan governs.",
+  example: workZoneBufferSpaceExample.inputs,
+  fields: [
+    { key: "speed_mph", label: "Speed: posted, off-peak 85th percentile, or anticipated (mph)", kind: "number", required: true, attrs: { step: "any", min: "20", max: "75" } },
+    { key: "work_length_ft", label: "Work space length (ft)", kind: "number", attrs: { step: "any", min: "0" } },
+    { key: "taper_ft", label: "Merging taper length (ft, blank = Table 6B-4 from the lane width)", kind: "number", required: true, attrs: { step: "any", min: "0" } },
+    { key: "lane_width_ft", label: "Width of the lane closed (ft)", kind: "number", default: 12, required: true, attrs: { step: "any", min: "0" } },
+    { key: "downstream_taper_ft", label: "Downstream taper (ft, 50 to 100)", kind: "number", default: 50, required: true, attrs: { step: "any", min: "50", max: "100" } },
+    { key: "shadow_offset_ft", label: "Shadow vehicle or arrow board ahead of the work space (ft, 0 if none)", kind: "number", attrs: { step: "any", min: "0" } },
+  ],
+  outputs: [
+    { key: "b", id: "wzb-out-b", label: "Longitudinal buffer (Table 6B-2)", value: (r) => r.buffer_ft + " ft (the " + r.row_speed_mph + " mph row)" },
+    { key: "s", id: "wzb-out-s", label: "Device spacing", value: (r) => "tangent " + r.tangent_spacing_ft + " ft, taper " + r.taper_spacing_ft + " ft at most; " + r.buffer_devices + " along the buffer (both ends), " + r.work_devices + " along the shadow offset and work space" },
+    { key: "a", id: "wzb-out-a", label: "Activity area", value: (r) => fmt(r.activity_area_ft, 0) + " ft" },
+    { key: "c", id: "wzb-out-c", label: "Closure, start of the merging taper to the end of the downstream taper", value: (r) => fmt(r.closure_ft, 0) + " ft (merging taper " + fmt(r.merging_taper_ft, 0) + " ft" + (r.taper_from_table ? " from Table 6B-4" : "") + ")" },
+    { key: "n", id: "wzb-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeWorkZoneBufferSpace,
+});

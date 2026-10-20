@@ -1,6 +1,6 @@
 # roughlogic.com Specification v1991 -- Work Zone Longitudinal Buffer Space and Activity Area Length (MUTCD 6B.06) (`calc-construction.js`, Group E Carpentry and Construction, civil, 1 New Tile)
 
-> **Status: PROPOSED 2026-10-19. Single-tile spec.** Part of [scope-product-expansion](scope-product-expansion.md). In scope under the
+> **Status: LANDED 2026-10-19 (proposed 2026-10-19). Single-tile spec. As built from the MUTCD 11th Edition Part 6 PDF (December 2023 printing) read on 2026-10-19: Table 6B-2, Tables 6B-3 and 6B-4 and Section 6K.01 para 4 are as this spec states. When the merging taper is left blank the tile computes it from the lane width by Table 6B-4.** Part of [scope-product-expansion](scope-product-expansion.md). In scope under the
 > spec-v106 trades-only charter: Group E, the temporary traffic control bench in `calc-construction.js` beside
 > `traffic-taper-length` and `advance-warning-sign-spacing`, no new dependency and no network call.
 >

@@ -118,10 +118,10 @@
     "realestate/loan-limits.json": "4f6f0bb907e2c437657ba517a397905d426de18686f73090d4f3d863824f0d44",
     "realestate/hud-fmr.json": "4fc4a6400f5d3028bd16d3e8c8f63fd6cf14a1a1110e8e962fee83f9b9deef7f",
     "realestate/manifest.json": "3093bfd51988e85fb98e46efd9e5fbe20776e8873a53f9c35fe23e72f348c4cd",
-    "fields/manifest.json": "c56707f6169da2baed0a248743e060c948b40db4da4e9951a05847a8372e8479",
-    "search/manifest.json": "9eb9d25b13d601328ad7a008b2f059350eb6a825a66977c233cb5db7ef9ee43d",
-    "desc/manifest.json": "33714b5ad48629e7bf75cb2caa959b358958046e3372868f60c93264d083d359",
-    "citations/manifest.json": "b76ce813fa36d4f8a53cf737f893bc8c3c73f5e6bfc26438e7a9f53446dd7a4e",
+    "fields/manifest.json": "3185e009cee38a28aa4dc730abca0a11ecc4f964ab40f56276e762bbd2199de1",
+    "search/manifest.json": "c99f1e778ee80e7495a285947f75d86f242e5fa504e96e12f0ced7c1d59ea166",
+    "desc/manifest.json": "81eb85041f1313b53d717bffaec73f70ff11e25868ae0e1af3d1d1fb1c3ceed6",
+    "citations/manifest.json": "e03a09170743d9dc8614b3cc73a5b47c82eb5a025cb0f571a394757846c81291",
     "legal/code-adoption.json": "e3cd04173c8b6b27e060a320595ec1d2a25df56d5d6121add42874b0e2242149"
   }
 }

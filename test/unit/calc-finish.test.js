@@ -163,3 +163,13 @@ test("shower-pan-mortar-bed: a grid integration of the level-rim surface matches
     assert.ok(Math.abs(vol - r.volume_cuft) / r.volume_cuft < 1e-3, JSON.stringify([L, W, x, y]));
   }
 });
+
+// spec-v1990: redo the MVER conversion in SI units (kg, m^2, s) and convert back.
+import { computeMverCalciumChloride as _mver } from "../../calc-finish.js";
+test("mver-calcium-chloride: the rate worked in kg per m^2 per s matches after converting to lb per 1,000 sq ft per day", () => {
+  for (const [g, a, h] of [[3, 0.44486, 72], [2.2, 0.44486, 66], [5.8, 0.5, 60]]) {
+    const si = (g / 1000) / (a * 0.09290304) / (h * 3600); // kg / m^2 / s
+    const lb = si / 0.45359237 * (1000 * 0.09290304) * 86400; // lb per 1,000 sq ft per day
+    assert.ok(Math.abs(_mver({ mass_gain_g: g, test_area_sqft: a, hours: h }).mver_lb - lb) / lb < 1e-4);
+  }
+});

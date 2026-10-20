@@ -2439,6 +2439,10 @@ const RELATED = {
   "tile-flatness-lippage-check": ["tile-layout-cut-balance","tile-count","thinset-coverage","self-leveler-bags"],
   // spec-v1989: shower pan mortar bed (calc-finish.js).
   "shower-pan-mortar-bed": ["tile-flatness-lippage-check","thinset-coverage","tile-count","self-leveler-bags"],
+  // spec-v1990: calcium chloride MVER (calc-finish.js).
+  "mver-calcium-chloride": ["tile-flatness-lippage-check","self-leveler-bags","thinset-coverage"],
+  // spec-v1991: work zone buffer space (calc-construction.js).
+  "work-zone-buffer-space": ["traffic-taper-length","advance-warning-sign-spacing"],
 };
 
 export { RELATED };

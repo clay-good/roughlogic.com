@@ -1534,6 +1534,10 @@ const _TILES = [
   ["tile-flatness-lippage-check", "E"],
   // spec-v1989: shower pan mortar bed (calc-finish.js).
   ["shower-pan-mortar-bed", "E"],
+  // spec-v1990: calcium chloride MVER (calc-finish.js).
+  ["mver-calcium-chloride", "E"],
+  // spec-v1991: work zone buffer space (calc-construction.js).
+  ["work-zone-buffer-space", "E"],
 ];
 
 

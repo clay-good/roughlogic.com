@@ -1847,6 +1847,7 @@ cross-check.
 | calc-construction.js | `computeWoodScrewWithdrawal` | `{ g = 0, d_in = 0, p_in = 0, cd = 1.0 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeWoodTensionBending` | `{ t_lb = 0, m_inlb = 0, a_in2 = 0, s_in3 = 0, ft_adj_psi = 0, fb_star_psi = 0...` | _ | _ | _ |
 | calc-construction.js | `computeWoodTensionMember` | `{ t_lb = 0, b_in = 0, d_in = 0, dh_in = 0, nh = 0, ft_psi = 575, cd_f = 1.0, ...` | _ | _ | _ |
+| calc-construction.js | `computeWorkZoneBufferSpace` | `{ speed_mph, work_length_ft, taper_ft = null, lane_width_ft = 12, downstream_...` | _ | _ | _ |
 | calc-construction.js | `renderAnchorEmbedment` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-construction.js | `renderArea` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-construction.js | `renderBeamLoading` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
@@ -2337,6 +2338,7 @@ cross-check.
 | calc-finish.js | `computeGlassWeight` | `{ width_in = 0, height_in = 0, thickness_in = 0, panes = 1 } = {}` | _ | _ | _ |
 | calc-finish.js | `computeGutterDownspout` | `{ roof_area_sqft = 0, pitch_factor = "1.00", rainfall_in_hr = 5, downspout_sq...` | _ | _ | _ |
 | calc-finish.js | `computeGutterDownspoutTakeoff` | `{ eave_length_ft = 140, roof_area_sf = 2400, max_area_per_downspout_sf = 800,...` | _ | _ | _ |
+| calc-finish.js | `computeMverCalciumChloride` | `{ mass_gain_g, test_area_sqft, hours, limit_lb = 3, floor_area_sqft = null } ...` | _ | _ | _ |
 | calc-finish.js | `computePaverPatio` | `{ area_sqft = 0, paver_length_in = 0, paver_width_in = 0, base_depth_in = 6, ...` | _ | _ | _ |
 | calc-finish.js | `computeRetainingWallBlock` | `{ wall_length_ft = 0, exposed_height_ft = 0, block_length_in = 18, block_heig...` | _ | _ | _ |
 | calc-finish.js | `computeRoughOpeningSize` | `{ opening_type = "window", unit_width_in = 0, unit_height_in = 0, width_adder...` | _ | _ | _ |
@@ -3951,7 +3953,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2535.
+Row count: 2537.
 
 <!-- END function-corpus-v14 -->
 
@@ -4739,7 +4741,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-extraction-rate` | Water Extraction Volume, Time, and Waste-Tank Dumps | Project (first-principles); standing + absorbed; wand time = total / gpm | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+4 more) |
 
-### Group E Construction (640 tiles)
+### Group E Construction (642 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -5069,6 +5071,7 @@ per spec-v14 §13.1 second paragraph.
 | `mt-yoke-coil-amperage` | Magnetic Particle Yoke, Coil Amperage, and Field Orientation | Project (first-principles); the standards named in the tile citation govern; recomput... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `mud-hydrostatic-pressure` | Drilling Mud Weight and Hydrostatic Pressure | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `multi-bend-flat-pattern` | Multi-Bend Flat Pattern (Developed Length) | sheet-metal layout (developed length); spec-v454 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
+| `mver-calcium-chloride` | Concrete Moisture Vapor Emission Rate from a Calcium Chloride Test (ASTM F1869) | Project (first-principles); 24,000 x 3.0 / (453.592 x 0.44486 x 72) = 4.9558 lb per 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `occupant-load` | Building Occupant Load from Area and Use (IBC Table 1004.4) | IBC 2021 Table 1004.5 occupant-load f...; spec-v242 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `osha-timber-trench-shoring` | OSHA Appendix C Timber Trench Shoring Lookup | OSHA (29 CFR 1926 Subpart P); Appendix C (f)(1) Example 1: Type A soil, 13 ft deep, 5 f... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `overconsolidated-settlement` | Primary Consolidation Settlement (Over-Consolidated Clay) | Terzaghi primary consolidation, OC cl...; Cc 0.25, Cr 0.05, H 10 ft, e0 0.90, sigma'0 2,000 psf, si... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5383,6 +5386,7 @@ per spec-v14 §13.1 second paragraph.
 | `wood-screw-withdrawal` | Wood Screw Withdrawal Design Value (NDS 12.2.2) | NDS 2018 12.2.2; spec-v334 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `wood-tension-bending` | Wood Bending Plus Axial Tension (NDS 3.9.1) | Missouri University of Science and Te...; D+S case: 2x6 No. 1 DF-L, A 8.250 sq in, S 7.563 cu in, T... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-tension-member` | Wood Tension Member Parallel to Grain (NDS 3.8) | NDS 2018 3.8.1; spec-v291 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
+| `work-zone-buffer-space` | Work Zone Longitudinal Buffer Space and Activity Area Length (MUTCD 6B.06) | FHWA; 35 mph: buffer 250 ft (Table 6B-2); L = 12 x 35^2 / 60 = ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
 ### Group F Fire-ground (58 tiles)
 
@@ -6405,6 +6409,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 
-Tile count: 2281. Fixture-covered or reference-cadence: 2281 / 2281.
+Tile count: 2283. Fixture-covered or reference-cadence: 2283 / 2283.
 
 <!-- END tile-index-v14 -->

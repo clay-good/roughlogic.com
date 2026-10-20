@@ -69,7 +69,7 @@
     {
       "file": "m.json",
       "name": "Tile descriptions after the opening sentence, m runtime shard (generated)",
-      "gzip_size_bytes": 30203
+      "gzip_size_bytes": 30510
     },
     {
       "file": "n.json",
@@ -119,7 +119,7 @@
     {
       "file": "w.json",
       "name": "Tile descriptions after the opening sentence, w runtime shard (generated)",
-      "gzip_size_bytes": 25644
+      "gzip_size_bytes": 26005
     },
     {
       "file": "y.json",
@@ -145,7 +145,7 @@
     "j.json": "f5ed4f82111db1d3843a7bd30f8cdddc13ecb47a09bccdf96f9b39993bd7e253",
     "k.json": "922a5b28e6ca5a5e8f9d3e03831ea7018d90dff67babae6344f27e0064457063",
     "l.json": "dd1242f04a711c96db54e62026df30466f1e0d404ab6c85ae5d19339d01d5add",
-    "m.json": "4ae739ac2825cd513bded3bf8005b32c393ab3d83c5ebd5d676fc6e328b87137",
+    "m.json": "9d63b87efce42633e55341d60967b040ce7947165b531b5961e228ab528e32e2",
     "n.json": "e2ae0436152f5f7f44abd8b30c8a71d2a8dd78505798d4741f260728c1842551",
     "o.json": "d61f0064b6371561e933c719893d6075da6ba7752ff67b47e6f1f8a433bad323",
     "p.json": "7ba02769574e8cf75a0402f282f5293cc96f48c3cb3c1ea17c307ecd7999ad09",
@@ -155,7 +155,7 @@
     "t.json": "e0b0b5416a23d3d23a2ef3274adf8e8ccec0359872661c79efaa1be3d758895f",
     "u.json": "070cad57383f7bd595656daa84c822d72a7c5d095feff47eaac5f08cf6cc3f7c",
     "v.json": "311a3226ab6bf728b9a69a8baf3eefbde7dfd78f9d4ea1d245da97f5843a6d2d",
-    "w.json": "18d45d4047462874422459f4d163b1651119c51f4598105658cbbaed07480497",
+    "w.json": "1c4afe2a994e21dc2262aa5dd04067a37e52919c560a43c5ed32e48ba81c6d7f",
     "y.json": "8159cfea22c44901e139ac49b55b87177249febe58d8fc0211c95d508cc9eafc",
     "z.json": "0d807396e16499129049770f5b02d19eb321cc80eade6d9f558dc011070e0040"
   }

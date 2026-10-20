@@ -2,11 +2,11 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "1edead374b7d159a",
+      "sha": "a71e935f931cbe4d",
       "date": "2026-10-20"
     },
     "/tools/": {
-      "sha": "5f713db7156d7a01",
+      "sha": "01705a21c25fa06d",
       "date": "2026-10-20"
     },
     "/errata/": {
@@ -14,91 +14,91 @@
       "date": "2026-10-18"
     },
     "/collections/disaster-response/": {
-      "sha": "82b531914e9144e3",
+      "sha": "4b520075bada167a",
       "date": "2026-10-20"
     },
     "/groups/accounting/": {
-      "sha": "0be57dea5c0e45e2",
+      "sha": "8fd62f7a9b4169ff",
       "date": "2026-10-20"
     },
     "/groups/agriculture/": {
-      "sha": "7a5f646e55d976d3",
+      "sha": "a1cf3ecfda7018ba",
       "date": "2026-10-20"
     },
     "/groups/construction/": {
-      "sha": "0dd5692a99c48f0a",
+      "sha": "1bcff91735c2c993",
       "date": "2026-10-20"
     },
     "/groups/cross-trade/": {
-      "sha": "4f6f817af0c1221c",
+      "sha": "486daa5a41005836",
       "date": "2026-10-20"
     },
     "/groups/educators/": {
-      "sha": "07fa27b12231cfea",
+      "sha": "f2fd30e12ba948bb",
       "date": "2026-10-20"
     },
     "/groups/electrical/": {
-      "sha": "8b326bda10c8f6f9",
+      "sha": "67da74450f72cbf0",
       "date": "2026-10-20"
     },
     "/groups/field/": {
-      "sha": "9fb3104d87ac3c28",
+      "sha": "b6531b0ec885ebb2",
       "date": "2026-10-20"
     },
     "/groups/fire-ground/": {
-      "sha": "6f4df9f02a5e5c22",
+      "sha": "4859a43a147b7244",
       "date": "2026-10-20"
     },
     "/groups/historical/": {
-      "sha": "ba95a15d64280d7c",
+      "sha": "f90f9d473764cc4c",
       "date": "2026-10-20"
     },
     "/groups/hvac/": {
-      "sha": "28ed33089160d6c2",
+      "sha": "e197bfafb9b464ea",
       "date": "2026-10-20"
     },
     "/groups/kitchen/": {
-      "sha": "9b4e42a3e7a1e1d3",
+      "sha": "265826e49a0cc23a",
       "date": "2026-10-20"
     },
     "/groups/lab/": {
-      "sha": "8670f560b2800c0c",
+      "sha": "66fe167ec03cab19",
       "date": "2026-10-20"
     },
     "/groups/mechanic/": {
-      "sha": "0a1ce64ea9dc0b19",
+      "sha": "7892681c0fe96da2",
       "date": "2026-10-20"
     },
     "/groups/plumbing/": {
-      "sha": "fb56357314607adc",
+      "sha": "9562608d5d361879",
       "date": "2026-10-20"
     },
     "/groups/real-estate/": {
-      "sha": "c084cdee4c7149fe",
+      "sha": "daccc182d256a7de",
       "date": "2026-10-20"
     },
     "/groups/references/": {
-      "sha": "f588bf9f8e8b2fe4",
+      "sha": "6fe5167490501bc4",
       "date": "2026-10-20"
     },
     "/groups/restoration/": {
-      "sha": "7da71bbda0c87508",
+      "sha": "12155acba38a6324",
       "date": "2026-10-20"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "f8abbe38d234e5e2",
+      "sha": "c40fca6e59cdced1",
       "date": "2026-10-20"
     },
     "/groups/stage/": {
-      "sha": "3d55e77388645286",
+      "sha": "a298b5d368a8028b",
       "date": "2026-10-20"
     },
     "/groups/trucking/": {
-      "sha": "b40bd6b9f0cb1b68",
+      "sha": "af9517caacf0bd37",
       "date": "2026-10-20"
     },
     "/groups/water/": {
-      "sha": "277236852931dda1",
+      "sha": "3327eddeb7148835",
       "date": "2026-10-20"
     },
     "/tools/aav-install-check/": {
@@ -5033,6 +5033,10 @@
       "sha": "f9d9777464107311",
       "date": "2026-10-17"
     },
+    "/tools/mver-calcium-chloride/": {
+      "sha": "365fdd685698b270",
+      "date": "2026-10-20"
+    },
     "/tools/mwbc-voltage-drop/": {
       "sha": "09a66389e7b71a11",
       "date": "2026-10-17"
@@ -8330,8 +8334,8 @@
       "date": "2026-10-17"
     },
     "/tools/traffic-taper-length/": {
-      "sha": "aa3065c1432c6f86",
-      "date": "2026-10-17"
+      "sha": "3134ba2694fad1b0",
+      "date": "2026-10-20"
     },
     "/tools/trailer-tongue-weight/": {
       "sha": "b1786dcb4aa846ba",
@@ -8674,8 +8678,8 @@
       "date": "2026-10-17"
     },
     "/tools/vapor-barrier-rolls/": {
-      "sha": "5bba4d401bca7b49",
-      "date": "2026-10-17"
+      "sha": "5d86722ad3269e50",
+      "date": "2026-10-20"
     },
     "/tools/vapor-pressure-deficit/": {
       "sha": "dbcf792c93e1973c",
@@ -9184,6 +9188,10 @@
     "/tools/wood-tension-member/": {
       "sha": "7ed3a42f67bfd2da",
       "date": "2026-10-17"
+    },
+    "/tools/work-zone-buffer-space/": {
+      "sha": "c094951cf7a9df04",
+      "date": "2026-10-20"
     },
     "/tools/workers-comp-emr-premium/": {
       "sha": "c00c2900aef614e7",

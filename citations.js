@@ -19731,7 +19731,7 @@ export const CITATIONS = {
     edition: "MUTCD Table 6C-1, Suggested Advance Warning Sign Spacing, from the FHWA Manual on Uniform Traffic Control Devices - a US-government public-domain work, extracted from the FHWA PDF rather than a secondary summary.",
     freeAccess: "The MUTCD is published free at mutcd.fhwa.dot.gov and is in the public domain.",
     governance: GOVERNANCE.general,
-    editionNote: "The letters read BACKWARD from the way a crew sets signs: A is the distance from the transition or point of restriction to the sign CLOSEST to the work, B is between the first and second signs, C is between the second and third, and the standard states that the third sign is the first one a driver encounters. Reporting A/B/C alone invites someone to place the first sign 500 ft out and stop, so this tile reports cumulative distances measured upstream from the transition - the last number is where the advance warning area begins. MUTCD 6C.04 adds that on rural highways the first warning sign should sit 8 to 12 times the speed limit in mph, and that the advance warning area should extend 1,500 ft or more for open highway conditions; both are checked. These are SUGGESTED distances and the urban speed category is determined by the highway agency per the table's own footnote; site distance, sight lines, and intersections routinely force adjustment. The taper is the separate traffic-taper-length tile; buffer space, channelizing-device spacing, and flagger stations are not modeled. The MUTCD as adopted by your state and the agency's traffic control plan govern.",
+    editionNote: "The letters read BACKWARD from the way a crew sets signs: A is the distance from the transition or point of restriction to the sign CLOSEST to the work, B is between the first and second signs, C is between the second and third, and the standard states that the third sign is the first one a driver encounters. Reporting A/B/C alone invites someone to place the first sign 500 ft out and stop, so this tile reports cumulative distances measured upstream from the transition - the last number is where the advance warning area begins. MUTCD 6C.04 adds that on rural highways the first warning sign should sit 8 to 12 times the speed limit in mph, and that the advance warning area should extend 1,500 ft or more for open highway conditions; both are checked. These are SUGGESTED distances and the urban speed category is determined by the highway agency per the table's own footnote; site distance, sight lines, and intersections routinely force adjustment. The taper is the separate traffic-taper-length tile and the buffer space and channelizing-device spacing are the work zone buffer space calculator; flagger stations are not modeled. The MUTCD as adopted by your state and the agency's traffic control plan govern.",
     assumptions: [
       { name: "Public-domain table", value: "MUTCD Table 6C-1 reproduced verbatim; it is a US-government work, not a copyrighted table", source: "FHWA MUTCD Table 6C-1" },
       { name: "A/B/C direction", value: "A is transition-to-nearest-sign; the third sign is the first a driver sees", source: "MUTCD Table 6C-1 footnote" },
@@ -26812,6 +26812,28 @@ export const CITATIONS = {
     assumptions: [
       { name: "Level perimeter", value: "the rim is screeded level and each facet is planar from the drain to its wall", source: "pre-slope screeding practice" },
       { name: "Bag yield entered", value: "about 0.45 cu ft per 60 lb bag of sand topping or deck mud; use the bag's printed yield", source: "manufacturer data" },
+    ],
+  },
+  "mver-calcium-chloride": {
+    formula: "MVER = 24,000 x mass gain (g) / (453.592 x test area (sq ft) x hours), lb of water per 1,000 sq ft per 24 h; passes when MVER <= the manufacturer's limit; tests = 3 for the first 1,000 sq ft + ceil((area - 1,000) / 1,000).",
+    edition: "ASTM F1869, Standard Test Method for Measuring Moisture Vapor Emission Rate of Concrete Subfloor Using Anhydrous Calcium Chloride, by name; the edition was not read here (ASTM sells it), and the arithmetic is its unit conversion with 453.592 g per lb.",
+    freeAccess: "ASTM F1869 is sold by ASTM; the conversion is grams to pounds, the test area to 1,000 sq ft, and hours to a day.",
+    governance: GOVERNANCE.general,
+    editionNote: "The 60 to 72 hour exposure and the three-tests-for-the-first-1,000-sq-ft-and-one-per-additional-1,000 frequency are the standard's; a result outside the window is reported as not a standard test. The standard does not set a pass line: the flooring or adhesive manufacturer's written limit does (3 lb per 1,000 sq ft per 24 h is common). Many manufacturers have moved to ASTM F2170 in-situ relative humidity, a percentage, not a rate.",
+    assumptions: [
+      { name: "Test area as the kit states it", value: "dome inside area or net exposed area, whichever the kit's instructions give", source: "kit instructions" },
+      { name: "Grams per pound", value: "453.592", source: "unit definition" },
+    ],
+  },
+  "work-zone-buffer-space": {
+    formula: "buffer = Table 6B-2 stopping sight distance at the next row at or above the speed (115 ft at 20 mph ... 820 ft at 75 mph); merging taper L = W S^2 / 60 (S <= 40 mph) or W S (S >= 45 mph) when not entered; tangent spacing = 2 S ft, taper spacing = S ft; devices along the buffer = ceil(buffer / 2S) + 1, along the work space = ceil(work / 2S); activity area = buffer + shadow offset + work; closure = L + activity area + downstream taper (50 to 100 ft).",
+    edition: "MUTCD 11th Edition (FHWA, December 2023 printing, as posted at mutcd.fhwa.dot.gov and read on 2026-10-19): Section 6B.06 paragraphs 11 and 13, Table 6B-2, Table 6B-3, Table 6B-4, and Section 6K.01 paragraphs 4 and 5.",
+    freeAccess: "The MUTCD is public domain and free at mutcd.fhwa.dot.gov.",
+    governance: GOVERNANCE.general,
+    editionNote: "Table 6B-2 rows (feet): 20 mph 115, 25 155, 30 200, 35 250, 40 305, 45 360, 50 425, 55 495, 60 570, 65 645, 70 730, 75 820; the speed is the posted speed, the off-peak 85th-percentile speed before work, or the anticipated operating speed. The buffer is optional ('may be used') in the manual; agencies' plans often require it. Section 6K.01 paragraph 4 uses the speed limit for device spacing. FHWA has issued a Revision 1 of the 11th Edition; these values were read from the December 2023 printing posted on 2026-10-19.",
+    assumptions: [
+      { name: "Next row up between speeds", value: "a speed between table rows takes the higher row", source: "conservative reading of Table 6B-2" },
+      { name: "Device count", value: "both ends of the buffer counted; the taper's own devices are the taper calculator's", source: "stated assumption" },
     ],
   },
 };

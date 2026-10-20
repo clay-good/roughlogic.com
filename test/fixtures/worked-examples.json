@@ -172827,6 +172827,158 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "mver-calcium-chloride",
+  "source_publisher": "Project (first-principles)",
+  "source_title": "spec-v1990 worked example, recomputed",
+  "source_edition_or_year": "2026",
+  "source_section_or_page": "24,000 x 3.0 / (453.592 x 0.44486 x 72) = 4.9558 lb per 1,000 sq ft per 24 h (the spec's 453.612 gives 4.9556); 2,400 sq ft: 3 + 2 = 5 tests.",
+  "verified_by": "rl",
+  "verified_on": "2026-10-19",
+  "inputs": {
+   "mass_gain_g": 3,
+   "test_area_sqft": 0.44486,
+   "hours": 72,
+   "limit_lb": 3,
+   "floor_area_sqft": 2400
+  },
+  "outputs": {
+   "mver_lb": {
+    "value": 4.955771,
+    "tolerance": {
+     "pct": 0.01
+    }
+   },
+   "margin_lb": {
+    "value": -1.955771,
+    "tolerance": {
+     "pct": 0.01
+    }
+   },
+   "tests_required": {
+    "value": 5,
+    "tolerance": {
+     "abs": 0
+    }
+   }
+  }
+ },
+ {
+  "tile_id": "mver-calcium-chloride",
+  "source_publisher": "Project (first-principles)",
+  "source_title": "spec-v1990 second example, recomputed",
+  "source_edition_or_year": "2026",
+  "source_section_or_page": "5.8 g over 60 h on 0.44486 sq ft: 24,000 x 5.8 / (453.592 x 0.44486 x 60) = 11.497 lb.",
+  "verified_by": "rl",
+  "verified_on": "2026-10-19",
+  "inputs": {
+   "mass_gain_g": 5.8,
+   "test_area_sqft": 0.44486,
+   "hours": 60,
+   "limit_lb": 3,
+   "floor_area_sqft": null
+  },
+  "outputs": {
+   "mver_lb": {
+    "value": 11.4974,
+    "tolerance": {
+     "pct": 0.01
+    }
+   }
+  }
+ },
+ {
+  "tile_id": "work-zone-buffer-space",
+  "source_publisher": "FHWA",
+  "source_title": "MUTCD 11th Edition, Section 6B.06, Tables 6B-2 to 6B-4 and Section 6K.01, applied to the spec-v1991 closure",
+  "source_edition_or_year": "December 2023 printing (mutcd.fhwa.dot.gov, read 2026-10-19)",
+  "source_section_or_page": "35 mph: buffer 250 ft (Table 6B-2); L = 12 x 35^2 / 60 = 245 ft; spacing 70 ft; buffer devices ceil(250/70) + 1 = 5; work devices ceil(400/70) = 6; closure 245 + 250 + 400 + 50 = 945 ft.",
+  "verified_by": "rl",
+  "verified_on": "2026-10-19",
+  "inputs": {
+   "speed_mph": 35,
+   "work_length_ft": 400,
+   "taper_ft": null,
+   "lane_width_ft": 12,
+   "downstream_taper_ft": 50,
+   "shadow_offset_ft": 0
+  },
+  "outputs": {
+   "buffer_ft": {
+    "value": 250,
+    "tolerance": {
+     "abs": 0
+    }
+   },
+   "merging_taper_ft": {
+    "value": 245,
+    "tolerance": {
+     "abs": 1e-9
+    }
+   },
+   "buffer_devices": {
+    "value": 5,
+    "tolerance": {
+     "abs": 0
+    }
+   },
+   "work_devices": {
+    "value": 6,
+    "tolerance": {
+     "abs": 0
+    }
+   },
+   "closure_ft": {
+    "value": 945,
+    "tolerance": {
+     "abs": 1e-9
+    }
+   }
+  }
+ },
+ {
+  "tile_id": "work-zone-buffer-space",
+  "source_publisher": "FHWA",
+  "source_title": "MUTCD 11th Edition, Table 6B-2 and Table 6B-4",
+  "source_edition_or_year": "December 2023 printing (mutcd.fhwa.dot.gov, read 2026-10-19)",
+  "source_section_or_page": "55 mph: buffer 495 ft; L = 12 x 55 = 660 ft; closure 660 + 495 + 400 + 50 = 1,605 ft; buffer devices ceil(495/110) + 1 = 6.",
+  "verified_by": "rl",
+  "verified_on": "2026-10-19",
+  "inputs": {
+   "speed_mph": 55,
+   "work_length_ft": 400,
+   "taper_ft": null,
+   "lane_width_ft": 12,
+   "downstream_taper_ft": 50,
+   "shadow_offset_ft": 0
+  },
+  "outputs": {
+   "buffer_ft": {
+    "value": 495,
+    "tolerance": {
+     "abs": 0
+    }
+   },
+   "merging_taper_ft": {
+    "value": 660,
+    "tolerance": {
+     "abs": 1e-9
+    }
+   },
+   "buffer_devices": {
+    "value": 6,
+    "tolerance": {
+     "abs": 0
+    }
+   },
+   "closure_ft": {
+    "value": 1605,
+    "tolerance": {
+     "abs": 1e-9
+    }
+   }
+  }
  }
  ]
 }

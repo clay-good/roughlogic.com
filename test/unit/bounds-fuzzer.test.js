@@ -62424,3 +62424,44 @@ test("bounds: spec-v1989 computeShowerPanMortarBed pins the rim, the (d + 2r) / 
     assert.ok("error" in _spb(bad), JSON.stringify(bad));
   }
 });
+
+// spec-v1990: ASTM F1869 MVER arithmetic and test count.
+import { computeMverCalciumChloride as _mvr } from "../../calc-finish.js";
+test("bounds: spec-v1990 computeMverCalciumChloride pins the conversion, the window flag, the test count and the error seams", () => {
+  const r = _mvr({ mass_gain_g: 3, test_area_sqft: 0.44486, hours: 72, limit_lb: 3, floor_area_sqft: 2400 });
+  assert.ok(Math.abs(r.mver_lb - 72000 / (453.592 * 0.44486 * 72)) < 1e-9); assert.equal(r.passes, false); assert.equal(r.tests_required, 5);
+  assert.equal(r.standard_window, true);
+  assert.equal(_mvr({ mass_gain_g: 1, test_area_sqft: 0.44486, hours: 59.9 }).standard_window, false);
+  assert.equal(_mvr({ mass_gain_g: 1, test_area_sqft: 0.44486, hours: 60 }).standard_window, true);
+  assert.equal(_mvr({ mass_gain_g: 1, test_area_sqft: 0.5, hours: 72, floor_area_sqft: 1000 }).tests_required, 3);
+  assert.equal(_mvr({ mass_gain_g: 1, test_area_sqft: 0.5, hours: 72, floor_area_sqft: 2000 }).tests_required, 4);
+  assert.equal(_mvr({ mass_gain_g: 1, test_area_sqft: 0.5, hours: 72, floor_area_sqft: 2000.5 }).tests_required, 5);
+  assert.equal(_mvr({ mass_gain_g: 1, test_area_sqft: 0.5, hours: 72 }).tests_required, null);
+  // At the limit exactly passes.
+  const g = 3 * 453.592 * 0.5 * 72 / 24000;
+  assert.equal(_mvr({ mass_gain_g: g, test_area_sqft: 0.5, hours: 72, limit_lb: 3 }).passes, true);
+  for (const bad of [{ test_area_sqft: 0.5, hours: 72 }, { mass_gain_g: -1, test_area_sqft: 0.5, hours: 72 }, { mass_gain_g: 1, test_area_sqft: 0, hours: 72 }, { mass_gain_g: 1, test_area_sqft: 0.5, hours: 0 }, { mass_gain_g: 1, test_area_sqft: 0.5, hours: 72, limit_lb: 0 }, { mass_gain_g: "x", test_area_sqft: 0.5, hours: 72 }, { mass_gain_g: 1e6, test_area_sqft: 0.5, hours: 72 }]) {
+    assert.ok("error" in _mvr(bad), JSON.stringify(bad));
+  }
+});
+
+// spec-v1991: MUTCD 11th Edition 6B.06 / Table 6B-2 buffer, 6K.01 spacing (read 2026-10-19).
+import { computeWorkZoneBufferSpace as _wzb } from "../../calc-construction.js";
+test("bounds: spec-v1991 computeWorkZoneBufferSpace pins Table 6B-2, the next-row rule, the taper formulas, the device counts and the error seams", () => {
+  const r = _wzb({ speed_mph: 35, work_length_ft: 400 });
+  assert.equal(r.buffer_ft, 250); assert.equal(r.merging_taper_ft, 245); assert.equal(r.buffer_devices, 5); assert.equal(r.work_devices, 6); assert.equal(r.closure_ft, 945);
+  assert.equal(_wzb({ speed_mph: 55, work_length_ft: 400 }).closure_ft, 1605);
+  assert.equal(_wzb({ speed_mph: 36, work_length_ft: 0 }).buffer_ft, 305, "between rows: the next row up");
+  assert.equal(_wzb({ speed_mph: 20, work_length_ft: 0 }).buffer_ft, 115);
+  assert.equal(_wzb({ speed_mph: 75, work_length_ft: 0 }).buffer_ft, 820);
+  assert.equal(_wzb({ speed_mph: 40, work_length_ft: 0 }).merging_taper_ft, 12 * 1600 / 60, "40 mph uses W S^2 / 60");
+  assert.equal(_wzb({ speed_mph: 45, work_length_ft: 0, lane_width_ft: 11 }).merging_taper_ft, 495);
+  assert.equal(_wzb({ speed_mph: 35, work_length_ft: 400, taper_ft: 300 }).merging_taper_ft, 300);
+  const sh = _wzb({ speed_mph: 35, work_length_ft: 400, shadow_offset_ft: 100 });
+  assert.equal(sh.activity_area_ft, 750); assert.equal(sh.work_devices, 8, "devices continue through the shadow-vehicle gap");
+  assert.equal(_wzb({ speed_mph: 42, work_length_ft: 0 }).merging_taper_ft, 504, "41 to 44 mph takes the longer W S");
+  assert.ok("error" in _wzb({ speed_mph: 35, work_length_ft: 400, taper_ft: 0 }));
+  for (const bad of [{ work_length_ft: 400 }, { speed_mph: 19, work_length_ft: 400 }, { speed_mph: 76, work_length_ft: 400 }, { speed_mph: 35, work_length_ft: -1 }, { speed_mph: 35, work_length_ft: 400, downstream_taper_ft: 40 }, { speed_mph: 35, work_length_ft: 400, downstream_taper_ft: 120 }, { speed_mph: 35, work_length_ft: 400, lane_width_ft: 0 }, { speed_mph: "x", work_length_ft: 400 }]) {
+    assert.ok("error" in _wzb(bad), JSON.stringify(bad));
+  }
+});

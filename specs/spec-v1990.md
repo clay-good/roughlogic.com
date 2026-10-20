@@ -1,6 +1,6 @@
 # roughlogic.com Specification v1990 -- Concrete Moisture Vapor Emission Rate from a Calcium Chloride Test (ASTM F1869) (`calc-finish.js`, Group E Carpentry and Construction, flooring, 1 New Tile)
 
-> **Status: PROPOSED 2026-10-19. Single-tile spec.** Part of [scope-product-expansion](scope-product-expansion.md). In scope under the
+> **Status: LANDED 2026-10-19 (proposed 2026-10-19). Single-tile spec. As built: the conversion uses 453.592 g per lb (this spec wrote 453.612; the results agree to four figures). ASTM F1869 is cited by name without the -23 edition year, which was not confirmed here.** Part of [scope-product-expansion](scope-product-expansion.md). In scope under the
 > spec-v106 trades-only charter: Group E, the flooring bench in `calc-finish.js` beside `flooring-takeoff` and
 > `self-leveler-bags`, no new dependency and no network call.
 >

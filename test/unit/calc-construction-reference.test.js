@@ -572,3 +572,13 @@ test("truss-uplift-connector: the near reaction from summing strip moments about
     assert.ok(Math.abs(r.per_connector_lb * 2 - r.net_uplift_lb) < 1e-9);
   }
 });
+
+// spec-v1991: Table 6B-2 against the AASHTO stopping sight distance formula it rounds (2.5 s, 11.2 ft/s^2).
+import { computeWorkZoneBufferSpace } from "../../calc-construction.js";
+test("work-zone-buffer-space: every Table 6B-2 row is within 5 ft of 1.47 V t + 1.075 V^2 / a at t = 2.5 s, a = 11.2 ft/s^2", () => {
+  for (let s = 20; s <= 75; s += 5) {
+    const ssd = 1.47 * s * 2.5 + 1.075 * s * s / 11.2;
+    const r = computeWorkZoneBufferSpace({ speed_mph: s, work_length_ft: 0 });
+    assert.ok(Math.abs(r.buffer_ft - ssd) <= 5, s + " mph: table " + r.buffer_ft + " vs formula " + ssd.toFixed(1));
+  }
+});

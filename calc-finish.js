@@ -1552,3 +1552,61 @@ FINISH_RENDERERS["shower-pan-mortar-bed"] = _simpleRenderer({
   ],
   compute: computeShowerPanMortarBed,
 });
+
+// ===================== spec-v1990: moisture vapor emission rate from a calcium chloride test =====================
+// ASTM F1869 arithmetic: the desiccant's gain in grams, converted to pounds of
+// water per 1,000 sq ft per 24 h over the test area and exposure time. The
+// standard measures; the flooring or adhesive maker's written limit decides.
+const _mvrNum = (v, what, opt) => {
+  const blank = v === null || v === undefined || (typeof v === "string" && v.trim() === "");
+  if (blank) return opt ? { v: null } : { error: "Enter the " + what + "." };
+  const ok = typeof v === "number" || (typeof v === "string" && /^\s*[+-]?(\d+\.?\d*|\.\d+)\s*$/.test(v));
+  if (!ok || !Number.isFinite(Number(v))) return { error: "The " + what + " must be a number." };
+  if (Number(v) < 0) return { error: "The " + what + " cannot be negative." };
+  return { v: Number(v) };
+};
+
+// dims: in { mass_gain_g: M, test_area_sqft: L^2, hours: T, limit_lb: dimensionless, floor_area_sqft: L^2 } out: { mver_lb: dimensionless, margin_lb: dimensionless, tests_required: dimensionless }
+export function computeMverCalciumChloride({ mass_gain_g, test_area_sqft, hours, limit_lb = 3, floor_area_sqft = null } = {}) {
+  const v = {};
+  for (const [k, x, w, opt] of [["g", mass_gain_g, "mass gain (g)"], ["a", test_area_sqft, "test area under the dome (sq ft)"], ["h", hours, "exposure time (hours)"], ["lim", limit_lb ?? 3, "manufacturer's limit (lb)"], ["fa", floor_area_sqft, "floor area (sq ft)", true]]) {
+    const r = _mvrNum(x, w, opt); if (r.error) return { error: r.error }; v[k] = r.v;
+  }
+  if (!(v.a > 0)) return { error: "The test area must be positive (sq ft)." };
+  if (!(v.h > 0)) return { error: "The exposure time must be positive (hours)." };
+  if (!(v.lim > 0)) return { error: "The manufacturer's limit must be positive (lb per 1,000 sq ft per 24 h)." };
+  if (v.g > 100 || v.a > 4 || v.h > 240 || v.lim > 50 || (v.fa ?? 0) > 1e7) return { error: "An input is outside a calcium chloride test (gain to 100 g, area to 4 sq ft, time to 240 h, limit to 50 lb)." };
+  const mver_lb = 24000 * v.g / (453.592 * v.a * v.h);
+  const margin_lb = v.lim - mver_lb;
+  const passes = mver_lb <= v.lim + 1e-9;
+  const standard_window = v.h >= 60 - 1e-9 && v.h <= 72 + 1e-9;
+  const tests_required = v.fa === null ? null : v.fa <= 1000 + 1e-9 ? 3 : 3 + Math.ceil((v.fa - 1000) / 1000 - 1e-9);
+  if (![mver_lb, margin_lb].every(Number.isFinite)) return { error: "MVER math is not a finite value." };
+  const verdict = (passes ? "WITHIN THE LIMIT: " + fmt(mver_lb, 2) + " lb against " + fmt(v.lim, 2) + " lb (" + fmt(margin_lb, 2) + " lb to spare)"
+    : "OVER THE LIMIT: " + fmt(mver_lb, 2) + " lb against " + fmt(v.lim, 2) + " lb (" + fmt(-margin_lb, 2) + " lb over)")
+    + (standard_window ? "" : "; the exposure of " + fmt(v.h, 1) + " h is outside the standard's 60 to 72 h window, so this is not a standard test result");
+  return {
+    mver_lb, margin_lb, passes, standard_window, tests_required, verdict,
+    note: "MVER = 24,000 x grams gained / (453.592 x test area in sq ft x hours), in pounds of water per 1,000 sq ft per 24 h: grams to pounds, the dome's area to 1,000 sq ft, and the hours to a day. ASTM F1869 sets a 60 to 72 hour exposure and asks for three tests in the first 1,000 sq ft and one more for each further 1,000 sq ft. Enter the test area your kit states: some state the dome's inside area and some the net area exposed to the dish, and the difference moves the answer. The standard only measures; the pass line is the flooring or adhesive manufacturer's written limit (3 lb is common, some products allow more). Many manufacturers now require the in-situ relative humidity probe of ASTM F2170 instead, whose limit is a percentage, not a rate. The test conditions (the slab at service temperature and humidity, a clean ground surface) are the standard's, not checked here.",
+  };
+}
+export const mverCalciumChlorideExample = { inputs: { mass_gain_g: 3, test_area_sqft: 0.44486, hours: 72, limit_lb: 3, floor_area_sqft: 2400 } };
+
+FINISH_RENDERERS["mver-calcium-chloride"] = _simpleRenderer({
+  citation: "Citation: ASTM F1869, Measuring Moisture Vapor Emission Rate of Concrete Subfloor Using Anhydrous Calcium Chloride, by name (the standard is sold by ASTM): MVER = 24,000 x grams gained / (453.592 x test area in sq ft x hours), lb per 1,000 sq ft per 24 h, over a 60 to 72 hour exposure, three tests in the first 1,000 sq ft and one per further 1,000 sq ft. The limit is the flooring or adhesive manufacturer's.",
+  example: mverCalciumChlorideExample.inputs,
+  fields: [
+    { key: "mass_gain_g", label: "Calcium chloride mass gain (g)", kind: "number", required: true, attrs: { step: "any", min: "0" } },
+    { key: "test_area_sqft", label: "Test area as the kit states it (sq ft)", kind: "number", required: true, attrs: { step: "any", min: "0" } },
+    { key: "hours", label: "Exposure time (hours, 60 to 72 by the standard)", kind: "number", required: true, attrs: { step: "any", min: "0" } },
+    { key: "limit_lb", label: "Flooring or adhesive maker's limit (lb per 1,000 sq ft per 24 h)", kind: "number", default: 3, required: true, attrs: { step: "any", min: "0" } },
+    { key: "floor_area_sqft", label: "Floor area to be covered (sq ft, blank to skip the test count)", kind: "number", required: true, attrs: { step: "any", min: "0" } },
+  ],
+  outputs: [
+    { key: "m", id: "mvr-out-m", label: "Moisture vapor emission rate", value: (r) => fmt(r.mver_lb, 3) + " lb per 1,000 sq ft per 24 h" },
+    { key: "v", id: "mvr-out-v", label: "Against the limit", value: (r) => r.verdict },
+    { key: "t", id: "mvr-out-t", label: "Tests the standard asks for", value: (r) => (r.tests_required === null ? "- (no floor area entered)" : r.tests_required + " tests") },
+    { key: "n", id: "mvr-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeMverCalciumChloride,
+});
