@@ -528,15 +528,20 @@
           "applies_to": "all",
           "edition": "2020",
           "effective": "2022-06-10"
+        },
+        {
+          "applies_to": "all",
+          "edition": "2023",
+          "effective": "2026-09-26"
         }
       ],
       "upcoming": [],
-      "pending": "NEC 2023 proposed in a DLI draft rule notice; not adopted when rechecked 2026-10-17.",
+      "pending": null,
       "scope": null,
       "citation": "Admin. R. Mont. 24.301.401",
       "citation_primary": true,
       "source_url": "https://bsd.dli.mt.gov/building-codes-permits/current-codes",
-      "draft_note": "Rechecked 2026-10-17: ARM 24.301.401 and the state's Current Codes page still adopt NEC 2020 (effective 2022-06-11; NFPA lists 2022-06-10). NFPA's projected 2026-09 update did not appear; commercial sites claiming NEC 2023 cite no rule.",
+      "draft_note": "Rechecked 2026-10-20: the state's Current Codes page (bsd.dli.mt.gov) lists National Electrical Code, 2023 Edition, effective September 26, 2026, adopted and amended by ARM Title 24, Chapter 301; the 2026-10-17 recheck predated the page update. NFPA's projected 2026-09 date matches. NEC 2020 (effective 2022-06-11; NFPA lists 2022-06-10) is kept as the prior edition. Signer: read the ARM 24.301.401 text as amended.",
       "verified_by": null,
       "verified_on": null,
       "nfpa_2026_08_03": "2020 with MT amendments (6/10/2022) | 2023 update process underway (Projected 9/2026)"

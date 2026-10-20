@@ -1,6 +1,1057 @@
 {
   "code": "IRC",
   "cadence_days": 92,
-  "about": "spec-v1974: per-state adoption of the IRC, drafted one state at a time from the state's own statute or rule, with ICC's adoption map as the cross-check only. Each row also names its code family (a state on the UPC or UMC adopts no IPC or IMC edition). No row is drafted yet; until one is, nothing ships for this code.",
-  "rows": {}
+  "about": "spec-v1974: per-state adoption of the IRC, drafted one state at a time from the state's own statute or rule, with ICC's adoption chart (April 2026) as the cross-check only. All 51 drafted 2026-10-20; unsigned rows show labeled not verified, and a row whose sources conflict shows no edition.",
+  "rows": {
+    "AL": {
+      "name": "Alabama",
+      "status": "limited",
+      "family": "IRC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2015",
+          "effective": "2016-10-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": "Board code binds local residential codes adopted after 2010; cities with a code in effect before then keep their own.",
+      "citation": "Ala. Admin. Code r. 305-2-4-.09 (Alabama Residential Building Code, 2015 IRC as modified); Ala. Code 41-23-85",
+      "citation_primary": true,
+      "source_url": "https://admincode.legislature.state.al.us/api/rule/305-2-4-.09",
+      "draft_note": "Read rule 305-2-4-.09 text: '2015 IRC as modified', (5) effective for enforcement 2016-10-01 (rule history: new rule eff 2016-10-06, amended eff 2017-06-04). Read 2010 Act (SB315 enrolled) 41-23-85(c): county/state codes adopted after the act must not conflict with the board code; a municipality without a code under 11-45-8 may adopt only the board code; municipalities with a code in effect at the act are exempt. Enforcement is local; no state enforcement where no local code. 2024 SB288 (statewide IRC) not shown enacted. No newer AERC adoption found.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Master I-Code chart (April 2026): IRC 15. ICC state page: 'Alabama Residential and Energy Codes Commission adopts statewide residential and energy codes.'"
+    },
+    "AK": {
+      "name": "Alaska",
+      "status": "local",
+      "family": "IRC",
+      "editions": [],
+      "upcoming": [],
+      "pending": null,
+      "scope": "No statewide residential code; boroughs and cities adopt their own IRC edition. State fire code review exempts triplexes and smaller.",
+      "citation": "No state adoption: 13 AAC 50.020 adopts the 2021 IBC only; the IRC is not adopted statewide",
+      "citation_primary": false,
+      "source_url": "https://matsu.gov/adopted-building-codes-2021-code-cycle",
+      "draft_note": "An absence has no adopting rule to cite. Mat-Su Borough page: 'The State of Alaska and MSB have not adopted the International Residential Code (IRC).' Search summaries of 13 AAC 50.020 show it adopts the 2021 IBC (Justia/DPS pages returned 403/404, not read directly). State Fire Marshal plan review exempts residential triplex or smaller (search snippet). Local examples: Fairbanks 2015 IRC, Kodiak 2012 IRC. Signer: confirm on akrules / DPS.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Master I-Code chart (April 2026): IRC X (adopted by some jurisdictions, not a statewide standard)."
+    },
+    "AZ": {
+      "name": "Arizona",
+      "status": "local",
+      "family": "IRC",
+      "editions": [],
+      "upcoming": [],
+      "pending": null,
+      "scope": "No statewide residential code; each city, town and county adopts and amends its own IRC edition.",
+      "citation": "No state adoption: counties adopt building codes under A.R.S. 11-861; cities under their own authority",
+      "citation_primary": false,
+      "source_url": "https://law.justia.com/codes/arizona/2012/title11/section11-861",
+      "draft_note": "An absence has no adopting rule to cite. A.R.S. 11-861 (read via search summaries of the Justia copy, 2011/2012 text) lets a zoned county adopt a code for unincorporated areas and exempt rural zones. Secondary guides agree: no statewide residential code. Signer: confirm no state rule and check current azleg.gov text.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Master I-Code chart (April 2026): IRC X (local adoptions only)."
+    },
+    "AR": {
+      "name": "Arkansas",
+      "status": "statewide-amended",
+      "family": "IRC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2021",
+          "effective": "2023-01-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": null,
+      "citation": "Ark. Code R. 015.01.22-005, 2021 Arkansas Fire Prevention Code, Volume III (Residential), State Fire Marshal",
+      "citation_primary": true,
+      "source_url": "https://www.law.cornell.edu/regulations/arkansas/015-01-22-Ark-Code-R-SS-005",
+      "draft_note": "Read the rule text (Cornell LII copy, first 100K of 121K chars): IRC 'shall mean the Arkansas Fire Prevention Code, Volume III', based on 2021 IRC as amended by the State Fire Marshal; 'shall be effective January 1, 2023'. Oct 2024 DPS foreword revisions still say 2021. No 2024-edition rulemaking found. Residential code sits in the fire code; local enforcement varies.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Master I-Code chart (April 2026): IRC 21. ICC search snippet: '2021 International Residential Code, effective January 1, 2023'."
+    },
+    "CA": {
+      "name": "California",
+      "status": "statewide-amended",
+      "family": "IRC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2024",
+          "effective": "2026-01-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": null,
+      "citation": "Cal. Code Regs. tit. 24, pt. 2.5 (2025 California Residential Code), Building Standards Commission",
+      "citation_primary": true,
+      "source_url": "https://dgs.ca.gov/BSC/Codes",
+      "draft_note": "Read DGS/BSC codes page: 2025 Title 24 published 2025-07-01, effective 2026-01-01; Part 2.5 errata also eff 2026-01-01. Prior 2022 CRC (2021 IRC) eff 2023-01-01. The 2024 IRC base comes from the ICC product listing, not the BSC page; confirm in the CRC preface. Cities may adopt stricter local amendments filed with BSC.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Master I-Code chart (April 2026): IRC 24."
+    },
+    "CO": {
+      "name": "Colorado",
+      "status": "local",
+      "family": "IRC",
+      "editions": [],
+      "upcoming": [],
+      "pending": null,
+      "scope": "No statewide residential code (home rule); counties and cities adopt their own IRC edition.",
+      "citation": "No state adoption: counties adopt building codes under C.R.S. 30-28-201; home-rule cities under their own charters",
+      "citation_primary": false,
+      "source_url": "https://www.energycodes.gov/status/states/Colorado",
+      "draft_note": "An absence has no adopting rule to cite. Secondary sources (DOE energy codes page, ACEEE, AWC) agree: no statewide residential code. State adopts some codes (plumbing, electrical, energy minimum under HB22-1362) and the State Architect adopts codes for state buildings; Division of Housing covers hotels/multifamily where no local department, not 1-2 family. Larimer, Loveland use 2021 IRC. Signer: confirm.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Master I-Code chart (April 2026): IRC X (local adoptions only)."
+    },
+    "CT": {
+      "name": "Connecticut",
+      "status": "statewide-amended",
+      "family": "IRC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2021",
+          "effective": "2022-10-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": "2026 State Building Code (2024 IRC) awaits Legislative Regulation Review Committee approval; July 1, 2026 date delayed.",
+      "scope": null,
+      "citation": "2022 Connecticut State Building Code (2021 IRC as amended), Office of the State Building Inspector, C.G.S. 29-252",
+      "citation_primary": true,
+      "source_url": "https://portal.ct.gov/en/das/office-of-state-building-inspector/connecticut-state-building-code/regulations",
+      "draft_note": "Read DAS regulations page: 2022 CSBC 'applies to projects with permit applications filed from October 1, 2022' and adopts the 2021 IRC. Read DAS adoption-process page: 2026 code (2024 IRC) was expected 2026-07-01, delayed pending LRRC approval; no new date. Statute section not checked; signer confirm C.G.S. cite.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Master I-Code chart (April 2026): IRC 21."
+    },
+    "DE": {
+      "name": "Delaware",
+      "status": "local",
+      "family": "IRC",
+      "editions": [],
+      "upcoming": [],
+      "pending": null,
+      "scope": "No statewide residential code; New Castle, Kent and Sussex counties and cities adopt their own. State sets the energy code minimum.",
+      "citation": "No state adoption: 16 Del. C. 7601 lets the three counties adopt and enforce building codes",
+      "citation_primary": true,
+      "source_url": "https://delcode.delaware.gov/title16/c076/index.html",
+      "draft_note": "Read 16 Del. C. ch. 76: 7601 counties 'may adopt and enforce building codes'; 7602 requires local codes to meet the latest IECC adopted by the Energy Office (energy only, not the IRC). No statewide IRC found. citation_primary true because the statute read is the state's own text showing local authority; signer may prefer false as for other absences. County editions not checked.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Master I-Code chart (April 2026): IRC X (local adoptions only)."
+    },
+    "FL": {
+      "name": "Florida",
+      "status": "statewide-amended",
+      "family": "IRC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2021",
+          "effective": "2023-12-31"
+        }
+      ],
+      "upcoming": [],
+      "pending": "9th Edition (2026) FBC, Residential (2024 IRC): rule proposed 2026-09-23, not final; Commission targets 2026-12-31.",
+      "scope": null,
+      "citation": "Fla. Admin. Code r. 61G20-1.001 (Florida Building Code, 8th Edition (2023), Residential), Florida Building Commission",
+      "citation_primary": true,
+      "source_url": "https://www.flrules.org/gateway/ruleNo.asp?id=61G20-1.001",
+      "draft_note": "Read flrules notice list for 61G20-1.001: 8th Edition (2023) adopted, Final notice effective 2023-12-31; later finals (2025-02-23, 2025-07-06, 2026-03-18) amend it for statute changes. Proposed notice 2026-09-23 adopts the 9th Edition (2026); no final notice yet, so listed as pending not upcoming. Miami-Dade and ICC say 9th Ed effective 2026-12-31. 2021 IRC base of the 8th Ed from ICC/secondary, not the rule page. Recheck in Dec 2026.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Master I-Code chart (April 2026): IRC 21. ICC-NTA: Florida updating to the 9th edition, effective December 31, 2026."
+    },
+    "GA": {
+      "name": "Georgia",
+      "status": "statewide-amended",
+      "family": "IRC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2024",
+          "effective": "2026-01-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": null,
+      "citation": "O.C.G.A. 8-2-23; DCA State Minimum Standard Codes: 2024 IRC with Georgia Amendments",
+      "citation_primary": true,
+      "source_url": "https://dca.georgia.gov/document/document/new-codes-and-amendments-effective-january-1-2026-memo/download",
+      "draft_note": "Read DCA memo dated 2025-12-01: DCA Board adopted the 2024 IRC with Georgia Amendments effective 2026-01-01 under O.C.G.A. 8-2-23. The IRC is a mandatory state minimum code; enforcement is by local governments that choose to enforce, and local amendments must be filed with DCA. Prior edition (2018 IRC) not recorded here.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Master I-Code chart (April 2026): IRC 24."
+    },
+    "HI": {
+      "name": "Hawaii",
+      "status": "statewide-amended",
+      "family": "IRC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2018",
+          "effective": "2021-04-20"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": "Counties adopt and amend the State Residential Code by ordinance; if a county misses the 2-year deadline it applies as interim county code.",
+      "citation": "Haw. Admin. R. tit. 3, State Building Code Council definitions: State Residential Code (2018 IRC) [Eff 4/20/2021]; HRS ch. 107",
+      "citation_primary": true,
+      "source_url": "https://www.law.cornell.edu/regulations/hawaii/Haw-Code-R-tit-3-Building-Code-Council-State-Building-Code-Council-Definitions",
+      "draft_note": "SOURCES CONFLICT: HAR definitions name the 2018 IRC State Residential Code [Eff 4/20/2021], and Honolulu Ord. 24-15 (2024) adopts the 2018-based state codes; but the SBCC 2024 Annual Report says the 2021 IBC, IRC and IECC 'were adopted by default in the State without state amendments' (statute: national code becomes state code if not adopted in 2 years), with SBCC work suspended by the Governor's affordable-housing proclamation. Which edition a dwelling permit uses depends on the county ordinance. Signer: decide 2018 vs 2021 default.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Master I-Code chart (April 2026): IRC 18."
+    },
+    "ID": {
+      "name": "Idaho",
+      "status": "limited",
+      "family": "IRC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2018",
+          "effective": "2021-01-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": "Building Code Board proposed the 2024 IRC (public hearing 2025-08-11); the June 2026 rule text still adopts the 2018 IRC.",
+      "scope": "Enforced where a city or county runs a building permit program; those localities must adopt the Idaho Residential Code (Idaho Code 39-4116).",
+      "citation": "IDAPA 24.39.30.600.03 (Idaho Building Code Board; International Residential Code, 2018 Edition, Parts I-III and IX, amended)",
+      "citation_primary": true,
+      "source_url": "https://adminrules.idaho.gov/rules/current/24/243930.pdf",
+      "draft_note": "Read the current IDAPA 24.39.30 PDF (created 2026-06-12): 600.03 adopts the 2018 IRC, Parts I, II, III and IX, with amendments, stamped (7-1-24), meaning the 2024 re-promulgation. The 2018 codes took effect 2021-01-01 per the Division's adopted-codes notice (secondary: city notices and search snippets of the DBS/DOPL list; optional early use from 2020-07-01). Read Idaho Code 39-4116: local governments that issue permits must adopt the code effective January 1 after Board adoption, may amend only to an equal level of protection, and must exempt 1- and 2-family dwellings from sprinkler requirements. 'limited' because nothing I read shows the IRC enforced where no local program exists; the signer may prefer 'statewide-amended'. BLD minutes 2025-08-11 list the 2024 IRC adoption as proposed. I found no final rule, and the 2026 rule text does not include it.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Master I-Code chart (April 2026): IRC 18."
+    },
+    "IL": {
+      "name": "Illinois",
+      "status": "local",
+      "family": "IRC",
+      "editions": [],
+      "upcoming": [],
+      "pending": null,
+      "scope": "No statewide residential code; cities and counties adopt their own. Where none exists, the current IRC applies to new-home contracts.",
+      "citation": "815 ILCS 670/10, 670/15 (Illinois Residential Building Code Act, as amended by P.A. 103-510, eff. 2024-01-01)",
+      "citation_primary": true,
+      "source_url": "https://www.ilga.gov/ftp/ILCS/Ch%200815/Act%200670/081506700K15.html",
+      "draft_note": "Read 815 ILCS 670/10 and 670/15 on ilga.gov. In a 'non-building code jurisdiction', a contract for a new 1- or 2-family home must name an agreed code: the IRC, or any city or county code in effect within 100 mi. If the contract names none, the current edition of the IRC applies by law. The Act defines the IRC as 'the current edition or the most recent preceding edition', excluding Parts IV and VII. This is a contract rule, not an enforced statewide code, so the row is 'local' with no edition. Indiana's 2025 readoption review also says Illinois has no statewide residential code.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Master I-Code chart (April 2026): IRC X (adopted by some jurisdictions, not a statewide standard)."
+    },
+    "IN": {
+      "name": "Indiana",
+      "status": "statewide-amended",
+      "family": "IRC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2018",
+          "effective": "2019-12-26"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": null,
+      "citation": "675 IAC 14-4.4 (2020 Indiana Residential Code, based on the 2018 IRC)",
+      "citation_primary": true,
+      "source_url": "https://secure.iot.in.gov/dhs/files/Adoption-and-Implementation-of-2020-Indiana-Residential-Code.pdf",
+      "draft_note": "Read the State Building Commissioner's circular (2020-02-25). The 2020 Indiana Residential Code (675 IAC 14-4.4) took effect 2019-12-26. It is the 2018 IRC with Indiana amendments and is in force in every location in the state for Class 2 structures (IC 36-7-2-9). Also read the Fire Prevention and Building Safety Commission's 2025 Readoption Review (LSA #24-566), which still says Rule 4.4 adopts the 2018 IRC. It was readopted so it would not expire on 2026-01-01, with no edition change. The Commission's 2026 drafts adopt the 2024 IBC and IFC only. I found no IRC update. I did not read the IAC text of 14-4.4 itself.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Master I-Code chart (April 2026): IRC 18."
+    },
+    "IA": {
+      "name": "Iowa",
+      "status": "limited",
+      "family": "IRC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2024",
+          "effective": "2025-09-10"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": "State code covers buildings subject to Iowa Code 103A.10/103A.12 (state buildings, localities using it); other cities adopt their own.",
+      "citation": "481 IAC 301.8(103A) (State Building Code; International Residential Code, 2024 edition, amended)",
+      "citation_primary": true,
+      "source_url": "https://www.legis.iowa.gov/docs/iac/chapter/481.301.pdf",
+      "draft_note": "Read 481 IAC ch. 301 (IAC 9/30/26). Rule 301.8 adopts the 2024 IRC with amendments (deletes R101.1 and R103-R114) [ARC 9474C, IAB 8/6/25, eff. 9/10/25]. The rules moved from 661 to 481 on 11/26/25, so Cornell/LII copies of 661-301.8 citing the 2015 IRC are out of date. Under rule 301.10, a project begun within 12 months (through about 2026-09-10) could use the prior standards. 'limited' because Iowa's state building code applies only to buildings subject to it under ch. 103A. Signer: confirm the 103A.10 applicability list. Rule 301.1 points to 103A.10 and 103A.12 but I did not read the statute.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Master I-Code chart (April 2026): IRC 24."
+    },
+    "KS": {
+      "name": "Kansas",
+      "status": "local",
+      "family": "IRC",
+      "editions": [],
+      "upcoming": [],
+      "pending": null,
+      "scope": "No statewide residential code; cities and counties adopt and amend their own edition.",
+      "citation": "No state adoption: Kansas has no statewide residential building code; cities and counties adopt under their home-rule powers",
+      "citation_primary": false,
+      "source_url": "https://www.energycodes.gov/status/states/kansas",
+      "draft_note": "An absence has no adopting rule to cite. ICC's April 2026 chart shows only X (local adoption) for every Kansas I-code. DOE energycodes.gov (read) lists Kansas as 'Home Rule', with codes 'Applicable by County or Jurisdiction' (energy code only). I did not find or read a Kansas statute confirming there is no state residential code. Signer: confirm.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Master I-Code chart (April 2026): IRC X (local adoptions only)."
+    },
+    "KY": {
+      "name": "Kentucky",
+      "status": "statewide-amended",
+      "family": "IRC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2015",
+          "effective": "2019-08-02"
+        }
+      ],
+      "upcoming": [],
+      "pending": "DHBC KBC/KRC task forces are reviewing the 2018, 2021 and 2024 IRC (December 2025 notice); no rule filed.",
+      "scope": null,
+      "citation": "815 KAR 7:125 (Kentucky Residential Code: 2015 IRC with the 2018 Kentucky Residential Code amendments)",
+      "citation_primary": true,
+      "source_url": "https://apps.legislature.ky.gov/law/kar/titles/815/007/125",
+      "draft_note": "Read 815 KAR 7:125 on the LRC site. Section 2(1) makes the 2015 IRC the mandatory state residential code for 1- and 2-family dwellings and townhouses. The 2018 KRC amendments (Third Edition, August 2024) supersede where they conflict. Latest history: eff. 8-2-2019; TAm eff. 5-29-2020; eff. 12-3-2024. The 2019-08-02 effective date is inferred: the earliest version I read (eff. 8-2-2019) already names the 2015 IRC, but I did not read the version before it to confirm that is when the 2015 base began. The 2024-12-03 amendment updated the KRC amendment document (and the NEC), not the IRC edition. The task force notice is secondary (dhbc.ky.gov search snippet).",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Master I-Code chart (April 2026): IRC 15."
+    },
+    "LA": {
+      "name": "Louisiana",
+      "status": "statewide-amended",
+      "family": "IRC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2021",
+          "effective": "2023-01-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": "2024 IRC proposed (notice of intent, La. Register 2026-08-20); the proposed rule says effective 2027-01-01. Final rule not seen.",
+      "scope": null,
+      "citation": "LAC 17:I.107 (Louisiana State Uniform Construction Code; IRC 2021 Edition, excluding Parts I and VIII)",
+      "citation_primary": true,
+      "source_url": "https://luccc.louisiana.gov/wp-content/uploads/2025/11/LSUCCC_Louisiana-Construction-Code-Information.pdf",
+      "draft_note": "Read LAC 17 Part I (doa.la.gov .docx). 107.A.1 adopts the 2021 IRC excluding Parts I (Administrative) and VIII (Electrical), last amended LR 52:684 (May 2026). Also read the council's code information sheet (revised 2026-08-06): 2021 ICC codes effective 2023-01-01, 2021 IECC 2023-07-01, and 'ICC code editions will become effective January 1, 2027'. The July 2026 handout has the proposed Rule 101 'effective January 1, 2027' and the 2024 IRC text. The council site says the notice of intent ran in the 2026-08-20 Register, so this is still a proposed rule and goes under 'pending', not 'upcoming'. R.S. 40:1730.28 bars sprinkler mandates in 1- and 2-family dwellings. The council was renamed LUCCC in 2026.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Master I-Code chart (April 2026): IRC 21."
+    },
+    "ME": {
+      "name": "Maine",
+      "status": "statewide-amended",
+      "family": "IRC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2021",
+          "effective": "2025-04-07"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": "MUBEC applies statewide; enforcement is mandatory only in municipalities of 4,000+ residents, optional below that.",
+      "citation": "16-642 C.M.R. ch. 5 (MUBEC Residential Building Code; 2021 IRC, ch. 1-11, 15, 44, amended)",
+      "citation_primary": true,
+      "source_url": "https://www.maine.gov/dps/fmo/sites/maine.gov.dps.fmo/files/inline-files/642C005.pdf",
+      "draft_note": "Read 16-642 ch. 5 (Bureau of Building Codes and Standards). It adopts Chapters 1-11, 15 and 44 of the 2021 IRC with amendments, and states it takes effect 90 days after the Commissioner approves it. Its footer reads 'AMENDED: March 4, 2025 - filing 2025-046'. The 2025-04-07 date comes from AIA Maine and a Bar Harbor notice (Commissioner signed 2025-01-07, plus 90 days), both secondary. Signer: check the SOS filing 2025-046 to choose between 2025-03-04 (filing) and 2025-04-07 (90-day clause). Ch. 1 says MUBEC applies to all buildings regardless of population, must be enforced at 4,000+ residents, and no municipality may enforce any other building code.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Master I-Code chart (April 2026): IRC 21."
+    },
+    "MD": {
+      "name": "Maryland",
+      "status": "statewide-amended",
+      "family": "IRC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2021",
+          "effective": "2023-05-29"
+        }
+      ],
+      "upcoming": [],
+      "pending": "2024 IRC proposed for COMAR 09.12.51 (Md. Register 2026-06-26, comments closed 2026-07-27); no final rule seen.",
+      "scope": "Statewide minimum (MBPS); counties and cities enforce it within 12 months of a state update and may adopt local amendments.",
+      "citation": "COMAR 09.12.51.04 (Maryland Building Performance Standards; 2021 IRC with State modifications)",
+      "citation_primary": true,
+      "source_url": "https://regs.maryland.gov/us/md/exec/comar/09.12.51.04",
+      "draft_note": "Read COMAR 09.12.51.04 on regs.maryland.gov: it incorporates the 2021 IRC with State modifications. Its last amendment, effective 2023-05-29 (50:10 Md. R. 407), is also printed on the Department of Labor's COMAR PDF. Local jurisdictions had 12 months to enforce (by about 2024-05-29, per Rockville). The 2024 IBC/IRC/IECC proposal comes from search results (DOL building news, the NEEP comment letter). I did not read the Md. Register notice. The edition in force at a given address can lag up to 12 months after a state update.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Master I-Code chart (April 2026): IRC 21."
+    },
+    "MA": {
+      "name": "Massachusetts",
+      "status": "statewide-amended",
+      "family": "IRC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2021",
+          "effective": "2024-10-11"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": null,
+      "citation": "780 CMR 51.00 (Massachusetts Residential Code, 10th edition State Building Code; 2021 IRC with MA amendments)",
+      "citation_primary": true,
+      "source_url": "https://www.mass.gov/handbook/tenth-edition-of-the-ma-state-building-code-780",
+      "draft_note": "Read the mass.gov (Division of Occupational Licensure) 10th edition page. The 10th edition first took effect 2024-10-11. During a concurrency period, extended to end 2025-06-30, the 9th edition could also be used. Chapter 51, the Massachusetts Residential Code, adopts the 2021 IRC with significant MA amendments. Since 2025-07-01 it is the only code in effect. I did not read 780 CMR 51 itself (mass.gov blocks scripted downloads). DOER stretch and specialized energy codes (225 CMR 22/23) apply by municipality.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Master I-Code chart (April 2026): IRC 21."
+    },
+    "MI": {
+      "name": "Michigan",
+      "status": "statewide-amended",
+      "family": "IRC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2015",
+          "effective": "2016-02-08"
+        }
+      ],
+      "upcoming": [],
+      "pending": "2021 Michigan Residential Code filed 2025-05-01 for 2025-08-29; paused by a Court of Claims order in HBA of Michigan v. LARA.",
+      "scope": null,
+      "citation": "Michigan Residential Code 2015 (LARA Bureau of Construction Codes; Stille-DeRossett-Hale Single State Construction Code Act)",
+      "citation_primary": true,
+      "source_url": "https://www.michigan.gov/lara/bureau-list/bcc/rules-acts/codes/code-books",
+      "draft_note": "LARA Code Books page read 2026-10-20: '2015 Michigan Residential Code Current Code - Effective February 8, 2016'. The 2021 MRC rules (filed 2025-05-01, to take effect 2025-08-29) were paused under a 2025-07-07 stipulated order in Home Builders Association of Michigan v. LARA; no ruling or settlement found as of 2026-10-20, so no upcoming date is recorded. Admin Code rule number (R 408.30401 et seq.) not read. One township page gives 2022-02-08; LARA says 2016-02-08.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Chart (April 2026, MiTek-hosted copy): IRC 15. State page: no edition table."
+    },
+    "MN": {
+      "name": "Minnesota",
+      "status": "statewide-amended",
+      "family": "IRC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2018",
+          "effective": "2020-03-31"
+        }
+      ],
+      "upcoming": [],
+      "pending": "DLI is drafting a chapter 1309 update to the 2024 IRC (request for comments 2026-02-02); no draft, hearing or date yet.",
+      "scope": null,
+      "citation": "Minn. R. 1309.0010 (Minnesota Residential Code, 2018 IRC as amended); Minn. Stat. 326B.121",
+      "citation_primary": true,
+      "source_url": "https://www.revisor.mn.gov/rules/1309.0010/",
+      "draft_note": "1309.0010 subp. 1 incorporates the 2018 IRC (history 44 SR 764); DLI fact sheet: Minnesota Residential Code effective March 31, 2020. Minn. Stat. 326B.121 says the code applies statewide and supersedes municipal codes, but municipalities outside the metro area are not all required to enforce it (they may opt in by ordinance). DLI docket node 8206 shows the 2024 IRC rule as 'To be determined' at every step.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Chart (April 2026): IRC 18. State page: jurisdictions that adopt codes must adopt the Minnesota State Building Code."
+    },
+    "MS": {
+      "name": "Mississippi",
+      "status": "local",
+      "family": "IRC",
+      "editions": [],
+      "upcoming": [],
+      "pending": null,
+      "scope": "Building Codes Council publishes minimum codes cities and counties may adopt; coastal counties must enforce. Edition not confirmed.",
+      "citation": "No mandatory statewide residential code: Miss. Code Ann. 17-2-1 et seq. (Mississippi Building Codes Council) not read",
+      "citation_primary": false,
+      "source_url": "https://www.iccsafe.org/advocacy/adoptions-map/mississippi/",
+      "draft_note": "SOURCES CONFLICT: ICC's April 2026 chart lists Mississippi IRC 24 as a state adoption; BCAP lists the 2021 IRC effective 2024-07-01; up.codes lists a 2024 Mississippi Residential Code effective 2025-01-01. The Council's own adopted-codes list and 17-2-1 text could not be reached (mid.ms.gov has no Council page found; Justia/FindLaw blocked). MID modular-home rule (Title 19 Part 7 Ch. 3) cites the 2024 IRC for modular homes from 2026-07-01. ICC says the coastal counties must adopt and enforce; enforcement is voluntary elsewhere. If the Council list is read, this row likely becomes 'limited' with that edition.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Chart (April 2026): IRC 24 (state). State page: MBCC adopts on a 3-year cycle; coastal counties must enforce; voluntary elsewhere."
+    },
+    "MO": {
+      "name": "Missouri",
+      "status": "local",
+      "family": "IRC",
+      "editions": [],
+      "upcoming": [],
+      "pending": null,
+      "scope": "No statewide residential code; cities and counties adopt their own edition.",
+      "citation": "No state adoption: Missouri has no statewide residential building code; counties and cities adopt codes by ordinance",
+      "citation_primary": false,
+      "source_url": "https://www.iccsafe.org/advocacy/adoptions-map/missouri/",
+      "draft_note": "An absence has no adopting rule to cite. ICC's chart marks every I-code X (local only) and its state page says codes are adopted locally, the state adopting only for state-owned buildings. No Missouri statute was read.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Chart (April 2026): IRC X (local adoption only). State page: most codes adopted locally; state adopts for state-owned buildings."
+    },
+    "MT": {
+      "name": "Montana",
+      "status": "limited",
+      "family": "IRC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2024",
+          "effective": "2026-09-26"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": "Under 5-unit homes are exempt unless a city, town or county opts in; certified local programs enforce the state code there.",
+      "citation": "Admin. R. Mont. 24.301.154 (IRC 2024 as amended); MCA 50-60-102",
+      "citation_primary": true,
+      "source_url": "https://bsd.dli.mt.gov/building-codes-permits/current-codes",
+      "draft_note": "DLI Current Codes page read 2026-10-20: 'International Residential Code, 2024 Edition - Effective: September 26, 2026' (search caches still show the prior 2021 IRC, effective 2022-06-11). MCA 50-60-102(1)(a): the state building code does not apply to residential buildings of fewer than five dwelling units unless the local legislative body makes it applicable; energy provisions still apply via builder self-certification. MAR adoption notice for the 2024 change not read; ICC's April 2026 chart (pre-change) shows 21.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Chart (April 2026): IRC 21. State page: BC Program enforces statewide; local programs must be certified."
+    },
+    "NE": {
+      "name": "Nebraska",
+      "status": "limited",
+      "family": "IRC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2018",
+          "effective": "2019-09-07"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": "Applies where a county, city or village has not adopted a conforming code within 2 years of an update; never to farm construction.",
+      "citation": "Neb. Rev. Stat. 71-6403(1)(b) (2018 IRC except R313 and Ch. 25-33); 71-6406",
+      "citation_primary": true,
+      "source_url": "https://nebraskalegislature.gov/laws/statutes.php?statute=71-6403",
+      "draft_note": "71-6403 names the 2018 IRC (from LB348, approved 2019-04-17, no emergency clause). The 2019-09-07 date is ICC's; the enacted bill has no operative date and Nebraska's three-months-after-adjournment rule (sine die 2019-05-31) was not computed from a primary source. Confirm the day. 71-6406: local codes must conform generally; failing that, the state code applies (LB131, 2021). The 2018 IECC replaces IRC Ch. 11 (effective 2020-07-01).",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Chart (April 2026): IRC 18. State page: from 2021-08-28 the state code applies where a jurisdiction lacks a conforming code."
+    },
+    "NV": {
+      "name": "Nevada",
+      "status": "local",
+      "family": "IRC",
+      "editions": [],
+      "upcoming": [],
+      "pending": null,
+      "scope": "No statewide residential code; cities and counties adopt their own edition (regional 'blended' amendments).",
+      "citation": "No statewide residential code: NAC 341.045 (State Public Works Board) covers state buildings only",
+      "citation_primary": false,
+      "source_url": "https://publicworks.nv.gov/uploadedFiles/publicworksnvgov/content/Documents/Permitting_Code_Enforcement/2024%20Adopted_Codes.pdf",
+      "draft_note": "Homes are under local codes only. For state buildings, the SPWD 2024 adopted-codes list names the 2024 IRC (2018-edition designs accepted until 2025-06-30), but the NAC 341.045 text posted at leg.state.nv.us still shows the 2018 IRC. That conflict matters only for state-owned buildings, so the row is kept local.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Chart (April 2026): IRC X (local adoption only). State page: state adopts for state buildings; blended codes adopted locally."
+    },
+    "NH": {
+      "name": "New Hampshire",
+      "status": "statewide-amended",
+      "family": "IRC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2024",
+          "effective": "2026-07-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": null,
+      "citation": "RSA 155-A:1, IV (state building code: IRC 2024 with NH amendments), as amended 2026, eff. July 1, 2026",
+      "citation_primary": true,
+      "source_url": "https://www.gencourt.state.nh.us/rsa/html/XII/155-A/155-A-1.htm",
+      "draft_note": "RSA 155-A:1, IV read 2026-10-20 names the IRC 2024 with board amendments as of 2025-10-10; source line: 2026 ch. 49:1 and 318:3, eff. July 1, 2026. Prior: IRC 2021, effective 2024-07-01 (2024 ch. 323). Town notices: either edition may be used through 2026-12-31; all new applications must use 2024 from 2027-01-01 (concurrency not read in the statute). Municipalities without a building official are enforced by the State Fire Marshal (155-A:2). ICC's chart and state page still show 2021 (before the change).",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Chart (April 2026): IRC 21. State page quotes RSA 155-A:1 IV with IRC 2021."
+    },
+    "NJ": {
+      "name": "New Jersey",
+      "status": "statewide-amended",
+      "family": "IRC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2024",
+          "effective": "2026-08-17"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": null,
+      "citation": "N.J.A.C. 5:23-3.21 (one- and two-family dwelling subcode: IRC/2024, New Jersey edition)",
+      "citation_primary": true,
+      "source_url": "https://www.nj.gov/dca/codes/codreg/pdf_rule_adoptions/model_codes_2024_adopt.pdf",
+      "draft_note": "Adoption notice 58 N.J.R. 8(2) (R.2026 d.086) read: adopted 2026-07-15, effective August 17, 2026; amends 5:23-3.21 with the 2024 IRC. The notice refers to a six-month grace period after adoption (until about 2027-02-17, prior IRC/2021 usable); the grace rule (N.J.A.C. 5:23-1.6) was not read. Prior: IRC/2021, effective 2022-09-06. The UCC is uniform statewide; localities may not amend. NJ deletes the IRC R313 sprinkler mandate.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Chart (April 2026): IRC 21. State page: UCC uniform statewide, local jurisdictions may not amend."
+    },
+    "NM": {
+      "name": "New Mexico",
+      "status": "statewide-amended",
+      "family": "IRC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2021",
+          "effective": "2023-07-14"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": null,
+      "citation": "14.7.3 NMAC (2021 New Mexico Residential Building Code)",
+      "citation_primary": true,
+      "source_url": "https://www.srca.nm.gov/parts/title14/14.007.0003.pdf",
+      "draft_note": "14.7.3.5: effective July 14, 2023; either the prior rule or this one could be used until 2023-12-14, after which permits issue only under this rule. 14.7.3.8 adopts the 2021 IRC as amended. Amendments to 14.7.3 were heard 2024-11-13 (same edition). No 2024 IRC rulemaking found. ICC says a few home-rule jurisdictions adopt their own codes.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Chart (April 2026): IRC 21. State page: 2021 IRC adopted statewide by CID as minimum code; a few home-rule jurisdictions adopt their own."
+    },
+    "NY": {
+      "name": "New York",
+      "status": "statewide-amended",
+      "family": "IRC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2024",
+          "effective": "2025-12-31"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": "Statewide outside New York City, which enforces its own NYC Construction Codes.",
+      "citation": "19 NYCRR Part 1220 (2025 Residential Code of New York State, Uniform Code)",
+      "citation_primary": true,
+      "source_url": "https://dos.ny.gov/notice-adoption",
+      "draft_note": "NYS DOS notice of adoption: 2025 Uniform Code (incl. 2025 RCNYS) effective 2025-12-31; Code Council approved 2025-07-25; optional 2020-or-2025 compliance before that date. The DOS page does not name the base IRC; ICC's product listing says 2025 RCNYS is based on the 2024 IRC. The fossil-fuel ban (19 NYCRR 1240.6, Subpart 1229-2) is suspended by court order, outside Part 1220. Prior: 2020 RCNYS (2018 IRC). NYC excluded from the Uniform Code (not verified here beyond general knowledge).",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "ICC chart (Apr 2026, MiTek-hosted copy): IRC 24. ICC state page lists no editions."
+    },
+    "NC": {
+      "name": "North Carolina",
+      "status": "statewide-amended",
+      "family": "IRC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2015",
+          "effective": "2019-01-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": "2024 NC Residential Code (2021 IRC) adopted; takes effect 12 months after OSFM certification under S.L. 2025-2; not yet certified.",
+      "scope": null,
+      "citation": "N.C.G.S. 143-138; 2018 North Carolina State Building Code: Residential Code (Office of State Fire Marshal)",
+      "citation_primary": true,
+      "source_url": "https://www.ncosfm.gov/codes/codes-current-and-past",
+      "draft_note": "SOURCES CONFLICT: ICC Apr 2026 chart shows IRC 21, but the 2024 NCRC (2021 IRC) is not yet effective. OSFM Codes Current and Past page lists the 2018 Residential Code as Current, effective 2019-01-01; the page does not name the base IRC (2015 IRC per UpCodes). S.L. 2024-57 delayed the 2024 code to 2025-07-01; S.L. 2025-2 (2025-03-19) made it effective 12 months after the first of the month following OSFM certification (requires a constituted Residential Code Council). Rimkus (2026-10-15) cites a 2026-06-01 plumbing-board notice: earliest possible date 2027-05-01, not set. 2024 code may be used as an alternate method on owner request. Could not read the OSFM 2025-03-31 letter (PDF unreadable).",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "ICC chart (Apr 2026, MiTek copy): IRC 21. ICC NC page: 2024 codes not effective until some time after April 1, 2026."
+    },
+    "ND": {
+      "name": "North Dakota",
+      "status": "limited",
+      "family": "IRC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2024",
+          "effective": "2026-01-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": "Applies only where a city, county or township elects to enforce a building code; home rule cities may adopt another code.",
+      "citation": "N.D.C.C. ch. 54-21.3 (North Dakota State Building Code), Dept. of Commerce, Division of Community Services",
+      "citation_primary": true,
+      "source_url": "https://www.commerce.nd.gov/community-services/building-codes",
+      "draft_note": "Commerce page: eligible jurisdictions and Advisory Committee adopted the 2024 IBC, IRC, IMC, IFGC updates on 2025-09-11; new State Building Code effective 2026-01-01. The state does not enforce; enforcing jurisdictions must adopt the State Building Code and may amend it. NDCC chapter text not read (citation from general knowledge of the chapter number; signer confirm). Prior edition not confirmed here.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "ICC chart (Apr 2026, MiTek copy): IRC 24. ICC ND page: state code = IBC, IRC, IMC, IFGC; locals use the state code."
+    },
+    "OH": {
+      "name": "Ohio",
+      "status": "statewide-amended",
+      "family": "IRC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2018",
+          "effective": "2019-07-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": "BBS proposed amendments to the 2019 Residential Code of Ohio (notice 2026-07-01), drawing on 2024 IRC appendices; no date.",
+      "scope": null,
+      "citation": "Ohio Adm. Code 4101:8-1-01 (Residential Code of Ohio)",
+      "citation_primary": true,
+      "source_url": "https://codes.ohio.gov/ohio-administrative-code/rule-4101:8-1-01",
+      "draft_note": "codes.ohio.gov shows 4101:8-1-01 effective 2019-07-01 (no later amendment), but its page did not show the text; Cornell/Justia copies of the rule name the 2018 IRC as the basis. Some RCO rules amended effective 2024-03-01 (frost-protection exceptions, 2023 NEC) per Ohio HBA, still on the 2018 IRC base. Enforced only where a BBS-certified residential building department exists. Secondary sites calling a '2024 RCO' are not supported.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "ICC chart (Apr 2026, MiTek copy): IRC 18. ICC OH page describes 2024 commercial codes only."
+    },
+    "OK": {
+      "name": "Oklahoma",
+      "status": "statewide-amended",
+      "family": "IRC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2024",
+          "effective": "2026-09-14"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": null,
+      "citation": "OAC 748:20-6-1 to -53 (OUBCC adoption of IRC 2024), 43 Ok Reg No. 20; 59 O.S. 1000.23",
+      "citation_primary": true,
+      "source_url": "https://oklahoma.gov/content/dam/ok/en/oubcc/documents/rules/2026%2009%2014%20IRC%202024%20Permanent%20Rule.pdf",
+      "draft_note": "Read the OUBCC permanent rule PDF: IRC 2024 adopted as statewide minimum code for 1-2 family and townhouses, effective 2026-09-14; OUBCC expressly did not adopt IRC 2021. Prior: IRC 2018 eff 2022-09-14 (39 Ok Reg 2364). Internal inconsistency: notice says 'first printing', 748:20-6-1(a) says 'second printing (October 2024)'. OUBCC web copy is unofficial; official text is the OAC/Ok Register. Locals not required to enforce, but if they do must use OUBCC codes.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "ICC chart (Apr 2026, MiTek copy): IRC 18 (predates the 2026-09-14 rule). ICC OK page: locals not mandated to enforce."
+    },
+    "OR": {
+      "name": "Oregon",
+      "status": "statewide-amended",
+      "family": "IRC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2024",
+          "effective": "2026-10-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": null,
+      "citation": "OAR 918-480-0005 (2026 Oregon Residential Specialty Code)",
+      "citation_primary": true,
+      "source_url": "https://www.oregon.gov/bcd/codes-stand/Pages/residential-structures.aspx",
+      "draft_note": "BCD page: 2026 ORSC based on 2024 IRC; Chapter 1 mandatory 2026-10-01; Chapters 2-44 effective 2026-10-01 with six-month phase-in (2023 ORSC/2021 IRC or 2026 ORSC accepted), mandatory 2027-04-01. Signer: decide whether to show 2021 until 2027-04-01. Did not read the amended OAR 918-480-0005 text for 2026 (only the 2023 version via Justia). Prior: 2023 ORSC (2021 IRC) eff 2023-10-01.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "ICC chart (Apr 2026, MiTek copy): IRC 21 (predates 2026 ORSC). ICC OR page lists no editions."
+    },
+    "PA": {
+      "name": "Pennsylvania",
+      "status": "statewide-amended",
+      "family": "IRC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2021",
+          "effective": "2026-01-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": null,
+      "citation": "34 Pa. Code 403.21(a)(7) (Uniform Construction Code), amended 55 Pa.B. 7701",
+      "citation_primary": true,
+      "source_url": "https://www.pacodeandbulletin.gov/Display/pacode?file=/secure/pacode/data/034/chapter403/s403.21.html",
+      "draft_note": "Read 34 Pa. Code 403.21: (a)(7) adopts the IRC of 2021 with exceptions (some 2015/2018 provisions kept); history 'amended November 7, 2025, effective January 1, 2026, 55 Pa.B. 7701'. L&I page: IRRC approved 2025-10-16, published 2025-11-08. Transition: pre-2026 signed design contract may use 2018 UCC (local cutoffs differ: 2026-06-01 vs 2026-07-01). 2021 accessibility updates enjoined (Commonwealth Court 2022). Opt-out municipalities: residential enforced by third-party agencies.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "ICC chart (Apr 2026, MiTek copy): IRC 21. ICC PA page lists no editions."
+    },
+    "RI": {
+      "name": "Rhode Island",
+      "status": "statewide-amended",
+      "family": "IRC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2021",
+          "effective": "2025-12-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": "H 7774 Sub A (2026) would require the 2024 IRC by 2027-01-01; no enactment shown.",
+      "scope": null,
+      "citation": "510-RICR-00-00-2 (SBC-2, Rhode Island One and Two Family Dwelling Code)",
+      "citation_primary": true,
+      "source_url": "https://rules.sos.ri.gov/Regulations/part/510-00-00-2",
+      "draft_note": "SOURCES CONFLICT: ICC Apr 2026 chart shows IRC 18; RI SOS rule and ICC's own RI page say 2021 IRC with RI amendments. SOS page: adopts IRC 2021 edition; current version is a 2025-12-01 technical revision (formatting only), with an amendment also effective 2025-12-01. Tradesppl (secondary) reports a 3-month concurrency, mandatory 2026-03-01. Prior: 2018 IRC eff 2022-02-01 (UpCodes). H 7774A text read; status shows only referral to committee. ribcc.ri.gov returned 403.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "ICC chart (Apr 2026, MiTek copy): IRC 18. ICC RI page: 2021 IRC with Rhode Island amendments."
+    },
+    "SC": {
+      "name": "South Carolina",
+      "status": "statewide-amended",
+      "family": "IRC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2021",
+          "effective": "2023-01-01"
+        }
+      ],
+      "upcoming": [
+        {
+          "applies_to": "all",
+          "edition": "2024",
+          "effective": "2027-01-01"
+        }
+      ],
+      "pending": null,
+      "scope": null,
+      "citation": "S.C. Code 6-9-50; LLR Building Codes Council adoption of the 2021 South Carolina Building Codes",
+      "citation_primary": true,
+      "source_url": "https://llr.sc.gov/bcc/BCAdoption.aspx",
+      "draft_note": "LLR page: Council adopted 2021 SC Building Codes 2021-10-06, effective 2023-01-01 (page does not list the IRC by name). Council adopted 2024 IRC with SC modifications 2025-08-26, local implementation 2027-01-01 (LLR 2024 modification index, read via search only); 2024 modifications published in State Register 2026-05-22. Regulation 5417 (IRC mods) approval resolution S.1076 is still in Senate LC&I committee, so the 2027 date may move. Locals must enforce; opt-out provision exists. S.C. Code 6-9-50 cited from general knowledge, not read.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "ICC chart (Apr 2026, MiTek copy): IRC 21. ICC SC page: locals mandated to enforce, opt-out allowed."
+    },
+    "SD": {
+      "name": "South Dakota",
+      "status": "local",
+      "family": "IRC",
+      "editions": [],
+      "upcoming": [],
+      "pending": null,
+      "scope": "No statewide residential code; a municipality may adopt the 2024 IRC, amended, and may not exceed it (SDCL 11-10-12).",
+      "citation": "SDCL 11-10-12 (municipal adoption of the 2024 IRC), as amended by SL 2026, ch 59, 4",
+      "citation_primary": true,
+      "source_url": "https://sdlegislature.gov/Statutes/11-10",
+      "draft_note": "SOURCES CONFLICT (mild): ICC Apr 2026 chart shows IRC 21; state law since SL 2026 ch 59 names the 2024 IRC (was 2021 under SL 2022 ch 35). Read SDCL 11-10-12 via the legislature API: municipality 'may' adopt the 2024 IRC, may amend, may not require sprinklers or be more stringent than the 2024 IRC. SL 2026 effective date assumed 2026-07-01 (SD default), not confirmed. Counties not named in 11-10-12. Locals with older ordinances (e.g., 2021 IRC) may not have updated.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "ICC chart (Apr 2026, MiTek copy): IRC 21. ICC SD page: state adopts IBC and IPMC; no IRC mention."
+    },
+    "TN": {
+      "name": "Tennessee",
+      "status": "limited",
+      "family": "IRC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2018",
+          "effective": "2020-07-16"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": "State residential code applies where the local government has not opted out or does not enforce its own residential code.",
+      "citation": "Tenn. Comp. R. & Regs. 0780-02-23-.02 (State Fire Marshal, residential codes, one- and two-family dwellings)",
+      "citation_primary": true,
+      "source_url": "https://www.tn.gov/commerce/fire/codes-enforcement/history.html",
+      "draft_note": "Read the SFMO 'Currently Adopted Codes' page: IRC 2018 with amendments (rule 0780-02-23), history row dated 7/16/2020. Rule .02 (per Cornell/Justia snippets) adopts IRC 2018 + Appendix Q, R313 sprinklers not mandatory, IRC electrical chapters replaced by 0780-02-01. Opt-out section is 0780-02-23-.14; its text and the T.C.A. 68-120-101 vote threshold were not read. Many cities/counties enforce their own (often 2021) IRC, e.g. Williamson County 2021. No upcoming edition stated on the SFMO page.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "IRC 18 (ICC chart, April 2026)"
+    },
+    "TX": {
+      "name": "Texas",
+      "status": "limited",
+      "family": "IRC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2012",
+          "effective": "2022-01-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": "Municipal residential code only (inside cities); cities may adopt later ICC editions and local amendments. No county residential code.",
+      "citation": "Tex. Local Gov't Code 214.212 (IRC as it existed May 1, 2012, municipal residential building code)",
+      "citation_primary": true,
+      "source_url": "https://capitol.texas.gov/tlodocs/87R/billtext/html/HB00738F.HTM",
+      "draft_note": "Read enrolled HB 738 (87R): amends 214.212(a) from the May 1, 2001 IRC to the May 1, 2012 IRC; Act effective 2022-01-01 for construction under agreements made on/after that date. Codified text confirmed on FindLaw (secondary); statutes.capitol.texas.gov is a JS app and could not be read. 214.212(d) lets cities adopt ICC amendments after May 1, 2012, so many cities enforce 2018/2021/2024. Later bills to move the date (HB 871 89R passed House 2025-05-16, died in Senate; HB 306 892 filed only) did not pass. Applies inside municipalities only; check whether ETJ is covered.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "IRC 12 (ICC chart, April 2026)"
+    },
+    "UT": {
+      "name": "Utah",
+      "status": "statewide-amended",
+      "family": "IRC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2021",
+          "effective": "2023-07-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": null,
+      "citation": "Utah Code 15A-2-103(1)(b) (State Construction Code: 2021 IRC), amended by Title 15A Ch. 3 statewide amendments",
+      "citation_primary": true,
+      "source_url": "https://le.utah.gov/xcode/Title15A/Chapter2/15A-2-S103.html",
+      "draft_note": "Read current 15A-2-103 (version effective 2026-07-01) and the version effective 2027-01-01: both still name the 2021 IRC (IBC/IPC/IMC/IFGC/IECC moved to 2024). 2021 IRC came in by HB 532 (2023), enrolled text Section 31: 'This bill takes effect on July 1, 2023.' 15A-1-204(3)(b): residential provisions are reviewed every second update, so 2024 IRC was skipped. Local amendments in 15A Ch. 4. Note HB 532 kept the 2015 IRC Ch. 11 energy provisions at the time; current energy reference not checked for the IRC row.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "IRC 21 (ICC chart, April 2026)"
+    },
+    "VT": {
+      "name": "Vermont",
+      "status": "local",
+      "family": "IRC",
+      "editions": [],
+      "upcoming": [],
+      "pending": null,
+      "scope": "No state code for owner-occupied single-family homes; a few towns adopt their own. Rentals fall under the state fire and building code.",
+      "citation": "20 V.S.A. 2730(b)(1): owner-occupied single-family residence is not a 'public building' under the state fire and building code",
+      "citation_primary": false,
+      "source_url": "https://legislature.vermont.gov/statutes/section/20/173/02730",
+      "draft_note": "Read 20 V.S.A. 2730: rentals ((a)(1)(D)) and condos are 'public buildings' regulated by the Division of Fire Safety (Vermont Fire and Building Safety Code, NFPA-based; IRC not adopted as such); owner-occupied single-family (and owner-occupied with ADU unless rented) excluded. No statewide IRC. A residential energy code (RBES) applies statewide but is not the IRC. Some municipalities (e.g. Burlington) enforce local codes. citation_primary false: an absence names no edition. Signer: confirm no IRC is incorporated for rented 1-2 family dwellings.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "IRC X (some agency/jurisdiction adopted; not statewide)"
+    },
+    "VA": {
+      "name": "Virginia",
+      "status": "statewide-amended",
+      "family": "IRC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2021",
+          "effective": "2024-01-18"
+        }
+      ],
+      "upcoming": [],
+      "pending": "2024 code development cycle (USBC to 2024 I-codes) in progress since 2025; no final regulation or effective date found.",
+      "scope": null,
+      "citation": "13VAC5-63-10 (Virginia Construction Code, USBC Part I, Section 101; 2021 IRC for one- and two-family dwellings per Section 310)",
+      "citation_primary": true,
+      "source_url": "https://law.lis.virginia.gov/admincodefull/title13/agency5/chapter63/",
+      "draft_note": "Read 13VAC5-63 full text: Section 101 lists '2021 International Residential Code (IRC)', Note 2: IRC applies to detached 1-2 family dwellings and townhouses per Section 310; referenced standards list 'International Residential Code - 2021 Edition'. DHCD codes page: 2021 USBC effective Jan. 18, 2024 (county bulletins: 2018 or 2021 optional until 2025-01-17). Uniform statewide; localities cannot amend. 2024 cycle: NOIRA approved 2025-03; proposals due 2025-10-01; no final found.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "IRC 21 (ICC chart, April 2026)"
+    },
+    "WA": {
+      "name": "Washington",
+      "status": "statewide-amended",
+      "family": "IRC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2021",
+          "effective": "2024-03-15"
+        }
+      ],
+      "upcoming": [],
+      "pending": "2024 IRC (WAC 51-51): CR-102 filed 2026-05-06, final adoption targeted 2026-10-16; SBCC says 2024 codes take effect 2027-05-03.",
+      "scope": null,
+      "citation": "WAC 51-51-003 (State Building Code: 2021 International Residential Code, with WA amendments)",
+      "citation_primary": true,
+      "source_url": "https://app.leg.wa.gov/wac/default.aspx?cite=51-51-003",
+      "draft_note": "Read WAC 51-51-003: 'The 2021 edition of the International Residential Code'; history WSR 23-02-058, 23-12-104, 23-20-024 effective 3/15/24 (WSR 23-23-104 eff 3/16/24 is a later amendment). Effective date was delayed from 2023-07-01 to 2024-03-15. SBCC home page: 2024 IBC/IRC final adoption targeted Oct 16, 2026, effective May 3, 2027. Final adoption (CR-103) not confirmed as of 2026-10-20, so 2024 is listed as pending, not upcoming. Signer: if CR-103 filed, move 2024 to upcoming with 2027-05-03.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "IRC 21 (ICC chart, April 2026)"
+    },
+    "WV": {
+      "name": "West Virginia",
+      "status": "limited",
+      "family": "IRC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2018",
+          "effective": "2022-08-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": "87CSR4 update to the 2024 I-codes is 'In Progress' at the Secretary of State; needs legislative rule review; no effective date.",
+      "scope": "State Building Code applies only where a city or county adopts it by ordinance; elsewhere no residential code.",
+      "citation": "W. Va. Code R. 87-4-4.1.h (State Building Code: 2018 IRC); 87-4-7 adoption by local jurisdiction",
+      "citation_primary": true,
+      "source_url": "https://apps.sos.wv.gov/adlaw/csr/rule.aspx?rule=87-04",
+      "draft_note": "SOURCES CONFLICT (minor): Buckhannon Ordinance 480 (Aug 2026) says 87CSR4 changes took effect 2026-07-29 with the 2024 IRC, but the WV SOS rule page shows the 8/1/2022 version Active and a new version 'In Progress' with no effective date, and Fire Commission minutes (2026-07-29) were sending it to legislative rule review. Read 87-4-4.1.h on Cornell: '2018 edition of the IRC for One- and Two-Family Dwellings' with exceptions. 2018 IRC effective 2022-08-01 per ICC-NTA and Charleston (AWC's 2020 date is stale). Local adoption optional (W. Va. Code 8-12-13, 7-1-3n).",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "IRC 18 (ICC chart, April 2026)"
+    },
+    "WI": {
+      "name": "Wisconsin",
+      "status": "statewide",
+      "family": "other",
+      "editions": [],
+      "upcoming": [],
+      "pending": null,
+      "scope": "Uniform Dwelling Code (SPS 320-325), Wisconsin's own code for one- and two-family dwellings; not based on the IRC.",
+      "citation": "Wis. Admin. Code SPS 320-325 (Uniform Dwelling Code)",
+      "citation_primary": true,
+      "source_url": "https://docs.legis.wisconsin.gov/code/admin_code/sps/safety_and_buildings_and_environment/320_325/320",
+      "draft_note": "Read SPS 320.01/320.02: uniform statewide standards for one- and 2-family dwellings built on or after the SPS 320.03 dates. No IRC reference seen; ICC chart shows IRC blank for Wisconsin, consistent. Current UDC register date and any pending revision not checked (not an IRC edition either way).",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "IRC blank (not adopted)"
+    },
+    "WY": {
+      "name": "Wyoming",
+      "status": "local",
+      "family": "IRC",
+      "editions": [],
+      "upcoming": [],
+      "pending": null,
+      "scope": "No statewide residential code; cities and counties adopt their own IRC edition (often with amendments).",
+      "citation": "No state adoption: 041-1 Wyo. Code R. 1-2(a)(vi) takes in IRC only as referenced by the state's IBC/IFC/IMC/IFGC",
+      "citation_primary": false,
+      "source_url": "https://www.law.cornell.edu/regulations/wyoming/041-1-Wyo-Code-R-SSSS-1-2",
+      "draft_note": "Read the Fire Prevention and Electrical Safety rule (amended eff. 6/26/2024; 2024 IBC/IFC etc.): IRC provisions incorporated only 'as they are referenced in' IBC/IFC/IMC/IFGC chapters, no IRC edition named, so it is not a residential code for 1-2 family dwellings. ICC Wyoming page: no statewide building code; local adoption. W.S. 35-9-108 plan-review scope not read. Absence row: citation_primary false.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "IRC X (local adoption); ICC state page: no statewide building code"
+    },
+    "DC": {
+      "name": "District of Columbia",
+      "status": "statewide-amended",
+      "family": "IRC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2015",
+          "effective": "2020-05-29"
+        }
+      ],
+      "upcoming": [],
+      "pending": "2021 ICC-based '2023 DC Construction Codes' in rulemaking (CCCB/OAG review, 2025); no effective date found.",
+      "scope": null,
+      "citation": "12-B DCMR (2017 DC Residential Code Supplement to the 2015 IRC), 2017 DC Construction Codes",
+      "citation_primary": true,
+      "source_url": "https://dob.dc.gov/node/1615636",
+      "draft_note": "Read DOB pages: 2017 DC Construction Codes are the 2015 ICC codes amended by 12 DCMR A-M; '2017 DC Construction Code takes effect on May 29, 2020'; residential is 12B on the 2015 IRC. Draft 2023 DC codes (on the 2021 IRC) appear in a DOB draft dated 2024-07-18 and a 2025-03 CCCB agenda (OAG review before 1st proposed rulemaking); no final publication in the DC Register found. Signer: check dcregs.dc.gov for a final 2023-codes notice.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "IRC 15 (ICC chart, April 2026)"
+    }
+  }
 }

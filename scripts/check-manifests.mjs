@@ -195,7 +195,12 @@ async function main() {
       // carries the camelCase rollup. So the gate checked exactly one date -- the
       // rollup -- and deleting a state's `verified_on` outright went green.
       // Descend into the row map and check the rows.
-      for (const [mapKey, rows] of Object.entries(body)) {
+      // spec-v1974: code-adoption.json nests one row map per building code
+      // under codes.<CODE>.by_state; those rows get the same check.
+      const maps = Object.entries(body).flatMap(([key, val]) => key === "codes" && val && typeof val === "object"
+        ? Object.entries(val).map(([code, c]) => ["codes." + code + ".by_state", c && c.by_state])
+        : [[key, val]]);
+      for (const [mapKey, rows] of maps) {
         if (!rows || typeof rows !== "object" || Array.isArray(rows)) continue;
         const rowStamps = [];
         for (const [k, entry] of Object.entries(rows)) {

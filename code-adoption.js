@@ -111,13 +111,20 @@ export function codeAdoptionLine(code, name, row, tileEdition, today, cadenceDay
   let text;
   if (row.family && row.family !== code && row.family !== "other") {
     text = name + " adopts the " + (FAMILY_NAME[row.family] || row.family) + ", not the " + code + " this calculator follows, so its " + code + " rule may not apply.";
+  } else if (row.family === "other") {
+    // A state code of its own (Wisconsin's Uniform Dwelling Code), not an edition of this one.
+    text = name + " enforces a code of its own, not based on the " + code + " this calculator follows, so its " + code + " rule may not apply." + (row.scope ? " " + row.scope : "");
   } else if (row.status === "local") {
     text = name + " adopts no statewide " + code + ": your city or county sets the edition.";
   } else if (row.status === "none") {
     text = name + " has not adopted the " + code + " statewide.";
   } else {
     const parts = editionsOn(row, today).map((e) => code + " " + e.edition + (SCOPE_LABEL[e.applies_to] ? " for " + SCOPE_LABEL[e.applies_to] : "") + (e.effective ? " (since " + prettyDate(e.effective) + ")" : ""));
-    text = name + " enforces " + parts.join(" and ") + (row.status === "statewide-amended" ? ", with state amendments." : ".") + (row.scope ? " " + row.scope : "");
+    text = row.status === "limited"
+      ? name + " has a limited state adoption: " + parts.join(" and ") + ". Applies to: " + (row.scope || "the buildings the state rule names.")
+      : name + " enforces " + parts.join(" and ") + (row.status === "statewide-amended" ? ", with state amendments." : ".") + (row.scope ? " " + row.scope : "");
+    const next = upcomingOn(row, today);
+    if (next.length) text += " " + next.map((e) => code + " " + e.edition + " takes effect " + prettyDate(e.effective) + ".").join(" ");
     text += tileEdition ? " This calculator follows " + code + " " + tileEdition + "." : "";
   }
   if (fresh) return { verified: true, source, text };

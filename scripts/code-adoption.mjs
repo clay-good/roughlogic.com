@@ -226,7 +226,7 @@ export function buildCodeAdoptionShard(doc, fetched, codeDocs = loadAllCodeRows(
 // docs/code-adoption-signoff.md, generated from the rows so the sheet a
 // maintainer signs from can never disagree with the file the sign-off edits.
 // Rows whose sources conflict, or that cannot be signed yet, are listed first.
-export function signoffSheet(doc, today) {
+export function signoffSheet(doc, today, codeDocs = loadAllCodeRows()) {
   const rank = (r) => (!r.citation_primary ? 0 : /CONFLICT/.test(r.draft_note || "") ? 1 : r.draft_note ? 2 : 3);
   const esc = (s) => String(s == null ? "" : s).replace(/\|/g, "\\|");
   const eds = (r) => r.status === "local" ? "local only" :
@@ -260,6 +260,28 @@ export function signoffSheet(doc, today) {
     lines.push("| " + flag + " | " + esc(r.name) + " | " + esc(now) + " | [" + esc(r.citation) + "](" + r.source_url + ") | " +
       esc([r.draft_note, "All listed: " + eds(r) + ".", r.nfpa_2026_08_03 ? "NFPA map (read 2026-08-03): " + r.nfpa_2026_08_03 + "." : "Not on the NFPA map."].filter(Boolean).join(" ")) +
       " | " + (r.verified_on ? esc(r.verified_by) + ", " + r.verified_on : "") + " |");
+  }
+  // spec-v1974: one section per building code once it has drafted rows, the
+  // same order (unsignable, conflicts, notes, clean) and the ICC cross-check
+  // where the NEC rows carry the NFPA map.
+  for (const code of BUILDING_CODES) {
+    const cd = codeDocs && codeDocs[code];
+    const ck = cd && cd.rows ? JURISDICTIONS.filter((k) => cd.rows[k]).sort((a, b) => rank(cd.rows[a]) - rank(cd.rows[b]) || a.localeCompare(b)) : [];
+    if (!ck.length) continue;
+    const file = codeRowsPath(code).split("/").pop();
+    lines.push("", "## " + code + " rows", "",
+      "**" + ck.filter((k) => cd.rows[k].verified_on).length + " of " + ck.length + " rows signed**, drafted from [" + file + "](" + file + ") by [spec-v1974](../specs/spec-v1974.md). Sign them the same way, in that file.", "",
+      "| | State | " + code + " in force " + today + " | Family | Citation | Check before signing | Signed |",
+      "|---|---|---|---|---|---|---|");
+    for (const k of ck) {
+      const r = cd.rows[k];
+      const flag = !r.citation_primary ? "not signable" : /CONFLICT/.test(r.draft_note || "") ? "conflict" : r.draft_note ? "check" : "";
+      const now = r.status === "local" || r.status === "none" ? "local only" : editionsOn(r, today).map((e) => e.edition + (e.applies_to === "all" ? "" : " (" + e.applies_to + ")")).join("; ");
+      const icc = Object.keys(r).find((f) => /^icc_\d{4}_\d{2}_\d{2}$/.test(f));
+      lines.push("| " + flag + " | " + esc(r.name) + " | " + esc(now) + " | " + esc(r.family) + " | [" + esc(r.citation) + "](" + r.source_url + ") | " +
+        esc([r.draft_note, "All listed: " + (eds(r) || "none") + ".", icc ? "ICC (read " + icc.slice(4).replace(/_/g, "-") + "): " + r[icc] + "." : "Not checked against ICC."].filter(Boolean).join(" ")) +
+        " | " + (r.verified_on ? esc(r.verified_by) + ", " + r.verified_on : "") + " |");
+    }
   }
   return lines.join("\n") + "\n";
 }

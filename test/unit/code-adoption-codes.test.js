@@ -12,14 +12,20 @@ const okRow = (over = {}) => ({
   verified_on: null, verified_by: null, ...over,
 });
 
-test("building codes: six empty rows files exist and pass; the NEC shard is unchanged by them", () => {
+test("building codes: six rows files exist and pass; the IRC has all 51 drafted, unsigned; the NEC rows are unchanged by them", () => {
   for (const c of BUILDING_CODES) {
     const doc = loadCodeRows(c);
     assert.ok(doc, c);
     assert.deepEqual(validateCodeRows(c, doc, TODAY).errors, [], c);
   }
-  assert.equal(buildCodeShards(Object.fromEntries(BUILDING_CODES.map((c) => [c, loadCodeRows(c)]))), null);
-  assert.equal("codes" in buildCodeAdoptionShard(loadRows(), TODAY), false);
+  const shards = buildCodeShards(Object.fromEntries(BUILDING_CODES.map((c) => [c, loadCodeRows(c)])));
+  assert.deepEqual(Object.keys(shards), ["IRC"], "only the IRC has drafted rows (IRC first, spec-v1974)");
+  assert.equal(Object.keys(shards.IRC.by_state).length, 51);
+  assert.ok(Object.values(loadCodeRows("IRC").rows).every((r) => r.verified_by === null && r.verified_on === null), "a person signs a row, never the drafter");
+  const withCodes = buildCodeAdoptionShard(loadRows(), TODAY);
+  const necOnly = buildCodeAdoptionShard(loadRows(), TODAY, {});
+  assert.equal("codes" in necOnly, false);
+  assert.deepEqual(withCodes.by_state, necOnly.by_state, "the NEC rows are byte-for-byte the same with the IRC beside them");
 });
 
 test("building codes: each rule, seeded red, is caught, and a UPC row may not carry an IPC edition", () => {
@@ -56,6 +62,17 @@ test("building codes: a UPC state reads the family sentence on an IPC tile; an u
   assert.equal(codeAdoptionLine("IRC", "California", undefined, "2024", TODAY, 92), null);
   const oh = { ...okRow(), review: null };
   assert.match(codeAdoptionLine("IRC", "Ohio", oh, "2024", TODAY, 92).text, /Ohio enforces IRC 2024 for residential buildings \(since Jan 1, 2025\), with state amendments\. This calculator follows IRC 2024\./);
+});
+
+test("building codes: a state code of its own, a limited adoption and an upcoming edition each read right", () => {
+  const wi = { name: "Wisconsin", status: "statewide", family: "other", editions: [], upcoming: [], scope: "Uniform Dwelling Code.", citation: "Wis. Admin. Code SPS 320", source_url: "https://docs.legis.wisconsin.gov/code/admin_code/sps/safety_and_buildings_and_environment/320_325/320", citation_primary: true, verified_on: null, verified_by: null, review: null };
+  const w = codeAdoptionLine("IRC", "Wisconsin", wi, "2024", TODAY, 92).text;
+  assert.match(w, /Wisconsin enforces a code of its own, not based on the IRC this calculator follows/);
+  assert.ok(!/enforces \./.test(w), "never an empty edition list");
+  const tx = { ...okRow({ name: "Texas", status: "limited", scope: "Inside cities only.", editions: [{ edition: "2012", applies_to: "all", effective: "2022-01-01" }] }), review: null };
+  assert.match(codeAdoptionLine("IRC", "Texas", tx, "2024", TODAY, 92).text, /Texas has a limited state adoption: IRC 2012 \(since Jan 1, 2022\)\. Applies to: Inside cities only\./);
+  const sc = { ...okRow({ name: "South Carolina", editions: [{ edition: "2021", applies_to: "all", effective: "2023-01-01" }], upcoming: [{ edition: "2024", applies_to: "all", effective: "2027-01-01" }] }), review: null };
+  assert.match(codeAdoptionLine("IRC", "South Carolina", sc, "2024", TODAY, 92).text, /IRC 2021 \(since Jan 1, 2023\), with state amendments\. IRC 2024 takes effect Jan 1, 2027\./);
 });
 
 test("building codes: a tile citing two codes gets two lines under one picker", async () => {
