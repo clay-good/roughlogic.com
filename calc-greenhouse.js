@@ -907,7 +907,7 @@ GREENHOUSE_RENDERERS["photoperiod-blackout-schedule"] = _simpleRenderer({
 // The gap between the bound and a measurement IS the crop's uptake, which is
 // why this calculation's error term is its product.
 
-// dims: in { volume_applied: L^3, volume_drained: L^3, feed_ec: dimensionless, measured_leachate_ec: dimensionless, alternative_leaching_fraction: dimensionless, target_leachate_ec: dimensionless } out: { leaching_fraction: dimensionless, bound_ec: dimensionless, alternative_bound_ec: dimensionless, implied_uptake_pct: dimensionless, required_leaching_fraction: dimensionless, bound_change_pct: dimensionless, salt_in: L, leaching_fraction_pct: dimensionless, required_leaching_fraction_pct: dimensionless, salt_out: dimensionless }
+// dims: in { volume_applied: L^3, volume_drained: L^3, feed_ec: dimensionless, measured_leachate_ec: dimensionless, alternative_leaching_fraction: dimensionless, target_leachate_ec: dimensionless } out: { leaching_fraction: dimensionless, bound_ec: dimensionless, alternative_bound_ec: dimensionless, implied_uptake_pct: dimensionless, required_leaching_fraction: dimensionless, bound_change_pct: dimensionless, salt_in: dimensionless, leaching_fraction_pct: dimensionless, required_leaching_fraction_pct: dimensionless, salt_out: dimensionless }
 export function computeLeachingFractionRunoffEc({ volume_applied = 0, volume_drained = 0, feed_ec = 0, measured_leachate_ec = 0, alternative_leaching_fraction = 0, target_leachate_ec = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   if (!(volume_applied > 0)) return { error: "The volume applied must be positive." };

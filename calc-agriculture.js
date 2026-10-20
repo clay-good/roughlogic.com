@@ -1186,7 +1186,7 @@ export const GRAIN_TEST_WEIGHT_LB_BU = {
 // 1 ft^3 = 0.8036 bushels (1 bushel = 1.2445 ft^3).
 const BUSHELS_PER_FT3 = 0.8036;
 
-// dims: in { diameter_ft: L, eave_height_ft: L, peak_height_ft: L, grain: dimensionless, packing_factor: dimensionless } out: { cylinder_ft3: L^3, cone_ft3: L^3, total_bushels: dimensionless, weight_lb: M, diameter_ft: L, packing_factor: dimensionless, total_ft3: L^3 }
+// dims: in { diameter_ft: L, eave_height_ft: L, peak_height_ft: L, grain: dimensionless, packing_factor: dimensionless } out: { cylinder_ft3: L^3, cone_ft3: L^3, total_bushels: L^3, weight_lb: M, diameter_ft: L, packing_factor: dimensionless, total_ft3: L^3 }
 export function computeGrainBin({
   diameter_ft = 0,
   eave_height_ft = 0,

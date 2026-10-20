@@ -440,7 +440,7 @@ LOWVOLTAGE_RENDERERS["cable-tray-fill"] = _renderCableTrayFill;
 // Z.3 IP camera / NVR storage and bandwidth (cctv-storage)
 // ---------------------------------------------------------------------
 // 1 Mbps continuous = 0.45 GB/hour = 10.8 GB/day.
-// dims: in { camera_count: dimensionless, bitrate_mbps: dimensionless, motion_duty_percent: dimensionless, retention_days: dimensionless } out: { total_storage_gb: dimensionless, aggregate_bandwidth_mbps: dimensionless, camera_count: dimensionless, per_camera_day_gb: dimensionless, recording_hours_per_day: T, total_storage_tb: dimensionless }
+// dims: in { camera_count: dimensionless, bitrate_mbps: dimensionless, motion_duty_percent: dimensionless, retention_days: T } out: { total_storage_gb: dimensionless, aggregate_bandwidth_mbps: dimensionless, camera_count: dimensionless, per_camera_day_gb: dimensionless, recording_hours_per_day: T, total_storage_tb: dimensionless }
 export function computeCctvStorage({ camera_count = 1, bitrate_mbps = 0, recording_mode = "continuous", motion_duty_percent, retention_days = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const n = Math.max(0, Number(camera_count) || 0);
@@ -504,7 +504,7 @@ LOWVOLTAGE_RENDERERS["cctv-storage"] = _renderCctvStorage;
 // so days = disk_capacity_gb / (n * br * 0.45 * hours). Reuses computeCctvStorage
 // at retention_days = 1 to get the daily total, keeping the daily-rate geometry
 // in one place.
-// dims: in { disk_capacity_gb: dimensionless, camera_count: dimensionless, bitrate_mbps: dimensionless, motion_duty_percent: dimensionless } out: { retention_days: dimensionless, per_camera_day_gb: dimensionless, aggregate_bandwidth_mbps: dimensionless, recording_hours_per_day: T, retention_weeks: T }
+// dims: in { disk_capacity_gb: dimensionless, camera_count: dimensionless, bitrate_mbps: dimensionless, motion_duty_percent: dimensionless } out: { retention_days: T, per_camera_day_gb: dimensionless, aggregate_bandwidth_mbps: dimensionless, recording_hours_per_day: T, retention_weeks: T }
 export function computeCctvRetentionDays({ disk_capacity_gb = 0, camera_count = 1, bitrate_mbps = 0, recording_mode = "continuous", motion_duty_percent } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const cap = Number(disk_capacity_gb);

@@ -327,6 +327,8 @@ const UNIT_TAIL_EXEMPT = new Set([
   "calc-service.js:computeVfdEnergySavings:frac_a",          // an A-or-B time FRACTION
   // 2026-10-20: declarations the tail had FORCED wrong (a count read as watts
   // or amps, a leg-A voltage read as amps), found while declaring outputs.
+  "calc-civil.js:computePavementStructuralNumber:base_per_inch_of_ac_in", // inches of base per inch of asphalt, a coefficient RATIO
+  "calc-greenhouse.js:computeLeachingFractionRunoffEc:salt_in", // the salt coming IN, an EC, not inches
   "calc-construction.js:computeConcreteSawcutFootage:panels_w", // a panel COUNT across the width
   "calc-construction.js:computePlumbingFixtureCount:lav_a", // a lavatory COUNT for sex A
   "calc-construction.js:computePlumbingFixtureCount:wc_a", // a water-closet COUNT for sex A

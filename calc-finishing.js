@@ -142,7 +142,7 @@ FINISHING_RENDERERS["galvanize-coating-weight"] = _simpleRenderer({
 
 // ============ spec-v1825: pretreatment bath dragout and rinse water ============
 
-// dims: in { dragout_gal_per_1000ft2: L^3 L^-2, area_ft2_per_day: L^2 T^-1, bath_volume_gal: L^3, bath_concentrate_pct: dimensionless, dilution_ratio: dimensionless, rinse_stages: dimensionless } out: { dragout_gal_day: L^3, concentrate_gal_day: L^3, bath_turnover_days: T, single_rinse_gal_day: L^3, rinse_flow_gal_day: L^3, saving_vs_single_pct: dimensionless, stages: dimensionless, three_stage_saving_pct: dimensionless, two_stage_saving_pct: dimensionless, makeup_water_gal_day: L^3 T^-1, next_stage_saving_gal_day: L^3 T^-1, three_stage_gal_day: L^3 T^-1, two_stage_gal_day: L^3 T^-1 }
+// dims: in { dragout_gal_per_1000ft2: L^3 L^-2, area_ft2_per_day: L^2 T^-1, bath_volume_gal: L^3, bath_concentrate_pct: dimensionless, dilution_ratio: dimensionless, rinse_stages: dimensionless } out: { dragout_gal_day: L^3 T^-1, concentrate_gal_day: L^3 T^-1, bath_turnover_days: T, single_rinse_gal_day: L^3 T^-1, rinse_flow_gal_day: L^3 T^-1, saving_vs_single_pct: dimensionless, stages: dimensionless, three_stage_saving_pct: dimensionless, two_stage_saving_pct: dimensionless, makeup_water_gal_day: L^3 T^-1, next_stage_saving_gal_day: L^3 T^-1, three_stage_gal_day: L^3 T^-1, two_stage_gal_day: L^3 T^-1 }
 export function computePretreatmentBathDragout({ dragout_gal_per_1000ft2 = 0, area_ft2_per_day = 0, bath_volume_gal = 0, bath_concentrate_pct = 5, dilution_ratio = 1000, rinse_stages = 2 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!Number.isInteger(Number(rinse_stages))) return { error: "Rinse stages is a whole number." };

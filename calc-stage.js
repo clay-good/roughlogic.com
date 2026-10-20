@@ -1083,7 +1083,7 @@ STAGE_RENDERERS["amp-power-spl"] = renderAmpPowerSpl;
 // (lux-to-footcandle): this is a single aimed fixture, not a room budget.
 // =====================================================================
 
-// dims: in { beam_angle_deg: dimensionless, throw_distance: L, distance_unit: dimensionless, source: dimensionless, candela: dimensionless, lumens: dimensionless } out: { beam_diameter: L, illuminance_lux: dimensionless, illuminance_fc: dimensionless, beam_angle_deg: dimensionless, beam_diameter_ft: L, throw_distance: L, beam_diameter_m: L }
+// dims: in { beam_angle_deg: dimensionless, throw_distance: L, distance_unit: dimensionless, source: dimensionless, candela: J, lumens: dimensionless } out: { beam_diameter: L, illuminance_lux: dimensionless, illuminance_fc: dimensionless, beam_angle_deg: dimensionless, beam_diameter_ft: L, throw_distance: L, beam_diameter_m: L }
 export function computeLightingBeam({ beam_angle_deg = 0, throw_distance = 0, distance_unit = "ft", source = "candela", candela = 0, lumens = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const ang = Number(beam_angle_deg) || 0;

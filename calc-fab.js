@@ -707,7 +707,7 @@ export function computeWeldPreheatFuel({ steel_lb, start_temp_F, preheat_temp_F,
   };
 }
 
-// dims: in { deposit_lb_per_ft: M, deposition_eff_pct: dimensionless, filler_cost_per_lb: dimensionless, deposition_rate_lb_hr: M T^-1, operating_factor_pct: dimensionless, labor_rate_per_hr: dimensionless, gas_cost_per_ft: dimensionless } out: { consumable_lb_per_ft: M, filler_cost_ft: dimensionless, labor_hr_per_ft: T, labor_cost_ft: dimensionless, total_cost_ft: dimensionless, arc_hr_per_ft: T L^-1 }
+// dims: in { deposit_lb_per_ft: M, deposition_eff_pct: dimensionless, filler_cost_per_lb: dimensionless, deposition_rate_lb_hr: M T^-1, operating_factor_pct: dimensionless, labor_rate_per_hr: dimensionless, gas_cost_per_ft: dimensionless } out: { consumable_lb_per_ft: M, filler_cost_ft: dimensionless, labor_hr_per_ft: T L^-1, labor_cost_ft: dimensionless, total_cost_ft: dimensionless, arc_hr_per_ft: T L^-1 }
 export function computeWeldCostPerFoot({ deposit_lb_per_ft, deposition_eff_pct = 95, filler_cost_per_lb = 0, deposition_rate_lb_hr, operating_factor_pct = 30, labor_rate_per_hr = 0, gas_cost_per_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // An efficiency is a percent; 0 < value < 1 is a fraction typed into a percent field (added 2026-09-26).

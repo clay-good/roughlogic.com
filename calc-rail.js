@@ -372,7 +372,7 @@ RAIL_RENDERERS["track-warp-fra-class"] = _simpleRenderer({
 
 // ===================== spec-v1544: ballast section volume and tonnage =====================
 
-// dims: in { top_width_ft: L, depth_in: L, side_slope_ratio: dimensionless, length_ft: L, density_ton_per_cy: M L^-3, raise_in: L } out: { bottom_width_ft: L, area_sqft: L^2, volume_cy: L^3, tons: M, cy_per_mile: L^3, tons_per_mile: M, raise_volume_cy: L^3, rectangle_area_sqft: L^2, understated_pct: dimensionless }
+// dims: in { top_width_ft: L, depth_in: L, side_slope_ratio: dimensionless, length_ft: L, density_ton_per_cy: M L^-3, raise_in: L } out: { bottom_width_ft: L, area_sqft: L^2, volume_cy: L^3, tons: M, cy_per_mile: L^2, tons_per_mile: M L^-1, raise_volume_cy: L^3, rectangle_area_sqft: L^2, understated_pct: dimensionless }
 export function computeBallastSection({ top_width_ft = 0, depth_in = 0, side_slope_ratio = 1.5, length_ft = 0, density_ton_per_cy = 1.4, raise_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(top_width_ft > 0)) return { error: "Top width of the ballast section must be positive." };

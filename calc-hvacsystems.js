@@ -2202,7 +2202,7 @@ const _hsInterpKwTon = (pct, p30, p50, p75, p100) => (
       : pct <= 75 ? p50 + (p75 - p50) * (pct - 50) / 25
         : p75 + (p100 - p75) * (pct - 75) / 25
 );
-// dims: in { machine_tons: L^3 T^-1, plant_load_tons: L^3 T^-1, kw_per_ton_100: dimensionless, kw_per_ton_75: dimensionless, kw_per_ton_50: dimensionless, kw_per_ton_30: dimensionless, auxiliary_kw_per_machine: M L^2 T^-3, staging_setpoint_pct: dimensionless } out: { one_machine_kw: M L^2 T^-3, two_machine_kw: M L^2 T^-3, crossover_tons: L^3 T^-1, crossover_pct_of_machine: dimensionless, setpoint_error_tons: L^3 T^-1, one_compressor_kw: M L^2 T^-3, one_pct: dimensionless, saving_kw: M L^2 T^-3, two_compressor_kw: M L^2 T^-3, two_pct: dimensionless, auxiliary_kw_per_machine: M L^2 T^-3, one_kw_ton: dimensionless, two_kw_ton: dimensionless, setpoint_tons: M L^2 T^-3 }
+// dims: in { machine_tons: M L^2 T^-3, plant_load_tons: M L^2 T^-3, kw_per_ton_100: dimensionless, kw_per_ton_75: dimensionless, kw_per_ton_50: dimensionless, kw_per_ton_30: dimensionless, auxiliary_kw_per_machine: M L^2 T^-3, staging_setpoint_pct: dimensionless } out: { one_machine_kw: M L^2 T^-3, two_machine_kw: M L^2 T^-3, crossover_tons: M L^2 T^-3, crossover_pct_of_machine: dimensionless, setpoint_error_tons: M L^2 T^-3, one_compressor_kw: M L^2 T^-3, one_pct: dimensionless, saving_kw: M L^2 T^-3, two_compressor_kw: M L^2 T^-3, two_pct: dimensionless, auxiliary_kw_per_machine: M L^2 T^-3, one_kw_ton: dimensionless, two_kw_ton: dimensionless, setpoint_tons: M L^2 T^-3 }
 export function computeChillerStagingPoint({
   machine_tons = 0, plant_load_tons = 0,
   kw_per_ton_100 = 0, kw_per_ton_75 = 0, kw_per_ton_50 = 0, kw_per_ton_30 = 0,

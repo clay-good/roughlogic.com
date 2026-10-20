@@ -3492,7 +3492,7 @@ const _AWG_CIRCULAR_MILS = [
   { awg: "1", cm: 83690 }, { awg: "1/0", cm: 105600 }, { awg: "2/0", cm: 133100 },
   { awg: "3/0", cm: 167800 }, { awg: "4/0", cm: 211600 },
 ];
-// dims: in { current_a: I, run_length_ft: L, system_voltage_v: M L^2 T^-3 I^-1, drop_pct: dimensionless } out: { v_drop_v: M L^2 T^-3 I^-1, circular_mils: dimensionless, awg: dimensionless }
+// dims: in { current_a: I, run_length_ft: L, system_voltage_v: M L^2 T^-3 I^-1, drop_pct: dimensionless } out: { v_drop_v: M L^2 T^-3 I^-1, circular_mils: L^2, awg: dimensionless }
 export function computeAbycDcWire({ current_a = 0, run_length_ft = 0, system_voltage_v = 0, drop_pct = 3 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const i = Number(current_a) || 0;

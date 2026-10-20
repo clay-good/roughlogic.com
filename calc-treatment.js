@@ -575,7 +575,7 @@ TREATMENT_RENDERERS["breakpoint-chlorination"] = _rPool({
 
 // ===================== spec-v405..v407: water/wastewater-operations trio (Group M) =====================
 
-// dims: in { flow_mgd: L^3 T^-1, surface_ft2: L^2, weir_len_ft: L, mlss_mgl: dimensionless, ras_mgd: L^3 T^-1 } out: { sor_gpd_ft2: dimensionless, weir_gpd_ft: dimensionless, solids_lb_ft2_day: M L^-2 T^-1, weir_limit_gpd_ft: L^2 T^-1 }
+// dims: in { flow_mgd: L^3 T^-1, surface_ft2: L^2, weir_len_ft: L, mlss_mgl: dimensionless, ras_mgd: L^3 T^-1 } out: { sor_gpd_ft2: L T^-1, weir_gpd_ft: L^2 T^-1, solids_lb_ft2_day: M L^-2 T^-1, weir_limit_gpd_ft: L^2 T^-1 }
 export function computeClarifierSurfaceLoading({ flow_mgd = 0, surface_ft2 = 0, weir_len_ft = 0, mlss_mgl = 0, ras_mgd = 0 } = {}) {
   const flow = Number(flow_mgd) || 0;
   const area = Number(surface_ft2) || 0;

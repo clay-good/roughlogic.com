@@ -303,7 +303,7 @@ MARINE_RENDERERS["barge-draft-displacement"] = _simpleRenderer({
 // on the simplified (Blum) gross-pressure diagram, and the result surprises
 // people: a 12 ft wall is a 25 ft pile, with 52% of the steel below the dredge line.
 
-// dims: in { retained_height_ft: L, friction_angle_deg: dimensionless, unit_weight_pcf: M L^-3, increase_factor_pct: dimensionless, allowable_stress_psi: M L^-1 T^-2 } out: { ka: dimensionless, kp: dimensionless, active_force_plf: M T^-2, theoretical_depth_ft: L, design_depth_ft: L, total_length_ft: L, depth_to_max_moment_ft: L, max_moment_ftlb_per_ft: M L T^-2, section_modulus_in3_per_ft: L^3, embedment_share_pct: dimensionless, lever_arm_ft: L, embedment_ratio: dimensionless }
+// dims: in { retained_height_ft: L, friction_angle_deg: dimensionless, unit_weight_pcf: M L^-3, increase_factor_pct: dimensionless, allowable_stress_psi: M L^-1 T^-2 } out: { ka: dimensionless, kp: dimensionless, active_force_plf: M T^-2, theoretical_depth_ft: L, design_depth_ft: L, total_length_ft: L, depth_to_max_moment_ft: L, max_moment_ftlb_per_ft: M L T^-2, section_modulus_in3_per_ft: L^2, embedment_share_pct: dimensionless, lever_arm_ft: L, embedment_ratio: dimensionless }
 export function computeSheetPilePenetration({ retained_height_ft = 0, friction_angle_deg = 0, unit_weight_pcf = 0, increase_factor_pct = 0, allowable_stress_psi = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   if (!(retained_height_ft > 0)) return { error: "Retained height must be positive." };
