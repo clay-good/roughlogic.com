@@ -62355,3 +62355,39 @@ test("bounds: spec-v1985 computeTrussUpliftConnector pins the tributary area, th
     assert.ok("error" in _tuc(bad), JSON.stringify(bad));
   }
 });
+
+// spec-v1986 / spec-v1987: IRC 2024 R401.3 grade (read 2026-10-19) and one-axis tile layout.
+import { computeFoundationGradeSlopeCheck as _fgs } from "../../calc-construction.js";
+import { computeTileLayoutCutBalance as _tlc } from "../../calc-finish.js";
+test("bounds: spec-v1986 computeFoundationGradeSlopeCheck pins the 6 in in 10 ft line, the barrier exception, the 2 percent surface and the error seams", () => {
+  const r = _fgs({ fall_in: 4, run_ft: 10 });
+  assert.ok(Math.abs(r.margin_in + 2) < 1e-9); assert.equal(r.passes, false);
+  assert.equal(_fgs({ fall_in: 6, run_ft: 10 }).passes, true, "exactly 6 in passes");
+  assert.equal(_fgs({ fall_in: 5.99, run_ft: 10 }).passes, false);
+  assert.equal(_fgs({ fall_in: 3, run_ft: 5 }).passes, true, "a uniform 5 percent over 5 ft is 6 in in 10 ft");
+  assert.ok("error" in _fgs({ fall_in: 12, run_ft: 20 }), "fall beyond 10 ft cannot count");
+  assert.equal(_fgs({ fall_in: 8, run_ft: 6, barrier: "yes" }).passes, true, "6 in reached before the barrier meets the rule");
+  const bar = _fgs({ fall_in: 3, run_ft: 6, barrier: "yes" });
+  assert.equal(bar.exception, true); assert.equal(bar.passes, null);
+  assert.equal(_fgs({ fall_in: 3, run_ft: 10, barrier: "yes" }).exception, false, "a barrier at 10 ft or more does not cut the run short");
+  assert.equal(_fgs({ surface: "impervious", fall_in: 1.92, run_ft: 8 }).passes, true);
+  assert.equal(_fgs({ surface: "impervious", fall_in: 1.9, run_ft: 8 }).passes, false);
+  for (const bad of [{ fall_in: 4 }, { fall_in: -1, run_ft: 10 }, { fall_in: 4, run_ft: 0 }, { fall_in: 4, run_ft: 101 }, { fall_in: 200, run_ft: 10 }, { surface: "gravel", fall_in: 4, run_ft: 10 }, { fall_in: "x", run_ft: 10 }, { fall_in: 4, run_ft: 10, barrier: "maybe" }]) {
+    assert.ok("error" in _fgs(bad), JSON.stringify(bad));
+  }
+});
+test("bounds: spec-v1987 computeTileLayoutCutBalance pins the three layouts, the half-pitch swap, exact fits and the error seams", () => {
+  const r = _tlc({ run_in: 132, tile_in: 12, joint_in: 0.125 });
+  assert.equal(r.start_full_cut_in, 10.75); assert.equal(r.tile_centered_cut_in, 11.375); assert.equal(r.joint_centered_cut_in, 5.3125);
+  assert.equal(r.recommended, "tile_centered"); assert.equal(r.first_full_edge_in, 11.5);
+  assert.ok(Math.abs(Math.abs(r.tile_centered_cut_in - r.joint_centered_cut_in) - 12.125 / 2) < 1e-9, "the centered layouts differ by half a pitch");
+  const b = _tlc({ run_in: 97, tile_in: 6, joint_in: 0.125 });
+  assert.equal(b.tile_centered_cut_in, 2.5); assert.equal(b.recommended, "joint_centered");
+  assert.equal(_tlc({ run_in: 121.125, tile_in: 12, joint_in: 0.125 }).start_full_cut_in, 0, "an exact fit has no cut");
+  assert.equal(_tlc({ run_in: 132, tile_in: 12, joint_in: 0.125, min_cut_in: 11.5 }).recommended, "tile_centered", "no layout clears 11.5 in: the largest cut wins");
+  assert.equal(_tlc({ run_in: 48, tile_in: 12, joint_in: 0, min_cut_in: 1 }).recommended, "joint_centered", "an exact fit beats a layout with cuts");
+  assert.equal(_tlc({ run_in: 30.3, tile_in: 1, joint_in: 0.0625 }).min_cut_in, 0.5, "mosaic: half a tile, not the whole tile");
+  for (const bad of [{ run_in: 0, tile_in: 12 }, { run_in: 132, tile_in: 0 }, { run_in: 10, tile_in: 12 }, { run_in: 132, tile_in: 12, joint_in: -0.1 }, { run_in: 132, tile_in: 12, joint_in: 2 }, { run_in: 132, tile_in: 12, min_cut_in: 13 }, { run_in: "x", tile_in: 12 }, { run_in: 1e5, tile_in: 12 }]) {
+    assert.ok("error" in _tlc(bad), JSON.stringify(bad));
+  }
+});

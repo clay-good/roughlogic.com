@@ -2384,6 +2384,8 @@ export const COMPUTE_MAP = {
   "chimney-termination-height": { module: "../../calc-masonry.js", fn: "computeChimneyTerminationHeight" },
   "fireplace-clearance-check": { module: "../../calc-masonry.js", fn: "computeFireplaceClearanceCheck" },
   "truss-uplift-connector": { module: "../../calc-construction.js", fn: "computeTrussUpliftConnector" },
+  "foundation-grade-slope-check": { module: "../../calc-construction.js", fn: "computeFoundationGradeSlopeCheck" },
+  "tile-layout-cut-balance": { module: "../../calc-finish.js", fn: "computeTileLayoutCutBalance" },
 };
 
 // Resolve a COMPUTE_MAP module path (relative to this file) and import it.

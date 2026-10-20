@@ -2285,4 +2285,6 @@ export const RENDERER_MAP = {
   "chimney-termination-height": { module: "../../calc-masonry.js", exportName: "MASONRY_RENDERERS" },
   "fireplace-clearance-check": { module: "../../calc-masonry.js", exportName: "MASONRY_RENDERERS" },
   "truss-uplift-connector": { module: "../../calc-construction.js", exportName: "CONSTRUCTION_RENDERERS" },
+  "foundation-grade-slope-check": { module: "../../calc-construction.js", exportName: "CONSTRUCTION_RENDERERS" },
+  "tile-layout-cut-balance": { module: "../../calc-finish.js", exportName: "FINISH_RENDERERS" },
 };

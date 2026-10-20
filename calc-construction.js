@@ -15601,3 +15601,88 @@ CONSTRUCTION_RENDERERS["truss-uplift-connector"] = _simpleRenderer({
   ],
   compute: computeTrussUpliftConnector,
 });
+
+// ===================== spec-v1986: foundation drainage grade check (IRC R401.3) =====================
+// IRC 2024 R401.3 (the same text in IRC 2021; both read 2026-10-19): the grade
+// falls not fewer than 6 in within the first 10 ft from the foundation; where lot
+// lines, walls, slopes or other barriers prevent it, drains or swales instead;
+// impervious surfaces within 10 ft slope not less than 2 percent away.
+const _fgsNum = (v, what) => {
+  const blank = v === null || v === undefined || (typeof v === "string" && v.trim() === "");
+  if (blank) return { error: "Enter the " + what + "." };
+  const ok = typeof v === "number" || (typeof v === "string" && /^\s*[+-]?(\d+\.?\d*|\.\d+)\s*$/.test(v));
+  if (!ok || !Number.isFinite(Number(v))) return { error: "The " + what + " must be a number." };
+  if (Number(v) < 0) return { error: "The " + what + " cannot be negative." };
+  return { v: Number(v) };
+};
+
+// dims: in { surface: dimensionless, fall_in: L, run_ft: L, barrier: dimensionless } out: { slope_pct: dimensionless, slope_in_per_ft: dimensionless, required_fall_in: L, fall_in_10ft: L, margin_in: L }
+export function computeFoundationGradeSlopeCheck({ surface = "pervious", fall_in, run_ft, barrier = "no" } = {}) {
+  const surf = String(surface ?? "pervious"), bar = String(barrier ?? "no");
+  if (surf !== "pervious" && surf !== "impervious") return { error: "Surface must be pervious or impervious." };
+  if (bar !== "no" && bar !== "yes") return { error: "Barrier must be yes or no." };
+  const F = _fgsNum(fall_in, "fall measured (in)"); if (F.error) return { error: F.error };
+  const R = _fgsNum(run_ft, "run it was measured over (ft)"); if (R.error) return { error: R.error };
+  if (!(R.v > 0)) return { error: "The run must be positive (ft)." };
+  if (R.v > 100) return { error: "A run over 100 ft is outside a foundation grade check." };
+  // The rule is "within the first 10 feet": a longer run could average away a flat first 10 ft.
+  if (surf === "pervious" && R.v > 10 + 1e-9) return { error: "Measure the fall over the first 10 ft from the foundation (or less): over a longer run, fall beyond 10 ft cannot count." };
+  if (F.v > R.v * 12) return { error: "A fall steeper than 1:1 is outside a foundation grade check." };
+  const slope = F.v / (R.v * 12);
+  const slope_pct = slope * 100, slope_in_per_ft = slope * 12;
+  let required_fall_in, fall_in_10ft = null, passes, exception = false, basis;
+  if (surf === "impervious") {
+    required_fall_in = 0.02 * R.v * 12;
+    passes = slope >= 0.02 - 1e-12;
+    basis = "2 percent (0.24 in per ft) away from the building";
+  } else if (bar === "yes" && R.v < 10 - 1e-9 && F.v < 6 - 1e-9) {
+    // A barrier stops the 10 ft short of 6 in of fall: the code then calls for drains or swales.
+    required_fall_in = 6;
+    exception = true;
+    passes = null;
+    basis = "6 in within 10 ft, which the barrier prevents";
+  } else if (bar === "yes" && R.v < 10 - 1e-9) {
+    // 6 in reached before the barrier: the main rule is met outright.
+    required_fall_in = 6;
+    fall_in_10ft = F.v;
+    passes = true;
+    basis = "6 in within the first 10 ft, reached in the " + fmt(R.v, 1) + " ft before the barrier";
+  } else {
+    // Uniform slope read over the run measured, applied to the first 10 ft.
+    fall_in_10ft = slope * 120;
+    required_fall_in = 6;
+    passes = fall_in_10ft >= 6 - 1e-9;
+    basis = "6 in within the first 10 ft (5 percent, 0.6 in per ft)";
+  }
+  const compare_in = fall_in_10ft !== null ? fall_in_10ft : F.v;
+  const margin_in = compare_in - required_fall_in;
+  const verdict = exception
+    ? "BARRIER EXCEPTION: " + fmt(F.v, 2) + " in over " + fmt(R.v, 1) + " ft (" + fmt(slope_pct, 1) + " percent), " + fmt(6 - F.v, 2) + " in short of 6 in, where a barrier stops the 10 ft; R401.3 then requires drains or swales to carry water away from the structure"
+    : passes
+      ? "PASSES: " + fmt(slope_pct, 1) + " percent, " + fmt(compare_in, 2) + " in against " + fmt(required_fall_in, 2) + " in required (" + fmt(margin_in, 2) + " in to spare)"
+      : "FAILS: " + fmt(slope_pct, 1) + " percent, " + fmt(compare_in, 2) + " in against " + fmt(required_fall_in, 2) + " in required (" + fmt(-margin_in, 2) + " in short)";
+  if (![slope_pct, slope_in_per_ft, required_fall_in, margin_in].every(Number.isFinite)) return { error: "Grade math is not a finite value." };
+  return {
+    slope_pct, slope_in_per_ft, required_fall_in, fall_in_10ft, margin_in, passes, exception, basis, verdict,
+    note: "IRC 2024 R401.3 (the same in IRC 2021): lots are graded to drain surface water away from foundation walls, and the grade falls not fewer than 6 in within the first 10 ft. Where lot lines, walls, slopes or other physical barriers prohibit that, drains or swales are built to carry water away instead. Impervious surfaces within 10 ft of the foundation slope not less than 2 percent away from the building. A fall measured over a run shorter than 10 ft is read as a uniform slope and projected to 10 ft (a longer run is refused, since fall beyond 10 ft cannot count), so a hump or a low spot inside the run is not seen: check the grade at the wall and every few feet out. Surface water must also go to a storm sewer or another approved point of collection that creates no hazard. Swale, drain and footing-drain sizing are separate.",
+  };
+}
+export const foundationGradeSlopeCheckExample = { inputs: { surface: "pervious", fall_in: 4, run_ft: 10, barrier: "no" } };
+
+CONSTRUCTION_RENDERERS["foundation-grade-slope-check"] = _simpleRenderer({
+  citation: "Citation: IRC 2024 R401.3 (the same text in IRC 2021), by name; free at codes.iccsafe.org, read 2026-10-19. The grade falls not fewer than 6 in within the first 10 ft of the foundation; where a lot line, wall, slope or other barrier prevents it, drains or swales instead; impervious surfaces within 10 ft slope not less than 2 percent away. The adopted code and the AHJ govern.",
+  example: foundationGradeSlopeCheckExample.inputs,
+  fields: [
+    { key: "surface", label: "Surface", kind: "select", default: "pervious", options: [{ value: "pervious", label: "Ground (pervious): 6 in in 10 ft" }, { value: "impervious", label: "Patio, walk or drive (impervious): 2 percent" }] },
+    { key: "fall_in", label: "Fall measured away from the foundation (in)", kind: "number", required: true, attrs: { step: "any", min: "0" } },
+    { key: "run_ft", label: "Run it was measured over (ft, 10 or less for ground; the surface width for a patio)", kind: "number", required: true, attrs: { step: "any", min: "0" } },
+    { key: "barrier", label: "Does a lot line, wall or other barrier stop the 10 ft short?", kind: "select", default: "no", options: [{ value: "no", label: "No" }, { value: "yes", label: "Yes (ground only)" }] },
+  ],
+  outputs: [
+    { key: "v", id: "fgs-out-v", label: "Check", value: (r) => r.verdict },
+    { key: "s", id: "fgs-out-s", label: "Slope", value: (r) => fmt(r.slope_pct, 2) + " percent, " + fmt(r.slope_in_per_ft, 3) + " in per ft" },
+    { key: "q", id: "fgs-out-q", label: "Required", value: (r) => fmt(r.required_fall_in, 2) + " in: " + r.basis + (r.fall_in_10ft === null ? "" : "; this slope gives " + fmt(r.fall_in_10ft, 2) + " in in the first 10 ft") },
+    { key: "n", id: "fgs-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeFoundationGradeSlopeCheck,
+});

@@ -26,6 +26,7 @@ export const INERT_INPUTS = {
   "cylinder-storage-separation::barrier_rating_hr": "moves the answer once another input changes (1,500 randomized settings)",
   "chimney-termination-height::ridge_distance_ft": "clamped at 10 ft: R1003.9 looks only 10 ft out, so a ridge farther away (the example's 14 ft) no longer moves the answer",
   "decibel-converter::ref_type": "read only in the reference-level mode",
+  "foundation-grade-slope-check::barrier": "read only when the ground run is under 10 ft and short of 6 in of fall (the R401.3 exception)",
   "safety-glazing-check::door_relation": "read only when the glazing is beside a door (R324.4.2)",
   "declining-balance-depreciation::sl_switch": "moves the answer once another input changes (1,500 randomized settings)",
   "depreciation-recapture::ordinary_rate_pct": "moves the answer once another input changes (1,500 randomized settings)",

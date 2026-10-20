@@ -621,6 +621,7 @@ export const TOOL_MODULES = (() => {
     "snow-unbalanced-gable",
     "safety-glazing-check",
     "truss-uplift-connector",
+    "foundation-grade-slope-check",
   ]);
   // spec-v1871 cap-relief split: the specialty-building and temporary-works
   // tail moved intact from calc-construction.js. All 11 tiles keep Group E
@@ -646,6 +647,7 @@ export const TOOL_MODULES = (() => {
     "attic-ventilation", "crawl-space-ventilation", "soffit-ridge-vent-count", "gutter-downspout", "gutter-downspout-takeoff", "deck-board-takeoff", "rough-opening-size", "closet-shelf-takeoff", "countertop-overhang-support", "cabinet-linear-feet", "drip-edge-takeoff", "valley-flashing-takeoff", "glass-weight",
     "cement-board-takeoff",
     "step-flashing-count",
+    "tile-layout-cut-balance",
   ]);
   // spec-v101 new electrician design/layout bench; relieves the standing
   // calc-electrical.js cap watch. Both tiles keep group "A".

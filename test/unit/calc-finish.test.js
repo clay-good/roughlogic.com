@@ -119,3 +119,21 @@ test("texture-material-takeoff: bags match an add-a-bag count and deducting an o
     assert.equal(r2.bags_required, r.bags_required);
   }
 });
+
+// spec-v1987: lay the tiles out one by one and measure the cuts, instead of the closed form.
+import { computeTileLayoutCutBalance as _layout } from "../../calc-finish.js";
+test("tile-layout-cut-balance: placing tiles one at a time from the center or the wall gives the same cuts", () => {
+  for (const [run, tile, j] of [[132, 12, 0.125], [150, 12, 0.1875], [97, 6, 0.125], [100, 24, 0.0625], [61, 4.25, 0.25]]) {
+    const r = _layout({ run_in: run, tile_in: tile, joint_in: j });
+    // Start full: keep adding tile + joint while the next tile still fits before the wall.
+    let x = 0, n = 0;
+    while (x + tile <= run + 1e-9) { x += tile; n++; if (x + j + tile <= run + 1e-9) x += j; else break; }
+    const leftover = run - x;
+    assert.ok(Math.abs(r.start_full_cut_in - (leftover > 1e-9 ? leftover - j : 0)) < 1e-9, "start full " + run);
+    // Centered on a tile: grow symmetric pairs around a center tile while room remains for a joint.
+    let span = tile, k = 1;
+    while (span + 2 * (j + tile) + 2 * j <= run + 1e-9) { span += 2 * (j + tile); k += 2; }
+    assert.equal(r.tile_centered_count, k, "tile-centered count " + run);
+    assert.ok(Math.abs(r.tile_centered_cut_in - Math.max(0, (run - span) / 2 - j)) < 1e-9, "tile-centered cut " + run);
+  }
+});

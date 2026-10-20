@@ -1526,6 +1526,10 @@ const _TILES = [
   ["fireplace-clearance-check", "E"],
   // spec-v1985: truss and rafter uplift connector demand (calc-construction.js).
   ["truss-uplift-connector", "E"],
+  // spec-v1986 and spec-v1987: foundation grade check (calc-construction.js) and tile layout (calc-finish.js).
+  ["foundation-grade-slope-check", "E"],
+  // spec-v1987: tile layout cut balance (calc-finish.js).
+  ["tile-layout-cut-balance", "E"],
 ];
 
 

@@ -1,6 +1,6 @@
 # Scope: The 2026-10-19 Product Expansion (specs v1970-v1992, 7 Platform Specs and 16 New Tiles)
 
-> **Status: ACTIVE (updated 2026-10-19). 11 of 23 specs are built (spec-v1972, spec-v1977 to spec-v1985, spec-v1992); catalog 2,277.**
+> **Status: ACTIVE (updated 2026-10-19). 13 of 23 specs are built (spec-v1972, spec-v1977 to spec-v1987, spec-v1992); catalog 2,279.**
 > All 23 spec files exist (`spec-v1970.md` through `spec-v1992.md`). Nothing in the catalog, the modules,
 > the counts or the gates changes until a spec lands. Inherits the spec-v106 trades-only charter and every
 > convention through spec-v1969.

@@ -2,11 +2,11 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "f953e996fe2e1421",
+      "sha": "7283b7cc94c7daff",
       "date": "2026-10-20"
     },
     "/tools/": {
-      "sha": "9fc268d44ba83376",
+      "sha": "3d4994a768b27a0e",
       "date": "2026-10-20"
     },
     "/errata/": {
@@ -14,91 +14,91 @@
       "date": "2026-10-18"
     },
     "/collections/disaster-response/": {
-      "sha": "9fefc27992d5ec50",
+      "sha": "60734edae665659c",
       "date": "2026-10-20"
     },
     "/groups/accounting/": {
-      "sha": "5b593963cd04f721",
+      "sha": "d02251d649e3b106",
       "date": "2026-10-20"
     },
     "/groups/agriculture/": {
-      "sha": "ebf24b9d7c090a68",
+      "sha": "76fe12d504a619db",
       "date": "2026-10-20"
     },
     "/groups/construction/": {
-      "sha": "5a0ba7ff36ad5493",
+      "sha": "e94a3e072b9bc83f",
       "date": "2026-10-20"
     },
     "/groups/cross-trade/": {
-      "sha": "d0b7b9b9ff11a779",
+      "sha": "a3ae0ad11fefaa53",
       "date": "2026-10-20"
     },
     "/groups/educators/": {
-      "sha": "c86894d91ae613fb",
+      "sha": "8fbcf5228cac0879",
       "date": "2026-10-20"
     },
     "/groups/electrical/": {
-      "sha": "7ef9aa9416bd0133",
+      "sha": "7733f555431cd7f6",
       "date": "2026-10-20"
     },
     "/groups/field/": {
-      "sha": "d0a6bcf244878b83",
+      "sha": "79524ecd710ff75e",
       "date": "2026-10-20"
     },
     "/groups/fire-ground/": {
-      "sha": "90e47027ba8ad001",
+      "sha": "77c128343ccd49a4",
       "date": "2026-10-20"
     },
     "/groups/historical/": {
-      "sha": "f4f5932d678b42a4",
+      "sha": "025ecbccda45c4bd",
       "date": "2026-10-20"
     },
     "/groups/hvac/": {
-      "sha": "51315c1399fbe873",
+      "sha": "9f834a42fc11677c",
       "date": "2026-10-20"
     },
     "/groups/kitchen/": {
-      "sha": "feafd82c49cebc73",
+      "sha": "1f9020bef548e67f",
       "date": "2026-10-20"
     },
     "/groups/lab/": {
-      "sha": "74782a3adfde3607",
+      "sha": "a2b8e9187a92b5ff",
       "date": "2026-10-20"
     },
     "/groups/mechanic/": {
-      "sha": "3f7694057cbd0fd0",
+      "sha": "c1f2f94856ef1a5d",
       "date": "2026-10-20"
     },
     "/groups/plumbing/": {
-      "sha": "3b9e0b5021b0934d",
+      "sha": "1e5b2b2818712fdd",
       "date": "2026-10-20"
     },
     "/groups/real-estate/": {
-      "sha": "cfdc37a7db2ab92c",
+      "sha": "775aae650e2be6cd",
       "date": "2026-10-20"
     },
     "/groups/references/": {
-      "sha": "a6b624062d23466c",
+      "sha": "7fd4f6e17cb3af05",
       "date": "2026-10-20"
     },
     "/groups/restoration/": {
-      "sha": "d0737b5d8cee1e3b",
+      "sha": "9b1fc972ec966f57",
       "date": "2026-10-20"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "4168761b33f509e2",
+      "sha": "e6ce76a8f8e81193",
       "date": "2026-10-20"
     },
     "/groups/stage/": {
-      "sha": "98a5be4af946f12b",
+      "sha": "5d1c248d7576e9c9",
       "date": "2026-10-20"
     },
     "/groups/trucking/": {
-      "sha": "feee642a93973de7",
+      "sha": "6496f36222be8b44",
       "date": "2026-10-20"
     },
     "/groups/water/": {
-      "sha": "06c9b39af939fef7",
+      "sha": "b89a67b155c0e951",
       "date": "2026-10-20"
     },
     "/tools/aav-install-check/": {
@@ -1010,8 +1010,8 @@
       "date": "2026-10-17"
     },
     "/tools/carpet-seam-layout/": {
-      "sha": "fed937fbdf45cc3c",
-      "date": "2026-10-17"
+      "sha": "694916f9734c747d",
+      "date": "2026-10-20"
     },
     "/tools/carpet-takeoff/": {
       "sha": "29e6ea30ab7d21b1",
@@ -2366,8 +2366,8 @@
       "date": "2026-10-17"
     },
     "/tools/drainage-board-takeoff/": {
-      "sha": "dcc818aaafebeef7",
-      "date": "2026-10-17"
+      "sha": "c2663d7770257746",
+      "date": "2026-10-20"
     },
     "/tools/drainage-invert/": {
       "sha": "15386942daf340a4",
@@ -3228,6 +3228,10 @@
     "/tools/formwork-tie-load/": {
       "sha": "9e217681a3ee98e6",
       "date": "2026-10-17"
+    },
+    "/tools/foundation-grade-slope-check/": {
+      "sha": "3c616c56d589de47",
+      "date": "2026-10-20"
     },
     "/tools/foundation-waterproofing-takeoff/": {
       "sha": "efd7ae4b8d7d75ef",
@@ -8200,6 +8204,10 @@
     "/tools/tile-count/": {
       "sha": "2813f277ad6135a7",
       "date": "2026-10-17"
+    },
+    "/tools/tile-layout-cut-balance/": {
+      "sha": "425adebda847c9e9",
+      "date": "2026-10-20"
     },
     "/tools/tilt-up-brace-load/": {
       "sha": "eda0392f051f20dc",

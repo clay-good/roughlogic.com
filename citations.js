@@ -26770,6 +26770,28 @@ export const CITATIONS = {
       { name: "Top-of-wall tie only", value: "plate to stud, stud to sill and sill to foundation need their own connectors", source: "continuous load path practice" },
     ],
   },
+  "foundation-grade-slope-check": {
+    formula: "slope = fall / (run x 12); ground: fall in the first 10 ft = slope x 120 in, required 6 in; barrier within 10 ft and under 6 in of fall: drains or swales; impervious surface: slope >= 2%, required fall = 0.02 x run x 12.",
+    edition: IRC_2024 + " Section R401.3 (the same text in IRC 2021), read at codes.iccsafe.org on 2026-10-19.",
+    freeAccess: "Free to read at codes.iccsafe.org.",
+    governance: GOVERNANCE.structural,
+    editionNote: "R401.3: surface drainage is diverted to a storm sewer or other approved point of collection that creates no hazard; lots are graded to drain surface water away from foundation walls; the grade falls not fewer than 6 in within the first 10 ft. Exception: where lot lines, walls, slopes or other physical barriers prohibit 6 in of fall within 10 ft, drains or swales are constructed to ensure drainage away from the structure. Impervious surfaces within 10 ft of the building foundation are sloped not less than 2% away from the building. IRC 2027 is expected in early 2027; verify the edition and any local amendment.",
+    assumptions: [
+      { name: "Uniform slope over the run measured", value: "a hump or low spot inside the run is not seen", source: "stated assumption" },
+      { name: "Barrier exception for ground only", value: "a patio's 2% applies regardless", source: "IRC R401.3" },
+    ],
+  },
+  "tile-layout-cut-balance": {
+    formula: "pitch P = tile + joint; start full: n = floor((run + joint) / P), cut = run - n x tile - n x joint (0 when it fits exactly); centered: the largest k of the right parity (odd on a tile, even on a joint) with cuts = (run - k x tile - (k - 1) x joint) / 2 - joint >= 0; a sliver is a cut under the minimum (default half a tile).",
+    edition: "First-principles layout arithmetic by name; joints run between tiles and between a full tile and its cut, not against the wall. Avoiding cuts under half a tile is common tile-setting practice, not a numbered standard requirement.",
+    freeAccess: "First-principles arithmetic on the reader's own room and tile.",
+    governance: GOVERNANCE.general,
+    editionNote: "The two centered layouts always differ by half a pitch in end-cut width, which is why one of them avoids a sliver whenever the other has one. The perimeter movement joint the setting standard asks for is not modeled as a grout joint; it sits under the trim. One axis at a time; diagonal, offset, herringbone and multi-size patterns, out-of-square rooms and doorways are not handled.",
+    assumptions: [
+      { name: "Square room, one axis", value: "run it again for the other dimension", source: "stated scope" },
+      { name: "Minimum cut", value: "half a tile by default, or the reader's entry", source: "setting practice" },
+    ],
+  },
 };
 
 // --- Reference block and copy text ---

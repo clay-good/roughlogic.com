@@ -1690,6 +1690,7 @@ cross-check.
 | calc-construction.js | `computeFormworkMemberSpacing` | `{ pressure_psf = 0, tributary_in = 12, width_b_in = 1.5, depth_d_in = 3.5, fb...` | _ | _ | _ |
 | calc-construction.js | `computeFormworkPressure` | `{ pour_rate_ft_per_hr = 0, concrete_temp_F = 70, weight_factor = "normal", un...` | _ | _ | _ |
 | calc-construction.js | `computeFormworkTieLoad` | `{ lateral_pressure_psf = 600, h_spacing_ft = 2, v_spacing_ft = 2, tie_swl_lb ...` | _ | _ | _ |
+| calc-construction.js | `computeFoundationGradeSlopeCheck` | `{ surface = "pervious", fall_in, run_ft, barrier = "no" } = {}` | _ | _ | _ |
 | calc-construction.js | `computeFoundationWaterproofingTakeoff` | `{ perimeter_ft = 150, below_grade_height_ft = 8, coverage_sf_per_gal = 50, wa...` | _ | _ | _ |
 | calc-construction.js | `computeGlassVacuumLift` | `{ area_sf = 32, glass_thickness_in = 0.5, safety_factor = 4, cup_wll_lb = 150...` | _ | _ | _ |
 | calc-construction.js | `computeGlulamVolumeFactor` | `{ span_ft = 0, depth_in = 0, width_in = 0, x = 10, kl = 1.0 } = {}` | _ | _ | _ |
@@ -2345,6 +2346,7 @@ cross-check.
 | calc-finish.js | `computeStepFlashingCount` | `{ wall_run_ft = 20, shingle_exposure_in = 5, waste_pct = 5 } = {}` | _ | _ | _ |
 | calc-finish.js | `computeTextureMaterialTakeoff` | `{ gross_area_sqft = 0, openings_sqft = 0, coverage_per_bag_sqft = 0, waste_pc...` | _ | _ | _ |
 | calc-finish.js | `computeThinsetCoverage` | `{ area_sqft = 0, trowel = "quarter_three_eighths", coverage_per_bag = 0, bag_...` | _ | _ | _ |
+| calc-finish.js | `computeTileLayoutCutBalance` | `{ run_in = 0, tile_in = 0, joint_in = 0.125, min_cut_in = 0 } = {}` | _ | _ | _ |
 | calc-finish.js | `computeValleyFlashingTakeoff` | `{ valley_run_ft = 0, valley_count = 1, pitch_rise_per_12 = 6, metal_width_in ...` | _ | _ | _ |
 | calc-finishing.js | `computeGalvanizeCoatingWeight` | `{ coating_grade_um = 0, steel_tons = 0, area_per_ton_ft2 = 0, alt_area_per_to...` | _ | _ | _ |
 | calc-finishing.js | `computeGalvanizeKettleThroughput` | `{ lower_min = 0, immerse_min = 0, withdraw_min = 0, travel_min = 0, load_lb_p...` | _ | _ | _ |
@@ -3947,7 +3949,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2531.
+Row count: 2533.
 
 <!-- END function-corpus-v14 -->
 
@@ -4735,7 +4737,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-extraction-rate` | Water Extraction Volume, Time, and Waste-Tank Dumps | Project (first-principles); standing + absorbed; wand time = total / gpm | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+4 more) |
 
-### Group E Construction (636 tiles)
+### Group E Construction (638 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4956,6 +4958,7 @@ per spec-v14 §13.1 second paragraph.
 | `formwork-member-spacing` | Formwork Stud / Wale Maximum Spacing | ACI 347 formwork practice; 600 psf x 12-in tributary = 50 lb/in; S 3.0625 in^3, I 5.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `formwork-pressure` | Formwork Pressure | ACI 347 Guide to Formwork for Concrete; Pour 5 ft/hr / 70 F / normal-weight 150 pcf / 12 ft wall ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `formwork-tie-load` | Formwork Tie Load and Spacing | Formwork tie-load identity (first-pri...; tie load = 600*2*2 = 2,400 lb; util = 2400/3000 = 0.80 (p... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `foundation-grade-slope-check` | Foundation Drainage Grade Check (IRC R401.3) | ICC; 4 in of fall over 10 ft = 4 / 120 = 3.33 percent; 6 in re... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `foundation-waterproofing-takeoff` | Foundation Waterproofing / Dampproofing Takeoff | Foundation waterproofing/dampproofing...; area = 150*8 = 1200; gal = ceil(1200*1.10/50) = ceil(26.4... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `fresh-concrete-temp` | Fresh Concrete Temperature (ACI 305.1) | ACI 305.1 Hot Weather Concreting (bat...; agg 3000 lb@80F, cement 564 lb@150F, water 240 lb@70F, ag... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `friction-hoist-traction` | Friction (Koepe) Hoist Traction and Slip Limit | Project (first-principles); limit e^(0.25 pi) = 2.193; T = 20,000 + 30,000 + 24 x 3,0... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -5304,6 +5307,7 @@ per spec-v14 §13.1 second paragraph.
 | `thermal-stress-restrained` | Restrained Thermal Stress and Force | mechanics of materials; spec-v360 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `thinset-coverage` | Thin-Set Mortar Coverage | Manufacturer thin-set coverage charts...; spec-v95 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `tile-count` | Tile Count and Grout Volume | Project (first-principles); 100 ft^2 with 12x12 tiles, default 1/8 in grout, 10% wast... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `tile-layout-cut-balance` | Tile Layout: Centering and Balanced Cuts | Project (first-principles); 132 in run, 12 in tile, 1/8 in joint: start full 10 + 132... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `tilt-up-brace-load` | Tilt-Up Panel Temporary Brace Load and Count | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `tilt-up-lift-stress` | Tilt-Up Panel Lifting Stress and Insert Layout | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `track-superelevation` | Railroad Curve Superelevation, Unbalance, and Maximum Speed | Project (first-principles); 49 CFR 213 named for the elevation and unbalance caps | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+6 more) |
@@ -6397,6 +6401,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 
-Tile count: 2277. Fixture-covered or reference-cadence: 2277 / 2277.
+Tile count: 2279. Fixture-covered or reference-cadence: 2279 / 2279.
 
 <!-- END tile-index-v14 -->

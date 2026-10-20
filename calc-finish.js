@@ -1318,3 +1318,91 @@ FINISH_RENDERERS["texture-material-takeoff"] = _simpleRenderer({
   ],
   compute: computeTextureMaterialTakeoff,
 });
+
+// ===================== spec-v1987: tile layout, centering and balanced cuts =====================
+// One axis of a rectangular run. Every layout holds the same tiles give or take
+// one; what differs is where the remainder goes: one cut at the far wall
+// (start full), or two equal cuts centered on a tile (odd count) or on a joint
+// (even count). The two centered layouts differ by half a pitch in cut width.
+// Joints run between tiles and between a full tile and its cut, not at the wall.
+const _tlcNum = (v, what) => {
+  const ok = typeof v === "number" || (typeof v === "string" && /^\s*[+-]?(\d+\.?\d*|\.\d+)\s*$/.test(v));
+  if (!ok || !Number.isFinite(Number(v))) return { error: "The " + what + " must be a number (in)." };
+  if (Number(v) < 0) return { error: "The " + what + " cannot be negative (in)." };
+  return { v: Number(v) };
+};
+
+// dims: in { run_in: L, tile_in: L, joint_in: L, min_cut_in: L } out: { pitch_in: L, start_full_cut_in: L, tile_centered_cut_in: L, joint_centered_cut_in: L, first_full_edge_in: L }
+export function computeTileLayoutCutBalance({ run_in = 0, tile_in = 0, joint_in = 0.125, min_cut_in = 0 } = {}) {
+  const v = {};
+  for (const [k, x, w] of [["run", run_in, "run"], ["tile", tile_in, "tile size"], ["j", joint_in ?? 0, "joint width"], ["m", min_cut_in ?? 0, "minimum cut"]]) {
+    const r = _tlcNum(x, w); if (r.error) return { error: r.error }; v[k] = r.v;
+  }
+  if (!(v.run > 0) || !(v.tile > 0)) return { error: "The run and the tile size must be positive (in)." };
+  if (v.tile > v.run) return { error: "The tile is longer than the run: it is a single cut piece." };
+  if (v.j > 1 || v.run > 2400 || v.tile > 120) return { error: "Inputs are outside a tile layout (joint to 1 in, run to 200 ft, tile to 120 in)." };
+  if (v.m > v.tile) return { error: "The minimum cut cannot exceed the tile size." };
+  const P = v.tile + v.j;
+  const min_cut = v.m > 0 ? v.m : v.tile / 2;
+  const eps = 1e-9;
+  // Start full: n tiles from the wall with joints between them, then a joint and one cut.
+  const n = Math.floor((v.run + v.j) / P + 1e-9);
+  const used = n * v.tile + (n - 1) * v.j;
+  const start_full_cut_in = v.run - used <= v.j + eps ? 0 : v.run - used - v.j;
+  // Centered: the largest k of the right parity whose two end cuts are not negative.
+  const centered = (odd) => {
+    let k = Math.floor((v.run + v.j) / P + 1e-9);
+    if ((k % 2 === 1) !== odd) k -= 1;
+    for (; k >= (odd ? 1 : 2); k -= 2) {
+      const occ = k * v.tile + (k - 1) * v.j;
+      const rem = (v.run - occ) / 2;
+      // A gap at the wall no wider than a joint is no cut (the perimeter joint takes it).
+      if (rem <= v.j + eps) { if (rem >= -eps) return { k, cut: 0 }; continue; }
+      const cut = rem - v.j;
+      if (cut >= -eps) return { k, cut: Math.max(0, cut) };
+    }
+    return { k: 0, cut: null };
+  };
+  const tc = centered(true), jc = centered(false);
+  const sliver = (c) => c !== null && c > eps && c < min_cut - 1e-9;
+  const layouts = [
+    { key: "tile_centered", label: "centered on a tile", full: tc.k, cut: tc.cut, cuts: 2 },
+    { key: "joint_centered", label: "centered on a joint", full: jc.k, cut: jc.cut, cuts: 2 },
+    { key: "start_full", label: "full tile at one wall", full: n, cut: start_full_cut_in, cuts: 1 },
+  ].filter((l) => l.cut !== null && l.full > 0);
+  // Prefer a centered layout without a sliver (the larger cut), then starting full.
+  const clean = layouts.filter((l) => !sliver(l.cut));
+  // An exact fit wins; then a centered layout; then the larger cut.
+  const noCut = (l) => !(l.cut > eps);
+  const pick = (clean.length ? clean : layouts).slice().sort((a, b) => noCut(b) - noCut(a) || (b.cuts === 2) - (a.cuts === 2) || b.cut - a.cut)[0];
+  const first_full_edge_in = pick.key === "start_full" || noCut(pick) ? 0 : pick.cut + v.j;
+  if (![P, start_full_cut_in, first_full_edge_in].every(Number.isFinite)) return { error: "Layout math is not a finite value." };
+  const desc = (l) => l.full + " full" + (l.cut > eps ? " + " + (l.cuts === 2 ? "two " : "one ") + fmt(l.cut, 3) + " in cut" + (l.cuts === 2 ? "s" : "") + " (" + fmt(100 * l.cut / v.tile, 0) + "% of a tile)" + (sliver(l.cut) ? " SLIVER" : "") : ", no cut");
+  return {
+    pitch_in: P, min_cut_in: min_cut,
+    start_full_count: n, start_full_cut_in, tile_centered_count: tc.k, tile_centered_cut_in: tc.cut, joint_centered_count: jc.k, joint_centered_cut_in: jc.cut,
+    recommended: pick.key, first_full_edge_in,
+    layouts_text: layouts.map((l) => l.label + ": " + desc(l)).join("; "),
+    verdict: (clean.length ? "Use " : "Every layout leaves a cut under " + fmt(min_cut, 2) + " in; least bad: ") + pick.label + " (" + desc(pick) + ")" + (pick.key === "start_full" || noCut(pick) ? ", starting with a full tile at the wall" : ", first full tile's edge " + fmt(first_full_edge_in, 3) + " in from the wall"),
+    note: "Pitch = tile + joint. Starting full at one wall puts the whole remainder in one cut at the far wall; centering splits it into two equal cuts, and centering on a tile (an odd count) or on a joint (an even count) changes each cut by half a pitch, so when one centered layout leaves a sliver the other does not. A sliver here is a cut under the minimum entered, by default half a tile, the usual setter's rule for a cut that looks deliberate. Joints sit between tiles and between a full tile and its cut, not against the wall; leave the movement joint the setting standard asks for at the perimeter, which the trim covers. Run it once per room dimension. Diagonal, offset and multi-size patterns, out-of-square rooms and doorways are not handled, and the installer's eye and the focal wall govern the final choice.",
+  };
+}
+export const tileLayoutCutBalanceExample = { inputs: { run_in: 132, tile_in: 12, joint_in: 0.125, min_cut_in: 0 } };
+
+FINISH_RENDERERS["tile-layout-cut-balance"] = _simpleRenderer({
+  citation: "Citation: first-principles layout arithmetic by name: pitch = tile + joint; start full: n = floor((run + joint) / pitch) and one cut = run - n x tile - n x joint; centered: k full tiles (odd on a tile, even on a joint) and two cuts = (run - k x tile - (k - 1) x joint) / 2 - joint. Avoiding cuts under half a tile is common setting practice. The installer and the focal wall govern.",
+  example: tileLayoutCutBalanceExample.inputs,
+  fields: [
+    { key: "run_in", label: "Run, wall to wall (in)", kind: "number", attrs: { step: "any", min: "0" } },
+    { key: "tile_in", label: "Tile size along the run (in)", kind: "number", attrs: { step: "any", min: "0" } },
+    { key: "joint_in", label: "Grout joint width (in)", kind: "number", default: 0.125, attrs: { step: "any", min: "0" } },
+    { key: "min_cut_in", label: "Smallest acceptable cut (in; 0 = half a tile)", kind: "number", attrs: { step: "any", min: "0" } },
+  ],
+  outputs: [
+    { key: "v", id: "tlc-out-v", label: "Recommended layout", value: (r) => r.verdict },
+    { key: "l", id: "tlc-out-l", label: "All three layouts", value: (r) => r.layouts_text },
+    { key: "p", id: "tlc-out-p", label: "Pitch and sliver line", value: (r) => fmt(r.pitch_in, 4) + " in pitch; cuts under " + fmt(r.min_cut_in, 3) + " in are slivers" },
+    { key: "n", id: "tlc-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeTileLayoutCutBalance,
+});

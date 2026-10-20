@@ -6468,6 +6468,16 @@
     {"term":"truss uplift per end","target":"truss-uplift-connector","kind":"industry"},
     {"term":"how much uplift does a rafter tie need","target":"truss-uplift-connector","kind":"question"},
     {"term":"net uplift on a truss connector","target":"truss-uplift-connector","kind":"industry"},
-    {"term":"H2.5 enough for this uplift","target":"truss-uplift-connector","kind":"industry"}
+    {"term":"H2.5 enough for this uplift","target":"truss-uplift-connector","kind":"industry"},
+    {"term":"grade away from foundation 6 inches in 10 feet","target":"foundation-grade-slope-check","kind":"industry"},
+    {"term":"slope away from house","target":"foundation-grade-slope-check","kind":"industry"},
+    {"term":"R401.3 drainage grade","target":"foundation-grade-slope-check","kind":"industry"},
+    {"term":"patio slope away from house 2 percent","target":"foundation-grade-slope-check","kind":"industry"},
+    {"term":"how much fall in 10 feet from the foundation","target":"foundation-grade-slope-check","kind":"question"},
+    {"term":"tile layout where to start","target":"tile-layout-cut-balance","kind":"industry"},
+    {"term":"center tile or center grout line","target":"tile-layout-cut-balance","kind":"industry"},
+    {"term":"avoid sliver cuts tile","target":"tile-layout-cut-balance","kind":"industry"},
+    {"term":"tile cut width at the wall","target":"tile-layout-cut-balance","kind":"industry"},
+    {"term":"balanced tile layout calculator","target":"tile-layout-cut-balance","kind":"industry"}
   ]
 }

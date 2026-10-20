@@ -2431,6 +2431,10 @@ const RELATED = {
   "fireplace-clearance-check": ["hearth-extension-check","chimney-termination-height","fireplace-flue-area","mortar-mix"],
   // spec-v1985: truss and rafter uplift connector demand (calc-construction.js).
   "truss-uplift-connector": ["asce7-load-combinations","wind-cc-pressure","wood-nail-withdrawal","anchor-embedment"],
+  // spec-v1986 and spec-v1987: foundation grade check (calc-construction.js) and tile layout (calc-finish.js).
+  "foundation-grade-slope-check": ["slope-from-level","foundation-waterproofing-takeoff","layout-squaring"],
+  // spec-v1987: tile layout cut balance (calc-finish.js).
+  "tile-layout-cut-balance": ["tile-count","thinset-coverage","layout-squaring"],
 };
 
 export { RELATED };

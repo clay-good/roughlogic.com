@@ -1,6 +1,6 @@
 # roughlogic.com Specification v1987 -- Tile Layout: Centering and Balanced Cuts (`calc-finish.js`, Group E Carpentry and Construction, tile, 1 New Tile)
 
-> **Status: PROPOSED 2026-10-19. Single-tile spec.** Part of [scope-product-expansion](scope-product-expansion.md). In scope under the
+> **Status: LANDED 2026-10-19 (proposed 2026-10-19). Single-tile spec. As built: this spec's start-full cut formula counts one joint too few. With joints between tiles and between the last full tile and its cut (not at the wall), the cut is run - n x tile - n x joint: 10.75 in for the 132 in example (not 10.875) and 3.75 in at 150 in (not 3.94). The centered formulas and figures are as written.** Part of [scope-product-expansion](scope-product-expansion.md). In scope under the
 > spec-v106 trades-only charter: Group E, the tile bench in `calc-finish.js` beside `tile-count` and
 > `thinset-coverage`, no new dependency and no network call.
 >

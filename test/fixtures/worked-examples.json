@@ -172533,6 +172533,140 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "foundation-grade-slope-check",
+  "source_publisher": "ICC",
+  "source_title": "International Residential Code 2024, Section R401.3, applied to the spec-v1986 lot",
+  "source_edition_or_year": "IRC 2024 (codes.iccsafe.org, read 2026-10-19)",
+  "source_section_or_page": "4 in of fall over 10 ft = 4 / 120 = 3.33 percent; 6 in required in the first 10 ft: 2 in short.",
+  "verified_by": "rl",
+  "verified_on": "2026-10-19",
+  "inputs": {
+   "surface": "pervious",
+   "fall_in": 4,
+   "run_ft": 10,
+   "barrier": "no"
+  },
+  "outputs": {
+   "slope_pct": {
+    "value": 3.333333,
+    "tolerance": {
+     "pct": 0.01
+    }
+   },
+   "required_fall_in": {
+    "value": 6,
+    "tolerance": {
+     "abs": 0
+    }
+   },
+   "margin_in": {
+    "value": -2,
+    "tolerance": {
+     "abs": 1e-9
+    }
+   }
+  }
+ },
+ {
+  "tile_id": "foundation-grade-slope-check",
+  "source_publisher": "ICC",
+  "source_title": "International Residential Code 2024, Section R401.3",
+  "source_edition_or_year": "IRC 2024 (codes.iccsafe.org, read 2026-10-19)",
+  "source_section_or_page": "Impervious surface: not less than 2 percent; an 8 ft patio needs 0.02 x 96 = 1.92 in.",
+  "verified_by": "rl",
+  "verified_on": "2026-10-19",
+  "inputs": {
+   "surface": "impervious",
+   "fall_in": 1.92,
+   "run_ft": 8,
+   "barrier": "no"
+  },
+  "outputs": {
+   "required_fall_in": {
+    "value": 1.92,
+    "tolerance": {
+     "abs": 1e-9
+    }
+   },
+   "slope_pct": {
+    "value": 2,
+    "tolerance": {
+     "abs": 1e-9
+    }
+   }
+  }
+ },
+ {
+  "tile_id": "tile-layout-cut-balance",
+  "source_publisher": "Project (first-principles)",
+  "source_title": "spec-v1987 worked example, recomputed",
+  "source_edition_or_year": "2026",
+  "source_section_or_page": "132 in run, 12 in tile, 1/8 in joint: start full 10 + 132 - 120 - 1.25 = 10.75 in (the spec's 10.875 in counted one joint too few); tile-centered 9 full, (132 - 109) / 2 - 0.125 = 11.375 in; joint-centered 10 full, (132 - 121.125) / 2 - 0.125 = 5.3125 in (sliver).",
+  "verified_by": "rl",
+  "verified_on": "2026-10-19",
+  "inputs": {
+   "run_in": 132,
+   "tile_in": 12,
+   "joint_in": 0.125,
+   "min_cut_in": 0
+  },
+  "outputs": {
+   "start_full_cut_in": {
+    "value": 10.75,
+    "tolerance": {
+     "abs": 1e-9
+    }
+   },
+   "tile_centered_cut_in": {
+    "value": 11.375,
+    "tolerance": {
+     "abs": 1e-9
+    }
+   },
+   "joint_centered_cut_in": {
+    "value": 5.3125,
+    "tolerance": {
+     "abs": 1e-9
+    }
+   },
+   "first_full_edge_in": {
+    "value": 11.5,
+    "tolerance": {
+     "abs": 1e-9
+    }
+   }
+  }
+ },
+ {
+  "tile_id": "tile-layout-cut-balance",
+  "source_publisher": "Project (first-principles)",
+  "source_title": "spec-v1987 second example, recomputed",
+  "source_edition_or_year": "2026",
+  "source_section_or_page": "97 in of 6 in tile at 1/8 in: tile-centered 15 full, (97 - 91.75) / 2 - 0.125 = 2.5 in (sliver); joint-centered 14 full, (97 - 85.625) / 2 - 0.125 = 5.5625 in.",
+  "verified_by": "rl",
+  "verified_on": "2026-10-19",
+  "inputs": {
+   "run_in": 97,
+   "tile_in": 6,
+   "joint_in": 0.125,
+   "min_cut_in": 0
+  },
+  "outputs": {
+   "tile_centered_cut_in": {
+    "value": 2.5,
+    "tolerance": {
+     "abs": 1e-9
+    }
+   },
+   "joint_centered_cut_in": {
+    "value": 5.5625,
+    "tolerance": {
+     "abs": 1e-9
+    }
+   }
+  }
  }
  ]
 }

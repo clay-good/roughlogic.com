@@ -1,6 +1,6 @@
 # roughlogic.com Specification v1986 -- Foundation Drainage Grade Check (IRC R401.3) (`calc-construction.js`, Group E Carpentry and Construction, landscaping, 1 New Tile)
 
-> **Status: PROPOSED 2026-10-19. Single-tile spec.** Part of [scope-product-expansion](scope-product-expansion.md). In scope under the
+> **Status: LANDED 2026-10-19 (proposed 2026-10-19). Single-tile spec. As built from the IRC 2024 and 2021 R401.3 text read on 2026-10-19 (identical). A fall over a run other than 10 ft is read as a uniform slope applied to the first 10 ft; with a barrier inside 10 ft the result is the exception sentence, not a fail.** Part of [scope-product-expansion](scope-product-expansion.md). In scope under the
 > spec-v106 trades-only charter: Group E, the IRC code-check bench in `calc-construction.js`, serving the landscaper,
 > the waterproofer and the home inspector, no new dependency and no network call.
 >
