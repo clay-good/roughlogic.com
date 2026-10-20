@@ -86,7 +86,13 @@ test("every calculator offers its worked example, and answers nothing until aske
         .map((el) => el.textContent.trim()).filter(Boolean),
     }));
     if (!state.hasFields) continue;
-    if (!state.hasButton) noButton.push(id);
+    // On a loaded CI runner the fields can be in before the button (run
+    // 39435976195 reported `stairs`, which has one); give a missing button up
+    // to 2 s before counting it, so only a tile that never gets one fails.
+    if (!state.hasButton) {
+      const late = await page.waitForSelector("#view-region .example-btn", { timeout: 2000 }).then(() => true, () => false);
+      if (!late) noButton.push(id);
+    }
     if (state.prefilled && state.answers.length) preAnswered.push(`${id}: ${state.answers.join(" ; ").slice(0, 120)}`);
   }
   expect(
