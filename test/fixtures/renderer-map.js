@@ -2279,4 +2279,5 @@ export const RENDERER_MAP = {
   "countertop-receptacle-count": { module: "../../calc-electricalfield.js", exportName: "ELECTRICALFIELD_RENDERERS" },
   "conduit-segment-bend": { module: "../../calc-fab.js", exportName: "FAB_RENDERERS" },
   "conduit-concentric-bend": { module: "../../calc-fab.js", exportName: "FAB_RENDERERS" },
+  "bath-exhaust-fan-sizing": { module: "../../calc-hvacservice.js", exportName: "HVACSERVICE_RENDERERS" },
 };

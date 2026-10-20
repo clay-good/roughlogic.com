@@ -1515,6 +1515,8 @@ const _TILES = [
   // spec-v1979..v1980: segment and concentric conduit bends (calc-fab.js, group A).
   ["conduit-segment-bend", "A"],
   ["conduit-concentric-bend", "A"],
+  // spec-v1981: bathroom and kitchen exhaust fan sizing (calc-hvacservice.js).
+  ["bath-exhaust-fan-sizing", "C"],
 ];
 
 

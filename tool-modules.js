@@ -697,6 +697,7 @@ export const TOOL_MODULES = (() => {
     "oil-burner-firing-rate",
     "flue-gas-dew-point",
     "condensing-flue-condensate",
+    "bath-exhaust-fan-sizing",
   ]);
   // spec-v103 new pipe/well disinfection bench; relieves the standing
   // calc-plumbing.js cap watch. Both tiles keep group "B".

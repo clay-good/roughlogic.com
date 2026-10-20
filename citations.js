@@ -26701,6 +26701,18 @@ export const CITATIONS = {
       { name: "Centerline layout", value: "bender take-up and springback are not included", source: "stated assumption" },
     ],
   },
+  "bath-exhaust-fan-sizing": {
+    formula: "code minimum from IRC 2024 Table M1505.5 by room and operation; 8 ACH rule cfm = L x W x H x 8 / 60; HVI area rule cfm = L x W x (H / 8); fixture rule cfm = 50 x (toilets + showers + tubs) + 100 x jetted tubs; intermittent size = ceil(max(intermittent minimum, rule) / 10) x 10; recommended = the continuous minimum for a continuous fan, else the intermittent size; air changes = cfm x 60 / volume.",
+    edition: IRC_2024 + " Section M1505.5 and Table M1505.5 (M1505.4.4 and Table M1505.4.4(1) in IRC 2021), read on the IRC 2024 text on 2026-10-19. Home Ventilating Institute sizing practice by name.",
+    freeAccess: "The IRC is free to read at codes.iccsafe.org; the Home Ventilating Institute publishes its sizing guidance free at hvi.org.",
+    governance: GOVERNANCE.mechanical,
+    editionNote: "IRC 2024 M1505.5: local exhaust systems must be able to exhaust the Table M1505.5 rate at one or more speed settings, and a bathroom or toilet room fan's listed rate must equal or exceed it at a minimum static pressure of 0.25 in wc (per M1505.3). Table M1505.5: kitchens 100 cfm intermittent or 25 cfm continuous; bathrooms and toilet rooms 50 cfm intermittent or 20 cfm continuous. The same rates appear in IRC 2021 as M1505.4.4 and Table M1505.4.4(1), and in ASHRAE 62.2. HVI's 1 cfm per sq ft (written for an 8 ft ceiling, 7.5 air changes an hour) and its fixture counts, and the common 8 air changes an hour volume rule, are rules of thumb above the code floor, not code requirements. IRC 2024 M1503.6 requires makeup air for an exhaust system over 400 cfm where an atmospherically vented fuel-burning appliance is inside the air barrier. IRC 2027 is expected in early 2027; verify the edition adopted by your AHJ.",
+    assumptions: [
+      { name: "Rule of thumb above the floor", value: "1 cfm per sq ft scaled for the ceiling (100 sq ft or less) or 50 cfm per toilet, shower or tub and 100 per jetted tub (over 100 sq ft); 8 air changes an hour as a volume alternative", source: "Home Ventilating Institute sizing practice" },
+      { name: "Fans sold in 10 cfm steps", value: "the recommended rate is rounded up to the next 10 cfm", source: "stated assumption" },
+      { name: "Rated at 0.25 in wc", value: "compare the fan's listed rate at 0.25 in wc, not its free-air rate", source: "IRC 2024 M1505.5" },
+    ],
+  },
 };
 
 // --- Reference block and copy text ---

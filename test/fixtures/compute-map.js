@@ -2378,6 +2378,7 @@ export const COMPUTE_MAP = {
   "countertop-receptacle-count": { module: "../../calc-electricalfield.js", fn: "computeCountertopReceptacleCount" },
   "conduit-segment-bend": { module: "../../calc-fab.js", fn: "computeConduitSegmentBend" },
   "conduit-concentric-bend": { module: "../../calc-fab.js", fn: "computeConduitConcentricBend" },
+  "bath-exhaust-fan-sizing": { module: "../../calc-hvacservice.js", fn: "computeBathExhaustFanSizing" },
 };
 
 // Resolve a COMPUTE_MAP module path (relative to this file) and import it.

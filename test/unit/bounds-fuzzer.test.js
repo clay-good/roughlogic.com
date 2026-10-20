@@ -62217,3 +62217,30 @@ test("bounds: spec-v1980 computeConduitConcentricBend pins the pitch, each radiu
     assert.ok("error" in _ccb(bad), JSON.stringify(bad));
   }
 });
+
+// spec-v1981: IRC 2024 Table M1505.5 floors and the HVI rules above them.
+import { computeBathExhaustFanSizing as _bef } from "../../calc-hvacservice.js";
+test("bounds: spec-v1981 computeBathExhaustFanSizing pins the Table M1505.5 floors, the 8 ACH and fixture rules, the 10 cfm rounding and the error seams", () => {
+  const b = { room_type: "bathroom", length_ft: 8, width_ft: 10, ceiling_ft: 8, operation: "intermittent", rule: "ach8" };
+  const r = _bef(b);
+  assert.ok(Math.abs(r.rule_cfm - 640 * 8 / 60) < 1e-9 && r.recommended_cfm === 90 && r.code_governs === false);
+  assert.ok(Math.abs(r.ach_at_recommended - 8.4375) < 1e-12);
+  const powder = _bef({ ...b, length_ft: 5, width_ft: 8, ceiling_ft: 9 });
+  assert.equal(powder.recommended_cfm, 50); assert.equal(powder.code_governs, true);
+  assert.equal(_bef({ ...b, length_ft: 12, width_ft: 14, ceiling_ft: 9 }).recommended_cfm, 210);
+  assert.equal(_bef({ ...b, length_ft: 12, width_ft: 14, ceiling_ft: 9, rule: "fixtures", toilets: 1, showers: 1, jetted_tubs: 1 }).recommended_cfm, 200);
+  // Exactly 60 cfm stays 60; a hair over goes to 70.
+  assert.equal(_bef({ ...b, length_ft: 7.5, width_ft: 7.5, ceiling_ft: 8 }).recommended_cfm, 60);
+  assert.equal(_bef({ ...b, length_ft: 7.51, width_ft: 7.5, ceiling_ft: 8 }).recommended_cfm, 70);
+  const cont = _bef({ ...b, operation: "continuous" });
+  assert.equal(cont.recommended_cfm, 20); assert.equal(cont.intermittent_size_cfm, 90); assert.equal(cont.code_min_cfm, 20);
+  // HVI's 1 cfm per sq ft, scaled for the ceiling: 80 at 8 ft, 90 at 9 ft.
+  assert.equal(_bef({ ...b, rule: "sqft" }).recommended_cfm, 80);
+  assert.ok(Math.abs(_bef({ ...b, rule: "sqft", ceiling_ft: 9 }).rule_cfm - 90) < 1e-9);
+  const k = _bef({ ...b, room_type: "kitchen" });
+  assert.equal(k.recommended_cfm, 100); assert.equal(k.rule_cfm, null); assert.equal(k.code_governs, null);
+  assert.equal(_bef({ ...b, room_type: "kitchen", operation: "continuous" }).recommended_cfm, 25);
+  for (const bad of [{ ...b, length_ft: 0 }, { ...b, width_ft: -8 }, { ...b, ceiling_ft: 5.9 }, { ...b, ceiling_ft: 20.1 }, { ...b, ceiling_ft: null }, { ...b, rule: "fixtures" }, { ...b, toilets: -1 }, { ...b, showers: 1.5 }, { ...b, room_type: "garage" }, { ...b, rule: "ach6" }, { ...b, operation: "timer" }, { ...b, length_ft: 101 }, { ...b, length_ft: Infinity }]) {
+    assert.ok("error" in _bef(bad), JSON.stringify(bad));
+  }
+});

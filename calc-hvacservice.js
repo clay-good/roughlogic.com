@@ -680,7 +680,7 @@ export function computeAshrae622Ventilation({ floor_area_ft2 = 0, bedrooms = 0, 
     : "Infiltration credit meets Qtot - no continuous fan required by 62.2";
   return {
     q_tot, q_fan, verdict,
-    note: "ASHRAE 62.2-2019 Eq. 4.1a: Qtot = 0.03 x CFA + 7.5 x (Nbr + 1) sets the total required ventilation from floor area and bedrooms only (occupants assumed Nbr + 1); the fan flow is Qtot minus Phi x Qinf x Aext (Eq. 4.2): the full credit only for a balanced system, a Qinf / Qtot share of it for an exhaust- or supply-only one. The conservative default is zero credit - size the fan to the full Qtot. The credit comes from the measured air-tightness (the blower-door natural infiltration) per the 62.2 infiltration method. Local kitchen and bath exhaust is a separate 62.2 requirement this tile does not cover. A sizing aid, not a 62.2 compliance certificate.",
+    note: "ASHRAE 62.2-2019 Eq. 4.1a: Qtot = 0.03 x CFA + 7.5 x (Nbr + 1) sets the total required ventilation from floor area and bedrooms only (occupants assumed Nbr + 1); the fan flow is Qtot minus Phi x Qinf x Aext (Eq. 4.2): the full credit only for a balanced system, a Qinf / Qtot share of it for an exhaust- or supply-only one. The conservative default is zero credit - size the fan to the full Qtot. The credit comes from the measured air-tightness (the blower-door natural infiltration) per the 62.2 infiltration method. Local kitchen and bath exhaust is a separate requirement (the bathroom and kitchen exhaust fan calculator). A sizing aid, not a 62.2 compliance certificate.",
   };
 }
 export const ashrae622VentilationExample = { inputs: { floor_area_ft2: 2000, bedrooms: 3, infil_credit_cfm: 0 } };
@@ -1560,4 +1560,92 @@ HVACSERVICE_RENDERERS["chilled-water-delta-t"] = _simpleRenderer({
     { key: "n", id: "cwdt-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeChilledWaterDeltaT,
+});
+
+// ===================== spec-v1981: bathroom and kitchen exhaust fan sizing =====================
+// IRC 2024 Table M1505.5 (M1505.4.4 in 2021) sets the floor; the Home
+// Ventilating Institute's practice sets the size: 1 cfm per sq ft for a bathroom
+// of 100 sq ft or less (7.5 air changes an hour at an 8 ft ceiling; the 8 ACH
+// volume rule is the common alternative and runs a little higher), or 50 cfm
+// per toilet, shower or tub and 100 per jetted tub for one over 100 sq ft. Fans are sold
+// in 10 cfm steps and rated at 0.25 in wc (M1505.5 via M1505.3).
+const _BEF_MIN = { bathroom: { intermittent: 50, continuous: 20 }, kitchen: { intermittent: 100, continuous: 25 } };
+
+// dims: in { room_type: dimensionless, length_ft: L, width_ft: L, ceiling_ft: L, operation: dimensionless, rule: dimensionless, toilets: dimensionless, showers: dimensionless, tubs: dimensionless, jetted_tubs: dimensionless } out: { area_sqft: L^2, volume_cuft: L^3, code_min_cfm: L^3 T^-1, rule_cfm: L^3 T^-1, intermittent_size_cfm: L^3 T^-1, recommended_cfm: L^3 T^-1, ach_at_recommended: T^-1 }
+export function computeBathExhaustFanSizing({
+  room_type = "bathroom", length_ft = 0, width_ft = 0, ceiling_ft = 8, operation = "intermittent", rule = "ach8",
+  toilets = 0, showers = 0, tubs = 0, jetted_tubs = 0,
+} = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const mins = _BEF_MIN[String(room_type)];
+  if (!mins) return { error: "Room type must be bathroom or kitchen." };
+  const op = String(operation);
+  if (op !== "intermittent" && op !== "continuous") return { error: "Operation must be intermittent or continuous." };
+  const ru = String(rule);
+  if (ru !== "ach8" && ru !== "sqft" && ru !== "fixtures") return { error: "Sizing rule must be ach8, sqft or fixtures." };
+  const L = Number(length_ft), W = Number(width_ft), H = ceiling_ft === null || ceiling_ft === "" ? NaN : Number(ceiling_ft);
+  if (!(L > 0) || !(W > 0)) return { error: "Room length and width must be positive (ft)." };
+  if (L > 100 || W > 100) return { error: "Room length and width above 100 ft are outside a residential exhaust fan." };
+  if (!(H >= 6 && H <= 20)) return { error: "Ceiling height must be from 6 to 20 ft." };
+  const counts = [toilets, showers, tubs, jetted_tubs].map(Number);
+  if (counts.some((c) => !Number.isInteger(c) || c < 0 || c > 10)) return { error: "Fixture counts must be whole numbers from 0 to 10." };
+  const area_sqft = L * W;
+  const volume_cuft = area_sqft * H;
+  const code_min_cfm = mins[op];
+  let rule_cfm = null;
+  if (room_type === "bathroom") {
+    if (ru === "ach8") rule_cfm = volume_cuft * 8 / 60;
+    // HVI's 1 cfm per sq ft is written for an 8 ft ceiling; scale it for a taller room.
+    else if (ru === "sqft") rule_cfm = area_sqft * H / 8;
+    else {
+      rule_cfm = 50 * (counts[0] + counts[1] + counts[2]) + 100 * counts[3];
+      if (rule_cfm === 0) return { error: "The fixture rule needs at least one toilet, shower, tub or jetted tub." };
+    }
+  }
+  // The intermittent size a fan is bought at: the larger of the floor and the rule, up to the next 10 cfm.
+  const intermittent_size_cfm = Math.ceil(Math.max(mins.intermittent, rule_cfm || 0) / 10 - 1e-9) * 10;
+  const recommended_cfm = op === "continuous" ? mins.continuous : intermittent_size_cfm;
+  const ach_at_recommended = recommended_cfm * 60 / volume_cuft;
+  const code_governs = rule_cfm === null ? null : rule_cfm <= mins.intermittent + 1e-9;
+  if (![area_sqft, volume_cuft, intermittent_size_cfm, ach_at_recommended].every(Number.isFinite)) return { error: "Exhaust-fan math is not a finite value." };
+  const advice = room_type === "kitchen"
+    ? "A kitchen's floor is 100 cfm intermittent or 25 cfm continuous; size a residential range hood by the range and its manufacturer's guidance. An exhaust system over 400 cfm needs makeup air where an atmospherically vented fuel-burning appliance is inside the air barrier (IRC 2024 M1503.6; the kitchen exhaust makeup air calculator)."
+    : ru !== "fixtures" && area_sqft > 100 + 1e-9
+      ? "This bathroom is over 100 sq ft, where HVI sizes by fixtures instead (50 cfm per toilet, shower or tub, 100 per jetted tub); compare that rule."
+      : ru === "fixtures" && area_sqft <= 100 + 1e-9
+        ? "This bathroom is 100 sq ft or less, where HVI sizes by 1 cfm per sq ft; compare that rule."
+        : op === "continuous" ? "A continuous fan meets the code at " + mins.continuous + " cfm; for the room's rule of thumb, boost it to " + intermittent_size_cfm + " cfm when the room is in use."
+        : code_governs ? "The code floor governs: the rule of thumb asks for no more than the 50 cfm code minimum." : "The rule of thumb governs: a fan at the code floor would be undersized for this room.";
+  return {
+    area_sqft, volume_cuft, code_min_cfm, continuous_min_cfm: mins.continuous, rule_cfm, intermittent_size_cfm, recommended_cfm, ach_at_recommended, code_governs,
+    advice,
+    note: "IRC 2024 M1505.5 and Table M1505.5 (M1505.4.4 in IRC 2021): bathrooms and toilet rooms 50 cfm intermittent or 20 cfm continuous, kitchens 100 cfm intermittent or 25 cfm continuous. The listed rate of a bathroom fan must be met at 0.25 in wc static pressure, so pick the fan by its rating at 0.25 in wc, not its free-air number; a long or flex duct run can hold a fan well under its rating, so check the duct against the static pressure the fan is listed at. The 1 cfm per sq ft and the fixture counts are the Home Ventilating Institute's sizing practice, and 8 air changes an hour a common volume rule that runs a little higher; all are rules of thumb above the code floor. A continuous fan with a boost speed meets the code at the continuous rate and should boost to the intermittent size. Duct size and length, makeup air and the whole-house rate are separate calculators.",
+  };
+}
+export const bathExhaustFanSizingExample = { inputs: { room_type: "bathroom", length_ft: 8, width_ft: 10, ceiling_ft: 8, operation: "intermittent", rule: "ach8", toilets: 0, showers: 0, tubs: 0, jetted_tubs: 0 } };
+
+HVACSERVICE_RENDERERS["bath-exhaust-fan-sizing"] = _simpleRenderer({
+  citation: "Citation: IRC 2024 M1505.5 and Table M1505.5 (M1505.4.4 in IRC 2021), by name; free at codes.iccsafe.org. Bathroom 50 cfm intermittent or 20 cfm continuous, kitchen 100 cfm intermittent or 25 cfm continuous, a bathroom fan's listed rate met at 0.25 in wc. Home Ventilating Institute sizing practice by name: 1 cfm per sq ft (or the 8 air changes an hour volume rule), or for a bathroom over 100 sq ft 50 cfm per toilet, shower or tub and 100 per jetted tub. The adopted code and the AHJ govern.",
+  example: bathExhaustFanSizingExample.inputs,
+  fields: [
+    { key: "room_type", label: "Room", kind: "select", default: "bathroom", options: [{ value: "bathroom", label: "Bathroom or toilet room" }, { value: "kitchen", label: "Kitchen" }] },
+    { key: "length_ft", label: "Room length (ft)", kind: "number", attrs: { step: "any", min: "0" } },
+    { key: "width_ft", label: "Room width (ft)", kind: "number", attrs: { step: "any", min: "0" } },
+    { key: "ceiling_ft", label: "Ceiling height (ft, 6 to 20)", kind: "number", default: 8, required: true, attrs: { step: "any", min: "6", max: "20" } },
+    { key: "operation", label: "Operation", kind: "select", default: "intermittent", options: [{ value: "intermittent", label: "Intermittent (switched)" }, { value: "continuous", label: "Continuous" }] },
+    { key: "rule", label: "Bathroom sizing rule", kind: "select", default: "ach8", options: [{ value: "ach8", label: "8 air changes an hour (volume)" }, { value: "sqft", label: "HVI 1 cfm per sq ft, scaled for the ceiling (100 sq ft or less)" }, { value: "fixtures", label: "HVI by fixtures (over 100 sq ft)" }] },
+    { key: "toilets", label: "Toilets (fixture rule)", kind: "number", attrs: { step: "1", min: "0" } },
+    { key: "showers", label: "Showers (fixture rule)", kind: "number", attrs: { step: "1", min: "0" } },
+    { key: "tubs", label: "Bathtubs (fixture rule)", kind: "number", attrs: { step: "1", min: "0" } },
+    { key: "jetted_tubs", label: "Jetted tubs (fixture rule)", kind: "number", attrs: { step: "1", min: "0" } },
+  ],
+  outputs: [
+    { key: "r", id: "bef-out-r", label: "Recommended fan rating (a bath fan's at 0.25 in wc)", value: (r) => r.recommended_cfm + " cfm " + (r.recommended_cfm === r.continuous_min_cfm && r.recommended_cfm !== r.intermittent_size_cfm ? "continuous (boost to " + r.intermittent_size_cfm + " cfm)" : "intermittent") },
+    { key: "c", id: "bef-out-c", label: "Code minimum", value: (r) => r.code_min_cfm + " cfm (" + (r.code_min_cfm === r.continuous_min_cfm ? "continuous" : "intermittent") + "; the other branch is " + (r.code_min_cfm === r.continuous_min_cfm ? r.intermittent_size_cfm + " cfm sized intermittent" : r.continuous_min_cfm + " cfm continuous") + ")" },
+    { key: "u", id: "bef-out-u", label: "Rule of thumb", value: (r) => (r.rule_cfm === null ? "- (kitchens: size the hood by the range)" : fmt(r.rule_cfm, 1) + " cfm") },
+    { key: "v", id: "bef-out-v", label: "Room and air changes", value: (r) => fmt(r.area_sqft, 1) + " sq ft, " + fmt(r.volume_cuft, 0) + " cu ft; " + fmt(r.ach_at_recommended, 1) + " air changes an hour at the recommended rate" },
+    { key: "a", id: "bef-out-a", label: "Which number governs", value: (r) => r.advice },
+    { key: "n", id: "bef-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeBathExhaustFanSizing,
 });

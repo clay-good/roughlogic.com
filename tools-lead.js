@@ -2275,4 +2275,5 @@ export const TOOLS = [
   {"id":"countertop-receptacle-count","name":"Kitchen Countertop Receptacles (NEC 210.52(C))","group":"A","trades":["electrical"],"desc":"How many receptacle outlets a kitchen's wall countertops need under NEC 210.52(C), and what the edition you are on says about islands and peninsulas.","more":1},
   {"id":"conduit-segment-bend","name":"Conduit Segment Bend Layout","group":"A","trades":["electrical"],"desc":"How to lay out a large-radius conduit sweep as a segment bend: many small shots, equally spaced along the arc.","more":1},
   {"id":"conduit-concentric-bend","name":"Concentric Conduit Bend Radii and Lengths","group":"A","trades":["electrical"],"desc":"The radius, arc length, mark spacing and extra stock for each conduit in a rack bent concentrically around one corner.","more":1},
+  {"id":"bath-exhaust-fan-sizing","name":"Bathroom and Kitchen Exhaust Fan Sizing","group":"C","trades":["hvac","electrical"],"desc":"What size bath fan a bathroom needs, and the code floor for a kitchen.","more":1},
 ];

@@ -2589,6 +2589,7 @@ cross-check.
 | calc-hvacairside.js | `computeMoistAirEnthalpy` | `{ t_db_f = null, w_lb_lb = 0 } = {}` | _ | _ | _ |
 | calc-hvacairside.js | `computeVibrationIsolation` | `{ equipment_rpm = 0, static_deflection_in = 0 } = {}` | _ | _ | _ |
 | calc-hvacservice.js | `computeAshrae622Ventilation` | `{ floor_area_ft2 = 0, bedrooms = 0, infil_credit_cfm = 0, system_type = "unba...` | _ | _ | _ |
+| calc-hvacservice.js | `computeBathExhaustFanSizing` | `{ room_type = "bathroom", length_ft = 0, width_ft = 0, ceiling_ft = 8, operat...` | _ | _ | _ |
 | calc-hvacservice.js | `computeBlowerDoorAch50` | `{ cfm50 = 0, volume_ft3 = 0, n_factor = 17, target_ach50 = 3, n_factor_low = ...` | _ | _ | _ |
 | calc-hvacservice.js | `computeChilledWaterDeltaT` | `{ load_btuh = 0, actual_gpm = 0, design_delta_t_f = 0 } = {}` | _ | _ | _ |
 | calc-hvacservice.js | `computeChimneyDraft` | `{ stack_height_ft = 0, ambient_temp_f = null, mean_flue_temp_f = null, baro_p...` | _ | _ | _ |
@@ -3941,7 +3942,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2525.
+Row count: 2526.
 
 <!-- END function-corpus-v14 -->
 
@@ -4439,7 +4440,7 @@ per spec-v14 §13.1 second paragraph.
 | `wobbe-index` | Wobbe Index (Fuel-Gas Interchangeability) | Wobbe index (fuel-gas interchangeabil...; WI = 1000 / sqrt(0.60) = 1000 / 0.77460 = 1290.99 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `wsfu-demand` | Probable Peak Demand (WSFU to GPM) | Hunter's curve (NBS BMS65) / IPC 2021...; 120 WSFU flush-valve -> 73.0 GPM, a printed row of Table ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group C HVAC (222 tiles)
+### Group C HVAC (223 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4458,6 +4459,7 @@ per spec-v14 §13.1 second paragraph.
 | `bare-pipe-heat-loss` | Bare Pipe Heat Loss (Convection and Radiation) | Engineers Edge; 2 in nominal pipe (OD 2.375 in) at 280 F; emissivity 0.8 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `baseboard-length-for-load` | Baseboard Length for a Room Load | Slant/Fin (inverse); 4,800 BTU/hr, 180 F water, 1 gpm, Fine/Line 30 (580 BTU/f... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+4 more) |
 | `baseboard-output` | Hydronic Baseboard Output | Slant/Fin; 180 F water / 1 gpm / 8 ft of Slant/Fin Fine/Line 30 -> 5... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `bath-exhaust-fan-sizing` | Bathroom and Kitchen Exhaust Fan Sizing | ICC and Home Ventilating Institute; 8 x 10 x 8 ft = 640 cu ft; 640 x 8 / 60 = 85.33 cfm > the... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `belt-pulley` | Belt Length and Pulley Speed | Project (first-principles); 4 in drive / 8 in driven / 18 in centers / 1750 RPM motor... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `bill-disaggregation` | Utility Bill Baseload and Weather-Sensitive Split (Energy Signature) | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `blowdown-heat-recovery` | Boiler Blowdown Heat Recovery and Efficiency Gain | Project (first-principles); ASME, the boiler manufacturer, the water treatment progra... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
@@ -6385,6 +6387,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 
-Tile count: 2271. Fixture-covered or reference-cadence: 2271 / 2271.
+Tile count: 2272. Fixture-covered or reference-cadence: 2272 / 2272.
 
 <!-- END tile-index-v14 -->

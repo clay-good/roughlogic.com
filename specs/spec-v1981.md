@@ -1,6 +1,6 @@
 # roughlogic.com Specification v1981 -- Bathroom and Kitchen Exhaust Fan Sizing (`calc-hvacservice.js`, Group C HVAC, 1 New Tile)
 
-> **Status: PROPOSED 2026-10-19. Single-tile spec.** Part of [scope-product-expansion](scope-product-expansion.md). In scope under the
+> **Status: LANDED 2026-10-19 (proposed 2026-10-19). Single-tile spec. As built: the IRC 2024 text, read on 2026-10-19, puts the rates at M1505.5 and Table M1505.5 (M1505.4.4 and Table M1505.4.4(1) in 2021) and the 0.25 in wc rating in M1505.5 by reference to M1505.3; the citation names both editions. A continuous fan is recommended at the continuous minimum and also shown the intermittent boost size; a kitchen gets the code floor only, with no rule of thumb. From an independent review: 8 air changes an hour is not HVI's 1 cfm per sq ft (that is 7.5 air changes at an 8 ft ceiling), so the tile offers HVI's area rule, scaled for the ceiling, as a third option (80 cfm for the worked example) beside the 8 ACH rule this spec names.** Part of [scope-product-expansion](scope-product-expansion.md). In scope under the
 > spec-v106 trades-only charter: Group C, the residential ventilation bench in `calc-hvacservice.js` beside
 > `ashrae-622-ventilation` and `dryer-duct-length`, no new dependency and no network call.
 >

@@ -2,11 +2,11 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "7a3d34852ee7c905",
+      "sha": "96d4ab88a718238f",
       "date": "2026-10-20"
     },
     "/tools/": {
-      "sha": "536e869665290942",
+      "sha": "14bcb448b9db49a5",
       "date": "2026-10-20"
     },
     "/errata/": {
@@ -14,91 +14,91 @@
       "date": "2026-10-18"
     },
     "/collections/disaster-response/": {
-      "sha": "7f0bfc22371a28c8",
+      "sha": "d38a8114e74315d2",
       "date": "2026-10-20"
     },
     "/groups/accounting/": {
-      "sha": "bf065734d2bb09a6",
+      "sha": "d0504049af3142cb",
       "date": "2026-10-20"
     },
     "/groups/agriculture/": {
-      "sha": "9aae86c21ab0dd9a",
+      "sha": "da213c7fe1e8aa90",
       "date": "2026-10-20"
     },
     "/groups/construction/": {
-      "sha": "c8c7473c7a86c8b7",
+      "sha": "5a9585beb8f3911b",
       "date": "2026-10-20"
     },
     "/groups/cross-trade/": {
-      "sha": "20b70fbf6da291d9",
+      "sha": "e005f166907c60a0",
       "date": "2026-10-20"
     },
     "/groups/educators/": {
-      "sha": "676915b89f7a38c8",
+      "sha": "1115df4bb490b220",
       "date": "2026-10-20"
     },
     "/groups/electrical/": {
-      "sha": "f046a383aa3a7640",
+      "sha": "f01ee89e5771b9bd",
       "date": "2026-10-20"
     },
     "/groups/field/": {
-      "sha": "cb3e1d5297f90b19",
+      "sha": "a44975e802090688",
       "date": "2026-10-20"
     },
     "/groups/fire-ground/": {
-      "sha": "f0852ed9ec534260",
+      "sha": "546288ad794236db",
       "date": "2026-10-20"
     },
     "/groups/historical/": {
-      "sha": "b0b4759a3d69655c",
+      "sha": "6cf8323d3b78854a",
       "date": "2026-10-20"
     },
     "/groups/hvac/": {
-      "sha": "d65ee1314b8d4afd",
+      "sha": "29819dbe4d6353ee",
       "date": "2026-10-20"
     },
     "/groups/kitchen/": {
-      "sha": "6e34fa71c325df6c",
+      "sha": "b7f17f0fc5c80ccc",
       "date": "2026-10-20"
     },
     "/groups/lab/": {
-      "sha": "62daaa07536da9e4",
+      "sha": "7fb961827bb49db0",
       "date": "2026-10-20"
     },
     "/groups/mechanic/": {
-      "sha": "69bdd8b54ed33570",
+      "sha": "2a247731e0a8f4ed",
       "date": "2026-10-20"
     },
     "/groups/plumbing/": {
-      "sha": "55f2bcf3777cdaa2",
+      "sha": "7f0406e582991c5d",
       "date": "2026-10-20"
     },
     "/groups/real-estate/": {
-      "sha": "5d4063ed35fc4e99",
+      "sha": "580d6c982417cbe7",
       "date": "2026-10-20"
     },
     "/groups/references/": {
-      "sha": "24e4fa03919b6b1b",
+      "sha": "25c18eaff17aec2d",
       "date": "2026-10-20"
     },
     "/groups/restoration/": {
-      "sha": "f6baf6b6257d7808",
+      "sha": "615cfac0db8e8fe5",
       "date": "2026-10-20"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "15d7446d0d21ec0e",
+      "sha": "964d91b08e8ac22f",
       "date": "2026-10-20"
     },
     "/groups/stage/": {
-      "sha": "74d46bb1e599748c",
+      "sha": "90d9217877adbe68",
       "date": "2026-10-20"
     },
     "/groups/trucking/": {
-      "sha": "4e9d5e098bc6bb3f",
+      "sha": "034e97a521512171",
       "date": "2026-10-20"
     },
     "/groups/water/": {
-      "sha": "8dfd90e82890db72",
+      "sha": "c466df42401acea0",
       "date": "2026-10-20"
     },
     "/tools/aav-install-check/": {
@@ -520,6 +520,10 @@
     "/tools/baseplate-grout-volume/": {
       "sha": "4d350bdd2bbe5763",
       "date": "2026-10-17"
+    },
+    "/tools/bath-exhaust-fan-sizing/": {
+      "sha": "a0f02ed127695d0c",
+      "date": "2026-10-20"
     },
     "/tools/battery-c-rate/": {
       "sha": "9d58482f7dc8e24f",
@@ -3834,8 +3838,8 @@
       "date": "2026-10-17"
     },
     "/tools/hood-exhaust/": {
-      "sha": "5c323bf9aaba7a3c",
-      "date": "2026-10-17"
+      "sha": "b96c0fe7ecad9f9b",
+      "date": "2026-10-20"
     },
     "/tools/hoop-stress-mawp/": {
       "sha": "6fbc8f83604af8b6",

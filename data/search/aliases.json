@@ -117367,6 +117367,31 @@
   "term": "extra length for outer conduit in a concentric bend",
   "target": "conduit-concentric-bend",
   "kind": "industry"
+ },
+ {
+  "term": "bath fan cfm",
+  "target": "bath-exhaust-fan-sizing",
+  "kind": "industry"
+ },
+ {
+  "term": "bathroom exhaust fan size",
+  "target": "bath-exhaust-fan-sizing",
+  "kind": "industry"
+ },
+ {
+  "term": "50 cfm or 80 cfm bath fan",
+  "target": "bath-exhaust-fan-sizing",
+  "kind": "industry"
+ },
+ {
+  "term": "kitchen exhaust 100 cfm",
+  "target": "bath-exhaust-fan-sizing",
+  "kind": "industry"
+ },
+ {
+  "term": "exhaust fan for a bathroom by square feet",
+  "target": "bath-exhaust-fan-sizing",
+  "kind": "question"
  }
  ]
 }

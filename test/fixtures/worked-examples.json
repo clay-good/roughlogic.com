@@ -172034,6 +172034,152 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "bath-exhaust-fan-sizing",
+  "source_publisher": "ICC and Home Ventilating Institute",
+  "source_title": "IRC 2024 Table M1505.5; HVI 8 air changes per hour, recomputed for the spec-v1981 bathroom",
+  "source_edition_or_year": "IRC 2024 (codes.iccsafe.org, read 2026-10-19)",
+  "source_section_or_page": "8 x 10 x 8 ft = 640 cu ft; 640 x 8 / 60 = 85.33 cfm > the 50 cfm intermittent floor; rounded up to 90 cfm; 90 x 60 / 640 = 8.44 air changes an hour.",
+  "verified_by": "rl",
+  "verified_on": "2026-10-19",
+  "inputs": {
+   "room_type": "bathroom",
+   "length_ft": 8,
+   "width_ft": 10,
+   "ceiling_ft": 8,
+   "operation": "intermittent",
+   "rule": "ach8",
+   "toilets": 0,
+   "showers": 0,
+   "tubs": 0,
+   "jetted_tubs": 0
+  },
+  "outputs": {
+   "rule_cfm": {
+    "value": 85.333333,
+    "tolerance": {
+     "pct": 0.01
+    }
+   },
+   "recommended_cfm": {
+    "value": 90,
+    "tolerance": {
+     "abs": 0
+    }
+   },
+   "ach_at_recommended": {
+    "value": 8.4375,
+    "tolerance": {
+     "pct": 0.01
+    }
+   }
+  }
+ },
+ {
+  "tile_id": "bath-exhaust-fan-sizing",
+  "source_publisher": "ICC and Home Ventilating Institute",
+  "source_title": "IRC 2024 Table M1505.5; HVI fixture rule, recomputed for the spec-v1981 master bath",
+  "source_edition_or_year": "IRC 2024 (codes.iccsafe.org, read 2026-10-19)",
+  "source_section_or_page": "12 x 14 ft bath over 100 sq ft with a toilet, a shower and a jetted tub: 50 + 50 + 100 = 200 cfm.",
+  "verified_by": "rl",
+  "verified_on": "2026-10-19",
+  "inputs": {
+   "room_type": "bathroom",
+   "length_ft": 12,
+   "width_ft": 14,
+   "ceiling_ft": 9,
+   "operation": "intermittent",
+   "rule": "fixtures",
+   "toilets": 1,
+   "showers": 1,
+   "tubs": 0,
+   "jetted_tubs": 1
+  },
+  "outputs": {
+   "rule_cfm": {
+    "value": 200,
+    "tolerance": {
+     "abs": 0
+    }
+   },
+   "recommended_cfm": {
+    "value": 200,
+    "tolerance": {
+     "abs": 0
+    }
+   }
+  }
+ },
+ {
+  "tile_id": "bath-exhaust-fan-sizing",
+  "source_publisher": "ICC",
+  "source_title": "IRC 2024 Table M1505.5",
+  "source_edition_or_year": "IRC 2024 (codes.iccsafe.org, read 2026-10-19)",
+  "source_section_or_page": "Table M1505.5: kitchens 100 cfm intermittent or 25 cfm continuous.",
+  "verified_by": "rl",
+  "verified_on": "2026-10-19",
+  "inputs": {
+   "room_type": "kitchen",
+   "length_ft": 12,
+   "width_ft": 14,
+   "ceiling_ft": 8,
+   "operation": "continuous",
+   "rule": "ach8",
+   "toilets": 0,
+   "showers": 0,
+   "tubs": 0,
+   "jetted_tubs": 0
+  },
+  "outputs": {
+   "code_min_cfm": {
+    "value": 25,
+    "tolerance": {
+     "abs": 0
+    }
+   },
+   "recommended_cfm": {
+    "value": 25,
+    "tolerance": {
+     "abs": 0
+    }
+   }
+  }
+ },
+ {
+  "tile_id": "bath-exhaust-fan-sizing",
+  "source_publisher": "Home Ventilating Institute",
+  "source_title": "HVI bathroom sizing guidance, 1 cfm per square foot for bathrooms of 100 sq ft or less, recomputed for the spec-v1981 bathroom",
+  "source_edition_or_year": "hvi.org consumer sizing guidance (rule as published; not re-read this session)",
+  "source_section_or_page": "8 x 10 ft = 80 sq ft at an 8 ft ceiling: 80 cfm, above the IRC 2024 Table M1505.5 50 cfm floor.",
+  "verified_by": "rl",
+  "verified_on": "2026-10-19",
+  "inputs": {
+   "room_type": "bathroom",
+   "length_ft": 8,
+   "width_ft": 10,
+   "ceiling_ft": 8,
+   "operation": "intermittent",
+   "rule": "sqft",
+   "toilets": 0,
+   "showers": 0,
+   "tubs": 0,
+   "jetted_tubs": 0
+  },
+  "outputs": {
+   "rule_cfm": {
+    "value": 80,
+    "tolerance": {
+     "abs": 1e-09
+    }
+   },
+   "recommended_cfm": {
+    "value": 80,
+    "tolerance": {
+     "abs": 0
+    }
+   }
+  }
  }
  ]
 }

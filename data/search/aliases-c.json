@@ -2443,6 +2443,11 @@
     {"term":"steam temperature at pressure","target":"saturated-steam-properties","kind":"industry"},
     {"term":"hfg steam","target":"saturated-steam-properties","kind":"industry"},
     {"term":"what temperature is steam at 100 psi","target":"saturated-steam-properties","kind":"question"},
-    {"term":"boiling point of water at pressure","target":"saturated-steam-properties","kind":"industry"}
+    {"term":"boiling point of water at pressure","target":"saturated-steam-properties","kind":"industry"},
+    {"term":"bath fan cfm","target":"bath-exhaust-fan-sizing","kind":"industry"},
+    {"term":"bathroom exhaust fan size","target":"bath-exhaust-fan-sizing","kind":"industry"},
+    {"term":"50 cfm or 80 cfm bath fan","target":"bath-exhaust-fan-sizing","kind":"industry"},
+    {"term":"kitchen exhaust 100 cfm","target":"bath-exhaust-fan-sizing","kind":"industry"},
+    {"term":"exhaust fan for a bathroom by square feet","target":"bath-exhaust-fan-sizing","kind":"question"}
   ]
 }
