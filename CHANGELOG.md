@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### Changed
+
+- **The 20 accessibility and floodplain calculators load from their own module (spec-v1993).** `calc-construction.js` was 331,450 B gz against a 335,000 B cap (98.9%), and its cap ledger had asked for a split instead of another raise since July. The contiguous spec-v1159..v1183 band (accessible parking count and geometry, reach range, door clear width, ADA stairs and ramps, shower, water closet, lavatory and tub clearances, signage, drinking fountains, and the two NFIP checks, flood openings and substantial improvement) moved intact to `calc-accessibility.js`. Opening one of those tiles now downloads 60,788 B gz instead of 331,450. `calc-construction.js` is 272,830 B and its cap drops to 305,000. Renderer and export counts are conserved (244 -> 224 + 20; 546 -> 506 + 40); IDs, formulas, fields, citations, examples and groups are unchanged.
+
 ### Tests
 
 - **Two module caps raised before CI's larger build reached them.** `calc-finish.js` sat at 39,937 B gz against its 40,000 B cap (99.8%) and `calc-rail.js` at 97.4%. CI builds measure about 0.2% larger than a local build, so the next edit to either would have turned the integration job red the way `calc-powerquality.js` did. Both are small modules, so the caps rose (46,000 B and 29,000 B) rather than splitting them. `calc-construction.js` (98.9%) is left as is: its ledger asks for a split, not another raise.

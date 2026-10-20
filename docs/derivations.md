@@ -1415,6 +1415,26 @@ cross-check.
 
 | Module | Function | Parameters | Citation | Fixture | Tolerance |
 | --- | --- | --- | --- | --- | --- |
+| calc-accessibility.js | `computeAccessibleParkingCount` | `{ total_spaces = 0, facility_count = 1, provided_accessible = 0, provided_van...` | _ | _ | _ |
+| calc-accessibility.js | `computeAccessibleParkingGeometry` | `{ space_type = "van", space_width_in = 0, aisle_width_in = 0, space_length_in...` | _ | _ | _ |
+| calc-accessibility.js | `computeAccessibleRouteWidth` | `{ clear_width_in = 0, pinch_present = "no", pinch_width_in = 0, pinch_length_...` | _ | _ | _ |
+| calc-accessibility.js | `computeAccessibleShowerCheck` | `{ shower_type = "transfer", width_in = 0, depth_in = 0, entry_width_in = 0, c...` | _ | _ | _ |
+| calc-accessibility.js | `computeAdaStairCheck` | `{ riser_height_in = 0, tread_depth_in = 0, total_rise_in = 0, open_risers = "...` | _ | _ | _ |
+| calc-accessibility.js | `computeDoorClearWidth` | `{ leaf_width_in = 0, door_thickness_in = 1.75, measured_clear_width_in = 0, o...` | _ | _ | _ |
+| calc-accessibility.js | `computeDrinkingFountainCheck` | `{ units_provided = 0, bi_level = "no", wheelchair_spout_in = 0, standing_spou...` | _ | _ | _ |
+| calc-accessibility.js | `computeFloodOpeningArea` | `{ enclosed_area_sf = 0, opening_type = "non-engineered", net_free_area_per_op...` | _ | _ | _ |
+| calc-accessibility.js | `computeFloorLevelChange` | `{ level_change_in = 0, bevel_run_in = 0, carpet_pile_in = 0, opening_size_in ...` | _ | _ | _ |
+| calc-accessibility.js | `computeHandrailGeometry` | `{ rail_height_in = 0, clearance_in = 0, grip_shape = "circular", diameter_in ...` | _ | _ | _ |
+| calc-accessibility.js | `computeKneeToeClearance` | `{ apron_height_in = 0, knee_depth_at_9_in = 0, knee_depth_at_27_in = 0, toe_d...` | _ | _ | _ |
+| calc-accessibility.js | `computeLavatoryTubClearance` | `{ rim_height_in = 0, counter_height_in = 0, metering_seconds = 0, tub_length_...` | _ | _ | _ |
+| calc-accessibility.js | `computeProtrudingObject` | `{ mounting = "wall", leading_edge_height_in = 0, projection_in = 0, corridor_...` | _ | _ | _ |
+| calc-accessibility.js | `computeRampDetailCheck` | `{ cross_slope_ratio = 48, clear_width_in = 0, handrails = "yes", handrail_int...` | _ | _ | _ |
+| calc-accessibility.js | `computeReachRange` | `{ approach = "forward", obstructed = "yes", obstruction_depth_in = 0, obstruc...` | _ | _ | _ |
+| calc-accessibility.js | `computeSignCharacterHeight` | `{ baseline_height_in = 0, viewing_distance_in = 0, provided_character_height_...` | _ | _ | _ |
+| calc-accessibility.js | `computeSubstantialImprovement` | `{ market_value = 0, improvement_cost = 0, prior_costs = 0, threshold_pct = 50...` | _ | _ | _ |
+| calc-accessibility.js | `computeTactileSignMounting` | `{ lowest_baseline_in = 0, tactile_block_height_in = 0, sign_position = "latch...` | _ | _ | _ |
+| calc-accessibility.js | `computeTurningAndClearFloorSpace` | `{ cfs_width_in = 0, cfs_depth_in = 0, approach = "forward", alcove_depth_in =...` | _ | _ | _ |
+| calc-accessibility.js | `computeWaterClosetLocation` | `{ centerline_in = 0, seat_height_in = 0, clear_side_in = 0, clear_rear_in = 0...` | _ | _ | _ |
 | calc-accounting.js | `computeAmortization` | `{ principal = 0, annual_rate_pct = 0, term_months = 0, extra_principal = 0, f...` | _ | _ | _ |
 | calc-accounting.js | `computeBreakeven` | `{ fixed_costs = 0, variable_cost_per_unit = 0, sale_price_per_unit = 0, targe...` | _ | _ | _ |
 | calc-accounting.js | `computeCashConversionCycle` | `{ dso = 0, dio = 0, dpo = 0 }` | _ | _ | _ |
@@ -1605,12 +1625,7 @@ cross-check.
 | calc-concreteplacement.js | `computeTiltUpBraceLoad` | `{ panel_width_ft = 0, panel_height_ft = 0, wind_pressure_psf = 0, resultant_h...` | _ | _ | _ |
 | calc-concreteplacement.js | `computeTiltUpLiftStress` | `{ panel_width_ft = 0, panel_height_ft = 0, thickness_in = 0, unit_weight_pcf ...` | _ | _ | _ |
 | calc-construction.js | `computeAbrasiveBlast` | `{ nozzle_bore_in, pressure_psi = 100, area_ft2, lb_per_ft2 = 8 } = {}` | _ | _ | _ |
-| calc-construction.js | `computeAccessibleParkingCount` | `{ total_spaces = 0, facility_count = 1, provided_accessible = 0, provided_van...` | _ | _ | _ |
-| calc-construction.js | `computeAccessibleParkingGeometry` | `{ space_type = "van", space_width_in = 0, aisle_width_in = 0, space_length_in...` | _ | _ | _ |
-| calc-construction.js | `computeAccessibleRouteWidth` | `{ clear_width_in = 0, pinch_present = "no", pinch_width_in = 0, pinch_length_...` | _ | _ | _ |
-| calc-construction.js | `computeAccessibleShowerCheck` | `{ shower_type = "transfer", width_in = 0, depth_in = 0, entry_width_in = 0, c...` | _ | _ | _ |
 | calc-construction.js | `computeAdaRampSlope` | `{ rise_in = 0, slope_ratio = 12, landing_in = 60 } = {}` | _ | _ | _ |
-| calc-construction.js | `computeAdaStairCheck` | `{ riser_height_in = 0, tread_depth_in = 0, total_rise_in = 0, open_risers = "...` | _ | _ | _ |
 | calc-construction.js | `computeAdvanceWarningSignSpacing` | `{ road_type = "rural", sign_count = 3, speed_mph = 0, approach_volume_vph = 0...` | _ | _ | _ |
 | calc-construction.js | `computeAggregate` | `{ area_ft2 = 0, depth_in = 0, material = "crushed_stone" }` | _ | _ | _ |
 | calc-construction.js | `computeAllowableArea` | `{ tabular_area = 0, ns_area = 0, frontage_ft = 0, perimeter_ft = 0, open_widt...` | _ | _ | _ |
@@ -1660,10 +1675,8 @@ cross-check.
 | calc-construction.js | `computeDeckBeamPost` | `{ joist_span_ft = 0, beam_span_ft = 0, post_height_ft = 8, live_load_psf = 40...` | _ | _ | _ |
 | calc-construction.js | `computeDeckLedgerFasteners` | `{ joist_span_ft = 0, spacing_in, ledger_length_ft = 0, fastener = "lag" } = {}` | _ | _ | _ |
 | calc-construction.js | `computeDemoDebris` | `{ structure_type = "wood_frame", volume_yd3 = 0 }` | _ | _ | _ |
-| calc-construction.js | `computeDoorClearWidth` | `{ leaf_width_in = 0, door_thickness_in = 1.75, measured_clear_width_in = 0, o...` | _ | _ | _ |
 | calc-construction.js | `computeDoorManeuveringClearance` | `{ clear_perpendicular_in = 0, clear_latch_side_in = 0, door_clear_width_in = ...` | _ | _ | _ |
 | calc-construction.js | `computeDrainageBoardTakeoff` | `{ perimeter_ft = 150, below_grade_height_ft = 8, roll_width_ft = 4, roll_leng...` | _ | _ | _ |
-| calc-construction.js | `computeDrinkingFountainCheck` | `{ units_provided = 0, bi_level = "no", wheelchair_spout_in = 0, standing_spou...` | _ | _ | _ |
 | calc-construction.js | `computeDryerDuctLength` | `{ straight_run_ft = 0, elbow_90_count = 0, elbow_45_count = 0, eq_len_90_ft =...` | _ | _ | _ |
 | calc-construction.js | `computeDrywall` | `{ wall_area_ft2 = 0, ceiling_area_ft2 = 0, sheet_size = "4x8", waste_percent ...` | _ | _ | _ |
 | calc-construction.js | `computeDrywallFastenerTakeoff` | `{ sheets = 100, sheet_length_ft = 8, sheet_width_ft = 4, stud_spacing_in = 16...` | _ | _ | _ |
@@ -1684,8 +1697,6 @@ cross-check.
 | calc-construction.js | `computeFilletWeldStrength` | `{ mode = "capacity-from-size", leg_in = 0, length_in = 0, electrode = "E70", ...` | _ | _ | _ |
 | calc-construction.js | `computeFlammableCabinetStorage` | `{ cat123_gallons = 0, cat4_gallons = 0, cabinets_available = 0, per_cabinet_c...` | _ | _ | _ |
 | calc-construction.js | `computeFlatTopStockpileVolume` | `{ base_diameter_ft = 0, top_diameter_ft = 0, repose_angle_deg = 37, density_p...` | _ | _ | _ |
-| calc-construction.js | `computeFloodOpeningArea` | `{ enclosed_area_sf = 0, opening_type = "non-engineered", net_free_area_per_op...` | _ | _ | _ |
-| calc-construction.js | `computeFloorLevelChange` | `{ level_change_in = 0, bevel_run_in = 0, carpet_pile_in = 0, opening_size_in ...` | _ | _ | _ |
 | calc-construction.js | `computeFootingArea` | `{ column_load_lb, soil_class, applied_moment_lbft = 0 }` | _ | _ | _ |
 | calc-construction.js | `computeFormworkMemberSpacing` | `{ pressure_psf = 0, tributary_in = 12, width_b_in = 1.5, depth_d_in = 3.5, fb...` | _ | _ | _ |
 | calc-construction.js | `computeFormworkPressure` | `{ pour_rate_ft_per_hr = 0, concrete_temp_F = 70, weight_factor = "normal", un...` | _ | _ | _ |
@@ -1696,7 +1707,6 @@ cross-check.
 | calc-construction.js | `computeGlulamVolumeFactor` | `{ span_ft = 0, depth_in = 0, width_in = 0, x = 10, kl = 1.0 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeGuardHandrailCheck` | `{ occupancy = "residential", surface_height_in = 0, measured_guard_in = 0, me...` | _ | _ | _ |
 | calc-construction.js | `computeGuardPostLoad` | `{ post_height_in = 36, post_spacing_ft = 6, concentrated_lb = 200, uniform_pl...` | _ | _ | _ |
-| calc-construction.js | `computeHandrailGeometry` | `{ rail_height_in = 0, clearance_in = 0, grip_shape = "circular", diameter_in ...` | _ | _ | _ |
 | calc-construction.js | `computeHeaderSizing` | `{ header_span_ft = 0, tributary_width_ft = 0, floors_above = 0, ground_snow_p...` | _ | _ | _ |
 | calc-construction.js | `computeHelicalPile` | `{ shaft = "1.5_inch_solid", torque_ft_lb = 0, factor_of_safety = 2.0 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeHelicalPileTorque` | `{ shaft = "1.5_inch_solid", target_capacity_lb = 0, capacity_basis = "allowab...` | _ | _ | _ |
@@ -1711,9 +1721,7 @@ cross-check.
 | calc-construction.js | `computeJoistDeflection` | `{ uniform_load_plf, span_ft, E_psi, I_in4 }` | _ | _ | _ |
 | calc-construction.js | `computeJoistHangerCount` | `{ run_width_ft = 16, spacing_in = 16, ends_per_joist = 2, nails_per_hanger = ...` | _ | _ | _ |
 | calc-construction.js | `computeJoistNotchBoreLimit` | `{ joist_depth_in = 9.25 } = {}` | _ | _ | _ |
-| calc-construction.js | `computeKneeToeClearance` | `{ apron_height_in = 0, knee_depth_at_9_in = 0, knee_depth_at_27_in = 0, toe_d...` | _ | _ | _ |
 | calc-construction.js | `computeLandingCheck` | `{ landing_depth_in = 0, landing_width_in = 0, flight_width_in = 36, threshold...` | _ | _ | _ |
-| calc-construction.js | `computeLavatoryTubClearance` | `{ rim_height_in = 0, counter_height_in = 0, metering_seconds = 0, tub_length_...` | _ | _ | _ |
 | calc-construction.js | `computeLayoutSquaring` | `{ mode, side_a, side_b, diag1, diag2, tolerance = 0, sym_left = 0, sym_right ...` | _ | _ | _ |
 | calc-construction.js | `computeLumberSpan` | `{ species_grade, nominal_size, total_load_psf, tributary_width_in = 16, defle...` | _ | _ | _ |
 | calc-construction.js | `computeMasonryControlJointLayout` | `{ wall_length_ft = 80, wall_height_ft = 16, max_spacing_cap_ft = 25 } = {}` | _ | _ | _ |
@@ -1740,13 +1748,10 @@ cross-check.
 | calc-construction.js | `computePolymericSandBags` | `{ area_sf = 400, coverage_per_bag_sf = 75, waste_pct = 5 } = {}` | _ | _ | _ |
 | calc-construction.js | `computePostHoleConcrete` | `{ num_posts = 0, hole_diameter_in = 0, hole_depth_in = 0, post_side_in = 0, b...` | _ | _ | _ |
 | calc-construction.js | `computePoweredAtticVentilator` | `{ attic_area_ft2 = 0, cfm_per_ft2 = 0.7, dark_roof = "no" } = {}` | _ | _ | _ |
-| calc-construction.js | `computeProtrudingObject` | `{ mounting = "wall", leading_edge_height_in = 0, projection_in = 0, corridor_...` | _ | _ | _ |
 | calc-construction.js | `computePullout` | `{ fastener_type, fastener_size, species, penetration_in }` | _ | _ | _ |
 | calc-construction.js | `computeRafter` | `{ horizontal_span_ft, pitch_rise_per_12, overhang_ft = 0 }` | _ | _ | _ |
 | calc-construction.js | `computeRainLoadPonding` | `{ static_head_in = 0, hydraulic_head_in = 0, ponding_head_in = 0, roof_area_f...` | _ | _ | _ |
 | calc-construction.js | `computeRainOnSnowSurcharge` | `{ pf_psf = 0, pg_psf = 0, slope_deg = 0, eave_to_ridge_ft = 0, surcharge_psf ...` | _ | _ | _ |
-| calc-construction.js | `computeRampDetailCheck` | `{ cross_slope_ratio = 48, clear_width_in = 0, handrails = "yes", handrail_int...` | _ | _ | _ |
-| calc-construction.js | `computeReachRange` | `{ approach = "forward", obstructed = "yes", obstruction_depth_in = 0, obstruc...` | _ | _ | _ |
 | calc-construction.js | `computeReadyMixConcreteOrder` | `{ volume_yd3 = 0, waste_pct = 8, load_yd3 = 10, min_yd3 = 10, price_per_yd3 =...` | _ | _ | _ |
 | calc-construction.js | `computeRebar` | `{ length_ft, width_ft, spacing_in, edge_clearance_in = 3, bar_size = "#4" }` | _ | _ | _ |
 | calc-construction.js | `computeRebarChairCount` | `{ slab_area_sf = 1000, support_spacing_ft = 4, waste_pct = 5 } = {}` | _ | _ | _ |
@@ -1788,7 +1793,6 @@ cross-check.
 | calc-construction.js | `computeShotcreteReboundQuantity` | `{ area_sf = 0, thickness_in = 0, rebound_pct = 20, shot_actual_cy = 0 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeSidingCourseLayout` | `{ wall_height_ft = 0, wall_length_ft = 0, target_exposure_in = 7, board_heigh...` | _ | _ | _ |
 | calc-construction.js | `computeSidingTakeoff` | `{ wall_area_sf = 2000, opening_area_sf = 0, waste_pct = 12, exposure_in = 4 }...` | _ | _ | _ |
-| calc-construction.js | `computeSignCharacterHeight` | `{ baseline_height_in = 0, viewing_distance_in = 0, provided_character_height_...` | _ | _ | _ |
 | calc-construction.js | `computeSillPlateAnchorCount` | `{ wall_length_ft = 40, max_spacing_ft = 6, end_distance_in = 9 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeSlidingSnowLoad` | `{ pf_upper_psf = 0, eave_ridge_ft = 0, lower_width_ft = 15 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeSmokeAlarmPlacement` | `{ sleeping_rooms = 0, sleeping_areas = 1, additional_stories = 0, alarm_type ...` | _ | _ | _ |
@@ -1806,9 +1810,7 @@ cross-check.
 | calc-construction.js | `computeStripingPaintQuantity` | `{ length_ft = 5280, width_in = 4, coverage_sf_per_gal = 100, bead_rate_lb_per...` | _ | _ | _ |
 | calc-construction.js | `computeStuccoCoverage` | `{ area_sf = 1000, total_thickness_in = 0.875, bag_yield_sf_in = 10.1, waste_p...` | _ | _ | _ |
 | calc-construction.js | `computeStudNotchBoreLimit` | `{ stud_width_in = 5.5 } = {}` | _ | _ | _ |
-| calc-construction.js | `computeSubstantialImprovement` | `{ market_value = 0, improvement_cost = 0, prior_costs = 0, threshold_pct = 50...` | _ | _ | _ |
 | calc-construction.js | `computeSuspendedCeilingGrid` | `{ room_length_ft = 24, room_width_ft = 40 } = {}` | _ | _ | _ |
-| calc-construction.js | `computeTactileSignMounting` | `{ lowest_baseline_in = 0, tactile_block_height_in = 0, sign_position = "latch...` | _ | _ | _ |
 | calc-construction.js | `computeTaperedRoofInsulation` | `{ run_ft = 40, slope_in_per_ft = 0.25, start_thk_in = 0.5, area_sf = 2000, r_...` | _ | _ | _ |
 | calc-construction.js | `computeTemporaryStairwayCheck` | `{ riser_count = 0, total_rise_in = 0, riser_height_in = 0, tread_depth_in = 0...` | _ | _ | _ |
 | calc-construction.js | `computeThermalStressMaxDeltaT` | `{ allowable_stress_psi = 0, E_psi = 0, alpha = 0, restraint = 1 } = {}` | _ | _ | _ |
@@ -1817,12 +1819,10 @@ cross-check.
 | calc-construction.js | `computeTrafficTaperLength` | `{ offset_width_ft = 12, speed_mph = 55, device_spacing_ft = 40 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeTrimLinearFootage` | `{ perimeter_ft = 0, openings_ft = 0, waste_pct = 10, stock_len_ft = 16, sprin...` | _ | _ | _ |
 | calc-construction.js | `computeTrussUpliftConnector` | `{ spacing_in, span_ft, overhang_ft = 0, uplift_psf, dead_psf, allowable_lb, c...` | _ | _ | _ |
-| calc-construction.js | `computeTurningAndClearFloorSpace` | `{ cfs_width_in = 0, cfs_depth_in = 0, approach = "forward", alcove_depth_in =...` | _ | _ | _ |
 | calc-construction.js | `computeVaporBarrierRolls` | `{ area_sf = 3000, roll_coverage_sf = 1000, overlap_waste_pct = 10, roll_width...` | _ | _ | _ |
 | calc-construction.js | `computeWallBracingLength` | `{ wall_line_length_ft = 0, bracing_percent = 0, provided_length_ft = 0, metho...` | _ | _ | _ |
 | calc-construction.js | `computeWallpaperRolls` | `{ perimeter_in = 0, height_in = 0, roll_width_in = 0, roll_len_in = 0, repeat...` | _ | _ | _ |
 | calc-construction.js | `computeWaterCementRatio` | `{ water_lb = 0, cement_lb = 0, scm_lb = 0, exposure_class = "none" } = {}` | _ | _ | _ |
-| calc-construction.js | `computeWaterClosetLocation` | `{ centerline_in = 0, seat_height_in = 0, clear_side_in = 0, clear_rear_in = 0...` | _ | _ | _ |
 | calc-construction.js | `computeWeldHeatInput` | `{ process, voltage_V, current_A, travel_in_min, efficiency, wps_min_kj_in, wp...` | _ | _ | _ |
 | calc-construction.js | `computeWeldUsage` | `{ process = "GMAW", weld_cross_section_in2 = 0, weld_length_in = 0, depositio...` | _ | _ | _ |
 | calc-construction.js | `computeWeldedWireMesh` | `{ slab_area_sf = 0, sheet_width_ft = 5, sheet_length_ft = 10, side_lap_in = 6...` | _ | _ | _ |

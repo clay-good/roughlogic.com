@@ -588,6 +588,29 @@ export const TOOL_MODULES = (() => {
     "rain-on-snow-surcharge", "sliding-snow-load", "snow-guard-layout", "minimum-roof-snow",
     // spec-v474 ADA ramp layout
     "ada-ramp-slope",
+    // trade expansion v1411
+    "curtain-wall-mullion-deflection",
+    // spec-v332..v334 wood-fastener withdrawal batch.
+    "wood-nail-withdrawal", "wood-nail-lateral", "wood-lag-withdrawal", "wood-screw-withdrawal",
+    "cantilever-beam", "section-properties", "combined-stress-axial-bending",
+    "shaft-torsion", "shaft-diameter-for-torsion", "thermal-stress-restrained", "thermal-stress-max-deltat", "hoop-stress-thin-wall", "hoop-stress-mawp",
+    "seismic-design-spectral-acceleration", "seismic-story-drift", "seismic-pdelta-stability",
+    // spec-v546
+    "wind-solid-sign",
+    // spec-v553
+    "snow-unbalanced-gable",
+    "safety-glazing-check",
+    "truss-uplift-connector",
+    "foundation-grade-slope-check",
+    "work-zone-buffer-space",
+  ]);
+  // spec-v1871 cap-relief split: the specialty-building and temporary-works
+  // tail moved intact from calc-construction.js. All 11 tiles keep Group E
+  // and their existing public behavior.
+  // spec-v1993 cap-relief split: the spec-v1159..v1183 accessibility and
+  // floodplain band moved intact from calc-construction.js. All 20 tiles keep
+  // Group E and their existing public behavior.
+  declare("./calc-accessibility.js", "ACCESSIBILITY_RENDERERS", [
     "accessible-parking-count",
     "sign-character-height",
     "reach-range",
@@ -608,25 +631,7 @@ export const TOOL_MODULES = (() => {
     "water-closet-location",
     "lavatory-tub-clearance",
     "ramp-detail-check",
-    // trade expansion v1411
-    "curtain-wall-mullion-deflection",
-    // spec-v332..v334 wood-fastener withdrawal batch.
-    "wood-nail-withdrawal", "wood-nail-lateral", "wood-lag-withdrawal", "wood-screw-withdrawal",
-    "cantilever-beam", "section-properties", "combined-stress-axial-bending",
-    "shaft-torsion", "shaft-diameter-for-torsion", "thermal-stress-restrained", "thermal-stress-max-deltat", "hoop-stress-thin-wall", "hoop-stress-mawp",
-    "seismic-design-spectral-acceleration", "seismic-story-drift", "seismic-pdelta-stability",
-    // spec-v546
-    "wind-solid-sign",
-    // spec-v553
-    "snow-unbalanced-gable",
-    "safety-glazing-check",
-    "truss-uplift-connector",
-    "foundation-grade-slope-check",
-    "work-zone-buffer-space",
   ]);
-  // spec-v1871 cap-relief split: the specialty-building and temporary-works
-  // tail moved intact from calc-construction.js. All 11 tiles keep Group E
-  // and their existing public behavior.
   declare("./calc-specialtytrades.js", "SPECIALTYTRADES_RENDERERS", [
     "elevator-handling-capacity", "glass-thickness-wind", "awning-canopy-load",
     "garage-door-torsion-spring", "window-film-shgc", "igu-u-factor",

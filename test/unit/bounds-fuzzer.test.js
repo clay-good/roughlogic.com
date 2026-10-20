@@ -36218,7 +36218,7 @@ test("bounds: spec-v1158 computeMasonryLimitedAccessZone pins height+4, the four
   assert.ok("error" in _v1158({ ...base, wall_length_ft: NaN }));
 });
 
-import { computeAccessibleParkingCount as _v1159 } from "../../calc-construction.js";
+import { computeAccessibleParkingCount as _v1159 } from "../../calc-accessibility.js";
 
 test("bounds: spec-v1159 computeAccessibleParkingCount pins Table 208.2, the 2% and over-1000 branches, the fraction-of-six van rule, and per-facility counting", () => {
   const base = { total_spaces: 100, facility_count: 1, provided_accessible: 4, provided_van: 0 };
@@ -36363,7 +36363,7 @@ test("bounds: spec-v1160 computeAccessibleToiletCompartment pins the OR trigger,
   assert.ok("error" in _v1160({ ...base, wheelchair_depth_in: Infinity }));
 });
 
-import { computeSignCharacterHeight as _v1161 } from "../../calc-construction.js";
+import { computeSignCharacterHeight as _v1161 } from "../../calc-accessibility.js";
 
 test("bounds: spec-v1161 computeSignCharacterHeight pins the three bands, the 1/8-in-per-foot term, the band cliffs, the inverse, and error seams", () => {
   const base = { baseline_height_in: 60, viewing_distance_in: 120, provided_character_height_in: 0.625 };
@@ -36426,7 +36426,7 @@ test("bounds: spec-v1161 computeSignCharacterHeight pins the three bands, the 1/
   assert.ok("error" in _v1161({ ...base, baseline_height_in: NaN }));
 });
 
-import { computeReachRange as _v1162 } from "../../calc-construction.js";
+import { computeReachRange as _v1162 } from "../../calc-accessibility.js";
 
 test("bounds: spec-v1162 computeReachRange pins all four rules, the no-permitted-reach depths, the 34 in obstruction ceiling, and error seams", () => {
   const base = { approach: "side", obstructed: "yes", obstruction_depth_in: 24, obstruction_height_in: 34, element_height_in: 48 };
@@ -36497,7 +36497,7 @@ test("bounds: spec-v1162 computeReachRange pins all four rules, the no-permitted
   assert.ok("error" in _v1162({ ...base, element_height_in: Infinity }));
 });
 
-import { computeProtrudingObject as _v1163 } from "../../calc-construction.js";
+import { computeProtrudingObject as _v1163 } from "../../calc-accessibility.js";
 
 test("bounds: spec-v1163 computeProtrudingObject pins the 27-80 in band, the three mounting limits, the three fixes, 307.4 and 307.5, and error seams", () => {
   const base = { mounting: "wall", leading_edge_height_in: 48, projection_in: 6, corridor_width_in: 44, required_route_width_in: 36, vertical_clearance_in: 80, barrier_edge_height_in: 0 };
@@ -36571,7 +36571,7 @@ test("bounds: spec-v1163 computeProtrudingObject pins the 27-80 in band, the thr
   assert.ok("error" in _v1163({ ...base, projection_in: Infinity }));
 });
 
-import { computeAccessibleRouteWidth as _v1164 } from "../../calc-construction.js";
+import { computeAccessibleRouteWidth as _v1164 } from "../../calc-accessibility.js";
 
 test("bounds: spec-v1164 computeAccessibleRouteWidth pins 36 in, the three-part pinch exception, the 180-degree turn, passing spaces, and error seams", () => {
   const base = { clear_width_in: 36, pinch_present: "yes", pinch_width_in: 32, pinch_length_in: 30, separation_length_in: 48, turn_present: "no", turn_element_width_in: 0, approach_width_in: 0, at_turn_width_in: 0, route_length_ft: 250 };
@@ -36646,7 +36646,7 @@ test("bounds: spec-v1164 computeAccessibleRouteWidth pins 36 in, the three-part 
   assert.ok("error" in _v1164({ ...base, clear_width_in: Infinity }));
 });
 
-import { computeDoorClearWidth as _v1165 } from "../../calc-construction.js";
+import { computeDoorClearWidth as _v1165 } from "../../calc-accessibility.js";
 
 test("bounds: spec-v1165 computeDoorClearWidth pins the leaf-to-clear loss, the 24 in deep rule, the alterations-only latch exception, thresholds, series, and error seams", () => {
   const base = { leaf_width_in: 32, door_thickness_in: 1.75, measured_clear_width_in: 0, opening_depth_in: 5, is_alteration: "no", latch_stop_projection_in: 0, threshold_height_in: 0.5, threshold_beveled: "no", series_spacing_in: 0, series_door_width_in: 0 };
@@ -36968,7 +36968,7 @@ test("bounds: spec-v1168 computeStaggeredNetWidth pins the s^2/4g credit, the go
   assert.ok("error" in _v1168({ ...base, plate_width_in: Infinity }));
 });
 
-import { computeFloorLevelChange as _v1169 } from "../../calc-construction.js";
+import { computeFloorLevelChange as _v1169 } from "../../calc-accessibility.js";
 
 test("bounds: spec-v1169 computeFloorLevelChange pins the three thresholds, the 1:2 arithmetic, the ramp cliff, carpet and openings, and error seams", () => {
   const base = { level_change_in: 0.5, bevel_run_in: 0.5, carpet_pile_in: 0, opening_size_in: 0, opening_elongated: "no", opening_perpendicular: "yes", ramp_run_per_rise: 12 };
@@ -37044,7 +37044,7 @@ test("bounds: spec-v1169 computeFloorLevelChange pins the three thresholds, the 
   assert.ok("error" in _v1169({ ...base, level_change_in: Infinity }));
 });
 
-import { computeTurningAndClearFloorSpace as _v1170 } from "../../calc-construction.js";
+import { computeTurningAndClearFloorSpace as _v1170 } from "../../calc-accessibility.js";
 
 test("bounds: spec-v1170 computeTurningAndClearFloorSpace pins the orientation trap, both alcove triggers, the circle and the four T conditions, and error seams", () => {
   const base = { cfs_width_in: 30, cfs_depth_in: 48, approach: "parallel", alcove_depth_in: 20, turning_type: "circular", turning_diameter_in: 60, t_square_in: 0, t_arm_width_in: 0, t_arm_clear_in: 0, t_base_clear_in: 0 };
@@ -37126,7 +37126,7 @@ test("bounds: spec-v1170 computeTurningAndClearFloorSpace pins the orientation t
   assert.ok("error" in _v1170({ ...base, cfs_width_in: Infinity }));
 });
 
-import { computeHandrailGeometry as _v1171 } from "../../calc-construction.js";
+import { computeHandrailGeometry as _v1171 } from "../../calc-accessibility.js";
 
 test("bounds: spec-v1171 computeHandrailGeometry pins the height range, the grip windows, the asymmetric extensions, and error seams", () => {
   const base = { rail_height_in: 36, clearance_in: 1.5, grip_shape: "circular", diameter_in: 2.5, perimeter_in: 0, cross_section_in: 0, flight_type: "stair", tread_depth_in: 11, top_extension_in: 12, bottom_extension_in: 12 };
@@ -37204,7 +37204,7 @@ test("bounds: spec-v1171 computeHandrailGeometry pins the height range, the grip
   assert.ok("error" in _v1171({ ...base, rail_height_in: Infinity }));
 });
 
-import { computeKneeToeClearance as _v1172 } from "../../calc-construction.js";
+import { computeKneeToeClearance as _v1172 } from "../../calc-accessibility.js";
 
 test("bounds: spec-v1172 computeKneeToeClearance pins the 27 in zone gate, the two knee depths, the taper rate, toe and width, and error seams", () => {
   const base = { apron_height_in: 26, knee_depth_at_9_in: 17, knee_depth_at_27_in: 14, toe_depth_in: 17, clear_width_in: 30 };
@@ -37273,7 +37273,7 @@ test("bounds: spec-v1172 computeKneeToeClearance pins the 27 in zone gate, the t
   assert.ok("error" in _v1172({ ...base, apron_height_in: Infinity }));
 });
 
-import { computeFloodOpeningArea as _v1173 } from "../../calc-construction.js";
+import { computeFloodOpeningArea as _v1173 } from "../../calc-accessibility.js";
 
 test("bounds: spec-v1173 computeFloodOpeningArea pins the 1 sq in per sq ft rule, the two-opening minimum, the engineered path, the height limit, and error seams", () => {
   const base = { enclosed_area_sf: 1200, opening_type: "non-engineered", net_free_area_per_opening_sqin: 51, coverage_sf_per_opening: 0, openings_provided: 8, bottom_height_in: 16 };
@@ -37424,7 +37424,7 @@ test("bounds: spec-v1174 computeLifelineTension pins the midspan statics, the 1/
   assert.ok("error" in _v1174({ ...base, span_ft: Infinity }));
 });
 
-import { computeAdaStairCheck as _v1175 } from "../../calc-construction.js";
+import { computeAdaStairCheck as _v1175 } from "../../calc-accessibility.js";
 
 test("bounds: spec-v1175 computeAdaStairCheck pins the 4-7 in riser window, the 11 in tread, the compliance cost, the nosing rules, and error seams", () => {
   const base = { riser_height_in: 7.75, tread_depth_in: 10, total_rise_in: 108.5, open_risers: "no", nosing_projection_in: 1, leading_edge_radius_in: 0.25, riser_slope_deg: 0 };
@@ -37483,7 +37483,7 @@ test("bounds: spec-v1175 computeAdaStairCheck pins the 4-7 in riser window, the 
   assert.ok("error" in _v1175({ ...base, total_rise_in: Infinity }));
 });
 
-import { computeTactileSignMounting as _v1176 } from "../../calc-construction.js";
+import { computeTactileSignMounting as _v1176 } from "../../calc-accessibility.js";
 
 test("bounds: spec-v1176 computeTactileSignMounting pins the two-baseline budget, the unmountable block, the location rule, the clear space, and error seams", () => {
   const base = { lowest_baseline_in: 60, tactile_block_height_in: 4, sign_position: "latch-side", clear_space_width_in: 18, clear_space_depth_in: 18, beyond_door_arc: "yes" };
@@ -37542,7 +37542,7 @@ test("bounds: spec-v1176 computeTactileSignMounting pins the two-baseline budget
   assert.ok("error" in _v1176({ ...base, lowest_baseline_in: Infinity }));
 });
 
-import { computeDrinkingFountainCheck as _v1177 } from "../../calc-construction.js";
+import { computeDrinkingFountainCheck as _v1177 } from "../../calc-accessibility.js";
 
 test("bounds: spec-v1177 computeDrinkingFountainCheck pins the two-unit rule, the dead band between the windows, the location rules, and error seams", () => {
   const base = { units_provided: 1, bi_level: "no", wheelchair_spout_in: 37, standing_spout_in: 37, spout_from_support_in: 15, spout_from_front_in: 5, water_flow_height_in: 4 };
@@ -37605,7 +37605,7 @@ test("bounds: spec-v1177 computeDrinkingFountainCheck pins the two-unit rule, th
   assert.ok("error" in _v1177({ ...base, wheelchair_spout_in: Infinity }));
 });
 
-import { computeAccessibleShowerCheck as _v1178 } from "../../calc-construction.js";
+import { computeAccessibleShowerCheck as _v1178 } from "../../calc-accessibility.js";
 
 test("bounds: spec-v1178 computeAccessibleShowerCheck pins all three type geometries, the outside clearances, the would-satisfy report, and error seams", () => {
   const base = { shower_type: "standard-roll-in", width_in: 32, depth_in: 60, entry_width_in: 32, clearance_width_in: 30, clearance_length_in: 60 };
@@ -37672,7 +37672,7 @@ test("bounds: spec-v1178 computeAccessibleShowerCheck pins all three type geomet
   assert.ok("error" in _v1178({ ...base, width_in: Infinity }));
 });
 
-import { computeSubstantialImprovement as _v1179 } from "../../calc-construction.js";
+import { computeSubstantialImprovement as _v1179 } from "../../calc-accessibility.js";
 
 test("bounds: spec-v1179 computeSubstantialImprovement pins the structure-only denominator, the cumulative rule, both exclusions, and error seams", () => {
   const base = { market_value: 180000, improvement_cost: 95000, prior_costs: 0, threshold_pct: 50, land_value: 220000, excluded_code_cost: 0, historic_structure: "no" };
@@ -37741,7 +37741,7 @@ test("bounds: spec-v1179 computeSubstantialImprovement pins the structure-only d
   assert.ok("error" in _v1179({ ...base, market_value: Infinity }));
 });
 
-import { computeAccessibleParkingGeometry as _v1180 } from "../../calc-construction.js";
+import { computeAccessibleParkingGeometry as _v1180 } from "../../calc-accessibility.js";
 
 test("bounds: spec-v1180 computeAccessibleParkingGeometry pins the two legal van layouts, the aisle length and side, the 98 in clearance, and error seams", () => {
   const base = { space_type: "van", space_width_in: 96, aisle_width_in: 60, space_length_in: 216, aisle_length_in: 216, angled: "no", aisle_side: "passenger", vertical_clearance_in: 98, surface_slope_ratio: 48 };
@@ -37813,7 +37813,7 @@ test("bounds: spec-v1180 computeAccessibleParkingGeometry pins the two legal van
   assert.ok("error" in _v1180({ ...base, space_width_in: Infinity }));
 });
 
-import { computeWaterClosetLocation as _v1181 } from "../../calc-construction.js";
+import { computeWaterClosetLocation as _v1181 } from "../../calc-accessibility.js";
 
 test("bounds: spec-v1181 computeWaterClosetLocation pins both windows, the IPC comparison, the clearance, the flush side, and error seams", () => {
   const base = { centerline_in: 15, seat_height_in: 16.5, clear_side_in: 60, clear_rear_in: 56, flush_side: "open", ambulatory: "no" };
@@ -37875,7 +37875,7 @@ test("bounds: spec-v1181 computeWaterClosetLocation pins both windows, the IPC c
   assert.ok("error" in _v1181({ ...base, centerline_in: Infinity }));
 });
 
-import { computeLavatoryTubClearance as _v1182 } from "../../calc-construction.js";
+import { computeLavatoryTubClearance as _v1182 } from "../../calc-accessibility.js";
 
 test("bounds: spec-v1182 computeLavatoryTubClearance pins the higher-of rule, the metering minimum, the head-end 12 in, and error seams", () => {
   const base = { rim_height_in: 33, counter_height_in: 36, metering_seconds: 6, tub_length_in: 60, permanent_seat: "yes", clear_width_in: 30, clear_length_in: 60 };
@@ -37946,7 +37946,7 @@ test("bounds: spec-v1182 computeLavatoryTubClearance pins the higher-of rule, th
   assert.ok("error" in _v1182({ ...base, rim_height_in: Infinity }));
 });
 
-import { computeRampDetailCheck as _v1183 } from "../../calc-construction.js";
+import { computeRampDetailCheck as _v1183 } from "../../calc-accessibility.js";
 
 test("bounds: spec-v1183 computeRampDetailCheck pins the cross slope, the between-handrails width, the turning landing, edge protection, and error seams", () => {
   const base = { cross_slope_ratio: 40, clear_width_in: 36, handrails: "yes", handrail_intrusion_in: 6, landing_length_in: 60, landing_width_in: 48, run_width_in: 36, changes_direction: "yes", edge_protection: "none" };
@@ -60357,6 +60357,7 @@ test("hardening slice 6 (fire, sprinkler, fire water, gas, relief): the reviewed
 // Hardening slice 7 (2026-10-10): construction part 1, 90 calculators re-derived and run by
 // independent reviewers. One assertion per confirmed defect.
 import * as _s7 from "../../calc-construction.js";
+import * as _acc7 from "../../calc-accessibility.js";
 
 test("hardening slice 7 (construction part 1): the reviewed defects stay fixed", () => {
   const near = (a, b, tol) => assert.ok(Math.abs(a - b) <= tol, a + " vs " + b);
@@ -60473,7 +60474,7 @@ test("hardening slice 9 (construction part 3, concrete placement, finishes): the
   err(_s7.computeMaterialStackingLimits({ material: "lumber", stack_height_ft: 18, handled_manually: "Yes" }));
   err(_s7.computeSeismicBaseShear({ weight_kip: 200, sds: 1.0, r_factor: 6.5, ie: 1, period_s: 0.3 }));
   err(_s7.computeSeismicOverturningStability({ overturning_moment_kipft: 5422, dead_load_kip: 900, footprint_width_ft: 20, sds: 1, design_method: "ASD" }));
-  err(_s7.computeReachRange({ approach: "side", obstructed: "yes", obstruction_depth_in: 10, obstruction_height_in: 0, element_height_in: 48 }));
+  err(_acc7.computeReachRange({ approach: "side", obstructed: "yes", obstruction_depth_in: 10, obstruction_height_in: 0, element_height_in: 48 }));
   err(_s7.computeEgressTravelDistance({}));
   err(_s7.computeEgressTravelDistance({ travel_ft: 50, common_path_ft: 90 }));
   err(_s7.computeExteriorOpeningProtection({ fsd_ft: 40, wall_area: 100, actual_opening: 500 }));
