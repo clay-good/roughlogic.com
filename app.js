@@ -788,6 +788,9 @@ function renderToolView(id, params) {
       if (/\bNEC\b|NFPA 70(?![0-9A-Z])/.test(entry.edition || "")) {
         import("./code-adoption.js").then((m) => m.mountStatePicker(block, entry)).catch(() => {});
       }
+      // spec-v1973: a tile whose rule changed between editions says so, for a
+      // reader who says they work under the older one.
+      import("./edition-sensitivity.js").then((m) => m.mountEditionChanges(block, tool.id)).catch(() => {});
     }
   }).catch(() => { /* citation block is opt-in per tile; missing map is fine */ });
 

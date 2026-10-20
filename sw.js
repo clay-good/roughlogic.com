@@ -37,6 +37,7 @@ const SHELL_ASSETS = [
   "./ui-fields.js",
   "./length-entry.js",
   "./icc-chapters.js",
+  "./edition-sensitivity.js",
   "./field-units.js",
   "./field-bucket.js",
   "./query-fill.js",

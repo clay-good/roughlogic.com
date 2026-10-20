@@ -1,6 +1,6 @@
 # spec-v1973.md -- When your state's edition would change the answer
 
-> **Status: PROPOSED (2026-10-19). Platform spec, no tile added. Part of [scope-product-expansion](scope-product-expansion.md). Roadmap pillar 1 of [spec-v106](spec-v106.md) section 7, second half: "flags when the answer would differ across editions". [spec-v1968](spec-v1968.md) built the first half and listed this as its v2.** Catalog stays at **2,267**.
+> **Status: LANDED 2026-10-20 (proposed 2026-10-19). Platform spec, no tile added. As built: seven rows, not eight: `hood-exhaust` is left out because its IMC rates did not change between 2021 and 2027 (only the sections moved), and a row there would tell a reader the answer changed when it did not. The rows ship as a small module, `edition-sensitivity.js`, rather than a `docs/` file plus a data shard on the legal manifest, which keeps the monthly data refresh untouched; the lint (`check-edition-sensitivity`) holds the same rules. Until spec-v1974's state rows exist, the trigger is a per-tile "Working under an older edition?" selector, as this spec allows; no NEC row is asserted. Part of [scope-product-expansion](scope-product-expansion.md). Roadmap pillar 1 of [spec-v106](spec-v106.md) section 7, second half: "flags when the answer would differ across editions". [spec-v1968](spec-v1968.md) built the first half and listed this as its v2.** Catalog stays at **2,267**.
 
 ## What it does for you
 
