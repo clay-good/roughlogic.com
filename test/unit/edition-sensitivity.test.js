@@ -9,8 +9,8 @@ import { CITATIONS } from "../../citations.js";
 
 const ctx = { ids: new Set(TOOLS.map((t) => t.id)), citations: CITATIONS, today: "2026-10-20" };
 
-test("edition sensitivity: the seven verified I-code rows pass every rule", () => {
-  assert.equal(EDITION_ROWS.length, 7);
+test("edition sensitivity: the eight verified I-code rows pass every rule", () => {
+  assert.equal(EDITION_ROWS.length, 8);
   assert.deepEqual(checkEditionRows(EDITION_ROWS, ctx), []);
   assert.ok(!EDITION_ROWS.some((r) => r.code === "NEC"), "no NEC row is asserted without both editions' text");
 });

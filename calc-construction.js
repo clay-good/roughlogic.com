@@ -15419,7 +15419,7 @@ const _SGC_EXC = {
 };
 // A distance or area: blank is "not entered" (an error only where the location needs it).
 function _sgcNum(v, what, need) {
-  if (v === undefined || v === null || v === "") return need ? { error: "Enter the " + what + "." } : { v: null };
+  if (v === undefined || v === null || (typeof v === "string" && v.trim() === "")) return need ? { error: "Enter the " + what + "." } : { v: null };
   const n = Number(v);
   if (!Number.isFinite(n)) return { error: "The " + what + " must be a number." };
   if (n < 0) return { error: "The " + what + " cannot be negative." };
@@ -15539,9 +15539,9 @@ CONSTRUCTION_RENDERERS["safety-glazing-check"] = _simpleRenderer({
 // tributary area less the roof dead load, both at 0.6 under the ASCE 7-22
 // Section 2.4.1 ASD combination 0.6D + 0.6W. The pressure entered is strength
 // level (ASCE 7-10 and later); the allowable is the connector's ESR value.
+const _tucBlank = (v) => v === null || v === undefined || (typeof v === "string" && v.trim() === "");
 const _tucNum = (v, what) => {
-  const blank = v === null || v === undefined || (typeof v === "string" && v.trim() === "");
-  if (blank) return { error: "Enter the " + what + "." };
+  if (_tucBlank(v)) return { error: "Enter the " + what + "." };
   const ok = typeof v === "number" || (typeof v === "string" && /^\s*[+-]?(\d+\.?\d*|\.\d+)\s*$/.test(v));
   if (!ok || !Number.isFinite(Number(v))) return { error: "The " + what + " must be a number." };
   if (Number(v) < 0) return { error: "The " + what + " cannot be negative." };
@@ -15551,7 +15551,7 @@ const _tucNum = (v, what) => {
 // dims: in { spacing_in: L, span_ft: L, overhang_ft: L, uplift_psf: M L^-1 T^-2, dead_psf: M L^-1 T^-2, allowable_lb: M L T^-2, connectors: dimensionless } out: { tributary_sqft: L^2, wind_lb: M L T^-2, dead_lb: M L T^-2, net_uplift_lb: M L T^-2, per_connector_lb: M L T^-2, utilization: dimensionless, connectors_needed: dimensionless }
 export function computeTrussUpliftConnector({ spacing_in, span_ft, overhang_ft = 0, uplift_psf, dead_psf, allowable_lb, connectors = 1 } = {}) {
   const v = {};
-  for (const [k, x, w] of [["s", spacing_in, "truss or rafter spacing (in)"], ["L", span_ft, "span (ft)"], ["o", overhang_ft ?? 0, "overhang (ft)"], ["p", uplift_psf, "net design uplift pressure (psf)"], ["d", dead_psf, "roof dead load (psf)"], ["a", allowable_lb, "connector allowable uplift (lb)"], ["n", connectors ?? 1, "number of connectors per end"]]) {
+  for (const [k, x, w] of [["s", spacing_in, "truss or rafter spacing (in)"], ["L", span_ft, "span (ft)"], ["o", _tucBlank(overhang_ft) ? 0 : overhang_ft, "overhang (ft)"], ["p", uplift_psf, "net design uplift pressure (psf)"], ["d", dead_psf, "roof dead load (psf)"], ["a", allowable_lb, "connector allowable uplift (lb)"], ["n", _tucBlank(connectors) ? 1 : connectors, "number of connectors per end"]]) {
     const r = _tucNum(x, w); if (r.error) return { error: r.error }; v[k] = r.v;
   }
   if (!(v.s > 0) || !(v.L > 0)) return { error: "Spacing and span must be positive." };
@@ -15572,7 +15572,7 @@ export function computeTrussUpliftConnector({ spacing_in, span_ft, overhang_ft =
   const verdict = net_uplift_lb === 0
     ? "NO NET UPLIFT: 0.6 of the dead load (" + fmt(0.6 * dead_lb, 0) + " lb) equals or outweighs 0.6 of the wind (" + fmt(0.6 * wind_lb, 0) + " lb); the code's minimum roof-to-wall connection still applies"
     : passes ? "OK: " + fmt(per_connector_lb, 0) + " lb per connector against " + fmt(v.a, 0) + " lb allowable (utilization " + fmt(utilization, 2) + ")"
-      : "OVERSTRESSED: " + fmt(per_connector_lb, 0) + " lb per connector against " + fmt(v.a, 0) + " lb allowable (utilization " + fmt(utilization, 2) + "); use " + connectors_needed + " of these where the evaluation report allows doubling them, or one rated " + fmt(net_uplift_lb, 0) + " lb or more";
+      : "OVERSTRESSED: " + fmt(per_connector_lb, 0) + " lb per connector against " + fmt(v.a, 0) + " lb allowable (utilization " + fmt(utilization, 2) + "); " + (connectors_needed <= 4 ? "use " + connectors_needed + " of these where the evaluation report allows doubling them, or one rated " : "even 4 of these fall short (" + connectors_needed + " would be needed): use one rated ") + fmt(net_uplift_lb, 0) + " lb or more";
   return {
     tributary_sqft, wind_lb, dead_lb, net_uplift_lb, per_connector_lb, utilization, passes, connectors_needed, verdict,
     note: "Net uplift at one bearing end of a simple-span truss or rafter under the ASCE 7-22 Section 2.4.1 ASD combination 0.6D + 0.6W: the end carries the reaction of the load on the span and its overhang, spacing x (span + overhang)^2 / (2 x span) of roof (a little more than half the span plus the overhang, because the overhang levers on the bearing), wind = pressure x that area, dead = roof dead load x area, net = 0.6 W - 0.6 D. Only 0.6 of the dead load may resist uplift, so a 12 psf roof resists as 7.2 psf, and the overhang is the part most often left out. The pressure must be the strength-level (ultimate) net uplift from ASCE 7-10 or later (the wind components and cladding calculator gives it); a pressure already at ASD level would be reduced twice. ASCE 7 Chapter 30 gives a roof overhang its own, higher pressure (its underside is loaded too): enter that larger pressure when the overhang is a large share of the area. The allowable is the connector manufacturer's ASD uplift value from its evaluation report, already matched to species, fasteners and load duration. Only the tie at the top of the wall is checked: the rest of the load path (plate to stud, stud to sill, sill to foundation) needs its own connectors, and combined uplift and lateral load follows the report's interaction rule. The ASCE 7 ASD load combinations calculator covers the other combinations.",
@@ -15626,7 +15626,8 @@ export function computeFoundationGradeSlopeCheck({ surface = "pervious", fall_in
   if (!(R.v > 0)) return { error: "The run must be positive (ft)." };
   if (R.v > 100) return { error: "A run over 100 ft is outside a foundation grade check." };
   // The rule is "within the first 10 feet": a longer run could average away a flat first 10 ft.
-  if (surf === "pervious" && R.v > 10 + 1e-9) return { error: "Measure the fall over the first 10 ft from the foundation (or less): over a longer run, fall beyond 10 ft cannot count." };
+  // Both rules are "within 10 feet of the building foundation", so a wide patio cannot average a flat first 10 ft away either.
+  if (R.v > 10 + 1e-9) return { error: "Measure the fall over the first 10 ft from the foundation (or less): over a longer run, fall beyond 10 ft cannot count." };
   if (F.v > R.v * 12) return { error: "A fall steeper than 1:1 is outside a foundation grade check." };
   const slope = F.v / (R.v * 12);
   const slope_pct = slope * 100, slope_in_per_ft = slope * 12;
@@ -15655,7 +15656,8 @@ export function computeFoundationGradeSlopeCheck({ surface = "pervious", fall_in
     basis = "6 in within the first 10 ft (5 percent, 0.6 in per ft)";
   }
   const compare_in = fall_in_10ft !== null ? fall_in_10ft : F.v;
-  const margin_in = compare_in - required_fall_in;
+  const margin_raw = compare_in - required_fall_in;
+  const margin_in = Math.abs(margin_raw) < 1e-9 ? 0 : margin_raw;
   const verdict = exception
     ? "BARRIER EXCEPTION: " + fmt(F.v, 2) + " in over " + fmt(R.v, 1) + " ft (" + fmt(slope_pct, 1) + " percent), " + fmt(6 - F.v, 2) + " in short of 6 in, where a barrier stops the 10 ft; R401.3 then requires drains or swales to carry water away from the structure"
     : passes
@@ -15664,7 +15666,7 @@ export function computeFoundationGradeSlopeCheck({ surface = "pervious", fall_in
   if (![slope_pct, slope_in_per_ft, required_fall_in, margin_in].every(Number.isFinite)) return { error: "Grade math is not a finite value." };
   return {
     slope_pct, slope_in_per_ft, required_fall_in, fall_in_10ft, margin_in, passes, exception, basis, verdict,
-    note: "IRC 2024 R401.3 (the same in IRC 2021): lots are graded to drain surface water away from foundation walls, and the grade falls not fewer than 6 in within the first 10 ft. Where lot lines, walls, slopes or other physical barriers prohibit that, drains or swales are built to carry water away instead. Impervious surfaces within 10 ft of the foundation slope not less than 2 percent away from the building. A fall measured over a run shorter than 10 ft is read as a uniform slope and projected to 10 ft (a longer run is refused, since fall beyond 10 ft cannot count), so a hump or a low spot inside the run is not seen: check the grade at the wall and every few feet out. Surface water must also go to a storm sewer or another approved point of collection that creates no hazard. Swale, drain and footing-drain sizing are separate.",
+    note: "IRC 2024 R401.3 (the same in IRC 2021): lots are graded to drain surface water away from foundation walls, and the grade falls not fewer than 6 in within the first 10 ft. Where lot lines, walls, slopes or other physical barriers prohibit that, drains or swales are built to carry water away instead. Impervious surfaces within 10 ft of the foundation slope not less than 2 percent away from the building. A fall measured over a run shorter than 10 ft is read as a uniform slope and projected to 10 ft (a longer run is refused for ground and paving alike, since fall beyond 10 ft cannot count: measure a wide patio over its first 10 ft), so a hump or a low spot inside the run is not seen: check the grade at the wall and every few feet out. Surface water must also go to a storm sewer or another approved point of collection that creates no hazard. Swale, drain and footing-drain sizing are separate.",
   };
 }
 export const foundationGradeSlopeCheckExample = { inputs: { surface: "pervious", fall_in: 4, run_ft: 10, barrier: "no" } };
@@ -15675,7 +15677,7 @@ CONSTRUCTION_RENDERERS["foundation-grade-slope-check"] = _simpleRenderer({
   fields: [
     { key: "surface", label: "Surface", kind: "select", default: "pervious", options: [{ value: "pervious", label: "Ground (pervious): 6 in in 10 ft" }, { value: "impervious", label: "Patio, walk or drive (impervious): 2 percent" }] },
     { key: "fall_in", label: "Fall measured away from the foundation (in)", kind: "number", required: true, attrs: { step: "any", min: "0" } },
-    { key: "run_ft", label: "Run it was measured over (ft, 10 or less for ground; the surface width for a patio)", kind: "number", required: true, attrs: { step: "any", min: "0" } },
+    { key: "run_ft", label: "Run it was measured over (ft, the first 10 ft or less from the foundation)", kind: "number", required: true, attrs: { step: "any", min: "0" } },
     { key: "barrier", label: "Does a lot line, wall or other barrier stop the 10 ft short?", kind: "select", default: "no", options: [{ value: "no", label: "No" }, { value: "yes", label: "Yes (ground only)" }] },
   ],
   outputs: [

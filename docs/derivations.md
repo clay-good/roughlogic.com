@@ -2879,7 +2879,7 @@ cross-check.
 | calc-masonry.js | `computeCmuShearWall` | `{ fm_psi = 1500, b_in = 0, dv_in = 0, p_lb = 0, mvd = 0.5, av_in2 = 0, s_in =...` | _ | _ | _ |
 | calc-masonry.js | `computeCmuWallAxial` | `{ fm_psi = 2000, an_in2 = 0, ast_in2 = 0, h_in = 0, r_in = 0, fs_psi = 32000 ...` | _ | _ | _ |
 | calc-masonry.js | `computeCmuWallFlexure` | `{ fm_psi = 2000, as_in2 = 0, d_in = 0, b_in = 12, fs_psi = 32000 } = {}` | _ | _ | _ |
-| calc-masonry.js | `computeFireplaceClearanceCheck` | `{ framing_front_in = null, framing_back_in = null, opening_area_class = "unde...` | _ | _ | _ |
+| calc-masonry.js | `computeFireplaceClearanceCheck` | `{ code_edition = "2024", framing_front_in = null, framing_back_in = null, ope...` | _ | _ | _ |
 | calc-masonry.js | `computeFireplaceFlueArea` | `{ opening_width_in = 0, opening_height_in = 0, flue_shape = "rectangular", fl...` | _ | _ | _ |
 | calc-masonry.js | `computeGroutLiftPourHeight` | `{ pour_height_ft = 0, lift_height_ft = 0, max_pour_height_ft = 0, max_lift_he...` | _ | _ | _ |
 | calc-masonry.js | `computeHearthExtensionCheck` | `{ opening_width_in = 0, opening_height_in = 0, front_in = null, side_in = nul...` | _ | _ | _ |

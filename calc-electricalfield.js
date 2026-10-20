@@ -801,7 +801,8 @@ export function computeCountertopReceptacleCount({ spaces = [], islands = [], ne
     isl_areas.push(a);
   }
   const n_isl = isl_areas.length;
-  const p = _rcpLengths(spaces, "length_in", "in");
+  // A kitchen whose only counter is an island or peninsula still has its 210.52(C)(2) count.
+  const p = n_isl > 0 && (spaces == null || (Array.isArray(spaces) && spaces.length === 0)) ? { lengths: [] } : _rcpLengths(spaces, "length_in", "in");
   if (p.error) return p;
   const per_space = [];
   let wall_receptacles = 0, narrow_count = 0;

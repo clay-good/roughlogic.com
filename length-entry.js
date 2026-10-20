@@ -12,6 +12,8 @@ const INCH = "(\\d+\\s*[\\s-]\\s*\\d+\\s*/\\s*\\d+|\\d+\\s*/\\s*\\d+|\\d+(?:\\.\
 const FT_WORD = "(?:'|ft\\.?|foot|feet)";
 const IN_WORD = "(?:\"|''|in\\.?|inch|inches)";
 
+const VULGAR = { "\u00bc": "1/4", "\u00bd": "1/2", "\u00be": "3/4", "\u215b": "1/8", "\u215c": "3/8", "\u215d": "5/8", "\u215e": "7/8" };
+
 // "6", "1/2", "6 1/2", "6-1/2" -> a number; NaN for a zero denominator.
 function inchValue(s) {
   const t = s.trim();
@@ -22,11 +24,12 @@ function inchValue(s) {
   return Number(t);
 }
 
+// The third field says the reading has a feet part, so its inches stay under 12 (0'13" too).
 const RULES = [
   // 8'6"  8' 6"  8'-6"  8'6  8' 6-1/2"  -- one measurement by construction.
-  [new RegExp("^" + NUM + "\\s*'\\s*-?\\s*" + INCH + "\\s*(?:" + IN_WORD + ")?$"), (ft, inch) => [Number(ft), inchValue(inch)]],
+  [new RegExp("^" + NUM + "\\s*'\\s*-?\\s*" + INCH + "\\s*(?:" + IN_WORD + ")?$"), (ft, inch) => [Number(ft), inchValue(inch), true]],
   // 8 ft 6 in, 8 feet 6 inches, 8ft 6.
-  [new RegExp("^" + NUM + "\\s*(?:ft\\.?|foot|feet)\\s*-?\\s*" + INCH + "\\s*(?:" + IN_WORD + ")?$"), (ft, inch) => [Number(ft), inchValue(inch)]],
+  [new RegExp("^" + NUM + "\\s*(?:ft\\.?|foot|feet)\\s*-?\\s*" + INCH + "\\s*(?:" + IN_WORD + ")?$"), (ft, inch) => [Number(ft), inchValue(inch), true]],
   // 8', 8 ft, and fractional feet: 1-1/2', 2 1/2 ft, 1/2 ft
   [new RegExp("^" + INCH + "\\s*" + FT_WORD + "$"), (ft) => [inchValue(ft), 0]],
   // 6", 6 in, 3-1/2", 5/8 in
@@ -37,9 +40,17 @@ const RULES = [
 // Returns { value } (null for an empty box) or { error }.
 export function parseLength(text, unit) {
   // Phones type curly quotes and primes; read them as the tape marks.
-  const t = String(text ?? "").trim().toLowerCase().replace(/[\u2032\u2018\u2019]/g, "'").replace(/[\u2033\u201c\u201d]/g, '"');
+  // A fraction character (5½) reads as the typed fraction (5 1/2).
+  const t = String(text ?? "").trim().toLowerCase().replace(/[\u2032\u2018\u2019]/g, "'").replace(/[\u2033\u201c\u201d]/g, '"')
+    .replace(/\u2044/g, "/").replace(/(\d?)\s*([\u00bc\u00bd\u00be\u215b\u215c\u215d\u215e])/g, (_, d, f) => (d ? d + " " : "") + VULGAR[f]);
   if (t === "") return { value: null };
-  if (/^[+-]?(\d+(?:\.\d+)?|\.\d+)(e[+-]?\d+)?$/.test(t)) return { value: Number(t) };
+  if (/^[+-]?(\d+(?:\.\d+)?|\.\d+)(e[+-]?\d+)?$/.test(t)) return Number.isFinite(Number(t)) ? { value: Number(t) } : { error: "That number is too large for a length." };
+  // A sign belongs to the whole reading: -2' 6" is -2.5 ft, not -2 ft + 6 in.
+  const sm = t.match(/^([+-])\s*([^+-].*)$/);
+  if (sm) {
+    const r = parseLength(sm[2], unit);
+    return r.error || r.value === null ? (r.error ? r : { error: "Enter a number after the sign." }) : { value: sm[1] === "-" ? -r.value : r.value };
+  }
   // A bare mixed number or fraction is in the box's own unit: 3-1/2, 3 1/2, 5/8.
   let m = t.match(/^(\d+\s*[\s-]\s*\d+\s*\/\s*\d+|\d+\s*\/\s*\d+)$/);
   if (m) {
@@ -52,9 +63,9 @@ export function parseLength(text, unit) {
   for (const [re, fn] of RULES) {
     const r = t.match(re);
     if (!r) continue;
-    const [ft, inch] = fn(r[1], r[2]);
+    const [ft, inch, hasFeet] = fn(r[1], r[2]);
     if (!Number.isFinite(ft) || !Number.isFinite(inch)) return { error: "A fraction cannot divide by zero." };
-    if (ft > 0 && inch >= 12) return { error: "The inches in a feet-and-inches measurement are under 12." };
+    if (hasFeet && inch >= 12) return { error: "The inches in a feet-and-inches measurement are under 12." };
     const inches = ft * 12 + inch;
     return { value: unit === "ft" ? inches / 12 : inches };
   }

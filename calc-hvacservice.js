@@ -1608,12 +1608,13 @@ export function computeBathExhaustFanSizing({
   const ach_at_recommended = recommended_cfm * 60 / volume_cuft;
   const code_governs = rule_cfm === null ? null : rule_cfm <= mins.intermittent + 1e-9;
   if (![area_sqft, volume_cuft, intermittent_size_cfm, ach_at_recommended].every(Number.isFinite)) return { error: "Exhaust-fan math is not a finite value." };
+  const boost = op === "continuous" ? "A continuous fan meets the code at " + mins.continuous + " cfm; for the room's rule of thumb, boost it to " + intermittent_size_cfm + " cfm when the room is in use." : "";
   const advice = room_type === "kitchen"
     ? "A kitchen's floor is 100 cfm intermittent or 25 cfm continuous; size a residential range hood by the range and its manufacturer's guidance. An exhaust system over 400 cfm needs makeup air where an atmospherically vented fuel-burning appliance is inside the air barrier (IRC 2024 M1503.6; the kitchen exhaust makeup air calculator)."
     : ru !== "fixtures" && area_sqft > 100 + 1e-9
-      ? "This bathroom is over 100 sq ft, where HVI sizes by fixtures instead (50 cfm per toilet, shower or tub, 100 per jetted tub); compare that rule."
+      ? (boost ? boost + " " : "") + "This bathroom is over 100 sq ft, where HVI sizes by fixtures instead (50 cfm per toilet, shower or tub, 100 per jetted tub); compare that rule."
       : ru === "fixtures" && area_sqft <= 100 + 1e-9
-        ? "This bathroom is 100 sq ft or less, where HVI sizes by 1 cfm per sq ft; compare that rule."
+        ? (boost ? boost + " " : "") + "This bathroom is 100 sq ft or less, where HVI sizes by 1 cfm per sq ft; compare that rule."
         : op === "continuous" ? "A continuous fan meets the code at " + mins.continuous + " cfm; for the room's rule of thumb, boost it to " + intermittent_size_cfm + " cfm when the room is in use."
         : code_governs ? "The code floor governs: the rule of thumb asks for no more than the 50 cfm code minimum." : "The rule of thumb governs: a fan at the code floor would be undersized for this room.";
   return {

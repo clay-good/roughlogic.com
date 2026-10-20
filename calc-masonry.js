@@ -1295,19 +1295,22 @@ const _fccNum = (v, what) => {
   return { v: Number(v) };
 };
 
-// dims: in { framing_front_in: L, framing_back_in: L, opening_area_class: dimensionless, sheathing_from_lining_in: L, mantel_distance_in: L, mantel_projection_in: L } out: { allowed_projection_in: L, distance_needed_in: L, sheathing_required_in: L, checks_failed: dimensionless }
+// dims: in { code_edition: dimensionless, framing_front_in: L, framing_back_in: L, opening_area_class: dimensionless, sheathing_from_lining_in: L, mantel_distance_in: L, mantel_projection_in: L } out: { allowed_projection_in: L, distance_needed_in: L, sheathing_required_in: L, checks_failed: dimensionless }
 export function computeFireplaceClearanceCheck({
-  framing_front_in = null, framing_back_in = null, opening_area_class = "under_6", sheathing_from_lining_in = null, mantel_distance_in = null, mantel_projection_in = null,
+  code_edition = "2024", framing_front_in = null, framing_back_in = null, opening_area_class = "under_6", sheathing_from_lining_in = null, mantel_distance_in = null, mantel_projection_in = null,
 } = {}) {
   const cls = String(opening_area_class ?? "under_6");
   if (cls !== "under_6" && cls !== "6_or_more") return { error: "Opening area class must be under_6 or 6_or_more." };
+  const ed = String(code_edition ?? "2024");
+  if (ed !== "2024" && ed !== "2021") return { error: "IRC edition must be 2024 or 2021." };
   const vals = {};
   for (const [k, v, w] of [["ff", framing_front_in, "framing clearance at the front and sides"], ["fb", framing_back_in, "framing clearance at the back"], ["sh", sheathing_from_lining_in, "sheathing distance from the firebox lining"], ["md", mantel_distance_in, "mantel or trim distance from the opening"], ["mp", mantel_projection_in, "mantel or trim projection"]]) {
     const r = _fccNum(v, w); if (r.error) return { error: r.error }; vals[k] = r.v;
   }
   if (Object.values(vals).some((x) => x !== null && x > 600)) return { error: "Distances above 600 in are outside this check." };
   if ((vals.md === null) !== (vals.mp === null)) return { error: "Enter both the mantel or trim distance from the opening and its projection, or neither." };
-  const sheathing_required_in = cls === "6_or_more" ? 12 : 8;
+  // IRC 2021 Exception 3 is 12 in for every opening; IRC 2024 added 8 in for one under 6 sq ft (both read 2026-10-20).
+  const sheathing_required_in = ed === "2021" || cls === "6_or_more" ? 12 : 8;
   // Exception 4: none within 6 in; within 12 in (inclusive) project at most d / 8.
   const allowed_projection_in = vals.md === null ? null : vals.md < 6 - 1e-9 ? 0 : vals.md <= 12 + 1e-9 ? vals.md / 8 : null;
   const distance_needed_in = vals.mp === null ? null : vals.mp <= 0.75 + 1e-9 ? 6 : vals.mp <= 1.5 + 1e-9 ? 8 * vals.mp : null;
@@ -1325,15 +1328,16 @@ export function computeFireplaceClearanceCheck({
     : failed.length ? "FAILS: " + failed.map((c) => c.label).join("; ") : "PASSES: " + checks.map((c) => c.label).join("; ");
   return {
     allowed_projection_in, distance_needed_in, sheathing_required_in, checks, mantel_entered: vals.md !== null, checks_failed: failed.length, checks_run: checks.length, verdict,
-    note: "IRC 2024 R1001.11: wood beams, joists, studs and other combustibles keep not less than 2 in from the front faces and sides and 4 in from the back faces of a masonry fireplace, and the air space is not filled except with noncombustible material or fireblocking (IRC 2021: fireblocking only). Exception 3: exposed combustible trim and the edges of sheathing such as siding, flooring and gypsum board may abut the fireplace sidewalls and hearth extension when they are not less than 8 in from the inside surface of the nearest firebox lining, or 12 in where the opening is 6 sq ft or larger. Exception 4: combustible mantels and trim on the fireplace front stay out of the 6 in around the opening, and within 12 in of it project no more than 1/8 in for each inch of distance, so 1 in proud at 8 in, 1.5 in at 12 in, and anything thicker more than 12 in away. A UL 127 listed masonry fireplace may have combustibles in contact (Exception 1), and a fireplace that is part of a masonry or concrete wall keeps combustibles off the wall within 12 in of the firebox lining (Exception 2); factory-built fireplaces and stoves follow their listings.",
+    note: "IRC 2024 R1001.11: wood beams, joists, studs and other combustibles keep not less than 2 in from the front faces and sides and 4 in from the back faces of a masonry fireplace, and the air space is not filled except with noncombustible material or fireblocking (IRC 2021: fireblocking only). Exception 3: exposed combustible trim and the edges of sheathing such as siding, flooring and gypsum board may abut the fireplace sidewalls and hearth extension when they are not less than 8 in from the inside surface of the nearest firebox lining, or 12 in where the opening is 6 sq ft or larger (IRC 2021: 12 in for every opening, so pick the edition your jurisdiction adopted). Exception 4: combustible mantels and trim on the fireplace front stay out of the 6 in around the opening, and within 12 in of it project no more than 1/8 in for each inch of distance, so 1 in proud at 8 in, 1.5 in at 12 in, and anything thicker more than 12 in away. A UL 127 listed masonry fireplace may have combustibles in contact (Exception 1), and a fireplace that is part of a masonry or concrete wall keeps combustibles off the wall within 12 in of the firebox lining (Exception 2); factory-built fireplaces and stoves follow their listings.",
   };
 }
-export const fireplaceClearanceCheckExample = { inputs: { framing_front_in: 2, framing_back_in: 4, opening_area_class: "under_6", sheathing_from_lining_in: 8, mantel_distance_in: 9, mantel_projection_in: 1.5 } };
+export const fireplaceClearanceCheckExample = { inputs: { code_edition: "2024", framing_front_in: 2, framing_back_in: 4, opening_area_class: "under_6", sheathing_from_lining_in: 8, mantel_distance_in: 9, mantel_projection_in: 1.5 } };
 
 MASONRY_RENDERERS["fireplace-clearance-check"] = _simpleRenderer({
-  citation: "Citation: IRC 2024 R1001.11 and its Exceptions 1 to 4 (the same values in IRC 2021), by name; free at codes.iccsafe.org, read 2026-10-19. Combustible framing 2 in from the front faces and sides and 4 in from the back of a masonry fireplace; sheathing edges and trim may abut the sidewalls and hearth extension 8 in or more from the firebox lining (12 in for an opening of 6 sq ft or more); mantels and trim on the front not within 6 in of the opening, and within 12 in projecting no more than 1/8 in per inch of distance. The adopted code and the AHJ govern.",
+  citation: "Citation: IRC 2024 R1001.11 and its Exceptions 1 to 4, by name; free at codes.iccsafe.org, read 2026-10-19; IRC 2021 R1001.11 read 2026-10-20 (its Exception 3 is 12 in for every opening). Combustible framing 2 in from the front faces and sides and 4 in from the back of a masonry fireplace; sheathing edges and trim may abut the sidewalls and hearth extension 8 in or more from the firebox lining (12 in for an opening of 6 sq ft or more, and for every opening under IRC 2021); mantels and trim on the front not within 6 in of the opening, and within 12 in projecting no more than 1/8 in per inch of distance. The adopted code and the AHJ govern.",
   example: fireplaceClearanceCheckExample.inputs,
   fields: [
+    { key: "code_edition", label: "IRC edition adopted", kind: "select", default: "2024", options: [{ value: "2024", label: "IRC 2024" }, { value: "2021", label: "IRC 2021" }] },
     { key: "framing_front_in", label: "Framing clearance at the front faces and sides (in, blank to skip)", kind: "number", required: true, attrs: { step: "any", min: "0" } },
     { key: "framing_back_in", label: "Framing clearance at the back face (in, blank to skip)", kind: "number", required: true, attrs: { step: "any", min: "0" } },
     { key: "opening_area_class", label: "Fireplace opening area", kind: "select", default: "under_6", options: [{ value: "under_6", label: "Under 6 sq ft" }, { value: "6_or_more", label: "6 sq ft or more" }] },

@@ -62465,3 +62465,31 @@ test("bounds: spec-v1991 computeWorkZoneBufferSpace pins Table 6B-2, the next-ro
     assert.ok("error" in _wzb(bad), JSON.stringify(bad));
   }
 });
+
+// hardening slice 59: the 2026-10-19/20 landings re-derived and run by independent reviewers.
+import { computeSafetyGlazingCheck as _h59sg, computeTrussUpliftConnector as _h59tu, computeFoundationGradeSlopeCheck as _h59fg } from "../../calc-construction.js";
+import { computeCountertopReceptacleCount as _h59cr } from "../../calc-electricalfield.js";
+import { computeBathExhaustFanSizing as _h59bf } from "../../calc-hvacservice.js";
+import { computeFireplaceClearanceCheck as _h59fc } from "../../calc-masonry.js";
+test("hardening slice 59: blank strings stay blank, a wide patio is measured over its first 10 ft, an island-only kitchen counts, IRC 2021 fireplace sheathing is 12 in", () => {
+  // A whitespace-only area read as 0 sq ft and said a window needed no safety glazing.
+  assert.ok("error" in _h59sg({ location: "window", area_sqft: " ", bottom_in: 12, top_in: 70, distance_in: 24 }));
+  // Blank optional truss inputs take their defaults instead of erroring.
+  const base = { spacing_in: 24, span_ft: 32, uplift_psf: 28.4, dead_psf: 12, allowable_lb: 585 };
+  assert.equal(_h59tu({ ...base, overhang_ft: "", connectors: " " }).net_uplift_lb, _h59tu(base).net_uplift_lb);
+  const over = _h59tu({ spacing_in: 96, span_ft: 100, overhang_ft: 10, uplift_psf: 300, dead_psf: 0, allowable_lb: 20000, connectors: 4 });
+  assert.equal(over.passes, false); assert.ok(!/use 5 of these/.test(over.verdict), "never advise more connectors than the tile accepts");
+  // R401.3: 2 percent within 10 ft; 7.2 in over a 30 ft patio averaged a flat first 10 ft away.
+  assert.ok("error" in _h59fg({ surface: "impervious", fall_in: 7.2, run_ft: 30 }));
+  assert.equal(_h59fg({ surface: "impervious", fall_in: 2.4, run_ft: 10 }).margin_in, 0, "no -0.00 in to spare");
+  // NEC 2020 210.52(C)(2): an island with no wall counter still needs its outlets.
+  assert.equal(_h59cr({ spaces: [], islands: [{ area_sqft: 24 }], nec_edition: "2020" }).total_required, 2);
+  assert.ok("error" in _h59cr({ spaces: [], islands: [] }));
+  // IRC 2021 R1001.11 Exception 3 is 12 in for every opening; the 8 in case is new in IRC 2024 (both read 2026-10-20).
+  assert.equal(_h59fc({ code_edition: "2024", sheathing_from_lining_in: 8 }).checks_failed, 0);
+  assert.equal(_h59fc({ code_edition: "2021", sheathing_from_lining_in: 8 }).checks_failed, 1);
+  assert.equal(_h59fc({ code_edition: "2021" }).sheathing_required_in, 12);
+  assert.ok("error" in _h59fc({ code_edition: "2018" }));
+  // A continuous fan in a bath over 100 sq ft is still told to boost.
+  assert.match(_h59bf({ room_type: "bathroom", length_ft: 12, width_ft: 10, ceiling_ft: 8, operation: "continuous", rule: "ach8" }).advice, /boost it to/);
+});
