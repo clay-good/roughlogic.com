@@ -2340,6 +2340,7 @@ cross-check.
 | calc-finish.js | `computePaverPatio` | `{ area_sqft = 0, paver_length_in = 0, paver_width_in = 0, base_depth_in = 6, ...` | _ | _ | _ |
 | calc-finish.js | `computeRetainingWallBlock` | `{ wall_length_ft = 0, exposed_height_ft = 0, block_length_in = 18, block_heig...` | _ | _ | _ |
 | calc-finish.js | `computeRoughOpeningSize` | `{ opening_type = "window", unit_width_in = 0, unit_height_in = 0, width_adder...` | _ | _ | _ |
+| calc-finish.js | `computeShowerPanMortarBed` | `{ length_ft = 0, width_ft = 0, drain_x_ft = null, drain_y_ft = null, drain_th...` | _ | _ | _ |
 | calc-finish.js | `computeSoffitRidgeVentCount` | `{ attic_area_sf = 1500, vent_ratio = 300, soffit_vent_nfa_in2 = 26, ridge_nfa...` | _ | _ | _ |
 | calc-finish.js | `computeSprayTipSelection` | `{ tip_number = 0, pressure_psi = 0, wet_film_mils = 0, ref_orifice_in = 0.015...` | _ | _ | _ |
 | calc-finish.js | `computeSrwGeogridSpacing` | `{ wall_height_ft = 0, block_depth_in = 12, block_height_in = 8, base_course_b...` | _ | _ | _ |
@@ -3950,7 +3951,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2534.
+Row count: 2535.
 
 <!-- END function-corpus-v14 -->
 
@@ -4738,7 +4739,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-extraction-rate` | Water Extraction Volume, Time, and Waste-Tank Dumps | Project (first-principles); standing + absorbed; wand time = total / gpm | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+4 more) |
 
-### Group E Construction (639 tiles)
+### Group E Construction (640 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -5209,6 +5210,7 @@ per spec-v14 §13.1 second paragraph.
 | `shore-post-load` | Formwork Shore Post Load and Spacing (ACI 347) | ACI 347 Guide to Formwork for Concrete; spec-v245 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `shoring-reshoring-load` | Slab Shoring and Reshoring Load Distribution | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `shotcrete-rebound-quantity` | Shotcrete / Gunite Order Quantity with Rebound | Rebound gross-up identity (first-prin...; in-place = 500*(4/12)/27 = 6.173 cy; shot = 6.173/0.80 = ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `shower-pan-mortar-bed` | Shower Pan Mortar Bed: Pre-Slope Thickness and Volume | Project (first-principles); 5 x 3 ft, centered drain, 0.75 in at the drain, 1/4 in pe... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `siding-course-layout` | Siding Course Layout (Story Pole) | story-pole practice; 9 ft at a 7-in target on 8-in board (1-in min lap) -> 16 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `siding-takeoff` | Lap / Panel Siding Squares and Linear Footage | Siding-takeoff identity (first-princi...; net = 2000-200 = 1800; squares = 1800*1.12/100 = 20.16; l... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+6 more) |
 | `sign-character-height` | Sign Character Height and Viewing Distance (2010 ADA Standards 703.5.5) | US Department of Justice / US Access ...; A baseline at 60 in falls in the 40-to-70-in band, where ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -6403,6 +6405,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 
-Tile count: 2280. Fixture-covered or reference-cadence: 2280 / 2280.
+Tile count: 2281. Fixture-covered or reference-cadence: 2281 / 2281.
 
 <!-- END tile-index-v14 -->

@@ -2437,6 +2437,8 @@ const RELATED = {
   "tile-layout-cut-balance": ["tile-count","thinset-coverage","layout-squaring"],
   // spec-v1988: tile substrate flatness and lippage (calc-finish.js).
   "tile-flatness-lippage-check": ["tile-layout-cut-balance","tile-count","thinset-coverage","self-leveler-bags"],
+  // spec-v1989: shower pan mortar bed (calc-finish.js).
+  "shower-pan-mortar-bed": ["tile-flatness-lippage-check","thinset-coverage","tile-count","self-leveler-bags"],
 };
 
 export { RELATED };

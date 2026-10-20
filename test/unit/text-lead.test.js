@@ -126,7 +126,7 @@ test("no public lead opens with maintainer vocabulary", () => {
   const ceramic = new Set([
     "tile-count", "thinset-coverage", "cement-board-takeoff",
     "flooring-takeoff", "pool-tile-coping-perimeter",
-    "tile-layout-cut-balance", "tile-flatness-lippage-check",
+    "tile-layout-cut-balance", "tile-flatness-lippage-check", "shower-pan-mortar-bed",
   ]);
   const offenders = TOOLS
     .filter((t) => !ceramic.has(t.id) && jargon.test(leadSentence(t.desc)))
@@ -217,7 +217,7 @@ test("no description body calls a calculator a tile or a sibling", () => {
     // A 3/8 in hearth extension of brick, stone or tile: the material.
     "hearth-extension-check",
     // Ceramic tile is the subject of the layout and flatness calculators.
-    "tile-layout-cut-balance", "tile-flatness-lippage-check",
+    "tile-layout-cut-balance", "tile-flatness-lippage-check", "shower-pan-mortar-bed",
   ]);
   const offenders = TOOLS
     .filter((t) => !exempt.has(t.id) && jargon.test(restOfDescription(t.desc)))

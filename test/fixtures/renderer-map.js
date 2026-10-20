@@ -2288,4 +2288,5 @@ export const RENDERER_MAP = {
   "foundation-grade-slope-check": { module: "../../calc-construction.js", exportName: "CONSTRUCTION_RENDERERS" },
   "tile-layout-cut-balance": { module: "../../calc-finish.js", exportName: "FINISH_RENDERERS" },
   "tile-flatness-lippage-check": { module: "../../calc-finish.js", exportName: "FINISH_RENDERERS" },
+  "shower-pan-mortar-bed": { module: "../../calc-finish.js", exportName: "FINISH_RENDERERS" },
 };

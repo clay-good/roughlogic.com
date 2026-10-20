@@ -2,11 +2,11 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "69ecbd463c83dbb2",
+      "sha": "1edead374b7d159a",
       "date": "2026-10-20"
     },
     "/tools/": {
-      "sha": "55c0b4da78e98a50",
+      "sha": "5f713db7156d7a01",
       "date": "2026-10-20"
     },
     "/errata/": {
@@ -14,91 +14,91 @@
       "date": "2026-10-18"
     },
     "/collections/disaster-response/": {
-      "sha": "4e5cd50d5f1320d2",
+      "sha": "82b531914e9144e3",
       "date": "2026-10-20"
     },
     "/groups/accounting/": {
-      "sha": "b05ea3edbd1c4d20",
+      "sha": "0be57dea5c0e45e2",
       "date": "2026-10-20"
     },
     "/groups/agriculture/": {
-      "sha": "2c34b0e654000aa1",
+      "sha": "7a5f646e55d976d3",
       "date": "2026-10-20"
     },
     "/groups/construction/": {
-      "sha": "28b34fe2131d33ff",
+      "sha": "0dd5692a99c48f0a",
       "date": "2026-10-20"
     },
     "/groups/cross-trade/": {
-      "sha": "cadd2446add86fa9",
+      "sha": "4f6f817af0c1221c",
       "date": "2026-10-20"
     },
     "/groups/educators/": {
-      "sha": "75dcc0470bf44beb",
+      "sha": "07fa27b12231cfea",
       "date": "2026-10-20"
     },
     "/groups/electrical/": {
-      "sha": "6fab351819dd5763",
+      "sha": "8b326bda10c8f6f9",
       "date": "2026-10-20"
     },
     "/groups/field/": {
-      "sha": "60ed5321c531b469",
+      "sha": "9fb3104d87ac3c28",
       "date": "2026-10-20"
     },
     "/groups/fire-ground/": {
-      "sha": "476d8d3d0b333bd0",
+      "sha": "6f4df9f02a5e5c22",
       "date": "2026-10-20"
     },
     "/groups/historical/": {
-      "sha": "2c37776e725485c9",
+      "sha": "ba95a15d64280d7c",
       "date": "2026-10-20"
     },
     "/groups/hvac/": {
-      "sha": "d5c37ceb7a770a13",
+      "sha": "28ed33089160d6c2",
       "date": "2026-10-20"
     },
     "/groups/kitchen/": {
-      "sha": "2f27b4ad264f55a8",
+      "sha": "9b4e42a3e7a1e1d3",
       "date": "2026-10-20"
     },
     "/groups/lab/": {
-      "sha": "901edcd19ea4b3e2",
+      "sha": "8670f560b2800c0c",
       "date": "2026-10-20"
     },
     "/groups/mechanic/": {
-      "sha": "d11c9818c347e9aa",
+      "sha": "0a1ce64ea9dc0b19",
       "date": "2026-10-20"
     },
     "/groups/plumbing/": {
-      "sha": "d7abb6437dd86469",
+      "sha": "fb56357314607adc",
       "date": "2026-10-20"
     },
     "/groups/real-estate/": {
-      "sha": "de94b444e5257ff0",
+      "sha": "c084cdee4c7149fe",
       "date": "2026-10-20"
     },
     "/groups/references/": {
-      "sha": "29eeb87f052e762b",
+      "sha": "f588bf9f8e8b2fe4",
       "date": "2026-10-20"
     },
     "/groups/restoration/": {
-      "sha": "27a5b6f63c5e35db",
+      "sha": "7da71bbda0c87508",
       "date": "2026-10-20"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "41703efdd76522c9",
+      "sha": "f8abbe38d234e5e2",
       "date": "2026-10-20"
     },
     "/groups/stage/": {
-      "sha": "6c4be865511d0822",
+      "sha": "3d55e77388645286",
       "date": "2026-10-20"
     },
     "/groups/trucking/": {
-      "sha": "cfe5b829c83f8a7d",
+      "sha": "b40bd6b9f0cb1b68",
       "date": "2026-10-20"
     },
     "/groups/water/": {
-      "sha": "16cb034df7ac4c1d",
+      "sha": "277236852931dda1",
       "date": "2026-10-20"
     },
     "/tools/aav-install-check/": {
@@ -1082,7 +1082,7 @@
       "date": "2026-10-17"
     },
     "/tools/cement-board-takeoff/": {
-      "sha": "67e1df5f1a925e89",
+      "sha": "c97dc4a9b563fec6",
       "date": "2026-10-20"
     },
     "/tools/center-of-gravity-2point/": {
@@ -1518,8 +1518,8 @@
       "date": "2026-10-17"
     },
     "/tools/concrete/": {
-      "sha": "f1b20832e497a783",
-      "date": "2026-10-17"
+      "sha": "08a2d31cb63ebd95",
+      "date": "2026-10-20"
     },
     "/tools/concrete-anchor-blowout/": {
       "sha": "d7ccc0023b5801c5",
@@ -3106,8 +3106,8 @@
       "date": "2026-10-17"
     },
     "/tools/flat-top-stockpile-volume/": {
-      "sha": "1e3e21e72987140d",
-      "date": "2026-10-17"
+      "sha": "9d84ac83b74b7729",
+      "date": "2026-10-20"
     },
     "/tools/flatbed-tarp-size/": {
       "sha": "f633ed06d6b932d1",
@@ -7088,6 +7088,10 @@
     "/tools/shower-compartment-check/": {
       "sha": "fdfbb925b7898500",
       "date": "2026-10-17"
+    },
+    "/tools/shower-pan-mortar-bed/": {
+      "sha": "5738b84034f065cd",
+      "date": "2026-10-20"
     },
     "/tools/shr/": {
       "sha": "630125cce9c6eaab",

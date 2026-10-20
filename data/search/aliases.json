@@ -117592,6 +117592,31 @@
   "term": "substrate flatness tile",
   "target": "tile-flatness-lippage-check",
   "kind": "industry"
+ },
+ {
+  "term": "shower pan mortar volume",
+  "target": "shower-pan-mortar-bed",
+  "kind": "industry"
+ },
+ {
+  "term": "pre slope deck mud how many bags",
+  "target": "shower-pan-mortar-bed",
+  "kind": "question"
+ },
+ {
+  "term": "shower floor slope 1/4 inch per foot thickness at wall",
+  "target": "shower-pan-mortar-bed",
+  "kind": "industry"
+ },
+ {
+  "term": "mud bed thickness shower pan",
+  "target": "shower-pan-mortar-bed",
+  "kind": "industry"
+ },
+ {
+  "term": "dry pack for a shower pan",
+  "target": "shower-pan-mortar-bed",
+  "kind": "industry"
  }
  ]
 }

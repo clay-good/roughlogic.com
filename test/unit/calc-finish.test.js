@@ -145,3 +145,21 @@ test("tile-flatness-lippage-check: the inch limits match the metric figures the 
   assert.ok(Math.abs(big.limit_10ft_in * 25.4 - 3) < 0.2 && Math.abs(big.limit_short_in * 25.4 - 1.6) < 0.05 && Math.abs(big.short_span_in * 25.4 - 600) < 10);
   assert.ok(Math.abs(small.limit_10ft_in * 25.4 - 6) < 0.4 && Math.abs(small.short_span_in * 25.4 - 300) < 5);
 });
+
+// spec-v1989: integrate the level-rim bed numerically instead of the (d + 2r) / 3 identity.
+import { computeShowerPanMortarBed as _pan } from "../../calc-finish.js";
+test("shower-pan-mortar-bed: a grid integration of the level-rim surface matches the volume", () => {
+  for (const [L, W, x, y, td, s] of [[5, 3, 2.5, 1.5, 0.75, 0.25], [6, 4, 1.5, 2, 1, 0.25], [4, 3, 1, 0.5, 0.75, 0.3125]]) {
+    const r = _pan({ length_ft: L, width_ft: W, drain_x_ft: x, drain_y_ft: y, drain_thickness_in: td, slope_in_per_ft: s });
+    const rim = r.rim_thickness_in, n = 400;
+    let sum = 0;
+    for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) {
+      const px = (i + 0.5) * L / n, py = (j + 0.5) * W / n;
+      // Fraction of the way from the drain to the wall along each axis; the governing facet is the largest.
+      const fx = px < x ? (x - px) / x : (px - x) / (L - x), fy = py < y ? (y - py) / y : (py - y) / (W - y);
+      sum += td + (rim - td) * Math.max(fx, fy);
+    }
+    const vol = (sum / (n * n)) * L * W / 12;
+    assert.ok(Math.abs(vol - r.volume_cuft) / r.volume_cuft < 1e-3, JSON.stringify([L, W, x, y]));
+  }
+});

@@ -1532,6 +1532,8 @@ const _TILES = [
   ["tile-layout-cut-balance", "E"],
   // spec-v1988: tile substrate flatness and lippage (calc-finish.js).
   ["tile-flatness-lippage-check", "E"],
+  // spec-v1989: shower pan mortar bed (calc-finish.js).
+  ["shower-pan-mortar-bed", "E"],
 ];
 
 

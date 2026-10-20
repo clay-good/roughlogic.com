@@ -1478,3 +1478,77 @@ FINISH_RENDERERS["tile-flatness-lippage-check"] = _simpleRenderer({
   ],
   compute: computeTileFlatnessLippageCheck,
 });
+
+// ===================== spec-v1989: shower pan mortar bed, pre-slope thickness and volume =====================
+// A pre-slope is screeded with a LEVEL perimeter and the drain low, so the bed
+// is a pyramid of planar facets, one toward each wall. The farthest wall sets
+// the rim height at the minimum pitch (IPC 2027 421.5.2: the liner pitched
+// 1/4 in per 12 in toward the drain); nearer walls are steeper. Each triangular
+// facet averages (t_drain + 2 t_rim) / 3, so the whole bed does too.
+const _spbNum = (v, what) => {
+  const ok = typeof v === "number" || (typeof v === "string" && /^\s*[+-]?(\d+\.?\d*|\.\d+)\s*$/.test(v));
+  if (!ok || !Number.isFinite(Number(v))) return { error: "The " + what + " must be a number." };
+  if (Number(v) < 0) return { error: "The " + what + " cannot be negative." };
+  return { v: Number(v) };
+};
+
+// dims: in { length_ft: L, width_ft: L, drain_x_ft: L, drain_y_ft: L, drain_thickness_in: L, slope_in_per_ft: dimensionless, bag_yield_cuft: L^3 } out: { rim_thickness_in: L, average_thickness_in: L, volume_cuft: L^3, bags: dimensionless, steepest_slope_in_per_ft: dimensionless }
+export function computeShowerPanMortarBed({ length_ft = 0, width_ft = 0, drain_x_ft = null, drain_y_ft = null, drain_thickness_in = 0.75, slope_in_per_ft = 0.25, bag_yield_cuft = 0.45 } = {}) {
+  const v = {};
+  for (const [k, x, w] of [["L", length_ft, "pan length (ft)"], ["W", width_ft, "pan width (ft)"], ["td", drain_thickness_in ?? 0.75, "bed thickness at the drain (in)"], ["s", slope_in_per_ft ?? 0.25, "slope (in per ft)"], ["y", bag_yield_cuft ?? 0.45, "bag yield (cu ft)"]]) {
+    const r = _spbNum(x, w); if (r.error) return { error: r.error }; v[k] = r.v;
+  }
+  if (!(v.L > 0) || !(v.W > 0)) return { error: "Pan length and width must be positive (ft)." };
+  if (v.L > 20 || v.W > 20) return { error: "A shower pan over 20 ft on a side is outside this calculator." };
+  // A blank drain position means centered.
+  const dxr = drain_x_ft === null || drain_x_ft === undefined || drain_x_ft === "" ? { v: v.L / 2 } : _spbNum(drain_x_ft, "drain distance along the length (ft)");
+  const dyr = drain_y_ft === null || drain_y_ft === undefined || drain_y_ft === "" ? { v: v.W / 2 } : _spbNum(drain_y_ft, "drain distance along the width (ft)");
+  if (dxr.error) return { error: dxr.error }; if (dyr.error) return { error: dyr.error };
+  const dx = dxr.v, dy = dyr.v;
+  if (dx > v.L + 1e-9 || dy > v.W + 1e-9) return { error: "The drain must be inside the pan." };
+  if (v.td < 0.5 - 1e-9) return { error: "A mortar bed under 1/2 in thick at the drain is too thin to hold together." };
+  if (v.td > 6) return { error: "A bed over 6 in thick at the drain is outside this calculator." };
+  if (v.s < 0.25 - 1e-9) return { error: "The pitch toward the drain must be at least 1/4 in per ft (IPC 2027 421.5.2)." };
+  if (v.s > 1) return { error: "A pitch over 1 in per ft is outside a shower pan." };
+  if (!(v.y > 0) || v.y > 5) return { error: "The bag yield must be above 0 and at most 5 cu ft." };
+  const walls = [["near end", dx], ["far end", v.L - dx], ["near side", dy], ["far side", v.W - dy]];
+  const a_max = Math.max(...walls.map((w) => w[1]));
+  if (!(a_max > 0)) return { error: "The pan has no area around the drain." };
+  const rim_thickness_in = v.td + v.s * a_max;
+  const rise = rim_thickness_in - v.td;
+  const facets = walls.filter((w) => w[1] > 1e-9).map(([name, a]) => ({ wall: name, distance_ft: a, slope_in_per_ft: rise / a }));
+  const steepest_slope_in_per_ft = Math.max(...facets.map((f) => f.slope_in_per_ft));
+  if (steepest_slope_in_per_ft > 2 + 1e-9) return { error: "The drain is too close to a wall for a sloped bed (a facet would pitch over 2 in per ft): move it, put it on the wall, or use a linear drain." };
+  if (rim_thickness_in > 12 + 1e-9) return { error: "The bed would be over 12 in thick at the walls: build up the subfloor or use a second drain." };
+  const average_thickness_in = (v.td + 2 * rim_thickness_in) / 3;
+  const volume_cuft = v.L * v.W * average_thickness_in / 12;
+  const bags = Math.ceil(volume_cuft / v.y - 1e-9);
+  if (![rim_thickness_in, average_thickness_in, volume_cuft, steepest_slope_in_per_ft].every(Number.isFinite)) return { error: "Mortar bed math is not a finite value." };
+  return {
+    rim_thickness_in, average_thickness_in, volume_cuft, bags, steepest_slope_in_per_ft, facets,
+    steep: steepest_slope_in_per_ft > 0.5 + 1e-9,
+    note: "The perimeter is screeded level and the drain low, so the bed is a pyramid of flat facets, one sloping to the drain from each wall. The farthest wall sets the rim at the minimum pitch, here " + v.s + " in per ft (IPC 2027 421.5.2 pitches the liner 1/4 in per 12 in toward the drain; 417.5.2 in IPC 2021), and the nearer walls run steeper: check the steepest facet against the receptor slope limit your adopted plumbing code sets, which in some codes is 1/2 in per ft, and against comfort underfoot. Each triangular facet averages (drain + 2 x rim) / 3 in thick, so the whole bed does, and the mortar is that average times the floor area. A traditional pan has a pre-slope under the liner and a top bed over it: run each bed on its own, with its own thickness at the drain. The liner turns up at least 2 in above the finished threshold (421.5.2). A bag of sand-topping or deck mud yields about 0.45 cu ft at 60 lb; use the yield printed on the bag.",
+  };
+}
+export const showerPanMortarBedExample = { inputs: { length_ft: 5, width_ft: 3, drain_x_ft: 2.5, drain_y_ft: 1.5, drain_thickness_in: 0.75, slope_in_per_ft: 0.25, bag_yield_cuft: 0.45 } };
+
+FINISH_RENDERERS["shower-pan-mortar-bed"] = _simpleRenderer({
+  citation: "Citation: IPC 2027 Section 421.5.2 (417.5.2 in IPC 2021), by name; free at codes.iccsafe.org, read 2026-10-19: shower liners pitched 1/4 in per 12 in toward the drain and turned up at least 2 in above the finished threshold. Pyramid geometry with a level perimeter: rim = drain + slope x farthest wall distance; average = (drain + 2 x rim) / 3; volume = area x average. The adopted plumbing code and the setting method govern.",
+  example: showerPanMortarBedExample.inputs,
+  fields: [
+    { key: "length_ft", label: "Pan length (ft)", kind: "number", attrs: { step: "any", min: "0" } },
+    { key: "width_ft", label: "Pan width (ft)", kind: "number", attrs: { step: "any", min: "0" } },
+    { key: "drain_x_ft", label: "Drain distance from one end wall (ft, blank = centered)", kind: "number", required: true, attrs: { step: "any", min: "0" } },
+    { key: "drain_y_ft", label: "Drain distance from one side wall (ft, blank = centered)", kind: "number", required: true, attrs: { step: "any", min: "0" } },
+    { key: "drain_thickness_in", label: "Bed thickness at the drain (in)", kind: "number", default: 0.75, attrs: { step: "any", min: "0" } },
+    { key: "slope_in_per_ft", label: "Pitch at the farthest wall (in per ft, 1/4 minimum)", kind: "number", default: 0.25, attrs: { step: "any", min: "0" } },
+    { key: "bag_yield_cuft", label: "Yield per bag (cu ft, from the bag)", kind: "number", default: 0.45, attrs: { step: "any", min: "0" } },
+  ],
+  outputs: [
+    { key: "b", id: "spb-out-b", label: "Mortar", value: (r) => fmt(r.volume_cuft, 3) + " cu ft, " + r.bags + " bag" + (r.bags === 1 ? "" : "s") },
+    { key: "r", id: "spb-out-r", label: "Thickness at the walls (level rim)", value: (r) => fmt(r.rim_thickness_in, 3) + " in; average " + fmt(r.average_thickness_in, 3) + " in" },
+    { key: "s", id: "spb-out-s", label: "Pitch of each facet", value: (r) => r.facets.map((f) => f.wall + " " + fmt(f.slope_in_per_ft, 3) + " in/ft over " + fmt(f.distance_ft, 2) + " ft").join("; ") + (r.steep ? " -- steepest over 1/2 in per ft" : "") },
+    { key: "n", id: "spb-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeShowerPanMortarBed,
+});

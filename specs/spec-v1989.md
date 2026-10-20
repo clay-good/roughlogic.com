@@ -1,6 +1,6 @@
 # roughlogic.com Specification v1989 -- Shower Pan Mortar Bed: Pre-Slope Thickness and Volume (`calc-finish.js`, Group E Carpentry and Construction, tile, 1 New Tile)
 
-> **Status: PROPOSED 2026-10-19. Single-tile spec.** Part of [scope-product-expansion](scope-product-expansion.md). In scope under the
+> **Status: LANDED 2026-10-19 (proposed 2026-10-19). Single-tile spec. As built, from the IPC 2027 text read on 2026-10-19: the shower sections are now 421 (421.5.2, liners pitched 1/4 in per 12 in toward the drain, 2 in above the finished threshold; 417.5.2 in IPC 2021), and IPC sets no 1/2 in per ft maximum, so the tile errors only under 1/4 in per ft and reports the steepest facet. The bed is modeled with a LEVEL perimeter, the usual screeding method, rather than this spec's max(|dx|, |dy|) surface, which screeds each wall at a different height: the average is (drain + 2 x rim) / 3, 1.167 in for the 5 by 3 ft example (not 1.100) and 1.75 in for the 6 by 4 ft one (not 1.524).** Part of [scope-product-expansion](scope-product-expansion.md). In scope under the
 > spec-v106 trades-only charter: Group E, the tile bench in `calc-finish.js`, with `shower-compartment-check` in the
 > plumbing module as the code-size sibling, no new dependency and no network call.
 >

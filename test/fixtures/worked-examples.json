@@ -172745,6 +172745,88 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "shower-pan-mortar-bed",
+  "source_publisher": "Project (first-principles)",
+  "source_title": "spec-v1989 worked example, recomputed with a level perimeter",
+  "source_edition_or_year": "2026",
+  "source_section_or_page": "5 x 3 ft, centered drain, 0.75 in at the drain, 1/4 in per ft: rim 0.75 + 0.25 x 2.5 = 1.375 in; average (0.75 + 2 x 1.375) / 3 = 1.1667 in; V = 15 x 1.1667 / 12 = 1.4583 cu ft; ceil(3.24) = 4 bags. The spec's 1.100 in average assumed walls screeded at different heights.",
+  "verified_by": "rl",
+  "verified_on": "2026-10-19",
+  "inputs": {
+   "length_ft": 5,
+   "width_ft": 3,
+   "drain_x_ft": 2.5,
+   "drain_y_ft": 1.5,
+   "drain_thickness_in": 0.75,
+   "slope_in_per_ft": 0.25,
+   "bag_yield_cuft": 0.45
+  },
+  "outputs": {
+   "rim_thickness_in": {
+    "value": 1.375,
+    "tolerance": {
+     "abs": 1e-9
+    }
+   },
+   "average_thickness_in": {
+    "value": 1.166667,
+    "tolerance": {
+     "pct": 0.01
+    }
+   },
+   "volume_cuft": {
+    "value": 1.458333,
+    "tolerance": {
+     "pct": 0.01
+    }
+   },
+   "bags": {
+    "value": 4,
+    "tolerance": {
+     "abs": 0
+    }
+   }
+  }
+ },
+ {
+  "tile_id": "shower-pan-mortar-bed",
+  "source_publisher": "Project (first-principles)",
+  "source_title": "spec-v1989 second example, recomputed with a level perimeter",
+  "source_edition_or_year": "2026",
+  "source_section_or_page": "6 x 4 ft, drain 1.5 ft from one end and 2 ft from a side, 1 in at the drain: rim 1 + 0.25 x 4.5 = 2.125 in; average 1.75 in; V = 3.5 cu ft; 8 bags; steepest facet 1.125 / 1.5 = 0.75 in per ft.",
+  "verified_by": "rl",
+  "verified_on": "2026-10-19",
+  "inputs": {
+   "length_ft": 6,
+   "width_ft": 4,
+   "drain_x_ft": 1.5,
+   "drain_y_ft": 2,
+   "drain_thickness_in": 1,
+   "slope_in_per_ft": 0.25,
+   "bag_yield_cuft": 0.45
+  },
+  "outputs": {
+   "rim_thickness_in": {
+    "value": 2.125,
+    "tolerance": {
+     "abs": 1e-9
+    }
+   },
+   "volume_cuft": {
+    "value": 3.5,
+    "tolerance": {
+     "abs": 1e-9
+    }
+   },
+   "steepest_slope_in_per_ft": {
+    "value": 0.75,
+    "tolerance": {
+     "abs": 1e-9
+    }
+   }
+  }
  }
  ]
 }

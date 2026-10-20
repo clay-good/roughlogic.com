@@ -2387,6 +2387,7 @@ export const COMPUTE_MAP = {
   "foundation-grade-slope-check": { module: "../../calc-construction.js", fn: "computeFoundationGradeSlopeCheck" },
   "tile-layout-cut-balance": { module: "../../calc-finish.js", fn: "computeTileLayoutCutBalance" },
   "tile-flatness-lippage-check": { module: "../../calc-finish.js", fn: "computeTileFlatnessLippageCheck" },
+  "shower-pan-mortar-bed": { module: "../../calc-finish.js", fn: "computeShowerPanMortarBed" },
 };
 
 // Resolve a COMPUTE_MAP module path (relative to this file) and import it.

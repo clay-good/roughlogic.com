@@ -62408,3 +62408,19 @@ test("bounds: spec-v1988 computeTileFlatnessLippageCheck pins the 15 in step, th
     assert.ok("error" in _tfl(bad), JSON.stringify(bad));
   }
 });
+
+// spec-v1989: level-rim pyramid pre-slope (IPC 2027 421.5.2 liner pitch, read 2026-10-19).
+import { computeShowerPanMortarBed as _spb } from "../../calc-finish.js";
+test("bounds: spec-v1989 computeShowerPanMortarBed pins the rim, the (d + 2r) / 3 average, the bag rounding, the facet pitches and the error seams", () => {
+  const r = _spb({ length_ft: 5, width_ft: 3, drain_x_ft: 2.5, drain_y_ft: 1.5, drain_thickness_in: 0.75 });
+  assert.equal(r.rim_thickness_in, 1.375); assert.ok(Math.abs(r.average_thickness_in - 3.5 / 3) < 1e-12); assert.equal(r.bags, 4);
+  assert.deepEqual(_spb({ length_ft: 5, width_ft: 3, drain_thickness_in: 0.75 }).rim_thickness_in, 1.375, "blank drain position is centered");
+  const off = _spb({ length_ft: 6, width_ft: 4, drain_x_ft: 1.5, drain_y_ft: 2, drain_thickness_in: 1 });
+  assert.equal(off.steepest_slope_in_per_ft, 0.75); assert.equal(off.steep, true); assert.equal(off.volume_cuft, 3.5);
+  const v4 = _spb({ length_ft: 4, width_ft: 4, drain_thickness_in: 1 }).volume_cuft; // 16 x (4/3) / 12
+  assert.equal(_spb({ length_ft: 4, width_ft: 4, drain_thickness_in: 1, bag_yield_cuft: v4 / 2 }).bags, 2, "an exact two bags is two, not three");
+  assert.equal(_spb({ length_ft: 5, width_ft: 3, drain_x_ft: 0, drain_y_ft: 1.5 }).facets.length, 3, "a drain on a wall has no facet toward that wall");
+  for (const bad of [{ length_ft: 0, width_ft: 3 }, { length_ft: 5, width_ft: 3, drain_x_ft: 6 }, { length_ft: 5, width_ft: 3, drain_thickness_in: 0.4 }, { length_ft: 5, width_ft: 3, slope_in_per_ft: 0.2 }, { length_ft: 5, width_ft: 3, bag_yield_cuft: 0 }, { length_ft: 5, width_ft: 3, drain_y_ft: -1 }, { length_ft: "x", width_ft: 3 }, { length_ft: 50, width_ft: 3 }, { length_ft: 5, width_ft: 3, drain_x_ft: 0.01 }, { length_ft: 20, width_ft: 20, drain_x_ft: 0, drain_y_ft: 0, drain_thickness_in: 6, slope_in_per_ft: 1 }]) {
+    assert.ok("error" in _spb(bad), JSON.stringify(bad));
+  }
+});

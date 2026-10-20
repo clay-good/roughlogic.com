@@ -26803,6 +26803,17 @@ export const CITATIONS = {
       { name: "Warpage entered", value: "the tile's allowable warpage under ANSI A137.1, from its data sheet", source: "stated assumption" },
     ],
   },
+  "shower-pan-mortar-bed": {
+    formula: "rim thickness = drain thickness + pitch x the largest drain-to-wall distance (level perimeter); facet pitch toward each wall = (rim - drain) / that wall's distance; average thickness = (drain + 2 x rim) / 3; volume = length x width x average / 12; bags = ceil(volume / yield).",
+    edition: IPC_2027 + " Section 421.5.2 (Section 417.5.2 in IPC 2021), read at codes.iccsafe.org on 2026-10-19: liners pitched 1/4 unit vertical in 12 units horizontal toward the drain and turned up not less than 2 in above the finished threshold. IPC 2027 sets no maximum shower-floor slope.",
+    freeAccess: "Free to read at codes.iccsafe.org.",
+    governance: GOVERNANCE.plumbing,
+    editionNote: "The level-perimeter pyramid is the usual screeding method: the rim is set level at the height the farthest wall needs, so each facet pitches toward the drain at (rim - drain) / its own distance, the farthest at the minimum and the nearest steepest. A triangle whose apex is at the drain thickness and whose base edge is at the rim thickness averages (drain + 2 x rim) / 3, whatever its shape, so the bed's average does not depend on where the drain sits, only the rim does. IPC 2027 421.5.2 states the 1/4 in per ft liner pitch and no upper limit; other plumbing codes may cap the receptor slope, so the steepest facet is reported for the reader to check.",
+    assumptions: [
+      { name: "Level perimeter", value: "the rim is screeded level and each facet is planar from the drain to its wall", source: "pre-slope screeding practice" },
+      { name: "Bag yield entered", value: "about 0.45 cu ft per 60 lb bag of sand topping or deck mud; use the bag's printed yield", source: "manufacturer data" },
+    ],
+  },
 };
 
 // --- Reference block and copy text ---
