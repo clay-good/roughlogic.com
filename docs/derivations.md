@@ -2873,6 +2873,7 @@ cross-check.
 | calc-masonry.js | `computeCmuWallFlexure` | `{ fm_psi = 2000, as_in2 = 0, d_in = 0, b_in = 12, fs_psi = 32000 } = {}` | _ | _ | _ |
 | calc-masonry.js | `computeFireplaceFlueArea` | `{ opening_width_in = 0, opening_height_in = 0, flue_shape = "rectangular", fl...` | _ | _ | _ |
 | calc-masonry.js | `computeGroutLiftPourHeight` | `{ pour_height_ft = 0, lift_height_ft = 0, max_pour_height_ft = 0, max_lift_he...` | _ | _ | _ |
+| calc-masonry.js | `computeHearthExtensionCheck` | `{ opening_width_in = 0, opening_height_in = 0, front_in = null, side_in = nul...` | _ | _ | _ |
 | calc-masonry.js | `computeMasonryAnchorBolt` | `{ fm_psi = 1500, lbe_in = 0, ab_in2 = 0, fy_psi = 36000 } = {}` | _ | _ | _ |
 | calc-masonry.js | `computeMasonryAnchorEmbedment` | `{ required_tension_lb = 0, fm_psi = 1500, ab_in2 = 0.334, fy_psi = 36000 } = {}` | _ | _ | _ |
 | calc-masonry.js | `computeMasonryAnchorShear` | `{ fm_psi = 1500, lb_in = 5, lbe_in = 4, ab_in2 = 0.334, fy_psi = 36000 } = {}` | _ | _ | _ |
@@ -3943,7 +3944,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2527.
+Row count: 2528.
 
 <!-- END function-corpus-v14 -->
 
@@ -4731,7 +4732,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-extraction-rate` | Water Extraction Volume, Time, and Waste-Tank Dumps | Project (first-principles); standing + absorbed; wand time = total / gpm | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+4 more) |
 
-### Group E Construction (632 tiles)
+### Group E Construction (633 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4980,6 +4981,7 @@ per spec-v14 §13.1 second paragraph.
 | `hdd-fluid-volume` | HDD Drilling Fluid Volume, Bentonite, and Spoil | Project (first-principles); the mud engineer and the disposal jurisdiction govern; re... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `hdd-pullback` | HDD Pullback Force First-Order Estimate | Simplified HDD pullback identity (AST...; pullback = 0.3*5*800*1.5 = 1,800 lb; utilization = 1800/2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `header-sizing` | Window / Door Header Sizing (IRC R602.7) | IRC / AWC NDS; w = (snow + 15 dead) x trib = 45 x 14 = 630 plf; double 2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `hearth-extension-check` | Hearth Extension Size and Thickness (IRC R1001.10, R1001.9.2) | ICC; 36 x 30 in = 7.5 sq ft, 6 sq ft or more: 20 in in front, ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `helical-pile` | Helical Pile Torque-to-Capacity | Project (first-principles) over IBC s...; 1.5 in solid square shaft / 5000 ft-lb torque / FOS 2.0 -... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+6 more) |
 | `helical-pile-torque` | Helical Pile Acceptance Torque for a Target Capacity | IBC sec. 1810.3.3.1.9 helical-pile to...; 1.5 in solid shaft (Kt 10), 25,000 lb allowable at FOS 2 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `highwall-bench-geometry` | Highwall Bench Width and Overall Slope Angle | Project (first-principles); geometry only; a qualified geotechnical engineer governs ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+5 more) |
@@ -6389,6 +6391,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 
-Tile count: 2273. Fixture-covered or reference-cadence: 2273 / 2273.
+Tile count: 2274. Fixture-covered or reference-cadence: 2274 / 2274.
 
 <!-- END tile-index-v14 -->

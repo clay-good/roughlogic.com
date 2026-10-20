@@ -2277,4 +2277,5 @@ export const TOOLS = [
   {"id":"conduit-concentric-bend","name":"Concentric Conduit Bend Radii and Lengths","group":"A","trades":["electrical"],"desc":"The radius, arc length, mark spacing and extra stock for each conduit in a rack bent concentrically around one corner.","more":1},
   {"id":"bath-exhaust-fan-sizing","name":"Bathroom and Kitchen Exhaust Fan Sizing","group":"C","trades":["hvac","electrical"],"desc":"What size bath fan a bathroom needs, and the code floor for a kitchen.","more":1},
   {"id":"safety-glazing-check","name":"Safety Glazing Hazardous Location Check (IRC R324.4)","group":"E","trades":["glazing","carpentry","construction"],"desc":"Whether a lite of glass is in a hazardous location and so must be safety glazing, by the seven locations of IRC 2024 R324.4 (R308.4 in IRC 2021, the same criteria).","more":1},
+  {"id":"hearth-extension-check","name":"Hearth Extension Size and Thickness (IRC R1001.10, R1001.9.2)","group":"E","trades":["masonry"],"desc":"How far a masonry fireplace's hearth extension must reach and how thick it must be, checked against what was built.","more":1},
 ];

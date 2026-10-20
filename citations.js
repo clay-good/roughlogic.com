@@ -26725,6 +26725,17 @@ export const CITATIONS = {
       { name: "Residential code only", value: "the IBC Section 2406.4 locations are not checked here", source: "stated scope" },
     ],
   },
+  "hearth-extension-check": {
+    formula: "opening area = width x height / 144 (sq ft); area < 6 sq ft: front >= 16 in, each side >= 8 in; area >= 6 sq ft: front >= 20 in, each side >= 12 in; footprint = (width + 2 x side) by front; thickness >= 2 in, or >= 3/8 in where the firebox opening bottom is raised >= 8 in above the extension.",
+    edition: IRC_2024 + " Sections R1001.10 and R1001.9.2 (the same sections and values in IRC 2021), both read at codes.iccsafe.org on 2026-10-19.",
+    freeAccess: "Free to read at codes.iccsafe.org.",
+    governance: GOVERNANCE.structural,
+    editionNote: "R1001.10: hearth extensions extend not less than 16 in in front of and not less than 8 in beyond each side of the fireplace opening; where the opening is 6 sq ft or larger, not less than 20 in and 12 in. R1001.9.2: hearth extensions are at least 2 in thick; where the bottom of the firebox opening is raised not less than 8 in above the top of the extension, 3/8 in brick, concrete, stone, tile or other approved noncombustible material is permitted. R1001.9.1 (not checked here) makes the hearth itself 4 in thick. IRC 2027 is expected in early 2027; verify the edition adopted by your AHJ.",
+    assumptions: [
+      { name: "Rectangular opening", value: "area = width x height; for an arched opening keep the true width and enter the height that gives its actual area", source: "stated assumption" },
+      { name: "Masonry fireplace", value: "factory-built fireplaces follow their listing (R1004)", source: "IRC R1004" },
+    ],
+  },
 };
 
 // --- Reference block and copy text ---

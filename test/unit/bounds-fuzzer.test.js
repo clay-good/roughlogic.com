@@ -62280,3 +62280,23 @@ test("bounds: spec-v1982 computeSafetyGlazingCheck pins each location's threshol
     assert.ok("error" in _sgc(bad), JSON.stringify(bad));
   }
 });
+
+// spec-v1983: IRC 2024 R1001.10 / R1001.9.2 hearth extension (read 2026-10-19).
+import { computeHearthExtensionCheck as _hec } from "../../calc-masonry.js";
+test("bounds: spec-v1983 computeHearthExtensionCheck pins the 6 sq ft step, the 8 in raise exception, the skipped checks and the error seams", () => {
+  const r = _hec({ opening_width_in: 36, opening_height_in: 30, front_in: 18, side_in: 12, thickness_in: 2 });
+  assert.equal(r.req_front_in, 20); assert.equal(r.req_side_in, 12); assert.equal(r.footprint_width_in, 60);
+  assert.equal(r.front_ok, false); assert.equal(r.side_ok, true); assert.equal(r.thickness_ok, true);
+  // Exactly 6 sq ft takes the larger hearth; just under does not.
+  assert.equal(_hec({ opening_width_in: 36, opening_height_in: 24 }).req_front_in, 20);
+  assert.equal(_hec({ opening_width_in: 36, opening_height_in: 23.99 }).req_front_in, 16);
+  assert.equal(_hec({ opening_width_in: 30, opening_height_in: 24 }).footprint_width_in, 46);
+  assert.equal(_hec({ opening_width_in: 30, opening_height_in: 24, firebox_raise_in: 8 }).req_thickness_in, 0.375);
+  assert.equal(_hec({ opening_width_in: 30, opening_height_in: 24, firebox_raise_in: 7.99 }).req_thickness_in, 2);
+  const none = _hec({ opening_width_in: 30, opening_height_in: 24 });
+  assert.equal(none.front_ok, null); assert.equal(none.side_ok, null); assert.equal(none.thickness_ok, null);
+  assert.equal(_hec({ opening_width_in: 30, opening_height_in: 24, front_in: 0 }).front_ok, false, "a measured 0 is a fail, not a skip");
+  for (const bad of [{ opening_width_in: 0, opening_height_in: 24 }, { opening_width_in: 30, opening_height_in: -1 }, { opening_width_in: 30, opening_height_in: 24, front_in: -2 }, { opening_width_in: 30, opening_height_in: 24, thickness_in: "x" }, { opening_width_in: 30, opening_height_in: 24, firebox_raise_in: -1 }, { opening_width_in: 300, opening_height_in: 24 }, { opening_width_in: Infinity, opening_height_in: 24 }]) {
+    assert.ok("error" in _hec(bad), JSON.stringify(bad));
+  }
+});

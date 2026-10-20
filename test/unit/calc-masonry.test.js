@@ -60,3 +60,15 @@ test("masonry cleaning: site water is the mix water plus the per-area prewet and
     within(r2.concentrate_pct, r.concentrate_pct, 1e-9, "strength independent of area");
   }
 });
+
+// spec-v1983: the hearth extension minimums, swept across opening sizes against the R1001.10 text.
+import { computeHearthExtensionCheck as _hearth } from "../../calc-masonry.js";
+test("hearth-extension-check: every opening from 12 to 60 in wide and 12 to 48 in tall gets the R1001.10 front and side for its area", () => {
+  for (let w = 12; w <= 60; w += 2) for (let h = 12; h <= 48; h += 2) {
+    const r = _hearth({ opening_width_in: w, opening_height_in: h });
+    const big = w * h >= 864; // 6 sq ft = 864 sq in, worked in square inches
+    assert.equal(r.req_front_in, big ? 20 : 16);
+    assert.equal(r.req_side_in, big ? 12 : 8);
+    assert.equal(r.footprint_width_in, w + (big ? 24 : 16));
+  }
+});

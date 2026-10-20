@@ -1519,6 +1519,8 @@ const _TILES = [
   ["bath-exhaust-fan-sizing", "C"],
   // spec-v1982: safety glazing hazardous location check (calc-construction.js).
   ["safety-glazing-check", "E"],
+  // spec-v1983: hearth extension size and thickness (calc-masonry.js).
+  ["hearth-extension-check", "E"],
 ];
 
 

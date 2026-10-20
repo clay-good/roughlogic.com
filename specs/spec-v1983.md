@@ -1,6 +1,6 @@
 # roughlogic.com Specification v1983 -- Hearth Extension Size and Thickness (IRC R1001.9, R1001.10) (`calc-masonry.js`, Group E Carpentry and Construction, masonry, 1 New Tile)
 
-> **Status: PROPOSED 2026-10-19. Single-tile spec.** Part of [scope-product-expansion](scope-product-expansion.md). In scope under the
+> **Status: LANDED 2026-10-19 (proposed 2026-10-19). Single-tile spec. As built from the IRC 2024 and IRC 2021 text read on 2026-10-19: the extension thickness rule is R1001.9.2 (this spec names R1001.9.1, which is the 4 in hearth); the values are as written here. Measured dimensions left blank are skipped rather than failed.** Part of [scope-product-expansion](scope-product-expansion.md). In scope under the
 > spec-v106 trades-only charter: Group E, the masonry fireplace bench in `calc-masonry.js` beside
 > `fireplace-flue-area`, no new dependency and no network call.
 >

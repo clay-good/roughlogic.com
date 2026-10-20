@@ -117417,6 +117417,31 @@
   "term": "tempered glass near tub or shower 60 inches",
   "target": "safety-glazing-check",
   "kind": "industry"
+ },
+ {
+  "term": "hearth extension size",
+  "target": "hearth-extension-check",
+  "kind": "industry"
+ },
+ {
+  "term": "how far does the hearth extend in front of the fireplace",
+  "target": "hearth-extension-check",
+  "kind": "question"
+ },
+ {
+  "term": "16 inch or 20 inch hearth",
+  "target": "hearth-extension-check",
+  "kind": "industry"
+ },
+ {
+  "term": "hearth extension 6 square feet rule",
+  "target": "hearth-extension-check",
+  "kind": "industry"
+ },
+ {
+  "term": "R1001.10 hearth",
+  "target": "hearth-extension-check",
+  "kind": "industry"
  }
  ]
 }

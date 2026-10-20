@@ -2,11 +2,11 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "b588a50c48bfa7cc",
+      "sha": "aa266e1014a960b1",
       "date": "2026-10-20"
     },
     "/tools/": {
-      "sha": "b62900e41aa7b031",
+      "sha": "6891d565cd2d8d44",
       "date": "2026-10-20"
     },
     "/errata/": {
@@ -14,91 +14,91 @@
       "date": "2026-10-18"
     },
     "/collections/disaster-response/": {
-      "sha": "b22569d09aab0f55",
+      "sha": "1adaf307704596cb",
       "date": "2026-10-20"
     },
     "/groups/accounting/": {
-      "sha": "b442d02cd96f6aa2",
+      "sha": "2df97e4ed2e68adb",
       "date": "2026-10-20"
     },
     "/groups/agriculture/": {
-      "sha": "91715a947c048331",
+      "sha": "0763ae9e0379d191",
       "date": "2026-10-20"
     },
     "/groups/construction/": {
-      "sha": "5cc11efbc46f1ddf",
+      "sha": "749fe8ae23d37b53",
       "date": "2026-10-20"
     },
     "/groups/cross-trade/": {
-      "sha": "b09cbfa6c5b459d1",
+      "sha": "4c54eca1b52a58f7",
       "date": "2026-10-20"
     },
     "/groups/educators/": {
-      "sha": "4fba6e33fba54808",
+      "sha": "3ded3eae68b1cd57",
       "date": "2026-10-20"
     },
     "/groups/electrical/": {
-      "sha": "4f69c4c141d0e9a7",
+      "sha": "71570607b46dd7cd",
       "date": "2026-10-20"
     },
     "/groups/field/": {
-      "sha": "2f0f69a00772eac8",
+      "sha": "1c8f159b09e13ba5",
       "date": "2026-10-20"
     },
     "/groups/fire-ground/": {
-      "sha": "6834165acca2485b",
+      "sha": "b3b9601d14341432",
       "date": "2026-10-20"
     },
     "/groups/historical/": {
-      "sha": "bb3016cd4d2a1418",
+      "sha": "ab01568cec987cc1",
       "date": "2026-10-20"
     },
     "/groups/hvac/": {
-      "sha": "2890de8b9ae68783",
+      "sha": "6d9f89fb90bfa4fa",
       "date": "2026-10-20"
     },
     "/groups/kitchen/": {
-      "sha": "6d2c4f092c7b4023",
+      "sha": "f77befa0098dcb1e",
       "date": "2026-10-20"
     },
     "/groups/lab/": {
-      "sha": "1c561d0b8f83ce67",
+      "sha": "c499506813459b10",
       "date": "2026-10-20"
     },
     "/groups/mechanic/": {
-      "sha": "87e6b827f692f3f4",
+      "sha": "550e49af1c11cfe3",
       "date": "2026-10-20"
     },
     "/groups/plumbing/": {
-      "sha": "1a0ac7c9132fc712",
+      "sha": "8f7a909848a8329f",
       "date": "2026-10-20"
     },
     "/groups/real-estate/": {
-      "sha": "0f39be739602482b",
+      "sha": "2b462f9eab35878c",
       "date": "2026-10-20"
     },
     "/groups/references/": {
-      "sha": "c1654afd26b34e4a",
+      "sha": "9358abe1a78630f4",
       "date": "2026-10-20"
     },
     "/groups/restoration/": {
-      "sha": "d0498ec7ca3e3b4c",
+      "sha": "c117e91dcbb973d9",
       "date": "2026-10-20"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "c55f05a4bbc6d677",
+      "sha": "5a14c189507ab993",
       "date": "2026-10-20"
     },
     "/groups/stage/": {
-      "sha": "03c98999c9e85db2",
+      "sha": "601e64aeac1153e8",
       "date": "2026-10-20"
     },
     "/groups/trucking/": {
-      "sha": "28d25d40ab5236c3",
+      "sha": "cf58c49d26eccc15",
       "date": "2026-10-20"
     },
     "/groups/water/": {
-      "sha": "44374633027621a3",
+      "sha": "3666cd4c47f53600",
       "date": "2026-10-20"
     },
     "/tools/aav-install-check/": {
@@ -3034,8 +3034,8 @@
       "date": "2026-10-17"
     },
     "/tools/fireplace-flue-area/": {
-      "sha": "b2c26f1c9ef9fb48",
-      "date": "2026-10-17"
+      "sha": "ee481fb9a32759df",
+      "date": "2026-10-20"
     },
     "/tools/firewood-cord/": {
       "sha": "1517c9168d58d96d",
@@ -3760,6 +3760,10 @@
     "/tools/hearing-protector-nrr/": {
       "sha": "90b89d5abf613150",
       "date": "2026-10-17"
+    },
+    "/tools/hearth-extension-check/": {
+      "sha": "8a2a974b32f07472",
+      "date": "2026-10-20"
     },
     "/tools/heat-pump-cold-capacity/": {
       "sha": "9fc881ef69971a3b",
@@ -4662,8 +4666,8 @@
       "date": "2026-10-17"
     },
     "/tools/masonry-joint-reinforcement/": {
-      "sha": "c0058f95909b382e",
-      "date": "2026-10-17"
+      "sha": "2cd27385f4393f34",
+      "date": "2026-10-20"
     },
     "/tools/masonry-limited-access-zone/": {
       "sha": "035fc7a7a1ea72b3",

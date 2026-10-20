@@ -213,6 +213,8 @@ test("no description body calls a calculator a tile or a sibling", () => {
     "adpi-diffuser-selection",
     // Floor covering under a rated door: carpet or ceramic tile, the material.
     "fire-door-clearance",
+    // A 3/8 in hearth extension of brick, stone or tile: the material.
+    "hearth-extension-check",
   ]);
   const offenders = TOOLS
     .filter((t) => !exempt.has(t.id) && jargon.test(restOfDescription(t.desc)))

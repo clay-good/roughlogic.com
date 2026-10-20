@@ -1129,3 +1129,82 @@ MASONRY_RENDERERS["masonry-cleaning-dilution"] = _simpleRenderer({
   ],
   compute: computeMasonryCleaningDilution,
 });
+
+// ===================== spec-v1983: hearth extension size and thickness =====================
+// IRC 2024 R1001.10 and R1001.9.2 (same numbers in IRC 2021; both read 2026-10-19).
+// The extension in front of a masonry fireplace is sized by the opening it faces:
+// under 6 sq ft, 16 in in front and 8 in past each side; 6 sq ft or more, 20 and 12.
+// It is 2 in thick unless the firebox bottom sits 8 in or more above it (3/8 in).
+const _hecIn = (x) => String(Number(x.toFixed(4)));
+// Blank (or whitespace) is "not measured"; only a number or a numeric string counts.
+const _hecOpt = (v, what) => {
+  const blank = v === null || v === undefined || (typeof v === "string" && v.trim() === "");
+  const ok = typeof v === "number" || (typeof v === "string" && /^\s*[+-]?(\d+\.?\d*|\.\d+)\s*$/.test(v));
+  return blank ? { v: null } : !ok || !Number.isFinite(Number(v)) ? { error: what + " must be a number (in)." }
+    : Number(v) < 0 ? { error: what + " cannot be negative (in)." } : { v: Number(v) };
+};
+
+// dims: in { opening_width_in: L, opening_height_in: L, front_in: L, side_in: L, thickness_in: L, firebox_raise_in: L } out: { opening_area_sqft: L^2, req_front_in: L, req_side_in: L, footprint_width_in: L, req_thickness_in: L }
+export function computeHearthExtensionCheck({
+  opening_width_in = 0, opening_height_in = 0, front_in = null, side_in = null, thickness_in = null, firebox_raise_in = 0,
+} = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const Wp = _hecOpt(opening_width_in, "The opening width"), Hp = _hecOpt(opening_height_in, "The opening height");
+  if (Wp.error) return { error: Wp.error }; if (Hp.error) return { error: Hp.error };
+  const W = Wp.v, H = Hp.v;
+  if (!(W > 0) || !(H > 0)) return { error: "Fireplace opening width and height must be positive (in)." };
+  if (W > 240 || H > 120) return { error: "An opening wider than 240 in or taller than 120 in is outside a residential masonry fireplace." };
+  const F = _hecOpt(front_in, "The measured extension in front"); if (F.error) return { error: F.error };
+  const S = _hecOpt(side_in, "The measured extension beyond each side"); if (S.error) return { error: S.error };
+  const T = _hecOpt(thickness_in, "The measured thickness"); if (T.error) return { error: T.error };
+  const R = _hecOpt(firebox_raise_in, "The firebox bottom height"); if (R.error) return { error: R.error };
+  const raise = R.v === null ? 0 : R.v;
+  const opening_area_sqft = W * H / 144;
+  const large = opening_area_sqft >= 6 - 1e-9;
+  const req_front_in = large ? 20 : 16;
+  const req_side_in = large ? 12 : 8;
+  const footprint_width_in = W + 2 * req_side_in;
+  const raised = raise >= 8 - 1e-9;
+  const req_thickness_in = raised ? 0.375 : 2;
+  const front_ok = F.v === null ? null : F.v >= req_front_in - 1e-9;
+  const side_ok = S.v === null ? null : S.v >= req_side_in - 1e-9;
+  const thickness_ok = T.v === null ? null : T.v >= req_thickness_in - 1e-9;
+  const checks = [
+    ["front", front_ok, F.v, req_front_in], ["each side", side_ok, S.v, req_side_in], ["thickness", thickness_ok, T.v, req_thickness_in],
+  ].filter((c) => c[1] !== null);
+  const fails = checks.filter((c) => !c[1]);
+  const rule_text = " (opening " + fmt(opening_area_sqft, 2) + " sq ft, " + (large ? "6 sq ft or more" : "under 6 sq ft") + "; firebox " + (raised ? "raised 8 in or more" : "not raised 8 in") + ")";
+  const verdict = !checks.length
+    ? "(no measured extension entered: build it at least " + req_front_in + " in in front, " + req_side_in + " in past each side and " + (raised ? "3/8" : "2") + " in thick)"
+    : fails.length
+      ? "FAILS: " + fails.map((c) => c[0] + " " + _hecIn(c[2]) + " in, " + (Number((c[3] - c[2]).toFixed(4)) > 0 ? _hecIn(c[3] - c[2]) + " in short of " : "under ") + _hecIn(c[3]) + " in").join("; ") + rule_text
+      : "PASSES " + checks.map((c) => c[0]).join(", ") + (checks.length < 3 ? " (the dimensions not entered are not checked)" : "");
+  if (![opening_area_sqft, footprint_width_in].every(Number.isFinite)) return { error: "Hearth math is not a finite value." };
+  return {
+    opening_area_sqft, large, req_front_in, req_side_in, footprint_width_in, footprint_depth_in: req_front_in, req_thickness_in, raised,
+    front_ok, side_ok, thickness_ok, verdict,
+    note: "IRC 2024 R1001.10: a hearth extension reaches not less than 16 in in front of and 8 in beyond each side of the fireplace opening, and 20 in and 12 in where the opening is 6 sq ft or larger. R1001.9.2: it is at least 2 in thick, except that where the bottom of the firebox opening is raised not less than 8 in above the top of the extension, 3/8 in of brick, concrete, stone, tile or other approved noncombustible material is permitted. The opening area is width x height; for an arched opening keep the true width and enter the height that gives its actual area (area in sq in / width). The same numbers stand in IRC 2021. The hearth under the firebox (4 in, R1001.9.1), the extension's support, clearance to combustibles and factory-built fireplaces (their listing, R1004) are separate checks.",
+  };
+}
+export const hearthExtensionCheckExample = { inputs: { opening_width_in: 36, opening_height_in: 30, front_in: 18, side_in: 12, thickness_in: 2, firebox_raise_in: 0 } };
+
+MASONRY_RENDERERS["hearth-extension-check"] = _simpleRenderer({
+  citation: "Citation: IRC 2024 R1001.10 and R1001.9.2 (the same sections and numbers in IRC 2021), by name; free at codes.iccsafe.org, read 2026-10-19. Opening under 6 sq ft: 16 in in front and 8 in past each side; 6 sq ft or more: 20 in and 12 in. Extension at least 2 in thick, or 3/8 in where the firebox bottom is raised 8 in or more above it. The adopted code and the AHJ govern.",
+  example: hearthExtensionCheckExample.inputs,
+  fields: [
+    { key: "opening_width_in", label: "Fireplace opening width (in)", kind: "number", attrs: { step: "any", min: "0" } },
+    { key: "opening_height_in", label: "Fireplace opening height (in)", kind: "number", attrs: { step: "any", min: "0" } },
+    { key: "front_in", label: "Measured extension in front of the opening (in, blank to skip)", kind: "number", required: true, attrs: { step: "any", min: "0" } },
+    { key: "side_in", label: "Measured extension beyond each side (in, the smaller side; blank to skip)", kind: "number", required: true, attrs: { step: "any", min: "0" } },
+    { key: "thickness_in", label: "Measured extension thickness (in, blank to skip)", kind: "number", required: true, attrs: { step: "any", min: "0" } },
+    { key: "firebox_raise_in", label: "Firebox opening bottom above the extension (in)", kind: "number", attrs: { step: "any", min: "0" } },
+  ],
+  outputs: [
+    { key: "a", id: "hec-out-a", label: "Opening area", value: (r) => fmt(r.opening_area_sqft, 2) + " sq ft (" + (r.large ? "6 sq ft or more" : "under 6 sq ft") + ")" },
+    { key: "q", id: "hec-out-q", label: "Required extension", value: (r) => r.req_front_in + " in in front, " + r.req_side_in + " in past each side: at least " + fmt(r.footprint_width_in, 1) + " by " + r.footprint_depth_in + " in" },
+    { key: "t", id: "hec-out-t", label: "Required thickness", value: (r) => (r.raised ? "3/8 in (firebox bottom raised 8 in or more)" : "2 in") },
+    { key: "v", id: "hec-out-v", label: "Check", value: (r) => r.verdict },
+    { key: "n", id: "hec-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeHearthExtensionCheck,
+});

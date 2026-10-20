@@ -172250,6 +172250,98 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "hearth-extension-check",
+  "source_publisher": "ICC",
+  "source_title": "International Residential Code 2024, Sections R1001.10 and R1001.9.2, applied to the spec-v1983 fireplace",
+  "source_edition_or_year": "IRC 2024 (codes.iccsafe.org, read 2026-10-19)",
+  "source_section_or_page": "36 x 30 in = 7.5 sq ft, 6 sq ft or more: 20 in in front, 12 in each side, footprint 60 x 20 in; 2 in thick (firebox bottom flush).",
+  "verified_by": "rl",
+  "verified_on": "2026-10-19",
+  "inputs": {
+   "opening_width_in": 36,
+   "opening_height_in": 30,
+   "front_in": 18,
+   "side_in": 12,
+   "thickness_in": 2,
+   "firebox_raise_in": 0
+  },
+  "outputs": {
+   "opening_area_sqft": {
+    "value": 7.5,
+    "tolerance": {
+     "abs": 1e-9
+    }
+   },
+   "req_front_in": {
+    "value": 20,
+    "tolerance": {
+     "abs": 0
+    }
+   },
+   "req_side_in": {
+    "value": 12,
+    "tolerance": {
+     "abs": 0
+    }
+   },
+   "footprint_width_in": {
+    "value": 60,
+    "tolerance": {
+     "abs": 1e-9
+    }
+   },
+   "req_thickness_in": {
+    "value": 2,
+    "tolerance": {
+     "abs": 0
+    }
+   }
+  }
+ },
+ {
+  "tile_id": "hearth-extension-check",
+  "source_publisher": "ICC",
+  "source_title": "International Residential Code 2024, Sections R1001.10 and R1001.9.2",
+  "source_edition_or_year": "IRC 2024 (codes.iccsafe.org, read 2026-10-19)",
+  "source_section_or_page": "30 x 24 in = 5.0 sq ft, under 6 sq ft: 16 in in front, 8 in each side, footprint 46 x 16 in; firebox raised 8 in: 3/8 in extension permitted.",
+  "verified_by": "rl",
+  "verified_on": "2026-10-19",
+  "inputs": {
+   "opening_width_in": 30,
+   "opening_height_in": 24,
+   "front_in": 16,
+   "side_in": 8,
+   "thickness_in": 0.375,
+   "firebox_raise_in": 8
+  },
+  "outputs": {
+   "req_front_in": {
+    "value": 16,
+    "tolerance": {
+     "abs": 0
+    }
+   },
+   "req_side_in": {
+    "value": 8,
+    "tolerance": {
+     "abs": 0
+    }
+   },
+   "footprint_width_in": {
+    "value": 46,
+    "tolerance": {
+     "abs": 1e-9
+    }
+   },
+   "req_thickness_in": {
+    "value": 0.375,
+    "tolerance": {
+     "abs": 0
+    }
+   }
+  }
  }
  ]
 }

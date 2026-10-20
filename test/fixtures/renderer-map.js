@@ -2281,4 +2281,5 @@ export const RENDERER_MAP = {
   "conduit-concentric-bend": { module: "../../calc-fab.js", exportName: "FAB_RENDERERS" },
   "bath-exhaust-fan-sizing": { module: "../../calc-hvacservice.js", exportName: "HVACSERVICE_RENDERERS" },
   "safety-glazing-check": { module: "../../calc-construction.js", exportName: "CONSTRUCTION_RENDERERS" },
+  "hearth-extension-check": { module: "../../calc-masonry.js", exportName: "MASONRY_RENDERERS" },
 };
