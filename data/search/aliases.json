@@ -117267,6 +117267,56 @@
    "term": "how much power does a belt feeder need",
    "target": "belt-feeder-pull",
    "kind": "question"
-  }
+  },
+ {
+  "term": "receptacle spacing 6 ft 12 ft",
+  "target": "wall-receptacle-count",
+  "kind": "industry"
+ },
+ {
+  "term": "how many outlets does a bedroom need",
+  "target": "wall-receptacle-count",
+  "kind": "question"
+ },
+ {
+  "term": "210.52 wall space receptacles",
+  "target": "wall-receptacle-count",
+  "kind": "industry"
+ },
+ {
+  "term": "receptacle count for a room",
+  "target": "wall-receptacle-count",
+  "kind": "industry"
+ },
+ {
+  "term": "outlet every 12 feet rule",
+  "target": "wall-receptacle-count",
+  "kind": "industry"
+ },
+ {
+  "term": "countertop receptacle spacing 24 48",
+  "target": "countertop-receptacle-count",
+  "kind": "industry"
+ },
+ {
+  "term": "how many outlets for kitchen counter",
+  "target": "countertop-receptacle-count",
+  "kind": "question"
+ },
+ {
+  "term": "210.52(C) countertop",
+  "target": "countertop-receptacle-count",
+  "kind": "industry"
+ },
+ {
+  "term": "island receptacle 2023 nec",
+  "target": "countertop-receptacle-count",
+  "kind": "industry"
+ },
+ {
+  "term": "kitchen counter outlet count",
+  "target": "countertop-receptacle-count",
+  "kind": "industry"
+ }
  ]
 }

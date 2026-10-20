@@ -1509,6 +1509,9 @@ const _TILES = [
   ["building-outage-cooldown", "C"],
   ["refrigeration-outage-holdover", "C"],
   ["pipe-freeze-time", "B"],
+  // spec-v1977..v1978: NEC 210.52 receptacle counts (calc-electricalfield.js).
+  ["wall-receptacle-count", "A"],
+  ["countertop-receptacle-count", "A"],
 ];
 
 

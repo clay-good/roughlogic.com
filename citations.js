@@ -26656,6 +26656,29 @@ export const CITATIONS = {
       { name: "Water density", value: "62.4 lb/cu ft for the water in the pipe", source: "physical data" },
     ],
   },
+  "wall-receptacle-count": {
+    formula: "per wall space of L ft: receptacles = ceil(L / 12) when L >= 2 ft, else 0; slack = 12 x receptacles - L. Hallway mode: 1 when the hallway is 10 ft or longer. Foyer mode (foyer over 60 sq ft): 1 per wall space 3 ft or wider. Room total = sum over spaces.",
+    edition: NEC_2023,
+    freeAccess: NEC_FREE,
+    governance: GOVERNANCE.electrical,
+    editionNote: "NEC 2023 210.52(A)(1) through (A)(4), (H) and (I), by name. 210.52(A)(1): no point measured horizontally along the floor line of any wall space more than 6 ft from a receptacle outlet. 210.52(A)(2): a wall space is any space 2 ft or more wide, measured around corners, unbroken along the floor line by doorways and similar openings, fireplaces and fixed cabinets that do not have countertops; fixed panels in exterior walls and fixed room dividers count, sliding panels do not. 210.52(A)(4): countertop receptacles do not count. NEC 2026 is the current published edition; the rule has stood in this form through several editions, but the section numbers here are the 2023 ones -- verify the edition your AHJ adopted.",
+    assumptions: [
+      { name: "Spaces entered already divided", value: "the reader splits a wall at each doorway, fireplace and fixed cabinet; the calculator cannot see them", source: "NEC 210.52(A)(2)" },
+      { name: "Receptacles above 5.5 ft do not count", value: "outlets more than 5.5 ft above the floor are not part of the required count", source: "NEC 210.52 (general)" },
+      { name: "Hallway length", value: "measured along the centerline without passing through a doorway", source: "NEC 210.52(H)" },
+    ],
+  },
+  "countertop-receptacle-count": {
+    formula: "per wall countertop space of L in: receptacles = ceil(L / 48) when L >= 12 in, else 0; slack = 48 x receptacles - L. Islands and peninsulas: NEC 2020 1 + ceil(max(0, A - 9) / 18) per island or peninsula of A sq ft; NEC 2023 none required, provisions for one required if none installed. Total = sum of the wall spaces plus any required island outlets.",
+    edition: NEC_2023,
+    freeAccess: NEC_FREE,
+    governance: GOVERNANCE.electrical,
+    editionNote: "NEC 2023 and NEC 2020 210.52(C), by name. 210.52(C)(1): a receptacle outlet at each wall countertop and work surface 12 in or wider, installed so no point along the wall line is more than 24 in, measured horizontally, from a receptacle outlet in that space. Countertop spaces separated by rangetops, refrigerators or sinks are separate spaces. The 2023 edition made island and peninsula outlets permitted but not required, with provisions for a future outlet when none is installed, and kept the location rule: on or above the countertop, not more than 20 in above it, or in a receptacle outlet assembly listed for countertops. The 2020 edition sized island and peninsula outlets by area: one for the first 9 sq ft or fraction and one for each further 18 sq ft or fraction, with at least one within 2 ft of a peninsula's outer end. NEC 2026 is the current published edition and has not been checked here for renumbering; verify the edition your AHJ adopted.",
+    assumptions: [
+      { name: "Spaces entered already divided", value: "the reader splits the counter at each sink, range, cooktop and refrigerator", source: "NEC 210.52(C)" },
+      { name: "Island and peninsula areas entered per countertop space", value: "an island split by a sink or range is entered as separate spaces; the peninsula-end outlet is stated, not placed", source: "NEC 2020 210.52(C)(2)" },
+    ],
+  },
 };
 
 // --- Reference block and copy text ---

@@ -2374,6 +2374,8 @@ export const COMPUTE_MAP = {
   "building-outage-cooldown": { module: "../../calc-outage.js", fn: "computeBuildingOutageCooldown" },
   "refrigeration-outage-holdover": { module: "../../calc-outage.js", fn: "computeRefrigerationOutageHoldover" },
   "pipe-freeze-time": { module: "../../calc-outage.js", fn: "computePipeFreezeTime" },
+  "wall-receptacle-count": { module: "../../calc-electricalfield.js", fn: "computeWallReceptacleCount" },
+  "countertop-receptacle-count": { module: "../../calc-electricalfield.js", fn: "computeCountertopReceptacleCount" },
 };
 
 // Resolve a COMPUTE_MAP module path (relative to this file) and import it.

@@ -84,6 +84,7 @@ export const TOOL_MODULES = (() => {
     "welder-resistance-circuit-conductor", "battery-inverter-dc-conductor",
     "pv-ac-output-circuit", "soil-resistivity-wenner", "max-circuit-length-for-vd",
     "open-delta-transformer", "conduit-nipple-60-fill", "mwbc-voltage-drop",
+    "wall-receptacle-count", "countertop-receptacle-count",
   ]);
   // spec-v129 cap-relief split: the cohesive spec-v121..v124 motor bench
   // (motor-synchronous-speed-slip, motor-shaft-torque, motor-operating-cost,

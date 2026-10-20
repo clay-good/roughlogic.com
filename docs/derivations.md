@@ -2216,12 +2216,14 @@ cross-check.
 | calc-electricalfield.js | `computeBranchCircuitWireFootage` | `{ circuits = 20, avg_homerun_ft = 45, makeup_ft = 15, conductors_per_circuit ...` | _ | _ | _ |
 | calc-electricalfield.js | `computeCableReelCapacity` | `{ flange_dia_in = 30, drum_dia_in = 12, traverse_width_in = 18, cable_od_in =...` | _ | _ | _ |
 | calc-electricalfield.js | `computeConduitNipple60Fill` | `{ conduit_area_sqin = 0.864, conductor_area_sqin = 0.0211, conductor_count = ...` | _ | _ | _ |
+| calc-electricalfield.js | `computeCountertopReceptacleCount` | `{ spaces = [], islands = [], nec_edition = "2023" } = {}` | _ | _ | _ |
 | calc-electricalfield.js | `computeMaxCircuitLengthForVd` | `{ source_voltage_v = 120, target_vd_pct = 3, current_a = 20, conductor_cmil =...` | _ | _ | _ |
 | calc-electricalfield.js | `computeMicroinverterBranchCount` | `{ branch_ocpd_a = 20, unit_max_current_a = 1.21 } = {}` | _ | _ | _ |
 | calc-electricalfield.js | `computeMwbcVoltageDrop` | `{ awg = "12", material = "copper", one_way_length_ft = 0, load_a_amps = 0, lo...` | _ | _ | _ |
 | calc-electricalfield.js | `computeOpenDeltaTransformer` | `{ transformer_kva_each = 25, required_load_kva = 40 } = {}` | _ | _ | _ |
 | calc-electricalfield.js | `computePvAcOutputCircuit` | `{ ac_power_w = 9600, ac_voltage_v = 240, phases = 1 } = {}` | _ | _ | _ |
 | calc-electricalfield.js | `computeSoilResistivityWenner` | `{ probe_spacing_ft = 10, meter_resistance_ohm = 5 } = {}` | _ | _ | _ |
+| calc-electricalfield.js | `computeWallReceptacleCount` | `{ spaces = [], space_type = "room" } = {}` | _ | _ | _ |
 | calc-electricalfield.js | `computeWelderArcCircuitConductor` | `{ primary_current_a = 40, duty_pct = 50, welder_type = "transformer" } = {}` | _ | _ | _ |
 | calc-electricalfield.js | `computeWelderResistanceCircuitConductor` | `{ primary_current_a = 100, duty_pct = 50 } = {}` | _ | _ | _ |
 | calc-electricalfield.js | `computeWirePullingLubricant` | `{ length_ft = 400, conduit_id_in = 3, k_factor = 0.0015, bend_factor = 1.0 } ...` | _ | _ | _ |
@@ -3937,7 +3939,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2521.
+Row count: 2523.
 
 <!-- END function-corpus-v14 -->
 
@@ -4005,7 +4007,7 @@ spec-v14 §12.1) record the v6 source-stamp recheck row in
 [docs/v6-audit.md](v6-audit.md) rather than a formula derivation,
 per spec-v14 §13.1 second paragraph.
 
-### Group A Electrical (261 tiles)
+### Group A Electrical (263 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4063,6 +4065,7 @@ per spec-v14 §13.1 second paragraph.
 | `continuous-load-ocpd` | Continuous-Load OCPD and Conductor at 125% (NEC 210.20 / 215.3) | NEC 2023 210.20(A) / 215.3 / 240.6(A); spec-v280 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `copper-resistance` | Conductor Resistance at Temperature | NFPA; NEC Table 8 gives 1.93 ohm/1000 ft at 75 C uncoated coppe... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `counterpoise-resistance` | Counterpoise and Radial Ground Array Resistance | Project (first-principles); IEEE 80, IEEE 81 for measurement and the utility groundin... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `countertop-receptacle-count` | Kitchen Countertop Receptacles (NEC 210.52(C)) | NFPA; 210.52(C)(1), recomputed for the spec-v1978 kitchen: spac... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `cp-rectifier-sizing` | Cathodic Protection Rectifier Sizing | Project (first-principles); NACE SP0169 and the manufacturer govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `critical-load-shed-tiers` | Critical Load Priority Shedding | Project (first-principles); spec-v1893 Section 3 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `datacenter-pue` | Data Center PUE and Cooling Overhead | Project (first-principles); The Green Grid measurement boundary and site meters govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4258,6 +4261,7 @@ per spec-v14 §13.1 second paragraph.
 | `voltage-drop` | Voltage Drop | Project (first-principles); Standard single-phase voltage-drop derivation; K=12.9 ohm... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `voltage-drop-reactance` | Voltage Drop With Reactance | NFPA; Vd = sqrt(3)*I*(R*cos(theta)+X*sin(theta))*L/1000 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `voltage-imbalance` | Voltage Imbalance | NEMA; V_a=480 / V_b=475 / V_c=470 -> avg 475 / max deviation 5 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `wall-receptacle-count` | Required Wall Receptacles by the 6-Foot Rule (NEC 210.52(A)) | NFPA; 210.52(A)(1)-(2), recomputed for the spec-v1977 bedroom: ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `weibull-capacity-factor` | Wind Weibull Distribution, Annual Energy, and Capacity Factor | Project (first-principles); IEC 61400-12 and an independent energy assessor govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `welder-arc-circuit-conductor` | Arc-Welder Branch-Circuit Conductor and OCPD (NEC 630.11) | arc-welder circuit sizing (NEC 630.11...; Table 630.11(A) prints 0.71 at 50% duty (sqrt(0.50) = 0.7... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `welder-resistance-circuit-conductor` | Resistance / Spot-Welder Branch-Circuit Conductor and OCPD (NEC 630.31) | resistance-welder circuit sizing (NEC...; Table 630.31(A)(2) multiplier at 50% = 0.71 (the code rou... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
@@ -6377,6 +6381,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 
-Tile count: 2267. Fixture-covered or reference-cadence: 2267 / 2267.
+Tile count: 2269. Fixture-covered or reference-cadence: 2269 / 2269.
 
 <!-- END tile-index-v14 -->

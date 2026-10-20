@@ -2414,6 +2414,9 @@ const RELATED = {
   "building-outage-cooldown": ["building-ua","internal-heat-gains","pipe-freeze-time","degree-day-energy","infiltration-load","generator-fuel-runtime"],
   "refrigeration-outage-holdover": ["walk-in-cooler-load","product-pull-down-load","generator-fuel-runtime","building-outage-cooldown"],
   "pipe-freeze-time": ["heat-trace-sizing","pipe-heat-loss-radial","insulation-heat-loss","building-outage-cooldown","pipe-insulation-takeoff"],
+  // spec-v1977..v1978: NEC 210.52 receptacle counts (calc-electricalfield.js).
+  "wall-receptacle-count": ["countertop-receptacle-count","branch-circuit-wire-footage","box-fill","gfci-afci-reference"],
+  "countertop-receptacle-count": ["wall-receptacle-count","gfci-afci-reference","branch-circuit-wire-footage","box-fill"],
 };
 
 export { RELATED };

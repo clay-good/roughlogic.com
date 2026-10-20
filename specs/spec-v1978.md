@@ -1,6 +1,6 @@
 # roughlogic.com Specification v1978 -- Kitchen Countertop Receptacles (NEC 210.52(C)) (`calc-electrical.js`, Group A Electrical, 1 New Tile)
 
-> **Status: PROPOSED 2026-10-19. Single-tile spec.** Part of [scope-product-expansion](scope-product-expansion.md). In scope under the
+> **Status: LANDED 2026-10-19 (proposed 2026-10-19). Single-tile spec. As built: in `calc-electricalfield.js`, where the spec-v1860 split moved the branch-circuit bench, because `calc-electrical.js` is at 96.6% of its cap. Islands and peninsulas are entered as countertop AREAS (sq ft), not a count: an independent review found that NEC 2020 210.52(C)(2) sizes them by area (one outlet for the first 9 sq ft or fraction, one per further 18 sq ft or fraction, one within 2 ft of a peninsula's end); the one-per-island rule this spec described is the 2017 wording.** Part of [scope-product-expansion](scope-product-expansion.md). In scope under the
 > spec-v106 trades-only charter: Group A, the NEC branch-circuit bench in `calc-electrical.js`, no new dependency and no
 > network call.
 >
@@ -52,7 +52,7 @@ a count that is low by one.
 
 The 2023 edition changed the island and peninsula rule from "at least one" to "none required, but provide for one, and
 if you install one it goes on or above the surface". The tile reports the island separately with that sentence, and
-reports it as a required receptacle under the 2020 wording when the reader selects that edition, because this is a
+reports the 2020 area-based count (one for the first 9 sq ft, one per further 18 sq ft) when the reader selects that edition, because this is a
 rule whose answer differs across editions and the adopted edition governs.
 
 **Inputs:** the wall countertop spaces as a list of lengths in inches (up to 12), the number of islands and peninsulas,

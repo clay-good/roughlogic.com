@@ -2,104 +2,104 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "be35748a2005b656",
-      "date": "2026-10-18"
+      "sha": "47c296f1aa6a591c",
+      "date": "2026-10-20"
     },
     "/tools/": {
-      "sha": "4347a3b3157eb916",
-      "date": "2026-10-18"
+      "sha": "18cae3b64300beae",
+      "date": "2026-10-20"
     },
     "/errata/": {
       "sha": "0312a4d1611f6171",
       "date": "2026-10-18"
     },
     "/collections/disaster-response/": {
-      "sha": "9b7b116e3c55c94d",
-      "date": "2026-10-17"
+      "sha": "e11d88ff9959f432",
+      "date": "2026-10-20"
     },
     "/groups/accounting/": {
-      "sha": "d39c2a5094666ec1",
-      "date": "2026-10-17"
+      "sha": "72eb077c075850b4",
+      "date": "2026-10-20"
     },
     "/groups/agriculture/": {
-      "sha": "761388578060373d",
-      "date": "2026-10-17"
+      "sha": "6b10674981370774",
+      "date": "2026-10-20"
     },
     "/groups/construction/": {
-      "sha": "4684c8047d959846",
-      "date": "2026-10-17"
+      "sha": "85b0cf42ca6c9755",
+      "date": "2026-10-20"
     },
     "/groups/cross-trade/": {
-      "sha": "ae1e552e41167e23",
-      "date": "2026-10-17"
+      "sha": "262d768c2cfb5862",
+      "date": "2026-10-20"
     },
     "/groups/educators/": {
-      "sha": "d2bae663a191244c",
-      "date": "2026-10-17"
+      "sha": "829e9faa2231ff41",
+      "date": "2026-10-20"
     },
     "/groups/electrical/": {
-      "sha": "b78e2bd98cb22af8",
-      "date": "2026-10-17"
+      "sha": "5477baf93091c673",
+      "date": "2026-10-20"
     },
     "/groups/field/": {
-      "sha": "b8369adc525cc546",
-      "date": "2026-10-17"
+      "sha": "5fd5da5dbed5ff11",
+      "date": "2026-10-20"
     },
     "/groups/fire-ground/": {
-      "sha": "f609b518226232b7",
-      "date": "2026-10-17"
+      "sha": "0ff66221f83ea5ee",
+      "date": "2026-10-20"
     },
     "/groups/historical/": {
-      "sha": "b16bf6484d076e2d",
-      "date": "2026-10-17"
+      "sha": "f00fe043c14d9a95",
+      "date": "2026-10-20"
     },
     "/groups/hvac/": {
-      "sha": "5e4152fa4e24ccbe",
-      "date": "2026-10-18"
+      "sha": "48f2ae87ededd52d",
+      "date": "2026-10-20"
     },
     "/groups/kitchen/": {
-      "sha": "7fdc2023194803a7",
-      "date": "2026-10-17"
+      "sha": "a487f6532659b87a",
+      "date": "2026-10-20"
     },
     "/groups/lab/": {
-      "sha": "930fc47d503a11f3",
-      "date": "2026-10-17"
+      "sha": "3b8c715f6baecbba",
+      "date": "2026-10-20"
     },
     "/groups/mechanic/": {
-      "sha": "01741abef3af5141",
-      "date": "2026-10-17"
+      "sha": "ad5b25620ce52a98",
+      "date": "2026-10-20"
     },
     "/groups/plumbing/": {
-      "sha": "b3133465bdb935b6",
-      "date": "2026-10-18"
+      "sha": "7829d26deb391f0f",
+      "date": "2026-10-20"
     },
     "/groups/real-estate/": {
-      "sha": "1f0b1a3a6f0058c1",
-      "date": "2026-10-17"
+      "sha": "de66fdf23134724f",
+      "date": "2026-10-20"
     },
     "/groups/references/": {
-      "sha": "c95a5facd0dedbc3",
-      "date": "2026-10-17"
+      "sha": "e2b8a4d5aa64f7dd",
+      "date": "2026-10-20"
     },
     "/groups/restoration/": {
-      "sha": "4bb785901e684764",
-      "date": "2026-10-17"
+      "sha": "769f9e323eb51ab5",
+      "date": "2026-10-20"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "807eb38152744bfe",
-      "date": "2026-10-17"
+      "sha": "28339dde61db56d0",
+      "date": "2026-10-20"
     },
     "/groups/stage/": {
-      "sha": "fd277b3eb86c00b9",
-      "date": "2026-10-17"
+      "sha": "de9052c478a295ca",
+      "date": "2026-10-20"
     },
     "/groups/trucking/": {
-      "sha": "6d365652af1dfc9f",
-      "date": "2026-10-17"
+      "sha": "7609fc79fcc94aaf",
+      "date": "2026-10-20"
     },
     "/groups/water/": {
-      "sha": "b7ee09d1bfb2ea6b",
-      "date": "2026-10-17"
+      "sha": "1e4472d6604f7a0e",
+      "date": "2026-10-20"
     },
     "/tools/aav-install-check/": {
       "sha": "0ee13965542bb91c",
@@ -1892,6 +1892,10 @@
     "/tools/countertop-overhang-support/": {
       "sha": "bee815b6938e92f3",
       "date": "2026-10-17"
+    },
+    "/tools/countertop-receptacle-count/": {
+      "sha": "868baeeafc70cf29",
+      "date": "2026-10-20"
     },
     "/tools/counterweight-arbor-load/": {
       "sha": "c46569a1bd530215",
@@ -5074,8 +5078,8 @@
       "date": "2026-10-17"
     },
     "/tools/noncoincident-load/": {
-      "sha": "a71a0af9278d6124",
-      "date": "2026-10-17"
+      "sha": "707c913ad288a133",
+      "date": "2026-10-20"
     },
     "/tools/nozzle-flow-pressure/": {
       "sha": "30b1a386ba926274",
@@ -8737,6 +8741,10 @@
       "sha": "51e56df8ef1fb523",
       "date": "2026-10-17"
     },
+    "/tools/wall-receptacle-count/": {
+      "sha": "7cca6d9b7429fa87",
+      "date": "2026-10-20"
+    },
     "/tools/wallpaper-rolls/": {
       "sha": "feba579e3ad723a4",
       "date": "2026-10-17"
@@ -8898,8 +8906,8 @@
       "date": "2026-10-17"
     },
     "/tools/welder-arc-circuit-conductor/": {
-      "sha": "12dcdbc1c1dc83f0",
-      "date": "2026-10-17"
+      "sha": "1e9828911854077a",
+      "date": "2026-10-20"
     },
     "/tools/welder-resistance-circuit-conductor/": {
       "sha": "42236bb4a6f5502f",

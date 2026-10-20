@@ -171736,6 +171736,179 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "wall-receptacle-count",
+  "source_publisher": "NFPA",
+  "source_title": "NFPA 70, National Electrical Code",
+  "source_edition_or_year": "2023 (nfpa.org/freeaccess)",
+  "source_section_or_page": "210.52(A)(1)-(2), recomputed for the spec-v1977 bedroom: wall spaces 14, 9, 3, 1.5 and 22 ft give ceil(14/12) + ceil(9/12) + ceil(3/12) + 0 (under 2 ft) + ceil(22/12) = 2 + 1 + 1 + 0 + 2 = 6 outlets.",
+  "verified_by": "rl",
+  "verified_on": "2026-10-19",
+  "inputs": {
+   "spaces": [
+    {
+     "length_ft": 14
+    },
+    {
+     "length_ft": 9
+    },
+    {
+     "length_ft": 3
+    },
+    {
+     "length_ft": 1.5
+    },
+    {
+     "length_ft": 22
+    }
+   ],
+   "space_type": "room"
+  },
+  "outputs": {
+   "total_receptacles": {
+    "value": 6,
+    "tolerance": {
+     "abs": 0
+    }
+   },
+   "narrow_count": {
+    "value": 1,
+    "tolerance": {
+     "abs": 0
+    }
+   }
+  }
+ },
+ {
+  "tile_id": "wall-receptacle-count",
+  "source_publisher": "NFPA",
+  "source_title": "NFPA 70, National Electrical Code",
+  "source_edition_or_year": "2023 (nfpa.org/freeaccess)",
+  "source_section_or_page": "210.52(H): a hallway of 10 ft or more needs at least one receptacle outlet; hallways of 12 ft and 8 ft give 1 + 0 = 1.",
+  "verified_by": "rl",
+  "verified_on": "2026-10-19",
+  "inputs": {
+   "spaces": [
+    {
+     "length_ft": 12
+    },
+    {
+     "length_ft": 8
+    }
+   ],
+   "space_type": "hallway"
+  },
+  "outputs": {
+   "total_receptacles": {
+    "value": 1,
+    "tolerance": {
+     "abs": 0
+    }
+   }
+  }
+ },
+ {
+  "tile_id": "countertop-receptacle-count",
+  "source_publisher": "NFPA",
+  "source_title": "NFPA 70, National Electrical Code",
+  "source_edition_or_year": "2023 (nfpa.org/freeaccess)",
+  "source_section_or_page": "210.52(C)(1), recomputed for the spec-v1978 kitchen: spaces 18, 30, 48, 96, 100 and 11 in give 1 + 1 + 1 + 2 + 3 + 0 = 8 wall countertop outlets; under 2023 the island adds none.",
+  "verified_by": "rl",
+  "verified_on": "2026-10-19",
+  "inputs": {
+   "spaces": [
+    {
+     "length_in": 18
+    },
+    {
+     "length_in": 30
+    },
+    {
+     "length_in": 48
+    },
+    {
+     "length_in": 96
+    },
+    {
+     "length_in": 100
+    },
+    {
+     "length_in": 11
+    }
+   ],
+   "islands": [
+    {
+     "area_sqft": 24
+    }
+   ],
+   "nec_edition": "2023"
+  },
+  "outputs": {
+   "wall_receptacles": {
+    "value": 8,
+    "tolerance": {
+     "abs": 0
+    }
+   },
+   "total_required": {
+    "value": 8,
+    "tolerance": {
+     "abs": 0
+    }
+   },
+   "narrow_count": {
+    "value": 1,
+    "tolerance": {
+     "abs": 0
+    }
+   }
+  }
+ },
+ {
+  "tile_id": "countertop-receptacle-count",
+  "source_publisher": "NFPA",
+  "source_title": "NFPA 70, National Electrical Code",
+  "source_edition_or_year": "2020 (nfpa.org/freeaccess)",
+  "source_section_or_page": "2020 210.52(C)(1)-(2): the same kitchen with a 24 sq ft island needs 8 wall outlets plus 1 + ceil((24 - 9) / 18) = 2 at the island = 10.",
+  "verified_by": "rl",
+  "verified_on": "2026-10-19",
+  "inputs": {
+   "spaces": [
+    {
+     "length_in": 18
+    },
+    {
+     "length_in": 30
+    },
+    {
+     "length_in": 48
+    },
+    {
+     "length_in": 96
+    },
+    {
+     "length_in": 100
+    },
+    {
+     "length_in": 11
+    }
+   ],
+   "islands": [
+    {
+     "area_sqft": 24
+    }
+   ],
+   "nec_edition": "2020"
+  },
+  "outputs": {
+   "total_required": {
+    "value": 10,
+    "tolerance": {
+     "abs": 0
+    }
+   }
+  }
  }
  ]
 }

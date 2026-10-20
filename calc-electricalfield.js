@@ -732,3 +732,168 @@ function _v1109renderMwbcVoltageDrop(inputRegion, outputRegion, citationEl) {
   update();
 }
 ELECTRICALFIELD_RENDERERS["mwbc-voltage-drop"] = _v1109renderMwbcVoltageDrop;
+
+// ===================== spec-v1977 / spec-v1978: NEC 210.52 receptacle counts =====================
+// Both are the same reach rule at two scales. A receptacle covers every point
+// within its reach on either side, so a run of L needs ceil(L / (2 x reach)):
+// 6 ft on a wall (210.52(A)(1)), 24 in on a kitchen countertop (210.52(C)(1)).
+// The reader enters the spaces already divided at doors, fireplaces, fixed
+// cabinets, sinks and ranges; the tile cannot see where those are.
+const _RCP_MAX_SPACES = 12;
+function _rcpLengths(spaces, key, unit) {
+  if (!Array.isArray(spaces) || spaces.length === 0) return { error: "Enter at least one space length (" + unit + ")." };
+  if (spaces.length > _RCP_MAX_SPACES) return { error: "Enter at most " + _RCP_MAX_SPACES + " spaces; split a larger room into two runs of the calculator." };
+  const out = [];
+  for (const s of spaces) {
+    const v = Number(s && typeof s === "object" ? s[key] : s);
+    if (!Number.isFinite(v)) return { error: "Each space length must be a finite number (" + unit + ")." };
+    if (!(v > 0)) return { error: "Each space length must be positive (" + unit + ")." };
+    out.push(v);
+  }
+  return { lengths: out };
+}
+
+// dims: in { spaces: dimensionless, space_type: dimensionless } out: { total_receptacles: dimensionless, narrow_count: dimensionless, space_count: dimensionless }
+export function computeWallReceptacleCount({ spaces = [], space_type = "room" } = {}) {
+  const t = String(space_type);
+  if (!["room", "hallway", "foyer"].includes(t)) return { error: "Space type must be room, hallway or foyer." };
+  const p = _rcpLengths(spaces, "length_ft", "ft");
+  if (p.error) return p;
+  const per_space = [];
+  let total_receptacles = 0, narrow_count = 0;
+  for (const L of p.lengths) {
+    let receptacles, slack_ft = null;
+    if (t === "hallway") {
+      // 210.52(H): a hallway 10 ft or longer, measured along its centerline, gets at least one.
+      receptacles = L >= 10 - 1e-9 ? 1 : 0;
+    } else if (t === "foyer") {
+      // 210.52(I): a foyer over 60 sq ft gets a receptacle in each wall space 3 ft or wider.
+      receptacles = L >= 3 - 1e-9 ? 1 : 0;
+    } else if (L < 2 - 1e-9) {
+      receptacles = 0; // under 2 ft is not a wall space (210.52(A)(2))
+    } else {
+      receptacles = Math.ceil(L / 12 - 1e-9);
+      slack_ft = 12 * receptacles - L;
+    }
+    if (receptacles === 0) narrow_count++;
+    total_receptacles += receptacles;
+    per_space.push({ length_ft: L, receptacles, slack_ft });
+  }
+  const note = t === "hallway"
+    ? "210.52(H): a hallway 10 ft or longer, measured along its centerline without passing through a doorway, needs at least one receptacle outlet; a shorter hallway needs none. Enter each hallway as its own space."
+    : t === "foyer"
+      ? "210.52(I): a foyer that is not part of a hallway and is larger than 60 sq ft needs a receptacle outlet in each wall space 3 ft or wider; doorways, door-side windows that extend to the floor and similar openings are not wall space there. A foyer of 60 sq ft or less needs none; enter it as a room only if it is part of a habitable room."
+      : "210.52(A)(1): no point along the floor line of any wall space may be more than 6 ft, measured horizontally, from a receptacle outlet. One outlet within 6 ft of an end covers 12 ft of wall, so a space of L ft needs ceil(L / 12). It is a reach, not a spacing: outlets every 6 ft is twice what the code asks, and outlets every 12 ft starting 12 ft from a corner fails. A wall space is 2 ft or wider, measured around corners and unbroken by doorways, fireplaces or fixed cabinets without countertops: enter a run that turns a corner as ONE space, or the count comes out high. A fixed panel in an exterior wall and a fixed room divider count. A floor receptacle within 18 in of the wall counts toward the wall (210.52(A)(3)). Countertop receptacles (210.52(C), the countertop calculator) and receptacles more than 5.5 ft above the floor do not count toward this.";
+  return { per_space, total_receptacles, narrow_count, space_count: per_space.length, note };
+}
+export const wallReceptacleCountExample = { inputs: { spaces: [{ length_ft: 14 }, { length_ft: 9 }, { length_ft: 3 }, { length_ft: 1.5 }, { length_ft: 22 }], space_type: "room" } };
+
+// dims: in { spaces: dimensionless, islands: dimensionless, nec_edition: dimensionless } out: { wall_receptacles: dimensionless, island_receptacles_required: dimensionless, total_required: dimensionless, narrow_count: dimensionless }
+export function computeCountertopReceptacleCount({ spaces = [], islands = [], nec_edition = "2023" } = {}) {
+  const ed = String(nec_edition);
+  if (ed !== "2023" && ed !== "2020") return { error: "NEC edition must be 2023 or 2020." };
+  if (!Array.isArray(islands)) return { error: "Islands and peninsulas are a list of countertop areas (sq ft)." };
+  if (islands.length > 6) return { error: "Enter at most 6 islands and peninsulas." };
+  const isl_areas = [];
+  for (const it of islands) {
+    const a = Number(it && typeof it === "object" ? it.area_sqft : it);
+    if (!Number.isFinite(a) || !(a > 0)) return { error: "Each island or peninsula countertop area must be a positive number (sq ft)." };
+    isl_areas.push(a);
+  }
+  const n_isl = isl_areas.length;
+  const p = _rcpLengths(spaces, "length_in", "in");
+  if (p.error) return p;
+  const per_space = [];
+  let wall_receptacles = 0, narrow_count = 0;
+  for (const L of p.lengths) {
+    // 210.52(C)(1): every wall countertop space 12 in or wider; no point more than 24 in from an outlet.
+    const receptacles = L < 12 - 1e-9 ? 0 : Math.ceil(L / 48 - 1e-9);
+    const slack_in = receptacles ? 48 * receptacles - L : null;
+    if (!receptacles) narrow_count++;
+    wall_receptacles += receptacles;
+    per_space.push({ length_in: L, receptacles, slack_in });
+  }
+  // NEC 2020 210.52(C)(2): one outlet for the first 9 sq ft or fraction, one more per further 18 sq ft or fraction.
+  const island_counts = isl_areas.map((a) => (ed === "2020" ? 1 + Math.ceil(Math.max(0, a - 9) / 18 - 1e-9) : 0));
+  const island_receptacles_required = island_counts.reduce((x, y) => x + y, 0);
+  const island_area_sqft = isl_areas.reduce((x, y) => x + y, 0);
+  const total_required = wall_receptacles + island_receptacles_required;
+  const island_text = n_isl === 0
+    ? "No islands or peninsulas entered."
+    : ed === "2023"
+      ? "NEC 2023: a receptacle outlet is not required at an island or peninsula (" + fmt(island_area_sqft, 1) + " sq ft of counter entered), but if none is installed, provisions for adding one later are required at each of the " + n_isl + "; any receptacle that is installed goes on or above the countertop, not more than 20 in above it, or in a receptacle assembly listed for countertops. A receptacle under the counter no longer serves it."
+      : "NEC 2020 210.52(C)(2): one receptacle outlet for the first 9 sq ft of island or peninsula countertop or fraction of it, and one more for each further 18 sq ft or fraction: " + island_counts.map((c, i) => fmt(isl_areas[i], 1) + " sq ft needs " + c).join("; ") + ". A peninsula also needs at least one within 2 ft of its outer end, and an island or peninsula split by a sink or range is entered as separate spaces. Location per 210.52(C)(3): on or above the countertop, not more than 20 in above it, in an assembly listed for countertops, or below it only where that section permits.";
+  return {
+    per_space, wall_receptacles, island_counts, island_receptacles_required, island_area_sqft, total_required, narrow_count,
+    space_count: per_space.length, island_text,
+    note: "210.52(C)(1): a receptacle outlet at every wall countertop and work surface 12 in or wider, placed so no point along the wall line is more than 24 in, measured horizontally, from an outlet in that space; so outlets at most 48 in apart and within 24 in of each end, and a space of L in needs ceil(L / 48). A range, counter-mounted cooking unit, refrigerator or sink divides a countertop into separate spaces, each counted on its own: one run entered across a sink comes out low. The small-appliance circuits that serve these outlets (210.11(C)(1)), GFCI protection (210.8) and the dining-room and pantry outlets on the same circuits are not counted here.",
+  };
+}
+export const countertopReceptacleCountExample = { inputs: { spaces: [{ length_in: 18 }, { length_in: 30 }, { length_in: 48 }, { length_in: 96 }, { length_in: 100 }, { length_in: 11 }], islands: [{ area_sqft: 24 }], nec_edition: "2023" } };
+
+function _rcpRender(inputRegion, outputRegion, citationEl, cfg) {
+  citationEl.textContent = cfg.citation;
+  const extras = cfg.extras();
+  for (const e of extras) for (const f of e.fs) inputRegion.appendChild(f.wrap);
+  const rows = [];
+  for (let i = 1; i <= _RCP_MAX_SPACES; i++) {
+    const f = makeNumber("Space " + i + " length (" + cfg.unit + ")", cfg.prefix + "-s" + i, { step: "any", min: "0" });
+    inputRegion.appendChild(f.wrap); rows.push(f);
+  }
+  attachExampleButton(inputRegion, () => {
+    const sp = cfg.example.spaces;
+    rows.forEach((f, i) => { f.input.value = sp[i] ? String(sp[i][cfg.key]) : ""; });
+    for (const e of extras) e.fill(cfg.example);
+    update();
+  });
+  const outs = cfg.outputs.map((o) => ({ ...o, el: makeOutputLine(outputRegion, o.label, cfg.prefix + "-out-" + o.k) }));
+  const update = debounce(() => {
+    const spaces = [];
+    for (const f of rows) if (f.input.value !== "") spaces.push({ [cfg.key]: Number(f.input.value) });
+    const args = { spaces };
+    for (const e of extras) args[e.key] = e.read();
+    const r = cfg.compute(args); stepsFor(outputRegion, inputRegion, ["spaces", ...extras.map((e) => e.key)], r);
+    if (r.error) { outs.forEach((o, i) => { o.el.textContent = i ? "-" : r.error; }); return; }
+    for (const o of outs) o.el.textContent = o.value(r);
+  }, DEBOUNCE_MS);
+  for (const f of rows) f.input.addEventListener("input", update);
+  for (const e of extras) for (const f of e.fs) (f.select || f.input).addEventListener(f.select ? "change" : "input", update);
+}
+const _rcpPerSpace = (unit, key, slack) => (r) => r.per_space.map((s) => fmt(s[key], 1) + " " + unit + ": " + s.receptacles + (s[slack] === null ? "" : " (slack " + fmt(s[slack], 1) + " " + unit + ")")).join("; ");
+
+ELECTRICALFIELD_RENDERERS["wall-receptacle-count"] = (i, o, c) => _rcpRender(i, o, c, {
+  citation: "Citation: NFPA 70 (NEC) 2023, 210.52(A)(1) through (A)(4), (H) and (I), by name; free read-only access at nfpa.org/freeaccess. No point along the floor line of a wall space more than 6 ft from a receptacle outlet, so a wall space of L ft needs ceil(L / 12); spaces under 2 ft need none. Hallways 10 ft or longer need one; foyers over 60 sq ft need one in each wall space 3 ft or wider. The AHJ-adopted edition and the inspector govern.",
+  unit: "ft", key: "length_ft", prefix: "wrc", example: wallReceptacleCountExample.inputs, compute: computeWallReceptacleCount,
+  extras: () => {
+    const f = makeSelect("Space type", "wrc-type", [
+      { value: "room", label: "Habitable room wall spaces (210.52(A))" },
+      { value: "hallway", label: "Hallway lengths (210.52(H))" },
+      { value: "foyer", label: "Foyer over 60 sq ft, wall spaces (210.52(I))" },
+    ]);
+    return [{ key: "space_type", fs: [f], read: () => f.select.value, fill: (x) => { f.select.value = x.space_type; } }];
+  },
+  outputs: [
+    { k: "t", label: "Receptacle outlets required", value: (r) => r.total_receptacles + " across " + r.space_count + " space" + (r.space_count === 1 ? "" : "s") + (r.narrow_count ? " (" + r.narrow_count + " need none)" : "") },
+    { k: "p", label: "By space", value: _rcpPerSpace("ft", "length_ft", "slack_ft") },
+    { k: "n", label: "Note", value: (r) => r.note },
+  ],
+});
+
+ELECTRICALFIELD_RENDERERS["countertop-receptacle-count"] = (i, o, c) => _rcpRender(i, o, c, {
+  citation: "Citation: NFPA 70 (NEC) 2023 and 2020, 210.52(C), by name; free read-only access at nfpa.org/freeaccess. A receptacle outlet at every wall countertop space 12 in or wider, no point more than 24 in from an outlet, so a space of L in needs ceil(L / 48); a sink, range, cooktop or refrigerator splits a countertop into separate spaces. Islands and peninsulas: required (2020) or provisions only (2023). The AHJ-adopted edition and the inspector govern.",
+  unit: "in", key: "length_in", prefix: "ctrc", example: countertopReceptacleCountExample.inputs, compute: computeCountertopReceptacleCount,
+  extras: () => {
+    const ed = makeSelect("NEC edition", "ctrc-ed", [{ value: "2023", label: "NEC 2023" }, { value: "2020", label: "NEC 2020" }]);
+    const isl = [1, 2, 3].map((k) => makeNumber("Island or peninsula " + k + " countertop area (sq ft)", "ctrc-isl" + k, { step: "any", min: "0" }));
+    return [
+      { key: "nec_edition", fs: [ed], read: () => ed.select.value, fill: (x) => { ed.select.value = x.nec_edition; } },
+      { key: "islands", fs: isl, read: () => isl.filter((f) => f.input.value !== "").map((f) => ({ area_sqft: Number(f.input.value) })), fill: (x) => { isl.forEach((f, k) => { f.input.value = x.islands[k] ? String(x.islands[k].area_sqft) : ""; }); } },
+    ];
+  },
+  outputs: [
+    { k: "t", label: "Wall countertop receptacle outlets", value: (r) => r.wall_receptacles + " across " + r.space_count + " space" + (r.space_count === 1 ? "" : "s") + (r.narrow_count ? " (" + r.narrow_count + " under 12 in need none)" : "") + (r.island_receptacles_required ? "; plus " + r.island_receptacles_required + " at islands and peninsulas = " + r.total_required : "") },
+    { k: "p", label: "By space", value: _rcpPerSpace("in", "length_in", "slack_in") },
+    { k: "i", label: "Islands and peninsulas", value: (r) => r.island_text },
+    { k: "n", label: "Note", value: (r) => r.note },
+  ],
+});

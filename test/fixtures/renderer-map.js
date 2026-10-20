@@ -2275,4 +2275,6 @@ export const RENDERER_MAP = {
   "building-outage-cooldown": { module: "../../calc-outage.js", exportName: "OUTAGE_RENDERERS" },
   "refrigeration-outage-holdover": { module: "../../calc-outage.js", exportName: "OUTAGE_RENDERERS" },
   "pipe-freeze-time": { module: "../../calc-outage.js", exportName: "OUTAGE_RENDERERS" },
+  "wall-receptacle-count": { module: "../../calc-electricalfield.js", exportName: "ELECTRICALFIELD_RENDERERS" },
+  "countertop-receptacle-count": { module: "../../calc-electricalfield.js", exportName: "ELECTRICALFIELD_RENDERERS" },
 };

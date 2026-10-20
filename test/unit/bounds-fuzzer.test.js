@@ -62133,3 +62133,44 @@ test("bounds: computeSalesTax pins a state rate, falls back from a blank custom 
     assert.ok("error" in _cov2(bad), JSON.stringify(bad));
   }
 });
+
+// spec-v1977 / spec-v1978: NEC 210.52 receptacle counts. The rule is a reach, so
+// the count steps at exact multiples of 12 ft (wall) and 48 in (countertop).
+import { computeWallReceptacleCount as _wrc, computeCountertopReceptacleCount as _ctrc } from "../../calc-electricalfield.js";
+test("bounds: spec-v1977 computeWallReceptacleCount pins the 6 ft reach, the 2 ft floor, hallway and foyer modes, and the error seams", () => {
+  const sp = (...l) => l.map((length_ft) => ({ length_ft }));
+  const r = _wrc({ spaces: sp(14, 9, 3, 1.5, 22) });
+  assert.equal(r.total_receptacles, 6);
+  assert.deepEqual(r.per_space.map((s) => s.receptacles), [2, 1, 1, 0, 2]);
+  assert.deepEqual(r.per_space.map((s) => s.slack_ft), [10, 3, 9, null, 2]);
+  // Exact multiples of 12 ft do not round up; a hair over does.
+  assert.equal(_wrc({ spaces: sp(12) }).total_receptacles, 1);
+  assert.equal(_wrc({ spaces: sp(24) }).total_receptacles, 2);
+  assert.equal(_wrc({ spaces: sp(24.01) }).total_receptacles, 3);
+  assert.equal(_wrc({ spaces: sp(2) }).total_receptacles, 1, "2 ft is a wall space");
+  assert.equal(_wrc({ spaces: sp(1.99) }).total_receptacles, 0);
+  assert.equal(_wrc({ spaces: sp(10, 9.99), space_type: "hallway" }).total_receptacles, 1);
+  assert.equal(_wrc({ spaces: sp(3, 2.99, 30), space_type: "foyer" }).total_receptacles, 2, "foyer: one per wall space 3 ft or wider, not per 12 ft");
+  for (const bad of [{ spaces: [] }, { spaces: sp(-3) }, { spaces: sp(0) }, { spaces: sp(NaN) }, { spaces: sp(Infinity) }, { spaces: sp(...Array(13).fill(5)) }, { spaces: sp(5), space_type: "garage" }, {}]) {
+    assert.ok("error" in _wrc(bad), JSON.stringify(bad));
+  }
+});
+test("bounds: spec-v1978 computeCountertopReceptacleCount pins the 24 in reach, the 12 in floor, the edition split on islands, and the error seams", () => {
+  const sp = (...l) => l.map((length_in) => ({ length_in }));
+  const r = _ctrc({ spaces: sp(18, 30, 48, 96, 100, 11), islands: [{ area_sqft: 24 }], nec_edition: "2023" });
+  assert.equal(r.wall_receptacles, 8);
+  assert.equal(r.total_required, 8);
+  assert.equal(r.island_receptacles_required, 0);
+  assert.deepEqual(r.per_space.map((s) => s.receptacles), [1, 1, 1, 2, 3, 0]);
+  assert.match(r.island_text, /provisions/);
+  // NEC 2020 210.52(C)(2): 1 for the first 9 sq ft, +1 per further 18 sq ft or fraction.
+  assert.equal(_ctrc({ spaces: sp(18, 30, 48, 96, 100, 11), islands: [{ area_sqft: 24 }], nec_edition: "2020" }).total_required, 10);
+  assert.deepEqual(_ctrc({ spaces: sp(48), islands: [{ area_sqft: 9 }, { area_sqft: 27 }, { area_sqft: 27.1 }, { area_sqft: 4 }], nec_edition: "2020" }).island_counts, [1, 2, 3, 1]);
+  assert.equal(_ctrc({ spaces: sp(12) }).wall_receptacles, 1, "12 in is a countertop space");
+  assert.equal(_ctrc({ spaces: sp(11.99) }).wall_receptacles, 0);
+  assert.equal(_ctrc({ spaces: sp(96.01) }).wall_receptacles, 3);
+  assert.equal(_ctrc({ spaces: sp(48), islands: [] }).total_required, 1, "no islands entered");
+  for (const bad of [{ spaces: [] }, { spaces: sp(-48) }, { spaces: sp(48), islands: [{ area_sqft: -4 }] }, { spaces: sp(48), islands: [{ area_sqft: 0 }] }, { spaces: sp(48), islands: 2 }, { spaces: sp(48), islands: Array(7).fill({ area_sqft: 10 }) }, { spaces: sp(48), nec_edition: "2017" }, { spaces: sp(...Array(13).fill(30)) }, { spaces: sp(Infinity) }]) {
+    assert.ok("error" in _ctrc(bad), JSON.stringify(bad));
+  }
+});

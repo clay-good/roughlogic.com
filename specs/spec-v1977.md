@@ -1,6 +1,6 @@
 # roughlogic.com Specification v1977 -- Required Wall Receptacles by the 6-Foot Rule (NEC 210.52(A)) (`calc-electrical.js`, Group A Electrical, 1 New Tile)
 
-> **Status: PROPOSED 2026-10-19. Single-tile spec.** Part of [scope-product-expansion](scope-product-expansion.md). In scope under the
+> **Status: LANDED 2026-10-19 (proposed 2026-10-19). Single-tile spec. As built: in `calc-electricalfield.js`, where the spec-v1860 split moved the branch-circuit bench, because `calc-electrical.js` is at 96.6% of its cap.** Part of [scope-product-expansion](scope-product-expansion.md). In scope under the
 > spec-v106 trades-only charter: Group A, the NEC branch-circuit bench in `calc-electrical.js`, no new dependency and no
 > network call.
 >
