@@ -1,6 +1,6 @@
 # spec-v1975.md -- Code citations link to the free chapter text
 
-> **Status: PROPOSED (2026-10-19). Platform spec, no tile added. Part of [scope-product-expansion](scope-product-expansion.md). Extends roadmap pillar 2 of [spec-v106](spec-v106.md) section 7 past the CFR ([spec-v1969](spec-v1969.md)) to the ICC codes and NFPA documents.** Catalog stays at **2,267**.
+> **Status: LANDED 2026-10-20 (proposed 2026-10-19). Platform spec, no tile added. As built: the chapter table is a shipped module, `icc-chapters.js` (the browser and the static shells both need it), not a docs JSON; 30 chapters across IRC2024V2.1, IBC2027V1.0, IPC2027V1.0, IMC2027V1.0 and IFGC2027V1.0, each URL opened on 2026-10-20. The real count is 149 ICC references, not 588: the larger figure counted the Internal Revenue Code ('IRC 179' in tax tiles), which must never link to the Residential Code, so an IRC section must carry its letter prefix. IECC chapter slugs do not follow its titles (a title-built slug redirects to the front page), so IECC references stay unlinked until their slugs are read one by one. The ICC-link floor in the test is 100, not 400. Part of [scope-product-expansion](scope-product-expansion.md). Extends roadmap pillar 2 of [spec-v106](spec-v106.md) section 7 past the CFR ([spec-v1969](spec-v1969.md)) to the ICC codes and NFPA documents.** Catalog stays at **2,267**.
 
 ## What it does for you
 

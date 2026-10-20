@@ -24,6 +24,8 @@
 // CFR_RE below.) textContent of the
 // host element is preserved (link text === the domain), so the existing
 // citation unit tests that assert on textContent still hold.
+import { iccHref, nfpaHref } from "./icc-chapters.js";
+
 const CITATION_LINK_RE =
   /\b((?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+(?:gov|org|com|edu|net|mil|int))(\/[A-Za-z0-9._~:/?#@!$&'*+,;=%-]*[A-Za-z0-9_~/#-])?/gi;
 
@@ -46,6 +48,13 @@ function appendPlainText(host, text) {
 // run 1 to 50.
 const CFR_RE = /\b([1-9]|[1-4][0-9]|50) CFR (?:\u00a7\u00a7? ?|Parts? )?(\d{1,4})(?:\.(\d{1,4}[a-z]?))?\b/g;
 
+// An ICC code section ("IRC R311.7.5", "IPC 2027 Table 1003.3.8") links to its
+// chapter of the free current text, and an NFPA document with its edition
+// ("NFPA 13-2025", "NEC 2023") to NFPA's free-access reader (spec-v1975). The
+// link text is the citation's own words; icc-chapters.js decides the target.
+const ICC_RE = /\b(IRC|IBC|IPC|IMC|IFGC)(?:\s+((?:19|20)\d\d))?\s+(?:(?:Sections?|Tables?|Figure)\s+)?([A-Z]{0,2})(\d{3,4})((?:\.\d+)*)/g;
+const NFPA_RE = /\b(?:NFPA\s+(\d{1,4}[A-Z]?)|(NEC))[ -]((?:19|20)\d\d)\b/g;
+
 export function cfrHref(title, part, section) {
   return section
     ? `https://www.ecfr.gov/current/title-${title}/section-${part}.${section}`
@@ -64,6 +73,13 @@ export function citationSegments(value) {
   while ((m = CITATION_LINK_RE.exec(str)) !== null) hits.push({ at: m.index, text: m[0], href: "https://" + m[0] });
   CFR_RE.lastIndex = 0;
   while ((m = CFR_RE.exec(str)) !== null) hits.push({ at: m.index, text: m[0], href: cfrHref(m[1], m[2], m[3]) });
+  ICC_RE.lastIndex = 0;
+  while ((m = ICC_RE.exec(str)) !== null) {
+    const href = iccHref(m[1], m[2], m[3], m[4], Boolean(m[5]));
+    if (href) hits.push({ at: m.index, text: m[0], href });
+  }
+  NFPA_RE.lastIndex = 0;
+  while ((m = NFPA_RE.exec(str)) !== null) hits.push({ at: m.index, text: m[0], href: nfpaHref(m[2] ? "70" : m[1], m[3]) });
   hits.sort((a, b) => a.at - b.at);
   let last = 0;
   for (const h of hits) {

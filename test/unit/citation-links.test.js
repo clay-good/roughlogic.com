@@ -1,66 +1,52 @@
-// spec-v1966 (spec-v106 roadmap pillar 2): the static shells link the official
-// free sources their citations name, through the same citationSegments matcher
-// the live reference block uses. A linker that drops or rewrites a word, links
-// a version number, or lets citation text through unescaped is worse than plain
-// text, so this runs it over every tile's citation.
+// spec-v1975: ICC sections link to their chapter of the free current text, NFPA
+// documents with an edition to NFPA's free-access reader.
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { execFileSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
+import { citationSegments } from "../../citation-block.js";
+import { ICC_CHAPTERS, iccHref, nfpaHref } from "../../icc-chapters.js";
 import { CITATIONS } from "../../citations.js";
-import { citationSegments, cfrHref } from "../../citation-block.js";
-import { linkedCitationHtml } from "../../scripts/build-shells.mjs";
 
-const FIELDS = ["formula", "edition", "freeAccess", "governance"];
-const HOST = /^https:\/\/(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+(?:gov|org|com|edu|net|mil|int)(?:\/|$)/i;
+const links = (t) => citationSegments(t).filter((s) => s.href).map((s) => [s.text, s.href]);
 
-test("every citation line links only public sources and keeps its words", () => {
-  const bad = [];
-  let links = 0, tiles = 0, cfrLinks = 0;
-  for (const [id, c] of Object.entries(CITATIONS)) {
-    if (!c || typeof c !== "object") continue;
-    let tileLinked = false;
-    for (const f of FIELDS) {
-      const v = c[f];
-      if (typeof v !== "string" || !v) continue;
-      const segs = citationSegments(v);
-      if (segs.map((x) => x.text).join("") !== v) bad.push(`${id}.${f}: segments do not rebuild the text`);
-      for (const x of segs.filter((s) => s.href)) {
-        links++; tileLinked = true;
-        if (!HOST.test(x.href)) bad.push(`${id}.${f}: "${x.href}" is not an https link to a public host`);
-        // A CFR reference (spec-v1969) keeps its own words and links to the
-        // eCFR section or part those words name; anything else links to itself.
-        const cfr = /^(\d+) CFR (?:\u00a7\u00a7? ?|Parts? )?(\d+)(?:\.(\w+))?$/.exec(x.text);
-        if (cfr) { cfrLinks++; if (x.href !== cfrHref(cfr[1], cfr[2], cfr[3])) bad.push(`${id}.${f}: "${x.text}" links to ${x.href}`); }
-        else if (x.href !== "https://" + x.text) bad.push(`${id}.${f}: link text "${x.text}" differs from its target`);
-        // A code section, a standard number or a version is never a link.
-        if (/^\d+(\.\d+)+$/.test(x.text)) bad.push(`${id}.${f}: version-like "${x.text}" linked`);
-      }
-      const html = linkedCitationHtml(v);
-      if (/<(?!a class="citation-link" href="https:\/\/|\/a>)/.test(html)) bad.push(`${id}.${f}: unescaped markup in shell HTML`);
-    }
-    if (tileLinked) tiles++;
+test("citation links: the spec's examples link where they should, and only there", () => {
+  assert.deepEqual(links("IRC 2024 R1001.10 and R1001.9.2"), [["IRC 2024 R1001.10", "https://codes.iccsafe.org/content/IRC2024V2.1/chapter-10-chimneys-and-fireplaces"]]);
+  assert.deepEqual(links("IPC 2027 Table 709.1"), [["IPC 2027 Table 709.1", "https://codes.iccsafe.org/content/IPC2027V1.0/chapter-7-sanitary-drainage"]]);
+  assert.deepEqual(links("IMC 2027 507.3"), [["IMC 2027 507.3", "https://codes.iccsafe.org/content/IMC2027V1.0/chapter-5-exhaust-systems-smoke-control-systems-and-energy-recovery-ventilation-systems"]]);
+  assert.deepEqual(links("NEC 2023 (NFPA 70)."), [["NEC 2023", "https://link.nfpa.org/free-access/publications/70/2023"]]);
+  assert.deepEqual(links("NFPA 13-2025"), [["NFPA 13-2025", "https://link.nfpa.org/free-access/publications/13/2025"]]);
+  for (const t of ["IRC 179 expensing (Internal Revenue Code)", "IBC 2021 Table 506.3", "IBC 2027 alone", "NFPA 70 alone", "NEC alone", "IECC 2024 Table R403.3", "IRC 2021 R311.7.5", "IPC Table E103.3"]) {
+    assert.deepEqual(links(t), [], t);
   }
-  assert.ok(tiles > 500 && links > 600, `only ${tiles} tiles / ${links} links: did the matcher or the citations change?`);
-  assert.ok(cfrLinks > 100, `only ${cfrLinks} CFR links: did the CFR matcher change?`);
-  assert.deepEqual(bad.slice(0, 20), [], `${bad.length} bad citation link(s)`);
 });
 
-test("the matcher leaves version numbers alone, links CFR sections to eCFR, and escapes the rest", () => {
-  assert.deepEqual(citationSegments("29 CFR 1910.146 and IEEE 802.3, free at ecfr.gov."), [
-    { text: "29 CFR 1910.146", href: "https://www.ecfr.gov/current/title-29/section-1910.146" },
-    { text: " and IEEE 802.3, free at " },
-    { text: "ecfr.gov", href: "https://ecfr.gov" },
-    { text: "." },
-  ]);
-  assert.equal(linkedCitationHtml("A <b> & nfpa.org/freeaccess"),
-    'A &lt;b&gt; &amp; <a class="citation-link" href="https://nfpa.org/freeaccess" rel="noopener noreferrer">nfpa.org/freeaccess</a>');
-  assert.deepEqual(citationSegments("no link here"), [{ text: "no link here" }]);
-  assert.deepEqual(citationSegments("29 CFR § 1926.502(d)(16); 49 CFR 213; 29 CFR Part 1926 Subpart P"), [
-    { text: "29 CFR § 1926.502", href: "https://www.ecfr.gov/current/title-29/section-1926.502" },
-    { text: "(d)(16); " },
-    { text: "49 CFR 213", href: "https://www.ecfr.gov/current/title-49/part-213" },
-    { text: "; " },
-    { text: "29 CFR Part 1926", href: "https://www.ecfr.gov/current/title-29/part-1926" },
-    { text: " Subpart P" },
-  ], "a paragraph and a subpart stay text; a bare part links to the part");
-  assert.deepEqual(citationSegments("51 CFR 3 and 129 CFR 4"), [{ text: "51 CFR 3 and 129 CFR 4" }], "CFR titles run 1 to 50");
+test("citation links: every ICC link in the catalog rebuilds from its own text and lands in a listed chapter", () => {
+  let icc = 0, nfpa = 0;
+  for (const c of Object.values(CITATIONS)) {
+    for (const k of ["formula", "edition", "freeAccess", "governance", "editionNote"]) {
+      for (const seg of citationSegments(c[k])) {
+        if (!seg.href) continue;
+        let m = seg.href.match(/^https:\/\/codes\.iccsafe\.org\/content\/([A-Z]+)(\d{4})V[\d.]+\/(chapter-(\d+)-[a-z0-9-]+)$/);
+        if (m) {
+          icc++;
+          const t = seg.text.match(/^(IRC|IBC|IPC|IMC|IFGC)(?:\s+(\d{4}))?\s+(?:(?:Sections?|Tables?|Figure)\s+)?([A-Z]{0,2})(\d{3,4})((?:\.\d+)*)$/);
+          assert.ok(t, seg.text);
+          assert.equal(iccHref(t[1], t[2], t[3], t[4], Boolean(t[5])), seg.href);
+          assert.ok(Number(m[4]) >= 1 && Number(m[4]) <= 60);
+          assert.equal(ICC_CHAPTERS[m[1]].chapters[m[4]], m[3]);
+          continue;
+        }
+        m = seg.href.match(/^https:\/\/link\.nfpa\.org\/free-access\/publications\/(\w+)\/(\d{4})$/);
+        if (m) { nfpa++; assert.equal(seg.href, nfpaHref(m[1], m[2])); }
+      }
+    }
+  }
+  assert.ok(icc >= 100, `only ${icc} ICC links: the matcher may be broken`);
+  assert.ok(nfpa >= 50, `only ${nfpa} NFPA links`);
+});
+
+test("citation links: the lint passes on the shipped table (seeded red by hand on landing: stale stamp, dropped chapter)", () => {
+  const script = fileURLToPath(new URL("../../scripts/check-citation-links.mjs", import.meta.url));
+  assert.match(execFileSync(process.execPath, [script], { encoding: "utf8" }), /check-citation-links OK/);
 });

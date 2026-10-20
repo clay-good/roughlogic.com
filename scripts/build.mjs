@@ -42,6 +42,7 @@ const FILES = [
   "clipboard.js",
   "ui-fields.js",
   "length-entry.js",
+  "icc-chapters.js",
   "ui-validity.js",
   // spec-v1339: the field index's shared vocabulary. field-bucket.js exists
   // so the build step that WRITES data/fields/*.json and the browser code
