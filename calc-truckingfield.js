@@ -175,7 +175,7 @@ TRUCKINGFIELD_RENDERERS["tiedown-count"] = _simpleRenderer({
 });
 
 // ===================== spec-v1378: kingpin-to-rear-axle compliance =====================
-// dims: in { kpra_ft: L, state_limit_ft: L, hole_spacing_in: L } out: { excess_ft: L, holes_needed: dimensionless, resulting_kpra_ft: L }
+// dims: in { kpra_ft: L, state_limit_ft: L, hole_spacing_in: L } out: { excess_ft: L, holes_needed: dimensionless, resulting_kpra_ft: L, slide_in: L }
 export function computeKingpinToAxle({ kpra_ft = 0, state_limit_ft = 40, hole_spacing_in = 6 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(kpra_ft > 0)) return { error: "Measured kingpin-to-rear-axle distance must be positive." };
@@ -225,7 +225,7 @@ TRUCKINGFIELD_RENDERERS["kingpin-to-axle"] = _simpleRenderer({
 });
 
 // ===================== spec-v1379: safe downgrade descent speed =====================
-// dims: in { gcw_lb: M L T^-2, grade_pct: dimensionless, descent_speed_mph: L T^-1, engine_brake_hp: M L^2 T^-3 } out: { descent_power_hp: M L^2 T^-3, balance_speed_mph: L T^-1, service_brake_hp: M L^2 T^-3 }
+// dims: in { gcw_lb: M L T^-2, grade_pct: dimensionless, descent_speed_mph: L T^-1, engine_brake_hp: M L^2 T^-3 } out: { descent_power_hp: M L^2 T^-3, balance_speed_mph: L T^-1, service_brake_hp: M L^2 T^-3, reserve_hp: M L^2 T^-3 }
 export function computeSafeDescentSpeed({ gcw_lb = 0, grade_pct = 0, descent_speed_mph = 0, engine_brake_hp = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(gcw_lb > 0)) return { error: "Gross combination weight must be positive." };
@@ -334,7 +334,7 @@ TRUCKINGFIELD_RENDERERS["air-brake-pushrod-stroke"] = _simpleRenderer({
 });
 
 // ===================== spec-v1381: oversize / overweight permit threshold screen =====================
-// dims: in { width_ft: L, height_ft: L, length_ft: L, weight_lb: M L T^-2, width_limit_ft: L, height_limit_ft: L, length_limit_ft: L, weight_limit_lb: M L T^-2 } out: { width_excess_ft: L, height_excess_ft: L, length_excess_ft: L, weight_excess_lb: M L T^-2 }
+// dims: in { width_ft: L, height_ft: L, length_ft: L, weight_lb: M L T^-2, width_limit_ft: L, height_limit_ft: L, length_limit_ft: L, weight_limit_lb: M L T^-2 } out: { width_excess_ft: L, height_excess_ft: L, length_excess_ft: L, weight_excess_lb: M L T^-2, over_count: dimensionless }
 export function computeOversizePermitScreen({
   width_ft = 0, height_ft = 0, length_ft = 0, weight_lb = 0,
   width_limit_ft = 8.5, height_limit_ft = 13.5, length_limit_ft = 75, weight_limit_lb = 80000,
@@ -397,7 +397,7 @@ TRUCKINGFIELD_RENDERERS["oversize-permit-screen"] = _simpleRenderer({
 });
 
 // ===================== spec-v1382: hazmat placarding threshold screen =====================
-// dims: in { materials: dimensionless, table1_present: dimensionless } out: { table2_aggregate_lb: M, threshold_met: dimensionless }
+// dims: in { materials: dimensionless, table1_present: dimensionless } out: { table2_aggregate_lb: M, threshold_met: dimensionless, class_count: dimensionless }
 export function computeHazmatPlacardThreshold({ materials = [], table1_present = false } = {}) {
   if (!Array.isArray(materials) || materials.length === 0) return { error: "List at least one hazardous material with its gross weight." };
   // 172.504(c) opens "Except for bulk packagings": the 1,001 lb exception never
@@ -565,7 +565,7 @@ TRUCKINGFIELD_RENDERERS["idle-fuel-cost"] = _simpleRenderer({
 });
 
 // ===================== spec-v1384: flatbed tarp coverage, count, and weight =====================
-// dims: in { load_length_ft: L, load_width_ft: L, load_height_ft: L, tarp_length_ft: L, tarp_width_ft: L, overlap_ft: L, tuck_ft: L, tarp_weight_lb: M } out: { width_needed_ft: L, tarps_needed: dimensionless, covered_length_ft: L, total_weight_lb: M }
+// dims: in { load_length_ft: L, load_width_ft: L, load_height_ft: L, tarp_length_ft: L, tarp_width_ft: L, overlap_ft: L, tuck_ft: L, tarp_weight_lb: M } out: { width_needed_ft: L, tarps_needed: dimensionless, covered_length_ft: L, total_weight_lb: M, width_spare_ft: L }
 export function computeFlatbedTarpSize({ load_length_ft = 0, load_width_ft = 0, load_height_ft = 0, tarp_length_ft = 0, tarp_width_ft = 0, overlap_ft = 0, tuck_ft = 1, tarp_weight_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(load_length_ft > 0 && load_width_ft > 0)) return { error: "Load length and width must be positive." };
@@ -627,7 +627,7 @@ TRUCKINGFIELD_RENDERERS["flatbed-tarp-size"] = _simpleRenderer({
 });
 
 // ===================== spec-v1385: trailer deck point load and dunnage spread =====================
-// dims: in { load_lb: M L T^-2, feet_count: dimensionless, foot_area_sqin: L^2, dunnage_bearing_ft: L, deck_rating_plf: M T^-2 } out: { bearing_pressure_psf: M L^-1 T^-2, linear_load_plf: M T^-2, utilization_pct: dimensionless, required_length_ft: L }
+// dims: in { load_lb: M L T^-2, feet_count: dimensionless, foot_area_sqin: L^2, dunnage_bearing_ft: L, deck_rating_plf: M T^-2 } out: { bearing_pressure_psf: M L^-1 T^-2, linear_load_plf: M T^-2, utilization_pct: dimensionless, required_length_ft: L, shortfall_ft: L, total_bearing_sqft: L^2 }
 export function computeDeckPointLoadDunnage({ load_lb = 0, feet_count = 4, foot_area_sqin = 0, dunnage_bearing_ft = 0, deck_rating_plf = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(load_lb > 0)) return { error: "Concentrated load must be positive." };

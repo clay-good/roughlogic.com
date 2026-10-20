@@ -88,7 +88,7 @@ export const SAFETY_RENDERERS = {};
 // RUNGS: spaced not less than 10 in nor more than 14 in apart, measured between centrelines.
 // It is a WINDOW, and too close fails as surely as too far.
 // WIDTH: minimum clear distance between side rails for all portable ladders is 11.5 in.
-// dims: in { ladder_length_ft: L, landing_height_ft: L, extension_above_landing_ft: L, rung_spacing_in: L, clear_width_in: L, secured_with_grasping_device: dimensionless, base_ratio: dimensionless } out: { required_extension_ft: L, base_setback_ft: L, max_landing_served_ft: L, climbable_height_ft: L }
+// dims: in { ladder_length_ft: L, landing_height_ft: L, extension_above_landing_ft: L, rung_spacing_in: L, clear_width_in: L, secured_with_grasping_device: dimensionless, base_ratio: dimensionless } out: { required_extension_ft: L, base_setback_ft: L, max_landing_served_ft: L, climbable_height_ft: L, extension_shortfall_ft: L, length_short_ft: L, rail_used_to_landing_ft: L, rail_used_total_ft: L, width_shortfall_in: L }
 export function computePortableLadderSetup({ ladder_length_ft = 0, landing_height_ft = 0, extension_above_landing_ft = 0, rung_spacing_in = 12, clear_width_in = 12, secured_with_grasping_device = "no", base_ratio = 4 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const L = Number(ladder_length_ft) || 0;
@@ -186,7 +186,7 @@ SAFETY_RENDERERS["portable-ladder-setup"] = _simpleRendererG({
 // guidance halves the adjusted value, and NIOSH derates the LABELLED NRR by type - 25% for
 // earmuffs, 50% for slow-recovery formable earplugs, 70% for all other earplugs - because a
 // laboratory fit is not a jobsite fit.
-// dims: in { twa_db: dimensionless, weighting: dimensionless, nrr_db: dimensionless, method: dimensionless, dual_protection: dimensionless, dual_bonus_db: dimensionless, target_db: dimensionless } out: { protected_twa_db: dimensionless, effective_attenuation_db: dimensionless, margin_db: dimensionless, label_vs_real_db: dimensionless }
+// dims: in { twa_db: dimensionless, weighting: dimensionless, nrr_db: dimensionless, method: dimensionless, dual_protection: dimensionless, dual_bonus_db: dimensionless, target_db: dimensionless } out: { protected_twa_db: dimensionless, effective_attenuation_db: dimensionless, margin_db: dimensionless, label_vs_real_db: dimensionless, appendix_b_attenuation_db: dimensionless, base_attenuation_db: dimensionless, derated_nrr_db: dimensionless, dual_bonus_applied_db: dimensionless, nrr_needed_db: dimensionless, spectral_adjustment_db: dimensionless }
 export function computeHearingProtectorNrr({ twa_db = 0, weighting = "A", nrr_db = 0, method = "appendix-b", dual_protection = "no", dual_bonus_db = 5, target_db = 85 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const twa = Number(twa_db);
@@ -425,7 +425,7 @@ SAFETY_RENDERERS["silica-table-1"] = _simpleRendererG({
 // OSHA then puts a factor on top: 1926.502(d)(8) requires a horizontal lifeline to maintain a
 // safety factor of at least two, and (d)(15) wants an anchorage good for 5,000 lb per employee
 // unless the whole system is engineered to that factor of two by a qualified person.
-// dims: in { span_ft: L, sag_ft: L, arrest_force_lb: M L T^-2, workers: dimensionless } out: { cable_tension_lb: M L T^-2, horizontal_pull_lb: M L T^-2, anchorage_demand_lb: M L T^-2, sag_for_target_ft: L, target_tension_lb: M L T^-2 }
+// dims: in { span_ft: L, sag_ft: L, arrest_force_lb: M L T^-2, workers: dimensionless } out: { cable_tension_lb: M L T^-2, horizontal_pull_lb: M L T^-2, anchorage_demand_lb: M L T^-2, sag_for_target_ft: L, target_tension_lb: M L T^-2, angle_deg: dimensionless, decel_max_ft: L, free_fall_max_ft: L, slant_ft: L }
 export function computeLifelineTension({ span_ft = 0, sag_ft = 0, arrest_force_lb = 1800, workers = 1, safety_factor = 2, anchorage_capacity_lb = 0, target_tension_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const L = Number(span_ft) || 0;

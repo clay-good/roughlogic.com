@@ -173,7 +173,7 @@ const _POOL_BOND_ITEMS = [
   "Pool water via a listed water-bond fitting (>= 9 sq in) -- 680.26(C)",
 ];
 
-// dims: in { pool_type: dimensionless } out: { items: dimensionless }
+// dims: in { pool_type: dimensionless } out: { items: dimensionless, item_count: dimensionless }
 export function computePoolBonding68026({ pool_type = "permanent pool/spa" } = {}) {
   if (!_POOL_TYPES.includes(pool_type)) return { error: "Pool type not recognized." };
   let items;

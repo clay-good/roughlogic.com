@@ -93,7 +93,7 @@ export const BREWING_RENDERERS = {};
 // leaves out, and the thermal-mass RATIO is what makes it matter on a small
 // batch and vanish on a large one.
 
-// dims: in { grain_weight_lb: M, mash_thickness_qt_per_lb: L^3 M^-1, grain_temp_f: T, target_mash_temp_f: T, grain_specific_heat: L^2 T^-2, tun_weight_lb: M, tun_specific_heat: L^2 T^-2, tun_temp_f: T } out: { mash_water_gal: L^3, mash_weight_lb: M, strike_temp_f: T, convention_strike_temp_f: T, tun_drop_f: T }
+// dims: in { grain_weight_lb: M, mash_thickness_qt_per_lb: L^3 M^-1, grain_temp_f: T, target_mash_temp_f: T, grain_specific_heat: L^2 T^-2, tun_weight_lb: M, tun_specific_heat: L^2 T^-2, tun_temp_f: T } out: { mash_water_gal: L^3, mash_weight_lb: M, strike_temp_f: T, convention_strike_temp_f: T, tun_drop_f: T, grain_weight_lb: M, tun_share_of_capacity_pct: dimensionless, water_lb: M }
 export function computeMashStrikeWater({ grain_weight_lb = 0, mash_thickness_qt_per_lb = 0, grain_temp_f = null, target_mash_temp_f = 0, grain_specific_heat = 0, tun_weight_lb = 0, tun_specific_heat = 0, tun_temp_f = null } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   // 0 F is a real reading, so a blank temperature cannot stand in for it. The tun's
@@ -170,7 +170,7 @@ BREWING_RENDERERS["mash-strike-water"] = _simpleRenderer({
 // brewhouse. On a high-gravity brew the SPARGE shrinks as the mash grows, which
 // is why efficiency falls as gravity rises.
 
-// dims: in { grain_weight_lb: M, mash_thickness_qt_per_lb: L^3 M^-1, absorption_gal_per_lb: L^3 M^-1, preboil_volume_gal: L^3, deadspace_gal: L^3, alternative_grain_weight_lb: M } out: { mash_water_gal: L^3, absorbed_gal: L^3, first_runnings_gal: L^3, sparge_gal: L^3, total_water_gal: L^3 }
+// dims: in { grain_weight_lb: M, mash_thickness_qt_per_lb: L^3 M^-1, absorption_gal_per_lb: L^3 M^-1, preboil_volume_gal: L^3, deadspace_gal: L^3, alternative_grain_weight_lb: M } out: { mash_water_gal: L^3, absorbed_gal: L^3, first_runnings_gal: L^3, sparge_gal: L^3, total_water_gal: L^3, absorbed_share_pct: dimensionless, alternative_absorbed_gal: L^3, alternative_first_runnings_gal: L^3, alternative_mash_water_gal: L^3, alternative_sparge_gal: L^3, extra_absorbed_gal: L^3, grain_change_pct: dimensionless, grain_weight_lb: M, preboil_volume_gal: L^3, sparge_change_pct: dimensionless, sparge_share_pct: dimensionless }
 export function computeSpargeWaterVolume({ grain_weight_lb = 0, mash_thickness_qt_per_lb = 0, absorption_gal_per_lb = 0, preboil_volume_gal = 0, deadspace_gal = 0, alternative_grain_weight_lb = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   if (!(grain_weight_lb > 0) || !(alternative_grain_weight_lb > 0)) return { error: "Grain weights must be positive." };
@@ -241,7 +241,7 @@ BREWING_RENDERERS["sparge-water-volume"] = _simpleRenderer({
 // that publishes one and scales with the other is short of extract every time.
 // And at high gravity the lost extract is the largest single cost of the day.
 
-// dims: in { grain_weight_lb: M, extract_potential_ppg: L^3 M^-1, volume_gal: L^3, original_gravity: dimensionless, transfer_loss_gal: L^3, strong_grain_weight_lb: M, assumed_efficiency_pct: dimensionless, achieved_efficiency_pct: dimensionless } out: { kettle_efficiency_pct: dimensionless, fermenter_efficiency_pct: dimensionless, assumed_og_points: dimensionless, achieved_og_points: dimensionless, shortfall_point_gallons: L^3, shortfall_malt_equivalent_lb: M, malt_to_recover_lb: M }
+// dims: in { grain_weight_lb: M, extract_potential_ppg: L^3 M^-1, volume_gal: L^3, original_gravity: dimensionless, transfer_loss_gal: L^3, strong_grain_weight_lb: M, assumed_efficiency_pct: dimensionless, achieved_efficiency_pct: dimensionless } out: { kettle_efficiency_pct: dimensionless, fermenter_efficiency_pct: dimensionless, assumed_og_points: dimensionless, achieved_og_points: dimensionless, shortfall_point_gallons: L^3, shortfall_malt_equivalent_lb: M, malt_to_recover_lb: M, achieved_efficiency_pct: dimensionless, assumed_efficiency_pct: dimensionless, available_point_gallons: L^3, fermenter_shortfall_pct: dimensionless, fermenter_volume_gal: L^3, grain_weight_lb: M, kettle_point_gallons: L^3, total_left_point_gallons: L^3, transfer_loss_gal: L^3, volume_gal: L^3 }
 export function computeBrewhouseEfficiency({ grain_weight_lb = 0, extract_potential_ppg = 0, volume_gal = 0, original_gravity = 0, transfer_loss_gal = 0, strong_grain_weight_lb = 0, assumed_efficiency_pct = 0, achieved_efficiency_pct = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   // An efficiency is a percent; 0 < value < 1 is a fraction typed into a percent field (added 2026-09-26).
@@ -324,7 +324,7 @@ BREWING_RENDERERS["brewhouse-efficiency"] = _simpleRenderer({
 // bitterness; and wort gravity suppresses it, so a strong beer needs a bigger
 // hop bill to taste the same.
 
-// dims: in { batch_volume_gal: L^3, hop_weight_lb: M, alpha_acid_pct: dimensionless, boil_minutes: T, boil_gravity: dimensionless, short_boil_minutes: T, strong_boil_gravity: dimensionless } out: { alpha_acid_mg_per_l: M L^-3, utilization: dimensionless, ibu: dimensionless, short_boil_ibu: dimensionless, strong_gravity_ibu: dimensionless, hops_to_match_lb: M }
+// dims: in { batch_volume_gal: L^3, hop_weight_lb: M, alpha_acid_pct: dimensionless, boil_minutes: T, boil_gravity: dimensionless, short_boil_minutes: T, strong_boil_gravity: dimensionless } out: { alpha_acid_mg_per_l: M L^-3, utilization: dimensionless, ibu: dimensionless, short_boil_ibu: dimensionless, strong_gravity_ibu: dimensionless, hops_to_match_lb: M, batch_volume_gal: L^3, short_boil_share_pct: dimensionless, short_time_share_pct: dimensionless, strong_gravity_loss_pct: dimensionless, utilization_pct: dimensionless }
 export function computeIbuTinseth({ batch_volume_gal = 0, hop_weight_lb = 0, alpha_acid_pct = 0, boil_minutes = 0, boil_gravity = 0, short_boil_minutes = 0, strong_boil_gravity = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   // Unit / range guard added 2026-09-26 after printed-example probing.
@@ -391,7 +391,7 @@ BREWING_RENDERERS["ibu-tinseth"] = _simpleRenderer({
 // color, and a small weight of dark malt carries most of it -- so a two-pound
 // error on the roast moves the color more than a fifty-pound error on the base.
 
-// dims: in { base_malt_lb: M, base_lovibond: dimensionless, crystal_malt_lb: M, crystal_lovibond: dimensionless, roast_malt_lb: M, roast_lovibond: dimensionless, batch_volume_gal: L^3 } out: { mcu: dimensionless, srm: dimensionless, srm_without_roast: dimensionless }
+// dims: in { base_malt_lb: M, base_lovibond: dimensionless, crystal_malt_lb: M, crystal_lovibond: dimensionless, roast_malt_lb: M, roast_lovibond: dimensionless, batch_volume_gal: L^3 } out: { mcu: dimensionless, srm: dimensionless, srm_without_roast: dimensionless, batch_volume_gal: L^3, roast_mcu_share_pct: dimensionless, roast_weight_share_pct: dimensionless }
 export function computeBeerColorSrm({ base_malt_lb = 0, base_lovibond = 0, crystal_malt_lb = 0, crystal_lovibond = 0, roast_malt_lb = 0, roast_lovibond = 0, batch_volume_gal = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   if (!(batch_volume_gal > 0)) return { error: "The batch volume must be positive." };
@@ -454,7 +454,7 @@ BREWING_RENDERERS["beer-color-srm"] = _simpleRenderer({
 // hides viability: pitching by a mark on the bucket underpitches the moment the
 // yeast ages, with nothing in the bucket looking different.
 
-// dims: in { batch_volume_gal: L^3, original_gravity: dimensionless, pitch_rate_million_per_ml_plato: dimensionless, slurry_cells_per_ml: L^-3, viability_pct: dimensionless, aged_viability_pct: dimensionless, strong_original_gravity: dimensionless } out: { plato: dimensionless, cells_required: dimensionless, slurry_ml: L^3, slurry_gal: L^3, aged_slurry_gal: L^3, strong_cells_required: dimensionless }
+// dims: in { batch_volume_gal: L^3, original_gravity: dimensionless, pitch_rate_million_per_ml_plato: dimensionless, slurry_cells_per_ml: L^-3, viability_pct: dimensionless, aged_viability_pct: dimensionless, strong_original_gravity: dimensionless } out: { plato: dimensionless, cells_required: dimensionless, slurry_ml: L^3, slurry_gal: L^3, aged_slurry_gal: L^3, strong_cells_required: dimensionless, aged_slurry_increase_pct: dimensionless, aged_viability_pct: dimensionless, batch_volume_gal: L^3, strong_increase_pct: dimensionless, underpitch_by_volume_pct: dimensionless, viability_pct: dimensionless }
 export function computeYeastPitchRate({ batch_volume_gal = 0, original_gravity = 0, pitch_rate_million_per_ml_plato = 0, slurry_cells_per_ml = 0, viability_pct = 0, aged_viability_pct = 0, strong_original_gravity = 0 } = {}) {
   if (original_gravity > 1.2 || (strong_original_gravity > 1.2)) return { error: "Enter gravities as specific gravity (1.055), not points or degrees Plato." };
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
@@ -523,7 +523,7 @@ BREWING_RENDERERS["yeast-pitch-rate"] = _simpleRenderer({
 // smaller beer, and topping up to volume cancels the two errors rather than
 // fixing either.
 
-// dims: in { preboil_volume_gal: L^3, preboil_gravity: dimensionless, boiloff_pct_per_hour: dimensionless, boil_hours: T, shrinkage_pct: dimensionless, hard_boiloff_pct_per_hour: dimensionless } out: { evaporated_gal: L^3, hot_volume_gal: L^3, cooled_volume_gal: L^3, cooled_og_points: dimensionless, hard_cooled_volume_gal: L^3, hard_og_points: dimensionless }
+// dims: in { preboil_volume_gal: L^3, preboil_gravity: dimensionless, boiloff_pct_per_hour: dimensionless, boil_hours: T, shrinkage_pct: dimensionless, hard_boiloff_pct_per_hour: dimensionless } out: { evaporated_gal: L^3, hot_volume_gal: L^3, cooled_volume_gal: L^3, cooled_og_points: dimensionless, hard_cooled_volume_gal: L^3, hard_og_points: dimensionless, extract_point_gallons: L^3, hard_volume_short_gal: L^3, hard_volume_short_pct: dimensionless, preboil_volume_gal: L^3, shrinkage_gal: L^3, volume_removed_gal: L^3 }
 export function computeKettleBoilOff({ preboil_volume_gal = 0, preboil_gravity = 0, boiloff_pct_per_hour = 0, boil_hours = 0, shrinkage_pct = 0, hard_boiloff_pct_per_hour = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   // Unit / range guard added 2026-09-26 after printed-example probing.
@@ -599,7 +599,7 @@ BREWING_RENDERERS["kettle-boil-off"] = _simpleRenderer({
 // flattens the beer with the gauge unmoved, and chasing it with pressure
 // over-carbonates the beer once the cooler is fixed.
 
-// dims: in { beer_temp_f: T, gauge_psig: M L^-1 T^-2, target_volumes: dimensionless, warm_temp_f: T } out: { co2_volumes: dimensionless, pressure_for_target_psig: M L^-1 T^-2, warm_co2_volumes: dimensionless, warm_pressure_for_target_psig: M L^-1 T^-2, overcarbonation_volumes: dimensionless }
+// dims: in { beer_temp_f: T, gauge_psig: M L^-1 T^-2, target_volumes: dimensionless, warm_temp_f: T } out: { co2_volumes: dimensionless, pressure_for_target_psig: M L^-1 T^-2, warm_co2_volumes: dimensionless, warm_pressure_for_target_psig: M L^-1 T^-2, overcarbonation_volumes: dimensionless, gauge_psig: M L^-1 T^-2, warm_loss_pct: dimensionless, warm_pressure_increase_pct: dimensionless }
 export function computeCarbonationVolumesPressure({ beer_temp_f = 0, gauge_psig = 0, target_volumes = 0, warm_temp_f = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   if (!(beer_temp_f >= 28 && beer_temp_f <= 80) || !(warm_temp_f >= 28 && warm_temp_f <= 80)) return { error: "Beer temperatures must be between 28 and 80 deg F, the range the fit covers." };
@@ -656,7 +656,7 @@ BREWING_RENDERERS["carbonation-volumes-pressure"] = _simpleRenderer({
 // on the heat of fermentation is short on the day a tank comes down, and the
 // shortfall shows up as a crash that takes three days instead of one.
 
-// dims: in { batch_volume_gal: L^3, original_gravity: dimensionless, final_gravity: dimensionless, heat_of_fermentation_btu_per_lb: L^2 T^-2, peak_day_share_pct: dimensionless, crash_start_temp_f: T, crash_target_temp_f: T, crash_hours: T, tank_surface_sqft: L^2, tank_u_factor: M T^-4, cellar_temp_f: T, glycol_delta_t_f: T } out: { fermentation_heat_btu: M L^2 T^-2, adiabatic_rise_f: T, fermentation_load_btuh: M L^2 T^-3, crash_load_btuh: M L^2 T^-3, glycol_gpm: L^3 T^-1 }
+// dims: in { batch_volume_gal: L^3, original_gravity: dimensionless, final_gravity: dimensionless, heat_of_fermentation_btu_per_lb: L^2 T^-2, peak_day_share_pct: dimensionless, crash_start_temp_f: T, crash_target_temp_f: T, crash_hours: T, tank_surface_sqft: L^2, tank_u_factor: M T^-4, cellar_temp_f: T, glycol_delta_t_f: T } out: { fermentation_heat_btu: M L^2 T^-2, adiabatic_rise_f: T, fermentation_load_btuh: M L^2 T^-3, crash_load_btuh: M L^2 T^-3, glycol_gpm: L^3 T^-1, ambient_btuh: M L^2 T^-3, batch_volume_gal: L^3, crash_heat_btu: M L^2 T^-2, fast_crash_load_btuh: M L^2 T^-3, fermentation_ambient_btuh: M L^2 T^-3, fermentation_sizing_shortfall_pct: dimensionless }
 export function computeFermenterGlycolLoad({ batch_volume_gal = 0, original_gravity = 0, final_gravity = 0, heat_of_fermentation_btu_per_lb = 0, peak_day_share_pct = 0, crash_start_temp_f = 0, crash_target_temp_f = null, crash_hours = 0, tank_surface_sqft = 0, tank_u_factor = 0, cellar_temp_f = 0, glycol_delta_t_f = 0 } = {}) {
   if (original_gravity > 1.2 || final_gravity > 1.2) return { error: "Enter gravities as specific gravity (1.055), not points or degrees Plato." };
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
@@ -752,7 +752,7 @@ BREWING_RENDERERS["fermenter-glycol-load"] = _simpleRenderer({
 // catches an arithmetic error anywhere in a gauging record. The tax follows the
 // alcohol, not the bottle.
 
-// dims: in { wash_volume_gal: L^3, wash_abv_pct: dimensionless, recovery_pct: dimensionless, collection_proof: dimensionless, alternative_proof: dimensionless, hearts_share_pct: dimensionless, excise_rate_per_pg: dimensionless } out: { absolute_alcohol_gal: L^3, recovered_alcohol_gal: L^3, wine_gallons: L^3, proof_gallons: L^3, hearts_proof_gallons: L^3, excise: dimensionless }
+// dims: in { wash_volume_gal: L^3, wash_abv_pct: dimensionless, recovery_pct: dimensionless, collection_proof: dimensionless, alternative_proof: dimensionless, hearts_share_pct: dimensionless, excise_rate_per_pg: dimensionless } out: { absolute_alcohol_gal: L^3, recovered_alcohol_gal: L^3, wine_gallons: L^3, proof_gallons: L^3, hearts_proof_gallons: L^3, excise: dimensionless, alternative_proof_gallons: L^3, alternative_wine_gallons: L^3, heads_tails_proof_gallons: L^3, hearts_alcohol_gal: L^3, hearts_share_pct: dimensionless, wash_volume_gal: L^3 }
 export function computeProofGallonYield({ wash_volume_gal = 0, wash_abv_pct = 0, recovery_pct = 0, collection_proof = 0, alternative_proof = 0, hearts_share_pct = 0, excise_rate_per_pg = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   // Unit / range guard added 2026-09-26 after printed-example probing.
@@ -822,7 +822,7 @@ BREWING_RENDERERS["proof-gallon-yield"] = _simpleRenderer({
 // does not scale or average -- which is why yield is tracked in whole packages
 // rather than in percentages.
 
-// dims: in { brite_volume_gal: L^3, transfer_loss_pct: dimensionless, fill_loss_pct: dimensionless, package_gal: L^3, smallest_package_gal: L^3, revenue_per_package: dimensionless } out: { packaged_volume_gal: L^3, whole_packages: dimensionless, remainder_gal: L^3, saleable_gal: L^3, total_loss_gal: L^3 }
+// dims: in { brite_volume_gal: L^3, transfer_loss_pct: dimensionless, fill_loss_pct: dimensionless, package_gal: L^3, smallest_package_gal: L^3, revenue_per_package: dimensionless } out: { packaged_volume_gal: L^3, whole_packages: dimensionless, remainder_gal: L^3, saleable_gal: L^3, total_loss_gal: L^3, after_transfer_gal: L^3, brite_volume_gal: L^3, package_gal: L^3, process_loss_gal: L^3, remainder_package_fraction: dimensionless, remainder_share_of_loss_pct: dimensionless, remainder_short_of_smallest_gal: L^3, smallest_package_gal: L^3, total_loss_pct: dimensionless }
 export function computePackagingYieldLoss({ brite_volume_gal = 0, transfer_loss_pct = 0, fill_loss_pct = 0, package_gal = 0, smallest_package_gal = 0, revenue_per_package = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   if (!(brite_volume_gal > 0)) return { error: "The brite tank volume must be positive." };
@@ -885,7 +885,7 @@ BREWING_RENDERERS["packaging-yield-loss"] = _simpleRenderer({
 // The depth limit caps the brewhouse, and it is a vessel decision made when the
 // tun was bought. Diameter is the lever and it is quadratic.
 
-// dims: in { tun_diameter_ft: L, grain_weight_lb: M, mash_thickness_qt_per_lb: L^3 M^-1, grain_displacement_gal_per_lb: L^3 M^-1, max_bed_depth_in: L, batch_volume_gal: L^3, efficiency_pct: dimensionless, extract_potential_ppg: L^3 M^-1, alternative_diameter_ft: L } out: { bed_area_sqft: L^2, mash_volume_gal: L^3, bed_depth_in: L, max_grain_lb: M, max_og_points: dimensionless, alternative_bed_depth_in: L, alternative_max_grain_lb: M }
+// dims: in { tun_diameter_ft: L, grain_weight_lb: M, mash_thickness_qt_per_lb: L^3 M^-1, grain_displacement_gal_per_lb: L^3 M^-1, max_bed_depth_in: L, batch_volume_gal: L^3, efficiency_pct: dimensionless, extract_potential_ppg: L^3 M^-1, alternative_diameter_ft: L } out: { bed_area_sqft: L^2, mash_volume_gal: L^3, bed_depth_in: L, max_grain_lb: M, max_og_points: dimensionless, alternative_bed_depth_in: L, alternative_max_grain_lb: M, alternative_area_sqft: L^2, alternative_diameter_ft: L, capacity_increase_pct: dimensionless, diameter_increase_pct: dimensionless, mash_volume_ft3: L^3, max_bed_depth_in: L, tun_diameter_ft: L }
 export function computeMashTunGrainBed({ tun_diameter_ft = 0, grain_weight_lb = 0, mash_thickness_qt_per_lb = 0, grain_displacement_gal_per_lb = 0, max_bed_depth_in = 0, batch_volume_gal = 0, efficiency_pct = 0, extract_potential_ppg = 0, alternative_diameter_ft = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   // An efficiency is a percent; 0 < value < 1 is a fraction typed into a percent field (added 2026-09-26).
@@ -958,7 +958,7 @@ BREWING_RENDERERS["mash-tun-grain-bed"] = _simpleRenderer({
 // exactly -- and the beer lost is the most expensive in the brewery, carrying
 // the whole brew day and lost in the last operation before packaging.
 
-// dims: in { batch_volume_gal: L^3, dry_hop_lb_per_bbl: M L^-3, absorption_gal_per_lb: L^3 M^-1, package_gal: L^3, revenue_per_package: dimensionless, heavy_dry_hop_lb_per_bbl: M L^-3 } out: { hop_weight_lb: M, absorbed_gal: L^3, loss_pct: dimensionless, heavy_absorbed_gal: L^3, heavy_packages_lost: dimensionless }
+// dims: in { batch_volume_gal: L^3, dry_hop_lb_per_bbl: M L^-3, absorption_gal_per_lb: L^3 M^-1, package_gal: L^3, revenue_per_package: dimensionless, heavy_dry_hop_lb_per_bbl: M L^-3 } out: { hop_weight_lb: M, absorbed_gal: L^3, loss_pct: dimensionless, heavy_absorbed_gal: L^3, heavy_packages_lost: dimensionless, batch_volume_gal: L^3, heavy_loss_pct: dimensionless }
 export function computeDryHopBeerLoss({ batch_volume_gal = 0, dry_hop_lb_per_bbl = 0, absorption_gal_per_lb = 0, package_gal = 0, revenue_per_package = 0, heavy_dry_hop_lb_per_bbl = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   if (!(batch_volume_gal > 0)) return { error: "The batch volume must be positive." };

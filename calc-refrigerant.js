@@ -875,7 +875,7 @@ REFRIGERANT_RENDERERS["condenser-cop-for-heat-rejection"] = _renderCondenserCopF
 
 // ===================== spec-v432..v434: walk-in refrigeration trio (Group C) =====================
 
-// dims: in { u_factor: dimensionless, area_ft2: L^2, delta_t_f: T, infiltration_btuh: M L^2 T^-3, product_btuh: M L^2 T^-3, internal_btuh: M L^2 T^-3, safety: dimensionless, run_hours: T } out: { transmission_btuh: M L^2 T^-3, total_btuh: M L^2 T^-3, tons: M, equipment_btuh: M L^2 T^-3 }
+// dims: in { u_factor: dimensionless, area_ft2: L^2, delta_t_f: T, infiltration_btuh: M L^2 T^-3, product_btuh: M L^2 T^-3, internal_btuh: M L^2 T^-3, safety: dimensionless, run_hours: T } out: { transmission_btuh: M L^2 T^-3, total_btuh: M L^2 T^-3, tons: M, equipment_btuh: M L^2 T^-3, run_hours: T, subtotal_btuh: M L^2 T^-3 }
 export function computeWalkInCoolerLoad({ u_factor = 0, area_ft2 = 0, delta_t_f = 0, infiltration_btuh = 0, product_btuh = 0, internal_btuh = 0, safety = 1.10, run_hours = 16 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const u = Number(u_factor) || 0;
@@ -1047,7 +1047,7 @@ function _v698renderProductPullDownTime(inputRegion, outputRegion, citationEl) {
 }
 REFRIGERANT_RENDERERS["product-pull-down-time"] = _v698renderProductPullDownTime;
 
-// dims: in { box_temp_f: T, sst_f: T } out: { dtd: T }
+// dims: in { box_temp_f: T, sst_f: T } out: { dtd: T, capacity_at_dtd_btuh: M L^2 T^-3, capacity_at_rating_btuh: M L^2 T^-3 }
 export function computeEvaporatorTdDtd({ box_temp_f = null, sst_f = null, design_load_btuh = 0, coil_ua_btuh_f = 0, rating_td_f = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // 0 F is a real box or suction temperature, so a blank cannot stand in for it.
@@ -1425,7 +1425,7 @@ REFRIGERANT_RENDERERS["txv-capacity-check"] = _simpleRenderer({
 });
 
 // ===================== spec-v1414: evaporator defrost heat and cycle time =====================
-// dims: in { frost_lb: M, coil_temp_f: T, coil_mass_lb: M, coil_specific_heat: L^2 T^-2, coil_temp_rise_f: T, heater_btuh: M L^2 T^-3, defrost_efficiency: dimensionless, drain_temp_f: T } out: { sensible_btu: M L^2 T^-2, latent_btu: M L^2 T^-2, meltwater_btu: M L^2 T^-2, total_btu: M L^2 T^-2, defrost_min: T }
+// dims: in { frost_lb: M, coil_temp_f: T, coil_mass_lb: M, coil_specific_heat: L^2 T^-2, coil_temp_rise_f: T, heater_btuh: M L^2 T^-3, defrost_efficiency: dimensionless, drain_temp_f: T } out: { sensible_btu: M L^2 T^-2, latent_btu: M L^2 T^-2, meltwater_btu: M L^2 T^-2, total_btu: M L^2 T^-2, defrost_min: T, box_gain_btu: M L^2 T^-2, coil_warmup_btu: M L^2 T^-2, latent_share_pct: dimensionless }
 export function computeDefrostCycleSizing({ frost_lb = 0, coil_temp_f = -10, coil_mass_lb = 0, coil_specific_heat = 0.10, coil_temp_rise_f = 0, heater_btuh = 0, defrost_efficiency = 0.8, drain_temp_f = 32 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // The page passes a blank box as null; 0 F is a real reading, so a blank cannot stand in for it.
@@ -1554,7 +1554,7 @@ REFRIGERANT_RENDERERS["refrigerant-leak-rate"] = _simpleRenderer({
 });
 
 // ===================== spec-v1418: refrigerant recovery time and phase split =====================
-// dims: in { total_charge_lb: M, liquid_charge_lb: M, liquid_rate_lb_min: M T^-1, vapor_rate_lb_min: M T^-1, evacuation_min: T, cylinder_net_lb: M } out: { liquid_min: T, vapor_min: T, total_min: T, speedup_factor: dimensionless }
+// dims: in { total_charge_lb: M, liquid_charge_lb: M, liquid_rate_lb_min: M T^-1, vapor_rate_lb_min: M T^-1, evacuation_min: T, cylinder_net_lb: M } out: { liquid_min: T, vapor_min: T, total_min: T, speedup_factor: dimensionless, cylinders: dimensionless }
 export function computeRefrigerantRecoveryTime({ total_charge_lb = 0, liquid_charge_lb = 0, liquid_rate_lb_min = 0, vapor_rate_lb_min = 0, evacuation_min = 0, cylinder_net_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(total_charge_lb > 0)) return { error: "Total charge must be positive." };

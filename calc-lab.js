@@ -319,7 +319,7 @@ export const massMolesExample = { inputs: { mass_g: 10, molecular_weight: 58.44 
 // the member that connects moles to a gas's pressure, volume, and temperature. This adds it: PV = nRT,
 // solvable for any one of the four, with R = 0.0820573 L*atm/(mol*K). Density needs the molar mass
 // (see molecular-weight / mass-moles).
-// dims: in { solve_for: dimensionless, pressure_atm: M L^-1 T^-2, volume_l: L^3, moles: N, temperature_c: T } out: { pressure_atm: M L^-1 T^-2, volume_l: L^3, moles: N, temperature_c: T, molar_volume_l: L^3 }
+// dims: in { solve_for: dimensionless, pressure_atm: M L^-1 T^-2, volume_l: L^3, moles: N, temperature_c: T } out: { pressure_atm: M L^-1 T^-2, volume_l: L^3, moles: N, temperature_c: T, molar_volume_l: L^3, temperature_k: T }
 export function computeIdealGasLaw({ solve_for = "moles", pressure_atm = 0, volume_l = 0, moles = 0, temperature_c = 25 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const R = 0.0820573; // L*atm/(mol*K)

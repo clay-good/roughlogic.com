@@ -92,7 +92,7 @@ const _PSI_ATM = 14.7;
 
 // ============ spec-v1557: no-decompression bookkeeping ============
 
-// dims: in { planned_depth_ft: L, table_ndl_min: T, residual_nitrogen_time_min: T, planned_bottom_time_min: T, alt_residual_time_min: T, oxygen_fraction: dimensionless, feet_per_atm: L } out: { adjusted_ndl_min: T, credited_bottom_time_min: T, remaining_min: T, equivalent_air_depth_ft: L, alt_adjusted_ndl_min: T }
+// dims: in { planned_depth_ft: L, table_ndl_min: T, residual_nitrogen_time_min: T, planned_bottom_time_min: T, alt_residual_time_min: T, oxygen_fraction: dimensionless, feet_per_atm: L } out: { adjusted_ndl_min: T, credited_bottom_time_min: T, remaining_min: T, equivalent_air_depth_ft: L, alt_adjusted_ndl_min: T, nitrogen_fraction: dimensionless, planned_depth_ft: L, residual_share_pct: dimensionless }
 export function computeNoDecompressionLimit({ planned_depth_ft = 0, table_ndl_min = 0, residual_nitrogen_time_min = 0, planned_bottom_time_min = 0, alt_residual_time_min = 0, oxygen_fraction = 0.21, feet_per_atm = _FSW_PER_ATM } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(planned_depth_ft > 0)) return { error: "Planned depth must be positive." };
@@ -161,7 +161,7 @@ DIVING_RENDERERS["no-decompression-limit"] = _simpleRenderer({
 
 // ============ spec-v1558: surface air consumption and rock bottom ============
 
-// dims: in { sac_cuft_per_min: L^3 T^-1, planned_depth_ft: L, planned_bottom_time_min: T, cylinder_volume_cuft: L^3, team_size: dimensionless, ascent_rate_fpm: L T^-1, stop_depth_ft: L, stop_time_min: T, stress_sac_cuft_per_min: L^3 T^-1, feet_per_atm: L } out: { depth_ata: dimensionless, rate_at_depth_cuft_min: L^3 T^-1, bottom_gas_cuft: L^3, rock_bottom_cuft: L^3, usable_gas_cuft: L^3, max_bottom_time_min: T }
+// dims: in { sac_cuft_per_min: L^3 T^-1, planned_depth_ft: L, planned_bottom_time_min: T, cylinder_volume_cuft: L^3, team_size: dimensionless, ascent_rate_fpm: L T^-1, stop_depth_ft: L, stop_time_min: T, stress_sac_cuft_per_min: L^3 T^-1, feet_per_atm: L } out: { depth_ata: dimensionless, rate_at_depth_cuft_min: L^3 T^-1, bottom_gas_cuft: L^3, rock_bottom_cuft: L^3, usable_gas_cuft: L^3, max_bottom_time_min: T, planned_bottom_time_min: T, reserve_share_pct: dimensionless }
 export function computeSurfaceAirConsumption({ sac_cuft_per_min = 0, planned_depth_ft = 0, planned_bottom_time_min = 0, cylinder_volume_cuft = 0, team_size = 2, ascent_rate_fpm = 30, stop_depth_ft = 15, stop_time_min = 3, stress_sac_cuft_per_min = 1.0, feet_per_atm = _FSW_PER_ATM } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(sac_cuft_per_min > 0)) return { error: "Surface air consumption must be positive (cu ft/min)." };
@@ -240,7 +240,7 @@ DIVING_RENDERERS["surface-air-consumption"] = _simpleRenderer({
 
 // ============ spec-v1559: nitrox maximum operating depth ============
 
-// dims: in { oxygen_fraction: dimensionless, ppo2_limit: dimensionless, contingency_ppo2_limit: dimensionless, planned_depth_ft: L, feet_per_atm: L } out: { depth_ata: dimensionless, ppo2_at_depth: dimensionless, mod_working_ft: L, mod_contingency_ft: L, best_mix_fraction: dimensionless, air_mod_ft: L }
+// dims: in { oxygen_fraction: dimensionless, ppo2_limit: dimensionless, contingency_ppo2_limit: dimensionless, planned_depth_ft: L, feet_per_atm: L } out: { depth_ata: dimensionless, ppo2_at_depth: dimensionless, mod_working_ft: L, mod_contingency_ft: L, best_mix_fraction: dimensionless, air_mod_ft: L, margin_ft: L, ppo2_limit: dimensionless }
 export function computeNitroxMod({ oxygen_fraction = 0.32, ppo2_limit = 1.4, contingency_ppo2_limit = 1.6, planned_depth_ft = 0, feet_per_atm = _FSW_PER_ATM } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(oxygen_fraction > 0 && oxygen_fraction <= 1)) return { error: "Oxygen fraction must be between 0 and 1." };
@@ -308,7 +308,7 @@ DIVING_RENDERERS["nitrox-mod"] = _simpleRenderer({
 
 // ============ spec-v1560: nitrox equivalent air depth ============
 
-// dims: in { oxygen_fraction: dimensionless, depth_ft: L, target_ead_ft: L, ppo2_limit: dimensionless, feet_per_atm: L } out: { nitrogen_fraction: dimensionless, equivalent_air_depth_ft: L, depth_reduction_ft: L, pn2_at_depth: dimensionless, mix_for_target_ead: dimensionless, deepest_usable_mix: dimensionless }
+// dims: in { oxygen_fraction: dimensionless, depth_ft: L, target_ead_ft: L, ppo2_limit: dimensionless, feet_per_atm: L } out: { nitrogen_fraction: dimensionless, equivalent_air_depth_ft: L, depth_reduction_ft: L, pn2_at_depth: dimensionless, mix_for_target_ead: dimensionless, deepest_usable_mix: dimensionless, deepest_usable_ead_ft: L, depth_ata: dimensionless, depth_ft: L, ppo2_limit: dimensionless }
 export function computeNitroxEad({ oxygen_fraction = 0.36, depth_ft = 0, target_ead_ft = 0, ppo2_limit = 1.4, feet_per_atm = _FSW_PER_ATM } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(oxygen_fraction > 0 && oxygen_fraction < 1)) return { error: "Oxygen fraction must be between 0 and 1." };
@@ -370,7 +370,7 @@ DIVING_RENDERERS["nitrox-ead"] = _simpleRenderer({
 
 // ============ spec-v1561: surface-supplied air supply rate ============
 
-// dims: in { diver_count: dimensionless, depth_ft: L, rate_per_diver_acfm: L^3 T^-1, compressor_scfm: L^3 T^-1, alt_depth_ft: L, reserve_minutes: T, volume_tank_cuft: L^3, tank_pressure_psi: M L^-1 T^-2, feet_per_atm: L } out: { depth_ata: dimensionless, required_scfm: L^3 T^-1, max_depth_ft: L, reserve_required_cuft: L^3, tank_free_gas_cuft: L^3 }
+// dims: in { diver_count: dimensionless, depth_ft: L, rate_per_diver_acfm: L^3 T^-1, compressor_scfm: L^3 T^-1, alt_depth_ft: L, reserve_minutes: T, volume_tank_cuft: L^3, tank_pressure_psi: M L^-1 T^-2, feet_per_atm: L } out: { depth_ata: dimensionless, required_scfm: L^3 T^-1, max_depth_ft: L, reserve_required_cuft: L^3, tank_free_gas_cuft: L^3, alt_depth_ft: L, compressor_scfm: L^3 T^-1, diver_count: dimensionless }
 export function computeUmbilicalAirSupply({ diver_count = 3, depth_ft = 0, rate_per_diver_acfm = 1.4, compressor_scfm = 0, alt_depth_ft = 0, reserve_minutes = 10, volume_tank_cuft = 0, tank_pressure_psi = 0, feet_per_atm = _FSW_PER_ATM } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(diver_count >= 1)) return { error: "Diver count must be at least 1, and the standby diver counts." };
@@ -452,7 +452,7 @@ DIVING_RENDERERS["umbilical-air-supply"] = _simpleRenderer({
 
 // ============ spec-v1562: recompression chamber gas volume ============
 
-// dims: in { chamber_volume_cuft: L^3, treatment_pressure_psig: M L^-1 T^-2, ventilation_acfm_per_occupant: L^3 T^-1, occupant_count: dimensionless, treatment_minutes: T, air_inventory_cuft: L^3, oxygen_acfm_per_occupant: L^3 T^-1, oxygen_minutes: T } out: { treatment_ata: dimensionless, pressurize_cuft: L^3, ventilation_cuft: L^3, total_air_cuft: L^3, oxygen_required_cuft: L^3, longest_treatment_min: T }
+// dims: in { chamber_volume_cuft: L^3, treatment_pressure_psig: M L^-1 T^-2, ventilation_acfm_per_occupant: L^3 T^-1, occupant_count: dimensionless, treatment_minutes: T, air_inventory_cuft: L^3, oxygen_acfm_per_occupant: L^3 T^-1, oxygen_minutes: T } out: { treatment_ata: dimensionless, pressurize_cuft: L^3, ventilation_cuft: L^3, total_air_cuft: L^3, oxygen_required_cuft: L^3, longest_treatment_min: T, pressurize_share_pct: dimensionless, ventilation_share_pct: dimensionless }
 export function computeChamberGasVolume({ chamber_volume_cuft = 0, treatment_pressure_psig = 0, ventilation_acfm_per_occupant = 2, occupant_count = 2, treatment_minutes = 0, air_inventory_cuft = 0, oxygen_acfm_per_occupant = 1.0, oxygen_minutes = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(chamber_volume_cuft > 0)) return { error: "Chamber internal volume must be positive (cu ft)." };

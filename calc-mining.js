@@ -101,7 +101,7 @@ const _BAR_PER_PSI = 0.0689475729;
 
 // ===================== spec-v1507: powder factor and explosive load =====================
 
-// dims: in { burden_ft: L, spacing_ft: L, bench_height_ft: L, hole_diameter_in: L, subdrill_ft: L, stemming_ft: L, explosive_sg: dimensionless, rock_density_pcf: M L^-3, hole_count: dimensionless } out: { loading_density_lb_per_ft: M L^-1, charge_length_ft: L, charge_weight_lb: M L T^-2, rock_tons_per_hole: M, powder_factor_lb_per_ton: dimensionless }
+// dims: in { burden_ft: L, spacing_ft: L, bench_height_ft: L, hole_diameter_in: L, subdrill_ft: L, stemming_ft: L, explosive_sg: dimensionless, rock_density_pcf: M L^-3, hole_count: dimensionless } out: { loading_density_lb_per_ft: M L^-1, charge_length_ft: L, charge_weight_lb: M L T^-2, rock_tons_per_hole: M, powder_factor_lb_per_ton: dimensionless, hole_depth_ft: L, rock_volume_cy: L^3, total_tons: dimensionless }
 export function computeBlastPowderFactor({ burden_ft = 0, spacing_ft = 0, bench_height_ft = 0, hole_diameter_in = 0, subdrill_ft = 0, stemming_ft = 0, explosive_sg = 0.82, rock_density_pcf = 0, hole_count = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (explosive_sg > 3) return { error: "Enter the explosive's specific gravity (ANFO is about 0.82), not a density in kg/m3 or pcf." };
@@ -165,7 +165,7 @@ MINING_RENDERERS["blast-powder-factor"] = _simpleRenderer({
 
 // ===================== spec-v1508: burden and spacing layout =====================
 
-// dims: in { hole_diameter_in: L, burden_ratio: dimensionless, bench_height_ft: L, spacing_ratio: dimensionless, subdrill_ratio: dimensionless, stemming_ratio: dimensionless } out: { burden_ft: L, spacing_ft: L, subdrill_ft: L, stemming_ft: L, stiffness_ratio: dimensionless, max_diameter_in: L }
+// dims: in { hole_diameter_in: L, burden_ratio: dimensionless, bench_height_ft: L, spacing_ratio: dimensionless, subdrill_ratio: dimensionless, stemming_ratio: dimensionless } out: { burden_ft: L, spacing_ft: L, subdrill_ft: L, stemming_ft: L, stiffness_ratio: dimensionless, max_diameter_in: L, pattern_area_sqft: L^2, rock_volume_cy: L^3 }
 export function computeBlastBurdenSpacing({ hole_diameter_in = 0, burden_ratio = 25, bench_height_ft = 0, spacing_ratio = 1.15, subdrill_ratio = 0.3, stemming_ratio = 0.7 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(hole_diameter_in > 0)) return { error: "Hole diameter must be positive." };
@@ -289,7 +289,7 @@ MINING_RENDERERS["blast-scaled-distance-ppv"] = _simpleRenderer({
 // The default constants are the best-fit line OSMRE prints with its BIVDEP example data set
 // (A = 0.220, slope -0.883). Until 2026-10-11 the defaults were K 0.2, b 1.2, which read 8 to 24 dB
 // BELOW that document's own measured records (680 ft, 426.5 lb: 126 dB measured, 110 predicted).
-// dims: in { distance_ft: L, charge_per_delay_lb: M L T^-2, airblast_k: dimensionless, airblast_b: dimensionless, limit_db: dimensionless } out: { cube_root_scaled_distance: dimensionless, overpressure_psi: M L^-1 T^-2, overpressure_db: dimensionless, limit_psi: M L^-1 T^-2, max_charge_lb: M L T^-2 }
+// dims: in { distance_ft: L, charge_per_delay_lb: M L T^-2, airblast_k: dimensionless, airblast_b: dimensionless, limit_db: dimensionless } out: { cube_root_scaled_distance: dimensionless, overpressure_psi: M L^-1 T^-2, overpressure_db: dimensionless, limit_psi: M L^-1 T^-2, max_charge_lb: M L T^-2, compliant_distance_ft: L, halving_gain_pct: dimensionless, margin_db: dimensionless, vented_db: dimensionless, vented_psi: M L^-1 T^-2 }
 export function computeBlastAirblastOverpressure({ distance_ft = 0, charge_per_delay_lb = 0, airblast_k = 0.22, airblast_b = 0.883, limit_db = 133, confinement_penalty_db = 20 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(distance_ft > 0)) return { error: "Distance to the structure must be positive." };
@@ -358,7 +358,7 @@ MINING_RENDERERS["blast-airblast-overpressure"] = _simpleRenderer({
 
 // ===================== spec-v1511: stemming length and flyrock screen =====================
 
-// dims: in { burden_ft: L, hole_diameter_in: L, proposed_stemming_ft: L, burden_ratio_low: dimensionless, burden_ratio_high: dimensionless, diameter_multiple: dimensionless } out: { by_burden_ft: L, by_diameter_ft: L, governing_ft: L, achieved_ratio: dimensionless, stone_min_in: L, stone_max_in: L }
+// dims: in { burden_ft: L, hole_diameter_in: L, proposed_stemming_ft: L, burden_ratio_low: dimensionless, burden_ratio_high: dimensionless, diameter_multiple: dimensionless } out: { by_burden_ft: L, by_diameter_ft: L, governing_ft: L, achieved_ratio: dimensionless, stone_min_in: L, stone_max_in: L, by_burden_high_ft: L, shortfall_ft: L }
 export function computeBlastStemmingLength({ burden_ft = 0, hole_diameter_in = 0, proposed_stemming_ft = 0, burden_ratio_low = 0.7, burden_ratio_high = 1.0, diameter_multiple = 20 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(burden_ft > 0)) return { error: "Burden must be positive." };
@@ -723,7 +723,7 @@ MINING_RENDERERS["screen-deck-capacity"] = _simpleRenderer({
 
 // ===================== spec-v1514: belt feeder volumetric capacity =====================
 
-// dims: in { opening_width_in: L, opening_height_in: L, belt_speed_fpm: L T^-1, bulk_density_pcf: M L^-3, target_tph: M T^-1, alternative_density_pcf: M L^-3 } out: { volumetric_cfh: L^3 T^-1, tph: M T^-1, required_speed_fpm: L T^-1, required_opening_in: L, alternative_tph: M T^-1 }
+// dims: in { opening_width_in: L, opening_height_in: L, belt_speed_fpm: L T^-1, bulk_density_pcf: M L^-3, target_tph: M T^-1, alternative_density_pcf: M L^-3 } out: { volumetric_cfh: L^3 T^-1, tph: M T^-1, required_speed_fpm: L T^-1, required_opening_in: L, alternative_tph: M T^-1, cross_section_sqft: L^2, density_change_pct: dimensionless }
 export function computeBeltFeederCapacity({ opening_width_in = 0, opening_height_in = 0, belt_speed_fpm = 0, bulk_density_pcf = 0, target_tph = 0, alternative_density_pcf = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(opening_width_in > 0)) return { error: "Opening width must be positive." };
@@ -846,7 +846,7 @@ MINING_RENDERERS["belt-feeder-pull"] = _simpleRenderer({
 
 // ===================== spec-v1515: dust collector air-to-cloth ratio =====================
 
-// dims: in { airflow_cfm: L^3 T^-1, bag_count: dimensionless, bag_diameter_in: L, bag_length_ft: L, range_low: L T^-1, range_high: L T^-1, bags_out_of_service: dimensionless } out: { cloth_area_sqft: L^2, air_to_cloth: L T^-1, derated_cloth_area_sqft: L^2, derated_air_to_cloth: L T^-1, max_airflow_cfm: L^3 T^-1, derated_max_airflow_cfm: L^3 T^-1 }
+// dims: in { airflow_cfm: L^3 T^-1, bag_count: dimensionless, bag_diameter_in: L, bag_length_ft: L, range_low: L T^-1, range_high: L T^-1, bags_out_of_service: dimensionless } out: { cloth_area_sqft: L^2, air_to_cloth: L T^-1, derated_cloth_area_sqft: L^2, derated_air_to_cloth: L T^-1, max_airflow_cfm: L^3 T^-1, derated_max_airflow_cfm: L^3 T^-1, airflow_headroom_cfm: L^3 T^-1, derated_increase_pct: dimensionless }
 export function computeDustCollectorAirToCloth({ airflow_cfm = 0, bag_count = 0, bag_diameter_in = 0, bag_length_ft = 0, range_low = 3, range_high = 5, bags_out_of_service = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(airflow_cfm > 0)) return { error: "System airflow must be positive." };
@@ -907,7 +907,7 @@ MINING_RENDERERS["dust-collector-air-to-cloth"] = _simpleRenderer({
 
 // ===================== spec-v1516: dust deflagration vent area (NFPA 68) =====================
 
-// dims: in { volume_cuft: L^3, kst_bar_m_s: dimensionless, pmax_bar: M L^-1 T^-2, p_red_psig: M L^-1 T^-2, p_stat_psig: M L^-1 T^-2, length_to_diameter: dimensionless, stronger_p_red_psig: M L^-1 T^-2, available_vent_area_sqft: L^2 } out: { vent_area_sqft: L^2, vent_area_at_stronger_sqft: L^2, dust_class: dimensionless }
+// dims: in { volume_cuft: L^3, kst_bar_m_s: dimensionless, pmax_bar: M L^-1 T^-2, p_red_psig: M L^-1 T^-2, p_stat_psig: M L^-1 T^-2, length_to_diameter: dimensionless, stronger_p_red_psig: M L^-1 T^-2, available_vent_area_sqft: L^2 } out: { vent_area_sqft: L^2, vent_area_at_stronger_sqft: L^2, dust_class: dimensionless, available_vent_area_sqft: L^2, shortfall_sqft: L^2, stronger_saving_pct: dimensionless }
 export function computeDustDeflagrationVentArea({ volume_cuft = 0, kst_bar_m_s = 0, pmax_bar = 8, p_red_psig = 0, p_stat_psig = 0, length_to_diameter = 2, stronger_p_red_psig = 0, available_vent_area_sqft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (pmax_bar > 0 && pmax_bar < 2) return { error: "Enter Pmax in bar (dusts run about 5 to 12 bar); a value under 2 looks like MPa or a reduced pressure." };
@@ -982,7 +982,7 @@ MINING_RENDERERS["dust-deflagration-vent-area"] = _simpleRenderer({
 
 // ===================== spec-v1517: underground face ventilation =====================
 
-// dims: in { heading_width_ft: L, heading_height_ft: L, fan_airflow_cfm: L^3 T^-1, tubing_efficiency_pct: dimensionless, diesel_units: dimensionless, diesel_cfm_each: L^3 T^-1, min_face_velocity_fpm: L T^-1 } out: { heading_area_sqft: L^2, delivered_cfm: L^3 T^-1, face_velocity_fpm: L T^-1, velocity_required_cfm: L^3 T^-1, diesel_required_cfm: L^3 T^-1, leakage_cfm: L^3 T^-1 }
+// dims: in { heading_width_ft: L, heading_height_ft: L, fan_airflow_cfm: L^3 T^-1, tubing_efficiency_pct: dimensionless, diesel_units: dimensionless, diesel_cfm_each: L^3 T^-1, min_face_velocity_fpm: L T^-1 } out: { heading_area_sqft: L^2, delivered_cfm: L^3 T^-1, face_velocity_fpm: L T^-1, velocity_required_cfm: L^3 T^-1, diesel_required_cfm: L^3 T^-1, leakage_cfm: L^3 T^-1, efficiency_needed_pct: dimensionless, governing_cfm: L^3 T^-1 }
 export function computeMineFaceVentilation({ heading_width_ft = 0, heading_height_ft = 0, fan_airflow_cfm = 0, tubing_efficiency_pct = 70, diesel_units = 1, diesel_cfm_each = 0, min_face_velocity_fpm = 60 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // An efficiency is a percent; 0 < value < 1 is a fraction typed into a percent field (added 2026-09-26).
@@ -1044,7 +1044,7 @@ MINING_RENDERERS["mine-face-ventilation"] = _simpleRenderer({
 
 // ===================== spec-v1518: pit dewatering head and staging =====================
 
-// dims: in { static_lift_ft: L, friction_head_ft: L, discharge_pressure_ft: L, head_per_pump_ft: L, suction_lift_ft: L, practical_suction_limit_ft: L, flow_gpm: L^3 T^-1, pump_efficiency_pct: dimensionless } out: { total_head_ft: L, stages: dimensionless, head_per_stage_ft: L, water_hp: M L^2 T^-3, brake_hp: M L^2 T^-3 }
+// dims: in { static_lift_ft: L, friction_head_ft: L, discharge_pressure_ft: L, head_per_pump_ft: L, suction_lift_ft: L, practical_suction_limit_ft: L, flow_gpm: L^3 T^-1, pump_efficiency_pct: dimensionless } out: { total_head_ft: L, stages: dimensionless, head_per_stage_ft: L, water_hp: M L^2 T^-3, brake_hp: M L^2 T^-3, static_share_pct: dimensionless, suction_excess_ft: L }
 export function computePitDewateringStaging({ static_lift_ft = 0, friction_head_ft = 0, discharge_pressure_ft = 0, head_per_pump_ft = 0, suction_lift_ft = 0, practical_suction_limit_ft = 25, flow_gpm = 0, pump_efficiency_pct = 65 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // An efficiency is a percent; 0 < value < 1 is a fraction typed into a percent field (added 2026-09-26).
@@ -1102,7 +1102,7 @@ MINING_RENDERERS["pit-dewatering-staging"] = _simpleRenderer({
 
 // ===================== spec-v1519: highwall bench geometry =====================
 
-// dims: in { bench_height_ft: L, bench_width_ft: L, face_angle_deg: dimensionless, bench_count: dimensionless, alternative_bench_width_ft: L, target_overall_angle_deg: dimensionless } out: { run_per_bench_ft: L, overall_angle_deg: dimensionless, total_height_ft: L, total_run_ft: L, alternative_overall_angle_deg: dimensionless, width_for_target_ft: L }
+// dims: in { bench_height_ft: L, bench_width_ft: L, face_angle_deg: dimensionless, bench_count: dimensionless, alternative_bench_width_ft: L, target_overall_angle_deg: dimensionless } out: { run_per_bench_ft: L, overall_angle_deg: dimensionless, total_height_ft: L, total_run_ft: L, alternative_overall_angle_deg: dimensionless, width_for_target_ft: L, face_run_ft: L, flattening_deg: dimensionless }
 export function computeHighwallBenchGeometry({ bench_height_ft = 0, bench_width_ft = 0, face_angle_deg = 0, bench_count = 1, alternative_bench_width_ft = 0, target_overall_angle_deg = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(bench_height_ft > 0)) return { error: "Bench height must be positive." };
@@ -1152,7 +1152,7 @@ MINING_RENDERERS["highwall-bench-geometry"] = _simpleRenderer({
 
 // ===================== spec-v1521: rock bolt pattern and support pressure =====================
 
-// dims: in { bolt_capacity_lb: M L T^-2, spacing_1_ft: L, spacing_2_ft: L, span_ft: L, rock_unit_weight_pcf: M L^-3, loosened_zone_ft: L, target_support_psf: M L^-1 T^-2 } out: { area_per_bolt_sqft: L^2, support_psf: M L^-1 T^-2, support_psi: M L^-1 T^-2, dead_weight_required_psf: M L^-1 T^-2, spacing_for_target_ft: L, bolt_length_ft: L }
+// dims: in { bolt_capacity_lb: M L T^-2, spacing_1_ft: L, spacing_2_ft: L, span_ft: L, rock_unit_weight_pcf: M L^-3, loosened_zone_ft: L, target_support_psf: M L^-1 T^-2 } out: { area_per_bolt_sqft: L^2, support_psf: M L^-1 T^-2, support_psi: M L^-1 T^-2, dead_weight_required_psf: M L^-1 T^-2, spacing_for_target_ft: L, bolt_length_ft: L, length_from_spacing_ft: L, length_from_span_ft: L, spacing_for_dead_weight_ft: L }
 export function computeRockBoltSupportPressure({ bolt_capacity_lb = 0, spacing_1_ft = 0, spacing_2_ft = 0, span_ft = 0, rock_unit_weight_pcf = 0, loosened_zone_ft = 0, target_support_psf = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(bolt_capacity_lb > 0)) return { error: "Bolt working capacity must be positive." };
@@ -1218,7 +1218,7 @@ MINING_RENDERERS["rock-bolt-support-pressure"] = _simpleRenderer({
 
 // ===================== spec-v1522: blast fume clearance time =====================
 
-// dims: in { heading_volume_cuft: L^3, delivered_cfm: L^3 T^-1, target_fraction_pct: dimensionless, wait_time_min: T, target_time_min: T } out: { air_change_min: T, air_changes_required: dimensionless, clearance_min: T, remaining_pct_at_wait: dimensionless, airflow_for_target_time_cfm: L^3 T^-1 }
+// dims: in { heading_volume_cuft: L^3, delivered_cfm: L^3 T^-1, target_fraction_pct: dimensionless, wait_time_min: T, target_time_min: T } out: { air_change_min: T, air_changes_required: dimensionless, clearance_min: T, remaining_pct_at_wait: dimensionless, airflow_for_target_time_cfm: L^3 T^-1, after_one_change_pct: dimensionless, after_two_changes_pct: dimensionless }
 export function computeBlastFumeClearanceTime({ heading_volume_cuft = 0, delivered_cfm = 0, target_fraction_pct = 1, wait_time_min = 0, target_time_min = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(heading_volume_cuft > 0)) return { error: "Heading volume must be positive." };
@@ -1269,7 +1269,7 @@ MINING_RENDERERS["blast-fume-clearance-time"] = _simpleRenderer({
 
 // ===================== spec-v1523: mine hoist rope factor of safety =====================
 
-// dims: in { conveyance_lb: M L T^-2, people_count: dimensionless, person_weight_lb: M L T^-2, rope_length_ft: L, rope_weight_per_ft: M T^-2, rope_count: dimensionless, rope_breaking_lb: M L T^-2, minimum_fs: dimensionless } out: { rope_weight_lb: M L T^-2, payload_lb: M L T^-2, total_load_lb: M L T^-2, factor_of_safety: dimensionless, max_payload_lb: M L T^-2, depth_at_limit_ft: L }
+// dims: in { conveyance_lb: M L T^-2, people_count: dimensionless, person_weight_lb: M L T^-2, rope_length_ft: L, rope_weight_per_ft: M T^-2, rope_count: dimensionless, rope_breaking_lb: M L T^-2, minimum_fs: dimensionless } out: { rope_weight_lb: M L T^-2, payload_lb: M L T^-2, total_load_lb: M L T^-2, factor_of_safety: dimensionless, max_payload_lb: M L T^-2, depth_at_limit_ft: L, margin: dimensionless, rope_share_pct: dimensionless }
 export function computeHoistRopeSafetyFactor({ conveyance_lb = 0, people_count = 0, person_weight_lb = 180, rope_length_ft = 0, rope_weight_per_ft = 0, rope_count = 0, rope_breaking_lb = 0, minimum_fs = 8 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(conveyance_lb > 0)) return { error: "Conveyance weight must be positive." };

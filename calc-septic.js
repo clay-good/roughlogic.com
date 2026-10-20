@@ -79,7 +79,7 @@ export const septicTankExample = {
 // Required absorption area = daily_flow_gpd / application_rate_gpd_per_ft2.
 // Trench linear feet = required_area / trench_width_ft.
 
-// dims: in { design_flow_gpd: L^3 T^-1, application_rate_gpd_per_ft2: L T^-1, trench_width_ft: L } out: { required_area_ft2: L^2 }
+// dims: in { design_flow_gpd: L^3 T^-1, application_rate_gpd_per_ft2: L T^-1, trench_width_ft: L } out: { required_area_ft2: L^2, application_rate_gpd_per_ft2: L T^-1, design_flow_gpd: L^3 T^-1 }
 export function computeSepticDrainfield({
   design_flow_gpd = 0,
   application_rate_gpd_per_ft2 = 0,

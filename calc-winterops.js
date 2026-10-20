@@ -230,7 +230,7 @@ WINTEROPS_RENDERERS["brine-batch-salinity"] = _simpleRenderer({
 
 // ===================== spec-v1847: plow route cycle time and truck count =====================
 
-// dims: in { route_lane_miles: L, plow_speed_mph: L T^-1, overhead_factor: dimensionless, system_lane_miles: L, cycle_target_hr: T, snowfall_in_hr: L T^-1, alt_cycle_target_hr: T } out: { effective_speed_lane_miles_hr: L T^-1, cycle_time_hr: T, accumulation_in: L, lane_miles_per_truck: L, trucks_required: dimensionless }
+// dims: in { route_lane_miles: L, plow_speed_mph: L T^-1, overhead_factor: dimensionless, system_lane_miles: L, cycle_target_hr: T, snowfall_in_hr: L T^-1, alt_cycle_target_hr: T } out: { effective_speed_lane_miles_hr: L T^-1, cycle_time_hr: T, accumulation_in: L, lane_miles_per_truck: L, trucks_required: dimensionless, accumulation_bought_in: L, alt_target_accumulation_in: L, extra_trucks_pct: dimensionless, target_accumulation_in: L }
 export function computePlowRouteCycleTime({ route_lane_miles = 0, plow_speed_mph = 0, overhead_factor = 1.2, system_lane_miles = 0, cycle_target_hr = 2, snowfall_in_hr = 1.5, alt_cycle_target_hr = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(route_lane_miles > 0)) return { error: "Route length must be positive (lane-miles)." };
@@ -289,7 +289,7 @@ WINTEROPS_RENDERERS["plow-route-cycle-time"] = _simpleRenderer({
 
 // ===================== spec-v1848: snow storage stacking area =====================
 
-// dims: in { lot_area_ft2: L^2, accumulation_in: L, events: dimensionless, fresh_density_lb_ft3: M L^-3, pile_density_lb_ft3: M L^-3, pile_height_ft: L, side_slope_run_per_rise: dimensionless, area_per_space_ft2: L^2, allocated_pct: dimensionless } out: { fallen_volume_ft3: L^3, pile_volume_ft3: L^3, windrow_length_ft: L, footprint_ft2: L^2, haul_volume_ft3: L^3 }
+// dims: in { lot_area_ft2: L^2, accumulation_in: L, events: dimensionless, fresh_density_lb_ft3: M L^-3, pile_density_lb_ft3: M L^-3, pile_height_ft: L, side_slope_run_per_rise: dimensionless, area_per_space_ft2: L^2, allocated_pct: dimensionless } out: { fallen_volume_ft3: L^3, pile_volume_ft3: L^3, windrow_length_ft: L, footprint_ft2: L^2, haul_volume_ft3: L^3, allocated_area_ft2: L^2, allocated_volume_ft3: L^3, base_width_ft: L, cone_footprint_ft2: L^2, cone_height_ft: L, cone_saving_ft2: L^2, cone_saving_pct: dimensionless, cross_section_ft2: L^2, densification_saving_pct: dimensionless, events: dimensionless, haul_cy: L^3, season_footprint_ft2: L^2, season_length_ft: L, season_pile_volume_ft3: L^3 }
 export function computeSnowStackingArea({ lot_area_ft2 = 0, accumulation_in = 0, events = 1, fresh_density_lb_ft3 = 7, pile_density_lb_ft3 = 25, pile_height_ft = 12, side_slope_run_per_rise = 1, area_per_space_ft2 = 300, allocated_pct = 5 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(lot_area_ft2 > 0)) return { error: "Lot area must be positive (sq ft)." };
@@ -369,7 +369,7 @@ WINTEROPS_RENDERERS["snow-stacking-area"] = _simpleRenderer({
 
 // ===================== spec-v1849: ice melt working temperature and capacity =====================
 
-// dims: in { area_ft2: L^2, ice_thickness_in: L, ice_density_lb_ft3: M L^-3, pavement_temp_f: T, capacity_lb_ice_per_lb: dimensionless, alt_capacity_lb_ice_per_lb: dimensionless, alt_temp_f: T, practical_limit_f: T, eutectic_f: T } out: { ice_volume_ft3: L^3, ice_mass_lb: M, product_lb: M, alt_product_lb: M }
+// dims: in { area_ft2: L^2, ice_thickness_in: L, ice_density_lb_ft3: M L^-3, pavement_temp_f: T, capacity_lb_ice_per_lb: dimensionless, alt_capacity_lb_ice_per_lb: dimensionless, alt_temp_f: T, practical_limit_f: T, eutectic_f: T } out: { ice_volume_ft3: L^3, ice_mass_lb: M, product_lb: M, alt_product_lb: M, margin_f: T }
 export function computeIceMeltWorkingTemperature({ area_ft2 = 0, ice_thickness_in = 0, ice_density_lb_ft3 = 57.2, pavement_temp_f = 30, capacity_lb_ice_per_lb = 0, alt_capacity_lb_ice_per_lb = 0, alt_temp_f = 20, practical_limit_f = 15, eutectic_f = -6 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(area_ft2 > 0)) return { error: "Area must be positive (sq ft)." };
@@ -432,7 +432,7 @@ WINTEROPS_RENDERERS["ice-melt-working-temperature"] = _simpleRenderer({
 
 // ===================== spec-v1850: walkway clearing crew productivity =====================
 
-// dims: in { total_area_ft2: L^2, hand_area_ft2: L^2, blower_rate_ft2_hr: L^2 T^-1, hand_rate_ft2_hr_person: L^2 T^-1, crew_size: dimensionless, service_window_hr: T, blower_depth_factor: dimensionless, hand_depth_factor: dimensionless, icemelt_lb_per_1000ft2: M L^-2, applications: dimensionless } out: { blower_hr: T, hand_hr: T, crew_hr: T, crews_required: dimensionless, icemelt_event_lb: M }
+// dims: in { total_area_ft2: L^2, hand_area_ft2: L^2, blower_rate_ft2_hr: L^2 T^-1, hand_rate_ft2_hr_person: L^2 T^-1, crew_size: dimensionless, service_window_hr: T, blower_depth_factor: dimensionless, hand_depth_factor: dimensionless, icemelt_lb_per_1000ft2: M L^-2, applications: dimensionless } out: { blower_hr: T, hand_hr: T, crew_hr: T, crews_required: dimensionless, icemelt_event_lb: M, crew_size: dimensionless, open_area_ft2: L^2 }
 export function computeWalkwayClearingProductivity({ total_area_ft2 = 0, hand_area_ft2 = 0, blower_rate_ft2_hr = 0, hand_rate_ft2_hr_person = 0, crew_size = 2, service_window_hr = 2, blower_depth_factor = 1, hand_depth_factor = 1, icemelt_lb_per_1000ft2 = 4, applications = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(total_area_ft2 > 0)) return { error: "Total walk area must be positive (sq ft)." };

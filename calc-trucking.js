@@ -969,7 +969,7 @@ export const stoppingSightDistanceExample = {
   inputs: { speed_mph: 55, reaction_time_s: 2.5, friction: SSD_AASHTO_F, grade: 0 },
 };
 
-// dims: in { sight_distance_ft: L, reaction_time_s: T, friction: dimensionless, grade: dimensionless } out: { design_speed_mph: L T^-1 }
+// dims: in { sight_distance_ft: L, reaction_time_s: T, friction: dimensionless, grade: dimensionless } out: { design_speed_mph: L T^-1, friction: dimensionless, grade: dimensionless, reaction_time_s: T }
 export function computeSsdDesignSpeed({ sight_distance_ft = 0, reaction_time_s = 2.5, friction = SSD_AASHTO_F, grade = 0.0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const D = Number(sight_distance_ft) || 0;
@@ -1144,7 +1144,7 @@ function renderTruckOffTracking(inputRegion, outputRegion, citationEl) {
 // the vehicle width) are separate"). The swept path is the total roadway width a
 // turning vehicle covers: SPW = vehicle width + off-tracking (+ the outer front
 // corner's swing-out). OT = R - sqrt(R^2 - sum(L_i^2)) as in the sibling.
-// dims: in { turn_radius_ft: L, wheelbase1_ft: L, wheelbase2_ft: L, vehicle_width_ft: L, front_swingout_ft: L } out: { off_tracking_ft: L, swept_path_width_ft: L, effective_wheelbase_ft: L }
+// dims: in { turn_radius_ft: L, wheelbase1_ft: L, wheelbase2_ft: L, vehicle_width_ft: L, front_swingout_ft: L } out: { off_tracking_ft: L, swept_path_width_ft: L, effective_wheelbase_ft: L, front_swingout_ft: L, vehicle_width_ft: L }
 export function computeTruckSweptPathWidth({ turn_radius_ft = 0, wheelbase1_ft = 0, wheelbase2_ft = 0, vehicle_width_ft = 8.5, front_swingout_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const R = Number(turn_radius_ft) || 0;
@@ -1215,7 +1215,7 @@ export const TRUCKING_RENDERERS = {
 // tiedowns for the article length. WLLs are user-supplied from the marked
 // hardware (the lowest-rated component governs each tiedown).
 //
-// dims: in { cargo_weight_lb: M, tiedown_count: dimensionless, wll_each_lb: M, cargo_length_ft: L, tiedown_path: dimensionless } out: { aggregate_wll_lb: M, tiedown_path: dimensionless, required_wll_lb: M, min_tiedowns: dimensionless, pass: dimensionless }
+// dims: in { cargo_weight_lb: M, tiedown_count: dimensionless, wll_each_lb: M, cargo_length_ft: L, tiedown_path: dimensionless } out: { aggregate_wll_lb: M, tiedown_path: dimensionless, required_wll_lb: M, min_tiedowns: dimensionless, pass: dimensionless, tiedown_count: dimensionless }
 export function computeCargoSecurementWLL({ cargo_weight_lb = 0, tiedown_count = 0, wll_each_lb = 0, cargo_length_ft = 0, tiedown_path = "over_other_side" } = {}) {
   const W = Number(cargo_weight_lb) || 0;
   const n = Math.floor(Number(tiedown_count) || 0);

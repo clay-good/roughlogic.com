@@ -99,7 +99,7 @@ const _AC_VELOCITY_EXPONENT = 5;
 // =====================================================================
 // spec-v1632: grille neck velocity and the NC that follows from it.
 // =====================================================================
-// dims: in { airflow_cfm: L^3 T^-1, neck_free_area_ft2: L^2, rated_nc: dimensionless, next_size_free_area_ft2: L^2, room_nc_target: dimensionless, room_correction_db: dimensionless } out: { neck_velocity_fpm: L T^-1, next_velocity_fpm: L T^-1, effective_nc: dimensionless, next_nc: dimensionless, nc_change_db: dimensionless, cfm_at_target: L^3 T^-1 }
+// dims: in { airflow_cfm: L^3 T^-1, neck_free_area_ft2: L^2, rated_nc: dimensionless, next_size_free_area_ft2: L^2, room_nc_target: dimensionless, room_correction_db: dimensionless } out: { neck_velocity_fpm: L T^-1, next_velocity_fpm: L T^-1, effective_nc: dimensionless, next_nc: dimensionless, nc_change_db: dimensionless, cfm_at_target: L^3 T^-1, over_target_db: dimensionless, target_velocity_fpm: L T^-1, velocity_drop_pct: dimensionless }
 export function computeGrilleNeckNc({
   airflow_cfm = 0, neck_free_area_ft2 = 0, rated_nc = 0,
   next_size_free_area_ft2 = 0, room_nc_target = 0, room_correction_db = 0,
@@ -167,7 +167,7 @@ export const grilleNeckNcExample = { inputs: { airflow_cfm: 600, neck_free_area_
 // equal-area round substitution, and the room level from the standard
 // room equation. The transmission loss itself is ENTERED by band.
 // =====================================================================
-// dims: in { duct_width_in: L, duct_height_in: L, exposed_length_ft: L, sound_power_db: dimensionless, breakout_tl_db: dimensionless, room_absorption_sabins: L^2, room_criterion_db: dimensionless, lagging_improvement_db: dimensionless } out: { exposed_area_ft2: L^2, aspect_ratio: dimensionless, round_diameter_in: L, room_spl_db: dimensionless, lagged_spl_db: dimensionless, over_criterion_db: dimensionless, tl_required_db: dimensionless }
+// dims: in { duct_width_in: L, duct_height_in: L, exposed_length_ft: L, sound_power_db: dimensionless, breakout_tl_db: dimensionless, room_absorption_sabins: L^2, room_criterion_db: dimensionless, lagging_improvement_db: dimensionless } out: { exposed_area_ft2: L^2, aspect_ratio: dimensionless, round_diameter_in: L, room_spl_db: dimensionless, lagged_spl_db: dimensionless, over_criterion_db: dimensionless, tl_required_db: dimensionless, area_gain_db: dimensionless, breakout_lw_db: dimensionless, duct_cross_section_ft2: L^2, room_term_db: dimensionless, round_area_ft2: L^2 }
 export function computeDuctBreakoutNoise({
   duct_width_in = 0, duct_height_in = 0, exposed_length_ft = 0,
   sound_power_db = 0, breakout_tl_db = 0, room_absorption_sabins = 0,
@@ -258,7 +258,7 @@ export const ductBreakoutNoiseExample = { inputs: { duct_width_in: 48, duct_heig
 // the attenuation, so above some velocity more insertion loss buys
 // nothing. Energy-summing the two is what shows it.
 // =====================================================================
-// dims: in { airflow_cfm: L^3 T^-1, face_width_in: L, face_height_in: L, reference_drop_in_wc: M L^-1 T^-2, reference_velocity_fpm: L T^-1, alt_face_width_in: L, alt_face_height_in: L, target_velocity_fpm: L T^-1, upstream_lw_db: dimensionless, insertion_loss_db: dimensionless, regenerated_lw_db: dimensionless, fan_available_static_in_wc: M L^-1 T^-2 } out: { face_area_ft2: L^2, face_velocity_fpm: L T^-1, pressure_drop_in_wc: M L^-1 T^-2, alt_face_velocity_fpm: L T^-1, alt_pressure_drop_in_wc: M L^-1 T^-2, drop_increase_in_wc: M L^-1 T^-2, target_face_area_ft2: L^2, downstream_lw_db: dimensionless, attenuated_lw_db: dimensionless }
+// dims: in { airflow_cfm: L^3 T^-1, face_width_in: L, face_height_in: L, reference_drop_in_wc: M L^-1 T^-2, reference_velocity_fpm: L T^-1, alt_face_width_in: L, alt_face_height_in: L, target_velocity_fpm: L T^-1, upstream_lw_db: dimensionless, insertion_loss_db: dimensionless, regenerated_lw_db: dimensionless, fan_available_static_in_wc: M L^-1 T^-2 } out: { face_area_ft2: L^2, face_velocity_fpm: L T^-1, pressure_drop_in_wc: M L^-1 T^-2, alt_face_velocity_fpm: L T^-1, alt_pressure_drop_in_wc: M L^-1 T^-2, drop_increase_in_wc: M L^-1 T^-2, target_face_area_ft2: L^2, downstream_lw_db: dimensionless, attenuated_lw_db: dimensionless, alt_face_area_ft2: L^2, more_il_downstream_db: dimensionless, more_il_gain_db: dimensionless, regen_penalty_db: dimensionless, velocity_increase_pct: dimensionless }
 export function computeSilencerInsertionLoss({
   airflow_cfm = 0, face_width_in = 0, face_height_in = 0,
   reference_drop_in_wc = 0, reference_velocity_fpm = 0,
@@ -419,7 +419,7 @@ export const mechanicalRoomNcExample = { inputs: { source_spl_db: 85, partition_
 // review. This reports the direction IN WORDS rather than as a signed
 // number, the fix carried over from the band-12 sign-convention finding.
 // =====================================================================
-// dims: in { unit_length_ft: L, unit_width_ft: L, unit_height_ft: L, unit_weight_lb: M L T^-2, uplift_psf: M L^-1 T^-2, lateral_psf: M L^-1 T^-2, fastener_count: dimensionless, windward_fastener_count: dimensionless, fastener_capacity_lb: M L T^-2 } out: { plan_area_ft2: L^2, uplift_lb: M L T^-2, net_uplift_lb: M L T^-2, lateral_lb: M L T^-2, overturning_ftlb: M L^2 T^-2, couple_tension_lb: M L T^-2, per_windward_lb: M L T^-2, demand_ratio: dimensionless, fasteners_required: dimensionless }
+// dims: in { unit_length_ft: L, unit_width_ft: L, unit_height_ft: L, unit_weight_lb: M L T^-2, uplift_psf: M L^-1 T^-2, lateral_psf: M L^-1 T^-2, fastener_count: dimensionless, windward_fastener_count: dimensionless, fastener_capacity_lb: M L T^-2 } out: { plan_area_ft2: L^2, uplift_lb: M L T^-2, net_uplift_lb: M L T^-2, lateral_lb: M L T^-2, overturning_ftlb: M L^2 T^-2, couple_tension_lb: M L T^-2, per_windward_lb: M L T^-2, demand_ratio: dimensionless, fasteners_required: dimensionless, lever_arm_ft: L, side_area_ft2: L^2 }
 export function computeRooftopCurbUplift({
   unit_length_ft = 0, unit_width_ft = 0, unit_height_ft = 0, unit_weight_lb = 0,
   uplift_psf = 0, lateral_psf = 0, fastener_count = 0,

@@ -240,7 +240,7 @@ function _v948renderPulseFlowmeterRate(inputRegion, outputRegion, citationEl) {
 INSTRUMENTATION_RENDERERS["pulse-flowmeter-k-factor"] = _v948renderPulseFlowmeterRate;
 
 // ===================== spec-v949: loop-powered 2-wire 4-20 mA transmitter voltage budget =====================
-// dims: in { supply_v: M L^2 T^-3 I^-1, transmitter_min_v: M L^2 T^-3 I^-1, load_resistance_ohms: M L^2 T^-3 I^-2, wire_resistance_ohms: M L^2 T^-3 I^-2 } out: { max_loop_resistance_ohms: M L^2 T^-3 I^-2, voltage_at_transmitter_v: M L^2 T^-3 I^-1, margin_v: M L^2 T^-3 I^-1, within_spec: dimensionless }
+// dims: in { supply_v: M L^2 T^-3 I^-1, transmitter_min_v: M L^2 T^-3 I^-1, load_resistance_ohms: M L^2 T^-3 I^-2, wire_resistance_ohms: M L^2 T^-3 I^-2 } out: { max_loop_resistance_ohms: M L^2 T^-3 I^-2, voltage_at_transmitter_v: M L^2 T^-3 I^-1, margin_v: M L^2 T^-3 I^-1, within_spec: dimensionless, headroom_ohms: M L^2 T^-3 I^-2 }
 export function computeLoopVoltageBudget({ supply_v = 24, transmitter_min_v = 10.5, load_resistance_ohms = 250, wire_resistance_ohms = 50 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(supply_v > 0)) return { error: "Loop supply voltage must be positive (Vdc)." };
@@ -400,7 +400,7 @@ function renderThermistorSteinhartHart(inputRegion, outputRegion, citationEl) {
 INSTRUMENTATION_RENDERERS["thermistor-steinhart-hart"] = renderThermistorSteinhartHart;
 
 // ===================== spec-v958: hydrostatic DP level transmitter (head to level) =====================
-// dims: in { measured_pressure_psi: M L^-1 T^-2, specific_gravity: dimensionless, max_level_ft: L } out: { level_ft: L, level_pct: dimensionless, span_psi: M L^-1 T^-2 }
+// dims: in { measured_pressure_psi: M L^-1 T^-2, specific_gravity: dimensionless, max_level_ft: L } out: { level_ft: L, level_pct: dimensionless, span_psi: M L^-1 T^-2, level_in: L }
 export function computeDpLevelHydrostatic({ measured_pressure_psi = 4.33, specific_gravity = 1.0, max_level_ft = 20 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(measured_pressure_psi >= 0)) return { error: "Measured pressure cannot be negative (psi)." };

@@ -107,7 +107,7 @@ const _W_PER_HP = 745.69987158227022;
 
 // ===================== spec-v1879: emergency drinking water bleach dose =====================
 
-// dims: in { water_volume: L^3, volume_unit: dimensionless, bleach_strength_pct: dimensionless, water_condition: dimensionless, drop_volume_ml: L^3 } out: { water_gal: L^3, water_l: L^3, drops_per_gal: L^-3, base_drops: dimensionless, base_tsp: L^3, base_ml: L^3, base_dose_mg_l: M L^-3, double_drops: dimensionless, double_tsp: L^3, double_ml: L^3, double_dose_mg_l: M L^-3, applied_drops: dimensionless, applied_tsp: L^3, applied_ml: L^3, applied_dose_mg_l: M L^-3, stand_min: T, retest_min: T, table_counted_dose_mg_l: M L^-3, table_measured_dose_mg_l: M L^-3, table_measured_ratio: dimensionless }
+// dims: in { water_volume: L^3, volume_unit: dimensionless, bleach_strength_pct: dimensionless, water_condition: dimensionless, drop_volume_ml: L^3 } out: { water_gal: L^3, water_l: L^3, drops_per_gal: L^-3, base_drops: dimensionless, base_tsp: L^3, base_ml: L^3, base_dose_mg_l: M L^-3, double_drops: dimensionless, double_tsp: L^3, double_ml: L^3, double_dose_mg_l: M L^-3, applied_drops: dimensionless, applied_tsp: L^3, applied_ml: L^3, applied_dose_mg_l: M L^-3, stand_min: T, retest_min: T, table_counted_dose_mg_l: M L^-3, table_measured_dose_mg_l: M L^-3, table_measured_ratio: dimensionless, bleach_strength_pct: dimensionless }
 export function computeEmergencyWaterBleachDose({ water_volume = 0, volume_unit = "gal", bleach_strength_pct = 8.25, water_condition = "clear", drop_volume_ml = _ML_PER_TSP / 96 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(water_volume > 0)) return { error: "Water volume must be positive." };
@@ -233,7 +233,7 @@ RELIEFWATER_RENDERERS["boil-water-altitude"] = _simpleRenderer({
 
 const _BAFFLING = { unbaffled: 0.1, poor: 0.3, average: 0.5, superior: 0.7, perfect: 1.0 };
 
-// dims: in { vessel_shape: dimensionless, volume_gal: L^3, diameter_ft: L, length_ft: L, width_ft: L, min_depth_ft: L, peak_flow_gpm: L^3 T^-1, baffling_condition: dimensionless, custom_baffling_factor: dimensionless, residual_mg_l: M L^-3 } out: { vessel_volume_gal: L^3, tdt_min: T, baffling_factor: dimensionless, t10_min: T, t_unbaffled_min: T, t_poor_min: T, t_average_min: T, t_superior_min: T, t_perfect_min: T, ct_mg_min_l: M L^-3 T }
+// dims: in { vessel_shape: dimensionless, volume_gal: L^3, diameter_ft: L, length_ft: L, width_ft: L, min_depth_ft: L, peak_flow_gpm: L^3 T^-1, baffling_condition: dimensionless, custom_baffling_factor: dimensionless, residual_mg_l: M L^-3 } out: { vessel_volume_gal: L^3, tdt_min: T, baffling_factor: dimensionless, t10_min: T, t_unbaffled_min: T, t_poor_min: T, t_average_min: T, t_superior_min: T, t_perfect_min: T, ct_mg_min_l: M L^-3 T, residual_mg_l: M L^-3 }
 export function computeContactTimeBaffling({ vessel_shape = "volume", volume_gal = 0, diameter_ft = 0, length_ft = 0, width_ft = 0, min_depth_ft = 0, peak_flow_gpm = 0, baffling_condition = "unbaffled", custom_baffling_factor = 0, residual_mg_l = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   let vessel_volume_gal;
@@ -370,7 +370,7 @@ RELIEFWATER_RENDERERS["rtcr-coliform-samples"] = _simpleRenderer({
 
 // ===================== spec-v1883: solar water pump array sizing =====================
 
-// dims: in { daily_demand_gpd: L^3 T^-1, peak_sun_hours: T, tdh_ft: L, pump_efficiency: dimensionless, panel_derate: dimensionless, storage_days: T } out: { design_flow_gpm: L^3 T^-1, hydraulic_w: M L^2 T^-3, pump_input_w: M L^2 T^-3, array_min_w: M L^2 T^-3, workload_m4: L^4, storage_gal: L^3 }
+// dims: in { daily_demand_gpd: L^3 T^-1, peak_sun_hours: T, tdh_ft: L, pump_efficiency: dimensionless, panel_derate: dimensionless, storage_days: T } out: { design_flow_gpm: L^3 T^-1, hydraulic_w: M L^2 T^-3, pump_input_w: M L^2 T^-3, array_min_w: M L^2 T^-3, workload_m4: L^4, storage_gal: L^3, round_the_clock_gpm: L^3 T^-1, storage_days: T }
 export function computeSolarWaterPumpSizing({ daily_demand_gpd = 0, peak_sun_hours = 0, tdh_ft = 0, pump_efficiency = 0, panel_derate = 0.85, storage_days = 3 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(daily_demand_gpd > 0)) return { error: "Daily water demand must be positive." };
@@ -555,7 +555,7 @@ RELIEFWATER_RENDERERS["lift-station-outage-storage"] = _simpleRenderer({
 const _J1 = [[15, 1], [35, 2], [55, 3], [80, 4], [110, 5], [150, 6]];
 const _j1WaterClosets = (n) => { if (!(n > 0)) return 0; const row = _J1.find(([upper]) => n <= upper); return row ? row[1] : 6 + Math.ceil((n - 150) / 40 - 1e-9); };
 
-// dims: in { industry: dimensionless, worker_count: dimensionless, used_by_women: dimensionless, women_count: dimensionless } out: { toilet_seats: dimensionless, urinals: dimensionless, water_closets_min: dimensionless, water_closets_men: dimensionless, water_closets_women: dimensionless, water_closet_floor: dimensionless, urinals_substitutable: dimensionless, handwash_facilities: dimensionless }
+// dims: in { industry: dimensionless, worker_count: dimensionless, used_by_women: dimensionless, women_count: dimensionless } out: { toilet_seats: dimensionless, urinals: dimensionless, water_closets_min: dimensionless, water_closets_men: dimensionless, water_closets_women: dimensionless, water_closet_floor: dimensionless, urinals_substitutable: dimensionless, handwash_facilities: dimensionless, women_count: dimensionless, worker_count: dimensionless }
 export function computeOshaToiletCount({ industry = "construction", worker_count = 0, used_by_women = "yes", women_count = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(worker_count >= 1) || !Number.isInteger(worker_count)) return { error: "Worker count must be a whole number of at least 1." };
@@ -645,7 +645,7 @@ RELIEFWATER_RENDERERS["osha-toilet-count"] = _simpleRenderer({
 
 // ===================== spec-v1887: responder base camp sanitation and water =====================
 
-// dims: in { men_count: dimensionless, women_count: dimensionless, pressure_water: dimensionless } out: { toilets_men: dimensionless, toilets_women: dimensionless, toilets_total: dimensionless, urinals: dimensionless, handwash_basins: dimensionless, showerheads: dimensionless, laundry_trays: dimensionless, drinking_fountains: dimensionless, water_gal_per_day: L^3 T^-1, average_gph: L^3 T^-1, peak_gph: L^3 T^-1, peak_gpm: L^3 T^-1, sleeping_area_sqft: L^2 }
+// dims: in { men_count: dimensionless, women_count: dimensionless, pressure_water: dimensionless } out: { toilets_men: dimensionless, toilets_women: dimensionless, toilets_total: dimensionless, urinals: dimensionless, handwash_basins: dimensionless, showerheads: dimensionless, laundry_trays: dimensionless, drinking_fountains: dimensionless, water_gal_per_day: L^3 T^-1, average_gph: L^3 T^-1, peak_gph: L^3 T^-1, peak_gpm: L^3 T^-1, sleeping_area_sqft: L^2, men_count: dimensionless, urinal_trough_ft: L, women_count: dimensionless }
 export function computeResponderCampSanitation({ men_count = 0, women_count = 0, pressure_water = "yes" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(men_count >= 0) || !(women_count >= 0)) return { error: "Occupant counts cannot be negative." };

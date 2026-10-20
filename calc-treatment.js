@@ -84,7 +84,7 @@ TREATMENT_RENDERERS["langelier-index"] = renderLangelierIndex;
 // --- v20 M.3: Chemical metering-pump setting (`chemical-feed-pump`) ---
 // pure lb/day = MGD*dose*8.34; solution lb/day = pure/(strength/100);
 // GPD = solution_lb/day/(8.34*SG); mL/min = GPD*3785.41/1440; setting% = GPD/pump_max*100.
-// dims: in { flow_mgd: L^3*T^-1, dose_mgl: M L^-3, strength_pct: dimensionless, sg: dimensionless, pump_max_gpd: L^3*T^-1 } out: { solution_gpd: L^3*T^-1, setting_pct: dimensionless }
+// dims: in { flow_mgd: L^3*T^-1, dose_mgl: M L^-3, strength_pct: dimensionless, sg: dimensionless, pump_max_gpd: L^3*T^-1 } out: { solution_gpd: L^3*T^-1, setting_pct: dimensionless, pure_lb_day: M T^-1 }
 export function computeChemicalFeedPump({ flow_mgd = 0, dose_mgl = 0, strength_pct = 100, sg = 1, pump_max_gpd = 0 } = {}) {
   const mgd = Number(flow_mgd) || 0;
   const dose = Number(dose_mgl) || 0;
@@ -306,7 +306,7 @@ TREATMENT_RENDERERS["pool-salt-dose"] = renderPoolSaltDose;
 // that clears chloramines (v355).
 
 const _POOL_CL_PRODUCTS = { "liquid-12.5": 12.5, "cal-hypo-65": 65, "dichlor-56": 56, "trichlor-90": 90 };
-// dims: in { ppm: dimensionless, gallons: L^3, product: dimensionless, avail: dimensionless } out: { lb_cl: dimensionless, lb_prod: dimensionless, dry_oz: dimensionless, liq_floz: dimensionless }
+// dims: in { ppm: dimensionless, gallons: L^3, product: dimensionless, avail: dimensionless } out: { lb_cl: dimensionless, lb_prod: dimensionless, dry_oz: dimensionless, liq_floz: dimensionless, avail_pct: dimensionless }
 export function computePoolChlorineDose({ ppm = 0, gallons = 0, product = "cal-hypo-65", avail = 0 } = {}) {
   const _g = _finiteGuardPool(arguments[0]); if (_g) return _g;
   const rise = Number(ppm) || 0;
@@ -575,7 +575,7 @@ TREATMENT_RENDERERS["breakpoint-chlorination"] = _rPool({
 
 // ===================== spec-v405..v407: water/wastewater-operations trio (Group M) =====================
 
-// dims: in { flow_mgd: L^3 T^-1, surface_ft2: L^2, weir_len_ft: L, mlss_mgl: dimensionless, ras_mgd: L^3 T^-1 } out: { sor_gpd_ft2: dimensionless, weir_gpd_ft: dimensionless, solids_lb_ft2_day: dimensionless }
+// dims: in { flow_mgd: L^3 T^-1, surface_ft2: L^2, weir_len_ft: L, mlss_mgl: dimensionless, ras_mgd: L^3 T^-1 } out: { sor_gpd_ft2: dimensionless, weir_gpd_ft: dimensionless, solids_lb_ft2_day: M L^-2 T^-1 }
 export function computeClarifierSurfaceLoading({ flow_mgd = 0, surface_ft2 = 0, weir_len_ft = 0, mlss_mgl = 0, ras_mgd = 0 } = {}) {
   const flow = Number(flow_mgd) || 0;
   const area = Number(surface_ft2) || 0;
@@ -669,7 +669,7 @@ function renderClarifierAreaForLoading(inputRegion, outputRegion, citationEl) {
 }
 TREATMENT_RENDERERS["clarifier-area-for-loading"] = renderClarifierAreaForLoading;
 
-// dims: in { flow_mgd: L^3 T^-1, influent_mgl: dimensionless, effluent_mgl: dimensionless } out: { influent_lb_day: dimensionless, effluent_lb_day: dimensionless, removed_lb_day: dimensionless, removal_pct: dimensionless }
+// dims: in { flow_mgd: L^3 T^-1, influent_mgl: dimensionless, effluent_mgl: dimensionless } out: { influent_lb_day: M T^-1, effluent_lb_day: M T^-1, removed_lb_day: M T^-1, removal_pct: dimensionless }
 export function computeBodTssLoadingRemoval({ flow_mgd = 0, influent_mgl = 0, effluent_mgl = 0 } = {}) {
   const flow = Number(flow_mgd) || 0;
   const inf = Number(influent_mgl) || 0;
@@ -864,7 +864,7 @@ TREATMENT_RENDERERS["va-alkalinity-ratio"] = renderVaAlkalinityRatio;
 
 // --- spec-v596 M: Digester gas and methane production (`digester-gas-production`) ---
 // VS_destroyed = VS_fed x reduction/100; gas = VS_destroyed x yield; methane = gas x methane_pct/100; energy = methane x 960 BTU/ft^3.
-// dims: in { vs_fed_lb_day: dimensionless, vs_reduction_pct: dimensionless, gas_yield_ft3_lb: dimensionless, methane_pct: dimensionless } out: { vs_destroyed_lb_day: dimensionless, gas_ft3_day: dimensionless, methane_ft3_day: dimensionless, energy_btu_day: dimensionless }
+// dims: in { vs_fed_lb_day: M T^-1, vs_reduction_pct: dimensionless, gas_yield_ft3_lb: dimensionless, methane_pct: dimensionless } out: { vs_destroyed_lb_day: M T^-1, gas_ft3_day: L^3 T^-1, methane_ft3_day: L^3 T^-1, energy_btu_day: M L^2 T^-3 }
 export function computeDigesterGasProduction({ vs_fed_lb_day = 0, vs_reduction_pct = 0, gas_yield_ft3_lb = 15, methane_pct = 65 } = {}) {
   const _g = _finiteGuardPool(arguments[0]); if (_g) return _g;
   const vsf = Number(vs_fed_lb_day) || 0;
@@ -993,7 +993,7 @@ TREATMENT_RENDERERS["flocculation-g-value"] = renderFlocculationGValue;
 
 // --- spec-v621 M: Tapered flocculation multi-stage G schedule (`tapered-flocculation-g`) ---
 // P_stage = G_stage^2 x mu(T) x V_stage (Camp-Stein inverted). Stage 3 G = 0 models a 2-stage train. Gt = mean(G) x total_time.
-// dims: in { stage1_g_per_s: dimensionless, stage2_g_per_s: dimensionless, stage3_g_per_s: dimensionless, stage_volume_m3: L^3, stage_volume_gal: L^3, water_temp_c: dimensionless, water_temp_f: T, total_detention_min: T } out: { stage1_power_w: M L^2 T^-3, stage2_power_w: M L^2 T^-3, stage3_power_w: M L^2 T^-3, total_power_w: M L^2 T^-3, mean_g: dimensionless, gt_value: dimensionless }
+// dims: in { stage1_g_per_s: dimensionless, stage2_g_per_s: dimensionless, stage3_g_per_s: dimensionless, stage_volume_m3: L^3, stage_volume_gal: L^3, water_temp_c: dimensionless, water_temp_f: T, total_detention_min: T } out: { stage1_power_w: M L^2 T^-3, stage2_power_w: M L^2 T^-3, stage3_power_w: M L^2 T^-3, total_power_w: M L^2 T^-3, mean_g: dimensionless, gt_value: dimensionless, stages: dimensionless }
 export function computeTaperedFlocculationG({ stage1_g_per_s = 0, stage2_g_per_s = 0, stage3_g_per_s = 0, stage_volume_m3 = 0, stage_volume_gal = null, water_temp_c = 15, water_temp_f = null, total_detention_min = 0 } = {}) {
   const _g = _finiteGuardPool(arguments[0]); if (_g) return _g;
   const g1 = Number(stage1_g_per_s) || 0;
@@ -1110,7 +1110,7 @@ TREATMENT_RENDERERS["flocculator-paddle-power"] = renderFlocculatorPaddlePower;
 // --- spec-v576 M: Gas chlorine cylinder withdrawal rate ---
 // per_container = base(type) x temp-derate. containers = ceil(feed / per). Frost warn if cold or near ceiling.
 const _CL_WITHDRAWAL_BASE = { cylinder: 40, ton: 400 }; // lb/day at ~70 F
-// dims: in { feed_rate_lb_day: M T^-1, container_type: dimensionless, room_temp_f: T } out: { per_container_lb_day: M T^-1, containers: dimensionless }
+// dims: in { feed_rate_lb_day: M T^-1, container_type: dimensionless, room_temp_f: T } out: { per_container_lb_day: M T^-1, containers: dimensionless, derate: dimensionless }
 export function computeChlorineCylinderWithdrawal({ feed_rate_lb_day = 0, container_type = "cylinder", room_temp_f = 70 } = {}) {
   const feed = Number(feed_rate_lb_day) || 0;
   // Until 2026-10-14 a blank room temperature (null) ran as 0 F and tripled the container count.

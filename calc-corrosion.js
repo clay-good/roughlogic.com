@@ -111,7 +111,7 @@ export const CORROSION_RENDERERS = {};
 // failed a 100 mV criterion it meets (fixed 2026-10-01). Round to the microvolt.
 const _roundMv = (mv) => Math.round(mv * 1e6) / 1e6;
 
-// dims: in { soil_resistivity_ohm_cm: M L^3 T^-3 I^-2, column_length_ft: L, column_diameter_in: L, anode_count: dimensionless, spacing_ft: L, alternative_spacing_ft: L, alternative_length_ft: L, alternative_diameter_in: L } out: { single_anode_resistance_ohm: M L^2 T^-3 I^-2, bed_resistance_ohm: M L^2 T^-3 I^-2, parallel_resistance_ohm: M L^2 T^-3 I^-2, alternative_spacing_bed_ohm: M L^2 T^-3 I^-2, alternative_length_single_ohm: M L^2 T^-3 I^-2 }
+// dims: in { soil_resistivity_ohm_cm: M L^3 T^-3 I^-2, column_length_ft: L, column_diameter_in: L, anode_count: dimensionless, spacing_ft: L, alternative_spacing_ft: L, alternative_length_ft: L, alternative_diameter_in: L } out: { single_anode_resistance_ohm: M L^2 T^-3 I^-2, bed_resistance_ohm: M L^2 T^-3 I^-2, parallel_resistance_ohm: M L^2 T^-3 I^-2, alternative_spacing_bed_ohm: M L^2 T^-3 I^-2, alternative_length_single_ohm: M L^2 T^-3 I^-2, alternative_diameter_change_pct: dimensionless, alternative_diameter_in: L, alternative_diameter_single_ohm: M L^2 T^-3 I^-2, alternative_length_change_pct: dimensionless, alternative_length_ft: L, alternative_spacing_change_pct: dimensionless, alternative_spacing_ft: L, anode_count: dimensionless, column_diameter_in: L, column_length_ft: L, interference_penalty_pct: dimensionless, soil_resistivity_ohm_cm: M L^3 T^-3 I^-2, spacing_ft: L }
 export function computeAnodeBedResistance({ soil_resistivity_ohm_cm = 0, column_length_ft = 0, column_diameter_in = 0, anode_count = 0, spacing_ft = 0, alternative_spacing_ft = 0, alternative_length_ft = 0, alternative_diameter_in = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   if (!(soil_resistivity_ohm_cm > 0)) return { error: "Soil resistivity must be positive." };
@@ -181,7 +181,7 @@ CORROSION_RENDERERS["anode-bed-resistance"] = _simpleRenderer({
 // forever -- a cathodic protection system switched off is not one. Every ohm
 // removed from the circuit comes straight off the voltage and the bill.
 
-// dims: in { design_current_a: I, bed_resistance_ohm: M L^2 T^-3 I^-2, header_length_ft: L, negative_length_ft: L, cable_ohm_per_kft: M L T^-3 I^-2, back_emf_v: M L^2 T^-3 I^-1, design_margin_pct: dimensionless, rectifier_efficiency_pct: dimensionless, energy_rate_per_kwh: dimensionless } out: { cable_resistance_ohm: M L^2 T^-3 I^-2, total_resistance_ohm: M L^2 T^-3 I^-2, required_voltage_v: M L^2 T^-3 I^-1, design_voltage_v: M L^2 T^-3 I^-1, dc_output_w: M L^2 T^-3, ac_input_w: M L^2 T^-3, annual_kwh: M L^2 T^-2 }
+// dims: in { design_current_a: I, bed_resistance_ohm: M L^2 T^-3 I^-2, header_length_ft: L, negative_length_ft: L, cable_ohm_per_kft: M L T^-3 I^-2, back_emf_v: M L^2 T^-3 I^-1, design_margin_pct: dimensionless, rectifier_efficiency_pct: dimensionless, energy_rate_per_kwh: dimensionless } out: { cable_resistance_ohm: M L^2 T^-3 I^-2, total_resistance_ohm: M L^2 T^-3 I^-2, required_voltage_v: M L^2 T^-3 I^-1, design_voltage_v: M L^2 T^-3 I^-1, dc_output_w: M L^2 T^-3, ac_input_w: M L^2 T^-3, annual_kwh: M L^2 T^-2, annual_cost: dimensionless, back_emf_v: M L^2 T^-3 I^-1, cable_drop_v: M L^2 T^-3 I^-1, cable_share_pct: dimensionless, design_current_a: I, design_margin_pct: dimensionless, rectifier_efficiency_pct: dimensionless, voltage_without_cable_v: M L^2 T^-3 I^-1 }
 export function computeCpRectifierSizing({ design_current_a = 0, bed_resistance_ohm = 0, header_length_ft = 0, negative_length_ft = 0, cable_ohm_per_kft = 0, back_emf_v = 0, design_margin_pct = 0, rectifier_efficiency_pct = 0, energy_rate_per_kwh = 0, structure_resistance_ohm = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   // An efficiency is a percent; 0 < value < 1 is a fraction typed into a percent field (added 2026-09-26).
@@ -254,7 +254,7 @@ CORROSION_RENDERERS["cp-rectifier-sizing"] = _simpleRenderer({
 // square root -- the one forgiving feature of the relation -- but the reach
 // still collapses by that same factor.
 
-// dims: in { pipe_od_in: L, wall_thickness_in: L, steel_resistivity_ohm_in: M L^3 T^-3 I^-2, coating_resistance_ohm_sqft: M L^4 T^-3 I^-2, drain_shift_v: M L^2 T^-3 I^-1, distance_mi: L, degraded_coating_resistance_ohm_sqft: M L^4 T^-3 I^-2 } out: { longitudinal_ohm_per_ft: M L T^-3 I^-2, leakage_ohm_ft: M L^3 T^-3 I^-2, attenuation_per_ft: L^-1, characteristic_resistance_ohm: M L^2 T^-3 I^-2, shift_at_distance_v: M L^2 T^-3 I^-1, half_shift_mi: L }
+// dims: in { pipe_od_in: L, wall_thickness_in: L, steel_resistivity_ohm_in: M L^3 T^-3 I^-2, coating_resistance_ohm_sqft: M L^4 T^-3 I^-2, drain_shift_v: M L^2 T^-3 I^-1, distance_mi: L, degraded_coating_resistance_ohm_sqft: M L^4 T^-3 I^-2 } out: { longitudinal_ohm_per_ft: M L T^-3 I^-2, leakage_ohm_ft: M L^3 T^-3 I^-2, attenuation_per_ft: L^-1, characteristic_resistance_ohm: M L^2 T^-3 I^-2, shift_at_distance_v: M L^2 T^-3 I^-1, half_shift_mi: L, degraded_half_shift_mi: L, degraded_shift_at_distance_v: M L^2 T^-3 I^-1, degraded_shift_surviving_pct: dimensionless, distance_mi: L, drain_shift_v: M L^2 T^-3 I^-1, shift_surviving_pct: dimensionless, steel_area_sqin: L^2 }
 export function computePipelinePotentialAttenuation({ pipe_od_in = 0, wall_thickness_in = 0, steel_resistivity_ohm_in = 0, coating_resistance_ohm_sqft = 0, drain_shift_v = 0, distance_mi = 0, degraded_coating_resistance_ohm_sqft = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   // Unit / range guard added 2026-09-26 after printed-example probing.
@@ -333,7 +333,7 @@ CORROSION_RENDERERS["pipeline-potential-attenuation"] = _simpleRenderer({
 // of the steel. Read against the on potential, a thin real margin looks like a
 // comfortable one.
 
-// dims: in { on_potential_v: M L^2 T^-3 I^-1, instant_off_potential_v: M L^2 T^-3 I^-1, native_potential_v: M L^2 T^-3 I^-1, criterion_v: M L^2 T^-3 I^-1, polarization_criterion_mv: M L^2 T^-3 I^-1 } out: { ir_drop_mv: M L^2 T^-3 I^-1, off_margin_mv: M L^2 T^-3 I^-1, on_margin_mv: M L^2 T^-3 I^-1, polarization_mv: M L^2 T^-3 I^-1 }
+// dims: in { on_potential_v: M L^2 T^-3 I^-1, instant_off_potential_v: M L^2 T^-3 I^-1, native_potential_v: M L^2 T^-3 I^-1, criterion_v: M L^2 T^-3 I^-1, polarization_criterion_mv: M L^2 T^-3 I^-1 } out: { ir_drop_mv: M L^2 T^-3 I^-1, off_margin_mv: M L^2 T^-3 I^-1, on_margin_mv: M L^2 T^-3 I^-1, polarization_mv: M L^2 T^-3 I^-1, criterion_v: M L^2 T^-3 I^-1, instant_off_potential_v: M L^2 T^-3 I^-1, native_potential_v: M L^2 T^-3 I^-1, on_potential_v: M L^2 T^-3 I^-1, polarization_criterion_mv: M L^2 T^-3 I^-1 }
 export function computeInstantOffIrDrop({ on_potential_v = 0, instant_off_potential_v = 0, native_potential_v = 0, criterion_v = 0, polarization_criterion_mv = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   // Unit / range guard added 2026-09-26 after printed-example probing.
@@ -386,7 +386,7 @@ CORROSION_RENDERERS["instant-off-ir-drop"] = _simpleRenderer({
 // buys anode metal while the FINAL current buys anode count and rectifier
 // capacity -- two different numbers for two different decisions.
 
-// dims: in { surface_sqft: L^2, bare_current_density_ma_per_sqft: I L^-2, initial_breakdown_pct: dimensionless, annual_degradation_pct: dimensionless, design_life_years: T, fast_degradation_pct: dimensionless } out: { initial_current_a: I, final_current_a: I, mean_current_a: I, bare_steel_current_a: I, years_to_bare: T }
+// dims: in { surface_sqft: L^2, bare_current_density_ma_per_sqft: I L^-2, initial_breakdown_pct: dimensionless, annual_degradation_pct: dimensionless, design_life_years: T, fast_degradation_pct: dimensionless } out: { initial_current_a: I, final_current_a: I, mean_current_a: I, bare_steel_current_a: I, years_to_bare: T, commissioning_share_of_final_pct: dimensionless, design_life_years: T, fast_degradation_pct: dimensionless, fast_final_current_a: I, mean_shortfall_pct: dimensionless, surface_sqft: L^2 }
 export function computeCoatingBreakdownFactor({ surface_sqft = 0, bare_current_density_ma_per_sqft = 0, initial_breakdown_pct = 0, annual_degradation_pct = 0, design_life_years = 0, fast_degradation_pct = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   if (!(surface_sqft > 0)) return { error: "Surface area must be positive." };
@@ -458,7 +458,7 @@ CORROSION_RENDERERS["coating-breakdown-factor"] = _simpleRenderer({
 // satisfies the arithmetic and leaves the foreign structure still discharging
 // has moved the problem rather than fixed it.
 
-// dims: in { open_circuit_v: M L^2 T^-3 I^-1, solid_bond_current_a: I, target_bond_current_a: I, interference_shift_mv: M L^2 T^-3 I^-1, rating_margin_factor: dimensionless } out: { circuit_resistance_ohm: M L^2 T^-3 I^-2, required_resistance_ohm: M L^2 T^-3 I^-2, resistor_ohm: M L^2 T^-3 I^-2, dissipation_w: M L^2 T^-3, recommended_rating_w: M L^2 T^-3 }
+// dims: in { open_circuit_v: M L^2 T^-3 I^-1, solid_bond_current_a: I, target_bond_current_a: I, interference_shift_mv: M L^2 T^-3 I^-1, rating_margin_factor: dimensionless } out: { circuit_resistance_ohm: M L^2 T^-3 I^-2, required_resistance_ohm: M L^2 T^-3 I^-2, resistor_ohm: M L^2 T^-3 I^-2, dissipation_w: M L^2 T^-3, recommended_rating_w: M L^2 T^-3, open_circuit_v: M L^2 T^-3 I^-1, solid_bond_current_a: I, solid_bond_excess_pct: dimensionless, target_bond_current_a: I }
 export function computeStrayCurrentBond({ open_circuit_v = 0, solid_bond_current_a = 0, target_bond_current_a = 0, interference_shift_mv = 0, rating_margin_factor = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   if (!(open_circuit_v > 0)) return { error: "The open-circuit potential difference across the bond points must be positive." };
@@ -508,7 +508,7 @@ CORROSION_RENDERERS["stray-current-bond"] = _simpleRenderer({
 // weighing, and the second one decides when the equipment leaks. A programme
 // that records mass loss and not pit depth has measured the wrong extreme.
 
-// dims: in { mass_loss_mg: M, density_g_cm3: M L^-3, exposed_area_sqin: L^2, exposure_hours: T, wall_thickness_in: L, retirement_thickness_in: L, pitting_factor: dimensionless, alternative_mass_loss_mg: M } out: { corrosion_rate_mpy: L T^-1, corrosion_rate_mm_per_year: L T^-1, remaining_life_years: T, pit_rate_mpy: L T^-1, pit_life_years: T }
+// dims: in { mass_loss_mg: M, density_g_cm3: M L^-3, exposed_area_sqin: L^2, exposure_hours: T, wall_thickness_in: L, retirement_thickness_in: L, pitting_factor: dimensionless, alternative_mass_loss_mg: M } out: { corrosion_rate_mpy: L T^-1, corrosion_rate_mm_per_year: L T^-1, remaining_life_years: T, pit_rate_mpy: L T^-1, pit_life_years: T, corrosion_allowance_in: L }
 export function computeCorrosionRateWeightLoss({ mass_loss_mg = 0, density_g_cm3 = 0, exposed_area_sqin = 0, exposure_hours = 0, wall_thickness_in = 0, retirement_thickness_in = 0, pitting_factor = 0, alternative_mass_loss_mg = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   if (!(mass_loss_mg > 0) || !(alternative_mass_loss_mg > 0)) return { error: "Mass loss must be positive; a coupon with no loss gives no rate." };
@@ -570,7 +570,7 @@ CORROSION_RENDERERS["corrosion-rate-weight-loss"] = _simpleRenderer({
 // you whether anyone will ever notice. Reversing the area ratio changes the
 // attack rate by that ratio squared.
 
-// dims: in { anode_potential_v: M L^2 T^-3 I^-1, cathode_potential_v: M L^2 T^-3 I^-1, cathodic_current_density_ma_per_sqft: I L^-2, cathode_area_sqin: L^2, anode_area_sqin: L^2, electrochemical_equivalent_lb_per_a_yr: M I^-1 T^-1, anode_density_pcf: M L^-3 } out: { driving_voltage_v: M L^2 T^-3 I^-1, galvanic_current_ma: I, anode_current_density_a_per_sqft: I L^-2, penetration_in_per_year: L T^-1, reversed_penetration_in_per_year: L T^-1 }
+// dims: in { anode_potential_v: M L^2 T^-3 I^-1, cathode_potential_v: M L^2 T^-3 I^-1, cathodic_current_density_ma_per_sqft: I L^-2, cathode_area_sqin: L^2, anode_area_sqin: L^2, electrochemical_equivalent_lb_per_a_yr: M I^-1 T^-1, anode_density_pcf: M L^-3 } out: { driving_voltage_v: M L^2 T^-3 I^-1, galvanic_current_ma: I, anode_current_density_a_per_sqft: I L^-2, penetration_in_per_year: L T^-1, reversed_penetration_in_per_year: L T^-1, anode_area_sqin: L^2, cathode_area_sqin: L^2 }
 export function computeGalvanicAreaRatio({ anode_potential_v = 0, cathode_potential_v = 0, cathodic_current_density_ma_per_sqft = 0, cathode_area_sqin = 0, anode_area_sqin = 0, electrochemical_equivalent_lb_per_a_yr = 0, anode_density_pcf = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   if (!(anode_potential_v < cathode_potential_v)) return { error: "The anode must be the more negative (more active) metal; check the two potentials." };
@@ -636,7 +636,7 @@ CORROSION_RENDERERS["galvanic-area-ratio"] = _simpleRenderer({
 // tank, where bottoms perforate, the farthest from any anode. Over a
 // containment liner the ring does nothing at all.
 
-// dims: in { tank_diameter_ft: L, current_density_ma_per_sqft: I L^-2, grid_spacing_ft: L, ribbon_rating_ma_per_ft: I L^-1 } out: { bottom_area_sqft: L^2, current_requirement_a: I, grid_ribbon_ft: L, grid_loading_ma_per_ft: I L^-1, ring_ribbon_ft: L, ring_loading_ma_per_ft: I L^-1, ring_to_centre_ft: L }
+// dims: in { tank_diameter_ft: L, current_density_ma_per_sqft: I L^-2, grid_spacing_ft: L, ribbon_rating_ma_per_ft: I L^-1 } out: { bottom_area_sqft: L^2, current_requirement_a: I, grid_ribbon_ft: L, grid_loading_ma_per_ft: I L^-1, ring_ribbon_ft: L, ring_loading_ma_per_ft: I L^-1, ring_to_centre_ft: L, grid_spacing_ft: L, grid_to_farthest_ft: L, line_count: dimensionless, ring_saving_pct: dimensionless, tank_diameter_ft: L }
 export function computeTankBottomAnodeLayout({ tank_diameter_ft = 0, current_density_ma_per_sqft = 0, grid_spacing_ft = 0, ribbon_rating_ma_per_ft = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   if (!(tank_diameter_ft > 0)) return { error: "The tank diameter must be positive." };
@@ -721,7 +721,7 @@ CORROSION_RENDERERS["tank-bottom-anode-layout"] = _simpleRenderer({
 // doubling the interval buys the wrong saving: it steps over half the holidays
 // the survey was commissioned to find.
 
-// dims: in { survey_length_mi: L, reading_interval_ft: L, readings_per_station: dimensionless, spool_length_ft: L, production_mi_per_day: L T^-1, seconds_per_reading: T, crew_day_hours: T, test_station_spacing_mi: L, alternative_interval_ft: L } out: { reading_count: dimensionless, data_points: dimensionless, spool_setups: dimensionless, field_days: T, reading_hours: T, alternative_reading_count: dimensionless }
+// dims: in { survey_length_mi: L, reading_interval_ft: L, readings_per_station: dimensionless, spool_length_ft: L, production_mi_per_day: L T^-1, seconds_per_reading: T, crew_day_hours: T, test_station_spacing_mi: L, alternative_interval_ft: L } out: { reading_count: dimensionless, data_points: dimensionless, spool_setups: dimensionless, field_days: T, reading_hours: T, alternative_reading_count: dimensionless, alternative_interval_ft: L, length_ft: L, meter_busy_pct: dimensionless, reading_interval_ft: L, survey_length_mi: L }
 export function computeCloseIntervalSurveyReadings({ survey_length_mi = 0, reading_interval_ft = 0, readings_per_station = 0, spool_length_ft = 0, production_mi_per_day = 0, seconds_per_reading = 0, crew_day_hours = 0, test_station_spacing_mi = 0, alternative_interval_ft = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   // Unit / range guard added 2026-09-26 after printed-example probing.
@@ -792,7 +792,7 @@ CORROSION_RENDERERS["close-interval-survey-readings"] = _simpleRenderer({
 // a holiday at the same time. Mitigating to the touch limit protects the crew
 // and does nothing for the pipe.
 
-// dims: in { induced_ac_v: M L^2 T^-3 I^-1, soil_resistivity_ohm_m: M L^3 T^-3 I^-2, holiday_area_cm2: L^2, touch_limit_v: M L^2 T^-3 I^-1, risk_threshold_a_per_m2: I L^-2, alternative_resistivity_ohm_m: M L^3 T^-3 I^-2 } out: { holiday_diameter_mm: L, ac_current_density_a_per_m2: I L^-2, voltage_for_threshold_v: M L^2 T^-3 I^-1, alternative_current_density_a_per_m2: I L^-2 }
+// dims: in { induced_ac_v: M L^2 T^-3 I^-1, soil_resistivity_ohm_m: M L^3 T^-3 I^-2, holiday_area_cm2: L^2, touch_limit_v: M L^2 T^-3 I^-1, risk_threshold_a_per_m2: I L^-2, alternative_resistivity_ohm_m: M L^3 T^-3 I^-2 } out: { holiday_diameter_mm: L, ac_current_density_a_per_m2: I L^-2, voltage_for_threshold_v: M L^2 T^-3 I^-1, alternative_current_density_a_per_m2: I L^-2, alternative_change_pct: dimensionless, touch_limit_v: M L^2 T^-3 I^-1, touch_margin_v: M L^2 T^-3 I^-1 }
 export function computeAcInducedVoltagePipeline({ induced_ac_v = 0, soil_resistivity_ohm_m = 0, holiday_area_cm2 = 0, touch_limit_v = 0, risk_threshold_a_per_m2 = 0, alternative_resistivity_ohm_m = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   if (!(induced_ac_v > 0)) return { error: "The induced AC voltage must be positive." };
@@ -852,7 +852,7 @@ CORROSION_RENDERERS["ac-induced-voltage-pipeline"] = _simpleRenderer({
 // criterion. Measuring the decay from the ON potential instead of the
 // instant-off certifies an unprotected line -- the failure mode that matters.
 
-// dims: in { on_potential_v: M L^2 T^-3 I^-1, instant_off_potential_v: M L^2 T^-3 I^-1, native_potential_v: M L^2 T^-3 I^-1, depolarized_potential_v: M L^2 T^-3 I^-1, criterion_v: M L^2 T^-3 I^-1, polarization_criterion_mv: M L^2 T^-3 I^-1 } out: { ir_drop_mv: M L^2 T^-3 I^-1, formation_mv: M L^2 T^-3 I^-1, decay_mv: M L^2 T^-3 I^-1, absolute_margin_mv: M L^2 T^-3 I^-1, decay_from_on_mv: M L^2 T^-3 I^-1 }
+// dims: in { on_potential_v: M L^2 T^-3 I^-1, instant_off_potential_v: M L^2 T^-3 I^-1, native_potential_v: M L^2 T^-3 I^-1, depolarized_potential_v: M L^2 T^-3 I^-1, criterion_v: M L^2 T^-3 I^-1, polarization_criterion_mv: M L^2 T^-3 I^-1 } out: { ir_drop_mv: M L^2 T^-3 I^-1, formation_mv: M L^2 T^-3 I^-1, decay_mv: M L^2 T^-3 I^-1, absolute_margin_mv: M L^2 T^-3 I^-1, decay_from_on_mv: M L^2 T^-3 I^-1, criterion_v: M L^2 T^-3 I^-1, instant_off_potential_v: M L^2 T^-3 I^-1, on_potential_v: M L^2 T^-3 I^-1, polarization_criterion_mv: M L^2 T^-3 I^-1 }
 export function computePolarizationDecayCriterion({ on_potential_v = 0, instant_off_potential_v = 0, native_potential_v = 0, depolarized_potential_v = 0, criterion_v = 0, polarization_criterion_mv = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   // Unit / range guard added 2026-09-26 after printed-example probing.
@@ -911,7 +911,7 @@ CORROSION_RENDERERS["polarization-decay-criterion"] = _simpleRenderer({
 // logarithm; doubling the depth buys a great deal. And voids are where the
 // anode touches soil and is consumed, so the waste allowance is not padding.
 
-// dims: in { hole_diameter_in: L, hole_depth_ft: L, anode_diameter_in: L, anode_length_ft: L, anode_count: dimensionless, backfill_density_pcf: M L^-3, bag_weight_lb: M, waste_pct: dimensionless, soil_resistivity_ohm_cm: M L^3 T^-3 I^-2 } out: { column_ft3: L^3, anode_ft3: L^3, backfill_ft3_per_anode: L^3, backfill_lb_per_anode: M, bed_backfill_ft3: L^3, bed_backfill_lb: M, bag_count: dimensionless }
+// dims: in { hole_diameter_in: L, hole_depth_ft: L, anode_diameter_in: L, anode_length_ft: L, anode_count: dimensionless, backfill_density_pcf: M L^-3, bag_weight_lb: M, waste_pct: dimensionless, soil_resistivity_ohm_cm: M L^3 T^-3 I^-2 } out: { column_ft3: L^3, anode_ft3: L^3, backfill_ft3_per_anode: L^3, backfill_lb_per_anode: M, bed_backfill_ft3: L^3, bed_backfill_lb: M, bag_count: dimensionless, anode_count: dimensionless, anode_share_pct: dimensionless, bag_weight_lb: M, base_resistance_ohm: M L^2 T^-3 I^-2, deeper_change_pct: dimensionless, deeper_resistance_ohm: M L^2 T^-3 I^-2, hole_depth_ft: L, hole_diameter_in: L, narrower_change_pct: dimensionless, narrower_resistance_ohm: M L^2 T^-3 I^-2, waste_pct: dimensionless, wider_change_pct: dimensionless, wider_resistance_ohm: M L^2 T^-3 I^-2 }
 export function computeCokeBreezeBackfill({ hole_diameter_in = 0, hole_depth_ft = 0, anode_diameter_in = 0, anode_length_ft = 0, anode_count = 0, backfill_density_pcf = 0, bag_weight_lb = 0, waste_pct = 0, soil_resistivity_ohm_cm = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   // Unit / range guard added 2026-09-26 after printed-example probing.

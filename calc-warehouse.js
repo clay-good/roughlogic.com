@@ -91,7 +91,7 @@ export const WAREHOUSE_RENDERERS = {};
 // span and deflection with its cube, which is why the L/180 acceptance limit
 // governs an ordinary beam that passes its stress check comfortably.
 
-// dims: in { span_in: L, pallet_weight_lb: M L T^-2, pallets_per_level: dimensionless, moment_of_inertia_in4: L^4, section_modulus_in3: L^3, yield_strength_psi: M L^-1 T^-2, deflection_limit_ratio: dimensionless } out: { load_per_beam_lb: M L T^-2, moment_in_lb: M L^2 T^-2, impact_moment_in_lb: M L^2 T^-2, design_moment_in_lb: M L^2 T^-2, bending_stress_psi: M L^-1 T^-2, allowable_stress_psi: M L^-1 T^-2, stress_ratio: dimensionless, deflection_in: L, deflection_limit_in: L, required_moment_of_inertia_in4: L^4 }
+// dims: in { span_in: L, pallet_weight_lb: M L T^-2, pallets_per_level: dimensionless, moment_of_inertia_in4: L^4, section_modulus_in3: L^3, yield_strength_psi: M L^-1 T^-2, deflection_limit_ratio: dimensionless } out: { load_per_beam_lb: M L T^-2, moment_in_lb: M L^2 T^-2, impact_moment_in_lb: M L^2 T^-2, design_moment_in_lb: M L^2 T^-2, bending_stress_psi: M L^-1 T^-2, allowable_stress_psi: M L^-1 T^-2, stress_ratio: dimensionless, deflection_in: L, deflection_limit_in: L, required_moment_of_inertia_in4: L^4, added_moment_of_inertia_pct: dimensionless, deflection_margin_pct: dimensionless, stress_margin_pct: dimensionless }
 export function computePalletRackBeamCapacity({ span_in = 0, pallet_weight_lb = 0, pallets_per_level = 0, moment_of_inertia_in4 = 0, section_modulus_in3 = 0, yield_strength_psi = 0, deflection_limit_ratio = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   if (!(span_in > 0) || !(pallet_weight_lb > 0)) return { error: "Beam span and pallet weight must be positive." };
@@ -171,7 +171,7 @@ WAREHOUSE_RENDERERS["pallet-rack-beam-capacity"] = _simpleRenderer({
 // unbraced length and quarters the buckling capacity with nothing visible
 // changing and the load plaque still reading the old number.
 
-// dims: in { beam_spacing_in: L, column_moment_of_inertia_in4: L^4, effective_length_factor: dimensionless, loaded_levels: dimensionless, load_per_level_lb: M L T^-2, rated_frame_capacity_lb: M L T^-2 } out: { load_per_column_lb: M L T^-2, load_per_frame_lb: M L T^-2, utilization_pct: dimensionless, euler_capacity_lb: M L T^-2, euler_capacity_level_removed_lb: M L T^-2 }
+// dims: in { beam_spacing_in: L, column_moment_of_inertia_in4: L^4, effective_length_factor: dimensionless, loaded_levels: dimensionless, load_per_level_lb: M L T^-2, rated_frame_capacity_lb: M L T^-2 } out: { load_per_column_lb: M L T^-2, load_per_frame_lb: M L T^-2, utilization_pct: dimensionless, euler_capacity_lb: M L T^-2, euler_capacity_level_removed_lb: M L T^-2, removed_capacity_loss_pct: dimensionless, unbraced_level_removed_in: L }
 export function computeRackUprightCapacityDerate({ beam_spacing_in = 0, column_moment_of_inertia_in4 = 0, effective_length_factor = 0, loaded_levels = 0, load_per_level_lb = 0, rated_frame_capacity_lb = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   if (!(beam_spacing_in > 0) || !(column_moment_of_inertia_in4 > 0)) return { error: "Beam spacing and column moment of inertia must be positive." };
@@ -225,7 +225,7 @@ WAREHOUSE_RENDERERS["rack-upright-capacity-derate"] = _simpleRenderer({
 // short lever arm at the base and the difference lands on the anchors as
 // tension. The slab is usually the governing element and the least known one.
 
-// dims: in { frame_weight_lb: M L T^-2, frame_depth_in: L, top_beam_height_ft: L, lateral_force_coefficient: dimensionless, effective_height_fraction: dimensionless, allowable_anchor_tension_lb: M L T^-2, base_plate_holes: dimensionless, improved_anchor_tension_lb: M L T^-2 } out: { lateral_force_lb: M L T^-2, overturning_moment_ftlb: M L^2 T^-2, resisting_moment_ftlb: M L^2 T^-2, net_uplift_lb: M L T^-2, anchors_required: dimensionless, anchors_required_improved: dimensionless }
+// dims: in { frame_weight_lb: M L T^-2, frame_depth_in: L, top_beam_height_ft: L, lateral_force_coefficient: dimensionless, effective_height_fraction: dimensionless, allowable_anchor_tension_lb: M L T^-2, base_plate_holes: dimensionless, improved_anchor_tension_lb: M L T^-2 } out: { lateral_force_lb: M L T^-2, overturning_moment_ftlb: M L^2 T^-2, resisting_moment_ftlb: M L^2 T^-2, net_uplift_lb: M L T^-2, anchors_required: dimensionless, anchors_required_improved: dimensionless, effective_height_ft: L, frame_depth_ft: L, resisting_arm_ft: L, resisting_share_pct: dimensionless }
 export function computeRackBasePlateAnchorage({ frame_weight_lb = 0, frame_depth_in = 0, top_beam_height_ft = 0, lateral_force_coefficient = 0, effective_height_fraction = 0, allowable_anchor_tension_lb = 0, base_plate_holes = 0, improved_anchor_tension_lb = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   if (!(frame_weight_lb > 0) || !(frame_depth_in > 0) || !(top_beam_height_ft > 0)) {
@@ -296,7 +296,7 @@ WAREHOUSE_RENDERERS["rack-base-plate-anchorage"] = _simpleRenderer({
 // across the whole floor plate. The three truck types differ only in where the
 // load sits relative to the turning centre, and that is the whole explanation.
 
-// dims: in { load_length_in: L, operating_clearance_in: L, counterbalanced_turning_radius_in: L, counterbalanced_load_center_in: L, reach_turning_radius_in: L, reach_load_center_in: L, turret_clearance_in: L, rack_row_depth_in: L, building_width_ft: L } out: { counterbalanced_aisle_in: L, reach_aisle_in: L, turret_aisle_in: L, counterbalanced_modules: dimensionless, reach_modules: dimensionless, turret_modules: dimensionless }
+// dims: in { load_length_in: L, operating_clearance_in: L, counterbalanced_turning_radius_in: L, counterbalanced_load_center_in: L, reach_turning_radius_in: L, reach_load_center_in: L, turret_clearance_in: L, rack_row_depth_in: L, building_width_ft: L } out: { counterbalanced_aisle_in: L, reach_aisle_in: L, turret_aisle_in: L, counterbalanced_modules: dimensionless, reach_modules: dimensionless, turret_modules: dimensionless, counterbalanced_aisle_ft: L, counterbalanced_module_in: L, reach_aisle_ft: L, reach_gain_pct: dimensionless, reach_module_in: L, reach_share_of_turret_gain_pct: dimensionless, turret_aisle_ft: L, turret_gain_pct: dimensionless, turret_module_in: L }
 export function computeStackingAisleWidth({ load_length_in = 0, operating_clearance_in = 0, counterbalanced_turning_radius_in = 0, counterbalanced_load_center_in = 0, reach_turning_radius_in = 0, reach_load_center_in = 0, turret_clearance_in = 0, rack_row_depth_in = 0, building_width_ft = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   if (!(load_length_in > 0) || !(operating_clearance_in > 0)) return { error: "Load length and operating clearance must be positive." };
@@ -375,7 +375,7 @@ WAREHOUSE_RENDERERS["stacking-aisle-width"] = _simpleRenderer({
 // before a single pallet is counted more than half the floor is committed to
 // getting to it.
 
-// dims: in { building_width_ft: L, building_depth_ft: L, clear_height_ft: L, module_pitch_in: L, rack_row_depth_in: L, rack_run_length_ft: L, bays_per_row: dimensionless, levels_per_bay: dimensionless, pallets_per_bay_level: dimensionless, pallet_width_in: L, pallet_depth_in: L, pallet_loaded_height_in: L, beam_pitch_in: L } out: { building_cube_ft3: L^3, pallet_positions: dimensionless, occupied_cube_ft3: L^3, cube_utilization_pct: dimensionless, aisle_floor_ft2: L^2, rack_floor_ft2: L^2 }
+// dims: in { building_width_ft: L, building_depth_ft: L, clear_height_ft: L, module_pitch_in: L, rack_row_depth_in: L, rack_run_length_ft: L, bays_per_row: dimensionless, levels_per_bay: dimensionless, pallets_per_bay_level: dimensionless, pallet_width_in: L, pallet_depth_in: L, pallet_loaded_height_in: L, beam_pitch_in: L } out: { building_cube_ft3: L^3, pallet_positions: dimensionless, occupied_cube_ft3: L^3, cube_utilization_pct: dimensionless, aisle_floor_ft2: L^2, rack_floor_ft2: L^2, aisle_floor_share_pct: dimensionless, aisle_width_ft: L, aisle_width_in: L, building_floor_ft2: L^2, level_clearance_in: L, level_clearance_share_pct: dimensionless, other_floor_share_pct: dimensionless, pallet_cube_ft3: L^3, rack_floor_share_pct: dimensionless }
 export function computeWarehouseCubeUtilization({ building_width_ft = 0, building_depth_ft = 0, clear_height_ft = 0, module_pitch_in = 0, rack_row_depth_in = 0, rack_run_length_ft = 0, bays_per_row = 0, levels_per_bay = 0, pallets_per_bay_level = 0, pallet_width_in = 0, pallet_depth_in = 0, pallet_loaded_height_in = 0, beam_pitch_in = 0 } = {}) {
   if (levels_per_bay > 0 && beam_pitch_in > 0 && clear_height_ft > 0 && levels_per_bay * beam_pitch_in / 12 > clear_height_ft) return { error: "That many levels at this beam pitch stand taller than the clear height." };
   if (pallet_loaded_height_in > 0 && beam_pitch_in > 0 && pallet_loaded_height_in >= beam_pitch_in) return { error: "The loaded pallet is as tall as the beam pitch or taller; it does not fit the level." };
@@ -452,7 +452,7 @@ WAREHOUSE_RENDERERS["warehouse-cube-utilization"] = _simpleRenderer({
 // whether the leveler can REACH a bed height; grade says whether equipment can
 // work across it once it does. Those are different questions.
 
-// dims: in { dock_height_in: L, low_bed_height_in: L, high_bed_height_in: L, leveler_length_ft: L, service_range_in: L, grade_guideline_pct: dimensionless, longer_leveler_length_ft: L, outlier_bed_height_in: L } out: { low_differential_in: L, high_differential_in: L, low_grade_pct: dimensionless, high_grade_pct: dimensionless, longer_leveler_grade_pct: dimensionless, outlier_grade_pct: dimensionless }
+// dims: in { dock_height_in: L, low_bed_height_in: L, high_bed_height_in: L, leveler_length_ft: L, service_range_in: L, grade_guideline_pct: dimensionless, longer_leveler_length_ft: L, outlier_bed_height_in: L } out: { low_differential_in: L, high_differential_in: L, low_grade_pct: dimensionless, high_grade_pct: dimensionless, longer_leveler_grade_pct: dimensionless, outlier_grade_pct: dimensionless, governing_grade_pct: dimensionless, outlier_differential_in: L, outlier_longer_grade_pct: dimensionless }
 export function computeDockLevelerSlope({ dock_height_in = 0, low_bed_height_in = 0, high_bed_height_in = 0, leveler_length_ft = 0, service_range_in = 0, grade_guideline_pct = 0, longer_leveler_length_ft = 0, outlier_bed_height_in = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   if (!(dock_height_in > 0) || !(low_bed_height_in > 0) || !(high_bed_height_in > 0) || !(outlier_bed_height_in > 0)) {
@@ -525,7 +525,7 @@ WAREHOUSE_RENDERERS["dock-leveler-slope"] = _simpleRenderer({
 // A bay is not sized by adding pallet widths; it is sized by adding pallet
 // widths AND the flues between them, so the flue sets the beam, not the pallet.
 
-// dims: in { pallet_width_in: L, pallet_depth_in: L, pallets_per_bay: dimensionless, transverse_gaps: dimensionless, nominal_flue_in: L, beam_length_in: L, frame_depth_in: L, back_to_back_spacing_in: L, deeper_load_depth_in: L } out: { transverse_gap_each_in: L, required_beam_length_in: L, pallet_overhang_in: L, longitudinal_flue_in: L, deeper_load_longitudinal_flue_in: L }
+// dims: in { pallet_width_in: L, pallet_depth_in: L, pallets_per_bay: dimensionless, transverse_gaps: dimensionless, nominal_flue_in: L, beam_length_in: L, frame_depth_in: L, back_to_back_spacing_in: L, deeper_load_depth_in: L } out: { transverse_gap_each_in: L, required_beam_length_in: L, pallet_overhang_in: L, longitudinal_flue_in: L, deeper_load_longitudinal_flue_in: L, beam_shortfall_in: L, deeper_load_flue_share_pct: dimensionless, deeper_load_overhang_in: L, flue_run_in: L, longitudinal_flue_share_pct: dimensionless, pallet_run_in: L, transverse_flue_share_pct: dimensionless, transverse_gap_total_in: L }
 export function computeRackFlueSpace({ pallet_width_in = 0, pallet_depth_in = 0, pallets_per_bay = 0, transverse_gaps = 0, nominal_flue_in = 0, beam_length_in = 0, frame_depth_in = 0, back_to_back_spacing_in = 0, deeper_load_depth_in = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   if (!(pallet_width_in > 0) || !(pallet_depth_in > 0) || !(deeper_load_depth_in > 0)) return { error: "Pallet width, depth, and the deeper load depth must be positive." };
@@ -661,7 +661,7 @@ WAREHOUSE_RENDERERS["dock-door-count-throughput"] = _simpleRenderer({
 // from elements makes it explainable and survives a change in the order mix.
 // Travel dominates and it is the element with no output.
 
-// dims: in { lines_per_order: dimensionless, units_per_line: dimensionless, travel_time_s: T, pick_time_s: T, additional_unit_time_s: T, setup_time_min: T, pfd_allowance_pct: dimensionless, batch_size: dimensionless, batch_travel_time_s: T } out: { time_per_line_s: T, pick_time_total_s: T, allowed_order_time_min: T, lines_per_hour: T^-1, units_per_hour: T^-1, travel_share_pct: dimensionless, batch_lines_per_hour: T^-1 }
+// dims: in { lines_per_order: dimensionless, units_per_line: dimensionless, travel_time_s: T, pick_time_s: T, additional_unit_time_s: T, setup_time_min: T, pfd_allowance_pct: dimensionless, batch_size: dimensionless, batch_travel_time_s: T } out: { time_per_line_s: T, pick_time_total_s: T, allowed_order_time_min: T, lines_per_hour: T^-1, units_per_hour: T^-1, travel_share_pct: dimensionless, batch_lines_per_hour: T^-1, batch_improvement_pct: dimensionless, batch_travel_reduction_pct: dimensionless, batch_travel_share_pct: dimensionless }
 export function computeOrderPickLaborStandard({ lines_per_order = 0, units_per_line = 0, travel_time_s = 0, pick_time_s = 0, additional_unit_time_s = 0, setup_time_min = 0, pfd_allowance_pct = 0, batch_size = 0, batch_travel_time_s = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   if (!(lines_per_order > 0)) return { error: "Lines per order must be positive." };

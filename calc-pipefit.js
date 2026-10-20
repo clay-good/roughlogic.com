@@ -74,7 +74,7 @@ const _PIPE_ALPHA = {
 // ---------------------------------------------------------------------
 // 29.1 Pipe cold spring / cut-short (pipe-cold-spring) - ASME B31.1 §119
 // ---------------------------------------------------------------------
-// dims: in { run_length_ft: L, install_temp_f: T, operating_temp_f: T, cold_spring_percent: dimensionless, alpha_per_f: T^-1 } out: { thermal_growth_in: L, cold_spring_gap_in: L, residual_movement_in: L, growth_per_100ft_in: L }
+// dims: in { run_length_ft: L, install_temp_f: T, operating_temp_f: T, cold_spring_percent: dimensionless, alpha_per_f: T^-1 } out: { thermal_growth_in: L, cold_spring_gap_in: L, residual_movement_in: L, growth_per_100ft_in: L, alpha_per_f: T^-1, cold_spring_percent: dimensionless, delta_t_f: T, run_length_ft: L }
 export function computeColdSpring({ material = "steel", run_length_ft = 0, install_temp_f = 0, operating_temp_f = 0, cold_spring_percent = 50, alpha_per_f = null } = {}) {
   const _g = _finiteGuard({ run_length_ft, install_temp_f, operating_temp_f, cold_spring_percent }); if (_g) return _g;
   // A blank temperature read as 0 F sized the cold-spring gap off a 0 F install or operating point.
@@ -138,7 +138,7 @@ PIPEFIT_RENDERERS["pipe-cold-spring"] = _renderColdSpring;
 // ---------------------------------------------------------------------
 // 29.2 PVC raceway expansion fitting (raceway-expansion-fitting) - NEC 352.44
 // ---------------------------------------------------------------------
-// dims: in { run_length_ft: L, temp_range_f: T, alpha_per_f: T^-1, fitting_travel_in: L, threshold_in: L } out: { length_change_in: L, per_100ft_in: L, fittings_needed: dimensionless }
+// dims: in { run_length_ft: L, temp_range_f: T, alpha_per_f: T^-1, fitting_travel_in: L, threshold_in: L } out: { length_change_in: L, per_100ft_in: L, fittings_needed: dimensionless, alpha_per_f: T^-1, fitting_travel_in: L, run_length_ft: L, threshold_in: L }
 export function computeRacewayExpansion({ run_length_ft = 0, temp_range_f = 0, alpha_per_f = 0.0000338, fitting_travel_in = 6, threshold_in = 0.25 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const L = Number(run_length_ft);
@@ -188,7 +188,7 @@ PIPEFIT_RENDERERS["raceway-expansion-fitting"] = _renderRacewayExpansion;
 // ---------------------------------------------------------------------
 // 29.3 Insulated parallel-pipe rack spacing (pipe-spacing-rack)
 // ---------------------------------------------------------------------
-// dims: in { pipe_od_in: L, insulation_thickness_in: L, clearance_in: L, pipe_count: dimensionless, rack_width_in: L } out: { insulated_od_in: L, center_to_center_in: L, total_bundle_width_in: L, remaining_in: L }
+// dims: in { pipe_od_in: L, insulation_thickness_in: L, clearance_in: L, pipe_count: dimensionless, rack_width_in: L } out: { insulated_od_in: L, center_to_center_in: L, total_bundle_width_in: L, remaining_in: L, clearance_in: L, insulation_thickness_in: L, pipe_count: dimensionless, pipe_od_in: L }
 export function computePipeSpacingRack({ pipe_od_in = 0, insulation_thickness_in = 0, clearance_in = 1, pipe_count = 2, rack_width_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const od = Number(pipe_od_in);
@@ -607,7 +607,7 @@ PIPEFIT_RENDERERS["pipe-pressure-rating"] = _renderPipePressureRating;
 // ---------------------------------------------------------------------
 // v161 Filled pipe support load (pipe-filled-support-load)
 // ---------------------------------------------------------------------
-// dims: in { od_in: L, wall_in: L, pipe_density: M L^-3, fluid_density: M L^-3, insul_thk_in: L, insul_density: M L^-3, spacing_ft: L } out: { empty_lbft: M L^-1, fluid_lbft: M L^-1, insul_lbft: M L^-1, filled_lbft: M L^-1, per_hanger_lb: M }
+// dims: in { od_in: L, wall_in: L, pipe_density: M L^-3, fluid_density: M L^-3, insul_thk_in: L, insul_density: M L^-3, spacing_ft: L } out: { empty_lbft: M L^-1, fluid_lbft: M L^-1, insul_lbft: M L^-1, filled_lbft: M L^-1, per_hanger_lb: M, id_in: L }
 export function computePipeFilledSupportLoad({ od_in = 0, wall_in = 0, pipe_density = 490, fluid_density = 62.4, insul_thk_in = 0, insul_density = 6, spacing_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const od = Number(od_in);
@@ -783,7 +783,7 @@ PIPEFIT_RENDERERS["condensate-return-sizing"] = _renderCondensateReturnSizing;
 // pipe for a welded branch connection. The cutback contour around the
 // branch end is a fixed function of the two diameters: the cylinder
 // intersection cutback(theta) = R - sqrt(R^2 - (r sin theta)^2).
-// dims: in { branch_od_in: L, run_od_in: L, stations: dimensionless } out: { r_in: L, R_in: L, max_cutback_in: L }
+// dims: in { branch_od_in: L, run_od_in: L, stations: dimensionless } out: { r_in: L, R_in: L, max_cutback_in: L, stations: dimensionless }
 export function computeBranchSaddleCutback({ branch_od_in = 0, run_od_in = 0, stations = 6 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const bod = Number(branch_od_in);
@@ -834,7 +834,7 @@ PIPEFIT_RENDERERS["branch-saddle-cutback"] = _renderBranchSaddleCutback;
 // by half the diameter change (a dam on a gravity drain, an air pocket on
 // a pump suction). An eccentric reducer keeps one side flat: flat-on-bottom
 // holds the invert continuous, flat-on-top holds the crown continuous.
-// dims: in { large_od_in: L, small_od_in: L, lay_length_in: L, type: dimensionless } out: { centerline_offset_in: L, bop_shift_in: L, top_shift_in: L }
+// dims: in { large_od_in: L, small_od_in: L, lay_length_in: L, type: dimensionless } out: { centerline_offset_in: L, bop_shift_in: L, top_shift_in: L, lay_length_in: L }
 export function computeReducerOffset({ large_od_in = 0, small_od_in = 0, lay_length_in = 0, type = "concentric" } = {}) {
   const _g = _finiteGuard({ large_od_in, small_od_in, lay_length_in }); if (_g) return _g;
   const D = Number(large_od_in);
@@ -912,7 +912,7 @@ const _B16_5_GROUP_1_1 = {
   1500: [3705, 3395, 3270, 3170, 3015, 2840, 2745],
   2500: [6170, 5655, 5450, 5280, 5025, 4730, 4575],
 };
-// dims: in { flange_class: dimensionless, temp_f: T } out: { mawp_psig: M L^-1 T^-2 }
+// dims: in { flange_class: dimensionless, temp_f: T } out: { mawp_psig: M L^-1 T^-2, temp_f: T }
 export function computeFlangeRating({ flange_class = 150, temp_f = 0 } = {}) {
   const _g = _finiteGuard({ flange_class, temp_f }); if (_g) return _g;
   // A blank service temperature read as 0 F returned the -20..100 F rating with confidence.
@@ -1070,7 +1070,7 @@ PIPEFIT_RENDERERS["branch-reinforcement"] = _renderBranchReinforcement;
 // diameters of the joint, the second within fourteen diameters of the
 // first. Beyond guide 2, intermediate spacing comes from the EJMA table or
 // the pipe-column stability calc; the anchor and joint selection govern.
-// dims: in { pipe_od_in: L, d1_mult: dimensionless, d2_mult: dimensionless } out: { first_guide_in: L, second_guide_in: L, guide2_from_joint_in: L }
+// dims: in { pipe_od_in: L, d1_mult: dimensionless, d2_mult: dimensionless } out: { first_guide_in: L, second_guide_in: L, guide2_from_joint_in: L, first_guide_ft: L, guide2_from_joint_ft: L, second_guide_ft: L }
 export function computeExpansionGuideSpacing({ pipe_od_in = 0, d1_mult = 4, d2_mult = 14 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const od = Number(pipe_od_in);

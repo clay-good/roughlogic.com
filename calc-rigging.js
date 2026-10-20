@@ -910,7 +910,7 @@ RIGGING_RENDERERS["chain-lever-hoist"] = renderChainLeverHoist;
 // --- block-redirect-load: Resultant Force on a Rigging Block ---
 //
 // resultant = 2 x line_tension x sin(direction_change / 2).
-// dims: in { line_tension_lb: M L T^-2, direction_chg_deg: dimensionless } out: { resultant_lb: M L T^-2 }
+// dims: in { line_tension_lb: M L T^-2, direction_chg_deg: dimensionless } out: { resultant_lb: M L T^-2, direction_chg_deg: dimensionless }
 // (Line tension and the resultant are forces M L T^-2; the direction change is
 //  a dimensionless angle.)
 export function computeBlockRedirectLoad({ line_tension_lb, direction_chg_deg } = {}) {
@@ -1302,7 +1302,7 @@ RIGGING_RENDERERS["spanline-sag-for-tension"] = renderSpanlineSagForTension;
 
 // --- spec-v544 Z: Two-leg asymmetric bridle leg tension (`bridle-leg-tension`) ---
 // L=sqrt(run^2+rise^2), a=run/L, b=rise/L. den = a2*b1 + a1*b2. T1 = W*a2/den, T2 = W*a1/den. H = T1*a1.
-// dims: in { apex_load_lb: M L T^-2, run1_ft: L, rise1_ft: L, run2_ft: L, rise2_ft: L } out: { t1_lb: M L T^-2, t2_lb: M L T^-2, horizontal_lb: M L T^-2 }
+// dims: in { apex_load_lb: M L T^-2, run1_ft: L, rise1_ft: L, run2_ft: L, rise2_ft: L } out: { t1_lb: M L T^-2, t2_lb: M L T^-2, horizontal_lb: M L T^-2, angle1_deg: dimensionless, angle2_deg: dimensionless, l1_ft: L, l2_ft: L }
 export function computeBridleLegTension({ apex_load_lb, run1_ft, rise1_ft, run2_ft, rise2_ft } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const W = Number(apex_load_lb);
@@ -1351,7 +1351,7 @@ RIGGING_RENDERERS["bridle-leg-tension"] = renderBridleLegTension;
 
 // --- spec-v545 Z: Winch drum line pull and capacity by layer (`winch-drum-line-pull`) ---
 // Dn = drum + (2n-1)*rope. Pn = rated*drum/Dn. Vn = drum_speed*Dn/drum. wraps = floor(barrel/rope).
-// dims: in { rated_pull_lb: M L T^-2, drum_dia_in: L, rope_dia_in: L, barrel_width_in: L, target_layer: dimensionless } out: { mean_dia_in: L, pull_at_layer_lb: M L T^-2, speed_ratio: dimensionless, wraps_per_layer: dimensionless }
+// dims: in { rated_pull_lb: M L T^-2, drum_dia_in: L, rope_dia_in: L, barrel_width_in: L, target_layer: dimensionless } out: { mean_dia_in: L, pull_at_layer_lb: M L T^-2, speed_ratio: dimensionless, wraps_per_layer: dimensionless, derate_pct: dimensionless }
 export function computeWinchDrumLinePull({ rated_pull_lb, drum_dia_in, rope_dia_in, barrel_width_in, target_layer = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const P1 = Number(rated_pull_lb);
@@ -1486,7 +1486,7 @@ RIGGING_RENDERERS["crane-outrigger-reaction"] = renderCraneOutriggerReaction;
 // Dp/2, both without the 1.20: 40-60% above BTH-1, enough to pass a lug BTH-1
 // fails (44 kip on a 1 in plate, 4 in wide, 2.06 in hole, 1.8 in edge: DCR
 // 0.98 "adequate" where tear-out gives 1.11).
-// dims: in { applied_load_kip: M L T^-2, plate_thick_in: L, hole_dia_in: L, pin_dia_in: L, edge_dist_in: L, plate_width_in: L, fy_ksi: M L^-1 T^-2, fu_ksi: M L^-1 T^-2, design_factor: dimensionless } out: { fracture_kip: M L T^-2, bearing_kip: M L T^-2, tension_kip: M L T^-2, tearout_kip: M L T^-2, dcr: dimensionless }
+// dims: in { applied_load_kip: M L T^-2, plate_thick_in: L, hole_dia_in: L, pin_dia_in: L, edge_dist_in: L, plate_width_in: L, fy_ksi: M L^-1 T^-2, fu_ksi: M L^-1 T^-2, design_factor: dimensionless } out: { fracture_kip: M L T^-2, bearing_kip: M L T^-2, tension_kip: M L T^-2, tearout_kip: M L T^-2, dcr: dimensionless, Av_in2: L^2, beff_in: L, governing_kip: M L T^-2 }
 export function computeLiftingLugDesign({ applied_load_kip, plate_thick_in, hole_dia_in, pin_dia_in, edge_dist_in, plate_width_in, fy_ksi = 36, fu_ksi = 58, design_factor = 2.0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const P = Number(applied_load_kip), t = Number(plate_thick_in), Dh = Number(hole_dia_in), Dp = Number(pin_dia_in);
@@ -1636,7 +1636,7 @@ RIGGING_RENDERERS["three-point-bridle"] = renderThreePointBridle;
 
 // --- spec-v616 Z: Beam clamp reaction and side-pull check (`beam-clamp-side-pull`) ---
 // V = T sin(angle), H = T cos(angle); utilizations vs the vertical WLL and the (often zero) side-pull rating.
-// dims: in { leg_tension_lb: M L T^-2, leg_angle_deg: dimensionless, vertical_wll_lb: M L T^-2, side_pull_lb: M L T^-2 } out: { vertical_lb: M L T^-2, horizontal_lb: M L T^-2, resultant_lb: M L T^-2, pull_from_vertical_deg: dimensionless, vertical_util_pct: dimensionless }
+// dims: in { leg_tension_lb: M L T^-2, leg_angle_deg: dimensionless, vertical_wll_lb: M L T^-2, side_pull_lb: M L T^-2 } out: { vertical_lb: M L T^-2, horizontal_lb: M L T^-2, resultant_lb: M L T^-2, pull_from_vertical_deg: dimensionless, vertical_util_pct: dimensionless, horizontal_util_pct: dimensionless }
 export function computeBeamClampSidePull({ leg_tension_lb, leg_angle_deg, vertical_wll_lb, side_pull_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const T = Number(leg_tension_lb);

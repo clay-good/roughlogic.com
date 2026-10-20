@@ -299,7 +299,7 @@ const _CH8_ACRES_PER_CY = 100 / 1000000;
 // FEMA-325 Appendix B: burning leaves 5%, grinding leaves 25%.
 const _REMAINING = { grind: 0.25, burn: 0.05 };
 
-// dims: in { debris_volume_cy: L^3, woody_volume_cy: L^3, stack_height_ft: L, land_use_fraction: dimensionless, site_fill_count: dimensionless, reduction_method: dimensionless, processing_rate_cyh: L^3 T^-1, machine_count: dimensionless, operating_hours_per_day: T } out: { storage_cy_per_acre: L, storage_acres: L^2, gross_site_acres: L^2, ch8_check_acres: L^2, cycled_site_acres: L^2, ground_volume_cy: L^3, burned_volume_cy: L^3, reduced_volume_cy: L^3, volume_removed_cy: L^3, processing_machine_hours: T, processing_days: T, processing_workdays: T }
+// dims: in { debris_volume_cy: L^3, woody_volume_cy: L^3, stack_height_ft: L, land_use_fraction: dimensionless, site_fill_count: dimensionless, reduction_method: dimensionless, processing_rate_cyh: L^3 T^-1, machine_count: dimensionless, operating_hours_per_day: T } out: { storage_cy_per_acre: L, storage_acres: L^2, gross_site_acres: L^2, ch8_check_acres: L^2, cycled_site_acres: L^2, ground_volume_cy: L^3, burned_volume_cy: L^3, reduced_volume_cy: L^3, volume_removed_cy: L^3, processing_machine_hours: T, processing_days: T, processing_workdays: T, ch8_difference_pct: dimensionless }
 export function computeDebrisSiteSizing({ debris_volume_cy = 0, woody_volume_cy = 0, stack_height_ft = 10, land_use_fraction = 0.6, site_fill_count = 1, reduction_method = "grind", processing_rate_cyh = 125, machine_count = 0, operating_hours_per_day = 10 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(debris_volume_cy > 0)) return { error: "Debris volume must be positive." };
@@ -370,7 +370,7 @@ DEBRIS_RENDERERS["debris-management-site-sizing"] = _simpleRenderer({
 const _NO_TAILGATE_FACTOR = 0.85;
 const _HAND_LOAD_FACTOR = 0.5;
 
-// dims: in { bed_length_ft: L, bed_width_ft: L, bed_height_ft: L, certified_override_cy: L^3, solid_tailgate: dimensionless, hand_loaded: dimensionless, observed_pct: dimensionless } out: { certified_capacity_cy: L^3, capacity_basis_cy: L^3, tailgate_reduction_cy: L^3, observed_load_cy: L^3, hand_load_reduction_cy: L^3, eligible_cy: L^3, eligible_pct_of_certified: dimensionless }
+// dims: in { bed_length_ft: L, bed_width_ft: L, bed_height_ft: L, certified_override_cy: L^3, solid_tailgate: dimensionless, hand_loaded: dimensionless, observed_pct: dimensionless } out: { certified_capacity_cy: L^3, capacity_basis_cy: L^3, tailgate_reduction_cy: L^3, observed_load_cy: L^3, hand_load_reduction_cy: L^3, eligible_cy: L^3, eligible_pct_of_certified: dimensionless, observed_pct: dimensionless }
 export function computeDebrisLoadTicket({ bed_length_ft = 0, bed_width_ft = 0, bed_height_ft = 0, certified_override_cy = 0, solid_tailgate = "yes", hand_loaded = "no", observed_pct = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(certified_override_cy >= 0)) return { error: "Certified capacity cannot be negative." };

@@ -400,7 +400,7 @@ FIREWATER_RENDERERS["tanker-shuttle-cycle"] = renderTankerShuttleCycle;
 
 // --- spec-v605 F: Tanker shuttle fill-site-limited fleet size ---
 // bottleneck = max(fill_min, dump_min). fleet_for_max = ceil(cycle/bottleneck). site_flow = tank/bottleneck.
-// dims: in { tank_gal: L^3, fill_gpm: L^3 T^-1, dump_gpm: L^3 T^-1, distance_mi: L, speed_mph: L T^-1 } out: { cycle_min: T, bottleneck_min: T, fleet_for_max: dimensionless, site_limited_flow_gpm: L^3 T^-1 }
+// dims: in { tank_gal: L^3, fill_gpm: L^3 T^-1, dump_gpm: L^3 T^-1, distance_mi: L, speed_mph: L T^-1 } out: { cycle_min: T, bottleneck_min: T, fleet_for_max: dimensionless, site_limited_flow_gpm: L^3 T^-1, dump_min: T, travel_min: T }
 export function computeTankerFleetSize({ tank_gal = 0, fill_gpm = 0, dump_gpm = 0, distance_mi = 0, speed_mph = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const tank = Number(tank_gal) || 0;

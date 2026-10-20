@@ -1172,7 +1172,7 @@ export const FIELD_RENDERERS = {
 // --- v20 P.1: Search probability of detection (`search-probability`) ---
 // cumulative_POD = 1 - product(1 - POD_i); POS = POA * cumulative_POD;
 // residual = POA * (1 - cumulative_POD).
-// dims: in { pod_list: dimensionless, poa_pct: dimensionless } out: { cumulative_pod_pct: dimensionless, pos_pct: dimensionless }
+// dims: in { pod_list: dimensionless, poa_pct: dimensionless } out: { cumulative_pod_pct: dimensionless, pos_pct: dimensionless, passes: dimensionless, residual_pct: dimensionless }
 export function computeSearchProbability({ pod_list = [], poa_pct = 100 } = {}) {
   const pods = (Array.isArray(pod_list) ? pod_list : []).map(Number).filter((x) => Number.isFinite(x));
   const poa = Number(poa_pct);
@@ -1225,7 +1225,7 @@ FIELD_RENDERERS["search-probability"] = renderSearchProbability;
 // pacing-distance (steps -> distance, not time).
 // =====================================================================
 
-// dims: in { distance: L, distance_unit: dimensionless, ascent: L, ascent_unit: dimensionless, speed: L T^-1, factor: dimensionless } out: { total_hours: T, base_hours: T, ascent_hours: T }
+// dims: in { distance: L, distance_unit: dimensionless, ascent: L, ascent_unit: dimensionless, speed: L T^-1, factor: dimensionless } out: { total_hours: T, base_hours: T, ascent_hours: T, distance_km: L, factor: dimensionless, total_min: T }
 export function computeHikingTime({ distance = 0, distance_unit = "km", ascent = 0, ascent_unit = "m", speed = 0, factor = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const KM_PER_MI = 1.609344, M_PER_FT = 0.3048;
@@ -1301,7 +1301,7 @@ FIELD_RENDERERS["hiking-time"] = renderHikingTime;
 // ===========================================================================
 
 // ===================== spec-v1397: map scale distance and area =====================
-// dims: in { representative_fraction: dimensionless, map_distance_in: L, map_area_sqin: L^2 } out: { ft_per_inch: L, ground_distance_ft: L, ground_area_acres: L^2, acres_per_sq_inch: L^2 }
+// dims: in { representative_fraction: dimensionless, map_distance_in: L, map_area_sqin: L^2 } out: { ft_per_inch: L, ground_distance_ft: L, ground_area_acres: L^2, acres_per_sq_inch: L^2, ground_area_sqft: L^2, ground_distance_mi: L }
 export function computeMapScaleConversion({ representative_fraction = 24000, map_distance_in = 0, map_area_sqin = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(representative_fraction > 0)) return { error: "Representative fraction must be positive (24000 for a 1:24,000 map)." };
@@ -1350,7 +1350,7 @@ FIELD_RENDERERS["map-scale-conversion"] = _r({
 });
 
 // ===================== spec-v1398: slope and grade from contour lines =====================
-// dims: in { contour_interval_ft: L, intervals_crossed: dimensionless, map_distance_in: L, representative_fraction: dimensionless } out: { rise_ft: L, run_ft: L, grade_pct: dimensionless, slope_angle_deg: dimensionless, slope_distance_ft: L }
+// dims: in { contour_interval_ft: L, intervals_crossed: dimensionless, map_distance_in: L, representative_fraction: dimensionless } out: { rise_ft: L, run_ft: L, grade_pct: dimensionless, slope_angle_deg: dimensionless, slope_distance_ft: L, slope_distance_excess_pct: dimensionless, slope_ratio: dimensionless }
 export function computeContourSlope({ contour_interval_ft = 0, intervals_crossed = 0, map_distance_in = 0, representative_fraction = 24000 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(contour_interval_ft > 0)) return { error: "Contour interval must be positive." };
@@ -1401,7 +1401,7 @@ FIELD_RENDERERS["contour-slope"] = _r({
 });
 
 // ===================== spec-v1400: helicopter landing zone sizing =====================
-// dims: in { rotor_diameter_ft: L, size_factor: dimensionless, measured_clear_ft: L, ground_slope_deg: dimensionless, slope_limit_deg: dimensionless, obstacle_height_ft: L, approach_ratio: dimensionless } out: { required_side_ft: L, slope_limit_pct: dimensionless, approach_length_ft: L, total_clear_ft: L }
+// dims: in { rotor_diameter_ft: L, size_factor: dimensionless, measured_clear_ft: L, ground_slope_deg: dimensionless, slope_limit_deg: dimensionless, obstacle_height_ft: L, approach_ratio: dimensionless } out: { required_side_ft: L, slope_limit_pct: dimensionless, approach_length_ft: L, total_clear_ft: L, ground_slope_pct: dimensionless }
 export function computeHelicopterLzSizing({ rotor_diameter_ft = 0, size_factor = 2, measured_clear_ft = 0, ground_slope_deg = 0, slope_limit_deg = 8, obstacle_height_ft = 0, approach_ratio = 10 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(rotor_diameter_ft > 0)) return { error: "Rotor diameter must be positive." };

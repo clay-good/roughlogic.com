@@ -50,7 +50,7 @@ const _finiteGuard = (o) => {
 // floor-mounted closet. The useful derived number is the minimum wall-to-wall width for a
 // row of fixtures, 2 x 15 + (n - 1) x 30, which is what actually decides whether a layout
 // fits before anything is drawn.
-// dims: in { center_to_left_in: L, center_to_right_in: L, front_clearance_in: L, adjacent_center_in: L, fixture_count: dimensionless, compartment_width_in: L, compartment_depth_in: L, min_side_in: L, min_center_in: L, min_front_in: L } out: { min_row_width_in: L, side_deficit_in: L, front_deficit_in: L, center_deficit_in: L }
+// dims: in { center_to_left_in: L, center_to_right_in: L, front_clearance_in: L, adjacent_center_in: L, fixture_count: dimensionless, compartment_width_in: L, compartment_depth_in: L, min_side_in: L, min_center_in: L, min_front_in: L } out: { min_row_width_in: L, side_deficit_in: L, front_deficit_in: L, center_deficit_in: L, min_alcove_depth_in: L }
 export function computeFixtureClearanceCheck({ center_to_left_in = 0, center_to_right_in = 0, front_clearance_in = 0, adjacent_center_in = 0, fixture_count = 1, compartment_width_in = 0, compartment_depth_in = 0, min_side_in = 15, min_center_in = 30, min_front_in = 21 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const L = Number(center_to_left_in) || 0;
@@ -425,7 +425,7 @@ PLUMBINGCODE_RENDERERS["aav-install-check"] = _v1136renderAavInstallCheck;
 // sustain 250 lbf, and a bar standing 1.5 in off the wall turns that into a prying moment
 // the blocking has to resolve over the fastener spacing - the same lever-arm collapse the
 // guard-post tile shows, in miniature. A bar screwed to drywall anchors meets none of it.
-// dims: in { bar_height_in: L, side_bar_length_in: L, side_bar_from_rear_in: L, rear_bar_length_in: L, rear_toward_side_in: L, rear_toward_open_in: L, load_lb: M L T^-2, standoff_in: L, fastener_spacing_in: L } out: { pull_out_lb: M L T^-2, prying_moment_inlb: M L^2 T^-2, fastener_force_lb: M L T^-2 }
+// dims: in { bar_height_in: L, side_bar_length_in: L, side_bar_from_rear_in: L, rear_bar_length_in: L, rear_toward_side_in: L, rear_toward_open_in: L, load_lb: M L T^-2, standoff_in: L, fastener_spacing_in: L } out: { pull_out_lb: M L T^-2, prying_moment_inlb: M L^2 T^-2, fastener_force_lb: M L T^-2, rear_span_needed_in: L, side_reach_in: L }
 export function computeGrabBarLayout({ bar_height_in = 34, side_bar_length_in = 42, side_bar_from_rear_in = 12, rear_bar_length_in = 36, rear_toward_side_in = 12, rear_toward_open_in = 24, load_lb = 250, standoff_in = 1.5, fastener_spacing_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const h = Number(bar_height_in) || 0;
@@ -622,7 +622,7 @@ PLUMBINGCODE_RENDERERS["cleanout-layout"] = _v1140renderCleanoutLayout;
 // system is now CLOSED and heated water has nowhere to expand back to. The homeowner who
 // fixes banging pipes with a PRV and then wonders why the T&P valve started weeping has
 // completed the chain without being told it existed. This tile walks it in one place.
-// dims: in { static_pressure_psi: M L^-1 T^-2, min_fixture_pressure_psi: M L^-1 T^-2, has_check_or_backflow: dimensionless, has_storage_water_heater: dimensionless, expansion_control_present: dimensionless, prv_setpoint_psi: M L^-1 T^-2 } out: { over_by_psi: M L^-1 T^-2, headroom_psi: M L^-1 T^-2 }
+// dims: in { static_pressure_psi: M L^-1 T^-2, min_fixture_pressure_psi: M L^-1 T^-2, has_check_or_backflow: dimensionless, has_storage_water_heater: dimensionless, expansion_control_present: dimensionless, prv_setpoint_psi: M L^-1 T^-2 } out: { over_by_psi: M L^-1 T^-2, headroom_psi: M L^-1 T^-2, delivered_psi: M L^-1 T^-2 }
 export function computeWaterServicePressureCheck({ static_pressure_psi = 0, min_fixture_pressure_psi = 20, has_check_or_backflow = "no", has_storage_water_heater = "yes", expansion_control_present = "no", prv_setpoint_psi = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   for (const [k, v] of [["has_check_or_backflow", has_check_or_backflow], ["has_storage_water_heater", has_storage_water_heater], ["expansion_control_present", expansion_control_present]]) if (v !== "yes" && v !== "no") return { error: k + " must be yes or no." };
@@ -715,7 +715,7 @@ PLUMBINGCODE_RENDERERS["water-service-pressure-check"] = _v1146renderWaterServic
 // without moving a partition.
 // The ambulatory compartment's width is a WINDOW, 35 in minimum to 37 in maximum: a 40 in
 // stall is too WIDE to qualify, because the point is grab bars on both sides within reach.
-// dims: in { compartment_count: dimensionless, urinal_count: dimensionless, water_closet_count: dimensionless, wheelchair_width_in: L, wheelchair_depth_in: L, wc_mounting: dimensionless, ambulatory_provided: dimensionless, ambulatory_width_in: L, ambulatory_depth_in: L } out: { required_wheelchair_depth_in: L, wheelchair_depth_deficit_in: L, wheelchair_width_deficit_in: L, fixture_total: dimensionless }
+// dims: in { compartment_count: dimensionless, urinal_count: dimensionless, water_closet_count: dimensionless, wheelchair_width_in: L, wheelchair_depth_in: L, wc_mounting: dimensionless, ambulatory_provided: dimensionless, ambulatory_width_in: L, ambulatory_depth_in: L } out: { required_wheelchair_depth_in: L, wheelchair_depth_deficit_in: L, wheelchair_width_deficit_in: L, fixture_total: dimensionless, other_mounting_depth_in: L }
 export function computeAccessibleToiletCompartment({ compartment_count = 0, urinal_count = 0, water_closet_count = 0, wheelchair_width_in = 0, wheelchair_depth_in = 0, wc_mounting = "wall-hung", ambulatory_provided = "no", ambulatory_width_in = 0, ambulatory_depth_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const stalls = Number(compartment_count) || 0;

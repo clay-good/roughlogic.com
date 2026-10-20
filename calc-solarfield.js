@@ -510,7 +510,7 @@ function _v968renderEvRangePerHour(inputRegion, outputRegion, citationEl) {
 SOLARFIELD_RENDERERS["ev-range-per-hour"] = _v968renderEvRangePerHour;
 
 // ===================== spec-v972: battery bank series/parallel configuration =====================
-// dims: in { target_bus_v: M L^2 T^-3 I^-1, module_v: M L^2 T^-3 I^-1, module_ah: I T, parallel_strings: dimensionless, depth_of_discharge: dimensionless } out: { series_count: dimensionless, actual_bus_v: M L^2 T^-3 I^-1, total_ah: I T, usable_kwh: M L^2 T^-2 }
+// dims: in { target_bus_v: M L^2 T^-3 I^-1, module_v: M L^2 T^-3 I^-1, module_ah: I T, parallel_strings: dimensionless, depth_of_discharge: dimensionless } out: { series_count: dimensionless, actual_bus_v: M L^2 T^-3 I^-1, total_ah: I T, usable_kwh: M L^2 T^-2, parallel_count: dimensionless }
 export function computeBatterySeriesParallel({ target_bus_v = 48, module_v = 12.8, module_ah = 100, parallel_strings = 2, depth_of_discharge = 0.8 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!Number.isInteger(Number(parallel_strings))) return { error: "Parallel strings is a whole number." };

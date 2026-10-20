@@ -207,7 +207,7 @@ STEEL_RENDERERS["required-section-modulus"] = _simpleRenderer({
 
 // ===================== spec-v255: steel beam web shear capacity =====================
 
-// dims: in { fy: M L^-1 T^-2, d: L, tw: L, cv1: dimensionless, omega_v: dimensionless, vu: M L T^-2 } out: { aw: L^2, vn: M L T^-2, va: M L T^-2, phi_vn: M L T^-2, util_asd: dimensionless, omega_used: dimensionless }
+// dims: in { fy: M L^-1 T^-2, d: L, tw: L, cv1: dimensionless, omega_v: dimensionless, vu: M L T^-2 } out: { aw: L^2, vn: M L T^-2, va: M L T^-2, phi_vn: M L T^-2, util_asd: dimensionless, omega_used: dimensionless, phi_v: M L^2 T^-3 I^-1 }
 export function computeSteelBeamShear({ fy = 50, d = 0, tw = 0, cv1 = 1.0, omega_v = 1.50, vu = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(fy > 0)) return { error: "Yield stress Fy must be positive (ksi)." };
@@ -510,7 +510,7 @@ STEEL_RENDERERS["steel-cb"] = _simpleRenderer({
   compute: computeSteelCb,
 });
 
-// dims: in { fy: M L^-1 T^-2, zx: L^3, sx: L^3, ry: L, rts: L, j: L^4, ho: L, lb_ft: L, cb: dimensionless } out: { mp_kipft: M L^2 T^-2, lp_ft: L, lr_ft: L, mn_kipft: M L^2 T^-2, ma_kipft: M L^2 T^-2, phi_mn: M L^2 T^-2 }
+// dims: in { fy: M L^-1 T^-2, zx: L^3, sx: L^3, ry: L, rts: L, j: L^4, ho: L, lb_ft: L, cb: dimensionless } out: { mp_kipft: M L^2 T^-2, lp_ft: L, lr_ft: L, mn_kipft: M L^2 T^-2, ma_kipft: M L^2 T^-2, phi_mn: M L^2 T^-2, fcr_ksi: M L^-1 T^-2 }
 export function computeSteelBeamLtb({ fy = 50, zx = 0, sx = 0, ry = 0, rts = 0, j = 0, ho = 0, lb_ft = 0, cb = 1.0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(fy > 0)) return { error: "Yield stress Fy must be positive (ksi)." };
@@ -898,7 +898,7 @@ STEEL_RENDERERS["steel-h1-interaction"] = _simpleRenderer({
 // the nonsway (braced) moment, with Cm = 0.6 - 0.4 (M1/M2) (no transverse load) or 1.0 (transverse load),
 // Pe1 = pi^2 EI* / (K1 L)^2 the in-plane elastic buckling load (E = 29,000 ksi, EI* = EI nominal here;
 // the direct analysis method reduces it to 0.8 tau_b EI), and alpha = 1.0 (LRFD) / 1.6 (ASD).
-// dims: in { pr_kip: M L T^-2, i_in4: L^4, lc1_ft: L, transverse_load: dimensionless, m1_m2: dimensionless, method: dimensionless } out: { b1: dimensionless, pe1_kip: M L T^-2, cm: dimensionless }
+// dims: in { pr_kip: M L T^-2, i_in4: L^4, lc1_ft: L, transverse_load: dimensionless, m1_m2: dimensionless, method: dimensionless } out: { b1: dimensionless, pe1_kip: M L T^-2, cm: dimensionless, alpha: dimensionless }
 export function computeSteelB1Amplifier({ pr_kip = 0, i_in4 = 0, lc1_ft = 0, transverse_load = "no", m1_m2 = 0, method = "LRFD" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const Pr = Number(pr_kip) || 0;
@@ -957,7 +957,7 @@ STEEL_RENDERERS["steel-b1-amplifier"] = _simpleRenderer({
 // where Pstory is the total vertical load on the story, Pmf the vertical load on the moment-frame columns
 // (0 for a braced frame, so RM = 1.0), H the story shear producing the first-order interstory drift dH, and
 // L the story height. A story quantity, unlike the member-level B1.
-// dims: in { pstory_kip: M L T^-2, pmf_kip: M L T^-2, h_kip: M L T^-2, l_ft: L, drift_in: L, method: dimensionless } out: { b2: dimensionless, pe_story_kip: M L T^-2, rm: dimensionless }
+// dims: in { pstory_kip: M L T^-2, pmf_kip: M L T^-2, h_kip: M L T^-2, l_ft: L, drift_in: L, method: dimensionless } out: { b2: dimensionless, pe_story_kip: M L T^-2, rm: dimensionless, alpha: dimensionless }
 export function computeSteelB2Amplifier({ pstory_kip = 0, pmf_kip = 0, h_kip = 0, l_ft = 0, drift_in = 0, method = "LRFD" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (method !== "LRFD" && method !== "ASD") return { error: "Method must be LRFD or ASD." };
@@ -1049,7 +1049,7 @@ STEEL_RENDERERS["steel-effective-length-k"] = _simpleRenderer({
 // condition by the standard AISC modifiers: braced (sidesway inhibited) far-pinned x1.5 / far-fixed x2.0,
 // moment (sidesway uninhibited) far-pinned x0.5 / far-fixed x0.67, rigid both ends x1.0. The result feeds
 // straight into steel-effective-length-k as GA (or GB). AISC 360 Commentary App. 7 / Salmon & Johnson.
-// dims: in { ic1: L^4, lc1: L, ic2: L^4, lc2: L, ig1: L^4, lg1: L, ig2: L^4, lg2: L, girder_far_end: dimensionless } out: { g_ratio: dimensionless, col_stiffness: L^3, girder_stiffness: L^3, girder_modifier: dimensionless }
+// dims: in { ic1: L^4, lc1: L, ic2: L^4, lc2: L, ig1: L^4, lg1: L, ig2: L^4, lg2: L, girder_far_end: dimensionless } out: { g_ratio: dimensionless, col_stiffness: L^3, girder_stiffness: L^3, girder_modifier: dimensionless, col_count: dimensionless, girder_count: dimensionless }
 export function computeSteelColumnStiffnessRatioG({ ic1 = 0, lc1 = 0, ic2 = 0, lc2 = 0, ig1 = 0, lg1 = 0, ig2 = 0, lg2 = 0, girder_far_end = "rigid" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const n = (x) => Number(x) || 0;
@@ -1118,7 +1118,7 @@ STEEL_RENDERERS["steel-column-stiffness-ratio-g"] = _simpleRenderer({
 // with Py = Fy Ag, alpha = 1.0 (LRFD) / 1.6 (ASD). The reduced flexural stiffness is
 // EI* = 0.8 tau_b EI (axial EA* = 0.8 EA). AISC permits tau_b = 1.0 for all members if an
 // extra notional load of 0.001 alpha Yi is added at each level.
-// dims: in { pr_kip: M L T^-2, fy_ksi: M L^-1 T^-2, ag_in2: L^2, method: dimensionless } out: { py_kip: M L T^-2, ratio: dimensionless, tau_b: dimensionless, flexural_stiffness_factor: dimensionless }
+// dims: in { pr_kip: M L T^-2, fy_ksi: M L^-1 T^-2, ag_in2: L^2, method: dimensionless } out: { py_kip: M L T^-2, ratio: dimensionless, tau_b: dimensionless, flexural_stiffness_factor: dimensionless, alpha: dimensionless }
 export function computeSteelTauBStiffnessReduction({ pr_kip = 0, fy_ksi = 50, ag_in2 = 0, method = "LRFD" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (method !== "LRFD" && method !== "ASD") return { error: "Method must be LRFD or ASD." };
@@ -1159,7 +1159,7 @@ STEEL_RENDERERS["steel-tau-b-stiffness-reduction"] = _simpleRenderer({
   compute: computeSteelTauBStiffnessReduction,
 });
 
-// dims: in { fnt_ksi: M L^-1 T^-2, fnv_ksi: M L^-1 T^-2, ab_in2: L^2, frv_ksi: M L^-1 T^-2, method: dimensionless } out: { fpnt_ksi: M L^-1 T^-2, avail_tension_kip: M L T^-2 }
+// dims: in { fnt_ksi: M L^-1 T^-2, fnv_ksi: M L^-1 T^-2, ab_in2: L^2, frv_ksi: M L^-1 T^-2, method: dimensionless } out: { fpnt_ksi: M L^-1 T^-2, avail_tension_kip: M L T^-2, pure_tension_kip: M L T^-2 }
 export function computeSteelBoltTensionShear({ fnt_ksi = 90, fnv_ksi = 54, ab_in2 = 0, frv_ksi = 0, method = "LRFD" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(fnt_ksi > 0) || !(fnv_ksi > 0)) return { error: "Fnt and Fnv must be positive (ksi)." };
@@ -1452,7 +1452,7 @@ STEEL_RENDERERS["steel-floor-vibration"] = _simpleRenderer({
 // Applied tension relieves part of the clamping force that makes a slip-critical joint work, so the
 // slip resistance is multiplied by ksc = 1 - Tu/(Du Tb nb) (Eq. J3-5a, LRFD). The unreduced Rn is
 // obtained by CALLING the landed computeSteelBoltSlipCritical so the two tiles cannot drift.
-// dims: in { mu: dimensionless, tb_kip: M L T^-2, ns: dimensionless, n: dimensionless, hf: dimensionless, du: dimensionless, applied_tension_kip: M L T^-2 } out: { ksc: dimensionless, reduced_rn_bolt_kip: M L T^-2, lrfd_total_kip: M L T^-2, asd_total_kip: M L T^-2 }
+// dims: in { mu: dimensionless, tb_kip: M L T^-2, ns: dimensionless, n: dimensionless, hf: dimensionless, du: dimensionless, applied_tension_kip: M L T^-2 } out: { ksc: dimensionless, reduced_rn_bolt_kip: M L T^-2, lrfd_total_kip: M L T^-2, asd_total_kip: M L T^-2, asd_bolt_kip: M L T^-2, clamp_total_kip: M L T^-2, loss_pct: dimensionless, lrfd_bolt_kip: M L T^-2, unreduced_lrfd_total_kip: M L T^-2, unreduced_rn_bolt_kip: M L T^-2 }
 export function computeSlipCriticalWithTension({ mu = 0.30, tb_kip = 0, ns = 1, n = 1, hf = 1.0, du = 1.13, applied_tension_kip = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const tu = Number(applied_tension_kip);
@@ -1522,7 +1522,7 @@ STEEL_RENDERERS["slip-critical-with-tension"] = _simpleRenderer({
 // diameter - a 1/16 for the standard hole and another 1/16 for damage around it. And staggering
 // has a ceiling: past a certain pitch the straight chain governs and further stagger buys
 // nothing, which is a number worth having before redrawing the pattern.
-// dims: in { plate_width_in: L, thickness_in: L, bolt_dia_in: L, hole_allowance_in: L, gage_in: L, pitch_in: L, holes_straight: dimensionless, holes_zigzag: dimensionless, gage_spaces_zigzag: dimensionless } out: { hole_dia_in: L, net_width_straight_in: L, net_width_zigzag_in: L, net_width_in: L, gross_area_in2: L^2, net_area_in2: L^2, stagger_credit_in: L, pitch_where_straight_governs_in: L }
+// dims: in { plate_width_in: L, thickness_in: L, bolt_dia_in: L, hole_allowance_in: L, gage_in: L, pitch_in: L, holes_straight: dimensionless, holes_zigzag: dimensionless, gage_spaces_zigzag: dimensionless } out: { hole_dia_in: L, net_width_straight_in: L, net_width_zigzag_in: L, net_width_in: L, gross_area_in2: L^2, net_area_in2: L^2, stagger_credit_in: L, pitch_where_straight_governs_in: L, efficiency: dimensionless, margin_in: L, no_stagger_net_width_in: L, pitch_headroom_in: L, stagger_gain_in: L }
 export function computeStaggeredNetWidth({ plate_width_in = 0, thickness_in = 0, bolt_dia_in = 0, hole_allowance_in = 0.125, gage_in = 0, pitch_in = 0, holes_straight = 0, holes_zigzag = 0, gage_spaces_zigzag = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const W = Number(plate_width_in) || 0;

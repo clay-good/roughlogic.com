@@ -445,7 +445,7 @@ FIRESPRINKLER_RENDERERS["jockey-pump-sizing"] = _simpleRenderer({
 // ===========================================================================
 
 // ===================== spec-v1386: stairwell pressurization =====================
-// dims: in { leakage_area_sqft: L^2, pressure_inwg: M L^-1 T^-2, door_width_ft: L, door_height_ft: L, knob_setback_in: L, closer_force_lbf: M L T^-2, force_limit_lbf: M L T^-2 } out: { airflow_cfm: L^3 T^-1, door_force_lbf: M L T^-2, max_pressure_inwg: M L^-1 T^-2 }
+// dims: in { leakage_area_sqft: L^2, pressure_inwg: M L^-1 T^-2, door_width_ft: L, door_height_ft: L, knob_setback_in: L, closer_force_lbf: M L T^-2, force_limit_lbf: M L T^-2 } out: { airflow_cfm: L^3 T^-1, door_force_lbf: M L T^-2, max_pressure_inwg: M L^-1 T^-2, margin_lbf: M L T^-2, pressure_force_lbf: M L T^-2 }
 export function computeStairwellPressurization({ leakage_area_sqft = 0, pressure_inwg = 0.15, door_width_ft = 3, door_height_ft = 7, knob_setback_in = 3, closer_force_lbf = 10, force_limit_lbf = 30 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(leakage_area_sqft > 0)) return { error: "Total effective leakage area must be positive." };
@@ -505,7 +505,7 @@ FIRESPRINKLER_RENDERERS["stairwell-pressurization"] = _simpleRenderer({
 });
 
 // ===================== spec-v1387: fire-protection water tank sizing =====================
-// dims: in { sprinkler_demand_gpm: L^3 T^-1, hose_allowance_gpm: L^3 T^-1, duration_min: T, unusable_fraction: dimensionless, refill_gpm: L^3 T^-1 } out: { total_demand_gpm: L^3 T^-1, net_volume_gal: L^3, gross_volume_gal: L^3, refill_hours: T }
+// dims: in { sprinkler_demand_gpm: L^3 T^-1, hose_allowance_gpm: L^3 T^-1, duration_min: T, unusable_fraction: dimensionless, refill_gpm: L^3 T^-1 } out: { total_demand_gpm: L^3 T^-1, net_volume_gal: L^3, gross_volume_gal: L^3, refill_hours: T, hose_share_pct: dimensionless, volume_without_hose_gal: L^3 }
 export function computeFireTankSizing({ sprinkler_demand_gpm = 0, hose_allowance_gpm = 0, duration_min = 60, unusable_fraction = 0.08, refill_gpm = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(sprinkler_demand_gpm > 0)) return { error: "Sprinkler system demand must be positive." };
@@ -556,7 +556,7 @@ FIRESPRINKLER_RENDERERS["fire-tank-sizing"] = _simpleRenderer({
 });
 
 // ===================== spec-v1390: sprinkler obstruction clearance =====================
-// dims: in { obstruction_width_in: L, horizontal_separation_in: L, obstruction_depth_in: L } out: { required_separation_in: L, deficiency_in: L }
+// dims: in { obstruction_width_in: L, horizontal_separation_in: L, obstruction_depth_in: L } out: { required_separation_in: L, deficiency_in: L, deflector_drop_in: L, three_times_in: L }
 export function computeSprinklerObstruction({ obstruction_width_in = 0, horizontal_separation_in = 0, obstruction_depth_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(obstruction_width_in > 0)) return { error: "Obstruction width must be positive." };
@@ -612,7 +612,7 @@ FIRESPRINKLER_RENDERERS["sprinkler-obstruction"] = _simpleRenderer({
 });
 
 // ===================== spec-v1393: hydrant count and spacing =====================
-// dims: in { required_flow_gpm: L^3 T^-1, credited_flow_per_hydrant_gpm: L^3 T^-1, frontage_ft: L, average_spacing_ft: L, max_distance_ft: L } out: { hydrants_by_flow: dimensionless, hydrants_by_frontage: dimensionless, actual_spacing_ft: L, max_distance_ft: L }
+// dims: in { required_flow_gpm: L^3 T^-1, credited_flow_per_hydrant_gpm: L^3 T^-1, frontage_ft: L, average_spacing_ft: L, max_distance_ft: L } out: { hydrants_by_flow: dimensionless, hydrants_by_frontage: dimensionless, actual_spacing_ft: L, max_distance_ft: L, governing_count: dimensionless, worst_distance_ft: L }
 export function computeHydrantSpacingCount({ required_flow_gpm = 0, credited_flow_per_hydrant_gpm = 0, frontage_ft = 0, average_spacing_ft = 0, max_distance_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(required_flow_gpm > 0)) return { error: "Required fire flow must be positive." };

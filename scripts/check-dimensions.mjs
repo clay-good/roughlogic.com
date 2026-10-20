@@ -304,6 +304,7 @@ const UNIT_TAIL_EXEMPT = new Set([
   "calc-steel.js:computeSteelBeamShear:omega_v",             // AISC Omega_v, a safety factor
   "calc-steel.js:computeBoltGroupEccentric:tors_v",          // a torsional SHEAR force
   "calc-concrete.js:computeRcOneWayShear:rho_w",             // As/(bw d), a WEB steel ratio
+  "calc-concrete.js:computeConcreteCrackedInertiaTee:rho_w", // As/(bw d), a WEB steel ratio
   "calc-construction.js:computeWoodNailWithdrawal:z_w",      // a WITHDRAWAL design force
   "calc-construction.js:computeWoodLagWithdrawal:z_w",       // a WITHDRAWAL design force
   "calc-construction.js:computeWoodScrewWithdrawal:z_w",     // a WITHDRAWAL design force
@@ -424,7 +425,7 @@ const POUND_CONVENTION_UNSETTLED = new Set([
   "actual_weight_lb", "capacity_lb", "charge_weight_lb", "displacement_lb", "force_lb",
   "green_weight_lb", "guy_tension_lb", "load_lb", "margin_lb", "max_charge_lb",
   "payload_lb", "reaction_lb", "required_wll_lb", "total_lb",
-  "total_weight_lb", "tractive_effort_lb", "vehicle_weight_lb", "vs_fed_lb_day",
+  "total_weight_lb", "tractive_effort_lb", "vehicle_weight_lb",
   "W_lb", "water_weight_lb", "wc_pcf", "weight_lb",
 ]);
 
@@ -825,4 +826,7 @@ async function main() {
   );
 }
 
-await main();
+// Imported by test/unit/dims-outputs-exist.test.js for the unit-tail rule;
+// run as a script, it lints.
+export { unitTailExpectation, UNIT_TAIL_EXEMPT };
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) await main();

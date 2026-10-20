@@ -90,7 +90,7 @@ export const STAGEPRODUCTION_RENDERERS = {};
 const _speedOfSound = (temp_f) => 49.03 * Math.sqrt(temp_f + 459.67);
 
 // ===================== spec-v1364: line array vertical coverage and splay =====================
-// dims: in { trim_height_ft: L, ear_height_ft: L, near_throw_ft: L, far_throw_ft: L, cabinets: dimensionless } out: { coverage_deg: dimensionless, avg_splay_deg: dimensionless, level_taper_db: dimensionless }
+// dims: in { trim_height_ft: L, ear_height_ft: L, near_throw_ft: L, far_throw_ft: L, cabinets: dimensionless } out: { coverage_deg: dimensionless, avg_splay_deg: dimensionless, level_taper_db: dimensionless, angle_far_deg: dimensionless, angle_near_deg: dimensionless, dh_ft: L }
 export function computeLineArraySplay({ trim_height_ft = 0, ear_height_ft = 4, near_throw_ft = 0, far_throw_ft = 0, cabinets = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(trim_height_ft > 0)) return { error: "Trim height must be positive." };
@@ -142,7 +142,7 @@ STAGEPRODUCTION_RENDERERS["line-array-splay"] = _r({
 });
 
 // ===================== spec-v1365: delay loudspeaker time and Haas offset =====================
-// dims: in { distance_ft: L, temp_f: T, haas_offset_ms: T, compare_temp_f: T } out: { speed_ft_s: L T^-1, geometric_ms: T, set_delay_ms: T }
+// dims: in { distance_ft: L, temp_f: T, haas_offset_ms: T, compare_temp_f: T } out: { speed_ft_s: L T^-1, geometric_ms: T, set_delay_ms: T, haas_distance_ft: L }
 export function computeDelayTowerAlignment({ distance_ft = 0, temp_f = 70, haas_offset_ms = 15, compare_temp_f = 90 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(distance_ft > 0)) return { error: "Distance from the main array must be positive." };
@@ -197,7 +197,7 @@ STAGEPRODUCTION_RENDERERS["delay-tower-alignment"] = _r({
 });
 
 // ===================== spec-v1366: end-fire and cardioid subwoofer array spacing =====================
-// dims: in { spacing_ft: L, elements: dimensionless, temp_f: T, target_freq_hz: T^-1 } out: { delay_per_element_ms: T, optimum_freq_hz: T^-1, wavelength_ft: L }
+// dims: in { spacing_ft: L, elements: dimensionless, temp_f: T, target_freq_hz: T^-1 } out: { delay_per_element_ms: T, optimum_freq_hz: T^-1, wavelength_ft: L, array_depth_ft: L, spacing_for_target_ft: L }
 export function computeCardioidSubArray({ spacing_ft = 0, elements = 4, temp_f = 70, target_freq_hz = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // Unit / range guard added 2026-09-26 after printed-example probing.
@@ -254,7 +254,7 @@ STAGEPRODUCTION_RENDERERS["cardioid-sub-array"] = _r({
 });
 
 // ===================== spec-v1367: driver spacing, lobing, and crossover ceiling =====================
-// dims: in { spacing_ft: L, test_freq_hz: T^-1, temp_f: T } out: { crossover_ceiling_hz: T^-1, wavelength_ft: L, max_spacing_ft: L }
+// dims: in { spacing_ft: L, test_freq_hz: T^-1, temp_f: T } out: { crossover_ceiling_hz: T^-1, wavelength_ft: L, max_spacing_ft: L, null_angle_deg: dimensionless }
 export function computeDriverSpacingLobing({ spacing_ft = 0, test_freq_hz = 0, temp_f = 70 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(spacing_ft > 0)) return { error: "Center-to-center spacing must be positive." };
@@ -366,7 +366,7 @@ STAGEPRODUCTION_RENDERERS["wireless-intermod"] = _r({
 });
 
 // ===================== spec-v1369: RF antenna cable loss and amplifier budget =====================
-// dims: in { length_ft: L, loss_per_100ft_db: dimensionless, connectors: dimensionless, loss_per_connector_db: dimensionless, splitter_loss_db: dimensionless, amplifier_gain_db: dimensionless } out: { cable_loss_db: dimensionless, total_loss_db: dimensionless, net_gain_db: dimensionless }
+// dims: in { length_ft: L, loss_per_100ft_db: dimensionless, connectors: dimensionless, loss_per_connector_db: dimensionless, splitter_loss_db: dimensionless, amplifier_gain_db: dimensionless } out: { cable_loss_db: dimensionless, total_loss_db: dimensionless, net_gain_db: dimensionless, connector_loss_db: dimensionless }
 export function computeRfAntennaCableLoss({ length_ft = 0, loss_per_100ft_db = 0, connectors = 0, loss_per_connector_db = 0.25, splitter_loss_db = 0, amplifier_gain_db = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // Unit / range guard added 2026-09-26 after printed-example probing.
@@ -422,7 +422,7 @@ STAGEPRODUCTION_RENDERERS["rf-antenna-cable-loss"] = _r({
 });
 
 // ===================== spec-v1370: chain hoist lift time, power, and duty cycle =====================
-// dims: in { lift_height_ft: L, hoist_speed_fpm: L T^-1, load_lb: M L T^-2, duty_cycle: dimensionless, rating_period_min: T, hoists: dimensionless } out: { lift_time_min: T, hoisting_hp: M L^2 T^-3, allowed_on_time_min: T, lifts_per_period: dimensionless }
+// dims: in { lift_height_ft: L, hoist_speed_fpm: L T^-1, load_lb: M L T^-2, duty_cycle: dimensionless, rating_period_min: T, hoists: dimensionless } out: { lift_time_min: T, hoisting_hp: M L^2 T^-3, allowed_on_time_min: T, lifts_per_period: dimensionless, set_hp: M L^2 T^-3 }
 export function computeChainHoistLiftTime({ lift_height_ft = 0, hoist_speed_fpm = 16, load_lb = 0, duty_cycle = 0.4, rating_period_min = 10, hoists = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // Unit / range guard added 2026-09-26 after printed-example probing.
@@ -667,7 +667,7 @@ STAGEPRODUCTION_RENDERERS["haze-machine-sizing"] = _r({
 });
 
 // ===================== spec-v1374: stage deck and platform live-load check =====================
-// dims: in { length_ft: L, width_ft: L, legs: dimensionless, design_psf: M L^-1 T^-2, deck_dead_lb: M L T^-2, leg_rating_lb: M L T^-2, point_load_lb: M L T^-2, bearing_sqin: L^2, deck_point_rating_lb: M L T^-2 } out: { deck_area_sqft: L^2, live_load_lb: M L T^-2, load_per_leg_lb: M L T^-2, leg_utilization_pct: dimensionless }
+// dims: in { length_ft: L, width_ft: L, legs: dimensionless, design_psf: M L^-1 T^-2, deck_dead_lb: M L T^-2, leg_rating_lb: M L T^-2, point_load_lb: M L T^-2, bearing_sqin: L^2, deck_point_rating_lb: M L T^-2 } out: { deck_area_sqft: L^2, live_load_lb: M L T^-2, load_per_leg_lb: M L T^-2, leg_utilization_pct: dimensionless, bearing_psi: M L^-1 T^-2, point_utilization_pct: dimensionless, total_load_lb: M L T^-2 }
 export function computeStageDeckLiveLoad({ length_ft = 0, width_ft = 0, legs = 4, design_psf = 150, deck_dead_lb = 0, leg_rating_lb = 0, point_load_lb = 0, bearing_sqin = 0, deck_point_rating_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(length_ft > 0 && width_ft > 0)) return { error: "Deck length and width must be positive." };
@@ -789,7 +789,7 @@ STAGEPRODUCTION_RENDERERS["video-wall-data-rate"] = _r({
 });
 
 // ===================== spec-v1376: outdoor stage and banner wind load with ballast =====================
-// dims: in { banner_height_ft: L, banner_width_ft: L, centroid_height_ft: L, wind_speed_mph: L T^-1, drag_coefficient: dimensionless, base_width_ft: L, safety_factor: dimensionless, available_ballast_lb: M L T^-2 } out: { velocity_pressure_psf: M L^-1 T^-2, wind_force_lb: M L T^-2, overturning_moment_ftlb: M L^2 T^-2, required_ballast_lb: M L T^-2 }
+// dims: in { banner_height_ft: L, banner_width_ft: L, centroid_height_ft: L, wind_speed_mph: L T^-1, drag_coefficient: dimensionless, base_width_ft: L, safety_factor: dimensionless, available_ballast_lb: M L T^-2 } out: { velocity_pressure_psf: M L^-1 T^-2, wind_force_lb: M L T^-2, overturning_moment_ftlb: M L^2 T^-2, required_ballast_lb: M L T^-2, area_sqft: L^2, capacity_speed_mph: L T^-1, resisting_arm_ft: L }
 export function computeOutdoorStageWind({ banner_height_ft = 0, banner_width_ft = 0, centroid_height_ft = 0, wind_speed_mph = 0, drag_coefficient = 1.3, base_width_ft = 0, safety_factor = 1.5, available_ballast_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(banner_height_ft > 0 && banner_width_ft > 0)) return { error: "Banner height and width must be positive." };

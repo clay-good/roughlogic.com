@@ -517,7 +517,7 @@ ARBORIST_RENDERERS["quadratic-mean-diameter"] = _v598renderQuadraticMeanDiameter
 
 // --- spec-v565 L: Hollow / decayed trunk strength loss (Wagener / Mattheck t/R) ---
 // hollow_d = D - 2t. loss% = (hollow_d^3 / D^3) x 100. t/R = t / (D/2). concern when t/R < 0.30.
-// dims: in { diameter_in: L, shell_thick_in: L } out: { hollow_d_in: L, loss_pct: dimensionless, t_over_r: dimensionless }
+// dims: in { diameter_in: L, shell_thick_in: L } out: { hollow_d_in: L, loss_pct: dimensionless, t_over_r: dimensionless, convention_difference_pct: dimensionless, section_modulus_loss_pct: dimensionless }
 export function computeTrunkDecayStrength({ diameter_in = 0, shell_thick_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const D = Number(diameter_in);
@@ -620,7 +620,7 @@ ARBORIST_RENDERERS["trunk-min-shell-thickness"] = _v730renderTrunkMinShellThickn
 
 // --- spec-v607 L: Open-cavity trunk strength loss (Smiley & Fraedrich 1992) ---
 // hollow_d = D - 2t. R = min(1, opening/(pi*D)). open_loss = (hollow_d^3 + R*(D^3 - hollow_d^3))/D^3 * 100. Collapses to Wagener at R=0.
-// dims: in { diameter_in: L, shell_thick_in: L, opening_width_in: L } out: { hollow_d_in: L, opening_ratio: dimensionless, closed_loss_pct: dimensionless, open_loss_pct: dimensionless, opening_penalty_pct: dimensionless }
+// dims: in { diameter_in: L, shell_thick_in: L, opening_width_in: L } out: { hollow_d_in: L, opening_ratio: dimensionless, closed_loss_pct: dimensionless, open_loss_pct: dimensionless, opening_penalty_pct: dimensionless, circumference_in: L }
 export function computeTreeOpenCavity({ diameter_in = 0, shell_thick_in = 0, opening_width_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const D = Number(diameter_in);
@@ -713,7 +713,7 @@ ARBORIST_RENDERERS["tree-protection-zone"] = _v566renderTreeProtectionZone;
 // --- spec-v608 L: Critical root zone encroachment percent (ANSI A300 Part 5) ---
 // radius = factor*dbh. segment = R^2*acos(d/R) - d*sqrt(R^2-d^2). encroach = segment/(pi*R^2)*100. thresholds tolerant 40 / intermediate 30 / sensitive 20.
 const _V608_TOLERANCE = { tolerant: 40, intermediate: 30, sensitive: 20 };
-// dims: in { dbh_in: L, radius_factor: dimensionless, limit_distance_ft: L, species_tolerance: dimensionless } out: { radius_ft: L, encroach_pct: dimensionless, threshold_pct: dimensionless }
+// dims: in { dbh_in: L, radius_factor: dimensionless, limit_distance_ft: L, species_tolerance: dimensionless } out: { radius_ft: L, encroach_pct: dimensionless, threshold_pct: dimensionless, area_ft2: L^2, segment_ft2: L^2 }
 export function computeTreeCrzEncroachment({ dbh_in = 0, radius_factor = 1.0, limit_distance_ft = 0, species_tolerance = "intermediate" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const dbh = Number(dbh_in);
@@ -921,7 +921,7 @@ ARBORIST_RENDERERS["firewood-cord"] = renderFirewoodCord;
 // turns on. The CTLA trunk formula: value = unit cost x trunk cross-sectional area x species x
 // condition x location. Every factor here is an INPUT: the unit cost is regional and the three
 // percentages come from a regional plant appraisal committee guide, so no table is shipped.
-// dims: in { dbh_in: L, unit_cost_per_sq_in: dimensionless, species_pct: dimensionless, condition_pct: dimensionless, location_pct: dimensionless } out: { trunk_area_sq_in: L^2, basic_value: dimensionless, appraised_value: dimensionless }
+// dims: in { dbh_in: L, unit_cost_per_sq_in: dimensionless, species_pct: dimensionless, condition_pct: dimensionless, location_pct: dimensionless } out: { trunk_area_sq_in: L^2, basic_value: dimensionless, appraised_value: dimensionless, combined_factor: dimensionless, depreciation_pct: dimensionless }
 export function computeTreeAppraisalCtla({ dbh_in = 0, unit_cost_per_sq_in = 0, species_pct, condition_pct, location_pct } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // The three ratings ARE the appraisal; left out they ran as 100% each and returned the undepreciated basic value.

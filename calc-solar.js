@@ -47,7 +47,7 @@ const _finiteGuard = (o) => {
 
 // --- Utility 67: Solar PV String Sizing ---
 
-// dims: in { module_voc_V: M L^2 T^-3 I^-1, module_vmp_V: M L^2 T^-3 I^-1, voc_temp_coeff_pct_per_C: T^-1, record_low_C: T, record_high_C: T, inverter_mppt_min_V: M L^2 T^-3 I^-1, inverter_mppt_max_V: M L^2 T^-3 I^-1, inverter_vdc_max_V: M L^2 T^-3 I^-1, cell_temp_rise_C: T } out: { max_series: dimensionless, min_series: dimensionless, cold_voc_V: M L^2 T^-3 I^-1, warm_vmp_V: M L^2 T^-3 I^-1 }
+// dims: in { module_voc_V: M L^2 T^-3 I^-1, module_vmp_V: M L^2 T^-3 I^-1, voc_temp_coeff_pct_per_C: T^-1, record_low_C: T, record_high_C: T, inverter_mppt_min_V: M L^2 T^-3 I^-1, inverter_mppt_max_V: M L^2 T^-3 I^-1, inverter_vdc_max_V: M L^2 T^-3 I^-1, cell_temp_rise_C: T } out: { max_series: dimensionless, min_series: dimensionless, cold_voc_V: M L^2 T^-3 I^-1, warm_vmp_V: M L^2 T^-3 I^-1, cold_string_vmp_V: M L^2 T^-3 I^-1, cold_vmp_V: M L^2 T^-3 I^-1, mppt_max_V: M L^2 T^-3 I^-1 }
 export function computePVStringSizing({
   module_voc_V, module_vmp_V, voc_temp_coeff_pct_per_C,
   record_low_C, record_high_C,
@@ -99,7 +99,7 @@ export const pvStringSizingExample = {
 
 // --- Utility 68: Battery Runtime ---
 
-// dims: in { amp_hours: I T, system_V: M L^2 T^-3 I^-1, dod_percent: dimensionless, load_W: M L^2 T^-3, peukert_k: dimensionless, rated_hours: T } out: { hours: T, inverter_efficiency_pct: dimensionless }
+// dims: in { amp_hours: I T, system_V: M L^2 T^-3 I^-1, dod_percent: dimensionless, load_W: M L^2 T^-3, peukert_k: dimensionless, rated_hours: T } out: { hours: T, inverter_efficiency_pct: dimensionless, minutes: T }
 export function computeBatteryRuntime({ amp_hours, system_V, dod_percent = 100, load_W, peukert_k = 1, inverter_efficiency_pct = 100, rated_hours = 20 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (Number(dod_percent) > 100) return { error: "Depth of discharge cannot exceed 100%." };
@@ -511,7 +511,7 @@ const _EV_BREAKER_SIZES = [15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 90, 100, 
 const _NEC_310_16_CU_75C = { "14": 20, "12": 25, "10": 35, "8": 50, "6": 65, "4": 85, "3": 100, "2": 115, "1": 130, "1/0": 150, "2/0": 175, "3/0": 200, "4/0": 230 };
 const _EV_CU_AWG = ["14", "12", "10", "8", "6", "4", "3", "2", "1", "1/0", "2/0", "3/0", "4/0"];
 
-// dims: in { charger_amps: I, main_breaker_a: I, existing_load_a: I, busbar_rating_a: I, load_managed: dimensionless } out: { continuous_circuit_a: I, recommended_breaker_a: I, new_panel_load_a: I, headroom_a: I }
+// dims: in { charger_amps: I, main_breaker_a: I, existing_load_a: I, busbar_rating_a: I, load_managed: dimensionless } out: { continuous_circuit_a: I, recommended_breaker_a: I, new_panel_load_a: I, headroom_a: I, headroom_pct: dimensionless }
 export function computeEvChargerLoad({
   charger_amps = 0,
   main_breaker_a = 0,
@@ -633,7 +633,7 @@ export function renderEvChargerLoad(inputRegion, outputRegion, citationEl) {
 // ampacity (NEC 690.8(A)/(B), the stacked-125% "156%" rule).
 // =====================================================================
 
-// dims: in { module_isc_a: I, parallel_strings: dimensionless, ocpd_a: I } out: { max_current_a: I, min_ampacity_a: I, stacked_factor: dimensionless }
+// dims: in { module_isc_a: I, parallel_strings: dimensionless, ocpd_a: I } out: { max_current_a: I, min_ampacity_a: I, stacked_factor: dimensionless, ocpd_a: I }
 export function computePvCircuitAmpacity({ module_isc_a = 0, parallel_strings = 1, ocpd_a = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const isc = Number(module_isc_a) || 0;
@@ -1046,7 +1046,7 @@ function renderBatteryCRate(inputRegion, outputRegion, citationEl) {
 // spec-v488: EV charge time (AC Level 2). energy = capacity x (target - start);
 // AC power is capped by the vehicle onboard charger (min(EVSE, onboard)); time =
 // energy / (power x efficiency). The onboard-charger limit is the field gotcha.
-// dims: in { battery_capacity_kwh: M L^2 T^-2, start_soc_pct: dimensionless, target_soc_pct: dimensionless, evse_power_kw: M L^2 T^-3, onboard_charger_kw: M L^2 T^-3, efficiency_pct: dimensionless } out: { energy_needed_kwh: M L^2 T^-2, charge_power_kw: M L^2 T^-3, time_hr: T }
+// dims: in { battery_capacity_kwh: M L^2 T^-2, start_soc_pct: dimensionless, target_soc_pct: dimensionless, evse_power_kw: M L^2 T^-3, onboard_charger_kw: M L^2 T^-3, efficiency_pct: dimensionless } out: { energy_needed_kwh: M L^2 T^-2, charge_power_kw: M L^2 T^-3, time_hr: T, power_to_battery_kw: M L^2 T^-3 }
 export function computeEvChargeTime({ battery_capacity_kwh = 0, start_soc_pct = 0, target_soc_pct = 80, evse_power_kw = 0, onboard_charger_kw = 0, efficiency_pct = 88 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // An efficiency is a percent; 0 < value < 1 is a fraction typed into a percent field (added 2026-09-26).

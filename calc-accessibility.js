@@ -195,7 +195,7 @@ ACCESSIBILITY_RENDERERS["accessible-parking-count"] = _simpleRenderer({
 // distance to whatever OBSTRUCTION prevents further approach, not the distance from wherever a
 // person happens to stand - so a counter, a rail, or a planter in front of a sign is what sets
 // the letter height, and removing one later shortens the distance rather than lengthening it.
-// dims: in { baseline_height_in: L, viewing_distance_in: L, provided_character_height_in: L } out: { required_character_height_in: L, base_height_in: L, shortfall_in: L, max_viewing_distance_in: L }
+// dims: in { baseline_height_in: L, viewing_distance_in: L, provided_character_height_in: L } out: { required_character_height_in: L, base_height_in: L, shortfall_in: L, max_viewing_distance_in: L, added_in: L, excess_in: L, next_band_required_in: L, threshold_in: L }
 export function computeSignCharacterHeight({ baseline_height_in = 0, viewing_distance_in = 0, provided_character_height_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const h = Number(baseline_height_in) || 0;
@@ -272,7 +272,7 @@ ACCESSIBILITY_RENDERERS["sign-character-height"] = _simpleRenderer({
 // from 10 to 24 in, and the OBSTRUCTION ITSELF may be no more than 34 in high and 24 in deep.
 // That last number is the one that ends arguments: a standard 36 in counter is too TALL to be
 // reached over under this section at all, whatever the height of the thing behind it.
-// dims: in { approach: dimensionless, obstructed: dimensionless, obstruction_depth_in: L, obstruction_height_in: L, element_height_in: L } out: { max_height_in: L, min_height_in: L, height_excess_in: L, max_obstruction_depth_in: L }
+// dims: in { approach: dimensionless, obstructed: dimensionless, obstruction_depth_in: L, obstruction_height_in: L, element_height_in: L } out: { max_height_in: L, min_height_in: L, height_excess_in: L, max_obstruction_depth_in: L, depth_to_gain_in: L, low_deficit_in: L, max_obstruction_height_in: L, shallow_limit_in: L }
 export function computeReachRange({ approach = "forward", obstructed = "yes", obstruction_depth_in = 0, obstruction_height_in = 0, element_height_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (approach === "side" && obstructed === "yes" && !(Number(obstruction_height_in) > 0)) return { error: "Enter the height of the obstruction (in); a side reach is only allowed over one 34 in high or less." };
@@ -369,7 +369,7 @@ ACCESSIBILITY_RENDERERS["reach-range"] = _simpleRenderer({
 // A free-standing object on posts gets 12 in, three times a wall-mounted one. Overhead, the
 // clearance is 80 in and anything less needs a barrier whose LEADING EDGE is 27 in maximum -
 // a rail at waist height is not a barrier, because the cane has to find it.
-// dims: in { mounting: dimensionless, leading_edge_height_in: L, projection_in: L, corridor_width_in: L, required_route_width_in: L, vertical_clearance_in: L, barrier_edge_height_in: L } out: { max_projection_in: L, projection_excess_in: L, remaining_width_in: L, width_deficit_in: L, drop_to_cane_zone_in: L }
+// dims: in { mounting: dimensionless, leading_edge_height_in: L, projection_in: L, corridor_width_in: L, required_route_width_in: L, vertical_clearance_in: L, barrier_edge_height_in: L } out: { max_projection_in: L, projection_excess_in: L, remaining_width_in: L, width_deficit_in: L, drop_to_cane_zone_in: L, raise_above_zone_in: L }
 export function computeProtrudingObject({ mounting = "wall", leading_edge_height_in = 0, projection_in = 0, corridor_width_in = 0, required_route_width_in = 36, vertical_clearance_in = 80, barrier_edge_height_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const h = Number(leading_edge_height_in) || 0;
@@ -462,7 +462,7 @@ ACCESSIBILITY_RENDERERS["protruding-object-check"] = _simpleRenderer({
 // it doubles back around a narrow wall stub, unless the turn itself is 60 in.
 // And any route under 60 in wide owes passing spaces at intervals of 200 ft maximum, which is
 // nearly every corridor, and the one people never draw.
-// dims: in { clear_width_in: L, pinch_width_in: L, pinch_length_in: L, separation_length_in: L, turn_element_width_in: L, approach_width_in: L, at_turn_width_in: L, route_length_ft: L } out: { width_deficit_in: L, pinch_length_excess_in: L, required_at_turn_in: L, passing_spaces_required: dimensionless }
+// dims: in { clear_width_in: L, pinch_width_in: L, pinch_length_in: L, separation_length_in: L, turn_element_width_in: L, approach_width_in: L, at_turn_width_in: L, route_length_ft: L } out: { width_deficit_in: L, pinch_length_excess_in: L, required_at_turn_in: L, passing_spaces_required: dimensionless, longest_stretch_ft: L, required_approach_in: L }
 export function computeAccessibleRouteWidth({ clear_width_in = 0, pinch_present = "no", pinch_width_in = 0, pinch_length_in = 0, separation_length_in = 0, turn_present = "no", turn_element_width_in = 0, approach_width_in = 0, at_turn_width_in = 0, route_length_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const w = Number(clear_width_in) || 0;
@@ -571,7 +571,7 @@ ACCESSIBILITY_RENDERERS["accessible-route-width"] = _simpleRenderer({
 // vestibule, a deep jamb - needs 36 in of clear width rather than 32, so the same door fails
 // simply for being set in a thicker wall. And the 5/8 in latch-side stop projection everyone
 // quotes is an ALTERATIONS exception; in new construction it is not available.
-// dims: in { leaf_width_in: L, door_thickness_in: L, measured_clear_width_in: L, opening_depth_in: L, latch_stop_projection_in: L, threshold_height_in: L, series_spacing_in: L, series_door_width_in: L } out: { estimated_clear_width_in: L, required_clear_width_in: L, clear_width_deficit_in: L, required_series_spacing_in: L }
+// dims: in { leaf_width_in: L, door_thickness_in: L, measured_clear_width_in: L, opening_depth_in: L, latch_stop_projection_in: L, threshold_height_in: L, series_spacing_in: L, series_door_width_in: L } out: { estimated_clear_width_in: L, required_clear_width_in: L, clear_width_deficit_in: L, required_series_spacing_in: L, clear_width_in: L, effective_clear_in: L, latch_allowance_in: L, leaf_needed_in: L, series_deficit_in: L, threshold_excess_in: L, threshold_limit_in: L }
 export function computeDoorClearWidth({ leaf_width_in = 0, door_thickness_in = 1.75, measured_clear_width_in = 0, opening_depth_in = 5, is_alteration = "no", latch_stop_projection_in = 0, threshold_height_in = 0, threshold_beveled = "no", series_spacing_in = 0, series_door_width_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const leaf = Number(leaf_width_in) || 0;
@@ -675,7 +675,7 @@ ACCESSIBILITY_RENDERERS["door-clear-width"] = _simpleRenderer({
 // Over 1/2 in it stops being a threshold detail and becomes a RAMP under 405 or 406 - which is
 // 1:12 at best, so a 5/8 in change needs 7.5 in of run instead of 1.25, and brings landings,
 // edge protection, and handrails with it. One sixteenth of an inch is the difference.
-// dims: in { level_change_in: L, bevel_run_in: L, carpet_pile_in: L, opening_size_in: L, ramp_run_per_rise: dimensionless } out: { required_bevel_run_in: L, bevel_run_deficit_in: L, ramp_run_required_in: L, vertical_allowance_in: L }
+// dims: in { level_change_in: L, bevel_run_in: L, carpet_pile_in: L, opening_size_in: L, ramp_run_per_rise: dimensionless } out: { required_bevel_run_in: L, bevel_run_deficit_in: L, ramp_run_required_in: L, vertical_allowance_in: L, bevel_run_if_under_in: L, over_by_in: L }
 export function computeFloorLevelChange({ level_change_in = 0, bevel_run_in = 0, carpet_pile_in = 0, opening_size_in = 0, opening_elongated = "no", opening_perpendicular = "yes", ramp_run_per_rise = 12 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const h = Number(level_change_in) || 0;
@@ -780,7 +780,7 @@ ACCESSIBILITY_RENDERERS["floor-level-change"] = _simpleRenderer({
 // 36 in wide, and a parallel-approach alcove deeper than 15 in must be 60 in wide. That last
 // one turns a 30 in nook into a 60 in one - double - and it is why a washer squeezed into a
 // closet fails while the same washer on an open wall passes.
-// dims: in { cfs_width_in: L, cfs_depth_in: L, alcove_depth_in: L, turning_diameter_in: L, t_square_in: L, t_arm_width_in: L } out: { required_alcove_width_in: L, alcove_width_deficit_in: L, cfs_short_side_in: L }
+// dims: in { cfs_width_in: L, cfs_depth_in: L, alcove_depth_in: L, turning_diameter_in: L, t_square_in: L, t_arm_width_in: L } out: { required_alcove_width_in: L, alcove_width_deficit_in: L, cfs_short_side_in: L, alcove_trigger_in: L, cfs_long_side_in: L, circle_deficit_in: L }
 export function computeTurningAndClearFloorSpace({ cfs_width_in = 0, cfs_depth_in = 0, approach = "forward", alcove_depth_in = 0, turning_type = "circular", turning_diameter_in = 0, t_square_in = 0, t_arm_width_in = 0, t_arm_clear_in = 0, t_base_clear_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const w = Number(cfs_width_in) || 0;
@@ -901,7 +901,7 @@ ACCESSIBILITY_RENDERERS["turning-clear-floor-space"] = _simpleRenderer({
 // pitch, not 12 in of level rail. At a ramp both ends take a flat 12 in horizontal.
 // The grip is a window in both directions: a circular rail is 1-1/4 to 2 in in diameter, so a
 // 2-1/2 in rail is too FAT to grip and fails as surely as a thin one.
-// dims: in { rail_height_in: L, clearance_in: L, diameter_in: L, perimeter_in: L, cross_section_in: L, tread_depth_in: L, top_extension_in: L, bottom_extension_in: L } out: { required_top_extension_in: L, required_bottom_extension_in: L, top_deficit_in: L, bottom_deficit_in: L }
+// dims: in { rail_height_in: L, clearance_in: L, diameter_in: L, perimeter_in: L, cross_section_in: L, tread_depth_in: L, top_extension_in: L, bottom_extension_in: L } out: { required_top_extension_in: L, required_bottom_extension_in: L, top_deficit_in: L, bottom_deficit_in: L, bottom_vs_flat_in: L, clearance_deficit_in: L }
 export function computeHandrailGeometry({ rail_height_in = 0, clearance_in = 0, grip_shape = "circular", diameter_in = 0, perimeter_in = 0, cross_section_in = 0, flight_type = "stair", tread_depth_in = 0, top_extension_in = 0, bottom_extension_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const h = Number(rail_height_in) || 0;
@@ -1007,7 +1007,7 @@ ACCESSIBILITY_RENDERERS["handrail-geometry"] = _simpleRenderer({
 // slanted apron or a bowl that hangs down eats the depth exactly where a knee needs it.
 // The 27 in figure is the one that decides a job: a lavatory whose apron sits at 26 in has NO
 // knee clearance at all under this section, whatever the space below it looks like.
-// dims: in { knee_depth_at_9_in: L, knee_depth_at_27_in: L, toe_depth_in: L, clear_width_in: L, apron_height_in: L } out: { required_knee_depth_at_27_in: L, taper_allowed_in: L, knee_deficit_in: L, toe_deficit_in: L }
+// dims: in { knee_depth_at_9_in: L, knee_depth_at_27_in: L, toe_depth_in: L, clear_width_in: L, apron_height_in: L } out: { required_knee_depth_at_27_in: L, taper_allowed_in: L, knee_deficit_in: L, toe_deficit_in: L, actual_taper_in: L, apron_shortfall_in: L, knee_height_available_in: L, required_knee_depth_at_9_in: L, width_deficit_in: L }
 export function computeKneeToeClearance({ apron_height_in = 0, knee_depth_at_9_in = 0, knee_depth_at_27_in = 0, toe_depth_in = 0, clear_width_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const apron = Number(apron_height_in) || 0;
@@ -1104,7 +1104,7 @@ ACCESSIBILITY_RENDERERS["knee-toe-clearance"] = _simpleRenderer({
 // second course of block is usually already too high.
 // Engineered openings are a different animal: they are certified by the square feet of
 // enclosure each one serves, and the square-inch rule does not apply to them at all.
-// dims: in { enclosed_area_sf: L^2, net_free_area_per_opening_sqin: L^2, coverage_sf_per_opening: L^2, bottom_height_in: L } out: { required_net_area_sqin: L^2, provided_net_area_sqin: L^2, net_area_deficit_sqin: L^2, openings_required: dimensionless }
+// dims: in { enclosed_area_sf: L^2, net_free_area_per_opening_sqin: L^2, coverage_sf_per_opening: L^2, bottom_height_in: L } out: { required_net_area_sqin: L^2, provided_net_area_sqin: L^2, net_area_deficit_sqin: L^2, openings_required: dimensionless, height_excess_in: L }
 export function computeFloodOpeningArea({ enclosed_area_sf = 0, opening_type = "non-engineered", net_free_area_per_opening_sqin = 0, coverage_sf_per_opening = 0, openings_provided = 0, bottom_height_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const area = Number(enclosed_area_sf) || 0;
@@ -1189,7 +1189,7 @@ ACCESSIBILITY_RENDERERS["flood-opening-area"] = _simpleRenderer({
 // Three more rules ride along. Open risers are not permitted at all. The leading edge may have
 // a radius of 1/2 in maximum. A nosing may project 1-1/2 in maximum over the tread below, and
 // a riser may slope under the tread at 30 degrees maximum from vertical.
-// dims: in { riser_height_in: L, tread_depth_in: L, total_rise_in: L, nosing_projection_in: L, leading_edge_radius_in: L } out: { risers_required: dimensionless, run_required_in: L, run_added_in: L, riser_deficit_in: L, tread_deficit_in: L }
+// dims: in { riser_height_in: L, tread_depth_in: L, total_rise_in: L, nosing_projection_in: L, leading_edge_radius_in: L } out: { risers_required: dimensionless, run_required_in: L, run_added_in: L, riser_deficit_in: L, tread_deficit_in: L, compliant_riser_in: L, run_as_built_in: L }
 export function computeAdaStairCheck({ riser_height_in = 0, tread_depth_in = 0, total_rise_in = 0, open_risers = "no", nosing_projection_in = 0, leading_edge_radius_in = 0, riser_slope_deg = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const rise = Number(riser_height_in) || 0;
@@ -1284,7 +1284,7 @@ ACCESSIBILITY_RENDERERS["ada-stair-check"] = _simpleRenderer({
 // reading it has to stand still while the door stays shut. And the 18 x 18 in clear floor space
 // must sit beyond the arc of the door swing between closed and 45 degrees open, which is what
 // rules out the wall a door swings back against.
-// dims: in { lowest_baseline_in: L, tactile_block_height_in: L, clear_space_width_in: L, clear_space_depth_in: L } out: { highest_baseline_in: L, window_height_in: L, lowest_min_in: L, lowest_max_in: L }
+// dims: in { lowest_baseline_in: L, tactile_block_height_in: L, clear_space_width_in: L, clear_space_depth_in: L } out: { highest_baseline_in: L, window_height_in: L, lowest_min_in: L, lowest_max_in: L, high_excess_in: L, low_deficit_in: L, space_deficit_in: L, usable_range_in: L }
 export function computeTactileSignMounting({ lowest_baseline_in = 0, tactile_block_height_in = 0, sign_position = "latch-side", clear_space_width_in = 0, clear_space_depth_in = 0, beyond_door_arc = "yes" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const low = Number(lowest_baseline_in) || 0;
@@ -1372,7 +1372,7 @@ ACCESSIBILITY_RENDERERS["tactile-sign-mounting"] = _simpleRenderer({
 // Two location rules ride along and get skipped: the spout must be at least 15 in from the
 // vertical support and not more than 5 in from the front edge INCLUDING BUMPERS, and the stream
 // must rise 4 in minimum so a cup can be filled under it.
-// dims: in { wheelchair_spout_in: L, standing_spout_in: L, spout_from_support_in: L, spout_from_front_in: L, water_flow_height_in: L } out: { wheelchair_excess_in: L, standing_deficit_in: L, support_deficit_in: L, front_excess_in: L }
+// dims: in { wheelchair_spout_in: L, standing_spout_in: L, spout_from_support_in: L, spout_from_front_in: L, water_flow_height_in: L } out: { wheelchair_excess_in: L, standing_deficit_in: L, support_deficit_in: L, front_excess_in: L, dead_band_high_in: L, dead_band_low_in: L, flow_deficit_in: L }
 export function computeDrinkingFountainCheck({ units_provided = 0, bi_level = "no", wheelchair_spout_in = 0, standing_spout_in = 0, spout_from_support_in = 0, spout_from_front_in = 0, water_flow_height_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const units = Number(units_provided) || 0;
@@ -1469,7 +1469,7 @@ ACCESSIBILITY_RENDERERS["drinking-fountain-check"] = _simpleRenderer({
 // ALTERNATE ROLL-IN: 36 x 60 in inside with a 36 in wide entry on one long side.
 // The transfer type is the only one that fits in a standard 36 in alcove, and the roll-in types
 // are the ones people draw at 32 or 34 in wide because that is what the tub was.
-// dims: in { width_in: L, depth_in: L, entry_width_in: L, clearance_width_in: L, clearance_length_in: L } out: { required_width_in: L, required_depth_in: L, required_entry_in: L, width_deficit_in: L }
+// dims: in { width_in: L, depth_in: L, entry_width_in: L, clearance_width_in: L, clearance_length_in: L } out: { required_width_in: L, required_depth_in: L, required_entry_in: L, width_deficit_in: L, clearance_length_deficit_in: L, clearance_width_deficit_in: L, depth_deficit_in: L, entry_deficit_in: L, inside_area_sf: L^2, required_clearance_length_in: L, required_clearance_width_in: L, total_footprint_sf: L^2 }
 export function computeAccessibleShowerCheck({ shower_type = "transfer", width_in = 0, depth_in = 0, entry_width_in = 0, clearance_width_in = 0, clearance_length_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const w = Number(width_in) || 0;
@@ -1586,7 +1586,7 @@ ACCESSIBILITY_RENDERERS["accessible-shower-check"] = _simpleRenderer({
 // The two things people get wrong: the denominator is the STRUCTURE, not the property - the land
 // is not in it, which on an expensive lot with a modest house makes the threshold far lower than
 // expected - and many communities count cumulative work over a period rather than one permit.
-// dims: in { market_value: dimensionless, improvement_cost: dimensionless, prior_costs: dimensionless } out: { threshold: dimensionless, headroom: dimensionless, ratio_pct: dimensionless }
+// dims: in { market_value: dimensionless, improvement_cost: dimensionless, prior_costs: dimensionless } out: { threshold: dimensionless, headroom: dimensionless, ratio_pct: dimensionless, cumulative_ratio_pct: dimensionless, federal_pct: dimensionless, land_share_pct: dimensionless, property_value: dimensionless, wrong_ratio_pct: dimensionless }
 export function computeSubstantialImprovement({ market_value = 0, improvement_cost = 0, prior_costs = 0, threshold_pct = 50, land_value = 0, excluded_code_cost = 0, historic_structure = "no" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const mv = Number(market_value) || 0;
@@ -1676,7 +1676,7 @@ ACCESSIBILITY_RENDERERS["substantial-improvement-check"] = _simpleRenderer({
 // rule that cannot be satisfied by flipping the stripes at the end.
 // And a van space, its aisle, AND the vehicular route serving them need 98 in of vertical
 // clearance, which is what disqualifies most parking structures without any striping involved.
-// dims: in { space_width_in: L, aisle_width_in: L, space_length_in: L, aisle_length_in: L, vertical_clearance_in: L } out: { required_space_width_in: L, required_aisle_width_in: L, pair_width_in: L, space_deficit_in: L }
+// dims: in { space_width_in: L, aisle_width_in: L, space_length_in: L, aisle_length_in: L, vertical_clearance_in: L } out: { required_space_width_in: L, required_aisle_width_in: L, pair_width_in: L, space_deficit_in: L, aisle_deficit_in: L, clearance_deficit_in: L, length_deficit_in: L, min_pair_width_in: L }
 export function computeAccessibleParkingGeometry({ space_type = "van", space_width_in = 0, aisle_width_in = 0, space_length_in = 0, aisle_length_in = 0, angled = "no", aisle_side = "passenger", vertical_clearance_in = 0, surface_slope_ratio = 48 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const w = Number(space_width_in) || 0;
@@ -1779,7 +1779,7 @@ ACCESSIBILITY_RENDERERS["accessible-parking-geometry"] = _simpleRenderer({
 // The clearance around the closet is 60 in from the SIDE wall and 56 in from the REAR - and it is
 // clearance, not a compartment: it must be clear of everything, which is why a lavatory that fits
 // the room can still fail by standing in it.
-// dims: in { centerline_in: L, seat_height_in: L, clear_side_in: L, clear_rear_in: L } out: { centerline_deficit_in: L, seat_deficit_in: L, side_deficit_in: L, rear_deficit_in: L }
+// dims: in { centerline_in: L, seat_height_in: L, clear_side_in: L, clear_rear_in: L } out: { centerline_deficit_in: L, seat_deficit_in: L, side_deficit_in: L, rear_deficit_in: L, clear_area_sf: L^2, required_area_sf: L^2 }
 export function computeWaterClosetLocation({ centerline_in = 0, seat_height_in = 0, clear_side_in = 0, clear_rear_in = 0, flush_side = "open", ambulatory = "no" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const c = Number(centerline_in) || 0;
@@ -1871,7 +1871,7 @@ ACCESSIBILITY_RENDERERS["water-closet-location"] = _simpleRenderer({
 // BATHTUB (607.2): the clearance in front runs THE LENGTH OF THE TUB and is 30 in wide minimum -
 // and where there is a permanent seat at the head end it extends 12 in BEYOND the wall at that
 // end, so the fixture is 60 in and the clearance is 72.
-// dims: in { rim_height_in: L, counter_height_in: L, metering_seconds: T, tub_length_in: L, clear_width_in: L, clear_length_in: L } out: { governing_lav_height_in: L, lav_excess_in: L, required_clear_length_in: L, clear_length_deficit_in: L }
+// dims: in { rim_height_in: L, counter_height_in: L, metering_seconds: T, tub_length_in: L, clear_width_in: L, clear_length_in: L } out: { governing_lav_height_in: L, lav_excess_in: L, required_clear_length_in: L, clear_length_deficit_in: L, clear_area_sf: L^2, clear_width_deficit_in: L, seat_extra_in: L }
 export function computeLavatoryTubClearance({ rim_height_in = 0, counter_height_in = 0, metering_seconds = 0, tub_length_in = 0, permanent_seat = "no", clear_width_in = 0, clear_length_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const rim = Number(rim_height_in) || 0;

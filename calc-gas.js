@@ -141,7 +141,7 @@ export function ifgcLowPressureFlow({ d_in, dP_in_wc, cr, L_ft }) {
   return Math.pow(19.17 * d_in * Math.pow(dP_in_wc / (cr * L_ft), 0.206), 1 / 0.381);
 }
 
-// dims: in { btu_load: M L^2 T^-3, length_ft: L, gas: dimensionless, dP_in_wc: M L^-1 T^-2, candidate_sizes: dimensionless } out: { required_cfh: L^3 T^-1, capacity_cfh: L^3 T^-1 }
+// dims: in { btu_load: M L^2 T^-3, length_ft: L, gas: dimensionless, dP_in_wc: M L^-1 T^-2, candidate_sizes: dimensionless } out: { required_cfh: L^3 T^-1, capacity_cfh: L^3 T^-1, dP_in_wc: M L^-1 T^-2 }
 export function computeGasPipeSizing({ btu_load, length_ft, gas, dP_in_wc = 0.5, candidate_sizes = ["0.5", "0.75", "1", "1.25", "1.5", "2"] }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(Number(btu_load) > 0)) return { error: "Connected load must be positive (BTU/h)." };
@@ -282,7 +282,7 @@ GAS_RENDERERS["gas-leak-rate"] = renderGasLeakRate;
 // metered leak into a hole size. From Q = 8706 c (pi d^2 / 4) sqrt(dP / SG),
 // d = sqrt( 4 Q / (8706 c pi sqrt(dP / SG)) ). Distinct from orifice-diameter-for-flow (the WATER orifice-discharge
 // inverse); this uses the 8706-coefficient orifice-equation small-leak form and the gas specific gravity.
-// dims: in { leak_rate_cfh: L^3 T^-1, upstream_psi: M L^-1 T^-2, gas: dimensionless, c: dimensionless } out: { orifice_diameter_in: L, orifice_area_in2: L^2 }
+// dims: in { leak_rate_cfh: L^3 T^-1, upstream_psi: M L^-1 T^-2, gas: dimensionless, c: dimensionless } out: { orifice_diameter_in: L, orifice_area_in2: L^2, discharge_coefficient: dimensionless, specific_gravity: dimensionless }
 export function computeGasLeakHoleDiameter({ leak_rate_cfh, upstream_psi, gas, c = 0.7 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const props = GAS_PROPERTIES[gas];
@@ -858,7 +858,7 @@ function _lpWettedArea(radius_ft, length_ft, depth_ft) {
 // demonstrate: BOTH TERMS MOVE THE WRONG WAY TOGETHER in a cold snap on a
 // drawn-down tank, so the compound fall is much larger than either alone.
 // =====================================================================
-// dims: in { tank_diameter_ft: L, tank_length_ft: L, percent_full: dimensionless, ambient_f: T, liquid_temperature_f: T, reference_capacity_btuh: M L^2 T^-3, reference_percent_full: dimensionless, reference_ambient_f: T, connected_load_btuh: M L^2 T^-3 } out: { wetted_area_ft2: L^2, reference_wetted_area_ft2: L^2, capacity_btuh: M L^2 T^-3, margin_btuh: M L^2 T^-3, tanks_required: dimensionless }
+// dims: in { tank_diameter_ft: L, tank_length_ft: L, percent_full: dimensionless, ambient_f: T, liquid_temperature_f: T, reference_capacity_btuh: M L^2 T^-3, reference_percent_full: dimensionless, reference_ambient_f: T, connected_load_btuh: M L^2 T^-3 } out: { wetted_area_ft2: L^2, reference_wetted_area_ft2: L^2, capacity_btuh: M L^2 T^-3, margin_btuh: M L^2 T^-3, tanks_required: dimensionless, depth_ft: L }
 export function computePropaneVaporizationRate({
   tank_diameter_ft = 0, tank_length_ft = 0, percent_full = 0, ambient_f = null,
   liquid_temperature_f = 0, reference_capacity_btuh = 0, reference_percent_full = 0,
@@ -939,7 +939,7 @@ export const propaneVaporizationRateExample = { inputs: { tank_diameter_ft: 3.5,
 // is not, which is why propane-vaporization-rate computes the area instead
 // of scaling it with the fill.
 // =====================================================================
-// dims: in { water_capacity_gal: L^3, fill_limit_pct: dimensionless, current_gauge_pct: dimensionless, btu_per_gal: M L^2 T^-2 L^-3, liquid_temperature_f: T } out: { max_fill_gal: L^3, outage_gal: L^3, current_gal: L^3, deliverable_gal: L^3, full_tank_mmbtu: M L^2 T^-2, current_mmbtu: M L^2 T^-2, expansion_headroom_f: T, hydraulically_full_at_f: T }
+// dims: in { water_capacity_gal: L^3, fill_limit_pct: dimensionless, current_gauge_pct: dimensionless, btu_per_gal: M L^2 T^-2 L^-3, liquid_temperature_f: T } out: { max_fill_gal: L^3, outage_gal: L^3, current_gal: L^3, deliverable_gal: L^3, full_tank_mmbtu: M L^2 T^-2, current_mmbtu: M L^2 T^-2, expansion_headroom_f: T, hydraulically_full_at_f: T, outage_pct: dimensionless }
 export function computePropaneFillOutage({
   water_capacity_gal = 0, fill_limit_pct = 80, current_gauge_pct = 0,
   btu_per_gal = _LP_BTU_PER_GAL, liquid_temperature_f = 0,
@@ -1002,7 +1002,7 @@ export const propaneFillOutageExample = { inputs: { water_capacity_gal: 500, fil
 // regulator against the SAME load at the summer and the winter tank
 // pressure, plus lock-up against the downstream rating.
 // =====================================================================
-// dims: in { connected_load_btuh: M L^2 T^-3, btu_per_ft3: M L^2 T^-2 L^-3, capacity_at_min_inlet_cfh: L^3 T^-1, capacity_at_max_inlet_cfh: L^3 T^-1, second_stage_capacity_cfh: L^3 T^-1, lockup_psig: M L^-1 T^-2, downstream_rating_psig: M L^-1 T^-2 } out: { required_cfh: L^3 T^-1, min_inlet_margin_cfh: L^3 T^-1, max_inlet_margin_cfh: L^3 T^-1, second_stage_margin_cfh: L^3 T^-1, lockup_margin_psig: M L^-1 T^-2 }
+// dims: in { connected_load_btuh: M L^2 T^-3, btu_per_ft3: M L^2 T^-2 L^-3, capacity_at_min_inlet_cfh: L^3 T^-1, capacity_at_max_inlet_cfh: L^3 T^-1, second_stage_capacity_cfh: L^3 T^-1, lockup_psig: M L^-1 T^-2, downstream_rating_psig: M L^-1 T^-2 } out: { required_cfh: L^3 T^-1, min_inlet_margin_cfh: L^3 T^-1, max_inlet_margin_cfh: L^3 T^-1, second_stage_margin_cfh: L^3 T^-1, lockup_margin_psig: M L^-1 T^-2, capacity_fall_pct: dimensionless, min_inlet_pct: dimensionless }
 export function computePropaneRegulatorSizing({
   connected_load_btuh = 0, btu_per_ft3 = 2500, capacity_at_min_inlet_cfh = 0,
   capacity_at_max_inlet_cfh = 0, second_stage_capacity_cfh = 0,
@@ -1077,7 +1077,7 @@ export const propaneRegulatorSizingExample = { inputs: { connected_load_btuh: 50
 // for it, with the margin, plus the same check at the next container size
 // so the siting conversation happens before the tank is ordered.
 // =====================================================================
-// dims: in { water_capacity_gal: L^3, required_building_ft: L, required_property_line_ft: L, required_ignition_ft: L, measured_building_ft: L, measured_property_line_ft: L, measured_ignition_ft: L, measured_opening_ft: L, required_opening_ft: L, next_size_required_building_ft: L } out: { building_margin_ft: L, property_line_margin_ft: L, ignition_margin_ft: L, opening_margin_ft: L, governing_required_ft: L, next_size_shortfall_ft: L }
+// dims: in { water_capacity_gal: L^3, required_building_ft: L, required_property_line_ft: L, required_ignition_ft: L, measured_building_ft: L, measured_property_line_ft: L, measured_ignition_ft: L, measured_opening_ft: L, required_opening_ft: L, next_size_required_building_ft: L } out: { building_margin_ft: L, property_line_margin_ft: L, ignition_margin_ft: L, opening_margin_ft: L, governing_required_ft: L, next_size_shortfall_ft: L, checked_count: dimensionless, failure_count: dimensionless }
 export function computeLpContainerSeparation({
   water_capacity_gal = 0, required_building_ft = 0, required_property_line_ft = 0,
   required_ignition_ft = 0, required_opening_ft = 0, measured_building_ft = 0,

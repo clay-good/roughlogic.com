@@ -125,7 +125,7 @@ const _MEC_REFERENCE_TEMP_F = 59;
 // with KM 2.6 ft and KG 3.1 ft" and then, mid-sentence, takes KG as 2.1 --
 // because 3.1 would have given a NEGATIVE GM and an unstable vessel. Both KM
 // and KG are inputs here and the sign of GM is a computed verdict.
-// dims: in { km_ft: L, kg_ft: L, displacement_lb: M L T^-2, added_weight_lb: M L T^-2, added_kg_ft: L, free_surface_moment_ftlb: M L^2 T^-2, heel_angle_deg: dimensionless } out: { gm_ft: L, new_kg_ft: L, new_gm_ft: L, gm_loss_pct: dimensionless, free_surface_correction_ft: L, gz_ft: L }
+// dims: in { km_ft: L, kg_ft: L, displacement_lb: M L T^-2, added_weight_lb: M L T^-2, added_kg_ft: L, free_surface_moment_ftlb: M L^2 T^-2, heel_angle_deg: dimensionless } out: { gm_ft: L, new_kg_ft: L, new_gm_ft: L, gm_loss_pct: dimensionless, free_surface_correction_ft: L, gz_ft: L, effective_gm_ft: L, gm_change_ft: L }
 export function computeMetacentricHeight({
   km_ft = 0, kg_ft = 0, displacement_lb = 0,
   added_weight_lb = 0, added_kg_ft = 0, free_surface_moment_ftlb = 0, heel_angle_deg = 10,
@@ -363,7 +363,7 @@ MARINEAVIATION_RENDERERS["marine-shaft-diameter"] = _simpleRenderer({
 // surprises are: an alternator delivers its rated output only while the
 // battery accepts it, and a flooded bank's acceptance falls steeply above
 // roughly 80 percent state of charge.
-// dims: in { daily_consumption_ah: I T, bank_ah: I T, usable_dod: dimensionless, alternator_a: I, acceptance_fraction: dimensionless, bulk_target_soc_pct: dimensionless } out: { usable_ah: I T, autonomy_days: T, bulk_hours: T, realistic_hours: T, bank_for_one_day_ah: I T }
+// dims: in { daily_consumption_ah: I T, bank_ah: I T, usable_dod: dimensionless, alternator_a: I, acceptance_fraction: dimensionless, bulk_target_soc_pct: dimensionless } out: { usable_ah: I T, autonomy_days: T, bulk_hours: T, realistic_hours: T, bank_for_one_day_ah: I T, effective_a: I, partial_soc_pct: dimensionless }
 export function computeHouseBatteryAlternator({
   daily_consumption_ah = 0, bank_ah = 0, usable_dod = 0.5,
   alternator_a = 0, acceptance_fraction = 1, bulk_target_soc_pct = 85,
@@ -436,7 +436,7 @@ MARINEAVIATION_RENDERERS["house-battery-alternator"] = _simpleRenderer({
 // The split, not half the displacement, is the number to check. The machine's
 // own capacity check on half the weight is the wrong check whenever the centre
 // of gravity is not centred between the slings.
-// dims: in { displacement_lb: M L T^-2, sling_spacing_ft: L, cg_from_fwd_ft: L, sling_wll_lb: M L T^-2, sling_angle_deg: dimensionless } out: { fwd_sling_lb: M L T^-2, aft_sling_lb: M L T^-2, aft_share_pct: dimensionless, difference_lb: M L T^-2, horizontal_component_lb: M L T^-2 }
+// dims: in { displacement_lb: M L T^-2, sling_spacing_ft: L, cg_from_fwd_ft: L, sling_wll_lb: M L T^-2, sling_angle_deg: dimensionless } out: { fwd_sling_lb: M L T^-2, aft_sling_lb: M L T^-2, aft_share_pct: dimensionless, difference_lb: M L T^-2, horizontal_component_lb: M L T^-2, cg_from_aft_ft: L }
 export function computeTravelLiftSlingPlacement({
   displacement_lb = 0, sling_spacing_ft = 0, cg_from_fwd_ft = 0,
   sling_wll_lb = 0, sling_angle_deg = 90,
@@ -521,7 +521,7 @@ MARINEAVIATION_RENDERERS["travel-lift-sling-placement"] = _simpleRenderer({
 // A piling is a cantilever fixed in soil. Driving to refusal establishes AXIAL
 // capacity against a hard layer and says nothing about the lateral resistance
 // in the soft material above -- which is what resists a boat pushing sideways.
-// dims: in { lateral_load_lb: M L T^-2, height_above_mudline_ft: L, pile_diameter_in: L, soil_lateral_bearing_psf_per_ft: M L^-1 T^-2, scour_ft: L, existing_embedment_ft: L } out: { moment_ftlb: M L^2 T^-2, embedment_ft: L, scoured_moment_ftlb: M L^2 T^-2, scoured_embedment_ft: L, total_depth_needed_ft: L }
+// dims: in { lateral_load_lb: M L T^-2, height_above_mudline_ft: L, pile_diameter_in: L, soil_lateral_bearing_psf_per_ft: M L^-1 T^-2, scour_ft: L, existing_embedment_ft: L } out: { moment_ftlb: M L^2 T^-2, embedment_ft: L, scoured_moment_ftlb: M L^2 T^-2, scoured_embedment_ft: L, total_depth_needed_ft: L, b_ft: L, extra_depth_ft: L, scoured_height_ft: L, shortfall_ft: L }
 export function computeDockPilingLateral({
   lateral_load_lb = 0, height_above_mudline_ft = 0, pile_diameter_in = 0,
   soil_lateral_bearing_psf_per_ft = 0, scour_ft = 0, existing_embedment_ft = 0,
@@ -809,7 +809,7 @@ MARINEAVIATION_RENDERERS["propeller-track-balance"] = _simpleRenderer({
 // difference: the spec reports 6.628 lb/gal and a 46 lb shortfall where the
 // arithmetic it describes gives 6.653 and 36.9 lb. Both temperatures are
 // inputs here and the difference is computed.
-// dims: in { gallons: L^3, standard_density_lb_gal: M L^-3, reference_temp_f: T, fuel_temp_f: T, density_change_pct_per_10f: dimensionless, arm_in: L, required_weight_lb: M L T^-2 } out: { temp_difference_f: T, actual_density_lb_gal: M L^-3, actual_weight_lb: M L T^-2, standard_weight_lb: M L T^-2, weight_difference_lb: M L T^-2, gallons_for_weight: L^3 }
+// dims: in { gallons: L^3, standard_density_lb_gal: M L^-3, reference_temp_f: T, fuel_temp_f: T, density_change_pct_per_10f: dimensionless, arm_in: L, required_weight_lb: M L T^-2 } out: { temp_difference_f: T, actual_density_lb_gal: M L^-3, actual_weight_lb: M L T^-2, standard_weight_lb: M L T^-2, weight_difference_lb: M L T^-2, gallons_for_weight: L^3, density_change_fraction: dimensionless }
 export function computeAviationFuelWeight({
   gallons = 0, standard_density_lb_gal = _MEC_JET_A_LB_GAL, reference_temp_f = _MEC_REFERENCE_TEMP_F,
   fuel_temp_f = 59, density_change_pct_per_10f = 0.4, arm_in = 0, required_weight_lb = 0,

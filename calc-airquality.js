@@ -221,7 +221,7 @@ AIRQUALITY_RENDERERS["stack-emission-pte"] = _simpleRenderer({
 // average is 12.71% rather than 12.5%. The conclusion survives -- both are
 // under a 20% limit -- but the sum does not reproduce, so the block sum is an
 // input here and everything is computed from it.
-// dims: in { readings_sum_pct: dimensionless, reading_count: dimensionless, peak_reading_pct: dimensionless, limit_pct: dimensionless, steady_reading_pct: dimensionless } out: { block_average_pct: dimensionless, margin_pct: dimensionless, peak_over_average_pct: dimensionless, readings_at_peak_allowed: dimensionless }
+// dims: in { readings_sum_pct: dimensionless, reading_count: dimensionless, peak_reading_pct: dimensionless, limit_pct: dimensionless, steady_reading_pct: dimensionless } out: { block_average_pct: dimensionless, margin_pct: dimensionless, peak_over_average_pct: dimensionless, readings_at_peak_allowed: dimensionless, reading_count: dimensionless }
 export function computeOpacitySixMinute({
   readings_sum_pct = 0, reading_count = 24, peak_reading_pct = 0,
   limit_pct = 20, steady_reading_pct = 0,
@@ -308,7 +308,7 @@ AIRQUALITY_RENDERERS["opacity-six-minute"] = _simpleRenderer({
 //
 // The BASELINE is the diagnostic, not the peak. The trigger sets the peak, so
 // a blinding baghouse shows nothing wrong at the top of the cycle for months.
-// dims: in { baseline_inwc: M L^-1 T^-2, trigger_inwc: M L^-1 T^-2, cycle_minutes: T, original_baseline_inwc: M L^-1 T^-2, original_cycle_minutes: T, elapsed_months: T, operating_hours_per_day: T } out: { baseline_rise_inwc: M L^-1 T^-2, baseline_rise_pct: dimensionless, cycle_change_pct: dimensionless, pulses_per_day: dimensionless, months_to_trigger: T }
+// dims: in { baseline_inwc: M L^-1 T^-2, trigger_inwc: M L^-1 T^-2, cycle_minutes: T, original_baseline_inwc: M L^-1 T^-2, original_cycle_minutes: T, elapsed_months: T, operating_hours_per_day: T } out: { baseline_rise_inwc: M L^-1 T^-2, baseline_rise_pct: dimensionless, cycle_change_pct: dimensionless, pulses_per_day: dimensionless, months_to_trigger: T, range_lost_pct: dimensionless }
 export function computeBaghouseCleaningInterval({
   baseline_inwc = 0, trigger_inwc = 0, cycle_minutes = 0,
   original_baseline_inwc = 0, original_cycle_minutes = 0, elapsed_months = 0,
@@ -403,7 +403,7 @@ AIRQUALITY_RENDERERS["baghouse-cleaning-interval"] = _simpleRenderer({
 // CONTROLLING VARIABLE differs: a venturi is a pressure-drop machine and L/G
 // supplies the liquid that pressure drop works on, while a packed tower's
 // removal follows contact between the gas and a continuously renewed surface.
-// dims: in { gas_acfm: L^3 T^-1, lg_ratio_gpm_per_1000: dimensionless, pump_head_ft: L, pump_efficiency: dimensionless, specific_gravity: dimensionless, annual_hours: T, energy_rate_per_kwh: dimensionless, alternate_lg_ratio: dimensionless, pressure_drop_inwc: M L^-1 T^-2, fan_efficiency: dimensionless } out: { liquid_gpm: L^3 T^-1, pump_bhp: M L^2 T^-3, annual_kwh: M L^2 T^-2, fan_bhp: M L^2 T^-3, alternate_liquid_gpm: L^3 T^-1 }
+// dims: in { gas_acfm: L^3 T^-1, lg_ratio_gpm_per_1000: dimensionless, pump_head_ft: L, pump_efficiency: dimensionless, specific_gravity: dimensionless, annual_hours: T, energy_rate_per_kwh: dimensionless, alternate_lg_ratio: dimensionless, pressure_drop_inwc: M L^-1 T^-2, fan_efficiency: dimensionless } out: { liquid_gpm: L^3 T^-1, pump_bhp: M L^2 T^-3, annual_kwh: M L^2 T^-2, fan_bhp: M L^2 T^-3, alternate_liquid_gpm: L^3 T^-1, annual_cost: dimensionless, fan_kw: M L^2 T^-3, pump_kw: M L^2 T^-3, total_kw: M L^2 T^-3 }
 export function computeScrubberLgRatio({
   gas_acfm = 0, lg_ratio_gpm_per_1000 = 0, pump_head_ft = 0, pump_efficiency = 0.65,
   specific_gravity = 1.0, annual_hours = 0, energy_rate_per_kwh = 0,
@@ -493,7 +493,7 @@ AIRQUALITY_RENDERERS["scrubber-lg-ratio"] = _simpleRenderer({
 // four, not the "roughly threefold" the spec's own summary states: a chamber
 // sized on inlet standard flow gives a residence time that many times what the
 // unit actually achieves.
-// dims: in { inlet_scfm: L^3 T^-1, chamber_temp_f: T, standard_temp_f: T, required_residence_s: T, chamber_volume_ft3: L^3 } out: { expansion_factor: dimensionless, actual_acfm: L^3 T^-1, volume_required_ft3: L^3, actual_residence_s: T, standard_basis_residence_s: T }
+// dims: in { inlet_scfm: L^3 T^-1, chamber_temp_f: T, standard_temp_f: T, required_residence_s: T, chamber_volume_ft3: L^3 } out: { expansion_factor: dimensionless, actual_acfm: L^3 T^-1, volume_required_ft3: L^3, actual_residence_s: T, standard_basis_residence_s: T, standard_basis_volume_ft3: L^3 }
 export function computeThermalOxidizerResidence({
   inlet_scfm = 0, chamber_temp_f = 0, standard_temp_f = 70,
   required_residence_s = 0.75, chamber_volume_ft3 = 0,
@@ -568,7 +568,7 @@ AIRQUALITY_RENDERERS["thermal-oxidizer-residence"] = _simpleRenderer({
 // The less-water basis exists to prevent compliance by dilution: measuring VOC
 // per gallon of coating as supplied would let anyone pass by adding water,
 // without reducing the solvent applied per square foot.
-// dims: in { coating_gal: L^3, voc_lb: M, water_gal: L^3, exempt_gal: L^3, thinner_gal: L^3, thinner_voc_lb_per_gal: M L^-3, limit_lb_per_gal: M L^-3 } out: { voc_as_supplied: M L^-3, voc_less_water: M L^-3, applied_voc_as_supplied: M L^-3, applied_voc_less_water: M L^-3, margin_lb_per_gal: M L^-3 }
+// dims: in { coating_gal: L^3, voc_lb: M, water_gal: L^3, exempt_gal: L^3, thinner_gal: L^3, thinner_voc_lb_per_gal: M L^-3, limit_lb_per_gal: M L^-3 } out: { voc_as_supplied: M L^-3, voc_less_water: M L^-3, applied_voc_as_supplied: M L^-3, applied_voc_less_water: M L^-3, margin_lb_per_gal: M L^-3, applied_gal: L^3, less_water_gal: L^3, non_voc_gal: L^3 }
 export function computeCoatingVocCompliance({
   coating_gal = 1, voc_lb = 0, water_gal = 0, exempt_gal = 0,
   thinner_gal = 0, thinner_voc_lb_per_gal = 0, limit_lb_per_gal = 0, thinner_water_exempt_pct = 0,
@@ -663,7 +663,7 @@ AIRQUALITY_RENDERERS["coating-voc-compliance"] = _simpleRenderer({
 // largest tank looks adequate until you notice that the other tanks, their
 // foundations and a pump skid all stand inside it and occupy volume that oil
 // cannot.
-// dims: in { largest_tank_gal: L^3, freeboard_pct: dimensionless, dike_length_ft: L, dike_width_ft: L, dike_height_ft: L, other_tank_count: dimensionless, other_tank_diameter_ft: L, other_equipment_ft3: L^3 } out: { required_gal: L^3, gross_ft3: L^3, displacement_ft3: L^3, net_gal: L^3, margin_gal: L^3 }
+// dims: in { largest_tank_gal: L^3, freeboard_pct: dimensionless, dike_length_ft: L, dike_width_ft: L, dike_height_ft: L, other_tank_count: dimensionless, other_tank_diameter_ft: L, other_equipment_ft3: L^3 } out: { required_gal: L^3, gross_ft3: L^3, displacement_ft3: L^3, net_gal: L^3, margin_gal: L^3, displacement_gal: L^3, displacement_pct: dimensionless, free_footprint_ft2: L^2, gross_gal: L^3, height_needed_ft: L, net_ft3: L^3, required_ft3: L^3, tank_displacement_ft3: L^3, tank_footprint_ft2: L^2 }
 export function computeSpccContainmentVolume({
   largest_tank_gal = 0, freeboard_pct = 10,
   dike_length_ft = 0, dike_width_ft = 0, dike_height_ft = 0,
@@ -761,7 +761,7 @@ AIRQUALITY_RENDERERS["spcc-containment-volume"] = _simpleRenderer({
 // area removes the same FRACTION of the remaining penetration, so going from
 // 99 to 99.9 percent takes exactly as much additional area as going from 0 to
 // 90 did. That identity is asserted in the bounds test.
-// dims: in { plate_area_ft2: L^2, gas_acfm: L^3 T^-1, migration_velocity_fps: L T^-1, target_efficiency_pct: dimensionless } out: { efficiency_pct: dimensionless, penetration_pct: dimensionless, deutsch_exponent: dimensionless, area_for_target_ft2: L^2, additional_area_ft2: L^2 }
+// dims: in { plate_area_ft2: L^2, gas_acfm: L^3 T^-1, migration_velocity_fps: L T^-1, target_efficiency_pct: dimensionless } out: { efficiency_pct: dimensionless, penetration_pct: dimensionless, deutsch_exponent: dimensionless, area_for_target_ft2: L^2, additional_area_ft2: L^2, gas_cfs: L^3 T^-1 }
 export function computeEspDeutschEfficiency({
   plate_area_ft2 = 0, gas_acfm = 0, migration_velocity_fps = 0, target_efficiency_pct = 0,
 } = {}) {
@@ -907,7 +907,7 @@ AIRQUALITY_RENDERERS["carbon-bed-life"] = _simpleRenderer({
 // Stable-air rise added 2026-10-09 (the note said stability was not modelled): for Pasquill classes E and F the
 // final rise is Briggs' stable form dh = 2.6 (F/(u s))^(1/3), s = (g/Ta)(dtheta/dz), dtheta/dz 0.020 K/m (E) and
 // 0.035 K/m (F), as EPA's ISC3 applies it; A-D keep the neutral-unstable forms.
-// dims: in { stack_height_ft: L, stack_diameter_ft: L, exit_velocity_fps: L T^-1, exit_temp_f: T, ambient_temp_f: T, wind_mph: L T^-1, stability_class: dimensionless } out: { buoyancy_flux: L^4 T^-3, plume_rise_ft: L, effective_height_ft: L, height_ratio: dimensionless, concentration_factor: dimensionless }
+// dims: in { stack_height_ft: L, stack_diameter_ft: L, exit_velocity_fps: L T^-1, exit_temp_f: T, ambient_temp_f: T, wind_mph: L T^-1, stability_class: dimensionless } out: { buoyancy_flux: L^4 T^-3, plume_rise_ft: L, effective_height_ft: L, height_ratio: dimensionless, concentration_factor: dimensionless, double_wind_effective_ft: L, double_wind_rise_ft: L, neutral_rise_ft: L }
 export function computePlumeRiseBriggs({
   stack_height_ft = 0, stack_diameter_ft = 0, exit_velocity_fps = 0,
   exit_temp_f = 0, ambient_temp_f, wind_mph = 0, stability_class = "D",
@@ -1005,7 +1005,7 @@ const _PG_SIGMA = {
   E: { ay: 50.5, by: 0.894, near: [22.8, 0.678, -1.3], far: [55.4, 0.305, -34.0] },
   F: { ay: 34, by: 0.894, near: [14.35, 0.740, -0.35], far: [62.6, 0.180, -48.6] },
 };
-// dims: in { emission_rate_lb_hr: M T^-1, effective_height_ft: L, wind_mph: L T^-1, distance_mi: L, stability_class: dimensionless, alt_stability_class: dimensionless } out: { sigma_y_m: L, sigma_z_m: L, concentration_ug_m3: M L^-3, max_concentration_ug_m3: M L^-3, max_distance_km: L, effective_height_m: L }
+// dims: in { emission_rate_lb_hr: M T^-1, effective_height_ft: L, wind_mph: L T^-1, distance_mi: L, stability_class: dimensionless, alt_stability_class: dimensionless } out: { sigma_y_m: L, sigma_z_m: L, concentration_ug_m3: M L^-3, max_concentration_ug_m3: M L^-3, max_distance_km: L, effective_height_m: L, distance_km: L }
 export function computeGaussianDispersionScreen({
   emission_rate_lb_hr = 0, effective_height_ft = 0, wind_mph = 0,
   distance_mi = 0, stability_class = "D", alt_stability_class = "",
@@ -1145,7 +1145,7 @@ AIRQUALITY_RENDERERS["gaussian-dispersion-screen"] = _simpleRenderer({
 // Speed of sound taken as 1,130 ft/s at room temperature, the standard
 // acoustics reference value.
 const _BARRIER_SPEED_OF_SOUND_FPS = 1130;
-// dims: in { source_to_top_ft: L, top_to_receiver_ft: L, source_to_receiver_ft: L, path_difference_ft: L, frequency_hz: T^-1, second_frequency_hz: T^-1, practical_ceiling_db: dimensionless } out: { path_difference_ft: L, wavelength_ft: L, fresnel_number: dimensionless, insertion_loss_db: dimensionless }
+// dims: in { source_to_top_ft: L, top_to_receiver_ft: L, source_to_receiver_ft: L, path_difference_ft: L, frequency_hz: T^-1, second_frequency_hz: T^-1, practical_ceiling_db: dimensionless } out: { path_difference_ft: L, wavelength_ft: L, fresnel_number: dimensionless, insertion_loss_db: dimensionless, grazing_db: dimensionless, raw_insertion_loss_db: dimensionless, second_insertion_loss_db: dimensionless }
 export function computeNoiseBarrierInsertionLoss({
   source_to_top_ft = 0, top_to_receiver_ft = 0, source_to_receiver_ft = 0,
   path_difference_ft = 0, frequency_hz = 0, second_frequency_hz = 0,
@@ -1243,7 +1243,7 @@ AIRQUALITY_RENDERERS["noise-barrier-insertion-loss"] = _simpleRenderer({
 // Ldn: day 7 a.m. to 10 p.m. unpenalized (15 h), night 10 p.m. to 7 a.m. +10 dB (9 h).
 // CNEL splits an evening 7 p.m. to 10 p.m. (3 h) carrying +4.77 dB.
 const _CNEL_EVENING_PENALTY_DB = 4.77;
-// dims: in { activity_level_db: dimensionless, activity_hours_day: T, activity_hours_evening: T, activity_hours_night: T, background_level_db: dimensionless, limit_ldn_db: dimensionless } out: { ldn_db: dimensionless, cnel_db: dimensionless, leq24_db: dimensionless, night_moved_ldn_db: dimensionless }
+// dims: in { activity_level_db: dimensionless, activity_hours_day: T, activity_hours_evening: T, activity_hours_night: T, background_level_db: dimensionless, limit_ldn_db: dimensionless } out: { ldn_db: dimensionless, cnel_db: dimensionless, leq24_db: dimensionless, night_moved_ldn_db: dimensionless, halved_ldn_db: dimensionless, quiet_background_ldn_db: dimensionless }
 export function computeCommunityNoiseLdn({
   activity_level_db = 0, activity_hours_day = 0, activity_hours_evening = 0, activity_hours_night = 0,
   background_level_db = 0, limit_ldn_db = 0,

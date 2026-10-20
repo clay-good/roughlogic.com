@@ -199,7 +199,7 @@ export const materialCostExample = {
 
 // --- Utility 61: Markup and Margin ---
 
-// dims: in { cost: dimensionless, mode: dimensionless, value: dimensionless } out: { price: dimensionless, margin: dimensionless }
+// dims: in { cost: dimensionless, mode: dimensionless, value: dimensionless } out: { price: dimensionless, margin: dimensionless, margin_percent: dimensionless, markup_percent: dimensionless }
 export function computeMarkup({ cost, mode, value }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   value = Number(value);
@@ -239,7 +239,7 @@ export const markupExample = {
 
 // --- Utility 62: Time and Materials Estimator ---
 
-// dims: in { hours: T, labor_rate_per_hour: dimensionless, material_cost: dimensionless, overhead_percent: dimensionless, profit_percent: dimensionless } out: { total: dimensionless, labor: dimensionless }
+// dims: in { hours: T, labor_rate_per_hour: dimensionless, material_cost: dimensionless, overhead_percent: dimensionless, profit_percent: dimensionless } out: { total: dimensionless, labor: dimensionless, subtotal: dimensionless }
 export function computeTimeAndMaterials({ hours, labor_rate_per_hour, material_cost, overhead_percent = 0, profit_percent = 0 }) {
   // DR-23 (D-2/C-1): the solver did its own arithmetic on raw arguments with
   // no coercion and no error branch, so a non-numeric argument made every
@@ -631,7 +631,7 @@ export const loanPaymentExample = {
 
 // --- Utility 106: Upgrade ROI / Payback ---
 
-// dims: in { incremental_cost: dimensionless, annual_savings: dimensionless, discount_rate_percent: dimensionless, years: T } out: { npv: dimensionless }
+// dims: in { incremental_cost: dimensionless, annual_savings: dimensionless, discount_rate_percent: dimensionless, years: T } out: { npv: dimensionless, years: T }
 export function computeUpgradeROI({ incremental_cost, annual_savings, discount_rate_percent = 0, years = 10 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(Number(discount_rate_percent) > -100)) return { error: "The discount rate must be above -100%." };
@@ -661,7 +661,7 @@ export const upgradeROIExample = {
 
 export const IRS_STANDARD_MILEAGE_RATE = 0.76;
 
-// dims: in { round_trip_miles: L, mpg: L^-2, fuel_price_per_gallon: dimensionless, irs_rate_per_mile: dimensionless } out: { fuel_cost: dimensionless, gallons: L^3 }
+// dims: in { round_trip_miles: L, mpg: L^-2, fuel_price_per_gallon: dimensionless, irs_rate_per_mile: dimensionless } out: { fuel_cost: dimensionless, gallons: L^3, irs_rate_per_mile: dimensionless }
 export function computeMileageCost({ round_trip_miles, mpg, fuel_price_per_gallon, irs_rate_per_mile = IRS_STANDARD_MILEAGE_RATE }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const miles = Number(round_trip_miles) || 0;
@@ -681,7 +681,7 @@ export const mileageCostExample = {
 
 // --- Utility 108: Overtime Hours ---
 
-// dims: in { total_hours: T, regular_rate: dimensionless, overtime_multiplier: dimensionless, double_time_multiplier: dimensionless, double_time_threshold_hr: T } out: { gross_pay: dimensionless, overtime_pay: dimensionless }
+// dims: in { total_hours: T, regular_rate: dimensionless, overtime_multiplier: dimensionless, double_time_multiplier: dimensionless, double_time_threshold_hr: T } out: { gross_pay: dimensionless, overtime_pay: dimensionless, overtime_hours: T }
 export function computeOvertime({ total_hours, regular_rate, overtime_multiplier = 1.5, double_time_multiplier = 2.0, double_time_threshold_hr = 60 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const h = Number(total_hours) || 0;
@@ -843,7 +843,7 @@ export const geometryExample = {
 
 // --- Utility 111: Dilution / Mixing Ratio ---
 
-// dims: in { concentrate_percent: dimensionless, target_percent: dimensionless, final_volume: L^3 } out: { concentrate_volume: L^3 }
+// dims: in { concentrate_percent: dimensionless, target_percent: dimensionless, final_volume: L^3 } out: { concentrate_volume: L^3, diluent_volume: L^3 }
 export function computeDilution({ concentrate_percent, target_percent, final_volume }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const C = Number(concentrate_percent) || 0;
@@ -2174,7 +2174,7 @@ CROSS_RENDERERS["noise-dose"] = renderNoiseDose;
 // bundled. A positive suction lift raises TDH; a flooded (negative) suction
 // lowers it.
 
-// dims: in { flow_gpm: L^3 T^-1, internal_diameter_in: L, hw_c: dimensionless, static_suction_lift_ft: L, static_discharge_head_ft: L, suction_length_ft: L, discharge_length_ft: L, fittings_equiv_length_ft: L } out: { tdh_ft: L, static_head_ft: L, velocity_fps: L T^-1 }
+// dims: in { flow_gpm: L^3 T^-1, internal_diameter_in: L, hw_c: dimensionless, static_suction_lift_ft: L, static_discharge_head_ft: L, suction_length_ft: L, discharge_length_ft: L, fittings_equiv_length_ft: L } out: { tdh_ft: L, static_head_ft: L, velocity_fps: L T^-1, discharge_friction_ft: L, fittings_friction_ft: L, static_discharge_head_ft: L, static_suction_lift_ft: L, suction_friction_ft: L }
 export function computePumpTdh({
   flow_gpm = 0,
   internal_diameter_in = 0,
@@ -2305,7 +2305,7 @@ CROSS_RENDERERS["pump-tdh"] = renderPumpTdh;
 // retraction (the annulus), so a cylinder extends slower with more force than
 // it retracts. 231 in^3 = 1 US gallon.
 
-// dims: in { bore_in: L, rod_in: L, pressure_psi: M L^-1 T^-2, flow_gpm: L^3 T^-1, direction: dimensionless, stroke_in: L } out: { force_lb: M L T^-2, speed_in_per_s: L T^-1, oil_per_stroke_gal: L^3 }
+// dims: in { bore_in: L, rod_in: L, pressure_psi: M L^-1 T^-2, flow_gpm: L^3 T^-1, direction: dimensionless, stroke_in: L } out: { force_lb: M L T^-2, speed_in_per_s: L T^-1, oil_per_stroke_gal: L^3, area_extend_in2: L^2, area_retract_in2: L^2, cycle_time_s: T, effective_area_in2: L^2 }
 export function computeHydraulicCylinder({
   bore_in = 0,
   rod_in = 0,
@@ -2436,7 +2436,7 @@ CROSS_RENDERERS["hydraulic-cylinder"] = renderHydraulicCylinder;
 // (Gates / Goodyear) governs the final belt count.
 const _VBELT_HP_PER_BELT = { A: 3, B: 7, C: 15, D: 30, "3V": 5, "5V": 12, "8V": 30 };
 
-// dims: in { driver_rpm: T^-1, driven_rpm: T^-1, driver_hp: M L^2 T^-3, driver_pitch_diameter_in: L, center_distance_in: L, belt_section: dimensionless, service_factor: dimensionless } out: { ratio: dimensionless, driven_pitch_diameter_in: L, belt_length_in: L, design_hp: M L^2 T^-3 }
+// dims: in { driver_rpm: T^-1, driven_rpm: T^-1, driver_hp: M L^2 T^-3, driver_pitch_diameter_in: L, center_distance_in: L, belt_section: dimensionless, service_factor: dimensionless } out: { ratio: dimensionless, driven_pitch_diameter_in: L, belt_length_in: L, design_hp: M L^2 T^-3, driver_pitch_diameter_in: L }
 export function computeVbeltDrive({
   driver_rpm = 0,
   driven_rpm = 0,
@@ -2875,7 +2875,7 @@ CROSS_RENDERERS["rolling-offset"] = renderRollingOffset;
 // trivial V = pi*R^2*h. First-principles geometry (flat ends).
 // =====================================================================
 
-// dims: in { orientation: dimensionless, linear_unit: dimensionless, diameter: L, length: L, depth: L } out: { volume_gal: L^3, full_gal: L^3, percent_full: dimensionless }
+// dims: in { orientation: dimensionless, linear_unit: dimensionless, diameter: L, length: L, depth: L } out: { volume_gal: L^3, full_gal: L^3, percent_full: dimensionless, full_in3: L^3, volume_ft3: L^3, volume_in3: L^3, volume_l: L^3 }
 export function computeTankVolume({ orientation = "horizontal", linear_unit = "in", diameter = 0, length = 0, depth = 0 } = {}) {
   const _g = _finiteGuard({ diameter, length, depth }); if (_g) return _g;
   if (orientation !== "horizontal" && orientation !== "vertical") return { error: "Orientation must be horizontal or vertical." };
@@ -3123,7 +3123,7 @@ CROSS_RENDERERS["bolt-proof-load"] = renderBoltProofLoad;
 // 40 ft and longer (the federal wording leaves 36-40 unstated, so this takes the conservative 4 ft
 // above 36 and says so; some standards add a 5-ft tier past 48 ft, hence the override input).
 // With the 4:1 setup the working length is the HYPOTENUSE: L^2 = H^2 + (H/4)^2, so H = L/sqrt(17/16).
-// dims: in { nominal_length_ft: L, sections: dimensionless, overlap_override_ft: L } out: { overlap_ft: L, working_length_ft: L, top_support_ft: L, base_offset_ft: L, max_landing_ft: L }
+// dims: in { nominal_length_ft: L, sections: dimensionless, overlap_override_ft: L } out: { overlap_ft: L, working_length_ft: L, top_support_ft: L, base_offset_ft: L, max_landing_ft: L, joints: dimensionless, lost_ft: L, rule_overlap_ft: L, section_length_ft: L }
 export function computeExtensionLadderOverlap({ nominal_length_ft = 0, sections = 2, overlap_override_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const nom = Number(nominal_length_ft) || 0;
@@ -3180,7 +3180,7 @@ CROSS_RENDERERS["extension-ladder-overlap"] = renderExtensionLadderOverlap;
 // L - sqrt(L^2 - X^2) = L(1 - cos theta) before the line goes vertical. That drop is free fall the
 // vertical clearance calculation never counted, and the speed at the bottom of the arc is
 // sqrt(2 g h) - the same energy that puts a worker into a wall or a column.
-// dims: in { horizontal_offset_ft: L, anchor_height_ft: L, base_required_clearance_ft: L } out: { swing_angle_deg: dimensionless, swing_drop_ft: L, impact_speed_fps: L T^-1, total_required_clearance_ft: L }
+// dims: in { horizontal_offset_ft: L, anchor_height_ft: L, base_required_clearance_ft: L } out: { swing_angle_deg: dimensionless, swing_drop_ft: L, impact_speed_fps: L T^-1, total_required_clearance_ft: L, arc_length_ft: L, impact_speed_mph: L T^-1 }
 export function computeSwingFallGeometry({ horizontal_offset_ft = 0, anchor_height_ft = 0, base_required_clearance_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const x = Number(horizontal_offset_ft) || 0;

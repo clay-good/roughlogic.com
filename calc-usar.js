@@ -198,7 +198,7 @@ const _FA_NUMERATOR_PSI = 480000;
 const _FC_CAP_PSI = 1100;
 const _POST_ACTUAL_IN = { "4x4": [3.5, 3.5], "6x6": [5.5, 5.5] };
 
-// dims: in { shore_height_ft: L, post_size: dimensionless, post_width_in: L, post_depth_in: L, posts: dimensionless, species: dimensionless, load_per_shore_lb: M L T^-2, aftershock_expected: dimensionless } out: { slenderness_ld: dimensionless, fa_psi: M L^-1 T^-2, post_area_sqin: L^2, load_per_post_lb: M L T^-2, shore_capacity_lb: M L T^-2, load_ratio: dimensionless, bracing_min_lb: M L T^-2, bracing_aftershock_lb: M L T^-2, bracing_required_lb: M L T^-2 }
+// dims: in { shore_height_ft: L, post_size: dimensionless, post_width_in: L, post_depth_in: L, posts: dimensionless, species: dimensionless, load_per_shore_lb: M L T^-2, aftershock_expected: dimensionless } out: { slenderness_ld: dimensionless, fa_psi: M L^-1 T^-2, post_area_sqin: L^2, load_per_post_lb: M L T^-2, shore_capacity_lb: M L T^-2, load_ratio: dimensionless, bracing_min_lb: M L T^-2, bracing_aftershock_lb: M L T^-2, bracing_required_lb: M L T^-2, euler_psi: M L^-1 T^-2, load_per_shore_lb: M L T^-2 }
 export function computeUsrVerticalShoreCapacity({ shore_height_ft = 10, post_size = "4x4", post_width_in = 3.5, post_depth_in = 3.5, posts = 3, species = "df", load_per_shore_lb = 12000, aftershock_expected = "yes" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(shore_height_ft > 0)) return { error: "Shore height must be positive." };
@@ -278,7 +278,7 @@ const _CRIB_PRACTICAL_FT = { "4x4": 4, "6x6": 6 };
 const _CRIB_POINTS = { "2x2": 4, "3x3": 9 };
 const _CRIB_RATIO = { all: 3, lifting: 2, two_corners: 1.5, one_corner: 1 };
 
-// dims: in { timber_size: dimensionless, layup: dimensionless, species: dimensionless, bearing_stress_psi: M L^-1 T^-2, crib_width_ft: L, bearing_condition: dimensionless, crib_load_lb: M L T^-2 } out: { contact_area_sqin: L^2, contact_points: dimensionless, base_capacity_lb: M L T^-2, crib_capacity_lb: M L T^-2, ratio_height_ft: L, practical_height_ft: L, max_height_ft: L, load_ratio: dimensionless }
+// dims: in { timber_size: dimensionless, layup: dimensionless, species: dimensionless, bearing_stress_psi: M L^-1 T^-2, crib_width_ft: L, bearing_condition: dimensionless, crib_load_lb: M L T^-2 } out: { contact_area_sqin: L^2, contact_points: dimensionless, base_capacity_lb: M L T^-2, crib_capacity_lb: M L T^-2, ratio_height_ft: L, practical_height_ft: L, max_height_ft: L, load_ratio: dimensionless, member_in: L }
 export function computeUsrCribCapacity({ timber_size = "6x6", layup = "3x3", species = "syp_hf_spf", bearing_stress_psi = 500, crib_width_ft = 4, bearing_condition = "all", crib_load_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(timber_size in _CRIB_MEMBER_IN)) return { error: "Timber size must be 4x4 or 6x6." };
@@ -359,7 +359,7 @@ const _RAKER_SOG_SINGLE_LB = 4000;
 const _RAKER_SOG_PAIR_LB = 8000;
 const _RAKER_FOG_LB = 2500;
 
-// dims: in { wall_psf: M L^-1 T^-2, wall_height_ft: L, raker_spacing_ft: L, roof_depth_ft: L, roof_psf: M L^-1 T^-2, insertion_height_ft: L, raker_angle_deg: dimensionless, aftershock_expected: dimensionless } out: { wall_weight_lb: M L T^-2, roof_weight_lb: M L T^-2, tributary_weight_lb: M L T^-2, design_force_lb: M L T^-2, raker_length_in: L, rule_length_in: L, base_distance_in: L, axial_force_lb: M L T^-2, vertical_kick_lb: M L T^-2, collapse_zone_min_ft: L, collapse_zone_max_ft: L }
+// dims: in { wall_psf: M L^-1 T^-2, wall_height_ft: L, raker_spacing_ft: L, roof_depth_ft: L, roof_psf: M L^-1 T^-2, insertion_height_ft: L, raker_angle_deg: dimensionless, aftershock_expected: dimensionless } out: { wall_weight_lb: M L T^-2, roof_weight_lb: M L T^-2, tributary_weight_lb: M L T^-2, design_force_lb: M L T^-2, raker_length_in: L, rule_length_in: L, base_distance_in: L, axial_force_lb: M L T^-2, vertical_kick_lb: M L T^-2, collapse_zone_min_ft: L, collapse_zone_max_ft: L, design_fraction: dimensionless }
 export function computeUsrRakerShore({ wall_psf = 125, wall_height_ft = 14, raker_spacing_ft = 8, roof_depth_ft = 10, roof_psf = 15, insertion_height_ft = 12, raker_angle_deg = 45, aftershock_expected = "yes" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(wall_psf > 0)) return { error: "Wall unit weight must be positive." };
@@ -442,7 +442,7 @@ const _PICKET_TABLE_EMBED_IN = 36;
 // Soil" per raker. The 2015 edition said 4; this used 4 until 2026-10-03.
 const _STANDARD_PATTERN_PICKETS = 6;
 
-// dims: in { required_force_lb: M L T^-2, picket_dia: dimensionless, soil: dimensionless, embedment_in: L } out: { design_load_per_picket_lb: M L T^-2, pickets_required: dimensionless, group_capacity_lb: M L T^-2, standard_pattern_capacity_lb: M L T^-2 }
+// dims: in { required_force_lb: M L T^-2, picket_dia: dimensionless, soil: dimensionless, embedment_in: L } out: { design_load_per_picket_lb: M L T^-2, pickets_required: dimensionless, group_capacity_lb: M L T^-2, standard_pattern_capacity_lb: M L T^-2, embedment_in: L }
 export function computePicketAnchorSoil({ required_force_lb = 1520, picket_dia = "1", soil = "cohesive_average", embedment_in = 36 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(required_force_lb > 0)) return { error: "Required lateral force must be positive." };
@@ -623,7 +623,7 @@ const _APPC_WIDTHS_FT = [4, 6, 9, 12, 15];
 const _APPC_PRESSURE_K = { A: 25, B: 45, C: 80 };
 const _APPC_TABLE_NAME = { oak: { A: "C-1.1", B: "C-1.2", C: "C-1.3" }, fir: { A: "C-2.1", B: "C-2.2", C: "C-2.3" } };
 
-// dims: in { soil_type: dimensionless, depth_ft: L, width_ft: L, table_set: dimensionless, crossbrace_spacing: dimensionless, limitation_present: dimensionless } out: { design_pressure_psf: M L^-1 T^-2, arrangement_count: dimensionless, first_crossbrace_load_lb: M L T^-2, max_crossbrace_load_lb: M L T^-2 }
+// dims: in { soil_type: dimensionless, depth_ft: L, width_ft: L, table_set: dimensionless, crossbrace_spacing: dimensionless, limitation_present: dimensionless } out: { design_pressure_psf: M L^-1 T^-2, arrangement_count: dimensionless, first_crossbrace_load_lb: M L T^-2, max_crossbrace_load_lb: M L T^-2, depth_ft: L, width_column_ft: L, width_ft: L }
 export function computeOshaTimberTrenchShoring({ soil_type = "A", depth_ft = 13, width_ft = 5, table_set = "oak", crossbrace_spacing = "all", limitation_present = "no" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!["A", "B", "C"].includes(soil_type)) return { error: "Soil type must be A, B, or C (classified by the competent person under Appendix A). Stable rock needs no shoring." };

@@ -98,7 +98,7 @@ export const POOL_RENDERERS = {};
 const _POOL_GAL_PER_CU_FT = 1728 / 231;
 const _POOL_LB_PER_GAL = 8.34;
 const _POOL_LATENT_BTU_PER_LB = 1046;
-// dims: in { surface_area_ft2: L^2, evaporation_in_day: L T^-1, cover_effectiveness_pct: dimensionless, cover_hours_per_day: T, heater_efficiency_pct: dimensionless, fuel_cost_per_mmbtu: dimensionless, season_days: T } out: { gallons_per_day: L^3 T^-1, pounds_per_day: M T^-1, mmbtu_per_day: L^2 M T^-2, cover_saving_mmbtu_day: L^2 M T^-2, season_saving_mmbtu: L^2 M T^-2, season_saving_cost: dimensionless }
+// dims: in { surface_area_ft2: L^2, evaporation_in_day: L T^-1, cover_effectiveness_pct: dimensionless, cover_hours_per_day: T, heater_efficiency_pct: dimensionless, fuel_cost_per_mmbtu: dimensionless, season_days: T } out: { gallons_per_day: L^3 T^-1, pounds_per_day: M T^-1, mmbtu_per_day: L^2 M T^-2, cover_saving_mmbtu_day: L^2 M T^-2, season_saving_mmbtu: L^2 M T^-2, season_saving_cost: dimensionless, cover_fraction: dimensionless }
 export function computePoolCoverEvaporation({
   surface_area_ft2 = 0, evaporation_in_day = 0, cover_effectiveness_pct = 90,
   cover_hours_per_day = 0, heater_efficiency_pct = 82, fuel_cost_per_mmbtu = 0, season_days = 180,
@@ -186,7 +186,7 @@ POOL_RENDERERS["pool-cover-evaporation"] = _simpleRenderer({
 // (1,500 to 2,500 W by service factor). Until 2026-10-01 this was the shaft
 // conversion, and every kW, kWh and dollar read about 44% low.
 const _POOL_DRAW_KW_PER_NAMEPLATE_HP = 2.0 / 1.5;
-// dims: in { pump_hp: L^2 M T^-3, full_speed_hours: T, speed_fraction: dimensionless, electricity_rate_per_kwh: dimensionless, days_per_year: dimensionless, minimum_flow_fraction: dimensionless } out: { full_kw: L^2 M T^-3, reduced_kw: L^2 M T^-3, reduced_hours: T, full_kwh_day: L^2 M T^-2, reduced_kwh_day: L^2 M T^-2, saving_kwh_day: L^2 M T^-2, annual_saving_cost: dimensionless, energy_fraction: dimensionless }
+// dims: in { pump_hp: L^2 M T^-3, full_speed_hours: T, speed_fraction: dimensionless, electricity_rate_per_kwh: dimensionless, days_per_year: dimensionless, minimum_flow_fraction: dimensionless } out: { full_kw: L^2 M T^-3, reduced_kw: L^2 M T^-3, reduced_hours: T, full_kwh_day: L^2 M T^-2, reduced_kwh_day: L^2 M T^-2, saving_kwh_day: L^2 M T^-2, annual_saving_cost: dimensionless, energy_fraction: dimensionless, power_fraction: dimensionless }
 export function computePoolPumpSpeedSavings({
   pump_hp = 0, full_speed_hours = 0, speed_fraction = 0.5,
   electricity_rate_per_kwh = 0, days_per_year = 365, minimum_flow_fraction = 0,
@@ -275,7 +275,7 @@ POOL_RENDERERS["pool-pump-speed-savings"] = _simpleRenderer({
 // and spec-v1672.
 // =====================================================================
 const _POOL_BTU_PER_GAL_DEGF = 8.34;
-// dims: in { rated_capacity_btuh: L^2 M T^-3, air_derate_factor: dimensionless, humidity_derate_factor: dimensionless, water_derate_factor: dimensionless, rated_cop: dimensionless, cop_derate_factor: dimensionless, pool_gallons: L^3, temperature_rise_f: T, cover_loss_reduction_pct: dimensionless, surface_loss_btuh: L^2 M T^-3 } out: { derated_capacity_btuh: L^2 M T^-3, capacity_pct_of_rating: dimensionless, derated_cop: dimensionless, heat_required_btu: L^2 M T^-2, heat_up_hours: T, heat_up_hours_with_cover: T }
+// dims: in { rated_capacity_btuh: L^2 M T^-3, air_derate_factor: dimensionless, humidity_derate_factor: dimensionless, water_derate_factor: dimensionless, rated_cop: dimensionless, cop_derate_factor: dimensionless, pool_gallons: L^3, temperature_rise_f: T, cover_loss_reduction_pct: dimensionless, surface_loss_btuh: L^2 M T^-3 } out: { derated_capacity_btuh: L^2 M T^-3, capacity_pct_of_rating: dimensionless, derated_cop: dimensionless, heat_required_btu: L^2 M T^-2, heat_up_hours: T, heat_up_hours_with_cover: T, combined_factor: dimensionless }
 export function computePoolHeatPumpCapacity({
   rated_capacity_btuh = 0, air_derate_factor = 1, humidity_derate_factor = 1, water_derate_factor = 1,
   rated_cop = 0, cop_derate_factor = 1,

@@ -278,7 +278,7 @@ FARMPRODUCTION_RENDERERS["center-pivot-runtime"] = _v568renderCenterPivotRuntime
 
 // --- spec-v602 L: Center-pivot outer-span application rate vs soil intake ---
 // speed = 2*pi*L/(T*60). wetting = W/speed. app_rate = D*2*pi*L/(T*W). exceeds if app_rate > intake.
-// dims: in { pass_depth_in: L, pivot_length_ft: L, revolution_hr: T, wetted_band_ft: L, soil_intake_in_hr: dimensionless } out: { speed_ft_min: dimensionless, wetting_min: T, app_rate_in_hr: dimensionless, ratio: dimensionless }
+// dims: in { pass_depth_in: L, pivot_length_ft: L, revolution_hr: T, wetted_band_ft: L, soil_intake_in_hr: L T^-1 } out: { speed_ft_min: L T^-1, wetting_min: T, app_rate_in_hr: L T^-1, ratio: dimensionless }
 export function computePivotApplicationRate({ pass_depth_in = 0, pivot_length_ft = 0, revolution_hr = 0, wetted_band_ft = 0, soil_intake_in_hr = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const D = Number(pass_depth_in) || 0;

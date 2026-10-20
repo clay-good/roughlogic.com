@@ -97,7 +97,7 @@ HVACAIRSIDE_RENDERERS["duct-heat-gain"] = _rEnv({
   compute: computeDuctHeatGain,
 });
 
-// dims: in { mode: dimensionless, cfm: L^3 T^-1, ratio: dimensionless, A_gross_ft2: L^2, V_target: L T^-1 } out: { V_face: L T^-1, A_gross_req_ft2: L^2 }
+// dims: in { mode: dimensionless, cfm: L^3 T^-1, ratio: dimensionless, A_gross_ft2: L^2, V_target: L T^-1 } out: { V_face: L T^-1, A_gross_req_ft2: L^2, A_gross_req_in2: L^2 }
 export function computeGrilleFaceVelocity({ mode = "velocity", cfm = 0, ratio = 0.75, A_gross_ft2 = 0, V_target = 0 } = {}) {
   const _g = _finiteGuardEnv(arguments[0]); if (_g) return _g;
   const q = Number(cfm) || 0;
@@ -309,7 +309,7 @@ function _renderVibrationIsolation(inputRegion, outputRegion, citationEl) {
 }
 HVACAIRSIDE_RENDERERS["vibration-isolation"] = _renderVibrationIsolation;
 
-// dims: in { equipment_rpm: T^-1, target_efficiency: dimensionless } out: { transmissibility: dimensionless, ratio: dimensionless, fn_hz: T^-1, deflection_in: L }
+// dims: in { equipment_rpm: T^-1, target_efficiency: dimensionless } out: { transmissibility: dimensionless, ratio: dimensionless, fn_hz: T^-1, deflection_in: L, disturbing_hz: T^-1 }
 export function computeIsolatorDeflection({ equipment_rpm = 0, target_efficiency = 0 } = {}) {
   const _g = _finiteGuardEnv(arguments[0]); if (_g) return _g;
   const rpm = Number(equipment_rpm) || 0;

@@ -35,7 +35,7 @@ const _v23hVelocityK = (air_density_lb_ft3) => {
   return { K: 4005 * Math.sqrt(_V23H_STD_AIR_LB_FT3 / rho), rho };
 };
 const _V23H_DENSITY_ERROR = "Air density must be between 0.02 and 0.15 lb/ft^3 (0.075 is standard air; leave it there if unsure).";
-// dims: in { solve_for: dimensionless, vp_inwc: dimensionless, velocity_fpm: L T^-1, air_density_lb_ft3: M L^-3 } out: { velocity_fpm: L T^-1, vp_inwc: dimensionless, velocity_constant: dimensionless }
+// dims: in { solve_for: dimensionless, vp_inwc: dimensionless, velocity_fpm: L T^-1, air_density_lb_ft3: M L^-3 } out: { velocity_fpm: L T^-1, vp_inwc: dimensionless, velocity_constant: dimensionless, air_density_lb_ft3: M L^-3 }
 export function computeDuctVelocityPressure({ solve_for = "velocity", vp_inwc = 0, velocity_fpm = 0, air_density_lb_ft3 = 0.075 } = {}) {
   const kd = _v23hVelocityK(air_density_lb_ft3);
   if (!kd) return { error: _V23H_DENSITY_ERROR };
@@ -87,7 +87,7 @@ VELOCITY_RENDERERS["duct-velocity-pressure"] = renderDuctVelocityPressure;
 // ~4000 fpm the line is noisy. Specific volume is user-supplied at the line
 // condition; manufacturer line-sizing tables govern.
 //
-// dims: in { mass_flow_lb_hr: M T^-1, line_id_in: L, specific_volume_ft3_lb: L^3 M^-1, orientation: dimensionless } out: { velocity_fpm: L T^-1 }
+// dims: in { mass_flow_lb_hr: M T^-1, line_id_in: L, specific_volume_ft3_lb: L^3 M^-1, orientation: dimensionless } out: { velocity_fpm: L T^-1, area_ft2: L^2 }
 export function computeRefrigerantVelocity({ mass_flow_lb_hr = 0, line_id_in = 0, specific_volume_ft3_lb = 0, orientation = "horizontal" } = {}) {
   const m = Number(mass_flow_lb_hr) || 0;
   const d = Number(line_id_in) || 0;
@@ -141,7 +141,7 @@ VELOCITY_RENDERERS["refrigerant-velocity"] = renderRefrigerantVelocity;
 // the design question is the largest line ID that still meets it. Solving
 // V = (m sv) / area / 60 for the diameter: area = m sv / (60 V),
 // d = 12 sqrt(4 area / pi).
-// dims: in { mass_flow_lb_hr: M T^-1, specific_volume_ft3_lb: L^3 M^-1, target_velocity_fpm: L T^-1 } out: { line_id_in: L, area_ft2: L^2, q_ft3_hr: L^3 T^-1 }
+// dims: in { mass_flow_lb_hr: M T^-1, specific_volume_ft3_lb: L^3 M^-1, target_velocity_fpm: L T^-1 } out: { line_id_in: L, area_ft2: L^2, q_ft3_hr: L^3 T^-1, target_velocity_fpm: L T^-1 }
 export function computeRefrigerantLineSize({ mass_flow_lb_hr = 0, specific_volume_ft3_lb = 0, target_velocity_fpm = 1500 } = {}) {
   const m = Number(mass_flow_lb_hr) || 0;
   const sv = Number(specific_volume_ft3_lb) || 0;
@@ -405,7 +405,7 @@ VELOCITY_RENDERERS["dp-flow-meter"] = renderDpFlowMeter;
 // and standard (scfm) flow. Valid for p2/p1 >= 0.75 (the tile flags below that).
 // Computed C added 2026-10-09: cd_mode "flange" / "corner" / "d_d2" takes C from orifice-discharge-coefficient
 // (ISO 5167-2 Reader-Harris/Gallagher), iterated with Re = 4 qm/(pi D mu) from the mass flow and the gas viscosity.
-// dims: in { pipe_id_in: L, bore_in: L, p1_psia: M L^-1 T^-2, dp_psi: M L^-1 T^-2, temp_f: T, gas_sg: dimensionless, kappa: dimensionless, cd: dimensionless, cd_mode: dimensionless, viscosity_cp: M L^-1 T^-1 } out: { expansion_factor: dimensionless, mass_flow_lb_min: M T^-1, scfm: L^3 T^-1, acfm: L^3 T^-1, beta_ratio: dimensionless, cd_used: dimensionless, reynolds_number: dimensionless }
+// dims: in { pipe_id_in: L, bore_in: L, p1_psia: M L^-1 T^-2, dp_psi: M L^-1 T^-2, temp_f: T, gas_sg: dimensionless, kappa: dimensionless, cd: dimensionless, cd_mode: dimensionless, viscosity_cp: M L^-1 T^-1 } out: { expansion_factor: dimensionless, mass_flow_lb_min: M T^-1, scfm: L^3 T^-1, acfm: L^3 T^-1, beta_ratio: dimensionless, cd_used: dimensionless, reynolds_number: dimensionless, pressure_ratio: dimensionless }
 export function computeGasDpFlowMeter({ pipe_id_in = 0, bore_in = 0, p1_psia = 0, dp_psi = 0, temp_f = 60, gas_sg = 1.0, kappa = 1.4, cd = 0.61, cd_mode = "entered", viscosity_cp = 0.018 } = {}) {
   const D = Number(pipe_id_in), d = Number(bore_in), p1 = Number(p1_psia), dp = Number(dp_psi), tF = Number(temp_f), sg = Number(gas_sg), k = Number(kappa), mu = Number(viscosity_cp);
   let Cd = Number(cd);
@@ -517,7 +517,7 @@ VELOCITY_RENDERERS["gas-dp-flow-meter"] = renderGasDpFlowMeter;
 // of the measured dP:  dW/dP = (sqrt(1 - beta^4 (1 - Cd^2)) - Cd beta^2) / (sqrt(1 - beta^4 (1 - Cd^2)) + Cd beta^2).
 // A smaller bore (lower beta) meters a wider range but wastes far more pressure. Orifice plates only -- a classical
 // venturi recovers most of the dP (its loss is a separate, much smaller diffuser calculation).
-// dims: in { pipe_id_in: L, bore_in: L, dp_psi: M L^-1 T^-2, cd: dimensionless } out: { beta_ratio: dimensionless, loss_fraction: dimensionless, permanent_loss_psi: M L^-1 T^-2, permanent_loss_inwc: M L^-1 T^-2, recovered_psi: M L^-1 T^-2 }
+// dims: in { pipe_id_in: L, bore_in: L, dp_psi: M L^-1 T^-2, cd: dimensionless } out: { beta_ratio: dimensionless, loss_fraction: dimensionless, permanent_loss_psi: M L^-1 T^-2, permanent_loss_inwc: M L^-1 T^-2, recovered_psi: M L^-1 T^-2, recovered_fraction: dimensionless }
 export function computeOrificePressureLoss({ pipe_id_in = 0, bore_in = 0, dp_psi = 0, cd = 0.61 } = {}) {
   const D = Number(pipe_id_in), d = Number(bore_in), dp = Number(dp_psi), Cd = Number(cd);
   if (![D, d, dp, Cd].every(Number.isFinite)) return { error: "All inputs must be finite numbers." };

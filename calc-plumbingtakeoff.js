@@ -90,7 +90,7 @@ function _v856renderSolderJointQuantity(inputRegion, outputRegion, citationEl) {
 PLUMBINGTAKEOFF_RENDERERS["solder-joint-quantity"] = _v856renderSolderJointQuantity;
 
 // ===================== spec-v857: pipe insulation and jacket material takeoff =====================
-// dims: in { pipe_ft: L, waste_pct: dimensionless, num_fittings: dimensionless, fitting_allow_ft: L, section_len_ft: L, insul_od_in: L } out: { cut_ft: L, sections: dimensionless, jacket_sf: L^2 }
+// dims: in { pipe_ft: L, waste_pct: dimensionless, num_fittings: dimensionless, fitting_allow_ft: L, section_len_ft: L, insul_od_in: L } out: { cut_ft: L, sections: dimensionless, jacket_sf: L^2, derived_jacket_od_in: L, jacket_circumference_ft: L, jacket_with_lap_sf: L^2, pipe_circumference_ft: L }
 export function computePipeInsulationTakeoff({ pipe_ft = 250, waste_pct = 5, num_fittings = 12, fitting_allow_ft = 1, section_len_ft = 3, insul_od_in = 4.5, pipe_od_in = 0, insul_thickness_in = 0, jacket_overlap_pct = 0, elbow_count = 0, tee_count = 0, valve_count = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(pipe_ft > 0)) return { error: "Pipe length must be positive (ft)." };
@@ -179,7 +179,7 @@ function _v857renderPipeInsulationTakeoff(inputRegion, outputRegion, citationEl)
 PLUMBINGTAKEOFF_RENDERERS["pipe-insulation-takeoff"] = _v857renderPipeInsulationTakeoff;
 
 // ===================== spec-v858: freeze-protection heat-trace cable and circuit =====================
-// dims: in { pipe_ft: L, allowance_pct: dimensionless, num_valves: dimensionless, valve_allow_ft: L, rated_w_per_ft: dimensionless, voltage: dimensionless, breaker_a: I } out: { cable_ft: L, watts: M L^2 T^-3, amps: dimensionless }
+// dims: in { pipe_ft: L, allowance_pct: dimensionless, num_valves: dimensionless, valve_allow_ft: L, rated_w_per_ft: dimensionless, voltage: dimensionless, breaker_a: I } out: { cable_ft: L, watts: M L^2 T^-3, amps: dimensionless, start_amps: I }
 export function computeHeatTraceSizing({ pipe_ft = 150, allowance_pct = 10, num_valves = 1, valve_allow_ft = 3, rated_w_per_ft = 5, voltage = 120, breaker_a = 20, start_factor = 3 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(pipe_ft > 0)) return { error: "Pipe length must be positive (ft)." };

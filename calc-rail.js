@@ -257,7 +257,7 @@ RAIL_RENDERERS["cwr-neutral-temperature"] = _simpleRenderer({
 
 // ===================== spec-v1542: rail head wear and condemning limit =====================
 
-// dims: in { new_head_height_in: L, new_head_width_in: L, new_head_area_in2: L^2, vertical_wear_in: L, gauge_face_wear_in: L, combined_limit_in: L, tonnage_mgt: dimensionless } out: { combined_wear_in: L, remaining_in: L, head_area_loss_pct: dimensionless, wear_rate_in_per_mgt: L, remaining_mgt: dimensionless }
+// dims: in { new_head_height_in: L, new_head_width_in: L, new_head_area_in2: L^2, vertical_wear_in: L, gauge_face_wear_in: L, combined_limit_in: L, tonnage_mgt: dimensionless } out: { combined_wear_in: L, remaining_in: L, head_area_loss_pct: dimensionless, wear_rate_in_per_mgt: L, remaining_mgt: dimensionless, lost_area_in2: L^2 }
 export function computeRailWearLimit({ new_head_height_in = 0, new_head_width_in = 0, new_head_area_in2 = 0, vertical_wear_in = 0, gauge_face_wear_in = 0, combined_limit_in = 0, tonnage_mgt = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(new_head_height_in > 0)) return { error: "New-rail head height must be positive." };
@@ -316,7 +316,7 @@ RAIL_RENDERERS["rail-wear-condemning-limit"] = _simpleRenderer({
 
 // ===================== spec-v1543: cross-level, warp, and the class limit =====================
 
-// dims: in { measured_a_in: L, designed_a_in: L, measured_b_in: L, designed_b_in: L, distance_ft: L, warp_limit_in: L } out: { deviation_a_in: L, deviation_b_in: L, warp_in: L, designed_change_in: L, crosslevel_difference_in: L, margin_in: L, warp_per_31ft_in: L, pct_of_limit: dimensionless }
+// dims: in { measured_a_in: L, designed_a_in: L, measured_b_in: L, designed_b_in: L, distance_ft: L, warp_limit_in: L } out: { deviation_a_in: L, deviation_b_in: L, warp_in: L, designed_change_in: L, crosslevel_difference_in: L, margin_in: L, warp_per_31ft_in: L, pct_of_limit: dimensionless, against_zero_in: L, warp_magnitude_in: L }
 export function computeTrackWarp({ measured_a_in = 0, designed_a_in = 0, measured_b_in = 0, designed_b_in = 0, distance_ft = 0, warp_limit_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(distance_ft > 0)) return { error: "Distance between the two points must be positive." };
@@ -372,7 +372,7 @@ RAIL_RENDERERS["track-warp-fra-class"] = _simpleRenderer({
 
 // ===================== spec-v1544: ballast section volume and tonnage =====================
 
-// dims: in { top_width_ft: L, depth_in: L, side_slope_ratio: dimensionless, length_ft: L, density_ton_per_cy: M L^-3, raise_in: L } out: { bottom_width_ft: L, area_sqft: L^2, volume_cy: L^3, tons: M, cy_per_mile: L^3, tons_per_mile: M, raise_volume_cy: L^3 }
+// dims: in { top_width_ft: L, depth_in: L, side_slope_ratio: dimensionless, length_ft: L, density_ton_per_cy: M L^-3, raise_in: L } out: { bottom_width_ft: L, area_sqft: L^2, volume_cy: L^3, tons: M, cy_per_mile: L^3, tons_per_mile: M, raise_volume_cy: L^3, rectangle_area_sqft: L^2, understated_pct: dimensionless }
 export function computeBallastSection({ top_width_ft = 0, depth_in = 0, side_slope_ratio = 1.5, length_ft = 0, density_ton_per_cy = 1.4, raise_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(top_width_ft > 0)) return { error: "Top width of the ballast section must be positive." };
@@ -511,7 +511,7 @@ const _CURVE_RESISTANCE_LB_PER_TON_PER_DEG = 0.8;
 
 // ============ spec-v1546: railcar load limit ============
 
-// dims: in { gross_rail_load_lb: M L T^-2, light_weight_lb: M L T^-2, lading_net_lb: M L T^-2, cubic_capacity_ft3: L^3, lading_density_pcf: M L^-3, route_gross_rail_load_lb: M L T^-2 } out: { load_limit_lb: M L T^-2, gross_on_rail_lb: M L T^-2, utilization_pct: dimensionless, remaining_capacity_lb: M L T^-2, route_load_limit_lb: M L T^-2, cube_limited_weight_lb: M L T^-2 }
+// dims: in { gross_rail_load_lb: M L T^-2, light_weight_lb: M L T^-2, lading_net_lb: M L T^-2, cubic_capacity_ft3: L^3, lading_density_pcf: M L^-3, route_gross_rail_load_lb: M L T^-2 } out: { load_limit_lb: M L T^-2, gross_on_rail_lb: M L T^-2, utilization_pct: dimensionless, remaining_capacity_lb: M L T^-2, route_load_limit_lb: M L T^-2, cube_limited_weight_lb: M L T^-2, cubic_capacity_ft3: L^3, governing_utilization_pct: dimensionless }
 export function computeRailcarLoadLimit({ gross_rail_load_lb = 0, light_weight_lb = 0, lading_net_lb = 0, cubic_capacity_ft3 = 0, lading_density_pcf = 0, route_gross_rail_load_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(gross_rail_load_lb > 0)) return { error: "Gross rail load must be positive (lb)." };
@@ -596,7 +596,7 @@ RAIL_RENDERERS["railcar-load-limit"] = _simpleRenderer({
 
 // ============ spec-v1547: locomotive tonnage rating on a ruling grade ============
 
-// dims: in { tractive_effort_lb: M L T^-2, ruling_grade_pct: dimensionless, rolling_resistance_lb_per_ton: M L T^-2, curve_degrees: dimensionless, weight_on_drivers_lb: M L T^-2, adhesion_factor: dimensionless, alternate_grade_pct: dimensionless } out: { grade_resistance_lb_per_ton: M L T^-2, curve_resistance_lb_per_ton: M L T^-2, total_resistance_lb_per_ton: M L T^-2, adhesion_limited_te_lb: M L T^-2, governing_te_lb: M L T^-2, tonnage_rating_tons: M }
+// dims: in { tractive_effort_lb: M L T^-2, ruling_grade_pct: dimensionless, rolling_resistance_lb_per_ton: M L T^-2, curve_degrees: dimensionless, weight_on_drivers_lb: M L T^-2, adhesion_factor: dimensionless, alternate_grade_pct: dimensionless } out: { grade_resistance_lb_per_ton: M L T^-2, curve_resistance_lb_per_ton: M L T^-2, total_resistance_lb_per_ton: M L T^-2, adhesion_limited_te_lb: M L T^-2, governing_te_lb: M L T^-2, tonnage_rating_tons: M, alternate_grade_pct: dimensionless, ruling_grade_pct: dimensionless }
 export function computeTonnageRatingGrade({ tractive_effort_lb = 0, ruling_grade_pct = 0, rolling_resistance_lb_per_ton = 3, curve_degrees = 0, weight_on_drivers_lb = 0, adhesion_factor = 0.3, alternate_grade_pct = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(tractive_effort_lb > 0)) return { error: "Available tractive effort must be positive (lb)." };
@@ -680,7 +680,7 @@ RAIL_RENDERERS["tonnage-rating-grade"] = _simpleRenderer({
 // tonnage-rating-grade takes rolling resistance as entered. The Davis family
 // computes it: a constant, a per-axle journal term that falls with axle load, a
 // term linear in speed, and an air term that does not depend on weight at all.
-// dims: in { car_weight_tons: M, axles_per_car: dimensionless, speed_mph: L T^-1, air_coefficient: dimensionless, cars: dimensionless } out: { resistance_lb_per_ton: M L T^-2, axle_term_lb_per_ton: M L T^-2, speed_term_lb_per_ton: M L T^-2, air_term_lb_per_ton: M L T^-2, car_resistance_lb: M L T^-2, train_resistance_lb: M L T^-2, power_hp: M L^2 T^-3, equivalent_grade_pct: dimensionless, rp548_lb_per_ton: M L T^-2, davis_1926_lb_per_ton: M L T^-2 }
+// dims: in { car_weight_tons: M, axles_per_car: dimensionless, speed_mph: L T^-1, air_coefficient: dimensionless, cars: dimensionless } out: { resistance_lb_per_ton: M L T^-2, axle_term_lb_per_ton: M L T^-2, speed_term_lb_per_ton: M L T^-2, air_term_lb_per_ton: M L T^-2, car_resistance_lb: M L T^-2, train_resistance_lb: M L T^-2, power_hp: M L^2 T^-3, equivalent_grade_pct: dimensionless, rp548_lb_per_ton: M L T^-2, davis_1926_lb_per_ton: M L T^-2, cars: dimensionless }
 export function computeTrainResistanceDavis({ car_weight_tons = 0, axles_per_car = 4, speed_mph = null, air_coefficient = 0.07, cars = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // 0 F is a real reading, so a blank temperature cannot stand in for it.
@@ -738,7 +738,7 @@ RAIL_RENDERERS["train-resistance-davis"] = _simpleRenderer({
 
 // ============ spec-v1548: train air brake reduction ============
 
-// dims: in { charged_pressure_psi: M L^-1 T^-2, reduction_psi: M L^-1 T^-2, cylinder_ratio: dimensionless, full_service_reduction_psi: M L^-1 T^-2, car_count: dimensionless, propagation_rate_cars_per_second: dimensionless } out: { brake_pipe_psi: M L^-1 T^-2, cylinder_psi: M L^-1 T^-2, remaining_reduction_psi: M L^-1 T^-2, full_service_cylinder_psi: M L^-1 T^-2, wasted_reduction_psi: M L^-1 T^-2, propagation_seconds: T }
+// dims: in { charged_pressure_psi: M L^-1 T^-2, reduction_psi: M L^-1 T^-2, cylinder_ratio: dimensionless, full_service_reduction_psi: M L^-1 T^-2, car_count: dimensionless, propagation_rate_cars_per_second: dimensionless } out: { brake_pipe_psi: M L^-1 T^-2, cylinder_psi: M L^-1 T^-2, remaining_reduction_psi: M L^-1 T^-2, full_service_cylinder_psi: M L^-1 T^-2, wasted_reduction_psi: M L^-1 T^-2, propagation_seconds: T, car_count: dimensionless, charged_pressure_psi: M L^-1 T^-2, effective_reduction_psi: M L^-1 T^-2, equalizing_reduction_psi: M L^-1 T^-2, equalizing_reservoir_psi: M L^-1 T^-2, full_service_reduction_psi: M L^-1 T^-2, reduction_psi: M L^-1 T^-2, remaining_cylinder_psi: M L^-1 T^-2 }
 export function computeTrainBrakeReduction({ charged_pressure_psi = 90, reduction_psi = 0, cylinder_ratio = 2.5, full_service_reduction_psi = 0, car_count = 0, propagation_rate_cars_per_second = 10 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(charged_pressure_psi > 0)) return { error: "Brake pipe charged pressure must be positive (psi)." };
@@ -813,7 +813,7 @@ RAIL_RENDERERS["train-brake-reduction"] = _simpleRenderer({
 
 // ============ spec-v1549: railcar clearance plate and dynamic envelope ============
 
-// dims: in { truck_centres_ft: L, car_length_ft: L, car_width_in: L, degree_of_curve: dimensionless, clearance_to_obstruction_in: L, required_clearance_in: L } out: { radius_ft: L, mid_ordinate_in: L, end_overhang_in: L, effective_half_width_in: L, remaining_clearance_in: L, sharpest_curve_deg: dimensionless }
+// dims: in { truck_centres_ft: L, car_length_ft: L, car_width_in: L, degree_of_curve: dimensionless, clearance_to_obstruction_in: L, required_clearance_in: L } out: { radius_ft: L, mid_ordinate_in: L, end_overhang_in: L, effective_half_width_in: L, remaining_clearance_in: L, sharpest_curve_deg: dimensionless, car_length_ft: L, car_width_in: L, clearance_to_obstruction_in: L, degree_of_curve: dimensionless, end_overhang_ft: L, half_width_in: L, inside_half_width_in: L, mid_ordinate_ft: L, outside_half_width_in: L, overhang_ft: L, required_clearance_in: L, truck_centres_ft: L }
 export function computeClearancePlateEnvelope({ truck_centres_ft = 0, car_length_ft = 0, car_width_in = 0, degree_of_curve = 0, clearance_to_obstruction_in = 0, required_clearance_in = 6 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(truck_centres_ft > 0)) return { error: "The distance between truck centres must be positive (ft)." };

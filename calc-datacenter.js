@@ -81,7 +81,7 @@ export const DATACENTER_RENDERERS = {};
 
 // ===================== spec-v1800: PUE =====================
 
-// dims: in { it_load_kw: L^2 M T^-3, cooling_kw: L^2 M T^-3, ups_loss_kw: L^2 M T^-3, miscellaneous_kw: L^2 M T^-3, tariff_per_kwh: dimensionless, target_pue: dimensionless, reduced_it_kw: L^2 M T^-3, reduced_cooling_kw: L^2 M T^-3, reduced_ups_loss_kw: L^2 M T^-3 } out: { total_facility_kw: L^2 M T^-3, pue: dimensionless, dcie_pct: dimensionless, annual_energy_kwh: L^2 M T^-2, annual_cost: dimensionless }
+// dims: in { it_load_kw: L^2 M T^-3, cooling_kw: L^2 M T^-3, ups_loss_kw: L^2 M T^-3, miscellaneous_kw: L^2 M T^-3, tariff_per_kwh: dimensionless, target_pue: dimensionless, reduced_it_kw: L^2 M T^-3, reduced_cooling_kw: L^2 M T^-3, reduced_ups_loss_kw: L^2 M T^-3 } out: { total_facility_kw: L^2 M T^-3, pue: dimensionless, dcie_pct: dimensionless, annual_energy_kwh: L^2 M T^-2, annual_cost: dimensionless, overhead_kw: M L^2 T^-3, reduced_energy_savings_pct: dimensionless, reduced_total_kw: M L^2 T^-3, target_total_kw: M L^2 T^-3 }
 export function computeDatacenterPue({ it_load_kw = 0, cooling_kw = 0, ups_loss_kw = 0, miscellaneous_kw = 0, tariff_per_kwh = 0, target_pue = 0, reduced_it_kw = 0, reduced_cooling_kw = 0, reduced_ups_loss_kw = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   if (!(it_load_kw > 0) || !(tariff_per_kwh > 0)) return { error: "IT load and electricity tariff must be positive." };
@@ -143,7 +143,7 @@ DATACENTER_RENDERERS["datacenter-pue"] = _simpleRenderer({
 
 // ===================== spec-v1801: rack airflow =====================
 
-// dims: in { rack_load_kw: L^2 M T^-3, equipment_delta_t_f: T^1, standard_tile_cfm: L^3 T^-1, comparison_rack_kw: L^2 M T^-3, high_flow_tile_cfm: L^3 T^-1, alternative_delta_t_f: T^1 } out: { heat_btu_h: L^2 M T^-3, required_cfm: L^3 T^-1, cfm_per_kw: L M^-1 T^2, standard_tiles_required: dimensionless }
+// dims: in { rack_load_kw: L^2 M T^-3, equipment_delta_t_f: T^1, standard_tile_cfm: L^3 T^-1, comparison_rack_kw: L^2 M T^-3, high_flow_tile_cfm: L^3 T^-1, alternative_delta_t_f: T^1 } out: { heat_btu_h: L^2 M T^-3, required_cfm: L^3 T^-1, cfm_per_kw: L M^-1 T^2, standard_tiles_required: dimensionless, alternative_airflow_reduction_pct: dimensionless, alternative_delta_t_cfm: L^3 T^-1, comparison_required_cfm: L^3 T^-1 }
 export function computeRackPowerDensityAirflow({ rack_load_kw = 0, equipment_delta_t_f = 0, standard_tile_cfm = 0, comparison_rack_kw = 0, high_flow_tile_cfm = 0, alternative_delta_t_f = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   if (![rack_load_kw, equipment_delta_t_f, standard_tile_cfm, comparison_rack_kw, high_flow_tile_cfm, alternative_delta_t_f].every((v) => v > 0)) return { error: "Loads, temperature rises, and tile delivery values must be positive." };
@@ -190,7 +190,7 @@ DATACENTER_RENDERERS["rack-power-density-airflow"] = _simpleRenderer({
 
 // ===================== spec-v1802: UPS redundancy =====================
 
-// dims: in { it_load_kw: L^2 M T^-3, power_factor: dimensionless, module_rating_kva: L^2 M T^-3, n_plus_one_efficiency_pct: dimensionless, two_n_efficiency_pct: dimensionless, tariff_per_kwh: dimensionless, cooling_cop: dimensionless } out: { apparent_power_kva: L^2 M T^-3, required_modules: dimensionless, n_plus_one_loss_kw: L^2 M T^-3, annual_total_penalty_delta: dimensionless }
+// dims: in { it_load_kw: L^2 M T^-3, power_factor: dimensionless, module_rating_kva: L^2 M T^-3, n_plus_one_efficiency_pct: dimensionless, two_n_efficiency_pct: dimensionless, tariff_per_kwh: dimensionless, cooling_cop: dimensionless } out: { apparent_power_kva: L^2 M T^-3, required_modules: dimensionless, n_plus_one_loss_kw: L^2 M T^-3, annual_total_penalty_delta: dimensionless, cooling_share_pct: dimensionless, loss_delta_kw: M L^2 T^-3, n_plus_one_load_pct: dimensionless, required_load_pct: dimensionless, two_n_load_pct: dimensionless, two_n_loss_kw: M L^2 T^-3 }
 export function computeUpsModuleRedundancy({ it_load_kw = 0, power_factor = 0, module_rating_kva = 0, n_plus_one_efficiency_pct = 0, two_n_efficiency_pct = 0, tariff_per_kwh = 0, cooling_cop = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   // An efficiency is a percent; 0 < value < 1 is a fraction typed into a percent field (added 2026-09-26).
@@ -248,7 +248,7 @@ DATACENTER_RENDERERS["ups-module-redundancy"] = _simpleRenderer({
 
 // ===================== spec-v1803: CRAC/CRAH sensible capacity =====================
 
-// dims: in { airflow_cfm: L^3 T^-1, supply_temp_f: T^1, return_temp_f: T^1, contained_return_temp_f: T^1, bypass_return_temp_f: T^1 } out: { capacity_btu_h: L^2 M T^-3, capacity_tons: dimensionless, capacity_kw: L^2 M T^-3, contained_capacity_kw: L^2 M T^-3 }
+// dims: in { airflow_cfm: L^3 T^-1, supply_temp_f: T^1, return_temp_f: T^1, contained_return_temp_f: T^1, bypass_return_temp_f: T^1 } out: { capacity_btu_h: L^2 M T^-3, capacity_tons: dimensionless, capacity_kw: L^2 M T^-3, contained_capacity_kw: L^2 M T^-3, bypass_capacity_kw: M L^2 T^-3, bypass_change_pct: dimensionless, contained_change_pct: dimensionless }
 export function computeCracSensibleDerate({ airflow_cfm = 0, supply_temp_f = 0, return_temp_f = 0, contained_return_temp_f = 0, bypass_return_temp_f = 0 } = {}) {
   { const v = arguments[0]?.supply_temp_f; if (v === undefined || v === null || v === "") return { error: "Enter the supply temperature (F)." }; }
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
@@ -291,7 +291,7 @@ DATACENTER_RENDERERS["crac-sensible-derate"] = _simpleRenderer({
 
 // ===================== spec-v1804: containment bypass =====================
 
-// dims: in { it_load_kw: L^2 M T^-3, equipment_delta_t_f: T^1, unit_count: dimensionless, airflow_per_unit_cfm: L^3 T^-1, supply_temp_f: T^1, exhaust_temp_f: T^1, fan_power_per_unit_kw: L^2 M T^-3, tariff_per_kwh: dimensionless } out: { it_airflow_cfm: L^3 T^-1, supply_airflow_cfm: L^3 T^-1, bypass_cfm: L^3 T^-1, return_temp_f: T^1, annual_fan_savings: dimensionless }
+// dims: in { it_load_kw: L^2 M T^-3, equipment_delta_t_f: T^1, unit_count: dimensionless, airflow_per_unit_cfm: L^3 T^-1, supply_temp_f: T^1, exhaust_temp_f: T^1, fan_power_per_unit_kw: L^2 M T^-3, tariff_per_kwh: dimensionless } out: { it_airflow_cfm: L^3 T^-1, supply_airflow_cfm: L^3 T^-1, bypass_cfm: L^3 T^-1, return_temp_f: T^1, annual_fan_savings: dimensionless, current_fan_power_kw: M L^2 T^-3, fan_savings_kw: M L^2 T^-3, matched_fan_power_kw: M L^2 T^-3, one_failed_margin_cfm: L^3 T^-1, one_failed_margin_pct: dimensionless, one_failed_supply_cfm: L^3 T^-1, recirculation_cfm: L^3 T^-1, two_failed_margin_cfm: L^3 T^-1, two_failed_margin_pct: dimensionless, two_failed_supply_cfm: L^3 T^-1 }
 export function computeContainmentBypassAirflow({ it_load_kw = 0, equipment_delta_t_f = 0, unit_count = 0, airflow_per_unit_cfm = 0, supply_temp_f = 0, exhaust_temp_f = 0, fan_power_per_unit_kw = 0, tariff_per_kwh = 0 } = {}) {
   { const v = arguments[0]?.supply_temp_f; if (v === undefined || v === null || v === "") return { error: "Enter the supply temperature (F)." }; }
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
@@ -412,7 +412,7 @@ DATACENTER_RENDERERS["pdu-branch-loading"] = _simpleRenderer({
 
 // ===================== spec-v1806: chilled-water ride-through =====================
 
-// dims: in { loop_volume_gal: L^3, it_load_kw: L^2 M T^-3, supply_temp_f: T^1, max_temp_f: T^1, generator_transfer_min: T, chiller_restart_min: T, smaller_loop_volume_gal: L^3 } out: { stored_cooling_btu: L^2 M T^-2, ride_through_min: T, required_restart_min: T, ride_margin_min: T, additional_volume_gal: L^3 }
+// dims: in { loop_volume_gal: L^3, it_load_kw: L^2 M T^-3, supply_temp_f: T^1, max_temp_f: T^1, generator_transfer_min: T, chiller_restart_min: T, smaller_loop_volume_gal: L^3 } out: { stored_cooling_btu: L^2 M T^-2, ride_through_min: T, required_restart_min: T, ride_margin_min: T, additional_volume_gal: L^3, delta_t_f: T, generator_only_volume_gal: L^3, required_volume_gal: L^3 }
 export function computeChilledWaterRideThrough({ loop_volume_gal = 0, it_load_kw = 0, supply_temp_f = 0, max_temp_f = 0, generator_transfer_min = 0, chiller_restart_min = 0, smaller_loop_volume_gal = 0 } = {}) {
   { const v = arguments[0]?.supply_temp_f; if (v === undefined || v === null || v === "") return { error: "Enter the supply temperature (F)." }; }
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
@@ -471,7 +471,7 @@ function _dewPointF(tempF, rhPct) {
   return 237.7 * gamma / (17.27 - gamma) * 9 / 5 + 32;
 }
 
-// dims: in { dry_bulb_f: T^1, relative_humidity_pct: dimensionless, recommended_min_f: T^1, recommended_max_f: T^1, allowable_min_f: T^1, allowable_max_f: T^1, upper_dew_point_f: T^1, upper_rh_pct: dimensionless, alternative_temp_f: T^1, alternative_rh_pct: dimensionless } out: { dew_point_f: T^1, dew_point_margin_f: T^1, allowable_upper_margin_f: T^1, alternative_dew_point_f: T^1 }
+// dims: in { dry_bulb_f: T^1, relative_humidity_pct: dimensionless, recommended_min_f: T^1, recommended_max_f: T^1, allowable_min_f: T^1, allowable_max_f: T^1, upper_dew_point_f: T^1, upper_rh_pct: dimensionless, alternative_temp_f: T^1, alternative_rh_pct: dimensionless } out: { dew_point_f: T^1, dew_point_margin_f: T^1, allowable_upper_margin_f: T^1, alternative_dew_point_f: T^1, rh_margin_pct: dimensionless }
 export function computeServerInletEnvelope({ dry_bulb_f = 0, relative_humidity_pct = 0, recommended_min_f = 0, recommended_max_f = 0, allowable_min_f = 0, allowable_max_f = 0, upper_dew_point_f = 0, upper_rh_pct = 0, alternative_temp_f = 0, alternative_rh_pct = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   const temps = [dry_bulb_f, recommended_min_f, recommended_max_f, allowable_min_f, allowable_max_f, upper_dew_point_f, alternative_temp_f];
@@ -534,7 +534,7 @@ DATACENTER_RENDERERS["server-inlet-envelope"] = _simpleRenderer({
 
 // ===================== spec-v1808: raised-floor tile airflow =====================
 
-// dims: in { tile_area_ft2: L^2, open_area_pct: dimensionless, discharge_coefficient: dimensionless, plenum_pressure_in_wc: dimensionless, total_supply_cfm: L^3 T^-1, open_tile_count: dimensionless, high_flow_open_pct: dimensionless, reduced_pressure_in_wc: dimensionless, increased_tile_count: dimensionless } out: { free_area_ft2: L^2, tile_airflow_cfm: L^3 T^-1, high_flow_airflow_cfm: L^3 T^-1, required_plenum_pressure_in_wc: dimensionless }
+// dims: in { tile_area_ft2: L^2, open_area_pct: dimensionless, discharge_coefficient: dimensionless, plenum_pressure_in_wc: dimensionless, total_supply_cfm: L^3 T^-1, open_tile_count: dimensionless, high_flow_open_pct: dimensionless, reduced_pressure_in_wc: dimensionless, increased_tile_count: dimensionless } out: { free_area_ft2: L^2, tile_airflow_cfm: L^3 T^-1, high_flow_airflow_cfm: L^3 T^-1, required_plenum_pressure_in_wc: dimensionless, high_flow_free_area_ft2: L^2, increased_count_flow_change_pct: dimensionless, increased_count_pressure_change_pct: dimensionless, reduced_pressure_airflow_cfm: L^3 T^-1, reduced_pressure_flow_change_pct: dimensionless }
 export function computeRaisedFloorTileAirflow({ tile_area_ft2 = 0, open_area_pct = 0, discharge_coefficient = 0, plenum_pressure_in_wc = 0, total_supply_cfm = 0, open_tile_count = 0, high_flow_open_pct = 0, reduced_pressure_in_wc = 0, increased_tile_count = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   if (!(tile_area_ft2 > 0) || !(plenum_pressure_in_wc > 0) || !(total_supply_cfm > 0) || !(open_tile_count > 0) || !(increased_tile_count > 0)) return { error: "Tile area, pressure, total airflow, and tile counts must be positive." };

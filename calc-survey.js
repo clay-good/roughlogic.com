@@ -137,7 +137,7 @@ SURVEY_RENDERERS["area-by-coordinates"] = renderAreaByCoordinates;
 // Latitude/departure for each course (azimuth clockwise from North):
 // lat = dist*cos(az), dep = dist*sin(az). Compass-rule (Bowditch)
 // adjustment distributes closure error proportional to course length.
-// dims: in { courses: dimensionless, n0: L, e0: L } out: { sum_lat: L, sum_dep: L, linear_misclosure: L, perimeter_ft: L, relative_precision_denominator: dimensionless }
+// dims: in { courses: dimensionless, n0: L, e0: L } out: { sum_lat: L, sum_dep: L, linear_misclosure: L, perimeter_ft: L, relative_precision_denominator: dimensionless, courses_count: dimensionless }
 export function computeTraverseClosure({ courses, n0 = 0, e0 = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!Array.isArray(courses) || courses.length < 2) return { error: "Need at least two courses." };
@@ -503,7 +503,7 @@ SURVEY_RENDERERS["cogo-forward-point"] = renderCogoForwardPoint;
 // two MEASURED DISTANCES to two known points -- the classic tape swing-tie / as-built / batter-board
 // method. Two-circle intersection: d = |P1-P0|, a = (r0^2 - r1^2 + d^2)/(2d), h = sqrt(r0^2 - a^2);
 // midpoint Pm = P0 + a*(P1-P0)/d, solutions = Pm +/- h*perpendicular. First-principles Euclidean geometry.
-// dims: in { n0_ft: L, e0_ft: L, dist0_ft: L, n1_ft: L, e1_ft: L, dist1_ft: L } out: { d_ft: L, sol1_n_ft: L, sol1_e_ft: L, sol2_n_ft: L, sol2_e_ft: L }
+// dims: in { n0_ft: L, e0_ft: L, dist0_ft: L, n1_ft: L, e1_ft: L, dist1_ft: L } out: { d_ft: L, sol1_n_ft: L, sol1_e_ft: L, sol2_n_ft: L, sol2_e_ft: L, offset_h_ft: L }
 export function computeDistanceDistanceIntersect({ n0_ft = 0, e0_ft = 0, dist0_ft = 0, n1_ft = 0, e1_ft = 0, dist1_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const n0 = Number(n0_ft), e0 = Number(e0_ft), r0 = Number(dist0_ft);
@@ -769,7 +769,7 @@ SURVEY_RENDERERS["cogo-inverse-locate"] = renderCogoInverseLocate;
 // recovers the textbook closed form P = 0.204 W sqrt(A E) / sqrt(P - P0), since
 // 1/sqrt(24) = 0.20412 - the same root, written implicitly. The fuzzer checks the
 // bisection against that identity rather than against a memorized number.
-// dims: in { span_ft: L, tape_weight_plf: M T^-2, tape_area_in2: L^2, standard_pull_lb: M L T^-2, applied_pull_lb: M L T^-2, e_psi: M L^-1 T^-2 } out: { normal_tension_lb: M L T^-2, span_weight_lb: M L T^-2, sag_at_normal_ft: L, pull_at_normal_ft: L, net_at_applied_ft: L, sag_at_applied_ft: L, pull_at_applied_ft: L }
+// dims: in { span_ft: L, tape_weight_plf: M T^-2, tape_area_in2: L^2, standard_pull_lb: M L T^-2, applied_pull_lb: M L T^-2, e_psi: M L^-1 T^-2 } out: { normal_tension_lb: M L T^-2, span_weight_lb: M L T^-2, sag_at_normal_ft: L, pull_at_normal_ft: L, net_at_applied_ft: L, sag_at_applied_ft: L, pull_at_applied_ft: L, residual_at_normal_ft: L }
 export function computeTapingNormalTension({ span_ft = 100, tape_weight_plf = 0.02, tape_area_in2 = 0.006, standard_pull_lb = 10, applied_pull_lb = 0, e_psi = 29e6 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const L = Number(span_ft) || 0;
@@ -1018,7 +1018,7 @@ function _simpleRenderer(spec) {
 }
 
 // ===================== spec-v1394: two-bearing resection =====================
-// dims: in { ax: L, ay: L, azimuth_to_a_deg: dimensionless, bx: L, by: L, azimuth_to_b_deg: dimensionless, declination_deg: dimensionless } out: { east: L, north: L, distance_a_ft: L, distance_b_ft: L, intersection_angle_deg: dimensionless }
+// dims: in { ax: L, ay: L, azimuth_to_a_deg: dimensionless, bx: L, by: L, azimuth_to_b_deg: dimensionless, declination_deg: dimensionless } out: { east: L, north: L, distance_a_ft: L, distance_b_ft: L, intersection_angle_deg: dimensionless, back_azimuth_b_deg: dimensionless }
 export function computeThreePointResection({ ax = 0, ay = 0, azimuth_to_a_deg = 0, bx = 0, by = 0, azimuth_to_b_deg = 0, declination_deg = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!Number.isFinite(ax) || !Number.isFinite(ay) || !Number.isFinite(bx) || !Number.isFinite(by)) return { error: "Known-point coordinates must be finite numbers." };
@@ -1093,7 +1093,7 @@ SURVEY_RENDERERS["three-point-resection"] = _simpleRenderer({
 });
 
 // ===================== spec-v1395: slope stake catch point on a cross slope =====================
-// dims: in { half_width_ft: L, depth_ft: L, side_slope_ratio: dimensionless, ground_cross_slope: dimensionless, section: dimensionless } out: { catch_distance_ft: L, vertical_at_catch_ft: L, flat_ground_distance_ft: L }
+// dims: in { half_width_ft: L, depth_ft: L, side_slope_ratio: dimensionless, ground_cross_slope: dimensionless, section: dimensionless } out: { catch_distance_ft: L, vertical_at_catch_ft: L, flat_ground_distance_ft: L, difference_ft: L, run_ft: L }
 export function computeSlopeStaking({ half_width_ft = 0, depth_ft = 0, side_slope_ratio = 2, ground_cross_slope = 0, section = "cut" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (section !== "cut" && section !== "fill") return { error: "Section must be cut or fill." };
@@ -1209,7 +1209,7 @@ SURVEY_RENDERERS["grade-rod-cut-fill"] = _simpleRenderer({
 
 // ============ spec-v1741: drone flight GSD, overlap, and image count ============
 
-// dims: in { flight_height_ft: L, focal_length_mm: L, pixel_pitch_um: L, sensor_width_px: dimensionless, sensor_height_px: dimensionless, forward_overlap_pct: dimensionless, side_overlap_pct: dimensionless, area_acres: L^2 } out: { gsd_cm_px: L, footprint_width_ft: L, footprint_height_ft: L, line_spacing_ft: L, shot_interval_ft: L, image_count: dimensionless }
+// dims: in { flight_height_ft: L, focal_length_mm: L, pixel_pitch_um: L, sensor_width_px: dimensionless, sensor_height_px: dimensionless, forward_overlap_pct: dimensionless, side_overlap_pct: dimensionless, area_acres: L^2 } out: { gsd_cm_px: L, footprint_width_ft: L, footprint_height_ft: L, line_spacing_ft: L, shot_interval_ft: L, image_count: dimensionless, area_acres: L^2, effective_area_ft2: L^2, flight_height_ft: L, focal_length_mm: L, forward_overlap_pct: dimensionless, half_height_image_count: dimensionless, line_count: dimensionless, side_overlap_pct: dimensionless }
 export function computeDroneGsdOverlap({ flight_height_ft = 0, focal_length_mm = 0, pixel_pitch_um = 0, sensor_width_px = 0, sensor_height_px = 0, forward_overlap_pct = 75, side_overlap_pct = 65, area_acres = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(flight_height_ft > 0)) return { error: "Flight height above ground must be positive (ft)." };
@@ -1280,7 +1280,7 @@ SURVEY_RENDERERS["drone-gsd-overlap"] = _simpleRenderer({
 
 // ============ spec-v1742: LiDAR point density and flight line spacing ============
 
-// dims: in { pulse_rate_khz: T^-1, scan_angle_deg: dimensionless, flight_height_m: L, ground_speed_ms: L T^-1, side_overlap_pct: dimensionless, area_acres: L^2 } out: { swath_width_m: L, point_density_per_m2: dimensionless, line_spacing_m: L, half_speed_density: dimensionless, half_height_density: dimensionless, line_count: dimensionless }
+// dims: in { pulse_rate_khz: T^-1, scan_angle_deg: dimensionless, flight_height_m: L, ground_speed_ms: L T^-1, side_overlap_pct: dimensionless, area_acres: L^2 } out: { swath_width_m: L, point_density_per_m2: dimensionless, line_spacing_m: L, half_speed_density: dimensionless, half_height_density: dimensionless, line_count: dimensionless, area_acres: L^2, area_m2: L^2, scan_angle_deg: dimensionless, side_overlap_pct: dimensionless }
 export function computeLidarPointDensity({ pulse_rate_khz = 0, scan_angle_deg = 0, flight_height_m = 0, ground_speed_ms = 0, side_overlap_pct = 20, area_acres = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(pulse_rate_khz > 0)) return { error: "Pulse rate must be positive (kHz)." };
@@ -1343,7 +1343,7 @@ SURVEY_RENDERERS["lidar-point-density"] = _simpleRenderer({
 
 // ============ spec-v1743: RTK baseline error budget ============
 
-// dims: in { baseline_km: L, horizontal_fixed_mm: L, horizontal_ppm: dimensionless, vertical_fixed_mm: L, vertical_ppm: dimensionless, base_position_error_mm: L, occupations: dimensionless } out: { horizontal_error_mm: L, vertical_error_mm: L, vertical_ratio: dimensionless, total_horizontal_mm: L, total_vertical_mm: L, baseline_for_target_km: L }
+// dims: in { baseline_km: L, horizontal_fixed_mm: L, horizontal_ppm: dimensionless, vertical_fixed_mm: L, vertical_ppm: dimensionless, base_position_error_mm: L, occupations: dimensionless } out: { horizontal_error_mm: L, vertical_error_mm: L, vertical_ratio: dimensionless, total_horizontal_mm: L, total_vertical_mm: L, baseline_for_target_km: L, base_position_error_mm: L, baseline_mm: L, horizontal_fixed_mm: L, horizontal_ppm: dimensionless, target_vertical_mm: L, vertical_fixed_mm: L, vertical_ppm: dimensionless }
 export function computeRtkErrorBudget({ baseline_km = 0, horizontal_fixed_mm = 8, horizontal_ppm = 1, vertical_fixed_mm = 15, vertical_ppm = 1, base_position_error_mm = 0, target_vertical_mm = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(baseline_km > 0)) return { error: "The baseline from the base to the rover must be positive (km)." };
@@ -1426,7 +1426,7 @@ SURVEY_RENDERERS["rtk-error-budget"] = _simpleRenderer({
 
 // ============ spec-v1744: mass haul balance, free haul, and overhaul ============
 
-// dims: in { cut_volume_cy: L^3, shrinkage_factor: dimensionless, fill_required_cy: L^3, free_haul_ft: L, overhaul_volume_cy: L^3, average_overhaul_distance_ft: L, overhaul_rate_per_station_yard: dimensionless, borrow_haul_ft: L } out: { compacted_from_cut_cy: L^3, balance_cy: L^3, overhaul_station_yards: dimensionless, overhaul_cost: dimensionless, borrow_station_yards: dimensionless, free_haul_stations: dimensionless }
+// dims: in { cut_volume_cy: L^3, shrinkage_factor: dimensionless, fill_required_cy: L^3, free_haul_ft: L, overhaul_volume_cy: L^3, average_overhaul_distance_ft: L, overhaul_rate_per_station_yard: dimensionless, borrow_haul_ft: L } out: { compacted_from_cut_cy: L^3, balance_cy: L^3, overhaul_station_yards: dimensionless, overhaul_cost: dimensionless, borrow_station_yards: dimensionless, free_haul_stations: dimensionless, average_overhaul_distance_ft: L, beyond_free_haul_ft: L, borrow_haul_ft: L, borrow_needed_cy: L^3, cut_needed_for_fill_cy: L^3, cut_volume_cy: L^3, fill_required_cy: L^3, free_haul_ft: L, overhaul_volume_cy: L^3, waste_cy: L^3 }
 export function computeMassHaulOverhaul({ cut_volume_cy = 0, shrinkage_factor = 0.9, fill_required_cy = 0, free_haul_ft = 0, overhaul_volume_cy = 0, average_overhaul_distance_ft = 0, overhaul_rate_per_station_yard = 0, borrow_haul_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(cut_volume_cy > 0)) return { error: "Cut volume must be positive (cubic yards)." };

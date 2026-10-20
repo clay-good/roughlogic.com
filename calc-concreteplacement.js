@@ -98,7 +98,7 @@ const _MODULUS_OF_RUPTURE_COEFF = 7.5;
 
 // ============ spec-v1617: concrete pump line pressure ============
 
-// dims: in { horizontal_length_ft: L, vertical_lift_ft: L, unit_weight_pcf: M L^-3, friction_psi_per_100ft: M L^-1 T^-2, bend_count: dimensionless, bend_equivalent_ft: L, hose_length_ft: L, hose_friction_multiple: dimensionless, pump_rated_psi: M L^-1 T^-2 } out: { static_psi: M L^-1 T^-2, friction_psi: M L^-1 T^-2, equivalent_length_ft: L, total_psi: M L^-1 T^-2, margin_psi: M L^-1 T^-2, additional_line_ft: L }
+// dims: in { horizontal_length_ft: L, vertical_lift_ft: L, unit_weight_pcf: M L^-3, friction_psi_per_100ft: M L^-1 T^-2, bend_count: dimensionless, bend_equivalent_ft: L, hose_length_ft: L, hose_friction_multiple: dimensionless, pump_rated_psi: M L^-1 T^-2 } out: { static_psi: M L^-1 T^-2, friction_psi: M L^-1 T^-2, equivalent_length_ft: L, total_psi: M L^-1 T^-2, margin_psi: M L^-1 T^-2, additional_line_ft: L, bend_count: dimensionless, bend_equivalent_total_ft: L, bend_psi: M L^-1 T^-2, horizontal_length_ft: L, hose_equivalent_ft: L, hose_length_ft: L, hose_psi: M L^-1 T^-2, line_psi: M L^-1 T^-2, pump_rated_psi: M L^-1 T^-2, unit_weight_pcf: M L^-3, utilization_pct: dimensionless, vertical_lift_ft: L }
 export function computeConcretePumpLinePressure({ horizontal_length_ft = 0, vertical_lift_ft = 0, unit_weight_pcf = 150, friction_psi_per_100ft = 0, bend_count = 0, bend_equivalent_ft = 10, hose_length_ft = 0, hose_friction_multiple = 3, pump_rated_psi = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(horizontal_length_ft > 0)) return { error: "Horizontal line length must be positive (ft)." };
@@ -170,7 +170,7 @@ CONCRETEPLACEMENT_RENDERERS["concrete-pump-line-pressure"] = _simpleRenderer({
 
 // ============ spec-v1618: concrete boom pump reach ============
 
-// dims: in { boom_reach_ft: L, required_distance_ft: L, required_height_ft: L, boom_centre_offset_ft: L, outrigger_load_lb: M L T^-2, outrigger_pad_area_ft2: L^2, power_line_distance_ft: L, required_line_clearance_ft: L } out: { reach_at_height_ft: L, reach_margin_ft: L, max_height_at_distance_ft: L, setup_to_target_ft: L, outrigger_pressure_psf: M L^-1 T^-2, power_line_margin_ft: L }
+// dims: in { boom_reach_ft: L, required_distance_ft: L, required_height_ft: L, boom_centre_offset_ft: L, outrigger_load_lb: M L T^-2, outrigger_pad_area_ft2: L^2, power_line_distance_ft: L, required_line_clearance_ft: L } out: { reach_at_height_ft: L, reach_margin_ft: L, max_height_at_distance_ft: L, setup_to_target_ft: L, outrigger_pressure_psf: M L^-1 T^-2, power_line_margin_ft: L, boom_centre_offset_ft: L, boom_reach_ft: L, outrigger_pad_area_ft2: L^2, power_line_distance_ft: L, reach_lost_to_height_ft: L, required_distance_ft: L, required_height_ft: L, required_line_clearance_ft: L }
 export function computeBoomPumpReach({ boom_reach_ft = 0, required_distance_ft = 0, required_height_ft = 0, boom_centre_offset_ft = 0, outrigger_load_lb = 0, outrigger_pad_area_ft2 = 0, power_line_distance_ft = 0, required_line_clearance_ft = 20 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(boom_reach_ft > 0)) return { error: "Boom reach must be positive (ft)." };
@@ -243,7 +243,7 @@ CONCRETEPLACEMENT_RENDERERS["boom-pump-reach"] = _simpleRenderer({
 
 // ============ spec-v1619: post-tension tendon elongation ============
 
-// dims: in { strand_area_in2: L^2, modulus_psi: M L^-1 T^-2, tendon_length_ft: L, jacking_stress_ksi: M L^-1 T^-2, curvature_friction: dimensionless, angular_change_rad: dimensionless, wobble_per_ft: dimensionless, anchor_set_in: L, measured_elongation_in: L, tolerance_pct: dimensionless } out: { jacking_force_lb: M L T^-2, far_end_force_lb: M L T^-2, average_force_lb: M L T^-2, theoretical_elongation_in: L, expected_measured_in: L, elongation_difference_pct: dimensionless }
+// dims: in { strand_area_in2: L^2, modulus_psi: M L^-1 T^-2, tendon_length_ft: L, jacking_stress_ksi: M L^-1 T^-2, curvature_friction: dimensionless, angular_change_rad: dimensionless, wobble_per_ft: dimensionless, anchor_set_in: L, measured_elongation_in: L, tolerance_pct: dimensionless } out: { jacking_force_lb: M L T^-2, far_end_force_lb: M L T^-2, average_force_lb: M L T^-2, theoretical_elongation_in: L, expected_measured_in: L, elongation_difference_pct: dimensionless, anchor_set_in: L, elongation_difference_in: L, friction_overstatement_in: L, jacking_stress_ksi: M L^-1 T^-2, measured_elongation_in: L, modulus_psi: M L^-1 T^-2, no_friction_elongation_in: L, strand_area_in2: L^2, tendon_length_ft: L, tolerance_pct: dimensionless }
 export function computePostTensionElongation({ strand_area_in2 = 0, modulus_psi = 0, tendon_length_ft = 0, jacking_stress_ksi = 0, curvature_friction = 0.2, angular_change_rad = 0, wobble_per_ft = 0.0002, anchor_set_in = 0.25, measured_elongation_in = 0, tolerance_pct = 7 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(strand_area_in2 > 0)) return { error: "Strand area must be positive (sq in)." };
@@ -325,7 +325,7 @@ CONCRETEPLACEMENT_RENDERERS["post-tension-elongation"] = _simpleRenderer({
 
 // ============ spec-v1620: tilt-up panel lifting stress ============
 
-// dims: in { panel_width_ft: L, panel_height_ft: L, thickness_in: L, unit_weight_pcf: M L^-3, lift_day_strength_psi: M L^-1 T^-2, insert_rows: dimensionless, insert_columns: dimensionless, suction_fraction: dimensionless, safety_factor: dimensionless } out: { panel_weight_lb: M L T^-2, load_per_insert_lb: M L T^-2, span_between_rows_ft: L, bending_stress_psi: M L^-1 T^-2, modulus_of_rupture_psi: M L^-1 T^-2, allowable_stress_psi: M L^-1 T^-2, rows_required: dimensionless }
+// dims: in { panel_width_ft: L, panel_height_ft: L, thickness_in: L, unit_weight_pcf: M L^-3, lift_day_strength_psi: M L^-1 T^-2, insert_rows: dimensionless, insert_columns: dimensionless, suction_fraction: dimensionless, safety_factor: dimensionless } out: { panel_weight_lb: M L T^-2, load_per_insert_lb: M L T^-2, span_between_rows_ft: L, bending_stress_psi: M L^-1 T^-2, modulus_of_rupture_psi: M L^-1 T^-2, allowable_stress_psi: M L^-1 T^-2, rows_required: dimensionless, insert_count: dimensionless, lift_day_strength_psi: M L^-1 T^-2, panel_area_ft2: L^2, panel_height_ft: L, panel_width_ft: L, safety_factor: dimensionless, stress_margin_psi: M L^-1 T^-2, suction_fraction: dimensionless, thickness_in: L, unit_weight_pcf: M L^-3, utilization_pct: dimensionless }
 export function computeTiltUpLiftStress({ panel_width_ft = 0, panel_height_ft = 0, thickness_in = 0, unit_weight_pcf = 150, lift_day_strength_psi = 0, insert_rows = 2, insert_columns = 2, suction_fraction = 0, safety_factor = 1.5 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!Number.isInteger(Number(insert_rows)) || !Number.isInteger(Number(insert_columns))) return { error: "Insert rows and columns are whole numbers." };
@@ -411,7 +411,7 @@ CONCRETEPLACEMENT_RENDERERS["tilt-up-lift-stress"] = _simpleRenderer({
 
 // ============ spec-v1621: tilt-up temporary brace load ============
 
-// dims: in { panel_width_ft: L, panel_height_ft: L, wind_pressure_psf: M L^-1 T^-2, resultant_height_ft: L, brace_attachment_height_ft: L, brace_angle_deg: dimensionless, brace_count: dimensionless, brace_capacity_lb: M L T^-2, alternate_angle_deg: dimensionless, brace_safety_factor: dimensionless } out: { design_axial_per_brace_lb: M L T^-2, wind_force_lb: M L T^-2, lateral_per_brace_lb: M L T^-2, axial_per_brace_lb: M L T^-2, anchor_horizontal_lb: M L T^-2, braces_required: dimensionless, alternate_axial_lb: M L T^-2 }
+// dims: in { panel_width_ft: L, panel_height_ft: L, wind_pressure_psf: M L^-1 T^-2, resultant_height_ft: L, brace_attachment_height_ft: L, brace_angle_deg: dimensionless, brace_count: dimensionless, brace_capacity_lb: M L T^-2, alternate_angle_deg: dimensionless, brace_safety_factor: dimensionless } out: { design_axial_per_brace_lb: M L T^-2, wind_force_lb: M L T^-2, lateral_per_brace_lb: M L T^-2, axial_per_brace_lb: M L T^-2, anchor_horizontal_lb: M L T^-2, braces_required: dimensionless, alternate_axial_lb: M L T^-2, alternate_angle_deg: dimensionless, alternate_offset_ft: L, anchor_offset_ft: L, brace_angle_deg: dimensionless, brace_attachment_height_ft: L, brace_count: dimensionless, panel_area_ft2: L^2, panel_height_ft: L, panel_width_ft: L, resultant_height_ft: L, wind_pressure_psf: M L^-1 T^-2 }
 export function computeTiltUpBraceLoad({ panel_width_ft = 0, panel_height_ft = 0, wind_pressure_psf = 0, resultant_height_ft = 0, brace_attachment_height_ft = 0, brace_angle_deg = 55, brace_count = 2, brace_capacity_lb = 0, alternate_angle_deg = 45, brace_safety_factor = 1.5 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (Number(brace_attachment_height_ft) > Number(panel_height_ft)) return { error: "The brace attachment cannot be above the top of the panel." };

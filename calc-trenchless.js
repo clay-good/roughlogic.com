@@ -98,7 +98,7 @@ const _PSI_PER_FT_PER_PPG = 0.052;
 
 // ===================== spec-v1597: HDD minimum bend radius =====================
 
-// dims: in { pipe_diameter_in: L, radius_per_inch_ft: dimensionless, rod_min_radius_ft: L, entry_angle_deg: dimensionless, required_depth_ft: L, available_setback_ft: L } out: { pipe_min_radius_ft: L, governing_radius_ft: L, sag_run_ft: L, sag_depth_ft: L, extra_run_to_depth_ft: L }
+// dims: in { pipe_diameter_in: L, radius_per_inch_ft: dimensionless, rod_min_radius_ft: L, entry_angle_deg: dimensionless, required_depth_ft: L, available_setback_ft: L } out: { pipe_min_radius_ft: L, governing_radius_ft: L, sag_run_ft: L, sag_depth_ft: L, extra_run_to_depth_ft: L, depth_short_ft: L, run_to_depth_ft: L }
 export function computeHddBendRadius({ pipe_diameter_in = 0, radius_per_inch_ft = 100, rod_min_radius_ft = 0, entry_angle_deg = 12, required_depth_ft = 0, available_setback_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(pipe_diameter_in > 0)) return { error: "Product pipe diameter must be positive." };
@@ -158,7 +158,7 @@ TRENCHLESS_RENDERERS["hdd-bend-radius"] = _simpleRenderer({
 
 // ===================== spec-v1598: HDD drilling fluid volume =====================
 
-// dims: in { ream_diameter_in: L, pipe_diameter_in: L, bore_length_ft: L, fluid_multiplier: dimensionless, bentonite_lb_per_100gal: M L^-3, pump_rate_gpm: L^3 T^-1, returns_fraction_pct: dimensionless } out: { hole_volume_gal: L^3, annular_volume_gal: L^3, fluid_required_gal: L^3, bentonite_lb: M, pumping_time_min: T, spoil_gal: L^3 }
+// dims: in { ream_diameter_in: L, pipe_diameter_in: L, bore_length_ft: L, fluid_multiplier: dimensionless, bentonite_lb_per_100gal: M L^-3, pump_rate_gpm: L^3 T^-1, returns_fraction_pct: dimensionless } out: { hole_volume_gal: L^3, annular_volume_gal: L^3, fluid_required_gal: L^3, bentonite_lb: M, pumping_time_min: T, spoil_gal: L^3, annular_volume_bbl: L^3, lost_to_formation_gal: L^3, returns_gal: L^3, spoil_cy: L^3 }
 export function computeHddFluidVolume({ ream_diameter_in = 0, pipe_diameter_in = 0, bore_length_ft = 0, fluid_multiplier = 3, bentonite_lb_per_100gal = 40, pump_rate_gpm = 0, returns_fraction_pct = 70 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(ream_diameter_in > 0)) return { error: "Reamed hole diameter must be positive." };
@@ -220,7 +220,7 @@ TRENCHLESS_RENDERERS["hdd-fluid-volume"] = _simpleRenderer({
 
 // ===================== spec-v1599: HDD annular pressure and frac-out screen =====================
 
-// dims: in { cover_depth_ft: L, shallow_cover_ft: L, soil_unit_weight_pcf: M L^-3, soil_cohesion_psf: M L^-1 T^-2, fluid_density_ppg: M L^-3, annular_friction_psi: M L^-1 T^-2, required_fs: dimensionless } out: { overburden_psi: M L^-1 T^-2, hydrostatic_psi: M L^-1 T^-2, annular_pressure_psi: M L^-1 T^-2, limiting_psi: M L^-1 T^-2, factor_of_safety: dimensionless, max_fluid_density_ppg: M L^-3 }
+// dims: in { cover_depth_ft: L, shallow_cover_ft: L, soil_unit_weight_pcf: M L^-3, soil_cohesion_psf: M L^-1 T^-2, fluid_density_ppg: M L^-3, annular_friction_psi: M L^-1 T^-2, required_fs: dimensionless } out: { overburden_psi: M L^-1 T^-2, hydrostatic_psi: M L^-1 T^-2, annular_pressure_psi: M L^-1 T^-2, limiting_psi: M L^-1 T^-2, factor_of_safety: dimensionless, max_fluid_density_ppg: M L^-3, max_friction_psi: M L^-1 T^-2, shallow_annular_pressure_psi: M L^-1 T^-2, shallow_limiting_psi: M L^-1 T^-2, shallow_overburden_psi: M L^-1 T^-2 }
 export function computeHddAnnularPressure({ cover_depth_ft = 0, shallow_cover_ft = 0, soil_unit_weight_pcf = 0, soil_cohesion_psf = 0, fluid_density_ppg = 0, annular_friction_psi = 0, required_fs = 1.5 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(cover_depth_ft > 0)) return { error: "Cover depth must be positive." };
@@ -308,7 +308,7 @@ TRENCHLESS_RENDERERS["hdd-annular-pressure"] = _simpleRenderer({
 
 // ===================== spec-v1600: electromagnetic locate depth check =====================
 
-// dims: in { instrument_depth_in: L, half_signal_offset_in: L, left_null_in: L, right_null_in: L, current_near_ma: I, current_far_ma: I, sharp_drop_pct: dimensionless } out: { geometric_depth_in: L, depth_difference_in: L, depth_disagreement_pct: dimensionless, null_asymmetry_pct: dimensionless, current_drop_pct: dimensionless }
+// dims: in { instrument_depth_in: L, half_signal_offset_in: L, left_null_in: L, right_null_in: L, current_near_ma: I, current_far_ma: I, sharp_drop_pct: dimensionless } out: { geometric_depth_in: L, depth_difference_in: L, depth_disagreement_pct: dimensionless, null_asymmetry_pct: dimensionless, current_drop_pct: dimensionless, null_asymmetry_in: L }
 export function computeLocateDepthOffset({ instrument_depth_in = 0, half_signal_offset_in = 0, left_null_in = 0, right_null_in = 0, current_near_ma = 0, current_far_ma = 0, sharp_drop_pct = 25 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(instrument_depth_in > 0)) return { error: "Instrument depth reading must be positive." };
@@ -371,7 +371,7 @@ TRENCHLESS_RENDERERS["locate-depth-offset"] = _simpleRenderer({
 
 // ===================== spec-v1601: vacuum excavation spoil and tank fills =====================
 
-// dims: in { pit_length_ft: L, pit_width_ft: L, pit_depth_ft: L, pit_count: dimensionless, swell_pct: dimensionless, water_added_gal: L^3, tank_capacity_cy: L^3, haul_round_trip_min: T } out: { bank_cy_each: L^3, bank_cy_total: L^3, loose_cy_total: L^3, tank_fills: dimensionless, pits_per_fill: dimensionless, haul_time_min: T }
+// dims: in { pit_length_ft: L, pit_width_ft: L, pit_depth_ft: L, pit_count: dimensionless, swell_pct: dimensionless, water_added_gal: L^3, tank_capacity_cy: L^3, haul_round_trip_min: T } out: { bank_cy_each: L^3, bank_cy_total: L^3, loose_cy_total: L^3, tank_fills: dimensionless, pits_per_fill: dimensionless, haul_time_min: T, first_pit_tank_pct: dimensionless, swelled_cy: L^3, water_cy: L^3 }
 export function computeVacuumExcavationSpoil({ pit_length_ft = 0, pit_width_ft = 0, pit_depth_ft = 0, pit_count = 1, swell_pct = 30, water_added_gal = 0, tank_capacity_cy = 0, haul_round_trip_min = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(pit_length_ft > 0)) return { error: "Pit length must be positive." };
@@ -426,7 +426,7 @@ TRENCHLESS_RENDERERS["vacuum-excavation-spoil"] = _simpleRenderer({
 
 // ===================== spec-v1602: pipe bursting displacement and pull load =====================
 
-// dims: in { old_diameter_in: L, new_diameter_in: L, run_length_ft: L, cover_depth_ft: L, expansion_force_lb_per_sqin: M L^-1 T^-2, drag_lb_per_ft: M L^-1 T^-2, pipe_safe_pull_lb: M L T^-2, adjacent_utility_ft: L } out: { displaced_area_sqin: L^2, displaced_cy: L^3, upsize_ratio: dimensionless, pull_load_lb: M L T^-2, influence_radius_ft: L }
+// dims: in { old_diameter_in: L, new_diameter_in: L, run_length_ft: L, cover_depth_ft: L, expansion_force_lb_per_sqin: M L^-1 T^-2, drag_lb_per_ft: M L^-1 T^-2, pipe_safe_pull_lb: M L T^-2, adjacent_utility_ft: L } out: { displaced_area_sqin: L^2, displaced_cy: L^3, upsize_ratio: dimensionless, pull_load_lb: M L T^-2, influence_radius_ft: L, displaced_area_sqft: L^2 }
 export function computePipeBurstingPullLoad({ old_diameter_in = 0, new_diameter_in = 0, run_length_ft = 0, cover_depth_ft = 0, expansion_force_lb_per_sqin = 400, drag_lb_per_ft = 15, pipe_safe_pull_lb = 0, adjacent_utility_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(old_diameter_in > 0)) return { error: "Existing pipe diameter must be positive." };
@@ -496,7 +496,7 @@ TRENCHLESS_RENDERERS["pipe-bursting-pull-load"] = _simpleRenderer({
 
 // ===================== spec-v1603: CIPP liner thickness (ASTM F1216) =====================
 
-// dims: in { host_id_in: L, ovality_pct: dimensionless, groundwater_head_ft: L, long_term_modulus_psi: M L^-1 T^-2, short_term_modulus_psi: M L^-1 T^-2, enhancement_factor: dimensionless, safety_factor: dimensionless, alternative_ovality_pct: dimensionless } out: { external_pressure_psi: M L^-1 T^-2, ovality_factor: dimensionless, dimension_ratio: dimensionless, thickness_in: L, short_term_thickness_in: L, alternative_thickness_in: L }
+// dims: in { host_id_in: L, ovality_pct: dimensionless, groundwater_head_ft: L, long_term_modulus_psi: M L^-1 T^-2, short_term_modulus_psi: M L^-1 T^-2, enhancement_factor: dimensionless, safety_factor: dimensionless, alternative_ovality_pct: dimensionless } out: { external_pressure_psi: M L^-1 T^-2, ovality_factor: dimensionless, dimension_ratio: dimensionless, thickness_in: L, short_term_thickness_in: L, alternative_thickness_in: L, creep_penalty_pct: dimensionless, ovality_penalty_pct: dimensionless, round_thickness_in: L }
 export function computeCippLinerThickness({ host_id_in = 0, ovality_pct = 0, groundwater_head_ft = 0, long_term_modulus_psi = 0, short_term_modulus_psi = 0, enhancement_factor = 7, safety_factor = 2, alternative_ovality_pct = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(host_id_in > 0)) return { error: "Host pipe inside diameter must be positive." };
@@ -568,7 +568,7 @@ TRENCHLESS_RENDERERS["cipp-liner-thickness"] = _simpleRenderer({
 //                flexural strength, solved for DR (needs ovality and groundwater)
 // Checked against the Iowa SUDAS Design Manual 14C-2 fully deteriorated example (12 in VCP, 5 ft of
 // cover, 2 ft of water, HS-20, 5% ovality): 0.199 in from X1.3 against 0.186 in for stiffness.
-// dims: in { host_id_in: L, ovality_pct: dimensionless, soil_cover_ft: L, groundwater_head_ft: L, soil_unit_weight_pcf: M L^-3, live_load_psi: M L^-1 T^-2, soil_modulus_psi: M L^-1 T^-2, long_term_modulus_psi: M L^-1 T^-2, initial_modulus_psi: M L^-1 T^-2, long_term_flexural_strength_psi: M L^-1 T^-2, enhancement_factor: dimensionless, safety_factor: dimensionless } out: { total_load_psi: M L^-1 T^-2, thickness_in: L, load_thickness_in: L, stiffness_thickness_in: L, buckling_thickness_in: L, bending_thickness_in: L, dimension_ratio: dimensionless, bending_stress_psi: M L^-1 T^-2 }
+// dims: in { host_id_in: L, ovality_pct: dimensionless, soil_cover_ft: L, groundwater_head_ft: L, soil_unit_weight_pcf: M L^-3, live_load_psi: M L^-1 T^-2, soil_modulus_psi: M L^-1 T^-2, long_term_modulus_psi: M L^-1 T^-2, initial_modulus_psi: M L^-1 T^-2, long_term_flexural_strength_psi: M L^-1 T^-2, enhancement_factor: dimensionless, safety_factor: dimensionless } out: { total_load_psi: M L^-1 T^-2, thickness_in: L, load_thickness_in: L, stiffness_thickness_in: L, buckling_thickness_in: L, bending_thickness_in: L, dimension_ratio: dimensionless, bending_stress_psi: M L^-1 T^-2, soil_psi: M L^-1 T^-2, water_psi: M L^-1 T^-2 }
 export function computeCippFullyDeteriorated({ host_id_in = 0, ovality_pct = 0, soil_cover_ft = 0, groundwater_head_ft = 0, soil_unit_weight_pcf = 120, live_load_psi = 0, soil_modulus_psi = 0, long_term_modulus_psi = 0, initial_modulus_psi = 0, long_term_flexural_strength_psi = 0, enhancement_factor = 7, safety_factor = 2 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const D = host_id_in, q = ovality_pct, Hs = soil_cover_ft, Hw = groundwater_head_ft;

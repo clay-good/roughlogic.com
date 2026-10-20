@@ -491,7 +491,7 @@ export const approachDeltaTExample = {
 // mixed_T = OA_fraction * OA_T + (1 - OA_fraction) * RA_T
 // mixed_W = mass-mixing of humidity ratios from psychrometric helpers.
 
-// dims: in { return_T_F: T, return_RH_percent: dimensionless, outdoor_T_F: T, outdoor_RH_percent: dimensionless, oa_fraction: dimensionless } out: { mixed_T_F: T }
+// dims: in { return_T_F: T, return_RH_percent: dimensionless, outdoor_T_F: T, outdoor_RH_percent: dimensionless, oa_fraction: dimensionless } out: { mixed_T_F: T, oa_fraction: dimensionless }
 export function computeOutdoorAirMix({ return_T_F, return_RH_percent, outdoor_T_F, outdoor_RH_percent, oa_fraction }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (![return_T_F, return_RH_percent, outdoor_T_F, outdoor_RH_percent, oa_fraction].every((x) => x !== null && x !== undefined && x !== "" && Number.isFinite(Number(x)))) return { error: "Enter both air states (F and % RH) and the outdoor-air fraction." };
@@ -563,7 +563,7 @@ export const equivalentLengthExample = {
 // where A is the psychrometric constant ~ 0.000662 1/C at sea-level
 // pressure (1013.25 hPa). RH = e / e_s(Td).
 
-// dims: in { dry_bulb_F: T, wet_bulb_F: T, P_hPa: M L^-1 T^-2 } out: { RH_percent: dimensionless, dew_point_F: T }
+// dims: in { dry_bulb_F: T, wet_bulb_F: T, P_hPa: M L^-1 T^-2 } out: { RH_percent: dimensionless, dew_point_F: T, GPP: dimensionless }
 export function computeWetBulbPsychrometer({ dry_bulb_F, wet_bulb_F, P_hPa = 1013.25 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if ([dry_bulb_F, wet_bulb_F].some((x) => x === null || x === undefined || x === "" || !Number.isFinite(Number(x)))) return { error: "Enter the dry-bulb and wet-bulb temperatures (F)." };
@@ -1514,7 +1514,7 @@ export const affinityLawsExample = {
 // driven_RPM = motor_RPM * (D_drive / D_driven)
 // belt_speed_fpm = pi * D_drive_in / 12 * motor_RPM
 
-// dims: in { drive_dia_in: L, driven_dia_in: L, center_distance_in: L, motor_rpm: T^-1 } out: { driven_rpm: T^-1, belt_length_in: L }
+// dims: in { drive_dia_in: L, driven_dia_in: L, center_distance_in: L, motor_rpm: T^-1 } out: { driven_rpm: T^-1, belt_length_in: L, belt_speed_fpm: L T^-1 }
 export function computeBeltAndPulley({ drive_dia_in = 0, driven_dia_in = 0, center_distance_in = 0, motor_rpm = 0 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (Number(center_distance_in) > 0 && Number(center_distance_in) < (Number(drive_dia_in) + Number(driven_dia_in)) / 2) return { error: "The sheaves overlap at this center distance; it must be at least half the sum of the two diameters." };
@@ -1538,7 +1538,7 @@ export const beltAndPulleyExample = {
 // V_gal = (t_min * (C_demand_scfm - C_pump_scfm) * P_atm_psi) / (P1 - P2)
 // converted to gallons via 7.4805 gal per ft^3.
 
-// dims: in { tools: dimensionless, pump_scfm: L^3 T^-1, p_high_psi: M L^-1 T^-2, p_low_psi: M L^-1 T^-2, drawdown_minutes: T, p_atm_psi: M L^-1 T^-2 } out: { receiver_gal: L^3 }
+// dims: in { tools: dimensionless, pump_scfm: L^3 T^-1, p_high_psi: M L^-1 T^-2, p_low_psi: M L^-1 T^-2, drawdown_minutes: T, p_atm_psi: M L^-1 T^-2 } out: { receiver_gal: L^3, receiver_ft3: L^3 }
 export function computeAirReceiver({
   tools = [], pump_scfm = 0, p_high_psi = 0, p_low_psi = 0,
   drawdown_minutes = 1, p_atm_psi = 14.7,
@@ -1747,7 +1747,7 @@ function vaporPressureFt(F) {
   return psi * 2.31;
 }
 
-// dims: in { elevation_ft: L, water_temp_F: T, source_elevation_relative_ft: L, npsh_required_ft: L, target_margin_ft: L } out: { H_atm_ft: L, H_vapor_ft: L, H_static_ft: L, H_friction_ft: L, NPSHa_ft: L, npsh_margin_ft: L, max_friction_ft: L, static_for_target_margin_ft: L }
+// dims: in { elevation_ft: L, water_temp_F: T, source_elevation_relative_ft: L, npsh_required_ft: L, target_margin_ft: L } out: { H_atm_ft: L, H_vapor_ft: L, H_static_ft: L, H_friction_ft: L, NPSHa_ft: L, npsh_margin_ft: L, max_friction_ft: L, static_for_target_margin_ft: L, target_margin_ft: L }
 export function computeNPSHa({
   elevation_ft = 0, water_temp_F = 60,
   source_elevation_relative_ft = 0, // positive if source above pump
@@ -3301,7 +3301,7 @@ HVAC_RENDERERS["insulation-thickness-for-heat-loss"] = renderInsulationThickness
 // AHP = CFM * TSP / 6356; BHP = AHP / eta_fan; motor HP = BHP / eta_drive,
 // rounded up to the next standard NEMA size.
 const NEMA_HP_SIZES = [0.25, 0.33, 0.5, 0.75, 1, 1.5, 2, 3, 5, 7.5, 10, 15, 20, 25, 30, 40, 50, 60, 75, 100, 125, 150, 200, 250, 300];
-// dims: in { cfm: L^3*T^-1, tsp_inwc: M*L^-1*T^-2, eta_fan: dimensionless, eta_drive: dimensionless } out: { ahp: dimensionless, bhp: M L^2 T^-3 }
+// dims: in { cfm: L^3*T^-1, tsp_inwc: M*L^-1*T^-2, eta_fan: dimensionless, eta_drive: dimensionless } out: { ahp: dimensionless, bhp: M L^2 T^-3, next_nema_hp: M L^2 T^-3 }
 export function computeFanMotorBhp({ cfm = 0, tsp_inwc = 0, eta_fan = 0.65, eta_drive = 1 } = {}) {
   const CFM = Number(cfm) || 0;
   const TSP = Number(tsp_inwc) || 0;
@@ -3410,7 +3410,7 @@ import {
 
 function _v27Deq(a, b) { return 1.30 * Math.pow(a * b, 0.625) / Math.pow(a + b, 0.250); }
 
-// dims: in { round_diameter_in: L, side_a_in: L, side_b_in: L, known_side_in: L } out: { equivalent_diameter_in: L, other_side_in: L, aspect_ratio: dimensionless }
+// dims: in { round_diameter_in: L, side_a_in: L, side_b_in: L, known_side_in: L } out: { equivalent_diameter_in: L, other_side_in: L, aspect_ratio: dimensionless, side_a_in: L, side_b_in: L }
 export function computeRoundToRectDuct({ mode = "rect-to-round", round_diameter_in = 0, side_a_in = 0, side_b_in = 0, known_side_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
 
@@ -3486,7 +3486,7 @@ HVAC_RENDERERS["round-to-rect-duct"] = _v27renderRoundToRectDuct;
 // spec-v1254: flat-oval duct equivalent round diameter. The round-to-rect tile covers rectangular;
 // this is the flat-oval companion for tight plenum/ceiling runs. ASHRAE equal-friction:
 // A = (pi/4) b^2 + b (a - b); P = pi b + 2 (a - b); De = 1.55 A^0.625 / P^0.25 (a = major, b = minor).
-// dims: in { major_axis_in: L, minor_axis_in: L } out: { equivalent_diameter_in: L, area_in2: L^2, perimeter_in: L }
+// dims: in { major_axis_in: L, minor_axis_in: L } out: { equivalent_diameter_in: L, area_in2: L^2, perimeter_in: L, aspect_ratio: dimensionless }
 export function computeFlatOvalDuct({ major_axis_in = 0, minor_axis_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const a = Number(major_axis_in), b = Number(minor_axis_in);
@@ -3618,7 +3618,7 @@ function _rEnv(spec) {
   return _rlRender;
 }
 
-// dims: in { cavity_r: dimensionless, continuous_r: dimensionless, stud_depth_in: L, framing_factor: dimensionless, air_films_r: dimensionless, finish_layers_r: dimensionless } out: { r_assembly: dimensionless, r_center: dimensionless }
+// dims: in { cavity_r: dimensionless, continuous_r: dimensionless, stud_depth_in: L, framing_factor: dimensionless, air_films_r: dimensionless, finish_layers_r: dimensionless } out: { r_assembly: dimensionless, r_center: dimensionless, area_weighted_overstatement_pct: dimensionless, bridging_pct: dimensionless }
 // (R-value carries hr-sq-ft-degF/Btu; treated dimensionless per spec-v14 for the U=1/R reciprocal and area-weighting core.)
 export function computeAssemblyRValue({ cavity_r = 0, continuous_r = 0, stud_depth_in = 0, framing_factor = 0.25, air_films_r = 0.85, finish_layers_r = 1.05, alt_framing_factor = 0, alt_continuous_r = 0 } = {}) {
   const _g = _finiteGuardEnv(arguments[0]); if (_g) return _g;
@@ -4792,7 +4792,7 @@ const AIR_GAS_CONSTANT_FT_LBF_PER_LB_R = 53.35;
 const AIR_VISCOSITY_LB_FT_S = 1.81e-5 * 0.67197; // 1.81e-5 Pa-s at 68 F -> lb/(ft-s)
 const STD_PRESSURE_PSIA = 14.7;
 const STD_TEMP_RANKINE = 527.67; // 68 F
-// dims: in { scfm: L^3 T^-1, pipe_id_in: L, length_ft: L, line_pressure_psig: M L^-1 T^-2, air_temp_f: T, roughness_ft: L } out: { velocity_fps: L T^-1, reynolds: dimensionless, pressure_drop_psi: M L^-1 T^-2, density_lb_ft3: M L^-3 }
+// dims: in { scfm: L^3 T^-1, pipe_id_in: L, length_ft: L, line_pressure_psig: M L^-1 T^-2, air_temp_f: T, roughness_ft: L } out: { velocity_fps: L T^-1, reynolds: dimensionless, pressure_drop_psi: M L^-1 T^-2, density_lb_ft3: M L^-3, actual_cfm: L^3 T^-1, friction_factor: dimensionless, p_abs_psia: M L^-1 T^-2 }
 export function computeCompressedAirPressureDrop({ scfm = 0, pipe_id_in = 0, length_ft = 0, line_pressure_psig = 100, air_temp_f = 68, roughness_ft = 0.00015 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (air_temp_f === null || air_temp_f === "") return { error: "Enter the air temperature (F)." };
@@ -4868,7 +4868,7 @@ HVAC_RENDERERS["compressed-air-pressure-drop"] = renderCompressedAirPressureDrop
 // ratio, and on a belt drive fan rpm = motor rpm x (drive sheave / driven sheave), so with the
 // driven (fan) sheave fixed the required DRIVE sheave scales with the same ratio. The point of the
 // tile is the cube law landing on the motor: +20% air is +73% brake horsepower.
-// dims: in { current_cfm: L^3 T^-1, target_cfm: L^3 T^-1, current_fan_rpm: T^-1, motor_rpm: T^-1, drive_sheave_in: L, current_bhp: M L^2 T^-3, motor_hp: M L^2 T^-3, current_sp_inwg: M L^-1 T^-2 } out: { ratio: dimensionless, required_fan_rpm: T^-1, new_drive_sheave_in: L, new_bhp: M L^2 T^-3 }
+// dims: in { current_cfm: L^3 T^-1, target_cfm: L^3 T^-1, current_fan_rpm: T^-1, motor_rpm: T^-1, drive_sheave_in: L, current_bhp: M L^2 T^-3, motor_hp: M L^2 T^-3, current_sp_inwg: M L^-1 T^-2 } out: { ratio: dimensionless, required_fan_rpm: T^-1, new_drive_sheave_in: L, new_bhp: M L^2 T^-3, bhp_increase_pct: dimensionless, check_fan_rpm: T^-1, driven_sheave_in: L }
 export function computeFanSheaveForTargetCfm({ current_cfm = 0, target_cfm = 0, current_fan_rpm = 0, motor_rpm = 1750, drive_sheave_in = 0, current_bhp = 0, motor_hp = 0, current_sp_inwg = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const q1 = Number(current_cfm) || 0;
@@ -4950,7 +4950,7 @@ HVAC_RENDERERS["fan-sheave-for-target-cfm"] = renderFanSheaveForTargetCfm;
 //   annual capital $ = price_per_in_sf x t x CRF,  CRF = i/(1-(1+i)^-n)
 //   d/dt = 0  ->  t_opt = k ( sqrt( C / (k x price x CRF) ) - R0 ),  C = dT x hours x $ / (1e6 eff)
 // The closed form was checked against a brute-force scan and agrees to four decimals.
-// dims: in { delta_t_f: T, bare_r_value: dimensionless, k_btu_in: dimensionless, operating_hours: T, energy_cost_per_mmbtu: dimensionless, system_efficiency: dimensionless, installed_cost_per_in_sf: dimensionless, life_years: T, discount_rate: dimensionless } out: { optimum_thickness_in: L, total_annual_cost: dimensionless, annual_savings: dimensionless, simple_payback_years: T }
+// dims: in { delta_t_f: T, bare_r_value: dimensionless, k_btu_in: dimensionless, operating_hours: T, energy_cost_per_mmbtu: dimensionless, system_efficiency: dimensionless, installed_cost_per_in_sf: dimensionless, life_years: T, discount_rate: dimensionless } out: { optimum_thickness_in: L, total_annual_cost: dimensionless, annual_savings: dimensionless, simple_payback_years: T, heat_loss_reduction_pct: dimensionless }
 export function computeEconomicInsulationThickness({ delta_t_f = 0, bare_r_value = 0.5, k_btu_in = 0.27, operating_hours = 8000, energy_cost_per_mmbtu = 12, system_efficiency = 0.8, installed_cost_per_in_sf = 3, life_years = 10, discount_rate = 0.08 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const dT = Number(delta_t_f) || 0;

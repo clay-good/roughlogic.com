@@ -1704,7 +1704,7 @@ export function renderPeriodicElement(inputRegion, outputRegion, citationEl) {
 
 // --- spec-v17 Y.2 Linear regression (least squares) ------------------
 
-// dims: in { x_values: dimensionless, y_values: dimensionless, predict_x: dimensionless, alpha: dimensionless } out: { slope: dimensionless, intercept: dimensionless, r2: dimensionless, rse: dimensionless }
+// dims: in { x_values: dimensionless, y_values: dimensionless, predict_x: dimensionless, alpha: dimensionless } out: { slope: dimensionless, intercept: dimensionless, r2: dimensionless, rse: dimensionless, alpha: dimensionless, df: dimensionless, p_value: dimensionless }
 export function computeLinearRegression({ x_values, y_values, predict_x = null, alpha = 0.05 }) {
   if (_hasBadToken(x_values) || _hasBadToken(y_values)) return { error: _BAD_TOKEN_ERROR };
   const xs = Array.isArray(x_values) ? x_values.filter(Number.isFinite) : parseNumberList(x_values);
@@ -1841,7 +1841,7 @@ function _pearsonStrength(absr) {
   return "near-perfect";
 }
 
-// dims: in { x_values: dimensionless, y_values: dimensionless, alpha: dimensionless } out: { r: dimensionless, r2: dimensionless, t: dimensionless, p_value: dimensionless }
+// dims: in { x_values: dimensionless, y_values: dimensionless, alpha: dimensionless } out: { r: dimensionless, r2: dimensionless, t: dimensionless, p_value: dimensionless, alpha: dimensionless, df: dimensionless }
 export function computePearson({ x_values, y_values, alpha = 0.05 }) {
   if (_hasBadToken(x_values) || _hasBadToken(y_values)) return { error: _BAD_TOKEN_ERROR };
   const xs = Array.isArray(x_values) ? x_values.filter(Number.isFinite) : parseNumberList(x_values);
@@ -1943,7 +1943,7 @@ export function renderPearson(inputRegion, outputRegion, citationEl) {
 
 // --- spec-v17 Y.3 Chi-square goodness-of-fit -------------------------
 
-// dims: in { observed: dimensionless, expected_type: dimensionless, alpha: dimensionless } out: { chi_square: dimensionless, df: dimensionless, p_value: dimensionless }
+// dims: in { observed: dimensionless, expected_type: dimensionless, alpha: dimensionless } out: { chi_square: dimensionless, df: dimensionless, p_value: dimensionless, alpha: dimensionless }
 export function computeChiSquareGof({ observed, expected, expected_type = "counts", alpha = 0.05 }) {
   if (_hasBadToken(observed) || _hasBadToken(expected)) return { error: _BAD_TOKEN_ERROR };
   if (expected_type !== "counts" && expected_type !== "proportions") return { error: "Expected values are counts or proportions." };
@@ -2048,7 +2048,7 @@ export function renderChiSquareGof(inputRegion, outputRegion, citationEl) {
   for (const s of [T.select, A.select]) s.addEventListener("change", update);
 }
 
-// dims: in { proportion: dimensionless, target_moe: dimensionless, confidence: dimensionless } out: { required_n: dimensionless, exact_n: dimensionless, z: dimensionless }
+// dims: in { proportion: dimensionless, target_moe: dimensionless, confidence: dimensionless } out: { required_n: dimensionless, exact_n: dimensionless, z: dimensionless, confidence_pct: dimensionless }
 // Inverse of the proportion Wald CI: given a target margin of error E, a
 // planning proportion p, and a confidence level, solve MOE = z*sqrt(p(1-p)/n)
 // for the sample size. n = z^2 * p(1-p) / E^2, rounded UP so the achieved
@@ -2156,7 +2156,7 @@ export const EDU_RENDERERS = {
 // (a = (100 - target)/(100 - mean); b = 100*(1 - a); new = raw*a + b).
 // Every method clamps the result to [0, 100].
 //
-// dims: in { method: dimensionless, raw_score: dimensionless, param: dimensionless, class_mean: dimensionless } out: { curved: dimensionless, slope: dimensionless, intercept: dimensionless }
+// dims: in { method: dimensionless, raw_score: dimensionless, param: dimensionless, class_mean: dimensionless } out: { curved: dimensionless, slope: dimensionless, intercept: dimensionless, raw: dimensionless }
 export function computeCurveGradeScaler({ method = "flat", raw_score = 0, param = 0, class_mean = 0 } = {}) {
   const raw = Number(raw_score);
   if (!Number.isFinite(raw) || raw < 0) return { error: "Raw score must be a non-negative number." };

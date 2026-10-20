@@ -92,7 +92,7 @@ export const CIVIL_RENDERERS = {};
 // curve. With deflection angle delta: T = R*tan(d/2), L = R*delta_rad,
 // E = R*(sec(d/2)-1), M = R*(1-cos(d/2)), LC = 2R*sin(d/2). Optional PI station
 // places PC = PI - T and PT = PC + L.
-// dims: in { radius_ft: L, degree_of_curve: dimensionless, delta_deg: dimensionless, pi_station_ft: L } out: { tangent_ft: L, curve_length_ft: L, external_ft: L, middle_ordinate_ft: L, long_chord_ft: L, degree_of_curve: dimensionless, pc_station_ft: L, pt_station_ft: L }
+// dims: in { radius_ft: L, degree_of_curve: dimensionless, delta_deg: dimensionless, pi_station_ft: L } out: { tangent_ft: L, curve_length_ft: L, external_ft: L, middle_ordinate_ft: L, long_chord_ft: L, degree_of_curve: dimensionless, pc_station_ft: L, pt_station_ft: L, radius_ft: L }
 export function computeHorizontalCurve({ mode, radius_ft, degree_of_curve, delta_deg, pi_station_ft } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (mode !== undefined && mode !== null && mode !== "" && !["radius", "degree"].includes(mode)) return { error: "Unknown mode; use radius or degree." };
@@ -841,7 +841,7 @@ CIVIL_RENDERERS["vertical-curve-sight-distance"] = renderVerticalCurveSightDista
 // AASHTO Green Book sag headlight criterion: L = A S^2/(400 + 3.5 S) for S <= L,
 // L = 2 S - (400 + 3.5 S)/A for S > L. The 400/3.5 embed the 2.0 ft headlight
 // height and 1-degree beam divergence (400 = 200*2.0, 3.5 ~ 200*tan 1deg). K = L/A.
-// dims: in { A_pct: dimensionless, S_ft: L } out: { L_ft: L, K_ft_per_pct: L }
+// dims: in { A_pct: dimensionless, S_ft: L } out: { L_ft: L, K_ft_per_pct: L, denom: dimensionless }
 export function computeSagVerticalCurve({ A_pct, S_ft } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const A = Number(A_pct) || 0;
@@ -1011,7 +1011,7 @@ CIVIL_RENDERERS["horizontal-sightline-offset"] = renderHorizontalSightlineOffset
 
 // ============ spec-v1610: skip line cycle layout ============
 
-// dims: in { stripe_length_ft: L, gap_length_ft: L, run_length_ft: L, start_offset_ft: L, counted_stripes: dimensionless, counted_length_ft: L } out: { cycle_length_ft: L, stripes_in_run: dimensionless, stripes_per_mile: dimensionless, painted_length_ft: L, painted_fraction_pct: dimensionless, implied_cycle_ft: L }
+// dims: in { stripe_length_ft: L, gap_length_ft: L, run_length_ft: L, start_offset_ft: L, counted_stripes: dimensionless, counted_length_ft: L } out: { cycle_length_ft: L, stripes_in_run: dimensionless, stripes_per_mile: dimensionless, painted_length_ft: L, painted_fraction_pct: dimensionless, implied_cycle_ft: L, counted_length_ft: L, first_stripe_start_ft: L, gap_length_ft: L, implied_cycle_to_end_ft: L, last_stripe_end_ft: L, last_stripe_start_ft: L, run_length_ft: L, start_offset_ft: L, stripe_length_ft: L, tail_ft: L }
 export function computeSkipLineLayout({ stripe_length_ft = 0, gap_length_ft = 0, run_length_ft = 0, start_offset_ft = 0, counted_stripes = 0, counted_length_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(stripe_length_ft > 0)) return { error: "Stripe length must be positive (ft)." };
@@ -1085,7 +1085,7 @@ CIVIL_RENDERERS["skip-line-layout"] = _simpleRenderer({
 
 // ============ spec-v1611: speed hump and speed table geometry ============
 
-// dims: in { height_in: L, total_length_ft: L, flat_top_length_ft: L, crossing_speed_mph: L T^-1, comfort_limit_g: dimensionless, wheelbase_in: L, ground_clearance_in: L, target_ramp_slope_pct: dimensionless } out: { ramp_length_ft: L, ramp_slope_pct: dimensionless, vertical_accel_g: dimensionless, comfort_speed_mph: L T^-1, clearance_required_in: L, ramp_length_for_target_ft: L }
+// dims: in { height_in: L, total_length_ft: L, flat_top_length_ft: L, crossing_speed_mph: L T^-1, comfort_limit_g: dimensionless, wheelbase_in: L, ground_clearance_in: L, target_ramp_slope_pct: dimensionless } out: { ramp_length_ft: L, ramp_slope_pct: dimensionless, vertical_accel_g: dimensionless, comfort_speed_mph: L T^-1, clearance_required_in: L, ramp_length_for_target_ft: L, clearance_margin_in: L, crossing_speed_mph: L T^-1, flat_top_length_ft: L, ground_clearance_in: L, height_in: L, target_ramp_slope_pct: dimensionless, total_length_ft: L, wheel_height_in: L, wheelbase_in: L }
 export function computeSpeedHumpGeometry({ height_in = 0, total_length_ft = 0, flat_top_length_ft = 0, crossing_speed_mph = 25, comfort_limit_g = 0.25, wheelbase_in = 120, ground_clearance_in = 5, target_ramp_slope_pct = 5 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(height_in > 0)) return { error: "Device height must be positive (in)." };
@@ -1187,7 +1187,7 @@ CIVIL_RENDERERS["speed-hump-geometry"] = _simpleRenderer({
 
 // ============ spec-v1612: intersection sight triangle ============
 
-// dims: in { major_speed_mph: L T^-1, time_gap_s: T, extra_lanes: dimensionless, added_gap_per_lane_s: T, setback_ft: L, available_left_ft: L, available_right_ft: L } out: { total_time_gap_s: T, required_distance_ft: L, triangle_area_ft2: L^2, shortfall_left_ft: L, shortfall_right_ft: L, adequate_speed_mph: L T^-1 }
+// dims: in { major_speed_mph: L T^-1, time_gap_s: T, extra_lanes: dimensionless, added_gap_per_lane_s: T, setback_ft: L, available_left_ft: L, available_right_ft: L } out: { total_time_gap_s: T, required_distance_ft: L, triangle_area_ft2: L^2, shortfall_left_ft: L, shortfall_right_ft: L, adequate_speed_mph: L T^-1, available_left_ft: L, available_right_ft: L, major_speed_mph: L T^-1, setback_ft: L, worst_available_ft: L }
 export function computeIntersectionSightTriangle({ major_speed_mph = 0, time_gap_s = 0, extra_lanes = 0, added_gap_per_lane_s = 0.5, setback_ft = 15, available_left_ft = 0, available_right_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(major_speed_mph > 0)) return { error: "Major road design speed must be positive (mph)." };
@@ -1252,7 +1252,7 @@ CIVIL_RENDERERS["intersection-sight-triangle"] = _simpleRenderer({
 
 // ============ spec-v1613: flexible pavement structural number ============
 
-// dims: in { ac_thickness_in: L, ac_coefficient: dimensionless, base_thickness_in: L, base_coefficient: dimensionless, base_drainage: dimensionless, subbase_thickness_in: L, subbase_coefficient: dimensionless, subbase_drainage: dimensionless, required_sn: dimensionless } out: { sn_surface: dimensionless, sn_base: dimensionless, sn_subbase: dimensionless, sn_total: dimensionless, sn_margin: dimensionless, base_per_inch_of_ac_in: L }
+// dims: in { ac_thickness_in: L, ac_coefficient: dimensionless, base_thickness_in: L, base_coefficient: dimensionless, base_drainage: dimensionless, subbase_thickness_in: L, subbase_coefficient: dimensionless, subbase_drainage: dimensionless, required_sn: dimensionless } out: { sn_surface: dimensionless, sn_base: dimensionless, sn_subbase: dimensionless, sn_total: dimensionless, sn_margin: dimensionless, base_per_inch_of_ac_in: L, ac_thickness_in: L, added_ac_needed_in: L, added_base_needed_in: L, base_thickness_in: L, subbase_thickness_in: L }
 export function computePavementStructuralNumber({ ac_thickness_in = 0, ac_coefficient = 0.44, base_thickness_in = 0, base_coefficient = 0.14, base_drainage = 1.0, subbase_thickness_in = 0, subbase_coefficient = 0.11, subbase_drainage = 1.0, required_sn = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(ac_thickness_in > 0)) return { error: "Asphalt thickness must be positive (in)." };
@@ -1324,7 +1324,7 @@ CIVIL_RENDERERS["pavement-structural-number"] = _simpleRenderer({
 
 // ============ spec-v1614: subgrade CBR to aggregate cover thickness ============
 
-// dims: in { cbr_pct: dimensionless, wheel_load_lb: M L T^-2, tire_pressure_psi: M L^-1 T^-2, coverages: dimensionless, geosynthetic_reduction_pct: dimensionless, alternate_cbr_pct: dimensionless } out: { thickness_in: L, thickness_with_geosynthetic_in: L, resilient_modulus_psi: M L^-1 T^-2, alternate_thickness_in: L, sensitivity_ratio: dimensionless, alpha_factor: dimensionless }
+// dims: in { cbr_pct: dimensionless, wheel_load_lb: M L T^-2, tire_pressure_psi: M L^-1 T^-2, coverages: dimensionless, geosynthetic_reduction_pct: dimensionless, alternate_cbr_pct: dimensionless } out: { thickness_in: L, thickness_with_geosynthetic_in: L, resilient_modulus_psi: M L^-1 T^-2, alternate_thickness_in: L, sensitivity_ratio: dimensionless, alpha_factor: dimensionless, alternate_cbr_pct: dimensionless, cbr_pct: dimensionless, geosynthetic_reduction_pct: dimensionless, geosynthetic_saving_in: L, tire_pressure_psi: M L^-1 T^-2 }
 export function computeSubgradeCbrThickness({ cbr_pct = 0, wheel_load_lb = 0, tire_pressure_psi = 0, coverages = 5000, geosynthetic_reduction_pct = 0, alternate_cbr_pct = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(cbr_pct > 0)) return { error: "Subgrade CBR must be positive (%)." };
@@ -1399,7 +1399,7 @@ CIVIL_RENDERERS["subgrade-cbr-thickness"] = _simpleRenderer({
 // load equivalency factor is taken against, not a design choice.
 const _STANDARD_AXLE_LB = 18000;
 
-// dims: in { aadt: dimensionless, truck_percent: dimensionless, directional_factor: dimensionless, lane_factor: dimensionless, esals_per_truck: dimensionless, growth_percent: dimensionless, design_life_years: T, car_axle_lb: M L T^-2, overload_axle_lb: M L T^-2 } out: { trucks_per_day_design_lane: dimensionless, first_year_esals: dimensionless, growth_factor: dimensionless, design_esals: dimensionless, car_esals: dimensionless, overload_lef: dimensionless }
+// dims: in { aadt: dimensionless, truck_percent: dimensionless, directional_factor: dimensionless, lane_factor: dimensionless, esals_per_truck: dimensionless, growth_percent: dimensionless, design_life_years: T, car_axle_lb: M L T^-2, overload_axle_lb: M L T^-2 } out: { trucks_per_day_design_lane: dimensionless, first_year_esals: dimensionless, growth_factor: dimensionless, design_esals: dimensionless, car_esals: dimensionless, overload_lef: dimensionless, car_share_pct: dimensionless, car_vehicle_share_pct: dimensionless, design_life_years: T, growth_percent: dimensionless, overload_excess_pct: dimensionless, truck_percent: dimensionless }
 export function computeEsalTrafficLoading({ aadt = 0, truck_percent = 0, directional_factor = 0.5, lane_factor = 1.0, esals_per_truck = 0, growth_percent = 0, design_life_years = 0, car_axle_lb = 2000, overload_axle_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(aadt > 0)) return { error: "AADT must be positive." };

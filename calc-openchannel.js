@@ -28,7 +28,7 @@ export const OPENCHANNEL_RENDERERS = {};
 // Approach velocity added 2026-10-09 for the rectangular weirs (the note said it was ignored): with the approach
 // channel width B and the weir height P entered, the Francis form Q = C L [(H + hv)^1.5 - hv^1.5] is iterated with
 // hv = V^2/(2 g), V = Q/(B (P + H)). A V-notch is fully contracted and keeps the plain rating.
-// dims: in { weir_type: dimensionless, head_ft: L, crest_length_ft: L, coeff: dimensionless, approach_width_ft: L, weir_height_ft: L } out: { flow_cfs: L^3*T^-1, flow_gpm: L^3 T^-1, approach_velocity_fps: L T^-1 }
+// dims: in { weir_type: dimensionless, head_ft: L, crest_length_ft: L, coeff: dimensionless, approach_width_ft: L, weir_height_ft: L } out: { flow_cfs: L^3*T^-1, flow_gpm: L^3 T^-1, approach_velocity_fps: L T^-1, approach_gain_pct: dimensionless, flow_mgd: L^3 T^-1 }
 export function computeWeirFlow({ weir_type = "vnotch90", head_ft = 0, crest_length_ft = 0, coeff = 0, approach_width_ft = 0, weir_height_ft = 0 } = {}) {
   const _g = _finiteGuardPool(arguments[0]); if (_g) return _g;
   const H = Number(head_ft) || 0;

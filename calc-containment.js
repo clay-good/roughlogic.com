@@ -236,7 +236,7 @@ CONTAINMENT_RENDERERS["radon-fan-static"] = _simpleRenderer({
 // none of that is knowable in advance -- so the communication test is the
 // design, and this turns its readings into a point count and an area.
 // =====================================================================
-// dims: in { slab_area_ft2: L^2, reaches_ft: L, fails_ft: L, slab_length_ft: L, slab_width_ft: L, existing_points: dimensionless } out: { effective_radius_ft: L, area_per_point_ft2: L^2, points_required: dimensionless, coverage_ratio: dimensionless, longest_dimension_ft: L }
+// dims: in { slab_area_ft2: L^2, reaches_ft: L, fails_ft: L, slab_length_ft: L, slab_width_ft: L, existing_points: dimensionless } out: { effective_radius_ft: L, area_per_point_ft2: L^2, points_required: dimensionless, coverage_ratio: dimensionless, longest_dimension_ft: L, upper_bound_ft: L }
 export function computeSubSlabSuctionField({
   slab_area_ft2 = 0, reaches_ft = 0, fails_ft = 0,
   slab_length_ft = 0, slab_width_ft = 0, existing_points = 0,
@@ -313,7 +313,7 @@ CONTAINMENT_RENDERERS["sub-slab-suction-field"] = _simpleRenderer({
 // =====================================================================
 // spec-v1747: acid waste neutralization tank sizing.
 // =====================================================================
-// dims: in { peak_flow_gpm: L^3 T^-1, retention_minutes: T, slug_volume_gal: L^3, tank_volume_gal: L^3, discharge_ph_min: dimensionless, discharge_ph_max: dimensionless, measured_ph: dimensionless } out: { required_volume_gal: L^3, turnover_minutes: T, slug_contact_minutes: T, slug_fraction_pct: dimensionless }
+// dims: in { peak_flow_gpm: L^3 T^-1, retention_minutes: T, slug_volume_gal: L^3, tank_volume_gal: L^3, discharge_ph_min: dimensionless, discharge_ph_max: dimensionless, measured_ph: dimensionless } out: { required_volume_gal: L^3, turnover_minutes: T, slug_contact_minutes: T, slug_fraction_pct: dimensionless, actual_tank_gal: L^3, slug_volume_gal: L^3 }
 export function computeAcidWasteNeutralization({
   peak_flow_gpm = 0, retention_minutes = 30, slug_volume_gal = 0, tank_volume_gal = 0,
   discharge_ph_min = 5.5, discharge_ph_max = 10, measured_ph = 0,

@@ -114,7 +114,7 @@ export const MILLWRIGHT_RENDERERS = {};
 
 // ============ spec-v1469: rim-and-face shaft alignment ============
 
-// dims: in { rim_tir_in: L, face_tir_in: L, face_diameter_in: L, front_foot_distance_in: L, rear_foot_distance_in: L } out: { offset_in: L, angularity_in_per_in: dimensionless, front_move_in: L, rear_move_in: L, foot_move_difference_in: L }
+// dims: in { rim_tir_in: L, face_tir_in: L, face_diameter_in: L, front_foot_distance_in: L, rear_foot_distance_in: L } out: { offset_in: L, angularity_in_per_in: dimensionless, front_move_in: L, rear_move_in: L, foot_move_difference_in: L, front_angular_part_in: L, offset_part_in: L, rear_angular_part_in: L }
 export function computeShaftAlignmentRimFace({ rim_tir_in = 0, face_tir_in = 0, face_diameter_in = 0, front_foot_distance_in = 0, rear_foot_distance_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(face_diameter_in > 0)) return { error: "The diameter the face indicator swept must be positive (in)." };
@@ -183,7 +183,7 @@ MILLWRIGHT_RENDERERS["shaft-alignment-rim-face"] = _simpleRenderer({
 
 // ============ spec-v1470: reverse-dial shaft alignment ============
 
-// dims: in { tir_a_in: L, tir_b_in: L, plane_spacing_in: L, front_foot_distance_in: L, rear_foot_distance_in: L, coupling_center_distance_in: L } out: { offset_a_in: L, offset_b_in: L, slope_in_per_in: dimensionless, front_move_in: L, rear_move_in: L, coupling_center_offset_in: L }
+// dims: in { tir_a_in: L, tir_b_in: L, plane_spacing_in: L, front_foot_distance_in: L, rear_foot_distance_in: L, coupling_center_distance_in: L } out: { offset_a_in: L, offset_b_in: L, slope_in_per_in: dimensionless, front_move_in: L, rear_move_in: L, coupling_center_offset_in: L, foot_move_difference_in: L }
 export function computeShaftAlignmentReverseDial({ tir_a_in = 0, tir_b_in = 0, plane_spacing_in = 0, front_foot_distance_in = 0, rear_foot_distance_in = 0, coupling_center_distance_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(plane_spacing_in > 0)) return { error: "The distance between the two indicator planes must be positive (in)." };
@@ -315,7 +315,7 @@ MILLWRIGHT_RENDERERS["alignment-thermal-growth"] = _simpleRenderer({
 
 // ============ spec-v1472: soft foot measurement and correction ============
 
-// dims: in { foot_lf_in: L, foot_rf_in: L, foot_lr_in: L, foot_rr_in: L, threshold_in: L } out: { worst_foot_rise_in: L, diagonal_lf_rr_in: L, diagonal_rf_lr_in: L, diagonal_difference_in: L, failing_feet: dimensionless }
+// dims: in { foot_lf_in: L, foot_rf_in: L, foot_lr_in: L, foot_rr_in: L, threshold_in: L } out: { worst_foot_rise_in: L, diagonal_lf_rr_in: L, diagonal_rf_lr_in: L, diagonal_difference_in: L, failing_feet: dimensionless, threshold_in: L, total_rise_in: L }
 export function computeSoftFootCorrection({ foot_lf_in = 0, foot_rf_in = 0, foot_lr_in = 0, foot_rr_in = 0, threshold_in = 0.002 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const feet = [["LF", foot_lf_in], ["RF", foot_rf_in], ["LR", foot_lr_in], ["RR", foot_rr_in]];
@@ -375,7 +375,7 @@ MILLWRIGHT_RENDERERS["soft-foot-correction"] = _simpleRenderer({
 
 // ============ spec-v1473: coupling alignment tolerance by speed ============
 
-// dims: in { rpm: T^-1, measured_offset_in: L, measured_angularity_mils_per_in: dimensionless, offset_excellent_in: L, offset_acceptable_in: L, angularity_excellent_mils_per_in: dimensionless, angularity_acceptable_mils_per_in: dimensionless, spacer_length_in: L, spacer_end_offset_in: L } out: { offset_pct_of_acceptable: dimensionless, angularity_pct_of_acceptable: dimensionless, offset_over_by_in: L, spacer_slope_mils_per_in: dimensionless }
+// dims: in { rpm: T^-1, measured_offset_in: L, measured_angularity_mils_per_in: dimensionless, offset_excellent_in: L, offset_acceptable_in: L, angularity_excellent_mils_per_in: dimensionless, angularity_acceptable_mils_per_in: dimensionless, spacer_length_in: L, spacer_end_offset_in: L } out: { offset_pct_of_acceptable: dimensionless, angularity_pct_of_acceptable: dimensionless, offset_over_by_in: L, spacer_slope_mils_per_in: dimensionless, rpm: T^-1, spacer_length_in: L }
 export function computeCouplingAlignmentTolerance({ rpm = 0, measured_offset_in = 0, measured_angularity_mils_per_in = 0, offset_excellent_in = 0, offset_acceptable_in = 0, angularity_excellent_mils_per_in = 0, angularity_acceptable_mils_per_in = 0, spacer_length_in = 0, spacer_end_offset_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(rpm > 0)) return { error: "Operating speed must be positive (rpm)." };
@@ -522,7 +522,7 @@ MILLWRIGHT_RENDERERS["vibration-severity-zone"] = _simpleRenderer({
 
 // ============ spec-v1475: vibration forcing frequencies ============
 
-// dims: in { rpm: T^-1, blade_count: dimensionless, gear_tooth_count: dimensionless, belt_length_in: L, sheave_diameter_in: L, line_frequency_hz: T^-1, rotor_bar_count: dimensionless } out: { one_x_hz: T^-1, blade_pass_hz: T^-1, gear_mesh_hz: T^-1, belt_frequency_hz: T^-1, twice_line_hz: T^-1, rotor_bar_pass_hz: T^-1 }
+// dims: in { rpm: T^-1, blade_count: dimensionless, gear_tooth_count: dimensionless, belt_length_in: L, sheave_diameter_in: L, line_frequency_hz: T^-1, rotor_bar_count: dimensionless } out: { one_x_hz: T^-1, blade_pass_hz: T^-1, gear_mesh_hz: T^-1, belt_frequency_hz: T^-1, twice_line_hz: T^-1, rotor_bar_pass_hz: T^-1, four_x_hz: T^-1, gear_sideband_high_hz: T^-1, gear_sideband_low_hz: T^-1, three_x_hz: T^-1, two_x_hz: T^-1, two_x_to_line_gap_hz: T^-1 }
 export function computeVibrationForcingFrequencies({ rpm = 0, blade_count = 0, gear_tooth_count = 0, belt_length_in = 0, sheave_diameter_in = 0, line_frequency_hz = 60, rotor_bar_count = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(rpm > 0)) return { error: "Shaft speed must be positive (rpm)." };
@@ -587,7 +587,7 @@ MILLWRIGHT_RENDERERS["vibration-forcing-frequencies"] = _simpleRenderer({
 
 // ============ spec-v1476: rolling-element bearing defect frequencies ============
 
-// dims: in { rpm: T^-1, ball_count: dimensionless, ball_diameter_in: L, pitch_diameter_in: L, contact_angle_deg: dimensionless } out: { shaft_hz: T^-1, ftf_hz: T^-1, bpfo_hz: T^-1, bpfi_hz: T^-1, bsf_hz: T^-1 }
+// dims: in { rpm: T^-1, ball_count: dimensionless, ball_diameter_in: L, pitch_diameter_in: L, contact_angle_deg: dimensionless } out: { shaft_hz: T^-1, ftf_hz: T^-1, bpfo_hz: T^-1, bpfi_hz: T^-1, bsf_hz: T^-1, ball_count: dimensionless, bpfi_approx_error_pct: dimensionless, bpfo_approx_error_pct: dimensionless, cage_identity_hz: T^-1, sideband_spacing_hz: T^-1 }
 export function computeBearingDefectFrequencies({ rpm = 0, ball_count = 0, ball_diameter_in = 0, pitch_diameter_in = 0, contact_angle_deg = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(rpm > 0)) return { error: "Shaft speed must be positive (rpm)." };
@@ -648,7 +648,7 @@ MILLWRIGHT_RENDERERS["bearing-defect-frequencies"] = _simpleRenderer({
 
 // ============ spec-v1477: single-plane field balance ============
 
-// dims: in { original_amplitude: L, original_phase_deg: dimensionless, trial_weight_g: M, trial_weight_angle_deg: dimensionless, trial_amplitude: L, trial_phase_deg: dimensionless } out: { effect_magnitude: L, effect_angle_deg: dimensionless, correction_weight_g: M, correction_angle_deg: dimensionless, influence_coefficient: dimensionless }
+// dims: in { original_amplitude: L, original_phase_deg: dimensionless, trial_weight_g: M, trial_weight_angle_deg: dimensionless, trial_amplitude: L, trial_phase_deg: dimensionless } out: { effect_magnitude: L, effect_angle_deg: dimensionless, correction_weight_g: M, correction_angle_deg: dimensionless, influence_coefficient: dimensionless, amplitude_change_pct: dimensionless, phase_swing_deg: dimensionless, rotation_deg: dimensionless, trial_weight_angle_deg: dimensionless, trial_weight_g: M }
 export function computeSinglePlaneFieldBalance({ original_amplitude = 0, original_phase_deg = 0, trial_weight_g = 0, trial_weight_angle_deg = 0, trial_amplitude = 0, trial_phase_deg = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(original_amplitude > 0)) return { error: "The original amplitude must be positive." };
@@ -722,7 +722,7 @@ MILLWRIGHT_RENDERERS["single-plane-field-balance"] = _simpleRenderer({
 
 // ============ spec-v1478: roller chain wear elongation ============
 
-// dims: in { chain_pitch_in: L, pitches_measured: dimensionless, measured_length_in: L, elongation_limit_pct: dimensionless, sprocket_teeth: dimensionless } out: { nominal_length_in: L, elongation_pct: dimensionless, elongation_in: L, allowable_length_in: L, remaining_allowance_in: L }
+// dims: in { chain_pitch_in: L, pitches_measured: dimensionless, measured_length_in: L, elongation_limit_pct: dimensionless, sprocket_teeth: dimensionless } out: { nominal_length_in: L, elongation_pct: dimensionless, elongation_in: L, allowable_length_in: L, remaining_allowance_in: L, chain_pitch_in: L, elongation_limit_pct: dimensionless, measured_length_in: L }
 export function computeRollerChainWearElongation({ chain_pitch_in = 0, pitches_measured = 0, measured_length_in = 0, elongation_limit_pct = 1.5, sprocket_teeth = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // Above 67 teeth the chain jumps the sprocket before it reaches the wear limit: the allowable elongation is 200 / N percent.
@@ -781,7 +781,7 @@ MILLWRIGHT_RENDERERS["roller-chain-wear-elongation"] = _simpleRenderer({
 
 // ============ spec-v1479: gear reducer service factor ============
 
-// dims: in { transmitted_hp: M L^2 T^-3, service_factor: dimensionless, catalog_mechanical_hp: M L^2 T^-3, catalog_thermal_hp: M L^2 T^-3, nameplate_selection_hp: M L^2 T^-3 } out: { required_hp: M L^2 T^-3, mechanical_margin: dimensionless, governing_rating_hp: M L^2 T^-3, shortfall_hp: M L^2 T^-3, max_transmitted_hp: M L^2 T^-3 }
+// dims: in { transmitted_hp: M L^2 T^-3, service_factor: dimensionless, catalog_mechanical_hp: M L^2 T^-3, catalog_thermal_hp: M L^2 T^-3, nameplate_selection_hp: M L^2 T^-3 } out: { required_hp: M L^2 T^-3, mechanical_margin: dimensionless, governing_rating_hp: M L^2 T^-3, shortfall_hp: M L^2 T^-3, max_transmitted_hp: M L^2 T^-3, catalog_mechanical_hp: M L^2 T^-3, catalog_thermal_hp: M L^2 T^-3, nameplate_shortfall_pct: dimensionless, service_factor: dimensionless, transmitted_hp: M L^2 T^-3 }
 export function computeGearReducerServiceFactor({ transmitted_hp = 0, service_factor = 1, catalog_mechanical_hp = 0, catalog_thermal_hp = 0, nameplate_selection_hp = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(transmitted_hp > 0)) return { error: "Transmitted power must be positive (hp)." };
@@ -862,7 +862,7 @@ MILLWRIGHT_RENDERERS["gear-reducer-service-factor"] = _simpleRenderer({
 
 // ============ spec-v1480: air compressor CFM and duty sizing ============
 
-// dims: in { tool1_qty: dimensionless, tool1_cfm: L^3 / T, tool1_duty: dimensionless, tool2_qty: dimensionless, tool2_cfm: L^3 / T, tool2_duty: dimensionless, tool3_qty: dimensionless, tool3_cfm: L^3 / T, tool3_duty: dimensionless, tool4_qty: dimensionless, tool4_cfm: L^3 / T, tool4_duty: dimensionless, leak_allowance_pct: dimensionless, growth_allowance_pct: dimensionless, cfm_per_hp: M^-1 L T^2 } out: { connected_cfm: L^3 / T, average_cfm: L^3 / T, with_leaks_cfm: L^3 / T, design_cfm: L^3 / T, motor_hp: M L^2 T^-3 }
+// dims: in { tool1_qty: dimensionless, tool1_cfm: L^3 / T, tool1_duty: dimensionless, tool2_qty: dimensionless, tool2_cfm: L^3 / T, tool2_duty: dimensionless, tool3_qty: dimensionless, tool3_cfm: L^3 / T, tool3_duty: dimensionless, tool4_qty: dimensionless, tool4_cfm: L^3 / T, tool4_duty: dimensionless, leak_allowance_pct: dimensionless, growth_allowance_pct: dimensionless, cfm_per_hp: M^-1 L T^2 } out: { connected_cfm: L^3 / T, average_cfm: L^3 / T, with_leaks_cfm: L^3 / T, design_cfm: L^3 / T, motor_hp: M L^2 T^-3, cfm_per_hp: M^-1 L T^2, connected_hp: M L^2 T^-3, growth_allowance_pct: dimensionless, growth_cfm: L^3 T^-1, largest_tool_cfm: L^3 T^-1, largest_tool_hp: M L^2 T^-3, leak_allowance_pct: dimensionless, leak_cfm: L^3 T^-1, tool_count: dimensionless }
 export function computeAirCompressorCfmSizing({ tool1_qty = 0, tool1_cfm = 0, tool1_duty = 0, tool2_qty = 0, tool2_cfm = 0, tool2_duty = 0, tool3_qty = 0, tool3_cfm = 0, tool3_duty = 0, tool4_qty = 0, tool4_cfm = 0, tool4_duty = 0, leak_allowance_pct = 15, growth_allowance_pct = 20, cfm_per_hp = 4 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   for (const [q, c, d] of [[tool1_qty, tool1_cfm, tool1_duty], [tool2_qty, tool2_cfm, tool2_duty], [tool3_qty, tool3_cfm, tool3_duty], [tool4_qty, tool4_cfm, tool4_duty]]) {
@@ -938,7 +938,7 @@ MILLWRIGHT_RENDERERS["air-compressor-cfm-sizing"] = _simpleRenderer({
 
 // ============ spec-v1482: air receiver pump-up and draw-down time ============
 
-// dims: in { receiver_volume_ft3: L^3, fill_start_psig: M L^-1 T^-2, fill_end_psig: M L^-1 T^-2, compressor_scfm: L^3 / T, cut_out_psig: M L^-1 T^-2, cut_in_psig: M L^-1 T^-2, net_demand_scfm: L^3 / T, required_cover_minutes: T } out: { pump_up_minutes: T, draw_down_minutes: T, usable_free_air_ft3: L^3, receiver_required_ft3: L^3, band_psi: M L^-1 T^-2 }
+// dims: in { receiver_volume_ft3: L^3, fill_start_psig: M L^-1 T^-2, fill_end_psig: M L^-1 T^-2, compressor_scfm: L^3 / T, cut_out_psig: M L^-1 T^-2, cut_in_psig: M L^-1 T^-2, net_demand_scfm: L^3 / T, required_cover_minutes: T } out: { pump_up_minutes: T, draw_down_minutes: T, usable_free_air_ft3: L^3, receiver_required_ft3: L^3, band_psi: M L^-1 T^-2, receiver_volume_ft3: L^3 }
 export function computeReceiverPumpUpTime({ receiver_volume_ft3 = 0, fill_start_psig = 0, fill_end_psig = 0, compressor_scfm = 0, cut_out_psig = 0, cut_in_psig = 0, net_demand_scfm = 0, required_cover_minutes = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // A blank cut-in is not 0 psig: a receiver drained to atmosphere is not usable storage.
@@ -1010,7 +1010,7 @@ MILLWRIGHT_RENDERERS["receiver-pump-up-time"] = _simpleRenderer({
 
 // ============ spec-v1481: refrigerated and desiccant air dryer sizing ============
 
-// dims: in { actual_scfm: L^3 / T, temp_correction: dimensionless, pressure_correction: dimensionless, ambient_correction: dimensionless, candidate_rated_scfm: L^3 / T, purge_fraction: dimensionless } out: { combined_factor: dimensionless, required_rated_scfm: L^3 / T, candidate_delivers_scfm: L^3 / T, purge_scfm: L^3 / T, compressor_load_scfm: L^3 / T }
+// dims: in { actual_scfm: L^3 / T, temp_correction: dimensionless, pressure_correction: dimensionless, ambient_correction: dimensionless, candidate_rated_scfm: L^3 / T, purge_fraction: dimensionless } out: { combined_factor: dimensionless, required_rated_scfm: L^3 / T, candidate_delivers_scfm: L^3 / T, purge_scfm: L^3 / T, compressor_load_scfm: L^3 / T, derate_pct: dimensionless, purge_fraction: dimensionless }
 export function computeAirDryerSizing({ actual_scfm = 0, temp_correction = 1, pressure_correction = 1, ambient_correction = 1, candidate_rated_scfm = 0, purge_fraction = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(actual_scfm > 0)) return { error: "Actual air flow must be positive (scfm)." };

@@ -92,7 +92,7 @@ const _LB_PER_TON = 2000;
 
 // ============ spec-v1824: hot-dip galvanised coating weight and thickness ============
 
-// dims: in { coating_grade_um: L, steel_tons: M, area_per_ton_ft2: L^2 M^-1, alt_area_per_ton_ft2: L^2 M^-1 } out: { thickness_mils: L, coating_oz_ft2: M L^-2, total_area_ft2: L^2, zinc_lb: M, pickup_pct: dimensionless }
+// dims: in { coating_grade_um: L, steel_tons: M, area_per_ton_ft2: L^2 M^-1, alt_area_per_ton_ft2: L^2 M^-1 } out: { thickness_mils: L, coating_oz_ft2: M L^-2, total_area_ft2: L^2, zinc_lb: M, pickup_pct: dimensionless, alt_pickup_pct: dimensionless }
 export function computeGalvanizeCoatingWeight({ coating_grade_um = 0, steel_tons = 0, area_per_ton_ft2 = 0, alt_area_per_ton_ft2 = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(coating_grade_um > 0)) return { error: "Coating grade (thickness) must be positive (microns)." };
@@ -142,7 +142,7 @@ FINISHING_RENDERERS["galvanize-coating-weight"] = _simpleRenderer({
 
 // ============ spec-v1825: pretreatment bath dragout and rinse water ============
 
-// dims: in { dragout_gal_per_1000ft2: L^3 L^-2, area_ft2_per_day: L^2, bath_volume_gal: L^3, bath_concentrate_pct: dimensionless, dilution_ratio: dimensionless, rinse_stages: dimensionless } out: { dragout_gal_day: L^3, concentrate_gal_day: L^3, bath_turnover_days: T, single_rinse_gal_day: L^3, rinse_flow_gal_day: L^3 }
+// dims: in { dragout_gal_per_1000ft2: L^3 L^-2, area_ft2_per_day: L^2, bath_volume_gal: L^3, bath_concentrate_pct: dimensionless, dilution_ratio: dimensionless, rinse_stages: dimensionless } out: { dragout_gal_day: L^3, concentrate_gal_day: L^3, bath_turnover_days: T, single_rinse_gal_day: L^3, rinse_flow_gal_day: L^3, saving_vs_single_pct: dimensionless, stages: dimensionless, three_stage_saving_pct: dimensionless, two_stage_saving_pct: dimensionless }
 export function computePretreatmentBathDragout({ dragout_gal_per_1000ft2 = 0, area_ft2_per_day = 0, bath_volume_gal = 0, bath_concentrate_pct = 5, dilution_ratio = 1000, rinse_stages = 2 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!Number.isInteger(Number(rinse_stages))) return { error: "Rinse stages is a whole number." };
@@ -202,7 +202,7 @@ FINISHING_RENDERERS["pretreatment-bath-dragout"] = _simpleRenderer({
 
 // ============ spec-v1826: galvanising kettle immersion cycle and throughput ============
 
-// dims: in { lower_min: T, immerse_min: T, withdraw_min: T, travel_min: T, load_lb_per_lift: M, area_per_ton_ft2: L^2 M^-1, steel_specific_heat_btu_lb_f: L^2 T^-2, bath_temp_f: T, ambient_temp_f: T, burner_btu_hr: M L^2 T^-3 } out: { cycle_min: T, lifts_per_hour: T^-1, throughput_lb_hr: M T^-1, heat_demand_btu_hr: M L^2 T^-3, heat_limited_lb_hr: M T^-1 }
+// dims: in { lower_min: T, immerse_min: T, withdraw_min: T, travel_min: T, load_lb_per_lift: M, area_per_ton_ft2: L^2 M^-1, steel_specific_heat_btu_lb_f: L^2 T^-2, bath_temp_f: T, ambient_temp_f: T, burner_btu_hr: M L^2 T^-3 } out: { cycle_min: T, lifts_per_hour: T^-1, throughput_lb_hr: M T^-1, heat_demand_btu_hr: M L^2 T^-3, heat_limited_lb_hr: M T^-1, delta_t_f: T, shortfall_pct: dimensionless }
 export function computeGalvanizeKettleThroughput({ lower_min = 0, immerse_min = 0, withdraw_min = 0, travel_min = 0, load_lb_per_lift = 0, area_per_ton_ft2 = 0, steel_specific_heat_btu_lb_f = 0.12, bath_temp_f = 830, ambient_temp_f = 70, burner_btu_hr = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // The page's cleared box is not 0 F; an omitted key keeps the 70 F default.

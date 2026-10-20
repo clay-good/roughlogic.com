@@ -101,7 +101,7 @@ const _FEXX = { E60: 60, E70: 70, E80: 80, E90: 90, E100: 100, E110: 110 };
 // ---------------------------------------------------------------------
 // 30.1 Groove weld strength (groove-weld-strength) - AWS D1.1 / AISC 360 §J2
 // ---------------------------------------------------------------------
-// dims: in { weld_type: dimensionless, effective_throat_in: L, base_thickness_in: L, length_in: L, applied_load_lb: dimensionless, electrode: dimensionless, base_fy_ksi: M L^-1 T^-2, base_fu_ksi: M L^-1 T^-2 } out: { throat_in: L, capacity_lb: dimensionless, utilization: dimensionless }
+// dims: in { weld_type: dimensionless, effective_throat_in: L, base_thickness_in: L, length_in: L, applied_load_lb: dimensionless, electrode: dimensionless, base_fy_ksi: M L^-1 T^-2, base_fu_ksi: M L^-1 T^-2 } out: { throat_in: L, capacity_lb: dimensionless, utilization: dimensionless, F_Exx_ksi: M L^-1 T^-2, length_in: L, stress_ksi: M L^-1 T^-2 }
 export function computeGrooveWeldStrength({ weld_type = "PJP", effective_throat_in = 0, base_thickness_in = 0, length_in = 0, electrode = "E70", method = "ASD", applied_load_lb = 0, base_fy_ksi = 36, base_fu_ksi = 58 } = {}) {
   const _g = _finiteGuard({ effective_throat_in, base_thickness_in, length_in, applied_load_lb, base_fy_ksi, base_fu_ksi }); if (_g) return _g;
   // An electrode not in the table used to be run as E70 (E60 came out 17% strong).
@@ -188,7 +188,7 @@ METALAIR_RENDERERS["groove-weld-strength"] = _renderGrooveWeldStrength;
 // length; the inverse recovers the weld length an applied load needs at a given effective throat, so a detailer sizes the
 // weld run. From capacity = stress_ksi x 1000 x throat x L (stress_ksi = 0.30 FEXX ASD or 0.75 x 0.60 FEXX LRFD),
 // L = load / (stress_ksi x 1000 x throat). CJP uses the thinner-part thickness as the throat; PJP uses the WPS effective throat.
-// dims: in { applied_load_lb: dimensionless, weld_type: dimensionless, effective_throat_in: L, base_thickness_in: L, electrode: dimensionless, method: dimensionless, base_fy_ksi: M L^-1 T^-2, base_fu_ksi: M L^-1 T^-2 } out: { required_length_in: L, stress_ksi: M L^-1 T^-2, throat_in: L }
+// dims: in { applied_load_lb: dimensionless, weld_type: dimensionless, effective_throat_in: L, base_thickness_in: L, electrode: dimensionless, method: dimensionless, base_fy_ksi: M L^-1 T^-2, base_fu_ksi: M L^-1 T^-2 } out: { required_length_in: L, stress_ksi: M L^-1 T^-2, throat_in: L, F_Exx_ksi: M L^-1 T^-2 }
 export function computeGrooveWeldLengthForLoad({ applied_load_lb = 0, weld_type = "PJP", effective_throat_in = 0, base_thickness_in = 0, electrode = "E70", method = "ASD", base_fy_ksi = 36, base_fu_ksi = 58 } = {}) {
   const _g = _finiteGuard({ applied_load_lb, effective_throat_in, base_thickness_in, base_fy_ksi, base_fu_ksi }); if (_g) return _g;
   // An electrode not in the table used to be run as E70 (E60 came out 17% strong).
@@ -330,7 +330,7 @@ METALAIR_RENDERERS["duct-static-pressure-total"] = _renderDuctStaticTotal;
 // ---------------------------------------------------------------------
 // 30.3 Compression ratio (compression-ratio-refrig) - ASHRAE Refrigeration
 // ---------------------------------------------------------------------
-// dims: in { suction_psig: M L^-1 T^-2, discharge_psig: M L^-1 T^-2, atmospheric_psia: M L^-1 T^-2 } out: { suction_psia: M L^-1 T^-2, discharge_psia: M L^-1 T^-2, compression_ratio: dimensionless }
+// dims: in { suction_psig: M L^-1 T^-2, discharge_psig: M L^-1 T^-2, atmospheric_psia: M L^-1 T^-2 } out: { suction_psia: M L^-1 T^-2, discharge_psia: M L^-1 T^-2, compression_ratio: dimensionless, atmospheric_psia: M L^-1 T^-2 }
 export function computeCompressionRatio({ suction_psig = 0, discharge_psig = 0, atmospheric_psia = 14.696 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // Until 2026-10-14 a blank suction box read as 0 psig and printed "18.69 : 1 (HIGH)" off a reading nobody took.
@@ -522,7 +522,7 @@ function _s2rPatternSheet(square_side_in, round_diameter_in, height_in, offset_i
   return { width: Math.min(best[0], best[1]), length: Math.max(best[0], best[1]) };
 }
 
-// dims: in { square_side_in: L, round_diameter_in: L, height_in: L, offset_in: L, elements_per_quadrant: dimensionless, seam_allowance_in: L } out: { corner_true_length_in: L, midpoint_true_length_in: L, fan_edge_true_length_in: L, plan_fan_edge_distance_in: L, plan_corner_distance_in: L, circumference_in: L, developed_arc_in: L, sheet_width_in: L }
+// dims: in { square_side_in: L, round_diameter_in: L, height_in: L, offset_in: L, elements_per_quadrant: dimensionless, seam_allowance_in: L } out: { corner_true_length_in: L, midpoint_true_length_in: L, fan_edge_true_length_in: L, plan_fan_edge_distance_in: L, plan_corner_distance_in: L, circumference_in: L, developed_arc_in: L, sheet_width_in: L, arc_shortfall_in: L, arc_shortfall_pct: dimensionless, chord_in: L, height_in: L, longest_true_length_in: L, offset_in: L, plan_midpoint_distance_in: L, round_diameter_in: L, seam_allowance_in: L, sheet_length_in: L, square_side_in: L, understatement_pct: dimensionless }
 export function computeSquareToRoundDevelopment({ square_side_in = 0, round_diameter_in = 0, height_in = 0, offset_in = 0, elements_per_quadrant = 8, seam_allowance_in = 0.5 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(square_side_in > 0)) return { error: "The square side must be positive (in)." };
@@ -610,7 +610,7 @@ METALAIR_RENDERERS["square-to-round-development"] = _simpleRenderer({
 
 // ============ spec-v1681: standing seam panel and clip takeoff ============
 
-// dims: in { building_width_ft: L, run_length_ft: L, coverage_width_in: L, sheet_width_in: L, field_clip_spacing_in: L, perimeter_clip_spacing_in: L, perimeter_panels: dimensionless, fasteners_per_clip: dimensionless, eave_ridge_allowance_in: L, waste_pct: dimensionless } out: { panel_count: dimensionless, panel_length_ft: L, total_panel_ft: L, field_clip_count: dimensionless, perimeter_clip_count: dimensionless, fastener_count: dimensionless }
+// dims: in { building_width_ft: L, run_length_ft: L, coverage_width_in: L, sheet_width_in: L, field_clip_spacing_in: L, perimeter_clip_spacing_in: L, perimeter_panels: dimensionless, fasteners_per_clip: dimensionless, eave_ridge_allowance_in: L, waste_pct: dimensionless } out: { panel_count: dimensionless, panel_length_ft: L, total_panel_ft: L, field_clip_count: dimensionless, perimeter_clip_count: dimensionless, fastener_count: dimensionless, building_width_ft: L, clip_count: dimensionless, coverage_width_in: L, eave_ridge_allowance_in: L, field_clip_spacing_in: L, perimeter_clip_spacing_in: L, run_length_ft: L, seam_count: dimensionless, seam_length_ft: L, sheet_width_in: L, total_panel_with_waste_ft: L, waste_pct: dimensionless }
 export function computeStandingSeamTakeoff({ building_width_ft = 0, run_length_ft = 0, coverage_width_in = 0, sheet_width_in = 0, field_clip_spacing_in = 0, perimeter_clip_spacing_in = 0, perimeter_panels = 0, fasteners_per_clip = 2, eave_ridge_allowance_in = 0, waste_pct = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(building_width_ft > 0)) return { error: "Building width must be positive (ft)." };
@@ -694,7 +694,7 @@ METALAIR_RENDERERS["standing-seam-takeoff"] = _simpleRenderer({
 
 // ============ spec-v1682: metal roof thermal movement ============
 
-// dims: in { panel_length_ft: L, alpha_per_f: T^-1, temp_swing_f: T, fixed_point_fraction: dimensionless, clip_travel_in: L } out: { total_movement_in: L, movement_up_slope_in: L, movement_down_slope_in: L, governing_movement_in: L, travel_margin_in: L, max_panel_length_ft: L }
+// dims: in { panel_length_ft: L, alpha_per_f: T^-1, temp_swing_f: T, fixed_point_fraction: dimensionless, clip_travel_in: L } out: { total_movement_in: L, movement_up_slope_in: L, movement_down_slope_in: L, governing_movement_in: L, travel_margin_in: L, max_panel_length_ft: L, alpha_per_f: T^-1, centre_fixed_movement_in: L, centre_fixed_saving_in: L, clip_travel_in: L, fixed_point_fraction: dimensionless, panel_length_ft: L }
 export function computeMetalRoofThermalMovement({ panel_length_ft = 0, alpha_per_f = 0.0000128, temp_swing_f = 0, fixed_point_fraction = 0, clip_travel_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(panel_length_ft > 0)) return { error: "Panel length must be positive (ft)." };

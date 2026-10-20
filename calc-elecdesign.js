@@ -542,7 +542,7 @@ ELECDESIGN_RENDERERS["step-touch-voltage"] = _simpleRenderer({
 
 // ===================== spec-v610: ground potential rise screen (IEEE Std 80) =====================
 // GPR = grid_current * grid_resistance. safe_by_gpr = tolerable_touch > 0 && GPR <= tolerable_touch.
-// dims: in { grid_current_a: I, grid_resistance_ohm: M L^2 T^-3 I^-2, tolerable_touch_v: M L^2 T^-3 I^-1 } out: { gpr_v: M L^2 T^-3 I^-1, safe_by_gpr: dimensionless, margin_v: M L^2 T^-3 I^-1 }
+// dims: in { grid_current_a: I, grid_resistance_ohm: M L^2 T^-3 I^-2, tolerable_touch_v: M L^2 T^-3 I^-1 } out: { gpr_v: M L^2 T^-3 I^-1, safe_by_gpr: dimensionless, margin_v: M L^2 T^-3 I^-1, ratio: dimensionless }
 export function computeGroundPotentialRise({ grid_current_a = 0, grid_resistance_ohm = 0, tolerable_touch_v = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const ig = Number(grid_current_a) || 0;
@@ -663,7 +663,7 @@ ELECDESIGN_RENDERERS["sccr-combination"] = renderSccrCombination;
 // standard) touches. A single mast of height h shields a ground-level circle of radius
 // d = sqrt(2 R h - h^2) for h <= R; for h >= R the ground-protected radius is capped at R
 // (upper mast portions may need separate side-flash protection).
-// dims: in { mast_height_ft: L, sphere_radius_ft: L } out: { protected_radius_ft: L, protected_area_ft2: L^2 }
+// dims: in { mast_height_ft: L, sphere_radius_ft: L } out: { protected_radius_ft: L, protected_area_ft2: L^2, sphere_radius_ft: L }
 export function computeRollingSphereProtection({ mast_height_ft = 0, sphere_radius_ft = 150 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const h = Number(mast_height_ft) || 0;

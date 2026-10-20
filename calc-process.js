@@ -98,7 +98,7 @@ export const PROCESS_RENDERERS = {};
 // =====================================================================
 // spec-v1705: injection mould clamp tonnage from projected area.
 // =====================================================================
-// dims: in { cavities: dimensionless, part_projected_area_in2: L^2, runner_projected_area_in2: L^2, cavity_pressure_tsi: M L^-1 T^-2, safety_factor_pct: dimensionless, machine_rating_tons: M L T^-2 } out: { total_area_in2: L^2, clamp_required_tons: M L T^-2, clamp_with_safety_tons: M L T^-2, runner_penalty_tons: M L T^-2, margin_tons: M L T^-2, max_cavity_pressure_tsi: M L^-1 T^-2 }
+// dims: in { cavities: dimensionless, part_projected_area_in2: L^2, runner_projected_area_in2: L^2, cavity_pressure_tsi: M L^-1 T^-2, safety_factor_pct: dimensionless, machine_rating_tons: M L T^-2 } out: { total_area_in2: L^2, clamp_required_tons: M L T^-2, clamp_with_safety_tons: M L T^-2, runner_penalty_tons: M L T^-2, margin_tons: M L T^-2, max_cavity_pressure_tsi: M L^-1 T^-2, part_area_total_in2: L^2 }
 export function computeInjectionClampTonnage({
   cavities = 0, part_projected_area_in2 = 0, runner_projected_area_in2 = 0,
   cavity_pressure_tsi = 0, safety_factor_pct = 15, machine_rating_tons = 0,
@@ -257,7 +257,7 @@ PROCESS_RENDERERS["shot-size-residence-time"] = _simpleRenderer({
 // which implies alpha = 0.000145 and contradicts its own stated range. The
 // example below uses 0.00015, and the range is stated honestly in the note.
 // =====================================================================
-// dims: in { wall_thickness_in: L, alpha_in2_s: L^2 T^-1, melt_temp_f: T, mould_temp_f: T, eject_temp_f: T, alt_wall_thickness_in: L, non_cooling_cycle_s: T, annual_parts: dimensionless } out: { cooling_time_s: T, alt_cooling_time_s: T, thickness_ratio: dimensionless, time_ratio: dimensionless, cycle_time_s: T, annual_machine_hours: T }
+// dims: in { wall_thickness_in: L, alpha_in2_s: L^2 T^-1, melt_temp_f: T, mould_temp_f: T, eject_temp_f: T, alt_wall_thickness_in: L, non_cooling_cycle_s: T, annual_parts: dimensionless } out: { cooling_time_s: T, alt_cooling_time_s: T, thickness_ratio: dimensionless, time_ratio: dimensionless, cycle_time_s: T, annual_machine_hours: T, cooling_share_pct: dimensionless }
 export function computeInjectionCoolingTime({
   wall_thickness_in = 0, alpha_in2_s = 0, melt_temp_f = 0, mould_temp_f = null, eject_temp_f = 0,
   alt_wall_thickness_in = 0, non_cooling_cycle_s = 0, annual_parts = 0,
@@ -338,7 +338,7 @@ PROCESS_RENDERERS["injection-cooling-time"] = _simpleRenderer({
 // =====================================================================
 // spec-v1708: moulded part shrinkage and the cavity dimension to cut.
 // =====================================================================
-// dims: in { part_dimension_in: L, shrinkage_flow_in_in: dimensionless, shrinkage_cross_in_in: dimensionless, shrinkage_low_in_in: dimensionless, shrinkage_high_in_in: dimensionless, existing_cavity_in: L } out: { cavity_flow_in: L, cavity_cross_in: L, anisotropy_in: L, cavity_low_in: L, cavity_high_in: L, range_in: L, part_from_cavity_in: L }
+// dims: in { part_dimension_in: L, shrinkage_flow_in_in: dimensionless, shrinkage_cross_in_in: dimensionless, shrinkage_low_in_in: dimensionless, shrinkage_high_in_in: dimensionless, existing_cavity_in: L } out: { cavity_flow_in: L, cavity_cross_in: L, anisotropy_in: L, cavity_low_in: L, cavity_high_in: L, range_in: L, part_from_cavity_in: L, oversize_in: L }
 export function computeMoldShrinkageDimension({
   part_dimension_in = 0, shrinkage_flow_in_in = 0, shrinkage_cross_in_in = 0,
   shrinkage_low_in_in = 0, shrinkage_high_in_in = 0, existing_cavity_in = 0,
@@ -412,7 +412,7 @@ PROCESS_RENDERERS["mold-shrinkage-dimension"] = _simpleRenderer({
 // =====================================================================
 // spec-v1709: extrusion output rate, line speed, and what actually governs.
 // =====================================================================
-// dims: in { product_od_in: L, wall_thickness_in: L, line_speed_ft_min: L T^-1, melt_density_lb_in3: M L^-3, extruder_output_lb_h: M T^-1, die_opening_in: L, cooling_capacity_lb_h: M T^-1, shift_hours: T } out: { area_in2: L^2, output_at_speed_lb_h: M T^-1, speed_at_output_ft_min: L T^-1, draw_down_ratio: dimensionless, lb_per_ft: M L^-1, shift_pounds: M }
+// dims: in { product_od_in: L, wall_thickness_in: L, line_speed_ft_min: L T^-1, melt_density_lb_in3: M L^-3, extruder_output_lb_h: M T^-1, die_opening_in: L, cooling_capacity_lb_h: M T^-1, shift_hours: T } out: { area_in2: L^2, output_at_speed_lb_h: M T^-1, speed_at_output_ft_min: L T^-1, draw_down_ratio: dimensionless, lb_per_ft: M L^-1, shift_pounds: M, id_in: L, thin_wall_area_in2: L^2 }
 export function computeExtrusionOutputRate({
   product_od_in = 0, wall_thickness_in = 0, line_speed_ft_min = 0, melt_density_lb_in3 = 0,
   extruder_output_lb_h = 0, die_opening_in = 0, cooling_capacity_lb_h = 0, shift_hours = 8,
@@ -507,7 +507,7 @@ PROCESS_RENDERERS["extrusion-output-rate"] = _simpleRenderer({
 // =====================================================================
 // spec-v1710: thermoforming draw ratio and wall thinning.
 // =====================================================================
-// dims: in { opening_diameter_in: L, draw_depth_in: L, sheet_thickness_in: L, corner_fraction: dimensionless, min_wall_in: L, hd_limit: dimensionless } out: { hd_ratio: dimensionless, areal_draw_ratio: dimensionless, average_wall_in: L, corner_wall_in: L, sheet_for_corner_in: L, formed_area_in2: L^2 }
+// dims: in { opening_diameter_in: L, draw_depth_in: L, sheet_thickness_in: L, corner_fraction: dimensionless, min_wall_in: L, hd_limit: dimensionless } out: { hd_ratio: dimensionless, areal_draw_ratio: dimensionless, average_wall_in: L, corner_wall_in: L, sheet_for_corner_in: L, formed_area_in2: L^2, original_area_in2: L^2, side_area_in2: L^2 }
 export function computeThermoformingDrawRatio({
   opening_diameter_in = 0, draw_depth_in = 0, sheet_thickness_in = 0,
   corner_fraction = 0.4, min_wall_in = 0, hd_limit = 0.5,
@@ -577,7 +577,7 @@ PROCESS_RENDERERS["thermoforming-draw-ratio"] = _simpleRenderer({
 // =====================================================================
 // spec-v1711: HDPE butt fusion interface pressure and cycle times.
 // =====================================================================
-// dims: in { pipe_od_in: L, dimension_ratio: dimensionless, wall_thickness_in: L, cylinder_area_in2: L^2, interfacial_pressure_psi: M L^-1 T^-2, drag_pressure_psi: M L^-1 T^-2, alt_pipe_od_in: L } out: { wall_in: L, face_area_in2: L^2, theoretical_gauge_psi: M L^-1 T^-2, total_gauge_psi: M L^-1 T^-2, alt_gauge_psi: M L^-1 T^-2 }
+// dims: in { pipe_od_in: L, dimension_ratio: dimensionless, wall_thickness_in: L, cylinder_area_in2: L^2, interfacial_pressure_psi: M L^-1 T^-2, drag_pressure_psi: M L^-1 T^-2, alt_pipe_od_in: L } out: { wall_in: L, face_area_in2: L^2, theoretical_gauge_psi: M L^-1 T^-2, total_gauge_psi: M L^-1 T^-2, alt_gauge_psi: M L^-1 T^-2, alt_face_area_in2: L^2, alt_wall_in: L }
 export function computeHdpeFusionPressureTime({
   pipe_od_in = 0, dimension_ratio = 0, wall_thickness_in = 0, cylinder_area_in2 = 0,
   interfacial_pressure_psi = 75, drag_pressure_psi = 0, alt_pipe_od_in = 0,
@@ -730,7 +730,7 @@ PROCESS_RENDERERS["thermoplastic-temperature-derate"] = _simpleRenderer({
 // =====================================================================
 // spec-v1713: casting pour weight, gating yield, and the melt energy it costs.
 // =====================================================================
-// dims: in { casting_weight_lb: M, gating_weight_lb: M, castings_per_mould: dimensionless, melt_energy_btu_lb: L^2 T^-2, target_yield_pct: dimensionless, annual_castings: dimensionless } out: { poured_weight_lb: M, yield_pct: dimensionless, btu_per_saleable_lb: L^2 T^-2, target_poured_lb: M, target_btu_per_lb: L^2 T^-2, annual_btu_saved: L^2 M T^-2 }
+// dims: in { casting_weight_lb: M, gating_weight_lb: M, castings_per_mould: dimensionless, melt_energy_btu_lb: L^2 T^-2, target_yield_pct: dimensionless, annual_castings: dimensionless } out: { poured_weight_lb: M, yield_pct: dimensionless, btu_per_saleable_lb: L^2 T^-2, target_poured_lb: M, target_btu_per_lb: L^2 T^-2, annual_btu_saved: L^2 M T^-2, energy_penalty_pct: dimensionless, poured_btu: M L^2 T^-2 }
 export function computeCastingPourYield({
   casting_weight_lb = 0, gating_weight_lb = 0, castings_per_mould = 1,
   melt_energy_btu_lb = 0, target_yield_pct = 0, annual_castings = 0,
@@ -802,7 +802,7 @@ PROCESS_RENDERERS["casting-pour-yield"] = _simpleRenderer({
 // =====================================================================
 // spec-v1714: riser modulus and the volume check that runs alongside it.
 // =====================================================================
-// dims: in { section_length_in: L, section_width_in: L, section_thickness_in: L, modulus_ratio: dimensionless, shrinkage_pct: dimensionless, riser_efficiency_pct: dimensionless, sleeve_factor: dimensionless } out: { section_volume_in3: L^3, section_surface_in2: L^2, casting_modulus_in: L, riser_modulus_in: L, riser_diameter_in: L, riser_volume_in3: L^3, volume_needed_in3: L^3 }
+// dims: in { section_length_in: L, section_width_in: L, section_thickness_in: L, modulus_ratio: dimensionless, shrinkage_pct: dimensionless, riser_efficiency_pct: dimensionless, sleeve_factor: dimensionless } out: { section_volume_in3: L^3, section_surface_in2: L^2, casting_modulus_in: L, riser_modulus_in: L, riser_diameter_in: L, riser_volume_in3: L^3, volume_needed_in3: L^3, diameter_for_volume_in: L, shrinkage_volume_in3: L^3 }
 export function computeRiserModulusFeeding({
   section_length_in = 0, section_width_in = 0, section_thickness_in = 0,
   modulus_ratio = 1.2, shrinkage_pct = 0, riser_efficiency_pct = 0, sleeve_factor = 1,
@@ -1023,7 +1023,7 @@ const _SAND_GAS_R_IN3_PSI_LBMOL_R = 10.7316 * 1728; // 10.7316 ft^3 psi / (lbmol
 const _SAND_WATER_LB_PER_LBMOL = 18.0153;
 const _SAND_CM3_PER_IN3 = 16.387064;
 const _SAND_RANKINE_OFFSET = 459.67;
-// dims: in { mould_sand_lb: M, moisture_pct: dimensionless, binder_lb: M, binder_gas_cm3_g: L^3 M^-1, pour_temp_f: T, vent_area_in2: L^2, permeability_number: dimensionless, fineness_change_pct: dimensionless } out: { water_lb: M, steam_volume_in3: L^3, binder_gas_in3: L^3, total_gas_in3: L^3, gas_per_vent_in2: L^2, new_permeability_number: dimensionless }
+// dims: in { mould_sand_lb: M, moisture_pct: dimensionless, binder_lb: M, binder_gas_cm3_g: L^3 M^-1, pour_temp_f: T, vent_area_in2: L^2, permeability_number: dimensionless, fineness_change_pct: dimensionless } out: { water_lb: M, steam_volume_in3: L^3, binder_gas_in3: L^3, total_gas_in3: L^3, gas_per_vent_in2: L^2, new_permeability_number: dimensionless, water_liquid_in3: L^3 }
 export function computeSandPermeabilityVent({
   mould_sand_lb = 0, moisture_pct = 0, binder_lb = 0, binder_gas_cm3_g = 0,
   pour_temp_f = 2600, vent_area_in2 = 0, permeability_number = 0, fineness_change_pct = 0,
@@ -1105,7 +1105,7 @@ PROCESS_RENDERERS["sand-permeability-vent"] = _simpleRenderer({
 // spec-v1716: melt furnace energy, efficiency, and energy per saleable pound.
 // =====================================================================
 const _MELT_BTU_PER_KWH = 3412.14;
-// dims: in { charge_weight_lb: M, theoretical_btu_lb: L^2 T^-2, furnace_efficiency_pct: dimensionless, energy_cost_per_kwh: dimensionless, alt_efficiency_pct: dimensionless, alt_theoretical_btu_lb: L^2 T^-2, casting_yield_pct: dimensionless } out: { theoretical_mmbtu: L^2 M T^-2, input_mmbtu: L^2 M T^-2, input_kwh: L^2 M T^-2, cost_per_heat: dimensionless, btu_per_saleable_lb: L^2 T^-2, alt_input_mmbtu: L^2 M T^-2 }
+// dims: in { charge_weight_lb: M, theoretical_btu_lb: L^2 T^-2, furnace_efficiency_pct: dimensionless, energy_cost_per_kwh: dimensionless, alt_efficiency_pct: dimensionless, alt_theoretical_btu_lb: L^2 T^-2, casting_yield_pct: dimensionless } out: { theoretical_mmbtu: L^2 M T^-2, input_mmbtu: L^2 M T^-2, input_kwh: L^2 M T^-2, cost_per_heat: dimensionless, btu_per_saleable_lb: L^2 T^-2, alt_input_mmbtu: L^2 M T^-2, input_btu: M L^2 T^-2, theoretical_btu: M L^2 T^-2 }
 export function computeMeltFurnaceEnergy({
   charge_weight_lb = 0, theoretical_btu_lb = 0, furnace_efficiency_pct = 0,
   energy_cost_per_kwh = 0, alt_efficiency_pct = 0, alt_theoretical_btu_lb = 0, casting_yield_pct = 0,

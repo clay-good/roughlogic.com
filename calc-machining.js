@@ -35,7 +35,7 @@ export const MACHINING_RENDERERS = {};
 
 // --- v31 K.4: Machining speed and feed (`cutting-speed-rpm`) ---
 // Spindle RPM = 12 * SFM / (pi * dia); feed IPM = RPM * flutes * chip load.
-// dims: in { surface_speed_sfm: L*T^-1, diameter_in: L, num_flutes: dimensionless, chip_load_in: L } out: { rpm: T^-1, feed_ipm: L*T^-1 }
+// dims: in { surface_speed_sfm: L*T^-1, diameter_in: L, num_flutes: dimensionless, chip_load_in: L } out: { rpm: T^-1, feed_ipm: L*T^-1, chip_load_in: L, diameter_in: L, surface_speed_sfm: L*T^-1 }
 export function computeCuttingSpeed({ surface_speed_sfm = 0, diameter_in = 0, num_flutes = 0, chip_load_in = 0 } = {}) {
   const _g = _finiteGuard({ surface_speed_sfm, diameter_in, num_flutes, chip_load_in }); if (_g) return _g;
   const sfm = Number(surface_speed_sfm) || 0;
@@ -82,7 +82,7 @@ MACHINING_RENDERERS["cutting-speed-rpm"] = renderCuttingSpeed;
 
 // --- v34 K.5: Drill point depth / tip allowance (`drill-point-depth`) ---
 // point length = (diameter/2) / tan(point angle / 2); a 118-deg point ~ 0.3*dia.
-// dims: in { diameter_in: L, point_angle_deg: dimensionless, full_depth_in: L } out: { point_length_in: L, drill_to_depth_in: L }
+// dims: in { diameter_in: L, point_angle_deg: dimensionless, full_depth_in: L } out: { point_length_in: L, drill_to_depth_in: L, diameter_in: L, full_depth_in: L, point_angle_deg: dimensionless }
 export function computeDrillPointDepth({ diameter_in = 0, point_angle_deg = 118, full_depth_in = 0 } = {}) {
   const _g = _finiteGuard({ diameter_in, point_angle_deg, full_depth_in }); if (_g) return _g;
   const d = Number(diameter_in);
@@ -130,7 +130,7 @@ MACHINING_RENDERERS["drill-point-depth"] = renderDrillPointDepth;
 // length -- the number you back out when you sharpen to a length or measure a
 // tip on a comparator. From point_length = (d/2)/tan(angle/2),
 // angle = 2 x atan( (d/2) / point_length ).
-// dims: in { diameter_in: L, point_length_in: L } out: { point_angle_deg: dimensionless, half_angle_deg: dimensionless, length_per_diameter: dimensionless }
+// dims: in { diameter_in: L, point_length_in: L } out: { point_angle_deg: dimensionless, half_angle_deg: dimensionless, length_per_diameter: dimensionless, diameter_in: L, point_length_in: L }
 export function computeDrillPointAngleFromLength({ diameter_in = 0, point_length_in = 0 } = {}) {
   const _g = _finiteGuard({ diameter_in, point_length_in }); if (_g) return _g;
   const d = Number(diameter_in);
@@ -177,7 +177,7 @@ MACHINING_RENDERERS["drill-point-angle-from-length"] = renderDrillPointAngleFrom
 // spindle RPM for a given surface speed. From RPM = 12 x SFM / (pi x diameter), diameter = 12 x SFM / (pi x RPM). At a
 // fixed SFM a larger diameter turns slower, so a machine RPM ceiling sets the SMALLEST diameter that still reaches the
 // full surface speed -- a smaller cutter tops out the spindle before it gets there.
-// dims: in { surface_speed_sfm: L T^-1, target_rpm: T^-1 } out: { diameter_in: L, sfm_to_rpm_const: dimensionless }
+// dims: in { surface_speed_sfm: L T^-1, target_rpm: T^-1 } out: { diameter_in: L, sfm_to_rpm_const: dimensionless, surface_speed_sfm: L*T^-1, target_rpm: T^-1 }
 export function computeCuttingDiameterForRpm({ surface_speed_sfm = 0, target_rpm = 0 } = {}) {
   const _g = _finiteGuard({ surface_speed_sfm, target_rpm }); if (_g) return _g;
   const sfm = Number(surface_speed_sfm) || 0;
@@ -504,7 +504,7 @@ function renderBoringBarMaxOverhang(inputRegion, outputRegion, citationEl) {
 }
 MACHINING_RENDERERS["boring-bar-max-overhang"] = renderBoringBarMaxOverhang;
 
-// dims: in { r_in: L, mode: dimensionless, s_in: L, h_in: L } out: { out_in: L }
+// dims: in { r_in: L, mode: dimensionless, s_in: L, h_in: L } out: { out_in: L, h_in: L, s_in: L }
 export function computeBallnoseScallopHeight({ r_in = 0, mode = "scallop-from-stepover", s_in = 0, h_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(r_in > 0)) return { error: "Ballnose radius must be positive (in)." };
@@ -1021,7 +1021,7 @@ const MARIN_SURFACE = {
 };
 const MARIN_RELIABILITY = { "50": 1.0, "90": 0.897, "95": 0.868, "99": 0.814, "99.9": 0.753 };
 const MARIN_KC = { bending: 1.0, axial: 0.85, torsion: 0.59 };
-// dims: in { ultimate_strength_psi: M L^-1 T^-2, surface_finish: dimensionless, diameter_in: L, load_type: dimensionless, reliability_pct: dimensionless, temperature_factor_kd: dimensionless } out: { endurance_limit_psi: M L^-1 T^-2, uncorrected_se_psi: M L^-1 T^-2, ka: dimensionless, kb: dimensionless, kc: dimensionless, ke: dimensionless }
+// dims: in { ultimate_strength_psi: M L^-1 T^-2, surface_finish: dimensionless, diameter_in: L, load_type: dimensionless, reliability_pct: dimensionless, temperature_factor_kd: dimensionless } out: { endurance_limit_psi: M L^-1 T^-2, uncorrected_se_psi: M L^-1 T^-2, ka: dimensionless, kb: dimensionless, kc: dimensionless, ke: dimensionless, kd: dimensionless }
 export function computeEnduranceLimitMarin({ ultimate_strength_psi = 0, surface_finish = "machined", diameter_in = 1, load_type = "bending", reliability_pct = "99", temperature_factor_kd = 1 } = {}) {
   const _g = _finiteGuard({ ultimate_strength_psi, diameter_in, temperature_factor_kd }); if (_g) return _g;
   const Sut = Number(ultimate_strength_psi) || 0;
@@ -1348,7 +1348,7 @@ MACHINING_RENDERERS["fatigue-combined-loading"] = renderFatigueCombinedLoading;
 //   T_lower = (F dm/2)(pi mu dm sec_a - l)/(pi dm + mu l sec_a) + F muc dc/2
 //   efficiency = F l/(2 pi T_raise); self-locking if pi mu dm sec_a > l.
 const SCREW_THREAD_HALF_ANGLE = { square: 0, acme: 14.5, unified: 30 };
-// dims: in { axial_load_lbf: M L T^-2, mean_diameter_in: L, lead_in: L, thread_friction: dimensionless, collar_friction: dimensionless, collar_diameter_in: L, thread_form: dimensionless } out: { raise_torque_in_lbf: M L^2 T^-2, lower_torque_in_lbf: M L^2 T^-2, efficiency_pct: dimensionless, lead_angle_deg: dimensionless }
+// dims: in { axial_load_lbf: M L T^-2, mean_diameter_in: L, lead_in: L, thread_friction: dimensionless, collar_friction: dimensionless, collar_diameter_in: L, thread_form: dimensionless } out: { raise_torque_in_lbf: M L^2 T^-2, lower_torque_in_lbf: M L^2 T^-2, efficiency_pct: dimensionless, lead_angle_deg: dimensionless, thread_half_angle_deg: dimensionless }
 export function computePowerScrewTorque({ axial_load_lbf = 0, mean_diameter_in = 0, lead_in = 0, thread_friction = 0.15, collar_friction = 0.15, collar_diameter_in = 0, thread_form = "acme" } = {}) {
   const _g = _finiteGuard({ axial_load_lbf, mean_diameter_in, lead_in, thread_friction, collar_friction, collar_diameter_in }); if (_g) return _g;
   // Unit / range guard added 2026-09-26 after printed-example probing.
@@ -1627,7 +1627,7 @@ MACHINING_RENDERERS["euler-johnson-column"] = renderEulerJohnsonColumn;
 // spec-v1935: eccentrically loaded column by the secant formula (Beer & Johnston 10.6; Shigley 4-16).
 // sigma_max = (P/A)[1 + (e c/r^2) sec((K L/2r) sqrt(P/(E A)))], y_max = e[sec(...) - 1]. Stress is NOT linear
 // in P, so a safety factor goes on the LOAD: with Sy entered, the load at first yield is found by bisection.
-// dims: in { load_lbf: M L T^-2, eccentricity_in: L, extreme_fiber_in: L, modulus_psi: M L^-1 T^-2, yield_strength_psi: M L^-1 T^-2, moment_of_inertia_in4: L^4, area_in2: L^2, length_in: L, end_condition: dimensionless } out: { critical_load_lbf: M L T^-2, load_ratio: dimensionless, secant_term: dimensionless, max_deflection_in: L, max_stress_psi: M L^-1 T^-2, yield_load_lbf: M L T^-2, yield_load_factor: dimensionless }
+// dims: in { load_lbf: M L T^-2, eccentricity_in: L, extreme_fiber_in: L, modulus_psi: M L^-1 T^-2, yield_strength_psi: M L^-1 T^-2, moment_of_inertia_in4: L^4, area_in2: L^2, length_in: L, end_condition: dimensionless } out: { critical_load_lbf: M L T^-2, load_ratio: dimensionless, secant_term: dimensionless, max_deflection_in: L, max_stress_psi: M L^-1 T^-2, yield_load_lbf: M L T^-2, yield_load_factor: dimensionless, radius_of_gyration_in: L }
 export function computeColumnSecantFormula({ load_lbf = 0, eccentricity_in = 0, extreme_fiber_in = 0, modulus_psi = 29000000, yield_strength_psi = 0, moment_of_inertia_in4 = 0, area_in2 = 0, length_in = 0, end_condition = "pinned-pinned" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (Number(modulus_psi) > 0 && Number(modulus_psi) < 1e5) return { error: "Enter the modulus E in psi (29,000,000 for steel), not ksi." };
@@ -1713,7 +1713,7 @@ MACHINING_RENDERERS["column-secant-formula"] = renderColumnSecantFormula;
 // gun barrel) the wall is thick, the stress varies through it, and the peak sits at the BORE. Lame equations for
 // internal pressure: sigma_hoop(bore) = P(ro^2+ri^2)/(ro^2-ri^2), sigma_hoop(outer) = 2P ri^2/(ro^2-ri^2),
 // sigma_radial(bore) = -P, sigma_long(closed) = P ri^2/(ro^2-ri^2). The thin-wall estimate is shown for comparison.
-// dims: in { pressure_psi: M L^-1 T^-2, inner_radius_in: L, wall_thickness_in: L } out: { hoop_bore_psi: M L^-1 T^-2, hoop_outer_psi: M L^-1 T^-2, radial_bore_psi: M L^-1 T^-2, longitudinal_psi: M L^-1 T^-2, thin_wall_estimate_psi: M L^-1 T^-2 }
+// dims: in { pressure_psi: M L^-1 T^-2, inner_radius_in: L, wall_thickness_in: L } out: { hoop_bore_psi: M L^-1 T^-2, hoop_outer_psi: M L^-1 T^-2, radial_bore_psi: M L^-1 T^-2, longitudinal_psi: M L^-1 T^-2, thin_wall_estimate_psi: M L^-1 T^-2, d_over_t: dimensionless, outer_radius_in: L }
 export function computeThickWallCylinderStress({ pressure_psi = 0, inner_radius_in = 0, wall_thickness_in = 0 } = {}) {
   const _g = _finiteGuard({ pressure_psi, inner_radius_in, wall_thickness_in }); if (_g) return _g;
   const P = Number(pressure_psi) || 0;
@@ -1872,7 +1872,7 @@ MACHINING_RENDERERS["plain-bearing-pressure-pv"] = renderPlainBearingPressurePv;
 // ===================== spec-v1303: rigid flange coupling torque capacity =====================
 // flange-bolt-torque is the wrench torque to tighten a bolt; this is the TORQUE a rigid flange coupling transmits
 // through its bolt circle. The bolts act in single shear at the bolt-circle radius: T = n (pi/4 d^2 tau) (BCD/2).
-// dims: in { bolt_count: dimensionless, bolt_diameter_in: L, allowable_shear_psi: M L^-1 T^-2, bolt_circle_diameter_in: L } out: { torque_capacity_in_lb: M L^2 T^-2, torque_capacity_ft_lb: M L^2 T^-2, shear_per_bolt_lbf: M L T^-2, shear_area_per_bolt_in2: L^2 }
+// dims: in { bolt_count: dimensionless, bolt_diameter_in: L, allowable_shear_psi: M L^-1 T^-2, bolt_circle_diameter_in: L } out: { torque_capacity_in_lb: M L^2 T^-2, torque_capacity_ft_lb: M L^2 T^-2, shear_per_bolt_lbf: M L T^-2, shear_area_per_bolt_in2: L^2, bolt_circle_radius_in: L }
 export function computeFlangeCouplingTorque({ bolt_count = 0, bolt_diameter_in = 0, allowable_shear_psi = 0, bolt_circle_diameter_in = 0 } = {}) {
   const _g = _finiteGuard({ bolt_count, bolt_diameter_in, allowable_shear_psi, bolt_circle_diameter_in }); if (_g) return _g;
   const n = Number(bolt_count) || 0;
@@ -2499,7 +2499,7 @@ MACHINING_RENDERERS["gear-undercut-backlash"] = renderGearUndercutBacklash;
 // tile is that the finish you actually get is the LARGER of the two, and a machinist who
 // halves the stepover while leaving a coarse feed has spent time on the cusp that was not
 // governing. The stepover cusp is delegated to the landed tile so the two cannot drift.
-// dims: in { r_in: L, stepover_in: L, feed_per_tooth_in: L, rpm: T^-1, flutes: dimensionless } out: { feed_cusp_in: L, stepover_cusp_in: L, governing_cusp_in: L, feedrate_ipm: L T^-1, balanced_feed_in: L, balanced_stepover_in: L }
+// dims: in { r_in: L, stepover_in: L, feed_per_tooth_in: L, rpm: T^-1, flutes: dimensionless } out: { feed_cusp_in: L, stepover_cusp_in: L, governing_cusp_in: L, feedrate_ipm: L T^-1, balanced_feed_in: L, balanced_stepover_in: L, approx_feed_cusp_in: L, approx_stepover_cusp_in: L, ratio: dimensionless }
 export function computeBallnoseFeedCusp({ r_in = 0.25, stepover_in = 0.03, feed_per_tooth_in = 0.004, rpm = 0, flutes = 2 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const R = Number(r_in) || 0;
@@ -2642,7 +2642,7 @@ function _simpleRenderer(spec) {
 }
 
 // ===================== spec-v1402: drill speed, feed, power, and torque =====================
-// dims: in { diameter_in: L, sfm: L T^-1, feed_ipr: L, unit_power: M L^-1 T^-2, spindle_efficiency: dimensionless } out: { rpm: T^-1, feed_ipm: L T^-1, removal_rate_cipm: L^3 T^-1, torque_in_lb: M L^2 T^-2 }
+// dims: in { diameter_in: L, sfm: L T^-1, feed_ipr: L, unit_power: M L^-1 T^-2, spindle_efficiency: dimensionless } out: { rpm: T^-1, feed_ipm: L T^-1, removal_rate_cipm: L^3 T^-1, torque_in_lb: M L^2 T^-2, motor_power_hp: M L^2 T^-3 }
 export function computeDrillFeedThrust({ diameter_in = 0, sfm = 0, feed_ipr = 0, unit_power = 1.0, spindle_efficiency = 0.8 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(diameter_in > 0)) return { error: "Drill diameter must be positive." };
@@ -2749,7 +2749,7 @@ MACHINING_RENDERERS["band-saw-blade-pitch"] = _simpleRenderer({
 });
 
 // ===================== spec-v1405: counterbore depth and remaining material =====================
-// dims: in { screw_diameter_in: L, head_height_in: L, below_flush_in: L, plate_thickness_in: L, engagement_multiplier: dimensionless, tapped_part: dimensionless } out: { counterbore_depth_in: L, remaining_thickness_in: L, required_engagement_in: L, shortfall_in: L }
+// dims: in { screw_diameter_in: L, head_height_in: L, below_flush_in: L, plate_thickness_in: L, engagement_multiplier: dimensionless, tapped_part: dimensionless } out: { counterbore_depth_in: L, remaining_thickness_in: L, required_engagement_in: L, shortfall_in: L, available_engagement_in: L, minimum_thickness_in: L }
 export function computeCounterboreDepth({ screw_diameter_in = 0, head_height_in = 0, below_flush_in = 0.015, plate_thickness_in = 0, engagement_multiplier = 1.0, tapped_part = "yes" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // Accepts the renderer's "yes"/"no" and a programmatic caller's boolean alike.

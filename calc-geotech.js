@@ -358,7 +358,7 @@ GEOTECH_RENDERERS["coulomb-earth-pressure"] = _simpleRenderer({
 
 // ===================== spec-v262: cantilever retaining wall stability =====================
 
-// dims: in { h_ft: L, b_ft: L, t_base: L, t_stem: L, toe_ft: L, gamma_s: M L^-2 T^-2, gamma_c: M L^-2 T^-2, phi: dimensionless, mu: dimensionless, q: M L^-1 T^-2 } out: { sum_v: M T^-2, mr: M L T^-2, mo: M L T^-2, pa_tot: M T^-2, fs_ot: dimensionless, fs_sl: dimensionless, ecc: L, q_max: M L^-1 T^-2, q_min: M L^-1 T^-2 }
+// dims: in { h_ft: L, b_ft: L, t_base: L, t_stem: L, toe_ft: L, gamma_s: M L^-2 T^-2, gamma_c: M L^-2 T^-2, phi: dimensionless, mu: dimensionless, q: M L^-1 T^-2 } out: { sum_v: M T^-2, mr: M L T^-2, mo: M L T^-2, pa_tot: M T^-2, fs_ot: dimensionless, fs_sl: dimensionless, ecc: L, q_max: M L^-1 T^-2, q_min: M L^-1 T^-2, bearing_length_ft: L, ka: dimensionless }
 export function computeRetainingWallStability({ h_ft = 0, b_ft = 0, t_base = 0, t_stem = 0, toe_ft = 0, gamma_s = 110, gamma_c = 150, phi = 0, mu = 0.5, q = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(h_ft > 0)) return { error: "Wall height must be positive (ft)." };
@@ -481,7 +481,7 @@ GEOTECH_RENDERERS["soil-settlement-elastic"] = _simpleRenderer({
 // is the largest pressure that keeps immediate settlement within a limit. From
 // Se = q B (1 - nu^2) Is / Es, solving for the pressure (with the width fixed):
 // q = Se Es / (B (1 - nu^2) Is), Se in feet = limit_in / 12.
-// dims: in { settlement_limit_in: L, b_ft: L, es_ksf: M L^-1 T^-2, nu: dimensionless, is_f: dimensionless } out: { allowable_pressure_ksf: M L^-1 T^-2, allowable_pressure_psf: M L^-1 T^-2 }
+// dims: in { settlement_limit_in: L, b_ft: L, es_ksf: M L^-1 T^-2, nu: dimensionless, is_f: dimensionless } out: { allowable_pressure_ksf: M L^-1 T^-2, allowable_pressure_psf: M L^-1 T^-2, settlement_limit_in: L }
 export function computeElasticSettlementAllowablePressure({ settlement_limit_in = 1, b_ft = 0, es_ksf = 0, nu = 0.3, is_f = 0.82 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const seIn = Number(settlement_limit_in) || 0;
@@ -1245,7 +1245,7 @@ GEOTECH_RENDERERS["cohesive-earth-pressure"] = _simpleRenderer({
 // 12 ft values and the depth keeps growing. Until 2026-10-07 the pressure kept growing with d, so a
 // pole needing more than 12 ft read short (17.7 ft where the capped relation asks 22.9), the error
 // the marine pile tile's 2026-10-01 fix removed from the same equation.
-// dims: in { lateral_force_lb: M L T^-2, force_height_ft: L, post_width_ft: L, lateral_bearing_psf_per_ft: M L^-2 T^-2, constraint: dimensionless, isolated: dimensionless } out: { embedment_ft: L, embedment_in: L, s_pressure_psf: M L^-1 T^-2 }
+// dims: in { lateral_force_lb: M L T^-2, force_height_ft: L, post_width_ft: L, lateral_bearing_psf_per_ft: M L^-2 T^-2, constraint: dimensionless, isolated: dimensionless } out: { embedment_ft: L, embedment_in: L, s_pressure_psf: M L^-1 T^-2, mult: dimensionless }
 export function computePoleEmbedmentDepth({ lateral_force_lb = 0, force_height_ft = 0, post_width_ft = 0, lateral_bearing_psf_per_ft = 150, constraint = "nonconstrained", isolated = "no" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const P = Number(lateral_force_lb) || 0;

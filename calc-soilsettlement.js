@@ -432,7 +432,7 @@ SOILSETTLEMENT_RENDERERS["consolidation-degree"] = _simpleRenderer({
 // the usual two-way (top-and-bottom porous stone) drainage, the full height for one-way. Output is
 // in^2/min (lab), cm^2/s (lab), and ft^2/day (the unit the two consolidation-time tiles consume).
 // dims: in { method: dimensionless, t_fit_min: T, specimen_height_in: L, drainage: dimensionless }
-//       out: { tv: dimensionless, hdr_in: L, cv_in2_min: L^2 T^-1, cv_cm2_s: L^2 T^-1, cv_ft2_day: L^2 T^-1 }
+//       out: { tv: dimensionless, hdr_in: L, cv_in2_min: L^2 T^-1, cv_cm2_s: L^2 T^-1, cv_ft2_day: L^2 T^-1, fit_percent: dimensionless }
 export function computeCoefficientOfConsolidation({ method = "casagrande", t_fit_min = 0, specimen_height_in = 0, drainage = "double" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const t = Number(t_fit_min) || 0;

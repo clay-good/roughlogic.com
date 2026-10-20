@@ -218,7 +218,7 @@ export function computeDriveshaftCritical({ od_in = 0, wall_in = 0, length_in = 
 
 export const driveshaftExample = { inputs: { od_in: 3.5, wall_in: 0.083, length_in: 48, material: "steel" } };
 
-// dims: in { target_rpm: T^-1, od_in: L, wall_in: L, material: dimensionless } out: { max_length_in: L, critical_rpm: T^-1 }
+// dims: in { target_rpm: T^-1, od_in: L, wall_in: L, material: dimensionless } out: { max_length_in: L, critical_rpm: T^-1, safety_factor: dimensionless }
 export function computeDriveshaftMaxLength({ target_rpm = 0, od_in = 0, wall_in = 0, material = "steel" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const rpm = Number(target_rpm) || 0;
@@ -341,7 +341,7 @@ export function parseTireSize(str) {
 }
 
 // dims: in { original_size: dimensionless, new_size: dimensionless, axle_ratio: dimensionless, top_gear_ratio: dimensionless, target_rpm: T^-1 }
-//        out: { diameter_orig_in: L, diameter_new_in: L, rev_per_mi_orig: L^-1, rev_per_mi_new: L^-1, effective_orig: dimensionless, effective_new: dimensionless, cruise_mph: L T^-1, recommended_axle_ratio: dimensionless }
+//        out: { diameter_orig_in: L, diameter_new_in: L, rev_per_mi_orig: L^-1, rev_per_mi_new: L^-1, effective_orig: dimensionless, effective_new: dimensionless, cruise_mph: L T^-1, recommended_axle_ratio: dimensionless, actual_mph: L T^-1, speedo_error_pct: dimensionless }
 // (Tire-size strings are categorical; axle / gear ratios are pure
 // ratios; target RPM is `T^-1`; cruise mph is length / time;
 // revolutions-per-mile is one revolution (dimensionless) per length,
@@ -780,7 +780,7 @@ MECHANIC_RENDERERS["valve-flow-coefficient"] = renderValveFlowCoefficient;
 // follows. Loading fractions come from the CEMA material class
 // (user-supplied); exceeding the class maximum is flagged.
 //
-// dims: in { screw_diameter_in: L, shaft_diameter_in: L, pitch_in: L, rpm: T^-1, loading_fraction: dimensionless, bulk_density_lb_ft3: dimensionless } out: { capacity_ft3_hr: L^3 T^-1, mass_rate_lb_hr: dimensionless, mass_rate_ton_hr: dimensionless }
+// dims: in { screw_diameter_in: L, shaft_diameter_in: L, pitch_in: L, rpm: T^-1, loading_fraction: dimensionless, bulk_density_lb_ft3: dimensionless } out: { capacity_ft3_hr: L^3 T^-1, mass_rate_lb_hr: M T^-1, mass_rate_ton_hr: M T^-1 }
 export function computeScrewConveyor({ screw_diameter_in = 0, shaft_diameter_in = 0, pitch_in = 0, rpm = 0, loading_fraction = 0, bulk_density_lb_ft3 = 0 } = {}) {
   const D = Number(screw_diameter_in) || 0;
   const d = Number(shaft_diameter_in) || 0;
@@ -827,7 +827,7 @@ const renderScrewConveyor = _simpleRenderer({
 });
 MECHANIC_RENDERERS["screw-conveyor"] = renderScrewConveyor;
 
-// dims: in { target_ft3_hr: dimensionless, screw_diameter_in: L, shaft_diameter_in: L, pitch_in: L, loading_fraction: dimensionless } out: { rpm: T^-1 }
+// dims: in { target_ft3_hr: L^3 T^-1, screw_diameter_in: L, shaft_diameter_in: L, pitch_in: L, loading_fraction: dimensionless } out: { rpm: T^-1, area_ft2: L^2 }
 export function computeScrewConveyorRpm({ target_ft3_hr = 0, screw_diameter_in = 0, shaft_diameter_in = 0, pitch_in = 0, loading_fraction = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const target = Number(target_ft3_hr) || 0;
@@ -932,7 +932,7 @@ MECHANIC_RENDERERS["helical-spring-rate"] = _simpleRenderer({
 // between flat parallel plates: fn = (1/2) sqrt(k g / W), with the same rate k = G d^4/(8 D^3 Na)
 // as helical-spring-rate and the weight of the active coils W = pi^2 d^2 D Na gamma / 4
 // (gamma = wire weight density). The rate cross-pins exactly to the helical-spring-rate tile.
-// dims: in { wire_diameter_in: L, mean_coil_diameter_in: L, active_coils: dimensionless, material: dimensionless } out: { spring_rate_lb_in: M T^-2, active_weight_lb: M L T^-2, natural_frequency_hz: T^-1, natural_frequency_cpm: T^-1 }
+// dims: in { wire_diameter_in: L, mean_coil_diameter_in: L, active_coils: dimensionless, material: dimensionless } out: { spring_rate_lb_in: M T^-2, active_weight_lb: M L T^-2, natural_frequency_hz: T^-1, natural_frequency_cpm: T^-1, spring_index: dimensionless }
 export function computeSpringNaturalFrequency({ wire_diameter_in = 0, mean_coil_diameter_in = 0, active_coils = 0, material = "music-wire" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const d = Number(wire_diameter_in) || 0;
@@ -1185,7 +1185,7 @@ MECHANIC_RENDERERS["gear-contact-stress"] = _simpleRenderer({
 // The bluff-body drag the Stokes settling tile (creeping flow) leaves out: F = 1/2 rho V^2 Cd A,
 // the reason a vehicle needs so much more power at highway speed (drag power grows with the cube
 // of speed). rho is the mass density (weight density / g); V in ft/s. Power P = F V to hp/kW.
-// dims: in { speed_mph: L T^-1, frontal_area_ft2: L^2, drag_coefficient: dimensionless, air_density_lb_ft3: M L^-3 } out: { drag_force_lbf: M L T^-2, drag_power_hp: M L^2 T^-3, drag_power_kw: M L^2 T^-3, dynamic_pressure_psf: M L^-1 T^-2 }
+// dims: in { speed_mph: L T^-1, frontal_area_ft2: L^2, drag_coefficient: dimensionless, air_density_lb_ft3: M L^-3 } out: { drag_force_lbf: M L T^-2, drag_power_hp: M L^2 T^-3, drag_power_kw: M L^2 T^-3, dynamic_pressure_psf: M L^-1 T^-2, speed_fps: L T^-1 }
 export function computeAerodynamicDragForce({ speed_mph = 0, frontal_area_ft2 = 0, drag_coefficient = 0, air_density_lb_ft3 = 0.0765 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const Vmph = Number(speed_mph) || 0;
@@ -1235,7 +1235,7 @@ MECHANIC_RENDERERS["aerodynamic-drag-force"] = _simpleRenderer({
 // loss, grade... are separate parts of the road load." This is the full road load: aero + rolling
 // + grade, and the tractive power to hold a steady speed. The aero term DELEGATES to
 // computeAerodynamicDragForce so the two never drift.
-// dims: in { speed_mph: L T^-1, vehicle_weight_lb: M L T^-2, frontal_area_ft2: L^2, drag_coefficient: dimensionless, rolling_coefficient: dimensionless, grade_pct: dimensionless, air_density_lb_ft3: M L^-3 } out: { total_force_lbf: M L T^-2, road_load_power_hp: M L^2 T^-3, road_load_power_kw: M L^2 T^-3, aero_force_lbf: M L T^-2, rolling_force_lbf: M L T^-2, grade_force_lbf: M L T^-2 }
+// dims: in { speed_mph: L T^-1, vehicle_weight_lb: M L T^-2, frontal_area_ft2: L^2, drag_coefficient: dimensionless, rolling_coefficient: dimensionless, grade_pct: dimensionless, air_density_lb_ft3: M L^-3 } out: { total_force_lbf: M L T^-2, road_load_power_hp: M L^2 T^-3, road_load_power_kw: M L^2 T^-3, aero_force_lbf: M L T^-2, rolling_force_lbf: M L T^-2, grade_force_lbf: M L T^-2, speed_fps: L T^-1 }
 export function computeVehicleRoadLoadPower({ speed_mph = 0, vehicle_weight_lb = 0, frontal_area_ft2 = 0, drag_coefficient = 0, rolling_coefficient = 0.012, grade_pct = 0, air_density_lb_ft3 = 0.0765 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const Vmph = Number(speed_mph) || 0;
@@ -1346,7 +1346,7 @@ MECHANIC_RENDERERS["planetary-gear-ratio"] = _simpleRenderer({
 // Braking torque T = (T1 - T2) r. The tension ratio climbs fast with wrap angle.
 // Lining pressure and band stress added 2026-10-09 (the note named them as separate): the pressure peaks at the
 // tight end, p_max = 2 T1/(b D) = T1/(b r) (Shigley Ch. 16), and the band carries T1 over b t.
-// dims: in { slack_tension_lbf: M L T^-2, wrap_angle_deg: dimensionless, friction_coefficient: dimensionless, drum_radius_in: L, band_width_in: L, band_thickness_in: L } out: { tight_tension_lbf: M L T^-2, tension_ratio: dimensionless, brake_torque_in_lbf: M L^2 T^-2, brake_torque_ft_lbf: M L^2 T^-2 , max_lining_pressure_psi: M L^-1 T^-2, band_stress_psi: M L^-1 T^-2 }
+// dims: in { slack_tension_lbf: M L T^-2, wrap_angle_deg: dimensionless, friction_coefficient: dimensionless, drum_radius_in: L, band_width_in: L, band_thickness_in: L } out: { tight_tension_lbf: M L T^-2, tension_ratio: dimensionless, brake_torque_in_lbf: M L^2 T^-2, brake_torque_ft_lbf: M L^2 T^-2 , max_lining_pressure_psi: M L^-1 T^-2, band_stress_psi: M L^-1 T^-2, wrap_angle_deg: dimensionless }
 export function computeBandBrakeTorque({ slack_tension_lbf = 0, wrap_angle_deg = 0, friction_coefficient = 0, drum_radius_in = 0, band_width_in = 0, band_thickness_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const T2 = Number(slack_tension_lbf) || 0;
@@ -1446,7 +1446,7 @@ MECHANIC_RENDERERS["centrifugal-force"] = _simpleRenderer({
 // clothespin, hinge return). A torsion spring loads its wire in BENDING, so its rate uses E (not G):
 // k' = d^4 E/(10.8 D Na) in-lb per turn; torque T = k'(deg/360); bending stress sigma = Kb 32 T/(pi d^3),
 // Kb = (4C^2 - C - 1)/(4C(C - 1)) the Wahl round-wire bending factor.
-// dims: in { wire_diameter_in: L, mean_coil_diameter_in: L, active_coils: dimensionless, deflection_deg: dimensionless, material: dimensionless } out: { rate_in_lb_per_turn: M L^2 T^-2, rate_in_lb_per_deg: M L^2 T^-2, torque_in_lb: M L^2 T^-2, bending_stress_psi: M L^-1 T^-2 }
+// dims: in { wire_diameter_in: L, mean_coil_diameter_in: L, active_coils: dimensionless, deflection_deg: dimensionless, material: dimensionless } out: { rate_in_lb_per_turn: M L^2 T^-2, rate_in_lb_per_deg: M L^2 T^-2, torque_in_lb: M L^2 T^-2, bending_stress_psi: M L^-1 T^-2, spring_index: dimensionless, youngs_modulus_psi: M L^-1 T^-2 }
 export function computeTorsionSpringRate({ wire_diameter_in = 0, mean_coil_diameter_in = 0, active_coils = 0, deflection_deg = 0, material = "music-wire" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const d = Number(wire_diameter_in) || 0;
@@ -1555,7 +1555,7 @@ MECHANIC_RENDERERS["universal-joint-speed"] = _simpleRenderer({
 // PAST mid-stroke at 90 deg. Velocity and acceleration at a crank speed added 2026-10-09 (the note named them
 // as separate): v = omega dx/dtheta, a = omega^2 d2x/dtheta2 at constant omega, s = sqrt(L^2 - r^2 sin^2):
 // dx/dtheta = r sin + r^2 sin cos / s; d2x/dtheta2 = r cos + r^2 (cos^2 - sin^2)/s + r^4 sin^2 cos^2 / s^3.
-// dims: in { stroke_in: L, rod_length_in: L, crank_angle_deg: dimensionless, crank_rpm: T^-1 } out: { position_from_tdc_in: L, percent_of_stroke: dimensionless, rod_angularity_shift_in: L, velocity_fps: L T^-1, accel_g: dimensionless, tdc_accel_g: dimensionless }
+// dims: in { stroke_in: L, rod_length_in: L, crank_angle_deg: dimensionless, crank_rpm: T^-1 } out: { position_from_tdc_in: L, percent_of_stroke: dimensionless, rod_angularity_shift_in: L, velocity_fps: L T^-1, accel_g: dimensionless, tdc_accel_g: dimensionless, simple_position_in: L }
 export function computeSliderCrankPistonPosition({ stroke_in = 0, rod_length_in = 0, crank_angle_deg = 0, crank_rpm = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const stroke = Number(stroke_in) || 0;
@@ -1616,7 +1616,7 @@ MECHANIC_RENDERERS["slider-crank-piston-position"] = _simpleRenderer({
 // x = r(1 - cos theta), v = r omega sin theta, a = r omega^2 cos theta. Used for reciprocating pumps and
 // compressors, valve/gate actuators, and sine-motion shaker or vibration-test rigs. Peak speed r*omega at mid-stroke,
 // peak acceleration r*omega^2 at each end (which sets the reciprocating inertia load).
-// dims: in { crank_radius_in: L, crank_rpm: T^-1, crank_angle_deg: dimensionless } out: { stroke_in: L, peak_velocity_fps: L T^-1, peak_accel_g: dimensionless }
+// dims: in { crank_radius_in: L, crank_rpm: T^-1, crank_angle_deg: dimensionless } out: { stroke_in: L, peak_velocity_fps: L T^-1, peak_accel_g: dimensionless, position_in: L }
 export function computeScotchYokeMotion({ crank_radius_in = 0, crank_rpm = 0, crank_angle_deg = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const G_IN_S2 = 386.0886; // 1 g in in/s^2 (32.174 ft/s^2 x 12)
@@ -1712,7 +1712,7 @@ MECHANIC_RENDERERS["toggle-mechanism-force"] = _simpleRenderer({
 // ramp, sizing a winch pull for a ramp, checking whether a load slides). Along the incline, F_up = W(sin th + mu cos
 // th) to move up, W(sin th - mu cos th) is the net down-slope pull gravity wins by (positive => slides on its own).
 // Ideal (frictionless) MA = 1/sin th = ramp length/rise; the self-slide threshold is the repose angle atan(mu).
-// dims: in { weight_lb: M L T^-2, incline_angle_deg: dimensionless, friction_coefficient: dimensionless } out: { force_up_lb: M L T^-2, normal_force_lb: M L T^-2, ideal_mechanical_advantage: dimensionless }
+// dims: in { weight_lb: M L T^-2, incline_angle_deg: dimensionless, friction_coefficient: dimensionless } out: { force_up_lb: M L T^-2, normal_force_lb: M L T^-2, ideal_mechanical_advantage: dimensionless, repose_angle_deg: dimensionless }
 export function computeInclinedPlaneForce({ weight_lb = 0, incline_angle_deg = 0, friction_coefficient = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const W = Number(weight_lb) || 0;
@@ -1764,7 +1764,7 @@ MECHANIC_RENDERERS["inclined-plane-force"] = _simpleRenderer({
 // advantage is (cos b - mu sin b)/(2 (sin b + mu cos b)). Frictionless it is 1/(2 tan b), but wedges live on friction: the
 // self-locking property (a driven wedge or shim STAYS put) holds when the half-angle is under the friction angle,
 // b < atan(mu). Distinct in use from the toggle (a clamp linkage) and the inclined plane (a load sliding up a ramp).
-// dims: in { driving_force_lb: M L T^-2, included_angle_deg: dimensionless, friction_coefficient: dimensionless } out: { spreading_force_lb: M L T^-2, mechanical_advantage: dimensionless, self_locking: dimensionless }
+// dims: in { driving_force_lb: M L T^-2, included_angle_deg: dimensionless, friction_coefficient: dimensionless } out: { spreading_force_lb: M L T^-2, mechanical_advantage: dimensionless, self_locking: dimensionless, friction_angle_deg: dimensionless, half_angle_deg: dimensionless }
 export function computeWedgeForce({ driving_force_lb = 0, included_angle_deg = 0, friction_coefficient = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const P = Number(driving_force_lb) || 0;
@@ -1918,7 +1918,7 @@ MECHANIC_RENDERERS["hydraulic-accumulator-volume"] = _simpleRenderer({
 // complementary angles give equal range. Still-air upper bound (no drag). g = 32.174 ft/s^2.
 // Launch height added 2026-10-09 (the note named it as separate): with the launch h above the landing plane,
 // t = (v sin + sqrt((v sin)^2 + 2 g h))/g, R = v cos t, and the best angle is atan(v / sqrt(v^2 + 2 g h)).
-// dims: in { velocity_fps: L T^-1, angle_deg: dimensionless, launch_height_ft: L } out: { range_ft: L, max_height_ft: L, flight_time_s: T, best_angle_deg: dimensionless }
+// dims: in { velocity_fps: L T^-1, angle_deg: dimensionless, launch_height_ft: L } out: { range_ft: L, max_height_ft: L, flight_time_s: T, best_angle_deg: dimensionless, complementary_angle_deg: dimensionless, launch_height_ft: L }
 export function computeProjectileRange({ velocity_fps = 0, angle_deg = 0, launch_height_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const v = Number(velocity_fps) || 0;
@@ -2054,7 +2054,7 @@ MECHANIC_RENDERERS["terminal-velocity"] = _simpleRenderer({
 
 // --- v20 K.1: Horsepower from torque and RPM (`hp-from-torque`) ---
 // HP = Torque * RPM / 5252; kW = HP * 0.7457. Solve for any of {HP, T, RPM}.
-// dims: in { solve_for: dimensionless, torque_lbft: M*L^2*T^-2, rpm: T^-1, hp: M L^2 T^-3 } out: { hp: M L^2 T^-3, kw: M L^2 T^-3 }
+// dims: in { solve_for: dimensionless, torque_lbft: M*L^2*T^-2, rpm: T^-1, hp: M L^2 T^-3 } out: { hp: M L^2 T^-3, kw: M L^2 T^-3, rpm: T^-1, torque_lbft: M L^2 T^-2 }
 export function computeHpFromTorque({ solve_for = "hp", torque_lbft = 0, rpm = 0, hp = 0 } = {}) {
   if (!["hp", "torque", "rpm"].includes(solve_for)) return { error: "Solve for must be hp, torque or rpm." };
   if (solve_for === "hp" && (!(Number(torque_lbft) > 0) || !(Number(rpm) > 0))) return { error: "Enter torque (lb-ft) and rpm." };
@@ -2161,7 +2161,7 @@ MECHANIC_RENDERERS["volumetric-efficiency"] = renderVolumetricEfficiency;
 
 // --- v20 K.3: Gear-ratio MPH from RPM (`gear-mph-rpm`) ---
 // MPH = RPM * pi * dia * 60 / (trans * axle * 63360); revs/mile = 63360/(pi*dia).
-// dims: in { solve_for: dimensionless, rpm: T^-1, trans_ratio: dimensionless, axle_ratio: dimensionless, tire_dia_in: L, mph: L*T^-1 } out: { mph: L*T^-1, rpm: T^-1 }
+// dims: in { solve_for: dimensionless, rpm: T^-1, trans_ratio: dimensionless, axle_ratio: dimensionless, tire_dia_in: L, mph: L*T^-1 } out: { mph: L*T^-1, rpm: T^-1, wheel_rpm: T^-1 }
 export function computeGearMphRpm({ solve_for = "mph", rpm = 0, trans_ratio = 1, axle_ratio = 0, tire_dia_in = 0, mph = 0 } = {}) {
   if (solve_for !== "mph" && solve_for !== "rpm") return { error: "Solve for must be mph or rpm." };
   const N = Number(rpm) || 0;
@@ -2475,7 +2475,7 @@ MECHANIC_RENDERERS["et-horsepower"] = _simpleRenderer({
 
 // ===================== spec-v396..v398: fluid-power / cooling trio (Group K) =====================
 
-// dims: in { gpm: L^3 T^-1, psi: M L^-1 T^-2, efficiency: dimensionless } out: { fluid_hp: M L^2 T^-3, input_hp: M L^2 T^-3 }
+// dims: in { gpm: L^3 T^-1, psi: M L^-1 T^-2, efficiency: dimensionless } out: { fluid_hp: M L^2 T^-3, input_hp: M L^2 T^-3, loss_hp: M L^2 T^-3 }
 export function computeHydraulicPumpHorsepower({ gpm = 0, psi = 0, efficiency = 0.85 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const q = Number(gpm) || 0;
@@ -3008,7 +3008,7 @@ MECHANIC_RENDERERS["hull-speed"] = _simpleRenderer({
 // displacement hull speed from a waterline length; sizing the waterline a hull
 // needs to reach a target speed is the inverse. From hull_speed = 1.34 x sqrt(LWL),
 // LWL = (target_speed / 1.34)^2 (the coefficient is editable, ~1.34-1.4).
-// dims: in { target_hull_speed_kn: L T^-1, coefficient: dimensionless } out: { waterline_length_ft: L }
+// dims: in { target_hull_speed_kn: L T^-1, coefficient: dimensionless } out: { waterline_length_ft: L, coefficient: dimensionless }
 export function computeWaterlineForHullSpeed({ target_hull_speed_kn = 0, coefficient = 1.34 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const sp = Number(target_hull_speed_kn) || 0;
@@ -3620,7 +3620,7 @@ MECHANIC_RENDERERS["sacrificial-anode-life"] = _simpleRenderer({
 // A 4-stroke fires every 2 crank revs (n_rev = 2), a 2-stroke every rev (n_rev = 1). With T in lb-in
 // (= lb-ft*12) and V_d in in^3, BMEP(psi) = 2*pi*n_rev*12*T_lbft/CID -> 150.8 (4-stroke) / 75.4 (2-stroke).
 const _BMEP_FACTOR = { four_stroke: 150.796, two_stroke: 75.398 };
-// dims: in { torque_lb_ft: M L^2 T^-2, displacement_cid: L^3, cycle_type: dimensionless } out: { bmep_psi: M L^-1 T^-2 }
+// dims: in { torque_lb_ft: M L^2 T^-2, displacement_cid: L^3, cycle_type: dimensionless } out: { bmep_psi: M L^-1 T^-2, factor: dimensionless }
 export function computeEngineBmep({ torque_lb_ft = 0, displacement_cid = 0, cycle_type = "four_stroke" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const t = Number(torque_lb_ft) || 0;
@@ -3701,7 +3701,7 @@ MECHANIC_RENDERERS["glidepath-descent-rate"] = _simpleRenderer({
 // In a coordinated level turn, horizontal lift = centripetal force: L sin(phi) = m V^2 / R and
 // L cos(phi) = m g, so tan(phi) = V^2/(g R) -> R = V^2/(g tan(phi)). With V in kt -> ft/s (x1.68781)
 // and g = 32.174 ft/s^2, R = 0.08854 x V_kt^2 / tan(phi). Rate of turn = V/R (rad/s) in deg/s.
-// dims: in { airspeed_kt: L T^-1, bank_angle_deg: dimensionless } out: { turn_radius_ft: L, rate_of_turn_deg_s: T^-1 }
+// dims: in { airspeed_kt: L T^-1, bank_angle_deg: dimensionless } out: { turn_radius_ft: L, rate_of_turn_deg_s: T^-1, turn_diameter_ft: L }
 export function computeTurnRadiusBank({ airspeed_kt = 0, bank_angle_deg = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const v = Number(airspeed_kt) || 0;
@@ -4039,7 +4039,7 @@ const HYD_LINE_BANDS = {
   return: { label: "Return", min: 4, max: 13 },
   pressure: { label: "Pressure / discharge", min: 7, max: 18 },
 };
-// dims: in { flow_gpm: L^3 T^-1, inside_dia_in: L, line_type: dimensionless, max_velocity_override_fps: L T^-1 } out: { area_in2: L^2, velocity_fps: L T^-1, min_dia_in: L }
+// dims: in { flow_gpm: L^3 T^-1, inside_dia_in: L, line_type: dimensionless, max_velocity_override_fps: L T^-1 } out: { area_in2: L^2, velocity_fps: L T^-1, min_dia_in: L, band_max_fps: L T^-1, max_flow_gpm: L^3 T^-1 }
 export function computeHydraulicLineVelocity({ flow_gpm = 0, inside_dia_in = 0, line_type = "pressure", max_velocity_override_fps = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const q = Number(flow_gpm) || 0;
@@ -4098,7 +4098,7 @@ MECHANIC_RENDERERS["hydraulic-line-velocity"] = _simpleRenderer({
 // where the two fuel systems part: a return system's regulator references manifold pressure and
 // holds the differential constant, while a returnless system holds the RAIL constant, so boost eats
 // the differential and the injector flows LESS exactly when the engine wants more.
-// dims: in { rated_flow_ccmin: L^3 T^-1, rated_pressure_psi: M L^-1 T^-2, rail_pressure_psi: M L^-1 T^-2, manifold_pressure_psig: M L^-1 T^-2, system_type: dimensionless } out: { effective_dp_psi: M L^-1 T^-2, flow_ccmin: L^3 T^-1, flow_lbh: M T^-1 }
+// dims: in { rated_flow_ccmin: L^3 T^-1, rated_pressure_psi: M L^-1 T^-2, rail_pressure_psi: M L^-1 T^-2, manifold_pressure_psig: M L^-1 T^-2, system_type: dimensionless } out: { effective_dp_psi: M L^-1 T^-2, flow_ccmin: L^3 T^-1, flow_lbh: M T^-1, pressure_ratio: dimensionless }
 export function computeInjectorFlowAtPressure({ rated_flow_ccmin = 0, rated_pressure_psi = 43.5, rail_pressure_psi = 43.5, manifold_pressure_psig = 0, system_type = "returnless" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const rated = Number(rated_flow_ccmin) || 0;
@@ -4256,7 +4256,7 @@ MECHANIC_RENDERERS["belt-deflection-tension"] = _simpleRenderer({
 // only multiplies by Kv (and by the idler factor for reversed bending).
 // Kv = (1200 + V)/1200 for cut or milled teeth, (600 + V)/600 for cast or crude teeth, with
 // V the pitch-line velocity in feet per minute.
-// dims: in { horsepower: M L^2 T^-3, rpm: T^-1, number_of_teeth: dimensionless, diametral_pitch_1_in: L^-1, face_width_in: L, tooth_system: dimensionless, y_diametral_override: dimensionless, tooth_cut: dimensionless, is_idler: dimensionless, sut_psi: M L^-1 T^-2 } out: { pitch_diameter_in: L, torque_inlb: M L^2 T^-2, wt_lb: M L T^-2, velocity_fpm: L T^-1, kv: dimensionless, static_stress_psi: M L^-1 T^-2, dynamic_stress_psi: M L^-1 T^-2, allowable_psi: M L^-1 T^-2, safety_factor: dimensionless }
+// dims: in { horsepower: M L^2 T^-3, rpm: T^-1, number_of_teeth: dimensionless, diametral_pitch_1_in: L^-1, face_width_in: L, tooth_system: dimensionless, y_diametral_override: dimensionless, tooth_cut: dimensionless, is_idler: dimensionless, sut_psi: M L^-1 T^-2 } out: { pitch_diameter_in: L, torque_inlb: M L^2 T^-2, wt_lb: M L T^-2, velocity_fpm: L T^-1, kv: dimensionless, static_stress_psi: M L^-1 T^-2, dynamic_stress_psi: M L^-1 T^-2, allowable_psi: M L^-1 T^-2, safety_factor: dimensionless, dynamic_penalty_pct: dimensionless }
 export function computeGearDynamicToothStress({ horsepower = 0, rpm = 0, number_of_teeth = 0, diametral_pitch_1_in = 0, face_width_in = 0, tooth_system = "20-full-depth", y_diametral_override = 0, tooth_cut = "cut", is_idler = "no", sut_psi = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (arguments[0]?.is_idler !== undefined && !["yes", "no"].includes(arguments[0].is_idler)) return { error: "is_idler must be yes or no." };
@@ -4365,7 +4365,7 @@ MECHANIC_RENDERERS["gear-dynamic-tooth-stress"] = _simpleRenderer({
 // root is 0.87 -- and it is what this tile computes.
 // ===========================================================================
 
-// dims: in { baseline_pressure_inhg: M L^-1 T^-2, baseline_temp_f: T, actual_pressure_inhg: M L^-1 T^-2, actual_temp_f: T, jet_flow_number: dimensionless, jet_diameter_in: L } out: { density_ratio: dimensionless, corrected_jet_number: dimensionless, corrected_jet_diameter_in: L }
+// dims: in { baseline_pressure_inhg: M L^-1 T^-2, baseline_temp_f: T, actual_pressure_inhg: M L^-1 T^-2, actual_temp_f: T, jet_flow_number: dimensionless, jet_diameter_in: L } out: { density_ratio: dimensionless, corrected_jet_number: dimensionless, corrected_jet_diameter_in: L, power_loss_pct: dimensionless, pressure_ratio: dimensionless }
 export function computeCarburetorAltitudeJetting({ baseline_pressure_inhg = 29.92, baseline_temp_f = 59, actual_pressure_inhg = 0, actual_temp_f = null, jet_flow_number = 0, jet_diameter_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // The page passes a blank box as null; 0 F is a real reading, so a blank cannot stand in for it.

@@ -135,7 +135,7 @@ const _REF_KW_PER_HP = 0.745699872;
 // Charge is a sum of liquid inventories, each at its own vessel's operating
 // temperature, because liquid ammonia's density falls markedly as it warms
 // and a single bundled density would misstate a low-temperature recirculator.
-// dims: in { receiver_volume_gal: L^3, receiver_fill_fraction: dimensionless, receiver_density_lb_ft3: M L^-3, recirculator_volume_gal: L^3, recirculator_fill_fraction: dimensionless, recirculator_density_lb_ft3: M L^-3, piping_volume_ft3: L^3, piping_liquid_fraction: dimensionless, piping_density_lb_ft3: M L^-3, threshold_lb: M } out: { receiver_lb: M, recirculator_lb: M, piping_lb: M, total_lb: M, margin_lb: M, pct_of_threshold: dimensionless, additional_cuft_to_cross: L^3 }
+// dims: in { receiver_volume_gal: L^3, receiver_fill_fraction: dimensionless, receiver_density_lb_ft3: M L^-3, recirculator_volume_gal: L^3, recirculator_fill_fraction: dimensionless, recirculator_density_lb_ft3: M L^-3, piping_volume_ft3: L^3, piping_liquid_fraction: dimensionless, piping_density_lb_ft3: M L^-3, threshold_lb: M } out: { receiver_lb: M, recirculator_lb: M, piping_lb: M, total_lb: M, margin_lb: M, pct_of_threshold: dimensionless, additional_cuft_to_cross: L^3, piping_share_pct: dimensionless }
 export function computeAmmoniaChargeInventory({
   receiver_volume_gal = 0, receiver_fill_fraction = 0, receiver_density_lb_ft3 = 0,
   recirculator_volume_gal = 0, recirculator_fill_fraction = 0, recirculator_density_lb_ft3 = 0,
@@ -226,7 +226,7 @@ REFRIGERATION_RENDERERS["ammonia-charge-inventory"] = _simpleRenderer({
 // total ratio equally minimizes the total work -- and equal ratios put the
 // interstage at the GEOMETRIC mean of the two absolute pressures, which is
 // always below the arithmetic mean the eye reaches for.
-// dims: in { low_psig: M L^-1 T^-2, high_psig: M L^-1 T^-2, intermediate_load_psig: M L^-1 T^-2 } out: { p_low_psia: M L^-1 T^-2, p_high_psia: M L^-1 T^-2, interstage_psia: M L^-1 T^-2, interstage_psig: M L^-1 T^-2, stage_ratio: dimensionless, single_stage_ratio: dimensionless, arithmetic_mean_psig: M L^-1 T^-2 }
+// dims: in { low_psig: M L^-1 T^-2, high_psig: M L^-1 T^-2, intermediate_load_psig: M L^-1 T^-2 } out: { p_low_psia: M L^-1 T^-2, p_high_psia: M L^-1 T^-2, interstage_psia: M L^-1 T^-2, interstage_psig: M L^-1 T^-2, stage_ratio: dimensionless, single_stage_ratio: dimensionless, arithmetic_mean_psig: M L^-1 T^-2, arithmetic_excess_psi: M L^-1 T^-2 }
 export function computeTwoStageInterstagePressure({ low_psig = 0, high_psig = 0, intermediate_load_psig = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const p_low_psia = low_psig + _REF_ATM_PSIA;
@@ -296,7 +296,7 @@ REFRIGERATION_RENDERERS["two-stage-interstage-pressure"] = _simpleRenderer({
 // envelope is paid twice, once at the meter and once at the compressor. So the
 // internal electric load is the only line that a retrofit touching no
 // refrigeration equipment can move, and it moves both bills at once.
-// dims: in { case_length_ft: L, infiltration_btuh_per_ft: M L T^-3, transmission_btuh_per_ft: M L T^-3, product_btuh: M L^2 T^-3, lights_w: M L^2 T^-3, fan_w: M L^2 T^-3, antisweat_w: M L^2 T^-3, antisweat_run_fraction: dimensionless, defrost_w: M L^2 T^-3, defrost_run_fraction: dimensionless, retrofit_lights_w: M L^2 T^-3, retrofit_antisweat_run_fraction: dimensionless } out: { infiltration_btuh: M L^2 T^-3, transmission_btuh: M L^2 T^-3, internal_btuh: M L^2 T^-3, total_btuh: M L^2 T^-3, internal_pct: dimensionless, retrofit_total_btuh: M L^2 T^-3, meter_saving_w: M L^2 T^-3 }
+// dims: in { case_length_ft: L, infiltration_btuh_per_ft: M L T^-3, transmission_btuh_per_ft: M L T^-3, product_btuh: M L^2 T^-3, lights_w: M L^2 T^-3, fan_w: M L^2 T^-3, antisweat_w: M L^2 T^-3, antisweat_run_fraction: dimensionless, defrost_w: M L^2 T^-3, defrost_run_fraction: dimensionless, retrofit_lights_w: M L^2 T^-3, retrofit_antisweat_run_fraction: dimensionless } out: { infiltration_btuh: M L^2 T^-3, transmission_btuh: M L^2 T^-3, internal_btuh: M L^2 T^-3, total_btuh: M L^2 T^-3, internal_pct: dimensionless, retrofit_total_btuh: M L^2 T^-3, meter_saving_w: M L^2 T^-3, antisweat_btuh: M L^2 T^-3, defrost_btuh: M L^2 T^-3, fan_btuh: M L^2 T^-3, infiltration_pct: dimensionless, internal_electric_w: M L^2 T^-3, lights_btuh: M L^2 T^-3, load_reduction_btuh: M L^2 T^-3, product_btuh: M L^2 T^-3, retrofit_internal_btuh: M L^2 T^-3, retrofit_internal_w: M L^2 T^-3 }
 export function computeRefrigeratedCaseLoad({
   case_length_ft = 0, infiltration_btuh_per_ft = 0, transmission_btuh_per_ft = 0, product_btuh = 0,
   lights_w = 0, fan_w = 0, antisweat_w = 0, antisweat_run_fraction = 1,
@@ -549,7 +549,7 @@ REFRIGERATION_RENDERERS["condenser-td-head-pressure"] = _simpleRenderer({
 // pressure rise is enormous and fast -- a vessel rupture rather than a relief
 // event if there is no relief path. So the limit is evaluated at the WARMEST
 // liquid temperature the receiver could see, not at operating temperature.
-// dims: in { receiver_volume_gal: L^3, existing_liquid_gal: L^3, fill_limit_fraction: dimensionless, liquid_density_lb_ft3: M L^-3, charge_to_pump_lb: M } out: { density_lb_gal: M L^-3, available_gal: L^3, required_gal: L^3, resulting_fill_pct: dimensionless, max_charge_lb: M, spare_gal: L^3 }
+// dims: in { receiver_volume_gal: L^3, existing_liquid_gal: L^3, fill_limit_fraction: dimensionless, liquid_density_lb_ft3: M L^-3, charge_to_pump_lb: M } out: { density_lb_gal: M L^-3, available_gal: L^3, required_gal: L^3, resulting_fill_pct: dimensionless, max_charge_lb: M, spare_gal: L^3, fill_limit_fraction: dimensionless, limit_gal: L^3, resulting_gal: L^3 }
 export function computeReceiverPumpdownCapacity({
   receiver_volume_gal = 0, existing_liquid_gal = 0, fill_limit_fraction = 0.8,
   liquid_density_lb_ft3 = 0, charge_to_pump_lb = 0,
@@ -616,7 +616,7 @@ REFRIGERATION_RENDERERS["receiver-pumpdown-capacity"] = _simpleRenderer({
 // below 1, so the same duty at the same delta-T needs MORE flow -- and the
 // fluid factor this returns, 500 x SG x cp, is exactly the input that
 // hydronic-gpm-deltat asks the user to supply.
-// dims: in { load_btuh: M L^2 T^-3, delta_t_f: T, glycol_cp: dimensionless, glycol_sg: dimensionless, head_ft: L, pump_efficiency: dimensionless, chiller_approach_f: T, coil_approach_f: T, compressor_pct_per_deg_f: dimensionless, annual_hours: T, energy_rate_per_kwh: dimensionless } out: { water_gpm: L^3 T^-1, glycol_gpm: L^3 T^-1, flow_increase_pct: dimensionless, fluid_factor: dimensionless, pump_bhp: M L^2 T^-3, annual_kwh: M L^2 T^-2, total_approach_f: T, compressor_penalty_pct: dimensionless }
+// dims: in { load_btuh: M L^2 T^-3, delta_t_f: T, glycol_cp: dimensionless, glycol_sg: dimensionless, head_ft: L, pump_efficiency: dimensionless, chiller_approach_f: T, coil_approach_f: T, compressor_pct_per_deg_f: dimensionless, annual_hours: T, energy_rate_per_kwh: dimensionless } out: { water_gpm: L^3 T^-1, glycol_gpm: L^3 T^-1, flow_increase_pct: dimensionless, fluid_factor: dimensionless, pump_bhp: M L^2 T^-3, annual_kwh: M L^2 T^-2, total_approach_f: T, compressor_penalty_pct: dimensionless, annual_cost: dimensionless, pump_kw: M L^2 T^-3 }
 export function computeSecondaryGlycolLoop({
   load_btuh = 0, delta_t_f = 0, glycol_cp = 1, glycol_sg = 1,
   head_ft = 0, pump_efficiency = 0.7,
@@ -703,7 +703,7 @@ REFRIGERATION_RENDERERS["secondary-glycol-loop"] = _simpleRenderer({
 // fixing one fixes the other. Raising pressure at a fixed outlet temperature
 // buys refrigerating effect and costs compressor work; the two cross, and the
 // crossing point is the optimum.
-// dims: in { ambient_f: T, gas_cooler_approach_f: T, evaporating_psig: M L^-1 T^-2 } out: { gc_outlet_f: T, gc_outlet_c: T, p_opt_bar: M L^-1 T^-2, p_opt_psia: M L^-1 T^-2, p_opt_psig: M L^-1 T^-2, pressure_ratio: dimensionless }
+// dims: in { ambient_f: T, gas_cooler_approach_f: T, evaporating_psig: M L^-1 T^-2 } out: { gc_outlet_f: T, gc_outlet_c: T, p_opt_bar: M L^-1 T^-2, p_opt_psia: M L^-1 T^-2, p_opt_psig: M L^-1 T^-2, pressure_ratio: dimensionless, critical_psia: M L^-1 T^-2 }
 export function computeCo2TranscriticalPressure({ ambient_f = null, gas_cooler_approach_f = 0, evaporating_psig = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // A blank ambient read as 0 F reported a subcritical gas cooler with confidence.

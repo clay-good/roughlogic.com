@@ -37,7 +37,7 @@ export const LOWVOLTAGE_RENDERERS = {};
 // ---------------------------------------------------------------------
 // Z.1 Fiber optic loss budget (fiber-loss-budget)
 // ---------------------------------------------------------------------
-// dims: in { length_m: L, attenuation_db_km: dimensionless, connector_count: dimensionless, splice_count: dimensionless, max_channel_loss_db: dimensionless } out: { total_loss_db: dimensionless, margin_db: dimensionless }
+// dims: in { length_m: L, attenuation_db_km: dimensionless, connector_count: dimensionless, splice_count: dimensionless, max_channel_loss_db: dimensionless } out: { total_loss_db: dimensionless, margin_db: dimensionless, connector_loss_db: dimensionless, fiber_loss_db: dimensionless, max_channel_loss_db: dimensionless, splice_loss_db: dimensionless }
 export function computeFiberLossBudget({ length_m = 0, attenuation_db_km = 0, connector_count = 0, loss_per_connector_db = 0.75, splice_count = 0, loss_per_splice_db = 0.3, max_channel_loss_db = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const len = Number(length_m);
@@ -270,7 +270,7 @@ function _renderWirelessLinkBudget(inputRegion, outputRegion, citationEl) {
 }
 LOWVOLTAGE_RENDERERS["wireless-link-budget"] = _renderWirelessLinkBudget;
 
-// dims: in { max_channel_loss_db: dimensionless, attenuation_db_km: dimensionless, connector_count: dimensionless, splice_count: dimensionless } out: { max_length_m: L, max_length_ft: L }
+// dims: in { max_channel_loss_db: dimensionless, attenuation_db_km: dimensionless, connector_count: dimensionless, splice_count: dimensionless } out: { max_length_m: L, max_length_ft: L, fiber_budget_db: dimensionless, fixed_loss_db: dimensionless }
 export function computeFiberMaxLength({ max_channel_loss_db = 0, attenuation_db_km = 0, connector_count = 0, loss_per_connector_db = 0.75, splice_count = 0, loss_per_splice_db = 0.3 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const maxch = Number(max_channel_loss_db);
@@ -339,7 +339,7 @@ function _trayColumn2Area(trayType, width) {
   const factor = trayType === "solid-bottom" ? 0.917 : 1.167;
   return factor * width;
 }
-// dims: in { tray_width_in: L, cables: dimensionless } out: { fill_value: L, allowable: L, fill_percent: dimensionless }
+// dims: in { tray_width_in: L, cables: dimensionless } out: { fill_value: L, allowable: L, fill_percent: dimensionless, area_sum_in2: L^2, diameter_sum_in: L, tray_width_in: L }
 export function computeCableTrayFill({ tray_type = "ladder", tray_width_in = 0, cables = [] } = {}) {
   const _g = _finiteGuard({ tray_width_in }); if (_g) return _g;
   const width = Number(tray_width_in);
@@ -440,7 +440,7 @@ LOWVOLTAGE_RENDERERS["cable-tray-fill"] = _renderCableTrayFill;
 // Z.3 IP camera / NVR storage and bandwidth (cctv-storage)
 // ---------------------------------------------------------------------
 // 1 Mbps continuous = 0.45 GB/hour = 10.8 GB/day.
-// dims: in { camera_count: dimensionless, bitrate_mbps: dimensionless, motion_duty_percent: dimensionless, retention_days: dimensionless } out: { total_storage_gb: dimensionless, aggregate_bandwidth_mbps: dimensionless }
+// dims: in { camera_count: dimensionless, bitrate_mbps: dimensionless, motion_duty_percent: dimensionless, retention_days: dimensionless } out: { total_storage_gb: dimensionless, aggregate_bandwidth_mbps: dimensionless, camera_count: dimensionless }
 export function computeCctvStorage({ camera_count = 1, bitrate_mbps = 0, recording_mode = "continuous", motion_duty_percent, retention_days = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const n = Math.max(0, Number(camera_count) || 0);
@@ -551,7 +551,7 @@ LOWVOLTAGE_RENDERERS["cctv-retention-days"] = _renderCctvRetentionDays;
 // ---------------------------------------------------------------------
 // Z.4 70-volt distributed speaker line (speaker-70v-line)
 // ---------------------------------------------------------------------
-// dims: in { amp_rated_w: M L^2 T^-3, headroom_percent: dimensionless, tap_watts: M L^2 T^-3, tap_count: dimensionless, line_voltage_v: M L^2 T^-3 I^-1 } out: { total_tap_w: M L^2 T^-3, reflected_impedance_ohm: M L^2 T^-3 I^-2 }
+// dims: in { amp_rated_w: M L^2 T^-3, headroom_percent: dimensionless, tap_watts: M L^2 T^-3, tap_count: dimensionless, line_voltage_v: M L^2 T^-3 I^-1 } out: { total_tap_w: M L^2 T^-3, reflected_impedance_ohm: M L^2 T^-3 I^-2, budget_limit_w: M L^2 T^-3, line_voltage_v: M L^2 T^-3 I^-1 }
 export function computeSpeaker70vLine({ amp_rated_w = 0, headroom_percent = 20, tap_watts = 0, tap_count = 0, line_voltage_v = 70.7, run_length_ft = 0, wire_ohms_per_1000ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const rating = Number(amp_rated_w);
@@ -623,7 +623,7 @@ LOWVOLTAGE_RENDERERS["speaker-70v-line"] = _renderSpeaker70vLine;
 // Z.5 Fire-alarm / security standby battery sizing (standby-battery-sizing)
 // ---------------------------------------------------------------------
 const _BATTERY_STANDARD_AH = [4, 7, 8, 12, 18, 26, 33, 40, 55, 75, 100];
-// dims: in { standby_current_a: I, standby_hours: T, alarm_current_a: I, alarm_minutes: T, derate: dimensionless } out: { required_ah: dimensionless, next_standard_ah: dimensionless }
+// dims: in { standby_current_a: I, standby_hours: T, alarm_current_a: I, alarm_minutes: T, derate: dimensionless } out: { required_ah: dimensionless, next_standard_ah: dimensionless, derate: dimensionless }
 export function computeStandbyBatterySizing({ standby_current_a = 0, standby_hours = 0, alarm_current_a = 0, alarm_minutes = 0, derate = 1.25 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const Is = Number(standby_current_a), Hs = Number(standby_hours);
@@ -673,7 +673,7 @@ function _renderStandbyBatterySizing(inputRegion, outputRegion, citationEl) {
 }
 LOWVOLTAGE_RENDERERS["standby-battery-sizing"] = _renderStandbyBatterySizing;
 
-// dims: in { battery_ah: I T, standby_current_a: I, alarm_current_a: I, alarm_minutes: T, derate: dimensionless } out: { standby_hours: T }
+// dims: in { battery_ah: I T, standby_current_a: I, alarm_current_a: I, alarm_minutes: T, derate: dimensionless } out: { standby_hours: T, derate: dimensionless }
 export function computeStandbyBatteryRuntime({ battery_ah = 0, standby_current_a = 0, alarm_current_a = 0, alarm_minutes = 0, derate = 1.25 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const Ah = Number(battery_ah), Is = Number(standby_current_a);
@@ -723,7 +723,7 @@ LOWVOLTAGE_RENDERERS["standby-battery-runtime"] = _renderStandbyBatteryRuntime;
 // ---------------------------------------------------------------------
 // Z.6 Coaxial cable attenuation (coax-rg-loss)
 // ---------------------------------------------------------------------
-// dims: in { loss_per_100ft_db: dimensionless, length_ft: L, source_level: dimensionless, target_level: dimensionless } out: { total_loss_db: dimensionless, end_level: dimensionless, max_run_ft: L }
+// dims: in { loss_per_100ft_db: dimensionless, length_ft: L, source_level: dimensionless, target_level: dimensionless } out: { total_loss_db: dimensionless, end_level: dimensionless, max_run_ft: L, length_ft: L, loss_per_100ft_db: dimensionless }
 export function computeCoaxRgLoss({ mode = "loss", loss_per_100ft_db = 0, length_ft = 0, source_level = null, target_level = null } = {}) {
   const _g = _finiteGuard({ loss_per_100ft_db, length_ft }); if (_g) return _g;
   const lp = Number(loss_per_100ft_db);
@@ -1138,7 +1138,7 @@ function _v890renderCableSupportJhook(inputRegion, outputRegion, citationEl) {
 LOWVOLTAGE_RENDERERS["cable-support-jhook"] = _v890renderCableSupportJhook;
 
 // ===================== spec-v929: access-control power supply and standby battery =====================
-// dims: in { lock_count: dimensionless, lock_current_a: I, reader_count: dimensionless, reader_current_a: I, other_load_a: I, standby_hours: T } out: { total_load_a: I, psu_min_a: I, battery_ah: I*T }
+// dims: in { lock_count: dimensionless, lock_current_a: I, reader_count: dimensionless, reader_current_a: I, other_load_a: I, standby_hours: T } out: { total_load_a: I, psu_min_a: I, battery_ah: I*T, standby_hours: T }
 export function computeAccessControlPowerSupply({ lock_count = 4, lock_current_a = 0.5, reader_count = 2, reader_current_a = 0.15, other_load_a = 0.225, standby_hours = 4 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (lock_count < 0 || reader_count < 0) return { error: "Device counts cannot be negative." };

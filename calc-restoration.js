@@ -161,7 +161,7 @@ export const dehumidifierExample = {
 // the 600 ft^2 Class 2 example at 6 units against the worksheet's 10-13.
 
 // dims: in { affected_area_ft2: L^2, water_class: dimensionless, rooms: dimensionless, wall_ceiling_ft2: L^2, insets: dimensionless }
-//        out: { air_mover_count: dimensionless, air_mover_count_high: dimensionless, water_class: dimensionless, total_cfm: L^3 T^-1, cfm_per_ft2: L T^-1, placement_pattern: dimensionless, placement_note: dimensionless }
+//        out: { air_mover_count: dimensionless, air_mover_count_high: dimensionless, water_class: dimensionless, total_cfm: L^3 T^-1, cfm_per_ft2: L T^-1, placement_pattern: dimensionless, placement_note: dimensionless, rooms: dimensionless, wall_ceiling_ft2: L^2 }
 // (Floor and wall/ceiling areas are `L^2`. CFM is volume-per-time
 //  `L^3 T^-1`; CFM per ft^2 collapses to a surface-velocity `L T^-1`.
 //  Counts, the class token and the placement pattern are dimensionless.)
@@ -545,7 +545,7 @@ export const standingWaterExample = {
 export const NAM_UNIT_SIZES_CFM = [500, 1000, 2000];
 
 // dims: in { room_volume_ft3: L^3, target_ach: T^-1 }
-//        out: { required_cfm: L^3 T^-1, recommendations: dimensionless }
+//        out: { required_cfm: L^3 T^-1, recommendations: dimensionless, clean_filter_cfm: L^3 T^-1, filter_loading_derate_pct: dimensionless }
 // (Room volume `L^3` * air-changes-per-hour `T^-1` / 60 = CFM
 //  `L^3 T^-1`. The recommendations array enumerates the standard
 //  500 / 1000 / 2000 CFM unit sizes (each `L^3 T^-1` internally)
@@ -1155,7 +1155,7 @@ export const RESTORATION_EQUIPMENT_AMPS = {
 // does not exceed 80% of the breaker rating.
 const _V16D_CONTINUOUS_FACTOR = 0.8;
 
-// dims: in { qty_lgr_dehu: dimensionless, qty_air_mover: dimensionless, qty_hepa_500: dimensionless, qty_heat_dryer: dimensionless, other_amps: I, breaker_A: I, voltage: M L^2 T^-3 I^-1 } out: { total_amps: I, continuous_limit_A: I, circuits_required: dimensionless, total_va: M L^2 T^-3 }
+// dims: in { qty_lgr_dehu: dimensionless, qty_air_mover: dimensionless, qty_hepa_500: dimensionless, qty_heat_dryer: dimensionless, other_amps: I, breaker_A: I, voltage: M L^2 T^-3 I^-1 } out: { total_amps: I, continuous_limit_A: I, circuits_required: dimensionless, total_va: M L^2 T^-3, breaker_A: I, max_unit_amps: I, other_amps: I }
 export function computeEquipmentCircuitLoad({
   qty_lgr_dehu = 0,
   qty_air_mover = 0,
@@ -3124,7 +3124,7 @@ function _simpleRenderer(spec) {
 }
 
 // ===================== spec-v1445: water extraction volume and time =====================
-// dims: in { area_sqft: L^2, standing_depth_in: L, absorption_gal_per_sqft: L, extraction_rate_gpm: L^3 T^-1, waste_tank_gal: L^3, dehu_gal_per_day: L^3 T^-1 } out: { total_gal: L^3, wand_time_min: T, water_weight_lb: M L T^-2 }
+// dims: in { area_sqft: L^2, standing_depth_in: L, absorption_gal_per_sqft: L, extraction_rate_gpm: L^3 T^-1, waste_tank_gal: L^3, dehu_gal_per_day: L^3 T^-1 } out: { total_gal: L^3, wand_time_min: T, water_weight_lb: M L T^-2, absorbed_gal: L^3, speed_ratio: dimensionless, standing_gal: L^3 }
 export function computeWaterExtractionRate({ area_sqft = 0, standing_depth_in = 0, absorption_gal_per_sqft = 0, extraction_rate_gpm = 0, waste_tank_gal = 0, dehu_gal_per_day = 15 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(area_sqft > 0)) return { error: "Affected area must be positive." };
@@ -3176,7 +3176,7 @@ RESTORATION_RENDERERS["water-extraction-rate"] = _simpleRenderer({
 });
 
 // ===================== spec-v1446: Category 3 disposal volume and routing =====================
-// dims: in { soft_area_sqft: L^2, soft_thickness_in: L, board_area_sqft: L^2, board_thickness_in: L, bulking_factor: dimensionless, bag_capacity_gal: L^3, container_cy: L^3, extracted_gal: L^3 } out: { in_place_cf: L^3, loose_cf: L^3, bag_count: dimensionless }
+// dims: in { soft_area_sqft: L^2, soft_thickness_in: L, board_area_sqft: L^2, board_thickness_in: L, bulking_factor: dimensionless, bag_capacity_gal: L^3, container_cy: L^3, extracted_gal: L^3 } out: { in_place_cf: L^3, loose_cf: L^3, bag_count: dimensionless, container_utilization_pct: dimensionless }
 export function computeSewageLossDisposal({ soft_area_sqft = 0, soft_thickness_in = 0, board_area_sqft = 0, board_thickness_in = 0, bulking_factor = 3, bag_capacity_gal = 33, container_cy = 10, extracted_gal = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(soft_area_sqft >= 0 && board_area_sqft >= 0)) return { error: "Removed areas cannot be negative." };

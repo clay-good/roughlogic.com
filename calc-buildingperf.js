@@ -143,7 +143,7 @@ const _bpDewPointF = (tf, rh) => {
 // The practical value of ELA is rhetorical: telling someone their house has a
 // ten by ten inch hole in it permanently changes a conversation that "5.8
 // ACH50" does not.
-// dims: in { cfm50: L^3 T^-1, floor_area_ft2: L^2, ceiling_height_ft: L, storeys: dimensionless } out: { ela_in2: L^2, eqla_in2: L^2, normalized_leakage: dimensionless, sla: dimensionless, hole_side_in: L, ach50: T^-1 }
+// dims: in { cfm50: L^3 T^-1, floor_area_ft2: L^2, ceiling_height_ft: L, storeys: dimensionless } out: { ela_in2: L^2, eqla_in2: L^2, normalized_leakage: dimensionless, sla: dimensionless, hole_side_in: L, ach50: T^-1, building_height_ft: L, volume_ft3: L^3 }
 export function computeEffectiveLeakageArea({
   cfm50 = 0, floor_area_ft2 = 0, ceiling_height_ft = 8, storeys = 1,
 } = {}) {
@@ -208,7 +208,7 @@ BUILDINGPERF_RENDERERS["effective-leakage-area"] = _simpleRenderer({
 // limit is the leakage below which the free share no longer covers it. Above
 // the limit sealing is pure benefit; below it, sealing without adding a fan
 // trades energy for air quality, and that is not a trade to make silently.
-// dims: in { floor_area_ft2: L^2, bedrooms: dimensionless, cfm50: L^3 T^-1, n_factor: dimensionless, ceiling_height_ft: L, planned_cfm50_reduction: L^3 T^-1 } out: { required_cfm: L^3 T^-1, tightness_limit_cfm50: L^3 T^-1, margin_cfm50: L^3 T^-1, natural_cfm: L^3 T^-1, ach50: T^-1 }
+// dims: in { floor_area_ft2: L^2, bedrooms: dimensionless, cfm50: L^3 T^-1, n_factor: dimensionless, ceiling_height_ft: L, planned_cfm50_reduction: L^3 T^-1 } out: { required_cfm: L^3 T^-1, tightness_limit_cfm50: L^3 T^-1, margin_cfm50: L^3 T^-1, natural_cfm: L^3 T^-1, ach50: T^-1, margin_pct: dimensionless, volume_ft3: L^3 }
 export function computeBuildingTightnessLimit({
   floor_area_ft2 = 0, bedrooms = 0, cfm50 = 0, n_factor = 17,
   ceiling_height_ft = 8, planned_cfm50_reduction = 0,
@@ -293,7 +293,7 @@ BUILDINGPERF_RENDERERS["building-tightness-limit"] = _simpleRenderer({
 // zone with the highest ratio of required outdoor air to primary air -- the
 // critical zone -- sets the fraction the whole system must run at, and every
 // other zone is over-ventilated as a consequence.
-// dims: in { rp_cfm_per_person: L^3 T^-1, ra_cfm_per_ft2: L T^-1, ez: dimensionless, people_1: dimensionless, area_1_ft2: L^2, primary_1_cfm: L^3 T^-1, people_2: dimensionless, area_2_ft2: L^2, primary_2_cfm: L^3 T^-1, people_3: dimensionless, area_3_ft2: L^2, primary_3_cfm: L^3 T^-1, diversity: dimensionless } out: { vou_cfm: L^3 T^-1, vps_cfm: L^3 T^-1, xs: dimensionless, zp_max: dimensionless, ev: dimensionless, vot_cfm: L^3 T^-1 }
+// dims: in { rp_cfm_per_person: L^3 T^-1, ra_cfm_per_ft2: L T^-1, ez: dimensionless, people_1: dimensionless, area_1_ft2: L^2, primary_1_cfm: L^3 T^-1, people_2: dimensionless, area_2_ft2: L^2, primary_2_cfm: L^3 T^-1, people_3: dimensionless, area_3_ft2: L^2, primary_3_cfm: L^3 T^-1, diversity: dimensionless } out: { vou_cfm: L^3 T^-1, vps_cfm: L^3 T^-1, xs: dimensionless, zp_max: dimensionless, ev: dimensionless, vot_cfm: L^3 T^-1, penalty_cfm: L^3 T^-1, zone_count: dimensionless }
 export function computeVentilationRateProcedure({
   rp_cfm_per_person = 0, ra_cfm_per_ft2 = 0, ez = 1,
   people_1 = 0, area_1_ft2 = 0, primary_1_cfm = 0,
@@ -542,7 +542,7 @@ BUILDINGPERF_RENDERERS["zonal-add-a-hole"] = _simpleRenderer({
 // The zone is judged by the WEAKEST appliance in it. An atmospherically vented
 // appliance relies on a buoyant draft worth only a few pascals, and any
 // exhaust that pulls the room more negative than that reverses the flow.
-// dims: in { measured_depressurization_pa: M L^-1 T^-2, natural_draft_wh_limit_pa: M L^-1 T^-2, natural_draft_furnace_limit_pa: M L^-1 T^-2, induced_draft_limit_pa: M L^-1 T^-2, direct_vent_limit_pa: M L^-1 T^-2, largest_exhaust_cfm: L^3 T^-1 } out: { governing_limit_pa: M L^-1 T^-2, margin_pa: M L^-1 T^-2 }
+// dims: in { measured_depressurization_pa: M L^-1 T^-2, natural_draft_wh_limit_pa: M L^-1 T^-2, natural_draft_furnace_limit_pa: M L^-1 T^-2, induced_draft_limit_pa: M L^-1 T^-2, direct_vent_limit_pa: M L^-1 T^-2, largest_exhaust_cfm: L^3 T^-1 } out: { governing_limit_pa: M L^-1 T^-2, margin_pa: M L^-1 T^-2, appliance_count: dimensionless }
 export function computeCazDepressurizationLimit({
   measured_depressurization_pa = 0,
   has_natural_draft_water_heater = "no", natural_draft_wh_limit_pa = 2,
@@ -870,7 +870,7 @@ BUILDINGPERF_RENDERERS["continuous-insulation-ratio"] = _simpleRenderer({
 const _GPM_PER_CFS = 60 * 1728 / 231;
 const _PUMP_CONSTANT = 3960;
 const _CP_TO_LB_FT_S = 6.7197e-4;
-// dims: in { tons: M L^2 T^-3, gpm_per_ton: M^-1 L T^2, pipe_id_in: L, fluid_density_lb_ft3: M L^-3, fluid_viscosity_cp: M L^-1 T^-1, specific_gravity: dimensionless, head_ft: L, wire_to_water_efficiency: dimensionless, benchmark_w_per_ton: dimensionless } out: { design_flow_gpm: L^3 T^-1, velocity_fps: L T^-1, reynolds: dimensionless, pump_bhp: M L^2 T^-3, pump_watts: M L^2 T^-3, watts_per_ton: dimensionless }
+// dims: in { tons: M L^2 T^-3, gpm_per_ton: M^-1 L T^2, pipe_id_in: L, fluid_density_lb_ft3: M L^-3, fluid_viscosity_cp: M L^-1 T^-1, specific_gravity: dimensionless, head_ft: L, wire_to_water_efficiency: dimensionless, benchmark_w_per_ton: dimensionless } out: { design_flow_gpm: L^3 T^-1, velocity_fps: L T^-1, reynolds: dimensionless, pump_bhp: M L^2 T^-3, pump_watts: M L^2 T^-3, watts_per_ton: dimensionless, allowable_head_ft: L, area_ft2: L^2 }
 export function computeGroundLoopFlowAntifreeze({
   tons = 0, gpm_per_ton = 3.0, pipe_id_in = 0,
   fluid_density_lb_ft3 = 63.9, fluid_viscosity_cp = 4.7, specific_gravity = 1.02,

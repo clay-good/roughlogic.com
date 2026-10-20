@@ -153,7 +153,7 @@ export const CHILLER_FLUID_FACTORS = {
   glycol_50: 449, // 50% propylene glycol: ~8.8 lb/gal * 0.85 cp * 60
 };
 
-// dims: in { gpm: L^3 T^-1, ewt_F: T, lwt_F: T, fluid: dimensionless, nameplate_tons: M L^2 T^-3 } out: { delta_T_F: T, q_btu_hr: M L^2 T^-3, tons: M L^2 T^-3, required_gpm: L^3 T^-1 }
+// dims: in { gpm: L^3 T^-1, ewt_F: T, lwt_F: T, fluid: dimensionless, nameplate_tons: M L^2 T^-3 } out: { delta_T_F: T, q_btu_hr: M L^2 T^-3, tons: M L^2 T^-3, required_gpm: L^3 T^-1, factor: dimensionless, kw: M L^2 T^-3 }
 export function computeChillerTons({
   gpm = 0,
   ewt_F = 54,
@@ -411,7 +411,7 @@ export const ACH_TARGET_BANDS = {
   operating_room: { lo: 20, hi: Infinity, label: "Operating room (ASHRAE 170 minimum)" },
 };
 
-// dims: in { volume_ft3: L^3, supply_cfm: L^3 T^-1, return_cfm: L^3 T^-1, occupancy: dimensionless } out: { ach: T^-1, net_ach: T^-1, pressurization_cfm: L^3 T^-1 }
+// dims: in { volume_ft3: L^3, supply_cfm: L^3 T^-1, return_cfm: L^3 T^-1, occupancy: dimensionless } out: { ach: T^-1, net_ach: T^-1, pressurization_cfm: L^3 T^-1, return_cfm: L^3 T^-1, supply_cfm: L^3 T^-1, volume_ft3: L^3 }
 export function computeAirChangesPerHour({
   volume_ft3 = 0,
   supply_cfm = 0,
@@ -559,7 +559,7 @@ function _v16h_pipeVelocityFps(gpm, id_in) {
   return id_in > 0 ? gpm / (2.44778 * id_in * id_in) : Infinity;
 }
 
-// dims: in { boiler_btu_hr: M L^2 T^-3, delta_T_F: T, material: dimensionless, max_velocity_fps: L T^-1, length_ft: L } out: { gpm: L^3 T^-1, velocity_fps: L T^-1, friction_ft_per_100ft: dimensionless, head_ft: L }
+// dims: in { boiler_btu_hr: M L^2 T^-3, delta_T_F: T, material: dimensionless, max_velocity_fps: L T^-1, length_ft: L } out: { gpm: L^3 T^-1, velocity_fps: L T^-1, friction_ft_per_100ft: dimensionless, head_ft: L, length_ft: L, max_velocity_fps: L T^-1, recommended_id_in: L }
 export function computeBoilerPipeSizing({
   boiler_btu_hr = 0,
   delta_T_F = 20,
@@ -803,7 +803,7 @@ function _v16h_humidityRatioFromRH({ T_db_F, rh_pct, P_kPa }) {
 // Latent heat of vaporization of water near room temperature (BTU/lb).
 const _V16H_HFG_BTU_LB = 1061;
 
-// dims: in { cfm: L^3 T^-1, supply_db_F: T, entering_rh_pct: dimensionless, target_rh_pct: dimensionless, altitude_ft: L } out: { addition_lb_hr: M T^-1, gpd: L^3 T^-1, latent_btu_hr: M L^2 T^-3 }
+// dims: in { cfm: L^3 T^-1, supply_db_F: T, entering_rh_pct: dimensionless, target_rh_pct: dimensionless, altitude_ft: L } out: { addition_lb_hr: M T^-1, gpd: L^3 T^-1, latent_btu_hr: M L^2 T^-3, air_density_lb_ft3: M L^-3, altitude_ft: L, cfm: L^3 T^-1, delta_W: M L^2 T^-3, supply_db_F: T }
 export function computeHumidifierCapacity({
   cfm = 0,
   supply_db_F = 70,
@@ -926,7 +926,7 @@ const _V16H_FILTER_REF_FPM = 300;
 // Air horsepower constant: AHP = CFM * dp(in. WC) / 6356.
 const _V16H_AHP_CONST = 6356;
 
-// dims: in { filter_type: dimensionless, face_area_ft2: L^2, face_velocity_fpm: L T^-1, clean_dp_override: M L^-1 T^-2, final_dp_override: M L^-1 T^-2, fan_total_efficiency: dimensionless, runtime_hr_per_year: T, energy_cost_per_kwh: dimensionless } out: { airflow_cfm: L^3 T^-1, clean_dp_in_wc: M L^-1 T^-2, final_dp_in_wc: M L^-1 T^-2, clean_fan_kw: M L^2 T^-3 }
+// dims: in { filter_type: dimensionless, face_area_ft2: L^2, face_velocity_fpm: L T^-1, clean_dp_override: M L^-1 T^-2, final_dp_override: M L^-1 T^-2, fan_total_efficiency: dimensionless, runtime_hr_per_year: T, energy_cost_per_kwh: dimensionless } out: { airflow_cfm: L^3 T^-1, clean_dp_in_wc: M L^-1 T^-2, final_dp_in_wc: M L^-1 T^-2, clean_fan_kw: M L^2 T^-3, avg_fan_kw: M L^2 T^-3, face_velocity_fpm: L T^-1, final_fan_kw: M L^2 T^-3, runtime_hr_per_year: T }
 export function computeFilterPressureDrop({
   filter_type = "merv13",
   face_area_ft2 = 0,
@@ -1260,7 +1260,7 @@ HVACSYSTEMS_RENDERERS["envelope-conduction-load"] = _v16h_renderEnvelopeConducti
 
 // ===================== spec-v409..v410: HVAC duct-design trio (Group C) =====================
 
-// dims: in { cfm: L^3 T^-1, face_width_in: L, face_height_in: L, threshold_fpm: L T^-1 } out: { face_area_ft2: L^2, face_velocity_fpm: L T^-1 }
+// dims: in { cfm: L^3 T^-1, face_width_in: L, face_height_in: L, threshold_fpm: L T^-1 } out: { face_area_ft2: L^2, face_velocity_fpm: L T^-1, threshold_fpm: L T^-1 }
 export function computeCoilFaceVelocity({ cfm = 0, face_width_in = 0, face_height_in = 0, threshold_fpm = 500 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const q = Number(cfm) || 0;
@@ -1303,7 +1303,7 @@ HVACSYSTEMS_RENDERERS["coil-face-velocity"] = _v409renderCoilFaceVelocity;
 // coil-face-area: inverse of coil-face-velocity. The forward tile gives
 // velocity = CFM / face_area; sizing a coil to stay under the wet-coil
 // carryover limit is the inverse: required face_area = CFM / target_velocity.
-// dims: in { cfm: L^3 T^-1, target_fpm: L T^-1 } out: { face_area_ft2: L^2, face_area_in2: L^2, square_side_in: L }
+// dims: in { cfm: L^3 T^-1, target_fpm: L T^-1 } out: { face_area_ft2: L^2, face_area_in2: L^2, square_side_in: L, target_fpm: L T^-1 }
 export function computeCoilFaceArea({ cfm = 0, target_fpm = 500 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const q = Number(cfm) || 0;
@@ -1339,7 +1339,7 @@ function _v701renderCoilFaceArea(inputRegion, outputRegion, citationEl) {
 }
 HVACSYSTEMS_RENDERERS["coil-face-area"] = _v701renderCoilFaceArea;
 
-// dims: in { zone_sensible_btuh: M L^2 T^-3, supply_dt_f: T, ventilation_cfm: L^3 T^-1, turndown: dimensionless } out: { cfm_max: L^3 T^-1, cfm_min: L^3 T^-1 }
+// dims: in { zone_sensible_btuh: M L^2 T^-3, supply_dt_f: T, ventilation_cfm: L^3 T^-1, turndown: dimensionless } out: { cfm_max: L^3 T^-1, cfm_min: L^3 T^-1, turndown_cfm: L^3 T^-1 }
 export function computeVavBoxAirflow({ zone_sensible_btuh = 0, supply_dt_f = 0, ventilation_cfm = 0, turndown = 0.30 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const load = Number(zone_sensible_btuh) || 0;
@@ -1640,7 +1640,7 @@ const _HS_FT_PER_PSI = 2.31;
 // working UNCORRECTED sees a system at design, and it is the correction that
 // reveals the shortfall. The spec says the opposite. Nothing here asserts a
 // direction: the correction's effect is computed and named from the factor.
-// dims: in { hood_reading_cfm: L^3 T^-1, correction_factor: dimensionless, reference_traverse_cfm: L^3 T^-1, design_cfm: L^3 T^-1, system_reading_total_cfm: L^3 T^-1 } out: { corrected_cfm: L^3 T^-1, derived_factor: dimensionless, pct_of_design: dimensionless, uncorrected_pct_of_design: dimensionless, system_corrected_cfm: L^3 T^-1, system_error_cfm: L^3 T^-1 }
+// dims: in { hood_reading_cfm: L^3 T^-1, correction_factor: dimensionless, reference_traverse_cfm: L^3 T^-1, design_cfm: L^3 T^-1, system_reading_total_cfm: L^3 T^-1 } out: { corrected_cfm: L^3 T^-1, derived_factor: dimensionless, pct_of_design: dimensionless, uncorrected_pct_of_design: dimensionless, system_corrected_cfm: L^3 T^-1, system_error_cfm: L^3 T^-1, correction_pct: dimensionless }
 export function computeFlowHoodCorrection({
   hood_reading_cfm = 0, correction_factor = 1, reference_traverse_cfm = 0,
   design_cfm = 0, system_reading_total_cfm = 0,
@@ -1718,7 +1718,7 @@ HVACSYSTEMS_RENDERERS["flow-hood-correction"] = _simpleRenderer({
 // a real installation rarely provides them. The straight-duct requirement is
 // the AMCA effective duct length: about 2.5 equivalent diameters at 2,500 fpm,
 // plus one more per additional 1,000 fpm.
-// dims: in { flow_cfm: L^3 T^-1, outlet_width_in: L, outlet_height_in: L, straight_duct_ft: L, fan_curve_tp_inwg: M L^-1 T^-2, measured_tp_inwg: M L^-1 T^-2 } out: { outlet_area_ft2: L^2, outlet_velocity_fpm: L T^-1, equivalent_diameter_ft: L, effective_length_ft: L, length_shortfall_ft: L, pressure_shortfall_inwg: M L^-1 T^-2 }
+// dims: in { flow_cfm: L^3 T^-1, outlet_width_in: L, outlet_height_in: L, straight_duct_ft: L, fan_curve_tp_inwg: M L^-1 T^-2, measured_tp_inwg: M L^-1 T^-2 } out: { outlet_area_ft2: L^2, outlet_velocity_fpm: L T^-1, equivalent_diameter_ft: L, effective_length_ft: L, length_shortfall_ft: L, pressure_shortfall_inwg: M L^-1 T^-2, length_fraction: dimensionless }
 export function computeFanSystemEffect({
   flow_cfm = 0, outlet_width_in = 0, outlet_height_in = 0, straight_duct_ft = 0,
   inlet_condition = "clear", fan_curve_tp_inwg = 0, measured_tp_inwg = 0,
@@ -1817,7 +1817,7 @@ HVACSYSTEMS_RENDERERS["fan-system-effect"] = _simpleRenderer({
 // the exports so the v14 lint reads the annotation, returning an expression
 // rather than a bare identifier.
 const _hsRatio = (measured, design) => (design > 0 ? measured / design : 0);
-// dims: in { design_1_cfm: L^3 T^-1, measured_1_cfm: L^3 T^-1, design_2_cfm: L^3 T^-1, measured_2_cfm: L^3 T^-1, design_3_cfm: L^3 T^-1, measured_3_cfm: L^3 T^-1, design_4_cfm: L^3 T^-1, measured_4_cfm: L^3 T^-1, design_5_cfm: L^3 T^-1, measured_5_cfm: L^3 T^-1, design_6_cfm: L^3 T^-1, measured_6_cfm: L^3 T^-1 } out: { reference_ratio: dimensionless, branch_design_cfm: L^3 T^-1, branch_measured_cfm: L^3 T^-1, branch_after_equalizing_cfm: L^3 T^-1, branch_adjustment_factor: dimensionless }
+// dims: in { design_1_cfm: L^3 T^-1, measured_1_cfm: L^3 T^-1, design_2_cfm: L^3 T^-1, measured_2_cfm: L^3 T^-1, design_3_cfm: L^3 T^-1, measured_3_cfm: L^3 T^-1, design_4_cfm: L^3 T^-1, measured_4_cfm: L^3 T^-1, design_5_cfm: L^3 T^-1, measured_5_cfm: L^3 T^-1, design_6_cfm: L^3 T^-1, measured_6_cfm: L^3 T^-1 } out: { reference_ratio: dimensionless, branch_design_cfm: L^3 T^-1, branch_measured_cfm: L^3 T^-1, branch_after_equalizing_cfm: L^3 T^-1, branch_adjustment_factor: dimensionless, outlet_count: dimensionless }
 export function computeProportionalBalanceRatio({
   design_1_cfm = 0, measured_1_cfm = 0, design_2_cfm = 0, measured_2_cfm = 0,
   design_3_cfm = 0, measured_3_cfm = 0, design_4_cfm = 0, measured_4_cfm = 0,
@@ -1903,7 +1903,7 @@ HVACSYSTEMS_RENDERERS["proportional-balance-ratio"] = _simpleRenderer({
 // resemble. Trimming changes the impeller's geometry relative to its casing
 // rather than scaling the whole machine, so the correspondence is approximate
 // and the manufacturer's trim curves are the authority.
-// dims: in { current_diameter_in: L, current_flow_gpm: L^3 T^-1, required_flow_gpm: L^3 T^-1, current_head_ft: L, required_head_ft: L, max_diameter_in: L, min_trim_fraction: dimensionless, motor_hp: M L^2 T^-3, annual_hours: T, energy_rate_per_kwh: dimensionless } out: { required_diameter_in: L, trim_in: L, trim_pct: dimensionless, head_at_trim_ft: L, power_ratio: dimensionless, annual_kwh_saved: M L^2 T^-2, annual_cost_saved: dimensionless }
+// dims: in { current_diameter_in: L, current_flow_gpm: L^3 T^-1, required_flow_gpm: L^3 T^-1, current_head_ft: L, required_head_ft: L, max_diameter_in: L, min_trim_fraction: dimensionless, motor_hp: M L^2 T^-3, annual_hours: T, energy_rate_per_kwh: dimensionless } out: { required_diameter_in: L, trim_in: L, trim_pct: dimensionless, head_at_trim_ft: L, power_ratio: dimensionless, annual_kwh_saved: M L^2 T^-2, annual_cost_saved: dimensionless, current_kwh: M L^2 T^-2, excess_head_ft: L, head_margin_ft: L, power_reduction_pct: dimensionless, trimmed_kwh: M L^2 T^-2 }
 export function computePumpImpellerTrim({
   current_diameter_in = 0, current_flow_gpm = 0, required_flow_gpm = 0,
   current_head_ft = 0, required_head_ft = 0, max_diameter_in = 0, min_trim_fraction = 0.75,
@@ -2018,7 +2018,7 @@ HVACSYSTEMS_RENDERERS["pump-impeller-trim"] = _simpleRenderer({
 // "fine" -- against its OWN stated 5 to 10% criterion. The tolerance is an
 // input here and the verdict is a boolean, so the sentence cannot disagree
 // with the arithmetic.
-// dims: in { airflow_cfm: L^3 T^-1, entering_air_db_f: T, leaving_air_db_f: T, enthalpy_drop_btu_lb: L^2 T^-2, water_gpm: L^3 T^-1, entering_water_f: T, leaving_water_f: T, fluid_factor: dimensionless, design_capacity_btuh: M L^2 T^-3, tolerance_pct: dimensionless } out: { air_sensible_btuh: M L^2 T^-3, air_total_btuh: M L^2 T^-3, water_btuh: M L^2 T^-3, balance_difference_pct: dimensionless, sensible_only_difference_pct: dimensionless }
+// dims: in { airflow_cfm: L^3 T^-1, entering_air_db_f: T, leaving_air_db_f: T, enthalpy_drop_btu_lb: L^2 T^-2, water_gpm: L^3 T^-1, entering_water_f: T, leaving_water_f: T, fluid_factor: dimensionless, design_capacity_btuh: M L^2 T^-3, tolerance_pct: dimensionless } out: { air_sensible_btuh: M L^2 T^-3, air_total_btuh: M L^2 T^-3, water_btuh: M L^2 T^-3, balance_difference_pct: dimensionless, sensible_only_difference_pct: dimensionless, air_used_btuh: M L^2 T^-3, latent_btuh: M L^2 T^-3, tolerance_pct: dimensionless }
 export function computeCoilCapacityVerification({
   airflow_cfm = 0, entering_air_db_f = null, leaving_air_db_f = null, enthalpy_drop_btu_lb = 0,
   water_gpm = 0, entering_water_f = null, leaving_water_f = null, fluid_factor = 500,
@@ -2110,7 +2110,7 @@ HVACSYSTEMS_RENDERERS["coil-capacity-verification"] = _simpleRenderer({
 // across the remaining valves rises toward shutoff head -- so the worst case is
 // MINIMUM system flow, the condition a designer computing at design never looks
 // at, and the condition in which the valve is most likely to be commanded shut.
-// dims: in { seat_area_in2: L^2, design_differential_psi: M L^-1 T^-2, minimum_flow_differential_psi: M L^-1 T^-2, actuator_closeoff_psi: M L^-1 T^-2, spring_closeoff_psi: M L^-1 T^-2 } out: { design_seat_force_lb: M L T^-2, worst_case_seat_force_lb: M L T^-2, actuator_force_lb: M L T^-2, force_shortfall_lb: M L T^-2 }
+// dims: in { seat_area_in2: L^2, design_differential_psi: M L^-1 T^-2, minimum_flow_differential_psi: M L^-1 T^-2, actuator_closeoff_psi: M L^-1 T^-2, spring_closeoff_psi: M L^-1 T^-2 } out: { design_seat_force_lb: M L T^-2, worst_case_seat_force_lb: M L T^-2, actuator_force_lb: M L T^-2, force_shortfall_lb: M L T^-2, differential_rise_psi: M L^-1 T^-2 }
 export function computeValveActuatorCloseOff({
   seat_area_in2 = 0, design_differential_psi = 0, minimum_flow_differential_psi = 0,
   actuator_closeoff_psi = 0, spring_closeoff_psi = 0, is_spring_return = "no",
@@ -2202,7 +2202,7 @@ const _hsInterpKwTon = (pct, p30, p50, p75, p100) => (
       : pct <= 75 ? p50 + (p75 - p50) * (pct - 50) / 25
         : p75 + (p100 - p75) * (pct - 75) / 25
 );
-// dims: in { machine_tons: L^3 T^-1, plant_load_tons: L^3 T^-1, kw_per_ton_100: dimensionless, kw_per_ton_75: dimensionless, kw_per_ton_50: dimensionless, kw_per_ton_30: dimensionless, auxiliary_kw_per_machine: M L^2 T^-3, staging_setpoint_pct: dimensionless } out: { one_machine_kw: M L^2 T^-3, two_machine_kw: M L^2 T^-3, crossover_tons: L^3 T^-1, crossover_pct_of_machine: dimensionless, setpoint_error_tons: L^3 T^-1 }
+// dims: in { machine_tons: L^3 T^-1, plant_load_tons: L^3 T^-1, kw_per_ton_100: dimensionless, kw_per_ton_75: dimensionless, kw_per_ton_50: dimensionless, kw_per_ton_30: dimensionless, auxiliary_kw_per_machine: M L^2 T^-3, staging_setpoint_pct: dimensionless } out: { one_machine_kw: M L^2 T^-3, two_machine_kw: M L^2 T^-3, crossover_tons: L^3 T^-1, crossover_pct_of_machine: dimensionless, setpoint_error_tons: L^3 T^-1, one_compressor_kw: M L^2 T^-3, one_pct: dimensionless, saving_kw: M L^2 T^-3, two_compressor_kw: M L^2 T^-3, two_pct: dimensionless }
 export function computeChillerStagingPoint({
   machine_tons = 0, plant_load_tons = 0,
   kw_per_ton_100 = 0, kw_per_ton_75 = 0, kw_per_ton_50 = 0, kw_per_ton_30 = 0,
@@ -2301,7 +2301,7 @@ HVACSYSTEMS_RENDERERS["chiller-staging-point"] = _simpleRenderer({
 // The bypass exists to protect the MACHINE, not to control temperature. The
 // interaction with staging is the part that catches plants out: two chillers
 // running have twice the minimum flow of one.
-// dims: in { machine_design_gpm: L^3 T^-1, minimum_flow_fraction: dimensionless, machines_running: dimensionless, system_flow_gpm: L^3 T^-1, bypass_differential_psi: M L^-1 T^-2, design_differential_psi: M L^-1 T^-2 } out: { minimum_per_machine_gpm: L^3 T^-1, combined_minimum_gpm: L^3 T^-1, bypass_gpm: L^3 T^-1, required_cv: dimensionless, cv_at_design_differential: dimensionless }
+// dims: in { machine_design_gpm: L^3 T^-1, minimum_flow_fraction: dimensionless, machines_running: dimensionless, system_flow_gpm: L^3 T^-1, bypass_differential_psi: M L^-1 T^-2, design_differential_psi: M L^-1 T^-2 } out: { minimum_per_machine_gpm: L^3 T^-1, combined_minimum_gpm: L^3 T^-1, bypass_gpm: L^3 T^-1, required_cv: dimensionless, cv_at_design_differential: dimensionless, fewer_bypass_gpm: L^3 T^-1, fewer_minimum_gpm: L^3 T^-1, pump_flow_gpm: L^3 T^-1, wasted_fraction: dimensionless }
 export function computeVariablePrimaryBypass({
   machine_design_gpm = 0, minimum_flow_fraction = 0.45, machines_running = 1,
   system_flow_gpm = 0, bypass_differential_psi = 0, design_differential_psi = 0,
@@ -2388,7 +2388,7 @@ HVACSYSTEMS_RENDERERS["variable-primary-bypass"] = _simpleRenderer({
 // of its gross face, so sizing on GROSS area understates the velocity by a
 // factor of two or more -- which is how rain gets into a mechanical room that
 // was designed correctly on paper.
-// dims: in { width_ft: L, height_ft: L, free_area_ratio: dimensionless, airflow_cfm: L^3 T^-1, water_penetration_fpm: L T^-1, allowable_velocity_fpm: L T^-1 } out: { gross_area_ft2: L^2, free_area_ft2: L^2, free_velocity_fpm: L T^-1, gross_velocity_fpm: L T^-1, gross_sized_free_velocity_fpm: L T^-1, gross_area_for_allowable_ft2: L^2 }
+// dims: in { width_ft: L, height_ft: L, free_area_ratio: dimensionless, airflow_cfm: L^3 T^-1, water_penetration_fpm: L T^-1, allowable_velocity_fpm: L T^-1 } out: { gross_area_ft2: L^2, free_area_ft2: L^2, free_velocity_fpm: L T^-1, gross_velocity_fpm: L T^-1, gross_sized_free_velocity_fpm: L T^-1, gross_area_for_allowable_ft2: L^2, free_area_needed_ft2: L^2, limit_fpm: L T^-1 }
 export function computeLouverFreeArea({
   width_ft = 0, height_ft = 0, free_area_ratio = 0.45, airflow_cfm = 0,
   water_penetration_fpm = 0, allowable_velocity_fpm = 0, application = "intake",
@@ -2566,7 +2566,7 @@ const _refractoryShellFilm = (tsF, taF, heightFt, eps) => {
   const rad = eps * 0.1714e-8 * (TsR ** 4 - TaR ** 4) / (TsR - TaR);
   return { conv, rad, Ra, Pr, Nu };
 };
-// dims: in { hot_face_f: T, ambient_f: T, film_coeff_btu_hr_ft2_f: M T^-3, layer1_thickness_in: L, layer1_k: M L T^-3, layer1_limit_f: T, layer2_thickness_in: L, layer2_k: M L T^-3, layer2_limit_f: T, layer3_thickness_in: L, layer3_k: M L T^-3, layer3_limit_f: T, shell_limit_f: T, acid_dew_point_f: T, film_mode: dimensionless, shell_emissivity: dimensionless, wall_height_ft: L } out: { film_used_btu_hr_ft2_f: M T^-3, total_resistance: dimensionless, flux_btu_hr_ft2: M T^-3, interface1_f: T, interface2_f: T, interface3_f: T, shell_temp_f: T }
+// dims: in { hot_face_f: T, ambient_f: T, film_coeff_btu_hr_ft2_f: M T^-3, layer1_thickness_in: L, layer1_k: M L T^-3, layer1_limit_f: T, layer2_thickness_in: L, layer2_k: M L T^-3, layer2_limit_f: T, layer3_thickness_in: L, layer3_k: M L T^-3, layer3_limit_f: T, shell_limit_f: T, acid_dew_point_f: T, film_mode: dimensionless, shell_emissivity: dimensionless, wall_height_ft: L } out: { film_used_btu_hr_ft2_f: M T^-3, total_resistance: dimensionless, flux_btu_hr_ft2: M T^-3, interface1_f: T, interface2_f: T, interface3_f: T, shell_temp_f: T, layer_count: dimensionless, over_layer_count: dimensionless }
 export function computeRefractoryShellTemperature({
   hot_face_f = null, ambient_f = null, film_coeff_btu_hr_ft2_f = 2.0,
   layer1_thickness_in = 0, layer1_k = 0, layer1_limit_f = 0,

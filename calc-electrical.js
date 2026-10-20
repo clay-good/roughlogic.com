@@ -215,7 +215,7 @@ export function parseConductorShorthand(s) {
   return { awg, insulation, count };
 }
 
-// dims: in { conduit: dimensionless, trade_size: L, conductors: dimensionless } out: { fill_in2: L^2, fill_percent: dimensionless, pass: dimensionless }
+// dims: in { conduit: dimensionless, trade_size: L, conductors: dimensionless } out: { fill_in2: L^2, fill_percent: dimensionless, pass: dimensionless, conduit_area_in2: L^2, margin_pct: dimensionless, threshold_percent: dimensionless }
 export function computeConduitFill({ conduit, trade_size, conductors }) {
   const areaTable = CONDUIT_AREAS_IN2[conduit];
   if (!areaTable) return { error: "Unknown conduit type." };
@@ -272,7 +272,7 @@ export const BOX_FILL_PER_CONDUCTOR_IN3 = {
   "18": 1.5, "16": 1.75, "14": 2.0, "12": 2.25, "10": 2.5, "8": 3.0, "6": 5.0,
 };
 
-// dims: in { box_volume_in3: L^3, conductors_by_size: dimensionless, devices: dimensionless, internal_clamps: dimensionless, largest_awg_for_clamp_and_device: dimensionless } out: { fill_in3: L^3, free_in3: L^3, pass: dimensionless }
+// dims: in { box_volume_in3: L^3, conductors_by_size: dimensionless, devices: dimensionless, internal_clamps: dimensionless, largest_awg_for_clamp_and_device: dimensionless } out: { fill_in3: L^3, free_in3: L^3, pass: dimensionless, box_volume_in3: L^3, grounding_in3: L^3 }
 export function computeBoxFill({ box_volume_in3, conductors_by_size, devices = 0, internal_clamps = false, largest_awg_for_clamp_and_device = null, grounding_conductors = 0 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // Until 2026-09-26 a negative entry here returned a negative quantity with no error.
@@ -435,7 +435,7 @@ export const transformerSizeExample = {
 
 // --- Utility 9: Three-Phase Power ---
 
-// dims: in { V_LL: M L^2 T^-3 I^-1, I_L: I, pf: dimensionless } out: { P_W: M L^2 T^-3, kW: M L^2 T^-3 }
+// dims: in { V_LL: M L^2 T^-3 I^-1, I_L: I, pf: dimensionless } out: { P_W: M L^2 T^-3, kW: M L^2 T^-3, Q_var: M L^2 T^-3, S_VA: M L^2 T^-3 }
 export function computeThreePhase({ V_LL, I_L, pf }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // A power factor above 1 made kW exceed kVA without complaint.
@@ -452,7 +452,7 @@ export const threePhaseExample = {
 
 // --- Utility 10: Resistance of Copper and Aluminum at Temperature ---
 
-// dims: in { material: dimensionless, awg: dimensionless, length_ft: L, temperature_C: T } out: { resistance_ohm: M L^2 T^-3 I^-2 }
+// dims: in { material: dimensionless, awg: dimensionless, length_ft: L, temperature_C: T } out: { resistance_ohm: M L^2 T^-3 I^-2, resistance_ohm_per_kft: M L^2 T^-3 I^-2 }
 export function computeConductorResistance({ material, awg, length_ft, temperature_C }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // A blank temperature used to be 0 C (the page) or NaN (a direct call); both are refused now.
@@ -1166,7 +1166,7 @@ export const NEMA_HP_DERATE_TABLE = [
   { imbalance_pct: 5.0, hp_derate_pct: 25, note: "5% imbalance → ~25% HP derate (the limit; NEMA MG-1: do not operate above it)" },
 ];
 
-// dims: in { V_a: M L^2 T^-3 I^-1, V_b: M L^2 T^-3 I^-1, V_c: M L^2 T^-3 I^-1 } out: { imbalance_percent: dimensionless, derate: dimensionless }
+// dims: in { V_a: M L^2 T^-3 I^-1, V_b: M L^2 T^-3 I^-1, V_c: M L^2 T^-3 I^-1 } out: { imbalance_percent: dimensionless, derate: dimensionless, average_V: M L^2 T^-3 I^-1, derate_factor: dimensionless, max_deviation_V: M L^2 T^-3 I^-1, nema_hp_derate_pct: dimensionless }
 export function computeVoltageImbalance({ V_a, V_b, V_c }) {
   const v = [V_a, V_b, V_c].map(Number);
   if (v.some((x) => !Number.isFinite(x) || x <= 0)) return { error: "Provide three positive line voltages." };
@@ -1284,7 +1284,7 @@ const LIGHTING_DENSITY_REMOVED = {
   residential: "Dwelling units have no W/ft^2 lighting allowance; the energy code sets a lamp-efficacy requirement for them instead.",
 };
 
-// dims: in { area_ft2: L^2, occupancy_class: dimensionless, code_edition: dimensionless } out: { target_W: M L^2 T^-3 }
+// dims: in { area_ft2: L^2, occupancy_class: dimensionless, code_edition: dimensionless } out: { target_W: M L^2 T^-3, area_ft2: L^2 }
 export function computeLightingDensity({ area_ft2, occupancy_class, code_edition = "2024" }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const a = Number(area_ft2) || 0;
@@ -3070,7 +3070,7 @@ ELECTRICAL_RENDERERS["arc-flash-screen"] = renderArcFlashScreen;
 // when nameplate FLA is provided, both are surfaced and the larger
 // (design) value is flagged.
 
-// dims: in { hp: M L^2 T^-3, voltage_V: M L^2 T^-3 I^-1, phase: dimensionless, eta: dimensionless, power_factor: dimensionless, nameplate_fla_A: I, service_factor: dimensionless } out: { computed_fla_A: I, design_fla_A: I, branch_conductor_125pct_A: I, overload_max_A: I }
+// dims: in { hp: M L^2 T^-3, voltage_V: M L^2 T^-3 I^-1, phase: dimensionless, eta: dimensionless, power_factor: dimensionless, nameplate_fla_A: I, service_factor: dimensionless } out: { computed_fla_A: I, design_fla_A: I, branch_conductor_125pct_A: I, overload_max_A: I, nameplate_fla_A: I }
 export function computeMotorBranchFromNameplate({
   hp = 0,
   voltage_V = 0,
@@ -3408,7 +3408,7 @@ ELECTRICAL_RENDERERS["grounding-electrode"] = renderGroundingElectrode;
 // since a steel raceway raises X). Table 9 is paywalled, so the user enters the
 // R and X for their conductor / conduit pair; the tile does not bundle it.
 
-// dims: in { system_voltage_v: M L^2 T^-3 I^-1, current_a: I, length_ft: L, r_ohm_per_kft: M L T^-3 I^-2, x_ohm_per_kft: M L T^-3 I^-2, power_factor: dimensionless, phase: dimensionless } out: { drop_v: M L^2 T^-3 I^-1, drop_percent: dimensionless, voltage_at_load_v: M L^2 T^-3 I^-1 }
+// dims: in { system_voltage_v: M L^2 T^-3 I^-1, current_a: I, length_ft: L, r_ohm_per_kft: M L T^-3 I^-2, x_ohm_per_kft: M L T^-3 I^-2, power_factor: dimensionless, phase: dimensionless } out: { drop_v: M L^2 T^-3 I^-1, drop_percent: dimensionless, voltage_at_load_v: M L^2 T^-3 I^-1, phase_angle_deg: dimensionless }
 export function computeVoltageDropReactance({
   system_voltage_v = 0,
   current_a = 0,
@@ -3869,7 +3869,7 @@ ELECTRICAL_RENDERERS["ambient-ampacity-adjust"] = renderAmbientAmpacityAdjust;
 // comparison line runs the standard (Part III, Table 220.45) method and the service is sized to
 // the larger of the two.
 
-// dims: in { area_ft2: L^2, small_appliance_circuits: dimensionless, laundry_circuits: dimensionless, fixed_appliances_kw: M L^2 T^-3, range_kw: M L^2 T^-3, dryer_kw: M L^2 T^-3, water_heater_kw: M L^2 T^-3, hvac_heating_kw: M L^2 T^-3, hvac_cooling_kw: M L^2 T^-3, ev_charger_a: I, service_voltage: M L^2 T^-3 I^-1 } out: { optional_total_va: M L^2 T^-3, optional_demand_a: I, recommended_a: I }
+// dims: in { area_ft2: L^2, small_appliance_circuits: dimensionless, laundry_circuits: dimensionless, fixed_appliances_kw: M L^2 T^-3, range_kw: M L^2 T^-3, dryer_kw: M L^2 T^-3, water_heater_kw: M L^2 T^-3, hvac_heating_kw: M L^2 T^-3, hvac_cooling_kw: M L^2 T^-3, ev_charger_a: I, service_voltage: M L^2 T^-3 I^-1 } out: { optional_total_va: M L^2 T^-3, optional_demand_a: I, recommended_a: I, standard_demand_a: I }
 export function computeServiceLoadOptional({
   area_ft2 = 0,
   small_appliance_circuits = 2,
@@ -4302,7 +4302,7 @@ function renderGroundingElectrodeConductor(inputRegion, outputRegion, citationEl
 }
 ELECTRICAL_RENDERERS["grounding-electrode-conductor"] = renderGroundingElectrodeConductor;
 
-// dims: in { mode: dimensionless, material: dimensionless, service_kcmil: L^2, ocpd_A: I, parallel_sets: dimensionless } out: { required_jumper: dimensionless }
+// dims: in { mode: dimensionless, material: dimensionless, service_kcmil: L^2, ocpd_A: I, parallel_sets: dimensionless } out: { required_jumper: dimensionless, parallel_sets: dimensionless }
 export function computeBondingJumper({ mode = "supply-side", material = "copper", service_kcmil = 0, ocpd_A = 0, parallel_sets = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (material !== "copper" && material !== "aluminum") return { error: "Material must be copper or aluminum." };
@@ -4380,7 +4380,7 @@ function _minAwgForDrop({ phase, material, current_A, length_ft, allowed_drop_V 
   }
   return { awg: "larger than 4/0", drop: null };
 }
-// dims: in { phase: dimensionless, material: dimensionless, current_A: I, length_ft: L, source_voltage_V: M L^2 T^-3 I^-1, target_percent: dimensionless } out: { resulting_drop_V: M L^2 T^-3 I^-1, resulting_percent: dimensionless }
+// dims: in { phase: dimensionless, material: dimensionless, current_A: I, length_ft: L, source_voltage_V: M L^2 T^-3 I^-1, target_percent: dimensionless } out: { resulting_drop_V: M L^2 T^-3 I^-1, resulting_percent: dimensionless, allowed_drop_V: M L^2 T^-3 I^-1 }
 export function computeMinConductorForVd({ phase = "single", material = "copper", current_A = 0, length_ft = 0, source_voltage_V = 0, target_percent = 3 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (material !== "copper" && material !== "aluminum") return { error: "Material must be copper or aluminum." };
@@ -5235,7 +5235,7 @@ function _v374renderConduitJamRatio(inputRegion, outputRegion, citationEl) {
 ELECTRICAL_RENDERERS["conduit-jam-ratio"] = _v374renderConduitJamRatio;
 
 // ===================== spec-v471: premium motor upgrade energy savings =====================
-// dims: in { hp: M L^2 T^-3, load: dimensionless, eff_standard: dimensionless, eff_premium: dimensionless, hours: T, rate_kwh: dimensionless } out: { kw_standard: dimensionless, kw_premium: dimensionless, annual_saving: dimensionless }
+// dims: in { hp: M L^2 T^-3, load: dimensionless, eff_standard: dimensionless, eff_premium: dimensionless, hours: T, rate_kwh: dimensionless } out: { kw_standard: dimensionless, kw_premium: dimensionless, annual_saving: dimensionless, kw_saved: M L^2 T^-3 }
 export function computeMotorEfficiencyUpgradeSavings({ hp = 0, load = 0, eff_standard = 0, eff_premium = 0, hours = 0, rate_kwh = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const h = Number(hp) || 0;
@@ -5612,7 +5612,7 @@ ELECTRICAL_RENDERERS["asymmetrical-fault-xr"] = _v496renderAsymmetricalFaultXr;
 // ===================== spec-v518: battery room hydrogen ventilation (IEEE 1635) =====================
 // IEEE 1635 Annex A: 1.27e-7 m^3/s (0.000269 cfm) of H2 per ampere per cell. Until 2026-09-26: 0.054 I N, called 1%, held 0.5%.
 const _H2_CFM_PER_AMP_CELL = 0.000269;
-// dims: in { cell_count: dimensionless, charge_current_a: I, room_volume_ft3: L^3, h2_limit_pct: dimensionless } out: { q_cfm: L^3 T^-1, ach: T^-1 }
+// dims: in { cell_count: dimensionless, charge_current_a: I, room_volume_ft3: L^3, h2_limit_pct: dimensionless } out: { q_cfm: L^3 T^-1, ach: T^-1, h2_limit_pct: dimensionless }
 export function computeBatteryHydrogenVent({ cell_count = 0, charge_current_a = 0, room_volume_ft3 = 0, h2_limit_pct = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const n = Number(cell_count) || 0;
@@ -5694,7 +5694,7 @@ function renderBatteryVentMaxCurrent(inputRegion, outputRegion, citationEl) {
 ELECTRICAL_RENDERERS["battery-vent-max-current"] = renderBatteryVentMaxCurrent;
 
 // ===================== spec-v520: transformer inrush coordination point =====================
-// dims: in { kva: M L^2 T^-3, primary_voltage_v: M L^2 T^-3 I^-1, phase: dimensionless, inrush_multiple: dimensionless, duration_s: T } out: { fla_a: I, inrush_point_a: I }
+// dims: in { kva: M L^2 T^-3, primary_voltage_v: M L^2 T^-3 I^-1, phase: dimensionless, inrush_multiple: dimensionless, duration_s: T } out: { fla_a: I, inrush_point_a: I, duration_s: T }
 export function computeTransformerInrushPoint({ kva = 0, primary_voltage_v = 0, phase = 3, inrush_multiple = 12, duration_s = 0.1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const k = Number(kva) || 0;
@@ -5911,7 +5911,7 @@ ELECTRICAL_RENDERERS["transformer-turns-ratio"] = _v806renderTransformerTurnsRat
 // sized to the whole circuit's OCPD - the EGC is NOT divided among the sets the way the ungrounded
 // conductors are. The table lookup is delegated to the landed computeEGCSize so no NEC table is
 // duplicated here; this tile adds the parallel rule and shows the wrong answer for contrast.
-// dims: in { ocpd_A: I, raceway_count: dimensionless, material: dimensionless } out: { egc_per_raceway_awg: dimensionless, total_egc_count: dimensionless }
+// dims: in { ocpd_A: I, raceway_count: dimensionless, material: dimensionless } out: { egc_per_raceway_awg: dimensionless, total_egc_count: dimensionless, divided_ocpd_A: I, ocpd_A: I }
 export function computeEgcParallelRaceways({ ocpd_A = 0, raceway_count = 2, material = "copper" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const ocpd = Number(ocpd_A) || 0;

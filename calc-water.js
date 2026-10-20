@@ -1012,7 +1012,7 @@ export const POOL_CHLORINE_TYPES = {
 };
 
 // dims: in { pool_volume_gal: L^3, turnover_hr: T, chlorine_ppm: dimensionless, chlorine_type: dimensionless }
-//        out: { turnover_gpm: L^3 T^-1, chlorine_product_lb: M, dose_pure_lb: M }
+//        out: { turnover_gpm: L^3 T^-1, chlorine_product_lb: M, dose_pure_lb: M, chlorine_pct: dimensionless }
 // (Pool volume `L^3` divided by turnover time `T` gives required flow
 // `L^3 T^-1`; the chlorine dose is a product mass `M`. ppm and the
 // product selector are dimensionless.)
@@ -1276,7 +1276,7 @@ WATER_RENDERERS["well-max-yield"] = _renderWellMaxYield;
 // --- N.4 Cooling water makeup from cycles of concentration -----------
 
 // dims: in { recirculation_gpm: L^3 T^-1, delta_T_F: T, coc: dimensionless, drift_fraction: dimensionless }
-//        out: { evaporation_gpm: L^3 T^-1, blowdown_gpm: L^3 T^-1, drift_gpm: L^3 T^-1, makeup_gpm: L^3 T^-1 }
+//        out: { evaporation_gpm: L^3 T^-1, blowdown_gpm: L^3 T^-1, drift_gpm: L^3 T^-1, makeup_gpm: L^3 T^-1, coc: dimensionless }
 // (Recirculation and every derived flow are `L^3 T^-1`; delta-T is a
 // temperature `T`; cycles of concentration and drift fraction are
 // dimensionless ratios.)
@@ -1651,7 +1651,7 @@ const renderChlorineDemand = _v23SimpleRenderer({
 });
 WATER_RENDERERS["chlorine-demand"] = renderChlorineDemand;
 
-// dims: in { intensity_mw_cm2: M T^-3, exposure_time_s: T, target_dose_mj_cm2: M T^-2 } out: { dose_mj_cm2: M T^-2 }
+// dims: in { intensity_mw_cm2: M T^-3, exposure_time_s: T, target_dose_mj_cm2: M T^-2 } out: { dose_mj_cm2: M T^-2, margin: dimensionless }
 export function computeUvDose({ intensity_mw_cm2 = 0, exposure_time_s = 0, target_dose_mj_cm2 = 40 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(intensity_mw_cm2 > 0)) return { error: "UV intensity must be positive (mW/cm^2)." };
@@ -2480,7 +2480,7 @@ WATER_RENDERERS["well-casing-purge-volume"] = _simpleRenderer({
 // =====================================================================
 // spec-v1590: constant-pressure well VFD setpoint and flow.
 // =====================================================================
-// dims: in { static_lift_ft: L, friction_at_design_ft: L, design_flow_gpm: L^3 T^-1, setpoint_psi: M L^-1 T^-2, reduced_flow_gpm: L^3 T^-1, full_speed_rpm: T^-1, drawdown_at_design_ft: L, pump_max_head_ft: L } out: { setpoint_head_ft: L, head_at_design_ft: L, head_at_reduced_ft: L, speed_at_reduced_rpm: T^-1, speed_reduction_pct: dimensionless, head_with_drawdown_ft: L }
+// dims: in { static_lift_ft: L, friction_at_design_ft: L, design_flow_gpm: L^3 T^-1, setpoint_psi: M L^-1 T^-2, reduced_flow_gpm: L^3 T^-1, full_speed_rpm: T^-1, drawdown_at_design_ft: L, pump_max_head_ft: L } out: { setpoint_head_ft: L, head_at_design_ft: L, head_at_reduced_ft: L, speed_at_reduced_rpm: T^-1, speed_reduction_pct: dimensionless, head_with_drawdown_ft: L, friction_at_reduced_ft: L }
 export function computeConstantPressureWellVfd({
   static_lift_ft = 0, friction_at_design_ft = 0, design_flow_gpm = 0, setpoint_psi = 0,
   reduced_flow_gpm = 0, full_speed_rpm = 3450, drawdown_at_design_ft = 0, pump_max_head_ft = 0,
@@ -2565,7 +2565,7 @@ WATER_RENDERERS["constant-pressure-well-vfd"] = _simpleRenderer({
 // minimising fill time plus draw time over the inflow.
 // =====================================================================
 const _WW_GAL_PER_CU_FT = 1728 / 231;
-// dims: in { pump_gpm: L^3 T^-1, well_diameter_ft: L, min_cycle_minutes: T, max_starts_per_hour: dimensionless, inflow_gpm: L^3 T^-1 } out: { active_volume_gal: L^3, area_ft2: L^2, gal_per_ft: L^2, level_differential_ft: L, worst_case_inflow_gpm: L^3 T^-1, cycle_at_inflow_min: T }
+// dims: in { pump_gpm: L^3 T^-1, well_diameter_ft: L, min_cycle_minutes: T, max_starts_per_hour: dimensionless, inflow_gpm: L^3 T^-1 } out: { active_volume_gal: L^3, area_ft2: L^2, gal_per_ft: L^2, level_differential_ft: L, worst_case_inflow_gpm: L^3 T^-1, cycle_at_inflow_min: T, cycle_min: T }
 export function computeWetWellCycleTime({
   pump_gpm = 0, well_diameter_ft = 0, min_cycle_minutes = 0, max_starts_per_hour = 0, inflow_gpm = 0,
 } = {}) {
@@ -2638,7 +2638,7 @@ WATER_RENDERERS["wet-well-cycle-time"] = _simpleRenderer({
 // =====================================================================
 const _MAIN_GAL_PER_FT_COEFF = 0.0408;
 const _MAIN_GPM_COEFF = 2.448; // gpm = 2.448 x d(in)^2 x v(ft/s)
-// dims: in { main_diameter_in: L, run_length_ft: L, target_velocity_fps: L T^-1, pipe_volumes: dimensionless, available_flow_gpm: L^3 T^-1, hydrant_outlets: dimensionless, outlet_capacity_gpm: L^3 T^-1 } out: { gal_per_ft: L^2, pipe_volume_gal: L^3, required_gpm: L^3 T^-1, duration_min: T, total_discharged_gal: L^3, achieved_velocity_fps: L T^-1 }
+// dims: in { main_diameter_in: L, run_length_ft: L, target_velocity_fps: L T^-1, pipe_volumes: dimensionless, available_flow_gpm: L^3 T^-1, hydrant_outlets: dimensionless, outlet_capacity_gpm: L^3 T^-1 } out: { gal_per_ft: L^2, pipe_volume_gal: L^3, required_gpm: L^3 T^-1, duration_min: T, total_discharged_gal: L^3, achieved_velocity_fps: L T^-1, governing_gpm: L^3 T^-1, outlet_total_gpm: L^3 T^-1 }
 export function computeMainFlushingVolume({
   main_diameter_in = 0, run_length_ft = 0, target_velocity_fps = 3, pipe_volumes = 3,
   available_flow_gpm = 0, hydrant_outlets = 0, outlet_capacity_gpm = 0,
@@ -2720,7 +2720,7 @@ WATER_RENDERERS["main-flushing-volume"] = _simpleRenderer({
 // cannot drift from the criterion the same tile prints.
 // =====================================================================
 const _HGL_PSI_PER_FT = 0.433;
-// dims: in { hgl_ft: L, service_elevation_ft: L, min_pressure_psi: M L^-1 T^-2, max_pressure_psi: M L^-1 T^-2, service_relief_ft: L, fire_flow_friction_ft: L } out: { static_psi: M L^-1 T^-2, lowest_servable_ft: L, highest_servable_ft: L, elevation_band_ft: L, zones_required: dimensionless, fire_flow_psi: M L^-1 T^-2 }
+// dims: in { hgl_ft: L, service_elevation_ft: L, min_pressure_psi: M L^-1 T^-2, max_pressure_psi: M L^-1 T^-2, service_relief_ft: L, fire_flow_friction_ft: L } out: { static_psi: M L^-1 T^-2, lowest_servable_ft: L, highest_servable_ft: L, elevation_band_ft: L, zones_required: dimensionless, fire_flow_psi: M L^-1 T^-2, fire_hgl_ft: L }
 export function computePressureZoneHgl({
   hgl_ft = 0, service_elevation_ft = 0, min_pressure_psi = 40, max_pressure_psi = 80,
   service_relief_ft = 0, fire_flow_friction_ft = 0,

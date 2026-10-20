@@ -53,7 +53,7 @@ export const SHOP_RENDERERS = {};
 // entered directly; cut time t = L / feed_IPM; total = t x passes.
 // =====================================================================
 
-// dims: in { cut_length_in: L, rpm: T^-1, feed_ipr_in: L, feed_ipm_in: L T^-1, passes: dimensionless } out: { feed_ipm: L T^-1, time_min: T, time_s: T, total_min: T }
+// dims: in { cut_length_in: L, rpm: T^-1, feed_ipr_in: L, feed_ipm_in: L T^-1, passes: dimensionless } out: { feed_ipm: L T^-1, time_min: T, time_s: T, total_min: T, passes: dimensionless }
 export function computeMachiningTime({ feed_mode = "rpm-ipr", cut_length_in = 0, rpm = 0, feed_ipr_in = 0, feed_ipm_in = 0, passes = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (feed_mode !== "rpm-ipr" && feed_mode !== "direct") return { error: "Feed mode must be rpm-ipr or direct." };
@@ -326,7 +326,7 @@ SHOP_RENDERERS["taper-calc"] = _v40renderTaperCalc;
 // and the length, solve the other diameter (the lathe-setup direction).
 // =====================================================================
 
-// dims: in { known_dia_in: L, known_end: dimensionless, taper_per_foot: dimensionless, length_in: L } out: { large_dia_in: L, small_dia_in: L, change_in: L, angle_per_side_deg: dimensionless, included_angle_deg: dimensionless }
+// dims: in { known_dia_in: L, known_end: dimensionless, taper_per_foot: dimensionless, length_in: L } out: { large_dia_in: L, small_dia_in: L, change_in: L, angle_per_side_deg: dimensionless, included_angle_deg: dimensionless, missing_dia_in: L }
 export function computeTaperDiameter({ known_dia_in = 0, known_end = "large", taper_per_foot = 0, length_in = 0 } = {}) {
   const _g = _finiteGuard({ known_dia_in, taper_per_foot, length_in }); if (_g) return _g;
   if (known_end !== "large" && known_end !== "small") return { error: "Known end must be large or small." };
@@ -492,7 +492,7 @@ SHOP_RENDERERS["tailstock-setover"] = _v805renderTailstockSetover;
 // that product is a whole number. First-principles ratio arithmetic.
 // =====================================================================
 
-// dims: in { divisions: dimensionless, worm_ratio: dimensionless, circles: dimensionless, index_by: dimensionless, angle_deg: dimensionless } out: { full_turns: dimensionless }
+// dims: in { divisions: dimensionless, worm_ratio: dimensionless, circles: dimensionless, index_by: dimensionless, angle_deg: dimensionless } out: { full_turns: dimensionless, angle_deg: dimensionless, fraction: dimensionless, turns: dimensionless }
 export function computeDividingHead({ divisions = 0, worm_ratio = 40, circles = "", index_by = "divisions", angle_deg = 0 } = {}) {
   const _g = _finiteGuard({ divisions, worm_ratio, angle_deg }); if (_g) return _g;
   if (index_by !== "divisions" && index_by !== "angle") return { error: "Index by must be divisions or angle." };
@@ -591,7 +591,7 @@ const _V40_MOW_K = Math.cos(Math.PI / 6); // 0.8660254 = (1/2)cot(30deg) = sqrt(
 const _WIRE_MIN_P = 0.505182;
 const _WIRE_MAX_P = 1.010362;
 
-// dims: in { thread_standard: dimensionless, tpi: L^-1, pitch_mm: L, pitch_diameter_in: L, wire_dia_in: L } out: { best_wire_in: L, measurement_over_wires_in: L }
+// dims: in { thread_standard: dimensionless, tpi: L^-1, pitch_mm: L, pitch_diameter_in: L, wire_dia_in: L } out: { best_wire_in: L, measurement_over_wires_in: L, measurement_over_wires_mm: L, pitch_in: L, wire_dia_in: L, wire_max_in: L }
 export function computeThreadMeasureWire({ thread_standard = "inch", tpi = 0, pitch_mm = 0, pitch_diameter_in = 0, wire_dia_in = 0 } = {}) {
   const _g = _finiteGuard({ tpi, pitch_mm, pitch_diameter_in, wire_dia_in }); if (_g) return _g;
   if (thread_standard !== "inch" && thread_standard !== "metric") return { error: "Thread standard must be inch or metric." };
@@ -658,7 +658,7 @@ SHOP_RENDERERS["thread-measure-wire"] = _v40renderThreadMeasureWire;
 // gives the measurement over wires M from a pitch diameter E; the machinist
 // actually measures M on the mic and wants E, so E = M - 3W + 0.86603 P is the
 // working direction. Same 60-degree geometry, best-wire default, and range check.
-// dims: in { thread_standard: dimensionless, tpi: L^-1, pitch_mm: L, measurement_over_wires_in: L, wire_dia_in: L } out: { pitch_diameter_in: L, best_wire_in: L, pitch_in: L }
+// dims: in { thread_standard: dimensionless, tpi: L^-1, pitch_mm: L, measurement_over_wires_in: L, wire_dia_in: L } out: { pitch_diameter_in: L, best_wire_in: L, pitch_in: L, wire_dia_in: L, wire_max_in: L }
 export function computeThreadPitchDiaFromWires({ thread_standard = "inch", tpi = 0, pitch_mm = 0, measurement_over_wires_in = 0, wire_dia_in = 0 } = {}) {
   const _g = _finiteGuard({ tpi, pitch_mm, measurement_over_wires_in, wire_dia_in }); if (_g) return _g;
   if (thread_standard !== "inch" && thread_standard !== "metric") return { error: "Thread standard must be inch or metric." };
@@ -727,7 +727,7 @@ SHOP_RENDERERS["thread-pitch-dia-from-wires"] = _v721renderThreadPitchDiaFromWir
 // constant is the published mild-steel value); total = tons/ft x L.
 // =====================================================================
 
-// dims: in { thickness_in: L, bend_length_ft: L, die_opening_in: L, uts_ksi: M L^-1 T^-2 } out: { tons_per_ft: dimensionless, total_tons: dimensionless }
+// dims: in { thickness_in: L, bend_length_ft: L, die_opening_in: L, uts_ksi: M L^-1 T^-2 } out: { tons_per_ft: dimensionless, total_tons: dimensionless, min_flange_in: L, recommended_die_in: L }
 export function computePressBrakeTonnage({ thickness_in = 0, bend_length_ft = 0, die_opening_in = 0, uts_ksi = 60 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const T = Number(thickness_in) || 0, L = Number(bend_length_ft) || 0;
@@ -1052,7 +1052,7 @@ SHOP_RENDERERS["carbon-equivalent"] = _v40renderCarbonEquivalent;
 
 const _V41_TAP_K = 76.98; // 60-degree percent-of-thread constant (1 / 0.012990)
 
-// dims: in { thread_standard: dimensionless, major_dia_in: L, tpi: L^-1, pitch_mm: L, thread_percent: dimensionless } out: { drill_dia_in: L, drill_dia_mm: L, nearest_64th_in: L, nearest_64th_percent: dimensionless }
+// dims: in { thread_standard: dimensionless, major_dia_in: L, tpi: L^-1, pitch_mm: L, thread_percent: dimensionless } out: { drill_dia_in: L, drill_dia_mm: L, nearest_64th_in: L, nearest_64th_percent: dimensionless, major_dia_in: L, nearest_64th_mm: L, pitch_in: L, thread_percent: dimensionless }
 export function computeTapDrillSize({ thread_standard = "inch", major_dia_in = 0, tpi = 0, pitch_mm = 0, thread_percent = 75 } = {}) {
   const _g = _finiteGuard({ major_dia_in, tpi, pitch_mm, thread_percent }); if (_g) return _g;
   if (thread_standard !== "inch" && thread_standard !== "metric") return { error: "Thread standard must be inch or metric." };
@@ -1138,7 +1138,7 @@ SHOP_RENDERERS["tap-drill-size"] = _v41renderTapDrillSize;
 // k = 0.5 (mid-thickness) gives L = pi x (OD - T) = pi x (ID + T).
 // =====================================================================
 
-// dims: in { reference: dimensionless, diameter_in: L, thickness_in: L, k_factor: dimensionless } out: { neutral_dia_in: L, blank_length_in: L }
+// dims: in { reference: dimensionless, diameter_in: L, thickness_in: L, k_factor: dimensionless } out: { neutral_dia_in: L, blank_length_in: L, blank_length_mm: L }
 export function computeRolledBlank({ reference = "od", diameter_in = 0, thickness_in = 0, k_factor = 0.5 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // Anything that was not exactly "id" used to be the outside diameter, 1.57 in short on a 12 in ID.
@@ -1545,7 +1545,7 @@ SHOP_RENDERERS["parabolic-segment"] = _v1316renderParabolicSegment;
 // V = (h/6)(A1 + A2 + 4 Am), Am the mid-height section. Top 0x0 = full pyramid; equal top/bottom = a prism.
 // Until 2026-09-25 this used (h/3)(A1 + A2 + sqrt(A1 A2)), exact only for similar ends: a 20x4 base
 // to a 10x4 top read 353.1 ft^3 of 360, and a wedge (top length 0) read as a pyramid.
-// dims: in { bottom_length_ft: L, bottom_width_ft: L, top_length_ft: L, top_width_ft: L, height_ft: L } out: { volume_ft3: L^3, volume_yd3: L^3, volume_gal: L^3 }
+// dims: in { bottom_length_ft: L, bottom_width_ft: L, top_length_ft: L, top_width_ft: L, height_ft: L } out: { volume_ft3: L^3, volume_yd3: L^3, volume_gal: L^3, bottom_area_ft2: L^2, top_area_ft2: L^2 }
 export function computePyramidFrustumVolume({ bottom_length_ft = 0, bottom_width_ft = 0, top_length_ft = 0, top_width_ft = 0, height_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const Lb = Number(bottom_length_ft) || 0;
@@ -2090,7 +2090,7 @@ SHOP_RENDERERS["tapered-tank-volume"] = _v1326renderTaperedTankVolume;
 // a dished/parabolic vessel bottom, or the free surface of a spinning liquid. Full V = (1/2) pi R^2 H, exactly half
 // the enclosing cylinder. A parabola has z proportional to r^2, so filling apex-up the wetted radius grows as
 // r(y) = R sqrt(y/H) and the volume as V(y) = pi R^2 y^2/(2H): it fills as the SQUARE of the depth (percent = (y/H)^2).
-// dims: in { base_diameter_ft: L, height_ft: L, fill_depth_ft: L } out: { full_ft3: L^3, fill_ft3: L^3, percent_full: dimensionless }
+// dims: in { base_diameter_ft: L, height_ft: L, fill_depth_ft: L } out: { full_ft3: L^3, fill_ft3: L^3, percent_full: dimensionless, fill_gal: L^3, full_gal: L^3 }
 export function computeParaboloidVolume({ base_diameter_ft = 0, height_ft = 0, fill_depth_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const GAL_PER_FT3 = 1728 / 231;
@@ -2190,7 +2190,7 @@ SHOP_RENDERERS["cylindrical-wedge-volume"] = _v1330renderCylindricalWedgeVolume;
 // parabolic profile) V = (pi L/15)(2 D^2 + D d + (3/4) d^2), and circular-arc staves (Kepler's approximation)
 // V = (pi L/12)(2 D^2 + d^2). Both collapse to the straight cylinder when D = d. Real barrels sit between the two,
 // within ~0.5%. Inches in; gallons + ft^3 out.
-// dims: in { bung_diameter_in: L, head_diameter_in: L, length_in: L } out: { parabolic_gal: L^3, circular_gal: L^3, parabolic_in3: L^3 }
+// dims: in { bung_diameter_in: L, head_diameter_in: L, length_in: L } out: { parabolic_gal: L^3, circular_gal: L^3, parabolic_in3: L^3, parabolic_ft3: L^3 }
 export function computeBarrelVolume({ bung_diameter_in = 0, head_diameter_in = 0, length_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const IN3_PER_GAL = 231;
@@ -2768,7 +2768,7 @@ SHOP_RENDERERS["plasma-cut-speed"] = _simpleRenderer({
 });
 
 // ===================== spec-v1409: hydraulic reservoir size and cooler duty =====================
-// dims: in { pump_gpm: L^3 T^-1, pressure_psi: M L^-1 T^-2, pump_efficiency: dimensionless, heat_fraction: dimensionless, reservoir_multiplier: dimensionless, reservoir_dissipation_btu_hr: M L^2 T^-3 } out: { hydraulic_hp: M L^2 T^-3, heat_btu_hr: M L^2 T^-3, reservoir_gal: L^3, cooler_duty_btu_hr: M L^2 T^-3 }
+// dims: in { pump_gpm: L^3 T^-1, pressure_psi: M L^-1 T^-2, pump_efficiency: dimensionless, heat_fraction: dimensionless, reservoir_multiplier: dimensionless, reservoir_dissipation_btu_hr: M L^2 T^-3 } out: { hydraulic_hp: M L^2 T^-3, heat_btu_hr: M L^2 T^-3, reservoir_gal: L^3, cooler_duty_btu_hr: M L^2 T^-3, heat_hp: M L^2 T^-3, input_hp: M L^2 T^-3 }
 export function computeHydraulicReservoirCooler({ pump_gpm = 0, pressure_psi = 0, pump_efficiency = 0.85, heat_fraction = 0.25, reservoir_multiplier = 3, reservoir_dissipation_btu_hr = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(pump_gpm > 0)) return { error: "Pump flow must be positive." };
@@ -2844,7 +2844,7 @@ const _dustPick = (required_in) => {
 };
 const _dustArea = (dia_in) => Math.PI * (dia_in / 12) * (dia_in / 12) / 4;
 
-// dims: in { cfm_per_machine: L^3 T^-1, branch_velocity_fpm: L T^-1, main_velocity_fpm: L T^-1, machines: dimensionless, simultaneous: dimensionless } out: { branch_area_sqft: L^2, branch_diameter_in: L, branch_velocity_actual_fpm: L T^-1 }
+// dims: in { cfm_per_machine: L^3 T^-1, branch_velocity_fpm: L T^-1, main_velocity_fpm: L T^-1, machines: dimensionless, simultaneous: dimensionless } out: { branch_area_sqft: L^2, branch_diameter_in: L, branch_velocity_actual_fpm: L T^-1, all_open_cfm: L^3 T^-1, branch_size_in: L, branch_up_in: L, branch_up_velocity_fpm: L T^-1, main_area_sqft: L^2, main_cfm: L^3 T^-1, main_diameter_in: L, main_size_in: L, main_velocity_actual_fpm: L T^-1 }
 export function computeDustCollectionDuct({ cfm_per_machine = 0, branch_velocity_fpm = 4000, main_velocity_fpm = 3500, machines = 1, simultaneous = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // Past the largest stocked size the table used to answer "16 in" for any airflow.
@@ -2914,7 +2914,7 @@ SHOP_RENDERERS["dust-collection-duct"] = _simpleRenderer({
 // ===========================================================================
 
 // ===================== spec-v1435: pneumatic cylinder air consumption =====================
-// dims: in { bore_in: L, rod_in: L, stroke_in: L, cycles_per_min: T^-1, pressure_psig: M L^-1 T^-2, cylinders: dimensionless, cfm_per_hp: M^-1 L T^2 } out: { volume_per_cycle_ft3: L^3, scfm_total: L^3 T^-1, compressor_hp: M L^2 T^-3 }
+// dims: in { bore_in: L, rod_in: L, stroke_in: L, cycles_per_min: T^-1, pressure_psig: M L^-1 T^-2, cylinders: dimensionless, cfm_per_hp: M^-1 L T^2 } out: { volume_per_cycle_ft3: L^3, scfm_total: L^3 T^-1, compressor_hp: M L^2 T^-3, compression_ratio: dimensionless, extend_in3: L^3, retract_in3: L^3 }
 export function computePneumaticCylinderScfm({ bore_in = 0, rod_in = 0, stroke_in = 0, cycles_per_min = 0, pressure_psig = 0, cylinders = 1, cfm_per_hp = 4 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(bore_in > 0)) return { error: "Bore diameter must be positive." };
@@ -2971,7 +2971,7 @@ SHOP_RENDERERS["pneumatic-cylinder-scfm"] = _simpleRenderer({
 });
 
 // ===================== spec-v1436: bucket elevator capacity and power =====================
-// dims: in { bucket_volume_ft3: L^3, spacing_in: L, speed_fpm: L T^-1, fill_factor: dimensionless, bulk_density_pcf: M L^-3, lift_ft: L, drive_efficiency: dimensionless, friction_allowance: dimensionless } out: { capacity_ft3_hr: L^3 T^-1, lifting_hp: M L^2 T^-3, motor_hp: M L^2 T^-3 }
+// dims: in { bucket_volume_ft3: L^3, spacing_in: L, speed_fpm: L T^-1, fill_factor: dimensionless, bulk_density_pcf: M L^-3, lift_ft: L, drive_efficiency: dimensionless, friction_allowance: dimensionless } out: { capacity_ft3_hr: L^3 T^-1, lifting_hp: M L^2 T^-3, motor_hp: M L^2 T^-3, lift_share_pct: dimensionless }
 export function computeBucketElevatorCapacity({ bucket_volume_ft3 = 0, spacing_in = 0, speed_fpm = 0, fill_factor = 0.75, bulk_density_pcf = 0, lift_ft = 0, drive_efficiency = 0.75, friction_allowance = 1.2 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(bucket_volume_ft3 > 0)) return { error: "Bucket volume must be positive." };
@@ -3024,7 +3024,7 @@ SHOP_RENDERERS["bucket-elevator-capacity"] = _simpleRenderer({
 });
 
 // ===================== spec-v1437: cyclone separator cut size and pressure drop =====================
-// dims: in { inlet_width_ft: L, inlet_velocity_fps: L T^-1, turns: dimensionless, gas_viscosity_lb_ft_s: M L^-1 T^-1, gas_density_pcf: M L^-3, particle_density_pcf: M L^-3, k_velocity_heads: dimensionless, airflow_cfm: L^3 T^-1, second_velocity_fps: L T^-1 } out: { d50_ft: L, d50_micron: L, pressure_drop_psf: M L^-1 T^-2 }
+// dims: in { inlet_width_ft: L, inlet_velocity_fps: L T^-1, turns: dimensionless, gas_viscosity_lb_ft_s: M L^-1 T^-1, gas_density_pcf: M L^-3, particle_density_pcf: M L^-3, k_velocity_heads: dimensionless, airflow_cfm: L^3 T^-1, second_velocity_fps: L T^-1 } out: { d50_ft: L, d50_micron: L, pressure_drop_psf: M L^-1 T^-2, cut_gain_pct: dimensionless, drop_rise_pct: dimensionless, fan_hp: M L^2 T^-3 }
 export function computeCycloneSeparatorSizing({ inlet_width_ft = 0, inlet_velocity_fps = 0, turns = 5, gas_viscosity_lb_ft_s = 1.24e-5, gas_density_pcf = 0.075, particle_density_pcf = 0, k_velocity_heads = 8, airflow_cfm = 0, second_velocity_fps = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(inlet_width_ft > 0)) return { error: "Inlet width must be positive." };
@@ -3084,7 +3084,7 @@ SHOP_RENDERERS["cyclone-separator-sizing"] = _simpleRenderer({
 });
 
 // ===================== spec-v1438: gas spring force and mounting geometry =====================
-// dims: in { lid_weight_lb: M L T^-2, cg_distance_in: L, opening_angle_deg: dimensionless, moment_arm_in: L, struts: dimensionless, second_angle_deg: dimensionless, second_moment_arm_in: L } out: { lid_moment_in_lb: M L^2 T^-2, force_per_strut_lb: M L T^-2 }
+// dims: in { lid_weight_lb: M L T^-2, cg_distance_in: L, opening_angle_deg: dimensionless, moment_arm_in: L, struts: dimensionless, second_angle_deg: dimensionless, second_moment_arm_in: L } out: { lid_moment_in_lb: M L^2 T^-2, force_per_strut_lb: M L T^-2, horizontal_cg_in: L, second_horizontal_in: L, total_force_lb: M L T^-2 }
 export function computeGasStrutForce({ lid_weight_lb = 0, cg_distance_in = 0, opening_angle_deg = 0, moment_arm_in = 0, struts = 2, second_angle_deg = 0, second_moment_arm_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(lid_weight_lb > 0)) return { error: "Lid weight must be positive." };
@@ -3136,7 +3136,7 @@ SHOP_RENDERERS["gas-strut-force"] = _simpleRenderer({
 });
 
 // ===================== spec-v1439: spray booth airflow and makeup air load =====================
-// dims: in { opening_width_ft: L, opening_height_ft: L, face_velocity_fpm: L T^-1, indoor_temp_f: T, outdoor_temp_f: T, burner_efficiency: dimensionless, hours_per_year: T, price_per_therm: dimensionless, booth_depth_ft: L, measured_face_velocity_fpm: L T^-1, bake_temp_f: T, bake_minutes: T, bakes_per_year: dimensionless } out: { exhaust_cfm: L^3 T^-1, heating_btu_hr: M L^2 T^-3, gas_input_btu_hr: M L^2 T^-3, booth_volume_cuft: L^3, air_changes_per_hour: T^-1, measured_cfm: L^3 T^-1, bake_btu_hr: M L^2 T^-3, bake_btu_per_cycle: M L^2 T^-2 }
+// dims: in { opening_width_ft: L, opening_height_ft: L, face_velocity_fpm: L T^-1, indoor_temp_f: T, outdoor_temp_f: T, burner_efficiency: dimensionless, hours_per_year: T, price_per_therm: dimensionless, booth_depth_ft: L, measured_face_velocity_fpm: L T^-1, bake_temp_f: T, bake_minutes: T, bakes_per_year: dimensionless } out: { exhaust_cfm: L^3 T^-1, heating_btu_hr: M L^2 T^-3, gas_input_btu_hr: M L^2 T^-3, booth_volume_cuft: L^3, air_changes_per_hour: T^-1, measured_cfm: L^3 T^-1, bake_btu_hr: M L^2 T^-3, bake_btu_per_cycle: M L^2 T^-2, annual_cost: dimensionless, makeup_cfm: L^3 T^-1, opening_sqft: L^2, velocity_shortfall_pct: dimensionless }
 export function computeSprayBoothAirflow({ opening_width_ft = 0, opening_height_ft = 0, face_velocity_fpm = 100, indoor_temp_f = 70, outdoor_temp_f = 0, burner_efficiency = 0.8, hours_per_year = 0, price_per_therm = 0, booth_depth_ft = 0, measured_face_velocity_fpm = 0, bake_temp_f = 0, bake_minutes = 0, bakes_per_year = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(opening_width_ft > 0 && opening_height_ft > 0)) return { error: "Booth opening width and height must be positive." };
@@ -3360,7 +3360,7 @@ SHOP_RENDERERS["plating-tank-current"] = _simpleRenderer({
 });
 
 // ===================== spec-v1442: heat-treat soak time and furnace load =====================
-// dims: in { charge_weight_lb: M, section_thickness_in: L, soak_temp_f: T, start_temp_f: T, through_heat_rate_hr_per_in: T L^-1, soak_rate_hr_per_in: T L^-1, specific_heat: L^2 T^-2, furnace_efficiency: dimensionless } out: { total_at_temp_hr: T, charge_heat_btu: M L^2 T^-2, furnace_input_btu_hr: M L^2 T^-3 }
+// dims: in { charge_weight_lb: M, section_thickness_in: L, soak_temp_f: T, start_temp_f: T, through_heat_rate_hr_per_in: T L^-1, soak_rate_hr_per_in: T L^-1, specific_heat: L^2 T^-2, furnace_efficiency: dimensionless } out: { total_at_temp_hr: T, charge_heat_btu: M L^2 T^-2, furnace_input_btu_hr: M L^2 T^-3, furnace_input_kw: M L^2 T^-3 }
 export function computeHeatTreatSoakTime({ charge_weight_lb = 0, section_thickness_in = 0, soak_temp_f = 0, start_temp_f = 70, through_heat_rate_hr_per_in = 1, soak_rate_hr_per_in = 1, specific_heat = 0.12, furnace_efficiency = 0.6 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // The page passes a blank box as null, and Number(null) is 0 F; 0 F is a real reading, so a blank cannot stand in for it.
@@ -3413,7 +3413,7 @@ SHOP_RENDERERS["heat-treat-soak-time"] = _simpleRenderer({
 });
 
 // ===================== spec-v1443: quench severity and the Biot screen =====================
-// dims: in { grossmann_h: L^-1, section_diameter_in: L, second_grossmann_h: L^-1 } out: { biot: dimensionless, second_biot: dimensionless }
+// dims: in { grossmann_h: L^-1, section_diameter_in: L, second_grossmann_h: L^-1 } out: { biot: dimensionless, second_biot: dimensionless, radius_in: L }
 export function computeQuenchSeverity({ grossmann_h = 0, section_diameter_in = 0, second_grossmann_h = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(grossmann_h > 0)) return { error: "Grossmann H-value must be positive." };
@@ -3460,7 +3460,7 @@ SHOP_RENDERERS["quench-severity"] = _simpleRenderer({
 });
 
 // ===================== spec-v1444: belt conveyor tension and drive power =====================
-// dims: in { tons_per_hour: M T^-1, belt_speed_fpm: L T^-1, length_ft: L, lift_ft: L, belt_weight_plf: M T^-2, idler_weight_plf: M T^-2, friction_factor: dimensionless, drive_efficiency: dimensionless } out: { effective_tension_lb: M L T^-2, belt_hp: M L^2 T^-3, motor_hp: M L^2 T^-3 }
+// dims: in { tons_per_hour: M T^-1, belt_speed_fpm: L T^-1, length_ft: L, lift_ft: L, belt_weight_plf: M T^-2, idler_weight_plf: M T^-2, friction_factor: dimensionless, drive_efficiency: dimensionless } out: { effective_tension_lb: M L T^-2, belt_hp: M L^2 T^-3, motor_hp: M L^2 T^-3, lift_share_pct: dimensionless }
 export function computeBeltConveyorTensionPower({ tons_per_hour = 0, belt_speed_fpm = 0, length_ft = 0, lift_ft = 0, belt_weight_plf = 0, idler_weight_plf = 0, friction_factor = 0.022, drive_efficiency = 0.85 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (Number(lift_ft) > Number(length_ft)) return { error: "The lift cannot exceed the conveyor length." };

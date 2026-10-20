@@ -44,7 +44,7 @@ export const LAYOUT_RENDERERS = {};
 // existing sling-angle tile, enhanced additively rather than duplicated.)
 // =====================================================================
 
-// dims: in { reading_1_lb: dimensionless, reading_2_lb: dimensionless, span_ft: L, total_weight_lb: dimensionless, cg_from_1_ft: L } out: { total_weight_lb: dimensionless, cg_from_point_1_ft: L, percent_at_1: dimensionless }
+// dims: in { reading_1_lb: dimensionless, reading_2_lb: dimensionless, span_ft: L, total_weight_lb: dimensionless, cg_from_1_ft: L } out: { total_weight_lb: dimensionless, cg_from_point_1_ft: L, percent_at_1: dimensionless, cg_from_point_2_ft: L }
 export function computeCenterOfGravity2Point({ mode = "two-scale-weigh", reading_1_lb = 0, reading_2_lb = 0, span_ft = 0, total_weight_lb = 0, cg_from_1_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const L = Number(span_ft);
@@ -331,7 +331,7 @@ LAYOUT_RENDERERS["triangle-ssa"] = renderTriangleSsa;
 // --- v32 G: Bolt circle / circle-of-holes layout (`bolt-circle`) ---
 // R = dia/2; hole i at angle start + i*(360/N): x = cx + R*cos, y = cy + R*sin;
 // adjacent center-to-center chord = 2*R*sin(180/N).
-// dims: in { bolt_circle_dia_in: L, num_holes: dimensionless, start_angle_deg: dimensionless, center_x_in: L, center_y_in: L } out: { radius_in: L, chord_in: L, angular_spacing_deg: dimensionless }
+// dims: in { bolt_circle_dia_in: L, num_holes: dimensionless, start_angle_deg: dimensionless, center_x_in: L, center_y_in: L } out: { radius_in: L, chord_in: L, angular_spacing_deg: dimensionless, bolt_circle_dia_in: L, center_x_in: L, center_y_in: L, start_angle_deg: dimensionless }
 export function computeBoltCircle({ bolt_circle_dia_in = 0, num_holes = 0, start_angle_deg = 0, center_x_in = 0, center_y_in = 0 } = {}) {
   const _g = _finiteGuard({ bolt_circle_dia_in, num_holes, start_angle_deg, center_x_in, center_y_in }); if (_g) return _g;
   const dia = Number(bolt_circle_dia_in) || 0;
@@ -387,7 +387,7 @@ LAYOUT_RENDERERS["bolt-circle"] = _v32renderBoltCircle;
 // Tape-measure math: round a decimal value to the nearest 1/den tick, reduce
 // the fraction, and break it into feet-inches. Helper kept above the dims block.
 const _bcGcd = (a, b) => { a = Math.abs(a); b = Math.abs(b); while (b) { const t = b; b = a % b; a = t; } return a || 1; };
-// dims: in { value_in: L, denominator: dimensionless } out: { whole_in: L, decimal_value_in: L, error_in: L }
+// dims: in { value_in: L, denominator: dimensionless } out: { whole_in: L, decimal_value_in: L, error_in: L, value_in: L }
 export function computeDecimalToFraction({ value_in = 0, denominator = 16 } = {}) {
   const _g = _finiteGuard({ value_in, denominator }); if (_g) return _g;
   const v = Number(value_in);
@@ -592,7 +592,7 @@ LAYOUT_RENDERERS["thread-pitch"] = _v38renderThreadPitch;
 // = R * angle. First-principles circle geometry.
 // =====================================================================
 
-// dims: in { chord_in: L, rise_in: L } out: { radius_in: L, diameter_in: L, arc_length_in: L, central_angle_deg: dimensionless }
+// dims: in { chord_in: L, rise_in: L } out: { radius_in: L, diameter_in: L, arc_length_in: L, central_angle_deg: dimensionless, chord_in: L, half_chord_in: L, rise_in: L }
 export function computeCircularArc({ chord_in = 0, rise_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const c = Number(chord_in) || 0, h = Number(rise_in) || 0;
@@ -681,7 +681,7 @@ LAYOUT_RENDERERS["circular-segment-area"] = renderCircularSegmentArea;
 // inverse recovers the rise (sagitta / middle ordinate) from a known radius and chord, so a layout person marks the arc
 // height at midspan when the radius is set. From R = ((chord/2)^2 + rise^2) / (2 rise), rise^2 - 2 R rise + (chord/2)^2 = 0,
 // and the minor-arc root is rise = R - sqrt(R^2 - (chord/2)^2). The chord cannot exceed the diameter (R >= chord/2).
-// dims: in { chord_in: L, radius_in: L } out: { rise_in: L, arc_length_in: L, central_angle_deg: dimensionless }
+// dims: in { chord_in: L, radius_in: L } out: { rise_in: L, arc_length_in: L, central_angle_deg: dimensionless, chord_in: L, radius_in: L }
 export function computeCircularArcRiseFromRadius({ chord_in = 0, radius_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const c = Number(chord_in) || 0, R = Number(radius_in) || 0;
@@ -868,7 +868,7 @@ LAYOUT_RENDERERS["polygon-miter"] = _v55renderPolygonMiter;
 // user-supplied.
 // =====================================================================
 
-// dims: in { run_in: L, item_width_in: L, mode: dimensionless, max_gap_in: L, count: dimensionless } out: { count: dimensionless, gap_in: L, center_to_center_in: L, span_used_in: L }
+// dims: in { run_in: L, item_width_in: L, mode: dimensionless, max_gap_in: L, count: dimensionless } out: { count: dimensionless, gap_in: L, center_to_center_in: L, span_used_in: L, item_width_in: L, run_in: L }
 export function computeEqualSpacing({ run_in = 0, item_width_in = 0, mode = "max-gap", max_gap_in = 0, count = 0 } = {}) {
   const _g = _finiteGuard({ run_in, item_width_in, max_gap_in, count }); if (_g) return _g;
   const run = Number(run_in) || 0;

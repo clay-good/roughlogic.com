@@ -97,7 +97,7 @@ const _WATER_OPTS = [{ value: "fresh", label: "Fresh water (62.4 pcf)" }, { valu
 
 // ===================== spec-v1904: USACE sandbag levee bags and sand =====================
 
-// dims: in { height_ft: L, length_ft: L, fill_weight_lb: M L T^-2 } out: { bags_per_ft: L^-1, total_bags: dimensionless, sand_tons: M L T^-2, base_width_ft: L }
+// dims: in { height_ft: L, length_ft: L, fill_weight_lb: M L T^-2 } out: { bags_per_ft: L^-1, total_bags: dimensionless, sand_tons: M L T^-2, base_width_ft: L, height_ft: L, length_ft: L }
 export function computeSandbagLeveeQuantity({ height_ft = 0, length_ft = 0, fill_weight_lb = 40 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(height_ft > 0)) return { error: "Levee height must be positive." };
@@ -144,7 +144,7 @@ FLOODFIGHT_RENDERERS["sandbag-levee-quantity"] = _simpleRenderer({
 
 // ===================== spec-v1905: USACE emergency earth levee section and seepage creep check =====================
 
-// dims: in { height_ft: L, fill: dimensionless, foundation: dimensionless, top_width_ft: L, length_ft: L } out: { riverside_slope_h: dimensionless, landside_slope_h: dimensionless, base_width_ft: L, area_sqft: L^2, fill_cy: L^3, required_path_ft: L, berm_shortfall_ft: L }
+// dims: in { height_ft: L, fill: dimensionless, foundation: dimensionless, top_width_ft: L, length_ft: L } out: { riverside_slope_h: dimensionless, landside_slope_h: dimensionless, base_width_ft: L, area_sqft: L^2, fill_cy: L^3, required_path_ft: L, berm_shortfall_ft: L, height_ft: L, length_ft: L, top_width_ft: L }
 export function computeEmergencyEarthLeveeSection({ height_ft = 0, fill = "sand", foundation = "fine_sand", top_width_ft = 10, length_ft = 100 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(height_ft > 0)) return { error: "Levee height must be positive." };
@@ -213,7 +213,7 @@ function _dragCoefficient(ratio) {
   return 2.0;
 }
 
-// dims: in { depth_ft: L, width_ft: L, water: dimensionless, velocity_basis: dimensionless, entered_velocity_fps: L T^-1, obstruction: dimensionless } out: { hydrostatic_lb_per_ft: M T^-2, hydrostatic_lb: M L T^-2, hydrostatic_height_ft: L, velocity_lower_fps: L T^-1, velocity_upper_fps: L T^-1, velocity_used_fps: L T^-1, drag_coefficient: dimensionless, hydrodynamic_lb: M L T^-2, hydrodynamic_lower_lb: M L T^-2, hydrodynamic_upper_lb: M L T^-2, hydrodynamic_height_ft: L, combined_lateral_lb: M L T^-2 }
+// dims: in { depth_ft: L, width_ft: L, water: dimensionless, velocity_basis: dimensionless, entered_velocity_fps: L T^-1, obstruction: dimensionless } out: { hydrostatic_lb_per_ft: M T^-2, hydrostatic_lb: M L T^-2, hydrostatic_height_ft: L, velocity_lower_fps: L T^-1, velocity_upper_fps: L T^-1, velocity_used_fps: L T^-1, drag_coefficient: dimensionless, hydrodynamic_lb: M L T^-2, hydrodynamic_lower_lb: M L T^-2, hydrodynamic_upper_lb: M L T^-2, hydrodynamic_height_ft: L, combined_lateral_lb: M L T^-2, area_sqft: L^2 }
 export function computeFloodLateralLoad({ depth_ft = 0, width_ft = 0, water = "fresh", velocity_basis = "lower", entered_velocity_fps = 0, obstruction = "wall" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(depth_ft > 0)) return { error: "Still-water flood depth must be positive." };
@@ -275,7 +275,7 @@ FLOODFIGHT_RENDERERS["flood-lateral-load"] = _simpleRenderer({
 
 // ===================== spec-v1907: FEMA flood debris impact load =====================
 
-// dims: in { debris_weight_lb: M L T^-2, zone: dimensionless, depth_ft: L, velocity_basis: dimensionless, entered_velocity_fps: L T^-1, screening: dimensionless, structure: dimensionless } out: { velocity_used_fps: L T^-1, depth_coefficient: dimensionless, blockage_coefficient: dimensionless, structure_coefficient_s_per_ft: T L^-1, impact_force_lb: M L T^-2, impact_elevation_ft: L }
+// dims: in { debris_weight_lb: M L T^-2, zone: dimensionless, depth_ft: L, velocity_basis: dimensionless, entered_velocity_fps: L T^-1, screening: dimensionless, structure: dimensionless } out: { velocity_used_fps: L T^-1, depth_coefficient: dimensionless, blockage_coefficient: dimensionless, structure_coefficient_s_per_ft: T L^-1, impact_force_lb: M L T^-2, impact_elevation_ft: L, velocity_eq89_fps: L T^-1, velocity_lower_fps: L T^-1, velocity_upper_fps: L T^-1 }
 export function computeFloodDebrisImpact({ debris_weight_lb = 1000, zone = "a", depth_ft = 0, velocity_basis = "eq89", entered_velocity_fps = 0, screening = "none", structure = "rc_wall" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(debris_weight_lb > 0)) return { error: "Debris weight must be positive." };
@@ -331,7 +331,7 @@ FLOODFIGHT_RENDERERS["flood-debris-impact"] = _simpleRenderer({
 
 // ===================== spec-v1908: flood-head uplift on a slab, hatch, or manhole cover =====================
 
-// dims: in { head_ft: L, water: dimensionless, element: dimensionless, slab_thickness_in: L, slab_area_sqft: L^2, cover_diameter_ft: L, cover_weight_lb: M L T^-2 } out: { uplift_psf: M L^-1 T^-2, area_sqft: L^2, uplift_lb: M L T^-2, resisting_psf: M L^-1 T^-2, net_psf: M L^-1 T^-2, net_lb: M L T^-2, floating_head_ft: L, counterweight_lb: M L T^-2 }
+// dims: in { head_ft: L, water: dimensionless, element: dimensionless, slab_thickness_in: L, slab_area_sqft: L^2, cover_diameter_ft: L, cover_weight_lb: M L T^-2 } out: { uplift_psf: M L^-1 T^-2, area_sqft: L^2, uplift_lb: M L T^-2, resisting_psf: M L^-1 T^-2, net_psf: M L^-1 T^-2, net_lb: M L T^-2, floating_head_ft: L, counterweight_lb: M L T^-2, head_ft: L }
 export function computeFloodUpliftCoverSlab({ head_ft = 0, water = "fresh", element = "slab", slab_thickness_in = 4, slab_area_sqft = 0, cover_diameter_ft = 2, cover_weight_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(head_ft > 0)) return { error: "Head above the underside must be positive." };
@@ -528,7 +528,7 @@ FLOODFIGHT_RENDERERS["roof-snow-ice-weight"] = _simpleRenderer({
 
 // ===================== spec-v1911: wood structural panel opening protection takeoff =====================
 
-// dims: in { opening_width_in: L, opening_height_in: L, overlap_in: L, thickness_in: L, fastened_edges: dimensionless, fastener_type: dimensionless, fastener_spacing_in: L, edge_distance_in: L, opening_count: dimensionless } out: { panel_width_in: L, panel_height_in: L, span_in: L, span_ft: L, fastened_edge_in: L, fasteners_per_edge: dimensionless, fasteners_per_panel: dimensionless, sheets: dimensionless, total_fasteners: dimensionless }
+// dims: in { opening_width_in: L, opening_height_in: L, overlap_in: L, thickness_in: L, fastened_edges: dimensionless, fastener_type: dimensionless, fastener_spacing_in: L, edge_distance_in: L, opening_count: dimensionless } out: { panel_width_in: L, panel_height_in: L, span_in: L, span_ft: L, fastened_edge_in: L, fasteners_per_edge: dimensionless, fasteners_per_panel: dimensionless, sheets: dimensionless, total_fasteners: dimensionless, fastener_spacing_in: L, opening_count: dimensionless, thickness_in: L }
 export function computeStormPanelPlywood({ opening_width_in = 0, opening_height_in = 0, overlap_in = 4, thickness_in = 0.4375, fastened_edges = "long", fastener_type = "wood_screw_8", fastener_spacing_in = 0, edge_distance_in = 1, opening_count = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(opening_width_in > 0) || !(opening_height_in > 0)) return { error: "Opening width and height must be positive." };
@@ -619,7 +619,7 @@ const _MH_TABLE = {
   },
 };
 
-// dims: in { wind_zone: dimensionless, floor_width_row: dimensionless, home_length_ft: L, strap_height_row: dimensionless, beam_spacing_row: dimensionless, method: dimensionless, sections: dimensionless } out: { max_spacing_in: L, max_spacing_ft: L, run_ft: L, spaces_per_side: dimensionless, anchors_per_side: dimensionless, total_anchors: dimensionless, vertical_ties: dimensionless, spacing_used_ft: L }
+// dims: in { wind_zone: dimensionless, floor_width_row: dimensionless, home_length_ft: L, strap_height_row: dimensionless, beam_spacing_row: dimensionless, method: dimensionless, sections: dimensionless } out: { max_spacing_in: L, max_spacing_ft: L, run_ft: L, spaces_per_side: dimensionless, anchors_per_side: dimensionless, total_anchors: dimensionless, vertical_ties: dimensionless, spacing_used_ft: L, sections: dimensionless }
 export function computeManufacturedHomeAnchorCount({ wind_zone = "I", floor_width_row = "14", home_length_ft = 0, strap_height_row = "25", beam_spacing_row = "82.5", method = "near", sections = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(home_length_ft > 0)) return { error: "Home length must be positive." };

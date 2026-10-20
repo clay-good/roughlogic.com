@@ -132,7 +132,7 @@ LATERAL_RENDERERS["diaphragm-shear"] = _simpleRenderer({
 // 12.4.2.3); wind is 0.6 D + 0.6 W. sds = 0 gives the wind case. Until
 // 2026-09-25 the seismic case used 0.6 D, overstating the resisting moment
 // by 30% at SDS 1.0 and understating the holdown.
-// dims: in { v_lb: M L T^-2, b_ft: L, h_ft: L, w_lb: M L T^-2, sds: dimensionless } out: { v_plf: M T^-2, mot_ftlb: M L^2 T^-2, mr_ftlb: M L^2 T^-2, t_kip: M L T^-2 }
+// dims: in { v_lb: M L T^-2, b_ft: L, h_ft: L, w_lb: M L T^-2, sds: dimensionless } out: { v_plf: M T^-2, mot_ftlb: M L^2 T^-2, mr_ftlb: M L^2 T^-2, t_kip: M L T^-2, t_lb: M L T^-2 }
 export function computeShearwallOverturning({ v_lb = 0, b_ft = 0, h_ft = 0, w_lb = 0, sds = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (v_lb < 0) return { error: "Story shear V cannot be negative (lb)." };

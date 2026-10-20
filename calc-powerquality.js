@@ -121,7 +121,7 @@ POWERQUALITY_RENDERERS["parallel-conductor-derate"] = renderParallelConductorDer
 // three 120-degree-displaced currents. With dominant triplens the neutral
 // approaches 3 * I_triplen_per_phase (triplens add arithmetically).
 // dims: in { ia_A: I, ib_A: I, ic_A: I, triplen_pct: dimensionless }
-//        out: { neutral_A: I, harmonic_neutral_A: I }
+//        out: { neutral_A: I, harmonic_neutral_A: I, max_phase_A: I }
 export function computeNeutralCurrent3ph({ ia_A = 0, ib_A = 0, ic_A = 0, triplen_pct = 0 } = {}) {
   const a = Number(ia_A) || 0, b = Number(ib_A) || 0, c = Number(ic_A) || 0;
   const trip = Number(triplen_pct) || 0;
@@ -180,7 +180,7 @@ POWERQUALITY_RENDERERS["neutral-current-3ph"] = renderNeutralCurrent3ph;
 // R = K / cmils per ft, phi the locked-rotor power-factor angle;
 // V_terminal = V_source - V_drop; %dip = V_drop / V_source * 100.
 // dims: in { source_voltage_V: M*L^2*T^-3*I^-1, length_ft: L, cmils: L^2, lrc_A: I, phase: dimensionless, k_const: dimensionless, dip_limit_pct: dimensionless, starting_pf: dimensionless, reactance_ohm_per_kft: dimensionless }
-//        out: { v_drop_V: M*L^2*T^-3*I^-1, v_terminal_V: M*L^2*T^-3*I^-1, dip_pct: dimensionless }
+//        out: { v_drop_V: M*L^2*T^-3*I^-1, v_terminal_V: M*L^2*T^-3*I^-1, dip_pct: dimensionless, dip_limit_pct: dimensionless }
 export function computeMotorVdStarting({ source_voltage_V = 0, length_ft = 0, cmils = 0, lrc_A = 0, phase = "three", k_const = 12.9, dip_limit_pct = 15, lrc_estimated = false, starting_pf = 0.35, reactance_ohm_per_kft = 0.05 } = {}) {
   const V = Number(source_voltage_V) || 0;
   const L = Number(length_ft) || 0;
@@ -279,7 +279,7 @@ function _mg1Derate(pct) {
   return 0.75;
 }
 
-// dims: in { v_ab: M L^2 T^-3 I^-1, v_bc: M L^2 T^-3 I^-1, v_ca: M L^2 T^-3 I^-1 } out: { unbalance_pct: dimensionless, derate_factor: dimensionless }
+// dims: in { v_ab: M L^2 T^-3 I^-1, v_bc: M L^2 T^-3 I^-1, v_ca: M L^2 T^-3 I^-1 } out: { unbalance_pct: dimensionless, derate_factor: dimensionless, allowable_pct: dimensionless }
 export function computeMotorUnbalanceDerate({ v_ab = 0, v_bc = 0, v_ca = 0 } = {}) {
   const ab = Number(v_ab) || 0, bc = Number(v_bc) || 0, ca = Number(v_ca) || 0;
   if (!Number.isFinite(ab) || !Number.isFinite(bc) || !Number.isFinite(ca)) return { error: "Line voltages must be finite numbers." };
@@ -571,7 +571,7 @@ function _v524renderTddIeee519(inputRegion, outputRegion, citationEl) {
 POWERQUALITY_RENDERERS["tdd-ieee-519"] = _v524renderTddIeee519;
 
 // --- spec-v955: Series RLC reactance, impedance, and resonant frequency (`rlc-reactance-resonance`) ---
-// dims: in { frequency_hz: T^-1, resistance_ohm: M L^2 T^-3 I^-2, inductance_h: M L^2 T^-2 I^-2, capacitance_uf: M^-1 L^-2 T^4 I^2 } out: { inductive_reactance_ohm: M L^2 T^-3 I^-2, capacitive_reactance_ohm: M L^2 T^-3 I^-2, impedance_ohm: M L^2 T^-3 I^-2, resonant_frequency_hz: T^-1, power_factor: dimensionless }
+// dims: in { frequency_hz: T^-1, resistance_ohm: M L^2 T^-3 I^-2, inductance_h: M L^2 T^-2 I^-2, capacitance_uf: M^-1 L^-2 T^4 I^2 } out: { inductive_reactance_ohm: M L^2 T^-3 I^-2, capacitive_reactance_ohm: M L^2 T^-3 I^-2, impedance_ohm: M L^2 T^-3 I^-2, resonant_frequency_hz: T^-1, power_factor: dimensionless, net_reactance_ohm: M L^2 T^-3 I^-2 }
 export function computeRlcReactanceResonance({ frequency_hz = 60, resistance_ohm = 10, inductance_h = 0.05, capacitance_uf = 50 } = {}) {
   for (const v of [frequency_hz, resistance_ohm, inductance_h, capacitance_uf]) {
     if (typeof v === "number" && !Number.isFinite(v)) return { error: "All numeric inputs must be finite numbers." };

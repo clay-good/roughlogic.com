@@ -101,7 +101,7 @@ const _AIR_BTU_PER_CUFT_F = 0.018;
 
 // ===================== spec-v1648: traction roping ratio =====================
 
-// dims: in { roping_ratio: dimensionless, car_speed_fpm: L T^-1, sheave_diameter_in: L, unbalanced_load_lb: M L T^-2, suspended_load_lb: M L T^-2, rope_count: dimensionless, machine_rated_torque_ftlb: M L^2 T^-2, alternative_roping_ratio: dimensionless } out: { rope_speed_fpm: L T^-1, sheave_rpm: T^-1, sheave_torque_ftlb: M L^2 T^-2, tension_per_rope_lb: M L T^-2, power_hp: M L^2 T^-3 }
+// dims: in { roping_ratio: dimensionless, car_speed_fpm: L T^-1, sheave_diameter_in: L, unbalanced_load_lb: M L T^-2, suspended_load_lb: M L T^-2, rope_count: dimensionless, machine_rated_torque_ftlb: M L^2 T^-2, alternative_roping_ratio: dimensionless } out: { rope_speed_fpm: L T^-1, sheave_rpm: T^-1, sheave_torque_ftlb: M L^2 T^-2, tension_per_rope_lb: M L T^-2, power_hp: M L^2 T^-3, alt_rope_speed_fpm: L T^-1, alt_sheave_rpm: T^-1, torque_margin_pct: dimensionless }
 export function computeTractionRopingRatio({ roping_ratio = 2, car_speed_fpm = 0, sheave_diameter_in = 0, unbalanced_load_lb = 0, suspended_load_lb = 0, rope_count = 0, machine_rated_torque_ftlb = 0, alternative_roping_ratio = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(roping_ratio >= 1)) return { error: "Roping ratio must be at least 1." };
@@ -160,7 +160,7 @@ ELEVATOR_RENDERERS["traction-roping-ratio"] = _simpleRenderer({
 
 // ===================== spec-v1649: counterweight balance =====================
 
-// dims: in { car_weight_lb: M L T^-2, rated_capacity_lb: M L T^-2, overbalance_pct: dimensionless, actual_counterweight_lb: M L T^-2, added_car_weight_lb: M L T^-2 } out: { counterweight_required_lb: M L T^-2, unbalanced_empty_lb: M L T^-2, unbalanced_full_lb: M L T^-2, balance_point_lb: M L T^-2, overbalance_actual_pct: dimensionless }
+// dims: in { car_weight_lb: M L T^-2, rated_capacity_lb: M L T^-2, overbalance_pct: dimensionless, actual_counterweight_lb: M L T^-2, added_car_weight_lb: M L T^-2 } out: { counterweight_required_lb: M L T^-2, unbalanced_empty_lb: M L T^-2, unbalanced_full_lb: M L T^-2, balance_point_lb: M L T^-2, overbalance_actual_pct: dimensionless, modified_overbalance_pct: dimensionless }
 export function computeCounterweightBalance({ car_weight_lb = 0, rated_capacity_lb = 0, overbalance_pct = 45, actual_counterweight_lb = 0, added_car_weight_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // Unit / range guard added 2026-09-26 after printed-example probing.
@@ -212,7 +212,7 @@ ELEVATOR_RENDERERS["counterweight-balance"] = _simpleRenderer({
 
 // ===================== spec-v1650: suspension rope factor of safety =====================
 
-// dims: in { car_weight_lb: M L T^-2, rated_load_lb: M L T^-2, travelling_cable_lb: M L T^-2, rope_count: dimensionless, rope_weight_per_ft: M T^-2, rope_breaking_strength_lb: M L T^-2, rise_ft: L, code_minimum_fs: dimensionless } out: { rope_weight_lb: M L T^-2, suspended_load_lb: M L T^-2, breaking_total_lb: M L T^-2, factor_of_safety: dimensionless, max_rated_load_lb: M L T^-2 }
+// dims: in { car_weight_lb: M L T^-2, rated_load_lb: M L T^-2, travelling_cable_lb: M L T^-2, rope_count: dimensionless, rope_weight_per_ft: M T^-2, rope_breaking_strength_lb: M L T^-2, rise_ft: L, code_minimum_fs: dimensionless } out: { rope_weight_lb: M L T^-2, suspended_load_lb: M L T^-2, breaking_total_lb: M L T^-2, factor_of_safety: dimensionless, max_rated_load_lb: M L T^-2, margin: dimensionless }
 export function computeElevatorRopeSafetyFactor({ car_weight_lb = 0, rated_load_lb = 0, travelling_cable_lb = 0, rope_count = 0, rope_weight_per_ft = 0, rope_breaking_strength_lb = 0, rise_ft = 0, code_minimum_fs = 0, roping_ratio = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(car_weight_lb > 0)) return { error: "Car weight must be positive." };
@@ -274,7 +274,7 @@ ELEVATOR_RENDERERS["rope-safety-factor"] = _simpleRenderer({
 
 // ===================== spec-v1651: buffer stroke and impact speed =====================
 
-// dims: in { contract_speed_fpm: L T^-1, governor_trip_fpm: L T^-1, permitted_retardation_g: dimensionless, buffer_rated_stroke_in: L, buffer_rated_speed_fpm: L T^-1 } out: { impact_speed_fps: L T^-1, stroke_required_in: L, stroke_at_1g_in: L, retardation_installed_g: dimensionless, max_speed_for_buffer_fpm: L T^-1 }
+// dims: in { contract_speed_fpm: L T^-1, governor_trip_fpm: L T^-1, permitted_retardation_g: dimensionless, buffer_rated_stroke_in: L, buffer_rated_speed_fpm: L T^-1 } out: { impact_speed_fps: L T^-1, stroke_required_in: L, stroke_at_1g_in: L, retardation_installed_g: dimensionless, max_speed_for_buffer_fpm: L T^-1, striking_speed_fpm: L T^-1, stroke_at_governor_trip_in: L, table_stroke_in: L }
 export function computeBufferStroke({ contract_speed_fpm = 0, governor_trip_fpm = 0, permitted_retardation_g = 1, buffer_rated_stroke_in = 0, buffer_rated_speed_fpm = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // Unit / range guard added 2026-09-26 after printed-example probing.
@@ -338,7 +338,7 @@ ELEVATOR_RENDERERS["buffer-stroke-speed"] = _simpleRenderer({
 
 // ===================== spec-v1652: hoistway venting and pressurization =====================
 
-// dims: in { hoistway_plan_area_sqft: L^2, vent_fraction_pct: dimensionless, door_width_in: L, door_height_in: L, pressure_diff_inwc: M L^-1 T^-2, door_force_limit_lbf: M L T^-2, leakage_area_sqft: L^2 } out: { vent_area_sqft: L^2, door_area_sqft: L^2, door_force_added_lbf: M L T^-2, max_pressure_inwc: M L^-1 T^-2, supply_airflow_cfm: L^3 T^-1 }
+// dims: in { hoistway_plan_area_sqft: L^2, vent_fraction_pct: dimensionless, door_width_in: L, door_height_in: L, pressure_diff_inwc: M L^-1 T^-2, door_force_limit_lbf: M L T^-2, leakage_area_sqft: L^2 } out: { vent_area_sqft: L^2, door_area_sqft: L^2, door_force_added_lbf: M L T^-2, max_pressure_inwc: M L^-1 T^-2, supply_airflow_cfm: L^3 T^-1, door_force_total_lbf: M L T^-2 }
 export function computeHoistwayVenting({ hoistway_plan_area_sqft = 0, vent_fraction_pct = 3.5, door_width_in = 0, door_height_in = 0, pressure_diff_inwc = 0, door_force_limit_lbf = 0, leakage_area_sqft = 0, closer_force_lbf = 0, knob_offset_in = 3, car_count = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(hoistway_plan_area_sqft > 0)) return { error: "Hoistway plan area must be positive." };
@@ -402,7 +402,7 @@ ELEVATOR_RENDERERS["hoistway-venting"] = _simpleRenderer({
 
 // ===================== spec-v1653: machine room heat load =====================
 
-// dims: in { input_power_kw: M L^2 T^-3, efficiency_pct: dimensionless, duty_cycle_pct: dimensionless, controller_standby_w: M L^2 T^-3, other_gains_btuh: M L^2 T^-3, room_volume_cuft: L^3, ambient_limit_f: T, starting_temp_f: T } out: { heat_running_btuh: M L^2 T^-3, heat_average_btuh: M L^2 T^-3, total_btuh: M L^2 T^-3, cooling_tons: M L^2 T^-3, temp_rise_f_per_hr: T }
+// dims: in { input_power_kw: M L^2 T^-3, efficiency_pct: dimensionless, duty_cycle_pct: dimensionless, controller_standby_w: M L^2 T^-3, other_gains_btuh: M L^2 T^-3, room_volume_cuft: L^3, ambient_limit_f: T, starting_temp_f: T } out: { heat_running_btuh: M L^2 T^-3, heat_average_btuh: M L^2 T^-3, total_btuh: M L^2 T^-3, cooling_tons: M L^2 T^-3, temp_rise_f_per_hr: T, connected_btuh: M L^2 T^-3, controller_btuh: M L^2 T^-3 }
 export function computeMachineRoomHeat({ input_power_kw = 0, efficiency_pct = 85, duty_cycle_pct = 40, controller_standby_w = 0, other_gains_btuh = 0, room_volume_cuft = 0, ambient_limit_f = 104, starting_temp_f = 80 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // A cleared starting temperature means the stated 80 F default, not a room at 0 F (four times the warning).
@@ -461,7 +461,7 @@ ELEVATOR_RENDERERS["machine-room-heat"] = _simpleRenderer({
 
 // ===================== spec-v1654: hydraulic jack pressure and pump flow =====================
 
-// dims: in { bore_in: L, total_load_lb: M L T^-2, car_speed_fpm: L T^-1, pump_flow_gpm: L^3 T^-1, relief_setting_psi: M L^-1 T^-2, alternative_bore_in: L } out: { jack_area_sqin: L^2, working_pressure_psi: M L^-1 T^-2, flow_required_gpm: L^3 T^-1, speed_from_pump_fpm: L T^-1, alt_working_pressure_psi: M L^-1 T^-2 }
+// dims: in { bore_in: L, total_load_lb: M L T^-2, car_speed_fpm: L T^-1, pump_flow_gpm: L^3 T^-1, relief_setting_psi: M L^-1 T^-2, alternative_bore_in: L } out: { jack_area_sqin: L^2, working_pressure_psi: M L^-1 T^-2, flow_required_gpm: L^3 T^-1, speed_from_pump_fpm: L T^-1, alt_working_pressure_psi: M L^-1 T^-2, alt_area_sqin: L^2, alt_pressure_change_pct: dimensionless, alt_speed_from_pump_fpm: L T^-1, relief_margin_pct: dimensionless }
 export function computeHydraulicJackPressure({ bore_in = 0, total_load_lb = 0, car_speed_fpm = 0, pump_flow_gpm = 0, relief_setting_psi = 0, alternative_bore_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // Unit / range guard added 2026-09-26 after printed-example probing.
@@ -514,7 +514,7 @@ ELEVATOR_RENDERERS["hydraulic-jack-pressure"] = _simpleRenderer({
 
 // ===================== spec-v1655: escalator step chain tension =====================
 
-// dims: in { total_load_lb: M L T^-2, incline_deg: dimensionless, friction_coefficient: dimensionless, chain_speed_fpm: L T^-1, chain_count: dimensionless, alternative_incline_deg: dimensionless } out: { gravity_lb: M L T^-2, friction_lb: M L T^-2, tension_lb: M L T^-2, per_chain_lb: M L T^-2, power_hp: M L^2 T^-3 }
+// dims: in { total_load_lb: M L T^-2, incline_deg: dimensionless, friction_coefficient: dimensionless, chain_speed_fpm: L T^-1, chain_count: dimensionless, alternative_incline_deg: dimensionless } out: { gravity_lb: M L T^-2, friction_lb: M L T^-2, tension_lb: M L T^-2, per_chain_lb: M L T^-2, power_hp: M L^2 T^-3, gravity_share_pct: dimensionless }
 export function computeStepChainTension({ total_load_lb = 0, incline_deg = 30, friction_coefficient = 0.03, chain_speed_fpm = 0, chain_count = 2, alternative_incline_deg = 6 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(total_load_lb > 0)) return { error: "Total moving load must be positive." };
@@ -573,7 +573,7 @@ ELEVATOR_RENDERERS["step-chain-tension"] = _simpleRenderer({
 
 // ===================== spec-v1656: door closing force and kinetic energy =====================
 
-// dims: in { door_mass_lb: M L T^-2, closing_speed_fps: L T^-1, ke_limit_normal_ftlb: M L^2 T^-2, ke_limit_reduced_ftlb: M L^2 T^-2, measured_force_lbf: M L T^-2, force_limit_lbf: M L T^-2, opening_width_in: L, added_mass_lb: M L T^-2 } out: { kinetic_energy_ftlb: M L^2 T^-2, speed_for_reduced_limit_fps: L T^-1, closing_time_s: T, ke_with_added_mass_ftlb: M L^2 T^-2 }
+// dims: in { door_mass_lb: M L T^-2, closing_speed_fps: L T^-1, ke_limit_normal_ftlb: M L^2 T^-2, ke_limit_reduced_ftlb: M L^2 T^-2, measured_force_lbf: M L T^-2, force_limit_lbf: M L T^-2, opening_width_in: L, added_mass_lb: M L T^-2 } out: { kinetic_energy_ftlb: M L^2 T^-2, speed_for_reduced_limit_fps: L T^-1, closing_time_s: T, ke_with_added_mass_ftlb: M L^2 T^-2, speed_change_pct: dimensionless }
 export function computeDoorClosingEnergy({ door_mass_lb = 0, closing_speed_fps = 0, ke_limit_normal_ftlb = 0, ke_limit_reduced_ftlb = 0, measured_force_lbf = 0, force_limit_lbf = 0, opening_width_in = 0, added_mass_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // Unit / range guard added 2026-09-26 after printed-example probing.
@@ -635,7 +635,7 @@ ELEVATOR_RENDERERS["door-closing-energy"] = _simpleRenderer({
 
 // ===================== spec-v1657: overspeed governor tripping speed =====================
 
-// dims: in { rated_speed_fpm: L T^-1, electrical_trip_fpm: L T^-1, mechanical_trip_fpm: L T^-1, code_minimum_pct: dimensionless, code_maximum_fpm: L T^-1, switch_limit_pct: dimensionless } out: { minimum_trip_fpm: L T^-1, switch_max_fpm: L T^-1, switch_pct_of_trip: dimensionless, mechanical_margin_pct: dimensionless, electrical_margin_pct: dimensionless, headroom_fpm: L T^-1, implied_buffer_stroke_in: L }
+// dims: in { rated_speed_fpm: L T^-1, electrical_trip_fpm: L T^-1, mechanical_trip_fpm: L T^-1, code_minimum_pct: dimensionless, code_maximum_fpm: L T^-1, switch_limit_pct: dimensionless } out: { minimum_trip_fpm: L T^-1, switch_max_fpm: L T^-1, switch_pct_of_trip: dimensionless, mechanical_margin_pct: dimensionless, electrical_margin_pct: dimensionless, headroom_fpm: L T^-1, implied_buffer_stroke_in: L, impact_speed_fps: L T^-1, switch_limit_used_pct: dimensionless }
 export function computeGovernorTrippingSpeed({ rated_speed_fpm = 0, electrical_trip_fpm = 0, mechanical_trip_fpm = 0, code_minimum_pct = 115, code_maximum_fpm = 0, switch_limit_pct = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // Unit / range guard added 2026-09-26 after printed-example probing.
@@ -706,7 +706,7 @@ ELEVATOR_RENDERERS["governor-tripping-speed"] = _simpleRenderer({
 
 // ===================== spec-v1658: guide rail bracket span =====================
 
-// dims: in { span_ft: L, horizontal_load_lb: M L T^-2, section_modulus_in3: L^3, moment_of_inertia_in4: L^4, modulus_psi: M L^-1 T^-2, allowable_stress_psi: M L^-1 T^-2, deflection_limit_in: L, safety_application_load_lb: M L T^-2 } out: { moment_inlb: M L^2 T^-2, stress_psi: M L^-1 T^-2, deflection_in: L, max_span_for_deflection_ft: L, safety_stress_psi: M L^-1 T^-2 }
+// dims: in { span_ft: L, horizontal_load_lb: M L T^-2, section_modulus_in3: L^3, moment_of_inertia_in4: L^4, modulus_psi: M L^-1 T^-2, allowable_stress_psi: M L^-1 T^-2, deflection_limit_in: L, safety_application_load_lb: M L T^-2 } out: { moment_inlb: M L^2 T^-2, stress_psi: M L^-1 T^-2, deflection_in: L, max_span_for_deflection_ft: L, safety_stress_psi: M L^-1 T^-2, halved_span_deflection_in: L }
 export function computeGuideRailBracketSpan({ span_ft = 0, horizontal_load_lb = 0, section_modulus_in3 = 0, moment_of_inertia_in4 = 0, modulus_psi = 29000000, allowable_stress_psi = 0, deflection_limit_in = 0, safety_application_load_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // Unit / range guard added 2026-09-26 after printed-example probing.

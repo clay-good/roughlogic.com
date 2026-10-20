@@ -210,7 +210,7 @@ function _v924renderMicroinverterBranchCount(inputRegion, outputRegion, citation
 ELECTRICALFIELD_RENDERERS["microinverter-branch-count"] = _v924renderMicroinverterBranchCount;
 
 // ===================== spec-v932: arc-welder branch-circuit conductor and OCPD =====================
-// dims: in { primary_current_a: I, duty_pct: dimensionless, welder_type: dimensionless } out: { duty_multiplier: dimensionless, effective_current_a: I, ocpd_max_a: I }
+// dims: in { primary_current_a: I, duty_pct: dimensionless, welder_type: dimensionless } out: { duty_multiplier: dimensionless, effective_current_a: I, ocpd_max_a: I, ocpd_std_a: I }
 export function computeWelderArcCircuitConductor({ primary_current_a = 40, duty_pct = 50, welder_type = "transformer" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(primary_current_a > 0)) return { error: "Nameplate primary current must be positive (A)." };
@@ -641,7 +641,7 @@ ELECTRICALFIELD_RENDERERS["conduit-nipple-60-fill"] = _v989renderConduitNipple60
 // Balanced (I_A = I_B) collapses to R x I -- HALF a two-wire circuit, since the neutral carries
 // nothing. Badly unbalanced makes VD_B negative: the lightly loaded leg RISES above nominal.
 // Resistance comes from the repo's own conductorResistancePerKft, not a recalled table.
-// dims: in { awg: dimensionless, material: dimensionless, one_way_length_ft: L, load_a_amps: I, load_b_amps: I, source_volts: M L^2 T^-3 I^-1, temperature_C: T } out: { neutral_amps: I, vd_a_volts: M L^2 T^-3 I^-1, vd_b_volts: M L^2 T^-3 I^-1 }
+// dims: in { awg: dimensionless, material: dimensionless, one_way_length_ft: L, load_a_amps: I, load_b_amps: I, source_volts: M L^2 T^-3 I^-1, temperature_C: T } out: { neutral_amps: I, vd_a_volts: M L^2 T^-3 I^-1, vd_b_volts: M L^2 T^-3 I^-1, r_ohms: M L^2 T^-3 I^-2, volts_a: I, worst_pct: dimensionless }
 export function computeMwbcVoltageDrop({ awg = "12", material = "copper", one_way_length_ft = 0, load_a_amps = 0, load_b_amps = 0, source_volts = 120, temperature_C = 75 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const len = Number(one_way_length_ft) || 0;
@@ -788,7 +788,7 @@ export function computeWallReceptacleCount({ spaces = [], space_type = "room" } 
 }
 export const wallReceptacleCountExample = { inputs: { spaces: [{ length_ft: 14 }, { length_ft: 9 }, { length_ft: 3 }, { length_ft: 1.5 }, { length_ft: 22 }], space_type: "room" } };
 
-// dims: in { spaces: dimensionless, islands: dimensionless, nec_edition: dimensionless } out: { wall_receptacles: dimensionless, island_receptacles_required: dimensionless, total_required: dimensionless, narrow_count: dimensionless }
+// dims: in { spaces: dimensionless, islands: dimensionless, nec_edition: dimensionless } out: { wall_receptacles: dimensionless, island_receptacles_required: dimensionless, total_required: dimensionless, narrow_count: dimensionless, island_area_sqft: L^2, space_count: dimensionless }
 export function computeCountertopReceptacleCount({ spaces = [], islands = [], nec_edition = "2023" } = {}) {
   const ed = String(nec_edition);
   if (ed !== "2023" && ed !== "2020") return { error: "NEC edition must be 2023 or 2020." };

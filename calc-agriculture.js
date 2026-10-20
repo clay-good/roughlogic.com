@@ -955,7 +955,7 @@ export const IRRIGATION_EFFICIENCY_PCT = {
 
 const GAL_PER_ACRE_FT = 43560 * 1728 / 231;
 
-// dims: in { crop: dimensionless, et_ref_in_per_day: L T^-1, period_days: T, area_acres: L^2, efficiency_pct: dimensionless, rainfall_in: L } out: { et_crop_in: L, gross_in: L, acre_ft: L^3, gallons: L^3 }
+// dims: in { crop: dimensionless, et_ref_in_per_day: L T^-1, period_days: T, area_acres: L^2, efficiency_pct: dimensionless, rainfall_in: L } out: { et_crop_in: L, gross_in: L, acre_ft: L^3, gallons: L^3, area_acres: L^2, efficiency_pct: dimensionless, net_in: L, period_days: T, rainfall_in: L }
 export function computeIrrigationRequirement({
   crop = "corn",
   et_ref_in_per_day = 0,
@@ -1075,7 +1075,7 @@ export const ANIMAL_UNIT_EQUIV = {
 const AUM_LB_DM = 790;
 const AU_LB_DM_PER_DAY = 26;
 
-// dims: in { area_acres: L^2, forage_lb_per_acre: M L^-2, utilization_pct: dimensionless, animal_class: dimensionless, herd_size: dimensionless } out: { available_forage_lb: M, aums_available: dimensionless, grazing_days: T }
+// dims: in { area_acres: L^2, forage_lb_per_acre: M L^-2, utilization_pct: dimensionless, animal_class: dimensionless, herd_size: dimensionless } out: { available_forage_lb: M, aums_available: dimensionless, grazing_days: T, area_acres: L^2, utilization_pct: dimensionless }
 export function computeStockingRate({
   area_acres = 0,
   forage_lb_per_acre = 0,
@@ -1186,7 +1186,7 @@ export const GRAIN_TEST_WEIGHT_LB_BU = {
 // 1 ft^3 = 0.8036 bushels (1 bushel = 1.2445 ft^3).
 const BUSHELS_PER_FT3 = 0.8036;
 
-// dims: in { diameter_ft: L, eave_height_ft: L, peak_height_ft: L, grain: dimensionless, packing_factor: dimensionless } out: { cylinder_ft3: L^3, cone_ft3: L^3, total_bushels: dimensionless, weight_lb: M }
+// dims: in { diameter_ft: L, eave_height_ft: L, peak_height_ft: L, grain: dimensionless, packing_factor: dimensionless } out: { cylinder_ft3: L^3, cone_ft3: L^3, total_bushels: dimensionless, weight_lb: M, diameter_ft: L, packing_factor: dimensionless, total_ft3: L^3 }
 export function computeGrainBin({
   diameter_ft = 0,
   eave_height_ft = 0,
@@ -1242,7 +1242,7 @@ export const grainBinExample = {
   inputs: { diameter_ft: 30, eave_height_ft: 20, peak_height_ft: 8, grain: "corn", packing_factor: 1.0 },
 };
 
-// dims: in { target_bushels: dimensionless, diameter_ft: L, peak_height_ft: L, packing_factor: dimensionless } out: { eave_height_ft: L }
+// dims: in { target_bushels: dimensionless, diameter_ft: L, peak_height_ft: L, packing_factor: dimensionless } out: { eave_height_ft: L, area_ft2: L^2 }
 export function computeGrainBinHeightForCapacity({ target_bushels = 0, diameter_ft = 0, peak_height_ft = 0, packing_factor = 1.0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const target = Number(target_bushels) || 0;
@@ -1456,7 +1456,7 @@ const NPK_DEFAULT_SOURCES = {
   mop_k_pct: 60,    // muriate of potash 0-0-60 (K source)
 };
 
-// dims: in { crop: dimensionless, soil_n_lb_per_acre: M L^-2, soil_p_lb_per_acre: M L^-2, soil_k_lb_per_acre: M L^-2, area_acres: L^2, urea_n_pct: dimensionless, dap_n_pct: dimensionless, dap_p_pct: dimensionless, mop_k_pct: dimensionless, bag_weight_lb: M } out: { rec_n_lb_per_acre: M L^-2, rec_p_lb_per_acre: M L^-2, rec_k_lb_per_acre: M L^-2, urea_lb_per_acre: M L^-2, dap_lb_per_acre: M L^-2, mop_lb_per_acre: M L^-2, urea_total_lb: M, dap_total_lb: M, mop_total_lb: M }
+// dims: in { crop: dimensionless, soil_n_lb_per_acre: M L^-2, soil_p_lb_per_acre: M L^-2, soil_k_lb_per_acre: M L^-2, area_acres: L^2, urea_n_pct: dimensionless, dap_n_pct: dimensionless, dap_p_pct: dimensionless, mop_k_pct: dimensionless, bag_weight_lb: M } out: { rec_n_lb_per_acre: M L^-2, rec_p_lb_per_acre: M L^-2, rec_k_lb_per_acre: M L^-2, urea_lb_per_acre: M L^-2, dap_lb_per_acre: M L^-2, mop_lb_per_acre: M L^-2, urea_total_lb: M, dap_total_lb: M, mop_total_lb: M, area_acres: L^2, bag_weight_lb: M }
 export function computeNpkBlend({
   crop = "corn",
   soil_n_lb_per_acre = 0,
@@ -1625,7 +1625,7 @@ const DRY_OZ_PER = { oz: 1, lb: 16 };
 const ML_PER_FL_OZ = 29.5735295625;
 const G_PER_OZ = 28.349523125;
 
-// dims: in { tank_gal: L^3, spray_volume_gpa: L, liquid_rate_per_acre: L, dry_rate_per_acre: M L^-2, product_unit: dimensionless, field_area_acres: L^2 } out: { acres_per_tank: L^2, product_per_tank_unit: dimensionless, tanks_needed: dimensionless, total_carrier_water_gal: L^3 }
+// dims: in { tank_gal: L^3, spray_volume_gpa: L, liquid_rate_per_acre: L, dry_rate_per_acre: M L^-2, product_unit: dimensionless, field_area_acres: L^2 } out: { acres_per_tank: L^2, product_per_tank_unit: dimensionless, tanks_needed: dimensionless, total_carrier_water_gal: L^3, tank_gal: L^3 }
 // A liquid rate (volume per acre) and a dry rate (weight per acre) are separate inputs;
 // product_unit says which one is read. Until 2026-10-19 one product_rate_per_acre was either.
 export function computeTankMix({
@@ -1942,7 +1942,7 @@ AGRICULTURE_RENDERERS["growing-degree-days"] = renderGrowingDegreeDays;
 
 // --- v20 L.2: Pearson-square feed ration (`pearson-square-ration`) ---
 // parts_a = |B - target|; parts_b = |A - target|; pct_a = parts_a/(parts_a+parts_b).
-// dims: in { feed_a_pct: dimensionless, feed_b_pct: dimensionless, target_pct: dimensionless, batch_lb: M } out: { pct_a: dimensionless, pct_b: dimensionless }
+// dims: in { feed_a_pct: dimensionless, feed_b_pct: dimensionless, target_pct: dimensionless, batch_lb: M } out: { pct_a: dimensionless, pct_b: dimensionless, parts_a: I, verified_pct: dimensionless }
 export function computePearsonSquareRation({ feed_a_pct = 0, feed_b_pct = 0, target_pct = 0, batch_lb = 0 } = {}) {
   const A = Number(feed_a_pct), B = Number(feed_b_pct), T = Number(target_pct);
   let batch = Number(batch_lb) || 0;
@@ -2065,7 +2065,7 @@ AGRICULTURE_RENDERERS["livestock-water-requirement"] = renderLivestockWaterRequi
 
 // --- v35 L: Two-stroke fuel/oil mix (`two-stroke-mix`) ---
 // oil volume = fuel volume / ratio (gas:oil by volume); 1 US gal = 128 fl oz.
-// dims: in { ratio: dimensionless, fuel_amount: L^3, fuel_unit: dimensionless } out: { oil_oz: L^3, oil_ml: L^3, oz_per_gallon: dimensionless }
+// dims: in { ratio: dimensionless, fuel_amount: L^3, fuel_unit: dimensionless } out: { oil_oz: L^3, oil_ml: L^3, oz_per_gallon: dimensionless, fuel_amount: L^3, ratio: dimensionless }
 export function computeTwoStrokeMix({ ratio = 50, fuel_amount = 0, fuel_unit = "gallon" } = {}) {
   const _g = _finiteGuard({ ratio, fuel_amount }); if (_g) return _g;
   // Anything but "liter" used to be gallons: "liters" asked for 3.8 times the oil.
@@ -2211,7 +2211,7 @@ export function computeNozzleFlowPressure({ rated_gpm, rated_psi, new_psi, targe
   };
 }
 
-// dims: in { base_buffer_ft: L, wind_mph: L T^-1, boom_height_in: L, ref_height_in: L } out: { buffer_ft: L }
+// dims: in { base_buffer_ft: L, wind_mph: L T^-1, boom_height_in: L, ref_height_in: L } out: { buffer_ft: L, base_buffer_ft: L }
 export function computeSprayDriftBuffer({ base_buffer_ft = 0, droplet_class = "medium", wind_mph, boom_height_in = 20, ref_height_in = 20 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!Object.hasOwn(_v84_DROPLET_BASE, String(droplet_class))) return { error: "Droplet class must be one of: " + Object.keys(_v84_DROPLET_BASE).join(", ") + "." };
@@ -2709,7 +2709,7 @@ AGRICULTURE_RENDERERS["grain-shrink-moisture"] = renderGrainShrinkMoisture;
 // --- spec-v339 L.x: Livestock dry-matter intake & as-fed ration (`livestock-dry-matter-intake`) ---
 // DMI = BW x intake%; as-fed = DMI / (feed_DM%); herd as-fed = as-fed x head.
 // Intake is always figured on a dry-matter basis; wet feeds weigh far more as-fed.
-// dims: in { BW_lb: M, intake: dimensionless, feed_DM: dimensionless, head: dimensionless } out: { DMI_lb: M, asfed_lb: M, herd_asfed_lb: M }
+// dims: in { BW_lb: M, intake: dimensionless, feed_DM: dimensionless, head: dimensionless } out: { DMI_lb: M, asfed_lb: M, herd_asfed_lb: M, head: dimensionless }
 export function computeLivestockDryMatterIntake({ BW_lb = 0, intake = 0, feed_DM = 0, head = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const BW = Number(BW_lb) || 0;

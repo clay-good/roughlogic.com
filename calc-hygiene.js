@@ -126,7 +126,7 @@ export const HYGIENE_RENDERERS = {};
 // times 1e6 for ppm, divided by 60 to take an hourly rate to cfm.
 const _DV_MOLAR_VOLUME_FT3 = 386.9;
 const _DV_CONSTANT = _DV_MOLAR_VOLUME_FT3 * 1e6 / 60;
-// dims: in { evaporation_lb_hr: M T^-1, molecular_weight: M N^-1, tlv_ppm: dimensionless, mixing_factor: dimensionless, lel_pct: dimensionless, lel_safety_fraction: dimensionless, room_volume_ft3: L^3, alt_mixing_factor: dimensionless } out: { health_cfm: L^3 T^-1, lel_cfm: L^3 T^-1, governing_cfm: L^3 T^-1, room_ach: T^-1, alt_health_cfm: L^3 T^-1 }
+// dims: in { evaporation_lb_hr: M T^-1, molecular_weight: M N^-1, tlv_ppm: dimensionless, mixing_factor: dimensionless, lel_pct: dimensionless, lel_safety_fraction: dimensionless, room_volume_ft3: L^3, alt_mixing_factor: dimensionless } out: { health_cfm: L^3 T^-1, lel_cfm: L^3 T^-1, governing_cfm: L^3 T^-1, room_ach: T^-1, alt_health_cfm: L^3 T^-1, lel_target_ppm: dimensionless }
 export function computeDilutionVentilationSolvent({
   evaporation_lb_hr = 0, molecular_weight = 0, tlv_ppm = 0, mixing_factor = 5,
   lel_pct = 0, lel_safety_fraction = 0.25, room_volume_ft3 = 0, alt_mixing_factor = 0,

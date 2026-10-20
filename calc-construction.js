@@ -37,7 +37,7 @@ const _finiteGuard = (o) => {
 
 // --- Utility 40: Stair Calculator ---
 
-// dims: in { total_rise_in: L, preferred_riser_height_in: L } out: { risers: dimensionless, riser_height_in: L, tread_depth_in: L, total_run_in: L }
+// dims: in { total_rise_in: L, preferred_riser_height_in: L } out: { risers: dimensionless, riser_height_in: L, tread_depth_in: L, total_run_in: L, stair_angle_deg: dimensionless }
 export function computeStairs({ total_rise_in, preferred_riser_height_in = 7.5 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(Number(total_rise_in) > 0)) return { error: "Total rise must be positive (in)." };
@@ -75,7 +75,7 @@ export const stairsExample = {
 
 // --- Utility 41: Roof Pitch ---
 
-// dims: in { rise: L, run: L, mode: dimensionless } out: { pitch_in_per_ft: dimensionless, percent: dimensionless, degrees: dimensionless }
+// dims: in { rise: L, run: L, mode: dimensionless } out: { pitch_in_per_ft: dimensionless, percent: dimensionless, degrees: dimensionless, fraction: dimensionless }
 export function computeRoofPitch({ rise = null, run = 12, mode = "rise_run" }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (mode === "rise_run") {
@@ -110,7 +110,7 @@ export const roofPitchExample = {
 
 // --- Utility 42: Rafter Length ---
 
-// dims: in { horizontal_span_ft: L, pitch_rise_per_12: dimensionless, overhang_ft: L } out: { rafter_length_ft: L }
+// dims: in { horizontal_span_ft: L, pitch_rise_per_12: dimensionless, overhang_ft: L } out: { rafter_length_ft: L, multiplier: dimensionless }
 export function computeRafter({ horizontal_span_ft, pitch_rise_per_12, overhang_ft = 0 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(Number(horizontal_span_ft) > 0)) return { error: "Horizontal span must be positive (ft)." };
@@ -166,7 +166,7 @@ export const boardFootageExample = {
 
 // --- Utility 45: Concrete Volume ---
 
-// dims: in { shape: dimensionless, waste_factor: dimensionless, length_ft: L, width_ft: L, thickness_in: L, diameter_in: L, height_ft: L, footing_thickness_in: L, footing_width_ft: L, stem_thickness_in: L, stem_height_ft: L } out: { cubic_feet: L^3, cubic_yards: L^3, cubic_yards_with_waste: L^3, bags_60lb: dimensionless, bags_80lb: dimensionless }
+// dims: in { shape: dimensionless, waste_factor: dimensionless, length_ft: L, width_ft: L, thickness_in: L, diameter_in: L, height_ft: L, footing_thickness_in: L, footing_width_ft: L, stem_thickness_in: L, stem_height_ft: L } out: { cubic_feet: L^3, cubic_yards: L^3, cubic_yards_with_waste: L^3, bags_60lb: dimensionless, bags_80lb: dimensionless, waste_factor: dimensionless }
 export function computeConcreteVolume({ shape, waste_factor = 0.10, length_ft, width_ft, thickness_in, diameter_in, height_ft, footing_thickness_in, footing_width_ft, stem_thickness_in, stem_height_ft } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // Named inputs (was a ...rest) so the fixture-key check can see them; same values either way.
@@ -408,7 +408,7 @@ export const pulloutExample = {
 
 // --- Utility 49: Beam Loading ---
 
-// dims: in { load_type: dimensionless, load_value: dimensionless, length_ft: L, E_psi: M L^-1 T^-2, b_in: L, d_in: L } out: { M_lbft: M L^2 T^-2, delta_in: L }
+// dims: in { load_type: dimensionless, load_value: dimensionless, length_ft: L, E_psi: M L^-1 T^-2, b_in: L, d_in: L } out: { M_lbft: M L^2 T^-2, delta_in: L, length_ft: L }
 export function computeBeamLoading({ load_type, load_value, length_ft, E_psi, b_in, d_in }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   length_ft = Number(length_ft);
@@ -803,7 +803,7 @@ export function renderMaterialQuantity(inputRegion, outputRegion, citationEl) {
 
 // --- Utility 90: Stair Stringer Length ---
 
-// dims: in { total_rise_in: L, total_run_in: L, tread_cut_depth_in: L } out: { stringer_in: L, board_feet: L^3 }
+// dims: in { total_rise_in: L, total_run_in: L, tread_cut_depth_in: L } out: { stringer_in: L, board_feet: L^3, stringer_ft: L, tread_cut_depth_in: L }
 export function computeStairStringer({ total_rise_in, total_run_in, tread_cut_depth_in = 1 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if ([tread_cut_depth_in].some((x) => Number(x) < 0)) return { error: "Tread cut depth cannot be negative." };
@@ -831,7 +831,7 @@ export const stairStringerExample = {
 // w in plf (per ft), L in ft, E in psi, I in in^4.
 // Convert: w (lb/in) = w/12; L (in) = L*12. delta in inches.
 
-// dims: in { uniform_load_plf: M T^-2, span_ft: L, E_psi: M L^-1 T^-2, I_in4: L^4 } out: { deflection_in: L, limit_360_in: L, limit_240_in: L }
+// dims: in { uniform_load_plf: M T^-2, span_ft: L, E_psi: M L^-1 T^-2, I_in4: L^4 } out: { deflection_in: L, limit_360_in: L, limit_240_in: L, limit_L_over_240_in: L, limit_L_over_360_in: L }
 export function computeJoistDeflection({ uniform_load_plf, span_ft, E_psi, I_in4 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const w_plf = Number(uniform_load_plf) || 0;
@@ -1203,7 +1203,7 @@ export const snowLoadExample = {
 // bonded smooth bar at 0.7 sqrt(f'c) (~38 psi) of bond: 66 in (5.5 ft) of
 // embedment for 5,000 lb on a 5/8 in bolt, where breakout needs ~2.7 in.
 
-// dims: in { uplift_lb: M L T^-2, bolt_diameter_in: L, fc_psi: M L^-1 T^-2, cracked: dimensionless, edge_distance_in: L } out: { embedment_in: L, embedment_cracked_in: L, edge_critical_in: L }
+// dims: in { uplift_lb: M L T^-2, bolt_diameter_in: L, fc_psi: M L^-1 T^-2, cracked: dimensionless, edge_distance_in: L } out: { embedment_in: L, embedment_cracked_in: L, edge_critical_in: L, bolt_diameter_in: L, embedment_ft: L, embedment_uncracked_in: L }
 export function computeAnchorEmbedment({ uplift_lb, bolt_diameter_in, fc_psi, cracked = false, edge_distance_in = 0 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const T = Number(uplift_lb) || 0;
@@ -1526,7 +1526,7 @@ export function renderAnchorEmbedment(inputRegion, outputRegion, citationEl) {
 
 export const SHEET_AREAS_FT2 = { "4x8": 32, "4x10": 40, "4x12": 48 };
 
-// dims: in { wall_area_ft2: L^2, ceiling_area_ft2: L^2, sheet_size: dimensionless, waste_percent: dimensionless } out: { sheets: dimensionless }
+// dims: in { wall_area_ft2: L^2, ceiling_area_ft2: L^2, sheet_size: dimensionless, waste_percent: dimensionless } out: { sheets: dimensionless, mud_gal: L^3, screws: dimensionless, tape_lf: L, total_ft2: L^2 }
 export function computeDrywall({ wall_area_ft2 = 0, ceiling_area_ft2 = 0, sheet_size = "4x8", waste_percent = 10 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   wall_area_ft2 = Number(wall_area_ft2); ceiling_area_ft2 = Number(ceiling_area_ft2);
@@ -1560,7 +1560,7 @@ export const drywallExample = {
 
 export const SHINGLE_BUNDLES_PER_SQUARE = { "3-tab": 3, architectural: 3, premium: 4 };
 
-// dims: in { roof_area_ft2: L^2, pitch_rise: dimensionless, shingle_product: dimensionless, perimeter_ft: L } out: { squares: dimensionless, bundles: dimensionless }
+// dims: in { roof_area_ft2: L^2, pitch_rise: dimensionless, shingle_product: dimensionless, perimeter_ft: L } out: { squares: dimensionless, bundles: dimensionless, drip_edge_lf: L, starter_strip_lf: L, waste_factor: dimensionless }
 export function computeRoofingSquares({ roof_area_ft2 = 0, pitch_rise = 0, shingle_product = "architectural", perimeter_ft = 0 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   perimeter_ft = Number(perimeter_ft);
@@ -1594,7 +1594,7 @@ export const roofingSquaresExample = {
 
 // --- Utility 149: Asphalt Tonnage ---
 
-// dims: in { area_ft2: L^2, depth_in: L, density_pcf: M L^-3, paving_width_ft: L } out: { tons: M }
+// dims: in { area_ft2: L^2, depth_in: L, density_pcf: M L^-3, paving_width_ft: L } out: { tons: M, volume_ft3: L^3 }
 export function computeAsphaltTonnage({ area_ft2 = 0, depth_in = 0, density_pcf = 145, paving_width_ft = 0 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(area_ft2 > 0)) return { error: "Area must be positive." };
@@ -1796,7 +1796,7 @@ const BOLT_TENSILE_AREA_IN2 = {
   0.5625: 0.1820, 0.625: 0.2260, 0.75: 0.3340, 0.875: 0.4620, 1: 0.6060, 1.25: 0.9690, 1.5: 1.405,
 };
 
-// dims: in { grade: dimensionless, diameter_in: L, lubrication: dimensionless, preload_fraction: dimensionless } out: { torque_ft_lb: M L^2 T^-2, F_lb: M L T^-2, torque_in_lb: M L^2 T^-2 }
+// dims: in { grade: dimensionless, diameter_in: L, lubrication: dimensionless, preload_fraction: dimensionless } out: { torque_ft_lb: M L^2 T^-2, F_lb: M L T^-2, torque_in_lb: M L^2 T^-2, K: T }
 export function computeBoltTorque({ grade = "SAE_5", diameter_in = 0.5, lubrication = "dry", preload_fraction = 0.75 }) {
   const proof = BOLT_PROOF_LOADS_PSI[grade];
   if (!Number.isFinite(proof)) return { error: "Unknown bolt grade." };
@@ -1905,7 +1905,7 @@ export const WELD_GAS_FLOW_CFH = { SMAW: 0, GMAW: 35, FCAW: 35, GTAW: 20 };
 // near 4.5 to 7.5 lb/HOUR, so the old 4 lb/min default was about 40x high and reported a
 // 1.7 lb weld as 25 seconds of arc time.
 export const WELD_DEPOSITION_RATE_LB_PER_MIN = { SMAW: 0.06, GMAW: 0.12, FCAW: 0.20, GTAW: 0.03 };
-// dims: in { process: dimensionless, weld_cross_section_in2: L^2, weld_length_in: L, deposition_rate_lb_per_min: M T^-1 } out: { deposit_lb: M, gas_ft3: L^3, efficiency: dimensionless }
+// dims: in { process: dimensionless, weld_cross_section_in2: L^2, weld_length_in: L, deposition_rate_lb_per_min: M T^-1 } out: { deposit_lb: M, gas_ft3: L^3, efficiency: dimensionless, minutes: T }
 export function computeWeldUsage({ process = "GMAW", weld_cross_section_in2 = 0, weld_length_in = 0, deposition_rate_lb_per_min }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const eff = WELD_DEPOSITION_EFFICIENCY[process];
@@ -2590,7 +2590,7 @@ export const APA_SPAN_RATINGS = {
   "48/24": { roof: { spacing_in: 48, no_edge_span_in: 36, live_psf: 30, total_psf: 40, live_by_spacing: { 20: 270, 24: 175, 32: 95, 40: 45, 48: 30 } }, floor: { spacing_in: 24, total_psf: 100 } },
 };
 
-// dims: in { span_rating: dimensionless, panel_thickness_in: L, application: dimensionless, support_spacing_in: L, live_load_psf: M L^-1 T^-2, dead_load_psf: M L^-1 T^-2, edge_support: dimensionless } out: { max_span_in: L, allowable_spacing_in: L }
+// dims: in { span_rating: dimensionless, panel_thickness_in: L, application: dimensionless, support_spacing_in: L, live_load_psf: M L^-1 T^-2, dead_load_psf: M L^-1 T^-2, edge_support: dimensionless } out: { max_span_in: L, allowable_spacing_in: L, panel_thickness_in: L }
 export function computePlywoodSpan({
   span_rating = "24/16", panel_thickness_in = 0,
   application = "roof", support_spacing_in = 0,
@@ -3356,7 +3356,7 @@ function _v15cSmallestMember({ sizes, plyOptions, props, species_grade, w_plf, s
 // reported, with the AWC NDS bending / deflection verification and the IRC
 // R602.7.5 jack-stud count from the end reaction and F_c-perp bearing.
 
-// dims: in { header_span_ft: L, tributary_width_ft: L, floors_above: dimensionless, ground_snow_psf: M L^-1 T^-2, species_grade: dimensionless } out: { member_size: dimensionless, plies: dimensionless, jack_studs_each_end: dimensionless, f_b_psi: M L^-1 T^-2 }
+// dims: in { header_span_ft: L, tributary_width_ft: L, floors_above: dimensionless, ground_snow_psf: M L^-1 T^-2, species_grade: dimensionless } out: { member_size: dimensionless, plies: dimensionless, jack_studs_each_end: dimensionless, f_b_psi: M L^-1 T^-2, F_b_base_psi: M L^-1 T^-2, F_b_psi: M L^-1 T^-2, allowable_deflection_in: L, allowable_span_ft: L, by_bending_ft: L, by_deflection_ft: L, deflection_in: L, w_plf: M T^-2 }
 export function computeHeaderSizing({
   header_span_ft = 0,
   tributary_width_ft = 0,
@@ -3555,7 +3555,7 @@ function _v15cPostColumnCapacity({ d_in, height_ft, F_c, E_min }) {
   return { A_in2, le_d, C_P, allowable_load_lb: F_c_prime * A_in2, slenderness_exceeded };
 }
 
-// dims: in { joist_span_ft: L, beam_span_ft: L, post_height_ft: L, live_load_psf: M L^-1 T^-2, dead_load_psf: M L^-1 T^-2, species_grade: dimensionless } out: { beam_label: dimensionless, post_size: dimensionless, footing_side_in: L }
+// dims: in { joist_span_ft: L, beam_span_ft: L, post_height_ft: L, live_load_psf: M L^-1 T^-2, dead_load_psf: M L^-1 T^-2, species_grade: dimensionless } out: { beam_label: dimensionless, post_size: dimensionless, footing_side_in: L, beam_allowable_span_ft: L, ledger_spacing_in: L, tributary_width_ft: L, w_plf: M T^-2 }
 export function computeDeckBeamPost({
   joist_span_ft = 0,
   beam_span_ft = 0,
@@ -3844,7 +3844,7 @@ CONSTRUCTION_RENDERERS["deck-ledger-fasteners"] = renderDeckLedgerFasteners;
 
 // --- v20 E.1: Bearing length on a wood plate (`point-load-bearing`) ---
 // A_req = P / (Fc_perp * Cb); length = A_req / width; f_c_perp = P/(width*len).
-// dims: in { load_lb: M*L*T^-2, width_in: L, fc_perp_psi: M*L^-1*T^-2, cb: dimensionless, provided_length_in: L } out: { req_length_in: L, actual_stress_psi: M*L^-1*T^-2 }
+// dims: in { load_lb: M*L*T^-2, width_in: L, fc_perp_psi: M*L^-1*T^-2, cb: dimensionless, provided_length_in: L } out: { req_length_in: L, actual_stress_psi: M*L^-1*T^-2, req_area_in2: L^2 }
 export function computePointLoadBearing({ load_lb = 0, width_in = 0, fc_perp_psi = 0, cb = 1, provided_length_in = 0 } = {}) {
   const P = Number(load_lb) || 0;
   const w = Number(width_in) || 0;
@@ -3898,7 +3898,7 @@ CONSTRUCTION_RENDERERS["point-load-bearing"] = renderPointLoadBearing;
 // --- v20 E.2: Wood column capacity, slenderness (`column-buckling-wood`) ---
 // le/d governs; FcE = 0.822*Emin/(le/d)^2; a = FcE/Fc*; c = 0.8 (sawn);
 // Cp = (1+a)/(2c) - sqrt(((1+a)/(2c))^2 - a/c); Fc' = Fc**Cp; cap = Fc'*b*d.
-// dims: in { b_in: L, d_in: L, le_in: L, fc_star_psi: M*L^-1*T^-2, emin_psi: M*L^-1*T^-2, ke: dimensionless } out: { cp: dimensionless, capacity_lb: M*L*T^-2 }
+// dims: in { b_in: L, d_in: L, le_in: L, fc_star_psi: M*L^-1*T^-2, emin_psi: M*L^-1*T^-2, ke: dimensionless } out: { cp: dimensionless, capacity_lb: M*L*T^-2, fc_prime_psi: M L^-1 T^-2, fce_psi: M L^-1 T^-2 }
 export function computeColumnBucklingWood({ b_in = 0, d_in = 0, le_in = 0, fc_star_psi = 0, emin_psi = 0, ke = 1 } = {}) {
   const b = Number(b_in) || 0;
   const d = Number(d_in) || 0;
@@ -4414,7 +4414,7 @@ function _v27MinFillet(t) {
 // AISC §J2.2b maximum fillet size (in) along an edge of the thinner part.
 function _v27MaxFillet(t) { return t < 0.25 ? t : t - 0.0625; }
 
-// dims: in { leg_in: L, length_in: L, base_thickness_in: L, applied_load_lb: dimensionless } out: { throat_in: L, strength_per_in_lb: dimensionless, capacity_lb: dimensionless }
+// dims: in { leg_in: L, length_in: L, base_thickness_in: L, applied_load_lb: dimensionless } out: { throat_in: L, strength_per_in_lb: dimensionless, capacity_lb: dimensionless, F_Exx_ksi: M L^-1 T^-2, length_in: L, max_fillet_in: L, min_fillet_in: L, stress_ksi: M L^-1 T^-2 }
 export function computeFilletWeldStrength({ mode = "capacity-from-size", leg_in = 0, length_in = 0, electrode = "E70", base_thickness_in = 0, applied_load_lb = 0, method = "ASD" } = {}) {
   const _g = _finiteGuard({ leg_in, length_in, base_thickness_in, applied_load_lb }); if (_g) return _g;
   if (mode !== "capacity-from-size" && mode !== "size-from-load") return { error: "Mode must be capacity-from-size or size-from-load." };
@@ -4638,7 +4638,7 @@ const _blastNozzle = (bore) => {
   }
   return best;
 };
-// dims: in { nozzle_bore_in: L, pressure_psi: M L^-1 T^-2, area_ft2: L^2, lb_per_ft2: dimensionless } out: { cfm: L^3 T^-1, compressor_hp: M L^2 T^-3, abrasive_lb_hr: M T^-1, abrasive_lb: M, abrasive_tons: M }
+// dims: in { nozzle_bore_in: L, pressure_psi: M L^-1 T^-2, area_ft2: L^2, lb_per_ft2: dimensionless } out: { cfm: L^3 T^-1, compressor_hp: M L^2 T^-3, abrasive_lb_hr: M T^-1, abrasive_lb: M, abrasive_tons: M, matched_bore_in: L }
 // (The nozzle bore is a length L; pressure is M L^-1 T^-2; the air-flow is a
 //  volume-rate L^3 T^-1; abrasive consumption is a mass-rate M T^-1 and the
 //  totals are masses M.)
@@ -4851,7 +4851,7 @@ const renderControlJointSpacing = _simpleRenderer({
 CONSTRUCTION_RENDERERS["control-joint-spacing"] = renderControlJointSpacing;
 
 const _REBAR_DB_IN = { "#3": 0.375, "#4": 0.5, "#5": 0.625, "#6": 0.75, "#7": 0.875, "#8": 1.0, "#9": 1.128, "#10": 1.270, "#11": 1.410 };
-// dims: in { bar_size: dimensionless, lap_factor: dimensionless, min_lap_in: L } out: { db: L, lap_in: L }
+// dims: in { bar_size: dimensionless, lap_factor: dimensionless, min_lap_in: L } out: { db: L, lap_in: L, lap_ft: L }
 export function computeRebarLapSplice({ bar_size = "#5", lap_factor = 48, min_lap_in = 12 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const db = _REBAR_DB_IN[bar_size];
@@ -5147,7 +5147,7 @@ CONSTRUCTION_RENDERERS["wallpaper-rolls"] = renderWallpaperRolls;
 
 // --- Utility: Eave Ice-Barrier Membrane Coverage and Rolls (spec-v215) ---
 
-// dims: in { eave_length_ft: L, overhang_in: L, pitch_rise: L, roll_width_in: L, roll_len_ft: L, side_lap_in: L } out: { slope_factor: dimensionless, coverage_in: L, courses: dimensionless, roll_lf: L, rolls: dimensionless }
+// dims: in { eave_length_ft: L, overhang_in: L, pitch_rise: L, roll_width_in: L, roll_len_ft: L, side_lap_in: L } out: { slope_factor: dimensionless, coverage_in: L, courses: dimensionless, roll_lf: L, rolls: dimensionless, wall_line_in: L }
 export function computeIceBarrierCoverage({ eave_length_ft = 0, overhang_in = 0, pitch_rise = 0, roll_width_in = 36, roll_len_ft = 66.7, side_lap_in = 6 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(eave_length_ft > 0)) return { error: "Eave length must be positive." };
@@ -5770,7 +5770,7 @@ const _singleExitMax = (group, story) => (_SINGLE_EXIT_ANY.has(group) ? null : s
 // I-2". The legacy mixed bucket holds I-2 and H-4 / H-5, so it takes the unsprinklered factor.
 const _NO_SPRINKLER_REDUCTION = new Set(["H2-H3", "H4-H5", "I-R1-R4-H4-H5"]);
 
-// dims: in { occupant_load: dimensionless, min_door_in: L, occupancy_group: dimensionless, story: dimensionless } out: { total_width_in: L, per_exit_in: L, exits_required: dimensionless }
+// dims: in { occupant_load: dimensionless, min_door_in: L, occupancy_group: dimensionless, story: dimensionless } out: { total_width_in: L, per_exit_in: L, exits_required: dimensionless, factor: dimensionless }
 export function computeEgressCapacity({ occupant_load = 0, sprinklered = true, path = "level", min_door_in = 32, occupancy_group = "A-B-E-F-M-U", story = "first" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(occupant_load > 0)) return { error: "Occupant load must be positive." };
@@ -5831,7 +5831,7 @@ CONSTRUCTION_RENDERERS["egress-capacity"] = _renderEgressCapacity;
 
 // ----- spec-v244: Required Plumbing Fixture Count by Occupancy (IBC 2027 §2902 / Table 2902.1.1; Table 2902.1 in 2021) -----
 
-// dims: in { occupant_load: dimensionless, wc_ratio: dimensionless, wc_ratio_over: dimensionless, wc_tier: dimensionless, lav_ratio: dimensionless, lav_ratio_over: dimensionless, lav_tier: dimensionless, fountain_ratio: dimensionless, distribution: dimensionless } out: { wc_total: dimensionless, lav_total: dimensionless, fountains: dimensionless, service_sinks: dimensionless }
+// dims: in { occupant_load: dimensionless, wc_ratio: dimensionless, wc_ratio_over: dimensionless, wc_tier: dimensionless, lav_ratio: dimensionless, lav_ratio_over: dimensionless, lav_tier: dimensionless, fountain_ratio: dimensionless, distribution: dimensionless } out: { wc_total: dimensionless, lav_total: dimensionless, fountains: dimensionless, service_sinks: dimensionless, lav_a: I, wc_a: I }
 export function computePlumbingFixtureCount({ occupant_load = 0, wc_ratio = 25, wc_ratio_over = 50, wc_tier = 50, lav_ratio = 40, lav_ratio_over = 0, lav_tier = 0, fountain_ratio = 100, distribution = 0.5 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(occupant_load > 0)) return { error: "Occupant load must be positive." };
@@ -6579,7 +6579,7 @@ CONSTRUCTION_RENDERERS["concrete-maturity"] = _renderConcreteMaturity;
 
 // ----- spec-v251: Allowable Building Area per Story (IBC 2027 Chapter 5) -----
 
-// dims: in { tabular_area: L^2, ns_area: L^2, frontage_ft: L, perimeter_ft: L, open_width_ft: L, actual_area: L^2, code_edition: dimensionless } out: { frontage_if: dimensionless, allowable: L^2 }
+// dims: in { tabular_area: L^2, ns_area: L^2, frontage_ft: L, perimeter_ft: L, open_width_ft: L, actual_area: L^2, code_edition: dimensionless } out: { frontage_if: dimensionless, allowable: L^2, margin: dimensionless, ratio: dimensionless }
 export function computeAllowableArea({ tabular_area = 0, ns_area = 0, frontage_ft = 0, perimeter_ft = 0, open_width_ft = 30, actual_area = 0, code_edition = "2027" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(tabular_area > 0)) return { error: "Tabular area At must be positive (ft^2)." };
@@ -6737,7 +6737,7 @@ CONSTRUCTION_RENDERERS["exterior-opening-protection"] = _renderExteriorOpeningPr
 
 // ----- spec-v263: Wood Bending Member (NDS Adjusted Bending Value Fb' and Beam Stability Factor CL) -----
 
-// dims: in { fb_star_psi: M L^-1 T^-2, emin_psi: M L^-1 T^-2, b_in: L, d_in: L, le_in: L } out: { rb: dimensionless, fbe_psi: M L^-1 T^-2, cl: dimensionless, fb_prime_psi: M L^-1 T^-2, s_in3: L^3, m_prime_inlb: M L^2 T^-2, m_prime_ftlb: M L^2 T^-2 }
+// dims: in { fb_star_psi: M L^-1 T^-2, emin_psi: M L^-1 T^-2, b_in: L, d_in: L, le_in: L } out: { rb: dimensionless, fbe_psi: M L^-1 T^-2, cl: dimensionless, fb_prime_psi: M L^-1 T^-2, s_in3: L^3, m_prime_inlb: M L^2 T^-2, m_prime_ftlb: M L^2 T^-2, ratio: dimensionless }
 export function computeWoodBeamBending({ fb_star_psi = 0, emin_psi = 620000, b_in = 0, d_in = 0, le_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(fb_star_psi > 0)) return { error: "Fb* must be positive (psi)." };
@@ -7185,7 +7185,7 @@ CONSTRUCTION_RENDERERS["wood-combined-bending-axial"] = _renderWoodCombinedBendi
 // separate. NDS 3.9.1: ft/Ft' + fb/Fb* <= 1.0 (Eq. 3.9-1) and (fb - ft)/Fb** <= 1.0 (Eq. 3.9-2), where
 // Fb* is Fb' without CL and Fb** is Fb' without CV. Checked against a Missouri S&T (CE 5260) truss
 // bottom-chord solution: 684/1,009 + 397/1,495 = 0.943.
-// dims: in { t_lb: M L T^-2, m_inlb: M L^2 T^-2, a_in2: L^2, s_in3: L^3, ft_adj_psi: M L^-1 T^-2, fb_star_psi: M L^-1 T^-2, fb_dstar_psi: M L^-1 T^-2 } out: { ft_psi: M L^-1 T^-2, fb_psi: M L^-1 T^-2, tension_interaction: dimensionless, compression_side_ratio: dimensionless }
+// dims: in { t_lb: M L T^-2, m_inlb: M L^2 T^-2, a_in2: L^2, s_in3: L^3, ft_adj_psi: M L^-1 T^-2, fb_star_psi: M L^-1 T^-2, fb_dstar_psi: M L^-1 T^-2 } out: { ft_psi: M L^-1 T^-2, fb_psi: M L^-1 T^-2, tension_interaction: dimensionless, compression_side_ratio: dimensionless, fb_dstar_used_psi: M L^-1 T^-2 }
 export function computeWoodTensionBending({ t_lb = 0, m_inlb = 0, a_in2 = 0, s_in3 = 0, ft_adj_psi = 0, fb_star_psi = 0, fb_dstar_psi } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(t_lb > 0)) return { error: "Axial tension must be positive (lb)." };
@@ -7540,7 +7540,7 @@ CONSTRUCTION_RENDERERS["wood-nail-withdrawal"] = _renderWoodNailWithdrawal;
 // Checked against AWC Design Aid No. 2 (toe-nails): a 16d common (0.162 x 3.5 in) at G 0.50 lists 117 lb.
 const _NAIL_FE = (g) => 16600 * Math.pow(g, 1.84);
 const _nailFyb = (d) => (d <= 0.142 ? 100000 : d <= 0.177 ? 90000 : d <= 0.236 ? 80000 : 70000);
-// dims: in { d_in: L, length_in: L, side_in: L, gm: dimensionless, gs: dimensionless, fyb_psi: M L^-1 T^-2, toenail: dimensionless, cd: dimensionless } out: { p_in: L, z_lb: M L T^-2, z_adj_lb: M L T^-2 }
+// dims: in { d_in: L, length_in: L, side_in: L, gm: dimensionless, gs: dimensionless, fyb_psi: M L^-1 T^-2, toenail: dimensionless, cd: dimensionless } out: { p_in: L, z_lb: M L T^-2, z_adj_lb: M L T^-2, fem_psi: M L^-1 T^-2, fes_psi: M L^-1 T^-2, fyb_psi: M L^-1 T^-2, side_len_in: L }
 export function computeWoodNailLateral({ d_in = 0, length_in = 0, side_in = 0, gm = 0.5, gs = 0.5, fyb_psi, toenail = "no", cd = 1.0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(d_in > 0) || d_in >= 0.25) return { error: "Nail diameter must be over 0 and under 1/4 in (larger dowels are the bolt calculation)." };
@@ -7790,7 +7790,7 @@ const _renderSectionProperties = _simpleRenderer({
 });
 CONSTRUCTION_RENDERERS["section-properties"] = _renderSectionProperties;
 
-// dims: in { P_lb: M L T^-2, M_lbin: M L^2 T^-2, A_in2: L^2, c_in: L, I_in4: L^4, e_in: L } out: { sigma_axial: M L^-1 T^-2, sigma_bend: M L^-1 T^-2, sigma_max: M L^-1 T^-2, sigma_min: M L^-1 T^-2 }
+// dims: in { P_lb: M L T^-2, M_lbin: M L^2 T^-2, A_in2: L^2, c_in: L, I_in4: L^4, e_in: L } out: { sigma_axial: M L^-1 T^-2, sigma_bend: M L^-1 T^-2, sigma_max: M L^-1 T^-2, sigma_min: M L^-1 T^-2, S_in3: L^3 }
 export function computeCombinedStressAxialBending({ P_lb = 0, M_lbin = 0, A_in2 = 0, c_in = 0, I_in4 = 0, e_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   M_lbin = Number(M_lbin);
@@ -8319,7 +8319,7 @@ CONSTRUCTION_RENDERERS["ready-mix-concrete-order"] = _v431renderReadyMixConcrete
 //
 // A large fraction of shotcrete/gunite bounces off the work (rebound) and never
 // stays, so the order grosses up: shot = in-place / (1 - rebound fraction).
-// dims: in { area_sf: L^2, thickness_in: L, rebound_pct: dimensionless } out: { in_place_cy: L^3, shot_cy: L^3, rebound_cy: L^3 }
+// dims: in { area_sf: L^2, thickness_in: L, rebound_pct: dimensionless } out: { in_place_cy: L^3, shot_cy: L^3, rebound_cy: L^3, achieved_thickness_in: L, in_place_from_shot_cy: L^3, naive_add_cy: L^3, shortfall_cy: L^3 }
 export function computeShotcreteReboundQuantity({ area_sf = 0, thickness_in = 0, rebound_pct = 20, shot_actual_cy = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(area_sf > 0)) return { error: "Area must be positive (ft^2)." };
@@ -8467,7 +8467,7 @@ CONSTRUCTION_RENDERERS["stockpile-volume"] = _v818renderStockpileVolume;
 // compost windrow, a DOT salt/sand pile, an aggregate windrow - is a triangular prism with a cone split across its
 // two ends. height = (W/2) tan(repose); cross-section = (1/2) W h; volume = prism (area x ridge length) + one full
 // cone at the ends. Ridge length 0 collapses to the conical pile.
-// dims: in { base_width_ft: L, ridge_length_ft: L, repose_angle_deg: dimensionless, density_pcf: M L^-3 } out: { height_ft: L, volume_ft3: L^3, volume_cy: L^3, tons: M }
+// dims: in { base_width_ft: L, ridge_length_ft: L, repose_angle_deg: dimensionless, density_pcf: M L^-3 } out: { height_ft: L, volume_ft3: L^3, volume_cy: L^3, tons: M, cross_section_ft2: L^2, ends_ft3: L^3, prism_ft3: L^3, radius_ft: L }
 export function computeWindrowStockpileVolume({ base_width_ft = 0, ridge_length_ft = 0, repose_angle_deg = 37, density_pcf = 100 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(base_width_ft > 0)) return { error: "Base width must be positive (ft)." };
@@ -8776,7 +8776,7 @@ const _v448renderGlulamVolumeFactor = _simpleRenderer({
 CONSTRUCTION_RENDERERS["glulam-volume-factor"] = _v448renderGlulamVolumeFactor;
 
 // ===================== spec-v453: intermittent fillet weld schedule (AISC J2 / AWS) =====================
-// dims: in { w_req_in: L, w_intermit_in: L, increment_in: L } out: { fraction: dimensionless, pitch_in: L, min_incr_in: L }
+// dims: in { w_req_in: L, w_intermit_in: L, increment_in: L } out: { fraction: dimensionless, pitch_in: L, min_incr_in: L, increment_in: L }
 export function computeIntermittentFilletWeld({ w_req_in = 0, w_intermit_in = 0, increment_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const wReq = Number(w_req_in) || 0;
@@ -9097,7 +9097,7 @@ CONSTRUCTION_RENDERERS["wind-solid-sign"] = _v546renderWindSolidSign;
 
 // --- spec-v553 E: Unbalanced snow load on gable roof (ASCE 7-22 7.6.1) ---
 // Applies for ~2.38-30.2 deg; W<=20 ft is windward 0 / leeward pg. Otherwise windward 0.3 ps, leeward ps + hd*gamma/sqrt(S).
-// dims: in { ground_snow_pg_psf: M L^-1 T^-2, flat_roof_ps_psf: M L^-1 T^-2, roof_rise_on_12: dimensionless, eave_to_ridge_ft: L, w2: dimensionless } out: { windward_psf: M L^-1 T^-2, leeward_peak_psf: M L^-1 T^-2, extent_ft: L }
+// dims: in { ground_snow_pg_psf: M L^-1 T^-2, flat_roof_ps_psf: M L^-1 T^-2, roof_rise_on_12: dimensionless, eave_to_ridge_ft: L, w2: dimensionless } out: { windward_psf: M L^-1 T^-2, leeward_peak_psf: M L^-1 T^-2, extent_ft: L, hd_ft: L, slope_deg: dimensionless, surcharge_psf: M L^-1 T^-2 }
 export function computeSnowUnbalancedGable({ ground_snow_pg_psf = 0, flat_roof_ps_psf = 0, roof_rise_on_12 = 0, eave_to_ridge_ft = 0, w2 = SNOW_W2_DEFAULT } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const pg = Number(ground_snow_pg_psf) || 0;
@@ -9216,7 +9216,7 @@ const _WCM_EXPOSURE_CAPS = {
   f2_s2: { cap: 0.45, label: "F2 freeze-thaw / S2-S3 sulfate (0.45)" },
   f3_c2: { cap: 0.40, label: "F3 freeze-thaw / C2 corrosion (0.40)" },
 };
-// dims: in { water_lb: M, cement_lb: M, scm_lb: M, exposure_class: dimensionless } out: { wcm: dimensionless, cementitious_lb: M }
+// dims: in { water_lb: M, cement_lb: M, scm_lb: M, exposure_class: dimensionless } out: { wcm: dimensionless, cementitious_lb: M, scm_fraction: dimensionless }
 export function computeWaterCementRatio({ water_lb = 0, cement_lb = 0, scm_lb = 0, exposure_class = "none" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const water = Number(water_lb) || 0;
@@ -9272,7 +9272,7 @@ const _LL_MEMBER_KLL = {
   interior_beam: { kll: 2, label: "Interior beam (KLL 2)" },
   other: { kll: 1, label: "Other members / one- & two-way slabs (KLL 1)" },
 };
-// dims: in { unreduced_load_psf: M L^-1 T^-2, tributary_area_ft2: L^2, member_type: dimensionless, floors_supported: dimensionless } out: { reduced_load_psf: M L^-1 T^-2, kll_at_ft2: L^2, reduction_percent: dimensionless }
+// dims: in { unreduced_load_psf: M L^-1 T^-2, tributary_area_ft2: L^2, member_type: dimensionless, floors_supported: dimensionless } out: { reduced_load_psf: M L^-1 T^-2, kll_at_ft2: L^2, reduction_percent: dimensionless, floor_fraction: dimensionless, multiplier: dimensionless }
 export function computeAsceLiveLoadReduction({ unreduced_load_psf = 0, tributary_area_ft2 = 0, member_type = "interior_column", floors_supported = "one" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const L0 = Number(unreduced_load_psf) || 0;
@@ -10669,7 +10669,7 @@ CONSTRUCTION_RENDERERS["vapor-barrier-rolls"] = _v885renderVaporBarrierRolls;
 // Panel grid from the joint spacing, then the interior saw-cut footage.
 //   panels_l = ceil(length/spacing); panels_w = ceil(width/spacing)
 //   joint = (panels_l - 1) x width + (panels_w - 1) x length
-// dims: in { length_ft: L, width_ft: L, spacing_ft: L } out: { panels: dimensionless, joint_lf: L }
+// dims: in { length_ft: L, width_ft: L, spacing_ft: L } out: { panels: dimensionless, joint_lf: L, panels_w: M L^2 T^-3 }
 export function computeConcreteSawcutFootage({ length_ft = 60, width_ft = 40, spacing_ft = 12 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(length_ft > 0)) return { error: "Slab length must be positive (ft)." };
@@ -11453,7 +11453,7 @@ CONSTRUCTION_RENDERERS["drainage-board-takeoff"] = _simpleRenderer({
 // plus a head. Pieces from stock length after waste; beads are not spliced mid-corner in practice,
 // so pieces are ALSO floored at one full stick per corner when the height exceeds nothing - the
 // count reports both the LF math and the per-corner stick reality and takes the larger.
-// dims: in { outside_corners: dimensionless, corner_height_ft: L, wrapped_openings: dimensionless, opening_width_ft: L, opening_height_ft: L, stock_length_ft: L, waste_pct: dimensionless } out: { corner_lf: L, wrap_lf: L, total_lf: L, pieces: dimensionless }
+// dims: in { outside_corners: dimensionless, corner_height_ft: L, wrapped_openings: dimensionless, opening_width_ft: L, opening_height_ft: L, stock_length_ft: L, waste_pct: dimensionless } out: { corner_lf: L, wrap_lf: L, total_lf: L, pieces: dimensionless, pieces_by_lf: L }
 export function computeCornerBeadTakeoff({ outside_corners = 0, corner_height_ft = 8, wrapped_openings = 0, opening_width_ft = 3, opening_height_ft = 7, stock_length_ft = 8, waste_pct = 10 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const corners = Number(outside_corners) || 0;
@@ -11513,7 +11513,7 @@ CONSTRUCTION_RENDERERS["corner-bead-takeoff"] = _simpleRenderer({
 // board height, exposure <= board - min_overlap (1 in headlap default), and shrinking exposure only
 // ever INCREASES overlap, so the adjusted layout is checked against the target only for a sliver
 // the other way (an added course pushing exposure far below target reads as intended).
-// dims: in { wall_height_ft: L, wall_length_ft: L, target_exposure_in: L, board_height_in: L, min_overlap_in: L } out: { courses: dimensionless, adjusted_exposure_in: L, starter_lf: L, total_course_lf: L }
+// dims: in { wall_height_ft: L, wall_length_ft: L, target_exposure_in: L, board_height_in: L, min_overlap_in: L } out: { courses: dimensionless, adjusted_exposure_in: L, starter_lf: L, total_course_lf: L, max_exposure_in: L, sliver_in: L }
 export function computeSidingCourseLayout({ wall_height_ft = 0, wall_length_ft = 0, target_exposure_in = 7, board_height_in = 8, min_overlap_in = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const hft = Number(wall_height_ft) || 0;
@@ -11637,7 +11637,7 @@ const MUTCD_SIGN_SPACING_FT = {
   rural: { label: "Rural", a: 500, b: 500, c: 500 },
   expressway: { label: "Expressway / Freeway", a: 1000, b: 1500, c: 2640 },
 };
-// dims: in { road_type: dimensionless, sign_count: dimensionless, speed_mph: L T^-1 } out: { a_ft: L, b_ft: L, c_ft: L, first_sign_ft: L, total_ft: L }
+// dims: in { road_type: dimensionless, sign_count: dimensionless, speed_mph: L T^-1 } out: { a_ft: L, b_ft: L, c_ft: L, first_sign_ft: L, total_ft: L, sign_count: dimensionless, speed_rule_max_ft: L, vehicle_spacing_ft: L }
 export function computeAdvanceWarningSignSpacing({ road_type = "rural", sign_count = 3, speed_mph = 0, approach_volume_vph = 0, flagger_cycle_min = 0, vehicle_spacing_ft = 25 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const row = MUTCD_SIGN_SPACING_FT[road_type];
@@ -11729,7 +11729,7 @@ CONSTRUCTION_RENDERERS["advance-warning-sign-spacing"] = _simpleRenderer({
 //   shear      V = 0.6 w L           (reaction at the first interior support)
 //   deflection D = w L^4 / (145 EI)  (end-span max, 0.0069 wL^4/EI -> 1/0.0069 = 144.9)
 // Each is inverted for the span, and the smallest governs.
-// dims: in { pressure_psf: M L^-1 T^-2, tributary_in: L, width_b_in: L, depth_d_in: L, fb_psi: M L^-1 T^-2, fv_psi: M L^-1 T^-2, e_psi: M L^-1 T^-2, deflection_denominator: dimensionless } out: { span_bending_in: L, span_shear_in: L, span_deflection_in: L, max_spacing_in: L }
+// dims: in { pressure_psf: M L^-1 T^-2, tributary_in: L, width_b_in: L, depth_d_in: L, fb_psi: M L^-1 T^-2, fv_psi: M L^-1 T^-2, e_psi: M L^-1 T^-2, deflection_denominator: dimensionless } out: { span_bending_in: L, span_shear_in: L, span_deflection_in: L, max_spacing_in: L, area_in2: L^2, section_modulus_in3: L^3, w_plf: M T^-2 }
 export function computeFormworkMemberSpacing({ pressure_psf = 0, tributary_in = 12, width_b_in = 1.5, depth_d_in = 3.5, fb_psi = 1000, fv_psi = 180, e_psi = 1600000, deflection_denominator = 360 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const p = Number(pressure_psf) || 0;
@@ -11882,7 +11882,7 @@ CONSTRUCTION_RENDERERS["chip-seal-mcleod"] = _simpleRenderer({
 // gets full drops plus a fill strip, and the ONLY real decision is which way to run the
 // roll: the direction with fewer seams is usually, but not always, the direction with less
 // waste, and the tile computes both and says which is which rather than assuming.
-// dims: in { room_length_ft: L, room_width_ft: L, roll_width_ft: L, pattern_repeat_in: L, waste_pct: dimensionless, min_fill_strip_in: L } out: { drops: dimensionless, fill_strip_in: L, seam_count: dimensionless, seam_length_ft: L, running_ft: L, roll_sf: L^2, room_sf: L^2, waste_sf: L^2, waste_actual_pct: dimensionless, alt_seam_count: dimensionless, alt_running_ft: L }
+// dims: in { room_length_ft: L, room_width_ft: L, roll_width_ft: L, pattern_repeat_in: L, waste_pct: dimensionless, min_fill_strip_in: L } out: { drops: dimensionless, fill_strip_in: L, seam_count: dimensionless, seam_length_ft: L, running_ft: L, roll_sf: L^2, room_sf: L^2, waste_sf: L^2, waste_actual_pct: dimensionless, alt_seam_count: dimensionless, alt_running_ft: L, cut_length_ft: L, order_running_ft: L, with_waste_sf: L^2 }
 export function computeCarpetSeamLayout({ room_length_ft = 0, room_width_ft = 0, roll_width_ft = 12, pattern_repeat_in = 0, waste_pct = 5, min_fill_strip_in = 6 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const L = Number(room_length_ft) || 0;
@@ -12083,7 +12083,7 @@ CONSTRUCTION_RENDERERS["seismic-overturning-stability"] = _simpleRenderer({
 // width, not the nominal roll width. Within a row the on-center spacing, and the tighter
 // spacing in the perimeter and corner zones, are wind-uplift and FM-approval values that
 // belong to the project - they are INPUTS here, not built in.
-// dims: in { roof_area_sf: L^2, roll_width_ft: L, sidelap_in: L, field_spacing_in: L, perimeter_spacing_in: L, perimeter_fraction_pct: dimensionless, field_seam_covered: dimensionless, waste_pct: dimensionless } out: { seam_lf: L, field_fasteners: dimensionless, perimeter_fasteners: dimensionless, total_fasteners: dimensionless, plates: dimensionless, cover_tape_lf: L, fasteners_per_square: dimensionless }
+// dims: in { roof_area_sf: L^2, roll_width_ft: L, sidelap_in: L, field_spacing_in: L, perimeter_spacing_in: L, perimeter_fraction_pct: dimensionless, field_seam_covered: dimensionless, waste_pct: dimensionless } out: { seam_lf: L, field_fasteners: dimensionless, perimeter_fasteners: dimensionless, total_fasteners: dimensionless, plates: dimensionless, cover_tape_lf: L, fasteners_per_square: dimensionless, avg_spacing_in: L, field_lf: L, perimeter_lf: L }
 export function computeMembraneFastenerTakeoff({ roof_area_sf = 8000, roll_width_ft = 10, sidelap_in = 6, field_spacing_in = 12, perimeter_spacing_in = 6, perimeter_fraction_pct = 25, field_seam_covered = "no", waste_pct = 5 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (field_seam_covered !== "yes" && field_seam_covered !== "no") return { error: "Field seam covered must be yes or no." };
@@ -12248,7 +12248,7 @@ CONSTRUCTION_RENDERERS["guard-post-load"] = _simpleRenderer({
 // 480 sq in = 3.33 sq ft, well under the 5.7 sq ft (820.8 sq in) the same section requires.
 // So one dimension always has to exceed its minimum, and by how much depends on the other.
 // That is the number this tile exists to produce - the minimum PARTNER dimension.
-// dims: in { clear_width_in: L, clear_height_in: L, sill_height_in: L, location: dimensionless, min_area_override_sf: L^2 } out: { clear_area_sqin: L^2, clear_area_sf: L^2, required_area_sf: L^2, required_area_sqin: L^2, width_needed_in: L, height_needed_in: L, area_deficit_sqin: L^2 }
+// dims: in { clear_width_in: L, clear_height_in: L, sill_height_in: L, location: dimensionless, min_area_override_sf: L^2 } out: { clear_area_sqin: L^2, clear_area_sf: L^2, required_area_sf: L^2, required_area_sqin: L^2, width_needed_in: L, height_needed_in: L, area_deficit_sqin: L^2, minimums_area_sqin: L^2, minimums_shortfall_sqin: L^2 }
 export function computeEgressWindowCheck({ clear_width_in = 0, clear_height_in = 0, sill_height_in = 0, location = "above-grade", min_area_override_sf = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const w = Number(clear_width_in) || 0;
@@ -12328,7 +12328,7 @@ CONSTRUCTION_RENDERERS["egress-window-check"] = _simpleRenderer({
 // exit door not more than 1.5 in below the top of the threshold.
 // The 1.5 in rule is the one that catches people: a landing set a full step down at a door
 // is a fall, not a step, and it fails whether or not the landing itself is big enough.
-// dims: in { landing_depth_in: L, landing_width_in: L, flight_width_in: L, threshold_drop_in: L, kind: dimensionless, min_depth_in: L, max_threshold_drop_in: L } out: { depth_deficit_in: L, width_deficit_in: L, drop_excess_in: L, min_landing_area_sf: L^2 }
+// dims: in { landing_depth_in: L, landing_width_in: L, flight_width_in: L, threshold_drop_in: L, kind: dimensionless, min_depth_in: L, max_threshold_drop_in: L } out: { depth_deficit_in: L, width_deficit_in: L, drop_excess_in: L, min_landing_area_sf: L^2, provided_area_sf: L^2 }
 export function computeLandingCheck({ landing_depth_in = 0, landing_width_in = 0, flight_width_in = 36, threshold_drop_in = 0, kind = "stair", min_depth_in = 36, max_threshold_drop_in = 1.5 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (kind !== "stair" && kind !== "door") return { error: "Kind must be stair or door." };
@@ -12408,7 +12408,7 @@ CONSTRUCTION_RENDERERS["landing-check"] = _simpleRenderer({
 // Only the FRONT approach is shipped here. Table 404.2.4.1 also covers hinge-side and
 // latch-side approaches and adds clearance where a closer and a latch are both provided;
 // those rows are not reproduced and the note says to read the table for them.
-// dims: in { clear_perpendicular_in: L, clear_latch_side_in: L, door_clear_width_in: L, side: dimensionless, min_pull_perpendicular_in: L, min_pull_latch_in: L, min_push_perpendicular_in: L } out: { required_perpendicular_in: L, required_latch_in: L, perpendicular_deficit_in: L, latch_deficit_in: L, required_area_sf: L^2 }
+// dims: in { clear_perpendicular_in: L, clear_latch_side_in: L, door_clear_width_in: L, side: dimensionless, min_pull_perpendicular_in: L, min_pull_latch_in: L, min_push_perpendicular_in: L } out: { required_perpendicular_in: L, required_latch_in: L, perpendicular_deficit_in: L, latch_deficit_in: L, required_area_sf: L^2, other_area_sf: L^2, required_width_in: L }
 export function computeDoorManeuveringClearance({ clear_perpendicular_in = 0, clear_latch_side_in = 0, door_clear_width_in = 32, side = "pull", min_pull_perpendicular_in = 60, min_pull_latch_in = 18, min_push_perpendicular_in = 48 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (side !== "pull" && side !== "push") return { error: "Side must be pull or push." };
@@ -12491,7 +12491,7 @@ CONSTRUCTION_RENDERERS["door-maneuvering-clearance"] = _simpleRenderer({
 // swings enormously with its bend radius and whether it is mitered or smooth, so a tight
 // mitered 90 can cost more than three times what a wide smooth one does. Elbow selection,
 // not duct routing, is usually the lever that brings a run into compliance.
-// dims: in { straight_run_ft: L, elbow_90_count: dimensionless, elbow_45_count: dimensionless, eq_len_90_ft: L, eq_len_45_ft: L, max_length_ft: L, transition_duct_ft: L } out: { fitting_equivalent_ft: L, developed_length_ft: L, remaining_straight_ft: L, over_by_ft: L, label_required: dimensionless }
+// dims: in { straight_run_ft: L, elbow_90_count: dimensionless, elbow_45_count: dimensionless, eq_len_90_ft: L, eq_len_45_ft: L, max_length_ft: L, transition_duct_ft: L } out: { fitting_equivalent_ft: L, developed_length_ft: L, remaining_straight_ft: L, over_by_ft: L, label_required: dimensionless, fitting_share_pct: dimensionless }
 export function computeDryerDuctLength({ straight_run_ft = 0, elbow_90_count = 0, elbow_45_count = 0, eq_len_90_ft = 0, eq_len_45_ft = 0, max_length_ft = 35, transition_duct_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const run = Number(straight_run_ft) || 0;
@@ -12742,7 +12742,7 @@ CONSTRUCTION_RENDERERS["co-alarm-placement"] = _simpleRenderer({
 // the well must allow the escape opening to be FULLY OPENED, which an inward-swinging
 // casement into a shallow well quietly defeats, and a well deeper than 44 in needs a
 // permanently affixed ladder or steps usable with the window fully open.
-// dims: in { well_width_in: L, well_projection_in: L, well_depth_in: L, has_ladder: dimensionless, ladder_inside_width_in: L, ladder_projection_in: L, ladder_spacing_in: L, opening_fully_opens: dimensionless } out: { area_sf: L^2, required_area_sf: L^2, area_deficit_sf: L^2, projection_needed_in: L, width_needed_in: L }
+// dims: in { well_width_in: L, well_projection_in: L, well_depth_in: L, has_ladder: dimensionless, ladder_inside_width_in: L, ladder_projection_in: L, ladder_spacing_in: L, opening_fully_opens: dimensionless } out: { area_sf: L^2, required_area_sf: L^2, area_deficit_sf: L^2, projection_needed_in: L, width_needed_in: L, minimums_area_sf: L^2 }
 export function computeEgressWindowWell({ well_width_in = 0, well_projection_in = 0, well_depth_in = 0, has_ladder = "no", ladder_inside_width_in = 0, ladder_projection_in = 0, ladder_spacing_in = 0, opening_fully_opens = "yes" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const w = Number(well_width_in) || 0;
@@ -12928,7 +12928,7 @@ CONSTRUCTION_RENDERERS["scaffold-guardrail-check"] = _simpleRenderer({
 // routinely have it backwards.
 // Also note the 5 ft exception has TWO conditions, not one: under 5 ft AND examined. Depth
 // alone does not exempt anything.
-// dims: in { depth_ft: L, trench_length_ft: L, egress_points: dimensionless, stable_rock: dimensionless, competent_person_exam: dimensionless } out: { egress_required: dimensionless, max_lateral_travel_ft: L, egress_points_needed: dimensionless, protection_required: dimensionless }
+// dims: in { depth_ft: L, trench_length_ft: L, egress_points: dimensionless, stable_rock: dimensionless, competent_person_exam: dimensionless } out: { egress_required: dimensionless, max_lateral_travel_ft: L, egress_points_needed: dimensionless, protection_required: dimensionless, worst_travel_ft: L }
 export function computeExcavationProtectionTrigger({ depth_ft = 0, trench_length_ft = 0, egress_points = 0, stable_rock = "no", competent_person_exam = "no" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const d = Number(depth_ft) || 0;
@@ -13012,7 +13012,7 @@ CONSTRUCTION_RENDERERS["excavation-protection-trigger"] = _simpleRenderer({
 // The 14 in front-edge limit likewise has an escape: guardrails along the front edge and/or
 // personal fall arrest. And gaps run two ways: between adjacent units AND between the
 // platform and the uprights, both capped at 1 in.
-// dims: in { plank_length_ft: L, platform_width_in: L, gap_between_units_in: L, gap_to_uprights_in: L, overhang_in: L, front_edge_gap_in: L, cantilever_designed: dimensionless, front_edge_protected: dimensionless } out: { max_overhang_in: L, overhang_excess_in: L, width_deficit_in: L, worst_gap_in: L }
+// dims: in { plank_length_ft: L, platform_width_in: L, gap_between_units_in: L, gap_to_uprights_in: L, overhang_in: L, front_edge_gap_in: L, cantilever_designed: dimensionless, front_edge_protected: dimensionless } out: { max_overhang_in: L, overhang_excess_in: L, width_deficit_in: L, worst_gap_in: L, overhang_in: L }
 export function computeScaffoldPlatformCheck({ plank_length_ft = 0, platform_width_in = 0, gap_between_units_in = 0, gap_to_uprights_in = 0, overhang_in = 0, front_edge_gap_in = 0, cantilever_designed = "no", front_edge_protected = "no" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const L = Number(plank_length_ft) || 0;
@@ -13098,7 +13098,7 @@ CONSTRUCTION_RENDERERS["scaffold-platform-check"] = _simpleRenderer({
 // violation, not a courtesy - a 25-degree run is a ramp with steps in it.
 // Third, uniformity is measured as a VARIATION across the flight, not a tolerance on each
 // step: not over 1/4 in in any stairway system.
-// dims: in { riser_count: dimensionless, total_rise_in: L, riser_height_in: L, tread_depth_in: L, riser_variation_in: L, tread_variation_in: L, stairrail_height_in: L, landing_depth_in: L } out: { angle_deg: dimensionless, rail_required: dimensionless, worst_variation_in: L }
+// dims: in { riser_count: dimensionless, total_rise_in: L, riser_height_in: L, tread_depth_in: L, riser_variation_in: L, tread_variation_in: L, stairrail_height_in: L, landing_depth_in: L } out: { angle_deg: dimensionless, rail_required: dimensionless, worst_variation_in: L, total_rise_used_in: L }
 export function computeTemporaryStairwayCheck({ riser_count = 0, total_rise_in = 0, riser_height_in = 0, tread_depth_in = 0, riser_variation_in = 0, tread_variation_in = 0, stairrail_height_in = 0, landing_depth_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const n = Number(riser_count) || 0;
@@ -13286,7 +13286,7 @@ CONSTRUCTION_RENDERERS["flammable-cabinet-storage"] = _simpleRenderer({
 // Masonry block: stacked higher than 6 ft, tapered back one-half block per tier above 6 ft.
 // Lumber: not more than 20 ft, and not more than 16 ft where it is handled manually - the
 // same pile is legal or not depending on how it will be taken down.
-// dims: in { material: dimensionless, stack_height_ft: L, taper_provided_in: L, block_height_in: L, block_length_in: L, handled_manually: dimensionless } out: { max_height_ft: L, taper_required_in: L, taper_shortfall_in: L, tiers_above_threshold: dimensionless }
+// dims: in { material: dimensionless, stack_height_ft: L, taper_provided_in: L, block_height_in: L, block_length_in: L, handled_manually: dimensionless } out: { max_height_ft: L, taper_required_in: L, taper_shortfall_in: L, tiers_above_threshold: dimensionless, height_over_ft: L, threshold_ft: L }
 export function computeMaterialStackingLimits({ material = "brick", stack_height_ft = 0, taper_provided_in = 0, block_height_in = 8, block_length_in = 16, handled_manually = "no" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (handled_manually !== "yes" && handled_manually !== "no") return { error: "Handled manually must be yes or no." };
@@ -13374,7 +13374,7 @@ CONSTRUCTION_RENDERERS["material-stacking-limits"] = _simpleRenderer({
 
 // ===================== spec-v1411: curtain wall mullion deflection limit =====================
 // Part of the 2026-08-26 trade expansion. See specs/scope-trade-expansion.md.
-// dims: in { span_in: L, tributary_width_ft: L, wind_pressure_psf: M L^-1 T^-2, modulus_psi: M L^-1 T^-2, allowable_stress_psi: M L^-1 T^-2 } out: { line_load_pli: M T^-2, allowable_deflection_in: L, required_i_in4: L^4, moment_in_lb: M L^2 T^-2 }
+// dims: in { span_in: L, tributary_width_ft: L, wind_pressure_psf: M L^-1 T^-2, modulus_psi: M L^-1 T^-2, allowable_stress_psi: M L^-1 T^-2 } out: { line_load_pli: M T^-2, allowable_deflection_in: L, required_i_in4: L^4, moment_in_lb: M L^2 T^-2, required_s_in3: L^3 }
 export function computeCurtainWallMullionDeflection({ span_in = 0, tributary_width_ft = 0, wind_pressure_psf = 0, modulus_psi = 10000000, allowable_stress_psi = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(span_in > 0)) return { error: "Mullion span must be positive." };
@@ -13735,7 +13735,7 @@ const _wzbNum = (v, what, opt) => {
   return { v: Number(v) };
 };
 
-// dims: in { speed_mph: L T^-1, work_length_ft: L, taper_ft: L, lane_width_ft: L, downstream_taper_ft: L, shadow_offset_ft: L } out: { buffer_ft: L, tangent_spacing_ft: L, taper_spacing_ft: L, merging_taper_ft: L, activity_area_ft: L, closure_ft: L, buffer_devices: dimensionless, work_devices: dimensionless }
+// dims: in { speed_mph: L T^-1, work_length_ft: L, taper_ft: L, lane_width_ft: L, downstream_taper_ft: L, shadow_offset_ft: L } out: { buffer_ft: L, tangent_spacing_ft: L, taper_spacing_ft: L, merging_taper_ft: L, activity_area_ft: L, closure_ft: L, buffer_devices: dimensionless, work_devices: dimensionless, row_speed_mph: L T^-1 }
 export function computeWorkZoneBufferSpace({ speed_mph, work_length_ft, taper_ft = null, lane_width_ft = 12, downstream_taper_ft = 50, shadow_offset_ft = 0 } = {}) {
   const v = {};
   for (const [k, x, w, opt] of [["S", speed_mph, "speed (mph)"], ["wk", work_length_ft, "work space length (ft)"], ["L", taper_ft, "merging taper (ft)", true], ["W", lane_width_ft ?? 12, "lane width (ft)"], ["dt", downstream_taper_ft ?? 50, "downstream taper (ft)"], ["sh", shadow_offset_ft ?? 0, "shadow vehicle offset (ft)"]]) {

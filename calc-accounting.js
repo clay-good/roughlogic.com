@@ -715,7 +715,7 @@ const HOME_OFFICE_SIMPLIFIED_RATE = 5;   // $/ft^2
 const HOME_OFFICE_SIMPLIFIED_MAX_FT2 = 300;
 const HOME_OFFICE_SIMPLIFIED_CAP = 1500; // $5 x 300
 
-// dims: in { office_ft2: L^2, home_ft2: L^2, total_home_expenses: dimensionless } out: { simplified_deduction: dimensionless, actual_deduction: dimensionless, recommended_deduction: dimensionless, office_use_pct: dimensionless }
+// dims: in { office_ft2: L^2, home_ft2: L^2, total_home_expenses: dimensionless } out: { simplified_deduction: dimensionless, actual_deduction: dimensionless, recommended_deduction: dimensionless, office_use_pct: dimensionless, home_ft2: L^2, office_ft2: L^2 }
 export function computeHomeOffice({
   office_ft2 = 0,
   home_ft2 = 0,
@@ -1530,7 +1530,7 @@ ACCOUNTING_RENDERERS["effective-annual-rate"] = renderEffectiveAnnualRate;
 
 // --- v20 R.2: Markup vs. margin converter (`markup-vs-margin`) ---
 // markup% = (price-cost)/cost*100; margin% = (price-cost)/price*100.
-// dims: in { cost: dimensionless, price: dimensionless, markup_pct: dimensionless, margin_pct: dimensionless, units: dimensionless } out: { markup_pct: dimensionless, margin_pct: dimensionless }
+// dims: in { cost: dimensionless, price: dimensionless, markup_pct: dimensionless, margin_pct: dimensionless, units: dimensionless } out: { markup_pct: dimensionless, margin_pct: dimensionless, cost: dimensionless, price: dimensionless }
 export function computeMarkupVsMargin({ cost = 0, price = 0, markup_pct = 0, margin_pct = 0, units = 0 } = {}) {
   let C = Number(cost) || 0;
   let P = Number(price) || 0;

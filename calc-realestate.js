@@ -799,7 +799,7 @@ export function renderCapRateDSCR(inputRegion, outputRegion, citationEl) {
 // 10-15 strong / >15 secondary or value-add.
 
 // dims: in { cash_invested: dimensionless, annual_pretax_cashflow: dimensionless }
-//        out: { cash_invested: dimensionless, annual_pretax_cashflow: dimensionless, cash_on_cash_percent: dimensionless, band: dimensionless }
+//        out: { cash_invested: dimensionless, annual_pretax_cashflow: dimensionless, cash_on_cash_percent: dimensionless, band: dimensionless, payback_years: T }
 // (Cash-on-cash return = cashflow / invested = dimensionless
 //  ratio of like-dim dollars; band is a categorical token.)
 export function computeCashOnCash({ cash_invested, annual_pretax_cashflow }) {
@@ -1355,7 +1355,7 @@ const RENTAL_EXPENSE_FIELDS = [
 ];
 
 // dims: in { inputs: dimensionless }
-//        out: { gross_rent: dimensionless, vacancy_loss: dimensionless, effective_gross_income: dimensionless, operating_expenses: dimensionless, noi_annual: dimensionless, annual_debt_service: dimensionless, cash_flow: dimensionless, cap_rate_percent: dimensionless, cash_on_cash_percent: dimensionless, dscr: dimensionless, grm: dimensionless, value_at_market_grm: dimensionless }
+//        out: { gross_rent: dimensionless, vacancy_loss: dimensionless, effective_gross_income: dimensionless, operating_expenses: dimensionless, noi_annual: dimensionless, annual_debt_service: dimensionless, cash_flow: dimensionless, cap_rate_percent: dimensionless, cash_on_cash_percent: dimensionless, dscr: dimensionless, grm: dimensionless, value_at_market_grm: dimensionless, cash_on_cash_pct: dimensionless, expense_ratio_pct: dimensionless }
 // (Rental-property cash-flow worksheet. All monetary aggregates
 //  are dimensionless dollars per the §7.1 monetary convention;
 //  cap rate, cash-on-cash, DSCR, and the gross-rent multiplier are
@@ -1557,7 +1557,7 @@ async function loadShard(file) {
 }
 
 // dims: in { shard: dimensionless, state: dimensionless, county_fips: dimensionless, county_name: dimensionless }
-//        out: { conforming_limit: dimensionless, conforming_high_cost_limit: dimensionless, fha_limit: dimensionless, va_no_down_limit: dimensionless, county: dimensionless, source: dimensionless, asOf: dimensionless }
+//        out: { conforming_limit: dimensionless, conforming_high_cost_limit: dimensionless, fha_limit: dimensionless, va_no_down_limit: dimensionless, county: dimensionless, source: dimensionless, asOf: dimensionless, year: dimensionless }
 // (FHFA / FHA / VA county-level loan-limit shard lookup. Monetary
 //  caps are dimensionless dollars per the §7.1 monetary
 //  convention; county / source / asOf tokens are categorical.)
@@ -1870,7 +1870,7 @@ export function renderMortgagePointBreakeven(inputRegion, outputRegion, citation
 // interest line on the CFPB Closing Disclosure.
 
 // dims: in { loan_amount: dimensionless, annual_rate_pct: dimensionless, closing_date_iso: dimensionless, day_count: dimensionless }
-//        out: { days_to_eom: T }
+//        out: { days_to_eom: T, basis: dimensionless }
 // (Monetary aggregates and the annual rate are dimensionless; the
 //  closing date and day-count convention are categorical; the day
 //  count to end-of-month carries time dimension T.)
@@ -1957,7 +1957,7 @@ export function renderPerDiemInterest(inputRegion, outputRegion, citationEl) {
 // months figure is user-supplied.
 
 // dims: in { piti_monthly: dimensionless, reserves_months: T, liquid_assets: dimensionless, retirement_balance: dimensionless, retirement_allowable_pct: dimensionless }
-//        out: { required: dimensionless }
+//        out: { required: dimensionless, delta: dimensionless }
 // (Monetary aggregates and the allowable percent are dimensionless;
 //  the reserves requirement carries time dimension T (months of PITI).)
 export function computeMortgageReserves({ piti_monthly, reserves_months, liquid_assets, retirement_balance, retirement_allowable_pct }) {
@@ -2865,7 +2865,7 @@ function renderBrrrrRefi(inputRegion, outputRegion, citationEl) {
 }
 REALESTATE_RENDERERS["brrrr-refi"] = renderBrrrrRefi;
 
-// dims: in { cash_invested_usd: dimensionless, annual_cash_flow_usd: dimensionless, principal_paydown_usd: dimensionless, appreciation_usd: dimensionless, tax_savings_usd: dimensionless } out: { total_usd: dimensionless, total_pct: dimensionless }
+// dims: in { cash_invested_usd: dimensionless, annual_cash_flow_usd: dimensionless, principal_paydown_usd: dimensionless, appreciation_usd: dimensionless, tax_savings_usd: dimensionless } out: { total_usd: dimensionless, total_pct: dimensionless, appr_pct: dimensionless, cf_pct: dimensionless, paydown_pct: dimensionless, tax_pct: dimensionless }
 export function computeRentalTotalReturn({ cash_invested_usd = 0, annual_cash_flow_usd = 0, principal_paydown_usd = 0, appreciation_usd = 0, tax_savings_usd = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const cash = Number(cash_invested_usd) || 0;

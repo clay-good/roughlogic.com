@@ -27,7 +27,7 @@ export const STEAMPRESSURE_RENDERERS = {};
 // ===================== spec-v588 B: steam orifice / PRV capacity (Napier) =====================
 // choked = P2 < 0.58*P1. W = 51.5*Cd*A*P1 (saturated, choked). 51.5 is the API 520 / ASME steam
 // constant the citation names; Napier's own AP/70 lb/s is 51.43 lb/hr, which this used until 2026-09-25.
-// dims: in { orifice_area_in2: L^2, upstream_p_psia: M L^-1 T^-2, downstream_p_psia: M L^-1 T^-2, discharge_coeff: dimensionless } out: { steam_capacity_lb_hr: M T^-1 }
+// dims: in { orifice_area_in2: L^2, upstream_p_psia: M L^-1 T^-2, downstream_p_psia: M L^-1 T^-2, discharge_coeff: dimensionless } out: { steam_capacity_lb_hr: M T^-1, choke_threshold_psia: M L^-1 T^-2 }
 export function computeSteamPrvNapier({ orifice_area_in2 = 0, upstream_p_psia = 0, downstream_p_psia = 0, discharge_coeff = 0.9 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const A = Number(orifice_area_in2) || 0;
@@ -216,7 +216,7 @@ STEAMPRESSURE_RENDERERS["radiator-edr-output"] = _v990renderRadiatorEdrOutput;
 // R is the INSIDE radius, E the joint efficiency, and the corrosion allowance is added AFTER.
 // Validity: cylinder t <= R/2 and P <= 0.385 S E; sphere t <= 0.356 R and P <= 0.665 S E. Both formulas and both limits were
 // confirmed against two independent published sources before shipping.
-// dims: in { design_pressure_psi: M L^-1 T^-2, inside_radius_in: L, allowable_stress_psi: M L^-1 T^-2, joint_efficiency: dimensionless, corrosion_allowance_in: L, geometry: dimensionless } out: { t_required_in: L, t_with_allowance_in: L, mawp_psi: M L^-1 T^-2 }
+// dims: in { design_pressure_psi: M L^-1 T^-2, inside_radius_in: L, allowable_stress_psi: M L^-1 T^-2, joint_efficiency: dimensionless, corrosion_allowance_in: L, geometry: dimensionless } out: { t_required_in: L, t_with_allowance_in: L, mawp_psi: M L^-1 T^-2, pressure_limit_psi: M L^-1 T^-2, thickness_limit_in: L }
 export function computeAsmeShellThickness({ design_pressure_psi = 0, inside_radius_in = 0, allowable_stress_psi = 0, joint_efficiency = 0.85, corrosion_allowance_in = 0.0625, geometry = "cylindrical" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const P = Number(design_pressure_psi) || 0;

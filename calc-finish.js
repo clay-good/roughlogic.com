@@ -137,7 +137,7 @@ FINISH_RENDERERS["thinset-coverage"] = _simpleRenderer({
 });
 
 const _FLOORING_WASTE = { straight: 10, diagonal: 15, herringbone: 17 }; // percent by install pattern
-// dims: in { room_length_ft: L, room_width_ft: L, box_coverage_sqft: L^2, pattern: dimensionless, waste_pct: dimensionless, plank_width_in: L } out: { order_area: L^2, boxes: dimensionless, full_rows: dimensionless, remainder: L }
+// dims: in { room_length_ft: L, room_width_ft: L, box_coverage_sqft: L^2, pattern: dimensionless, waste_pct: dimensionless, plank_width_in: L } out: { order_area: L^2, boxes: dimensionless, full_rows: dimensionless, remainder: L, usable_width_in: L }
 export function computeFlooringTakeoff({ room_length_ft = 0, room_width_ft = 0, box_coverage_sqft = 20, pattern = "straight", waste_pct = 0, plank_width_in = 0, expansion_gap_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (waste_pct < 0) return { error: "Waste must be non-negative." };
@@ -279,7 +279,7 @@ FINISH_RENDERERS["retaining-wall-block"] = _simpleRenderer({
 // ===================== spec-v98: roofing trim-out =====================
 
 const _ATTIC_DIVISOR = { "150": 150, "300": 300 };
-// dims: in { attic_floor_area_sqft: L^2, ratio: dimensionless, intake_vent_nfa_sqin: L^2, ridge_nfa_per_lf_sqin: L^2 } out: { nfa_sqin: L^2, intake_vents: dimensionless, ridge_lf: L }
+// dims: in { attic_floor_area_sqft: L^2, ratio: dimensionless, intake_vent_nfa_sqin: L^2, ridge_nfa_per_lf_sqin: L^2 } out: { nfa_sqin: L^2, intake_vents: dimensionless, ridge_lf: L, exhaust_sqin: L^2, intake_sqin: L^2, nfa_sqft: L^2 }
 export function computeAtticVentilation({ attic_floor_area_sqft = 0, ratio = "150", intake_vent_nfa_sqin = 9, ridge_nfa_per_lf_sqin = 18 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (intake_vent_nfa_sqin < 0 || ridge_nfa_per_lf_sqin < 0) return { error: "Vent net free areas must be non-negative." };
@@ -373,7 +373,7 @@ FINISH_RENDERERS["gutter-downspout"] = _simpleRenderer({
 // ===================== spec-v789: deck board and fastener takeoff =====================
 // Boards run the length; their count is set by the width they cover (allowing the gap
 // between boards, none after the last): N = ceil((width_in + gap) / (face + gap)).
-// dims: in { deck_width_ft: L, deck_length_ft: L, board_face_width_in: L, gap_in: L, joist_spacing_in: L, waste_pct: dimensionless } out: { boards: dimensionless, lineal_ft: L, joists: dimensionless, screws: dimensionless }
+// dims: in { deck_width_ft: L, deck_length_ft: L, board_face_width_in: L, gap_in: L, joist_spacing_in: L, waste_pct: dimensionless } out: { boards: dimensionless, lineal_ft: L, joists: dimensionless, screws: dimensionless, waste_pct: dimensionless }
 export function computeDeckBoardTakeoff({ deck_width_ft = 0, deck_length_ft = 0, board_face_width_in = 5.5, gap_in = 0.25, joist_spacing_in = 16, waste_pct = 10 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const W = Number(deck_width_ft) || 0;
@@ -746,7 +746,7 @@ FINISH_RENDERERS["closet-shelf-takeoff"] = _simpleRenderer({
 // every source states alongside it. Past the limit the overhang needs corbels or steel: brackets
 // at the entered spacing (24 in default), each extending about 2/3 of the overhang under the stone.
 // Slab weight comes from an ENTERED density (170 pcf granite default), never a recalled table.
-// dims: in { overhang_in: L, total_depth_in: L, thickness_cm: L, run_length_ft: L, bracket_spacing_in: L, density_pcf: M L^-3, unsupported_limit_override_in: L } out: { governing_limit_in: L, overhang_weight_plf: M T^-2, brackets: dimensionless, bracket_depth_in: L }
+// dims: in { overhang_in: L, total_depth_in: L, thickness_cm: L, run_length_ft: L, bracket_spacing_in: L, density_pcf: M L^-3, unsupported_limit_override_in: L } out: { governing_limit_in: L, overhang_weight_plf: M T^-2, brackets: dimensionless, bracket_depth_in: L, one_third_limit_in: L, thickness_limit_in: L }
 export function computeCountertopOverhangSupport({ overhang_in = 0, total_depth_in = 25.5, thickness_cm = 3, run_length_ft = 0, bracket_spacing_in = 24, density_pcf = 170, unsupported_limit_override_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const oh = Number(overhang_in) || 0;
@@ -813,7 +813,7 @@ FINISH_RENDERERS["countertop-overhang-support"] = _simpleRenderer({
 // corners consume depth from one leg, appliance openings come OUT, and fillers go IN. Base, wall,
 // and tall runs are priced separately because their per-foot cost differs. Counts are reported in
 // both linear feet and standard-width cabinet equivalents.
-// dims: in { base_wall_ft: L, wall_cab_ft: L, tall_ft: L, appliance_openings_ft: L, corners: dimensionless, cabinet_depth_in: L, filler_per_corner_in: L, standard_width_in: L, toe_kick_height_in: L } out: { base_lf: L, wall_lf: L, tall_lf: L, total_lf: L, base_cabinets: dimensionless }
+// dims: in { base_wall_ft: L, wall_cab_ft: L, tall_ft: L, appliance_openings_ft: L, corners: dimensionless, cabinet_depth_in: L, filler_per_corner_in: L, standard_width_in: L, toe_kick_height_in: L } out: { base_lf: L, wall_lf: L, tall_lf: L, total_lf: L, base_cabinets: dimensionless, corner_loss_ft: L, countertop_lf: L, filler_ft: L, toe_kick_lf: L, toe_kick_sf: L^2 }
 export function computeCabinetLinearFeet({ base_wall_ft = 0, wall_cab_ft = 0, tall_ft = 0, appliance_openings_ft = 0, corners = 0, cabinet_depth_in = 24, filler_per_corner_in = 3, standard_width_in = 24, toe_kick_height_in = 4 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const baseRun = Number(base_wall_ft) || 0;
@@ -883,7 +883,7 @@ FINISH_RENDERERS["cabinet-linear-feet"] = _simpleRenderer({
 // the one thing that matters: RAKES run up the slope and eaves do not. A rake measured off the
 // plan under-orders by the slope factor sqrt(1 + (rise/12)^2) - 12% on a 6:12, 20% on a 8:12. The
 // two also take different profiles, so they are counted separately, and pieces account for the lap.
-// dims: in { eave_length_ft: L, rake_run_ft: L, rake_count: dimensionless, pitch_rise_per_12: dimensionless, stock_length_ft: L, lap_in: L, waste_pct: dimensionless } out: { slope_factor: dimensionless, eave_lf: L, rake_lf: L, total_lf: L, pieces: dimensionless }
+// dims: in { eave_length_ft: L, rake_run_ft: L, rake_count: dimensionless, pitch_rise_per_12: dimensionless, stock_length_ft: L, lap_in: L, waste_pct: dimensionless } out: { slope_factor: dimensionless, eave_lf: L, rake_lf: L, total_lf: L, pieces: dimensionless, effective_piece_ft: L, rake_plan_lf: L, rake_slope_gain_lf: L, total_with_waste_lf: L }
 export function computeDripEdgeTakeoff({ eave_length_ft = 0, rake_run_ft = 0, rake_count = 0, pitch_rise_per_12 = 0, stock_length_ft = 10, lap_in = 2, waste_pct = 10 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const eave = Number(eave_length_ft) || 0;
@@ -952,7 +952,7 @@ FINISH_RENDERERS["drip-edge-takeoff"] = _simpleRenderer({
 // The valley run multiplier is the same 17-inch-rule geometry, sqrt(pitch^2 + 288)/12 - computed
 // inline rather than imported so no cross-module runtime dependency is created, with the bounds
 // fuzzer pinning that it agrees with computeHipValleyRafter exactly.
-// dims: in { valley_run_ft: L, valley_count: dimensionless, pitch_rise_per_12: dimensionless, metal_width_in: L, stock_length_ft: L, lap_in: L, waste_pct: dimensionless } out: { valley_multiplier: dimensionless, valley_length_ft: L, total_valley_lf: L, pieces: dimensionless, metal_area_sf: L^2 }
+// dims: in { valley_run_ft: L, valley_count: dimensionless, pitch_rise_per_12: dimensionless, metal_width_in: L, stock_length_ft: L, lap_in: L, waste_pct: dimensionless } out: { valley_multiplier: dimensionless, valley_length_ft: L, total_valley_lf: L, pieces: dimensionless, metal_area_sf: L^2, effective_piece_ft: L, ice_barrier_sf: L^2, total_with_waste_lf: L }
 export function computeValleyFlashingTakeoff({ valley_run_ft = 0, valley_count = 1, pitch_rise_per_12 = 6, metal_width_in = 24, stock_length_ft = 10, lap_in = 6, waste_pct = 10 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const run = Number(valley_run_ft) || 0;
@@ -1026,7 +1026,7 @@ FINISH_RENDERERS["valley-flashing-takeoff"] = _simpleRenderer({
 //   FHWA NHI-10-024 4.4.7.d: twice the block depth or 32 in, whichever is less.
 // The three agree on 2 x depth; they differ only in the absolute ceiling, so the tile takes
 // the most restrictive and says which rule produced it.
-// dims: in { wall_height_ft: L, block_depth_in: L, block_height_in: L, base_course_buried_in: L, ncma_suggested_max_in: L, grid_length_basis: dimensionless } out: { spacing_limit_in: L, actual_spacing_in: L, courses_per_layer: dimensionless, layer_count: dimensionless, first_layer_height_in: L, top_layer_height_in: L, unreinforced_crest_in: L, crest_limit_in: L, grid_length_ft: L, grid_sf_per_lf: L, compaction_lifts: dimensionless }
+// dims: in { wall_height_ft: L, block_depth_in: L, block_height_in: L, base_course_buried_in: L, ncma_suggested_max_in: L, grid_length_basis: dimensionless } out: { spacing_limit_in: L, actual_spacing_in: L, courses_per_layer: dimensionless, layer_count: dimensionless, first_layer_height_in: L, top_layer_height_in: L, unreinforced_crest_in: L, crest_limit_in: L, grid_length_ft: L, grid_sf_per_lf: L, compaction_lifts: dimensionless, exposed_ft: L, twice_depth_in: L }
 export function computeSrwGeogridSpacing({ wall_height_ft = 0, block_depth_in = 12, block_height_in = 8, base_course_buried_in = 0, ncma_suggested_max_in = 24, grid_length_basis = 0.6 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const H_ft = Number(wall_height_ft) || 0;
@@ -1129,7 +1129,7 @@ FINISH_RENDERERS["srw-geogrid-spacing"] = _simpleRenderer({
 // 1/300 rather than 1/150), so shipping one number as if it were universal would be wrong.
 // Net free area per vent is also an input - it is product data off the vent, and it is much
 // less than the rough opening once the mesh or louver is counted.
-// dims: in { floor_area_sf: L^2, base_ratio_denominator: dimensionless, vapor_retarder: dimensionless, cross_ventilated: dimensionless, vent_net_free_sqin: L^2, corner_count: dimensionless } out: { required_sf: L^2, required_sqin: L^2, ratio_used: dimensionless, vents_by_area: dimensionless, vents_required: dimensionless, provided_sqin: L^2, surplus_sqin: L^2 }
+// dims: in { floor_area_sf: L^2, base_ratio_denominator: dimensionless, vapor_retarder: dimensionless, cross_ventilated: dimensionless, vent_net_free_sqin: L^2, corner_count: dimensionless } out: { required_sf: L^2, required_sqin: L^2, ratio_used: dimensionless, vents_by_area: dimensionless, vents_required: dimensionless, provided_sqin: L^2, surplus_sqin: L^2, alt_required_sqin: L^2 }
 export function computeCrawlSpaceVentilation({ floor_area_sf = 0, base_ratio_denominator = 150, vapor_retarder = "no", cross_ventilated = "no", vent_net_free_sqin = 50, corner_count = 4 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const area = Number(floor_area_sf) || 0;
@@ -1211,7 +1211,7 @@ FINISH_RENDERERS["crawl-space-ventilation"] = _simpleRenderer({
 // ===========================================================================
 
 // ===================== spec-v1447: airless spray tip selection =====================
-// dims: in { tip_number: dimensionless, pressure_psi: M L^-1 T^-2, wet_film_mils: L, ref_orifice_in: L, ref_flow_gpm: L^3 T^-1, ref_pressure_psi: M L^-1 T^-2 } out: { flow_gpm: L^3 T^-1, coverage_rate_sqft_min: L^2 T^-1, travel_speed_fpm: L T^-1 }
+// dims: in { tip_number: dimensionless, pressure_psi: M L^-1 T^-2, wet_film_mils: L, ref_orifice_in: L, ref_flow_gpm: L^3 T^-1, ref_pressure_psi: M L^-1 T^-2 } out: { flow_gpm: L^3 T^-1, coverage_rate_sqft_min: L^2 T^-1, travel_speed_fpm: L T^-1, fan_width_ft: L, fan_width_in: L, orifice_in: L }
 export function computeSprayTipSelection({ tip_number = 0, pressure_psi = 0, wet_film_mils = 0, ref_orifice_in = 0.015, ref_flow_gpm = 0.24, ref_pressure_psi = 2000 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(tip_number >= 100 && tip_number <= 999)) return { error: "Tip number must be a three-digit airless tip designation (100 to 999)." };
@@ -1273,7 +1273,7 @@ FINISH_RENDERERS["spray-tip-selection"] = _simpleRenderer({
 });
 
 // ===================== spec-v1448: wall and ceiling texture takeoff =====================
-// dims: in { gross_area_sqft: L^2, openings_sqft: L^2, coverage_per_bag_sqft: L^2, waste_pct: dimensionless, bag_weight_lb: M, water_gal_per_bag: L^3 } out: { net_area_sqft: L^2, dry_weight_lb: M, mix_water_gal: L^3 }
+// dims: in { gross_area_sqft: L^2, openings_sqft: L^2, coverage_per_bag_sqft: L^2, waste_pct: dimensionless, bag_weight_lb: M, water_gal_per_bag: L^3 } out: { net_area_sqft: L^2, dry_weight_lb: M, mix_water_gal: L^3, actual_coverage_sqft: L^2, order_area_sqft: L^2 }
 export function computeTextureMaterialTakeoff({ gross_area_sqft = 0, openings_sqft = 0, coverage_per_bag_sqft = 0, waste_pct = 10, bag_weight_lb = 40, water_gal_per_bag = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(gross_area_sqft > 0)) return { error: "Gross area must be positive." };
@@ -1334,7 +1334,7 @@ const _tlcNum = (v, what) => {
   return { v: Number(v) };
 };
 
-// dims: in { run_in: L, tile_in: L, joint_in: L, min_cut_in: L } out: { pitch_in: L, start_full_cut_in: L, tile_centered_cut_in: L, joint_centered_cut_in: L, first_full_edge_in: L }
+// dims: in { run_in: L, tile_in: L, joint_in: L, min_cut_in: L } out: { pitch_in: L, start_full_cut_in: L, tile_centered_cut_in: L, joint_centered_cut_in: L, first_full_edge_in: L, joint_centered_count: dimensionless, start_full_count: dimensionless, tile_centered_count: dimensionless }
 export function computeTileLayoutCutBalance({ run_in = 0, tile_in = 0, joint_in = 0.125, min_cut_in = 0 } = {}) {
   const v = {};
   for (const [k, x, w] of [["run", run_in, "run"], ["tile", tile_in, "tile size"], ["j", joint_in ?? 0, "joint width"], ["m", min_cut_in ?? 0, "minimum cut"]]) {

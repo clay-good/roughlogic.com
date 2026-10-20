@@ -94,7 +94,7 @@ const _SQIN_PER_SQFT = 144;
 
 // ===================== spec-v1571: door closer size and opening force =====================
 
-// dims: in { door_width_in: L, door_height_in: L, door_weight_lb: M L T^-2, measured_opening_force_lbf: M L T^-2, force_limit_lbf: M L T^-2, measured_closing_time_s: T, min_closing_time_s: T, pressure_difference_inwc: M L^-1 T^-2, knob_offset_in: L } out: { closer_size: dimensionless, force_margin_lbf: M L T^-2, pressure_force_lbf: M L T^-2, closer_force_lbf: M L T^-2 }
+// dims: in { door_width_in: L, door_height_in: L, door_weight_lb: M L T^-2, measured_opening_force_lbf: M L T^-2, force_limit_lbf: M L T^-2, measured_closing_time_s: T, min_closing_time_s: T, pressure_difference_inwc: M L^-1 T^-2, knob_offset_in: L } out: { closer_size: dimensionless, force_margin_lbf: M L T^-2, pressure_force_lbf: M L T^-2, closer_force_lbf: M L T^-2, door_area_sqft: L^2 }
 export function computeDoorCloserForce({ door_width_in = 0, door_height_in = 0, door_weight_lb = 0, measured_opening_force_lbf = 0, force_limit_lbf = 5, measured_closing_time_s = 0, min_closing_time_s = 5, pressure_difference_inwc = 0, knob_offset_in = 3 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(door_width_in > 0)) return { error: "Door width must be positive." };
@@ -172,7 +172,7 @@ DOORHARDWARE_RENDERERS["door-closer-opening-force"] = _simpleRenderer({
 
 // ===================== spec-v1572: lock backset, bore, and strike layout =====================
 
-// dims: in { backset_in: L, cross_bore_dia_in: L, edge_bore_dia_in: L, door_thickness_in: L, lock_height_in: L, stile_width_in: L, accessible_min_in: L, accessible_max_in: L } out: { min_stile_required_in: L, edge_bore_side_wall_in: L, cross_bore_far_side_in: L }
+// dims: in { backset_in: L, cross_bore_dia_in: L, edge_bore_dia_in: L, door_thickness_in: L, lock_height_in: L, stile_width_in: L, accessible_min_in: L, accessible_max_in: L } out: { min_stile_required_in: L, edge_bore_side_wall_in: L, cross_bore_far_side_in: L, backset_mismatch_in: L, cross_bore_near_side_in: L, edge_bore_center_from_face_in: L, other_backset_in: L, strike_height_in: L }
 export function computeLockBacksetLayout({ backset_in = 2.375, cross_bore_dia_in = 2.125, edge_bore_dia_in = 1, door_thickness_in = 1.75, lock_height_in = 38, stile_width_in = 0, accessible_min_in = 34, accessible_max_in = 48 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(backset_in > 0)) return { error: "Backset must be positive." };
@@ -295,7 +295,7 @@ DOORHARDWARE_RENDERERS["panic-hardware-force"] = _simpleRenderer({
 
 // ===================== spec-v1574: electric lock power and standby budget =====================
 
-// dims: in { device_count: dimensionless, holding_current_a: I, inrush_current_a: I, standby_hours: T, battery_derate: dimensionless, supply_rating_a: I, installed_battery_ah: I T, alarm_current_a: I, alarm_minutes: T } out: { steady_current_a: I, peak_inrush_a: I, amp_hours_required: I T, amp_hours_after_derate: I T }
+// dims: in { device_count: dimensionless, holding_current_a: I, inrush_current_a: I, standby_hours: T, battery_derate: dimensionless, supply_rating_a: I, installed_battery_ah: I T, alarm_current_a: I, alarm_minutes: T } out: { steady_current_a: I, peak_inrush_a: I, amp_hours_required: I T, amp_hours_after_derate: I T, supply_margin_a: I }
 export function computeElectricLockPowerBudget({ device_count = 0, holding_current_a = 0, inrush_current_a = 0, standby_hours = 24, battery_derate = 0.8, supply_rating_a = 0, installed_battery_ah = 0, alarm_current_a = 0, alarm_minutes = 5 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(device_count >= 1)) return { error: "Device count must be at least 1." };
@@ -364,7 +364,7 @@ DOORHARDWARE_RENDERERS["electric-lock-power-budget"] = _simpleRenderer({
 
 // ===================== spec-v1575: maglock holding force and door leverage =====================
 
-// dims: in { rated_holding_lb: M L T^-2, lock_distance_from_hinge_in: L, handle_distance_from_hinge_in: L, door_width_in: L, gap_derate_pct: dimensionless, voltage_at_lock: M L^2 T^-3 I^-1, rated_voltage: M L^2 T^-3 I^-1, target_resistance_lb: M L T^-2 } out: { lever_ratio: dimensionless, force_at_handle_lb: M L T^-2, best_case_force_lb: M L T^-2, effective_force_lb: M L T^-2, rating_needed_lb: M L T^-2 }
+// dims: in { rated_holding_lb: M L T^-2, lock_distance_from_hinge_in: L, handle_distance_from_hinge_in: L, door_width_in: L, gap_derate_pct: dimensionless, voltage_at_lock: M L^2 T^-3 I^-1, rated_voltage: M L^2 T^-3 I^-1, target_resistance_lb: M L T^-2 } out: { lever_ratio: dimensionless, force_at_handle_lb: M L T^-2, best_case_force_lb: M L T^-2, effective_force_lb: M L T^-2, rating_needed_lb: M L T^-2, best_lock_distance_in: L }
 export function computeMaglockLeverage({ rated_holding_lb = 0, lock_distance_from_hinge_in = 0, handle_distance_from_hinge_in = 0, door_width_in = 0, gap_derate_pct = 0, voltage_at_lock = 24, rated_voltage = 24, target_resistance_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(rated_holding_lb > 0)) return { error: "Rated holding force must be positive." };
@@ -427,7 +427,7 @@ DOORHARDWARE_RENDERERS["maglock-holding-leverage"] = _simpleRenderer({
 
 // ===================== spec-v1576: master key system bitting capacity =====================
 
-// dims: in { cut_positions: dimensionless, usable_depths: dimensionless, mastered_positions: dimensionless, alternative_mastered_positions: dimensionless, change_keys_required: dimensionless } out: { theoretical_total: dimensionless, per_mastered_position: dimensionless, change_keys_available: dimensionless, alternative_change_keys: dimensionless, margin: dimensionless }
+// dims: in { cut_positions: dimensionless, usable_depths: dimensionless, mastered_positions: dimensionless, alternative_mastered_positions: dimensionless, change_keys_required: dimensionless } out: { theoretical_total: dimensionless, per_mastered_position: dimensionless, change_keys_available: dimensionless, alternative_change_keys: dimensionless, margin: dimensionless, utilisation_pct: dimensionless }
 export function computeMasterKeyCapacity({ cut_positions = 0, usable_depths = 0, mastered_positions = 0, alternative_mastered_positions = 0, change_keys_required = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(cut_positions >= 1)) return { error: "Cut positions must be at least 1." };
@@ -564,7 +564,7 @@ DOORHARDWARE_RENDERERS["key-cut-macs-check"] = _simpleRenderer({
 
 // ===================== spec-v1578: door undercut free area and transfer air =====================
 
-// dims: in { door_width_in: L, undercut_in: L, required_cfm: L^3 T^-1, max_velocity_fpm: L T^-1 } out: { free_area_sqin: L^2, free_area_sqft: L^2, cfm_at_velocity: L^3 T^-1, velocity_at_required_fpm: L T^-1, undercut_needed_in: L, grille_free_area_sqft: L^2 }
+// dims: in { door_width_in: L, undercut_in: L, required_cfm: L^3 T^-1, max_velocity_fpm: L T^-1 } out: { free_area_sqin: L^2, free_area_sqft: L^2, cfm_at_velocity: L^3 T^-1, velocity_at_required_fpm: L T^-1, undercut_needed_in: L, grille_free_area_sqft: L^2, shortfall_cfm: L^3 T^-1 }
 export function computeDoorUndercutTransferAir({ door_width_in = 0, undercut_in = 0, required_cfm = 0, max_velocity_fpm = 300 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(door_width_in > 0)) return { error: "Door width must be positive." };
@@ -611,7 +611,7 @@ DOORHARDWARE_RENDERERS["door-undercut-transfer-air"] = _simpleRenderer({
 
 // ===================== spec-v1579: fire door clearance and inspection limits =====================
 
-// dims: in { head_in: L, hinge_jamb_in: L, strike_jamb_in: L, meeting_edge_in: L, bottom_in: L, perimeter_limit_in: L, meeting_limit_in: L, bottom_limit_in: L } out: { head_margin_in: L, hinge_margin_in: L, strike_margin_in: L, meeting_margin_in: L, bottom_margin_in: L }
+// dims: in { head_in: L, hinge_jamb_in: L, strike_jamb_in: L, meeting_edge_in: L, bottom_in: L, perimeter_limit_in: L, meeting_limit_in: L, bottom_limit_in: L } out: { head_margin_in: L, hinge_margin_in: L, strike_margin_in: L, meeting_margin_in: L, bottom_margin_in: L, bottom_reduction_needed_in: L, covering_headroom_in: L, failure_count: dimensionless }
 export function computeFireDoorClearance({ head_in = 0, hinge_jamb_in = 0, strike_jamb_in = 0, meeting_edge_in = 0, bottom_in = 0, perimeter_limit_in = 0.125, meeting_limit_in = 0.125, bottom_limit_in = 0.75 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // Until 2026-10-14 the page read five blank clearances as 0 in and passed the door.
@@ -679,7 +679,7 @@ DOORHARDWARE_RENDERERS["fire-door-clearance"] = _simpleRenderer({
 
 // ===================== spec-v1580: slide gate operator force and duty cycle =====================
 
-// dims: in { gate_weight_lb: M L T^-2, rolling_coefficient: dimensionless, grade_pct: dimensionless, gate_length_ft: L, operator_speed_fps: L T^-1, cycles_per_day: dimensionless, operating_hours: T, operator_rated_force_lb: M L T^-2, intermittent_duty_limit_pct: dimensionless } out: { rolling_force_lb: M L T^-2, grade_force_lb: M L T^-2, total_force_lb: M L T^-2, travel_time_s: T, cycle_time_s: T, duty_cycle_pct: dimensionless }
+// dims: in { gate_weight_lb: M L T^-2, rolling_coefficient: dimensionless, grade_pct: dimensionless, gate_length_ft: L, operator_speed_fps: L T^-1, cycles_per_day: dimensionless, operating_hours: T, operator_rated_force_lb: M L T^-2, intermittent_duty_limit_pct: dimensionless } out: { rolling_force_lb: M L T^-2, grade_force_lb: M L T^-2, total_force_lb: M L T^-2, travel_time_s: T, cycle_time_s: T, duty_cycle_pct: dimensionless, grade_share_pct: dimensionless }
 export function computeGateOperatorDuty({ gate_weight_lb = 0, rolling_coefficient = 0.1, grade_pct = 0, gate_length_ft = 0, operator_speed_fps = 0, cycles_per_day = 0, operating_hours = 0, operator_rated_force_lb = 0, intermittent_duty_limit_pct = 10 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (operating_hours > 24) return { error: "Operating hours are per day, 24 or fewer." };

@@ -220,7 +220,7 @@ DRAINAGE_RENDERERS["roof-drain-sizing"] = renderRoofDrainSizing;
 const _IPC_712_4_2_MIN_GPM = { 2: 21, 2.5: 30, 3: 46 };
 // IPC Table 712.4.2 minimum sewage pump/ejector capacity by discharge size, added 2026-10-09: 2 in 21 gpm,
 // 2-1/2 in 30 gpm, 3 in 46 gpm -- each is 2 ft/s scouring velocity in that pipe, reported alongside.
-// dims: in { basin_dia: L, drawdown_in: L, inflow_gpm: L^3 T^-1, pump_gpm: L^3 T^-1, min_run_s: T, discharge_in: L } out: { drawdown_gal: L^3, run_time_s: T, fill_time_s: T, cycles_per_hr: T^-1, discharge_velocity_fps: L T^-1 }
+// dims: in { basin_dia: L, drawdown_in: L, inflow_gpm: L^3 T^-1, pump_gpm: L^3 T^-1, min_run_s: T, discharge_in: L } out: { drawdown_gal: L^3, run_time_s: T, fill_time_s: T, cycles_per_hr: T^-1, discharge_velocity_fps: L T^-1, discharge_in: L }
 // (Basin diameter and float spread are lengths L; the 7.48 gal/ft^3 constant
 //  turns the L^3 band into a volume; inflow and pump rates are L^3 T^-1, so
 //  volume over rate gives the run and fill times T and cycles per hour T^-1.)
@@ -589,7 +589,7 @@ export function renderManningSlope(inputRegion, outputRegion, citationEl) {
   for (const el of [d.input, f.input, m.select, sv.input, as.input]) el.addEventListener("input", update);
 }
 
-// dims: in { d_in: L, slope: dimensionless, material: dimensionless } out: { v_fps: L T^-1, q_cfs: L^3 T^-1, q_gpm: L^3 T^-1 }
+// dims: in { d_in: L, slope: dimensionless, material: dimensionless } out: { v_fps: L T^-1, q_cfs: L^3 T^-1, q_gpm: L^3 T^-1, a_ft2: L^2, r_ft: L }
 export function computeManningPipeCapacity({ d_in = 0, slope = 0, material = "pvc" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(d_in > 0)) return { error: "Pipe diameter must be positive (in)." };
@@ -648,7 +648,7 @@ function _v1011root(f, a, b) {
 const THETA_MAX_Q = _v1011root((t) => 3 * t - 5 * t * Math.cos(t) + 2 * Math.sin(t), 4.0, 6.0);
 const THETA_MAX_V = _v1011root((t) => Math.tan(t) - t, Math.PI + 1e-9, 3 * Math.PI / 2 - 1e-9);
 
-// dims: in { d_in: L, slope: dimensionless, flow_gpm: L^3 T^-1, material: dimensionless } out: { depth_in: L, d_over_d: dimensionless, v_fps: L T^-1, a_ft2: L^2, r_ft: L, q_full_gpm: L^3 T^-1, q_max_gpm: L^3 T^-1, shear_psf: M L^-1 T^-2 }
+// dims: in { d_in: L, slope: dimensionless, flow_gpm: L^3 T^-1, material: dimensionless } out: { depth_in: L, d_over_d: dimensionless, v_fps: L T^-1, a_ft2: L^2, r_ft: L, q_full_gpm: L^3 T^-1, q_max_gpm: L^3 T^-1, shear_psf: M L^-1 T^-2, d_ft: L, d_over_d_at_max_v: M L^2 T^-3 I^-1 }
 export function computePipePartialFlowDepth({ d_in = 0, slope = 0, flow_gpm = 0, material = "pvc" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(d_in > 0)) return { error: "Pipe diameter must be positive (in)." };
@@ -932,7 +932,7 @@ function _tr55InterpTable(table, x, yLo, yHi) {
   return last[1];
 }
 // dims: in { tc_hr: T, curve_number: dimensionless, rainfall_in: L, area_mi2: L^2, pond_pct: dimensionless }
-//       out: { qp_cfs: L^3 T^-1, runoff_in: L, retention_s_in: L, initial_abstraction_in: L }
+//       out: { qp_cfs: L^3 T^-1, runoff_in: L, retention_s_in: L, initial_abstraction_in: L, qu_csm_in: L }
 // (qu is the empirical unit peak discharge in csm/in and Ia/P, Fp are dimensionless ratios;
 //  the peak discharge qp = qu*Am*Q*Fp resolves to a volumetric flow L^3 T^-1.)
 export function computeTr55GraphicalPeakDischarge({ tc_hr = 0, curve_number = 0, rainfall_in = 0, area_mi2 = 0, rainfall_type = "II", pond_pct = 0 } = {}) {
@@ -1158,7 +1158,7 @@ const _CULVERT_INLET = {
   cmp_projecting:             { K: 0.0340, M: 1.50, c: 0.0553, Y: 0.54, Ks: -0.5, label: "Corrugated metal (CMP), projecting" },
 };
 
-// dims: in { diameter_in: L, flow_cfs: L^3 T^-1, slope: dimensionless, config: dimensionless } out: { d_ft: L, barrel_area_ft2: L^2, dc_ft: L, hc_ft: L, hw_ft: L, hw_over_d: dimensionless, hc_over_d: dimensionless }
+// dims: in { diameter_in: L, flow_cfs: L^3 T^-1, slope: dimensionless, config: dimensionless } out: { d_ft: L, barrel_area_ft2: L^2, dc_ft: L, hc_ft: L, hw_ft: L, hw_over_d: dimensionless, hc_over_d: dimensionless, vc_fps: L T^-1 }
 export function computeCulvertInletControl({ diameter_in = 0, flow_cfs = 0, slope = 0, config = "concrete_groove_headwall" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (Number(slope) > 0.5) return { error: "Enter the barrel slope in ft/ft (0.01 for 1%); a slope above 0.5 is outside these culvert relations." };
@@ -1265,7 +1265,7 @@ const _BOX_CULVERT_INLET = {
   headwall_bevel337:  { K: 0.486, M: 0.667, c: 0.0252, Y: 0.865, form: 2, label: "90 deg headwall, 33.7 deg bevels" },
 };
 
-// dims: in { span_in: L, rise_in: L, flow_cfs: L^3 T^-1, slope: dimensionless, config: dimensionless } out: { span_ft: L, rise_ft: L, barrel_area_ft2: L^2, dc_ft: L, hc_ft: L, hw_ft: L, hw_over_d: dimensionless, hc_over_d: dimensionless }
+// dims: in { span_in: L, rise_in: L, flow_cfs: L^3 T^-1, slope: dimensionless, config: dimensionless } out: { span_ft: L, rise_ft: L, barrel_area_ft2: L^2, dc_ft: L, hc_ft: L, hw_ft: L, hw_over_d: dimensionless, hc_over_d: dimensionless, vc_fps: L T^-1 }
 export function computeBoxCulvertInletControl({ span_in = 0, rise_in = 0, flow_cfs = 0, slope = 0, config = "wingwall_30_75" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (Number(slope) > 0.5) return { error: "Enter the barrel slope in ft/ft (0.01 for 1%); a slope above 0.5 is outside these culvert relations." };
@@ -1369,7 +1369,7 @@ const _CULVERT_OUTLET_KE = {
   cmp_projecting:             { ke: 0.9, label: "Corrugated metal (CMP), projecting" },
 };
 
-// dims: in { diameter_in: L, flow_cfs: L^3 T^-1, length_ft: L, slope: dimensionless, manning_n: dimensionless, tw_ft: L, config: dimensionless } out: { d_ft: L, barrel_area_ft2: L^2, v_fps: L T^-1, velocity_head_ft: L, head_loss_ft: L, dc_ft: L, ho_ft: L, hw_ft: L, friction_coeff: dimensionless, ke: dimensionless }
+// dims: in { diameter_in: L, flow_cfs: L^3 T^-1, length_ft: L, slope: dimensionless, manning_n: dimensionless, tw_ft: L, config: dimensionless } out: { d_ft: L, barrel_area_ft2: L^2, v_fps: L T^-1, velocity_head_ft: L, head_loss_ft: L, dc_ft: L, ho_ft: L, hw_ft: L, friction_coeff: dimensionless, ke: dimensionless, r_ft: L, tw_ft: L }
 export function computeCulvertOutletControl({ diameter_in = 0, flow_cfs = 0, length_ft = 0, slope = 0, manning_n, tw_ft = 0, config = "concrete_square_headwall" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (Number(slope) > 0.5) return { error: "Enter the barrel slope in ft/ft (0.01 for 1%); a slope above 0.5 is outside these culvert relations." };
@@ -1480,7 +1480,7 @@ const _BOX_OUTLET_KE = {
   headwall_bevel:   { ke: 0.2, label: "Headwall with 45 deg bevels or rounded edges" },
 };
 
-// dims: in { span_in: L, rise_in: L, flow_cfs: L^3 T^-1, length_ft: L, slope: dimensionless, manning_n: dimensionless, tw_ft: L, config: dimensionless } out: { span_ft: L, rise_ft: L, barrel_area_ft2: L^2, r_ft: L, v_fps: L T^-1, velocity_head_ft: L, head_loss_ft: L, dc_ft: L, ho_ft: L, hw_ft: L, friction_coeff: dimensionless, ke: dimensionless }
+// dims: in { span_in: L, rise_in: L, flow_cfs: L^3 T^-1, length_ft: L, slope: dimensionless, manning_n: dimensionless, tw_ft: L, config: dimensionless } out: { span_ft: L, rise_ft: L, barrel_area_ft2: L^2, r_ft: L, v_fps: L T^-1, velocity_head_ft: L, head_loss_ft: L, dc_ft: L, ho_ft: L, hw_ft: L, friction_coeff: dimensionless, ke: dimensionless, tw_ft: L }
 export function computeBoxCulvertOutletControl({ span_in = 0, rise_in = 0, flow_cfs = 0, length_ft = 0, slope = 0, manning_n = 0.012, tw_ft = 0, config = "wingwall_30_75" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (Number(slope) > 0.5) return { error: "Enter the barrel slope in ft/ft (0.01 for 1%); a slope above 0.5 is outside these culvert relations." };
@@ -1732,7 +1732,7 @@ DRAINAGE_RENDERERS["box-culvert-headwater"] = renderBoxCulvertHeadwater;
 
 // ============ spec-v1738: groundwater seepage velocity and travel time ============
 
-// dims: in { hydraulic_conductivity_ft_day: L T^-1, head_difference_ft: L, flow_path_ft: L, effective_porosity: dimensionless, travel_distance_ft: L, retardation_factor: dimensionless } out: { gradient: dimensionless, darcy_velocity_ft_day: L T^-1, seepage_velocity_ft_day: L T^-1, travel_time_days: T, travel_time_years: T, contaminant_travel_years: T }
+// dims: in { hydraulic_conductivity_ft_day: L T^-1, head_difference_ft: L, flow_path_ft: L, effective_porosity: dimensionless, travel_distance_ft: L, retardation_factor: dimensionless } out: { gradient: dimensionless, darcy_velocity_ft_day: L T^-1, seepage_velocity_ft_day: L T^-1, travel_time_days: T, travel_time_years: T, contaminant_travel_years: T, flow_path_ft: L, head_difference_ft: L, travel_distance_ft: L }
 export function computeSeepageTravelTime({ hydraulic_conductivity_ft_day = 0, head_difference_ft = 0, flow_path_ft = 0, effective_porosity = 0, travel_distance_ft = 0, retardation_factor = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(hydraulic_conductivity_ft_day > 0)) return { error: "Hydraulic conductivity must be positive (ft/day)." };
@@ -1796,7 +1796,7 @@ DRAINAGE_RENDERERS["seepage-travel-time"] = _simpleRenderer({
 
 // ============ spec-v1739: well point dewatering spacing and staging ============
 
-// dims: in { excavation_depth_ft: L, water_table_depth_ft: L, subgrade_margin_ft: L, practical_lift_ft: L, excavation_length_ft: L, excavation_width_ft: L, point_spacing_ft: L, point_capacity_gpm: L^3 T^-1 } out: { total_drawdown_ft: L, stages_required: dimensionless, drawdown_per_stage_ft: L, perimeter_ft: L, point_count: dimensionless, system_capacity_gpm: L^3 T^-1 }
+// dims: in { excavation_depth_ft: L, water_table_depth_ft: L, subgrade_margin_ft: L, practical_lift_ft: L, excavation_length_ft: L, excavation_width_ft: L, point_spacing_ft: L, point_capacity_gpm: L^3 T^-1 } out: { total_drawdown_ft: L, stages_required: dimensionless, drawdown_per_stage_ft: L, perimeter_ft: L, point_count: dimensionless, system_capacity_gpm: L^3 T^-1, excavation_depth_ft: L, excavation_length_ft: L, excavation_width_ft: L, header_length_ft: L, point_capacity_gpm: L^3 T^-1, point_spacing_ft: L, practical_lift_ft: L, subgrade_margin_ft: L, target_depth_ft: L, water_table_depth_ft: L }
 export function computeWellPointSpacing({ excavation_depth_ft = 0, water_table_depth_ft = 0, subgrade_margin_ft = 3, practical_lift_ft = 15, excavation_length_ft = 0, excavation_width_ft = 0, point_spacing_ft = 0, point_capacity_gpm = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(excavation_depth_ft > 0)) return { error: "Excavation depth must be positive (ft)." };
@@ -1865,7 +1865,7 @@ DRAINAGE_RENDERERS["well-point-spacing"] = _simpleRenderer({
 
 // ============ spec-v1740: stormwater water quality volume ============
 
-// dims: in { rainfall_depth_in: L, impervious_percent: dimensionless, area_ac: L^2, alternative_impervious_percent: dimensionless, drawdown_hours: T } out: { runoff_coefficient: dimensionless, wqv_cf: L^3, wqv_ac_ft: L^3, alternative_wqv_cf: L^3, volume_saved_cf: L^3, release_rate_cfs: L^3 T^-1 }
+// dims: in { rainfall_depth_in: L, impervious_percent: dimensionless, area_ac: L^2, alternative_impervious_percent: dimensionless, drawdown_hours: T } out: { runoff_coefficient: dimensionless, wqv_cf: L^3, wqv_ac_ft: L^3, alternative_wqv_cf: L^3, volume_saved_cf: L^3, release_rate_cfs: L^3 T^-1, alternative_impervious_percent: dimensionless, area_ac: L^2, impervious_percent: dimensionless, rainfall_depth_in: L, volume_saved_pct: dimensionless, wqv_gal: L^3 }
 export function computeWaterQualityVolume({ rainfall_depth_in = 0, impervious_percent = 0, area_ac = 0, alternative_impervious_percent = 0, drawdown_hours = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(rainfall_depth_in > 0)) return { error: "The water quality rainfall depth must be positive (in) -- commonly 1.0 to 1.5, set by the state or local manual." };

@@ -296,7 +296,7 @@ MASONRY_RENDERERS["masonry-wall-weight"] = _simpleRenderer({
   compute: computeMasonryWallWeight,
 });
 
-// dims: in { area_ft2: L^2, area_per: L^2, max_horiz_in: L, max_vert_in: L } out: { anchors: dimensionless, grid_ft2: L^2 }
+// dims: in { area_ft2: L^2, area_per: L^2, max_horiz_in: L, max_vert_in: L } out: { anchors: dimensionless, grid_ft2: L^2, max_grid_ft2: L^2, max_horiz_in: L, max_vert_in: L }
 export function computeBrickVeneerAnchorSpacing({ area_ft2 = 0, area_per = 2.67, max_horiz_in = 32, max_vert_in = 25 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const area = Number(area_ft2) || 0;
@@ -339,7 +339,7 @@ MASONRY_RENDERERS["brick-veneer-anchor-spacing"] = _simpleRenderer({
   compute: computeBrickVeneerAnchorSpacing,
 });
 
-// dims: in { span_ft: L, wall_psf: M L^-1 T^-2, wall_h_above: L } out: { tri_h_ft: L, W_lb: M L T^-2, w_udl_plf: M T^-2 }
+// dims: in { span_ft: L, wall_psf: M L^-1 T^-2, wall_h_above: L } out: { tri_h_ft: L, W_lb: M L T^-2, w_udl_plf: M T^-2, arch_h_ft: L }
 export function computeMasonryLintelLoading({ span_ft = 0, wall_psf = 0, wall_h_above = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const span = Number(span_ft) || 0;
@@ -690,7 +690,7 @@ MASONRY_RENDERERS["masonry-joint-reinforcement"] = _simpleRenderer({
 // is an INPUT, not a recalled coefficient - published secondary sources disagree on it (one-fourth
 // vs one-third of f'm), so the tile takes the designer's value from the governing code edition and
 // says so, rather than shipping a number it cannot verify.
-// dims: in { clear_span_ft: L, lintel_depth_in: L, support_center_ft: L, udl_plf: M T^-2, bearing_width_in: L, allowable_bearing_psi: M L^-1 T^-2 } out: { eff_span_ft: L, reaction_lb: M L T^-2, required_bearing_in: L, governing_bearing_in: L }
+// dims: in { clear_span_ft: L, lintel_depth_in: L, support_center_ft: L, udl_plf: M T^-2, bearing_width_in: L, allowable_bearing_psi: M L^-1 T^-2 } out: { eff_span_ft: L, reaction_lb: M L T^-2, required_bearing_in: L, governing_bearing_in: L, required_area_in2: L^2, span_by_depth_ft: L }
 export function computeMasonryLintelBearing({ clear_span_ft = 0, lintel_depth_in = 8, support_center_ft = 0, udl_plf = 0, bearing_width_in = 7.625, allowable_bearing_psi = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const clear = Number(clear_span_ft) || 0;
@@ -845,7 +845,7 @@ MASONRY_RENDERERS["fireplace-flue-area"] = _simpleRenderer({
 // And it must be established BEFORE the wall starts, not once the wall gets tall.
 // Separately, a wall over 8 ft must be braced until the permanent supporting elements are in
 // place - which is usually long after the masons have finished and left.
-// dims: in { wall_height_ft: L, wall_length_ft: L, zone_width_provided_ft: L, zone_runs_full_length: dimensionless, zone_on_unscaffolded_side: dimensionless, established_before_start: dimensionless, bracing_in_place: dimensionless } out: { required_zone_width_ft: L, zone_width_shortfall_ft: L, zone_area_sf: L^2, bracing_required: dimensionless }
+// dims: in { wall_height_ft: L, wall_length_ft: L, zone_width_provided_ft: L, zone_runs_full_length: dimensionless, zone_on_unscaffolded_side: dimensionless, established_before_start: dimensionless, bracing_in_place: dimensionless } out: { required_zone_width_ft: L, zone_width_shortfall_ft: L, zone_area_sf: L^2, bracing_required: dimensionless, provided_area_sf: L^2 }
 export function computeMasonryLimitedAccessZone({ wall_height_ft = 0, wall_length_ft = 0, zone_width_provided_ft = 0, zone_runs_full_length = "yes", zone_on_unscaffolded_side = "yes", established_before_start = "yes", bracing_in_place = "no" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const h = Number(wall_height_ft) || 0;
@@ -932,7 +932,7 @@ const _GAL_PER_CUFT = 1728 / 231;
 
 // ============ spec-v1683: ASTM C270 mortar batch proportions ============
 
-// dims: in { cement_volumes: dimensionless, lime_volumes: dimensionless, sand_ratio: dimensionless, cement_bags: dimensionless, unit_strength_psi: M L^-1 T^-2, mortar_strength_psi: M L^-1 T^-2 } out: { cementitious_cuft: L^3, sand_cuft: L^3, sand_min_cuft: L^3, sand_max_cuft: L^3, lime_bags: dimensionless, sand_shovels: dimensionless }
+// dims: in { cement_volumes: dimensionless, lime_volumes: dimensionless, sand_ratio: dimensionless, cement_bags: dimensionless, unit_strength_psi: M L^-1 T^-2, mortar_strength_psi: M L^-1 T^-2 } out: { cementitious_cuft: L^3, sand_cuft: L^3, sand_min_cuft: L^3, sand_max_cuft: L^3, lime_bags: dimensionless, sand_shovels: dimensionless, mortar_strength_psi: M L^-1 T^-2, unit_strength_psi: M L^-1 T^-2 }
 export function computeMortarBatchC270({ cement_volumes = 1, lime_volumes = 0.5, sand_ratio = 2.5, cement_bags = 1, unit_strength_psi = 0, mortar_strength_psi = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(cement_volumes > 0)) return { error: "The cement proportion must be positive (volumes)." };
@@ -1007,7 +1007,7 @@ MASONRY_RENDERERS["mortar-batch-c270"] = _simpleRenderer({
 
 // ============ spec-v1684: CMU grout lift and pour height ============
 
-// dims: in { pour_height_ft: L, lift_height_ft: L, max_pour_height_ft: L, max_lift_height_ft: L, grout_unit_weight_pcf: M L^-3, cleanout_threshold_ft: L } out: { lifts_in_pour: dimensionless, base_pressure_psi: M L^-1 T^-2, base_pressure_psf: M L^-1 T^-2, pour_margin_ft: L, lift_margin_ft: L, pressure_at_limit_psi: M L^-1 T^-2 }
+// dims: in { pour_height_ft: L, lift_height_ft: L, max_pour_height_ft: L, max_lift_height_ft: L, grout_unit_weight_pcf: M L^-3, cleanout_threshold_ft: L } out: { lifts_in_pour: dimensionless, base_pressure_psi: M L^-1 T^-2, base_pressure_psf: M L^-1 T^-2, pour_margin_ft: L, lift_margin_ft: L, pressure_at_limit_psi: M L^-1 T^-2, actual_lift_ft: L, cleanout_threshold_ft: L, lift_height_ft: L, max_lift_height_ft: L, max_pour_height_ft: L, pour_height_ft: L }
 export function computeGroutLiftPourHeight({ pour_height_ft = 0, lift_height_ft = 0, max_pour_height_ft = 0, max_lift_height_ft = 0, grout_unit_weight_pcf = 140, cleanout_threshold_ft = 5.333 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(pour_height_ft > 0)) return { error: "The proposed pour height must be positive (ft)." };
@@ -1077,7 +1077,7 @@ MASONRY_RENDERERS["grout-lift-pour-height"] = _simpleRenderer({
 
 // ============ spec-v1685: masonry cleaning dilution and coverage ============
 
-// dims: in { area_ft2: L^2, dilution_parts_water: dimensionless, coverage_ft2_per_gal: L^-1, prewet_gal_per_100ft2: L^3, rinse_gal_per_100ft2: L^3, acid_safe_unit: dimensionless } out: { diluted_gal: L^3, concentrate_gal: L^3, water_gal: L^3, prewet_gal: L^3, rinse_gal: L^3, total_water_gal: L^3 }
+// dims: in { area_ft2: L^2, dilution_parts_water: dimensionless, coverage_ft2_per_gal: L^-1, prewet_gal_per_100ft2: L^3, rinse_gal_per_100ft2: L^3, acid_safe_unit: dimensionless } out: { diluted_gal: L^3, concentrate_gal: L^3, water_gal: L^3, prewet_gal: L^3, rinse_gal: L^3, total_water_gal: L^3, area_ft2: L^2, concentrate_pct: dimensionless, coverage_ft2_per_gal: L^-1 }
 export function computeMasonryCleaningDilution({ area_ft2 = 0, dilution_parts_water = 0, coverage_ft2_per_gal = 0, prewet_gal_per_100ft2 = 0, rinse_gal_per_100ft2 = 0, acid_safe_unit = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(area_ft2 > 0)) return { error: "The area to be cleaned must be positive (sq ft)." };
@@ -1144,7 +1144,7 @@ const _hecOpt = (v, what) => {
     : Number(v) < 0 ? { error: what + " cannot be negative (in)." } : { v: Number(v) };
 };
 
-// dims: in { opening_width_in: L, opening_height_in: L, front_in: L, side_in: L, thickness_in: L, firebox_raise_in: L } out: { opening_area_sqft: L^2, req_front_in: L, req_side_in: L, footprint_width_in: L, req_thickness_in: L }
+// dims: in { opening_width_in: L, opening_height_in: L, front_in: L, side_in: L, thickness_in: L, firebox_raise_in: L } out: { opening_area_sqft: L^2, req_front_in: L, req_side_in: L, footprint_width_in: L, req_thickness_in: L, footprint_depth_in: L }
 export function computeHearthExtensionCheck({
   opening_width_in = 0, opening_height_in = 0, front_in = null, side_in = null, thickness_in = null, firebox_raise_in = 0,
 } = {}) {

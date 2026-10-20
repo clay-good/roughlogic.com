@@ -108,7 +108,7 @@ function _condensateDrainSize(tons) {
   if (tons <= 250) return 2.0;
   return null; // IMC Table 307.2.2 stops at 250 tons
 }
-// dims: in { tons: M L^2 T^-3, pints_per_ton_hr: dimensionless, run_ft: L, slope_in_per_ft: dimensionless } out: { rate_pints_hr: dimensionless, rate_gph: dimensionless, min_size_in: L, fall_in: L }
+// dims: in { tons: M L^2 T^-3, pints_per_ton_hr: M^-1 L T^2, run_ft: L, slope_in_per_ft: dimensionless } out: { rate_pints_hr: L^3 T^-1, rate_gph: L^3 T^-1, min_size_in: L, fall_in: L }
 export function computeCondensateDrain({ tons = 0, pints_per_ton_hr = 3, run_ft = 0, slope_in_per_ft = 0.125 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (run_ft < 0 || slope_in_per_ft < 0) return { error: "Run and slope must be non-negative." };
@@ -785,7 +785,7 @@ export const DUCT_LEAKAGE_LIMITS_2024 = {
   "installed-inside": { lt3: 8, ge3: 12, small_cfm: 80 },
 };
 export const DUCT_LEAKAGE_LIMITS_2021 = { "rough-in": 3, installed: 4, "rough-in-inside": 8, "installed-inside": 8 };
-// dims: in { leakage_cfm25: L^3 T^-1, cfa_ft2: L^2, limit: dimensionless, configuration: dimensionless, ducted_returns: dimensionless, code_edition: dimensionless } out: { normalized: dimensionless }
+// dims: in { leakage_cfm25: L^3 T^-1, cfa_ft2: L^2, limit: dimensionless, configuration: dimensionless, ducted_returns: dimensionless, code_edition: dimensionless } out: { normalized: dimensionless, limit: dimensionless }
 export function computeDuctLeakageCfm25({ leakage_cfm25 = 0, cfa_ft2 = 0, limit = 4, configuration, ducted_returns = "fewer-than-3", code_edition = "2024" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const leak = Number(leakage_cfm25) || 0;
@@ -1353,7 +1353,7 @@ HVACSERVICE_RENDERERS["condensate-trap-depth"] = _simpleRenderer({
 // handler wants a 24 in pan, not a 27 in one. Getting it wrong the generous way wastes
 // money and attic room; getting it wrong the other way fails inspection. Plus a 1.5 in
 // minimum depth, and a choice among the four methods the section allows.
-// dims: in { unit_width_in: L, unit_length_in: L, pan_width_in: L, pan_length_in: L, pan_depth_in: L, method: dimensionless } out: { required_width_in: L, required_length_in: L, width_deficit_in: L, length_deficit_in: L, depth_deficit_in: L, pan_area_sf: L^2 }
+// dims: in { unit_width_in: L, unit_length_in: L, pan_width_in: L, pan_length_in: L, pan_depth_in: L, method: dimensionless } out: { required_width_in: L, required_length_in: L, width_deficit_in: L, length_deficit_in: L, depth_deficit_in: L, pan_area_sf: L^2, misread_length_in: L, misread_width_in: L }
 export function computeCondensateOverflowPan({ unit_width_in = 0, unit_length_in = 0, pan_width_in = 0, pan_length_in = 0, pan_depth_in = 0, method = "pan-with-drain" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const uw = Number(unit_width_in) || 0;
@@ -1509,7 +1509,7 @@ HVACSERVICE_RENDERERS["damper-authority"] = _simpleRenderer({
 });
 
 // ===================== spec-v1416: chilled-water low delta-T screen =====================
-// dims: in { load_btuh: M L^2 T^-3, actual_gpm: L^3 T^-1, design_delta_t_f: T } out: { actual_delta_t_f: T, design_flow_gpm: L^3 T^-1, excess_flow_gpm: L^3 T^-1, pump_penalty: dimensionless }
+// dims: in { load_btuh: M L^2 T^-3, actual_gpm: L^3 T^-1, design_delta_t_f: T } out: { actual_delta_t_f: T, design_flow_gpm: L^3 T^-1, excess_flow_gpm: L^3 T^-1, pump_penalty: dimensionless, excess_pct: dimensionless }
 export function computeChilledWaterDeltaT({ load_btuh = 0, actual_gpm = 0, design_delta_t_f = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(load_btuh > 0)) return { error: "Measured load must be positive." };

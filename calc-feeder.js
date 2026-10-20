@@ -43,7 +43,7 @@ const _V26_STD_OCPD = [15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 90, 100, 110,
 function _v26StdDown(x) { let best = null; for (const s of [1, 3, 6, 10, ..._V26_STD_OCPD]) { if (s <= x) best = s; } return best; }
 function _v26StdUp(x) { for (const s of _V26_STD_OCPD) { if (s >= x) return s; } return null; }
 
-// dims: in { motors: dimensionless, nonmotor_continuous_A: I, nonmotor_noncontinuous_A: I } out: { conductor_min_A: I, feeder_ocpd_max_A: I }
+// dims: in { motors: dimensionless, nonmotor_continuous_A: I, nonmotor_noncontinuous_A: I } out: { conductor_min_A: I, feeder_ocpd_max_A: I, feeder_ocpd_raw_A: I, largest_branch_device_A: I, largest_motor_flc_A: I, motor_count: dimensionless, nonmotor_load_A: I, sum_flc_A: I }
 export function computeMotorFeederMultiple({ motors = [], nonmotor_continuous_A = 0, nonmotor_noncontinuous_A = 0 } = {}) {
   const _g = _finiteGuard({ nonmotor_continuous_A, nonmotor_noncontinuous_A }); if (_g) return _g;
   if (!Array.isArray(motors) || motors.length === 0) return { error: "Enter at least one motor (FLC and branch-device rating)." };
@@ -139,7 +139,7 @@ function _v26renderMotorFeederMultiple(inputRegion, outputRegion, citationEl) {
 }
 FEEDER_RENDERERS["motor-feeder-multiple"] = _v26renderMotorFeederMultiple;
 
-// dims: in { kva: M L^2 T^-3, primary_v: M L^2 T^-3 I^-1, secondary_v: M L^2 T^-3 I^-1, phase: dimensionless } out: { primary_fla_A: I, secondary_fla_A: I, primary_ocpd_max_A: I, secondary_ocpd_max_A: I, secondary_conductor_min_A: I }
+// dims: in { kva: M L^2 T^-3, primary_v: M L^2 T^-3 I^-1, secondary_v: M L^2 T^-3 I^-1, phase: dimensionless } out: { primary_fla_A: I, secondary_fla_A: I, primary_ocpd_max_A: I, secondary_ocpd_max_A: I, secondary_conductor_min_A: I, phase: dimensionless }
 export function computeTransformerConductorProtection({ kva = 0, primary_v = 0, secondary_v = 0, phase = 3, secondary_protection = false } = {}) {
   const _g = _finiteGuard({ kva, primary_v, secondary_v }); if (_g) return _g;
   const KVA = Number(kva) || 0;
@@ -264,7 +264,7 @@ FEEDER_RENDERERS["transformer-conductor-protection"] = _v26renderTransformerCond
 // Feeder tap conductor 10-ft / 25-ft rule (NEC 240.21(B)(1)/(B)(2)).
 // =====================================================================
 
-// dims: in { feeder_ocpd_a: I, tap_length_ft: L, tap_ampacity_a: I } out: { min_tap_ampacity_a: I, margin_a: I }
+// dims: in { feeder_ocpd_a: I, tap_length_ft: L, tap_ampacity_a: I } out: { min_tap_ampacity_a: I, margin_a: I, tap_ampacity_a: I }
 export function computeFeederTapRule({ feeder_ocpd_a = 0, tap_length_ft = 0, tap_ampacity_a = 0 } = {}) {
   const _g = _finiteGuard({ feeder_ocpd_a, tap_length_ft, tap_ampacity_a }); if (_g) return _g;
   const ocpd = Number(feeder_ocpd_a) || 0;
@@ -572,7 +572,7 @@ FEEDER_RENDERERS["ev-load-management-ems"] = _v561renderEvLoadManagementEms;
 
 // ===================== spec-v611 A: EV charger throttled-current schedule (NEC 625.42(A)) =====================
 // throttled = min(charger_max, limit/active). full_rate_count = floor(limit/charger_max). all_full = active*charger_max <= limit.
-// dims: in { aggregate_limit_a: I, charger_max_a: I, active_chargers: dimensionless } out: { throttled_a: I, full_rate_count: dimensionless, all_full: dimensionless }
+// dims: in { aggregate_limit_a: I, charger_max_a: I, active_chargers: dimensionless } out: { throttled_a: I, full_rate_count: dimensionless, all_full: dimensionless, share_a: I }
 export function computeEvChargerThrottle({ aggregate_limit_a = 0, charger_max_a = 0, active_chargers = 0 } = {}) {
   const _g = _finiteGuard({ aggregate_limit_a, charger_max_a, active_chargers }); if (_g) return _g;
   const limit = Number(aggregate_limit_a) || 0;

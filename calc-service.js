@@ -48,7 +48,7 @@ export const SERVICE_RENDERERS = {};
 // AHJ accepts a demand factor (IFGC 402.2). Default heating values: natural gas
 // ~1,000 BTU/ft^3, propane ~2,516 BTU/ft^3 (both editable).
 const GAS_HEATING_VALUE = { natural_gas: 1000, propane: 2516 };
-// dims: in { appliances: M L^2 T^-3, fuel: dimensionless, heating_value: M L^-1 T^-2 } out: { total_btuh: M L^2 T^-3, cfh: L^3 T^-1 }
+// dims: in { appliances: M L^2 T^-3, fuel: dimensionless, heating_value: M L^-1 T^-2 } out: { total_btuh: M L^2 T^-3, cfh: L^3 T^-1, appliance_count: dimensionless }
 // (Each appliance input rating is an energy rate M L^2 T^-3 (BTU/hr); the
 //  heating value is an energy density M L^-1 T^-2 (BTU/ft^3), so the connected
 //  load divided by it gives the volumetric demand L^3 T^-1 (CFH).)
@@ -384,7 +384,7 @@ function _rangeColABPct(n, colA) {
   return n <= 30 ? 24 : n <= 40 ? 22 : n <= 50 ? 20 : n <= 60 ? 18 : 16;
 }
 
-// dims: in { num_ranges: dimensionless, nameplate_kw: M L^2 T^-3, supply_v: M L^2 T^-3 I^-1 } out: { col_c_kw: M L^2 T^-3, demand_kw: M L^2 T^-3, demand_a: I }
+// dims: in { num_ranges: dimensionless, nameplate_kw: M L^2 T^-3, supply_v: M L^2 T^-3 I^-1 } out: { col_c_kw: M L^2 T^-3, demand_kw: M L^2 T^-3, demand_a: I, column_pct: dimensionless, increase_pct: dimensionless }
 export function computeRangeDemand22055({ num_ranges = 1, nameplate_kw = 0, supply_v = 240 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const n = Math.round(Number(num_ranges) || 0);
@@ -463,7 +463,7 @@ function _dryerDemandFactor(n) {
   return 0.25;
 }
 
-// dims: in { num_dryers: dimensionless, nameplate_w: M L^2 T^-3, supply_v: M L^2 T^-3 I^-1 } out: { per_dryer_w: M L^2 T^-3, demand_w: M L^2 T^-3, demand_a: I }
+// dims: in { num_dryers: dimensionless, nameplate_w: M L^2 T^-3, supply_v: M L^2 T^-3 I^-1 } out: { per_dryer_w: M L^2 T^-3, demand_w: M L^2 T^-3, demand_a: I, connected_w: M L^2 T^-3 }
 export function computeDryerDemand22054({ num_dryers = 1, nameplate_w = 5000, supply_v = 240 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const n = Math.round(Number(num_dryers) || 0);
@@ -709,7 +709,7 @@ SERVICE_RENDERERS["noncoincident-load"] = _v181renderNoncoincidentLoad;
 // A centrifugal pump or fan throttled to part flow keeps drawing near-full
 // power; slowed by a VFD it draws the cube of the speed ratio (the affinity
 // law). The saving is that gap integrated over a three-bin duty cycle.
-// dims: in { full_load_kw: M L^2 T^-3, frac_a: dimensionless, hours_a: T, frac_b: dimensionless, hours_b: T, frac_c: dimensionless, hours_c: T, rate_kwh: dimensionless } out: { vfd_kwh: M L^2 T^-2, full_kwh: M L^2 T^-2, saved_kwh: M L^2 T^-2, saved_usd: dimensionless }
+// dims: in { full_load_kw: M L^2 T^-3, frac_a: dimensionless, hours_a: T, frac_b: dimensionless, hours_b: T, frac_c: dimensionless, hours_c: T, rate_kwh: dimensionless } out: { vfd_kwh: M L^2 T^-2, full_kwh: M L^2 T^-2, saved_kwh: M L^2 T^-2, saved_usd: dimensionless, saved_pct: dimensionless }
 export function computeVfdEnergySavings({ full_load_kw = 0, frac_a = 1.0, hours_a = 0, frac_b = 0.75, hours_b = 0, frac_c = 0.5, hours_c = 0, rate_kwh = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(full_load_kw > 0)) return { error: "Full-load motor power must be positive (kW)." };

@@ -96,7 +96,7 @@ const _T_REF_R = 518.67;
 
 // ============ spec-v1550: tip speed ratio ============
 
-// dims: in { rotor_diameter_ft: L, rotor_rpm: T^-1, wind_speed_mph: L T^-1, design_tsr: dimensionless, tip_speed_cap_fps: L T^-1 } out: { tip_speed_fps: L T^-1, tip_speed_ratio: dimensionless, rpm_for_design_tsr: T^-1, rpm_at_tip_cap: T^-1 }
+// dims: in { rotor_diameter_ft: L, rotor_rpm: T^-1, wind_speed_mph: L T^-1, design_tsr: dimensionless, tip_speed_cap_fps: L T^-1 } out: { tip_speed_fps: L T^-1, tip_speed_ratio: dimensionless, rpm_for_design_tsr: T^-1, rpm_at_tip_cap: T^-1, tip_speed_mph: L T^-1, wind_at_cap_mph: L T^-1, wind_fps: L T^-1 }
 export function computeTipSpeedRatio({ rotor_diameter_ft = 0, rotor_rpm = 0, wind_speed_mph = 0, design_tsr = 7, tip_speed_cap_fps = 280 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(rotor_diameter_ft > 0)) return { error: "Rotor diameter must be positive." };
@@ -150,7 +150,7 @@ WIND_RENDERERS["tip-speed-ratio"] = _simpleRenderer({
 
 // ============ spec-v1551: wind power density and the Betz limit ============
 
-// dims: in { wind_speed_mph: L T^-1, air_density_pcf: M L^-3, rotor_diameter_ft: L, power_coefficient: dimensionless, alt_wind_speed_mph: L T^-1 } out: { swept_area_ft2: L^2, power_in_wind_kw: M L^2 T^-3, betz_power_kw: M L^2 T^-3, extracted_power_kw: M L^2 T^-3, power_density_w_ft2: M T^-3 }
+// dims: in { wind_speed_mph: L T^-1, air_density_pcf: M L^-3, rotor_diameter_ft: L, power_coefficient: dimensionless, alt_wind_speed_mph: L T^-1 } out: { swept_area_ft2: L^2, power_in_wind_kw: M L^2 T^-3, betz_power_kw: M L^2 T^-3, extracted_power_kw: M L^2 T^-3, power_density_w_ft2: M T^-3, alt_extracted_kw: M L^2 T^-3, coefficient_of_betz_pct: dimensionless }
 export function computeWindPowerDensityBetz({ wind_speed_mph = 0, air_density_pcf = _RHO_REF_PCF, rotor_diameter_ft = 0, power_coefficient = 0.45, alt_wind_speed_mph = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(wind_speed_mph > 0)) return { error: "Wind speed must be positive." };
@@ -203,7 +203,7 @@ WIND_RENDERERS["wind-power-density-betz"] = _simpleRenderer({
 
 // ============ spec-v1552: wind shear to hub height ============
 
-// dims: in { measured_speed_mph: L T^-1, measured_height_ft: L, hub_height_ft: L, shear_exponent: dimensionless, alt_shear_exponent: dimensionless, second_speed_mph: L T^-1, second_height_ft: L } out: { hub_speed_mph: L T^-1, energy_ratio: dimensionless, alt_hub_speed_mph: L T^-1, derived_exponent: dimensionless }
+// dims: in { measured_speed_mph: L T^-1, measured_height_ft: L, hub_height_ft: L, shear_exponent: dimensionless, alt_shear_exponent: dimensionless, second_speed_mph: L T^-1, second_height_ft: L } out: { hub_speed_mph: L T^-1, energy_ratio: dimensionless, alt_hub_speed_mph: L T^-1, derived_exponent: dimensionless, derived_hub_speed_mph: L T^-1, speed_ratio: dimensionless }
 export function computeWindShearHubHeight({ measured_speed_mph = 0, measured_height_ft = 0, hub_height_ft = 0, shear_exponent = 0.2, alt_shear_exponent = 0.14, second_speed_mph = 0, second_height_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(measured_speed_mph > 0)) return { error: "Measured wind speed must be positive." };
@@ -360,7 +360,7 @@ WIND_RENDERERS["weibull-capacity-factor"] = _simpleRenderer({
 
 // ============ spec-v1554: air-density correction against a power curve ============
 
-// dims: in { elevation_ft: L, air_temp_f: T, reference_density_pcf: M L^-3, measured_power_kw: M L^2 T^-3, curve_power_kw: M L^2 T^-3, wind_speed_mph: L T^-1, alt_air_temp_f: T } out: { site_density_pcf: M L^-3, density_ratio: dimensionless, corrected_curve_power_kw: M L^2 T^-3, iec_corrected_wind_mph: L T^-1 }
+// dims: in { elevation_ft: L, air_temp_f: T, reference_density_pcf: M L^-3, measured_power_kw: M L^2 T^-3, curve_power_kw: M L^2 T^-3, wind_speed_mph: L T^-1, alt_air_temp_f: T } out: { site_density_pcf: M L^-3, density_ratio: dimensionless, corrected_curve_power_kw: M L^2 T^-3, iec_corrected_wind_mph: L T^-1, curve_power_kw: M L^2 T^-3, measured_of_corrected_pct: dimensionless, measured_of_curve_pct: dimensionless }
 export function computeTurbineDensityCorrection({ elevation_ft = 0, air_temp_f = 59, reference_density_pcf = _RHO_REF_PCF, measured_power_kw = 0, curve_power_kw = 0, wind_speed_mph = 0, alt_air_temp_f = 20 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // The page passes a blank box as null, and Number(null) is 0 F; 0 F is a real reading, so a blank cannot stand in for it.
@@ -428,7 +428,7 @@ WIND_RENDERERS["turbine-density-correction"] = _simpleRenderer({
 
 // ============ spec-v1555: yaw misalignment power loss ============
 
-// dims: in { yaw_error_deg: dimensionless, rated_power_kw: M L^2 T^-3, capacity_factor_pct: dimensionless, energy_price_per_mwh: dimensionless, turbine_count: dimensionless, acceptable_loss_pct: dimensionless } out: { loss_cubed_pct: dimensionless, loss_squared_pct: dimensionless, annual_mwh: M L^2 T^-2, lost_mwh: M L^2 T^-2, acceptable_angle_deg: dimensionless }
+// dims: in { yaw_error_deg: dimensionless, rated_power_kw: M L^2 T^-3, capacity_factor_pct: dimensionless, energy_price_per_mwh: dimensionless, turbine_count: dimensionless, acceptable_loss_pct: dimensionless } out: { loss_cubed_pct: dimensionless, loss_squared_pct: dimensionless, annual_mwh: M L^2 T^-2, lost_mwh: M L^2 T^-2, acceptable_angle_deg: dimensionless, turbine_count: dimensionless }
 export function computeYawErrorLoss({ yaw_error_deg = 0, rated_power_kw = 0, capacity_factor_pct = 40, energy_price_per_mwh = 40, turbine_count = 1, acceptable_loss_pct = 2 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(yaw_error_deg >= 0 && yaw_error_deg < 90)) return { error: "Yaw error must be at least 0 and less than 90 degrees." };
@@ -488,7 +488,7 @@ WIND_RENDERERS["yaw-error-loss"] = _simpleRenderer({
 
 // ============ spec-v1556: gin-pole and uptower lift load ============
 
-// dims: in { component_weight_lb: M, haul_angle_deg: dimensionless, pole_length_ft: L, mount_rated_lb: M, hauled_line_angle_deg: dimensionless } out: { head_resultant_lb: M, head_horizontal_lb: M, mount_moment_ftlb: M L, direct_line_pull_lb: M, max_component_lb: M }
+// dims: in { component_weight_lb: M, haul_angle_deg: dimensionless, pole_length_ft: L, mount_rated_lb: M, hauled_line_angle_deg: dimensionless } out: { head_resultant_lb: M, head_horizontal_lb: M, mount_moment_ftlb: M L, direct_line_pull_lb: M, max_component_lb: M, mount_margin_pct: dimensionless }
 export function computeGinPoleUptowerLift({ component_weight_lb = 0, haul_angle_deg = 0, pole_length_ft = 0, mount_rated_lb = 0, hauled_line_angle_deg = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(component_weight_lb > 0)) return { error: "Component weight including rigging must be positive." };

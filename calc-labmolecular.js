@@ -32,7 +32,7 @@ export const LABMOLECULAR_RENDERERS = {};
 
 // --- v20 T.1: Primer melting temperature (`primer-tm`) ---
 // Wallace (<=14 nt): Tm = 2(A+T) + 4(G+C). Basic GC% (>14 nt): Tm = 64.9 + 41*(G+C-16.4)/len.
-// dims: in { sequence: dimensionless, method: dimensionless } out: { tm_c: T, length_nt: dimensionless }
+// dims: in { sequence: dimensionless, method: dimensionless } out: { tm_c: T, length_nt: dimensionless, gc_content_pct: dimensionless }
 export function computePrimerTm({ sequence = "", method = "auto" } = {}) {
   const seq = String(sequence || "").toUpperCase().replace(/\s+/g, "");
   const cleaned = seq.replace(/[^ATGC]/g, "");
@@ -193,7 +193,7 @@ LABMOLECULAR_RENDERERS["molarity-from-stock"] = renderMolarityFromStock;
 // --- spec-v533 T: Nucleic-acid concentration from A260 (`nucleic-acid-a260`) ---
 // concentration = A260 x factor x dilution (factor 50 dsDNA, 33 ssDNA/oligo, 40 RNA). purity = A260/A280.
 const NUCLEIC_ACID_FACTORS = { dsDNA: 50, ssDNA: 33, oligo: 33, RNA: 40 };
-// dims: in { a260: dimensionless, na_type: dimensionless, dilution_factor: dimensionless, a280: dimensionless } out: { concentration_ng_ul: dimensionless, purity_260_280: dimensionless }
+// dims: in { a260: dimensionless, na_type: dimensionless, dilution_factor: dimensionless, a280: dimensionless } out: { concentration_ng_ul: dimensionless, purity_260_280: dimensionless, factor: dimensionless }
 export function computeNucleicAcidA260({ a260 = 0, na_type = "dsDNA", dilution_factor = 1, a280 = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const a = Number(a260) || 0;
