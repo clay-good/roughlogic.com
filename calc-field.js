@@ -312,7 +312,7 @@ function fractionalYear(date) {
 }
 
 // dims: in { lat_deg: dimensionless, lon_deg: dimensionless, date_iso: dimensionless, tz_offset_hours: T }
-//        out: { sunrise_local: dimensionless, sunset_local: dimensionless, solar_noon_local: dimensionless, day_length_hours: T, equation_of_time_minutes: T, declination_deg: dimensionless }
+//        out: { sunrise_local: dimensionless, sunset_local: dimensionless, solar_noon_local: dimensionless, day_length_hours: T, equation_of_time_minutes: T, declination_deg: dimensionless, daylight_minutes: T, eqtime_min: T }
 // (NOAA solar-position algorithm. Lat / lon and the solar
 //  declination are dimensionless angles; ISO date and local-time
 //  strings are categorical tokens (dimensionless). Time-zone
@@ -1225,7 +1225,7 @@ FIELD_RENDERERS["search-probability"] = renderSearchProbability;
 // pacing-distance (steps -> distance, not time).
 // =====================================================================
 
-// dims: in { distance: L, distance_unit: dimensionless, ascent: L, ascent_unit: dimensionless, speed: L T^-1, factor: dimensionless } out: { total_hours: T, base_hours: T, ascent_hours: T, distance_km: L, factor: dimensionless, total_min: T }
+// dims: in { distance: L, distance_unit: dimensionless, ascent: L, ascent_unit: dimensionless, speed: L T^-1, factor: dimensionless } out: { total_hours: T, base_hours: T, ascent_hours: T, distance_km: L, factor: dimensionless, total_min: T, ascent_m: L, speed_kmh: L T^-1, subtotal_hours: T, total_h: T }
 export function computeHikingTime({ distance = 0, distance_unit = "km", ascent = 0, ascent_unit = "m", speed = 0, factor = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const KM_PER_MI = 1.609344, M_PER_FT = 0.3048;
@@ -1469,7 +1469,7 @@ FIELD_RENDERERS["helicopter-lz-sizing"] = _r({
 });
 
 // ===================== spec-v1401: litter carry team size and rotation =====================
-// dims: in { distance_mi: L, pace_mph: L T^-1, carriers_per_litter: dimensionless, duty_fraction: dimensionless, rotation_interval_min: T, support_personnel: dimensionless } out: { carry_time_hr: T, teams_needed: dimensionless, total_personnel: dimensionless, person_hours: T }
+// dims: in { distance_mi: L, pace_mph: L T^-1, carriers_per_litter: dimensionless, duty_fraction: dimensionless, rotation_interval_min: T, support_personnel: dimensionless } out: { carry_time_hr: T, teams_needed: dimensionless, total_personnel: dimensionless, person_hours: T, carriers_needed: dimensionless, carry_time_min: T, rotations: dimensionless }
 export function computeLitterCarryTeam({ distance_mi = 0, pace_mph = 1.0, carriers_per_litter = 6, duty_fraction = 0.5, rotation_interval_min = 10, support_personnel = 2 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(distance_mi > 0)) return { error: "Carry distance must be positive." };

@@ -570,7 +570,7 @@ function _interpolateHoldMinutes(T_F) {
 }
 
 // dims: in { category: dimensionless, thickness_in: L, bath_temperature_F: T, initial_temperature_F: T }
-//        out: { come_up_minutes: T, hold_minutes: T, total_minutes: T, diffusivity_m2_per_s: L^2 T^-1, warnings: dimensionless }
+//        out: { come_up_minutes: T, hold_minutes: T, total_minutes: T, diffusivity_m2_per_s: L^2 T^-1, warnings: dimensionless, bath_temperature_F: T }
 // (Heisler-slab come-up uses alpha [L^2 T^-1] * time [T] = L^2 (slab
 // half-thickness squared), so the come-up and hold both surface as `T`.)
 export function computeSousVidePasteurization({
@@ -824,7 +824,7 @@ KITCHEN_RENDERERS["brine-cure"] = renderBrineCure;
 // "bakers' percentages do not scale linearly"). First-principles arithmetic.
 // =====================================================================
 
-// dims: in { flour_g: M, hydration_pct: dimensionless, salt_pct: dimensionless, yeast_pct: dimensionless, other_pct: dimensionless, pieces: dimensionless } out: { water_g: M, salt_g: M, yeast_g: M, total_dough_g: M, total_pct: dimensionless, hydration_pct: dimensionless, pieces: dimensionless }
+// dims: in { flour_g: M, hydration_pct: dimensionless, salt_pct: dimensionless, yeast_pct: dimensionless, other_pct: dimensionless, pieces: dimensionless } out: { water_g: M, salt_g: M, yeast_g: M, total_dough_g: M, total_pct: dimensionless, hydration_pct: dimensionless, pieces: dimensionless, flour_g: M, other_g: M, per_piece_g: M, total_dough_oz: M, water_oz: M }
 export function computeBakersPercentage({ flour_g = 0, hydration_pct = 0, salt_pct = 0, yeast_pct = 0, other_pct = 0, pieces = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const flour = Number(flour_g) || 0;
@@ -894,7 +894,7 @@ KITCHEN_RENDERERS["bakers-percentage"] = renderBakersPercentage;
 // (29.5735295625 mL). GOVERNANCE.general (business arithmetic, not food safety).
 // =====================================================================
 
-// dims: in { beginning_inventory: dimensionless, purchases: dimensionless, ending_inventory: dimensionless, food_sales: dimensionless, theoretical_cost_pct: dimensionless, employee_meals: dimensionless } out: { cogs: dimensionless, food_cost_pct: dimensionless }
+// dims: in { beginning_inventory: dimensionless, purchases: dimensionless, ending_inventory: dimensionless, food_sales: dimensionless, theoretical_cost_pct: dimensionless, employee_meals: dimensionless } out: { cogs: dimensionless, food_cost_pct: dimensionless, variance_dollars: dimensionless, variance_pts: dimensionless }
 // (Dollar amounts are dimensionless money per spec-v14; percent is dimensionless.)
 export function computeFoodCostPercentage({ beginning_inventory = 0, purchases = 0, ending_inventory = 0, food_sales = 0, theoretical_cost_pct = 0, employee_meals = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
@@ -938,7 +938,7 @@ const renderFoodCostPercentage = _r({
 });
 KITCHEN_RENDERERS["food-cost-percentage"] = renderFoodCostPercentage;
 
-// dims: in { food_cost: dimensionless, beverage_cost: dimensionless, labor_cost: dimensionless, total_sales: dimensionless } out: { prime_cost: dimensionless, prime_cost_pct: dimensionless, cogs_pct: dimensionless, labor_pct: dimensionless }
+// dims: in { food_cost: dimensionless, beverage_cost: dimensionless, labor_cost: dimensionless, total_sales: dimensionless } out: { prime_cost: dimensionless, prime_cost_pct: dimensionless, cogs_pct: dimensionless, labor_pct: dimensionless, cogs_total: dimensionless }
 export function computePrimeCost({ food_cost = 0, beverage_cost = 0, labor_cost = 0, total_sales = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   food_cost = Number(food_cost); beverage_cost = Number(beverage_cost); labor_cost = Number(labor_cost);
@@ -975,7 +975,7 @@ const renderPrimeCost = _r({
 });
 KITCHEN_RENDERERS["prime-cost"] = renderPrimeCost;
 
-// dims: in { bottle_cost: dimensionless, bottle_size_ml: L, pour_size_oz: L, target_pour_cost_pct: dimensionless, other_cost_per_drink: dimensionless } out: { pours_per_bottle: dimensionless, suggested_price: dimensionless }
+// dims: in { bottle_cost: dimensionless, bottle_size_ml: L, pour_size_oz: L, target_pour_cost_pct: dimensionless, other_cost_per_drink: dimensionless } out: { pours_per_bottle: dimensionless, suggested_price: dimensionless, cost_per_pour: dimensionless, drink_cost: dimensionless }
 export function computePourCost({ bottle_cost = 0, bottle_size_ml = 0, pour_size_oz = 0, target_pour_cost_pct = 0, other_cost_per_drink = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // Unit / range guard added 2026-09-26 after printed-example probing.
@@ -1080,7 +1080,7 @@ const SANITIZER_BANDS = {
   quat: { lo: 150, hi: 400, label: "quaternary ammonium", contact: "at least 30 seconds (Food Code 4-703.11(C)(3)), or longer if the EPA-registered label says so" },
   iodine: { lo: 12.5, hi: 25, label: "iodine", contact: "at least 30 seconds (Food Code 4-703.11(C)(3))" },
 };
-// dims: in { sanitizer_type: dimensionless, active_pct: dimensionless, target_ppm: dimensionless, batch_gallons: L^3 } out: { oz_per_gal: dimensionless, total_oz: dimensionless }
+// dims: in { sanitizer_type: dimensionless, active_pct: dimensionless, target_ppm: dimensionless, batch_gallons: L^3 } out: { oz_per_gal: dimensionless, total_oz: dimensionless, band_hi: dimensionless, band_lo: dimensionless }
 export function computeKitchenSanitizerPpm({ sanitizer_type = "chlorine", active_pct = 0, target_ppm = 0, batch_gallons = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const active = Number(active_pct) || 0;
@@ -1125,7 +1125,7 @@ KITCHEN_RENDERERS["kitchen-sanitizer-ppm"] = renderKitchenSanitizerPpm;
 // --- spec-v539 O: Cocktail final ABV with dilution (`drink-abv-dilution`) ---
 // final_abv = pure_alcohol / (total + melt) x 100. standard_drinks = pure_alcohol / 0.6.
 const DRINK_METHOD_DILUTION = { shaken: 28, stirred: 23, rocks: 15, neat: 0 };
-// dims: in { total_volume_oz: L, weighted_abv_pct: dimensionless, method: dimensionless, dilution_pct: dimensionless } out: { pure_alcohol_oz: L, final_volume_oz: L, final_abv_pct: dimensionless, standard_drinks: dimensionless, method_pct: dimensionless }
+// dims: in { total_volume_oz: L, weighted_abv_pct: dimensionless, method: dimensionless, dilution_pct: dimensionless } out: { pure_alcohol_oz: L, final_volume_oz: L, final_abv_pct: dimensionless, standard_drinks: dimensionless, method_pct: dimensionless, dilution_water_oz: L^3 }
 export function computeDrinkAbvDilution({ total_volume_oz = 0, weighted_abv_pct = 0, method = "stirred", dilution_pct = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const vol = Number(total_volume_oz) || 0;
@@ -1616,7 +1616,7 @@ KITCHEN_RENDERERS["thaw-time"] = _r({
 });
 
 // ===================== spec-v1354: fryer oil turnover, life, and annual cost =====================
-// dims: in { vat_capacity_lb: M, daily_product_lb: M, absorption_fraction: dimensionless, operating_days: T, oil_price_per_lb: dimensionless } out: { daily_oil_loss_lb: M, turnover_days: T, annual_oil_lb: M, annual_cost: dimensionless }
+// dims: in { vat_capacity_lb: M, daily_product_lb: M, absorption_fraction: dimensionless, operating_days: T, oil_price_per_lb: dimensionless } out: { daily_oil_loss_lb: M, turnover_days: T, annual_oil_lb: M, annual_cost: dimensionless, vat_charges_per_year: T^-1 }
 export function computeFryerOilTurnover({ vat_capacity_lb = 0, daily_product_lb = 0, absorption_fraction = 0.12, operating_days = 360, oil_price_per_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(vat_capacity_lb > 0)) return { error: "Vat oil capacity must be positive." };
@@ -1672,7 +1672,7 @@ export const KEG_SIZES_GAL = {
   custom:         { gal: 0,     label: "Custom (enter gallons)" },
 };
 
-// dims: in { keg_size: dimensionless, custom_gallons: L^3, serving_oz: L^3, loss_fraction: dimensionless, keg_cost: dimensionless, menu_price: dimensionless } out: { gross_oz: L^3, net_oz: L^3, servings: dimensionless, cost_per_serving: dimensionless, pour_cost_pct: dimensionless, gallons: L^3 }
+// dims: in { keg_size: dimensionless, custom_gallons: L^3, serving_oz: L^3, loss_fraction: dimensionless, keg_cost: dimensionless, menu_price: dimensionless } out: { gross_oz: L^3, net_oz: L^3, servings: dimensionless, cost_per_serving: dimensionless, pour_cost_pct: dimensionless, gallons: L^3, revenue_per_keg: dimensionless }
 export function computeKegYield({ keg_size = "half_barrel", custom_gallons = 0, serving_oz = 16, loss_fraction = 0.15, keg_cost = 0, menu_price = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // Unit / range guard added 2026-09-26 after printed-example probing.
@@ -1927,7 +1927,7 @@ KITCHEN_RENDERERS["covers-per-labor-hour"] = _r({
 });
 
 // ===================== spec-v1360: par level and order quantity =====================
-// dims: in { daily_usage: T^-1, lead_time_days: T, order_cycle_days: T, safety_factor: dimensionless, on_hand: dimensionless, on_order: dimensionless, units_per_case: dimensionless } out: { coverage_days: T, par_level: dimensionless, order_needed: dimensionless, cases: dimensionless, overshoot: dimensionless }
+// dims: in { daily_usage: T^-1, lead_time_days: T, order_cycle_days: T, safety_factor: dimensionless, on_hand: dimensionless, on_order: dimensionless, units_per_case: dimensionless } out: { coverage_days: T, par_level: dimensionless, order_needed: dimensionless, cases: dimensionless, overshoot: dimensionless, ordered_quantity: dimensionless }
 export function computeParLevelOrder({ daily_usage = 0, lead_time_days = 0, order_cycle_days = 0, safety_factor = 0.25, on_hand = 0, on_order = 0, units_per_case = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // Unit / range guard added 2026-09-26 after printed-example probing.
@@ -2078,7 +2078,7 @@ KITCHEN_RENDERERS["tphc-window"] = _r({
 });
 
 // ===================== spec-v1362: steam kettle heat-up time and steam demand =====================
-// dims: in { gallons: L^3, specific_gravity: dimensionless, specific_heat: L^2 T^-2, start_temp_f: T, final_temp_f: T, rated_input_btuh: M L^2 T^-3, jacket_efficiency: dimensionless, latent_heat_btu_lb: L^2 T^-2 } out: { mass_lb: M, heat_btu: M L^2 T^-2, heatup_min: T, steam_per_batch_lb: M, steam_rate_lb_hr: M T^-1, boiler_hp: M L^2 T^-3 }
+// dims: in { gallons: L^3, specific_gravity: dimensionless, specific_heat: L^2 T^-2, start_temp_f: T, final_temp_f: T, rated_input_btuh: M L^2 T^-3, jacket_efficiency: dimensionless, latent_heat_btu_lb: L^2 T^-2 } out: { mass_lb: M, heat_btu: M L^2 T^-2, heatup_min: T, steam_per_batch_lb: M, steam_rate_lb_hr: M T^-1, boiler_hp: M L^2 T^-3, heatup_hr: T }
 export function computeSteamKettleHeatup({ gallons = 0, specific_gravity = 1.0, specific_heat = 1.0, start_temp_f = 60, final_temp_f = 200, rated_input_btuh = 0, jacket_efficiency = 0.85, latent_heat_btu_lb = 945.6 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // The page's cleared box is not 0 F; an omitted key keeps the 60 F default.
@@ -2268,7 +2268,7 @@ KITCHEN_RENDERERS["hot-holding-energy"] = renderHotHoldingEnergy;
 
 // ============ spec-v1637: grease duct buildup and cleaning interval ============
 
-// dims: in { inspection_interval_months: T, months_since_inspection: T, measured_thickness_um: L, cleaning_trigger_um: L, inspection_point_trigger_um: L, is_designated_point: dimensionless } out: { months_overdue: T, next_inspection_months: T, thickness_margin_um: L, applicable_trigger_um: L, thickness_ratio: dimensionless, inspections_per_year: T^-1, measured_thickness_in: L, trigger_thickness_in: L }
+// dims: in { inspection_interval_months: T, months_since_inspection: T, measured_thickness_um: L, cleaning_trigger_um: L, inspection_point_trigger_um: L, is_designated_point: dimensionless } out: { months_overdue: T, next_inspection_months: T, thickness_margin_um: L, applicable_trigger_um: L, thickness_ratio: dimensionless, inspections_per_year: T^-1, measured_thickness_in: L, trigger_thickness_in: L, clean_to_um: L, cleaning_trigger_um: L, inspection_interval_months: T, inspection_point_trigger_um: L, is_designated_point: dimensionless, measured_thickness_um: L, months_since_inspection: T }
 export function computeGreaseDuctCleaningInterval({ inspection_interval_months = 0, months_since_inspection = 0, measured_thickness_um = 0, cleaning_trigger_um = 2000, inspection_point_trigger_um = 3175, is_designated_point = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(inspection_interval_months > 0)) return { error: "The inspection interval must be positive (months) -- monthly for solid fuel, quarterly for high volume, semiannually for moderate, annually for low volume." };
@@ -2340,7 +2340,7 @@ KITCHEN_RENDERERS["grease-duct-cleaning-interval"] = _simpleRenderer({
 
 // ============ spec-v1638: walk-in door infiltration load ============
 
-// dims: in { door_width_ft: L, door_height_ft: L, full_open_cfm: L^3 T^-1, openings_per_hour: T^-1, seconds_open_each: T, protection_factor: dimensionless, enthalpy_difference_btu_lb: L^2 T^-2, moisture_difference_lb_lb: dimensionless, air_density_lb_ft3: M L^-3 } out: { door_area_ft2: L^2, door_open_factor: dimensionless, effective_cfm: L^3 T^-1, total_load_btuh: M L^2 T^-3, latent_load_btuh: M L^2 T^-3, latent_share_pct: dimensionless, frost_lb_day: M, air_density_lb_ft3: M L^-3, door_height_ft: L, door_width_ft: L, full_open_cfm: L^3 T^-1, load_avoided_btuh: M L^2 T^-3, mass_flow_lb_hr: M T^-1, reduction_pct: dimensionless, sensible_load_btuh: M L^2 T^-3, unprotected_cfm: L^3 T^-1, unprotected_load_btuh: M L^2 T^-3 }
+// dims: in { door_width_ft: L, door_height_ft: L, full_open_cfm: L^3 T^-1, openings_per_hour: T^-1, seconds_open_each: T, protection_factor: dimensionless, enthalpy_difference_btu_lb: L^2 T^-2, moisture_difference_lb_lb: dimensionless, air_density_lb_ft3: M L^-3 } out: { door_area_ft2: L^2, door_open_factor: dimensionless, effective_cfm: L^3 T^-1, total_load_btuh: M L^2 T^-3, latent_load_btuh: M L^2 T^-3, latent_share_pct: dimensionless, frost_lb_day: M, air_density_lb_ft3: M L^-3, door_height_ft: L, door_width_ft: L, full_open_cfm: L^3 T^-1, load_avoided_btuh: M L^2 T^-3, mass_flow_lb_hr: M T^-1, reduction_pct: dimensionless, sensible_load_btuh: M L^2 T^-3, unprotected_cfm: L^3 T^-1, unprotected_load_btuh: M L^2 T^-3, enthalpy_difference_btu_lb: L^2 T^-2, moisture_difference_lb_lb: dimensionless, openings_per_hour: T^-1, protection_factor: dimensionless, seconds_open_each: T, total_load_tons: M L^2 T^-3 }
 export function computeWalkInDoorInfiltration({ door_width_ft = 0, door_height_ft = 0, full_open_cfm = 0, openings_per_hour = 0, seconds_open_each = 0, protection_factor = 1, enthalpy_difference_btu_lb = 0, moisture_difference_lb_lb = 0, air_density_lb_ft3 = 0.0765 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (Number(moisture_difference_lb_lb) * 1061 > Number(enthalpy_difference_btu_lb) * (1 + 1e-9) && Number(enthalpy_difference_btu_lb) > 0) return { error: "The moisture difference carries more latent heat than the whole enthalpy difference entered; the two psychrometric readings are not consistent." };
@@ -2419,7 +2419,7 @@ KITCHEN_RENDERERS["walk-in-door-infiltration"] = _simpleRenderer({
 
 // ============ spec-v1639: kitchen exhaust and makeup air balance ============
 
-// dims: in { hood_exhaust_cfm: L^3 T^-1, other_exhaust_cfm: L^3 T^-1, dedicated_makeup_cfm: L^3 T^-1, intended_transfer_cfm: L^3 T^-1, building_leakage_cfm_per_pa: L^3 T^-1, door_width_ft: L, door_height_ft: L, door_closer_force_lbf: M L T^-2 } out: { total_exhaust_cfm: L^3 T^-1, deficit_cfm: L^3 T^-1, deficit_percent: dimensionless, uncontrolled_cfm: L^3 T^-1, makeup_shortfall_cfm: L^3 T^-1, door_force_lbf: M L T^-2, door_total_force_lbf: M L T^-2, dedicated_makeup_cfm: L^3 T^-1, door_area_ft2: L^2, door_closer_force_lbf: M L T^-2, door_height_ft: L, door_width_ft: L, egress_limit_lbf: M L T^-2, hood_exhaust_cfm: L^3 T^-1, intended_transfer_cfm: L^3 T^-1, other_exhaust_cfm: L^3 T^-1, pressure_psf: M L^-1 T^-2 }
+// dims: in { hood_exhaust_cfm: L^3 T^-1, other_exhaust_cfm: L^3 T^-1, dedicated_makeup_cfm: L^3 T^-1, intended_transfer_cfm: L^3 T^-1, building_leakage_cfm_per_pa: L^3 T^-1, door_width_ft: L, door_height_ft: L, door_closer_force_lbf: M L T^-2 } out: { total_exhaust_cfm: L^3 T^-1, deficit_cfm: L^3 T^-1, deficit_percent: dimensionless, uncontrolled_cfm: L^3 T^-1, makeup_shortfall_cfm: L^3 T^-1, door_force_lbf: M L T^-2, door_total_force_lbf: M L T^-2, dedicated_makeup_cfm: L^3 T^-1, door_area_ft2: L^2, door_closer_force_lbf: M L T^-2, door_height_ft: L, door_width_ft: L, egress_limit_lbf: M L T^-2, hood_exhaust_cfm: L^3 T^-1, intended_transfer_cfm: L^3 T^-1, other_exhaust_cfm: L^3 T^-1, pressure_psf: M L^-1 T^-2, knob_factor: dimensionless, pressure_inwc: M L^-1 T^-2, pressure_pa: M L^-1 T^-2 }
 export function computeKitchenMakeupAirDeficit({ hood_exhaust_cfm = 0, other_exhaust_cfm = 0, dedicated_makeup_cfm = 0, intended_transfer_cfm = 0, building_leakage_cfm_per_pa = 0, door_width_ft = 3, door_height_ft = 7, door_closer_force_lbf = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (door_closer_force_lbf < 0) return { error: "The door closer force cannot be negative (lbf)." };

@@ -575,7 +575,7 @@ TREATMENT_RENDERERS["breakpoint-chlorination"] = _rPool({
 
 // ===================== spec-v405..v407: water/wastewater-operations trio (Group M) =====================
 
-// dims: in { flow_mgd: L^3 T^-1, surface_ft2: L^2, weir_len_ft: L, mlss_mgl: dimensionless, ras_mgd: L^3 T^-1 } out: { sor_gpd_ft2: dimensionless, weir_gpd_ft: dimensionless, solids_lb_ft2_day: M L^-2 T^-1 }
+// dims: in { flow_mgd: L^3 T^-1, surface_ft2: L^2, weir_len_ft: L, mlss_mgl: dimensionless, ras_mgd: L^3 T^-1 } out: { sor_gpd_ft2: dimensionless, weir_gpd_ft: dimensionless, solids_lb_ft2_day: M L^-2 T^-1, weir_limit_gpd_ft: L^2 T^-1 }
 export function computeClarifierSurfaceLoading({ flow_mgd = 0, surface_ft2 = 0, weir_len_ft = 0, mlss_mgl = 0, ras_mgd = 0 } = {}) {
   const flow = Number(flow_mgd) || 0;
   const area = Number(surface_ft2) || 0;
@@ -712,7 +712,7 @@ function renderBodTssLoadingRemoval(inputRegion, outputRegion, citationEl) {
 }
 TREATMENT_RENDERERS["bod-tss-loading-removal"] = renderBodTssLoadingRemoval;
 
-// dims: in { conductivity_us_cm: dimensionless, k_factor: dimensionless } out: { tds_mgl: dimensionless }
+// dims: in { conductivity_us_cm: dimensionless, k_factor: dimensionless } out: { tds_mgl: dimensionless, tds_high: dimensionless, tds_low: dimensionless }
 export function computeTdsFromConductivity({ conductivity_us_cm = 0, k_factor = 0.65 } = {}) {
   const ec = Number(conductivity_us_cm) || 0;
   const k = Number(k_factor) || 0;
@@ -864,7 +864,7 @@ TREATMENT_RENDERERS["va-alkalinity-ratio"] = renderVaAlkalinityRatio;
 
 // --- spec-v596 M: Digester gas and methane production (`digester-gas-production`) ---
 // VS_destroyed = VS_fed x reduction/100; gas = VS_destroyed x yield; methane = gas x methane_pct/100; energy = methane x 960 BTU/ft^3.
-// dims: in { vs_fed_lb_day: M T^-1, vs_reduction_pct: dimensionless, gas_yield_ft3_lb: dimensionless, methane_pct: dimensionless } out: { vs_destroyed_lb_day: M T^-1, gas_ft3_day: L^3 T^-1, methane_ft3_day: L^3 T^-1, energy_btu_day: M L^2 T^-3 }
+// dims: in { vs_fed_lb_day: M T^-1, vs_reduction_pct: dimensionless, gas_yield_ft3_lb: dimensionless, methane_pct: dimensionless } out: { vs_destroyed_lb_day: M T^-1, gas_ft3_day: L^3 T^-1, methane_ft3_day: L^3 T^-1, energy_btu_day: M L^2 T^-3, energy_mmbtu_day: M L^2 T^-3 }
 export function computeDigesterGasProduction({ vs_fed_lb_day = 0, vs_reduction_pct = 0, gas_yield_ft3_lb = 15, methane_pct = 65 } = {}) {
   const _g = _finiteGuardPool(arguments[0]); if (_g) return _g;
   const vsf = Number(vs_fed_lb_day) || 0;
@@ -935,7 +935,7 @@ const _FGV_M3_PER_GAL = 0.003785411784;
 // empty page field must fail its own guard, not fall through to the metric
 // default. (Number(null) is 0, so a finiteness test cannot decide this.)
 const _fgvGiven = (v) => v !== null && v !== undefined;
-// dims: in { power_input_w: M L^2 T^-3, power_input_hp: M L^2 T^-3, basin_volume_m3: L^3, basin_volume_gal: L^3, water_temp_c: dimensionless, water_temp_f: T, detention_time_s: T } out: { g_value: dimensionless, gt_value: dimensionless, power_input_w: M L^2 T^-3, basin_volume_m3: L^3, water_temp_c: dimensionless }
+// dims: in { power_input_w: M L^2 T^-3, power_input_hp: M L^2 T^-3, basin_volume_m3: L^3, basin_volume_gal: L^3, water_temp_c: dimensionless, water_temp_f: T, detention_time_s: T } out: { g_value: dimensionless, gt_value: dimensionless, power_input_w: M L^2 T^-3, basin_volume_m3: L^3, water_temp_c: dimensionless, mu: M L^-1 T^-1 }
 export function computeFlocculationGValue({ power_input_w = 0, power_input_hp = null, basin_volume_m3 = 0, basin_volume_gal = null, water_temp_c = 15, water_temp_f = null, detention_time_s = 0 } = {}) {
   const useHp = _fgvGiven(power_input_hp), useGal = _fgvGiven(basin_volume_gal), useF = _fgvGiven(water_temp_f);
   const hp = Number(power_input_hp), gal = Number(basin_volume_gal), tF = Number(water_temp_f);
@@ -1265,7 +1265,7 @@ function _v899renderPoolInteriorFinishVolume(inputRegion, outputRegion, citation
 TREATMENT_RENDERERS["pool-interior-finish-volume"] = _v899renderPoolInteriorFinishVolume;
 
 // ===================== spec-v943: gravity oil/water separator surface area (API 421) =====================
-// dims: in { flow_gpm: L^3 T^-1, oil_sg: dimensionless, droplet_micron: L, water_viscosity_cp: M L^-1 T^-1, water_sg: dimensionless } out: { rise_velocity_ftmin: L T^-1, horizontal_area_ft2: L^2, vh_ratio: dimensionless }
+// dims: in { flow_gpm: L^3 T^-1, oil_sg: dimensionless, droplet_micron: L, water_viscosity_cp: M L^-1 T^-1, water_sg: dimensionless } out: { rise_velocity_ftmin: L T^-1, horizontal_area_ft2: L^2, vh_ratio: dimensionless, f_total: dimensionless }
 export function computeOilWaterSeparatorSizing({ flow_gpm = 50, oil_sg = 0.85, droplet_micron = 150, water_viscosity_cp = 1.1, water_sg = 1 } = {}) {
   const _g = _finiteGuardPool(arguments[0]); if (_g) return _g;
   if (!(flow_gpm > 0)) return { error: "Flow must be positive (gpm)." };
@@ -1340,7 +1340,7 @@ TREATMENT_RENDERERS["oil-water-separator-sizing"] = _v943renderOilWaterSeparator
 // Hindered settling added 2026-10-09 (the note said it was separate): with a solids volume fraction c entered, the
 // Richardson-Zaki (1954) relation v = vs (1 - c)^n, n = 4.65 (Re < 0.2), 4.35 Re^-0.03 (0.2-1), 4.45 Re^-0.1 (1-500),
 // 2.39 (above 500), with the wall term dropped (container much wider than the particle).
-// dims: in { particle_diameter_mm: L, particle_sg: dimensionless, water_temp_f: T, solids_volume_pct: dimensionless } out: { settling_velocity_mm_s: L T^-1, settling_velocity_ft_min: L T^-1, reynolds: dimensionless, hindered_velocity_mm_s: L T^-1 }
+// dims: in { particle_diameter_mm: L, particle_sg: dimensionless, water_temp_f: T, solids_volume_pct: dimensionless } out: { settling_velocity_mm_s: L T^-1, settling_velocity_ft_min: L T^-1, reynolds: dimensionless, hindered_velocity_mm_s: L T^-1, richardson_zaki_n: dimensionless }
 export function computeParticleSettlingVelocity({ particle_diameter_mm = 0.05, particle_sg = 2.65, water_temp_f = 68, solids_volume_pct = 0 } = {}) {
   const _g = _finiteGuardPool(arguments[0]); if (_g) return _g;
   if (!(particle_diameter_mm > 0)) return { error: "Particle diameter must be positive (mm)." };

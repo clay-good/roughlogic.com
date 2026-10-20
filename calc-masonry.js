@@ -93,7 +93,7 @@ export const MASONRY_RENDERERS = {};
 
 // ===================== spec-v269: reinforced CMU wall out-of-plane flexure =====================
 
-// dims: in { fm_psi: M L^-1 T^-2, as_in2: L^2, d_in: L, b_in: L, fs_psi: M L^-1 T^-2 } out: { n_ratio: dimensionless, rho: dimensionless, k: dimensionless, j: dimensionless, ms_ftlb: M L^2 T^-2, mm_ftlb: M L^2 T^-2, ma_ftlb: M L^2 T^-2 }
+// dims: in { fm_psi: M L^-1 T^-2, as_in2: L^2, d_in: L, b_in: L, fs_psi: M L^-1 T^-2 } out: { n_ratio: dimensionless, rho: dimensionless, k: dimensionless, j: dimensionless, ms_ftlb: M L^2 T^-2, mm_ftlb: M L^2 T^-2, ma_ftlb: M L^2 T^-2, fb: M L^-1 T^-2 }
 export function computeCmuWallFlexure({ fm_psi = 2000, as_in2 = 0, d_in = 0, b_in = 12, fs_psi = 32000 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(fm_psi > 0)) return { error: "Masonry strength f'm must be positive (psi)." };
@@ -147,7 +147,7 @@ MASONRY_RENDERERS["cmu-wall-flexure"] = _simpleRenderer({
 // in place of 1/2 for a special reinforced masonry shear wall (8.3.5.1.2).
 // Until 2026-09-25 the tile had neither: a special wall read 1/2, up to about
 // 77% high on the masonry term, and a partially grouted wall had no input.
-// dims: in { fm_psi: M L^-1 T^-2, b_in: L, dv_in: L, p_lb: M L T^-2, mvd: dimensionless, av_in2: L^2, s_in: L, fs_psi: M L^-1 T^-2, grouting: dimensionless, special: dimensionless } out: { an_in2: L^2, fvm: M L^-1 T^-2, fvs: M L^-1 T^-2, fv: M L^-1 T^-2, fv_max: M L^-1 T^-2, va_kip: M L T^-2 }
+// dims: in { fm_psi: M L^-1 T^-2, b_in: L, dv_in: L, p_lb: M L T^-2, mvd: dimensionless, av_in2: L^2, s_in: L, fs_psi: M L^-1 T^-2, grouting: dimensionless, special: dimensionless } out: { an_in2: L^2, fvm: M L^-1 T^-2, fvs: M L^-1 T^-2, fv: M L^-1 T^-2, fv_max: M L^-1 T^-2, va_kip: M L T^-2, fv_gov: M L^-1 T^-2, gamma_g: dimensionless }
 export function computeCmuShearWall({ fm_psi = 1500, b_in = 0, dv_in = 0, p_lb = 0, mvd = 0.5, av_in2 = 0, s_in = 48, fs_psi = 32000, grouting = "full", special = "no" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(fm_psi > 0)) return { error: "Masonry strength f'm must be positive (psi)." };
@@ -250,7 +250,7 @@ MASONRY_RENDERERS["cmu-wall-axial"] = _simpleRenderer({
 // count per TMS 402 / IBC (v369), and the triangular arching load a lintel carries
 // over an opening (v370).
 
-// dims: in { hollow_psf: M L^-1 T^-2, grout_adder: M L^-1 T^-2, cell_spacing: L, grout_spacing: L, height_ft: L, area_ft2: L^2 } out: { wall_psf: M L^-1 T^-2, line_load_plf: M T^-2, total_lb: M L T^-2 }
+// dims: in { hollow_psf: M L^-1 T^-2, grout_adder: M L^-1 T^-2, cell_spacing: L, grout_spacing: L, height_ft: L, area_ft2: L^2 } out: { wall_psf: M L^-1 T^-2, line_load_plf: M T^-2, total_lb: M L T^-2, grout_term: M L^-1 T^-2 }
 export function computeMasonryWallWeight({ hollow_psf = 0, grout_adder = 0, cell_spacing = 8, grout_spacing = 0, height_ft = 0, area_ft2 = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const hollow = Number(hollow_psf) || 0;
@@ -690,7 +690,7 @@ MASONRY_RENDERERS["masonry-joint-reinforcement"] = _simpleRenderer({
 // is an INPUT, not a recalled coefficient - published secondary sources disagree on it (one-fourth
 // vs one-third of f'm), so the tile takes the designer's value from the governing code edition and
 // says so, rather than shipping a number it cannot verify.
-// dims: in { clear_span_ft: L, lintel_depth_in: L, support_center_ft: L, udl_plf: M T^-2, bearing_width_in: L, allowable_bearing_psi: M L^-1 T^-2 } out: { eff_span_ft: L, reaction_lb: M L T^-2, required_bearing_in: L, governing_bearing_in: L, required_area_in2: L^2, span_by_depth_ft: L }
+// dims: in { clear_span_ft: L, lintel_depth_in: L, support_center_ft: L, udl_plf: M T^-2, bearing_width_in: L, allowable_bearing_psi: M L^-1 T^-2 } out: { eff_span_ft: L, reaction_lb: M L T^-2, required_bearing_in: L, governing_bearing_in: L, required_area_in2: L^2, span_by_depth_ft: L, code_min_in: L }
 export function computeMasonryLintelBearing({ clear_span_ft = 0, lintel_depth_in = 8, support_center_ft = 0, udl_plf = 0, bearing_width_in = 7.625, allowable_bearing_psi = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const clear = Number(clear_span_ft) || 0;
@@ -759,7 +759,7 @@ MASONRY_RENDERERS["masonry-lintel-bearing"] = _simpleRenderer({
 // figure (until 2026-09-25 it was presented as an Option 1 requirement).
 // Clay liner NOMINAL sizes are not their net areas, so this tile takes the ACTUAL inside
 // dimensions - the liner tables are code-document tables and are not reproduced here.
-// dims: in { opening_width_in: L, opening_height_in: L, flue_shape: dimensionless, flue_inside_dia_in: L, flue_inside_a_in: L, flue_inside_b_in: L, chimney_height_ft: L } out: { opening_area_sqin: L^2, required_area_sqin: L^2, actual_area_sqin: L^2, min_round_dia_in: L, min_square_side_in: L, aspect_ratio: dimensionless, surplus_sqin: L^2 }
+// dims: in { opening_width_in: L, opening_height_in: L, flue_shape: dimensionless, flue_inside_dia_in: L, flue_inside_a_in: L, flue_inside_b_in: L, chimney_height_ft: L } out: { opening_area_sqin: L^2, required_area_sqin: L^2, actual_area_sqin: L^2, min_round_dia_in: L, min_square_side_in: L, aspect_ratio: dimensionless, surplus_sqin: L^2, ratio_actual: dimensionless }
 export function computeFireplaceFlueArea({ opening_width_in = 0, opening_height_in = 0, flue_shape = "rectangular", flue_inside_dia_in = 0, flue_inside_a_in = 0, flue_inside_b_in = 0, chimney_height_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const w = Number(opening_width_in) || 0;
@@ -932,7 +932,7 @@ const _GAL_PER_CUFT = 1728 / 231;
 
 // ============ spec-v1683: ASTM C270 mortar batch proportions ============
 
-// dims: in { cement_volumes: dimensionless, lime_volumes: dimensionless, sand_ratio: dimensionless, cement_bags: dimensionless, unit_strength_psi: M L^-1 T^-2, mortar_strength_psi: M L^-1 T^-2 } out: { cementitious_cuft: L^3, sand_cuft: L^3, sand_min_cuft: L^3, sand_max_cuft: L^3, lime_bags: dimensionless, sand_shovels: dimensionless, mortar_strength_psi: M L^-1 T^-2, unit_strength_psi: M L^-1 T^-2, strength_ratio: dimensionless, cement_bags: dimensionless, sand_ratio: dimensionless }
+// dims: in { cement_volumes: dimensionless, lime_volumes: dimensionless, sand_ratio: dimensionless, cement_bags: dimensionless, unit_strength_psi: M L^-1 T^-2, mortar_strength_psi: M L^-1 T^-2 } out: { cementitious_cuft: L^3, sand_cuft: L^3, sand_min_cuft: L^3, sand_max_cuft: L^3, lime_bags: dimensionless, sand_shovels: dimensionless, mortar_strength_psi: M L^-1 T^-2, unit_strength_psi: M L^-1 T^-2, strength_ratio: dimensionless, cement_bags: dimensionless, sand_ratio: dimensionless, batch_yield_cuft: L^3, cement_cuft: L^3, cement_weight_lb: M, lime_cuft: L^3, cement_volumes: dimensionless, lime_volumes: dimensionless }
 export function computeMortarBatchC270({ cement_volumes = 1, lime_volumes = 0.5, sand_ratio = 2.5, cement_bags = 1, unit_strength_psi = 0, mortar_strength_psi = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(cement_volumes > 0)) return { error: "The cement proportion must be positive (volumes)." };
@@ -1007,7 +1007,7 @@ MASONRY_RENDERERS["mortar-batch-c270"] = _simpleRenderer({
 
 // ============ spec-v1684: CMU grout lift and pour height ============
 
-// dims: in { pour_height_ft: L, lift_height_ft: L, max_pour_height_ft: L, max_lift_height_ft: L, grout_unit_weight_pcf: M L^-3, cleanout_threshold_ft: L } out: { lifts_in_pour: dimensionless, base_pressure_psi: M L^-1 T^-2, base_pressure_psf: M L^-1 T^-2, pour_margin_ft: L, lift_margin_ft: L, pressure_at_limit_psi: M L^-1 T^-2, actual_lift_ft: L, cleanout_threshold_ft: L, lift_height_ft: L, max_lift_height_ft: L, max_pour_height_ft: L, pour_height_ft: L }
+// dims: in { pour_height_ft: L, lift_height_ft: L, max_pour_height_ft: L, max_lift_height_ft: L, grout_unit_weight_pcf: M L^-3, cleanout_threshold_ft: L } out: { lifts_in_pour: dimensionless, base_pressure_psi: M L^-1 T^-2, base_pressure_psf: M L^-1 T^-2, pour_margin_ft: L, lift_margin_ft: L, pressure_at_limit_psi: M L^-1 T^-2, actual_lift_ft: L, cleanout_threshold_ft: L, lift_height_ft: L, max_lift_height_ft: L, max_pour_height_ft: L, pour_height_ft: L, grout_unit_weight_pcf: M L^-3 }
 export function computeGroutLiftPourHeight({ pour_height_ft = 0, lift_height_ft = 0, max_pour_height_ft = 0, max_lift_height_ft = 0, grout_unit_weight_pcf = 140, cleanout_threshold_ft = 5.333 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(pour_height_ft > 0)) return { error: "The proposed pour height must be positive (ft)." };
@@ -1077,7 +1077,7 @@ MASONRY_RENDERERS["grout-lift-pour-height"] = _simpleRenderer({
 
 // ============ spec-v1685: masonry cleaning dilution and coverage ============
 
-// dims: in { area_ft2: L^2, dilution_parts_water: dimensionless, coverage_ft2_per_gal: L^-1, prewet_gal_per_100ft2: L^3, rinse_gal_per_100ft2: L^3, acid_safe_unit: dimensionless } out: { diluted_gal: L^3, concentrate_gal: L^3, water_gal: L^3, prewet_gal: L^3, rinse_gal: L^3, total_water_gal: L^3, area_ft2: L^2, concentrate_pct: dimensionless, coverage_ft2_per_gal: L^-1 }
+// dims: in { area_ft2: L^2, dilution_parts_water: dimensionless, coverage_ft2_per_gal: L^-1, prewet_gal_per_100ft2: L^3, rinse_gal_per_100ft2: L^3, acid_safe_unit: dimensionless } out: { diluted_gal: L^3, concentrate_gal: L^3, water_gal: L^3, prewet_gal: L^3, rinse_gal: L^3, total_water_gal: L^3, area_ft2: L^2, concentrate_pct: dimensionless, coverage_ft2_per_gal: L^-1, total_parts: dimensionless, acid_safe_unit: dimensionless, dilution_parts_water: dimensionless, prewet_gal_per_100ft2: L^3, rinse_gal_per_100ft2: L^3 }
 export function computeMasonryCleaningDilution({ area_ft2 = 0, dilution_parts_water = 0, coverage_ft2_per_gal = 0, prewet_gal_per_100ft2 = 0, rinse_gal_per_100ft2 = 0, acid_safe_unit = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(area_ft2 > 0)) return { error: "The area to be cleaned must be positive (sq ft)." };
@@ -1295,7 +1295,7 @@ const _fccNum = (v, what) => {
   return { v: Number(v) };
 };
 
-// dims: in { code_edition: dimensionless, framing_front_in: L, framing_back_in: L, opening_area_class: dimensionless, sheathing_from_lining_in: L, mantel_distance_in: L, mantel_projection_in: L } out: { allowed_projection_in: L, distance_needed_in: L, sheathing_required_in: L, checks_failed: dimensionless }
+// dims: in { code_edition: dimensionless, framing_front_in: L, framing_back_in: L, opening_area_class: dimensionless, sheathing_from_lining_in: L, mantel_distance_in: L, mantel_projection_in: L } out: { allowed_projection_in: L, distance_needed_in: L, sheathing_required_in: L, checks_failed: dimensionless, checks_run: dimensionless }
 export function computeFireplaceClearanceCheck({
   code_edition = "2024", framing_front_in = null, framing_back_in = null, opening_area_class = "under_6", sheathing_from_lining_in = null, mantel_distance_in = null, mantel_projection_in = null,
 } = {}) {

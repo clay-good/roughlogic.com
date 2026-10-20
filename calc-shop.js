@@ -53,7 +53,7 @@ export const SHOP_RENDERERS = {};
 // entered directly; cut time t = L / feed_IPM; total = t x passes.
 // =====================================================================
 
-// dims: in { cut_length_in: L, rpm: T^-1, feed_ipr_in: L, feed_ipm_in: L T^-1, passes: dimensionless } out: { feed_ipm: L T^-1, time_min: T, time_s: T, total_min: T, passes: dimensionless }
+// dims: in { cut_length_in: L, rpm: T^-1, feed_ipr_in: L, feed_ipm_in: L T^-1, passes: dimensionless } out: { feed_ipm: L T^-1, time_min: T, time_s: T, total_min: T, passes: dimensionless, total_s: T }
 export function computeMachiningTime({ feed_mode = "rpm-ipr", cut_length_in = 0, rpm = 0, feed_ipr_in = 0, feed_ipm_in = 0, passes = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (feed_mode !== "rpm-ipr" && feed_mode !== "direct") return { error: "Feed mode must be rpm-ipr or direct." };
@@ -185,7 +185,7 @@ SHOP_RENDERERS["material-removal-rate"] = _v40renderMaterialRemovalRate;
 // Round-nose scallop geometry: Rt = f^2 / (8 r); Ra ~= Rt / 4.
 // =====================================================================
 
-// dims: in { feed_ipr_in: L, nose_radius_in: L } out: { rt_in: L, ra_in: L }
+// dims: in { feed_ipr_in: L, nose_radius_in: L } out: { rt_in: L, ra_in: L, ra_uin: L, ra_um: L, rt_uin: L, rt_um: L }
 export function computeTurningSurfaceFinish({ feed_ipr_in = 0, nose_radius_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // The f^2 / (8 r) form approximates the scallop of an arc and holds only while the feed is well
@@ -230,7 +230,7 @@ SHOP_RENDERERS["turning-surface-finish"] = _v40renderTurningSurfaceFinish;
 
 // spec-v680 - feed-for-surface-finish (inverse of turning-surface-finish) - Group K
 // Rt = f^2 / (8 r); solved for feed: f = sqrt(8 r Rt), with Rt = 4 Ra if the target is an Ra.
-// dims: in { target_finish_uin: L, finish_basis: dimensionless, nose_radius_in: L } out: { max_feed_ipr: L, rt_in: L }
+// dims: in { target_finish_uin: L, finish_basis: dimensionless, nose_radius_in: L } out: { max_feed_ipr: L, rt_in: L, ra_uin: L, rt_uin: L }
 export function computeFeedForSurfaceFinish({ target_finish_uin = 0, finish_basis = "ra", nose_radius_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const target = Number(target_finish_uin) || 0;
@@ -381,7 +381,7 @@ SHOP_RENDERERS["taper-diameter"] = _v650renderTaperDiameter;
 // diameter D seated in the acute corners: offset k = D(1 + cot(alpha/2)); male over-pins = flat + k,
 // female over-pins = flat - k. Pure trig (Machinery's Handbook, "Checking a Dovetail"). alpha is the
 // included dovetail angle (commonly 60 deg).
-// dims: in { dovetail_type: dimensionless, known: dimensionless, dimension_in: L, pin_dia_in: L, angle_deg: dimensionless } out: { offset_in: L, over_pins_in: L, flat_in: L }
+// dims: in { dovetail_type: dimensionless, known: dimensionless, dimension_in: L, pin_dia_in: L, angle_deg: dimensionless } out: { offset_in: L, over_pins_in: L, flat_in: L, cot_half: dimensionless }
 export function computeDovetailOverPins({ dovetail_type = "male", known = "flat", dimension_in = 0, pin_dia_in = 0, angle_deg = 60 } = {}) {
   const _g = _finiteGuard({ dimension_in, pin_dia_in, angle_deg }); if (_g) return _g;
   const dim = Number(dimension_in) || 0;
@@ -492,7 +492,7 @@ SHOP_RENDERERS["tailstock-setover"] = _v805renderTailstockSetover;
 // that product is a whole number. First-principles ratio arithmetic.
 // =====================================================================
 
-// dims: in { divisions: dimensionless, worm_ratio: dimensionless, circles: dimensionless, index_by: dimensionless, angle_deg: dimensionless } out: { full_turns: dimensionless, angle_deg: dimensionless, fraction: dimensionless, turns: dimensionless, worm_ratio: dimensionless }
+// dims: in { divisions: dimensionless, worm_ratio: dimensionless, circles: dimensionless, index_by: dimensionless, angle_deg: dimensionless } out: { full_turns: dimensionless, angle_deg: dimensionless, fraction: dimensionless, turns: dimensionless, worm_ratio: dimensionless, divisions: dimensionless }
 export function computeDividingHead({ divisions = 0, worm_ratio = 40, circles = "", index_by = "divisions", angle_deg = 0 } = {}) {
   const _g = _finiteGuard({ divisions, worm_ratio, angle_deg }); if (_g) return _g;
   if (index_by !== "divisions" && index_by !== "angle") return { error: "Index by must be divisions or angle." };
@@ -591,7 +591,7 @@ const _V40_MOW_K = Math.cos(Math.PI / 6); // 0.8660254 = (1/2)cot(30deg) = sqrt(
 const _WIRE_MIN_P = 0.505182;
 const _WIRE_MAX_P = 1.010362;
 
-// dims: in { thread_standard: dimensionless, tpi: L^-1, pitch_mm: L, pitch_diameter_in: L, wire_dia_in: L } out: { best_wire_in: L, measurement_over_wires_in: L, measurement_over_wires_mm: L, pitch_in: L, wire_dia_in: L, wire_max_in: L }
+// dims: in { thread_standard: dimensionless, tpi: L^-1, pitch_mm: L, pitch_diameter_in: L, wire_dia_in: L } out: { best_wire_in: L, measurement_over_wires_in: L, measurement_over_wires_mm: L, pitch_in: L, wire_dia_in: L, wire_max_in: L, wire_min_in: L }
 export function computeThreadMeasureWire({ thread_standard = "inch", tpi = 0, pitch_mm = 0, pitch_diameter_in = 0, wire_dia_in = 0 } = {}) {
   const _g = _finiteGuard({ tpi, pitch_mm, pitch_diameter_in, wire_dia_in }); if (_g) return _g;
   if (thread_standard !== "inch" && thread_standard !== "metric") return { error: "Thread standard must be inch or metric." };
@@ -658,7 +658,7 @@ SHOP_RENDERERS["thread-measure-wire"] = _v40renderThreadMeasureWire;
 // gives the measurement over wires M from a pitch diameter E; the machinist
 // actually measures M on the mic and wants E, so E = M - 3W + 0.86603 P is the
 // working direction. Same 60-degree geometry, best-wire default, and range check.
-// dims: in { thread_standard: dimensionless, tpi: L^-1, pitch_mm: L, measurement_over_wires_in: L, wire_dia_in: L } out: { pitch_diameter_in: L, best_wire_in: L, pitch_in: L, wire_dia_in: L, wire_max_in: L }
+// dims: in { thread_standard: dimensionless, tpi: L^-1, pitch_mm: L, measurement_over_wires_in: L, wire_dia_in: L } out: { pitch_diameter_in: L, best_wire_in: L, pitch_in: L, wire_dia_in: L, wire_max_in: L, wire_min_in: L }
 export function computeThreadPitchDiaFromWires({ thread_standard = "inch", tpi = 0, pitch_mm = 0, measurement_over_wires_in = 0, wire_dia_in = 0 } = {}) {
   const _g = _finiteGuard({ tpi, pitch_mm, measurement_over_wires_in, wire_dia_in }); if (_g) return _g;
   if (thread_standard !== "inch" && thread_standard !== "metric") return { error: "Thread standard must be inch or metric." };
@@ -1052,7 +1052,7 @@ SHOP_RENDERERS["carbon-equivalent"] = _v40renderCarbonEquivalent;
 
 const _V41_TAP_K = 76.98; // 60-degree percent-of-thread constant (1 / 0.012990)
 
-// dims: in { thread_standard: dimensionless, major_dia_in: L, tpi: L^-1, pitch_mm: L, thread_percent: dimensionless } out: { drill_dia_in: L, drill_dia_mm: L, nearest_64th_in: L, nearest_64th_percent: dimensionless, major_dia_in: L, nearest_64th_mm: L, pitch_in: L, thread_percent: dimensionless }
+// dims: in { thread_standard: dimensionless, major_dia_in: L, tpi: L^-1, pitch_mm: L, thread_percent: dimensionless } out: { drill_dia_in: L, drill_dia_mm: L, nearest_64th_in: L, nearest_64th_percent: dimensionless, major_dia_in: L, nearest_64th_mm: L, pitch_in: L, thread_percent: dimensionless, tpi_effective: L^-1 }
 export function computeTapDrillSize({ thread_standard = "inch", major_dia_in = 0, tpi = 0, pitch_mm = 0, thread_percent = 75 } = {}) {
   const _g = _finiteGuard({ major_dia_in, tpi, pitch_mm, thread_percent }); if (_g) return _g;
   if (thread_standard !== "inch" && thread_standard !== "metric") return { error: "Thread standard must be inch or metric." };
@@ -1138,7 +1138,7 @@ SHOP_RENDERERS["tap-drill-size"] = _v41renderTapDrillSize;
 // k = 0.5 (mid-thickness) gives L = pi x (OD - T) = pi x (ID + T).
 // =====================================================================
 
-// dims: in { reference: dimensionless, diameter_in: L, thickness_in: L, k_factor: dimensionless } out: { neutral_dia_in: L, blank_length_in: L, blank_length_mm: L }
+// dims: in { reference: dimensionless, diameter_in: L, thickness_in: L, k_factor: dimensionless } out: { neutral_dia_in: L, blank_length_in: L, blank_length_mm: L, k_factor: dimensionless }
 export function computeRolledBlank({ reference = "od", diameter_in = 0, thickness_in = 0, k_factor = 0.5 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // Anything that was not exactly "id" used to be the outside diameter, 1.57 in short on a 12 in ID.
@@ -1239,7 +1239,7 @@ SHOP_RENDERERS["compound-miter"] = _renderCompoundMiter;
 
 // ===================== spec-v399..v400: fabrication shop-math (Group G) =====================
 
-// dims: in { nominal_gap_in: L, tolerances: dimensionless } out: { tol_wc: L, tol_rss: L, n: dimensionless }
+// dims: in { nominal_gap_in: L, tolerances: dimensionless } out: { tol_wc: L, tol_rss: L, n: dimensionless, gap_rss_hi: L, gap_rss_lo: L, gap_wc_hi: L, gap_wc_lo: L }
 export function computeToleranceStackRss({ nominal_gap_in = 0, tolerances = "" } = {}) {
   const gap = Number(nominal_gap_in);
   if (!Number.isFinite(gap)) return { error: "Enter a valid nominal gap (in)." };
@@ -2023,7 +2023,7 @@ SHOP_RENDERERS["cone-bottom-tank-volume"] = _v1325renderConeBottomTankVolume;
 // tank whose diameter changes top to bottom, which frustum-volume gives only FULL. Radius grows linearly with
 // height r(h) = R1 + (R2 - R1) h/H, and the liquid up to h is itself a frustum: V = (pi h/3)(R1^2 + R1 r(h) + r(h)^2).
 // Handles a widening bin (R2>R1) or a narrowing hopper (R2<R1); equal diameters collapse to a cylinder.
-// dims: in { bottom_diameter_ft: L, top_diameter_ft: L, height_ft: L, depth_ft: L } out: { volume_gal: L^3, volume_ft3: L^3, full_gal: L^3, full_ft3: L^3, percent_full: dimensionless }
+// dims: in { bottom_diameter_ft: L, top_diameter_ft: L, height_ft: L, depth_ft: L } out: { volume_gal: L^3, volume_ft3: L^3, full_gal: L^3, full_ft3: L^3, percent_full: dimensionless, radius_at_level: L }
 export function computeTaperedTankVolume({ bottom_diameter_ft = 0, top_diameter_ft = 0, height_ft = 0, depth_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const D1 = Number(bottom_diameter_ft) || 0;
@@ -2090,7 +2090,7 @@ SHOP_RENDERERS["tapered-tank-volume"] = _v1326renderTaperedTankVolume;
 // a dished/parabolic vessel bottom, or the free surface of a spinning liquid. Full V = (1/2) pi R^2 H, exactly half
 // the enclosing cylinder. A parabola has z proportional to r^2, so filling apex-up the wetted radius grows as
 // r(y) = R sqrt(y/H) and the volume as V(y) = pi R^2 y^2/(2H): it fills as the SQUARE of the depth (percent = (y/H)^2).
-// dims: in { base_diameter_ft: L, height_ft: L, fill_depth_ft: L } out: { full_ft3: L^3, fill_ft3: L^3, percent_full: dimensionless, fill_gal: L^3, full_gal: L^3 }
+// dims: in { base_diameter_ft: L, height_ft: L, fill_depth_ft: L } out: { full_ft3: L^3, fill_ft3: L^3, percent_full: dimensionless, fill_gal: L^3, full_gal: L^3, radius_at_level: L }
 export function computeParaboloidVolume({ base_diameter_ft = 0, height_ft = 0, fill_depth_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const GAL_PER_FT3 = 1728 / 231;
@@ -2143,7 +2143,7 @@ SHOP_RENDERERS["paraboloid-volume"] = _v1329renderParaboloidVolume;
 // to a height H at the far side (base is a semicircle). By integrating the sloping top z = (H/R) y over the
 // semicircle, V = (H/R) * (first moment 2R^3/3) = (2/3) R^2 H = D^2 H / 6. Uses: a mitered round pipe/duct end cut,
 // the wedge of liquid in a tilted horizontal cylinder just touching the bottom at one end, a cam or bar-stock wedge.
-// dims: in { base_diameter_ft: L, height_ft: L } out: { volume_ft3: L^3, volume_gal: L^3, base_area_ft2: L^2 }
+// dims: in { base_diameter_ft: L, height_ft: L } out: { volume_ft3: L^3, volume_gal: L^3, base_area_ft2: L^2, percent_of_cylinder: dimensionless }
 export function computeCylindricalWedgeVolume({ base_diameter_ft = 0, height_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const GAL_PER_FT3 = 1728 / 231;
@@ -2597,7 +2597,7 @@ function _simpleRenderer(spec) {
 }
 
 // ===================== spec-v1406: permissible residual unbalance =====================
-// dims: in { balance_grade: L T^-1, rpm: T^-1, rotor_mass_kg: M, planes: dimensionless, correction_radius_mm: L } out: { omega_rad_s: T^-1, e_permissible: L, u_permissible: M L, correction_mass_g: M }
+// dims: in { balance_grade: L T^-1, rpm: T^-1, rotor_mass_kg: M, planes: dimensionless, correction_radius_mm: L } out: { omega_rad_s: T^-1, e_permissible: L, u_permissible: M L, correction_mass_g: M, per_plane: M L }
 export function computeRotorBalanceGrade({ balance_grade = 6.3, rpm = 0, rotor_mass_kg = 0, planes = 2, correction_radius_mm = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(balance_grade > 0)) return { error: "Balance grade must be positive." };
@@ -2646,7 +2646,7 @@ SHOP_RENDERERS["rotor-balance-grade"] = _simpleRenderer({
 });
 
 // ===================== spec-v1407: bearing regrease quantity and interval =====================
-// dims: in { od_mm: L, width_mm: L, bore_mm: L, rpm: T^-1, correction_factor: dimensionless, duty_hours_per_day: T, bearing_type: dimensionless } out: { grease_grams: M, base_interval_hr: T, corrected_interval_hr: T }
+// dims: in { od_mm: L, width_mm: L, bore_mm: L, rpm: T^-1, correction_factor: dimensionless, duty_hours_per_day: T, bearing_type: dimensionless } out: { grease_grams: M, base_interval_hr: T, corrected_interval_hr: T, interval_days: T }
 export function computeBearingRegrease({ od_mm = 0, width_mm = 0, bore_mm = 0, rpm = 0, correction_factor = 1.0, duty_hours_per_day = 24, bearing_type = "ball" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(od_mm > 0)) return { error: "Bearing outside diameter must be positive." };
@@ -2705,7 +2705,7 @@ SHOP_RENDERERS["bearing-regrease"] = _simpleRenderer({
 });
 
 // ===================== spec-v1408: plasma cut time, consumable life, cost per part =====================
-// dims: in { cut_length_in: L, cut_speed_ipm: L T^-1, pierces_per_part: dimensionless, set_cost: dimensionless, rated_pierces: dimensionless, rated_arc_hours: T } out: { cut_time_min: T, arc_hours_per_part: T, parts_per_set: dimensionless, cost_per_part: dimensionless }
+// dims: in { cut_length_in: L, cut_speed_ipm: L T^-1, pierces_per_part: dimensionless, set_cost: dimensionless, rated_pierces: dimensionless, rated_arc_hours: T } out: { cut_time_min: T, arc_hours_per_part: T, parts_per_set: dimensionless, cost_per_part: dimensionless, cost_per_foot: dimensionless, parts_by_arc_hours: dimensionless, parts_by_pierces: dimensionless }
 export function computePlasmaCutSpeed({ cut_length_in = 0, cut_speed_ipm = 0, pierces_per_part = 0, set_cost = 0, rated_pierces = 0, rated_arc_hours = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(cut_length_in > 0)) return { error: "Cut length per part must be positive." };
@@ -2914,7 +2914,7 @@ SHOP_RENDERERS["dust-collection-duct"] = _simpleRenderer({
 // ===========================================================================
 
 // ===================== spec-v1435: pneumatic cylinder air consumption =====================
-// dims: in { bore_in: L, rod_in: L, stroke_in: L, cycles_per_min: T^-1, pressure_psig: M L^-1 T^-2, cylinders: dimensionless, cfm_per_hp: M^-1 L T^2 } out: { volume_per_cycle_ft3: L^3, scfm_total: L^3 T^-1, compressor_hp: M L^2 T^-3, compression_ratio: dimensionless, extend_in3: L^3, retract_in3: L^3 }
+// dims: in { bore_in: L, rod_in: L, stroke_in: L, cycles_per_min: T^-1, pressure_psig: M L^-1 T^-2, cylinders: dimensionless, cfm_per_hp: M^-1 L T^2 } out: { volume_per_cycle_ft3: L^3, scfm_total: L^3 T^-1, compressor_hp: M L^2 T^-3, compression_ratio: dimensionless, extend_in3: L^3, retract_in3: L^3, per_cycle_in3: L^3, scfm_per_cylinder: L^3 T^-1 }
 export function computePneumaticCylinderScfm({ bore_in = 0, rod_in = 0, stroke_in = 0, cycles_per_min = 0, pressure_psig = 0, cylinders = 1, cfm_per_hp = 4 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(bore_in > 0)) return { error: "Bore diameter must be positive." };
@@ -2971,7 +2971,7 @@ SHOP_RENDERERS["pneumatic-cylinder-scfm"] = _simpleRenderer({
 });
 
 // ===================== spec-v1436: bucket elevator capacity and power =====================
-// dims: in { bucket_volume_ft3: L^3, spacing_in: L, speed_fpm: L T^-1, fill_factor: dimensionless, bulk_density_pcf: M L^-3, lift_ft: L, drive_efficiency: dimensionless, friction_allowance: dimensionless } out: { capacity_ft3_hr: L^3 T^-1, lifting_hp: M L^2 T^-3, motor_hp: M L^2 T^-3, lift_share_pct: dimensionless }
+// dims: in { bucket_volume_ft3: L^3, spacing_in: L, speed_fpm: L T^-1, fill_factor: dimensionless, bulk_density_pcf: M L^-3, lift_ft: L, drive_efficiency: dimensionless, friction_allowance: dimensionless } out: { capacity_ft3_hr: L^3 T^-1, lifting_hp: M L^2 T^-3, motor_hp: M L^2 T^-3, lift_share_pct: dimensionless, buckets_per_ft: L^-1, bushels_per_hr: L^3 T^-1, tons_per_hr: M T^-1 }
 export function computeBucketElevatorCapacity({ bucket_volume_ft3 = 0, spacing_in = 0, speed_fpm = 0, fill_factor = 0.75, bulk_density_pcf = 0, lift_ft = 0, drive_efficiency = 0.75, friction_allowance = 1.2 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(bucket_volume_ft3 > 0)) return { error: "Bucket volume must be positive." };
@@ -3024,7 +3024,7 @@ SHOP_RENDERERS["bucket-elevator-capacity"] = _simpleRenderer({
 });
 
 // ===================== spec-v1437: cyclone separator cut size and pressure drop =====================
-// dims: in { inlet_width_ft: L, inlet_velocity_fps: L T^-1, turns: dimensionless, gas_viscosity_lb_ft_s: M L^-1 T^-1, gas_density_pcf: M L^-3, particle_density_pcf: M L^-3, k_velocity_heads: dimensionless, airflow_cfm: L^3 T^-1, second_velocity_fps: L T^-1 } out: { d50_ft: L, d50_micron: L, pressure_drop_psf: M L^-1 T^-2, cut_gain_pct: dimensionless, drop_rise_pct: dimensionless, fan_hp: M L^2 T^-3 }
+// dims: in { inlet_width_ft: L, inlet_velocity_fps: L T^-1, turns: dimensionless, gas_viscosity_lb_ft_s: M L^-1 T^-1, gas_density_pcf: M L^-3, particle_density_pcf: M L^-3, k_velocity_heads: dimensionless, airflow_cfm: L^3 T^-1, second_velocity_fps: L T^-1 } out: { d50_ft: L, d50_micron: L, pressure_drop_psf: M L^-1 T^-2, cut_gain_pct: dimensionless, drop_rise_pct: dimensionless, fan_hp: M L^2 T^-3, alt_d50_micron: L, alt_drop_inwg: M L^-1 T^-2, pressure_drop_inwg: M L^-1 T^-2 }
 export function computeCycloneSeparatorSizing({ inlet_width_ft = 0, inlet_velocity_fps = 0, turns = 5, gas_viscosity_lb_ft_s = 1.24e-5, gas_density_pcf = 0.075, particle_density_pcf = 0, k_velocity_heads = 8, airflow_cfm = 0, second_velocity_fps = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(inlet_width_ft > 0)) return { error: "Inlet width must be positive." };
@@ -3136,7 +3136,7 @@ SHOP_RENDERERS["gas-strut-force"] = _simpleRenderer({
 });
 
 // ===================== spec-v1439: spray booth airflow and makeup air load =====================
-// dims: in { opening_width_ft: L, opening_height_ft: L, face_velocity_fpm: L T^-1, indoor_temp_f: T, outdoor_temp_f: T, burner_efficiency: dimensionless, hours_per_year: T, price_per_therm: dimensionless, booth_depth_ft: L, measured_face_velocity_fpm: L T^-1, bake_temp_f: T, bake_minutes: T, bakes_per_year: T^-1 } out: { exhaust_cfm: L^3 T^-1, heating_btu_hr: M L^2 T^-3, gas_input_btu_hr: M L^2 T^-3, booth_volume_cuft: L^3, air_changes_per_hour: T^-1, measured_cfm: L^3 T^-1, bake_btu_hr: M L^2 T^-3, bake_btu_per_cycle: M L^2 T^-2, annual_cost: dimensionless, makeup_cfm: L^3 T^-1, opening_sqft: L^2, velocity_shortfall_pct: dimensionless }
+// dims: in { opening_width_ft: L, opening_height_ft: L, face_velocity_fpm: L T^-1, indoor_temp_f: T, outdoor_temp_f: T, burner_efficiency: dimensionless, hours_per_year: T, price_per_therm: dimensionless, booth_depth_ft: L, measured_face_velocity_fpm: L T^-1, bake_temp_f: T, bake_minutes: T, bakes_per_year: T^-1 } out: { exhaust_cfm: L^3 T^-1, heating_btu_hr: M L^2 T^-3, gas_input_btu_hr: M L^2 T^-3, booth_volume_cuft: L^3, air_changes_per_hour: T^-1, measured_cfm: L^3 T^-1, bake_btu_hr: M L^2 T^-3, bake_btu_per_cycle: M L^2 T^-2, annual_cost: dimensionless, makeup_cfm: L^3 T^-1, opening_sqft: L^2, velocity_shortfall_pct: dimensionless, bake_annual_cost: dimensionless, bake_cost_per_cycle: dimensionless, bake_delta_t: T, bake_gas_btu_per_cycle: M L^2 T^-2, cost_per_hour: dimensionless, delta_t: T, heating_mbh: M L^2 T^-3, therms_per_hour: M L^2 T^-3 }
 export function computeSprayBoothAirflow({ opening_width_ft = 0, opening_height_ft = 0, face_velocity_fpm = 100, indoor_temp_f = 70, outdoor_temp_f = 0, burner_efficiency = 0.8, hours_per_year = 0, price_per_therm = 0, booth_depth_ft = 0, measured_face_velocity_fpm = 0, bake_temp_f = 0, bake_minutes = 0, bakes_per_year = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(opening_width_ft > 0 && opening_height_ft > 0)) return { error: "Booth opening width and height must be positive." };
@@ -3249,7 +3249,7 @@ SHOP_RENDERERS["spray-booth-airflow"] = _simpleRenderer({
 });
 
 // ===================== spec-v1440: powder coating coverage and reclaim =====================
-// dims: in { specific_gravity: dimensionless, film_thickness_mils: L, part_area_sqft: L^2, transfer_efficiency: dimensionless, reclaim_efficiency: dimensionless, price_per_lb: dimensionless } out: { theoretical_coverage_sqft_lb: L^2 M^-1, utilization: dimensionless, saving_pct: dimensionless }
+// dims: in { specific_gravity: dimensionless, film_thickness_mils: L, part_area_sqft: L^2, transfer_efficiency: dimensionless, reclaim_efficiency: dimensionless, price_per_lb: dimensionless } out: { theoretical_coverage_sqft_lb: L^2 M^-1, utilization: dimensionless, saving_pct: dimensionless, cost_saving: dimensionless, reclaim_cost: dimensionless, waste_cost: dimensionless }
 export function computePowderCoatingCoverage({ specific_gravity = 0, film_thickness_mils = 0, part_area_sqft = 0, transfer_efficiency = 0.6, reclaim_efficiency = 0, price_per_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(specific_gravity > 0)) return { error: "Powder specific gravity must be positive." };
@@ -3304,7 +3304,7 @@ SHOP_RENDERERS["powder-coating-coverage"] = _simpleRenderer({
 });
 
 // ===================== spec-v1441: plating tank current and time (Faraday) =====================
-// dims: in { current_density_asf: I L^-2, part_area_sqft: L^2, atomic_weight: dimensionless, valence: dimensionless, metal_density_gcc: M L^-3, current_efficiency: dimensionless, target_thickness_in: L } out: { total_current_a: I, plating_time_s: T, thickness_rate_in_hr: L T^-1 }
+// dims: in { current_density_asf: I L^-2, part_area_sqft: L^2, atomic_weight: dimensionless, valence: dimensionless, metal_density_gcc: M L^-3, current_efficiency: dimensionless, target_thickness_in: L } out: { total_current_a: I, plating_time_s: T, thickness_rate_in_hr: L T^-1, area_cm2: L^2, deposit_mass_g: M, mass_rate_g_s: M T^-1, plating_time_min: T, thickness_rate_cm_s: L T^-1, volume_rate_cm3_s: L^3 T^-1 }
 export function computePlatingTankCurrent({ current_density_asf = 0, part_area_sqft = 0, atomic_weight = 0, valence = 0, metal_density_gcc = 0, current_efficiency = 0.95, target_thickness_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(current_density_asf > 0)) return { error: "Current density must be positive." };
@@ -3360,7 +3360,7 @@ SHOP_RENDERERS["plating-tank-current"] = _simpleRenderer({
 });
 
 // ===================== spec-v1442: heat-treat soak time and furnace load =====================
-// dims: in { charge_weight_lb: M, section_thickness_in: L, soak_temp_f: T, start_temp_f: T, through_heat_rate_hr_per_in: T L^-1, soak_rate_hr_per_in: T L^-1, specific_heat: L^2 T^-2, furnace_efficiency: dimensionless } out: { total_at_temp_hr: T, charge_heat_btu: M L^2 T^-2, furnace_input_btu_hr: M L^2 T^-3, furnace_input_kw: M L^2 T^-3 }
+// dims: in { charge_weight_lb: M, section_thickness_in: L, soak_temp_f: T, start_temp_f: T, through_heat_rate_hr_per_in: T L^-1, soak_rate_hr_per_in: T L^-1, specific_heat: L^2 T^-2, furnace_efficiency: dimensionless } out: { total_at_temp_hr: T, charge_heat_btu: M L^2 T^-2, furnace_input_btu_hr: M L^2 T^-3, furnace_input_kw: M L^2 T^-3, delta_t: T, soak_hr: T, through_heat_hr: T }
 export function computeHeatTreatSoakTime({ charge_weight_lb = 0, section_thickness_in = 0, soak_temp_f = 0, start_temp_f = 70, through_heat_rate_hr_per_in = 1, soak_rate_hr_per_in = 1, specific_heat = 0.12, furnace_efficiency = 0.6 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // The page passes a blank box as null, and Number(null) is 0 F; 0 F is a real reading, so a blank cannot stand in for it.

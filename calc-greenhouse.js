@@ -180,7 +180,7 @@ GREENHOUSE_RENDERERS["greenhouse-vent-area"] = _simpleRenderer({
 // crop returns about half the solar gain as latent heat, and emptying the house
 // doubles the temperature rise from the pad end to the fan end.
 
-// dims: in { floor_area_sqft: L^2, airflow_per_sqft_cfm: L T^-1, pad_face_velocity_fpm: L T^-1, pad_height_ft: L, outdoor_dry_bulb_f: T, outdoor_wet_bulb_f: T, pad_efficiency_pct: dimensionless, solar_gain_btuh_per_sqft: M T^-3, latent_fraction: dimensionless } out: { total_airflow_cfm: L^3 T^-1, pad_area_sqft: L^2, pad_length_ft: L, pad_outlet_temp_f: T, temp_rise_f: T, fan_end_temp_f: T, empty_house_rise_f: T, cropped_sensible_btuh: M L^2 T^-3, total_solar_btuh: M L^2 T^-3, empty_house_rise_ratio: dimensionless }
+// dims: in { floor_area_sqft: L^2, airflow_per_sqft_cfm: L T^-1, pad_face_velocity_fpm: L T^-1, pad_height_ft: L, outdoor_dry_bulb_f: T, outdoor_wet_bulb_f: T, pad_efficiency_pct: dimensionless, solar_gain_btuh_per_sqft: M T^-3, latent_fraction: dimensionless } out: { total_airflow_cfm: L^3 T^-1, pad_area_sqft: L^2, pad_length_ft: L, pad_outlet_temp_f: T, temp_rise_f: T, fan_end_temp_f: T, empty_house_rise_f: T, cropped_sensible_btuh: M L^2 T^-3, total_solar_btuh: M L^2 T^-3, empty_house_rise_ratio: dimensionless, empty_house_fan_end_f: T, empty_house_vs_outdoor_f: T, fan_end_below_outdoor_f: T, pad_drop_f: T, wet_bulb_depression_f: T }
 export function computeFanPadEvaporativeCooling({ floor_area_sqft = 0, airflow_per_sqft_cfm = 0, pad_face_velocity_fpm = 0, pad_height_ft = 0, outdoor_dry_bulb_f = 0, outdoor_wet_bulb_f = 0, pad_efficiency_pct = 0, solar_gain_btuh_per_sqft = 0, latent_fraction = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   // An efficiency is a percent; 0 < value < 1 is a fraction typed into a percent field (added 2026-09-26).
@@ -250,7 +250,7 @@ GREENHOUSE_RENDERERS["fan-pad-evaporative-cooling"] = _simpleRenderer({
 // per footcandle is specific to sunlight's spectrum, and applied to an HPS
 // fixture or a red-blue LED array it is simply wrong.
 
-// dims: in { ppfd_umol_m2_s: dimensionless, photoperiod_hours: T, outdoor_dli: dimensionless, transmission_pct: dimensionless, target_dli: dimensionless } out: { dli: dimensionless, inside_dli: dimensionless, shortfall_dli: dimensionless, supplemental_ppfd_umol_m2_s: dimensionless, dli_vs_target_pct: dimensionless, supplemental_share_of_entered_pct: dimensionless }
+// dims: in { ppfd_umol_m2_s: dimensionless, photoperiod_hours: T, outdoor_dli: dimensionless, transmission_pct: dimensionless, target_dli: dimensionless } out: { dli: dimensionless, inside_dli: dimensionless, shortfall_dli: dimensionless, supplemental_ppfd_umol_m2_s: dimensionless, dli_vs_target_pct: dimensionless, supplemental_share_of_entered_pct: dimensionless, inside_share_of_target: dimensionless }
 export function computePpfdDailyLightIntegral({ ppfd_umol_m2_s = 0, photoperiod_hours = 0, outdoor_dli = 0, transmission_pct = 0, target_dli = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   // Unit / range guard added 2026-09-26 after printed-example probing.
@@ -302,7 +302,7 @@ GREENHOUSE_RENDERERS["ppfd-daily-light-integral"] = _simpleRenderer({
 // quantity, and every connected watt arrives in the house as heat -- a credit
 // in December and a cooling load in March.
 
-// dims: in { growing_area_sqft: L^2, target_ppfd_umol_m2_s: dimensionless, fixture_ppf_umol_s: dimensionless, fixture_watts: M L^2 T^-3, on_target_fraction: dimensionless, photoperiod_hours: T, season_days: T, energy_rate_per_kwh: dimensionless } out: { growing_area_m2: L^2, photons_required_umol_s: dimensionless, fixture_count: dimensionless, connected_load_w: M L^2 T^-3, efficacy_umol_per_joule: dimensionless, season_kwh: M L^2 T^-2, heat_btuh: M L^2 T^-3, exact_count: dimensionless, perfect_count: dimensionless, perfect_exact_count: dimensionless }
+// dims: in { growing_area_sqft: L^2, target_ppfd_umol_m2_s: dimensionless, fixture_ppf_umol_s: dimensionless, fixture_watts: M L^2 T^-3, on_target_fraction: dimensionless, photoperiod_hours: T, season_days: T, energy_rate_per_kwh: dimensionless } out: { growing_area_m2: L^2, photons_required_umol_s: dimensionless, fixture_count: dimensionless, connected_load_w: M L^2 T^-3, efficacy_umol_per_joule: dimensionless, season_kwh: M L^2 T^-2, heat_btuh: M L^2 T^-3, exact_count: dimensionless, perfect_count: dimensionless, perfect_exact_count: dimensionless, effective_ppf_umol_s: dimensionless, on_target_cost_fixtures: dimensionless, season_cost: dimensionless, watts_per_m2: M T^-3 }
 export function computeGrowLightFixtureCount({ growing_area_sqft = 0, target_ppfd_umol_m2_s = 0, fixture_ppf_umol_s = 0, fixture_watts = 0, on_target_fraction = 0, photoperiod_hours = 0, season_days = 0, energy_rate_per_kwh = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   // Unit / range guard added 2026-09-26 after printed-example probing.
@@ -368,7 +368,7 @@ GREENHOUSE_RENDERERS["grow-light-fixture-count"] = _simpleRenderer({
 // leaf temperature. A leaf 3 degF above air raises the deficit by well over
 // half with the air and the humidity completely unchanged.
 
-// dims: in { air_temp_f: T, relative_humidity_pct: dimensionless, leaf_offset_f: T, alternative_leaf_offset_f: T, alternative_humidity_pct: dimensionless } out: { air_saturation_kpa: M L^-1 T^-2, leaf_saturation_kpa: M L^-1 T^-2, actual_vapor_pressure_kpa: M L^-1 T^-2, leaf_vpd_kpa: M L^-1 T^-2, air_vpd_kpa: M L^-1 T^-2, air_over_leaf_pct: dimensionless, alternative_change_pct: dimensionless, humidity_change_pct: dimensionless, air_over_leaf_ratio: dimensionless }
+// dims: in { air_temp_f: T, relative_humidity_pct: dimensionless, leaf_offset_f: T, alternative_leaf_offset_f: T, alternative_humidity_pct: dimensionless } out: { air_saturation_kpa: M L^-1 T^-2, leaf_saturation_kpa: M L^-1 T^-2, actual_vapor_pressure_kpa: M L^-1 T^-2, leaf_vpd_kpa: M L^-1 T^-2, air_vpd_kpa: M L^-1 T^-2, air_over_leaf_pct: dimensionless, alternative_change_pct: dimensionless, humidity_change_pct: dimensionless, air_over_leaf_ratio: dimensionless, alternative_leaf_vpd_kpa: M L^-1 T^-2, humid_leaf_vpd_kpa: M L^-1 T^-2 }
 export function computeVaporPressureDeficit({ air_temp_f = 0, relative_humidity_pct = 0, leaf_offset_f = 0, alternative_leaf_offset_f = 0, alternative_humidity_pct = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   // Unit / range guard added 2026-09-26 after printed-example probing.
@@ -430,7 +430,7 @@ GREENHOUSE_RENDERERS["vapor-pressure-deficit"] = _simpleRenderer({
 // same target costs the air change rate times as much once the vents crack, and
 // the gas goes straight outside.
 
-// dims: in { house_volume_ft3: L^3, ambient_ppm: dimensionless, target_ppm: dimensionless, air_changes_per_hour: T^-1, gas_price_per_lb: dimensionless, vented_air_changes_per_hour: T^-1, floor_area_sqft: L^2, enrichment_hours_per_day: T } out: { initial_charge_ft3: L^3, makeup_ft3_per_hour: L^3 T^-1, makeup_lb_per_hour: M T^-1, hourly_cost: dimensionless, vented_makeup_ft3_per_hour: L^3 T^-1, vented_hourly_cost: dimensionless, lift_ppm: dimensionless, vented_cost_ratio: dimensionless }
+// dims: in { house_volume_ft3: L^3, ambient_ppm: dimensionless, target_ppm: dimensionless, air_changes_per_hour: T^-1, gas_price_per_lb: dimensionless, vented_air_changes_per_hour: T^-1, floor_area_sqft: L^2, enrichment_hours_per_day: T } out: { initial_charge_ft3: L^3, makeup_ft3_per_hour: L^3 T^-1, makeup_lb_per_hour: M T^-1, hourly_cost: dimensionless, vented_makeup_ft3_per_hour: L^3 T^-1, vented_hourly_cost: dimensionless, lift_ppm: dimensionless, vented_cost_ratio: dimensionless, daily_cost: dimensionless }
 export function computeCo2EnrichmentRate({ house_volume_ft3 = 0, ambient_ppm = 0, target_ppm = 0, air_changes_per_hour = 0, gas_price_per_lb = 0, vented_air_changes_per_hour = 0, floor_area_sqft = 0, enrichment_hours_per_day = 0, crop_use_ft3_per_hour = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   if (!(house_volume_ft3 > 0)) return { error: "House volume must be positive." };
@@ -498,7 +498,7 @@ GREENHOUSE_RENDERERS["co2-enrichment-rate"] = _simpleRenderer({
 // outdoor light, because the glazing took its share first and the two fractions
 // MULTIPLY. Two layers transmit a quarter, not none.
 
-// dims: in { outdoor_dli: dimensionless, glazing_transmission_pct: dimensionless, shade_pct: dimensionless, target_dli: dimensionless, outdoor_peak_btuh_per_sqft: M T^-3, floor_area_sqft: L^2 } out: { system_transmission: dimensionless, inside_dli: dimensionless, two_layer_dli: dimensionless, required_shade_pct: dimensionless, solar_removed_btuh: M L^2 T^-3, inside_share_of_target_pct: dimensionless, shade_pct: dimensionless, system_transmission_pct: dimensionless, two_layer_share_of_target_pct: dimensionless }
+// dims: in { outdoor_dli: dimensionless, glazing_transmission_pct: dimensionless, shade_pct: dimensionless, target_dli: dimensionless, outdoor_peak_btuh_per_sqft: M T^-3, floor_area_sqft: L^2 } out: { system_transmission: dimensionless, inside_dli: dimensionless, two_layer_dli: dimensionless, required_shade_pct: dimensionless, solar_removed_btuh: M L^2 T^-3, inside_share_of_target_pct: dimensionless, shade_pct: dimensionless, system_transmission_pct: dimensionless, two_layer_share_of_target_pct: dimensionless, glazed_btuh_per_sqft: M T^-3, inside_vs_target: dimensionless, required_transmission: dimensionless, shaded_btuh_per_sqft: M T^-3, solar_removed_tons: M L^2 T^-3, two_layer_transmission: dimensionless }
 export function computeShadeClothTransmission({ outdoor_dli = 0, glazing_transmission_pct = 0, shade_pct = 0, target_dli = 0, outdoor_peak_btuh_per_sqft = 0, floor_area_sqft = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   // Unit / range guard added 2026-09-26 after printed-example probing.
@@ -567,7 +567,7 @@ GREENHOUSE_RENDERERS["shade-cloth-transmission"] = _simpleRenderer({
 // outside without anyone noticing; a sealed house has to remove it, which is
 // why closed and indoor rooms fail on humidity before anything else.
 
-// dims: in { floor_area_sqft: L^2, daily_solar_btu_per_sqft: M T^-2, latent_fraction: dimensionless, leaching_fraction: dimensionless, peak_solar_btuh_per_sqft: M T^-3, irrigation_hours_per_day: T } out: { transpiration_lb_per_day: M T^-1, transpiration_gal_per_day: L^3 T^-1, gal_per_sqft_per_day: L T^-1, applied_gal_per_day: L^3 T^-1, peak_gal_per_hour: L^3 T^-1, moisture_pints_per_day: L^3 T^-1, peak_to_average_ratio: dimensionless }
+// dims: in { floor_area_sqft: L^2, daily_solar_btu_per_sqft: M T^-2, latent_fraction: dimensionless, leaching_fraction: dimensionless, peak_solar_btuh_per_sqft: M T^-3, irrigation_hours_per_day: T } out: { transpiration_lb_per_day: M T^-1, transpiration_gal_per_day: L^3 T^-1, gal_per_sqft_per_day: L T^-1, applied_gal_per_day: L^3 T^-1, peak_gal_per_hour: L^3 T^-1, moisture_pints_per_day: L^3 T^-1, peak_to_average_ratio: dimensionless, average_gal_per_hour: L^3 T^-1, daily_energy_btu: M L^2 T^-2, leached_gal_per_day: L^3 T^-1, peak_applied_gal_per_hour: L^3 T^-1 }
 export function computeGreenhouseTranspirationWater({ floor_area_sqft = 0, daily_solar_btu_per_sqft = 0, latent_fraction = 0, leaching_fraction = 0, peak_solar_btuh_per_sqft = 0, irrigation_hours_per_day = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   if (!(floor_area_sqft > 0)) return { error: "Floor area must be positive." };
@@ -627,7 +627,7 @@ GREENHOUSE_RENDERERS["greenhouse-transpiration-water"] = _simpleRenderer({
 // heating bill looks nothing like a building's. The number that does not appear
 // in the payback is the light: open on a light level, not on a clock.
 
-// dims: in { house_width_ft: L, house_length_ft: L, gutter_height_ft: L, ridge_height_ft: L, glazing_u_factor: M T^-4, screen_ua_reduction_pct: dimensionless, season_nights: T, night_hours: T, night_temp_difference_f: T, plant_efficiency_pct: dimensionless, fuel_price_per_therm: dimensionless, screen_cost_per_sqft: dimensionless } out: { envelope_sqft: L^2, base_ua: M L^2 T^-3, screened_ua: M L^2 T^-3, heat_saved_btu: M L^2 T^-2, therms_saved: M L^2 T^-2, annual_saving: dimensionless, payback_years: T, floor_area_sqft: L^2, fuel_saved_btu: M L^2 T^-2, gable_area_sqft: L^2, roof_area_sqft: L^2, roof_share_pct: dimensionless, sidewall_area_sqft: L^2, envelope_to_floor_ratio: dimensionless }
+// dims: in { house_width_ft: L, house_length_ft: L, gutter_height_ft: L, ridge_height_ft: L, glazing_u_factor: M T^-4, screen_ua_reduction_pct: dimensionless, season_nights: T, night_hours: T, night_temp_difference_f: T, plant_efficiency_pct: dimensionless, fuel_price_per_therm: dimensionless, screen_cost_per_sqft: dimensionless } out: { envelope_sqft: L^2, base_ua: M L^2 T^-3, screened_ua: M L^2 T^-3, heat_saved_btu: M L^2 T^-2, therms_saved: M L^2 T^-2, annual_saving: dimensionless, payback_years: T, floor_area_sqft: L^2, fuel_saved_btu: M L^2 T^-2, gable_area_sqft: L^2, roof_area_sqft: L^2, roof_share_pct: dimensionless, sidewall_area_sqft: L^2, envelope_to_floor_ratio: dimensionless, screen_cost: dimensionless, season_hours: T }
 export function computeThermalScreenEnergySaving({ house_width_ft = 0, house_length_ft = 0, gutter_height_ft = 0, ridge_height_ft = 0, glazing_u_factor = 0, screen_ua_reduction_pct = 0, season_nights = 0, night_hours = 0, night_temp_difference_f = 0, plant_efficiency_pct = 0, fuel_price_per_therm = 0, screen_cost_per_sqft = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   // Unit / range guard added 2026-09-26 after printed-example probing.
@@ -711,7 +711,7 @@ GREENHOUSE_RENDERERS["thermal-screen-energy-saving"] = _simpleRenderer({
 // losses together, and the shortage is found at transplant -- when a re-sow is
 // weeks too late to ship with the crop.
 
-// dims: in { plants_required: dimensionless, cells_per_tray: dimensionless, germination_pct: dimensionless, cull_pct: dimensionless, seeds_per_cell: dimensionless, tray_footprint_sqft: L^2 } out: { usable_per_tray: dimensionless, trays_to_sow: dimensionless, cells_sown: dimensionless, seed_required: dimensionless, finished_yield: dimensionless, bench_area_sqft: L^2, naive_trays: dimensionless, naive_shortfall_pct: dimensionless, surplus_pct: dimensionless }
+// dims: in { plants_required: dimensionless, cells_per_tray: dimensionless, germination_pct: dimensionless, cull_pct: dimensionless, seeds_per_cell: dimensionless, tray_footprint_sqft: L^2 } out: { usable_per_tray: dimensionless, trays_to_sow: dimensionless, cells_sown: dimensionless, seed_required: dimensionless, finished_yield: dimensionless, bench_area_sqft: L^2, naive_trays: dimensionless, naive_shortfall_pct: dimensionless, surplus_pct: dimensionless, cells_per_tray: dimensionless, naive_shortfall: dimensionless, naive_yield: dimensionless, surplus: dimensionless, survival: dimensionless, trays_the_naive_count_misses: dimensionless }
 export function computePlugTrayCellCount({ plants_required = 0, cells_per_tray = 0, germination_pct = 0, cull_pct = 0, seeds_per_cell = 0, tray_footprint_sqft = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   // Unit / range guard added 2026-09-26 after printed-example probing.
@@ -775,7 +775,7 @@ GREENHOUSE_RENDERERS["plug-tray-cell-count"] = _simpleRenderer({
 // EXPANDS (a 3.8 cu ft bale opens to about 8, Colorado Materials); until
 // 2026-10-01 this tile had the bale shrinking and rejected real supplier data.
 
-// dims: in { container_count: dimensionless, filled_volume_in3: L^3, allowance_pct: dimensionless, bale_label_ft3: L^3, bale_loose_yield_ft3: L^3, true_gallon_in3: L^3 } out: { loose_volume_ft3: L^3, loose_volume_yd3: L^3, ordered_volume_ft3: L^3, ordered_volume_yd3: L^3, bale_count: dimensionless, true_gallon_volume_yd3: L^3, label_bale_count: dimensionless, order_yd3: L^3, true_gallon_excess_yd3: L^3, true_gallon_over_pct: dimensionless, true_gallon_volume_ft3: L^3 }
+// dims: in { container_count: dimensionless, filled_volume_in3: L^3, allowance_pct: dimensionless, bale_label_ft3: L^3, bale_loose_yield_ft3: L^3, true_gallon_in3: L^3 } out: { loose_volume_ft3: L^3, loose_volume_yd3: L^3, ordered_volume_ft3: L^3, ordered_volume_yd3: L^3, bale_count: dimensionless, true_gallon_volume_yd3: L^3, label_bale_count: dimensionless, order_yd3: L^3, true_gallon_excess_yd3: L^3, true_gallon_over_pct: dimensionless, true_gallon_volume_ft3: L^3, bales_the_label_overorders: dimensionless }
 export function computeSubstrateContainerVolume({ container_count = 0, filled_volume_in3 = 0, allowance_pct = 0, bale_label_ft3 = 0, bale_loose_yield_ft3 = 0, true_gallon_in3 = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   // Unit / range guard added 2026-09-26 after printed-example probing.
@@ -836,7 +836,7 @@ GREENHOUSE_RENDERERS["substrate-container-volume"] = _simpleRenderer({
 // whole economics of photoperiod control -- and also the warning, because a
 // security light is enough to break a night by accident.
 
-// dims: in { blackout_pull_hour: T, blackout_open_hour: T, critical_dark_hours: T, long_photoperiod_hours: T, short_photoperiod_hours: T, ppfd_umol_m2_s: dimensionless, interruption_hours: T, interruption_ppfd_umol_m2_s: dimensionless } out: { dark_hours: T, light_hours: T, long_dli: dimensionless, short_dli: dimensionless, dli_given_up: dimensionless, interruption_dli: dimensionless, dli_given_up_pct: dimensionless, interruption_share_of_long_pct: dimensionless }
+// dims: in { blackout_pull_hour: T, blackout_open_hour: T, critical_dark_hours: T, long_photoperiod_hours: T, short_photoperiod_hours: T, ppfd_umol_m2_s: dimensionless, interruption_hours: T, interruption_ppfd_umol_m2_s: dimensionless } out: { dark_hours: T, light_hours: T, long_dli: dimensionless, short_dli: dimensionless, dli_given_up: dimensionless, interruption_dli: dimensionless, dli_given_up_pct: dimensionless, interruption_share_of_long_pct: dimensionless, critical_dark_hours: T, dark_margin_hours: T }
 export function computePhotoperiodBlackoutSchedule({ blackout_pull_hour = 0, blackout_open_hour = 0, critical_dark_hours = 0, long_photoperiod_hours = 0, short_photoperiod_hours = 0, ppfd_umol_m2_s = 0, interruption_hours = 0, interruption_ppfd_umol_m2_s = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   // Until 2026-10-14 the page read a blank pull or open hour as midnight.
@@ -907,7 +907,7 @@ GREENHOUSE_RENDERERS["photoperiod-blackout-schedule"] = _simpleRenderer({
 // The gap between the bound and a measurement IS the crop's uptake, which is
 // why this calculation's error term is its product.
 
-// dims: in { volume_applied: L^3, volume_drained: L^3, feed_ec: dimensionless, measured_leachate_ec: dimensionless, alternative_leaching_fraction: dimensionless, target_leachate_ec: dimensionless } out: { leaching_fraction: dimensionless, bound_ec: dimensionless, alternative_bound_ec: dimensionless, implied_uptake_pct: dimensionless, required_leaching_fraction: dimensionless, bound_change_pct: dimensionless, salt_in: L, leaching_fraction_pct: dimensionless, required_leaching_fraction_pct: dimensionless }
+// dims: in { volume_applied: L^3, volume_drained: L^3, feed_ec: dimensionless, measured_leachate_ec: dimensionless, alternative_leaching_fraction: dimensionless, target_leachate_ec: dimensionless } out: { leaching_fraction: dimensionless, bound_ec: dimensionless, alternative_bound_ec: dimensionless, implied_uptake_pct: dimensionless, required_leaching_fraction: dimensionless, bound_change_pct: dimensionless, salt_in: L, leaching_fraction_pct: dimensionless, required_leaching_fraction_pct: dimensionless, salt_out: dimensionless }
 export function computeLeachingFractionRunoffEc({ volume_applied = 0, volume_drained = 0, feed_ec = 0, measured_leachate_ec = 0, alternative_leaching_fraction = 0, target_leachate_ec = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   if (!(volume_applied > 0)) return { error: "The volume applied must be positive." };

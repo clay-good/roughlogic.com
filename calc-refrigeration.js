@@ -135,7 +135,7 @@ const _REF_KW_PER_HP = 0.745699872;
 // Charge is a sum of liquid inventories, each at its own vessel's operating
 // temperature, because liquid ammonia's density falls markedly as it warms
 // and a single bundled density would misstate a low-temperature recirculator.
-// dims: in { receiver_volume_gal: L^3, receiver_fill_fraction: dimensionless, receiver_density_lb_ft3: M L^-3, recirculator_volume_gal: L^3, recirculator_fill_fraction: dimensionless, recirculator_density_lb_ft3: M L^-3, piping_volume_ft3: L^3, piping_liquid_fraction: dimensionless, piping_density_lb_ft3: M L^-3, threshold_lb: M } out: { receiver_lb: M, recirculator_lb: M, piping_lb: M, total_lb: M, margin_lb: M, pct_of_threshold: dimensionless, additional_cuft_to_cross: L^3, piping_share_pct: dimensionless }
+// dims: in { receiver_volume_gal: L^3, receiver_fill_fraction: dimensionless, receiver_density_lb_ft3: M L^-3, recirculator_volume_gal: L^3, recirculator_fill_fraction: dimensionless, recirculator_density_lb_ft3: M L^-3, piping_volume_ft3: L^3, piping_liquid_fraction: dimensionless, piping_density_lb_ft3: M L^-3, threshold_lb: M } out: { receiver_lb: M, recirculator_lb: M, piping_lb: M, total_lb: M, margin_lb: M, pct_of_threshold: dimensionless, additional_cuft_to_cross: L^3, piping_share_pct: dimensionless, threshold_lb: M }
 export function computeAmmoniaChargeInventory({
   receiver_volume_gal = 0, receiver_fill_fraction = 0, receiver_density_lb_ft3 = 0,
   recirculator_volume_gal = 0, recirculator_fill_fraction = 0, recirculator_density_lb_ft3 = 0,
@@ -460,7 +460,7 @@ REFRIGERATION_RENDERERS["freezer-underfloor-heat"] = _simpleRenderer({
 // runs 15 to 25 degF below it. Confusing the two produces a diagnosis wrong by
 // the entire wet-bulb depression, so the basis is a select and the label says
 // which one the answer used.
-// dims: in { ambient_f: T, design_td_f: T, alternate_ambient_f: T, alternate_td_f: T, power_pct_per_deg_f: dimensionless, compressor_hp: M L^2 T^-3, annual_hours: T, energy_rate_per_kwh: dimensionless } out: { condensing_f: T, alternate_condensing_f: T, condensing_change_f: T, power_change_pct: dimensionless, annual_kwh_change: M L^2 T^-2, annual_cost_change: dimensionless }
+// dims: in { ambient_f: T, design_td_f: T, alternate_ambient_f: T, alternate_td_f: T, power_pct_per_deg_f: dimensionless, compressor_hp: M L^2 T^-3, annual_hours: T, energy_rate_per_kwh: dimensionless } out: { condensing_f: T, alternate_condensing_f: T, condensing_change_f: T, power_change_pct: dimensionless, annual_kwh_change: M L^2 T^-2, annual_cost_change: dimensionless, design_td_f: T }
 export function computeCondenserTdHeadPressure({
   condenser_type = "air_cooled", ambient_f = null, design_td_f = 0,
   alternate_ambient_f = 0, alternate_td_f = 0,
@@ -616,7 +616,7 @@ REFRIGERATION_RENDERERS["receiver-pumpdown-capacity"] = _simpleRenderer({
 // below 1, so the same duty at the same delta-T needs MORE flow -- and the
 // fluid factor this returns, 500 x SG x cp, is exactly the input that
 // hydronic-gpm-deltat asks the user to supply.
-// dims: in { load_btuh: M L^2 T^-3, delta_t_f: T, glycol_cp: dimensionless, glycol_sg: dimensionless, head_ft: L, pump_efficiency: dimensionless, chiller_approach_f: T, coil_approach_f: T, compressor_pct_per_deg_f: dimensionless, annual_hours: T, energy_rate_per_kwh: dimensionless } out: { water_gpm: L^3 T^-1, glycol_gpm: L^3 T^-1, flow_increase_pct: dimensionless, fluid_factor: dimensionless, pump_bhp: M L^2 T^-3, annual_kwh: M L^2 T^-2, total_approach_f: T, compressor_penalty_pct: dimensionless, annual_cost: dimensionless, pump_kw: M L^2 T^-3 }
+// dims: in { load_btuh: M L^2 T^-3, delta_t_f: T, glycol_cp: dimensionless, glycol_sg: dimensionless, head_ft: L, pump_efficiency: dimensionless, chiller_approach_f: T, coil_approach_f: T, compressor_pct_per_deg_f: dimensionless, annual_hours: T, energy_rate_per_kwh: dimensionless } out: { water_gpm: L^3 T^-1, glycol_gpm: L^3 T^-1, flow_increase_pct: dimensionless, fluid_factor: dimensionless, pump_bhp: M L^2 T^-3, annual_kwh: M L^2 T^-2, total_approach_f: T, compressor_penalty_pct: dimensionless, annual_cost: dimensionless, pump_kw: M L^2 T^-3, tons: M L^2 T^-3 }
 export function computeSecondaryGlycolLoop({
   load_btuh = 0, delta_t_f = 0, glycol_cp = 1, glycol_sg = 1,
   head_ft = 0, pump_efficiency = 0.7,
@@ -703,7 +703,7 @@ REFRIGERATION_RENDERERS["secondary-glycol-loop"] = _simpleRenderer({
 // fixing one fixes the other. Raising pressure at a fixed outlet temperature
 // buys refrigerating effect and costs compressor work; the two cross, and the
 // crossing point is the optimum.
-// dims: in { ambient_f: T, gas_cooler_approach_f: T, evaporating_psig: M L^-1 T^-2 } out: { gc_outlet_f: T, gc_outlet_c: T, p_opt_bar: M L^-1 T^-2, p_opt_psia: M L^-1 T^-2, p_opt_psig: M L^-1 T^-2, pressure_ratio: dimensionless, critical_psia: M L^-1 T^-2 }
+// dims: in { ambient_f: T, gas_cooler_approach_f: T, evaporating_psig: M L^-1 T^-2 } out: { gc_outlet_f: T, gc_outlet_c: T, p_opt_bar: M L^-1 T^-2, p_opt_psia: M L^-1 T^-2, p_opt_psig: M L^-1 T^-2, pressure_ratio: dimensionless, critical_psia: M L^-1 T^-2, critical_f: T }
 export function computeCo2TranscriticalPressure({ ambient_f = null, gas_cooler_approach_f = 0, evaporating_psig = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // A blank ambient read as 0 F reported a subcritical gas cooler with confidence.
@@ -764,7 +764,7 @@ REFRIGERATION_RENDERERS["co2-transcritical-pressure"] = _simpleRenderer({
 // fire case is heat absorbed through the shell boiling the contents. That is
 // why a long thin vessel and a short fat one of the same VOLUME need different
 // relief, and why relief sizing never asks how much refrigerant is inside.
-// dims: in { vessel_diameter_ft: L, vessel_length_ft: L, f_constant: dimensionless, valve_rated_lb_min: M T^-1, pipe_straight_length_ft: L, fitting_equivalent_length_ft: L, max_allowable_equivalent_length_ft: L, combustibles_within_20ft: dimensionless } out: { required_lb_min: M T^-1, margin_ratio: dimensionless, dl_product_ft2: L^2, equivalent_length_ft: L, length_margin_ft: L }
+// dims: in { vessel_diameter_ft: L, vessel_length_ft: L, f_constant: dimensionless, valve_rated_lb_min: M T^-1, pipe_straight_length_ft: L, fitting_equivalent_length_ft: L, max_allowable_equivalent_length_ft: L, combustibles_within_20ft: dimensionless } out: { required_lb_min: M T^-1, margin_ratio: dimensionless, dl_product_ft2: L^2, equivalent_length_ft: L, length_margin_ft: L, combustibles_multiplier: dimensionless }
 export function computeRefrigerationReliefCapacity({
   vessel_diameter_ft = 0, vessel_length_ft = 0, f_constant = 0, valve_rated_lb_min = 0,
   pipe_straight_length_ft = 0, fitting_equivalent_length_ft = 0, max_allowable_equivalent_length_ft = 0,

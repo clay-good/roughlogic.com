@@ -141,7 +141,7 @@ export function ifgcLowPressureFlow({ d_in, dP_in_wc, cr, L_ft }) {
   return Math.pow(19.17 * d_in * Math.pow(dP_in_wc / (cr * L_ft), 0.206), 1 / 0.381);
 }
 
-// dims: in { btu_load: M L^2 T^-3, length_ft: L, gas: dimensionless, dP_in_wc: M L^-1 T^-2, candidate_sizes: dimensionless } out: { required_cfh: L^3 T^-1, capacity_cfh: L^3 T^-1, dP_in_wc: M L^-1 T^-2 }
+// dims: in { btu_load: M L^2 T^-3, length_ft: L, gas: dimensionless, dP_in_wc: M L^-1 T^-2, candidate_sizes: dimensionless } out: { required_cfh: L^3 T^-1, capacity_cfh: L^3 T^-1, dP_in_wc: M L^-1 T^-2, dP_achieved_in_wc: M L^-1 T^-2 }
 export function computeGasPipeSizing({ btu_load, length_ft, gas, dP_in_wc = 0.5, candidate_sizes = ["0.5", "0.75", "1", "1.25", "1.5", "2"] }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(Number(btu_load) > 0)) return { error: "Connected load must be positive (BTU/h)." };
@@ -858,7 +858,7 @@ function _lpWettedArea(radius_ft, length_ft, depth_ft) {
 // demonstrate: BOTH TERMS MOVE THE WRONG WAY TOGETHER in a cold snap on a
 // drawn-down tank, so the compound fall is much larger than either alone.
 // =====================================================================
-// dims: in { tank_diameter_ft: L, tank_length_ft: L, percent_full: dimensionless, ambient_f: T, liquid_temperature_f: T, reference_capacity_btuh: M L^2 T^-3, reference_percent_full: dimensionless, reference_ambient_f: T, connected_load_btuh: M L^2 T^-3 } out: { wetted_area_ft2: L^2, reference_wetted_area_ft2: L^2, capacity_btuh: M L^2 T^-3, margin_btuh: M L^2 T^-3, tanks_required: dimensionless, depth_ft: L, temperature_ratio: dimensionless, area_ratio: dimensionless }
+// dims: in { tank_diameter_ft: L, tank_length_ft: L, percent_full: dimensionless, ambient_f: T, liquid_temperature_f: T, reference_capacity_btuh: M L^2 T^-3, reference_percent_full: dimensionless, reference_ambient_f: T, connected_load_btuh: M L^2 T^-3 } out: { wetted_area_ft2: L^2, reference_wetted_area_ft2: L^2, capacity_btuh: M L^2 T^-3, margin_btuh: M L^2 T^-3, tanks_required: dimensionless, depth_ft: L, temperature_ratio: dimensionless, area_ratio: dimensionless, limit_percent_full: dimensionless, load_pct_of_capacity: dimensionless }
 export function computePropaneVaporizationRate({
   tank_diameter_ft = 0, tank_length_ft = 0, percent_full = 0, ambient_f = null,
   liquid_temperature_f = 0, reference_capacity_btuh = 0, reference_percent_full = 0,
@@ -939,7 +939,7 @@ export const propaneVaporizationRateExample = { inputs: { tank_diameter_ft: 3.5,
 // is not, which is why propane-vaporization-rate computes the area instead
 // of scaling it with the fill.
 // =====================================================================
-// dims: in { water_capacity_gal: L^3, fill_limit_pct: dimensionless, current_gauge_pct: dimensionless, btu_per_gal: M L^2 T^-2 L^-3, liquid_temperature_f: T } out: { max_fill_gal: L^3, outage_gal: L^3, current_gal: L^3, deliverable_gal: L^3, full_tank_mmbtu: M L^2 T^-2, current_mmbtu: M L^2 T^-2, expansion_headroom_f: T, hydraulically_full_at_f: T, outage_pct: dimensionless }
+// dims: in { water_capacity_gal: L^3, fill_limit_pct: dimensionless, current_gauge_pct: dimensionless, btu_per_gal: M L^2 T^-2 L^-3, liquid_temperature_f: T } out: { max_fill_gal: L^3, outage_gal: L^3, current_gal: L^3, deliverable_gal: L^3, full_tank_mmbtu: M L^2 T^-2, current_mmbtu: M L^2 T^-2, expansion_headroom_f: T, hydraulically_full_at_f: T, outage_pct: dimensionless, limit_headroom_f: T }
 export function computePropaneFillOutage({
   water_capacity_gal = 0, fill_limit_pct = 80, current_gauge_pct = 0,
   btu_per_gal = _LP_BTU_PER_GAL, liquid_temperature_f = 0,
@@ -1147,7 +1147,7 @@ export const lpContainerSeparationExample = { inputs: { water_capacity_gal: 500,
 // honest: the duty cycle, the delivery trigger rather than empty, and a
 // degree-day history that beats any appliance rating.
 // =====================================================================
-// dims: in { water_capacity_gal: L^3, fill_limit_pct: dimensionless, current_gauge_pct: dimensionless, trigger_pct: dimensionless, connected_load_btuh: M L^2 T^-3, duty_cycle: dimensionless, btu_per_gal: M L^2 T^-2 L^-3, gallons_per_hdd: L^3, hdd_per_day: T } out: { usable_gal: L^3, usable_mmbtu: M L^2 T^-2, continuous_hours: T, continuous_days: T, realistic_days: T, gallons_to_trigger: L^3, gallons_per_day: L^3 T^-1, days_to_trigger: T, hdd_days_to_trigger: T, history_ratio: dimensionless }
+// dims: in { water_capacity_gal: L^3, fill_limit_pct: dimensionless, current_gauge_pct: dimensionless, trigger_pct: dimensionless, connected_load_btuh: M L^2 T^-3, duty_cycle: dimensionless, btu_per_gal: M L^2 T^-2 L^-3, gallons_per_hdd: L^3, hdd_per_day: T } out: { usable_gal: L^3, usable_mmbtu: M L^2 T^-2, continuous_hours: T, continuous_days: T, realistic_days: T, gallons_to_trigger: L^3, gallons_per_day: L^3 T^-1, days_to_trigger: T, hdd_days_to_trigger: T, history_ratio: dimensionless, hdd_gallons_per_day: L^3 T^-1, refill_interval_days: T }
 export function computePropaneRunTime({
   water_capacity_gal = 0, fill_limit_pct = 80, current_gauge_pct = 0, trigger_pct = 0,
   connected_load_btuh = 0, duty_cycle = 0, btu_per_gal = _LP_BTU_PER_GAL,

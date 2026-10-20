@@ -97,7 +97,7 @@ export const ARBORICULTURE_RENDERERS = {};
 
 // ============ spec-v1696: crown reduction and leaf area loss ============
 
-// dims: in { crown_radius_ft: L, reduction_ft: L, outer_third_leaf_share: dimensionless, live_crown_cap_pct: dimensionless } out: { original_area_ft2: L^2, reduced_area_ft2: L^2, area_removed_pct: dimensionless, leaf_area_removed_pct: dimensionless, radius_for_cap_ft: L, amplification: dimensionless, area_removed_ft2: L^2, crown_radius_ft: L, live_crown_cap_pct: dimensionless, radius_removed_pct: dimensionless, reduced_radius_ft: L, reduction_ft: L }
+// dims: in { crown_radius_ft: L, reduction_ft: L, outer_third_leaf_share: dimensionless, live_crown_cap_pct: dimensionless } out: { original_area_ft2: L^2, reduced_area_ft2: L^2, area_removed_pct: dimensionless, leaf_area_removed_pct: dimensionless, radius_for_cap_ft: L, amplification: dimensionless, area_removed_ft2: L^2, crown_radius_ft: L, live_crown_cap_pct: dimensionless, radius_removed_pct: dimensionless, reduced_radius_ft: L, reduction_ft: L, outer_third_leaf_share: dimensionless }
 export function computeCrownReductionLeafArea({ crown_radius_ft = 0, reduction_ft = 0, outer_third_leaf_share = 0.75, live_crown_cap_pct = 25 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(crown_radius_ft > 0)) return { error: "Crown radius must be positive (ft)." };
@@ -181,7 +181,7 @@ ARBORICULTURE_RENDERERS["crown-reduction-leaf-area"] = _simpleRenderer({
 
 // ============ spec-v1697: root ball diameter and weight ============
 
-// dims: in { caliper_in: L, ball_per_caliper_in: dimensionless, depth_ratio: dimensionless, soil_density_pcf: M L^-3, handling_limit_lb: M L T^-2 } out: { ball_diameter_in: L, ball_diameter_ft: L, ball_depth_ft: L, ball_volume_ft3: L^3, ball_weight_lb: M L T^-2, ball_weight_tons: M, caliper_for_limit_in: L, caliper_in: L, depth_ratio: dimensionless, soil_density_pcf: M L^-3 }
+// dims: in { caliper_in: L, ball_per_caliper_in: dimensionless, depth_ratio: dimensionless, soil_density_pcf: M L^-3, handling_limit_lb: M L T^-2 } out: { ball_diameter_in: L, ball_diameter_ft: L, ball_depth_ft: L, ball_volume_ft3: L^3, ball_weight_lb: M L T^-2, ball_weight_tons: M, caliper_for_limit_in: L, caliper_in: L, depth_ratio: dimensionless, soil_density_pcf: M L^-3, ball_per_caliper_in: dimensionless, handling_limit_lb: M L T^-2 }
 export function computeRootBallSizeWeight({ caliper_in = 0, ball_per_caliper_in = 10, depth_ratio = 0.6, soil_density_pcf = 105, handling_limit_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(caliper_in > 0)) return { error: "Trunk caliper must be positive (in)." };
@@ -249,7 +249,7 @@ ARBORICULTURE_RENDERERS["root-ball-size-weight"] = _simpleRenderer({
 
 // ============ spec-v1698: tree cabling support system rating ============
 
-// dims: in { defect_to_tips_ft: L, placement_fraction: dimensionless, alternative_placement_ft: L, design_load_lb: M L T^-2, cable_rating_lb: M L T^-2, termination_rating_lb: M L T^-2, anchor_rating_lb: M L T^-2, cable_count: dimensionless } out: { placement_height_ft: L, moment_arm_ratio: dimensionless, force_at_placement_lb: M L T^-2, force_at_alternative_lb: M L T^-2, system_rating_lb: M L T^-2, utilization_pct: dimensionless, alternative_placement_ft: L, cable_count: dimensionless, defect_to_tips_ft: L, design_load_lb: M L T^-2, placement_fraction: dimensionless }
+// dims: in { defect_to_tips_ft: L, placement_fraction: dimensionless, alternative_placement_ft: L, design_load_lb: M L T^-2, cable_rating_lb: M L T^-2, termination_rating_lb: M L T^-2, anchor_rating_lb: M L T^-2, cable_count: dimensionless } out: { placement_height_ft: L, moment_arm_ratio: dimensionless, force_at_placement_lb: M L T^-2, force_at_alternative_lb: M L T^-2, system_rating_lb: M L T^-2, utilization_pct: dimensionless, alternative_placement_ft: L, cable_count: dimensionless, defect_to_tips_ft: L, design_load_lb: M L T^-2, placement_fraction: dimensionless, anchor_rating_lb: M L T^-2, cable_rating_lb: M L T^-2, force_multiple: dimensionless, termination_rating_lb: M L T^-2 }
 export function computeTreeCablingRating({ defect_to_tips_ft = 0, placement_fraction = 0.6667, alternative_placement_ft = 0, design_load_lb = 0, cable_rating_lb = 0, termination_rating_lb = 0, anchor_rating_lb = 0, cable_count = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(defect_to_tips_ft > 0)) return { error: "The distance from the defect to the branch tips must be positive (ft)." };
@@ -322,7 +322,7 @@ ARBORICULTURE_RENDERERS["tree-cabling-rating"] = _simpleRenderer({
 
 // ============ spec-v1699: stump grinding volume and chip yield ============
 
-// dims: in { stump_diameter_in: L, grind_diameter_in: L, grind_depth_in: L, swell_factor: dimensionless, settlement_fraction: dimensionless } out: { in_place_volume_ft3: L^3, stump_only_volume_ft3: L^3, flare_multiple: dimensionless, chip_volume_ft3: L^3, backfill_volume_ft3: L^3, excess_volume_ft3: L^3, chip_volume_cy: L^3, excess_volume_cy: L^3, grind_depth_in: L, grind_diameter_in: L, settled_volume_ft3: L^3, settlement_fraction: dimensionless, stump_diameter_in: L, topping_volume_ft3: L^3 }
+// dims: in { stump_diameter_in: L, grind_diameter_in: L, grind_depth_in: L, swell_factor: dimensionless, settlement_fraction: dimensionless } out: { in_place_volume_ft3: L^3, stump_only_volume_ft3: L^3, flare_multiple: dimensionless, chip_volume_ft3: L^3, backfill_volume_ft3: L^3, excess_volume_ft3: L^3, chip_volume_cy: L^3, excess_volume_cy: L^3, grind_depth_in: L, grind_diameter_in: L, settled_volume_ft3: L^3, settlement_fraction: dimensionless, stump_diameter_in: L, topping_volume_ft3: L^3, swell_factor: dimensionless }
 export function computeStumpGrindingVolume({ stump_diameter_in = 0, grind_diameter_in = 0, grind_depth_in = 0, swell_factor = 1.8, settlement_fraction = 0.3 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(stump_diameter_in > 0)) return { error: "Stump diameter must be positive (in)." };

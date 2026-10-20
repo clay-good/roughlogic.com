@@ -66,7 +66,7 @@ export const EARTHWORK_RENDERERS = {};
 //
 // loose = bank x (1 + swell/100); load_factor = 1/(1+swell/100);
 // compacted = bank x (1 - shrink/100); fill_shortage = bank - compacted.
-// dims: in { bank_cy: L^3, swell_pct: dimensionless, shrink_pct: dimensionless } out: { loose_cy: L^3, load_factor: dimensionless, compacted_cy: L^3, fill_shortage_cy: L^3 }
+// dims: in { bank_cy: L^3, swell_pct: dimensionless, shrink_pct: dimensionless } out: { loose_cy: L^3, load_factor: dimensionless, compacted_cy: L^3, fill_shortage_cy: L^3, borrow_per_compacted: dimensionless }
 // (Bank volume is L^3; swell and shrinkage are dimensionless percents; the
 //  loose, compacted, and shortfall volumes are L^3 and the load factor dimensionless.)
 export function computeSoilSwellShrink({ bank_cy, swell_pct = 25, shrink_pct = 15 } = {}) {
@@ -1098,7 +1098,7 @@ EARTHWORK_RENDERERS["restrained-pipe-length"] = _v832renderRestrainedPipeLength;
 // full capstan/bend and hydrokinetic drag terms):
 //   pullback_lb = friction_coeff x eff_weight_plf x length_ft x bend_factor + fluid_drag_lb
 //   utilization = safe pull > 0 ? pullback / safe pull : null
-// dims: in { eff_weight_plf: M T^-2, length_ft: L, friction_coeff: dimensionless, bend_factor: dimensionless, fluid_drag_lb: M L T^-2, pipe_safe_pull_lb: M L T^-2 } out: { pullback_lb: M L T^-2, utilization: dimensionless, capstan_utilization: dimensionless, governing_utilization: dimensionless }
+// dims: in { eff_weight_plf: M T^-2, length_ft: L, friction_coeff: dimensionless, bend_factor: dimensionless, fluid_drag_lb: M L T^-2, pipe_safe_pull_lb: M L T^-2 } out: { pullback_lb: M L T^-2, utilization: dimensionless, capstan_utilization: dimensionless, governing_utilization: dimensionless, capstan_factor: dimensionless }
 export function computeHddPullback({ eff_weight_plf = 5, length_ft = 800, friction_coeff = 0.3, bend_factor = 1.5, fluid_drag_lb = 0, pipe_safe_pull_lb = 0, total_bend_deg = 0, rig_rated_pull_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(eff_weight_plf > 0)) return { error: "Effective pipe weight must be positive (lb/ft)." };

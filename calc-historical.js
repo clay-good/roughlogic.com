@@ -102,7 +102,7 @@ export function computePercentileBands({ points = [], lookback_months = 12 } = {
 // Convenience for tests: drive the pipeline end-to-end using a bundled-shape
 // shard. Returns the same fields plus the commodity catalog entry.
 // dims: in { commodity: dimensionless, lookback_months: dimensionless, shard: dimensionless }
-//        out: { p25: dimensionless, p50: dimensionless, p75: dimensionless, p90: dimensionless, latest: dimensionless }
+//        out: { p25: dimensionless, p50: dimensionless, p75: dimensionless, p90: dimensionless, latest: dimensionless, points_in_window: dimensionless }
 export function computeHistorical({ commodity, lookback_months = 12, shard }) {
   const cat = COMMODITY_BY_ID[commodity];
   if (!cat) return { error: "Unknown commodity." };

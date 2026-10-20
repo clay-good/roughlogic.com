@@ -586,7 +586,7 @@ HVACSERVICE_RENDERERS["furnace-airflow-to-rise"] = _simpleRenderer({
 
 // ===================== spec-v218: blower-door air-tightness (ACH50) =====================
 
-// dims: in { cfm50: L^3 T^-1, volume_ft3: L^3, n_factor: dimensionless, target_ach50: dimensionless, n_factor_low: dimensionless, n_factor_high: dimensionless, heating_degree_days: dimensionless } out: { ach50: T^-1, ach_nat: T^-1, cfm_nat: L^3 T^-1, cfm_nat_low_n: L^3 T^-1, cfm_nat_high_n: L^3 T^-1, spread_ratio: dimensionless, infiltration_btu_per_year: M L^2 T^-3 }
+// dims: in { cfm50: L^3 T^-1, volume_ft3: L^3, n_factor: dimensionless, target_ach50: dimensionless, n_factor_low: dimensionless, n_factor_high: dimensionless, heating_degree_days: dimensionless } out: { ach50: T^-1, ach_nat: T^-1, cfm_nat: L^3 T^-1, cfm_nat_low_n: L^3 T^-1, cfm_nat_high_n: L^3 T^-1, spread_ratio: dimensionless, infiltration_btu_per_year: M L^2 T^-3, infiltration_btu_high_n: M L^2 T^-3, infiltration_btu_low_n: M L^2 T^-3 }
 export function computeBlowerDoorAch50({ cfm50 = 0, volume_ft3 = 0, n_factor = 17, target_ach50 = 3, n_factor_low = 0, n_factor_high = 0, heating_degree_days = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(cfm50 > 0)) return { error: "Measured CFM50 must be positive (cfm)." };
@@ -1439,7 +1439,7 @@ HVACSERVICE_RENDERERS["condensate-overflow-pan"] = _simpleRenderer({
 // ===========================================================================
 
 // ===================== spec-v1415: control damper authority and leakage =====================
-// dims: in { damper_dp_inwg: M L^-1 T^-2, branch_dp_inwg: M L^-1 T^-2, face_area_sqft: L^2, leakage_class_cfm_sqft: L T^-1, closed_dp_inwg: M L^-1 T^-2, design_cfm: L^3 T^-1, blade_type: dimensionless } out: { authority: dimensionless, leakage_1in_cfm: L^3 T^-1, leakage_actual_cfm: L^3 T^-1, leakage_pct: dimensionless }
+// dims: in { damper_dp_inwg: M L^-1 T^-2, branch_dp_inwg: M L^-1 T^-2, face_area_sqft: L^2, leakage_class_cfm_sqft: L T^-1, closed_dp_inwg: M L^-1 T^-2, design_cfm: L^3 T^-1, blade_type: dimensionless } out: { authority: dimensionless, leakage_1in_cfm: L^3 T^-1, leakage_actual_cfm: L^3 T^-1, leakage_pct: dimensionless, dp_for_target: M L^-1 T^-2 }
 export function computeDamperAuthority({ damper_dp_inwg = 0, branch_dp_inwg = 0, face_area_sqft = 0, leakage_class_cfm_sqft = 0, closed_dp_inwg = 0, design_cfm = 0, blade_type = "parallel" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (blade_type !== "parallel" && blade_type !== "opposed") return { error: "Blade type must be parallel or opposed." };
@@ -1509,7 +1509,7 @@ HVACSERVICE_RENDERERS["damper-authority"] = _simpleRenderer({
 });
 
 // ===================== spec-v1416: chilled-water low delta-T screen =====================
-// dims: in { load_btuh: M L^2 T^-3, actual_gpm: L^3 T^-1, design_delta_t_f: T } out: { actual_delta_t_f: T, design_flow_gpm: L^3 T^-1, excess_flow_gpm: L^3 T^-1, pump_penalty: dimensionless, excess_pct: dimensionless }
+// dims: in { load_btuh: M L^2 T^-3, actual_gpm: L^3 T^-1, design_delta_t_f: T } out: { actual_delta_t_f: T, design_flow_gpm: L^3 T^-1, excess_flow_gpm: L^3 T^-1, pump_penalty: dimensionless, excess_pct: dimensionless, tons: M L^2 T^-3 }
 export function computeChilledWaterDeltaT({ load_btuh = 0, actual_gpm = 0, design_delta_t_f = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(load_btuh > 0)) return { error: "Measured load must be positive." };
@@ -1571,7 +1571,7 @@ HVACSERVICE_RENDERERS["chilled-water-delta-t"] = _simpleRenderer({
 // in 10 cfm steps and rated at 0.25 in wc (M1505.5 via M1505.3).
 const _BEF_MIN = { bathroom: { intermittent: 50, continuous: 20 }, kitchen: { intermittent: 100, continuous: 25 } };
 
-// dims: in { room_type: dimensionless, length_ft: L, width_ft: L, ceiling_ft: L, operation: dimensionless, rule: dimensionless, toilets: dimensionless, showers: dimensionless, tubs: dimensionless, jetted_tubs: dimensionless } out: { area_sqft: L^2, volume_cuft: L^3, code_min_cfm: L^3 T^-1, rule_cfm: L^3 T^-1, intermittent_size_cfm: L^3 T^-1, recommended_cfm: L^3 T^-1, ach_at_recommended: T^-1 }
+// dims: in { room_type: dimensionless, length_ft: L, width_ft: L, ceiling_ft: L, operation: dimensionless, rule: dimensionless, toilets: dimensionless, showers: dimensionless, tubs: dimensionless, jetted_tubs: dimensionless } out: { area_sqft: L^2, volume_cuft: L^3, code_min_cfm: L^3 T^-1, rule_cfm: L^3 T^-1, intermittent_size_cfm: L^3 T^-1, recommended_cfm: L^3 T^-1, ach_at_recommended: T^-1, continuous_min_cfm: L^3 T^-1 }
 export function computeBathExhaustFanSizing({
   room_type = "bathroom", length_ft = 0, width_ft = 0, ceiling_ft = 8, operation = "intermittent", rule = "ach8",
   toilets = 0, showers = 0, tubs = 0, jetted_tubs = 0,

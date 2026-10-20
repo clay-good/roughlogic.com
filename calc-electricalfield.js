@@ -114,7 +114,7 @@ function _v852renderWirePullingLubricant(inputRegion, outputRegion, citationEl) 
 ELECTRICALFIELD_RENDERERS["wire-pulling-lubricant"] = _v852renderWirePullingLubricant;
 
 // ===================== spec-v854: branch-circuit conductor footage takeoff =====================
-// dims: in { circuits: dimensionless, avg_homerun_ft: L, makeup_ft: L, conductors_per_circuit: dimensionless, roll_ft: L } out: { total_ft: L, rolls: dimensionless }
+// dims: in { circuits: dimensionless, avg_homerun_ft: L, makeup_ft: L, conductors_per_circuit: dimensionless, roll_ft: L } out: { total_ft: L, rolls: dimensionless, ft_per_color: L, rolls_bought: dimensionless, rolls_per_color: dimensionless }
 export function computeBranchCircuitWireFootage({ circuits = 20, avg_homerun_ft = 45, makeup_ft = 15, conductors_per_circuit = 3, roll_ft = 1000 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(circuits > 0)) return { error: "Circuit count must be positive." };
@@ -641,7 +641,7 @@ ELECTRICALFIELD_RENDERERS["conduit-nipple-60-fill"] = _v989renderConduitNipple60
 // Balanced (I_A = I_B) collapses to R x I -- HALF a two-wire circuit, since the neutral carries
 // nothing. Badly unbalanced makes VD_B negative: the lightly loaded leg RISES above nominal.
 // Resistance comes from the repo's own conductorResistancePerKft, not a recalled table.
-// dims: in { awg: dimensionless, material: dimensionless, one_way_length_ft: L, load_a_amps: I, load_b_amps: I, source_volts: M L^2 T^-3 I^-1, temperature_C: T } out: { neutral_amps: I, vd_a_volts: M L^2 T^-3 I^-1, vd_b_volts: M L^2 T^-3 I^-1, r_ohms: M L^2 T^-3 I^-2, volts_a: I, worst_pct: dimensionless }
+// dims: in { awg: dimensionless, material: dimensionless, one_way_length_ft: L, load_a_amps: I, load_b_amps: I, source_volts: M L^2 T^-3 I^-1, temperature_C: T } out: { neutral_amps: I, vd_a_volts: M L^2 T^-3 I^-1, vd_b_volts: M L^2 T^-3 I^-1, r_ohms: M L^2 T^-3 I^-2, volts_a: M L^2 T^-3 I^-1, worst_pct: dimensionless, balanced_vd: M L^2 T^-3 I^-1, pct_a: dimensionless, pct_b: dimensionless, r_per_kft: M L T^-3 I^-2, two_wire_vd: M L^2 T^-3 I^-1, volts_b: M L^2 T^-3 I^-1 }
 export function computeMwbcVoltageDrop({ awg = "12", material = "copper", one_way_length_ft = 0, load_a_amps = 0, load_b_amps = 0, source_volts = 120, temperature_C = 75 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const len = Number(one_way_length_ft) || 0;

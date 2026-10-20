@@ -99,7 +99,7 @@ function _international14Bf(D, L) {
   if (rem > 0) bf += sec(D + 0.5 * n) * rem / 4;
   return Math.max(0, bf);
 }
-// dims: in { scaled_bf: dimensionless, actual_bf: dimensionless, log_volume_cuft: L^3, benchmark_lrf: L^-3, avg_log_diameter_in: L, log_length_ft: L, kerf_in: L, target_kerf_in: L, board_thickness_in: L } out: { overrun_pct: dimensionless, recovery_bf_per_cuft: L^-3, scale_bias_overrun_pct: dimensionless, kerf_gain_bf: dimensionless, sawdust_share_pct: dimensionless, kerf_gain_pct: dimensionless, lrf_vs_benchmark_pct: dimensionless, target_sawdust_share_pct: dimensionless }
+// dims: in { scaled_bf: dimensionless, actual_bf: dimensionless, log_volume_cuft: L^3, benchmark_lrf: L^-3, avg_log_diameter_in: L, log_length_ft: L, kerf_in: L, target_kerf_in: L, board_thickness_in: L } out: { overrun_pct: dimensionless, recovery_bf_per_cuft: L^-3, scale_bias_overrun_pct: dimensionless, kerf_gain_bf: dimensionless, sawdust_share_pct: dimensionless, kerf_gain_pct: dimensionless, lrf_vs_benchmark_pct: dimensionless, target_sawdust_share_pct: dimensionless, performance_overrun_pts: dimensionless }
 export function computeLumberRecoveryOverrun({ scaled_bf = 0, actual_bf = 0, log_volume_cuft = 0, benchmark_lrf = 7, avg_log_diameter_in = 0, log_length_ft = 16, kerf_in = 0, target_kerf_in = 0, board_thickness_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(scaled_bf > 0)) return { error: "Scaled board feet must be positive." };
@@ -167,7 +167,7 @@ SAWMILL_RENDERERS["lumber-recovery-overrun"] = _simpleRenderer({
 
 // ============ spec-v1583: kiln drying time ============
 
-// dims: in { mc_initial_pct: dimensionless, mc_final_pct: dimensionless, fsp_mc_pct: dimensionless, rate_above_fsp_ppd: T^-1, rate_below_fsp_ppd: T^-1, equalize_condition_days: T, thickness_in: L, alt_thickness_in: L, thickness_exponent: dimensionless } out: { days_above_fsp: T, days_below_fsp: T, drying_days: T, cycle_days: T, alt_drying_days: T, below_share_pct: dimensionless }
+// dims: in { mc_initial_pct: dimensionless, mc_final_pct: dimensionless, fsp_mc_pct: dimensionless, rate_above_fsp_ppd: T^-1, rate_below_fsp_ppd: T^-1, equalize_condition_days: T, thickness_in: L, alt_thickness_in: L, thickness_exponent: dimensionless } out: { days_above_fsp: T, days_below_fsp: T, drying_days: T, cycle_days: T, alt_drying_days: T, below_share_pct: dimensionless, alt_cycle_days: T, linear_rate_ppd: T^-1, points_removed: dimensionless, proportional_days: T, rate_below_fsp_ppd: T^-1, thickness_scale: dimensionless, underquote_factor: dimensionless }
 export function computeKilnDryingTime({ mc_initial_pct = 0, mc_final_pct = 0, fsp_mc_pct = 30, rate_above_fsp_ppd = 0, rate_below_fsp_ppd = 0, equalize_condition_days = 0, thickness_in = 0, alt_thickness_in = 0, thickness_exponent = 1.8 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(mc_initial_pct > 0)) return { error: "Initial moisture content must be positive." };
@@ -240,7 +240,7 @@ SAWMILL_RENDERERS["kiln-drying-time"] = _simpleRenderer({
 
 // ============ spec-v1584: kiln charge water and vent load ============
 
-// dims: in { green_weight_lb: M, mc_initial_pct: dimensionless, mc_final_pct: dimensionless, btu_per_lb_water: L^2 T^-2, schedule_days: T, intermediate_mc_pct: dimensionless } out: { oven_dry_lb: M, water_lb: M, water_gal: L^3, energy_btu: M L^2 T^-2, vent_lb_per_hr: M T^-1, green_water_share_pct: dimensionless, wrong_way_excess_pct: dimensionless }
+// dims: in { green_weight_lb: M, mc_initial_pct: dimensionless, mc_final_pct: dimensionless, btu_per_lb_water: L^2 T^-2, schedule_days: T, intermediate_mc_pct: dimensionless } out: { oven_dry_lb: M, water_lb: M, water_gal: L^3, energy_btu: M L^2 T^-2, vent_lb_per_hr: M T^-1, green_water_share_pct: dimensionless, wrong_way_excess_pct: dimensionless, avg_rate_ppd: T^-1, energy_mmbtu: M L^2 T^-2, pct_water_out_by_intermediate: dimensionless, vent_gal_per_hr: L^3 T^-1 }
 export function computeKilnChargeWater({ green_weight_lb = 0, mc_initial_pct = 0, mc_final_pct = 0, btu_per_lb_water = 2000, schedule_days = 0, intermediate_mc_pct = 30 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(green_weight_lb > 0)) return { error: "Charge green weight must be positive." };
@@ -306,7 +306,7 @@ SAWMILL_RENDERERS["kiln-charge-water"] = _simpleRenderer({
 
 // ============ spec-v1585: bandmill blade speed, feed, and bite ============
 
-// dims: in { wheel_diameter_in: L, wheel_rpm: T^-1, tooth_spacing_in: L, feed_rate_fpm: L T^-1, target_bite_in: L, kerf_in: L, depth_of_face_in: L, gullet_capacity_cuin: L^3 } out: { blade_speed_sfpm: L T^-1, teeth_per_min: T^-1, bite_in: L, feed_for_target_fpm: L T^-1, max_face_in: L, gullet_use_pct: dimensionless, max_feed_at_face_fpm: L T^-1 }
+// dims: in { wheel_diameter_in: L, wheel_rpm: T^-1, tooth_spacing_in: L, feed_rate_fpm: L T^-1, target_bite_in: L, kerf_in: L, depth_of_face_in: L, gullet_capacity_cuin: L^3 } out: { blade_speed_sfpm: L T^-1, teeth_per_min: T^-1, bite_in: L, feed_for_target_fpm: L T^-1, max_face_in: L, gullet_use_pct: dimensionless, max_feed_at_face_fpm: L T^-1, gullet_load_cuin: L^3 }
 export function computeBandmillSpeedBite({ wheel_diameter_in = 0, wheel_rpm = 0, tooth_spacing_in = 0, feed_rate_fpm = 0, target_bite_in = 0, kerf_in = 0, depth_of_face_in = 0, gullet_capacity_cuin = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(wheel_diameter_in > 0)) return { error: "Wheel diameter must be positive." };
@@ -372,7 +372,7 @@ SAWMILL_RENDERERS["bandmill-speed-bite"] = _simpleRenderer({
 
 // ============ spec-v1586: sawmill residue and sawdust yield ============
 
-// dims: in { lumber_recovery_pct: dimensionless, kerf_in: L, target_kerf_in: L, board_thickness_in: L, alt_board_thickness_in: L, bark_fraction_pct: dimensionless, annual_lumber_mbf: dimensionless } out: { sawdust_share_pct: dimensionless, residue_pct: dimensionless, chips_of_log_pct: dimensionless, gain_pts: dimensionless, annual_gain_bf: dimensionless, alt_share_pct: dimensionless, alt_target_share_pct: dimensionless, sawdust_of_log_pct: dimensionless, target_sawdust_share_pct: dimensionless, gain_ratio: dimensionless, bark_fraction_pct: dimensionless }
+// dims: in { lumber_recovery_pct: dimensionless, kerf_in: L, target_kerf_in: L, board_thickness_in: L, alt_board_thickness_in: L, bark_fraction_pct: dimensionless, annual_lumber_mbf: dimensionless } out: { sawdust_share_pct: dimensionless, residue_pct: dimensionless, chips_of_log_pct: dimensionless, gain_pts: dimensionless, annual_gain_bf: dimensionless, alt_share_pct: dimensionless, alt_target_share_pct: dimensionless, sawdust_of_log_pct: dimensionless, target_sawdust_share_pct: dimensionless, gain_ratio: dimensionless, bark_fraction_pct: dimensionless, alt_gain_pts: dimensionless }
 export function computeSawmillResidueYield({ lumber_recovery_pct = 0, kerf_in = 0, target_kerf_in = 0, board_thickness_in = 0, alt_board_thickness_in = 0, bark_fraction_pct = 0, annual_lumber_mbf = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(lumber_recovery_pct > 0 && lumber_recovery_pct < 100)) return { error: "Lumber recovery must be between 0 and 100 percent of log volume." };

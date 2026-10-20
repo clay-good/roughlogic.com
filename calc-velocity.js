@@ -87,7 +87,7 @@ VELOCITY_RENDERERS["duct-velocity-pressure"] = renderDuctVelocityPressure;
 // ~4000 fpm the line is noisy. Specific volume is user-supplied at the line
 // condition; manufacturer line-sizing tables govern.
 //
-// dims: in { mass_flow_lb_hr: M T^-1, line_id_in: L, specific_volume_ft3_lb: L^3 M^-1, orientation: dimensionless } out: { velocity_fpm: L T^-1, area_ft2: L^2 }
+// dims: in { mass_flow_lb_hr: M T^-1, line_id_in: L, specific_volume_ft3_lb: L^3 M^-1, orientation: dimensionless } out: { velocity_fpm: L T^-1, area_ft2: L^2, oil_return_min_fpm: L T^-1 }
 export function computeRefrigerantVelocity({ mass_flow_lb_hr = 0, line_id_in = 0, specific_volume_ft3_lb = 0, orientation = "horizontal" } = {}) {
   const m = Number(mass_flow_lb_hr) || 0;
   const d = Number(line_id_in) || 0;

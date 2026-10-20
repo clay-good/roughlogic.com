@@ -825,7 +825,7 @@ function _bilinearInterp(table, xs, ys, x, y) {
 }
 
 // dims: in { chlorine_mg_l: M L^-3, t10_minutes: T, temperature_C: T, pH: dimensionless }
-//        out: { CT_achieved: M L^-3 T, CT_required_3log_Giardia: M L^-3 T, log_inactivation: dimensionless, pass_3log_giardia: dimensionless, pass_4log_virus: dimensionless, warnings: dimensionless }
+//        out: { CT_achieved: M L^-3 T, CT_required_3log_Giardia: M L^-3 T, log_inactivation: dimensionless, pass_3log_giardia: dimensionless, pass_4log_virus: dimensionless, warnings: dimensionless, CT_required_4log_virus: M L^-3 T, CT_required_selected: M L^-3 T, log_target: dimensionless, required_t10_min: T }
 // (Chlorine residual is mass / volume; contact time and temperature
 // both surface as `T` per the spec-v14 §7.1 T-shortcut; CT product
 // surfaces as (mass / volume) * time; pH is a logarithmic ratio
@@ -1722,7 +1722,7 @@ WATER_RENDERERS["uv-required-exposure"] = renderUvRequiredExposure;
 
 // --- spec-v570 M: Population equivalent (organic load) ---
 // PE_bod = MGD*BOD*8.34/0.17. PE_flow = MGD*1e6/100. PE_ss = MGD*SS*8.34/0.20. PE = max.
-// dims: in { flow_mgd: L^3 T^-1, bod_mg_l: M L^-3, ss_mg_l: M L^-3 } out: { pe_bod: dimensionless, pe_flow: dimensionless, pe_governing: dimensionless }
+// dims: in { flow_mgd: L^3 T^-1, bod_mg_l: M L^-3, ss_mg_l: M L^-3 } out: { pe_bod: dimensionless, pe_flow: dimensionless, pe_governing: dimensionless, pe_ss: dimensionless }
 export function computePopulationEquivalent({ flow_mgd = 0, bod_mg_l = 0, ss_mg_l = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const mgd = Number(flow_mgd) || 0;
@@ -1763,7 +1763,7 @@ WATER_RENDERERS["population-equivalent"] = renderPopulationEquivalent;
 
 // --- spec-v571 M: Return activated sludge (RAS) flow rate ---
 // Q_RAS = Q x MLSS / (RAS_SS - MLSS). ratio = Q_RAS / Q x 100.
-// dims: in { plant_flow_mgd: L^3 T^-1, mlss_mg_l: M L^-3, ras_ss_mg_l: M L^-3 } out: { q_ras_mgd: L^3 T^-1, ras_ratio_pct: dimensionless }
+// dims: in { plant_flow_mgd: L^3 T^-1, mlss_mg_l: M L^-3, ras_ss_mg_l: M L^-3 } out: { q_ras_mgd: L^3 T^-1, ras_ratio_pct: dimensionless, thickening: dimensionless }
 export function computeRasFlowRate({ plant_flow_mgd = 0, mlss_mg_l = 0, ras_ss_mg_l = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const q = Number(plant_flow_mgd) || 0;
@@ -2300,7 +2300,7 @@ WATER_RENDERERS["two-source-blend"] = _v992renderTwoSourceBlend;
 // well fighting itself and IS recoverable). A step test at three or more
 // rates separates them: plotting s/Q against Q gives the intercept B and the
 // slope C, fitted here by least squares.
-// dims: in { q1_gpm: L^3 T^-1, s1_ft: L, q2_gpm: L^3 T^-1, s2_ft: L, q3_gpm: L^3 T^-1, s3_ft: L, operating_gpm: L^3 T^-1, efficiency_threshold_pct: dimensionless, previous_efficiency_pct: dimensionless } out: { b_ft_per_gpm: T L^-2, c_ft_per_gpm2: T^2 L^-5, aquifer_loss_ft: L, well_loss_ft: L, total_drawdown_ft: L, efficiency_pct: dimensionless, specific_capacity_gpm_ft: L^2 T^-1, light_rate_efficiency_pct: dimensionless }
+// dims: in { q1_gpm: L^3 T^-1, s1_ft: L, q2_gpm: L^3 T^-1, s2_ft: L, q3_gpm: L^3 T^-1, s3_ft: L, operating_gpm: L^3 T^-1, efficiency_threshold_pct: dimensionless, previous_efficiency_pct: dimensionless } out: { b_ft_per_gpm: T L^-2, c_ft_per_gpm2: T^2 L^-5, aquifer_loss_ft: L, well_loss_ft: L, total_drawdown_ft: L, efficiency_pct: dimensionless, specific_capacity_gpm_ft: L^2 T^-1, light_rate_efficiency_pct: dimensionless, efficiency_change_pts: dimensionless, steps_used: dimensionless }
 export function computeStepDrawdownEfficiency({
   q1_gpm = 0, s1_ft = 0, q2_gpm = 0, s2_ft = 0, q3_gpm = 0, s3_ft = 0,
   operating_gpm = 0, efficiency_threshold_pct = 65, previous_efficiency_pct = 0,
@@ -2565,7 +2565,7 @@ WATER_RENDERERS["constant-pressure-well-vfd"] = _simpleRenderer({
 // minimising fill time plus draw time over the inflow.
 // =====================================================================
 const _WW_GAL_PER_CU_FT = 1728 / 231;
-// dims: in { pump_gpm: L^3 T^-1, well_diameter_ft: L, min_cycle_minutes: T, max_starts_per_hour: T^-1, inflow_gpm: L^3 T^-1 } out: { active_volume_gal: L^3, area_ft2: L^2, gal_per_ft: L^2, level_differential_ft: L, worst_case_inflow_gpm: L^3 T^-1, cycle_at_inflow_min: T, cycle_min: T }
+// dims: in { pump_gpm: L^3 T^-1, well_diameter_ft: L, min_cycle_minutes: T, max_starts_per_hour: T^-1, inflow_gpm: L^3 T^-1 } out: { active_volume_gal: L^3, area_ft2: L^2, gal_per_ft: L^2, level_differential_ft: L, worst_case_inflow_gpm: L^3 T^-1, cycle_at_inflow_min: T, cycle_min: T, draw_min: T, fill_min: T, starts_per_hour: T^-1 }
 export function computeWetWellCycleTime({
   pump_gpm = 0, well_diameter_ft = 0, min_cycle_minutes = 0, max_starts_per_hour = 0, inflow_gpm = 0,
 } = {}) {
@@ -2638,7 +2638,7 @@ WATER_RENDERERS["wet-well-cycle-time"] = _simpleRenderer({
 // =====================================================================
 const _MAIN_GAL_PER_FT_COEFF = 0.0408;
 const _MAIN_GPM_COEFF = 2.448; // gpm = 2.448 x d(in)^2 x v(ft/s)
-// dims: in { main_diameter_in: L, run_length_ft: L, target_velocity_fps: L T^-1, pipe_volumes: dimensionless, available_flow_gpm: L^3 T^-1, hydrant_outlets: dimensionless, outlet_capacity_gpm: L^3 T^-1 } out: { gal_per_ft: L^2, pipe_volume_gal: L^3, required_gpm: L^3 T^-1, duration_min: T, total_discharged_gal: L^3, achieved_velocity_fps: L T^-1, governing_gpm: L^3 T^-1, outlet_total_gpm: L^3 T^-1 }
+// dims: in { main_diameter_in: L, run_length_ft: L, target_velocity_fps: L T^-1, pipe_volumes: dimensionless, available_flow_gpm: L^3 T^-1, hydrant_outlets: dimensionless, outlet_capacity_gpm: L^3 T^-1 } out: { gal_per_ft: L^2, pipe_volume_gal: L^3, required_gpm: L^3 T^-1, duration_min: T, total_discharged_gal: L^3, achieved_velocity_fps: L T^-1, governing_gpm: L^3 T^-1, outlet_total_gpm: L^3 T^-1, actual_duration_min: T, max_diameter_one_outlet: L }
 export function computeMainFlushingVolume({
   main_diameter_in = 0, run_length_ft = 0, target_velocity_fps = 3, pipe_volumes = 3,
   available_flow_gpm = 0, hydrant_outlets = 0, outlet_capacity_gpm = 0,

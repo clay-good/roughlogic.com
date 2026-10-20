@@ -138,7 +138,7 @@ PIPEFIT_RENDERERS["pipe-cold-spring"] = _renderColdSpring;
 // ---------------------------------------------------------------------
 // 29.2 PVC raceway expansion fitting (raceway-expansion-fitting) - NEC 352.44
 // ---------------------------------------------------------------------
-// dims: in { run_length_ft: L, temp_range_f: T, alpha_per_f: T^-1, fitting_travel_in: L, threshold_in: L } out: { length_change_in: L, per_100ft_in: L, fittings_needed: dimensionless, alpha_per_f: T^-1, fitting_travel_in: L, run_length_ft: L, threshold_in: L }
+// dims: in { run_length_ft: L, temp_range_f: T, alpha_per_f: T^-1, fitting_travel_in: L, threshold_in: L } out: { length_change_in: L, per_100ft_in: L, fittings_needed: dimensionless, alpha_per_f: T^-1, fitting_travel_in: L, run_length_ft: L, threshold_in: L, temp_range_f: T }
 export function computeRacewayExpansion({ run_length_ft = 0, temp_range_f = 0, alpha_per_f = 0.0000338, fitting_travel_in = 6, threshold_in = 0.25 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const L = Number(run_length_ft);
@@ -188,7 +188,7 @@ PIPEFIT_RENDERERS["raceway-expansion-fitting"] = _renderRacewayExpansion;
 // ---------------------------------------------------------------------
 // 29.3 Insulated parallel-pipe rack spacing (pipe-spacing-rack)
 // ---------------------------------------------------------------------
-// dims: in { pipe_od_in: L, insulation_thickness_in: L, clearance_in: L, pipe_count: dimensionless, rack_width_in: L } out: { insulated_od_in: L, center_to_center_in: L, total_bundle_width_in: L, remaining_in: L, clearance_in: L, insulation_thickness_in: L, pipe_count: dimensionless, pipe_od_in: L }
+// dims: in { pipe_od_in: L, insulation_thickness_in: L, clearance_in: L, pipe_count: dimensionless, rack_width_in: L } out: { insulated_od_in: L, center_to_center_in: L, total_bundle_width_in: L, remaining_in: L, clearance_in: L, insulation_thickness_in: L, pipe_count: dimensionless, pipe_od_in: L, pipes_that_fit: dimensionless }
 export function computePipeSpacingRack({ pipe_od_in = 0, insulation_thickness_in = 0, clearance_in = 1, pipe_count = 2, rack_width_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const od = Number(pipe_od_in);
@@ -912,7 +912,7 @@ const _B16_5_GROUP_1_1 = {
   1500: [3705, 3395, 3270, 3170, 3015, 2840, 2745],
   2500: [6170, 5655, 5450, 5280, 5025, 4730, 4575],
 };
-// dims: in { flange_class: dimensionless, temp_f: T } out: { mawp_psig: M L^-1 T^-2, temp_f: T }
+// dims: in { flange_class: dimensionless, temp_f: T } out: { mawp_psig: M L^-1 T^-2, temp_f: T, flange_class: dimensionless }
 export function computeFlangeRating({ flange_class = 150, temp_f = 0 } = {}) {
   const _g = _finiteGuard({ flange_class, temp_f }); if (_g) return _g;
   // A blank service temperature read as 0 F returned the -20..100 F rating with confidence.

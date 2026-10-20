@@ -340,7 +340,7 @@ ELECDESIGN_RENDERERS["lighting-light-loss-factor"] = _simpleRenderer({
   compute: computeLightingLightLossFactor,
 });
 
-// dims: in { readings: dimensionless, target_avgmin: dimensionless, target_maxmin: dimensionless } out: { avg: dimensionless, min: dimensionless, max: dimensionless, avg_min: dimensionless, max_min: dimensionless, U0: dimensionless }
+// dims: in { readings: dimensionless, target_avgmin: dimensionless, target_maxmin: dimensionless } out: { avg: dimensionless, min: dimensionless, max: dimensionless, avg_min: dimensionless, max_min: dimensionless, U0: dimensionless, n: dimensionless }
 export function computeLightingUniformityRatio({ readings = [], target_avgmin = 0, target_maxmin = 0 } = {}) {
   let vals;
   if (Array.isArray(readings)) vals = readings.map(Number);
@@ -612,7 +612,7 @@ ELECDESIGN_RENDERERS["max-grid-resistance-for-touch"] = _simpleRenderer({
 
 // ===================== spec-v560: industrial control panel SCCR (UL 508A SB) =====================
 
-// dims: in { component_sccrs_ka: dimensionless, feeder_ir_ka: I, available_fault_ka: I } out: { panel_sccr_ka: I, compliant: dimensionless }
+// dims: in { component_sccrs_ka: dimensionless, feeder_ir_ka: I, available_fault_ka: I } out: { panel_sccr_ka: I, compliant: dimensionless, n: dimensionless }
 export function computeSccrCombination({ component_sccrs_ka = [], feeder_ir_ka = 0, available_fault_ka = 0 } = {}) {
   let vals;
   if (Array.isArray(component_sccrs_ka)) vals = component_sccrs_ka.map(Number);

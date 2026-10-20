@@ -94,7 +94,7 @@ const _SQIN_PER_SQFT = 144;
 
 // ===================== spec-v1571: door closer size and opening force =====================
 
-// dims: in { door_width_in: L, door_height_in: L, door_weight_lb: M L T^-2, measured_opening_force_lbf: M L T^-2, force_limit_lbf: M L T^-2, measured_closing_time_s: T, min_closing_time_s: T, pressure_difference_inwc: M L^-1 T^-2, knob_offset_in: L } out: { closer_size: dimensionless, force_margin_lbf: M L T^-2, pressure_force_lbf: M L T^-2, closer_force_lbf: M L T^-2, door_area_sqft: L^2 }
+// dims: in { door_width_in: L, door_height_in: L, door_weight_lb: M L T^-2, measured_opening_force_lbf: M L T^-2, force_limit_lbf: M L T^-2, measured_closing_time_s: T, min_closing_time_s: T, pressure_difference_inwc: M L^-1 T^-2, knob_offset_in: L } out: { closer_size: dimensionless, force_margin_lbf: M L T^-2, pressure_force_lbf: M L T^-2, closer_force_lbf: M L T^-2, door_area_sqft: L^2, knob_factor: dimensionless, width_size: dimensionless }
 export function computeDoorCloserForce({ door_width_in = 0, door_height_in = 0, door_weight_lb = 0, measured_opening_force_lbf = 0, force_limit_lbf = 5, measured_closing_time_s = 0, min_closing_time_s = 5, pressure_difference_inwc = 0, knob_offset_in = 3 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(door_width_in > 0)) return { error: "Door width must be positive." };
@@ -295,7 +295,7 @@ DOORHARDWARE_RENDERERS["panic-hardware-force"] = _simpleRenderer({
 
 // ===================== spec-v1574: electric lock power and standby budget =====================
 
-// dims: in { device_count: dimensionless, holding_current_a: I, inrush_current_a: I, standby_hours: T, battery_derate: dimensionless, supply_rating_a: I, installed_battery_ah: I T, alarm_current_a: I, alarm_minutes: T } out: { steady_current_a: I, peak_inrush_a: I, amp_hours_required: I T, amp_hours_after_derate: I T, supply_margin_a: I }
+// dims: in { device_count: dimensionless, holding_current_a: I, inrush_current_a: I, standby_hours: T, battery_derate: dimensionless, supply_rating_a: I, installed_battery_ah: I T, alarm_current_a: I, alarm_minutes: T } out: { steady_current_a: I, peak_inrush_a: I, amp_hours_required: I T, amp_hours_after_derate: I T, supply_margin_a: I, alarm_amp_hours: I T, batteries_needed: dimensionless, battery_margin_ah: I T, standby_amp_hours: I T }
 export function computeElectricLockPowerBudget({ device_count = 0, holding_current_a = 0, inrush_current_a = 0, standby_hours = 24, battery_derate = 0.8, supply_rating_a = 0, installed_battery_ah = 0, alarm_current_a = 0, alarm_minutes = 5 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(device_count >= 1)) return { error: "Device count must be at least 1." };
@@ -364,7 +364,7 @@ DOORHARDWARE_RENDERERS["electric-lock-power-budget"] = _simpleRenderer({
 
 // ===================== spec-v1575: maglock holding force and door leverage =====================
 
-// dims: in { rated_holding_lb: M L T^-2, lock_distance_from_hinge_in: L, handle_distance_from_hinge_in: L, door_width_in: L, gap_derate_pct: dimensionless, voltage_at_lock: M L^2 T^-3 I^-1, rated_voltage: M L^2 T^-3 I^-1, target_resistance_lb: M L T^-2 } out: { lever_ratio: dimensionless, force_at_handle_lb: M L T^-2, best_case_force_lb: M L T^-2, effective_force_lb: M L T^-2, rating_needed_lb: M L T^-2, best_lock_distance_in: L }
+// dims: in { rated_holding_lb: M L T^-2, lock_distance_from_hinge_in: L, handle_distance_from_hinge_in: L, door_width_in: L, gap_derate_pct: dimensionless, voltage_at_lock: M L^2 T^-3 I^-1, rated_voltage: M L^2 T^-3 I^-1, target_resistance_lb: M L T^-2 } out: { lever_ratio: dimensionless, force_at_handle_lb: M L T^-2, best_case_force_lb: M L T^-2, effective_force_lb: M L T^-2, rating_needed_lb: M L T^-2, best_lock_distance_in: L, gap_factor: dimensionless, improvement_factor: dimensionless, voltage_factor: dimensionless }
 export function computeMaglockLeverage({ rated_holding_lb = 0, lock_distance_from_hinge_in = 0, handle_distance_from_hinge_in = 0, door_width_in = 0, gap_derate_pct = 0, voltage_at_lock = 24, rated_voltage = 24, target_resistance_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(rated_holding_lb > 0)) return { error: "Rated holding force must be positive." };
@@ -486,7 +486,7 @@ DOORHARDWARE_RENDERERS["master-key-bitting-capacity"] = _simpleRenderer({
 
 // ===================== spec-v1577: key cut depths and the MACS check =====================
 
-// dims: in { depth_1: dimensionless, depth_2: dimensionless, depth_3: dimensionless, depth_4: dimensionless, depth_5: dimensionless, depth_6: dimensionless, macs: dimensionless, min_depth: dimensionless, max_depth: dimensionless, pin_count: dimensionless } out: { max_difference: dimensionless, failing_pairs: dimensionless, worst_position: dimensionless }
+// dims: in { depth_1: dimensionless, depth_2: dimensionless, depth_3: dimensionless, depth_4: dimensionless, depth_5: dimensionless, depth_6: dimensionless, macs: dimensionless, min_depth: dimensionless, max_depth: dimensionless, pin_count: dimensionless } out: { max_difference: dimensionless, failing_pairs: dimensionless, worst_position: dimensionless, at_limit: dimensionless, longest_run: dimensionless }
 export function computeKeyCutMacs({ depth_1 = 0, depth_2 = 0, depth_3 = 0, depth_4 = 0, depth_5 = 0, depth_6 = 0, macs = 7, min_depth = 0, max_depth = 9, pin_count = 6 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(macs > 0)) return { error: "MACS must be positive." };
@@ -679,7 +679,7 @@ DOORHARDWARE_RENDERERS["fire-door-clearance"] = _simpleRenderer({
 
 // ===================== spec-v1580: slide gate operator force and duty cycle =====================
 
-// dims: in { gate_weight_lb: M L T^-2, rolling_coefficient: dimensionless, grade_pct: dimensionless, gate_length_ft: L, operator_speed_fps: L T^-1, cycles_per_day: T^-1, operating_hours: T, operator_rated_force_lb: M L T^-2, intermittent_duty_limit_pct: dimensionless } out: { rolling_force_lb: M L T^-2, grade_force_lb: M L T^-2, total_force_lb: M L T^-2, travel_time_s: T, cycle_time_s: T, duty_cycle_pct: dimensionless, grade_share_pct: dimensionless }
+// dims: in { gate_weight_lb: M L T^-2, rolling_coefficient: dimensionless, grade_pct: dimensionless, gate_length_ft: L, operator_speed_fps: L T^-1, cycles_per_day: T^-1, operating_hours: T, operator_rated_force_lb: M L T^-2, intermittent_duty_limit_pct: dimensionless } out: { rolling_force_lb: M L T^-2, grade_force_lb: M L T^-2, total_force_lb: M L T^-2, travel_time_s: T, cycle_time_s: T, duty_cycle_pct: dimensionless, grade_share_pct: dimensionless, run_time_hr: T }
 export function computeGateOperatorDuty({ gate_weight_lb = 0, rolling_coefficient = 0.1, grade_pct = 0, gate_length_ft = 0, operator_speed_fps = 0, cycles_per_day = 0, operating_hours = 0, operator_rated_force_lb = 0, intermittent_duty_limit_pct = 10 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (operating_hours > 24) return { error: "Operating hours are per day, 24 or fewer." };
@@ -744,7 +744,7 @@ DOORHARDWARE_RENDERERS["gate-operator-duty-cycle"] = _simpleRenderer({
 
 // ===================== spec-v1581: revolving door and turnstile throughput =====================
 
-// dims: in { rpm: T^-1, wings: dimensionless, people_per_compartment: dimensionless, utilization_pct: dimensionless, building_population: dimensionless, peak_fraction_pct: dimensionless, peak_window_min: T, device_count: dimensionless, operating_hours: T } out: { theoretical_per_hour: T^-1, effective_per_hour: T^-1, peak_rate_per_hour: T^-1, devices_required: dimensionless, queue_at_peak: dimensionless }
+// dims: in { rpm: T^-1, wings: dimensionless, people_per_compartment: dimensionless, utilization_pct: dimensionless, building_population: dimensionless, peak_fraction_pct: dimensionless, peak_window_min: T, device_count: dimensionless, operating_hours: T } out: { theoretical_per_hour: T^-1, effective_per_hour: T^-1, peak_rate_per_hour: T^-1, devices_required: dimensionless, queue_at_peak: dimensionless, average_rate_per_hour: T^-1, cleared_in_peak: dimensionless, devices_by_average: dimensionless, peak_people: dimensionless, total_per_hour: T^-1 }
 export function computeRevolvingDoorThroughput({ rpm = 0, wings = 0, people_per_compartment = 0, utilization_pct = 60, building_population = 0, peak_fraction_pct = 0, peak_window_min = 0, device_count = 1, operating_hours = 8 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(rpm > 0)) return { error: "Rotation rate must be positive." };

@@ -1247,7 +1247,7 @@ function midpointCost(item, { loan_amount, purchase_price, transfer_tax_rate_pct
 }
 
 // dims: in { purchase_price: dimensionless, loan_amount: dimensionless, transfer_tax_rate_pct: dimensionless, note_rate_pct: dimensionless }
-//        out: { line_items: dimensionless, low_total: dimensionless, mid_total: dimensionless, high_total: dimensionless, transfer_tax: dimensionless, prepaid_interest_estimate: dimensionless }
+//        out: { line_items: dimensionless, low_total: dimensionless, mid_total: dimensionless, high_total: dimensionless, transfer_tax: dimensionless, prepaid_interest_estimate: dimensionless, total_high: dimensionless, total_low: dimensionless, total_mid: dimensionless, total_pct_of_price_mid: dimensionless }
 // (Sum over CFPB Closing-Disclosure line items. All monetary
 //  inputs / outputs are dimensionless dollars; transfer-tax and
 //  note rates are dimensionless ratios.)
@@ -1355,7 +1355,7 @@ const RENTAL_EXPENSE_FIELDS = [
 ];
 
 // dims: in { inputs: dimensionless }
-//        out: { gross_rent: dimensionless, vacancy_loss: dimensionless, effective_gross_income: dimensionless, operating_expenses: dimensionless, noi_annual: dimensionless, annual_debt_service: dimensionless, cash_flow: dimensionless, cap_rate_percent: dimensionless, cash_on_cash_percent: dimensionless, dscr: dimensionless, grm: dimensionless, value_at_market_grm: dimensionless, cash_on_cash_pct: dimensionless, expense_ratio_pct: dimensionless, cap_rate_pct: dimensionless }
+//        out: { gross_rent: dimensionless, vacancy_loss: dimensionless, effective_gross_income: dimensionless, operating_expenses: dimensionless, noi_annual: dimensionless, annual_debt_service: dimensionless, cash_flow: dimensionless, cap_rate_percent: dimensionless, cash_on_cash_percent: dimensionless, dscr: dimensionless, grm: dimensionless, value_at_market_grm: dimensionless, cash_on_cash_pct: dimensionless, expense_ratio_pct: dimensionless, cap_rate_pct: dimensionless, NOI: dimensionless, depreciation_annual: dimensionless, gross_rent_annual: dimensionless, taxable_rental_income: dimensionless, total_expenses: dimensionless }
 // (Rental-property cash-flow worksheet. All monetary aggregates
 //  are dimensionless dollars per the §7.1 monetary convention;
 //  cap rate, cash-on-cash, DSCR, and the gross-rent multiplier are
@@ -1557,7 +1557,7 @@ async function loadShard(file) {
 }
 
 // dims: in { shard: dimensionless, state: dimensionless, county_fips: dimensionless, county_name: dimensionless }
-//        out: { conforming_limit: dimensionless, conforming_high_cost_limit: dimensionless, fha_limit: dimensionless, va_no_down_limit: dimensionless, county: dimensionless, source: dimensionless, asOf: dimensionless, year: dimensionless }
+//        out: { conforming_limit: dimensionless, conforming_high_cost_limit: dimensionless, fha_limit: dimensionless, va_no_down_limit: dimensionless, county: dimensionless, source: dimensionless, asOf: dimensionless, year: dimensionless, conforming_one_unit_usd: dimensionless, fha_one_unit_usd: dimensionless }
 // (FHFA / FHA / VA county-level loan-limit shard lookup. Monetary
 //  caps are dimensionless dollars per the §7.1 monetary
 //  convention; county / source / asOf tokens are categorical.)
@@ -1652,7 +1652,7 @@ export function renderLoanLimits(inputRegion, outputRegion, citationEl) {
 // carries them (FY2027, effective 2026-10-01, from HUD's FY27_FMRs.xlsx); on or after its effective
 // date they replace the current year's rents for the same area. `as_of` (ISO date) defaults to today.
 // dims: in { shard: dimensionless, state: dimensionless, fips: dimensionless, area_name: dimensionless, as_of: dimensionless }
-//        out: { fmr_studio: dimensionless, fmr_1br: dimensionless, fmr_2br: dimensionless, fmr_3br: dimensionless, fmr_4br: dimensionless, area: dimensionless, source: dimensionless, asOf: dimensionless, safmr: dimensionless }
+//        out: { fmr_studio: dimensionless, fmr_1br: dimensionless, fmr_2br: dimensionless, fmr_3br: dimensionless, fmr_4br: dimensionless, area: dimensionless, source: dimensionless, asOf: dimensionless, safmr: dimensionless, fiscal_year: dimensionless, fmr_0br: dimensionless }
 // (HUD Fair Market Rent shard lookup. FMRs are dimensionless
 //  monthly-rent dollar aggregates per the §7.1 monetary
 //  convention; area / source / asOf tokens are categorical.)
@@ -1760,7 +1760,7 @@ export function renderHudFmr(inputRegion, outputRegion, citationEl) {
 // monthly_savings; the verdict compares the holding period to it.
 
 // dims: in { loan_amount: dimensionless, base_rate_pct: dimensionless, points_rate_pct: dimensionless, point_cost_pct: dimensionless, term_years: T, holding_years: T }
-//        out: { break_even_months: T }
+//        out: { break_even_months: T, break_even_years: T, monthly_savings: dimensionless, payment_base: dimensionless, payment_points: dimensionless, point_cost: dimensionless }
 // (Monetary aggregates and percentage rates are dimensionless per the
 //  §7.1 monetary convention; loan term and holding period carry time
 //  dimension T.)
@@ -1870,7 +1870,7 @@ export function renderMortgagePointBreakeven(inputRegion, outputRegion, citation
 // interest line on the CFPB Closing Disclosure.
 
 // dims: in { loan_amount: dimensionless, annual_rate_pct: dimensionless, closing_date_iso: dimensionless, day_count: dimensionless }
-//        out: { days_to_eom: T, basis: dimensionless }
+//        out: { days_to_eom: T, basis: dimensionless, daily_interest: dimensionless, last_day_of_month: dimensionless, prepaid_interest: dimensionless }
 // (Monetary aggregates and the annual rate are dimensionless; the
 //  closing date and day-count convention are categorical; the day
 //  count to end-of-month carries time dimension T.)
@@ -1957,7 +1957,7 @@ export function renderPerDiemInterest(inputRegion, outputRegion, citationEl) {
 // months figure is user-supplied.
 
 // dims: in { piti_monthly: dimensionless, reserves_months: T, liquid_assets: dimensionless, retirement_balance: dimensionless, retirement_allowable_pct: dimensionless }
-//        out: { required: dimensionless, delta: dimensionless }
+//        out: { required: dimensionless, delta: dimensionless, eligible: dimensionless, eligible_retirement: dimensionless, months_covered: T }
 // (Monetary aggregates and the allowable percent are dimensionless;
 //  the reserves requirement carries time dimension T (months of PITI).)
 export function computeMortgageReserves({ piti_monthly, reserves_months, liquid_assets, retirement_balance, retirement_allowable_pct }) {
@@ -2061,7 +2061,7 @@ export function renderMortgageReserves(inputRegion, outputRegion, citationEl) {
 // deduction, the Section 121 exclusion) is out of scope here and noted.
 
 // dims: in { purchase_price: dimensionless, down_payment: dimensionless, mortgage_rate_pct: dimensionless, term_years: T, property_tax_pct: dimensionless, insurance_annual: dimensionless, hoa_monthly: dimensionless, maintenance_pct: dimensionless, appreciation_pct: dimensionless, rent_monthly: dimensionless, rent_inflation_pct: dimensionless, investment_return_pct: dimensionless, holding_years: T, selling_cost_pct: dimensionless }
-//        out: { npv_buy: dimensionless, npv_rent: dimensionless, difference: dimensionless, break_even_years: T, verdict: dimensionless }
+//        out: { npv_buy: dimensionless, npv_rent: dimensionless, difference: dimensionless, break_even_years: T, verdict: dimensionless, annual_ownership: dimensionless, home_value_N: dimensionless, loan_balance_N: dimensionless, monthly_pi: dimensionless, net_sale: dimensionless }
 // (All monetary inputs/outputs are dimensionless dollar aggregates per
 //  the §7.1 convention; term and holding period carry T.)
 export function computeRentVsBuy({
@@ -2328,7 +2328,7 @@ function _v23SimpleRenderer(spec) {
 // =====================================================================
 // v23 X.1: Depreciation recapture on sale (IRC §1245 / §1250)
 // =====================================================================
-// dims: in { asset_class: dimensionless, accumulated_depreciation: dimensionless, total_gain: dimensionless, ordinary_rate_pct: dimensionless, straight_line_depreciation: dimensionless, max_1250_rate_pct: dimensionless } out: { recaptured: dimensionless, rate_applied_pct: dimensionless, recapture_tax: dimensionless, remaining_capital_gain: dimensionless }
+// dims: in { asset_class: dimensionless, accumulated_depreciation: dimensionless, total_gain: dimensionless, ordinary_rate_pct: dimensionless, straight_line_depreciation: dimensionless, max_1250_rate_pct: dimensionless } out: { recaptured: dimensionless, rate_applied_pct: dimensionless, recapture_tax: dimensionless, remaining_capital_gain: dimensionless, additional_ordinary_recapture: dimensionless }
 export function computeDepreciationRecapture({ asset_class = "1250", accumulated_depreciation = 0, total_gain = 0, ordinary_rate_pct = 0, straight_line_depreciation = 0, max_1250_rate_pct = 25 } = {}) {
   if (asset_class !== "1245" && asset_class !== "1250") return { error: "Asset class must be 1245 (personal property) or 1250 (real property)." };
   if (Number(max_1250_rate_pct) > 25) return { error: "The unrecaptured section 1250 rate is a maximum of 25%." };
@@ -2425,7 +2425,7 @@ REALESTATE_RENDERERS["rent-roll-vacancy"] = renderRentRollVacancy;
 // --- v20 X.1: Gross rent multiplier (`gross-rent-multiplier`) ---
 // GRM_annual = price / gross_annual_rent; implied_value = market_GRM * gross_rent on the
 // selected basis (the market GRM is read on the same annual or monthly basis as the rent).
-// dims: in { price: dimensionless, gross_rent: dimensionless, rent_basis: dimensionless, market_grm: dimensionless } out: { grm_annual: dimensionless, gross_yield_pct: dimensionless }
+// dims: in { price: dimensionless, gross_rent: dimensionless, rent_basis: dimensionless, market_grm: dimensionless } out: { grm_annual: dimensionless, gross_yield_pct: dimensionless, grm_monthly: dimensionless }
 export function computeGrossRentMultiplier({ price = 0, gross_rent = 0, rent_basis = "annual", market_grm = 0 } = {}) {
   if (rent_basis !== "annual" && rent_basis !== "monthly") return { error: "Rent basis must be annual or monthly." };
   const P = Number(price) || 0;
@@ -2475,7 +2475,7 @@ REALESTATE_RENDERERS["gross-rent-multiplier"] = renderGrossRentMultiplier;
 
 // --- v20 X.2: PMI cancellation / termination (`pmi-cancellation-date`) ---
 // Amortized balance B(m) = P*((1+r)^n - (1+r)^m)/((1+r)^n - 1); solve for 80% / 78% LTV.
-// dims: in { value: dimensionless, loan: dimensionless, rate_pct: dimensionless, term_months: T } out: { month_80: dimensionless, month_78: dimensionless }
+// dims: in { value: dimensionless, loan: dimensionless, rate_pct: dimensionless, term_months: T } out: { month_80: dimensionless, month_78: dimensionless, backstop_month: dimensionless, balance_78: dimensionless, balance_80: dimensionless, midpoint_month: dimensionless, months_pmi_saved: T }
 export function computePmiCancellationDate({ value = 0, loan = 0, rate_pct = 0, term_months = 0 } = {}) {
   const V = Number(value) || 0;
   const P = Number(loan) || 0;
@@ -2536,7 +2536,7 @@ REALESTATE_RENDERERS["pmi-cancellation-date"] = renderPmiCancellationDate;
 
 // --- v20 X.3: Seller net proceeds sheet (`seller-net-sheet`) ---
 // net = price - payoff - commission - transfer_tax - fees - concessions +/- proration.
-// dims: in { price: dimensionless, payoff: dimensionless, commission_pct: dimensionless, transfer_tax_pct: dimensionless, fees: dimensionless, concessions: dimensionless, annual_tax: dimensionless, days_seller_owes: dimensionless, other: dimensionless } out: { net_proceeds: dimensionless, cost_of_sale_pct: dimensionless }
+// dims: in { price: dimensionless, payoff: dimensionless, commission_pct: dimensionless, transfer_tax_pct: dimensionless, fees: dimensionless, concessions: dimensionless, annual_tax: dimensionless, days_seller_owes: dimensionless, other: dimensionless } out: { net_proceeds: dimensionless, cost_of_sale_pct: dimensionless, commission: dimensionless, gross_price: dimensionless, tax_proration: dimensionless, transfer_tax: dimensionless }
 export function computeSellerNetSheet({ price = 0, payoff = 0, commission_pct = 0, transfer_tax_pct = 0, fees = 0, concessions = 0, annual_tax = 0, days_seller_owes = 0, other = 0 } = {}) {
   const P = Number(price) || 0;
   const payoffN = Number(payoff) || 0;
@@ -2671,7 +2671,7 @@ function renderDebtYield(inputRegion, outputRegion, citationEl) {
 REALESTATE_RENDERERS["debt-yield"] = renderDebtYield;
 
 // dims: in { opex: dimensionless, debt_svc: dimensionless, pgi: dimensionless, target_occ: dimensionless }
-//        out: { beo_pct: dimensionless, cushion_pts: dimensionless }
+//        out: { beo_pct: dimensionless, cushion_pts: dimensionless, target_occ: dimensionless }
 // (Break-even occupancy = (opex + debt service) / PGI = dimensionless ratio.)
 export function computeBreakEvenOccupancy({ opex = 0, debt_svc = 0, pgi = 0, target_occ = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
@@ -3100,7 +3100,7 @@ function renderBlendedMortgageRate(inputRegion, outputRegion, citationEl) {
 REALESTATE_RENDERERS["blended-mortgage-rate"] = renderBlendedMortgageRate;
 
 // ===================== spec-v784: floor area ratio (zoning) =====================
-// dims: in { building_floor_area_sf: L^2, lot_area_sf: L^2, far_limit: dimensionless } out: { far: dimensionless, max_buildable_sf: L^2, remaining_sf: L^2 }
+// dims: in { building_floor_area_sf: L^2, lot_area_sf: L^2, far_limit: dimensionless } out: { far: dimensionless, max_buildable_sf: L^2, remaining_sf: L^2, far_limit: dimensionless }
 export function computeFloorAreaRatio({ building_floor_area_sf = 0, lot_area_sf = 0, far_limit = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const bldg = Number(building_floor_area_sf) || 0;

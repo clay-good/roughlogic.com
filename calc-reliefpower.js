@@ -125,7 +125,7 @@ function _curveError(pts) {
 
 // ===================== spec-v1888: generator output derate for altitude and temperature =====================
 
-// dims: in { rated_kw: M L^2 T^-3, site_elevation_ft: L, site_ambient_f: T, altitude_threshold_ft: L, altitude_step_ft: L, altitude_rate_pct: dimensionless, temp_threshold_f: T, temp_step_f: T, temp_rate_pct: dimensionless } out: { altitude_derate_pct: dimensionless, temperature_derate_pct: dimensionless, total_derate_pct: dimensionless, multiplied_derate_pct: dimensionless, available_kw: M L^2 T^-3, available_multiplied_kw: M L^2 T^-3, lost_kw: M L^2 T^-3, method_difference_kw: M L^2 T^-3, rated_kw: M L^2 T^-3 }
+// dims: in { rated_kw: M L^2 T^-3, site_elevation_ft: L, site_ambient_f: T, altitude_threshold_ft: L, altitude_step_ft: L, altitude_rate_pct: dimensionless, temp_threshold_f: T, temp_step_f: T, temp_rate_pct: dimensionless } out: { altitude_derate_pct: dimensionless, temperature_derate_pct: dimensionless, total_derate_pct: dimensionless, multiplied_derate_pct: dimensionless, available_kw: M L^2 T^-3, available_multiplied_kw: M L^2 T^-3, lost_kw: M L^2 T^-3, method_difference_kw: M L^2 T^-3, rated_kw: M L^2 T^-3, available_pct_of_rated: dimensionless }
 export function computeGeneratorAltitudeTempDerate({ rated_kw = 0, site_elevation_ft = 0, site_ambient_f = 0, altitude_threshold_ft = 0, altitude_step_ft = 0, altitude_rate_pct = 0, temp_threshold_f = null, temp_step_f = 0, temp_rate_pct = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   { const v = arguments[0]?.site_ambient_f; if (v === undefined || v === null || v === "") return { error: "Enter the site ambient temperature (F)." }; }
@@ -469,7 +469,7 @@ RELIEFPOWER_RENDERERS["split-phase-leg-balance"] = _simpleRenderer({
 
 // ===================== spec-v1893: critical load priority shedding =====================
 
-// dims: in { source_kw: M L^2 T^-3, tier1_kw: M L^2 T^-3, tier2_kw: M L^2 T^-3, tier3_kw: M L^2 T^-3, tier4_kw: M L^2 T^-3, usable_kwh: M L^2 T^-2 } out: { served_kw: M L^2 T^-3, shed_kw: M L^2 T^-3, total_kw: M L^2 T^-3, served_pct: dimensionless, utilization_pct: dimensionless, headroom_kw: M L^2 T^-3, runtime_tier1_hours: T, runtime_tiers12_hours: T, runtime_tiers123_hours: T, runtime_all_hours: T, runtime_served_hours: T }
+// dims: in { source_kw: M L^2 T^-3, tier1_kw: M L^2 T^-3, tier2_kw: M L^2 T^-3, tier3_kw: M L^2 T^-3, tier4_kw: M L^2 T^-3, usable_kwh: M L^2 T^-2 } out: { served_kw: M L^2 T^-3, shed_kw: M L^2 T^-3, total_kw: M L^2 T^-3, served_pct: dimensionless, utilization_pct: dimensionless, headroom_kw: M L^2 T^-3, runtime_tier1_hours: T, runtime_tiers12_hours: T, runtime_tiers123_hours: T, runtime_all_hours: T, runtime_served_hours: T, tiers_served: dimensionless }
 export function computeCriticalLoadShedTiers({ source_kw = 0, tier1_kw = 0, tier2_kw = 0, tier3_kw = 0, tier4_kw = 0, usable_kwh = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(source_kw > 0)) return { error: "The available source capacity must be positive." };
@@ -629,7 +629,7 @@ RELIEFPOWER_RENDERERS["radio-site-duty-cycle-battery"] = _simpleRenderer({
 
 // ===================== spec-v1896: generator-battery hybrid fuel savings =====================
 
-// dims: in { load_kw: M L^2 T^-3, rating_kw: M L^2 T^-3, fuel_quarter_gph: L^3 T^-1, fuel_half_gph: L^3 T^-1, fuel_three_quarter_gph: L^3 T^-1, fuel_full_gph: L^3 T^-1, setpoint_kw: M L^2 T^-3, round_trip_efficiency: dimensionless, cycles_per_day: T^-1 } out: { generator_hours_per_day: dimensionless, setpoint_gph: L^3 T^-1, load_gph: L^3 T^-1, hybrid_gal_per_day: L^3 T^-1, continuous_gal_per_day: L^3 T^-1, saving_gal_per_day: L^3 T^-1, saving_pct: dimensionless, battery_kwh_per_cycle: M L^2 T^-2, run_hour_reduction_pct: dimensionless }
+// dims: in { load_kw: M L^2 T^-3, rating_kw: M L^2 T^-3, fuel_quarter_gph: L^3 T^-1, fuel_half_gph: L^3 T^-1, fuel_three_quarter_gph: L^3 T^-1, fuel_full_gph: L^3 T^-1, setpoint_kw: M L^2 T^-3, round_trip_efficiency: dimensionless, cycles_per_day: T^-1 } out: { generator_hours_per_day: dimensionless, setpoint_gph: L^3 T^-1, load_gph: L^3 T^-1, hybrid_gal_per_day: L^3 T^-1, continuous_gal_per_day: L^3 T^-1, saving_gal_per_day: L^3 T^-1, saving_pct: dimensionless, battery_kwh_per_cycle: M L^2 T^-2, run_hour_reduction_pct: dimensionless, load_pct_of_rating: dimensionless, setpoint_pct_of_rating: dimensionless }
 export function computeGeneratorBatteryHybridFuel({ load_kw = 0, rating_kw = 0, fuel_quarter_gph = 0, fuel_half_gph = 0, fuel_three_quarter_gph = 0, fuel_full_gph = 0, setpoint_kw = 0, round_trip_efficiency = 0.85, cycles_per_day = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(load_kw > 0)) return { error: "The average load must be positive." };

@@ -300,7 +300,7 @@ STEEL_RENDERERS["steel-column-capacity"] = _simpleRenderer({
 
 // ===================== spec-v266: eccentric bolt group (elastic vector) =====================
 
-// dims: in { load_kip: M L T^-2, ecc_in: L, ncols: dimensionless, nrows: dimensionless, gage_in: L, pitch_in: L } out: { n: dimensionless, moment: M L^2 T^-2, ip: L^2, direct_kip: M L T^-2, tors_h: M L T^-2, tors_v: M L T^-2, resultant_kip: M L T^-2 }
+// dims: in { load_kip: M L T^-2, ecc_in: L, ncols: dimensionless, nrows: dimensionless, gage_in: L, pitch_in: L } out: { n: dimensionless, moment: M L^2 T^-2, ip: L^2, direct_kip: M L T^-2, tors_h: M L T^-2, tors_v: M L T^-2, resultant_kip: M L T^-2, ix: L^2, iy: L^2 }
 export function computeBoltGroupEccentric({ load_kip = 0, ecc_in = 0, ncols = 2, nrows = 3, gage_in = 3, pitch_in = 3 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(load_kip > 0)) return { error: "Load P must be positive (kip)." };
@@ -351,7 +351,7 @@ STEEL_RENDERERS["bolt-group-eccentric"] = _simpleRenderer({
 
 // ===================== spec-v267: bolt shear + bearing / tearout =====================
 
-// dims: in { d_in: L, ab_in2: L^2, fnv_ksi: M L^-1 T^-2, nplanes: dimensionless, t_in: L, fu_ksi: M L^-1 T^-2, le_in: L, dh_in: L, s_in: L } out: { rn_shear: M L T^-2, bearing_cap: M L T^-2, rn_edge: M L T^-2, rn_int: M L T^-2, rn_gov: M L T^-2, phi_rn: M L T^-2, rn_asd: M L T^-2 }
+// dims: in { d_in: L, ab_in2: L^2, fnv_ksi: M L^-1 T^-2, nplanes: dimensionless, t_in: L, fu_ksi: M L^-1 T^-2, le_in: L, dh_in: L, s_in: L } out: { rn_shear: M L T^-2, bearing_cap: M L T^-2, rn_edge: M L T^-2, rn_int: M L T^-2, rn_gov: M L T^-2, phi_rn: M L T^-2, rn_asd: M L T^-2, lc_edge: L, lc_int: L }
 export function computeBoltShearBearing({ d_in = 0.75, ab_in2 = 0.4418, fnv_ksi = 54, nplanes = 1, t_in = 0.5, fu_ksi = 58, le_in = 1.5, dh_in = 0, s_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(d_in > 0)) return { error: "Bolt diameter d must be positive (in)." };
@@ -574,7 +574,7 @@ STEEL_RENDERERS["steel-beam-ltb"] = _simpleRenderer({
   compute: computeSteelBeamLtb,
 });
 
-// dims: in { t_in: L, fy: M L^-1 T^-2, fu: M L^-1 T^-2, n: dimensionless, s_in: L, end_in: L, edge_in: L, dh_in: L, ubs: dimensionless } out: { agv: L^2, anv: L^2, ant: L^2, rn_kip: M L T^-2, asd_kip: M L T^-2, lrfd_kip: M L T^-2 }
+// dims: in { t_in: L, fy: M L^-1 T^-2, fu: M L^-1 T^-2, n: dimensionless, s_in: L, end_in: L, edge_in: L, dh_in: L, ubs: dimensionless } out: { agv: L^2, anv: L^2, ant: L^2, rn_kip: M L T^-2, asd_kip: M L T^-2, lrfd_kip: M L T^-2, lgv: L, rupture: M L T^-2 }
 export function computeSteelBlockShear({ t_in = 0, fy = 36, fu = 58, n = 0, s_in = 3, end_in = 0, edge_in = 0, dh_in = 0.875, ubs = 1.0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(t_in > 0)) return { error: "Element thickness must be positive (in)." };
@@ -629,7 +629,7 @@ STEEL_RENDERERS["steel-block-shear"] = _simpleRenderer({
   compute: computeSteelBlockShear,
 });
 
-// dims: in { ag_in2: L^2, fy: M L^-1 T^-2, fu: M L^-1 T^-2, t_in: L, dh_in: L, nh: dimensionless, xbar_in: L, l_in: L, u_in: dimensionless } out: { an_in2: L^2, ae_in2: L^2, pn_yield_kip: M L T^-2, pn_rupt_kip: M L T^-2, p_asd_kip: M L T^-2, p_lrfd_kip: M L T^-2 }
+// dims: in { ag_in2: L^2, fy: M L^-1 T^-2, fu: M L^-1 T^-2, t_in: L, dh_in: L, nh: dimensionless, xbar_in: L, l_in: L, u_in: dimensionless } out: { an_in2: L^2, ae_in2: L^2, pn_yield_kip: M L T^-2, pn_rupt_kip: M L T^-2, p_asd_kip: M L T^-2, p_lrfd_kip: M L T^-2, asd_rupt: M L T^-2, asd_yield: M L T^-2, u: dimensionless }
 export function computeSteelTensionMember({ ag_in2 = 0, fy = 36, fu = 58, t_in = 0, dh_in = 0.875, nh = 0, xbar_in = 0, l_in = 0, u_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(ag_in2 > 0)) return { error: "Gross area must be positive (in^2)." };
@@ -701,7 +701,7 @@ STEEL_RENDERERS["steel-tension-member"] = _simpleRenderer({
 // force (J10 yielding + crippling), the slip-critical pretensioned bolt
 // (360-22 J3.9), and the fillet-weld detailing size limits (J2.2b / Table J2.4).
 
-// dims: in { fy: M L^-1 T^-2, tw: L, tf: L, k_in: L, d_in: L, lb_in: L, location: dimensionless } out: { wly_rn: M L T^-2, wc_rn: M L T^-2, asd_kip: M L T^-2, lrfd_kip: M L T^-2 }
+// dims: in { fy: M L^-1 T^-2, tw: L, tf: L, k_in: L, d_in: L, lb_in: L, location: dimensionless } out: { wly_rn: M L T^-2, wc_rn: M L T^-2, asd_kip: M L T^-2, lrfd_kip: M L T^-2, wc_asd: M L T^-2, wly_asd: M L T^-2 }
 export function computeSteelWebLocalStrength({ fy = 50, tw = 0, tf = 0, k_in = 0, d_in = 0, lb_in = 0, location = "interior" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(fy > 0)) return { error: "Yield stress Fy must be positive (ksi)." };
@@ -1307,7 +1307,7 @@ STEEL_RENDERERS["composite-beam-flexure"] = _simpleRenderer({
   compute: computeCompositeBeamFlexure,
 });
 
-// dims: in { w_kip_ft: M T^-2, span_ft: L, moi_in4: L^4, e_ksi: M L^-1 T^-2, fraction: dimensionless } out: { defl_in: L, camber_in: L }
+// dims: in { w_kip_ft: M T^-2, span_ft: L, moi_in4: L^4, e_ksi: M L^-1 T^-2, fraction: dimensionless } out: { defl_in: L, camber_in: L, camber_raw: L }
 export function computeSteelCamber({ w_kip_ft = 0, span_ft = 0, moi_in4 = 0, e_ksi = 29000, fraction = 0.80 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const w = Number(w_kip_ft) || 0;
@@ -1452,7 +1452,7 @@ STEEL_RENDERERS["steel-floor-vibration"] = _simpleRenderer({
 // Applied tension relieves part of the clamping force that makes a slip-critical joint work, so the
 // slip resistance is multiplied by ksc = 1 - Tu/(Du Tb nb) (Eq. J3-5a, LRFD). The unreduced Rn is
 // obtained by CALLING the landed computeSteelBoltSlipCritical so the two tiles cannot drift.
-// dims: in { mu: dimensionless, tb_kip: M L T^-2, ns: dimensionless, n: dimensionless, hf: dimensionless, du: dimensionless, applied_tension_kip: M L T^-2 } out: { ksc: dimensionless, reduced_rn_bolt_kip: M L T^-2, lrfd_total_kip: M L T^-2, asd_total_kip: M L T^-2, asd_bolt_kip: M L T^-2, clamp_total_kip: M L T^-2, loss_pct: dimensionless, lrfd_bolt_kip: M L T^-2, unreduced_lrfd_total_kip: M L T^-2, unreduced_rn_bolt_kip: M L T^-2 }
+// dims: in { mu: dimensionless, tb_kip: M L T^-2, ns: dimensionless, n: dimensionless, hf: dimensionless, du: dimensionless, applied_tension_kip: M L T^-2 } out: { ksc: dimensionless, reduced_rn_bolt_kip: M L T^-2, lrfd_total_kip: M L T^-2, asd_total_kip: M L T^-2, asd_bolt_kip: M L T^-2, clamp_total_kip: M L T^-2, loss_pct: dimensionless, lrfd_bolt_kip: M L T^-2, unreduced_lrfd_total_kip: M L T^-2, unreduced_rn_bolt_kip: M L T^-2, ksc_asd: dimensionless }
 export function computeSlipCriticalWithTension({ mu = 0.30, tb_kip = 0, ns = 1, n = 1, hf = 1.0, du = 1.13, applied_tension_kip = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const tu = Number(applied_tension_kip);

@@ -325,6 +325,16 @@ const UNIT_TAIL_EXEMPT = new Set([
   "calc-instrumentation.js:computeThermistorSteinhartHart:coeff_a", // Steinhart-Hart's A
   "calc-refrigerant.js:computeCompareRefrigerants:refrigerant_a", // an A-or-B LABEL
   "calc-service.js:computeVfdEnergySavings:frac_a",          // an A-or-B time FRACTION
+  // 2026-10-20: declarations the tail had FORCED wrong (a count read as watts
+  // or amps, a leg-A voltage read as amps), found while declaring outputs.
+  "calc-construction.js:computeConcreteSawcutFootage:panels_w", // a panel COUNT across the width
+  "calc-construction.js:computePlumbingFixtureCount:lav_a", // a lavatory COUNT for sex A
+  "calc-construction.js:computePlumbingFixtureCount:wc_a", // a water-closet COUNT for sex A
+  "calc-agriculture.js:computePearsonSquareRation:parts_a", // Pearson-square PARTS of feed A
+  "calc-electricalfield.js:computeMwbcVoltageDrop:volts_a", // the voltage on leg A, not an ampere
+  "calc-hvacsystems.js:computeHumidifierCapacity:delta_W", // a humidity-ratio difference, W the psychrometric symbol
+  "calc-drainage.js:computePipePartialFlowDepth:d_over_d_at_max_v", // depth ratio at maximum VELOCITY
+  "calc-electrical.js:computeGroundingElectrodeResistance:supplemental_count_to_25_ohm", // a rod COUNT to reach 25 ohms
 ]);
 
 function canonicalDimension(expr) {
@@ -395,6 +405,7 @@ const POLYMORPHIC_KEYS = new Map(Object.entries({
   db: "a rebar diameter in concrete, a decibel in calc-stage (and dry-bulb elsewhere)",
   F: "degrees Fahrenheit in pure-math, magnetic field intensity in computeWMM",
   fv: "a future value (money) in accounting, an allowable shear stress in structural",
+  shortfall: "a heating-load shortfall (Btu/h) in calc-hvac, a missing tooth count in computeGearUndercutBacklash",
   governing: "which check governs (a label), except computePullBoxSizing where it is a length",
   gpa: "gallons per acre in agriculture, a grade point average in calc-edu",
   headroom: "a pressure headroom and a dimensionless margin",

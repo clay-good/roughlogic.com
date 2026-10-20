@@ -95,7 +95,7 @@ export const ACCESSIBILITY_RENDERERS = {};
 // becomes 2 percent of the total; above 1,000 it is 20 plus one for each 100 or fraction over.
 // And the count is PER PARKING FACILITY, not per site: four separate lots of 26 owe eight
 // accessible spaces, while one lot of 104 owes five. Splitting a lot raises the requirement.
-// dims: in { total_spaces: dimensionless, facility_count: dimensionless, provided_accessible: dimensionless, provided_van: dimensionless } out: { required_accessible: dimensionless, required_van: dimensionless, required_car: dimensionless, site_required_accessible: dimensionless }
+// dims: in { total_spaces: dimensionless, facility_count: dimensionless, provided_accessible: dimensionless, provided_van: dimensionless } out: { required_accessible: dimensionless, required_van: dimensionless, required_car: dimensionless, site_required_accessible: dimensionless, accessible_short: dimensionless, combined_required: dimensionless, site_required_van: dimensionless, site_total_spaces: dimensionless, split_penalty: dimensionless, van_short: dimensionless }
 export function computeAccessibleParkingCount({ total_spaces = 0, facility_count = 1, provided_accessible = 0, provided_van = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const n = Number(total_spaces) || 0;
@@ -195,7 +195,7 @@ ACCESSIBILITY_RENDERERS["accessible-parking-count"] = _simpleRenderer({
 // distance to whatever OBSTRUCTION prevents further approach, not the distance from wherever a
 // person happens to stand - so a counter, a rail, or a planter in front of a sign is what sets
 // the letter height, and removing one later shortens the distance rather than lengthening it.
-// dims: in { baseline_height_in: L, viewing_distance_in: L, provided_character_height_in: L } out: { required_character_height_in: L, base_height_in: L, shortfall_in: L, max_viewing_distance_in: L, added_in: L, excess_in: L, next_band_required_in: L, threshold_in: L }
+// dims: in { baseline_height_in: L, viewing_distance_in: L, provided_character_height_in: L } out: { required_character_height_in: L, base_height_in: L, shortfall_in: L, max_viewing_distance_in: L, added_in: L, excess_in: L, next_band_required_in: L, threshold_in: L, cliff_multiple: dimensionless }
 export function computeSignCharacterHeight({ baseline_height_in = 0, viewing_distance_in = 0, provided_character_height_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const h = Number(baseline_height_in) || 0;
@@ -675,7 +675,7 @@ ACCESSIBILITY_RENDERERS["door-clear-width"] = _simpleRenderer({
 // Over 1/2 in it stops being a threshold detail and becomes a RAMP under 405 or 406 - which is
 // 1:12 at best, so a 5/8 in change needs 7.5 in of run instead of 1.25, and brings landings,
 // edge protection, and handrails with it. One sixteenth of an inch is the difference.
-// dims: in { level_change_in: L, bevel_run_in: L, carpet_pile_in: L, opening_size_in: L, ramp_run_per_rise: dimensionless } out: { required_bevel_run_in: L, bevel_run_deficit_in: L, ramp_run_required_in: L, vertical_allowance_in: L, bevel_run_if_under_in: L, over_by_in: L }
+// dims: in { level_change_in: L, bevel_run_in: L, carpet_pile_in: L, opening_size_in: L, ramp_run_per_rise: dimensionless } out: { required_bevel_run_in: L, bevel_run_deficit_in: L, ramp_run_required_in: L, vertical_allowance_in: L, bevel_run_if_under_in: L, over_by_in: L, bevel_slope_run_per_rise: dimensionless, cliff_multiple: dimensionless }
 export function computeFloorLevelChange({ level_change_in = 0, bevel_run_in = 0, carpet_pile_in = 0, opening_size_in = 0, opening_elongated = "no", opening_perpendicular = "yes", ramp_run_per_rise = 12 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const h = Number(level_change_in) || 0;
@@ -1104,7 +1104,7 @@ ACCESSIBILITY_RENDERERS["knee-toe-clearance"] = _simpleRenderer({
 // second course of block is usually already too high.
 // Engineered openings are a different animal: they are certified by the square feet of
 // enclosure each one serves, and the square-inch rule does not apply to them at all.
-// dims: in { enclosed_area_sf: L^2, net_free_area_per_opening_sqin: L^2, coverage_sf_per_opening: L^2, bottom_height_in: L } out: { required_net_area_sqin: L^2, provided_net_area_sqin: L^2, net_area_deficit_sqin: L^2, openings_required: dimensionless, height_excess_in: L }
+// dims: in { enclosed_area_sf: L^2, net_free_area_per_opening_sqin: L^2, coverage_sf_per_opening: L^2, bottom_height_in: L } out: { required_net_area_sqin: L^2, provided_net_area_sqin: L^2, net_area_deficit_sqin: L^2, openings_required: dimensionless, height_excess_in: L, openings_for_area: dimensionless, openings_short: dimensionless }
 export function computeFloodOpeningArea({ enclosed_area_sf = 0, opening_type = "non-engineered", net_free_area_per_opening_sqin = 0, coverage_sf_per_opening = 0, openings_provided = 0, bottom_height_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const area = Number(enclosed_area_sf) || 0;
@@ -1189,7 +1189,7 @@ ACCESSIBILITY_RENDERERS["flood-opening-area"] = _simpleRenderer({
 // Three more rules ride along. Open risers are not permitted at all. The leading edge may have
 // a radius of 1/2 in maximum. A nosing may project 1-1/2 in maximum over the tread below, and
 // a riser may slope under the tread at 30 degrees maximum from vertical.
-// dims: in { riser_height_in: L, tread_depth_in: L, total_rise_in: L, nosing_projection_in: L, leading_edge_radius_in: L } out: { risers_required: dimensionless, run_required_in: L, run_added_in: L, riser_deficit_in: L, tread_deficit_in: L, compliant_riser_in: L, run_as_built_in: L }
+// dims: in { riser_height_in: L, tread_depth_in: L, total_rise_in: L, nosing_projection_in: L, leading_edge_radius_in: L } out: { risers_required: dimensionless, run_required_in: L, run_added_in: L, riser_deficit_in: L, tread_deficit_in: L, compliant_riser_in: L, run_as_built_in: L, risers_added: dimensionless, risers_as_built: dimensionless, treads_as_built: dimensionless, treads_required: dimensionless }
 export function computeAdaStairCheck({ riser_height_in = 0, tread_depth_in = 0, total_rise_in = 0, open_risers = "no", nosing_projection_in = 0, leading_edge_radius_in = 0, riser_slope_deg = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const rise = Number(riser_height_in) || 0;
@@ -1372,7 +1372,7 @@ ACCESSIBILITY_RENDERERS["tactile-sign-mounting"] = _simpleRenderer({
 // Two location rules ride along and get skipped: the spout must be at least 15 in from the
 // vertical support and not more than 5 in from the front edge INCLUDING BUMPERS, and the stream
 // must rise 4 in minimum so a cup can be filled under it.
-// dims: in { wheelchair_spout_in: L, standing_spout_in: L, spout_from_support_in: L, spout_from_front_in: L, water_flow_height_in: L } out: { wheelchair_excess_in: L, standing_deficit_in: L, support_deficit_in: L, front_excess_in: L, dead_band_high_in: L, dead_band_low_in: L, flow_deficit_in: L }
+// dims: in { wheelchair_spout_in: L, standing_spout_in: L, spout_from_support_in: L, spout_from_front_in: L, water_flow_height_in: L } out: { wheelchair_excess_in: L, standing_deficit_in: L, support_deficit_in: L, front_excess_in: L, dead_band_high_in: L, dead_band_low_in: L, flow_deficit_in: L, units_short: dimensionless }
 export function computeDrinkingFountainCheck({ units_provided = 0, bi_level = "no", wheelchair_spout_in = 0, standing_spout_in = 0, spout_from_support_in = 0, spout_from_front_in = 0, water_flow_height_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const units = Number(units_provided) || 0;
@@ -1586,7 +1586,7 @@ ACCESSIBILITY_RENDERERS["accessible-shower-check"] = _simpleRenderer({
 // The two things people get wrong: the denominator is the STRUCTURE, not the property - the land
 // is not in it, which on an expensive lot with a modest house makes the threshold far lower than
 // expected - and many communities count cumulative work over a period rather than one permit.
-// dims: in { market_value: dimensionless, improvement_cost: dimensionless, prior_costs: dimensionless } out: { threshold: dimensionless, headroom: dimensionless, ratio_pct: dimensionless, cumulative_ratio_pct: dimensionless, federal_pct: dimensionless, land_share_pct: dimensionless, property_value: dimensionless, wrong_ratio_pct: dimensionless }
+// dims: in { market_value: dimensionless, improvement_cost: dimensionless, prior_costs: dimensionless } out: { threshold: dimensionless, headroom: dimensionless, ratio_pct: dimensionless, cumulative_ratio_pct: dimensionless, federal_pct: dimensionless, land_share_pct: dimensionless, property_value: dimensionless, wrong_ratio_pct: dimensionless, countable_cost: dimensionless, cumulative_cost: dimensionless, over_by: dimensionless }
 export function computeSubstantialImprovement({ market_value = 0, improvement_cost = 0, prior_costs = 0, threshold_pct = 50, land_value = 0, excluded_code_cost = 0, historic_structure = "no" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const mv = Number(market_value) || 0;
@@ -1871,7 +1871,7 @@ ACCESSIBILITY_RENDERERS["water-closet-location"] = _simpleRenderer({
 // BATHTUB (607.2): the clearance in front runs THE LENGTH OF THE TUB and is 30 in wide minimum -
 // and where there is a permanent seat at the head end it extends 12 in BEYOND the wall at that
 // end, so the fixture is 60 in and the clearance is 72.
-// dims: in { rim_height_in: L, counter_height_in: L, metering_seconds: T, tub_length_in: L, clear_width_in: L, clear_length_in: L } out: { governing_lav_height_in: L, lav_excess_in: L, required_clear_length_in: L, clear_length_deficit_in: L, clear_area_sf: L^2, clear_width_deficit_in: L, seat_extra_in: L }
+// dims: in { rim_height_in: L, counter_height_in: L, metering_seconds: T, tub_length_in: L, clear_width_in: L, clear_length_in: L } out: { governing_lav_height_in: L, lav_excess_in: L, required_clear_length_in: L, clear_length_deficit_in: L, clear_area_sf: L^2, clear_width_deficit_in: L, seat_extra_in: L, metering_deficit_s: T }
 export function computeLavatoryTubClearance({ rim_height_in = 0, counter_height_in = 0, metering_seconds = 0, tub_length_in = 0, permanent_seat = "no", clear_width_in = 0, clear_length_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const rim = Number(rim_height_in) || 0;

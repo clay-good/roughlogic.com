@@ -112,7 +112,7 @@ const _S_MULT = { none_light: 1.0, medium_heavy: 1.3 };
 // FEMA-325 C&D composition after sorting (Hurricane Andrew).
 const _CD_SPLIT = { burnable: 0.42, soil: 0.05, metals: 0.15, landfill: 0.38 };
 
-// dims: in { population: dimensionless, persons_per_household: dimensionless, storm_category: dimensionless, vegetation: dimensionless, commercial: dimensionless, precipitation: dimensionless, woody_fraction: dimensionless, wood_type: dimensionless } out: { households: dimensionless, debris_cy: L^3, debris_low_cy: L^3, debris_high_cy: L^3, woody_cy: L^3, cd_cy: L^3, cd_burnable_cy: L^3, cd_soil_cy: L^3, cd_metals_cy: L^3, cd_landfill_cy: L^3, woody_tons: M, cd_tons: M, debris_weight_tons: M, reversed_mix_landfill_cy: L^3 }
+// dims: in { population: dimensionless, persons_per_household: dimensionless, storm_category: dimensionless, vegetation: dimensionless, commercial: dimensionless, precipitation: dimensionless, woody_fraction: dimensionless, wood_type: dimensionless } out: { households: dimensionless, debris_cy: L^3, debris_low_cy: L^3, debris_high_cy: L^3, woody_cy: L^3, cd_cy: L^3, cd_burnable_cy: L^3, cd_soil_cy: L^3, cd_metals_cy: L^3, cd_landfill_cy: L^3, woody_tons: M, cd_tons: M, debris_weight_tons: M, reversed_mix_landfill_cy: L^3, b_multiplier: dimensionless, category_cy_per_household: L^3, s_multiplier: dimensionless, v_multiplier: dimensionless, woody_cy_per_ton: L^3 M^-1 }
 export function computeHurricaneDebrisEstimate({ population = 0, persons_per_household = 3, storm_category = 0, vegetation = "medium", commercial = "light", precipitation = "none_light", woody_fraction = 0.3, wood_type = "hardwood" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(population > 0)) return { error: "Population must be positive." };
@@ -203,7 +203,7 @@ const _FIXED_RANGE_CY = {
   flooded_basement: [45, 50],
 };
 
-// dims: in { structure_type: dimensionless, structure_count: dimensionless, length_ft: L, width_ft: L, stories: dimensionless, height_ft: L, vegetation: dimensionless, wood_type: dimensionless } out: { vcm: dimensionless, structural_cy: L^3, vegetative_cy: L^3, per_structure_low_cy: L^3, per_structure_high_cy: L^3, per_structure_cy: L^3, total_low_cy: L^3, total_high_cy: L^3, total_cy: L^3, naive_whole_house_cy: L^3, naive_overstatement_pct: dimensionless, cd_tons: M, woody_tons: M, debris_weight_tons: M }
+// dims: in { structure_type: dimensionless, structure_count: dimensionless, length_ft: L, width_ft: L, stories: dimensionless, height_ft: L, vegetation: dimensionless, wood_type: dimensionless } out: { vcm: dimensionless, structural_cy: L^3, vegetative_cy: L^3, per_structure_low_cy: L^3, per_structure_high_cy: L^3, per_structure_cy: L^3, total_low_cy: L^3, total_high_cy: L^3, total_cy: L^3, naive_whole_house_cy: L^3, naive_overstatement_pct: dimensionless, cd_tons: M, woody_tons: M, debris_weight_tons: M, woody_cy_per_ton: L^3 M^-1 }
 export function computeStructureDebrisEstimate({ structure_type = "single_family", structure_count = 1, length_ft = 0, width_ft = 0, stories = 1, height_ft = 0, vegetation = "medium", wood_type = "hardwood" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const types = ["single_family", "mobile_single", "mobile_double", "flooded_slab", "flooded_basement", "other_building"];
@@ -299,7 +299,7 @@ const _CH8_ACRES_PER_CY = 100 / 1000000;
 // FEMA-325 Appendix B: burning leaves 5%, grinding leaves 25%.
 const _REMAINING = { grind: 0.25, burn: 0.05 };
 
-// dims: in { debris_volume_cy: L^3, woody_volume_cy: L^3, stack_height_ft: L, land_use_fraction: dimensionless, site_fill_count: dimensionless, reduction_method: dimensionless, processing_rate_cyh: L^3 T^-1, machine_count: dimensionless, operating_hours_per_day: T } out: { storage_cy_per_acre: L, storage_acres: L^2, gross_site_acres: L^2, ch8_check_acres: L^2, cycled_site_acres: L^2, ground_volume_cy: L^3, burned_volume_cy: L^3, reduced_volume_cy: L^3, volume_removed_cy: L^3, processing_machine_hours: T, processing_days: T, processing_workdays: T, ch8_difference_pct: dimensionless }
+// dims: in { debris_volume_cy: L^3, woody_volume_cy: L^3, stack_height_ft: L, land_use_fraction: dimensionless, site_fill_count: dimensionless, reduction_method: dimensionless, processing_rate_cyh: L^3 T^-1, machine_count: dimensionless, operating_hours_per_day: T } out: { storage_cy_per_acre: L, storage_acres: L^2, gross_site_acres: L^2, ch8_check_acres: L^2, cycled_site_acres: L^2, ground_volume_cy: L^3, burned_volume_cy: L^3, reduced_volume_cy: L^3, volume_removed_cy: L^3, processing_machine_hours: T, processing_days: T, processing_workdays: T, ch8_difference_pct: dimensionless, land_use_factor: dimensionless }
 export function computeDebrisSiteSizing({ debris_volume_cy = 0, woody_volume_cy = 0, stack_height_ft = 10, land_use_fraction = 0.6, site_fill_count = 1, reduction_method = "grind", processing_rate_cyh = 125, machine_count = 0, operating_hours_per_day = 10 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(debris_volume_cy > 0)) return { error: "Debris volume must be positive." };

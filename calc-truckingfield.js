@@ -89,7 +89,7 @@ export const TRUCKINGFIELD_RENDERERS = {};
 // ===========================================================================
 
 // ===================== spec-v1377: minimum tiedown count =====================
-// dims: in { length_ft: L, weight_lb: M, tiedowns: dimensionless, wll_per_tiedown_lb: M, tiedown_path: dimensionless } out: { min_tiedowns: dimensionless, tiedown_path: dimensionless, required_wll_lb: M, provided_wll_lb: M }
+// dims: in { length_ft: L, weight_lb: M, tiedowns: dimensionless, wll_per_tiedown_lb: M, tiedown_path: dimensionless } out: { min_tiedowns: dimensionless, tiedown_path: dimensionless, required_wll_lb: M, provided_wll_lb: M, count_margin: dimensionless, tiedowns_by_wll: dimensionless }
 export function computeTiedownCount({ length_ft = 0, weight_lb = 0, tiedowns = 0, wll_per_tiedown_lb = 0, tiedown_path = "over_other_side" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(length_ft > 0)) return { error: "Article length must be positive." };
@@ -277,7 +277,7 @@ TRUCKINGFIELD_RENDERERS["safe-descent-speed"] = _simpleRenderer({
 });
 
 // ===================== spec-v1380: air brake pushrod stroke screen =====================
-// dims: in { readjustment_limit_in: L, measured_stroke_in: L, defective_brakes: dimensionless, total_brakes: dimensionless } out: { margin_in: L, defective_fraction_pct: dimensionless }
+// dims: in { readjustment_limit_in: L, measured_stroke_in: L, defective_brakes: dimensionless, total_brakes: dimensionless } out: { margin_in: L, defective_fraction_pct: dimensionless, brakes_to_oos: dimensionless, oos_count_weight: dimensionless }
 export function computeAirBrakePushrodStroke({ readjustment_limit_in = 2.0, measured_stroke_in = 0, defective_brakes = 0, total_brakes = 10 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(readjustment_limit_in > 0)) return { error: "Readjustment limit must be positive." };
@@ -508,7 +508,7 @@ function renderHazmatPlacardThreshold(inputRegion, outputRegion, citationEl) {
 TRUCKINGFIELD_RENDERERS["hazmat-placard-threshold"] = renderHazmatPlacardThreshold;
 
 // ===================== spec-v1383: idle fuel burn, cost, and engine-hour equivalent =====================
-// dims: in { idle_hours_per_day: T, operating_days: T, idle_gph: L^3 T^-1, fuel_price: dimensionless, trucks: dimensionless, miles_per_engine_hour: L T^-1, fleet_annual_miles: L } out: { annual_idle_hours: T, annual_gallons: L^3, annual_cost: dimensionless, equivalent_miles: L }
+// dims: in { idle_hours_per_day: T, operating_days: T, idle_gph: L^3 T^-1, fuel_price: dimensionless, trucks: dimensionless, miles_per_engine_hour: L T^-1, fleet_annual_miles: L } out: { annual_idle_hours: T, annual_gallons: L^3, annual_cost: dimensionless, equivalent_miles: L, cost_per_mile_cents: dimensionless, fleet_cost: dimensionless }
 export function computeIdleFuelCost({ idle_hours_per_day = 0, operating_days = 0, idle_gph = 0.8, fuel_price = 0, trucks = 1, miles_per_engine_hour = 7, fleet_annual_miles = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(idle_hours_per_day > 0)) return { error: "Idle hours per day must be positive." };

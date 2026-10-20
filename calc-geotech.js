@@ -96,7 +96,7 @@ export const GEOTECH_RENDERERS = {};
 
 // ===================== spec-v260: shallow foundation bearing capacity =====================
 
-// dims: in { c: M L^-1 T^-2, phi: dimensionless, gamma: M L^-2 T^-2, b_ft: L, df_ft: L, fs: dimensionless } out: { nc: dimensionless, nq: dimensionless, ngamma: dimensionless, q_surch: M L^-1 T^-2, qu: M L^-1 T^-2, q_all: M L^-1 T^-2 }
+// dims: in { c: M L^-1 T^-2, phi: dimensionless, gamma: M L^-2 T^-2, b_ft: L, df_ft: L, fs: dimensionless } out: { nc: dimensionless, nq: dimensionless, ngamma: dimensionless, q_surch: M L^-1 T^-2, qu: M L^-1 T^-2, q_all: M L^-1 T^-2, sc: dimensionless, sgamma: dimensionless, sq: dimensionless }
 export function computeSoilBearingCapacity({ c = 0, phi = 0, gamma = 120, b_ft = 0, df_ft = 0, shape = "strip", fs = 3 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(gamma > 0)) return { error: "Soil unit weight must be positive (pcf)." };
@@ -520,7 +520,7 @@ GEOTECH_RENDERERS["elastic-settlement-allowable-pressure"] = _simpleRenderer({
   compute: computeElasticSettlementAllowablePressure,
 });
 
-// dims: in { d_ft: L, l_ft: L, cu_ksf: M L^-1 T^-2, alpha: dimensionless, fs: dimensionless } out: { as_ft2: L^2, ap_ft2: L^2, qs_kip: M L T^-2, qp_kip: M L T^-2, qult_kip: M L T^-2, qall_kip: M L T^-2 }
+// dims: in { d_ft: L, l_ft: L, cu_ksf: M L^-1 T^-2, alpha: dimensionless, fs: dimensionless } out: { as_ft2: L^2, ap_ft2: L^2, qs_kip: M L T^-2, qp_kip: M L T^-2, qult_kip: M L T^-2, qall_kip: M L T^-2, skin_frac: dimensionless }
 export function computePileAxialCapacity({ d_ft = 0, l_ft = 0, cu_ksf = 0, alpha = 0.55, fs = 3 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(d_ft > 0)) return { error: "Pile diameter must be positive (ft)." };
@@ -745,7 +745,7 @@ GEOTECH_RENDERERS["spt-bearing-capacity"] = _simpleRenderer({
 // design pressure is the inverse. Since qa is linear in N60 for both footing
 // branches (and Kd is independent of N60), the required N60 = qa_target /
 // qa(at N60 = 1); the forward is reused at N60 = 1 to carry the branch + Kd.
-// dims: in { qa_target_ksf: M L^-1 T^-2, b_ft: L, d_ft: L } out: { n60: dimensionless, kd: dimensionless, qa_per_n60_ksf: M L^-1 T^-2 }
+// dims: in { qa_target_ksf: M L^-1 T^-2, b_ft: L, d_ft: L } out: { n60: dimensionless, kd: dimensionless, qa_per_n60_ksf: M L^-1 T^-2, n60_design: dimensionless }
 export function computeSptRequiredN60({ qa_target_ksf = 0, b_ft = 0, d_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const qa = Number(qa_target_ksf) || 0;
@@ -1084,7 +1084,7 @@ GEOTECH_RENDERERS["frost-depth-berggren"] = _simpleRenderer({
 // pseudo-static body force added, so it reduces EXACTLY to the Coulomb Ka
 // when kh = kv = 0; the tile reports both and the fuzzer pins the identity.
 
-// dims: in { phi: dimensionless, delta: dimensionless, theta: dimensionless, alpha: dimensionless, gamma: M L^-2 T^-2, h_ft: L, kh: dimensionless, kv: dimensionless } out: { kae: dimensionless, ka_static: dimensionless, psi_deg: dimensionless, pae: M T^-2, pa_static: M T^-2, d_pae: M T^-2, pae_h: M T^-2, pae_v: M T^-2, sw_increment: M T^-2, y_bar_ft: L }
+// dims: in { phi: dimensionless, delta: dimensionless, theta: dimensionless, alpha: dimensionless, gamma: M L^-2 T^-2, h_ft: L, kh: dimensionless, kv: dimensionless } out: { kae: dimensionless, ka_static: dimensionless, psi_deg: dimensionless, pae: M T^-2, pa_static: M T^-2, d_pae: M T^-2, pae_h: M T^-2, pae_v: M T^-2, sw_increment: M T^-2, y_bar_ft: L, p_design: M T^-2 }
 export function computeSeismicEarthPressure({ phi = 0, delta = 0, theta = 0, alpha = 0, gamma = 120, h_ft = 0, kh = 0, kv = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(gamma > 0)) return { error: "Soil unit weight must be positive (pcf)." };

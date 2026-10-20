@@ -78,7 +78,7 @@ function renderLaborBurdenRate(inputRegion, outputRegion, citationEl) {
 }
 CONTRACTOR_FINANCE_RENDERERS["labor-burden-rate"] = renderLaborBurdenRate;
 
-// dims: in { purchase: dimensionless, salvage: dimensionless, life_hr: dimensionless, annual_hr: dimensionless, iit_pct: dimensionless, fuel_gph: L^3 T^-1, fuel_price: dimensionless, maint_hr: dimensionless, wear_hr: dimensionless } out: { owning_hr: dimensionless, operating_hr: dimensionless, total_hr: dimensionless }
+// dims: in { purchase: dimensionless, salvage: dimensionless, life_hr: dimensionless, annual_hr: dimensionless, iit_pct: dimensionless, fuel_gph: L^3 T^-1, fuel_price: dimensionless, maint_hr: dimensionless, wear_hr: dimensionless } out: { owning_hr: dimensionless, operating_hr: dimensionless, total_hr: dimensionless, avg_investment: dimensionless, deprec_hr: dimensionless, iit_hr: dimensionless }
 export function computeEquipmentHourlyRate({ purchase = 0, salvage = 0, life_hr = 0, annual_hr = 0, iit_pct = 0, fuel_gph = 0, fuel_price = 0, maint_hr = 0, wear_hr = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (Number(iit_pct) < 0) return { error: "Interest, insurance and tax percent cannot be negative." };
@@ -205,7 +205,7 @@ CONTRACTOR_FINANCE_RENDERERS["overhead-recovery-rate"] = renderOverheadRecoveryR
 
 // ===================== spec-v390..v392: contractor-billing trio (Group R) =====================
 
-// dims: in { contract_usd: dimensionless, cost_to_date_usd: dimensionless, est_total_cost_usd: dimensionless, billed_to_date_usd: dimensionless } out: { pct_complete: dimensionless, earned_revenue: dimensionless, over_under: dimensionless }
+// dims: in { contract_usd: dimensionless, cost_to_date_usd: dimensionless, est_total_cost_usd: dimensionless, billed_to_date_usd: dimensionless } out: { pct_complete: dimensionless, earned_revenue: dimensionless, over_under: dimensionless, projected_loss_usd: dimensionless }
 export function computeWipPercentComplete({ contract_usd = 0, cost_to_date_usd = 0, est_total_cost_usd = 0, billed_to_date_usd = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const contract = Number(contract_usd) || 0;
@@ -260,7 +260,7 @@ function renderWipPercentComplete(inputRegion, outputRegion, citationEl) {
 }
 CONTRACTOR_FINANCE_RENDERERS["wip-percent-complete"] = renderWipPercentComplete;
 
-// dims: in { direct_cost_usd: dimensionless, overhead_pct: dimensionless, profit_pct: dimensionless, current_contract_usd: dimensionless } out: { price: dimensionless, markup: dimensionless, margin_pct: dimensionless, new_contract: dimensionless }
+// dims: in { direct_cost_usd: dimensionless, overhead_pct: dimensionless, profit_pct: dimensionless, current_contract_usd: dimensionless } out: { price: dimensionless, markup: dimensionless, margin_pct: dimensionless, new_contract: dimensionless, additive_price: dimensionless }
 export function computeChangeOrderMarkup({ direct_cost_usd = 0, overhead_pct = 10, profit_pct = 10, current_contract_usd = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const direct = Number(direct_cost_usd) || 0;
@@ -348,7 +348,7 @@ CONTRACTOR_FINANCE_RENDERERS["retainage-tracker"] = renderRetainageTracker;
 
 // ===================== spec-v444..v446: contractor-cost trio (Group R) =====================
 
-// dims: in { contract_usd: dimensionless, rate1_per_k: dimensionless, rate2_per_k: dimensionless, rate3_per_k: dimensionless } out: { premium_usd: dimensionless, effective_rate: dimensionless }
+// dims: in { contract_usd: dimensionless, rate1_per_k: dimensionless, rate2_per_k: dimensionless, rate3_per_k: dimensionless } out: { premium_usd: dimensionless, effective_rate: dimensionless, band1: dimensionless, band2: dimensionless, band3: dimensionless }
 export function computeSuretyBondPremium({ contract_usd = 0, rate1_per_k = 25, rate2_per_k = 15, rate3_per_k = 10 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const contract = Number(contract_usd) || 0;
@@ -391,7 +391,7 @@ function renderSuretyBondPremium(inputRegion, outputRegion, citationEl) {
 }
 CONTRACTOR_FINANCE_RENDERERS["surety-bond-premium"] = renderSuretyBondPremium;
 
-// dims: in { payroll_usd: dimensionless, class_rate: dimensionless, emr: dimensionless } out: { manual_premium: dimensionless, modified_premium: dimensionless, emr_swing: dimensionless }
+// dims: in { payroll_usd: dimensionless, class_rate: dimensionless, emr: dimensionless } out: { manual_premium: dimensionless, modified_premium: dimensionless, emr_swing: dimensionless, cost_per_100: dimensionless }
 export function computeWorkersCompEmrPremium({ payroll_usd = 0, class_rate = 0, emr = 1.0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const payroll = Number(payroll_usd) || 0;

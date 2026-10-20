@@ -143,7 +143,7 @@ const _bpDewPointF = (tf, rh) => {
 // The practical value of ELA is rhetorical: telling someone their house has a
 // ten by ten inch hole in it permanently changes a conversation that "5.8
 // ACH50" does not.
-// dims: in { cfm50: L^3 T^-1, floor_area_ft2: L^2, ceiling_height_ft: L, storeys: dimensionless } out: { ela_in2: L^2, eqla_in2: L^2, normalized_leakage: dimensionless, sla: dimensionless, hole_side_in: L, ach50: T^-1, building_height_ft: L, volume_ft3: L^3, convention_ratio: dimensionless }
+// dims: in { cfm50: L^3 T^-1, floor_area_ft2: L^2, ceiling_height_ft: L, storeys: dimensionless } out: { ela_in2: L^2, eqla_in2: L^2, normalized_leakage: dimensionless, sla: dimensionless, hole_side_in: L, ach50: T^-1, building_height_ft: L, volume_ft3: L^3, convention_ratio: dimensionless, height_factor: dimensionless }
 export function computeEffectiveLeakageArea({
   cfm50 = 0, floor_area_ft2 = 0, ceiling_height_ft = 8, storeys = 1,
 } = {}) {
@@ -208,7 +208,7 @@ BUILDINGPERF_RENDERERS["effective-leakage-area"] = _simpleRenderer({
 // limit is the leakage below which the free share no longer covers it. Above
 // the limit sealing is pure benefit; below it, sealing without adding a fan
 // trades energy for air quality, and that is not a trade to make silently.
-// dims: in { floor_area_ft2: L^2, bedrooms: dimensionless, cfm50: L^3 T^-1, n_factor: dimensionless, ceiling_height_ft: L, planned_cfm50_reduction: L^3 T^-1 } out: { required_cfm: L^3 T^-1, tightness_limit_cfm50: L^3 T^-1, margin_cfm50: L^3 T^-1, natural_cfm: L^3 T^-1, ach50: T^-1, margin_pct: dimensionless, volume_ft3: L^3 }
+// dims: in { floor_area_ft2: L^2, bedrooms: dimensionless, cfm50: L^3 T^-1, n_factor: dimensionless, ceiling_height_ft: L, planned_cfm50_reduction: L^3 T^-1 } out: { required_cfm: L^3 T^-1, tightness_limit_cfm50: L^3 T^-1, margin_cfm50: L^3 T^-1, natural_cfm: L^3 T^-1, ach50: T^-1, margin_pct: dimensionless, volume_ft3: L^3, after_cfm50: L^3 T^-1 }
 export function computeBuildingTightnessLimit({
   floor_area_ft2 = 0, bedrooms = 0, cfm50 = 0, n_factor = 17,
   ceiling_height_ft = 8, planned_cfm50_reduction = 0,
@@ -293,7 +293,7 @@ BUILDINGPERF_RENDERERS["building-tightness-limit"] = _simpleRenderer({
 // zone with the highest ratio of required outdoor air to primary air -- the
 // critical zone -- sets the fraction the whole system must run at, and every
 // other zone is over-ventilated as a consequence.
-// dims: in { rp_cfm_per_person: L^3 T^-1, ra_cfm_per_ft2: L T^-1, ez: dimensionless, people_1: dimensionless, area_1_ft2: L^2, primary_1_cfm: L^3 T^-1, people_2: dimensionless, area_2_ft2: L^2, primary_2_cfm: L^3 T^-1, people_3: dimensionless, area_3_ft2: L^2, primary_3_cfm: L^3 T^-1, diversity: dimensionless } out: { vou_cfm: L^3 T^-1, vps_cfm: L^3 T^-1, xs: dimensionless, zp_max: dimensionless, ev: dimensionless, vot_cfm: L^3 T^-1, penalty_cfm: L^3 T^-1, zone_count: dimensionless }
+// dims: in { rp_cfm_per_person: L^3 T^-1, ra_cfm_per_ft2: L T^-1, ez: dimensionless, people_1: dimensionless, area_1_ft2: L^2, primary_1_cfm: L^3 T^-1, people_2: dimensionless, area_2_ft2: L^2, primary_2_cfm: L^3 T^-1, people_3: dimensionless, area_3_ft2: L^2, primary_3_cfm: L^3 T^-1, diversity: dimensionless } out: { vou_cfm: L^3 T^-1, vps_cfm: L^3 T^-1, xs: dimensionless, zp_max: dimensionless, ev: dimensionless, vot_cfm: L^3 T^-1, penalty_cfm: L^3 T^-1, zone_count: dimensionless, area_term: L^3 T^-1, people_term: L^3 T^-1 }
 export function computeVentilationRateProcedure({
   rp_cfm_per_person = 0, ra_cfm_per_ft2 = 0, ez = 1,
   people_1 = 0, area_1_ft2 = 0, primary_1_cfm = 0,
@@ -542,7 +542,7 @@ BUILDINGPERF_RENDERERS["zonal-add-a-hole"] = _simpleRenderer({
 // The zone is judged by the WEAKEST appliance in it. An atmospherically vented
 // appliance relies on a buoyant draft worth only a few pascals, and any
 // exhaust that pulls the room more negative than that reverses the flow.
-// dims: in { measured_depressurization_pa: M L^-1 T^-2, natural_draft_wh_limit_pa: M L^-1 T^-2, natural_draft_furnace_limit_pa: M L^-1 T^-2, induced_draft_limit_pa: M L^-1 T^-2, direct_vent_limit_pa: M L^-1 T^-2, largest_exhaust_cfm: L^3 T^-1 } out: { governing_limit_pa: M L^-1 T^-2, margin_pa: M L^-1 T^-2, appliance_count: dimensionless }
+// dims: in { measured_depressurization_pa: M L^-1 T^-2, natural_draft_wh_limit_pa: M L^-1 T^-2, natural_draft_furnace_limit_pa: M L^-1 T^-2, induced_draft_limit_pa: M L^-1 T^-2, direct_vent_limit_pa: M L^-1 T^-2, largest_exhaust_cfm: L^3 T^-1 } out: { governing_limit_pa: M L^-1 T^-2, margin_pa: M L^-1 T^-2, appliance_count: dimensionless, measured: M L^-1 T^-2 }
 export function computeCazDepressurizationLimit({
   measured_depressurization_pa = 0,
   has_natural_draft_water_heater = "no", natural_draft_wh_limit_pa = 2,
@@ -628,7 +628,7 @@ BUILDINGPERF_RENDERERS["caz-depressurization-limit"] = _simpleRenderer({
 // the established relation gives 11.0 Pa -- and the spec printed "0 Pa" for
 // every case it worked, including a 240 ft tower, without anyone noticing that
 // scaling the building tenfold changed nothing.
-// dims: in { height_ft: L, indoor_temp_f: T, outdoor_temp_f: T, neutral_plane_fraction: dimensionless, tall_building_height_ft: L } out: { total_pressure_pa: M L^-1 T^-2, total_pressure_inwc: M L^-1 T^-2, neutral_plane_ft: L, bottom_pressure_pa: M L^-1 T^-2, top_pressure_pa: M L^-1 T^-2, tall_pressure_pa: M L^-1 T^-2, height_ratio: dimensionless }
+// dims: in { height_ft: L, indoor_temp_f: T, outdoor_temp_f: T, neutral_plane_fraction: dimensionless, tall_building_height_ft: L } out: { total_pressure_pa: M L^-1 T^-2, total_pressure_inwc: M L^-1 T^-2, neutral_plane_ft: L, bottom_pressure_pa: M L^-1 T^-2, top_pressure_pa: M L^-1 T^-2, tall_pressure_pa: M L^-1 T^-2, height_ratio: dimensionless, indoor_r: T, outdoor_r: T, reciprocal_difference: T^-1 }
 export function computeStackEffectNpp({
   height_ft = 0, indoor_temp_f = 70, outdoor_temp_f = null,
   neutral_plane_fraction = 0.5, tall_building_height_ft = 0,
@@ -779,7 +779,7 @@ BUILDINGPERF_RENDERERS["bill-disaggregation"] = _simpleRenderer({
 // The counterintuitive direction is the reason this tile earns its place:
 // adding CAVITY insulation to a wall with fixed exterior insulation makes the
 // assembly WORSE from a moisture standpoint even as it improves the R-value.
-// dims: in { r_cavity: dimensionless, r_continuous: dimensionless, required_ratio: dimensionless, indoor_temp_f: T, indoor_rh_pct: dimensionless, outdoor_design_temp_f: T } out: { achieved_ratio: dimensionless, r_continuous_min: dimensionless, r_cavity_max: dimensionless, dew_point_f: T, ratio_from_dew_point: dimensionless, sheathing_temp_f: T, more_cavity_ratio: dimensionless }
+// dims: in { r_cavity: dimensionless, r_continuous: dimensionless, required_ratio: dimensionless, indoor_temp_f: T, indoor_rh_pct: dimensionless, outdoor_design_temp_f: T } out: { achieved_ratio: dimensionless, r_continuous_min: dimensionless, r_cavity_max: dimensionless, dew_point_f: T, ratio_from_dew_point: dimensionless, sheathing_temp_f: T, more_cavity_ratio: dimensionless, r_total: dimensionless }
 export function computeContinuousInsulationRatio({
   r_cavity = 0, r_continuous = 0, required_ratio = 0,
   indoor_temp_f = 70, indoor_rh_pct = 0, outdoor_design_temp_f = 0,

@@ -715,7 +715,7 @@ const HOME_OFFICE_SIMPLIFIED_RATE = 5;   // $/ft^2
 const HOME_OFFICE_SIMPLIFIED_MAX_FT2 = 300;
 const HOME_OFFICE_SIMPLIFIED_CAP = 1500; // $5 x 300
 
-// dims: in { office_ft2: L^2, home_ft2: L^2, total_home_expenses: dimensionless } out: { simplified_deduction: dimensionless, actual_deduction: dimensionless, recommended_deduction: dimensionless, office_use_pct: dimensionless, home_ft2: L^2, office_ft2: L^2 }
+// dims: in { office_ft2: L^2, home_ft2: L^2, total_home_expenses: dimensionless } out: { simplified_deduction: dimensionless, actual_deduction: dimensionless, recommended_deduction: dimensionless, office_use_pct: dimensionless, home_ft2: L^2, office_ft2: L^2, total_home_expenses: dimensionless }
 export function computeHomeOffice({
   office_ft2 = 0,
   home_ft2 = 0,
@@ -1291,7 +1291,7 @@ export const ACCOUNTING_RENDERERS = {
 // --- v20 R.1: Declining-balance depreciation (`declining-balance-depreciation`) ---
 // DB_rate = factor*(1/life); dep = book_begin*DB_rate, floored so book never
 // drops below salvage; optional straight-line crossover.
-// dims: in { cost: dimensionless, salvage: dimensionless, life_yr: dimensionless, factor: dimensionless, year: dimensionless, sl_switch: dimensionless } out: { book_value: dimensionless, year_depreciation: dimensionless, accumulated_depreciation: dimensionless }
+// dims: in { cost: dimensionless, salvage: dimensionless, life_yr: dimensionless, factor: dimensionless, year: dimensionless, sl_switch: dimensionless } out: { book_value: dimensionless, year_depreciation: dimensionless, accumulated_depreciation: dimensionless, db_rate: dimensionless }
 export function computeDecliningBalanceDepreciation({ cost = 0, salvage = 0, life_yr = 0, factor = 2, year = 1, sl_switch = true } = {}) {
   if (!Number.isInteger(Number(year)) || Number(year) < 1) return { error: "Year is a whole number, 1 or more." };
   if (Number(year) > Math.round(Number(life_yr)) && Number(life_yr) > 0) return { error: "Year " + year + " is past the asset's " + Math.round(Number(life_yr)) + "-year life; depreciation is $0." };
@@ -1359,7 +1359,7 @@ ACCOUNTING_RENDERERS["declining-balance-depreciation"] = renderDecliningBalanceD
 
 // --- spec-v1231 R: Sum-of-the-years'-digits depreciation (`sum-of-years-digits-depreciation`) ---
 // SYD = n(n+1)/2; year k depreciation = (cost - salvage) x (n - k + 1) / SYD. Accelerated time-based method.
-// dims: in { cost: dimensionless, salvage: dimensionless, life_yr: dimensionless, year: dimensionless } out: { year_depreciation: dimensionless, accumulated_depreciation: dimensionless, book_value: dimensionless }
+// dims: in { cost: dimensionless, salvage: dimensionless, life_yr: dimensionless, year: dimensionless } out: { year_depreciation: dimensionless, accumulated_depreciation: dimensionless, book_value: dimensionless, syd_denominator: dimensionless }
 export function computeSumOfYearsDigitsDepreciation({ cost = 0, salvage = 0, life_yr = 0, year = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!Number.isInteger(Number(year)) || Number(year) < 1) return { error: "Year is a whole number, 1 or more." };
@@ -1482,7 +1482,7 @@ ACCOUNTING_RENDERERS["future-value-of-annuity"] = renderFutureValueOfAnnuity;
 // or e^APR - 1 for continuous compounding. The finance set takes a rate as given but never converts
 // compounding bases. Truth in Savings / Reg DD (12 CFR 1030.2(c), Appendix A) APY definition.
 const _EAR_FREQ = { annual: 1, semiannual: 2, quarterly: 4, monthly: 12, daily: 365 };
-// dims: in { apr_pct: dimensionless, compounding: dimensionless } out: { ear_pct: dimensionless, periodic_rate_pct: dimensionless }
+// dims: in { apr_pct: dimensionless, compounding: dimensionless } out: { ear_pct: dimensionless, periodic_rate_pct: dimensionless, periods_per_year: T^-1 }
 export function computeEffectiveAnnualRate({ apr_pct = 0, compounding = "monthly" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const apr = Number(apr_pct);
@@ -1530,7 +1530,7 @@ ACCOUNTING_RENDERERS["effective-annual-rate"] = renderEffectiveAnnualRate;
 
 // --- v20 R.2: Markup vs. margin converter (`markup-vs-margin`) ---
 // markup% = (price-cost)/cost*100; margin% = (price-cost)/price*100.
-// dims: in { cost: dimensionless, price: dimensionless, markup_pct: dimensionless, margin_pct: dimensionless, units: dimensionless } out: { markup_pct: dimensionless, margin_pct: dimensionless, cost: dimensionless, price: dimensionless }
+// dims: in { cost: dimensionless, price: dimensionless, markup_pct: dimensionless, margin_pct: dimensionless, units: dimensionless } out: { markup_pct: dimensionless, margin_pct: dimensionless, cost: dimensionless, price: dimensionless, profit_per_unit: dimensionless }
 export function computeMarkupVsMargin({ cost = 0, price = 0, markup_pct = 0, margin_pct = 0, units = 0 } = {}) {
   let C = Number(cost) || 0;
   let P = Number(price) || 0;
@@ -1589,7 +1589,7 @@ ACCOUNTING_RENDERERS["markup-vs-margin"] = renderMarkupVsMargin;
 
 // --- v20 R.3: Employer payroll tax (`employer-payroll-tax`) ---
 // SS = min(wages, SS_base)*6.2%; Medicare = wages*1.45%; FUTA = min(wages,7000)*rate; SUTA = min(wages,state_base)*rate.
-// dims: in { wages: dimensionless, ss_base: dimensionless, futa_base: dimensionless, futa_rate_pct: dimensionless, suta_rate_pct: dimensionless, suta_base: dimensionless } out: { total_employer_tax: dimensionless, loaded_cost: dimensionless }
+// dims: in { wages: dimensionless, ss_base: dimensionless, futa_base: dimensionless, futa_rate_pct: dimensionless, suta_rate_pct: dimensionless, suta_base: dimensionless } out: { total_employer_tax: dimensionless, loaded_cost: dimensionless, employer_medicare: dimensionless, employer_ss: dimensionless, futa: dimensionless, suta: dimensionless }
 export function computeEmployerPayrollTax({ wages = 0, ss_base = 0, futa_base = 7000, futa_rate_pct = 0.6, suta_rate_pct = 0, suta_base = 0 } = {}) {
   if (Number(suta_rate_pct) > 0 && !(Number(suta_base) > 0)) return { error: "Enter the state unemployment wage base; with a SUTA rate and no base the tax read $0." };
   if (futa_rate_pct === null || futa_rate_pct === "") futa_rate_pct = 0.6;

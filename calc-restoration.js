@@ -161,7 +161,7 @@ export const dehumidifierExample = {
 // the 600 ft^2 Class 2 example at 6 units against the worksheet's 10-13.
 
 // dims: in { affected_area_ft2: L^2, water_class: dimensionless, rooms: dimensionless, wall_ceiling_ft2: L^2, insets: dimensionless }
-//        out: { air_mover_count: dimensionless, air_mover_count_high: dimensionless, water_class: dimensionless, total_cfm: L^3 T^-1, cfm_per_ft2: L T^-1, placement_pattern: dimensionless, placement_note: dimensionless, rooms: dimensionless, wall_ceiling_ft2: L^2 }
+//        out: { air_mover_count: dimensionless, air_mover_count_high: dimensionless, water_class: dimensionless, total_cfm: L^3 T^-1, cfm_per_ft2: L T^-1, placement_pattern: dimensionless, placement_note: dimensionless, rooms: dimensionless, wall_ceiling_ft2: L^2, insets: dimensionless }
 // (Floor and wall/ceiling areas are `L^2`. CFM is volume-per-time
 //  `L^3 T^-1`; CFM per ft^2 collapses to a surface-velocity `L T^-1`.
 //  Counts, the class token and the placement pattern are dimensionless.)
@@ -545,7 +545,7 @@ export const standingWaterExample = {
 export const NAM_UNIT_SIZES_CFM = [500, 1000, 2000];
 
 // dims: in { room_volume_ft3: L^3, target_ach: T^-1 }
-//        out: { required_cfm: L^3 T^-1, recommendations: dimensionless, clean_filter_cfm: L^3 T^-1, filter_loading_derate_pct: dimensionless }
+//        out: { required_cfm: L^3 T^-1, recommendations: dimensionless, clean_filter_cfm: L^3 T^-1, filter_loading_derate_pct: dimensionless, makeup_discharge_coefficient: dimensionless }
 // (Room volume `L^3` * air-changes-per-hour `T^-1` / 60 = CFM
 //  `L^3 T^-1`. The recommendations array enumerates the standard
 //  500 / 1000 / 2000 CFM unit sizes (each `L^3 T^-1` internally)
@@ -1155,7 +1155,7 @@ export const RESTORATION_EQUIPMENT_AMPS = {
 // does not exceed 80% of the breaker rating.
 const _V16D_CONTINUOUS_FACTOR = 0.8;
 
-// dims: in { qty_lgr_dehu: dimensionless, qty_air_mover: dimensionless, qty_hepa_500: dimensionless, qty_heat_dryer: dimensionless, other_amps: I, breaker_A: I, voltage: M L^2 T^-3 I^-1 } out: { total_amps: I, continuous_limit_A: I, circuits_required: dimensionless, total_va: M L^2 T^-3, breaker_A: I, max_unit_amps: I, other_amps: I, single_circuit_utilization: dimensionless }
+// dims: in { qty_lgr_dehu: dimensionless, qty_air_mover: dimensionless, qty_hepa_500: dimensionless, qty_heat_dryer: dimensionless, other_amps: I, breaker_A: I, voltage: M L^2 T^-3 I^-1 } out: { total_amps: I, continuous_limit_A: I, circuits_required: dimensionless, total_va: M L^2 T^-3, breaker_A: I, max_unit_amps: I, other_amps: I, single_circuit_utilization: dimensionless, voltage: M L^2 T^-3 I^-1 }
 export function computeEquipmentCircuitLoad({
   qty_lgr_dehu = 0,
   qty_air_mover = 0,
@@ -1373,7 +1373,7 @@ RESTORATION_RENDERERS["drying-chamber-co2"] = renderDryingChamberCO2;
 // --- v20 D.1: Moisture removed by grain depression (`grains-removed`) ---
 // dG = inlet - outlet; mass air = CFM*60/13.33 lb-dry-air/hr; water lb/hr =
 // mass-air * dG / 7000; gal = lb/hr * hours / 8.345.
-// dims: in { cfm: L^3*T^-1, inlet_gpp: dimensionless, outlet_gpp: dimensionless, hours: T } out: { water_lb_hr: M*T^-1, water_gal: L^3 }
+// dims: in { cfm: L^3*T^-1, inlet_gpp: dimensionless, outlet_gpp: dimensionless, hours: T } out: { water_lb_hr: M*T^-1, water_gal: L^3, grain_depression_gpp: dimensionless }
 export function computeGrainsRemoved({ cfm = 0, inlet_gpp = 0, outlet_gpp = 0, hours = 0 } = {}) {
   if (!(Number(inlet_gpp) > 0) || !(Number(outlet_gpp) > 0)) return { error: "Enter the inlet and outlet humidity ratios (grains per pound); a dehumidifier does not deliver 0 GPP air." };
   const CFM = Number(cfm) || 0;
@@ -1426,7 +1426,7 @@ RESTORATION_RENDERERS["grains-removed"] = renderGrainsRemoved;
 // load_gal = area * load_factor(class); lb = gal * 8.345; first-24h pints =
 // load_gal * 8 * fraction; suggested AHAM pints = target / derating.
 const WATER_CLASS_LOAD_GAL_FT2 = { 1: 0.02, 2: 0.04, 3: 0.08, 4: 0.1 };
-// dims: in { area_ft2: L^2, water_class: dimensionless, load_factor: dimensionless, first24_fraction: dimensionless, derating: dimensionless } out: { load_gal: L^3, aham_pints: dimensionless }
+// dims: in { area_ft2: L^2, water_class: dimensionless, load_factor: dimensionless, first24_fraction: dimensionless, derating: dimensionless } out: { load_gal: L^3, aham_pints: dimensionless, first24_pints: L^3, load_factor_used: dimensionless }
 export function computeEvaporationLoad({ area_ft2 = 0, water_class = 3, load_factor = 0, first24_fraction = 0.4, derating = 0.5 } = {}) {
   const area = Number(area_ft2) || 0;
   const cls = Math.round(Number(water_class) || 0);
@@ -1604,7 +1604,7 @@ RESTORATION_RENDERERS["mold-conditions"] = renderMoldConditions;
 // finished_gal * conc_oz_per_gal; water_gal = finished_gal - conc_oz/128;
 // tanks = ceil(finished_gal / tank); per-tank conc = conc_oz_per_gal * tank.
 // dims: in { affected_area_ft2: L^2, coverage_ft2_per_gal: L^-1, tank_size_gal: L^3, mode: dimensionless, oz_per_gal: dimensionless, ratio_N: dimensionless }
-//        out: { finished_gal: L^3, water_gal: L^3, concentrate_oz: dimensionless, per_tank_conc_oz: dimensionless, tanks_needed: dimensionless }
+//        out: { finished_gal: L^3, water_gal: L^3, concentrate_oz: dimensionless, per_tank_conc_oz: dimensionless, tanks_needed: dimensionless, conc_oz_per_gal: dimensionless }
 // (Area L^2 over coverage L^-1 = finished volume L^3; fluid-ounce amounts are
 //  marked dimensionless (the 128 fl oz/gal constant absorbs the unit), the
 //  evaporation-load pints precedent.)
@@ -2119,7 +2119,7 @@ RESTORATION_RENDERERS["desiccant-airflow-sizing"] = renderDesiccantAirflow;
 // --- spec-v189: Drying-system balance (`drying-balance`) ---
 // balance_ppd = installed - evap; ratio = installed / evap; verdict from
 // the ratio against the target margin (default 1.2).
-// dims: in { evap_load_ppd: L^3 T^-1, installed_ppd: L^3 T^-1, target_margin: dimensionless } out: { balance_ppd: L^3 T^-1, ratio: dimensionless }
+// dims: in { evap_load_ppd: L^3 T^-1, installed_ppd: L^3 T^-1, target_margin: dimensionless } out: { balance_ppd: L^3 T^-1, ratio: dimensionless, add_ppd: L^3 T^-1 }
 export function computeDryingBalance({ evap_load_ppd = 0, installed_ppd = 0, target_margin = 1.2 } = {}) {
   const evap = Number(evap_load_ppd);
   const installed = Number(installed_ppd);
@@ -2651,7 +2651,7 @@ RESTORATION_RENDERERS["char-depth-capacity"] = renderCharDepthCapacity;
 // --- spec-v147: Dry-sponge soot cleaning takeoff + seal coat (`soot-cleaning-takeoff`) ---
 // Affected area / per-sponge coverage -> chemical sponges; area / production
 // rate -> labor hours; an optional odor-seal primer is area / coverage gallons.
-// dims: in { affected_sf: L^2, sponge_coverage_sf: L^2, production_sf_per_hr: L^2 T^-1, seal_coat: dimensionless, primer_sf_per_gal: L^-1 } out: { dry_sponges: dimensionless, labor_hours: T, sealer_gal: L^3 }
+// dims: in { affected_sf: L^2, sponge_coverage_sf: L^2, production_sf_per_hr: L^2 T^-1, seal_coat: dimensionless, primer_sf_per_gal: L^-1 } out: { dry_sponges: dimensionless, labor_hours: T, sealer_gal: L^3, seal_coat: dimensionless }
 export function computeSootCleaningTakeoff({ affected_sf = 0, sponge_coverage_sf = 100, production_sf_per_hr = 150, seal_coat = 1, primer_sf_per_gal = 300 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const area = Number(affected_sf), cov = Number(sponge_coverage_sf), prod = Number(production_sf_per_hr), primer = Number(primer_sf_per_gal);
@@ -2701,7 +2701,7 @@ RESTORATION_RENDERERS["soot-cleaning-takeoff"] = renderSootCleaningTakeoff;
 // Generators = ceil(volume / rated treatable volume). The lockout is a CONSTANT
 // precondition, never computed off: the space is unoccupied and sealed, then
 // aired below the 0.1 ppm OSHA limit before reentry.
-// dims: in { structure_volume_ft3: L^3, rated_volume_per_unit: L^3, treatment_time_hr: T, aeration_min: T } out: { generators_needed: dimensionless }
+// dims: in { structure_volume_ft3: L^3, rated_volume_per_unit: L^3, treatment_time_hr: T, aeration_min: T } out: { generators_needed: dimensionless, aeration_min: T, treatment_time_hr: T }
 export function computeOzoneShockTreatment({ structure_volume_ft3 = 0, rated_volume_per_unit = 2000, treatment_time_hr = 24, aeration_min = 120 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const vol = Number(structure_volume_ft3), rated = Number(rated_volume_per_unit), time = Number(treatment_time_hr), aer = Number(aeration_min);
@@ -3124,7 +3124,7 @@ function _simpleRenderer(spec) {
 }
 
 // ===================== spec-v1445: water extraction volume and time =====================
-// dims: in { area_sqft: L^2, standing_depth_in: L, absorption_gal_per_sqft: L, extraction_rate_gpm: L^3 T^-1, waste_tank_gal: L^3, dehu_gal_per_day: L^3 T^-1 } out: { total_gal: L^3, wand_time_min: T, water_weight_lb: M L T^-2, absorbed_gal: L^3, speed_ratio: dimensionless, standing_gal: L^3 }
+// dims: in { area_sqft: L^2, standing_depth_in: L, absorption_gal_per_sqft: L, extraction_rate_gpm: L^3 T^-1, waste_tank_gal: L^3, dehu_gal_per_day: L^3 T^-1 } out: { total_gal: L^3, wand_time_min: T, water_weight_lb: M L T^-2, absorbed_gal: L^3, speed_ratio: dimensionless, standing_gal: L^3, dehu_days: T, tank_dumps: dimensionless, wand_time_hr: T }
 export function computeWaterExtractionRate({ area_sqft = 0, standing_depth_in = 0, absorption_gal_per_sqft = 0, extraction_rate_gpm = 0, waste_tank_gal = 0, dehu_gal_per_day = 15 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(area_sqft > 0)) return { error: "Affected area must be positive." };
@@ -3176,7 +3176,7 @@ RESTORATION_RENDERERS["water-extraction-rate"] = _simpleRenderer({
 });
 
 // ===================== spec-v1446: Category 3 disposal volume and routing =====================
-// dims: in { soft_area_sqft: L^2, soft_thickness_in: L, board_area_sqft: L^2, board_thickness_in: L, bulking_factor: dimensionless, bag_capacity_gal: L^3, container_cy: L^3, extracted_gal: L^3 } out: { in_place_cf: L^3, loose_cf: L^3, bag_count: dimensionless, container_utilization_pct: dimensionless }
+// dims: in { soft_area_sqft: L^2, soft_thickness_in: L, board_area_sqft: L^2, board_thickness_in: L, bulking_factor: dimensionless, bag_capacity_gal: L^3, container_cy: L^3, extracted_gal: L^3 } out: { in_place_cf: L^3, loose_cf: L^3, bag_count: dimensionless, container_utilization_pct: dimensionless, bag_cf: L^3, board_cf: L^3, container_cf: L^3, soft_cf: L^3 }
 export function computeSewageLossDisposal({ soft_area_sqft = 0, soft_thickness_in = 0, board_area_sqft = 0, board_thickness_in = 0, bulking_factor = 3, bag_capacity_gal = 33, container_cy = 10, extracted_gal = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(soft_area_sqft >= 0 && board_area_sqft >= 0)) return { error: "Removed areas cannot be negative." };

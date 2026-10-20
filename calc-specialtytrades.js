@@ -102,7 +102,7 @@ export const SPECIALTYTRADES_RENDERERS = {};
 // ===========================================================================
 
 // ===================== spec-v1425: elevator round-trip time =====================
-// dims: in { rise_ft: L, car_speed_fpm: L T^-1, passengers_per_trip: dimensionless, probable_stops: dimensionless, stop_time_s: T, transfer_time_s: T, cars: dimensionless, population: dimensionless, target_interval_s: T } out: { rtt_s: T, interval_s: T, hc_total: T^-1, hc_percent: dimensionless }
+// dims: in { rise_ft: L, car_speed_fpm: L T^-1, passengers_per_trip: dimensionless, probable_stops: dimensionless, stop_time_s: T, transfer_time_s: T, cars: dimensionless, population: dimensionless, target_interval_s: T } out: { rtt_s: T, interval_s: T, hc_total: T^-1, hc_percent: dimensionless, cars_for_target: dimensionless, hc_per_car: T^-1, stopping_s: T, transfer_s: T, travel_s: T }
 export function computeElevatorHandlingCapacity({ rise_ft = 0, car_speed_fpm = 0, passengers_per_trip = 0, probable_stops = 0, stop_time_s = 0, transfer_time_s = 0, cars = 1, population = 0, target_interval_s = 30 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(rise_ft > 0)) return { error: "Rise must be positive." };
@@ -175,7 +175,7 @@ export const GLASS_TYPE_FACTOR = {
   tempered: { factor: 4, label: "Fully tempered" },
 };
 
-// dims: in { width_ft: L, height_ft: L, design_pressure_psf: M L^-1 T^-2, glass_type: dimensionless, deflection_divisor: dimensionless, thickness_in: L, lites: dimensionless, spacer_allowance_psf: M L^-1 T^-2 } out: { area_sqft: L^2, total_load_lb: M L T^-2, allowable_deflection_in: L, aspect_ratio: dimensionless }
+// dims: in { width_ft: L, height_ft: L, design_pressure_psf: M L^-1 T^-2, glass_type: dimensionless, deflection_divisor: dimensionless, thickness_in: L, lites: dimensionless, spacer_allowance_psf: M L^-1 T^-2 } out: { area_sqft: L^2, total_load_lb: M L T^-2, allowable_deflection_in: L, aspect_ratio: dimensionless, type_factor: dimensionless }
 export function computeGlassThicknessWind({ width_ft = 0, height_ft = 0, design_pressure_psf = 0, glass_type = "annealed", deflection_divisor = 175, thickness_in = 0, lites = 1, spacer_allowance_psf = 0.33 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const t = GLASS_TYPE_FACTOR[glass_type];
@@ -305,7 +305,7 @@ SPECIALTYTRADES_RENDERERS["awning-canopy-load"] = _simpleRenderer({
 });
 
 // ===================== spec-v1429: garage door torsion spring =====================
-// dims: in { door_weight_lb: M L T^-2, door_height_in: L, drum_radius_in: L, springs: dimensionless, extra_turns: dimensionless } out: { required_torque_inlb: M L^2 T^-2, turns: dimensionless, lift_turns: dimensionless, required_ippt: M L^2 T^-2 }
+// dims: in { door_weight_lb: M L T^-2, door_height_in: L, drum_radius_in: L, springs: dimensionless, extra_turns: dimensionless } out: { required_torque_inlb: M L^2 T^-2, turns: dimensionless, lift_turns: dimensionless, required_ippt: M L^2 T^-2, extra_turns: dimensionless, ippt_per_spring: M L^2 T^-2, travel_per_turn_in: L }
 export function computeGarageDoorTorsionSpring({ door_weight_lb = 0, door_height_in = 0, drum_radius_in = 0, springs = 1, extra_turns = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(door_weight_lb > 0)) return { error: "Door weight must be positive." };
@@ -355,7 +355,7 @@ SPECIALTYTRADES_RENDERERS["garage-door-torsion-spring"] = _simpleRenderer({
 });
 
 // ===================== spec-v1430: window film solar heat gain reduction =====================
-// dims: in { area_sqft: L^2, shgc_before: dimensionless, shgc_after: dimensionless, peak_irradiance_btuh_sqft: M T^-3, full_sun_hours: T, eer: dimensionless, price_per_kwh: dimensionless, cost_per_sqft: dimensionless } out: { peak_reduction_btuh: M L^2 T^-3, kwh_saved: M L^2 T^-2, payback_years: T, peak_after_btuh: M L^2 T^-3, peak_before_btuh: M L^2 T^-3 }
+// dims: in { area_sqft: L^2, shgc_before: dimensionless, shgc_after: dimensionless, peak_irradiance_btuh_sqft: M T^-3, full_sun_hours: T, eer: dimensionless, price_per_kwh: dimensionless, cost_per_sqft: dimensionless } out: { peak_reduction_btuh: M L^2 T^-3, kwh_saved: M L^2 T^-2, payback_years: T, peak_after_btuh: M L^2 T^-3, peak_before_btuh: M L^2 T^-3, annual_btu: M L^2 T^-2, dollars_saved: dimensionless, installed_cost: dimensionless, peak_reduction_tons: M L^2 T^-3 }
 export function computeWindowFilmShgc({ area_sqft = 0, shgc_before = 0, shgc_after = 0, peak_irradiance_btuh_sqft = 0, full_sun_hours = 0, eer = 0, price_per_kwh = 0, cost_per_sqft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(area_sqft > 0)) return { error: "Glass area must be positive." };
@@ -411,7 +411,7 @@ SPECIALTYTRADES_RENDERERS["window-film-shgc"] = _simpleRenderer({
 });
 
 // ===================== spec-v1431: insulating glass U-factor and condensation =====================
-// dims: in { lites: dimensionless, r_per_lite: dimensionless, r_gap: dimensionless, r_indoor_film: dimensionless, r_outdoor_film: dimensionless, indoor_temp_f: T, outdoor_temp_f: T, indoor_rh_pct: dimensionless } out: { r_total: dimensionless, u_factor: M T^-4, surface_temp_f: T, dew_point_f: T, critical_rh_pct: dimensionless, margin_f: T }
+// dims: in { lites: dimensionless, r_per_lite: dimensionless, r_gap: dimensionless, r_indoor_film: dimensionless, r_outdoor_film: dimensionless, indoor_temp_f: T, outdoor_temp_f: T, indoor_rh_pct: dimensionless } out: { r_total: dimensionless, u_factor: M T^-4, surface_temp_f: T, dew_point_f: T, critical_rh_pct: dimensionless, margin_f: T, gaps: dimensionless }
 export function computeIguUFactor({ lites = 2, r_per_lite = 0.03, r_gap = 1.02, r_indoor_film = 0.68, r_outdoor_film = 0.17, indoor_temp_f = 70, outdoor_temp_f = null, indoor_rh_pct = 40 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // A blank temperature is not 0 F; the indoor one keeps its 70 F default when omitted.
@@ -473,7 +473,7 @@ SPECIALTYTRADES_RENDERERS["igu-u-factor"] = _simpleRenderer({
 });
 
 // ===================== spec-v1434: escalator handling capacity =====================
-// dims: in { speed_fpm: L T^-1, step_depth_in: L, persons_per_step: dimensionless, loading_factor: dimensionless, weight_per_person_lb: M L T^-2, design_flow_pph: T^-1 } out: { steps_per_hour: T^-1, practical_pph: T^-1, step_load_lb: M L T^-2 }
+// dims: in { speed_fpm: L T^-1, step_depth_in: L, persons_per_step: dimensionless, loading_factor: dimensionless, weight_per_person_lb: M L T^-2, design_flow_pph: T^-1 } out: { steps_per_hour: T^-1, practical_pph: T^-1, step_load_lb: M L T^-2, theoretical_pph: T^-1, units_needed: dimensionless, units_theoretical: dimensionless }
 export function computeEscalatorCapacity({ speed_fpm = 0, step_depth_in = 0, persons_per_step = 1, loading_factor = 0.6, weight_per_person_lb = 150, design_flow_pph = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(speed_fpm > 0)) return { error: "Rated speed must be positive." };
@@ -540,7 +540,7 @@ SPECIALTYTRADES_RENDERERS["escalator-capacity"] = _simpleRenderer({
 
 // ============ spec-v1686: scaffold tie spacing and height-to-base ratio ============
 
-// dims: in { scaffold_height_ft: L, base_width_ft: L, outrigger_base_ft: L, max_ratio: dimensionless, vertical_tie_spacing_ft: L, horizontal_tie_spacing_ft: L, scaffold_run_ft: L, sheeted: dimensionless } out: { height_to_base_ratio: dimensionless, max_free_standing_ft: L, first_tie_height_ft: L, tie_rows: dimensionless, ties_per_row: dimensionless, tie_count: dimensionless, base_to_eliminate_ties_ft: L, base_width_ft: L, effective_base_ft: L, horizontal_tie_spacing_ft: L, max_free_standing_bare_ft: L, outrigger_base_ft: L, outrigger_reach_needed_ft: L, scaffold_height_ft: L, scaffold_run_ft: L, vertical_tie_spacing_ft: L, bare_ratio: dimensionless, max_ratio: dimensionless }
+// dims: in { scaffold_height_ft: L, base_width_ft: L, outrigger_base_ft: L, max_ratio: dimensionless, vertical_tie_spacing_ft: L, horizontal_tie_spacing_ft: L, scaffold_run_ft: L, sheeted: dimensionless } out: { height_to_base_ratio: dimensionless, max_free_standing_ft: L, first_tie_height_ft: L, tie_rows: dimensionless, ties_per_row: dimensionless, tie_count: dimensionless, base_to_eliminate_ties_ft: L, base_width_ft: L, effective_base_ft: L, horizontal_tie_spacing_ft: L, max_free_standing_bare_ft: L, outrigger_base_ft: L, outrigger_reach_needed_ft: L, scaffold_height_ft: L, scaffold_run_ft: L, vertical_tie_spacing_ft: L, bare_ratio: dimensionless, max_ratio: dimensionless, sheeted: dimensionless }
 export function computeScaffoldTieSpacing({ scaffold_height_ft = 0, base_width_ft = 0, outrigger_base_ft = 0, max_ratio = 4, vertical_tie_spacing_ft = 0, horizontal_tie_spacing_ft = 0, scaffold_run_ft = 0, sheeted = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(scaffold_height_ft > 0)) return { error: "Scaffold height must be positive (ft)." };
@@ -625,7 +625,7 @@ SPECIALTYTRADES_RENDERERS["scaffold-tie-spacing"] = _simpleRenderer({
 
 // ============ spec-v1687: mast climbing work platform load distribution ============
 
-// dims: in { platform_length_ft: L, cantilever_length_ft: L, rated_capacity_lb: M L T^-2, zone_rated_capacity_lb: M L T^-2, load_lb: M L T^-2, load_centroid_ft: L, tie_spacing_ft: L, tie_capacity_lb: M L T^-2 } out: { total_utilization_pct: dimensionless, zone_utilization_pct: dimensionless, moment_ft_lb: M L^2 T^-2, distributed_moment_ft_lb: M L^2 T^-2, tie_force_lb: M L T^-2, max_load_at_position_lb: M L T^-2, cantilever_length_ft: L, half_platform_ft: L, load_centroid_ft: L, platform_length_ft: L, rated_capacity_lb: M L T^-2, tie_spacing_ft: L, tie_utilization_pct: dimensionless }
+// dims: in { platform_length_ft: L, cantilever_length_ft: L, rated_capacity_lb: M L T^-2, zone_rated_capacity_lb: M L T^-2, load_lb: M L T^-2, load_centroid_ft: L, tie_spacing_ft: L, tie_capacity_lb: M L T^-2 } out: { total_utilization_pct: dimensionless, zone_utilization_pct: dimensionless, moment_ft_lb: M L^2 T^-2, distributed_moment_ft_lb: M L^2 T^-2, tie_force_lb: M L T^-2, max_load_at_position_lb: M L T^-2, cantilever_length_ft: L, half_platform_ft: L, load_centroid_ft: L, platform_length_ft: L, rated_capacity_lb: M L T^-2, tie_spacing_ft: L, tie_utilization_pct: dimensionless, load_lb: M L T^-2, tie_capacity_lb: M L T^-2, zone_rated_capacity_lb: M L T^-2 }
 export function computeMastClimberPlatformLoad({ platform_length_ft = 0, cantilever_length_ft = 0, rated_capacity_lb = 0, zone_rated_capacity_lb = 0, load_lb = 0, load_centroid_ft = 0, tie_spacing_ft = 0, tie_capacity_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(platform_length_ft > 0)) return { error: "Platform length must be positive (ft)." };
@@ -710,7 +710,7 @@ SPECIALTYTRADES_RENDERERS["mast-climber-platform-load"] = _simpleRenderer({
 
 // ============ spec-v1688: suspended scaffold outrigger counterweight ============
 
-// dims: in { rated_load_lb: M L T^-2, outboard_arm_ft: L, inboard_arm_ft: L, factor_of_safety: dimensionless, counterweight_unit_lb: M L T^-2, target_counterweight_lb: M L T^-2, hoist_stall_load_lb: M L T^-2 } out: { lever_ratio: dimensionless, stall_counterweight_lb: M L T^-2, overturning_moment_ft_lb: M L^2 T^-2, required_counterweight_lb: M L T^-2, counterweight_units: dimensionless, resisting_moment_ft_lb: M L^2 T^-2, inboard_for_target_ft: L, factor_of_safety: dimensionless, inboard_arm_ft: L, outboard_arm_ft: L, rated_load_lb: M L T^-2 }
+// dims: in { rated_load_lb: M L T^-2, outboard_arm_ft: L, inboard_arm_ft: L, factor_of_safety: dimensionless, counterweight_unit_lb: M L T^-2, target_counterweight_lb: M L T^-2, hoist_stall_load_lb: M L T^-2 } out: { lever_ratio: dimensionless, stall_counterweight_lb: M L T^-2, overturning_moment_ft_lb: M L^2 T^-2, required_counterweight_lb: M L T^-2, counterweight_units: dimensionless, resisting_moment_ft_lb: M L^2 T^-2, inboard_for_target_ft: L, factor_of_safety: dimensionless, inboard_arm_ft: L, outboard_arm_ft: L, rated_load_lb: M L T^-2, achieved_fos: dimensionless, counterweight_unit_lb: M L T^-2, hoist_stall_load_lb: M L T^-2, target_counterweight_lb: M L T^-2 }
 export function computeSuspendedScaffoldCounterweight({ rated_load_lb = 0, outboard_arm_ft = 0, inboard_arm_ft = 0, factor_of_safety = 4, counterweight_unit_lb = 0, target_counterweight_lb = 0, hoist_stall_load_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(rated_load_lb > 0)) return { error: "The hoist's RATED load must be positive (lb) -- not its empty weight, and not what happens to be on it today." };
@@ -778,7 +778,7 @@ SPECIALTYTRADES_RENDERERS["suspended-scaffold-counterweight"] = _simpleRenderer(
 
 // ============ spec-v1689: slab shoring and reshoring load distribution ============
 
-// dims: in { slab_dead_psf: M L^-1 T^-2, construction_live_psf: M L^-1 T^-2, form_dead_psf: M L^-1 T^-2, connected_levels: dimensionless, backshored: dimensionless, governing_slab_capacity_psf: M L^-1 T^-2, governing_slab_strength_psi: M L^-1 T^-2 } out: { new_pour_load_psf: M L^-1 T^-2, redistributed_load_psf: M L^-1 T^-2, share_per_level_psf: M L^-1 T^-2, governing_level_load_psf: M L^-1 T^-2, capacity_margin_psf: M L^-1 T^-2, levels_required: dimensionless, governing_slab_strength_psi: M L^-1 T^-2, utilization_pct: dimensionless }
+// dims: in { slab_dead_psf: M L^-1 T^-2, construction_live_psf: M L^-1 T^-2, form_dead_psf: M L^-1 T^-2, connected_levels: dimensionless, backshored: dimensionless, governing_slab_capacity_psf: M L^-1 T^-2, governing_slab_strength_psi: M L^-1 T^-2 } out: { new_pour_load_psf: M L^-1 T^-2, redistributed_load_psf: M L^-1 T^-2, share_per_level_psf: M L^-1 T^-2, governing_level_load_psf: M L^-1 T^-2, capacity_margin_psf: M L^-1 T^-2, levels_required: dimensionless, governing_slab_strength_psi: M L^-1 T^-2, utilization_pct: dimensionless, backshored: dimensionless, connected_levels: dimensionless, construction_live_psf: M L^-1 T^-2, form_dead_psf: M L^-1 T^-2, governing_slab_capacity_psf: M L^-1 T^-2, slab_dead_psf: M L^-1 T^-2 }
 export function computeShoringReshoringLoad({ slab_dead_psf = 0, construction_live_psf = 0, form_dead_psf = 0, connected_levels = 0, backshored = 0, governing_slab_capacity_psf = 0, governing_slab_strength_psi = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!Number.isInteger(Number(connected_levels))) return { error: "Connected levels is a whole number of floors." };

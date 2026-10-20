@@ -147,7 +147,7 @@ const _OG_CLASS_DESIGN_FACTOR = { class_1: 0.72, class_2: 0.60, class_3: 0.50, c
 // than of the pipe: as development grows around a line its class location
 // changes, the allowable factor drops, and a line compliant at 0.72 in open
 // country is not compliant at 0.50 once a subdivision is built beside it.
-// dims: in { od_in: L, wall_in: L, smys_psi: M L^-1 T^-2, joint_factor: dimensionless, temperature_factor: dimensionless, operating_pressure_psig: M L^-1 T^-2, target_pressure_psig: M L^-1 T^-2 } out: { barlow_yield_psi: M L^-1 T^-2, maop_psig: M L^-1 T^-2, hoop_stress_psi: M L^-1 T^-2, pct_smys: dimensionless, wall_required_in: L, design_factor: dimensionless }
+// dims: in { od_in: L, wall_in: L, smys_psi: M L^-1 T^-2, joint_factor: dimensionless, temperature_factor: dimensionless, operating_pressure_psig: M L^-1 T^-2, target_pressure_psig: M L^-1 T^-2 } out: { barlow_yield_psi: M L^-1 T^-2, maop_psig: M L^-1 T^-2, hoop_stress_psi: M L^-1 T^-2, pct_smys: dimensionless, wall_required_in: L, design_factor: dimensionless, maop_class_1: M L^-1 T^-2, maop_class_2: M L^-1 T^-2, maop_class_3: M L^-1 T^-2, maop_class_4: M L^-1 T^-2 }
 export function computePipelineMaoBarlow({
   od_in = 0, wall_in = 0, smys_psi = 0, class_location = "class_1",
   joint_factor = 1, temperature_factor = 1,
@@ -244,7 +244,7 @@ const _ogPanhandleA = (tb, pb, dp2, g, t, l, z, d, e) =>
   * Math.pow(d, _OG_PANHANDLE_A_DIAMETER_EXP) * e;
 // Computed Z added 2026-10-09: z_mode "computed" takes Z from gas-z-factor (Sutton + Dranchuk-Abou-Kassem) at the
 // standard average flowing pressure P_avg = (2/3)(P1 + P2 - P1 P2/(P1 + P2)) and the flowing temperature.
-// dims: in { id_in: L, length_mi: L, inlet_psig: M L^-1 T^-2, outlet_psig: M L^-1 T^-2, gravity: dimensionless, flowing_temp_f: T, z_factor: dimensionless, efficiency: dimensionless, alternate_id_in: L, z_mode: dimensionless } out: { squared_difference: dimensionless, q_scfd: L^3 T^-1, q_mmscfd: L^3 T^-1, alternate_q_scfd: L^3 T^-1, diameter_capacity_ratio: dimensionless , z_used: dimensionless, avg_pressure_psia: M L^-1 T^-2, inlet_psia: M L^-1 T^-2, outlet_psia: M L^-1 T^-2 }
+// dims: in { id_in: L, length_mi: L, inlet_psig: M L^-1 T^-2, outlet_psig: M L^-1 T^-2, gravity: dimensionless, flowing_temp_f: T, z_factor: dimensionless, efficiency: dimensionless, alternate_id_in: L, z_mode: dimensionless } out: { squared_difference: dimensionless, q_scfd: L^3 T^-1, q_mmscfd: L^3 T^-1, alternate_q_scfd: L^3 T^-1, diameter_capacity_ratio: dimensionless , z_used: dimensionless, avg_pressure_psia: M L^-1 T^-2, inlet_psia: M L^-1 T^-2, outlet_psia: M L^-1 T^-2, flowing_temp_r: T, q_mscfd: L^3 T^-1 }
 export function computeGasPipelineFlow({
   equation = "panhandle_a", id_in = 0, length_mi = 0, inlet_psig = 0, outlet_psig = 0,
   gravity = 0.6, flowing_temp_f = 60, z_factor = 1, efficiency = 0.92, alternate_id_in = 0, z_mode = "entered",
@@ -336,7 +336,7 @@ OILGAS_RENDERERS["gas-pipeline-flow"] = _simpleRenderer({
 // Unlike gas, liquid is incompressible, so the pressure profile is a straight
 // line falling at the friction gradient and tilted by terrain. That makes the
 // arithmetic simple and makes elevation matter enormously.
-// dims: in { total_length_mi: L, friction_gradient_ft_per_mi: dimensionless, elevation_change_ft: L, maop_head_ft: L, min_suction_head_ft: L, flow_bpd: L^3 T^-1, alternate_flow_bpd: L^3 T^-1 } out: { available_head_ft: L, elevation_gradient_ft_per_mi: dimensionless, combined_gradient_ft_per_mi: dimensionless, max_spacing_mi: L, station_count: dimensionless, alternate_gradient_ft_per_mi: dimensionless, actual_spacing_mi: L, alternate_spacing_mi: L, alternate_station_count: dimensionless, elevation_share_pct: dimensionless }
+// dims: in { total_length_mi: L, friction_gradient_ft_per_mi: dimensionless, elevation_change_ft: L, maop_head_ft: L, min_suction_head_ft: L, flow_bpd: L^3 T^-1, alternate_flow_bpd: L^3 T^-1 } out: { available_head_ft: L, elevation_gradient_ft_per_mi: dimensionless, combined_gradient_ft_per_mi: dimensionless, max_spacing_mi: L, station_count: dimensionless, alternate_gradient_ft_per_mi: dimensionless, actual_spacing_mi: L, alternate_spacing_mi: L, alternate_station_count: dimensionless, elevation_share_pct: dimensionless, head_used_per_station_ft: L }
 export function computeLiquidPipelineStationSpacing({
   total_length_mi = 0, friction_gradient_ft_per_mi = 0, elevation_change_ft = 0,
   maop_head_ft = 0, min_suction_head_ft = 0, flow_bpd = 0, alternate_flow_bpd = 0,
@@ -420,7 +420,7 @@ OILGAS_RENDERERS["liquid-pipeline-station-spacing"] = _simpleRenderer({
 // spec-v1527's own example calls 2.98 ft/s "comfortably inside" a 3 to 12 ft/s
 // tool window. It is BELOW the window. The verdict here is driven off a
 // boolean the compute returns, so the sentence cannot disagree with the number.
-// dims: in { id_in: L, length_mi: L, flow_bpd: L^3 T^-1, tool_min_fps: L T^-1, tool_max_fps: L T^-1 } out: { bbl_per_mile: L^2, total_bbl: L^3, total_ft3: L^3, velocity_fps: L T^-1, travel_time_h: T, flow_for_min_bpd: L^3 T^-1, velocity_mph: L T^-1 }
+// dims: in { id_in: L, length_mi: L, flow_bpd: L^3 T^-1, tool_min_fps: L T^-1, tool_max_fps: L T^-1 } out: { bbl_per_mile: L^2, total_bbl: L^3, total_ft3: L^3, velocity_fps: L T^-1, travel_time_h: T, flow_for_min_bpd: L^3 T^-1, velocity_mph: L T^-1, flow_for_max_bpd: L^3 T^-1, ft3_per_mile: L^2 }
 export function computePigBatchVolume({
   id_in = 0, length_mi = 0, flow_bpd = 0, tool_min_fps = 0, tool_max_fps = 0,
 } = {}) {
@@ -498,7 +498,7 @@ OILGAS_RENDERERS["pig-batch-volume"] = _simpleRenderer({
 // Everything turns on how much steel is actually exposed. The current this
 // returns is the input a sacrificial-anode life calculation asks a user to
 // supply, so what that one takes on faith is computed here.
-// dims: in { od_in: L, length_mi: L, coating_efficiency_pct: dimensionless, current_density_ma_per_ft2: I L^-2, anode_weight_lb: M, consumption_lb_per_a_yr: M I^-1 T^-1, utilization: dimensionless, current_per_anode_a: I, degraded_efficiency_pct: dimensionless, target_life_years: T } out: { total_area_ft2: L^2, bare_area_ft2: L^2, current_required_a: I, anode_count: dimensionless, anode_life_years: T, mass_for_target_lb: M, degraded_current_a: I, bare_fraction: dimensionless, degraded_bare_ft2: L^2 }
+// dims: in { od_in: L, length_mi: L, coating_efficiency_pct: dimensionless, current_density_ma_per_ft2: I L^-2, anode_weight_lb: M, consumption_lb_per_a_yr: M I^-1 T^-1, utilization: dimensionless, current_per_anode_a: I, degraded_efficiency_pct: dimensionless, target_life_years: T } out: { total_area_ft2: L^2, bare_area_ft2: L^2, current_required_a: I, anode_count: dimensionless, anode_life_years: T, mass_for_target_lb: M, degraded_current_a: I, bare_fraction: dimensionless, degraded_bare_ft2: L^2, current_multiple: dimensionless }
 export function computeCathodicAnodeCountLife({
   od_in = 0, length_mi = 0, coating_efficiency_pct = 0, current_density_ma_per_ft2 = 0,
   anode_weight_lb = 0, consumption_lb_per_a_yr = 0, utilization = 0.85,
@@ -681,7 +681,7 @@ OILGAS_RENDERERS["corroded-pipe-b31g"] = _simpleRenderer({
 // The annulus is a difference of SQUARES, which is why it is far more
 // sensitive to hole size than to casing size, and why an oversized or
 // washed-out hole eats cement fast.
-// dims: in { hole_dia_in: L, casing_od_in: L, casing_id_in: L, cement_column_ft: L, excess_pct: dimensionless, float_collar_ft: L, slurry_yield_ft3_per_sack: L^3, low_excess_pct: dimensionless, high_excess_pct: dimensionless } out: { annular_capacity_bbl_ft: L^2, casing_capacity_bbl_ft: L^2, annular_volume_bbl: L^3, slurry_volume_bbl: L^3, sacks: dimensionless, displacement_bbl: L^3, excess_spread_bbl: L^3, slurry_volume_ft3: L^3, spread_column_ft: L }
+// dims: in { hole_dia_in: L, casing_od_in: L, casing_id_in: L, cement_column_ft: L, excess_pct: dimensionless, float_collar_ft: L, slurry_yield_ft3_per_sack: L^3, low_excess_pct: dimensionless, high_excess_pct: dimensionless } out: { annular_capacity_bbl_ft: L^2, casing_capacity_bbl_ft: L^2, annular_volume_bbl: L^3, slurry_volume_bbl: L^3, sacks: dimensionless, displacement_bbl: L^3, excess_spread_bbl: L^3, slurry_volume_ft3: L^3, spread_column_ft: L, high_slurry_bbl: L^3, low_slurry_bbl: L^3 }
 export function computeCasingCementVolume({
   hole_dia_in = 0, casing_od_in = 0, casing_id_in = 0, cement_column_ft = 0,
   excess_pct = 0, float_collar_ft = 0, slurry_yield_ft3_per_sack = 0,
@@ -839,7 +839,7 @@ OILGAS_RENDERERS["mud-hydrostatic-pressure"] = _simpleRenderer({
 // arriving at a negative number it calls extra pressure. Rounding a kill
 // weight DOWN leaves the well underbalanced, so the rounded weight here is an
 // input and the verdict on it is driven off a boolean.
-// dims: in { original_mw_ppg: M L^-3, tvd_ft: L, sidpp_psi: M L^-1 T^-2, scr_pressure_psi: M L^-1 T^-2, safety_margin_ppg: M L^-3, rounded_mw_ppg: M L^-3, drillpipe_capacity_bbl_ft: L^2, measured_depth_ft: L, pump_output_bbl_stroke: L^3, pump_spm: T^-1 } out: { kill_mw_ppg: M L^-3, formation_pressure_psi: M L^-1 T^-2, icp_psi: M L^-1 T^-2, fcp_psi: M L^-1 T^-2, strokes_to_bit: dimensionless, minutes_to_bit: T, rounded_bhp_change_psi: M L^-1 T^-2, original_hydrostatic_psi: M L^-1 T^-2 }
+// dims: in { original_mw_ppg: M L^-3, tvd_ft: L, sidpp_psi: M L^-1 T^-2, scr_pressure_psi: M L^-1 T^-2, safety_margin_ppg: M L^-3, rounded_mw_ppg: M L^-3, drillpipe_capacity_bbl_ft: L^2, measured_depth_ft: L, pump_output_bbl_stroke: L^3, pump_spm: T^-1 } out: { kill_mw_ppg: M L^-3, formation_pressure_psi: M L^-1 T^-2, icp_psi: M L^-1 T^-2, fcp_psi: M L^-1 T^-2, strokes_to_bit: dimensionless, minutes_to_bit: T, rounded_bhp_change_psi: M L^-1 T^-2, original_hydrostatic_psi: M L^-1 T^-2, drillpipe_volume_bbl: L^3, safety_margin_ppg: M L^-3 }
 export function computeKillMudWeight({
   original_mw_ppg = 0, tvd_ft = 0, sidpp_psi = 0, scr_pressure_psi = 0,
   safety_margin_ppg = 0, rounded_mw_ppg = 0,
@@ -1122,7 +1122,7 @@ const _OG_STD_P_PSIA = 14.696;
 // spec-v1534: vertical tank strapping, and the two corrections between
 // gross and net that are both money.
 // =====================================================================
-// dims: in { tank_diameter_ft: L, gauge_ft: L, gauge_in: L, closing_gauge_ft: L, closing_gauge_in: L, volume_correction_factor: dimensionless, sediment_water_pct: dimensionless } out: { bbl_per_ft: L^3, bbl_per_in: L^3, gross_bbl: L^3, moved_bbl: L^3, net_bbl: L^3, correction_bbl: L^3, correction_pct: dimensionless }
+// dims: in { tank_diameter_ft: L, gauge_ft: L, gauge_in: L, closing_gauge_ft: L, closing_gauge_in: L, volume_correction_factor: dimensionless, sediment_water_pct: dimensionless } out: { bbl_per_ft: L^3, bbl_per_in: L^3, gross_bbl: L^3, moved_bbl: L^3, net_bbl: L^3, correction_bbl: L^3, correction_pct: dimensionless, subject_bbl: L^3 }
 export function computeTankStrappingVolume({
   tank_diameter_ft = 0, gauge_ft = 0, gauge_in = 0,
   closing_gauge_ft = 0, closing_gauge_in = 0,
@@ -1255,7 +1255,7 @@ export const tankVentApi2000Example = { inputs: { pump_in_bph: 3000, pump_out_bp
 // =====================================================================
 // Computed Z added 2026-10-09: z_mode "computed" takes Z from gas-z-factor (Sutton + Dranchuk-Abou-Kassem) at the
 // operating pressure and temperature.
-// dims: in { vessel_diameter_ft: L, seam_to_seam_ft: L, liquid_fraction: dimensionless, liquid_rate_bpd: L^3 T^-1, required_retention_min: T, gas_rate_mmscfd: L^3 T^-1, pressure_psig: M L^-1 T^-2, temperature_f: T, z_factor: dimensionless, gas_gravity: dimensionless, liquid_density_lb_ft3: M L^-3, k_factor: L T^-1, z_mode: dimensionless } out: { liquid_volume_bbl: L^3, actual_retention_min: T, required_liquid_bbl: L^3, gas_density_lb_ft3: M L^-3, max_velocity_fps: L T^-1, actual_velocity_fps: L T^-1, gas_pct_of_max: dimensionless, liquid_pct_of_required: dimensionless, z_used: dimensionless, vapour_area_ft2: L^2 }
+// dims: in { vessel_diameter_ft: L, seam_to_seam_ft: L, liquid_fraction: dimensionless, liquid_rate_bpd: L^3 T^-1, required_retention_min: T, gas_rate_mmscfd: L^3 T^-1, pressure_psig: M L^-1 T^-2, temperature_f: T, z_factor: dimensionless, gas_gravity: dimensionless, liquid_density_lb_ft3: M L^-3, k_factor: L T^-1, z_mode: dimensionless } out: { liquid_volume_bbl: L^3, actual_retention_min: T, required_liquid_bbl: L^3, gas_density_lb_ft3: M L^-3, max_velocity_fps: L T^-1, actual_velocity_fps: L T^-1, gas_pct_of_max: dimensionless, liquid_pct_of_required: dimensionless, z_used: dimensionless, vapour_area_ft2: L^2, liquid_rate_bpm: L^3 T^-1 }
 export function computeSeparatorRetentionSizing({
   vessel_diameter_ft = 0, seam_to_seam_ft = 0, liquid_fraction = 0.5,
   liquid_rate_bpd = 0, required_retention_min = 0, gas_rate_mmscfd = 0,
@@ -1488,7 +1488,7 @@ export const flareRadiationDistanceExample = { inputs: { heat_release_btuh: 2500
 // the same entered number, because which of the two a quoted decline is
 // meant to be is exactly what nobody writes down.
 // =====================================================================
-// dims: in { initial_rate_bpd: L^3 T^-1, decline_rate: T^-1, rate_is_effective: dimensionless, economic_limit_bpd: L^3 T^-1, years_ahead: T } out: { nominal_decline: T^-1, effective_decline: T^-1, economic_life_years: T, remaining_reserves_bbl: L^3, rate_at_years_bpd: L^3 T^-1, cumulative_to_years_bbl: L^3, misread_reserves_bbl: L^3, misread_error_pct: dimensionless }
+// dims: in { initial_rate_bpd: L^3 T^-1, decline_rate: T^-1, rate_is_effective: dimensionless, economic_limit_bpd: L^3 T^-1, years_ahead: T } out: { nominal_decline: T^-1, effective_decline: T^-1, economic_life_years: T, remaining_reserves_bbl: L^3, rate_at_years_bpd: L^3 T^-1, cumulative_to_years_bbl: L^3, misread_reserves_bbl: L^3, misread_error_pct: dimensionless, misread_life_years: T }
 export function computeWellDeclineReserves({
   initial_rate_bpd = 0, decline_rate = 0, rate_is_effective = "no",
   economic_limit_bpd = 0, years_ahead = 0,

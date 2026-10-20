@@ -47,7 +47,7 @@ const _finiteGuard = (o) => {
 
 // --- Utility 67: Solar PV String Sizing ---
 
-// dims: in { module_voc_V: M L^2 T^-3 I^-1, module_vmp_V: M L^2 T^-3 I^-1, voc_temp_coeff_pct_per_C: T^-1, record_low_C: T, record_high_C: T, inverter_mppt_min_V: M L^2 T^-3 I^-1, inverter_mppt_max_V: M L^2 T^-3 I^-1, inverter_vdc_max_V: M L^2 T^-3 I^-1, cell_temp_rise_C: T } out: { max_series: dimensionless, min_series: dimensionless, cold_voc_V: M L^2 T^-3 I^-1, warm_vmp_V: M L^2 T^-3 I^-1, cold_string_vmp_V: M L^2 T^-3 I^-1, cold_vmp_V: M L^2 T^-3 I^-1, mppt_max_V: M L^2 T^-3 I^-1 }
+// dims: in { module_voc_V: M L^2 T^-3 I^-1, module_vmp_V: M L^2 T^-3 I^-1, voc_temp_coeff_pct_per_C: T^-1, record_low_C: T, record_high_C: T, inverter_mppt_min_V: M L^2 T^-3 I^-1, inverter_mppt_max_V: M L^2 T^-3 I^-1, inverter_vdc_max_V: M L^2 T^-3 I^-1, cell_temp_rise_C: T } out: { max_series: dimensionless, min_series: dimensionless, cold_voc_V: M L^2 T^-3 I^-1, warm_vmp_V: M L^2 T^-3 I^-1, cold_string_vmp_V: M L^2 T^-3 I^-1, cold_vmp_V: M L^2 T^-3 I^-1, mppt_max_V: M L^2 T^-3 I^-1, hot_cell_C: T, max_series_in_mppt: dimensionless }
 export function computePVStringSizing({
   module_voc_V, module_vmp_V, voc_temp_coeff_pct_per_C,
   record_low_C, record_high_C,
@@ -99,7 +99,7 @@ export const pvStringSizingExample = {
 
 // --- Utility 68: Battery Runtime ---
 
-// dims: in { amp_hours: I T, system_V: M L^2 T^-3 I^-1, dod_percent: dimensionless, load_W: M L^2 T^-3, peukert_k: dimensionless, rated_hours: T } out: { hours: T, inverter_efficiency_pct: dimensionless, minutes: T }
+// dims: in { amp_hours: I T, system_V: M L^2 T^-3 I^-1, dod_percent: dimensionless, load_W: M L^2 T^-3, peukert_k: dimensionless, rated_hours: T } out: { hours: T, inverter_efficiency_pct: dimensionless, minutes: T, usable_Wh: M L^2 T^-2 }
 export function computeBatteryRuntime({ amp_hours, system_V, dod_percent = 100, load_W, peukert_k = 1, inverter_efficiency_pct = 100, rated_hours = 20 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (Number(dod_percent) > 100) return { error: "Depth of discharge cannot exceed 100%." };
@@ -390,7 +390,7 @@ export function renderPvInterconnectionBusbar(inputRegion, outputRegion, citatio
 // efficiency. LFP industry practice uses ~80% DoD; flooded lead-acid ~50%.
 // The manufacturer datasheet governs chemistry-specific derates.
 
-// dims: in { daily_load_wh: M L^2 T^-2, days_autonomy: T, dod_limit: dimensionless, system_voltage_v: M L^2 T^-3 I^-1, round_trip_efficiency: dimensionless, temperature_derate: dimensionless } out: { usable_wh: M L^2 T^-3 T, nameplate_wh: M L^2 T^-3 T, nameplate_ah: I T }
+// dims: in { daily_load_wh: M L^2 T^-2, days_autonomy: T, dod_limit: dimensionless, system_voltage_v: M L^2 T^-3 I^-1, round_trip_efficiency: dimensionless, temperature_derate: dimensionless } out: { usable_wh: M L^2 T^-3 T, nameplate_wh: M L^2 T^-3 T, nameplate_ah: I T, daily_load_wh: M L^2 T^-2, days_autonomy: T }
 export function computeOffGridBattery({
   daily_load_wh = 0,
   days_autonomy = 3,
@@ -1305,7 +1305,7 @@ SOLAR_RENDERERS["pv-performance-ratio"] = renderPvPerformanceRatio;
 
 // NEC 240.6(A) standard overcurrent-device ampere ratings (the range PV source circuits use).
 const _PV_STD_OCPD_A = [1, 3, 6, 10, 15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 90, 100, 110, 125, 150, 175, 200];
-// dims: in { Isc_A: I, max_fuse_A: I, n_strings: dimensionless } out: { req_A: I, fuse_A: I }
+// dims: in { Isc_A: I, max_fuse_A: I, n_strings: dimensionless } out: { req_A: I, fuse_A: I, n: dimensionless }
 export function computePvStringFusing({ Isc_A = 0, max_fuse_A = 0, n_strings = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const isc = Number(Isc_A) || 0;

@@ -48,7 +48,7 @@ export const SERVICE_RENDERERS = {};
 // AHJ accepts a demand factor (IFGC 402.2). Default heating values: natural gas
 // ~1,000 BTU/ft^3, propane ~2,516 BTU/ft^3 (both editable).
 const GAS_HEATING_VALUE = { natural_gas: 1000, propane: 2516 };
-// dims: in { appliances: M L^2 T^-3, fuel: dimensionless, heating_value: M L^-1 T^-2 } out: { total_btuh: M L^2 T^-3, cfh: L^3 T^-1, appliance_count: dimensionless }
+// dims: in { appliances: M L^2 T^-3, fuel: dimensionless, heating_value: M L^-1 T^-2 } out: { total_btuh: M L^2 T^-3, cfh: L^3 T^-1, appliance_count: dimensionless, heating_value: M L^-1 T^-2 }
 // (Each appliance input rating is an energy rate M L^2 T^-3 (BTU/hr); the
 //  heating value is an energy density M L^-1 T^-2 (BTU/ft^3), so the connected
 //  load divided by it gives the volumetric demand L^3 T^-1 (CFH).)
@@ -141,7 +141,7 @@ const TPR_CHECKLIST = [
   "Materials per IPC 605.4 or rated to ASME A112.4.1",
   "To the floor, the heater pan, a waste receptor, or the outdoors, where occupants can see it; serves no other relief device",
 ];
-// dims: in { heater_input: M L^2 T^-3, valve_rating: M L^2 T^-3, outlet_size: L } out: { discharge_in: L, rating_margin_btuh: M L^2 T^-3, rating_ok: dimensionless }
+// dims: in { heater_input: M L^2 T^-3, valve_rating: M L^2 T^-3, outlet_size: L } out: { discharge_in: L, rating_margin_btuh: M L^2 T^-3, rating_ok: dimensionless, heater_input: M L^2 T^-3, valve_rating: M L^2 T^-3 }
 // (Heater input and valve relief capacity are energy rates M L^2 T^-3 (BTU/hr);
 //  the discharge size is a length L equal to the valve outlet, never reduced.)
 export function computeTprDischarge({ heater_input, valve_rating, outlet_size = 0.75 } = {}) {
@@ -282,7 +282,7 @@ SERVICE_RENDERERS["pipe-support-spacing"] = renderPipeSupportSpacing;
 // daily_gal = people x use_per_cap; grain_load = daily_gal x comp_hardness;
 // days_between = floor(capacity / grain_load); annual_salt =
 // salt_per_regen x (365 / days_between).
-// dims: in { people: dimensionless, use_per_cap: L^3, hardness_gpg: dimensionless, iron_ppm: dimensionless, capacity: dimensionless, salt_per_regen: M } out: { comp_hardness: dimensionless, daily_gal: L^3, grain_load: dimensionless, days_between: dimensionless, annual_salt: M }
+// dims: in { people: dimensionless, use_per_cap: L^3, hardness_gpg: dimensionless, iron_ppm: dimensionless, capacity: dimensionless, salt_per_regen: M } out: { comp_hardness: dimensionless, daily_gal: L^3, grain_load: dimensionless, days_between: dimensionless, annual_salt: M, salt_per_regen: M }
 // (Daily use is a volume L^3 (gal); hardness and grain capacity are grain
 //  counts (dimensionless); salt is a mass M (lb).)
 export function computeSoftenerSizing({ people, use_per_cap = 75, hardness_gpg, iron_ppm = 0, capacity, salt_per_regen = null } = {}) {
@@ -463,7 +463,7 @@ function _dryerDemandFactor(n) {
   return 0.25;
 }
 
-// dims: in { num_dryers: dimensionless, nameplate_w: M L^2 T^-3, supply_v: M L^2 T^-3 I^-1 } out: { per_dryer_w: M L^2 T^-3, demand_w: M L^2 T^-3, demand_a: I, connected_w: M L^2 T^-3 }
+// dims: in { num_dryers: dimensionless, nameplate_w: M L^2 T^-3, supply_v: M L^2 T^-3 I^-1 } out: { per_dryer_w: M L^2 T^-3, demand_w: M L^2 T^-3, demand_a: I, connected_w: M L^2 T^-3, demand_factor: dimensionless }
 export function computeDryerDemand22054({ num_dryers = 1, nameplate_w = 5000, supply_v = 240 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const n = Math.round(Number(num_dryers) || 0);

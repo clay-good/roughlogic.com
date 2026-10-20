@@ -124,7 +124,7 @@ SOILSETTLEMENT_RENDERERS["soil-consolidation-settlement"] = _simpleRenderer({
 // index Cr until the load pushes the stress past the preconsolidation pressure sigma'p, then
 // the steep virgin Cc. Below sigma'p the settlement is a fraction of the NC value -- the whole
 // reason knowing sigma'p matters. Reduces exactly to the NC tile when sigma'p = sigma'0.
-// dims: in { cc: dimensionless, cr: dimensionless, h_ft: L, e0: dimensionless, sig0_psf: M L^-1 T^-2, sigp_psf: M L^-1 T^-2, dsig_psf: M L^-1 T^-2 } out: { sc_ft: L, sc_in: L, ocr: dimensionless }
+// dims: in { cc: dimensionless, cr: dimensionless, h_ft: L, e0: dimensionless, sig0_psf: M L^-1 T^-2, sigp_psf: M L^-1 T^-2, dsig_psf: M L^-1 T^-2 } out: { sc_ft: L, sc_in: L, ocr: dimensionless, final_stress_psf: M L^-1 T^-2 }
 export function computeOverconsolidatedSettlement({ cc = 0, cr = 0, h_ft = 0, e0 = 0, sig0_psf = 0, sigp_psf = 0, dsig_psf = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   cc = Number(cc); cr = Number(cr); h_ft = Number(h_ft); e0 = Number(e0); sig0_psf = Number(sig0_psf); sigp_psf = Number(sigp_psf); dsig_psf = Number(dsig_psf);
@@ -258,7 +258,7 @@ SOILSETTLEMENT_RENDERERS["settlement-limit-load"] = _simpleRenderer({
   compute: computeSettlementLimitLoad,
 });
 
-// dims: in { p_kip: M L T^-2, m_kft: M L^2 T^-2, b_ft: L, l_ft: L } out: { e_ft: L, q_max_ksf: M L^-1 T^-2, q_min_ksf: M L^-1 T^-2, bearing_len_ft: L }
+// dims: in { p_kip: M L T^-2, m_kft: M L^2 T^-2, b_ft: L, l_ft: L } out: { e_ft: L, q_max_ksf: M L^-1 T^-2, q_min_ksf: M L^-1 T^-2, bearing_len_ft: L, kern: L }
 export function computeFootingEccentricPressure({ p_kip = 0, m_kft = 0, b_ft = 0, l_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(p_kip > 0)) return { error: "Vertical load must be positive (kip)." };
@@ -349,7 +349,7 @@ SOILSETTLEMENT_RENDERERS["boussinesq-surcharge-wall"] = _simpleRenderer({
 
 // ===================== spec-v414..v416: geotechnical settlement/foundation trio (Group E) =====================
 
-// dims: in { u_percent: dimensionless, cv_ft2_day: L^2 T^-1, hdr_ft: L } out: { tv: dimensionless, t_days: dimensionless }
+// dims: in { u_percent: dimensionless, cv_ft2_day: L^2 T^-1, hdr_ft: L } out: { tv: dimensionless, t_days: T, t_years: T }
 export function computeConsolidationTimeRate({ u_percent = 0, cv_ft2_day = 0, hdr_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const u = Number(u_percent) || 0;
@@ -382,7 +382,7 @@ SOILSETTLEMENT_RENDERERS["consolidation-time-rate"] = _simpleRenderer({
   compute: computeConsolidationTimeRate,
 });
 
-// dims: in { cv_ft2_day: L^2 T^-1, hdr_ft: L, t_days: dimensionless } out: { tv: dimensionless, u_percent: dimensionless }
+// dims: in { cv_ft2_day: L^2 T^-1, hdr_ft: L, t_days: T } out: { tv: dimensionless, u_percent: dimensionless }
 export function computeConsolidationDegree({ cv_ft2_day = 0, hdr_ft = 0, t_days = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const cv = Number(cv_ft2_day) || 0;

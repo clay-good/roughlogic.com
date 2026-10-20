@@ -440,7 +440,7 @@ LOWVOLTAGE_RENDERERS["cable-tray-fill"] = _renderCableTrayFill;
 // Z.3 IP camera / NVR storage and bandwidth (cctv-storage)
 // ---------------------------------------------------------------------
 // 1 Mbps continuous = 0.45 GB/hour = 10.8 GB/day.
-// dims: in { camera_count: dimensionless, bitrate_mbps: dimensionless, motion_duty_percent: dimensionless, retention_days: dimensionless } out: { total_storage_gb: dimensionless, aggregate_bandwidth_mbps: dimensionless, camera_count: dimensionless }
+// dims: in { camera_count: dimensionless, bitrate_mbps: dimensionless, motion_duty_percent: dimensionless, retention_days: dimensionless } out: { total_storage_gb: dimensionless, aggregate_bandwidth_mbps: dimensionless, camera_count: dimensionless, per_camera_day_gb: dimensionless, recording_hours_per_day: T, total_storage_tb: dimensionless }
 export function computeCctvStorage({ camera_count = 1, bitrate_mbps = 0, recording_mode = "continuous", motion_duty_percent, retention_days = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const n = Math.max(0, Number(camera_count) || 0);
@@ -504,7 +504,7 @@ LOWVOLTAGE_RENDERERS["cctv-storage"] = _renderCctvStorage;
 // so days = disk_capacity_gb / (n * br * 0.45 * hours). Reuses computeCctvStorage
 // at retention_days = 1 to get the daily total, keeping the daily-rate geometry
 // in one place.
-// dims: in { disk_capacity_gb: dimensionless, camera_count: dimensionless, bitrate_mbps: dimensionless, motion_duty_percent: dimensionless } out: { retention_days: dimensionless, per_camera_day_gb: dimensionless }
+// dims: in { disk_capacity_gb: dimensionless, camera_count: dimensionless, bitrate_mbps: dimensionless, motion_duty_percent: dimensionless } out: { retention_days: dimensionless, per_camera_day_gb: dimensionless, aggregate_bandwidth_mbps: dimensionless, recording_hours_per_day: T, retention_weeks: T }
 export function computeCctvRetentionDays({ disk_capacity_gb = 0, camera_count = 1, bitrate_mbps = 0, recording_mode = "continuous", motion_duty_percent } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const cap = Number(disk_capacity_gb);
@@ -551,7 +551,7 @@ LOWVOLTAGE_RENDERERS["cctv-retention-days"] = _renderCctvRetentionDays;
 // ---------------------------------------------------------------------
 // Z.4 70-volt distributed speaker line (speaker-70v-line)
 // ---------------------------------------------------------------------
-// dims: in { amp_rated_w: M L^2 T^-3, headroom_percent: dimensionless, tap_watts: M L^2 T^-3, tap_count: dimensionless, line_voltage_v: M L^2 T^-3 I^-1 } out: { total_tap_w: M L^2 T^-3, reflected_impedance_ohm: M L^2 T^-3 I^-2, budget_limit_w: M L^2 T^-3, line_voltage_v: M L^2 T^-3 I^-1 }
+// dims: in { amp_rated_w: M L^2 T^-3, headroom_percent: dimensionless, tap_watts: M L^2 T^-3, tap_count: dimensionless, line_voltage_v: M L^2 T^-3 I^-1 } out: { total_tap_w: M L^2 T^-3, reflected_impedance_ohm: M L^2 T^-3 I^-2, budget_limit_w: M L^2 T^-3, line_voltage_v: M L^2 T^-3 I^-1, max_additional_taps: dimensionless }
 export function computeSpeaker70vLine({ amp_rated_w = 0, headroom_percent = 20, tap_watts = 0, tap_count = 0, line_voltage_v = 70.7, run_length_ft = 0, wire_ohms_per_1000ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const rating = Number(amp_rated_w);
@@ -623,7 +623,7 @@ LOWVOLTAGE_RENDERERS["speaker-70v-line"] = _renderSpeaker70vLine;
 // Z.5 Fire-alarm / security standby battery sizing (standby-battery-sizing)
 // ---------------------------------------------------------------------
 const _BATTERY_STANDARD_AH = [4, 7, 8, 12, 18, 26, 33, 40, 55, 75, 100];
-// dims: in { standby_current_a: I, standby_hours: T, alarm_current_a: I, alarm_minutes: T, derate: dimensionless } out: { required_ah: dimensionless, next_standard_ah: dimensionless, derate: dimensionless }
+// dims: in { standby_current_a: I, standby_hours: T, alarm_current_a: I, alarm_minutes: T, derate: dimensionless } out: { required_ah: I T, next_standard_ah: I T, derate: dimensionless, alarm_ah: I T, standby_ah: I T }
 export function computeStandbyBatterySizing({ standby_current_a = 0, standby_hours = 0, alarm_current_a = 0, alarm_minutes = 0, derate = 1.25 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const Is = Number(standby_current_a), Hs = Number(standby_hours);
@@ -673,7 +673,7 @@ function _renderStandbyBatterySizing(inputRegion, outputRegion, citationEl) {
 }
 LOWVOLTAGE_RENDERERS["standby-battery-sizing"] = _renderStandbyBatterySizing;
 
-// dims: in { battery_ah: I T, standby_current_a: I, alarm_current_a: I, alarm_minutes: T, derate: dimensionless } out: { standby_hours: T, derate: dimensionless }
+// dims: in { battery_ah: I T, standby_current_a: I, alarm_current_a: I, alarm_minutes: T, derate: dimensionless } out: { standby_hours: T, derate: dimensionless, alarm_ah: I T, usable_ah: I T }
 export function computeStandbyBatteryRuntime({ battery_ah = 0, standby_current_a = 0, alarm_current_a = 0, alarm_minutes = 0, derate = 1.25 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const Ah = Number(battery_ah), Is = Number(standby_current_a);
@@ -723,7 +723,7 @@ LOWVOLTAGE_RENDERERS["standby-battery-runtime"] = _renderStandbyBatteryRuntime;
 // ---------------------------------------------------------------------
 // Z.6 Coaxial cable attenuation (coax-rg-loss)
 // ---------------------------------------------------------------------
-// dims: in { loss_per_100ft_db: dimensionless, length_ft: L, source_level: dimensionless, target_level: dimensionless } out: { total_loss_db: dimensionless, end_level: dimensionless, max_run_ft: L, length_ft: L, loss_per_100ft_db: dimensionless }
+// dims: in { loss_per_100ft_db: dimensionless, length_ft: L, source_level: dimensionless, target_level: dimensionless } out: { total_loss_db: dimensionless, end_level: dimensionless, max_run_ft: L, length_ft: L, loss_per_100ft_db: dimensionless, source_level: dimensionless }
 export function computeCoaxRgLoss({ mode = "loss", loss_per_100ft_db = 0, length_ft = 0, source_level = null, target_level = null } = {}) {
   const _g = _finiteGuard({ loss_per_100ft_db, length_ft }); if (_g) return _g;
   const lp = Number(loss_per_100ft_db);

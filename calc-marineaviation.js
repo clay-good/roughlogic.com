@@ -216,7 +216,7 @@ MARINEAVIATION_RENDERERS["metacentric-height"] = _simpleRenderer({
 // metacentric-height takes the free surface moment as entered. For a
 // rectangular tank it is geometry: the liquid surface's second moment of area
 // about its own fore-and-aft centreline, l b^3 / 12, times the liquid density.
-// dims: in { tank_length_ft: L, tank_breadth_ft: L, liquid_density_lb_ft3: M L^-3, compartments_across: dimensionless, tanks: dimensionless, displacement_lb: M L T^-2 } out: { free_surface_moment_ftlb: M L^2 T^-2, undivided_moment_ftlb: M L^2 T^-2, surface_inertia_ft4: L^4, free_surface_correction_ft: L, moment_if_split_ftlb: M L^2 T^-2 }
+// dims: in { tank_length_ft: L, tank_breadth_ft: L, liquid_density_lb_ft3: M L^-3, compartments_across: dimensionless, tanks: dimensionless, displacement_lb: M L T^-2 } out: { free_surface_moment_ftlb: M L^2 T^-2, undivided_moment_ftlb: M L^2 T^-2, surface_inertia_ft4: L^4, free_surface_correction_ft: L, moment_if_split_ftlb: M L^2 T^-2, compartments_across: dimensionless, next_compartments: dimensionless }
 export function computeFreeSurfaceMoment({
   tank_length_ft = 0, tank_breadth_ft = 0, liquid_density_lb_ft3 = 64, compartments_across = 1, tanks = 1, displacement_lb = 0,
 } = {}) {
@@ -363,7 +363,7 @@ MARINEAVIATION_RENDERERS["marine-shaft-diameter"] = _simpleRenderer({
 // surprises are: an alternator delivers its rated output only while the
 // battery accepts it, and a flooded bank's acceptance falls steeply above
 // roughly 80 percent state of charge.
-// dims: in { daily_consumption_ah: I T, bank_ah: I T, usable_dod: dimensionless, alternator_a: I, acceptance_fraction: dimensionless, bulk_target_soc_pct: dimensionless } out: { usable_ah: I T, autonomy_days: T, bulk_hours: T, realistic_hours: T, bank_for_one_day_ah: I T, effective_a: I, partial_soc_pct: dimensionless }
+// dims: in { daily_consumption_ah: I T, bank_ah: I T, usable_dod: dimensionless, alternator_a: I, acceptance_fraction: dimensionless, bulk_target_soc_pct: dimensionless } out: { usable_ah: I T, autonomy_days: T, bulk_hours: T, realistic_hours: T, bank_for_one_day_ah: I T, effective_a: I, partial_soc_pct: dimensionless, extra_hours: T }
 export function computeHouseBatteryAlternator({
   daily_consumption_ah = 0, bank_ah = 0, usable_dod = 0.5,
   alternator_a = 0, acceptance_fraction = 1, bulk_target_soc_pct = 85,
@@ -521,7 +521,7 @@ MARINEAVIATION_RENDERERS["travel-lift-sling-placement"] = _simpleRenderer({
 // A piling is a cantilever fixed in soil. Driving to refusal establishes AXIAL
 // capacity against a hard layer and says nothing about the lateral resistance
 // in the soft material above -- which is what resists a boat pushing sideways.
-// dims: in { lateral_load_lb: M L T^-2, height_above_mudline_ft: L, pile_diameter_in: L, soil_lateral_bearing_psf_per_ft: M L^-1 T^-2, scour_ft: L, existing_embedment_ft: L } out: { moment_ftlb: M L^2 T^-2, embedment_ft: L, scoured_moment_ftlb: M L^2 T^-2, scoured_embedment_ft: L, total_depth_needed_ft: L, b_ft: L, extra_depth_ft: L, scoured_height_ft: L, shortfall_ft: L }
+// dims: in { lateral_load_lb: M L T^-2, height_above_mudline_ft: L, pile_diameter_in: L, soil_lateral_bearing_psf_per_ft: M L^-1 T^-2, scour_ft: L, existing_embedment_ft: L } out: { moment_ftlb: M L^2 T^-2, embedment_ft: L, scoured_moment_ftlb: M L^2 T^-2, scoured_embedment_ft: L, total_depth_needed_ft: L, b_ft: L, extra_depth_ft: L, scoured_height_ft: L, shortfall_ft: L, a_term: L }
 export function computeDockPilingLateral({
   lateral_load_lb = 0, height_above_mudline_ft = 0, pile_diameter_in = 0,
   soil_lateral_bearing_psf_per_ft = 0, scour_ft = 0, existing_embedment_ft = 0,
@@ -623,7 +623,7 @@ MARINEAVIATION_RENDERERS["dock-piling-lateral"] = _simpleRenderer({
 // cable system and tension CLIMBS. Rigging to nominal on a cold morning leaves
 // it over-tensioned in the sun; rigging to nominal on a hot ramp leaves it
 // slack in the cold.
-// dims: in { nominal_tension_lb: M L T^-2, reference_temp_f: T, ambient_temp_f: T, cable_area_in2: L^2, cable_modulus_psi: M L^-1 T^-2, structure_alpha_per_f: dimensionless, cable_alpha_per_f: dimensionless } out: { temp_difference_f: T, differential_strain: dimensionless, tension_change_lb: M L T^-2, target_at_ambient_lb: M L T^-2, tension_when_warm_lb: M L T^-2 }
+// dims: in { nominal_tension_lb: M L T^-2, reference_temp_f: T, ambient_temp_f: T, cable_area_in2: L^2, cable_modulus_psi: M L^-1 T^-2, structure_alpha_per_f: dimensionless, cable_alpha_per_f: dimensionless } out: { temp_difference_f: T, differential_strain: dimensionless, tension_change_lb: M L T^-2, target_at_ambient_lb: M L T^-2, tension_when_warm_lb: M L T^-2, service_difference_f: T }
 export function computeControlCableTension({
   nominal_tension_lb = 0, reference_temp_f = 70, ambient_temp_f = 70,
   cable_area_in2 = 0, cable_modulus_psi = 0,
@@ -809,7 +809,7 @@ MARINEAVIATION_RENDERERS["propeller-track-balance"] = _simpleRenderer({
 // difference: the spec reports 6.628 lb/gal and a 46 lb shortfall where the
 // arithmetic it describes gives 6.653 and 36.9 lb. Both temperatures are
 // inputs here and the difference is computed.
-// dims: in { gallons: L^3, standard_density_lb_gal: M L^-3, reference_temp_f: T, fuel_temp_f: T, density_change_pct_per_10f: dimensionless, arm_in: L, required_weight_lb: M L T^-2 } out: { temp_difference_f: T, actual_density_lb_gal: M L^-3, actual_weight_lb: M L T^-2, standard_weight_lb: M L T^-2, weight_difference_lb: M L T^-2, gallons_for_weight: L^3, density_change_fraction: dimensionless }
+// dims: in { gallons: L^3, standard_density_lb_gal: M L^-3, reference_temp_f: T, fuel_temp_f: T, density_change_pct_per_10f: dimensionless, arm_in: L, required_weight_lb: M L T^-2 } out: { temp_difference_f: T, actual_density_lb_gal: M L^-3, actual_weight_lb: M L T^-2, standard_weight_lb: M L T^-2, weight_difference_lb: M L T^-2, gallons_for_weight: L^3, density_change_fraction: dimensionless, gallons_at_standard: L^3 }
 export function computeAviationFuelWeight({
   gallons = 0, standard_density_lb_gal = _MEC_JET_A_LB_GAL, reference_temp_f = _MEC_REFERENCE_TEMP_F,
   fuel_temp_f = 59, density_change_pct_per_10f = 0.4, arm_in = 0, required_weight_lb = 0,

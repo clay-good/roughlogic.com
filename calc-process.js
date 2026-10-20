@@ -98,7 +98,7 @@ export const PROCESS_RENDERERS = {};
 // =====================================================================
 // spec-v1705: injection mould clamp tonnage from projected area.
 // =====================================================================
-// dims: in { cavities: dimensionless, part_projected_area_in2: L^2, runner_projected_area_in2: L^2, cavity_pressure_tsi: M L^-1 T^-2, safety_factor_pct: dimensionless, machine_rating_tons: M L T^-2 } out: { total_area_in2: L^2, clamp_required_tons: M L T^-2, clamp_with_safety_tons: M L T^-2, runner_penalty_tons: M L T^-2, margin_tons: M L T^-2, max_cavity_pressure_tsi: M L^-1 T^-2, part_area_total_in2: L^2 }
+// dims: in { cavities: dimensionless, part_projected_area_in2: L^2, runner_projected_area_in2: L^2, cavity_pressure_tsi: M L^-1 T^-2, safety_factor_pct: dimensionless, machine_rating_tons: M L T^-2 } out: { total_area_in2: L^2, clamp_required_tons: M L T^-2, clamp_with_safety_tons: M L T^-2, runner_penalty_tons: M L T^-2, margin_tons: M L T^-2, max_cavity_pressure_tsi: M L^-1 T^-2, part_area_total_in2: L^2, part_only_with_safety_tons: M L T^-2 }
 export function computeInjectionClampTonnage({
   cavities = 0, part_projected_area_in2 = 0, runner_projected_area_in2 = 0,
   cavity_pressure_tsi = 0, safety_factor_pct = 15, machine_rating_tons = 0,
@@ -257,7 +257,7 @@ PROCESS_RENDERERS["shot-size-residence-time"] = _simpleRenderer({
 // which implies alpha = 0.000145 and contradicts its own stated range. The
 // example below uses 0.00015, and the range is stated honestly in the note.
 // =====================================================================
-// dims: in { wall_thickness_in: L, alpha_in2_s: L^2 T^-1, melt_temp_f: T, mould_temp_f: T, eject_temp_f: T, alt_wall_thickness_in: L, non_cooling_cycle_s: T, annual_parts: dimensionless } out: { cooling_time_s: T, alt_cooling_time_s: T, thickness_ratio: dimensionless, time_ratio: dimensionless, cycle_time_s: T, annual_machine_hours: T, cooling_share_pct: dimensionless }
+// dims: in { wall_thickness_in: L, alpha_in2_s: L^2 T^-1, melt_temp_f: T, mould_temp_f: T, eject_temp_f: T, alt_wall_thickness_in: L, non_cooling_cycle_s: T, annual_parts: dimensionless } out: { cooling_time_s: T, alt_cooling_time_s: T, thickness_ratio: dimensionless, time_ratio: dimensionless, cycle_time_s: T, annual_machine_hours: T, cooling_share_pct: dimensionless, cored_time_s: T }
 export function computeInjectionCoolingTime({
   wall_thickness_in = 0, alpha_in2_s = 0, melt_temp_f = 0, mould_temp_f = null, eject_temp_f = 0,
   alt_wall_thickness_in = 0, non_cooling_cycle_s = 0, annual_parts = 0,
@@ -412,7 +412,7 @@ PROCESS_RENDERERS["mold-shrinkage-dimension"] = _simpleRenderer({
 // =====================================================================
 // spec-v1709: extrusion output rate, line speed, and what actually governs.
 // =====================================================================
-// dims: in { product_od_in: L, wall_thickness_in: L, line_speed_ft_min: L T^-1, melt_density_lb_in3: M L^-3, extruder_output_lb_h: M T^-1, die_opening_in: L, cooling_capacity_lb_h: M T^-1, shift_hours: T } out: { area_in2: L^2, output_at_speed_lb_h: M T^-1, speed_at_output_ft_min: L T^-1, draw_down_ratio: dimensionless, lb_per_ft: M L^-1, shift_pounds: M, id_in: L, thin_wall_area_in2: L^2 }
+// dims: in { product_od_in: L, wall_thickness_in: L, line_speed_ft_min: L T^-1, melt_density_lb_in3: M L^-3, extruder_output_lb_h: M T^-1, die_opening_in: L, cooling_capacity_lb_h: M T^-1, shift_hours: T } out: { area_in2: L^2, output_at_speed_lb_h: M T^-1, speed_at_output_ft_min: L T^-1, draw_down_ratio: dimensionless, lb_per_ft: M L^-1, shift_pounds: M, id_in: L, thin_wall_area_in2: L^2, cooling_speed_ft_min: L T^-1 }
 export function computeExtrusionOutputRate({
   product_od_in = 0, wall_thickness_in = 0, line_speed_ft_min = 0, melt_density_lb_in3 = 0,
   extruder_output_lb_h = 0, die_opening_in = 0, cooling_capacity_lb_h = 0, shift_hours = 8,

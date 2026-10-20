@@ -305,7 +305,7 @@ STEAMPRESSURE_RENDERERS["asme-shell-thickness"] = _v1113renderAsmeShellThickness
 // D is the INSIDE diameter, E the joint efficiency, corrosion allowance added AFTER. All three
 // forms and the standard-F&D 0.885 coefficient were confirmed against two independent sources
 // (CASTI Guidebook to ASME Section VIII Div 1, Eq 8.1 and worked Example 8.1; ASME UG-32).
-// dims: in { design_pressure_psi: M L^-1 T^-2, inside_diameter_in: L, allowable_stress_psi: M L^-1 T^-2, joint_efficiency: dimensionless, corrosion_allowance_in: L, head_type: dimensionless, ellipse_ratio: dimensionless, crown_ratio: dimensionless, knuckle_ratio: dimensionless } out: { t_required_in: L, t_with_allowance_in: L, mawp_psi: M L^-1 T^-2 }
+// dims: in { design_pressure_psi: M L^-1 T^-2, inside_diameter_in: L, allowable_stress_psi: M L^-1 T^-2, joint_efficiency: dimensionless, corrosion_allowance_in: L, head_type: dimensionless, ellipse_ratio: dimensionless, crown_ratio: dimensionless, knuckle_ratio: dimensionless } out: { t_required_in: L, t_with_allowance_in: L, mawp_psi: M L^-1 T^-2, shape_factor: dimensionless }
 export function computeAsmeHeadThickness({ design_pressure_psi = 0, inside_diameter_in = 0, allowable_stress_psi = 0, joint_efficiency = 0.85, corrosion_allowance_in = 0.0625, head_type = "ellipsoidal", ellipse_ratio = null, crown_ratio = null, knuckle_ratio = null } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const P = Number(design_pressure_psi) || 0;

@@ -179,7 +179,7 @@ export const unitConverterExample = {
 
 // --- Utility 60: Material Cost Estimator ---
 
-// dims: in { unit_price: dimensionless, quantity: dimensionless, tax_rate_percent: dimensionless, delivery_fee: dimensionless } out: { total: dimensionless, tax: dimensionless, subtotal: dimensionless }
+// dims: in { unit_price: dimensionless, quantity: dimensionless, tax_rate_percent: dimensionless, delivery_fee: dimensionless } out: { total: dimensionless, tax: dimensionless, subtotal: dimensionless, delivery_fee: dimensionless }
 export function computeMaterialCost({ unit_price, quantity, tax_rate_percent = 0, delivery_fee = 0 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   delivery_fee = Number(delivery_fee);
@@ -199,7 +199,7 @@ export const materialCostExample = {
 
 // --- Utility 61: Markup and Margin ---
 
-// dims: in { cost: dimensionless, mode: dimensionless, value: dimensionless } out: { price: dimensionless, margin: dimensionless, margin_percent: dimensionless, markup_percent: dimensionless }
+// dims: in { cost: dimensionless, mode: dimensionless, value: dimensionless } out: { price: dimensionless, margin: dimensionless, margin_percent: dimensionless, markup_percent: dimensionless, profit: dimensionless, selling_price: dimensionless }
 export function computeMarkup({ cost, mode, value }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   value = Number(value);
@@ -239,7 +239,7 @@ export const markupExample = {
 
 // --- Utility 62: Time and Materials Estimator ---
 
-// dims: in { hours: T, labor_rate_per_hour: dimensionless, material_cost: dimensionless, overhead_percent: dimensionless, profit_percent: dimensionless } out: { total: dimensionless, labor: dimensionless, subtotal: dimensionless }
+// dims: in { hours: T, labor_rate_per_hour: dimensionless, material_cost: dimensionless, overhead_percent: dimensionless, profit_percent: dimensionless } out: { total: dimensionless, labor: dimensionless, subtotal: dimensionless, overhead: dimensionless, profit: dimensionless, material_cost: dimensionless }
 export function computeTimeAndMaterials({ hours, labor_rate_per_hour, material_cost, overhead_percent = 0, profit_percent = 0 }) {
   // DR-23 (D-2/C-1): the solver did its own arithmetic on raw arguments with
   // no coercion and no error branch, so a non-numeric argument made every
@@ -326,7 +326,7 @@ export const salesTaxExample = {
 
 // --- Utility 64: Tip Out ---
 
-// dims: in { total_amount: dimensionless, members: dimensionless } out: { total_hours: T }
+// dims: in { total_amount: dimensionless, members: dimensionless } out: { total_hours: T, total_amount: dimensionless }
 export function computeTipOut({ total_amount, members }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   total_amount = Number(total_amount);
@@ -597,7 +597,7 @@ export function renderTipOut(inputRegion, outputRegion, citationEl) {
 // payment = P * r / (1 - (1+r)^-n), monthly r = APR/12.
 // Output amortization first 12 rows for sanity.
 
-// dims: in { principal: dimensionless, apr_percent: dimensionless, term_months: T } out: { payment: dimensionless, total_interest: dimensionless }
+// dims: in { principal: dimensionless, apr_percent: dimensionless, term_months: T } out: { payment: dimensionless, total_interest: dimensionless, monthly_payment: dimensionless }
 export function computeLoanPayment({ principal, apr_percent, term_months }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(Number(apr_percent) >= 0 && Number(apr_percent) <= 100)) return { error: "APR must be between 0 and 100 percent." };
@@ -631,7 +631,7 @@ export const loanPaymentExample = {
 
 // --- Utility 106: Upgrade ROI / Payback ---
 
-// dims: in { incremental_cost: dimensionless, annual_savings: dimensionless, discount_rate_percent: dimensionless, years: T } out: { npv: dimensionless, years: T, discount_rate_percent: dimensionless }
+// dims: in { incremental_cost: dimensionless, annual_savings: dimensionless, discount_rate_percent: dimensionless, years: T } out: { npv: dimensionless, years: T, discount_rate_percent: dimensionless, npv_dollars: dimensionless, simple_payback_yr: T }
 export function computeUpgradeROI({ incremental_cost, annual_savings, discount_rate_percent = 0, years = 10 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(Number(discount_rate_percent) > -100)) return { error: "The discount rate must be above -100%." };
@@ -661,7 +661,7 @@ export const upgradeROIExample = {
 
 export const IRS_STANDARD_MILEAGE_RATE = 0.76;
 
-// dims: in { round_trip_miles: L, mpg: L^-2, fuel_price_per_gallon: dimensionless, irs_rate_per_mile: dimensionless } out: { fuel_cost: dimensionless, gallons: L^3, irs_rate_per_mile: dimensionless }
+// dims: in { round_trip_miles: L, mpg: L^-2, fuel_price_per_gallon: dimensionless, irs_rate_per_mile: dimensionless } out: { fuel_cost: dimensionless, gallons: L^3, irs_rate_per_mile: dimensionless, reimbursement: dimensionless }
 export function computeMileageCost({ round_trip_miles, mpg, fuel_price_per_gallon, irs_rate_per_mile = IRS_STANDARD_MILEAGE_RATE }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const miles = Number(round_trip_miles) || 0;
@@ -681,7 +681,7 @@ export const mileageCostExample = {
 
 // --- Utility 108: Overtime Hours ---
 
-// dims: in { total_hours: T, regular_rate: dimensionless, overtime_multiplier: dimensionless, double_time_multiplier: dimensionless, double_time_threshold_hr: T } out: { gross_pay: dimensionless, overtime_pay: dimensionless, overtime_hours: T }
+// dims: in { total_hours: T, regular_rate: dimensionless, overtime_multiplier: dimensionless, double_time_multiplier: dimensionless, double_time_threshold_hr: T } out: { gross_pay: dimensionless, overtime_pay: dimensionless, overtime_hours: T, double_time_hours: T, double_time_pay: dimensionless, regular_hours: T, regular_pay: dimensionless }
 export function computeOvertime({ total_hours, regular_rate, overtime_multiplier = 1.5, double_time_multiplier = 2.0, double_time_threshold_hr = 60 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const h = Number(total_hours) || 0;
@@ -795,7 +795,7 @@ export const perDiemExample = {
 
 // --- Utility 110: Geometry Pack ---
 
-// dims: in { shape: dimensionless, args: dimensionless } out: { area: L^2, volume: L^3, perimeter: L }
+// dims: in { shape: dimensionless, args: dimensionless } out: { area: L^2, volume: L^3, perimeter: L, circumference: L, sector_area: L^2 }
 export function computeGeometry({ shape, ...args }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // Until 2026-09-26 a negative entry here returned a negative quantity with no error.
@@ -863,7 +863,7 @@ export const dilutionExample = {
 
 // --- Utility 112: Slope from Digital Level ---
 
-// dims: in { value: dimensionless, from: dimensionless } out: { percent: dimensionless, degrees: dimensionless }
+// dims: in { value: dimensionless, from: dimensionless } out: { percent: dimensionless, degrees: dimensionless, in_per_ft: dimensionless }
 export function computeSlopeFromLevel({ value, from }) {
   const v = Number(value);
   if (!Number.isFinite(v)) return { error: "Provide a numeric value." };
@@ -890,7 +890,7 @@ export const slopeFromLevelExample = {
 const EARTH_RADIUS_MI = 3958.8;
 const EARTH_RADIUS_KM = 6371.0088;
 
-// dims: in { lat1: dimensionless, lon1: dimensionless, lat2: dimensionless, lon2: dimensionless } out: { miles: L, initial_bearing_deg: dimensionless, final_bearing_deg: dimensionless, bearing_drift_deg: dimensionless }
+// dims: in { lat1: dimensionless, lon1: dimensionless, lat2: dimensionless, lon2: dimensionless } out: { miles: L, initial_bearing_deg: dimensionless, final_bearing_deg: dimensionless, bearing_drift_deg: dimensionless, kilometers: L }
 export function computeHaversineDistance({ lat1, lon1, lat2, lon2 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const phi1 = (Number(lat1) || 0) * Math.PI / 180;
@@ -1277,7 +1277,7 @@ export const nioshLiftingExample = {
 
 // --- Utility 164: Heat Stress (NWS Rothfusz heat index + WBGT approx + work/rest) ---
 
-// dims: in { T_F: T, RH_percent: dimensionless, solar: dimensionless } out: { heat_index_F: T }
+// dims: in { T_F: T, RH_percent: dimensionless, solar: dimensionless } out: { heat_index_F: T, WBGT_F: T, rest_min_per_hr: T, work_min_per_hr: T }
 export function computeHeatStress({ T_F = 0, RH_percent = 0, solar = false }) {
   if ([arguments[0]?.T_F, arguments[0]?.RH_percent].some((x) => x === undefined || x === null || x === "")) return { error: "Enter the air temperature (F) and the relative humidity (%)." };
   if (!(Number(RH_percent) >= 0 && Number(RH_percent) <= 100)) return { error: "Relative humidity is between 0 and 100%." };
@@ -1396,7 +1396,7 @@ export const PULLEY_RIGS = {
   block_6: { ma: 6, pulleys: 6 },
 };
 
-// dims: in { rig: dimensionless, efficiency: dimensionless } out: { theoretical_ma: dimensionless, actual_ma: dimensionless }
+// dims: in { rig: dimensionless, efficiency: dimensionless } out: { theoretical_ma: dimensionless, actual_ma: dimensionless, pulleys: dimensionless }
 export function computePulleyMA({ rig = "block_2", efficiency = 0.95 }) {
   const r = PULLEY_RIGS[rig];
   if (!r) return { error: "Unknown rig." };
@@ -1432,7 +1432,7 @@ export const rampSlopeExample = { inputs: { rise_in: 6, run_in: 72 } };
 
 // --- Utility 169: Rainwater Harvesting Yield ---
 
-// dims: in { catchment_ft2: L^2, monthly_in: L, annual_in: L, efficiency: dimensionless } out: { gallons: L^3 }
+// dims: in { catchment_ft2: L^2, monthly_in: L, annual_in: L, efficiency: dimensionless } out: { gallons: L^3, annual_gal: L^3 }
 export function computeRainwaterYield({ catchment_ft2 = 0, monthly_in = [], annual_in = null, efficiency = 0.85 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (efficiency === null || efficiency === "" || !(Number(efficiency) > 0 && Number(efficiency) <= 1)) return { error: "Collection efficiency is a fraction over 0 and at most 1 (0.85, not 85)." };
@@ -1479,7 +1479,7 @@ export const rainwaterCatchmentAreaExample = { inputs: { target_annual_gal: 1589
 
 // --- Utility 171: Daily Multi-Job Timesheet ---
 
-// dims: in { jobs: dimensionless, regular_rate: dimensionless, weekly_overtime_threshold_hr: T, irs_rate_per_mile: dimensionless } out: { gross_pay: dimensionless, total_hours: T, overtime_hours: T }
+// dims: in { jobs: dimensionless, regular_rate: dimensionless, weekly_overtime_threshold_hr: T, irs_rate_per_mile: dimensionless } out: { gross_pay: dimensionless, total_hours: T, overtime_hours: T, regular_hours: T, reimbursable: dimensionless, total_miles: L }
 export function computeTimesheet({ jobs = [], regular_rate = 0, weekly_overtime_threshold_hr = 40, irs_rate_per_mile = IRS_STANDARD_MILEAGE_RATE }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!Array.isArray(jobs) || jobs.length === 0) return { error: "Provide at least one job." };
@@ -2025,7 +2025,7 @@ CROSS_RENDERERS["fall-protection-clearance"] = _v7x_renderFallProtection;
 // without unbounded growth in the home-view payload. Total exposure
 // across all rows above 24 hours is rejected.
 
-// dims: in { rows: dimensionless } out: { total_dose_pct: dimensionless, total_hours: T }
+// dims: in { rows: dimensionless } out: { total_dose_pct: dimensionless, total_hours: T, twa_dBA: dimensionless }
 export function computeNoiseDose({ rows = [] } = {}) {
   if (!Array.isArray(rows) || rows.length === 0) {
     return { error: "Provide at least one exposure row (level dBA, hours)." };
@@ -2436,7 +2436,7 @@ CROSS_RENDERERS["hydraulic-cylinder"] = renderHydraulicCylinder;
 // (Gates / Goodyear) governs the final belt count.
 const _VBELT_HP_PER_BELT = { A: 3, B: 7, C: 15, D: 30, "3V": 5, "5V": 12, "8V": 30 };
 
-// dims: in { driver_rpm: T^-1, driven_rpm: T^-1, driver_hp: M L^2 T^-3, driver_pitch_diameter_in: L, center_distance_in: L, belt_section: dimensionless, service_factor: dimensionless } out: { ratio: dimensionless, driven_pitch_diameter_in: L, belt_length_in: L, design_hp: M L^2 T^-3, driver_pitch_diameter_in: L }
+// dims: in { driver_rpm: T^-1, driven_rpm: T^-1, driver_hp: M L^2 T^-3, driver_pitch_diameter_in: L, center_distance_in: L, belt_section: dimensionless, service_factor: dimensionless } out: { ratio: dimensionless, driven_pitch_diameter_in: L, belt_length_in: L, design_hp: M L^2 T^-3, driver_pitch_diameter_in: L, belts: dimensionless, hp_per_belt: M L^2 T^-3 }
 export function computeVbeltDrive({
   driver_rpm = 0,
   driven_rpm = 0,
@@ -2686,7 +2686,7 @@ CROSS_RENDERERS["belt-hp-transmitted"] = renderBeltHpTransmitted;
 // the overall ratio and a per-stage efficiency (0.97 default for spur gears).
 // Up to four stages; blank or incomplete stages are ignored.
 
-// dims: in { stages: dimensionless, input_rpm: T^-1, input_torque: M L^2 T^-2, efficiency: dimensionless } out: { overall_ratio: dimensionless, output_rpm: T^-1, output_torque: M L^2 T^-2 }
+// dims: in { stages: dimensionless, input_rpm: T^-1, input_torque: M L^2 T^-2, efficiency: dimensionless } out: { overall_ratio: dimensionless, output_rpm: T^-1, output_torque: M L^2 T^-2, stages_used: dimensionless }
 export function computeGearCascade({
   stages = [],
   input_rpm = 0,
@@ -2961,7 +2961,7 @@ CROSS_RENDERERS["tank-volume"] = renderTankVolume;
 // query falls outside the two points. First-principles linear geometry.
 // =====================================================================
 
-// dims: in { x1: dimensionless, y1: dimensionless, x2: dimensionless, y2: dimensionless, x: dimensionless } out: { y: dimensionless, slope: dimensionless }
+// dims: in { x1: dimensionless, y1: dimensionless, x2: dimensionless, y2: dimensionless, x: dimensionless } out: { y: dimensionless, slope: dimensionless, x_hi: dimensionless, x_lo: dimensionless }
 export function computeLinearInterpolation({ x1 = 0, y1 = 0, x2 = 0, y2 = 0, x = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const X1 = Number(x1), Y1 = Number(y1), X2 = Number(x2), Y2 = Number(y2), X = Number(x);

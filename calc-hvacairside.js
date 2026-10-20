@@ -62,7 +62,7 @@ export const HVACAIRSIDE_RENDERERS = {};
 // correction that turns ACFM into SCFM (v349).
 // =====================================================================
 
-// dims: in { R_duct: dimensionless, A_ft2: L^2, dT_F: T, cfm: L^3 T^-1 } out: { Q_btuh: M L^2 T^-3, dT_air: T }
+// dims: in { R_duct: dimensionless, A_ft2: L^2, dT_F: T, cfm: L^3 T^-1 } out: { Q_btuh: M L^2 T^-3, dT_air: T, U: M T^-4 }
 export function computeDuctHeatGain({ R_duct = 0, A_ft2 = 0, dT_F = 0, cfm = 0 } = {}) {
   const _g = _finiteGuardEnv(arguments[0]); if (_g) return _g;
   if (!(R_duct > 0)) return { error: "Duct insulation R-value must be positive." };
@@ -181,7 +181,7 @@ const _ADPI_TABLE = {
 const _ADPI_PERFORATED = { throw: "T0.25 (50 fpm)", opt: 2.0, max: 96, thr: 80, lo: 1.0, hi: 3.4 };
 const _ADPI_LOADS = [20, 40, 60, 80];
 
-// dims: in { diffuser_type: dimensionless, cooling_load: dimensionless, throw_ft: L, char_length_ft: L } out: { ratio: dimensionless, opt_ratio: dimensionless, max_adpi: dimensionless, threshold: dimensionless, target_throw_ft: L }
+// dims: in { diffuser_type: dimensionless, cooling_load: dimensionless, throw_ft: L, char_length_ft: L } out: { ratio: dimensionless, opt_ratio: dimensionless, max_adpi: dimensionless, threshold: dimensionless, target_throw_ft: L, band_hi: dimensionless, band_lo: dimensionless }
 export function computeAdpiSelection({ diffuser_type = "circular-ceiling", cooling_load = 40, throw_ft = 0, char_length_ft = 0 } = {}) {
   const _g = _finiteGuardEnv(arguments[0]); if (_g) return _g;
   const Tt = Number(throw_ft) || 0;
@@ -342,7 +342,7 @@ HVACAIRSIDE_RENDERERS["isolator-deflection"] = _rEnv({
   compute: computeIsolatorDeflection,
 });
 
-// dims: in { elev_ft: L, T_F: T, acfm: L^3 T^-1, rated_sp: dimensionless } out: { DF: dimensionless, SCFM: L^3 T^-1, const_corr: dimensionless, sp_corr: dimensionless }
+// dims: in { elev_ft: L, T_F: T, acfm: L^3 T^-1, rated_sp: dimensionless } out: { DF: dimensionless, SCFM: L^3 T^-1, const_corr: dimensionless, sp_corr: dimensionless, alt_factor: dimensionless, temp_factor: dimensionless }
 export function computeAirDensityCorrection({ elev_ft = 0, T_F = 70, acfm = 0, rated_sp = 0 } = {}) {
   const _g = _finiteGuardEnv(arguments[0]); if (_g) return _g;
   // A blank page box read as 0 F overstated the density; an omitted key keeps the 70 F default.

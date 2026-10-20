@@ -267,7 +267,7 @@ RIGGINGFIELD_RENDERERS["guy-wire-tension"] = _v996renderGuyWireTension;
 // 50 ft, and Table A keeps climbing past it - so on transmission the number people carry
 // is not conservative, it is wrong in the dangerous direction.
 // Table A is a US federal regulation table and is in the public domain.
-// dims: in { option: dimensionless, voltage_kv: L^2 M T^-3 I^-1, actual_clearance_ft: L, boom_length_ft: L } out: { required_clearance_ft: L, default_clearance_ft: L, clearance_shortfall_ft: L, table_a_saving_ft: L }
+// dims: in { option: dimensionless, voltage_kv: L^2 M T^-3 I^-1, actual_clearance_ft: L, boom_length_ft: L } out: { required_clearance_ft: L, default_clearance_ft: L, clearance_shortfall_ft: L, table_a_saving_ft: L, table_a_ft: L }
 export function computeCranePowerLineClearance({ option = "default", voltage_kv = 0, actual_clearance_ft = 0, boom_length_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const kv = Number(voltage_kv) || 0;

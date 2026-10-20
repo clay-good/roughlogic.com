@@ -503,7 +503,7 @@ SOILPROPERTIES_RENDERERS["fine-aggregate-grading"] = _v1195renderFineAggregateGr
 // Cu is the spread of the curve, Cc its smoothness; together they separate a
 // well-graded soil (packs and compacts) from a uniform one (does not).
 
-// dims: in { d10_mm: L, d30_mm: L, d60_mm: L, pct_coarse_passing_no4: dimensionless, pct_fines: dimensionless } out: { cu: dimensionless, cc: dimensionless, hazen_k_cm_s: L T^-1 }
+// dims: in { d10_mm: L, d30_mm: L, d60_mm: L, pct_coarse_passing_no4: dimensionless, pct_fines: dimensionless } out: { cu: dimensionless, cc: dimensionless, hazen_k_cm_s: L T^-1, cu_threshold: dimensionless }
 export function computeSoilGradationCoefficients({ d10_mm = 0, d30_mm = 0, d60_mm = 0, pct_coarse_passing_no4 = 60, pct_fines = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // A percent passing the No. 4 between 0 and 1 is a fraction typed into a percent field (added

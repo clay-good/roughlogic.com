@@ -103,7 +103,7 @@ export function countSyllables(text) {
 
 // --- Compute ---
 
-// dims: in { text: dimensionless } out: { fkgl: dimensionless, fre: dimensionless, words: dimensionless, sentences: dimensionless, syllables: dimensionless }
+// dims: in { text: dimensionless } out: { fkgl: dimensionless, fre: dimensionless, words: dimensionless, sentences: dimensionless, syllables: dimensionless, flesch_kincaid_grade_level: dimensionless, flesch_reading_ease: dimensionless, syllables_per_word: dimensionless, words_per_sentence: dimensionless }
 export function computeReadability({ text }) {
   if (typeof text !== "string") {
     return { error: "Text input is required." };
@@ -252,7 +252,7 @@ function parseNumberList(raw) {
   return out;
 }
 
-// dims: in { values: dimensionless } out: { mean: dimensionless, count: dimensionless, min: dimensionless, max: dimensionless }
+// dims: in { values: dimensionless } out: { mean: dimensionless, count: dimensionless, min: dimensionless, max: dimensionless, median: dimensionless, range: dimensionless, sd_population: dimensionless, sd_sample: dimensionless, sum: dimensionless, variance_population: dimensionless, variance_sample: dimensionless }
 export function computeStatistics({ values }) {
   const nums = Array.isArray(values) ? values.filter((v) => Number.isFinite(v)) : parseNumberList(values);
   if (nums.length === 0) {
@@ -348,7 +348,7 @@ export function renderStatistics(inputRegion, outputRegion, citationEl) {
 // Solves ax^2 + bx + c = 0. Returns real or complex roots and the
 // vertex of the parabola. Public algebra; no citation beyond convention.
 
-// dims: in { a: dimensionless, b: dimensionless, c: dimensionless } out: { roots: dimensionless }
+// dims: in { a: dimensionless, b: dimensionless, c: dimensionless } out: { roots: dimensionless, discriminant: dimensionless, vertex_x: dimensionless, vertex_y: dimensionless }
 export function computeQuadratic({ a, b, c }) {
   const A = Number(a), B = Number(b), C = Number(c);
   if (!Number.isFinite(A) || !Number.isFinite(B) || !Number.isFinite(C)) {
@@ -456,7 +456,7 @@ export function renderQuadratic(inputRegion, outputRegion, citationEl) {
 // notation in the form `m * 10^n` where 1 <= |m| < 10. Also reports a
 // significant-figure count for the input.
 
-// dims: in { value: dimensionless } out: { mantissa: dimensionless, exponent: dimensionless }
+// dims: in { value: dimensionless } out: { mantissa: dimensionless, exponent: dimensionless, sig_figs: dimensionless, value: dimensionless }
 export function computeScientificNotation({ value }) {
   // Until 2026-10-14 "0x1F" read as 31 and a blank read as 0; only decimal or
   // e-notation is accepted now.
@@ -598,7 +598,7 @@ export function roundToSigFigs(value, n) {
   return Math.sign(x) * Number(s);
 }
 
-// dims: in { value: dimensionless, target_sig_figs: dimensionless } out: { rounded: dimensionless }
+// dims: in { value: dimensionless, target_sig_figs: dimensionless } out: { rounded: dimensionless, input_sig_figs: dimensionless, input_value: dimensionless, rounded_value: dimensionless, target_sig_figs: dimensionless }
 export function computeSigFigs({ value, target_sig_figs }) {
   const raw = String(value == null ? "" : value).trim();
   if (raw.length === 0) return { error: "Enter a number." };
@@ -762,7 +762,7 @@ export function renderCodonTable(inputRegion, outputRegion, citationEl) {
 // and arbitrary bases 2-36. Uses JS parseInt + toString(radix); the
 // only judgment call is rejecting non-conforming digits.
 
-// dims: in { value: dimensionless, from_base: dimensionless, to_base: dimensionless } out: { converted: dimensionless }
+// dims: in { value: dimensionless, from_base: dimensionless, to_base: dimensionless } out: { converted: dimensionless, decimal_value: dimensionless, from_base: dimensionless, to_base: dimensionless }
 export function computeBaseConvert({ value, from_base, to_base }) {
   // Until 2026-10-14 a numeric 0 read as blank ("Enter a value to convert.").
   const v = String(value == null ? "" : value).trim();
@@ -881,7 +881,7 @@ function parseGpaCourseList(raw) {
   return out;
 }
 
-// dims: in { courses: dimensionless } out: { credits: dimensionless, course_count: dimensionless }
+// dims: in { courses: dimensionless } out: { credits: dimensionless, course_count: dimensionless, total_credits: dimensionless, unweighted_gpa: dimensionless, weighted_gpa: dimensionless }
 export function computeGPA({ courses }) {
   const rows = Array.isArray(courses) ? courses : parseGpaCourseList(courses);
   if (rows.length === 0) return { error: "Enter at least one course (letter and credits per line)." };
@@ -982,7 +982,7 @@ export function renderGPA(inputRegion, outputRegion, citationEl) {
 
 const Z_CRITICAL = { 80: 1.2816, 90: 1.6449, 95: 1.9600, 98: 2.3263, 99: 2.5758 };
 
-// dims: in { mode: dimensionless, n: dimensionless, proportion: dimensionless, mean: dimensionless, sd: dimensionless, confidence_pct: dimensionless } out: { confidence_pct: dimensionless }
+// dims: in { mode: dimensionless, n: dimensionless, proportion: dimensionless, mean: dimensionless, sd: dimensionless, confidence_pct: dimensionless } out: { confidence_pct: dimensionless, lower_bound: dimensionless, margin_of_error: dimensionless, n: dimensionless, point_estimate: dimensionless, standard_error: dimensionless, upper_bound: dimensionless, z_critical: dimensionless }
 export function computeConfidenceInterval({ mode, n, proportion, mean, sd, confidence_pct }) {
   const conf = Math.round(Number(confidence_pct));
   if (Math.abs(Number(confidence_pct) - conf) > 1e-9) return { error: "Confidence must be one of 80, 90, 95, 98, 99." };
@@ -1132,7 +1132,7 @@ function rowsConsistent(a1, b1, c1, a2, b2, c2) {
   return near(a1 * c2, a2 * c1) && near(b1 * c2, b2 * c1);
 }
 
-// dims: in { a1: dimensionless, b1: dimensionless, c1: dimensionless, a2: dimensionless, b2: dimensionless, c2: dimensionless } out: { x: dimensionless, y: dimensionless }
+// dims: in { a1: dimensionless, b1: dimensionless, c1: dimensionless, a2: dimensionless, b2: dimensionless, c2: dimensionless } out: { x: dimensionless, y: dimensionless, determinant: dimensionless }
 export function computeLinearSystem2x2({ a1, b1, c1, a2, b2, c2 }) {
   const A1 = Number(a1), B1 = Number(b1), C1 = Number(c1);
   const A2 = Number(a2), B2 = Number(b2), C2 = Number(c2);
@@ -1340,7 +1340,7 @@ function parseSBGLine(raw) {
   return { standard, level, priority };
 }
 
-// dims: in { rows: dimensionless } out: { standards_count: dimensionless }
+// dims: in { rows: dimensionless } out: { standards_count: dimensionless, overall_mastery: dimensionless }
 export function computeStandardsBasedGrade({ rows }) {
   const lines = String(rows || "").split(/\r?\n/);
   const parsed = [];
@@ -1443,7 +1443,7 @@ const BELLCURVE_BANDS = [
   { min_sigma: -Infinity, letter: "F",  note: "below mean - 2 sigma (~2.3%)" },
 ];
 
-// dims: in { raw: dimensionless, mean: dimensionless, sd: dimensionless } out: { z: dimensionless, percentile: dimensionless }
+// dims: in { raw: dimensionless, mean: dimensionless, sd: dimensionless } out: { z: dimensionless, percentile: dimensionless, z_score: dimensionless }
 export function computeBellCurve({ raw_score, mean, sd }) {
   for (const v of [raw_score, mean, sd]) if (v === undefined || v === null || v === "") return { error: "Enter the raw score, the mean and the standard deviation." };
   const x = Number(raw_score);
@@ -1520,7 +1520,7 @@ function countLettersInWord(word) {
   return (word.match(/[A-Za-z]/g) || []).length;
 }
 
-// dims: in { text: dimensionless } out: { ari: dimensionless, smog: dimensionless, gunning_fog: dimensionless, coleman_liau: dimensionless }
+// dims: in { text: dimensionless } out: { ari: dimensionless, smog: dimensionless, gunning_fog: dimensionless, coleman_liau: dimensionless, letters: dimensionless, polysyllables: dimensionless, sentences: dimensionless, words: dimensionless }
 export function computeAlternateReadability({ text }) {
   if (typeof text !== "string") return { error: "Text input is required." };
   const sentences = countSentences(text);
@@ -1649,7 +1649,7 @@ const PERIODIC_EXT = {
   82: { symbol: "Pb", name: "Lead",       period: 6, group: 14, block: "p", electronegativity_pauling: 1.87, electron_configuration: "[Xe] 4f14 5d10 6s2 6p2",    oxidation_states: [+2, +4] },
 };
 
-// dims: in { query: dimensionless } out: { element: dimensionless, atomic_number: dimensionless }
+// dims: in { query: dimensionless } out: { element: dimensionless, atomic_number: dimensionless, electronegativity_pauling: dimensionless, group: dimensionless, period: dimensionless }
 export function computePeriodicElement({ query }) {
   const q = String(query || "").trim();
   if (q.length === 0) return { error: "Enter an atomic number (1-36, plus 47/53/79/80/82), symbol (e.g. Fe), or name (e.g. iron)." };
@@ -1704,7 +1704,7 @@ export function renderPeriodicElement(inputRegion, outputRegion, citationEl) {
 
 // --- spec-v17 Y.2 Linear regression (least squares) ------------------
 
-// dims: in { x_values: dimensionless, y_values: dimensionless, predict_x: dimensionless, alpha: dimensionless } out: { slope: dimensionless, intercept: dimensionless, r2: dimensionless, rse: dimensionless, alpha: dimensionless, df: dimensionless, p_value: dimensionless }
+// dims: in { x_values: dimensionless, y_values: dimensionless, predict_x: dimensionless, alpha: dimensionless } out: { slope: dimensionless, intercept: dimensionless, r2: dimensionless, rse: dimensionless, alpha: dimensionless, df: dimensionless, p_value: dimensionless, n: dimensionless, predict_x: dimensionless, predicted_y: dimensionless, r: dimensionless, rss: dimensionless, slope_se: dimensionless, t: dimensionless }
 export function computeLinearRegression({ x_values, y_values, predict_x = null, alpha = 0.05 }) {
   if (_hasBadToken(x_values) || _hasBadToken(y_values)) return { error: _BAD_TOKEN_ERROR };
   const xs = Array.isArray(x_values) ? x_values.filter(Number.isFinite) : parseNumberList(x_values);
@@ -1841,7 +1841,7 @@ function _pearsonStrength(absr) {
   return "near-perfect";
 }
 
-// dims: in { x_values: dimensionless, y_values: dimensionless, alpha: dimensionless } out: { r: dimensionless, r2: dimensionless, t: dimensionless, p_value: dimensionless, alpha: dimensionless, df: dimensionless }
+// dims: in { x_values: dimensionless, y_values: dimensionless, alpha: dimensionless } out: { r: dimensionless, r2: dimensionless, t: dimensionless, p_value: dimensionless, alpha: dimensionless, df: dimensionless, n: dimensionless }
 export function computePearson({ x_values, y_values, alpha = 0.05 }) {
   if (_hasBadToken(x_values) || _hasBadToken(y_values)) return { error: _BAD_TOKEN_ERROR };
   const xs = Array.isArray(x_values) ? x_values.filter(Number.isFinite) : parseNumberList(x_values);
@@ -1943,7 +1943,7 @@ export function renderPearson(inputRegion, outputRegion, citationEl) {
 
 // --- spec-v17 Y.3 Chi-square goodness-of-fit -------------------------
 
-// dims: in { observed: dimensionless, expected_type: dimensionless, alpha: dimensionless } out: { chi_square: dimensionless, df: dimensionless, p_value: dimensionless, alpha: dimensionless }
+// dims: in { observed: dimensionless, expected_type: dimensionless, alpha: dimensionless } out: { chi_square: dimensionless, df: dimensionless, p_value: dimensionless, alpha: dimensionless, k: dimensionless, min_expected: dimensionless, total_observed: dimensionless }
 export function computeChiSquareGof({ observed, expected, expected_type = "counts", alpha = 0.05 }) {
   if (_hasBadToken(observed) || _hasBadToken(expected)) return { error: _BAD_TOKEN_ERROR };
   if (expected_type !== "counts" && expected_type !== "proportions") return { error: "Expected values are counts or proportions." };
@@ -2048,7 +2048,7 @@ export function renderChiSquareGof(inputRegion, outputRegion, citationEl) {
   for (const s of [T.select, A.select]) s.addEventListener("change", update);
 }
 
-// dims: in { proportion: dimensionless, target_moe: dimensionless, confidence: dimensionless } out: { required_n: dimensionless, exact_n: dimensionless, z: dimensionless, confidence_pct: dimensionless }
+// dims: in { proportion: dimensionless, target_moe: dimensionless, confidence: dimensionless } out: { required_n: dimensionless, exact_n: dimensionless, z: dimensionless, confidence_pct: dimensionless, planning_proportion: dimensionless, target_moe: dimensionless, z_critical: dimensionless }
 // Inverse of the proportion Wald CI: given a target margin of error E, a
 // planning proportion p, and a confidence level, solve MOE = z*sqrt(p(1-p)/n)
 // for the sample size. n = z^2 * p(1-p) / E^2, rounded UP so the achieved

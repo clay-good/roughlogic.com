@@ -125,7 +125,7 @@ DISINFECT_RENDERERS["main-disinfection-chlorine"] = _simpleRenderer({
 
 // ===================== spec-v103: well shock-chlorination =====================
 
-// dims: in { casing_diameter_in: L, water_column_ft: L, target_ppm: dimensionless, bleach_pct: dimensionless } out: { well_volume_gal: L^3, available_cl_lb: M, bleach_gal: L^3 }
+// dims: in { casing_diameter_in: L, water_column_ft: L, target_ppm: dimensionless, bleach_pct: dimensionless } out: { well_volume_gal: L^3, available_cl_lb: M, bleach_gal: L^3, bleach_floz: L^3, bleach_qt: L^3 }
 export function computeWellShockChlorination({ casing_diameter_in = 0, water_column_ft = 0, target_ppm = 100, bleach_pct = 6 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(casing_diameter_in > 0)) return { error: "Casing inside diameter must be positive." };

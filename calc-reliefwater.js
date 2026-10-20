@@ -307,7 +307,7 @@ const _RTCR_TABLE = [
   [1520000, 330], [1850000, 360], [2270000, 390], [3020000, 420], [3960000, 450], [Infinity, 480],
 ];
 
-// dims: in { population_served: dimensionless, tc_positive_count: dimensionless, positive_repeat_count: dimensionless, routine_samples_taken: dimensionless } out: { routine_samples_per_month: T^-1, routine_samples_counted: dimensionless, repeat_samples_required: dimensionless, repeat_deadline_hr: T, ecoli_analyses_required: dimensionless, total_samples: dimensionless, total_positives: dimensionless, tc_positive_pct: dimensionless, tc_positive_pct_routine: dimensionless }
+// dims: in { population_served: dimensionless, tc_positive_count: dimensionless, positive_repeat_count: dimensionless, routine_samples_taken: dimensionless } out: { routine_samples_per_month: T^-1, routine_samples_counted: dimensionless, repeat_samples_required: dimensionless, repeat_deadline_hr: T, ecoli_analyses_required: dimensionless, total_samples: dimensionless, total_positives: dimensionless, tc_positive_pct: dimensionless, tc_positive_pct_routine: dimensionless, population_served: dimensionless }
 export function computeRtcrColiformSamples({ population_served = 0, tc_positive_count = 0, positive_repeat_count = 0, routine_samples_taken = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(population_served > 0) || !Number.isInteger(population_served)) return { error: "Population served must be a positive whole number." };
@@ -475,7 +475,7 @@ RELIEFWATER_RENDERERS["first-flush-diverter"] = _simpleRenderer({
 
 // ===================== spec-v1885: lift station outage time to overflow and pump-and-haul loads =====================
 
-// dims: in { wet_well_shape: dimensionless, wet_well_diameter_ft: L, wet_well_length_ft: L, wet_well_width_ft: L, storage_depth_ft: L, sewer_length_ft: L, sewer_diameter_in: L, inflow_gpm: L^3 T^-1, detection_min: T, travel_min: T, hookup_min: T, outage_hr: T, truck_capacity_gal: L^3 } out: { wet_well_gal: L^3, sewer_gal: L^3, storage_gal: L^3, sewer_share_pct: dimensionless, time_to_overflow_min: T, response_min: T, margin_min: T, shortfall_gal: L^3, outage_inflow_gal: L^3, haul_volume_gal: L^3, truck_loads: dimensionless }
+// dims: in { wet_well_shape: dimensionless, wet_well_diameter_ft: L, wet_well_length_ft: L, wet_well_width_ft: L, storage_depth_ft: L, sewer_length_ft: L, sewer_diameter_in: L, inflow_gpm: L^3 T^-1, detection_min: T, travel_min: T, hookup_min: T, outage_hr: T, truck_capacity_gal: L^3 } out: { wet_well_gal: L^3, sewer_gal: L^3, storage_gal: L^3, sewer_share_pct: dimensionless, time_to_overflow_min: T, response_min: T, margin_min: T, shortfall_gal: L^3, outage_inflow_gal: L^3, haul_volume_gal: L^3, truck_loads: dimensionless, outage_hr: T }
 export function computeLiftStationOutageStorage({ wet_well_shape = "round", wet_well_diameter_ft = 0, wet_well_length_ft = 0, wet_well_width_ft = 0, storage_depth_ft = 0, sewer_length_ft = 0, sewer_diameter_in = 0, inflow_gpm = 0, detection_min = 0, travel_min = 0, hookup_min = 0, outage_hr = 0, truck_capacity_gal = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(detection_min > 0) && !(travel_min > 0) && !(hookup_min > 0)) return { error: "Enter the response time (detection, travel and hookup); with none entered the response read as instant." };
@@ -645,7 +645,7 @@ RELIEFWATER_RENDERERS["osha-toilet-count"] = _simpleRenderer({
 
 // ===================== spec-v1887: responder base camp sanitation and water =====================
 
-// dims: in { men_count: dimensionless, women_count: dimensionless, pressure_water: dimensionless } out: { toilets_men: dimensionless, toilets_women: dimensionless, toilets_total: dimensionless, urinals: dimensionless, handwash_basins: dimensionless, showerheads: dimensionless, laundry_trays: dimensionless, drinking_fountains: dimensionless, water_gal_per_day: L^3 T^-1, average_gph: L^3 T^-1, peak_gph: L^3 T^-1, peak_gpm: L^3 T^-1, sleeping_area_sqft: L^2, men_count: dimensionless, urinal_trough_ft: L, women_count: dimensionless, whole_camp_ratio: dimensionless }
+// dims: in { men_count: dimensionless, women_count: dimensionless, pressure_water: dimensionless } out: { toilets_men: dimensionless, toilets_women: dimensionless, toilets_total: dimensionless, urinals: dimensionless, handwash_basins: dimensionless, showerheads: dimensionless, laundry_trays: dimensionless, drinking_fountains: dimensionless, water_gal_per_day: L^3 T^-1, average_gph: L^3 T^-1, peak_gph: L^3 T^-1, peak_gpm: L^3 T^-1, sleeping_area_sqft: L^2, men_count: dimensionless, urinal_trough_ft: L, women_count: dimensionless, whole_camp_ratio: dimensionless, total_occupants: dimensionless }
 export function computeResponderCampSanitation({ men_count = 0, women_count = 0, pressure_water = "yes" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(men_count >= 0) || !(women_count >= 0)) return { error: "Occupant counts cannot be negative." };

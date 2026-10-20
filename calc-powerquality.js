@@ -42,7 +42,7 @@ function cccAdjustmentFactor(n) {
   return 0.35;
 }
 // dims: in { i_single_A: I, n_sets: dimensionless, total_ccc: dimensionless, ambient_factor: dimensionless, i_load_A: I, conductor_size: dimensionless }
-//        out: { i_total_A: I, i_set_A: I, adjustment_factor: dimensionless }
+//        out: { i_total_A: I, i_set_A: I, adjustment_factor: dimensionless, ccc_factor: dimensionless, per_set_ampacity_A: I }
 export function computeParallelConductorDerate({ i_single_A = 0, n_sets = 1, total_ccc = 0, ambient_factor = 1, i_load_A = 0, conductor_size = "" } = {}) {
   const Is = Number(i_single_A) || 0;
   if (!Number.isInteger(Number(n_sets))) return { error: "Parallel sets is a whole number." };
@@ -279,7 +279,7 @@ function _mg1Derate(pct) {
   return 0.75;
 }
 
-// dims: in { v_ab: M L^2 T^-3 I^-1, v_bc: M L^2 T^-3 I^-1, v_ca: M L^2 T^-3 I^-1 } out: { unbalance_pct: dimensionless, derate_factor: dimensionless, allowable_pct: dimensionless }
+// dims: in { v_ab: M L^2 T^-3 I^-1, v_bc: M L^2 T^-3 I^-1, v_ca: M L^2 T^-3 I^-1 } out: { unbalance_pct: dimensionless, derate_factor: dimensionless, allowable_pct: dimensionless, max_dev: M L^2 T^-3 I^-1, v_avg: M L^2 T^-3 I^-1 }
 export function computeMotorUnbalanceDerate({ v_ab = 0, v_bc = 0, v_ca = 0 } = {}) {
   const ab = Number(v_ab) || 0, bc = Number(v_bc) || 0, ca = Number(v_ca) || 0;
   if (!Number.isFinite(ab) || !Number.isFinite(bc) || !Number.isFinite(ca)) return { error: "Line voltages must be finite numbers." };

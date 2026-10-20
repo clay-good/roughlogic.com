@@ -94,7 +94,7 @@ EDUCATIONASSESSMENT_RENDERERS["final-grade-needed"] = renderFinalGradeNeeded;
 
 // --- v20 Y.2: Weighted category grade (`category-weighted-grade`) ---
 // category% = earned/possible*100; overall = sum(cat%*weight)/sum(weight).
-// dims: in { categories: dimensionless } out: { overall_pct: dimensionless, letter: dimensionless }
+// dims: in { categories: dimensionless } out: { overall_pct: dimensionless, letter: dimensionless, weight_sum: dimensionless }
 export function computeCategoryWeightedGrade({ categories = [] } = {}) {
   const cats = Array.isArray(categories) ? categories : [];
   if (cats.length === 0) return { error: "Enter at least one category (earned/possible/weight)." };
@@ -152,7 +152,7 @@ EDUCATIONASSESSMENT_RENDERERS["category-weighted-grade"] = renderCategoryWeighte
 
 // --- v20 Y.3: Two-sample t-test (`two-sample-t-test`) ---
 // t = (m1-m2)/sqrt(s1^2/n1 + s2^2/n2); Welch-Satterthwaite df; p from tcdf.
-// dims: in { mean1: dimensionless, sd1: dimensionless, n1: dimensionless, mean2: dimensionless, sd2: dimensionless, n2: dimensionless, tail: dimensionless } out: { t_stat: dimensionless, p_value: dimensionless, df: dimensionless }
+// dims: in { mean1: dimensionless, sd1: dimensionless, n1: dimensionless, mean2: dimensionless, sd2: dimensionless, n2: dimensionless, tail: dimensionless } out: { t_stat: dimensionless, p_value: dimensionless, df: dimensionless, mean_diff: dimensionless, se: dimensionless }
 export function computeTwoSampleTTest({ mean1 = 0, sd1 = 0, n1 = 0, mean2 = 0, sd2 = 0, n2 = 0, tail = "two", alpha = 0.05 } = {}) {
   if (!(Number(alpha) > 0 && Number(alpha) < 1)) return { error: "Alpha is a probability between 0 and 1 (0.05)." };
   if ([alpha].some((x) => Number(x) < 0)) return { error: "Significance level alpha cannot be negative." };
@@ -210,7 +210,7 @@ EDUCATIONASSESSMENT_RENDERERS["two-sample-t-test"] = renderTwoSampleTTest;
 
 // --- spec-v1234 Y: Paired (dependent-samples) t-test (`paired-t-test`) ---
 // On the n differences d_i (before-after / matched pairs): t = d_bar / (s_d / sqrt(n)), df = n-1, p from tcdf.
-// dims: in { mean_diff: dimensionless, sd_diff: dimensionless, n_pairs: dimensionless, tail: dimensionless, alpha: dimensionless } out: { t_stat: dimensionless, df: dimensionless, p_value: dimensionless }
+// dims: in { mean_diff: dimensionless, sd_diff: dimensionless, n_pairs: dimensionless, tail: dimensionless, alpha: dimensionless } out: { t_stat: dimensionless, df: dimensionless, p_value: dimensionless, se: dimensionless }
 export function computePairedTTest({ mean_diff = 0, sd_diff = 0, n_pairs = 0, tail = "two", alpha = 0.05 } = {}) {
   if (!(Number(alpha) > 0 && Number(alpha) < 1)) return { error: "Alpha is a probability between 0 and 1 (0.05)." };
   if ([alpha].some((x) => Number(x) < 0)) return { error: "Significance level alpha cannot be negative." };
@@ -262,7 +262,7 @@ EDUCATIONASSESSMENT_RENDERERS["paired-t-test"] = renderPairedTTest;
 
 // --- spec-v1236 Y: One-sample t-test (`one-sample-t-test`) ---
 // Tests a sample mean against a hypothesized/target value mu0: t = (x_bar - mu0)/(s/sqrt(n)), df = n-1, p from tcdf.
-// dims: in { sample_mean: dimensionless, sample_sd: dimensionless, n: dimensionless, hypothesized_mean: dimensionless, tail: dimensionless, alpha: dimensionless } out: { t_stat: dimensionless, df: dimensionless, p_value: dimensionless }
+// dims: in { sample_mean: dimensionless, sample_sd: dimensionless, n: dimensionless, hypothesized_mean: dimensionless, tail: dimensionless, alpha: dimensionless } out: { t_stat: dimensionless, df: dimensionless, p_value: dimensionless, mean_diff: dimensionless, se: dimensionless }
 export function computeOneSampleTTest({ sample_mean = 0, sample_sd = 0, n = 0, hypothesized_mean = 0, tail = "two", alpha = 0.05 } = {}) {
   if (!(Number(alpha) > 0 && Number(alpha) < 1)) return { error: "Alpha is a probability between 0 and 1 (0.05)." };
   if ([alpha].some((x) => Number(x) < 0)) return { error: "Significance level alpha cannot be negative." };
@@ -532,7 +532,7 @@ EDUCATIONASSESSMENT_RENDERERS["spearman-rank-correlation"] = renderSpearman;
 // line 1 vs line 2, pass rate this year vs last). The pooled two-proportion z-test: p_pool = (x1+x2)/(n1+n2),
 // z = (p1 - p2) / sqrt(p_pool (1-p_pool)(1/n1 + 1/n2)); p from the standard-normal CDF. Verified against
 // statsmodels.stats.proportion.proportions_ztest (pooled).
-// dims: in { x1: dimensionless, n1: dimensionless, x2: dimensionless, n2: dimensionless, tail: dimensionless, alpha: dimensionless } out: { p1: dimensionless, p2: dimensionless, diff: dimensionless, z_stat: dimensionless, p_value: dimensionless, alpha: dimensionless }
+// dims: in { x1: dimensionless, n1: dimensionless, x2: dimensionless, n2: dimensionless, tail: dimensionless, alpha: dimensionless } out: { p1: dimensionless, p2: dimensionless, diff: dimensionless, z_stat: dimensionless, p_value: dimensionless, alpha: dimensionless, ci_high: dimensionless, ci_low: dimensionless, pooled_p: dimensionless }
 export function computeTwoProportionZTest({ x1 = 0, n1 = 0, x2 = 0, n2 = 0, tail = "two", alpha = 0.05 } = {}) {
   const s1 = Number(x1), t1 = Number(n1), s2 = Number(x2), t2 = Number(n2);
   if (![s1, t1, s2, t2].every(Number.isFinite)) return { error: "Successes and totals must be finite numbers." };

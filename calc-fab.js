@@ -123,7 +123,7 @@ function _v26renderPipeFittingTakeout(inputRegion, outputRegion, citationEl) {
 }
 FAB_RENDERERS["pipe-fitting-takeout"] = _v26renderPipeFittingTakeout;
 
-// dims: in { total_angle_deg: dimensionless, pieces: dimensionless, outside_diameter_in: L, centerline_radius_in: L } out: { miter_angle_deg: dimensionless, cutback_in: L, gore_centerline_in: L, gore_turn_deg: dimensionless, pieces: dimensionless, total_angle_deg: dimensionless }
+// dims: in { total_angle_deg: dimensionless, pieces: dimensionless, outside_diameter_in: L, centerline_radius_in: L } out: { miter_angle_deg: dimensionless, cutback_in: L, gore_centerline_in: L, gore_turn_deg: dimensionless, pieces: dimensionless, total_angle_deg: dimensionless, n_welds: dimensionless }
 export function computePipeMiterCut({ total_angle_deg = 90, pieces = 2, outside_diameter_in = 0, centerline_radius_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const A = Number(total_angle_deg);
@@ -281,7 +281,7 @@ function _v26crossSequence(n) {
   return { seq, standard: false };
 }
 
-// dims: in { bolt_diameter_in: L, bolt_count: dimensionless, tensile_area_in2: L^2, target_percent_yield: dimensionless, target_stress_ksi: M L^-1 T^-2, yield_ksi: M L^-1 T^-2, nut_factor_k: dimensionless } out: { preload_lb: dimensionless, torque_ftlb: dimensionless, torque_nm: dimensionless, stress_pct_yield: dimensionless, bolt_count: dimensionless, bolt_diameter_in: L, stress_ksi: M L^-1 T^-2, tensile_area_in2: L^2, torque_inlb: M L^2 T^-2, yield_ksi: M L^-1 T^-2 }
+// dims: in { bolt_diameter_in: L, bolt_count: dimensionless, tensile_area_in2: L^2, target_percent_yield: dimensionless, target_stress_ksi: M L^-1 T^-2, yield_ksi: M L^-1 T^-2, nut_factor_k: dimensionless } out: { preload_lb: dimensionless, torque_ftlb: dimensionless, torque_nm: dimensionless, stress_pct_yield: dimensionless, bolt_count: dimensionless, bolt_diameter_in: L, stress_ksi: M L^-1 T^-2, tensile_area_in2: L^2, torque_inlb: M L^2 T^-2, yield_ksi: M L^-1 T^-2, nut_factor_k: dimensionless }
 export function computeFlangeBoltTorque({ bolt_diameter_in = 0, thread_series = "UNC", bolt_count = 8, tensile_area_in2 = null, target_percent_yield = 50, target_stress_ksi = null, yield_ksi = 105, nut_factor_k = 0.18 } = {}) {
   const _g = _finiteGuard({ bolt_diameter_in, bolt_count, target_percent_yield, yield_ksi, nut_factor_k }); if (_g) return _g;
   const D = Number(bolt_diameter_in);
@@ -443,7 +443,7 @@ FAB_RENDERERS["conduit-offset"] = renderConduitOffset;
 // Three-point uses field multipliers (2.5x for 45/22.5, 2.0x for 60/30) and the 3/16-in-per-inch shrink rule
 // for the 45/22.5 case; four-point is two back-to-back offsets each = depth / sin(theta) separated by width.
 // dims: in { mode: dimensionless, depth_in: L, preset: dimensionless, width_in: L }
-//        out: { mark_spacing_in: L, shrink_in: L, center_bend_deg: dimensionless, outer_bend_deg: dimensionless, width_in: L }
+//        out: { mark_spacing_in: L, shrink_in: L, center_bend_deg: dimensionless, outer_bend_deg: dimensionless, width_in: L, exact_outer_csc: dimensionless }
 export function computeConduitSaddle({ mode = "three-point", depth_in = 0, preset = "45/22.5", width_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const depth = Number(depth_in) || 0;
@@ -707,7 +707,7 @@ export function computeWeldPreheatFuel({ steel_lb, start_temp_F, preheat_temp_F,
   };
 }
 
-// dims: in { deposit_lb_per_ft: M, deposition_eff_pct: dimensionless, filler_cost_per_lb: dimensionless, deposition_rate_lb_hr: M T^-1, operating_factor_pct: dimensionless, labor_rate_per_hr: dimensionless, gas_cost_per_ft: dimensionless } out: { consumable_lb_per_ft: M, filler_cost_ft: dimensionless, labor_hr_per_ft: T, labor_cost_ft: dimensionless, total_cost_ft: dimensionless }
+// dims: in { deposit_lb_per_ft: M, deposition_eff_pct: dimensionless, filler_cost_per_lb: dimensionless, deposition_rate_lb_hr: M T^-1, operating_factor_pct: dimensionless, labor_rate_per_hr: dimensionless, gas_cost_per_ft: dimensionless } out: { consumable_lb_per_ft: M, filler_cost_ft: dimensionless, labor_hr_per_ft: T, labor_cost_ft: dimensionless, total_cost_ft: dimensionless, arc_hr_per_ft: T L^-1 }
 export function computeWeldCostPerFoot({ deposit_lb_per_ft, deposition_eff_pct = 95, filler_cost_per_lb = 0, deposition_rate_lb_hr, operating_factor_pct = 30, labor_rate_per_hr = 0, gas_cost_per_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // An efficiency is a percent; 0 < value < 1 is a fraction typed into a percent field (added 2026-09-26).
@@ -1373,7 +1373,7 @@ function renderWeldDepositComposition(inputRegion, outputRegion, citationEl) {
 }
 FAB_RENDERERS["weld-deposit-composition"] = renderWeldDepositComposition;
 
-// dims: in { A_groove: L^2, length_in: L, a_pass: L^2, dep_rate: M T^-1, density: M L^-3, op_factor: dimensionless } out: { passes: dimensionless, weight_lb: M, arc_h: T, total_h: T, total_min: T }
+// dims: in { A_groove: L^2, length_in: L, a_pass: L^2, dep_rate: M T^-1, density: M L^-3, op_factor: dimensionless } out: { passes: dimensionless, weight_lb: M, arc_h: T, total_h: T, total_min: T, arc_min: T }
 export function computeWeldPassesArcTime({ A_groove = 0, length_in = 0, a_pass = 0, dep_rate = 0, density = 0.283, op_factor = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const ag = Number(A_groove) || 0;
@@ -1428,7 +1428,7 @@ function _v357renderWeldPassesArcTime(inputRegion, outputRegion, citationEl) {
 }
 FAB_RENDERERS["weld-passes-arc-time"] = _v357renderWeldPassesArcTime;
 
-// dims: in { V_volts: M L^2 T^-3 I^-1, I_amps: I, eta: dimensionless, HI_kjin: M L T^-2 } out: { travel_speed_ipm: L T^-1 }
+// dims: in { V_volts: M L^2 T^-3 I^-1, I_amps: I, eta: dimensionless, HI_kjin: M L T^-2 } out: { travel_speed_ipm: L T^-1, hi_check: M L T^-2 }
 // AWS D1.1 (Table 4.5 note) and ASME IX QW-409.1(a) compute heat input as 60 E I / V with NO
 // arc efficiency, so a WPS heat-input limit is on that basis and eta defaults to 1.0. The EN 1011-1
 // thermal-efficiency factors (0.8 GMAW / SMAW, 0.6 GTAW, 1.0 SAW) give an "effective" heat input
@@ -1698,7 +1698,7 @@ FAB_RENDERERS["bend-springback"] = _v962renderBendSpringback;
 // them while every stick is still empty leaves the short ones to fill the gaps they leave.
 // Kerf is charged per CUT, and a stick that is cut to its very end takes one fewer kerf
 // than a stick with drop left over, which is the detail hand estimates usually miss.
-// dims: in { cut_list: dimensionless, stock_length_in: L, kerf_in: L, end_trim_in: L } out: { sticks: dimensionless, total_pieces: dimensionless, total_stock_in: L, total_piece_in: L, total_kerf_in: L, total_drop_in: L, yield_pct: dimensionless, longest_drop_in: L, size_count: dimensionless, total_trim_in: L, usable_in: L }
+// dims: in { cut_list: dimensionless, stock_length_in: L, kerf_in: L, end_trim_in: L } out: { sticks: dimensionless, total_pieces: dimensionless, total_stock_in: L, total_piece_in: L, total_kerf_in: L, total_drop_in: L, yield_pct: dimensionless, longest_drop_in: L, size_count: dimensionless, total_trim_in: L, usable_in: L, theoretical_min_sticks: dimensionless }
 export function computeBarNesting({ cut_list = "", stock_length_in = 240, kerf_in = 0.125, end_trim_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const stock = Number(stock_length_in) || 0;
@@ -1821,7 +1821,7 @@ const _MSG_STEEL_IN = { 3: 0.2391, 4: 0.2242, 5: 0.2092, 6: 0.1943, 7: 0.1793, 8
 // (16 ga = 1/16 = 0.0625) -- up to 20% thin at the duct gauges (30 ga 0.0125
 // where galvanized is 0.0157). Values as the published galvanized gauge charts print.
 const _GSG_GALV_IN = { 8: 0.1681, 9: 0.1532, 10: 0.1382, 11: 0.1233, 12: 0.1084, 13: 0.0934, 14: 0.0785, 15: 0.0710, 16: 0.0635, 17: 0.0575, 18: 0.0516, 19: 0.0456, 20: 0.0396, 21: 0.0366, 22: 0.0336, 23: 0.0306, 24: 0.0276, 25: 0.0247, 26: 0.0217, 27: 0.0202, 28: 0.0187, 29: 0.0172, 30: 0.0157 };
-// dims: in { gauge: dimensionless, material: dimensionless } out: { thickness_in: L, thickness_mm: L }
+// dims: in { gauge: dimensionless, material: dimensionless } out: { thickness_in: L, thickness_mm: L, gauge: dimensionless }
 export function computeSheetMetalGauge({ gauge = 0, material = "steel" } = {}) {
   const _g = _finiteGuard({ gauge }); if (_g) return _g;
   const n = Math.round(Number(gauge) || 0);
@@ -2252,7 +2252,7 @@ FAB_RENDERERS["conduit-segment-bend"] = _simpleRenderer({
   compute: computeConduitSegmentBend,
 });
 
-// dims: in { inside_radius_in: L, od_in: L, gap_in: L, bend_angle_deg: dimensionless, conduits: dimensionless, shots: dimensionless } out: { pitch_in: L, rack_width_in: L, max_extra_in: L, shot_clearance_in: L, shot_pitch_in: L }
+// dims: in { inside_radius_in: L, od_in: L, gap_in: L, bend_angle_deg: dimensionless, conduits: dimensionless, shots: dimensionless } out: { pitch_in: L, rack_width_in: L, max_extra_in: L, shot_clearance_in: L, shot_pitch_in: L, deg_per_shot: dimensionless }
 export function computeConduitConcentricBend({ inside_radius_in = 0, od_in = 0, gap_in = 0, bend_angle_deg = 90, conduits = 4, shots = 9 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const R1 = Number(inside_radius_in), OD = Number(od_in), th = Number(bend_angle_deg);

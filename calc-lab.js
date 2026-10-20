@@ -443,7 +443,7 @@ export const arrheniusEquationExample = { inputs: { k1: 1.0, temp1_c: 25, k2: 2.
 // phase-equilibrium member the lab phys-chem set (ideal gas, Arrhenius, Nernst) leaves out.
 // Clausius-Clapeyron: ln(P2/P1) = -(dHvap/R)(1/T2 - 1/T1), so dHvap = R ln(P2/P1)/(1/T1 - 1/T2).
 // Only the pressure RATIO enters, so any consistent pressure unit works. R = 8.314 J/(mol*K).
-// dims: in { pressure1: dimensionless, temp1_c: T, pressure2: dimensionless, temp2_c: T } out: { enthalpy_j_mol: dimensionless, enthalpy_kj_mol: dimensionless }
+// dims: in { pressure1: dimensionless, temp1_c: T, pressure2: dimensionless, temp2_c: T } out: { enthalpy_j_mol: M L^2 T^-2 N^-1, enthalpy_kj_mol: dimensionless, slope_k: T }
 export function computeClausiusClapeyron({ pressure1 = 0, temp1_c = 0, pressure2 = 0, temp2_c = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // A blank temperature read as 0 C gave an enthalpy off a temperature nobody entered.
@@ -1167,7 +1167,7 @@ export const LAB_RENDERERS = {
 // user-supplied (no universal constant). The linear range is typically
 // OD < ~0.8; above it, dilute and re-read (flagged).
 //
-// dims: in { od600: dimensionless, factor_cells_per_od: dimensionless, dilution: dimensionless } out: { cells_per_ml: dimensionless }
+// dims: in { od600: dimensionless, factor_cells_per_od: dimensionless, dilution: dimensionless } out: { cells_per_ml: dimensionless, od600: dimensionless }
 export function computeOd600CellCount({ od600 = 0, factor_cells_per_od = 0, dilution = 1 } = {}) {
   const od = Number(od600) || 0;
   const factor = Number(factor_cells_per_od) || 0;

@@ -123,7 +123,7 @@ export const ISO_CONSTRUCTION_FACTORS = {
 };
 
 // dims: in { structure_area_ft2: L^2, construction_class: dimensionless, occupancy_factor: dimensionless, exposure_factor: dimensionless, communication_factor: dimensionless, volume_ft3: L^3 }
-//        out: { needed_fire_flow_gpm: L^3 T^-1, base_C_gpm: L^3 T^-1, construction_factor: dimensionless, iowa_rate_gpm: L^3 T^-1, divergence_gpm: L^3 T^-1, Ci_rounded_gpm: L^3 T^-1 }
+//        out: { needed_fire_flow_gpm: L^3 T^-1, base_C_gpm: L^3 T^-1, construction_factor: dimensionless, iowa_rate_gpm: L^3 T^-1, divergence_gpm: L^3 T^-1, Ci_rounded_gpm: L^3 T^-1, x_plus_p: dimensionless }
 export function computeRequiredFireFlow({ structure_area_ft2, construction_class = "ordinary", occupancy_factor = 1.0, exposure_factor = 0, communication_factor = 0, volume_ft3 = 0 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(Number(occupancy_factor) > 0)) return { error: "Occupancy factor must be positive (0.75 to 1.25)." };
@@ -1591,7 +1591,7 @@ FIRE_RENDERERS["standpipe-pdp"] = _v15f_renderStandpipePDP;
 // Time to one air change = volume / actual CFM. The exhaust-to-entry opening
 // ratio drives PPV efficiency (1:1 to 1.5:1 is the fireground best practice).
 
-// dims: in { length_ft: L, width_ft: L, height_ft: L, target_ach: T^-1, fan_cfm: L^3 T^-1, exhaust_opening_ft2: L^2, entry_opening_ft2: L^2 } out: { cfm_required: L^3 T^-1, fans: dimensionless, time_to_one_change_min: T, target_ach: T^-1, volume_ft3: L^3, opening_ratio: dimensionless }
+// dims: in { length_ft: L, width_ft: L, height_ft: L, target_ach: T^-1, fan_cfm: L^3 T^-1, exhaust_opening_ft2: L^2, entry_opening_ft2: L^2 } out: { cfm_required: L^3 T^-1, fans: dimensionless, time_to_one_change_min: T, target_ach: T^-1, volume_ft3: L^3, opening_ratio: dimensionless, cfm_actual: L^3 T^-1 }
 export function computeSmokeEjector({
   length_ft = 0,
   width_ft = 0,
@@ -2139,7 +2139,7 @@ function _simpleRenderer(spec) {
 }
 
 // ===================== spec-v1388: PPV fan sizing and clearing time =====================
-// dims: in { volume_cf: L^3, fan_cfm: L^3 T^-1, entrainment_efficiency: dimensionless, remaining_fraction: dimensionless, target_time_min: T } out: { effective_cfm: L^3 T^-1, air_change_min: T, clearing_min: T, required_cfm: L^3 T^-1 }
+// dims: in { volume_cf: L^3, fan_cfm: L^3 T^-1, entrainment_efficiency: dimensionless, remaining_fraction: dimensionless, target_time_min: T } out: { effective_cfm: L^3 T^-1, air_change_min: T, clearing_min: T, required_cfm: L^3 T^-1, air_changes_needed: dimensionless }
 export function computePpvFanSizing({ volume_cf = 0, fan_cfm = 0, entrainment_efficiency = 0.6, remaining_fraction = 0.10, target_time_min = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(volume_cf > 0)) return { error: "Structure volume must be positive." };
@@ -2189,7 +2189,7 @@ FIRE_RENDERERS["ppv-fan-sizing"] = _simpleRenderer({
 });
 
 // ===================== spec-v1389: hose lay section count, reach, and charged weight =====================
-// dims: in { map_distance_ft: L, slack_fraction: dimensionless, section_length_ft: L, hose_id_in: L, dry_weight_per_section_lb: M } out: { lay_length_ft: L, sections: dimensionless, actual_reach_ft: L, charged_weight_lb: M, gal_per_ft: L^2, gallons: L^3 }
+// dims: in { map_distance_ft: L, slack_fraction: dimensionless, section_length_ft: L, hose_id_in: L, dry_weight_per_section_lb: M } out: { lay_length_ft: L, sections: dimensionless, actual_reach_ft: L, charged_weight_lb: M, gal_per_ft: L^2, gallons: L^3, sections_by_map: dimensionless }
 export function computeHoseLaySectionCount({ map_distance_ft = 0, slack_fraction = 0.20, section_length_ft = 50, hose_id_in = 0, dry_weight_per_section_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (Number(slack_fraction) > 5) return { error: "Slack is a fraction of the map distance (0.20 for 20%), not a percent." };
@@ -2247,7 +2247,7 @@ FIRE_RENDERERS["hose-lay-section-count"] = _simpleRenderer({
 });
 
 // ===================== spec-v1391: fire department connection supply check =====================
-// dims: in { fdc_pressure_psi: M L^-1 T^-2, total_flow_gpm: L^3 T^-1, lines: dimensionless, line_length_ft: L, friction_coefficient: dimensionless, elevation_ft: L } out: { flow_per_line_gpm: L^3 T^-1, friction_loss_psi: M L^-1 T^-2, engine_pressure_psi: M L^-1 T^-2, elevation_psi: M L^-1 T^-2, single_line_engine_psi: M L^-1 T^-2, single_line_friction_psi: M L^-1 T^-2 }
+// dims: in { fdc_pressure_psi: M L^-1 T^-2, total_flow_gpm: L^3 T^-1, lines: dimensionless, line_length_ft: L, friction_coefficient: dimensionless, elevation_ft: L } out: { flow_per_line_gpm: L^3 T^-1, friction_loss_psi: M L^-1 T^-2, engine_pressure_psi: M L^-1 T^-2, elevation_psi: M L^-1 T^-2, single_line_engine_psi: M L^-1 T^-2, single_line_friction_psi: M L^-1 T^-2, single_line_cost_psi: M L^-1 T^-2 }
 export function computeFdcSupplyCheck({ fdc_pressure_psi = 0, total_flow_gpm = 0, lines = 2, line_length_ft = 0, friction_coefficient = 0.677, elevation_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!Number.isInteger(Number(lines)) || !(Number(lines) >= 1)) return { error: "Supply lines is a whole number, 1 or more." };

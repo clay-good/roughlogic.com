@@ -35,7 +35,7 @@ export const MACHINING_RENDERERS = {};
 
 // --- v31 K.4: Machining speed and feed (`cutting-speed-rpm`) ---
 // Spindle RPM = 12 * SFM / (pi * dia); feed IPM = RPM * flutes * chip load.
-// dims: in { surface_speed_sfm: L*T^-1, diameter_in: L, num_flutes: dimensionless, chip_load_in: L } out: { rpm: T^-1, feed_ipm: L*T^-1, chip_load_in: L, diameter_in: L, surface_speed_sfm: L*T^-1 }
+// dims: in { surface_speed_sfm: L*T^-1, diameter_in: L, num_flutes: dimensionless, chip_load_in: L } out: { rpm: T^-1, feed_ipm: L*T^-1, chip_load_in: L, diameter_in: L, surface_speed_sfm: L*T^-1, num_flutes: dimensionless }
 export function computeCuttingSpeed({ surface_speed_sfm = 0, diameter_in = 0, num_flutes = 0, chip_load_in = 0 } = {}) {
   const _g = _finiteGuard({ surface_speed_sfm, diameter_in, num_flutes, chip_load_in }); if (_g) return _g;
   const sfm = Number(surface_speed_sfm) || 0;
@@ -867,7 +867,7 @@ const BEARING_XY_TABLE = [
   [0.056, 0.26, 1.71], [0.070, 0.27, 1.63], [0.084, 0.28, 1.55], [0.110, 0.30, 1.45],
   [0.17, 0.34, 1.31], [0.28, 0.38, 1.15], [0.42, 0.42, 1.04], [0.56, 0.44, 1.00],
 ];
-// dims: in { radial_load_lbf: M L T^-2, thrust_load_lbf: M L T^-2, static_rating_lbf: M L T^-2 } out: { equivalent_load_lbf: M L T^-2, e_ratio: dimensionless, x_factor: dimensionless, y_factor: dimensionless }
+// dims: in { radial_load_lbf: M L T^-2, thrust_load_lbf: M L T^-2, static_rating_lbf: M L T^-2 } out: { equivalent_load_lbf: M L T^-2, e_ratio: dimensionless, x_factor: dimensionless, y_factor: dimensionless, fa_over_fr: dimensionless }
 export function computeBearingEquivalentLoad({ radial_load_lbf = 0, thrust_load_lbf = 0, static_rating_lbf = 0 } = {}) {
   const _g = _finiteGuard({ radial_load_lbf, thrust_load_lbf, static_rating_lbf }); if (_g) return _g;
   const Fr = Number(radial_load_lbf) || 0;
@@ -1217,7 +1217,7 @@ MACHINING_RENDERERS["fatigue-notch-sensitivity"] = renderFatigueNotchSensitivity
 // spec-v1938: cumulative fatigue damage by the Palmgren-Miner rule (Shigley Sec. 6-15, Eq. 6-57) on the
 // same finite-life S-N line as fatigue-finite-life. D = sum(n_i / N_i); a block below Se does no damage
 // (Shigley's convention with an endurance limit); failure is predicted at D = 1, so the block repeats 1/D times.
-// dims: in { ultimate_strength_psi: M L^-1 T^-2, endurance_limit_psi: M L^-1 T^-2, fatigue_fraction: dimensionless, stress_1_psi: M L^-1 T^-2, cycles_1: dimensionless, stress_2_psi: M L^-1 T^-2, cycles_2: dimensionless, stress_3_psi: M L^-1 T^-2, cycles_3: dimensionless } out: { life_1_cycles: dimensionless, life_2_cycles: dimensionless, life_3_cycles: dimensionless, damage: dimensionless, blocks_to_failure: dimensionless, cycles_to_failure: dimensionless }
+// dims: in { ultimate_strength_psi: M L^-1 T^-2, endurance_limit_psi: M L^-1 T^-2, fatigue_fraction: dimensionless, stress_1_psi: M L^-1 T^-2, cycles_1: dimensionless, stress_2_psi: M L^-1 T^-2, cycles_2: dimensionless, stress_3_psi: M L^-1 T^-2, cycles_3: dimensionless } out: { life_1_cycles: dimensionless, life_2_cycles: dimensionless, life_3_cycles: dimensionless, damage: dimensionless, blocks_to_failure: dimensionless, cycles_to_failure: dimensionless, f_used: dimensionless }
 export function computeFatigueMinerDamage({ ultimate_strength_psi = 0, endurance_limit_psi = 0, fatigue_fraction = 0, stress_1_psi = 0, cycles_1 = 0, stress_2_psi = 0, cycles_2 = 0, stress_3_psi = 0, cycles_3 = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const blocks = [[stress_1_psi, cycles_1], [stress_2_psi, cycles_2], [stress_3_psi, cycles_3]].map(([s, n]) => [Number(s) || 0, Number(n) || 0]);
@@ -1426,7 +1426,7 @@ MACHINING_RENDERERS["power-screw-torque"] = renderPowerScrewTorque;
 //   Uniform wear:     T = F mu N (ro + ri)/2          (p max at inner radius; the conservative design value)
 //   Uniform pressure: T = (2/3) F mu N (ro^3 - ri^3)/(ro^2 - ri^2)
 //   Max contact pressure (uniform wear): p_max = F/(2 pi ri (ro - ri))
-// dims: in { clamp_force_lbf: M L T^-2, friction_coefficient: dimensionless, outer_radius_in: L, inner_radius_in: L, friction_surfaces: dimensionless } out: { uniform_wear_torque_in_lbf: M L^2 T^-2, uniform_pressure_torque_in_lbf: M L^2 T^-2, max_pressure_psi: M L^-1 T^-2 }
+// dims: in { clamp_force_lbf: M L T^-2, friction_coefficient: dimensionless, outer_radius_in: L, inner_radius_in: L, friction_surfaces: dimensionless } out: { uniform_wear_torque_in_lbf: M L^2 T^-2, uniform_pressure_torque_in_lbf: M L^2 T^-2, max_pressure_psi: M L^-1 T^-2, friction_surfaces: dimensionless }
 export function computeDiskClutchTorque({ clamp_force_lbf = 0, friction_coefficient = 0.3, outer_radius_in = 0, inner_radius_in = 0, friction_surfaces = 1 } = {}) {
   const _g = _finiteGuard({ clamp_force_lbf, friction_coefficient, outer_radius_in, inner_radius_in, friction_surfaces }); if (_g) return _g;
   // Unit / range guard added 2026-09-26 after printed-example probing.
@@ -1559,7 +1559,7 @@ const COLUMN_END_K = {
   "fixed-fixed": { k: 0.5, label: "Fixed-fixed (K = 0.5)" },
   "fixed-pinned": { k: 0.7, label: "Fixed-pinned (K = 0.7)" },
 };
-// dims: in { modulus_psi: M L^-1 T^-2, yield_strength_psi: M L^-1 T^-2, moment_of_inertia_in4: L^4, area_in2: L^2, length_in: L, end_condition: dimensionless } out: { critical_load_lbf: M L T^-2, critical_stress_psi: M L^-1 T^-2, slenderness_ratio: dimensionless, transition_slenderness: dimensionless, radius_of_gyration_in: L }
+// dims: in { modulus_psi: M L^-1 T^-2, yield_strength_psi: M L^-1 T^-2, moment_of_inertia_in4: L^4, area_in2: L^2, length_in: L, end_condition: dimensionless } out: { critical_load_lbf: M L T^-2, critical_stress_psi: M L^-1 T^-2, slenderness_ratio: dimensionless, transition_slenderness: dimensionless, radius_of_gyration_in: L, effective_length_factor: dimensionless }
 export function computeEulerJohnsonColumn({ modulus_psi = 30000000, yield_strength_psi = 0, moment_of_inertia_in4 = 0, area_in2 = 0, length_in = 0, end_condition = "pinned-pinned" } = {}) {
   const _g = _finiteGuard({ modulus_psi, yield_strength_psi, moment_of_inertia_in4, area_in2, length_in }); if (_g) return _g;
   // Unit / range guard added 2026-09-26 after printed-example probing.
@@ -1627,7 +1627,7 @@ MACHINING_RENDERERS["euler-johnson-column"] = renderEulerJohnsonColumn;
 // spec-v1935: eccentrically loaded column by the secant formula (Beer & Johnston 10.6; Shigley 4-16).
 // sigma_max = (P/A)[1 + (e c/r^2) sec((K L/2r) sqrt(P/(E A)))], y_max = e[sec(...) - 1]. Stress is NOT linear
 // in P, so a safety factor goes on the LOAD: with Sy entered, the load at first yield is found by bisection.
-// dims: in { load_lbf: M L T^-2, eccentricity_in: L, extreme_fiber_in: L, modulus_psi: M L^-1 T^-2, yield_strength_psi: M L^-1 T^-2, moment_of_inertia_in4: L^4, area_in2: L^2, length_in: L, end_condition: dimensionless } out: { critical_load_lbf: M L T^-2, load_ratio: dimensionless, secant_term: dimensionless, max_deflection_in: L, max_stress_psi: M L^-1 T^-2, yield_load_lbf: M L T^-2, yield_load_factor: dimensionless, radius_of_gyration_in: L, eccentricity_ratio: dimensionless }
+// dims: in { load_lbf: M L T^-2, eccentricity_in: L, extreme_fiber_in: L, modulus_psi: M L^-1 T^-2, yield_strength_psi: M L^-1 T^-2, moment_of_inertia_in4: L^4, area_in2: L^2, length_in: L, end_condition: dimensionless } out: { critical_load_lbf: M L T^-2, load_ratio: dimensionless, secant_term: dimensionless, max_deflection_in: L, max_stress_psi: M L^-1 T^-2, yield_load_lbf: M L T^-2, yield_load_factor: dimensionless, radius_of_gyration_in: L, eccentricity_ratio: dimensionless, effective_length_factor: dimensionless }
 export function computeColumnSecantFormula({ load_lbf = 0, eccentricity_in = 0, extreme_fiber_in = 0, modulus_psi = 29000000, yield_strength_psi = 0, moment_of_inertia_in4 = 0, area_in2 = 0, length_in = 0, end_condition = "pinned-pinned" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (Number(modulus_psi) > 0 && Number(modulus_psi) < 1e5) return { error: "Enter the modulus E in psi (29,000,000 for steel), not ksi." };
@@ -1765,7 +1765,7 @@ MACHINING_RENDERERS["thick-wall-cylinder-stress"] = renderThickWallCylinderStres
 // The gear family has spur/worm/planetary geometry but not the rack and pinion (rotary to linear: CNC gantry,
 // sliding gate, steering rack, linear actuator). PD = N/Pd; travel per rev = pi PD; travel per tooth = pi/Pd;
 // linear speed = pi PD rpm; rack force F = 2T/PD. A bigger pinion moves faster but pushes softer at the same torque.
-// dims: in { pinion_teeth: dimensionless, diametral_pitch_1_in: L^-1, pinion_torque_in_lb: M L^2 T^-2, pinion_rpm: T^-1 } out: { pitch_diameter_in: L, travel_per_rev_in: L, travel_per_tooth_in: L, linear_speed_in_min: L T^-1, rack_force_lbf: M L T^-2 }
+// dims: in { pinion_teeth: dimensionless, diametral_pitch_1_in: L^-1, pinion_torque_in_lb: M L^2 T^-2, pinion_rpm: T^-1 } out: { pitch_diameter_in: L, travel_per_rev_in: L, travel_per_tooth_in: L, linear_speed_in_min: L T^-1, rack_force_lbf: M L T^-2, linear_speed_ft_min: L T^-1 }
 export function computeRackAndPinion({ pinion_teeth = 0, diametral_pitch_1_in = 0, pinion_torque_in_lb = 0, pinion_rpm = 0 } = {}) {
   const _g = _finiteGuard({ pinion_teeth, diametral_pitch_1_in, pinion_torque_in_lb, pinion_rpm }); if (_g) return _g;
   const N = Number(pinion_teeth) || 0;
@@ -2424,7 +2424,7 @@ MACHINING_RENDERERS["stub-acme-thread-depth"] = renderStubAcmeThreadDepth;
 //   Nmin = 2k / sin^2(phi)   -- the tooth count below which the cutter undercuts the root.
 //     Reproduces the classic published values exactly: 32 at 14.5 deg, 18 at 20, 12 at 25.
 //   B = 2 dC tan(phi)        -- backlash produced by opening the center distance by dC.
-// dims: in { pressure_angle_deg: dimensionless, teeth: dimensionless, addendum_coefficient: dimensionless, center_distance_change_in: L, diametral_pitch: L^-1 } out: { min_teeth: dimensionless, backlash_in: L, shortfall: M L^2 T^-3, circular_pitch_in: L }
+// dims: in { pressure_angle_deg: dimensionless, teeth: dimensionless, addendum_coefficient: dimensionless, center_distance_change_in: L, diametral_pitch: L^-1 } out: { min_teeth: dimensionless, backlash_in: L, shortfall: dimensionless, circular_pitch_in: L, backlash_pct_of_pitch: dimensionless, min_teeth_exact: dimensionless }
 export function computeGearUndercutBacklash({ pressure_angle_deg = 20, teeth = 0, addendum_coefficient = 1.0, center_distance_change_in = 0, diametral_pitch = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const phi = Number(pressure_angle_deg) || 0;
@@ -2642,7 +2642,7 @@ function _simpleRenderer(spec) {
 }
 
 // ===================== spec-v1402: drill speed, feed, power, and torque =====================
-// dims: in { diameter_in: L, sfm: L T^-1, feed_ipr: L, unit_power: M L^-1 T^-2, spindle_efficiency: dimensionless } out: { rpm: T^-1, feed_ipm: L T^-1, removal_rate_cipm: L^3 T^-1, torque_in_lb: M L^2 T^-2, motor_power_hp: M L^2 T^-3 }
+// dims: in { diameter_in: L, sfm: L T^-1, feed_ipr: L, unit_power: M L^-1 T^-2, spindle_efficiency: dimensionless } out: { rpm: T^-1, feed_ipm: L T^-1, removal_rate_cipm: L^3 T^-1, torque_in_lb: M L^2 T^-2, motor_power_hp: M L^2 T^-3, power_at_cut_hp: M L^2 T^-3 }
 export function computeDrillFeedThrust({ diameter_in = 0, sfm = 0, feed_ipr = 0, unit_power = 1.0, spindle_efficiency = 0.8 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(diameter_in > 0)) return { error: "Drill diameter must be positive." };
@@ -2694,7 +2694,7 @@ MACHINING_RENDERERS["drill-feed-thrust"] = _simpleRenderer({
 });
 
 // ===================== spec-v1403: band saw blade pitch, speed, and cut time =====================
-// dims: in { thickness_in_cut_in: L, blade_speed_sfm: L T^-1, wheel_diameter_in: L, cut_area_sqin: L^2, feed_sqin_per_min: L^2 T^-1 } out: { min_tpi: dimensionless, max_tpi: dimensionless, wheel_rpm: T^-1, cut_time_min: T }
+// dims: in { thickness_in_cut_in: L, blade_speed_sfm: L T^-1, wheel_diameter_in: L, cut_area_sqin: L^2, feed_sqin_per_min: L^2 T^-1 } out: { min_tpi: dimensionless, max_tpi: dimensionless, wheel_rpm: T^-1, cut_time_min: T, cut_time_sec: T }
 export function computeBandSawBladePitch({ thickness_in_cut_in = 0, blade_speed_sfm = 0, wheel_diameter_in = 0, cut_area_sqin = 0, feed_sqin_per_min = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(thickness_in_cut_in > 0)) return { error: "Section thickness in the cut must be positive." };

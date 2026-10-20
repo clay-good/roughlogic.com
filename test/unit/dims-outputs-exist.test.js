@@ -225,3 +225,50 @@ test("a <thing>_per_<time> key is declared with the time in its denominator", ()
   assert.ok(seen > 100, `only ${seen} per-time keys found; did the annotation format move?`);
   assert.deepEqual(bad, []);
 });
+
+// Every number a tile compute returns on its worked examples now has a
+// declared dimension except these, nearly all pound-valued (the force-vs-mass
+// reading is undecided; see POUND_CONVENTION_UNSETTLED) or a name that means
+// two quantities. 2026-10-20: ~4,300 undeclared -> 331. The count may only
+// fall; a new tile declares every output it returns.
+const UNDECLARED_BUDGET = 331;
+test("undeclared returned outputs only fall", async () => {
+  const { COMPUTE_MAP } = await import("../fixtures/compute-map.js");
+  const { rows } = JSON.parse(readFileSync(resolve(ROOT, "test/fixtures/worked-examples.json"), "utf8"));
+  const examples = new Map();
+  for (const r of rows) {
+    if (!examples.has(r.tile_id)) examples.set(r.tile_id, []);
+    examples.get(r.tile_id).push(r.inputs || {});
+  }
+  const sources = new Map();
+  const seen = new Set();
+  let undeclared = 0;
+  for (const [id, { module, fn }] of Object.entries(COMPUTE_MAP)) {
+    const rel = module.replace("../../", "");
+    if (seen.has(rel + ":" + fn)) continue;
+    seen.add(rel + ":" + fn);
+    if (!sources.has(rel)) sources.set(rel, readFileSync(resolve(ROOT, rel), "utf8").split("\n"));
+    const lines = sources.get(rel);
+    const at = lines.findIndex((l) => new RegExp("^export function " + fn + "\\(").test(l));
+    if (at < 1) continue;
+    let j = at - 1;
+    while (j >= 0 && /^\s*\/\//.test(lines[j])) j--;
+    const block = lines.slice(j + 1, at).join(" ");
+    const outAt = block.indexOf("out:");
+    if (!block.includes("dims:") || outAt < 0) continue;
+    const declared = new Set([...block.slice(outAt).matchAll(/(\w+)\s*:/g)].map((m) => m[1]));
+    const compute = (await import(resolve(ROOT, rel)))[fn];
+    const returned = new Set();
+    for (const inputs of examples.get(id) || [{}]) {
+      try {
+        const r = compute(inputs);
+        if (r && typeof r === "object" && !Array.isArray(r)) {
+          for (const [k, v] of Object.entries(r)) if (typeof v === "number" && /^[A-Za-z_]\w*$/.test(k)) returned.add(k);
+        }
+      } catch { /* another test's concern */ }
+    }
+    for (const k of returned) if (!declared.has(k)) undeclared++;
+  }
+  assert.ok(undeclared <= UNDECLARED_BUDGET, `${undeclared} returned outputs have no declared dimension (budget ${UNDECLARED_BUDGET}); declare the new ones`);
+  if (undeclared < UNDECLARED_BUDGET) console.log(`undeclared outputs fell to ${undeclared}; lower UNDECLARED_BUDGET`);
+});

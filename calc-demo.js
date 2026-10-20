@@ -320,7 +320,7 @@ DEMO_RENDERERS["abatement-containment"] = _v69renderAbatementContainment;
 
 // ============ spec-v1691: abatement waste volume and container count ============
 
-// dims: in { area_ft2: L^2, thickness_in: L, bulking_factor: dimensionless, bag_volume_ft3: L^3, bag_fill_fraction: dimensionless, material_density_pcf: M L^-3, container_volume_yd3: L^3 } out: { in_place_volume_ft3: L^3, bulked_volume_ft3: L^3, bag_count: dimensionless, waste_weight_lb: M L T^-2, container_count: dimensionless, bulked_volume_yd3: L^3, area_ft2: L^2, bag_fill_fraction: dimensionless, bag_volume_ft3: L^3, bulking_factor: dimensionless, container_volume_yd3: L^3, in_place_volume_yd3: L^3, naive_bag_count: dimensionless, thickness_in: L, usable_bag_volume_ft3: L^3 }
+// dims: in { area_ft2: L^2, thickness_in: L, bulking_factor: dimensionless, bag_volume_ft3: L^3, bag_fill_fraction: dimensionless, material_density_pcf: M L^-3, container_volume_yd3: L^3 } out: { in_place_volume_ft3: L^3, bulked_volume_ft3: L^3, bag_count: dimensionless, waste_weight_lb: M L T^-2, container_count: dimensionless, bulked_volume_yd3: L^3, area_ft2: L^2, bag_fill_fraction: dimensionless, bag_volume_ft3: L^3, bulking_factor: dimensionless, container_volume_yd3: L^3, in_place_volume_yd3: L^3, naive_bag_count: dimensionless, thickness_in: L, usable_bag_volume_ft3: L^3, bag_multiple: dimensionless, material_density_pcf: M L^-3 }
 export function computeAbatementWasteContainers({ area_ft2 = 0, thickness_in = 0, bulking_factor = 2, bag_volume_ft3 = 3, bag_fill_fraction = 0.7, material_density_pcf = 30, container_volume_yd3 = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(area_ft2 > 0)) return { error: "The area of material must be positive (sq ft)." };
@@ -381,7 +381,7 @@ DEMO_RENDERERS["abatement-waste-containers"] = _simpleRenderer({
 
 // ============ spec-v1692: lead dust clearance loading and wipe count ============
 
-// dims: in { lab_result_ug: M, wipe_area_ft2: L^2, clearance_limit_ug_ft2: M L^-2, rooms: dimensionless, surfaces_per_room: dimensionless, blanks_per_job: dimensionless } out: { dust_loading_ug_ft2: M L^-2, limit_margin_ug_ft2: M L^-2, loading_ratio: dimensionless, max_lab_result_ug: M, wipe_count: dimensionless, total_samples: dimensionless, rooms: dimensionless, wipe_area_ft2: L^2 }
+// dims: in { lab_result_ug: M, wipe_area_ft2: L^2, clearance_limit_ug_ft2: M L^-2, rooms: dimensionless, surfaces_per_room: dimensionless, blanks_per_job: dimensionless } out: { dust_loading_ug_ft2: M L^-2, limit_margin_ug_ft2: M L^-2, loading_ratio: dimensionless, max_lab_result_ug: M, wipe_count: dimensionless, total_samples: dimensionless, rooms: dimensionless, wipe_area_ft2: L^2, blanks_per_job: dimensionless, clearance_limit_ug_ft2: M L^-2, lab_result_ug: M, surfaces_per_room: dimensionless }
 export function computeLeadDustClearance({ lab_result_ug = 0, wipe_area_ft2 = 1, clearance_limit_ug_ft2 = 0, rooms = 0, surfaces_per_room = 3, blanks_per_job = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   for (const k of ["lab_result_ug"]) { const v = arguments[0]?.[k]; if (v === undefined || v === null || v === "") return { error: "Enter the laboratory result (micrograms); a blank result read as a pass at zero." }; }
@@ -439,7 +439,7 @@ DEMO_RENDERERS["lead-dust-clearance"] = _simpleRenderer({
 
 // ============ spec-v1693: respirable silica exposure and ventilation screen ============
 
-// dims: in { measured_concentration_ug_m3: M L^-3, sample_minutes: T, shift_minutes: T, pel_ug_m3: M L^-3, action_level_ug_m3: M L^-3, control_efficiency_pct: dimensionless } out: { twa_ug_m3: M L^-3, pel_ratio: dimensionless, over_pel_by_ug_m3: M L^-3, controlled_twa_ug_m3: M L^-3, required_efficiency_pct: dimensionless, max_task_minutes: T, control_efficiency_pct: dimensionless }
+// dims: in { measured_concentration_ug_m3: M L^-3, sample_minutes: T, shift_minutes: T, pel_ug_m3: M L^-3, action_level_ug_m3: M L^-3, control_efficiency_pct: dimensionless } out: { twa_ug_m3: M L^-3, pel_ratio: dimensionless, over_pel_by_ug_m3: M L^-3, controlled_twa_ug_m3: M L^-3, required_efficiency_pct: dimensionless, max_task_minutes: T, control_efficiency_pct: dimensionless, max_task_minutes_controlled: T, action_level_ug_m3: M L^-3, measured_concentration_ug_m3: M L^-3, pel_ug_m3: M L^-3, sample_minutes: T, shift_minutes: T }
 export function computeSilicaVentilationScreen({ measured_concentration_ug_m3 = 0, sample_minutes = 0, shift_minutes = 480, pel_ug_m3 = 50, action_level_ug_m3 = 25, control_efficiency_pct = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // An efficiency is a percent; 0 < value < 1 is a fraction typed into a percent field (added 2026-09-26).

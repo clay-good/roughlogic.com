@@ -463,7 +463,7 @@ const _MT_COIL_HIGH_FILL_CONSTANT = 35000;
 // is shot in sections of at most 18 in and 18 is the L in L/D (NRC NDE
 // Technology and Codes Student Manual, Vol. 2, Ch. 7, 7.4.3.6).
 const _MT_COIL_MAX_SECTION_IN = 18;
-// dims: in { part_diameter_in: L, amps_per_inch: I L^-1, part_length_in: L, coil_turns: dimensionless, yoke_pole_spacing_in: L } out: { circular_amps: I, length_used_in: L, sections_count: dimensionless, coil_amp_turns: I, coil_amps: I, yoke_lift_required_lb: M L T^-2, ld_used: dimensionless }
+// dims: in { part_diameter_in: L, amps_per_inch: I L^-1, part_length_in: L, coil_turns: dimensionless, yoke_pole_spacing_in: L } out: { circular_amps: I, length_used_in: L, sections_count: dimensionless, coil_amp_turns: I, coil_amps: I, yoke_lift_required_lb: M L T^-2, ld_used: dimensionless, ld_raw: dimensionless }
 export function computeMtYokeCoilAmperage({
   part_diameter_in = 0, amps_per_inch = 800, part_length_in = 0, coil_turns = 0,
   fill_factor = "high", yoke_pole_spacing_in = 0, yoke_current = "ac",
@@ -841,7 +841,7 @@ INSPECTION_RENDERERS["jominy-quench-severity"] = _simpleRenderer({
 // =====================================================================
 // spec-v1673: tempering temperature for a target hardness.
 // =====================================================================
-// dims: in { target_hardness_hrc: dimensionless, curve_temp_f: T, section_thickness_in: L, soak_rate_hr_per_in: T L^-1, minimum_soak_hr: T, embrittlement_low_f: T, embrittlement_high_f: T, secondary_hardening: dimensionless } out: { soak_time_hr: T, embrittlement_span_f: T }
+// dims: in { target_hardness_hrc: dimensionless, curve_temp_f: T, section_thickness_in: L, soak_rate_hr_per_in: T L^-1, minimum_soak_hr: T, embrittlement_low_f: T, embrittlement_high_f: T, secondary_hardening: dimensionless } out: { soak_time_hr: T, embrittlement_span_f: T, computed_soak_hr: T }
 export function computeTemperingTemperature({
   target_hardness_hrc = 0, curve_temp_f = 0, section_thickness_in = 0,
   soak_rate_hr_per_in = 1, minimum_soak_hr = 1,

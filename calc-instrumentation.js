@@ -448,7 +448,7 @@ function _v958renderDpLevelHydrostatic(inputRegion, outputRegion, citationEl) {
 INSTRUMENTATION_RENDERERS["dp-level-hydrostatic"] = _v958renderDpLevelHydrostatic;
 
 // ===================== spec-v961: Ziegler-Nichols closed-loop PID tuning =====================
-// dims: in { ultimate_gain_ku: dimensionless, ultimate_period_tu_sec: T } out: { pid_kp: dimensionless, pid_ti_sec: T, pid_td_sec: T, proportional_band_pct: dimensionless }
+// dims: in { ultimate_gain_ku: dimensionless, ultimate_period_tu_sec: T } out: { pid_kp: dimensionless, pid_ti_sec: T, pid_td_sec: T, proportional_band_pct: dimensionless, p_kp: dimensionless, pi_kp: dimensionless, pi_ti_sec: T }
 export function computePidTuningZieglerNichols({ ultimate_gain_ku = 4, ultimate_period_tu_sec = 2 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(ultimate_gain_ku > 0)) return { error: "Ultimate gain Ku must be positive." };

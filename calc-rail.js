@@ -511,7 +511,7 @@ const _CURVE_RESISTANCE_LB_PER_TON_PER_DEG = 0.8;
 
 // ============ spec-v1546: railcar load limit ============
 
-// dims: in { gross_rail_load_lb: M L T^-2, light_weight_lb: M L T^-2, lading_net_lb: M L T^-2, cubic_capacity_ft3: L^3, lading_density_pcf: M L^-3, route_gross_rail_load_lb: M L T^-2 } out: { load_limit_lb: M L T^-2, gross_on_rail_lb: M L T^-2, utilization_pct: dimensionless, remaining_capacity_lb: M L T^-2, route_load_limit_lb: M L T^-2, cube_limited_weight_lb: M L T^-2, cubic_capacity_ft3: L^3, governing_utilization_pct: dimensionless }
+// dims: in { gross_rail_load_lb: M L T^-2, light_weight_lb: M L T^-2, lading_net_lb: M L T^-2, cubic_capacity_ft3: L^3, lading_density_pcf: M L^-3, route_gross_rail_load_lb: M L T^-2 } out: { load_limit_lb: M L T^-2, gross_on_rail_lb: M L T^-2, utilization_pct: dimensionless, remaining_capacity_lb: M L T^-2, route_load_limit_lb: M L T^-2, cube_limited_weight_lb: M L T^-2, cubic_capacity_ft3: L^3, governing_utilization_pct: dimensionless, gross_rail_load_lb: M L T^-2, lading_density_pcf: M L^-3, lading_net_lb: M L T^-2, light_weight_lb: M L T^-2, route_gross_rail_load_lb: M L T^-2 }
 export function computeRailcarLoadLimit({ gross_rail_load_lb = 0, light_weight_lb = 0, lading_net_lb = 0, cubic_capacity_ft3 = 0, lading_density_pcf = 0, route_gross_rail_load_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(gross_rail_load_lb > 0)) return { error: "Gross rail load must be positive (lb)." };
@@ -596,7 +596,7 @@ RAIL_RENDERERS["railcar-load-limit"] = _simpleRenderer({
 
 // ============ spec-v1547: locomotive tonnage rating on a ruling grade ============
 
-// dims: in { tractive_effort_lb: M L T^-2, ruling_grade_pct: dimensionless, rolling_resistance_lb_per_ton: M L T^-2, curve_degrees: dimensionless, weight_on_drivers_lb: M L T^-2, adhesion_factor: dimensionless, alternate_grade_pct: dimensionless } out: { grade_resistance_lb_per_ton: M L T^-2, curve_resistance_lb_per_ton: M L T^-2, total_resistance_lb_per_ton: M L T^-2, adhesion_limited_te_lb: M L T^-2, governing_te_lb: M L T^-2, tonnage_rating_tons: M, alternate_grade_pct: dimensionless, ruling_grade_pct: dimensionless }
+// dims: in { tractive_effort_lb: M L T^-2, ruling_grade_pct: dimensionless, rolling_resistance_lb_per_ton: M L T^-2, curve_degrees: dimensionless, weight_on_drivers_lb: M L T^-2, adhesion_factor: dimensionless, alternate_grade_pct: dimensionless } out: { grade_resistance_lb_per_ton: M L T^-2, curve_resistance_lb_per_ton: M L T^-2, total_resistance_lb_per_ton: M L T^-2, adhesion_limited_te_lb: M L T^-2, governing_te_lb: M L T^-2, tonnage_rating_tons: M, alternate_grade_pct: dimensionless, ruling_grade_pct: dimensionless, grade_penalty_x: dimensionless, adhesion_factor: dimensionless, curve_degrees: dimensionless, tractive_effort_lb: M L T^-2, weight_on_drivers_lb: M L T^-2 }
 export function computeTonnageRatingGrade({ tractive_effort_lb = 0, ruling_grade_pct = 0, rolling_resistance_lb_per_ton = 3, curve_degrees = 0, weight_on_drivers_lb = 0, adhesion_factor = 0.3, alternate_grade_pct = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(tractive_effort_lb > 0)) return { error: "Available tractive effort must be positive (lb)." };
@@ -738,7 +738,7 @@ RAIL_RENDERERS["train-resistance-davis"] = _simpleRenderer({
 
 // ============ spec-v1548: train air brake reduction ============
 
-// dims: in { charged_pressure_psi: M L^-1 T^-2, reduction_psi: M L^-1 T^-2, cylinder_ratio: dimensionless, full_service_reduction_psi: M L^-1 T^-2, car_count: dimensionless, propagation_rate_cars_per_second: T^-1 } out: { brake_pipe_psi: M L^-1 T^-2, cylinder_psi: M L^-1 T^-2, remaining_reduction_psi: M L^-1 T^-2, full_service_cylinder_psi: M L^-1 T^-2, wasted_reduction_psi: M L^-1 T^-2, propagation_seconds: T, car_count: dimensionless, charged_pressure_psi: M L^-1 T^-2, effective_reduction_psi: M L^-1 T^-2, equalizing_reduction_psi: M L^-1 T^-2, equalizing_reservoir_psi: M L^-1 T^-2, full_service_reduction_psi: M L^-1 T^-2, reduction_psi: M L^-1 T^-2, remaining_cylinder_psi: M L^-1 T^-2, cylinder_ratio: dimensionless }
+// dims: in { charged_pressure_psi: M L^-1 T^-2, reduction_psi: M L^-1 T^-2, cylinder_ratio: dimensionless, full_service_reduction_psi: M L^-1 T^-2, car_count: dimensionless, propagation_rate_cars_per_second: T^-1 } out: { brake_pipe_psi: M L^-1 T^-2, cylinder_psi: M L^-1 T^-2, remaining_reduction_psi: M L^-1 T^-2, full_service_cylinder_psi: M L^-1 T^-2, wasted_reduction_psi: M L^-1 T^-2, propagation_seconds: T, car_count: dimensionless, charged_pressure_psi: M L^-1 T^-2, effective_reduction_psi: M L^-1 T^-2, equalizing_reduction_psi: M L^-1 T^-2, equalizing_reservoir_psi: M L^-1 T^-2, full_service_reduction_psi: M L^-1 T^-2, reduction_psi: M L^-1 T^-2, remaining_cylinder_psi: M L^-1 T^-2, cylinder_ratio: dimensionless, propagation_rate_cars_per_second: T^-1 }
 export function computeTrainBrakeReduction({ charged_pressure_psi = 90, reduction_psi = 0, cylinder_ratio = 2.5, full_service_reduction_psi = 0, car_count = 0, propagation_rate_cars_per_second = 10 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(charged_pressure_psi > 0)) return { error: "Brake pipe charged pressure must be positive (psi)." };

@@ -152,7 +152,7 @@ function _changeOfStateTension(K, C) {
 
 // ============ spec-v1450: ruling (equivalent) span ============
 
-// dims: in { span_1_ft: L, span_2_ft: L, span_3_ft: L, span_4_ft: L, span_5_ft: L, span_6_ft: L, span_7_ft: L, span_8_ft: L, ruling_span_sag_ft: L } out: { ruling_span_ft: L, average_span_ft: L, field_approximation_ft: L, longest_span_sag_ft: L, shortest_span_sag_ft: L, approximation_error_ft: L, approximation_error_pct: dimensionless, longest_span_ft: L, ruling_span_sag_ft: L, shortest_span_ft: L, span_count: dimensionless, ruling_to_average_ratio: dimensionless, sag_spread_ratio: dimensionless }
+// dims: in { span_1_ft: L, span_2_ft: L, span_3_ft: L, span_4_ft: L, span_5_ft: L, span_6_ft: L, span_7_ft: L, span_8_ft: L, ruling_span_sag_ft: L } out: { ruling_span_ft: L, average_span_ft: L, field_approximation_ft: L, longest_span_sag_ft: L, shortest_span_sag_ft: L, approximation_error_ft: L, approximation_error_pct: dimensionless, longest_span_ft: L, ruling_span_sag_ft: L, shortest_span_ft: L, span_count: dimensionless, ruling_to_average_ratio: dimensionless, sag_spread_ratio: dimensionless, sum_l: L, sum_l3: L^3 }
 export function computeRulingSpan({ span_1_ft = 0, span_2_ft = 0, span_3_ft = 0, span_4_ft = 0, span_5_ft = 0, span_6_ft = 0, span_7_ft = 0, span_8_ft = 0, ruling_span_sag_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const entered = [span_1_ft, span_2_ft, span_3_ft, span_4_ft, span_5_ft, span_6_ft, span_7_ft, span_8_ft];
@@ -222,7 +222,7 @@ LINEWORKER_RENDERERS["ruling-span"] = _simpleRenderer({
 
 // ============ spec-v1451: conductor sag change with temperature ============
 
-// dims: in { span_ft: L, area_in2: L^2, weight1_lb_per_ft: M / L, weight2_lb_per_ft: M / L, modulus_psi: M L^-1 T^-2, alpha_per_f: T^-1, tension1_lb: M L T^-2, temp1_f: T, temp2_f: T, rated_strength_lb: M L T^-2 } out: { sag1_ft: L, tension2_lb: M L T^-2, sag2_ft: L, sag_increase_ft: L, tension_change_lb: M L T^-2, sag_increase_pct: dimensionless, tension1_lb: M L T^-2, tension_change_pct: dimensionless }
+// dims: in { span_ft: L, area_in2: L^2, weight1_lb_per_ft: M / L, weight2_lb_per_ft: M / L, modulus_psi: M L^-1 T^-2, alpha_per_f: T^-1, tension1_lb: M L T^-2, temp1_f: T, temp2_f: T, rated_strength_lb: M L T^-2 } out: { sag1_ft: L, tension2_lb: M L T^-2, sag2_ft: L, sag_increase_ft: L, tension_change_lb: M L T^-2, sag_increase_pct: dimensionless, tension1_lb: M L T^-2, tension_change_pct: dimensionless, temp1_f: T, temp2_f: T, tension1_pct_rated: dimensionless, tension2_pct_rated: dimensionless }
 export function computeConductorSagAtTemperature({ span_ft = 0, area_in2 = 0, weight1_lb_per_ft = 0, weight2_lb_per_ft = 0, modulus_psi = 0, alpha_per_f = 0, tension1_lb = 0, temp1_f = 60, temp2_f = 120, rated_strength_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(span_ft > 0)) return { error: "Span must be positive (ft)." };
@@ -306,7 +306,7 @@ LINEWORKER_RENDERERS["conductor-sag-at-temperature"] = _simpleRenderer({
 
 // ============ spec-v1452: conductor blowout and horizontal clearance ============
 
-// dims: in { conductor_diameter_in: L, weight_lb_per_ft: M / L, wind_pressure_psf: M L^-1 T^-2, wind_speed_mph: L / T, sag_ft: L, still_air_clearance_ft: L, insulator_length_ft: L } out: { wind_load_lb_per_ft: M / L, swing_angle_deg: dimensionless, blowout_ft: L, remaining_clearance_ft: L, pressure_at_zero_clearance_psf: M L^-1 T^-2, insulator_length_ft: L, pressure_psf: M L^-1 T^-2, sag_ft: L, still_air_clearance_ft: L, swing_length_ft: L }
+// dims: in { conductor_diameter_in: L, weight_lb_per_ft: M / L, wind_pressure_psf: M L^-1 T^-2, wind_speed_mph: L / T, sag_ft: L, still_air_clearance_ft: L, insulator_length_ft: L } out: { wind_load_lb_per_ft: M / L, swing_angle_deg: dimensionless, blowout_ft: L, remaining_clearance_ft: L, pressure_at_zero_clearance_psf: M L^-1 T^-2, insulator_length_ft: L, pressure_psf: M L^-1 T^-2, sag_ft: L, still_air_clearance_ft: L, swing_length_ft: L, projected_area_ft2_per_ft: L }
 export function computeConductorBlowout({ conductor_diameter_in = 0, weight_lb_per_ft = 0, wind_pressure_psf = 0, wind_speed_mph = 0, sag_ft = 0, still_air_clearance_ft = 0, insulator_length_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(conductor_diameter_in > 0)) return { error: "Conductor diameter must be positive (in)." };
@@ -578,7 +578,7 @@ LINEWORKER_RENDERERS["pole-class-groundline-moment"] = _simpleRenderer({
 
 // ============ spec-v1456: guy anchor holding capacity in soil ============
 
-// dims: in { helix_diameter_in: L, installed_depth_ft: L, cohesion_psf: M L^-1 T^-2, friction_bearing_factor: dimensionless, soil_unit_weight_pcf: M L^-3, factor_of_safety: dimensionless, installing_torque_ftlb: M L^2 T^-2, torque_factor_per_ft: dimensionless, guy_tension_lb: M L T^-2 } out: { helix_area_ft2: L^2, ultimate_capacity_lb: M L T^-2, allowable_capacity_lb: M L T^-2, torque_capacity_lb: M L T^-2, margin_lb: M L T^-2, factor_of_safety: dimensionless, method_ratio: dimensionless }
+// dims: in { helix_diameter_in: L, installed_depth_ft: L, cohesion_psf: M L^-1 T^-2, friction_bearing_factor: dimensionless, soil_unit_weight_pcf: M L^-3, factor_of_safety: dimensionless, installing_torque_ftlb: M L^2 T^-2, torque_factor_per_ft: dimensionless, guy_tension_lb: M L T^-2 } out: { helix_area_ft2: L^2, ultimate_capacity_lb: M L T^-2, allowable_capacity_lb: M L T^-2, torque_capacity_lb: M L T^-2, margin_lb: M L T^-2, factor_of_safety: dimensionless, method_ratio: dimensionless, guy_tension_lb: M L T^-2 }
 export function computeGuyAnchorHoldingCapacity({ helix_diameter_in = 0, installed_depth_ft = 0, cohesion_psf = 0, friction_bearing_factor = 0, soil_unit_weight_pcf = 0, factor_of_safety = 2, installing_torque_ftlb = 0, torque_factor_per_ft = 10, guy_tension_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // Unit / range guard added 2026-09-26 after printed-example probing.
@@ -753,7 +753,7 @@ const _NESC_DISTRICTS = {
   3: { name: "Light", ice_in: 0.00, wind_psf: 9, k: 0.05, temp_f: 30 },
 };
 
-// dims: in { bare_diameter_in: L, bare_weight_lb_per_ft: M / L, district: dimensionless, custom_ice_in: L, custom_wind_psf: M L^-1 T^-2, custom_k_lb_per_ft: M / L, custom_temp_f: T } out: { iced_diameter_in: L, ice_weight_lb_per_ft: M / L, vertical_lb_per_ft: M / L, horizontal_lb_per_ft: M / L, resultant_lb_per_ft: M / L, design_temp_f: T, ice_area_in2: L^2, ice_in: L, k_share_pct: dimensionless }
+// dims: in { bare_diameter_in: L, bare_weight_lb_per_ft: M / L, district: dimensionless, custom_ice_in: L, custom_wind_psf: M L^-1 T^-2, custom_k_lb_per_ft: M / L, custom_temp_f: T } out: { iced_diameter_in: L, ice_weight_lb_per_ft: M / L, vertical_lb_per_ft: M / L, horizontal_lb_per_ft: M / L, resultant_lb_per_ft: M / L, design_temp_f: T, ice_area_in2: L^2, ice_in: L, k_share_pct: dimensionless, bare_weight_lb_per_ft: M / L, ice_multiple: dimensionless, ratio_to_bare: dimensionless, wind_psf: M L^-1 T^-2 }
 export function computeNescDistrictLoading({ bare_diameter_in = 0, bare_weight_lb_per_ft = 0, district = 1, custom_ice_in = 0, custom_wind_psf = 0, custom_k_lb_per_ft = 0, custom_temp_f = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(bare_diameter_in > 0)) return { error: "Bare conductor diameter must be positive (in)." };
@@ -818,7 +818,7 @@ LINEWORKER_RENDERERS["nesc-district-loading"] = _simpleRenderer({
 
 // ============ spec-v1459: conductor long-term creep ============
 
-// dims: in { creep_strain: dimensionless, alpha_per_f: T^-1, span_ft: L, area_in2: L^2, weight_lb_per_ft: M / L, modulus_psi: M L^-1 T^-2, tension1_lb: M L T^-2, design_temp_f: T } out: { equivalent_temp_rise_f: T, sag_design_ft: L, sag_after_creep_ft: L, creep_sag_increase_ft: L, initial_stringing_sag_ft: L, creep_sag_increase_pct: dimensionless, design_temp_f: T, stringing_offset_ft: L }
+// dims: in { creep_strain: dimensionless, alpha_per_f: T^-1, span_ft: L, area_in2: L^2, weight_lb_per_ft: M / L, modulus_psi: M L^-1 T^-2, tension1_lb: M L T^-2, design_temp_f: T } out: { equivalent_temp_rise_f: T, sag_design_ft: L, sag_after_creep_ft: L, creep_sag_increase_ft: L, initial_stringing_sag_ft: L, creep_sag_increase_pct: dimensionless, design_temp_f: T, stringing_offset_ft: L, creep_strain: dimensionless, string_at_temp_f: T }
 export function computeConductorCreepElongation({ creep_strain = 0, alpha_per_f = 0, span_ft = 0, area_in2 = 0, weight_lb_per_ft = 0, modulus_psi = 0, tension1_lb = 0, design_temp_f = 60 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // The page passes a blank box as null, and Number(null) is 0 F; 0 F is a real reading, so a blank cannot stand in for it.
@@ -905,7 +905,7 @@ LINEWORKER_RENDERERS["conductor-creep-elongation"] = _simpleRenderer({
 // and a crew stopping at 2.99 s leaves about 1 ft of sag, twelve times the tension.
 const _RETURN_WAVE_CONSTANT = 32.174 / 32;
 
-// dims: in { elapsed_seconds: T, return_waves: dimensionless, target_sag_ft: L, stopwatch_error_seconds: T } out: { sag_from_timing_ft: L, target_time_seconds: T, period_per_wave_seconds: T, sag_error_ft: L, single_wave_sag_error_ft: L, sag_at_error_ft: L }
+// dims: in { elapsed_seconds: T, return_waves: dimensionless, target_sag_ft: L, stopwatch_error_seconds: T } out: { sag_from_timing_ft: L, target_time_seconds: T, period_per_wave_seconds: T, sag_error_ft: L, single_wave_sag_error_ft: L, sag_at_error_ft: L, error_advantage: dimensionless, reference_sag: L, return_waves: dimensionless, single_wave_time: T, stopwatch_error_seconds: T }
 export function computeSaggingReturnWave({ elapsed_seconds = 0, return_waves = 3, target_sag_ft = 0, stopwatch_error_seconds = 0.2 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const N = return_waves;
@@ -992,7 +992,7 @@ LINEWORKER_RENDERERS["sagging-return-wave"] = _simpleRenderer({
 
 // ============ spec-v1461: distribution transformer diversified loading ============
 
-// dims: in { customers: dimensionless, individual_peak_kva: M L^2 T^-3, diversity_factor: dimensionless, continuous_rating_kva: M L^2 T^-3, short_time_rating_kva: M L^2 T^-3, average_demand_kva: M L^2 T^-3 } out: { connected_kva: M L^2 T^-3, diversified_kva: M L^2 T^-3, continuous_loading_pct: dimensionless, short_time_loading_pct: dimensionless, headroom_customers: dimensionless, load_factor: dimensionless, connected_loading_pct: dimensionless, continuous_rating_kva: M L^2 T^-3, diversity_factor: dimensionless, individual_peak_kva: M L^2 T^-3, short_time_rating_kva: M L^2 T^-3 }
+// dims: in { customers: dimensionless, individual_peak_kva: M L^2 T^-3, diversity_factor: dimensionless, continuous_rating_kva: M L^2 T^-3, short_time_rating_kva: M L^2 T^-3, average_demand_kva: M L^2 T^-3 } out: { connected_kva: M L^2 T^-3, diversified_kva: M L^2 T^-3, continuous_loading_pct: dimensionless, short_time_loading_pct: dimensionless, headroom_customers: dimensionless, load_factor: dimensionless, connected_loading_pct: dimensionless, continuous_rating_kva: M L^2 T^-3, diversity_factor: dimensionless, individual_peak_kva: M L^2 T^-3, short_time_rating_kva: M L^2 T^-3, classic_diversity_factor: dimensionless, customers: dimensionless, customers_at_continuous: dimensionless }
 export function computeTransformerDiversityLoading({ customers = 0, individual_peak_kva = 0, diversity_factor = 0, continuous_rating_kva = 0, short_time_rating_kva = 0, average_demand_kva = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(customers >= 1)) return { error: "Customer count must be at least one." };
@@ -1059,7 +1059,7 @@ LINEWORKER_RENDERERS["transformer-diversity-loading"] = _simpleRenderer({
 
 // ============ spec-v1462: line capacitor bank voltage rise ============
 
-// dims: in { bank_kvar: M L^2 T^-3, line_voltage_kv: M L^2 T^-3 I^-1, reactance_to_source_ohm: M L^2 T^-3 I^-2, peak_load_voltage_v: M L^2 T^-3 I^-1, light_load_voltage_v: M L^2 T^-3 I^-1, upper_limit_v: M L^2 T^-3 I^-1 } out: { rise_pct: dimensionless, rise_volts_120_base: M L^2 T^-3 I^-1, leading_current_a: I, peak_load_result_v: M L^2 T^-3 I^-1, light_load_result_v: M L^2 T^-3 I^-1, max_bank_kvar: M L^2 T^-3, light_load_margin_v: M L^2 T^-3 I^-1, light_load_voltage_v: M L^2 T^-3 I^-1, peak_load_voltage_v: M L^2 T^-3 I^-1, reactance_to_source_ohm: M L^2 T^-3 I^-2, upper_limit_v: M L^2 T^-3 I^-1 }
+// dims: in { bank_kvar: M L^2 T^-3, line_voltage_kv: M L^2 T^-3 I^-1, reactance_to_source_ohm: M L^2 T^-3 I^-2, peak_load_voltage_v: M L^2 T^-3 I^-1, light_load_voltage_v: M L^2 T^-3 I^-1, upper_limit_v: M L^2 T^-3 I^-1 } out: { rise_pct: dimensionless, rise_volts_120_base: M L^2 T^-3 I^-1, leading_current_a: I, peak_load_result_v: M L^2 T^-3 I^-1, light_load_result_v: M L^2 T^-3 I^-1, max_bank_kvar: M L^2 T^-3, light_load_margin_v: M L^2 T^-3 I^-1, light_load_voltage_v: M L^2 T^-3 I^-1, peak_load_voltage_v: M L^2 T^-3 I^-1, reactance_to_source_ohm: M L^2 T^-3 I^-2, upper_limit_v: M L^2 T^-3 I^-1, bank_kvar: M L^2 T^-3, line_voltage_kv: M L^2 T^-3 I^-1 }
 export function computeCapacitorBankVoltageRise({ bank_kvar = 0, line_voltage_kv = 0, reactance_to_source_ohm = 0, peak_load_voltage_v = 118, light_load_voltage_v = 124, upper_limit_v = 126 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(line_voltage_kv > 0)) return { error: "Line-to-line system voltage must be positive (kV)." };
@@ -1121,7 +1121,7 @@ LINEWORKER_RENDERERS["capacitor-bank-voltage-rise"] = _simpleRenderer({
 
 // ============ spec-v1463: step voltage regulator tap and bandwidth ============
 
-// dims: in { base_voltage_v: M L^2 T^-3 I^-1, bandwidth_v: M L^2 T^-3 I^-1, tap_position: dimensionless, load_current_a: I, power_factor: dimensionless, ldc_r_volts: M L^2 T^-3 I^-1, ldc_x_volts: M L^2 T^-3 I^-1, ct_rating_a: I } out: { volts_per_step: M L^2 T^-3 I^-1, bandwidth_steps: dimensionless, band_half_v: M L^2 T^-3 I^-1, full_range_v: M L^2 T^-3 I^-1, output_voltage_v: M L^2 T^-3 I^-1, simulated_drop_v: M L^2 T^-3 I^-1, bandwidth_v: M L^2 T^-3 I^-1, base_voltage_v: M L^2 T^-3 I^-1, ct_rating_a: I, full_range_pct: dimensionless, load_current_a: I, power_factor: dimensionless, tap_change_v: M L^2 T^-3 I^-1, terminal_for_set_point_v: M L^2 T^-3 I^-1, current_ratio: dimensionless }
+// dims: in { base_voltage_v: M L^2 T^-3 I^-1, bandwidth_v: M L^2 T^-3 I^-1, tap_position: dimensionless, load_current_a: I, power_factor: dimensionless, ldc_r_volts: M L^2 T^-3 I^-1, ldc_x_volts: M L^2 T^-3 I^-1, ct_rating_a: I } out: { volts_per_step: M L^2 T^-3 I^-1, bandwidth_steps: dimensionless, band_half_v: M L^2 T^-3 I^-1, full_range_v: M L^2 T^-3 I^-1, output_voltage_v: M L^2 T^-3 I^-1, simulated_drop_v: M L^2 T^-3 I^-1, bandwidth_v: M L^2 T^-3 I^-1, base_voltage_v: M L^2 T^-3 I^-1, ct_rating_a: I, full_range_pct: dimensionless, load_current_a: I, power_factor: dimensionless, tap_change_v: M L^2 T^-3 I^-1, terminal_for_set_point_v: M L^2 T^-3 I^-1, current_ratio: dimensionless, ldc_r_volts: M L^2 T^-3 I^-1, ldc_x_volts: M L^2 T^-3 I^-1, sin_phi: dimensionless, tap_position: dimensionless }
 export function computeRegulatorTapBandwidth({ base_voltage_v = 120, bandwidth_v = 0, tap_position = 0, load_current_a = 0, power_factor = 0.9, ldc_r_volts = 0, ldc_x_volts = 0, ct_rating_a = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(base_voltage_v > 0)) return { error: "Base voltage must be positive (V)." };
@@ -1187,7 +1187,7 @@ LINEWORKER_RENDERERS["regulator-tap-bandwidth"] = _simpleRenderer({
 
 // ============ spec-v1464: recloser-to-fuse coordination screen ============
 
-// dims: in { fault_current_a: I, fast_curve_s: T, slow_curve_s: T, fuse_min_melt_s: T, fuse_total_clear_s: T, heating_factor: dimensionless, system_frequency_hz: T^-1 } out: { heated_fast_s: T, coordination_ratio: dimensionless, margin_s: T, margin_cycles: dimensionless, longest_fast_curve_s: T, blowing_margin_s: T, fault_current_a: I, system_frequency_hz: T^-1 }
+// dims: in { fault_current_a: I, fast_curve_s: T, slow_curve_s: T, fuse_min_melt_s: T, fuse_total_clear_s: T, heating_factor: dimensionless, system_frequency_hz: T^-1 } out: { heated_fast_s: T, coordination_ratio: dimensionless, margin_s: T, margin_cycles: dimensionless, longest_fast_curve_s: T, blowing_margin_s: T, fault_current_a: I, system_frequency_hz: T^-1, blowing_margin_cycles: dimensionless, fast_curve_s: T, fuse_min_melt_s: T, fuse_total_clear_s: T, heating_factor: dimensionless, slow_curve_s: T }
 export function computeRecloserFuseCoordination({ fault_current_a = 0, fast_curve_s = 0, slow_curve_s = 0, fuse_min_melt_s = 0, fuse_total_clear_s = 0, heating_factor = 1.35, system_frequency_hz = 60 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(fault_current_a > 0)) return { error: "Fault current at the branch must be positive (A)." };
@@ -1257,7 +1257,7 @@ LINEWORKER_RENDERERS["recloser-fuse-coordination"] = _simpleRenderer({
 
 // ============ spec-v1465: distribution feeder I2R loss and loss factor ============
 
-// dims: in { peak_current_a: I, resistance_ohm_per_mile: M L^2 T^-3 I^-2, length_miles: L, load_factor: dimensionless, energy_cost_per_kwh: dimensionless, peak_demand_kw: M L^2 T^-3, loss_factor_k: dimensionless } out: { total_resistance_ohm: M L^2 T^-3 I^-2, peak_loss_kw: M L^2 T^-3, loss_factor: dimensionless, annual_loss_kwh: M L^2 T^-2, annual_cost: dimensionless, loss_percent_of_delivered: dimensionless, delivered_kwh: M L^2 T^-2, energy_cost_per_kwh: dimensionless, hours_per_year: T, load_factor: dimensionless, load_factor_overstatement_pct: dimensionless, peak_current_a: I, using_load_factor_kwh: M L^2 T^-2 }
+// dims: in { peak_current_a: I, resistance_ohm_per_mile: M L^2 T^-3 I^-2, length_miles: L, load_factor: dimensionless, energy_cost_per_kwh: dimensionless, peak_demand_kw: M L^2 T^-3, loss_factor_k: dimensionless } out: { total_resistance_ohm: M L^2 T^-3 I^-2, peak_loss_kw: M L^2 T^-3, loss_factor: dimensionless, annual_loss_kwh: M L^2 T^-2, annual_cost: dimensionless, loss_percent_of_delivered: dimensionless, delivered_kwh: M L^2 T^-2, energy_cost_per_kwh: dimensionless, hours_per_year: T, load_factor: dimensionless, load_factor_overstatement_pct: dimensionless, peak_current_a: I, using_load_factor_kwh: M L^2 T^-2, peak_all_year_kwh: M L^2 T^-2, peak_overstatement_x: dimensionless }
 export function computeFeederLossLoadFactor({ peak_current_a = 0, resistance_ohm_per_mile = 0, length_miles = 0, load_factor = 0, energy_cost_per_kwh = 0, peak_demand_kw = 0, loss_factor_k = 0.3 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(peak_current_a > 0)) return { error: "Peak current per phase must be positive (A)." };
@@ -1321,7 +1321,7 @@ LINEWORKER_RENDERERS["feeder-loss-load-factor"] = _simpleRenderer({
 
 // ============ spec-v1466: watt-hour meter CT / PT multiplier ============
 
-// dims: in { ct_primary_a: I, ct_secondary_a: I, pt_primary_v: M L^2 T^-3 I^-1, pt_secondary_v: M L^2 T^-3 I^-1, register_constant: dimensionless, register_reading_kwh: M L^2 T^-2, demand_register_kw: M L^2 T^-3, service_voltage_kv: M L^2 T^-3 I^-1, ct_rating_factor: dimensionless } out: { ct_ratio: dimensionless, pt_ratio: dimensionless, multiplier: dimensionless, billed_kwh: M L^2 T^-2, implied_demand_kw: M L^2 T^-3, implied_current_a: I, ct_continuous_a: I, ct_primary_a: I, ct_secondary_a: I, ct_utilization_pct: dimensionless, demand_register_kw: M L^2 T^-3, pt_primary_v: M L^2 T^-3 I^-1, pt_secondary_v: M L^2 T^-3 I^-1, register_reading_kwh: M L^2 T^-2 }
+// dims: in { ct_primary_a: I, ct_secondary_a: I, pt_primary_v: M L^2 T^-3 I^-1, pt_secondary_v: M L^2 T^-3 I^-1, register_constant: dimensionless, register_reading_kwh: M L^2 T^-2, demand_register_kw: M L^2 T^-3, service_voltage_kv: M L^2 T^-3 I^-1, ct_rating_factor: dimensionless } out: { ct_ratio: dimensionless, pt_ratio: dimensionless, multiplier: dimensionless, billed_kwh: M L^2 T^-2, implied_demand_kw: M L^2 T^-3, implied_current_a: I, ct_continuous_a: I, ct_primary_a: I, ct_secondary_a: I, ct_utilization_pct: dimensionless, demand_register_kw: M L^2 T^-3, pt_primary_v: M L^2 T^-3 I^-1, pt_secondary_v: M L^2 T^-3 I^-1, register_reading_kwh: M L^2 T^-2, ct_rating_factor: dimensionless, register_constant: dimensionless, service_voltage_kv: M L^2 T^-3 I^-1 }
 export function computeMeterCtPtMultiplier({ ct_primary_a = 0, ct_secondary_a = 5, pt_primary_v = 0, pt_secondary_v = 120, register_constant = 1, register_reading_kwh = 0, demand_register_kw = 0, service_voltage_kv = 0, ct_rating_factor = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // Unit / range guard added 2026-09-26 after printed-example probing.
@@ -1397,7 +1397,7 @@ LINEWORKER_RENDERERS["meter-ct-pt-multiplier"] = _simpleRenderer({
 
 // ============ spec-v1467: counterpoise and radial ground array resistance ============
 
-// dims: in { soil_resistivity_ohm_cm: M L^3 T^-3 I^-2, length_ft: L, burial_depth_in: L, wire_diameter_in: L, radials: dimensionless, coupling_penalty: dimensionless, target_resistance_ohm: M L^2 T^-3 I^-2 } out: { single_wire_ohm: M L^2 T^-3 I^-2, array_ohm: M L^2 T^-3 I^-2, ideal_parallel_ohm: M L^2 T^-3 I^-2, coupling_cost_ohm: M L^2 T^-3 I^-2, length_for_target_ft: L, burial_depth_in: L, double_length_ohm: M L^2 T^-3 I^-2, length_ft: L, soil_resistivity_ohm_cm: M L^3 T^-3 I^-2, target_resistance_ohm: M L^2 T^-3 I^-2, wire_diameter_in: L }
+// dims: in { soil_resistivity_ohm_cm: M L^3 T^-3 I^-2, length_ft: L, burial_depth_in: L, wire_diameter_in: L, radials: dimensionless, coupling_penalty: dimensionless, target_resistance_ohm: M L^2 T^-3 I^-2 } out: { single_wire_ohm: M L^2 T^-3 I^-2, array_ohm: M L^2 T^-3 I^-2, ideal_parallel_ohm: M L^2 T^-3 I^-2, coupling_cost_ohm: M L^2 T^-3 I^-2, length_for_target_ft: L, burial_depth_in: L, double_length_ohm: M L^2 T^-3 I^-2, length_ft: L, soil_resistivity_ohm_cm: M L^3 T^-3 I^-2, target_resistance_ohm: M L^2 T^-3 I^-2, wire_diameter_in: L, coupling_penalty: dimensionless, doubling_improvement_x: dimensionless, radials: dimensionless }
 export function computeCounterpoiseResistance({ soil_resistivity_ohm_cm = 0, length_ft = 0, burial_depth_in = 0, wire_diameter_in = 0, radials = 1, coupling_penalty = 1.5, target_resistance_ohm = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(soil_resistivity_ohm_cm > 0)) return { error: "Soil resistivity must be positive (ohm-cm)." };
@@ -1498,7 +1498,7 @@ LINEWORKER_RENDERERS["counterpoise-resistance"] = _simpleRenderer({
 // image above grade / distance to the neighbour). That sum is what identifies
 // the governing duct. It is NOT the derate factor -- the factor also depends on
 // the cable's own thermal resistances and comes from the standard.
-// dims: in { ducts_across: dimensionless, ducts_down: dimensionless, loaded_ducts: dimensionless, spacing_in: L, depth_to_top_in: L, base_table_ampacity_a: I, derate_factor: dimensionless, alt_derate_factor: dimensionless, target_load_a: I } out: { derated_ampacity_a: I, alt_derated_ampacity_a: I, required_table_ampacity_a: I, governing_mutual_heat: dimensionless, heat_spread_pct: dimensionless, lost_a: I }
+// dims: in { ducts_across: dimensionless, ducts_down: dimensionless, loaded_ducts: dimensionless, spacing_in: L, depth_to_top_in: L, base_table_ampacity_a: I, derate_factor: dimensionless, alt_derate_factor: dimensionless, target_load_a: I } out: { derated_ampacity_a: I, alt_derated_ampacity_a: I, required_table_ampacity_a: I, governing_mutual_heat: dimensionless, heat_spread_pct: dimensionless, lost_a: I, coolest_mutual_heat: dimensionless, governing_col: dimensionless, governing_row: dimensionless, total_ducts: dimensionless }
 export function computeDuctBankAmpacityDerate({
   ducts_across = 0, ducts_down = 0, loaded_ducts = 0,
   spacing_in = 0, depth_to_top_in = 0,

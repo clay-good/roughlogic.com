@@ -161,7 +161,7 @@ export function pipeSizingFromPreset(presetId) {
   return computePipeSizing({ fixtures: p.fixtures, slope_in_per_ft: 0.25 });
 }
 
-// dims: in { fixtures: dimensionless, slope_in_per_ft: dimensionless } out: { wsfu: dimensionless, dfu: dimensionless, total_dfu: dimensionless, estimated_demand_gpm: L^3 T^-1 }
+// dims: in { fixtures: dimensionless, slope_in_per_ft: dimensionless } out: { wsfu: dimensionless, dfu: dimensionless, total_dfu: dimensionless, estimated_demand_gpm: L^3 T^-1, total_wsfu: dimensionless }
 export function computePipeSizing({ fixtures, slope_in_per_ft = 0.25 }) {
   let wsfu = 0;
   let dfu = 0;
@@ -232,7 +232,7 @@ function _v8frictionVelocityFlag(v_ft_s) {
   return "within typical (≤5 ft/s)";
 }
 
-// dims: in { method: dimensionless, material: dimensionless, nominal_size: L, length_ft: L, flow_gpm: L^3 T^-1, internal_diameter_in: L } out: { headLoss_ft: L, pressureLoss_psi: M L^-1 T^-2, internal_diameter_in: L }
+// dims: in { method: dimensionless, material: dimensionless, nominal_size: L, length_ft: L, flow_gpm: L^3 T^-1, internal_diameter_in: L } out: { headLoss_ft: L, pressureLoss_psi: M L^-1 T^-2, internal_diameter_in: L, velocity_ft_s: L T^-1 }
 export function computeFrictionLoss({ method, material, nominal_size, length_ft, flow_gpm, internal_diameter_in }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const d = internal_diameter_in || (FRICTION_ID_BY_MATERIAL[material] || SCH40_ID_IN)[String(nominal_size)];
@@ -280,7 +280,7 @@ export const frictionLossExample = {
 
 // --- Utility 14: Pipe Volume ---
 
-// dims: in { internal_diameter_in: L, length_ft: L, nominal_size: L } out: { gallons: L^3, cubic_feet: L^3 }
+// dims: in { internal_diameter_in: L, length_ft: L, nominal_size: L } out: { gallons: L^3, cubic_feet: L^3, gallons_per_ft: L^2 }
 export function computePipeVolume({ internal_diameter_in, length_ft, nominal_size }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // Until 2026-09-26 a negative entry here returned a negative quantity with no error.
@@ -340,7 +340,7 @@ export const staticPressurePipingExample = {
 
 // --- Utility 18: Slope ---
 
-// dims: in { rise: L, run: L, units: dimensionless } out: { percent: dimensionless, degrees: dimensionless, fraction: dimensionless }
+// dims: in { rise: L, run: L, units: dimensionless } out: { percent: dimensionless, degrees: dimensionless, fraction: dimensionless, in_per_ft: dimensionless }
 export function computeSlope({ rise, run, units = "in_per_ft" }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // A missing rise (or, in rise/run mode, a missing run) used to come back as empty
@@ -625,7 +625,7 @@ export const PDI_WH_ARRESTOR_SIZES = [
   { designation: "AA-F", max_wsfu: 330 },
 ];
 
-// dims: in { wsfu: dimensionless, length_ft: L, internal_diameter_in: L, system_pressure_psi: M L^-1 T^-2 } out: { pipe_diameter_in: L, precharge_psi: M L^-1 T^-2 }
+// dims: in { wsfu: dimensionless, length_ft: L, internal_diameter_in: L, system_pressure_psi: M L^-1 T^-2 } out: { pipe_diameter_in: L, precharge_psi: M L^-1 T^-2, wsfu_total: dimensionless }
 export function computeWaterHammerArrestor({ wsfu, length_ft = 0, internal_diameter_in = 0, system_pressure_psi = 0 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   internal_diameter_in = Number(internal_diameter_in);
@@ -744,7 +744,7 @@ export const PIPE_EXPANSION_ALPHA_PER_F = {
   steel: 6.5e-6,
 };
 
-// dims: in { material: dimensionless, length_ft: L, delta_T_F: T } out: { delta_L_in: L, delta_T_F: T, length_ft: L }
+// dims: in { material: dimensionless, length_ft: L, delta_T_F: T } out: { delta_L_in: L, delta_T_F: T, length_ft: L, alpha_per_F: T^-1 }
 export function computePipeExpansion({ material, length_ft, delta_T_F }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const alpha = PIPE_EXPANSION_ALPHA_PER_F[material];
@@ -777,7 +777,7 @@ export const TANKLESS_INLET_F_BY_ZONE = {
   "7_Duluth_MN": 40,
 };
 
-// dims: in { kbtu_input: M L^2 T^-3, climate_zone: dimensionless, target_outlet_F: T, solve_for: dimensionless, target_gpm: L^3 T^-1, inlet_override_F: T } out: { gpm: L^3 T^-1, kbtu_input: M L^2 T^-3, delta_T_F: T }
+// dims: in { kbtu_input: M L^2 T^-3, climate_zone: dimensionless, target_outlet_F: T, solve_for: dimensionless, target_gpm: L^3 T^-1, inlet_override_F: T } out: { gpm: L^3 T^-1, kbtu_input: M L^2 T^-3, delta_T_F: T, inlet_F: T, target_outlet_F: T }
 export function computeTanklessGPM({ kbtu_input, climate_zone, target_outlet_F = 110, solve_for = "gpm", target_gpm = 0, inlet_override_F = 0, thermal_efficiency = 0.82 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // The burner's INPUT rating times its thermal efficiency is the heat the water
@@ -1302,7 +1302,7 @@ function rhoAt(F) {
   return t[0].rho;
 }
 
-// dims: in { system_volume_gal: L^3, fill_temperature_F: T, max_temperature_F: T, fill_pressure_psi: M L^-1 T^-2, relief_pressure_psi: M L^-1 T^-2 } out: { tank_volume_gal: L^3, precharge_psi: M L^-1 T^-2 }
+// dims: in { system_volume_gal: L^3, fill_temperature_F: T, max_temperature_F: T, fill_pressure_psi: M L^-1 T^-2, relief_pressure_psi: M L^-1 T^-2 } out: { tank_volume_gal: L^3, precharge_psi: M L^-1 T^-2, P_final_abs: M L^-1 T^-2, P_initial_abs: M L^-1 T^-2 }
 export function computeExpansionTank({ system_volume_gal = 0, fill_temperature_F = 60, max_temperature_F = 200, fill_pressure_psi = 12, relief_pressure_psi = 30 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // The page passes a blank box as null, and Number(null) is 0 F; 0 F is a real reading, so a blank cannot stand in for it.
@@ -1658,7 +1658,7 @@ export const FLUID_PROPERTIES = {
   glycol_50:    { K_psi: 322000, rho_slug_ft3: 2.045, label: "50% propylene glycol" },
 };
 
-// dims: in { material: dimensionless, pipe_size: dimensionless, velocity_fps: L T^-1, closure_time_s: T, run_length_ft: L, fluid: dimensionless } out: { celerity_fps: L T^-1, surge_psi: M L^-1 T^-2, d_over_t: dimensionless }
+// dims: in { material: dimensionless, pipe_size: dimensionless, velocity_fps: L T^-1, closure_time_s: T, run_length_ft: L, fluid: dimensionless } out: { celerity_fps: L T^-1, surge_psi: M L^-1 T^-2, d_over_t: dimensionless, reflection_time_s: T }
 export function computeWaterHammerSurge({
   material = "copper",
   pipe_size = "1",
@@ -1815,7 +1815,7 @@ export const THERMAL_EXPANSION_COEFFICIENTS = {
   pvc:           { alpha_per_F: 3.0e-5,  E_psi: 420000,  S_a_psi: 2000,  description: "PVC Schedule 80" },
 };
 
-// dims: in { material: dimensionless, length_ft: L, delta_T_F: T, pipe_OD_in: L } out: { delta_L_in: L, loop_leg_in: L, loop_leg_ft: L }
+// dims: in { material: dimensionless, length_ft: L, delta_T_F: T, pipe_OD_in: L } out: { delta_L_in: L, loop_leg_in: L, loop_leg_ft: L, alpha_per_F: T^-1 }
 export function computePipeExpansionLoop({
   material = "copper",
   length_ft = 0,
@@ -2078,7 +2078,7 @@ function _interpInsulationU(row, t) {
   return row[String(keys[0])];
 }
 
-// dims: in { loop_length_ft: L, nominal_size_in: L, insulation_in: L, hot_supply_F: T, ambient_F: T, set_point_delta_F: T, fuel: dimensionless, heater_efficiency: dimensionless, runtime_hr_per_year: T, fuel_price: dimensionless } out: { flow_gpm: L^3 T^-1, head_ft: L, pressure_psi: M L^-1 T^-2, recommended_hp: M L^2 T^-3, heater_efficiency: dimensionless, runtime_hr_per_year: T }
+// dims: in { loop_length_ft: L, nominal_size_in: L, insulation_in: L, hot_supply_F: T, ambient_F: T, set_point_delta_F: T, fuel: dimensionless, heater_efficiency: dimensionless, runtime_hr_per_year: T, fuel_price: dimensionless } out: { flow_gpm: L^3 T^-1, head_ft: L, pressure_psi: M L^-1 T^-2, recommended_hp: M L^2 T^-3, heater_efficiency: dimensionless, runtime_hr_per_year: T, Q_total_btu_hr: M L^2 T^-3, annual_energy_units: M L^2 T^-2, annual_loss_btu: M L^2 T^-2, gpm_required: L^3 T^-1, q_per_ft_btu_hr: M L T^-3 }
 export function computeRecircLoopSizing({
   loop_length_ft = 0,
   nominal_size_in = "0.75",
@@ -2688,7 +2688,7 @@ export const SANITARY_BUILDING_DRAIN_MAX_DFU = {
   "0.5": { 1.25: 1, 1.5: 3, 2: 26, 2.5: 31, 3: 50, 4: 250, 5: 575, 6: 1000, 8: 2300, 10: 4200, 12: 6700, 15: 12000 },
 };
 
-// dims: in { fixtures: dimensionless, config: dimensionless, slope_in_per_ft: dimensionless, proposed_size_in: L, branch_intervals: dimensionless } out: { total_dfu: dimensionless, min_size_in: L, slope_in_per_ft: dimensionless }
+// dims: in { fixtures: dimensionless, config: dimensionless, slope_in_per_ft: dimensionless, proposed_size_in: L, branch_intervals: dimensionless } out: { total_dfu: dimensionless, min_size_in: L, slope_in_per_ft: dimensionless, capacity_at_size: dimensionless }
 export function computeSanitaryDfu({
   fixtures = {},
   config = "horizontal_branch",
@@ -2872,7 +2872,7 @@ export const TRAP_PRIMER_DRAINS_PER_UNIT = {
   pump_discharge: 4,
 };
 
-// dims: in { floor_drain_count: dimensionless, zone: dimensionless, prime_method: dimensionless, prime_volume_oz: L^3, cycles_per_day: T^-1 } out: { primers_needed: dimensionless, water_gal_per_year: L^3 T^-1, floor_drain_count: dimensionless }
+// dims: in { floor_drain_count: dimensionless, zone: dimensionless, prime_method: dimensionless, prime_volume_oz: L^3, cycles_per_day: T^-1 } out: { primers_needed: dimensionless, water_gal_per_year: L^3 T^-1, floor_drain_count: dimensionless, drains_per_unit: dimensionless }
 export function computeTrapPrimer({
   floor_drain_count = 0,
   zone = "occupied",
@@ -3266,7 +3266,7 @@ function waterDensityAtF(tF) {
   }
   return tbl[tbl.length - 1][1];
 }
-// dims: in { volume_gal: L^3, cold_f: T, hot_f: T } out: { expansion_gal: L^3, expansion_pct: dimensionless }
+// dims: in { volume_gal: L^3, cold_f: T, hot_f: T } out: { expansion_gal: L^3, expansion_pct: dimensionless, rho_cold: M L^-3, rho_hot: M L^-3 }
 export function computeThermalExpansionVolume({ volume_gal = 0, cold_f = 0, hot_f = 0, closed_system = true } = {}) {
   const V = Number(volume_gal) || 0;
   const tc = Number(cold_f), th = Number(hot_f);
@@ -4287,7 +4287,7 @@ function _v641renderChannelNormalDepth(inputRegion, outputRegion, citationEl) {
 }
 PLUMBING_RENDERERS["channel-normal-depth"] = _v641renderChannelNormalDepth;
 
-// dims: in { b_ft: L, q_cfs: L^3 T^-1, y1_ft: L } out: { v1_fps: L T^-1, fr1: dimensionless, y2_ft: L, fr2: dimensionless, de_ft: L, efficiency: dimensionless, height_ft: L, v2_fps: L T^-1 }
+// dims: in { b_ft: L, q_cfs: L^3 T^-1, y1_ft: L } out: { v1_fps: L T^-1, fr1: dimensionless, y2_ft: L, fr2: dimensionless, de_ft: L, efficiency: dimensionless, height_ft: L, v2_fps: L T^-1, e1: L, e2: L }
 export function computeHydraulicJump({ b_ft = 0, q_cfs = 0, y1_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(b_ft > 0)) return { error: "Channel width must be positive (ft)." };
@@ -4334,7 +4334,7 @@ function _v632renderHydraulicJump(inputRegion, outputRegion, citationEl) {
 }
 PLUMBING_RENDERERS["hydraulic-jump"] = _v632renderHydraulicJump;
 
-// dims: in { b_ft: L, q_cfs: L^3 T^-1, y_ft: L } out: { v_fps: L T^-1, e_ft: L, yc_ft: L, ec_ft: L, fr: dimensionless, y_alt_ft: L }
+// dims: in { b_ft: L, q_cfs: L^3 T^-1, y_ft: L } out: { v_fps: L T^-1, e_ft: L, yc_ft: L, ec_ft: L, fr: dimensionless, y_alt_ft: L, q_unit: L^2 T^-1 }
 export function computeSpecificEnergy({ b_ft = 0, q_cfs = 0, y_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(b_ft > 0)) return { error: "Channel width must be positive (ft)." };

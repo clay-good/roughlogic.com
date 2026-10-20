@@ -101,7 +101,7 @@ const _AIR_BTU_PER_CUFT_F = 0.018;
 
 // ===================== spec-v1648: traction roping ratio =====================
 
-// dims: in { roping_ratio: dimensionless, car_speed_fpm: L T^-1, sheave_diameter_in: L, unbalanced_load_lb: M L T^-2, suspended_load_lb: M L T^-2, rope_count: dimensionless, machine_rated_torque_ftlb: M L^2 T^-2, alternative_roping_ratio: dimensionless } out: { rope_speed_fpm: L T^-1, sheave_rpm: T^-1, sheave_torque_ftlb: M L^2 T^-2, tension_per_rope_lb: M L T^-2, power_hp: M L^2 T^-3, alt_rope_speed_fpm: L T^-1, alt_sheave_rpm: T^-1, torque_margin_pct: dimensionless }
+// dims: in { roping_ratio: dimensionless, car_speed_fpm: L T^-1, sheave_diameter_in: L, unbalanced_load_lb: M L T^-2, suspended_load_lb: M L T^-2, rope_count: dimensionless, machine_rated_torque_ftlb: M L^2 T^-2, alternative_roping_ratio: dimensionless } out: { rope_speed_fpm: L T^-1, sheave_rpm: T^-1, sheave_torque_ftlb: M L^2 T^-2, tension_per_rope_lb: M L T^-2, power_hp: M L^2 T^-3, alt_rope_speed_fpm: L T^-1, alt_sheave_rpm: T^-1, torque_margin_pct: dimensionless, rope_travel_per_car_ft: dimensionless }
 export function computeTractionRopingRatio({ roping_ratio = 2, car_speed_fpm = 0, sheave_diameter_in = 0, unbalanced_load_lb = 0, suspended_load_lb = 0, rope_count = 0, machine_rated_torque_ftlb = 0, alternative_roping_ratio = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(roping_ratio >= 1)) return { error: "Roping ratio must be at least 1." };
@@ -212,7 +212,7 @@ ELEVATOR_RENDERERS["counterweight-balance"] = _simpleRenderer({
 
 // ===================== spec-v1650: suspension rope factor of safety =====================
 
-// dims: in { car_weight_lb: M L T^-2, rated_load_lb: M L T^-2, travelling_cable_lb: M L T^-2, rope_count: dimensionless, rope_weight_per_ft: M T^-2, rope_breaking_strength_lb: M L T^-2, rise_ft: L, code_minimum_fs: dimensionless } out: { rope_weight_lb: M L T^-2, suspended_load_lb: M L T^-2, breaking_total_lb: M L T^-2, factor_of_safety: dimensionless, max_rated_load_lb: M L T^-2, margin: dimensionless }
+// dims: in { car_weight_lb: M L T^-2, rated_load_lb: M L T^-2, travelling_cable_lb: M L T^-2, rope_count: dimensionless, rope_weight_per_ft: M T^-2, rope_breaking_strength_lb: M L T^-2, rise_ft: L, code_minimum_fs: dimensionless } out: { rope_weight_lb: M L T^-2, suspended_load_lb: M L T^-2, breaking_total_lb: M L T^-2, factor_of_safety: dimensionless, max_rated_load_lb: M L T^-2, margin: dimensionless, fs_without_rope_weight: dimensionless, overstatement: dimensionless }
 export function computeElevatorRopeSafetyFactor({ car_weight_lb = 0, rated_load_lb = 0, travelling_cable_lb = 0, rope_count = 0, rope_weight_per_ft = 0, rope_breaking_strength_lb = 0, rise_ft = 0, code_minimum_fs = 0, roping_ratio = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(car_weight_lb > 0)) return { error: "Car weight must be positive." };
@@ -338,7 +338,7 @@ ELEVATOR_RENDERERS["buffer-stroke-speed"] = _simpleRenderer({
 
 // ===================== spec-v1652: hoistway venting and pressurization =====================
 
-// dims: in { hoistway_plan_area_sqft: L^2, vent_fraction_pct: dimensionless, door_width_in: L, door_height_in: L, pressure_diff_inwc: M L^-1 T^-2, door_force_limit_lbf: M L T^-2, leakage_area_sqft: L^2 } out: { vent_area_sqft: L^2, door_area_sqft: L^2, door_force_added_lbf: M L T^-2, max_pressure_inwc: M L^-1 T^-2, supply_airflow_cfm: L^3 T^-1, door_force_total_lbf: M L T^-2 }
+// dims: in { hoistway_plan_area_sqft: L^2, vent_fraction_pct: dimensionless, door_width_in: L, door_height_in: L, pressure_diff_inwc: M L^-1 T^-2, door_force_limit_lbf: M L T^-2, leakage_area_sqft: L^2 } out: { vent_area_sqft: L^2, door_area_sqft: L^2, door_force_added_lbf: M L T^-2, max_pressure_inwc: M L^-1 T^-2, supply_airflow_cfm: L^3 T^-1, door_force_total_lbf: M L T^-2, knob_factor: dimensionless }
 export function computeHoistwayVenting({ hoistway_plan_area_sqft = 0, vent_fraction_pct = 3.5, door_width_in = 0, door_height_in = 0, pressure_diff_inwc = 0, door_force_limit_lbf = 0, leakage_area_sqft = 0, closer_force_lbf = 0, knob_offset_in = 3, car_count = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(hoistway_plan_area_sqft > 0)) return { error: "Hoistway plan area must be positive." };
@@ -402,7 +402,7 @@ ELEVATOR_RENDERERS["hoistway-venting"] = _simpleRenderer({
 
 // ===================== spec-v1653: machine room heat load =====================
 
-// dims: in { input_power_kw: M L^2 T^-3, efficiency_pct: dimensionless, duty_cycle_pct: dimensionless, controller_standby_w: M L^2 T^-3, other_gains_btuh: M L^2 T^-3, room_volume_cuft: L^3, ambient_limit_f: T, starting_temp_f: T } out: { heat_running_btuh: M L^2 T^-3, heat_average_btuh: M L^2 T^-3, total_btuh: M L^2 T^-3, cooling_tons: M L^2 T^-3, temp_rise_f_per_hr: T, connected_btuh: M L^2 T^-3, controller_btuh: M L^2 T^-3 }
+// dims: in { input_power_kw: M L^2 T^-3, efficiency_pct: dimensionless, duty_cycle_pct: dimensionless, controller_standby_w: M L^2 T^-3, other_gains_btuh: M L^2 T^-3, room_volume_cuft: L^3, ambient_limit_f: T, starting_temp_f: T } out: { heat_running_btuh: M L^2 T^-3, heat_average_btuh: M L^2 T^-3, total_btuh: M L^2 T^-3, cooling_tons: M L^2 T^-3, temp_rise_f_per_hr: T, connected_btuh: M L^2 T^-3, controller_btuh: M L^2 T^-3, connected_overstatement: dimensionless, hours_to_limit: T, minutes_to_limit: T }
 export function computeMachineRoomHeat({ input_power_kw = 0, efficiency_pct = 85, duty_cycle_pct = 40, controller_standby_w = 0, other_gains_btuh = 0, room_volume_cuft = 0, ambient_limit_f = 104, starting_temp_f = 80 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // A cleared starting temperature means the stated 80 F default, not a room at 0 F (four times the warning).
@@ -573,7 +573,7 @@ ELEVATOR_RENDERERS["step-chain-tension"] = _simpleRenderer({
 
 // ===================== spec-v1656: door closing force and kinetic energy =====================
 
-// dims: in { door_mass_lb: M L T^-2, closing_speed_fps: L T^-1, ke_limit_normal_ftlb: M L^2 T^-2, ke_limit_reduced_ftlb: M L^2 T^-2, measured_force_lbf: M L T^-2, force_limit_lbf: M L T^-2, opening_width_in: L, added_mass_lb: M L T^-2 } out: { kinetic_energy_ftlb: M L^2 T^-2, speed_for_reduced_limit_fps: L T^-1, closing_time_s: T, ke_with_added_mass_ftlb: M L^2 T^-2, speed_change_pct: dimensionless }
+// dims: in { door_mass_lb: M L T^-2, closing_speed_fps: L T^-1, ke_limit_normal_ftlb: M L^2 T^-2, ke_limit_reduced_ftlb: M L^2 T^-2, measured_force_lbf: M L T^-2, force_limit_lbf: M L T^-2, opening_width_in: L, added_mass_lb: M L T^-2 } out: { kinetic_energy_ftlb: M L^2 T^-2, speed_for_reduced_limit_fps: L T^-1, closing_time_s: T, ke_with_added_mass_ftlb: M L^2 T^-2, speed_change_pct: dimensionless, closing_time_at_limit_s: T, closing_time_change_s: T }
 export function computeDoorClosingEnergy({ door_mass_lb = 0, closing_speed_fps = 0, ke_limit_normal_ftlb = 0, ke_limit_reduced_ftlb = 0, measured_force_lbf = 0, force_limit_lbf = 0, opening_width_in = 0, added_mass_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // Unit / range guard added 2026-09-26 after printed-example probing.

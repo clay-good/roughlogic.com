@@ -183,7 +183,7 @@ const _OUT_OF_TABLE = (refrigerant) => "Outside the bundled saturation tables fo
 
 // --- Utility 25: Refrigerant P-T Lookup ---
 
-// dims: in { refrigerant: dimensionless, pressure_psig: M L^-1 T^-2, temperature_F: T, outdoor_F: T, indoor_wb_F: T } out: { pressure_psig: M L^-1 T^-2, target_superheat_F: T }
+// dims: in { refrigerant: dimensionless, pressure_psig: M L^-1 T^-2, temperature_F: T, outdoor_F: T, indoor_wb_F: T } out: { pressure_psig: M L^-1 T^-2, target_superheat_F: T, saturated_temperature_F: T }
 export function computeRefrigerantPT({ refrigerant, pressure_psig = null, temperature_F = null, outdoor_F = null, indoor_wb_F = null }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const r = REFRIGERANTS[refrigerant];
@@ -236,7 +236,7 @@ function _v8shScDiagnostic(value, mode) {
   return null;
 }
 
-// dims: in { refrigerant: dimensionless, system_pressure_psig: M L^-1 T^-2, line_temperature_F: T, mode: dimensionless, indoor_wet_bulb_F: T, outdoor_dry_bulb_F: T, deadband_F: T } out: { target_superheat_F: T }
+// dims: in { refrigerant: dimensionless, system_pressure_psig: M L^-1 T^-2, line_temperature_F: T, mode: dimensionless, indoor_wet_bulb_F: T, outdoor_dry_bulb_F: T, deadband_F: T } out: { target_superheat_F: T, saturated_temperature_F: T, superheat_F: T }
 export function computeSuperheatSubcool({ refrigerant, system_pressure_psig, line_temperature_F, mode, indoor_wet_bulb_F = 0, outdoor_dry_bulb_F = null, deadband_F = 5, target_subcool_F = 0 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const r = REFRIGERANTS[refrigerant];
@@ -432,7 +432,7 @@ function _interpRefSatT(refrigerant, psia, dew = false) {
   return NaN;
 }
 
-// dims: in { refrigerant: dimensionless, suction_pressure: M L^-1 T^-2, suction_unit: dimensionless, suction_line_temp_F: T, liquid_pressure: M L^-1 T^-2, liquid_unit: dimensionless, liquid_line_temp_F: T } out: { suction_psia: M L^-1 T^-2, liquid_psia: M L^-1 T^-2 }
+// dims: in { refrigerant: dimensionless, suction_pressure: M L^-1 T^-2, suction_unit: dimensionless, suction_line_temp_F: T, liquid_pressure: M L^-1 T^-2, liquid_unit: dimensionless, liquid_line_temp_F: T } out: { suction_psia: M L^-1 T^-2, liquid_psia: M L^-1 T^-2, T_sat_liquid_F: T, T_sat_suction_F: T, subcool_F: T, superheat_F: T }
 export function computeRefrigerantCharging({
   refrigerant = "R_410A",
   suction_pressure = 0, suction_unit = "psig", suction_line_temp_F = null,
@@ -875,7 +875,7 @@ REFRIGERANT_RENDERERS["condenser-cop-for-heat-rejection"] = _renderCondenserCopF
 
 // ===================== spec-v432..v434: walk-in refrigeration trio (Group C) =====================
 
-// dims: in { u_factor: dimensionless, area_ft2: L^2, delta_t_f: T, infiltration_btuh: M L^2 T^-3, product_btuh: M L^2 T^-3, internal_btuh: M L^2 T^-3, safety: dimensionless, run_hours: T } out: { transmission_btuh: M L^2 T^-3, total_btuh: M L^2 T^-3, tons: M, equipment_btuh: M L^2 T^-3, run_hours: T, subtotal_btuh: M L^2 T^-3 }
+// dims: in { u_factor: dimensionless, area_ft2: L^2, delta_t_f: T, infiltration_btuh: M L^2 T^-3, product_btuh: M L^2 T^-3, internal_btuh: M L^2 T^-3, safety: dimensionless, run_hours: T } out: { transmission_btuh: M L^2 T^-3, total_btuh: M L^2 T^-3, tons: M, equipment_btuh: M L^2 T^-3, run_hours: T, subtotal_btuh: M L^2 T^-3, equipment_tons: M L^2 T^-3 }
 export function computeWalkInCoolerLoad({ u_factor = 0, area_ft2 = 0, delta_t_f = 0, infiltration_btuh = 0, product_btuh = 0, internal_btuh = 0, safety = 1.10, run_hours = 16 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const u = Number(u_factor) || 0;
@@ -1005,7 +1005,7 @@ REFRIGERANT_RENDERERS["product-pull-down-load"] = _v433renderProductPullDownLoad
 // gives rate = Q / hours; given the refrigeration capacity dedicated to the
 // product load, the pull-down time is hours = Q / capacity. Q (with the freezer
 // latent branch) is reused from computeProductPullDownLoad at hours = 1.
-// dims: in { mass_lb: M, cp_above: dimensionless, t_enter_f: T, t_storage_f: T, t_freeze_f: T, hif_btu_lb: dimensionless, cp_below: dimensionless, capacity_btuh: M L^2 T^-3 } out: { hours: T, q_btu: M L^2 T^-2 }
+// dims: in { mass_lb: M, cp_above: dimensionless, t_enter_f: T, t_storage_f: T, t_freeze_f: T, hif_btu_lb: dimensionless, cp_below: dimensionless, capacity_btuh: M L^2 T^-3 } out: { hours: T, q_btu: M L^2 T^-2, rate_btuh: M L^2 T^-3 }
 export function computeProductPullDownTime({ mass_lb = 0, cp_above = 0, t_enter_f = null, t_storage_f = null, t_freeze_f = 0, hif_btu_lb = 0, cp_below = 0, capacity_btuh = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const cap = Number(capacity_btuh) || 0;
@@ -1047,7 +1047,7 @@ function _v698renderProductPullDownTime(inputRegion, outputRegion, citationEl) {
 }
 REFRIGERANT_RENDERERS["product-pull-down-time"] = _v698renderProductPullDownTime;
 
-// dims: in { box_temp_f: T, sst_f: T } out: { dtd: T, capacity_at_dtd_btuh: M L^2 T^-3, capacity_at_rating_btuh: M L^2 T^-3, capacity_ratio: dimensionless }
+// dims: in { box_temp_f: T, sst_f: T } out: { dtd: T, capacity_at_dtd_btuh: M L^2 T^-3, capacity_at_rating_btuh: M L^2 T^-3, capacity_ratio: dimensionless, td_required_f: T, ua_ratio_vs_rating: dimensionless }
 export function computeEvaporatorTdDtd({ box_temp_f = null, sst_f = null, design_load_btuh = 0, coil_ua_btuh_f = 0, rating_td_f = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // 0 F is a real box or suction temperature, so a blank cannot stand in for it.
@@ -1181,7 +1181,7 @@ REFRIGERANT_RENDERERS["flash-gas-subcool"] = _v586renderFlashGasSubcool;
 // ===================== spec-v792 C: compressor theoretical displacement =====================
 // Swept-volume geometry: each cylinder sweeps (pi/4) D^2 L per revolution; times cylinders times
 // RPM is the volumetric flow rate at 100% volumetric efficiency. Divide in^3/min by 1728 for CFM.
-// dims: in { bore_in: L, stroke_in: L, cylinders: dimensionless, rpm: T^-1 } out: { displacement_cid_per_rev: L^3, displacement_cfm: L^3 T^-1 }
+// dims: in { bore_in: L, stroke_in: L, cylinders: dimensionless, rpm: T^-1 } out: { displacement_cid_per_rev: L^3, displacement_cfm: L^3 T^-1, displacement_cid_per_min: L^3 T^-1 }
 export function computeCompressorDisplacement({ bore_in = 0, stroke_in = 0, cylinders = 0, rpm = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const bore = Number(bore_in) || 0;
@@ -1425,7 +1425,7 @@ REFRIGERANT_RENDERERS["txv-capacity-check"] = _simpleRenderer({
 });
 
 // ===================== spec-v1414: evaporator defrost heat and cycle time =====================
-// dims: in { frost_lb: M, coil_temp_f: T, coil_mass_lb: M, coil_specific_heat: L^2 T^-2, coil_temp_rise_f: T, heater_btuh: M L^2 T^-3, defrost_efficiency: dimensionless, drain_temp_f: T } out: { sensible_btu: M L^2 T^-2, latent_btu: M L^2 T^-2, meltwater_btu: M L^2 T^-2, total_btu: M L^2 T^-2, defrost_min: T, box_gain_btu: M L^2 T^-2, coil_warmup_btu: M L^2 T^-2, latent_share_pct: dimensionless }
+// dims: in { frost_lb: M, coil_temp_f: T, coil_mass_lb: M, coil_specific_heat: L^2 T^-2, coil_temp_rise_f: T, heater_btuh: M L^2 T^-3, defrost_efficiency: dimensionless, drain_temp_f: T } out: { sensible_btu: M L^2 T^-2, latent_btu: M L^2 T^-2, meltwater_btu: M L^2 T^-2, total_btu: M L^2 T^-2, defrost_min: T, box_gain_btu: M L^2 T^-2, coil_warmup_btu: M L^2 T^-2, latent_share_pct: dimensionless, defrost_hr: T }
 export function computeDefrostCycleSizing({ frost_lb = 0, coil_temp_f = -10, coil_mass_lb = 0, coil_specific_heat = 0.10, coil_temp_rise_f = 0, heater_btuh = 0, defrost_efficiency = 0.8, drain_temp_f = 32 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // The page passes a blank box as null; 0 F is a real reading, so a blank cannot stand in for it.
@@ -1554,7 +1554,7 @@ REFRIGERANT_RENDERERS["refrigerant-leak-rate"] = _simpleRenderer({
 });
 
 // ===================== spec-v1418: refrigerant recovery time and phase split =====================
-// dims: in { total_charge_lb: M, liquid_charge_lb: M, liquid_rate_lb_min: M T^-1, vapor_rate_lb_min: M T^-1, evacuation_min: T, cylinder_net_lb: M } out: { liquid_min: T, vapor_min: T, total_min: T, speedup_factor: dimensionless, cylinders: dimensionless }
+// dims: in { total_charge_lb: M, liquid_charge_lb: M, liquid_rate_lb_min: M T^-1, vapor_rate_lb_min: M T^-1, evacuation_min: T, cylinder_net_lb: M } out: { liquid_min: T, vapor_min: T, total_min: T, speedup_factor: dimensionless, cylinders: dimensionless, all_vapor_min: T, minutes_saved: T, recovery_min: T }
 export function computeRefrigerantRecoveryTime({ total_charge_lb = 0, liquid_charge_lb = 0, liquid_rate_lb_min = 0, vapor_rate_lb_min = 0, evacuation_min = 0, cylinder_net_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(total_charge_lb > 0)) return { error: "Total charge must be positive." };
@@ -1614,7 +1614,7 @@ REFRIGERANT_RENDERERS["refrigerant-recovery-time"] = _simpleRenderer({
 });
 
 // ===================== spec-v1419: low-ambient head pressure control =====================
-// dims: in { refrigerant: dimensionless, evaporator_psig: M L^-1 T^-2, valve_dp_psi: M L^-1 T^-2, line_losses_psi: M L^-1 T^-2, condenser_volume_cf: L^3, flooded_fraction: dimensionless, liquid_density_pcf: M L^-3, receiver_capacity_lb: M, summer_charge_lb: M } out: { min_head_psig: M L^-1 T^-2, flooding_charge_lb: M, winter_charge_lb: M }
+// dims: in { refrigerant: dimensionless, evaporator_psig: M L^-1 T^-2, valve_dp_psi: M L^-1 T^-2, line_losses_psi: M L^-1 T^-2, condenser_volume_cf: L^3, flooded_fraction: dimensionless, liquid_density_pcf: M L^-3, receiver_capacity_lb: M, summer_charge_lb: M } out: { min_head_psig: M L^-1 T^-2, flooding_charge_lb: M, winter_charge_lb: M, min_condensing_f: T }
 export function computeHeadPressureControl({ refrigerant = "R_410A", evaporator_psig = 0, valve_dp_psi = 0, line_losses_psi = 0, condenser_volume_cf = 0, flooded_fraction = 0.8, liquid_density_pcf = 70, receiver_capacity_lb = 0, summer_charge_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(evaporator_psig >= 0)) return { error: "Evaporator pressure cannot be negative." };

@@ -236,7 +236,7 @@ CONTAINMENT_RENDERERS["radon-fan-static"] = _simpleRenderer({
 // none of that is knowable in advance -- so the communication test is the
 // design, and this turns its readings into a point count and an area.
 // =====================================================================
-// dims: in { slab_area_ft2: L^2, reaches_ft: L, fails_ft: L, slab_length_ft: L, slab_width_ft: L, existing_points: dimensionless } out: { effective_radius_ft: L, area_per_point_ft2: L^2, points_required: dimensionless, coverage_ratio: dimensionless, longest_dimension_ft: L, upper_bound_ft: L }
+// dims: in { slab_area_ft2: L^2, reaches_ft: L, fails_ft: L, slab_length_ft: L, slab_width_ft: L, existing_points: dimensionless } out: { effective_radius_ft: L, area_per_point_ft2: L^2, points_required: dimensionless, coverage_ratio: dimensionless, longest_dimension_ft: L, upper_bound_ft: L, governing_points: dimensionless, points_by_length: dimensionless }
 export function computeSubSlabSuctionField({
   slab_area_ft2 = 0, reaches_ft = 0, fails_ft = 0,
   slab_length_ft = 0, slab_width_ft = 0, existing_points = 0,

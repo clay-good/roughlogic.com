@@ -87,7 +87,7 @@ const _ACTUATOR_SIZES_IN_LB = [35, 70, 140, 180, 360];
 
 // ===================== spec-v1818: transmitter span, accuracy, 4-20 mA scaling =====================
 
-// dims: in { lower_range_value: dimensionless, upper_range_value: dimensionless, upper_range_limit: dimensionless, loop_ma: I, accuracy_pct: dimensionless, low_reading_value: dimensionless, alt_upper_range_value: dimensionless } out: { value_eng: dimensionless, span_eng: dimensionless, turndown: dimensionless, err_span_eng: dimensionless, err_url_eng: dimensionless, err_url_at_low_reading_pct: dimensionless, basis_ratio: dimensionless }
+// dims: in { lower_range_value: dimensionless, upper_range_value: dimensionless, upper_range_limit: dimensionless, loop_ma: I, accuracy_pct: dimensionless, low_reading_value: dimensionless, alt_upper_range_value: dimensionless } out: { value_eng: dimensionless, span_eng: dimensionless, turndown: dimensionless, err_span_eng: dimensionless, err_url_eng: dimensionless, err_url_at_low_reading_pct: dimensionless, basis_ratio: dimensionless, alt_err_url_as_pct_of_span: dimensionless, alt_span_eng: dimensionless, alt_turndown: dimensionless, err_reading_eng: dimensionless, err_url_as_pct_of_span: dimensionless, low_reading_pct_of_span: dimensionless }
 export function computeTransmitterSpanScaling({ lower_range_value = 0, upper_range_value = 0, upper_range_limit = 0, loop_ma = 12, accuracy_pct = 0.1, low_reading_value = 0, alt_upper_range_value = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (upper_range_limit > 0 && upper_range_value > upper_range_limit) return { error: "The upper range value is beyond the sensor's upper range limit." };
@@ -150,7 +150,7 @@ CONTROLS_RENDERERS["transmitter-span-scaling"] = _simpleRenderer({
 
 // ===================== spec-v1819: deadband, differential, equipment cycling =====================
 
-// dims: in { capacitance_btu_f: M L^2 T^-2, ua_btu_hr_f: M L^2 T^-3, setpoint_f: T, outdoor_f: T, capacity_btu_hr: M L^2 T^-3, deadband_f: T, alt_deadband_f: T, alt_capacity_btu_hr: M L^2 T^-3 } out: { load_btu_hr: M L^2 T^-3, on_min: T, off_min: T, cycles_per_hour: T^-1, duty_pct: dimensionless, alt_capacity_duty_pct: dimensionless, alt_deadband_duty_pct: dimensionless }
+// dims: in { capacitance_btu_f: M L^2 T^-2, ua_btu_hr_f: M L^2 T^-3, setpoint_f: T, outdoor_f: T, capacity_btu_hr: M L^2 T^-3, deadband_f: T, alt_deadband_f: T, alt_capacity_btu_hr: M L^2 T^-3 } out: { load_btu_hr: M L^2 T^-3, on_min: T, off_min: T, cycles_per_hour: T^-1, duty_pct: dimensionless, alt_capacity_duty_pct: dimensionless, alt_deadband_duty_pct: dimensionless, alt_capacity_cycles_per_hour: T^-1, alt_capacity_max_cycles_per_hour: T^-1, alt_capacity_outdoor_at_max_f: T, alt_deadband_cycles_per_hour: T^-1, alt_deadband_on_min: T, load_at_max_btu_hr: M L^2 T^-3, max_cycles_per_hour: T^-1, outdoor_at_max_f: T }
 export function computeDeadbandCyclingRate({ capacitance_btu_f = 0, ua_btu_hr_f = 0, setpoint_f = 70, outdoor_f = 30, capacity_btu_hr = 0, deadband_f = 2, alt_deadband_f = 0, alt_capacity_btu_hr = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(capacitance_btu_f > 0)) return { error: "Space thermal capacitance must be positive (Btu/degF)." };
@@ -223,7 +223,7 @@ CONTROLS_RENDERERS["deadband-cycling-rate"] = _simpleRenderer({
 
 // ===================== spec-v1820: trend log sample interval and storage =====================
 
-// dims: in { point_count: dimensionless, interval_min: T, retention_years: T, bytes_per_sample: dimensionless, controller_points: dimensionless, controller_buffer_samples: dimensionless, poll_interval_min: T, cov_changes_per_point_day: T^-1, alt_interval_min: T } out: { samples_per_point_year: dimensionless, total_samples: dimensionless, storage_gb: dimensionless, buffer_fill_min: T, cov_reduction_pct: dimensionless, poll_loss_pct: dimensionless }
+// dims: in { point_count: dimensionless, interval_min: T, retention_years: T, bytes_per_sample: dimensionless, controller_points: dimensionless, controller_buffer_samples: dimensionless, poll_interval_min: T, cov_changes_per_point_day: T^-1, alt_interval_min: T } out: { samples_per_point_year: dimensionless, total_samples: dimensionless, storage_gb: dimensionless, buffer_fill_min: T, cov_reduction_pct: dimensionless, poll_loss_pct: dimensionless, alt_storage_gb: dimensionless, alt_total_samples: dimensionless, controller_samples_per_hour: T^-1, cov_storage_gb: dimensionless, cov_total_samples: dimensionless, max_poll_interval_min: T, periodic_samples_per_day: T^-1, samples_per_poll: dimensionless }
 export function computeTrendLogStorage({ point_count = 0, interval_min = 0, retention_years = 0, bytes_per_sample = 16, controller_points = 0, controller_buffer_samples = 0, poll_interval_min = 60, cov_changes_per_point_day = 0, alt_interval_min = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(point_count > 0)) return { error: "Point count must be positive." };
@@ -299,7 +299,7 @@ CONTROLS_RENDERERS["trend-log-storage"] = _simpleRenderer({
 
 // ===================== spec-v1821: BACnet MS/TP segment loading =====================
 
-// dims: in { baud: T^-1, device_count: dimensionless, token_octets: dimensionless, turnaround_bits: dimensionless, frame_octets: dimensionless, transmitting_share: dimensionless, alt_device_count: dimensionless, alt_baud: T^-1 } out: { token_frame_ms: T, turnaround_ms: T, idle_rotation_ms: T, frame_time_ms: T, loop_time_ms: T, alt_baud_ratio: dimensionless, alt_devices_ratio: dimensionless }
+// dims: in { baud: T^-1, device_count: dimensionless, token_octets: dimensionless, turnaround_bits: dimensionless, frame_octets: dimensionless, transmitting_share: dimensionless, alt_device_count: dimensionless, alt_baud: T^-1 } out: { token_frame_ms: T, turnaround_ms: T, idle_rotation_ms: T, frame_time_ms: T, loop_time_ms: T, alt_baud_ratio: dimensionless, alt_devices_ratio: dimensionless, alt_baud_loop_ms: T, alt_devices_idle_ms: T, alt_devices_loop_ms: T, data_ms: T, per_device_ms: T, transmitting_devices: dimensionless, worst_case_response_ms: T }
 export function computeMstpSegmentLoading({ baud = 76800, device_count = 0, token_octets = 8, turnaround_bits = 40, frame_octets = 50, transmitting_share = 0.5, alt_device_count = 0, alt_baud = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(baud > 0)) return { error: "Baud rate must be positive." };
@@ -429,7 +429,7 @@ CONTROLS_RENDERERS["damper-actuator-torque"] = _simpleRenderer({
 
 // ===================== spec-v1823: instrument loop total error stackup =====================
 
-// dims: in { span_eng: dimensionless, element_err_eng: dimensionless, transmitter_err_pct_span: dimensionless, input_err_pct_span: dimensionless, installation_err_eng: dimensionless, averaging_err_eng: dimensionless, deadband_eng: dimensionless } out: { worst_case_eng: dimensionless, rss_eng: dimensionless, ratio: dimensionless, total_with_installation_eng: dimensionless, element_share_of_worst_pct: dimensionless }
+// dims: in { span_eng: dimensionless, element_err_eng: dimensionless, transmitter_err_pct_span: dimensionless, input_err_pct_span: dimensionless, installation_err_eng: dimensionless, averaging_err_eng: dimensionless, deadband_eng: dimensionless } out: { worst_case_eng: dimensionless, rss_eng: dimensionless, ratio: dimensionless, total_with_installation_eng: dimensionless, element_share_of_worst_pct: dimensionless, element_eng: dimensionless, input_eng: dimensionless, installation_multiple: dimensionless, total_with_averaging_eng: dimensionless, transmitter_eng: dimensionless }
 export function computeLoopErrorStackup({ span_eng = 0, element_err_eng = 0, transmitter_err_pct_span = 0, input_err_pct_span = 0, installation_err_eng = 0, averaging_err_eng = 0, deadband_eng = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(span_eng > 0)) return { error: "Measurement span must be positive (engineering units)." };

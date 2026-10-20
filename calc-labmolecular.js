@@ -32,7 +32,7 @@ export const LABMOLECULAR_RENDERERS = {};
 
 // --- v20 T.1: Primer melting temperature (`primer-tm`) ---
 // Wallace (<=14 nt): Tm = 2(A+T) + 4(G+C). Basic GC% (>14 nt): Tm = 64.9 + 41*(G+C-16.4)/len.
-// dims: in { sequence: dimensionless, method: dimensionless } out: { tm_c: T, length_nt: dimensionless, gc_content_pct: dimensionless }
+// dims: in { sequence: dimensionless, method: dimensionless } out: { tm_c: T, length_nt: dimensionless, gc_content_pct: dimensionless, dropped_chars: dimensionless }
 export function computePrimerTm({ sequence = "", method = "auto" } = {}) {
   const seq = String(sequence || "").toUpperCase().replace(/\s+/g, "");
   const cleaned = seq.replace(/[^ATGC]/g, "");

@@ -95,7 +95,7 @@ export const CONCRETE_RENDERERS = {};
 
 // ===================== spec-v257: reinforced concrete beam flexural capacity =====================
 
-// dims: in { fc: M L^-1 T^-2, fy: M L^-1 T^-2, as_in2: L^2, b: L, d: L, mu: M L^2 T^-2 } out: { a_in: L, mn_kipft: M L^2 T^-2, phi_mn: M L^2 T^-2, util: dimensionless, eps_t: dimensionless, tc_limit: dimensionless, tension_controlled: dimensionless }
+// dims: in { fc: M L^-1 T^-2, fy: M L^-1 T^-2, as_in2: L^2, b: L, d: L, mu: M L^2 T^-2 } out: { a_in: L, mn_kipft: M L^2 T^-2, phi_mn: M L^2 T^-2, util: dimensionless, eps_t: dimensionless, tc_limit: dimensionless, tension_controlled: dimensionless, phi: dimensionless }
 export function computeRcBeamFlexure({ fc = 4000, fy = 60000, as_in2 = 0, b = 0, d = 0, mu = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(fc > 0)) return { error: "Concrete strength f'c must be positive (psi)." };
@@ -214,7 +214,7 @@ CONCRETE_RENDERERS["rc-beam-shear"] = _simpleRenderer({
 
 // ===================== spec-v259: rebar tension development length =====================
 
-// dims: in { fc: M L^-1 T^-2, fy: M L^-1 T^-2, db: L, psi_t: dimensionless, psi_e: dimensionless, psi_s: dimensionless, psi_g: dimensionless, lambda: dimensionless, conf: dimensionless } out: { te: dimensionless, conf_eff: dimensionless, ld_in: L, ld_db: dimensionless }
+// dims: in { fc: M L^-1 T^-2, fy: M L^-1 T^-2, db: L, psi_t: dimensionless, psi_e: dimensionless, psi_s: dimensionless, psi_g: dimensionless, lambda: dimensionless, conf: dimensionless } out: { te: dimensionless, conf_eff: dimensionless, ld_in: L, ld_db: dimensionless, psi_g_used: dimensionless }
 export function computeRcDevelopmentLength({ fc = 4000, fy = 60000, db = 0, psi_t = 1.0, psi_e = 1.0, psi_s = 1.0, psi_g = 1.0, lambda = 1.0, conf = 2.5 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(fc > 0)) return { error: "Concrete strength f'c must be positive (psi)." };
@@ -304,7 +304,7 @@ export const rcColumnAxialExample = { inputs: { b_in: 16, h_in: 16, fc_psi: 4000
 // area; the inverse recovers the longitudinal steel a target factored axial load needs for a given column size. From
 // phi Pn = 0.80 x 0.65 x [0.85 f'c (Ag - Ast) + fy Ast] = 0.52 x Po,
 // Ast = (phi Pn / 0.52 - 0.85 f'c Ag) / (fy - 0.85 f'c). The 1% minimum governs the minimum and 8% the maximum (ACI 10.6.1).
-// dims: in { target_load_kip: M L T^-2, b_in: L, h_in: L, fc_psi: M L^-1 T^-2, fy_psi: M L^-1 T^-2 } out: { ast_required_in2: L^2, ag_in2: L^2, rho_g: dimensionless, ast_max_in2: L^2 }
+// dims: in { target_load_kip: M L T^-2, b_in: L, h_in: L, fc_psi: M L^-1 T^-2, fy_psi: M L^-1 T^-2 } out: { ast_required_in2: L^2, ag_in2: L^2, rho_g: dimensionless, ast_max_in2: L^2, ast_min_in2: L^2 }
 export function computeRcColumnSteelForLoad({ target_load_kip = 0, b_in = 0, h_in = 0, fc_psi = 4000, fy_psi = 60000 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const target = Number(target_load_kip) || 0;
@@ -370,7 +370,7 @@ CONCRETE_RENDERERS["rc-column-axial"] = _simpleRenderer({
   compute: computeRcColumnAxial,
 });
 
-// dims: in { c1_in: L, c2_in: L, d_in: L, fc_psi: M L^-1 T^-2, position: dimensionless, lambda: dimensionless } out: { bo_in: L, beta: dimensionless, lambda_s: dimensionless, vc_psi: M L^-1 T^-2, phi_vc_kip: M L T^-2 }
+// dims: in { c1_in: L, c2_in: L, d_in: L, fc_psi: M L^-1 T^-2, position: dimensionless, lambda: dimensionless } out: { bo_in: L, beta: dimensionless, lambda_s: dimensionless, vc_psi: M L^-1 T^-2, phi_vc_kip: M L T^-2, alpha_s: dimensionless, least: dimensionless, t2: dimensionless, t3: dimensionless }
 export function computeRcPunchingShear({ c1_in = 0, c2_in = 0, d_in = 0, fc_psi = 4000, position = "interior", lambda = 1.0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(c1_in > 0) || !(c2_in > 0)) return { error: "Column plan dimensions must be positive (in)." };
@@ -791,7 +791,7 @@ CONCRETE_RENDERERS["rc-slab-max-span-for-thickness"] = _simpleRenderer({
   compute: computeRcSlabMaxSpanForThickness,
 });
 
-// dims: in { b_in: L, d_in: L, dp_in: L, as_in2: L^2, asp_in2: L^2, fc_psi: M L^-1 T^-2, fy_psi: M L^-1 T^-2 } out: { a_in: L, c_in: L, eps_sp: dimensionless, eps_t: dimensionless, mn_kipft: M L^2 T^-2, phi_mn_kipft: M L^2 T^-2, fs_psi: M L^-1 T^-2, fsp_psi: M L^-1 T^-2 }
+// dims: in { b_in: L, d_in: L, dp_in: L, as_in2: L^2, asp_in2: L^2, fc_psi: M L^-1 T^-2, fy_psi: M L^-1 T^-2 } out: { a_in: L, c_in: L, eps_sp: dimensionless, eps_t: dimensionless, mn_kipft: M L^2 T^-2, phi_mn_kipft: M L^2 T^-2, fs_psi: M L^-1 T^-2, fsp_psi: M L^-1 T^-2, beta1: dimensionless, eps_y: dimensionless, phi: dimensionless, tc_limit: dimensionless }
 export function computeRcDoublyReinforced({ b_in = 0, d_in = 0, dp_in = 0, as_in2 = 0, asp_in2 = 0, fc_psi = 4000, fy_psi = 60000 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(b_in > 0) || !(d_in > 0)) return { error: "Beam width and effective depth must be positive (in)." };
@@ -1457,7 +1457,7 @@ CONCRETE_RENDERERS["rc-compression-dev-length"] = _simpleRenderer({
 // with Bischoff's form: Ie = Ig when Ma <= (2/3)Mcr (Eq 24.2.3.5b), else Ie = Icr/[1 - ((2/3)Mcr/Ma)^2 (1 - Icr/Ig)]
 // (Eq 24.2.3.5a). Mcr = fr Ig/yt, fr = 7.5 lambda sqrt(f'c). Icr is the cracked transformed section (singly
 // reinforced rectangular): n = Es/Ec, kd = d(sqrt((rho n)^2 + 2 rho n) - rho n), Icr = b kd^3/3 + n As (d-kd)^2.
-// dims: in { b_in: L, h_in: L, d_in: L, as_in2: L^2, fc_psi: M L^-1 T^-2, ma_kipft: M L^2 T^-2, lambda: dimensionless } out: { ig_in4: L^4, icr_in4: L^4, ie_in4: L^4, mcr_kipft: M L^2 T^-2, ec_psi: M L^-1 T^-2, kd_in: L, ie_ratio: dimensionless }
+// dims: in { b_in: L, h_in: L, d_in: L, as_in2: L^2, fc_psi: M L^-1 T^-2, ma_kipft: M L^2 T^-2, lambda: dimensionless } out: { ig_in4: L^4, icr_in4: L^4, ie_in4: L^4, mcr_kipft: M L^2 T^-2, ec_psi: M L^-1 T^-2, kd_in: L, ie_ratio: dimensionless, n: dimensionless }
 export function computeConcreteEffectiveInertia({ b_in = 0, h_in = 0, d_in = 0, as_in2 = 0, fc_psi = 4000, ma_kipft = 0, lambda = 1.0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const b = Number(b_in), h = Number(h_in), d = Number(d_in), As = Number(as_in2);
@@ -1643,7 +1643,7 @@ CONCRETE_RENDERERS["concrete-immediate-deflection"] = _simpleRenderer({
 //   locate the neutral axis c from  b c^2/2 + (n-1) As' (c - d') = n As (d - c)
 //   Icr = b c^3/3 + (n-1) As' (c - d')^2 + n As (d - c)^2,  n = Es/Ec, Ec = 57000 sqrt(f'c).
 // With As' = 0 it reduces EXACTLY to the singly-reinforced Icr the effective-inertia tile returns.
-// dims: in { b_in: L, d_in: L, as_in2: L^2, fc_psi: M L^-1 T^-2, asp_in2: L^2, dp_in: L } out: { n: dimensionless, ec_psi: M L^-1 T^-2, kd_in: L, icr_in4: L^4 }
+// dims: in { b_in: L, d_in: L, as_in2: L^2, fc_psi: M L^-1 T^-2, asp_in2: L^2, dp_in: L } out: { n: dimensionless, ec_psi: M L^-1 T^-2, kd_in: L, icr_in4: L^4, rho: dimensionless, rho_prime: dimensionless }
 export function computeConcreteCrackedInertiaDoubly({ b_in = 0, d_in = 0, as_in2 = 0, fc_psi = 4000, asp_in2 = 0, dp_in = 2.5 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const b = Number(b_in), d = Number(d_in), As = Number(as_in2), fc = Number(fc_psi), Asp = Number(asp_in2), dp = Number(dp_in);
@@ -1761,7 +1761,7 @@ CONCRETE_RENDERERS["concrete-cracked-inertia-tee"] = _simpleRenderer({
 // Anchor groups added 2026-10-09 (the pryout note said the group form was not modeled): ACI 318-19 17.6.2.1, a
 // concentrically loaded rectangular group of n1 rows (spacing s1, toward the edge) by n2 anchors (spacing s2, along
 // it), ANc = [min(ca1, 1.5 hef) + (n1 - 1) min(s1, 3 hef) + 1.5 hef] x [3 hef + (n2 - 1) min(s2, 3 hef)] <= n ANco.
-// dims: in { embedment_in: L, fc_psi: M L^-1 T^-2, edge_distance_in: L, anchor_type: dimensionless, lambda: dimensionless, cracking: dimensionless, rows_toward_edge: dimensionless, spacing_toward_edge_in: L, anchors_along_edge: dimensionless, spacing_along_edge_in: L } out: { nb_lb: M L T^-2, ncb_lb: M L T^-2, phi_ncb_lb: M L T^-2, phi_tension: dimensionless, psi_c: dimensionless, area_ratio: dimensionless }
+// dims: in { embedment_in: L, fc_psi: M L^-1 T^-2, edge_distance_in: L, anchor_type: dimensionless, lambda: dimensionless, cracking: dimensionless, rows_toward_edge: dimensionless, spacing_toward_edge_in: L, anchors_along_edge: dimensionless, spacing_along_edge_in: L } out: { nb_lb: M L T^-2, ncb_lb: M L T^-2, phi_ncb_lb: M L T^-2, phi_tension: dimensionless, psi_c: dimensionless, area_ratio: dimensionless, ANc: L^2, ANco: L^2, n_anchors: dimensionless, psi_cp: dimensionless, psi_ed: dimensionless }
 export function computeConcreteAnchorBreakout({ embedment_in = 0, fc_psi = 0, edge_distance_in = 0, anchor_type = "cast-in", lambda = 1.0, cracking = "cracked", rows_toward_edge = 1, spacing_toward_edge_in = 0, anchors_along_edge = 1, spacing_along_edge_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const hef = Number(embedment_in) || 0;
@@ -1878,7 +1878,7 @@ CONCRETE_RENDERERS["rc-slender-column-magnify"] = _simpleRenderer({
 
 // ===================== spec-v556: concrete corbel / bracket design (ACI 318-19 16.5) =====================
 
-// dims: in { factored_shear_lb: M L T^-2, horiz_tension_lb: M L T^-2, shear_span_av_in: L, eff_depth_d_in: L, height_h_in: L, width_b_in: L, fc_psi: M L^-1 T^-2, fy_psi: M L^-1 T^-2, friction_mu: dimensionless } out: { nuc_lb: M L T^-2, asc_in2: L^2, phi_vn_lb: M L T^-2, af_in2: L^2, ah_in2: L^2, ah_zone_in: L, an_in2: L^2, avf_in2: L^2 }
+// dims: in { factored_shear_lb: M L T^-2, horiz_tension_lb: M L T^-2, shear_span_av_in: L, eff_depth_d_in: L, height_h_in: L, width_b_in: L, fc_psi: M L^-1 T^-2, fy_psi: M L^-1 T^-2, friction_mu: dimensionless } out: { nuc_lb: M L T^-2, asc_in2: L^2, phi_vn_lb: M L T^-2, af_in2: L^2, ah_in2: L^2, ah_zone_in: L, an_in2: L^2, avf_in2: L^2, asc_min_in2: L^2, flex_path: L^2, sf_path: L^2 }
 export function computeConcreteCorbelBracket({ factored_shear_lb = 0, horiz_tension_lb = 0, shear_span_av_in = 0, eff_depth_d_in = 0, height_h_in = 0, width_b_in = 0, fc_psi = 4000, fy_psi = 60000, friction_mu = 1.4 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const Vu = Number(factored_shear_lb) || 0;
@@ -1984,7 +1984,7 @@ CONCRETE_RENDERERS["concrete-anchor-breakout"] = _simpleRenderer({
 
 // --- spec-v612 E: Concrete headed-anchor pullout (ACI 318-19 17.6.3) ---
 // Np = 8 * Abrg * fc. Npn = psi_cP * Np (1.4 uncracked, 1.0 cracked). phiNpn = 0.70 * Npn.
-// dims: in { head_bearing_area_in2: L^2, fc_psi: M L^-1 T^-2, cracking: dimensionless } out: { np_lb: M L T^-2, npn_lb: M L T^-2, phi_npn_lb: M L T^-2 }
+// dims: in { head_bearing_area_in2: L^2, fc_psi: M L^-1 T^-2, cracking: dimensionless } out: { np_lb: M L T^-2, npn_lb: M L T^-2, phi_npn_lb: M L T^-2, psi_cP: dimensionless }
 export function computeConcreteAnchorPullout({ head_bearing_area_in2 = 0, fc_psi = 0, cracking = "cracked" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const abrg = Number(head_bearing_area_in2) || 0;
@@ -2081,7 +2081,7 @@ CONCRETE_RENDERERS["concrete-anchor-blowout"] = _simpleRenderer({
 // edge: AVc = min(1.5 ca1, ha) x (1.5 ca1 + min(1.5 ca1, ca2)). psi_edV = 0.7 + 0.3 ca2/(1.5 ca1)
 // when ca2 < 1.5 ca1; psi_cV 1.0 cracked / 1.4 uncracked; psi_hV = sqrt(1.5 ca1/ha) >= 1.0 when
 // ha < 1.5 ca1. phi = 0.70 Condition B.
-// dims: in { anchor_dia_in: L, embedment_in: L, fc_psi: M L^-1 T^-2, edge_distance_in: L, perp_edge_in: L, member_thickness_in: L, cracking: dimensionless, lambda: dimensionless, direction: dimensionless } out: { vb_lb: M L T^-2, vcb_lb: M L T^-2, phi_vcb_lb: M L T^-2, ca1_used_in: L, le_in: L, area_ratio: dimensionless }
+// dims: in { anchor_dia_in: L, embedment_in: L, fc_psi: M L^-1 T^-2, edge_distance_in: L, perp_edge_in: L, member_thickness_in: L, cracking: dimensionless, lambda: dimensionless, direction: dimensionless } out: { vb_lb: M L T^-2, vcb_lb: M L T^-2, phi_vcb_lb: M L T^-2, ca1_used_in: L, le_in: L, area_ratio: dimensionless, AVc: L^2, AVco: L^2, psi_cV: dimensionless, psi_edV: dimensionless, psi_hV: dimensionless }
 export function computeConcreteAnchorShearBreakout({ anchor_dia_in = 0, embedment_in = 0, fc_psi = 4000, edge_distance_in = 0, perp_edge_in = 0, member_thickness_in = 0, cracking = "cracked", lambda = 1.0, direction = "toward" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const da = Number(anchor_dia_in) || 0;
@@ -2163,7 +2163,7 @@ CONCRETE_RENDERERS["concrete-anchor-shear-breakout"] = _simpleRenderer({
 // Vcp = kcp x Ncp, Ncp = Ncb (the tension-breakout strength, computed by CALLING the landed
 // computeConcreteAnchorBreakout so the two tiles can never drift); kcp = 1.0 for hef < 2.5 in,
 // 2.0 for hef >= 2.5 in; phi = 0.70 Condition B. Governs short stiff anchors AWAY from an edge.
-// dims: in { embedment_in: L, fc_psi: M L^-1 T^-2, edge_distance_in: L, anchor_type: dimensionless, lambda: dimensionless, cracking: dimensionless, rows_toward_edge: dimensionless, spacing_toward_edge_in: L, anchors_along_edge: dimensionless, spacing_along_edge_in: L } out: { ncb_lb: M L T^-2, vcp_lb: M L T^-2, phi_vcp_lb: M L T^-2, psi_c: dimensionless }
+// dims: in { embedment_in: L, fc_psi: M L^-1 T^-2, edge_distance_in: L, anchor_type: dimensionless, lambda: dimensionless, cracking: dimensionless, rows_toward_edge: dimensionless, spacing_toward_edge_in: L, anchors_along_edge: dimensionless, spacing_along_edge_in: L } out: { ncb_lb: M L T^-2, vcp_lb: M L T^-2, phi_vcp_lb: M L T^-2, psi_c: dimensionless, kcp: dimensionless, psi_cp: dimensionless }
 export function computeConcreteAnchorPryout({ embedment_in = 0, fc_psi = 4000, edge_distance_in = 0, anchor_type = "cast-in", lambda = 1.0, cracking = "cracked", rows_toward_edge = 1, spacing_toward_edge_in = 0, anchors_along_edge = 1, spacing_along_edge_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const base = computeConcreteAnchorBreakout({ embedment_in, fc_psi, edge_distance_in, anchor_type, lambda, cracking, rows_toward_edge, spacing_toward_edge_in, anchors_along_edge, spacing_along_edge_in });
@@ -2600,7 +2600,7 @@ CONCRETE_RENDERERS["concrete-premix-bags"] = _simpleRenderer({
 // become a true T, and the capacity splits into a flange couple and a web couple.
 // The effective width is DELEGATED to computeTBeamEffectiveFlangeWidth so the two tiles
 // cannot disagree, with an override for a be taken from the engineer's drawings.
-// dims: in { fc_psi: M L^-1 T^-2, fy_psi: M L^-1 T^-2, as_in2: L^2, bw_in: L, hf_in: L, d_in: L, ln_in: L, sw_in: L, beam_type: dimensionless, be_override_in: L, mu_kipft: M L^2 T^-2 } out: { be_in: L, a_in: L, c_in: L, mn_kipft: M L^2 T^-2, phi_mn_kipft: M L^2 T^-2, asf_in2: L^2, asw_in2: L^2, eps_t: dimensionless, phi: dimensionless, a_trial_in: L, flange_fraction: dimensionless, util: dimensionless }
+// dims: in { fc_psi: M L^-1 T^-2, fy_psi: M L^-1 T^-2, as_in2: L^2, bw_in: L, hf_in: L, d_in: L, ln_in: L, sw_in: L, beam_type: dimensionless, be_override_in: L, mu_kipft: M L^2 T^-2 } out: { be_in: L, a_in: L, c_in: L, mn_kipft: M L^2 T^-2, phi_mn_kipft: M L^2 T^-2, asf_in2: L^2, asw_in2: L^2, eps_t: dimensionless, phi: dimensionless, a_trial_in: L, flange_fraction: dimensionless, util: dimensionless, beta1: dimensionless, eps_ty: dimensionless, tc_limit: dimensionless }
 export function computeRcTBeamFlexure({ fc_psi = 4000, fy_psi = 60000, as_in2 = 0, bw_in = 0, hf_in = 0, d_in = 0, ln_in = 0, sw_in = 0, beam_type = "interior", be_override_in = 0, mu_kipft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const fc = Number(fc_psi) || 0, fy = Number(fy_psi) || 0, As = Number(as_in2) || 0;

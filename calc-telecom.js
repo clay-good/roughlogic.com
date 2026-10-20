@@ -82,7 +82,7 @@ const FT_PER_M = 3.280839895013123;
 
 // ===================== spec-v1837: OTDR event distance =====================
 
-// dims: in { round_trip_time_us: T, entered_group_index: dimensionless, true_group_index: dimensionless, excess_fiber_pct: dimensionless, slack_per_splice_ft: L, splice_points: dimensionless, comparison_span_km: L } out: { entered_distance_m: L, corrected_distance_m: L, index_error_m: L, cable_distance_m: L, route_distance_m: L, comparison_error_ft: L, corrected_distance_ft: L, entered_distance_ft: L, index_error_ft: L, index_error_pct: dimensionless, route_distance_ft: L }
+// dims: in { round_trip_time_us: T, entered_group_index: dimensionless, true_group_index: dimensionless, excess_fiber_pct: dimensionless, slack_per_splice_ft: L, splice_points: dimensionless, comparison_span_km: L } out: { entered_distance_m: L, corrected_distance_m: L, index_error_m: L, cable_distance_m: L, route_distance_m: L, comparison_error_ft: L, corrected_distance_ft: L, entered_distance_ft: L, index_error_ft: L, index_error_pct: dimensionless, route_distance_ft: L, comparison_error_m: L, fiber_to_route_delta_m: L }
 export function computeOtdrEventDistance({ round_trip_time_us = 0, entered_group_index = 0, true_group_index = 0, excess_fiber_pct = 0, slack_per_splice_ft = 0, splice_points = 0, comparison_span_km = 40 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   if (!(round_trip_time_us > 0)) return { error: "Round-trip time must be positive (microseconds)." };
@@ -136,7 +136,7 @@ TELECOM_RENDERERS["otdr-event-distance"] = _simpleRenderer({
 
 // ===================== spec-v1838: chromatic dispersion =====================
 
-// dims: in { dispersion_ps_nm_km: T L^-2, span_km: L, bit_rate_gbps: T^-1, spectral_width_nm: L, lower_bit_rate_gbps: T^-1, higher_bit_rate_gbps: T^-1 } out: { accumulated_dispersion_ps_nm: T L^-1, pulse_spread_ps: T, bit_period_ps: T, reach_km: L, over_limit_pct: dimensionless }
+// dims: in { dispersion_ps_nm_km: T L^-2, span_km: L, bit_rate_gbps: T^-1, spectral_width_nm: L, lower_bit_rate_gbps: T^-1, higher_bit_rate_gbps: T^-1 } out: { accumulated_dispersion_ps_nm: T L^-1, pulse_spread_ps: T, bit_period_ps: T, reach_km: L, over_limit_pct: dimensionless, higher_rate_reach_km: L, lower_rate_reach_km: L }
 export function computeChromaticDispersionReach({ dispersion_ps_nm_km = 0, span_km = 0, bit_rate_gbps = 0, spectral_width_nm = 0, lower_bit_rate_gbps = 2.5, higher_bit_rate_gbps = 40 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   if (!(dispersion_ps_nm_km > 0) || !(span_km > 0) || !(bit_rate_gbps > 0)) return { error: "Dispersion, span, and bit rate must be positive." };
@@ -184,7 +184,7 @@ TELECOM_RENDERERS["chromatic-dispersion-reach"] = _simpleRenderer({
 
 // ===================== spec-v1839: outside-plant slack =====================
 
-// dims: in { route_length_ft: L, usable_reel_length_ft: L, slack_per_splice_ft: L, terminal_slack_ft: L, waste_pct: dimensionless, restoration_slack_each_side_ft: L } out: { splice_points: dimensionless, total_slack_ft: L, cable_to_order_ft: L, additional_restoration_slack_ft: L, cable_before_allowance_ft: L, splice_slack_ft: L, terminal_slack_total_ft: L }
+// dims: in { route_length_ft: L, usable_reel_length_ft: L, slack_per_splice_ft: L, terminal_slack_ft: L, waste_pct: dimensionless, restoration_slack_each_side_ft: L } out: { splice_points: dimensionless, total_slack_ft: L, cable_to_order_ft: L, additional_restoration_slack_ft: L, cable_before_allowance_ft: L, splice_slack_ft: L, terminal_slack_total_ft: L, required_at_cut_ft: L, shortfall_per_splice_ft: L, slack_pct_of_route: dimensionless }
 export function computeFiberSlackStorage({ route_length_ft = 0, usable_reel_length_ft = 0, slack_per_splice_ft = 0, terminal_slack_ft = 0, waste_pct = 0, restoration_slack_each_side_ft = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   // A route shorter than one reel is one pull with no splice; until 2026-10-01
@@ -237,7 +237,7 @@ TELECOM_RENDERERS["fiber-slack-storage"] = _simpleRenderer({
 
 // ===================== spec-v1840: PON split loss =====================
 
-// dims: in { class_budget_db: dimensionless, split_ratio: dimensionless, splitter_excess_db: dimensionless, connector_count: dimensionless, connector_loss_db: dimensionless, splice_count: dimensionless, splice_loss_db: dimensionless, attenuation_db_km: dimensionless, design_margin_db: dimensionless, alternative_split_ratio: dimensionless } out: { splitter_loss_db: dimensionless, remaining_fiber_budget_db: dimensionless, reach_km: L, alternative_remaining_fiber_budget_db: dimensionless, alternative_splitter_loss_db: dimensionless, connector_total_db: dimensionless, ideal_splitter_loss_db: dimensionless, splice_total_db: dimensionless, split_loss_delta_db: dimensionless, splitter_share_pct: dimensionless }
+// dims: in { class_budget_db: dimensionless, split_ratio: dimensionless, splitter_excess_db: dimensionless, connector_count: dimensionless, connector_loss_db: dimensionless, splice_count: dimensionless, splice_loss_db: dimensionless, attenuation_db_km: dimensionless, design_margin_db: dimensionless, alternative_split_ratio: dimensionless } out: { splitter_loss_db: dimensionless, remaining_fiber_budget_db: dimensionless, reach_km: L, alternative_remaining_fiber_budget_db: dimensionless, alternative_splitter_loss_db: dimensionless, connector_total_db: dimensionless, ideal_splitter_loss_db: dimensionless, splice_total_db: dimensionless, split_loss_delta_db: dimensionless, splitter_share_pct: dimensionless, alternative_reach_km: L }
 export function computePonSplitLossBudget({ class_budget_db = 0, split_ratio = 0, splitter_excess_db = 0, connector_count = 0, connector_loss_db = 0, splice_count = 0, splice_loss_db = 0, attenuation_db_km = 0, design_margin_db = 0, alternative_split_ratio = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   if (!(class_budget_db > 0) || !(split_ratio > 0) || !(attenuation_db_km > 0)) return { error: "Class budget, split ratio, and fiber attenuation must be positive." };
@@ -308,7 +308,7 @@ function _parseStandardCounts(value) {
   return [...new Set(values)].sort((a, b) => a - b);
 }
 
-// dims: in { living_units: dimensionless, split_ratio: dimensionless, terminal_ports: dimensionless, spare_pct: dimensionless, route_length_ft: L, lower_material_cost_per_ft: dimensionless, selected_material_cost_per_ft: dimensionless, placement_cost_per_ft: dimensionless } out: { feeder_fibers_required: dimensionless, selected_standard_count: dimensionless, selected_installed_cost: dimensionless, placement_share_pct: dimensionless, installed_cost_delta_pct: dimensionless }
+// dims: in { living_units: dimensionless, split_ratio: dimensionless, terminal_ports: dimensionless, spare_pct: dimensionless, route_length_ft: L, lower_material_cost_per_ft: dimensionless, selected_material_cost_per_ft: dimensionless, placement_cost_per_ft: dimensionless } out: { feeder_fibers_required: dimensionless, selected_standard_count: dimensionless, selected_installed_cost: dimensionless, placement_share_pct: dimensionless, installed_cost_delta_pct: dimensionless, distribution_fibers_required: dimensionless, distribution_with_spare: dimensionless, drop_terminals: dimensionless, feeder_with_spare: dimensionless, free_rounding_spares: dimensionless, installed_cost_delta: dimensionless, lower_installed_cost: dimensionless, standard_without_spare: dimensionless }
 export function computeFiberStrandCountPlanning({ living_units = 0, split_ratio = 0, terminal_ports = 0, spare_pct = 0, standard_counts = "12,24,48,72,96,144,216,288,432", route_length_ft = 0, lower_material_cost_per_ft = 0, selected_material_cost_per_ft = 0, placement_cost_per_ft = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   if (!(living_units > 0) || !(split_ratio > 0) || !(terminal_ports > 0)) return { error: "Living units, split ratio, and terminal port count must be positive." };
@@ -421,7 +421,7 @@ TELECOM_RENDERERS["optical-return-loss"] = _simpleRenderer({
 
 // ===================== spec-v1843: microduct cable jetting =====================
 
-// dims: in { duct_id_mm: L, cable_od_mm: L, fill_min_pct: dimensionless, fill_max_pct: dimensionless, optimal_fill_pct: dimensionless, air_velocity_m_s: L T^-1, pressure_bar_absolute: M L^-1 T^-2 } out: { fill_ratio_pct: dimensionless, area_fill_pct: dimensionless, annulus_area_mm2: L^2, free_air_l_min: L^3 T^-1, free_air_change_pct: dimensionless, optimal_cable_od_mm: L }
+// dims: in { duct_id_mm: L, cable_od_mm: L, fill_min_pct: dimensionless, fill_max_pct: dimensionless, optimal_fill_pct: dimensionless, air_velocity_m_s: L T^-1, pressure_bar_absolute: M L^-1 T^-2 } out: { fill_ratio_pct: dimensionless, area_fill_pct: dimensionless, annulus_area_mm2: L^2, free_air_l_min: L^3 T^-1, free_air_change_pct: dimensionless, optimal_cable_od_mm: L, optimal_annulus_area_mm2: L^2 }
 export function computeCableJettingDistance({ duct_id_mm = 0, cable_od_mm = 0, fill_min_pct = 50, fill_max_pct = 80, optimal_fill_pct = 65, air_velocity_m_s = 0, pressure_bar_absolute = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   if (!(duct_id_mm > 0) || !(cable_od_mm > 0) || cable_od_mm >= duct_id_mm) return { error: "Duct and cable diameters must be positive, and cable OD must be below duct ID." };

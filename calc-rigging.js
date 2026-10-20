@@ -997,7 +997,7 @@ RIGGING_RENDERERS["block-redirect-max-angle"] = renderBlockRedirectMaxAngle;
 // Wire Rope Users Manual; the qualified rigger and the certified rating govern.
 // =====================================================================
 
-// dims: in { total_load_lb: M L T^-2, num_legs: dimensionless, horizontal_angle_deg: dimensionless } out: { tension_per_leg_lb: M L T^-2, equal_share_lb: M L T^-2, load_factor: dimensionless }
+// dims: in { total_load_lb: M L T^-2, num_legs: dimensionless, horizontal_angle_deg: dimensionless } out: { tension_per_leg_lb: M L T^-2, equal_share_lb: M L T^-2, load_factor: dimensionless, share_legs: dimensionless }
 export function computeMultiLegSling({ total_load_lb = 0, num_legs = 2, horizontal_angle_deg = 60 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(total_load_lb > 0)) return { error: "Total load must be positive (lb)." };
@@ -1486,7 +1486,7 @@ RIGGING_RENDERERS["crane-outrigger-reaction"] = renderCraneOutriggerReaction;
 // Dp/2, both without the 1.20: 40-60% above BTH-1, enough to pass a lug BTH-1
 // fails (44 kip on a 1 in plate, 4 in wide, 2.06 in hole, 1.8 in edge: DCR
 // 0.98 "adequate" where tear-out gives 1.11).
-// dims: in { applied_load_kip: M L T^-2, plate_thick_in: L, hole_dia_in: L, pin_dia_in: L, edge_dist_in: L, plate_width_in: L, fy_ksi: M L^-1 T^-2, fu_ksi: M L^-1 T^-2, design_factor: dimensionless } out: { fracture_kip: M L T^-2, bearing_kip: M L T^-2, tension_kip: M L T^-2, tearout_kip: M L T^-2, dcr: dimensionless, Av_in2: L^2, beff_in: L, governing_kip: M L T^-2 }
+// dims: in { applied_load_kip: M L T^-2, plate_thick_in: L, hole_dia_in: L, pin_dia_in: L, edge_dist_in: L, plate_width_in: L, fy_ksi: M L^-1 T^-2, fu_ksi: M L^-1 T^-2, design_factor: dimensionless } out: { fracture_kip: M L T^-2, bearing_kip: M L T^-2, tension_kip: M L T^-2, tearout_kip: M L T^-2, dcr: dimensionless, Av_in2: L^2, beff_in: L, governing_kip: M L T^-2, Cr: dimensionless }
 export function computeLiftingLugDesign({ applied_load_kip, plate_thick_in, hole_dia_in, pin_dia_in, edge_dist_in, plate_width_in, fy_ksi = 36, fu_ksi = 58, design_factor = 2.0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const P = Number(applied_load_kip), t = Number(plate_thick_in), Dh = Number(hole_dia_in), Dp = Number(pin_dia_in);

@@ -215,7 +215,7 @@ export function parseConductorShorthand(s) {
   return { awg, insulation, count };
 }
 
-// dims: in { conduit: dimensionless, trade_size: L, conductors: dimensionless } out: { fill_in2: L^2, fill_percent: dimensionless, pass: dimensionless, conduit_area_in2: L^2, margin_pct: dimensionless, threshold_percent: dimensionless }
+// dims: in { conduit: dimensionless, trade_size: L, conductors: dimensionless } out: { fill_in2: L^2, fill_percent: dimensionless, pass: dimensionless, conduit_area_in2: L^2, margin_pct: dimensionless, threshold_percent: dimensionless, count: dimensionless }
 export function computeConduitFill({ conduit, trade_size, conductors }) {
   const areaTable = CONDUIT_AREAS_IN2[conduit];
   if (!areaTable) return { error: "Unknown conduit type." };
@@ -435,7 +435,7 @@ export const transformerSizeExample = {
 
 // --- Utility 9: Three-Phase Power ---
 
-// dims: in { V_LL: M L^2 T^-3 I^-1, I_L: I, pf: dimensionless } out: { P_W: M L^2 T^-3, kW: M L^2 T^-3, Q_var: M L^2 T^-3, S_VA: M L^2 T^-3 }
+// dims: in { V_LL: M L^2 T^-3 I^-1, I_L: I, pf: dimensionless } out: { P_W: M L^2 T^-3, kW: M L^2 T^-3, Q_var: M L^2 T^-3, S_VA: M L^2 T^-3, kVA: M L^2 T^-3, kVAR: M L^2 T^-3 }
 export function computeThreePhase({ V_LL, I_L, pf }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // A power factor above 1 made kW exceed kVA without complaint.
@@ -1284,7 +1284,7 @@ const LIGHTING_DENSITY_REMOVED = {
   residential: "Dwelling units have no W/ft^2 lighting allowance; the energy code sets a lamp-efficacy requirement for them instead.",
 };
 
-// dims: in { area_ft2: L^2, occupancy_class: dimensionless, code_edition: dimensionless } out: { target_W: M L^2 T^-3, area_ft2: L^2 }
+// dims: in { area_ft2: L^2, occupancy_class: dimensionless, code_edition: dimensionless } out: { target_W: M L^2 T^-3, area_ft2: L^2, w_per_ft2: M T^-3 }
 export function computeLightingDensity({ area_ft2, occupancy_class, code_edition = "2024" }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const a = Number(area_ft2) || 0;
@@ -1499,7 +1499,7 @@ export function renderLightingDensity(inputRegion, outputRegion, citationEl, par
 // over a sequence of bends. Sidewall pressure at each bend = T / R where
 // R is the bend radius in feet.
 
-// dims: in { cable_weight_lb_per_ft: M T^-2, run_length_ft: L, lubricant: dimensionless, straight_run_ft: L, bends: dimensionless } out: { tension_lb: M L T^-2 }
+// dims: in { cable_weight_lb_per_ft: M T^-2, run_length_ft: L, lubricant: dimensionless, straight_run_ft: L, bends: dimensionless } out: { tension_lb: M L T^-2, mu: dimensionless }
 export function computePullingTension({
   cable_weight_lb_per_ft = 0,
   run_length_ft = 0,
@@ -1606,7 +1606,7 @@ export const bendRadiusExample = {
 
 // --- Utility 127: Power Factor Correction Capacitor ---
 
-// dims: in { kW: M L^2 T^-3, pf1: dimensionless, pf2: dimensionless, system_V: M L^2 T^-3 I^-1, phase: dimensionless } out: { capacitance_delta_uF: T^4 I^2 M^-1 L^-2, capacitance_uF: M^-1 L^-2 T^4 I^2 }
+// dims: in { kW: M L^2 T^-3, pf1: dimensionless, pf2: dimensionless, system_V: M L^2 T^-3 I^-1, phase: dimensionless } out: { capacitance_delta_uF: T^4 I^2 M^-1 L^-2, capacitance_uF: M^-1 L^-2 T^4 I^2, kVAR: M L^2 T^-3 }
 export function computePFCorrection({ kW, pf1, pf2, system_V, phase = "single" }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(kW > 0)) return { error: "Real power must be positive." };
@@ -1849,7 +1849,7 @@ export const POE_CLASSES = {
   bt4: { pse_W: 90.0, pd_min_W: 71.3, label: "802.3bt Type 4" },
 };
 
-// dims: in { poe_class: dimensionless, category: dimensionless, run_length_ft: L, ambient_C: T } out: { pse_W: M L^2 T^-3, pd_available_W: M L^2 T^-3, voltage_at_pd_V: M L^2 T^-3 I^-1, cable_loss_W: M L^2 T^-3 }
+// dims: in { poe_class: dimensionless, category: dimensionless, run_length_ft: L, ambient_C: T } out: { pse_W: M L^2 T^-3, pd_available_W: M L^2 T^-3, voltage_at_pd_V: M L^2 T^-3 I^-1, cable_loss_W: M L^2 T^-3, pd_min_W: M L^2 T^-3 }
 export function computePoEBudget({ poe_class = "at", category = "Cat6", run_length_ft = 100, ambient_C = 25 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const cls = POE_CLASSES[poe_class];
@@ -2278,7 +2278,7 @@ export const transformerKvaSizingExample = {
 
 const POINT_TO_POINT_SQRT3 = 1.732;
 
-// dims: in { utility_kVA: M L^2 T^-3, utility_Z_pct: dimensionless, secondary_V: M L^2 T^-3 I^-1, phase: dimensionless, C_value: dimensionless, length_ft: L, parallel_sets: dimensionless } out: { M: dimensionless, I_sca_secondary_A: I, I_sca_panel_A: I }
+// dims: in { utility_kVA: M L^2 T^-3, utility_Z_pct: dimensionless, secondary_V: M L^2 T^-3 I^-1, phase: dimensionless, C_value: dimensionless, length_ft: L, parallel_sets: dimensionless } out: { M: dimensionless, I_sca_secondary_A: I, I_sca_panel_A: I, M_factor: dimensionless, f_factor: dimensionless }
 export function computeShortCircuitPP({
   utility_kVA = 0,
   utility_Z_pct = 0,
@@ -2340,7 +2340,7 @@ export const NEMA_MG1_CODE_LETTERS = {
 
 const GENERATOR_KW_STEPS = [15, 22, 35, 50, 60, 80, 100, 125, 150, 175, 200, 230, 275, 300, 400, 500, 600, 750, 1000];
 
-// dims: in { motors: dimensionless, non_motor_kW: M L^2 T^-3, dip_factor: dimensionless, starts_per_hour: T^-1 } out: { recommended_kW: M L^2 T^-3, running_kW: M L^2 T^-3, worst_starting_kVA: M L^2 T^-3, required_starting_kVA: M L^2 T^-3, required_kW: M L^2 T^-3 }
+// dims: in { motors: dimensionless, non_motor_kW: M L^2 T^-3, dip_factor: dimensionless, starts_per_hour: T^-1 } out: { recommended_kW: M L^2 T^-3, running_kW: M L^2 T^-3, worst_starting_kVA: M L^2 T^-3, required_starting_kVA: M L^2 T^-3, required_kW: M L^2 T^-3, generator_xd: dimensionless, starts_factor: dimensionless }
 export function computeGeneratorMotorStarting({
   motors = [],
   non_motor_kW = 0,
@@ -2745,7 +2745,7 @@ import {
 // circuits whose breaker positions are listed in `swappable_pairs`, or
 // (if not supplied) between any two single-leg breakers across phases.
 
-// dims: in { circuits: dimensionless, swappable_pairs: dimensionless, lightPhase: dimensionless } out: { totals_B_amps: I, totals_C_amps: I, mean_amps: I, imbalance_pct: dimensionless }
+// dims: in { circuits: dimensionless, swappable_pairs: dimensionless, lightPhase: dimensionless } out: { totals_B_amps: I, totals_C_amps: I, mean_amps: I, imbalance_pct: dimensionless, totals_A_amps: I }
 export function computePanelRebalance({
   circuits = [],
   swappable_pairs = null,
@@ -3070,7 +3070,7 @@ ELECTRICAL_RENDERERS["arc-flash-screen"] = renderArcFlashScreen;
 // when nameplate FLA is provided, both are surfaced and the larger
 // (design) value is flagged.
 
-// dims: in { hp: M L^2 T^-3, voltage_V: M L^2 T^-3 I^-1, phase: dimensionless, eta: dimensionless, power_factor: dimensionless, nameplate_fla_A: I, service_factor: dimensionless } out: { computed_fla_A: I, design_fla_A: I, branch_conductor_125pct_A: I, overload_max_A: I, nameplate_fla_A: I }
+// dims: in { hp: M L^2 T^-3, voltage_V: M L^2 T^-3 I^-1, phase: dimensionless, eta: dimensionless, power_factor: dimensionless, nameplate_fla_A: I, service_factor: dimensionless } out: { computed_fla_A: I, design_fla_A: I, branch_conductor_125pct_A: I, overload_max_A: I, nameplate_fla_A: I, overload_multiplier: dimensionless }
 export function computeMotorBranchFromNameplate({
   hp = 0,
   voltage_V = 0,
@@ -3232,7 +3232,7 @@ ELECTRICAL_RENDERERS["motor-branch-from-nameplate"] = renderMotorBranchFromNamep
 // between rods means n rods at ~6 ft spacing land closer to ~1.1n /
 // R_single in practice; the count is a starting point, not a design.
 
-// dims: in { electrode_type: dimensionless, soil_resistivity_ohm_cm: M L^3 T^-3 I^-2, rod_diameter_in: L, rod_length_ft: L, ring_diameter_ft: L, ring_conductor_diameter_in: L, ring_burial_depth_ft: L, plate_area_ft2: L^2, plate_burial_depth_ft: L, ufer_concrete_diameter_in: L } out: { resistance_ohms: M L^2 T^-3 I^-2, supplemental_count_to_25_ohm: M L^2 T^-3 I^-2 }
+// dims: in { electrode_type: dimensionless, soil_resistivity_ohm_cm: M L^3 T^-3 I^-2, rod_diameter_in: L, rod_length_ft: L, ring_diameter_ft: L, ring_conductor_diameter_in: L, ring_burial_depth_ft: L, plate_area_ft2: L^2, plate_burial_depth_ft: L, ufer_concrete_diameter_in: L } out: { resistance_ohms: M L^2 T^-3 I^-2, supplemental_count_to_25_ohm: dimensionless, rho_ohm_cm: M L^3 T^-3 I^-2 }
 export function computeGroundingElectrodeResistance({
   electrode_type = "driven_rod",
   soil_resistivity_ohm_cm = 0,
@@ -3408,7 +3408,7 @@ ELECTRICAL_RENDERERS["grounding-electrode"] = renderGroundingElectrode;
 // since a steel raceway raises X). Table 9 is paywalled, so the user enters the
 // R and X for their conductor / conduit pair; the tile does not bundle it.
 
-// dims: in { system_voltage_v: M L^2 T^-3 I^-1, current_a: I, length_ft: L, r_ohm_per_kft: M L T^-3 I^-2, x_ohm_per_kft: M L T^-3 I^-2, power_factor: dimensionless, phase: dimensionless } out: { drop_v: M L^2 T^-3 I^-1, drop_percent: dimensionless, voltage_at_load_v: M L^2 T^-3 I^-1, phase_angle_deg: dimensionless }
+// dims: in { system_voltage_v: M L^2 T^-3 I^-1, current_a: I, length_ft: L, r_ohm_per_kft: M L T^-3 I^-2, x_ohm_per_kft: M L T^-3 I^-2, power_factor: dimensionless, phase: dimensionless } out: { drop_v: M L^2 T^-3 I^-1, drop_percent: dimensionless, voltage_at_load_v: M L^2 T^-3 I^-1, phase_angle_deg: dimensionless, z_eff_ohm_per_kft: M L T^-3 I^-2 }
 export function computeVoltageDropReactance({
   system_voltage_v = 0,
   current_a = 0,
@@ -3869,7 +3869,7 @@ ELECTRICAL_RENDERERS["ambient-ampacity-adjust"] = renderAmbientAmpacityAdjust;
 // comparison line runs the standard (Part III, Table 220.45) method and the service is sized to
 // the larger of the two.
 
-// dims: in { area_ft2: L^2, small_appliance_circuits: dimensionless, laundry_circuits: dimensionless, fixed_appliances_kw: M L^2 T^-3, range_kw: M L^2 T^-3, dryer_kw: M L^2 T^-3, water_heater_kw: M L^2 T^-3, hvac_heating_kw: M L^2 T^-3, hvac_cooling_kw: M L^2 T^-3, ev_charger_a: I, service_voltage: M L^2 T^-3 I^-1 } out: { optional_total_va: M L^2 T^-3, optional_demand_a: I, recommended_a: I, standard_demand_a: I }
+// dims: in { area_ft2: L^2, small_appliance_circuits: dimensionless, laundry_circuits: dimensionless, fixed_appliances_kw: M L^2 T^-3, range_kw: M L^2 T^-3, dryer_kw: M L^2 T^-3, water_heater_kw: M L^2 T^-3, hvac_heating_kw: M L^2 T^-3, hvac_cooling_kw: M L^2 T^-3, ev_charger_a: I, service_voltage: M L^2 T^-3 I^-1 } out: { optional_total_va: M L^2 T^-3, optional_demand_a: I, recommended_a: I, standard_demand_a: I, general_demand_va: M L^2 T^-3, general_va: M L^2 T^-3, hvac_demand_va: M L^2 T^-3, standard_total_va: M L^2 T^-3 }
 export function computeServiceLoadOptional({
   area_ft2 = 0,
   small_appliance_circuits = 2,
@@ -4829,7 +4829,7 @@ ELECTRICAL_RENDERERS["wireway-fill"] = _v170renderWirewayFill;
 // Reuses the module-level _AMBIENT_FACTORS[90] correction table.
 // =====================================================================
 
-// dims: in { measured_ambient_f: T, height_above_roof_in: L, base_ampacity_a: I } out: { adder_f: T, design_ambient_f: T, correction: dimensionless, corrected_a: I }
+// dims: in { measured_ambient_f: T, height_above_roof_in: L, base_ampacity_a: I } out: { adder_f: T, design_ambient_f: T, correction: dimensionless, corrected_a: I, design_ambient_c: T }
 export function computeRooftopTempAdder({ measured_ambient_f = null, height_above_roof_in = 0, base_ampacity_a = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // Blank, null and omitted all used to become 0 F, whose correction factor RAISES the ampacity.
@@ -5187,7 +5187,7 @@ ELECTRICAL_RENDERERS["shock-approach-boundary"] = _v186renderShockApproachBounda
 // in a narrow band around 3.0 (they triangulate and wedge). The 100th tile of
 // the v275-v374 campaign.
 
-// dims: in { conduit_id_in: L, conductor_od_in: L, n_conductors: dimensionless } out: { ratio: dimensionless, jam_prone: dimensionless }
+// dims: in { conduit_id_in: L, conductor_od_in: L, n_conductors: dimensionless } out: { ratio: dimensionless, jam_prone: dimensionless, n: dimensionless, ratio_straight: dimensionless }
 export function computeConduitJamRatio({ conduit_id_in = 0, conductor_od_in = 0, n_conductors = 3 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const id = Number(conduit_id_in) || 0;
@@ -5235,7 +5235,7 @@ function _v374renderConduitJamRatio(inputRegion, outputRegion, citationEl) {
 ELECTRICAL_RENDERERS["conduit-jam-ratio"] = _v374renderConduitJamRatio;
 
 // ===================== spec-v471: premium motor upgrade energy savings =====================
-// dims: in { hp: M L^2 T^-3, load: dimensionless, eff_standard: dimensionless, eff_premium: dimensionless, hours: T, rate_kwh: dimensionless } out: { kw_standard: dimensionless, kw_premium: dimensionless, annual_saving: dimensionless, kw_saved: M L^2 T^-3 }
+// dims: in { hp: M L^2 T^-3, load: dimensionless, eff_standard: dimensionless, eff_premium: dimensionless, hours: T, rate_kwh: dimensionless } out: { kw_standard: M L^2 T^-3, kw_premium: M L^2 T^-3, annual_saving: dimensionless, kw_saved: M L^2 T^-3, annual_kwh_saved: M L^2 T^-2 }
 export function computeMotorEfficiencyUpgradeSavings({ hp = 0, load = 0, eff_standard = 0, eff_premium = 0, hours = 0, rate_kwh = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const h = Number(hp) || 0;
@@ -5745,7 +5745,7 @@ function _v520renderTransformerInrushPoint(inputRegion, outputRegion, citationEl
 ELECTRICAL_RENDERERS["transformer-inrush-point"] = _v520renderTransformerInrushPoint;
 
 // ===================== spec-v562: termination temperature ampacity limit (NEC 110.14(C)) =====================
-// dims: in { amp_90c: I, amp_75c: I, amp_60c: I, termination_rating: dimensionless, over_100a: dimensionless, derate_factor: dimensionless } out: { termination_ampacity_a: I, derated_90c_a: I, governing_a: I }
+// dims: in { amp_90c: I, amp_75c: I, amp_60c: I, termination_rating: dimensionless, over_100a: dimensionless, derate_factor: dimensionless } out: { termination_ampacity_a: I, derated_90c_a: I, governing_a: I, nec_default_column_c: T }
 export function computeTerminationTempAmpacity({ amp_90c = 0, amp_75c = 0, amp_60c = 0, termination_rating = 75, over_100a = false, derate_factor = 1.0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const a90 = Number(amp_90c) || 0;

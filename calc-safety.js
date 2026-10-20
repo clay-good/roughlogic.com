@@ -294,7 +294,7 @@ SAFETY_RENDERERS["hearing-protector-nrr"] = _simpleRendererG({
 // APF 25 - a half mask to a PAPR or full facepiece - at four hours and one minute.
 // And several rows change or vanish indoors. A walk-behind saw needs nothing outdoors and APF
 // 10 indoors; a drivable saw has no indoor row at all, so taking it inside leaves Table 1.
-// dims: in { hours_per_shift: T, apf_provided: dimensionless } out: { required_apf: dimensionless, hours_to_upgrade: T }
+// dims: in { hours_per_shift: T, apf_provided: dimensionless } out: { required_apf: dimensionless, hours_to_upgrade: T, apf_shortfall: dimensionless, high_apf: dimensionless, indoor_move_penalty: dimensionless, low_apf: dimensionless, other_location_apf: dimensionless, pel_ug_m3: M L^-3 }
 export function computeSilicaTable1({ task = "xi", location = "outdoors", hours_per_shift = 0, controls_fully_implemented = "yes", apf_provided = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const hrs = Number(hours_per_shift);
@@ -425,7 +425,7 @@ SAFETY_RENDERERS["silica-table-1"] = _simpleRendererG({
 // OSHA then puts a factor on top: 1926.502(d)(8) requires a horizontal lifeline to maintain a
 // safety factor of at least two, and (d)(15) wants an anchorage good for 5,000 lb per employee
 // unless the whole system is engineered to that factor of two by a qualified person.
-// dims: in { span_ft: L, sag_ft: L, arrest_force_lb: M L T^-2, workers: dimensionless } out: { cable_tension_lb: M L T^-2, horizontal_pull_lb: M L T^-2, anchorage_demand_lb: M L T^-2, sag_for_target_ft: L, target_tension_lb: M L T^-2, angle_deg: dimensionless, decel_max_ft: L, free_fall_max_ft: L, slant_ft: L }
+// dims: in { span_ft: L, sag_ft: L, arrest_force_lb: M L T^-2, workers: dimensionless } out: { cable_tension_lb: M L T^-2, horizontal_pull_lb: M L T^-2, anchorage_demand_lb: M L T^-2, sag_for_target_ft: L, target_tension_lb: M L T^-2, angle_deg: dimensionless, decel_max_ft: L, free_fall_max_ft: L, slant_ft: L, tension_multiple: dimensionless }
 export function computeLifelineTension({ span_ft = 0, sag_ft = 0, arrest_force_lb = 1800, workers = 1, safety_factor = 2, anchorage_capacity_lb = 0, target_tension_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const L = Number(span_ft) || 0;

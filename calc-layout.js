@@ -44,7 +44,7 @@ export const LAYOUT_RENDERERS = {};
 // existing sling-angle tile, enhanced additively rather than duplicated.)
 // =====================================================================
 
-// dims: in { reading_1_lb: dimensionless, reading_2_lb: dimensionless, span_ft: L, total_weight_lb: dimensionless, cg_from_1_ft: L } out: { total_weight_lb: dimensionless, cg_from_point_1_ft: L, percent_at_1: dimensionless, cg_from_point_2_ft: L }
+// dims: in { reading_1_lb: dimensionless, reading_2_lb: dimensionless, span_ft: L, total_weight_lb: dimensionless, cg_from_1_ft: L } out: { total_weight_lb: dimensionless, cg_from_point_1_ft: L, percent_at_1: dimensionless, cg_from_point_2_ft: L, percent_at_2: dimensionless, reading_1_lb: dimensionless, reading_2_lb: dimensionless }
 export function computeCenterOfGravity2Point({ mode = "two-scale-weigh", reading_1_lb = 0, reading_2_lb = 0, span_ft = 0, total_weight_lb = 0, cg_from_1_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const L = Number(span_ft);
@@ -331,7 +331,7 @@ LAYOUT_RENDERERS["triangle-ssa"] = renderTriangleSsa;
 // --- v32 G: Bolt circle / circle-of-holes layout (`bolt-circle`) ---
 // R = dia/2; hole i at angle start + i*(360/N): x = cx + R*cos, y = cy + R*sin;
 // adjacent center-to-center chord = 2*R*sin(180/N).
-// dims: in { bolt_circle_dia_in: L, num_holes: dimensionless, start_angle_deg: dimensionless, center_x_in: L, center_y_in: L } out: { radius_in: L, chord_in: L, angular_spacing_deg: dimensionless, bolt_circle_dia_in: L, center_x_in: L, center_y_in: L, start_angle_deg: dimensionless }
+// dims: in { bolt_circle_dia_in: L, num_holes: dimensionless, start_angle_deg: dimensionless, center_x_in: L, center_y_in: L } out: { radius_in: L, chord_in: L, angular_spacing_deg: dimensionless, bolt_circle_dia_in: L, center_x_in: L, center_y_in: L, start_angle_deg: dimensionless, num_holes: dimensionless }
 export function computeBoltCircle({ bolt_circle_dia_in = 0, num_holes = 0, start_angle_deg = 0, center_x_in = 0, center_y_in = 0 } = {}) {
   const _g = _finiteGuard({ bolt_circle_dia_in, num_holes, start_angle_deg, center_x_in, center_y_in }); if (_g) return _g;
   const dia = Number(bolt_circle_dia_in) || 0;
@@ -387,7 +387,7 @@ LAYOUT_RENDERERS["bolt-circle"] = _v32renderBoltCircle;
 // Tape-measure math: round a decimal value to the nearest 1/den tick, reduce
 // the fraction, and break it into feet-inches. Helper kept above the dims block.
 const _bcGcd = (a, b) => { a = Math.abs(a); b = Math.abs(b); while (b) { const t = b; b = a % b; a = t; } return a || 1; };
-// dims: in { value_in: L, denominator: dimensionless } out: { whole_in: L, decimal_value_in: L, error_in: L, value_in: L }
+// dims: in { value_in: L, denominator: dimensionless } out: { whole_in: L, decimal_value_in: L, error_in: L, value_in: L, denominator: dimensionless, feet: L, inch_in_ft: L, numerator: dimensionless, reduced_denominator: dimensionless }
 export function computeDecimalToFraction({ value_in = 0, denominator = 16 } = {}) {
   const _g = _finiteGuard({ value_in, denominator }); if (_g) return _g;
   const v = Number(value_in);
@@ -514,7 +514,7 @@ LAYOUT_RENDERERS["sine-bar"] = _v37renderSineBar;
 // P x number of starts. The fundamental sharp-V triangle height is
 // H = P x cos(30) = P x sqrt(3) / 2, exact 60-degree geometry.
 const _V38_COS30 = Math.sqrt(3) / 2; // = 0.8660254037844386
-// dims: in { thread_standard: dimensionless, tpi: L^-1, pitch_mm: L, starts: dimensionless } out: { pitch_in: L, pitch_mm: L, tpi: L^-1, lead_in: L, lead_mm: L, sharp_v_height_in: L, sharp_v_height_mm: L }
+// dims: in { thread_standard: dimensionless, tpi: L^-1, pitch_mm: L, starts: dimensionless } out: { pitch_in: L, pitch_mm: L, tpi: L^-1, lead_in: L, lead_mm: L, sharp_v_height_in: L, sharp_v_height_mm: L, starts: dimensionless }
 export function computeThreadPitch({ thread_standard = "inch", tpi = 0, pitch_mm = 0, starts = 1 } = {}) {
   const _g = _finiteGuard({ tpi, pitch_mm, starts }); if (_g) return _g;
   if (!["inch", "metric"].includes(String(thread_standard))) return { error: "Unknown thread standard; use inch or metric." };
@@ -797,7 +797,7 @@ LAYOUT_RENDERERS["circle-from-3-points"] = renderCircleFrom3Points;
 // values (square 45, hexagon 30, octagon 22.5).
 // =====================================================================
 
-// dims: in { sides: dimensionless, size_mode: dimensionless, size_in: L } out: { side_in: L, miter_angle_deg: dimensionless, interior_angle_deg: dimensionless, across_flats_in: L, across_corners_in: L, perimeter_in: L, area_in2: L^2 }
+// dims: in { sides: dimensionless, size_mode: dimensionless, size_in: L } out: { side_in: L, miter_angle_deg: dimensionless, interior_angle_deg: dimensionless, across_flats_in: L, across_corners_in: L, perimeter_in: L, area_in2: L^2, sides: dimensionless }
 export function computePolygonMiter({ sides = 0, size_mode = "side", size_in = 0 } = {}) {
   const _g = _finiteGuard({ sides, size_in }); if (_g) return _g;
   if (!Number.isInteger(Number(sides))) return { error: "Number of sides must be a whole number." };

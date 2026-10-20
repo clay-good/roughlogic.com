@@ -289,7 +289,7 @@ export const staticPressureHvacExample = {
 
 // --- Utility 27: SEER and EER Conversion ---
 
-// dims: in { value: dimensionless, from: dimensionless, cooling_load_btu_hr: M L^2 T^-3, annual_hours: T, electricity_rate: dimensionless } out: { seer: dimensionless, annual_kwh: M L^2 T^-2, annual_cost_usd: dimensionless }
+// dims: in { value: dimensionless, from: dimensionless, cooling_load_btu_hr: M L^2 T^-3, annual_hours: T, electricity_rate: dimensionless } out: { seer: dimensionless, annual_kwh: M L^2 T^-2, annual_cost_usd: dimensionless, SEER: dimensionless, SEER2_estimate: dimensionless }
 export function computeSeerEer({ value, from, cooling_load_btu_hr = 0, annual_hours = 0, electricity_rate = 0 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // NREL Building America House Simulation Protocols (Wassmer 2003): EER = -0.02 SEER^2 + 1.12 SEER;
@@ -491,7 +491,7 @@ export const approachDeltaTExample = {
 // mixed_T = OA_fraction * OA_T + (1 - OA_fraction) * RA_T
 // mixed_W = mass-mixing of humidity ratios from psychrometric helpers.
 
-// dims: in { return_T_F: T, return_RH_percent: dimensionless, outdoor_T_F: T, outdoor_RH_percent: dimensionless, oa_fraction: dimensionless } out: { mixed_T_F: T, oa_fraction: dimensionless }
+// dims: in { return_T_F: T, return_RH_percent: dimensionless, outdoor_T_F: T, outdoor_RH_percent: dimensionless, oa_fraction: dimensionless } out: { mixed_T_F: T, oa_fraction: dimensionless, mixed_GPP: dimensionless, mixed_W_kg_kg: dimensionless, outdoor_W_kg_kg: dimensionless, return_W_kg_kg: dimensionless }
 export function computeOutdoorAirMix({ return_T_F, return_RH_percent, outdoor_T_F, outdoor_RH_percent, oa_fraction }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (![return_T_F, return_RH_percent, outdoor_T_F, outdoor_RH_percent, oa_fraction].every((x) => x !== null && x !== undefined && x !== "" && Number.isFinite(Number(x)))) return { error: "Enter both air states (F and % RH) and the outdoor-air fraction." };
@@ -610,7 +610,7 @@ export const wetBulbPsychrometerExample = {
 // Computed film added 2026-10-09: film_mode "computed" takes the outer coefficient from bare-pipe-heat-loss
 // (Churchill-Chu natural convection + gray-body radiation + optional Churchill-Bernstein wind) at the jacket OD
 // and the target surface temperature, inside the thickness bisection.
-// dims: in { pipe_od_in: L, surface_temp_F: T, ambient_F: T, surface_limit_F: T, k_btu_in_per_hr_ft2_F: M L^2 T^-3, outside_film_coeff_btu_hr_ft2_F: M T^-3, at_thickness_in: L, alt_film_coeff_btu_hr_ft2_F: M T^-3, film_mode: dimensionless, jacket_emissivity: dimensionless, wind_mph: L T^-1 } out: { thickness_in: L, film_used_btu_hr_ft2_F: M T^-3, r2_in: L, r1_in: L, alt_thickness_in: L }
+// dims: in { pipe_od_in: L, surface_temp_F: T, ambient_F: T, surface_limit_F: T, k_btu_in_per_hr_ft2_F: M L^2 T^-3, outside_film_coeff_btu_hr_ft2_F: M T^-3, at_thickness_in: L, alt_film_coeff_btu_hr_ft2_F: M T^-3, film_mode: dimensionless, jacket_emissivity: dimensionless, wind_mph: L T^-1 } out: { thickness_in: L, film_used_btu_hr_ft2_F: M T^-3, r2_in: L, r1_in: L, alt_thickness_in: L, alt_surface_at_thickness_F: T, surface_at_thickness_F: T }
 export function computeInsulationThickness({
   pipe_od_in, surface_temp_F, ambient_F, surface_limit_F, k_btu_in_per_hr_ft2_F,
   outside_film_coeff_btu_hr_ft2_F = 1.65,
@@ -756,7 +756,7 @@ export const insulationThicknessExample = {
 
 export const HFG_WATER_BTU_PER_LB = 1054;
 
-// dims: in { evaporation_rate_lb_hr: M T^-1, hfg_btu_per_lb: dimensionless } out: { cooling_btu_hr: M L^2 T^-3 }
+// dims: in { evaporation_rate_lb_hr: M T^-1, hfg_btu_per_lb: dimensionless } out: { cooling_btu_hr: M L^2 T^-3, cooling_tons: M L^2 T^-3 }
 export function computeEvaporativeCooling({ evaporation_rate_lb_hr, hfg_btu_per_lb = HFG_WATER_BTU_PER_LB }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const m = Number(evaporation_rate_lb_hr) || 0;
@@ -1538,7 +1538,7 @@ export const beltAndPulleyExample = {
 // V_gal = (t_min * (C_demand_scfm - C_pump_scfm) * P_atm_psi) / (P1 - P2)
 // converted to gallons via 7.4805 gal per ft^3.
 
-// dims: in { tools: dimensionless, pump_scfm: L^3 T^-1, p_high_psi: M L^-1 T^-2, p_low_psi: M L^-1 T^-2, drawdown_minutes: T, p_atm_psi: M L^-1 T^-2 } out: { receiver_gal: L^3, receiver_ft3: L^3 }
+// dims: in { tools: dimensionless, pump_scfm: L^3 T^-1, p_high_psi: M L^-1 T^-2, p_low_psi: M L^-1 T^-2, drawdown_minutes: T, p_atm_psi: M L^-1 T^-2 } out: { receiver_gal: L^3, receiver_ft3: L^3, concurrent: dimensionless, deficit_scfm: L^3 T^-1, demand_scfm: L^3 T^-1 }
 export function computeAirReceiver({
   tools = [], pump_scfm = 0, p_high_psi = 0, p_low_psi = 0,
   drawdown_minutes = 1, p_atm_psi = 14.7,
@@ -1644,7 +1644,7 @@ export const BASEBOARD_OUTPUT = {
   },
 };
 
-// dims: in { water_temp_F: T, flow_gpm: L^3 T^-1, length_ft: L, model: dimensionless } out: { btu_per_ft: M L T^-3 }
+// dims: in { water_temp_F: T, flow_gpm: L^3 T^-1, length_ft: L, model: dimensionless } out: { btu_per_ft: M L T^-3, btu_total: M L^2 T^-3, flow_factor: dimensionless }
 export function computeBaseboardOutput({ water_temp_F = 0, flow_gpm = 1, length_ft = 0, model = "slant_fin_baseline" }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const m = BASEBOARD_OUTPUT[model];
@@ -1682,7 +1682,7 @@ export const baseboardOutputExample = {
   inputs: { water_temp_F: 180, flow_gpm: 1, length_ft: 8, model: "slant_fin_baseline" },
 };
 
-// dims: in { target_btuhr: M L^2 T^-3, water_temp_F: T, flow_gpm: L^3 T^-1, model: dimensionless } out: { length_ft: L, btu_per_ft: M L T^-3 }
+// dims: in { target_btuhr: M L^2 T^-3, water_temp_F: T, flow_gpm: L^3 T^-1, model: dimensionless } out: { length_ft: L, btu_per_ft: M L T^-3, flow_factor: dimensionless }
 export function computeBaseboardLengthForLoad({ target_btuhr = 0, water_temp_F = 0, flow_gpm = 1, model = "slant_fin_baseline" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const target = Number(target_btuhr) || 0;
@@ -2090,7 +2090,7 @@ function _frictionFactor(eps_ft, D_h_ft, Re) {
   return 0.25 / (denom * denom);
 }
 
-// dims: in { shape: dimensionless, D_in: L, W_in: L, H_in: L, material: dimensionless, cfm: L^3 T^-1, length_ft: L, fittings: dimensionless } out: { total_static_in_wc: M L^-1 T^-2, velocity_fpm: L T^-1, reynolds: dimensionless, friction_factor: dimensionless, hydraulic_diameter_in: L, equivalent_diameter_in: L }
+// dims: in { shape: dimensionless, D_in: L, W_in: L, H_in: L, material: dimensionless, cfm: L^3 T^-1, length_ft: L, fittings: dimensionless } out: { total_static_in_wc: M L^-1 T^-2, velocity_fpm: L T^-1, reynolds: dimensionless, friction_factor: dimensionless, hydraulic_diameter_in: L, equivalent_diameter_in: L, fitting_loss_in_wc: M L^-1 T^-2, friction_loss_per_100ft_in_wc: M L^-1 T^-2, straight_loss_in_wc: M L^-1 T^-2, velocity_pressure_in_wc: M L^-1 T^-2 }
 export function computeDuctFrictionStatic({
   shape = "round", D_in = 0, W_in = 0, H_in = 0,
   material = "galv_smooth", cfm = 0, length_ft = 0, fittings = [],
@@ -2167,7 +2167,7 @@ export const ductFrictionStaticExample = {
 
 // --- 244: Cooling Tower Approach and Range ---
 
-// dims: in { T_in_F: T, T_out_F: T, T_wb_F: T, gpm: L^3 T^-1, fan_kW: M L^2 T^-3 } out: { range_F: T, approach_F: T, efficiency: dimensionless }
+// dims: in { T_in_F: T, T_out_F: T, T_wb_F: T, gpm: L^3 T^-1, fan_kW: M L^2 T^-3 } out: { range_F: T, approach_F: T, efficiency: dimensionless, fan_kW_per_ton: dimensionless, heat_rejection_BTU_hr: M L^2 T^-3 }
 export function computeCoolingTower({ T_in_F, T_out_F, T_wb_F, gpm = 0, fan_kW = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // A blank wet-bulb read as 0 F reported an 85 F approach on a normal tower.
@@ -2240,7 +2240,7 @@ function _filmCoeff(V_fpm, eps_jacket, T_surface_F, T_ambient_F, D_ft) {
   return h_conv + h_rad;
 }
 
-// dims: in { pipe_OD_in: L, surface_T_F: T, ambient_T_F: T, air_velocity_fpm: L T^-1, insulation: dimensionless, thickness_in: L, jacket_emissivity: dimensionless } out: { surface_T_F: T, effectiveness_pct: dimensionless, k_value: dimensionless }
+// dims: in { pipe_OD_in: L, surface_T_F: T, ambient_T_F: T, air_velocity_fpm: L T^-1, insulation: dimensionless, thickness_in: L, jacket_emissivity: dimensionless } out: { surface_T_F: T, effectiveness_pct: dimensionless, k_value: dimensionless, Q_bare_BTU_hr_ft: M L T^-3, Q_insulated_BTU_hr_ft: M L T^-3, outer_surface_T_F: T }
 export function computeInsulationHeatLoss({
   pipe_OD_in = 0, surface_T_F, ambient_T_F,
   air_velocity_fpm = 0, insulation = "fiberglass",
@@ -2435,7 +2435,7 @@ export const SMACNA_LEAKAGE_CLASSES = {
   48: { cfm_per_100ft2_at_1inwc: 48, description: "Class 48 - SMACNA 1985 unsealed rectangular" },
 };
 
-// dims: in { design_cfm: L^3 T^-1, measured_cfm: L^3 T^-1, duct_surface_ft2: L^2, test_pressure_inwc: M L^-1 T^-2, design_class: dimensionless } out: { leakage_cfm: L^3 T^-1, leakage_pct: dimensionless }
+// dims: in { design_cfm: L^3 T^-1, measured_cfm: L^3 T^-1, duct_surface_ft2: L^2, test_pressure_inwc: M L^-1 T^-2, design_class: dimensionless } out: { leakage_cfm: L^3 T^-1, leakage_pct: dimensionless, effective_class: dimensionless, leak_at_1inwc: L^3 T^-1, leak_per_100ft2: L T^-1, target_class: dimensionless }
 export function computeDuctLeakage({
   design_cfm = 0, measured_cfm = 0,
   duct_surface_ft2 = 0, test_pressure_inwc = 1.0,
@@ -2546,7 +2546,7 @@ export const OA_OCCUPANCY_PRESETS = {
   retail:    { Rp: 7.5, Ra: 0.12, label: "Retail sales floor (ASHRAE 62.1-2022 placeholder)" },
 };
 
-// dims: in { people: dimensionless, floor_area_ft2: L^2 } out: { Vbz_cfm: L^3 T^-1, Voz_cfm: L^3 T^-1, cfm_per_ft2: L T^-1 }
+// dims: in { people: dimensionless, floor_area_ft2: L^2 } out: { Vbz_cfm: L^3 T^-1, Voz_cfm: L^3 T^-1, cfm_per_ft2: L T^-1, Ez: dimensionless, Ra_cfm_per_ft2: L T^-1, Rp_cfm_per_person: L^3 T^-1, cfm_per_person: L^3 T^-1 }
 export function computeOutdoorAirVentilation({
   Rp_cfm_per_person = 0,
   Ra_cfm_per_ft2 = 0,
@@ -2693,7 +2693,7 @@ export const HOOD_DUTY_MULTIPLIERS_CFM_PER_FT = {
 // no rate for those hoods and gave 100 cfm/ft, half the 200 cfm/ft a wall canopy needs.
 export const TYPE_II_HOOD_CFM_PER_FT = 100;
 
-// dims: in { hood_type: dimensionless, hood_class: dimensionless, duty: dimensionless, type_ii_use: dimensionless, length_ft: L, width_ft: L, duct_velocity_fpm: L T^-1 } out: { Q_exhaust_cfm: L^3 T^-1, makeup_cfm: L^3 T^-1, duct_area_in2: L^2 }
+// dims: in { hood_type: dimensionless, hood_class: dimensionless, duty: dimensionless, type_ii_use: dimensionless, length_ft: L, width_ft: L, duct_velocity_fpm: L T^-1 } out: { Q_exhaust_cfm: L^3 T^-1, makeup_cfm: L^3 T^-1, duct_area_in2: L^2, cfm_per_ft: L^2 T^-1, grease_duct_slope_in_per_ft: dimensionless }
 export function computeHoodExhaust({
   hood_type = "wall-canopy",
   hood_class = "I",
@@ -3020,7 +3020,7 @@ HVAC_RENDERERS["shr-latent"] = renderSHRLatent;
 
 // --- v20 C.1: Air-side economizer free-cooling hours (`economizer-savings-hours`) ---
 // Q_sens = 1.08 * CFM * dT; ton-hours = Q_sens * hours / 12,000.
-// dims: in { cfm: L^3*T^-1, delta_t_f: T, hours: T } out: { q_sens_btuh: M*L^2*T^-3, ton_hours: dimensionless }
+// dims: in { cfm: L^3*T^-1, delta_t_f: T, hours: T } out: { q_sens_btuh: M*L^2*T^-3, ton_hours: dimensionless, tons: M L^2 T^-3 }
 export function computeEconomizerSavingsHours({ cfm = 0, delta_t_f = 0, hours = 0 } = {}) {
   const CFM = Number(cfm) || 0;
   const dT = Number(delta_t_f) || 0;
@@ -3171,7 +3171,7 @@ HVAC_RENDERERS["pipe-heat-loss-radial"] = renderPipeHeatLossRadial;
 // Wind added 2026-10-09: forced convection in cross flow by Churchill-Bernstein (1977),
 // Nu = 0.3 + 0.62 Re^(1/2) Pr^(1/3) / [1 + (0.4/Pr)^(2/3)]^(1/4) x [1 + (Re/282000)^(5/8)]^(4/5),
 // combined with the natural-convection Nu as (Nu_F^3 + Nu_N^3)^(1/3) (Churchill; Incropera 9.9).
-// dims: in { od_in: L, surface_f: T, amb_f: T, emissivity: dimensionless, length_ft: L, wind_mph: L T^-1 } out: { conv_coefficient: M T^-3, rad_coefficient: M T^-3, q_per_ft_btuh: M*L*T^-3, q_total_btuh: M*L^2*T^-3, conv_share: dimensionless, reynolds: dimensionless, forced_nusselt: dimensionless }
+// dims: in { od_in: L, surface_f: T, amb_f: T, emissivity: dimensionless, length_ft: L, wind_mph: L T^-1 } out: { conv_coefficient: M T^-3, rad_coefficient: M T^-3, q_per_ft_btuh: M*L*T^-3, q_total_btuh: M*L^2*T^-3, conv_share: dimensionless, reynolds: dimensionless, forced_nusselt: dimensionless, natural_nusselt: dimensionless, prandtl: dimensionless, rayleigh: dimensionless }
 export function computeBarePipeHeatLoss({ od_in = 0, surface_f = null, amb_f = 70, emissivity = 0.8, length_ft = 1, wind_mph = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (surface_f === null || surface_f === undefined || surface_f === "") return { error: "Enter the pipe surface temperature (F)." };
@@ -3301,7 +3301,7 @@ HVAC_RENDERERS["insulation-thickness-for-heat-loss"] = renderInsulationThickness
 // AHP = CFM * TSP / 6356; BHP = AHP / eta_fan; motor HP = BHP / eta_drive,
 // rounded up to the next standard NEMA size.
 const NEMA_HP_SIZES = [0.25, 0.33, 0.5, 0.75, 1, 1.5, 2, 3, 5, 7.5, 10, 15, 20, 25, 30, 40, 50, 60, 75, 100, 125, 150, 200, 250, 300];
-// dims: in { cfm: L^3*T^-1, tsp_inwc: M*L^-1*T^-2, eta_fan: dimensionless, eta_drive: dimensionless } out: { ahp: dimensionless, bhp: M L^2 T^-3, next_nema_hp: M L^2 T^-3 }
+// dims: in { cfm: L^3*T^-1, tsp_inwc: M*L^-1*T^-2, eta_fan: dimensionless, eta_drive: dimensionless } out: { ahp: dimensionless, bhp: M L^2 T^-3, next_nema_hp: M L^2 T^-3, motor_hp_required: M L^2 T^-3 }
 export function computeFanMotorBhp({ cfm = 0, tsp_inwc = 0, eta_fan = 0.65, eta_drive = 1 } = {}) {
   const CFM = Number(cfm) || 0;
   const TSP = Number(tsp_inwc) || 0;
@@ -3618,7 +3618,7 @@ function _rEnv(spec) {
   return _rlRender;
 }
 
-// dims: in { cavity_r: dimensionless, continuous_r: dimensionless, stud_depth_in: L, framing_factor: dimensionless, air_films_r: dimensionless, finish_layers_r: dimensionless } out: { r_assembly: dimensionless, r_center: dimensionless, area_weighted_overstatement_pct: dimensionless, bridging_pct: dimensionless }
+// dims: in { cavity_r: dimensionless, continuous_r: dimensionless, stud_depth_in: L, framing_factor: dimensionless, air_films_r: dimensionless, finish_layers_r: dimensionless } out: { r_assembly: dimensionless, r_center: dimensionless, area_weighted_overstatement_pct: dimensionless, bridging_pct: dimensionless, continuous_gain: dimensionless, framing_gain: dimensionless, r_alt_continuous: dimensionless, r_alt_framing: dimensionless, r_area_weighted: dimensionless, r_cavity_path: dimensionless, r_framing_path: dimensionless, u_assembly: dimensionless }
 // (R-value carries hr-sq-ft-degF/Btu; treated dimensionless per spec-v14 for the U=1/R reciprocal and area-weighting core.)
 export function computeAssemblyRValue({ cavity_r = 0, continuous_r = 0, stud_depth_in = 0, framing_factor = 0.25, air_films_r = 0.85, finish_layers_r = 1.05, alt_framing_factor = 0, alt_continuous_r = 0 } = {}) {
   const _g = _finiteGuardEnv(arguments[0]); if (_g) return _g;
@@ -3922,7 +3922,7 @@ HVAC_RENDERERS["air-leak-cost"] = _rEnv({
   compute: computeAirLeakCost,
 });
 
-// dims: in { free_air_cfm: L^3 T^-1, inlet_psia: M L^-1 T^-2, discharge_psig: M L^-1 T^-2, overall_eff: dimensionless, run_hours: T, rate_kwh: dimensionless } out: { theo_hp: M L^2 T^-3, input_kw: M L^2 T^-3, annual_kwh: M L^2 T^-2, annual_cost: dimensionless }
+// dims: in { free_air_cfm: L^3 T^-1, inlet_psia: M L^-1 T^-2, discharge_psig: M L^-1 T^-2, overall_eff: dimensionless, run_hours: T, rate_kwh: dimensionless } out: { theo_hp: M L^2 T^-3, input_kw: M L^2 T^-3, annual_kwh: M L^2 T^-2, annual_cost: dimensionless, p2_abs: M L^-1 T^-2 }
 export function computeCompressedAirPower({ free_air_cfm = 0, inlet_psia = 14.7, discharge_psig = 0, overall_eff = 0.75, run_hours = 4000, rate_kwh = 0 } = {}) {
   const _g = _finiteGuardEnv(arguments[0]); if (_g) return _g;
   if (!(free_air_cfm > 0)) return { error: "Free-air flow must be positive (cfm)." };
@@ -4548,7 +4548,7 @@ HVAC_RENDERERS["radiant-floor-output"] = _v442renderRadiantFloorOutput;
 
 // ----- spec-v478: Hydronic Snowmelt Surface Load and Boiler Sizing (ASHRAE / Chapman) -----
 
-// dims: in { s_inhr: L T^-1, t_air_f: T, wind_mph: L T^-1, rh_pct: dimensionless, ar: dimensionless, area_ft2: L^2, back_loss_pct: dimensionless } out: { p_av_inhg: M L^-1 T^-2, q_s: M T^-3, q_m: M T^-3, q_h: M T^-3, q_e: M T^-3, q_o: M T^-3, boiler_btu_hr: M L^2 T^-3, t_m_f: T }
+// dims: in { s_inhr: L T^-1, t_air_f: T, wind_mph: L T^-1, rh_pct: dimensionless, ar: dimensionless, area_ft2: L^2, back_loss_pct: dimensionless } out: { p_av_inhg: M L^-1 T^-2, q_s: M T^-3, q_m: M T^-3, q_h: M T^-3, q_e: M T^-3, q_o: M T^-3, boiler_btu_hr: M L^2 T^-3, t_m_f: T, mbh: M L^2 T^-3 }
 export function computeSnowmeltLoad({ s_inhr = 0, t_air_f = null, wind_mph = 0, rh_pct = 0, ar = 0.5, area_ft2 = 0, back_loss_pct = 20 } = {}) {
   const _g = _finiteGuardEnv(arguments[0]); if (_g) return _g;
   // 0 F is a real reading, so a blank temperature cannot stand in for it.
@@ -4792,7 +4792,7 @@ const AIR_GAS_CONSTANT_FT_LBF_PER_LB_R = 53.35;
 const AIR_VISCOSITY_LB_FT_S = 1.81e-5 * 0.67197; // 1.81e-5 Pa-s at 68 F -> lb/(ft-s)
 const STD_PRESSURE_PSIA = 14.7;
 const STD_TEMP_RANKINE = 527.67; // 68 F
-// dims: in { scfm: L^3 T^-1, pipe_id_in: L, length_ft: L, line_pressure_psig: M L^-1 T^-2, air_temp_f: T, roughness_ft: L } out: { velocity_fps: L T^-1, reynolds: dimensionless, pressure_drop_psi: M L^-1 T^-2, density_lb_ft3: M L^-3, actual_cfm: L^3 T^-1, friction_factor: dimensionless, p_abs_psia: M L^-1 T^-2 }
+// dims: in { scfm: L^3 T^-1, pipe_id_in: L, length_ft: L, line_pressure_psig: M L^-1 T^-2, air_temp_f: T, roughness_ft: L } out: { velocity_fps: L T^-1, reynolds: dimensionless, pressure_drop_psi: M L^-1 T^-2, density_lb_ft3: M L^-3, actual_cfm: L^3 T^-1, friction_factor: dimensionless, p_abs_psia: M L^-1 T^-2, drop_per_100ft_psi: M L^-1 T^-2, pct_of_line: dimensionless }
 export function computeCompressedAirPressureDrop({ scfm = 0, pipe_id_in = 0, length_ft = 0, line_pressure_psig = 100, air_temp_f = 68, roughness_ft = 0.00015 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (air_temp_f === null || air_temp_f === "") return { error: "Enter the air temperature (F)." };
@@ -4868,7 +4868,7 @@ HVAC_RENDERERS["compressed-air-pressure-drop"] = renderCompressedAirPressureDrop
 // ratio, and on a belt drive fan rpm = motor rpm x (drive sheave / driven sheave), so with the
 // driven (fan) sheave fixed the required DRIVE sheave scales with the same ratio. The point of the
 // tile is the cube law landing on the motor: +20% air is +73% brake horsepower.
-// dims: in { current_cfm: L^3 T^-1, target_cfm: L^3 T^-1, current_fan_rpm: T^-1, motor_rpm: T^-1, drive_sheave_in: L, current_bhp: M L^2 T^-3, motor_hp: M L^2 T^-3, current_sp_inwg: M L^-1 T^-2 } out: { ratio: dimensionless, required_fan_rpm: T^-1, new_drive_sheave_in: L, new_bhp: M L^2 T^-3, bhp_increase_pct: dimensionless, check_fan_rpm: T^-1, driven_sheave_in: L }
+// dims: in { current_cfm: L^3 T^-1, target_cfm: L^3 T^-1, current_fan_rpm: T^-1, motor_rpm: T^-1, drive_sheave_in: L, current_bhp: M L^2 T^-3, motor_hp: M L^2 T^-3, current_sp_inwg: M L^-1 T^-2 } out: { ratio: dimensionless, required_fan_rpm: T^-1, new_drive_sheave_in: L, new_bhp: M L^2 T^-3, bhp_increase_pct: dimensionless, check_fan_rpm: T^-1, driven_sheave_in: L, new_sp_inwg: M L^-1 T^-2 }
 export function computeFanSheaveForTargetCfm({ current_cfm = 0, target_cfm = 0, current_fan_rpm = 0, motor_rpm = 1750, drive_sheave_in = 0, current_bhp = 0, motor_hp = 0, current_sp_inwg = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const q1 = Number(current_cfm) || 0;
@@ -4950,7 +4950,7 @@ HVAC_RENDERERS["fan-sheave-for-target-cfm"] = renderFanSheaveForTargetCfm;
 //   annual capital $ = price_per_in_sf x t x CRF,  CRF = i/(1-(1+i)^-n)
 //   d/dt = 0  ->  t_opt = k ( sqrt( C / (k x price x CRF) ) - R0 ),  C = dT x hours x $ / (1e6 eff)
 // The closed form was checked against a brute-force scan and agrees to four decimals.
-// dims: in { delta_t_f: T, bare_r_value: dimensionless, k_btu_in: dimensionless, operating_hours: T, energy_cost_per_mmbtu: dimensionless, system_efficiency: dimensionless, installed_cost_per_in_sf: dimensionless, life_years: T, discount_rate: dimensionless } out: { optimum_thickness_in: L, total_annual_cost: dimensionless, annual_savings: dimensionless, simple_payback_years: T, heat_loss_reduction_pct: dimensionless }
+// dims: in { delta_t_f: T, bare_r_value: dimensionless, k_btu_in: dimensionless, operating_hours: T, energy_cost_per_mmbtu: dimensionless, system_efficiency: dimensionless, installed_cost_per_in_sf: dimensionless, life_years: T, discount_rate: dimensionless } out: { optimum_thickness_in: L, total_annual_cost: dimensionless, annual_savings: dimensionless, simple_payback_years: T, heat_loss_reduction_pct: dimensionless, annual_capital_cost: dimensionless, annual_energy_cost: dimensionless, bare_annual_cost: dimensionless, crf: dimensionless, first_cost: dimensionless, q_bare: M T^-3, q_optimum: M T^-3, r_at_optimum: dimensionless }
 export function computeEconomicInsulationThickness({ delta_t_f = 0, bare_r_value = 0.5, k_btu_in = 0.27, operating_hours = 8000, energy_cost_per_mmbtu = 12, system_efficiency = 0.8, installed_cost_per_in_sf = 3, life_years = 10, discount_rate = 0.08 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const dT = Number(delta_t_f) || 0;

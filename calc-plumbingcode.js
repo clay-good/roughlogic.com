@@ -141,7 +141,7 @@ PLUMBINGCODE_RENDERERS["fixture-clearance-check"] = _v1132renderFixtureClearance
 // to 25 in is allowed if the area reaches 1,300 sq in. Both are measured from the FINISHED
 // interior at the top of the threshold, exclusive of valves, showerheads, soap dishes, and
 // grab bars, and the dimension has to hold up to 70 in above the drain.
-// dims: in { width_in: L, depth_in: L, base_min_area_sqin: L^2, base_min_dim_in: L, exception_min_area_sqin: L^2, exception_min_dim_in: L } out: { area_sqin: L^2, least_dim_in: L, greater_dim_in: L, exc_other_needed_in: L }
+// dims: in { width_in: L, depth_in: L, base_min_area_sqin: L^2, base_min_dim_in: L, exception_min_area_sqin: L^2, exception_min_dim_in: L } out: { area_sqin: L^2, least_dim_in: L, greater_dim_in: L, exc_other_needed_in: L, area_deficit_base: L^2, area_deficit_exc: L^2 }
 export function computeShowerCompartmentCheck({ width_in = 0, depth_in = 0, base_min_area_sqin = 900, base_min_dim_in = 30, exception_min_area_sqin = 1300, exception_min_dim_in = 25 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const w = Number(width_in) || 0;
@@ -425,7 +425,7 @@ PLUMBINGCODE_RENDERERS["aav-install-check"] = _v1136renderAavInstallCheck;
 // sustain 250 lbf, and a bar standing 1.5 in off the wall turns that into a prying moment
 // the blocking has to resolve over the fastener spacing - the same lever-arm collapse the
 // guard-post tile shows, in miniature. A bar screwed to drywall anchors meets none of it.
-// dims: in { bar_height_in: L, side_bar_length_in: L, side_bar_from_rear_in: L, rear_bar_length_in: L, rear_toward_side_in: L, rear_toward_open_in: L, load_lb: M L T^-2, standoff_in: L, fastener_spacing_in: L } out: { pull_out_lb: M L T^-2, prying_moment_inlb: M L^2 T^-2, fastener_force_lb: M L T^-2, rear_span_needed_in: L, side_reach_in: L }
+// dims: in { bar_height_in: L, side_bar_length_in: L, side_bar_from_rear_in: L, rear_bar_length_in: L, rear_toward_side_in: L, rear_toward_open_in: L, load_lb: M L T^-2, standoff_in: L, fastener_spacing_in: L } out: { pull_out_lb: M L T^-2, prying_moment_inlb: M L^2 T^-2, fastener_force_lb: M L T^-2, rear_span_needed_in: L, side_reach_in: L, force_multiplier: dimensionless }
 export function computeGrabBarLayout({ bar_height_in = 34, side_bar_length_in = 42, side_bar_from_rear_in = 12, rear_bar_length_in = 36, rear_toward_side_in = 12, rear_toward_open_in = 24, load_lb = 250, standoff_in = 1.5, fastener_spacing_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const h = Number(bar_height_in) || 0;

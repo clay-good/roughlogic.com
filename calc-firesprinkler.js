@@ -212,7 +212,7 @@ FIRESPRINKLER_RENDERERS["sprinkler-protection-area-for-supply"] = _simpleRendere
 
 // ===================== spec-v250: sprinkler head count and spacing =====================
 
-// dims: in { room_length: L, room_width: L, area_per_head: L^2, max_spacing: L } out: { spacing: L, heads_per_line: dimensionless, num_lines: dimensionless, total_heads: dimensionless, room_area: L^2, achieved_area_per_head: L^2, max_wall_distance: L }
+// dims: in { room_length: L, room_width: L, area_per_head: L^2, max_spacing: L } out: { spacing: L, heads_per_line: dimensionless, num_lines: dimensionless, total_heads: dimensionless, room_area: L^2, achieved_area_per_head: L^2, max_wall_distance: L, area_per_head_cap: L^2, wall_distance_length: L, wall_distance_width: L }
 export function computeSprinklerHeadLayout({ room_length = 0, room_width = 0, area_per_head = 130, max_spacing = 15 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(room_length > 0)) return { error: "Room length must be positive (ft)." };
@@ -612,7 +612,7 @@ FIRESPRINKLER_RENDERERS["sprinkler-obstruction"] = _simpleRenderer({
 });
 
 // ===================== spec-v1393: hydrant count and spacing =====================
-// dims: in { required_flow_gpm: L^3 T^-1, credited_flow_per_hydrant_gpm: L^3 T^-1, frontage_ft: L, average_spacing_ft: L, max_distance_ft: L } out: { hydrants_by_flow: dimensionless, hydrants_by_frontage: dimensionless, actual_spacing_ft: L, max_distance_ft: L, governing_count: dimensionless, worst_distance_ft: L }
+// dims: in { required_flow_gpm: L^3 T^-1, credited_flow_per_hydrant_gpm: L^3 T^-1, frontage_ft: L, average_spacing_ft: L, max_distance_ft: L } out: { hydrants_by_flow: dimensionless, hydrants_by_frontage: dimensionless, actual_spacing_ft: L, max_distance_ft: L, governing_count: dimensionless, worst_distance_ft: L, hydrants_for_max_distance: dimensionless }
 export function computeHydrantSpacingCount({ required_flow_gpm = 0, credited_flow_per_hydrant_gpm = 0, frontage_ft = 0, average_spacing_ft = 0, max_distance_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(required_flow_gpm > 0)) return { error: "Required fire flow must be positive." };

@@ -225,7 +225,7 @@ ARBORIST_RENDERERS["felling-notch-hinge"] = _v68renderFellingNotchHinge;
 // --- porta-wrap-friction: Friction-Device Hold Force by Wrap Count ---
 //
 // hold(n) = load x exp(-mu x n x 2pi) (capstan / Euler-Eytelwein) over n = 1..4.
-// dims: in { load_lb: M L T^-2, mu: dimensionless, wraps: dimensionless } out: { hold_1_lb: M L T^-2, hold_2_lb: M L T^-2, hold_3_lb: M L T^-2, hold_4_lb: M L T^-2, selected_hold_lb: M L T^-2 }
+// dims: in { load_lb: M L T^-2, mu: dimensionless, wraps: dimensionless } out: { hold_1_lb: M L T^-2, hold_2_lb: M L T^-2, hold_3_lb: M L T^-2, hold_4_lb: M L T^-2, selected_hold_lb: M L T^-2, selected_wraps: dimensionless, load_lb: M L T^-2 }
 // (Load-side tension and the per-wrap hold forces are forces M L T^-2; the
 //  friction coefficient and wrap count are dimensionless.)
 export function computePortaWrapFriction({ load_lb, mu = 0.20, wraps = 3 } = {}) {
@@ -921,7 +921,7 @@ ARBORIST_RENDERERS["firewood-cord"] = renderFirewoodCord;
 // turns on. The CTLA trunk formula: value = unit cost x trunk cross-sectional area x species x
 // condition x location. Every factor here is an INPUT: the unit cost is regional and the three
 // percentages come from a regional plant appraisal committee guide, so no table is shipped.
-// dims: in { dbh_in: L, unit_cost_per_sq_in: dimensionless, species_pct: dimensionless, condition_pct: dimensionless, location_pct: dimensionless } out: { trunk_area_sq_in: L^2, basic_value: dimensionless, appraised_value: dimensionless, combined_factor: dimensionless, depreciation_pct: dimensionless }
+// dims: in { dbh_in: L, unit_cost_per_sq_in: dimensionless, species_pct: dimensionless, condition_pct: dimensionless, location_pct: dimensionless } out: { trunk_area_sq_in: L^2, basic_value: dimensionless, appraised_value: dimensionless, combined_factor: dimensionless, depreciation_pct: dimensionless, condition_f: dimensionless, location_f: dimensionless, species_f: dimensionless }
 export function computeTreeAppraisalCtla({ dbh_in = 0, unit_cost_per_sq_in = 0, species_pct, condition_pct, location_pct } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // The three ratings ARE the appraisal; left out they ran as 100% each and returned the undepreciated basic value.

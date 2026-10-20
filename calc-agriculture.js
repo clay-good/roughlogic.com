@@ -955,7 +955,7 @@ export const IRRIGATION_EFFICIENCY_PCT = {
 
 const GAL_PER_ACRE_FT = 43560 * 1728 / 231;
 
-// dims: in { crop: dimensionless, et_ref_in_per_day: L T^-1, period_days: T, area_acres: L^2, efficiency_pct: dimensionless, rainfall_in: L } out: { et_crop_in: L, gross_in: L, acre_ft: L^3, gallons: L^3, area_acres: L^2, efficiency_pct: dimensionless, net_in: L, period_days: T, rainfall_in: L }
+// dims: in { crop: dimensionless, et_ref_in_per_day: L T^-1, period_days: T, area_acres: L^2, efficiency_pct: dimensionless, rainfall_in: L } out: { et_crop_in: L, gross_in: L, acre_ft: L^3, gallons: L^3, area_acres: L^2, efficiency_pct: dimensionless, net_in: L, period_days: T, rainfall_in: L, et_ref_in_per_day: L T^-1, kc: dimensionless }
 export function computeIrrigationRequirement({
   crop = "corn",
   et_ref_in_per_day = 0,
@@ -1075,7 +1075,7 @@ export const ANIMAL_UNIT_EQUIV = {
 const AUM_LB_DM = 790;
 const AU_LB_DM_PER_DAY = 26;
 
-// dims: in { area_acres: L^2, forage_lb_per_acre: M L^-2, utilization_pct: dimensionless, animal_class: dimensionless, herd_size: dimensionless } out: { available_forage_lb: M, aums_available: dimensionless, grazing_days: T, area_acres: L^2, utilization_pct: dimensionless }
+// dims: in { area_acres: L^2, forage_lb_per_acre: M L^-2, utilization_pct: dimensionless, animal_class: dimensionless, herd_size: dimensionless } out: { available_forage_lb: M, aums_available: dimensionless, grazing_days: T, area_acres: L^2, utilization_pct: dimensionless, acres_per_head: L^2, au_equiv: dimensionless, forage_lb_per_acre: M L^-2, head_one_month: dimensionless, herd_size: dimensionless }
 export function computeStockingRate({
   area_acres = 0,
   forage_lb_per_acre = 0,
@@ -1456,7 +1456,7 @@ const NPK_DEFAULT_SOURCES = {
   mop_k_pct: 60,    // muriate of potash 0-0-60 (K source)
 };
 
-// dims: in { crop: dimensionless, soil_n_lb_per_acre: M L^-2, soil_p_lb_per_acre: M L^-2, soil_k_lb_per_acre: M L^-2, area_acres: L^2, urea_n_pct: dimensionless, dap_n_pct: dimensionless, dap_p_pct: dimensionless, mop_k_pct: dimensionless, bag_weight_lb: M } out: { rec_n_lb_per_acre: M L^-2, rec_p_lb_per_acre: M L^-2, rec_k_lb_per_acre: M L^-2, urea_lb_per_acre: M L^-2, dap_lb_per_acre: M L^-2, mop_lb_per_acre: M L^-2, urea_total_lb: M, dap_total_lb: M, mop_total_lb: M, area_acres: L^2, bag_weight_lb: M, dap_bags: dimensionless, mop_bags: dimensionless, urea_bags: dimensionless }
+// dims: in { crop: dimensionless, soil_n_lb_per_acre: M L^-2, soil_p_lb_per_acre: M L^-2, soil_k_lb_per_acre: M L^-2, area_acres: L^2, urea_n_pct: dimensionless, dap_n_pct: dimensionless, dap_p_pct: dimensionless, mop_k_pct: dimensionless, bag_weight_lb: M } out: { rec_n_lb_per_acre: M L^-2, rec_p_lb_per_acre: M L^-2, rec_k_lb_per_acre: M L^-2, urea_lb_per_acre: M L^-2, dap_lb_per_acre: M L^-2, mop_lb_per_acre: M L^-2, urea_total_lb: M, dap_total_lb: M, mop_total_lb: M, area_acres: L^2, bag_weight_lb: M, dap_bags: dimensionless, mop_bags: dimensionless, urea_bags: dimensionless, rec_k_kg_per_ha: M L^-2, rec_n_kg_per_ha: M L^-2, rec_p_kg_per_ha: M L^-2 }
 export function computeNpkBlend({
   crop = "corn",
   soil_n_lb_per_acre = 0,
@@ -1625,7 +1625,7 @@ const DRY_OZ_PER = { oz: 1, lb: 16 };
 const ML_PER_FL_OZ = 29.5735295625;
 const G_PER_OZ = 28.349523125;
 
-// dims: in { tank_gal: L^3, spray_volume_gpa: L, liquid_rate_per_acre: L, dry_rate_per_acre: M L^-2, product_unit: dimensionless, field_area_acres: L^2 } out: { acres_per_tank: L^2, product_per_tank_unit: dimensionless, tanks_needed: dimensionless, total_carrier_water_gal: L^3, tank_gal: L^3 }
+// dims: in { tank_gal: L^3, spray_volume_gpa: L, liquid_rate_per_acre: L, dry_rate_per_acre: M L^-2, product_unit: dimensionless, field_area_acres: L^2 } out: { acres_per_tank: L^2, product_per_tank_unit: dimensionless, tanks_needed: dimensionless, total_carrier_water_gal: L^3, tank_gal: L^3, field_area_acres: L^2, spray_volume_gpa: L }
 // A liquid rate (volume per acre) and a dry rate (weight per acre) are separate inputs;
 // product_unit says which one is read. Until 2026-10-19 one product_rate_per_acre was either.
 export function computeTankMix({
@@ -1874,7 +1874,7 @@ AGRICULTURE_RENDERERS["pesticide-rei-phi"] = renderPesticideReiPhi;
 // --- v20 L.1: Growing degree days (`growing-degree-days`) ---
 // GDD = ((min(Tmax,cutoff) + Tmin_adj)/2) - base, floored at 0. Modified
 // method caps Tmax at cutoff AND floors Tmin at base before averaging.
-// dims: in { days_series: dimensionless, base_f: T, cutoff_f: T, method: dimensionless } out: { accumulated_gdd: dimensionless, days: dimensionless }
+// dims: in { days_series: dimensionless, base_f: T, cutoff_f: T, method: dimensionless } out: { accumulated_gdd: dimensionless, days: dimensionless, flagged_days: dimensionless }
 export function computeGrowingDegreeDays({ days_series = [], base_f = 50, cutoff_f = 0, method = "standard" } = {}) {
   if (method !== "standard" && method !== "modified") return { error: "Method must be standard or modified." };
   if (!Number.isFinite(Number(base_f))) return { error: "Base temperature must be a number (F)." };
@@ -1942,7 +1942,7 @@ AGRICULTURE_RENDERERS["growing-degree-days"] = renderGrowingDegreeDays;
 
 // --- v20 L.2: Pearson-square feed ration (`pearson-square-ration`) ---
 // parts_a = |B - target|; parts_b = |A - target|; pct_a = parts_a/(parts_a+parts_b).
-// dims: in { feed_a_pct: dimensionless, feed_b_pct: dimensionless, target_pct: dimensionless, batch_lb: M } out: { pct_a: dimensionless, pct_b: dimensionless, parts_a: I, verified_pct: dimensionless }
+// dims: in { feed_a_pct: dimensionless, feed_b_pct: dimensionless, target_pct: dimensionless, batch_lb: M } out: { pct_a: dimensionless, pct_b: dimensionless, parts_a: dimensionless, verified_pct: dimensionless, parts_b: dimensionless }
 export function computePearsonSquareRation({ feed_a_pct = 0, feed_b_pct = 0, target_pct = 0, batch_lb = 0 } = {}) {
   const A = Number(feed_a_pct), B = Number(feed_b_pct), T = Number(target_pct);
   let batch = Number(batch_lb) || 0;
@@ -2065,7 +2065,7 @@ AGRICULTURE_RENDERERS["livestock-water-requirement"] = renderLivestockWaterRequi
 
 // --- v35 L: Two-stroke fuel/oil mix (`two-stroke-mix`) ---
 // oil volume = fuel volume / ratio (gas:oil by volume); 1 US gal = 128 fl oz.
-// dims: in { ratio: dimensionless, fuel_amount: L^3, fuel_unit: dimensionless } out: { oil_oz: L^3, oil_ml: L^3, oz_per_gallon: dimensionless, fuel_amount: L^3, ratio: dimensionless }
+// dims: in { ratio: dimensionless, fuel_amount: L^3, fuel_unit: dimensionless } out: { oil_oz: L^3, oil_ml: L^3, oz_per_gallon: dimensionless, fuel_amount: L^3, ratio: dimensionless, ml_per_liter: dimensionless }
 export function computeTwoStrokeMix({ ratio = 50, fuel_amount = 0, fuel_unit = "gallon" } = {}) {
   const _g = _finiteGuard({ ratio, fuel_amount }); if (_g) return _g;
   // Anything but "liter" used to be gallons: "liters" asked for 3.8 times the oil.
@@ -2487,7 +2487,7 @@ const renderSprinklerGpmForPrecip = _v23SimpleRenderer({
 AGRICULTURE_RENDERERS["sprinkler-gpm-for-precip"] = renderSprinklerGpmForPrecip;
 
 // --- spec-v208: irrigation-zone-runtime ---
-// dims: in { target_in: L, precip_in_hr: L T^-1, du: dimensionless, max_cycle_min: T } out: { net_min: T, gross_min: T, cycles: dimensionless, per_cycle_min: T }
+// dims: in { target_in: L, precip_in_hr: L T^-1, du: dimensionless, max_cycle_min: T } out: { net_min: T, gross_min: T, cycles: dimensionless, per_cycle_min: T, rtm: dimensionless }
 export function computeIrrigationZoneRuntime({ target_in = 0, precip_in_hr = 0, du = 1.0, max_cycle_min = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(target_in > 0)) return { error: "Target depth must be positive (in)." };

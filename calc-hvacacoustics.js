@@ -258,7 +258,7 @@ export const ductBreakoutNoiseExample = { inputs: { duct_width_in: 48, duct_heig
 // the attenuation, so above some velocity more insertion loss buys
 // nothing. Energy-summing the two is what shows it.
 // =====================================================================
-// dims: in { airflow_cfm: L^3 T^-1, face_width_in: L, face_height_in: L, reference_drop_in_wc: M L^-1 T^-2, reference_velocity_fpm: L T^-1, alt_face_width_in: L, alt_face_height_in: L, target_velocity_fpm: L T^-1, upstream_lw_db: dimensionless, insertion_loss_db: dimensionless, regenerated_lw_db: dimensionless, fan_available_static_in_wc: M L^-1 T^-2 } out: { face_area_ft2: L^2, face_velocity_fpm: L T^-1, pressure_drop_in_wc: M L^-1 T^-2, alt_face_velocity_fpm: L T^-1, alt_pressure_drop_in_wc: M L^-1 T^-2, drop_increase_in_wc: M L^-1 T^-2, target_face_area_ft2: L^2, downstream_lw_db: dimensionless, attenuated_lw_db: dimensionless, alt_face_area_ft2: L^2, more_il_downstream_db: dimensionless, more_il_gain_db: dimensionless, regen_penalty_db: dimensionless, velocity_increase_pct: dimensionless, drop_ratio: dimensionless }
+// dims: in { airflow_cfm: L^3 T^-1, face_width_in: L, face_height_in: L, reference_drop_in_wc: M L^-1 T^-2, reference_velocity_fpm: L T^-1, alt_face_width_in: L, alt_face_height_in: L, target_velocity_fpm: L T^-1, upstream_lw_db: dimensionless, insertion_loss_db: dimensionless, regenerated_lw_db: dimensionless, fan_available_static_in_wc: M L^-1 T^-2 } out: { face_area_ft2: L^2, face_velocity_fpm: L T^-1, pressure_drop_in_wc: M L^-1 T^-2, alt_face_velocity_fpm: L T^-1, alt_pressure_drop_in_wc: M L^-1 T^-2, drop_increase_in_wc: M L^-1 T^-2, target_face_area_ft2: L^2, downstream_lw_db: dimensionless, attenuated_lw_db: dimensionless, alt_face_area_ft2: L^2, more_il_downstream_db: dimensionless, more_il_gain_db: dimensionless, regen_penalty_db: dimensionless, velocity_increase_pct: dimensionless, drop_ratio: dimensionless, static_margin_in_wc: M L^-1 T^-2 }
 export function computeSilencerInsertionLoss({
   airflow_cfm = 0, face_width_in = 0, face_height_in = 0,
   reference_drop_in_wc = 0, reference_velocity_fpm = 0,
@@ -354,7 +354,7 @@ export const silencerInsertionLossExample = { inputs: { airflow_cfm: 9000, face_
 // output is the FLANKING TEST -- the gap between what the wall should
 // deliver and what the room measures.
 // =====================================================================
-// dims: in { source_spl_db: dimensionless, partition_tl_db: dimensionless, partition_area_ft2: L^2, receiving_absorption_sabins: L^2, criterion_db: dimensionless, measured_spl_db: dimensionless, flanking_threshold_db: dimensionless } out: { received_spl_db: dimensionless, area_term_db: dimensionless, over_criterion_db: dimensionless, tl_required_db: dimensionless, measured_excess_db: dimensionless }
+// dims: in { source_spl_db: dimensionless, partition_tl_db: dimensionless, partition_area_ft2: L^2, receiving_absorption_sabins: L^2, criterion_db: dimensionless, measured_spl_db: dimensionless, flanking_threshold_db: dimensionless } out: { received_spl_db: dimensionless, area_term_db: dimensionless, over_criterion_db: dimensionless, tl_required_db: dimensionless, measured_excess_db: dimensionless, energy_factor: dimensionless }
 export function computeMechanicalRoomNc({
   source_spl_db = 0, partition_tl_db = 0, partition_area_ft2 = 0,
   receiving_absorption_sabins = 0, criterion_db = 0, measured_spl_db = 0,
@@ -419,7 +419,7 @@ export const mechanicalRoomNcExample = { inputs: { source_spl_db: 85, partition_
 // review. This reports the direction IN WORDS rather than as a signed
 // number, the fix carried over from the band-12 sign-convention finding.
 // =====================================================================
-// dims: in { unit_length_ft: L, unit_width_ft: L, unit_height_ft: L, unit_weight_lb: M L T^-2, uplift_psf: M L^-1 T^-2, lateral_psf: M L^-1 T^-2, fastener_count: dimensionless, windward_fastener_count: dimensionless, fastener_capacity_lb: M L T^-2 } out: { plan_area_ft2: L^2, uplift_lb: M L T^-2, net_uplift_lb: M L T^-2, lateral_lb: M L T^-2, overturning_ftlb: M L^2 T^-2, couple_tension_lb: M L T^-2, per_windward_lb: M L T^-2, demand_ratio: dimensionless, fasteners_required: dimensionless, lever_arm_ft: L, side_area_ft2: L^2 }
+// dims: in { unit_length_ft: L, unit_width_ft: L, unit_height_ft: L, unit_weight_lb: M L T^-2, uplift_psf: M L^-1 T^-2, lateral_psf: M L^-1 T^-2, fastener_count: dimensionless, windward_fastener_count: dimensionless, fastener_capacity_lb: M L T^-2 } out: { plan_area_ft2: L^2, uplift_lb: M L T^-2, net_uplift_lb: M L T^-2, lateral_lb: M L T^-2, overturning_ftlb: M L^2 T^-2, couple_tension_lb: M L T^-2, per_windward_lb: M L T^-2, demand_ratio: dimensionless, fasteners_required: dimensionless, lever_arm_ft: L, side_area_ft2: L^2, uplift_pct_of_weight: dimensionless }
 export function computeRooftopCurbUplift({
   unit_length_ft = 0, unit_width_ft = 0, unit_height_ft = 0, unit_weight_lb = 0,
   uplift_psf = 0, lateral_psf = 0, fastener_count = 0,

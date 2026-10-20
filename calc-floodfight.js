@@ -97,7 +97,7 @@ const _WATER_OPTS = [{ value: "fresh", label: "Fresh water (62.4 pcf)" }, { valu
 
 // ===================== spec-v1904: USACE sandbag levee bags and sand =====================
 
-// dims: in { height_ft: L, length_ft: L, fill_weight_lb: M L T^-2 } out: { bags_per_ft: L^-1, total_bags: dimensionless, sand_tons: M L T^-2, base_width_ft: L, height_ft: L, length_ft: L }
+// dims: in { height_ft: L, length_ft: L, fill_weight_lb: M L T^-2 } out: { bags_per_ft: L^-1, total_bags: dimensionless, sand_tons: M L T^-2, base_width_ft: L, height_ft: L, length_ft: L, fill_weight_lb: M L T^-2 }
 export function computeSandbagLeveeQuantity({ height_ft = 0, length_ft = 0, fill_weight_lb = 40 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(height_ft > 0)) return { error: "Levee height must be positive." };
@@ -275,7 +275,7 @@ FLOODFIGHT_RENDERERS["flood-lateral-load"] = _simpleRenderer({
 
 // ===================== spec-v1907: FEMA flood debris impact load =====================
 
-// dims: in { debris_weight_lb: M L T^-2, zone: dimensionless, depth_ft: L, velocity_basis: dimensionless, entered_velocity_fps: L T^-1, screening: dimensionless, structure: dimensionless } out: { velocity_used_fps: L T^-1, depth_coefficient: dimensionless, blockage_coefficient: dimensionless, structure_coefficient_s_per_ft: T L^-1, impact_force_lb: M L T^-2, impact_elevation_ft: L, velocity_eq89_fps: L T^-1, velocity_lower_fps: L T^-1, velocity_upper_fps: L T^-1 }
+// dims: in { debris_weight_lb: M L T^-2, zone: dimensionless, depth_ft: L, velocity_basis: dimensionless, entered_velocity_fps: L T^-1, screening: dimensionless, structure: dimensionless } out: { velocity_used_fps: L T^-1, depth_coefficient: dimensionless, blockage_coefficient: dimensionless, structure_coefficient_s_per_ft: T L^-1, impact_force_lb: M L T^-2, impact_elevation_ft: L, velocity_eq89_fps: L T^-1, velocity_lower_fps: L T^-1, velocity_upper_fps: L T^-1, debris_weight_lb: M L T^-2 }
 export function computeFloodDebrisImpact({ debris_weight_lb = 1000, zone = "a", depth_ft = 0, velocity_basis = "eq89", entered_velocity_fps = 0, screening = "none", structure = "rc_wall" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(debris_weight_lb > 0)) return { error: "Debris weight must be positive." };
@@ -391,7 +391,7 @@ FLOODFIGHT_RENDERERS["flood-uplift-cover-slab"] = _simpleRenderer({
 
 // ===================== spec-v1909: flooded basement staged pump-down schedule =====================
 
-// dims: in { floor_area_sqft: L^2, water_depth_ft: L, daily_drawdown_ft: L, pump_gpm: L^3 T^-1 } out: { total_gal: L^3, gal_per_ft: L^2, days: dimensionless, largest_day_gal: L^3, largest_day_run_min: T }
+// dims: in { floor_area_sqft: L^2, water_depth_ft: L, daily_drawdown_ft: L, pump_gpm: L^3 T^-1 } out: { total_gal: L^3, gal_per_ft: L^2, days: dimensionless, largest_day_gal: L^3, largest_day_run_min: T, largest_day_ft: L }
 export function computeBasementFloodPumpdown({ floor_area_sqft = 0, water_depth_ft = 0, daily_drawdown_ft = 2.5, pump_gpm = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(floor_area_sqft > 0)) return { error: "Basement floor area must be positive." };
@@ -451,7 +451,7 @@ FLOODFIGHT_RENDERERS["basement-flood-pumpdown"] = _simpleRenderer({
 
 // ===================== spec-v1910: existing roof snow and ice weight against design load =====================
 
-// dims: in { layer1_depth_in: L, layer1_type: dimensionless, layer2_depth_in: L, layer2_type: dimensionless, layer3_depth_in: L, layer3_type: dimensionless, entered_weight_pcf: M L^-2 T^-2, ground_snow_psf: M L^-1 T^-2, override_range: dimensionless, design_snow_psf: M L^-1 T^-2 } out: { layer1_psf: M L^-1 T^-2, layer2_psf: M L^-1 T^-2, layer3_psf: M L^-1 T^-2, total_psf: M L^-1 T^-2, design_ratio: dimensionless }
+// dims: in { layer1_depth_in: L, layer1_type: dimensionless, layer2_depth_in: L, layer2_type: dimensionless, layer3_depth_in: L, layer3_type: dimensionless, entered_weight_pcf: M L^-2 T^-2, ground_snow_psf: M L^-1 T^-2, override_range: dimensionless, design_snow_psf: M L^-1 T^-2 } out: { layer1_psf: M L^-1 T^-2, layer2_psf: M L^-1 T^-2, layer3_psf: M L^-1 T^-2, total_psf: M L^-1 T^-2, design_ratio: dimensionless, design_snow_psf: M L^-1 T^-2 }
 export function computeRoofSnowIceWeight({ layer1_depth_in = 0, layer1_type = "wet", layer2_depth_in = 0, layer2_type = "ice", layer3_depth_in = 0, layer3_type = "dry", entered_weight_pcf = 15, ground_snow_psf = 0, override_range = "no", design_snow_psf = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(layer1_depth_in > 0) && !(layer2_depth_in > 0) && !(layer3_depth_in > 0)) return { error: "Enter at least one layer depth; with none measured there is nothing to compare with the design load." };
@@ -528,7 +528,7 @@ FLOODFIGHT_RENDERERS["roof-snow-ice-weight"] = _simpleRenderer({
 
 // ===================== spec-v1911: wood structural panel opening protection takeoff =====================
 
-// dims: in { opening_width_in: L, opening_height_in: L, overlap_in: L, thickness_in: L, fastened_edges: dimensionless, fastener_type: dimensionless, fastener_spacing_in: L, edge_distance_in: L, opening_count: dimensionless } out: { panel_width_in: L, panel_height_in: L, span_in: L, span_ft: L, fastened_edge_in: L, fasteners_per_edge: dimensionless, fasteners_per_panel: dimensionless, sheets: dimensionless, total_fasteners: dimensionless, fastener_spacing_in: L, opening_count: dimensionless, thickness_in: L }
+// dims: in { opening_width_in: L, opening_height_in: L, overlap_in: L, thickness_in: L, fastened_edges: dimensionless, fastener_type: dimensionless, fastener_spacing_in: L, edge_distance_in: L, opening_count: dimensionless } out: { panel_width_in: L, panel_height_in: L, span_in: L, span_ft: L, fastened_edge_in: L, fasteners_per_edge: dimensionless, fasteners_per_panel: dimensionless, sheets: dimensionless, total_fasteners: dimensionless, fastener_spacing_in: L, opening_count: dimensionless, thickness_in: L, per_sheet: dimensionless }
 export function computeStormPanelPlywood({ opening_width_in = 0, opening_height_in = 0, overlap_in = 4, thickness_in = 0.4375, fastened_edges = "long", fastener_type = "wood_screw_8", fastener_spacing_in = 0, edge_distance_in = 1, opening_count = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(opening_width_in > 0) || !(opening_height_in > 0)) return { error: "Opening width and height must be positive." };

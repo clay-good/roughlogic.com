@@ -264,7 +264,7 @@ METALAIR_RENDERERS["groove-weld-length-for-load"] = _renderGrooveWeldLengthForLo
 // ---------------------------------------------------------------------
 // 30.2 Total external static pressure (duct-static-pressure-total) - Manual D
 // ---------------------------------------------------------------------
-// dims: in { components: dimensionless, rated_esp_in_wc: dimensionless } out: { total_esp_in_wc: dimensionless, remaining_in_wc: dimensionless }
+// dims: in { components: dimensionless, rated_esp_in_wc: M L^-1 T^-2 } out: { total_esp_in_wc: dimensionless, remaining_in_wc: dimensionless }
 export function computeDuctStaticTotal({ components = [], rated_esp_in_wc = 0 } = {}) {
   const _g = _finiteGuard({ rated_esp_in_wc }); if (_g) return _g;
   if (!Array.isArray(components) || components.length === 0) return { error: "Enter at least one component pressure drop (in. w.c.)." };
@@ -522,7 +522,7 @@ function _s2rPatternSheet(square_side_in, round_diameter_in, height_in, offset_i
   return { width: Math.min(best[0], best[1]), length: Math.max(best[0], best[1]) };
 }
 
-// dims: in { square_side_in: L, round_diameter_in: L, height_in: L, offset_in: L, elements_per_quadrant: dimensionless, seam_allowance_in: L } out: { corner_true_length_in: L, midpoint_true_length_in: L, fan_edge_true_length_in: L, plan_fan_edge_distance_in: L, plan_corner_distance_in: L, circumference_in: L, developed_arc_in: L, sheet_width_in: L, arc_shortfall_in: L, arc_shortfall_pct: dimensionless, chord_in: L, height_in: L, longest_true_length_in: L, offset_in: L, plan_midpoint_distance_in: L, round_diameter_in: L, seam_allowance_in: L, sheet_length_in: L, square_side_in: L, understatement_pct: dimensionless }
+// dims: in { square_side_in: L, round_diameter_in: L, height_in: L, offset_in: L, elements_per_quadrant: dimensionless, seam_allowance_in: L } out: { corner_true_length_in: L, midpoint_true_length_in: L, fan_edge_true_length_in: L, plan_fan_edge_distance_in: L, plan_corner_distance_in: L, circumference_in: L, developed_arc_in: L, sheet_width_in: L, arc_shortfall_in: L, arc_shortfall_pct: dimensionless, chord_in: L, height_in: L, longest_true_length_in: L, offset_in: L, plan_midpoint_distance_in: L, round_diameter_in: L, seam_allowance_in: L, sheet_length_in: L, square_side_in: L, understatement_pct: dimensionless, elements_per_quadrant: dimensionless, total_elements: dimensionless }
 export function computeSquareToRoundDevelopment({ square_side_in = 0, round_diameter_in = 0, height_in = 0, offset_in = 0, elements_per_quadrant = 8, seam_allowance_in = 0.5 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(square_side_in > 0)) return { error: "The square side must be positive (in)." };
@@ -610,7 +610,7 @@ METALAIR_RENDERERS["square-to-round-development"] = _simpleRenderer({
 
 // ============ spec-v1681: standing seam panel and clip takeoff ============
 
-// dims: in { building_width_ft: L, run_length_ft: L, coverage_width_in: L, sheet_width_in: L, field_clip_spacing_in: L, perimeter_clip_spacing_in: L, perimeter_panels: dimensionless, fasteners_per_clip: dimensionless, eave_ridge_allowance_in: L, waste_pct: dimensionless } out: { panel_count: dimensionless, panel_length_ft: L, total_panel_ft: L, field_clip_count: dimensionless, perimeter_clip_count: dimensionless, fastener_count: dimensionless, building_width_ft: L, clip_count: dimensionless, coverage_width_in: L, eave_ridge_allowance_in: L, field_clip_spacing_in: L, perimeter_clip_spacing_in: L, run_length_ft: L, seam_count: dimensionless, seam_length_ft: L, sheet_width_in: L, total_panel_with_waste_ft: L, waste_pct: dimensionless }
+// dims: in { building_width_ft: L, run_length_ft: L, coverage_width_in: L, sheet_width_in: L, field_clip_spacing_in: L, perimeter_clip_spacing_in: L, perimeter_panels: dimensionless, fasteners_per_clip: dimensionless, eave_ridge_allowance_in: L, waste_pct: dimensionless } out: { panel_count: dimensionless, panel_length_ft: L, total_panel_ft: L, field_clip_count: dimensionless, perimeter_clip_count: dimensionless, fastener_count: dimensionless, building_width_ft: L, clip_count: dimensionless, coverage_width_in: L, eave_ridge_allowance_in: L, field_clip_spacing_in: L, perimeter_clip_spacing_in: L, run_length_ft: L, seam_count: dimensionless, seam_length_ft: L, sheet_width_in: L, total_panel_with_waste_ft: L, waste_pct: dimensionless, clips_per_field_panel: dimensionless, clips_per_perimeter_panel: dimensionless, fasteners_per_clip: dimensionless, field_panels: dimensionless, panels_if_ordered_on_sheet: dimensionless, panels_short: dimensionless, perimeter_panels: dimensionless }
 export function computeStandingSeamTakeoff({ building_width_ft = 0, run_length_ft = 0, coverage_width_in = 0, sheet_width_in = 0, field_clip_spacing_in = 0, perimeter_clip_spacing_in = 0, perimeter_panels = 0, fasteners_per_clip = 2, eave_ridge_allowance_in = 0, waste_pct = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(building_width_ft > 0)) return { error: "Building width must be positive (ft)." };
@@ -694,7 +694,7 @@ METALAIR_RENDERERS["standing-seam-takeoff"] = _simpleRenderer({
 
 // ============ spec-v1682: metal roof thermal movement ============
 
-// dims: in { panel_length_ft: L, alpha_per_f: T^-1, temp_swing_f: T, fixed_point_fraction: dimensionless, clip_travel_in: L } out: { total_movement_in: L, movement_up_slope_in: L, movement_down_slope_in: L, governing_movement_in: L, travel_margin_in: L, max_panel_length_ft: L, alpha_per_f: T^-1, centre_fixed_movement_in: L, centre_fixed_saving_in: L, clip_travel_in: L, fixed_point_fraction: dimensionless, panel_length_ft: L }
+// dims: in { panel_length_ft: L, alpha_per_f: T^-1, temp_swing_f: T, fixed_point_fraction: dimensionless, clip_travel_in: L } out: { total_movement_in: L, movement_up_slope_in: L, movement_down_slope_in: L, governing_movement_in: L, travel_margin_in: L, max_panel_length_ft: L, alpha_per_f: T^-1, centre_fixed_movement_in: L, centre_fixed_saving_in: L, clip_travel_in: L, fixed_point_fraction: dimensionless, panel_length_ft: L, temp_swing_f: T }
 export function computeMetalRoofThermalMovement({ panel_length_ft = 0, alpha_per_f = 0.0000128, temp_swing_f = 0, fixed_point_fraction = 0, clip_travel_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(panel_length_ft > 0)) return { error: "Panel length must be positive (ft)." };

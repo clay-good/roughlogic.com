@@ -283,7 +283,7 @@ export const SPL_MODES = {
 };
 
 // dims: in { L1_dB: dimensionless, d1: L, d2: L, mode: dimensionless }
-//        out: { L2_dB: dimensionless, L2_freefield_dB: dimensionless, mode_factor_dB: dimensionless, L2_combined_dB: dimensionless }
+//        out: { L2_dB: dimensionless, L2_freefield_dB: dimensionless, mode_factor_dB: dimensionless, L2_combined_dB: dimensionless, n_sources: dimensionless }
 // (Decibels are a logarithmic ratio and therefore dimensionless; mode
 // is a categorical string. Only the d1 / d2 distances carry length.)
 export function computeSPL({ L1_dB = 0, d1 = 1, d2 = 0, mode = "free_field", n_sources = 1 } = {}) {
@@ -841,7 +841,7 @@ STAGE_RENDERERS["power-distro"] = renderPowerDistro;
 
 // --- v24 N.1: Speaker impedance network (`speaker-impedance`) ---
 // series Z = z*N; parallel equal Z = z/N; series-parallel = (z*series_per_branch)/branches.
-// dims: in { topology: dimensionless, z_ohm: M L^2 T^-3 I^-2, count: dimensionless, series_per_branch: dimensionless, branches: dimensionless, amp_min_ohm: M L^2 T^-3 I^-2, power_w: M L^2 T^-3 } out: { z_total_ohm: M L^2 T^-3 I^-2, safe: dimensionless, per_driver_power_w: M L^2 T^-3 }
+// dims: in { topology: dimensionless, z_ohm: M L^2 T^-3 I^-2, count: dimensionless, series_per_branch: dimensionless, branches: dimensionless, amp_min_ohm: M L^2 T^-3 I^-2, power_w: M L^2 T^-3 } out: { z_total_ohm: M L^2 T^-3 I^-2, safe: dimensionless, per_driver_power_w: M L^2 T^-3, n_drivers: dimensionless }
 export function computeSpeakerImpedance({ topology, z_ohm, count, series_per_branch, branches, amp_min_ohm, power_w }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(z_ohm > 0)) return { error: "Driver impedance must be greater than zero (Ohm)." };
@@ -1083,7 +1083,7 @@ STAGE_RENDERERS["amp-power-spl"] = renderAmpPowerSpl;
 // (lux-to-footcandle): this is a single aimed fixture, not a room budget.
 // =====================================================================
 
-// dims: in { beam_angle_deg: dimensionless, throw_distance: L, distance_unit: dimensionless, source: dimensionless, candela: dimensionless, lumens: dimensionless } out: { beam_diameter: L, illuminance_lux: dimensionless, illuminance_fc: dimensionless, beam_angle_deg: dimensionless, beam_diameter_ft: L, throw_distance: L }
+// dims: in { beam_angle_deg: dimensionless, throw_distance: L, distance_unit: dimensionless, source: dimensionless, candela: dimensionless, lumens: dimensionless } out: { beam_diameter: L, illuminance_lux: dimensionless, illuminance_fc: dimensionless, beam_angle_deg: dimensionless, beam_diameter_ft: L, throw_distance: L, beam_diameter_m: L }
 export function computeLightingBeam({ beam_angle_deg = 0, throw_distance = 0, distance_unit = "ft", source = "candela", candela = 0, lumens = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const ang = Number(beam_angle_deg) || 0;
@@ -1169,7 +1169,7 @@ STAGE_RENDERERS["lighting-beam"] = renderLightingBeam;
 // 3.28084 ft/m, the ~1 m per 1 mm pitch viewing rule.
 // =====================================================================
 
-// dims: in { cab_w_px: dimensionless, cab_h_px: dimensionless, pixel_pitch_mm: L, cols: dimensionless, rows: dimensionless, cab_weight_lb: M, cab_max_watts: dimensionless, avg_power_factor: dimensionless } out: { total_pixels: dimensionless, width_ft: L, min_view_ft: L, avg_power_w: M L^2 T^-3, cab_h_mm: L, height_ft: L, peak_power_w: M L^2 T^-3 }
+// dims: in { cab_w_px: dimensionless, cab_h_px: dimensionless, pixel_pitch_mm: L, cols: dimensionless, rows: dimensionless, cab_weight_lb: M, cab_max_watts: dimensionless, avg_power_factor: dimensionless } out: { total_pixels: dimensionless, width_ft: L, min_view_ft: L, avg_power_w: M L^2 T^-3, cab_h_mm: L, height_ft: L, peak_power_w: M L^2 T^-3, cab_w_mm: L, cabinets: dimensionless, total_h_px: dimensionless, total_w_px: dimensionless }
 export function computeLedVideoWall({ cab_w_px = 0, cab_h_px = 0, pixel_pitch_mm = 0, cols = 0, rows = 0, cab_weight_lb = 0, cab_max_watts = 0, avg_power_factor = 0.35 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (cab_weight_lb < 0 || cab_max_watts < 0) return { error: "Weight and power inputs must be non-negative." };
@@ -1685,7 +1685,7 @@ STAGE_RENDERERS["led-tape-max-run"] = renderLedTapeMaxRun;
 
 // --- spec-v673 N: distance at which SPL falls to a target level (inverse of spl-distance) ---
 // L2 = L1 - 20 log10(d2/d1) + mode_factor + 10 log10(n); solved for d2.
-// dims: in { L1_dB: dimensionless, d1: L, target_L2_dB: dimensionless, mode: dimensionless, n_sources: dimensionless } out: { d2: L, delta_dB: dimensionless, mode_factor_dB: dimensionless }
+// dims: in { L1_dB: dimensionless, d1: L, target_L2_dB: dimensionless, mode: dimensionless, n_sources: dimensionless } out: { d2: L, delta_dB: dimensionless, mode_factor_dB: dimensionless, n_sources: dimensionless }
 export function computeSPLDistanceForLevel({ L1_dB = 0, d1 = 1, target_L2_dB = 0, mode = "free_field", n_sources = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // Unit / range guard added 2026-09-26 after printed-example probing.

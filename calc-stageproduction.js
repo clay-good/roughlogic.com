@@ -142,7 +142,7 @@ STAGEPRODUCTION_RENDERERS["line-array-splay"] = _r({
 });
 
 // ===================== spec-v1365: delay loudspeaker time and Haas offset =====================
-// dims: in { distance_ft: L, temp_f: T, haas_offset_ms: T, compare_temp_f: T } out: { speed_ft_s: L T^-1, geometric_ms: T, set_delay_ms: T, haas_distance_ft: L }
+// dims: in { distance_ft: L, temp_f: T, haas_offset_ms: T, compare_temp_f: T } out: { speed_ft_s: L T^-1, geometric_ms: T, set_delay_ms: T, haas_distance_ft: L, compare_geometric_ms: T, compare_speed_ft_s: L T^-1, drift_ms: T }
 export function computeDelayTowerAlignment({ distance_ft = 0, temp_f = 70, haas_offset_ms = 15, compare_temp_f = 90 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(distance_ft > 0)) return { error: "Distance from the main array must be positive." };
@@ -197,7 +197,7 @@ STAGEPRODUCTION_RENDERERS["delay-tower-alignment"] = _r({
 });
 
 // ===================== spec-v1366: end-fire and cardioid subwoofer array spacing =====================
-// dims: in { spacing_ft: L, elements: dimensionless, temp_f: T, target_freq_hz: T^-1 } out: { delay_per_element_ms: T, optimum_freq_hz: T^-1, wavelength_ft: L, array_depth_ft: L, spacing_for_target_ft: L }
+// dims: in { spacing_ft: L, elements: dimensionless, temp_f: T, target_freq_hz: T^-1 } out: { delay_per_element_ms: T, optimum_freq_hz: T^-1, wavelength_ft: L, array_depth_ft: L, spacing_for_target_ft: L, speed_ft_s: L T^-1, total_delay_ms: T }
 export function computeCardioidSubArray({ spacing_ft = 0, elements = 4, temp_f = 70, target_freq_hz = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // Unit / range guard added 2026-09-26 after printed-example probing.
@@ -254,7 +254,7 @@ STAGEPRODUCTION_RENDERERS["cardioid-sub-array"] = _r({
 });
 
 // ===================== spec-v1367: driver spacing, lobing, and crossover ceiling =====================
-// dims: in { spacing_ft: L, test_freq_hz: T^-1, temp_f: T } out: { crossover_ceiling_hz: T^-1, wavelength_ft: L, max_spacing_ft: L, null_angle_deg: dimensionless }
+// dims: in { spacing_ft: L, test_freq_hz: T^-1, temp_f: T } out: { crossover_ceiling_hz: T^-1, wavelength_ft: L, max_spacing_ft: L, null_angle_deg: dimensionless, speed_ft_s: L T^-1 }
 export function computeDriverSpacingLobing({ spacing_ft = 0, test_freq_hz = 0, temp_f = 70 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(spacing_ft > 0)) return { error: "Center-to-center spacing must be positive." };
@@ -306,7 +306,7 @@ STAGEPRODUCTION_RENDERERS["driver-spacing-lobing"] = _r({
 });
 
 // ===================== spec-v1368: two-transmitter intermodulation screen =====================
-// dims: in { f1_mhz: T^-1, f2_mhz: T^-1, test_freq_mhz: T^-1 } out: { spacing_mhz: T^-1, third_low_mhz: T^-1, third_high_mhz: T^-1 }
+// dims: in { f1_mhz: T^-1, f2_mhz: T^-1, test_freq_mhz: T^-1 } out: { spacing_mhz: T^-1, third_low_mhz: T^-1, third_high_mhz: T^-1, fifth_high_mhz: T^-1, fifth_low_mhz: T^-1, nearest_product_mhz: T^-1, test_margin_mhz: T^-1 }
 export function computeWirelessIntermod({ f1_mhz = 0, f2_mhz = 0, test_freq_mhz = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(f1_mhz > 0) || !(f2_mhz > 0)) return { error: "Both carrier frequencies must be positive." };
@@ -482,7 +482,7 @@ STAGEPRODUCTION_RENDERERS["chain-hoist-lift-time"] = _r({
 });
 
 // ===================== spec-v1371: gobo projected image size and keystone =====================
-// dims: in { throw_ft: L, field_angle_deg: dimensionless, incidence_deg: dimensionless, gobo_image_mm: L, gate_diameter_mm: L } out: { image_diameter_ft: L, keystone_stretch: dimensionless, stretched_axis_ft: L, relative_illuminance: dimensionless }
+// dims: in { throw_ft: L, field_angle_deg: dimensionless, incidence_deg: dimensionless, gobo_image_mm: L, gate_diameter_mm: L } out: { image_diameter_ft: L, keystone_stretch: dimensionless, stretched_axis_ft: L, relative_illuminance: dimensionless, stops_down: dimensionless }
 export function computeGoboImageSize({ throw_ft = 0, field_angle_deg = 0, incidence_deg = 0, gobo_image_mm = 0, gate_diameter_mm = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(throw_ft > 0)) return { error: "Throw distance must be positive." };
@@ -559,7 +559,7 @@ export const MIRED_CORRECTIONS = [
   { name: "Full CTO", shift: 167 },
 ];
 
-// dims: in { source_k: T, target_k: T, applied_shift: T^-1 } out: { source_mired: T^-1, target_mired: T^-1, shift_needed: T^-1, resulting_k: T }
+// dims: in { source_k: T, target_k: T, applied_shift: T^-1 } out: { source_mired: T^-1, target_mired: T^-1, shift_needed: T^-1, resulting_k: T, effective_shift: T^-1, nearest_error: T^-1, nearest_shift: T^-1 }
 export function computeMiredGelShift({ source_k = 3200, target_k = 5600, applied_shift = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // Unit / range guard added 2026-09-26 after printed-example probing.
@@ -617,7 +617,7 @@ STAGEPRODUCTION_RENDERERS["mired-gel-shift"] = _r({
 });
 
 // ===================== spec-v1373: haze and fog machine output for a venue =====================
-// dims: in { volume_cf: L^3, ach: T^-1, ref_volume_cf: L^3, ref_ach: T^-1, ref_output: dimensionless } out: { ventilation_cfm: L^3 T^-1, required_output: dimensionless, time_constant_hr: T, time_to_90_hr: T }
+// dims: in { volume_cf: L^3, ach: T^-1, ref_volume_cf: L^3, ref_ach: T^-1, ref_output: dimensionless } out: { ventilation_cfm: L^3 T^-1, required_output: dimensionless, time_constant_hr: T, time_to_90_hr: T, scaling_factor: dimensionless }
 export function computeHazeMachineSizing({ volume_cf = 0, ach = 0, ref_volume_cf = 100000, ref_ach = 2, ref_output = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(volume_cf > 0)) return { error: "Venue volume must be positive." };
@@ -739,7 +739,7 @@ STAGEPRODUCTION_RENDERERS["stage-deck-live-load"] = _r({
 });
 
 // ===================== spec-v1375: LED wall data rate and processor port count =====================
-// dims: in { width_px: dimensionless, height_px: dimensionless, bit_depth: dimensionless, refresh_hz: T^-1, pixels_per_port: dimensionless } out: { total_pixels: dimensionless, data_rate_gbps: dimensionless, ports_needed: dimensionless, spare_pixels: dimensionless }
+// dims: in { width_px: dimensionless, height_px: dimensionless, bit_depth: dimensionless, refresh_hz: T^-1, pixels_per_port: dimensionless } out: { total_pixels: dimensionless, data_rate_gbps: dimensionless, ports_needed: dimensionless, spare_pixels: dimensionless, last_port_used: dimensionless }
 export function computeVideoWallDataRate({ width_px = 0, height_px = 0, bit_depth = 8, refresh_hz = 60, pixels_per_port = 650000 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // Unit / range guard added 2026-09-26 after printed-example probing.
