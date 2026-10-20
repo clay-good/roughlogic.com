@@ -42,6 +42,7 @@ const DIST = resolve(ROOT, "dist");
 // from the table use the default cap (DEFAULT_CAP).
 const DEFAULT_CAP = 6 * 1024;
 const CAPS = {
+  "ui-fields.js": 7000, // spec-v1970 feet-and-inches entry 2026-10-20 (default 6144 -> 7000): two calls into length-entry.js took the shared field builder to 6,082 B gz (99.0%), inside the ~0.2% CI build margin.
   // spec-v10 §§H.1/H.2: the tile-id -> renderer-module registry, extracted
   // from app.js on 2026-08-27 and lazy-loaded on the first tile open. It is
   // one entry per tile, so it grows with the catalog by design and the

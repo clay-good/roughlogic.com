@@ -172,7 +172,7 @@ for (const id of TOOL_IDS) {
       // anything not visible+editable, with a short per-action timeout so a
       // transiently-disabled control can never stall the sweep.
       const fields = page.locator(
-        ".input-region input[type=number], .input-region input:not([type])",
+        ".input-region input[type=number], .input-region input[data-length-unit], .input-region input:not([type])",
       );
       const nFields = await fields.count();
       for (let k = 0; k < nFields; k++) {

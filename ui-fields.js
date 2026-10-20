@@ -6,6 +6,7 @@
 // behavior. textContent / createElement only - never innerHTML.
 
 import { copyText } from "./clipboard.js";
+import { lengthUnitOf, makeLengthEntry } from "./length-entry.js";
 
 export const DEBOUNCE_MS = 50;
 
@@ -49,6 +50,8 @@ export function makeNumber(label, id, attrs = {}) {
   for (const [k, v] of Object.entries(attrs)) input.setAttribute(k, String(v));
   wrap.appendChild(lab);
   wrap.appendChild(input);
+  const unit = lengthUnitOf(label); // spec-v1970: (ft) / (in) boxes take 8'6" and 3-1/2
+  if (unit) makeLengthEntry(input, wrap, unit);
   return { wrap, input };
 }
 
@@ -72,6 +75,8 @@ export function makeRowField(label, id, attrs = {}) {
   for (const [k, v] of Object.entries(attrs)) input.setAttribute(k, String(v));
   wrap.appendChild(lab);
   wrap.appendChild(input);
+  const unit = lengthUnitOf(label); // spec-v1970: (ft) / (in) boxes take 8'6" and 3-1/2
+  if (unit) makeLengthEntry(input, wrap, unit);
   return { wrap, input };
 }
 

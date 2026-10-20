@@ -815,6 +815,13 @@ input[aria-invalid="true"] {
   border-color: var(--error-border);
 }
 
+.length-hint {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.95rem;
+  color: var(--fg-dim);
+}
+
 .validity-reason {
   display: block;
   margin-top: 6px;

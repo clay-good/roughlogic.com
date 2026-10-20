@@ -48,7 +48,7 @@ for (const { id } of TOOLS) {
     report.withExample++;
     scan("example");
     for (const el of inputs.querySelectorAll("input")) {
-      if (el.type !== "number") continue;
+      if (el.type !== "number" && !el.dataset?.lengthUnit) continue;
       const v = el.value, x = Number(v);
       if (v === "" || !Number.isFinite(x) || x === 0) continue;
       for (const k of [0.2, 0.5, 2, 5]) { el.value = String(+(x * k).toPrecision(6)); fire(el); scan(el.id + " x" + k); }

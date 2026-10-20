@@ -75,7 +75,7 @@ export function domFields(region) {
       : el.tagName === "SELECT" ? (el.options[el.selectedIndex] || {}).text || el.value
       : el.value.trim();
     if (v === "") continue;
-    if (el.type === "number" && Number.isFinite(Number(v))) v = Number(v);
+    if ((el.type === "number" || (el.dataset && el.dataset.lengthUnit)) && Number.isFinite(Number(v))) v = Number(v);
     fields.push({ key: "\u0000" + el.id, label });
     params["\u0000" + el.id] = v;
   }

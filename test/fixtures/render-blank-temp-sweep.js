@@ -39,7 +39,7 @@ for (const { id } of TOOLS) {
     report.withExample++;
     const labels = inputs.querySelectorAll("label");
     for (const el of inputs.querySelectorAll("input")) {
-      if (el.type !== "number") continue;
+      if (el.type !== "number" && !el.dataset?.lengthUnit) continue;
       const lab = labels.find((l) => l.htmlFor === el.id || l.getAttribute("for") === el.id);
       const name = (lab ? lab.textContent : "") + " " + el.id;
       if (!TEMP.test(name) || SKIP.test(name)) continue;

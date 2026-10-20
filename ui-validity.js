@@ -55,6 +55,8 @@ export function wireValidity(inputRegion, outputRegion) {
 
 function hasConstraints(el) {
   if (el.required) return true;
+  // spec-v1970: a feet/inches text box reports its own parse and range errors.
+  if (el.dataset && el.dataset.lengthUnit) return true;
   if (el.type === "number" || el.type === "range") {
     if (el.min !== "" || el.max !== "" || (el.step && el.step !== "any")) return true;
   }
