@@ -23,7 +23,7 @@ import { gzipSync } from "node:zlib";
 import { lintProseInShard } from "./prose-lint-keys.mjs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { loadRows, validateRows, buildCodeAdoptionShard, signoffSheet } from "./code-adoption.mjs";
+import { loadRows, validateRows, buildCodeAdoptionShard, signoffSheet, BUILDING_CODES, loadCodeRows, validateCodeRows } from "./code-adoption.mjs";
 import { isoToday } from "../code-adoption.js";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -33,6 +33,14 @@ const SHEET = resolve(ROOT, "docs", "code-adoption-signoff.md");
 const doc = loadRows();
 const today = isoToday();
 const { errors, warnings } = validateRows(doc, today);
+// spec-v1974: each building code's rows file, by the same rules plus the family rule.
+const codeCounts = [];
+for (const code of BUILDING_CODES) {
+  const v = validateCodeRows(code, loadCodeRows(code), today);
+  errors.push(...v.errors);
+  warnings.push(...v.warnings);
+  codeCounts.push(code + " " + Object.keys((loadCodeRows(code) || {}).rows || {}).length);
+}
 
 let shard = JSON.parse(readFileSync(SHARD, "utf8"));
 let built = buildCodeAdoptionShard(doc, shard.fetched);
@@ -90,4 +98,4 @@ if (errors.length) {
 }
 const shipped = Object.keys(shard.by_state).filter((k) => k !== "verifiedOn");
 const signed = shipped.filter((k) => shard.by_state[k].verified_on).length;
-console.log("check-code-adoption OK: " + Object.keys(doc.rows).length + " jurisdictions drafted, each cited; " + shipped.length + " shipped, " + signed + " signed off (the rest show as not verified); the shard matches the rows.");
+console.log("check-code-adoption OK: " + Object.keys(doc.rows).length + " jurisdictions drafted, each cited; " + shipped.length + " shipped, " + signed + " signed off (the rest show as not verified); the shard matches the rows. Building-code rows drafted: " + codeCounts.join(", ") + ".");

@@ -98,6 +98,92 @@ export function validateRows(doc, today) {
   return { errors, warnings };
 }
 
+// spec-v1974: the same rows for the building codes, one file per code
+// (docs/code-adoption-rows.<code>.json). A building code is adopted per family
+// as well as per edition: a state on the Uniform Plumbing Code has no IPC
+// edition, and the row says so. Rows are drafted one state at a time, so a
+// file need not hold all 51; an empty file ships nothing.
+export const BUILDING_CODES = ["IRC", "IBC", "IPC", "IMC", "IFGC", "IECC"];
+export const FAMILIES = {
+  IRC: ["IRC", "other"], IBC: ["IBC", "other"], IPC: ["IPC", "UPC", "other"],
+  IMC: ["IMC", "UMC", "other"], IFGC: ["IFGC", "NFPA 54", "UPC", "other"], IECC: ["IECC", "other"],
+};
+const CODE_SCOPES = new Set([...SCOPES, "residential", "residential-and-commercial"]);
+export const codeRowsPath = (code) => resolve(ROOT, "docs", "code-adoption-rows." + code.toLowerCase() + ".json");
+
+export function loadCodeRows(code) {
+  try { return JSON.parse(readFileSync(codeRowsPath(code), "utf8")); } catch { return null; }
+}
+
+// The rulebook for one building code's file. Returns { errors, warnings }.
+export function validateCodeRows(code, doc, today) {
+  const errors = [];
+  const warnings = [];
+  const at0 = code + " ";
+  if (!doc) return { errors: [at0 + "rows file missing (" + codeRowsPath(code).split("/").pop() + ")"], warnings };
+  if (doc.code !== code) errors.push(at0 + "file names code '" + doc.code + "'");
+  const cadence = doc.cadence_days;
+  if (!Number.isInteger(cadence) || cadence < 1) errors.push(at0 + "cadence_days must be a positive integer");
+  for (const [k, r] of Object.entries(doc.rows || {})) {
+    const at = at0 + k + ": ";
+    if (!JURISDICTIONS.includes(k)) { errors.push(at + "not a state or DC"); continue; }
+    if (!r.name) errors.push(at + "no name");
+    if (!STATUSES.has(r.status)) errors.push(at + "status '" + r.status + "' is not one of " + [...STATUSES].join(", "));
+    if (!FAMILIES[code].includes(r.family)) errors.push(at + "family '" + r.family + "' is not one of " + FAMILIES[code].join(", "));
+    if (!r.citation || !r.citation.trim()) errors.push(at + "no citation (every row cites its state's own statute or rule)");
+    if (!/^https:\/\/[^\s]+$/.test(r.source_url || "")) errors.push(at + "source_url must be an https link");
+    if (typeof r.citation_primary !== "boolean") errors.push(at + "citation_primary must be true or false");
+    for (const f of ["citation", "scope", "pending"]) {
+      if (typeof r[f] === "string" && r[f].length > CAP) errors.push(at + f + " is " + r[f].length + " characters; shipped strings stop at " + CAP);
+    }
+    const eds = [...(r.editions || []), ...(r.upcoming || [])];
+    // A state on another family (UPC, UMC, NFPA 54) adopts no edition of this code.
+    if (r.family !== code && eds.length) errors.push(at + "a " + r.family + " row lists " + code + " editions; a state on another code family adopts none");
+    for (const e of eds) {
+      if (!CODE_SCOPES.has(e.applies_to)) errors.push(at + "applies_to '" + e.applies_to + "' is not a known scope");
+      if (!/^(19|20)\d\d$/.test(e.edition || "")) errors.push(at + "edition '" + e.edition + "' is not a year");
+      if (e.effective === null) { if (!r.draft_note) errors.push(at + code + " " + e.edition + " has no effective date and no draft_note saying why"); }
+      else if (!ISO.test(e.effective || "")) errors.push(at + "effective '" + e.effective + "' is not an ISO date");
+    }
+    if (r.family === code && (r.status === "statewide" || r.status === "statewide-amended" || r.status === "limited") && editionsOn(r, today).length === 0) {
+      errors.push(at + "a " + r.status + " " + code + " row needs an edition in force on " + today);
+    }
+    const signed = r.verified_on != null || r.verified_by != null;
+    if (signed) {
+      if (!r.verified_by || !String(r.verified_by).trim()) errors.push(at + "verified_on is set but verified_by is empty");
+      if (!ISO.test(r.verified_on || "")) errors.push(at + "verified_by is set but verified_on is not an ISO date");
+      else if (r.verified_on > today) errors.push(at + "verified_on " + r.verified_on + " is in the future");
+      if (!r.citation_primary) errors.push(at + "signed, but its citation is not a primary source");
+    }
+  }
+  return { errors, warnings };
+}
+
+// The shipped rows for each building code that has any, or null.
+export function buildCodeShards(docs) {
+  const codes = {};
+  for (const code of BUILDING_CODES) {
+    const d = docs[code];
+    if (!d || !d.rows || !Object.keys(d.rows).length) continue;
+    const by_state = {};
+    for (const j of JURISDICTIONS) {
+      const r = d.rows[j];
+      if (!r) continue;
+      const out = {};
+      for (const f of SHIPPED) out[f] = r[f] === undefined ? null : r[f];
+      out.family = r.family;
+      out.review = reviewFlag(r);
+      by_state[j] = out;
+    }
+    codes[code] = { cadence_days: d.cadence_days, by_state };
+  }
+  return Object.keys(codes).length ? codes : null;
+}
+
+export function loadAllCodeRows() {
+  return Object.fromEntries(BUILDING_CODES.map((c) => [c, loadCodeRows(c)]));
+}
+
 // "conflict" when the drafted sources disagree (draft_note says SOURCES
 // CONFLICT): the page then shows no edition. "secondary" when no primary
 // citation was found (an absence of statewide adoption has no rule to cite).
@@ -109,7 +195,7 @@ export function reviewFlag(r) {
 
 // The shipped shard: every jurisdiction's name (so the picker can list all 51)
 // and every row, signed or not, with draft-only fields removed and a review flag.
-export function buildCodeAdoptionShard(doc, fetched) {
+export function buildCodeAdoptionShard(doc, fetched, codeDocs = loadAllCodeRows()) {
   const by_state = {};
   const stamps = [];
   for (const j of JURISDICTIONS) {
@@ -131,6 +217,9 @@ export function buildCodeAdoptionShard(doc, fetched) {
     cadence_days: doc.cadence_days,
     names,
     by_state,
+    // spec-v1974: present only once a building code has drafted rows, so the
+    // NEC-only shard is unchanged until then.
+    ...(buildCodeShards(codeDocs || {}) ? { codes: buildCodeShards(codeDocs || {}) } : {}),
   };
 }
 

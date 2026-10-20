@@ -1,6 +1,6 @@
 # Scope: The 2026-10-19 Product Expansion (specs v1970-v1992, 7 Platform Specs and 16 New Tiles)
 
-> **Status: ACTIVE (updated 2026-10-19). 22 of 23 specs are built (spec-v1970 to spec-v1973, spec-v1975, spec-v1976 (mechanism; Spanish rows await review), and every tile spec, spec-v1977 to spec-v1992); catalog 2,283.**
+> **Status: COMPLETE (updated 2026-10-20). All 23 specs are built: the 16 tile specs (catalog 2,267 -> 2,283) and the 7 platform specs. Two platform specs ship their mechanism and wait on a person: spec-v1976's Spanish aliases need a Spanish-speaking reviewer before they ship, and spec-v1974's state rows for the building codes are drafted one state at a time, as the spec requires.**
 > All 23 spec files exist (`spec-v1970.md` through `spec-v1992.md`). Nothing in the catalog, the modules,
 > the counts or the gates changes until a spec lands. Inherits the spec-v106 trades-only charter and every
 > convention through spec-v1969.

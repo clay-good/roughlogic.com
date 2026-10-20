@@ -783,9 +783,10 @@ function renderToolView(id, params) {
         }
       });
       block.appendChild(copyBtn);
-      // spec-v1968: on a tile that cites the NEC, the edition the reader's
-      // state enforces (signed-off rows only; nothing shows until one is).
-      if (/\bNEC\b|NFPA 70(?![0-9A-Z])/.test(entry.edition || "")) {
+      // spec-v1968 / v1974: on a tile that cites the NEC or a building code,
+      // the edition the reader's state enforces (nothing shows for a code with
+      // no drafted rows; the module decides).
+      if (/\bNEC\b|NFPA 70(?![0-9A-Z])|\b(?:IRC|IBC|IPC|IMC|IFGC|IECC)\b/.test(entry.edition || "")) {
         import("./code-adoption.js").then((m) => m.mountStatePicker(block, entry)).catch(() => {});
       }
       // spec-v1973: a tile whose rule changed between editions says so, for a

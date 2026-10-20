@@ -1,0 +1,6 @@
+{
+  "code": "IBC",
+  "cadence_days": 92,
+  "about": "spec-v1974: per-state adoption of the IBC, drafted one state at a time from the state's own statute or rule, with ICC's adoption map as the cross-check only. Each row also names its code family (a state on the UPC or UMC adopts no IPC or IMC edition). No row is drafted yet; until one is, nothing ships for this code.",
+  "rows": {}
+}
