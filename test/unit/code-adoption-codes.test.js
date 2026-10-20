@@ -12,15 +12,15 @@ const okRow = (over = {}) => ({
   verified_on: null, verified_by: null, ...over,
 });
 
-test("building codes: six rows files exist and pass; the IRC and IBC have all 51 drafted, unsigned; the NEC rows are unchanged by them", () => {
+test("building codes: six rows files exist and pass; five codes have all 51 drafted, unsigned (the IECC is last); the NEC rows are unchanged by them", () => {
   for (const c of BUILDING_CODES) {
     const doc = loadCodeRows(c);
     assert.ok(doc, c);
     assert.deepEqual(validateCodeRows(c, doc, TODAY).errors, [], c);
   }
   const shards = buildCodeShards(Object.fromEntries(BUILDING_CODES.map((c) => [c, loadCodeRows(c)])));
-  assert.deepEqual(Object.keys(shards), ["IRC", "IBC"], "the IRC and then the IBC have drafted rows (spec-v1974 order)");
-  for (const c of ["IRC", "IBC"]) {
+  assert.deepEqual(Object.keys(shards), ["IRC", "IBC", "IPC", "IMC", "IFGC"], "drafted in the spec-v1974 order");
+  for (const c of ["IRC", "IBC", "IPC", "IMC", "IFGC"]) {
     assert.equal(Object.keys(shards[c].by_state).length, 51, c);
     assert.ok(Object.values(loadCodeRows(c).rows).every((r) => r.verified_by === null && r.verified_on === null), c + ": a person signs a row, never the drafter");
   }
@@ -61,6 +61,7 @@ test("building codes: a UPC state reads the family sentence on an IPC tile; an u
   const r = codeAdoptionLine("IPC", "California", ca, "2027", TODAY, 92);
   assert.match(r.text, /California adopts the Uniform Plumbing Code, not the IPC this calculator follows, so its IPC rule may not apply/);
   assert.match(r.text, /^Not verified/);
+  assert.match(codeAdoptionLine("IPC", "California", { ...ca, scope: "California Plumbing Code 2025, on UPC 2024." }, "2027", TODAY, 92).text, /may not apply\. California Plumbing Code 2025, on UPC 2024\./, "the other family's edition is named");
   assert.equal(codeAdoptionLine("IRC", "California", undefined, "2024", TODAY, 92), null);
   const oh = { ...okRow(), review: null };
   assert.match(codeAdoptionLine("IRC", "Ohio", oh, "2024", TODAY, 92).text, /Ohio enforces IRC 2024 for residential buildings \(since Jan 1, 2025\), with state amendments\. This calculator follows IRC 2024\./);

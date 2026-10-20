@@ -1,6 +1,990 @@
 {
   "code": "IPC",
   "cadence_days": 92,
-  "about": "spec-v1974: per-state adoption of the IPC, drafted one state at a time from the state's own statute or rule, with ICC's adoption map as the cross-check only. Each row also names its code family (a state on the UPC or UMC adopts no IPC or IMC edition). No row is drafted yet; until one is, nothing ships for this code.",
-  "rows": {}
+  "about": "spec-v1974: per-state adoption of the IPC, drafted one state at a time from the state's own statute or rule, with ICC's adoption map as the cross-check only. Each row also names its code family (a state on the UPC or UMC adopts no IPC or IMC edition). All 51 drafted 2026-10-20 from the state's own rule where found, ICC's April 2026 adoption chart as the cross-check; unsigned rows show labeled not verified, and a row whose sources conflict shows no edition.",
+  "rows": {
+    "AL": {
+      "name": "Alabama",
+      "status": "limited",
+      "family": "IPC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2021",
+          "effective": "2022-10-15"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": "Minimum standard for certified plumbers where no local code is adopted; DCM also adopts the 2021 IPC for state-funded buildings and schools.",
+      "citation": "Ala. Admin. Code r. 720-X-1-.02(1)(b) (2021 IPC for commercial plumbing), Plumbers and Gas Fitters Examining Board",
+      "citation_primary": true,
+      "source_url": "https://admincode.legislature.state.al.us/api/rule/720-X-1-.02",
+      "draft_note": "Read rule 720-X-1-.02 PDF: 'In the absence of locally adopted codes', certified plumbing contractors 'shall comply with the minimum standards of the 2021 International Plumbing Code for commercial plumbing'; history amended eff 2022-10-15. The local-conflict override in (a) is for residential (IRC) only, so a locally adopted commercial plumbing code may differ. Also read DCM rule 355-12-1-.01: 2021 IPC for state-funded work, schools, hotels/motels (eff 2022-07-01 per DCM page). Signer: statewide vs limited is a judgment call.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Chart: IPC 21."
+    },
+    "AK": {
+      "name": "Alaska",
+      "status": "statewide-amended",
+      "family": "UPC",
+      "editions": [],
+      "upcoming": [],
+      "pending": null,
+      "scope": "Uniform Plumbing Code 2018 with Alaska revisions (8 AAC 63.010), minimum plumbing standard statewide; last amended eff 2020-04-24.",
+      "citation": "8 AAC 63.010 (Uniform Plumbing Code 2018 as revised), Dept. of Labor and Workforce Development, Mechanical Inspection",
+      "citation_primary": true,
+      "source_url": "https://www.akleg.gov/basis/aac.asp?media=print&secStart=8.63.010&secEnd=8.63.010",
+      "draft_note": "Read 8 AAC 63.010 on akleg.gov (print view): codes 'adopted in accordance with AS 18.60.705 as the minimum plumbing standards to be followed throughout the state', IAPMO 'Uniform Plumbing Code, 2018 edition' chapters 2-17 with Alaska revisions. DOL Plumbing Code booklet (April 2020) gives history ending 'am 4/24/2020, Register 234'; the 2018 UPC adoption date is assumed to be that last amendment, not confirmed. AS 18.60.710/.735 exceptions (municipalities with their own codes) not read. No newer UPC rulemaking found.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Chart: IPC blank. State page not read."
+    },
+    "AZ": {
+      "name": "Arizona",
+      "status": "local",
+      "family": "IPC",
+      "editions": [],
+      "upcoming": [],
+      "pending": null,
+      "scope": "No statewide IPC; cities and counties adopt their own plumbing/mechanical/gas codes.",
+      "citation": "No state adoption: counties adopt building codes under A.R.S. 11-861; cities by reference under A.R.S. 9-802",
+      "citation_primary": true,
+      "source_url": "https://www.azleg.gov/ars/11/00861.htm",
+      "draft_note": "An absence has no adopting rule to cite. A.R.S. 11-861 and 9-802 (read for the IBC row) give counties and cities code-adoption authority; no state IPC adoption found (ROC licenses contractors but adopts no installation code). citation_primary true because the statutes show local authority; signer may prefer false. Local editions not checked.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Chart: IPC X. State page: codes are adopted locally."
+    },
+    "AR": {
+      "name": "Arkansas",
+      "status": "statewide-amended",
+      "family": "IPC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2018",
+          "effective": "2021-08-12"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": null,
+      "citation": "Ark. Code R. 007.24.20-003 (2018 Arkansas Plumbing Code, based on 2018 IPC), Dept. of Health, Plumbing and Natural Gas",
+      "citation_primary": true,
+      "source_url": "https://www.law.cornell.edu/regulations/arkansas/007-24-20-Ark-Code-R-003",
+      "draft_note": "Read the LII record for rule 007.24.20-003 '2018 Arkansas Plumbing Code': adopted by Arkansas Register Vol. MMXXI No. 08, eff. 8/12/2021 (full text not on LII). Read ADH's hosted 2018 Arkansas Plumbing Code front matter: ICC book containing the 2018 International Plumbing Code. Rule text itself not read (ADH site blocked by Cloudflare). No 2021/2024 update found.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Chart: IPC 18. State page: 2018 AR Plumbing Code based on the 2018 IPC."
+    },
+    "CA": {
+      "name": "California",
+      "status": "statewide-amended",
+      "family": "UPC",
+      "editions": [],
+      "upcoming": [],
+      "pending": null,
+      "scope": "Uniform Plumbing Code 2024 (2025 California Plumbing Code, Title 24 Part 5), effective 2026-01-01.",
+      "citation": "Cal. Code Regs. tit. 24, pt. 5 (2025 California Plumbing Code), Building Standards Commission",
+      "citation_primary": true,
+      "source_url": "https://dgs.ca.gov/BSC/Codes",
+      "draft_note": "Read DGS/BSC codes page: 2025 Title 24 effective January 1, 2026; Part 5 errata effective 2026-01-01. Read BSC ISOR for Part 5 (BSC-02-24): BSC 'adopts the most current edition of the Uniform Plumbing Code (UPC)' and updates the title 'reflecting adoption of the 2024 Uniform Plumbing Code'. Prior 2022 CPC (2021 UPC) eff 2023-01-01. Local amendments possible.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Chart: IPC blank (state-specific codes)."
+    },
+    "CO": {
+      "name": "Colorado",
+      "status": "statewide-amended",
+      "family": "IPC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2021",
+          "effective": "2023-04-14"
+        },
+        {
+          "applies_to": "all",
+          "edition": "2024",
+          "effective": "2026-08-14"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": "Colorado Plumbing Code applies throughout Colorado; local jurisdictions enforce and may be on other editions.",
+      "citation": "3 CCR 720-1, rule 1.2.A (Colorado Plumbing Code: 2024 IPC as amended), State Plumbing Board",
+      "citation_primary": true,
+      "source_url": "https://www.sos.state.co.us/CCR/DisplayRule.do?action=ruleinfo&ruleId=2255&deptID=18&agencyID=33",
+      "draft_note": "Read current 3 CCR 720-1 PDF (eff 08/14/2026, adopted 06/24/2026, eDocket 2026-00212): rule 1.2.A adopts 'the IPC, 2024 edition' as the Colorado Plumbing Code governing plumbing 'throughout Colorado'; editor's notes 'Rules 1.2 eff. 08/14/2026'. Read prior version (eff 02/14/2026): IPC 2021 edition. 2021 start date 2023-04-14 from editor's notes ('Rules 1.2 ... eff. 04/14/2023') and the Pueblo County ordinance; signer confirm. The ICC chart (April 2026) predates the 2024 adoption: ICC chart lag.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Chart: IPC 21."
+    },
+    "CT": {
+      "name": "Connecticut",
+      "status": "statewide-amended",
+      "family": "IPC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2021",
+          "effective": "2022-10-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": "2026 State Building Code (2024 I-codes) awaits Legislative Regulation Review Committee approval; July 1, 2026 date delayed.",
+      "scope": null,
+      "citation": "2022 Connecticut State Building Code (2021 IPC as amended), Office of the State Building Inspector",
+      "citation_primary": true,
+      "source_url": "https://portal.ct.gov/en/das/office-of-state-building-inspector/connecticut-state-building-code/regulations",
+      "draft_note": "Read DAS regulations page: 2022 CSBC 'applies to projects with permit applications filed from October 1, 2022' and is based on the 2021 I-codes, listing the '2021 International Plumbing Code'. Pending 2026 CSBC as in the IBC row (LRRC rejected without prejudice 2025-12-16, resubmitted). Codes cannot be amended locally.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Chart: IPC 21."
+    },
+    "DE": {
+      "name": "Delaware",
+      "status": "statewide-amended",
+      "family": "IPC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2021",
+          "effective": "2022-08-11"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": "Every county and municipality must enforce the state code; local water, wastewater and administrative rules may add to it.",
+      "citation": "16 Del. Admin. Code 4455 (2021 State of Delaware Plumbing Code, 2021 IPC as amended), Division of Public Health",
+      "citation_primary": true,
+      "source_url": "https://www.law.cornell.edu/regulations/delaware/16-Del-Admin-Code-SS-4455-1.0",
+      "draft_note": "Read 4455-1.0 (LII copy): DPH 'shall hereby adopt the 2021 International Plumbing Code with following amendments', known as the '2021 State of Delaware Plumbing Code'; every political subdivision 'shall enforce the International Plumbing Code (IPC) as adopted or modified by the Division of Public Health'. Notes: 26 DE Reg. 110 (8/1/2022) (Final). Effective August 11, 2022 per the final order (search summary of the Register order; Register page itself did not render). Section 2.1 still names 'The 2018 Delaware Plumbing Code' (stale text). No 2024 IPC proposal found.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Chart: IPC 21. State page: statewide adoption only for the IPC and IECC."
+    },
+    "FL": {
+      "name": "Florida",
+      "status": "statewide-amended",
+      "family": "IPC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2021",
+          "effective": "2023-12-31"
+        }
+      ],
+      "upcoming": [],
+      "pending": "9th Edition (2026) Florida Building Code proposed 2026-09-23 (comment period closed 2026-10-14); no final notice or date yet.",
+      "scope": null,
+      "citation": "Fla. Admin. Code r. 61G20-1.001 (Florida Building Code, 8th Edition (2023), Plumbing), Florida Building Commission",
+      "citation_primary": true,
+      "source_url": "https://www.flrules.org/gateway/ruleNo.asp?id=61G20-1.001",
+      "draft_note": "Read rule 61G20-1.001 text (flrules .doc, eff 3-18-26): 'The Florida Building Code, 8th Edition (2023), as updated ... is hereby adopted as the building code for the State of Florida'; history includes 12-31-23 (8th Edition). The rule adopts the FBC as a whole; the Plumbing volume and its 2021 IPC base are from ICC/secondary sources, not the rule text. 9th Edition proposed 2026-09-23, pending; ICC/Miami-Dade say effective 2026-12-31. Recheck Dec 2026.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Chart: IPC 21."
+    },
+    "GA": {
+      "name": "Georgia",
+      "status": "statewide-amended",
+      "family": "IPC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2024",
+          "effective": "2026-01-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": "Mandatory state minimum code; local governments choose whether to enforce, and local amendments must be filed with DCA.",
+      "citation": "O.C.G.A. 8-2-23; DCA State Minimum Standard Codes: 2024 IPC with Georgia Amendments",
+      "citation_primary": true,
+      "source_url": "https://dca.georgia.gov/document/document/new-codes-and-amendments-effective-january-1-2026-memo/download",
+      "draft_note": "Read DCA memo dated 2025-12-01: the DCA Board 'voted to adopt the following codes with an effective date of January 1, 2026', including the '2024 International Plumbing Code with Georgia Amendments', as mandatory state codes under O.C.G.A. 8-2-23. Prior edition not recorded.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Chart: IPC 24."
+    },
+    "HI": {
+      "name": "Hawaii",
+      "status": "statewide-amended",
+      "family": "UPC",
+      "editions": [],
+      "upcoming": [],
+      "pending": "SBCC code-update work suspended under the Governor's housing proclamation; no newer UPC adoption found.",
+      "scope": "Uniform Plumbing Code 2018 (Hawaii State Plumbing Code), eff 2020-05-19; counties amend and enforce.",
+      "citation": "Haw. Admin. R. tit. 3, State Building Code Council, State Plumbing Code (UPC 2018) [Eff 5/19/2020]; HRS 107-25",
+      "citation_primary": true,
+      "source_url": "https://www.law.cornell.edu/regulations/hawaii/Haw-Code-R-tit-3-Building-Code-Council-State-Plumbing-Code-Adoption-of-the-Uniform-Plumbing-Code",
+      "draft_note": "Read HAR tit. 3 State Plumbing Code (LII): 'The \"Uniform Plumbing Code, 2018 Edition\" including appendices ... is incorporated by reference' [Eff 5/19/2020]; scope section applies to all new construction [Eff 5/19/2020]. Read HRS 107-25: state codes are based on the UPC; counties must adopt within 2 years or the state code becomes the county's interim code (Garden Island: counties by 2022-05-19). Uncertain: whether HRS 107's default rule has made a newer UPC the state code (as the SBCC report says for the 2021 IBC/IRC/IECC); SBCC work is suspended under the housing proclamation. County ordinances not checked.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Chart: IPC X* (local use). State page: core codes based on IBC, IRC, IECC, UPC."
+    },
+    "ID": {
+      "name": "Idaho",
+      "status": "statewide-amended",
+      "family": "UPC",
+      "editions": [],
+      "upcoming": [],
+      "pending": "Plumbing Board discussed adopting the 2024 UPC (2023-2024 minutes); DOPL page says no rulemaking in 2025-26 or 2026-27.",
+      "scope": "Uniform Plumbing Code 2015 (2017 Idaho State Plumbing Code), effective 2018-01-01 (inferred). Local programs must adopt the UPC.",
+      "citation": "IDAPA 24.39.20.600 (Idaho Plumbing Board; Idaho State Plumbing Code = 2015 Uniform Plumbing Code, amended)",
+      "citation_primary": true,
+      "source_url": "https://adminrules.idaho.gov/rules/current/24/243920.pdf",
+      "draft_note": "Read the current IDAPA 24.39.20 PDF (created 2026-06-12): rule 600 adopts the 2015 UPC with appendices A-E, G, I-L and Idaho amendments as the ISPC, stamped (3-28-23) (re-promulgation). Read Idaho Code 54-2601: the code must be the UPC, adopted by the Board, effective January 1 of the year after adoption; cities/counties with programs adopt the UPC by ordinance, no other code allowed; the Division inspects elsewhere. DOPL's 2025 'Idaho Adopted Codes' sheet: '2017 Idaho State Plumbing Code based on the 2015 Uniform Plumbing Code'. Effective 2018-01-01 is inferred from the 2017 name plus the January 1 rule; not read in a dated source. 2024 UPC adoption appears stalled (search summary of DOPL minutes and rulemaking page; not read directly).",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "IPC blank (not adopted)."
+    },
+    "IL": {
+      "name": "Illinois",
+      "status": "statewide-amended",
+      "family": "other",
+      "editions": [],
+      "upcoming": [],
+      "pending": null,
+      "scope": "Illinois Plumbing Code (IDPH, 77 Ill. Adm. Code 890), the state's own code; applies to all new plumbing and alterations.",
+      "citation": "77 Ill. Adm. Code 890 (Illinois Plumbing Code, Department of Public Health), Section 890.110 Applicability",
+      "citation_primary": true,
+      "source_url": "https://ftp.ilga.gov/JCAR/AdminCode/077/077008900A01100R.html",
+      "draft_note": "Read 77 Ill. Adm. Code 890.110 on the ILGA public file repository (ilga.gov blocks scripts): the Part governs design and installation of all new plumbing and any alteration (source note: amended 38 Ill. Reg. 9940, eff. 2014-04-24). Part 890 is IDPH's own code, not a model code, so family 'other' with no edition. I did not read the Illinois Plumbing License Law (225 ILCS 320) on whether municipalities (e.g. Chicago) may keep their own equal-or-stricter codes, nor find the date of the latest Part 890 amendment. The commercial-building inspection rule (20 ILCS 3105/10.09-1, IBC row) also names the Illinois Plumbing Code.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "IPC X (some local adoptions)."
+    },
+    "IN": {
+      "name": "Indiana",
+      "status": "statewide-amended",
+      "family": "IPC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2006",
+          "effective": "2012-12-24"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": null,
+      "citation": "675 IAC 16-1.4 (2012 Indiana Plumbing Code, based on the 2006 IPC, Second Printing)",
+      "citation_primary": true,
+      "source_url": "https://www.in.gov/dhs/boards-and-commissions/fpbsc-rules/",
+      "draft_note": "Read the IDHS Fire Prevention and Building Safety Commission rules page: 675 IAC 16-1.4, 2012 Indiana Plumbing Code, model code 'International Plumbing Code, 2006 Edition, Second Printing', effective 12/24/2012, currently in effect (replaced the 1999 UPC-based code). No plumbing draft listed. I did not read the IAC text itself. Indiana rules apply statewide; local amendments need Commission approval (per IBC row, not re-read).",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "IPC 06."
+    },
+    "IA": {
+      "name": "Iowa",
+      "status": "statewide-amended",
+      "family": "UPC",
+      "editions": [],
+      "upcoming": [],
+      "pending": null,
+      "scope": "Uniform Plumbing Code 2024 (Iowa State Plumbing Code), effective 2025-03-26. Applies statewide; localities may only add stricter amendments.",
+      "citation": "481 IAC 425.1(105) (State Plumbing Code; Uniform Plumbing Code, 2024 Edition, amended)",
+      "citation_primary": true,
+      "source_url": "https://www.legis.iowa.gov/docs/iac/chapter/481.425.pdf",
+      "draft_note": "Read 481 IAC ch. 425 (IAC 9/30/26): 425.1 adopts UPC 2024 sections 101-102, ch. 2-17, App. A and M as the state plumbing code under Iowa Code 105.4 [ARC 8913C, IAB 2/19/25, eff. 3/26/25]; 425.2: applies to plumbing in buildings in Iowa; local jurisdictions may not adopt other plumbing codes, only stricter amendments. Formerly 641 IAC 25 (moved 4/2/25). ICC chart shows IPC X, likely a few local or state-building references; the state plumbing code is the UPC.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "IPC X (some adoptions; not the statewide standard)."
+    },
+    "KS": {
+      "name": "Kansas",
+      "status": "local",
+      "family": "IPC",
+      "editions": [],
+      "upcoming": [],
+      "pending": null,
+      "scope": "No statewide plumbing code; cities and counties adopt their own (IPC or UPC).",
+      "citation": "No state adoption found: Kansas has no statewide plumbing code; cities and counties adopt under home rule",
+      "citation_primary": false,
+      "source_url": "https://www.energycodes.gov/status/states/kansas",
+      "draft_note": "An absence has no adopting rule to cite. ICC's April 2026 chart shows X (local adoptions only) for every Kansas I-code; the IBC/IRC rows found no statewide building code (home rule). I found no Kansas statute or K.A.R. adopting a statewide plumbing code; did not search exhaustively. Signer: confirm.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "IPC X (local adoptions only)."
+    },
+    "KY": {
+      "name": "Kentucky",
+      "status": "statewide-amended",
+      "family": "other",
+      "editions": [],
+      "upcoming": [],
+      "pending": null,
+      "scope": "Kentucky State Plumbing Code (815 KAR Chapter 20), the state's own code, not a model code.",
+      "citation": "815 KAR Chapter 20 (Kentucky State Plumbing Law, Regulations and Code)",
+      "citation_primary": false,
+      "source_url": "https://dhbc.ky.gov/Documents/Find%20Currently%20Enforced%20Code.pdf",
+      "draft_note": "Read DHBC 'Codes Currently Adopted by Kentucky': lists 'Kentucky State Plumbing Law, Regulations & Code (815 KAR Chapter 20)'; no IPC or UPC. I did not read 815 KAR 20 itself or its latest amendment date, so citation_primary false. 815 KAR 7:120 (KBC) has no plumbing references (read).",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "IPC blank (not adopted)."
+    },
+    "LA": {
+      "name": "Louisiana",
+      "status": "statewide-amended",
+      "family": "IPC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2021",
+          "effective": "2023-01-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": "2024 IPC proposed (notice of intent, La. Register 2026-08-20); proposed effective 2027-01-01. Final rule not seen.",
+      "scope": null,
+      "citation": "LAC 17:I (Louisiana State Uniform Construction Code; International Plumbing Code 2021, amended)",
+      "citation_primary": true,
+      "source_url": "https://luccc.louisiana.gov/wp-content/uploads/2025/11/LSUCCC_Louisiana-Construction-Code-Information.pdf",
+      "draft_note": "Read the LUCCC code information sheet (revised 2026-08-06): current IPC edition 2021; '2021 ICC Codes' effective January 1, 2023; next cycle '2024 editions for ICC Codes', 'will become effective January 1, 2027'. History: the IPC replaced the Louisiana State Plumbing Code on 2016-01-01 (2012 IPC). The 2024 adoption was still a proposed rule (notice of intent, La. Register 2026-08-20, per the IBC/IRC rows), so it is 'pending', not 'upcoming'. I did not re-read the LAC 17:I section text for this code. Signer: check the Oct/Nov 2026 Register for a final rule.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "IPC 21."
+    },
+    "ME": {
+      "name": "Maine",
+      "status": "statewide-amended",
+      "family": "UPC",
+      "editions": [],
+      "upcoming": [],
+      "pending": "A proposal would add 2024 UPC Section 422 (all-gender toilet rooms) to ch. 4; final adoption not seen.",
+      "scope": "Uniform Plumbing Code 2021 (02-395 C.M.R. ch. 4), effective 2022-01-01; amended 2022-02-23 and 2024-03-06.",
+      "citation": "02-395 C.M.R. ch. 4, sec. 1 (Plumbers' Examining Board; IAPMO 2021 Uniform Plumbing Code, amended)",
+      "citation_primary": false,
+      "source_url": "https://www.law.cornell.edu/regulations/maine/02-395-C-M-R-ch-4-SS-1",
+      "draft_note": "Read 02-395 ch. 4 sec. 1 on Cornell LII (maine.gov and Justia returned 403): the Board adopts the 2021 UPC (29th ed., third printing May 2021) 'as the standard for plumbing installations in the State of Maine', with exclusions and amendments. Dates are secondary (search summary of Board minutes and SOS rulemaking lists): adopted 2021-08-09, effective 2022-01-01 (filing 2021-212); amended eff. 2022-02-23 (2022-022) and 2024-03-06 (2024-047). citation_primary false because I read only the LII copy. Chapter 238 (old Internal Plumbing Code) was replaced by ch. 4.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "IPC blank (not adopted)."
+    },
+    "MD": {
+      "name": "Maryland",
+      "status": "statewide",
+      "family": "IPC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2024",
+          "effective": "2025-11-24"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": "State Plumbing Code is the minimum; WSSC (Montgomery/Prince George's) and some counties adopt their own plumbing codes.",
+      "citation": "COMAR 09.20.01.01B(1) (State Plumbing Code: Board adopts 'the most recent version' of the International Plumbing Code)",
+      "citation_primary": true,
+      "source_url": "https://regs.maryland.gov/us/md/exec/comar/09.20.01",
+      "draft_note": "Read COMAR 09.20.01 on regs.maryland.gov: .01B says the Board adopts 'the most recent version' of the IPC, IRC, IFGC, NFPA 54 and NFPA 58 'as they may be amended, modified, or updated from time to time'; .02-.04 (State modifications) repealed. History: chapter revised eff. 2019-12-30 (2018 IPC/IFGC per ICC press release); .01 amended and .02-.04 repealed eff. 2025-11-24 (52:23 Md. R. 1138). Edition 2024 and date 2025-11-24 are INFERRED: the newest IPC on that date was 2024; the rule names no year and I did not read the Md. Register notice. No modifications remain, hence 'statewide'. WSSC/county local codes: from search (WSSC 2021 IPC draft), not read. ICC chart IPC 21 may be lag or reflect local codes.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "IPC 21."
+    },
+    "MA": {
+      "name": "Massachusetts",
+      "status": "statewide-amended",
+      "family": "other",
+      "editions": [],
+      "upcoming": [],
+      "pending": null,
+      "scope": "Massachusetts Uniform State Plumbing Code (248 CMR 10.00), the state's own code; latest revision effective 2023-12-08.",
+      "citation": "248 CMR 10.00 (Uniform State Plumbing Code, Board of State Examiners of Plumbers and Gas Fitters)",
+      "citation_primary": false,
+      "source_url": "https://www.mass.gov/regulations/248-CMR-10",
+      "draft_note": "Search summaries of the mass.gov 248 CMR 10 page and the Board FAQ: revised code effective 2023-12-08, permit date governs, no concurrency. Not read directly (mass.gov blocks scripts), so citation_primary false. 780 CMR ch. 28 (read) names 248 CMR for plumbing/gas.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "IPC blank (not adopted)."
+    },
+    "MI": {
+      "name": "Michigan",
+      "status": "statewide-amended",
+      "family": "IPC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2021",
+          "effective": "2024-03-12"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": null,
+      "citation": "2021 Michigan Plumbing Code (LARA Bureau of Construction Codes; Stille-DeRossett-Hale Single State Construction Code Act)",
+      "citation_primary": true,
+      "source_url": "https://www.michigan.gov/lara/bureau-list/bcc/rules-acts/codes/code-books",
+      "draft_note": "LARA Code Books page read 2026-10-20: '2021 Michigan Plumbing Code Current Code-March 12, 2024'; residential plumbing is in the Michigan Residential Code (still 2015). The Part 7 rule number and text adopting the 2021 IPC were not read, nor the prior MPC edition/date.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Chart (April 2026): IPC 21."
+    },
+    "MN": {
+      "name": "Minnesota",
+      "status": "statewide-amended",
+      "family": "UPC",
+      "editions": [],
+      "upcoming": [],
+      "pending": null,
+      "scope": "Uniform Plumbing Code 2018 (2020 Minnesota Plumbing Code, Minn. R. ch. 4714), effective 2021-12-17, all buildings.",
+      "citation": "Minn. R. 4714.0050 (Minnesota Plumbing Code: 2018 UPC chapters 2-11, 16, 17, as amended)",
+      "citation_primary": true,
+      "source_url": "https://www.revisor.mn.gov/rules/4714.0050/",
+      "draft_note": "4714.0050 read 2026-10-20: incorporates chapters 2 to 11, 16 and 17 of the 2018 UPC (history 40 SR 71; 45 SR 1007). DLI fact sheet '2020 Minnesota Plumbing Code' read: regulates plumbing 'statewide for all buildings'; amendments effective Dec. 17, 2021. Prior: 2012 UPC-based code (effective 2016-01-23 per a DLI timeline, via search; not read).",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Chart (April 2026): IPC blank (not adopted)."
+    },
+    "MS": {
+      "name": "Mississippi",
+      "status": "local",
+      "family": "IPC",
+      "editions": [],
+      "upcoming": [],
+      "pending": null,
+      "scope": "Council codes are minimum codes localities may adopt (coastal counties must enforce); edition not confirmed.",
+      "citation": "Miss. Code Ann. 17-2-1 et seq. (Mississippi Building Codes Council), not read directly",
+      "citation_primary": false,
+      "source_url": "https://www.iccsafe.org/advocacy/adoptions-map/Mississippi/",
+      "draft_note": "SOURCES CONFLICT: ICC's April 2026 chart (column read by position) lists IPC 24; ICC's state page says the Council adopted the 2018 I-codes incl. IPC in December 2019; an ICC-NTA post (2026-07-20, via search) says the 2024 I-codes incl. IPC apply to modular construction from 2026-07-01. The Council's adopted-codes list and 17-2-1 text were not reached. Localities adopt one of the last three editions or opted out; coastal counties must enforce. Kept 'local' with no edition, as the IBC and IRC rows are.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Chart (April 2026): IPC 24 (state). State page: MBCC 3-year cycle; voluntary outside coastal counties."
+    },
+    "MO": {
+      "name": "Missouri",
+      "status": "local",
+      "family": "IPC",
+      "editions": [],
+      "upcoming": [],
+      "pending": null,
+      "scope": "No statewide code; cities and counties adopt their own code and edition.",
+      "citation": "No state adoption: Missouri has no statewide plumbing code; counties and cities adopt codes by ordinance",
+      "citation_primary": false,
+      "source_url": "https://www.iccsafe.org/advocacy/adoptions-map/missouri/",
+      "draft_note": "An absence has no adopting rule to cite; no Missouri statute was read. ICC's chart marks every I-code X (local only); its state page says the state adopts codes only for state-owned buildings (edition not found, as in the IBC row).",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Chart (April 2026): IPC X (local adoption only)."
+    },
+    "MT": {
+      "name": "Montana",
+      "status": "statewide-amended",
+      "family": "UPC",
+      "editions": [],
+      "upcoming": [],
+      "pending": null,
+      "scope": "Uniform Plumbing Code 2024 as amended by ARM Title 24, Ch. 301, effective 2026-09-26.",
+      "citation": "ARM Title 24, Ch. 301 (Uniform Plumbing Code 2024 as amended), per DLI Current Codes",
+      "citation_primary": true,
+      "source_url": "https://bsd.dli.mt.gov/building-codes-permits/current-codes",
+      "draft_note": "DLI Current Codes page read 2026-10-20: 'Uniform Plumbing Code, 2024 Edition - Effective: September 26, 2026', amended by ARM Title 24 Ch. 301 (specific rule number and MCA section not read). Prior UPC edition (likely 2021, effective 2022-06-11) not confirmed. Certified local programs enforce the state code; the state enforces elsewhere.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Chart (April 2026): IPC blank (not adopted)."
+    },
+    "NE": {
+      "name": "Nebraska",
+      "status": "limited",
+      "family": "UPC",
+      "editions": [],
+      "upcoming": [],
+      "pending": null,
+      "scope": "UPC 2018 (state building code, 71-6403) applies where a locality has no conforming code; effective date not confirmed.",
+      "citation": "Neb. Rev. Stat. 71-6403(1)(d) (state building code: UPC 2018); 71-6406; 18-1915",
+      "citation_primary": true,
+      "source_url": "https://nebraskalegislature.gov/laws/statutes.php?statute=71-6403",
+      "draft_note": "71-6403(1)(d) read 2026-10-20: 'The Uniform Plumbing Code, 2018 edition' (history to LB131, 2021). 18-1915 read: outside city/village limits, where the nearest city has no plumbing ordinance, the 2018 UPC applies to all buildings except single-family dwellings and farm/ranch structures. Which bill first added the UPC to 71-6403, and its operative date, were not read. ICC's X marks are local adoptions.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Chart (April 2026): IPC X (local only)."
+    },
+    "NV": {
+      "name": "Nevada",
+      "status": "limited",
+      "family": "UPC",
+      "editions": [],
+      "upcoming": [],
+      "pending": null,
+      "scope": "Uniform Plumbing Code 2024 for state buildings only (SPWD, eff. 2024-11-15); cities and counties adopt their own UPC edition.",
+      "citation": "NAC 341.045 (State Public Works Board: UPC for state buildings), as amended by R072-24A",
+      "citation_primary": true,
+      "source_url": "https://publicworks.nv.gov/uploadedFiles/publicworksnvgov/content/Documents/Permitting_Code_Enforcement/2024%20Adopted_Codes.pdf",
+      "draft_note": "SPWD Adopted Codes list (rev. 2024-02-13, under NAC 341.045) read: '2024 Uniform Plumbing Code (UPC)' and '2024 Uniform Mechanical Code (UMC)'; 2018-edition designs accepted until 2025-06-30. The leg.state.nv.us NAC 341.045 text (stale, 2018 IBC) replaces IPC/IMC references with UPC/UMC. Effective 2024-11-15 per the IBC row's Cornell reading of R072-24A (not re-read). Private buildings: local codes only (southern Nevada jurisdictions phasing in the 2024 UPC/UMC).",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Chart (April 2026): IPC blank (col. read by position)."
+    },
+    "NH": {
+      "name": "New Hampshire",
+      "status": "statewide-amended",
+      "family": "IPC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2024",
+          "effective": "2026-07-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": null,
+      "citation": "RSA 155-A:1, IV (state building code: IPC 2024 with NH amendments), as amended 2026, eff. July 1, 2026",
+      "citation_primary": true,
+      "source_url": "https://gc.nh.gov/rsa/html/XII/155-A/155-A-1.htm",
+      "draft_note": "RSA 155-A:1, IV read 2026-10-20: adopts 'the International Plumbing Code 2024' with board amendments approved as of 2025-10-10; source line ends 2026 ch. 49:1 and 318:3, eff. July 1, 2026. Prior: IPC 2021, effective 2024-07-01 (2024 ch. 323; edition not re-read). Whether the town-notice concurrency (either edition through 2026-12-31) applies was not read in the statute. State Fire Marshal enforces where a town has no building official.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Chart (April 2026): IPC 21 (predates the 2026-07-01 update)."
+    },
+    "NJ": {
+      "name": "New Jersey",
+      "status": "statewide-amended",
+      "family": "other",
+      "editions": [],
+      "upcoming": [],
+      "pending": null,
+      "scope": "National Standard Plumbing Code 2024 (PHCC), New Jersey edition, effective 2026-08-17.",
+      "citation": "N.J.A.C. 5:23-3.15 (plumbing subcode: National Standard Plumbing Code/2024, New Jersey edition), R.2026 d.086",
+      "citation_primary": true,
+      "source_url": "https://www.nj.gov/dca/codes/codreg/pdf_rule_adoptions/model_codes_2024_adopt.pdf",
+      "draft_note": "Adoption notice 58 N.J.R. 8(2) read: amends 5:23-3.15, adopted 2026-07-15, effective August 17, 2026; comments 25-26 and responses refer to 'the adoption of the 2024 edition of the National Standard Plumbing Code', which commenters say has been NJ's plumbing code since the 1970s. The 3.15 edition line itself was not seen. Six-month grace period (5:23-1.6, not read): prior NSPC/2021 usable until about 2027-02-17.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Chart (April 2026): IPC blank (not adopted)."
+    },
+    "NM": {
+      "name": "New Mexico",
+      "status": "statewide-amended",
+      "family": "UPC",
+      "editions": [],
+      "upcoming": [],
+      "pending": null,
+      "scope": "Uniform Plumbing Code 2021 (2021 New Mexico Plumbing Code), effective 2022-03-10; mandatory for new permits after 2022-09-10.",
+      "citation": "14.8.2 NMAC (2021 New Mexico Plumbing Code, adopting the 2021 UPC as amended)",
+      "citation_primary": true,
+      "source_url": "https://www.srca.nm.gov/parts/title14/14.008.0002.pdf",
+      "draft_note": "14.8.2.8 read: 'This rule adopts by reference the 2021 UPC and all appendices, as amended'. 14.8.2.5: effective May 15, 2018 with the 2021 update by amendment 'A, 3/10/2022'; either the prior or this rule could be used until 2022-09-10. No 2024 UPC rulemaking found. ICC says a few home-rule jurisdictions adopt their own codes.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Chart (April 2026): IPC X (local only)."
+    },
+    "NY": {
+      "name": "New York",
+      "status": "statewide-amended",
+      "family": "IPC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2024",
+          "effective": "2025-12-31"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": "Statewide outside New York City, which enforces its own NYC Construction Codes.",
+      "citation": "19 NYCRR Part 1222 (2025 Plumbing Code of New York State, Uniform Code)",
+      "citation_primary": true,
+      "source_url": "https://dos.ny.gov/19-nycrr-part-1222",
+      "draft_note": "Read DOS 19 NYCRR Part 1222 PDF (dos.ny.gov/19-nycrr-part-1222): 1222.2(a) requires compliance with the 2025 PCNYS, incorporated by reference, published by ICC; Part 1219 lists Parts 1220-1229. DOS notice of adoption: 2025 Uniform Code (incl. 2025 PCNYS, publication July 2025) effective 2025-12-31; 2020 or 2025 optional during transition. Base edition 2024 IPC per DOS Code Outreach 2026-1 ('based on the 2024 ICC books with NY modifications', read for the IBC row); the Part 1222 PDF itself does not name the IPC year. Prior: 2020 PCNYS (2018 IPC). NYC excluded.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "ICC chart (Apr 2026): IPC 24"
+    },
+    "NC": {
+      "name": "North Carolina",
+      "status": "statewide-amended",
+      "family": "IPC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2015",
+          "effective": "2019-01-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": "2024 NC Plumbing Code (2021 IPC) adopted; effective 12 months after OSFM certification under S.L. 2025-2; not yet certified.",
+      "scope": null,
+      "citation": "N.C.G.S. 143-138; 2018 North Carolina State Building Code: Plumbing Code (Office of State Fire Marshal)",
+      "citation_primary": true,
+      "source_url": "https://www.ncosfm.gov/codes/codes-current-and-past",
+      "draft_note": "SOURCES CONFLICT: ICC Apr 2026 chart shows IPC 21, but the 2024 NC codes are not yet effective. OSFM Codes Current and Past (read): 2018 NC Plumbing Code effective 2019-01-01 and 'currently effective', with the 2018 NC amendments 'along with the 2015 International Codes'. The 2024 section of that page covers only the Building Code; the S.L. 2025-2 sec. 5.12(b) delay (all ten 2024 codes effective 12 months after the State Fire Marshal's certification) is from the OSFM 2025-03-31 letter read for the IBC row. No certification found as of 2026-10-20. 2024 NC base = 2021 IPC per ICC chart (OSFM page does not name it).",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "ICC chart (Apr 2026): IPC 21 (counts the adopted, not-yet-effective 2024 NC code)"
+    },
+    "ND": {
+      "name": "North Dakota",
+      "status": "statewide-amended",
+      "family": "UPC",
+      "editions": [],
+      "upcoming": [],
+      "pending": null,
+      "scope": "Uniform Plumbing Code 2018 (2018 North Dakota Plumbing Code, selected chapters/appendices), effective 2020-04-01.",
+      "citation": "N.D. Admin. Code 62-03.1-01-01 (State Plumbing Board), NDCC 43-18-09",
+      "citation_primary": true,
+      "source_url": "https://ndlegis.gov/api/acdata/pdf/62-03.1-01.pdf",
+      "draft_note": "Read NDAC 62-03.1-01-01 (ndlegis.gov PDF): board adopts the 2018 UPC (IAPMO) as the 2018 North Dakota Plumbing Code, chapters 1-4, 6-11, 17 and appendices A-E, I, M, plus ch. 62-03.1-03; all plumbing must meet it; history last amended 2020-04-01. No 2024 UPC rulemaking found (search only). Plumbing is exempt from the State Building Code (NDCC 54-21.3-04), so no IPC applies statewide.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "ICC chart (Apr 2026): IPC blank"
+    },
+    "OH": {
+      "name": "Ohio",
+      "status": "statewide-amended",
+      "family": "IPC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2021",
+          "effective": "2024-03-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": null,
+      "citation": "Ohio Adm. Code 4101:3-1-01 (Ohio Plumbing Code), Board of Building Standards",
+      "citation_primary": true,
+      "source_url": "https://codes.ohio.gov/ohio-administrative-code/rule-4101:3-1-01",
+      "draft_note": "Read rule PDF 4101:3-1-01 eff 2025-10-15: 101.1 incorporates the 'International Plumbing Code, 2021 edition, Chapters 2 through 15'. BBS memo (read for the IBC row): OBC/OMC/OPC based on 2021 I-codes effective 2024-03-01 for applications filed on/after that date. The 2025-10-15 version keeps the 2021 IPC base (what it changed not checked). Applies to buildings other than 1-3 family dwellings.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "ICC chart (Apr 2026): IPC 21"
+    },
+    "OK": {
+      "name": "Oklahoma",
+      "status": "statewide-amended",
+      "family": "IPC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2024",
+          "effective": "2026-09-14"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": null,
+      "citation": "OAC 748:20-16-1 et seq. (OUBCC adoption of IPC 2024), 43 Ok Reg No. 20; 59 O.S. 1000.23",
+      "citation_primary": true,
+      "source_url": "https://oklahoma.gov/content/dam/ok/en/oubcc/documents/rules/2026%2009%2014%20IPC%202026%20Permanent%20Rule%20.pdf",
+      "draft_note": "ICC chart lag, not a conflict: ICC Apr 2026 chart shows IPC 18 (predates the 2026-09-14 effective date). Read the OUBCC permanent rule PDF: 748:20-16-1 adopts the IPC 2024 first printing, amended, as 'the statewide minimum code for commercial plumbing construction', source 'Amended at 43 Ok Reg, Number 20, effective 9-14-26'. Prior: IPC 2018, eff 2021-09-14 (38 Ok Reg 2726). OUBCC web copy is unofficial; official OAC/Ok Register text not read.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "ICC chart (Apr 2026): IPC 18"
+    },
+    "OR": {
+      "name": "Oregon",
+      "status": "statewide-amended",
+      "family": "UPC",
+      "editions": [],
+      "upcoming": [],
+      "pending": null,
+      "scope": "Uniform Plumbing Code 2024 (2026 Oregon Plumbing Specialty Code), effective 2026-10-01.",
+      "citation": "OAR 918-750-0110 (2026 Oregon Plumbing Specialty Code), Building Codes Division",
+      "citation_primary": true,
+      "source_url": "https://www.oregon.gov/bcd/codes-stand/pages/plumbing.aspx",
+      "draft_note": "BCD plumbing page: 2026 OPSC 'Based on the 2024 Uniform Plumbing Code', effective 2026-10-01; prior 2023 OPSC (2021 UPC) effective 2023-10-01. Read BCD Notice of Permanent Rule (laws-rules/Documents/20261001-2026opsc-adoption-pr.pdf): amends OAR 918-750-0110 to adopt the 2026 OPSC, 'effective Oct. 1, 2026'. No phase-in stated on either page (the ORSC has one; unknown whether the OPSC does). OAR text itself not read.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "ICC chart (Apr 2026): IPC blank"
+    },
+    "PA": {
+      "name": "Pennsylvania",
+      "status": "statewide-amended",
+      "family": "IPC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2021",
+          "effective": "2026-01-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": "Statewide except Allegheny County (second-class county), which keeps its own county plumbing code.",
+      "citation": "34 Pa. Code 403.21(a) (Uniform Construction Code, International Plumbing Code of 2021), 55 Pa.B. 7701",
+      "citation_primary": true,
+      "source_url": "https://www.pacodeandbulletin.gov/Display/pacode?file=/secure/pacode/data/034/chapter403/s403.21.html",
+      "draft_note": "Read 34 Pa. Code 403.21(a): (3) 'International Mechanical Code of 2021', (4) 'International Fuel Gas Code of 2021', (6) 'International Plumbing Code of 2021' except that a municipality in a county of the second class (Allegheny) may not administer and enforce the IPC and keeps its Local Health Administration Law plumbing code. Section amended effective 2026-01-01, 55 Pa.B. 7701 (per IBC row; source history read). Prior: 2018 editions. Pre-2026 design contracts may use the 2018 UCC for a transition period. L&I enforces commercial work where municipalities opted out.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "ICC chart (Apr 2026): IPC 21"
+    },
+    "RI": {
+      "name": "Rhode Island",
+      "status": "statewide-amended",
+      "family": "IPC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2021",
+          "effective": "2025-12-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": null,
+      "citation": "510-RICR-00-00-3 (SBC-3, Rhode Island Plumbing Code)",
+      "citation_primary": true,
+      "source_url": "https://rules.sos.ri.gov/Regulations/part/510-00-00-3",
+      "draft_note": "ICC chart lag, not a conflict: ICC Apr 2026 chart shows IPC 18. RI SOS rule page (read): Building Code Standards Committee adopts the IPC 2021 edition (later editions excluded), with RI amendments; current version effective 2025-12-01; prior version 2022-02-01 to 2025-12-01 adopted the 2018 IPC (per the rulemaking description). 3-month prior-code grace to 2026-03-01 is from IBC-row search results, not read for this code.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "ICC chart (Apr 2026): IPC 18"
+    },
+    "SC": {
+      "name": "South Carolina",
+      "status": "statewide-amended",
+      "family": "IPC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2021",
+          "effective": "2023-01-01"
+        }
+      ],
+      "upcoming": [
+        {
+          "applies_to": "all",
+          "edition": "2024",
+          "effective": "2027-01-01"
+        }
+      ],
+      "pending": null,
+      "scope": null,
+      "citation": "S.C. Code 6-9-50; LLR Building Codes Council, 2021 South Carolina Plumbing Code (2021 IPC with SC modifications)",
+      "citation_primary": true,
+      "source_url": "https://llr.sc.gov/bcc/BCAdoption.aspx",
+      "draft_note": "Read LLR 'Building Codes in Effect for South Carolina' PDF: Council adopted on 2021-10-06 the '2021 South Carolina Plumbing Code or the 2021 International Plumbing Code with SC modifications', mandatory for all municipalities and counties, implementation 2023-01-01. Read LLR 2024 Final Modification Index PDF: on 2025-08-26 the Council adopted the 2024 IPC (to be known as the 2024 South Carolina Plumbing Code), implementation 2027-01-01. Caveat from IBC row: legislative approval of the SC modification regulations may still be pending. The May 22, 2026 State Register PDF is image-only (not read).",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "ICC chart (Apr 2026): IPC 21"
+    },
+    "SD": {
+      "name": "South Dakota",
+      "status": "statewide-amended",
+      "family": "UPC",
+      "editions": [],
+      "upcoming": [],
+      "pending": null,
+      "scope": "Uniform Plumbing Code 2024 (State Plumbing Code, ARSD 20:54), rule effective 2025-10-28; cities may not set lower standards.",
+      "citation": "SDCL 36-25-15 (2024 UPC), SL 2025 ch 162; ARSD 20:54:02:01 (State Plumbing Commission)",
+      "citation_primary": true,
+      "source_url": "https://sdlegislature.gov/Statutes/36-25-15",
+      "draft_note": "Read via legislature API: SDCL 36-25-15 requires all plumbing to be in substantial accord with the '2024 Uniform Plumbing Code' (IAPMO), source SL 2025 ch 162 (was 2015 UPC); ARSD 20:54:02:01 requires the UPC 2024 edition with listed appendices and exceptions, source includes 52 SDR 42 eff 2025-10-28 and 52 SDR 106 eff 2026-05-25. Which SDR entry switched the edition to 2024 was not read; 2025-10-28 assumed. 36-25-16: local ordinances must meet the state code.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "ICC chart (Apr 2026): IPC blank"
+    },
+    "TN": {
+      "name": "Tennessee",
+      "status": "statewide",
+      "family": "IPC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2021",
+          "effective": "2025-04-17"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": "State minimum code via the State Fire Marshal; local governments that adopt and enforce their own codes (T.C.A. 68-120-101) may be exempt.",
+      "citation": "Tenn. Comp. R. & Regs. 0780-02-02-.01 (State Fire Marshal minimum codes: 2021 IPC)",
+      "citation_primary": true,
+      "source_url": "https://www.tn.gov/commerce/fire/codes-enforcement/history.html",
+      "draft_note": "Read the SFMO 'Currently Adopted Codes' page (last updated 2025-04-17): 'The International Plumbing Code (IPC), 2021 edition, published by the International Code Council (ICC)'; Code Adoption History row 4/17/2025 lists 2021 for IMC, IPC and IFGC (prior 2012, eff 2016-08-04). Same rule filing as the IBC row (01-17-25, eff 2025-04-17; 120-day option to use prior codes for SFMO plan review). No state amendments flagged for the IPC on that page (the IBC/IFC/IPMC entries carry 'see Appendix'). Exempt local governments under T.C.A. 68-120-101 enforce their own codes; exempt list not read. Cornell/Justia copies of 0780-02-02-.01 still show the 2012 text (stale mirror).",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "IPC 21 (ICC chart, April 2026)"
+    },
+    "TX": {
+      "name": "Texas",
+      "status": "limited",
+      "family": "IPC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2018",
+          "effective": null
+        }
+      ],
+      "upcoming": [],
+      "pending": "TSBPE proposed 2021 UPC/IPC in 367.2 (TexReg 2026-08-14); no final adoption or effective date found.",
+      "scope": "Board code applies only where no local plumbing code exists (unincorporated areas); cities adopt the IPC or the UPC (Occ. Code 1301.255).",
+      "citation": "22 Tex. Admin. Code 367.2(a) (TSBPE adopts 2018 UPC and 2018 IPC), under Tex. Occ. Code 1301.255",
+      "citation_primary": true,
+      "source_url": "https://www.sos.state.tx.us/texreg/archive/August142026/Proposed%20Rules/22.EXAMINING%20BOARDS.html",
+      "draft_note": "Read the TSBPE proposal in the Texas Register (Aug 14, 2026): 'The Board currently has the 2018 editions of the UPC and IPC adopted by rule'; it proposes the 2021 UPC and IPC (and the 2021 IFGC/IRC incorporated with the IPC); filed 2026-07-31, earliest adoption 2026-09-13; no adoption notice found. Rule text (Cornell LII, secondary): 367.2(c) work must follow the codes the local political subdivision adopts; in unincorporated areas with no code, follow (a). Occ. Code 1301.255 lets the board adopt both UPC and IPC; each city picks one. EFFECTIVE DATE UNKNOWN: 367.2 history shows amendments eff 2018-08-29, 2021-06-16 and 2023-02-16; which one moved to the 2018 editions was not read (Texas Register archive pages not reachable). Family is IPC or UPC by locality; IPC recorded because the board adopts it.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "IPC X (ICC chart, April 2026)"
+    },
+    "UT": {
+      "name": "Utah",
+      "status": "statewide-amended",
+      "family": "IPC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2024",
+          "effective": "2026-07-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": null,
+      "citation": "Utah Code 15A-2-103(1)(d) (State Construction Code: 2024 IPC), amended by Title 15A Ch. 3-4",
+      "citation_primary": true,
+      "source_url": "https://le.utah.gov/xcode/Title15A/Chapter2/15A-2-S103.html",
+      "draft_note": "Read 15A-2-103 version 'Effective 7/1/2026': '(d) the 2024 edition of the International Plumbing Code, issued by the International Code Council'; the version effective 2027-01-01 keeps 2024. Read enrolled H.B. 65 (2026 GS): '(d) the [2021] 2024 edition of the International Plumbing Code'; 'this bill takes effect July 1, 2026.' Prior 2021 edition (HB 532, 2023, eff 2023-07-01). ICC April 2026 chart shows 21, which predates the change (ICC chart lag). Uniform statewide code; statewide amendments in 15A Ch. 3, local amendments Ch. 4.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "IPC 21 (ICC chart, April 2026; predates the 2026-07-01 move to 2024)"
+    },
+    "VT": {
+      "name": "Vermont",
+      "status": "statewide-amended",
+      "family": "IPC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2024",
+          "effective": "2025-11-04"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": "Public buildings statewide, plus owner-occupied single-family homes connected to public water or sewer.",
+      "citation": "2025 Vermont Plumbing Rules, Section 21 (Plumbers' Examining Board adopts the 2024 IPC with VT amendments), 26 V.S.A. 2173",
+      "citation_primary": true,
+      "source_url": "https://firesafety.vermont.gov/sites/firesafety/files/Rules/2025%20Vermont%20Plumbing%20Rules%20V2.pdf",
+      "draft_note": "Read the 2025 Vermont Plumbing Rules PDF: cover 'Effective Date: 11/04/2025'; Section 21 'the Board adopts the provisions of the 2024 International Plumbing Code ... All plumbing installations shall comply with the 2024 IPC, as amended'; Section 23 'These rules shall take effect [11/04/2025]' (date in brackets). SOS rule 25P024 'Adopted', summary: update the 2021 IPC to the 2024 edition. Scope (Section 2): all public buildings plus owner-occupied single-family homes on public water or sewer. Prior: 2021 IPC (2021 Vermont Plumbing Rules, rule 22P019). The DFS plumbing page still labels 'International Plumbing Code, 2021 Edition' as current while listing the 2025 Rules as current; the DFS codes page lists IPC 2024 (stale page text, not a conflict). ICC chart lag.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "IPC 21 (ICC chart, April 2026)"
+    },
+    "VA": {
+      "name": "Virginia",
+      "status": "statewide-amended",
+      "family": "IPC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2021",
+          "effective": "2024-01-18"
+        }
+      ],
+      "upcoming": [],
+      "pending": "2024 USBC cycle in progress (BHCD proposals 2026-05); no proposed/final regulation or effective date yet.",
+      "scope": null,
+      "citation": "13VAC5-63-10 (Virginia Construction Code, USBC Part I, Section 101.2 Note 1: 2021 IPC as part of the USBC)",
+      "citation_primary": true,
+      "source_url": "https://law.lis.virginia.gov/admincodefull/title13/agency5/chapter63/",
+      "draft_note": "Read 13VAC5-63-10 (Section 101.2): IBC Chapters 2-35 incorporated; 'Note 1: The IBC references other International Codes and standards, including the following major codes: 2021 International Plumbing Code (IPC)'; codes referenced by the IBC are part of the USBC. DHCD: 2021 USBC effective Jan. 18, 2024 (2018 USBC optional for a year). Uniform statewide; localities may not amend. 2024 cycle in progress (NOIRA 2025-03-10; proposals considered 2026-05); no proposed or final regulation found.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "IPC 21 (ICC chart, April 2026)"
+    },
+    "WA": {
+      "name": "Washington",
+      "status": "statewide-amended",
+      "family": "UPC",
+      "editions": [],
+      "upcoming": [],
+      "pending": "2024 codes (SBCC): CR-102 filed 2026-05-06, final adoption targeted 2026-10-16; SBCC says effective 2027-05-03.",
+      "scope": "Uniform Plumbing Code 2021 (WAC 51-56, WA amendments), effective 2024-03-15; fuel gas piping excluded (IFGC via WAC 51-52).",
+      "citation": "WAC 51-56-003 (State Building Code: 2021 Uniform Plumbing Code, App. A, B, I, M, with WA amendments)",
+      "citation_primary": true,
+      "source_url": "https://app.leg.wa.gov/wac/default.aspx?cite=51-56-003",
+      "draft_note": "Read WAC 51-56-003: 'The 2021 edition of the Uniform Plumbing Code, including Appendices A, B, I, and M, published by the International Association of Plumbing and Mechanical Officials, is hereby adopted by reference'; chapters 12 (fuel gas) and 14 not adopted, nor fuel-fired appliance venting/combustion air (ch. 5) or building sewers; history WSR 23-02-057, 23-12-110, 23-20-029, effective 3/15/24 (prior 2018 UPC eff 2020-07-01). RCW 19.27.031(1)(e) names the UPC. SBCC home page: CR-102 for the 2024 codes incl. the UPC filed 2026-05-06, final adoption targeted 2026-10-16, effective 2027-05-03; no CR-103 seen, so pending only. ICC 'X' reflects local IPC use, not a state IPC.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "IPC X (ICC chart, April 2026)"
+    },
+    "WV": {
+      "name": "West Virginia",
+      "status": "limited",
+      "family": "IPC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2018",
+          "effective": "2022-08-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": "87CSR4 update 'In Progress' at the Secretary of State (2024 I-codes per a city ordinance); no register effective date found.",
+      "scope": "State Building Code applies only where a city or county adopts it by ordinance; elsewhere no state code.",
+      "citation": "W. Va. Code R. 87-4-4.1.b (State Building Code: 2018 IPC); 87-4-7 adoption by local jurisdiction",
+      "citation_primary": true,
+      "source_url": "https://apps.sos.wv.gov/adlaw/csr/rule.aspx?rule=87-04",
+      "draft_note": "SOURCES CONFLICT (minor): City of Buckhannon Ordinance 480 (Aug 2026) says 87CSR4 changes took effect 2026-07-29 with the 2024 I-codes, but the WV SOS rule page shows the 8/1/2022 version Active and a new version 'In Progress' with no effective date (see the IBC/IRC rows). Read 87-4-4.1.b (Cornell LII mirror): 'The 2018 edition of the International Plumbing Code'; 87-4-1: effective 2022-08-01. State Building Code applies only where a county/city adopts it (W. Va. Code 7-1-3n, 8-12-13; rule 87-4-7).",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "IPC 18 (ICC chart, April 2026)"
+    },
+    "WI": {
+      "name": "Wisconsin",
+      "status": "statewide",
+      "family": "other",
+      "editions": [],
+      "upcoming": [],
+      "pending": null,
+      "scope": "Wisconsin Plumbing Code (SPS 381-387), the state's own code; not based on the IPC or UPC.",
+      "citation": "Wis. Admin. Code SPS 361.04(12): 'IPC' means the Wisconsin Plumbing Code, chs. SPS 381 to 387",
+      "citation_primary": true,
+      "source_url": "https://docs.legis.wisconsin.gov/document/administrativecode/SPS%20361.05",
+      "draft_note": "Read SPS 361.04(12) (am. CR 23-007, eff 2025-09-01): '\"IPC\" and \"International Plumbing Code\" mean the Wisconsin Plumbing Code, chs. SPS 381 to 387'. Wisconsin writes its own plumbing code; no IPC or UPC edition adopted. ICC chart IPC blank, consistent. Current SPS 381-387 register dates not checked (not an IPC edition either way).",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "IPC blank (not adopted)"
+    },
+    "WY": {
+      "name": "Wyoming",
+      "status": "local",
+      "family": "IPC",
+      "editions": [],
+      "upcoming": [],
+      "pending": null,
+      "scope": "No statewide plumbing code; cities and counties adopt their own (mostly IPC).",
+      "citation": "No state adoption: 041-1 Wyo. Code R. 1-2(a)(vi) takes in IPC only as referenced by the state's IBC/IFC/IMC/IFGC",
+      "citation_primary": false,
+      "source_url": "https://www.law.cornell.edu/regulations/wyoming/041-1-Wyo-Code-R-SSSS-1-2",
+      "draft_note": "Read rule 041-1 Wyo. Code R. 1-2 (amended eff 6/26/2024): '(vi) Provisions of the ... International Plumbing Code ... as they are referenced in chapters 1 - 10 of' the IBC, IFC, IMC and IFGC; no IPC edition named, so no state plumbing code. Secondary sources (licensing guides) say plumbing licensing and codes are local; e.g. Laramie County adopted the 2024 IPC by resolution (not read). Absence row: citation_primary false.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "IPC X (local adoption)"
+    },
+    "DC": {
+      "name": "District of Columbia",
+      "status": "statewide-amended",
+      "family": "IPC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2015",
+          "effective": "2020-05-29"
+        }
+      ],
+      "upcoming": [],
+      "pending": "Next DC Construction Codes (2024 ICC base per secondary report) in development; no DC Register final rule or effective date.",
+      "scope": null,
+      "citation": "12-F DCMR (2017 DC Plumbing Code Supplement to the 2015 IPC), 2017 DC Construction Codes",
+      "citation_primary": true,
+      "source_url": "https://dob.dc.gov/node/1615636",
+      "draft_note": "Read DOB page: '2017 DCMR 12F, DC Plumbing Code' with base '2015 International Plumbing Code (IPC)'; 'The 2017 DC Construction Code takes effect on May 29, 2020.' The 2021-based '2023 DC codes' drafts never reached a final notice (per the IRC row); a secondary report says DOB is moving to the 2024 model codes with final rules anticipated late 2027. No DC Register final rulemaking found.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "IPC 15 (ICC chart, April 2026)"
+    }
+  }
 }

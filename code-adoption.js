@@ -110,7 +110,7 @@ export function codeAdoptionLine(code, name, row, tileEdition, today, cadenceDay
   }
   let text;
   if (row.family && row.family !== code && row.family !== "other") {
-    text = name + " adopts the " + (FAMILY_NAME[row.family] || row.family) + ", not the " + code + " this calculator follows, so its " + code + " rule may not apply.";
+    text = name + " adopts the " + (FAMILY_NAME[row.family] || row.family) + ", not the " + code + " this calculator follows, so its " + code + " rule may not apply." + (row.scope ? " " + row.scope : "");
   } else if (row.family === "other") {
     // A state code of its own (Wisconsin's Uniform Dwelling Code), not an edition of this one.
     text = name + " enforces a code of its own, not based on the " + code + " this calculator follows, so its " + code + " rule may not apply." + (row.scope ? " " + row.scope : "");

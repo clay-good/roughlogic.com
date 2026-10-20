@@ -1,6 +1,1057 @@
 {
   "code": "IMC",
   "cadence_days": 92,
-  "about": "spec-v1974: per-state adoption of the IMC, drafted one state at a time from the state's own statute or rule, with ICC's adoption map as the cross-check only. Each row also names its code family (a state on the UPC or UMC adopts no IPC or IMC edition). No row is drafted yet; until one is, nothing ships for this code.",
-  "rows": {}
+  "about": "spec-v1974: per-state adoption of the IMC, drafted one state at a time from the state's own statute or rule, with ICC's adoption map as the cross-check only. Each row also names its code family (a state on the UPC or UMC adopts no IPC or IMC edition). All 51 drafted 2026-10-20 from the state's own rule where found, ICC's April 2026 adoption chart as the cross-check; unsigned rows show labeled not verified, and a row whose sources conflict shows no edition.",
+  "rows": {
+    "AL": {
+      "name": "Alabama",
+      "status": "limited",
+      "family": "IMC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2021",
+          "effective": "2022-07-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": "DCM code covers state-owned or state-funded work, schools, hotels/motels and movie theaters; other buildings adopt locally.",
+      "citation": "Ala. Admin. Code r. 355-12-1-.01(1)(e) (2021 IMC with 2024 IMC refrigerant sections), Division of Construction Management",
+      "citation_primary": true,
+      "source_url": "https://admincode.legislature.state.al.us/api/rule/355-12-1-.01",
+      "draft_note": "Read rule 355-12-1-.01 PDF: '(e) 2021 - International Mechanical Code, with the following section from the 2024 International Mechanical Code' (refrigerant sections 1101.2.1, 1110.3.1, Table 1104.3.2, 1109.4...). Effective date 2022-07-01 from the DCM page (as in the IBC row); rule history also shows 2022 and 2025 amendments. Also read HVAC Board rule 440-X-5 (eff 2023-01-14): certified HVAC contractors must meet the 'International Mechanical Code; including appendices' for commercial work, but no edition is named, so it is not recorded as an edition.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Chart: IMC 21."
+    },
+    "AK": {
+      "name": "Alaska",
+      "status": "statewide-amended",
+      "family": "IMC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2021",
+          "effective": "2022-10-28"
+        }
+      ],
+      "upcoming": [],
+      "pending": "DPS review of the 2024 IBC/IEBC/IFC/IMC/IFGC underway; public notice estimated summer 2026, none found.",
+      "scope": "Applies to all occupancies under state fire marshal review; deferred cities and boroughs enforce it locally.",
+      "citation": "13 AAC 50.023 (2021 IMC as amended), Alaska State Fire Marshal, Dept. of Public Safety",
+      "citation_primary": true,
+      "source_url": "https://www.akleg.gov/basis/aac.asp?media=print&secStart=13.50.023&secEnd=13.50.023",
+      "draft_note": "Read 13 AAC 50.023 (print view): 'The International Mechanical Code 2021 Edition (IMC), Chapters 1 - 15 and Appendix A, are adopted by reference to regulate all occupancies and buildings', with IFGC/IPC references replaced by the plumbing code under 8 AAC 63.010. Print view has no history line; effective date 2022-10-28 assumed from the same 13 AAC 50 package as the IBC row (Mat-Su Borough page). Signer: confirm the Register date.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Chart: IMC 21."
+    },
+    "AZ": {
+      "name": "Arizona",
+      "status": "local",
+      "family": "IMC",
+      "editions": [],
+      "upcoming": [],
+      "pending": null,
+      "scope": "No statewide IMC; cities and counties adopt their own plumbing/mechanical/gas codes.",
+      "citation": "No state adoption: counties adopt building codes under A.R.S. 11-861; cities by reference under A.R.S. 9-802",
+      "citation_primary": true,
+      "source_url": "https://www.azleg.gov/ars/11/00861.htm",
+      "draft_note": "An absence has no adopting rule to cite. A.R.S. 11-861 and 9-802 (read for the IBC row) give counties and cities code-adoption authority; no state IMC adoption found (ROC licenses contractors but adopts no installation code). citation_primary true because the statutes show local authority; signer may prefer false. Local editions not checked.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Chart: IMC X. State page: codes are adopted locally."
+    },
+    "AR": {
+      "name": "Arkansas",
+      "status": "statewide",
+      "family": "IMC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2021",
+          "effective": "2022-06-02"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": "Standard for licensed HVACR work statewide; local jurisdictions may adopt their own mechanical code.",
+      "citation": "Ark. Code R. 235.13.22-006, HVACR Licensing Board rules s. XXIII (2021 IMC)",
+      "citation_primary": true,
+      "source_url": "https://www.law.cornell.edu/regulations/arkansas/235-13-22-Ark-Code-R-SS-006",
+      "draft_note": "Read rule text (LII copy): 'The Board hereby adopts and incorporates herein the International Mechanical Code, 2021 edition' and 'The International Mechanical Code, 2021 shall be the standard for the conduct of HVACR work'; adopted by Arkansas Register Vol. 47 No. 06, effective 6/2/2022. Little Rock separately adopted the 2021 IMC in Dec 2022 (was on the 2010 Arkansas Mechanical Code), so local enforcement may vary.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Chart: IMC 21."
+    },
+    "CA": {
+      "name": "California",
+      "status": "statewide-amended",
+      "family": "UMC",
+      "editions": [],
+      "upcoming": [],
+      "pending": null,
+      "scope": "Uniform Mechanical Code 2024 (2025 California Mechanical Code, Title 24 Part 4), effective 2026-01-01.",
+      "citation": "Cal. Code Regs. tit. 24, pt. 4 (2025 California Mechanical Code), Building Standards Commission",
+      "citation_primary": true,
+      "source_url": "https://dgs.ca.gov/BSC/Codes",
+      "draft_note": "Read DGS/BSC codes page: 2025 Title 24 effective January 1, 2026; Part 4 errata effective 2026-01-01. Read BSC ISOR for Part 4 (BSC-01-24): adopts 'the most current edition of the Uniform Mechanical Code (UMC)', title updated 'reflecting adoption of the 2024 Uniform Mechanical Code'.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Chart: IMC blank (state-specific codes)."
+    },
+    "CO": {
+      "name": "Colorado",
+      "status": "limited",
+      "family": "IMC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2021",
+          "effective": "2021-06-30"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": "No statewide mechanical code; DFPC rules cover public schools, health facilities and other DFPC-overseen property. Others adopt locally.",
+      "citation": "8 CCR 1507-101, rule 3.2 (2021 IMC), Division of Fire Prevention and Control",
+      "citation_primary": true,
+      "source_url": "https://www.law.cornell.edu/regulations/colorado/title-8/agency-1507/division-101/article-3",
+      "draft_note": "Read 8 CCR 1507-101 art. 3 (LII): DFPC enforces 'International Mechanical Code- 2021 Edition' with the 2021 IBC for property under its oversight; rules 3.1, 3.2 eff 06/30/2021 (per the IBC row). State Architect / Division of Housing scopes not checked.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Chart: IMC X."
+    },
+    "CT": {
+      "name": "Connecticut",
+      "status": "statewide-amended",
+      "family": "IMC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2021",
+          "effective": "2022-10-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": "2026 State Building Code (2024 I-codes) awaits Legislative Regulation Review Committee approval; July 1, 2026 date delayed.",
+      "scope": null,
+      "citation": "2022 Connecticut State Building Code (2021 IMC as amended), Office of the State Building Inspector",
+      "citation_primary": true,
+      "source_url": "https://portal.ct.gov/en/das/office-of-state-building-inspector/connecticut-state-building-code/regulations",
+      "draft_note": "Read DAS regulations page: 2022 CSBC applies to permit applications filed from October 1, 2022 and lists the '2021 International Mechanical Code'. Pending 2026 CSBC as in the IBC row.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Chart: IMC 21."
+    },
+    "DE": {
+      "name": "Delaware",
+      "status": "local",
+      "family": "IMC",
+      "editions": [],
+      "upcoming": [],
+      "pending": null,
+      "scope": "No statewide mechanical code; the three counties and municipalities adopt their own edition.",
+      "citation": "No state adoption: 16 Del. C. 7601 lets the three counties adopt and enforce building codes",
+      "citation_primary": true,
+      "source_url": "https://delcode.delaware.gov/title16/c076/index.html",
+      "draft_note": "An absence has no adopting rule to cite. 16 Del. C. ch. 76 (read for the IBC row) gives counties code authority; no state IMC adoption found. ICC state page says statewide adoption is only the IPC and IECC. citation_primary true as in the IBC row; signer may prefer false. County editions not checked.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Chart: IMC X."
+    },
+    "FL": {
+      "name": "Florida",
+      "status": "statewide-amended",
+      "family": "IMC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2021",
+          "effective": "2023-12-31"
+        }
+      ],
+      "upcoming": [],
+      "pending": "9th Edition (2026) Florida Building Code proposed 2026-09-23 (comment period closed 2026-10-14); no final notice or date yet.",
+      "scope": null,
+      "citation": "Fla. Admin. Code r. 61G20-1.001 (Florida Building Code, 8th Edition (2023), Mechanical), Florida Building Commission",
+      "citation_primary": true,
+      "source_url": "https://www.flrules.org/gateway/ruleNo.asp?id=61G20-1.001",
+      "draft_note": "Read rule 61G20-1.001 text (flrules .doc, eff 3-18-26): 'The Florida Building Code, 8th Edition (2023), as updated ... is hereby adopted as the building code for the State of Florida'; history includes 12-31-23 (8th Edition). The rule adopts the FBC as a whole; the Mechanical volume and its 2021 IMC base are from ICC/secondary sources, not the rule text. 9th Edition proposed 2026-09-23, pending; ICC/Miami-Dade say effective 2026-12-31. Recheck Dec 2026.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Chart: IMC 21."
+    },
+    "GA": {
+      "name": "Georgia",
+      "status": "statewide-amended",
+      "family": "IMC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2024",
+          "effective": "2026-01-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": "Mandatory state minimum code; local governments choose whether to enforce, and local amendments must be filed with DCA.",
+      "citation": "O.C.G.A. 8-2-23; DCA State Minimum Standard Codes: 2024 IMC with Georgia Amendments",
+      "citation_primary": true,
+      "source_url": "https://dca.georgia.gov/document/document/new-codes-and-amendments-effective-january-1-2026-memo/download",
+      "draft_note": "Read DCA memo dated 2025-12-01: the DCA Board 'voted to adopt the following codes with an effective date of January 1, 2026', including the '2024 International Mechanical Code with Georgia Amendments', as mandatory state codes under O.C.G.A. 8-2-23. Prior edition not recorded.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Chart: IMC 24."
+    },
+    "HI": {
+      "name": "Hawaii",
+      "status": "local",
+      "family": "IMC",
+      "editions": [],
+      "upcoming": [],
+      "pending": null,
+      "scope": "No state mechanical code adopted; HRS 107-25(6) allows one but none found. Counties may regulate locally.",
+      "citation": "No state adoption: HRS 107-25 bases state codes on the fire code, UPC, IBC, IRC, IECC and NEC; no mechanical code adopted",
+      "citation_primary": true,
+      "source_url": "https://data.capitol.hawaii.gov/hrscurrent/Vol02_Ch0046-0115/HRS0107/HRS_0107-0025.htm",
+      "draft_note": "An absence has no adopting rule to cite. Read HRS 107-25: lists the state fire code, UPC, IBC/IRC/IECC, NEC and Hawaii design standards, plus (6) codes 'based on nationally published codes or standards' including 'mechanical'; no SBCC mechanical code rule found. County mechanical provisions not checked. citation_primary true for the statute read; signer may prefer false.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Chart: IMC blank."
+    },
+    "ID": {
+      "name": "Idaho",
+      "status": "statewide-amended",
+      "family": "IMC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2018",
+          "effective": "2021-01-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": "Applied by the Division statewide; cities/counties running a mechanical permit program must adopt the same codes (Idaho Code 54-5001).",
+      "citation": "IDAPA 24.39.70.600.01 (Idaho HVAC Board; Idaho Mechanical Code: International Mechanical Code, 2018 Edition, amended)",
+      "citation_primary": true,
+      "source_url": "https://adminrules.idaho.gov/rules/current/24/243970.pdf",
+      "draft_note": "Read the current IDAPA 24.39.70 PDF (created 2026-06-12): rule 600.01 adopts the 2018 IMC with appendix A and Idaho amendments (deletes 109; light/medium-duty cooking definitions), stamped (3-28-23). Read Idaho Code 54-5001: names the 2006 IMC/IFGC plus later editions adopted by the HVAC Board; local governments that issue mechanical permits must adopt them by ordinance. DOPL's 2025 adopted-codes sheet lists the 2018 IMC. The 2021-01-01 effective date is secondary (Division of Building Safety 2018-codes notice via city sites and search; soft start 2020-07-01); matches the IBC/IRC rows. No newer IMC proposal found.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "IMC 18."
+    },
+    "IL": {
+      "name": "Illinois",
+      "status": "local",
+      "family": "IMC",
+      "editions": [],
+      "upcoming": [],
+      "pending": null,
+      "scope": "No statewide mechanical code; cities and counties adopt their own (often the IMC).",
+      "citation": "No state adoption found: Illinois has no statewide mechanical code; municipalities and counties adopt their own",
+      "citation_primary": false,
+      "source_url": "https://www.ilga.gov/legislation/publicacts/view/103-0510",
+      "draft_note": "An absence has no adopting rule to cite. The IBC row's reading of P.A. 103-510 (20 ILCS 3105/10.09-1) lists the IBC, IEBC, NEC, energy code, accessibility code and Illinois Plumbing Code for non-building-code jurisdictions; no mechanical or fuel gas code is named there (from the IBC draft, not re-read). ICC chart shows X. Signer: confirm no state mechanical code.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "IMC X (some local adoptions)."
+    },
+    "IN": {
+      "name": "Indiana",
+      "status": "statewide-amended",
+      "family": "IMC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2012",
+          "effective": "2014-12-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": null,
+      "citation": "675 IAC 18-1.6 (2014 Indiana Mechanical Code, based on the 2012 IMC, First Printing)",
+      "citation_primary": true,
+      "source_url": "https://www.in.gov/dhs/boards-and-commissions/fpbsc-rules/",
+      "draft_note": "Read the IDHS FPBSC rules page: 675 IAC 18-1.6, 2014 Indiana Mechanical Code, 'International Mechanical Code, 2012 Edition, First Printing', effective 12/1/2014, currently in effect. The page lists 18-1.5 as repealed 12/1/2018, which looks like a typo for 2014. No mechanical draft listed; the 2026 drafts cover the IBC and IFC only (IBC/IRC rows). IAC text not read.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "IMC 12."
+    },
+    "IA": {
+      "name": "Iowa",
+      "status": "statewide-amended",
+      "family": "IMC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2024",
+          "effective": "2025-03-26"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": "Applies to buildings in Iowa; localities may administer permits but may not adopt other mechanical codes.",
+      "citation": "481 IAC 426.2(105) (State Mechanical Code; International Mechanical Code, 2024 edition, amended)",
+      "citation_primary": true,
+      "source_url": "https://www.legis.iowa.gov/docs/iac/chapter/481.426.pdf",
+      "draft_note": "Read 481 IAC ch. 426 (IAC 9/30/26): 426.2 adopts IMC 2024 sections 101-102 and ch. 2-15 for mechanical systems in buildings in Iowa [ARC 8914C, IAB 2/19/25, eff. 3/26/25]; 426.3 replaces the IMC's IFGC reference with NFPA 54/58, 661-ch. 226 and the state plumbing code, and new 102.12 bars local mechanical codes other than the state code. Formerly 641 IAC 61. ICC chart lag: the April 2026 chart still shows IMC 21. The State Building Code (481-301) separately covers state buildings.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "IMC 21."
+    },
+    "KS": {
+      "name": "Kansas",
+      "status": "local",
+      "family": "IMC",
+      "editions": [],
+      "upcoming": [],
+      "pending": null,
+      "scope": "No statewide mechanical code; cities and counties adopt their own.",
+      "citation": "No state adoption found: Kansas has no statewide mechanical code; cities and counties adopt under home rule",
+      "citation_primary": false,
+      "source_url": "https://www.energycodes.gov/status/states/kansas",
+      "draft_note": "An absence has no adopting rule to cite. ICC's April 2026 chart shows X (local adoptions only) for every Kansas I-code; the IBC/IRC rows found no statewide building code (home rule). I found no Kansas statute or K.A.R. adopting a statewide mechanical code; did not search exhaustively. Signer: confirm.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "IMC X (local adoptions only)."
+    },
+    "KY": {
+      "name": "Kentucky",
+      "status": "statewide-amended",
+      "family": "IMC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2015",
+          "effective": "2019-08-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": "DHBC task forces reviewing newer I-code editions (December 2025 notice, secondary, per IBC row); no rule filed.",
+      "scope": null,
+      "citation": "815 KAR 7:120 (2018 Kentucky Building Code on the 2015 IBC) as applied by DHBC: 2015 International Mechanical Code",
+      "citation_primary": true,
+      "source_url": "https://dhbc.ky.gov/Documents/Find%20Currently%20Enforced%20Code.pdf",
+      "draft_note": "Read DHBC 'Codes Currently Adopted by Kentucky': lists the '2015 International Mechanical Code' beside the 2018 KBC (2015 IBC base). Read 815 KAR 7:120: it adopts only the 2015 IBC and the 2018 KBC amendment document and does not itself name the IMC, so the IMC applies through the KBC's chapter 28 reference (KBC amendment text not read). Effective date borrowed from the IBC row (2018 KBC plans submitted on or after 2019-08-01); the 2015 IMC may have applied with the first 2018 KBC edition in 2018. 815 KAR 8:070 (HVAC homeowner permits, search) requires work to comply with the KBC/KRC.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "IMC 15."
+    },
+    "LA": {
+      "name": "Louisiana",
+      "status": "statewide-amended",
+      "family": "IMC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2021",
+          "effective": "2023-01-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": "2024 IMC proposed (notice of intent, La. Register 2026-08-20); proposed effective 2027-01-01. Final rule not seen.",
+      "scope": null,
+      "citation": "LAC 17:I (Louisiana State Uniform Construction Code; International Mechanical Code 2021, amended)",
+      "citation_primary": true,
+      "source_url": "https://luccc.louisiana.gov/wp-content/uploads/2025/11/LSUCCC_Louisiana-Construction-Code-Information.pdf",
+      "draft_note": "Read the LUCCC code information sheet (revised 2026-08-06): current IMC edition 2021; '2021 ICC Codes' effective January 1, 2023; next cycle '2024 editions for ICC Codes', 'will become effective January 1, 2027'. The 2024 adoption was still a proposed rule (notice of intent, La. Register 2026-08-20, per the IBC/IRC rows), so it is 'pending', not 'upcoming'. I did not re-read the LAC 17:I section text for this code. Signer: check the Oct/Nov 2026 Register for a final rule.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "IMC 21."
+    },
+    "ME": {
+      "name": "Maine",
+      "status": "statewide-amended",
+      "family": "IMC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2021",
+          "effective": "2025-04-07"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": "MUBEC applies statewide; enforcement is mandatory only in municipalities of 4,000+ residents. IMC ch. 7, 10, 13 and App. A-C excluded.",
+      "citation": "16-642 C.M.R. ch. 7 (MUBEC mechanical; 2021 International Mechanical Code, amended); renumbered ch. 8 under MOCA",
+      "citation_primary": false,
+      "source_url": "https://www.maine.gov/dps/fmo/sites/maine.gov.dps.fmo/files/inline-files/642C007.pdf",
+      "draft_note": "All maine.gov copies (FMO PDF, SOS docx, building-codes page) returned 403, so not read. Search summaries of the SOS rule text: ch. 7 adopts the 2021 IMC excluding ch. 7, 10, 13 and appendices A-C; a later version is labeled ch. 8 under the Maine Office of Community Affairs (formerly 16-642 ch. 7). The FMO building-codes page (snippet) lists the 2021 IMC in the MUBEC as amended April 7, 2025. 2025-04-07 effective date matches the IBC/IRC rows (secondary). Signer: read ch. 7/8 and confirm the date.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "IMC 21."
+    },
+    "MD": {
+      "name": "Maryland",
+      "status": "local",
+      "family": "IMC",
+      "editions": [],
+      "upcoming": [],
+      "pending": null,
+      "scope": "No statewide mechanical code: the MBPS adopts only the IBC, IRC and IECC; counties and cities adopt the IMC locally.",
+      "citation": "COMAR 09.12.51.05 (Maryland Building Performance Standards = IBC, IRC, IECC as modified; no IMC)",
+      "citation_primary": false,
+      "source_url": "https://regs.maryland.gov/us/md/exec/comar/09.12.51.04",
+      "draft_note": "Per the IBC row's reading of COMAR 09.12.51, the MBPS consists of the IBC, IRC and IECC as modified; no IMC adoption was found (not re-read here). The IBC's chapter 28 points to the IMC, and counties adopt it locally. ICC chart shows IMC 21, probably counting local adoptions or the IBC reference. Signer may prefer 'limited' with 2021 via the IBC.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "IMC 21."
+    },
+    "MA": {
+      "name": "Massachusetts",
+      "status": "statewide-amended",
+      "family": "IMC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2021",
+          "effective": "2024-10-11"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": "9th edition (2015 IMC base) could also be used until 2025-06-30 (concurrency).",
+      "citation": "780 CMR ch. 28 (10th edition MA amendments to the 2021 IBC: 2801.1 and 2802 Amendments to the International Mechanical Code)",
+      "citation_primary": true,
+      "source_url": "https://www.mass.gov/doc/10th-edition-chapter-28-mechanical-systems/download",
+      "draft_note": "Read the 10th edition 780 CMR ch. 28 (unofficial mass.gov copy via Wayback): 2801.1 says this chapter, the IMC, IRC, IECC and 248 CMR govern mechanical systems; 2802 amends the IMC (Chapter 15 referenced standards). The chapter heading is 'Massachusetts amendments to the International Building Code 2021', so the IMC edition is the 2021 one referenced by the 2021 IBC (year not stated in ch. 28 itself). Effective 2024-10-11 with concurrency to 2025-06-30, from the IBC row's reading of the 10th edition handbook.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "IMC 21."
+    },
+    "MI": {
+      "name": "Michigan",
+      "status": "statewide-amended",
+      "family": "IMC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2021",
+          "effective": "2024-03-12"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": null,
+      "citation": "Mich. Admin. Code R 408.30901a (2021 IMC adopted by reference as the Michigan Mechanical Code), 2023 MR 22",
+      "citation_primary": true,
+      "source_url": "https://www.michigan.gov/lara/bureau-list/bcc/rules-acts/codes/code-books",
+      "draft_note": "LARA Code Books page read 2026-10-20: '2021 Michigan Mechanical Code Current Code-Effective March 12, 2024'. Cornell's copy of R 408.30901a: adopts the 2021 IMC with listed exclusions; history '2023 MR 22, Eff. 3/12/2024'. Residential work is under the Michigan Residential Code (2015).",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Chart (April 2026): IMC 21."
+    },
+    "MN": {
+      "name": "Minnesota",
+      "status": "statewide-amended",
+      "family": "IMC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2018",
+          "effective": "2020-04-06"
+        }
+      ],
+      "upcoming": [],
+      "pending": "DLI chapter 1346 docket: request for comments 2026-02-02 on the 2024 IMC and IFGC; draft, hearing and dates 'to be determined'.",
+      "scope": null,
+      "citation": "Minn. R. 1346.0050 (Minnesota Mechanical Code: 2018 IMC chapters 2-15, as amended); Minn. Stat. 326B.121",
+      "citation_primary": true,
+      "source_url": "https://www.revisor.mn.gov/rules/1346.0050/",
+      "draft_note": "1346.0050 read 2026-10-20: chapters 2 to 15 of the 2018 IMC incorporated (history ends 44 SR 1085). Revisor rule record R-04515 read: adopted with modifications 2020-03-30, effective April 06, 2020. Same metro/opt-in enforcement caveat as the IBC row (Minn. Stat. 326B.121).",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Chart (April 2026): IMC 18."
+    },
+    "MS": {
+      "name": "Mississippi",
+      "status": "local",
+      "family": "IMC",
+      "editions": [],
+      "upcoming": [],
+      "pending": null,
+      "scope": "Council codes are minimum codes localities may adopt (coastal counties must enforce); edition not confirmed.",
+      "citation": "Miss. Code Ann. 17-2-1 et seq. (Mississippi Building Codes Council), not read directly",
+      "citation_primary": false,
+      "source_url": "https://www.iccsafe.org/advocacy/adoptions-map/Mississippi/",
+      "draft_note": "SOURCES CONFLICT: ICC's April 2026 chart (column read by position) lists IMC 24; ICC's state page says the Council adopted the 2018 I-codes incl. IMC in December 2019; an ICC-NTA post (2026-07-20, via search) says the 2024 I-codes incl. IMC apply to modular construction from 2026-07-01. The Council's adopted-codes list and 17-2-1 text were not reached. Localities adopt one of the last three editions or opted out; coastal counties must enforce. Kept 'local' with no edition, as the IBC and IRC rows are.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Chart (April 2026): IMC 24 (state). State page: MBCC 3-year cycle; voluntary outside coastal counties."
+    },
+    "MO": {
+      "name": "Missouri",
+      "status": "local",
+      "family": "IMC",
+      "editions": [],
+      "upcoming": [],
+      "pending": null,
+      "scope": "No statewide code; cities and counties adopt their own code and edition.",
+      "citation": "No state adoption: Missouri has no statewide mechanical code; counties and cities adopt codes by ordinance",
+      "citation_primary": false,
+      "source_url": "https://www.iccsafe.org/advocacy/adoptions-map/missouri/",
+      "draft_note": "An absence has no adopting rule to cite; no Missouri statute was read. ICC's chart marks every I-code X (local only); its state page says the state adopts codes only for state-owned buildings (edition not found, as in the IBC row).",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Chart (April 2026): IMC X (local adoption only)."
+    },
+    "MT": {
+      "name": "Montana",
+      "status": "statewide-amended",
+      "family": "IMC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2024",
+          "effective": "2026-09-26"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": null,
+      "citation": "ARM Title 24, Ch. 301 (IMC 2024 as amended), per DLI Current Codes",
+      "citation_primary": true,
+      "source_url": "https://bsd.dli.mt.gov/building-codes-permits/current-codes",
+      "draft_note": "DLI Current Codes page read 2026-10-20: 'International Mechanical Code, 2024 Edition - Effective: September 26, 2026', amended by ARM Title 24 Ch. 301 (specific rule number not read). Prior: 2021 IMC, believed effective 2022-06-11 (date carried from the IBC/IRC rows, not re-read). Certified local programs enforce the state code; the state enforces elsewhere.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Chart (April 2026): IMC 21 (predates the 2026-09-26 update)."
+    },
+    "NE": {
+      "name": "Nebraska",
+      "status": "local",
+      "family": "IMC",
+      "editions": [],
+      "upcoming": [],
+      "pending": null,
+      "scope": "No statewide mechanical code; cities and counties adopt their own.",
+      "citation": "No state adoption: Neb. Rev. Stat. 71-6403 (state building code) names no mechanical code; localities adopt their own",
+      "citation_primary": true,
+      "source_url": "https://nebraskalegislature.gov/laws/statutes.php?statute=71-6403",
+      "draft_note": "71-6403 read 2026-10-20: the state building code is the IBC, IRC, IEBC (2018) and UPC 2018 only; no mechanical code. ICC's X marks local adoptions.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Chart (April 2026): IMC X (local only)."
+    },
+    "NV": {
+      "name": "Nevada",
+      "status": "limited",
+      "family": "UMC",
+      "editions": [],
+      "upcoming": [],
+      "pending": null,
+      "scope": "Uniform Mechanical Code 2024 for state buildings only (SPWD, eff. 2024-11-15); cities and counties adopt their own UMC edition.",
+      "citation": "NAC 341.045 (State Public Works Board: UMC for state buildings), as amended by R072-24A",
+      "citation_primary": true,
+      "source_url": "https://publicworks.nv.gov/uploadedFiles/publicworksnvgov/content/Documents/Permitting_Code_Enforcement/2024%20Adopted_Codes.pdf",
+      "draft_note": "SPWD Adopted Codes list (rev. 2024-02-13, under NAC 341.045) read: '2024 Uniform Plumbing Code (UPC)' and '2024 Uniform Mechanical Code (UMC)'; 2018-edition designs accepted until 2025-06-30. The leg.state.nv.us NAC 341.045 text (stale, 2018 IBC) replaces IPC/IMC references with UPC/UMC. Effective 2024-11-15 per the IBC row's Cornell reading of R072-24A (not re-read). Private buildings: local codes only (southern Nevada jurisdictions phasing in the 2024 UPC/UMC).",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Chart (April 2026): IMC blank."
+    },
+    "NH": {
+      "name": "New Hampshire",
+      "status": "statewide-amended",
+      "family": "IMC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2024",
+          "effective": "2026-07-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": null,
+      "citation": "RSA 155-A:1, IV (state building code: IMC 2024 with NH amendments), as amended 2026, eff. July 1, 2026",
+      "citation_primary": true,
+      "source_url": "https://gc.nh.gov/rsa/html/XII/155-A/155-A-1.htm",
+      "draft_note": "RSA 155-A:1, IV read 2026-10-20: adopts 'the International Mechanical Code 2024' with board amendments approved as of 2025-10-10; source line ends 2026 ch. 49:1 and 318:3, eff. July 1, 2026. Prior: IMC 2021, effective 2024-07-01 (2024 ch. 323; edition not re-read). Whether the town-notice concurrency (either edition through 2026-12-31) applies was not read in the statute. State Fire Marshal enforces where a town has no building official.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Chart (April 2026): IMC 21 (predates the 2026-07-01 update)."
+    },
+    "NJ": {
+      "name": "New Jersey",
+      "status": "statewide-amended",
+      "family": "IMC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2024",
+          "effective": "2026-08-17"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": null,
+      "citation": "N.J.A.C. 5:23-3.20 (mechanical subcode: IMC/2024, New Jersey edition), R.2026 d.086",
+      "citation_primary": true,
+      "source_url": "https://www.nj.gov/dca/codes/codreg/pdf_rule_adoptions/model_codes_2024_adopt.pdf",
+      "draft_note": "Adoption notice 58 N.J.R. 8(2) (R.2026 d.086) read: amends N.J.A.C. 5:23-3.14 to 3.22, adopted 2026-07-15, effective August 17, 2026. The notice's rule text shows only changed paragraphs, so the mechanical subcode edition line was not seen; a DCA Code Advisory Board agenda (2024-08-09, via search) names IMC/2024 under 5:23-3.20. Six-month grace period (N.J.A.C. 5:23-1.6, not read): prior IMC/2021 usable until about 2027-02-17. Prior IMC/2021 effective date not read (IRC row gives 2022-09-06 for the 2021 cycle). The UCC is uniform statewide.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Chart (April 2026): IMC 21 (predates the 2026-08-17 adoption)."
+    },
+    "NM": {
+      "name": "New Mexico",
+      "status": "statewide-amended",
+      "family": "UMC",
+      "editions": [],
+      "upcoming": [],
+      "pending": null,
+      "scope": "Uniform Mechanical Code 2021 (2021 New Mexico Mechanical Code); mandatory for new permits after 2022-09-10.",
+      "citation": "14.9.2 NMAC (2021 New Mexico Mechanical Code, adopting the 2021 UMC as amended)",
+      "citation_primary": true,
+      "source_url": "https://www.srca.nm.gov/parts/title14/14.009.0002.pdf",
+      "draft_note": "14.9.2.8 read: 'This rule adopts by reference the 2021 UMC, as amended'. 14.9.2.5: effective May 15, 2018 (2021 update by amendment; amendment date assumed 2022-03-10 like 14.8.2, not seen); either rule usable until 2022-09-10. No 2024 UMC rulemaking found.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "Chart (April 2026): IMC X (local only)."
+    },
+    "NY": {
+      "name": "New York",
+      "status": "statewide-amended",
+      "family": "IMC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2024",
+          "effective": "2025-12-31"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": "Statewide outside New York City, which enforces its own NYC Construction Codes.",
+      "citation": "19 NYCRR Part 1223 (2025 Mechanical Code of New York State, Uniform Code)",
+      "citation_primary": true,
+      "source_url": "https://dos.ny.gov/19-nycrr-part-1223",
+      "draft_note": "Read DOS 19 NYCRR Part 1223 PDF (dos.ny.gov/19-nycrr-part-1223): 1223.2(a) requires compliance with the 2025 MCNYS, incorporated by reference, published by ICC; Part 1219 lists Parts 1220-1229. DOS notice of adoption: 2025 Uniform Code (incl. 2025 MCNYS, publication July 2025) effective 2025-12-31; 2020 or 2025 optional during transition. Base edition 2024 IMC per DOS Code Outreach 2026-1 ('based on the 2024 ICC books with NY modifications', read for the IBC row); the Part 1223 PDF itself does not name the IMC year. Prior: 2020 MCNYS (2018 IMC). NYC excluded.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "ICC chart (Apr 2026): IMC 24"
+    },
+    "NC": {
+      "name": "North Carolina",
+      "status": "statewide-amended",
+      "family": "IMC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2015",
+          "effective": "2019-01-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": "2024 NC Mechanical Code (2021 IMC) adopted; effective 12 months after OSFM certification under S.L. 2025-2; not yet certified.",
+      "scope": null,
+      "citation": "N.C.G.S. 143-138; 2018 North Carolina State Building Code: Mechanical Code (Office of State Fire Marshal)",
+      "citation_primary": true,
+      "source_url": "https://www.ncosfm.gov/codes/codes-current-and-past",
+      "draft_note": "SOURCES CONFLICT: ICC Apr 2026 chart shows IMC 21, but the 2024 NC codes are not yet effective. OSFM Codes Current and Past (read): 2018 NC Mechanical Code effective 2019-01-01 and 'currently effective', with the 2018 NC amendments 'along with the 2015 International Codes'. The 2024 section of that page covers only the Building Code; the S.L. 2025-2 sec. 5.12(b) delay (all ten 2024 codes effective 12 months after the State Fire Marshal's certification) is from the OSFM 2025-03-31 letter read for the IBC row. No certification found as of 2026-10-20. 2024 NC base = 2021 IMC per ICC chart (OSFM page does not name it).",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "ICC chart (Apr 2026): IMC 21 (counts the adopted, not-yet-effective 2024 NC code)"
+    },
+    "ND": {
+      "name": "North Dakota",
+      "status": "limited",
+      "family": "IMC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2024",
+          "effective": "2026-01-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": "Applies only where a city, county or township elects to enforce a building code; the state does not enforce it.",
+      "citation": "N.D.C.C. ch. 54-21.3 (North Dakota State Building Code), Dept. of Commerce, Division of Community Services",
+      "citation_primary": true,
+      "source_url": "https://www.commerce.nd.gov/community-services/building-codes",
+      "draft_note": "Commerce page (read): on 2025-09-11 eligible cities, counties and BCAC members adopted the 2024 IBC, IRC, IMC and IFGC; new State Building Code effective 2026-01-01; Community Services 'not involved in the enforcement'; adopting localities must enforce it and may amend. NDCC 54-21.3-03 (read for the IBC row) requires the code to consist of the international building, residential, mechanical and fuel gas codes. NDAC rule text adopting the 2024 IMC not read.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "ICC chart (Apr 2026): IMC 24"
+    },
+    "OH": {
+      "name": "Ohio",
+      "status": "statewide-amended",
+      "family": "IMC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2021",
+          "effective": "2024-03-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": null,
+      "citation": "Ohio Adm. Code 4101:2-1-01 (Ohio Mechanical Code), Board of Building Standards",
+      "citation_primary": true,
+      "source_url": "https://codes.ohio.gov/ohio-administrative-code/rule-4101:2-1-01",
+      "draft_note": "Read rule PDF 4101:2-1-01 eff 2025-10-15: 101.1 incorporates the 'International Mechanical Code 2021 edition, Chapters 2 through 10 and Chapters 12 through 15, and the International Mechanical Code 2024 edition, Chapter 11' (refrigeration from the 2024 IMC, apparently the 2025-10-15 change). OMC based on the 2021 IMC effective 2024-03-01 (BBS memo, read for the IBC row). Edition recorded as 2021 with Chapter 11 from 2024.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "ICC chart (Apr 2026): IMC 21"
+    },
+    "OK": {
+      "name": "Oklahoma",
+      "status": "statewide-amended",
+      "family": "IMC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2024",
+          "effective": "2026-09-14"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": null,
+      "citation": "OAC 748:20-14-1 et seq. (OUBCC adoption of IMC 2024), 43 Ok Reg No. 20; 59 O.S. 1000.23",
+      "citation_primary": true,
+      "source_url": "https://oklahoma.gov/content/dam/ok/en/oubcc/documents/rules/2026%2009%2014%20IMC%20Permanent%20Rule.pdf",
+      "draft_note": "ICC chart lag, not a conflict: ICC Apr 2026 chart shows IMC 18 (predates the 2026-09-14 effective date). Read the OUBCC permanent rule PDF: 748:20-14-1 adopts the IMC 2024 first printing, amended, as 'the statewide minimum code for commercial mechanical construction', source 'Amended at 43 Ok Reg, Number 20, effective 9-14-26'. Prior: IMC 2018, eff 2021-09-14 (38 Ok Reg 2716). OUBCC web copy is unofficial; official OAC/Ok Register text not read.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "ICC chart (Apr 2026): IMC 18"
+    },
+    "OR": {
+      "name": "Oregon",
+      "status": "statewide-amended",
+      "family": "IMC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2024",
+          "effective": "2025-10-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": null,
+      "citation": "2025 Oregon Mechanical Specialty Code, Building Codes Division (ORS 455.020)",
+      "citation_primary": true,
+      "source_url": "https://www.oregon.gov/bcd/codes-stand/pages/mechanical.aspx",
+      "draft_note": "BCD mechanical page (read): 2025 OMSC 'Based on the 2024 International Mechanical Code (IMC) and International Fuel Gas Code (IFGC)', effective 2025-10-01 with a 6-month phase-in (2022 or 2025 OMSC), mandatory 2026-04-01. Prior: 2022 OMSC (2021 IMC/IFGC). OAR division number for the OMSC not read.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "ICC chart (Apr 2026): IMC 24"
+    },
+    "PA": {
+      "name": "Pennsylvania",
+      "status": "statewide-amended",
+      "family": "IMC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2021",
+          "effective": "2026-01-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": null,
+      "citation": "34 Pa. Code 403.21(a) (Uniform Construction Code, International Mechanical Code of 2021), 55 Pa.B. 7701",
+      "citation_primary": true,
+      "source_url": "https://www.pacodeandbulletin.gov/Display/pacode?file=/secure/pacode/data/034/chapter403/s403.21.html",
+      "draft_note": "Read 34 Pa. Code 403.21(a): (3) 'International Mechanical Code of 2021', (4) 'International Fuel Gas Code of 2021', (6) 'International Plumbing Code of 2021' except that a municipality in a county of the second class (Allegheny) may not administer and enforce the IPC and keeps its Local Health Administration Law plumbing code. Section amended effective 2026-01-01, 55 Pa.B. 7701 (per IBC row; source history read). Prior: 2018 editions. Pre-2026 design contracts may use the 2018 UCC for a transition period. L&I enforces commercial work where municipalities opted out.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "ICC chart (Apr 2026): IMC 21"
+    },
+    "RI": {
+      "name": "Rhode Island",
+      "status": "statewide-amended",
+      "family": "IMC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2021",
+          "effective": "2025-12-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": null,
+      "citation": "510-RICR-00-00-4 (SBC-4, Rhode Island Mechanical Code)",
+      "citation_primary": true,
+      "source_url": "https://rules.sos.ri.gov/Regulations/part/510-00-00-4",
+      "draft_note": "ICC chart lag, not a conflict: ICC Apr 2026 chart shows IMC 18. RI SOS rule page (read): Building Code Standards Committee adopts the IMC 2021 edition (later editions excluded), with RI amendments; current version effective 2025-12-01; prior version 2022-02-01 to 2025-12-01 adopted the 2018 IMC (per the rulemaking description). 3-month prior-code grace to 2026-03-01 is from IBC-row search results, not read for this code.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "ICC chart (Apr 2026): IMC 18"
+    },
+    "SC": {
+      "name": "South Carolina",
+      "status": "statewide-amended",
+      "family": "IMC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2021",
+          "effective": "2023-01-01"
+        }
+      ],
+      "upcoming": [
+        {
+          "applies_to": "all",
+          "edition": "2024",
+          "effective": "2027-01-01"
+        }
+      ],
+      "pending": null,
+      "scope": null,
+      "citation": "S.C. Code 6-9-50; LLR Building Codes Council, 2021 South Carolina Mechanical Code (2021 IMC with SC modifications)",
+      "citation_primary": true,
+      "source_url": "https://llr.sc.gov/bcc/BCAdoption.aspx",
+      "draft_note": "Read LLR 'Building Codes in Effect for South Carolina' PDF: Council adopted on 2021-10-06 the '2021 South Carolina Mechanical Code or the 2021 International Mechanical Code with SC modifications', mandatory for all municipalities and counties, implementation 2023-01-01. Read LLR 2024 Final Modification Index PDF: on 2025-08-26 the Council adopted the 2024 IMC (to be known as the 2024 South Carolina Mechanical Code), implementation 2027-01-01. Caveat from IBC row: legislative approval of the SC modification regulations may still be pending. The May 22, 2026 State Register PDF is image-only (not read).",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "ICC chart (Apr 2026): IMC 21"
+    },
+    "SD": {
+      "name": "South Dakota",
+      "status": "limited",
+      "family": "IMC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2015",
+          "effective": "2016-10-17"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": "State Fire Marshal fire-safety rules only: public buildings, lodging/eating, 6+ family multifamily, etc.; otherwise local adoption.",
+      "citation": "ARSD 61:15:01:01 (IMC 2015 as fire safety standards); SDCL 34-29B-2",
+      "citation_primary": true,
+      "source_url": "https://sdlegislature.gov/Rules/Administrative/61:15:01:01",
+      "draft_note": "Read via legislature API: ARSD 61:15:01:01 makes the fire-safety standards of the IBC, IFC and IMC 2015 editions the Dept. of Public Safety rules, last amended 43 SDR 56 eff 2016-10-17; SDCL 34-29B-2 names the 2015 IMC and limits the rules to listed building types. No general statewide mechanical code; SDCL 11-10 covers only the IBC. Effective date is the last amendment, not necessarily the IMC 2015 switch.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "ICC chart (Apr 2026): IMC 15"
+    },
+    "TN": {
+      "name": "Tennessee",
+      "status": "statewide",
+      "family": "IMC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2021",
+          "effective": "2025-04-17"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": "State minimum code via the State Fire Marshal; local governments that adopt and enforce their own codes (T.C.A. 68-120-101) may be exempt.",
+      "citation": "Tenn. Comp. R. & Regs. 0780-02-02-.01 (State Fire Marshal minimum codes: 2021 IMC)",
+      "citation_primary": true,
+      "source_url": "https://www.tn.gov/commerce/fire/codes-enforcement/history.html",
+      "draft_note": "Read the SFMO 'Currently Adopted Codes' page (last updated 2025-04-17): 'The International Mechanical Code (IMC), 2021 edition, published by the International Code Council (ICC)'; Code Adoption History row 4/17/2025 lists 2021 for IMC, IPC and IFGC (prior 2012, eff 2016-08-04). Same rule filing as the IBC row (01-17-25, eff 2025-04-17; 120-day option to use prior codes for SFMO plan review). No state amendments flagged for the IMC on that page (the IBC/IFC/IPMC entries carry 'see Appendix'). Exempt local governments under T.C.A. 68-120-101 enforce their own codes; exempt list not read. Cornell/Justia copies of 0780-02-02-.01 still show the 2012 text (stale mirror).",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "IMC 21 (ICC chart, April 2026)"
+    },
+    "TX": {
+      "name": "Texas",
+      "status": "limited",
+      "family": "IMC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2024",
+          "effective": "2026-09-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": "TDLR air conditioning and refrigeration licensing rule (adopts both IMC and UMC); cities adopt their own mechanical codes.",
+      "citation": "16 Tex. Admin. Code 75.110 (TDLR A/C and refrigeration rules: 2024 IMC, IFGC, IRC and UMC, eff 2026-09-01)",
+      "citation_primary": true,
+      "source_url": "https://www.tdlr.texas.gov/news/rulemaking/2026/08/31/commission-adopts-rules-11/",
+      "draft_note": "Read TDLR's adoption notice (2026-08-31): the Commission amended 16 TAC 75.10, 75.80, 75.110, 75.121 and 75.124 to 'update the codes adopted by reference from the 2021 editions to the 2024 editions of the International Residential Code, International Mechanical Code, International Fuel Gas Code' and the 'Uniform Mechanical Code', effective September 1, 2026. Prior text (Cornell LII, secondary): 75.110(a) 'Effective September 1, 2024, the commission adopts' 2021 IRC, IMC, IFGC and UMC; 2018 editions before. The adopted 2026 rule text itself was not read. These are the A/C and refrigeration licensing rules (Occ. Code ch. 1302); cities set their own mechanical codes (1302.303) and many use the UMC or IMC; how 75.110 applies where a city has no code was not read. No general statewide mechanical/fuel gas code.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "IMC X (ICC chart, April 2026)"
+    },
+    "UT": {
+      "name": "Utah",
+      "status": "statewide-amended",
+      "family": "IMC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2024",
+          "effective": "2026-07-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": null,
+      "citation": "Utah Code 15A-2-103(1)(e) (State Construction Code: 2024 IMC), amended by Title 15A Ch. 3-4",
+      "citation_primary": true,
+      "source_url": "https://le.utah.gov/xcode/Title15A/Chapter2/15A-2-S103.html",
+      "draft_note": "Read 15A-2-103 version 'Effective 7/1/2026': '(e) the 2024 edition of the International Mechanical Code, issued by the International Code Council'; the version effective 2027-01-01 keeps 2024. Read enrolled H.B. 65 (2026 GS): '(e) the [2021] 2024 edition of the International Mechanical Code'; 'this bill takes effect July 1, 2026.' Prior 2021 edition (HB 532, 2023, eff 2023-07-01). ICC April 2026 chart shows 21, which predates the change (ICC chart lag). Uniform statewide code; statewide amendments in 15A Ch. 3, local amendments Ch. 4.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "IMC 21 (ICC chart, April 2026; predates the 2026-07-01 move to 2024)"
+    },
+    "VT": {
+      "name": "Vermont",
+      "status": "statewide-amended",
+      "family": "other",
+      "editions": [],
+      "upcoming": [],
+      "pending": null,
+      "scope": "No IMC: mechanical rules come from NFPA 1 Fire Code 2021 incl. NFPA 90A, effective 2025-11-04, for public buildings.",
+      "citation": "2025 Vermont Fire & Building Safety Code, IBC 101.4 amendment: IMC references go to NFPA 1 (2021) incl. NFPA 90A",
+      "citation_primary": true,
+      "source_url": "https://firesafety.vermont.gov/sites/firesafety/files/Rules/2025%20Vermont%20Fire%20%26%20Building%20Safety%20Code.pdf",
+      "draft_note": "Read the 2025 VT Fire & Building Safety Code (eff 11/04/2025), IBC 101.4 replacement: '*International Mechanical Code, shall be to the Fire Code, NFPA 1, 2021 edition, including NFPA 90A, as adopted under this Code, unless specifically adopted within these rules'; '*International Fuel Gas Code, shall be to the National Fuel Gas Code, NFPA 54 2021 edition including Annex G'. NFPA 1 2.2 adds NFPA 54 2021 incl. Annex G; Section 6 amends NFPA 54 (2021) and NFPA 58 (2020). Some IMC sections are used piecemeal (e.g. 2021 IMC 404 garage ventilation as an accepted alternative). The 2025 Plumbing Rules also replace IFGC/IMC references with the Fire & Building Safety Code incl. NFPA 31, 54, 58, 211. Applies to public buildings (20 V.S.A. 2730). No IMC edition adopted; family 'other' (NFPA 1 / NFPA 90A).",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "IMC blank (not adopted)"
+    },
+    "VA": {
+      "name": "Virginia",
+      "status": "statewide-amended",
+      "family": "IMC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2021",
+          "effective": "2024-01-18"
+        }
+      ],
+      "upcoming": [],
+      "pending": "2024 USBC cycle in progress (BHCD proposals 2026-05); no proposed/final regulation or effective date yet.",
+      "scope": null,
+      "citation": "13VAC5-63-10 (Virginia Construction Code, USBC Part I, Section 101.2 Note 1: 2021 IMC as part of the USBC)",
+      "citation_primary": true,
+      "source_url": "https://law.lis.virginia.gov/admincodefull/title13/agency5/chapter63/",
+      "draft_note": "Read 13VAC5-63-10 (Section 101.2): IBC Chapters 2-35 incorporated; 'Note 1: The IBC references other International Codes and standards, including the following major codes: 2021 International Mechanical Code (IMC)'; codes referenced by the IBC are part of the USBC. DHCD: 2021 USBC effective Jan. 18, 2024 (2018 USBC optional for a year). Uniform statewide; localities may not amend. 2024 cycle in progress (NOIRA 2025-03-10; proposals considered 2026-05); no proposed or final regulation found.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "IMC 21 (ICC chart, April 2026)"
+    },
+    "WA": {
+      "name": "Washington",
+      "status": "statewide-amended",
+      "family": "IMC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2021",
+          "effective": "2024-03-15"
+        }
+      ],
+      "upcoming": [],
+      "pending": "2024 codes (SBCC): CR-102 filed 2026-05-06, final adoption targeted 2026-10-16; SBCC says effective 2027-05-03.",
+      "scope": null,
+      "citation": "WAC 51-52-003 (State Building Code: 2021 International Mechanical Code, with WA amendments)",
+      "citation_primary": true,
+      "source_url": "https://app.leg.wa.gov/wac/default.aspx?cite=51-52-003",
+      "draft_note": "Read WAC 51-52-003: 'The 2021 edition of the International Mechanical Code published by the International Code Council is hereby adopted by reference with the exceptions noted in this chapter'; history WSR 23-02-055, 23-12-106, 23-20-025, effective 3/15/24 (WSR 23-23-105 eff 3/16/24 a later amendment). RCW 19.27.031(1)(b) names the IMC. SBCC: CR-102 for the 2024 IMC filed 2026-05-06, final adoption targeted 2026-10-16, effective 2027-05-03; no CR-103 seen.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "IMC 21 (ICC chart, April 2026)"
+    },
+    "WV": {
+      "name": "West Virginia",
+      "status": "limited",
+      "family": "IMC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2018",
+          "effective": "2022-08-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": "87CSR4 update 'In Progress' at the Secretary of State (2024 I-codes per a city ordinance); no register effective date found.",
+      "scope": "State Building Code applies only where a city or county adopts it by ordinance; elsewhere no state code.",
+      "citation": "W. Va. Code R. 87-4-4.1.c (State Building Code: 2018 IMC); 87-4-7 adoption by local jurisdiction",
+      "citation_primary": true,
+      "source_url": "https://apps.sos.wv.gov/adlaw/csr/rule.aspx?rule=87-04",
+      "draft_note": "SOURCES CONFLICT (minor): City of Buckhannon Ordinance 480 (Aug 2026) says 87CSR4 changes took effect 2026-07-29 with the 2024 I-codes, but the WV SOS rule page shows the 8/1/2022 version Active and a new version 'In Progress' with no effective date (see the IBC/IRC rows). Read 87-4-4.1.c (Cornell LII mirror): 'The 2018 edition of the International Mechanical Code' with additions (e.g. Section 908 cooling towers); 87-4-1: effective 2022-08-01. State Building Code applies only where a county/city adopts it (W. Va. Code 7-1-3n, 8-12-13; rule 87-4-7).",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "IMC 18 (ICC chart, April 2026)"
+    },
+    "WI": {
+      "name": "Wisconsin",
+      "status": "statewide-amended",
+      "family": "IMC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2021",
+          "effective": "2025-09-01"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": "Commercial Building Code: public buildings and places of employment (incl. multifamily); not 1-2 family dwellings.",
+      "citation": "Wis. Admin. Code SPS 361.05(3) (Commercial Building Code: IMC 2021 as modified by SPS 361-366, chiefly SPS 364)",
+      "citation_primary": true,
+      "source_url": "https://docs.legis.wisconsin.gov/document/administrativecode/SPS%20361.05",
+      "draft_note": "Read SPS 361.05: '(3) Imc. The International Mechanical Code - 2021, subject to the modifications specified in chs. SPS 361 to 366 is incorporated by reference'; '(4) Ifgc. The International Fuel Gas Code - 2021 ...'; history 'CR 23-007: am. Register August 2025 No. 836, eff. 9-1-25' (prior 2015 editions, CR 16-094 eff 2018-05-01). Commercial Building Code covers public buildings and places of employment incl. multifamily; 1-2 family dwellings are under the Uniform Dwelling Code. Transition/plan-submittal grace for CR 23-007 not checked.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "IMC 21 (ICC chart, April 2026)"
+    },
+    "WY": {
+      "name": "Wyoming",
+      "status": "limited",
+      "family": "IMC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2024",
+          "effective": "2024-06-26"
+        }
+      ],
+      "upcoming": [],
+      "pending": null,
+      "scope": "State code via fire marshal plan review for public, school, assembly, multi-story and >5,000 sq ft buildings; local codes elsewhere.",
+      "citation": "041-1 Wyo. Code R. 1-2(a)(iv) (Council on Fire Prevention and Electrical Safety: 2024 IMC), W.S. 35-9-108 plan review",
+      "citation_primary": true,
+      "source_url": "https://www.law.cornell.edu/regulations/wyoming/041-1-Wyo-Code-R-SSSS-1-2",
+      "draft_note": "Read rule 041-1 Wyo. Code R. 1-2 on Cornell LII (mirror): '(iv) The International Mechanical Code, 2024 Edition'; '(v) The International Fuel Gas Code, 2024 Edition'; note 'Amended, Eff. 6/26/2024'. State Fire Marshal plan-review page (per the IBC row): 2024 International Codes adopted June 28, 2024 (2-day mismatch; rule date used). State plan review (W.S. 35-9-108) covers state/local government buildings, schools, >5,000 sq ft public buildings, multi-story, assembly; cities/counties adopt their own codes elsewhere.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "IMC 24 (ICC chart, April 2026)"
+    },
+    "DC": {
+      "name": "District of Columbia",
+      "status": "statewide-amended",
+      "family": "IMC",
+      "editions": [
+        {
+          "applies_to": "all",
+          "edition": "2015",
+          "effective": "2020-05-29"
+        }
+      ],
+      "upcoming": [],
+      "pending": "Next DC Construction Codes (2024 ICC base per secondary report) in development; no DC Register final rule or effective date.",
+      "scope": null,
+      "citation": "12-E DCMR (2017 DC Mechanical Code Supplement to the 2015 IMC), 2017 DC Construction Codes",
+      "citation_primary": true,
+      "source_url": "https://dob.dc.gov/node/1615636",
+      "draft_note": "Read DOB page: '2017 DCMR 12E, DC Mechanical Code' with base '2015 International Mechanical Code (IMC)'; 'The 2017 DC Construction Code takes effect on May 29, 2020.' The 2021-based '2023 DC codes' drafts never reached a final notice (per the IRC row); a secondary report says DOB is moving to the 2024 model codes with final rules anticipated late 2027. No DC Register final rulemaking found.",
+      "verified_by": null,
+      "verified_on": null,
+      "icc_2026_10_20": "IMC 15 (ICC chart, April 2026)"
+    }
+  }
 }
