@@ -216,8 +216,8 @@ test("no description body calls a calculator a tile or a sibling", () => {
     "fire-door-clearance",
     // A 3/8 in hearth extension of brick, stone or tile: the material.
     "hearth-extension-check",
-    // Ceramic tile is the subject of the layout calculator.
-    "tile-layout-cut-balance",
+    // Ceramic tile is the subject of the layout and flatness calculators.
+    "tile-layout-cut-balance", "tile-flatness-lippage-check",
   ]);
   const offenders = TOOLS
     .filter((t) => !exempt.has(t.id) && jargon.test(restOfDescription(t.desc)))

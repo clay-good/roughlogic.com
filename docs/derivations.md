@@ -2346,6 +2346,7 @@ cross-check.
 | calc-finish.js | `computeStepFlashingCount` | `{ wall_run_ft = 20, shingle_exposure_in = 5, waste_pct = 5 } = {}` | _ | _ | _ |
 | calc-finish.js | `computeTextureMaterialTakeoff` | `{ gross_area_sqft = 0, openings_sqft = 0, coverage_per_bag_sqft = 0, waste_pc...` | _ | _ | _ |
 | calc-finish.js | `computeThinsetCoverage` | `{ area_sqft = 0, trowel = "quarter_three_eighths", coverage_per_bag = 0, bag_...` | _ | _ | _ |
+| calc-finish.js | `computeTileFlatnessLippageCheck` | `{ tile_edge_in, joint_in = 0.125, deviation_10ft_in = null, deviation_short_i...` | _ | _ | _ |
 | calc-finish.js | `computeTileLayoutCutBalance` | `{ run_in = 0, tile_in = 0, joint_in = 0.125, min_cut_in = 0 } = {}` | _ | _ | _ |
 | calc-finish.js | `computeValleyFlashingTakeoff` | `{ valley_run_ft = 0, valley_count = 1, pitch_rise_per_12 = 6, metal_width_in ...` | _ | _ | _ |
 | calc-finishing.js | `computeGalvanizeCoatingWeight` | `{ coating_grade_um = 0, steel_tons = 0, area_per_ton_ft2 = 0, alt_area_per_to...` | _ | _ | _ |
@@ -3949,7 +3950,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2533.
+Row count: 2534.
 
 <!-- END function-corpus-v14 -->
 
@@ -4737,7 +4738,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-extraction-rate` | Water Extraction Volume, Time, and Waste-Tank Dumps | Project (first-principles); standing + absorbed; wand time = total / gpm | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+4 more) |
 
-### Group E Construction (638 tiles)
+### Group E Construction (639 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -5307,6 +5308,7 @@ per spec-v14 §13.1 second paragraph.
 | `thermal-stress-restrained` | Restrained Thermal Stress and Force | mechanics of materials; spec-v360 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `thinset-coverage` | Thin-Set Mortar Coverage | Manufacturer thin-set coverage charts...; spec-v95 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `tile-count` | Tile Count and Grout Volume | Project (first-principles); 100 ft^2 with 12x12 tiles, default 1/8 in grout, 10% wast... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `tile-flatness-lippage-check` | Tile Substrate Flatness and Allowable Lippage (ANSI A108.02) | Ceramic Tile Education Foundation (qu...; 24 in tile: 1/8 in in 10 ft and 1/16 in in 24 in; 3/16 in... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `tile-layout-cut-balance` | Tile Layout: Centering and Balanced Cuts | Project (first-principles); 132 in run, 12 in tile, 1/8 in joint: start full 10 + 132... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `tilt-up-brace-load` | Tilt-Up Panel Temporary Brace Load and Count | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `tilt-up-lift-stress` | Tilt-Up Panel Lifting Stress and Insert Layout | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
@@ -6401,6 +6403,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 
-Tile count: 2279. Fixture-covered or reference-cadence: 2279 / 2279.
+Tile count: 2280. Fixture-covered or reference-cadence: 2280 / 2280.
 
 <!-- END tile-index-v14 -->

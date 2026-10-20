@@ -172667,6 +172667,84 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "tile-flatness-lippage-check",
+  "source_publisher": "Ceramic Tile Education Foundation (quoting ANSI A108.02)",
+  "source_title": "ANSI A108.02 Sections 4.1.4.3.1 and 4.3.7 applied to the spec-v1988 floor",
+  "source_edition_or_year": "ceramictilefoundation.org, read 2026-10-19",
+  "source_section_or_page": "24 in tile: 1/8 in in 10 ft and 1/16 in in 24 in; 3/16 in under the 10 ft straightedge fails; 1/8 in joint: lippage 1/32 in + 1/32 in warpage = 1/16 in.",
+  "verified_by": "rl",
+  "verified_on": "2026-10-19",
+  "inputs": {
+   "tile_edge_in": 24,
+   "joint_in": 0.125,
+   "deviation_10ft_in": 0.1875,
+   "deviation_short_in": 0.0625,
+   "warpage_in": 0.03125
+  },
+  "outputs": {
+   "limit_10ft_in": {
+    "value": 0.125,
+    "tolerance": {
+     "abs": 0
+    }
+   },
+   "limit_short_in": {
+    "value": 0.0625,
+    "tolerance": {
+     "abs": 0
+    }
+   },
+   "short_span_in": {
+    "value": 24,
+    "tolerance": {
+     "abs": 0
+    }
+   },
+   "lippage_allowance_in": {
+    "value": 0.0625,
+    "tolerance": {
+     "abs": 1e-12
+    }
+   }
+  }
+ },
+ {
+  "tile_id": "tile-flatness-lippage-check",
+  "source_publisher": "Ceramic Tile Education Foundation (quoting ANSI A108.02)",
+  "source_title": "ANSI A108.02 Section 4.1.4.3.2 applied to a 12 in tile",
+  "source_edition_or_year": "ceramictilefoundation.org, read 2026-10-19",
+  "source_section_or_page": "12 in tile: 1/4 in in 10 ft and 1/16 in in 1 ft; 1/4 in joint: lippage 1/16 in + 1/32 in warpage = 3/32 in.",
+  "verified_by": "rl",
+  "verified_on": "2026-10-19",
+  "inputs": {
+   "tile_edge_in": 12,
+   "joint_in": 0.25,
+   "deviation_10ft_in": 0.1875,
+   "deviation_short_in": 0.0625,
+   "warpage_in": 0.03125
+  },
+  "outputs": {
+   "limit_10ft_in": {
+    "value": 0.25,
+    "tolerance": {
+     "abs": 0
+    }
+   },
+   "short_span_in": {
+    "value": 12,
+    "tolerance": {
+     "abs": 0
+    }
+   },
+   "lippage_allowance_in": {
+    "value": 0.09375,
+    "tolerance": {
+     "abs": 1e-12
+    }
+   }
+  }
  }
  ]
 }

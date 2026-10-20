@@ -64,7 +64,9 @@ function _simpleRenderer(spec) {
       const params = {};
       for (const f of spec.fields) {
         if (f.kind === "select") params[f.key] = fields[f.key].select.value;
-        else params[f.key] = Number(fields[f.key].input.value) || 0;
+        // A field marked `required` passes null when blank, so the compute can
+        // tell an unmeasured reading from a typed 0.
+        else params[f.key] = f.required && fields[f.key].input.value === "" ? null : Number(fields[f.key].input.value) || 0;
       }
       const r = spec.compute(params); _steps.update(spec.fields, params, r);
       if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }
@@ -1405,4 +1407,74 @@ FINISH_RENDERERS["tile-layout-cut-balance"] = _simpleRenderer({
     { key: "n", id: "tlc-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeTileLayoutCutBalance,
+});
+
+// ===================== spec-v1988: tile substrate flatness and allowable lippage =====================
+// ANSI A108.02, as quoted by the Ceramic Tile Education Foundation and the trade
+// press (the standard is sold): Section 4.1.4.3.1, a tile with any edge 15 in or
+// longer needs the substrate within 1/8 in in 10 ft and 1/16 in in 24 in of the
+// required plane; 4.1.4.3.2, smaller tile 1/4 in in 10 ft and 1/16 in in 12 in,
+// both measured from the high points. Lippage (4.3.7): 1/32 in at joints under
+// 1/4 in, 1/16 in at 1/4 in or wider, each plus the tile's inherent warpage.
+const _tflNum = (v, what, opt) => {
+  const blank = v === null || v === undefined || (typeof v === "string" && v.trim() === "");
+  if (blank) return opt ? { v: null } : { error: "Enter the " + what + "." };
+  const ok = typeof v === "number" || (typeof v === "string" && /^\s*[+-]?(\d+\.?\d*|\.\d+)\s*$/.test(v));
+  if (!ok || !Number.isFinite(Number(v))) return { error: "The " + what + " must be a number (in)." };
+  if (Number(v) < 0) return { error: "The " + what + " cannot be negative (in)." };
+  return { v: Number(v) };
+};
+
+// Inches as a sixty-fourths fraction where exact (3/16, 1-1/8), else a decimal.
+const _tflFrac = (x) => { const n = Math.round(x * 64); if (Math.abs(n / 64 - x) > 1e-9) return String(Number(x.toFixed(4))); const g = (a, b) => (b ? g(b, a % b) : a); const d = g(n, 64) || 1; const w = Math.floor(n / 64 + 1e-9); const r = n % 64; return r === 0 ? String(w) : (w ? w + "-" : "") + (r / d) + "/" + (64 / d); };
+// dims: in { tile_edge_in: L, joint_in: L, deviation_10ft_in: L, deviation_short_in: L, warpage_in: L } out: { limit_10ft_in: L, limit_short_in: L, short_span_in: L, lippage_in: L, lippage_allowance_in: L }
+export function computeTileFlatnessLippageCheck({ tile_edge_in, joint_in = 0.125, deviation_10ft_in = null, deviation_short_in = null, warpage_in = 0 } = {}) {
+  const v = {};
+  for (const [k, x, w, opt] of [["t", tile_edge_in, "tile's longest edge", false], ["j", joint_in, "grout joint width", false], ["d10", deviation_10ft_in, "deviation under the 10 ft straightedge", true], ["ds", deviation_short_in, "deviation under the short straightedge", true], ["w", warpage_in ?? 0, "tile warpage", true]]) {
+    const r = _tflNum(x, w, opt); if (r.error) return { error: r.error }; v[k] = r.v;
+  }
+  if (!(v.t > 0)) return { error: "The tile's longest edge must be positive (in)." };
+  if (v.t > 240 || v.j > 1 || (v.d10 ?? 0) > 6 || (v.ds ?? 0) > 6 || (v.w ?? 0) > 1) return { error: "Inputs are outside a tile flatness check (tile to 240 in, joint to 1 in, deviations to 6 in, warpage to 1 in)." };
+  if (v.j < 1 / 16 - 1e-9) return { error: "The lippage figures start at a 1/16 in joint; a narrower joint is outside the standard's chart." };
+  const large = v.t >= 15 - 1e-9;
+  const limit_10ft_in = large ? 1 / 8 : 1 / 4;
+  const limit_short_in = 1 / 16;
+  const short_span_in = large ? 24 : 12;
+  const flat10_ok = v.d10 === null ? null : v.d10 <= limit_10ft_in + 1e-9;
+  const flatS_ok = v.ds === null ? null : v.ds <= limit_short_in + 1e-9;
+  const lippage_in = v.j < 0.25 - 1e-9 ? 1 / 32 : 1 / 16;
+  const warp = v.w ?? 0;
+  const lippage_allowance_in = lippage_in + warp;
+  const fails = [];
+  if (flat10_ok === false) fails.push("10 ft reading " + _tflFrac(v.d10) + " in is over " + _tflFrac(limit_10ft_in) + " in");
+  if (flatS_ok === false) fails.push(short_span_in + " in reading " + _tflFrac(v.ds) + " in is over 1/16 in");
+  const checked = (flat10_ok !== null) + (flatS_ok !== null);
+  const verdict = !checked
+    ? "(no straightedge readings entered: the substrate must be within " + _tflFrac(limit_10ft_in) + " in in 10 ft and 1/16 in in " + short_span_in + " in from the high points)"
+    : fails.length ? "NOT FLAT ENOUGH: " + fails.join("; ") + ". Grind the high spots or level the floor before setting."
+      : "FLAT ENOUGH: the reading" + (checked === 2 ? "s are" : " is") + " within " + (flat10_ok !== null ? _tflFrac(limit_10ft_in) + " in in 10 ft" : "") + (checked === 2 ? " and " : "") + (flatS_ok !== null ? "1/16 in in " + short_span_in + " in" : "");
+  return {
+    large, limit_10ft_in, limit_short_in, short_span_in, flat10_ok, flatS_ok, lippage_in, lippage_allowance_in, verdict,
+    note: "ANSI A108.02 Section 4.1.4.3: for tile with an edge 15 in or longer, the substrate may vary no more than 1/8 in in 10 ft and 1/16 in in 24 in from the required plane; for smaller tile, 1/4 in in 10 ft and 1/16 in in 12 in; measured from the high points with a straightedge. Section 4.3.7 lippage: 1/32 in at grout joints from 1/16 in to under 1/4 in, 1/16 in at 1/4 in or wider, in each case plus the tile's allowable warpage under ANSI A137.1 (from its data sheet), which is why a lip of 1/16 in can be within tolerance on a bowed tile and out of it on a flat one. The lippage chart is for pressed floor and porcelain tile and does not apply to floors sloping to drains; a running bond on tile whose offset side is over 18 in is held to an offset of 33% or less (4.3.8.2). These values are as the Ceramic Tile Education Foundation and the trade press quote the standard; ANSI A108.02 is sold, and the edition named in the project specification governs, with the tile manufacturer and the installer.",
+  };
+}
+export const tileFlatnessLippageCheckExample = { inputs: { tile_edge_in: 24, joint_in: 0.125, deviation_10ft_in: 0.1875, deviation_short_in: 0.0625, warpage_in: 0.03125 } };
+
+FINISH_RENDERERS["tile-flatness-lippage-check"] = _simpleRenderer({
+  citation: "Citation: ANSI A108.02 Sections 4.1.4.3.1, 4.1.4.3.2 and 4.3.7, by name, as quoted by the Ceramic Tile Education Foundation (ceramictilefoundation.org) and the trade press; the standard is sold by TCNA. Tile 15 in or longer: substrate within 1/8 in in 10 ft and 1/16 in in 24 in; smaller tile: 1/4 in in 10 ft and 1/16 in in 12 in; lippage 1/32 in at joints under 1/4 in and 1/16 in at 1/4 in or wider, plus the tile's warpage. The project specification, the tile manufacturer and the installer govern.",
+  example: tileFlatnessLippageCheckExample.inputs,
+  fields: [
+    { key: "tile_edge_in", label: "Tile's longest edge (in)", kind: "number", attrs: { step: "any", min: "0" } },
+    { key: "joint_in", label: "Grout joint width (in, 1/16 or more)", kind: "number", default: 0.125, required: true, attrs: { step: "any", min: "0" } },
+    { key: "deviation_10ft_in", label: "Gap under a 10 ft straightedge from the high points (in)", kind: "number", required: true, attrs: { step: "any", min: "0" } },
+    { key: "deviation_short_in", label: "Gap under a 24 in straightedge, or 12 in for tile under 15 in (in)", kind: "number", required: true, attrs: { step: "any", min: "0" } },
+    { key: "warpage_in", label: "Tile's allowable warpage (in, ANSI A137.1, from its data sheet)", kind: "number", attrs: { step: "any", min: "0" } },
+  ],
+  outputs: [
+    { key: "v", id: "tfl-out-v", label: "Substrate flatness", value: (r) => r.verdict },
+    { key: "f", id: "tfl-out-f", label: "Flatness limits for this tile", value: (r) => _tflFrac(r.limit_10ft_in) + " in in 10 ft and 1/16 in in " + r.short_span_in + " in (" + (r.large ? "an edge 15 in or longer" : "all edges under 15 in") + ")" },
+    { key: "l", id: "tfl-out-l", label: "Allowable lippage between tiles", value: (r) => _tflFrac(r.lippage_in) + " in for this joint + warpage = " + _tflFrac(r.lippage_allowance_in) + " in" },
+    { key: "n", id: "tfl-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeTileFlatnessLippageCheck,
 });

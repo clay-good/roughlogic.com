@@ -62391,3 +62391,20 @@ test("bounds: spec-v1987 computeTileLayoutCutBalance pins the three layouts, the
     assert.ok("error" in _tlc(bad), JSON.stringify(bad));
   }
 });
+
+// spec-v1988: ANSI A108.02 4.1.4.3 flatness and 4.3.7 lippage, as CTEF quotes them.
+import { computeTileFlatnessLippageCheck as _tfl } from "../../calc-finish.js";
+test("bounds: spec-v1988 computeTileFlatnessLippageCheck pins the 15 in step, the two straightedge spans, the 1/4 in joint step, warpage and the error seams", () => {
+  const r = _tfl({ tile_edge_in: 24, joint_in: 0.125, deviation_10ft_in: 0.1875, deviation_short_in: 0.0625, warpage_in: 0.03125 });
+  assert.equal(r.limit_10ft_in, 0.125); assert.equal(r.short_span_in, 24); assert.equal(r.flat10_ok, false); assert.equal(r.flatS_ok, true);
+  assert.equal(r.lippage_allowance_in, 0.0625);
+  assert.equal(_tfl({ tile_edge_in: 15, joint_in: 0.125 }).large, true, "15 in counts as large");
+  const small = _tfl({ tile_edge_in: 14.99, joint_in: 0.25, deviation_10ft_in: 0.25, deviation_short_in: 0.0625 });
+  assert.equal(small.limit_10ft_in, 0.25); assert.equal(small.short_span_in, 12); assert.equal(small.flat10_ok, true); assert.equal(small.lippage_in, 0.0625);
+  assert.equal(_tfl({ tile_edge_in: 24, joint_in: 0.2499 }).lippage_in, 1 / 32);
+  const blank = _tfl({ tile_edge_in: 24, joint_in: 0.125 });
+  assert.equal(blank.flat10_ok, null); assert.equal(blank.flatS_ok, null, "unmeasured is not a pass");
+  for (const bad of [{ joint_in: 0.125 }, { tile_edge_in: 0, joint_in: 0.125 }, { tile_edge_in: 24, joint_in: 0.03 }, { tile_edge_in: 24, joint_in: 2 }, { tile_edge_in: 24, joint_in: 0.125, deviation_10ft_in: -0.1 }, { tile_edge_in: 24, joint_in: 0.125, warpage_in: "x" }, { tile_edge_in: 1e4, joint_in: 0.125 }]) {
+    assert.ok("error" in _tfl(bad), JSON.stringify(bad));
+  }
+});

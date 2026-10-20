@@ -6478,6 +6478,11 @@
     {"term":"center tile or center grout line","target":"tile-layout-cut-balance","kind":"industry"},
     {"term":"avoid sliver cuts tile","target":"tile-layout-cut-balance","kind":"industry"},
     {"term":"tile cut width at the wall","target":"tile-layout-cut-balance","kind":"industry"},
-    {"term":"balanced tile layout calculator","target":"tile-layout-cut-balance","kind":"industry"}
+    {"term":"balanced tile layout calculator","target":"tile-layout-cut-balance","kind":"industry"},
+    {"term":"tile lippage allowed 1/32","target":"tile-flatness-lippage-check","kind":"industry"},
+    {"term":"floor flatness for large format tile 1/8 in 10 ft","target":"tile-flatness-lippage-check","kind":"industry"},
+    {"term":"is my floor flat enough for 24 inch tile","target":"tile-flatness-lippage-check","kind":"question"},
+    {"term":"ANSI A108.02 lippage","target":"tile-flatness-lippage-check","kind":"industry"},
+    {"term":"substrate flatness tile","target":"tile-flatness-lippage-check","kind":"industry"}
   ]
 }

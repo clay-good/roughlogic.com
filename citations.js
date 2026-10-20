@@ -26792,6 +26792,17 @@ export const CITATIONS = {
       { name: "Minimum cut", value: "half a tile by default, or the reader's entry", source: "setting practice" },
     ],
   },
+  "tile-flatness-lippage-check": {
+    formula: "tile edge >= 15 in: flatness <= 1/8 in in 10 ft and <= 1/16 in in 24 in; tile edges < 15 in: <= 1/4 in in 10 ft and <= 1/16 in in 12 in (from the high points); lippage = 1/32 in for joints 1/16 in to under 1/4 in, 1/16 in for joints 1/4 in or wider; allowance = lippage + inherent warpage.",
+    edition: "ANSI A108.02 Sections 4.1.4.3.1 (tile 15 in or longer), 4.1.4.3.2 (smaller tile) and 4.3.7 (lippage), by name, as quoted by the Ceramic Tile Education Foundation and the trade press on 2026-10-19; the standard itself was not read (it is sold by TCNA).",
+    freeAccess: "The Ceramic Tile Education Foundation quotes the flatness clauses free at ceramictilefoundation.org; ANSI A108.02 itself is sold.",
+    governance: GOVERNANCE.general,
+    editionNote: "Section 4.1.4.3.2 as quoted: for tile with all edges shorter than 15 in, no more than 1/4 in in 10 ft and no more than 1/16 in in 1 ft from the required plane, measured from the high points. Section 4.1.4.3.1: for tile with at least one edge 15 in or longer, 1/8 in in 10 ft and 1/16 in in 2 ft. The lippage chart (pressed floor and porcelain tile) gives 1/32 in at joints from 1/16 in to under 1/4 in and 1/16 in at 1/4 in or wider, plus inherent warpage, and does not apply to floors sloping to drains. One trade article quotes 1/32 in in 1 ft for small tile; the CTEF quotation of 1/16 in is used. Edition: the one named in the project specification.",
+    assumptions: [
+      { name: "Secondary quotation", value: "values as quoted by CTEF and the trade press, not read from the standard", source: "ceramictilefoundation.org" },
+      { name: "Warpage entered", value: "the tile's allowable warpage under ANSI A137.1, from its data sheet", source: "stated assumption" },
+    ],
+  },
 };
 
 // --- Reference block and copy text ---

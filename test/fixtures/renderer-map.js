@@ -2287,4 +2287,5 @@ export const RENDERER_MAP = {
   "truss-uplift-connector": { module: "../../calc-construction.js", exportName: "CONSTRUCTION_RENDERERS" },
   "foundation-grade-slope-check": { module: "../../calc-construction.js", exportName: "CONSTRUCTION_RENDERERS" },
   "tile-layout-cut-balance": { module: "../../calc-finish.js", exportName: "FINISH_RENDERERS" },
+  "tile-flatness-lippage-check": { module: "../../calc-finish.js", exportName: "FINISH_RENDERERS" },
 };

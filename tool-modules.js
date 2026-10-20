@@ -648,6 +648,7 @@ export const TOOL_MODULES = (() => {
     "cement-board-takeoff",
     "step-flashing-count",
     "tile-layout-cut-balance",
+    "tile-flatness-lippage-check",
   ]);
   // spec-v101 new electrician design/layout bench; relieves the standing
   // calc-electrical.js cap watch. Both tiles keep group "A".

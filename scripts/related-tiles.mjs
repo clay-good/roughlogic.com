@@ -2435,6 +2435,8 @@ const RELATED = {
   "foundation-grade-slope-check": ["slope-from-level","foundation-waterproofing-takeoff","layout-squaring"],
   // spec-v1987: tile layout cut balance (calc-finish.js).
   "tile-layout-cut-balance": ["tile-count","thinset-coverage","layout-squaring"],
+  // spec-v1988: tile substrate flatness and lippage (calc-finish.js).
+  "tile-flatness-lippage-check": ["tile-layout-cut-balance","tile-count","thinset-coverage","self-leveler-bags"],
 };
 
 export { RELATED };

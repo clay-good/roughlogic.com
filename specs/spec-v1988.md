@@ -1,6 +1,6 @@
 # roughlogic.com Specification v1988 -- Tile Substrate Flatness and Allowable Lippage (ANSI A108.02) (`calc-finish.js`, Group E Carpentry and Construction, tile, 1 New Tile)
 
-> **Status: PROPOSED 2026-10-19. Single-tile spec.** Part of [scope-product-expansion](scope-product-expansion.md). In scope under the
+> **Status: LANDED 2026-10-19 (proposed 2026-10-19). Single-tile spec. As built from the Ceramic Tile Education Foundation's quotation of ANSI A108.02 (read 2026-10-19; the standard itself is sold and was not read): for tile with all edges under 15 in, Section 4.1.4.3.2 is 1/4 in in 10 ft and 1/16 in in 12 in (1 ft), not the 1/8 in in 24 in this spec gives. The 2023-edition renumbering this spec mentions was not confirmed, so the tile cites the 4.1.4.3 and 4.3.7 numbers the quotation uses. The lippage chart is for pressed floor and porcelain tile and joints of 1/16 in or more.** Part of [scope-product-expansion](scope-product-expansion.md). In scope under the
 > spec-v106 trades-only charter: Group E, the tile bench in `calc-finish.js`, no new dependency and no network call.
 >
 > **The gap.** Large-format tile fails for one reason more than any other: the floor under it was not flat enough,

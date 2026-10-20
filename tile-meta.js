@@ -1530,6 +1530,8 @@ const _TILES = [
   ["foundation-grade-slope-check", "E"],
   // spec-v1987: tile layout cut balance (calc-finish.js).
   ["tile-layout-cut-balance", "E"],
+  // spec-v1988: tile substrate flatness and lippage (calc-finish.js).
+  ["tile-flatness-lippage-check", "E"],
 ];
 
 

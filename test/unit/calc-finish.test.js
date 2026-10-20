@@ -137,3 +137,11 @@ test("tile-layout-cut-balance: placing tiles one at a time from the center or th
     assert.ok(Math.abs(r.tile_centered_cut_in - Math.max(0, (run - span) / 2 - j)) < 1e-9, "tile-centered cut " + run);
   }
 });
+
+// spec-v1988: the flatness limits worked in millimetres as CTEF quotes them (6 mm in 3 m, 1.6 mm in 0.3 m; 3 mm and 1.6 mm in 0.6 m).
+import { computeTileFlatnessLippageCheck as _flat } from "../../calc-finish.js";
+test("tile-flatness-lippage-check: the inch limits match the metric figures the standard prints beside them", () => {
+  const big = _flat({ tile_edge_in: 24, joint_in: 0.125 }), small = _flat({ tile_edge_in: 12, joint_in: 0.125 });
+  assert.ok(Math.abs(big.limit_10ft_in * 25.4 - 3) < 0.2 && Math.abs(big.limit_short_in * 25.4 - 1.6) < 0.05 && Math.abs(big.short_span_in * 25.4 - 600) < 10);
+  assert.ok(Math.abs(small.limit_10ft_in * 25.4 - 6) < 0.4 && Math.abs(small.short_span_in * 25.4 - 300) < 5);
+});
