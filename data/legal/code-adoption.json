@@ -1814,7 +1814,7 @@
           "verified_by": null,
           "verified_on": null,
           "family": "IRC",
-          "review": "conflict"
+          "review": null
         },
         "TN": {
           "name": "Tennessee",
@@ -1996,6 +1996,1001 @@
           "verified_by": null,
           "verified_on": null,
           "family": "IRC",
+          "review": null
+        }
+      }
+    },
+    "IBC": {
+      "cadence_days": 92,
+      "by_state": {
+        "AL": {
+          "name": "Alabama",
+          "status": "limited",
+          "editions": [
+            {
+              "applies_to": "all",
+              "edition": "2021",
+              "effective": "2022-07-01"
+            }
+          ],
+          "upcoming": [],
+          "pending": null,
+          "scope": "State code covers state-owned or state-funded work, K-12 and public postsecondary schools, hotels/motels and movie theaters only.",
+          "citation": "Ala. Admin. Code r. 355-12-1-.01 (Alabama State Building Code: 2021 IBC with 2024 IBC sections), DCM",
+          "source_url": "https://admincode.legislature.state.al.us/api/rule/355-12-1-.01",
+          "verified_by": null,
+          "verified_on": null,
+          "family": "IBC",
+          "review": null
+        },
+        "AK": {
+          "name": "Alaska",
+          "status": "statewide-amended",
+          "editions": [
+            {
+              "applies_to": "all",
+              "edition": "2021",
+              "effective": "2022-10-28"
+            }
+          ],
+          "upcoming": [],
+          "pending": "DPS review of the 2024 IBC/IEBC/IFC/IMC/IFGC underway; public notice estimated summer 2026, none found.",
+          "scope": "Applies to all occupancies except 1-3 family dwellings and small townhouses; deferred cities and boroughs enforce it locally.",
+          "citation": "13 AAC 50.020 (2021 IBC as amended), Alaska State Fire Marshal, Dept. of Public Safety",
+          "source_url": "https://www.akleg.gov/basis/aac.asp?media=print&secStart=13.50.020&secEnd=13.50.020",
+          "verified_by": null,
+          "verified_on": null,
+          "family": "IBC",
+          "review": null
+        },
+        "AZ": {
+          "name": "Arizona",
+          "status": "local",
+          "editions": [],
+          "upcoming": [],
+          "pending": null,
+          "scope": "No statewide building code; cities and counties adopt their own edition. The State Fire Code (2018 IFC) covers state buildings and schools.",
+          "citation": "No state adoption: counties adopt building codes under A.R.S. 11-861; cities by reference under A.R.S. 9-802",
+          "source_url": "https://www.azleg.gov/ars/11/00861.htm",
+          "verified_by": null,
+          "verified_on": null,
+          "family": "IBC",
+          "review": null
+        },
+        "AR": {
+          "name": "Arkansas",
+          "status": "statewide-amended",
+          "editions": [
+            {
+              "applies_to": "all",
+              "edition": "2021",
+              "effective": "2023-01-01"
+            }
+          ],
+          "upcoming": [],
+          "pending": null,
+          "scope": null,
+          "citation": "Ark. Code R. 015.01.22-005, 2021 Arkansas Fire Prevention Code, Volume II (Building), State Fire Marshal",
+          "source_url": "https://www.law.cornell.edu/regulations/arkansas/015-01-22-Ark-Code-R-SS-005",
+          "verified_by": null,
+          "verified_on": null,
+          "family": "IBC",
+          "review": null
+        },
+        "CA": {
+          "name": "California",
+          "status": "statewide-amended",
+          "editions": [
+            {
+              "applies_to": "all",
+              "edition": "2024",
+              "effective": "2026-01-01"
+            }
+          ],
+          "upcoming": [],
+          "pending": null,
+          "scope": null,
+          "citation": "Cal. Code Regs. tit. 24, pt. 2 (2025 California Building Code), Building Standards Commission",
+          "source_url": "https://dgs.ca.gov/BSC/Codes",
+          "verified_by": null,
+          "verified_on": null,
+          "family": "IBC",
+          "review": null
+        },
+        "CO": {
+          "name": "Colorado",
+          "status": "limited",
+          "editions": [
+            {
+              "applies_to": "all",
+              "edition": "2021",
+              "effective": "2021-06-30"
+            }
+          ],
+          "upcoming": [],
+          "pending": null,
+          "scope": "No statewide code; state rules cover only buildings under DFPC (public schools, health facilities) and state-owned buildings.",
+          "citation": "8 CCR 1507-101, rule 3.2.1 (2021 IBC), Division of Fire Prevention and Control",
+          "source_url": "https://www.law.cornell.edu/regulations/colorado/title-8/agency-1507/division-101/article-3",
+          "verified_by": null,
+          "verified_on": null,
+          "family": "IBC",
+          "review": null
+        },
+        "CT": {
+          "name": "Connecticut",
+          "status": "statewide-amended",
+          "editions": [
+            {
+              "applies_to": "all",
+              "edition": "2021",
+              "effective": "2022-10-01"
+            }
+          ],
+          "upcoming": [],
+          "pending": "2026 State Building Code (2024 IBC) awaits Legislative Regulation Review Committee approval; July 1, 2026 date delayed, no new date.",
+          "scope": null,
+          "citation": "2022 Connecticut State Building Code (2021 IBC as amended), Office of the State Building Inspector, C.G.S. 29-252",
+          "source_url": "https://portal.ct.gov/en/das/office-of-state-building-inspector/connecticut-state-building-code/regulations",
+          "verified_by": null,
+          "verified_on": null,
+          "family": "IBC",
+          "review": null
+        },
+        "DE": {
+          "name": "Delaware",
+          "status": "local",
+          "editions": [],
+          "upcoming": [],
+          "pending": null,
+          "scope": "No statewide building code; the three counties and municipalities adopt their own edition.",
+          "citation": "No state adoption: 16 Del. C. 7601 lets the three counties adopt and enforce building codes",
+          "source_url": "https://delcode.delaware.gov/title16/c076/index.html",
+          "verified_by": null,
+          "verified_on": null,
+          "family": "IBC",
+          "review": null
+        },
+        "FL": {
+          "name": "Florida",
+          "status": "statewide-amended",
+          "editions": [
+            {
+              "applies_to": "all",
+              "edition": "2021",
+              "effective": "2023-12-31"
+            }
+          ],
+          "upcoming": [],
+          "pending": "9th Edition (2026) Florida Building Code proposed 2026-09-23 (comment period closed 2026-10-14); no final notice or date yet.",
+          "scope": null,
+          "citation": "Fla. Admin. Code r. 61G20-1.001 (Florida Building Code, 8th Edition (2023), Building), Florida Building Commission",
+          "source_url": "https://www.flrules.org/gateway/ruleNo.asp?id=61G20-1.001",
+          "verified_by": null,
+          "verified_on": null,
+          "family": "IBC",
+          "review": null
+        },
+        "GA": {
+          "name": "Georgia",
+          "status": "statewide-amended",
+          "editions": [
+            {
+              "applies_to": "all",
+              "edition": "2024",
+              "effective": "2026-01-01"
+            }
+          ],
+          "upcoming": [],
+          "pending": null,
+          "scope": "Mandatory state minimum code; local governments choose whether to enforce, and local amendments must be filed with DCA.",
+          "citation": "O.C.G.A. 8-2-23; DCA State Minimum Standard Codes: 2024 IBC with Georgia Amendments",
+          "source_url": "https://dca.georgia.gov/document/document/new-codes-and-amendments-effective-january-1-2026-memo/download",
+          "verified_by": null,
+          "verified_on": null,
+          "family": "IBC",
+          "review": null
+        },
+        "HI": {
+          "name": "Hawaii",
+          "status": "statewide-amended",
+          "editions": [
+            {
+              "applies_to": "all",
+              "edition": "2018",
+              "effective": "2021-04-20"
+            }
+          ],
+          "upcoming": [],
+          "pending": "SBCC 2021-code work suspended under the Governor's housing proclamation; 2021 IBC said to apply by default without amendments.",
+          "scope": "State code becomes each county's interim code if the county does not adopt it within 2 years; counties amend and enforce.",
+          "citation": "Haw. Admin. R. tit. 3, State Building Code Council definitions: State Building Code (2018 IBC) [Eff 4/20/2021]; HRS ch. 107",
+          "source_url": "https://www.law.cornell.edu/regulations/hawaii/Haw-Code-R-tit-3-Building-Code-Council-State-Building-Code-Council-Definitions",
+          "verified_by": null,
+          "verified_on": null,
+          "family": "IBC",
+          "review": "conflict"
+        },
+        "ID": {
+          "name": "Idaho",
+          "status": "limited",
+          "editions": [
+            {
+              "applies_to": "all",
+              "edition": "2018",
+              "effective": "2021-01-01"
+            }
+          ],
+          "upcoming": [],
+          "pending": "Building Code Board proposed the 2024 IBC (minutes 2025-08-11); the June 2026 rule text still adopts the 2018 IBC.",
+          "scope": "Applied by cities and counties that run a permit program (Idaho Code 39-4116) and by the Division for public buildings and schools.",
+          "citation": "IDAPA 24.39.30.600.01 (Idaho Building Code Board; International Building Code, 2018 Edition, amended)",
+          "source_url": "https://adminrules.idaho.gov/rules/current/24/243930.pdf",
+          "verified_by": null,
+          "verified_on": null,
+          "family": "IBC",
+          "review": null
+        },
+        "IL": {
+          "name": "Illinois",
+          "status": "local",
+          "editions": [],
+          "upcoming": [],
+          "pending": null,
+          "scope": "No statewide building code; cities and counties adopt their own. Elsewhere, commercial buildings are inspected to the current or prior IBC.",
+          "citation": "20 ILCS 3105/10.09-1 and 10.18 (Capital Development Board Act, as amended by P.A. 103-510, eff. 2024-01-01)",
+          "source_url": "https://www.ilga.gov/legislation/publicacts/view/103-0510",
+          "verified_by": null,
+          "verified_on": null,
+          "family": "IBC",
+          "review": null
+        },
+        "IN": {
+          "name": "Indiana",
+          "status": "statewide-amended",
+          "editions": [
+            {
+              "applies_to": "all",
+              "edition": "2012",
+              "effective": "2014-12-01"
+            }
+          ],
+          "upcoming": [],
+          "pending": "2026 Indiana Building Code (2024 IBC, new 675 IAC 13-2.7) drafted by the FPBSC; LSA number and effective date not yet set.",
+          "scope": null,
+          "citation": "675 IAC 13-2.6 (2014 Indiana Building Code, based on the 2012 IBC)",
+          "source_url": "https://www.in.gov/dhs/fire-and-building-safety/fpbsc-rules/",
+          "verified_by": null,
+          "verified_on": null,
+          "family": "IBC",
+          "review": null
+        },
+        "IA": {
+          "name": "Iowa",
+          "status": "limited",
+          "editions": [
+            {
+              "applies_to": "all",
+              "edition": "2024",
+              "effective": "2025-09-10"
+            }
+          ],
+          "upcoming": [],
+          "pending": null,
+          "scope": "State code applies to state-owned or state-funded buildings, localities that accept it, and cities over 15,000 with no local code.",
+          "citation": "481 IAC 301.3(103A) (State Building Code; International Building Code, 2024 edition, amended)",
+          "source_url": "https://www.legis.iowa.gov/docs/iac/chapter/481.301.pdf",
+          "verified_by": null,
+          "verified_on": null,
+          "family": "IBC",
+          "review": null
+        },
+        "KS": {
+          "name": "Kansas",
+          "status": "local",
+          "editions": [],
+          "upcoming": [],
+          "pending": null,
+          "scope": "No statewide building code; cities and counties adopt and amend their own. State-owned buildings follow state agency requirements.",
+          "citation": "No state adoption found: Kansas has no statewide building code; cities and counties adopt under home rule",
+          "source_url": "https://www.kslegislature.gov/li/b2025_26/statute/031_000_0000_chapter/031_001_0000_article/031_001_0034a_section/031_001_0034a_k/",
+          "verified_by": null,
+          "verified_on": null,
+          "family": "IBC",
+          "review": "secondary"
+        },
+        "KY": {
+          "name": "Kentucky",
+          "status": "statewide-amended",
+          "editions": [
+            {
+              "applies_to": "all",
+              "edition": "2015",
+              "effective": "2019-08-01"
+            }
+          ],
+          "upcoming": [],
+          "pending": "DHBC KBC/KRC task forces are reviewing newer I-code editions (December 2025 notice, secondary); no rule filed.",
+          "scope": null,
+          "citation": "815 KAR 7:120 (Kentucky Building Code: 2015 IBC with the 2018 Kentucky Building Code amendments)",
+          "source_url": "https://apps.legislature.ky.gov/law/kar/titles/815/007/120",
+          "verified_by": null,
+          "verified_on": null,
+          "family": "IBC",
+          "review": null
+        },
+        "LA": {
+          "name": "Louisiana",
+          "status": "statewide-amended",
+          "editions": [
+            {
+              "applies_to": "all",
+              "edition": "2021",
+              "effective": "2023-01-01"
+            }
+          ],
+          "upcoming": [],
+          "pending": "2024 IBC proposed (notice of intent, La. Register 2026-08-20); the proposed rule says effective 2027-01-01. Final rule not seen.",
+          "scope": null,
+          "citation": "LAC 17:I.103 (Louisiana State Uniform Construction Code; IBC 2021 Edition, excluding Chapters 1 and 27)",
+          "source_url": "https://luccc.louisiana.gov/wp-content/uploads/2025/11/LSUCCC_Louisiana-Construction-Code-Information.pdf",
+          "verified_by": null,
+          "verified_on": null,
+          "family": "IBC",
+          "review": null
+        },
+        "ME": {
+          "name": "Maine",
+          "status": "statewide-amended",
+          "editions": [
+            {
+              "applies_to": "all",
+              "edition": "2021",
+              "effective": "2025-04-07"
+            }
+          ],
+          "upcoming": [],
+          "pending": null,
+          "scope": "MUBEC applies statewide; enforcement is mandatory only in municipalities of 4,000+ residents, optional below that.",
+          "citation": "16-642 C.M.R. ch. 3 (MUBEC Building Code; 2021 IBC, amended); ch. 1 sec. 6",
+          "source_url": "https://www.maine.gov/dps/fmo/sites/maine.gov.dps.fmo/files/inline-files/642C003.pdf",
+          "verified_by": null,
+          "verified_on": null,
+          "family": "IBC",
+          "review": null
+        },
+        "MD": {
+          "name": "Maryland",
+          "status": "statewide-amended",
+          "editions": [
+            {
+              "applies_to": "all",
+              "edition": "2021",
+              "effective": "2023-05-29"
+            }
+          ],
+          "upcoming": [],
+          "pending": "2024 IBC proposed for COMAR 09.12.51 (Md. Register 2026-06-26, comments closed 2026-07-27); no final rule seen.",
+          "scope": "Statewide minimum (MBPS); counties and cities enforce it within 12 months of a state update and may adopt local amendments.",
+          "citation": "COMAR 09.12.51.04 (Maryland Building Performance Standards; 2021 IBC with State modifications)",
+          "source_url": "https://regs.maryland.gov/us/md/exec/comar/09.12.51.04",
+          "verified_by": null,
+          "verified_on": null,
+          "family": "IBC",
+          "review": null
+        },
+        "MA": {
+          "name": "Massachusetts",
+          "status": "statewide-amended",
+          "editions": [
+            {
+              "applies_to": "all",
+              "edition": "2021",
+              "effective": "2024-10-11"
+            }
+          ],
+          "upcoming": [],
+          "pending": null,
+          "scope": null,
+          "citation": "780 CMR 1.00-115.00 (Massachusetts State Building Code, 10th edition; 2021 IBC with MA amendments)",
+          "source_url": "https://www.mass.gov/handbook/tenth-edition-of-the-ma-state-building-code-780",
+          "verified_by": null,
+          "verified_on": null,
+          "family": "IBC",
+          "review": null
+        },
+        "MI": {
+          "name": "Michigan",
+          "status": "statewide-amended",
+          "editions": [
+            {
+              "applies_to": "all",
+              "edition": "2021",
+              "effective": "2025-04-09"
+            }
+          ],
+          "upcoming": [],
+          "pending": null,
+          "scope": null,
+          "citation": "2021 Michigan Building Code (LARA Bureau of Construction Codes; Stille-DeRossett-Hale Single State Construction Code Act)",
+          "source_url": "https://www.michigan.gov/lara/bureau-list/bcc/rules-acts/codes/code-books",
+          "verified_by": null,
+          "verified_on": null,
+          "family": "IBC",
+          "review": null
+        },
+        "MN": {
+          "name": "Minnesota",
+          "status": "statewide-amended",
+          "editions": [
+            {
+              "applies_to": "all",
+              "edition": "2018",
+              "effective": "2020-03-31"
+            }
+          ],
+          "upcoming": [],
+          "pending": "DLI is drafting a chapter 1305 update to the 2024 IBC (request for comments 2025-01-21); proposal, hearing and dates 'to be determined'.",
+          "scope": null,
+          "citation": "Minn. R. 1305.0011 (Minnesota Building Code, 2018 IBC as amended); Minn. Stat. 326B.121",
+          "source_url": "https://www.revisor.mn.gov/rules/1305.0011/",
+          "verified_by": null,
+          "verified_on": null,
+          "family": "IBC",
+          "review": null
+        },
+        "MS": {
+          "name": "Mississippi",
+          "status": "local",
+          "editions": [],
+          "upcoming": [],
+          "pending": null,
+          "scope": "Council codes are minimum codes; localities adopt one of the last 3 editions unless they opted out in 2014. Edition not confirmed.",
+          "citation": "Miss. Code Ann. 17-2-1 et seq., 17-2-4 (Mississippi Building Codes Council; State Uniform Construction Code), not read directly",
+          "source_url": "https://www.iccsafe.org/advocacy/adoptions-map/Mississippi/",
+          "verified_by": null,
+          "verified_on": null,
+          "family": "IBC",
+          "review": "conflict"
+        },
+        "MO": {
+          "name": "Missouri",
+          "status": "local",
+          "editions": [],
+          "upcoming": [],
+          "pending": null,
+          "scope": "No statewide building code; cities and counties adopt their own edition.",
+          "citation": "No state adoption: Missouri has no statewide commercial building code; counties and cities adopt codes by ordinance",
+          "source_url": "https://www.iccsafe.org/advocacy/adoptions-map/missouri/",
+          "verified_by": null,
+          "verified_on": null,
+          "family": "IBC",
+          "review": "secondary"
+        },
+        "MT": {
+          "name": "Montana",
+          "status": "statewide-amended",
+          "editions": [
+            {
+              "applies_to": "all",
+              "edition": "2024",
+              "effective": "2026-09-26"
+            }
+          ],
+          "upcoming": [],
+          "pending": null,
+          "scope": null,
+          "citation": "Admin. R. Mont. 24.301.131 (IBC 2024 as amended by ARM Title 24, Ch. 301)",
+          "source_url": "https://bsd.dli.mt.gov/building-codes-permits/current-codes",
+          "verified_by": null,
+          "verified_on": null,
+          "family": "IBC",
+          "review": null
+        },
+        "NE": {
+          "name": "Nebraska",
+          "status": "limited",
+          "editions": [
+            {
+              "applies_to": "all",
+              "edition": "2018",
+              "effective": "2019-09-07"
+            }
+          ],
+          "upcoming": [],
+          "pending": null,
+          "scope": "Applies where a county, city or village has not adopted a conforming code within 2 years of an update.",
+          "citation": "Neb. Rev. Stat. 71-6403(1)(a) (IBC 2018, except 101.4.3 and Ch. 29); 71-6406",
+          "source_url": "https://nebraskalegislature.gov/laws/statutes.php?statute=71-6403",
+          "verified_by": null,
+          "verified_on": null,
+          "family": "IBC",
+          "review": null
+        },
+        "NV": {
+          "name": "Nevada",
+          "status": "limited",
+          "editions": [
+            {
+              "applies_to": "state-buildings",
+              "edition": "2024",
+              "effective": "2024-11-15"
+            }
+          ],
+          "upcoming": [],
+          "pending": null,
+          "scope": "State code covers state buildings only (State Public Works Board); cities and counties adopt their own edition for other buildings.",
+          "citation": "NAC 341.045(1)(a) (State Public Works Board: 2024 IBC for state buildings), as amended by R072-24A",
+          "source_url": "https://publicworks.nv.gov/uploadedFiles/publicworksnvgov/content/Documents/Permitting_Code_Enforcement/2024%20Adopted_Codes.pdf",
+          "verified_by": null,
+          "verified_on": null,
+          "family": "IBC",
+          "review": null
+        },
+        "NH": {
+          "name": "New Hampshire",
+          "status": "statewide-amended",
+          "editions": [
+            {
+              "applies_to": "all",
+              "edition": "2024",
+              "effective": "2026-07-01"
+            }
+          ],
+          "upcoming": [],
+          "pending": null,
+          "scope": null,
+          "citation": "RSA 155-A:1, IV (state building code: IBC 2024 with NH amendments), as amended 2026, eff. July 1, 2026",
+          "source_url": "https://gc.nh.gov/rsa/html/XII/155-A/155-A-1.htm",
+          "verified_by": null,
+          "verified_on": null,
+          "family": "IBC",
+          "review": null
+        },
+        "NJ": {
+          "name": "New Jersey",
+          "status": "statewide-amended",
+          "editions": [
+            {
+              "applies_to": "all",
+              "edition": "2024",
+              "effective": "2026-08-17"
+            }
+          ],
+          "upcoming": [],
+          "pending": null,
+          "scope": null,
+          "citation": "N.J.A.C. 5:23-3.14 (building subcode: IBC/2024, New Jersey edition), R.2026 d.086",
+          "source_url": "https://www.nj.gov/dca/codes/codreg/pdf_rule_adoptions/model_codes_2024_adopt.pdf",
+          "verified_by": null,
+          "verified_on": null,
+          "family": "IBC",
+          "review": null
+        },
+        "NM": {
+          "name": "New Mexico",
+          "status": "statewide-amended",
+          "editions": [
+            {
+              "applies_to": "all",
+              "edition": "2021",
+              "effective": "2023-07-14"
+            }
+          ],
+          "upcoming": [],
+          "pending": null,
+          "scope": null,
+          "citation": "14.7.2 NMAC (2021 New Mexico Commercial Building Code, adopting the 2021 IBC as amended)",
+          "source_url": "https://www.srca.nm.gov/parts/title14/14.007.0002.pdf",
+          "verified_by": null,
+          "verified_on": null,
+          "family": "IBC",
+          "review": null
+        },
+        "NY": {
+          "name": "New York",
+          "status": "statewide-amended",
+          "editions": [
+            {
+              "applies_to": "all",
+              "edition": "2024",
+              "effective": "2025-12-31"
+            }
+          ],
+          "upcoming": [],
+          "pending": null,
+          "scope": "Statewide outside New York City, which enforces its own NYC Construction Codes.",
+          "citation": "19 NYCRR Part 1221 (2025 Building Code of New York State, Uniform Code)",
+          "source_url": "https://dos.ny.gov/notice-adoption",
+          "verified_by": null,
+          "verified_on": null,
+          "family": "IBC",
+          "review": null
+        },
+        "NC": {
+          "name": "North Carolina",
+          "status": "statewide-amended",
+          "editions": [
+            {
+              "applies_to": "all",
+              "edition": "2015",
+              "effective": "2019-01-01"
+            }
+          ],
+          "upcoming": [],
+          "pending": "2024 NC Building Code (2021 IBC) adopted; takes effect 12 months after OSFM certification under S.L. 2025-2; not yet certified.",
+          "scope": null,
+          "citation": "N.C.G.S. 143-138; 2018 North Carolina State Building Code: Building Code (Office of State Fire Marshal)",
+          "source_url": "https://www.ncosfm.gov/codes/codes-current-and-past",
+          "verified_by": null,
+          "verified_on": null,
+          "family": "IBC",
+          "review": "conflict"
+        },
+        "ND": {
+          "name": "North Dakota",
+          "status": "limited",
+          "editions": [
+            {
+              "applies_to": "all",
+              "edition": "2024",
+              "effective": "2026-01-01"
+            }
+          ],
+          "upcoming": [],
+          "pending": null,
+          "scope": "Applies only where a city, county or township elects to enforce a building code; the state does not enforce it.",
+          "citation": "N.D.C.C. ch. 54-21.3 (North Dakota State Building Code), Dept. of Commerce, Division of Community Services",
+          "source_url": "https://www.commerce.nd.gov/community-services/building-codes",
+          "verified_by": null,
+          "verified_on": null,
+          "family": "IBC",
+          "review": null
+        },
+        "OH": {
+          "name": "Ohio",
+          "status": "statewide-amended",
+          "editions": [
+            {
+              "applies_to": "all",
+              "edition": "2021",
+              "effective": "2024-03-01"
+            }
+          ],
+          "upcoming": [],
+          "pending": null,
+          "scope": null,
+          "citation": "Ohio Adm. Code 4101:1-1-01 (2024 Ohio Building Code), Board of Building Standards",
+          "source_url": "https://codes.ohio.gov/ohio-administrative-code/rule-4101:1-1-01",
+          "verified_by": null,
+          "verified_on": null,
+          "family": "IBC",
+          "review": null
+        },
+        "OK": {
+          "name": "Oklahoma",
+          "status": "statewide-amended",
+          "editions": [
+            {
+              "applies_to": "all",
+              "edition": "2024",
+              "effective": "2026-09-14"
+            }
+          ],
+          "upcoming": [],
+          "pending": null,
+          "scope": null,
+          "citation": "OAC 748:20-2-1 to -40 (OUBCC adoption of IBC 2024), 43 Ok Reg No. 20; 59 O.S. 1000.23",
+          "source_url": "https://oklahoma.gov/content/dam/ok/en/oubcc/documents/rules/2026%2009%2014%20IBC%202024%20Permanent%20Rule.pdf",
+          "verified_by": null,
+          "verified_on": null,
+          "family": "IBC",
+          "review": null
+        },
+        "OR": {
+          "name": "Oregon",
+          "status": "statewide-amended",
+          "editions": [
+            {
+              "applies_to": "all",
+              "edition": "2024",
+              "effective": "2025-10-01"
+            }
+          ],
+          "upcoming": [],
+          "pending": null,
+          "scope": null,
+          "citation": "2025 Oregon Structural Specialty Code (OAR ch. 918, div. 460), Building Codes Division",
+          "source_url": "https://www.oregon.gov/bcd/codes-stand/pages/commercial-structures.aspx",
+          "verified_by": null,
+          "verified_on": null,
+          "family": "IBC",
+          "review": null
+        },
+        "PA": {
+          "name": "Pennsylvania",
+          "status": "statewide-amended",
+          "editions": [
+            {
+              "applies_to": "all",
+              "edition": "2021",
+              "effective": "2026-01-01"
+            }
+          ],
+          "upcoming": [],
+          "pending": null,
+          "scope": null,
+          "citation": "34 Pa. Code 403.21(a)(1) (Uniform Construction Code), amended 55 Pa.B. 7701",
+          "source_url": "https://www.pacodeandbulletin.gov/Display/pacode?file=/secure/pacode/data/034/chapter403/s403.21.html",
+          "verified_by": null,
+          "verified_on": null,
+          "family": "IBC",
+          "review": null
+        },
+        "RI": {
+          "name": "Rhode Island",
+          "status": "statewide-amended",
+          "editions": [
+            {
+              "applies_to": "all",
+              "edition": "2021",
+              "effective": "2025-12-01"
+            }
+          ],
+          "upcoming": [],
+          "pending": null,
+          "scope": null,
+          "citation": "510-RICR-00-00-1 (SBC-1, Rhode Island Building Code)",
+          "source_url": "https://rules.sos.ri.gov/Regulations/part/510-00-00-1",
+          "verified_by": null,
+          "verified_on": null,
+          "family": "IBC",
+          "review": null
+        },
+        "SC": {
+          "name": "South Carolina",
+          "status": "statewide-amended",
+          "editions": [
+            {
+              "applies_to": "all",
+              "edition": "2021",
+              "effective": "2023-01-01"
+            }
+          ],
+          "upcoming": [
+            {
+              "applies_to": "all",
+              "edition": "2024",
+              "effective": "2027-01-01"
+            }
+          ],
+          "pending": null,
+          "scope": null,
+          "citation": "S.C. Code 6-9-50; LLR Building Codes Council adoption of the 2021 South Carolina Building Codes",
+          "source_url": "https://llr.sc.gov/bcc/BCAdoption.aspx",
+          "verified_by": null,
+          "verified_on": null,
+          "family": "IBC",
+          "review": null
+        },
+        "SD": {
+          "name": "South Dakota",
+          "status": "limited",
+          "editions": [
+            {
+              "applies_to": "all",
+              "edition": "2024",
+              "effective": "2026-07-01"
+            }
+          ],
+          "upcoming": [],
+          "pending": null,
+          "scope": "Statewide design standard for non-residential buildings; locals may adopt and amend it; no state plan review or inspection.",
+          "citation": "SDCL 11-10-5 and 11-10-6 (2024 IBC), as amended by SL 2026, ch 59, 1-2",
+          "source_url": "https://sdlegislature.gov/Statutes/11-10",
+          "verified_by": null,
+          "verified_on": null,
+          "family": "IBC",
+          "review": null
+        },
+        "TN": {
+          "name": "Tennessee",
+          "status": "statewide-amended",
+          "editions": [
+            {
+              "applies_to": "all",
+              "edition": "2021",
+              "effective": "2025-04-17"
+            }
+          ],
+          "upcoming": [],
+          "pending": null,
+          "scope": "State minimum code; local governments that adopt and enforce their own codes under T.C.A. 68-120-101 may be exempt.",
+          "citation": "Tenn. Comp. R. & Regs. 0780-02-02-.01 (State Fire Marshal minimum codes: 2021 IBC with state amendments)",
+          "source_url": "https://www.tn.gov/commerce/fire/codes-enforcement/history.html",
+          "verified_by": null,
+          "verified_on": null,
+          "family": "IBC",
+          "review": null
+        },
+        "TX": {
+          "name": "Texas",
+          "status": "limited",
+          "editions": [
+            {
+              "applies_to": "all",
+              "edition": "2012",
+              "effective": "2022-01-01"
+            }
+          ],
+          "upcoming": [],
+          "pending": null,
+          "scope": "Municipal commercial building code only (inside cities); cities may adopt later editions and local amendments. No county code.",
+          "citation": "Tex. Local Gov't Code 214.216 (IBC as it existed May 1, 2012, municipal commercial building code)",
+          "source_url": "https://capitol.texas.gov/tlodocs/87R/billtext/html/HB00738F.HTM",
+          "verified_by": null,
+          "verified_on": null,
+          "family": "IBC",
+          "review": null
+        },
+        "UT": {
+          "name": "Utah",
+          "status": "statewide-amended",
+          "editions": [
+            {
+              "applies_to": "all",
+              "edition": "2024",
+              "effective": "2026-07-01"
+            }
+          ],
+          "upcoming": [],
+          "pending": null,
+          "scope": null,
+          "citation": "Utah Code 15A-2-103(1)(a) (State Construction Code: 2024 IBC incl. App. C and J), amended by Title 15A Ch. 3-4",
+          "source_url": "https://le.utah.gov/xcode/Title15A/Chapter2/15A-2-S103.html",
+          "verified_by": null,
+          "verified_on": null,
+          "family": "IBC",
+          "review": null
+        },
+        "VT": {
+          "name": "Vermont",
+          "status": "statewide-amended",
+          "editions": [
+            {
+              "applies_to": "all",
+              "edition": "2021",
+              "effective": "2025-11-04"
+            }
+          ],
+          "upcoming": [],
+          "pending": null,
+          "scope": "Applies to 'public buildings' (commercial, multifamily, rentals); owner-occupied single-family homes are excluded.",
+          "citation": "Vermont Fire & Building Safety Code 2025 (Div. of Fire Safety rule; adopts 2021 IBC/IEBC), under 20 V.S.A. ch. 173",
+          "source_url": "https://firesafety.vermont.gov/sites/firesafety/files/Rules/2025%20Vermont%20Fire%20%26%20Building%20Safety%20Code.pdf",
+          "verified_by": null,
+          "verified_on": null,
+          "family": "IBC",
+          "review": null
+        },
+        "VA": {
+          "name": "Virginia",
+          "status": "statewide-amended",
+          "editions": [
+            {
+              "applies_to": "all",
+              "edition": "2021",
+              "effective": "2024-01-18"
+            }
+          ],
+          "upcoming": [],
+          "pending": "2024 USBC cycle in progress (BHCD proposals 2026-05); no proposed/final regulation or effective date yet.",
+          "scope": null,
+          "citation": "13VAC5-63-10 (Virginia Construction Code, USBC Part I, Section 101.2: 2021 IBC with Virginia amendments)",
+          "source_url": "https://law.lis.virginia.gov/admincodefull/title13/agency5/chapter63/",
+          "verified_by": null,
+          "verified_on": null,
+          "family": "IBC",
+          "review": null
+        },
+        "WA": {
+          "name": "Washington",
+          "status": "statewide-amended",
+          "editions": [
+            {
+              "applies_to": "all",
+              "edition": "2021",
+              "effective": "2024-03-15"
+            }
+          ],
+          "upcoming": [],
+          "pending": "2024 IBC (WAC 51-50): CR-102 filed 2026-05-06, final adoption targeted 2026-10-16; SBCC says effective 2027-05-03.",
+          "scope": null,
+          "citation": "WAC 51-50-003 (State Building Code: 2021 International Building Code incl. Appendix E, with WA amendments)",
+          "source_url": "https://app.leg.wa.gov/wac/default.aspx?cite=51-50-003",
+          "verified_by": null,
+          "verified_on": null,
+          "family": "IBC",
+          "review": null
+        },
+        "WV": {
+          "name": "West Virginia",
+          "status": "limited",
+          "editions": [
+            {
+              "applies_to": "all",
+              "edition": "2018",
+              "effective": "2022-08-01"
+            }
+          ],
+          "upcoming": [],
+          "pending": "87CSR4 update 'In Progress' at the Secretary of State (2024 I-codes per a city ordinance); no register effective date found.",
+          "scope": "State Building Code applies only where a city or county adopts it by ordinance; elsewhere no building code.",
+          "citation": "W. Va. Code R. 87-4-4.1.a (State Building Code: 2018 IBC with exceptions); 87-4-7 adoption by local jurisdiction",
+          "source_url": "https://apps.sos.wv.gov/adlaw/csr/rule.aspx?rule=87-04",
+          "verified_by": null,
+          "verified_on": null,
+          "family": "IBC",
+          "review": "conflict"
+        },
+        "WI": {
+          "name": "Wisconsin",
+          "status": "statewide-amended",
+          "editions": [
+            {
+              "applies_to": "all",
+              "edition": "2021",
+              "effective": "2025-09-01"
+            }
+          ],
+          "upcoming": [],
+          "pending": null,
+          "scope": "Commercial Building Code covers public buildings and places of employment (incl. multifamily); not 1-2 family dwellings.",
+          "citation": "Wis. Admin. Code SPS 361.05(1) (Commercial Building Code: IBC 2021 as modified by SPS 361-366)",
+          "source_url": "https://docs.legis.wisconsin.gov/document/administrativecode/SPS%20361.05",
+          "verified_by": null,
+          "verified_on": null,
+          "family": "IBC",
+          "review": null
+        },
+        "WY": {
+          "name": "Wyoming",
+          "status": "limited",
+          "editions": [
+            {
+              "applies_to": "all",
+              "edition": "2024",
+              "effective": "2024-06-26"
+            }
+          ],
+          "upcoming": [],
+          "pending": null,
+          "scope": "State code via fire marshal plan review for public, school, assembly, multi-story and >5,000 sq ft buildings; local codes elsewhere.",
+          "citation": "041-1 Wyo. Code R. 1-2(a)(i) (Council on Fire Prevention and Electrical Safety: 2024 IBC), W.S. 35-9-108 plan review",
+          "source_url": "https://wsfm.wyo.gov/fire-prevention/plan-review",
+          "verified_by": null,
+          "verified_on": null,
+          "family": "IBC",
+          "review": null
+        },
+        "DC": {
+          "name": "District of Columbia",
+          "status": "statewide-amended",
+          "editions": [
+            {
+              "applies_to": "all",
+              "edition": "2015",
+              "effective": "2020-05-29"
+            }
+          ],
+          "upcoming": [],
+          "pending": "Next DC Construction Codes (2024 ICC base per secondary report) in development; no DC Register final rule or effective date.",
+          "scope": null,
+          "citation": "12-A DCMR (2017 DC Building Code Supplement to the 2015 IBC), 2017 DC Construction Codes",
+          "source_url": "https://dob.dc.gov/node/1615636",
+          "verified_by": null,
+          "verified_on": null,
+          "family": "IBC",
           "review": null
         }
       }

@@ -846,7 +846,7 @@
       "citation": "SDCL 11-10-12 (municipal adoption of the 2024 IRC), as amended by SL 2026, ch 59, 4",
       "citation_primary": true,
       "source_url": "https://sdlegislature.gov/Statutes/11-10",
-      "draft_note": "SOURCES CONFLICT (mild): ICC Apr 2026 chart shows IRC 21; state law since SL 2026 ch 59 names the 2024 IRC (was 2021 under SL 2022 ch 35). Read SDCL 11-10-12 via the legislature API: municipality 'may' adopt the 2024 IRC, may amend, may not require sprinklers or be more stringent than the 2024 IRC. SL 2026 effective date assumed 2026-07-01 (SD default), not confirmed. Counties not named in 11-10-12. Locals with older ordinances (e.g., 2021 IRC) may not have updated.",
+      "draft_note": "ICC chart lag, not a conflict: ICC Apr 2026 chart shows IRC 21; state law since SL 2026 ch 59 names the 2024 IRC (was 2021 under SL 2022 ch 35). Read SDCL 11-10-12 via the legislature API: municipality 'may' adopt the 2024 IRC, may amend, may not require sprinklers or be more stringent than the 2024 IRC. SL 2026 effective date assumed 2026-07-01 (SD default), not confirmed. Counties not named in 11-10-12. Locals with older ordinances (e.g., 2021 IRC) may not have updated.",
       "verified_by": null,
       "verified_on": null,
       "icc_2026_10_20": "ICC chart (Apr 2026, MiTek copy): IRC 21. ICC SD page: state adopts IBC and IPMC; no IRC mention."

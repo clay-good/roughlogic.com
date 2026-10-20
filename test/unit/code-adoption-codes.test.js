@@ -12,16 +12,18 @@ const okRow = (over = {}) => ({
   verified_on: null, verified_by: null, ...over,
 });
 
-test("building codes: six rows files exist and pass; the IRC has all 51 drafted, unsigned; the NEC rows are unchanged by them", () => {
+test("building codes: six rows files exist and pass; the IRC and IBC have all 51 drafted, unsigned; the NEC rows are unchanged by them", () => {
   for (const c of BUILDING_CODES) {
     const doc = loadCodeRows(c);
     assert.ok(doc, c);
     assert.deepEqual(validateCodeRows(c, doc, TODAY).errors, [], c);
   }
   const shards = buildCodeShards(Object.fromEntries(BUILDING_CODES.map((c) => [c, loadCodeRows(c)])));
-  assert.deepEqual(Object.keys(shards), ["IRC"], "only the IRC has drafted rows (IRC first, spec-v1974)");
-  assert.equal(Object.keys(shards.IRC.by_state).length, 51);
-  assert.ok(Object.values(loadCodeRows("IRC").rows).every((r) => r.verified_by === null && r.verified_on === null), "a person signs a row, never the drafter");
+  assert.deepEqual(Object.keys(shards), ["IRC", "IBC"], "the IRC and then the IBC have drafted rows (spec-v1974 order)");
+  for (const c of ["IRC", "IBC"]) {
+    assert.equal(Object.keys(shards[c].by_state).length, 51, c);
+    assert.ok(Object.values(loadCodeRows(c).rows).every((r) => r.verified_by === null && r.verified_on === null), c + ": a person signs a row, never the drafter");
+  }
   const withCodes = buildCodeAdoptionShard(loadRows(), TODAY);
   const necOnly = buildCodeAdoptionShard(loadRows(), TODAY, {});
   assert.equal("codes" in necOnly, false);

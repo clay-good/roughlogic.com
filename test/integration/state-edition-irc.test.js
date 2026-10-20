@@ -16,3 +16,13 @@ test("an IRC calculator prints the chosen state's IRC edition, labeled not verif
   await select.selectOption("HI");
   await expect(lines.filter({ hasText: "the sources we found disagree about which IRC edition Hawaii enforces" })).toHaveCount(1);
 });
+
+test("an IBC calculator prints the chosen state's IBC edition", async ({ page }) => {
+  await page.goto("/index.html#allowable-area");
+  const select = page.locator("#rl-state-select");
+  await expect(select).toBeAttached({ timeout: 20000 });
+  await page.getByText("Details, formula, and sources").click();
+  await select.selectOption("OK");
+  const lines = page.locator(".v6-reference-row-state .state-edition-line");
+  await expect(lines.filter({ hasText: "Oklahoma enforces IBC 2024 (since Sep 14, 2026), with state amendments." })).toHaveCount(1);
+});
