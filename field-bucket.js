@@ -21,7 +21,7 @@
 // gzips to 31.7 KB as a single shard. Split in two it is well under the cap.
 // 2026-09-30: four shards -- the disaster response bands pushed e-1 to
 // 24.2 KB gzip, over the 24 KB cap.
-export const SPLIT_GROUPS = { e: 4 };
+export const SPLIT_GROUPS = { e: 5 };
 
 const A = "a".charCodeAt(0);
 

@@ -1517,6 +1517,8 @@ const _TILES = [
   ["conduit-concentric-bend", "A"],
   // spec-v1981: bathroom and kitchen exhaust fan sizing (calc-hvacservice.js).
   ["bath-exhaust-fan-sizing", "C"],
+  // spec-v1982: safety glazing hazardous location check (calc-construction.js).
+  ["safety-glazing-check", "E"],
 ];
 
 

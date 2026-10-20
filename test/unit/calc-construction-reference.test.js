@@ -539,3 +539,23 @@ test("vapor barrier: the seam tape is the strip run, one strip longer than the t
   within(r.seam_tape_lf, 600, 1e-9, "the documented upper bound");
   within(r.seam_tape_lf - 100, 5 * 100, 1e-9, "one strip run over the taped seams");
 });
+
+// spec-v1982: R324.4.3 is a conjunction of four conditions and R324.4.5 of two. Sample the
+// input space on a grid around each line and hold the compute to the plain-language rule.
+import { computeSafetyGlazingCheck } from "../../calc-construction.js";
+test("safety-glazing-check: across a grid of windows, hazardous exactly when all four R324.4.3 conditions hold", () => {
+  let checked = 0;
+  for (const area_sqft of [8, 9, 9.01, 12]) for (const bottom_in of [0, 17.9, 18, 24]) for (const top_in of [30, 36, 36.1, 80]) for (const distance_in of [0, 36, 36.1, 60]) {
+    if (top_in <= bottom_in) continue;
+    const r = computeSafetyGlazingCheck({ location: "window", area_sqft, bottom_in, top_in, distance_in });
+    assert.equal(r.hazardous, area_sqft > 9 && bottom_in < 18 && top_in > 36 && distance_in <= 36, JSON.stringify({ area_sqft, bottom_in, top_in, distance_in }));
+    checked++;
+  }
+  assert.ok(checked > 200);
+});
+test("safety-glazing-check: near water, hazardous exactly when the bottom is under 60 in and it is not more than 60 in from the edge", () => {
+  for (const bottom_in of [0, 59.9, 60, 72]) for (const distance_in of [0, 60, 60.1, 90]) {
+    const r = computeSafetyGlazingCheck({ location: "wet", bottom_in, distance_in });
+    assert.equal(r.hazardous, bottom_in < 60 && distance_in <= 60);
+  }
+});

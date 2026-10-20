@@ -26713,6 +26713,18 @@ export const CITATIONS = {
       { name: "Rated at 0.25 in wc", value: "compare the fan's listed rate at 0.25 in wc, not its free-air rate", source: "IRC 2024 M1505.5" },
     ],
   },
+  "safety-glazing-check": {
+    formula: "R324.4.1 door panel: always (exceptions: 3 in sphere, decorative); R324.4.2 beside a door: bottom < 60 in AND within 24 in AND (in the door's plane OR hinge side of an in-swinging door); R324.4.3 window: area > 9 sq ft AND bottom < 18 in AND top > 36 in AND walking surface <= 36 in; R324.4.4 guard: always; R324.4.5 wet: bottom < 60 in AND <= 60 in from the water's edge; R324.4.6 stair or ramp: bottom < 36 in AND < 36 in horizontally; R324.4.7 bottom landing: < 36 in up AND within a 60 in arc of the bottom nosing.",
+    edition: IRC_2024 + " Sections R324.4.1 through R324.4.7 and R324.1 (R308.4.1 through R308.4.7 and R308.1 in IRC 2021), both read at codes.iccsafe.org on 2026-10-19: the criteria are the same, only the section numbers moved.",
+    freeAccess: "Free to read at codes.iccsafe.org.",
+    governance: GOVERNANCE.structural,
+    editionNote: "IRC 2024 moved glazing from Section R308 to R324. Exceptions: R324.4.1 a glazed opening a 3 in sphere cannot pass, decorative glazing; R324.4.2 decorative glazing, an intervening wall or permanent barrier, a door to a closet or storage area 3 ft deep or less (the glazing then follows R324.4.3), glazing adjacent to the fixed panel of a patio door; R324.4.3 decorative glazing, a horizontal rail 34 to 38 in above the walking surface carrying 50 plf without touching the glass and at least 1-1/2 in tall, an outboard insulating-glass pane 25 ft or more above the surface outside; R324.4.6 the same rail, or glazing 36 in or more horizontally from the walking surface; R324.4.7 a guard complying with R321 with the glass more than 18 in behind it. Each pane in a hazardous location needs a manufacturer's designation visible in the installation (R324.1). IRC 2027 is expected in early 2027; verify the edition adopted by your AHJ.",
+    assumptions: [
+      { name: "One location at a time", value: "a lite that sits in two locations (beside a door and near a tub) is checked under each", source: "stated assumption" },
+      { name: "Exceptions asserted by the reader", value: "the tile does not judge whether glazing is decorative or a barrier is permanent", source: "stated assumption" },
+      { name: "Residential code only", value: "the IBC Section 2406.4 locations are not checked here", source: "stated scope" },
+    ],
+  },
 };
 
 // --- Reference block and copy text ---

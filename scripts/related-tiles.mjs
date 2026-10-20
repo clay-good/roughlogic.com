@@ -2422,6 +2422,8 @@ const RELATED = {
   "conduit-concentric-bend": ["conduit-segment-bend","conduit-90-stub","conduit-offset","conduit-saddle"],
   // spec-v1981: bathroom and kitchen exhaust fan sizing (calc-hvacservice.js).
   "bath-exhaust-fan-sizing": ["ashrae-622-ventilation","dryer-duct-length","duct-friction-static","kitchen-makeup-air-deficit"],
+  // spec-v1982: safety glazing hazardous location check (calc-construction.js).
+  "safety-glazing-check": ["egress-window-check","guard-handrail-check","glass-thickness-wind","stair-code-check"],
 };
 
 export { RELATED };

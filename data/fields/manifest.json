@@ -29,22 +29,22 @@
     {
       "file": "e-1.json",
       "name": "Field descriptors, e-1 runtime shard (generated)",
-      "gzip_size_bytes": 23620
+      "gzip_size_bytes": 21863
     },
     {
       "file": "e-2.json",
       "name": "Field descriptors, e-2 runtime shard (generated)",
-      "gzip_size_bytes": 9433
+      "gzip_size_bytes": 7995
     },
     {
       "file": "e-3.json",
       "name": "Field descriptors, e-3 runtime shard (generated)",
-      "gzip_size_bytes": 24359
+      "gzip_size_bytes": 13605
     },
     {
       "file": "e-4.json",
       "name": "Field descriptors, e-4 runtime shard (generated)",
-      "gzip_size_bytes": 5218
+      "gzip_size_bytes": 20064
     },
     {
       "file": "f.json",
@@ -132,10 +132,10 @@
     "b.json": "22f8b4ce0ee2013dc3230fd426fc62f66634e899969617a770e9bc8d836f5bf7",
     "c.json": "c691b669452368712c6108a03f8d5b14425d23459b84b2711db0bdd93be0a01b",
     "d.json": "59349bcec05709b2f5bc961d185a396bb312c92c290d0d33fc654782f556dc8d",
-    "e-1.json": "d98810cad35f630d8ab470d4de5eb664574bbbe695ceec396da127a7f812cd8f",
-    "e-2.json": "e56cddd3f9320d4efbfcacbbbca54dd02760c57dfa572c122979127c55ba2061",
-    "e-3.json": "30da0a567fb9047b9dcea929d7c939f62d7988afb717b8d00e65a71bb55e3424",
-    "e-4.json": "5aed542018ad7e6b41e79a673bec52873be2df997f6e3791e75d4d1d1da868ea",
+    "e-1.json": "bfb4c39afc29aefd28e27ed2540ebcaa8b6ce2b9dada70e310f7a48044f3b168",
+    "e-2.json": "da224b7181e7117d175e48135d5ebe48757877d160079fed9f2b6311beaee1e1",
+    "e-3.json": "000a460c9550b1a69c0d5ebdb26940977b3967459dd43ea49c619146c49ec1d0",
+    "e-4.json": "59aa4bd4bad913c2bd260555a3a3f3ffe22acc0231ce8a53b8158958fdafec07",
     "f.json": "d744f157e97db499fe16839b69fe2ce7786e19db4a4996305f8b72cce309369a",
     "g.json": "7f1b4ef4f9d359d1b13a5e19d68ef4a72c8e20f72f57359b3215ed2ca70b8425",
     "h.json": "492450310773cfd07c08de94568b08c9d15638251c728b0e70a001aa7fc85358",

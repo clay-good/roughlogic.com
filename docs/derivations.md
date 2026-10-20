@@ -1761,6 +1761,7 @@ cross-check.
 | calc-construction.js | `computeRoofPitch` | `{ rise = null, run = 12, mode = "rise_run" }` | _ | _ | _ |
 | calc-construction.js | `computeRoofUnderlaymentRolls` | `{ roof_area_sf = 2500, roll_coverage_sf = 1000, lap_waste_pct = 10 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeRoofingSquares` | `{ roof_area_ft2 = 0, pitch_rise = 0, shingle_product = "architectural", perim...` | _ | _ | _ |
+| calc-construction.js | `computeSafetyGlazingCheck` | `{ location = "window", area_sqft, bottom_in, top_in, distance_in, door_relati...` | _ | _ | _ |
 | calc-construction.js | `computeScaffoldGuardrailCheck` | `{ top_rail_height_in = 0, midrail_height_in = 0, toeboard_height_in = 0, topr...` | _ | _ | _ |
 | calc-construction.js | `computeScaffoldLegLoad` | `{ platform_dead_lb = 100, num_workers = 2, worker_lb = 250, material_lb = 500...` | _ | _ | _ |
 | calc-construction.js | `computeScaffoldMudsillBearing` | `{ leg_load_lb = 0, plank_width_in = 0, plank_length_in = 0, allowable_psf = 0...` | _ | _ | _ |
@@ -3942,7 +3943,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2526.
+Row count: 2527.
 
 <!-- END function-corpus-v14 -->
 
@@ -4730,7 +4731,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-extraction-rate` | Water Extraction Volume, Time, and Waste-Tank Dumps | Project (first-principles); standing + absorbed; wand time = total / gpm | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+4 more) |
 
-### Group E Construction (631 tiles)
+### Group E Construction (632 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -5155,6 +5156,7 @@ per spec-v14 §13.1 second paragraph.
 | `rtk-error-budget` | RTK Baseline Error Budget and Vertical Uncertainty | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `rusle-soil-loss` | RUSLE Annual Soil Loss | RUSLE (USDA Agriculture Handbook 703); A = 150*0.32*1.5*1.0*1.0 = 72 tons/acre/yr; site = 72*5 =... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `safe-room-capacity` | Storm Safe Room Occupant Capacity | FEMA; Part B, Section B5.2.1 usable floor area example (955 occ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
+| `safety-glazing-check` | Safety Glazing Hazardous Location Check (IRC R324.4) | ICC; R324.4.3: a 12 sq ft pane, bottom 12 in, top 70 in, a wal... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `sag-vertical-curve` | Sag Vertical Curve Length for Headlight SSD (AASHTO) | AASHTO Green Book (sag headlight crit...; spec-v636 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `sag-vertical-curve-comfort` | Sag Vertical Curve Comfort and Drainage (AASHTO) | AASHTO Green Book (sag comfort criter...; spec-v638 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `scaffold-guardrail-check` | Scaffold Guardrail System Check (OSHA 1926.451(g)(4)) | Occupational Safety and Health Admini...; 'The top edge height of toprails... shall be between 38 i... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -6387,6 +6389,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 
-Tile count: 2272. Fixture-covered or reference-cadence: 2272 / 2272.
+Tile count: 2273. Fixture-covered or reference-cadence: 2273 / 2273.
 
 <!-- END tile-index-v14 -->

@@ -2276,4 +2276,5 @@ export const TOOLS = [
   {"id":"conduit-segment-bend","name":"Conduit Segment Bend Layout","group":"A","trades":["electrical"],"desc":"How to lay out a large-radius conduit sweep as a segment bend: many small shots, equally spaced along the arc.","more":1},
   {"id":"conduit-concentric-bend","name":"Concentric Conduit Bend Radii and Lengths","group":"A","trades":["electrical"],"desc":"The radius, arc length, mark spacing and extra stock for each conduit in a rack bent concentrically around one corner.","more":1},
   {"id":"bath-exhaust-fan-sizing","name":"Bathroom and Kitchen Exhaust Fan Sizing","group":"C","trades":["hvac","electrical"],"desc":"What size bath fan a bathroom needs, and the code floor for a kitchen.","more":1},
+  {"id":"safety-glazing-check","name":"Safety Glazing Hazardous Location Check (IRC R324.4)","group":"E","trades":["glazing","carpentry","construction"],"desc":"Whether a lite of glass is in a hazardous location and so must be safety glazing, by the seven locations of IRC 2024 R324.4 (R308.4 in IRC 2021, the same criteria).","more":1},
 ];

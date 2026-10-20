@@ -62244,3 +62244,39 @@ test("bounds: spec-v1981 computeBathExhaustFanSizing pins the Table M1505.5 floo
     assert.ok("error" in _bef(bad), JSON.stringify(bad));
   }
 });
+
+// spec-v1982: IRC 2024 R324.4 (R308.4 in 2021) hazardous glazing locations, read 2026-10-19.
+import { computeSafetyGlazingCheck as _sgc } from "../../calc-construction.js";
+test("bounds: spec-v1982 computeSafetyGlazingCheck pins each location's thresholds, the all-four window rule, the exceptions and the error seams", () => {
+  const w = { location: "window", area_sqft: 12, bottom_in: 12, top_in: 70, distance_in: 24 };
+  assert.equal(_sgc(w).hazardous, true);
+  // Each of the four window conditions, failed alone at its exact line, clears the pane.
+  assert.equal(_sgc({ ...w, area_sqft: 9 }).hazardous, false);
+  assert.equal(_sgc({ ...w, bottom_in: 18 }).hazardous, false);
+  assert.equal(_sgc({ ...w, top_in: 36 }).hazardous, false);
+  assert.equal(_sgc({ ...w, distance_in: 36 }).hazardous, true, "within 36 in includes 36");
+  assert.equal(_sgc({ ...w, distance_in: 36.01 }).hazardous, false);
+  assert.equal(_sgc({ ...w, exception: "rail" }).hazardous, false);
+  assert.equal(_sgc({ location: "door" }).hazardous, true);
+  assert.equal(_sgc({ location: "door", exception: "sphere_3in" }).excepted, true);
+  assert.equal(_sgc({ location: "guard" }).hazardous, true);
+  const d = { location: "adjacent_door", bottom_in: 20, distance_in: 24 };
+  assert.equal(_sgc(d).hazardous, true);
+  assert.equal(_sgc({ ...d, door_relation: "hinge_wall" }).hazardous, true);
+  assert.equal(_sgc({ ...d, door_relation: "other" }).hazardous, false);
+  assert.equal(_sgc({ ...d, bottom_in: 60 }).hazardous, false);
+  assert.equal(_sgc({ ...d, distance_in: 24.5 }).hazardous, false);
+  // A closet door hands the lite to the window rule.
+  assert.equal(_sgc({ ...d, bottom_in: 12, exception: "closet", area_sqft: 12, top_in: 70 }).hazardous, true);
+  assert.equal(_sgc({ ...d, bottom_in: 12, exception: "closet", area_sqft: 8, top_in: 70 }).hazardous, false);
+  assert.equal(_sgc({ location: "wet", bottom_in: 59.9, distance_in: 60 }).hazardous, true);
+  assert.equal(_sgc({ location: "wet", bottom_in: 24, distance_in: 60.1 }).hazardous, false);
+  assert.equal(_sgc({ location: "stair", bottom_in: 35.9, distance_in: 35.9 }).hazardous, true);
+  assert.equal(_sgc({ location: "stair", bottom_in: 35.9, distance_in: 36 }).hazardous, false, "36 in or more away is excepted");
+  assert.equal(_sgc({ location: "bottom_landing", bottom_in: 30, distance_in: 60 }).hazardous, true);
+  assert.equal(_sgc({ location: "bottom_landing", bottom_in: 36, distance_in: 30 }).hazardous, false, "the bottom landing line is 36 in, not 60");
+  assert.equal(_sgc({ location: "bottom_landing", bottom_in: 30, distance_in: 30, exception: "guard_18in" }).hazardous, false);
+  for (const bad of [{ ...w, area_sqft: undefined }, { ...w, top_in: 10 }, { ...w, bottom_in: -1 }, { ...w, exception: "guard_18in" }, { location: "wet", bottom_in: 24 }, { location: "attic" }, { ...d, door_relation: "latch" }, { ...w, area_sqft: "x" }, { ...d, exception: "closet" }, { exception: "toString" }, { location: "constructor" }]) {
+    assert.ok("error" in _sgc(bad), JSON.stringify(bad));
+  }
+});

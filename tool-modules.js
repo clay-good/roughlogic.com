@@ -619,6 +619,7 @@ export const TOOL_MODULES = (() => {
     "wind-solid-sign",
     // spec-v553
     "snow-unbalanced-gable",
+    "safety-glazing-check",
   ]);
   // spec-v1871 cap-relief split: the specialty-building and temporary-works
   // tail moved intact from calc-construction.js. All 11 tiles keep Group E

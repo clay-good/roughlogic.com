@@ -2,11 +2,11 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "96d4ab88a718238f",
+      "sha": "b588a50c48bfa7cc",
       "date": "2026-10-20"
     },
     "/tools/": {
-      "sha": "14bcb448b9db49a5",
+      "sha": "b62900e41aa7b031",
       "date": "2026-10-20"
     },
     "/errata/": {
@@ -14,91 +14,91 @@
       "date": "2026-10-18"
     },
     "/collections/disaster-response/": {
-      "sha": "d38a8114e74315d2",
+      "sha": "b22569d09aab0f55",
       "date": "2026-10-20"
     },
     "/groups/accounting/": {
-      "sha": "d0504049af3142cb",
+      "sha": "b442d02cd96f6aa2",
       "date": "2026-10-20"
     },
     "/groups/agriculture/": {
-      "sha": "da213c7fe1e8aa90",
+      "sha": "91715a947c048331",
       "date": "2026-10-20"
     },
     "/groups/construction/": {
-      "sha": "5a9585beb8f3911b",
+      "sha": "5cc11efbc46f1ddf",
       "date": "2026-10-20"
     },
     "/groups/cross-trade/": {
-      "sha": "e005f166907c60a0",
+      "sha": "b09cbfa6c5b459d1",
       "date": "2026-10-20"
     },
     "/groups/educators/": {
-      "sha": "1115df4bb490b220",
+      "sha": "4fba6e33fba54808",
       "date": "2026-10-20"
     },
     "/groups/electrical/": {
-      "sha": "f01ee89e5771b9bd",
+      "sha": "4f69c4c141d0e9a7",
       "date": "2026-10-20"
     },
     "/groups/field/": {
-      "sha": "a44975e802090688",
+      "sha": "2f0f69a00772eac8",
       "date": "2026-10-20"
     },
     "/groups/fire-ground/": {
-      "sha": "546288ad794236db",
+      "sha": "6834165acca2485b",
       "date": "2026-10-20"
     },
     "/groups/historical/": {
-      "sha": "6cf8323d3b78854a",
+      "sha": "bb3016cd4d2a1418",
       "date": "2026-10-20"
     },
     "/groups/hvac/": {
-      "sha": "29819dbe4d6353ee",
+      "sha": "2890de8b9ae68783",
       "date": "2026-10-20"
     },
     "/groups/kitchen/": {
-      "sha": "b7f17f0fc5c80ccc",
+      "sha": "6d2c4f092c7b4023",
       "date": "2026-10-20"
     },
     "/groups/lab/": {
-      "sha": "7fb961827bb49db0",
+      "sha": "1c561d0b8f83ce67",
       "date": "2026-10-20"
     },
     "/groups/mechanic/": {
-      "sha": "2a247731e0a8f4ed",
+      "sha": "87e6b827f692f3f4",
       "date": "2026-10-20"
     },
     "/groups/plumbing/": {
-      "sha": "7f0406e582991c5d",
+      "sha": "1a0ac7c9132fc712",
       "date": "2026-10-20"
     },
     "/groups/real-estate/": {
-      "sha": "580d6c982417cbe7",
+      "sha": "0f39be739602482b",
       "date": "2026-10-20"
     },
     "/groups/references/": {
-      "sha": "25c18eaff17aec2d",
+      "sha": "c1654afd26b34e4a",
       "date": "2026-10-20"
     },
     "/groups/restoration/": {
-      "sha": "615cfac0db8e8fe5",
+      "sha": "d0498ec7ca3e3b4c",
       "date": "2026-10-20"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "964d91b08e8ac22f",
+      "sha": "c55f05a4bbc6d677",
       "date": "2026-10-20"
     },
     "/groups/stage/": {
-      "sha": "90d9217877adbe68",
+      "sha": "03c98999c9e85db2",
       "date": "2026-10-20"
     },
     "/groups/trucking/": {
-      "sha": "034e97a521512171",
+      "sha": "28d25d40ab5236c3",
       "date": "2026-10-20"
     },
     "/groups/water/": {
-      "sha": "c466df42401acea0",
+      "sha": "44374633027621a3",
       "date": "2026-10-20"
     },
     "/tools/aav-install-check/": {
@@ -3014,8 +3014,8 @@
       "date": "2026-10-17"
     },
     "/tools/fire-door-clearance/": {
-      "sha": "2e1b8b226d68d2d5",
-      "date": "2026-10-17"
+      "sha": "373c367b24424c39",
+      "date": "2026-10-20"
     },
     "/tools/fire-friction/": {
       "sha": "79986176ecb75a2c",
@@ -3498,8 +3498,8 @@
       "date": "2026-10-17"
     },
     "/tools/glass-weight/": {
-      "sha": "a9f409ac0f76defb",
-      "date": "2026-10-17"
+      "sha": "4f6b374e2fe76010",
+      "date": "2026-10-20"
     },
     "/tools/glidepath-descent-rate/": {
       "sha": "c3fe709949b6c614",
@@ -6664,6 +6664,10 @@
     "/tools/safe-room-capacity/": {
       "sha": "f459b377416f03eb",
       "date": "2026-10-17"
+    },
+    "/tools/safety-glazing-check/": {
+      "sha": "0234f1932f54c9c4",
+      "date": "2026-10-20"
     },
     "/tools/safety-valve-capacity/": {
       "sha": "f01ee38e36a38118",

@@ -1,6 +1,6 @@
 # roughlogic.com Specification v1982 -- Safety Glazing Hazardous Location Check (IRC R308.4) (`calc-construction.js`, Group E Carpentry and Construction, glazing, 1 New Tile)
 
-> **Status: PROPOSED 2026-10-19. Single-tile spec.** Part of [scope-product-expansion](scope-product-expansion.md). In scope under the
+> **Status: LANDED 2026-10-19 (proposed 2026-10-19). Single-tile spec. As built from the IRC 2024 text read on 2026-10-19: glazing is Section R324 in IRC 2024 (R308 in 2021, same criteria, also read), so the tile cites R324.4.1 through R324.4.7. The text corrects this spec's table in three places: R324.4.7 is under 36 in above the landing (not 60); R324.4.2 condition 2 is glazing on a wall less than 180 degrees from the door within 24 in of the HINGE side of an in-swinging door (there is no latch-side exception); and the R324.4.2 exceptions are decorative glazing, an intervening barrier, a closet or storage area 3 ft deep or less, and the fixed panel of a patio door. The IBC stair selector was not built: the tile is residential only.** Part of [scope-product-expansion](scope-product-expansion.md). In scope under the
 > spec-v106 trades-only charter: Group E, the IRC code-check bench in `calc-construction.js` beside `stair-code-check`,
 > `guard-handrail-check` and `egress-window-check`, no new dependency and no network call.
 >

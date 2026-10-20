@@ -172180,6 +172180,76 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "safety-glazing-check",
+  "source_publisher": "ICC",
+  "source_title": "International Residential Code 2024, Section R324.4.3, applied to the spec-v1982 window",
+  "source_edition_or_year": "IRC 2024 (codes.iccsafe.org, read 2026-10-19)",
+  "source_section_or_page": "R324.4.3: a 12 sq ft pane, bottom 12 in, top 70 in, a walking surface 24 in away meets all four conditions (over 9 sq ft, under 18 in, over 36 in, within 36 in): hazardous.",
+  "verified_by": "rl",
+  "verified_on": "2026-10-19",
+  "inputs": {
+   "location": "window",
+   "area_sqft": 12,
+   "bottom_in": 12,
+   "top_in": 70,
+   "distance_in": 24,
+   "door_relation": "plane",
+   "exception": "none"
+  },
+  "outputs": {
+   "conditions_met": {
+    "value": 4,
+    "tolerance": {
+     "abs": 0
+    }
+   },
+   "conditions_checked": {
+    "value": 4,
+    "tolerance": {
+     "abs": 0
+    }
+   },
+   "section": {
+    "value": "R324.4.3",
+    "tolerance": {
+     "abs": 0
+    }
+   }
+  }
+ },
+ {
+  "tile_id": "safety-glazing-check",
+  "source_publisher": "ICC",
+  "source_title": "International Residential Code 2024, Section R324.4.5, applied to the spec-v1982 shower lite",
+  "source_edition_or_year": "IRC 2024 (codes.iccsafe.org, read 2026-10-19)",
+  "source_section_or_page": "R324.4.5 Exception: glazing more than 60 in horizontally from the shower edge is not hazardous; a lite 24 in up and 61 in away is cleared.",
+  "verified_by": "rl",
+  "verified_on": "2026-10-19",
+  "inputs": {
+   "location": "wet",
+   "area_sqft": 1,
+   "bottom_in": 24,
+   "top_in": 40,
+   "distance_in": 61,
+   "door_relation": "plane",
+   "exception": "none"
+  },
+  "outputs": {
+   "conditions_met": {
+    "value": 1,
+    "tolerance": {
+     "abs": 0
+    }
+   },
+   "conditions_checked": {
+    "value": 2,
+    "tolerance": {
+     "abs": 0
+    }
+   }
+  }
  }
  ]
 }

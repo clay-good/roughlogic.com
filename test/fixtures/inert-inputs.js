@@ -25,6 +25,7 @@ export const INERT_INPUTS = {
   "crane-power-line-clearance::boom_length_ft": "moves the answer once another input changes (1,500 randomized settings)",
   "cylinder-storage-separation::barrier_rating_hr": "moves the answer once another input changes (1,500 randomized settings)",
   "decibel-converter::ref_type": "read only in the reference-level mode",
+  "safety-glazing-check::door_relation": "read only when the glazing is beside a door (R324.4.2)",
   "declining-balance-depreciation::sl_switch": "moves the answer once another input changes (1,500 randomized settings)",
   "depreciation-recapture::ordinary_rate_pct": "moves the answer once another input changes (1,500 randomized settings)",
   "door-clear-width::threshold_beveled": "moves the answer once another input changes (1,500 randomized settings)",

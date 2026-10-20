@@ -15401,3 +15401,135 @@ CONSTRUCTION_RENDERERS["curtain-wall-mullion-deflection"] = _simpleRenderer({
   ],
   compute: computeCurtainWallMullionDeflection,
 });
+
+// ===================== spec-v1982: safety glazing hazardous location check =====================
+// IRC 2024 R324.4 (R308.4 in IRC 2021, same criteria; both read 2026-10-19):
+// seven places a person can fall into glass, each a short list of distances.
+// The reader picks the place and gives the two or three distances it turns on.
+const _SGC_EXC = {
+  none: null,
+  sphere_3in: { label: "a 3 in sphere cannot pass the opening", where: ["door"] },
+  decorative: { label: "decorative glazing", where: ["door", "adjacent_door", "window"] },
+  barrier: { label: "an intervening wall or permanent barrier between the door and the glazing", where: ["adjacent_door"] },
+  closet: { label: "the door serves a closet or storage area 3 ft deep or less (the window rule then applies)", where: ["adjacent_door"] },
+  patio_fixed: { label: "glazing adjacent to the fixed panel of a patio door", where: ["adjacent_door"] },
+  rail: { label: "a horizontal rail 34 to 38 in above the walking surface (50 plf, 1-1/2 in tall)", where: ["window", "stair"] },
+  outboard_25ft: { label: "an outboard pane of insulating glass 25 ft or more above the surface outside", where: ["window"] },
+  guard_18in: { label: "a code guard with the glass more than 18 in behind it", where: ["bottom_landing"] },
+};
+// A distance or area: blank is "not entered" (an error only where the location needs it).
+function _sgcNum(v, what, need) {
+  if (v === undefined || v === null || v === "") return need ? { error: "Enter the " + what + "." } : { v: null };
+  const n = Number(v);
+  if (!Number.isFinite(n)) return { error: "The " + what + " must be a number." };
+  if (n < 0) return { error: "The " + what + " cannot be negative." };
+  return { v: n };
+}
+const _sgcCond = (list, label, holds) => (list.push({ label, holds }), holds);
+const _SGC_SEC = { door: "R324.4.1", adjacent_door: "R324.4.2", window: "R324.4.3", guard: "R324.4.4", wet: "R324.4.5", stair: "R324.4.6", bottom_landing: "R324.4.7" };
+
+// dims: in { location: dimensionless, area_sqft: L^2, bottom_in: L, top_in: L, distance_in: L, door_relation: dimensionless, exception: dimensionless } out: { conditions_met: dimensionless, conditions_checked: dimensionless }
+export function computeSafetyGlazingCheck({
+  location = "window", area_sqft, bottom_in, top_in, distance_in, door_relation = "plane", exception = "none",
+} = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const loc = String(location);
+  if (!Object.hasOwn(_SGC_SEC, loc)) return { error: "Location must be door, adjacent_door, window, guard, wet, stair or bottom_landing." };
+  const exKey = String(exception);
+  if (!Object.hasOwn(_SGC_EXC, exKey)) return { error: "Unknown exception." };
+  const ex = _SGC_EXC[exKey];
+  if (ex && !ex.where.includes(loc)) return { error: "That exception (" + ex.label + ") does not apply to " + _SGC_SEC[loc] + "." };
+  const rel = String(door_relation);
+  if (!["plane", "hinge_wall", "other"].includes(rel)) return { error: "Door relation must be plane, hinge_wall or other." };
+  const needs = { door: [], guard: [], adjacent_door: ["b", "d"], window: ["a", "b", "t", "d"], wet: ["b", "d"], stair: ["b", "d"], bottom_landing: ["b", "d"] };
+  const nd = needs[loc];
+  const A = _sgcNum(area_sqft, "exposed area of the pane (sq ft)", nd.includes("a")); if (A.error) return { error: A.error };
+  const B = _sgcNum(bottom_in, "bottom edge height (in)", nd.includes("b")); if (B.error) return { error: B.error };
+  const T = _sgcNum(top_in, "top edge height (in)", nd.includes("t")); if (T.error) return { error: T.error };
+  const D = _sgcNum(distance_in, "horizontal distance (in)", nd.includes("d")); if (D.error) return { error: D.error };
+  if (nd.includes("t") && T.v <= B.v) return { error: "The top edge must be above the bottom edge." };
+  const conditions = [];
+  const windowRule = () => [
+    _sgcCond(conditions, "exposed area over 9 sq ft (" + fmt(A.v, 2) + ")", A.v > 9 + 1e-9),
+    _sgcCond(conditions, "bottom edge under 18 in above the floor (" + fmt(B.v, 1) + " in)", B.v < 18 - 1e-9),
+    _sgcCond(conditions, "top edge over 36 in above the floor (" + fmt(T.v, 1) + " in)", T.v > 36 + 1e-9),
+    _sgcCond(conditions, "a walking surface within 36 in horizontally (" + fmt(D.v, 1) + " in)", D.v <= 36 + 1e-9),
+  ].every(Boolean);
+  let in_location, section = _SGC_SEC[loc];
+  if (loc === "door" || loc === "guard") {
+    in_location = _sgcCond(conditions, loc === "door" ? "glazing in a fixed or operable panel of a swinging, sliding or bifold door" : "glazing in a guard or railing, regardless of area or height", true);
+  } else if (loc === "adjacent_door") {
+    if (exKey === "closet") {
+      section = "R324.4.3 (via R324.4.2 Exception 3)";
+      if (A.v === null || T.v === null) return { error: "Glazing beside a closet door 3 ft deep or less is checked by the window rule: enter the area and top edge, and enter the distance as the distance to the nearest walking surface." };
+      if (T.v <= B.v) return { error: "The top edge must be above the bottom edge." };
+      in_location = windowRule();
+    } else {
+      const low = _sgcCond(conditions, "bottom edge under 60 in above the floor or walking surface (" + fmt(B.v, 1) + " in)", B.v < 60 - 1e-9);
+      const near = _sgcCond(conditions, "within 24 in of the door (" + fmt(D.v, 1) + " in)", D.v <= 24 + 1e-9);
+      const placed = _sgcCond(conditions, rel === "plane" ? "in the plane of the closed door, either side" : rel === "hinge_wall" ? "on a wall less than 180 degrees from the closed door, on the hinge side of an in-swinging door" : "in the door's plane, or on a wall less than 180 degrees from it on the hinge side of an in-swinging door", rel !== "other");
+      in_location = low && near && placed;
+    }
+  } else if (loc === "window") {
+    in_location = windowRule();
+  } else if (loc === "wet") {
+    const low = _sgcCond(conditions, "bottom edge under 60 in above a standing or walking surface (" + fmt(B.v, 1) + " in)", B.v < 60 - 1e-9);
+    const near = _sgcCond(conditions, "not more than 60 in horizontally from the water's edge or the shower, sauna or steam room edge (" + fmt(D.v, 1) + " in)", D.v <= 60 + 1e-9);
+    in_location = low && near;
+  } else if (loc === "stair") {
+    const low = _sgcCond(conditions, "bottom edge under 36 in above the adjacent stair, ramp or landing surface (" + fmt(B.v, 1) + " in)", B.v < 36 - 1e-9);
+    const near = _sgcCond(conditions, "less than 36 in horizontally from that walking surface (" + fmt(D.v, 1) + " in)", D.v < 36 - 1e-9);
+    in_location = low && near;
+  } else {
+    const low = _sgcCond(conditions, "glazing under 36 in above the bottom landing (bottom edge " + fmt(B.v, 1) + " in)", B.v < 36 - 1e-9);
+    const near = _sgcCond(conditions, "within the 60 in horizontal arc, less than 180 degrees, from the bottom tread nosing (" + fmt(D.v, 1) + " in)", D.v <= 60 + 1e-9);
+    in_location = low && near;
+  }
+  const excepted = in_location && !!ex && exKey !== "closet";
+  const hazardous = in_location && !excepted;
+  const failed = conditions.filter((c) => !c.holds).map((c) => c.label);
+  const verdict = hazardous
+    ? "HAZARDOUS LOCATION under " + section + ": safety glazing required (glazing that passes 16 CFR 1201 or as R324.3 allows, such as tempered or laminated glass, with the permanent identification of R324.1)"
+    : excepted
+      ? "NOT hazardous: it is in an " + section + " location, but the exception applies: " + ex.label
+      : "NOT hazardous under " + section + ": " + (failed.length ? "not met: " + failed.join("; ") : "no condition met");
+  return {
+    hazardous, in_location, excepted, section, conditions, verdict,
+    conditions_met: conditions.filter((c) => c.holds).length, conditions_checked: conditions.length,
+    note: "IRC 2024 R324.4 lists seven hazardous locations (R308.4 in IRC 2021, the same criteria). Doors (save openings a 3 in sphere cannot pass) and guards are hazardous at any size; glazing beside a door is hazardous when its bottom edge is under 60 in and it is within 24 in of the door in its plane or on the hinge side of an in-swinging door; a window must meet ALL FOUR conditions (over 9 sq ft, bottom under 18 in, top over 36 in, a walking surface within 36 in), so a big picture window with a 20 in sill is not hazardous by that rule; glazing near a tub, shower, spa or pool is hazardous at any size when its bottom edge is under 60 in, unless it is more than 60 in from the water's edge; beside a stair or ramp, under 36 in up and less than 36 in away; at the bottom landing, under 36 in up and within a 60 in arc of the bottom nosing. Check each location that applies: one lite can sit in two. A screen of the code's decision table, not a code-official determination; the glazing category (16 CFR 1201 Category I or II) and wind sizing are separate.",
+  };
+}
+export const safetyGlazingCheckExample = { inputs: { location: "window", area_sqft: 12, bottom_in: 12, top_in: 70, distance_in: 24, door_relation: "plane", exception: "none" } };
+
+CONSTRUCTION_RENDERERS["safety-glazing-check"] = _simpleRenderer({
+  citation: "Citation: IRC 2024 R324.4.1 through R324.4.7 [R308.4.1 through R308.4.7 in IRC 2021, the same criteria], by name; both read at codes.iccsafe.org on 2026-10-19, free to read. Doors and guards always; beside a door: bottom under 60 in and within 24 in; windows: over 9 sq ft AND bottom under 18 in AND top over 36 in AND a walking surface within 36 in; wet areas: bottom under 60 in within 60 in of the water; stairs and ramps: under 36 in and less than 36 in away; bottom landing: under 36 in within a 60 in arc. A screen, not a code-official determination; the adopted code and the AHJ govern.",
+  example: safetyGlazingCheckExample.inputs,
+  fields: [
+    { key: "location", label: "Where the glazing is", kind: "select", default: "window", options: [
+      { value: "door", label: "In a door panel (R324.4.1)" }, { value: "adjacent_door", label: "Beside a door (R324.4.2)" },
+      { value: "window", label: "Window (R324.4.3)" }, { value: "guard", label: "In a guard or railing (R324.4.4)" },
+      { value: "wet", label: "Near a tub, shower, spa or pool (R324.4.5)" }, { value: "stair", label: "Beside a stair, ramp or landing (R324.4.6)" },
+      { value: "bottom_landing", label: "At the bottom stair landing (R324.4.7)" },
+    ] },
+    { key: "area_sqft", label: "Exposed area of the pane (sq ft; windows)", kind: "number", blankUndefined: true, attrs: { step: "any", min: "0" } },
+    { key: "bottom_in", label: "Bottom exposed edge above the floor or walking surface (in)", kind: "number", blankUndefined: true, attrs: { step: "any", min: "0" } },
+    { key: "top_in", label: "Top edge above the floor (in; windows)", kind: "number", blankUndefined: true, attrs: { step: "any", min: "0" } },
+    { key: "distance_in", label: "Horizontal distance to the door edge, walking surface, water's edge or nosing (in)", kind: "number", blankUndefined: true, attrs: { step: "any", min: "0" } },
+    { key: "door_relation", label: "Beside a door: where the glazing is", kind: "select", default: "plane", options: [
+      { value: "plane", label: "In the plane of the closed door" }, { value: "hinge_wall", label: "On a wall at the hinge side of an in-swinging door" },
+      { value: "other", label: "Elsewhere (e.g. perpendicular wall, latch side)" },
+    ] },
+    { key: "exception", label: "Exception that applies", kind: "select", default: "none", options: [
+      { value: "none", label: "None" }, { value: "sphere_3in", label: "Door: 3 in sphere cannot pass" }, { value: "decorative", label: "Decorative glazing" },
+      { value: "barrier", label: "Beside a door: wall or permanent barrier between" }, { value: "closet", label: "Beside a door: closet 3 ft deep or less" },
+      { value: "patio_fixed", label: "Beside a patio door's fixed panel" }, { value: "rail", label: "Window or stair: rail 34 to 38 in" },
+      { value: "outboard_25ft", label: "Window: outboard pane 25 ft or more up" }, { value: "guard_18in", label: "Bottom landing: guard more than 18 in from the glass" },
+    ] },
+  ],
+  outputs: [
+    { key: "v", id: "sgc-out-v", label: "Verdict", value: (r) => r.verdict },
+    { key: "c", id: "sgc-out-c", label: "Conditions checked", value: (r) => r.conditions.map((c) => (c.holds ? "yes: " : "no: ") + c.label).join("; ") },
+    { key: "n", id: "sgc-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSafetyGlazingCheck,
+});

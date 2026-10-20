@@ -2,6 +2,7 @@
  "_comment": "Every N CFR section or part cited in citations.js, tools-data.js or calc-*.js, with its heading as read from the eCFR API (ecfr.gov/api/versioner) on 2026-10-17. test/unit/cfr-citations-verified.test.js fails on a citation that is not listed here, so a new CFR pointer has to be read before it lands. Refresh a heading by re-reading it; do not edit it from memory.",
  "verified_on": "2026-10-17",
  "headings": {
+  "16 CFR 1201": "PART 1201—SAFETY STANDARD FOR ARCHITECTURAL GLAZING MATERIALS",
   "7 CFR 810": "PART 810—OFFICIAL UNITED STATES STANDARDS FOR GRAIN",
   "9 CFR 424.21": "§ 424.21 Use of food ingredients and sources of radiation.",
   "9 CFR 424.22": "§ 424.22 Certain other permitted uses.",

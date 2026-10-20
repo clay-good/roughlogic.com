@@ -2379,6 +2379,7 @@ export const COMPUTE_MAP = {
   "conduit-segment-bend": { module: "../../calc-fab.js", fn: "computeConduitSegmentBend" },
   "conduit-concentric-bend": { module: "../../calc-fab.js", fn: "computeConduitConcentricBend" },
   "bath-exhaust-fan-sizing": { module: "../../calc-hvacservice.js", fn: "computeBathExhaustFanSizing" },
+  "safety-glazing-check": { module: "../../calc-construction.js", fn: "computeSafetyGlazingCheck" },
 };
 
 // Resolve a COMPUTE_MAP module path (relative to this file) and import it.

@@ -117392,6 +117392,31 @@
   "term": "exhaust fan for a bathroom by square feet",
   "target": "bath-exhaust-fan-sizing",
   "kind": "question"
+ },
+ {
+  "term": "does this window need tempered glass",
+  "target": "safety-glazing-check",
+  "kind": "question"
+ },
+ {
+  "term": "safety glazing hazardous location",
+  "target": "safety-glazing-check",
+  "kind": "industry"
+ },
+ {
+  "term": "R308.4 tempered glass rule",
+  "target": "safety-glazing-check",
+  "kind": "industry"
+ },
+ {
+  "term": "glass within 24 inches of a door",
+  "target": "safety-glazing-check",
+  "kind": "industry"
+ },
+ {
+  "term": "tempered glass near tub or shower 60 inches",
+  "target": "safety-glazing-check",
+  "kind": "industry"
  }
  ]
 }
