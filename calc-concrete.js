@@ -639,7 +639,7 @@ CONCRETE_RENDERERS["rc-hook-development"] = _simpleRenderer({
 // psi_p 1.0 (Att >= 0.3 Ahs or s >= 6 db) / 1.6, psi_o 1.0 (inside a column core with 2.5 in side cover,
 // or side cover >= 6 db) / 1.25, psi_e 1.0 / 1.2 epoxy, psi_c = f'c/15,000 + 0.6 below 6,000 psi.
 // ACI 318-25 prints 90 in place of 75 (Dextra's 318-25 calculation: #8, fy 70,000, f'c 5,800, epoxy -> 12.09 in).
-// dims: in { db_in: L, fy_psi: M L^-1 T^-2, fc_psi: M L^-1 T^-2, psi_e: dimensionless, psi_p: dimensionless, psi_o: dimensionless, edition: dimensionless } out: { psi_c: dimensionless, ldt_eq_in: L, floor_in: L, ldt_in: L, min_clear_cover_in: L, min_spacing_in: L }
+// dims: in { db_in: L, fy_psi: M L^-1 T^-2, fc_psi: M L^-1 T^-2, psi_e: dimensionless, psi_p: dimensionless, psi_o: dimensionless, edition: dimensionless } out: { psi_c: dimensionless, ldt_eq_in: L, floor_in: L, ldt_in: L, min_clear_cover_in: L, min_spacing_in: L, min_bearing_area_ratio: dimensionless }
 export function computeRcHeadedBarDevelopment({ db_in = 0, fy_psi = 60000, fc_psi = 4000, psi_e = 1.0, psi_p = 1.0, psi_o = 1.0, edition = "318-19" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(db_in > 0)) return { error: "Bar diameter must be positive (in)." };
@@ -1457,7 +1457,7 @@ CONCRETE_RENDERERS["rc-compression-dev-length"] = _simpleRenderer({
 // with Bischoff's form: Ie = Ig when Ma <= (2/3)Mcr (Eq 24.2.3.5b), else Ie = Icr/[1 - ((2/3)Mcr/Ma)^2 (1 - Icr/Ig)]
 // (Eq 24.2.3.5a). Mcr = fr Ig/yt, fr = 7.5 lambda sqrt(f'c). Icr is the cracked transformed section (singly
 // reinforced rectangular): n = Es/Ec, kd = d(sqrt((rho n)^2 + 2 rho n) - rho n), Icr = b kd^3/3 + n As (d-kd)^2.
-// dims: in { b_in: L, h_in: L, d_in: L, as_in2: L^2, fc_psi: M L^-1 T^-2, ma_kipft: M L^2 T^-2, lambda: dimensionless } out: { ig_in4: L^4, icr_in4: L^4, ie_in4: L^4, mcr_kipft: M L^2 T^-2, ec_psi: M L^-1 T^-2, kd_in: L }
+// dims: in { b_in: L, h_in: L, d_in: L, as_in2: L^2, fc_psi: M L^-1 T^-2, ma_kipft: M L^2 T^-2, lambda: dimensionless } out: { ig_in4: L^4, icr_in4: L^4, ie_in4: L^4, mcr_kipft: M L^2 T^-2, ec_psi: M L^-1 T^-2, kd_in: L, ie_ratio: dimensionless }
 export function computeConcreteEffectiveInertia({ b_in = 0, h_in = 0, d_in = 0, as_in2 = 0, fc_psi = 4000, ma_kipft = 0, lambda = 1.0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const b = Number(b_in), h = Number(h_in), d = Number(d_in), As = Number(as_in2);
@@ -1761,7 +1761,7 @@ CONCRETE_RENDERERS["concrete-cracked-inertia-tee"] = _simpleRenderer({
 // Anchor groups added 2026-10-09 (the pryout note said the group form was not modeled): ACI 318-19 17.6.2.1, a
 // concentrically loaded rectangular group of n1 rows (spacing s1, toward the edge) by n2 anchors (spacing s2, along
 // it), ANc = [min(ca1, 1.5 hef) + (n1 - 1) min(s1, 3 hef) + 1.5 hef] x [3 hef + (n2 - 1) min(s2, 3 hef)] <= n ANco.
-// dims: in { embedment_in: L, fc_psi: M L^-1 T^-2, edge_distance_in: L, anchor_type: dimensionless, lambda: dimensionless, cracking: dimensionless, rows_toward_edge: dimensionless, spacing_toward_edge_in: L, anchors_along_edge: dimensionless, spacing_along_edge_in: L } out: { nb_lb: M L T^-2, ncb_lb: M L T^-2, phi_ncb_lb: M L T^-2, phi_tension: dimensionless, psi_c: dimensionless }
+// dims: in { embedment_in: L, fc_psi: M L^-1 T^-2, edge_distance_in: L, anchor_type: dimensionless, lambda: dimensionless, cracking: dimensionless, rows_toward_edge: dimensionless, spacing_toward_edge_in: L, anchors_along_edge: dimensionless, spacing_along_edge_in: L } out: { nb_lb: M L T^-2, ncb_lb: M L T^-2, phi_ncb_lb: M L T^-2, phi_tension: dimensionless, psi_c: dimensionless, area_ratio: dimensionless }
 export function computeConcreteAnchorBreakout({ embedment_in = 0, fc_psi = 0, edge_distance_in = 0, anchor_type = "cast-in", lambda = 1.0, cracking = "cracked", rows_toward_edge = 1, spacing_toward_edge_in = 0, anchors_along_edge = 1, spacing_along_edge_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const hef = Number(embedment_in) || 0;
@@ -2081,7 +2081,7 @@ CONCRETE_RENDERERS["concrete-anchor-blowout"] = _simpleRenderer({
 // edge: AVc = min(1.5 ca1, ha) x (1.5 ca1 + min(1.5 ca1, ca2)). psi_edV = 0.7 + 0.3 ca2/(1.5 ca1)
 // when ca2 < 1.5 ca1; psi_cV 1.0 cracked / 1.4 uncracked; psi_hV = sqrt(1.5 ca1/ha) >= 1.0 when
 // ha < 1.5 ca1. phi = 0.70 Condition B.
-// dims: in { anchor_dia_in: L, embedment_in: L, fc_psi: M L^-1 T^-2, edge_distance_in: L, perp_edge_in: L, member_thickness_in: L, cracking: dimensionless, lambda: dimensionless, direction: dimensionless } out: { vb_lb: M L T^-2, vcb_lb: M L T^-2, phi_vcb_lb: M L T^-2, ca1_used_in: L, le_in: L }
+// dims: in { anchor_dia_in: L, embedment_in: L, fc_psi: M L^-1 T^-2, edge_distance_in: L, perp_edge_in: L, member_thickness_in: L, cracking: dimensionless, lambda: dimensionless, direction: dimensionless } out: { vb_lb: M L T^-2, vcb_lb: M L T^-2, phi_vcb_lb: M L T^-2, ca1_used_in: L, le_in: L, area_ratio: dimensionless }
 export function computeConcreteAnchorShearBreakout({ anchor_dia_in = 0, embedment_in = 0, fc_psi = 4000, edge_distance_in = 0, perp_edge_in = 0, member_thickness_in = 0, cracking = "cracked", lambda = 1.0, direction = "toward" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const da = Number(anchor_dia_in) || 0;

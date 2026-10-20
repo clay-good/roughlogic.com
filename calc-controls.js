@@ -87,7 +87,7 @@ const _ACTUATOR_SIZES_IN_LB = [35, 70, 140, 180, 360];
 
 // ===================== spec-v1818: transmitter span, accuracy, 4-20 mA scaling =====================
 
-// dims: in { lower_range_value: dimensionless, upper_range_value: dimensionless, upper_range_limit: dimensionless, loop_ma: I, accuracy_pct: dimensionless, low_reading_value: dimensionless, alt_upper_range_value: dimensionless } out: { value_eng: dimensionless, span_eng: dimensionless, turndown: dimensionless, err_span_eng: dimensionless, err_url_eng: dimensionless, err_url_at_low_reading_pct: dimensionless }
+// dims: in { lower_range_value: dimensionless, upper_range_value: dimensionless, upper_range_limit: dimensionless, loop_ma: I, accuracy_pct: dimensionless, low_reading_value: dimensionless, alt_upper_range_value: dimensionless } out: { value_eng: dimensionless, span_eng: dimensionless, turndown: dimensionless, err_span_eng: dimensionless, err_url_eng: dimensionless, err_url_at_low_reading_pct: dimensionless, basis_ratio: dimensionless }
 export function computeTransmitterSpanScaling({ lower_range_value = 0, upper_range_value = 0, upper_range_limit = 0, loop_ma = 12, accuracy_pct = 0.1, low_reading_value = 0, alt_upper_range_value = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (upper_range_limit > 0 && upper_range_value > upper_range_limit) return { error: "The upper range value is beyond the sensor's upper range limit." };
@@ -299,7 +299,7 @@ CONTROLS_RENDERERS["trend-log-storage"] = _simpleRenderer({
 
 // ===================== spec-v1821: BACnet MS/TP segment loading =====================
 
-// dims: in { baud: T^-1, device_count: dimensionless, token_octets: dimensionless, turnaround_bits: dimensionless, frame_octets: dimensionless, transmitting_share: dimensionless, alt_device_count: dimensionless, alt_baud: T^-1 } out: { token_frame_ms: T, turnaround_ms: T, idle_rotation_ms: T, frame_time_ms: T, loop_time_ms: T }
+// dims: in { baud: T^-1, device_count: dimensionless, token_octets: dimensionless, turnaround_bits: dimensionless, frame_octets: dimensionless, transmitting_share: dimensionless, alt_device_count: dimensionless, alt_baud: T^-1 } out: { token_frame_ms: T, turnaround_ms: T, idle_rotation_ms: T, frame_time_ms: T, loop_time_ms: T, alt_baud_ratio: dimensionless, alt_devices_ratio: dimensionless }
 export function computeMstpSegmentLoading({ baud = 76800, device_count = 0, token_octets = 8, turnaround_bits = 40, frame_octets = 50, transmitting_share = 0.5, alt_device_count = 0, alt_baud = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(baud > 0)) return { error: "Baud rate must be positive." };

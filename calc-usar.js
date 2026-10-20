@@ -278,7 +278,7 @@ const _CRIB_PRACTICAL_FT = { "4x4": 4, "6x6": 6 };
 const _CRIB_POINTS = { "2x2": 4, "3x3": 9 };
 const _CRIB_RATIO = { all: 3, lifting: 2, two_corners: 1.5, one_corner: 1 };
 
-// dims: in { timber_size: dimensionless, layup: dimensionless, species: dimensionless, bearing_stress_psi: M L^-1 T^-2, crib_width_ft: L, bearing_condition: dimensionless, crib_load_lb: M L T^-2 } out: { contact_area_sqin: L^2, contact_points: dimensionless, base_capacity_lb: M L T^-2, crib_capacity_lb: M L T^-2, ratio_height_ft: L, practical_height_ft: L, max_height_ft: L, load_ratio: dimensionless, member_in: L }
+// dims: in { timber_size: dimensionless, layup: dimensionless, species: dimensionless, bearing_stress_psi: M L^-1 T^-2, crib_width_ft: L, bearing_condition: dimensionless, crib_load_lb: M L T^-2 } out: { contact_area_sqin: L^2, contact_points: dimensionless, base_capacity_lb: M L T^-2, crib_capacity_lb: M L T^-2, ratio_height_ft: L, practical_height_ft: L, max_height_ft: L, load_ratio: dimensionless, member_in: L, height_ratio: dimensionless }
 export function computeUsrCribCapacity({ timber_size = "6x6", layup = "3x3", species = "syp_hf_spf", bearing_stress_psi = 500, crib_width_ft = 4, bearing_condition = "all", crib_load_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(timber_size in _CRIB_MEMBER_IN)) return { error: "Timber size must be 4x4 or 6x6." };

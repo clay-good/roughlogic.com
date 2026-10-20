@@ -1555,7 +1555,7 @@ MECHANIC_RENDERERS["universal-joint-speed"] = _simpleRenderer({
 // PAST mid-stroke at 90 deg. Velocity and acceleration at a crank speed added 2026-10-09 (the note named them
 // as separate): v = omega dx/dtheta, a = omega^2 d2x/dtheta2 at constant omega, s = sqrt(L^2 - r^2 sin^2):
 // dx/dtheta = r sin + r^2 sin cos / s; d2x/dtheta2 = r cos + r^2 (cos^2 - sin^2)/s + r^4 sin^2 cos^2 / s^3.
-// dims: in { stroke_in: L, rod_length_in: L, crank_angle_deg: dimensionless, crank_rpm: T^-1 } out: { position_from_tdc_in: L, percent_of_stroke: dimensionless, rod_angularity_shift_in: L, velocity_fps: L T^-1, accel_g: dimensionless, tdc_accel_g: dimensionless, simple_position_in: L }
+// dims: in { stroke_in: L, rod_length_in: L, crank_angle_deg: dimensionless, crank_rpm: T^-1 } out: { position_from_tdc_in: L, percent_of_stroke: dimensionless, rod_angularity_shift_in: L, velocity_fps: L T^-1, accel_g: dimensionless, tdc_accel_g: dimensionless, simple_position_in: L, rod_stroke_ratio: dimensionless }
 export function computeSliderCrankPistonPosition({ stroke_in = 0, rod_length_in = 0, crank_angle_deg = 0, crank_rpm = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const stroke = Number(stroke_in) || 0;
@@ -2161,7 +2161,7 @@ MECHANIC_RENDERERS["volumetric-efficiency"] = renderVolumetricEfficiency;
 
 // --- v20 K.3: Gear-ratio MPH from RPM (`gear-mph-rpm`) ---
 // MPH = RPM * pi * dia * 60 / (trans * axle * 63360); revs/mile = 63360/(pi*dia).
-// dims: in { solve_for: dimensionless, rpm: T^-1, trans_ratio: dimensionless, axle_ratio: dimensionless, tire_dia_in: L, mph: L*T^-1 } out: { mph: L*T^-1, rpm: T^-1, wheel_rpm: T^-1 }
+// dims: in { solve_for: dimensionless, rpm: T^-1, trans_ratio: dimensionless, axle_ratio: dimensionless, tire_dia_in: L, mph: L*T^-1 } out: { mph: L*T^-1, rpm: T^-1, wheel_rpm: T^-1, total_ratio: dimensionless }
 export function computeGearMphRpm({ solve_for = "mph", rpm = 0, trans_ratio = 1, axle_ratio = 0, tire_dia_in = 0, mph = 0 } = {}) {
   if (solve_for !== "mph" && solve_for !== "rpm") return { error: "Solve for must be mph or rpm." };
   const N = Number(rpm) || 0;
@@ -4365,7 +4365,7 @@ MECHANIC_RENDERERS["gear-dynamic-tooth-stress"] = _simpleRenderer({
 // root is 0.87 -- and it is what this tile computes.
 // ===========================================================================
 
-// dims: in { baseline_pressure_inhg: M L^-1 T^-2, baseline_temp_f: T, actual_pressure_inhg: M L^-1 T^-2, actual_temp_f: T, jet_flow_number: dimensionless, jet_diameter_in: L } out: { density_ratio: dimensionless, corrected_jet_number: dimensionless, corrected_jet_diameter_in: L, power_loss_pct: dimensionless, pressure_ratio: dimensionless }
+// dims: in { baseline_pressure_inhg: M L^-1 T^-2, baseline_temp_f: T, actual_pressure_inhg: M L^-1 T^-2, actual_temp_f: T, jet_flow_number: dimensionless, jet_diameter_in: L } out: { density_ratio: dimensionless, corrected_jet_number: dimensionless, corrected_jet_diameter_in: L, power_loss_pct: dimensionless, pressure_ratio: dimensionless, diameter_ratio: dimensionless, temperature_ratio: dimensionless, area_ratio: dimensionless, power_ratio: dimensionless }
 export function computeCarburetorAltitudeJetting({ baseline_pressure_inhg = 29.92, baseline_temp_f = 59, actual_pressure_inhg = 0, actual_temp_f = null, jet_flow_number = 0, jet_diameter_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // The page passes a blank box as null; 0 F is a real reading, so a blank cannot stand in for it.

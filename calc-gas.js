@@ -858,7 +858,7 @@ function _lpWettedArea(radius_ft, length_ft, depth_ft) {
 // demonstrate: BOTH TERMS MOVE THE WRONG WAY TOGETHER in a cold snap on a
 // drawn-down tank, so the compound fall is much larger than either alone.
 // =====================================================================
-// dims: in { tank_diameter_ft: L, tank_length_ft: L, percent_full: dimensionless, ambient_f: T, liquid_temperature_f: T, reference_capacity_btuh: M L^2 T^-3, reference_percent_full: dimensionless, reference_ambient_f: T, connected_load_btuh: M L^2 T^-3 } out: { wetted_area_ft2: L^2, reference_wetted_area_ft2: L^2, capacity_btuh: M L^2 T^-3, margin_btuh: M L^2 T^-3, tanks_required: dimensionless, depth_ft: L }
+// dims: in { tank_diameter_ft: L, tank_length_ft: L, percent_full: dimensionless, ambient_f: T, liquid_temperature_f: T, reference_capacity_btuh: M L^2 T^-3, reference_percent_full: dimensionless, reference_ambient_f: T, connected_load_btuh: M L^2 T^-3 } out: { wetted_area_ft2: L^2, reference_wetted_area_ft2: L^2, capacity_btuh: M L^2 T^-3, margin_btuh: M L^2 T^-3, tanks_required: dimensionless, depth_ft: L, temperature_ratio: dimensionless, area_ratio: dimensionless }
 export function computePropaneVaporizationRate({
   tank_diameter_ft = 0, tank_length_ft = 0, percent_full = 0, ambient_f = null,
   liquid_temperature_f = 0, reference_capacity_btuh = 0, reference_percent_full = 0,
@@ -1147,7 +1147,7 @@ export const lpContainerSeparationExample = { inputs: { water_capacity_gal: 500,
 // honest: the duty cycle, the delivery trigger rather than empty, and a
 // degree-day history that beats any appliance rating.
 // =====================================================================
-// dims: in { water_capacity_gal: L^3, fill_limit_pct: dimensionless, current_gauge_pct: dimensionless, trigger_pct: dimensionless, connected_load_btuh: M L^2 T^-3, duty_cycle: dimensionless, btu_per_gal: M L^2 T^-2 L^-3, gallons_per_hdd: L^3, hdd_per_day: T } out: { usable_gal: L^3, usable_mmbtu: M L^2 T^-2, continuous_hours: T, continuous_days: T, realistic_days: T, gallons_to_trigger: L^3, gallons_per_day: L^3 T^-1, days_to_trigger: T, hdd_days_to_trigger: T }
+// dims: in { water_capacity_gal: L^3, fill_limit_pct: dimensionless, current_gauge_pct: dimensionless, trigger_pct: dimensionless, connected_load_btuh: M L^2 T^-3, duty_cycle: dimensionless, btu_per_gal: M L^2 T^-2 L^-3, gallons_per_hdd: L^3, hdd_per_day: T } out: { usable_gal: L^3, usable_mmbtu: M L^2 T^-2, continuous_hours: T, continuous_days: T, realistic_days: T, gallons_to_trigger: L^3, gallons_per_day: L^3 T^-1, days_to_trigger: T, hdd_days_to_trigger: T, history_ratio: dimensionless }
 export function computePropaneRunTime({
   water_capacity_gal = 0, fill_limit_pct = 80, current_gauge_pct = 0, trigger_pct = 0,
   connected_load_btuh = 0, duty_cycle = 0, btu_per_gal = _LP_BTU_PER_GAL,

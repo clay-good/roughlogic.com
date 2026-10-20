@@ -121,7 +121,7 @@ function _v27SlingDDEfficiency(dd) {
 }
 
 // dims: in { load_lb: M L T^-2, sling_config: dimensionless, included_angle_deg: dimensionless, n_legs: dimensionless }
-//        out: { tension_per_leg_lb: M L T^-2, choker_factor: dimensionless }
+//        out: { tension_per_leg_lb: M L T^-2, choker_factor: dimensionless, dd_efficiency: dimensionless }
 export function computeSlingAngle({ load_lb = 0, sling_config = "vertical", included_angle_deg = null, n_legs = 2, dd_ratio = 0, sling_rated_capacity_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // No angle given: a vertical hitch has none; any other hitch needs one.

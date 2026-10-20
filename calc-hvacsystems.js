@@ -250,7 +250,7 @@ HVACSYSTEMS_RENDERERS["chiller-tons"] = _v16h_renderChillerTons;
 // balance as the chiller tile. C = GPM * factor.
 export const HX_FLUID_FACTORS = CHILLER_FLUID_FACTORS;
 
-// dims: in { config: dimensionless, th_in_F: T, th_out_F: T, tc_in_F: T, tc_out_F: T, hot_gpm: L^3 T^-1, cold_gpm: L^3 T^-1, hot_fluid: dimensionless, cold_fluid: dimensionless } out: { lmtd_F: T, q_btu_hr: M L^2 T^-3, ua_btu_hr_F: M L^2 T^-3, effectiveness: dimensionless, ntu: dimensionless }
+// dims: in { config: dimensionless, th_in_F: T, th_out_F: T, tc_in_F: T, tc_out_F: T, hot_gpm: L^3 T^-1, cold_gpm: L^3 T^-1, hot_fluid: dimensionless, cold_fluid: dimensionless } out: { lmtd_F: T, q_btu_hr: M L^2 T^-3, ua_btu_hr_F: M L^2 T^-3, effectiveness: dimensionless, ntu: dimensionless, c_ratio: dimensionless }
 export function computeHxLmtdNtu({
   config = "counterflow",
   th_in_F = 0,
@@ -683,7 +683,7 @@ export const COMPRESSOR_CYCLE_LIMITS = {
   inverter: { label: "VRF / inverter", min_on_min: 4, min_off_min: 3, max_cph: null },
 };
 
-// dims: in { system_type: dimensionless, load_fraction_pct: dimensionless, observed_cph: T^-1 } out: { cph_estimated: T^-1, on_time_min: T, off_time_min: T }
+// dims: in { system_type: dimensionless, load_fraction_pct: dimensionless, observed_cph: T^-1 } out: { cph_estimated: T^-1, on_time_min: T, off_time_min: T, load_fraction_pct: dimensionless }
 export function computeCompressorShortCycle({
   system_type = "single",
   load_fraction_pct = 50,
@@ -1903,7 +1903,7 @@ HVACSYSTEMS_RENDERERS["proportional-balance-ratio"] = _simpleRenderer({
 // resemble. Trimming changes the impeller's geometry relative to its casing
 // rather than scaling the whole machine, so the correspondence is approximate
 // and the manufacturer's trim curves are the authority.
-// dims: in { current_diameter_in: L, current_flow_gpm: L^3 T^-1, required_flow_gpm: L^3 T^-1, current_head_ft: L, required_head_ft: L, max_diameter_in: L, min_trim_fraction: dimensionless, motor_hp: M L^2 T^-3, annual_hours: T, energy_rate_per_kwh: dimensionless } out: { required_diameter_in: L, trim_in: L, trim_pct: dimensionless, head_at_trim_ft: L, power_ratio: dimensionless, annual_kwh_saved: M L^2 T^-2, annual_cost_saved: dimensionless, current_kwh: M L^2 T^-2, excess_head_ft: L, head_margin_ft: L, power_reduction_pct: dimensionless, trimmed_kwh: M L^2 T^-2 }
+// dims: in { current_diameter_in: L, current_flow_gpm: L^3 T^-1, required_flow_gpm: L^3 T^-1, current_head_ft: L, required_head_ft: L, max_diameter_in: L, min_trim_fraction: dimensionless, motor_hp: M L^2 T^-3, annual_hours: T, energy_rate_per_kwh: dimensionless } out: { required_diameter_in: L, trim_in: L, trim_pct: dimensionless, head_at_trim_ft: L, power_ratio: dimensionless, annual_kwh_saved: M L^2 T^-2, annual_cost_saved: dimensionless, current_kwh: M L^2 T^-2, excess_head_ft: L, head_margin_ft: L, power_reduction_pct: dimensionless, trimmed_kwh: M L^2 T^-2, diameter_ratio: dimensionless }
 export function computePumpImpellerTrim({
   current_diameter_in = 0, current_flow_gpm = 0, required_flow_gpm = 0,
   current_head_ft = 0, required_head_ft = 0, max_diameter_in = 0, min_trim_fraction = 0.75,
@@ -2110,7 +2110,7 @@ HVACSYSTEMS_RENDERERS["coil-capacity-verification"] = _simpleRenderer({
 // across the remaining valves rises toward shutoff head -- so the worst case is
 // MINIMUM system flow, the condition a designer computing at design never looks
 // at, and the condition in which the valve is most likely to be commanded shut.
-// dims: in { seat_area_in2: L^2, design_differential_psi: M L^-1 T^-2, minimum_flow_differential_psi: M L^-1 T^-2, actuator_closeoff_psi: M L^-1 T^-2, spring_closeoff_psi: M L^-1 T^-2 } out: { design_seat_force_lb: M L T^-2, worst_case_seat_force_lb: M L T^-2, actuator_force_lb: M L T^-2, force_shortfall_lb: M L T^-2, differential_rise_psi: M L^-1 T^-2 }
+// dims: in { seat_area_in2: L^2, design_differential_psi: M L^-1 T^-2, minimum_flow_differential_psi: M L^-1 T^-2, actuator_closeoff_psi: M L^-1 T^-2, spring_closeoff_psi: M L^-1 T^-2 } out: { design_seat_force_lb: M L T^-2, worst_case_seat_force_lb: M L T^-2, actuator_force_lb: M L T^-2, force_shortfall_lb: M L T^-2, differential_rise_psi: M L^-1 T^-2, rise_ratio: dimensionless }
 export function computeValveActuatorCloseOff({
   seat_area_in2 = 0, design_differential_psi = 0, minimum_flow_differential_psi = 0,
   actuator_closeoff_psi = 0, spring_closeoff_psi = 0, is_spring_return = "no",
@@ -2301,7 +2301,7 @@ HVACSYSTEMS_RENDERERS["chiller-staging-point"] = _simpleRenderer({
 // The bypass exists to protect the MACHINE, not to control temperature. The
 // interaction with staging is the part that catches plants out: two chillers
 // running have twice the minimum flow of one.
-// dims: in { machine_design_gpm: L^3 T^-1, minimum_flow_fraction: dimensionless, machines_running: dimensionless, system_flow_gpm: L^3 T^-1, bypass_differential_psi: M L^-1 T^-2, design_differential_psi: M L^-1 T^-2 } out: { minimum_per_machine_gpm: L^3 T^-1, combined_minimum_gpm: L^3 T^-1, bypass_gpm: L^3 T^-1, required_cv: dimensionless, cv_at_design_differential: dimensionless, fewer_bypass_gpm: L^3 T^-1, fewer_minimum_gpm: L^3 T^-1, pump_flow_gpm: L^3 T^-1, wasted_fraction: dimensionless }
+// dims: in { machine_design_gpm: L^3 T^-1, minimum_flow_fraction: dimensionless, machines_running: dimensionless, system_flow_gpm: L^3 T^-1, bypass_differential_psi: M L^-1 T^-2, design_differential_psi: M L^-1 T^-2 } out: { minimum_per_machine_gpm: L^3 T^-1, combined_minimum_gpm: L^3 T^-1, bypass_gpm: L^3 T^-1, required_cv: dimensionless, cv_at_design_differential: dimensionless, fewer_bypass_gpm: L^3 T^-1, fewer_minimum_gpm: L^3 T^-1, pump_flow_gpm: L^3 T^-1, wasted_fraction: dimensionless, oversize_ratio: dimensionless }
 export function computeVariablePrimaryBypass({
   machine_design_gpm = 0, minimum_flow_fraction = 0.45, machines_running = 1,
   system_flow_gpm = 0, bypass_differential_psi = 0, design_differential_psi = 0,
@@ -2470,7 +2470,7 @@ HVACSYSTEMS_RENDERERS["louver-free-area"] = _simpleRenderer({
 //
 // The plenum is a duct whose cross-section is whatever the structure left
 // over, and its restriction is concentrated where that cross-section pinches.
-// dims: in { return_cfm: L^3 T^-1, pinch_width_ft: L, pinch_clear_in: L, target_velocity_fpm: L T^-1, measured_room_to_plenum_inwg: M L^-1 T^-2, measured_plenum_to_shaft_inwg: M L^-1 T^-2, assumed_return_inwg: M L^-1 T^-2 } out: { pinch_area_ft2: L^2, pinch_velocity_fpm: L T^-1, area_for_target_ft2: L^2, width_for_target_ft: L, measured_total_inwg: M L^-1 T^-2, static_shortfall_inwg: M L^-1 T^-2 }
+// dims: in { return_cfm: L^3 T^-1, pinch_width_ft: L, pinch_clear_in: L, target_velocity_fpm: L T^-1, measured_room_to_plenum_inwg: M L^-1 T^-2, measured_plenum_to_shaft_inwg: M L^-1 T^-2, assumed_return_inwg: M L^-1 T^-2 } out: { pinch_area_ft2: L^2, pinch_velocity_fpm: L T^-1, area_for_target_ft2: L^2, width_for_target_ft: L, measured_total_inwg: M L^-1 T^-2, static_shortfall_inwg: M L^-1 T^-2, velocity_ratio: dimensionless }
 export function computePlenumReturnDrop({
   return_cfm = 0, pinch_width_ft = 0, pinch_clear_in = 0, target_velocity_fpm = 400,
   measured_room_to_plenum_inwg = 0, measured_plenum_to_shaft_inwg = 0, assumed_return_inwg = 0,

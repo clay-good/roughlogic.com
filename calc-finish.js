@@ -883,7 +883,7 @@ FINISH_RENDERERS["cabinet-linear-feet"] = _simpleRenderer({
 // the one thing that matters: RAKES run up the slope and eaves do not. A rake measured off the
 // plan under-orders by the slope factor sqrt(1 + (rise/12)^2) - 12% on a 6:12, 20% on a 8:12. The
 // two also take different profiles, so they are counted separately, and pieces account for the lap.
-// dims: in { eave_length_ft: L, rake_run_ft: L, rake_count: dimensionless, pitch_rise_per_12: dimensionless, stock_length_ft: L, lap_in: L, waste_pct: dimensionless } out: { slope_factor: dimensionless, eave_lf: L, rake_lf: L, total_lf: L, pieces: dimensionless, effective_piece_ft: L, rake_plan_lf: L, rake_slope_gain_lf: L, total_with_waste_lf: L }
+// dims: in { eave_length_ft: L, rake_run_ft: L, rake_count: dimensionless, pitch_rise_per_12: dimensionless, stock_length_ft: L, lap_in: L, waste_pct: dimensionless } out: { slope_factor: dimensionless, eave_lf: L, rake_lf: L, total_lf: L, pieces: dimensionless, effective_piece_ft: L, rake_plan_lf: L, rake_slope_gain_lf: L, total_with_waste_lf: L, eave_pieces: dimensionless, rake_pieces: dimensionless }
 export function computeDripEdgeTakeoff({ eave_length_ft = 0, rake_run_ft = 0, rake_count = 0, pitch_rise_per_12 = 0, stock_length_ft = 10, lap_in = 2, waste_pct = 10 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const eave = Number(eave_length_ft) || 0;
@@ -1129,7 +1129,7 @@ FINISH_RENDERERS["srw-geogrid-spacing"] = _simpleRenderer({
 // 1/300 rather than 1/150), so shipping one number as if it were universal would be wrong.
 // Net free area per vent is also an input - it is product data off the vent, and it is much
 // less than the rough opening once the mesh or louver is counted.
-// dims: in { floor_area_sf: L^2, base_ratio_denominator: dimensionless, vapor_retarder: dimensionless, cross_ventilated: dimensionless, vent_net_free_sqin: L^2, corner_count: dimensionless } out: { required_sf: L^2, required_sqin: L^2, ratio_used: dimensionless, vents_by_area: dimensionless, vents_required: dimensionless, provided_sqin: L^2, surplus_sqin: L^2, alt_required_sqin: L^2 }
+// dims: in { floor_area_sf: L^2, base_ratio_denominator: dimensionless, vapor_retarder: dimensionless, cross_ventilated: dimensionless, vent_net_free_sqin: L^2, corner_count: dimensionless } out: { required_sf: L^2, required_sqin: L^2, ratio_used: dimensionless, vents_by_area: dimensionless, vents_required: dimensionless, provided_sqin: L^2, surplus_sqin: L^2, alt_required_sqin: L^2, alt_ratio: dimensionless }
 export function computeCrawlSpaceVentilation({ floor_area_sf = 0, base_ratio_denominator = 150, vapor_retarder = "no", cross_ventilated = "no", vent_net_free_sqin = 50, corner_count = 4 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const area = Number(floor_area_sf) || 0;

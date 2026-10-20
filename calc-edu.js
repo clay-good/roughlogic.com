@@ -1649,7 +1649,7 @@ const PERIODIC_EXT = {
   82: { symbol: "Pb", name: "Lead",       period: 6, group: 14, block: "p", electronegativity_pauling: 1.87, electron_configuration: "[Xe] 4f14 5d10 6s2 6p2",    oxidation_states: [+2, +4] },
 };
 
-// dims: in { query: dimensionless } out: { element: dimensionless }
+// dims: in { query: dimensionless } out: { element: dimensionless, atomic_number: dimensionless }
 export function computePeriodicElement({ query }) {
   const q = String(query || "").trim();
   if (q.length === 0) return { error: "Enter an atomic number (1-36, plus 47/53/79/80/82), symbol (e.g. Fe), or name (e.g. iron)." };

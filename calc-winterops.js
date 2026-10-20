@@ -89,7 +89,7 @@ const _CUFT_PER_CY = 27;
 
 // ===================== spec-v1845: deicing salt application rate =====================
 
-// dims: in { rate_lb_per_lane_mile: M L^-2, route_lane_miles: L, lot_area_ft2: L^2, hopper_capacity_tons: M, alt_rate_lb_per_lane_mile: M L^-2 } out: { material_lb_per_pass: M, passes_per_load: dimensionless, lot_lane_miles: L, lot_material_lb: M }
+// dims: in { rate_lb_per_lane_mile: M L^-2, route_lane_miles: L, lot_area_ft2: L^2, hopper_capacity_tons: M, alt_rate_lb_per_lane_mile: M L^-2 } out: { material_lb_per_pass: M, passes_per_load: dimensionless, lot_lane_miles: L, lot_material_lb: M, rate_ratio: dimensionless }
 export function computeSaltApplicationRate({ rate_lb_per_lane_mile = 0, route_lane_miles = 0, lot_area_ft2 = 0, hopper_capacity_tons = 0, alt_rate_lb_per_lane_mile = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(rate_lb_per_lane_mile > 0)) return { error: "Application rate must be positive (lb per lane-mile)." };
@@ -369,7 +369,7 @@ WINTEROPS_RENDERERS["snow-stacking-area"] = _simpleRenderer({
 
 // ===================== spec-v1849: ice melt working temperature and capacity =====================
 
-// dims: in { area_ft2: L^2, ice_thickness_in: L, ice_density_lb_ft3: M L^-3, pavement_temp_f: T, capacity_lb_ice_per_lb: dimensionless, alt_capacity_lb_ice_per_lb: dimensionless, alt_temp_f: T, practical_limit_f: T, eutectic_f: T } out: { ice_volume_ft3: L^3, ice_mass_lb: M, product_lb: M, alt_product_lb: M, margin_f: T }
+// dims: in { area_ft2: L^2, ice_thickness_in: L, ice_density_lb_ft3: M L^-3, pavement_temp_f: T, capacity_lb_ice_per_lb: dimensionless, alt_capacity_lb_ice_per_lb: dimensionless, alt_temp_f: T, practical_limit_f: T, eutectic_f: T } out: { ice_volume_ft3: L^3, ice_mass_lb: M, product_lb: M, alt_product_lb: M, margin_f: T, capacity_ratio: dimensionless, product_ratio: dimensionless }
 export function computeIceMeltWorkingTemperature({ area_ft2 = 0, ice_thickness_in = 0, ice_density_lb_ft3 = 57.2, pavement_temp_f = 30, capacity_lb_ice_per_lb = 0, alt_capacity_lb_ice_per_lb = 0, alt_temp_f = 20, practical_limit_f = 15, eutectic_f = -6 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(area_ft2 > 0)) return { error: "Area must be positive (sq ft)." };

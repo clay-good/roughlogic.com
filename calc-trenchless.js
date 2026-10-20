@@ -98,7 +98,7 @@ const _PSI_PER_FT_PER_PPG = 0.052;
 
 // ===================== spec-v1597: HDD minimum bend radius =====================
 
-// dims: in { pipe_diameter_in: L, radius_per_inch_ft: dimensionless, rod_min_radius_ft: L, entry_angle_deg: dimensionless, required_depth_ft: L, available_setback_ft: L } out: { pipe_min_radius_ft: L, governing_radius_ft: L, sag_run_ft: L, sag_depth_ft: L, extra_run_to_depth_ft: L, depth_short_ft: L, run_to_depth_ft: L }
+// dims: in { pipe_diameter_in: L, radius_per_inch_ft: dimensionless, rod_min_radius_ft: L, entry_angle_deg: dimensionless, required_depth_ft: L, available_setback_ft: L } out: { pipe_min_radius_ft: L, governing_radius_ft: L, sag_run_ft: L, sag_depth_ft: L, extra_run_to_depth_ft: L, depth_short_ft: L, run_to_depth_ft: L, rod_ratio: dimensionless }
 export function computeHddBendRadius({ pipe_diameter_in = 0, radius_per_inch_ft = 100, rod_min_radius_ft = 0, entry_angle_deg = 12, required_depth_ft = 0, available_setback_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(pipe_diameter_in > 0)) return { error: "Product pipe diameter must be positive." };

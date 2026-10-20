@@ -150,7 +150,7 @@ WIND_RENDERERS["tip-speed-ratio"] = _simpleRenderer({
 
 // ============ spec-v1551: wind power density and the Betz limit ============
 
-// dims: in { wind_speed_mph: L T^-1, air_density_pcf: M L^-3, rotor_diameter_ft: L, power_coefficient: dimensionless, alt_wind_speed_mph: L T^-1 } out: { swept_area_ft2: L^2, power_in_wind_kw: M L^2 T^-3, betz_power_kw: M L^2 T^-3, extracted_power_kw: M L^2 T^-3, power_density_w_ft2: M T^-3, alt_extracted_kw: M L^2 T^-3, coefficient_of_betz_pct: dimensionless }
+// dims: in { wind_speed_mph: L T^-1, air_density_pcf: M L^-3, rotor_diameter_ft: L, power_coefficient: dimensionless, alt_wind_speed_mph: L T^-1 } out: { swept_area_ft2: L^2, power_in_wind_kw: M L^2 T^-3, betz_power_kw: M L^2 T^-3, extracted_power_kw: M L^2 T^-3, power_density_w_ft2: M T^-3, alt_extracted_kw: M L^2 T^-3, coefficient_of_betz_pct: dimensionless, alt_ratio: dimensionless }
 export function computeWindPowerDensityBetz({ wind_speed_mph = 0, air_density_pcf = _RHO_REF_PCF, rotor_diameter_ft = 0, power_coefficient = 0.45, alt_wind_speed_mph = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(wind_speed_mph > 0)) return { error: "Wind speed must be positive." };
@@ -203,7 +203,7 @@ WIND_RENDERERS["wind-power-density-betz"] = _simpleRenderer({
 
 // ============ spec-v1552: wind shear to hub height ============
 
-// dims: in { measured_speed_mph: L T^-1, measured_height_ft: L, hub_height_ft: L, shear_exponent: dimensionless, alt_shear_exponent: dimensionless, second_speed_mph: L T^-1, second_height_ft: L } out: { hub_speed_mph: L T^-1, energy_ratio: dimensionless, alt_hub_speed_mph: L T^-1, derived_exponent: dimensionless, derived_hub_speed_mph: L T^-1, speed_ratio: dimensionless }
+// dims: in { measured_speed_mph: L T^-1, measured_height_ft: L, hub_height_ft: L, shear_exponent: dimensionless, alt_shear_exponent: dimensionless, second_speed_mph: L T^-1, second_height_ft: L } out: { hub_speed_mph: L T^-1, energy_ratio: dimensionless, alt_hub_speed_mph: L T^-1, derived_exponent: dimensionless, derived_hub_speed_mph: L T^-1, speed_ratio: dimensionless, extrapolation_ratio: dimensionless, height_ratio: dimensionless }
 export function computeWindShearHubHeight({ measured_speed_mph = 0, measured_height_ft = 0, hub_height_ft = 0, shear_exponent = 0.2, alt_shear_exponent = 0.14, second_speed_mph = 0, second_height_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(measured_speed_mph > 0)) return { error: "Measured wind speed must be positive." };

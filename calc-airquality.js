@@ -133,7 +133,7 @@ const _aqKelvin = (f) => (f + _AQ_RANKINE_OFFSET) * _AQ_KELVIN_PER_RANKINE;
 // the year at full capacity, because it COULD, absent an enforceable
 // restriction. spec-v1717's worked example is an unfinished edit -- it starts
 // at 5.5 lb/h, trails off mid-sentence, and restarts at 11.0 "for clarity".
-// dims: in { hourly_rate_lb_h: M T^-1, actual_hours_per_year: T, permitted_hours_per_year: T, major_threshold_tpy: M T^-1, control_efficiency_pct: dimensionless } out: { actual_tpy: M T^-1, pte_tpy: M T^-1, pte_with_limit_tpy: M T^-1, hours_for_minor: T, controlled_rate_lb_h: M T^-1 }
+// dims: in { hourly_rate_lb_h: M T^-1, actual_hours_per_year: T, permitted_hours_per_year: T, major_threshold_tpy: M T^-1, control_efficiency_pct: dimensionless } out: { actual_tpy: M T^-1, pte_tpy: M T^-1, pte_with_limit_tpy: M T^-1, hours_for_minor: T, controlled_rate_lb_h: M T^-1, pte_ratio: dimensionless }
 export function computeStackEmissionPte({
   hourly_rate_lb_h = 0, actual_hours_per_year = 0, permitted_hours_per_year = 0,
   major_threshold_tpy = 100, control_efficiency_pct = 0, control_enforceable = "no",
@@ -403,7 +403,7 @@ AIRQUALITY_RENDERERS["baghouse-cleaning-interval"] = _simpleRenderer({
 // CONTROLLING VARIABLE differs: a venturi is a pressure-drop machine and L/G
 // supplies the liquid that pressure drop works on, while a packed tower's
 // removal follows contact between the gas and a continuously renewed surface.
-// dims: in { gas_acfm: L^3 T^-1, lg_ratio_gpm_per_1000: dimensionless, pump_head_ft: L, pump_efficiency: dimensionless, specific_gravity: dimensionless, annual_hours: T, energy_rate_per_kwh: dimensionless, alternate_lg_ratio: dimensionless, pressure_drop_inwc: M L^-1 T^-2, fan_efficiency: dimensionless } out: { liquid_gpm: L^3 T^-1, pump_bhp: M L^2 T^-3, annual_kwh: M L^2 T^-2, fan_bhp: M L^2 T^-3, alternate_liquid_gpm: L^3 T^-1, annual_cost: dimensionless, fan_kw: M L^2 T^-3, pump_kw: M L^2 T^-3, total_kw: M L^2 T^-3 }
+// dims: in { gas_acfm: L^3 T^-1, lg_ratio_gpm_per_1000: dimensionless, pump_head_ft: L, pump_efficiency: dimensionless, specific_gravity: dimensionless, annual_hours: T, energy_rate_per_kwh: dimensionless, alternate_lg_ratio: dimensionless, pressure_drop_inwc: M L^-1 T^-2, fan_efficiency: dimensionless } out: { liquid_gpm: L^3 T^-1, pump_bhp: M L^2 T^-3, annual_kwh: M L^2 T^-2, fan_bhp: M L^2 T^-3, alternate_liquid_gpm: L^3 T^-1, annual_cost: dimensionless, fan_kw: M L^2 T^-3, pump_kw: M L^2 T^-3, total_kw: M L^2 T^-3, liquid_ratio: dimensionless }
 export function computeScrubberLgRatio({
   gas_acfm = 0, lg_ratio_gpm_per_1000 = 0, pump_head_ft = 0, pump_efficiency = 0.65,
   specific_gravity = 1.0, annual_hours = 0, energy_rate_per_kwh = 0,
@@ -568,7 +568,7 @@ AIRQUALITY_RENDERERS["thermal-oxidizer-residence"] = _simpleRenderer({
 // The less-water basis exists to prevent compliance by dilution: measuring VOC
 // per gallon of coating as supplied would let anyone pass by adding water,
 // without reducing the solvent applied per square foot.
-// dims: in { coating_gal: L^3, voc_lb: M, water_gal: L^3, exempt_gal: L^3, thinner_gal: L^3, thinner_voc_lb_per_gal: M L^-3, limit_lb_per_gal: M L^-3 } out: { voc_as_supplied: M L^-3, voc_less_water: M L^-3, applied_voc_as_supplied: M L^-3, applied_voc_less_water: M L^-3, margin_lb_per_gal: M L^-3, applied_gal: L^3, less_water_gal: L^3, non_voc_gal: L^3 }
+// dims: in { coating_gal: L^3, voc_lb: M, water_gal: L^3, exempt_gal: L^3, thinner_gal: L^3, thinner_voc_lb_per_gal: M L^-3, limit_lb_per_gal: M L^-3 } out: { voc_as_supplied: M L^-3, voc_less_water: M L^-3, applied_voc_as_supplied: M L^-3, applied_voc_less_water: M L^-3, margin_lb_per_gal: M L^-3, applied_gal: L^3, less_water_gal: L^3, non_voc_gal: L^3, basis_ratio: dimensionless }
 export function computeCoatingVocCompliance({
   coating_gal = 1, voc_lb = 0, water_gal = 0, exempt_gal = 0,
   thinner_gal = 0, thinner_voc_lb_per_gal = 0, limit_lb_per_gal = 0, thinner_water_exempt_pct = 0,
@@ -761,7 +761,7 @@ AIRQUALITY_RENDERERS["spcc-containment-volume"] = _simpleRenderer({
 // area removes the same FRACTION of the remaining penetration, so going from
 // 99 to 99.9 percent takes exactly as much additional area as going from 0 to
 // 90 did. That identity is asserted in the bounds test.
-// dims: in { plate_area_ft2: L^2, gas_acfm: L^3 T^-1, migration_velocity_fps: L T^-1, target_efficiency_pct: dimensionless } out: { efficiency_pct: dimensionless, penetration_pct: dimensionless, deutsch_exponent: dimensionless, area_for_target_ft2: L^2, additional_area_ft2: L^2, gas_cfs: L^3 T^-1 }
+// dims: in { plate_area_ft2: L^2, gas_acfm: L^3 T^-1, migration_velocity_fps: L T^-1, target_efficiency_pct: dimensionless } out: { efficiency_pct: dimensionless, penetration_pct: dimensionless, deutsch_exponent: dimensionless, area_for_target_ft2: L^2, additional_area_ft2: L^2, gas_cfs: L^3 T^-1, area_ratio: dimensionless }
 export function computeEspDeutschEfficiency({
   plate_area_ft2 = 0, gas_acfm = 0, migration_velocity_fps = 0, target_efficiency_pct = 0,
 } = {}) {
@@ -1005,7 +1005,7 @@ const _PG_SIGMA = {
   E: { ay: 50.5, by: 0.894, near: [22.8, 0.678, -1.3], far: [55.4, 0.305, -34.0] },
   F: { ay: 34, by: 0.894, near: [14.35, 0.740, -0.35], far: [62.6, 0.180, -48.6] },
 };
-// dims: in { emission_rate_lb_hr: M T^-1, effective_height_ft: L, wind_mph: L T^-1, distance_mi: L, stability_class: dimensionless, alt_stability_class: dimensionless } out: { sigma_y_m: L, sigma_z_m: L, concentration_ug_m3: M L^-3, max_concentration_ug_m3: M L^-3, max_distance_km: L, effective_height_m: L, distance_km: L }
+// dims: in { emission_rate_lb_hr: M T^-1, effective_height_ft: L, wind_mph: L T^-1, distance_mi: L, stability_class: dimensionless, alt_stability_class: dimensionless } out: { sigma_y_m: L, sigma_z_m: L, concentration_ug_m3: M L^-3, max_concentration_ug_m3: M L^-3, max_distance_km: L, effective_height_m: L, distance_km: L, height_ratio: dimensionless }
 export function computeGaussianDispersionScreen({
   emission_rate_lb_hr = 0, effective_height_ft = 0, wind_mph = 0,
   distance_mi = 0, stability_class = "D", alt_stability_class = "",

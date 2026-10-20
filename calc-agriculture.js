@@ -238,7 +238,7 @@ export function computeDrawbarPower({ pull_lb = 0, speed_mph = 0, surface = "fir
 
 export const drawbarPowerExample = { inputs: { pull_lb: 4500, speed_mph: 4.5, surface: "firm_soil" } };
 
-// dims: in { power_hp: M L^2 T^-3, power_basis: dimensionless, speed_mph: L T^-1, surface: dimensionless, tractor_type: dimensionless } out: { pull_lb: M L T^-2, drawbar_hp: M L^2 T^-3 }
+// dims: in { power_hp: M L^2 T^-3, power_basis: dimensionless, speed_mph: L T^-1, surface: dimensionless, tractor_type: dimensionless } out: { pull_lb: M L T^-2, drawbar_hp: M L^2 T^-3, tractive_efficiency: dimensionless }
 export function computeDrawbarPull({ power_hp = 0, power_basis = "drawbar", speed_mph = 0, surface = "firm_soil", tractor_type = "2wd" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const power = Number(power_hp) || 0;
@@ -1456,7 +1456,7 @@ const NPK_DEFAULT_SOURCES = {
   mop_k_pct: 60,    // muriate of potash 0-0-60 (K source)
 };
 
-// dims: in { crop: dimensionless, soil_n_lb_per_acre: M L^-2, soil_p_lb_per_acre: M L^-2, soil_k_lb_per_acre: M L^-2, area_acres: L^2, urea_n_pct: dimensionless, dap_n_pct: dimensionless, dap_p_pct: dimensionless, mop_k_pct: dimensionless, bag_weight_lb: M } out: { rec_n_lb_per_acre: M L^-2, rec_p_lb_per_acre: M L^-2, rec_k_lb_per_acre: M L^-2, urea_lb_per_acre: M L^-2, dap_lb_per_acre: M L^-2, mop_lb_per_acre: M L^-2, urea_total_lb: M, dap_total_lb: M, mop_total_lb: M, area_acres: L^2, bag_weight_lb: M }
+// dims: in { crop: dimensionless, soil_n_lb_per_acre: M L^-2, soil_p_lb_per_acre: M L^-2, soil_k_lb_per_acre: M L^-2, area_acres: L^2, urea_n_pct: dimensionless, dap_n_pct: dimensionless, dap_p_pct: dimensionless, mop_k_pct: dimensionless, bag_weight_lb: M } out: { rec_n_lb_per_acre: M L^-2, rec_p_lb_per_acre: M L^-2, rec_k_lb_per_acre: M L^-2, urea_lb_per_acre: M L^-2, dap_lb_per_acre: M L^-2, mop_lb_per_acre: M L^-2, urea_total_lb: M, dap_total_lb: M, mop_total_lb: M, area_acres: L^2, bag_weight_lb: M, dap_bags: dimensionless, mop_bags: dimensionless, urea_bags: dimensionless }
 export function computeNpkBlend({
   crop = "corn",
   soil_n_lb_per_acre = 0,

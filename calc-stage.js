@@ -1542,7 +1542,7 @@ STAGE_RENDERERS["room-absorption-target"] = renderRoomAbsorptionTarget;
 
 // --- spec-v542 N: Counterweight fly-system balance (`counterweight-arbor-load`) ---
 // required = (batten + load) x purchase_ratio (1 single, 2 double). out_of_weight = required - existing.
-// dims: in { batten_weight_lb: M L T^-2, attached_load_lb: M L T^-2, purchase_type: dimensionless, brick_weight_lb: M L T^-2, existing_cw_lb: M L T^-2 } out: { required_cw_lb: M L T^-2, out_of_weight_lb: M L T^-2, bricks: dimensionless }
+// dims: in { batten_weight_lb: M L T^-2, attached_load_lb: M L T^-2, purchase_type: dimensionless, brick_weight_lb: M L T^-2, existing_cw_lb: M L T^-2 } out: { required_cw_lb: M L T^-2, out_of_weight_lb: M L T^-2, bricks: dimensionless, purchase_ratio: dimensionless }
 export function computeCounterweightArborLoad({ batten_weight_lb = 0, attached_load_lb = 0, purchase_type = "single", brick_weight_lb = 0, existing_cw_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const batten = Number(batten_weight_lb) || 0;

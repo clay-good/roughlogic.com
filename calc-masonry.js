@@ -932,7 +932,7 @@ const _GAL_PER_CUFT = 1728 / 231;
 
 // ============ spec-v1683: ASTM C270 mortar batch proportions ============
 
-// dims: in { cement_volumes: dimensionless, lime_volumes: dimensionless, sand_ratio: dimensionless, cement_bags: dimensionless, unit_strength_psi: M L^-1 T^-2, mortar_strength_psi: M L^-1 T^-2 } out: { cementitious_cuft: L^3, sand_cuft: L^3, sand_min_cuft: L^3, sand_max_cuft: L^3, lime_bags: dimensionless, sand_shovels: dimensionless, mortar_strength_psi: M L^-1 T^-2, unit_strength_psi: M L^-1 T^-2 }
+// dims: in { cement_volumes: dimensionless, lime_volumes: dimensionless, sand_ratio: dimensionless, cement_bags: dimensionless, unit_strength_psi: M L^-1 T^-2, mortar_strength_psi: M L^-1 T^-2 } out: { cementitious_cuft: L^3, sand_cuft: L^3, sand_min_cuft: L^3, sand_max_cuft: L^3, lime_bags: dimensionless, sand_shovels: dimensionless, mortar_strength_psi: M L^-1 T^-2, unit_strength_psi: M L^-1 T^-2, strength_ratio: dimensionless, cement_bags: dimensionless, sand_ratio: dimensionless }
 export function computeMortarBatchC270({ cement_volumes = 1, lime_volumes = 0.5, sand_ratio = 2.5, cement_bags = 1, unit_strength_psi = 0, mortar_strength_psi = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(cement_volumes > 0)) return { error: "The cement proportion must be positive (volumes)." };

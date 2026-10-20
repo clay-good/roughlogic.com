@@ -287,7 +287,7 @@ export const LUMBER_NOMINAL_TO_ACTUAL = {
   "2x12": { b_in: 1.5, d_in: 11.25 },
 };
 
-// dims: in { species_grade: dimensionless, nominal_size: dimensionless, total_load_psf: M L^-1 T^-2, tributary_width_in: L, deflection_limit: dimensionless, live_load_psf: M L^-1 T^-2 } out: { governing: dimensionless, allowable_span_ft: L, by_bending_ft: L, by_deflection_ft: L, F_b_psi: M L^-1 T^-2, E_psi: M L^-1 T^-2, deflection_in: L, allowable_deflection_in: L }
+// dims: in { species_grade: dimensionless, nominal_size: dimensionless, total_load_psf: M L^-1 T^-2, tributary_width_in: L, deflection_limit: dimensionless, live_load_psf: M L^-1 T^-2 } out: { governing: dimensionless, allowable_span_ft: L, by_bending_ft: L, by_deflection_ft: L, F_b_psi: M L^-1 T^-2, E_psi: M L^-1 T^-2, deflection_in: L, allowable_deflection_in: L, deflection_ratio: dimensionless }
 export function computeLumberSpan({ species_grade, nominal_size, total_load_psf, tributary_width_in = 16, deflection_limit = 360, live_load_psf = 0 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const props = LUMBER_SPECIES_GRADES[species_grade];
@@ -3898,7 +3898,7 @@ CONSTRUCTION_RENDERERS["point-load-bearing"] = renderPointLoadBearing;
 // --- v20 E.2: Wood column capacity, slenderness (`column-buckling-wood`) ---
 // le/d governs; FcE = 0.822*Emin/(le/d)^2; a = FcE/Fc*; c = 0.8 (sawn);
 // Cp = (1+a)/(2c) - sqrt(((1+a)/(2c))^2 - a/c); Fc' = Fc**Cp; cap = Fc'*b*d.
-// dims: in { b_in: L, d_in: L, le_in: L, fc_star_psi: M*L^-1*T^-2, emin_psi: M*L^-1*T^-2, ke: dimensionless } out: { cp: dimensionless, capacity_lb: M*L*T^-2, fc_prime_psi: M L^-1 T^-2, fce_psi: M L^-1 T^-2 }
+// dims: in { b_in: L, d_in: L, le_in: L, fc_star_psi: M*L^-1*T^-2, emin_psi: M*L^-1*T^-2, ke: dimensionless } out: { cp: dimensionless, capacity_lb: M*L*T^-2, fc_prime_psi: M L^-1 T^-2, fce_psi: M L^-1 T^-2, slenderness_ratio: dimensionless }
 export function computeColumnBucklingWood({ b_in = 0, d_in = 0, le_in = 0, fc_star_psi = 0, emin_psi = 0, ke = 1 } = {}) {
   const b = Number(b_in) || 0;
   const d = Number(d_in) || 0;
@@ -6479,7 +6479,7 @@ CONSTRUCTION_RENDERERS["concrete-evaporation-rate"] = _renderConcreteEvaporation
 
 // ----- spec-v247: Concrete Age-Strength Gain for Form Stripping and Loading (ACI 209) -----
 
-// dims: in { fc28: M L^-1 T^-2, age_days: T, a: T, b: dimensionless, target_pct: dimensionless } out: { fraction: dimensionless, fc_t: M L^-1 T^-2 }
+// dims: in { fc28: M L^-1 T^-2, age_days: T, a: T, b: dimensionless, target_pct: dimensionless } out: { fraction: dimensionless, fc_t: M L^-1 T^-2, pct: dimensionless }
 export function computeConcreteStrengthGain({ fc28 = 0, age_days = 0, a = 4.0, b = 0.85, target_pct = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(fc28 > 0)) return { error: "Specified 28-day strength must be positive (psi)." };
@@ -7684,7 +7684,7 @@ CONSTRUCTION_RENDERERS["wood-screw-withdrawal"] = _renderWoodScrewWithdrawal;
 // (v341), a cross-section's A/I/S/r for any of four shapes (v342), and the combined
 // axial+bending fiber stresses with the kern threshold (v343).
 
-// dims: in { L_ft: L, P_lb: M L T^-2, w_plf: M T^-2, E_psi: M L^-1 T^-2, I_in4: L^4 } out: { M_lbft: M L^2 T^-2, V_lb: M L T^-2, delta_in: L }
+// dims: in { L_ft: L, P_lb: M L T^-2, w_plf: M T^-2, E_psi: M L^-1 T^-2, I_in4: L^4 } out: { M_lbft: M L^2 T^-2, V_lb: M L T^-2, delta_in: L, span_ratio: dimensionless }
 export function computeCantileverBeam({ L_ft = 0, P_lb = 0, w_plf = 0, E_psi = 29e6, I_in4 = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (Number(P_lb) < 0 || Number(w_plf) < 0) return { error: "Loads act downward and cannot be negative; mixed-direction loads are not this case." };
@@ -10587,7 +10587,7 @@ CONSTRUCTION_RENDERERS["siding-takeoff"] = _v883renderSidingTakeoff;
 //
 // Bags of plaster for a multi-coat thickness over an area, with waste.
 //   bags = ceil(area x thickness / bag_yield x (1 + waste/100))
-// dims: in { area_sf: L^2, total_thickness_in: L, bag_yield_sf_in: L^3, waste_pct: dimensionless } out: { bags: dimensionless }
+// dims: in { area_sf: L^2, total_thickness_in: L, bag_yield_sf_in: L^3, waste_pct: dimensionless } out: { bags: dimensionless, raw_bags: dimensionless }
 export function computeStuccoCoverage({ area_sf = 1000, total_thickness_in = 0.875, bag_yield_sf_in = 10.1, waste_pct = 10 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(area_sf > 0)) return { error: "Area must be positive (ft^2)." };
@@ -10849,7 +10849,7 @@ CONSTRUCTION_RENDERERS["glass-vacuum-lift"] = _v889renderGlassVacuumLift;
 //
 // Bags of polymeric joint sand for a paver area, with waste; coverage swings with joint width.
 //   bags = ceil(area x (1 + waste/100) / coverage_per_bag)
-// dims: in { area_sf: L^2, coverage_per_bag_sf: L^2, waste_pct: dimensionless } out: { bags: dimensionless }
+// dims: in { area_sf: L^2, coverage_per_bag_sf: L^2, waste_pct: dimensionless } out: { bags: dimensionless, raw_bags: dimensionless }
 export function computePolymericSandBags({ area_sf = 400, coverage_per_bag_sf = 75, waste_pct = 5 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(area_sf > 0)) return { error: "Paver area must be positive (ft^2)." };
@@ -12165,7 +12165,7 @@ CONSTRUCTION_RENDERERS["membrane-fastener-takeoff"] = _simpleRenderer({
 // see 1,800 lb each from a 200 lb push. That ratio - the lever arm going from 36 in down to
 // 4 in - is why deck guards fail at the rim joist and not at the post.
 // IBC 1607.9.1: a 50 plf uniform load and a 200 lb concentrated load, NOT concurrent.
-// dims: in { post_height_in: L, post_spacing_ft: L, concentrated_lb: M L T^-2, uniform_plf: M T^-2, post_b_in: L, post_d_in: L, allowable_fb_psi: M L^-1 T^-2, connection_lever_in: L } out: { governing_load_lb: M L T^-2, moment_inlb: M L^2 T^-2, section_modulus_in3: L^3, required_fb_psi: M L^-1 T^-2, connection_force_lb: M L T^-2, force_multiplier: dimensionless }
+// dims: in { post_height_in: L, post_spacing_ft: L, concentrated_lb: M L T^-2, uniform_plf: M T^-2, post_b_in: L, post_d_in: L, allowable_fb_psi: M L^-1 T^-2, connection_lever_in: L } out: { governing_load_lb: M L T^-2, moment_inlb: M L^2 T^-2, section_modulus_in3: L^3, required_fb_psi: M L^-1 T^-2, connection_force_lb: M L T^-2, force_multiplier: dimensionless, post_utilization: dimensionless }
 export function computeGuardPostLoad({ post_height_in = 36, post_spacing_ft = 6, concentrated_lb = 200, uniform_plf = 50, post_b_in = 3.5, post_d_in = 3.5, allowable_fb_psi = 0, connection_lever_in = 4 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (uniform_plf === null || uniform_plf === "") uniform_plf = 50;
@@ -12408,7 +12408,7 @@ CONSTRUCTION_RENDERERS["landing-check"] = _simpleRenderer({
 // Only the FRONT approach is shipped here. Table 404.2.4.1 also covers hinge-side and
 // latch-side approaches and adds clearance where a closer and a latch are both provided;
 // those rows are not reproduced and the note says to read the table for them.
-// dims: in { clear_perpendicular_in: L, clear_latch_side_in: L, door_clear_width_in: L, side: dimensionless, min_pull_perpendicular_in: L, min_pull_latch_in: L, min_push_perpendicular_in: L } out: { required_perpendicular_in: L, required_latch_in: L, perpendicular_deficit_in: L, latch_deficit_in: L, required_area_sf: L^2, other_area_sf: L^2, required_width_in: L }
+// dims: in { clear_perpendicular_in: L, clear_latch_side_in: L, door_clear_width_in: L, side: dimensionless, min_pull_perpendicular_in: L, min_pull_latch_in: L, min_push_perpendicular_in: L } out: { required_perpendicular_in: L, required_latch_in: L, perpendicular_deficit_in: L, latch_deficit_in: L, required_area_sf: L^2, other_area_sf: L^2, required_width_in: L, area_ratio: dimensionless }
 export function computeDoorManeuveringClearance({ clear_perpendicular_in = 0, clear_latch_side_in = 0, door_clear_width_in = 32, side = "pull", min_pull_perpendicular_in = 60, min_pull_latch_in = 18, min_push_perpendicular_in = 48 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (side !== "pull" && side !== "push") return { error: "Side must be pull or push." };

@@ -152,7 +152,7 @@ function _changeOfStateTension(K, C) {
 
 // ============ spec-v1450: ruling (equivalent) span ============
 
-// dims: in { span_1_ft: L, span_2_ft: L, span_3_ft: L, span_4_ft: L, span_5_ft: L, span_6_ft: L, span_7_ft: L, span_8_ft: L, ruling_span_sag_ft: L } out: { ruling_span_ft: L, average_span_ft: L, field_approximation_ft: L, longest_span_sag_ft: L, shortest_span_sag_ft: L, approximation_error_ft: L, approximation_error_pct: dimensionless, longest_span_ft: L, ruling_span_sag_ft: L, shortest_span_ft: L, span_count: dimensionless }
+// dims: in { span_1_ft: L, span_2_ft: L, span_3_ft: L, span_4_ft: L, span_5_ft: L, span_6_ft: L, span_7_ft: L, span_8_ft: L, ruling_span_sag_ft: L } out: { ruling_span_ft: L, average_span_ft: L, field_approximation_ft: L, longest_span_sag_ft: L, shortest_span_sag_ft: L, approximation_error_ft: L, approximation_error_pct: dimensionless, longest_span_ft: L, ruling_span_sag_ft: L, shortest_span_ft: L, span_count: dimensionless, ruling_to_average_ratio: dimensionless, sag_spread_ratio: dimensionless }
 export function computeRulingSpan({ span_1_ft = 0, span_2_ft = 0, span_3_ft = 0, span_4_ft = 0, span_5_ft = 0, span_6_ft = 0, span_7_ft = 0, span_8_ft = 0, ruling_span_sag_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const entered = [span_1_ft, span_2_ft, span_3_ft, span_4_ft, span_5_ft, span_6_ft, span_7_ft, span_8_ft];
@@ -578,7 +578,7 @@ LINEWORKER_RENDERERS["pole-class-groundline-moment"] = _simpleRenderer({
 
 // ============ spec-v1456: guy anchor holding capacity in soil ============
 
-// dims: in { helix_diameter_in: L, installed_depth_ft: L, cohesion_psf: M L^-1 T^-2, friction_bearing_factor: dimensionless, soil_unit_weight_pcf: M L^-3, factor_of_safety: dimensionless, installing_torque_ftlb: M L^2 T^-2, torque_factor_per_ft: dimensionless, guy_tension_lb: M L T^-2 } out: { helix_area_ft2: L^2, ultimate_capacity_lb: M L T^-2, allowable_capacity_lb: M L T^-2, torque_capacity_lb: M L T^-2, margin_lb: M L T^-2, factor_of_safety: dimensionless }
+// dims: in { helix_diameter_in: L, installed_depth_ft: L, cohesion_psf: M L^-1 T^-2, friction_bearing_factor: dimensionless, soil_unit_weight_pcf: M L^-3, factor_of_safety: dimensionless, installing_torque_ftlb: M L^2 T^-2, torque_factor_per_ft: dimensionless, guy_tension_lb: M L T^-2 } out: { helix_area_ft2: L^2, ultimate_capacity_lb: M L T^-2, allowable_capacity_lb: M L T^-2, torque_capacity_lb: M L T^-2, margin_lb: M L T^-2, factor_of_safety: dimensionless, method_ratio: dimensionless }
 export function computeGuyAnchorHoldingCapacity({ helix_diameter_in = 0, installed_depth_ft = 0, cohesion_psf = 0, friction_bearing_factor = 0, soil_unit_weight_pcf = 0, factor_of_safety = 2, installing_torque_ftlb = 0, torque_factor_per_ft = 10, guy_tension_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // Unit / range guard added 2026-09-26 after printed-example probing.
@@ -1121,7 +1121,7 @@ LINEWORKER_RENDERERS["capacitor-bank-voltage-rise"] = _simpleRenderer({
 
 // ============ spec-v1463: step voltage regulator tap and bandwidth ============
 
-// dims: in { base_voltage_v: M L^2 T^-3 I^-1, bandwidth_v: M L^2 T^-3 I^-1, tap_position: dimensionless, load_current_a: I, power_factor: dimensionless, ldc_r_volts: M L^2 T^-3 I^-1, ldc_x_volts: M L^2 T^-3 I^-1, ct_rating_a: I } out: { volts_per_step: M L^2 T^-3 I^-1, bandwidth_steps: dimensionless, band_half_v: M L^2 T^-3 I^-1, full_range_v: M L^2 T^-3 I^-1, output_voltage_v: M L^2 T^-3 I^-1, simulated_drop_v: M L^2 T^-3 I^-1, bandwidth_v: M L^2 T^-3 I^-1, base_voltage_v: M L^2 T^-3 I^-1, ct_rating_a: I, full_range_pct: dimensionless, load_current_a: I, power_factor: dimensionless, tap_change_v: M L^2 T^-3 I^-1, terminal_for_set_point_v: M L^2 T^-3 I^-1 }
+// dims: in { base_voltage_v: M L^2 T^-3 I^-1, bandwidth_v: M L^2 T^-3 I^-1, tap_position: dimensionless, load_current_a: I, power_factor: dimensionless, ldc_r_volts: M L^2 T^-3 I^-1, ldc_x_volts: M L^2 T^-3 I^-1, ct_rating_a: I } out: { volts_per_step: M L^2 T^-3 I^-1, bandwidth_steps: dimensionless, band_half_v: M L^2 T^-3 I^-1, full_range_v: M L^2 T^-3 I^-1, output_voltage_v: M L^2 T^-3 I^-1, simulated_drop_v: M L^2 T^-3 I^-1, bandwidth_v: M L^2 T^-3 I^-1, base_voltage_v: M L^2 T^-3 I^-1, ct_rating_a: I, full_range_pct: dimensionless, load_current_a: I, power_factor: dimensionless, tap_change_v: M L^2 T^-3 I^-1, terminal_for_set_point_v: M L^2 T^-3 I^-1, current_ratio: dimensionless }
 export function computeRegulatorTapBandwidth({ base_voltage_v = 120, bandwidth_v = 0, tap_position = 0, load_current_a = 0, power_factor = 0.9, ldc_r_volts = 0, ldc_x_volts = 0, ct_rating_a = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(base_voltage_v > 0)) return { error: "Base voltage must be positive (V)." };

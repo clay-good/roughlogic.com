@@ -264,7 +264,7 @@ FEEDER_RENDERERS["transformer-conductor-protection"] = _v26renderTransformerCond
 // Feeder tap conductor 10-ft / 25-ft rule (NEC 240.21(B)(1)/(B)(2)).
 // =====================================================================
 
-// dims: in { feeder_ocpd_a: I, tap_length_ft: L, tap_ampacity_a: I } out: { min_tap_ampacity_a: I, margin_a: I, tap_ampacity_a: I }
+// dims: in { feeder_ocpd_a: I, tap_length_ft: L, tap_ampacity_a: I } out: { min_tap_ampacity_a: I, margin_a: I, tap_ampacity_a: I, min_fraction: dimensionless }
 export function computeFeederTapRule({ feeder_ocpd_a = 0, tap_length_ft = 0, tap_ampacity_a = 0 } = {}) {
   const _g = _finiteGuard({ feeder_ocpd_a, tap_length_ft, tap_ampacity_a }); if (_g) return _g;
   const ocpd = Number(feeder_ocpd_a) || 0;

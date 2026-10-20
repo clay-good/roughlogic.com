@@ -299,7 +299,7 @@ INSPECTION_RENDERERS["ut-thickness-velocity"] = _simpleRenderer({
 // =====================================================================
 const _RT_IR192_HALF_LIFE_DAYS = 73.83;
 const _RT_CO60_HALF_LIFE_DAYS = 1925.3;
-// dims: in { base_exposure_s: T, base_distance_in: L, new_distance_in: L, source_size_in: L, material_thickness_in: L, days_elapsed: T, half_life_days: T, unsharpness_limit_in: L } out: { new_exposure_s: T, ug_base_in: L, ug_new_in: L, decay_factor: dimensionless, decayed_exposure_s: T, activity_pct: dimensionless, distance_for_limit_in: L }
+// dims: in { base_exposure_s: T, base_distance_in: L, new_distance_in: L, source_size_in: L, material_thickness_in: L, days_elapsed: T, half_life_days: T, unsharpness_limit_in: L } out: { new_exposure_s: T, ug_base_in: L, ug_new_in: L, decay_factor: dimensionless, decayed_exposure_s: T, activity_pct: dimensionless, distance_for_limit_in: L, distance_ratio: dimensionless }
 export function computeRtExposureTime({
   base_exposure_s = 0, base_distance_in = 0, new_distance_in = 0,
   source_size_in = 0, material_thickness_in = 0,

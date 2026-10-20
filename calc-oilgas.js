@@ -1181,7 +1181,7 @@ export const tankStrappingVolumeExample = { inputs: { tank_diameter_ft: 30, gaug
 // are tabulated by capacity and by wetted area and the adopted edition
 // governs -- and what is computed is the combination and the margin.
 // =====================================================================
-// dims: in { pump_in_bph: L^3 T^-1, pump_out_bph: L^3 T^-1, volatile_factor: dimensionless, thermal_out_ft3h: L^3 T^-1, thermal_in_ft3h: L^3 T^-1, fire_case_ft3h: L^3 T^-1, installed_pressure_ft3h: L^3 T^-1, installed_vacuum_ft3h: L^3 T^-1 } out: { liquid_out_ft3h: L^3 T^-1, liquid_in_ft3h: L^3 T^-1, required_out_ft3h: L^3 T^-1, required_in_ft3h: L^3 T^-1, pressure_margin_ft3h: L^3 T^-1, vacuum_margin_ft3h: L^3 T^-1, thermal_share_out_pct: dimensionless }
+// dims: in { pump_in_bph: L^3 T^-1, pump_out_bph: L^3 T^-1, volatile_factor: dimensionless, thermal_out_ft3h: L^3 T^-1, thermal_in_ft3h: L^3 T^-1, fire_case_ft3h: L^3 T^-1, installed_pressure_ft3h: L^3 T^-1, installed_vacuum_ft3h: L^3 T^-1 } out: { liquid_out_ft3h: L^3 T^-1, liquid_in_ft3h: L^3 T^-1, required_out_ft3h: L^3 T^-1, required_in_ft3h: L^3 T^-1, pressure_margin_ft3h: L^3 T^-1, vacuum_margin_ft3h: L^3 T^-1, thermal_share_out_pct: dimensionless, fire_ratio: dimensionless, thermal_share_in_pct: dimensionless }
 export function computeTankVentApi2000({
   pump_in_bph = 0, pump_out_bph = 0, volatile_factor = 1,
   thermal_out_ft3h = 0, thermal_in_ft3h = 0, fire_case_ft3h = 0,

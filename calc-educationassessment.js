@@ -44,7 +44,7 @@ export const EDUCATIONASSESSMENT_RENDERERS = {};
 
 // --- v20 Y.1: Final-exam grade needed (`final-grade-needed`) ---
 // needed = (target - current*(1 - w_f)) / w_f, w_f = final_weight/100.
-// dims: in { current_pct: dimensionless, final_weight_pct: dimensionless, target_pct: dimensionless } out: { needed_pct: dimensionless, max_pct: dimensionless, needed_raw_pct: dimensionless }
+// dims: in { current_pct: dimensionless, final_weight_pct: dimensionless, target_pct: dimensionless } out: { needed_pct: dimensionless, max_pct: dimensionless, needed_raw_pct: dimensionless, min_pct: dimensionless }
 export function computeFinalGradeNeeded({ current_pct = 0, final_weight_pct = 0, target_pct = 0 } = {}) {
   const current = Number(current_pct);
   const fwPct = Number(final_weight_pct);

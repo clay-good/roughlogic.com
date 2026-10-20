@@ -125,7 +125,7 @@ const _MEC_REFERENCE_TEMP_F = 59;
 // with KM 2.6 ft and KG 3.1 ft" and then, mid-sentence, takes KG as 2.1 --
 // because 3.1 would have given a NEGATIVE GM and an unstable vessel. Both KM
 // and KG are inputs here and the sign of GM is a computed verdict.
-// dims: in { km_ft: L, kg_ft: L, displacement_lb: M L T^-2, added_weight_lb: M L T^-2, added_kg_ft: L, free_surface_moment_ftlb: M L^2 T^-2, heel_angle_deg: dimensionless } out: { gm_ft: L, new_kg_ft: L, new_gm_ft: L, gm_loss_pct: dimensionless, free_surface_correction_ft: L, gz_ft: L, effective_gm_ft: L, gm_change_ft: L }
+// dims: in { km_ft: L, kg_ft: L, displacement_lb: M L T^-2, added_weight_lb: M L T^-2, added_kg_ft: L, free_surface_moment_ftlb: M L^2 T^-2, heel_angle_deg: dimensionless } out: { gm_ft: L, new_kg_ft: L, new_gm_ft: L, gm_loss_pct: dimensionless, free_surface_correction_ft: L, gz_ft: L, effective_gm_ft: L, gm_change_ft: L, weight_fraction_pct: dimensionless }
 export function computeMetacentricHeight({
   km_ft = 0, kg_ft = 0, displacement_lb = 0,
   added_weight_lb = 0, added_kg_ft = 0, free_surface_moment_ftlb = 0, heel_angle_deg = 10,
@@ -272,7 +272,7 @@ MARINEAVIATION_RENDERERS["free-surface-moment"] = _simpleRenderer({
 // that a torsion-only calculation misses entirely -- which is why the
 // classification rule formula governs and the torsion figure is shown only to
 // demonstrate that it under-calls the answer.
-// dims: in { engine_hp: M L^2 T^-3, shaft_rpm: T^-1, shaft_diameter_in: L, allowable_stress_psi: M L^-1 T^-2, rule_factor: dimensionless, repower_hp: M L^2 T^-3 } out: { torque_inlb: M L^2 T^-2, torsional_stress_psi: M L^-1 T^-2, torsion_diameter_in: L, rule_diameter_in: L, repower_diameter_in: L }
+// dims: in { engine_hp: M L^2 T^-3, shaft_rpm: T^-1, shaft_diameter_in: L, allowable_stress_psi: M L^-1 T^-2, rule_factor: dimensionless, repower_hp: M L^2 T^-3 } out: { torque_inlb: M L^2 T^-2, torsional_stress_psi: M L^-1 T^-2, torsion_diameter_in: L, rule_diameter_in: L, repower_diameter_in: L, diameter_ratio: dimensionless, power_ratio: dimensionless }
 export function computeMarineShaftDiameter({
   engine_hp = 0, shaft_rpm = 0, shaft_diameter_in = 0,
   allowable_stress_psi = 0, rule_factor = 0, repower_hp = 0,

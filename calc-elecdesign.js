@@ -849,7 +849,7 @@ ELECDESIGN_RENDERERS["grounding-grid-conductor"] = _simpleRenderer({
 });
 
 // ===================== spec-v1421: overcurrent selective coordination screen =====================
-// dims: in { device_type: dimensionless, upstream_rating_a: I, downstream_rating_a: I, published_ratio: dimensionless, instantaneous_multiplier: dimensionless, available_fault_a: I, pickup_tolerance_pct: dimensionless } out: { ratio: dimensionless, pickup_a: I, pickup_low_a: I, coordinated_to_a: I }
+// dims: in { device_type: dimensionless, upstream_rating_a: I, downstream_rating_a: I, published_ratio: dimensionless, instantaneous_multiplier: dimensionless, available_fault_a: I, pickup_tolerance_pct: dimensionless } out: { ratio: dimensionless, pickup_a: I, pickup_low_a: I, coordinated_to_a: I, published_ratio: dimensionless }
 export function computeSelectiveCoordinationScreen({ device_type = "fuse", upstream_rating_a = 0, downstream_rating_a = 0, published_ratio = 2, instantaneous_multiplier = 10, available_fault_a = 0, pickup_tolerance_pct = 25 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (device_type !== "fuse" && device_type !== "breaker") return { error: "Device type must be fuse or breaker." };

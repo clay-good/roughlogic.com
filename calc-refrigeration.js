@@ -226,7 +226,7 @@ REFRIGERATION_RENDERERS["ammonia-charge-inventory"] = _simpleRenderer({
 // total ratio equally minimizes the total work -- and equal ratios put the
 // interstage at the GEOMETRIC mean of the two absolute pressures, which is
 // always below the arithmetic mean the eye reaches for.
-// dims: in { low_psig: M L^-1 T^-2, high_psig: M L^-1 T^-2, intermediate_load_psig: M L^-1 T^-2 } out: { p_low_psia: M L^-1 T^-2, p_high_psia: M L^-1 T^-2, interstage_psia: M L^-1 T^-2, interstage_psig: M L^-1 T^-2, stage_ratio: dimensionless, single_stage_ratio: dimensionless, arithmetic_mean_psig: M L^-1 T^-2, arithmetic_excess_psi: M L^-1 T^-2 }
+// dims: in { low_psig: M L^-1 T^-2, high_psig: M L^-1 T^-2, intermediate_load_psig: M L^-1 T^-2 } out: { p_low_psia: M L^-1 T^-2, p_high_psia: M L^-1 T^-2, interstage_psia: M L^-1 T^-2, interstage_psig: M L^-1 T^-2, stage_ratio: dimensionless, single_stage_ratio: dimensionless, arithmetic_mean_psig: M L^-1 T^-2, arithmetic_excess_psi: M L^-1 T^-2, arithmetic_high_ratio: dimensionless, arithmetic_low_ratio: dimensionless, intermediate_high_ratio: dimensionless, intermediate_low_ratio: dimensionless }
 export function computeTwoStageInterstagePressure({ low_psig = 0, high_psig = 0, intermediate_load_psig = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const p_low_psia = low_psig + _REF_ATM_PSIA;

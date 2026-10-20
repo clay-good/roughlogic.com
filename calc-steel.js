@@ -898,7 +898,7 @@ STEEL_RENDERERS["steel-h1-interaction"] = _simpleRenderer({
 // the nonsway (braced) moment, with Cm = 0.6 - 0.4 (M1/M2) (no transverse load) or 1.0 (transverse load),
 // Pe1 = pi^2 EI* / (K1 L)^2 the in-plane elastic buckling load (E = 29,000 ksi, EI* = EI nominal here;
 // the direct analysis method reduces it to 0.8 tau_b EI), and alpha = 1.0 (LRFD) / 1.6 (ASD).
-// dims: in { pr_kip: M L T^-2, i_in4: L^4, lc1_ft: L, transverse_load: dimensionless, m1_m2: dimensionless, method: dimensionless } out: { b1: dimensionless, pe1_kip: M L T^-2, cm: dimensionless, alpha: dimensionless }
+// dims: in { pr_kip: M L T^-2, i_in4: L^4, lc1_ft: L, transverse_load: dimensionless, m1_m2: dimensionless, method: dimensionless } out: { b1: dimensionless, pe1_kip: M L T^-2, cm: dimensionless, alpha: dimensionless, axial_ratio: dimensionless }
 export function computeSteelB1Amplifier({ pr_kip = 0, i_in4 = 0, lc1_ft = 0, transverse_load = "no", m1_m2 = 0, method = "LRFD" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const Pr = Number(pr_kip) || 0;
@@ -957,7 +957,7 @@ STEEL_RENDERERS["steel-b1-amplifier"] = _simpleRenderer({
 // where Pstory is the total vertical load on the story, Pmf the vertical load on the moment-frame columns
 // (0 for a braced frame, so RM = 1.0), H the story shear producing the first-order interstory drift dH, and
 // L the story height. A story quantity, unlike the member-level B1.
-// dims: in { pstory_kip: M L T^-2, pmf_kip: M L T^-2, h_kip: M L T^-2, l_ft: L, drift_in: L, method: dimensionless } out: { b2: dimensionless, pe_story_kip: M L T^-2, rm: dimensionless, alpha: dimensionless }
+// dims: in { pstory_kip: M L T^-2, pmf_kip: M L T^-2, h_kip: M L T^-2, l_ft: L, drift_in: L, method: dimensionless } out: { b2: dimensionless, pe_story_kip: M L T^-2, rm: dimensionless, alpha: dimensionless, axial_ratio: dimensionless }
 export function computeSteelB2Amplifier({ pstory_kip = 0, pmf_kip = 0, h_kip = 0, l_ft = 0, drift_in = 0, method = "LRFD" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (method !== "LRFD" && method !== "ASD") return { error: "Method must be LRFD or ASD." };

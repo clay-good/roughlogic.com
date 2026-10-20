@@ -416,7 +416,7 @@ MINING_RENDERERS["blast-stemming-length"] = _simpleRenderer({
 
 // ===================== spec-v1512: crusher reduction ratio =====================
 
-// dims: in { feed_size_in: L, product_size_in: L, stages: dimensionless, machine_ratio_low: dimensionless, machine_ratio_high: dimensionless, actual_intermediate_in: L } out: { total_ratio: dimensionless, per_stage_ratio: dimensionless, first_intermediate_in: L, second_intermediate_in: L, stages_required: dimensionless, actual_downstream_ratio: dimensionless }
+// dims: in { feed_size_in: L, product_size_in: L, stages: dimensionless, machine_ratio_low: dimensionless, machine_ratio_high: dimensionless, actual_intermediate_in: L } out: { total_ratio: dimensionless, per_stage_ratio: dimensionless, first_intermediate_in: L, second_intermediate_in: L, stages_required: dimensionless, actual_downstream_ratio: dimensionless, comfortable_ratio: dimensionless, downstream_per_stage_ratio: dimensionless }
 export function computeCrusherReductionRatio({ feed_size_in = 0, product_size_in = 0, stages = 2, machine_ratio_low = 3, machine_ratio_high = 6, actual_intermediate_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(feed_size_in > 0)) return { error: "Feed size must be positive." };
@@ -1152,7 +1152,7 @@ MINING_RENDERERS["highwall-bench-geometry"] = _simpleRenderer({
 
 // ===================== spec-v1521: rock bolt pattern and support pressure =====================
 
-// dims: in { bolt_capacity_lb: M L T^-2, spacing_1_ft: L, spacing_2_ft: L, span_ft: L, rock_unit_weight_pcf: M L^-3, loosened_zone_ft: L, target_support_psf: M L^-1 T^-2 } out: { area_per_bolt_sqft: L^2, support_psf: M L^-1 T^-2, support_psi: M L^-1 T^-2, dead_weight_required_psf: M L^-1 T^-2, spacing_for_target_ft: L, bolt_length_ft: L, length_from_spacing_ft: L, length_from_span_ft: L, spacing_for_dead_weight_ft: L }
+// dims: in { bolt_capacity_lb: M L T^-2, spacing_1_ft: L, spacing_2_ft: L, span_ft: L, rock_unit_weight_pcf: M L^-3, loosened_zone_ft: L, target_support_psf: M L^-1 T^-2 } out: { area_per_bolt_sqft: L^2, support_psf: M L^-1 T^-2, support_psi: M L^-1 T^-2, dead_weight_required_psf: M L^-1 T^-2, spacing_for_target_ft: L, bolt_length_ft: L, length_from_spacing_ft: L, length_from_span_ft: L, spacing_for_dead_weight_ft: L, dead_weight_ratio: dimensionless }
 export function computeRockBoltSupportPressure({ bolt_capacity_lb = 0, spacing_1_ft = 0, spacing_2_ft = 0, span_ft = 0, rock_unit_weight_pcf = 0, loosened_zone_ft = 0, target_support_psf = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(bolt_capacity_lb > 0)) return { error: "Bolt working capacity must be positive." };

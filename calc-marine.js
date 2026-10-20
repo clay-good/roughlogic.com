@@ -303,7 +303,7 @@ MARINE_RENDERERS["barge-draft-displacement"] = _simpleRenderer({
 // on the simplified (Blum) gross-pressure diagram, and the result surprises
 // people: a 12 ft wall is a 25 ft pile, with 52% of the steel below the dredge line.
 
-// dims: in { retained_height_ft: L, friction_angle_deg: dimensionless, unit_weight_pcf: M L^-3, increase_factor_pct: dimensionless, allowable_stress_psi: M L^-1 T^-2 } out: { ka: dimensionless, kp: dimensionless, active_force_plf: M T^-2, theoretical_depth_ft: L, design_depth_ft: L, total_length_ft: L, depth_to_max_moment_ft: L, max_moment_ftlb_per_ft: M L T^-2, section_modulus_in3_per_ft: L^3, embedment_share_pct: dimensionless, lever_arm_ft: L }
+// dims: in { retained_height_ft: L, friction_angle_deg: dimensionless, unit_weight_pcf: M L^-3, increase_factor_pct: dimensionless, allowable_stress_psi: M L^-1 T^-2 } out: { ka: dimensionless, kp: dimensionless, active_force_plf: M T^-2, theoretical_depth_ft: L, design_depth_ft: L, total_length_ft: L, depth_to_max_moment_ft: L, max_moment_ftlb_per_ft: M L T^-2, section_modulus_in3_per_ft: L^3, embedment_share_pct: dimensionless, lever_arm_ft: L, embedment_ratio: dimensionless }
 export function computeSheetPilePenetration({ retained_height_ft = 0, friction_angle_deg = 0, unit_weight_pcf = 0, increase_factor_pct = 0, allowable_stress_psi = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   if (!(retained_height_ft > 0)) return { error: "Retained height must be positive." };
@@ -378,7 +378,7 @@ MARINE_RENDERERS["sheet-pile-penetration"] = _simpleRenderer({
 // range from 0.3 in to 0.1 in of set spans a factor of two on a measurement
 // taken by eye on a moving pile.
 
-// dims: in { hammer_energy_ftlb: M L^2 T^-2, loss_constant_in: L, required_capacity_tons: M L T^-2, refusal_blows_per_inch: L^-1, loose_set_in: L, embedded_safety_factor: dimensionless } out: { set_in: L, blows_per_inch: L^-1, blows_per_foot: L^-1, refusal_capacity_tons: M L T^-2, loose_set_capacity_tons: M L T^-2, ultimate_capacity_tons: M L T^-2, loose_set_shortfall_pct: dimensionless, refusal_set_in: L }
+// dims: in { hammer_energy_ftlb: M L^2 T^-2, loss_constant_in: L, required_capacity_tons: M L T^-2, refusal_blows_per_inch: L^-1, loose_set_in: L, embedded_safety_factor: dimensionless } out: { set_in: L, blows_per_inch: L^-1, blows_per_foot: L^-1, refusal_capacity_tons: M L T^-2, loose_set_capacity_tons: M L T^-2, ultimate_capacity_tons: M L T^-2, loose_set_shortfall_pct: dimensionless, refusal_set_in: L, refusal_capacity_ratio: dimensionless, set_range_capacity_ratio: dimensionless }
 export function computePileHammerBearing({ hammer_energy_ftlb = 0, loss_constant_in = 0, required_capacity_tons = 0, refusal_blows_per_inch = 0, loose_set_in = 0, embedded_safety_factor = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   if (!(hammer_energy_ftlb > 0)) return { error: "Rated hammer energy must be positive." };
@@ -446,7 +446,7 @@ MARINE_RENDERERS["pile-hammer-bearing"] = _simpleRenderer({
 // that is squared. A vessel arriving at twice the design speed does not deliver
 // twice the energy; it delivers four times.
 
-// dims: in { displacement_tons: M L T^-2, approach_velocity_fps: L T^-1, virtual_mass_factor: dimensionless, eccentricity_factor: dimensionless, softness_factor: dimensionless, configuration_factor: dimensionless, fender_rating_ftlb: M L^2 T^-2, alternative_velocity_fps: L T^-1 } out: { vessel_mass_slugs: M, kinetic_energy_ftlb: M L^2 T^-2, design_energy_ftlb: M L^2 T^-2, usable_rating_ftlb: M L^2 T^-2, accidental_energy_ftlb: M L^2 T^-2, alternative_design_energy_ftlb: M L^2 T^-2, fender_margin_pct: dimensionless, combined_factor: dimensionless }
+// dims: in { displacement_tons: M L T^-2, approach_velocity_fps: L T^-1, virtual_mass_factor: dimensionless, eccentricity_factor: dimensionless, softness_factor: dimensionless, configuration_factor: dimensionless, fender_rating_ftlb: M L^2 T^-2, alternative_velocity_fps: L T^-1 } out: { vessel_mass_slugs: M, kinetic_energy_ftlb: M L^2 T^-2, design_energy_ftlb: M L^2 T^-2, usable_rating_ftlb: M L^2 T^-2, accidental_energy_ftlb: M L^2 T^-2, alternative_design_energy_ftlb: M L^2 T^-2, fender_margin_pct: dimensionless, combined_factor: dimensionless, alternative_energy_ratio: dimensionless, alternative_fender_utilization: dimensionless, fender_utilization: dimensionless, square_berthing_ratio: dimensionless, velocity_ratio: dimensionless }
 export function computeBerthingFenderEnergy({ displacement_tons = 0, approach_velocity_fps = 0, virtual_mass_factor = 0, eccentricity_factor = 0, softness_factor = 0, configuration_factor = 0, fender_rating_ftlb = 0, alternative_velocity_fps = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   if (!(displacement_tons > 0)) return { error: "Vessel displacement must be positive." };
@@ -522,7 +522,7 @@ MARINE_RENDERERS["berthing-fender-energy"] = _simpleRenderer({
 // is roughly 800 times denser than air, so a modest current on a modest area
 // beats a strong wind on a large one.
 
-// dims: in { wind_area_ft2: L^2, wind_drag_coefficient: dimensionless, wind_speed_mph: L T^-1, submerged_area_ft2: L^2, current_drag_coefficient: dimensionless, current_speed_knots: L T^-1, line_count: dimensionless, line_angle_deg: dimensionless, worst_line_share_pct: dimensionless, safety_factor: dimensionless } out: { wind_force_lb: M L T^-2, current_force_lb: M L T^-2, total_force_lb: M L T^-2, load_per_line_lb: M L T^-2, worst_line_load_lb: M L T^-2, required_mbl_lb: M L T^-2, current_over_wind_pct: dimensionless, current_speed_fps: L T^-1, equal_share_pct: dimensionless, wind_speed_fps: L T^-1, worst_line_share_pct: dimensionless }
+// dims: in { wind_area_ft2: L^2, wind_drag_coefficient: dimensionless, wind_speed_mph: L T^-1, submerged_area_ft2: L^2, current_drag_coefficient: dimensionless, current_speed_knots: L T^-1, line_count: dimensionless, line_angle_deg: dimensionless, worst_line_share_pct: dimensionless, safety_factor: dimensionless } out: { wind_force_lb: M L T^-2, current_force_lb: M L T^-2, total_force_lb: M L T^-2, load_per_line_lb: M L T^-2, worst_line_load_lb: M L T^-2, required_mbl_lb: M L T^-2, current_over_wind_pct: dimensionless, current_speed_fps: L T^-1, equal_share_pct: dimensionless, wind_speed_fps: L T^-1, worst_line_share_pct: dimensionless, angle_cost_pct: dimensionless, current_to_wind_ratio: dimensionless, worst_to_equal_ratio: dimensionless }
 export function computeMooringLoadWindCurrent({ wind_area_ft2 = 0, wind_drag_coefficient = 0, wind_speed_mph = 0, submerged_area_ft2 = 0, current_drag_coefficient = 0, current_speed_knots = 0, line_count = 0, line_angle_deg = 0, worst_line_share_pct = 0, safety_factor = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   if (!(wind_area_ft2 > 0) || !(submerged_area_ft2 > 0)) return { error: "Projected wind area and submerged lateral area must be positive." };
@@ -596,7 +596,7 @@ MARINE_RENDERERS["mooring-load-wind-current"] = _simpleRenderer({
 // where a design number becomes a disaster: a skewed pier presents a projection
 // that includes its LENGTH, and a pier is several times longer than it is wide.
 
-// dims: in { pier_width_ft: L, pier_length_ft: L, flow_depth_ft: L, velocity_fps: L T^-1, nose_shape_factor: dimensionless, bed_condition_factor: dimensionless, angle_of_attack_deg: dimensionless, wider_pier_width_ft: L, foundation_margin_ft: L } out: { froude_number: dimensionless, angle_factor: dimensionless, scour_depth_ft: L, wider_pier_scour_ft: L, skewed_scour_ft: L, foundation_depth_ft: L, governing_scour_ft: L, wider_pier_increase_pct: dimensionless }
+// dims: in { pier_width_ft: L, pier_length_ft: L, flow_depth_ft: L, velocity_fps: L T^-1, nose_shape_factor: dimensionless, bed_condition_factor: dimensionless, angle_of_attack_deg: dimensionless, wider_pier_width_ft: L, foundation_margin_ft: L } out: { froude_number: dimensionless, angle_factor: dimensionless, scour_depth_ft: L, wider_pier_scour_ft: L, skewed_scour_ft: L, foundation_depth_ft: L, governing_scour_ft: L, wider_pier_increase_pct: dimensionless, aligned_limit_ratio: dimensionless, skew_ratio: dimensionless, wider_pier_ratio: dimensionless }
 export function computePierScourDepth({ pier_width_ft = 0, pier_length_ft = 0, flow_depth_ft = 0, velocity_fps = 0, nose_shape_factor = 0, bed_condition_factor = 0, angle_of_attack_deg = 0, wider_pier_width_ft = 0, foundation_margin_ft = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   if (!(pier_width_ft > 0) || !(wider_pier_width_ft > 0)) return { error: "Pier widths must be positive." };
@@ -680,7 +680,7 @@ MARINE_RENDERERS["pier-scour-depth"] = _simpleRenderer({
 // workable at all, while wind enters far more strongly. The duration term is the
 // one most often left out and it is frequently what governs.
 
-// dims: in { wind_speed_mph: L T^-1, fetch_mi: L, alternative_fetch_mi: L, alternative_wind_speed_mph: L T^-1 } out: { adjusted_wind_ms: L T^-1, dimensionless_fetch: dimensionless, wave_height_m: L, wave_height_ft: L, peak_period_s: T, duration_required_hr: T, alternative_fetch_height_ft: L, alternative_wind_height_ft: L, alternative_fetch_increase_pct: dimensionless, alternative_wind_increase_pct: dimensionless, fetch_increase_pct: dimensionless, wind_increase_pct: dimensionless }
+// dims: in { wind_speed_mph: L T^-1, fetch_mi: L, alternative_fetch_mi: L, alternative_wind_speed_mph: L T^-1 } out: { adjusted_wind_ms: L T^-1, dimensionless_fetch: dimensionless, wave_height_m: L, wave_height_ft: L, peak_period_s: T, duration_required_hr: T, alternative_fetch_height_ft: L, alternative_wind_height_ft: L, alternative_fetch_increase_pct: dimensionless, alternative_wind_increase_pct: dimensionless, fetch_increase_pct: dimensionless, wind_increase_pct: dimensionless, alternative_fetch_ratio: dimensionless }
 export function computeWaveHeightFetch({ wind_speed_mph = 0, fetch_mi = 0, alternative_fetch_mi = 0, alternative_wind_speed_mph = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   if (!(wind_speed_mph > 0) || !(alternative_wind_speed_mph > 0)) return { error: "Wind speeds must be positive." };

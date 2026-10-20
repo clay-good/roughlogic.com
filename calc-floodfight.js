@@ -144,7 +144,7 @@ FLOODFIGHT_RENDERERS["sandbag-levee-quantity"] = _simpleRenderer({
 
 // ===================== spec-v1905: USACE emergency earth levee section and seepage creep check =====================
 
-// dims: in { height_ft: L, fill: dimensionless, foundation: dimensionless, top_width_ft: L, length_ft: L } out: { riverside_slope_h: dimensionless, landside_slope_h: dimensionless, base_width_ft: L, area_sqft: L^2, fill_cy: L^3, required_path_ft: L, berm_shortfall_ft: L, height_ft: L, length_ft: L, top_width_ft: L }
+// dims: in { height_ft: L, fill: dimensionless, foundation: dimensionless, top_width_ft: L, length_ft: L } out: { riverside_slope_h: dimensionless, landside_slope_h: dimensionless, base_width_ft: L, area_sqft: L^2, fill_cy: L^3, required_path_ft: L, berm_shortfall_ft: L, height_ft: L, length_ft: L, top_width_ft: L, creep_ratio: dimensionless }
 export function computeEmergencyEarthLeveeSection({ height_ft = 0, fill = "sand", foundation = "fine_sand", top_width_ft = 10, length_ft = 100 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(height_ft > 0)) return { error: "Levee height must be positive." };
@@ -213,7 +213,7 @@ function _dragCoefficient(ratio) {
   return 2.0;
 }
 
-// dims: in { depth_ft: L, width_ft: L, water: dimensionless, velocity_basis: dimensionless, entered_velocity_fps: L T^-1, obstruction: dimensionless } out: { hydrostatic_lb_per_ft: M T^-2, hydrostatic_lb: M L T^-2, hydrostatic_height_ft: L, velocity_lower_fps: L T^-1, velocity_upper_fps: L T^-1, velocity_used_fps: L T^-1, drag_coefficient: dimensionless, hydrodynamic_lb: M L T^-2, hydrodynamic_lower_lb: M L T^-2, hydrodynamic_upper_lb: M L T^-2, hydrodynamic_height_ft: L, combined_lateral_lb: M L T^-2, area_sqft: L^2 }
+// dims: in { depth_ft: L, width_ft: L, water: dimensionless, velocity_basis: dimensionless, entered_velocity_fps: L T^-1, obstruction: dimensionless } out: { hydrostatic_lb_per_ft: M T^-2, hydrostatic_lb: M L T^-2, hydrostatic_height_ft: L, velocity_lower_fps: L T^-1, velocity_upper_fps: L T^-1, velocity_used_fps: L T^-1, drag_coefficient: dimensionless, hydrodynamic_lb: M L T^-2, hydrodynamic_lower_lb: M L T^-2, hydrodynamic_upper_lb: M L T^-2, hydrodynamic_height_ft: L, combined_lateral_lb: M L T^-2, area_sqft: L^2, width_depth_ratio: dimensionless }
 export function computeFloodLateralLoad({ depth_ft = 0, width_ft = 0, water = "fresh", velocity_basis = "lower", entered_velocity_fps = 0, obstruction = "wall" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(depth_ft > 0)) return { error: "Still-water flood depth must be positive." };

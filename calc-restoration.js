@@ -1155,7 +1155,7 @@ export const RESTORATION_EQUIPMENT_AMPS = {
 // does not exceed 80% of the breaker rating.
 const _V16D_CONTINUOUS_FACTOR = 0.8;
 
-// dims: in { qty_lgr_dehu: dimensionless, qty_air_mover: dimensionless, qty_hepa_500: dimensionless, qty_heat_dryer: dimensionless, other_amps: I, breaker_A: I, voltage: M L^2 T^-3 I^-1 } out: { total_amps: I, continuous_limit_A: I, circuits_required: dimensionless, total_va: M L^2 T^-3, breaker_A: I, max_unit_amps: I, other_amps: I }
+// dims: in { qty_lgr_dehu: dimensionless, qty_air_mover: dimensionless, qty_hepa_500: dimensionless, qty_heat_dryer: dimensionless, other_amps: I, breaker_A: I, voltage: M L^2 T^-3 I^-1 } out: { total_amps: I, continuous_limit_A: I, circuits_required: dimensionless, total_va: M L^2 T^-3, breaker_A: I, max_unit_amps: I, other_amps: I, single_circuit_utilization: dimensionless }
 export function computeEquipmentCircuitLoad({
   qty_lgr_dehu = 0,
   qty_air_mover = 0,

@@ -92,7 +92,7 @@ const _LB_PER_TON = 2000;
 
 // ============ spec-v1824: hot-dip galvanised coating weight and thickness ============
 
-// dims: in { coating_grade_um: L, steel_tons: M, area_per_ton_ft2: L^2 M^-1, alt_area_per_ton_ft2: L^2 M^-1 } out: { thickness_mils: L, coating_oz_ft2: M L^-2, total_area_ft2: L^2, zinc_lb: M, pickup_pct: dimensionless, alt_pickup_pct: dimensionless }
+// dims: in { coating_grade_um: L, steel_tons: M, area_per_ton_ft2: L^2 M^-1, alt_area_per_ton_ft2: L^2 M^-1 } out: { thickness_mils: L, coating_oz_ft2: M L^-2, total_area_ft2: L^2, zinc_lb: M, pickup_pct: dimensionless, alt_pickup_pct: dimensionless, zinc_ratio: dimensionless }
 export function computeGalvanizeCoatingWeight({ coating_grade_um = 0, steel_tons = 0, area_per_ton_ft2 = 0, alt_area_per_ton_ft2 = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(coating_grade_um > 0)) return { error: "Coating grade (thickness) must be positive (microns)." };

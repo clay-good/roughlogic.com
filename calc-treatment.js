@@ -1265,7 +1265,7 @@ function _v899renderPoolInteriorFinishVolume(inputRegion, outputRegion, citation
 TREATMENT_RENDERERS["pool-interior-finish-volume"] = _v899renderPoolInteriorFinishVolume;
 
 // ===================== spec-v943: gravity oil/water separator surface area (API 421) =====================
-// dims: in { flow_gpm: L^3 T^-1, oil_sg: dimensionless, droplet_micron: L, water_viscosity_cp: M L^-1 T^-1, water_sg: dimensionless } out: { rise_velocity_ftmin: L T^-1, horizontal_area_ft2: L^2 }
+// dims: in { flow_gpm: L^3 T^-1, oil_sg: dimensionless, droplet_micron: L, water_viscosity_cp: M L^-1 T^-1, water_sg: dimensionless } out: { rise_velocity_ftmin: L T^-1, horizontal_area_ft2: L^2, vh_ratio: dimensionless }
 export function computeOilWaterSeparatorSizing({ flow_gpm = 50, oil_sg = 0.85, droplet_micron = 150, water_viscosity_cp = 1.1, water_sg = 1 } = {}) {
   const _g = _finiteGuardPool(arguments[0]); if (_g) return _g;
   if (!(flow_gpm > 0)) return { error: "Flow must be positive (gpm)." };

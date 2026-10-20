@@ -1890,7 +1890,7 @@ WATER_RENDERERS["was-srt-control"] = renderWasSrtControl;
 // --- spec-v574 M: Activated-sludge oxygen and blower air demand ---
 // O2 (AOR) = factor*BOD_removed + 4.6*NH3. SOR = AOR / [alpha F theta^(T-20)
 // (beta Cs,T - C) / Cs,20]. air_scfm = SOR / (0.075*0.232*(SOTE/100)*1440).
-// dims: in { bod_removed_lb_day: M T^-1, oxygen_factor: dimensionless, nh3_nitrified_lb_day: M T^-1, sote_pct: dimensionless, alpha: dimensionless, fouling_f: dimensionless, beta: dimensionless, water_temp_F: T, do_mg_l: M L^-3, cs_field_mg_l: M L^-3, cs20_mg_l: M L^-3 } out: { o2_demand_lb_day: M T^-1, air_scfm: L^3 T^-1 }
+// dims: in { bod_removed_lb_day: M T^-1, oxygen_factor: dimensionless, nh3_nitrified_lb_day: M T^-1, sote_pct: dimensionless, alpha: dimensionless, fouling_f: dimensionless, beta: dimensionless, water_temp_F: T, do_mg_l: M L^-3, cs_field_mg_l: M L^-3, cs20_mg_l: M L^-3 } out: { o2_demand_lb_day: M T^-1, air_scfm: L^3 T^-1, aor_sor_ratio: dimensionless }
 export function computeAerationOxygenDemand({ bod_removed_lb_day = 0, oxygen_factor = 0, nh3_nitrified_lb_day = 0, sote_pct = 0, alpha = 0.5, fouling_f = 0.9, beta = 0.95, water_temp_F = 68, do_mg_l = 2, cs_field_mg_l = 9.09, cs20_mg_l = 9.09 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (water_temp_F === null || water_temp_F === "" || !(Number(water_temp_F) >= 32 && Number(water_temp_F) <= 104)) return { error: "Enter the mixed-liquor temperature, 32 to 104 F." };
@@ -2300,7 +2300,7 @@ WATER_RENDERERS["two-source-blend"] = _v992renderTwoSourceBlend;
 // well fighting itself and IS recoverable). A step test at three or more
 // rates separates them: plotting s/Q against Q gives the intercept B and the
 // slope C, fitted here by least squares.
-// dims: in { q1_gpm: L^3 T^-1, s1_ft: L, q2_gpm: L^3 T^-1, s2_ft: L, q3_gpm: L^3 T^-1, s3_ft: L, operating_gpm: L^3 T^-1, efficiency_threshold_pct: dimensionless, previous_efficiency_pct: dimensionless } out: { b_ft_per_gpm: T L^-2, c_ft_per_gpm2: T^2 L^-5, aquifer_loss_ft: L, well_loss_ft: L, total_drawdown_ft: L, efficiency_pct: dimensionless, specific_capacity_gpm_ft: L^2 T^-1 }
+// dims: in { q1_gpm: L^3 T^-1, s1_ft: L, q2_gpm: L^3 T^-1, s2_ft: L, q3_gpm: L^3 T^-1, s3_ft: L, operating_gpm: L^3 T^-1, efficiency_threshold_pct: dimensionless, previous_efficiency_pct: dimensionless } out: { b_ft_per_gpm: T L^-2, c_ft_per_gpm2: T^2 L^-5, aquifer_loss_ft: L, well_loss_ft: L, total_drawdown_ft: L, efficiency_pct: dimensionless, specific_capacity_gpm_ft: L^2 T^-1, light_rate_efficiency_pct: dimensionless }
 export function computeStepDrawdownEfficiency({
   q1_gpm = 0, s1_ft = 0, q2_gpm = 0, s2_ft = 0, q3_gpm = 0, s3_ft = 0,
   operating_gpm = 0, efficiency_threshold_pct = 65, previous_efficiency_pct = 0,
@@ -2480,7 +2480,7 @@ WATER_RENDERERS["well-casing-purge-volume"] = _simpleRenderer({
 // =====================================================================
 // spec-v1590: constant-pressure well VFD setpoint and flow.
 // =====================================================================
-// dims: in { static_lift_ft: L, friction_at_design_ft: L, design_flow_gpm: L^3 T^-1, setpoint_psi: M L^-1 T^-2, reduced_flow_gpm: L^3 T^-1, full_speed_rpm: T^-1, drawdown_at_design_ft: L, pump_max_head_ft: L } out: { setpoint_head_ft: L, head_at_design_ft: L, head_at_reduced_ft: L, speed_at_reduced_rpm: T^-1, speed_reduction_pct: dimensionless, head_with_drawdown_ft: L, friction_at_reduced_ft: L }
+// dims: in { static_lift_ft: L, friction_at_design_ft: L, design_flow_gpm: L^3 T^-1, setpoint_psi: M L^-1 T^-2, reduced_flow_gpm: L^3 T^-1, full_speed_rpm: T^-1, drawdown_at_design_ft: L, pump_max_head_ft: L } out: { setpoint_head_ft: L, head_at_design_ft: L, head_at_reduced_ft: L, speed_at_reduced_rpm: T^-1, speed_reduction_pct: dimensionless, head_with_drawdown_ft: L, friction_at_reduced_ft: L, flow_ratio: dimensionless }
 export function computeConstantPressureWellVfd({
   static_lift_ft = 0, friction_at_design_ft = 0, design_flow_gpm = 0, setpoint_psi = 0,
   reduced_flow_gpm = 0, full_speed_rpm = 3450, drawdown_at_design_ft = 0, pump_max_head_ft = 0,

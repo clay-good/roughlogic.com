@@ -103,9 +103,14 @@ test("every input a tile compute's dims annotation declares is one it takes", as
 // were declared from that name, 258 more from the one dimension every other
 // declaration of the key gives. Now every returned number whose name states a
 // unit must be declared. (Names that state no unit, `area_ratio` or `se`,
-// still need a person's reading and are not held here.)
+// still need a person's reading and are not held here.) A name ending in a
+// count or ratio word (`_ratio`, `_count`, `_fraction`) is held the same way.
 test("every number a tile compute returns under a unit-named key is declared in its dims", async () => {
   const { unitTailExpectation, UNIT_TAIL_EXEMPT } = await import("../../scripts/check-dimensions.mjs");
+  // Suffix words the corpus declares dimensionless in at least 98% of 10 or
+  // more uses (165 outputs declared from this on 2026-10-20). `_factor` and
+  // `_grade` are not here: a U-factor and a balance grade carry units.
+  const COUNT_OR_RATIO = /_(ratio|fraction|efficiency|utilization|pct|percent|count|number|bags|rows|pieces)$/;
   const { COMPUTE_MAP } = await import("../fixtures/compute-map.js");
   const { rows } = JSON.parse(readFileSync(resolve(ROOT, "test/fixtures/worked-examples.json"), "utf8"));
   const examples = new Map();
@@ -142,7 +147,8 @@ test("every number a tile compute returns under a unit-named key is declared in 
       } catch { /* a throwing example is another test's concern */ }
     }
     for (const key of returned) {
-      if (!unitTailExpectation(key) || UNIT_TAIL_EXEMPT.has(`${rel}:${fn}:${key}`)) continue;
+      const named = unitTailExpectation(key) || COUNT_OR_RATIO.test(key);
+      if (!named || UNIT_TAIL_EXEMPT.has(`${rel}:${fn}:${key}`)) continue;
       checked++;
       if (!declared.has(key)) bad.push(`${rel}: ${fn} returns \`${key}\` but its dims annotation does not declare it`);
     }

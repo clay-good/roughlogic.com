@@ -372,7 +372,7 @@ SAWMILL_RENDERERS["bandmill-speed-bite"] = _simpleRenderer({
 
 // ============ spec-v1586: sawmill residue and sawdust yield ============
 
-// dims: in { lumber_recovery_pct: dimensionless, kerf_in: L, target_kerf_in: L, board_thickness_in: L, alt_board_thickness_in: L, bark_fraction_pct: dimensionless, annual_lumber_mbf: dimensionless } out: { sawdust_share_pct: dimensionless, residue_pct: dimensionless, chips_of_log_pct: dimensionless, gain_pts: dimensionless, annual_gain_bf: dimensionless, alt_share_pct: dimensionless, alt_target_share_pct: dimensionless, sawdust_of_log_pct: dimensionless, target_sawdust_share_pct: dimensionless }
+// dims: in { lumber_recovery_pct: dimensionless, kerf_in: L, target_kerf_in: L, board_thickness_in: L, alt_board_thickness_in: L, bark_fraction_pct: dimensionless, annual_lumber_mbf: dimensionless } out: { sawdust_share_pct: dimensionless, residue_pct: dimensionless, chips_of_log_pct: dimensionless, gain_pts: dimensionless, annual_gain_bf: dimensionless, alt_share_pct: dimensionless, alt_target_share_pct: dimensionless, sawdust_of_log_pct: dimensionless, target_sawdust_share_pct: dimensionless, gain_ratio: dimensionless, bark_fraction_pct: dimensionless }
 export function computeSawmillResidueYield({ lumber_recovery_pct = 0, kerf_in = 0, target_kerf_in = 0, board_thickness_in = 0, alt_board_thickness_in = 0, bark_fraction_pct = 0, annual_lumber_mbf = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(lumber_recovery_pct > 0 && lumber_recovery_pct < 100)) return { error: "Lumber recovery must be between 0 and 100 percent of log volume." };

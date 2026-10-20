@@ -93,7 +93,7 @@ export const BREWING_RENDERERS = {};
 // leaves out, and the thermal-mass RATIO is what makes it matter on a small
 // batch and vanish on a large one.
 
-// dims: in { grain_weight_lb: M, mash_thickness_qt_per_lb: L^3 M^-1, grain_temp_f: T, target_mash_temp_f: T, grain_specific_heat: L^2 T^-2, tun_weight_lb: M, tun_specific_heat: L^2 T^-2, tun_temp_f: T } out: { mash_water_gal: L^3, mash_weight_lb: M, strike_temp_f: T, convention_strike_temp_f: T, tun_drop_f: T, grain_weight_lb: M, tun_share_of_capacity_pct: dimensionless, water_lb: M }
+// dims: in { grain_weight_lb: M, mash_thickness_qt_per_lb: L^3 M^-1, grain_temp_f: T, target_mash_temp_f: T, grain_specific_heat: L^2 T^-2, tun_weight_lb: M, tun_specific_heat: L^2 T^-2, tun_temp_f: T } out: { mash_water_gal: L^3, mash_weight_lb: M, strike_temp_f: T, convention_strike_temp_f: T, tun_drop_f: T, grain_weight_lb: M, tun_share_of_capacity_pct: dimensionless, water_lb: M, strike_ratio: dimensionless }
 export function computeMashStrikeWater({ grain_weight_lb = 0, mash_thickness_qt_per_lb = 0, grain_temp_f = null, target_mash_temp_f = 0, grain_specific_heat = 0, tun_weight_lb = 0, tun_specific_heat = 0, tun_temp_f = null } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   // 0 F is a real reading, so a blank temperature cannot stand in for it. The tun's
@@ -391,7 +391,7 @@ BREWING_RENDERERS["ibu-tinseth"] = _simpleRenderer({
 // color, and a small weight of dark malt carries most of it -- so a two-pound
 // error on the roast moves the color more than a fifty-pound error on the base.
 
-// dims: in { base_malt_lb: M, base_lovibond: dimensionless, crystal_malt_lb: M, crystal_lovibond: dimensionless, roast_malt_lb: M, roast_lovibond: dimensionless, batch_volume_gal: L^3 } out: { mcu: dimensionless, srm: dimensionless, srm_without_roast: dimensionless, batch_volume_gal: L^3, roast_mcu_share_pct: dimensionless, roast_weight_share_pct: dimensionless }
+// dims: in { base_malt_lb: M, base_lovibond: dimensionless, crystal_malt_lb: M, crystal_lovibond: dimensionless, roast_malt_lb: M, roast_lovibond: dimensionless, batch_volume_gal: L^3 } out: { mcu: dimensionless, srm: dimensionless, srm_without_roast: dimensionless, batch_volume_gal: L^3, roast_mcu_share_pct: dimensionless, roast_weight_share_pct: dimensionless, linear_overstatement_ratio: dimensionless }
 export function computeBeerColorSrm({ base_malt_lb = 0, base_lovibond = 0, crystal_malt_lb = 0, crystal_lovibond = 0, roast_malt_lb = 0, roast_lovibond = 0, batch_volume_gal = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   if (!(batch_volume_gal > 0)) return { error: "The batch volume must be positive." };
@@ -656,7 +656,7 @@ BREWING_RENDERERS["carbonation-volumes-pressure"] = _simpleRenderer({
 // on the heat of fermentation is short on the day a tank comes down, and the
 // shortfall shows up as a crash that takes three days instead of one.
 
-// dims: in { batch_volume_gal: L^3, original_gravity: dimensionless, final_gravity: dimensionless, heat_of_fermentation_btu_per_lb: L^2 T^-2, peak_day_share_pct: dimensionless, crash_start_temp_f: T, crash_target_temp_f: T, crash_hours: T, tank_surface_sqft: L^2, tank_u_factor: M T^-4, cellar_temp_f: T, glycol_delta_t_f: T } out: { fermentation_heat_btu: M L^2 T^-2, adiabatic_rise_f: T, fermentation_load_btuh: M L^2 T^-3, crash_load_btuh: M L^2 T^-3, glycol_gpm: L^3 T^-1, ambient_btuh: M L^2 T^-3, batch_volume_gal: L^3, crash_heat_btu: M L^2 T^-2, fast_crash_load_btuh: M L^2 T^-3, fermentation_ambient_btuh: M L^2 T^-3, fermentation_sizing_shortfall_pct: dimensionless }
+// dims: in { batch_volume_gal: L^3, original_gravity: dimensionless, final_gravity: dimensionless, heat_of_fermentation_btu_per_lb: L^2 T^-2, peak_day_share_pct: dimensionless, crash_start_temp_f: T, crash_target_temp_f: T, crash_hours: T, tank_surface_sqft: L^2, tank_u_factor: M T^-4, cellar_temp_f: T, glycol_delta_t_f: T } out: { fermentation_heat_btu: M L^2 T^-2, adiabatic_rise_f: T, fermentation_load_btuh: M L^2 T^-3, crash_load_btuh: M L^2 T^-3, glycol_gpm: L^3 T^-1, ambient_btuh: M L^2 T^-3, batch_volume_gal: L^3, crash_heat_btu: M L^2 T^-2, fast_crash_load_btuh: M L^2 T^-3, fermentation_ambient_btuh: M L^2 T^-3, fermentation_sizing_shortfall_pct: dimensionless, crash_to_fermentation_ratio: dimensionless }
 export function computeFermenterGlycolLoad({ batch_volume_gal = 0, original_gravity = 0, final_gravity = 0, heat_of_fermentation_btu_per_lb = 0, peak_day_share_pct = 0, crash_start_temp_f = 0, crash_target_temp_f = null, crash_hours = 0, tank_surface_sqft = 0, tank_u_factor = 0, cellar_temp_f = 0, glycol_delta_t_f = 0 } = {}) {
   if (original_gravity > 1.2 || final_gravity > 1.2) return { error: "Enter gravities as specific gravity (1.055), not points or degrees Plato." };
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };

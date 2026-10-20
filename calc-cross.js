@@ -297,7 +297,7 @@ export const STATE_TAX_RATE_CHANGES = {
   SD: [{ effective: "2027-07-01", rate: 4.5 }],
 };
 
-// dims: in { state: dimensionless, subtotal: dimensionless, custom_rate_percent: dimensionless, as_of: dimensionless } out: { tax: dimensionless, total: dimensionless }
+// dims: in { state: dimensionless, subtotal: dimensionless, custom_rate_percent: dimensionless, as_of: dimensionless } out: { tax: dimensionless, total: dimensionless, rate_percent: dimensionless }
 export function computeSalesTax({ state, subtotal, custom_rate_percent = null, as_of = "" }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // A missing subtotal gave an empty tax, a blank custom rate was read as 0%, and a
@@ -631,7 +631,7 @@ export const loanPaymentExample = {
 
 // --- Utility 106: Upgrade ROI / Payback ---
 
-// dims: in { incremental_cost: dimensionless, annual_savings: dimensionless, discount_rate_percent: dimensionless, years: T } out: { npv: dimensionless, years: T }
+// dims: in { incremental_cost: dimensionless, annual_savings: dimensionless, discount_rate_percent: dimensionless, years: T } out: { npv: dimensionless, years: T, discount_rate_percent: dimensionless }
 export function computeUpgradeROI({ incremental_cost, annual_savings, discount_rate_percent = 0, years = 10 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(Number(discount_rate_percent) > -100)) return { error: "The discount rate must be above -100%." };

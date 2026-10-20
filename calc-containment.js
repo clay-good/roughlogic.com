@@ -131,7 +131,7 @@ const _RADON_IN_PER_FT = 12;
 const _RADON_AIR_DENSITY_LB_FT3 = 0.075;
 const _RADON_KINEMATIC_VISC_FT2_S = 1.57e-4; // air at about 70 degF
 const _RADON_LB_FT2_PER_IN_WC = 5.192;
-// dims: in { flow_cfm: L^3 T^-1, pipe_diameter_in: L, pipe_length_ft: L, fan_static_in_wc: M L^-1 T^-2, measured_vacuum_in_wc: M L^-1 T^-2, alt_pipe_diameter_in: L } out: { area_ft2: L^2, velocity_fpm: L T^-1, pipe_loss_in_wc: M L^-1 T^-2, pipe_share_pct: dimensionless, alt_velocity_fpm: L T^-1, alt_pipe_loss_in_wc: M L^-1 T^-2 }
+// dims: in { flow_cfm: L^3 T^-1, pipe_diameter_in: L, pipe_length_ft: L, fan_static_in_wc: M L^-1 T^-2, measured_vacuum_in_wc: M L^-1 T^-2, alt_pipe_diameter_in: L } out: { area_ft2: L^2, velocity_fpm: L T^-1, pipe_loss_in_wc: M L^-1 T^-2, pipe_share_pct: dimensionless, alt_velocity_fpm: L T^-1, alt_pipe_loss_in_wc: M L^-1 T^-2, vacuum_ratio: dimensionless }
 export function computeRadonFanStatic({
   flow_cfm = 0, pipe_diameter_in = 4, pipe_length_ft = 0, fan_static_in_wc = 0,
   measured_vacuum_in_wc = 0, alt_pipe_diameter_in = 0,

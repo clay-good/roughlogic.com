@@ -587,7 +587,7 @@ MILLWRIGHT_RENDERERS["vibration-forcing-frequencies"] = _simpleRenderer({
 
 // ============ spec-v1476: rolling-element bearing defect frequencies ============
 
-// dims: in { rpm: T^-1, ball_count: dimensionless, ball_diameter_in: L, pitch_diameter_in: L, contact_angle_deg: dimensionless } out: { shaft_hz: T^-1, ftf_hz: T^-1, bpfo_hz: T^-1, bpfi_hz: T^-1, bsf_hz: T^-1, ball_count: dimensionless, bpfi_approx_error_pct: dimensionless, bpfo_approx_error_pct: dimensionless, cage_identity_hz: T^-1, sideband_spacing_hz: T^-1 }
+// dims: in { rpm: T^-1, ball_count: dimensionless, ball_diameter_in: L, pitch_diameter_in: L, contact_angle_deg: dimensionless } out: { shaft_hz: T^-1, ftf_hz: T^-1, bpfo_hz: T^-1, bpfi_hz: T^-1, bsf_hz: T^-1, ball_count: dimensionless, bpfi_approx_error_pct: dimensionless, bpfo_approx_error_pct: dimensionless, cage_identity_hz: T^-1, sideband_spacing_hz: T^-1, diameter_ratio: dimensionless }
 export function computeBearingDefectFrequencies({ rpm = 0, ball_count = 0, ball_diameter_in = 0, pitch_diameter_in = 0, contact_angle_deg = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(rpm > 0)) return { error: "Shaft speed must be positive (rpm)." };
@@ -648,7 +648,7 @@ MILLWRIGHT_RENDERERS["bearing-defect-frequencies"] = _simpleRenderer({
 
 // ============ spec-v1477: single-plane field balance ============
 
-// dims: in { original_amplitude: L, original_phase_deg: dimensionless, trial_weight_g: M, trial_weight_angle_deg: dimensionless, trial_amplitude: L, trial_phase_deg: dimensionless } out: { effect_magnitude: L, effect_angle_deg: dimensionless, correction_weight_g: M, correction_angle_deg: dimensionless, influence_coefficient: dimensionless, amplitude_change_pct: dimensionless, phase_swing_deg: dimensionless, rotation_deg: dimensionless, trial_weight_angle_deg: dimensionless, trial_weight_g: M }
+// dims: in { original_amplitude: L, original_phase_deg: dimensionless, trial_weight_g: M, trial_weight_angle_deg: dimensionless, trial_amplitude: L, trial_phase_deg: dimensionless } out: { effect_magnitude: L, effect_angle_deg: dimensionless, correction_weight_g: M, correction_angle_deg: dimensionless, influence_coefficient: dimensionless, amplitude_change_pct: dimensionless, phase_swing_deg: dimensionless, rotation_deg: dimensionless, trial_weight_angle_deg: dimensionless, trial_weight_g: M, weight_ratio: dimensionless }
 export function computeSinglePlaneFieldBalance({ original_amplitude = 0, original_phase_deg = 0, trial_weight_g = 0, trial_weight_angle_deg = 0, trial_amplitude = 0, trial_phase_deg = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(original_amplitude > 0)) return { error: "The original amplitude must be positive." };
@@ -862,7 +862,7 @@ MILLWRIGHT_RENDERERS["gear-reducer-service-factor"] = _simpleRenderer({
 
 // ============ spec-v1480: air compressor CFM and duty sizing ============
 
-// dims: in { tool1_qty: dimensionless, tool1_cfm: L^3 / T, tool1_duty: dimensionless, tool2_qty: dimensionless, tool2_cfm: L^3 / T, tool2_duty: dimensionless, tool3_qty: dimensionless, tool3_cfm: L^3 / T, tool3_duty: dimensionless, tool4_qty: dimensionless, tool4_cfm: L^3 / T, tool4_duty: dimensionless, leak_allowance_pct: dimensionless, growth_allowance_pct: dimensionless, cfm_per_hp: M^-1 L T^2 } out: { connected_cfm: L^3 / T, average_cfm: L^3 / T, with_leaks_cfm: L^3 / T, design_cfm: L^3 / T, motor_hp: M L^2 T^-3, cfm_per_hp: M^-1 L T^2, connected_hp: M L^2 T^-3, growth_allowance_pct: dimensionless, growth_cfm: L^3 T^-1, largest_tool_cfm: L^3 T^-1, largest_tool_hp: M L^2 T^-3, leak_allowance_pct: dimensionless, leak_cfm: L^3 T^-1, tool_count: dimensionless }
+// dims: in { tool1_qty: dimensionless, tool1_cfm: L^3 / T, tool1_duty: dimensionless, tool2_qty: dimensionless, tool2_cfm: L^3 / T, tool2_duty: dimensionless, tool3_qty: dimensionless, tool3_cfm: L^3 / T, tool3_duty: dimensionless, tool4_qty: dimensionless, tool4_cfm: L^3 / T, tool4_duty: dimensionless, leak_allowance_pct: dimensionless, growth_allowance_pct: dimensionless, cfm_per_hp: M^-1 L T^2 } out: { connected_cfm: L^3 / T, average_cfm: L^3 / T, with_leaks_cfm: L^3 / T, design_cfm: L^3 / T, motor_hp: M L^2 T^-3, cfm_per_hp: M^-1 L T^2, connected_hp: M L^2 T^-3, growth_allowance_pct: dimensionless, growth_cfm: L^3 T^-1, largest_tool_cfm: L^3 T^-1, largest_tool_hp: M L^2 T^-3, leak_allowance_pct: dimensionless, leak_cfm: L^3 T^-1, tool_count: dimensionless, oversize_ratio: dimensionless }
 export function computeAirCompressorCfmSizing({ tool1_qty = 0, tool1_cfm = 0, tool1_duty = 0, tool2_qty = 0, tool2_cfm = 0, tool2_duty = 0, tool3_qty = 0, tool3_cfm = 0, tool3_duty = 0, tool4_qty = 0, tool4_cfm = 0, tool4_duty = 0, leak_allowance_pct = 15, growth_allowance_pct = 20, cfm_per_hp = 4 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   for (const [q, c, d] of [[tool1_qty, tool1_cfm, tool1_duty], [tool2_qty, tool2_cfm, tool2_duty], [tool3_qty, tool3_cfm, tool3_duty], [tool4_qty, tool4_cfm, tool4_duty]]) {

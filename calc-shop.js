@@ -492,7 +492,7 @@ SHOP_RENDERERS["tailstock-setover"] = _v805renderTailstockSetover;
 // that product is a whole number. First-principles ratio arithmetic.
 // =====================================================================
 
-// dims: in { divisions: dimensionless, worm_ratio: dimensionless, circles: dimensionless, index_by: dimensionless, angle_deg: dimensionless } out: { full_turns: dimensionless, angle_deg: dimensionless, fraction: dimensionless, turns: dimensionless }
+// dims: in { divisions: dimensionless, worm_ratio: dimensionless, circles: dimensionless, index_by: dimensionless, angle_deg: dimensionless } out: { full_turns: dimensionless, angle_deg: dimensionless, fraction: dimensionless, turns: dimensionless, worm_ratio: dimensionless }
 export function computeDividingHead({ divisions = 0, worm_ratio = 40, circles = "", index_by = "divisions", angle_deg = 0 } = {}) {
   const _g = _finiteGuard({ divisions, worm_ratio, angle_deg }); if (_g) return _g;
   if (index_by !== "divisions" && index_by !== "angle") return { error: "Index by must be divisions or angle." };
@@ -3413,7 +3413,7 @@ SHOP_RENDERERS["heat-treat-soak-time"] = _simpleRenderer({
 });
 
 // ===================== spec-v1443: quench severity and the Biot screen =====================
-// dims: in { grossmann_h: L^-1, section_diameter_in: L, second_grossmann_h: L^-1 } out: { biot: dimensionless, second_biot: dimensionless, radius_in: L }
+// dims: in { grossmann_h: L^-1, section_diameter_in: L, second_grossmann_h: L^-1 } out: { biot: dimensionless, second_biot: dimensionless, radius_in: L, h_ratio: dimensionless }
 export function computeQuenchSeverity({ grossmann_h = 0, section_diameter_in = 0, second_grossmann_h = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(grossmann_h > 0)) return { error: "Grossmann H-value must be positive." };

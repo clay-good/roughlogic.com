@@ -308,7 +308,7 @@ function _parseStandardCounts(value) {
   return [...new Set(values)].sort((a, b) => a - b);
 }
 
-// dims: in { living_units: dimensionless, split_ratio: dimensionless, terminal_ports: dimensionless, spare_pct: dimensionless, route_length_ft: L, lower_material_cost_per_ft: dimensionless, selected_material_cost_per_ft: dimensionless, placement_cost_per_ft: dimensionless } out: { feeder_fibers_required: dimensionless, selected_standard_count: dimensionless, selected_installed_cost: dimensionless, placement_share_pct: dimensionless }
+// dims: in { living_units: dimensionless, split_ratio: dimensionless, terminal_ports: dimensionless, spare_pct: dimensionless, route_length_ft: L, lower_material_cost_per_ft: dimensionless, selected_material_cost_per_ft: dimensionless, placement_cost_per_ft: dimensionless } out: { feeder_fibers_required: dimensionless, selected_standard_count: dimensionless, selected_installed_cost: dimensionless, placement_share_pct: dimensionless, installed_cost_delta_pct: dimensionless }
 export function computeFiberStrandCountPlanning({ living_units = 0, split_ratio = 0, terminal_ports = 0, spare_pct = 0, standard_counts = "12,24,48,72,96,144,216,288,432", route_length_ft = 0, lower_material_cost_per_ft = 0, selected_material_cost_per_ft = 0, placement_cost_per_ft = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   if (!(living_units > 0) || !(split_ratio > 0) || !(terminal_ports > 0)) return { error: "Living units, split ratio, and terminal port count must be positive." };

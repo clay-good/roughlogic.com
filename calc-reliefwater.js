@@ -645,7 +645,7 @@ RELIEFWATER_RENDERERS["osha-toilet-count"] = _simpleRenderer({
 
 // ===================== spec-v1887: responder base camp sanitation and water =====================
 
-// dims: in { men_count: dimensionless, women_count: dimensionless, pressure_water: dimensionless } out: { toilets_men: dimensionless, toilets_women: dimensionless, toilets_total: dimensionless, urinals: dimensionless, handwash_basins: dimensionless, showerheads: dimensionless, laundry_trays: dimensionless, drinking_fountains: dimensionless, water_gal_per_day: L^3 T^-1, average_gph: L^3 T^-1, peak_gph: L^3 T^-1, peak_gpm: L^3 T^-1, sleeping_area_sqft: L^2, men_count: dimensionless, urinal_trough_ft: L, women_count: dimensionless }
+// dims: in { men_count: dimensionless, women_count: dimensionless, pressure_water: dimensionless } out: { toilets_men: dimensionless, toilets_women: dimensionless, toilets_total: dimensionless, urinals: dimensionless, handwash_basins: dimensionless, showerheads: dimensionless, laundry_trays: dimensionless, drinking_fountains: dimensionless, water_gal_per_day: L^3 T^-1, average_gph: L^3 T^-1, peak_gph: L^3 T^-1, peak_gpm: L^3 T^-1, sleeping_area_sqft: L^2, men_count: dimensionless, urinal_trough_ft: L, women_count: dimensionless, whole_camp_ratio: dimensionless }
 export function computeResponderCampSanitation({ men_count = 0, women_count = 0, pressure_water = "yes" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(men_count >= 0) || !(women_count >= 0)) return { error: "Occupant counts cannot be negative." };

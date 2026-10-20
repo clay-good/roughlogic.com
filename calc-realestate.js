@@ -1355,7 +1355,7 @@ const RENTAL_EXPENSE_FIELDS = [
 ];
 
 // dims: in { inputs: dimensionless }
-//        out: { gross_rent: dimensionless, vacancy_loss: dimensionless, effective_gross_income: dimensionless, operating_expenses: dimensionless, noi_annual: dimensionless, annual_debt_service: dimensionless, cash_flow: dimensionless, cap_rate_percent: dimensionless, cash_on_cash_percent: dimensionless, dscr: dimensionless, grm: dimensionless, value_at_market_grm: dimensionless, cash_on_cash_pct: dimensionless, expense_ratio_pct: dimensionless }
+//        out: { gross_rent: dimensionless, vacancy_loss: dimensionless, effective_gross_income: dimensionless, operating_expenses: dimensionless, noi_annual: dimensionless, annual_debt_service: dimensionless, cash_flow: dimensionless, cap_rate_percent: dimensionless, cash_on_cash_percent: dimensionless, dscr: dimensionless, grm: dimensionless, value_at_market_grm: dimensionless, cash_on_cash_pct: dimensionless, expense_ratio_pct: dimensionless, cap_rate_pct: dimensionless }
 // (Rental-property cash-flow worksheet. All monetary aggregates
 //  are dimensionless dollars per the §7.1 monetary convention;
 //  cap rate, cash-on-cash, DSCR, and the gross-rent multiplier are
