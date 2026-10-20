@@ -36,3 +36,13 @@ test("an IPC calculator tells a Uniform Plumbing Code state that the IPC rule ma
   const lines = page.locator(".v6-reference-row-state .state-edition-line");
   await expect(lines.filter({ hasText: "California adopts the Uniform Plumbing Code, not the IPC this calculator follows" })).toHaveCount(1);
 });
+
+test("an IECC calculator names a state's residential and commercial editions apart", async ({ page }) => {
+  await page.goto("/index.html#lighting-density");
+  const select = page.locator("#rl-state-select");
+  await expect(select).toBeAttached({ timeout: 20000 });
+  await page.getByText("Details, formula, and sources").click();
+  await select.selectOption("OH");
+  const lines = page.locator(".v6-reference-row-state .state-edition-line");
+  await expect(lines.filter({ hasText: "Ohio enforces IECC 2018 for residential buildings (since Jul 1, 2019) and IECC 2021 for commercial buildings" })).toHaveCount(1);
+});

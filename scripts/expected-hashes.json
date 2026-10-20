@@ -106,7 +106,7 @@
     "accounting/pub-15-t-tables.json": "e19ddf44a2509b01e16371820fd7d934234706080360917e116f17fd808d9051",
     "accounting/manifest.json": "8e6171f75188456f38b7448d8a125dd20e591e3f20efb9347829afa681f999ce",
     "legal/sales-tax-nexus.json": "74a0aadde7fc521346a0aea80e5e354d2eb9b7d5a693a3ed8045038c44967138",
-    "legal/manifest.json": "b19de9d2ccd4ae315440e773012d1ab7bebdbb134d0d9c2c5c139fc2c7667df0",
+    "legal/manifest.json": "26d6e18c2a1fc8f6595d2dac04be4a019f81fc423b6d77c78c755674510f63f7",
     "lab/iupac-atomic-weights.json": "48b6c2cda0e96240fccfe10aa5db778c6f99b3b58026228db4ec46389cf9df76",
     "lab/buffer-pka.json": "68b3e58cbd0293193cec7cf64eca8430e4230821a9249ecbb1116168b5910fee",
     "lab/centrifuge-rotors.json": "c4f3d441122924bb472028d4e32a5f556cd132ba20139b542f86e16792b0a77f",
@@ -122,6 +122,6 @@
     "search/manifest.json": "15dc9822c199097dc00b1a64c3433587ef5cda76adeaa9fc60365667a0214694",
     "desc/manifest.json": "b46f6513f09308991aeeca9af8971555457403eaa8eb332e6c096ac1b71235a2",
     "citations/manifest.json": "e3c0f20927634b465e268732816bddf0f878a35e34bae0d2e50b647234861d43",
-    "legal/code-adoption.json": "405159398af6c2a1e32a1c0e6b53b593ea8a28604d11bef9c4162d641dcd8ee5"
+    "legal/code-adoption.json": "72c8f6b03b30be6c86fd15308115143be71a8f4ed9c9cddb7593b252aa663043"
   }
 }

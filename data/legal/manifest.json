@@ -14,12 +14,12 @@
     {
       "file": "code-adoption.json",
       "name": "Per-state NEC adoption (signed-off rows only)",
-      "gzip_size_bytes": 36763
+      "gzip_size_bytes": 44166
     }
   ],
   "hashes": {
     "sales-tax-nexus.json": "74a0aadde7fc521346a0aea80e5e354d2eb9b7d5a693a3ed8045038c44967138",
-    "code-adoption.json": "405159398af6c2a1e32a1c0e6b53b593ea8a28604d11bef9c4162d641dcd8ee5"
+    "code-adoption.json": "72c8f6b03b30be6c86fd15308115143be71a8f4ed9c9cddb7593b252aa663043"
   },
   "staleness_note": "14 of 47 rows still carry verified_on 2026-09-03; the 33 re-verified since then run to 2026-09-09. States change these by legislation, not on a calendar, so each recheck is a per-state lookup against that department of revenue and is maintainer work, not a build step. The tile prints every row's citation and verified_on date and tells the reader to confirm with the state before filing. Recheck oldest-first; this note is generated from the stamps and goes away when they are current."
 }

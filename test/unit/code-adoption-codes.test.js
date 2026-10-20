@@ -12,15 +12,15 @@ const okRow = (over = {}) => ({
   verified_on: null, verified_by: null, ...over,
 });
 
-test("building codes: six rows files exist and pass; five codes have all 51 drafted, unsigned (the IECC is last); the NEC rows are unchanged by them", () => {
+test("building codes: six rows files exist and pass; all six codes have all 51 drafted, unsigned; the NEC rows are unchanged by them", () => {
   for (const c of BUILDING_CODES) {
     const doc = loadCodeRows(c);
     assert.ok(doc, c);
     assert.deepEqual(validateCodeRows(c, doc, TODAY).errors, [], c);
   }
   const shards = buildCodeShards(Object.fromEntries(BUILDING_CODES.map((c) => [c, loadCodeRows(c)])));
-  assert.deepEqual(Object.keys(shards), ["IRC", "IBC", "IPC", "IMC", "IFGC"], "drafted in the spec-v1974 order");
-  for (const c of ["IRC", "IBC", "IPC", "IMC", "IFGC"]) {
+  assert.deepEqual(Object.keys(shards), BUILDING_CODES, "every building code has its rows");
+  for (const c of BUILDING_CODES) {
     assert.equal(Object.keys(shards[c].by_state).length, 51, c);
     assert.ok(Object.values(loadCodeRows(c).rows).every((r) => r.verified_by === null && r.verified_on === null), c + ": a person signs a row, never the drafter");
   }
