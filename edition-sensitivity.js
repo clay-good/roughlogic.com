@@ -7,7 +7,7 @@
 // by side and gave these tiles an edition input that runs either rule. No NEC
 // row is asserted: each needs both editions' text quoted first.
 export const EDITION_ROWS = [
-  { id: "allowable-area", code: "IBC", from_edition: 2021, to_edition: 2027, section: "Table 506.3.3", input: "code_edition",
+  { id: "allowable-area", code: "IBC", from_edition: 2021, to_edition: 2027, also_older: [2024], section: "Table 506.3.3", input: "code_edition",
     changed: "Frontage increase factors are read from Table 506.3.3 as printed; interpolating between its rows and columns is no longer allowed.",
     older_rule: "IBC 2021 (and 2024) footnote a allowed interpolating Table 506.3.3 between rows and columns.",
     verified_on: "2026-10-17", verified_by: "rl",
@@ -49,11 +49,17 @@ export const EDITION_ROWS = [
     sources: [{ edition: 2021, citation: "IECC 2021 R403.3.6" }, { edition: 2024, citation: "IECC 2024 Table R403.3.8" }] },
 ];
 
+// The editions a row's older rule covers: from_edition, plus any later edition
+// printed before the change (`also_older`, e.g. IBC 2024 kept the 2021 footnote).
+export function olderEditions(row) {
+  return [row.from_edition].concat(Array.isArray(row.also_older) ? row.also_older : []);
+}
+
 // The sentence for a reader working under `working`, or null when it is on the
 // same side of the change as the edition the tile follows.
 export function sensitivityLine(row, working) {
   const w = Number(working);
-  if (!row || !Number.isFinite(w) || w > row.from_edition) return null;
+  if (!row || !Number.isFinite(w) || w > Math.max(...olderEditions(row))) return null;
   return "This calculator follows " + row.code + " " + row.to_edition + ", and the rule it applies changed after " + row.code + " " + w + " (" + row.section + "): "
     + row.changed + " The older rule: " + row.older_rule
     + (row.input ? " Set the calculator's edition input to " + row.from_edition + " to run the older rule." : "")
@@ -78,7 +84,7 @@ export function mountEditionChanges(block, toolId) {
   const select = document.createElement("select");
   select.id = "rl-edition-older";
   const opts = [{ value: "", text: "No, " + rows.map((r) => r.code + " " + r.to_edition).join(" / ") }]
-    .concat(rows.map((r, i) => ({ value: String(i), text: "Yes, " + r.code + " " + r.from_edition })));
+    .concat(rows.map((r, i) => ({ value: String(i), text: "Yes, " + r.code + " " + olderEditions(r).join(" or ") })));
   for (const o of opts) { const el = document.createElement("option"); el.value = o.value; el.textContent = o.text; select.appendChild(el); }
   const out = document.createElement("p");
   out.className = "state-edition-line";

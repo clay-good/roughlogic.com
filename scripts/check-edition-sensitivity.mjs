@@ -27,6 +27,9 @@ for (const r of rows) {
     || !r.sources.every((s) => typeof s.citation === "string" && s.citation.includes(String(s.edition)))) {
     errors.push(`${tag}: needs exactly two sources, one read in ${r.from_edition} and one in ${r.to_edition}, each citation naming its edition`);
   }
+  if (r.also_older !== undefined && !(Array.isArray(r.also_older) && r.also_older.length && r.also_older.every((y) => Number.isInteger(y) && y > r.from_edition && y < r.to_edition))) {
+    errors.push(`${tag}: also_older must list editions after ${r.from_edition} and before ${r.to_edition}`);
+  }
   for (const k of ["changed", "older_rule", "section"]) if (typeof r[k] !== "string" || !r[k].trim()) errors.push(`${tag}: ${k} is empty`);
   for (const k of ["changed", "older_rule"]) if (typeof r[k] === "string" && r[k].length > 140) errors.push(`${tag}: ${k} is ${r[k].length} characters, over the 140 cap`);
   if (!/^\d{4}-\d{2}-\d{2}$/.test(r.verified_on || "") || r.verified_on > today) errors.push(`${tag}: verified_on must be a date not in the future`);

@@ -2,7 +2,7 @@
 // reader working under the other edition, and every row stays checkable.
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { EDITION_ROWS, sensitivityLine, mountEditionChanges } from "../../edition-sensitivity.js";
+import { EDITION_ROWS, sensitivityLine, mountEditionChanges, olderEditions } from "../../edition-sensitivity.js";
 import { checkEditionRows } from "../../scripts/check-edition-sensitivity.mjs";
 import { TOOLS } from "../../tools-data.js";
 import { CITATIONS } from "../../citations.js";
@@ -28,6 +28,9 @@ test("edition sensitivity: each rule, seeded red, is caught", () => {
     { ...base, verified_on: "2026-12-31" },
     { ...base, verified_by: "" },
     { ...base, to_edition: 2027, sources: [base.sources[0], { edition: 2027, citation: "IRC 2027 R310.3.1" }] },
+    { ...base, also_older: [2024] },
+    { ...base, also_older: [2021] },
+    { ...base, also_older: [] },
   ];
   for (const s of seeds) assert.ok(checkEditionRows([s], ctx).length > 0, JSON.stringify(s).slice(0, 80));
   assert.ok(checkEditionRows([base, base], ctx).some((e) => /more than one row/.test(e)));
@@ -38,6 +41,11 @@ test("edition sensitivity: the sentence shows only for a reader on the older sid
   assert.match(sensitivityLine(r, 2021), /follows IRC 2024.*changed after IRC 2021.*Set the calculator's edition input to 2021/);
   assert.equal(sensitivityLine(r, 2024), null);
   assert.equal(sensitivityLine(r, "x"), null);
+  // IBC 2024 kept the 2021 interpolation footnote, so a 2024 reader is on the older side too.
+  const aa = EDITION_ROWS.find((x) => x.id === "allowable-area");
+  assert.deepEqual(olderEditions(aa), [2021, 2024]);
+  assert.match(sensitivityLine(aa, 2024), /changed after IBC 2024/);
+  assert.equal(sensitivityLine(aa, 2027), null);
   const g = EDITION_ROWS.find((x) => x.id === "grease-trap");
   assert.ok(!/edition input/.test(sensitivityLine(g, 2021)), "a tile without an edition input is not told to set one");
 });
