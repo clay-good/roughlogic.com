@@ -62174,3 +62174,46 @@ test("bounds: spec-v1978 computeCountertopReceptacleCount pins the 24 in reach, 
     assert.ok("error" in _ctrc(bad), JSON.stringify(bad));
   }
 });
+
+// spec-v1979 / spec-v1980: segment and concentric conduit bends.
+import { computeConduitSegmentBend as _csb, computeConduitConcentricBend as _ccb } from "../../calc-fab.js";
+test("bounds: spec-v1979 computeConduitSegmentBend pins the arc, the half-interval first mark, the polygon side, the gain and the radius check", () => {
+  const r = _csb({ radius_in: 36, bend_angle_deg: 90, shots: 9, min_radius_in: 20 });
+  assert.ok(Math.abs(r.developed_in - 18 * Math.PI) < 1e-9);
+  assert.ok(Math.abs(r.first_mark_in - r.mark_spacing_in / 2) < 1e-12);
+  assert.ok(Math.abs(r.marks_in[8] + r.mark_spacing_in / 2 - r.developed_in) < 1e-9, "the last mark sits half an interval from the end");
+  // The tube between shots keeps its length, so the polygon is tangent to a smaller circle.
+  const re = (2 * Math.PI) / (2 * Math.tan(Math.PI / 36));
+  assert.ok(Math.abs(r.effective_radius_in - re) < 1e-9 && r.effective_radius_in < 36);
+  assert.ok(Math.abs(r.gain_in - (2 * re - 18 * Math.PI)) < 1e-9);
+  assert.equal(r.radius_ok, true);
+  assert.equal(_csb({ radius_in: 19.99, bend_angle_deg: 90, shots: 9, min_radius_in: 20 }).radius_ok, false);
+  assert.equal(_csb({ radius_in: 20.1, bend_angle_deg: 90, shots: 9, min_radius_in: 20 }).radius_ok, true);
+  // Two 90 degree kinks on a 20 in layout make a 15.7 in radius: the check must fail.
+  const coarse = _csb({ radius_in: 20, bend_angle_deg: 180, shots: 2, min_radius_in: 20 });
+  assert.equal(coarse.radius_ok, false);
+  assert.ok(Math.abs(coarse.effective_radius_in - 5 * Math.PI) < 1e-9);
+  assert.equal(_csb({ radius_in: 36, bend_angle_deg: 90, shots: 9, min_radius_in: 0 }).radius_ok, null, "no minimum entered: no verdict");
+  assert.equal(_csb({ radius_in: 36, bend_angle_deg: 180, shots: 18 }).gain_in, null);
+  // More shots converge the polygon side on the mark spacing.
+  const d = (n) => _csb({ radius_in: 36, bend_angle_deg: 90, shots: n }).radius_shortfall_in;
+  assert.ok(d(3) > d(9) && d(9) > d(30) && d(30) > 0);
+  assert.equal(_csb({ radius_in: 36, min_radius_in: "" }).radius_ok, null, "a blank minimum skips the check");
+  for (const bad of [{ radius_in: 0 }, { radius_in: -36 }, { radius_in: 36, bend_angle_deg: 0 }, { radius_in: 36, bend_angle_deg: 181 }, { radius_in: 36, shots: 1 }, { radius_in: 36, shots: 61 }, { radius_in: 36, shots: 4.5 }, { radius_in: 36, min_radius_in: -1 }, { radius_in: 36, min_radius_in: "x" }, { radius_in: 1e6 }, { radius_in: Infinity }]) {
+    assert.ok("error" in _csb(bad), JSON.stringify(bad));
+  }
+});
+test("bounds: spec-v1980 computeConduitConcentricBend pins the pitch, each radius and arc, the extra stock and the rack width", () => {
+  const r = _ccb({ inside_radius_in: 12, od_in: 1.163, gap_in: 0.5, bend_angle_deg: 90, conduits: 4, shots: 9 });
+  assert.ok(Math.abs(r.pitch_in - 1.663) < 1e-12 && Math.abs(r.rack_width_in - 6.152) < 1e-9);
+  assert.deepEqual(r.per_conduit.map((c) => +c.radius_in.toFixed(3)), [12, 13.663, 15.326, 16.989]);
+  assert.ok(Math.abs(r.max_extra_in - 3 * 1.663 * Math.PI / 2) < 1e-9);
+  assert.deepEqual(r.per_conduit.map((c) => +c.mark_spacing_in.toFixed(2)), [2.09, 2.38, 2.67, 2.97]);
+  assert.equal(r.per_conduit[0].extra_in, 0);
+  const k = (Math.PI / 36) / Math.tan(Math.PI / 36);
+  assert.ok(Math.abs(r.shot_pitch_in - 1.663 * k) < 1e-12 && r.clash === false);
+  assert.equal(_ccb({ inside_radius_in: 12, od_in: 1.163, gap_in: 0, bend_angle_deg: 90, conduits: 2, shots: 2 }).clash, true, "touching conduits in two 45s clash between shots");
+  for (const bad of [{ inside_radius_in: 0, od_in: 1 }, { inside_radius_in: 12, od_in: 0 }, { inside_radius_in: 12, od_in: 1, gap_in: -0.1 }, { inside_radius_in: 0.4, od_in: 1 }, { inside_radius_in: 12, od_in: 1, conduits: 1 }, { inside_radius_in: 12, od_in: 1, conduits: 13 }, { inside_radius_in: 12, od_in: 1, shots: 1 }, { inside_radius_in: 12, od_in: 1, bend_angle_deg: 200 }, { inside_radius_in: 12, od_in: 1, gap_in: "x" }, { inside_radius_in: 12, od_in: 20 }]) {
+    assert.ok("error" in _ccb(bad), JSON.stringify(bad));
+  }
+});

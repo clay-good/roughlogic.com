@@ -1,6 +1,6 @@
 # roughlogic.com Specification v1980 -- Concentric Conduit Bend Radii and Lengths (`calc-fab.js`, Group A Electrical, 1 New Tile)
 
-> **Status: PROPOSED 2026-10-19. Single-tile spec.** Part of [scope-product-expansion](scope-product-expansion.md). In scope under the
+> **Status: LANDED 2026-10-19 (proposed 2026-10-19). Single-tile spec. As built: a shot count input (default 9) was added, since the outputs name a mark spacing at the chosen shot count; and, from an independent review, a clearance check between the straight runs of neighbouring conduits at the shots, which sit (shot angle / 2) / tan(shot angle / 2) of a pitch apart and can clash with a near-zero gap and few shots.** Part of [scope-product-expansion](scope-product-expansion.md). In scope under the
 > spec-v106 trades-only charter: Group A, the conduit-bending bench in `calc-fab.js`, no new dependency and no
 > network call. Companion to `conduit-segment-bend` ([spec-v1979](spec-v1979.md)).
 >

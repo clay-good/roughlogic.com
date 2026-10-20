@@ -1512,6 +1512,9 @@ const _TILES = [
   // spec-v1977..v1978: NEC 210.52 receptacle counts (calc-electricalfield.js).
   ["wall-receptacle-count", "A"],
   ["countertop-receptacle-count", "A"],
+  // spec-v1979..v1980: segment and concentric conduit bends (calc-fab.js, group A).
+  ["conduit-segment-bend", "A"],
+  ["conduit-concentric-bend", "A"],
 ];
 
 

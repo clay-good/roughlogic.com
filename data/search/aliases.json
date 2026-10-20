@@ -117317,6 +117317,56 @@
   "term": "kitchen counter outlet count",
   "target": "countertop-receptacle-count",
   "kind": "industry"
+ },
+ {
+  "term": "segment bend conduit",
+  "target": "conduit-segment-bend",
+  "kind": "industry"
+ },
+ {
+  "term": "segmented 90 degree bend",
+  "target": "conduit-segment-bend",
+  "kind": "industry"
+ },
+ {
+  "term": "large radius conduit bend shots",
+  "target": "conduit-segment-bend",
+  "kind": "industry"
+ },
+ {
+  "term": "degrees per shot conduit",
+  "target": "conduit-segment-bend",
+  "kind": "industry"
+ },
+ {
+  "term": "developed length of a conduit bend",
+  "target": "conduit-segment-bend",
+  "kind": "industry"
+ },
+ {
+  "term": "concentric bends conduit",
+  "target": "conduit-concentric-bend",
+  "kind": "industry"
+ },
+ {
+  "term": "parallel conduit bend radius",
+  "target": "conduit-concentric-bend",
+  "kind": "industry"
+ },
+ {
+  "term": "bending a rack of conduits around a corner",
+  "target": "conduit-concentric-bend",
+  "kind": "question"
+ },
+ {
+  "term": "concentric 90 radius each conduit",
+  "target": "conduit-concentric-bend",
+  "kind": "industry"
+ },
+ {
+  "term": "extra length for outer conduit in a concentric bend",
+  "target": "conduit-concentric-bend",
+  "kind": "industry"
  }
  ]
 }

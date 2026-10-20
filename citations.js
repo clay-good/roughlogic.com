@@ -26679,6 +26679,28 @@ export const CITATIONS = {
       { name: "Island and peninsula areas entered per countertop space", value: "an island split by a sink or range is entered as separate spaces; the peninsula-end outlet is stated, not placed", source: "NEC 2020 210.52(C)(2)" },
     ],
   },
+  "conduit-segment-bend": {
+    formula: "DL = R x theta x pi / 180; n shots of theta / n; marks DL / n apart, the first DL / (2 n) from the start of the arc; effective radius of the shot polygon r = (DL / n) / (2 tan(theta / (2 n))); gain = 2 r tan(theta / 2) - DL (theta < 180); radius check r >= R_min when R_min is entered.",
+    edition: "Circular-arc geometry by name; the minimum bending radius is the reader's entry from NFPA 70 (NEC) 2023 Chapter 9 Table 2 or the raceway's listing, not reproduced here.",
+    freeAccess: NEC_FREE,
+    governance: GOVERNANCE.electrical,
+    editionNote: "The geometry is single-edition. The shots straddle the arc when the first mark sits half an interval in; a full interval leaves the last shot half an interval short. The tube between two shots keeps its length DL / n, so the bent polygon is tangent to a circle a little smaller than R, r = (DL / n) / (2 tan(theta / 2n)); it converges on R as n grows (35.91 in for nine 10 degree shots on a 36 in radius), and the minimum-radius check runs on it. NEC Chapter 9 Table 2 gives the minimum radius per trade size in two columns; a segment bend falls under Other Bends, not One Shot and Full Shoe. A fiber or coaxial raceway carries its own minimum in its listing.",
+    assumptions: [
+      { name: "Centerline layout", value: "radius, arc and marks on the conduit centerline; bender take-up, shoe radius and springback are not included", source: "stated assumption" },
+      { name: "Equal shots", value: "every shot bends the same angle at the middle of its own interval", source: "segment-bending practice" },
+    ],
+  },
+  "conduit-concentric-bend": {
+    formula: "pitch = OD + gap; R_i = R_1 + (i - 1) x pitch; DL_i = R_i x theta x pi / 180; mark spacing_i = DL_i / n; extra_i = DL_i - DL_1; rack width = (conduits - 1) x pitch + OD.",
+    edition: "Circular-arc geometry by name; the outside diameter is the reader's entry from the raceway listing or NFPA 70 (NEC) 2023 Chapter 9 Table 4, not reproduced here.",
+    freeAccess: NEC_FREE,
+    governance: GOVERNANCE.electrical,
+    editionNote: "The geometry is single-edition. All conduits share one center and the same straight tangents, so only the arcs differ, by one pitch x angle per position. Equal shot counts and equal shot angles on every conduit put the shots on common radial lines, which keeps a concentric rack evenly spaced; between shots neighbouring straight runs sit (phi / 2) / tan(phi / 2) of a pitch apart, phi the shot angle, so a near-zero gap with few shots can clash. The inside conduit's radius is the one to check against NEC Chapter 9 Table 2.",
+    assumptions: [
+      { name: "One center, constant pitch", value: "every conduit the same OD and gap; a rack that changes pitch is not handled", source: "stated assumption" },
+      { name: "Centerline layout", value: "bender take-up and springback are not included", source: "stated assumption" },
+    ],
+  },
 };
 
 // --- Reference block and copy text ---

@@ -1,6 +1,6 @@
 # roughlogic.com Specification v1979 -- Conduit Segment Bend Layout (`calc-fab.js`, Group A Electrical, 1 New Tile)
 
-> **Status: PROPOSED 2026-10-19. Single-tile spec.** Part of [scope-product-expansion](scope-product-expansion.md). In scope under the
+> **Status: LANDED 2026-10-19 (proposed 2026-10-19). Single-tile spec. As built: `conduit-90-stub` already had a segmented-90 mode (shot count from a per-shot angle, 90 only); this tile extends it to any angle up to 180 with the mark layout and radius check, and that tile's note now points here. A radius under the entered minimum returns a TOO TIGHT verdict with the layout rather than an error. An independent review found the drafted chord 2 R tan(theta / 2n) cannot be built (the tube between shots stays DL / n long), so the tile reports the effective radius the shots make, checks THAT against the minimum (two 90 degree shots on a 20 in layout make 15.7 in), and computes the gain from it; this text was corrected to match.** Part of [scope-product-expansion](scope-product-expansion.md). In scope under the
 > spec-v106 trades-only charter: Group A, the conduit-bending bench in `calc-fab.js` beside `conduit-offset`,
 > `conduit-saddle` and `conduit-90-stub`, no new dependency and no network call.
 >
@@ -16,8 +16,7 @@ Repository: github.com/clay-good/roughlogic.com -- US standards only.
 
 The v14 dimensional lint, bounds fuzzer, worked-example registry and the v18/v21 contract apply: a non-positive
 radius, an angle outside (0, 180], fewer than 2 shots or more than 60, or a minimum radius larger than the entered
-radius returns `{ error }`. Citation: circular-arc geometry (developed length = radius x angle in radians; chord = 2 R
-sin(theta/2)), first principles, with NEC 2023 Chapter 9 Table 2 named as the source of the minimum bending radius the
+radius returns `{ error }`. Citation: circular-arc geometry (developed length = radius x angle in radians; effective radius of the shot polygon = (DL / n) / (2 tan(theta / 2n))), first principles, with NEC 2023 Chapter 9 Table 2 named as the source of the minimum bending radius the
 reader enters, GOVERNANCE.general. Aliases: `segment bend conduit`, `segmented 90 degree bend`, `large radius conduit
 bend shots`, `degrees per shot conduit`, `developed length of a conduit bend`.
 
@@ -31,33 +30,34 @@ developed length   DL = R x theta x pi / 180, R the centerline radius (in), thet
 shots              n equal shots, each theta / n degrees
 arc spacing        DL / n between shot marks, the first mark DL / (2 n) in from the
                    start of the bend so the shots straddle the arc evenly
-chord spacing      2 R tan(theta / (2 n)): the straight-line distance between adjacent
-                   shot points on the finished bend; approaches the arc spacing as n grows
-gain               R x tan(theta / 2) x 2 - DL for a 90: the length saved by bending
-                   instead of running the two tangents to their intersection
-minimum radius     entered from NEC Chapter 9 Table 2 (or the raceway's own listing);
-                   the tile refuses a radius under it
+effective radius   r = (DL / n) / (2 tan(theta / (2 n))): the tube between shots keeps
+                   its length, so the bent polygon is tangent to this slightly smaller
+                   circle; approaches R as n grows
+gain               2 r tan(theta / 2) - DL for any angle under 180: the length saved by
+                   bending instead of running the two tangents to their intersection
+minimum radius     entered from NEC Chapter 9 Table 2, Other Bends column (or the
+                   raceway's own listing); an effective radius under it is TOO TIGHT
 ```
 
 A segment bend replaces one impossible shoe with many possible ones. The arc has a developed length of R theta, and
-dividing that length into n equal pieces and bending theta / n at the center of each piece produces a polygon that
-sits inside the intended arc by a sagitta that shrinks with the square of the shot angle. The marks go at DL / n
+dividing that length into n equal pieces and bending theta / n at the center of each piece produces a polygon tangent
+to a circle slightly smaller than R, which converges on the intended arc as the shot angle shrinks. The marks go at DL / n
 intervals starting half an interval in, which is the detail most often got wrong: starting at the first mark with a
 full interval leaves the last shot half an interval short of the end of the bend.
 
 The number of shots is the reader's choice within the bender's habits. Ten degrees per shot is common for a 90 (nine
 shots); fewer, larger shots produce a visible polygon and a tighter effective radius at each kink, which is what the
-minimum-radius rule is protecting against. The tile reports the chord between shot points so the reader can see how
-far the finished bend departs from a true arc.
+minimum-radius rule is protecting against. The tile reports the effective radius the shots make so the reader can see how
+far the finished bend departs from a true arc, and checks that radius against the minimum.
 
 The minimum radius is not computed. NEC Chapter 9 Table 2 lists it per trade size for conductors, and a fiber or
-coaxial raceway carries its own, so the tile takes it as an input and refuses a layout tighter than it.
+coaxial raceway carries its own, so the tile takes it as an input and flags a layout whose effective radius is tighter than it.
 
 **Inputs:** the centerline radius, the total bend angle, the number of shots, and the minimum bending radius from the
 table or listing
 
-**Outputs:** the developed length, degrees per shot, the arc spacing and first-mark offset, the chord spacing, the gain
-for a 90, and a pass/fail against the minimum radius
+**Outputs:** the developed length, degrees per shot, the arc spacing and first-mark offset, the effective radius, the
+gain, and a pass/fail of the effective radius against the minimum radius
 
 ## 3. Worked example
 
@@ -67,14 +67,15 @@ A 90 degree sweep at a 36 in centerline radius in nine shots, minimum radius fro
 DL          = 36 x 90 x pi / 180 = 56.55 in
 per shot    = 90 / 9 = 10 deg
 arc spacing = 56.55 / 9 = 6.28 in; first mark at 3.14 in
-chord       = 2 x 36 x tan(5 deg) = 6.30 in
-radius      36 in >= 20 in minimum: ok
+r_eff       = 6.28 / (2 tan(5 deg)) = 35.91 in
+gain        = 2 x 35.91 - 56.55 = 15.27 in
+radius      35.91 in >= 20 in minimum: ok
 ```
 
-**The chord is 0.02 in longer than the arc spacing:** at 10 degrees per shot the polygon is indistinguishable from the
-arc, which is why nine shots is the habit. At six shots of 15 degrees on a 24 in radius the same numbers are DL 37.70
-in, spacing 6.28 in, chord 6.32 in; at 45 degrees in five shots on a 48 in radius, DL 37.70 in, 9 degrees per shot,
-spacing 7.54 in, chord 7.56 in.
+**The effective radius is 0.09 in under the layout radius:** at 10 degrees per shot the polygon is indistinguishable
+from the arc, which is why nine shots is the habit. At six shots of 15 degrees on a 24 in radius the same numbers are
+DL 37.70 in, spacing 6.28 in, r_eff 23.86 in; at 45 degrees in five shots on a 48 in radius, DL 37.70 in, 9 degrees per
+shot, spacing 7.54 in, r_eff 47.90 in.
 
 ## 4. Scope and non-goals
 

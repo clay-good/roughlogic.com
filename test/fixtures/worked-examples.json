@@ -171909,6 +171909,131 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "conduit-segment-bend",
+  "source_publisher": "roughlogic (circular-arc geometry)",
+  "source_title": "spec-v1979 worked example, recomputed",
+  "source_edition_or_year": "2026",
+  "source_section_or_page": "90 deg at R = 36 in in 9 shots: DL = 36 x pi / 2 = 56.5487 in; spacing 6.2832 in; first mark 3.1416 in; effective radius 6.2832 / (2 tan 5 deg) = 35.9086 in; gain 2 x 35.9086 - 56.5487 = 15.2685 in.",
+  "verified_by": "rl",
+  "verified_on": "2026-10-19",
+  "inputs": {
+   "radius_in": 36,
+   "bend_angle_deg": 90,
+   "shots": 9,
+   "min_radius_in": 20
+  },
+  "outputs": {
+   "developed_in": {
+    "value": 56.548668,
+    "tolerance": {
+     "pct": 0.01
+    }
+   },
+   "mark_spacing_in": {
+    "value": 6.283185,
+    "tolerance": {
+     "pct": 0.01
+    }
+   },
+   "first_mark_in": {
+    "value": 3.141593,
+    "tolerance": {
+     "pct": 0.01
+    }
+   },
+   "effective_radius_in": {
+    "value": 35.908568,
+    "tolerance": {
+     "pct": 0.01
+    }
+   },
+   "gain_in": {
+    "value": 15.268469,
+    "tolerance": {
+     "pct": 0.01
+    }
+   }
+  }
+ },
+ {
+  "tile_id": "conduit-segment-bend",
+  "source_publisher": "roughlogic (circular-arc geometry)",
+  "source_title": "spec-v1979 second example, recomputed",
+  "source_edition_or_year": "2026",
+  "source_section_or_page": "45 deg at R = 48 in in 5 shots: DL = 48 x pi / 4 = 37.6991 in, 9 deg per shot, spacing 7.5398 in, effective radius 7.5398 / (2 tan 4.5 deg) = 47.9013 in.",
+  "verified_by": "rl",
+  "verified_on": "2026-10-19",
+  "inputs": {
+   "radius_in": 48,
+   "bend_angle_deg": 45,
+   "shots": 5,
+   "min_radius_in": 0
+  },
+  "outputs": {
+   "developed_in": {
+    "value": 37.699112,
+    "tolerance": {
+     "pct": 0.01
+    }
+   },
+   "deg_per_shot": {
+    "value": 9,
+    "tolerance": {
+     "pct": 0.01
+    }
+   },
+   "mark_spacing_in": {
+    "value": 7.539822,
+    "tolerance": {
+     "pct": 0.01
+    }
+   },
+   "effective_radius_in": {
+    "value": 47.901263,
+    "tolerance": {
+     "pct": 0.01
+    }
+   }
+  }
+ },
+ {
+  "tile_id": "conduit-concentric-bend",
+  "source_publisher": "roughlogic (circular-arc geometry)",
+  "source_title": "spec-v1980 worked example, recomputed",
+  "source_edition_or_year": "2026",
+  "source_section_or_page": "Four 1 in EMT, OD 1.163 in, gap 0.5 in, R1 = 12 in, 90 deg: pitch 1.663 in; R4 = 16.989 in; DL4 = 26.6862 in; extra 3 x 1.663 x pi / 2 = 7.8367 in; rack 6.152 in.",
+  "verified_by": "rl",
+  "verified_on": "2026-10-19",
+  "inputs": {
+   "inside_radius_in": 12,
+   "od_in": 1.163,
+   "gap_in": 0.5,
+   "bend_angle_deg": 90,
+   "conduits": 4,
+   "shots": 9
+  },
+  "outputs": {
+   "pitch_in": {
+    "value": 1.663,
+    "tolerance": {
+     "pct": 0.01
+    }
+   },
+   "rack_width_in": {
+    "value": 6.152,
+    "tolerance": {
+     "pct": 0.01
+    }
+   },
+   "max_extra_in": {
+    "value": 7.836703,
+    "tolerance": {
+     "pct": 0.01
+    }
+   }
+  }
  }
  ]
 }

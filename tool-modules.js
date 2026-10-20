@@ -1093,6 +1093,7 @@ export const TOOL_MODULES = (() => {
     "interpass-temperature-control",
     // spec-v912 dished tank / vessel head volume (group E)
     "vessel-head-volume",
+    "conduit-segment-bend", "conduit-concentric-bend",
   ]);
   // Group G (cont.): the layout & shop-geometry bench, split out of
   // calc-fab.js into calc-layout.js (spec-v56) once calc-fab hit 96% of its

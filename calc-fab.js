@@ -543,7 +543,7 @@ export function computeConduit90Stub({ mode = "stub-up", height_in = 0, deduct_i
       n_shots: Number.isFinite(n_shots) ? n_shots : null,
       arc_per_shot_in: Number.isFinite(arc_per_shot_in) ? arc_per_shot_in : null,
       residual_deg: Number.isFinite(residual_deg) ? residual_deg : null,
-      note: "Segment 90: " + n_shots + " shots of " + perShot + " deg" + (residual_deg > 1e-9 ? " (last shot covers the " + residual_deg + " deg residual since 90 is not divisible by the per-shot angle)" : "") + ". Arc length per shot = radius * angle(rad). Confirm against your bender.",
+      note: "Segment 90: " + n_shots + " shots of " + perShot + " deg" + (residual_deg > 1e-9 ? " (last shot covers the " + residual_deg + " deg residual since 90 is not divisible by the per-shot angle)" : "") + ". Arc length per shot = radius * angle(rad). Confirm against your bender. For any angle up to 180, the mark positions and a minimum-radius check, use the Conduit Segment Bend Layout calculator.",
     };
   }
   const height = Number(height_in) || 0;
@@ -2166,4 +2166,146 @@ FAB_RENDERERS["interpass-temperature-control"] = _simpleRenderer({
     { key: "n", id: "iptc-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeInterpassTemperatureControl,
+});
+
+// ===================== spec-v1979 / spec-v1980: segment and concentric conduit bends =====================
+// A large-radius sweep is bent as n equal shots spaced along the arc's developed
+// length R x theta. The marks go DL / n apart starting HALF an interval in, so
+// the shots straddle the arc; starting a full interval in leaves the last shot
+// half an interval short of the end. conduit-90-stub's segmented-90 mode counts
+// shots from a per-shot angle; this lays out any angle from a shot count.
+function _segInts(v, lo, hi, what) {
+  const n = Number(v);
+  if (!Number.isInteger(n) || n < lo || n > hi) return { error: what + " must be a whole number from " + lo + " to " + hi + "." };
+  return { n };
+}
+
+// A blank optional length is 0; text is an error, not a silent skip.
+function _segOptLen(v, what) {
+  if (v === "" || v === null || v === undefined) return { v: 0 };
+  const n = Number(v);
+  if (!Number.isFinite(n)) return { error: what + " must be a number (in)." };
+  if (n < 0) return { error: what + " cannot be negative (in)." };
+  return { v: n };
+}
+
+// dims: in { radius_in: L, bend_angle_deg: dimensionless, shots: dimensionless, min_radius_in: L } out: { developed_in: L, deg_per_shot: dimensionless, mark_spacing_in: L, first_mark_in: L, effective_radius_in: L, gain_in: L }
+export function computeConduitSegmentBend({ radius_in = 0, bend_angle_deg = 90, shots = 9, min_radius_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const R = Number(radius_in), th = Number(bend_angle_deg);
+  if (!(R > 0)) return { error: "Centerline radius must be positive (in)." };
+  if (R > 1200) return { error: "Centerline radius above 1,200 in (100 ft) is outside a bender layout." };
+  if (!(th > 0 && th <= 180)) return { error: "Bend angle must be above 0 and at most 180 degrees." };
+  const m = _segOptLen(min_radius_in, "Minimum bending radius"); if (m.error) return { error: m.error };
+  const Rmin = m.v;
+  const s = _segInts(shots, 2, 60, "Shots"); if (s.error) return { error: s.error };
+  const n = s.n;
+  const developed_in = R * th * Math.PI / 180;
+  const deg_per_shot = th / n;
+  const mark_spacing_in = developed_in / n;
+  const first_mark_in = mark_spacing_in / 2;
+  const marks_in = Array.from({ length: n }, (_, k) => first_mark_in + k * mark_spacing_in);
+  // The tube between two shots stays DL / n long, so the bent polygon is tangent
+  // to a slightly SMALLER circle than R: r_eff = s / (2 tan(phi / 2)), phi the
+  // angle per shot. That is the radius the conduit actually takes.
+  const phi = deg_per_shot * Math.PI / 180;
+  const effective_radius_in = mark_spacing_in / (2 * Math.tan(phi / 2));
+  const radius_shortfall_in = R - effective_radius_in;
+  // Length saved against running both tangents to their intersection, for the
+  // bend as made; a 180 has no tangent intersection.
+  const gain_in = th < 180 ? 2 * effective_radius_in * Math.tan(th * Math.PI / 360) - developed_in : null;
+  const has_check = Rmin > 0;
+  const radius_ok = has_check ? effective_radius_in >= Rmin * (1 - 1e-9) : null;
+  const verdict = !has_check
+    ? "(no minimum radius entered: read it from the Other Bends column of NEC Chapter 9 Table 2 for the trade size, or the raceway's listing)"
+    : radius_ok
+      ? "OK: the " + n + " shots make an effective radius of " + fmt(effective_radius_in, 2) + " in, at or above the " + fmt(Rmin, 2) + " in minimum"
+      : "TOO TIGHT: the " + n + " shots make an effective radius of " + fmt(effective_radius_in, 2) + " in, under the " + fmt(Rmin, 2) + " in minimum; " + (R >= Rmin ? "use more, smaller shots" : "open the radius to at least " + fmt(Rmin, 2) + " in");
+  if (![developed_in, deg_per_shot, mark_spacing_in, first_mark_in, effective_radius_in, radius_shortfall_in].every(Number.isFinite)) return { error: "Segment-bend math is not a finite value." };
+  return {
+    developed_in, deg_per_shot, mark_spacing_in, first_mark_in, marks_in, effective_radius_in, radius_shortfall_in, gain_in,
+    has_check, radius_ok, verdict,
+    note: "Developed length DL = R x angle x pi / 180 on the centerline radius. Mark the start of the arc, then put the first shot mark DL / (2 n) in and every next one DL / n further, bending angle / n at each, so the shots straddle the arc evenly. The tube between two shots stays DL / n long, so the finished bend is a polygon tangent to a circle a little smaller than R: the effective radius s / (2 tan(shot angle / 2)). More, smaller shots bring it toward R (0.09 in short at 10 degree shots on a 36 in radius); a few large shots make visible kinks and a tighter radius, which is what the minimum-radius rule protects, so the check runs on the effective radius. A segment bend takes its minimum from the Other Bends column of NEC Chapter 9 Table 2, not the one-shot and full-shoe column, or from the raceway listing. This is a layout on the centerline; the bender's take-up, shoe radius and springback are not included.",
+  };
+}
+export const conduitSegmentBendExample = { inputs: { radius_in: 36, bend_angle_deg: 90, shots: 9, min_radius_in: 20 } };
+
+FAB_RENDERERS["conduit-segment-bend"] = _simpleRenderer({
+  citation: "Citation: circular-arc geometry by name: developed length = R x angle (rad), n equal shots of angle / n with marks DL / n apart starting DL / (2 n) in, effective radius of the shot polygon r = (DL / n) / (2 tan(angle / 2n)), gain 2 r tan(angle / 2) - DL. The minimum bending radius is entered from NFPA 70 (NEC) 2023 Chapter 9 Table 2 (Other Bends) or the raceway's listing (free read-only access at nfpa.org/freeaccess). A layout aid; the bender's take-up and the listing govern.",
+  example: conduitSegmentBendExample.inputs,
+  fields: [
+    { key: "radius_in", label: "Centerline bend radius (in)", kind: "number", attrs: { step: "any", min: "0" } },
+    { key: "bend_angle_deg", label: "Total bend angle (deg, up to 180)", kind: "number", default: 90, attrs: { step: "any", min: "0" } },
+    { key: "shots", label: "Number of shots (2 to 60)", kind: "number", default: 9, attrs: { step: "1", min: "2" } },
+    { key: "min_radius_in", label: "Minimum bending radius, Table 2 Other Bends or listing (in, 0 to skip)", kind: "number", attrs: { step: "any", min: "0" } },
+  ],
+  outputs: [
+    { key: "dl", id: "csb-out-dl", label: "Developed length of the arc", value: (r) => fmt(r.developed_in, 2) + " in" },
+    { key: "sh", id: "csb-out-sh", label: "Shots", value: (r) => r.marks_in.length + " shots of " + fmt(r.deg_per_shot, 2) + " deg" },
+    { key: "mk", id: "csb-out-mk", label: "Mark spacing", value: (r) => fmt(r.mark_spacing_in, 2) + " in apart, first mark " + fmt(r.first_mark_in, 2) + " in from the start of the arc" },
+    { key: "ms", id: "csb-out-ms", label: "Marks from the start of the arc", value: (r) => r.marks_in.map((m) => fmt(m, 2)).join(", ") + " in" },
+    { key: "re", id: "csb-out-re", label: "Effective radius of the bend as shot", value: (r) => fmt(r.effective_radius_in, 2) + " in (" + fmt(r.radius_shortfall_in, 2) + " in under the layout radius)" },
+    { key: "gn", id: "csb-out-gn", label: "Gain against the tangents", value: (r) => (r.gain_in === null ? "- (a 180 has no tangent intersection)" : fmt(r.gain_in, 2) + " in") },
+    { key: "v", id: "csb-out-v", label: "Minimum radius check", value: (r) => r.verdict },
+    { key: "n", id: "csb-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeConduitSegmentBend,
+});
+
+// dims: in { inside_radius_in: L, od_in: L, gap_in: L, bend_angle_deg: dimensionless, conduits: dimensionless, shots: dimensionless } out: { pitch_in: L, rack_width_in: L, max_extra_in: L }
+export function computeConduitConcentricBend({ inside_radius_in = 0, od_in = 0, gap_in = 0, bend_angle_deg = 90, conduits = 4, shots = 9 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const R1 = Number(inside_radius_in), OD = Number(od_in), th = Number(bend_angle_deg);
+  if (!(R1 > 0)) return { error: "Inside conduit's centerline radius must be positive (in)." };
+  if (R1 > 1200) return { error: "Inside radius above 1,200 in (100 ft) is outside a bender layout." };
+  if (!(OD > 0 && OD <= 12)) return { error: "Conduit outside diameter must be above 0 and at most 12 in." };
+  const gp = _segOptLen(gap_in, "Gap between conduits"); if (gp.error) return { error: gp.error };
+  const gap = gp.v;
+  if (!(th > 0 && th <= 180)) return { error: "Bend angle must be above 0 and at most 180 degrees." };
+  if (!(R1 > OD / 2)) return { error: "The inside centerline radius must exceed half the conduit's outside diameter." };
+  const c = _segInts(conduits, 2, 12, "Conduits"); if (c.error) return { error: c.error };
+  const s = _segInts(shots, 2, 60, "Shots"); if (s.error) return { error: s.error };
+  const pitch_in = OD + gap;
+  const rad = th * Math.PI / 180;
+  const per_conduit = [];
+  for (let i = 0; i < c.n; i++) {
+    const radius_in = R1 + i * pitch_in;
+    const developed_in = radius_in * rad;
+    per_conduit.push({ radius_in, developed_in, mark_spacing_in: developed_in / s.n, extra_in: developed_in - R1 * rad });
+  }
+  const rack_width_in = (c.n - 1) * pitch_in + OD;
+  const max_extra_in = per_conduit[c.n - 1].extra_in;
+  // Shot polygons sit on circles k x R (k = (phi/2) / tan(phi/2)), so neighbouring
+  // straight runs end up k x pitch apart, not a full pitch.
+  const half = th / s.n * Math.PI / 360;
+  const shot_pitch_in = pitch_in * half / Math.tan(half);
+  const shot_clearance_in = shot_pitch_in - OD;
+  const clash = shot_clearance_in < -1e-9;
+  if (![pitch_in, rack_width_in, max_extra_in, shot_pitch_in, shot_clearance_in].every(Number.isFinite)) return { error: "Concentric-bend math is not a finite value." };
+  return {
+    pitch_in, per_conduit, rack_width_in, max_extra_in, deg_per_shot: th / s.n, shot_pitch_in, shot_clearance_in, clash,
+    note: "Every conduit in the rack shares one center: each centerline radius is the inside one plus one pitch (outside diameter plus gap) per position, and each developed length is its radius x angle. The tangents into and out of the bend are the same for every conduit, so the outer conduits need exactly the extra arc shown; cut them all to one length and the outer ones come up short. Bend every conduit with the same number of shots of the same angle, spacing each one's marks by its own DL / n, and the shots fall on common radial lines and the rack stays evenly spaced through the sweep (the segment-bend calculator lays out the marks and checks the inside radius against NEC Chapter 9 Table 2). Between shots the straight runs of neighbouring conduits sit a little closer than one pitch, (shot angle / 2) / tan(shot angle / 2) of it, so a rack with almost no gap and a few large shots can clash. Bender take-up and springback are not included; the outside diameter comes from the raceway listing or NEC Chapter 9 Table 4.",
+  };
+}
+export const conduitConcentricBendExample = { inputs: { inside_radius_in: 12, od_in: 1.163, gap_in: 0.5, bend_angle_deg: 90, conduits: 4, shots: 9 } };
+
+FAB_RENDERERS["conduit-concentric-bend"] = _simpleRenderer({
+  citation: "Citation: circular-arc geometry by name: pitch = OD + gap, R_i = R_1 + (i - 1) x pitch, DL_i = R_i x angle (rad), extra = DL_i - DL_1, rack width = (n - 1) x pitch + OD. Outside diameter from the raceway listing or NFPA 70 (NEC) 2023 Chapter 9 Table 4 (free read-only access at nfpa.org/freeaccess). A layout aid; the bender's take-up and the listing govern.",
+  example: conduitConcentricBendExample.inputs,
+  fields: [
+    { key: "inside_radius_in", label: "Inside conduit centerline radius (in)", kind: "number", attrs: { step: "any", min: "0" } },
+    { key: "od_in", label: "Conduit outside diameter (in)", kind: "number", attrs: { step: "any", min: "0" } },
+    { key: "gap_in", label: "Gap between conduits (in)", kind: "number", attrs: { step: "any", min: "0" } },
+    { key: "bend_angle_deg", label: "Bend angle (deg, up to 180)", kind: "number", default: 90, attrs: { step: "any", min: "0" } },
+    { key: "conduits", label: "Conduits in the rack (2 to 12)", kind: "number", default: 4, attrs: { step: "1", min: "2" } },
+    { key: "shots", label: "Shots per conduit (2 to 60)", kind: "number", default: 9, attrs: { step: "1", min: "2" } },
+  ],
+  outputs: [
+    { key: "p", id: "ccb-out-p", label: "Pitch, center to center", value: (r) => fmt(r.pitch_in, 3) + " in; rack " + fmt(r.rack_width_in, 2) + " in wide through the bend" },
+    { key: "t", id: "ccb-out-t", label: "Per conduit, inside out", value: (r) => r.per_conduit.map((c, i) => "#" + (i + 1) + " R " + fmt(c.radius_in, 3) + " in, DL " + fmt(c.developed_in, 2) + " in, marks " + fmt(c.mark_spacing_in, 2) + " in apart, extra " + fmt(c.extra_in, 2) + " in").join("; ") },
+    { key: "c", id: "ccb-out-c", label: "Clearance between straight runs at the shots", value: (r) => (r.clash ? "CLASH: " : "") + fmt(r.shot_clearance_in, 3) + " in (runs " + fmt(r.shot_pitch_in, 3) + " in apart)" + (r.clash ? "; widen the gap or use more shots" : "") },
+    { key: "x", id: "ccb-out-x", label: "Outer conduit's extra stock", value: (r) => fmt(r.max_extra_in, 2) + " in more than the inside conduit (shots of " + fmt(r.deg_per_shot, 2) + " deg)" },
+    { key: "n", id: "ccb-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeConduitConcentricBend,
 });

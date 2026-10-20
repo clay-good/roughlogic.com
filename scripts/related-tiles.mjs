@@ -2417,6 +2417,9 @@ const RELATED = {
   // spec-v1977..v1978: NEC 210.52 receptacle counts (calc-electricalfield.js).
   "wall-receptacle-count": ["countertop-receptacle-count","branch-circuit-wire-footage","box-fill","gfci-afci-reference"],
   "countertop-receptacle-count": ["wall-receptacle-count","gfci-afci-reference","branch-circuit-wire-footage","box-fill"],
+  // spec-v1979..v1980: segment and concentric conduit bends (calc-fab.js, group A).
+  "conduit-segment-bend": ["conduit-concentric-bend","conduit-90-stub","conduit-offset","conduit-saddle"],
+  "conduit-concentric-bend": ["conduit-segment-bend","conduit-90-stub","conduit-offset","conduit-saddle"],
 };
 
 export { RELATED };

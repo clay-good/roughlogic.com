@@ -160,3 +160,33 @@ test("weld-preheat-cet: at Q = 1 kJ/mm a CET 0.01 higher raises the preheat 7.5 
   const thicker = computeWeldPreheatCet({ ...base, thickness_in: 2 });
   assert.ok(thicker.preheat_c > a.preheat_c);
 });
+
+// spec-v1979 / spec-v1980: walk the tube shot by shot instead of trusting the formulas.
+import { computeConduitSegmentBend, computeConduitConcentricBend } from "../../calc-fab.js";
+function walkShots(markSpacing, n, phiRad) {
+  // Half an interval, then n turns of phi separated by full intervals, then half an interval.
+  let x = 0, y = 0, a = 0;
+  const step = (len) => { x += len * Math.cos(a); y += len * Math.sin(a); };
+  step(markSpacing / 2);
+  for (let k = 0; k < n; k++) { a += phiRad; step(k < n - 1 ? markSpacing : markSpacing / 2); }
+  return { x, y, a };
+}
+test("conduit-segment-bend: a shot-by-shot walk of the tube ends on the bend angle, and its tangent intersection gives the reported gain", () => {
+  const r = computeConduitSegmentBend({ radius_in: 36, bend_angle_deg: 90, shots: 9 });
+  const w = walkShots(r.mark_spacing_in, 9, Math.PI / 18);
+  assert.ok(Math.abs(w.a - Math.PI / 2) < 1e-12);
+  // Incoming tangent is the x axis; outgoing is vertical through the end point, so the
+  // intersection is at (w.x, 0) and both tangent legs are w.x and w.y long.
+  assert.ok(Math.abs(w.x - w.y) < 1e-9, "a symmetric layout");
+  assert.ok(Math.abs(w.x + w.y - r.developed_in - r.gain_in) < 1e-9);
+  assert.ok(Math.abs(w.x - r.effective_radius_in) < 1e-9, "for a 90 each tangent leg equals the effective radius");
+});
+test("conduit-concentric-bend: each arc is its radius times the angle, and the extras grow by one pitch-arc per position", () => {
+  const r = computeConduitConcentricBend({ inside_radius_in: 10, od_in: 2, gap_in: 1, bend_angle_deg: 60, conduits: 3, shots: 6 });
+  const step = 3 * Math.PI / 3;
+  r.per_conduit.forEach((c, i) => {
+    assert.ok(Math.abs(c.developed_in - (10 + 3 * i) * Math.PI / 3) < 1e-12);
+    assert.ok(Math.abs(c.extra_in - i * step) < 1e-12);
+  });
+  assert.equal(r.rack_width_in, 8);
+});

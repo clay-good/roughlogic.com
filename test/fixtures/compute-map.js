@@ -2376,6 +2376,8 @@ export const COMPUTE_MAP = {
   "pipe-freeze-time": { module: "../../calc-outage.js", fn: "computePipeFreezeTime" },
   "wall-receptacle-count": { module: "../../calc-electricalfield.js", fn: "computeWallReceptacleCount" },
   "countertop-receptacle-count": { module: "../../calc-electricalfield.js", fn: "computeCountertopReceptacleCount" },
+  "conduit-segment-bend": { module: "../../calc-fab.js", fn: "computeConduitSegmentBend" },
+  "conduit-concentric-bend": { module: "../../calc-fab.js", fn: "computeConduitConcentricBend" },
 };
 
 // Resolve a COMPUTE_MAP module path (relative to this file) and import it.

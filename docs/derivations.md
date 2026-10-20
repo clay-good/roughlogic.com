@@ -2246,8 +2246,10 @@ cross-check.
 | calc-fab.js | `computeBendSpringback` | `{ tool_radius_in = 1.0, thickness_in = 0.1, yield_strength_psi = 50000, modul...` | _ | _ | _ |
 | calc-fab.js | `computeCoilLength` | `{ outside_diameter_in = 0, inside_diameter_in = 0, material_thickness_in = 0 ...` | _ | _ | _ |
 | calc-fab.js | `computeConduit90Stub` | `{ mode = "stub-up", height_in = 0, deduct_in = 0, back_to_back_in = 0, radius...` | _ | _ | _ |
+| calc-fab.js | `computeConduitConcentricBend` | `{ inside_radius_in = 0, od_in = 0, gap_in = 0, bend_angle_deg = 90, conduits ...` | _ | _ | _ |
 | calc-fab.js | `computeConduitOffset` | `{ offset_in = 0, angle_deg = 0 } = {}` | _ | _ | _ |
 | calc-fab.js | `computeConduitSaddle` | `{ mode = "three-point", depth_in = 0, preset = "45/22.5", width_in = 0 } = {}` | _ | _ | _ |
+| calc-fab.js | `computeConduitSegmentBend` | `{ radius_in = 0, bend_angle_deg = 90, shots = 9, min_radius_in = 0 } = {}` | _ | _ | _ |
 | calc-fab.js | `computeFlangeBoltTorque` | `{ bolt_diameter_in = 0, thread_series = "UNC", bolt_count = 8, tensile_area_i...` | _ | _ | _ |
 | calc-fab.js | `computeInterpassTemperatureControl` | `{ tau_min = 0, ambient_f = 70, preheat_min_f = 0, interpass_max_f = 0, curren...` | _ | _ | _ |
 | calc-fab.js | `computeMinBendRadius` | `{ thickness_in = 0, elongation_pct = 0 } = {}` | _ | _ | _ |
@@ -3939,7 +3941,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2523.
+Row count: 2525.
 
 <!-- END function-corpus-v14 -->
 
@@ -4007,7 +4009,7 @@ spec-v14 §12.1) record the v6 source-stamp recheck row in
 [docs/v6-audit.md](v6-audit.md) rather than a formula derivation,
 per spec-v14 §13.1 second paragraph.
 
-### Group A Electrical (263 tiles)
+### Group A Electrical (265 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4055,12 +4057,14 @@ per spec-v14 §13.1 second paragraph.
 | `conductor-short-circuit-withstand` | Conductor Short-Circuit Thermal Withstand (Onderdonk / ICEA) | ICEA / Onderdonk; spec-v125 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `conductor-uplift-check` | Suspension Insulator Uplift Check at a Low Point | Project (first-principles); the utility construction standards and the line designer ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `conduit-90-stub` | Conduit 90 Stub and Back-to-Back | Ugly's Electrical References (by name); 3/4 in EMT, 8 in stub, 6 in deduct -> 2 in mark | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `conduit-concentric-bend` | Concentric Conduit Bend Radii and Lengths | roughlogic (circular-arc geometry); Four 1 in EMT, OD 1.163 in, gap 0.5 in, R1 = 12 in, 90 de... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `conduit-expansion-max-run` | PVC Conduit Max Run Before an Expansion Fitting | NFPA; spec-v665 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `conduit-fill` | Conduit Fill | NFPA; Chapter 9 Tables 1, 4, 5; 4 conductors -> 40% fill thresh... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `conduit-jam-ratio` | Conduit Jam Ratio for Three Same-Size Conductors (NEC Ch. 9) | NEC (NFPA 70) Chapter 9; spec-v374 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `conduit-nipple-60-fill` | Conduit Nipple 60% Fill (NEC Ch. 9 Note 4) | Conduit nipple 60% fill (NEC Chapter ...; fill = 20 x 0.0211 / 0.864 = 48.8%; nipple max 0.6 x 0.86... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `conduit-offset` | Conduit Offset Bend | Ugly's Electrical References / NECA b...; 6 in offset at 30 deg -> 12 in mark spacing, multiplier 2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `conduit-saddle` | Conduit Saddle Bend | Ugly's Electrical References (by name); 3 in obstruction, 45/22.5 preset -> 7.5 in outer-mark spa... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `conduit-segment-bend` | Conduit Segment Bend Layout | roughlogic (circular-arc geometry); 90 deg at R = 36 in in 9 shots: DL = 36 x pi / 2 = 56.548... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `conduit-thermal-expansion` | PVC Conduit Thermal Expansion (NEC 352.44) | NFPA; spec-v126 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `continuous-load-ocpd` | Continuous-Load OCPD and Conductor at 125% (NEC 210.20 / 215.3) | NEC 2023 210.20(A) / 215.3 / 240.6(A); spec-v280 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `copper-resistance` | Conductor Resistance at Temperature | NFPA; NEC Table 8 gives 1.93 ohm/1000 ft at 75 C uncoated coppe... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -6381,6 +6385,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 
-Tile count: 2269. Fixture-covered or reference-cadence: 2269 / 2269.
+Tile count: 2271. Fixture-covered or reference-cadence: 2271 / 2271.
 
 <!-- END tile-index-v14 -->
