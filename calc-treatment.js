@@ -84,7 +84,7 @@ TREATMENT_RENDERERS["langelier-index"] = renderLangelierIndex;
 // --- v20 M.3: Chemical metering-pump setting (`chemical-feed-pump`) ---
 // pure lb/day = MGD*dose*8.34; solution lb/day = pure/(strength/100);
 // GPD = solution_lb/day/(8.34*SG); mL/min = GPD*3785.41/1440; setting% = GPD/pump_max*100.
-// dims: in { flow_mgd: L^3*T^-1, dose_mgl: M L^-3, strength_pct: dimensionless, sg: dimensionless, pump_max_gpd: L^3*T^-1 } out: { solution_gpd: L^3*T^-1, setting_pct: dimensionless, pure_lb_day: M T^-1, solution_lb_day: M T^-1 }
+// dims: in { flow_mgd: L^3*T^-1, dose_mgl: M L^-3, strength_pct: dimensionless, sg: dimensionless, pump_max_gpd: L^3*T^-1 } out: { solution_gpd: L^3*T^-1, setting_pct: dimensionless, pure_lb_day: M T^-1, solution_lb_day: M T^-1, ml_min: L^3 T^-1 }
 export function computeChemicalFeedPump({ flow_mgd = 0, dose_mgl = 0, strength_pct = 100, sg = 1, pump_max_gpd = 0 } = {}) {
   const mgd = Number(flow_mgd) || 0;
   const dose = Number(dose_mgl) || 0;

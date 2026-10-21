@@ -5393,7 +5393,7 @@ CONSTRUCTION_RENDERERS["asce7-load-combinations"] = _simpleRenderer({
 
 // ===================== spec-v226: seismic base shear (ASCE 7 §12.8 ELF) =====================
 
-// dims: in { weight_kip: M L T^-2, sds: dimensionless, sd1: dimensionless, r_factor: dimensionless, ie: dimensionless, period_s: T, s1: dimensionless } out: { cs: dimensionless, base_shear_kip: M L T^-2, cs_basic: dimensionless, cs_cap: dimensionless }
+// dims: in { weight_kip: M L T^-2, sds: dimensionless, sd1: dimensionless, r_factor: dimensionless, ie: dimensionless, period_s: T, s1: dimensionless } out: { cs: dimensionless, base_shear_kip: M L T^-2, cs_basic: dimensionless, cs_cap: dimensionless, cs_min: dimensionless }
 export function computeSeismicBaseShear({ weight_kip = 0, sds = 0, sd1 = 0, r_factor = 0, ie = 1.0, period_s = 0, s1 = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(Number(sd1) > 0)) return { error: "SD1 must be positive (g); left blank, Cs fell to the code minimum." };

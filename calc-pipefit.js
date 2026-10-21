@@ -511,7 +511,7 @@ PIPEFIT_RENDERERS["boiler-horsepower"] = _renderBoilerHorsepower;
 // ---------------------------------------------------------------------
 // v160 ASME B31.1 pipe pressure rating / required wall (pipe-pressure-rating)
 // ---------------------------------------------------------------------
-// dims: in { od_in: L, wall_in: L, allow_stress: M L^-1 T^-2, joint_factor: dimensionless, y_coeff: dimensionless, mill_tol_frac: dimensionless, allowance_in: L, design_p: M L^-1 T^-2, mode: dimensionless, weld_strength_reduction: dimensionless } out: { p_allow: M L^-1 T^-2, t_min: L, t_avail: L }
+// dims: in { od_in: L, wall_in: L, allow_stress: M L^-1 T^-2, joint_factor: dimensionless, y_coeff: dimensionless, mill_tol_frac: dimensionless, allowance_in: L, design_p: M L^-1 T^-2, mode: dimensionless, weld_strength_reduction: dimensionless } out: { p_allow: M L^-1 T^-2, t_min: L, t_avail: L, t_nominal_min: L }
 export function computePipePressureRating({ od_in = 0, wall_in = 0, allow_stress = 0, joint_factor = 1, y_coeff = 0.4, mill_tol_frac = 0.125, allowance_in = 0, design_p = 0, mode = "allowable_pressure", weld_strength_reduction = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const od = Number(od_in);

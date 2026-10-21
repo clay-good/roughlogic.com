@@ -158,7 +158,6 @@ test("a final `min` reads as minutes only where the dims annotation says time", 
   const EXEMPT = new Map([
     ["speed_ft_min", "annotated dimensionless as filler; it is a speed in ft/min and reads so"],
     ["typical_contact_min", "a text value (\"10 min\"), never captioned from the key"],
-    ["free_air_l_min", "litres per minute; the single letter l is deliberately not a unit"],
   ]);
   const dims = new Map();
   for (const f of readdirSync(ROOT).filter((n) => /^calc-.*\.js$/.test(n))) {
@@ -209,7 +208,6 @@ test("a caption's closing unit agrees with the key's dims annotation", () => {
     ["wastewater_ft3", "a per-day volume named without its rate (check-dimensions UNIT_TAIL_EXEMPT)"],
     ["bedding_ft3", "a per-day volume named without its rate (check-dimensions UNIT_TAIL_EXEMPT)"],
     ["q_s", "a heat flux with subscript s; q is not on the Greek-letter subscript list"],
-    ["free_air_l_min", "litres per minute; the single letter l is deliberately not a unit"],
     ["feed_ipm_in", "an input in in/min; inputs show their field label, never this caption"],
     ["bag_yield_sf_in", "square feet at a depth in inches, a volume; an input, captioned by its field"],
     ["dispersion_ps_nm_km", "ps/(nm km), a compound no caption rule spells"],

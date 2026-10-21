@@ -1350,7 +1350,7 @@ AIRQUALITY_RENDERERS["community-noise-ldn"] = _simpleRenderer({
 });
 
 // ===================== spec-v1730: odour dilution to threshold =====================
-// dims: in { source_dt: dimensionless, airflow_acfm: L^3 T^-1, dilution_factor: dimensionless, limit_dt: dimensionless, target_dt: dimensionless } out: { odour_emission_rate_ou_s: L^3 T^-1, dt_at_receptor: dimensionless, required_source_dt: dimensionless, reduction_pct: dimensionless, dilution_multiple_needed: dimensionless }
+// dims: in { source_dt: dimensionless, airflow_acfm: L^3 T^-1, dilution_factor: dimensionless, limit_dt: dimensionless, target_dt: dimensionless } out: { odour_emission_rate_ou_s: L^3 T^-1, dt_at_receptor: dimensionless, required_source_dt: dimensionless, reduction_pct: dimensionless, dilution_multiple_needed: dimensionless, odour_emission_rate_oue_s: L^3 T^-1 }
 export function computeOdorDilutionThreshold({
   source_dt = 0, airflow_acfm = 0, dilution_factor = 0,
   limit_dt = 0, target_dt = 0,

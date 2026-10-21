@@ -421,7 +421,7 @@ TELECOM_RENDERERS["optical-return-loss"] = _simpleRenderer({
 
 // ===================== spec-v1843: microduct cable jetting =====================
 
-// dims: in { duct_id_mm: L, cable_od_mm: L, fill_min_pct: dimensionless, fill_max_pct: dimensionless, optimal_fill_pct: dimensionless, air_velocity_m_s: L T^-1, pressure_bar_absolute: M L^-1 T^-2 } out: { fill_ratio_pct: dimensionless, area_fill_pct: dimensionless, annulus_area_mm2: L^2, free_air_l_min: L^3 T^-1, free_air_change_pct: dimensionless, optimal_cable_od_mm: L, optimal_annulus_area_mm2: L^2 }
+// dims: in { duct_id_mm: L, cable_od_mm: L, fill_min_pct: dimensionless, fill_max_pct: dimensionless, optimal_fill_pct: dimensionless, air_velocity_m_s: L T^-1, pressure_bar_absolute: M L^-1 T^-2 } out: { fill_ratio_pct: dimensionless, area_fill_pct: dimensionless, annulus_area_mm2: L^2, free_air_l_min: L^3 T^-1, free_air_change_pct: dimensionless, optimal_cable_od_mm: L, optimal_annulus_area_mm2: L^2, duct_air_l_min: L^3 T^-1, free_air_delta_l_min: L^3 T^-1, optimal_duct_air_l_min: L^3 T^-1, optimal_free_air_l_min: L^3 T^-1 }
 export function computeCableJettingDistance({ duct_id_mm = 0, cable_od_mm = 0, fill_min_pct = 50, fill_max_pct = 80, optimal_fill_pct = 65, air_velocity_m_s = 0, pressure_bar_absolute = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   if (!(duct_id_mm > 0) || !(cable_od_mm > 0) || cable_od_mm >= duct_id_mm) return { error: "Duct and cable diameters must be positive, and cable OD must be below duct ID." };

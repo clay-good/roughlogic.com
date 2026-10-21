@@ -269,7 +269,7 @@ STEELPANELZONE_RENDERERS["steel-panel-zone-axial"] = _simpleRenderer({
 // actual t: t_c = sqrt(k B b' / (p Fu)), alpha = (1 / (delta (1 + rho))) ((t_c/t)^2 - 1), and
 // T_avail = B when alpha < 0, B (t/t_c)^2 (1 + delta alpha) up to alpha = 1, B (t/t_c)^2 (1 + delta)
 // beyond. Checked against AISC Design Example II.D-1 (WT8x28.5, 3/4 in bolts at 4 in): t_min 0.521 in.
-// dims: in { tension_per_bolt_kip: M L T^-2, bolt_available_kip: M L T^-2, bolt_dia_in: L, hole_dia_in: L, tributary_p_in: L, b_in: L, a_in: L, flange_t_in: L, fu_ksi: M L^-1 T^-2, method: dimensionless } out: { t_min_in: L, t_no_prying_in: L, t_c_in: L, available_tension_kip: M L T^-2, b_prime_in: L, a_prime_in: L, delta: dimensionless, beta: dimensionless, alpha_prime: dimensionless, rho: dimensionless }
+// dims: in { tension_per_bolt_kip: M L T^-2, bolt_available_kip: M L T^-2, bolt_dia_in: L, hole_dia_in: L, tributary_p_in: L, b_in: L, a_in: L, flange_t_in: L, fu_ksi: M L^-1 T^-2, method: dimensionless } out: { t_min_in: L, t_no_prying_in: L, t_c_in: L, available_tension_kip: M L T^-2, b_prime_in: L, a_prime_in: L, delta: dimensionless, beta: dimensionless, alpha_prime: dimensionless, rho: dimensionless, alpha_prime_min: dimensionless }
 export function computeBoltPryingAction({ tension_per_bolt_kip = 0, bolt_available_kip = 0, bolt_dia_in = 0, hole_dia_in = 0, tributary_p_in = 0, b_in = 0, a_in = 0, flange_t_in = 0, fu_ksi = 65, method = "LRFD" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const T = tension_per_bolt_kip, B = bolt_available_kip, d = bolt_dia_in, p = tributary_p_in, t = flange_t_in;

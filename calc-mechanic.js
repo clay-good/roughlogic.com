@@ -1501,7 +1501,7 @@ MECHANIC_RENDERERS["torsion-spring-rate"] = _simpleRenderer({
 // Torque pulsation and peak output angular acceleration added 2026-10-09 (the note named them as separate):
 // with power conserved, T_out = T_in / (speed ratio), so it runs T cos(beta) to T/cos(beta); the output angular
 // acceleration is omega^2 cos(beta) sin^2(beta) sin(2 theta) / (1 - sin^2(beta) sin^2(theta))^2, peak found by search.
-// dims: in { joint_angle_deg: dimensionless, input_speed_rpm: T^-1, input_torque_lbft: M L^2 T^-2 } out: { max_output_rpm: T^-1, min_output_rpm: T^-1, fluctuation_pct: dimensionless, max_output_torque_lbft: M L^2 T^-2, min_output_torque_lbft: M L^2 T^-2, peak_output_accel_rad_s2: T^-2, velocity_ratio_max: dimensionless }
+// dims: in { joint_angle_deg: dimensionless, input_speed_rpm: T^-1, input_torque_lbft: M L^2 T^-2 } out: { max_output_rpm: T^-1, min_output_rpm: T^-1, fluctuation_pct: dimensionless, max_output_torque_lbft: M L^2 T^-2, min_output_torque_lbft: M L^2 T^-2, peak_output_accel_rad_s2: T^-2, velocity_ratio_max: dimensionless, velocity_ratio_min: dimensionless }
 export function computeUniversalJointSpeed({ joint_angle_deg = 0, input_speed_rpm = 0, input_torque_lbft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const beta = Number(joint_angle_deg) || 0;
@@ -4161,7 +4161,7 @@ MECHANIC_RENDERERS["injector-flow-at-pressure"] = _simpleRenderer({
 // and substituting d = t/64 collapses the span out entirely to F = T/16. So the measured
 // deflection force times 16 IS the static tension per belt, which is why the 1/64 rule
 // works on any drive without knowing its size.
-// dims: in { center_distance_in: L, large_sheave_dia_in: L, small_sheave_dia_in: L, measured_force_lb: M L T^-2, rec_min_force_lb: M L T^-2, rec_max_force_lb: M L T^-2, belt_condition: dimensionless, new_belt_factor: dimensionless, belt_count: dimensionless } out: { span_in: L, deflection_in: L, static_tension_lb: M L T^-2, target_min_force_lb: M L T^-2, target_max_force_lb: M L T^-2, wrap_angle_deg: dimensionless, shaft_load_lb: M L T^-2, deflection_64ths: dimensionless, target_tension_max_lb: M L T^-2, target_tension_min_lb: M L T^-2 }
+// dims: in { center_distance_in: L, large_sheave_dia_in: L, small_sheave_dia_in: L, measured_force_lb: M L T^-2, rec_min_force_lb: M L T^-2, rec_max_force_lb: M L T^-2, belt_condition: dimensionless, new_belt_factor: dimensionless, belt_count: dimensionless } out: { span_in: L, deflection_in: L, static_tension_lb: M L T^-2, target_min_force_lb: M L T^-2, target_max_force_lb: M L T^-2, wrap_angle_deg: dimensionless, shaft_load_lb: M L T^-2, deflection_64ths: dimensionless, target_tension_max_lb: M L T^-2, target_tension_min_lb: M L T^-2, pct_of_min: dimensionless }
 export function computeBeltDeflectionTension({ center_distance_in = 0, large_sheave_dia_in = 0, small_sheave_dia_in = 0, measured_force_lb = 0, rec_min_force_lb = 0, rec_max_force_lb = 0, belt_condition = "used", new_belt_factor = 1.3, belt_count = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (arguments[0]?.belt_condition !== undefined && !["new", "used"].includes(String(arguments[0].belt_condition))) return { error: "Belt condition must be new or used." };

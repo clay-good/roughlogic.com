@@ -25,7 +25,7 @@ const KEY_UNITS = new Map(Object.entries({
   psi: "psi", psig: "psig", psid: "psid", psf: "psf", ksi: "ksi", ksf: "ksf", pcf: "pcf", plf: "plf", klf: "klf",
   lb: "lb", lbs: "lb", kip: "kip", kips: "kip", ton: "ton", tons: "ton", kg: "kg",
   hp: "hp", kw: "kW", kwh: "kWh", kva: "kVA", btuh: "Btu/h", btu: "Btu", mbh: "MBH",
-  amps: "A", volts: "V", ohms: "ohms", hz: "Hz", torr: "torr",
+  amps: "A", volts: "V", ohms: "ohms", hz: "Hz", torr: "torr", pints: "pints",
   deg: "deg", pct: "%", percent: "%",
   hr: "hr", hrs: "hr", yr: "yr", years: "yr", months: "months", days: "days",
   ft2: "ft\u00b2", ft3: "ft\u00b3", sqin: "sq in", sqft: "ft\u00b2", in2: "in\u00b2", in3: "in\u00b3", in4: "in\u2074",
@@ -90,7 +90,7 @@ const IN_WORDS = new Set(["cut", "shut"]);
 // A top-only tail ends the read: `cumulative_to_years_bbl` is barrels.
 const TOP_ONLY = new Set(["bbl", "kj", "lcy", "bcy", "ccy"]);
 const MIN_AFTER_UNITS = new Set(["cfm", "scfm", "acfm", "gpm", "gph", "gpd", "cfh", "mgd", "hp", "kw", "kva", "kvar", "a", "amps", "v", "volts", "w", "psi", "psig", "psia", "psf", "ksi", "f", "c", "ohm", "ohms", "hz", "rpm", "fpm", "fps", "mph", "pct", "percent"]);
-const MIN_AFTER_WORDS = new Set(["max", "avg", "sigma", "q", "angle", "straight", "continuous", "closets", "fixture", "ph", "required", "allowed", "allowable"]);
+const MIN_AFTER_WORDS = new Set(["max", "avg", "sigma", "q", "angle", "straight", "continuous", "closets", "fixture", "ph", "required", "allowed", "allowable", "ratio", "of", "cs", "prime", "nominal"]);
 
 // Read a machine field name back as English. This claims nothing the key does
 // not already say -- it only spaces the words out and spells the unit -- so it
@@ -117,7 +117,10 @@ export function humanizeKey(key) {
     const last = parts[n - 1], prev = parts[n - 2].toLowerCase();
     const headOf = (k) => { const h = k.length ? humanizeKey(k.join("_")) : null; if (h) return h; const r = k.join(" "); return r.charAt(0).toUpperCase() + r.slice(1); };
     if (last.toLowerCase() === "ft" && (prev === "ac" || prev === "acre")) return n === 2 ? "Acre-ft" : `${headOf(parts.slice(0, -2))} (acre-ft)`;
-    const perSecond = { m: "m/s", g: "g/s", rad: "rad/s", umol: "\u00b5mol/s" }[prev];
+    const perSecond = { m: "m/s", g: "g/s", rad: "rad/s", umol: "\u00b5mol/s", oue: "ouE/s" }[prev];
+    // Litres and millilitres per minute, never "l (min)".
+    const perMinute = { l: "L/min", ml: "mL/min" }[prev];
+    if (last === "min" && perMinute) return n > 2 ? `${headOf(parts.slice(0, -2))} (${perMinute})` : perMinute;
     if (last === "s" && perSecond && n > 2) return `${headOf(parts.slice(0, -2))} (${perSecond})`;
     if (prev === "1" && n > 2 && KEY_UNITS.has(last.toLowerCase())) return `${headOf(parts.slice(0, -2))} (1/${KEY_UNITS.get(last.toLowerCase())})`;
     for (let i = parts.length - 2; i >= 0; i--) if (parts[i + 1].toLowerCase() === "in" && IN_WORDS.has(parts[i].toLowerCase()) && (i === 0 || parts[i - 1].toLowerCase() !== "in")) parts.splice(i, 2, parts[i] + "-in");

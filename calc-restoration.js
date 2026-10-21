@@ -1373,7 +1373,7 @@ RESTORATION_RENDERERS["drying-chamber-co2"] = renderDryingChamberCO2;
 // --- v20 D.1: Moisture removed by grain depression (`grains-removed`) ---
 // dG = inlet - outlet; mass air = CFM*60/13.33 lb-dry-air/hr; water lb/hr =
 // mass-air * dG / 7000; gal = lb/hr * hours / 8.345.
-// dims: in { cfm: L^3*T^-1, inlet_gpp: dimensionless, outlet_gpp: dimensionless, hours: T } out: { water_lb_hr: M*T^-1, water_gal: L^3, grain_depression_gpp: dimensionless }
+// dims: in { cfm: L^3*T^-1, inlet_gpp: dimensionless, outlet_gpp: dimensionless, hours: T } out: { water_lb_hr: M*T^-1, water_gal: L^3, grain_depression_gpp: dimensionless, water_pints_hr: L^3 T^-1 }
 export function computeGrainsRemoved({ cfm = 0, inlet_gpp = 0, outlet_gpp = 0, hours = 0 } = {}) {
   if (!(Number(inlet_gpp) > 0) || !(Number(outlet_gpp) > 0)) return { error: "Enter the inlet and outlet humidity ratios (grains per pound); a dehumidifier does not deliver 0 GPP air." };
   const CFM = Number(cfm) || 0;
