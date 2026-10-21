@@ -437,7 +437,7 @@ HYGIENE_RENDERERS["fixed-ladder-fall-protection"] = _simpleRenderer({
 // =====================================================================
 // spec-v1736: confined space retrieval winch force and line pull.
 // =====================================================================
-// dims: in { entrant_weight_lb: M L T^-2, equipment_weight_lb: M L T^-2, friction_pct: dimensionless, entanglement_factor: dimensionless, system_rating_lb: M L T^-2, anchorage_rating_lb: M L T^-2 } out: { suspended_lb: M L T^-2, friction_lb: M L T^-2, retrieval_lb: M L T^-2, entangled_lb: M L T^-2, system_margin_lb: M L T^-2, anchorage_margin_lb: M L T^-2 }
+// dims: in { entrant_weight_lb: M L T^-2, equipment_weight_lb: M L T^-2, friction_pct: dimensionless, entanglement_factor: dimensionless, system_rating_lb: M L T^-2, anchorage_rating_lb: M L T^-2 } out: { suspended_lb: M L T^-2, friction_lb: M L T^-2, retrieval_lb: M L T^-2, entangled_lb: M L T^-2, system_margin_lb: M L T^-2, anchorage_margin_lb: M L T^-2, weakest_rating_lb: M L T^-2 }
 export function computeRetrievalWinchForce({
   entrant_weight_lb = 0, equipment_weight_lb = 0, friction_pct = 15,
   entanglement_factor = 0, system_rating_lb = 0, anchorage_rating_lb = 0,

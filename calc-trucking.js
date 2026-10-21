@@ -1421,7 +1421,7 @@ TRUCKING_RENDERERS["deadhead-percent"] = renderDeadheadPercent;
 // --- v20 J.3: Axle-load tandem slide (`axle-load-distribution`) ---
 // Lever-arm: moving the tandem d inches changes the trailer reaction by
 // dW = load * d / L. Holes = target_shift / shift_per_hole, rounded up.
-// dims: in { drive_lb: M*L*T^-2, trailer_lb: M*L*T^-2, kingpin_to_tandem_in: L, hole_spacing_in: L, tandem_cap: M*L*T^-2 } out: { shift_per_hole_lb: M*L*T^-2, holes: dimensionless }
+// dims: in { drive_lb: M*L*T^-2, trailer_lb: M*L*T^-2, kingpin_to_tandem_in: L, hole_spacing_in: L, tandem_cap: M*L*T^-2 } out: { shift_per_hole_lb: M*L*T^-2, holes: dimensionless, drive_over_lb: M L T^-2, trailer_over_lb: M L T^-2, projected_drive_lb: M L T^-2, projected_trailer_lb: M L T^-2 }
 export function computeAxleLoadDistribution({ drive_lb = 0, trailer_lb = 0, kingpin_to_tandem_in = 0, hole_spacing_in = 6, tandem_cap = 34000 } = {}) {
   const drive = Number(drive_lb) || 0;
   const trailer = Number(trailer_lb) || 0;
@@ -1636,7 +1636,7 @@ TRUCKING_RENDERERS["maintenance-reserve"] = renderMaintenanceReserve;
 // AHJ governs an over-limit move.
 // =====================================================================
 
-// dims: in { gcwr_lb: M, tractor_weight_lb: M, trailer_weight_lb: M, federal_max_lb: M } out: { combined_lb: M, margin_gcwr: M, margin_fed: M }
+// dims: in { gcwr_lb: M, tractor_weight_lb: M, trailer_weight_lb: M, federal_max_lb: M } out: { combined_lb: M, margin_gcwr: M, margin_fed: M, over_by: M }
 export function computeGcwrCheck({ gcwr_lb = 0, tractor_weight_lb = 0, trailer_weight_lb = 0, federal_max_lb = 80000 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(gcwr_lb > 0)) return { error: "Rated GCWR must be positive (lb)." };
@@ -1678,7 +1678,7 @@ const renderGcwrCheck = _simpleRenderer({
 });
 TRUCKING_RENDERERS["gcwr-check"] = renderGcwrCheck;
 
-// dims: in { axle_weight_lb: M, tires_on_axle: dimensionless, tire_max_load_lb: M } out: { axle_capacity_lb: M, utilization_pct: dimensionless }
+// dims: in { axle_weight_lb: M, tires_on_axle: dimensionless, tire_max_load_lb: M } out: { axle_capacity_lb: M, utilization_pct: dimensionless, over_by: M }
 export function computeTireLoadCheck({ axle_weight_lb = 0, tires_on_axle = 2, tire_max_load_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(axle_weight_lb > 0)) return { error: "Axle scale weight must be positive (lb)." };

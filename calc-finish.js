@@ -321,7 +321,7 @@ FINISH_RENDERERS["attic-ventilation"] = _simpleRenderer({
 });
 
 const _GUTTER_PITCH = { "1.00": 1.0, "1.05": 1.05, "1.10": 1.1, "1.20": 1.2, "1.30": 1.3 };
-// dims: in { roof_area_sqft: L^2, pitch_factor: dimensionless, rainfall_in_hr: L T^-1, downspout_sqin: L^2 } out: { adjusted_area: L^2, downspout_total_sqin: L^2, downspouts: dimensionless }
+// dims: in { roof_area_sqft: L^2, pitch_factor: dimensionless, rainfall_in_hr: L T^-1, downspout_sqin: L^2 } out: { adjusted_area: L^2, downspout_total_sqin: L^2, downspouts: dimensionless, gutter_design_area: L^3 T^-1 }
 export function computeGutterDownspout({ roof_area_sqft = 0, pitch_factor = "1.00", rainfall_in_hr = 5, downspout_sqin = 12 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(roof_area_sqft > 0)) return { error: "Roof area must be positive." };
@@ -424,7 +424,7 @@ FINISH_RENDERERS["deck-board-takeoff"] = _simpleRenderer({
 // ===================== spec-v798: flat glass lite weight for handling =====================
 // Density x volume. Soda-lime float glass is SG 2.50 = 156.1 lb/ft^3, i.e. ~13.0 lb/ft^2 per inch of
 // thickness. weight = 156.1 x area(ft^2) x thickness(in)/12 x panes.
-// dims: in { width_in: L, height_in: L, thickness_in: L, panes: dimensionless } out: { area_ft2: L^2, weight_lb: M, weight_per_ft2: M L^-2 }
+// dims: in { width_in: L, height_in: L, thickness_in: L, panes: dimensionless } out: { area_ft2: L^2, weight_lb: M, weight_per_ft2: M L^-2, per_pane_lb: M }
 export function computeGlassWeight({ width_in = 0, height_in = 0, thickness_in = 0, panes = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const w = Number(width_in) || 0;
@@ -746,7 +746,7 @@ FINISH_RENDERERS["closet-shelf-takeoff"] = _simpleRenderer({
 // every source states alongside it. Past the limit the overhang needs corbels or steel: brackets
 // at the entered spacing (24 in default), each extending about 2/3 of the overhang under the stone.
 // Slab weight comes from an ENTERED density (170 pcf granite default), never a recalled table.
-// dims: in { overhang_in: L, total_depth_in: L, thickness_cm: L, run_length_ft: L, bracket_spacing_in: L, density_pcf: M L^-3, unsupported_limit_override_in: L } out: { governing_limit_in: L, overhang_weight_plf: M T^-2, brackets: dimensionless, bracket_depth_in: L, one_third_limit_in: L, thickness_limit_in: L }
+// dims: in { overhang_in: L, total_depth_in: L, thickness_cm: L, run_length_ft: L, bracket_spacing_in: L, density_pcf: M L^-3, unsupported_limit_override_in: L } out: { governing_limit_in: L, overhang_weight_plf: M T^-2, brackets: dimensionless, bracket_depth_in: L, one_third_limit_in: L, thickness_limit_in: L, psf: M L^-1 T^-2, overhang_weight_lb: M L T^-2 }
 export function computeCountertopOverhangSupport({ overhang_in = 0, total_depth_in = 25.5, thickness_cm = 3, run_length_ft = 0, bracket_spacing_in = 24, density_pcf = 170, unsupported_limit_override_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const oh = Number(overhang_in) || 0;

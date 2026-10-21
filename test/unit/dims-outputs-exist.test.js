@@ -227,11 +227,11 @@ test("a <thing>_per_<time> key is declared with the time in its denominator", ()
 });
 
 // Every number a tile compute returns on its worked examples now has a
-// declared dimension except these, nearly all pound-valued (the force-vs-mass
-// reading is undecided; see POUND_CONVENTION_UNSETTLED) or a name that means
-// two quantities. 2026-10-20: ~4,300 undeclared -> 331. The count may only
+// declared dimension except these: a non-integer exponent (culvert flow
+// factor, Kf), a name meaning another quantity elsewhere, or a caption that
+// reads its `_min` as minutes. 2026-10-20: ~4,300 undeclared -> 42. The count may only
 // fall; a new tile declares every output it returns.
-const UNDECLARED_BUDGET = 331;
+const UNDECLARED_BUDGET = 42;
 test("undeclared returned outputs only fall", async () => {
   const { COMPUTE_MAP } = await import("../fixtures/compute-map.js");
   const { rows } = JSON.parse(readFileSync(resolve(ROOT, "test/fixtures/worked-examples.json"), "utf8"));

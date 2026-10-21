@@ -381,7 +381,7 @@ ARBORICULTURE_RENDERERS["stump-grinding-volume"] = _simpleRenderer({
 
 // ============ spec-v1700: soil volume required for a target canopy ============
 
-// dims: in { canopy_diameter_ft: L, soil_per_canopy_ft3_per_ft2: L, pit_length_ft: L, pit_width_ft: L, pit_depth_ft: L, usable_fraction: dimensionless } out: { canopy_area_ft2: L^2, soil_required_ft3: L^3, pit_volume_ft3: L^3, usable_pit_volume_ft3: L^3, provision_pct: dimensionless, supported_canopy_ft: L, canopy_diameter_ft: L, pit_depth_ft: L, pit_length_ft: L, pit_width_ft: L, shortfall_ft3: L^3, soil_required_cy: L^3, supported_area_ft2: L^2, usable_fraction: dimensionless }
+// dims: in { canopy_diameter_ft: L, soil_per_canopy_ft3_per_ft2: L, pit_length_ft: L, pit_width_ft: L, pit_depth_ft: L, usable_fraction: dimensionless } out: { canopy_area_ft2: L^2, soil_required_ft3: L^3, pit_volume_ft3: L^3, usable_pit_volume_ft3: L^3, provision_pct: dimensionless, supported_canopy_ft: L, canopy_diameter_ft: L, pit_depth_ft: L, pit_length_ft: L, pit_width_ft: L, shortfall_ft3: L^3, soil_required_cy: L^3, supported_area_ft2: L^2, usable_fraction: dimensionless, soil_per_canopy_ft3_per_ft2: L }
 export function computeSoilVolumeForCanopy({ canopy_diameter_ft = 0, soil_per_canopy_ft3_per_ft2 = 2, pit_length_ft = 0, pit_width_ft = 0, pit_depth_ft = 0, usable_fraction = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(canopy_diameter_ft > 0)) return { error: "The intended mature canopy diameter must be positive (ft)." };

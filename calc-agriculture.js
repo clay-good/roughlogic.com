@@ -1186,7 +1186,7 @@ export const GRAIN_TEST_WEIGHT_LB_BU = {
 // 1 ft^3 = 0.8036 bushels (1 bushel = 1.2445 ft^3).
 const BUSHELS_PER_FT3 = 0.8036;
 
-// dims: in { diameter_ft: L, eave_height_ft: L, peak_height_ft: L, grain: dimensionless, packing_factor: dimensionless } out: { cylinder_ft3: L^3, cone_ft3: L^3, total_bushels: L^3, weight_lb: M, diameter_ft: L, packing_factor: dimensionless, total_ft3: L^3 }
+// dims: in { diameter_ft: L, eave_height_ft: L, peak_height_ft: L, grain: dimensionless, packing_factor: dimensionless } out: { cylinder_ft3: L^3, cone_ft3: L^3, total_bushels: L^3, weight_lb: M, diameter_ft: L, packing_factor: dimensionless, total_ft3: L^3, cylinder_bushels: L^3, cone_bushels: L^3, test_weight_lb_bu: M L^-3 }
 export function computeGrainBin({
   diameter_ft = 0,
   eave_height_ft = 0,
@@ -1242,7 +1242,7 @@ export const grainBinExample = {
   inputs: { diameter_ft: 30, eave_height_ft: 20, peak_height_ft: 8, grain: "corn", packing_factor: 1.0 },
 };
 
-// dims: in { target_bushels: dimensionless, diameter_ft: L, peak_height_ft: L, packing_factor: dimensionless } out: { eave_height_ft: L, area_ft2: L^2 }
+// dims: in { target_bushels: dimensionless, diameter_ft: L, peak_height_ft: L, packing_factor: dimensionless } out: { eave_height_ft: L, area_ft2: L^2, cone_bushels: L^3 }
 export function computeGrainBinHeightForCapacity({ target_bushels = 0, diameter_ft = 0, peak_height_ft = 0, packing_factor = 1.0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const target = Number(target_bushels) || 0;
@@ -1456,7 +1456,7 @@ const NPK_DEFAULT_SOURCES = {
   mop_k_pct: 60,    // muriate of potash 0-0-60 (K source)
 };
 
-// dims: in { crop: dimensionless, soil_n_lb_per_acre: M L^-2, soil_p_lb_per_acre: M L^-2, soil_k_lb_per_acre: M L^-2, area_acres: L^2, urea_n_pct: dimensionless, dap_n_pct: dimensionless, dap_p_pct: dimensionless, mop_k_pct: dimensionless, bag_weight_lb: M } out: { rec_n_lb_per_acre: M L^-2, rec_p_lb_per_acre: M L^-2, rec_k_lb_per_acre: M L^-2, urea_lb_per_acre: M L^-2, dap_lb_per_acre: M L^-2, mop_lb_per_acre: M L^-2, urea_total_lb: M, dap_total_lb: M, mop_total_lb: M, area_acres: L^2, bag_weight_lb: M, dap_bags: dimensionless, mop_bags: dimensionless, urea_bags: dimensionless, rec_k_kg_per_ha: M L^-2, rec_n_kg_per_ha: M L^-2, rec_p_kg_per_ha: M L^-2 }
+// dims: in { crop: dimensionless, soil_n_lb_per_acre: M L^-2, soil_p_lb_per_acre: M L^-2, soil_k_lb_per_acre: M L^-2, area_acres: L^2, urea_n_pct: dimensionless, dap_n_pct: dimensionless, dap_p_pct: dimensionless, mop_k_pct: dimensionless, bag_weight_lb: M } out: { rec_n_lb_per_acre: M L^-2, rec_p_lb_per_acre: M L^-2, rec_k_lb_per_acre: M L^-2, urea_lb_per_acre: M L^-2, dap_lb_per_acre: M L^-2, mop_lb_per_acre: M L^-2, urea_total_lb: M, dap_total_lb: M, mop_total_lb: M, area_acres: L^2, bag_weight_lb: M, dap_bags: dimensionless, mop_bags: dimensionless, urea_bags: dimensionless, rec_k_kg_per_ha: M L^-2, rec_n_kg_per_ha: M L^-2, rec_p_kg_per_ha: M L^-2, n_delivered_lb_per_acre: M L^-2, p_delivered_lb_per_acre: M L^-2, k_delivered_lb_per_acre: M L^-2, total_blend_tons: M }
 export function computeNpkBlend({
   crop = "corn",
   soil_n_lb_per_acre = 0,

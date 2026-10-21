@@ -522,7 +522,7 @@ DIVING_RENDERERS["chamber-gas-volume"] = _simpleRenderer({
 // Manual's buoyancy method). In-water weight = weight in air x (1 - water density / object density); the bag must
 // displace that weight of water; the air to fill it at depth, as surface (free) air, is the volume x (D + Dw)/Dw with
 // Dw = 2,116.2 / rho_water ft per atmosphere (33.07 ft of seawater, 33.9 ft of fresh).
-// dims: in { object_weight_lb: M L T^-2, object_density_lb_ft3: M L^-3, water_density_lb_ft3: M L^-3, depth_ft: L, bag_rating_lb: M L T^-2, breakout_lb: M L T^-2 } out: { in_water_weight_lb: M L T^-2, required_lift_lb: M L T^-2, bag_volume_cuft: L^3, surface_air_cuft: L^3, bags_needed: dimensionless }
+// dims: in { object_weight_lb: M L T^-2, object_density_lb_ft3: M L^-3, water_density_lb_ft3: M L^-3, depth_ft: L, bag_rating_lb: M L T^-2, breakout_lb: M L T^-2 } out: { in_water_weight_lb: M L T^-2, required_lift_lb: M L T^-2, bag_volume_cuft: L^3, surface_air_cuft: L^3, bags_needed: dimensionless, water_density: M L^-3 }
 export function computeLiftBagSizing({ object_weight_lb = 0, object_density_lb_ft3 = 490, water_density_lb_ft3 = 64, depth_ft = 0, bag_rating_lb = 0, breakout_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const W = Number(object_weight_lb) || 0, rhoObj = Number(object_density_lb_ft3) || 0, D = Number(depth_ft) || 0;

@@ -430,7 +430,7 @@ GREENHOUSE_RENDERERS["vapor-pressure-deficit"] = _simpleRenderer({
 // same target costs the air change rate times as much once the vents crack, and
 // the gas goes straight outside.
 
-// dims: in { house_volume_ft3: L^3, ambient_ppm: dimensionless, target_ppm: dimensionless, air_changes_per_hour: T^-1, gas_price_per_lb: dimensionless, vented_air_changes_per_hour: T^-1, floor_area_sqft: L^2, enrichment_hours_per_day: T } out: { initial_charge_ft3: L^3, makeup_ft3_per_hour: L^3 T^-1, makeup_lb_per_hour: M T^-1, hourly_cost: dimensionless, vented_makeup_ft3_per_hour: L^3 T^-1, vented_hourly_cost: dimensionless, lift_ppm: dimensionless, vented_cost_ratio: dimensionless, daily_cost: dimensionless }
+// dims: in { house_volume_ft3: L^3, ambient_ppm: dimensionless, target_ppm: dimensionless, air_changes_per_hour: T^-1, gas_price_per_lb: dimensionless, vented_air_changes_per_hour: T^-1, floor_area_sqft: L^2, enrichment_hours_per_day: T } out: { initial_charge_ft3: L^3, makeup_ft3_per_hour: L^3 T^-1, makeup_lb_per_hour: M T^-1, hourly_cost: dimensionless, vented_makeup_ft3_per_hour: L^3 T^-1, vented_hourly_cost: dimensionless, lift_ppm: dimensionless, vented_cost_ratio: dimensionless, daily_cost: dimensionless, initial_charge_lb: M, lb_per_1000_sqft_per_hour: M L^-2 T^-1, vented_lb_per_hour: M T^-1 }
 export function computeCo2EnrichmentRate({ house_volume_ft3 = 0, ambient_ppm = 0, target_ppm = 0, air_changes_per_hour = 0, gas_price_per_lb = 0, vented_air_changes_per_hour = 0, floor_area_sqft = 0, enrichment_hours_per_day = 0, crop_use_ft3_per_hour = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   if (!(house_volume_ft3 > 0)) return { error: "House volume must be positive." };
@@ -567,7 +567,7 @@ GREENHOUSE_RENDERERS["shade-cloth-transmission"] = _simpleRenderer({
 // outside without anyone noticing; a sealed house has to remove it, which is
 // why closed and indoor rooms fail on humidity before anything else.
 
-// dims: in { floor_area_sqft: L^2, daily_solar_btu_per_sqft: M T^-2, latent_fraction: dimensionless, leaching_fraction: dimensionless, peak_solar_btuh_per_sqft: M T^-3, irrigation_hours_per_day: T } out: { transpiration_lb_per_day: M T^-1, transpiration_gal_per_day: L^3 T^-1, gal_per_sqft_per_day: L T^-1, applied_gal_per_day: L^3 T^-1, peak_gal_per_hour: L^3 T^-1, moisture_pints_per_day: L^3 T^-1, peak_to_average_ratio: dimensionless, average_gal_per_hour: L^3 T^-1, daily_energy_btu: M L^2 T^-2, leached_gal_per_day: L^3 T^-1, peak_applied_gal_per_hour: L^3 T^-1 }
+// dims: in { floor_area_sqft: L^2, daily_solar_btu_per_sqft: M T^-2, latent_fraction: dimensionless, leaching_fraction: dimensionless, peak_solar_btuh_per_sqft: M T^-3, irrigation_hours_per_day: T } out: { transpiration_lb_per_day: M T^-1, transpiration_gal_per_day: L^3 T^-1, gal_per_sqft_per_day: L T^-1, applied_gal_per_day: L^3 T^-1, peak_gal_per_hour: L^3 T^-1, moisture_pints_per_day: L^3 T^-1, peak_to_average_ratio: dimensionless, average_gal_per_hour: L^3 T^-1, daily_energy_btu: M L^2 T^-2, leached_gal_per_day: L^3 T^-1, peak_applied_gal_per_hour: L^3 T^-1, peak_lb_per_hour: M T^-1 }
 export function computeGreenhouseTranspirationWater({ floor_area_sqft = 0, daily_solar_btu_per_sqft = 0, latent_fraction = 0, leaching_fraction = 0, peak_solar_btuh_per_sqft = 0, irrigation_hours_per_day = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   if (!(floor_area_sqft > 0)) return { error: "Floor area must be positive." };

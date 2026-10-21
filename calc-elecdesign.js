@@ -249,7 +249,7 @@ ELECDESIGN_RENDERERS["luminaire-height-for-illuminance"] = _simpleRenderer({
   compute: computeLuminaireHeightForIlluminance,
 });
 
-// dims: in { target_illuminance: L^-2, illuminance_unit: dimensionless, mount_height_ft: L, angle_deg: dimensionless } out: { required_cd: J }
+// dims: in { target_illuminance: L^-2, illuminance_unit: dimensionless, mount_height_ft: L, angle_deg: dimensionless } out: { required_cd: J, e_fc: L^-2, e_lux: L^-2 }
 export function computePointMethodRequiredCandela({ target_illuminance = 0, illuminance_unit = "fc", mount_height_ft = 0, angle_deg = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const target = Number(target_illuminance) || 0;

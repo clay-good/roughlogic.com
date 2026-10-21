@@ -839,7 +839,7 @@ OILGAS_RENDERERS["mud-hydrostatic-pressure"] = _simpleRenderer({
 // arriving at a negative number it calls extra pressure. Rounding a kill
 // weight DOWN leaves the well underbalanced, so the rounded weight here is an
 // input and the verdict on it is driven off a boolean.
-// dims: in { original_mw_ppg: M L^-3, tvd_ft: L, sidpp_psi: M L^-1 T^-2, scr_pressure_psi: M L^-1 T^-2, safety_margin_ppg: M L^-3, rounded_mw_ppg: M L^-3, drillpipe_capacity_bbl_ft: L^2, measured_depth_ft: L, pump_output_bbl_stroke: L^3, pump_spm: T^-1 } out: { kill_mw_ppg: M L^-3, formation_pressure_psi: M L^-1 T^-2, icp_psi: M L^-1 T^-2, fcp_psi: M L^-1 T^-2, strokes_to_bit: dimensionless, minutes_to_bit: T, rounded_bhp_change_psi: M L^-1 T^-2, original_hydrostatic_psi: M L^-1 T^-2, drillpipe_volume_bbl: L^3, safety_margin_ppg: M L^-3 }
+// dims: in { original_mw_ppg: M L^-3, tvd_ft: L, sidpp_psi: M L^-1 T^-2, scr_pressure_psi: M L^-1 T^-2, safety_margin_ppg: M L^-3, rounded_mw_ppg: M L^-3, drillpipe_capacity_bbl_ft: L^2, measured_depth_ft: L, pump_output_bbl_stroke: L^3, pump_spm: T^-1 } out: { kill_mw_ppg: M L^-3, formation_pressure_psi: M L^-1 T^-2, icp_psi: M L^-1 T^-2, fcp_psi: M L^-1 T^-2, strokes_to_bit: dimensionless, minutes_to_bit: T, rounded_bhp_change_psi: M L^-1 T^-2, original_hydrostatic_psi: M L^-1 T^-2, drillpipe_volume_bbl: L^3, safety_margin_ppg: M L^-3, kill_mw_with_margin_ppg: M L^-3, weight_up_ppg: M L^-3 }
 export function computeKillMudWeight({
   original_mw_ppg = 0, tvd_ft = 0, sidpp_psi = 0, scr_pressure_psi = 0,
   safety_margin_ppg = 0, rounded_mw_ppg = 0,

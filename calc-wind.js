@@ -360,7 +360,7 @@ WIND_RENDERERS["weibull-capacity-factor"] = _simpleRenderer({
 
 // ============ spec-v1554: air-density correction against a power curve ============
 
-// dims: in { elevation_ft: L, air_temp_f: T, reference_density_pcf: M L^-3, measured_power_kw: M L^2 T^-3, curve_power_kw: M L^2 T^-3, wind_speed_mph: L T^-1, alt_air_temp_f: T } out: { site_density_pcf: M L^-3, density_ratio: dimensionless, corrected_curve_power_kw: M L^2 T^-3, iec_corrected_wind_mph: L T^-1, curve_power_kw: M L^2 T^-3, measured_of_corrected_pct: dimensionless, measured_of_curve_pct: dimensionless, alt_vs_entered: dimensionless, altitude_factor: dimensionless, iec_speed_factor: dimensionless, temperature_factor: dimensionless }
+// dims: in { elevation_ft: L, air_temp_f: T, reference_density_pcf: M L^-3, measured_power_kw: M L^2 T^-3, curve_power_kw: M L^2 T^-3, wind_speed_mph: L T^-1, alt_air_temp_f: T } out: { site_density_pcf: M L^-3, density_ratio: dimensionless, corrected_curve_power_kw: M L^2 T^-3, iec_corrected_wind_mph: L T^-1, curve_power_kw: M L^2 T^-3, measured_of_corrected_pct: dimensionless, measured_of_curve_pct: dimensionless, alt_vs_entered: dimensionless, altitude_factor: dimensionless, iec_speed_factor: dimensionless, temperature_factor: dimensionless, alt_density_pcf: M L^-3 }
 export function computeTurbineDensityCorrection({ elevation_ft = 0, air_temp_f = 59, reference_density_pcf = _RHO_REF_PCF, measured_power_kw = 0, curve_power_kw = 0, wind_speed_mph = 0, alt_air_temp_f = 20 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // The page passes a blank box as null, and Number(null) is 0 F; 0 F is a real reading, so a blank cannot stand in for it.
@@ -488,7 +488,7 @@ WIND_RENDERERS["yaw-error-loss"] = _simpleRenderer({
 
 // ============ spec-v1556: gin-pole and uptower lift load ============
 
-// dims: in { component_weight_lb: M, haul_angle_deg: dimensionless, pole_length_ft: L, mount_rated_lb: M, hauled_line_angle_deg: dimensionless } out: { head_resultant_lb: M, head_horizontal_lb: M, mount_moment_ftlb: M L, direct_line_pull_lb: M, max_component_lb: M, mount_margin_pct: dimensionless, component_weight_lb: M, resultant_multiple: dimensionless }
+// dims: in { component_weight_lb: M L T^-2, haul_angle_deg: dimensionless, pole_length_ft: L, mount_rated_lb: M L T^-2, hauled_line_angle_deg: dimensionless } out: { head_resultant_lb: M L T^-2, head_horizontal_lb: M L T^-2, mount_moment_ftlb: M L^2 T^-2, direct_line_pull_lb: M L T^-2, max_component_lb: M L T^-2, mount_margin_pct: dimensionless, component_weight_lb: M L T^-2, resultant_multiple: dimensionless, angle_premium_lb: M L T^-2, direct_side_load_lb: M L T^-2, head_vertical_lb: M L T^-2 }
 export function computeGinPoleUptowerLift({ component_weight_lb = 0, haul_angle_deg = 0, pole_length_ft = 0, mount_rated_lb = 0, hauled_line_angle_deg = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(component_weight_lb > 0)) return { error: "Component weight including rigging must be positive." };

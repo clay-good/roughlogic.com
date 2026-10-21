@@ -101,7 +101,7 @@ const _AIR_BTU_PER_CUFT_F = 0.018;
 
 // ===================== spec-v1648: traction roping ratio =====================
 
-// dims: in { roping_ratio: dimensionless, car_speed_fpm: L T^-1, sheave_diameter_in: L, unbalanced_load_lb: M L T^-2, suspended_load_lb: M L T^-2, rope_count: dimensionless, machine_rated_torque_ftlb: M L^2 T^-2, alternative_roping_ratio: dimensionless } out: { rope_speed_fpm: L T^-1, sheave_rpm: T^-1, sheave_torque_ftlb: M L^2 T^-2, tension_per_rope_lb: M L T^-2, power_hp: M L^2 T^-3, alt_rope_speed_fpm: L T^-1, alt_sheave_rpm: T^-1, torque_margin_pct: dimensionless, rope_travel_per_car_ft: dimensionless }
+// dims: in { roping_ratio: dimensionless, car_speed_fpm: L T^-1, sheave_diameter_in: L, unbalanced_load_lb: M L T^-2, suspended_load_lb: M L T^-2, rope_count: dimensionless, machine_rated_torque_ftlb: M L^2 T^-2, alternative_roping_ratio: dimensionless } out: { rope_speed_fpm: L T^-1, sheave_rpm: T^-1, sheave_torque_ftlb: M L^2 T^-2, tension_per_rope_lb: M L T^-2, power_hp: M L^2 T^-3, alt_rope_speed_fpm: L T^-1, alt_sheave_rpm: T^-1, torque_margin_pct: dimensionless, rope_travel_per_car_ft: dimensionless, alt_sheave_torque_ftlb: M L^2 T^-2, alt_tension_per_rope_lb: M L T^-2 }
 export function computeTractionRopingRatio({ roping_ratio = 2, car_speed_fpm = 0, sheave_diameter_in = 0, unbalanced_load_lb = 0, suspended_load_lb = 0, rope_count = 0, machine_rated_torque_ftlb = 0, alternative_roping_ratio = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(roping_ratio >= 1)) return { error: "Roping ratio must be at least 1." };
@@ -160,7 +160,7 @@ ELEVATOR_RENDERERS["traction-roping-ratio"] = _simpleRenderer({
 
 // ===================== spec-v1649: counterweight balance =====================
 
-// dims: in { car_weight_lb: M L T^-2, rated_capacity_lb: M L T^-2, overbalance_pct: dimensionless, actual_counterweight_lb: M L T^-2, added_car_weight_lb: M L T^-2 } out: { counterweight_required_lb: M L T^-2, unbalanced_empty_lb: M L T^-2, unbalanced_full_lb: M L T^-2, balance_point_lb: M L T^-2, overbalance_actual_pct: dimensionless, modified_overbalance_pct: dimensionless }
+// dims: in { car_weight_lb: M L T^-2, rated_capacity_lb: M L T^-2, overbalance_pct: dimensionless, actual_counterweight_lb: M L T^-2, added_car_weight_lb: M L T^-2 } out: { counterweight_required_lb: M L T^-2, unbalanced_empty_lb: M L T^-2, unbalanced_full_lb: M L T^-2, balance_point_lb: M L T^-2, overbalance_actual_pct: dimensionless, modified_overbalance_pct: dimensionless, equal_overbalance_unbalanced_lb: M L T^-2, modified_balance_point_lb: M L T^-2, worst_case_lb: M L T^-2 }
 export function computeCounterweightBalance({ car_weight_lb = 0, rated_capacity_lb = 0, overbalance_pct = 45, actual_counterweight_lb = 0, added_car_weight_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // Unit / range guard added 2026-09-26 after printed-example probing.
@@ -514,7 +514,7 @@ ELEVATOR_RENDERERS["hydraulic-jack-pressure"] = _simpleRenderer({
 
 // ===================== spec-v1655: escalator step chain tension =====================
 
-// dims: in { total_load_lb: M L T^-2, incline_deg: dimensionless, friction_coefficient: dimensionless, chain_speed_fpm: L T^-1, chain_count: dimensionless, alternative_incline_deg: dimensionless } out: { gravity_lb: M L T^-2, friction_lb: M L T^-2, tension_lb: M L T^-2, per_chain_lb: M L T^-2, power_hp: M L^2 T^-3, gravity_share_pct: dimensionless }
+// dims: in { total_load_lb: M L T^-2, incline_deg: dimensionless, friction_coefficient: dimensionless, chain_speed_fpm: L T^-1, chain_count: dimensionless, alternative_incline_deg: dimensionless } out: { gravity_lb: M L T^-2, friction_lb: M L T^-2, tension_lb: M L T^-2, per_chain_lb: M L T^-2, power_hp: M L^2 T^-3, gravity_share_pct: dimensionless, alt_friction_lb: M L T^-2, alt_gravity_lb: M L T^-2, alt_tension_lb: M L T^-2, descending_brake_lb: M L T^-2 }
 export function computeStepChainTension({ total_load_lb = 0, incline_deg = 30, friction_coefficient = 0.03, chain_speed_fpm = 0, chain_count = 2, alternative_incline_deg = 6 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(total_load_lb > 0)) return { error: "Total moving load must be positive." };
@@ -706,7 +706,7 @@ ELEVATOR_RENDERERS["governor-tripping-speed"] = _simpleRenderer({
 
 // ===================== spec-v1658: guide rail bracket span =====================
 
-// dims: in { span_ft: L, horizontal_load_lb: M L T^-2, section_modulus_in3: L^3, moment_of_inertia_in4: L^4, modulus_psi: M L^-1 T^-2, allowable_stress_psi: M L^-1 T^-2, deflection_limit_in: L, safety_application_load_lb: M L T^-2 } out: { moment_inlb: M L^2 T^-2, stress_psi: M L^-1 T^-2, deflection_in: L, max_span_for_deflection_ft: L, safety_stress_psi: M L^-1 T^-2, halved_span_deflection_in: L }
+// dims: in { span_ft: L, horizontal_load_lb: M L T^-2, section_modulus_in3: L^3, moment_of_inertia_in4: L^4, modulus_psi: M L^-1 T^-2, allowable_stress_psi: M L^-1 T^-2, deflection_limit_in: L, safety_application_load_lb: M L T^-2 } out: { moment_inlb: M L^2 T^-2, stress_psi: M L^-1 T^-2, deflection_in: L, max_span_for_deflection_ft: L, safety_stress_psi: M L^-1 T^-2, halved_span_deflection_in: L, halved_span_moment_inlb: M L^2 T^-2, safety_moment_inlb: M L^2 T^-2 }
 export function computeGuideRailBracketSpan({ span_ft = 0, horizontal_load_lb = 0, section_modulus_in3 = 0, moment_of_inertia_in4 = 0, modulus_psi = 29000000, allowable_stress_psi = 0, deflection_limit_in = 0, safety_application_load_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // Unit / range guard added 2026-09-26 after printed-example probing.

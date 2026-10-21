@@ -125,7 +125,7 @@ const _MEC_REFERENCE_TEMP_F = 59;
 // with KM 2.6 ft and KG 3.1 ft" and then, mid-sentence, takes KG as 2.1 --
 // because 3.1 would have given a NEGATIVE GM and an unstable vessel. Both KM
 // and KG are inputs here and the sign of GM is a computed verdict.
-// dims: in { km_ft: L, kg_ft: L, displacement_lb: M L T^-2, added_weight_lb: M L T^-2, added_kg_ft: L, free_surface_moment_ftlb: M L^2 T^-2, heel_angle_deg: dimensionless } out: { gm_ft: L, new_kg_ft: L, new_gm_ft: L, gm_loss_pct: dimensionless, free_surface_correction_ft: L, gz_ft: L, effective_gm_ft: L, gm_change_ft: L, weight_fraction_pct: dimensionless }
+// dims: in { km_ft: L, kg_ft: L, displacement_lb: M L T^-2, added_weight_lb: M L T^-2, added_kg_ft: L, free_surface_moment_ftlb: M L^2 T^-2, heel_angle_deg: dimensionless } out: { gm_ft: L, new_kg_ft: L, new_gm_ft: L, gm_loss_pct: dimensionless, free_surface_correction_ft: L, gz_ft: L, effective_gm_ft: L, gm_change_ft: L, weight_fraction_pct: dimensionless, new_displacement_lb: M L T^-2 }
 export function computeMetacentricHeight({
   km_ft = 0, kg_ft = 0, displacement_lb = 0,
   added_weight_lb = 0, added_kg_ft = 0, free_surface_moment_ftlb = 0, heel_angle_deg = 10,
@@ -436,7 +436,7 @@ MARINEAVIATION_RENDERERS["house-battery-alternator"] = _simpleRenderer({
 // The split, not half the displacement, is the number to check. The machine's
 // own capacity check on half the weight is the wrong check whenever the centre
 // of gravity is not centred between the slings.
-// dims: in { displacement_lb: M L T^-2, sling_spacing_ft: L, cg_from_fwd_ft: L, sling_wll_lb: M L T^-2, sling_angle_deg: dimensionless } out: { fwd_sling_lb: M L T^-2, aft_sling_lb: M L T^-2, aft_share_pct: dimensionless, difference_lb: M L T^-2, horizontal_component_lb: M L T^-2, cg_from_aft_ft: L }
+// dims: in { displacement_lb: M L T^-2, sling_spacing_ft: L, cg_from_fwd_ft: L, sling_wll_lb: M L T^-2, sling_angle_deg: dimensionless } out: { fwd_sling_lb: M L T^-2, aft_sling_lb: M L T^-2, aft_share_pct: dimensionless, difference_lb: M L T^-2, horizontal_component_lb: M L T^-2, cg_from_aft_ft: L, even_split_lb: M L T^-2, governing_lb: M L T^-2, sling_tension_lb: M L T^-2 }
 export function computeTravelLiftSlingPlacement({
   displacement_lb = 0, sling_spacing_ft = 0, cg_from_fwd_ft = 0,
   sling_wll_lb = 0, sling_angle_deg = 90,
@@ -623,7 +623,7 @@ MARINEAVIATION_RENDERERS["dock-piling-lateral"] = _simpleRenderer({
 // cable system and tension CLIMBS. Rigging to nominal on a cold morning leaves
 // it over-tensioned in the sun; rigging to nominal on a hot ramp leaves it
 // slack in the cold.
-// dims: in { nominal_tension_lb: M L T^-2, reference_temp_f: T, ambient_temp_f: T, cable_area_in2: L^2, cable_modulus_psi: M L^-1 T^-2, structure_alpha_per_f: dimensionless, cable_alpha_per_f: dimensionless } out: { temp_difference_f: T, differential_strain: dimensionless, tension_change_lb: M L T^-2, target_at_ambient_lb: M L T^-2, tension_when_warm_lb: M L T^-2, service_difference_f: T }
+// dims: in { nominal_tension_lb: M L T^-2, reference_temp_f: T, ambient_temp_f: T, cable_area_in2: L^2, cable_modulus_psi: M L^-1 T^-2, structure_alpha_per_f: dimensionless, cable_alpha_per_f: dimensionless } out: { temp_difference_f: T, differential_strain: dimensionless, tension_change_lb: M L T^-2, target_at_ambient_lb: M L T^-2, tension_when_warm_lb: M L T^-2, service_difference_f: T, alpha_difference: dimensionless, service_change_lb: M L T^-2 }
 export function computeControlCableTension({
   nominal_tension_lb = 0, reference_temp_f = 70, ambient_temp_f = 70,
   cable_area_in2 = 0, cable_modulus_psi = 0,
@@ -809,7 +809,7 @@ MARINEAVIATION_RENDERERS["propeller-track-balance"] = _simpleRenderer({
 // difference: the spec reports 6.628 lb/gal and a 46 lb shortfall where the
 // arithmetic it describes gives 6.653 and 36.9 lb. Both temperatures are
 // inputs here and the difference is computed.
-// dims: in { gallons: L^3, standard_density_lb_gal: M L^-3, reference_temp_f: T, fuel_temp_f: T, density_change_pct_per_10f: dimensionless, arm_in: L, required_weight_lb: M L T^-2 } out: { temp_difference_f: T, actual_density_lb_gal: M L^-3, actual_weight_lb: M L T^-2, standard_weight_lb: M L T^-2, weight_difference_lb: M L T^-2, gallons_for_weight: L^3, density_change_fraction: dimensionless, gallons_at_standard: L^3 }
+// dims: in { gallons: L^3, standard_density_lb_gal: M L^-3, reference_temp_f: T, fuel_temp_f: T, density_change_pct_per_10f: dimensionless, arm_in: L, required_weight_lb: M } out: { temp_difference_f: T, actual_density_lb_gal: M L^-3, actual_weight_lb: M, standard_weight_lb: M, weight_difference_lb: M, gallons_for_weight: L^3, density_change_fraction: dimensionless, gallons_at_standard: L^3, actual_moment_inlb: M L, moment_difference_inlb: M L }
 export function computeAviationFuelWeight({
   gallons = 0, standard_density_lb_gal = _MEC_JET_A_LB_GAL, reference_temp_f = _MEC_REFERENCE_TEMP_F,
   fuel_temp_f = 59, density_change_pct_per_10f = 0.4, arm_in = 0, required_weight_lb = 0,

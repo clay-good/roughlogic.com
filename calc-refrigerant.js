@@ -1047,7 +1047,7 @@ function _v698renderProductPullDownTime(inputRegion, outputRegion, citationEl) {
 }
 REFRIGERANT_RENDERERS["product-pull-down-time"] = _v698renderProductPullDownTime;
 
-// dims: in { box_temp_f: T, sst_f: T } out: { dtd: T, capacity_at_dtd_btuh: M L^2 T^-3, capacity_at_rating_btuh: M L^2 T^-3, capacity_ratio: dimensionless, td_required_f: T, ua_ratio_vs_rating: dimensionless }
+// dims: in { box_temp_f: T, sst_f: T } out: { dtd: T, capacity_at_dtd_btuh: M L^2 T^-3, capacity_at_rating_btuh: M L^2 T^-3, capacity_ratio: dimensionless, td_required_f: T, ua_ratio_vs_rating: dimensionless, ua_required_btuh_f: M L^2 T^-4 }
 export function computeEvaporatorTdDtd({ box_temp_f = null, sst_f = null, design_load_btuh = 0, coil_ua_btuh_f = 0, rating_td_f = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // 0 F is a real box or suction temperature, so a blank cannot stand in for it.

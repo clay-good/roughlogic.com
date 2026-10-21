@@ -89,7 +89,7 @@ export const TRUCKINGFIELD_RENDERERS = {};
 // ===========================================================================
 
 // ===================== spec-v1377: minimum tiedown count =====================
-// dims: in { length_ft: L, weight_lb: M, tiedowns: dimensionless, wll_per_tiedown_lb: M, tiedown_path: dimensionless } out: { min_tiedowns: dimensionless, tiedown_path: dimensionless, required_wll_lb: M, provided_wll_lb: M, count_margin: dimensionless, tiedowns_by_wll: dimensionless }
+// dims: in { length_ft: L, weight_lb: M L T^-2, tiedowns: dimensionless, wll_per_tiedown_lb: M L T^-2, tiedown_path: dimensionless } out: { min_tiedowns: dimensionless, tiedown_path: dimensionless, required_wll_lb: M L T^-2, provided_wll_lb: M L T^-2, count_margin: dimensionless, tiedowns_by_wll: dimensionless, wll_margin_lb: M L T^-2 }
 export function computeTiedownCount({ length_ft = 0, weight_lb = 0, tiedowns = 0, wll_per_tiedown_lb = 0, tiedown_path = "over_other_side" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(length_ft > 0)) return { error: "Article length must be positive." };
@@ -397,7 +397,7 @@ TRUCKINGFIELD_RENDERERS["oversize-permit-screen"] = _simpleRenderer({
 });
 
 // ===================== spec-v1382: hazmat placarding threshold screen =====================
-// dims: in { materials: dimensionless, table1_present: dimensionless } out: { table2_aggregate_lb: M, threshold_met: dimensionless, class_count: dimensionless }
+// dims: in { materials: dimensionless, table1_present: dimensionless } out: { table2_aggregate_lb: M, threshold_met: dimensionless, class_count: dimensionless, margin_lb: M }
 export function computeHazmatPlacardThreshold({ materials = [], table1_present = false } = {}) {
   if (!Array.isArray(materials) || materials.length === 0) return { error: "List at least one hazardous material with its gross weight." };
   // 172.504(c) opens "Except for bulk packagings": the 1,001 lb exception never

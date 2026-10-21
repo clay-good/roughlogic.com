@@ -568,7 +568,7 @@ AIRQUALITY_RENDERERS["thermal-oxidizer-residence"] = _simpleRenderer({
 // The less-water basis exists to prevent compliance by dilution: measuring VOC
 // per gallon of coating as supplied would let anyone pass by adding water,
 // without reducing the solvent applied per square foot.
-// dims: in { coating_gal: L^3, voc_lb: M, water_gal: L^3, exempt_gal: L^3, thinner_gal: L^3, thinner_voc_lb_per_gal: M L^-3, limit_lb_per_gal: M L^-3 } out: { voc_as_supplied: M L^-3, voc_less_water: M L^-3, applied_voc_as_supplied: M L^-3, applied_voc_less_water: M L^-3, margin_lb_per_gal: M L^-3, applied_gal: L^3, less_water_gal: L^3, non_voc_gal: L^3, basis_ratio: dimensionless }
+// dims: in { coating_gal: L^3, voc_lb: M, water_gal: L^3, exempt_gal: L^3, thinner_gal: L^3, thinner_voc_lb_per_gal: M L^-3, limit_lb_per_gal: M L^-3 } out: { voc_as_supplied: M L^-3, voc_less_water: M L^-3, applied_voc_as_supplied: M L^-3, applied_voc_less_water: M L^-3, margin_lb_per_gal: M L^-3, applied_gal: L^3, less_water_gal: L^3, non_voc_gal: L^3, basis_ratio: dimensionless, applied_voc_lb: M, governing_voc: M L^-3 }
 export function computeCoatingVocCompliance({
   coating_gal = 1, voc_lb = 0, water_gal = 0, exempt_gal = 0,
   thinner_gal = 0, thinner_voc_lb_per_gal = 0, limit_lb_per_gal = 0, thinner_water_exempt_pct = 0,
@@ -837,7 +837,7 @@ AIRQUALITY_RENDERERS["esp-deutsch-efficiency"] = _simpleRenderer({
 // spec-v1725 left THREE unrendered python placeholders in its worked example
 // (5.95 days, 18 operating days, 40 percent shorter) -- the seventh, eighth and
 // ninth of this program. All three are computed here.
-// dims: in { carbon_lb: M, working_capacity_pct: dimensionless, loading_lb_h: M T^-1, operating_hours_per_day: T, degraded_capacity_pct: dimensionless } out: { bed_capacity_lb: M, bed_life_hours: T, bed_life_days: T, operating_days: T, degraded_life_hours: T, life_lost_pct: dimensionless, degraded_operating_days: T }
+// dims: in { carbon_lb: M, working_capacity_pct: dimensionless, loading_lb_h: M T^-1, operating_hours_per_day: T, degraded_capacity_pct: dimensionless } out: { bed_capacity_lb: M, bed_life_hours: T, bed_life_days: T, operating_days: T, degraded_life_hours: T, life_lost_pct: dimensionless, degraded_operating_days: T, degraded_capacity_lb: M }
 export function computeCarbonBedLife({
   carbon_lb = 0, working_capacity_pct = 0, loading_lb_h = 0,
   operating_hours_per_day = 8, degraded_capacity_pct = 0,

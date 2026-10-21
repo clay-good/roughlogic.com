@@ -372,7 +372,7 @@ RAIL_RENDERERS["track-warp-fra-class"] = _simpleRenderer({
 
 // ===================== spec-v1544: ballast section volume and tonnage =====================
 
-// dims: in { top_width_ft: L, depth_in: L, side_slope_ratio: dimensionless, length_ft: L, density_ton_per_cy: M L^-3, raise_in: L } out: { bottom_width_ft: L, area_sqft: L^2, volume_cy: L^3, tons: M, cy_per_mile: L^2, tons_per_mile: M L^-1, raise_volume_cy: L^3, rectangle_area_sqft: L^2, understated_pct: dimensionless }
+// dims: in { top_width_ft: L, depth_in: L, side_slope_ratio: dimensionless, length_ft: L, density_ton_per_cy: M L^-3, raise_in: L } out: { bottom_width_ft: L, area_sqft: L^2, volume_cy: L^3, tons: M, cy_per_mile: L^2, tons_per_mile: M L^-1, raise_volume_cy: L^3, rectangle_area_sqft: L^2, understated_pct: dimensionless, understated_tons_per_mile: M L^-1 }
 export function computeBallastSection({ top_width_ft = 0, depth_in = 0, side_slope_ratio = 1.5, length_ft = 0, density_ton_per_cy = 1.4, raise_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(top_width_ft > 0)) return { error: "Top width of the ballast section must be positive." };
@@ -511,7 +511,7 @@ const _CURVE_RESISTANCE_LB_PER_TON_PER_DEG = 0.8;
 
 // ============ spec-v1546: railcar load limit ============
 
-// dims: in { gross_rail_load_lb: M L T^-2, light_weight_lb: M L T^-2, lading_net_lb: M L T^-2, cubic_capacity_ft3: L^3, lading_density_pcf: M L^-3, route_gross_rail_load_lb: M L T^-2 } out: { load_limit_lb: M L T^-2, gross_on_rail_lb: M L T^-2, utilization_pct: dimensionless, remaining_capacity_lb: M L T^-2, route_load_limit_lb: M L T^-2, cube_limited_weight_lb: M L T^-2, cubic_capacity_ft3: L^3, governing_utilization_pct: dimensionless, gross_rail_load_lb: M L T^-2, lading_density_pcf: M L^-3, lading_net_lb: M L T^-2, light_weight_lb: M L T^-2, route_gross_rail_load_lb: M L T^-2 }
+// dims: in { gross_rail_load_lb: M L T^-2, light_weight_lb: M L T^-2, lading_net_lb: M L T^-2, cubic_capacity_ft3: L^3, lading_density_pcf: M L^-2 T^-2, route_gross_rail_load_lb: M L T^-2 } out: { load_limit_lb: M L T^-2, gross_on_rail_lb: M L T^-2, utilization_pct: dimensionless, remaining_capacity_lb: M L T^-2, route_load_limit_lb: M L T^-2, cube_limited_weight_lb: M L T^-2, cubic_capacity_ft3: L^3, governing_utilization_pct: dimensionless, gross_rail_load_lb: M L T^-2, lading_density_pcf: M L^-2 T^-2, lading_net_lb: M L T^-2, light_weight_lb: M L T^-2, route_gross_rail_load_lb: M L T^-2, governing_load_limit_lb: M L T^-2, governing_remaining_capacity_lb: M L T^-2, route_shortfall_lb: M L T^-2 }
 export function computeRailcarLoadLimit({ gross_rail_load_lb = 0, light_weight_lb = 0, lading_net_lb = 0, cubic_capacity_ft3 = 0, lading_density_pcf = 0, route_gross_rail_load_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(gross_rail_load_lb > 0)) return { error: "Gross rail load must be positive (lb)." };
@@ -596,7 +596,7 @@ RAIL_RENDERERS["railcar-load-limit"] = _simpleRenderer({
 
 // ============ spec-v1547: locomotive tonnage rating on a ruling grade ============
 
-// dims: in { tractive_effort_lb: M L T^-2, ruling_grade_pct: dimensionless, rolling_resistance_lb_per_ton: M L T^-2, curve_degrees: dimensionless, weight_on_drivers_lb: M L T^-2, adhesion_factor: dimensionless, alternate_grade_pct: dimensionless } out: { grade_resistance_lb_per_ton: M L T^-2, curve_resistance_lb_per_ton: M L T^-2, total_resistance_lb_per_ton: M L T^-2, adhesion_limited_te_lb: M L T^-2, governing_te_lb: M L T^-2, tonnage_rating_tons: M, alternate_grade_pct: dimensionless, ruling_grade_pct: dimensionless, grade_penalty_x: dimensionless, adhesion_factor: dimensionless, curve_degrees: dimensionless, tractive_effort_lb: M L T^-2, weight_on_drivers_lb: M L T^-2 }
+// dims: in { tractive_effort_lb: M L T^-2, ruling_grade_pct: dimensionless, rolling_resistance_lb_per_ton: L T^-2, curve_degrees: dimensionless, weight_on_drivers_lb: M L T^-2, adhesion_factor: dimensionless, alternate_grade_pct: dimensionless } out: { grade_resistance_lb_per_ton: L T^-2, curve_resistance_lb_per_ton: L T^-2, total_resistance_lb_per_ton: L T^-2, adhesion_limited_te_lb: M L T^-2, governing_te_lb: M L T^-2, tonnage_rating_tons: M, alternate_grade_pct: dimensionless, ruling_grade_pct: dimensionless, grade_penalty_x: dimensionless, adhesion_factor: dimensionless, curve_degrees: dimensionless, tractive_effort_lb: M L T^-2, weight_on_drivers_lb: M L T^-2, alternate_resistance_lb_per_ton: L T^-2, alternate_tonnage_tons: M, drivers_needed_for_te_lb: M L T^-2, level_resistance_lb_per_ton: L T^-2, level_tonnage_tons: M, loco_tons: M, rating_on_te_alone_tons: M, rolling_resistance_lb_per_ton: L T^-2, train_tons_total: M }
 export function computeTonnageRatingGrade({ tractive_effort_lb = 0, ruling_grade_pct = 0, rolling_resistance_lb_per_ton = 3, curve_degrees = 0, weight_on_drivers_lb = 0, adhesion_factor = 0.3, alternate_grade_pct = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(tractive_effort_lb > 0)) return { error: "Available tractive effort must be positive (lb)." };
@@ -680,7 +680,7 @@ RAIL_RENDERERS["tonnage-rating-grade"] = _simpleRenderer({
 // tonnage-rating-grade takes rolling resistance as entered. The Davis family
 // computes it: a constant, a per-axle journal term that falls with axle load, a
 // term linear in speed, and an air term that does not depend on weight at all.
-// dims: in { car_weight_tons: M, axles_per_car: dimensionless, speed_mph: L T^-1, air_coefficient: dimensionless, cars: dimensionless } out: { resistance_lb_per_ton: M L T^-2, axle_term_lb_per_ton: M L T^-2, speed_term_lb_per_ton: M L T^-2, air_term_lb_per_ton: M L T^-2, car_resistance_lb: M L T^-2, train_resistance_lb: M L T^-2, power_hp: M L^2 T^-3, equivalent_grade_pct: dimensionless, rp548_lb_per_ton: M L T^-2, davis_1926_lb_per_ton: M L T^-2, cars: dimensionless }
+// dims: in { car_weight_tons: M, axles_per_car: dimensionless, speed_mph: L T^-1, air_coefficient: dimensionless, cars: dimensionless } out: { resistance_lb_per_ton: L T^-2, axle_term_lb_per_ton: L T^-2, speed_term_lb_per_ton: L T^-2, air_term_lb_per_ton: L T^-2, car_resistance_lb: M L T^-2, train_resistance_lb: M L T^-2, power_hp: M L^2 T^-3, equivalent_grade_pct: dimensionless, rp548_lb_per_ton: L T^-2, davis_1926_lb_per_ton: L T^-2, cars: dimensionless, axle_load_tons: M }
 export function computeTrainResistanceDavis({ car_weight_tons = 0, axles_per_car = 4, speed_mph = null, air_coefficient = 0.07, cars = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // 0 F is a real reading, so a blank temperature cannot stand in for it.

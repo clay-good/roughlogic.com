@@ -2189,7 +2189,7 @@ FIRE_RENDERERS["ppv-fan-sizing"] = _simpleRenderer({
 });
 
 // ===================== spec-v1389: hose lay section count, reach, and charged weight =====================
-// dims: in { map_distance_ft: L, slack_fraction: dimensionless, section_length_ft: L, hose_id_in: L, dry_weight_per_section_lb: M } out: { lay_length_ft: L, sections: dimensionless, actual_reach_ft: L, charged_weight_lb: M, gal_per_ft: L^2, gallons: L^3, sections_by_map: dimensionless }
+// dims: in { map_distance_ft: L, slack_fraction: dimensionless, section_length_ft: L, hose_id_in: L, dry_weight_per_section_lb: M } out: { lay_length_ft: L, sections: dimensionless, actual_reach_ft: L, charged_weight_lb: M, gal_per_ft: L^2, gallons: L^3, sections_by_map: dimensionless, water_per_section_lb: M }
 export function computeHoseLaySectionCount({ map_distance_ft = 0, slack_fraction = 0.20, section_length_ft = 50, hose_id_in = 0, dry_weight_per_section_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (Number(slack_fraction) > 5) return { error: "Slack is a fraction of the map distance (0.20 for 20%), not a percent." };

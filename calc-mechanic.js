@@ -1712,7 +1712,7 @@ MECHANIC_RENDERERS["toggle-mechanism-force"] = _simpleRenderer({
 // ramp, sizing a winch pull for a ramp, checking whether a load slides). Along the incline, F_up = W(sin th + mu cos
 // th) to move up, W(sin th - mu cos th) is the net down-slope pull gravity wins by (positive => slides on its own).
 // Ideal (frictionless) MA = 1/sin th = ramp length/rise; the self-slide threshold is the repose angle atan(mu).
-// dims: in { weight_lb: M L T^-2, incline_angle_deg: dimensionless, friction_coefficient: dimensionless } out: { force_up_lb: M L T^-2, normal_force_lb: M L T^-2, ideal_mechanical_advantage: dimensionless, repose_angle_deg: dimensionless, actual_mechanical_advantage: dimensionless }
+// dims: in { weight_lb: M L T^-2, incline_angle_deg: dimensionless, friction_coefficient: dimensionless } out: { force_up_lb: M L T^-2, normal_force_lb: M L T^-2, ideal_mechanical_advantage: dimensionless, repose_angle_deg: dimensionless, actual_mechanical_advantage: dimensionless, gravity_minus_friction_lb: M L T^-2, restraint_or_push_lb: M L T^-2 }
 export function computeInclinedPlaneForce({ weight_lb = 0, incline_angle_deg = 0, friction_coefficient = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const W = Number(weight_lb) || 0;
@@ -2618,7 +2618,7 @@ MECHANIC_RENDERERS["hydraulic-pump-flow"] = _simpleRenderer({
   compute: computeHydraulicPumpFlow,
 });
 
-// dims: in { q_btuh: M L^2 T^-3, dt_f: T, coolant: dimensionless } out: { gpm: L^3 T^-1 }
+// dims: in { q_btuh: M L^2 T^-3, dt_f: T, coolant: dimensionless } out: { gpm: L^3 T^-1, c: M L^-1 T^-3 }
 export function computeCoolingSystemFlow({ q_btuh = 0, dt_f = 0, coolant = "water" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (arguments[0]?.coolant !== undefined && !["water", "glycol50"].includes(String(arguments[0].coolant))) return { error: "Coolant must be water or glycol50." };
@@ -4098,7 +4098,7 @@ MECHANIC_RENDERERS["hydraulic-line-velocity"] = _simpleRenderer({
 // where the two fuel systems part: a return system's regulator references manifold pressure and
 // holds the differential constant, while a returnless system holds the RAIL constant, so boost eats
 // the differential and the injector flows LESS exactly when the engine wants more.
-// dims: in { rated_flow_ccmin: L^3 T^-1, rated_pressure_psi: M L^-1 T^-2, rail_pressure_psi: M L^-1 T^-2, manifold_pressure_psig: M L^-1 T^-2, system_type: dimensionless } out: { effective_dp_psi: M L^-1 T^-2, flow_ccmin: L^3 T^-1, flow_lbh: M T^-1, pressure_ratio: dimensionless, flow_factor: dimensionless, pct_change: dimensionless }
+// dims: in { rated_flow_ccmin: L^3 T^-1, rated_pressure_psi: M L^-1 T^-2, rail_pressure_psi: M L^-1 T^-2, manifold_pressure_psig: M L^-1 T^-2, system_type: dimensionless } out: { effective_dp_psi: M L^-1 T^-2, flow_ccmin: L^3 T^-1, flow_lbh: M T^-1, pressure_ratio: dimensionless, flow_factor: dimensionless, pct_change: dimensionless, rated_lbh: M T^-1 }
 export function computeInjectorFlowAtPressure({ rated_flow_ccmin = 0, rated_pressure_psi = 43.5, rail_pressure_psi = 43.5, manifold_pressure_psig = 0, system_type = "returnless" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const rated = Number(rated_flow_ccmin) || 0;
@@ -4161,7 +4161,7 @@ MECHANIC_RENDERERS["injector-flow-at-pressure"] = _simpleRenderer({
 // and substituting d = t/64 collapses the span out entirely to F = T/16. So the measured
 // deflection force times 16 IS the static tension per belt, which is why the 1/64 rule
 // works on any drive without knowing its size.
-// dims: in { center_distance_in: L, large_sheave_dia_in: L, small_sheave_dia_in: L, measured_force_lb: M L T^-2, rec_min_force_lb: M L T^-2, rec_max_force_lb: M L T^-2, belt_condition: dimensionless, new_belt_factor: dimensionless, belt_count: dimensionless } out: { span_in: L, deflection_in: L, static_tension_lb: M L T^-2, target_min_force_lb: M L T^-2, target_max_force_lb: M L T^-2, wrap_angle_deg: dimensionless, shaft_load_lb: M L T^-2 }
+// dims: in { center_distance_in: L, large_sheave_dia_in: L, small_sheave_dia_in: L, measured_force_lb: M L T^-2, rec_min_force_lb: M L T^-2, rec_max_force_lb: M L T^-2, belt_condition: dimensionless, new_belt_factor: dimensionless, belt_count: dimensionless } out: { span_in: L, deflection_in: L, static_tension_lb: M L T^-2, target_min_force_lb: M L T^-2, target_max_force_lb: M L T^-2, wrap_angle_deg: dimensionless, shaft_load_lb: M L T^-2, deflection_64ths: dimensionless, target_tension_max_lb: M L T^-2, target_tension_min_lb: M L T^-2 }
 export function computeBeltDeflectionTension({ center_distance_in = 0, large_sheave_dia_in = 0, small_sheave_dia_in = 0, measured_force_lb = 0, rec_min_force_lb = 0, rec_max_force_lb = 0, belt_condition = "used", new_belt_factor = 1.3, belt_count = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (arguments[0]?.belt_condition !== undefined && !["new", "used"].includes(String(arguments[0].belt_condition))) return { error: "Belt condition must be new or used." };

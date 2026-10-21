@@ -405,7 +405,7 @@ VELOCITY_RENDERERS["dp-flow-meter"] = renderDpFlowMeter;
 // and standard (scfm) flow. Valid for p2/p1 >= 0.75 (the tile flags below that).
 // Computed C added 2026-10-09: cd_mode "flange" / "corner" / "d_d2" takes C from orifice-discharge-coefficient
 // (ISO 5167-2 Reader-Harris/Gallagher), iterated with Re = 4 qm/(pi D mu) from the mass flow and the gas viscosity.
-// dims: in { pipe_id_in: L, bore_in: L, p1_psia: M L^-1 T^-2, dp_psi: M L^-1 T^-2, temp_f: T, gas_sg: dimensionless, kappa: dimensionless, cd: dimensionless, cd_mode: dimensionless, viscosity_cp: M L^-1 T^-1 } out: { expansion_factor: dimensionless, mass_flow_lb_min: M T^-1, scfm: L^3 T^-1, acfm: L^3 T^-1, beta_ratio: dimensionless, cd_used: dimensionless, reynolds_number: dimensionless, pressure_ratio: dimensionless }
+// dims: in { pipe_id_in: L, bore_in: L, p1_psia: M L^-1 T^-2, dp_psi: M L^-1 T^-2, temp_f: T, gas_sg: dimensionless, kappa: dimensionless, cd: dimensionless, cd_mode: dimensionless, viscosity_cp: M L^-1 T^-1 } out: { expansion_factor: dimensionless, mass_flow_lb_min: M T^-1, scfm: L^3 T^-1, acfm: L^3 T^-1, beta_ratio: dimensionless, cd_used: dimensionless, reynolds_number: dimensionless, pressure_ratio: dimensionless, upstream_density_lb_ft3: M L^-3 }
 export function computeGasDpFlowMeter({ pipe_id_in = 0, bore_in = 0, p1_psia = 0, dp_psi = 0, temp_f = 60, gas_sg = 1.0, kappa = 1.4, cd = 0.61, cd_mode = "entered", viscosity_cp = 0.018 } = {}) {
   const D = Number(pipe_id_in), d = Number(bore_in), p1 = Number(p1_psia), dp = Number(dp_psi), tF = Number(temp_f), sg = Number(gas_sg), k = Number(kappa), mu = Number(viscosity_cp);
   let Cd = Number(cd);

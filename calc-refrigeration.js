@@ -135,7 +135,7 @@ const _REF_KW_PER_HP = 0.745699872;
 // Charge is a sum of liquid inventories, each at its own vessel's operating
 // temperature, because liquid ammonia's density falls markedly as it warms
 // and a single bundled density would misstate a low-temperature recirculator.
-// dims: in { receiver_volume_gal: L^3, receiver_fill_fraction: dimensionless, receiver_density_lb_ft3: M L^-3, recirculator_volume_gal: L^3, recirculator_fill_fraction: dimensionless, recirculator_density_lb_ft3: M L^-3, piping_volume_ft3: L^3, piping_liquid_fraction: dimensionless, piping_density_lb_ft3: M L^-3, threshold_lb: M } out: { receiver_lb: M, recirculator_lb: M, piping_lb: M, total_lb: M, margin_lb: M, pct_of_threshold: dimensionless, additional_cuft_to_cross: L^3, piping_share_pct: dimensionless, threshold_lb: M }
+// dims: in { receiver_volume_gal: L^3, receiver_fill_fraction: dimensionless, receiver_density_lb_ft3: M L^-3, recirculator_volume_gal: L^3, recirculator_fill_fraction: dimensionless, recirculator_density_lb_ft3: M L^-3, piping_volume_ft3: L^3, piping_liquid_fraction: dimensionless, piping_density_lb_ft3: M L^-3, threshold_lb: M } out: { receiver_lb: M, recirculator_lb: M, piping_lb: M, total_lb: M, margin_lb: M, pct_of_threshold: dimensionless, additional_cuft_to_cross: L^3, piping_share_pct: dimensionless, threshold_lb: M, vessel_total_lb: M }
 export function computeAmmoniaChargeInventory({
   receiver_volume_gal = 0, receiver_fill_fraction = 0, receiver_density_lb_ft3 = 0,
   recirculator_volume_gal = 0, recirculator_fill_fraction = 0, recirculator_density_lb_ft3 = 0,

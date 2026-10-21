@@ -419,7 +419,7 @@ export const mechanicalRoomNcExample = { inputs: { source_spl_db: 85, partition_
 // review. This reports the direction IN WORDS rather than as a signed
 // number, the fix carried over from the band-12 sign-convention finding.
 // =====================================================================
-// dims: in { unit_length_ft: L, unit_width_ft: L, unit_height_ft: L, unit_weight_lb: M L T^-2, uplift_psf: M L^-1 T^-2, lateral_psf: M L^-1 T^-2, fastener_count: dimensionless, windward_fastener_count: dimensionless, fastener_capacity_lb: M L T^-2 } out: { plan_area_ft2: L^2, uplift_lb: M L T^-2, net_uplift_lb: M L T^-2, lateral_lb: M L T^-2, overturning_ftlb: M L^2 T^-2, couple_tension_lb: M L T^-2, per_windward_lb: M L T^-2, demand_ratio: dimensionless, fasteners_required: dimensionless, lever_arm_ft: L, side_area_ft2: L^2, uplift_pct_of_weight: dimensionless }
+// dims: in { unit_length_ft: L, unit_width_ft: L, unit_height_ft: L, unit_weight_lb: M L T^-2, uplift_psf: M L^-1 T^-2, lateral_psf: M L^-1 T^-2, fastener_count: dimensionless, windward_fastener_count: dimensionless, fastener_capacity_lb: M L T^-2 } out: { plan_area_ft2: L^2, uplift_lb: M L T^-2, net_uplift_lb: M L T^-2, lateral_lb: M L T^-2, overturning_ftlb: M L^2 T^-2, couple_tension_lb: M L T^-2, per_windward_lb: M L T^-2, demand_ratio: dimensionless, fasteners_required: dimensionless, lever_arm_ft: L, side_area_ft2: L^2, uplift_pct_of_weight: dimensionless, couple_share_lb: M L T^-2, direct_share_lb: M L T^-2, weight_reserve_lb: M L T^-2 }
 export function computeRooftopCurbUplift({
   unit_length_ft = 0, unit_width_ft = 0, unit_height_ft = 0, unit_weight_lb = 0,
   uplift_psf = 0, lateral_psf = 0, fastener_count = 0,

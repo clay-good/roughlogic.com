@@ -1124,7 +1124,7 @@ export const hydrostaticTestExample = {
 export const FOG_LB_PER_MEAL = {
   low: [0.005, 0.0065], medium: [0.025, 0.0325], high: [0.035, 0.0455], "very-high": [0.058, 0.075],
 };
-// dims: in { peak_flow_gpm: L^3 T^-1, retention_minutes: T, loading_factor: dimensionless, meals_per_day: T^-1, grease_class: dimensionless, with_flatware: dimensionless, service_days: T } out: { volume_gal: L^3, separation_gal: L^3, fog_storage_gal: L^3, recommended_nominal_gal: L^3 }
+// dims: in { peak_flow_gpm: L^3 T^-1, retention_minutes: T, loading_factor: dimensionless, meals_per_day: T^-1, grease_class: dimensionless, with_flatware: dimensionless, service_days: T } out: { volume_gal: L^3, separation_gal: L^3, fog_storage_gal: L^3, recommended_nominal_gal: L^3, fog_lb: M, lb_per_meal: M }
 export function computeGreaseTrap({ peak_flow_gpm = 0, retention_minutes = 30, loading_factor = 1.25, meals_per_day = 0, grease_class = "high", with_flatware = "no", service_days = 90 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(peak_flow_gpm > 0)) return { error: "Peak flow must be positive." };
@@ -1302,7 +1302,7 @@ function rhoAt(F) {
   return t[0].rho;
 }
 
-// dims: in { system_volume_gal: L^3, fill_temperature_F: T, max_temperature_F: T, fill_pressure_psi: M L^-1 T^-2, relief_pressure_psi: M L^-1 T^-2 } out: { tank_volume_gal: L^3, precharge_psi: M L^-1 T^-2, P_final_abs: M L^-1 T^-2, P_initial_abs: M L^-1 T^-2 }
+// dims: in { system_volume_gal: L^3, fill_temperature_F: T, max_temperature_F: T, fill_pressure_psi: M L^-1 T^-2, relief_pressure_psi: M L^-1 T^-2 } out: { tank_volume_gal: L^3, precharge_psi: M L^-1 T^-2, P_final_abs: M L^-1 T^-2, P_initial_abs: M L^-1 T^-2, rho_cold: M L^-3, rho_hot: M L^-3 }
 export function computeExpansionTank({ system_volume_gal = 0, fill_temperature_F = 60, max_temperature_F = 200, fill_pressure_psi = 12, relief_pressure_psi = 30 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // The page passes a blank box as null, and Number(null) is 0 F; 0 F is a real reading, so a blank cannot stand in for it.
@@ -2078,7 +2078,7 @@ function _interpInsulationU(row, t) {
   return row[String(keys[0])];
 }
 
-// dims: in { loop_length_ft: L, nominal_size_in: L, insulation_in: L, hot_supply_F: T, ambient_F: T, set_point_delta_F: T, fuel: dimensionless, heater_efficiency: dimensionless, runtime_hr_per_year: T, fuel_price: dimensionless } out: { flow_gpm: L^3 T^-1, head_ft: L, pressure_psi: M L^-1 T^-2, recommended_hp: M L^2 T^-3, heater_efficiency: dimensionless, runtime_hr_per_year: T, Q_total_btu_hr: M L^2 T^-3, annual_energy_units: M L^2 T^-2, annual_loss_btu: M L^2 T^-2, gpm_required: L^3 T^-1, q_per_ft_btu_hr: M L T^-3 }
+// dims: in { loop_length_ft: L, nominal_size_in: L, insulation_in: L, hot_supply_F: T, ambient_F: T, set_point_delta_F: T, fuel: dimensionless, heater_efficiency: dimensionless, runtime_hr_per_year: T, fuel_price: dimensionless } out: { flow_gpm: L^3 T^-1, head_ft: L, pressure_psi: M L^-1 T^-2, recommended_hp: M L^2 T^-3, heater_efficiency: dimensionless, runtime_hr_per_year: T, Q_total_btu_hr: M L^2 T^-3, annual_energy_units: M L^2 T^-2, annual_loss_btu: M L^2 T^-2, gpm_required: L^3 T^-1, q_per_ft_btu_hr: M L T^-3, U_coefficient: M L T^-4 }
 export function computeRecircLoopSizing({
   loop_length_ft = 0,
   nominal_size_in = "0.75",
@@ -2524,7 +2524,7 @@ function _v16p_waterDensity(F) {
   return t[t.length - 1].rho;
 }
 
-// dims: in { water_heater_vol_gal: L^3, incoming_psi: M L^-1 T^-2, relief_psi: M L^-1 T^-2, incoming_F: T, setpoint_F: T, acceptance_factor: dimensionless } out: { v_expansion_gal: L^3, v_tank_gal: L^3, recommended_gal: L^3, delta_T_F: T, expansion_factor: dimensionless, pre_charge_psi: M L^-1 T^-2, relief_psi: M L^-1 T^-2 }
+// dims: in { water_heater_vol_gal: L^3, incoming_psi: M L^-1 T^-2, relief_psi: M L^-1 T^-2, incoming_F: T, setpoint_F: T, acceptance_factor: dimensionless } out: { v_expansion_gal: L^3, v_tank_gal: L^3, recommended_gal: L^3, delta_T_F: T, expansion_factor: dimensionless, pre_charge_psi: M L^-1 T^-2, relief_psi: M L^-1 T^-2, rho_cold: M L^-3, rho_hot: M L^-3 }
 export function computeWhExpansionTank({
   water_heater_vol_gal = 0,
   incoming_psi = 60,

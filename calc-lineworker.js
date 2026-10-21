@@ -222,7 +222,7 @@ LINEWORKER_RENDERERS["ruling-span"] = _simpleRenderer({
 
 // ============ spec-v1451: conductor sag change with temperature ============
 
-// dims: in { span_ft: L, area_in2: L^2, weight1_lb_per_ft: M / L, weight2_lb_per_ft: M / L, modulus_psi: M L^-1 T^-2, alpha_per_f: T^-1, tension1_lb: M L T^-2, temp1_f: T, temp2_f: T, rated_strength_lb: M L T^-2 } out: { sag1_ft: L, tension2_lb: M L T^-2, sag2_ft: L, sag_increase_ft: L, tension_change_lb: M L T^-2, sag_increase_pct: dimensionless, tension1_lb: M L T^-2, tension_change_pct: dimensionless, temp1_f: T, temp2_f: T, tension1_pct_rated: dimensionless, tension2_pct_rated: dimensionless }
+// dims: in { span_ft: L, area_in2: L^2, weight1_lb_per_ft: M T^-2, weight2_lb_per_ft: M T^-2, modulus_psi: M L^-1 T^-2, alpha_per_f: T^-1, tension1_lb: M L T^-2, temp1_f: T, temp2_f: T, rated_strength_lb: M L T^-2 } out: { sag1_ft: L, tension2_lb: M L T^-2, sag2_ft: L, sag_increase_ft: L, tension_change_lb: M L T^-2, sag_increase_pct: dimensionless, tension1_lb: M L T^-2, tension_change_pct: dimensionless, temp1_f: T, temp2_f: T, tension1_pct_rated: dimensionless, tension2_pct_rated: dimensionless, cubic_c: M^3 L^3 T^-6, cubic_k: M L T^-2, ea_lb: M L T^-2, initial_curve_term: M L T^-2, thermal_term_lb: M L T^-2, weight2_used_lb_per_ft: M T^-2 }
 export function computeConductorSagAtTemperature({ span_ft = 0, area_in2 = 0, weight1_lb_per_ft = 0, weight2_lb_per_ft = 0, modulus_psi = 0, alpha_per_f = 0, tension1_lb = 0, temp1_f = 60, temp2_f = 120, rated_strength_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(span_ft > 0)) return { error: "Span must be positive (ft)." };
@@ -306,7 +306,7 @@ LINEWORKER_RENDERERS["conductor-sag-at-temperature"] = _simpleRenderer({
 
 // ============ spec-v1452: conductor blowout and horizontal clearance ============
 
-// dims: in { conductor_diameter_in: L, weight_lb_per_ft: M / L, wind_pressure_psf: M L^-1 T^-2, wind_speed_mph: L / T, sag_ft: L, still_air_clearance_ft: L, insulator_length_ft: L } out: { wind_load_lb_per_ft: M / L, swing_angle_deg: dimensionless, blowout_ft: L, remaining_clearance_ft: L, pressure_at_zero_clearance_psf: M L^-1 T^-2, insulator_length_ft: L, pressure_psf: M L^-1 T^-2, sag_ft: L, still_air_clearance_ft: L, swing_length_ft: L, projected_area_ft2_per_ft: L }
+// dims: in { conductor_diameter_in: L, weight_lb_per_ft: M T^-2, wind_pressure_psf: M L^-1 T^-2, wind_speed_mph: L / T, sag_ft: L, still_air_clearance_ft: L, insulator_length_ft: L } out: { wind_load_lb_per_ft: M T^-2, swing_angle_deg: dimensionless, blowout_ft: L, remaining_clearance_ft: L, pressure_at_zero_clearance_psf: M L^-1 T^-2, insulator_length_ft: L, pressure_psf: M L^-1 T^-2, sag_ft: L, still_air_clearance_ft: L, swing_length_ft: L, projected_area_ft2_per_ft: L, pressure_from_speed_psf: M L^-1 T^-2 }
 export function computeConductorBlowout({ conductor_diameter_in = 0, weight_lb_per_ft = 0, wind_pressure_psf = 0, wind_speed_mph = 0, sag_ft = 0, still_air_clearance_ft = 0, insulator_length_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(conductor_diameter_in > 0)) return { error: "Conductor diameter must be positive (in)." };
@@ -385,7 +385,7 @@ LINEWORKER_RENDERERS["conductor-blowout"] = _simpleRenderer({
 
 // ============ spec-v1453: suspension insulator uplift check ============
 
-// dims: in { span_ft: L, elevation_rise_ft: L, weight_lb_per_ft: M / L, tension_lb: M L T^-2, back_span_ft: L, back_span_rise_ft: L } out: { vertical_load_low_lb: M L T^-2, vertical_load_high_lb: M L T^-2, low_point_offset_ft: L, uplift_tension_lb: M L T^-2, structure_vertical_load_lb: M L T^-2, span_ft: L, tension_lb: M L T^-2 }
+// dims: in { span_ft: L, elevation_rise_ft: L, weight_lb_per_ft: M T^-2, tension_lb: M L T^-2, back_span_ft: L, back_span_rise_ft: L } out: { vertical_load_low_lb: M L T^-2, vertical_load_high_lb: M L T^-2, low_point_offset_ft: L, uplift_tension_lb: M L T^-2, structure_vertical_load_lb: M L T^-2, span_ft: L, tension_lb: M L T^-2, back_span_contribution_lb: M L T^-2, half_weight_lb: M L T^-2, slope_component_lb: M L T^-2 }
 export function computeConductorUpliftCheck({ span_ft = 0, elevation_rise_ft = 0, weight_lb_per_ft = 0, tension_lb = 0, back_span_ft = 0, back_span_rise_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(span_ft > 0)) return { error: "Span must be positive (ft)." };
@@ -507,7 +507,7 @@ LINEWORKER_RENDERERS["line-ground-clearance-nesc"] = _simpleRenderer({
 
 // ============ spec-v1455: wood pole class and groundline moment ============
 
-// dims: in { groundline_circumference_in: L, fiber_stress_psi: M L^-1 T^-2, load_1_lb: M L T^-2, height_1_ft: L, load_2_lb: M L T^-2, height_2_ft: L, load_3_lb: M L T^-2, height_3_ft: L, check_height_ft: L } out: { groundline_diameter_in: L, section_modulus_in3: L^3, moment_capacity_ftlb: M L^2 T^-2, applied_moment_ftlb: M L^2 T^-2, utilization_pct: dimensionless, remaining_load_lb: M L T^-2, at_height_ft: L, load_count: dimensionless, one_inch_loss_pct: dimensionless }
+// dims: in { groundline_circumference_in: L, fiber_stress_psi: M L^-1 T^-2, load_1_lb: M L T^-2, height_1_ft: L, load_2_lb: M L T^-2, height_2_ft: L, load_3_lb: M L T^-2, height_3_ft: L, check_height_ft: L } out: { groundline_diameter_in: L, section_modulus_in3: L^3, moment_capacity_ftlb: M L^2 T^-2, applied_moment_ftlb: M L^2 T^-2, utilization_pct: dimensionless, remaining_load_lb: M L T^-2, at_height_ft: L, load_count: dimensionless, one_inch_loss_pct: dimensionless, moment_capacity_inlb: M L^2 T^-2, one_inch_less_capacity_ftlb: M L^2 T^-2, remaining_moment_ftlb: M L^2 T^-2 }
 export function computePoleClassGroundlineMoment({ groundline_circumference_in = 0, fiber_stress_psi = 8000, load_1_lb = 0, height_1_ft = 0, load_2_lb = 0, height_2_ft = 0, load_3_lb = 0, height_3_ft = 0, check_height_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // Unit / range guard added 2026-09-26 after printed-example probing.
@@ -578,7 +578,7 @@ LINEWORKER_RENDERERS["pole-class-groundline-moment"] = _simpleRenderer({
 
 // ============ spec-v1456: guy anchor holding capacity in soil ============
 
-// dims: in { helix_diameter_in: L, installed_depth_ft: L, cohesion_psf: M L^-1 T^-2, friction_bearing_factor: dimensionless, soil_unit_weight_pcf: M L^-3, factor_of_safety: dimensionless, installing_torque_ftlb: M L^2 T^-2, torque_factor_per_ft: dimensionless, guy_tension_lb: M L T^-2 } out: { helix_area_ft2: L^2, ultimate_capacity_lb: M L T^-2, allowable_capacity_lb: M L T^-2, torque_capacity_lb: M L T^-2, margin_lb: M L T^-2, factor_of_safety: dimensionless, method_ratio: dimensionless, guy_tension_lb: M L T^-2 }
+// dims: in { helix_diameter_in: L, installed_depth_ft: L, cohesion_psf: M L^-1 T^-2, friction_bearing_factor: dimensionless, soil_unit_weight_pcf: M L^-2 T^-2, factor_of_safety: dimensionless, installing_torque_ftlb: M L^2 T^-2, torque_factor_per_ft: L^-1, guy_tension_lb: M L T^-2 } out: { helix_area_ft2: L^2, ultimate_capacity_lb: M L T^-2, allowable_capacity_lb: M L T^-2, torque_capacity_lb: M L T^-2, margin_lb: M L T^-2, factor_of_safety: dimensionless, method_ratio: dimensionless, guy_tension_lb: M L T^-2, cohesive_capacity_lb: M L T^-2, governing_allowable_lb: M L T^-2, granular_capacity_lb: M L T^-2, overburden_psf: M L^-1 T^-2, torque_allowable_lb: M L T^-2 }
 export function computeGuyAnchorHoldingCapacity({ helix_diameter_in = 0, installed_depth_ft = 0, cohesion_psf = 0, friction_bearing_factor = 0, soil_unit_weight_pcf = 0, factor_of_safety = 2, installing_torque_ftlb = 0, torque_factor_per_ft = 10, guy_tension_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // Unit / range guard added 2026-09-26 after printed-example probing.
@@ -666,7 +666,7 @@ LINEWORKER_RENDERERS["guy-anchor-holding-capacity"] = _simpleRenderer({
 
 // ============ spec-v1457: transverse wind load on conductor and pole ============
 
-// dims: in { wind_pressure_psf: M L^-1 T^-2, wind_speed_mph: L / T, conductor_diameter_in: L, wind_span_ft: L, conductor_count: dimensionless, conductor_height_ft: L, pole_top_diameter_in: L, pole_groundline_diameter_in: L, pole_height_above_ground_ft: L } out: { pressure_psf: M L^-1 T^-2, conductor_force_lb: M L T^-2, pole_force_lb: M L T^-2, total_force_lb: M L T^-2, groundline_moment_ftlb: M L^2 T^-2, conductor_count: dimensionless, pole_projected_area_ft2: L^2, pole_resultant_height_ft: L, pole_share_pct: dimensionless }
+// dims: in { wind_pressure_psf: M L^-1 T^-2, wind_speed_mph: L / T, conductor_diameter_in: L, wind_span_ft: L, conductor_count: dimensionless, conductor_height_ft: L, pole_top_diameter_in: L, pole_groundline_diameter_in: L, pole_height_above_ground_ft: L } out: { pressure_psf: M L^-1 T^-2, conductor_force_lb: M L T^-2, pole_force_lb: M L T^-2, total_force_lb: M L T^-2, groundline_moment_ftlb: M L^2 T^-2, conductor_count: dimensionless, pole_projected_area_ft2: L^2, pole_resultant_height_ft: L, pole_share_pct: dimensionless, conductor_force_each_lb: M L T^-2, conductor_force_per_ft_lb: M T^-2, conductor_moment_ftlb: M L^2 T^-2, pole_moment_ftlb: M L^2 T^-2, pressure_from_speed_psf: M L^-1 T^-2 }
 export function computeTransverseWindLoadConductor({ wind_pressure_psf = 0, wind_speed_mph = 0, conductor_diameter_in = 0, wind_span_ft = 0, conductor_count = 1, conductor_height_ft = 0, pole_top_diameter_in = 0, pole_groundline_diameter_in = 0, pole_height_above_ground_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (wind_pressure_psf < 0 || wind_speed_mph < 0) return { error: "Wind pressure and speed cannot be negative." };
@@ -753,7 +753,7 @@ const _NESC_DISTRICTS = {
   3: { name: "Light", ice_in: 0.00, wind_psf: 9, k: 0.05, temp_f: 30 },
 };
 
-// dims: in { bare_diameter_in: L, bare_weight_lb_per_ft: M / L, district: dimensionless, custom_ice_in: L, custom_wind_psf: M L^-1 T^-2, custom_k_lb_per_ft: M / L, custom_temp_f: T } out: { iced_diameter_in: L, ice_weight_lb_per_ft: M / L, vertical_lb_per_ft: M / L, horizontal_lb_per_ft: M / L, resultant_lb_per_ft: M / L, design_temp_f: T, ice_area_in2: L^2, ice_in: L, k_share_pct: dimensionless, bare_weight_lb_per_ft: M / L, ice_multiple: dimensionless, ratio_to_bare: dimensionless, wind_psf: M L^-1 T^-2 }
+// dims: in { bare_diameter_in: L, bare_weight_lb_per_ft: M T^-2, district: dimensionless, custom_ice_in: L, custom_wind_psf: M L^-1 T^-2, custom_k_lb_per_ft: M T^-2, custom_temp_f: T } out: { iced_diameter_in: L, ice_weight_lb_per_ft: M T^-2, vertical_lb_per_ft: M T^-2, horizontal_lb_per_ft: M T^-2, resultant_lb_per_ft: M T^-2, design_temp_f: T, ice_area_in2: L^2, ice_in: L, k_share_pct: dimensionless, bare_weight_lb_per_ft: M T^-2, ice_multiple: dimensionless, ratio_to_bare: dimensionless, wind_psf: M L^-1 T^-2, k_lb_per_ft: M T^-2, vector_sum_lb_per_ft: M T^-2 }
 export function computeNescDistrictLoading({ bare_diameter_in = 0, bare_weight_lb_per_ft = 0, district = 1, custom_ice_in = 0, custom_wind_psf = 0, custom_k_lb_per_ft = 0, custom_temp_f = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(bare_diameter_in > 0)) return { error: "Bare conductor diameter must be positive (in)." };
@@ -818,7 +818,7 @@ LINEWORKER_RENDERERS["nesc-district-loading"] = _simpleRenderer({
 
 // ============ spec-v1459: conductor long-term creep ============
 
-// dims: in { creep_strain: dimensionless, alpha_per_f: T^-1, span_ft: L, area_in2: L^2, weight_lb_per_ft: M / L, modulus_psi: M L^-1 T^-2, tension1_lb: M L T^-2, design_temp_f: T } out: { equivalent_temp_rise_f: T, sag_design_ft: L, sag_after_creep_ft: L, creep_sag_increase_ft: L, initial_stringing_sag_ft: L, creep_sag_increase_pct: dimensionless, design_temp_f: T, stringing_offset_ft: L, creep_strain: dimensionless, string_at_temp_f: T }
+// dims: in { creep_strain: dimensionless, alpha_per_f: T^-1, span_ft: L, area_in2: L^2, weight_lb_per_ft: M T^-2, modulus_psi: M L^-1 T^-2, tension1_lb: M L T^-2, design_temp_f: T } out: { equivalent_temp_rise_f: T, sag_design_ft: L, sag_after_creep_ft: L, creep_sag_increase_ft: L, initial_stringing_sag_ft: L, creep_sag_increase_pct: dimensionless, design_temp_f: T, stringing_offset_ft: L, creep_strain: dimensionless, string_at_temp_f: T, initial_stringing_tension_lb: M L T^-2, tension_after_creep_lb: M L T^-2 }
 export function computeConductorCreepElongation({ creep_strain = 0, alpha_per_f = 0, span_ft = 0, area_in2 = 0, weight_lb_per_ft = 0, modulus_psi = 0, tension1_lb = 0, design_temp_f = 60 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // The page passes a blank box as null, and Number(null) is 0 F; 0 F is a real reading, so a blank cannot stand in for it.

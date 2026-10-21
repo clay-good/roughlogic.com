@@ -1174,7 +1174,7 @@ KITCHEN_RENDERERS["drink-abv-dilution"] = renderDrinkAbvDilution;
 // --- spec-v782 O: Ice cream overrun by weight (`overrun-percent`) ---
 // overrun% = (mix_weight - finished_weight) / finished_weight x 100 for equal volumes.
 // air% = (mix_weight - finished_weight) / mix_weight x 100 (air fraction of the finished volume).
-// dims: in { mix_weight_lb: M, finished_weight_lb: M } out: { overrun_pct: dimensionless, air_pct: dimensionless, meets_fda: dimensionless }
+// dims: in { mix_weight_lb: M, finished_weight_lb: M } out: { overrun_pct: dimensionless, air_pct: dimensionless, meets_fda: dimensionless, finished_lb_per_gal: M L^-3 }
 export function computeOverrunPercent({ mix_weight_lb = 0, finished_weight_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const mix = Number(mix_weight_lb) || 0;
@@ -2419,7 +2419,7 @@ KITCHEN_RENDERERS["walk-in-door-infiltration"] = _simpleRenderer({
 
 // ============ spec-v1639: kitchen exhaust and makeup air balance ============
 
-// dims: in { hood_exhaust_cfm: L^3 T^-1, other_exhaust_cfm: L^3 T^-1, dedicated_makeup_cfm: L^3 T^-1, intended_transfer_cfm: L^3 T^-1, building_leakage_cfm_per_pa: L^3 T^-1, door_width_ft: L, door_height_ft: L, door_closer_force_lbf: M L T^-2 } out: { total_exhaust_cfm: L^3 T^-1, deficit_cfm: L^3 T^-1, deficit_percent: dimensionless, uncontrolled_cfm: L^3 T^-1, makeup_shortfall_cfm: L^3 T^-1, door_force_lbf: M L T^-2, door_total_force_lbf: M L T^-2, dedicated_makeup_cfm: L^3 T^-1, door_area_ft2: L^2, door_closer_force_lbf: M L T^-2, door_height_ft: L, door_width_ft: L, egress_limit_lbf: M L T^-2, hood_exhaust_cfm: L^3 T^-1, intended_transfer_cfm: L^3 T^-1, other_exhaust_cfm: L^3 T^-1, pressure_psf: M L^-1 T^-2, knob_factor: dimensionless, pressure_inwc: M L^-1 T^-2, pressure_pa: M L^-1 T^-2 }
+// dims: in { hood_exhaust_cfm: L^3 T^-1, other_exhaust_cfm: L^3 T^-1, dedicated_makeup_cfm: L^3 T^-1, intended_transfer_cfm: L^3 T^-1, building_leakage_cfm_per_pa: M^-1 L^4 T, door_width_ft: L, door_height_ft: L, door_closer_force_lbf: M L T^-2 } out: { total_exhaust_cfm: L^3 T^-1, deficit_cfm: L^3 T^-1, deficit_percent: dimensionless, uncontrolled_cfm: L^3 T^-1, makeup_shortfall_cfm: L^3 T^-1, door_force_lbf: M L T^-2, door_total_force_lbf: M L T^-2, dedicated_makeup_cfm: L^3 T^-1, door_area_ft2: L^2, door_closer_force_lbf: M L T^-2, door_height_ft: L, door_width_ft: L, egress_limit_lbf: M L T^-2, hood_exhaust_cfm: L^3 T^-1, intended_transfer_cfm: L^3 T^-1, other_exhaust_cfm: L^3 T^-1, pressure_psf: M L^-1 T^-2, knob_factor: dimensionless, pressure_inwc: M L^-1 T^-2, pressure_pa: M L^-1 T^-2, building_leakage_cfm_per_pa: M^-1 L^4 T }
 export function computeKitchenMakeupAirDeficit({ hood_exhaust_cfm = 0, other_exhaust_cfm = 0, dedicated_makeup_cfm = 0, intended_transfer_cfm = 0, building_leakage_cfm_per_pa = 0, door_width_ft = 3, door_height_ft = 7, door_closer_force_lbf = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (door_closer_force_lbf < 0) return { error: "The door closer force cannot be negative (lbf)." };

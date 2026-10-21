@@ -175,7 +175,7 @@ export const GLASS_TYPE_FACTOR = {
   tempered: { factor: 4, label: "Fully tempered" },
 };
 
-// dims: in { width_ft: L, height_ft: L, design_pressure_psf: M L^-1 T^-2, glass_type: dimensionless, deflection_divisor: dimensionless, thickness_in: L, lites: dimensionless, spacer_allowance_psf: M L^-1 T^-2 } out: { area_sqft: L^2, total_load_lb: M L T^-2, allowable_deflection_in: L, aspect_ratio: dimensionless, type_factor: dimensionless }
+// dims: in { width_ft: L, height_ft: L, design_pressure_psf: M L^-1 T^-2, glass_type: dimensionless, deflection_divisor: dimensionless, thickness_in: L, lites: dimensionless, spacer_allowance_psf: M L^-2} out: { area_sqft: L^2, total_load_lb: M L T^-2, allowable_deflection_in: L, aspect_ratio: dimensionless, type_factor: dimensionless, equivalent_annealed_psf: M L^-1 T^-2, lite_weight_lb: M, assembly_weight_lb: M }
 export function computeGlassThicknessWind({ width_ft = 0, height_ft = 0, design_pressure_psf = 0, glass_type = "annealed", deflection_divisor = 175, thickness_in = 0, lites = 1, spacer_allowance_psf = 0.33 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const t = GLASS_TYPE_FACTOR[glass_type];
@@ -233,7 +233,7 @@ SPECIALTYTRADES_RENDERERS["glass-thickness-wind"] = _simpleRenderer({
 });
 
 // ===================== spec-v1428: attached canopy wind uplift and snow =====================
-// dims: in { projection_ft: L, width_ft: L, wind_speed_mph: L T^-1, kz: dimensionless, kzt: dimensionless, kd: dimensionless, cn_uplift: dimensionless, cn_downward: dimensionless, ground_snow_psf: M L^-1 T^-2, ce: dimensionless, ct: dimensionless, dead_load_psf: M L^-1 T^-2 } out: { area_sqft: L^2, q_psf: M L^-1 T^-2, uplift_force_lb: M L T^-2, dead_offset_pct: dimensionless, net_uplift_lb: M L T^-2, uplift_psf: M L^-1 T^-2 }
+// dims: in { projection_ft: L, width_ft: L, wind_speed_mph: L T^-1, kz: dimensionless, kzt: dimensionless, kd: dimensionless, cn_uplift: dimensionless, cn_downward: dimensionless, ground_snow_psf: M L^-1 T^-2, ce: dimensionless, ct: dimensionless, dead_load_psf: M L^-1 T^-2 } out: { area_sqft: L^2, q_psf: M L^-1 T^-2, uplift_force_lb: M L T^-2, dead_offset_pct: dimensionless, net_uplift_lb: M L T^-2, uplift_psf: M L^-1 T^-2, downward_psf: M L^-1 T^-2, snow_pf_psf: M L^-1 T^-2, downward_force_lb: M L T^-2, snow_force_lb: M L T^-2, dead_force_lb: M L T^-2, gravity_force_lb: M L T^-2 }
 export function computeAwningCanopyLoad({ projection_ft = 0, width_ft = 0, wind_speed_mph = 0, kz = 0.98, kzt = 1, kd = 0.85, cn_uplift = 1.2, cn_downward = 0.7, ground_snow_psf = 0, ce = 1, ct = 1, dead_load_psf = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(projection_ft > 0 && width_ft > 0)) return { error: "Canopy projection and width must be positive." };
@@ -710,7 +710,7 @@ SPECIALTYTRADES_RENDERERS["mast-climber-platform-load"] = _simpleRenderer({
 
 // ============ spec-v1688: suspended scaffold outrigger counterweight ============
 
-// dims: in { rated_load_lb: M L T^-2, outboard_arm_ft: L, inboard_arm_ft: L, factor_of_safety: dimensionless, counterweight_unit_lb: M L T^-2, target_counterweight_lb: M L T^-2, hoist_stall_load_lb: M L T^-2 } out: { lever_ratio: dimensionless, stall_counterweight_lb: M L T^-2, overturning_moment_ft_lb: M L^2 T^-2, required_counterweight_lb: M L T^-2, counterweight_units: dimensionless, resisting_moment_ft_lb: M L^2 T^-2, inboard_for_target_ft: L, factor_of_safety: dimensionless, inboard_arm_ft: L, outboard_arm_ft: L, rated_load_lb: M L T^-2, achieved_fos: dimensionless, counterweight_unit_lb: M L T^-2, hoist_stall_load_lb: M L T^-2, target_counterweight_lb: M L T^-2 }
+// dims: in { rated_load_lb: M L T^-2, outboard_arm_ft: L, inboard_arm_ft: L, factor_of_safety: dimensionless, counterweight_unit_lb: M L T^-2, target_counterweight_lb: M L T^-2, hoist_stall_load_lb: M L T^-2 } out: { lever_ratio: dimensionless, stall_counterweight_lb: M L T^-2, overturning_moment_ft_lb: M L^2 T^-2, required_counterweight_lb: M L T^-2, counterweight_units: dimensionless, resisting_moment_ft_lb: M L^2 T^-2, inboard_for_target_ft: L, factor_of_safety: dimensionless, inboard_arm_ft: L, outboard_arm_ft: L, rated_load_lb: M L T^-2, achieved_fos: dimensionless, counterweight_unit_lb: M L T^-2, hoist_stall_load_lb: M L T^-2, target_counterweight_lb: M L T^-2, balance_counterweight_lb: M L T^-2, provided_counterweight_lb: M L T^-2 }
 export function computeSuspendedScaffoldCounterweight({ rated_load_lb = 0, outboard_arm_ft = 0, inboard_arm_ft = 0, factor_of_safety = 4, counterweight_unit_lb = 0, target_counterweight_lb = 0, hoist_stall_load_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(rated_load_lb > 0)) return { error: "The hoist's RATED load must be positive (lb) -- not its empty weight, and not what happens to be on it today." };
@@ -778,7 +778,7 @@ SPECIALTYTRADES_RENDERERS["suspended-scaffold-counterweight"] = _simpleRenderer(
 
 // ============ spec-v1689: slab shoring and reshoring load distribution ============
 
-// dims: in { slab_dead_psf: M L^-1 T^-2, construction_live_psf: M L^-1 T^-2, form_dead_psf: M L^-1 T^-2, connected_levels: dimensionless, backshored: dimensionless, governing_slab_capacity_psf: M L^-1 T^-2, governing_slab_strength_psi: M L^-1 T^-2 } out: { new_pour_load_psf: M L^-1 T^-2, redistributed_load_psf: M L^-1 T^-2, share_per_level_psf: M L^-1 T^-2, governing_level_load_psf: M L^-1 T^-2, capacity_margin_psf: M L^-1 T^-2, levels_required: dimensionless, governing_slab_strength_psi: M L^-1 T^-2, utilization_pct: dimensionless, backshored: dimensionless, connected_levels: dimensionless, construction_live_psf: M L^-1 T^-2, form_dead_psf: M L^-1 T^-2, governing_slab_capacity_psf: M L^-1 T^-2, slab_dead_psf: M L^-1 T^-2 }
+// dims: in { slab_dead_psf: M L^-1 T^-2, construction_live_psf: M L^-1 T^-2, form_dead_psf: M L^-1 T^-2, connected_levels: dimensionless, backshored: dimensionless, governing_slab_capacity_psf: M L^-1 T^-2, governing_slab_strength_psi: M L^-1 T^-2 } out: { new_pour_load_psf: M L^-1 T^-2, redistributed_load_psf: M L^-1 T^-2, share_per_level_psf: M L^-1 T^-2, governing_level_load_psf: M L^-1 T^-2, capacity_margin_psf: M L^-1 T^-2, levels_required: dimensionless, governing_slab_strength_psi: M L^-1 T^-2, utilization_pct: dimensionless, backshored: dimensionless, connected_levels: dimensionless, construction_live_psf: M L^-1 T^-2, form_dead_psf: M L^-1 T^-2, governing_slab_capacity_psf: M L^-1 T^-2, slab_dead_psf: M L^-1 T^-2, other_case_load_psf: M L^-1 T^-2 }
 export function computeShoringReshoringLoad({ slab_dead_psf = 0, construction_live_psf = 0, form_dead_psf = 0, connected_levels = 0, backshored = 0, governing_slab_capacity_psf = 0, governing_slab_strength_psi = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!Number.isInteger(Number(connected_levels))) return { error: "Connected levels is a whole number of floors." };

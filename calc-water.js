@@ -1722,7 +1722,7 @@ WATER_RENDERERS["uv-required-exposure"] = renderUvRequiredExposure;
 
 // --- spec-v570 M: Population equivalent (organic load) ---
 // PE_bod = MGD*BOD*8.34/0.17. PE_flow = MGD*1e6/100. PE_ss = MGD*SS*8.34/0.20. PE = max.
-// dims: in { flow_mgd: L^3 T^-1, bod_mg_l: M L^-3, ss_mg_l: M L^-3 } out: { pe_bod: dimensionless, pe_flow: dimensionless, pe_governing: dimensionless, pe_ss: dimensionless }
+// dims: in { flow_mgd: L^3 T^-1, bod_mg_l: M L^-3, ss_mg_l: M L^-3 } out: { pe_bod: dimensionless, pe_flow: dimensionless, pe_governing: dimensionless, pe_ss: dimensionless, bod_load_lb: M T^-1 }
 export function computePopulationEquivalent({ flow_mgd = 0, bod_mg_l = 0, ss_mg_l = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const mgd = Number(flow_mgd) || 0;
@@ -1840,7 +1840,7 @@ WATER_RENDERERS["ras-svi-settleability"] = renderRasSviSettleability;
 
 // --- spec-v572 M: WAS rate to hold target SRT (sludge age) ---
 // system_solids = V*MLSS*8.34. solids_to_waste = system_solids/SRT. Q_WAS = (stw - eff_solids)/(WAS*8.34).
-// dims: in { aeration_volume_mg: L^3, mlss_mg_l: M L^-3, target_srt_days: T, was_conc_mg_l: M L^-3, effluent_flow_mgd: L^3 T^-1, effluent_tss_mg_l: M L^-3 } out: { q_was_mgd: L^3 T^-1, q_was_gpm: L^3 T^-1 }
+// dims: in { aeration_volume_mg: L^3, mlss_mg_l: M L^-3, target_srt_days: T, was_conc_mg_l: M L^-3, effluent_flow_mgd: L^3 T^-1, effluent_tss_mg_l: M L^-3 } out: { q_was_mgd: L^3 T^-1, q_was_gpm: L^3 T^-1, effluent_solids_lb: M T^-1, solids_to_waste_lb: M T^-1, system_solids_lb: M }
 export function computeWasSrtControl({ aeration_volume_mg = 0, mlss_mg_l = 0, target_srt_days = 0, was_conc_mg_l = 0, effluent_flow_mgd = 0, effluent_tss_mg_l = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const V = Number(aeration_volume_mg) || 0;
@@ -1890,7 +1890,7 @@ WATER_RENDERERS["was-srt-control"] = renderWasSrtControl;
 // --- spec-v574 M: Activated-sludge oxygen and blower air demand ---
 // O2 (AOR) = factor*BOD_removed + 4.6*NH3. SOR = AOR / [alpha F theta^(T-20)
 // (beta Cs,T - C) / Cs,20]. air_scfm = SOR / (0.075*0.232*(SOTE/100)*1440).
-// dims: in { bod_removed_lb_day: M T^-1, oxygen_factor: dimensionless, nh3_nitrified_lb_day: M T^-1, sote_pct: dimensionless, alpha: dimensionless, fouling_f: dimensionless, beta: dimensionless, water_temp_F: T, do_mg_l: M L^-3, cs_field_mg_l: M L^-3, cs20_mg_l: M L^-3 } out: { o2_demand_lb_day: M T^-1, air_scfm: L^3 T^-1, aor_sor_ratio: dimensionless }
+// dims: in { bod_removed_lb_day: M T^-1, oxygen_factor: dimensionless, nh3_nitrified_lb_day: M T^-1, sote_pct: dimensionless, alpha: dimensionless, fouling_f: dimensionless, beta: dimensionless, water_temp_F: T, do_mg_l: M L^-3, cs_field_mg_l: M L^-3, cs20_mg_l: M L^-3 } out: { o2_demand_lb_day: M T^-1, air_scfm: L^3 T^-1, aor_sor_ratio: dimensionless, o2_carbon_lb_day: M T^-1, o2_nitro_lb_day: M T^-1, sor_lb_day: M T^-1 }
 export function computeAerationOxygenDemand({ bod_removed_lb_day = 0, oxygen_factor = 0, nh3_nitrified_lb_day = 0, sote_pct = 0, alpha = 0.5, fouling_f = 0.9, beta = 0.95, water_temp_F = 68, do_mg_l = 2, cs_field_mg_l = 9.09, cs20_mg_l = 9.09 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (water_temp_F === null || water_temp_F === "" || !(Number(water_temp_F) >= 32 && Number(water_temp_F) <= 104)) return { error: "Enter the mixed-liquor temperature, 32 to 104 F." };
@@ -2402,7 +2402,7 @@ WATER_RENDERERS["step-drawdown-efficiency"] = _simpleRenderer({
 // =====================================================================
 const _WELL_GAL_PER_FT_COEFF = 0.0408; // gal per ft of a round casing, diameter in inches
 const _WELL_LB_PER_MG_MGL = 8.34;
-// dims: in { casing_diameter_in: L, well_depth_ft: L, static_water_level_ft: L, purge_volumes: dimensionless, purge_rate_gpm: L^3 T^-1, target_dose_mg_l: M L^-3, solution_strength_pct: dimensionless, solution_lb_per_gal: M L^-3 } out: { gal_per_ft: L^2, standing_column_ft: L, casing_volume_gal: L^3, purge_volume_gal: L^3, purge_minutes: T, chlorine_lb: M, solution_gal: L^3 }
+// dims: in { casing_diameter_in: L, well_depth_ft: L, static_water_level_ft: L, purge_volumes: dimensionless, purge_rate_gpm: L^3 T^-1, target_dose_mg_l: M L^-3, solution_strength_pct: dimensionless, solution_lb_per_gal: M L^-3 } out: { gal_per_ft: L^2, standing_column_ft: L, casing_volume_gal: L^3, purge_volume_gal: L^3, purge_minutes: T, chlorine_lb: M, solution_gal: L^3, solution_lb: M }
 export function computeWellCasingPurgeVolume({
   casing_diameter_in = 0, well_depth_ft = 0, static_water_level_ft = 0,
   purge_volumes = 3, purge_rate_gpm = 0,

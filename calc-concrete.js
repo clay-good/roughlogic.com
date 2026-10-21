@@ -1815,7 +1815,7 @@ export const concreteAnchorBreakoutExample = { inputs: { embedment_in: 6, fc_psi
 
 // ===================== spec-v552: slender column moment magnification, nonsway (ACI 318-19 6.6.4.5) =====================
 
-// dims: in { factored_axial_kip: M L T^-2, end_moment_m2_kft: M L^2 T^-2, end_moment_m1_kft: M L^2 T^-2, unbraced_len_ft: L, eff_length_k: dimensionless, eff_stiffness_ei: M L^3 T^-2, column_dim_h_in: L } out: { cm: dimensionless, pc_kip: M L T^-2, delta_ns: dimensionless, mc_kft: M L^2 T^-2 }
+// dims: in { factored_axial_kip: M L T^-2, end_moment_m2_kft: M L^2 T^-2, end_moment_m1_kft: M L^2 T^-2, unbraced_len_ft: L, eff_length_k: dimensionless, eff_stiffness_ei: M L^3 T^-2, column_dim_h_in: L } out: { cm: dimensionless, pc_kip: M L T^-2, delta_ns: dimensionless, mc_kft: M L^2 T^-2, m2_min_kft: M L^2 T^-2, m2_used_kft: M L^2 T^-2 }
 export function computeRcSlenderColumnMagnify({ factored_axial_kip = 0, end_moment_m2_kft = 0, end_moment_m1_kft = 0, unbraced_len_ft = 0, eff_length_k = 1.0, eff_stiffness_ei = 0, column_dim_h_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const Pu = Number(factored_axial_kip) || 0;

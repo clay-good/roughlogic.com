@@ -407,6 +407,8 @@ const POLYMORPHIC_KEYS = new Map(Object.entries({
   db: "a rebar diameter in concrete, a decibel in calc-stage (and dry-bulb elsewhere)",
   F: "degrees Fahrenheit in pure-math, magnetic field intensity in computeWMM",
   fv: "a future value (money) in accounting, an allowable shear stress in structural",
+  over_by: "a dollar overage in computeSubstantialImprovement, pounds over a weight rating in the trucking checks",
+  psf: "a peak solar factor (Btu/h per sq ft) in computeWindowSolarHeatGain, a countertop load in pounds per sq ft",
   shortfall: "a heating-load shortfall (Btu/h) in calc-hvac, a missing tooth count in computeGearUndercutBacklash",
   governing: "which check governs (a label), except computePullBoxSizing where it is a length",
   gpa: "gallons per acre in agriculture, a grade point average in calc-edu",
@@ -434,9 +436,15 @@ const POLYMORPHIC_KEYS = new Map(Object.entries({
 // Deciding it means rewriting well over a hundred annotations one way, which is
 // a maintainer's call, not this gate's. Until then these are named, counted and
 // printed on every run rather than quietly waived.
+// DECIDED 2026-10-20 by the maintainer: pounds are read BY CONTEXT. A load,
+// tension, reaction, capacity or fastener value in lb is a force; a material
+// quantity (cement, salt, fuel, goods) is a mass. So a name below may be a
+// force in one tile and a mass in another on purpose; within one function the
+// readings must agree. The list stays explicit so a new split is a choice.
 const POUND_CONVENTION_UNSETTLED = new Set([
-  "actual_weight_lb", "capacity_lb", "charge_weight_lb", "displacement_lb", "force_lb",
-  "green_weight_lb", "guy_tension_lb", "load_lb", "margin_lb", "max_charge_lb",
+  "total_tons", // ballast mass in computeRoofBallastWeight, a press tonnage FORCE in computePressBrakeTonnage
+  "capacity_lb", "displacement_lb", "force_lb",
+  "green_weight_lb", "guy_tension_lb", "load_lb", "margin_lb", 
   "payload_lb", "reaction_lb", "required_wll_lb", "total_lb",
   "total_weight_lb", "tractive_effort_lb", "vehicle_weight_lb",
   "W_lb", "water_weight_lb", "wc_pcf", "weight_lb",
@@ -712,7 +720,7 @@ async function main() {
     "key agreement: " + keyDims.size + " distinct key names, " + stillSplit.length +
     " still declared two ways and named as such (" +
     stillSplit.filter((k) => k.endsWith("(pound convention)")).length +
-    " of them the undecided pound convention, " +
+    " of them pound keys read by context (force or mass, decided 2026-10-20), " +
     stillSplit.filter((k) => k.endsWith("(polymorphic)")).length +
     " genuine name collisions). Any name not on those lists must mean one quantity.",
   );

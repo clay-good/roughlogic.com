@@ -27,7 +27,7 @@ export const STEAMPRESSURE_RENDERERS = {};
 // ===================== spec-v588 B: steam orifice / PRV capacity (Napier) =====================
 // choked = P2 < 0.58*P1. W = 51.5*Cd*A*P1 (saturated, choked). 51.5 is the API 520 / ASME steam
 // constant the citation names; Napier's own AP/70 lb/s is 51.43 lb/hr, which this used until 2026-09-25.
-// dims: in { orifice_area_in2: L^2, upstream_p_psia: M L^-1 T^-2, downstream_p_psia: M L^-1 T^-2, discharge_coeff: dimensionless } out: { steam_capacity_lb_hr: M T^-1, choke_threshold_psia: M L^-1 T^-2 }
+// dims: in { orifice_area_in2: L^2, upstream_p_psia: M L^-1 T^-2, downstream_p_psia: M L^-1 T^-2, discharge_coeff: dimensionless } out: { steam_capacity_lb_hr: M T^-1, choke_threshold_psia: M L^-1 T^-2, choked_capacity_lb_hr: M T^-1 }
 export function computeSteamPrvNapier({ orifice_area_in2 = 0, upstream_p_psia = 0, downstream_p_psia = 0, discharge_coeff = 0.9 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const A = Number(orifice_area_in2) || 0;

@@ -101,7 +101,7 @@ const _BAR_PER_PSI = 0.0689475729;
 
 // ===================== spec-v1507: powder factor and explosive load =====================
 
-// dims: in { burden_ft: L, spacing_ft: L, bench_height_ft: L, hole_diameter_in: L, subdrill_ft: L, stemming_ft: L, explosive_sg: dimensionless, rock_density_pcf: M L^-3, hole_count: dimensionless } out: { loading_density_lb_per_ft: M L^-1, charge_length_ft: L, charge_weight_lb: M L T^-2, rock_tons_per_hole: M, powder_factor_lb_per_ton: dimensionless, hole_depth_ft: L, rock_volume_cy: L^3, total_tons: dimensionless, rock_volume_cuft: L^3 }
+// dims: in { burden_ft: L, spacing_ft: L, bench_height_ft: L, hole_diameter_in: L, subdrill_ft: L, stemming_ft: L, explosive_sg: dimensionless, rock_density_pcf: M L^-3, hole_count: dimensionless } out: { loading_density_lb_per_ft: M L^-1, charge_length_ft: L, charge_weight_lb: M, rock_tons_per_hole: M, powder_factor_lb_per_ton: dimensionless, hole_depth_ft: L, rock_volume_cy: L^3, total_tons: M, rock_volume_cuft: L^3, powder_factor_lb_per_cy: M L^-3, total_explosive_lb: M }
 export function computeBlastPowderFactor({ burden_ft = 0, spacing_ft = 0, bench_height_ft = 0, hole_diameter_in = 0, subdrill_ft = 0, stemming_ft = 0, explosive_sg = 0.82, rock_density_pcf = 0, hole_count = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (explosive_sg > 3) return { error: "Enter the explosive's specific gravity (ANFO is about 0.82), not a density in kg/m3 or pcf." };
@@ -225,7 +225,7 @@ MINING_RENDERERS["blast-burden-spacing"] = _simpleRenderer({
 
 // ===================== spec-v1509: scaled distance and peak particle velocity =====================
 
-// dims: in { distance_ft: L, charge_per_delay_lb: M L T^-2, site_k: dimensionless, site_b: dimensionless, ppv_limit_in_s: L T^-1, required_scaled_distance: dimensionless } out: { scaled_distance: dimensionless, predicted_ppv_in_s: L T^-1, max_charge_lb: M L T^-2, compliant_distance_ft: L, margin_in_s: L T^-1 }
+// dims: in { distance_ft: L, charge_per_delay_lb: M, site_k: dimensionless, site_b: dimensionless, ppv_limit_in_s: L T^-1, required_scaled_distance: dimensionless } out: { scaled_distance: dimensionless, predicted_ppv_in_s: L T^-1, max_charge_lb: M, compliant_distance_ft: L, margin_in_s: L T^-1, charge_headroom_lb: M }
 export function computeBlastScaledDistancePPV({ distance_ft = 0, charge_per_delay_lb = 0, site_k = 242, site_b = 1.6, ppv_limit_in_s = 1, required_scaled_distance = 55 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(distance_ft > 0)) return { error: "Distance to the structure must be positive." };
@@ -289,7 +289,7 @@ MINING_RENDERERS["blast-scaled-distance-ppv"] = _simpleRenderer({
 // The default constants are the best-fit line OSMRE prints with its BIVDEP example data set
 // (A = 0.220, slope -0.883). Until 2026-10-11 the defaults were K 0.2, b 1.2, which read 8 to 24 dB
 // BELOW that document's own measured records (680 ft, 426.5 lb: 126 dB measured, 110 predicted).
-// dims: in { distance_ft: L, charge_per_delay_lb: M L T^-2, airblast_k: dimensionless, airblast_b: dimensionless, limit_db: dimensionless } out: { cube_root_scaled_distance: dimensionless, overpressure_psi: M L^-1 T^-2, overpressure_db: dimensionless, limit_psi: M L^-1 T^-2, max_charge_lb: M L T^-2, compliant_distance_ft: L, halving_gain_pct: dimensionless, margin_db: dimensionless, vented_db: dimensionless, vented_psi: M L^-1 T^-2, vented_pressure_factor: dimensionless }
+// dims: in { distance_ft: L, charge_per_delay_lb: M, airblast_k: dimensionless, airblast_b: dimensionless, limit_db: dimensionless } out: { cube_root_scaled_distance: dimensionless, overpressure_psi: M L^-1 T^-2, overpressure_db: dimensionless, limit_psi: M L^-1 T^-2, max_charge_lb: M, compliant_distance_ft: L, halving_gain_pct: dimensionless, margin_db: dimensionless, vented_db: dimensionless, vented_psi: M L^-1 T^-2, vented_pressure_factor: dimensionless }
 export function computeBlastAirblastOverpressure({ distance_ft = 0, charge_per_delay_lb = 0, airblast_k = 0.22, airblast_b = 0.883, limit_db = 133, confinement_penalty_db = 20 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(distance_ft > 0)) return { error: "Distance to the structure must be positive." };

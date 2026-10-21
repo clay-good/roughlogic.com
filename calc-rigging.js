@@ -1250,7 +1250,7 @@ RIGGING_RENDERERS["spanline-sag-tension"] = renderSpanlineSagTension;
 // exceed it or no sag can carry the load.
 // Midspan point load added 2026-10-09 with spanline-sag-tension: V = w L/2 + P/2 and
 // d_min = (w L^2/8 + P L/4) / sqrt(T_allow^2 - V^2).
-// dims: in { span_ft: L, load_lb_per_ft: M T^-2, allowable_tension_lb: M L T^-2, point_load_lb: M L T^-2 } out: { min_sag_ft: L, horizontal_tension_lb: M L T^-2, sag_ratio: dimensionless }
+// dims: in { span_ft: L, load_lb_per_ft: M T^-2, allowable_tension_lb: M L T^-2, point_load_lb: M L T^-2 } out: { min_sag_ft: L, horizontal_tension_lb: M L T^-2, sag_ratio: dimensionless, vertical_reaction_lb: M L T^-2 }
 export function computeSpanlineSagForTension({ span_ft, load_lb_per_ft, allowable_tension_lb, point_load_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const L = Number(span_ft);

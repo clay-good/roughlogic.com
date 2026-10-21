@@ -1499,7 +1499,7 @@ export function renderLightingDensity(inputRegion, outputRegion, citationEl, par
 // over a sequence of bends. Sidewall pressure at each bend = T / R where
 // R is the bend radius in feet.
 
-// dims: in { cable_weight_lb_per_ft: M T^-2, run_length_ft: L, lubricant: dimensionless, straight_run_ft: L, bends: dimensionless } out: { tension_lb: M L T^-2, mu: dimensionless }
+// dims: in { cable_weight_lb_per_ft: M T^-2, run_length_ft: L, lubricant: dimensionless, straight_run_ft: L, bends: dimensionless } out: { tension_lb: M L T^-2, mu: dimensionless, max_sidewall_lb_per_ft: M T^-2 }
 export function computePullingTension({
   cable_weight_lb_per_ft = 0,
   run_length_ft = 0,
@@ -4448,7 +4448,7 @@ ELECTRICAL_RENDERERS["min-conductor-for-vd"] = renderMinConductorForVd;
 
 const _ONDERDONK = { copper: { K: 0.0297, B: 234 }, aluminum: { K: 0.0125, B: 228 } };
 
-// dims: in { area_cmil: L^2, fault_current_a: I, clearing_time_s: T, material: dimensionless, t_initial_c: T, t_final_c: T } out: { withstand_a: I, min_cmil: L^2, adequate: dimensionless }
+// dims: in { area_cmil: L^2, fault_current_a: I, clearing_time_s: T, material: dimensionless, t_initial_c: T, t_final_c: T } out: { withstand_a: I, min_cmil: L^2, adequate: dimensionless, C: L^-4 T I^2 }
 export function computeConductorShortCircuitWithstand({ area_cmil = 0, fault_current_a = 0, clearing_time_s = 0, material = "copper", t_initial_c = 75, t_final_c = 250 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const m = _ONDERDONK[material];

@@ -1083,7 +1083,7 @@ STAGE_RENDERERS["amp-power-spl"] = renderAmpPowerSpl;
 // (lux-to-footcandle): this is a single aimed fixture, not a room budget.
 // =====================================================================
 
-// dims: in { beam_angle_deg: dimensionless, throw_distance: L, distance_unit: dimensionless, source: dimensionless, candela: J, lumens: dimensionless } out: { beam_diameter: L, illuminance_lux: dimensionless, illuminance_fc: dimensionless, beam_angle_deg: dimensionless, beam_diameter_ft: L, throw_distance: L, beam_diameter_m: L }
+// dims: in { beam_angle_deg: dimensionless, throw_distance: L, distance_unit: dimensionless, source: dimensionless, candela: J, lumens: dimensionless } out: { beam_diameter: L, illuminance_lux: dimensionless, illuminance_fc: dimensionless, beam_angle_deg: dimensionless, beam_diameter_ft: L, throw_distance: L, beam_diameter_m: L, candela: J }
 export function computeLightingBeam({ beam_angle_deg = 0, throw_distance = 0, distance_unit = "ft", source = "candela", candela = 0, lumens = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const ang = Number(beam_angle_deg) || 0;
@@ -1169,7 +1169,7 @@ STAGE_RENDERERS["lighting-beam"] = renderLightingBeam;
 // 3.28084 ft/m, the ~1 m per 1 mm pitch viewing rule.
 // =====================================================================
 
-// dims: in { cab_w_px: dimensionless, cab_h_px: dimensionless, pixel_pitch_mm: L, cols: dimensionless, rows: dimensionless, cab_weight_lb: M, cab_max_watts: dimensionless, avg_power_factor: dimensionless } out: { total_pixels: dimensionless, width_ft: L, min_view_ft: L, avg_power_w: M L^2 T^-3, cab_h_mm: L, height_ft: L, peak_power_w: M L^2 T^-3, cab_w_mm: L, cabinets: dimensionless, total_h_px: dimensionless, total_w_px: dimensionless }
+// dims: in { cab_w_px: dimensionless, cab_h_px: dimensionless, pixel_pitch_mm: L, cols: dimensionless, rows: dimensionless, cab_weight_lb: M, cab_max_watts: dimensionless, avg_power_factor: dimensionless } out: { total_pixels: dimensionless, width_ft: L, min_view_ft: L, avg_power_w: M L^2 T^-3, cab_h_mm: L, height_ft: L, peak_power_w: M L^2 T^-3, cab_w_mm: L, cabinets: dimensionless, total_h_px: dimensionless, total_w_px: dimensionless, total_weight: M }
 export function computeLedVideoWall({ cab_w_px = 0, cab_h_px = 0, pixel_pitch_mm = 0, cols = 0, rows = 0, cab_weight_lb = 0, cab_max_watts = 0, avg_power_factor = 0.35 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (cab_weight_lb < 0 || cab_max_watts < 0) return { error: "Weight and power inputs must be non-negative." };
@@ -1542,7 +1542,7 @@ STAGE_RENDERERS["room-absorption-target"] = renderRoomAbsorptionTarget;
 
 // --- spec-v542 N: Counterweight fly-system balance (`counterweight-arbor-load`) ---
 // required = (batten + load) x purchase_ratio (1 single, 2 double). out_of_weight = required - existing.
-// dims: in { batten_weight_lb: M L T^-2, attached_load_lb: M L T^-2, purchase_type: dimensionless, brick_weight_lb: M L T^-2, existing_cw_lb: M L T^-2 } out: { required_cw_lb: M L T^-2, out_of_weight_lb: M L T^-2, bricks: dimensionless, purchase_ratio: dimensionless }
+// dims: in { batten_weight_lb: M L T^-2, attached_load_lb: M L T^-2, purchase_type: dimensionless, brick_weight_lb: M L T^-2, existing_cw_lb: M L T^-2 } out: { required_cw_lb: M L T^-2, out_of_weight_lb: M L T^-2, bricks: dimensionless, purchase_ratio: dimensionless, residual_lb: M L T^-2 }
 export function computeCounterweightArborLoad({ batten_weight_lb = 0, attached_load_lb = 0, purchase_type = "single", brick_weight_lb = 0, existing_cw_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const batten = Number(batten_weight_lb) || 0;

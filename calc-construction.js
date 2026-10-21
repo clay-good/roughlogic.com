@@ -376,7 +376,7 @@ const SCREW_SHANK_DIA_IN = {
   "1/4": 0.250,
 };
 
-// dims: in { fastener_type: dimensionless, fastener_size: dimensionless, species: dimensionless, penetration_in: L } out: { specific_gravity: dimensionless, diameter_in: L }
+// dims: in { fastener_type: dimensionless, fastener_size: dimensionless, species: dimensionless, penetration_in: L } out: { specific_gravity: dimensionless, diameter_in: L, withdrawal_per_inch_lb: M T^-2, total_withdrawal_lb: M L T^-2 }
 export function computePullout({ fastener_type, fastener_size, species, penetration_in }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // Until 2026-09-26 a negative entry here returned a negative quantity with no error.
@@ -1203,7 +1203,7 @@ export const snowLoadExample = {
 // bonded smooth bar at 0.7 sqrt(f'c) (~38 psi) of bond: 66 in (5.5 ft) of
 // embedment for 5,000 lb on a 5/8 in bolt, where breakout needs ~2.7 in.
 
-// dims: in { uplift_lb: M L T^-2, bolt_diameter_in: L, fc_psi: M L^-1 T^-2, cracked: dimensionless, edge_distance_in: L } out: { embedment_in: L, embedment_cracked_in: L, edge_critical_in: L, bolt_diameter_in: L, embedment_ft: L, embedment_uncracked_in: L }
+// dims: in { uplift_lb: M L T^-2, bolt_diameter_in: L, fc_psi: M L^-1 T^-2, cracked: dimensionless, edge_distance_in: L } out: { embedment_in: L, embedment_cracked_in: L, edge_critical_in: L, bolt_diameter_in: L, embedment_ft: L, embedment_uncracked_in: L, T_lb: M L T^-2 }
 export function computeAnchorEmbedment({ uplift_lb, bolt_diameter_in, fc_psi, cracked = false, edge_distance_in = 0 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const T = Number(uplift_lb) || 0;
@@ -1660,7 +1660,7 @@ export const AGGREGATE_DENSITIES_PCF = {
   sand: 100, pea_gravel: 110, crushed_stone: 100, road_base: 130,
 };
 
-// dims: in { area_ft2: L^2, depth_in: L, material: dimensionless } out: { tons: M, cubic_yards: L^3 }
+// dims: in { area_ft2: L^2, depth_in: L, material: dimensionless } out: { tons: M, cubic_yards: L^3, pcf: M L^-3 }
 export function computeAggregate({ area_ft2 = 0, depth_in = 0, material = "crushed_stone" }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(area_ft2 > 0)) return { error: "Area must be positive." };
@@ -1717,7 +1717,7 @@ export const ACI_211_W_C = {
   sulfate: { 2500: 0.50, 3000: 0.45, 3500: 0.42, 4000: 0.40, 5000: 0.38, 6000: 0.34 },
 };
 
-// dims: in { strength_psi: M L^-1 T^-2, exposure: dimensionless, max_aggregate_in: L, slump_in: L } out: { wc_ratio: dimensionless, cement_bags_yd3: L^3 }
+// dims: in { strength_psi: M L^-1 T^-2, exposure: dimensionless, max_aggregate_in: L, slump_in: L } out: { wc_ratio: dimensionless, cement_bags_yd3: L^3, water_lb_yd3: M L^-3, cement_lb_yd3: M L^-3, coarse_lb_yd3: M L^-3, fine_lb_yd3: M L^-3 }
 export function computeConcreteMixDesign({ strength_psi = 3000, exposure = "interior", max_aggregate_in = 1, slump_in = 4 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // Above the table the 6,000 psi mix used to be returned under the requested strength's name.
@@ -1905,7 +1905,7 @@ export const WELD_GAS_FLOW_CFH = { SMAW: 0, GMAW: 35, FCAW: 35, GTAW: 20 };
 // near 4.5 to 7.5 lb/HOUR, so the old 4 lb/min default was about 40x high and reported a
 // 1.7 lb weld as 25 seconds of arc time.
 export const WELD_DEPOSITION_RATE_LB_PER_MIN = { SMAW: 0.06, GMAW: 0.12, FCAW: 0.20, GTAW: 0.03 };
-// dims: in { process: dimensionless, weld_cross_section_in2: L^2, weld_length_in: L, deposition_rate_lb_per_min: M T^-1 } out: { deposit_lb: M, gas_ft3: L^3, efficiency: dimensionless, minutes: T }
+// dims: in { process: dimensionless, weld_cross_section_in2: L^2, weld_length_in: L, deposition_rate_lb_per_min: M T^-1 } out: { deposit_lb: M, gas_ft3: L^3, efficiency: dimensionless, minutes: T, consumable_lb: M }
 export function computeWeldUsage({ process = "GMAW", weld_cross_section_in2 = 0, weld_length_in = 0, deposition_rate_lb_per_min }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const eff = WELD_DEPOSITION_EFFICIENCY[process];
@@ -1934,7 +1934,7 @@ export const weldUsageExample = { inputs: { process: "GMAW", weld_cross_section_
 export const DEMO_DEBRIS_PCF = { wood_frame: 18, mixed: 60, masonry: 110, concrete: 85 };
 export const DUMPSTER_SIZES_YD3 = [10, 20, 30, 40];
 
-// dims: in { structure_type: dimensionless, volume_yd3: L^3 } out: { volume_ft3: L^3, dumpster_yd3: L^3, dumpster_count: dimensionless, tons: M }
+// dims: in { structure_type: dimensionless, volume_yd3: L^3 } out: { volume_ft3: L^3, dumpster_yd3: L^3, dumpster_count: dimensionless, tons: M, pcf: M L^-3 }
 export function computeDemoDebris({ structure_type = "wood_frame", volume_yd3 = 0 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (volume_yd3 > 40) {
@@ -1972,7 +1972,7 @@ export const ACI_C_C = {
   high_blend_no_retarder: 1.4, high_blend_retarder: 1.5,
 };
 
-// dims: in { pour_rate_ft_per_hr: L T^-1, concrete_temp_F: T, weight_factor: dimensionless, unit_weight_pcf: M L^-3, wall_height_ft: L, chemistry: dimensionless } out: { pressure_psf: M L^-1 T^-2, chemistry_coefficient: dimensionless, aci_pressure_psf: M L^-1 T^-2, wet_head_psf: M L^-1 T^-2, weight_factor: dimensionless }
+// dims: in { pour_rate_ft_per_hr: L T^-1, concrete_temp_F: T, weight_factor: dimensionless, unit_weight_pcf: M L^-2 T^-2, wall_height_ft: L, chemistry: dimensionless } out: { pressure_psf: M L^-1 T^-2, chemistry_coefficient: dimensionless, aci_pressure_psf: M L^-1 T^-2, wet_head_psf: M L^-1 T^-2, weight_factor: dimensionless }
 export function computeFormworkPressure({
   pour_rate_ft_per_hr = 0, concrete_temp_F = 70, weight_factor = "normal", unit_weight_pcf, wall_height_ft = 100, chemistry = "auto",
 }) {
@@ -3555,7 +3555,7 @@ function _v15cPostColumnCapacity({ d_in, height_ft, F_c, E_min }) {
   return { A_in2, le_d, C_P, allowable_load_lb: F_c_prime * A_in2, slenderness_exceeded };
 }
 
-// dims: in { joist_span_ft: L, beam_span_ft: L, post_height_ft: L, live_load_psf: M L^-1 T^-2, dead_load_psf: M L^-1 T^-2, species_grade: dimensionless } out: { beam_label: dimensionless, post_size: dimensionless, footing_side_in: L, beam_allowable_span_ft: L, ledger_spacing_in: L, tributary_width_ft: L, w_plf: M T^-2, beam_plies: dimensionless, footing_soil_psf: M L^-1 T^-2, post_slenderness_le_d: dimensionless, total_load_psf: M L^-1 T^-2 }
+// dims: in { joist_span_ft: L, beam_span_ft: L, post_height_ft: L, live_load_psf: M L^-1 T^-2, dead_load_psf: M L^-1 T^-2, species_grade: dimensionless } out: { beam_label: dimensionless, post_size: dimensionless, footing_side_in: L, beam_allowable_span_ft: L, ledger_spacing_in: L, tributary_width_ft: L, w_plf: M T^-2, beam_plies: dimensionless, footing_soil_psf: M L^-1 T^-2, post_slenderness_le_d: dimensionless, total_load_psf: M L^-1 T^-2, post_load_lb: M L T^-2, post_allowable_load_lb: M L T^-2 }
 export function computeDeckBeamPost({
   joist_span_ft = 0,
   beam_span_ft = 0,
@@ -3960,7 +3960,7 @@ CONSTRUCTION_RENDERERS["column-buckling-wood"] = renderColumnBucklingWood;
 // --- v20 E.3: Simple-span beam reactions and max moment (`beam-reactions`) ---
 // UDL: R = wL/2, M = wL^2/8. Point load: R_left = P(L-a)/L, R_right = Pa/L,
 // moment at load = R_left*a. Superpose.
-// dims: in { span_ft: L, w_plf: M*T^-2, point_lb: M*L*T^-2, a_ft: L } out: { r_left_lb: M*L*T^-2, m_max_ftlb: M*L^2*T^-2 }
+// dims: in { span_ft: L, w_plf: M*T^-2, point_lb: M*L*T^-2, a_ft: L } out: { r_left_lb: M*L*T^-2, m_max_ftlb: M*L^2*T^-2, r_right_lb: M L T^-2, max_shear_lb: M L T^-2 }
 export function computeBeamReactions({ span_ft = 0, w_plf = 0, point_lb = 0, a_ft = 0 } = {}) {
   const L = Number(span_ft) || 0;
   const w = Number(w_plf) || 0;
@@ -4414,7 +4414,7 @@ function _v27MinFillet(t) {
 // AISC §J2.2b maximum fillet size (in) along an edge of the thinner part.
 function _v27MaxFillet(t) { return t < 0.25 ? t : t - 0.0625; }
 
-// dims: in { leg_in: L, length_in: L, base_thickness_in: L, applied_load_lb: dimensionless } out: { throat_in: L, strength_per_in_lb: dimensionless, capacity_lb: dimensionless, F_Exx_ksi: M L^-1 T^-2, length_in: L, max_fillet_in: L, min_fillet_in: L, stress_ksi: M L^-1 T^-2 }
+// dims: in { leg_in: L, length_in: L, base_thickness_in: L, applied_load_lb: M L T^-2 } out: { throat_in: L, strength_per_in_lb: M T^-2, capacity_lb: dimensionless, F_Exx_ksi: M L^-1 T^-2, length_in: L, max_fillet_in: L, min_fillet_in: L, stress_ksi: M L^-1 T^-2 }
 export function computeFilletWeldStrength({ mode = "capacity-from-size", leg_in = 0, length_in = 0, electrode = "E70", base_thickness_in = 0, applied_load_lb = 0, method = "ASD" } = {}) {
   const _g = _finiteGuard({ leg_in, length_in, base_thickness_in, applied_load_lb }); if (_g) return _g;
   if (mode !== "capacity-from-size" && mode !== "size-from-load") return { error: "Mode must be capacity-from-size or size-from-load." };
@@ -7062,7 +7062,7 @@ CONSTRUCTION_RENDERERS["wood-tension-member"] = _renderWoodTensionMember;
 // Z'RTi = ni Fv' t scrit, scrit = the lesser of the end distance and the in-row spacing, Z'RT = sum over rows;
 // group tear-out Z'GT = Z'RT-1/2 + Z'RT-n/2 + Ft' t (nrow - 1)(srow - Dh). Checked against the AWC Wood Design
 // Focus (Winter 2002) Appendix E Example 1: 39,930 / 24,000 / 22,030 lb, group tear-out governs.
-// dims: in { t_in: L, d_in: L, dh_in: L, n_rows: dimensionless, bolts_outer_row: dimensionless, bolts_inner_row: dimensionless, end_dist_in: L, bolt_spacing_in: L, row_spacing_in: L, fv_adj_psi: M L^-1 T^-2, ft_adj_psi: M L^-1 T^-2, fastener_capacity_lb: M L T^-2 } out: { s_crit_in: L, z_nt_lb: M L T^-2, z_rt_lb: M L T^-2, z_gt_lb: M L T^-2, member_capacity_lb: M L T^-2, connection_capacity_lb: M L T^-2, bolts_inner_row_used: dimensionless }
+// dims: in { t_in: L, d_in: L, dh_in: L, n_rows: dimensionless, bolts_outer_row: dimensionless, bolts_inner_row: dimensionless, end_dist_in: L, bolt_spacing_in: L, row_spacing_in: L, fv_adj_psi: M L^-1 T^-2, ft_adj_psi: M L^-1 T^-2, fastener_capacity_lb: M L T^-2 } out: { s_crit_in: L, z_nt_lb: M L T^-2, z_rt_lb: M L T^-2, z_gt_lb: M L T^-2, member_capacity_lb: M L T^-2, connection_capacity_lb: M L T^-2, bolts_inner_row_used: dimensionless, z_rt_outer_lb: M L T^-2 }
 export function computeWoodRowGroupTearout({ t_in = 0, d_in = 0, dh_in = 0, n_rows = 1, bolts_outer_row = 0, bolts_inner_row, end_dist_in = 0, bolt_spacing_in = 0, row_spacing_in = 0, fv_adj_psi = 0, ft_adj_psi = 0, fastener_capacity_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(t_in > 0) || !(d_in > 0)) return { error: "Member thickness and depth must be positive (in)." };
@@ -11366,7 +11366,7 @@ CONSTRUCTION_RENDERERS["foundation-waterproofing-takeoff"] = _simpleRenderer({
 });
 
 // ===================== spec-v986: ballasted single-ply roof ballast weight and order =====================
-// dims: in { roof_area_sqft: L^2, ballast_psf: M L^-2, stone_density_pcf: M L^-3 } out: { total_ballast_lb: dimensionless, total_tons: dimensionless, stone_depth_in: L, volume_cy: L^3 }
+// dims: in { roof_area_sqft: L^2, ballast_psf: M L^-2, stone_density_pcf: M L^-3 } out: { total_ballast_lb: dimensionless, total_tons: M, stone_depth_in: L, volume_cy: L^3 }
 export function computeRoofBallastWeight({ roof_area_sqft = 5000, ballast_psf = 12, stone_density_pcf = 100 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(roof_area_sqft > 0)) return { error: "Roof area must be positive (sq ft)." };
@@ -11729,7 +11729,7 @@ CONSTRUCTION_RENDERERS["advance-warning-sign-spacing"] = _simpleRenderer({
 //   shear      V = 0.6 w L           (reaction at the first interior support)
 //   deflection D = w L^4 / (145 EI)  (end-span max, 0.0069 wL^4/EI -> 1/0.0069 = 144.9)
 // Each is inverted for the span, and the smallest governs.
-// dims: in { pressure_psf: M L^-1 T^-2, tributary_in: L, width_b_in: L, depth_d_in: L, fb_psi: M L^-1 T^-2, fv_psi: M L^-1 T^-2, e_psi: M L^-1 T^-2, deflection_denominator: dimensionless } out: { span_bending_in: L, span_shear_in: L, span_deflection_in: L, max_spacing_in: L, area_in2: L^2, section_modulus_in3: L^3, w_plf: M T^-2, moment_inertia_in4: L^4, w_lb_per_in: M T^-2 }
+// dims: in { pressure_psf: M L^-1 T^-2, tributary_in: L, width_b_in: L, depth_d_in: L, fb_psi: M L^-1 T^-2, fv_psi: M L^-1 T^-2, e_psi: M L^-1 T^-2, deflection_denominator: dimensionless } out: { span_bending_in: L, span_shear_in: L, span_deflection_in: L, max_spacing_in: L, area_in2: L^2, section_modulus_in3: L^3, w_plf: M T^-2, moment_inertia_in4: L^4, w_lb_per_in: M T^-2, shear_capacity_lb: M L T^-2 }
 export function computeFormworkMemberSpacing({ pressure_psf = 0, tributary_in = 12, width_b_in = 1.5, depth_d_in = 3.5, fb_psi = 1000, fv_psi = 180, e_psi = 1600000, deflection_denominator = 360 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const p = Number(pressure_psf) || 0;
@@ -11799,7 +11799,7 @@ CONSTRUCTION_RENDERERS["formwork-member-spacing"] = _simpleRenderer({
 //   aggregate  C = 46.8 (1 - 0.4 V) H G E        lb/SY
 //   binder     B = (2.244 H T V + S + A) / R     gal/SY
 // The T, E, and S factors are DOT table lookups and are entered, with their published ranges named.
-// dims: in { median_size_in: L, flakiness_index_pct: dimensionless, loose_unit_weight_pcf: M L^-3, bulk_specific_gravity: dimensionless, wastage_factor: dimensionless, traffic_factor: dimensionless, surface_factor_gal_sy: L, absorption_gal_sy: L, residual_asphalt: dimensionless } out: { ald_in: L, voids: dimensionless, aggregate_lb_sy: M L^-2, binder_gal_sy: L, binder_gal_per_1000sy: L, project_area_sy: L^2, residual_gal_sy: L }
+// dims: in { median_size_in: L, flakiness_index_pct: dimensionless, loose_unit_weight_pcf: M L^-3, bulk_specific_gravity: dimensionless, wastage_factor: dimensionless, traffic_factor: dimensionless, surface_factor_gal_sy: L, absorption_gal_sy: L, residual_asphalt: dimensionless } out: { ald_in: L, voids: dimensionless, aggregate_lb_sy: M L^-2, binder_gal_sy: L, binder_gal_per_1000sy: L, project_area_sy: L^2, residual_gal_sy: L, aggregate_ton_per_1000sy: M L^-2 }
 export function computeChipSealMcleod({ median_size_in = 0, flakiness_index_pct = 0, loose_unit_weight_pcf = 0, bulk_specific_gravity = 2.65, wastage_factor = 1.05, traffic_factor = 0.75, surface_factor_gal_sy = 0.02, absorption_gal_sy = 0, residual_asphalt = 0.67, project_area_sy = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const M = Number(median_size_in) || 0;
@@ -12165,7 +12165,7 @@ CONSTRUCTION_RENDERERS["membrane-fastener-takeoff"] = _simpleRenderer({
 // see 1,800 lb each from a 200 lb push. That ratio - the lever arm going from 36 in down to
 // 4 in - is why deck guards fail at the rim joist and not at the post.
 // IBC 1607.9.1: a 50 plf uniform load and a 200 lb concentrated load, NOT concurrent.
-// dims: in { post_height_in: L, post_spacing_ft: L, concentrated_lb: M L T^-2, uniform_plf: M T^-2, post_b_in: L, post_d_in: L, allowable_fb_psi: M L^-1 T^-2, connection_lever_in: L } out: { governing_load_lb: M L T^-2, moment_inlb: M L^2 T^-2, section_modulus_in3: L^3, required_fb_psi: M L^-1 T^-2, connection_force_lb: M L T^-2, force_multiplier: dimensionless, post_utilization: dimensionless, moment_ftlb: M L^2 T^-2 }
+// dims: in { post_height_in: L, post_spacing_ft: L, concentrated_lb: M L T^-2, uniform_plf: M T^-2, post_b_in: L, post_d_in: L, allowable_fb_psi: M L^-1 T^-2, connection_lever_in: L } out: { governing_load_lb: M L T^-2, moment_inlb: M L^2 T^-2, section_modulus_in3: L^3, required_fb_psi: M L^-1 T^-2, connection_force_lb: M L T^-2, force_multiplier: dimensionless, post_utilization: dimensionless, moment_ftlb: M L^2 T^-2, uniform_at_post_lb: M L T^-2 }
 export function computeGuardPostLoad({ post_height_in = 36, post_spacing_ft = 6, concentrated_lb = 200, uniform_plf = 50, post_b_in = 3.5, post_d_in = 3.5, allowable_fb_psi = 0, connection_lever_in = 4 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (uniform_plf === null || uniform_plf === "") uniform_plf = 50;

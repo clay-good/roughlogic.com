@@ -980,7 +980,7 @@ EARTHWORK_RENDERERS["rock-construction-entrance"] = _v830renderRockConstructionE
 //   uplift_plf = water_unit_wt_pcf x (PI/4) x (od_in/12)^2
 //   fs = (pipe_weight_plf + backfill_weight_plf) / uplift_plf
 //   required_backfill_plf = target_fs x uplift_plf - pipe_weight_plf
-// dims: in { pipe_od_in: L, pipe_weight_plf: M T^-2, backfill_weight_plf: M T^-2, target_fs: dimensionless, water_unit_wt_pcf: M L^-2 T^-2 } out: { uplift_plf: M T^-2, resisting_plf: M T^-2, fs: dimensionless, required_backfill_plf: M T^-2 }
+// dims: in { pipe_od_in: L, pipe_weight_plf: M T^-2, backfill_weight_plf: M T^-2, target_fs: dimensionless, water_unit_wt_pcf: M L^-2 T^-2 } out: { uplift_plf: M T^-2, resisting_plf: M T^-2, fs: dimensionless, required_backfill_plf: M T^-2, required_backfill_on_backfill_plf: M T^-2 }
 export function computePipeFlotation({ pipe_od_in = 48, pipe_weight_plf = 200, backfill_weight_plf = 900, target_fs = 1.5, water_unit_wt_pcf = 62.4 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(pipe_od_in > 0)) return { error: "Pipe outside diameter must be positive (in)." };
@@ -1098,7 +1098,7 @@ EARTHWORK_RENDERERS["restrained-pipe-length"] = _v832renderRestrainedPipeLength;
 // full capstan/bend and hydrokinetic drag terms):
 //   pullback_lb = friction_coeff x eff_weight_plf x length_ft x bend_factor + fluid_drag_lb
 //   utilization = safe pull > 0 ? pullback / safe pull : null
-// dims: in { eff_weight_plf: M T^-2, length_ft: L, friction_coeff: dimensionless, bend_factor: dimensionless, fluid_drag_lb: M L T^-2, pipe_safe_pull_lb: M L T^-2 } out: { pullback_lb: M L T^-2, utilization: dimensionless, capstan_utilization: dimensionless, governing_utilization: dimensionless, capstan_factor: dimensionless }
+// dims: in { eff_weight_plf: M T^-2, length_ft: L, friction_coeff: dimensionless, bend_factor: dimensionless, fluid_drag_lb: M L T^-2, pipe_safe_pull_lb: M L T^-2 } out: { pullback_lb: M L T^-2, utilization: dimensionless, capstan_utilization: dimensionless, governing_utilization: dimensionless, capstan_factor: dimensionless, capstan_pullback_lb: M L T^-2, governing_limit_lb: M L T^-2, governing_pullback_lb: M L T^-2, straight_drag_lb: M L T^-2 }
 export function computeHddPullback({ eff_weight_plf = 5, length_ft = 800, friction_coeff = 0.3, bend_factor = 1.5, fluid_drag_lb = 0, pipe_safe_pull_lb = 0, total_bend_deg = 0, rig_rated_pull_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(eff_weight_plf > 0)) return { error: "Effective pipe weight must be positive (lb/ft)." };

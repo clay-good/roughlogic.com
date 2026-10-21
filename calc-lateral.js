@@ -92,7 +92,7 @@ export const LATERAL_RENDERERS = {};
 
 // ===================== spec-v272: flexible wood diaphragm unit shear and chord force =====================
 
-// dims: in { w_plf: M T^-2, l_ft: L, b_ft: L } out: { v_end_lb: M L T^-2, v_plf: M T^-2, m_ftlb: M L^2 T^-2, chord_kip: M L T^-2 }
+// dims: in { w_plf: M T^-2, l_ft: L, b_ft: L } out: { v_end_lb: M L T^-2, v_plf: M T^-2, m_ftlb: M L^2 T^-2, chord_kip: M L T^-2, chord_lb: M L T^-2 }
 export function computeDiaphragmShear({ w_plf = 0, l_ft = 0, b_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (w_plf < 0) return { error: "Lateral load w cannot be negative (plf)." };

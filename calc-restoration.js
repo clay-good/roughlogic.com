@@ -1426,7 +1426,7 @@ RESTORATION_RENDERERS["grains-removed"] = renderGrainsRemoved;
 // load_gal = area * load_factor(class); lb = gal * 8.345; first-24h pints =
 // load_gal * 8 * fraction; suggested AHAM pints = target / derating.
 const WATER_CLASS_LOAD_GAL_FT2 = { 1: 0.02, 2: 0.04, 3: 0.08, 4: 0.1 };
-// dims: in { area_ft2: L^2, water_class: dimensionless, load_factor: dimensionless, first24_fraction: dimensionless, derating: dimensionless } out: { load_gal: L^3, aham_pints: dimensionless, first24_pints: L^3, load_factor_used: dimensionless }
+// dims: in { area_ft2: L^2, water_class: dimensionless, load_factor: dimensionless, first24_fraction: dimensionless, derating: dimensionless } out: { load_gal: L^3, aham_pints: dimensionless, first24_pints: L^3, load_factor_used: dimensionless, load_lb: M }
 export function computeEvaporationLoad({ area_ft2 = 0, water_class = 3, load_factor = 0, first24_fraction = 0.4, derating = 0.5 } = {}) {
   const area = Number(area_ft2) || 0;
   const cls = Math.round(Number(water_class) || 0);
@@ -3176,7 +3176,7 @@ RESTORATION_RENDERERS["water-extraction-rate"] = _simpleRenderer({
 });
 
 // ===================== spec-v1446: Category 3 disposal volume and routing =====================
-// dims: in { soft_area_sqft: L^2, soft_thickness_in: L, board_area_sqft: L^2, board_thickness_in: L, bulking_factor: dimensionless, bag_capacity_gal: L^3, container_cy: L^3, extracted_gal: L^3 } out: { in_place_cf: L^3, loose_cf: L^3, bag_count: dimensionless, container_utilization_pct: dimensionless, bag_cf: L^3, board_cf: L^3, container_cf: L^3, soft_cf: L^3 }
+// dims: in { soft_area_sqft: L^2, soft_thickness_in: L, board_area_sqft: L^2, board_thickness_in: L, bulking_factor: dimensionless, bag_capacity_gal: L^3, container_cy: L^3, extracted_gal: L^3 } out: { in_place_cf: L^3, loose_cf: L^3, bag_count: dimensionless, container_utilization_pct: dimensionless, bag_cf: L^3, board_cf: L^3, container_cf: L^3, soft_cf: L^3, liquid_weight_lb: M }
 export function computeSewageLossDisposal({ soft_area_sqft = 0, soft_thickness_in = 0, board_area_sqft = 0, board_thickness_in = 0, bulking_factor = 3, bag_capacity_gal = 33, container_cy = 10, extracted_gal = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(soft_area_sqft >= 0 && board_area_sqft >= 0)) return { error: "Removed areas cannot be negative." };

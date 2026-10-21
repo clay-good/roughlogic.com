@@ -730,7 +730,7 @@ PROCESS_RENDERERS["thermoplastic-temperature-derate"] = _simpleRenderer({
 // =====================================================================
 // spec-v1713: casting pour weight, gating yield, and the melt energy it costs.
 // =====================================================================
-// dims: in { casting_weight_lb: M, gating_weight_lb: M, castings_per_mould: dimensionless, melt_energy_btu_lb: L^2 T^-2, target_yield_pct: dimensionless, annual_castings: dimensionless } out: { poured_weight_lb: M, yield_pct: dimensionless, btu_per_saleable_lb: L^2 T^-2, target_poured_lb: M, target_btu_per_lb: L^2 T^-2, annual_btu_saved: L^2 M T^-2, energy_penalty_pct: dimensionless, poured_btu: M L^2 T^-2 }
+// dims: in { casting_weight_lb: M, gating_weight_lb: M, castings_per_mould: dimensionless, melt_energy_btu_lb: L^2 T^-2, target_yield_pct: dimensionless, annual_castings: dimensionless } out: { poured_weight_lb: M, yield_pct: dimensionless, btu_per_saleable_lb: L^2 T^-2, target_poured_lb: M, target_btu_per_lb: L^2 T^-2, annual_btu_saved: L^2 M T^-2, energy_penalty_pct: dimensionless, poured_btu: M L^2 T^-2, saleable_lb: M, saving_btu_per_lb: L^2 T^-2 }
 export function computeCastingPourYield({
   casting_weight_lb = 0, gating_weight_lb = 0, castings_per_mould = 1,
   melt_energy_btu_lb = 0, target_yield_pct = 0, annual_castings = 0,

@@ -1081,7 +1081,7 @@ const _CA_PSI_PER_MPA = 1e6 / 6894.757293168;
 const _CA_MW_RATIO = 18.015268 / 28.966;
 const _caSatPsia = (temp_f) => IF97.saturationPressureMpa((temp_f + 459.67) / 1.8) * _CA_PSI_PER_MPA;
 const _caSaturatedW = (temp_f, pressure_psia) => { const pw = _caSatPsia(temp_f); return pw < pressure_psia ? _CA_MW_RATIO * pw / (pressure_psia - pw) : Number.POSITIVE_INFINITY; };
-// dims: in { flow_scfm: L^3 T^-1, inlet_temp_f: T, inlet_rh_pct: dimensionless, atmosphere_psia: M L^-1 T^-2, line_pressure_psig: M L^-1 T^-2, line_temp_f: T, dryer_dew_point_f: T } out: { intake_water_lb_hr: M T^-1, intake_humidity_ratio: dimensionless, line_humidity_ratio: dimensionless, condensed_lb_hr: M T^-1, condensed_gal_day: L^3 T^-1, dryer_removed_lb_hr: M T^-1, dryer_removed_gal_day: L^3 T^-1, remaining_vapor_lb_hr: M T^-1, total_liquid_gal_day: L^3 T^-1, atmospheric_dew_point_f: T }
+// dims: in { flow_scfm: L^3 T^-1, inlet_temp_f: T, inlet_rh_pct: dimensionless, atmosphere_psia: M L^-1 T^-2, line_pressure_psig: M L^-1 T^-2, line_temp_f: T, dryer_dew_point_f: T } out: { intake_water_lb_hr: M T^-1, intake_humidity_ratio: dimensionless, line_humidity_ratio: dimensionless, condensed_lb_hr: M T^-1, condensed_gal_day: L^3 T^-1, dryer_removed_lb_hr: M T^-1, dryer_removed_gal_day: L^3 T^-1, remaining_vapor_lb_hr: M T^-1, total_liquid_gal_day: L^3 T^-1, atmospheric_dew_point_f: T, dry_air_lb_hr: M T^-1 }
 export function computeCompressedAirCondensate({ flow_scfm = 0, inlet_temp_f = 70, inlet_rh_pct = 50, atmosphere_psia = 14.696, line_pressure_psig = 100, line_temp_f = 100, dryer_dew_point_f = 38 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // The page passes a blank box as null; 0 F is a real reading, so a blank cannot stand in for it.

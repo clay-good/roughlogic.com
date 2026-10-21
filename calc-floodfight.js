@@ -451,7 +451,7 @@ FLOODFIGHT_RENDERERS["basement-flood-pumpdown"] = _simpleRenderer({
 
 // ===================== spec-v1910: existing roof snow and ice weight against design load =====================
 
-// dims: in { layer1_depth_in: L, layer1_type: dimensionless, layer2_depth_in: L, layer2_type: dimensionless, layer3_depth_in: L, layer3_type: dimensionless, entered_weight_pcf: M L^-2 T^-2, ground_snow_psf: M L^-1 T^-2, override_range: dimensionless, design_snow_psf: M L^-1 T^-2 } out: { layer1_psf: M L^-1 T^-2, layer2_psf: M L^-1 T^-2, layer3_psf: M L^-1 T^-2, total_psf: M L^-1 T^-2, design_ratio: dimensionless, design_snow_psf: M L^-1 T^-2 }
+// dims: in { layer1_depth_in: L, layer1_type: dimensionless, layer2_depth_in: L, layer2_type: dimensionless, layer3_depth_in: L, layer3_type: dimensionless, entered_weight_pcf: M L^-2 T^-2, ground_snow_psf: M L^-1 T^-2, override_range: dimensionless, design_snow_psf: M L^-1 T^-2 } out: { layer1_psf: M L^-1 T^-2, layer2_psf: M L^-1 T^-2, layer3_psf: M L^-1 T^-2, total_psf: M L^-1 T^-2, design_ratio: dimensionless, design_snow_psf: M L^-1 T^-2, asce7_weight_pcf: M L^-2 T^-2 }
 export function computeRoofSnowIceWeight({ layer1_depth_in = 0, layer1_type = "wet", layer2_depth_in = 0, layer2_type = "ice", layer3_depth_in = 0, layer3_type = "dry", entered_weight_pcf = 15, ground_snow_psf = 0, override_range = "no", design_snow_psf = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(layer1_depth_in > 0) && !(layer2_depth_in > 0) && !(layer3_depth_in > 0)) return { error: "Enter at least one layer depth; with none measured there is nothing to compare with the design load." };

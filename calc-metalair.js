@@ -101,7 +101,7 @@ const _FEXX = { E60: 60, E70: 70, E80: 80, E90: 90, E100: 100, E110: 110 };
 // ---------------------------------------------------------------------
 // 30.1 Groove weld strength (groove-weld-strength) - AWS D1.1 / AISC 360 §J2
 // ---------------------------------------------------------------------
-// dims: in { weld_type: dimensionless, effective_throat_in: L, base_thickness_in: L, length_in: L, applied_load_lb: dimensionless, electrode: dimensionless, base_fy_ksi: M L^-1 T^-2, base_fu_ksi: M L^-1 T^-2 } out: { throat_in: L, capacity_lb: dimensionless, utilization: dimensionless, F_Exx_ksi: M L^-1 T^-2, length_in: L, stress_ksi: M L^-1 T^-2 }
+// dims: in { weld_type: dimensionless, effective_throat_in: L, base_thickness_in: L, length_in: L, applied_load_lb: M L T^-2, electrode: dimensionless, base_fy_ksi: M L^-1 T^-2, base_fu_ksi: M L^-1 T^-2 } out: { throat_in: L, capacity_lb: M L T^-2, utilization: dimensionless, F_Exx_ksi: M L^-1 T^-2, length_in: L, stress_ksi: M L^-1 T^-2, strength_per_in_lb: M T^-2 }
 export function computeGrooveWeldStrength({ weld_type = "PJP", effective_throat_in = 0, base_thickness_in = 0, length_in = 0, electrode = "E70", method = "ASD", applied_load_lb = 0, base_fy_ksi = 36, base_fu_ksi = 58 } = {}) {
   const _g = _finiteGuard({ effective_throat_in, base_thickness_in, length_in, applied_load_lb, base_fy_ksi, base_fu_ksi }); if (_g) return _g;
   // An electrode not in the table used to be run as E70 (E60 came out 17% strong).
@@ -188,7 +188,7 @@ METALAIR_RENDERERS["groove-weld-strength"] = _renderGrooveWeldStrength;
 // length; the inverse recovers the weld length an applied load needs at a given effective throat, so a detailer sizes the
 // weld run. From capacity = stress_ksi x 1000 x throat x L (stress_ksi = 0.30 FEXX ASD or 0.75 x 0.60 FEXX LRFD),
 // L = load / (stress_ksi x 1000 x throat). CJP uses the thinner-part thickness as the throat; PJP uses the WPS effective throat.
-// dims: in { applied_load_lb: dimensionless, weld_type: dimensionless, effective_throat_in: L, base_thickness_in: L, electrode: dimensionless, method: dimensionless, base_fy_ksi: M L^-1 T^-2, base_fu_ksi: M L^-1 T^-2 } out: { required_length_in: L, stress_ksi: M L^-1 T^-2, throat_in: L, F_Exx_ksi: M L^-1 T^-2 }
+// dims: in { applied_load_lb: M L T^-2, weld_type: dimensionless, effective_throat_in: L, base_thickness_in: L, electrode: dimensionless, method: dimensionless, base_fy_ksi: M L^-1 T^-2, base_fu_ksi: M L^-1 T^-2 } out: { required_length_in: L, stress_ksi: M L^-1 T^-2, throat_in: L, F_Exx_ksi: M L^-1 T^-2, strength_per_in_lb: M T^-2 }
 export function computeGrooveWeldLengthForLoad({ applied_load_lb = 0, weld_type = "PJP", effective_throat_in = 0, base_thickness_in = 0, electrode = "E70", method = "ASD", base_fy_ksi = 36, base_fu_ksi = 58 } = {}) {
   const _g = _finiteGuard({ applied_load_lb, effective_throat_in, base_thickness_in, base_fy_ksi, base_fu_ksi }); if (_g) return _g;
   // An electrode not in the table used to be run as E70 (E60 came out 17% strong).
@@ -264,7 +264,7 @@ METALAIR_RENDERERS["groove-weld-length-for-load"] = _renderGrooveWeldLengthForLo
 // ---------------------------------------------------------------------
 // 30.2 Total external static pressure (duct-static-pressure-total) - Manual D
 // ---------------------------------------------------------------------
-// dims: in { components: dimensionless, rated_esp_in_wc: M L^-1 T^-2 } out: { total_esp_in_wc: dimensionless, remaining_in_wc: dimensionless }
+// dims: in { components: dimensionless, rated_esp_in_wc: M L^-1 T^-2 } out: { total_esp_in_wc: M L^-1 T^-2, remaining_in_wc: M L^-1 T^-2, rated_esp_in_wc: M L^-1 T^-2 }
 export function computeDuctStaticTotal({ components = [], rated_esp_in_wc = 0 } = {}) {
   const _g = _finiteGuard({ rated_esp_in_wc }); if (_g) return _g;
   if (!Array.isArray(components) || components.length === 0) return { error: "Enter at least one component pressure drop (in. w.c.)." };

@@ -84,7 +84,7 @@ TREATMENT_RENDERERS["langelier-index"] = renderLangelierIndex;
 // --- v20 M.3: Chemical metering-pump setting (`chemical-feed-pump`) ---
 // pure lb/day = MGD*dose*8.34; solution lb/day = pure/(strength/100);
 // GPD = solution_lb/day/(8.34*SG); mL/min = GPD*3785.41/1440; setting% = GPD/pump_max*100.
-// dims: in { flow_mgd: L^3*T^-1, dose_mgl: M L^-3, strength_pct: dimensionless, sg: dimensionless, pump_max_gpd: L^3*T^-1 } out: { solution_gpd: L^3*T^-1, setting_pct: dimensionless, pure_lb_day: M T^-1 }
+// dims: in { flow_mgd: L^3*T^-1, dose_mgl: M L^-3, strength_pct: dimensionless, sg: dimensionless, pump_max_gpd: L^3*T^-1 } out: { solution_gpd: L^3*T^-1, setting_pct: dimensionless, pure_lb_day: M T^-1, solution_lb_day: M T^-1 }
 export function computeChemicalFeedPump({ flow_mgd = 0, dose_mgl = 0, strength_pct = 100, sg = 1, pump_max_gpd = 0 } = {}) {
   const mgd = Number(flow_mgd) || 0;
   const dose = Number(dose_mgl) || 0;
@@ -228,7 +228,7 @@ const renderPoolAlkalinityAdjust = _rPool({
 });
 TREATMENT_RENDERERS["pool-alkalinity-adjust"] = renderPoolAlkalinityAdjust;
 
-// dims: in { gallons: L^3, current_cya_ppm: dimensionless, target_cya_ppm: dimensionless } out: { delta_ppm: dimensionless, cya_lb: dimensionless, drain_gallons: L^3 }
+// dims: in { gallons: L^3, current_cya_ppm: dimensionless, target_cya_ppm: dimensionless } out: { delta_ppm: dimensionless, cya_lb: M, drain_gallons: L^3, cya_oz: M }
 export function computePoolCyaDose({ gallons = 0, current_cya_ppm = 0, target_cya_ppm = 0 } = {}) {
   const _g = _finiteGuardPool(arguments[0]); if (_g) return _g;
   if (current_cya_ppm < 0 || target_cya_ppm < 0) return { error: "Cyanuric acid readings must be non-negative." };
@@ -1110,7 +1110,7 @@ TREATMENT_RENDERERS["flocculator-paddle-power"] = renderFlocculatorPaddlePower;
 // --- spec-v576 M: Gas chlorine cylinder withdrawal rate ---
 // per_container = base(type) x temp-derate. containers = ceil(feed / per). Frost warn if cold or near ceiling.
 const _CL_WITHDRAWAL_BASE = { cylinder: 40, ton: 400 }; // lb/day at ~70 F
-// dims: in { feed_rate_lb_day: M T^-1, container_type: dimensionless, room_temp_f: T } out: { per_container_lb_day: M T^-1, containers: dimensionless, derate: dimensionless }
+// dims: in { feed_rate_lb_day: M T^-1, container_type: dimensionless, room_temp_f: T } out: { per_container_lb_day: M T^-1, containers: dimensionless, derate: dimensionless, per_container_draw: M T^-1 }
 export function computeChlorineCylinderWithdrawal({ feed_rate_lb_day = 0, container_type = "cylinder", room_temp_f = 70 } = {}) {
   const feed = Number(feed_rate_lb_day) || 0;
   // Until 2026-10-14 a blank room temperature (null) ran as 0 F and tripled the container count.

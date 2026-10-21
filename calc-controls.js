@@ -368,7 +368,7 @@ CONTROLS_RENDERERS["mstp-segment-loading"] = _simpleRenderer({
 
 // ===================== spec-v1822: damper actuator torque and sizing =====================
 
-// dims: in { damper_width_in: L, damper_height_in: L, torque_factor_in_lb_ft2: M T^-2, sealed_torque_factor_in_lb_ft2: M T^-2, safety_factor: dimensionless } out: { damper_area_ft2: L^2, required_torque_in_lb: M L^2 T^-2, design_torque_in_lb: M L^2 T^-2, selected_actuator_in_lb: M L^2 T^-2, actuator_count: dimensionless, sealed_actuator_count: dimensionless }
+// dims: in { damper_width_in: L, damper_height_in: L, torque_factor_in_lb_ft2: M T^-2, sealed_torque_factor_in_lb_ft2: M T^-2, safety_factor: dimensionless } out: { damper_area_ft2: L^2, required_torque_in_lb: M L^2 T^-2, design_torque_in_lb: M L^2 T^-2, selected_actuator_in_lb: M L^2 T^-2, actuator_count: dimensionless, sealed_actuator_count: dimensionless, largest_actuator_in_lb: M L^2 T^-2, sealed_design_torque_in_lb: M L^2 T^-2, sealed_required_torque_in_lb: M L^2 T^-2, sealed_selected_actuator_in_lb: M L^2 T^-2 }
 export function computeDamperActuatorTorque({ damper_width_in = 0, damper_height_in = 0, torque_factor_in_lb_ft2 = 5, sealed_torque_factor_in_lb_ft2 = 9, safety_factor = 1.5 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(damper_width_in > 0)) return { error: "Damper width must be positive (in)." };

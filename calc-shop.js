@@ -727,7 +727,7 @@ SHOP_RENDERERS["thread-pitch-dia-from-wires"] = _v721renderThreadPitchDiaFromWir
 // constant is the published mild-steel value); total = tons/ft x L.
 // =====================================================================
 
-// dims: in { thickness_in: L, bend_length_ft: L, die_opening_in: L, uts_ksi: M L^-1 T^-2 } out: { tons_per_ft: dimensionless, total_tons: dimensionless, min_flange_in: L, recommended_die_in: L }
+// dims: in { thickness_in: L, bend_length_ft: L, die_opening_in: L, uts_ksi: M L^-1 T^-2 } out: { tons_per_ft: dimensionless, total_tons: M L T^-2, min_flange_in: L, recommended_die_in: L }
 export function computePressBrakeTonnage({ thickness_in = 0, bend_length_ft = 0, die_opening_in = 0, uts_ksi = 60 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const T = Number(thickness_in) || 0, L = Number(bend_length_ft) || 0;
@@ -823,7 +823,7 @@ SHOP_RENDERERS["press-brake-max-thickness"] = _v724renderPressBrakeMaxThickness;
 // First-principles shear: F = perimeter x T x shear strength.
 // =====================================================================
 
-// dims: in { shape: dimensionless, diameter_in: L, side_a_in: L, side_b_in: L, perimeter_in: L, thickness_in: L, shear_strength_psi: M L^-1 T^-2 } out: { perimeter_in: L, force_lb: dimensionless, force_tons: dimensionless }
+// dims: in { shape: dimensionless, diameter_in: L, side_a_in: L, side_b_in: L, perimeter_in: L, thickness_in: L, shear_strength_psi: M L^-1 T^-2 } out: { perimeter_in: L, force_lb: M L T^-2, force_tons: M L T^-2, stripping_lb: M L T^-2 }
 export function computePunchForce({ shape = "round", diameter_in = 0, side_a_in = 0, side_b_in = 0, perimeter_in = 0, thickness_in = 0, shear_strength_psi = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!["round", "rectangular", "perimeter"].includes(String(shape))) return { error: "Shape must be round, rectangular or perimeter." };
@@ -2971,7 +2971,7 @@ SHOP_RENDERERS["pneumatic-cylinder-scfm"] = _simpleRenderer({
 });
 
 // ===================== spec-v1436: bucket elevator capacity and power =====================
-// dims: in { bucket_volume_ft3: L^3, spacing_in: L, speed_fpm: L T^-1, fill_factor: dimensionless, bulk_density_pcf: M L^-3, lift_ft: L, drive_efficiency: dimensionless, friction_allowance: dimensionless } out: { capacity_ft3_hr: L^3 T^-1, lifting_hp: M L^2 T^-3, motor_hp: M L^2 T^-3, lift_share_pct: dimensionless, buckets_per_ft: L^-1, bushels_per_hr: L^3 T^-1, tons_per_hr: M T^-1 }
+// dims: in { bucket_volume_ft3: L^3, spacing_in: L, speed_fpm: L T^-1, fill_factor: dimensionless, bulk_density_pcf: M L^-3, lift_ft: L, drive_efficiency: dimensionless, friction_allowance: dimensionless } out: { capacity_ft3_hr: L^3 T^-1, lifting_hp: M L^2 T^-3, motor_hp: M L^2 T^-3, lift_share_pct: dimensionless, buckets_per_ft: L^-1, bushels_per_hr: L^3 T^-1, tons_per_hr: M T^-1, mass_lb_hr: M T^-1 }
 export function computeBucketElevatorCapacity({ bucket_volume_ft3 = 0, spacing_in = 0, speed_fpm = 0, fill_factor = 0.75, bulk_density_pcf = 0, lift_ft = 0, drive_efficiency = 0.75, friction_allowance = 1.2 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(bucket_volume_ft3 > 0)) return { error: "Bucket volume must be positive." };
@@ -3084,7 +3084,7 @@ SHOP_RENDERERS["cyclone-separator-sizing"] = _simpleRenderer({
 });
 
 // ===================== spec-v1438: gas spring force and mounting geometry =====================
-// dims: in { lid_weight_lb: M L T^-2, cg_distance_in: L, opening_angle_deg: dimensionless, moment_arm_in: L, struts: dimensionless, second_angle_deg: dimensionless, second_moment_arm_in: L } out: { lid_moment_in_lb: M L^2 T^-2, force_per_strut_lb: M L T^-2, horizontal_cg_in: L, second_horizontal_in: L, total_force_lb: M L T^-2 }
+// dims: in { lid_weight_lb: M L T^-2, cg_distance_in: L, opening_angle_deg: dimensionless, moment_arm_in: L, struts: dimensionless, second_angle_deg: dimensionless, second_moment_arm_in: L } out: { lid_moment_in_lb: M L^2 T^-2, force_per_strut_lb: M L T^-2, horizontal_cg_in: L, second_horizontal_in: L, total_force_lb: M L T^-2, second_moment_in_lb: M L^2 T^-2, second_force_per_strut_lb: M L T^-2 }
 export function computeGasStrutForce({ lid_weight_lb = 0, cg_distance_in = 0, opening_angle_deg = 0, moment_arm_in = 0, struts = 2, second_angle_deg = 0, second_moment_arm_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(lid_weight_lb > 0)) return { error: "Lid weight must be positive." };
@@ -3249,7 +3249,7 @@ SHOP_RENDERERS["spray-booth-airflow"] = _simpleRenderer({
 });
 
 // ===================== spec-v1440: powder coating coverage and reclaim =====================
-// dims: in { specific_gravity: dimensionless, film_thickness_mils: L, part_area_sqft: L^2, transfer_efficiency: dimensionless, reclaim_efficiency: dimensionless, price_per_lb: dimensionless } out: { theoretical_coverage_sqft_lb: L^2 M^-1, utilization: dimensionless, saving_pct: dimensionless, cost_saving: dimensionless, reclaim_cost: dimensionless, waste_cost: dimensionless }
+// dims: in { specific_gravity: dimensionless, film_thickness_mils: L, part_area_sqft: L^2, transfer_efficiency: dimensionless, reclaim_efficiency: dimensionless, price_per_lb: dimensionless } out: { theoretical_coverage_sqft_lb: L^2 M^-1, utilization: dimensionless, saving_pct: dimensionless, cost_saving: dimensionless, reclaim_cost: dimensionless, waste_cost: dimensionless, waste_coverage: L^2 M^-1, waste_powder_lb: M, reclaim_coverage: L^2 M^-1, reclaim_powder_lb: M }
 export function computePowderCoatingCoverage({ specific_gravity = 0, film_thickness_mils = 0, part_area_sqft = 0, transfer_efficiency = 0.6, reclaim_efficiency = 0, price_per_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(specific_gravity > 0)) return { error: "Powder specific gravity must be positive." };
@@ -3460,7 +3460,7 @@ SHOP_RENDERERS["quench-severity"] = _simpleRenderer({
 });
 
 // ===================== spec-v1444: belt conveyor tension and drive power =====================
-// dims: in { tons_per_hour: M T^-1, belt_speed_fpm: L T^-1, length_ft: L, lift_ft: L, belt_weight_plf: M T^-2, idler_weight_plf: M T^-2, friction_factor: dimensionless, drive_efficiency: dimensionless } out: { effective_tension_lb: M L T^-2, belt_hp: M L^2 T^-3, motor_hp: M L^2 T^-3, lift_share_pct: dimensionless }
+// dims: in { tons_per_hour: M T^-1, belt_speed_fpm: L T^-1, length_ft: L, lift_ft: L, belt_weight_plf: M T^-2, idler_weight_plf: M T^-2, friction_factor: dimensionless, drive_efficiency: dimensionless } out: { effective_tension_lb: M L T^-2, belt_hp: M L^2 T^-3, motor_hp: M L^2 T^-3, lift_share_pct: dimensionless, material_load_plf: M T^-2, friction_term_lb: M L T^-2, lift_term_lb: M L T^-2 }
 export function computeBeltConveyorTensionPower({ tons_per_hour = 0, belt_speed_fpm = 0, length_ft = 0, lift_ft = 0, belt_weight_plf = 0, idler_weight_plf = 0, friction_factor = 0.022, drive_efficiency = 0.85 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (Number(lift_ft) > Number(length_ft)) return { error: "The lift cannot exceed the conveyor length." };

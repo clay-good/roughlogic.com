@@ -89,7 +89,7 @@ const _CUFT_PER_CY = 27;
 
 // ===================== spec-v1845: deicing salt application rate =====================
 
-// dims: in { rate_lb_per_lane_mile: M L^-2, route_lane_miles: L, lot_area_ft2: L^2, hopper_capacity_tons: M, alt_rate_lb_per_lane_mile: M L^-2 } out: { material_lb_per_pass: M, passes_per_load: dimensionless, lot_lane_miles: L, lot_material_lb: M, rate_ratio: dimensionless, alt_passes_per_load: dimensionless, alt_reloads_per_pass: dimensionless, lot_acres: L^2, material_tons_per_pass: M, reloads_per_pass: dimensionless }
+// dims: in { rate_lb_per_lane_mile: M L^-1, route_lane_miles: L, lot_area_ft2: L^2, hopper_capacity_tons: M, alt_rate_lb_per_lane_mile: M L^-1 } out: { material_lb_per_pass: M, passes_per_load: dimensionless, lot_lane_miles: L, lot_material_lb: M, rate_ratio: dimensionless, alt_passes_per_load: dimensionless, alt_reloads_per_pass: dimensionless, lot_acres: L^2, material_tons_per_pass: M, reloads_per_pass: dimensionless, alt_material_lb_per_pass: M, hopper_lb: M }
 export function computeSaltApplicationRate({ rate_lb_per_lane_mile = 0, route_lane_miles = 0, lot_area_ft2 = 0, hopper_capacity_tons = 0, alt_rate_lb_per_lane_mile = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(rate_lb_per_lane_mile > 0)) return { error: "Application rate must be positive (lb per lane-mile)." };
@@ -167,7 +167,7 @@ function _naclFreezePointF(pct) {
   return t[t.length - 1][1];
 }
 
-// dims: in { batch_gal: L^3, target_pct: dimensionless, brine_density_lb_gal: M L^-3, saturation_pct: dimensionless, alt_pct: dimensionless } out: { batch_weight_lb: M, salt_lb: M, water_lb: M, water_gal: L^3, salt_per_1000gal_lb: M, alt_freeze_point_f: T, freeze_point_f: T, freeze_point_given_up_f: T, salometer: dimensionless, salt_tons: M }
+// dims: in { batch_gal: L^3, target_pct: dimensionless, brine_density_lb_gal: M L^-3, saturation_pct: dimensionless, alt_pct: dimensionless } out: { batch_weight_lb: M, salt_lb: M, water_lb: M, water_gal: L^3, salt_per_1000gal_lb: M, alt_freeze_point_f: T, freeze_point_f: T, freeze_point_given_up_f: T, salometer: dimensionless, salt_tons: M, alt_salt_lb: M, salt_difference_lb: M }
 export function computeBrineBatchSalinity({ batch_gal = 0, target_pct = 23.3, brine_density_lb_gal = 9.8, saturation_pct = 26.4, alt_pct = 20 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(batch_gal > 0)) return { error: "Batch volume must be positive (gal)." };
@@ -432,7 +432,7 @@ WINTEROPS_RENDERERS["ice-melt-working-temperature"] = _simpleRenderer({
 
 // ===================== spec-v1850: walkway clearing crew productivity =====================
 
-// dims: in { total_area_ft2: L^2, hand_area_ft2: L^2, blower_rate_ft2_hr: L^2 T^-1, hand_rate_ft2_hr_person: L^2 T^-1, crew_size: dimensionless, service_window_hr: T, blower_depth_factor: dimensionless, hand_depth_factor: dimensionless, icemelt_lb_per_1000ft2: M L^-2, applications: dimensionless } out: { blower_hr: T, hand_hr: T, crew_hr: T, crews_required: dimensionless, icemelt_event_lb: M, crew_size: dimensionless, open_area_ft2: L^2, applications: dimensionless, crew_min: T, slack_hr: T }
+// dims: in { total_area_ft2: L^2, hand_area_ft2: L^2, blower_rate_ft2_hr: L^2 T^-1, hand_rate_ft2_hr_person: L^2 T^-1, crew_size: dimensionless, service_window_hr: T, blower_depth_factor: dimensionless, hand_depth_factor: dimensionless, icemelt_lb_per_1000ft2: M L^-2, applications: dimensionless } out: { blower_hr: T, hand_hr: T, crew_hr: T, crews_required: dimensionless, icemelt_event_lb: M, crew_size: dimensionless, open_area_ft2: L^2, applications: dimensionless, crew_min: T, slack_hr: T, icemelt_per_application_lb: M }
 export function computeWalkwayClearingProductivity({ total_area_ft2 = 0, hand_area_ft2 = 0, blower_rate_ft2_hr = 0, hand_rate_ft2_hr_person = 0, crew_size = 2, service_window_hr = 2, blower_depth_factor = 1, hand_depth_factor = 1, icemelt_lb_per_1000ft2 = 4, applications = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(total_area_ft2 > 0)) return { error: "Total walk area must be positive (sq ft)." };

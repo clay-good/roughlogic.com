@@ -250,7 +250,7 @@ HVACSYSTEMS_RENDERERS["chiller-tons"] = _v16h_renderChillerTons;
 // balance as the chiller tile. C = GPM * factor.
 export const HX_FLUID_FACTORS = CHILLER_FLUID_FACTORS;
 
-// dims: in { config: dimensionless, th_in_F: T, th_out_F: T, tc_in_F: T, tc_out_F: T, hot_gpm: L^3 T^-1, cold_gpm: L^3 T^-1, hot_fluid: dimensionless, cold_fluid: dimensionless } out: { lmtd_F: T, q_btu_hr: M L^2 T^-3, ua_btu_hr_F: M L^2 T^-3, effectiveness: dimensionless, ntu: dimensionless, c_ratio: dimensionless, dT1: T, dT2: T }
+// dims: in { config: dimensionless, th_in_F: T, th_out_F: T, tc_in_F: T, tc_out_F: T, hot_gpm: L^3 T^-1, cold_gpm: L^3 T^-1, hot_fluid: dimensionless, cold_fluid: dimensionless } out: { lmtd_F: T, q_btu_hr: M L^2 T^-3, ua_btu_hr_F: M L^2 T^-3, effectiveness: dimensionless, ntu: dimensionless, c_ratio: dimensionless, dT1: T, dT2: T, c_cold: M L^2 T^-4, c_hot: M L^2 T^-4 }
 export function computeHxLmtdNtu({
   config = "counterflow",
   th_in_F = 0,
@@ -2110,7 +2110,7 @@ HVACSYSTEMS_RENDERERS["coil-capacity-verification"] = _simpleRenderer({
 // across the remaining valves rises toward shutoff head -- so the worst case is
 // MINIMUM system flow, the condition a designer computing at design never looks
 // at, and the condition in which the valve is most likely to be commanded shut.
-// dims: in { seat_area_in2: L^2, design_differential_psi: M L^-1 T^-2, minimum_flow_differential_psi: M L^-1 T^-2, actuator_closeoff_psi: M L^-1 T^-2, spring_closeoff_psi: M L^-1 T^-2 } out: { design_seat_force_lb: M L T^-2, worst_case_seat_force_lb: M L T^-2, actuator_force_lb: M L T^-2, force_shortfall_lb: M L T^-2, differential_rise_psi: M L^-1 T^-2, rise_ratio: dimensionless }
+// dims: in { seat_area_in2: L^2, design_differential_psi: M L^-1 T^-2, minimum_flow_differential_psi: M L^-1 T^-2, actuator_closeoff_psi: M L^-1 T^-2, spring_closeoff_psi: M L^-1 T^-2 } out: { design_seat_force_lb: M L T^-2, worst_case_seat_force_lb: M L T^-2, actuator_force_lb: M L T^-2, force_shortfall_lb: M L T^-2, differential_rise_psi: M L^-1 T^-2, rise_ratio: dimensionless, spring_force_lb: M L T^-2 }
 export function computeValveActuatorCloseOff({
   seat_area_in2 = 0, design_differential_psi = 0, minimum_flow_differential_psi = 0,
   actuator_closeoff_psi = 0, spring_closeoff_psi = 0, is_spring_return = "no",
@@ -2715,7 +2715,7 @@ HVACSYSTEMS_RENDERERS["refractory-shell-temperature"] = _simpleRenderer({
 // from the ideal gas law at the entered vapour temperature.
 const _CRYO_R_PSIA_FT3_PER_LBMOL_R = 10.7316;
 const _CRYO_GAL_PER_FT3 = 1728 / 231;
-// dims: in { tank_volume_gal: L^3, ner_pct_per_day: T^-1, liquid_density_lb_gal: M L^-3, latent_heat_btu_lb: L^2 T^-2, vapour_space_pct: dimensionless, current_pressure_psig: M L^-1 T^-2, relief_pressure_psig: M L^-1 T^-2, molecular_weight: dimensionless, vapour_temp_r: T, alt_vapour_space_pct: dimensionless, withdrawal_gal_day: L^3 } out: { boil_off_gal_day: L^3, boil_off_lb_day: M, heat_leak_btu_hr: M L^2 T^-3, vapour_space_ft3: L^3, hold_time_hr: T, alt_hold_time_hr: T }
+// dims: in { tank_volume_gal: L^3, ner_pct_per_day: T^-1, liquid_density_lb_gal: M L^-3, latent_heat_btu_lb: L^2 T^-2, vapour_space_pct: dimensionless, current_pressure_psig: M L^-1 T^-2, relief_pressure_psig: M L^-1 T^-2, molecular_weight: dimensionless, vapour_temp_r: T, alt_vapour_space_pct: dimensionless, withdrawal_gal_day: L^3 } out: { boil_off_gal_day: L^3, boil_off_lb_day: M T^-1, heat_leak_btu_hr: M L^2 T^-3, vapour_space_ft3: L^3, hold_time_hr: T, alt_hold_time_hr: T, boil_off_lb_hr: M T^-1 }
 export function computeCryogenicBoiloff({
   tank_volume_gal = 0, ner_pct_per_day = 0, liquid_density_lb_gal = 0, latent_heat_btu_lb = 0,
   vapour_space_pct = 0, current_pressure_psig = 0, relief_pressure_psig = 0,
