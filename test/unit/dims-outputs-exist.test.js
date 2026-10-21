@@ -228,9 +228,9 @@ test("a <thing>_per_<time> key is declared with the time in its denominator", ()
 
 // Every number a tile compute returns on its worked examples now has a
 // declared dimension except these: a non-integer exponent (culvert flow
-// factor, Kf) or a name meaning another quantity elsewhere. 2026-10-20: ~4,300 undeclared -> 30. The count may only
+// factor, Kf) or a name meaning another quantity elsewhere. 2026-10-20: ~4,300 undeclared -> 29. The count may only
 // fall; a new tile declares every output it returns.
-const UNDECLARED_BUDGET = 30;
+const UNDECLARED_BUDGET = 29;
 test("undeclared returned outputs only fall", async () => {
   const { COMPUTE_MAP } = await import("../fixtures/compute-map.js");
   const { rows } = JSON.parse(readFileSync(resolve(ROOT, "test/fixtures/worked-examples.json"), "utf8"));

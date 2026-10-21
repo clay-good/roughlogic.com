@@ -420,7 +420,7 @@ ARBORIST_RENDERERS["reineke-sdi"] = _v564renderReinekeSdi;
 
 // --- spec-v619 L: Thinning target TPA from a target SDI ---
 // SDI_target = SDI_max x pct/100; TPA_target = SDI_target / (QMD/10)^1.605; cut = max(0, current - target); BA = TPA x 0.005454 x QMD^2.
-// dims: in { sdi_max: dimensionless, target_pct: dimensionless, qmd_in: L, current_tpa: dimensionless } out: { sdi_target: dimensionless, tpa_target: dimensionless, ba_target: dimensionless }
+// dims: in { sdi_max: dimensionless, target_pct: dimensionless, qmd_in: L, current_tpa: L^-2 } out: { sdi_target: dimensionless, tpa_target: L^-2, ba_target: dimensionless, cut_tpa: L^-2 }
 export function computeThinningTargetTpa({ sdi_max = 0, target_pct = 0, qmd_in = 0, current_tpa = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const smax = Number(sdi_max);

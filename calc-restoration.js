@@ -1426,7 +1426,7 @@ RESTORATION_RENDERERS["grains-removed"] = renderGrainsRemoved;
 // load_gal = area * load_factor(class); lb = gal * 8.345; first-24h pints =
 // load_gal * 8 * fraction; suggested AHAM pints = target / derating.
 const WATER_CLASS_LOAD_GAL_FT2 = { 1: 0.02, 2: 0.04, 3: 0.08, 4: 0.1 };
-// dims: in { area_ft2: L^2, water_class: dimensionless, load_factor: dimensionless, first24_fraction: dimensionless, derating: dimensionless } out: { load_gal: L^3, aham_pints: dimensionless, first24_pints: L^3, load_factor_used: dimensionless, load_lb: M }
+// dims: in { area_ft2: L^2, water_class: dimensionless, load_factor: dimensionless, first24_fraction: dimensionless, derating: dimensionless } out: { load_gal: L^3, aham_pints: L^3, first24_pints: L^3, load_factor_used: dimensionless, load_lb: M }
 export function computeEvaporationLoad({ area_ft2 = 0, water_class = 3, load_factor = 0, first24_fraction = 0.4, derating = 0.5 } = {}) {
   const area = Number(area_ft2) || 0;
   const cls = Math.round(Number(water_class) || 0);

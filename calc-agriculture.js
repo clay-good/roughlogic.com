@@ -1242,7 +1242,7 @@ export const grainBinExample = {
   inputs: { diameter_ft: 30, eave_height_ft: 20, peak_height_ft: 8, grain: "corn", packing_factor: 1.0 },
 };
 
-// dims: in { target_bushels: dimensionless, diameter_ft: L, peak_height_ft: L, packing_factor: dimensionless } out: { eave_height_ft: L, area_ft2: L^2, cone_bushels: L^3 }
+// dims: in { target_bushels: L^3, diameter_ft: L, peak_height_ft: L, packing_factor: dimensionless } out: { eave_height_ft: L, area_ft2: L^2, cone_bushels: L^3 }
 export function computeGrainBinHeightForCapacity({ target_bushels = 0, diameter_ft = 0, peak_height_ft = 0, packing_factor = 1.0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const target = Number(target_bushels) || 0;

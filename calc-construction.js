@@ -1717,7 +1717,7 @@ export const ACI_211_W_C = {
   sulfate: { 2500: 0.50, 3000: 0.45, 3500: 0.42, 4000: 0.40, 5000: 0.38, 6000: 0.34 },
 };
 
-// dims: in { strength_psi: M L^-1 T^-2, exposure: dimensionless, max_aggregate_in: L, slump_in: L } out: { wc_ratio: dimensionless, cement_bags_yd3: L^3, water_lb_yd3: M L^-3, cement_lb_yd3: M L^-3, coarse_lb_yd3: M L^-3, fine_lb_yd3: M L^-3 }
+// dims: in { strength_psi: M L^-1 T^-2, exposure: dimensionless, max_aggregate_in: L, slump_in: L } out: { wc_ratio: dimensionless, cement_bags_yd3: L^-3, water_lb_yd3: M L^-3, cement_lb_yd3: M L^-3, coarse_lb_yd3: M L^-3, fine_lb_yd3: M L^-3 }
 export function computeConcreteMixDesign({ strength_psi = 3000, exposure = "interior", max_aggregate_in = 1, slump_in = 4 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // Above the table the 6,000 psi mix used to be returned under the requested strength's name.
