@@ -194,6 +194,7 @@ test("no code line converts cubic feet to gallons with a truncated inline 7.48",
 // calc-motor's energy tiles -- and nowhere else.
 const INLINE_POWER_FLOW_ALLOWED = new Map([
   ["calc-electrical.js", "the premium-motor relation, input kW = HP x 0.746 x load / efficiency, as its citation prints it"],
+  ["calc-electricalanalysis.js", "the premium-motor relation (motor-efficiency-upgrade-savings), split out of calc-electrical.js; input kW = HP x 0.746 x load / efficiency, as its citation prints it"],
   ["calc-motor.js", "the motor energy tiles, whose formula and citation state 0.746 kW/HP"],
 ]);
 
@@ -255,6 +256,7 @@ const NEAR_MISS_ALLOWED = new Map(Object.entries({
   "calc-lab.js:47.867": "the atomic weight of titanium",
   "calc-telecom.js:1.468": "a fibre group index",
   "calc-electrical.js:0.746": "the motor convention its premium-motor formula and citation print",
+  "calc-electricalanalysis.js:0.746": "the motor convention the premium-motor tile's formula and citation print (split out of calc-electrical.js)",
   "calc-motor.js:0.746": "the motor convention its formulas and citations print",
   "calc-hvac.js:0.746": "the DOE compressed-air 0.746 kW/hp its batch comment names",
 }));

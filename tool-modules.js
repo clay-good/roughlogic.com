@@ -24,8 +24,7 @@ export const TOOL_MODULES = (() => {
   const map = {};
   const declare = (path, exportName, ids) => { for (const id of ids) map[id] = { path, exportName }; };
   declare("./calc-electrical.js", "ELECTRICAL_RENDERERS", [
-    "ohms-law", "wire-ampacity", "voltage-drop", "egc-parallel-raceways", "conduit-fill", "box-fill",
-    "awg-wire-geometry",
+    "ohms-law", "wire-ampacity", "voltage-drop", "conduit-fill", "box-fill",
     "breaker-sizing", "motor-fla", "transformer-sizing", "three-phase",
     "copper-resistance", "egc-sizing",
     // v2
@@ -57,14 +56,19 @@ export const TOOL_MODULES = (() => {
     "buck-boost-sizing", "wireway-fill", "rooftop-temp-adder", "working-space-110-26",
     // spec-v179/v185/v186 electrician second-pass batch
     "motor-branch-protection", "bends-between-pulls", "shock-approach-boundary",
-    "conduit-jam-ratio",
+  ]);
+  // cap-relief split: electrical engineering analysis and equipment-sizing tiles
+  // moved intact out of calc-electrical.js (which sat at 97% of its gzip cap and
+  // names a per-bench split as its preferred eventual fix). Lazy-loaded; the tile
+  // ids are unchanged, only their module is. See calc-electricalanalysis.js.
+  declare("./calc-electricalanalysis.js", "ELECTRICALANALYSIS_RENDERERS", [
+    "conduit-jam-ratio", "awg-wire-geometry", "egc-parallel-raceways",
     // spec-v471..v473 energy-economics batch
     "motor-efficiency-upgrade-savings", "transformer-loading-efficiency", "economic-conductor-sizing",
     // spec-v487 generator fuel runtime and backup duration
     "generator-fuel-runtime",
-    // spec-v494 transformer voltage regulation from %R and %X
-    "transformer-voltage-regulation",
-    "transformer-turns-ratio",
+    // spec-v494/v806 transformer voltage regulation and turns ratio
+    "transformer-voltage-regulation", "transformer-turns-ratio",
     // spec-v495 capacitor discharge time and bleed resistor
     "capacitor-discharge-time",
     // spec-v496 asymmetrical and peak fault current from X/R
@@ -73,7 +77,7 @@ export const TOOL_MODULES = (() => {
     "battery-hydrogen-vent", "battery-vent-max-current",
     // spec-v520 transformer inrush coordination point
     "transformer-inrush-point",
-    // spec-v562
+    // spec-v562 termination temperature ampacity limit
     "termination-temp-ampacity",
   ]);
   // spec-v1860: field-installation and branch-circuit calculators split from

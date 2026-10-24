@@ -39,10 +39,12 @@ import {
 import {
   computeConduitExpansionMaxRun,
   computeConduitThermalExpansion,
+} from "../../calc-electrical.js";
+import {
   computeBatteryVentMaxCurrent,
   computeBatteryHydrogenVent,
   computeEconomicConductorSizing,
-} from "../../calc-electrical.js";
+} from "../../calc-electricalanalysis.js";
 import {
   computeLuminaireSpacingMh,
   computeLumenMethod,

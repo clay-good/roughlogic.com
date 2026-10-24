@@ -58,6 +58,7 @@ const FILES = [
   "integrity.js",
   "calc-electrical.js",
   "calc-electricalfield.js",
+  "calc-electricalanalysis.js",
   "calc-motor.js",
   "calc-solar.js",
   "calc-solarfield.js",

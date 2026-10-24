@@ -21222,7 +21222,7 @@ test("bounds: spec-v373 computeBernoulliHead pins the three-term sum and error s
 });
 
 // ===================== spec-v374 conduit jam ratio (the 100th tile) =====================
-import { computeConduitJamRatio as _v374 } from "../../calc-electrical.js";
+import { computeConduitJamRatio as _v374 } from "../../calc-electricalanalysis.js";
 
 test("bounds: spec-v374 computeConduitJamRatio pins the jam band, the three-conductor rule, and error seams", () => {
   // Jam ratio = 1.05 x ID / OD (Southwire / IEEE 1185; EC&M prints 1.05 x 5.07/1.60 = 3.33, no jam).
@@ -22291,7 +22291,7 @@ test("bounds: spec-v470 computeMinimumRoofSnow pins Pm, the governing value, and
 });
 
 // ===================== spec-v471..v473 energy-economics + v474 ADA ramp (campaign close) =====================
-import { computeMotorEfficiencyUpgradeSavings as _v471, computeTransformerLoadingEfficiency as _v472, computeEconomicConductorSizing as _v473 } from "../../calc-electrical.js";
+import { computeMotorEfficiencyUpgradeSavings as _v471, computeTransformerLoadingEfficiency as _v472, computeEconomicConductorSizing as _v473 } from "../../calc-electricalanalysis.js";
 import { computeAdaRampSlope as _v474 } from "../../calc-construction.js";
 
 test("bounds: spec-v471 computeMotorEfficiencyUpgradeSavings pins the saving, load scaling, and error seams", () => {
@@ -23575,7 +23575,7 @@ test("bounds: spec-v486 computeTrailerTongueWeight pins the percent, the convent
 });
 
 // ===================== spec-v487 generator fuel runtime and backup duration (Group A) =====================
-import { computeGeneratorFuelRuntime as _v487 } from "../../calc-electrical.js";
+import { computeGeneratorFuelRuntime as _v487 } from "../../calc-electricalanalysis.js";
 
 test("bounds: spec-v487 computeGeneratorFuelRuntime pins usable fuel, runtime, the target fuel/tank sizing, meets-target, and error seams", () => {
   const r = _v487({ tank_capacity_gal: 100, consumption_gph: 3.0, usable_pct: 90, target_runtime_hr: 72 });
@@ -23760,7 +23760,7 @@ test("bounds: spec-v493 computeGeneratorConductor445 pins the 115% basis, the de
   assert.ok("error" in _v493({ nameplate_current_a: 0, gen_kw: 150, voltage_v: 480, power_factor: 1.5 }));
 });
 
-import { computeTransformerVoltageRegulation as _v494 } from "../../calc-electrical.js";
+import { computeTransformerVoltageRegulation as _v494 } from "../../calc-electricalanalysis.js";
 
 test("bounds: spec-v494 computeTransformerVoltageRegulation pins the lagging sag, the leading rise, the load scaling, and error seams", () => {
   const lag = _v494({ percent_r: 1.2, percent_x: 5.0, power_factor: 0.85, leading: false, load_fraction: 1.0 });
@@ -23784,7 +23784,7 @@ test("bounds: spec-v494 computeTransformerVoltageRegulation pins the lagging sag
   assert.ok("error" in _v494({ percent_r: 1.2, percent_x: 5.0, power_factor: 0.85, load_fraction: -1 }));
 });
 
-import { computeCapacitorDischargeTime as _v495 } from "../../calc-electrical.js";
+import { computeCapacitorDischargeTime as _v495 } from "../../calc-electricalanalysis.js";
 
 test("bounds: spec-v495 computeCapacitorDischargeTime pins the R_max, the continuous power, the class limit, and error seams", () => {
   const r = _v495({ capacitance_uf: 100, initial_voltage: 600, safe_voltage: 50, time_limit_s: 0, resistor_ohm: 0 });
@@ -23810,7 +23810,7 @@ test("bounds: spec-v495 computeCapacitorDischargeTime pins the R_max, the contin
   assert.strictEqual(_v495({ capacitance_uf: 100, initial_voltage: 800, safe_voltage: 50, time_limit_s: 0, resistor_ohm: 0 }).limit_s, 60);
 });
 
-import { computeAsymmetricalFaultXr as _v496 } from "../../calc-electrical.js";
+import { computeAsymmetricalFaultXr as _v496 } from "../../calc-electricalanalysis.js";
 
 test("bounds: spec-v496 computeAsymmetricalFaultXr pins both factors, their monotonic rise and limits, and error seams", () => {
   const r = _v496({ isym_ka: 20, x_over_r: 15 });
@@ -24513,7 +24513,7 @@ test("bounds: spec-v803 computeAsceLiveLoadReduction pins the reduction, the flo
   assert.ok("error" in _v803({ unreduced_load_psf: 50, tributary_area_ft2: 0, member_type: "interior_column", floors_supported: "one" }));
 });
 
-import { computeAwgWireGeometry as _v804 } from "../../calc-electrical.js";
+import { computeAwgWireGeometry as _v804 } from "../../calc-electricalanalysis.js";
 
 test("bounds: spec-v804 computeAwgWireGeometry pins the AWG diameter/area, the aught sizes, the 6-gauge ratio, and error seams", () => {
   const r = _v804({ awg: "12" });
@@ -24556,7 +24556,7 @@ test("bounds: spec-v805 computeTailstockSetover pins the OAL-scaled offset, the 
   assert.ok("error" in _v805({ overall_length_in: 8, large_dia_in: 1.5, small_dia_in: 1.0, taper_length_in: 12 }));
 });
 
-import { computeTransformerTurnsRatio as _v806 } from "../../calc-electrical.js";
+import { computeTransformerTurnsRatio as _v806 } from "../../calc-electricalanalysis.js";
 
 test("bounds: spec-v806 computeTransformerTurnsRatio pins the turns/current/impedance ratios, the optional outputs, and error seams", () => {
   const r = _v806({ primary_voltage_v: 480, secondary_voltage_v: 120, secondary_current_a: 50, load_impedance_ohm: 8 });
@@ -24738,7 +24738,7 @@ test("bounds: spec-v517 computeAbycDcWire pins the round-trip circular mils, the
   assert.ok("error" in _v517({ current_a: 20, run_length_ft: 25, system_voltage_v: 12, drop_pct: 120 }));
 });
 
-import { computeBatteryHydrogenVent as _v518, computeBatteryVentMaxCurrent as _v666 } from "../../calc-electrical.js";
+import { computeBatteryHydrogenVent as _v518, computeBatteryVentMaxCurrent as _v666 } from "../../calc-electricalanalysis.js";
 
 test("bounds: spec-v666 computeBatteryVentMaxCurrent pins I_max = Q/(0.0269 N) at 1%, the cells-not-jars scaling, round-trips through computeBatteryHydrogenVent, and error seams", () => {
   const r = _v666({ available_cfm: 100, cell_count: 24 });
@@ -24803,7 +24803,7 @@ test("bounds: spec-v519 computeExistingLoad22087 pins the 125% basis, the headro
   assert.ok("error" in _v519({ recorded_peak_a: 120, new_load_a: 40, service_rating_a: 0 }));
 });
 
-import { computeTransformerInrushPoint as _v520 } from "../../calc-electrical.js";
+import { computeTransformerInrushPoint as _v520 } from "../../calc-electricalanalysis.js";
 
 test("bounds: spec-v520 computeTransformerInrushPoint pins the FLA, the inrush point, the single-phase path, and error seams", () => {
   const r = _v520({ kva: 75, primary_voltage_v: 480, phase: 3, inrush_multiple: 12, duration_s: 0.1 });
@@ -26336,7 +26336,7 @@ test("bounds: spec-v561 computeEvLoadManagementEms pins the un-managed sum, the 
   assert.ok("error" in _v561({ charger_count: 4, per_charger_a: 40, evems_limit_a: -1 }));
 });
 
-import { computeTerminationTempAmpacity as _v562 } from "../../calc-electrical.js";
+import { computeTerminationTempAmpacity as _v562 } from "../../calc-electricalanalysis.js";
 
 test("bounds: spec-v562 computeTerminationTempAmpacity pins the termination-column selection, the derated 90C value, the governing minimum, and error seams", () => {
   const r = _v562({ amp_90c: 260, amp_75c: 230, amp_60c: 195, termination_rating: 75, over_100a: true, derate_factor: 0.8 });
@@ -31986,7 +31986,7 @@ test("bounds: the wire-ampacity tile does not claim to be NEC Table 310.16", () 
   assert.ok(/estimate/i.test(block), "must be labelled an estimate");
 });
 
-import { computeTerminationTempAmpacity as _necTerm } from "../../calc-electrical.js";
+import { computeTerminationTempAmpacity as _necTerm } from "../../calc-electricalanalysis.js";
 
 test("bounds: NEC 110.14(C) honors the DECLARED lowest termination rating above 100 A", () => {
   // The field is "Lowest termination rating" and both the note and citation say
@@ -33503,7 +33503,7 @@ test("bounds: spec-v1110 computeEconomicInsulationThickness pins the closed-form
   assert.ok("error" in _v1110({ ...base, delta_t_f: Infinity }));
 });
 
-import { computeEgcParallelRaceways as _v1111 } from "../../calc-electrical.js";
+import { computeEgcParallelRaceways as _v1111 } from "../../calc-electricalanalysis.js";
 import { computeEGCSize as _v1111sib } from "../../calc-electrical.js";
 
 test("bounds: spec-v1111 computeEgcParallelRaceways pins the full-size-per-raceway rule, agreement with the landed sizer, independence from raceway count, the undersizing contrast, and error seams", () => {
@@ -56424,7 +56424,7 @@ test("bounds: every efficiency-percent input refuses a fraction (0.85 for 85%)",
   assert.ok("error" in _effFur({ ...f, efficiency_pct: 0.8 }));
 });
 
-import { computeCapacitorDischargeTime as _b40cap, computeEconomicConductorSizing as _b40ecs } from "../../calc-electrical.js";
+import { computeCapacitorDischargeTime as _b40cap, computeEconomicConductorSizing as _b40ecs } from "../../calc-electricalanalysis.js";
 import { computePvCellTemperaturePower as _b40pvc, computePvMaxAmbientForPower as _b40pvm } from "../../calc-solar.js";
 import { computePoolHeaterBtu as _b40pool } from "../../calc-treatment.js";
 import { computeDuctHeatGain as _b40duct } from "../../calc-hvacairside.js";
@@ -60146,6 +60146,7 @@ test("hardening slice 3 (concrete part 2, masonry, geotechnical): the reviewed d
 // Hardening slice 4 (2026-10-10): calc-electrical and calc-elecdesign, 85 calculators re-derived
 // and run by independent reviewers. One assertion per confirmed defect.
 import * as _s4E from "../../calc-electrical.js";
+import * as _s4Ea from "../../calc-electricalanalysis.js";
 import * as _s4D from "../../calc-elecdesign.js";
 import { awgToNumber as _s4Awg } from "../../pure-math.js";
 
@@ -60198,8 +60199,8 @@ test("hardening slice 4 (electrical, electrical design): the reviewed defects st
   err(_s4E.computeBreakerSize({ load_W: 10000, voltage_V: 208, power_factor: 1.5 }));
   err(_s4E.computeMultiLoadVoltageDrop({ loads: [{ distance_ft: -50, current_A: 5 }] }));
   err(_s4E.computeGeneratorSize({ items: [{ running_watts: -500 }, { running_watts: 1000 }] }));
-  err(_s4E.computeMotorEfficiencyUpgradeSavings({ hp: 50, load: 0.75, eff_standard: 0.945, eff_premium: 0.90, hours: 4000, rate_kwh: 0.1 }));
-  err(_s4E.computeMotorEfficiencyUpgradeSavings({ hp: 50, load: 0.75, eff_standard: 0.90, eff_premium: 0.945, hours: 20000, rate_kwh: 0.1 }));
+  err(_s4Ea.computeMotorEfficiencyUpgradeSavings({ hp: 50, load: 0.75, eff_standard: 0.945, eff_premium: 0.90, hours: 4000, rate_kwh: 0.1 }));
+  err(_s4Ea.computeMotorEfficiencyUpgradeSavings({ hp: 50, load: 0.75, eff_standard: 0.90, eff_premium: 0.945, hours: 20000, rate_kwh: 0.1 }));
   err(_s4E.computePoEBudget({ poe_class: "af", category: "Cat6A", run_length_ft: 450 }));
   err(_s4E.computeConductorShortCircuitWithstand({ area_cmil: 26240, fault_current_a: 10000, clearing_time_s: 0.1, t_initial_c: -234 }));
   err(_s4E.computeConductorShortCircuitWithstand({ area_cmil: 26240, fault_current_a: 10000, clearing_time_s: 0.1, t_final_c: 5000 }));
@@ -60214,7 +60215,7 @@ test("hardening slice 4 (electrical, electrical design): the reviewed defects st
   // AWG parsing.
   assert.strictEqual(_s4Awg("0000"), -3); assert.strictEqual(_s4Awg("4/0"), -3); assert.strictEqual(_s4Awg("12"), 12);
   assert.throws(() => _s4Awg("250")); assert.throws(() => _s4Awg("")); assert.throws(() => _s4Awg("12.5"));
-  near(_s4E.computeAwgWireGeometry({ awg: "0000" }).area_cmils, 211600, 1);
+  near(_s4Ea.computeAwgWireGeometry({ awg: "0000" }).area_cmils, 211600, 1);
   err(_s4E.computeConductorResistance({ material: "copper", awg: "250", length_ft: 1000, temperature_C: 20 }));
 
   // Wrong numbers.
@@ -60225,7 +60226,7 @@ test("hardening slice 4 (electrical, electrical design): the reviewed defects st
   near(_s4E.computeMotorBranchFromNameplate({ hp: 5, voltage_V: 230, phase: 1, eta: 0.875, power_factor: 0.78, nameplate_fla_A: "28" }).design_fla_A, 28, 1e-9);
   near(_s4E.computeConduitThermalExpansion({ run_length_ft: 100, temp_change_f: -50 }).delta_l_in, 2.028, 1e-9);
   near(_s4E.computeRooftopTempAdder({ measured_ambient_f: 98.6, height_above_roof_in: 0, base_ampacity_a: 55 }).correction, 0.58, 1e-9); // 37 + 33 = 70 C row
-  err(_s4E.computeConduitJamRatio({ conduit_id_in: 1, conductor_od_in: 0.9, n_conductors: 3 }));
+  err(_s4Ea.computeConduitJamRatio({ conduit_id_in: 1, conductor_od_in: 0.9, n_conductors: 3 }));
   const up = _s4E.computeEgcUpsizeProportional({ base_egc_cmil: 10380, base_phase_cmil: 6530, installed_phase_cmil: 10380 });
   near(up.upsized_egc_cmil, 10380, 1e-9); assert.strictEqual(up.capped_at_phase, true);
   err(_s4E.computeGroundingElectrodeResistance({ electrode_type: "driven_rod", soil_resistivity_ohm_cm: 10000, rod_length_ft: 0.02, rod_diameter_in: 1 }));
