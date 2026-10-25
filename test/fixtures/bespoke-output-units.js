@@ -652,7 +652,6 @@ export const BESPOKE_OUTPUT_UNITS = {
   "taping-normal-tension": {"normal_tension_lb":{"prefix":"","suffix":" lb","digits":1},"span_weight_lb":{"prefix":"","suffix":" lb","digits":2}},
   "tdd-ieee-519": {"limit_pct":{"prefix":"","suffix":"%","digits":1}},
   "tds-from-conductivity": {"tds_mgl":{"prefix":"","suffix":" mg/L","digits":0}},
-  "termination-temp-ampacity": {"derated_90c_a":{"prefix":"","suffix":" A","digits":0}},
   "thermal-expansion-volume": {"expansion_gal":{"prefix":"","suffix":" gal","digits":3},"expansion_pct":{"prefix":"","suffix":"%","digits":2}},
   "thermal-fog-deodorization": {"deodorant_gal":{"prefix":"","suffix":" gal","digits":2}},
   "thermistor-beta-temp": {"temperature_c":{"prefix":"","suffix":" C","digits":2},"temperature_f":{"prefix":"","suffix":" F","digits":2}},

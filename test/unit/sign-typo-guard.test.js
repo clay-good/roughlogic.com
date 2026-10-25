@@ -93,6 +93,7 @@ const CEILING_EXEMPT = [
   "hose-lay-section-count::slack_fraction", // a slack allowance, not a share
   "screen-deck-capacity::efficiency_factor", // sizing factor, ~2 at low efficiency
   "blast-fume-clearance-time::target_fraction_pct", // a percent; the compute caps it at 100
+  "transformer-voltage-regulation::load_fraction", // per-unit loading, not a 0-1 share; legitimately above 1 (overload), the compute caps it at 3
 ];
 
 test("sign typo: a non-negative input rejects a negative value or is listed as signed", async () => {

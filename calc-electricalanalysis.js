@@ -360,6 +360,26 @@ function _v494renderTransformerVoltageRegulation(inputRegion, outputRegion, cita
   lead.select.addEventListener("change", update);
 }
 ELECTRICALANALYSIS_RENDERERS["transformer-voltage-regulation"] = _v494renderTransformerVoltageRegulation;
+// spec-v1184 hand-authored field schema (bespoke renderer; keys match
+// computeTransformerVoltageRegulation's parameters; `leading` is the boolean the
+// select resolves to, shown here as a checkbox so the agent sees a boolean input).
+_v494renderTransformerVoltageRegulation.schema = {
+  inputs: [
+    { key: "percent_r", label: "Transformer %R (from test report)", kind: "number", options: null, default: null, attrs: { step: "any", min: "0" } },
+    { key: "percent_x", label: "Transformer %X (from test report)", kind: "number", options: null, default: null, attrs: { step: "any", min: "0" } },
+    { key: "power_factor", label: "Load power factor (0-1)", kind: "number", options: null, default: "0.85", attrs: { step: "any", min: "0", max: "1" } },
+    { key: "leading", label: "Leading power factor (over-corrected / exporting)", kind: "checkbox", options: null, default: null, attrs: null },
+    { key: "load_fraction", label: "Per-unit loading (1.0 = full load)", kind: "number", options: null, default: "1.0", attrs: { step: "any", min: "0" } },
+  ],
+  outputs: [
+    { key: "vr_percent", label: "Voltage regulation", unit: "%", format: (r) => (r.vr_percent == null ? "-" : fmt(r.vr_percent, 2) + " %") },
+    { key: "main_term", label: "Main term", unit: "%", format: (r) => (r.main_term == null ? "-" : fmt(r.main_term, 2) + " %") },
+    { key: "quad_term", label: "Quadrature term", unit: "%", format: (r) => (r.quad_term == null ? "-" : fmt(r.quad_term, 3) + " %") },
+    { key: "note", label: "Note", unit: null, format: (r) => String(r.note) },
+  ],
+  citation: "Citation: Transformer voltage-regulation approximation VR% = load x (%R cos + %X sin) + load^2 x (%X cos - %R sin)^2 / 200, sin negative for a leading power factor. Terminal regulation, not the feeder drop.",
+  scope: null,
+};
 
 // ===================== spec-v495: capacitor discharge time and bleed resistor (NEC 460.6) =====================
 // dims: in { capacitance_uf: M^-1 L^-2 T^4 I^2, initial_voltage: M L^2 T^-3 I^-1, safe_voltage: M L^2 T^-3 I^-1, time_limit_s: T, resistor_ohm: M L^2 T^-3 I^-2 } out: { ln_ratio: dimensionless, r_max_ohm: M L^2 T^-3 I^-2, r_used_ohm: M L^2 T^-3 I^-2, t_discharge_s: T, p_continuous_w: M L^2 T^-3, limit_s: T, meets_code: dimensionless }
@@ -673,6 +693,27 @@ function _v562renderTerminationTempAmpacity(inputRegion, outputRegion, citationE
   for (const s of [tr, over]) s.select.addEventListener("change", update);
 }
 ELECTRICALANALYSIS_RENDERERS["termination-temp-ampacity"] = _v562renderTerminationTempAmpacity;
+// spec-v1184 hand-authored field schema (bespoke renderer; keys match
+// computeTerminationTempAmpacity's parameters; `over_100a` is the boolean the
+// "circuit over 100 A?" select resolves to).
+_v562renderTerminationTempAmpacity.schema = {
+  inputs: [
+    { key: "amp_90c", label: "90 C ampacity (Table 310.16)", kind: "number", options: null, default: null, attrs: { step: "any", min: "0" } },
+    { key: "amp_75c", label: "75 C ampacity", kind: "number", options: null, default: null, attrs: { step: "any", min: "0" } },
+    { key: "amp_60c", label: "60 C ampacity", kind: "number", options: null, default: null, attrs: { step: "any", min: "0" } },
+    { key: "termination_rating", label: "Lowest termination rating", kind: "select", options: [{ value: "75", label: "75 C" }, { value: "60", label: "60 C" }], default: null, attrs: null },
+    { key: "over_100a", label: "Circuit over 100 A (75 C default column)", kind: "checkbox", options: null, default: null, attrs: null },
+    { key: "derate_factor", label: "Combined ambient/fill derate (1.0 = none)", kind: "number", options: null, default: null, attrs: { step: "any", min: "0", max: "1" } },
+  ],
+  outputs: [
+    { key: "termination_ampacity_a", label: "Termination-column ampacity", unit: "A", format: (r) => (r.termination_ampacity_a == null ? "-" : fmt(r.termination_ampacity_a, 0) + " A") },
+    { key: "derated_90c_a", label: "Derated 90 C value", unit: "A", format: (r) => (r.derated_90c_a == null ? "-" : fmt(r.derated_90c_a, 1) + " A") },
+    { key: "governing_a", label: "Governing ampacity", unit: "A", format: (r) => (r.governing_a == null ? "-" : fmt(r.governing_a, 1) + " A (" + String(r.governed_by) + ")") },
+    { key: "note", label: "Note", unit: null, format: (r) => String(r.note) },
+  ],
+  citation: "Citation: NEC 2023 110.14(C) with Table 310.16: usable ampacity is capped at the lowest-rated termination (60 or 75 C); the 90 C column is used only for derating; governing = min(termination column, derated 90 C).",
+  scope: null,
+};
 
 // ===================== spec-v804: AWG conductor geometry (diameter, circular mils, mm^2) =====================
 // dims: in { awg: dimensionless } out: { diameter_in: L, diameter_mm: L, area_cmils: L^2, area_mm2: L^2 }
