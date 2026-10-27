@@ -7,7 +7,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { loadRows, validateRows, buildCodeAdoptionShard, JURISDICTIONS } from "../../scripts/code-adoption.mjs";
+import { loadRows, validateRows, buildCodeAdoptionShard, signoffSheet, JURISDICTIONS } from "../../scripts/code-adoption.mjs";
 import { editionsOn, adoptionLine, isFresh, tileNecEdition, citesNec, mountStatePicker } from "../../code-adoption.js";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
@@ -144,5 +144,27 @@ test("the picker appears with no row signed, and lists all 51 jurisdictions", as
     assert.equal(await mountStatePicker(block, { edition: "NFPA 72" }, shard), null, "a tile that does not cite the NEC gets nothing");
   } finally {
     delete globalThis.document;
+  }
+});
+
+// The sign-off sheet is generated from the code-adoption shard's fetch day,
+// and build-data.mjs stamps that shard with the run date. For months every
+// data refresh therefore left docs/code-adoption-signoff.md one date behind
+// its shard, and `npm run lint` -- which the refresh lanes run -- failed on
+// it. The producer must write both halves, and the refresh PR must carry the
+// doc, or main goes red again on the next Monday.
+test("every data refresh regenerates the sign-off sheet and commits it", () => {
+  const onDisk = readFileSync(resolve(ROOT, "docs", "code-adoption-signoff.md"), "utf8");
+  // The sheet really is dated by the day it is built, so a shard restamp
+  // cannot leave it untouched.
+  assert.notEqual(signoffSheet(loadRows(), "2099-01-01"), onDisk);
+
+  const buildData = readFileSync(resolve(ROOT, "scripts", "build-data.mjs"), "utf8");
+  assert.match(buildData, /docs"?,?\s*"code-adoption-signoff\.md"/);
+
+  for (const wf of ["data-refresh.yml", "data-refresh-weekly.yml"]) {
+    const text = readFileSync(resolve(ROOT, ".github", "workflows", wf), "utf8");
+    const addPaths = text.slice(text.indexOf("add-paths:"));
+    assert.ok(addPaths.includes("docs/code-adoption-signoff.md"), wf + " must commit the regenerated sign-off sheet");
   }
 });

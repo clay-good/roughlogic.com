@@ -8098,8 +8098,8 @@
       "date": "2026-10-17"
     },
     "/tools/termination-temp-ampacity/": {
-      "sha": "f23b36af37770fb0",
-      "date": "2026-10-20"
+      "sha": "8add89051acc1831",
+      "date": "2026-10-27"
     },
     "/tools/texture-material-takeoff/": {
       "sha": "ae7c6da615577255",
@@ -8386,8 +8386,8 @@
       "date": "2026-10-17"
     },
     "/tools/transformer-voltage-regulation/": {
-      "sha": "bde33cd58ad5a7b2",
-      "date": "2026-10-17"
+      "sha": "f507ed7a0f02df7e",
+      "date": "2026-10-27"
     },
     "/tools/transmitter-span-scaling/": {
       "sha": "e2bb7b771aecb0b0",

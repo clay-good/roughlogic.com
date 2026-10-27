@@ -80,3 +80,4 @@ jobs:
             data/**
             scripts/expected-hashes.json
             scripts/sources.md
+            docs/code-adoption-signoff.md

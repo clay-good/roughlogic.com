@@ -1680,7 +1680,7 @@ const GLOSSARY_DATA_V5 = {
 
 import { SALES_TAX_NEXUS } from "../calc-references.js";
 import { stalenessNote, collectRowStamps, NOTE_EXCLUDED_SHARDS } from "./staleness-notes.mjs";
-import { loadRows as loadCodeAdoptionRows, buildCodeAdoptionShard } from "./code-adoption.mjs";
+import { loadRows as loadCodeAdoptionRows, buildCodeAdoptionShard, signoffSheet } from "./code-adoption.mjs";
 import { lintProseInShard } from "./prose-lint-keys.mjs";
 
 function buildSalesTaxNexusShard() {
@@ -2033,6 +2033,16 @@ async function buildAll() {
   }
   const integrityPath = resolve(DATA, "integrity.json");
   pendingWrites.push([integrityPath, formatJson({ generated: TODAY, manifests: manifestHashes })]);
+
+  // spec-v1968: the sign-off sheet's "in force <date>" columns are generated
+  // from the code-adoption shard's fetch day, and the shard above is stamped
+  // TODAY on every run. Writing the shard without the sheet therefore left
+  // check-code-adoption red after every data refresh -- the monthly and weekly
+  // lanes both failed on it. The two are one artifact; write them together.
+  pendingWrites.push([
+    resolve(ROOT, "docs", "code-adoption-signoff.md"),
+    signoffSheet(loadCodeAdoptionRows(), TODAY),
+  ]);
 
   if (proseLintErrors.length > 0) {
     console.error("v6 prose-lint failures:");
