@@ -1080,7 +1080,7 @@ const SANITIZER_BANDS = {
   quat: { lo: 150, hi: 400, label: "quaternary ammonium", contact: "at least 30 seconds (Food Code 4-703.11(C)(3)), or longer if the EPA-registered label says so" },
   iodine: { lo: 12.5, hi: 25, label: "iodine", contact: "at least 30 seconds (Food Code 4-703.11(C)(3))" },
 };
-// dims: in { sanitizer_type: dimensionless, active_pct: dimensionless, target_ppm: dimensionless, batch_gallons: L^3 } out: { oz_per_gal: dimensionless, total_oz: dimensionless, band_hi: dimensionless, band_lo: dimensionless }
+// dims: in { sanitizer_type: dimensionless, active_pct: dimensionless, target_ppm: dimensionless, batch_gallons: L^3 } out: { oz_per_gal: dimensionless, total_oz: L^3, band_hi: dimensionless, band_lo: dimensionless }
 export function computeKitchenSanitizerPpm({ sanitizer_type = "chlorine", active_pct = 0, target_ppm = 0, batch_gallons = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const active = Number(active_pct) || 0;

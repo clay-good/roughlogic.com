@@ -212,6 +212,13 @@ test("a caption's closing unit agrees with the key's dims annotation", () => {
     ["bag_yield_sf_in", "square feet at a depth in inches, a volume; an input, captioned by its field"],
     ["dispersion_ps_nm_km", "ps/(nm km), a compound no caption rule spells"],
     ["freezing_index_f_days", "a degree-day product, a compound no caption rule spells"],
+    // Surfaced 2026-10-27 when `_acres`, `_years` and `_minutes` joined the
+    // unit-tail table and these three keys got an accurate dimension for the
+    // first time. Each names a compound RATE that the caption rule spells
+    // with its last token only, so the caption understates it.
+    ["effective_ac_hr", "acres per hour; the caption spells the hour and drops the acre"],
+    ["accum_gal_pp_yr", "gallons per person per year; an input, captioned by its field label"],
+    ["annual_accum_gal", "gallons per year; the caption spells the gallon and drops the year"],
   ]);
   const dims = new Map();
   for (const f of readdirSync(ROOT).filter((n) => /^calc-.*\.js$/.test(n))) {

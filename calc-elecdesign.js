@@ -131,7 +131,7 @@ ELECDESIGN_RENDERERS["pull-box-sizing"] = _simpleRenderer({
 
 // ===================== spec-v101: IES lumen-method luminaire count =====================
 
-// dims: in { target_fc: dimensionless, area_sqft: L^2, lumens_per_lum: dimensionless, cu: dimensionless, llf: dimensionless } out: { count_raw: dimensionless, count: dimensionless, achieved_fc: dimensionless, total_lumens: dimensionless }
+// dims: in { target_fc: L^-2, area_sqft: L^2, lumens_per_lum: dimensionless, cu: dimensionless, llf: dimensionless } out: { count_raw: dimensionless, count: dimensionless, achieved_fc: L^-2, total_lumens: dimensionless }
 export function computeLumenMethod({ target_fc = 0, area_sqft = 0, lumens_per_lum = 0, cu = 0.7, llf = 0.8 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(target_fc > 0)) return { error: "Target footcandle level must be positive." };

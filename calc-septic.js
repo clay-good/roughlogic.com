@@ -171,7 +171,7 @@ export function computeSepticDoseTank({ daily_flow_gpd, doses_per_day = 4, drain
   };
 }
 
-// dims: in { tank_gal: L^3, people: dimensionless, accum_gal_pp_yr: dimensionless, fill_fraction: dimensionless } out: { years: T, allowed_gal: L^3, annual_accum_gal: dimensionless }
+// dims: in { tank_gal: L^3, people: dimensionless, accum_gal_pp_yr: L^3 T^-1, fill_fraction: dimensionless } out: { years: T, allowed_gal: L^3, annual_accum_gal: L^3 T^-1 }
 export function computeSepticPumpoutInterval({ tank_gal, people, accum_gal_pp_yr = 30, fill_fraction = 0.33 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const tank = Number(tank_gal);
@@ -196,7 +196,7 @@ export function computeSepticPumpoutInterval({ tank_gal, people, accum_gal_pp_yr
 // septic-tank-for-interval: inverse of septic-pumpout-interval. The forward
 // tile gives years = (tank x fill) / (people x accum); sizing a tank to a
 // target pumping interval is the inverse: tank = target_years x people x accum / fill.
-// dims: in { target_years: dimensionless, people: dimensionless, accum_gal_pp_yr: dimensionless, fill_fraction: dimensionless } out: { tank_gal: L^3, working_gal: L^3, annual_accum_gal: dimensionless }
+// dims: in { target_years: T, people: dimensionless, accum_gal_pp_yr: L^3 T^-1, fill_fraction: dimensionless } out: { tank_gal: L^3, working_gal: L^3, annual_accum_gal: L^3 T^-1 }
 export function computeSepticTankForInterval({ target_years = 0, people = 0, accum_gal_pp_yr = 30, fill_fraction = 0.33 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const yrs = Number(target_years);

@@ -295,7 +295,7 @@ WASTE_RENDERERS["leachate-water-balance"] = _simpleRenderer({
 // is the case for alternative daily cover -- but the cover is doing a job, and
 // an alternative has to be APPROVED as meeting those purposes first.
 
-// dims: in { face_length_ft: L, face_width_ft: L, cover_depth_in: L, operating_days: T, airspace_value_per_cy: dimensionless, annual_tons: M, in_place_density_lb_per_cy: M L^-3, alternative_cover_annual_cost: dimensionless } out: { cover_cy_per_day: L^3 T^-1, cover_cy_per_year: L^3 T^-1, cover_share_pct: dimensionless, cover_airspace_value: dimensionless, net_saving: dimensionless, face_area_sqft: L^2, total_airspace_cy: L^3, waste_airspace_cy: L^3, recovered_tons: M }
+// dims: in { face_length_ft: L, face_width_ft: L, cover_depth_in: L, operating_days: T, airspace_value_per_cy: dimensionless, annual_tons: M, in_place_density_lb_per_cy: M L^-3, alternative_cover_annual_cost: dimensionless } out: { cover_cy_per_day: L^3 T^-1, cover_cy_per_year: L^3 T^-1, cover_share_pct: dimensionless, cover_airspace_value: dimensionless, net_saving: dimensionless, face_area_sqft: L^2, total_airspace_cy: L^3, waste_airspace_cy: L^3, recovered_tons: M, extra_site_life_years: T }
 export function computeDailyCoverVolume({ face_length_ft = 0, face_width_ft = 0, cover_depth_in = 0, operating_days = 0, airspace_value_per_cy = 0, annual_tons = 0, in_place_density_lb_per_cy = 0, alternative_cover_annual_cost = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   if (!(face_length_ft > 0) || !(face_width_ft > 0)) return { error: "Working face dimensions must be positive." };

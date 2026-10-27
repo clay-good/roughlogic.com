@@ -210,6 +210,16 @@ const UNIT_TAIL_DIMS = new Map(Object.entries({
   kip: "M L T^-2", kips: "M L T^-2", ksi: "M L^-1 T^-2",
   uf: "M^-1 L^-2 T^4 I^2",
   in3: "L^3", lf: "L", mm: "L",
+  // Added 2026-10-27. Each tail below was read across every key that
+  // names it and declares ONE dimension there -- except `ftlb`, `acres`
+  // and `years`, which were unanimous but for a single key apiece, and
+  // those three keys were the wrong side and are fixed in this change.
+  // `psf`, `pcf` and `inlb` are deliberately NOT here: each splits on the
+  // pound convention (a load is a force, a material is a mass), so a
+  // single expectation would fail the honest half.
+  ftlb: "M L^2 T^-2", kipft: "M L^2 T^-2", plf: "M T^-2",
+  cuft: "L^3", acres: "L^2", scfm: "L^3 T^-1",
+  years: "T", minutes: "T", points: "dimensionless",
   pct: "dimensionless", deg: "dimensionless", db: "dimensionless", ppm: "dimensionless",
   percent: "dimensionless", fraction: "dimensionless", count: "dimensionless",
 }));
@@ -404,26 +414,24 @@ const POLYMORPHIC_KEYS = new Map(Object.entries({
   a1: "a linear-system coefficient in calc-edu, a base-plate area in calc-steel",
   allowable: "an allowable area in calc-construction, an allowable depth in calc-lowvoltage",
   area: "a geometric area everywhere except computeHudFmr, where it is a metro area NAME",
-  days: "a duration, except computeGrowingDegreeDays where it is a degree-day product",
+  days: "a duration in calc-restoration and calc-water; a degree-day product in computeGrowingDegreeDays, and a step or day COUNT in computeBasementFloodPumpdown and computeLoadProfitability",
   db: "a rebar diameter in concrete, a decibel in calc-stage (and dry-bulb elsewhere)",
   F: "degrees Fahrenheit in pure-math, magnetic field intensity in computeWMM",
-  fv: "a future value (money) in accounting, an allowable shear stress in structural",
+  fv: "the dimensionless seismic site coefficient Fv in calc-construction, an allowable shear stress in calc-masonry",
   over_by: "a dollar overage in computeSubstantialImprovement, pounds over a weight rating in the trucking checks",
   psf: "a peak solar factor (Btu/h per sq ft) in computeWindowSolarHeatGain, a countertop load in pounds per sq ft",
   shortfall: "a heating-load shortfall (Btu/h) in calc-hvac, a missing tooth count in computeGearUndercutBacklash",
   governing: "which check governs (a label), except computePullBoxSizing where it is a length",
-  gpa: "gallons per acre in agriculture, a grade point average in calc-edu",
   headroom: "a pressure headroom and a dimensionless margin",
-  I: "electric current, and second moment of area in the beam tiles",
+  I: "electric current, and the dimensionless magnetic inclination angle in computeWMM",
   j: "a polar moment of area, and a loop index",
   mo: "an overturning moment, and a month count",
   pa: "an active-earth-pressure resultant per unit width in geotech, an axial force in steel",
   rho: "a density in plumbing, Spearman's rho in calc-edu, a reinforcement ratio in masonry",
   slope: "a hydraulic gradient (dimensionless) in 12 uses, a capacity slope in computeHeatPumpColdCapacity",
   t_min: "a minimum wall thickness in pipefit, a minimum time in plumbing",
-  target_fc: "a footcandle target; the luminous base J is dropped by every use",
   tons: "a REFRIGERATION ton in the four HVAC uses -- 12,000 BTU/hr, a power -- and a\n    short ton of silage or compost in calc-agriculture, a mass",
-  total_oz: "fluid ounces (volume) and weight ounces (mass)",
+  total_oz: "fluid ounces (a volume) in calc-kitchen and calc-mechanic, weight ounces (a mass) in computeRefrigerantCharge",
 }));
 
 // The pound is declared as a FORCE (`M L T^-2`) in some annotations and a MASS
@@ -468,7 +476,28 @@ function checkKeyAgreement(keyDims, errors) {
   for (const [key, byDim] of keyDims) {
     if (byDim.size < 2) continue;
     if (UNQUALIFIED_KEYS.has(key)) continue;
-    if (POLYMORPHIC_KEYS.has(key)) { stillSplit.push(key + " (polymorphic)"); continue; }
+    if (POLYMORPHIC_KEYS.has(key)) {
+      stillSplit.push(key + " (polymorphic)");
+      // The entry's REASON must describe the split it waives. `gpa` was
+      // waived for weeks as "gallons per acre in agriculture, a grade point
+      // average in calc-edu" while both declarations were in calc-agriculture
+      // and both meant gallons per acre -- calc-edu names its averages
+      // unweighted_gpa and weighted_gpa and never used the bare key. The
+      // reason was unfalsifiable prose, so nobody could see that the waiver
+      // was covering a wrong declaration. Every function or module a reason
+      // NAMES must be somewhere in the split.
+      const where = [...byDim.values()].flat().join(" ");
+      const named = String(POLYMORPHIC_KEYS.get(key)).match(/\bcompute[A-Za-z0-9_]+|\bcalc-[a-z]+\.js|\bpure-math\.js/g) || [];
+      for (const n of [...new Set(named)]) {
+        if (!where.includes(n)) {
+          errors.push(
+            "POLYMORPHIC_KEYS waives `" + key + "` with a reason that names `" + n +
+            "`, which declares no dimension for that key. Name where the split actually is: " + where + ".",
+          );
+        }
+      }
+      continue;
+    }
     if (POUND_CONVENTION_UNSETTLED.has(key)) { stillSplit.push(key + " (pound convention)"); continue; }
     const variants = [...byDim.entries()]
       .sort((a, b) => b[1].length - a[1].length)

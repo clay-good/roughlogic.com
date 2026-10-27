@@ -2232,7 +2232,7 @@ export function computeSprayDriftBuffer({ base_buffer_ft = 0, droplet_class = "m
   };
 }
 
-// dims: in { boom_width_ft: L, speed_mph: L T^-1, field_efficiency_pct: dimensionless, field_acres: dimensionless, tank_gal: L^3, gpa: dimensionless } out: { theoretical_ac_hr: dimensionless, effective_ac_hr: dimensionless, spray_time_hr: dimensionless, acres_per_tank: L^2, tanks_needed: dimensionless }
+// dims: in { boom_width_ft: L, speed_mph: L T^-1, field_efficiency_pct: dimensionless, field_acres: L^2, tank_gal: L^3, gpa: L } out: { theoretical_ac_hr: L^2 T^-1, effective_ac_hr: L^2 T^-1, spray_time_hr: T, acres_per_tank: L^2, tanks_needed: dimensionless }
 export function computeSprayerFieldCapacity({ boom_width_ft, speed_mph, field_efficiency_pct = 70, field_acres, tank_gal, gpa } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // An efficiency is a percent; 0 < value < 1 is a fraction typed into a percent field (added 2026-09-26).
