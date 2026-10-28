@@ -314,7 +314,7 @@ function renderSearchTrackSpacing(inputRegion, outputRegion, citationEl) {
 
 // --- spec-v541 P: Sweat rate and fluid replacement (`sweat-rate-hydration`) ---
 // sweat_loss = (pre-post)*16 + fluid - urine. rate = loss/hr. rehydration = 1.5 x max(0, deficit).
-// dims: in { pre_weight_lb: dimensionless, post_weight_lb: dimensionless, fluid_oz: L, urine_oz: L, duration_hr: T } out: { sweat_loss_oz: L, sweat_rate_oz_hr: dimensionless, pct_bw_loss: dimensionless, rehydration_oz: L }
+// dims: in { pre_weight_lb: dimensionless, post_weight_lb: dimensionless, fluid_oz: L^3, urine_oz: L^3, duration_hr: T } out: { sweat_loss_oz: L^3, sweat_rate_oz_hr: L^3 T^-1, pct_bw_loss: dimensionless, rehydration_oz: L^3 }
 export function computeSweatRateHydration({ pre_weight_lb = 0, post_weight_lb = 0, fluid_oz = 0, urine_oz = 0, duration_hr = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const pre = Number(pre_weight_lb) || 0;

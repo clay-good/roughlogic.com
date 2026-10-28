@@ -229,6 +229,11 @@ const UNIT_TAIL_DIMS = new Map(Object.entries({
   effect: "dimensionless", share: "dimensionless", index: "dimensionless",
   multiplier: "dimensionless", efficiency: "dimensionless",
   utilization: "dimensionless", margin: "dimensionless",
+  // `va` is apparent power and `bbl` an oil barrel. `va` became unanimous
+  // only once the six calc-service keys that declared it dimensionless were
+  // fixed -- three of them sat in the same annotation as a correct
+  // `total_va`.
+  va: "M L^2 T^-3", bbl: "L^3",
   pct: "dimensionless", deg: "dimensionless", db: "dimensionless", ppm: "dimensionless",
   percent: "dimensionless", fraction: "dimensionless", count: "dimensionless",
 }));

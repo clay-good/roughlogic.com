@@ -573,7 +573,7 @@ SERVICE_RENDERERS["neutral-demand-220-61"] = _v169renderNeutralDemand;
 // / 220.14(I) / 220.47; Table 220.12 and 220.44 before 2023).
 // =====================================================================
 
-// dims: in { floor_area_ft2: L^2, unit_load_va_ft2: dimensionless, receptacle_count: dimensionless, supply_v: M L^2 T^-3 I^-1, phases: dimensionless } out: { lighting_va: dimensionless, recep_va: dimensionless, recep_demand_va: dimensionless, total_va: M L^2 T^-3, total_a: I }
+// dims: in { floor_area_ft2: L^2, unit_load_va_ft2: M T^-3, receptacle_count: dimensionless, supply_v: M L^2 T^-3 I^-1, phases: dimensionless } out: { lighting_va: M L^2 T^-3, recep_va: M L^2 T^-3, recep_demand_va: M L^2 T^-3, total_va: M L^2 T^-3, total_a: I }
 export function computeCommercialLightingLoad({ floor_area_ft2 = 0, unit_load_va_ft2 = 0, receptacle_count = 0, supply_v = 208, phases = 3 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (Number(phases) !== 1 && Number(phases) !== 3) return { error: "Phases must be 1 or 3." };
@@ -650,7 +650,7 @@ SERVICE_RENDERERS["commercial-lighting-load"] = _v180renderCommercialLightingLoa
 // Noncoincident loads: larger of heating vs air-conditioning (NEC 220.60).
 // =====================================================================
 
-// dims: in { load_a_va: dimensionless, load_b_va: dimensionless, both_can_run: dimensionless } out: { counted_va: dimensionless, omitted_va: dimensionless }
+// dims: in { load_a_va: M L^2 T^-3, load_b_va: M L^2 T^-3, both_can_run: dimensionless } out: { counted_va: M L^2 T^-3, omitted_va: M L^2 T^-3 }
 export function computeNoncoincidentLoad({ load_a_va = 0, load_b_va = 0, both_can_run = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const a = Number(load_a_va) || 0;

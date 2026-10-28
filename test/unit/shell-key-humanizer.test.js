@@ -219,6 +219,7 @@ test("a caption's closing unit agrees with the key's dims annotation", () => {
     ["effective_ac_hr", "acres per hour; the caption spells the hour and drops the acre"],
     ["accum_gal_pp_yr", "gallons per person per year; an input, captioned by its field label"],
     ["annual_accum_gal", "gallons per year; the caption spells the gallon and drops the year"],
+    ["unit_load_va_ft2", "volt-amperes per square foot; an input, captioned by its field label"],
   ]);
   const dims = new Map();
   for (const f of readdirSync(ROOT).filter((n) => /^calc-.*\.js$/.test(n))) {

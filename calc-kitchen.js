@@ -975,7 +975,7 @@ const renderPrimeCost = _r({
 });
 KITCHEN_RENDERERS["prime-cost"] = renderPrimeCost;
 
-// dims: in { bottle_cost: dimensionless, bottle_size_ml: L, pour_size_oz: L, target_pour_cost_pct: dimensionless, other_cost_per_drink: dimensionless } out: { pours_per_bottle: dimensionless, suggested_price: dimensionless, cost_per_pour: dimensionless, drink_cost: dimensionless }
+// dims: in { bottle_cost: dimensionless, bottle_size_ml: L^3, pour_size_oz: L^3, target_pour_cost_pct: dimensionless, other_cost_per_drink: dimensionless } out: { pours_per_bottle: dimensionless, suggested_price: dimensionless, cost_per_pour: dimensionless, drink_cost: dimensionless }
 export function computePourCost({ bottle_cost = 0, bottle_size_ml = 0, pour_size_oz = 0, target_pour_cost_pct = 0, other_cost_per_drink = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // Unit / range guard added 2026-09-26 after printed-example probing.
@@ -1125,7 +1125,7 @@ KITCHEN_RENDERERS["kitchen-sanitizer-ppm"] = renderKitchenSanitizerPpm;
 // --- spec-v539 O: Cocktail final ABV with dilution (`drink-abv-dilution`) ---
 // final_abv = pure_alcohol / (total + melt) x 100. standard_drinks = pure_alcohol / 0.6.
 const DRINK_METHOD_DILUTION = { shaken: 28, stirred: 23, rocks: 15, neat: 0 };
-// dims: in { total_volume_oz: L, weighted_abv_pct: dimensionless, method: dimensionless, dilution_pct: dimensionless } out: { pure_alcohol_oz: L, final_volume_oz: L, final_abv_pct: dimensionless, standard_drinks: dimensionless, method_pct: dimensionless, dilution_water_oz: L^3 }
+// dims: in { total_volume_oz: L^3, weighted_abv_pct: dimensionless, method: dimensionless, dilution_pct: dimensionless } out: { pure_alcohol_oz: L^3, final_volume_oz: L^3, final_abv_pct: dimensionless, standard_drinks: dimensionless, method_pct: dimensionless, dilution_water_oz: L^3 }
 export function computeDrinkAbvDilution({ total_volume_oz = 0, weighted_abv_pct = 0, method = "stirred", dilution_pct = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const vol = Number(total_volume_oz) || 0;
