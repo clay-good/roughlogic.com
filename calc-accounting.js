@@ -628,7 +628,7 @@ export const inventoryTurnoverExample = { inputs: { cogs: 2000000, beginning_inv
 // --- 244: Cash Conversion Cycle ---
 
 // dims: in { dso: T, dio: T, dpo: T }
-//        out: { ccc_days: dimensionless, dso: T, dio: T, dpo: T, dio_contribution: dimensionless, dso_contribution: dimensionless, dpo_contribution: dimensionless }
+//        out: { ccc_days: T, dso: T, dio: T, dpo: T, dio_contribution: T, dso_contribution: T, dpo_contribution: T }
 // (CCC = DIO + DSO - DPO. All three inputs and the sum are
 //  expressed as days (dimensionless count per the §7.1 count
 //  convention); contributions are signed copies of the inputs.)
