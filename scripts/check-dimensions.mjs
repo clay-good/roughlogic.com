@@ -220,6 +220,15 @@ const UNIT_TAIL_DIMS = new Map(Object.entries({
   ftlb: "M L^2 T^-2", kipft: "M L^2 T^-2", plf: "M T^-2",
   cuft: "L^3", acres: "L^2", scfm: "L^3 T^-1",
   years: "T", minutes: "T", points: "dimensionless",
+  // A second tier, same reading. `ach` is air changes per hour and `sg` a
+  // specific gravity; the rest are dimensionless BY CONSTRUCTION -- a
+  // share, an efficiency, a utilization, a multiplier, an index, a margin
+  // or a ratio of like quantities cannot carry a unit. They belong here
+  // for the same reason `pct`, `fraction` and `count` already do.
+  ach: "T^-1", sg: "dimensionless", ratio: "dimensionless",
+  effect: "dimensionless", share: "dimensionless", index: "dimensionless",
+  multiplier: "dimensionless", efficiency: "dimensionless",
+  utilization: "dimensionless", margin: "dimensionless",
   pct: "dimensionless", deg: "dimensionless", db: "dimensionless", ppm: "dimensionless",
   percent: "dimensionless", fraction: "dimensionless", count: "dimensionless",
 }));
@@ -268,6 +277,18 @@ const UNIT_TAIL_EXEMPT = new Set([
   "calc-hvac.js:computeGeothermalLoop:cooling_btu",
   // BTU/hr: sized against a minimum ON TIME, so it is a rate, not a quantity.
   "calc-hvacsystems.js:computeHydronicBufferTank:zone_min_load_btu",
+  // A years-per-YEAR ratio, added 2026-10-27 with the `years` tail. Both
+  // sides are one year's tonnage -- recovered tons over tons placed -- and
+  // the renderer says so: "about 2.35 years of extra site life per year
+  // used". The name states the numerator and drops the denominator.
+  "calc-waste.js:computeDailyCoverVolume:extra_site_life_years",
+  // A ratio of two UNLIKE quantities, so it is not dimensionless: the key
+  // names both sides and the declaration is right. Every other `_ratio`
+  // in the catalog compares like with like.
+  "calc-farmproduction.js:computeTractorBallast:weight_to_power_ratio",
+  // Food-to-microorganism: BOD loading per day over MLVSS inventory, which
+  // is a reciprocal time (1/day) by definition, not a pure number.
+  "calc-water.js:computeSRTandFM:fm_ratio",
   "calc-hvacsystems.js:computeBufferTankLoopCredit:zone_min_load_btu",
   // BTU/hr: an energy divided by the target heat-up hours.
   "calc-treatment.js:computePoolHeaterSize:required_output_btu",
