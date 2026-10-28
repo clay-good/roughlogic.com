@@ -138,7 +138,7 @@ LABMOLECULAR_RENDERERS["cfu-plate-count"] = renderCfuPlateCount;
 
 // --- spec-v531 T: Molarity from a concentrated reagent (`molarity-from-stock`) ---
 // M = 10 * %(w/w) * density / MW. volume_to_draw = target_M * final_volume / stock_M.
-// dims: in { purity_pct: dimensionless, density_g_ml: dimensionless, mol_weight: dimensionless, target_m: dimensionless, final_volume_ml: dimensionless } out: { stock_m: dimensionless, volume_to_draw_ml: dimensionless }
+// dims: in { purity_pct: dimensionless, density_g_ml: dimensionless, mol_weight: dimensionless, target_m: dimensionless, final_volume_ml: L^3 } out: { stock_m: dimensionless, volume_to_draw_ml: L^3 }
 export function computeMolarityFromStock({ purity_pct = 0, density_g_ml = 0, mol_weight = 0, target_m = 0, final_volume_ml = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const purity = Number(purity_pct) || 0;

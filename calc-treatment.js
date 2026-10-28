@@ -14,7 +14,7 @@ export const TREATMENT_RENDERERS = {};
 
 // --- v20 M.2: Langelier saturation index (`langelier-index`) ---
 // LSI = pH - pHs; pHs = (9.3 + A + B) - (C + D).
-// dims: in { ph: dimensionless, temp: T, temp_unit: dimensionless, ca_mgl: dimensionless, alk_mgl: dimensionless, tds_mgl: dimensionless } out: { lsi: dimensionless, phs: dimensionless }
+// dims: in { ph: dimensionless, temp: T, temp_unit: dimensionless, ca_mgl: M L^-3, alk_mgl: M L^-3, tds_mgl: M L^-3 } out: { lsi: dimensionless, phs: dimensionless }
 export function computeLangelierIndex({ ph = 0, temp = 0, temp_unit = "C", ca_mgl = 0, alk_mgl = 0, tds_mgl = 0 } = {}) {
   const pH = Number(ph) || 0;
   const ca = Number(ca_mgl) || 0;
@@ -575,7 +575,7 @@ TREATMENT_RENDERERS["breakpoint-chlorination"] = _rPool({
 
 // ===================== spec-v405..v407: water/wastewater-operations trio (Group M) =====================
 
-// dims: in { flow_mgd: L^3 T^-1, surface_ft2: L^2, weir_len_ft: L, mlss_mgl: dimensionless, ras_mgd: L^3 T^-1 } out: { sor_gpd_ft2: L T^-1, weir_gpd_ft: L^2 T^-1, solids_lb_ft2_day: M L^-2 T^-1, weir_limit_gpd_ft: L^2 T^-1 }
+// dims: in { flow_mgd: L^3 T^-1, surface_ft2: L^2, weir_len_ft: L, mlss_mgl: M L^-3, ras_mgd: L^3 T^-1 } out: { sor_gpd_ft2: L T^-1, weir_gpd_ft: L^2 T^-1, solids_lb_ft2_day: M L^-2 T^-1, weir_limit_gpd_ft: L^2 T^-1 }
 export function computeClarifierSurfaceLoading({ flow_mgd = 0, surface_ft2 = 0, weir_len_ft = 0, mlss_mgl = 0, ras_mgd = 0 } = {}) {
   const flow = Number(flow_mgd) || 0;
   const area = Number(surface_ft2) || 0;
@@ -669,7 +669,7 @@ function renderClarifierAreaForLoading(inputRegion, outputRegion, citationEl) {
 }
 TREATMENT_RENDERERS["clarifier-area-for-loading"] = renderClarifierAreaForLoading;
 
-// dims: in { flow_mgd: L^3 T^-1, influent_mgl: dimensionless, effluent_mgl: dimensionless } out: { influent_lb_day: M T^-1, effluent_lb_day: M T^-1, removed_lb_day: M T^-1, removal_pct: dimensionless }
+// dims: in { flow_mgd: L^3 T^-1, influent_mgl: M L^-3, effluent_mgl: M L^-3 } out: { influent_lb_day: M T^-1, effluent_lb_day: M T^-1, removed_lb_day: M T^-1, removal_pct: dimensionless }
 export function computeBodTssLoadingRemoval({ flow_mgd = 0, influent_mgl = 0, effluent_mgl = 0 } = {}) {
   const flow = Number(flow_mgd) || 0;
   const inf = Number(influent_mgl) || 0;
@@ -712,7 +712,7 @@ function renderBodTssLoadingRemoval(inputRegion, outputRegion, citationEl) {
 }
 TREATMENT_RENDERERS["bod-tss-loading-removal"] = renderBodTssLoadingRemoval;
 
-// dims: in { conductivity_us_cm: dimensionless, k_factor: dimensionless } out: { tds_mgl: dimensionless, tds_high: dimensionless, tds_low: dimensionless }
+// dims: in { conductivity_us_cm: dimensionless, k_factor: dimensionless } out: { tds_mgl: M L^-3, tds_high: dimensionless, tds_low: dimensionless }
 export function computeTdsFromConductivity({ conductivity_us_cm = 0, k_factor = 0.65 } = {}) {
   const ec = Number(conductivity_us_cm) || 0;
   const k = Number(k_factor) || 0;
@@ -749,7 +749,7 @@ function renderTdsFromConductivity(inputRegion, outputRegion, citationEl) {
 TREATMENT_RENDERERS["tds-from-conductivity"] = renderTdsFromConductivity;
 
 // --- spec-v657 M: electrical conductivity from TDS (inverse of tds-from-conductivity) ---
-// dims: in { tds_mgl: dimensionless, k_factor: dimensionless } out: { conductivity_us_cm: dimensionless }
+// dims: in { tds_mgl: M L^-3, k_factor: dimensionless } out: { conductivity_us_cm: dimensionless }
 export function computeConductivityFromTds({ tds_mgl = 0, k_factor = 0.65 } = {}) {
   const tds = Number(tds_mgl) || 0;
   const k = Number(k_factor) || 0;
@@ -827,7 +827,7 @@ TREATMENT_RENDERERS["digester-vs-loading"] = renderDigesterVsLoading;
 
 // --- spec-v620 M: Digester volatile-acid to alkalinity ratio (`va-alkalinity-ratio`) ---
 // ratio = volatile_acids / alkalinity (common CaCO3 basis). Bands: <0.1 stable, <=0.25 acceptable, <=0.4 corrective, >0.4 souring.
-// dims: in { volatile_acids_mgl: dimensionless, alkalinity_mgl: dimensionless } out: { ratio: dimensionless, buffer_margin_mgl: dimensionless }
+// dims: in { volatile_acids_mgl: M L^-3, alkalinity_mgl: M L^-3 } out: { ratio: dimensionless, buffer_margin_mgl: M L^-3 }
 export function computeVaAlkalinityRatio({ volatile_acids_mgl = 0, alkalinity_mgl = 0 } = {}) {
   const _g = _finiteGuardPool(arguments[0]); if (_g) return _g;
   const va = Number(volatile_acids_mgl) || 0;

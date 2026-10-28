@@ -237,6 +237,11 @@ const UNIT_TAIL_DIMS = new Map(Object.entries({
   // `hours` is the one TIME tail that is safe: it is always spelled out, so
   // it never sits in a per-hour compound the way `hr` does (`flux_btu_hr_ft2`).
   hours: "T",
+  // Concentrations, volumes, illuminances and a pressure. Each was split
+  // only by keys that declared it `dimensionless`, which no reading of the
+  // unit allows; `fc` and `lux` follow the catalog convention of dropping
+  // the luminous base J, so an illuminance is `L^-2`.
+  mgl: "M L^-3", ml: "L^3", fc: "L^-2", lux: "L^-2", atm: "M L^-1 T^-2",
   pct: "dimensionless", deg: "dimensionless", db: "dimensionless", ppm: "dimensionless",
   percent: "dimensionless", fraction: "dimensionless", count: "dimensionless",
 }));

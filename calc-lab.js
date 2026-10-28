@@ -473,7 +473,7 @@ export const clausiusClapeyronExample = { inputs: { pressure1: 760, temp1_c: 100
 // The colligative-property member the lab set (molarity, dilution, Beer-Lambert, Henderson-Hasselbalch)
 // leaves out. Osmolarity = i * C (i the van't Hoff dissociation number: 1 glucose/urea, 2 NaCl/KCl,
 // 3 CaCl2/MgCl2/Na2SO4); osmotic pressure Pi = Osm * R * T, R = 0.08206 L*atm/(mol*K), T in kelvin.
-// dims: in { concentration_mol_l: dimensionless, vant_hoff_i: dimensionless, temperature_c: T } out: { osmolarity_osmol_l: dimensionless, osmolarity_mosmol_l: dimensionless, osmotic_pressure_atm: dimensionless }
+// dims: in { concentration_mol_l: dimensionless, vant_hoff_i: dimensionless, temperature_c: T } out: { osmolarity_osmol_l: dimensionless, osmolarity_mosmol_l: dimensionless, osmotic_pressure_atm: M L^-1 T^-2 }
 export function computeOsmolarity({ concentration_mol_l = 0, vant_hoff_i = 1, temperature_c = 37 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const C = Number(concentration_mol_l) || 0;
@@ -1248,7 +1248,7 @@ function _v23SimpleRenderer(spec) {
 // =====================================================================
 // v23 T.1: Agarose gel percent (Sambrook & Russell resolution map)
 // =====================================================================
-// dims: in { target_bp_high: dimensionless, gel_percent: dimensionless, buffer_volume_ml: dimensionless } out: { recommended_percent: dimensionless, used_percent: dimensionless, grams_agarose: dimensionless, out_of_standard: dimensionless }
+// dims: in { target_bp_high: dimensionless, gel_percent: dimensionless, buffer_volume_ml: L^3 } out: { recommended_percent: dimensionless, used_percent: dimensionless, grams_agarose: dimensionless, out_of_standard: dimensionless }
 export function computeGelPercentAgarose({ target_bp_high = 0, gel_percent = 0, buffer_volume_ml = 0 } = {}) {
   const bp = Number(target_bp_high) || 0;
   let chosen = Number(gel_percent); if (!Number.isFinite(chosen) || chosen < 0) chosen = 0;

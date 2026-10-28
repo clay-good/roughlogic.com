@@ -392,7 +392,7 @@ function _v366renderLightingUniformityRatio(inputRegion, outputRegion, citationE
 }
 ELECDESIGN_RENDERERS["lighting-uniformity-ratio"] = _v366renderLightingUniformityRatio;
 
-// dims: in { avg_fc: dimensionless, min_fc: dimensionless, max_fc: dimensionless, mode: dimensionless } out: { max_min: dimensionless, pass: dimensionless }
+// dims: in { avg_fc: L^-2, min_fc: dimensionless, max_fc: L^-2, mode: dimensionless } out: { max_min: dimensionless, pass: dimensionless }
 export function computeEgressLightingCheck({ avg_fc = 0, min_fc = 0, max_fc = 0, mode = "normal" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const avg = Number(avg_fc) || 0;
