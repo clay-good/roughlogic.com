@@ -4188,7 +4188,7 @@ HVAC_RENDERERS["reynolds-number-pipe"] = _rEnv({
   compute: computeReynoldsNumberPipe,
 });
 
-// dims: in { load: M L^2 T^-3, unit_tons: dimensionless, dt_f: T, factor: dimensionless } out: { q_btuh: M L^2 T^-3, gpm: L^3 T^-1 }
+// dims: in { load: M L^2 T^-3, unit_tons: M L^2 T^-3, dt_f: T, factor: dimensionless } out: { q_btuh: M L^2 T^-3, gpm: L^3 T^-1 }
 export function computeHydronicGpmDeltat({ load = 0, unit_tons = 0, dt_f = 0, factor = 500 } = {}) {
   if (![0, 1, "0", "1", true, false].includes(unit_tons)) return { error: "The load unit flag is 0 (Btu/h) or 1 (tons)." };
   unit_tons = unit_tons === 1 || unit_tons === "1" || unit_tons === true ? 1 : 0;

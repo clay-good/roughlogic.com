@@ -698,7 +698,7 @@ export const REFRIGERANT_RENDERERS = {
 // refrigerant mass flow from the load and the refrigeration effect, the cycle
 // COP and its Carnot ceiling, and the condenser total heat of rejection.
 
-// dims: in { q: M L^2 T^-3, unit_tons: dimensionless, h1_btulb: L^2 T^-2, h4_btulb: L^2 T^-2 } out: { re_btulb: L^2 T^-2, m_dot_lbmin: M T^-1, m_dot_lbh: M T^-1 }
+// dims: in { q: M L^2 T^-3, unit_tons: M L^2 T^-3, h1_btulb: L^2 T^-2, h4_btulb: L^2 T^-2 } out: { re_btulb: L^2 T^-2, m_dot_lbmin: M T^-1, m_dot_lbh: M T^-1 }
 export function computeRefrigerantMassFlow({ q = 0, unit_tons = 0, h1_btulb = 0, h4_btulb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(q > 0)) return { error: "Capacity must be positive." };
@@ -784,7 +784,7 @@ function _v321renderRefrigerationCop(inputRegion, outputRegion, citationEl) {
 }
 REFRIGERANT_RENDERERS["refrigeration-cop"] = _v321renderRefrigerationCop;
 
-// dims: in { q_evap: M L^2 T^-3, unit_tons: dimensionless, cop: dimensionless } out: { w_comp_btuh: M L^2 T^-3, thr_btuh: M L^2 T^-3, thr_tons: M L^2 T^-3, factor: dimensionless }
+// dims: in { q_evap: M L^2 T^-3, unit_tons: M L^2 T^-3, cop: dimensionless } out: { w_comp_btuh: M L^2 T^-3, thr_btuh: M L^2 T^-3, thr_tons: M L^2 T^-3, factor: dimensionless }
 export function computeCondenserHeatRejection({ q_evap = 0, unit_tons = 0, cop = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(q_evap > 0)) return { error: "Evaporator capacity must be positive." };
@@ -828,7 +828,7 @@ REFRIGERANT_RENDERERS["condenser-heat-rejection"] = _v322renderCondenserHeatReje
 // rejection from the COP; the inverse backs out the implied COP from a measured or rated heat of rejection and the
 // evaporator capacity, so a commissioning tech reads the operating efficiency off the condenser duty. From
 // THR = Q_evap (1 + 1/COP), COP = Q_evap / (THR - Q_evap). THR must exceed Q_evap (compressor work adds heat).
-// dims: in { q_evap: M L^2 T^-3, target_thr: M L^2 T^-3, unit_tons: dimensionless } out: { cop: dimensionless, w_comp_btuh: M L^2 T^-3, factor: dimensionless }
+// dims: in { q_evap: M L^2 T^-3, target_thr: M L^2 T^-3, unit_tons: M L^2 T^-3 } out: { cop: dimensionless, w_comp_btuh: M L^2 T^-3, factor: dimensionless }
 export function computeCondenserCopForHeatRejection({ q_evap = 0, target_thr = 0, unit_tons = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const q = Number(q_evap) || 0;

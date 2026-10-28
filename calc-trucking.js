@@ -1717,7 +1717,7 @@ TRUCKING_RENDERERS["tire-load-check"] = renderTireLoadCheck;
 
 // ===================== spec-v423..v425: trucking-business trio (Group J) =====================
 
-// dims: in { free_hours: dimensionless, actual_hours: dimensionless, rate_usd_hr: dimensionless, truck_rev_usd_hr: dimensionless } out: { detention_hours: dimensionless, billable_usd: dimensionless, opportunity_usd: dimensionless, shortfall_usd: dimensionless }
+// dims: in { free_hours: T, actual_hours: T, rate_usd_hr: dimensionless, truck_rev_usd_hr: dimensionless } out: { detention_hours: T, billable_usd: dimensionless, opportunity_usd: dimensionless, shortfall_usd: dimensionless }
 export function computeDetentionDemurrageBilling({ free_hours = 0, actual_hours = 0, rate_usd_hr = 0, truck_rev_usd_hr = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const free = Number(free_hours) || 0;

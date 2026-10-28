@@ -248,7 +248,7 @@ DATACENTER_RENDERERS["ups-module-redundancy"] = _simpleRenderer({
 
 // ===================== spec-v1803: CRAC/CRAH sensible capacity =====================
 
-// dims: in { airflow_cfm: L^3 T^-1, supply_temp_f: T^1, return_temp_f: T^1, contained_return_temp_f: T^1, bypass_return_temp_f: T^1 } out: { capacity_btu_h: L^2 M T^-3, capacity_tons: dimensionless, capacity_kw: L^2 M T^-3, contained_capacity_kw: L^2 M T^-3, bypass_capacity_kw: M L^2 T^-3, bypass_change_pct: dimensionless, contained_change_pct: dimensionless, bypass_capacity_btu_h: M L^2 T^-3, contained_capacity_btu_h: M L^2 T^-3 }
+// dims: in { airflow_cfm: L^3 T^-1, supply_temp_f: T^1, return_temp_f: T^1, contained_return_temp_f: T^1, bypass_return_temp_f: T^1 } out: { capacity_btu_h: L^2 M T^-3, capacity_tons: M L^2 T^-3, capacity_kw: L^2 M T^-3, contained_capacity_kw: L^2 M T^-3, bypass_capacity_kw: M L^2 T^-3, bypass_change_pct: dimensionless, contained_change_pct: dimensionless, bypass_capacity_btu_h: M L^2 T^-3, contained_capacity_btu_h: M L^2 T^-3 }
 export function computeCracSensibleDerate({ airflow_cfm = 0, supply_temp_f = 0, return_temp_f = 0, contained_return_temp_f = 0, bypass_return_temp_f = 0 } = {}) {
   { const v = arguments[0]?.supply_temp_f; if (v === undefined || v === null || v === "") return { error: "Enter the supply temperature (F)." }; }
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };

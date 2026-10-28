@@ -234,6 +234,9 @@ const UNIT_TAIL_DIMS = new Map(Object.entries({
   // fixed -- three of them sat in the same annotation as a correct
   // `total_va`.
   va: "M L^2 T^-3", bbl: "L^3",
+  // `hours` is the one TIME tail that is safe: it is always spelled out, so
+  // it never sits in a per-hour compound the way `hr` does (`flux_btu_hr_ft2`).
+  hours: "T",
   pct: "dimensionless", deg: "dimensionless", db: "dimensionless", ppm: "dimensionless",
   percent: "dimensionless", fraction: "dimensionless", count: "dimensionless",
 }));
@@ -294,6 +297,9 @@ const UNIT_TAIL_EXEMPT = new Set([
   // Food-to-microorganism: BOD loading per day over MLVSS inventory, which
   // is a reciprocal time (1/day) by definition, not a pure number.
   "calc-water.js:computeSRTandFM:fm_ratio",
+  // A COUNT of parts, not a duration: rated arc hours over arc hours per
+  // part. The tail is the tail of a phrase, not the unit of the value.
+  "calc-shop.js:computePlasmaCutSpeed:parts_by_arc_hours",
   "calc-hvacsystems.js:computeBufferTankLoopCredit:zone_min_load_btu",
   // BTU/hr: an energy divided by the target heat-up hours.
   "calc-treatment.js:computePoolHeaterSize:required_output_btu",
@@ -448,6 +454,7 @@ const POLYMORPHIC_KEYS = new Map(Object.entries({
   psf: "a peak solar factor (Btu/h per sq ft) in computeWindowSolarHeatGain, a countertop load in pounds per sq ft",
   shortfall: "a heating-load shortfall (Btu/h) in calc-hvac, a missing tooth count in computeGearUndercutBacklash",
   governing: "which check governs (a label), except computePullBoxSizing where it is a length",
+  capacity_tons: "a REFRIGERATION ton in computeCracSensibleDerate -- 12,000 Btu/hr, a power -- and a ton of FORCE in computePunchCapacity",
   headroom: "a pressure headroom and a dimensionless margin",
   I: "electric current, and the dimensionless magnetic inclination angle in computeWMM",
   j: "a polar moment of area, and a loop index",
@@ -478,7 +485,7 @@ const POLYMORPHIC_KEYS = new Map(Object.entries({
 // readings must agree. The list stays explicit so a new split is a choice.
 const POUND_CONVENTION_UNSETTLED = new Set([
   "total_tons", // ballast mass in computeRoofBallastWeight, a press tonnage FORCE in computePressBrakeTonnage
-  "capacity_lb", "displacement_lb", "force_lb",
+  "capacity_lb", "displacement_lb",
   "green_weight_lb", "guy_tension_lb", "load_lb", "margin_lb", 
   "payload_lb", "reaction_lb", "required_wll_lb", "total_lb",
   "total_weight_lb", "tractive_effort_lb", "vehicle_weight_lb",

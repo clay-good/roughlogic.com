@@ -139,7 +139,7 @@ function renderEquipmentHourlyRate(inputRegion, outputRegion, citationEl) {
 }
 CONTRACTOR_FINANCE_RENDERERS["equipment-hourly-rate"] = renderEquipmentHourlyRate;
 
-// dims: in { annual_overhead: dimensionless, basis: dimensionless, billable_hours: dimensionless, annual_direct: dimensionless, job_direct: dimensionless } out: { rate_hr: dimensionless, overhead_pct: dimensionless, job_overhead: dimensionless }
+// dims: in { annual_overhead: dimensionless, basis: dimensionless, billable_hours: T, annual_direct: dimensionless, job_direct: dimensionless } out: { rate_hr: dimensionless, overhead_pct: dimensionless, job_overhead: dimensionless }
 export function computeOverheadRecoveryRate({ annual_overhead = 0, basis = "per-hour", billable_hours = 0, annual_direct = 0, job_direct = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (basis !== "per-hour" && basis !== "markup") return { error: "Basis must be per-hour or markup." };

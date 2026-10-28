@@ -776,7 +776,7 @@ SHOP_RENDERERS["press-brake-tonnage"] = _v40renderPressBrakeTonnage;
 // the thickest material a given press can air-bend. From
 // total_tons = 575 x (UTS/60) x T^2 / V x L, solving for T:
 // T = sqrt( total_tons x V / (575 x (UTS/60) x L) ).
-// dims: in { available_tonnage_tons: dimensionless, die_opening_in: L, bend_length_ft: L, uts_ksi: M L^-1 T^-2 } out: { max_thickness_in: L, recommended_die_in: L }
+// dims: in { available_tonnage_tons: M L T^-2, die_opening_in: L, bend_length_ft: L, uts_ksi: M L^-1 T^-2 } out: { max_thickness_in: L, recommended_die_in: L }
 export function computePressBrakeMaxThickness({ available_tonnage_tons = 0, die_opening_in = 0, bend_length_ft = 0, uts_ksi = 60 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const tons = Number(available_tonnage_tons) || 0;
@@ -888,7 +888,7 @@ SHOP_RENDERERS["punch-force"] = _v40renderPunchForce;
 
 // spec-v683 - punch-capacity (inverse of punch-force) - Group G
 // F = perimeter x T x tau; solved for the max round-hole diameter or the max thickness a press can punch.
-// dims: in { capacity_tons: dimensionless, shear_strength_psi: M L^-1 T^-2, solve_for: dimensionless, diameter_in: L, thickness_in: L } out: { max_thickness_in: L, max_diameter_in: L, force_lb: dimensionless }
+// dims: in { capacity_tons: M L T^-2, shear_strength_psi: M L^-1 T^-2, solve_for: dimensionless, diameter_in: L, thickness_in: L } out: { max_thickness_in: L, max_diameter_in: L, force_lb: M L T^-2 }
 export function computePunchCapacity({ capacity_tons = 0, shear_strength_psi = 0, solve_for = "thickness", diameter_in = 0, thickness_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const cap = Number(capacity_tons) || 0;

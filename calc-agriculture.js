@@ -1830,7 +1830,7 @@ function _v23SimpleRenderer(spec) {
 // time remaining and a violation flag from the elapsed time since
 // application. The label always governs over any default.
 //
-// dims: in { rei_hours: dimensionless, phi_days: dimensionless, hours_since_application: dimensionless, days_since_application: dimensionless } out: { rei_remaining_hours: dimensionless, phi_remaining_days: dimensionless, rei_clear: dimensionless, phi_clear: dimensionless, early_entry_violation: dimensionless, early_harvest_violation: dimensionless }
+// dims: in { rei_hours: T, phi_days: dimensionless, hours_since_application: dimensionless, days_since_application: dimensionless } out: { rei_remaining_hours: T, phi_remaining_days: dimensionless, rei_clear: dimensionless, phi_clear: dimensionless, early_entry_violation: dimensionless, early_harvest_violation: dimensionless }
 export function computePesticideReiPhi({ rei_hours = 0, phi_days = 0, hours_since_application = 0, days_since_application = 0 } = {}) {
   // A blank or non-numeric label interval used to read CLEAR.
   for (const [k, v] of [["rei_hours", rei_hours], ["phi_days", phi_days]]) if (v === null || v === "" || !Number.isFinite(Number(v)) || Number(v) < 0) return { error: "Enter the label's " + (k === "rei_hours" ? "restricted-entry interval (hours)" : "pre-harvest interval (days)") + "; 0 only if the label says none." };
