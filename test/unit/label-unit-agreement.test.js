@@ -13,12 +13,9 @@
 // eleven are fixed, and this holds the line.
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync, readdirSync } from "node:fs";
-import { resolve, dirname } from "node:path";
-import { fileURLToPath } from "node:url";
 import { BESPOKE_LABELS } from "../fixtures/bespoke-labels.js";
+import { declaredDimensions, canonicalDim as canonical } from "../fixtures/declared-dims.js";
 
-const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
 
 // A parenthetical unit a label may end with -> the dimension it means. Only
 // units whose reading is unambiguous appear here: `lb`, `pcf` and `tons` are
@@ -47,39 +44,7 @@ const EXEMPT = new Map([
   ["motor-feeder-multiple.motors", "a typed list of motors; the (A) describes an item inside it"],
 ]);
 
-function canonical(expr) {
-  const t = String(expr).replace(/\*/g, " ").trim();
-  if (t === "dimensionless") return "1";
-  const map = new Map();
-  let sign = 1;
-  for (const tok of t.split(/(\s+|\/)/)) {
-    if (!tok || /^\s+$/.test(tok)) continue;
-    if (tok === "/") { sign = -1; continue; }
-    const m = tok.match(/^([A-Za-z]+)(?:\^(-?\d+))?$/);
-    if (!m) return null;
-    map.set(m[1], (map.get(m[1]) || 0) + (m[2] ? parseInt(m[2], 10) : 1) * sign);
-    sign = 1;
-  }
-  const parts = [...map.entries()].filter(([, e]) => e !== 0).sort((a, b) => a[0].localeCompare(b[0]));
-  return parts.length ? parts.map(([b, e]) => b + "^" + e).join(" ") : "1";
-}
 
-export function declaredDimensions(root = ROOT) {
-  const dims = new Map();
-  for (const f of readdirSync(root).filter((n) => /^calc-.*\.js$/.test(n))) {
-    for (const line of readFileSync(resolve(root, f), "utf8").split("\n")) {
-      if (!line.includes("// dims:")) continue;
-      for (const [, k, d] of line.split("// dims:")[1].matchAll(/(\w+): ([^,}]+)/g)) {
-        if (k === "in" || k === "out") continue;
-        const c = canonical(d);
-        if (!c) continue;
-        if (!dims.has(k)) dims.set(k, new Set());
-        dims.get(k).add(c);
-      }
-    }
-  }
-  return dims;
-}
 
 export function labelDisagreements(labels, dims) {
   const bad = [];

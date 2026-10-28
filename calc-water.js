@@ -1451,7 +1451,7 @@ function _v16w_renderChlorineDecay(inputRegion, outputRegion, citationEl) {
 }
 WATER_RENDERERS["chlorine-decay"] = _v16w_renderChlorineDecay;
 
-// dims: in { initial_mg_l: M L^-3, residual_mg_l: M L^-3, time_hr: T } out: { decay_k_per_hr: T^-1, half_life_hr: dimensionless }
+// dims: in { initial_mg_l: M L^-3, residual_mg_l: M L^-3, time_hr: T } out: { decay_k_per_hr: T^-1, half_life_hr: T }
 // Inverse of the chlorine-decay tile: given an initial residual and a
 // measured residual after an elapsed time (a distribution bottle test),
 // back out the first-order decay constant. C = C0 * exp(-k*t), so
