@@ -168,7 +168,7 @@ LOWVOLTAGE_RENDERERS["wireless-fspl"] = _renderWirelessFspl;
 // r_n(m) = 17.32 sqrt(n d1 d2 / (f_GHz D)), d1/d2/D in km (D = d1 + d2); 17.32 = sqrt(300) from
 // r_n = sqrt(n lambda d1 d2 / D). The link is considered clear when >= 60% of the FIRST zone (n=1)
 // is unobstructed. ITU-R P.526 / first-principles diffraction.
-// dims: in { frequency_ghz: dimensionless, d1_km: dimensionless, d2_km: dimensionless, zone_number: dimensionless } out: { radius_m: dimensionless, first_zone_radius_m: dimensionless, clearance_60pct_m: dimensionless, total_distance_km: dimensionless }
+// dims: in { frequency_ghz: dimensionless, d1_km: L, d2_km: L, zone_number: dimensionless } out: { radius_m: dimensionless, first_zone_radius_m: dimensionless, clearance_60pct_m: dimensionless, total_distance_km: dimensionless }
 export function computeFresnelZoneClearance({ frequency_ghz = 0, d1_km = 0, d2_km = 0, zone_number = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const f = Number(frequency_ghz);

@@ -403,7 +403,7 @@ POWERQUALITY_RENDERERS["transformer-k-factor"] = _v183renderTransformerKFactor;
 // (NEMA MG-1 / IEEE 18 magnetizing-kVAR limit).
 // =====================================================================
 
-// dims: in { v_ll: dimensionless, i_noload_a: I, safety_factor: dimensionless } out: { magnetizing_kvar: dimensionless, max_capacitor_kvar: dimensionless }
+// dims: in { v_ll: M L^2 T^-3 I^-1, i_noload_a: I, safety_factor: dimensionless } out: { magnetizing_kvar: dimensionless, max_capacitor_kvar: dimensionless }
 export function computeMotorCapacitorMax({ v_ll = 0, i_noload_a = 0, safety_factor = 0.90 } = {}) {
   const v = Number(v_ll) || 0, i = Number(i_noload_a) || 0, sf = Number(safety_factor);
   if (!Number.isFinite(v) || !Number.isFinite(i) || !Number.isFinite(sf)) return { error: "Voltage, current, and safety factor must be finite numbers." };

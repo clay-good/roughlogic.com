@@ -78,7 +78,7 @@ function renderLaborBurdenRate(inputRegion, outputRegion, citationEl) {
 }
 CONTRACTOR_FINANCE_RENDERERS["labor-burden-rate"] = renderLaborBurdenRate;
 
-// dims: in { purchase: dimensionless, salvage: dimensionless, life_hr: dimensionless, annual_hr: dimensionless, iit_pct: dimensionless, fuel_gph: L^3 T^-1, fuel_price: dimensionless, maint_hr: dimensionless, wear_hr: dimensionless } out: { owning_hr: dimensionless, operating_hr: dimensionless, total_hr: dimensionless, avg_investment: dimensionless, deprec_hr: dimensionless, iit_hr: dimensionless }
+// dims: in { purchase: dimensionless, salvage: dimensionless, life_hr: T, annual_hr: dimensionless, iit_pct: dimensionless, fuel_gph: L^3 T^-1, fuel_price: dimensionless, maint_hr: dimensionless, wear_hr: dimensionless } out: { owning_hr: dimensionless, operating_hr: dimensionless, total_hr: dimensionless, avg_investment: dimensionless, deprec_hr: dimensionless, iit_hr: dimensionless }
 export function computeEquipmentHourlyRate({ purchase = 0, salvage = 0, life_hr = 0, annual_hr = 0, iit_pct = 0, fuel_gph = 0, fuel_price = 0, maint_hr = 0, wear_hr = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (Number(iit_pct) < 0) return { error: "Interest, insurance and tax percent cannot be negative." };

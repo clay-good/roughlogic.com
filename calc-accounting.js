@@ -208,7 +208,7 @@ export const straightLineExample = { inputs: { cost: 10000, salvage: 1000, life_
 // year-of-interest. Returns full schedule plus the year-of-interest
 // snapshot.
 
-// dims: in { cost: dimensionless, class_life: dimensionless, convention: dimensionless, year_of_interest: dimensionless }
+// dims: in { cost: dimensionless, class_life: T, convention: dimensionless, year_of_interest: dimensionless }
 //        out: { schedule: dimensionless, year_of_interest: dimensionless, year_depreciation: dimensionless, accumulated_depreciation: dimensionless, book_value: dimensionless }
 // (Pure IRS Pub 946 percentage-table lookup. Cost and per-year
 //  depreciation / accumulated / book-value entries are
@@ -627,8 +627,8 @@ export const inventoryTurnoverExample = { inputs: { cogs: 2000000, beginning_inv
 
 // --- 244: Cash Conversion Cycle ---
 
-// dims: in { dso: dimensionless, dio: dimensionless, dpo: dimensionless }
-//        out: { ccc_days: dimensionless, dso: dimensionless, dio: dimensionless, dpo: dimensionless, dio_contribution: dimensionless, dso_contribution: dimensionless, dpo_contribution: dimensionless }
+// dims: in { dso: T, dio: T, dpo: T }
+//        out: { ccc_days: dimensionless, dso: T, dio: T, dpo: T, dio_contribution: dimensionless, dso_contribution: dimensionless, dpo_contribution: dimensionless }
 // (CCC = DIO + DSO - DPO. All three inputs and the sum are
 //  expressed as days (dimensionless count per the §7.1 count
 //  convention); contributions are signed copies of the inputs.)
@@ -1291,7 +1291,7 @@ export const ACCOUNTING_RENDERERS = {
 // --- v20 R.1: Declining-balance depreciation (`declining-balance-depreciation`) ---
 // DB_rate = factor*(1/life); dep = book_begin*DB_rate, floored so book never
 // drops below salvage; optional straight-line crossover.
-// dims: in { cost: dimensionless, salvage: dimensionless, life_yr: dimensionless, factor: dimensionless, year: dimensionless, sl_switch: dimensionless } out: { book_value: dimensionless, year_depreciation: dimensionless, accumulated_depreciation: dimensionless, db_rate: dimensionless }
+// dims: in { cost: dimensionless, salvage: dimensionless, life_yr: T, factor: dimensionless, year: dimensionless, sl_switch: dimensionless } out: { book_value: dimensionless, year_depreciation: dimensionless, accumulated_depreciation: dimensionless, db_rate: dimensionless }
 export function computeDecliningBalanceDepreciation({ cost = 0, salvage = 0, life_yr = 0, factor = 2, year = 1, sl_switch = true } = {}) {
   if (!Number.isInteger(Number(year)) || Number(year) < 1) return { error: "Year is a whole number, 1 or more." };
   if (Number(year) > Math.round(Number(life_yr)) && Number(life_yr) > 0) return { error: "Year " + year + " is past the asset's " + Math.round(Number(life_yr)) + "-year life; depreciation is $0." };
@@ -1359,7 +1359,7 @@ ACCOUNTING_RENDERERS["declining-balance-depreciation"] = renderDecliningBalanceD
 
 // --- spec-v1231 R: Sum-of-the-years'-digits depreciation (`sum-of-years-digits-depreciation`) ---
 // SYD = n(n+1)/2; year k depreciation = (cost - salvage) x (n - k + 1) / SYD. Accelerated time-based method.
-// dims: in { cost: dimensionless, salvage: dimensionless, life_yr: dimensionless, year: dimensionless } out: { year_depreciation: dimensionless, accumulated_depreciation: dimensionless, book_value: dimensionless, syd_denominator: dimensionless }
+// dims: in { cost: dimensionless, salvage: dimensionless, life_yr: T, year: dimensionless } out: { year_depreciation: dimensionless, accumulated_depreciation: dimensionless, book_value: dimensionless, syd_denominator: dimensionless }
 export function computeSumOfYearsDigitsDepreciation({ cost = 0, salvage = 0, life_yr = 0, year = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!Number.isInteger(Number(year)) || Number(year) < 1) return { error: "Year is a whole number, 1 or more." };
