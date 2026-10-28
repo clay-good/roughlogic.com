@@ -485,9 +485,9 @@ const POLYMORPHIC_KEYS = new Map(Object.entries({
 // readings must agree. The list stays explicit so a new split is a choice.
 const POUND_CONVENTION_UNSETTLED = new Set([
   "total_tons", // ballast mass in computeRoofBallastWeight, a press tonnage FORCE in computePressBrakeTonnage
-  "capacity_lb", "displacement_lb",
-  "green_weight_lb", "guy_tension_lb", "load_lb", "margin_lb", 
-  "payload_lb", "reaction_lb", "required_wll_lb", "total_lb",
+  "displacement_lb",
+  "green_weight_lb", "load_lb", "margin_lb", 
+  "payload_lb", "required_wll_lb", "total_lb",
   "total_weight_lb", "tractive_effort_lb", "vehicle_weight_lb",
   "W_lb", "water_weight_lb", "wc_pcf", "weight_lb",
 ]);

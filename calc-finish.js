@@ -1566,7 +1566,7 @@ const _mvrNum = (v, what, opt) => {
   return { v: Number(v) };
 };
 
-// dims: in { mass_gain_g: M, test_area_sqft: L^2, hours: T, limit_lb: dimensionless, floor_area_sqft: L^2 } out: { mver_lb: dimensionless, margin_lb: dimensionless, tests_required: dimensionless }
+// dims: in { mass_gain_g: M, test_area_sqft: L^2, hours: T, limit_lb: M L^-2 T^-1, floor_area_sqft: L^2 } out: { mver_lb: M L^-2 T^-1, margin_lb: M L^-2 T^-1, tests_required: dimensionless }
 export function computeMverCalciumChloride({ mass_gain_g, test_area_sqft, hours, limit_lb = 3, floor_area_sqft = null } = {}) {
   const v = {};
   for (const [k, x, w, opt] of [["g", mass_gain_g, "mass gain (g)"], ["a", test_area_sqft, "test area under the dome (sq ft)"], ["h", hours, "exposure time (hours)"], ["lim", limit_lb ?? 3, "manufacturer's limit (lb)"], ["fa", floor_area_sqft, "floor area (sq ft)", true]]) {

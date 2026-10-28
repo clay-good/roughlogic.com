@@ -44,7 +44,7 @@ export const LAYOUT_RENDERERS = {};
 // existing sling-angle tile, enhanced additively rather than duplicated.)
 // =====================================================================
 
-// dims: in { reading_1_lb: dimensionless, reading_2_lb: dimensionless, span_ft: L, total_weight_lb: dimensionless, cg_from_1_ft: L } out: { total_weight_lb: dimensionless, cg_from_point_1_ft: L, percent_at_1: dimensionless, cg_from_point_2_ft: L, percent_at_2: dimensionless, reading_1_lb: dimensionless, reading_2_lb: dimensionless }
+// dims: in { reading_1_lb: M L T^-2, reading_2_lb: M L T^-2, span_ft: L, total_weight_lb: M L T^-2, cg_from_1_ft: L } out: { total_weight_lb: M L T^-2, cg_from_point_1_ft: L, percent_at_1: dimensionless, cg_from_point_2_ft: L, percent_at_2: dimensionless, reading_1_lb: M L T^-2, reading_2_lb: M L T^-2 }
 export function computeCenterOfGravity2Point({ mode = "two-scale-weigh", reading_1_lb = 0, reading_2_lb = 0, span_ft = 0, total_weight_lb = 0, cg_from_1_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const L = Number(span_ft);

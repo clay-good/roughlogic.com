@@ -209,7 +209,7 @@ function _v991renderReevingPartsOfLine(inputRegion, outputRegion, citationEl) {
 RIGGINGFIELD_RENDERERS["reeving-parts-of-line"] = _v991renderReevingPartsOfLine;
 
 // ===================== spec-v996: guy-wire / down-guy tension and mast download =====================
-// dims: in { horizontal_load_lb: M L T^-2, attachment_height_ft: L, anchor_lead_ft: L } out: { guy_angle_deg: dimensionless, guy_tension_lb: dimensionless, mast_download_lb: dimensionless, anchor_uplift_lb: dimensionless }
+// dims: in { horizontal_load_lb: M L T^-2, attachment_height_ft: L, anchor_lead_ft: L } out: { guy_angle_deg: dimensionless, guy_tension_lb: M L T^-2, mast_download_lb: M L T^-2, anchor_uplift_lb: M L T^-2 }
 export function computeGuyWireTension({ horizontal_load_lb = 500, attachment_height_ft = 20, anchor_lead_ft = 20 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(horizontal_load_lb > 0)) return { error: "Horizontal load must be positive (lb)." };

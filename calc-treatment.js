@@ -194,7 +194,7 @@ function _rPool(spec) {
   return _rlRender;
 }
 
-// dims: in { gallons: L^3, current_ta_ppm: dimensionless, target_ta_ppm: dimensionless } out: { delta_ppm: dimensionless, bicarb_lb: dimensionless, acid_floz: dimensionless }
+// dims: in { gallons: L^3, current_ta_ppm: dimensionless, target_ta_ppm: dimensionless } out: { delta_ppm: dimensionless, bicarb_lb: M, acid_floz: dimensionless }
 export function computePoolAlkalinityAdjust({ gallons = 0, current_ta_ppm = 0, target_ta_ppm = 0 } = {}) {
   const _g = _finiteGuardPool(arguments[0]); if (_g) return _g;
   if (current_ta_ppm < 0 || target_ta_ppm < 0) return { error: "Alkalinity readings must be non-negative." };
@@ -864,7 +864,7 @@ TREATMENT_RENDERERS["va-alkalinity-ratio"] = renderVaAlkalinityRatio;
 
 // --- spec-v596 M: Digester gas and methane production (`digester-gas-production`) ---
 // VS_destroyed = VS_fed x reduction/100; gas = VS_destroyed x yield; methane = gas x methane_pct/100; energy = methane x 960 BTU/ft^3.
-// dims: in { vs_fed_lb_day: M T^-1, vs_reduction_pct: dimensionless, gas_yield_ft3_lb: dimensionless, methane_pct: dimensionless } out: { vs_destroyed_lb_day: M T^-1, gas_ft3_day: L^3 T^-1, methane_ft3_day: L^3 T^-1, energy_btu_day: M L^2 T^-3, energy_mmbtu_day: M L^2 T^-3 }
+// dims: in { vs_fed_lb_day: M T^-1, vs_reduction_pct: dimensionless, gas_yield_ft3_lb: L^3 M^-1, methane_pct: dimensionless } out: { vs_destroyed_lb_day: M T^-1, gas_ft3_day: L^3 T^-1, methane_ft3_day: L^3 T^-1, energy_btu_day: M L^2 T^-3, energy_mmbtu_day: M L^2 T^-3 }
 export function computeDigesterGasProduction({ vs_fed_lb_day = 0, vs_reduction_pct = 0, gas_yield_ft3_lb = 15, methane_pct = 65 } = {}) {
   const _g = _finiteGuardPool(arguments[0]); if (_g) return _g;
   const vsf = Number(vs_fed_lb_day) || 0;
@@ -1411,7 +1411,7 @@ function _v1271renderParticleSettlingVelocity(inputRegion, outputRegion, citatio
 TREATMENT_RENDERERS["particle-settling-velocity"] = _v1271renderParticleSettlingVelocity;
 
 // ===================== spec-v969: pool calcium hardness increase (calcium chloride dose) =====================
-// dims: in { gallons: L^3, ppm_increase: dimensionless, product_purity_pct: dimensionless } out: { calcium_chloride_lb: dimensionless, calcium_chloride_oz: dimensionless }
+// dims: in { gallons: L^3, ppm_increase: dimensionless, product_purity_pct: dimensionless } out: { calcium_chloride_lb: M, calcium_chloride_oz: dimensionless }
 export function computePoolCalciumHardnessDose({ gallons = 20000, ppm_increase = 20, product_purity_pct = 77 } = {}) {
   const _g = _finiteGuardPool(arguments[0]); if (_g) return _g;
   if (!(gallons > 0)) return { error: "Pool volume must be positive (gal)." };

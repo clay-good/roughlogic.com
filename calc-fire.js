@@ -1709,7 +1709,7 @@ import {
 // Smooth bore: NR = 1.57 * d^2 * NP. Fog: NR = 0.0505 * Q * sqrt(NP).
 // Staffing thresholds (~60 lb one person, ~75 lb hose team) are advisory.
 //
-// dims: in { nozzle_type: dimensionless, bore_in: L, flow_gpm: L^3 T^-1, nozzle_pressure_psi: M L^-1 T^-2 } out: { reaction_lb: dimensionless }
+// dims: in { nozzle_type: dimensionless, bore_in: L, flow_gpm: L^3 T^-1, nozzle_pressure_psi: M L^-1 T^-2 } out: { reaction_lb: M L T^-2 }
 export function computeFireStreamReaction({ nozzle_type = "smooth", bore_in = 0, flow_gpm = 0, nozzle_pressure_psi = 0 } = {}) {
   if (nozzle_type !== "smooth" && nozzle_type !== "fog") return { error: "Nozzle type must be smooth or fog." };
   const np = Number(nozzle_pressure_psi) || 0;

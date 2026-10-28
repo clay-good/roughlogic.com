@@ -4414,7 +4414,7 @@ function _v27MinFillet(t) {
 // AISC §J2.2b maximum fillet size (in) along an edge of the thinner part.
 function _v27MaxFillet(t) { return t < 0.25 ? t : t - 0.0625; }
 
-// dims: in { leg_in: L, length_in: L, base_thickness_in: L, applied_load_lb: M L T^-2 } out: { throat_in: L, strength_per_in_lb: M T^-2, capacity_lb: dimensionless, F_Exx_ksi: M L^-1 T^-2, length_in: L, max_fillet_in: L, min_fillet_in: L, stress_ksi: M L^-1 T^-2 }
+// dims: in { leg_in: L, length_in: L, base_thickness_in: L, applied_load_lb: M L T^-2 } out: { throat_in: L, strength_per_in_lb: M T^-2, capacity_lb: M L T^-2, F_Exx_ksi: M L^-1 T^-2, length_in: L, max_fillet_in: L, min_fillet_in: L, stress_ksi: M L^-1 T^-2 }
 export function computeFilletWeldStrength({ mode = "capacity-from-size", leg_in = 0, length_in = 0, electrode = "E70", base_thickness_in = 0, applied_load_lb = 0, method = "ASD" } = {}) {
   const _g = _finiteGuard({ leg_in, length_in, base_thickness_in, applied_load_lb }); if (_g) return _g;
   if (mode !== "capacity-from-size" && mode !== "size-from-load") return { error: "Mode must be capacity-from-size or size-from-load." };
@@ -5246,7 +5246,7 @@ CONSTRUCTION_RENDERERS["metal-roof-panels"] = renderMetalRoofPanels;
 
 // --- Utility: Ridge / Hip Cap and Roofing-Nail Takeoff (spec-v217) ---
 
-// dims: in { ridge_lf: L, hip_lf: L, cap_lf_per_bundle: L, cap_exposure_in: L, squares: dimensionless, shingles_per_sq: dimensionless, nails_per_shingle: dimensionless, nails_per_lb: dimensionless } out: { cap_len_lf: L, cap_bundles: dimensionless, field_nails: dimensionless, cap_pieces: dimensionless, cap_nails: dimensionless, total_nails: dimensionless, nail_lbs: dimensionless }
+// dims: in { ridge_lf: L, hip_lf: L, cap_lf_per_bundle: L, cap_exposure_in: L, squares: dimensionless, shingles_per_sq: dimensionless, nails_per_shingle: dimensionless, nails_per_lb: dimensionless } out: { cap_len_lf: L, cap_bundles: dimensionless, field_nails: dimensionless, cap_pieces: dimensionless, cap_nails: dimensionless, total_nails: dimensionless, nail_lbs: M }
 export function computeRidgeCapFasteners({ ridge_lf = 0, hip_lf = 0, cap_lf_per_bundle = 20, cap_exposure_in = 5, squares = 0, shingles_per_sq = 64, nails_per_shingle = 4, nails_per_lb = 150 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   ridge_lf = Number(ridge_lf); hip_lf = Number(hip_lf);
@@ -11366,7 +11366,7 @@ CONSTRUCTION_RENDERERS["foundation-waterproofing-takeoff"] = _simpleRenderer({
 });
 
 // ===================== spec-v986: ballasted single-ply roof ballast weight and order =====================
-// dims: in { roof_area_sqft: L^2, ballast_psf: M L^-2, stone_density_pcf: M L^-3 } out: { total_ballast_lb: dimensionless, total_tons: M, stone_depth_in: L, volume_cy: L^3 }
+// dims: in { roof_area_sqft: L^2, ballast_psf: M L^-2, stone_density_pcf: M L^-3 } out: { total_ballast_lb: M, total_tons: M, stone_depth_in: L, volume_cy: L^3 }
 export function computeRoofBallastWeight({ roof_area_sqft = 5000, ballast_psf = 12, stone_density_pcf = 100 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(roof_area_sqft > 0)) return { error: "Roof area must be positive (sq ft)." };
