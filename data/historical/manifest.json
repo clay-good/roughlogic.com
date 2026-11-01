@@ -1,96 +1,96 @@
 {
   "name": "historical",
-  "version": "2026-09-25",
-  "fetched": "2026-09-25",
-  "edition": "Modeled after BLS PPI / EIA / USDA NASS / FRED federal series (series IDs named verbatim; the monthly values are generated from an in-tree anchor, not downloaded -- the build fetches nothing); built 2026-09-09. Build fails if any shard's latest point is more than 30 days behind the build date.",
-  "asOf": "2026-09-25",
+  "version": "2026-11-01",
+  "fetched": "2026-11-01",
+  "edition": "Modeled after BLS PPI / EIA / USDA NASS / FRED federal series (series IDs named verbatim; the monthly values are generated from an in-tree anchor, not downloaded -- the build fetches nothing); built 2026-11-01. Build fails if any shard's latest point is more than 30 days behind the build date.",
+  "asOf": "2026-11-01",
   "refresh_cadence": "monthly",
   "shards": [
     {
       "file": "commodities/copper.json",
       "name": "BLS PPI WPU102502 (Index 1982=100)",
-      "gzip_size_bytes": 603
+      "gzip_size_bytes": 602
     },
     {
       "file": "commodities/aluminum.json",
       "name": "BLS PPI WPU102501 (Index 1982=100)",
-      "gzip_size_bytes": 610
+      "gzip_size_bytes": 604
     },
     {
       "file": "commodities/structural-steel.json",
       "name": "BLS PPI WPU101704 (Index Jun 1982=100)",
-      "gzip_size_bytes": 610
+      "gzip_size_bytes": 606
     },
     {
       "file": "commodities/rebar.json",
       "name": "BLS PPI WPU1074051 (Index 1982=100)",
-      "gzip_size_bytes": 611
+      "gzip_size_bytes": 608
     },
     {
       "file": "commodities/framing-lumber.json",
       "name": "BLS PPI WPU081 (Index 1982=100)",
-      "gzip_size_bytes": 595
+      "gzip_size_bytes": 593
     },
     {
       "file": "commodities/osb.json",
       "name": "BLS PPI WPU083 (Index 1982=100)",
-      "gzip_size_bytes": 611
+      "gzip_size_bytes": 606
     },
     {
       "file": "commodities/drywall.json",
       "name": "BLS PPI WPU137 (Index 1982=100)",
-      "gzip_size_bytes": 592
+      "gzip_size_bytes": 589
     },
     {
       "file": "commodities/asphalt.json",
       "name": "BLS PPI WPU058102 (Index Jun 1985=100)",
-      "gzip_size_bytes": 592
+      "gzip_size_bytes": 593
     },
     {
       "file": "commodities/diesel.json",
       "name": "EIA PET.EMD_EPD2D_PTE_NUS_DPG.M (USD/gal)",
-      "gzip_size_bytes": 597
+      "gzip_size_bytes": 598
     },
     {
       "file": "commodities/gasoline.json",
       "name": "EIA PET.EMM_EPMR_PTE_NUS_DPG.M (USD/gal)",
-      "gzip_size_bytes": 591
+      "gzip_size_bytes": 590
     },
     {
       "file": "commodities/natural-gas.json",
       "name": "EIA NG.N3050US3.M (USD/Mcf)",
-      "gzip_size_bytes": 602
+      "gzip_size_bytes": 598
     },
     {
       "file": "commodities/wheat.json",
       "name": "USDA NASS WHEAT - PRICE RECEIVED, MEASURED IN $ / BU (USD/bushel)",
-      "gzip_size_bytes": 625
+      "gzip_size_bytes": 626
     },
     {
       "file": "commodities/corn.json",
       "name": "USDA NASS CORN, GRAIN - PRICE RECEIVED, MEASURED IN $ / BU (USD/bushel)",
-      "gzip_size_bytes": 621
+      "gzip_size_bytes": 623
     },
     {
       "file": "commodities/soybeans.json",
       "name": "USDA NASS SOYBEANS - PRICE RECEIVED, MEASURED IN $ / BU (USD/bushel)",
-      "gzip_size_bytes": 644
+      "gzip_size_bytes": 643
     }
   ],
   "hashes": {
-    "commodities/copper.json": "3643ed03f11d234747dc2a3047cde23ca665886d15aa22ab6732b147aea611a1",
-    "commodities/aluminum.json": "c23d4f190bdc6a93ba5cca306aadb332f8d718cc6962db25a07d9a3289b2a8d9",
-    "commodities/structural-steel.json": "5a4933a50d405d2838c36bb77d76c695c1f0f73a52d1965e497d06c0ce0ec8a8",
-    "commodities/rebar.json": "80aa8f283d66ee486215d7a8c6d34bcf1833745a629f49847d6265c67d87f921",
-    "commodities/framing-lumber.json": "c30add80f29bd1f6f54ae6cd5402a432e83fb48c35ced277252edd06226691ec",
-    "commodities/osb.json": "170e6056e51f154a72e8fe1b8bd7172f52079cb5540d1ca735b0fb96d2a8592f",
-    "commodities/drywall.json": "99fd3ae78289d7c149e1e98f9a89147dfa3a25346d502795c632bc3bf2c99a5c",
-    "commodities/asphalt.json": "be6f4847eb665732ceb210a2dd628932119129fc6f93e0c910f67ff171f17201",
-    "commodities/diesel.json": "44b74ba1c9c68d3eb834c5670d0c2c37e67aa3ca61e4e5c84d070891c37f85c6",
-    "commodities/gasoline.json": "7f1c23482257297afcf28b81107cc46cd02b494830a9a3e01bf0ca442aabd1c5",
-    "commodities/natural-gas.json": "3fd03e1ac5cad236199f4e9a9be3a6033e4b8e02f55170c8cd11f64971d03469",
-    "commodities/wheat.json": "30093535bae19680cef58fc0cc2d722b583233cacbcd21f1e248619529173848",
-    "commodities/corn.json": "8856a82c64ad80fcb393fee5e938e1c65ba9b91d6ad641647546555d342139dc",
-    "commodities/soybeans.json": "dfef8ed9df9ee67c16a97279b0fed201c912c20d5b0587ba31261b5610afbc90"
+    "commodities/copper.json": "456c9c06369d7d3c76f51305f992e6ee7fc897069d1ba64ed81862c1247829d2",
+    "commodities/aluminum.json": "4ea10233c2a8ffa2a5df6b42c3ac46bec3851342f3b7c9df133e1542d9b61769",
+    "commodities/structural-steel.json": "8b788e04eced79ad69deed9c654ae5af0d53f436aebb7f6a91d0fbfe6ca4d84d",
+    "commodities/rebar.json": "365bac6a56b858af74240ad81470ae7570f68104eda55e8a361cb3b9cdca575d",
+    "commodities/framing-lumber.json": "4030310f6939d75ff3e3eb5f731d4d1f74a6272b695e26081feeb6ad656e5985",
+    "commodities/osb.json": "365c9350768d2b49dcbadc182cc586b1c24cec155d0d5496892434a8d6e8ea11",
+    "commodities/drywall.json": "2b69d8faf75a317a1a52d2f2a4c935eec9f180c22094b2fde7c2ae50a8eefc9b",
+    "commodities/asphalt.json": "37803454e0450328c4a20d91fd9697242b80d118c1e01a0ac32654e28852597f",
+    "commodities/diesel.json": "a2a4719028b3d18e0486b2664a8b3bf1b992f8d2b491bd9577895f3aef3ea32e",
+    "commodities/gasoline.json": "ffeac31194b40e090b169cd38dbffdd1b063c0e076f621c02abba344e4047c51",
+    "commodities/natural-gas.json": "a8f206dfdd1fe169af3f2985121356cde9988c9e032288e9db636db56a5ecb33",
+    "commodities/wheat.json": "48f7dc06dfb05cf51f3e562f245852591cb0c6a84d20aabcbc5f59d5c097378e",
+    "commodities/corn.json": "8f34fc3fb88bc7e412ff78f7bb8229e9ac80e039b199ecd71bd402b2be4f5360",
+    "commodities/soybeans.json": "e841480e0f1ab831d07b20a3f742f1960dda694ab821a7c7c98a53228753cd97"
   }
 }
