@@ -159,6 +159,12 @@ const SOFT_404 = /^\/(?:common\/)?(?:notfound|not-found|404|pagenotfound|page-no
 //                                        residential connection with any UA;
 //                                        the GitHub runner gets 404, so the
 //                                        wall here is the datacenter address
+//   ashrae.org, www.ashrae.org
+//                            2026-11-01  the apex serves "Home | ashrae.org"
+//                                        and the cited page serves "Read-Only
+//                                        Versions of ASHRAE Standards" with
+//                                        its full preview list; the runner
+//                                        gets 403 on both
 // Re-open any of these in a browser rather than trusting the list: a host that
 // has genuinely gone away looks exactly the same from here.
 const BOT_WALLED = new Set([
@@ -169,6 +175,8 @@ const BOT_WALLED = new Set([
   "publications.iupac.org",
   "fda.gov",
   "www.fda.gov",
+  "ashrae.org",
+  "www.ashrae.org",
 ]);
 // Most walls answer 403; FDA answers a datacenter fetch with 404 instead, so
 // the status that counts as the wall is per host.

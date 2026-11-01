@@ -124,6 +124,8 @@ Per spec-v10.md §3.2, a `check:free-access` WARN (4xx / 5xx / network error on 
 
 - 2026-07-05: Clay Good. Probe run: 24 OK / 2 WARN, both on `ncei.noaa.gov` (apex and `/products/world-magnetic-model`; `fetch failed` network error in the probe environment). Manual recheck the same day: `https://www.ncei.noaa.gov` returns 200 and the apex `https://ncei.noaa.gov` returns a 301 to www, with the WMM product page live at `https://www.ncei.noaa.gov/products/world-magnetic-model`. The source (NOAA NCEI, World Magnetic Model — `data/field/wmm/coefficients.json`) remains free and public; the WARN was an apex-host fetch quirk, not a paywall or takedown. No action needed; recheck on the next probe run.
 
+- 2026-11-01: Clay Good. Probe run: 39 OK / 11 WARN, of which 3 were not explained by a known bot wall -- `https://ashrae.org`, `https://ashrae.org/technical-resources/standards-and-guidelines/read-only-versions-of-ashrae-standards` and its `www` form, all 403. Manual recheck the same day in a browser: the apex serves "Home | ashrae.org" and the cited page serves "Read-Only Versions of ASHRAE Standards" with its full preview list of standards and guidelines. ASHRAE's read-only preview access remains free and public; the 403 is a bot wall on the publisher's edge, not a paywall or takedown. Action: `ashrae.org` and `www.ashrae.org` added to `BOT_WALLED` in `scripts/check-free-access.mjs`, so a future 403 on these hosts is annotated rather than counted as a broken link. Re-open in a browser on the next probe run rather than trusting the list.
+
 ## Adding a new dataset
 
 1. Add the authoritative input to `scripts/build-data.mjs` (or to a new in-tree input file under `scripts/`).
