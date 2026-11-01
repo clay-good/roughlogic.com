@@ -1,9 +1,9 @@
 {
   "name": "construction",
-  "version": "2026-09-24",
-  "fetched": "2026-09-24",
+  "version": "2026-11-01",
+  "fetched": "2026-11-01",
   "edition": "IRC 2021 / IBC 2021 cited by section number (IRC 2024 and IBC 2027 are the current published editions; bundled values follow 2021 and the tile citations disclose it); ASCE 7 formulas applied (no licensed text reproduced); ACI 211 / ACI 318 / ACI 347 cited by name (ACI 318 provisions follow 318-19; ACI CODE-318-25, published 2025, is the current edition); ASTM A615 + CRSI rebar values; APA span-rating tables (technical-bulletin reuse); ICC-ES AC358 helical-pile Kt; ASME B30.5 / B30.9 + OSHA 29 CFR 1926 Subpart CC for crane-lift; ASTM/SAE bolt grades; AWS deposition; lumber properties from public engineering references; verified 2026-09-02.",
-  "asOf": "2026-09-24",
+  "asOf": "2026-11-01",
   "refresh_cadence": "annual",
   "shards": [
     {
@@ -14,12 +14,12 @@
     {
       "file": "concrete-mixes.json",
       "name": "Concrete mixes",
-      "gzip_size_bytes": 243
+      "gzip_size_bytes": 244
     },
     {
       "file": "span-derivations.json",
       "name": "Span derivations",
-      "gzip_size_bytes": 210
+      "gzip_size_bytes": 211
     },
     {
       "file": "soil-bearing.json",
@@ -29,22 +29,22 @@
     {
       "file": "wind-snow-zones.json",
       "name": "Wind and snow design data",
-      "gzip_size_bytes": 525
+      "gzip_size_bytes": 521
     },
     {
       "file": "aci-211-curves.json",
       "name": "ACI 211 mix-design curves",
-      "gzip_size_bytes": 503
+      "gzip_size_bytes": 499
     },
     {
       "file": "bolt-grades.json",
       "name": "Bolt grade proof loads",
-      "gzip_size_bytes": 322
+      "gzip_size_bytes": 326
     },
     {
       "file": "sfm-table.json",
       "name": "SFM and chipload table",
-      "gzip_size_bytes": 357
+      "gzip_size_bytes": 360
     },
     {
       "file": "aws-deposition.json",
@@ -54,12 +54,12 @@
     {
       "file": "rebar-unit-weights.json",
       "name": "Rebar unit weights and bar diameters (ASTM A615 / CRSI)",
-      "gzip_size_bytes": 352
+      "gzip_size_bytes": 356
     },
     {
       "file": "apa-span-ratings.json",
       "name": "APA plywood / OSB span-rating tables",
-      "gzip_size_bytes": 566
+      "gzip_size_bytes": 569
     },
     {
       "file": "helical-pile-kt.json",
@@ -70,7 +70,7 @@
   "hashes": {
     "lumber-properties.json": "947041f4cb75814aa707ed283fa6dcd65885aec3c69362c004f6c9c80729b015",
     "concrete-mixes.json": "4c302a4012faa2b2e034dc826accbcab49860ed23dc204f68071d70372f5a45f",
-    "span-derivations.json": "71a2f3150a4375a1071dea3779d8c36fa7f9818522b8e4ca5df4cc207f845fef",
+    "span-derivations.json": "6052ef66ac15d3af2206502e7558d0939f4cfc8aabe1564d60025b16474fd98e",
     "soil-bearing.json": "a757623cfa441880a29623e8ff73e39fd084427046fd66e6f4608535986de96e",
     "wind-snow-zones.json": "c595680fe26d86d17e3ead00c4a18967a823c3c8c67bc09210025906ca2066b4",
     "aci-211-curves.json": "bb85e0973fb931d12489c2509428985b9495df214430270081f7fe9649f0dbec",
