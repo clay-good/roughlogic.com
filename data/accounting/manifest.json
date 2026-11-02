@@ -1,9 +1,9 @@
 {
   "name": "accounting",
-  "version": "2026-11-01",
-  "fetched": "2026-11-01",
+  "version": "2026-11-02",
+  "fetched": "2026-11-02",
   "edition": "IRS Pub 946 (MACRS), Pub 15-T (payroll percentage method), annual Rev. Proc. (Section 179 cap), SSA wage-base announcement (SE tax), IRS Form 1040-ES schedule (estimated tax), IRS standard mileage rate notice. U.S. Census ARTS 2022 (benchmarked) industry aggregates (inventory turnover; ARTS has no later data year, having folded into the Annual Integrated Economic Survey). Per-year entries with verified-on date; verified 2026-09-09.",
-  "asOf": "2026-11-01",
+  "asOf": "2026-11-02",
   "refresh_cadence": "annual",
   "shards": [
     {
@@ -14,7 +14,7 @@
     {
       "file": "section-179-limits.json",
       "name": "Section 179 cap and phase-out, per-year",
-      "gzip_size_bytes": 537
+      "gzip_size_bytes": 536
     },
     {
       "file": "se-tax-parameters.json",
@@ -24,12 +24,12 @@
     {
       "file": "estimated-tax-due-dates.json",
       "name": "IRS Form 1040-ES quarterly due dates",
-      "gzip_size_bytes": 344
+      "gzip_size_bytes": 345
     },
     {
       "file": "standard-mileage-rates.json",
       "name": "IRS standard mileage rate, per-year",
-      "gzip_size_bytes": 419
+      "gzip_size_bytes": 420
     },
     {
       "file": "inventory-benchmarks.json",
@@ -43,12 +43,12 @@
     }
   ],
   "hashes": {
-    "macrs-tables.json": "13a44295fe34ae91e1c3d1ec49cee88a8268ce26798f1e021c357540281d79e9",
-    "section-179-limits.json": "ce0ae0835b7d070a5d1d414b62e2ede352251155211bc0aae7eedd66e4a2d1d1",
-    "se-tax-parameters.json": "c778cbeccd8e1db9b7808fee2f81bb46ab543831206f18ad1d3c09b2b537b50b",
-    "estimated-tax-due-dates.json": "8795616d2b0e9491ebba4505de0e0d8827a635f2a1b2ae88e4f80f57e848dfa0",
-    "standard-mileage-rates.json": "61b5e9df13e2bbfb836497aa68e2cbae6c12126907d3bd15238be80646db5d85",
-    "inventory-benchmarks.json": "465beab41d8d06e6db9dbff99b0fba0dccf122bbac82acf4e68975a5f4c5618b",
-    "pub-15-t-tables.json": "52665ca6118bec96188c0593dbda61f52be04bb6968e6e55f8447b0c869e3e9f"
+    "macrs-tables.json": "678e7c8f3bd60aa852b70970d0038907d852cc510c92ba881836c82a2e289cbe",
+    "section-179-limits.json": "60135d26e3a798f3d348515ad90da781eacda532369b2ad3c5254eca1633cb84",
+    "se-tax-parameters.json": "40821fbb499a75bab51314efe5858ad2c63fedd4c81076430f10aacb61b3d718",
+    "estimated-tax-due-dates.json": "b6b63c721103f2b3ed11c42f1910795184329784670f993e08b32c3c12d92409",
+    "standard-mileage-rates.json": "9873519797abd6dc9f846ef70d1bddf199ef45af63454ddf9ebc5f5ffd472161",
+    "inventory-benchmarks.json": "51eca35928240a1285d6c3bb2457096da7931cb9e204d26fe908f82849f9fc2d",
+    "pub-15-t-tables.json": "ad29da4c0eba8e4ef845b865373138f8ccb24d19dfcc87cde6ad769939377bcd"
   }
 }
