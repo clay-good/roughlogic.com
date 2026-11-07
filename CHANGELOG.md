@@ -67,6 +67,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **The bonus-depreciation tooltip no longer says bonus ends in 2027.** On the Section 179 calculator it still read "phases down ... 20% in 2026 and 0% in 2027 unless Congress extends", while the calculator beside it applied the One Big Beautiful Bill Act's permanent 100%. The tooltip, its glossary shard and the derivation note now say what the code does. A new test holds the inlined glossary equal to the shipped `data/cross/glossary.json` and requires the bonus tooltip to state the latest bundled year's rate; with the old wording both fail.
+
 - **The plumbing tiles named the wrong states as Uniform Plumbing Code states.** Their shared edition note said "UPC jurisdictions (CA, IN, MA, NV, parts of NJ)". Indiana enforces the IPC (2006), Massachusetts and New Jersey have plumbing codes of their own (248 CMR; the National Standard Plumbing Code), and the UPC states are fifteen, among them Minnesota, Oregon and Washington, which the note left out. It now gives the counts from the drafted state rows and points to the "Your state's edition" row.
 - **Montana's NEC row said NEC 2020; Montana has enforced NEC 2023 since Sep 26, 2026.** The state's Current Codes page, read 2026-10-20, lists the 2023 edition adopted by ARM Title 24, Chapter 301; the 2026-10-17 recheck predated the page's update. Found while drafting the IRC rows, which the same page lists as IRC 2024 on the same date.
 - **Hardening slice 59: the sixteen tiles and the feet-and-inches entry landed 2026-10-19/20, each re-derived from its rule and run by an independent reviewer.** Ten tiles had no defect. Fixed:

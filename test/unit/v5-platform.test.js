@@ -8,6 +8,8 @@ import assert from "node:assert/strict";
 import {
   buildCsv, inputHash, GLOSSARY,
 } from "../../v5-platform.js";
+import { SECTION_179_LIMITS } from "../../calc-accounting.js";
+import { readFileSync } from "node:fs";
 
 // 269 CSV builder
 test("CSV: simple header + row", () => {
@@ -120,4 +122,18 @@ test("Glossary: every entry is plain English (>15 chars, no HTML)", () => {
 });
 test("Glossary: at least 20 terms bundled (v5 starter)", () => {
   assert.ok(Object.keys(GLOSSARY).length >= 20);
+});
+
+// The tooltip is inlined here AND shipped as data/cross/glossary.json; two
+// surfaces written separately drift. Until 2026-11-07 the bonus tooltip on the
+// Section 179 tile still said bonus "phases down ... 0% in 2027" while the
+// tile itself applied OBBBA's permanent 100%.
+test("Glossary: inlined terms equal the shipped glossary shard", () => {
+  const shard = JSON.parse(readFileSync(new URL("../../data/cross/glossary.json", import.meta.url), "utf8")).terms;
+  assert.deepEqual(GLOSSARY, shard);
+});
+test("Glossary: the bonus tooltip states the latest bundled year's bonus rate", () => {
+  const latest = Math.max(...Object.keys(SECTION_179_LIMITS).map(Number));
+  const pct = SECTION_179_LIMITS[latest].bonus_pct;
+  assert.ok(GLOSSARY.bonus_depreciation.includes(pct + "%"), latest + " bonus is " + pct + "%: " + GLOSSARY.bonus_depreciation);
 });

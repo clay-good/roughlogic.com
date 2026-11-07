@@ -1087,7 +1087,7 @@ Verification: 5-year row sums to 100.00%, 7-year row sums to 100.00 (within publ
   bonus = after_179 * (bonus_pct / 100)
   remaining_basis_to_macrs = after_179 - bonus
 
-Citations: IRC 179 (Election to expense certain depreciable business assets), IRS annual Rev. Proc. for the inflation-adjusted cap and phase-out threshold. Bonus depreciation per IRC 168(k) with the TCJA phase-down (80 / 60 / 40 / 20 percent for 2023 / 2024 / 2025 / 2026).
+Citations: IRC 179 (Election to expense certain depreciable business assets), IRS annual Rev. Proc. for the inflation-adjusted cap and phase-out threshold. Bonus depreciation per IRC 168(k): the TCJA phase-down ran 80 / 60 percent for 2023 / 2024; the One Big Beautiful Bill Act made it a permanent 100 percent from 2025 for qualified property acquired after 2025-01-19 (40 percent in the 2025-01-01 to 2025-01-19 window). Per-year limits through 2027 are bundled.
 
 Verification: At cost = phaseout_start + $100k, dollar_cap drops by exactly $100k (phaseout is dollar-for-dollar). business_use_pct = 50 halves the basis. Bonus applies to the residual after Section 179, never the original cost.
 

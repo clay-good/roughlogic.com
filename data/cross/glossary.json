@@ -9,7 +9,7 @@
     "MACRS": "Modified Accelerated Cost Recovery System. The depreciation method most U.S. business assets use for tax. Bundled percentage tables (Pub 946) prescribe the deduction by class life and convention.",
     "FICA": "Federal Insurance Contributions Act. The combined Social Security (6.2%) and Medicare (1.45%) tax. Self-employed pay both halves via Schedule SE; employees split it with the employer.",
     "Section_179": "An election to expense the full cost of qualifying business property in the placed-in-service year, up to an annual cap that phases out above a property-cost threshold.",
-    "bonus_depreciation": "An additional first-year depreciation under IRC 168(k). The percentage phases down (80% in 2023 down to 20% in 2026 and 0% in 2027 unless Congress extends).",
+    "bonus_depreciation": "An additional first-year depreciation under IRC 168(k). The TCJA phased it down (80% in 2023, 60% in 2024); the One Big Beautiful Bill Act made it a permanent 100% for qualified property acquired after 2025-01-19.",
     "DSO": "Days Sales Outstanding. Average number of days between making a sale and collecting cash on it.",
     "DIO": "Days Inventory Outstanding. Average number of days inventory sits before being sold.",
     "DPO": "Days Payable Outstanding. Average number of days between receiving a supplier invoice and paying it.",

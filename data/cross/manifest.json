@@ -9,10 +9,10 @@
     {
       "file": "glossary.json",
       "name": "Inline glossary tooltip definitions",
-      "gzip_size_bytes": 1803
+      "gzip_size_bytes": 1867
     }
   ],
   "hashes": {
-    "glossary.json": "2730a72a1310fd93a4733fd0e15d1290249c208b4ccb7b8166f36625b3b4d8b1"
+    "glossary.json": "a067ee54c02c1c91c726c400344666b22ff63403ac497ad71724b2535b71bc3d"
   }
 }
