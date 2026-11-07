@@ -317,7 +317,9 @@ export function computeSnowStackingArea({ lot_area_ft2 = 0, accumulation_in = 0,
   const spaces_lost = Math.ceil(footprint_ft2 / area_per_space_ft2 - 1e-9);
   const season_pile_volume_ft3 = pile_volume_ft3 * n;
   const season_length_ft = season_pile_volume_ft3 / cross_section_ft2;
-  const season_footprint_ft2 = season_length_ft * base_width_ft;
+  // The same small-pile rule as one event: a season total too small to reach the height limit is a cone.
+  const _season_cone_h = Math.cbrt(3 * season_pile_volume_ft3 / (Math.PI * side_slope_run_per_rise * side_slope_run_per_rise));
+  const season_footprint_ft2 = _season_cone_h < pile_height_ft ? Math.PI * Math.pow(side_slope_run_per_rise * _season_cone_h, 2) : season_length_ft * base_width_ft;
   const season_footprint_pct_of_lot = 100 * season_footprint_ft2 / lot_area_ft2;
   const season_spaces_lost = Math.ceil(season_footprint_ft2 / area_per_space_ft2 - 1e-9);
   const allocated_area_ft2 = lot_area_ft2 * (allocated_pct / 100);

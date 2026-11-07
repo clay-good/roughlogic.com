@@ -715,13 +715,13 @@ export function computeClosetShelfTakeoff({ single_hang_ft = 0, double_hang_ft =
   if (![rod_lf, shelf_lf, rod_sticks, shelf_boards, brackets].every(Number.isFinite)) return { error: "Closet-takeoff math did not produce a finite value." };
   return {
     rod_lf, shelf_lf, rod_sticks, shelf_boards, brackets, splice_needed,
-    note: (splice_needed ? "A run is LONGER than the stock length - the splice must land AT a support (never mid-span), which can add a stick beyond the straight division below. " : "")
+    note: (splice_needed ? "A run is LONGER than the stock length - the splice must land AT a support (never mid-span), which the packed stick count below already reflects. " : "")
       + "Single-hang walls take one rod and one shelf; double-hang walls take two rods (two bracket tiers) and one shelf; a linen wall takes its shelf count with supports under every shelf. Supports land at each end and every " + spacing + " in between - the middle bracket is what keeps a loaded 6-ft rod from smiling. Standard hang heights (66-in single; 40/80-in double; linen starting near 76 in and stacking down) are practice, not code. Wire shelving counts by the same wall lengths but its own bracket system; the manufacturer's span and support instructions govern.",
   };
 }
 export const closetShelfTakeoffExample = { inputs: { single_hang_ft: 6, double_hang_ft: 4, linen_wall_ft: 3, linen_shelf_count: 4, bracket_spacing_in: 32, stock_length_ft: 8 } };
 FINISH_RENDERERS["closet-shelf-takeoff"] = _simpleRenderer({
-  citation: "Citation: closet takeoff arithmetic - rod LF = single-hang + 2 x double-hang; shelf LF = one shelf per hang run + linen shelves; supports at each end and every entered spacing between (count per run = ceil(run/spacing) + 1), with double-hang runs carrying two tiers and linen stacks one per shelf; sticks and boards divide the totals by stock length, and a run longer than stock is flagged because the splice must land at a support. A counting aid; the shelving manufacturer's span and support instructions govern.",
+  citation: "Citation: closet takeoff arithmetic - rod LF = single-hang + 2 x double-hang; shelf LF = one shelf per hang run + linen shelves; supports at each end and every entered spacing between (count per run = ceil(run/spacing) + 1), with double-hang runs carrying two tiers and linen stacks one per shelf; sticks and boards pack the actual pieces into stock lengths (offcuts cannot be joined), and a run longer than stock is flagged because the splice must land at a support. A counting aid; the shelving manufacturer's span and support instructions govern.",
   example: closetShelfTakeoffExample.inputs,
   fields: [
     { key: "single_hang_ft", label: "Single-hang wall length (ft)", kind: "number" },

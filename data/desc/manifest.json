@@ -9,7 +9,7 @@
     {
       "file": "a.json",
       "name": "Tile descriptions after the opening sentence, a runtime shard (generated)",
-      "gzip_size_bytes": 19580
+      "gzip_size_bytes": 19615
     },
     {
       "file": "b.json",
@@ -19,12 +19,12 @@
     {
       "file": "c.json",
       "name": "Tile descriptions after the opening sentence, c runtime shard (generated)",
-      "gzip_size_bytes": 64335
+      "gzip_size_bytes": 64362
     },
     {
       "file": "d.json",
       "name": "Tile descriptions after the opening sentence, d runtime shard (generated)",
-      "gzip_size_bytes": 32692
+      "gzip_size_bytes": 32736
     },
     {
       "file": "e.json",
@@ -44,7 +44,7 @@
     {
       "file": "h.json",
       "name": "Tile descriptions after the opening sentence, h runtime shard (generated)",
-      "gzip_size_bytes": 22154
+      "gzip_size_bytes": 22209
     },
     {
       "file": "i.json",
@@ -94,12 +94,12 @@
     {
       "file": "r.json",
       "name": "Tile descriptions after the opening sentence, r runtime shard (generated)",
-      "gzip_size_bytes": 41632
+      "gzip_size_bytes": 41686
     },
     {
       "file": "s.json",
       "name": "Tile descriptions after the opening sentence, s runtime shard (generated)",
-      "gzip_size_bytes": 76505
+      "gzip_size_bytes": 76518
     },
     {
       "file": "t.json",
@@ -109,12 +109,12 @@
     {
       "file": "u.json",
       "name": "Tile descriptions after the opening sentence, u runtime shard (generated)",
-      "gzip_size_bytes": 5242
+      "gzip_size_bytes": 5248
     },
     {
       "file": "v.json",
       "name": "Tile descriptions after the opening sentence, v runtime shard (generated)",
-      "gzip_size_bytes": 10196
+      "gzip_size_bytes": 10212
     },
     {
       "file": "w.json",
@@ -133,14 +133,14 @@
     }
   ],
   "hashes": {
-    "a.json": "5184039623f1fcaf1d2fc5264a66cd375321f893fb930236306d8394e32775be",
+    "a.json": "aa042145f90819b33b0bcf8018828d8e9e87dd139366c4912a9c31ed80360833",
     "b.json": "29c3f31c2d44aa5210db44f5b5cf375373f052885cff9373ad07da6bc344fe28",
-    "c.json": "3c7500054018cf03bb7b46df5e24154e090119c11023b682b109554f5b58ed40",
-    "d.json": "723bad29a130f680f2f80f1e49a9fa7f3ebd591d9cdda159b1fba1a6d99545d8",
+    "c.json": "4296216e5454ed15416a43a739a96ce32633a2cacd6cf3f8befae2ccf403f0b8",
+    "d.json": "24555e46380ed7fe3aeb904ea1bec6b12d4988f2842bb033393a8a4084ad73f2",
     "e.json": "8055b63c2dc910362a0ee777de775c8a1c48eb3780280bea4f0df0cf57de12fb",
     "f.json": "dd3b60de9ddf7b47c07368ba62d14ddf225c0a02848ac2d9e31362c758fd7602",
     "g.json": "d5d5e5eec523d540a8faa4ada1acc6d6809cd262433e254ed3e04466bccfa593",
-    "h.json": "948b2f5eeb30fe1f5727fb49f312fd7f0c7c67dd349ca87480331a90ec1faaba",
+    "h.json": "ad87edb3cb2fc916535f62dcc74bdb105f804b9e860d70f5b732123e9e52ddf3",
     "i.json": "06fcc9606909c8901eab664bf8fa1aed49ef5b750c7573f1591d5e7fec8547b8",
     "j.json": "f5ed4f82111db1d3843a7bd30f8cdddc13ecb47a09bccdf96f9b39993bd7e253",
     "k.json": "922a5b28e6ca5a5e8f9d3e03831ea7018d90dff67babae6344f27e0064457063",
@@ -150,11 +150,11 @@
     "o.json": "d61f0064b6371561e933c719893d6075da6ba7752ff67b47e6f1f8a433bad323",
     "p.json": "7ba02769574e8cf75a0402f282f5293cc96f48c3cb3c1ea17c307ecd7999ad09",
     "q.json": "a83d9062334d0d6fd4ff7ddffcbf0778411f275d092c331e78c04f57565af3a7",
-    "r.json": "c81d1b74b036fe18ab42c54e9ce1dc5d52a905314fb3689f546bed7c18ebb196",
-    "s.json": "c496a9dc12baabd91501d8fa1e717a02e25ec9def9bbf31117516a03388107e0",
+    "r.json": "f03584762702149a96590023ae1b66173a61dd49e7974de4ca301509e1793582",
+    "s.json": "62b0c399c5603bfa6696528c3ad855d9e4e92c7e002233d371ea8684781f364e",
     "t.json": "e0b0b5416a23d3d23a2ef3274adf8e8ccec0359872661c79efaa1be3d758895f",
-    "u.json": "070cad57383f7bd595656daa84c822d72a7c5d095feff47eaac5f08cf6cc3f7c",
-    "v.json": "311a3226ab6bf728b9a69a8baf3eefbde7dfd78f9d4ea1d245da97f5843a6d2d",
+    "u.json": "617b1d19902262d547a53359ff4308d79df9de7f34885e1cdf21fd1824c6eff1",
+    "v.json": "e627b8815d9a4bd7878a83d660f5d7dd6e865f6a4c866d5557ec3236cf8eb6bf",
     "w.json": "1c4afe2a994e21dc2262aa5dd04067a37e52919c560a43c5ed32e48ba81c6d7f",
     "y.json": "8159cfea22c44901e139ac49b55b87177249febe58d8fc0211c95d508cc9eafc",
     "z.json": "0d807396e16499129049770f5b02d19eb321cc80eade6d9f558dc011070e0040"

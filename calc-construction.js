@@ -5180,7 +5180,7 @@ export const iceBarrierCoverageExample = {
 };
 
 const renderIceBarrierCoverage = _simpleRenderer({
-  citation: "Citation: IRC R905.1.2 (ice barrier from the eave to 24 in inside the exterior wall line, measured up the slope, and on a roof of 8:12 or steeper not less than 36 in along the slope from the eave edge; IRC 2021 and 2024 alike) and ASTM D1970 self-adhering membrane. slope_factor = sqrt(rise^2 + 144) / 12; coverage = (overhang + 24) * slope_factor; courses = coverage <= roll width ? 1 : 1 + ceil((coverage - roll width) / (roll width - side lap)); rolls = ceil(courses * eave / roll length). Required only where the AHJ has adopted it; valley and low-slope-transition coverage is a separate manual add. A material takeoff, not a flashing plan.",
+  citation: "Citation: IRC R905.1.2 (ice barrier from the eave to 24 in inside the exterior wall line, measured up the slope, and on a roof of 8:12 or steeper not less than 36 in along the slope from the eave edge; IRC 2021 and 2024 alike) and ASTM D1970 self-adhering membrane. slope_factor = sqrt(rise^2 + 144) / 12; coverage = (overhang + 24) * slope_factor, at least 36 in at 8:12 or steeper; courses = coverage <= roll width ? 1 : 1 + ceil((coverage - roll width) / (roll width - side lap)); rolls = ceil(courses * eave / roll length). Required only where the AHJ has adopted it; valley and low-slope-transition coverage is a separate manual add. A material takeoff, not a flashing plan.",
   example: iceBarrierCoverageExample.inputs,
   fields: [
     { key: "eave_length_ft", label: "Eave run to protect (ft, all eaves)", kind: "number" },
@@ -11058,7 +11058,7 @@ export function computeChainLinkFenceTakeoff({ perimeter_ft = 200, height_ft = 4
 export const chainLinkFenceTakeoffExample = { inputs: { perimeter_ft: 200, height_ft: 4, gate_width_ft: 4, corners: 4, line_post_spacing_ft: 10 } };
 
 const _v901renderChainLinkFenceTakeoff = _simpleRenderer({
-  citation: "Citation: takeoff identity by name (Master Halco chain-link estimating). fabric and top rail = perimeter - gates; total posts = ceil(perimeter / spacing); terminals = corners + gate jambs; line posts = total - terminals; bands = (2 x corners + gate jambs) x ceil(height - 1), a corner taking two sets.",
+  citation: "Citation: takeoff identity by name (Master Halco chain-link estimating). fabric and top rail = perimeter - gates; total posts = ceil(perimeter / spacing), plus one on an open run with end posts; terminals = corners + end posts + gate jambs; line posts = total - terminals; bands = (2 x corners + end posts + gate jambs) x ceil(height - 1), a corner taking two sets.",
   example: chainLinkFenceTakeoffExample.inputs,
   fields: [
     { key: "perimeter_ft", label: "Fence run / perimeter (ft)", kind: "number" },

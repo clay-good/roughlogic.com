@@ -1238,7 +1238,7 @@ export const equipmentCircuitLoadExample = {
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 function _v16d_renderEquipmentCircuitLoad(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: total draw = sum(quantity x nameplate amps); NEC 2023 210.20(A) limits a continuous load to 80% of the branch-circuit rating, so circuits required = ceil(total / (0.8 x breaker)). Nameplate amps are representative cut-sheet defaults (Phoenix / Dri-Eaz / B-Air class); the actual unit nameplate governs. Free at nfpa.org/freeaccess for NFPA 70 (NEC).";
+  citationEl.textContent = "Citation: total draw = sum(quantity x nameplate amps); NEC 2023 210.20(A) limits a continuous load to 80% of the branch-circuit rating, so circuits required = the larger of ceil(total / (0.8 x breaker)) and the circuits each equipment type needs with whole machines per circuit. Nameplate amps are representative cut-sheet defaults (Phoenix / Dri-Eaz / B-Air class); the actual unit nameplate governs. Free at nfpa.org/freeaccess for NFPA 70 (NEC).";
   const lgr = makeNumber("LGR dehumidifiers (8.5 A)", "ec5-lgr", { step: "1", min: "0"});
   const am = makeNumber("Air movers (2.5 A)", "ec5-am", { step: "1", min: "0"});
   const hepa = makeNumber("HEPA scrubbers, 500 CFM (3.5 A)", "ec5-hepa", { step: "1", min: "0", value: "0" });

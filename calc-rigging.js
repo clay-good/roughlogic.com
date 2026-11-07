@@ -770,7 +770,7 @@ export function computeForkliftCapacityDerate({ rated_cap_lb, rated_lc_in = 24, 
 }
 
 function renderForkliftCapacityDerate(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: ASME B56.1 (Powered Industrial Trucks) and the truck data plate by name. net capacity = rated x rated load center / actual load center. Estimate - the capacity plate is the legal rating.";
+  citationEl.textContent = "Citation: ASME B56.1 (Powered Industrial Trucks) and the truck data plate by name. net capacity = rated x rated load center / actual load center, never above the plate rating. Estimate - the capacity plate is the legal rating.";
   const ratedCap = makeNumber("Rated capacity (lb)", "fk-cap", { step: "any", min: "0" });
   const ratedLc = makeNumber("Rated load center (in)", "fk-rlc", { step: "any", min: "0", value: "24" });
   ratedLc.input.value = "24";

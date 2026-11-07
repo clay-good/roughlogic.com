@@ -1722,7 +1722,7 @@ const renderLadderAngle = _simpleRendererG({
 });
 
 const renderPulleyMAGen = _simpleRendererG({
-  citation: "Citation: Public mechanics. actual_MA = theoretical_MA * efficiency^pulleys.",
+  citation: "Citation: Public mechanics. actual_MA = sum of efficiency^k over the sheaves (p + p^2 + ... + p^n, plus 1 when the haul part rises from the moving block).",
   example: pulleyMAExample.inputs,
   fields: [
     { key: "rig", label: "Rig", kind: "select", options: Object.keys(PULLEY_RIGS).map((k) => ({ value: k, label: k })) },

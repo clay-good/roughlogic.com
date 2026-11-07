@@ -2,16 +2,16 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "e463df6408850015",
-      "date": "2026-10-20"
+      "sha": "7c57fe0d3fc36df9",
+      "date": "2026-11-07"
     },
     "/tools/": {
       "sha": "01705a21c25fa06d",
       "date": "2026-10-20"
     },
     "/errata/": {
-      "sha": "44f91a53d13c6c42",
-      "date": "2026-10-20"
+      "sha": "1234e97dff0f707f",
+      "date": "2026-11-07"
     },
     "/collections/disaster-response/": {
       "sha": "4b520075bada167a",
@@ -338,8 +338,8 @@
       "date": "2026-10-17"
     },
     "/tools/as-purchased-quantity/": {
-      "sha": "2da55534b76bee93",
-      "date": "2026-10-17"
+      "sha": "ff98ad7d4fa25d03",
+      "date": "2026-11-07"
     },
     "/tools/asce-live-load-reduction/": {
       "sha": "bc08280e9f5d1160",
@@ -406,8 +406,8 @@
       "date": "2026-10-17"
     },
     "/tools/awning-canopy-load/": {
-      "sha": "50c8e70d5a925376",
-      "date": "2026-10-17"
+      "sha": "5652bd03bc99659d",
+      "date": "2026-11-07"
     },
     "/tools/axle-load-distribution/": {
       "sha": "9db481db2cc5526f",
@@ -1118,8 +1118,8 @@
       "date": "2026-10-17"
     },
     "/tools/chain-link-fence-takeoff/": {
-      "sha": "38088be873bfa4e6",
-      "date": "2026-10-17"
+      "sha": "6a80d335404913b4",
+      "date": "2026-11-07"
     },
     "/tools/chamber-cc-for-cr/": {
       "sha": "eabbc21f755cd355",
@@ -1294,8 +1294,8 @@
       "date": "2026-10-17"
     },
     "/tools/closet-shelf-takeoff/": {
-      "sha": "4838e2d6fdd03e53",
-      "date": "2026-10-17"
+      "sha": "1ec6fac212ce7617",
+      "date": "2026-11-07"
     },
     "/tools/closing-costs/": {
       "sha": "e695145d1ca1204d",
@@ -1306,8 +1306,8 @@
       "date": "2026-10-17"
     },
     "/tools/cmu-grout-volume/": {
-      "sha": "574734d62260bc52",
-      "date": "2026-10-17"
+      "sha": "a9ddbd99d2069dff",
+      "date": "2026-11-07"
     },
     "/tools/cmu-shear-wall/": {
       "sha": "e51659fbd67de4ba",
@@ -1374,8 +1374,8 @@
       "date": "2026-10-17"
     },
     "/tools/cohesive-earth-pressure/": {
-      "sha": "0b0bf758519ed97e",
-      "date": "2026-10-17"
+      "sha": "4e2882d890fd8bd7",
+      "date": "2026-11-07"
     },
     "/tools/coil-bypass-factor/": {
       "sha": "2592a3ff05d2e9de",
@@ -1762,8 +1762,8 @@
       "date": "2026-10-20"
     },
     "/tools/conduit-thermal-expansion/": {
-      "sha": "d2e4ce43f08d8d48",
-      "date": "2026-10-20"
+      "sha": "c37755ebe14139fd",
+      "date": "2026-11-07"
     },
     "/tools/cone-bottom-tank-volume/": {
       "sha": "1b571814ced68a69",
@@ -1942,8 +1942,8 @@
       "date": "2026-10-17"
     },
     "/tools/crane-lift-quick/": {
-      "sha": "88982715bd8dbbcf",
-      "date": "2026-10-17"
+      "sha": "e08c0f832f8620d4",
+      "date": "2026-11-07"
     },
     "/tools/crane-load-radius-boom/": {
       "sha": "45090f5ddfa5b7cd",
@@ -1954,16 +1954,16 @@
       "date": "2026-10-17"
     },
     "/tools/crane-outrigger-reaction/": {
-      "sha": "10a5c1f6a0e00268",
-      "date": "2026-10-17"
+      "sha": "4e9af2225b37a06f",
+      "date": "2026-11-07"
     },
     "/tools/crane-power-line-clearance/": {
       "sha": "6c50fd1189364563",
       "date": "2026-10-17"
     },
     "/tools/crawl-space-ventilation/": {
-      "sha": "86328e9435475b02",
-      "date": "2026-10-20"
+      "sha": "892fac938a835b9c",
+      "date": "2026-11-07"
     },
     "/tools/critical-load-shed-tiers/": {
       "sha": "a924da46a27f9e94",
@@ -2142,8 +2142,8 @@
       "date": "2026-10-17"
     },
     "/tools/deck-ledger-fasteners/": {
-      "sha": "269f6e0e55e62db2",
-      "date": "2026-10-17"
+      "sha": "c9df4b774433f25c",
+      "date": "2026-11-07"
     },
     "/tools/deck-point-load-dunnage/": {
       "sha": "577e24a72299646b",
@@ -2546,8 +2546,8 @@
       "date": "2026-10-17"
     },
     "/tools/duct-static-regain/": {
-      "sha": "de2de7f67e51391f",
-      "date": "2026-10-17"
+      "sha": "bd7c5bff9385a163",
+      "date": "2026-11-07"
     },
     "/tools/duct-transition-length/": {
       "sha": "cb93b5d894ad794e",
@@ -2638,12 +2638,12 @@
       "date": "2026-10-20"
     },
     "/tools/egress-capacity/": {
-      "sha": "15b0323c710834ac",
-      "date": "2026-10-20"
+      "sha": "61acfc7f82b379bc",
+      "date": "2026-11-07"
     },
     "/tools/egress-lighting-check/": {
-      "sha": "d9ee5de1a0c6f257",
-      "date": "2026-10-17"
+      "sha": "ae07325bb881adf5",
+      "date": "2026-11-07"
     },
     "/tools/egress-travel-distance/": {
       "sha": "5e7cf8622b6f7ec6",
@@ -2730,8 +2730,8 @@
       "date": "2026-10-17"
     },
     "/tools/equipment-power-draw/": {
-      "sha": "406cde4bd8e0f666",
-      "date": "2026-10-20"
+      "sha": "0fe41ef0a968ad11",
+      "date": "2026-11-07"
     },
     "/tools/equivalent-length/": {
       "sha": "b2413ed9d6eb0e4f",
@@ -2874,8 +2874,8 @@
       "date": "2026-10-17"
     },
     "/tools/fall-arrest-clearance/": {
-      "sha": "c328b8348a30eb5a",
-      "date": "2026-10-17"
+      "sha": "bce2c09c6b6063a4",
+      "date": "2026-11-07"
     },
     "/tools/fall-protection-clearance/": {
       "sha": "cd42faa1cc08f053",
@@ -2910,8 +2910,8 @@
       "date": "2026-10-17"
     },
     "/tools/fatigue-combined-loading/": {
-      "sha": "77c42d7e1be2a516",
-      "date": "2026-10-17"
+      "sha": "ea14cf0bcce733d3",
+      "date": "2026-11-07"
     },
     "/tools/fatigue-finite-life/": {
       "sha": "f6e8e8d0f6345adf",
@@ -3214,8 +3214,8 @@
       "date": "2026-10-17"
     },
     "/tools/forklift-capacity-derate/": {
-      "sha": "743afebbae3baa5e",
-      "date": "2026-10-17"
+      "sha": "6736d40852113d66",
+      "date": "2026-11-07"
     },
     "/tools/formwork-member-spacing/": {
       "sha": "48d4273a8348eaa0",
@@ -3854,8 +3854,8 @@
       "date": "2026-10-17"
     },
     "/tools/hood-exhaust/": {
-      "sha": "3062e56dde4b26ad",
-      "date": "2026-10-20"
+      "sha": "bea09575dc113bf0",
+      "date": "2026-11-07"
     },
     "/tools/hoop-stress-mawp/": {
       "sha": "6fbc8f83604af8b6",
@@ -4018,8 +4018,8 @@
       "date": "2026-10-17"
     },
     "/tools/ice-barrier-coverage/": {
-      "sha": "a0f9e2424ce37a1f",
-      "date": "2026-10-20"
+      "sha": "d49d194856e23aad",
+      "date": "2026-11-07"
     },
     "/tools/ice-machine-sizing/": {
       "sha": "035e0b0cad435827",
@@ -4374,8 +4374,8 @@
       "date": "2026-10-17"
     },
     "/tools/lifting-lug-design/": {
-      "sha": "6ba393532e70802a",
-      "date": "2026-10-17"
+      "sha": "b252f2a8d6acdc15",
+      "date": "2026-11-07"
     },
     "/tools/ligation-molar-ratio/": {
       "sha": "ffd12a96ddf2f55d",
@@ -5006,8 +5006,8 @@
       "date": "2026-10-17"
     },
     "/tools/mua-tempering-load/": {
-      "sha": "8abc31617696dc0b",
-      "date": "2026-10-20"
+      "sha": "afb3be3467b651b2",
+      "date": "2026-11-07"
     },
     "/tools/mud-hydrostatic-pressure/": {
       "sha": "c5a74220c69f4bc7",
@@ -5726,8 +5726,8 @@
       "date": "2026-10-17"
     },
     "/tools/pool-turnover/": {
-      "sha": "672321e867ce3718",
-      "date": "2026-10-17"
+      "sha": "1121e1657a11e1f7",
+      "date": "2026-11-07"
     },
     "/tools/pool-volume/": {
       "sha": "6343b4470d094058",
@@ -5742,8 +5742,8 @@
       "date": "2026-10-17"
     },
     "/tools/portable-ladder-setup/": {
-      "sha": "df82c2bd9117b587",
-      "date": "2026-10-17"
+      "sha": "564f31538125862c",
+      "date": "2026-11-07"
     },
     "/tools/post-hole-concrete/": {
       "sha": "5355540d324a49f1",
@@ -5918,8 +5918,8 @@
       "date": "2026-10-17"
     },
     "/tools/pulley-ma-gen/": {
-      "sha": "b8507b05b78b4b18",
-      "date": "2026-10-17"
+      "sha": "243b1442cca0b3c6",
+      "date": "2026-11-07"
     },
     "/tools/pulling-tension/": {
       "sha": "ea1a85117959255c",
@@ -6146,8 +6146,8 @@
       "date": "2026-10-17"
     },
     "/tools/range-demand-220-55/": {
-      "sha": "6423c7e3d85935c9",
-      "date": "2026-10-20"
+      "sha": "dd35819fe030bf9a",
+      "date": "2026-11-07"
     },
     "/tools/ras-flow-rate/": {
       "sha": "9cdd903a6d033b2c",
@@ -6158,8 +6158,8 @@
       "date": "2026-10-17"
     },
     "/tools/rc-beam-flexure/": {
-      "sha": "2423a30250d7ace8",
-      "date": "2026-10-17"
+      "sha": "7c0adec383e2c091",
+      "date": "2026-11-07"
     },
     "/tools/rc-beam-shear/": {
       "sha": "38897862f36c414b",
@@ -6182,8 +6182,8 @@
       "date": "2026-10-17"
     },
     "/tools/rc-doubly-reinforced/": {
-      "sha": "27b03fd4a26796bd",
-      "date": "2026-10-17"
+      "sha": "c642de743eac4e5c",
+      "date": "2026-11-07"
     },
     "/tools/rc-headed-bar-development/": {
       "sha": "7d1b4e7ac307fa01",
@@ -7266,8 +7266,8 @@
       "date": "2026-10-18"
     },
     "/tools/snow-stacking-area/": {
-      "sha": "a01b283a61920093",
-      "date": "2026-10-17"
+      "sha": "a29ae2d88dd9b6c9",
+      "date": "2026-11-07"
     },
     "/tools/snow-unbalanced-gable/": {
       "sha": "ce4f00dc1103fbb1",
@@ -7406,8 +7406,8 @@
       "date": "2026-10-17"
     },
     "/tools/speaker-70v-line/": {
-      "sha": "50bb9f16f684e78c",
-      "date": "2026-10-17"
+      "sha": "347e3dd17a53c676",
+      "date": "2026-11-07"
     },
     "/tools/speaker-impedance/": {
       "sha": "03e16c479ae6fe44",
@@ -7942,8 +7942,8 @@
       "date": "2026-10-17"
     },
     "/tools/surface-air-consumption/": {
-      "sha": "cd6821252bb8c96f",
-      "date": "2026-10-17"
+      "sha": "8e992d32cd92bd51",
+      "date": "2026-11-07"
     },
     "/tools/surface-condensation-risk/": {
       "sha": "541570198d5eba6b",
@@ -8582,8 +8582,8 @@
       "date": "2026-10-17"
     },
     "/tools/umbilical-air-supply/": {
-      "sha": "785bee971c35a312",
-      "date": "2026-10-17"
+      "sha": "8744cf996c061205",
+      "date": "2026-11-07"
     },
     "/tools/unit-converter/": {
       "sha": "1849bea0a7dbeb56",
@@ -8714,8 +8714,8 @@
       "date": "2026-10-17"
     },
     "/tools/vent-terminal-check/": {
-      "sha": "ac017f13b721ed9d",
-      "date": "2026-10-20"
+      "sha": "fcc35aa829ef72a8",
+      "date": "2026-11-07"
     },
     "/tools/ventilation-rate-procedure/": {
       "sha": "ea2813a9eb43df58",
@@ -8738,8 +8738,8 @@
       "date": "2026-10-17"
     },
     "/tools/vfd-reflected-wave/": {
-      "sha": "d32d023ec8d6a283",
-      "date": "2026-10-17"
+      "sha": "ac3129761e373bc4",
+      "date": "2026-11-07"
     },
     "/tools/vibration-forcing-frequencies/": {
       "sha": "85eb61586ae31a3e",

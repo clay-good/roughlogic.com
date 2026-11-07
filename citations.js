@@ -2453,7 +2453,7 @@ export const CITATIONS = {
   },
 
   "pool-turnover": {
-    formula: "Required flow (GPM) = pool volume / (turnover hours x 60). Chlorine product (lb) = volume x ppm x 8.34 / 1,000,000 / available-chlorine fraction (cal-hypo 0.65, trichlor 0.90, liquid bleach 0.125).",
+    formula: "Required flow (GPM) = pool volume / (turnover hours x 60). Chlorine product (lb) = volume x ppm x 8.34 / 1,000,000 / available-chlorine fraction (cal-hypo 0.65, trichlor 0.90); liquid bleach by trade percent: gal = that pure-chlorine lb / (0.125 x 8.34), lb = gal x 8.34 x (1 + 0.0158 x 12.5).",
     edition: "NSPF Certified Pool Operator Handbook (2022); ANSI/APSP/ICC 11 (Public Pools and Spas).",
     freeAccess: "phta.org for the APSP-11 TOC; NSPF handbook licensed.",
     governance: GOVERNANCE.water,
@@ -2888,7 +2888,7 @@ export const CITATIONS = {
   },
 
   "hood-exhaust": {
-    formula: "Type I: Q = duty_multiplier * L. Wall-canopy duty multipliers (light 200, medium 300, heavy 400, extra-heavy 550 cfm/ft) per IMC 2027 §507.2.10.1-507.2.10.3 (Type I) and §507.3.4.1 (light duty) [§507.5.1-507.5.4 in IMC 2021]. Single-island canopy (400 / 500 / 600 / 700). Double-island (250 / 300 / 400 / 550). Backshelf / proximity / pass-over (250 / 300 / 400; extra-heavy not allowed). Type II: dishwashing Q = 100 * L (IMC 2027 507.3.4.2 [507.5.5 in 2021]); light-duty cooking or food preparation Q = light-duty rate for the hood type * L (IMC 2027 507.3.4.1 [507.5.4 in 2021]). Makeup = 0.80 * Q (IMC 508 balance check). Duct area (in^2) = Q / V * 144.",
+    formula: "Type I: Q = duty_multiplier * L. Wall-canopy duty multipliers (light 200, medium 300, heavy 400, extra-heavy 550 cfm/ft) per IMC 2027 §507.2.10.1-507.2.10.3 (Type I) and §507.3.4.1 (light duty) [§507.5.1-507.5.4 in IMC 2021]. Single-island canopy (400 / 500 / 600 / 700). Double-island (250 / 300 / 400 / 550 per side; both faces are open, so Q = 2 x multiplier x L). Backshelf / proximity / pass-over (250 / 300 / 400; extra-heavy not allowed). Type II: dishwashing Q = 100 * L (IMC 2027 507.3.4.2 [507.5.5 in 2021]); light-duty cooking or food preparation Q = light-duty rate for the hood type * L (IMC 2027 507.3.4.1 [507.5.4 in 2021]). Makeup = 0.80 * Q (IMC 508 balance check). Duct area (in^2) = Q / V * 144.",
     edition: "IMC 2027 §507.2.10 (Type I) and §507.3.4 (Type II) [§507.5 in IMC 2021; rates unchanged]. NFPA 96-2024 governs grease-handling exhaust system design.",
     freeAccess: "codes.iccsafe.org for IMC TOC; nfpa.org/freeaccess for NFPA 96 TOC.",
     governance: GOVERNANCE.mechanical,
@@ -3077,7 +3077,7 @@ export const CITATIONS = {
     editionNote: NEC_DISCLOSURE,
     assumptions: [
       { name: "PVC coefficient", value: "the bundled 3.38e-5 in/in/deg-F coefficient is the public PVC physical property underlying NEC Table 352.44; the manufacturer's published coefficient governs", source: "NEC 2023 Table 352.44 / PVC manufacturer" },
-      { name: "Temperature swing", value: "the temperature change is the maximum-minus-minimum the conduit will see; a zero or negative swing yields zero expansion to absorb", source: "site temperature extremes; the AHJ governs" },
+      { name: "Temperature swing", value: "the temperature change is the maximum-minus-minimum the conduit will see; the swing is taken as a magnitude (a contraction moves the run as far as an equal expansion); a zero swing is rejected", source: "site temperature extremes; the AHJ governs" },
     ],
   },
 
@@ -3428,9 +3428,9 @@ export const CITATIONS = {
     edition: "IRC §R507.9 deck ledger connection provisions, by name.",
     freeAccess: "Free read-only at codes.iccsafe.org; the AHJ-adopted edition governs.",
     governance: GOVERNANCE.structural,
-    editionNote: "Single-edition (the count follows from the on-center spacing, which is user-supplied from the AHJ-adopted IRC R507.9 table for the fastener type / joist-span row)." + IRC_DECK_2024,
+    editionNote: "Single-edition (the count follows from the on-center spacing, which defaults to the bundled IRC Table R507.9.1.3(1) maximum for the fastener type / joist-span row (an entered spacing is checked against it; a proprietary screw's comes from its evaluation report))." + IRC_DECK_2024,
     assumptions: [
-      { name: "Spacing", value: "user-supplied from the adopted IRC R507.9 table; bolt edge-distance and stagger apply; bottom-of-ledger spacing excluded", source: "IRC R507.9" },
+      { name: "Spacing", value: "the IRC Table R507.9.1.3(1) maximum when left blank (an entered value is checked against it); bolt edge-distance and stagger apply; bottom-of-ledger spacing excluded", source: "IRC R507.9" },
     ],
   },
 
@@ -3683,13 +3683,13 @@ export const CITATIONS = {
     ],
   },
   "crane-lift-quick": {
-    formula: "Gross load = load + rigging + block + jib_deduct. Per-leg sling tension L = W / (n × sin(theta)) with the sling angle theta measured from horizontal (vertical pick theta = 90 deg gives W/n; tension diverges as the sling flattens). Percent of chart = gross / chart_capacity × 100. Flags: < 75% green, 75-90% yellow, ≥ 90% red. Refuses to render an output without the user-entered chart capacity (the tool never reproduces a load chart).",
+    formula: "Gross load = load + rigging + block + jib_deduct. Per-leg sling tension L = W / (min(n, 2) × sin(theta)) (three or more legs are not assumed to share; two carry the load) with the sling angle theta measured from horizontal (vertical pick theta = 90 deg gives W/n; tension diverges as the sling flattens). Percent of chart = gross / chart_capacity × 100. Flags: < 75% green, 75-90% yellow, ≥ 90% red. Refuses to render an output without the user-entered chart capacity (the tool never reproduces a load chart).",
     edition: "ASME B30.5 (Mobile and Locomotive Cranes) by name and section. ASME B30.9 (Slings) for the per-leg formula. OSHA 29 CFR 1926 Subpart CC (cranes and derricks) by section.",
     freeAccess: "ASME B30 series licensed; OSHA 29 CFR 1926 free at ecfr.gov.",
     governance: GOVERNANCE.engineer_of_record,
     editionNote: "Single-edition (ASME B30.5 / B30.9 + OSHA 29 CFR 1926 Subpart CC). The crane manufacturer's load chart and the qualified lift director govern.",
     assumptions: [
-      { name: "Per-leg formula", value: "L = W / (n × sin(theta)) with theta the sling angle from horizontal; vertical pick (theta = 90 deg) L = W / n", source: "ASME B30.9" },
+      { name: "Per-leg formula", value: "L = W / (min(n, 2) × sin(theta)) with theta the sling angle from horizontal (two legs carry the load on a 3- or 4-leg pick); vertical two-leg pick L = W / 2", source: "ASME B30.9" },
       { name: "Critical-lift threshold", value: "75% of chart capacity (engineering-practice critical-lift trigger)", source: "engineering practice" },
     ],
   },
@@ -5516,7 +5516,7 @@ export const CITATIONS = {
     ],
   },
   "as-purchased-quantity": {
-    formula: "ap_quantity = ep_quantity_needed / (yield_pct / 100); ap_units = unit_weight > 0 ? ap_quantity / unit_weight : n/a.",
+    formula: "ap_quantity = ep_quantity_needed / (yield_pct / 100); ap_units = purchase_unit_size > 0 ? ap_quantity / purchase_unit_size : n/a (purchase_unit_size in the EP unit, lb or each).",
     edition: "As-purchased quantity from edible-portion needed (standard culinary math; CIA The Professional Chef; Labensky, On Cooking; ServSafe), by name; the actual yield varies with grade, season, and trimming, so a yield test on the real product governs.",
     freeAccess: "The as-purchased-quantity relation is public culinary math (the inverse of yield); the edible-portion amount needed, the yield percentage, and the purchase-unit weight are the kitchen's values.",
     governance: GOVERNANCE.general,
@@ -6078,7 +6078,7 @@ export const CITATIONS = {
     ],
   },
   "equipment-power-draw": {
-    formula: "Total continuous draw (A) = sum(quantity × nameplate amps) + other load. Continuous-load limit per circuit = 0.80 × breaker rating (NEC 210.20(A), continuous = 3 hr or more). Circuits required = ceil(total / (0.80 × breaker)). Total VA = total amps × circuit voltage.",
+    formula: "Total continuous draw (A) = sum(quantity × nameplate amps) + other load. Continuous-load limit per circuit = 0.80 × breaker rating (NEC 210.20(A), continuous = 3 hr or more). Circuits required = the larger of ceil(total / (0.80 × breaker)) and, for each equipment type, ceil(count / floor(0.80 × breaker / unit amps)), since a machine cannot be split across circuits. Total VA = total amps × circuit voltage.",
     edition: "NEC 2023 (NFPA 70) §210.20(A) (overcurrent protection for branch circuits) by section. Equipment nameplate amps are representative cut-sheet values (Phoenix / Dri-Eaz / B-Air class drying equipment).",
     freeAccess: "NFPA 70 free read-only at nfpa.org/freeaccess; manufacturer cut sheets free at each vendor site.",
     governance: GOVERNANCE.electrical,
@@ -6445,9 +6445,9 @@ export const CITATIONS = {
     edition: "ANSI Z359.1 (Fall Protection Code) and OSHA 1926 Subpart M fall-clearance calculation, by name.",
     freeAccess: "The additive fall-clearance model is public (ANSI Z359 / OSHA 1926 Subpart M); OSHA standards are free at osha.gov, the Z359 standards are licensed.",
     governance: GOVERNANCE.fire,
-    editionNote: "The vertical clearance a personal fall-arrest system needs below the anchor so the worker does not strike a lower level: RFC = free-fall distance + deceleration distance + worker height (harness D-ring to the feet) + a safety margin. Each term is entered explicitly because the free-fall distance depends on the anchor position relative to the D-ring (a foot-level anchor produces a large free fall, an overhead anchor a small one) and the connector length; the deceleration distance is the energy absorber's stroke - OSHA 1926.502(d)(16)(iv) limits the system to 3.5 ft, but an ANSI/ASSP Z359.13 absorber rated for a 6 ft free fall may deploy up to 48 in (4 ft), so plan on the label's figure (a self-retracting lifeline is usually less); the worker height D-ring-to-feet is about 5 ft; and the safety margin (commonly 2-3 ft) keeps the feet off the level. If the available clearance is less than RFC the worker contacts the lower level before arrest. A planning aid; the equipment manufacturer's instructions and a qualified/competent person govern the actual system.",
+    editionNote: "The vertical clearance a personal fall-arrest system needs below the anchor so the worker does not strike a lower level: RFC = anchor height above the D-ring + free-fall distance + deceleration distance + worker height (harness D-ring to the feet) + a safety margin. Each term is entered explicitly because the free-fall distance depends on the anchor position relative to the D-ring (a foot-level anchor produces a large free fall, an overhead anchor a small one) and the connector length; the deceleration distance is the energy absorber's stroke - OSHA 1926.502(d)(16)(iv) limits the system to 3.5 ft, but an ANSI/ASSP Z359.13 absorber rated for a 6 ft free fall may deploy up to 48 in (4 ft), so plan on the label's figure (a self-retracting lifeline is usually less); the worker height D-ring-to-feet is about 5 ft; and the safety margin (commonly 2-3 ft) keeps the feet off the level. If the available clearance is less than RFC the worker contacts the lower level before arrest. A planning aid; the equipment manufacturer's instructions and a qualified/competent person govern the actual system.",
     assumptions: [
-      { name: "Additive model", value: "RFC = free fall + deceleration + worker height + safety margin", source: "ANSI Z359 / OSHA 1926 Subpart M" },
+      { name: "Additive model", value: "RFC = anchor height above the D-ring + free fall + deceleration + worker height + safety margin", source: "ANSI Z359 / OSHA 1926 Subpart M" },
       { name: "Deceleration distance", value: "up to 48 in (4 ft) for a 6 ft free-fall energy absorber and 60 in for a 12 ft one; OSHA limits the system to 3.5 ft; an SRL is usually less", source: "ANSI/ASSP Z359.13-2013; 29 CFR 1926.502(d)(16)(iv)" },
       { name: "Free-fall basis", value: "depends on the anchor position relative to the D-ring and the connector length", source: "fall-protection practice" },
     ],
@@ -6690,7 +6690,7 @@ export const CITATIONS = {
     ],
   },
   "pulley-ma-gen": {
-    formula: "Theoretical MA = number of supporting rope segments. Actual MA = theoretical × pulley_efficiency^n_pulleys. Fixed pulley redirects but does not multiply force; movable pulley × 2; the block_n options are an n-part tackle (MA n) reeved over n sheaves, the haul line leaving the fixed block. The p^n friction model is a simple approximation: tension tracking (1 + p + ... per sheave) gives a somewhat higher actual MA, and the Army FM 5-125 rule (add about 10% of the load per sheave: 5,000 lb on a 4-part, 4-sheave tackle takes a 1,750 lb pull, MA 2.86) a lower one than p^n at 0.95.",
+    formula: "Theoretical MA = number of supporting rope segments. Actual MA by tension tracking = p + p^2 + ... + p^n over the n sheaves (plus 1 when the haul part rises from the moving block). Fixed pulley redirects but does not multiply force; movable pulley × 2; the block_n options are an n-part tackle (MA n) reeved over n sheaves, the haul line leaving the fixed block. The p^n friction model is a simple approximation: tension tracking (1 + p + ... per sheave) gives a somewhat higher actual MA, and the Army FM 5-125 rule (add about 10% of the load per sheave: 5,000 lb on a 4-part, 4-sheave tackle takes a 1,750 lb pull, MA 2.86) a lower one than p^n at 0.95.",
     edition: "Classical mechanics; NFPA 1006 / 1670 by name for rescue context.",
     freeAccess: "Mechanics texts free at university OCW.",
     governance: GOVERNANCE.general,
@@ -8851,7 +8851,7 @@ export const CITATIONS = {
     ],
   },
   "range-demand-220-55": {
-    formula: "demand_kw = ColumnC(num_ranges) x (1 + increase); increase = 0.05 x round(nameplate_kw - 12) for ranges over 12 kW, else 0 (Note 1 counts a kW 'or major fraction thereof' -- round-half-up, not ceil); demand_a = demand_kw x 1000 / supply_v. Column C: 1->8, 2->11, 3->14, 4->17, 5->20 kW.",
+    formula: "demand_kw = ColumnC(num_ranges) x (1 + increase) for 8.75-27 kW ranges, or num_ranges x nameplate_kw x the Column A (under 3.5 kW) / Column B (3.5-8.75 kW) percentage for the count under 8.75 kW; increase = 0.05 x round(nameplate_kw - 12) for ranges over 12 kW, else 0 (Note 1 counts a kW 'or major fraction thereof' -- round-half-up, not ceil); demand_a = demand_kw x 1000 / supply_v. Column C: 1->8, 2->11, 3->14, 4->17, 5->20 kW.",
     edition: "Household electric ranges, wall ovens, and counter-mounted cooking units, NEC 2023 Table 220.55 Column C and Note 1, by name.",
     freeAccess: "NEC is free to read at nfpa.org/freeaccess. Equal-rating Column C with the Note 1 over-12 kW increase, and under 8.75 kW the Note 3 Columns A/B percentages by count (added 2026-10-09; spot values A 10 = 49%, B 10 = 34%, B 9 = 35%, B 4 = 50% agree with EC&M worked examples); Note 2 unequal-rating averaging is not modeled.",
     governance: GOVERNANCE.electrical,
@@ -9837,7 +9837,7 @@ export const CITATIONS = {
     ],
   },
   "forklift-capacity-derate": {
-    formula: "net_capacity = rated_cap x rated_lc / actual_lc (data-plate method); pass = load <= net_capacity; margin_pct = (net_capacity - load) / net_capacity x 100.",
+    formula: "net_capacity = min(rated_cap, rated_cap x rated_lc / actual_lc) (data-plate method; a shorter load center never raises it above the plate); pass = load <= net_capacity; margin_pct = (net_capacity - load) / net_capacity x 100.",
     edition: "ASME B56.1 (Powered Industrial Trucks) and the truck data plate by name; the data-plate load-center method.",
     freeAccess: "ASME B56.1 is a published consensus standard. The capacity comes from the truck's data plate.",
     governance: GOVERNANCE.rigging,
@@ -10553,7 +10553,7 @@ export const CITATIONS = {
     ],
   },
   "chain-link-fence-takeoff": {
-    formula: "fabric_lf = rail_wire_lf = perimeter_ft - gate_width_ft; total_posts = ceil(perimeter_ft / line_post_spacing_ft); terminals = corners + (gate jambs); line_posts = total_posts - terminals; tension_bands = (2 x corners + gate jambs) x ceil(height_ft - 1).",
+    formula: "fabric_lf = rail_wire_lf = perimeter_ft - gate_width_ft; total_posts = ceil(perimeter_ft / line_post_spacing_ft), plus one on an open run with end posts (never fewer than the terminals); terminals = corners + end posts + (gate jambs); line_posts = total_posts - terminals; tension_bands = (2 x corners + end posts + gate jambs) x ceil(height_ft - 1).",
     edition: "Chain-link takeoff identity by name (fabric net of gates; posts over the run; bands per terminal per foot of height); first-principles count arithmetic.",
     freeAccess: "The count arithmetic is public first-principles; the fabric gauge, post schedule, and hardware follow the fence spec.",
     governance: GOVERNANCE.general,
@@ -10940,7 +10940,7 @@ export const CITATIONS = {
     edition: "NEC 630.11 (conductors) and 630.12 (overcurrent protection) for arc-welding equipment, with the Table 630.11(A) duty-cycle multipliers, by name; the welder nameplate and the adopted NEC edition govern.",
     freeAccess: "The duty-cycle multipliers and the 200% OCPD limit are public NEC (many jurisdictions post the adopted NEC); the rated primary current and duty come from the welder nameplate.",
     governance: GOVERNANCE.general,
-    editionNote: "An arc-welder branch circuit is sized on an EFFECTIVE current rather than the nameplate primary. NEC 630.11(A) and Table 630.11(A) set the conductor at the rated primary current times a duty-cycle multiplier equal to the square root of the duty cycle, held at 0.45 for a duty of 20% or less where the table stops (a 50%-duty welder draws its rated current only half the time, so its I^2 t heating is halved and the conductor need only carry sqrt(0.5) = 0.71 of the primary). The conductor's ampacity must be at least this effective current. NEC 630.12(A) permits the overcurrent device to be up to 200% of the rated primary current (using the next standard size down if 200% does not land on one). This covers arc welders (transformer / rectifier / motor-generator); resistance (spot / seam) welders use the separate 630.31 / 630.32 method with a 300% OCPD limit. Use the welder's rated primary current and duty cycle; the AHJ, the welder nameplate, and the adopted NEC edition govern.",
+    editionNote: "An arc-welder branch circuit is sized on an EFFECTIVE current rather than the nameplate primary. NEC 630.11(A) and Table 630.11(A) set the conductor at the rated primary current times the Table 630.11(A) duty-cycle multiplier: for transformer/rectifier welders the printed rounding of the square root of the duty cycle, held at 0.45 for a duty of 20% or less; for motor-generator welders a higher column (0.75 at 50%, 0.55 at 20% or less) (a 50%-duty welder draws its rated current only half the time, so its I^2 t heating is halved and the conductor need only carry sqrt(0.5) = 0.71 of the primary). The conductor's ampacity must be at least this effective current. NEC 630.12(A) permits the overcurrent device to be up to 200% of the rated primary current (using the next standard size down if 200% does not land on one). This covers arc welders (transformer / rectifier / motor-generator); resistance (spot / seam) welders use the separate 630.31 / 630.32 method with a 300% OCPD limit. Use the welder's rated primary current and duty cycle; the AHJ, the welder nameplate, and the adopted NEC edition govern.",
     assumptions: [
       { name: "Duty multiplier", value: "conductor at I_primary x the Table 630.11(A) multiplier for the welder type: transformer / rectifier (sqrt(duty) as printed, 0.45 at 20% or less) or motor-generator (the higher column, 0.55 at 20% or less); a low-duty welder heats the wire less", source: "NEC 630.11(A)" },
       { name: "OCPD 200%", value: "arc-welder overcurrent device up to 200% of the rated primary (630.12(A)); resistance welders use 630.31/32 (300%)", source: "NEC 630.12" },
@@ -11930,7 +11930,7 @@ export const CITATIONS = {
     ],
   },
   "fatigue-combined-loading": {
-    formula: "sigma'a = sqrt((Kf_b sa_b + Kf_ax sa_ax/0.85)^2 + 3 (Kfs ta)^2); sigma'm = sqrt((Kf_b sm_b + Kf_ax sm_ax)^2 + 3 (Kfs tm)^2); sigma'max = sqrt((Kf_b (sa_b + sm_b) + Kf_ax (sa_ax + sm_ax))^2 + 3 (Kfs (ta + tm))^2).",
+    formula: "sigma'a = sqrt((Kf_b sa_b + Kf_ax sa_ax/0.85)^2 + 3 (Kfs ta)^2); sigma'm = sqrt((Kf_b sm_b + Kf_ax sm_ax)^2 + 3 (Kfs tm)^2); sigma'max = the larger of sqrt((Kf_b (sm_b ± sa_b) + Kf_ax (sm_ax ± sa_ax))^2 + 3 (Kfs (tm ± ta))^2), both in-phase extremes.",
     edition: "Combinations of loading modes for fatigue (Shigley, Mischke and Budynas, Mechanical Engineering Design, Ch. 6), by name: von Mises combination of the notch-corrected alternating and mean components, with the axial alternating stress divided by the axial load factor 0.85 so a rotating-bending endurance limit applies.",
     freeAccess: "Standard published fatigue relations; the stress components and notch factors are the user's inputs.",
     governance: GOVERNANCE.general,
@@ -13523,7 +13523,7 @@ export const CITATIONS = {
     ],
   },
   "speaker-70v-line": {
-    formula: "Constant-voltage line: total tap load = sum of tap watts; budget verdict total <= rating*(1 - headroom); reflected impedance Z = V^2 / P_total; line loss from wire resistance and the line current I = P_total/V.",
+    formula: "Constant-voltage line: total tap load = sum of tap watts; budget verdict total <= rating*(1 - headroom); reflected impedance Z = V^2 / P_total; line loss = 20 log10(1 + R / Z), with R = 2 x run length x wire ohms per ft (the wire in series with the reflected load Z = V^2 / P_total).",
     edition: "Constant-voltage (70 V / 100 V) distributed-audio line design - tap-wattage budget, reflected line impedance Z = V^2/P, and run line-loss - per the standard 70 V distributed-system practice and NEC Article 640 / 725 (Class 2/3 audio) wiring, by name; first-principles Ohm's law.",
     freeAccess: "First-principles Ohm's law. The amplifier spec governs the rated power and minimum load.",
     governance: GOVERNANCE.electrical,
@@ -13685,7 +13685,7 @@ export const CITATIONS = {
     ],
   },
   "duct-static-regain": {
-    formula: "vp = (V/4005)^2 in w.c. (standard air); static_regain = recovery_factor x (vp_upstream - vp_downstream). Recovery factor ~ 0.75 (0.5-0.9 by fitting). A negative result is a static loss (velocity increased).",
+    formula: "vp = (V/4005)^2 in w.c. (standard air); static_regain = recovery_factor x (vp_upstream - vp_downstream) at a velocity decrease; on an increase the full (vp_upstream - vp_downstream), with no recovery factor. Recovery factor ~ 0.75 (0.5-0.9 by fitting). A negative result is a static loss (velocity increased).",
     edition: "Duct static-regain method and the standard-air velocity-pressure constant (SMACNA HVAC Duct Design / ASHRAE Fundamentals), by name; the fitting quality sets the recovery factor and the engineer of record governs the design.",
     freeAccess: "The velocity-pressure relation VP = (V/4005)^2 and the static-regain balance are public (SMACNA / ASHRAE); the velocities are the design values and the recovery factor is the fitting property.",
     governance: GOVERNANCE.general,
@@ -16569,7 +16569,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.rigging,
     editionNote: "The maximum reaction is not a quarter of the total because swinging the boom over a corner concentrates the overturning into one diagonal outrigger (which can carry well over half the load); a wider outrigger spread lowers the reaction; this is a planning estimate that feeds crane-ground-bearing. A planning estimate, not the crane rating.",
     assumptions: [
-      { name: "Over-corner concentration", value: "R_max = (W+Wc)/4 + M/(sqrt(2) x spread); the diagonal outrigger takes the overturning", source: "crane load-moment method" },
+      { name: "Over-corner concentration", value: "R_max = (W+Wc)/4 + M/(sqrt(2) x spread) while all four pads are down, and sqrt(2) x M/spread once the far one lifts; the diagonal outrigger takes the overturning", source: "crane load-moment method" },
       { name: "Chart governs", value: "the crane manufacturer's load-moment chart and published outrigger reaction data are authoritative", source: "SAE J1063" },
     ],
   },
@@ -16591,7 +16591,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.rigging,
     editionNote: "The four modes trade off through hole placement: moving the hole from the edge cures tear-out but shrinks the net tension width, and the pin-to-hole clearance drives bearing, so a lug sized for gross tension alone can tear out at the pin. The design factor Nd depends on the ASME BTH-1 design category (A or B) and service class; cheek plates and weld design are separate checks. A screening aid, not the engineer of record.",
     assumptions: [
-      { name: "Three checked modes", value: "bearing, tension through the pinhole, and double-plane shear tear-out; the minimum governs (dishing and cheek-plate welds are separate)", source: "ASME BTH-1 3-3.3" },
+      { name: "Four checked modes", value: "bearing, tension through the pinhole, single-plane fracture beyond the hole, and double-plane shear tear-out; the minimum governs (dishing and cheek-plate welds are separate)", source: "ASME BTH-1 3-3.3" },
       { name: "Design factor Nd", value: "2.00 (Design Category A, the default) or 3.00 (Category B); 1.67 is AISC's ASD factor, not BTH-1's", source: "ASME BTH-1 3-1.3" },
     ],
   },
@@ -16727,7 +16727,7 @@ export const CITATIONS = {
     ],
   },
   "ice-barrier-coverage": {
-    formula: "slope_factor = sqrt(pitch_rise^2 + 144) / 12; coverage_in = (overhang_in + 24) x slope_factor; courses = coverage_in <= roll_width_in ? 1 : 1 + ceil((coverage_in - roll_width_in) / (roll_width_in - side_lap_in)); roll_lf = courses x eave_length_ft; rolls = ceil(roll_lf / roll_len_ft).",
+    formula: "slope_factor = sqrt(pitch_rise^2 + 144) / 12; coverage_in = (overhang_in + 24) x slope_factor, at least 36 in when pitch_rise >= 8; courses = coverage_in <= roll_width_in ? 1 : 1 + ceil((coverage_in - roll_width_in) / (roll_width_in - side_lap_in)); roll_lf = courses x eave_length_ft; rolls = ceil(roll_lf / roll_len_ft).",
     edition: "IRC R905.1.2 (the ice-barrier extent: from the eave to 24 in inside the exterior wall line, and at least 36 in along the slope from the eave on a roof of 8:12 or steeper) and ASTM D1970 (self-adhering polymer-modified membrane), by name; the coverage-and-roll relations are first-principles geometry.",
     freeAccess: "The ice-barrier extent is stated in the published IRC R905.1.2; the slope-factor and roll relations are public roofing-takeoff arithmetic. The membrane standard is ASTM D1970.",
     governance: GOVERNANCE.general,
@@ -17103,14 +17103,14 @@ export const CITATIONS = {
     ],
   },
   "vfd-reflected-wave": {
-    formula: "cable_velocity = 0.01 x velocity_pct x 984; L_crit = rise_time x cable_velocity / 2; V_bus = sqrt(2) x V_LL; V_peak = 2 V_bus (run > L_crit); limits 3.1 x V_LL (inverter-duty) and ~1000 V (general-purpose).",
+    formula: "cable_velocity = 0.01 x velocity_pct x 984; L_crit = rise_time x cable_velocity / 2; V_bus = sqrt(2) x V_LL; V_peak = 2 V_bus (run > L_crit); limits 3.1 x V_LL at 600 V and less, 2.04 x V_LL above (inverter-duty), and ~1000 V (general-purpose).",
     edition: "VFD reflected-wave cable-length limit (NEMA MG-1 Part 31; transmission-line reflection), by name.",
     freeAccess: "The transmission-line reflection relation is public physics; NEMA MG-1 Part 31 defines the inverter-duty withstand. The drive and motor data govern.",
     governance: GOVERNANCE.general,
     editionNote: "The limit is set by the drive rise time, not the motor horsepower or the cable ampacity. Above the critical length the reflection fully develops and the peak terminal voltage reaches twice the DC bus. NEMA MG-1 Part 31 inverter-duty insulation withstands about 3.1 times the line-to-line (about 1,430 V at 460 V and 1,780 V at 575 V), while a general-purpose motor is limited near 1000 V. The fix is a dV/dt or sine-wave filter or an inverter-duty motor. A screening aid, not the manufacturer's spec.",
     assumptions: [
       { name: "Critical length", value: "L_crit = rise_time x cable_velocity / 2; past it the reflection fully develops (V_peak = 2 V_bus)", source: "transmission-line reflection" },
-      { name: "Inverter-duty withstand", value: "NEMA MG-1 Part 31 ~3.1 x V_LL; general-purpose motors far lower (~1000 V)", source: "NEMA MG-1 Part 31" },
+      { name: "Inverter-duty withstand", value: "NEMA MG-1 Part 31 ~3.1 x V_LL at 600 V and less, 2.04 x V_LL above; general-purpose motors far lower (~1000 V)", source: "NEMA MG-1 Part 31" },
     ],
   },
   "rotary-phase-converter-sizing": {
@@ -19172,10 +19172,10 @@ export const CITATIONS = {
     edition: "The ACI 318-19 doubly-reinforced rectangular-beam flexural capacity with the compression-steel yield check and the tension-controlled strength-reduction factor, by name.",
     freeAccess: "ACI 318 is readable free through the ACI online reading room at concrete.org; the flexural provisions are in the published code.",
     governance: GOVERNANCE.general,
-    editionNote: "The ACI 318-19 doubly-reinforced rectangular-beam capacity a = (As - A's) fy / (0.85 f'c b), Mn = (As - A's) fy (d - a/2) + A's fy (d - d'), the compression-steel yield check epsilon's = 0.003 (c - d')/c >= fy/Es, and the ACI 318-19 21.2.2 strength-reduction factor: tension-controlled phi = 0.90 at epsilon_t >= epsilon_ty + 0.003, 0.65 at epsilon_t <= epsilon_ty = fy/Es, linear between. This assumes both steel layers yield (flagged when the compression steel does not, where a rigorous solution would iterate with f's = Es epsilon's <= fy), covers a rectangular section (no T-beam flange), and does not check minimum steel, bar spacing, or development. A design aid, not a substitute for the structural engineer of record's stamped design." + ACI_LAG,
+    editionNote: "The ACI 318-19 doubly-reinforced rectangular-beam capacity a = (As - A's) fy / (0.85 f'c b), Mn = (As - A's) fy (d - a/2) + A's fy (d - d'), the compression-steel yield check epsilon's = 0.003 (c - d')/c >= fy/Es, and the ACI 318-19 21.2.2 strength-reduction factor: tension-controlled phi = 0.90 at epsilon_t >= epsilon_ty + 0.003, 0.65 at epsilon_t <= epsilon_ty = fy/Es, linear between. Both steel layers are taken at their strain-compatible stress, solved for c by force balance (the closed form when both yield), covers a rectangular section (no T-beam flange), and does not check minimum steel, bar spacing, or development. A design aid, not a substitute for the structural engineer of record's stamped design." + ACI_LAG,
     assumptions: [
       { name: "Two couples", value: "the singly-reinforced concrete couple plus the compression-steel-to-tension-steel couple A's fy (d - d')", source: "ACI 318-19 22.2" },
-      { name: "Both yield", value: "both steel layers are assumed at fy; the compression-steel strain is checked and flagged", source: "ACI 318-19 22.2.1.1" },
+      { name: "Both yield", value: "each steel layer is at its strain-compatible stress (fy once it yields); a layer that has not yielded is reported", source: "ACI 318-19 22.2.1.1" },
       { name: "Tension-controlled", value: "phi = 0.90 at epsilon_t >= epsilon_ty + 0.003 (the 318-19 limit, not the fixed 0.005); transition below", source: "ACI 318-19 21.2.2" },
     ],
   },
@@ -19520,7 +19520,7 @@ export const CITATIONS = {
     edition: "The IBC Section 1807.3 embedded posts and poles design equations and the 1806.3.4 isolated-pole increase, by name; the formula pair dates to the legacy UBC and is unchanged across the 2018-2024 IBC editions.",
     freeAccess: "The IBC is viewable free through the ICC public-access portal (codes.iccsafe.org) and public code-hosting mirrors; 1807.3 is in every adopted edition.",
     governance: GOVERNANCE.general,
-    editionNote: "The embedment definition stops at 12 ft - a deeper pole is outside the formula and flagged, not extrapolated. S1/S3 come from the LOCAL code's lateral-bearing table or the geotech report, entered per foot of depth - no Table 1806.2 values are reproduced. The 2x isolated-pole increase applies only where 1/2 in of motion at grade is acceptable (flagpoles, signs, fences), never where the pole supports a building. Poles carrying masonry or concrete need bracing per 1807.3.1; wood posts need AWPA U1 UC4B treatment. Lateral load only - vertical capacity and hole volume are separate tiles. The adopted edition and the AHJ govern - a design aid, not the engineer of record.",
+    editionNote: "IBC 1807.3.2.1 takes d at no more than 12 ft for the lateral pressure: past 12 ft the pressure is held at its 12 ft value and the required depth keeps growing; such a pole is flagged as usually needing an engineered foundation. S1/S3 come from the LOCAL code's lateral-bearing table or the geotech report, entered per foot of depth - no Table 1806.2 values are reproduced. The 2x isolated-pole increase applies only where 1/2 in of motion at grade is acceptable (flagpoles, signs, fences), never where the pole supports a building. Poles carrying masonry or concrete need bracing per 1807.3.1; wood posts need AWPA U1 UC4B treatment. Lateral load only - vertical capacity and hole volume are separate tiles. The adopted edition and the AHJ govern - a design aid, not the engineer of record.",
     assumptions: [
       { name: "Implicit S1", value: "the nonconstrained equation evaluates the lateral bearing at one-third the (unknown) embedment, so the tile solves it by bisection and the fuzzer verifies the root by back-substitution", source: "IBC 1807.3.2.1" },
       { name: "Constrained restraint", value: "the closed-form case assumes a rigid floor or pavement restrains the pole at grade", source: "IBC 1807.3.2.2" },
@@ -19575,7 +19575,7 @@ export const CITATIONS = {
     ],
   },
   "closet-shelf-takeoff": {
-    formula: "rod = single + 2 x double; shelf = single + double + linen x count; supports per run = ceil(run/spacing) + 1 (two tiers on double-hang, one per linen shelf); sticks/boards = ceil(LF/stock); a run longer than stock flags a splice-at-support.",
+    formula: "rod = single + 2 x double; shelf = single + double + linen x count; supports per run = ceil(run/spacing) + 1 (two tiers on double-hang, one per linen shelf); sticks/boards = the actual pieces packed into stock lengths (first-fit, longest first, offcuts not joined); a run longer than stock flags a splice-at-support.",
     edition: "Closet takeoff arithmetic - no standard claimed; hang heights are named as common practice, not code.",
     freeAccess: "Counting arithmetic; shelving manufacturers publish span and support instructions free.",
     governance: GOVERNANCE.general,
@@ -19700,7 +19700,7 @@ export const CITATIONS = {
     ],
   },
   "portable-ladder-setup": {
-    formula: "rail per foot of height at a b:1 setup = sqrt(1 + 1/b^2); base setback = height / b; rail to the landing = height x that factor; total rail = (height + 3 ft) x that factor; the highest landing served = ladder length / factor - 3 ft. Rung spacing must fall between 10 and 14 in between centrelines; clear width between side rails must be at least 11.5 in; side rails must extend at least 3 ft above the landing unless the ladder is secured at its top to a rigid support with a grasping device provided.",
+    formula: "rail per foot of height at a b:1 setup (foot out 1/b of the working length) = 1 / sqrt(1 - 1/b^2); base setback = height x that factor / b; rail to the landing = height x that factor; total rail = (height + the larger of the entered extension and 3 ft) x that factor; the highest landing served = ladder length / factor - 3 ft. Rung spacing must fall between 10 and 14 in between centrelines; clear width between side rails must be at least 11.5 in; side rails must extend at least 3 ft above the landing unless the ladder is secured at its top to a rigid support with a grasping device provided.",
     edition: "OSHA 29 CFR 1926.1053, Subpart X - Stairways and Ladders. A US federal regulation in the public domain, quoted directly. The rail-budget arithmetic is geometry from the setup ratio, not a code value.",
     freeAccess: "29 CFR is published in full at no cost by OSHA and the eCFR.",
     governance: GOVERNANCE.general,
@@ -19708,7 +19708,7 @@ export const CITATIONS = {
     assumptions: [
       { name: "Extension", value: "side rails at least 3 ft above the upper landing surface", source: "29 CFR 1926.1053" },
       { name: "Alternative", value: "secured at the top to a rigid support AND a grasping device provided", source: "29 CFR 1926.1053" },
-      { name: "Rail budget", value: "geometry: rail per foot of height = sqrt(1 + 1/ratio^2)", source: "derived from the setup ratio" },
+      { name: "Rail budget", value: "geometry: rail per foot of height = 1 / sqrt(1 - 1/ratio^2)", source: "derived from the setup ratio" },
       { name: "Rung spacing", value: "a window, 10 to 14 in between centrelines", source: "29 CFR 1926.1053" },
       { name: "Clear width", value: "at least 11.5 in between side rails for all portable ladders", source: "29 CFR 1926.1053" },
       { name: "Not checked", value: "angle, duty rating, base securing, fixed ladders, section overlap, electrical clearance", source: "stated scope limit" },
@@ -20094,7 +20094,7 @@ export const CITATIONS = {
     ],
   },
   "mua-tempering-load": {
-    formula: "dT_F = t_target_F - t_oa_F; Q_s_btuh = 1.08 x cfm x |dT_F|; Q_l_btuh = 0.68 x cfm x (w_oa_gr - w_target_gr); Q_t_btuh = Q_s_btuh + Q_l_btuh; input_btuh = Q_s_btuh / eta when heating, 0 when the target is below the outdoor air (cooling MUA: size the coil for Q_t).",
+    formula: "dT_F = t_target_F - t_oa_F; Q_s_btuh = 1.08 x cfm x |dT_F|; Q_l_btuh = 0.68 x cfm x |w_oa_gr - w_target_gr| (a magnitude that adds when drying on a cooling unit and when humidifying on a heating one); Q_t_btuh = Q_s_btuh + Q_l_btuh; input_btuh = Q_s_btuh / eta when heating, 0 when the target is below the outdoor air (cooling MUA: size the coil for Q_t).",
     edition: "The ASHRAE Fundamentals sensible (Q_s = 1.08 x CFM x dT), latent (Q_l = 0.68 x CFM x dW in gr/lb), and total psychrometric load equations and the IMC 508 makeup-air-equals-exhaust requirement, by name; the sea-level constants 1.08, 0.68, and 4.5 are named constants.",
     freeAccess: "The psychrometric load equations and their sea-level constants are public; the IMC makeup-air requirement is readable free at codes.iccsafe.org.",
     governance: GOVERNANCE.general,
@@ -20218,7 +20218,7 @@ export const CITATIONS = {
     ],
   },
   "egress-capacity": {
-    formula: "factor = stair ? (sprinklered ? 0.2 : 0.3) : (sprinklered ? 0.15 : 0.2); exits_required = ol <= single_exit_max(group, story) ? 1 : ol <= 500 ? 2 : ol <= 1000 ? 3 : 4 (IBC 2027 Table 1006.3.3(2) [1006.3.4(2) in IBC 2021] single-exit limit: first story 49 A/B/E/F/M, 29 S, 10 I/R-1/H-4/H-5, 3 H-2/H-3; second story 29 for B/F/M/S only; third story and up none; R-3 and R-4 no limit at any story (1006.3.3 item 4); Table 1006.3.2 [1006.3.3 in IBC 2021] beyond); total_width_in = ol x factor; per_exit_in = max(total_width_in / exits_required, min_door_in).",
+    formula: "factor = stair ? (sprinklered ? 0.2 : 0.3) : (sprinklered ? 0.15 : 0.2); exits_required = ol <= single_exit_max(group, story) ? 1 : ol <= 500 ? 2 : ol <= 1000 ? 3 : 4 (IBC 2027 Table 1006.3.3(2) [1006.3.4(2) in IBC 2021] single-exit limit: first story 49 A/B/E/F/M, 29 S, 10 I/R-1/H-4/H-5, 3 H-2/H-3; second story 29 for B/F/M/S only; third story and up none; R-3 and R-4 no limit at any story (1006.3.3 item 4); Table 1006.3.2 [1006.3.3 in IBC 2021] beyond); total_width_in = ol x factor; per_exit_in = max(total_width_in / exits_required, min_door_in, and for a stair 44 in or 36 in under 50 occupants per IBC 1011.2).",
     edition: "IBC 2027 §1005.3 (egress width = occupant load x capacity factor), Table 1006.3.3(2) [1006.3.4(2) in IBC 2021] (single-exit limits by story and occupancy), 1006.3.3 item 4 (R-3 and R-4), Table 1006.3.2 [1006.3.3 in IBC 2021] (2 / 3 / 4 exits), and §1010.1.1.1 [1010.1.1 in IBC 2021] (32 in minimum door clear width), by name.",
     freeAccess: "The egress-width and exit-count relations are stated in the published IBC §1005.3 / §1006.2 / Table 1006.3.2 (2027 numbering); the arithmetic is public.",
     governance: GOVERNANCE.general,
@@ -20290,7 +20290,7 @@ export const CITATIONS = {
     ],
   },
   "vent-terminal-check": {
-    formula: "required height = 84 in where the roof is used as a promenade, deck or similar, otherwise max(roof minimum -- IRC 6 in, or the number the jurisdiction wrote into IPC 903.1.1 -- , snow accumulation + 6 in); frost closure applies when the 97.5% outdoor design temperature <= 0 degF, requiring diameter >= 3 in and any size increase made >= 12 in inside the thermal envelope; location passes when the terminal is >= 10 ft horizontally from a door, openable window, or air intake OR >= 3 ft above it.",
+    formula: "required height = max(roof minimum -- IRC 6 in, or the number the jurisdiction wrote into IPC 903.1.1 -- , snow accumulation + 6 in), and not less than 84 in where the roof is used as a promenade, deck or similar; frost closure applies when the 97.5% outdoor design temperature <= 0 degF, requiring diameter >= 3 in and any size increase made >= 12 in inside the thermal envelope; location passes when the terminal is >= 10 ft horizontally from a door, openable window, or air intake OR >= 3 ft above it.",
     edition: "IRC P3103.1.1 (vent terminal height; IPC 2027 903.1.1, like 2021, leaves the number to the adopting jurisdiction), IPC 903.1.2 (7 ft for a roof used as a promenade, deck or similar), IPC 903.2 (frost closure), and IPC 903.5 (vent terminal location relative to doors, openable windows, and air intakes of the building or of an adjacent building).",
     freeAccess: "All three are short prescriptive provisions reproduced in state and municipal adoptions and code-viewer sites. No table is reproduced; the snow accumulation and the design temperature are local figures entered by the user.",
     governance: GOVERNANCE.general,
@@ -20671,7 +20671,7 @@ export const CITATIONS = {
     edition: "AISC 360-22 §J3.7 (Table J3.2 Fnv) and §J3.11, by name; the material Fu and the bolt Ab / Fnv are standard tabulated values.",
     freeAccess: "The bolt shear-rupture and bearing / tearout relations and their phi / Omega factors are stated in AISC 360 §J3; the Fnv values are in Table J3.2.",
     governance: GOVERNANCE.general,
-    editionNote: "AISC 360-22 §J3.7 bolt shear rupture Rn = nplanes x Fnv x Ab (Fnv from Table J3.2: 54 ksi A325-N, 68 ksi A325-X, 68 ksi A490-N, 84 ksi A490-X) and §J3.11 bearing / tearout at a bolt hole Rn = 1.2 lc t Fu <= 2.4 d t Fu, where lc is the clear distance in the line of force (edge bolt: le - dh/2; interior bolt: s - dh). The governing per-bolt nominal strength is the smaller of bolt shear and edge bearing / tearout; the design strength is phi x Rn (phi = 0.75) and the allowable is Rn / Omega (Omega = 2.00). Standard holes and the deformation-considered coefficients; one bolt at one hole (group action, slip-critical, and combined tension-shear are separate checks). A design aid, not a substitute for the engineer of record.",
+    editionNote: "AISC 360-22 §J3.7 bolt shear rupture Rn = nplanes x Fnv x Ab (Fnv from Table J3.2: 54 ksi A325-N, 68 ksi A325-X, 68 ksi A490-N, 84 ksi A490-X) and §J3.11 bearing / tearout at a bolt hole Rn = 1.2 lc t Fu <= 2.4 d t Fu, where lc is the clear distance in the line of force (edge bolt: le - dh/2; interior bolt: s - dh). The governing per-bolt nominal strength is the smallest of bolt shear, edge bearing / tearout, and (with a pitch entered) interior bearing / tearout; the design strength is phi x Rn (phi = 0.75) and the allowable is Rn / Omega (Omega = 2.00). Standard holes and the deformation-considered coefficients; one bolt at one hole (group action, slip-critical, and combined tension-shear are separate checks). A design aid, not a substitute for the engineer of record.",
     assumptions: [
       { name: "Two limit states", value: "the per-bolt strength is the smaller of shear rupture (Fnv Ab) and bearing / tearout (1.2 lc t Fu, capped at 2.4 d t Fu)", source: "AISC 360-22 J3.7 / J3.11" },
       { name: "Clear distance lc", value: "edge bolt lc = le - dh/2; interior bolt lc = s - dh, in the line of the force", source: "AISC 360-22 J3.11" },
@@ -20815,7 +20815,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.general,
     editionNote: "ACI 318-19 §22.2.2.4.1 (equivalent rectangular stress block, a = As x fy / (0.85 x f'c x b)), §22.2 (Mn = As x fy x (d - a/2)), and §21.2.2 (the strength-reduction factor phi = 0.90 for a tension-controlled section). fy defaults to 60,000 psi (Grade 60, the standard deformed-bar grade). Covers only a singly-reinforced rectangular section. The net tensile strain is checked against fy/Es + 0.003 (§21.2.2): below it the beam fails §9.3.3.1 and phi is reduced toward 0.65, and compression reinforcement, T-beam flange action, minimum steel (§9.6.1.2), and shear (see rc-beam-shear) are not checked here. Take As and d from the reinforcement schedule for the actual section. A design aid, not a substitute for a licensed engineer's design - the engineer of record's stamped design governs." + ACI_LAG,
     assumptions: [
-      { name: "Section basis", value: "singly-reinforced rectangular section, tension-controlled (epsilon_t >= 0.005, phi = 0.90); confirm the strain, and use a doubly-reinforced or T-beam analysis where the section calls for it", source: "ACI 318-19 §21.2.2 / §22.2" },
+      { name: "Section basis", value: "singly-reinforced rectangular section, tension-controlled (epsilon_t >= fy/Es + 0.003, phi = 0.90; phi falls toward 0.65 below that); confirm the strain, and use a doubly-reinforced or T-beam analysis where the section calls for it", source: "ACI 318-19 §21.2.2 / §22.2" },
       { name: "Grade 60 default", value: "fy defaults to 60,000 psi (Grade 60 deformed bar), editable for Gr 40 / Gr 80", source: "ACI 318-19" },
       { name: "Companion checks separate", value: "minimum steel (§9.6.1.2), shear (rc-beam-shear), deflection, and development (rc-development-length) are separate checks", source: "ACI 318-19" },
     ],
@@ -20926,11 +20926,11 @@ export const CITATIONS = {
     ],
   },
   "cohesive-earth-pressure": {
-    formula: "Ka = (1 - sin phi)/(1 + sin phi); sigma_a(z) = Ka (gamma z + q) - 2 c sqrt(Ka); zc = (2 c sqrt(Ka) - Ka q)/(Ka gamma); Pa_cracked = 0.5 sigma_a(H) (H - zc) at (H - zc)/3; Pw = 0.5 gamma_w zc^2; sigma_p(z) = Kp gamma z + 2 c sqrt(Kp), Pp = 0.5 Kp gamma H^2 + 2 c sqrt(Kp) H; Hc = 4 c / (gamma sqrt(Ka)) = 2 zc.",
+    formula: "Ka = (1 - sin phi)/(1 + sin phi); sigma_a(z) = Ka (gamma z + q) - 2 c sqrt(Ka); zc = (2 c sqrt(Ka) - Ka q)/(Ka gamma); Pa_cracked = (max(sigma_a(0),0) + sigma_a(H)) (H - zc)/2 (the triangle 0.5 sigma_a(H) (H - zc) at (H - zc)/3 when zc > 0); Pw = 0.5 gamma_w zc^2; sigma_p(z) = Kp gamma z + 2 c sqrt(Kp), Pp = 0.5 Kp gamma H^2 + 2 c sqrt(Kp) H; Hc = 4 c / (gamma sqrt(Ka)) = 2 zc.",
     edition: "Rankine active and passive earth pressure on a c-phi soil, with the tension-crack depth and critical unsupported height, as compiled in Das, Principles of Foundation Engineering, and NAVFAC DM-7.02 (Foundations and Earth Structures), by name.",
     freeAccess: "NAVFAC DM-7.02 is a free public US Navy design manual; the Rankine c-phi active pressure, tension-crack depth, and critical-height results are public and printed in every soil-mechanics text.",
     governance: GOVERNANCE.general,
-    editionNote: "Cohesion subtracts a constant 2 c sqrt(Ka) from the Rankine active pressure at every depth, so a clay backfill's upper zone computes as tension. Soil does not pull: the tension is not credited, the backfill cracks to the depth zc where sigma_a crosses zero, and the design thrust is the triangle below the crack, 0.5 sigma_a(H) (H - zc) acting at (H - zc)/3 above the base. The tile reports the uncracked trapezoid too, because that is the value most texts print first and it is markedly LOWER than the cracked value - crediting the tension understates the wall load, which is the trap this tile exists to close. The water-filled-crack case adds full hydrostatic 0.5 gamma_w zc^2 over the crack depth and normally governs; it is the engineering reason clay backfills are drained rather than relied upon. On the passive side cohesion ADDS, +2 c sqrt(Kp). The critical unsupported height Hc = 4 c / (gamma sqrt(Ka)) = 2 zc is the theoretical depth at which the uncracked thrust vanishes; it is NOT an excavation-safety allowance and OSHA 29 CFR 1926 Subpart P governs any unbraced face. Scope: vertical wall, level backfill, no wall friction, no water table below the crack, fully-mobilized active state. phi = 0 is the undrained (total-stress) clay case and is allowed; the long-term drained condition can lose most of the cohesion the short-term case shows, so a design that leans on c should be run both ways. zc is clamped to [0, H] - a heavy surcharge suppresses the crack entirely. Take c, phi, and gamma from the geotechnical report. A design aid, not a substitute for a geotechnical engineer's report - the geotechnical engineer of record's recommendation governs.",
+    editionNote: "Cohesion subtracts a constant 2 c sqrt(Ka) from the Rankine active pressure at every depth, so a clay backfill's upper zone computes as tension. Soil does not pull: the tension is not credited, the backfill cracks to the depth zc where sigma_a crosses zero, and the design thrust is the positive pressure below the crack: the triangle 0.5 sigma_a(H) (H - zc) at (H - zc)/3 above the base, or the full trapezoid when a surcharge keeps the top in compression. The tile reports the uncracked trapezoid too, because that is the value most texts print first and it is markedly LOWER than the cracked value - crediting the tension understates the wall load, which is the trap this tile exists to close. The water-filled-crack case adds full hydrostatic 0.5 gamma_w zc^2 over the crack depth and normally governs; it is the engineering reason clay backfills are drained rather than relied upon. On the passive side cohesion ADDS, +2 c sqrt(Kp). The critical unsupported height Hc = 4 c / (gamma sqrt(Ka)) = 2 zc is the theoretical depth at which the uncracked thrust vanishes; it is NOT an excavation-safety allowance and OSHA 29 CFR 1926 Subpart P governs any unbraced face. Scope: vertical wall, level backfill, no wall friction, no water table below the crack, fully-mobilized active state. phi = 0 is the undrained (total-stress) clay case and is allowed; the long-term drained condition can lose most of the cohesion the short-term case shows, so a design that leans on c should be run both ways. zc is clamped to [0, H] - a heavy surcharge suppresses the crack entirely. Take c, phi, and gamma from the geotechnical report. A design aid, not a substitute for a geotechnical engineer's report - the geotechnical engineer of record's recommendation governs.",
     assumptions: [
       { name: "Tension is not credited", value: "the negative upper pressure is discarded and the wall is loaded only below the crack; the cracked thrust exceeds the uncracked trapezoid, so using the textbook uncracked value understates the load", source: "Rankine / Das / NAVFAC DM-7.02" },
       { name: "Water-filled crack usually governs", value: "a tension crack open to the surface fills; full hydrostatic 0.5 gamma_w zc^2 is added over the crack depth and typically exceeds the relief the crack gave", source: "Das / NAVFAC DM-7.02" },
@@ -24597,7 +24597,7 @@ export const CITATIONS = {
     ],
   },
   "surface-air-consumption": {
-    formula: "consumption at depth = the measured surface air consumption x the absolute pressure (1 + depth / 33 seawater); rock bottom = the team's elevated rate x the ascent time at the average ascent pressure, plus the stop time at the stop pressure; usable gas = cylinder volume - rock bottom.",
+    formula: "consumption at depth = the measured surface air consumption x the absolute pressure (1 + depth / 33 seawater); rock bottom = the team's elevated rate x the ascent time at the average ascent pressure, plus the stop time at the stop pressure, plus the final ascent from the stop to the surface at its average pressure; usable gas = cylinder volume - rock bottom.",
     edition: "The standard gas-planning relations by name. The operation's diving safety manual, the diving supervisor, and the applicable regulations govern.",
     freeAccess: "Volume arithmetic on the diver's own measured consumption and cylinder; no proprietary planning table is reproduced.",
     governance: GOVERNANCE.general,
@@ -25749,7 +25749,7 @@ export const CITATIONS = {
     ],
   },
   "snow-stacking-area": {
-    formula: "fallen volume = lot area x depth; pile volume = fallen volume x fresh density / piled density; a windrow at a given side slope has base = 2 x height x run-per-rise and cross-section = 0.5 x base x height, so length = pile volume / cross-section and footprint = length x base; the free-cone comparison solves V = pi r^2 h / 3 at the same slope.",
+    formula: "fallen volume = lot area x depth; pile volume = fallen volume x fresh density / piled density; a windrow at a given side slope has base = 2 x height x run-per-rise and cross-section = 0.5 x base x height, so length = pile volume / cross-section and footprint = length x base -- unless the pile is too small to reach the height limit, when it is the free cone's footprint; the free-cone comparison solves V = pi r^2 h / 3 at the same slope.",
     edition: "Snow densification and prism geometry. Densities and the height limit are ENTERED; fresh snow runs roughly 5 to 10 lb per cu ft and a worked pile 20 to 30.",
     freeAccess: "A density ratio and two solid geometries.",
     governance: GOVERNANCE.general,

@@ -672,13 +672,13 @@ export function computeVfdReflectedWave({ rise_time_us = 0, velocity_pct = 50, s
     cable_velocity_ft_us, l_crit_ft, v_bus_v, v_peak_v, limit_invduty_v, limit_genpurpose_v,
     exceeds_invduty: v_peak_v > limit_invduty_v + 1e-9 * Math.abs(limit_invduty_v),
     exceeds_genpurpose: v_peak_v > limit_genpurpose_v + 1e-9 * Math.abs(limit_genpurpose_v),
-    note: "The limit is set by the drive rise time, not the motor horsepower. Above the critical length the reflection fully develops and the peak terminal voltage reaches twice the DC bus. NEMA MG-1 Part 31 inverter-duty insulation withstands about 3.1 times the line-to-line, while a general-purpose motor is limited near 1000 V. The fix is a dV/dt or sine-wave filter or an inverter-duty motor. The drive and motor data govern.",
+    note: "The limit is set by the drive rise time, not the motor horsepower. Above the critical length the reflection fully develops and the peak terminal voltage reaches twice the DC bus. NEMA MG-1 Part 31 inverter-duty insulation withstands about 3.1 times the rated line-to-line for motors of 600 V and less (2.04 times above 600 V), while a general-purpose motor is limited near 1000 V. The fix is a dV/dt or sine-wave filter or an inverter-duty motor. The drive and motor data govern.",
   };
 }
 export const vfdReflectedWaveExample = { inputs: { rise_time_us: 0.1, velocity_pct: 50, system_voltage_v: 480, run_length_ft: 100 } };
 
 function renderVfdReflectedWave(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: VFD reflected-wave cable-length limit (NEMA MG-1 Part 31; transmission-line reflection): cable_velocity = 0.01 x velocity_pct x 984; L_crit = rise_time x cable_velocity / 2; V_bus = sqrt(2) x V_LL; V_peak = 2 V_bus past L_crit; limits 3.1 x V_LL (inverter-duty) and ~1000 V (general-purpose). The limit is the drive rise time, not the horsepower. The fix is a dV/dt filter or an inverter-duty motor. The drive and motor data govern.";
+  citationEl.textContent = "Citation: VFD reflected-wave cable-length limit (NEMA MG-1 Part 31; transmission-line reflection): cable_velocity = 0.01 x velocity_pct x 984; L_crit = rise_time x cable_velocity / 2; V_bus = sqrt(2) x V_LL; V_peak = 2 V_bus past L_crit; limits 3.1 x V_LL at 600 V and less, 2.04 x V_LL above (inverter-duty), and ~1000 V (general-purpose). The limit is the drive rise time, not the horsepower. The fix is a dV/dt filter or an inverter-duty motor. The drive and motor data govern.";
   const rt = makeNumber("Drive rise time (us)", "rw-rt", { step: "any", min: "0" });
   const vp = makeNumber("Cable velocity (% of light)", "rw-vp", { step: "any", min: "0" });
   const Vll = makeNumber("System voltage V_LL (V)", "rw-v", { step: "any", min: "0" });

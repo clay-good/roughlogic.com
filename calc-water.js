@@ -1068,7 +1068,7 @@ export const poolTurnoverExample = {
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 function _v16w_renderPoolTurnover(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Citation: required flow = pool volume / (turnover hours x 60); chlorine product = volume x ppm x 8.34 / 1,000,000 / available-chlorine fraction. Per the NSPF Certified Pool Operator Handbook (2022) and ANSI/APSP/ICC 11. NSPF governs operator certification; AHJ governs adopted code. Free at phta.org for the APSP-11 TOC.";
+  citationEl.textContent = "Citation: required flow = pool volume / (turnover hours x 60); chlorine product = volume x ppm x 8.34 / 1,000,000 / available-chlorine fraction (liquid bleach by trade percent: gallons = that / (0.125 x 8.34), weighed at its ~10 lb/gal). Per the NSPF Certified Pool Operator Handbook (2022) and ANSI/APSP/ICC 11. NSPF governs operator certification; AHJ governs adopted code. Free at phta.org for the APSP-11 TOC.";
   const vol = makeNumber("Pool volume (gal)", "pt-vol", { step: "any", min: "0" });
   const hr = makeNumber("Turnover target (hr)", "pt-hr", { step: "any", min: "0" });
   const ppm = makeNumber("Free-chlorine target (ppm)", "pt-ppm", { step: "any", min: "0" });

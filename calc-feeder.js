@@ -72,7 +72,8 @@ export function computeMotorFeederMultiple({ motors = [], nonmotor_continuous_A 
   for (const m of list) { if (m.dev > largestDev.dev || (m.dev === largestDev.dev && m.flc > largestDev.flc)) largestDev = m; }
   const feeder_ocpd_raw_A = largestDev.dev + (sumFlc - largestDev.flc) + nonmotor_load_A;
   // 430.62 does NOT round up; take the next-smaller standard size where the sum is not a standard rating.
-  const isStd = _V26_STD_OCPD.includes(feeder_ocpd_raw_A);
+  // The small fuse ratings (1, 3, 6, 10 A) are standard too: a 10 A sum is not stepped down to itself.
+  const isStd = [1, 3, 6, 10, ..._V26_STD_OCPD].includes(feeder_ocpd_raw_A);
   const feeder_ocpd_max_A = isStd ? feeder_ocpd_raw_A : _v26StdDown(feeder_ocpd_raw_A);
   if (feeder_ocpd_max_A === null) return { error: "The 430.62 sum is under 1 A; there is no standard device that small. Check the motor currents." };
 

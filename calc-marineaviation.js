@@ -465,16 +465,17 @@ export function computeTravelLiftSlingPlacement({
   // A sling is rated on its TENSION, which is the vertical share over sin(angle): at 60 degrees a
   // 14,000 lb share is 16,166 lb in the sling. Until 2026-10-11 the vertical share was compared.
   const _sinA = Math.sin(sling_angle_deg * Math.PI / 180);
-  const within_wll = has_wll && governing_lb / _sinA <= sling_wll_lb + 1e-9 * Math.abs(sling_wll_lb);
+  const governing_tension_lb = governing_lb / _sinA;
+  const within_wll = has_wll && governing_tension_lb <= sling_wll_lb + 1e-9 * Math.abs(sling_wll_lb);
   // (The half-the-weight check stays the naive one people make: weight / 2 against the rating.)
   const even_split_would_pass = has_wll && even_split_lb <= sling_wll_lb + 1e-9 * Math.abs(sling_wll_lb);
   const wll_verdict = !has_wll
     ? "(no sling working load limit entered)"
     : within_wll
-      ? "both slings are inside the " + fmt(sling_wll_lb, 0) + " lb working load limit, the governing one at " + fmt(governing_lb, 0) + " lb"
+      ? "both slings are inside the " + fmt(sling_wll_lb, 0) + " lb working load limit, the governing one at " + fmt(governing_tension_lb, 0) + " lb of tension"
       : even_split_would_pass
-        ? "the governing sling is at " + fmt(governing_lb, 0) + " lb, OVER the " + fmt(sling_wll_lb, 0) + " lb limit -- and a check on half the displacement (" + fmt(even_split_lb, 0) + " lb) would have PASSED, which is exactly why the split rather than half the weight is the number to check"
-        : "the governing sling is at " + fmt(governing_lb, 0) + " lb, over the " + fmt(sling_wll_lb, 0) + " lb limit; even an even split would have been over";
+        ? "the governing sling's tension is " + fmt(governing_tension_lb, 0) + " lb (a " + fmt(governing_lb, 0) + " lb vertical share at " + fmt(sling_angle_deg, 0) + " degrees), OVER the " + fmt(sling_wll_lb, 0) + " lb limit -- and a check on half the displacement (" + fmt(even_split_lb, 0) + " lb) would have PASSED, which is exactly why the split rather than half the weight is the number to check"
+        : "the governing sling's tension is " + fmt(governing_tension_lb, 0) + " lb (a " + fmt(governing_lb, 0) + " lb vertical share at " + fmt(sling_angle_deg, 0) + " degrees), over the " + fmt(sling_wll_lb, 0) + " lb limit; even an even split would have been over";
   // Convergence: slings picked up inboard of the machine's beams add
   // compression across the hull.
   const angle_rad = sling_angle_deg * Math.PI / 180;

@@ -13699,7 +13699,7 @@
    "source_publisher": "IRC R311 (residential stair geometry; project bundled defaults)",
    "source_title": "Stair-layout solver: riser_count = ceil(rise/preferred); tread = run/(risers-1); throat per IRC R311",
    "source_edition_or_year": "IRC R311 default tread depth 11 in; preferred riser height 6.75-7.5 in",
-   "source_section_or_page": "108 in rise / 6.75 in preferred riser -> 16 risers / 6.75 in / 11 in tread / 15 treads / 165 in run / 33.21 deg / both flags pass",
+   "source_section_or_page": "108 in rise / 6.75 in preferred riser -> 16 risers / 6.75 in / 11 in tread / 15 treads / 165 in run / 31.53 deg / both flags pass",
    "verified_by": "rl",
    "verified_on": "2026-05-11",
    "inputs": {
@@ -62810,7 +62810,7 @@
   {
    "tile_id": "rc-slender-column-magnify",
    "source_publisher": "ACI 318-19 Section 6.6.4.5 (nonsway moment magnifier)",
-   "source_title": "delta_ns = max(Cm/(1 - Pu/(0.75 Pc)), 1.0); Mc = max(delta_ns M2, M2,min)",
+   "source_title": "delta_ns = max(Cm/(1 - Pu/(0.75 Pc)), 1.0); Mc = delta_ns x max(M2, M2,min)",
    "source_edition_or_year": "ACI 318-19",
    "source_section_or_page": "Pu 200, M2 80, M1 -50 (single curvature, ACI 318-19 sign), lu 14 ft, k 1, EI 1.5e6, h 16 -> Cm 0.85, Pc 524.5, delta_ns 1.73, Mc 138.3 kip-ft",
    "verified_by": "rl",
@@ -92622,7 +92622,7 @@
    "source_publisher": "takeoff arithmetic",
    "source_title": "reach-in closet with single, double, and linen sections (spec-v1028)",
    "source_edition_or_year": "trade practice",
-   "source_section_or_page": "6-ft single + 4-ft double + 3-ft linen (4 shelves), 32-in supports, 8-ft stock -> 14 ft rod (2 sticks), 22 ft shelf (3 boards), 22 supports (4 + 2x3 + 4x3)",
+   "source_section_or_page": "6-ft single + 4-ft double + 3-ft linen (4 shelves), 32-in supports, 8-ft stock -> 14 ft rod (2 sticks), 22 ft shelf (4 boards), 22 supports (4 + 2x3 + 4x3)",
    "verified_by": "rl",
    "verified_on": "2026-07-27",
    "inputs": {
@@ -148728,7 +148728,7 @@
    "source_publisher": "EC&M (Mike Holt, author)",
    "source_title": "Code Calculations (voltage drop), EC&M magazine (ecmweb.com/content/article/20891042/code-calculations)",
    "source_edition_or_year": "February 1, 2000 (based on the 1999 NEC)",
-   "source_section_or_page": "Single-phase example: 'What is the voltage drop for a No. 6 conductor that supplies a 44A, 240V, single-phase load located 160 ft from the panelboard?', 'VD = 2 wires x 12.9 ohms x 44A x 160 ft/26,240 circular mils', 'Answer: (b) 6.9V', '(6.9V /240V = 2.9% volts drop)', 'Operating voltage = 233.1V'. Printed to 0.1 V; abs 0.06 covers the rounding (exact 6.92 V). NOTE: the tile currently returns 6.76 V because its #6 copper resistance is 0.4804 ohm/kft (solid-conductor resistivity) against the K = 12.9 basis (0.4916 ohm/kft) its own comment cites; the row reproduces only after that fix -- see r57c_report.md.",
+   "source_section_or_page": "Single-phase example: 'What is the voltage drop for a No. 6 conductor that supplies a 44A, 240V, single-phase load located 160 ft from the panelboard?', 'VD = 2 wires x 12.9 ohms x 44A x 160 ft/26,240 circular mils', 'Answer: (b) 6.9V', '(6.9V /240V = 2.9% volts drop)', 'Operating voltage = 233.1V'. Printed to 0.1 V; abs 0.06 covers the rounding (exact 6.92 V). The tile returns 6.92 V on the K = 12.9 basis.",
    "verified_by": "rl",
    "verified_on": "2026-10-02",
    "inputs": {
