@@ -8,6 +8,7 @@ import { computeMotorFeederMultiple } from "../../calc-feeder.js";
 import { computeSnowStackingArea } from "../../calc-winterops.js";
 import { computeTravelLiftSlingPlacement } from "../../calc-marineaviation.js";
 import { computePortableLadderSetup } from "../../calc-safety.js";
+import { computeConstantPressureWellVfd, constantPressureWellVfdExample } from "../../calc-water.js";
 
 test("soil bearing: the Circular option the page offers is accepted, with the square shape factors", () => {
   const args = { c: 1000, phi: 0, b_ft: 4, df_ft: 3 };
@@ -42,4 +43,10 @@ test("portable ladder: the note's extension term is the one the total charges", 
   const m = r.note.match(/takes ([\d.]+) ft of rail, plus ([\d.]+) ft more for the extension - ([\d.]+) ft/);
   assert.ok(m, r.note);
   assert.ok(Math.abs(Number(m[1]) + Number(m[2]) - Number(m[3])) <= 0.1, m[0]);
+});
+
+test("constant-pressure well: a pump that cannot hold the setpoint says so even with drawdown left blank", () => {
+  const r = computeConstantPressureWellVfd({ ...constantPressureWellVfdExample.inputs, drawdown_at_design_ft: 0, pump_max_head_ft: 200 });
+  assert.equal(r.cannot_hold, true);
+  assert.match(r.drawdown_verdict, /CANNOT hold the setpoint/);
 });

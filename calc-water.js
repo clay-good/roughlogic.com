@@ -2515,8 +2515,12 @@ export function computeConstantPressureWellVfd({
   // The pump head is checked whenever one is entered, with or without drawdown: until 2026-10-10
   // a 200 ft pump against a 440 ft requirement read fine if the drawdown field was blank.
   const cannot_hold = has_curve && (head_at_design_ft + (has_drawdown ? drawdown_at_design_ft : 0)) > pump_max_head_ft * (1 + 1e-9);
+  // With no drawdown entered the pump check still runs, and its answer has to reach the page:
+  // until 2026-11-07 cannot_hold was computed here but this line printed only the placeholder.
   const drawdown_verdict = !has_drawdown
-    ? "(no drawdown entered -- and drawdown is what makes the demand-day complaint)"
+    ? (cannot_hold
+      ? "A pump topping out at " + fmt(pump_max_head_ft, 0) + " ft CANNOT hold the setpoint at " + fmt(design_flow_gpm, 0) + " gpm AT ANY SPEED: it needs " + fmt(head_at_design_ft, 0) + " ft before any drawdown, and drawdown (not entered) only adds to that"
+      : "(no drawdown entered -- and drawdown is what makes the demand-day complaint)")
     : "AND THE DRAWDOWN MOVES THE TARGET. Pumping " + fmt(design_flow_gpm, 0) + " gpm draws the level down another " + fmt(drawdown_at_design_ft, 0) + " ft, so the head required becomes " + fmt(head_with_drawdown_ft, 0) + " ft"
       + (!has_curve
         ? ". (No pump maximum head entered.) The static lift is not a constant -- it grows with the flow being drawn"
