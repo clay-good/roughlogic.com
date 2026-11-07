@@ -74,7 +74,7 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
   - `travel-lift-sling-placement` compared sling TENSION with the limit but printed the vertical share ("13,500 lb, OVER the 14,000 lb limit"); it now prints the 14,366 lb tension.
   - `portable-ladder-setup` printed "20.7 ft of rail, plus 3.1 ft more for the extension - 25.8 ft" for a 5 ft extension; the middle term is now the 5.2 ft the total charges.
 
-  `test/unit/text-vs-code-audit-2026-11.test.js` holds all five; each fails on the old code. Still open: the crawl-space worked example quotes an older wording of IRC R408.2 (retarder AND cross ventilation for 1/1500) that the tile no longer follows; the quote needs reading against the current IRC before it is replaced.
+  `test/unit/text-vs-code-audit-2026-11.test.js` holds all five; each fails on the old code. The crawl-space worked example quoted an older wording of IRC R408.2 (retarder AND cross ventilation for 1/1500); it now quotes IRC 2024 (V2.1) R408.2 Exception 1, read 2026-11-07, where the retarder alone allows 1/1500 and cross ventilation only lifts the corner rule (Exception 2).
 
 - **The bonus-depreciation tooltip no longer says bonus ends in 2027.** On the Section 179 calculator it still read "phases down ... 20% in 2026 and 0% in 2027 unless Congress extends", while the calculator beside it applied the One Big Beautiful Bill Act's permanent 100%. The tooltip, its glossary shard and the derivation note now say what the code does. A new test holds the inlined glossary equal to the shipped `data/cross/glossary.json` and requires the bonus tooltip to state the latest bundled year's rate; with the old wording both fail.
 

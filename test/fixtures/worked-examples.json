@@ -99905,10 +99905,10 @@
    "tile_id": "crawl-space-ventilation",
    "source_publisher": "International Code Council",
    "source_title": "cross-check: the Class I vapor retarder cuts it ten-fold, and then the CORNER rule governs",
-   "source_edition_or_year": "IRC R408.1 exception (1/1500)",
-   "source_section_or_page": "'The total area of ventilation openings shall be permitted to be reduced to 1/1,500 of the under-floor area where the ground surface is covered with an approved Class I vapor retarder material and the required openings are placed to provide cross ventilation of the space.' The same 1,500 sq ft crawl now needs 1,500/1,500 = 1.00 sq ft = 144 sq in, which is only 3 vents by area -- but the code still wants an opening within 3 ft of each corner, so 4 govern. Twenty-nine vents down to four, for the price of covering the ground.",
+   "source_edition_or_year": "IRC 2024 R408.2 Exception 1 (1/1500)",
+   "source_section_or_page": "'The total area of ventilation openings shall be permitted to be reduced to 1/1,500 of the under-floor area where the ground surface is covered with an approved Class I vapor retarder material.' (Exception 2 drops the corner rule only where the openings are also placed for cross ventilation.) The same 1,500 sq ft crawl now needs 1,500/1,500 = 1.00 sq ft = 144 sq in, which is only 3 vents by area -- but the code still wants an opening within 3 ft of each corner, so 4 govern. Twenty-nine vents down to four, for the price of covering the ground.",
    "verified_by": "rl",
-   "verified_on": "2026-07-27",
+   "verified_on": "2026-11-07",
    "inputs": {
     "floor_area_sf": 1500,
     "base_ratio_denominator": 150,
