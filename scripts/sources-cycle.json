@@ -1,6 +1,6 @@
 {
   "_comment": "v10 Phase A.1 source-cycle table. One row per cited standard listing the publishing body, the current edition, the cycle in years, the next-expected release date (best estimate), and a free-access URL. Used by scripts/check-citation-freshness.mjs to flag manifests whose 'edition' string is more than one cycle behind the current publication of that standard. spec-v22 CF-03: when 'next_expected' is in the past, the row must carry a 'last_verified' (ISO date >= next_expected) re-stamp -- the 'verified, not yet released' acknowledgement -- or the freshness gate fails. Update on each rollover (see docs/citation-freshness-ledger.md). Since 2026-09-02 the file also carries `annual_figures`: the bundled federal dollar figures that reprice every year on a known calendar (IRS mileage, Section 179, the SSA wage base, FHFA and HUD loan limits, GSA per-diem, HUD FMRs, Pub 15-T). Five of them were found stale on one day; nothing had ever asked when their publisher last spoke.",
-  "_updated": "2026-10-17",
+  "_updated": "2026-11-07",
   "standards": [
     {
       "id": "nec",
@@ -346,8 +346,8 @@
       "publishes_month": 11,
       "covers": "calendar tax year",
       "where": "data/accounting/section-179-limits.json; SECTION_179_LIMITS",
-      "last_verified": "2026-09-02",
-      "verification_note": "The One Big Beautiful Bill Act rewrote both from 2025: cap $2,500,000 / phase-out $4,000,000 (2026: $2,560,000 / $4,090,000), bonus a permanent 100% for property acquired after 2025-01-19. The bundled table was still the repealed TCJA phase-down until 2026-09-02. Watch for statute changes, not only the annual Rev. Proc."
+      "last_verified": "2026-11-07",
+      "verification_note": "The One Big Beautiful Bill Act rewrote both from 2025: cap $2,500,000 / phase-out $4,000,000 (2026: $2,560,000 / $4,090,000; 2027: $2,640,000 / $4,230,000 per Rev. Proc. 2026-35 section 3.26, read from irs.gov/pub/irs-drop/rp-26-35.pdf 2026-11-07), bonus a permanent 100% for property acquired after 2025-01-19. The bundled table was still the repealed TCJA phase-down until 2026-09-02. Watch for statute changes, not only the annual Rev. Proc."
     },
     {
       "id": "ssa-wage-base",

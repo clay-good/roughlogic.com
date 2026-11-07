@@ -14,7 +14,7 @@
     {
       "file": "section-179-limits.json",
       "name": "Section 179 cap and phase-out, per-year",
-      "gzip_size_bytes": 536
+      "gzip_size_bytes": 544
     },
     {
       "file": "se-tax-parameters.json",
@@ -44,7 +44,7 @@
   ],
   "hashes": {
     "macrs-tables.json": "678e7c8f3bd60aa852b70970d0038907d852cc510c92ba881836c82a2e289cbe",
-    "section-179-limits.json": "60135d26e3a798f3d348515ad90da781eacda532369b2ad3c5254eca1633cb84",
+    "section-179-limits.json": "1eb8846474563a2799f747dd82b7afe30cda240e0709559e8cd4b7dd0d682b4e",
     "se-tax-parameters.json": "40821fbb499a75bab51314efe5858ad2c63fedd4c81076430f10aacb61b3d718",
     "estimated-tax-due-dates.json": "b6b63c721103f2b3ed11c42f1910795184329784670f993e08b32c3c12d92409",
     "standard-mileage-rates.json": "9873519797abd6dc9f846ef70d1bddf199ef45af63454ddf9ebc5f5ffd472161",

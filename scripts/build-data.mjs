@@ -1489,6 +1489,7 @@ const SECTION_179_DATA_V5 = {
       bonus_note: "100% applies to qualified property acquired after 2025-01-19. Property placed in service after 2024-12-31 but before 2025-01-20 takes 40% (60% for long-production-period property and certain aircraft).",
     },
     "2026": { cap_usd: 2560000, phaseout_start_usd: 4090000, bonus_pct: 100 },
+    "2027": { cap_usd: 2640000, phaseout_start_usd: 4230000, bonus_pct: 100 },
   },
 };
 

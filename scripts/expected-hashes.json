@@ -98,13 +98,13 @@
     "historical/commodities/soybeans.json": "f264abde35b43ee53ed0ae35362551b59bd6b608dcf73ac5ed7adce80281df26",
     "historical/manifest.json": "2e75f1492807019ceb7983bfde73213365a39385c203da2890703233bb146e03",
     "accounting/macrs-tables.json": "678e7c8f3bd60aa852b70970d0038907d852cc510c92ba881836c82a2e289cbe",
-    "accounting/section-179-limits.json": "60135d26e3a798f3d348515ad90da781eacda532369b2ad3c5254eca1633cb84",
+    "accounting/section-179-limits.json": "1eb8846474563a2799f747dd82b7afe30cda240e0709559e8cd4b7dd0d682b4e",
     "accounting/se-tax-parameters.json": "40821fbb499a75bab51314efe5858ad2c63fedd4c81076430f10aacb61b3d718",
     "accounting/estimated-tax-due-dates.json": "b6b63c721103f2b3ed11c42f1910795184329784670f993e08b32c3c12d92409",
     "accounting/standard-mileage-rates.json": "9873519797abd6dc9f846ef70d1bddf199ef45af63454ddf9ebc5f5ffd472161",
     "accounting/inventory-benchmarks.json": "51eca35928240a1285d6c3bb2457096da7931cb9e204d26fe908f82849f9fc2d",
     "accounting/pub-15-t-tables.json": "ad29da4c0eba8e4ef845b865373138f8ccb24d19dfcc87cde6ad769939377bcd",
-    "accounting/manifest.json": "83f76d12e767a942eab76418393aeba885035f3f69bf005b9035576aea81592a",
+    "accounting/manifest.json": "1cf43d013c8684fb0c59176c845b8b2141e006cf7ec553a9529cc6772f4c9e02",
     "legal/sales-tax-nexus.json": "91e8874ad0ef289edbd2bbf26e6afa7980096a491334dbdb668155e605ffc690",
     "legal/code-adoption.json": "9bf05003a54e29f5796d9c4e071711b51898c90f7429f7df43e6fd8f1a9151bd",
     "legal/manifest.json": "81762f8bdfca8b347b4972c5f50d032bea4d8775b1a313181e15c8c8dbdaac60",
@@ -119,9 +119,9 @@
     "realestate/loan-limits.json": "4f6f0bb907e2c437657ba517a397905d426de18686f73090d4f3d863824f0d44",
     "realestate/hud-fmr.json": "4fc4a6400f5d3028bd16d3e8c8f63fd6cf14a1a1110e8e962fee83f9b9deef7f",
     "realestate/manifest.json": "3093bfd51988e85fb98e46efd9e5fbe20776e8873a53f9c35fe23e72f348c4cd",
-    "fields/manifest.json": "77f059967b9799c04ffc554ebe846d4ca565aeedf852a62541bb3a1d5a3ca805",
+    "fields/manifest.json": "8a7d9c6a6ba6e74b3d475b97e38df706e052853538d29d53246b18f1a68904e6",
     "search/manifest.json": "15dc9822c199097dc00b1a64c3433587ef5cda76adeaa9fc60365667a0214694",
     "desc/manifest.json": "b46f6513f09308991aeeca9af8971555457403eaa8eb332e6c096ac1b71235a2",
-    "citations/manifest.json": "8c41a7d6372d0ce7c21fda06d77ce77b15ecfb18b94419f324c8f4f375844c60"
+    "citations/manifest.json": "eada87e92e791473527b41b5bc5403b91ae8506a0df3aae63780f5506e0ced11"
   }
 }

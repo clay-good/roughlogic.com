@@ -260,3 +260,11 @@ test("SE: 2027 wage base is $192,300 and caps the SS portion", () => {
   const r = computeSETax({ net_se_earnings: 1000000, tax_year: 2027, filing_status: "single" });
   assert.ok(close(r.ss_tax, 192300 * 0.124, 0.01), String(r.ss_tax));
 });
+// Rev. Proc. 2026-35 section 3.26 (IR-2026-133, 2026-11-05): 2027 cap $2,640,000, phase-out above $4,230,000.
+test("S179: 2027 cap is $2,640,000 and phases out dollar-for-dollar above $4,230,000", () => {
+  assert.equal(SECTION_179_LIMITS[2027].cap, 2640000);
+  assert.equal(SECTION_179_LIMITS[2027].phaseout_start, 4230000);
+  assert.equal(SECTION_179_LIMITS[2027].bonus_pct, 100);
+  const r = computeSection179({ cost: 4330000, business_use_pct: 100, taxable_income: 1e9, tax_year: 2027, bonus_pct: 0 });
+  assert.equal(r.section_179_deduction, 2540000, JSON.stringify(r));
+});

@@ -57,6 +57,8 @@ export const SECTION_179_LIMITS = {
     bonus_note: "100% applies to qualified property acquired after 2025-01-19. Property placed in service after 2024-12-31 but before 2025-01-20 takes 40% (60% for long-production-period property and certain aircraft); the page applies the default; pass bonus_pct to override.",
   },
   2026: { cap: 2560000, phaseout_start: 4090000, bonus_pct: 100, verified_on: "2026-09-02" },
+  // Rev. Proc. 2026-35 section 3.26 (IR-2026-133, 2026-11-05): $2,640,000 cap, phase-out above $4,230,000.
+  2027: { cap: 2640000, phaseout_start: 4230000, bonus_pct: 100, verified_on: "2026-11-07" },
 };
 
 // Self-employment tax parameters by year.

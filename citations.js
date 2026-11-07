@@ -7537,7 +7537,7 @@ export const CITATIONS = {
   },
   "section-179": {
     formula: "Section 179 = min(business_basis, dollar_cap, taxable_income). dollar_cap = max(0, annual_cap - max(0, business_basis - phaseout_start)). bonus = (business_basis - sec179) * bonus_pct. Residual basis flows to MACRS.",
-    edition: "IRC 179 cap and phase-out per IRS Publication 946 and the annual revenue procedures; 2025 $2,500,000 / $4,000,000 and 2026 $2,560,000 / $4,090,000 as amended by the One Big Beautiful Bill Act. Bonus depreciation per IRC 168(k), a permanent 100% for qualified property acquired after 2025-01-19 (IRS Notice 2026-11). Per-year parameters bundled in SECTION_179_LIMITS (data/accounting/section-179-limits.json).",
+    edition: "IRC 179 cap and phase-out per IRS Publication 946 and the annual revenue procedures; 2025 $2,500,000 / $4,000,000, 2026 $2,560,000 / $4,090,000 and 2027 $2,640,000 / $4,230,000 (Rev. Proc. 2026-35) as amended by the One Big Beautiful Bill Act. Bonus depreciation per IRC 168(k), a permanent 100% for qualified property acquired after 2025-01-19 (IRS Notice 2026-11). Per-year parameters bundled in SECTION_179_LIMITS (data/accounting/section-179-limits.json).",
     freeAccess: "Free at irs.gov; cap and phase-out announced in the annual Rev. Proc. (e.g., Rev. Proc. 2024-40 for 2025).",
     governance: GOVERNANCE.tax,
     editionNote: "Annual cadence: refreshed each January when the IRS posts the inflation-adjusted cap. Until 2026-09-02 this table carried the pre-OBBBA TCJA schedule -- a 2025 cap of $1,250,000 with 40% bonus -- which understated the allowable first-year deduction by more than half. 2023 and 2024 were re-checked and are unaffected.",
