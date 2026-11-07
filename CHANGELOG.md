@@ -6,6 +6,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **Every calculator's accessibility stamp is current again.** The axe-core sweep (WCAG 2 A, AA and 2.2 AA) was re-run over all 2,376 routes on 2026-11-07 and passed, so `a11y_verified_on` moves from 2026-05-10 to 2026-11-07 and the 2,283 lint warnings for stamps past 180 days clear. CI runs the same sweep on every push; the stamp records the last time one was run on purpose.
+
 - **The 2027 Section 179 limits are bundled: $2,640,000, phasing out above $4,230,000.** The IRS published them in Rev. Proc. 2026-35 (section 3.26, IR-2026-133, 2026-11-05), read from the PDF on irs.gov. The Section 179 calculator now offers tax year 2027; bonus depreciation stays a permanent 100% under the One Big Beautiful Bill Act. A unit test holds the dollar-for-dollar phase-out at the new threshold.
 
 - **Two more bespoke electrical tiles expose a field schema to the agent door.** Transformer voltage regulation and termination-temperature ampacity are drawn by hand-written renderers the schema extractor cannot read, so the agent and MCP layer saw no select options, defaults, or output units for them. Each now carries a spec-v1184 `render.schema` whose input keys match its compute parameters exactly, with the 60/75 C and leading/lagging selections, the documented power-factor and per-unit-load defaults, and typed outputs. (`load_fraction` is a per-unit load that legitimately exceeds 1, so it is listed in the sign-typo ceiling guard's exempt set.) Renderer-schema coverage rises to 2,209 of 2,283 tiles.

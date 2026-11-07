@@ -20,7 +20,8 @@
 // tile's meta is one new id/group row in `_TILES` plus, optionally, a
 // SIMPLIFIED / FIELD_METER entry.
 
-const A11Y = "2026-05-10";
+// Last full sweep: 2026-11-07, test/integration/a11y.test.js, 2,376 routes passed (wcag2a, wcag2aa, wcag22aa).
+const A11Y = "2026-11-07";
 
 // Tiles that render the spec-v10 §B.3 limitation banner above the
 // inputs. Every entry here MUST have canonical copy in
