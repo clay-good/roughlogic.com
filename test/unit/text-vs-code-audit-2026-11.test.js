@@ -9,6 +9,7 @@ import { computeSnowStackingArea } from "../../calc-winterops.js";
 import { computeTravelLiftSlingPlacement } from "../../calc-marineaviation.js";
 import { computePortableLadderSetup } from "../../calc-safety.js";
 import { computeConstantPressureWellVfd, constantPressureWellVfdExample } from "../../calc-water.js";
+import { computeFlashGasSubcool } from "../../calc-refrigerant.js";
 
 test("soil bearing: the Circular option the page offers is accepted, with the square shape factors", () => {
   const args = { c: 1000, phi: 0, b_ft: 4, df_ft: 3 };
@@ -49,4 +50,13 @@ test("constant-pressure well: a pump that cannot hold the setpoint says so even 
   const r = computeConstantPressureWellVfd({ ...constantPressureWellVfdExample.inputs, drawdown_at_design_ft: 0, pump_max_head_ft: 200 });
   assert.equal(r.cannot_hold, true);
   assert.match(r.drawdown_verdict, /CANNOT hold the setpoint/);
+});
+
+test("flash-gas subcooling: a requirement past the typical 8-12 F charge is called out, and one under 8 F is not a failure", () => {
+  const low = computeFlashGasSubcool({ vertical_lift_ft: 40, friction_dp_psi: 15 });
+  assert.equal(low.typical_charge_covers, true);
+  assert.match(low.verdict, /already holds/);
+  const high = computeFlashGasSubcool({ vertical_lift_ft: 160, friction_dp_psi: 15 });
+  assert.equal(high.typical_charge_covers, false);
+  assert.match(high.verdict, /MORE than a typical 8-12 F charge/);
 });

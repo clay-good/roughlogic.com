@@ -1,11 +1,12 @@
 // A warning flag a compute returns (cannot_hold, negative_pressure_ok, ...) is
 // only worth something if the page says it. Until 2026-11-07 two did not:
 // constant-pressure-well-vfd computed cannot_hold with drawdown blank and printed
-// a placeholder, and kitchen-makeup-air-deficit checked the 0.02 in wc limit and
-// never showed the result.
+// a placeholder, kitchen-makeup-air-deficit checked the 0.02 in wc limit and
+// never showed the result, and conductor-sag-at-temperature warned of an
+// over-strength tension only when the tension was rising.
 //
-// From every worked example, change one input at a time (x0, x0.5, x2, each
-// select option). Where a flag-named boolean flips, the page's WORDS (numbers
+// From every worked example, change one input at a time (x0, x0.25, x0.5, x2,
+// x4, x10, each select option). Where a flag-named boolean flips, the page's WORDS (numbers
 // stripped) must change too. A flip whose only trace is a number is listed in
 // REVIEWED with the reason.
 import { test } from "node:test";
@@ -24,6 +25,12 @@ const REVIEWED = {
   "responder-camp-sanitation minimum_governs": "the per-sex toilet counts show the minimum of two",
   // "Which governs" prints "neither, tightly" whenever both_ample is true, whichever side is larger.
   "separator-retention-sizing gas_governs": "masked by both_ample, which the page states",
+  // A quarter-height element on an obstructed side reach: the page already says no height complies.
+  "reach-range low_ok": "masked by 'no height complies; the element must move'",
+  // Rows without a four-hour step print "no change with duration", correctly, either side of four hours.
+  "silica-table-1 over_four": "only rows with a duration step print it, and those do",
+  // An action level raised past the PEL: the OVER THE PEL verdict takes precedence, as it should.
+  "silica-ventilation-screen over_action_level": "masked by over_pel, which the verdict states",
 };
 
 const words = (s) => s.replace(/-?[\d.,]+(e[-+]?\d+)?/gi, "#").replace(/\s+/g, " ").trim();
@@ -57,7 +64,7 @@ test("silent flags: a warning flag that flips changes the words on the page", as
       const b = view(base);
       if (!b) continue;
       const variants = [];
-      for (const [k, v] of Object.entries(base)) if (typeof v === "number") for (const m of [0, 0.5, 2]) variants.push({ ...base, [k]: v * m });
+      for (const [k, v] of Object.entries(base)) if (typeof v === "number") for (const m of [0, 0.25, 0.5, 2, 4, 10]) variants.push({ ...base, [k]: v * m });
       for (const f of schema.inputs || []) if (f.options) for (const o of f.options) { const val = o.value ?? o; if (val !== base[f.key]) variants.push({ ...base, [f.key]: val }); }
       for (const inp of variants) {
         const v = view(inp);

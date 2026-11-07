@@ -1146,9 +1146,17 @@ export function computeFlashGasSubcool({ vertical_lift_ft = 0, friction_dp_psi =
   const dp_lift_psi = grad * lift;
   const dp_total_psi = dp_lift_psi + friction;
   const required_subcool_f = dp_total_psi / slope;
-  const meets_target = required_subcool_f >= 8 - 1e-9 * Math.abs(8) && required_subcool_f <= 12 + 1e-9 * Math.abs(12);
+  // Against the 8-12 F a TXV system is typically charged to. Until 2026-11-07 a `meets_target`
+  // flag was true only INSIDE 8-12, so a requirement under 8 F (the easy case) read as failing,
+  // and the page never said when the requirement passed 12 F, which is when the line flashes.
+  const typical_charge_covers = required_subcool_f <= 12 + 1e-9 * 12;
+  const verdict = required_subcool_f <= 8 + 1e-9 * 8
+    ? "inside what a typical 8-12 F charge already holds; confirm it at the metering device"
+    : typical_charge_covers
+      ? "in the upper part of the typical 8-12 F range; charge toward the top of it and confirm at the metering device"
+      : "MORE than a typical 8-12 F charge holds, so the liquid will flash at a normal charge; cut the lift or the friction, or provide the extra subcooling the manufacturer allows";
   return {
-    dp_lift_psi, dp_total_psi, required_subcool_f, meets_target,
+    dp_lift_psi, dp_total_psi, required_subcool_f, typical_charge_covers, verdict,
     note: "Techs often credit only the friction and forget the 0.43 psi/ft vertical-lift column, which dominates on a tall riser. Liquid-line heat gain also flashes liquid. Subcooling should be measured at the metering device, not the condenser outlet. The ~5 psi/degF P-T slope (R-410A near 100 F condensing) steepens at higher condensing pressure and flattens at lower; enter the slope at the actual condensing temperature. Add margin to reach the 8 to 12 F field target. The manufacturer data and the actual refrigerant govern - a design aid, not a commissioning measurement.",
   };
 }
@@ -1171,7 +1179,7 @@ function _v586renderFlashGasSubcool(inputRegion, outputRegion, citationEl) {
     if (r.error) { oLift.textContent = r.error; oTotal.textContent = "-"; oSub.textContent = "-"; oNote.textContent = ""; return; }
     oLift.textContent = fmt(r.dp_lift_psi, 1) + " psi";
     oTotal.textContent = fmt(r.dp_total_psi, 1) + " psi";
-    oSub.textContent = fmt(r.required_subcool_f, 1) + " F minimum (add margin to 8-12 F target)";
+    oSub.textContent = fmt(r.required_subcool_f, 1) + " F minimum -- " + r.verdict;
     oNote.textContent = r.note;
   }, DEBOUNCE_MS);
   for (const f of [lift, friction, grad, slope]) f.input.addEventListener("input", update);

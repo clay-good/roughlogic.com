@@ -67,6 +67,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **Two more verdicts the code computed and the page did not say.** A code-level pass over every compute (flag-named booleans returned but read by nothing) reached the hand-written renderers the standing guard cannot:
+  - `flash-gas-subcool` returned `meets_target`, true only INSIDE 8-12 F, so a requirement under 8 F (the easy case) read as failing; and the page printed "16.8 F minimum (add margin to 8-12 F target)" even when 16.8 F is more than a typical charge holds, which is when the liquid flashes. The flag is now `typical_charge_covers` (at most 12 F) and the line says which of three bands the requirement falls in.
+  - `conductor-sag-at-temperature` warned of a tension over the rated breaking strength only when the tension was rising, so a conductor strung at 190% of its rating and then heated printed "190.5% initially, 174.1% finally" and "hotter: tension falls". The rated-strength line now says OVER whenever either state is.
+
+  `silent-flag-guard.test.js` now perturbs by x0.25 to x10 (it caught the conductor case once widened); three more reviewed exceptions carry their reasons.
+
 - **The kitchen makeup-air calculator now says whether the kitchen is over the 0.02 in wc negative-pressure limit.** It has checked the limit since 2026-09-29 but printed only the pressure in pascals, so 10 Pa (0.040 in wc, twice the limit) read as a bare number. The Negative pressure line now gives in wc and "within" or "OVER" the limit of UMC 511.3.1 / NFPA 96, noting that the IMC sets none. A new standing test, `test/unit/silent-flag-guard.test.js`, changes one input at a time from every worked example and fails when a warning flag (cannot_*, *_ok, exceeds_*, ...) flips while the page's words stay the same; four reviewed exceptions carry their reasons.
 
 - **The constant-pressure well calculator now says when the pump cannot hold the setpoint, even with drawdown left blank.** Since 2026-10-10 the compute has flagged a pump whose maximum head is below the requirement without a drawdown entry, but the page then printed only "(no drawdown entered ...)", so a 200 ft pump against a 321 ft requirement showed nothing wrong. The line now reads that the pump cannot hold the setpoint at any speed. A regression test holds it.
