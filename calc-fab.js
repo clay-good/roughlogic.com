@@ -602,7 +602,7 @@ function renderConduit90Stub(inputRegion, outputRegion, citationEl) {
     }); stepsFor(outputRegion, inputRegion, ["mode", "height_in", "deduct_in", "back_to_back_in", "radius_in", "per_shot_deg"], r);
     if (r.error) { oMark.textContent = r.error; oSecond.textContent = ""; oNote.textContent = ""; return; }
     if (r.mode === "segment-90") {
-      oMark.textContent = r.n_shots + " shots";
+      oMark.textContent = r.n_shots + " " + (r.n_shots === 1 ? "shot" : "shots");
       oSecond.textContent = fmt(r.arc_per_shot_in, 3) + " in arc per shot";
     } else if (r.mode === "back-to-back") {
       oMark.textContent = (r.impractical ? "IMPRACTICAL " : "") + fmt(r.mark_in, 2) + " in (first mark)";
@@ -1569,7 +1569,7 @@ function _v909renderBarstockCutlist(inputRegion, outputRegion, citationEl) {
     }); stepsFor(outputRegion, inputRegion, ["stock_length_in", "piece_length_in", "kerf_in", "pieces_needed"], r);
     if (r.error) { oPer.textContent = r.error; oSticks.textContent = "-"; oDrop.textContent = "-"; oYield.textContent = "-"; return; }
     oPer.textContent = fmt(r.pieces_per_stick, 0) + " per stick";
-    oSticks.textContent = fmt(r.sticks_needed, 0) + " sticks";
+    oSticks.textContent = fmt(r.sticks_needed, 0) + " " + (fmt(r.sticks_needed, 0) === "1" ? "stick" : "sticks");
     oDrop.textContent = fmt(r.drop_per_stick_in, 2) + " in";
     oYield.textContent = fmt(r.yield_pct, 1) + "%";
   }, DEBOUNCE_MS);
@@ -1794,7 +1794,7 @@ function _v1127renderBarNesting(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const r = computeBarNesting({ cut_list: list.input.value, stock_length_in: Number(stock.input.value) || 0, kerf_in: Number(kerf.input.value) || 0, end_trim_in: Number(trim.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["cut_list", "stock_length_in", "kerf_in", "end_trim_in"], r);
     if (r.error) { oSticks.textContent = r.error; oYield.textContent = "-"; oSplit.textContent = "-"; oDrop.textContent = "-"; oPat.textContent = "-"; oNote.textContent = "-"; return; }
-    oSticks.textContent = r.sticks + " (" + r.total_pieces + " pieces in " + r.size_count + " sizes)" + (r.at_theoretical_min ? " - at the material lower bound" : ", lower bound " + r.theoretical_min_sticks);
+    oSticks.textContent = r.sticks + " (" + r.total_pieces + " " + (r.total_pieces === 1 ? "piece" : "pieces") + " in " + r.size_count + " " + (r.size_count === 1 ? "size" : "sizes") + ")" + (r.at_theoretical_min ? " - at the material lower bound" : ", lower bound " + r.theoretical_min_sticks);
     oYield.textContent = fmt(r.yield_pct, 1) + "%";
     oSplit.textContent = fmt(r.total_piece_in, 1) + " in part / " + fmt(r.total_kerf_in, 2) + " in kerf / " + fmt(r.total_trim_in, 1) + " in trim / " + fmt(r.total_drop_in, 1) + " in drop of " + fmt(r.total_stock_in, 1) + " in bought";
     oDrop.textContent = fmt(r.longest_drop_in, 2) + " in";

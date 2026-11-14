@@ -444,7 +444,7 @@ function renderTankerFleetSize(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const r = computeTankerFleetSize({ tank_gal: readNum(tank.input), fill_gpm: readNum(fill.input), dump_gpm: readNum(dump.input), distance_mi: readNum(dist.input), speed_mph: readNum(speed.input) }); stepsFor(outputRegion, inputRegion, ["tank_gal", "fill_gpm", "dump_gpm", "distance_mi", "speed_mph"], r);
     if (r.error) { oFleet.textContent = r.error; oFlow.textContent = "-"; oBottle.textContent = "-"; oNote.textContent = ""; return; }
-    oFleet.textContent = r.fleet_for_max + " tankers (a further tanker just queues)";
+    oFleet.textContent = r.fleet_for_max + " " + (r.fleet_for_max === 1 ? "tanker" : "tankers") + " (a further tanker just queues)";
     oFlow.textContent = fmt(r.site_limited_flow_gpm, 0) + " gpm";
     oBottle.textContent = "the " + r.bottleneck_site + " site (" + fmt(r.bottleneck_min, 1) + " min per tanker)";
     oNote.textContent = r.note;

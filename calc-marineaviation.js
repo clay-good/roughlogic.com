@@ -256,7 +256,7 @@ MARINEAVIATION_RENDERERS["free-surface-moment"] = _simpleRenderer({
   outputs: [
     { key: "m", id: "fsm-out-m", label: "Free surface moment", value: (r) => fmt(r.free_surface_moment_ftlb, 0) + " ft-lb" },
     { key: "g", id: "fsm-out-g", label: "Loss of metacentric height", value: (r) => r.has_displacement ? fmt(r.free_surface_correction_ft, 3) + " ft (" + fmt(r.free_surface_correction_ft * 12, 1) + " in)" : "(enter the displacement)" },
-    { key: "s", id: "fsm-out-s", label: "With one more fore-and-aft division", value: (r) => fmt(r.moment_if_split_ftlb, 0) + " ft-lb as " + fmt(r.next_compartments, 0) + " compartments across" },
+    { key: "s", id: "fsm-out-s", label: "With one more fore-and-aft division", value: (r) => fmt(r.moment_if_split_ftlb, 0) + " ft-lb as " + fmt(r.next_compartments, 0) + " " + (fmt(r.next_compartments, 0) === "1" ? "compartment" : "compartments") + " across" },
     { key: "u", id: "fsm-out-u", label: "Undivided, for comparison", value: (r) => fmt(r.undivided_moment_ftlb, 0) + " ft-lb" },
     { key: "n", id: "fsm-out-n", label: "Note", value: (r) => r.note },
   ],

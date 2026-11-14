@@ -2410,7 +2410,7 @@ CONCRETE_RENDERERS["curing-compound-coverage"] = _simpleRenderer({
   ],
   outputs: [
     { key: "g", id: "ccc-out-g", label: "Curing compound", value: (r) => fmt(r.gallons_needed, 0) + " gal (" + fmt(r.gallons_exact, 1) + " exact)" },
-    { key: "p", id: "ccc-out-p", label: "5-gallon pails", value: (r) => fmt(r.pails_5gal, 0) + " pails" },
+    { key: "p", id: "ccc-out-p", label: "5-gallon pails", value: (r) => fmt(r.pails_5gal, 0) + " " + (fmt(r.pails_5gal, 0) === "1" ? "pail" : "pails") },
     { key: "n", id: "ccc-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeCuringCompoundCoverage,
@@ -2451,8 +2451,8 @@ CONCRETE_RENDERERS["concrete-isolation-joint"] = _simpleRenderer({
     { key: "strip_length_ft", label: "Filler strip length (ft)", kind: "number" },
   ],
   outputs: [
-    { key: "f", id: "cij-out-f", label: "Isolation-joint filler", value: (r) => fmt(r.filler_lf, 0) + " LF (" + fmt(r.slab_perimeter_ft, 0) + " perimeter + " + fmt(r.column_isolation_ft, 0) + " columns)" },
-    { key: "s", id: "cij-out-s", label: "Filler strips", value: (r) => fmt(r.strips, 0) + " strips" },
+    { key: "f", id: "cij-out-f", label: "Isolation-joint filler", value: (r) => fmt(r.filler_lf, 0) + " LF (" + fmt(r.slab_perimeter_ft, 0) + " perimeter + " + fmt(r.column_isolation_ft, 0) + " " + (fmt(r.column_isolation_ft, 0) === "1" ? "column" : "columns") + ")" },
+    { key: "s", id: "cij-out-s", label: "Filler strips", value: (r) => fmt(r.strips, 0) + " " + (fmt(r.strips, 0) === "1" ? "strip" : "strips") },
     { key: "n", id: "cij-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeConcreteIsolationJoint,

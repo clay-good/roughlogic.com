@@ -1342,10 +1342,10 @@ GAS_RENDERERS["propane-run-time"] = _simpleRenderer({
   outputs: [
     { key: "usable_mmbtu", label: "Energy in the tank (MMBTU)", unit: "MMBTU", value: (r) => fmt(r.usable_mmbtu, 1) + " MMBTU (" + fmt(r.usable_gal, 0) + " gal)" },
     { key: "continuous_days", label: "Continuous firing (days)", unit: "days", value: (r) => fmt(r.continuous_days, 1) + " days (" + fmt(r.continuous_hours, 0) + " h)" },
-    { key: "realistic_days", label: "At the duty cycle (days)", unit: "days", value: (r) => fmt(r.realistic_days, 0) + " days" },
+    { key: "realistic_days", label: "At the duty cycle (days)", unit: "days", value: (r) => fmt(r.realistic_days, 0) + " " + (fmt(r.realistic_days, 0) === "1" ? "day" : "days") },
     { key: "gallons_per_day", label: "Consumption (gal/day)", unit: "gal/day", value: (r) => fmt(r.gallons_per_day, 1) + " gal/day" },
-    { key: "days_to_trigger", label: "Days to the delivery trigger", unit: "days", value: (r) => fmt(r.days_to_trigger, 0) + " days (" + fmt(r.gallons_to_trigger, 0) + " gal)" },
-    { key: "hdd_days_to_trigger", label: "From the degree-day history", unit: "days", value: (r) => !r.has_history ? "not entered" : fmt(r.hdd_days_to_trigger, 0) + " days (" + fmt(r.hdd_gallons_per_day, 1) + " gal/day)" },
+    { key: "days_to_trigger", label: "Days to the delivery trigger", unit: "days", value: (r) => fmt(r.days_to_trigger, 0) + " " + (fmt(r.days_to_trigger, 0) === "1" ? "day" : "days") + " (" + fmt(r.gallons_to_trigger, 0) + " gal)" },
+    { key: "hdd_days_to_trigger", label: "From the degree-day history", unit: "days", value: (r) => !r.has_history ? "not entered" : fmt(r.hdd_days_to_trigger, 0) + " " + (fmt(r.hdd_days_to_trigger, 0) === "1" ? "day" : "days") + " (" + fmt(r.hdd_gallons_per_day, 1) + " gal/day)" },
     { key: "energyVerdict", label: "Energy", value: (r) => r.energyVerdict },
     { key: "continuousVerdict", label: "Continuous firing", value: (r) => r.continuousVerdict },
     { key: "dutyVerdict", label: "The duty cycle", value: (r) => r.dutyVerdict },

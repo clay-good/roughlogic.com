@@ -683,7 +683,7 @@ REFRIGERATION_RENDERERS["secondary-glycol-loop"] = _simpleRenderer({
     { key: "energy_rate_per_kwh", label: "Energy rate ($/kWh)", kind: "number" },
   ],
   outputs: [
-    { key: "w", id: "sgl-out-w", label: "On a water basis", value: (r) => fmt(r.water_gpm, 0) + " gpm for " + fmt(r.tons, 0) + " tons at the entered delta-T" },
+    { key: "w", id: "sgl-out-w", label: "On a water basis", value: (r) => fmt(r.water_gpm, 0) + " gpm for " + fmt(r.tons, 0) + " " + (fmt(r.tons, 0) === "1" ? "ton" : "tons") + " at the entered delta-T" },
     { key: "g", id: "sgl-out-g", label: "Corrected for the glycol", value: (r) => fmt(r.glycol_gpm, 0) + " gpm, " + fmtDir(r.flow_increase_pct, 1, "%", "more", "less") },
     { key: "f", id: "sgl-out-f", label: "Fluid factor", value: (r) => fmt(r.fluid_factor, 0) + " (500 x SG x cp), the factor a hydronic flow calculation asks for" },
     { key: "p", id: "sgl-out-p", label: "Pump power", value: (r) => r.pump_verdict },

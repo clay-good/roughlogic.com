@@ -405,7 +405,7 @@ OILGAS_RENDERERS["liquid-pipeline-station-spacing"] = _simpleRenderer({
   outputs: [
     { key: "h", id: "lps-out-h", label: "Head available per station", value: (r) => fmt(r.available_head_ft, 0) + " ft" },
     { key: "g", id: "lps-out-g", label: "Combined gradient", value: (r) => fmt(r.combined_gradient_ft_per_mi, 2) + " ft per mile (" + (r.elevation_gradient_ft_per_mi < 0 ? "the terrain falls " + fmt(-r.elevation_gradient_ft_per_mi, 2) + " ft per mile, giving back head against the friction" : fmt(r.elevation_gradient_ft_per_mi, 2) + " of it elevation, " + fmt(r.elevation_share_pct, 0) + "%" + (r.elevation_dominates ? " -- elevation is the LARGER term" : "")) + ")" },
-    { key: "s", id: "lps-out-s", label: "Maximum station spacing", value: (r) => fmt(r.max_spacing_mi, 0) + " miles" },
+    { key: "s", id: "lps-out-s", label: "Maximum station spacing", value: (r) => fmt(r.max_spacing_mi, 0) + " " + (fmt(r.max_spacing_mi, 0) === "1" ? "mile" : "miles") },
     { key: "c", id: "lps-out-c", label: "Stations required", value: (r) => fmt(r.station_count, 0) + " at " + fmt(r.actual_spacing_mi, 0) + " mile spacing, using " + fmt(r.head_used_per_station_ft, 0) + " ft of the available head" },
     { key: "a", id: "lps-out-a", label: "At the alternative throughput", value: (r) => r.alternate_verdict },
     { key: "n", id: "lps-out-n", label: "Note", value: (r) => r.note },
@@ -747,7 +747,7 @@ OILGAS_RENDERERS["casing-cement-volume"] = _simpleRenderer({
   outputs: [
     { key: "c", id: "ccv-out-c", label: "Capacities", value: (r) => fmt(r.annular_capacity_bbl_ft, 4) + " bbl/ft annulus, " + fmt(r.casing_capacity_bbl_ft, 4) + " bbl/ft casing" },
     { key: "a", id: "ccv-out-a", label: "Annular volume", value: (r) => fmt(r.annular_volume_bbl, 1) + " bbl theoretical" },
-    { key: "s", id: "ccv-out-s", label: "Slurry with excess", value: (r) => fmt(r.slurry_volume_bbl, 1) + " bbl (" + fmt(r.slurry_volume_ft3, 0) + " cu ft)" + (r.has_yield ? ", " + fmt(r.sacks, 0) + " sacks at the entered yield" : "") },
+    { key: "s", id: "ccv-out-s", label: "Slurry with excess", value: (r) => fmt(r.slurry_volume_bbl, 1) + " bbl (" + fmt(r.slurry_volume_ft3, 0) + " cu ft)" + (r.has_yield ? ", " + fmt(r.sacks, 0) + " " + (fmt(r.sacks, 0) === "1" ? "sack" : "sacks") + " at the entered yield" : "") },
     { key: "d", id: "ccv-out-d", label: "Displacement", value: (r) => !r.has_float ? "(no float collar depth entered)" : fmt(r.displacement_bbl, 1) + " bbl to the float" },
     { key: "e", id: "ccv-out-e", label: "Excess sensitivity", value: (r) => r.spread_verdict },
     { key: "n", id: "ccv-out-n", label: "Note", value: (r) => r.note },
@@ -909,7 +909,7 @@ OILGAS_RENDERERS["kill-mud-weight"] = _simpleRenderer({
     { key: "k", id: "kmw-out-k", label: "Kill mud weight", value: (r) => fmt(r.kill_mw_with_margin_ppg, 2) + " ppg" + (r.safety_margin_ppg > 0 ? " (" + fmt(r.kill_mw_ppg, 2) + " to balance plus a " + fmt(r.safety_margin_ppg, 2) + " ppg margin)" : "") + ", weighting up " + fmt(r.weight_up_ppg, 2) + " ppg" },
     { key: "f", id: "kmw-out-f", label: "Formation pressure", value: (r) => fmt(r.formation_pressure_psi, 0) + " psi" },
     { key: "p", id: "kmw-out-p", label: "Drillpipe pressures", value: (r) => "start at " + fmt(r.icp_psi, 0) + " psi (ICP), walk down to " + fmt(r.fcp_psi, 0) + " psi (FCP) as kill mud reaches the bit, then hold FCP" },
-    { key: "s", id: "kmw-out-s", label: "To the bit", value: (r) => !r.has_pump ? "(no pipe capacity or pump output entered)" : fmt(r.strokes_to_bit, 0) + " strokes" + (r.minutes_to_bit > 0 ? ", " + fmt(r.minutes_to_bit, 0) + " minutes at the entered rate" : "") },
+    { key: "s", id: "kmw-out-s", label: "To the bit", value: (r) => !r.has_pump ? "(no pipe capacity or pump output entered)" : fmt(r.strokes_to_bit, 0) + " " + (fmt(r.strokes_to_bit, 0) === "1" ? "stroke" : "strokes") + (r.minutes_to_bit > 0 ? ", " + fmt(r.minutes_to_bit, 0) + " " + (fmt(r.minutes_to_bit, 0) === "1" ? "minute" : "minutes") + " at the entered rate" : "") },
     { key: "r", id: "kmw-out-r", label: "The weight actually planned", value: (r) => r.rounding_verdict },
     { key: "n", id: "kmw-out-n", label: "Note", value: (r) => r.note },
   ],

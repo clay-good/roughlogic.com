@@ -376,7 +376,7 @@ SOILSETTLEMENT_RENDERERS["consolidation-time-rate"] = _simpleRenderer({
   ],
   outputs: [
     { key: "tv", id: "ctr-out-tv", label: "Time factor Tv", value: (r) => fmt(r.tv, 3) },
-    { key: "t", id: "ctr-out-t", label: "Time to reach U", value: (r) => fmt(r.t_days, 0) + " days (" + fmt(r.t_years, 2) + " yr)" },
+    { key: "t", id: "ctr-out-t", label: "Time to reach U", value: (r) => fmt(r.t_days, 0) + " " + (fmt(r.t_days, 0) === "1" ? "day" : "days") + " (" + fmt(r.t_years, 2) + " yr)" },
     { key: "n", id: "ctr-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeConsolidationTimeRate,

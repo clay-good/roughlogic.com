@@ -209,7 +209,7 @@ export function computeKilnDryingTime({ mc_initial_pct = 0, mc_final_pct = 0, fs
 // proportional quote on thinner stock overquotes, and equal stock has nothing to compare.
 const _kdtProportionalClause = (r) => Math.abs(r.underquote_factor - 1) <= 1e-9
   ? ""
-  : " -- quoting it proportionally at " + fmt(r.proportional_days, 0) + " days " + (r.underquote_factor > 1
+  : " -- quoting it proportionally at " + fmt(r.proportional_days, 0) + " " + (fmt(r.proportional_days, 0) === "1" ? "day" : "days") + " " + (r.underquote_factor > 1
     ? "underquotes by " + fmt(r.underquote_factor, 2) + " times"
     : "overquotes by " + fmt(1 / r.underquote_factor, 2) + " times");
 const kilnDryingTimeExample = { inputs: { mc_initial_pct: 85, mc_final_pct: 8, fsp_mc_pct: 30, rate_above_fsp_ppd: 3.5, rate_below_fsp_ppd: 1.6, equalize_condition_days: 4, thickness_in: 1, alt_thickness_in: 2, thickness_exponent: 1.8 } };
@@ -232,7 +232,7 @@ SAWMILL_RENDERERS["kiln-drying-time"] = _simpleRenderer({
     { key: "b", id: "kdt-out-b", label: "Below fibre saturation", value: (r) => fmt(r.days_below_fsp, 1) + " days -- " + fmt(r.below_share_pct, 0) + "% of the drying time" },
     { key: "t", id: "kdt-out-t", label: "Drying, then the whole charge cycle", value: (r) => fmt(r.drying_days, 1) + " days drying, " + fmt(r.cycle_days, 1) + " days including equalizing and conditioning" },
     { key: "l", id: "kdt-out-l", label: "What a single average rate would hide", value: (r) => fmt(r.linear_rate_ppd, 2) + " points per day averaged over the run, against " + fmt(r.rate_below_fsp_ppd || 0, 2) + " actually available below fibre saturation" },
-    { key: "s", id: "kdt-out-s", label: "At the compared thickness", value: (r) => fmt(r.alt_drying_days, 0) + " days drying (" + fmt(r.alt_cycle_days, 0) + " days of kiln), " + fmt(r.thickness_scale, 2) + " times the entered stock" + _kdtProportionalClause(r) },
+    { key: "s", id: "kdt-out-s", label: "At the compared thickness", value: (r) => fmt(r.alt_drying_days, 0) + " " + (fmt(r.alt_drying_days, 0) === "1" ? "day" : "days") + " drying (" + fmt(r.alt_cycle_days, 0) + " " + (fmt(r.alt_cycle_days, 0) === "1" ? "day" : "days") + " of kiln), " + fmt(r.thickness_scale, 2) + " times the entered stock" + _kdtProportionalClause(r) },
     { key: "n", id: "kdt-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeKilnDryingTime,
@@ -294,7 +294,7 @@ SAWMILL_RENDERERS["kiln-charge-water"] = _simpleRenderer({
   ],
   outputs: [
     { key: "d", id: "kcw-out-d", label: "Oven-dry weight of the charge", value: (r) => fmt(r.oven_dry_lb, 0) + " lb, so " + fmt(r.green_water_share_pct, 0) + "% of what came in the door is water" },
-    { key: "w", id: "kcw-out-w", label: "Water to remove", value: (r) => fmt(r.water_lb, 0) + " lb, " + fmt(r.water_gal, 0) + " gallons" },
+    { key: "w", id: "kcw-out-w", label: "Water to remove", value: (r) => fmt(r.water_lb, 0) + " lb, " + fmt(r.water_gal, 0) + " " + (fmt(r.water_gal, 0) === "1" ? "gallon" : "gallons") },
     { key: "x", id: "kcw-out-x", label: "The wrong way, on green weight", value: (r) => fmt(r.wrong_way_lb, 0) + " lb -- " + fmt(r.wrong_way_excess_lb, 0) + " lb too high, an overstatement of " + fmt(r.wrong_way_excess_pct, 0) + "%" },
     { key: "e", id: "kcw-out-e", label: "Energy for the charge", value: (r) => fmt(r.energy_mmbtu, 1) + " million BTU" },
     { key: "v", id: "kcw-out-v", label: "Vent load and schedule check", value: (r) => fmt(r.vent_lb_per_hr, 1) + " lb of water per hour, at an average " + fmt(r.avg_rate_ppd, 2) + " moisture points per day" },
@@ -427,7 +427,7 @@ SAWMILL_RENDERERS["sawmill-residue-yield"] = _simpleRenderer({
     { key: "s", id: "sry-out-s", label: "Sawdust share of the wood cut", value: (r) => fmt(r.sawdust_share_pct, 1) + "% now, " + fmt(r.target_sawdust_share_pct, 1) + "% at the changed kerf -- " + fmt(r.gain_pts, 1) + " points move from sawdust to lumber" },
     { key: "t", id: "sry-out-t", label: "The same kerf change on the thicker stock", value: (r) => fmt(r.alt_gain_pts, 1) + " points, " + fmt(r.gain_ratio, 2) + " times the gain on the thinner boards" },
     { key: "a", id: "sry-out-a", label: "Worth of the kerf change over a year", value: (r) => fmt(r.annual_gain_bf, 0) + " board feet of additional lumber from the same logs" },
-    { key: "r", id: "sry-out-r", label: "Residue split of the log", value: (r) => fmt(r.residue_pct, 0) + "% residue: " + fmt(r.bark_fraction_pct, 0) + " points bark, " + fmt(r.sawdust_of_log_pct, 1) + " points sawdust, " + fmt(r.chips_of_log_pct, 1) + " points chips" },
+    { key: "r", id: "sry-out-r", label: "Residue split of the log", value: (r) => fmt(r.residue_pct, 0) + "% residue: " + fmt(r.bark_fraction_pct, 0) + " " + (fmt(r.bark_fraction_pct, 0) === "1" ? "point" : "points") + " bark, " + fmt(r.sawdust_of_log_pct, 1) + " points sawdust, " + fmt(r.chips_of_log_pct, 1) + " points chips" },
     { key: "c", id: "sry-out-c", label: "The stream with a market", value: (r) => "chips, at " + fmt(r.chips_of_log_pct, 1) + "% of the log -- " + fmt(r.chips_of_log_pct / r.residue_pct * 100, 0) + "% of everything that is not lumber" },
     { key: "n", id: "sry-out-n", label: "Note", value: (r) => r.note },
   ],

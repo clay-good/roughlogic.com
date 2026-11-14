@@ -290,9 +290,9 @@ STEEL_RENDERERS["steel-column-capacity"] = _simpleRenderer({
   outputs: [
     { key: "sl", id: "scc-out-sl", label: "Slenderness KL/r", value: (r) => fmt(r.slender, 1) + (r.elastic ? " (elastic)" : " (inelastic)") },
     { key: "fc", id: "scc-out-fc", label: "Critical stress Fcr", value: (r) => fmt(r.fcr, 1) + " ksi" },
-    { key: "pn", id: "scc-out-pn", label: "Nominal Pn", value: (r) => fmt(r.pn, 0) + " kips" },
-    { key: "pa", id: "scc-out-pa", label: "ASD allowable Pn/Omega", value: (r) => fmt(r.pa, 0) + " kips" },
-    { key: "pp", id: "scc-out-pp", label: "LRFD design phi_c*Pn", value: (r) => fmt(r.phi_pn, 0) + " kips" },
+    { key: "pn", id: "scc-out-pn", label: "Nominal Pn", value: (r) => fmt(r.pn, 0) + " " + (fmt(r.pn, 0) === "1" ? "kip" : "kips") },
+    { key: "pa", id: "scc-out-pa", label: "ASD allowable Pn/Omega", value: (r) => fmt(r.pa, 0) + " " + (fmt(r.pa, 0) === "1" ? "kip" : "kips") },
+    { key: "pp", id: "scc-out-pp", label: "LRFD design phi_c*Pn", value: (r) => fmt(r.phi_pn, 0) + " " + (fmt(r.phi_pn, 0) === "1" ? "kip" : "kips") },
     { key: "ut", id: "scc-out-ut", label: "Demand / capacity (ASD)", value: (r) => r.util_asd === null ? "-" : fmt(r.util_asd, Math.abs(r.util_asd - 1) < 0.005 && r.util_asd !== 1 ? 4 : 2) + (r.util_asd > 1 + 1e-9 ? " (OVER)" : "") },
   ],
   compute: computeSteelColumnCapacity,
@@ -1249,7 +1249,7 @@ STEEL_RENDERERS["shear-stud-strength"] = _simpleRenderer({
   outputs: [
     { key: "qn", id: "sss-out-qn", label: "Stud strength Qn", value: (r) => fmt(r.qn_kip, 1) + " kip (" + (r.cap_governs ? "Rg Rp Asc Fu cap governs" : "0.5 Asc sqrt(f'c Ec) governs") + ")" },
     { key: "calc", id: "sss-out-calc", label: "Calc vs cap", value: (r) => fmt(r.qn_calc_kip, 1) + " / " + fmt(r.qn_cap_kip, 1) + " kip" },
-    { key: "n", id: "sss-out-n", label: "Studs each side", value: (r) => r.studs_each_side == null ? "(enter V' for the count)" : r.studs_each_side + " studs" },
+    { key: "n", id: "sss-out-n", label: "Studs each side", value: (r) => r.studs_each_side == null ? "(enter V' for the count)" : r.studs_each_side + " " + (r.studs_each_side === 1 ? "stud" : "studs") },
     { key: "note", id: "sss-out-note", label: "Note", value: (r) => r.note },
   ],
   compute: computeShearStudStrength,

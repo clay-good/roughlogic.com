@@ -427,7 +427,7 @@ STEAMPLANT_RENDERERS["blowdown-heat-recovery"] = _simpleRenderer({
     { key: "f", id: "bhr-out-f", label: "Flash steam to the deaerator", value: (r) => fmt(r.flash_steam_lb_hr, 0) + " lb/hr, " + fmt(r.flash_fraction * 100, 1) + "% of the blowdown -- it displaces live steam" },
     { key: "x", id: "bhr-out-x", label: "Heat exchanger on the remaining liquid", value: (r) => fmt(r.exchanger_heat_btuh / 1e6, 2) + " MMBTU/hr from " + fmt(r.residual_liquid_lb_hr, 0) + " lb/hr still near boiling" },
     { key: "r", id: "bhr-out-r", label: "Recovered, both stages", value: (r) => fmt(r.recovered_pct, 0) + "% of the stream, worth $" + fmt(r.annual_recovery_saving, 0) + " a year" },
-    { key: "c", id: "bhr-out-c", label: "Treatment first", value: (r) => "at " + fmt(r.alt_cycles_of_concentration, 0) + " cycles blowdown falls to " + fmt(r.alt_blowdown_lb_hr, 0) + " lb/hr, worth $" + fmt(r.alt_cycles_annual_saving, 0) + " a year with no capital -- " + r.lever_verdict },
+    { key: "c", id: "bhr-out-c", label: "Treatment first", value: (r) => "at " + fmt(r.alt_cycles_of_concentration, 0) + " " + (fmt(r.alt_cycles_of_concentration, 0) === "1" ? "cycle" : "cycles") + " blowdown falls to " + fmt(r.alt_blowdown_lb_hr, 0) + " lb/hr, worth $" + fmt(r.alt_cycles_annual_saving, 0) + " a year with no capital -- " + r.lever_verdict },
     { key: "n", id: "bhr-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeBlowdownHeatRecovery,
@@ -647,7 +647,7 @@ STEAMPLANT_RENDERERS["safety-valve-capacity"] = _simpleRenderer({
   ],
   outputs: [
     { key: "r", id: "svc-out-r", label: "Required relieving capacity", value: (r) => fmt(r.required_capacity_lb_hr, 0) + " lb/hr -- " + (r.fuel_governs ? "the FUEL INPUT governs, not the nameplate: it supports " + fmt(r.capacity_from_fuel_lb_hr, 0) + " lb/hr" : "the nameplate rating governs") },
-    { key: "i", id: "svc-out-i", label: "Installed stamped capacity", value: (r) => fmt(r.installed_capacity_lb_hr, 0) + " lb/hr across " + fmt(r.valve_count, 0) + " valves, at the set pressures actually fitted" },
+    { key: "i", id: "svc-out-i", label: "Installed stamped capacity", value: (r) => fmt(r.installed_capacity_lb_hr, 0) + " lb/hr across " + fmt(r.valve_count, 0) + " " + (fmt(r.valve_count, 0) === "1" ? "valve" : "valves") + ", at the set pressures actually fitted" },
     { key: "m", id: "svc-out-m", label: "Capacity check", value: (r) => r.capacity_verdict },
     { key: "s", id: "svc-out-s", label: "Set pressures", value: (r) => "lowest " + fmt(r.lowest_set_psig, 0) + " psig against a " + fmt(r.mawp_psig, 0) + " psig MAWP -- " + r.set_pressure_verdict + (r.supplementary_above_mawp ? "; the highest at " + fmt(r.highest_set_psig, 0) + " psig is a supplementary valve, and its stamp applies THERE" : "") },
     { key: "a", id: "svc-out-a", label: "Accumulation limit", value: (r) => "pressure must not exceed " + fmt(r.accumulation_pressure_psig, 1) + " psig with the valves relieving (" + fmt(r.accumulation_limit_pct, 0) + "% over MAWP)" },

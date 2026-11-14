@@ -2331,7 +2331,7 @@ KITCHEN_RENDERERS["grease-duct-cleaning-interval"] = _simpleRenderer({
   outputs: [
     { key: "s", id: "gdci-out-s", label: "Against the schedule", value: (r) => r.schedule_verdict },
     { key: "m", id: "gdci-out-m", label: "Against the measurement", value: (r) => r.measurement_verdict },
-    { key: "t", id: "gdci-out-t", label: "Trigger in use", value: (r) => fmt(r.applicable_trigger_um, 0) + " micrometres (" + fmt(r.trigger_thickness_in, 4) + " in), the " + (r.is_designated_point ? "fan housing" : "general") + " criterion -- the measurement is " + fmt(r.thickness_ratio, 2) + "x it" },
+    { key: "t", id: "gdci-out-t", label: "Trigger in use", value: (r) => fmt(r.applicable_trigger_um, 0) + " " + (fmt(r.applicable_trigger_um, 0) === "1" ? "micrometre" : "micrometres") + " (" + fmt(r.trigger_thickness_in, 4) + " in), the " + (r.is_designated_point ? "fan housing" : "general") + " criterion -- the measurement is " + fmt(r.thickness_ratio, 2) + "x it" },
     { key: "f", id: "gdci-out-f", label: "Inspection frequency", value: (r) => fmt(r.inspections_per_year, 1) + " inspections a year at this interval" },
     { key: "n", id: "gdci-out-n", label: "Note", value: (r) => r.note },
   ],
@@ -2407,7 +2407,7 @@ KITCHEN_RENDERERS["walk-in-door-infiltration"] = _simpleRenderer({
     { key: "air_density_lb_ft3", label: "Air density (lb per cu ft)", kind: "number", default: 0.0765 },
   ],
   outputs: [
-    { key: "d", id: "wdi-out-d", label: "Door open factor", value: (r) => fmt(r.door_open_factor, 3) + " -- " + fmt(r.openings_per_hour, 0) + " openings of " + fmt(r.seconds_open_each, 0) + " s is " + fmt(r.door_open_factor * 100, 0) + "% of the hour, through " + fmt(r.door_area_ft2, 0) + " sq ft of door" },
+    { key: "d", id: "wdi-out-d", label: "Door open factor", value: (r) => fmt(r.door_open_factor, 3) + " -- " + fmt(r.openings_per_hour, 0) + " " + (fmt(r.openings_per_hour, 0) === "1" ? "opening" : "openings") + " of " + fmt(r.seconds_open_each, 0) + " s is " + fmt(r.door_open_factor * 100, 0) + "% of the hour, through " + fmt(r.door_area_ft2, 0) + " sq ft of door" },
     { key: "q", id: "wdi-out-q", label: "Effective infiltration", value: (r) => fmt(r.effective_cfm, 0) + " cfm, " + fmt(r.mass_flow_lb_hr, 0) + " lb of air an hour" },
     { key: "l", id: "wdi-out-l", label: "Infiltration load", value: (r) => fmt(r.total_load_btuh, 0) + " Btu/h (" + fmt(r.total_load_tons, 2) + " tons) -- " + fmt(r.latent_load_btuh, 0) + " of it LATENT, " + fmt(r.latent_share_pct, 0) + "%" },
     { key: "p", id: "wdi-out-p", label: "Doorway protection", value: (r) => r.protection_verdict },

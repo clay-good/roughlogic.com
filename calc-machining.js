@@ -1149,7 +1149,7 @@ function renderFatigueFiniteLife(inputRegion, outputRegion, citationEl) {
     if (r.error) { oL.textContent = r.error; oS.textContent = "-"; oN.textContent = "-"; oNote.textContent = ""; return; }
     oL.textContent = "Sf = " + fmt(r.coefficient_a_psi, 0) + " N^" + fmt(r.exponent_b, 4) + " psi (f = " + fmt(r.f_used, 3) + (r.f_entered ? ", entered" : ", Shigley fit") + ")";
     oS.textContent = r.has_cycles ? fmt(r.strength_at_cycles_psi, 0) + " psi" : "enter cycles to find it";
-    oN.textContent = !r.has_stress ? "enter a stress to find it" : r.life_note ? r.life_note : fmt(r.life_cycles, 0) + " cycles";
+    oN.textContent = !r.has_stress ? "enter a stress to find it" : r.life_note ? r.life_note : fmt(r.life_cycles, 0) + " " + (fmt(r.life_cycles, 0) === "1" ? "cycle" : "cycles");
     oNote.textContent = r.note;
   }, DEBOUNCE_MS);
   for (const x of [sut, se, f, n, sa]) x.input.addEventListener("input", update);
@@ -1268,7 +1268,7 @@ function renderFatigueMinerDamage(inputRegion, outputRegion, citationEl) {
     oD.textContent = fmt(r.blocks_to_failure, 3) + " (damage per block D = " + fmt(r.damage, 5) + (r.fails_in_block ? "; FAILS within one block" : "") + ")";
     if (r.infinite) oD.textContent = "unlimited: every block is at or below Se";
     oL.textContent = [s1, s2, s3].map((x, i) => (readNum(x.input) > 0 ? "block " + (i + 1) + ": " + life([r.life_1_cycles, r.life_2_cycles, r.life_3_cycles][i]) : "")).filter(Boolean).join("; ");
-    oT.textContent = fmt(r.cycles_to_failure, 0) + " cycles";
+    oT.textContent = fmt(r.cycles_to_failure, 0) + " " + (fmt(r.cycles_to_failure, 0) === "1" ? "cycle" : "cycles");
     if (r.infinite) oT.textContent = "unlimited";
     oNote.textContent = r.note;
   }, DEBOUNCE_MS);

@@ -638,7 +638,7 @@ MILLWRIGHT_RENDERERS["bearing-defect-frequencies"] = _simpleRenderer({
     { key: "o", id: "bdf-out-o", label: "Outer race (BPFO)", value: (r) => fmt(r.bpfo_hz, 2) + " Hz at " + fmt(r.bpfo_order, 2) + "x -- a non-integer order nothing else in the machine can produce" },
     { key: "i", id: "bdf-out-i", label: "Inner race (BPFI)", value: (r) => fmt(r.bpfi_hz, 2) + " Hz at " + fmt(r.bpfi_order, 2) + "x, with SIDEBANDS every " + fmt(r.sideband_spacing_hz, 2) + " Hz -- the sideband spacing equal to shaft speed is the confirmation" },
     { key: "b", id: "bdf-out-b", label: "Ball spin (BSF; a ball defect also shows at 2 x BSF)", value: (r) => fmt(r.bsf_hz, 2) + " Hz at " + fmt(r.bsf_order, 2) + "x (2x: " + fmt(2 * r.bsf_order, 2) + "x)" },
-    { key: "c", id: "bdf-out-c", label: "Cage (FTF)", value: (r) => fmt(r.ftf_hz, 2) + " Hz at " + fmt(r.ftf_order, 3) + "x -- and cage times the " + fmt(r.ball_count, 0) + " elements is " + fmt(r.cage_identity_hz, 2) + " Hz, which is the outer race exactly" },
+    { key: "c", id: "bdf-out-c", label: "Cage (FTF)", value: (r) => fmt(r.ftf_hz, 2) + " Hz at " + fmt(r.ftf_order, 3) + "x -- and cage times the " + fmt(r.ball_count, 0) + " " + (fmt(r.ball_count, 0) === "1" ? "element" : "elements") + " is " + fmt(r.cage_identity_hz, 2) + " Hz, which is the outer race exactly" },
     { key: "a", id: "bdf-out-a", label: "If you do not know the bearing", value: (r) => "0.4n = " + fmt(r.bpfo_approx_order, 2) + "x outer and 0.6n = " + fmt(r.bpfi_approx_order, 2) + "x inner, against the exact " + fmt(r.bpfo_order, 2) + "x and " + fmt(r.bpfi_order, 2) + "x -- close enough to search a spectrum" },
     { key: "s", id: "bdf-out-s", label: "Expect them low", value: () => "real bearings slip, so measured defect frequencies run one to two percent BELOW these -- a peak that is close but not exact is still the bearing" },
     { key: "n", id: "bdf-out-n", label: "Note", value: (r) => r.note },
@@ -769,7 +769,7 @@ MILLWRIGHT_RENDERERS["roller-chain-wear-elongation"] = _simpleRenderer({
     { key: "sprocket_teeth", label: "Sprocket teeth (0 to skip)", kind: "number" },
   ],
   outputs: [
-    { key: "n", id: "rcw-out-n", label: "Nominal length", value: (r) => fmt(r.nominal_length_in, 4) + " in across " + fmt(r.pitches_measured, 0) + " pitches" },
+    { key: "n", id: "rcw-out-n", label: "Nominal length", value: (r) => fmt(r.nominal_length_in, 4) + " in across " + fmt(r.pitches_measured, 0) + " " + (fmt(r.pitches_measured, 0) === "1" ? "pitch" : "pitches") },
     { key: "e", id: "rcw-out-e", label: "Elongation", value: (r) => fmt(r.elongation_pct, 2) + "%, which is " + fmt(r.elongation_in, 3) + " in over the span" },
     { key: "a", id: "rcw-out-a", label: "Allowable length", value: (r) => fmt(r.allowable_length_in, 4) + " in at the " + fmt(r.elongation_limit_pct, 2) + "% limit" },
     { key: "v", id: "rcw-out-v", label: "Verdict", value: (r) => r.verdict },

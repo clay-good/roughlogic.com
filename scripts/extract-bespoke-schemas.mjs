@@ -261,6 +261,10 @@ function splitTopLevel(expr) {
 const STRING_LITERAL = /^"((?:[^"\\]|\\.)*)"$|^'((?:[^'\\]|\\.)*)'$/;
 function parseOutputUnit(expr, key, aliases = DEFAULT_ALIASES, vars = ["r"]) {
   const VAR = "(?:" + vars.map((v) => v.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|") + ")";
+  // A count's noun agrees with it: `fmt(r.bags, 0) + " " + (fmt(r.bags, 0) === "1"
+  // ? "bag" : "bags")` (2026-11-14). That is one unit in two spellings, not a
+  // conditional line, so read it as the plural literal it was before.
+  expr = expr.replace(/\((?:\w+\([^()]*\)\s*===\s*"1"|[\w.$]+\s*===\s*1)\s*\?\s*"([^"\\]*)"\s*:\s*"([^"\\]*)"\)/g, (_m, _one, many) => JSON.stringify(many));
   // A conditional line says different things about the same number; whichever
   // branch we picked would be wrong half the time.
   if (splitTopLevel(expr).length === 1 && expr.includes("?")) return null;

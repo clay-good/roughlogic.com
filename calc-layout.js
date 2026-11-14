@@ -847,7 +847,7 @@ function _v55renderPolygonMiter(inputRegion, outputRegion, citationEl) {
     const r = computePolygonMiter({ sides: readNum(n.input), size_mode: mode.select.value, size_in: readNum(size.input) }); stepsFor(outputRegion, inputRegion, ["sides", "size_mode", "size_in"], r);
     if (r.error) { oMiter.textContent = r.error; oSide.textContent = "-"; oSize.textContent = "-"; oArea.textContent = "-"; oNote.textContent = ""; return; }
     oMiter.textContent = fmt(r.miter_angle_deg, 3) + " deg miter (off square) at each end; interior " + fmt(r.interior_angle_deg, 3) + " deg";
-    oSide.textContent = fmt(r.side_in, 4) + " in x " + r.sides + " pieces";
+    oSide.textContent = fmt(r.side_in, 4) + " in x " + r.sides + " " + (r.sides === 1 ? "piece" : "pieces");
     oSize.textContent = fmt(r.across_flats_in, 4) + " in flats / " + fmt(r.across_corners_in, 4) + " in corners";
     oArea.textContent = fmt(r.perimeter_in, 3) + " in perimeter / " + fmt(r.area_in2, 3) + " in^2";
     oNote.textContent = r.notes.join(" ");

@@ -293,7 +293,7 @@ AIRQUALITY_RENDERERS["opacity-six-minute"] = _simpleRenderer({
     { key: "steady_reading_pct", label: "Steady-haze comparison, every reading at (%, 0 to skip)", kind: "number", attrs: { step: "any" } },
   ],
   outputs: [
-    { key: "a", id: "osm-out-a", label: "Block average", value: (r) => r.block_verdict + (r.full_block ? "" : " (note: " + fmt(r.reading_count, 0) + " readings, not the 24 a full six-minute block carries)") },
+    { key: "a", id: "osm-out-a", label: "Block average", value: (r) => r.block_verdict + (r.full_block ? "" : " (note: " + fmt(r.reading_count, 0) + " " + (fmt(r.reading_count, 0) === "1" ? "reading" : "readings") + ", not the 24 a full six-minute block carries)") },
     { key: "p", id: "osm-out-p", label: "The peak inside it", value: (r) => r.peak_verdict },
     { key: "c", id: "osm-out-c", label: "How much dark it can carry", value: (r) => r.capacity_verdict },
     { key: "s", id: "osm-out-s", label: "A steady haze instead", value: (r) => r.steady_verdict },
@@ -887,7 +887,7 @@ AIRQUALITY_RENDERERS["carbon-bed-life"] = _simpleRenderer({
   ],
   outputs: [
     { key: "c", id: "cbl-out-c", label: "Bed capacity", value: (r) => fmt(r.bed_capacity_lb, 1) + " lb of solvent" },
-    { key: "l", id: "cbl-out-l", label: "Bed life", value: (r) => fmt(r.bed_life_hours, 0) + " hours -- " + fmt(r.bed_life_days, 1) + " days continuous, or " + fmt(r.operating_days, 1) + " operating days at the entered schedule" },
+    { key: "l", id: "cbl-out-l", label: "Bed life", value: (r) => fmt(r.bed_life_hours, 0) + " " + (fmt(r.bed_life_hours, 0) === "1" ? "hour" : "hours") + " -- " + fmt(r.bed_life_days, 1) + " days continuous, or " + fmt(r.operating_days, 1) + " operating days at the entered schedule" },
     { key: "d", id: "cbl-out-d", label: "If capacity degrades", value: (r) => r.degraded_verdict },
     { key: "b", id: "cbl-out-b", label: "Why a timer is not enough", value: (r) => r.breakthrough_verdict },
     { key: "n", id: "cbl-out-n", label: "Note", value: (r) => r.note },

@@ -479,7 +479,7 @@ WIND_RENDERERS["yaw-error-loss"] = _simpleRenderer({
     { key: "l", id: "yel-out-l", label: "Power lost", value: (r) => fmt(r.loss_cubed_pct, 2) + "% on the cubed form, " + fmt(r.loss_squared_pct, 2) + "% on the squared -- read the cubed as the pessimistic bound" },
     { key: "e", id: "yel-out-e", label: "Annual energy lost, one machine", value: (r) => fmt(r.lost_mwh, 0) + " MWh of " + fmt(r.annual_mwh, 0) + " MWh" },
     { key: "d", id: "yel-out-d", label: "Annual revenue lost, one machine", value: (r) => "$" + fmt(r.lost_usd, 0) },
-    { key: "f", id: "yel-out-f", label: "Across the entered fleet", value: (r) => "$" + fmt(r.fleet_lost_usd, 0) + " a year from " + fmt(r.turbine_count, 0) + " machines, on a wind vane calibration" },
+    { key: "f", id: "yel-out-f", label: "Across the entered fleet", value: (r) => "$" + fmt(r.fleet_lost_usd, 0) + " a year from " + fmt(r.turbine_count, 0) + " " + (fmt(r.turbine_count, 0) === "1" ? "machine" : "machines") + ", on a wind vane calibration" },
     { key: "a", id: "yel-out-a", label: "Error worth chasing", value: (r) => "anything past " + fmt(r.acceptable_angle_deg, 1) + " deg -- " + r.chase_verdict },
     { key: "n", id: "yel-out-n", label: "Note", value: (r) => r.note },
   ],

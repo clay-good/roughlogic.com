@@ -300,8 +300,8 @@ RELIEFPOWER_RENDERERS["generator-fleet-fuel-resupply"] = _simpleRenderer({
   outputs: [
     { key: "shortest_interval_hours", id: "gffr-out-short", label: "Route must return within", unit: "h", value: (r) => fmt(r.shortest_interval_hours, 1) + " h, set by " + r.shortest_sizes },
     { key: "fleet_fuel_gal_per_day", id: "gffr-out-day", label: "Fleet fuel per day", value: (r) => fmt(r.fleet_fuel_gal_per_day, 0) + " gal/day for " + fmt(r.fleet_kw, 0) + " kW (" + r.basis + ")" },
-    { key: "trips_per_day", id: "gffr-out-trips", label: "Truck trips per day", value: (r) => r.trips_per_day + " trips" },
-    { key: "fleet_fuel_70_gal_per_day", id: "gffr-out-70", label: "USACE rule at 70% load, for comparison", value: (r) => fmt(r.fleet_fuel_70_gal_per_day, 0) + " gal/day, " + r.trips_per_day_70 + " trips" },
+    { key: "trips_per_day", id: "gffr-out-trips", label: "Truck trips per day", value: (r) => r.trips_per_day + " " + (r.trips_per_day === 1 ? "trip" : "trips") },
+    { key: "fleet_fuel_70_gal_per_day", id: "gffr-out-70", label: "USACE rule at 70% load, for comparison", value: (r) => fmt(r.fleet_fuel_70_gal_per_day, 0) + " gal/day, " + r.trips_per_day_70 + " " + (r.trips_per_day_70 === 1 ? "trip" : "trips") },
     { key: "size1_interval_hours", id: "gffr-out-s1", label: "Size 1 burn and refuel interval", value: (r) => (r.size1_interval_hours === null ? "unused" : fmt(r.size1_unit_gph, 2) + " gph each; " + fmt(r.size1_interval_hours, 1) + " h") },
     { key: "size2_interval_hours", id: "gffr-out-s2", label: "Size 2 burn and refuel interval", value: (r) => (r.size2_interval_hours === null ? "unused" : fmt(r.size2_unit_gph, 2) + " gph each; " + fmt(r.size2_interval_hours, 1) + " h") },
     { key: "size3_interval_hours", id: "gffr-out-s3", label: "Size 3 burn and refuel interval", value: (r) => (r.size3_interval_hours === null ? "unused" : fmt(r.size3_unit_gph, 2) + " gph each; " + fmt(r.size3_interval_hours, 1) + " h") },

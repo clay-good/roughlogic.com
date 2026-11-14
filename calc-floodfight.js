@@ -133,7 +133,7 @@ FLOODFIGHT_RENDERERS["sandbag-levee-quantity"] = _simpleRenderer({
   ],
   outputs: [
     { key: "bpf", id: "sbl-out-bpf", label: "Bags per linear foot", value: (r) => fmt(r.bags_per_ft, 1) + " bags/ft" },
-    { key: "bags", id: "sbl-out-bags", label: "Total bags", value: (r) => fmt(r.total_bags, 0) + " bags" },
+    { key: "bags", id: "sbl-out-bags", label: "Total bags", value: (r) => fmt(r.total_bags, 0) + " " + (fmt(r.total_bags, 0) === "1" ? "bag" : "bags") },
     { key: "sand", id: "sbl-out-sand", label: "Sand", value: (r) => fmt(r.sand_tons, 1) + " tons at " + fmt(r.fill_weight_lb, 0) + " lb per bag" },
     { key: "base", id: "sbl-out-base", label: "Base width (footprint)", value: (r) => fmt(r.base_width_ft, 1) + " ft" },
     { key: "flag", id: "sbl-out-flag", label: "Height", value: (r) => r.height_flag },
@@ -441,7 +441,7 @@ FLOODFIGHT_RENDERERS["basement-flood-pumpdown"] = _simpleRenderer({
   ],
   outputs: [
     { key: "v", id: "bfp-out-v", label: "Water volume", value: (r) => fmt(r.total_gal, 0) + " gal (" + fmt(r.gal_per_ft, 0) + " gal per ft of depth)" },
-    { key: "d", id: "bfp-out-d", label: "Days", value: (r) => fmt(r.days, 0) + " days if every drawdown holds" + (r.below_fema_rate ? " (slower than FEMA's 2 to 3 ft/day, which is conservative)" : "") },
+    { key: "d", id: "bfp-out-d", label: "Days", value: (r) => fmt(r.days, 0) + " " + (fmt(r.days, 0) === "1" ? "day" : "days") + " if every drawdown holds" + (r.below_fema_rate ? " (slower than FEMA's 2 to 3 ft/day, which is conservative)" : "") },
     { key: "s", id: "bfp-out-s", label: "Schedule", value: (r) => r.schedule },
     { key: "p", id: "bfp-out-p", label: "Pump run on the largest day", value: (r) => fmt(r.largest_day_run_min, 0) + " min (" + fmt(r.largest_day_run_min / 60, 1) + " h) for " + fmt(r.largest_day_gal, 0) + " gal" + (r.pump_keeps_up ? "" : " -- MORE than 24 h: the pump cannot keep to the schedule") },
     { key: "n", id: "bfp-out-n", label: "Note", value: (r) => r.note },
@@ -670,7 +670,7 @@ FLOODFIGHT_RENDERERS["manufactured-home-anchor-count"] = _simpleRenderer({
   outputs: [
     { key: "s", id: "mha-out-s", label: "Maximum strap spacing", value: (r) => r.spacing_label + " (" + r.cell + ")" },
     { key: "a", id: "mha-out-a", label: "Diagonal anchors", value: (r) => fmt(r.anchors_per_side, 0) + " per side, " + fmt(r.total_anchors, 0) + " total for " + fmt(r.sections, 0) + " section(s)" },
-    { key: "u", id: "mha-out-u", label: "Spacing used", value: (r) => fmt(r.spaces_per_side, 0) + " spaces of " + fmt(r.spacing_used_ft, 2) + " ft over the " + fmt(r.run_ft, 1) + " ft between end straps" },
+    { key: "u", id: "mha-out-u", label: "Spacing used", value: (r) => fmt(r.spaces_per_side, 0) + " " + (fmt(r.spaces_per_side, 0) === "1" ? "space" : "spaces") + " of " + fmt(r.spacing_used_ft, 2) + " ft over the " + fmt(r.run_ft, 1) + " ft between end straps" },
     { key: "v", id: "mha-out-v", label: "Vertical ties", value: (r) => r.vertical_required ? fmt(r.vertical_ties, 0) + " -- one at every diagonal tie location" : "not required by the Zone I table" },
     { key: "l", id: "mha-out-l", label: "Table limits", value: (r) => r.limits },
     { key: "n", id: "mha-out-n", label: "Note", value: (r) => r.note },

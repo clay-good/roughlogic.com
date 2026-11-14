@@ -154,9 +154,9 @@ MINING_RENDERERS["blast-powder-factor"] = _simpleRenderer({
   outputs: [
     { key: "l", id: "bpf-out-l", label: "Loading density", value: (r) => fmt(r.loading_density_lb_per_ft, 2) + " lb per ft of hole" },
     { key: "c", id: "bpf-out-c", label: "Charge column and weight per hole", value: (r) => fmt(r.charge_length_ft, 1) + " ft, " + fmt(r.charge_weight_lb, 0) + " lb" },
-    { key: "r", id: "bpf-out-r", label: "Rock per hole", value: (r) => fmt(r.rock_tons_per_hole, 0) + " tons (" + fmt(r.rock_volume_cy, 0) + " cu yd)" },
+    { key: "r", id: "bpf-out-r", label: "Rock per hole", value: (r) => fmt(r.rock_tons_per_hole, 0) + " " + (fmt(r.rock_tons_per_hole, 0) === "1" ? "ton" : "tons") + " (" + fmt(r.rock_volume_cy, 0) + " cu yd)" },
     { key: "p", id: "bpf-out-p", label: "Powder factor", value: (r) => fmt(r.powder_factor_lb_per_ton, 3) + " lb per ton (" + fmt(r.powder_factor_lb_per_cy, 3) + " lb per cu yd)" },
-    { key: "t", id: "bpf-out-t", label: "Whole shot", value: (r) => fmt(r.total_explosive_lb, 0) + " lb of explosive over " + fmt(r.total_tons, 0) + " tons" },
+    { key: "t", id: "bpf-out-t", label: "Whole shot", value: (r) => fmt(r.total_explosive_lb, 0) + " lb of explosive over " + fmt(r.total_tons, 0) + " " + (fmt(r.total_tons, 0) === "1" ? "ton" : "tons") },
     { key: "d", id: "bpf-out-d", label: "Hole depth drilled", value: (r) => fmt(r.hole_depth_ft, 1) + " ft" },
     { key: "n", id: "bpf-out-n", label: "Note", value: (r) => r.note },
   ],
@@ -528,7 +528,7 @@ MINING_RENDERERS["bond-work-index-power"] = _simpleRenderer({
   outputs: [
     { key: "w", id: "bwi-out-w", label: "Specific energy", value: (r) => fmt(r.specific_energy_kwh_st, 2) + " kWh per short ton (reduction ratio " + fmt(r.reduction_ratio, 1) + ")" },
     { key: "p", id: "bwi-out-p", label: "Power at the pinion", value: (r) => (r.has_rate ? fmt(r.power_kw, 0) + " kW (" + fmt(r.power_hp, 0) + " hp)" : "enter a feed rate") },
-    { key: "a", id: "bwi-out-a", label: "Finest product the available power reaches", value: (r) => (r.has_available ? fmt(r.achievable_p80_um, 0) + " microns P80" : "enter the available power") },
+    { key: "a", id: "bwi-out-a", label: "Finest product the available power reaches", value: (r) => (r.has_available ? fmt(r.achievable_p80_um, 0) + " " + (fmt(r.achievable_p80_um, 0) === "1" ? "micron" : "microns") + " P80" : "enter the available power") },
     { key: "n", id: "bwi-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeBondWorkIndexPower,

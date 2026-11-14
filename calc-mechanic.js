@@ -967,7 +967,7 @@ MECHANIC_RENDERERS["spring-natural-frequency"] = _simpleRenderer({
     { key: "material", label: "Wire material", kind: "select", default: "music-wire", options: Object.keys(SPRING_MATERIALS).map((k) => ({ value: k, label: SPRING_MATERIALS[k].label })) },
   ],
   outputs: [
-    { key: "fn", id: "snf-out-fn", label: "Surge frequency fn", value: (r) => fmt(r.natural_frequency_hz, 0) + " Hz (" + fmt(r.natural_frequency_cpm, 0) + " cycles/min)" },
+    { key: "fn", id: "snf-out-fn", label: "Surge frequency fn", value: (r) => fmt(r.natural_frequency_hz, 0) + " Hz (" + fmt(r.natural_frequency_cpm, 0) + " " + (fmt(r.natural_frequency_cpm, 0) === "1" ? "cycle" : "cycles") + "/min)" },
     { key: "k", id: "snf-out-k", label: "Spring rate", value: (r) => fmt(r.spring_rate_lb_in, 2) + " lb/in (matches helical-spring-rate)" },
     { key: "w", id: "snf-out-w", label: "Active-coil weight W", value: (r) => fmt(r.active_weight_lb, 4) + " lb (spring index D/d = " + fmt(r.spring_index, 2) + ")" },
     { key: "n", id: "snf-out-n", label: "Note", value: (r) => r.note },

@@ -10,7 +10,7 @@
       "date": "2026-10-20"
     },
     "/errata/": {
-      "sha": "2ee2c4e8b8a81feb",
+      "sha": "22300621aa59c264",
       "date": "2026-11-14"
     },
     "/collections/disaster-response/": {
@@ -3466,8 +3466,8 @@
       "date": "2026-10-17"
     },
     "/tools/generator-fleet-fuel-resupply/": {
-      "sha": "0685e5b42f041d9e",
-      "date": "2026-10-17"
+      "sha": "c44e7a54186947f8",
+      "date": "2026-11-14"
     },
     "/tools/generator-fuel-runtime/": {
       "sha": "70ae71642f36d038",

@@ -269,7 +269,7 @@ function renderPipeSupportSpacing(inputRegion, outputRegion, citationEl) {
     const r = computePipeSupportSpacing({ material: material.select.value, pipe_size: Number(size.input.value) || 0, run_length: Number(run.input.value) || 0, orientation: orient.select.value }); stepsFor(outputRegion, inputRegion, ["material", "pipe_size", "run_length", "orientation"], r);
     if (r.error) { oSpacing.textContent = r.error; oHangers.textContent = "-"; return; }
     oSpacing.textContent = fmt(r.max_spacing_ft, 2) + " ft (" + r.material + ", " + r.orientation + ")";
-    oHangers.textContent = r.hangers + " hangers";
+    oHangers.textContent = r.hangers + " " + (r.hangers === 1 ? "hanger" : "hangers");
   }, DEBOUNCE_MS);
   for (const el of [size.input, run.input]) el.addEventListener("input", update);
   for (const el of [material.select, orient.select]) el.addEventListener("change", update);
@@ -350,8 +350,8 @@ function renderSoftenerSizing(inputRegion, outputRegion, citationEl) {
     }); stepsFor(outputRegion, inputRegion, ["people", "use_per_cap", "hardness_gpg", "iron_ppm", "capacity", "salt_per_regen"], r);
     if (r.error) { oComp.textContent = r.error; for (const o of [oLoad, oDays, oSalt]) o.textContent = "-"; return; }
     oComp.textContent = fmt(r.comp_hardness, 1) + " gpg (" + fmt(r.daily_gal, 0) + " gal/day)";
-    oLoad.textContent = fmt(r.grain_load, 0) + " grains/day";
-    oDays.textContent = r.days_between + " days" + (r.undersized ? " (regenerates daily - undersized)" : "");
+    oLoad.textContent = fmt(r.grain_load, 0) + " " + (fmt(r.grain_load, 0) === "1" ? "grain" : "grains") + "/day";
+    oDays.textContent = r.days_between + " " + (r.days_between === 1 ? "day" : "days") + (r.undersized ? " (regenerates daily - undersized)" : "");
     oSalt.textContent = fmt(r.salt_per_regen, 1) + " lb/regen, " + fmt(r.annual_salt, 0) + " lb/yr";
   }, DEBOUNCE_MS);
   for (const el of [people.input, use.input, hardness.input, iron.input, cap.input, salt.input]) el.addEventListener("input", update);

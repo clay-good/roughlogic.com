@@ -133,7 +133,7 @@ function _v26renderMotorFeederMultiple(inputRegion, outputRegion, citationEl) {
     if (r.error) { oCond.textContent = r.error; oDev.textContent = "-"; oLargest.textContent = "-"; oNote.textContent = ""; return; }
     oCond.textContent = _v26fmt(r.conductor_min_A, 1) + " A";
     oDev.textContent = r.feeder_ocpd_max_A + " A (raw max " + _v26fmt(r.feeder_ocpd_raw_A, 1) + " A)";
-    oLargest.textContent = "largest FLC " + _v26fmt(r.largest_motor_flc_A, 1) + " A; largest branch device " + r.largest_branch_device_A + " A; " + r.motor_count + " motors, ΣFLC " + _v26fmt(r.sum_flc_A, 1) + " A";
+    oLargest.textContent = "largest FLC " + _v26fmt(r.largest_motor_flc_A, 1) + " A; largest branch device " + r.largest_branch_device_A + " A; " + r.motor_count + " " + (r.motor_count === 1 ? "motor" : "motors") + ", ΣFLC " + _v26fmt(r.sum_flc_A, 1) + " A";
     oNote.textContent = r.notes.join(" ");
   }, _V26_DEB);
   for (const f of [list.input, nmC.input, nmN.input]) f.addEventListener("input", update);

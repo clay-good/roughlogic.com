@@ -1205,8 +1205,8 @@ function _v898renderPoolTileCopingPerimeter(inputRegion, outputRegion, citationE
     }); stepsFor(outputRegion, inputRegion, ["length_ft", "width_ft", "tile_length_in", "courses", "coping_length_in", "waste_pct"], r);
     if (r.error) { oPerim.textContent = r.error; oTiles.textContent = "-"; oCoping.textContent = "-"; return; }
     oPerim.textContent = fmt(r.perimeter_ft, 0) + " ft";
-    oTiles.textContent = fmt(r.waterline_tiles, 0) + " tiles";
-    oCoping.textContent = fmt(r.coping_units, 0) + " units";
+    oTiles.textContent = fmt(r.waterline_tiles, 0) + " " + (fmt(r.waterline_tiles, 0) === "1" ? "tile" : "tiles");
+    oCoping.textContent = fmt(r.coping_units, 0) + " " + (fmt(r.coping_units, 0) === "1" ? "unit" : "units");
   }, DEBOUNCE_MS);
   for (const f of [ln, wd, tl, cs, cl, ws]) f.input.addEventListener("input", update);
 }

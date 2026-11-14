@@ -1791,7 +1791,7 @@ const renderDriverPayCpmVsPercentage = _simpleRenderer({
   ],
   outputs: [
     { key: "cpm", id: "dpc-out-cpm", label: "Cents-per-mile pay", value: (r) => "$" + fmt(r.cpm_pay_usd, 2) },
-    { key: "pct", id: "dpc-out-pct", label: "Percentage pay", value: (r) => "$" + fmt(r.pct_pay_usd, 2) + " (" + r.winner + " pays more)" },
+    { key: "pct", id: "dpc-out-pct", label: "Percentage pay", value: (r) => "$" + fmt(r.pct_pay_usd, 2) + " (" + r.winner + " pays" + " more)" },
     { key: "be", id: "dpc-out-be", label: "Break-even load rate", value: (r) => "$" + fmt(r.breakeven_rate_usd_mi, 2) + "/mi (this load $" + fmt(r.load_rate_usd_mi, 2) + "/mi)" },
     { key: "n", id: "dpc-out-n", label: "Note", value: (r) => r.note },
   ],

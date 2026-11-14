@@ -1050,7 +1050,7 @@ function renderIrrigationRequirement(inputRegion, outputRegion, citationEl) {
     if (r.error) { oEt.textContent = r.error; oNet.textContent = "-"; oVol.textContent = "-"; oNote.textContent = ""; return; }
     oEt.textContent = fmt(r.et_crop_in, 2) + " in (Kc " + r.kc + " x " + fmt(r.et_ref_in_per_day, 2) + " in/day x " + fmt(r.period_days, 0) + " d)";
     oNet.textContent = fmt(r.net_in, 2) + " in net / " + fmt(r.gross_in, 2) + " in gross (" + r.efficiency_pct + "% eff)";
-    oVol.textContent = fmt(r.acre_ft, 2) + " acre-ft (" + fmt(r.gallons, 0) + " gal) over " + fmt(r.area_acres, 0) + " acres";
+    oVol.textContent = fmt(r.acre_ft, 2) + " acre-ft (" + fmt(r.gallons, 0) + " gal) over " + fmt(r.area_acres, 0) + " " + (fmt(r.area_acres, 0) === "1" ? "acre" : "acres");
     oNote.textContent = r.warnings.length ? r.warnings.join(" ") : "Gross depth applied across the field; compare against your water right or allocation.";
   }, DEBOUNCE_MS);
   for (const el of [et0.input, days.input, area.input, rain.input]) el.addEventListener("input", update);
@@ -1166,7 +1166,7 @@ function renderStockingRate(inputRegion, outputRegion, citationEl) {
     if (r.error) { oForage.textContent = r.error; oAum.textContent = "-"; oDays.textContent = "-"; oNote.textContent = ""; return; }
     oForage.textContent = fmt(r.available_forage_lb, 0) + " lb dry matter (" + r.utilization_pct + "% of " + fmt(r.forage_lb_per_acre * r.area_acres, 0) + " lb)";
     oAum.textContent = fmt(r.aums_available, 1) + " AUMs; ~" + Math.floor(r.head_one_month) + " head of this class for one AUM (30.4 days)";
-    oDays.textContent = r.grazing_days != null ? fmt(r.grazing_days, 0) + " days for " + r.herd_size + " head (" + fmt(r.acres_per_head, 1) + " acres/head)" : "enter a herd size";
+    oDays.textContent = r.grazing_days != null ? fmt(r.grazing_days, 0) + " " + (fmt(r.grazing_days, 0) === "1" ? "day" : "days") + " for " + r.herd_size + " head (" + fmt(r.acres_per_head, 1) + " acres/head)" : "enter a herd size";
     oNote.textContent = r.warnings.length ? r.warnings.join(" ") : "Carrying capacity from clip-and-weigh or the NRCS Ecological Site Description; adjust for drought.";
   }, DEBOUNCE_MS);
   for (const el of [area.input, forage.input, util.input, herd.input]) el.addEventListener("input", update);
@@ -1605,7 +1605,7 @@ function renderNpkBlend(inputRegion, outputRegion, citationEl) {
     oRec.textContent = fmt(r.rec_n_lb_per_acre, 0) + " N / " + fmt(r.rec_p_lb_per_acre, 0) + " P2O5 / " + fmt(r.rec_k_lb_per_acre, 0) + " K2O lb/acre still needed";
     oRate.textContent = "Urea " + fmt(r.urea_lb_per_acre, 1) + " + DAP " + fmt(r.dap_lb_per_acre, 1) + " + Potash " + fmt(r.mop_lb_per_acre, 1) + " lb/acre";
     oKg.textContent = fmt(r.rec_n_kg_per_ha, 0) + " N / " + fmt(r.rec_p_kg_per_ha, 0) + " P2O5 / " + fmt(r.rec_k_kg_per_ha, 0) + " K2O kg/ha";
-    oTotal.textContent = "Urea " + fmt(r.urea_total_lb, 0) + " + DAP " + fmt(r.dap_total_lb, 0) + " + Potash " + fmt(r.mop_total_lb, 0) + " lb over " + fmt(r.area_acres, 0) + " acres";
+    oTotal.textContent = "Urea " + fmt(r.urea_total_lb, 0) + " + DAP " + fmt(r.dap_total_lb, 0) + " + Potash " + fmt(r.mop_total_lb, 0) + " lb over " + fmt(r.area_acres, 0) + " " + (fmt(r.area_acres, 0) === "1" ? "acre" : "acres");
     oBags.textContent = r.urea_bags + " urea + " + r.dap_bags + " DAP + " + r.mop_bags + " potash bags (" + fmt(r.bag_weight_lb, 0) + " lb each); " + fmt(r.total_blend_tons, 2) + " tons total";
     oNote.textContent = r.warnings.length ? r.warnings.join(" ") : "Blend delivers " + fmt(r.n_delivered_lb_per_acre, 0) + " N / " + fmt(r.p_delivered_lb_per_acre, 0) + " P2O5 / " + fmt(r.k_delivered_lb_per_acre, 0) + " K2O lb/acre. Apply per your certified soil-test recommendation.";
   }, DEBOUNCE_MS);
@@ -1746,7 +1746,7 @@ function renderTankMix(inputRegion, outputRegion, citationEl) {
     }
     if (r.tanks_needed !== undefined) {
       const total = r.total_liquid ? fmt(r.total_liquid.gal, 2) + " gal" : fmt(r.total_dry.lb, 2) + " lb";
-      oField.textContent = r.tanks_needed + " tank(s) for " + fmt(r.field_area_acres, 0) + " acres; " + fmt(r.total_product_unit, 1) + " " + unitLabel(r.product_unit) + " (" + total + ") product; " + fmt(r.total_carrier_water_gal, 0) + " gal carrier water";
+      oField.textContent = r.tanks_needed + " tank(s) for " + fmt(r.field_area_acres, 0) + " " + (fmt(r.field_area_acres, 0) === "1" ? "acre" : "acres") + "; " + fmt(r.total_product_unit, 1) + " " + unitLabel(r.product_unit) + " (" + total + ") product; " + fmt(r.total_carrier_water_gal, 0) + " gal carrier water";
     } else {
       oField.textContent = "Enter a field area for tanks-needed and totals.";
     }
@@ -2354,7 +2354,7 @@ function _v84renderSprayerFieldCapacity(inputRegion, outputRegion, citationEl) {
     oTheo.textContent = fmt(r.theoretical_ac_hr, 1) + " ac/hr";
     oEff.textContent = fmt(r.effective_ac_hr, 1) + " ac/hr";
     oTime.textContent = fmt(r.spray_time_hr, 1) + " hr";
-    oTanks.textContent = r.tanks_needed + " tanks (" + fmt(r.acres_per_tank, 1) + " ac/tank)";
+    oTanks.textContent = r.tanks_needed + " " + (r.tanks_needed === 1 ? "tank" : "tanks") + " (" + fmt(r.acres_per_tank, 1) + " ac/tank)";
   }, DEBOUNCE_MS);
   for (const f of [boom, speed, eff, acres, tank, gpa]) f.input.addEventListener("input", update);
 }

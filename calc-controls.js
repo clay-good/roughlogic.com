@@ -287,9 +287,9 @@ CONTROLS_RENDERERS["trend-log-storage"] = _simpleRenderer({
   ],
   outputs: [
     { key: "y", id: "tls-out-y", label: "Samples per point per year", value: (r) => fmt(r.samples_per_point_year, 0) },
-    { key: "t", id: "tls-out-t", label: "Total over the retention", value: (r) => fmt(r.total_samples, 0) + " samples, " + fmt(r.storage_gb, 1) + " GB" },
+    { key: "t", id: "tls-out-t", label: "Total over the retention", value: (r) => fmt(r.total_samples, 0) + " " + (fmt(r.total_samples, 0) === "1" ? "sample" : "samples") + ", " + fmt(r.storage_gb, 1) + " GB" },
     { key: "f", id: "tls-out-f", label: "At the faster interval", value: (r) => r.alt_storage_gb === null ? "not compared" : fmt(r.alt_storage_gb, 1) + " GB" },
-    { key: "b", id: "tls-out-b", label: "Controller buffer", value: (r) => r.buffer_fill_min === null ? "no controller entered" : fmt(r.controller_samples_per_hour, 0) + " samples/hr, fills in " + fmt(r.buffer_fill_min, 0) + " min -- the maximum poll interval" },
+    { key: "b", id: "tls-out-b", label: "Controller buffer", value: (r) => r.buffer_fill_min === null ? "no controller entered" : fmt(r.controller_samples_per_hour, 0) + " " + (fmt(r.controller_samples_per_hour, 0) === "1" ? "sample" : "samples") + "/hr, fills in " + fmt(r.buffer_fill_min, 0) + " min -- the maximum poll interval" },
     { key: "o", id: "tls-out-o", label: "Against the poll interval", value: (r) => r.buffer_verdict },
     { key: "v", id: "tls-out-v", label: "Under change-of-value", value: (r) => r.cov_storage_gb === null ? "not compared" : fmt(r.cov_storage_gb, 1) + " GB, " + (r.cov_reduction_pct < 0 ? fmt(-r.cov_reduction_pct, 0) + " % MORE, because it logs more than the " : fmt(r.cov_reduction_pct, 0) + " % less -- and only because it is fewer than the ") + fmt(r.periodic_samples_per_day, 0) + " periodic samples a day" },
     { key: "n", id: "tls-out-n", label: "Note", value: (r) => r.note },
@@ -357,7 +357,7 @@ CONTROLS_RENDERERS["mstp-segment-loading"] = _simpleRenderer({
   outputs: [
     { key: "p", id: "msl-out-p", label: "Per device", value: (r) => fmt(r.token_frame_ms, 3) + " ms token + " + fmt(r.turnaround_ms, 3) + " ms turnaround = " + fmt(r.per_device_ms, 3) + " ms" },
     { key: "i", id: "msl-out-i", label: "Idle token rotation", value: (r) => fmt(r.idle_rotation_ms, 1) + " ms with nothing to say" },
-    { key: "d", id: "msl-out-d", label: "Data added", value: (r) => fmt(r.frame_time_ms, 2) + " ms per frame x " + fmt(r.transmitting_devices, 0) + " devices = " + fmt(r.data_ms, 1) + " ms" },
+    { key: "d", id: "msl-out-d", label: "Data added", value: (r) => fmt(r.frame_time_ms, 2) + " ms per frame x " + fmt(r.transmitting_devices, 0) + " " + (fmt(r.transmitting_devices, 0) === "1" ? "device" : "devices") + " = " + fmt(r.data_ms, 1) + " ms" },
     { key: "l", id: "msl-out-l", label: "Loop time (worst-case response)", value: (r) => fmt(r.loop_time_ms, 1) + " ms" },
     { key: "a", id: "msl-out-a", label: "At the larger device count", value: (r) => r.alt_devices_loop_ms === null ? "not compared" : fmt(r.alt_devices_loop_ms, 1) + " ms (" + fmt(r.alt_devices_ratio, 2) + " x), idle alone " + fmt(r.alt_devices_idle_ms, 1) + " ms" },
     { key: "b", id: "msl-out-b", label: "At the lower baud rate", value: (r) => r.alt_baud_loop_ms === null ? "not compared" : fmt(r.alt_baud_loop_ms, 1) + " ms (" + fmt(r.alt_baud_ratio, 2) + " x)" },
@@ -418,9 +418,9 @@ CONTROLS_RENDERERS["damper-actuator-torque"] = _simpleRenderer({
   outputs: [
     { key: "a", id: "dat-out-a", label: "Damper area", value: (r) => fmt(r.damper_area_ft2, 2) + " sq ft" },
     { key: "t", id: "dat-out-t", label: "Torque, unsealed", value: (r) => fmt(r.required_torque_in_lb, 0) + " in-lb required, " + fmt(r.design_torque_in_lb, 0) + " in-lb design" },
-    { key: "s", id: "dat-out-s", label: "Selection, unsealed", value: (r) => r.selected_actuator_in_lb === null ? r.actuator_count + " actuators or a jackshaft" : r.selected_actuator_in_lb + " in-lb" },
+    { key: "s", id: "dat-out-s", label: "Selection, unsealed", value: (r) => r.selected_actuator_in_lb === null ? r.actuator_count + " " + (r.actuator_count === 1 ? "actuator" : "actuators") + " or a jackshaft" : r.selected_actuator_in_lb + " in-lb" },
     { key: "e", id: "dat-out-e", label: "Torque with seals", value: (r) => r.sealed_design_torque_in_lb === null ? "not compared" : fmt(r.sealed_required_torque_in_lb, 0) + " in-lb required, " + fmt(r.sealed_design_torque_in_lb, 0) + " in-lb design" },
-    { key: "f", id: "dat-out-f", label: "Selection with seals", value: (r) => r.sealed_design_torque_in_lb === null ? "not compared" : (r.sealed_selected_actuator_in_lb === null ? r.sealed_actuator_count + " actuators or a jackshaft" : r.sealed_selected_actuator_in_lb + " in-lb") + (r.seals_move_the_selection ? " -- THE SEALS MOVED THE SELECTION, and the leakage spec that required them lives on the damper schedule, not this one" : " -- same selection as unsealed") },
+    { key: "f", id: "dat-out-f", label: "Selection with seals", value: (r) => r.sealed_design_torque_in_lb === null ? "not compared" : (r.sealed_selected_actuator_in_lb === null ? r.sealed_actuator_count + " " + (r.sealed_actuator_count === 1 ? "actuator" : "actuators") + " or a jackshaft" : r.sealed_selected_actuator_in_lb + " in-lb") + (r.seals_move_the_selection ? " -- THE SEALS MOVED THE SELECTION, and the leakage spec that required them lives on the damper schedule, not this one" : " -- same selection as unsealed") },
     { key: "v", id: "dat-out-v", label: "Verdict", value: (r) => r.selection_verdict },
     { key: "n", id: "dat-out-n", label: "Note", value: (r) => r.note },
   ],

@@ -158,7 +158,7 @@ SPECIALTYTRADES_RENDERERS["elevator-handling-capacity"] = _simpleRenderer({
   outputs: [
     { key: "r", id: "ehc-out-r", label: "Round-trip time", value: (r) => fmt(r.rtt_s, 1) + " s = " + fmt(r.travel_s, 1) + " travel + " + fmt(r.stopping_s, 1) + " stopping + " + fmt(r.transfer_s, 1) + " transfer" },
     { key: "d", id: "ehc-out-d", label: "Largest term", value: (r) => "the " + r.dominant + " term -- " + (r.dominant === "stopping" ? "fewer stops, not a faster car, is the lever" : "unusual for an office run") },
-    { key: "i", id: "ehc-out-i", label: "Average interval", value: (r) => fmt(r.interval_s, 1) + " s with " + fmt(r.cars_for_target, 0) + " cars needed for the target -- " + r.interval_verdict },
+    { key: "i", id: "ehc-out-i", label: "Average interval", value: (r) => fmt(r.interval_s, 1) + " s with " + fmt(r.cars_for_target, 0) + " " + (fmt(r.cars_for_target, 0) === "1" ? "car" : "cars") + " needed for the target -- " + r.interval_verdict },
     { key: "h", id: "ehc-out-h", label: "Handling capacity", value: (r) => fmt(r.hc_total, 1) + " persons per 5 min (" + fmt(r.hc_per_car, 1) + " per car), " + fmt(r.hc_percent, 1) + "% of population" },
     { key: "n", id: "ehc-out-n", label: "Note", value: (r) => r.note },
   ],
@@ -514,8 +514,8 @@ SPECIALTYTRADES_RENDERERS["escalator-capacity"] = _simpleRenderer({
     { key: "design_flow_pph", label: "Design peak flow to serve (persons/hr)", kind: "number" },
   ],
   outputs: [
-    { key: "s", id: "esc-out-s", label: "Steps past a point", value: (r) => fmt(r.steps_per_hour, 0) + " steps per hour" },
-    { key: "c", id: "esc-out-c", label: "Capacity", value: (r) => fmt(r.theoretical_pph, 0) + " persons/hr theoretical, " + fmt(r.practical_pph, 0) + " practical" },
+    { key: "s", id: "esc-out-s", label: "Steps past a point", value: (r) => fmt(r.steps_per_hour, 0) + " " + (fmt(r.steps_per_hour, 0) === "1" ? "step" : "steps") + " per hour" },
+    { key: "c", id: "esc-out-c", label: "Capacity", value: (r) => fmt(r.theoretical_pph, 0) + " " + (fmt(r.theoretical_pph, 0) === "1" ? "person" : "persons") + "/hr theoretical, " + fmt(r.practical_pph, 0) + " practical" },
     { key: "u", id: "esc-out-u", label: "Units for the design flow", value: (r) => r.units_needed === 0 ? "no design flow entered" : fmt(r.units_needed, 0) + " at the practical rate" + (r.understated ? ", against " + fmt(r.units_theoretical, 0) + " if the theoretical figure were believed" : "") },
     { key: "l", id: "esc-out-l", label: "Live load per step", value: (r) => fmt(r.step_load_lb, 0) + " lb" },
     { key: "n", id: "esc-out-n", label: "Note", value: (r) => r.note },
@@ -615,7 +615,7 @@ SPECIALTYTRADES_RENDERERS["scaffold-tie-spacing"] = _simpleRenderer({
   outputs: [
     { key: "r", id: "sts-out-r", label: "Height to base", value: (r) => fmt(r.height_to_base_ratio, 1) + ":1 at an effective base of " + fmt(r.effective_base_ft, 1) + " ft" + (r.outrigger_base_ft > 0 ? " (" + fmt(r.bare_ratio, 1) + ":1 on the " + fmt(r.base_width_ft, 1) + " ft frame alone)" : "") },
     { key: "v", id: "sts-out-v", label: "Ties", value: (r) => r.verdict },
-    { key: "c", id: "sts-out-c", label: "Tie count", value: (r) => r.tie_count === null ? "(enter the spacings and the run for a count)" : fmt(r.tie_count, 0) + " ties -- " + fmt(r.tie_rows, 0) + " rows at " + fmt(r.vertical_tie_spacing_ft, 0) + " ft vertically, " + fmt(r.ties_per_row, 0) + " per row at " + fmt(r.horizontal_tie_spacing_ft, 0) + " ft along a " + fmt(r.scaffold_run_ft, 0) + " ft run" },
+    { key: "c", id: "sts-out-c", label: "Tie count", value: (r) => r.tie_count === null ? "(enter the spacings and the run for a count)" : fmt(r.tie_count, 0) + " " + (fmt(r.tie_count, 0) === "1" ? "tie" : "ties") + " -- " + fmt(r.tie_rows, 0) + " " + (fmt(r.tie_rows, 0) === "1" ? "row" : "rows") + " at " + fmt(r.vertical_tie_spacing_ft, 0) + " ft vertically, " + fmt(r.ties_per_row, 0) + " per row at " + fmt(r.horizontal_tie_spacing_ft, 0) + " ft along a " + fmt(r.scaffold_run_ft, 0) + " ft run" },
     { key: "o", id: "sts-out-o", label: "Outriggers", value: (r) => r.outrigger_verdict },
     { key: "s", id: "sts-out-s", label: "Sheeting", value: (r) => r.sheeting_verdict },
     { key: "n", id: "sts-out-n", label: "Note", value: (r) => r.note },

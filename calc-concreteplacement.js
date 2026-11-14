@@ -159,7 +159,7 @@ CONCRETEPLACEMENT_RENDERERS["concrete-pump-line-pressure"] = _simpleRenderer({
   ],
   outputs: [
     { key: "s", id: "cplp-out-s", label: "Static pressure from lift", value: (r) => fmt(r.static_psi, 1) + " psi -- " + fmt(r.psi_per_ft_of_lift, 3) + " psi per foot at " + fmt(r.unit_weight_pcf, 0) + " pcf" },
-    { key: "e", id: "cplp-out-e", label: "Equivalent length", value: (r) => fmt(r.equivalent_length_ft, 0) + " ft -- " + fmt(r.horizontal_length_ft, 0) + " of line, " + fmt(r.bend_equivalent_total_ft, 0) + " for " + fmt(r.bend_count, 0) + " bends, " + fmt(r.hose_equivalent_ft, 0) + " for " + fmt(r.hose_length_ft, 0) + " ft of hose" },
+    { key: "e", id: "cplp-out-e", label: "Equivalent length", value: (r) => fmt(r.equivalent_length_ft, 0) + " ft -- " + fmt(r.horizontal_length_ft, 0) + " of line, " + fmt(r.bend_equivalent_total_ft, 0) + " for " + fmt(r.bend_count, 0) + " " + (fmt(r.bend_count, 0) === "1" ? "bend" : "bends") + ", " + fmt(r.hose_equivalent_ft, 0) + " for " + fmt(r.hose_length_ft, 0) + " ft of hose" },
     { key: "f", id: "cplp-out-f", label: "Friction pressure", value: (r) => fmt(r.friction_psi, 1) + " psi -- line " + fmt(r.line_psi, 1) + ", bends " + fmt(r.bend_psi, 1) + ", hose " + fmt(r.hose_psi, 1) },
     { key: "t", id: "cplp-out-t", label: "Total required", value: (r) => fmt(r.total_psi, 1) + " psi" },
     { key: "v", id: "cplp-out-v", label: "Against the pump", value: (r) => r.verdict },
@@ -400,7 +400,7 @@ CONCRETEPLACEMENT_RENDERERS["tilt-up-lift-stress"] = _simpleRenderer({
   ],
   outputs: [
     { key: "w", id: "tls-out-w", label: "Panel weight", value: (r) => fmt(r.panel_weight_lb, 0) + " lb (" + fmt(r.panel_weight_lb / 2000, 2) + " tons)" + (r.suction_fraction > 0 ? ", and " + fmt(r.lift_load_lb, 0) + " lb with the " + fmt(r.suction_fraction * 100, 0) + "% suction allowance" : "") },
-    { key: "i", id: "tls-out-i", label: "Load per insert", value: (r) => fmt(r.load_per_insert_lb, 0) + " lb across " + fmt(r.insert_count, 0) + " inserts (" + fmt(r.insert_rows, 0) + " rows x " + fmt(r.insert_columns, 0) + " columns)" },
+    { key: "i", id: "tls-out-i", label: "Load per insert", value: (r) => fmt(r.load_per_insert_lb, 0) + " lb across " + fmt(r.insert_count, 0) + " " + (fmt(r.insert_count, 0) === "1" ? "insert" : "inserts") + " (" + fmt(r.insert_rows, 0) + " " + (fmt(r.insert_rows, 0) === "1" ? "row" : "rows") + " x " + fmt(r.insert_columns, 0) + " " + (fmt(r.insert_columns, 0) === "1" ? "column" : "columns") + ")" },
     { key: "s", id: "tls-out-s", label: "Bending stress", value: (r) => fmt(r.bending_stress_psi, 0) + " psi (two-row span " + fmt(r.span_between_rows_ft, 1) + " ft, scaled by (2 / n)^0.75 for n insert rows)" },
     { key: "r", id: "tls-out-r", label: "Modulus of rupture on lift day", value: (r) => fmt(r.modulus_of_rupture_psi, 0) + " psi at " + fmt(r.lift_day_strength_psi, 0) + " psi -- allowable " + fmt(r.allowable_stress_psi, 0) + " psi after the " + fmt(r.safety_factor, 2) + " factor" },
     { key: "v", id: "tls-out-v", label: "Against capacity", value: (r) => r.verdict },
@@ -486,9 +486,9 @@ CONCRETEPLACEMENT_RENDERERS["tilt-up-brace-load"] = _simpleRenderer({
   ],
   outputs: [
     { key: "w", id: "tbl-out-w", label: "Wind force on the panel", value: (r) => fmt(r.wind_force_lb, 0) + " lb over " + fmt(r.panel_area_ft2, 0) + " sq ft at " + fmt(r.wind_pressure_psf, 1) + " psf" },
-    { key: "l", id: "tbl-out-l", label: "Lateral load per brace", value: (r) => fmt(r.lateral_per_brace_lb, 0) + " lb -- the wind resultant at " + fmt(r.resultant_height_ft, 1) + " ft carried by braces at " + fmt(r.brace_attachment_height_ft, 1) + " ft, across " + fmt(r.brace_count, 0) + " braces" },
-    { key: "a", id: "tbl-out-a", label: "Axial load per brace", value: (r) => fmt(r.axial_per_brace_lb, 0) + " lb at " + fmt(r.brace_angle_deg, 0) + " degrees, with the anchor " + fmt(r.anchor_offset_ft, 1) + " ft out from the panel" },
-    { key: "c", id: "tbl-out-c", label: "At the comparison angle", value: (r) => fmt(r.alternate_axial_lb, 0) + " lb at " + fmt(r.alternate_angle_deg, 0) + " degrees, anchor " + fmt(r.alternate_offset_ft, 1) + " ft out -- flatter carries less and reaches further into the slab" },
+    { key: "l", id: "tbl-out-l", label: "Lateral load per brace", value: (r) => fmt(r.lateral_per_brace_lb, 0) + " lb -- the wind resultant at " + fmt(r.resultant_height_ft, 1) + " ft carried by braces at " + fmt(r.brace_attachment_height_ft, 1) + " ft, across " + fmt(r.brace_count, 0) + " " + (fmt(r.brace_count, 0) === "1" ? "brace" : "braces") },
+    { key: "a", id: "tbl-out-a", label: "Axial load per brace", value: (r) => fmt(r.axial_per_brace_lb, 0) + " lb at " + fmt(r.brace_angle_deg, 0) + " " + (fmt(r.brace_angle_deg, 0) === "1" ? "degree" : "degrees") + ", with the anchor " + fmt(r.anchor_offset_ft, 1) + " ft out from the panel" },
+    { key: "c", id: "tbl-out-c", label: "At the comparison angle", value: (r) => fmt(r.alternate_axial_lb, 0) + " lb at " + fmt(r.alternate_angle_deg, 0) + " " + (fmt(r.alternate_angle_deg, 0) === "1" ? "degree" : "degrees") + ", anchor " + fmt(r.alternate_offset_ft, 1) + " ft out -- flatter carries less and reaches further into the slab" },
     { key: "k", id: "tbl-out-k", label: "At the slab anchor", value: (r) => fmt(r.anchor_horizontal_lb, 0) + " lb horizontal and " + fmt(r.anchor_vertical_lb, 0) + " lb vertical. The vertical component is what pulls an anchor out of a thin or green slab" },
     { key: "v", id: "tbl-out-v", label: "Against the brace rating", value: (r) => r.verdict },
     { key: "n", id: "tbl-out-n", label: "Note", value: (r) => r.note },

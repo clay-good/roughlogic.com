@@ -67,6 +67,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **A count of one no longer reads "1 bags".** About 300 output lines across 82 modules printed a whole count beside a fixed plural noun, so every small job read "1 bags", "1 rolls", "1 days", "1 trucks", "1 runs of 10 AWG". Each now chooses the noun by the number it prints (so a 0.6 that prints as "1" takes the singular too). The bespoke-schema extractor reads the new shape as the plural unit it was, so the tile pages' worked-example units are unchanged, and two counts that already agreed by hand (`abatement-containment` machines, `per-diem-interest` days) gained their unit there. `count-noun-agreement.test.js` keeps new lines out of the old shape. Text built other ways (template strings, sentences in a compute's verdict) is not covered.
+
 - **Three negative figures beside a word that already gave the direction.** The fake-DOM direction sweep read only "less", "more", "short" and similar words, so it passed:
   - `rack-upright-capacity-derate`: "125% used, -6,000 lb remaining". Now "6,000 lb OVER the rated capacity".
   - `npsh-a`: "-20.31 ft of liquid above the pump". Now "the liquid may sit up to 20.31 ft BELOW the pump (a suction lift)".

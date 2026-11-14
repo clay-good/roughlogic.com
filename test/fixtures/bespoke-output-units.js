@@ -3,7 +3,7 @@
 // key each output line shows. scripts/build-shells.mjs wraps these around a
 // tile's worked-example answers so a reader sees "1200 W" rather than "1200".
 export const BESPOKE_OUTPUT_UNITS = {
-  "abatement-containment": {"poly_sf":{"prefix":"","suffix":" ft^2","digits":0},"req_cfm":{"prefix":"","suffix":" cfm","digits":0},"waste_bags":{"prefix":"","suffix":" bags"}},
+  "abatement-containment": {"poly_sf":{"prefix":"","suffix":" ft^2","digits":0},"req_cfm":{"prefix":"","suffix":" cfm","digits":0},"nam_count":{"prefix":"","suffix":" machines"},"waste_bags":{"prefix":"","suffix":" bags"}},
   "abrasive-blast": {"cfm":{"prefix":"","suffix":" cfm","digits":0},"compressor_hp":{"prefix":"","suffix":" hp","digits":1},"abrasive_lb_hr":{"prefix":"","suffix":" lb/hr","digits":0}},
   "access-control-power-supply": {"total_load_a":{"prefix":"","suffix":" A","digits":2},"psu_min_a":{"prefix":"","suffix":" A (1.25x load)","digits":2}},
   "acme-thread-depth": {"crest_flat_in":{"prefix":"","suffix":" in","digits":4}},
@@ -421,7 +421,7 @@ export const BESPOKE_OUTPUT_UNITS = {
   "particle-settling-velocity": {"settling_velocity_mm_s":{"prefix":"","suffix":" mm/s","digits":3},"settling_velocity_ft_min":{"prefix":"","suffix":" ft/min","digits":3}},
   "payroll-withholding": {"fed_income_tax_period":{"prefix":"$","suffix":"","digits":2},"ss_tax_period":{"prefix":"$","suffix":"","digits":2},"medicare_period":{"prefix":"$","suffix":"","digits":2},"total_employee_period":{"prefix":"$","suffix":"","digits":2}},
   "pdp": {"pdp_psi":{"prefix":"","suffix":" psi","digits":1},"elevation_psi":{"prefix":"","suffix":" psi","digits":1}},
-  "per-diem-interest": {"prepaid_interest":{"prefix":"$","suffix":"","digits":2}},
+  "per-diem-interest": {"days_to_eom":{"prefix":"","suffix":" days"},"prepaid_interest":{"prefix":"$","suffix":"","digits":2}},
   "pex-homerun-takeoff": {"tubing_lf":{"prefix":"","suffix":" LF","digits":0}},
   "pf-correction": {"kVAR":{"prefix":"","suffix":" kVAR","digits":2}},
   "phase-balance": {"imbalance_percent":{"prefix":"","suffix":" %","digits":2},"final_imbalance_percent":{"prefix":"","suffix":" %","digits":2}},

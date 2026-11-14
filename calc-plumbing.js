@@ -2965,7 +2965,7 @@ function _v16p_renderTrapPrimer(inputRegion, outputRegion, citationEl) {
       cycles_per_day: _v16p_readNum(cyc.input),
     }); stepsFor(outputRegion, inputRegion, ["floor_drain_count", "zone", "prime_method", "prime_volume_oz", "cycles_per_day"], r);
     if (r.error) { oPrimers.textContent = r.error; oWater.textContent = "-"; oComp.textContent = "-"; oNote.textContent = ""; return; }
-    oPrimers.textContent = String(r.primers_needed) + " (" + r.drains_per_unit + " drains each)";
+    oPrimers.textContent = String(r.primers_needed) + " (" + r.drains_per_unit + " " + (r.drains_per_unit === 1 ? "drain" : "drains") + " each)";
     oWater.textContent = fmt(r.water_gal_per_year, 1) + " gal/yr";
     oComp.textContent = r.compliant ? "OK for this zone" : "Not compliant as configured";
     oNote.textContent = r.warnings.length ? r.warnings.join(" ") : "Every floor drain in occupied space has a primer (IPC 1002.4.1).";

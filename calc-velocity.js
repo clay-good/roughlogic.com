@@ -291,7 +291,7 @@ export function renderPitotTraverseAverage(inputRegion, outputRegion, citationEl
     if (list === null) { oV.textContent = "Each velocity pressure must be a finite number, one per line."; oCfm.textContent = "-"; oShortcut.textContent = "-"; oNote.textContent = ""; return; }
     const r = computePitotTraverseAverage({ vp_readings: list, w_in: readNum(w.input), h_in: readNum(h.input), air_density_lb_ft3: readNum(rho.input) }); stepsFor(outputRegion, inputRegion, ["vp_readings", "w_in", "h_in", "air_density_lb_ft3"], r);
     if (r.error) { oV.textContent = r.error; oCfm.textContent = "-"; oShortcut.textContent = "-"; oNote.textContent = ""; return; }
-    oV.textContent = _v23h_fmt(r.v_avg_fpm, 0) + " fpm over " + r.point_count + " points (" + _v23h_fmt(r.area_ft2, 2) + " ft^2)";
+    oV.textContent = _v23h_fmt(r.v_avg_fpm, 0) + " fpm over " + r.point_count + " " + (r.point_count === 1 ? "point" : "points") + " (" + _v23h_fmt(r.area_ft2, 2) + " ft^2)";
     oCfm.textContent = _v23h_fmt(r.cfm, 0) + " CFM";
     oShortcut.textContent = _v23h_fmt(r.cfm_vp_average, 0) + " CFM (" + _v23h_fmt(r.overread_pct, 2) + " percent high)";
     oNote.textContent = r.note;

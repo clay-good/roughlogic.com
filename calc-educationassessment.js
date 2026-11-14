@@ -369,7 +369,7 @@ function renderOneWayAnova(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const r = computeOneWayAnova({ groups_text: t.input.value }); stepsFor(outputRegion, inputRegion, ["groups_text"], r);
     if (r.error) { oF.textContent = r.error; oP.textContent = ""; oE.textContent = ""; oNote.textContent = ""; return; }
-    oF.textContent = "F = " + fmt(r.f_stat, 3) + " (df " + r.df_between + ", " + r.df_within + "); " + r.groups + " groups, N = " + r.n_total;
+    oF.textContent = "F = " + fmt(r.f_stat, 3) + " (df " + r.df_between + ", " + r.df_within + "); " + r.groups + " " + (r.groups === 1 ? "group" : "groups") + ", N = " + r.n_total;
     oP.textContent = "p = " + fmt(r.p_value, 4) + " (" + (r.significant ? "significant" : "not significant") + " at 0.05)";
     oE.textContent = "eta^2 = " + fmt(r.eta_squared, 3);
     oNote.textContent = r.note;

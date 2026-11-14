@@ -2040,7 +2040,7 @@ export function renderChiSquareGof(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const r = computeChiSquareGof({ observed: O.input.value || "", expected: E.input.value || "", expected_type: T.select.value, alpha: Number(A.select.value) }); stepsFor(outputRegion, inputRegion, ["observed", "expected", "expected_type", "alpha"], r);
     if (r.error) { oChi.textContent = r.error; oP.textContent = "-"; oNote.textContent = ""; return; }
-    oChi.textContent = fmt(r.chi_square, 4) + " on " + r.df + " df (" + r.k + " categories)";
+    oChi.textContent = fmt(r.chi_square, 4) + " on " + r.df + " df (" + r.k + " " + (r.k === 1 ? "category" : "categories") + ")";
     oP.textContent = fmt(r.p_value, 5) + " -> " + (r.significant ? "reject H0: the observed counts differ from expected" : "fail to reject H0 (consistent with the expected distribution)") + " at alpha " + r.alpha;
     oNote.textContent = r.warnings.length ? r.warnings.join(" ") : "Smallest expected count " + fmt(r.min_expected, 1) + " (>= 5 keeps the approximation valid).";
   }, DEBOUNCE_MS);

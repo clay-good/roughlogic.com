@@ -356,9 +356,9 @@ TELECOM_RENDERERS["fiber-strand-count-planning"] = _simpleRenderer({
   ],
   outputs: [
     { key: "feeder_fibers_required", id: "fcp-feed", label: "Feeder fibers required", value: (r) => r.feeder_fibers_required + " raw; " + r.feeder_with_spare + " with spare" },
-    { key: "selected_standard_count", id: "fcp-select", label: "Selected standard cable", value: (r) => r.selected_standard_count + " fibers" },
-    { key: "standard_without_spare", id: "fcp-base", label: "Without design spare", value: (r) => r.standard_without_spare + " fibers (" + r.free_rounding_spares + " rounding spares)" },
-    { key: "drop_terminals", id: "fcp-drop", label: "Distribution side", value: (r) => r.drop_terminals + " terminals; " + r.distribution_fibers_required + " fibers raw; " + r.distribution_with_spare + " with spare" },
+    { key: "selected_standard_count", id: "fcp-select", label: "Selected standard cable", value: (r) => r.selected_standard_count + " " + (r.selected_standard_count === 1 ? "fiber" : "fibers") },
+    { key: "standard_without_spare", id: "fcp-base", label: "Without design spare", value: (r) => r.standard_without_spare + " " + (r.standard_without_spare === 1 ? "fiber" : "fibers") + " (" + r.free_rounding_spares + " rounding spares)" },
+    { key: "drop_terminals", id: "fcp-drop", label: "Distribution side", value: (r) => r.drop_terminals + " " + (r.drop_terminals === 1 ? "terminal" : "terminals") + "; " + r.distribution_fibers_required + " " + (r.distribution_fibers_required === 1 ? "fiber" : "fibers") + " raw; " + r.distribution_with_spare + " with spare" },
     { key: "lower_installed_cost", id: "fcp-low", label: "Lower-count installed cost", unit: "$", value: (r) => "$" + fmt(r.lower_installed_cost, 0) },
     { key: "selected_installed_cost", id: "fcp-high", label: "Selected-count installed cost", unit: "$", value: (r) => "$" + fmt(r.selected_installed_cost, 0) },
     { key: "installed_cost_delta", id: "fcp-delta", label: "Increment for selected count", unit: "$", value: (r) => "$" + fmt(r.installed_cost_delta, 0) + " (" + fmt(r.installed_cost_delta_pct, 1) + " %)" },

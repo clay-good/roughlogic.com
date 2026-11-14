@@ -180,7 +180,7 @@ function renderHistoricalPricing(inputRegion, outputRegion, citationEl) {
       ["75th percentile", fmt(r.p75, 2) + " " + r.units],
       ["90th percentile", fmt(r.p90, 2) + " " + r.units],
       ["Placement", r.placement],
-      ["Window", r.points_in_window + " months"],
+      ["Window", r.points_in_window + " " + (r.points_in_window === 1 ? "month" : "months")],
     ];
     for (const [k, v] of rows) {
       const dt = document.createElement("dt"); dt.textContent = k;

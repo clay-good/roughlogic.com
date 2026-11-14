@@ -1081,7 +1081,7 @@ function _v855renderLvCablePullFootage(inputRegion, outputRegion, citationEl) {
     }); stepsFor(outputRegion, inputRegion, ["drops", "avg_run_ft", "slack_ft", "box_ft"], r);
     if (r.error) { oTotal.textContent = r.error; oBoxes.textContent = "-"; return; }
     oTotal.textContent = fmt(r.total_ft, 0) + " ft";
-    oBoxes.textContent = fmt(r.boxes, 0) + " boxes";
+    oBoxes.textContent = fmt(r.boxes, 0) + " " + (fmt(r.boxes, 0) === "1" ? "box" : "boxes");
   }, DEBOUNCE_MS);
   for (const f of [d, ar, sl, bx]) f.input.addEventListener("input", update);
 }
@@ -1129,7 +1129,7 @@ function _v890renderCableSupportJhook(inputRegion, outputRegion, citationEl) {
       hook_wll_lb: hw.input.value === "" ? 0 : Number(hw.input.value),
     }); stepsFor(outputRegion, inputRegion, ["run_ft", "spacing_ft", "num_cables", "cable_lb_per_ft", "hook_wll_lb"], r);
     if (r.error) { oHooks.textContent = r.error; oLoad.textContent = "-"; oUtil.textContent = "-"; return; }
-    oHooks.textContent = fmt(r.hooks, 0) + " hooks";
+    oHooks.textContent = fmt(r.hooks, 0) + " " + (fmt(r.hooks, 0) === "1" ? "hook" : "hooks");
     oLoad.textContent = fmt(r.load_per_hook_lb, 1) + " lb/hook";
     oUtil.textContent = r.utilization === null ? "-- (enter a hook WLL to check)" : (fmt(r.utilization * 100, 0) + "% of the hook WLL" + (r.utilization > 1 + 1e-9 ? " (OVER -- split the bundle or upsize)" : ""));
   }, DEBOUNCE_MS);

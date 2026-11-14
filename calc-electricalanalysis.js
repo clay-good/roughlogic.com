@@ -853,7 +853,7 @@ function _v1111renderEgcParallelRaceways(inputRegion, outputRegion, citationEl) 
   const update = debounce(() => {
     const r = computeEgcParallelRaceways({ ocpd_A: Number(oc.input.value), raceway_count: Number(rc.input.value), material: mt.select.value }); stepsFor(outputRegion, inputRegion, ["ocpd_A", "raceway_count", "material"], r);
     if (r.error) { oE.textContent = r.error; oW.textContent = "-"; oN.textContent = "-"; return; }
-    oE.textContent = r.total_egc_count + " runs of " + r.egc_per_raceway_awg + " AWG " + mt.select.value + " (one per raceway, sized to the full " + r.ocpd_A + " A)";
+    oE.textContent = r.total_egc_count + " " + (r.total_egc_count === 1 ? "run" : "runs") + " of " + r.egc_per_raceway_awg + " AWG " + mt.select.value + " (one per raceway, sized to the full " + r.ocpd_A + " A)";
     oW.textContent = r.same_either_way
       ? "sizing from the divided " + fmt(r.divided_ocpd_A, 0) + " A gives the same size at this rating"
       : "sizing from the divided " + fmt(r.divided_ocpd_A, 0) + " A would give " + r.undersized_awg + " AWG - UNDERSIZED";

@@ -85,7 +85,7 @@ function _v938renderWireRopeClips(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const r = computeWireRopeClips({ rope_diameter_in: Number(dia.input.value) || 0, clip_material: mat.select.value }); stepsFor(outputRegion, inputRegion, ["rope_diameter_in", "clip_material"], r);
     if (r.error) { oClips.textContent = r.error; oSpace.textContent = "-"; oTail.textContent = "-"; return; }
-    oClips.textContent = fmt(r.clip_count, 0) + " clips";
+    oClips.textContent = fmt(r.clip_count, 0) + " " + (fmt(r.clip_count, 0) === "1" ? "clip" : "clips");
     oSpace.textContent = fmt(r.spacing_in, 2) + " in on center";
     oTail.textContent = fmt(r.minimum_tail_in, 2) + " in";
   }, DEBOUNCE_MS);

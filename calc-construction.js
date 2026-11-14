@@ -642,8 +642,8 @@ export function renderConcrete(inputRegion, outputRegion, citationEl) {
     oCF.textContent = fmt(r.cubic_feet, 2);
     oCY.textContent = fmt(r.cubic_yards, 3);
     oCYW.textContent = fmt(r.cubic_yards_with_waste, 3);
-    oBags60.textContent = r.bags_60lb + " bags";
-    oBags80.textContent = r.bags_80lb + " bags";
+    oBags60.textContent = r.bags_60lb + " " + (r.bags_60lb === 1 ? "bag" : "bags");
+    oBags80.textContent = r.bags_80lb + " " + (r.bags_80lb === 1 ? "bag" : "bags");
   }
   shape.select.addEventListener("input", () => { refreshDims(); update(); });
   waste.input.addEventListener("input", update);
@@ -3077,10 +3077,10 @@ function _v8c_renderResidentialFraming(inputRegion, outputRegion, citationEl) {
       building_run_ft: Number(br.input.value) || 0, pitch: Number(p.input.value) || 0,
     }); stepsFor(outputRegion, inputRegion, ["footprint_ft2", "perimeter_ft", "wall_height_ft", "stud_oc_in", "joist_span_ft", "joist_oc_in", "rafter_oc_in", "building_run_ft", "pitch"], r);
     if (r.error) { oS.textContent = r.error; for (const o of [oPl, oJ, oR, oT]) o.textContent = "-"; return; }
-    oS.textContent = r.stud_count + " studs (" + _v7c_fmt(r.stud_bf, 0) + " bf)";
+    oS.textContent = r.stud_count + " " + (r.stud_count === 1 ? "stud" : "studs") + " (" + _v7c_fmt(r.stud_bf, 0) + " bf)";
     oPl.textContent = r.plate_lf + " lf (" + _v7c_fmt(r.plate_bf, 0) + " bf)";
-    oJ.textContent = r.joist_count + " joists (" + _v7c_fmt(r.joist_bf, 0) + " bf)";
-    oR.textContent = r.rafter_count + " rafters (" + _v7c_fmt(r.rafter_bf, 0) + " bf, " + _v7c_fmt(r.rafter_length_ft, 2) + " ft each)";
+    oJ.textContent = r.joist_count + " " + (r.joist_count === 1 ? "joist" : "joists") + " (" + _v7c_fmt(r.joist_bf, 0) + " bf)";
+    oR.textContent = r.rafter_count + " " + (r.rafter_count === 1 ? "rafter" : "rafters") + " (" + _v7c_fmt(r.rafter_bf, 0) + " bf, " + _v7c_fmt(r.rafter_length_ft, 2) + " ft each)";
     oT.textContent = _v7c_fmt(r.total_bf, 0) + " bf total";
   }, _V7C_DEB);
   for (const f of [fp.input, per.input, wh.input, oc.input, js.input, jo.input, ro.input, br.input, p.input]) f.addEventListener("input", update);
@@ -4842,7 +4842,7 @@ const renderControlJointSpacing = _simpleRenderer({
   outputs: [
     { key: "s", id: "cjs-out-s", label: "Joint spacing", value: (r) => fmt(r.spacing_ft, 1) + " ft" },
     { key: "d", id: "cjs-out-d", label: "Saw-cut depth", value: (r) => fmt(r.depth_in, 2) + " in" },
-    { key: "p", id: "cjs-out-p", label: "Panel grid", value: (r) => r.panels === null ? "-" : r.panels_long + " x " + r.panels_wide + " = " + r.panels + " panels" },
+    { key: "p", id: "cjs-out-p", label: "Panel grid", value: (r) => r.panels === null ? "-" : r.panels_long + " x " + r.panels_wide + " = " + r.panels + " " + (r.panels === 1 ? "panel" : "panels") },
     { key: "a", id: "cjs-out-a", label: "Aspect ratio", value: (r) => r.aspect === null ? "-" : fmt(r.aspect, 2) + (r.aspect_over ? " (over 1.5 - re-grid)" : " (ok)") },
     { key: "n", id: "cjs-out-n", label: "Note", value: (r) => r.note },
   ],
@@ -5743,7 +5743,7 @@ function _renderOccupantLoad(inputRegion, outputRegion, citationEl) {
     if (spaces.length === 0) { oT.textContent = "Enter at least one space."; oB.textContent = "-"; return; }
     const r = computeOccupantLoad({ spaces }); stepsFor(outputRegion, inputRegion, ["spaces"], r);
     if (r.error) { oT.textContent = r.error; oB.textContent = "-"; return; }
-    oT.textContent = r.total_load + " occupants";
+    oT.textContent = r.total_load + " " + (r.total_load === 1 ? "occupant" : "occupants");
     oB.textContent = r.per_space.map((s) => s.load).join(" + ") + " = " + r.total_load;
   }, _DC);
   for (const r of rows) { r.a.input.addEventListener("input", update); r.o.input.addEventListener("input", update); }
@@ -8677,8 +8677,8 @@ const _v439renderInsulationBattCoverage = _simpleRenderer({
     { key: "waste_pct", label: "Waste allowance (%)", kind: "number" },
   ],
   outputs: [
-    { key: "b", id: "ibc-out-b", label: "Batts (pieces)", value: (r) => r.batts == null ? "(enter coverage per batt)" : r.batts + " batts" },
-    { key: "g", id: "ibc-out-g", label: "Bags", value: (r) => r.bags == null ? "(enter coverage per bag)" : r.bags + " bags (net " + fmt(r.net_ft2, 0) + " ft^2)" },
+    { key: "b", id: "ibc-out-b", label: "Batts (pieces)", value: (r) => r.batts == null ? "(enter coverage per batt)" : r.batts + " " + (r.batts === 1 ? "batt" : "batts") },
+    { key: "g", id: "ibc-out-g", label: "Bags", value: (r) => r.bags == null ? "(enter coverage per bag)" : r.bags + " " + (r.bags === 1 ? "bag" : "bags") + " (net " + fmt(r.net_ft2, 0) + " ft^2)" },
     { key: "n", id: "ibc-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeInsulationBattCoverage,
@@ -11972,7 +11972,7 @@ CONSTRUCTION_RENDERERS["carpet-seam-layout"] = _simpleRenderer({
     { key: "f", id: "csl-out-f", label: "Fill strip", value: (r) => r.fill_strip_in <= 0 ? "none - drops divide evenly" : fmt(r.fill_strip_in, 1) + " in" + (r.narrow_fill ? " - too narrow, reconsider the layout" : "") },
     { key: "o", id: "csl-out-o", label: "Order", value: (r) => fmt(r.order_running_ft, 1) + " LF of roll (" + fmt(r.sy, 1) + " SY), cut length " + fmt(r.cut_length_ft, 2) + " ft" },
     { key: "w", id: "csl-out-w", label: "Actual waste over room area", value: (r) => fmt(r.waste_sf, 0) + " sq ft, " + fmt(r.waste_actual_pct, 1) + "% of " + fmt(r.room_sf, 0) + " sq ft" },
-    { key: "a", id: "csl-out-a", label: "The other orientation", value: (r) => r.alt_drops + " drops, " + r.alt_seam_count + " seam" + (r.alt_seam_count === 1 ? "" : "s") + ", " + fmt(r.alt_running_ft, 1) + " LF" },
+    { key: "a", id: "csl-out-a", label: "The other orientation", value: (r) => r.alt_drops + " " + (r.alt_drops === 1 ? "drop" : "drops") + ", " + r.alt_seam_count + " seam" + (r.alt_seam_count === 1 ? "" : "s") + ", " + fmt(r.alt_running_ft, 1) + " LF" },
     { key: "n", id: "csl-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeCarpetSeamLayout,
@@ -12064,7 +12064,7 @@ CONSTRUCTION_RENDERERS["seismic-overturning-stability"] = _simpleRenderer({
     { key: "required_ratio", label: "Required stability ratio", kind: "number" },
   ],
   outputs: [
-    { key: "w", id: "sos-out-w", label: "Dead load that actually resists", value: (r) => fmt(r.dead_coeff, 3) + " D = " + fmt(r.w_eff_kip, 0) + " kips (Ev removes " + fmt(r.ev_coeff, 3) + ")" },
+    { key: "w", id: "sos-out-w", label: "Dead load that actually resists", value: (r) => fmt(r.dead_coeff, 3) + " D = " + fmt(r.w_eff_kip, 0) + " " + (fmt(r.w_eff_kip, 0) === "1" ? "kip" : "kips") + " (Ev removes " + fmt(r.ev_coeff, 3) + ")" },
     { key: "mr", id: "sos-out-mr", label: "Resisting moment", value: (r) => fmt(r.m_resist_kipft, 0) + " kip-ft on a " + fmt(r.arm_ft, 2) + " ft arm" },
     { key: "md", id: "sos-out-md", label: "Design overturning moment", value: (r) => fmt(r.m_demand_kipft, 0) + " kip-ft" },
     { key: "ra", id: "sos-out-ra", label: "Stability ratio", value: (r) => fmt(r.ratio, 2) + (r.passes ? " - OK" : " - FAILS") },
@@ -13364,7 +13364,7 @@ CONSTRUCTION_RENDERERS["material-stacking-limits"] = _simpleRenderer({
   ],
   outputs: [
     { key: "h", id: "msl-out-h", label: "Height limit", value: (r) => r.max_height_ft === null ? "no explicit ceiling for block in this section" : r.max_height_ft + " ft - " + (r.height_ok ? "OK" : "OVER by " + fmt(r.height_over_ft, 1) + " ft") },
-    { key: "t", id: "msl-out-t", label: "Taper required", value: (r) => !r.taper_required ? "none - at or below the threshold" : fmt(r.taper_required_in, 1) + " in" + (r.tiers_above_threshold ? " (" + r.tiers_above_threshold + " tiers above the threshold)" : "") },
+    { key: "t", id: "msl-out-t", label: "Taper required", value: (r) => !r.taper_required ? "none - at or below the threshold" : fmt(r.taper_required_in, 1) + " in" + (r.tiers_above_threshold ? " (" + r.tiers_above_threshold + " " + (r.tiers_above_threshold === 1 ? "tier" : "tiers") + " above the threshold)" : "") },
     { key: "p", id: "msl-out-p", label: "Taper provided", value: (r) => r.taper_ok === null ? "n/a" : r.taper_ok ? "sufficient" : "SHORT by " + fmt(r.taper_shortfall_in, 1) + " in" },
     { key: "v", id: "msl-out-v", label: "Verdict", value: (r) => r.passes ? "PASSES the items entered" : "DOES NOT PASS" },
     { key: "n", id: "msl-out-n", label: "Note", value: (r) => r.note },

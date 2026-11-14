@@ -162,7 +162,7 @@ function _v854renderBranchCircuitWireFootage(inputRegion, outputRegion, citation
     }); stepsFor(outputRegion, inputRegion, ["circuits", "avg_homerun_ft", "makeup_ft", "conductors_per_circuit", "roll_ft"], r);
     if (r.error) { oTotal.textContent = r.error; oRolls.textContent = "-"; return; }
     oTotal.textContent = fmt(r.total_ft, 0) + " ft (" + fmt(r.ft_per_color, 0) + " ft per color)";
-    oRolls.textContent = fmt(r.rolls_bought, 0) + " rolls to buy -- " + fmt(r.rolls_per_color, 0) + " per color (" + fmt(r.rolls, 0) + " if the footage were one pool)";
+    oRolls.textContent = fmt(r.rolls_bought, 0) + " " + (fmt(r.rolls_bought, 0) === "1" ? "roll" : "rolls") + " to buy -- " + fmt(r.rolls_per_color, 0) + " per color (" + fmt(r.rolls, 0) + " if the footage were one pool)";
   }, DEBOUNCE_MS);
   for (const f of [c, hr, mu, cp, rf]) f.input.addEventListener("input", update);
 }
@@ -202,7 +202,7 @@ function _v924renderMicroinverterBranchCount(inputRegion, outputRegion, citation
       branch_ocpd_a: oc.input.value === "" ? 20 : Number(oc.input.value), unit_max_current_a: iu.input.value === "" ? 1.21 : Number(iu.input.value),
     }); stepsFor(outputRegion, inputRegion, ["branch_ocpd_a", "unit_max_current_a"], r);
     if (r.error) { oN.textContent = r.error; oLoad.textContent = "-"; return; }
-    oN.textContent = fmt(r.max_microinverters, 0) + " units";
+    oN.textContent = fmt(r.max_microinverters, 0) + " " + (fmt(r.max_microinverters, 0) === "1" ? "unit" : "units");
     oLoad.textContent = fmt(r.branch_load_a, 2) + " A of " + fmt(r.continuous_limit_a, 1) + " A allowed (80% of " + fmt(Number(oc.input.value) || 20, 0) + " A)";
   }, DEBOUNCE_MS);
   for (const f of [oc, iu]) f.input.addEventListener("input", update);

@@ -600,7 +600,7 @@ METALAIR_RENDERERS["square-to-round-development"] = _simpleRenderer({
   outputs: [
     { key: "c", id: "strd-out-c", label: "Corner element", value: (r) => fmt(r.plan_corner_distance_in, 2) + " in on the plan is " + fmt(r.corner_true_length_in, 2) + " in true -- " + fmt(r.understatement_pct, 0) + "% longer than the plan view shows" },
     { key: "m", id: "strd-out-m", label: "Side midpoint element", value: (r) => fmt(r.plan_midpoint_distance_in, 2) + " in on the plan is " + fmt(r.midpoint_true_length_in, 2) + " in true" },
-    { key: "e", id: "strd-out-e", label: "Element chord", value: (r) => fmt(r.chord_in, 3) + " in across each of " + fmt(r.total_elements, 0) + " elements" },
+    { key: "e", id: "strd-out-e", label: "Element chord", value: (r) => fmt(r.chord_in, 3) + " in across each of " + fmt(r.total_elements, 0) + " " + (fmt(r.total_elements, 0) === "1" ? "element" : "elements") },
     { key: "k", id: "strd-out-k", label: "Circumference check", value: (r) => "the development gives " + fmt(r.developed_arc_in, 2) + " in against a true circumference of " + fmt(r.circumference_in, 2) + " in -- short by " + fmt(r.arc_shortfall_in, 3) + " in, " + fmt(r.arc_shortfall_pct, 2) + "%. More elements close it" },
     { key: "s", id: "strd-out-s", label: "Sheet the pattern needs", value: (r) => fmt(r.sheet_width_in, 1) + " in by " + fmt(r.sheet_length_in, 1) + " in, seams included" },
     { key: "n", id: "strd-out-n", label: "Note", value: (r) => r.note },
@@ -686,7 +686,7 @@ METALAIR_RENDERERS["standing-seam-takeoff"] = _simpleRenderer({
     { key: "w", id: "sst-out-w", label: "Coverage against sheet width", value: (r) => r.coverage_verdict },
     { key: "c", id: "sst-out-c", label: "Clips", value: (r) => fmt(r.clip_count, 0) + " total -- " + fmt(r.field_clip_count, 0) + " on " + fmt(r.field_panels, 0) + " field panels at " + fmt(r.clips_per_field_panel, 0) + " each, " + fmt(r.perimeter_clip_count, 0) + " on " + fmt(r.perimeter_panels, 0) + " edge and corner panels at " + fmt(r.clips_per_perimeter_panel, 0) + " each" },
     { key: "f", id: "sst-out-f", label: "Fasteners", value: (r) => fmt(r.fastener_count, 0) + " at " + fmt(r.fasteners_per_clip, 0) + " per clip" },
-    { key: "s", id: "sst-out-s", label: "Seam length", value: (r) => fmt(r.seam_length_ft, 0) + " ft across " + fmt(r.seam_count, 0) + " seams" },
+    { key: "s", id: "sst-out-s", label: "Seam length", value: (r) => fmt(r.seam_length_ft, 0) + " ft across " + fmt(r.seam_count, 0) + " " + (fmt(r.seam_count, 0) === "1" ? "seam" : "seams") },
     { key: "n", id: "sst-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeStandingSeamTakeoff,

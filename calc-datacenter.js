@@ -400,8 +400,8 @@ DATACENTER_RENDERERS["pdu-branch-loading"] = _simpleRenderer({
   outputs: [
     { key: "usable_current_a", id: "pbl-use", label: "Usable continuous current", unit: "A", value: (r) => fmt(r.usable_current_a, 1) + " A" },
     { key: "branch_capacity_kva", id: "pbl-kva", label: "Branch capacity", value: (r) => fmt(r.branch_capacity_kva, 2) + " kVA / " + fmt(r.branch_capacity_kw, 2) + " kW" },
-    { key: "supported_device_count", id: "pbl-count", label: "Supported devices", value: (r) => r.supported_device_count + " devices" },
-    { key: "naive_device_count", id: "pbl-naive", label: "Naive full-breaker count", value: (r) => r.naive_device_count + " devices" },
+    { key: "supported_device_count", id: "pbl-count", label: "Supported devices", value: (r) => r.supported_device_count + " " + (r.supported_device_count === 1 ? "device" : "devices") },
+    { key: "naive_device_count", id: "pbl-naive", label: "Naive full-breaker count", value: (r) => r.naive_device_count + " " + (r.naive_device_count === 1 ? "device" : "devices") },
     { key: "normal_current_per_branch_a", id: "pbl-normal", label: "Normal current on each A/B branch", unit: "A", value: (r) => fmt(r.normal_current_per_branch_a, 1) + " A (" + fmt(r.normal_breaker_utilization_pct, 1) + " % of breaker)" },
     { key: "failover_current_a", id: "pbl-fail", label: "Survivor current at correct loading", unit: "A", value: (r) => fmt(r.failover_current_a, 1) + " A" },
     { key: "pair_filled_survivor_current_a", id: "pbl-over", label: "Survivor if both branches are filled", unit: "A", value: (r) => fmt(r.pair_filled_survivor_current_a, 1) + " A (" + fmt(r.pair_filled_survivor_breaker_pct, 0) + " % of breaker)" },

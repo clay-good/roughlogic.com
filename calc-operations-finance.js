@@ -55,8 +55,8 @@ function renderEoqOrderQuantity(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const r = computeEoqOrderQuantity({ annual_demand: readNum(d.input), order_cost: readNum(s.input), holding_cost: readNum(h.input) }); stepsFor(outputRegion, inputRegion, ["annual_demand", "order_cost", "holding_cost"], r);
     if (r.error) { oEoq.textContent = r.error; oOrders.textContent = "-"; oTotal.textContent = "-"; oNote.textContent = ""; return; }
-    oEoq.textContent = fmt(r.eoq, 0) + " units per order";
-    oOrders.textContent = fmt(r.orders_per_year, 1) + " orders/yr (every " + fmt(r.cycle_days, 0) + " days)";
+    oEoq.textContent = fmt(r.eoq, 0) + " " + (fmt(r.eoq, 0) === "1" ? "unit" : "units") + " per order";
+    oOrders.textContent = fmt(r.orders_per_year, 1) + " orders/yr (every " + fmt(r.cycle_days, 0) + " " + (fmt(r.cycle_days, 0) === "1" ? "day" : "days") + ")";
     oTotal.textContent = "$" + fmt(r.total_annual, 0) + "/yr (ordering + holding)";
     oNote.textContent = r.note;
   }, DEBOUNCE_MS);
@@ -114,8 +114,8 @@ function renderReorderPoint(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const r = computeReorderPoint({ avg_daily_demand: readNum(dd.input), lead_time_days: readNum(lt.input), demand_sd: readNum(sd.input), service_level_pct: sl.input.value === "" ? 95 : readNum(sl.input) }); stepsFor(outputRegion, inputRegion, ["avg_daily_demand", "lead_time_days", "demand_sd", "service_level_pct"], r);
     if (r.error) { oSafety.textContent = r.error; oRop.textContent = "-"; oNote.textContent = ""; return; }
-    oSafety.textContent = fmt(r.safety_stock, 0) + " units (z = " + fmt(r.z, 3) + ")";
-    oRop.textContent = fmt(r.reorder_point, 0) + " units -- reorder when stock drops here";
+    oSafety.textContent = fmt(r.safety_stock, 0) + " " + (fmt(r.safety_stock, 0) === "1" ? "unit" : "units") + " (z = " + fmt(r.z, 3) + ")";
+    oRop.textContent = fmt(r.reorder_point, 0) + " " + (fmt(r.reorder_point, 0) === "1" ? "unit" : "units") + " -- reorder when stock drops here";
     oNote.textContent = r.note;
   }, DEBOUNCE_MS);
   for (const f of [dd, lt, sd, sl]) f.input.addEventListener("input", update);

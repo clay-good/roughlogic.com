@@ -121,7 +121,7 @@ function renderMulchTopsoilVolume(inputRegion, outputRegion, citationEl) {
     const r = computeMulchTopsoilVolume({ area_ft2: readNum(area.input), depth_in: readNum(depth.input), bulk_density: readNum(dens.input), bag_ft3: readNum(bag.input), load_yd3: readNum(load.input), waste_pct: readNum(waste.input) }); stepsFor(outputRegion, inputRegion, ["area_ft2", "depth_in", "bulk_density", "bag_ft3", "load_yd3", "waste_pct"], r);
     if (r.error) { oYd.textContent = r.error; oBags.textContent = ""; oNote.textContent = ""; return; }
     oYd.textContent = fmt(r.yd3, 2) + " yd^3";
-    oBags.textContent = r.bags + " bags / " + fmt(r.tons, 1) + " tons / " + r.loads + " load(s)";
+    oBags.textContent = r.bags + " " + (r.bags === 1 ? "bag" : "bags") + " / " + fmt(r.tons, 1) + " tons / " + r.loads + " load(s)";
     oNote.textContent = r.note;
   }, DEBOUNCE_MS);
   for (const f of [area.input, depth.input, dens.input, bag.input, load.input, waste.input]) f.addEventListener("input", update);

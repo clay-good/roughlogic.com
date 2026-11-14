@@ -4360,7 +4360,7 @@ function renderBondingJumper(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const r = computeBondingJumper({ mode: mode.select.value, material: mat.select.value, service_kcmil: Number(kcmil.input.value) || 0, ocpd_A: Number(ocpd.input.value) || 0, parallel_sets: Number(psets.input.value) || 1 }); stepsFor(outputRegion, inputRegion, ["mode", "material", "service_kcmil", "ocpd_A", "parallel_sets"], r);
     if (r.error) { oReq.textContent = r.error; oRule.textContent = "-"; oNote.textContent = "-"; return; }
-    oReq.textContent = r.required_jumper + " AWG/kcmil " + mat.select.value + (r.parallel_sets > 1 ? " in each of " + r.parallel_sets + " raceways" : "");
+    oReq.textContent = r.required_jumper + " AWG/kcmil " + mat.select.value + (r.parallel_sets > 1 ? " in each of " + r.parallel_sets + " " + (r.parallel_sets === 1 ? "raceway" : "raceways") : "");
     oRule.textContent = r.rule;
     oNote.textContent = r.note;
   }, DEBOUNCE_MS);

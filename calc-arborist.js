@@ -273,7 +273,7 @@ function _v68renderPortaWrapFriction(inputRegion, outputRegion, citationEl) {
     o2.textContent = fmt(r.hold_2_lb, 1) + " lb";
     o3.textContent = fmt(r.hold_3_lb, 1) + " lb";
     o4.textContent = fmt(r.hold_4_lb, 1) + " lb";
-    oSel.textContent = r.selected_wraps + " wraps -> " + fmt(r.selected_hold_lb, 1) + " lb hand force";
+    oSel.textContent = r.selected_wraps + " " + (r.selected_wraps === 1 ? "wrap" : "wraps") + " -> " + fmt(r.selected_hold_lb, 1) + " lb hand force";
   }, DEBOUNCE_MS);
   for (const f of [load, mu, wraps]) f.input.addEventListener("input", update);
 }
@@ -317,7 +317,7 @@ function _v68renderChipperDebris(inputRegion, outputRegion, citationEl) {
     const r = computeChipperDebris({ green_weight_lb: Number(weight.input.value) || 0, chip_density_lcy: density.input.value === "" ? 550 : Number(density.input.value), box_capacity_cy: Number(box.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["green_weight_lb", "chip_density_lcy", "box_capacity_cy"], r);
     if (r.error) { oVol.textContent = r.error; oLoads.textContent = "-"; return; }
     oVol.textContent = fmt(r.chip_volume_lcy, 1) + " loose cy";
-    oLoads.textContent = r.loads + " loads";
+    oLoads.textContent = r.loads + " " + (r.loads === 1 ? "load" : "loads");
   }, DEBOUNCE_MS);
   for (const f of [weight, density, box]) f.input.addEventListener("input", update);
 }

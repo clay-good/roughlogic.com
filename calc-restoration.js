@@ -465,7 +465,7 @@ export function renderDryingTimes(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const r = computeDryingTime({ material: m.select.value }); stepsFor(outputRegion, inputRegion, ["material"], r);
     if (r.error) { oD.textContent = r.error; oN.textContent = "-"; return; }
-    oD.textContent = r.typical_days + " days"; oN.textContent = r.notes;
+    oD.textContent = r.typical_days + " " + (r.typical_days === 1 ? "day" : "days"); oN.textContent = r.notes;
   }, DEBOUNCE_MS);
   m.select.addEventListener("input", update);
 }
@@ -1962,7 +1962,7 @@ function renderDehumidifierDerate(inputRegion, outputRegion, citationEl) {
       required_pints_per_day: Number(demand.input.value) || 0,
     }); stepsFor(outputRegion, inputRegion, ["aham_pints_per_day", "derate_factor", "required_pints_per_day"], r);
     if (r.error) { oEff.textContent = r.error; oNom.textContent = "-"; oField.textContent = "-"; oShort.textContent = "-"; return; }
-    oEff.textContent = fmt(r.effective_pints, 0) + " pints/day";
+    oEff.textContent = fmt(r.effective_pints, 0) + " " + (fmt(r.effective_pints, 0) === "1" ? "pint" : "pints") + "/day";
     oNom.textContent = r.units_by_nameplate + " unit(s)";
     oField.textContent = r.units_by_field + " unit(s)";
     oShort.textContent = (r.shortfall_units > 0 ? "+" : "") + r.shortfall_units + " unit(s)";
@@ -2473,8 +2473,8 @@ function renderCavityDryingSystem(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const r = computeCavityDryingSystem({ affected_wall_ft: Number(wall.input.value) || 0, stud_spacing_in: spacing.input.value === "" ? 16 : Number(spacing.input.value), ports_per_bay: perBay.input.value === "" ? 1 : Number(perBay.input.value), ports_per_system: perSystem.input.value === "" ? 12 : Number(perSystem.input.value) }); stepsFor(outputRegion, inputRegion, ["affected_wall_ft", "stud_spacing_in", "ports_per_bay", "ports_per_system"], r);
     if (r.error) { oBays.textContent = r.error; oPorts.textContent = "-"; oSystems.textContent = "-"; return; }
-    oBays.textContent = r.bays + " bays";
-    oPorts.textContent = r.ports + " ports";
+    oBays.textContent = r.bays + " " + (r.bays === 1 ? "bay" : "bays");
+    oPorts.textContent = r.ports + " " + (r.ports === 1 ? "port" : "ports");
     oSystems.textContent = r.systems + " system(s)";
   }, DEBOUNCE_MS);
   for (const el of [wall.input, spacing.input, perBay.input, perSystem.input]) el.addEventListener("input", update);
@@ -2689,7 +2689,7 @@ function renderSootCleaningTakeoff(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const r = computeSootCleaningTakeoff({ affected_sf: Number(area.input.value) || 0, sponge_coverage_sf: cov.input.value === "" ? 100 : Number(cov.input.value), production_sf_per_hr: prod.input.value === "" ? 150 : Number(prod.input.value), seal_coat: seal.input.checked ? 1 : 0, primer_sf_per_gal: primer.input.value === "" ? 300 : Number(primer.input.value) }); stepsFor(outputRegion, inputRegion, ["affected_sf", "sponge_coverage_sf", "production_sf_per_hr", "seal_coat", "primer_sf_per_gal"], r);
     if (r.error) { oSponges.textContent = r.error; oLabor.textContent = "-"; oSealer.textContent = "-"; return; }
-    oSponges.textContent = r.dry_sponges + " sponges";
+    oSponges.textContent = r.dry_sponges + " " + (r.dry_sponges === 1 ? "sponge" : "sponges");
     oLabor.textContent = fmt(r.labor_hours, 1) + " hr";
     oSealer.textContent = r.seal_coat ? fmt(r.sealer_gal, 1) + " gal" : "No seal coat";
   }, DEBOUNCE_MS);
@@ -2863,7 +2863,7 @@ function renderContentsPackoutInventory(inputRegion, outputRegion, citationEl) {
     const r = computeContentsPackoutInventory({ floor_area_ft2: Number(area.input.value) || 0, contents_ft3_per_ft2: density.input.value === "" ? 2 : Number(density.input.value), box_volume_ft3: box.input.value === "" ? 3 : Number(box.input.value), stacking_factor: stack.input.value === "" ? 1.5 : Number(stack.input.value), truck_volume_ft3: truck.input.value === "" ? 1000 : Number(truck.input.value) }); stepsFor(outputRegion, inputRegion, ["floor_area_ft2", "contents_ft3_per_ft2", "box_volume_ft3", "stacking_factor", "truck_volume_ft3"], r);
     if (r.error) { oContents.textContent = r.error; oBoxes.textContent = "-"; oStorage.textContent = "-"; oTruck.textContent = "-"; return; }
     oContents.textContent = fmt(r.contents_volume_ft3, 0) + " ft^3";
-    oBoxes.textContent = r.boxes + " boxes";
+    oBoxes.textContent = r.boxes + " " + (r.boxes === 1 ? "box" : "boxes");
     oStorage.textContent = fmt(r.storage_volume_ft3, 0) + " ft^3";
     oTruck.textContent = r.truck_loads + " load(s)";
   }, DEBOUNCE_MS);
@@ -3006,7 +3006,7 @@ function renderHardwoodFloorDryingMat(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const r = computeHardwoodFloorDryingMat({ floor_area_ft2: Number(area.input.value) || 0, mat_coverage_ft2: cov.input.value === "" ? 6 : Number(cov.input.value), mats_per_unit: per.input.value === "" ? 16 : Number(per.input.value) }); stepsFor(outputRegion, inputRegion, ["floor_area_ft2", "mat_coverage_ft2", "mats_per_unit"], r);
     if (r.error) { oMats.textContent = r.error; oUnits.textContent = "-"; return; }
-    oMats.textContent = r.mats_needed + " mats";
+    oMats.textContent = r.mats_needed + " " + (r.mats_needed === 1 ? "mat" : "mats");
     oUnits.textContent = r.suction_units + " unit(s)";
   }, DEBOUNCE_MS);
   for (const el of [area.input, cov.input, per.input]) el.addEventListener("input", update);
@@ -3168,8 +3168,8 @@ RESTORATION_RENDERERS["water-extraction-rate"] = _simpleRenderer({
   outputs: [
     { key: "v", id: "wer-out-v", label: "Water to extract", value: (r) => fmt(r.total_gal, 0) + " gal = " + fmt(r.standing_gal, 0) + " standing + " + fmt(r.absorbed_gal, 0) + " absorbed (" + fmt(r.water_weight_lb, 0) + " lb)" },
     { key: "t", id: "wer-out-t", label: "Wand time", value: (r) => fmt(r.wand_time_min, 0) + " min = " + fmt(r.wand_time_hr, 1) + " hr at the rate entered" },
-    { key: "d", id: "wer-out-d", label: "Waste tank dumps", value: (r) => fmt(r.tank_dumps, 0) + " trips to the drain" },
-    { key: "c", id: "wer-out-c", label: "If the dehumidifiers had to do it", value: (r) => fmt(r.dehu_days, 0) + " days of dehumidification -- extraction is about " + fmt(r.speed_ratio, 0) + " times faster" },
+    { key: "d", id: "wer-out-d", label: "Waste tank dumps", value: (r) => fmt(r.tank_dumps, 0) + " " + (fmt(r.tank_dumps, 0) === "1" ? "trip" : "trips") + " to the drain" },
+    { key: "c", id: "wer-out-c", label: "If the dehumidifiers had to do it", value: (r) => fmt(r.dehu_days, 0) + " " + (fmt(r.dehu_days, 0) === "1" ? "day" : "days") + " of dehumidification -- extraction is about " + fmt(r.speed_ratio, 0) + " times faster" },
     { key: "n", id: "wer-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeWaterExtractionRate,
@@ -3225,7 +3225,7 @@ RESTORATION_RENDERERS["sewage-loss-disposal"] = _simpleRenderer({
   ],
   outputs: [
     { key: "v", id: "sld-out-v", label: "Debris volume", value: (r) => fmt(r.in_place_cf, 1) + " cubic ft in place, " + fmt(r.loose_cf, 1) + " cubic ft loose" },
-    { key: "b", id: "sld-out-b", label: "Bags", value: (r) => fmt(r.bag_count, 0) + " bags at " + fmt(r.bag_cf, 2) + " cubic ft each" },
+    { key: "b", id: "sld-out-b", label: "Bags", value: (r) => fmt(r.bag_count, 0) + " " + (fmt(r.bag_count, 0) === "1" ? "bag" : "bags") + " at " + fmt(r.bag_cf, 2) + " cubic ft each" },
     { key: "c", id: "sld-out-c", label: "Container", value: (r) => fmt(r.container_cf, 0) + " cubic ft of box, " + fmt(r.container_utilization_pct, 0) + "% used" + (r.oversized ? " -- the box is oversized for this debris" : "") },
     { key: "l", id: "sld-out-l", label: "Liquid, routed separately", value: (r) => fmt(r.liquid_weight_lb, 0) + " lb of extracted water, which does not go in the box" },
     { key: "n", id: "sld-out-n", label: "Note", value: (r) => r.note },

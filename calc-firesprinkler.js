@@ -351,7 +351,7 @@ FIRESPRINKLER_RENDERERS["smoke-detector-spacing-count"] = _simpleRenderer({
     { key: "listed_spacing_ft", label: "Device listed spacing (ft)", kind: "number" },
   ],
   outputs: [
-    { key: "d", id: "sds-out-d", label: "Detectors", value: (r) => fmt(r.detectors, 0) + " detectors (" + fmt(r.rows, 0) + " x " + fmt(r.cols, 0) + " grid)" },
+    { key: "d", id: "sds-out-d", label: "Detectors", value: (r) => fmt(r.detectors, 0) + " " + (fmt(r.detectors, 0) === "1" ? "detector" : "detectors") + " (" + fmt(r.rows, 0) + " x " + fmt(r.cols, 0) + " grid)" },
     { key: "w", id: "sds-out-w", label: "Max off each wall", value: (r) => fmt(r.wall_max_ft, 1) + " ft" },
     { key: "note", id: "sds-out-note", label: "Note", value: (r) => r.note },
   ],

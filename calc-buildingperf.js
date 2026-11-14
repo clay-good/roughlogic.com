@@ -757,7 +757,7 @@ BUILDINGPERF_RENDERERS["bill-disaggregation"] = _simpleRenderer({
     { key: "btu_per_unit", label: "BTU per unit (100,000 for a therm)", kind: "number", default: 100000 },
   ],
   outputs: [
-    { key: "t", id: "bdg-out-t", label: "Total", value: (r) => fmt(r.total_units, 0) + " units: " + fmt(r.weather_units, 0) + " weather-driven, " + fmt(r.baseload_per_year, 0) + " baseload" },
+    { key: "t", id: "bdg-out-t", label: "Total", value: (r) => fmt(r.total_units, 0) + " " + (fmt(r.total_units, 0) === "1" ? "unit" : "units") + ": " + fmt(r.weather_units, 0) + " weather-driven, " + fmt(r.baseload_per_year, 0) + " baseload" },
     { key: "s", id: "bdg-out-s", label: "What that means", value: (r) => r.split_verdict },
     { key: "u", id: "bdg-out-u", label: "Implied UA", value: (r) => r.ua_verdict },
     { key: "b", id: "bdg-out-b", label: "Baseload", value: (r) => r.baseline_verdict },

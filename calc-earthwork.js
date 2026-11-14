@@ -191,10 +191,10 @@ function _v67renderHaulCycleProduction(inputRegion, outputRegion, citationEl) {
     if (r.error) { oCycle.textContent = r.error; for (const o of [oProd, oTrucks, oFleet, oLoader]) o.textContent = "-"; return; }
     oCycle.textContent = fmt(r.cycle_min, 1) + " min (" + fmt(r.loads_per_hour, 2) + " loads/hr)";
     oProd.textContent = fmt(r.production_lcy_hr, 1) + " lcy/hr";
-    oTrucks.textContent = r.trucks_to_match + " trucks";
+    oTrucks.textContent = r.trucks_to_match + " " + (r.trucks_to_match === 1 ? "truck" : "trucks");
     oFleet.textContent = fmt(r.fleet_production_lcy_hr, 0) + " lcy/hr";
     oLoader.textContent = fmt(r.loader_capacity_lcy_hr, 0) + " lcy/hr" + (r.loader_governs
-      ? " -- the loader governs: " + r.trucks_to_match + " trucks could haul " + fmt(r.production_lcy_hr * r.trucks_to_match, 0) + " lcy/hr, but the loader fills only this much, so the fleet figure is the loader's"
+      ? " -- the loader governs: " + r.trucks_to_match + " " + (r.trucks_to_match === 1 ? "truck" : "trucks") + " could haul " + fmt(r.production_lcy_hr * r.trucks_to_match, 0) + " lcy/hr, but the loader fills only this much, so the fleet figure is the loader's"
       : "; the trucks govern");
   }, DEBOUNCE_MS);
   for (const f of [cap, load, haul, dump, ret, spot, eff]) f.input.addEventListener("input", update);
@@ -561,7 +561,7 @@ function _v822renderRusleSoilLoss(inputRegion, outputRegion, citationEl) {
     }); stepsFor(outputRegion, inputRegion, ["r_factor", "k_factor", "ls_factor", "c_factor", "p_factor", "acres"], res);
     if (res.error) { oA.textContent = res.error; oSite.textContent = "-"; return; }
     oA.textContent = fmt(res.a_tons_ac_yr, 1) + " tons/acre/yr";
-    oSite.textContent = fmt(res.site_tons_yr, 0) + " tons/yr";
+    oSite.textContent = fmt(res.site_tons_yr, 0) + " " + (fmt(res.site_tons_yr, 0) === "1" ? "ton" : "tons") + "/yr";
   }, DEBOUNCE_MS);
   for (const f of [r, k, ls, c, p, ac]) f.input.addEventListener("input", update);
 }
@@ -759,7 +759,7 @@ function _v826renderCheckDamSpacing(inputRegion, outputRegion, citationEl) {
     }); stepsFor(outputRegion, inputRegion, ["dam_height_ft", "channel_slope_pct", "reach_length_ft"], r);
     if (r.error) { oSpacing.textContent = r.error; oDams.textContent = "-"; return; }
     oSpacing.textContent = fmt(r.spacing_ft, 1) + " ft";
-    oDams.textContent = r.dams + " dams";
+    oDams.textContent = r.dams + " " + (r.dams === 1 ? "dam" : "dams");
   }, DEBOUNCE_MS);
   for (const f of [h, s, reach]) f.input.addEventListener("input", update);
 }
@@ -861,8 +861,8 @@ function _v828renderErosionBlanketCoverage(inputRegion, outputRegion, citationEl
       staples_per_sy: sr.input.value === "" ? 1.5 : Number(sr.input.value),
     }); stepsFor(outputRegion, inputRegion, ["area_sf", "overlap_pct", "roll_width_ft", "roll_length_ft", "staples_per_sy"], r);
     if (r.error) { oRolls.textContent = r.error; oStaples.textContent = "-"; return; }
-    oRolls.textContent = r.rolls + " rolls (" + fmt(r.coverage_sy, 0) + " sy slope, " + fmt(r.roll_sy, 0) + " sy/roll)";
-    oStaples.textContent = fmt(r.staples, 0) + " staples";
+    oRolls.textContent = r.rolls + " " + (r.rolls === 1 ? "roll" : "rolls") + " (" + fmt(r.coverage_sy, 0) + " sy slope, " + fmt(r.roll_sy, 0) + " sy/roll)";
+    oStaples.textContent = fmt(r.staples, 0) + " " + (fmt(r.staples, 0) === "1" ? "staple" : "staples");
   }, DEBOUNCE_MS);
   for (const f of [area, overlap, w, l, sr]) f.input.addEventListener("input", update);
 }
@@ -1238,7 +1238,7 @@ function _v836renderDustControlWater(inputRegion, outputRegion, citationEl) {
     }); stepsFor(outputRegion, inputRegion, ["length_ft", "width_ft", "rate_gal_per_sy", "truck_cap_gal", "applications_per_day"], r);
     if (r.error) { oApp.textContent = r.error; oDaily.textContent = "-"; return; }
     oApp.textContent = fmt(r.gal_per_app, 0) + " gal (" + fmt(r.trips_per_app, 0) + " trip" + (r.trips_per_app === 1 ? "" : "s") + ")";
-    oDaily.textContent = fmt(r.daily_gal, 0) + " gal/day over " + fmt(r.daily_trips, 0) + " trips";
+    oDaily.textContent = fmt(r.daily_gal, 0) + " gal/day over " + fmt(r.daily_trips, 0) + " " + (fmt(r.daily_trips, 0) === "1" ? "trip" : "trips");
   }, DEBOUNCE_MS);
   for (const f of [l, w, rt, tc, ap]) f.input.addEventListener("input", update);
 }
@@ -1337,7 +1337,7 @@ function _v845renderDumpTruckLoads(inputRegion, outputRegion, citationEl) {
       weight_limit_lb: wl.input.value === "" ? 40000 : Number(wl.input.value), material_density_lb_per_lcy: d.input.value === "" ? 2800 : Number(d.input.value),
     }); stepsFor(outputRegion, inputRegion, ["total_lcy", "box_vol_cy", "weight_limit_lb", "material_density_lb_per_lcy"], r);
     if (r.error) { oLoads.textContent = r.error; oPayload.textContent = "-"; return; }
-    oLoads.textContent = fmt(r.loads, 0) + " loads";
+    oLoads.textContent = fmt(r.loads, 0) + " " + (fmt(r.loads, 0) === "1" ? "load" : "loads");
     oPayload.textContent = fmt(r.payload_cy, 2) + " cy per truck (" + r.governs + " governs)";
   }, DEBOUNCE_MS);
   for (const f of [t, b, wl, d]) f.input.addEventListener("input", update);

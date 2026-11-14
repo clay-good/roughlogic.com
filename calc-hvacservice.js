@@ -326,7 +326,7 @@ HVACSERVICE_RENDERERS["vacuum-decay-test"] = _simpleRenderer({
     { key: "pass_ceiling_micron", label: "Pass ceiling (microns)", kind: "number", default: 500 },
   ],
   outputs: [
-    { key: "r", id: "vdt-out-r", label: "Total rise", value: (r) => fmt(r.rise_micron, 0) + " microns" },
+    { key: "r", id: "vdt-out-r", label: "Total rise", value: (r) => fmt(r.rise_micron, 0) + " " + (fmt(r.rise_micron, 0) === "1" ? "micron" : "microns") },
     { key: "t", id: "vdt-out-t", label: "Rise rate", value: (r) => fmt(r.rate_micron_per_min, 1) + " microns/min" },
     { key: "v", id: "vdt-out-v", label: "Verdict", value: (r) => r.verdict },
     { key: "n", id: "vdt-out-n", label: "Note", value: (r) => r.note },
@@ -1552,7 +1552,7 @@ HVACSERVICE_RENDERERS["chilled-water-delta-t"] = _simpleRenderer({
     { key: "design_delta_t_f", label: "Design delta-T (F)", kind: "number" },
   ],
   outputs: [
-    { key: "d", id: "cwdt-out-d", label: "Actual delta-T", value: (r) => fmt(r.actual_delta_t_f, 2) + " F on " + fmt(r.tons, 0) + " tons" },
+    { key: "d", id: "cwdt-out-d", label: "Actual delta-T", value: (r) => fmt(r.actual_delta_t_f, 2) + " F on " + fmt(r.tons, 0) + " " + (fmt(r.tons, 0) === "1" ? "ton" : "tons") },
     { key: "f", id: "cwdt-out-f", label: "Flow the load needs at design delta-T", value: (r) => fmt(r.design_flow_gpm, 0) + " gpm" },
     { key: "e", id: "cwdt-out-e", label: "Excess flow", value: (r) => fmt(r.excess_flow_gpm, 0) + " gpm (" + fmt(r.excess_pct, 1) + " %)" },
     { key: "p", id: "cwdt-out-p", label: "Pump power against design", value: (r) => fmt(r.pump_penalty, 2) + " x" },

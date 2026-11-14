@@ -3787,7 +3787,7 @@ HVAC_RENDERERS["heat-pump-seasonal-energy"] = _rEnv({
   outputs: [
     { key: "hp", id: "hpse-out-hp", label: "Heat pump", value: (r) => fmt(r.hp_kwh, 0) + " kWh = $" + fmt(r.hp_cost, 0) + "/season" },
     { key: "res", id: "hpse-out-res", label: "Resistance heat", value: (r) => fmt(r.resistance_kwh, 0) + " kWh = $" + fmt(r.resistance_cost, 0) + "/season" },
-    { key: "gas", id: "hpse-out-gas", label: "Gas furnace", value: (r) => r.gas_cost === null ? "(enter gas rate)" : fmt(r.gas_therms, 0) + " therms = $" + fmt(r.gas_cost, 0) + "/season" },
+    { key: "gas", id: "hpse-out-gas", label: "Gas furnace", value: (r) => r.gas_cost === null ? "(enter gas rate)" : fmt(r.gas_therms, 0) + " " + (fmt(r.gas_therms, 0) === "1" ? "therm" : "therms") + " = $" + fmt(r.gas_cost, 0) + "/season" },
     { key: "n", id: "hpse-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeHeatPumpSeasonalEnergy,

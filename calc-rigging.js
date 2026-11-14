@@ -453,7 +453,7 @@ function renderTaglineForce(inputRegion, outputRegion, citationEl) {
     }); stepsFor(outputRegion, inputRegion, ["lateral_force_lb", "tagline_angle_deg", "per_person_lb"], r);
     if (r.error) { oTension.textContent = r.error; oHandlers.textContent = "-"; oVerdict.textContent = "-"; return; }
     oTension.textContent = fmt(r.tag_tension_lb, 1) + " lb";
-    oHandlers.textContent = r.handlers + " handlers";
+    oHandlers.textContent = r.handlers + " " + (r.handlers === 1 ? "handler" : "handlers");
     oVerdict.textContent = r.verdict;
   }, DEBOUNCE_MS);
   for (const f of [force, angle, perPerson]) f.input.addEventListener("input", update);
@@ -846,7 +846,7 @@ function renderRollerJackForce(inputRegion, outputRegion, citationEl) {
     oRoll.textContent = fmt(r.roll_force_lb, 0) + " lb (grade " + fmt(r.grade_force_lb, 0) + " lb)";
     oPush.textContent = fmt(r.push_steady_lb, 0) + " lb";
     oBreak.textContent = fmt(r.push_breakaway_lb, 0) + " lb";
-    oSkates.textContent = r.skates_needed + " skates";
+    oSkates.textContent = r.skates_needed + " " + (r.skates_needed === 1 ? "skate" : "skates");
   }, DEBOUNCE_MS);
   for (const f of [load, coef, incline, skateCap]) f.input.addEventListener("input", update);
 }
@@ -1033,7 +1033,7 @@ function renderMultiLegSling(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const r = computeMultiLegSling({ total_load_lb: Number(load.input.value) || 0, num_legs: Number(legs.select.value) || 0, horizontal_angle_deg: Number(angle.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["total_load_lb", "num_legs", "horizontal_angle_deg"], r);
     if (r.error) { oT.textContent = r.error; oE.textContent = "-"; oF.textContent = "-"; oN.textContent = "-"; return; }
-    oT.textContent = fmt(r.tension_per_leg_lb, 0) + " lb (over " + r.share_legs + " legs)";
+    oT.textContent = fmt(r.tension_per_leg_lb, 0) + " lb (over " + r.share_legs + " " + (r.share_legs === 1 ? "leg" : "legs") + ")";
     oE.textContent = fmt(r.equal_share_lb, 0) + " lb";
     oF.textContent = fmt(r.load_factor, 3);
     oN.textContent = r.note;
@@ -1400,7 +1400,7 @@ function renderWinchDrumLinePull(inputRegion, outputRegion, citationEl) {
     if (r.error) { oM.textContent = r.error; for (const o of [oP, oS]) o.textContent = "-"; return; }
     oM.textContent = fmt(r.mean_dia_in, 2) + " in";
     oP.textContent = fmt(r.pull_at_layer_lb, 0) + " lb (" + fmt(r.derate_pct, 0) + "% below rated)";
-    oS.textContent = fmt(r.speed_ratio, 2) + "x speed, " + r.wraps_per_layer + " wraps/layer";
+    oS.textContent = fmt(r.speed_ratio, 2) + "x speed, " + r.wraps_per_layer + " " + (r.wraps_per_layer === 1 ? "wrap" : "wraps") + "/layer";
   }, DEBOUNCE_MS);
   for (const f of [p, d, rr, bw, n]) f.input.addEventListener("input", update);
 }

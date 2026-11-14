@@ -210,7 +210,7 @@ LINEWORKER_RENDERERS["ruling-span"] = _simpleRenderer({
     { key: "ruling_span_sag_ft", label: "Sag at the ruling span (ft, 0 to skip)", kind: "number" },
   ],
   outputs: [
-    { key: "r", id: "rsp-out-r", label: "Ruling span", value: (r) => fmt(r.ruling_span_ft, 2) + " ft across " + fmt(r.span_count, 0) + " spans -- enter the stringing chart HERE, not at the span in front of the truck" },
+    { key: "r", id: "rsp-out-r", label: "Ruling span", value: (r) => fmt(r.ruling_span_ft, 2) + " ft across " + fmt(r.span_count, 0) + " " + (fmt(r.span_count, 0) === "1" ? "span" : "spans") + " -- enter the stringing chart HERE, not at the span in front of the truck" },
     { key: "a", id: "rsp-out-a", label: "Against the arithmetic average", value: (r) => fmt(r.average_span_ft, 1) + " ft average, so the ruling span is " + fmt(r.ruling_span_ft - r.average_span_ft, 1) + " ft higher -- pulled up by the " + fmt(r.longest_span_ft, 0) + " ft span" },
     { key: "f", id: "rsp-out-f", label: "Tailboard approximation", value: (r) => fmt(r.field_approximation_ft, 1) + " ft -- " + r.approximation_verdict },
     { key: "s", id: "rsp-out-s", label: "Sag in the longest span", value: (r) => fmt(r.longest_span_sag_ft, 2) + " ft in the " + fmt(r.longest_span_ft, 0) + " ft span, against " + fmt(r.shortest_span_sag_ft, 2) + " ft in the " + fmt(r.shortest_span_ft, 0) + " ft one" },
@@ -948,9 +948,9 @@ LINEWORKER_RENDERERS["sagging-return-wave"] = _simpleRenderer({
   ],
   outputs: [
     { key: "s", id: "srw-out-s", label: "Sag from the timing", value: (r) => r.sag_from_timing_ft === null ? "(no elapsed time entered)" : fmt(r.sag_from_timing_ft, 2) + " ft over " + fmt(r.return_waves, 0) + " return waves" },
-    { key: "t", id: "srw-out-t", label: "Time to listen for", value: (r) => r.target_time_seconds === null ? "(no target sag entered)" : fmt(r.target_time_seconds, 2) + " s for " + fmt(r.return_waves, 0) + " returns" },
+    { key: "t", id: "srw-out-t", label: "Time to listen for", value: (r) => r.target_time_seconds === null ? "(no target sag entered)" : fmt(r.target_time_seconds, 2) + " s for " + fmt(r.return_waves, 0) + " " + (fmt(r.return_waves, 0) === "1" ? "return" : "returns") },
     { key: "p", id: "srw-out-p", label: "Period per wave", value: (r) => fmt(r.period_per_wave_seconds, 3) + " s" },
-    { key: "e", id: "srw-out-e", label: "What your stopwatch error is worth", value: (r) => fmt(r.stopwatch_error_seconds, 2) + " s of error is " + fmt(r.sag_error_ft, 2) + " ft of sag error at " + fmt(r.return_waves, 0) + " waves" },
+    { key: "e", id: "srw-out-e", label: "What your stopwatch error is worth", value: (r) => fmt(r.stopwatch_error_seconds, 2) + " s of error is " + fmt(r.sag_error_ft, 2) + " ft of sag error at " + fmt(r.return_waves, 0) + " " + (fmt(r.return_waves, 0) === "1" ? "wave" : "waves") },
     { key: "o", id: "srw-out-o", label: "The same error on ONE wave", value: (r) => fmt(r.single_wave_sag_error_ft, 2) + " ft" + (r.error_advantage === null ? "" : " -- " + fmt(r.error_advantage, 1) + "x worse for the identical stopwatch. Counting more waves is the method, not fussiness") },
     { key: "n", id: "srw-out-n", label: "Note", value: (r) => r.note },
   ],

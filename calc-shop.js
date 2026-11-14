@@ -568,7 +568,7 @@ function _v40renderDividingHead(inputRegion, outputRegion, citationEl) {
     if (r.error) { oTurns.textContent = r.error; oPlate.textContent = "-"; oNote.textContent = ""; return; }
     oTurns.textContent = (r.index_by === "angle" ? "for " + fmt(r.angle_deg, 4) + " degrees: " : "") + r.full_turns + " full turn" + (r.full_turns === 1 ? "" : "s") + (r.fraction > 0 ? " + " + fmt(r.fraction, 6) + " of a turn" : "");
     const usable = r.settings.filter((s) => s.whole);
-    oPlate.textContent = usable.length ? usable.map((s) => r.full_turns + " turns + " + s.holes + " holes on the " + s.circle + "-hole circle").join("; ") : "no supplied circle divides evenly";
+    oPlate.textContent = usable.length ? usable.map((s) => r.full_turns + " " + (r.full_turns === 1 ? "turn" : "turns") + " + " + s.holes + " holes on the " + s.circle + "-hole circle").join("; ") : "no supplied circle divides evenly";
     oNote.textContent = r.notes.join(" ");
   }, DEBOUNCE_MS);
   for (const f of [div.input, ratio.input, ang.input]) f.addEventListener("input", update);
@@ -1275,7 +1275,7 @@ function _v399renderToleranceStackRss(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const r = computeToleranceStackRss({ nominal_gap_in: Number(gap.input.value), tolerances: tols.input.value }); stepsFor(outputRegion, inputRegion, ["nominal_gap_in", "tolerances"], r);
     if (r.error) { oWc.textContent = r.error; oRss.textContent = "-"; oNote.textContent = ""; return; }
-    oWc.textContent = "+/-" + fmt(r.tol_wc, 4) + " in (" + fmt(r.gap_wc_lo, 4) + " to " + fmt(r.gap_wc_hi, 4) + " in, " + r.n + " dims)";
+    oWc.textContent = "+/-" + fmt(r.tol_wc, 4) + " in (" + fmt(r.gap_wc_lo, 4) + " to " + fmt(r.gap_wc_hi, 4) + " in, " + r.n + " " + (r.n === 1 ? "dim" : "dims") + ")";
     oRss.textContent = "+/-" + fmt(r.tol_rss, 4) + " in (" + fmt(r.gap_rss_lo, 4) + " to " + fmt(r.gap_rss_hi, 4) + " in)";
     oNote.textContent = r.note;
   }, DEBOUNCE_MS);
@@ -2391,7 +2391,7 @@ function _v512renderRollerChainLength(inputRegion, outputRegion, citationEl) {
     const r = computeRollerChainLength({ small_teeth_n1: _readNum(n1.input), large_teeth_n2: _readNum(n2.input), center_distance_in: _readNum(c.input), pitch_in: _readNum(p.input) }); stepsFor(outputRegion, inputRegion, ["small_teeth_n1", "large_teeth_n2", "center_distance_in", "pitch_in"], r);
     if (r.error) { oL.textContent = r.error; oLe.textContent = "-"; oC.textContent = "-"; oNote.textContent = ""; return; }
     oL.textContent = fmt(r.length_pitches, 2) + " pitches";
-    oLe.textContent = r.length_even + " pitches (even)";
+    oLe.textContent = r.length_even + " " + (r.length_even === 1 ? "pitch" : "pitches") + " (even)";
     oC.textContent = fmt(r.center_corrected_in, 2) + " in";
     oNote.textContent = r.note;
   }, DEBOUNCE_MS);
@@ -2696,8 +2696,8 @@ SHOP_RENDERERS["bearing-regrease"] = _simpleRenderer({
   ],
   outputs: [
     { key: "g", id: "brgr-out-g", label: "Grease quantity", value: (r) => fmt(r.grease_grams, 1) + " g" },
-    { key: "b", id: "brgr-out-b", label: "Base interval", value: (r) => fmt(r.base_interval_hr, 0) + " hours" },
-    { key: "c", id: "brgr-out-c", label: "Corrected interval", value: (r) => fmt(r.corrected_interval_hr, 0) + " hours" },
+    { key: "b", id: "brgr-out-b", label: "Base interval", value: (r) => fmt(r.base_interval_hr, 0) + " " + (fmt(r.base_interval_hr, 0) === "1" ? "hour" : "hours") },
+    { key: "c", id: "brgr-out-c", label: "Corrected interval", value: (r) => fmt(r.corrected_interval_hr, 0) + " " + (fmt(r.corrected_interval_hr, 0) === "1" ? "hour" : "hours") },
     { key: "d", id: "brgr-out-d", label: "At the stated duty", value: (r) => "every " + fmt(r.interval_days, 1) + " operating days" },
     { key: "n", id: "brgr-out-n", label: "Note", value: (r) => r.note },
   ],

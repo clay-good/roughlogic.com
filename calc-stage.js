@@ -905,7 +905,7 @@ function renderSpeakerImpedance(inputRegion, outputRegion, citationEl) {
       power_w: readNum(power.input),
     }); stepsFor(outputRegion, inputRegion, ["topology", "z_ohm", "count", "series_per_branch", "branches", "amp_min_ohm", "power_w"], r);
     if (r.error) { oZ.textContent = r.error; oSafe.textContent = ""; oPower.textContent = ""; return; }
-    oZ.textContent = fmt(r.z_total_ohm, 2) + " Ohm (" + r.n_drivers + " drivers)";
+    oZ.textContent = fmt(r.z_total_ohm, 2) + " Ohm (" + r.n_drivers + " " + (r.n_drivers === 1 ? "driver" : "drivers") + ")";
     oSafe.textContent = r.safe === null ? "No amp minimum entered" : (r.safe ? "SAFE (at or above amp minimum)" : "BELOW amp minimum - check amp spec");
     oPower.textContent = r.per_driver_power_w === null ? "No power entered" : fmt(r.per_driver_power_w, 1) + " W per driver";
   }, DEBOUNCE_MS);
@@ -1213,7 +1213,7 @@ const renderLedVideoWall = _r({
   ],
   outputs: [
     { key: "res", id: "lvw-out-res", label: "Resolution", value: (r) => r.total_w_px + " x " + r.total_h_px + " px (" + fmt(r.total_pixels, 0) + " px)" },
-    { key: "sz", id: "lvw-out-sz", label: "Size", value: (r) => fmt(r.width_ft, 2) + " x " + fmt(r.height_ft, 2) + " ft (" + r.cabinets + " cabinets)" },
+    { key: "sz", id: "lvw-out-sz", label: "Size", value: (r) => fmt(r.width_ft, 2) + " x " + fmt(r.height_ft, 2) + " ft (" + r.cabinets + " " + (r.cabinets === 1 ? "cabinet" : "cabinets") + ")" },
     { key: "wt", id: "lvw-out-wt", label: "Weight", value: (r) => r.total_weight === null ? "-" : fmt(r.total_weight, 0) + " lb" },
     { key: "pk", id: "lvw-out-pk", label: "Peak power", value: (r) => r.peak_power_w === null ? "-" : fmt(r.peak_power_w, 0) + " W" },
     { key: "av", id: "lvw-out-av", label: "Average power", value: (r) => r.avg_power_w === null ? "-" : fmt(r.avg_power_w, 0) + " W" },
@@ -1415,7 +1415,7 @@ const renderEyringReverberation = _r({
   outputs: [
     { key: "ey", id: "ey-out-ey", label: "RT60 (Eyring)", value: (r) => fmt(r.rt60_eyring_s, 2) + " s" },
     { key: "sa", id: "ey-out-sa", label: "RT60 (Sabine, for comparison)", value: (r) => fmt(r.rt60_sabine_s, 2) + " s" },
-    { key: "sab", id: "ey-out-sab", label: "Total absorption", value: (r) => fmt(r.total_sabins, 0) + " sabins" },
+    { key: "sab", id: "ey-out-sab", label: "Total absorption", value: (r) => fmt(r.total_sabins, 0) + " " + (fmt(r.total_sabins, 0) === "1" ? "sabin" : "sabins") },
     { key: "n", id: "ey-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeEyringReverberation,
@@ -1532,8 +1532,8 @@ const renderRoomAbsorptionTarget = _r({
     { key: "sabine_coeff", label: "Sabine coefficient (default 0.049)", kind: "number", default: 0.049, attrs: { step: "any", min: "0" } },
   ],
   outputs: [
-    { key: "req", id: "rat-out-req", label: "Total absorption required", value: (r) => fmt(r.required_sabins, 0) + " sabins" },
-    { key: "add", id: "rat-out-add", label: "Additional treatment to add", value: (r) => r.meets_already ? "0 sabins (the room already meets the target)" : fmt(r.additional_sabins, 0) + " sabins" },
+    { key: "req", id: "rat-out-req", label: "Total absorption required", value: (r) => fmt(r.required_sabins, 0) + " " + (fmt(r.required_sabins, 0) === "1" ? "sabin" : "sabins") },
+    { key: "add", id: "rat-out-add", label: "Additional treatment to add", value: (r) => r.meets_already ? "0 sabins (the room already meets the target)" : fmt(r.additional_sabins, 0) + " " + (fmt(r.additional_sabins, 0) === "1" ? "sabin" : "sabins") },
     { key: "n", id: "rat-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeRoomAbsorptionTarget,
@@ -1584,7 +1584,7 @@ const renderCounterweightArborLoad = _r({
   outputs: [
     { key: "req", id: "cwa-out-req", label: "Required counterweight", value: (r) => fmt(r.required_cw_lb, 0) + " lb (" + (r.purchase_ratio === 2 ? "double 2:1" : "single 1:1") + ")" },
     { key: "oow", id: "cwa-out-oow", label: "Out of weight", value: (r) => (r.action === "balanced" ? "balanced" : fmt(Math.abs(r.out_of_weight_lb), 0) + " lb " + (r.action === "add" ? "light - add" : "heavy - remove")) },
-    { key: "b", id: "cwa-out-b", label: "Bricks to " + "add/remove", value: (r) => r.action === "balanced" ? "0" : (r.bricks === 0 ? "none: closer than half a brick" : fmt(r.bricks, 0) + " bricks to " + r.action) + (Math.abs(r.residual_lb) > 1e-6 ? ", leaving the arbor " + fmt(Math.abs(r.residual_lb), 0) + " lb " + (r.residual_lb > 0 ? "heavy" : "light") : "") },
+    { key: "b", id: "cwa-out-b", label: "Bricks to " + "add/remove", value: (r) => r.action === "balanced" ? "0" : (r.bricks === 0 ? "none: closer than half a brick" : fmt(r.bricks, 0) + " " + (fmt(r.bricks, 0) === "1" ? "brick" : "bricks") + " to " + r.action) + (Math.abs(r.residual_lb) > 1e-6 ? ", leaving the arbor " + fmt(Math.abs(r.residual_lb), 0) + " lb " + (r.residual_lb > 0 ? "heavy" : "light") : "") },
     { key: "n", id: "cwa-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeCounterweightArborLoad,

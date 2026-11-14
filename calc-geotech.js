@@ -925,7 +925,7 @@ GEOTECH_RENDERERS["pile-group-efficiency"] = _simpleRenderer({
   outputs: [
     { key: "th", id: "pge-out-th", label: "Angle theta = atan(d/s)", value: (r) => fmt(r.theta_deg, 2) + " deg" },
     { key: "eg", id: "pge-out-eg", label: "Converse-Labarre efficiency Eg", value: (r) => fmt(r.eg, 3) },
-    { key: "grp", id: "pge-out-grp", label: "Group allowable (" + "Eg x n x Q)", value: (r) => fmt(r.group_kip, 0) + " kip (" + r.n_piles + " piles)" },
+    { key: "grp", id: "pge-out-grp", label: "Group allowable (" + "Eg x n x Q)", value: (r) => fmt(r.group_kip, 0) + " kip (" + r.n_piles + " " + (r.n_piles === 1 ? "pile" : "piles") + ")" },
     { key: "nv", id: "pge-out-nv", label: "Naive sum it corrects", value: (r) => fmt(r.naive_kip, 0) + " kip (over-predicts by " + fmt(r.naive_kip - r.group_kip, 0) + " kip)" },
   ],
   compute: computePileGroupEfficiency,

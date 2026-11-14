@@ -182,7 +182,7 @@ USAR_RENDERERS["collapse-floor-load"] = _simpleRenderer({
     { key: "total", id: "cfl-out-total", label: "Total load on the floor", value: (r) => fmt(r.total_psf, 1) + " psf (floor " + fmt(r.floor_psf, 1) + " + rubble " + fmt(r.rubble_psf, 1) + " + rescuers " + fmt(r.rescuer_psf, 1) + ")" },
     { key: "share", id: "cfl-out-share", label: "Rubble share of the load", value: (r) => fmt(r.rubble_share_pct, 1) + "% -- largest component: " + r.largest_component },
     { key: "shore", id: "cfl-out-shore", label: "Load per shore", value: (r) => fmt(r.load_per_shore_lb, 0) + " lb on " + fmt(r.tributary_area_sqft, 1) + " sq ft" },
-    { key: "post", id: "cfl-out-post", label: "Load per post", value: (r) => fmt(r.load_per_post_lb, 0) + " lb (" + fmt(r.posts_per_shore, 0) + " posts)" },
+    { key: "post", id: "cfl-out-post", label: "Load per post", value: (r) => fmt(r.load_per_post_lb, 0) + " lb (" + fmt(r.posts_per_shore, 0) + " " + (fmt(r.posts_per_shore, 0) === "1" ? "post" : "posts") + ")" },
     { key: "n", id: "cfl-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeCollapseFloorLoad,
@@ -762,7 +762,7 @@ USAR_RENDERERS["relief-storage-floor-load"] = _simpleRenderer({
   outputs: [
     { key: "fp", id: "rsf-out-fp", label: "Pressure under a stack", value: (r) => fmt(r.footprint_psf, 1) + " psf (" + fmt(r.footprint_ratio, 2) + " x design) -- " + r.footprint_verdict },
     { key: "avg", id: "rsf-out-avg", label: "Area-average pressure", value: (r) => fmt(r.average_psf, 1) + " psf (" + fmt(r.average_ratio, 2) + " x design) -- " + r.average_verdict },
-    { key: "cnt", id: "rsf-out-cnt", label: "Upper-bound pallet count", value: (r) => fmt(r.pallets_allowed, 0) + " pallets (" + fmt(r.stacks_allowed, 0) + " stacks of " + fmt(r.tiers, 0) + "); " + fmt(r.stack_positions, 0) + " stack positions at the entered coverage" },
+    { key: "cnt", id: "rsf-out-cnt", label: "Upper-bound pallet count", value: (r) => fmt(r.pallets_allowed, 0) + " " + (fmt(r.pallets_allowed, 0) === "1" ? "pallet" : "pallets") + " (" + fmt(r.stacks_allowed, 0) + " " + (fmt(r.stacks_allowed, 0) === "1" ? "stack" : "stacks") + " of " + fmt(r.tiers, 0) + "); " + fmt(r.stack_positions, 0) + " stack positions at the entered coverage" },
     { key: "n", id: "rsf-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeReliefStorageFloorLoad,

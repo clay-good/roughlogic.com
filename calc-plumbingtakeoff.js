@@ -83,7 +83,7 @@ function _v856renderSolderJointQuantity(inputRegion, outputRegion, citationEl) {
     }); stepsFor(outputRegion, inputRegion, ["joints", "wire_in_per_joint", "wire_dia_in", "solder_density_lb_in3", "spool_lb"], r);
     if (r.error) { oSolder.textContent = r.error; oSpools.textContent = "-"; return; }
     oSolder.textContent = fmt(r.solder_lb, 2) + " lb";
-    oSpools.textContent = fmt(r.spools, 0) + " spools";
+    oSpools.textContent = fmt(r.spools, 0) + " " + (fmt(r.spools, 0) === "1" ? "spool" : "spools");
   }, DEBOUNCE_MS);
   for (const f of [j, wj, wd, dn, sp]) f.input.addEventListener("input", update);
 }
@@ -171,7 +171,7 @@ function _v857renderPipeInsulationTakeoff(inputRegion, outputRegion, citationEl)
       section_len_ft: sl.input.value === "" ? 3 : Number(sl.input.value), insul_od_in: od.input.value === "" ? 4.5 : Number(od.input.value),
     }); stepsFor(outputRegion, inputRegion, ["pipe_ft", "waste_pct", "num_fittings", "fitting_allow_ft", "section_len_ft", "insul_od_in"], r);
     if (r.error) { oSections.textContent = r.error; oJacket.textContent = "-"; return; }
-    oSections.textContent = fmt(r.sections, 0) + " sections (" + fmt(r.cut_ft, 1) + " ft cut)";
+    oSections.textContent = fmt(r.sections, 0) + " " + (fmt(r.sections, 0) === "1" ? "section" : "sections") + " (" + fmt(r.cut_ft, 1) + " ft cut)";
     oJacket.textContent = fmt(r.jacket_sf, 0) + " sf";
   }, DEBOUNCE_MS);
   for (const f of [p, w, nf, fa, sl, od]) f.input.addEventListener("input", update);
@@ -387,7 +387,7 @@ function _v906renderPexHomerunTakeoff(inputRegion, outputRegion, citationEl) {
       avg_run_ft: ar.input.value === "" ? 35 : Number(ar.input.value), waste_pct: ws.input.value === "" ? 10 : Number(ws.input.value),
     }); stepsFor(outputRegion, inputRegion, ["fixtures", "hot_fixtures", "avg_run_ft", "waste_pct"], r);
     if (r.error) { oPorts.textContent = r.error; oTubing.textContent = "-"; return; }
-    oPorts.textContent = fmt(r.total_ports, 0) + " ports (" + fmt(r.cold_ports, 0) + " cold, " + fmt(r.hot_ports, 0) + " hot)";
+    oPorts.textContent = fmt(r.total_ports, 0) + " " + (fmt(r.total_ports, 0) === "1" ? "port" : "ports") + " (" + fmt(r.cold_ports, 0) + " cold, " + fmt(r.hot_ports, 0) + " hot)";
     oTubing.textContent = fmt(r.tubing_lf, 0) + " LF";
   }, DEBOUNCE_MS);
   for (const f of [fx, hf, ar, ws]) f.input.addEventListener("input", update);

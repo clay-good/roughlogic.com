@@ -299,7 +299,7 @@ function _v69renderAbatementContainment(inputRegion, outputRegion, citationEl) {
     oPoly.textContent = fmt(r.poly_sf, 0) + " ft^2";
     oCfm.textContent = fmt(r.req_cfm, 0) + " cfm";
     oNam.textContent = r.nam_count + " machine" + (r.nam_count === 1 ? "" : "s");
-    oBags.textContent = r.waste_bags + " bags";
+    oBags.textContent = r.waste_bags + " " + (r.waste_bags === 1 ? "bag" : "bags");
   }, DEBOUNCE_MS);
   for (const f of [len, wid, ht, ach, nam, debris]) f.input.addEventListener("input", update);
 }
@@ -431,7 +431,7 @@ DEMO_RENDERERS["lead-dust-clearance"] = _simpleRenderer({
     { key: "l", id: "ldc-out-l", label: "Dust loading", value: (r) => fmt(r.dust_loading_ug_ft2, 2) + " micrograms per sq ft -- " + fmt(r.lab_result_ug, 1) + " micrograms over " + fmt(r.wipe_area_ft2, 2) + " sq ft" },
     { key: "v", id: "ldc-out-v", label: "Against the limit", value: (r) => r.verdict },
     { key: "m", id: "ldc-out-m", label: "What the limit actually allows", value: (r) => "under " + fmt(r.max_lab_result_ug, 1) + " micrograms on this wipe -- which is why surfaces that look and feel clean routinely fail" },
-    { key: "c", id: "ldc-out-c", label: "Samples", value: (r) => r.wipe_count === null ? "(no room count entered)" : fmt(r.wipe_count, 0) + " wipes across " + fmt(r.rooms, 0) + " rooms at " + fmt(r.surfaces_per_room, 0) + " surface types, plus " + fmt(r.blanks_per_job, 0) + " field blank" + (r.blanks_per_job === 1 ? "" : "s") + " -- " + fmt(r.total_samples, 0) + " to the laboratory" },
+    { key: "c", id: "ldc-out-c", label: "Samples", value: (r) => r.wipe_count === null ? "(no room count entered)" : fmt(r.wipe_count, 0) + " " + (fmt(r.wipe_count, 0) === "1" ? "wipe" : "wipes") + " across " + fmt(r.rooms, 0) + " " + (fmt(r.rooms, 0) === "1" ? "room" : "rooms") + " at " + fmt(r.surfaces_per_room, 0) + " surface types, plus " + fmt(r.blanks_per_job, 0) + " field blank" + (r.blanks_per_job === 1 ? "" : "s") + " -- " + fmt(r.total_samples, 0) + " to the laboratory" },
     { key: "n", id: "ldc-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeLeadDustClearance,

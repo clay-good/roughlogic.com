@@ -441,7 +441,7 @@ DIVING_RENDERERS["umbilical-air-supply"] = _simpleRenderer({
     { key: "feet_per_atm", label: "Feet per atmosphere (33 seawater, 34 fresh)", kind: "number", default: 33 },
   ],
   outputs: [
-    { key: "r", id: "uas-out-r", label: "Surface flow required at depth (scfm = acfm x ata)", value: (r) => fmt(r.required_scfm, 1) + " scfm for " + fmt(r.diver_count, 0) + " divers (" + fmt(r.per_diver_scfm, 2) + " each at " + fmt(r.depth_ata, 2) + " ata) -- " + r.flow_verdict },
+    { key: "r", id: "uas-out-r", label: "Surface flow required at depth (scfm = acfm x ata)", value: (r) => fmt(r.required_scfm, 1) + " scfm for " + fmt(r.diver_count, 0) + " " + (fmt(r.diver_count, 0) === "1" ? "diver" : "divers") + " (" + fmt(r.per_diver_scfm, 2) + " each at " + fmt(r.depth_ata, 2) + " ata) -- " + r.flow_verdict },
     { key: "a", id: "uas-out-a", label: "The same spread on the deeper job", value: (r) => fmt(r.alt_required_scfm, 1) + " scfm at " + fmt(r.alt_depth_ft, 0) + " ft, with nothing changed but depth" },
     { key: "d", id: "uas-out-d", label: "Deepest this compressor meets the requirement", value: (r) => fmt(r.max_depth_ft, 0) + " ft -- the operational limit of the spread, worth knowing before the job" },
     { key: "v", id: "uas-out-v", label: "Reserve supply, a separate requirement", value: (r) => fmt(r.reserve_required_cuft, 0) + " cu ft needed against " + fmt(r.tank_free_gas_cuft, 0) + " cu ft of free gas in the tank -- " + r.reserve_verdict },
@@ -562,7 +562,7 @@ DIVING_RENDERERS["lift-bag-sizing"] = _simpleRenderer({
     { key: "w", id: "lbs-out-w", label: "Lift needed", value: (r) => fmt(r.required_lift_lb, 0) + " lb (in-water weight " + fmt(r.in_water_weight_lb, 0) + " lb)" },
     { key: "v", id: "lbs-out-v", label: "Bag displacement", value: (r) => fmt(r.bag_volume_cuft, 1) + " cu ft of water displaced" },
     { key: "a", id: "lbs-out-a", label: "Air to fill at depth", value: (r) => fmt(r.surface_air_cuft, 1) + " cu ft of free (surface) air" },
-    { key: "b", id: "lbs-out-b", label: "Bags", value: (r) => (r.has_rating ? r.bags_needed + " bags at that rating" : "enter a bag rating") },
+    { key: "b", id: "lbs-out-b", label: "Bags", value: (r) => (r.has_rating ? r.bags_needed + " " + (r.bags_needed === 1 ? "bag" : "bags") + " at that rating" : "enter a bag rating") },
     { key: "n", id: "lbs-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeLiftBagSizing,

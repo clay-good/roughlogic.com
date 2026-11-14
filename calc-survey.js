@@ -126,7 +126,7 @@ function renderAreaByCoordinates(inputRegion, outputRegion, citationEl) {
     const r = computeAreaByCoordinates({ points: pointList }); stepsFor(outputRegion, inputRegion, ["points"], r);
     if (r.error) { oArea.textContent = r.error; oPerim.textContent = "-"; oWind.textContent = "-"; return; }
     oArea.textContent = fmt(r.area_ft2, 1) + " ft2 (" + fmt(r.area_acres, 4) + " ac / " + fmt(r.area_m2, 1) + " m2)";
-    oPerim.textContent = fmt(r.perimeter_ft, 1) + " ft over " + r.distinct_points + " corners";
+    oPerim.textContent = fmt(r.perimeter_ft, 1) + " ft over " + r.distinct_points + " " + (r.distinct_points === 1 ? "corner" : "corners");
     oWind.textContent = r.winding;
   }, DEBOUNCE_MS);
   pts.input.addEventListener("input", update);
@@ -222,7 +222,7 @@ function renderTraverseClosure(inputRegion, outputRegion, citationEl) {
     const r = computeTraverseClosure({ courses: list, n0: readNum(n0.input), e0: readNum(e0.input) }); stepsFor(outputRegion, inputRegion, ["courses", "n0", "e0"], r);
     if (r.error) { oClosure.textContent = r.error; oComponents.textContent = "-"; oEnd.textContent = "-"; return; }
     oClosure.textContent = r.closure_note;
-    oComponents.textContent = "sum lat " + fmt(r.sum_lat, 3) + " ft, sum dep " + fmt(r.sum_dep, 3) + " ft, misclosure " + fmt(r.linear_misclosure, 3) + " ft over " + r.courses_count + " courses";
+    oComponents.textContent = "sum lat " + fmt(r.sum_lat, 3) + " ft, sum dep " + fmt(r.sum_dep, 3) + " ft, misclosure " + fmt(r.linear_misclosure, 3) + " ft over " + r.courses_count + " " + (r.courses_count === 1 ? "course" : "courses");
     const end = r.adjusted[r.adjusted.length - 1];
     oEnd.textContent = "N " + fmt(end.n, 3) + " / E " + fmt(end.e, 3);
   }, DEBOUNCE_MS);
@@ -1271,8 +1271,8 @@ SURVEY_RENDERERS["drone-gsd-overlap"] = _simpleRenderer({
     { key: "g", id: "dgo-out-g", label: "Ground sample distance", value: (r) => fmt(r.gsd_cm_px, 3) + " cm per pixel -- RESOLUTION, not accuracy, which comes from ground control" },
     { key: "f", id: "dgo-out-f", label: "Image footprint", value: (r) => fmt(r.footprint_width_ft, 1) + " ft across track by " + fmt(r.footprint_height_ft, 1) + " ft along track" },
     { key: "s", id: "dgo-out-s", label: "Flight geometry", value: (r) => fmt(r.line_spacing_ft, 1) + " ft between lines at " + fmt(r.side_overlap_pct, 0) + "% side overlap, a shot every " + fmt(r.shot_interval_ft, 1) + " ft at " + fmt(r.forward_overlap_pct, 0) + "% forward" },
-    { key: "c", id: "dgo-out-c", label: "Images", value: (r) => r.image_count === null ? "(no area entered)" : fmt(r.image_count, 0) + " over " + fmt(r.area_acres, 1) + " acres, about " + fmt(r.line_count, 0) + " lines" },
-    { key: "h", id: "dgo-out-h", label: "Flying half as high", value: (r) => fmt(r.half_height_gsd_cm_px, 3) + " cm per pixel" + (r.half_height_image_count === null ? "" : " and " + fmt(r.half_height_image_count, 0) + " images -- FOUR times as many for twice the detail, because both footprint dimensions halve at once") },
+    { key: "c", id: "dgo-out-c", label: "Images", value: (r) => r.image_count === null ? "(no area entered)" : fmt(r.image_count, 0) + " over " + fmt(r.area_acres, 1) + " acres, about " + fmt(r.line_count, 0) + " " + (fmt(r.line_count, 0) === "1" ? "line" : "lines") },
+    { key: "h", id: "dgo-out-h", label: "Flying half as high", value: (r) => fmt(r.half_height_gsd_cm_px, 3) + " cm per pixel" + (r.half_height_image_count === null ? "" : " and " + fmt(r.half_height_image_count, 0) + " " + (fmt(r.half_height_image_count, 0) === "1" ? "image" : "images") + " -- FOUR times as many for twice the detail, because both footprint dimensions halve at once") },
     { key: "n", id: "dgo-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeDroneGsdOverlap,
@@ -1333,7 +1333,7 @@ SURVEY_RENDERERS["lidar-point-density"] = _simpleRenderer({
   outputs: [
     { key: "s", id: "lpd-out-s", label: "Swath width", value: (r) => fmt(r.swath_width_m, 1) + " m at " + fmt(r.flight_height_m, 0) + " m and a " + fmt(r.scan_angle_deg, 0) + " degree scan" },
     { key: "d", id: "lpd-out-d", label: "Point density", value: (r) => fmt(r.point_density_per_m2, 1) + " points per sq m -- about " + fmt(r.point_spacing_m, 3) + " m between points" },
-    { key: "l", id: "lpd-out-l", label: "Line spacing", value: (r) => fmt(r.line_spacing_m, 1) + " m at " + fmt(r.side_overlap_pct, 0) + "% side overlap" + (r.line_count === null ? "" : ", about " + fmt(r.line_count, 0) + " lines over " + fmt(r.area_acres, 0) + " acres") },
+    { key: "l", id: "lpd-out-l", label: "Line spacing", value: (r) => fmt(r.line_spacing_m, 1) + " m at " + fmt(r.side_overlap_pct, 0) + "% side overlap" + (r.line_count === null ? "" : ", about " + fmt(r.line_count, 0) + " " + (fmt(r.line_count, 0) === "1" ? "line" : "lines") + " over " + fmt(r.area_acres, 0) + " " + (fmt(r.area_acres, 0) === "1" ? "acre" : "acres")) },
     { key: "v", id: "lpd-out-v", label: "Half the speed", value: (r) => fmt(r.half_speed_density, 1) + " points per sq m, and twice the flight time -- a linear trade" },
     { key: "h", id: "lpd-out-h", label: "Half the height", value: (r) => fmt(r.half_height_density, 1) + " points per sq m, but the swath falls to " + fmt(r.half_height_swath_m, 1) + " m so it takes " + fmt(r.half_height_line_multiple, 1) + "x the flight lines. Altitude is the expensive lever" },
     { key: "n", id: "lpd-out-n", label: "Note", value: (r) => r.note },

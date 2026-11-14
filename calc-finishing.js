@@ -189,7 +189,7 @@ FINISHING_RENDERERS["pretreatment-bath-dragout"] = _simpleRenderer({
   outputs: [
     { key: "d", id: "pbd-out-d", label: "Dragout volume", value: (r) => fmt(r.dragout_gal_day, 1) + " gal/day" },
     { key: "c", id: "pbd-out-c", label: "Concentrate lost (makeup)", value: (r) => fmt(r.concentrate_gal_day, 2) + " gal/day concentrate + " + fmt(r.makeup_water_gal_day, 1) + " gal/day water" },
-    { key: "t", id: "pbd-out-t", label: "Bath turnover by dragout", value: (r) => fmt(r.bath_turnover_days, 0) + " days" },
+    { key: "t", id: "pbd-out-t", label: "Bath turnover by dragout", value: (r) => fmt(r.bath_turnover_days, 0) + " " + (fmt(r.bath_turnover_days, 0) === "1" ? "day" : "days") },
     { key: "s", id: "pbd-out-s", label: "Single rinse tank", value: (r) => fmt(r.single_rinse_gal_day, 0) + " gal/day" },
     { key: "f", id: "pbd-out-f", label: "At the entered stage count", value: (r) => fmt(r.rinse_flow_gal_day, 0) + " gal/day at " + r.stages + " stage(s), " + fmt(r.saving_vs_single_pct, 2) + " % less than one tank" },
     { key: "s2", id: "pbd-out-2", label: "Two counterflow stages", value: (r) => fmt(r.two_stage_gal_day, 0) + " gal/day (" + fmt(r.two_stage_saving_pct, 2) + " % saving)" },

@@ -677,7 +677,7 @@ MASONRY_RENDERERS["masonry-joint-reinforcement"] = _simpleRenderer({
   outputs: [
     { key: "c", id: "mjr-out-c", label: "Reinforced courses", value: (r) => fmt(r.reinforced_courses, 0) },
     { key: "p", id: "mjr-out-p", label: "Pieces per course", value: (r) => fmt(r.pieces_per_course, 0) },
-    { key: "t", id: "mjr-out-t", label: "Total wire pieces", value: (r) => fmt(r.total_pieces, 0) + " pieces" },
+    { key: "t", id: "mjr-out-t", label: "Total wire pieces", value: (r) => fmt(r.total_pieces, 0) + " " + (fmt(r.total_pieces, 0) === "1" ? "piece" : "pieces") },
     { key: "n", id: "mjr-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeMasonryJointReinforcement,
@@ -996,7 +996,7 @@ MASONRY_RENDERERS["mortar-batch-c270"] = _simpleRenderer({
   ],
   outputs: [
     { key: "c", id: "mbc-out-c", label: "Cementitious", value: (r) => fmt(r.cement_cuft, 2) + " cu ft of cement (" + fmt(r.cement_bags, 0) + " bag" + (r.cement_bags === 1 ? "" : "s") + ", " + fmt(r.cement_weight_lb, 0) + " lb) and " + fmt(r.lime_cuft, 2) + " cu ft of lime (" + fmt(r.lime_bags, 2) + " bag equivalent, " + fmt(r.lime_weight_lb, 0) + " lb)" },
-    { key: "s", id: "mbc-out-s", label: "Sand", value: (r) => fmt(r.sand_cuft, 2) + " cu ft, about " + fmt(r.sand_shovels, 0) + " shovels of damp sand" },
+    { key: "s", id: "mbc-out-s", label: "Sand", value: (r) => fmt(r.sand_cuft, 2) + " cu ft, about " + fmt(r.sand_shovels, 0) + " " + (fmt(r.sand_shovels, 0) === "1" ? "shovel" : "shovels") + " of damp sand" },
     { key: "r", id: "mbc-out-r", label: "Sand against the allowable range", value: (r) => r.sand_verdict },
     { key: "y", id: "mbc-out-y", label: "Batch yield", value: (r) => fmt(r.batch_yield_cuft, 2) + " cu ft before water" },
     { key: "k", id: "mbc-out-k", label: "Mortar against the unit", value: (r) => r.compat_verdict },

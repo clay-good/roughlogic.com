@@ -361,7 +361,7 @@ function _v896renderPvRailClampTakeoff(inputRegion, outputRegion, citationEl) {
     oRail.textContent = fmt(r.rail_lf, 1) + " LF (" + fmt(r.run_len_ft, 2) + " ft per run)";
     oMid.textContent = fmt(r.mid_clamps, 0) + " mid clamps";
     oEnd.textContent = fmt(r.end_clamps, 0) + " end clamps";
-    oSpl.textContent = fmt(r.splices, 0) + " splices";
+    oSpl.textContent = fmt(r.splices, 0) + " " + (fmt(r.splices, 0) === "1" ? "splice" : "splices");
   }, DEBOUNCE_MS);
   for (const f of [rw, mp, mw, gp, rp, rs]) f.input.addEventListener("input", update);
 }
