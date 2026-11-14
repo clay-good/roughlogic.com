@@ -1,9 +1,9 @@
 {
   "name": "construction",
-  "version": "2026-11-02",
-  "fetched": "2026-11-02",
+  "version": "2026-11-09",
+  "fetched": "2026-11-09",
   "edition": "IRC 2021 / IBC 2021 cited by section number (IRC 2024 and IBC 2027 are the current published editions; bundled values follow 2021 and the tile citations disclose it); ASCE 7 formulas applied (no licensed text reproduced); ACI 211 / ACI 318 / ACI 347 cited by name (ACI 318 provisions follow 318-19; ACI CODE-318-25, published 2025, is the current edition); ASTM A615 + CRSI rebar values; APA span-rating tables (technical-bulletin reuse); ICC-ES AC358 helical-pile Kt; ASME B30.5 / B30.9 + OSHA 29 CFR 1926 Subpart CC for crane-lift; ASTM/SAE bolt grades; AWS deposition; lumber properties from public engineering references; verified 2026-09-02.",
-  "asOf": "2026-11-02",
+  "asOf": "2026-11-09",
   "refresh_cadence": "annual",
   "shards": [
     {
@@ -70,7 +70,7 @@
   "hashes": {
     "lumber-properties.json": "947041f4cb75814aa707ed283fa6dcd65885aec3c69362c004f6c9c80729b015",
     "concrete-mixes.json": "4c302a4012faa2b2e034dc826accbcab49860ed23dc204f68071d70372f5a45f",
-    "span-derivations.json": "d1405b68d327b7c81a6261602df9fbc606bd173bd4956e88ceb5d6db5d1fc6d3",
+    "span-derivations.json": "f731c7075b22429eb6a189f416f2f00836781bd39cc67cbed180846af47ad53b",
     "soil-bearing.json": "a757623cfa441880a29623e8ff73e39fd084427046fd66e6f4608535986de96e",
     "wind-snow-zones.json": "c595680fe26d86d17e3ead00c4a18967a823c3c8c67bc09210025906ca2066b4",
     "aci-211-curves.json": "bb85e0973fb931d12489c2509428985b9495df214430270081f7fe9649f0dbec",
