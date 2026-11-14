@@ -1515,7 +1515,7 @@ FIELD_RENDERERS["litter-carry-team"] = _r({
   ],
   outputs: [
     { key: "t", id: "ltcy-out-t", label: "Carry time", value: (r) => fmt(r.carry_time_hr, 2) + " hr (" + fmt(r.carry_time_min, 0) + " min)" },
-    { key: "m", id: "ltcy-out-m", label: "Teams in rotation", value: (r) => String(r.teams_needed) + " teams, " + String(r.carriers_needed) + " carriers" },
+    { key: "m", id: "ltcy-out-m", label: "Teams in rotation", value: (r) => String(r.teams_needed) + " " + (String(r.teams_needed) === "1" ? "team" : "teams") + ", " + String(r.carriers_needed) + " " + (String(r.carriers_needed) === "1" ? "carrier" : "carriers") },
     { key: "p", id: "ltcy-out-p", label: "Total personnel", value: (r) => String(r.total_personnel) + " people" },
     { key: "h", id: "ltcy-out-h", label: "Person-hours", value: (r) => fmt(r.person_hours, 1) },
     { key: "r", id: "ltcy-out-r", label: "Rotations during the carry", value: (r) => fmt(r.rotations, 1) },

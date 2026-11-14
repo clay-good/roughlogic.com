@@ -3384,7 +3384,7 @@ export function renderGroundingElectrode(inputRegion, outputRegion, citationEl) 
     }
     oR.textContent = fmt(r.resistance_ohms, 2) + " ohms";
     o25.textContent = r.meets_25_ohm ? "Yes" : "No";
-    oS.textContent = r.supplemental_count_to_25_ohm === 0 ? "Single electrode meets 25-ohm" : String(r.supplemental_count_to_25_ohm) + " electrodes (estimate; ignores mutual impedance)";
+    oS.textContent = r.supplemental_count_to_25_ohm === 0 ? "Single electrode meets 25-ohm" : String(r.supplemental_count_to_25_ohm) + " " + (String(r.supplemental_count_to_25_ohm) === "1" ? "electrode" : "electrodes") + " (estimate; ignores mutual impedance)";
     oW.textContent = r.warnings.length > 0 ? r.warnings.join(" ") : "IEEE 142 closed-form; field megger reading is authoritative.";
   }, DEBOUNCE_MS);
   for (const f of [t.select, rho.input, rd.input, rl.input, Du.input, dc.input, sR.input, pA.input, pS.input, ucd.input]) f.addEventListener("input", update);

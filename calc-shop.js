@@ -2760,7 +2760,7 @@ SHOP_RENDERERS["plasma-cut-speed"] = _simpleRenderer({
     { key: "t", id: "plcs-out-t", label: "Cut time per part", value: (r) => fmt(r.cut_time_min, 2) + " min (" + fmt(r.arc_hours_per_part, 4) + " arc hours)" },
     { key: "p", id: "plcs-out-p", label: "Parts per set by pierces", value: (r) => String(r.parts_by_pierces) },
     { key: "a", id: "plcs-out-a", label: "Parts per set by arc hours", value: (r) => String(r.parts_by_arc_hours) },
-    { key: "g", id: "plcs-out-g", label: "Governing limit", value: (r) => r.governing + " at " + String(r.parts_per_set) + " parts per set" },
+    { key: "g", id: "plcs-out-g", label: "Governing limit", value: (r) => r.governing + " at " + String(r.parts_per_set) + " " + (String(r.parts_per_set) === "1" ? "part" : "parts") + " per set" },
     { key: "c", id: "plcs-out-c", label: "Consumable cost", value: (r) => "$" + fmt(r.cost_per_part, 2) + " per part ($" + fmt(r.cost_per_foot, 3) + " per foot of cut)" },
     { key: "n", id: "plcs-out-n", label: "Note", value: (r) => r.note },
   ],

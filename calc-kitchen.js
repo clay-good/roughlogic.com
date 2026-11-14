@@ -1976,7 +1976,7 @@ KITCHEN_RENDERERS["par-level-order"] = _r({
     { key: "c", id: "parl-out-c", label: "Coverage window", value: (r) => fmt(r.coverage_days, 1) + " days" },
     { key: "p", id: "parl-out-p", label: "Par level", value: (r) => fmt(r.par_level, 1) + " units" },
     { key: "o", id: "parl-out-o", label: "Order needed", value: (r) => fmt(r.order_needed, 1) + " units" },
-    { key: "s", id: "parl-out-s", label: "Cases to order", value: (r) => String(r.cases) + " cases (" + fmt(r.ordered_quantity, 1) + " units)" },
+    { key: "s", id: "parl-out-s", label: "Cases to order", value: (r) => String(r.cases) + " " + (String(r.cases) === "1" ? "case" : "cases") + " (" + fmt(r.ordered_quantity, 1) + " units)" },
     { key: "v", id: "parl-out-v", label: "Overshoot above par", value: (r) => fmt(r.overshoot, 1) + " units" },
     { key: "n", id: "parl-out-n", label: "Note", value: (r) => r.note },
   ],

@@ -2600,8 +2600,8 @@ const renderPlantSpacingCount = _v23SimpleRenderer({
     { key: "spacing_in", label: "On-center spacing (in)", kind: "number" },
   ],
   outputs: [
-    { key: "sq", id: "psc-out-sq", label: "Square grid", value: (r) => String(r.square_n) + " plants" },
-    { key: "tri", id: "psc-out-tri", label: "Triangular grid", value: (r) => String(r.triangular_n) + " plants (staggered, ~15% more)" },
+    { key: "sq", id: "psc-out-sq", label: "Square grid", value: (r) => String(r.square_n) + " " + (String(r.square_n) === "1" ? "plant" : "plants") },
+    { key: "tri", id: "psc-out-tri", label: "Triangular grid", value: (r) => String(r.triangular_n) + " " + (String(r.triangular_n) === "1" ? "plant" : "plants") + " (staggered, ~15% more)" },
     { key: "n", id: "psc-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computePlantSpacingCount,

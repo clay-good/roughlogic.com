@@ -781,7 +781,7 @@ STAGEPRODUCTION_RENDERERS["video-wall-data-rate"] = _r({
   outputs: [
     { key: "p", id: "vwdr-out-p", label: "Total pixels", value: (r) => fmt(r.total_pixels, 0) },
     { key: "d", id: "vwdr-out-d", label: "Uncompressed data rate", value: (r) => fmt(r.data_rate_gbps, 2) + " Gbps" },
-    { key: "n", id: "vwdr-out-n", label: "Processor ports required", value: (r) => String(r.ports_needed) + " ports" },
+    { key: "n", id: "vwdr-out-n", label: "Processor ports required", value: (r) => String(r.ports_needed) + " " + (String(r.ports_needed) === "1" ? "port" : "ports") },
     { key: "s", id: "vwdr-out-s", label: "Spare capacity on the last port", value: (r) => fmt(r.spare_pixels, 0) + " " + (fmt(r.spare_pixels, 0) === "1" ? "pixel" : "pixels") + " (" + fmt(r.last_port_used, 0) + " used)" },
     { key: "z", id: "vwdr-out-z", label: "Note", value: (r) => r.note },
   ],

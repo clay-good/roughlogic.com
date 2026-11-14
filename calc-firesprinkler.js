@@ -669,7 +669,7 @@ FIRESPRINKLER_RENDERERS["hydrant-spacing-count"] = _simpleRenderer({
   outputs: [
     { key: "f", id: "hysp-out-f", label: "Hydrants by the flow rule", value: (r) => String(r.hydrants_by_flow) },
     { key: "s", id: "hysp-out-s", label: "Hydrants by the spacing rule", value: (r) => String(r.hydrants_by_frontage) },
-    { key: "c", id: "hysp-out-c", label: "Governing count", value: (r) => String(r.governing_count) + " hydrants -- " + r.governing + " governs" },
+    { key: "c", id: "hysp-out-c", label: "Governing count", value: (r) => String(r.governing_count) + " " + (String(r.governing_count) === "1" ? "hydrant" : "hydrants") + " -- " + r.governing + " governs" },
     { key: "a", id: "hysp-out-a", label: "Resulting spacing", value: (r) => fmt(r.actual_spacing_ft, 0) + " ft apart, worst point " + fmt(r.worst_distance_ft, 0) + " ft from a hydrant" },
     { key: "v", id: "hysp-out-v", label: "Against the distance limit", value: (r) => r.verdict },
     { key: "n", id: "hysp-out-n", label: "Note", value: (r) => r.note },

@@ -9,14 +9,16 @@ import assert from "node:assert/strict";
 import { readFileSync, readdirSync } from "node:fs";
 
 const ROOT = new URL("../../", import.meta.url);
-const NOT_A_PLURAL_NOUN = new Set(["governs", "vs", "pass", "cfs", "fps", "pays", "times", "plus", "minus", "gas", "less",
+const NOT_A_PLURAL_NOUN = new Set(["governs", "vs", "pass", "cfs", "fps", "pays", "times", "plus", "minus", "gas", "less", "across", "this", "pervious", "gross",
   // calc-soilproperties.js: a soil type name followed by a verb ("Gravel needs ...").
   "needs",
   // calc-airquality.js: "<area> reaches 99%" -- a verb after an area figure.
   "reaches"]);
 // The result-key form (`fmt(r.bags, 0)`) and, since the same day's second pass
 // over computes' verdict sentences, the local-variable form (`fmt(days, 0)`).
-const SHAPE = /(?:fmt\((?:(?:r|x|res|out)\.)?[A-Za-z_][A-Za-z_0-9]*, ?0\)|(?:r|x)\.[a-z_0-9]+) \+ " ([a-z]+s)\b/g;
+// A third pass the same day added the material-order factories' forms,
+// `_fmtC(r.rolls, 0)` and `String(r.sheets)` (61 lines).
+const SHAPE = /(?:(?:fmt|_fmtC)\((?:(?:r|x|res|out)\.)?[A-Za-z_][A-Za-z_0-9]*, ?0\)|String\((?:r|x)\.[a-z_0-9]+\)|(?:r|x)\.[a-z_0-9]+) \+ " ([a-z]+s)\b/g;
 
 test("count nouns: a whole count is not printed beside a fixed plural noun", () => {
   const hits = [];

@@ -412,7 +412,7 @@ FINISH_RENDERERS["deck-board-takeoff"] = _simpleRenderer({
     { key: "waste_pct", label: "Waste (%)", kind: "number", default: 10 },
   ],
   outputs: [
-    { key: "b", id: "deck-out-b", label: "Deck boards", value: (r) => String(r.boards) + " boards across" },
+    { key: "b", id: "deck-out-b", label: "Deck boards", value: (r) => String(r.boards) + " " + (String(r.boards) === "1" ? "board" : "boards") + " across" },
     { key: "l", id: "deck-out-l", label: "Lineal feet (with waste)", value: (r) => fmt(r.lineal_ft, 0) + " lf" },
     { key: "j", id: "deck-out-j", label: "Joists carrying the deck", value: (r) => String(r.joists) },
     { key: "s", id: "deck-out-s", label: "Deck screws (2 per board per joist)", value: (r) => fmt(r.screws, 0) },
@@ -617,8 +617,8 @@ FINISH_RENDERERS["step-flashing-count"] = _simpleRenderer({
     { key: "waste_pct", label: "Waste (percent)", kind: "number", default: 5 },
   ],
   outputs: [
-    { key: "p", id: "sfc-out-p", label: "Step-flashing pieces (one per course + 1)", value: (r) => String(r.step_flashing_pieces) + " pieces" },
-    { key: "o", id: "sfc-out-o", label: "Order with waste", value: (r) => String(r.order_pieces) + " pieces" },
+    { key: "p", id: "sfc-out-p", label: "Step-flashing pieces (one per course + 1)", value: (r) => String(r.step_flashing_pieces) + " " + (String(r.step_flashing_pieces) === "1" ? "piece" : "pieces") },
+    { key: "o", id: "sfc-out-o", label: "Order with waste", value: (r) => String(r.order_pieces) + " " + (String(r.order_pieces) === "1" ? "piece" : "pieces") },
     { key: "n", id: "sfc-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeStepFlashingCount,

@@ -2158,7 +2158,7 @@ const renderAsphaltPavingSpeed = _simpleRenderer({
   outputs: [
     { key: "tph", id: "aps-out-tph", label: "Production", value: (r) => _fmtC(r.tons_per_hour, 1) + " tons/hr" },
     { key: "lph", id: "aps-out-lph", label: "Lane feet per hour", value: (r) => _fmtC(r.lane_ft_per_hour, 0) + " lane-ft/hr" },
-    { key: "dt", id: "aps-out-dt", label: "Daily tonnage", value: (r) => _fmtC(r.daily_tons, 0) + " tons/day" },
+    { key: "dt", id: "aps-out-dt", label: "Daily tonnage", value: (r) => _fmtC(r.daily_tons, 0) + " " + (_fmtC(r.daily_tons, 0) === "1" ? "ton" : "tons") + "/day" },
     { key: "dl", id: "aps-out-dl", label: "Daily lane feet", value: (r) => _fmtC(r.daily_lane_ft, 0) + " lane-ft/day" },
     { key: "n", id: "aps-out-n", label: "Note", value: (r) => r.note },
   ],
@@ -8454,7 +8454,7 @@ const _v818renderStockpileVolume = _simpleRenderer({
   ],
   outputs: [
     { key: "v", id: "spv-out-v", label: "Volume", value: (r) => _fmtC(r.volume_cy, 0) + " cy (" + _fmtC(r.volume_ft3, 0) + " ft^3)" },
-    { key: "t", id: "spv-out-t", label: "Tonnage", value: (r) => _fmtC(r.tons, 0) + " tons" },
+    { key: "t", id: "spv-out-t", label: "Tonnage", value: (r) => _fmtC(r.tons, 0) + " " + (_fmtC(r.tons, 0) === "1" ? "ton" : "tons") },
     { key: "h", id: "spv-out-h", label: "Pile height", value: (r) => _fmtC(r.height_ft, 1) + " ft" },
     { key: "n", id: "spv-out-n", label: "Note", value: (r) => r.note },
   ],
@@ -8500,7 +8500,7 @@ const _v1327renderWindrowStockpileVolume = _simpleRenderer({
   ],
   outputs: [
     { key: "v", id: "wsp-out-v", label: "Volume", value: (r) => _fmtC(r.volume_cy, 0) + " cy (" + _fmtC(r.volume_ft3, 0) + " ft^3)" },
-    { key: "t", id: "wsp-out-t", label: "Tonnage", value: (r) => _fmtC(r.tons, 0) + " tons" },
+    { key: "t", id: "wsp-out-t", label: "Tonnage", value: (r) => _fmtC(r.tons, 0) + " " + (_fmtC(r.tons, 0) === "1" ? "ton" : "tons") },
     { key: "h", id: "wsp-out-h", label: "Pile height", value: (r) => _fmtC(r.height_ft, 1) + " ft" },
     { key: "n", id: "wsp-out-n", label: "Note", value: (r) => r.note },
   ],
@@ -8543,7 +8543,7 @@ const _v1328renderFlatTopStockpileVolume = _simpleRenderer({
   ],
   outputs: [
     { key: "v", id: "ftsp-out-v", label: "Volume", value: (r) => _fmtC(r.volume_cy, 0) + " cy (" + _fmtC(r.volume_ft3, 0) + " ft^3)" },
-    { key: "t", id: "ftsp-out-t", label: "Tonnage", value: (r) => _fmtC(r.tons, 0) + " tons" },
+    { key: "t", id: "ftsp-out-t", label: "Tonnage", value: (r) => _fmtC(r.tons, 0) + " " + (_fmtC(r.tons, 0) === "1" ? "ton" : "tons") },
     { key: "h", id: "ftsp-out-h", label: "Pile height", value: (r) => _fmtC(r.height_ft, 1) + " ft" },
     { key: "n", id: "ftsp-out-n", label: "Note", value: (r) => r.note },
   ],
@@ -8593,7 +8593,7 @@ const _v819renderWeldedWireMesh = _simpleRenderer({
     { key: "waste_pct", label: "Waste / cutting allowance (%)", kind: "number", default: 5 },
   ],
   outputs: [
-    { key: "s", id: "wwm-out-s", label: "Sheets to order", value: (r) => String(r.sheets) + " sheets (" + _fmtC(r.purchased_sf, 0) + " sf purchased)" },
+    { key: "s", id: "wwm-out-s", label: "Sheets to order", value: (r) => String(r.sheets) + " " + (String(r.sheets) === "1" ? "sheet" : "sheets") + " (" + _fmtC(r.purchased_sf, 0) + " sf purchased)" },
     { key: "e", id: "wwm-out-e", label: "Effective coverage per sheet", value: (r) => _fmtC(r.effective_sheet_sf, 2) + " sf" },
     { key: "g", id: "wwm-out-g", label: "Gross area with waste", value: (r) => _fmtC(r.gross_area_sf, 0) + " sf" },
     { key: "n", id: "wwm-out-n", label: "Note", value: (r) => r.note },
@@ -9524,7 +9524,7 @@ const _v859renderDuctWrapTakeoff = _simpleRenderer({
     { key: "roll_coverage_sf", label: "Installed coverage per roll (ft²)", kind: "number" },
   ],
   outputs: [
-    { key: "r", id: "dwt-out-r", label: "Wrap rolls to order", value: (r) => _fmtC(r.rolls, 0) + " rolls" },
+    { key: "r", id: "dwt-out-r", label: "Wrap rolls to order", value: (r) => _fmtC(r.rolls, 0) + " " + (_fmtC(r.rolls, 0) === "1" ? "roll" : "rolls") },
     { key: "a", id: "dwt-out-a", label: "Wrap area", value: (r) => _fmtC(r.wrap_sf, 0) + " sf (" + _fmtC(r.perimeter_ft, 2) + " ft girth)" },
     { key: "note", id: "dwt-out-note", label: "Note", value: (r) => r.note },
   ],
@@ -9608,7 +9608,7 @@ const _v862renderRoofUnderlaymentRolls = _simpleRenderer({
     { key: "lap_waste_pct", label: "Lap + waste allowance (percent)", kind: "number" },
   ],
   outputs: [
-    { key: "r", id: "rur-out-r", label: "Underlayment rolls to order", value: (r) => _fmtC(r.rolls, 0) + " rolls" },
+    { key: "r", id: "rur-out-r", label: "Underlayment rolls to order", value: (r) => _fmtC(r.rolls, 0) + " " + (_fmtC(r.rolls, 0) === "1" ? "roll" : "rolls") },
     { key: "note", id: "rur-out-note", label: "Note", value: (r) => r.note },
   ],
   compute: computeRoofUnderlaymentRolls,
@@ -9656,7 +9656,7 @@ const _v863renderMembraneRoofTakeoff = _simpleRenderer({
     { key: "waste_pct", label: "Waste allowance (percent)", kind: "number" },
   ],
   outputs: [
-    { key: "r", id: "mrt-out-r", label: "Membrane rolls", value: (r) => _fmtC(r.rolls, 0) + " rolls" },
+    { key: "r", id: "mrt-out-r", label: "Membrane rolls", value: (r) => _fmtC(r.rolls, 0) + " " + (_fmtC(r.rolls, 0) === "1" ? "roll" : "rolls") },
     { key: "s", id: "mrt-out-s", label: "Seam length to weld (upper bound)", value: (r) => _fmtC(r.seam_lf, 0) + " LF (" + _fmtC(r.usable_w_ft, 1) + " ft usable width) -- the total strip run; the welded seams between strips are one strip-length shorter" },
     { key: "note", id: "mrt-out-note", label: "Note", value: (r) => r.note },
   ],
@@ -9745,7 +9745,7 @@ const _v865renderSheathingTakeoff = _simpleRenderer({
     { key: "nails_per_sheet", label: "Nails per panel from the schedule", kind: "number" },
   ],
   outputs: [
-    { key: "s", id: "sht-out-s", label: "Sheathing panels", value: (r) => _fmtC(r.sheets, 0) + " sheets" },
+    { key: "s", id: "sht-out-s", label: "Sheathing panels", value: (r) => _fmtC(r.sheets, 0) + " " + (_fmtC(r.sheets, 0) === "1" ? "sheet" : "sheets") },
     { key: "n", id: "sht-out-n", label: "Nails to order", value: (r) => _fmtC(r.nails, 0) },
     { key: "note", id: "sht-out-note", label: "Note", value: (r) => r.note },
   ],
@@ -9789,7 +9789,7 @@ const _v866renderConstructionAdhesiveTubes = _simpleRenderer({
     { key: "bead_dia_in", label: "Bead diameter (in)", kind: "number" },
   ],
   outputs: [
-    { key: "t", id: "cat-out-t", label: "Adhesive tubes", value: (r) => _fmtC(r.tubes, 0) + " tubes" },
+    { key: "t", id: "cat-out-t", label: "Adhesive tubes", value: (r) => _fmtC(r.tubes, 0) + " " + (_fmtC(r.tubes, 0) === "1" ? "tube" : "tubes") },
     { key: "l", id: "cat-out-l", label: "Coverage per tube", value: (r) => _fmtC(r.lf_per_tube, 1) + " ft" },
     { key: "note", id: "cat-out-note", label: "Note", value: (r) => r.note },
   ],
@@ -9835,7 +9835,7 @@ const _v867renderSillPlateAnchorCount = _simpleRenderer({
     { key: "end_distance_in", label: "Bolt distance from each end (in)", kind: "number", default: 9 },
   ],
   outputs: [
-    { key: "b", id: "spa-out-b", label: "Anchor bolts", value: (r) => _fmtC(r.bolts, 0) + " bolts" },
+    { key: "b", id: "spa-out-b", label: "Anchor bolts", value: (r) => _fmtC(r.bolts, 0) + " " + (_fmtC(r.bolts, 0) === "1" ? "bolt" : "bolts") },
     { key: "e", id: "spa-out-e", label: "Span between end bolts", value: (r) => _fmtC(r.effective_len_ft, 1) + " ft" },
     { key: "note", id: "spa-out-note", label: "Note", value: (r) => r.note },
   ],
@@ -9878,7 +9878,7 @@ const _v868renderMetalStudTakeoff = _simpleRenderer({
     { key: "extra_per_opening", label: "Extra studs per opening", kind: "number" },
   ],
   outputs: [
-    { key: "s", id: "mst-out-s", label: "Steel studs", value: (r) => _fmtC(r.studs, 0) + " studs" },
+    { key: "s", id: "mst-out-s", label: "Steel studs", value: (r) => _fmtC(r.studs, 0) + " " + (_fmtC(r.studs, 0) === "1" ? "stud" : "studs") },
     { key: "t", id: "mst-out-t", label: "Track (top + bottom runners)", value: (r) => _fmtC(r.track_lf, 0) + " LF" },
     { key: "note", id: "mst-out-note", label: "Note", value: (r) => r.note },
   ],
@@ -9925,9 +9925,9 @@ const _v869renderSuspendedCeilingGrid = _simpleRenderer({
     { key: "room_width_ft", label: "Room width (ft)", kind: "number" },
   ],
   outputs: [
-    { key: "p", id: "scg-out-p", label: "Ceiling panels (2x4)", value: (r) => _fmtC(r.panels, 0) + " panels" },
+    { key: "p", id: "scg-out-p", label: "Ceiling panels (2x4)", value: (r) => _fmtC(r.panels, 0) + " " + (_fmtC(r.panels, 0) === "1" ? "panel" : "panels") },
     { key: "t", id: "scg-out-t", label: "Main + cross tee", value: (r) => _fmtC(r.main_tee_lf, 0) + " LF main / " + _fmtC(r.cross_tee_lf, 0) + " LF cross" },
-    { key: "w", id: "scg-out-w", label: "Wall angle + hangers", value: (r) => _fmtC(r.wall_angle_lf, 0) + " LF angle / " + _fmtC(r.hangers, 0) + " hangers" },
+    { key: "w", id: "scg-out-w", label: "Wall angle + hangers", value: (r) => _fmtC(r.wall_angle_lf, 0) + " LF angle / " + _fmtC(r.hangers, 0) + " " + (_fmtC(r.hangers, 0) === "1" ? "hanger" : "hangers") },
     { key: "note", id: "scg-out-note", label: "Note", value: (r) => r.note },
   ],
   compute: computeSuspendedCeilingGrid,
@@ -9972,7 +9972,7 @@ const _v870renderMasonryControlJointLayout = _simpleRenderer({
     { key: "max_spacing_cap_ft", label: "Project spacing cap (ft)", kind: "number" },
   ],
   outputs: [
-    { key: "j", id: "mcj-out-j", label: "Control joints", value: (r) => _fmtC(r.joints, 0) + " joints (" + _fmtC(r.panels, 0) + " panels)" },
+    { key: "j", id: "mcj-out-j", label: "Control joints", value: (r) => _fmtC(r.joints, 0) + " " + (_fmtC(r.joints, 0) === "1" ? "joint" : "joints") + " (" + _fmtC(r.panels, 0) + " " + (_fmtC(r.panels, 0) === "1" ? "panel" : "panels") + ")" },
     { key: "s", id: "mcj-out-s", label: "Max joint spacing", value: (r) => _fmtC(r.max_spacing_ft, 1) + " ft (panels ~" + _fmtC(r.panel_length_ft, 1) + " ft)" },
     { key: "note", id: "mcj-out-note", label: "Note", value: (r) => r.note },
   ],
@@ -10022,7 +10022,7 @@ const _v871renderDumpsterCount = _simpleRenderer({
     { key: "weight_cap_tons", label: "Container weight cap (tons)", kind: "number" },
   ],
   outputs: [
-    { key: "h", id: "dmp-out-h", label: "Hauls", value: (r) => _fmtC(r.hauls, 0) + " hauls (" + r.governs + " governs)" },
+    { key: "h", id: "dmp-out-h", label: "Hauls", value: (r) => _fmtC(r.hauls, 0) + " " + (_fmtC(r.hauls, 0) === "1" ? "haul" : "hauls") + " (" + r.governs + " governs)" },
     { key: "b", id: "dmp-out-b", label: "By volume / by weight", value: (r) => _fmtC(r.by_vol, 0) + " by volume, " + _fmtC(r.by_wt, 0) + " by weight" },
     { key: "note", id: "dmp-out-note", label: "Note", value: (r) => r.note },
   ],
@@ -10068,7 +10068,7 @@ const _v872renderSealantJointYield = _simpleRenderer({
     { key: "joint_depth_in", label: "Joint depth (in)", kind: "number" },
   ],
   outputs: [
-    { key: "c", id: "sjy-out-c", label: "Cartridges", value: (r) => _fmtC(r.cartridges, 0) + " cartridges" },
+    { key: "c", id: "sjy-out-c", label: "Cartridges", value: (r) => _fmtC(r.cartridges, 0) + " " + (_fmtC(r.cartridges, 0) === "1" ? "cartridge" : "cartridges") },
     { key: "l", id: "sjy-out-l", label: "Yield per cartridge", value: (r) => _fmtC(r.lf_per_cart, 1) + " ft" },
     { key: "note", id: "sjy-out-note", label: "Note", value: (r) => r.note },
   ],
@@ -10111,7 +10111,7 @@ const _v873renderSelfLevelerBags = _simpleRenderer({
     { key: "waste_pct", label: "Waste allowance (percent)", kind: "number", default: 5 },
   ],
   outputs: [
-    { key: "b", id: "slb-out-b", label: "Bags to order", value: (r) => _fmtC(r.bags, 0) + " bags" },
+    { key: "b", id: "slb-out-b", label: "Bags to order", value: (r) => _fmtC(r.bags, 0) + " " + (_fmtC(r.bags, 0) === "1" ? "bag" : "bags") },
     { key: "n", id: "slb-out-n", label: "Neat (no waste)", value: (r) => _fmtC(r.neat_bags, 1) + " bags" },
     { key: "note", id: "slb-out-note", label: "Note", value: (r) => r.note },
   ],
@@ -10201,7 +10201,7 @@ const _v875renderSfrmTakeoff = _simpleRenderer({
     { key: "waste_pct", label: "In-place waste / overspray (percent)", kind: "number", default: 15 },
   ],
   outputs: [
-    { key: "b", id: "sfr-out-b", label: "Bags to order", value: (r) => _fmtC(r.bags, 0) + " bags" },
+    { key: "b", id: "sfr-out-b", label: "Bags to order", value: (r) => _fmtC(r.bags, 0) + " " + (_fmtC(r.bags, 0) === "1" ? "bag" : "bags") },
     { key: "w", id: "sfr-out-w", label: "In-place material", value: (r) => _fmtC(r.weight_lb, 0) + " lb (" + _fmtC(r.volume_ft3, 0) + " ft^3)" },
     { key: "note", id: "sfr-out-note", label: "Note", value: (r) => r.note },
   ],
@@ -10244,7 +10244,7 @@ const _v876renderSprayFoamBoardFeet = _simpleRenderer({
     { key: "waste_pct", label: "Waste allowance (percent)", kind: "number" },
   ],
   outputs: [
-    { key: "s", id: "sfb-out-s", label: "Foam sets to order", value: (r) => _fmtC(r.sets, 0) + " sets" },
+    { key: "s", id: "sfb-out-s", label: "Foam sets to order", value: (r) => _fmtC(r.sets, 0) + " " + (_fmtC(r.sets, 0) === "1" ? "set" : "sets") },
     { key: "b", id: "sfb-out-b", label: "Board-feet", value: (r) => _fmtC(r.board_feet, 0) + " bd-ft" },
     { key: "note", id: "sfb-out-note", label: "Note", value: (r) => r.note },
   ],
@@ -10289,7 +10289,7 @@ const _v877renderMetalDeckTakeoff = _simpleRenderer({
     { key: "waste_pct", label: "Waste allowance (percent)", kind: "number", default: 5 },
   ],
   outputs: [
-    { key: "s", id: "mdt-out-s", label: "Deck sheets", value: (r) => _fmtC(r.sheets, 0) + " sheets" },
+    { key: "s", id: "mdt-out-s", label: "Deck sheets", value: (r) => _fmtC(r.sheets, 0) + " " + (_fmtC(r.sheets, 0) === "1" ? "sheet" : "sheets") },
     { key: "l", id: "mdt-out-l", label: "Side-lap run, fastening (upper bound)", value: (r) => _fmtC(r.sidelap_lf, 0) + " LF -- the total sheet run; the laps between sheets are one sheet-run shorter" },
     { key: "note", id: "mdt-out-note", label: "Note", value: (r) => r.note },
   ],
@@ -10344,7 +10344,7 @@ const _v878renderRebarTieWire = _simpleRenderer({
   ],
   outputs: [
     { key: "w", id: "rtw-out-w", label: "Tie wire", value: (r) => _fmtC(r.wire_lb, 1) + " lb (" + _fmtC(r.wire_ft, 0) + " ft)" },
-    { key: "t", id: "rtw-out-t", label: "Ties / intersections", value: (r) => _fmtC(r.ties, 0) + " ties of " + _fmtC(r.intersections, 0) + " intersections" },
+    { key: "t", id: "rtw-out-t", label: "Ties / intersections", value: (r) => _fmtC(r.ties, 0) + " " + (_fmtC(r.ties, 0) === "1" ? "tie" : "ties") + " of " + _fmtC(r.intersections, 0) + " " + (_fmtC(r.intersections, 0) === "1" ? "intersection" : "intersections") },
     { key: "note", id: "rtw-out-note", label: "Note", value: (r) => r.note },
   ],
   compute: computeRebarTieWire,
@@ -10395,7 +10395,7 @@ const _v879renderAnchorEpoxyVolume = _simpleRenderer({
     { key: "waste_pct", label: "Nozzle-purge waste (percent)", kind: "number", default: 10 },
   ],
   outputs: [
-    { key: "c", id: "aev-out-c", label: "Epoxy cartridges", value: (r) => _fmtC(r.cartridges, 0) + " cartridges" },
+    { key: "c", id: "aev-out-c", label: "Epoxy cartridges", value: (r) => _fmtC(r.cartridges, 0) + " " + (_fmtC(r.cartridges, 0) === "1" ? "cartridge" : "cartridges") },
     { key: "v", id: "aev-out-v", label: "Epoxy volume", value: (r) => _fmtC(r.total_in3, 1) + " in^3 (" + _fmtC(r.per_hole_in3, 3) + " per hole)" },
     { key: "note", id: "aev-out-note", label: "Note", value: (r) => r.note },
   ],
@@ -10446,7 +10446,7 @@ const _v880renderBaseplateGroutVolume = _simpleRenderer({
     { key: "waste_pct", label: "Waste allowance (percent)", kind: "number", default: 10 },
   ],
   outputs: [
-    { key: "b", id: "bgv-out-b", label: "Non-shrink grout bags", value: (r) => _fmtC(r.bags, 0) + " bags" },
+    { key: "b", id: "bgv-out-b", label: "Non-shrink grout bags", value: (r) => _fmtC(r.bags, 0) + " " + (_fmtC(r.bags, 0) === "1" ? "bag" : "bags") },
     { key: "v", id: "bgv-out-v", label: "Grout volume", value: (r) => _fmtC(r.grout_in3, 0) + " in^3 (" + _fmtC(r.grout_ft3, 3) + " ft^3 with waste)" },
     { key: "note", id: "bgv-out-note", label: "Note", value: (r) => r.note },
   ],
@@ -10490,7 +10490,7 @@ const _v881renderBalusterPicketCount = _simpleRenderer({
     { key: "max_gap_in", label: "Maximum clear gap (in)", kind: "number" },
   ],
   outputs: [
-    { key: "p", id: "bpc-out-p", label: "Balusters / pickets", value: (r) => _fmtC(r.pickets, 0) + " pickets (" + _fmtC(r.gaps, 0) + " gaps)" },
+    { key: "p", id: "bpc-out-p", label: "Balusters / pickets", value: (r) => _fmtC(r.pickets, 0) + " " + (_fmtC(r.pickets, 0) === "1" ? "picket" : "pickets") + " (" + _fmtC(r.gaps, 0) + " " + (_fmtC(r.gaps, 0) === "1" ? "gap" : "gaps") + ")" },
     { key: "g", id: "bpc-out-g", label: "Actual clear gap", value: (r) => _fmtC(r.actual_gap_in, Math.abs(r.actual_gap_in - 4) < 0.005 && r.actual_gap_in !== 4 ? 4 : 2) + " in" + (r.actual_gap_in <= 4 + 1e-9 ? " (meets the IRC 4 in sphere rule)" : r.actual_gap_in <= 4.375 + 1e-9 ? " (over 4 in: meets only the 4-3/8 in rule for a guard on the open side of a stair)" : " (over the IRC 4 in guard limit - fine only where the guard rule does not apply)") },
     { key: "note", id: "bpc-out-note", label: "Note", value: (r) => r.note },
   ],
@@ -10532,7 +10532,7 @@ const _v882renderTrafficTaperLength = _simpleRenderer({
   ],
   outputs: [
     { key: "L", id: "ttl-out-L", label: "Merging taper length", value: (r) => _fmtC(r.taper_length_ft, 0) + " ft (" + r.branch + ")" },
-    { key: "d", id: "ttl-out-d", label: "Channelizing devices", value: (r) => _fmtC(r.devices, 0) + " devices" },
+    { key: "d", id: "ttl-out-d", label: "Channelizing devices", value: (r) => _fmtC(r.devices, 0) + " " + (_fmtC(r.devices, 0) === "1" ? "device" : "devices") },
     { key: "note", id: "ttl-out-note", label: "Note", value: (r) => r.note },
   ],
   compute: computeTrafficTaperLength,
@@ -10616,7 +10616,7 @@ const _v884renderStuccoCoverage = _simpleRenderer({
     { key: "waste_pct", label: "Waste allowance (%)", kind: "number", default: 10 },
   ],
   outputs: [
-    { key: "bags", id: "stu-out-bags", label: "Plaster bags", value: (r) => _fmtC(r.bags, 0) + " bags (" + _fmtC(r.raw_bags, 1) + " before rounding)" },
+    { key: "bags", id: "stu-out-bags", label: "Plaster bags", value: (r) => _fmtC(r.bags, 0) + " " + (_fmtC(r.bags, 0) === "1" ? "bag" : "bags") + " (" + _fmtC(r.raw_bags, 1) + " before rounding)" },
     { key: "note", id: "stu-out-note", label: "Note", value: (r) => r.note },
   ],
   compute: computeStuccoCoverage,
@@ -10656,7 +10656,7 @@ const _v885renderVaporBarrierRolls = _simpleRenderer({
     { key: "roll_width_ft", label: "Roll width (ft)", kind: "number" },
   ],
   outputs: [
-    { key: "rolls", id: "vbr-out-rolls", label: "Vapor barrier rolls", value: (r) => _fmtC(r.rolls, 0) + " rolls" },
+    { key: "rolls", id: "vbr-out-rolls", label: "Vapor barrier rolls", value: (r) => _fmtC(r.rolls, 0) + " " + (_fmtC(r.rolls, 0) === "1" ? "roll" : "rolls") },
     { key: "tape", id: "vbr-out-tape", label: "Seam tape (upper bound)", value: (r) => _fmtC(r.seam_tape_lf, 0) + " LF -- the total strip run; the seams between strips are one strip-length shorter" },
     { key: "note", id: "vbr-out-note", label: "Note", value: (r) => r.note },
   ],
@@ -10700,7 +10700,7 @@ const _v886renderConcreteSawcutFootage = _simpleRenderer({
     { key: "spacing_ft", label: "Joint spacing (ft)", kind: "number" },
   ],
   outputs: [
-    { key: "panels", id: "csf-out-p", label: "Panel grid", value: (r) => _fmtC(r.panels_l, 0) + " x " + _fmtC(r.panels_w, 0) + " = " + _fmtC(r.panels, 0) + " panels" },
+    { key: "panels", id: "csf-out-p", label: "Panel grid", value: (r) => _fmtC(r.panels_l, 0) + " x " + _fmtC(r.panels_w, 0) + " = " + _fmtC(r.panels, 0) + " " + (_fmtC(r.panels, 0) === "1" ? "panel" : "panels") },
     { key: "joint", id: "csf-out-j", label: "Saw-cut footage", value: (r) => _fmtC(r.joint_lf, 0) + " LF" },
     { key: "note", id: "csf-out-note", label: "Note", value: (r) => r.note },
   ],
@@ -10744,8 +10744,8 @@ const _v887renderJoistHangerCount = _simpleRenderer({
     { key: "nails_per_hanger", label: "Connector nails per hanger", kind: "number" },
   ],
   outputs: [
-    { key: "h", id: "jhc-out-h", label: "Hangers", value: (r) => _fmtC(r.hangers, 0) + " hangers (" + _fmtC(r.joists, 0) + " joists)" },
-    { key: "n", id: "jhc-out-n", label: "Connector nails", value: (r) => _fmtC(r.hanger_nails, 0) + " nails" },
+    { key: "h", id: "jhc-out-h", label: "Hangers", value: (r) => _fmtC(r.hangers, 0) + " " + (_fmtC(r.hangers, 0) === "1" ? "hanger" : "hangers") + " (" + _fmtC(r.joists, 0) + " " + (_fmtC(r.joists, 0) === "1" ? "joist" : "joists") + ")" },
+    { key: "n", id: "jhc-out-n", label: "Connector nails", value: (r) => _fmtC(r.hanger_nails, 0) + " " + (_fmtC(r.hanger_nails, 0) === "1" ? "nail" : "nails") },
     { key: "note", id: "jhc-out-note", label: "Note", value: (r) => r.note },
   ],
   compute: computeJoistHangerCount,
@@ -10793,8 +10793,8 @@ const _v888renderDrywallFastenerTakeoff = _simpleRenderer({
     { key: "field_screw_spacing_in", label: "Field screw spacing (in)", kind: "number" },
   ],
   outputs: [
-    { key: "ps", id: "dft-out-ps", label: "Screws per sheet", value: (r) => _fmtC(r.screws_per_sheet, 0) + " (" + _fmtC(r.studs_per_sheet, 0) + " studs x " + _fmtC(r.screws_per_stud, 0) + ")" },
-    { key: "tot", id: "dft-out-tot", label: "Total screws", value: (r) => _fmtC(r.total_screws, 0) + " screws" },
+    { key: "ps", id: "dft-out-ps", label: "Screws per sheet", value: (r) => _fmtC(r.screws_per_sheet, 0) + " (" + _fmtC(r.studs_per_sheet, 0) + " " + (_fmtC(r.studs_per_sheet, 0) === "1" ? "stud" : "studs") + " x " + _fmtC(r.screws_per_stud, 0) + ")" },
+    { key: "tot", id: "dft-out-tot", label: "Total screws", value: (r) => _fmtC(r.total_screws, 0) + " " + (_fmtC(r.total_screws, 0) === "1" ? "screw" : "screws") },
     { key: "note", id: "dft-out-note", label: "Note", value: (r) => r.note },
   ],
   compute: computeDrywallFastenerTakeoff,
@@ -10838,7 +10838,7 @@ const _v889renderGlassVacuumLift = _simpleRenderer({
   ],
   outputs: [
     { key: "w", id: "gvl-out-w", label: "Glass weight", value: (r) => _fmtC(r.weight_lb, 0) + " lb" },
-    { key: "c", id: "gvl-out-c", label: "Suction cups", value: (r) => _fmtC(r.cups, 0) + " cups" },
+    { key: "c", id: "gvl-out-c", label: "Suction cups", value: (r) => _fmtC(r.cups, 0) + " " + (_fmtC(r.cups, 0) === "1" ? "cup" : "cups") },
     { key: "note", id: "gvl-out-note", label: "Note", value: (r) => r.note },
   ],
   compute: computeGlassVacuumLift,
@@ -10876,7 +10876,7 @@ const _v891renderPolymericSandBags = _simpleRenderer({
     { key: "waste_pct", label: "Waste allowance (%)", kind: "number", default: 5 },
   ],
   outputs: [
-    { key: "bags", id: "psb-out-bags", label: "Polymeric sand bags", value: (r) => _fmtC(r.bags, 0) + " bags (" + _fmtC(r.raw_bags, 1) + " before rounding)" },
+    { key: "bags", id: "psb-out-bags", label: "Polymeric sand bags", value: (r) => _fmtC(r.bags, 0) + " " + (_fmtC(r.bags, 0) === "1" ? "bag" : "bags") + " (" + _fmtC(r.raw_bags, 1) + " before rounding)" },
     { key: "note", id: "psb-out-note", label: "Note", value: (r) => r.note },
   ],
   compute: computePolymericSandBags,
@@ -10917,7 +10917,7 @@ const _v892renderRigidFoamBoardCount = _simpleRenderer({
     { key: "waste_pct", label: "Waste allowance (%)", kind: "number", default: 8 },
   ],
   outputs: [
-    { key: "b", id: "rfb-out-b", label: "Rigid insulation boards", value: (r) => _fmtC(r.boards, 0) + " boards (" + _fmtC(r.boards_per_layer, 0) + " per layer)" },
+    { key: "b", id: "rfb-out-b", label: "Rigid insulation boards", value: (r) => _fmtC(r.boards, 0) + " " + (_fmtC(r.boards, 0) === "1" ? "board" : "boards") + " (" + _fmtC(r.boards_per_layer, 0) + " per layer)" },
     { key: "note", id: "rfb-out-note", label: "Note", value: (r) => r.note },
   ],
   compute: computeRigidFoamBoardCount,
@@ -10960,8 +10960,8 @@ const _v893renderRoofInsulationFasteners = _simpleRenderer({
     { key: "corner_per_board", label: "Fasteners per corner board", kind: "number" },
   ],
   outputs: [
-    { key: "f", id: "rif-out-f", label: "Fasteners", value: (r) => _fmtC(r.fasteners, 0) + " fasteners" },
-    { key: "p", id: "rif-out-p", label: "Plates", value: (r) => _fmtC(r.plates, 0) + " plates (one per fastener)" },
+    { key: "f", id: "rif-out-f", label: "Fasteners", value: (r) => _fmtC(r.fasteners, 0) + " " + (_fmtC(r.fasteners, 0) === "1" ? "fastener" : "fasteners") },
+    { key: "p", id: "rif-out-p", label: "Plates", value: (r) => _fmtC(r.plates, 0) + " " + (_fmtC(r.plates, 0) === "1" ? "plate" : "plates") + " (one per fastener)" },
     { key: "note", id: "rif-out-note", label: "Note", value: (r) => r.note },
   ],
   compute: computeRoofInsulationFasteners,
@@ -11005,8 +11005,8 @@ const _v895renderHousewrapRolls = _simpleRenderer({
     { key: "roll_width_ft", label: "Roll width / height (ft)", kind: "number" },
   ],
   outputs: [
-    { key: "rolls", id: "hwr-out-rolls", label: "Housewrap rolls", value: (r) => _fmtC(r.rolls, 0) + " rolls" },
-    { key: "cap", id: "hwr-out-cap", label: "Cap fasteners", value: (r) => _fmtC(r.cap_fasteners, 0) + " fasteners" },
+    { key: "rolls", id: "hwr-out-rolls", label: "Housewrap rolls", value: (r) => _fmtC(r.rolls, 0) + " " + (_fmtC(r.rolls, 0) === "1" ? "roll" : "rolls") },
+    { key: "cap", id: "hwr-out-cap", label: "Cap fasteners", value: (r) => _fmtC(r.cap_fasteners, 0) + " " + (_fmtC(r.cap_fasteners, 0) === "1" ? "fastener" : "fasteners") },
     { key: "tape", id: "hwr-out-tape", label: "Seam tape (upper bound)", value: (r) => _fmtC(r.seam_tape_lf, 0) + " LF -- the total wrap run; horizontal seams are one course of perimeter shorter, and a single course has none" },
     { key: "note", id: "hwr-out-note", label: "Note", value: (r) => r.note },
   ],
@@ -11070,8 +11070,8 @@ const _v901renderChainLinkFenceTakeoff = _simpleRenderer({
   ],
   outputs: [
     { key: "fab", id: "clf-out-fab", label: "Fabric / rail / wire", value: (r) => _fmtC(r.fabric_lf, 0) + " LF fabric, " + _fmtC(r.rail_wire_lf, 0) + " LF rail + wire each" },
-    { key: "p", id: "clf-out-p", label: "Posts", value: (r) => _fmtC(r.total_posts, 0) + " posts (" + _fmtC(r.line_posts, 0) + " line, " + _fmtC(r.terminals, 0) + " terminal)" },
-    { key: "b", id: "clf-out-b", label: "Tension bands", value: (r) => _fmtC(r.tension_bands, 0) + " bands" },
+    { key: "p", id: "clf-out-p", label: "Posts", value: (r) => _fmtC(r.total_posts, 0) + " " + (_fmtC(r.total_posts, 0) === "1" ? "post" : "posts") + " (" + _fmtC(r.line_posts, 0) + " line, " + _fmtC(r.terminals, 0) + " terminal)" },
+    { key: "b", id: "clf-out-b", label: "Tension bands", value: (r) => _fmtC(r.tension_bands, 0) + " " + (_fmtC(r.tension_bands, 0) === "1" ? "band" : "bands") },
     { key: "note", id: "clf-out-note", label: "Note", value: (r) => r.note },
   ],
   compute: computeChainLinkFenceTakeoff,
@@ -11148,7 +11148,7 @@ const _v905renderRebarChairCount = _simpleRenderer({
     { key: "waste_pct", label: "Waste allowance (%)", kind: "number", default: 5 },
   ],
   outputs: [
-    { key: "c", id: "rcc-out-c", label: "Rebar chairs / bar supports", value: (r) => _fmtC(r.chairs, 0) + " chairs (" + _fmtC(r.raw_chairs, 1) + " before rounding)" },
+    { key: "c", id: "rcc-out-c", label: "Rebar chairs / bar supports", value: (r) => _fmtC(r.chairs, 0) + " " + (_fmtC(r.chairs, 0) === "1" ? "chair" : "chairs") + " (" + _fmtC(r.raw_chairs, 1) + " before rounding)" },
     { key: "note", id: "rcc-out-note", label: "Note", value: (r) => r.note },
   ],
   compute: computeRebarChairCount,
@@ -11442,7 +11442,7 @@ CONSTRUCTION_RENDERERS["drainage-board-takeoff"] = _simpleRenderer({
   ],
   outputs: [
     { key: "a", id: "dbt-out-a", label: "Below-grade wall area", value: (r) => fmt(r.wall_area_sf, 0) + " sf" },
-    { key: "r", id: "dbt-out-r", label: "Drainage board", value: (r) => String(r.rolls) + " rolls (+" + fmt(r.termination_lf, 0) + " lf termination bar)" },
+    { key: "r", id: "dbt-out-r", label: "Drainage board", value: (r) => String(r.rolls) + " " + (String(r.rolls) === "1" ? "roll" : "rolls") + " (+" + fmt(r.termination_lf, 0) + " lf termination bar)" },
     { key: "n", id: "dbt-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeDrainageBoardTakeoff,

@@ -2584,7 +2584,7 @@ CONCRETE_RENDERERS["concrete-premix-bags"] = _simpleRenderer({
   ],
   outputs: [
     { key: "v", id: "cpb-out-v", label: "Pour volume", value: (r) => fmt(r.volume_ft3, 2) + " ft^3" },
-    { key: "b", id: "cpb-out-b", label: "Bags needed", value: (r) => String(r.bags) + " bags" },
+    { key: "b", id: "cpb-out-b", label: "Bags needed", value: (r) => String(r.bags) + " " + (String(r.bags) === "1" ? "bag" : "bags") },
     { key: "n", id: "cpb-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeConcretePremixBags,
