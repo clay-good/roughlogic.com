@@ -48,7 +48,13 @@ jobs:
       # base is the target branch; on a push it is the commit the push moved
       # FROM. The script now refuses a base equal to HEAD rather than
       # reporting OK on an empty comparison.
+      # Only on a push or a pull request: a scheduled or dispatched run has no
+      # "commit it moved from", and on the depth-1 checkout HEAD^ does not
+      # exist, so the script (rightly) refuses to pass. Every commit on main
+      # already ran this on its own push. (The first dispatched run, 2026-11-14,
+      # failed exactly that way.)
       - name: Provenance stamps only move forward
+        if: github.event_name == 'push' || github.event_name == 'pull_request'
         run: |
           set -euo pipefail
           if [ -n "${{ github.base_ref }}" ]; then
