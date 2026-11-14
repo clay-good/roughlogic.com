@@ -14,8 +14,10 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { COMPUTE_MAP } from "../fixtures/compute-map.js";
 import { RENDERER_MAP } from "../fixtures/renderer-map.js";
+import { FLAG } from "../fixtures/silent-flag-pattern.js";
+import { execFileSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
 
-const FLAG = /(cannot|can_not|exceed|fail|over_|_over|unsafe|short|insufficient|violat|lifted|too_|not_ok|warn|undersiz|overload|_ok$|^ok_|passes|^pass$|adequate|meets|complies|governs|required$|needs_|needed$|unstable|slides|tips|overturn|collapse|buckl|yield)/i;
 
 const REVIEWED = {
   // The four criteria are inputs echoed back; the page shows the criteria count and eligibility.
@@ -80,4 +82,18 @@ test("silent flags: a warning flag that flips changes the words on the page", as
   assert.deepEqual(unexpected, [], "a flag flipped but the page's words did not change");
   const stale = Object.keys(REVIEWED).filter((k) => !found.has(k)).sort();
   assert.deepEqual(stale, [], "a REVIEWED entry no longer reproduces; remove it");
+});
+
+// The test above reads only the ~1,180 tiles whose schema gives each output a
+// format(). This one drives EVERY renderer, hand-written ones included, against
+// the fake DOM with each compute wrapped so its returned flags can be read (see
+// test/fixtures/render-silent-flag-sweep.js). Seeded with the old kitchen and
+// conductor-sag code it reports both. The same REVIEWED list answers for it.
+test("silent flags: the same holds on every rendered page, hand-written renderers included", () => {
+  const sweep = fileURLToPath(new URL("../fixtures/render-silent-flag-sweep.js", import.meta.url));
+  const report = JSON.parse(execFileSync(process.execPath, [sweep], { encoding: "utf8", maxBuffer: 1 << 24, stdio: ["ignore", "pipe", "ignore"] }));
+  // A spy that stopped wrapping would read no results and pass; hold the floor.
+  assert.ok(report.spied > 2200, `only ${report.spied} tiles returned a result to the spy`);
+  const unexpected = report.hits.filter((h) => !REVIEWED[h.key]).map((h) => `${h.key} (${h.state}: ${h.from} -> ${h.to})`).sort();
+  assert.deepEqual(unexpected, [], "a flag flipped but the page's words did not change");
 });

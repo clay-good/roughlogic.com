@@ -4666,7 +4666,10 @@ function _v443renderEconomizerEnthalpyChangeover(inputRegion, outputRegion, cita
     const r = computeEconomizerEnthalpyChangeover({ mode: mode.select.value, h_outdoor: readNum(hoa.input), h_return: readNum(hra.input), t_outdoor_f: readNum(toa.input), setpoint_f: readNum(sp.input) }); stepsFor(outputRegion, inputRegion, ["mode", "h_outdoor", "h_return", "t_outdoor_f", "setpoint_f"], r);
     if (r.error) { oE.textContent = r.error; oM.textContent = "-"; oNote.textContent = ""; return; }
     oE.textContent = r.enable ? "ENABLE free cooling" : "LOCK OUT (mechanical cooling)";
-    oM.textContent = (r.margin >= 0 ? "+" : "") + fmt(r.margin, 1) + " " + r.unit + (r.enable ? " below the limit" : " over the limit");
+    // The combined control says which limit locked it out (both can).
+    if (!r.enable && r.db_ok !== undefined) oE.textContent += " -- " + [r.enth_ok ? "" : "outdoor enthalpy above the return", r.db_ok ? "" : "outdoor dry-bulb above the fixed limit"].filter(Boolean).join(" and ");
+    // Until 2026-11-14 a lockout printed the signed margin before "over": "-5.0 F over the limit".
+    oM.textContent = (r.margin >= 0 && r.enable ? "+" : "") + fmt(r.enable ? r.margin : -r.margin, 1) + " " + r.unit + (r.enable ? " below the limit" : " over the limit");
     oNote.textContent = r.note;
   }, DEBOUNCE_MS);
   attachExampleButton(inputRegion, () => { mode.select.value = "differential_enthalpy"; hoa.input.value = "24"; hra.input.value = "28"; toa.input.value = "70"; sp.input.value = "65"; sync(); update(); });

@@ -67,6 +67,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **Six more verdicts the code computed and the page did not say, found by changing two inputs at once.** The silent-flag check now drives every renderer, hand-written ones included (2,253 tiles), against the fake DOM with each compute wrapped so its returned flags can be read. One input at a time it found nothing new. Changing a second input from the first one's state (the shape of the well-VFD bug: a blank field hiding a verdict) found six:
+  - `spa-drain-interval` checked a current TDS against the limit with the fill reading blank, then printed "(no fill and current TDS entered ...)". 4,400 ppm against a 1,500 ppm limit now reads OVER.
+  - `separator-retention-sizing` never said the liquid side was short. 1.0 min of retention against 3.0 required printed "1.0 min against 298% of the requirement". Both liquid lines now say SHORT.
+  - `track-superelevation` dropped "the target speed needs more elevation than the cap allows" whenever the unbalance was also over. The required-elevation line now says it either way.
+  - `buffer-stroke-speed` said only "OVER the buffer's rated striking speed" when the buffer was also short of stroke. It now names both.
+  - `backflow-test-psi` failed an RP test as "below the field-test threshold" whichever part failed. It now names the #1 check, the relief valve, or the #2 check, which are different repairs.
+  - `economizer-enthalpy-changeover` printed a lockout as "-5.0 F over the limit". It now prints "5.0 F over" and, for the combined control, which limit locked it out.
+
+  `silent-flag-guard.test.js` gains the all-renderer check (about 5 s; seeded with the old kitchen and conductor-sag code it reports both). The two-input mode (`render-silent-flag-sweep.js --pairs`, about 2 min) stays a manual probe; its 17 remaining hits are each masked by a louder verdict on the same page.
+
 - **Two more verdicts the code computed and the page did not say.** A code-level pass over every compute (flag-named booleans returned but read by nothing) reached the hand-written renderers the standing guard cannot:
   - `flash-gas-subcool` returned `meets_target`, true only INSIDE 8-12 F, so a requirement under 8 F (the easy case) read as failing; and the page printed "16.8 F minimum (add margin to 8-12 F target)" even when 16.8 F is more than a typical charge holds, which is when the liquid flashes. The flag is now `typical_charge_covers` (at most 12 F) and the line says which of three bands the requirement falls in.
   - `conductor-sag-at-temperature` warned of a tension over the rated breaking strength only when the tension was rising, so a conductor strung at 190% of its rating and then heated printed "190.5% initially, 174.1% finally" and "hotter: tension falls". The rated-strength line now says OVER whenever either state is.

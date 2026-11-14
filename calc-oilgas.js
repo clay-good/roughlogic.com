@@ -1308,7 +1308,7 @@ export function computeSeparatorRetentionSizing({
   const gas_governs = gas_pct_of_max >= liquid_pct_of_required;
   const both_ample = gas_pct_of_max < 50 && liquid_pct_of_required < 50;
 
-  const liquidVerdict = "LIQUID SIDE: at " + fmt(100 * liquid_fraction, 0) + "% full a " + fmt(vessel_diameter_ft, 1) + " by " + fmt(seam_to_seam_ft, 1) + " ft vessel holds " + fmt(liquid_volume_bbl, 2) + " barrels, and " + fmt(liquid_rate_bpd, 0) + " bbl/day is " + fmt(liquid_rate_bpm, 3) + " bbl/min -- " + fmt(actual_retention_min, 1) + " minutes of retention against the " + fmt(required_retention_min, 1) + " required, so the liquid side is at " + fmt(liquid_pct_of_required, 0) + "% of its limit";
+  const liquidVerdict = "LIQUID SIDE: at " + fmt(100 * liquid_fraction, 0) + "% full a " + fmt(vessel_diameter_ft, 1) + " by " + fmt(seam_to_seam_ft, 1) + " ft vessel holds " + fmt(liquid_volume_bbl, 2) + " barrels, and " + fmt(liquid_rate_bpd, 0) + " bbl/day is " + fmt(liquid_rate_bpm, 3) + " bbl/min -- " + fmt(actual_retention_min, 1) + " minutes of retention against the " + fmt(required_retention_min, 1) + " required, so the liquid side is at " + fmt(liquid_pct_of_required, 0) + "% of its limit" + (liquid_ok ? "" : " -- SHORT of the required retention, so gas stays in the oil and breaks out downstream");
   const gasVerdict = "GAS SIDE: gas density at " + fmt(pressure_psig, 0) + " psig and " + fmt(temperature_f, 0) + " degF is " + fmt(gas_density_lb_ft3, 3) + " lb/cu ft, so the Souders-Brown limit at K = " + fmt(k_factor, 2) + " is " + fmt(max_velocity_fps, 2) + " ft/s. " + fmt(gas_rate_mmscfd, 2) + " MMSCFD across " + fmt(vapour_area_ft2, 2) + " sq ft of vapour space is " + fmt(actual_velocity_fps, 3) + " ft/s -- " + fmt(gas_pct_of_max, 0) + "% of the limit";
   const governsVerdict = both_ample
     ? "NEITHER SIDE GOVERNS THIS VESSEL TIGHTLY. The liquid is at " + fmt(liquid_pct_of_required, 0) + "% of its requirement and the gas at " + fmt(gas_pct_of_max, 0) + "% of its velocity limit, so the vessel is comfortable on both and the next constraint on this location is something else"
@@ -1627,7 +1627,7 @@ OILGAS_RENDERERS["separator-retention-sizing"] = _simpleRenderer({
     { key: "k_factor", label: "Souders-Brown K factor" },
   ],
   outputs: [
-    { key: "actual_retention_min", label: "Retention achieved", unit: "min", value: (r) => fmt(r.actual_retention_min, 1) + " min against " + fmt(r.liquid_pct_of_required, 0) + "% of the requirement" },
+    { key: "actual_retention_min", label: "Retention achieved", unit: "min", value: (r) => fmt(r.actual_retention_min, 1) + " min -- " + (r.liquid_ok ? "meets" : "SHORT of") + " the requirement (the required liquid volume is " + fmt(r.liquid_pct_of_required, 0) + "% of what the vessel holds)" },
     { key: "liquid_volume_bbl", label: "Liquid volume", unit: "bbl", value: (r) => fmt(r.liquid_volume_bbl, 2) + " bbl (needs " + fmt(r.required_liquid_bbl, 2) + ")" },
     { key: "max_velocity_fps", label: "Souders-Brown limit", unit: "ft/s", value: (r) => fmt(r.max_velocity_fps, 2) + " ft/s" },
     { key: "actual_velocity_fps", label: "Actual gas velocity", unit: "ft/s", value: (r) => fmt(r.actual_velocity_fps, 3) + " ft/s (" + fmt(r.gas_pct_of_max, 0) + "% of the limit)" },

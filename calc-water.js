@@ -1584,7 +1584,15 @@ export function computeBackflowTestPSI({ assembly_type = "rp", check1_psid = 0, 
   const relief_ok = relief >= 2 - 1e-9 * Math.abs(2) && buffer_psid > 1e-9;
   const check2_ok = c2 >= 1;
   const pass = check1_ok && relief_ok && check2_ok;
-  return { assembly_type: "rp", pass, buffer_psid, check1_ok, relief_ok, check2_ok, criterion: "RP: #1 check >= 5 psid and above the relief opening point, relief opens at >= 2 psid, #2 check tight >= 1 psid (USC 10th ed.)" };
+  // Until 2026-11-14 a failure printed only "below the field-test threshold", whichever part failed;
+  // the #1 check, the relief valve and the #2 check are different repairs.
+  const failed = [
+    check1_ok ? "" : "#1 check under 5 psid",
+    relief >= 2 - 1e-9 * Math.abs(2) ? "" : "relief opens under 2 psid",
+    buffer_psid > 1e-9 ? "" : "#1 check not above the relief opening point",
+    check2_ok ? "" : "#2 check under 1 psid",
+  ].filter(Boolean).join("; ");
+  return { assembly_type: "rp", pass, buffer_psid, check1_ok, relief_ok, check2_ok, failed, criterion: "RP: #1 check >= 5 psid and above the relief opening point, relief opens at >= 2 psid, #2 check tight >= 1 psid (USC 10th ed.)" };
 }
 export const backflowTestPsiExample = { inputs: { assembly_type: "rp", check1_psid: 8, relief_open_psid: 4, check2_psi: 3 } };
 const renderBackflowTestPSI = _v23SimpleRenderer({
@@ -1600,7 +1608,7 @@ const renderBackflowTestPSI = _v23SimpleRenderer({
     { key: "check2_psi", label: "Check #2 tightness (psi)", kind: "number" },
   ],
   outputs: [
-    { key: "pass", id: "bft-out-p", label: "Verdict", value: (r) => r.pass ? "PASS" : "FAIL - below the field-test threshold" },
+    { key: "pass", id: "bft-out-p", label: "Verdict", value: (r) => r.pass ? "PASS" : "FAIL - " + (r.failed || "below the field-test threshold") },
     { key: "crit", id: "bft-out-c", label: "Governing criterion", value: (r) => r.criterion + (r.assembly_type === "rp" ? " (buffer " + fmt(r.buffer_psid, 1) + " psid)" : "") },
   ],
   compute: computeBackflowTestPSI,

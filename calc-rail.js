@@ -143,7 +143,7 @@ RAIL_RENDERERS["track-superelevation"] = _simpleRenderer({
     { key: "e", id: "tse-out-e", label: "Equilibrium elevation at the operating speed", value: (r) => fmt(r.equilibrium_in, 2) + " in" },
     { key: "u", id: "tse-out-u", label: "Unbalance at the actual elevation", value: (r) => fmt(r.unbalance_in, 2) + " in (" + r.condition + ")" },
     { key: "v", id: "tse-out-v", label: "Maximum speed at the actual elevation", value: (r) => fmt(r.max_speed_mph, 1) + " mph" },
-    { key: "t", id: "tse-out-t", label: "Elevation required for the target speed", value: (r) => fmt(r.required_elevation_in, 2) + " in (equilibrium " + fmt(r.equilibrium_at_target_in, 2) + " in)" },
+    { key: "t", id: "tse-out-t", label: "Elevation required for the target speed", value: (r) => fmt(r.required_elevation_in, 2) + " in (equilibrium " + fmt(r.equilibrium_at_target_in, 2) + " in)" + (r.required_over_cap ? " -- MORE than the entered elevation cap allows" : "") },
     { key: "f", id: "tse-out-f", label: "Regulatory cap check", value: (r) => r.flag },
     { key: "n", id: "tse-out-n", label: "Note", value: (r) => r.note },
   ],
