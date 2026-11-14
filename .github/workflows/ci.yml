@@ -1,10 +1,18 @@
 name: CI
 
+# Every push runs `test` only (~8 min): lint, unit tests, data integrity, the
+# provenance-stamp check, and the built-copy gates that need Node but no
+# browser. The two Playwright jobs (~30 min together) run nightly, on pull
+# requests, and on demand (Actions -> CI -> Run workflow); as of 2026-11-14
+# they no longer hold up each push to main.
 on:
   push:
     branches: [main, develop]
   pull_request:
     branches: [main, develop]
+  schedule:
+    - cron: "17 8 * * *"
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -57,6 +65,28 @@ jobs:
           fi
           echo "Comparing provenance stamps against $BASE"
           DATA_STAMP_BASE="$BASE" npm run check:data-stamps
+      # The built-copy gates. They read dist/, which `npm run lint` above runs
+      # before; they need Node and no browser, so they run here on every push
+      # rather than waiting for the nightly Playwright jobs. The 320px shell
+      # audit needs a browser and stays in `integration`.
+      - name: Build site
+        run: npm run build
+      # The per-module gzip budget reads dist/, and `npm run lint` runs BEFORE
+      # any build, so there it skips with a WARN and exit 0. It skipped in CI
+      # that way until 2026-08-30, when an over-cap module went green through it.
+      - name: Per-module gzip budget (needs dist/)
+        run: npm run check:module-sizes
+      - name: dist/ integrity gate (no dangling same-origin references)
+        run: npm run check:dist
+      - name: Prerendered shell content gate (titles, JSON-LD, citation, gzip)
+        run: npm run check:shells
+      # Per-URL <lastmod>. Fails if a page's bytes have moved since
+      # scripts/page-lastmod.json was last stamped -- otherwise a changed page
+      # ships with a stale date and an unchanged one is never noticed.
+      - name: Sitemap lastmod ledger matches dist/
+        run: npm run check:lastmod
+      - name: Prerendered shell value gate (no NaN / undefined / empty answers)
+        run: npm run check:shell-values
 
   # Fast a11y-only signal: axe-core scan over every tile_id in TOOLS plus
   # the home view (spec-v10 §E.3, parameterized at test-import time from
@@ -65,6 +95,7 @@ jobs:
   accessibility:
     runs-on: ubuntu-latest
     needs: test
+    if: github.event_name != 'push'
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -88,6 +119,7 @@ jobs:
   integration:
     runs-on: ubuntu-latest
     needs: test
+    if: github.event_name != 'push'
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -117,30 +149,9 @@ jobs:
       - name: Run integration tests (everything the a11y job does not)
         run: npm run test:e2e:ci
       # spec-v18 §6: prerendered-shell 320px horizontal-scroll gate. Needs a
-      # built dist/ and a headless browser; the integration job already has
-      # Playwright + chromium, so build dist/ and run the audit here. Fails
-      # if any /tools/, /groups/, or home shell scrolls sideways
-      # on a 320px phone viewport.
+      # built dist/ and a headless browser, so it stays here; the Node-only
+      # built-copy gates moved to `test` on 2026-11-14 to run on every push.
       - name: Build site
         run: npm run build
-      # The per-module gzip budget reads dist/, and `npm run lint` in the test
-      # job runs BEFORE any build, so this gate has been skipping there with a
-      # WARN and exit 0 since it was written -- its own comment says so. It has
-      # therefore never enforced a cap in CI, and on 2026-08-30 an over-cap
-      # module went green through it. Run it here, where dist/ exists.
-      - name: Per-module gzip budget (needs dist/)
-        run: npm run check:module-sizes
-      - name: dist/ integrity gate (no dangling same-origin references)
-        run: npm run check:dist
-      - name: Prerendered shell content gate (titles, JSON-LD, citation, gzip)
-        run: npm run check:shells
-      # Per-URL <lastmod>. Reads dist/, so it belongs here and not in the lint
-      # job, which runs before any build. Fails if a page's bytes have moved
-      # since scripts/page-lastmod.json was last stamped -- otherwise a changed
-      # page ships with a stale date and an unchanged one is never noticed.
-      - name: Sitemap lastmod ledger matches dist/
-        run: npm run check:lastmod
-      - name: Prerendered shell value gate (no NaN / undefined / empty answers)
-        run: npm run check:shell-values
       - name: Prerendered shell mobile audit (320px)
         run: npm run check:shell-mobile

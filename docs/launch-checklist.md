@@ -432,14 +432,14 @@ than sitting here misinforming a reader for three months.
 | Unit-test suite files under `test/unit/` | **266 live unit suites** |
 | Playwright spec files under `test/integration/` | **30 live integration specs** |
 
-CI runs three jobs per push: `test` (lint, unit tests, data-integrity
-verification), then `accessibility` and `integration` in parallel. The
-two Playwright jobs partition the suite by title rather than both running
-it. Post-build gates -- per-module gzip budget, `check:dist`,
-`check:shells`, `check:shell-values`, `check:lastmod`, and the 320 px
-shell audit -- run in the `integration` job, after the build, because the
-lint job runs before any build and a gate that reads `dist/` there reads
-nothing. See the CI table in [../README.md](../README.md).
+CI defines three jobs. `test` (lint, unit tests, data-integrity
+verification, then a build and the post-build gates -- per-module gzip
+budget, `check:dist`, `check:shells`, `check:shell-values`,
+`check:lastmod`) runs on every push. `accessibility` and `integration`
+(the Playwright suite, split by title, plus the 320 px shell audit) run
+nightly, on pull requests, and on demand since 2026-11-14. The post-build
+gates run after the build because lint runs before any build, and a gate
+that reads `dist/` there reads nothing. See the CI table in [../README.md](../README.md).
 
 ### What is still a gate rather than a pass
 

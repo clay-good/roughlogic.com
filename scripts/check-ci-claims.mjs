@@ -60,10 +60,13 @@ async function main() {
   }
 
   // A. the stated count.
-  const stated = /CI adds (\w+) (?:parallel )?jobs? per push/.exec(readme);
+  // "per push" until 2026-11-14, when the two Playwright jobs moved off the
+  // per-push path (nightly, pull requests, on demand); the count is still every
+  // job ci.yml defines.
+  const stated = /CI defines (\w+) (?:parallel )?jobs?\b/.exec(readme);
   if (!stated) {
     errors.push(
-      `docs/how-it-works.md no longer contains the "CI adds <N> jobs per push" sentence this gate anchors on. ` +
+      `docs/how-it-works.md no longer contains the "CI defines <N> jobs" sentence this gate anchors on. ` +
         `Restore it or update this gate -- it is how a reader learns what stands between a change and a deploy.`,
     );
   } else {

@@ -54,7 +54,7 @@ its document root.
    404 page -- wordmark, "Page not found", and links to `/tools/` and every
    trade hub -- with a 404 status, not Cloudflare's default. Pages serves
    `/404.html` automatically; nothing configures it.
-6. The three CI jobs in `.github/workflows/ci.yml` continue to pass on every push. (A Lighthouse job stood here until 2026-08-23; it was removed over an unpatched advisory in `@lhci/cli`. See [performance.md](performance.md) for what gates performance now.)
+6. The `test` CI job passes on every push, and the two Playwright jobs (`accessibility`, `integration`) pass on the latest nightly run; start one from the Actions tab before a deploy that touches the UI. (A Lighthouse job stood here until 2026-08-23; it was removed over an unpatched advisory in `@lhci/cli`. See [performance.md](performance.md) for what gates performance now.)
 
 ## v0.2.0 release notes
 

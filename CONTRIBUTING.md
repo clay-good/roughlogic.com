@@ -24,7 +24,8 @@ post-build gate `npm run audit` does not include.
 A green audit is not a green CI, and the difference is worth knowing before you
 open the pull request: everything that needs a browser stays out of that
 command, so `test:a11y` (the axe-core sweep over every route), `test:e2e:ci`
-(the rest of the Playwright suite) and `check:shell-mobile` run only in CI. If
+(the rest of the Playwright suite) and `check:shell-mobile` run only in CI, and
+there only on pull requests, nightly and on demand, not on each push to main. If
 you have run `npx playwright install chromium`, `npm run test:e2e` covers the
 first two locally. `check-ci-claims` fails the build if a stage is added to CI
 without either joining the audit chain or being named here.
