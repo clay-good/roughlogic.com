@@ -995,7 +995,7 @@ MASONRY_RENDERERS["mortar-batch-c270"] = _simpleRenderer({
     { key: "mortar_strength_psi", label: "Mortar compressive strength (psi, 0 to skip)", kind: "number" },
   ],
   outputs: [
-    { key: "c", id: "mbc-out-c", label: "Cementitious", value: (r) => fmt(r.cement_cuft, 2) + " cu ft of cement (" + fmt(r.cement_bags, 0) + " bag" + (r.cement_bags === 1 ? "" : "s") + ", " + fmt(r.cement_weight_lb, 0) + " lb) and " + fmt(r.lime_cuft, 2) + " cu ft of lime (" + fmt(r.lime_bags, 2) + " bag equivalent, " + fmt(r.lime_weight_lb, 0) + " lb)" },
+    { key: "c", id: "mbc-out-c", label: "Cementitious", value: (r) => fmt(r.cement_cuft, 2) + " cu ft of cement (" + fmt(r.cement_bags, 0) + " bag" + (fmt(r.cement_bags, 0) === "1" ? "" : "s") + ", " + fmt(r.cement_weight_lb, 0) + " lb) and " + fmt(r.lime_cuft, 2) + " cu ft of lime (" + fmt(r.lime_bags, 2) + " bag equivalent, " + fmt(r.lime_weight_lb, 0) + " lb)" },
     { key: "s", id: "mbc-out-s", label: "Sand", value: (r) => fmt(r.sand_cuft, 2) + " cu ft, about " + fmt(r.sand_shovels, 0) + " " + (fmt(r.sand_shovels, 0) === "1" ? "shovel" : "shovels") + " of damp sand" },
     { key: "r", id: "mbc-out-r", label: "Sand against the allowable range", value: (r) => r.sand_verdict },
     { key: "y", id: "mbc-out-y", label: "Batch yield", value: (r) => fmt(r.batch_yield_cuft, 2) + " cu ft before water" },
@@ -1039,7 +1039,7 @@ export function computeGroutLiftPourHeight({ pour_height_ft = 0, lift_height_ft 
     ? "POUR ALLOWED: " + fmt(pour_height_ft, 2) + " ft against a limit of " + fmt(max_pour_height_ft, 2) + " ft, " + fmt(pour_margin_ft, 2) + " ft to spare"
     : "POUR OVER THE LIMIT by " + fmt(-pour_margin_ft, 2) + " ft: " + fmt(pour_height_ft, 2) + " ft against " + fmt(max_pour_height_ft, 2) + " ft. This is the blowout case -- fluid grout at " + fmt(base_pressure_psi, 2) + " psi against joints that are hours old";
   const lift_verdict = lift_ok
-    ? "LIFT ALLOWED: " + fmt(lift_height_ft, 2) + " ft against a limit of " + fmt(max_lift_height_ft, 2) + " ft, so " + fmt(lifts_in_pour, 0) + " lift" + (lifts_in_pour === 1 ? " of " : "s of ") + fmt(actual_lift_ft, 2) + " ft " + (lifts_in_pour === 1 ? "makes" : "make") + " this pour"
+    ? "LIFT ALLOWED: " + fmt(lift_height_ft, 2) + " ft against a limit of " + fmt(max_lift_height_ft, 2) + " ft, so " + fmt(lifts_in_pour, 0) + " lift" + (fmt(lifts_in_pour, 0) === "1" ? " of " : "s of ") + fmt(actual_lift_ft, 2) + " ft " + (lifts_in_pour === 1 ? "makes" : "make") + " this pour"
     : "LIFT OVER THE LIMIT by " + fmt(-lift_margin_ft, 2) + " ft: grout deeper than it can be consolidated leaves voids, and a void in a grouted cell means the reinforcement is not embedded and the wall does not have the strength the drawings assume";
   const cleanout_verdict = cleanouts_required
     ? "CLEANOUTS REQUIRED at " + fmt(pour_height_ft, 2) + " ft, above the " + fmt(cleanout_threshold_ft, 2) + " ft threshold -- openings at the base of EVERY grouted cell, closed only after inspection. A wall laid without them has to be opened at the base"

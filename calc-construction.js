@@ -2801,7 +2801,7 @@ function _v7c_renderHipValleyRafter(inputRegion, outputRegion, citationEl) {
     oCL.textContent = _v7c_fmt(r.common_length_ft, 2) + " ft";
     oCO.textContent = _v7c_fmt(r.common_with_overhang_ft, 2) + " ft";
     oHL.textContent = _v7c_fmt(r.hip_length_ft, 2) + " ft";
-    oN.textContent = r.jacks.length + " jacks (per side)";
+    oN.textContent = r.jacks.length + (r.jacks.length === 1 ? " jack" : " jacks") + " (per side)";
     oI.textContent = r.irregular ? _v7c_fmt(r.irregular.common_2_length_ft, 2) + " ft (pitch " + r.irregular.pitch_2 + "/12)" : "n/a (regular hip)";
   }, _V7C_DEB);
   for (const f of [run.input, p.input, p2.input, oh.input, oc.input]) f.addEventListener("input", update);
@@ -3249,7 +3249,7 @@ function _v9c_renderExcavationBenchPlan(inputRegion, outputRegion, citationEl) {
     oF.textContent = _v7c_fmt(r.footprint_ft2, 0) + " ft^2";
     if (r.bench_layout) {
       const bl = r.bench_layout;
-      oB.textContent = bl.bench_count + " benches @ " + bl.bench_height_ft + " ft (last " + _v7c_fmt(bl.last_bench_height_ft, 1) + " ft); step " + _v7c_fmt(bl.horizontal_step_ft, 2) + " ft per bench";
+      oB.textContent = bl.bench_count + (bl.bench_count === 1 ? " bench @ " : " benches @ ") + bl.bench_height_ft + " ft (last " + _v7c_fmt(bl.last_bench_height_ft, 1) + " ft); step " + _v7c_fmt(bl.horizontal_step_ft, 2) + " ft per bench";
     } else {
       oB.textContent = "Sloped-only plan (Type C does not bench)";
     }
@@ -11620,7 +11620,7 @@ CONSTRUCTION_RENDERERS["snow-guard-layout"] = _simpleRenderer({
     { key: "v", id: "sgl-out-v", label: "Vector (down-slope) force", value: (r) => fmt(r.vector_psf, 2) + " psf at " + fmt(r.slope_deg, 1) + " deg" },
     { key: "f", id: "sgl-out-f", label: "Force per ft of eave", value: (r) => fmt(r.force_plf, 0) + " lb/ft total, " + fmt(r.per_row_plf, 0) + " per row, " + fmt(r.required_plf, 0) + " with the safety factor" },
     { key: "s", id: "sgl-out-s", label: "Guard spacing", value: (r) => fmt(r.spacing_in, 1) + " in on center (" + fmt(r.guards_per_ft, 2) + " per ft)" },
-    { key: "c", id: "sgl-out-c", label: "Guard count", value: (r) => fmt(r.guards_per_row, 0) + " per row x " + fmt(r.guards_total / r.guards_per_row, 0) + " rows = " + fmt(r.guards_total, 0) },
+    { key: "c", id: "sgl-out-c", label: "Guard count", value: (r) => fmt(r.guards_per_row, 0) + " per row x " + fmt(r.guards_total / r.guards_per_row, 0) + (fmt(r.guards_total / r.guards_per_row, 0) === "1" ? " row = " : " rows = ") + fmt(r.guards_total, 0) },
     { key: "n", id: "sgl-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeSnowGuardLayout,
@@ -11930,13 +11930,13 @@ export function computeCarpetSeamLayout({ room_length_ft = 0, room_width_ft = 0,
   const dir = lengthwise_better ? "along the " + L + " ft length" : "across the " + W + " ft width";
   const note = (seamless
     ? "SEAMLESS: the " + RW + " ft roll covers this room in one drop run " + dir + ", so there is no seam to place at all - which is worth reorienting a room for whenever it is possible. "
-    : best.drops + " drops run " + dir + ", giving " + best.seam_count + " seam" + (best.seam_count === 1 ? "" : "s") + " totalling " + best.seam_length_ft.toFixed(1) + " ft. ")
+    : best.drops + (best.drops === 1 ? " drop runs " : " drops run ") + dir + ", giving " + best.seam_count + " seam" + (best.seam_count === 1 ? "" : "s") + " totalling " + best.seam_length_ft.toFixed(1) + " ft. ")
     + (best.fill_in > 0
       ? "The last drop is a " + best.fill_in.toFixed(1) + " in fill strip"
       + (narrow_fill ? " - NARROWER than the " + minFill + " in you set as a minimum. A skinny fill strip is fragile, hard to stretch true, and shows; either shift the layout so the waste splits between two wider strips, or accept more waste to avoid it. " : ", wide enough to lay and stretch. ")
       : "The drops divide the room evenly, with no fill strip. ")
     + (alt.seam_count !== best.seam_count || Math.abs(alt.running_ft - best.running_ft) > 0.01
-      ? "Running the other way takes " + alt.drops + " drops, " + alt.seam_count + " seam" + (alt.seam_count === 1 ? "" : "s") + ", and " + alt.running_ft.toFixed(1) + " ft of roll against " + best.running_ft.toFixed(1) + " - "
+      ? "Running the other way takes " + alt.drops + (alt.drops === 1 ? " drop, " : " drops, ") + alt.seam_count + " seam" + (alt.seam_count === 1 ? "" : "s") + ", and " + alt.running_ft.toFixed(1) + " ft of roll against " + best.running_ft.toFixed(1) + " - "
         + (alt.seam_count < best.seam_count ? "FEWER seams but more material, which is a judgment call rather than a calculation: a seam in the wrong place costs more than the yardage saved. "
           : Math.abs(alt.running_ft - best.running_ft) < 0.01 ? "the same material for more seams, so this orientation wins outright. "
           : "more of both, so this orientation wins outright. ")

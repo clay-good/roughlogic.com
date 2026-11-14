@@ -348,7 +348,7 @@ SPECIALTYTRADES_RENDERERS["garage-door-torsion-spring"] = _simpleRenderer({
     { key: "t", id: "gdts-out-t", label: "Required torque at the closed position", value: (r) => fmt(r.required_torque_inlb, 0) + " in-lb" },
     { key: "u", id: "gdts-out-u", label: "Turns of the spring", value: (r) => fmt(r.turns, 2) + " turns: " + fmt(r.lift_turns, 2) + " to wind the door height at " + fmt(r.travel_per_turn_in, 2) + " in of cable per turn, plus " + fmt(r.extra_turns, 2) + " to hold it open" },
     { key: "r", id: "gdts-out-r", label: "Required rate", value: (r) => fmt(r.required_ippt, 1) + " IPPT total" },
-    { key: "p", id: "gdts-out-p", label: "Rate per spring", value: (r) => fmt(r.ippt_per_spring, 1) + " IPPT each across " + fmt(r.required_ippt / r.ippt_per_spring, 0) + " springs" },
+    { key: "p", id: "gdts-out-p", label: "Rate per spring", value: (r) => fmt(r.ippt_per_spring, 1) + " IPPT each across " + fmt(r.required_ippt / r.ippt_per_spring, 0) + (fmt(r.required_ippt / r.ippt_per_spring, 0) === "1" ? " spring" : " springs") },
     { key: "n", id: "gdts-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeGarageDoorTorsionSpring,

@@ -32,3 +32,29 @@ test("count nouns: a whole count is not printed beside a fixed plural noun", () 
   }
   assert.deepEqual(hits, [], 'write `fmt(r.n, 0) + " " + (fmt(r.n, 0) === "1" ? "bag" : "bags")`');
 });
+
+// The rendered-page check: every tile is drawn, its example loaded, and each
+// input scaled down until counts fall to one; any "1 <word>s" on the page must
+// be a reviewed tile + word below. Each reviewed pair was read: the word is a
+// verb or a table name, or the 1 is not a count of that noun ("2 to 1 terms",
+// "reading 1, 7, 2 and 1 mils", "1 meals" = one pallet of meals).
+const REVIEWED = new Set([
+  "ada-stair-check this", "asme-shell-thickness governs", "blast-airblast-overpressure times",
+  "cleanout-layout governs", "coating-breakdown-factor times", "composite-curve-number pervious",
+  "extinguisher-coverage governs", "governor-tripping-speed terms", "hazmat-placard-threshold class",
+  "hazmat-placard-threshold materials", "pwht-holding-time flattens", "refractory-shell-temperature sees",
+  "relief-commodity-truckloads meals", "seepage-travel-time this", "silica-table-1 specifies",
+  "soft-foot-correction mils", "soil-relative-density cancels", "standby-battery-sizing credits",
+  "sub-slab-suction-field this", "traction-roping-ratio dominates", "two-stage-interstage-pressure across",
+  "ventilation-rate-procedure needs", "weld-metal-volume pass",
+]);
+
+test("count nouns: no rendered page prints a count of one beside a plural noun", async () => {
+  const { execFileSync } = await import("node:child_process");
+  const { fileURLToPath } = await import("node:url");
+  const sweep = fileURLToPath(new URL("../fixtures/render-count-noun-sweep.js", import.meta.url));
+  const report = JSON.parse(execFileSync(process.execPath, [sweep], { encoding: "utf8", maxBuffer: 1 << 24, stdio: ["ignore", "pipe", "ignore"] }));
+  assert.ok(report.withExample > 2200, `only ${report.withExample} tiles rendered an example`);
+  const fresh = report.hits.filter((h) => !REVIEWED.has(h.id + " " + h.word)).map((h) => `${h.id} (${h.state}): ...${h.text}`);
+  assert.deepEqual(fresh, [], "choose the noun by the printed count, or review the pair above");
+});

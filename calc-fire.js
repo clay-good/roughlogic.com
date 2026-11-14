@@ -1313,9 +1313,9 @@ function renderNFPA1142(inputRegion, outputRegion, citationEl) {
       return;
     }
     oQ.textContent = fmt(r.Q_min_gal, 0) + " gal";
-    o1000.textContent = r.tanker_count[1000] + " trips";
-    o2000.textContent = r.tanker_count[2000] + " trips";
-    o3000.textContent = r.tanker_count[3000] + " trips";
+    o1000.textContent = r.tanker_count[1000] + " " + (r.tanker_count[1000] === 1 ? "trip" : "trips");
+    o2000.textContent = r.tanker_count[2000] + " " + (r.tanker_count[2000] === 1 ? "trip" : "trips");
+    o3000.textContent = r.tanker_count[3000] + " " + (r.tanker_count[3000] === 1 ? "trip" : "trips");
     oW.textContent = r.warnings.length > 0 ? r.warnings.join(" ") : "WS = (V * CCN) / OHC per NFPA 1142 Ch. 4. AHJ governs final requirement.";
   }, DEBOUNCE_MS);
   for (const f of [v.input, occ.select, con.select, exp.select, spr.select]) f.addEventListener("input", update);

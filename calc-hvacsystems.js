@@ -2321,7 +2321,7 @@ export function computeVariablePrimaryBypass({
   const wasted_fraction = pump_flow_gpm > 0 ? bypass_gpm / pump_flow_gpm : 0;
   const bypass_verdict = !bypass_needed
     ? "no bypass is needed: the system is moving " + fmt(system_flow_gpm, 0) + " gpm against a combined minimum of " + fmt(combined_minimum_gpm, 0) + " gpm"
-    : "the bypass must pass " + fmt(bypass_gpm, 0) + " gpm: the system needs only " + fmt(system_flow_gpm, 0) + " gpm and " + fmt(machines_running, 0) + " machine" + (machines_running === 1 ? "" : "s") + " require " + fmt(combined_minimum_gpm, 0) + ", so the pumps move " + fmt(pump_flow_gpm, 0) + " gpm to serve a " + fmt(system_flow_gpm, 0) + " gpm load and " + fmt(wasted_fraction * 100, 0) + "% of the flow does no work";
+    : "the bypass must pass " + fmt(bypass_gpm, 0) + " gpm: the system needs only " + fmt(system_flow_gpm, 0) + " gpm and " + fmt(machines_running, 0) + " machine" + (fmt(machines_running, 0) === "1" ? "" : "s") + " require " + fmt(combined_minimum_gpm, 0) + ", so the pumps move " + fmt(pump_flow_gpm, 0) + " gpm to serve a " + fmt(system_flow_gpm, 0) + " gpm load and " + fmt(wasted_fraction * 100, 0) + "% of the flow does no work";
   // The staging interaction, computed rather than warned about: what the same
   // system flow would need with one fewer machine running.
   const has_fewer = machines_running > 1;

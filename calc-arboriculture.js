@@ -312,7 +312,7 @@ ARBORICULTURE_RENDERERS["tree-cabling-rating"] = _simpleRenderer({
   ],
   outputs: [
     { key: "p", id: "tcr-out-p", label: "Placement", value: (r) => fmt(r.placement_height_ft, 1) + " ft above the defect, " + fmt(r.placement_fraction * 100, 0) + "% of the " + fmt(r.defect_to_tips_ft, 1) + " ft to the tips" },
-    { key: "f", id: "tcr-out-f", label: "Force per cable", value: (r) => fmt(r.force_at_placement_lb, 0) + " lb across " + fmt(r.cable_count, 0) + " cable" + (r.cable_count === 1 ? "" : "s") },
+    { key: "f", id: "tcr-out-f", label: "Force per cable", value: (r) => fmt(r.force_at_placement_lb, 0) + " lb across " + fmt(r.cable_count, 0) + " cable" + (fmt(r.cable_count, 0) === "1" ? "" : "s") },
     { key: "l", id: "tcr-out-l", label: "What a lower cable costs", value: (r) => r.placement_verdict },
     { key: "v", id: "tcr-out-v", label: "Against the system rating", value: (r) => r.verdict },
     { key: "n", id: "tcr-out-n", label: "Note", value: (r) => r.note },

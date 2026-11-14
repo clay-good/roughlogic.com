@@ -1856,7 +1856,7 @@ DRAINAGE_RENDERERS["well-point-spacing"] = _simpleRenderer({
     { key: "d", id: "wps-out-d", label: "Total drawdown required", value: (r) => fmt(r.total_drawdown_ft, 1) + " ft -- to " + fmt(r.target_depth_ft, 1) + " ft, which is " + fmt(r.subgrade_margin_ft, 1) + " ft below a " + fmt(r.excavation_depth_ft, 1) + " ft subgrade, from a water table at " + fmt(r.water_table_depth_ft, 1) + " ft" },
     { key: "s", id: "wps-out-s", label: "Staging", value: (r) => r.stage_verdict },
     { key: "p", id: "wps-out-p", label: "Points", value: (r) => fmt(r.points_per_stage, 0) + " per stage around a " + fmt(r.perimeter_ft, 0) + " ft perimeter at " + fmt(r.point_spacing_ft, 1) + " ft, " + fmt(r.point_count, 0) + " in all" },
-    { key: "h", id: "wps-out-h", label: "Header", value: (r) => fmt(r.header_length_ft, 0) + " ft across " + fmt(r.stages_required, 0) + " stage" + (r.stages_required === 1 ? "" : "s") },
+    { key: "h", id: "wps-out-h", label: "Header", value: (r) => fmt(r.header_length_ft, 0) + " ft across " + fmt(r.stages_required, 0) + " stage" + (fmt(r.stages_required, 0) === "1" ? "" : "s") },
     { key: "q", id: "wps-out-q", label: "Nominal system capacity", value: (r) => r.system_capacity_gpm === null ? "(no per-point capacity entered)" : fmt(r.system_capacity_gpm, 0) + " gpm per stage -- an UPPER BOUND from the equipment, not a flow the soil will necessarily deliver" },
     { key: "n", id: "wps-out-n", label: "Note", value: (r) => r.note },
   ],

@@ -350,7 +350,7 @@ export function computeRtExposureTime({
   const decayed_exposure_s = (has_new ? new_exposure_s : base_exposure_s) / decay_factor;
   const decay_verdict = !has_decay
     ? "(no elapsed time entered -- and a technique sheet used without the decay correction UNDEREXPOSES)"
-    : "after " + fmt(days_elapsed, 0) + " " + (fmt(days_elapsed, 0) === "1" ? "day" : "days") + " the source is at " + fmt(activity_pct, 1) + "% of its activity (half-life " + fmt(half_life_days, 1) + " days), so the same technique needs " + fmt(decayed_exposure_s, 0) + " " + (fmt(decayed_exposure_s, 0) === "1" ? "second" : "seconds") + " instead of " + fmt(has_new ? new_exposure_s : base_exposure_s, 0) + " -- " + fmt(decayed_exposure_s - (has_new ? new_exposure_s : base_exposure_s), 0) + " seconds longer, from nothing but the calendar";
+    : "after " + fmt(days_elapsed, 0) + " " + (fmt(days_elapsed, 0) === "1" ? "day" : "days") + " the source is at " + fmt(activity_pct, 1) + "% of its activity (half-life " + fmt(half_life_days, 1) + " days), so the same technique needs " + fmt(decayed_exposure_s, 0) + " " + (fmt(decayed_exposure_s, 0) === "1" ? "second" : "seconds") + " instead of " + fmt(has_new ? new_exposure_s : base_exposure_s, 0) + " -- " + fmt(decayed_exposure_s - (has_new ? new_exposure_s : base_exposure_s), 0) + (fmt(decayed_exposure_s - (has_new ? new_exposure_s : base_exposure_s), 0) === "1" ? " second" : " seconds") + " longer, from nothing but the calendar";
   if (![new_exposure_s, ug_base_in, ug_new_in, decay_factor, decayed_exposure_s, activity_pct].every(Number.isFinite)) return { error: "Radiographic exposure math is not a finite value." };
   return {
     distance_ratio, new_exposure_s, distance_verdict,
@@ -699,7 +699,7 @@ export function computeCarburizingCaseDepth({
   // one reference point fixes the whole curve.
   const _k = reference_case_in / Math.sqrt(reference_time_hr);
   const case_depth_in = _k * Math.sqrt(time_hr);
-  const depth_verdict = "from a reference of " + fmt(reference_case_in, 4) + " in in " + fmt(reference_time_hr, 1) + " hours, " + fmt(time_hr, 1) + " hours gives a case of " + fmt(case_depth_in, 4) + " in -- " + fmt(case_depth_in * 1000, 0) + " thousandths";
+  const depth_verdict = "from a reference of " + fmt(reference_case_in, 4) + " in in " + fmt(reference_time_hr, 1) + " hours, " + fmt(time_hr, 1) + " hours gives a case of " + fmt(case_depth_in, 4) + " in -- " + fmt(case_depth_in * 1000, 0) + (fmt(case_depth_in * 1000, 0) === "1" ? " thousandth" : " thousandths");
   const has_target = target_case_in > 0;
   const time_for_target_hr = has_target ? Math.pow(target_case_in / _k, 2) : 0;
   const depth_ratio = has_target ? target_case_in / case_depth_in : 0;

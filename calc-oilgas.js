@@ -379,7 +379,7 @@ export function computeLiquidPipelineStationSpacing({
     : "at " + fmt(alternate_flow_bpd, 0) + " bbl/day the friction gradient " + alt_moves(alternate_gradient_ft_per_mi, friction_gradient_ft_per_mi) + (alt_moves(alternate_gradient_ft_per_mi, friction_gradient_ft_per_mi) === "stays" ? " at " : " to ") + fmt(alternate_gradient_ft_per_mi, 1) + " ft per mile (friction goes as the SQUARE of flow)"
       + (alternate_slack
         ? ", no more than the line's " + fmt(-elevation_gradient_ft_per_mi, 1) + " ft per mile fall, so the line runs SLACK: gravity drives the flow, no station spacing applies, and holding the line packed is a back-pressure and surge question rather than a spacing one"
-        : ", spacing " + ({ rises: "grows", falls: "falls", stays: "stays" })[alt_moves(alternate_spacing_mi, max_spacing_mi)] + (alt_moves(alternate_spacing_mi, max_spacing_mi) === "stays" ? " at " : " to ") + fmt(alternate_spacing_mi, 0) + " " + (fmt(alternate_spacing_mi, 0) === "1" ? "mile" : "miles") + ", and the line needs " + fmt(alternate_station_count, 0) + " station" + (alternate_station_count === 1 ? "" : "s"));
+        : ", spacing " + ({ rises: "grows", falls: "falls", stays: "stays" })[alt_moves(alternate_spacing_mi, max_spacing_mi)] + (alt_moves(alternate_spacing_mi, max_spacing_mi) === "stays" ? " at " : " to ") + fmt(alternate_spacing_mi, 0) + " " + (fmt(alternate_spacing_mi, 0) === "1" ? "mile" : "miles") + ", and the line needs " + fmt(alternate_station_count, 0) + " station" + (fmt(alternate_station_count, 0) === "1" ? "" : "s"));
   if (![available_head_ft, elevation_gradient_ft_per_mi, combined_gradient_ft_per_mi, max_spacing_mi, station_count, alternate_gradient_ft_per_mi].every(Number.isFinite)) return { error: "Station spacing math is not a finite value." };
   return {
     available_head_ft, elevation_gradient_ft_per_mi, combined_gradient_ft_per_mi,
@@ -565,7 +565,7 @@ OILGAS_RENDERERS["cathodic-anode-count-life"] = _simpleRenderer({
   outputs: [
     { key: "a", id: "cac-out-a", label: "Surface area", value: (r) => fmt(r.total_area_ft2, 0) + " sq ft total, " + fmt(r.bare_area_ft2, 0) + " sq ft bare" },
     { key: "i", id: "cac-out-i", label: "Current required", value: (r) => fmt(r.current_required_a, 2) + " A" },
-    { key: "c", id: "cac-out-c", label: "Anodes", value: (r) => !r.has_anode_output ? "(no current per anode entered)" : fmt(r.anode_count, 0) + " anode" + (r.anode_count === 1 ? "" : "s") },
+    { key: "c", id: "cac-out-c", label: "Anodes", value: (r) => !r.has_anode_output ? "(no current per anode entered)" : fmt(r.anode_count, 0) + " anode" + (fmt(r.anode_count, 0) === "1" ? "" : "s") },
     { key: "l", id: "cac-out-l", label: "Anode life", value: (r) => r.life_verdict },
     { key: "m", id: "cac-out-m", label: "Mass for the target life", value: (r) => !r.has_target_life ? "(no target life entered)" : fmt(r.mass_for_target_lb, 0) + " lb of anode total" },
     { key: "d", id: "cac-out-d", label: "If the coating degrades", value: (r) => r.degraded_verdict },

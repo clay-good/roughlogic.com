@@ -1483,7 +1483,7 @@ LINEWORKER_RENDERERS["counterpoise-resistance"] = _simpleRenderer({
   ],
   outputs: [
     { key: "s", id: "cpr-out-s", label: "One radial on its own", value: (r) => fmt(r.single_wire_ohm, 2) + " ohms at " + fmt(r.length_ft, 0) + " ft" },
-    { key: "a", id: "cpr-out-a", label: "The array as built", value: (r) => fmt(r.array_ohm, 2) + " ohms from " + fmt(r.radials, 0) + " radial" + (r.radials === 1 ? "" : "s") },
+    { key: "a", id: "cpr-out-a", label: "The array as built", value: (r) => fmt(r.array_ohm, 2) + " ohms from " + fmt(r.radials, 0) + " radial" + (fmt(r.radials, 0) === "1" ? "" : "s") },
     { key: "i", id: "cpr-out-i", label: "What the coupling costs", value: (r) => "the ideal parallel value is " + fmt(r.ideal_parallel_ohm, 2) + " ohms, so the " + fmt(r.coupling_penalty, 2) + "x penalty adds " + fmt(r.coupling_cost_ohm, 2) + " ohms. Radials interfere; they do not simply divide" },
     { key: "d", id: "cpr-out-d", label: "Doubling the length", value: (r) => r.doubling_improvement_x === null ? "-" : fmt(r.double_length_ohm, 2) + " ohms at " + fmt(2 * r.length_ft, 0) + " ft -- " + fmt(r.doubling_improvement_x, 2) + "x better, which is the one-over-length behaviour a driven rod does not have" },
     { key: "t", id: "cpr-out-t", label: "Against the target", value: (r) => r.verdict },

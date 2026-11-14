@@ -1237,7 +1237,7 @@ function _v836renderDustControlWater(inputRegion, outputRegion, citationEl) {
       applications_per_day: ap.input.value === "" ? 6 : Number(ap.input.value),
     }); stepsFor(outputRegion, inputRegion, ["length_ft", "width_ft", "rate_gal_per_sy", "truck_cap_gal", "applications_per_day"], r);
     if (r.error) { oApp.textContent = r.error; oDaily.textContent = "-"; return; }
-    oApp.textContent = fmt(r.gal_per_app, 0) + " gal (" + fmt(r.trips_per_app, 0) + " trip" + (r.trips_per_app === 1 ? "" : "s") + ")";
+    oApp.textContent = fmt(r.gal_per_app, 0) + " gal (" + fmt(r.trips_per_app, 0) + " trip" + (fmt(r.trips_per_app, 0) === "1" ? "" : "s") + ")";
     oDaily.textContent = fmt(r.daily_gal, 0) + " gal/day over " + fmt(r.daily_trips, 0) + " " + (fmt(r.daily_trips, 0) === "1" ? "trip" : "trips");
   }, DEBOUNCE_MS);
   for (const f of [l, w, rt, tc, ap]) f.input.addEventListener("input", update);

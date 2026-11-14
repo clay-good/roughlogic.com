@@ -974,7 +974,7 @@ export function renderUpgradeROI(inputRegion, outputRegion, citationEl) {
     }); stepsFor(outputRegion, inputRegion, ["incremental_cost", "annual_savings", "discount_rate_percent", "years"], r);
     if (r.error) { oP.textContent = r.error; oN.textContent = "-"; return; }
     oP.textContent = fmt(r.simple_payback_yr, 2) + " yr";
-    oN.textContent = "$" + fmt(r.npv_dollars, 2) + " over " + Math.floor(Number(y.input.value) || 0) + " years";
+    oN.textContent = "$" + fmt(r.npv_dollars, 2) + " over " + ((n) => n + (n === 1 ? " year" : " years"))(Math.floor(Number(y.input.value) || 0));
   }, DEBOUNCE_MS);
   for (const el of [c.input, s.input, d.input, y.input]) el.addEventListener("input", update);
 }
@@ -3163,7 +3163,7 @@ const renderExtensionLadderOverlap = _simpleRendererG({
     { key: "overlap_override_ft", label: "Overlap override (ft, 0 = rule)", kind: "number" },
   ],
   outputs: [
-    { key: "w", id: "elo-out-w", label: "Working length", value: (r) => fmt(r.working_length_ft, 1) + " ft (loses " + fmt(r.lost_ft, 1) + " ft to " + fmt(r.overlap_ft, 0) + " ft of overlap at " + fmt(r.joints, 0) + " joint" + (r.joints === 1 ? "" : "s") + ")" },
+    { key: "w", id: "elo-out-w", label: "Working length", value: (r) => fmt(r.working_length_ft, 1) + " ft (loses " + fmt(r.lost_ft, 1) + " ft to " + fmt(r.overlap_ft, 0) + " ft of overlap at " + fmt(r.joints, 0) + " joint" + (fmt(r.joints, 0) === "1" ? "" : "s") + ")" },
     { key: "h", id: "elo-out-h", label: "Top support height at 4:1", value: (r) => fmt(r.top_support_ft, 1) + " ft, base " + fmt(r.base_offset_ft, 1) + " ft out" },
     { key: "l", id: "elo-out-l", label: "Highest landing served (3 ft extension)", value: (r) => (r.can_reach_landing ? fmt(r.max_landing_ft, 1) + " ft" : "none - too short to serve a landing") },
     { key: "n", id: "elo-out-n", label: "Note", value: (r) => r.note },
@@ -3205,7 +3205,7 @@ export function computeSwingFallGeometry({ horizontal_offset_ft = 0, anchor_heig
     swing_angle_deg, swing_drop_ft, impact_speed_fps, impact_speed_mph, arc_length_ft,
     total_required_clearance_ft, over_30_deg,
     note: "Working off to the side of an anchor turns a fall into a pendulum. The worker drops " + swing_drop_ft.toFixed(2) + " ft just getting under the anchor - free fall the vertical clearance calculation never counted, so add it to whatever fall-protection-clearance told you - and arrives at the bottom of the arc doing " + impact_speed_fps.toFixed(1) + " ft/s (" + impact_speed_mph.toFixed(1) + " mph) MOVING SIDEWAYS. That last part is what hurts people: the arrest system stops the fall, and the swing puts them into a wall, a column, or the leading edge on the way. "
-      + (over_30_deg ? "This layout is " + swing_angle_deg.toFixed(0) + " degrees off vertical, past the 30 degrees commonly given as the limit for keeping an anchor overhead - move the anchor or add a horizontal lifeline. " : "At " + swing_angle_deg.toFixed(0) + " degrees this is at or inside the 30 degrees commonly given as the limit, but the swing terms still apply. ")
+      + (over_30_deg ? "This layout is " + swing_angle_deg.toFixed(0) + " degrees off vertical, past the 30 degrees commonly given as the limit for keeping an anchor overhead - move the anchor or add a horizontal lifeline. " : "At " + swing_angle_deg.toFixed(0) + (swing_angle_deg.toFixed(0) === "1" ? " degree" : " degrees") + " this is at or inside the 30 degrees commonly given as the limit, but the swing terms still apply. ")
       + "Geometry only, and it assumes a taut line pivoting about a fixed anchor: it does not model lanyard stretch, a self-retracting lifeline's locking behavior, the strike itself, or edge contact where a line drags over a corner. The vertical terms - free fall, deceleration, harness stretch, worker height, margin - are the fall-protection-clearance tile. A competent person and the employer's fall-protection plan govern.",
   };
 }
