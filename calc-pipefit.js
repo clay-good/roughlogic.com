@@ -231,7 +231,7 @@ function _renderPipeSpacingRack(inputRegion, outputRegion, citationEl) {
     if (r.error) { oCtc.textContent = r.error; oBundle.textContent = "-"; oFit.textContent = "-"; oNote.textContent = ""; return; }
     oCtc.textContent = fmt(r.center_to_center_in, 3) + " in";
     oBundle.textContent = fmt(r.total_bundle_width_in, 2) + " in for " + r.pipe_count + " pipes (insulated OD " + fmt(r.insulated_od_in, 3) + " in)";
-    oFit.textContent = r.pipes_that_fit === null ? "(enter a rack width)" : (r.pipes_that_fit + " pipes fit; " + fmt(r.remaining_in, 2) + " in remaining");
+    oFit.textContent = r.pipes_that_fit === null ? "(enter a rack width)" : (r.pipes_that_fit + " pipes fit; " + (r.remaining_in >= 0 ? fmt(r.remaining_in, 2) + " in remaining" : "the " + r.pipe_count + "-pipe bundle is " + fmt(-r.remaining_in, 2) + " in WIDER than the rack"));
     oNote.textContent = r.notes.join(" ");
   }, DEBOUNCE_MS);
   for (const f of [od.input, ins.input, gap.input, n.input, rack.input]) f.addEventListener("input", update);

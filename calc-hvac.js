@@ -2010,7 +2010,8 @@ function renderNPSHa(inputRegion, outputRegion, citationEl) {
     const sat = x.at_saturation ? " -- at saturation the atmospheric and vapor heads cancel, so this is static minus friction and nothing else" : "";
     oM.textContent = x.npsh_margin_ft === null ? "(no NPSHr supplied)" : fmt(x.npsh_margin_ft, 2) + " ft" + sat;
     oF.textContent = x.max_friction_ft === null ? "(no NPSHr supplied)" : fmt(x.max_friction_ft, 2) + " ft before the margin is gone -- a fouling strainer eats this invisibly";
-    oS.textContent = x.static_for_target_margin_ft === null ? "(no NPSHr supplied)" : fmt(x.static_for_target_margin_ft, 2) + " ft of liquid above the pump for " + fmt(x.target_margin_ft, 1) + " ft of margin";
+    // Until 2026-11-14 a negative figure printed as "-20.31 ft of liquid above the pump": it is a suction lift.
+    oS.textContent = x.static_for_target_margin_ft === null ? "(no NPSHr supplied)" : x.static_for_target_margin_ft >= 0 ? fmt(x.static_for_target_margin_ft, 2) + " ft of liquid above the pump for " + fmt(x.target_margin_ft, 1) + " ft of margin" : "the liquid may sit up to " + fmt(-x.static_for_target_margin_ft, 2) + " ft BELOW the pump (a suction lift) and still give " + fmt(x.target_margin_ft, 1) + " ft of margin";
   }, DEBOUNCE_MS);
   for (const el of [e.input, w.input, s.input, f.input, r.input, tm.input]) el.addEventListener("input", update);
 }

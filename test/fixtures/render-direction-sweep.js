@@ -2,7 +2,11 @@
 // numeric input by 0.2, 0.5, 2 and 5 and reads the output lines for a minus
 // sign in front of a figure the sentence already gives a direction ("-33.3 %
 // less", "saving -8.8 min", "up -5.46 ft"). Prints a JSON report; see
-// test/unit/render-text-guard.test.js.
+// test/unit/render-text-guard.test.js. "remaining", "above", "below", "over the
+// limit" and the rest of the second half of the word list were added 2026-11-14
+// after "-6,000 lb remaining", "-20.31 ft of liquid above the pump" and "-5.0 F
+// over the limit" (a bare "over" is left out: "-0.04 ft over the span" is a
+// signed correction across a distance, not a direction).
 import { installDocument, installTimers, flushTimers } from "./fake-dom.js";
 import { RENDERER_MAP } from "./renderer-map.js";
 
@@ -11,9 +15,9 @@ const doc = installDocument();
 const { TOOLS } = await import("../../tools-data.js");
 
 const NUM = "-\\$?\\d[\\d,]*(?:\\.\\d+)?";
-const UNIT = "(?:\\s?(?:%|percent|x|times|lb|ft|in|gal|psi|psig|dB|V|A|W|kW|hours?|hr|min|days?|years?|cfm|gpm|tons?|cy|MBF|points|sq ft|deg F|degF))?";
+const UNIT = "(?:\\s?(?:%|percent|x|times|lb|ft|in|gal|psi|psig|dB|V|A|W|kW|hours?|hr|min|days?|years?|cfm|gpm|tons?|cy|MBF|points|sq ft|deg F|degF|Btu\\/lb|F))?";
 // figure, then the direction word (at most two words between: "-5 lb per ton more")
-const AFTER = new RegExp("(?:^|[\\s(])" + NUM + UNIT + "\\s(?:(?!the\\b)[a-z]+\\s){0,2}?(?:less|more|fewer|saved|saving|savings|short|shorter|longer|taller|wider|thicker|thinner|slower|faster|finer|heavier|lighter|smaller|larger|higher|lower|over rated)\\b(?! negative)", "i");
+const AFTER = new RegExp("(?:^|[\\s(])" + NUM + UNIT + "\\s(?:(?!(?:the|or)\\b)[a-z]+\\s){0,2}?(?:less|more|fewer|saved|saving|savings|short|shorter|longer|taller|wider|thicker|thinner|slower|faster|finer|heavier|lighter|smaller|larger|higher|lower|over rated|over the (?:limit|rated|cap|allowance|capacity|maximum)|remaining|to spare|surplus|above|below|overdue)\\b(?! negative)", "i");
 // direction word, then the figure
 const BEFORE = new RegExp("\\b(?:saving of|saving|saves|short by|over by|under by|off by|another|extra|up|down|risen|fallen|increase of|decrease of|reduction of|underpitches by|overstates it by)\\s" + NUM, "i");
 

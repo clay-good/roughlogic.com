@@ -210,7 +210,7 @@ WAREHOUSE_RENDERERS["rack-upright-capacity-derate"] = _simpleRenderer({
   ],
   outputs: [
     { key: "load_per_column_lb", id: "ruc-col", label: "Load per column", unit: "lb", value: (r) => fmt(r.load_per_column_lb, 0) + " lb (frame " + fmt(r.load_per_frame_lb, 0) + " lb)" },
-    { key: "utilization_pct", id: "ruc-util", label: "Against the rated capacity", value: (r) => fmt(r.utilization_pct, 0) + "% used, " + fmt(r.remaining_capacity_lb, 0) + " lb remaining" },
+    { key: "utilization_pct", id: "ruc-util", label: "Against the rated capacity", value: (r) => fmt(r.utilization_pct, 0) + "% used, " + (r.remaining_capacity_lb >= 0 ? fmt(r.remaining_capacity_lb, 0) + " lb remaining" : fmt(-r.remaining_capacity_lb, 0) + " lb OVER the rated capacity") },
     { key: "euler_capacity_lb", id: "ruc-eul", label: "Euler load at the entered spacing", unit: "lb", value: (r) => fmt(r.euler_capacity_lb, 0) + " lb" },
     { key: "euler_capacity_level_removed_lb", id: "ruc-rem", label: "Euler load with one level removed", unit: "lb", value: (r) => fmt(r.euler_capacity_level_removed_lb, 0) + " lb at " + fmt(r.unbraced_level_removed_in, 0) + " in unbraced" },
     { key: "removed_capacity_ratio", id: "ruc-rat", label: "What removing a level costs", value: (r) => fmt(100 * r.removed_capacity_ratio, 0) + "% of the braced capacity remains -- a " + fmt(r.removed_capacity_loss_pct, 0) + "% loss" },

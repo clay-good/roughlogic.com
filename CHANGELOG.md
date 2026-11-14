@@ -67,6 +67,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Fixed
 
+- **Three negative figures beside a word that already gave the direction.** The fake-DOM direction sweep read only "less", "more", "short" and similar words, so it passed:
+  - `rack-upright-capacity-derate`: "125% used, -6,000 lb remaining". Now "6,000 lb OVER the rated capacity".
+  - `npsh-a`: "-20.31 ft of liquid above the pump". Now "the liquid may sit up to 20.31 ft BELOW the pump (a suction lift)".
+  - `pipe-spacing-rack`: "1 pipes fit; -4.75 in remaining". Now says the bundle is 4.75 in wider than the rack.
+
+  The sweep now also reads "remaining", "to spare", "surplus", "above", "below", "overdue" and "over the limit/rated/cap/...", plus Btu/lb as a unit, so the economizer's old "-20.0 Btu/lb over the limit" fails it too. A bare "over" is left out because "-0.04 ft over the span" is a signed survey correction.
+
 - **Six more verdicts the code computed and the page did not say, found by changing two inputs at once.** The silent-flag check now drives every renderer, hand-written ones included (2,253 tiles), against the fake DOM with each compute wrapped so its returned flags can be read. One input at a time it found nothing new. Changing a second input from the first one's state (the shape of the well-VFD bug: a blank field hiding a verdict) found six:
   - `spa-drain-interval` checked a current TDS against the limit with the fill reading blank, then printed "(no fill and current TDS entered ...)". 4,400 ppm against a 1,500 ppm limit now reads OVER.
   - `separator-retention-sizing` never said the liquid side was short. 1.0 min of retention against 3.0 required printed "1.0 min against 298% of the requirement". Both liquid lines now say SHORT.
