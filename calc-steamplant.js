@@ -29,7 +29,7 @@
 // Steam plant operation is a licensed activity in many jurisdictions. Nothing
 // here designs a relief system, certifies a valve, or sets a chemistry limit.
 
-import {
+import { aFig,
   DEBOUNCE_MS, debounce, makeNumber,
   makeOutputLine, attachExampleButton, fmt,
   makeStepsPanel,
@@ -649,7 +649,7 @@ STEAMPLANT_RENDERERS["safety-valve-capacity"] = _simpleRenderer({
     { key: "r", id: "svc-out-r", label: "Required relieving capacity", value: (r) => fmt(r.required_capacity_lb_hr, 0) + " lb/hr -- " + (r.fuel_governs ? "the FUEL INPUT governs, not the nameplate: it supports " + fmt(r.capacity_from_fuel_lb_hr, 0) + " lb/hr" : "the nameplate rating governs") },
     { key: "i", id: "svc-out-i", label: "Installed stamped capacity", value: (r) => fmt(r.installed_capacity_lb_hr, 0) + " lb/hr across " + fmt(r.valve_count, 0) + " " + (fmt(r.valve_count, 0) === "1" ? "valve" : "valves") + ", at the set pressures actually fitted" },
     { key: "m", id: "svc-out-m", label: "Capacity check", value: (r) => r.capacity_verdict },
-    { key: "s", id: "svc-out-s", label: "Set pressures", value: (r) => "lowest " + fmt(r.lowest_set_psig, 0) + " psig against a " + fmt(r.mawp_psig, 0) + " psig MAWP -- " + r.set_pressure_verdict + (r.supplementary_above_mawp ? "; the highest at " + fmt(r.highest_set_psig, 0) + " psig is a supplementary valve, and its stamp applies THERE" : "") },
+    { key: "s", id: "svc-out-s", label: "Set pressures", value: (r) => "lowest " + fmt(r.lowest_set_psig, 0) + " psig against " + aFig(fmt(r.mawp_psig, 0)) + " psig MAWP -- " + r.set_pressure_verdict + (r.supplementary_above_mawp ? "; the highest at " + fmt(r.highest_set_psig, 0) + " psig is a supplementary valve, and its stamp applies THERE" : "") },
     { key: "a", id: "svc-out-a", label: "Accumulation limit", value: (r) => "pressure must not exceed " + fmt(r.accumulation_pressure_psig, 1) + " psig with the valves relieving (" + fmt(r.accumulation_limit_pct, 0) + "% over MAWP)" },
     { key: "u", id: "svc-out-u", label: "After an uprate", value: (r) => fmt(r.uprated_capacity_lb_hr, 0) + " lb/hr would be " + r.uprate_verdict },
     { key: "n", id: "svc-out-n", label: "Note", value: (r) => r.note },

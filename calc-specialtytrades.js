@@ -4,7 +4,7 @@
 // formulas, fields, outputs, citations, examples, and Group E assignments
 // are unchanged.
 
-import {
+import { aFig,
   DEBOUNCE_MS as _DC, debounce as _debC, makeNumber as _mnC,
   makeSelect as _msC, makeOutputLine as _moC,
   attachExampleButton as _aeC, fmt as _fmtC, fmt,
@@ -577,7 +577,7 @@ export function computeScaffoldTieSpacing({ scaffold_height_ft = 0, base_width_f
   const outs = [effective_base_ft, height_to_base_ratio, max_free_standing_ft, base_to_eliminate_ties_ft];
   if (!outs.every(Number.isFinite)) return { error: "Scaffold tie math is not a finite value." };
   const verdict = ties_required
-    ? "TIES REQUIRED: " + fmt(height_to_base_ratio, 1) + ":1 against a " + fmt(max_ratio, 0) + ":1 limit, so the FIRST tie goes at or below " + fmt(max_free_standing_ft, 1) + " ft. A first tie higher than that leaves unbraced height past the free-standing limit, which is the geometry that folds"
+    ? "TIES REQUIRED: " + fmt(height_to_base_ratio, 1) + ":1 against " + aFig(fmt(max_ratio, 0)) + ":1 limit, so the FIRST tie goes at or below " + fmt(max_free_standing_ft, 1) + " ft. A first tie higher than that leaves unbraced height past the free-standing limit, which is the geometry that folds"
     : "FREE-STANDING: " + fmt(height_to_base_ratio, 1) + ":1 is inside the " + fmt(max_ratio, 0) + ":1 limit at an effective base of " + fmt(effective_base_ft, 1) + " ft, so no ties are required by the ratio";
   const outrigger_verdict = outrigger_base_ft > 0
     ? (outriggers_sufficient
@@ -615,7 +615,7 @@ SPECIALTYTRADES_RENDERERS["scaffold-tie-spacing"] = _simpleRenderer({
   outputs: [
     { key: "r", id: "sts-out-r", label: "Height to base", value: (r) => fmt(r.height_to_base_ratio, 1) + ":1 at an effective base of " + fmt(r.effective_base_ft, 1) + " ft" + (r.outrigger_base_ft > 0 ? " (" + fmt(r.bare_ratio, 1) + ":1 on the " + fmt(r.base_width_ft, 1) + " ft frame alone)" : "") },
     { key: "v", id: "sts-out-v", label: "Ties", value: (r) => r.verdict },
-    { key: "c", id: "sts-out-c", label: "Tie count", value: (r) => r.tie_count === null ? "(enter the spacings and the run for a count)" : fmt(r.tie_count, 0) + " " + (fmt(r.tie_count, 0) === "1" ? "tie" : "ties") + " -- " + fmt(r.tie_rows, 0) + " " + (fmt(r.tie_rows, 0) === "1" ? "row" : "rows") + " at " + fmt(r.vertical_tie_spacing_ft, 0) + " ft vertically, " + fmt(r.ties_per_row, 0) + " per row at " + fmt(r.horizontal_tie_spacing_ft, 0) + " ft along a " + fmt(r.scaffold_run_ft, 0) + " ft run" },
+    { key: "c", id: "sts-out-c", label: "Tie count", value: (r) => r.tie_count === null ? "(enter the spacings and the run for a count)" : fmt(r.tie_count, 0) + " " + (fmt(r.tie_count, 0) === "1" ? "tie" : "ties") + " -- " + fmt(r.tie_rows, 0) + " " + (fmt(r.tie_rows, 0) === "1" ? "row" : "rows") + " at " + fmt(r.vertical_tie_spacing_ft, 0) + " ft vertically, " + fmt(r.ties_per_row, 0) + " per row at " + fmt(r.horizontal_tie_spacing_ft, 0) + " ft along " + aFig(fmt(r.scaffold_run_ft, 0)) + " ft run" },
     { key: "o", id: "sts-out-o", label: "Outriggers", value: (r) => r.outrigger_verdict },
     { key: "s", id: "sts-out-s", label: "Sheeting", value: (r) => r.sheeting_verdict },
     { key: "n", id: "sts-out-n", label: "Note", value: (r) => r.note },
@@ -742,7 +742,7 @@ export function computeSuspendedScaffoldCounterweight({ rated_load_lb = 0, outbo
     : null;
   const outs = [lever_ratio, overturning_moment_ft_lb, required_counterweight_lb, resisting_moment_ft_lb];
   if (!outs.every(Number.isFinite)) return { error: "Counterweight math is not a finite value." };
-  const verdict = "REQUIRED: " + fmt(required_counterweight_lb, 0) + " lb per outrigger" + (stall_governs ? " (the 1.5x stall-load test governs) -- " : " -- ") + fmt(rated_load_lb, 0) + " lb of rated load at a " + fmt(lever_ratio, 2) + ":1 lever disadvantage, times a " + fmt(factor_of_safety, 1) + ":1 factor"
+  const verdict = "REQUIRED: " + fmt(required_counterweight_lb, 0) + " lb per outrigger" + (stall_governs ? " (the 1.5x stall-load test governs) -- " : " -- ") + fmt(rated_load_lb, 0) + " lb of rated load at " + aFig(fmt(lever_ratio, 2)) + ":1 lever disadvantage, times " + aFig(fmt(factor_of_safety, 1)) + ":1 factor"
     + (counterweight_units === null ? "" : ", which is " + fmt(counterweight_units, 0) + " " + (fmt(counterweight_units, 0) === "1" ? "unit" : "units") + " of " + fmt(counterweight_unit_lb, 0) + " lb (" + fmt(provided_counterweight_lb, 0) + " lb provided, " + fmt(achieved_fos, 2) + ":1 achieved)");
   return {
     rated_load_lb, outboard_arm_ft, inboard_arm_ft, lever_ratio, factor_of_safety,
@@ -820,7 +820,7 @@ export function computeShoringReshoringLoad({ slab_dead_psf = 0, construction_li
   const verdict = within_capacity === null
     ? "Enter the governing slab's capacity at its age today to check it."
     : capacity_below_dead
-      ? "THE SLAB CANNOT CARRY ITS OWN WEIGHT at " + fmt(governing_slab_capacity_psf, 0) + " psf against a " + fmt(slab_dead_psf, 0) + " psf dead load. No number of shoring levels fixes that; the slab is too young to strip at all"
+      ? "THE SLAB CANNOT CARRY ITS OWN WEIGHT at " + fmt(governing_slab_capacity_psf, 0) + " psf against " + aFig(fmt(slab_dead_psf, 0)) + " psf dead load. No number of shoring levels fixes that; the slab is too young to strip at all"
       : within_capacity
         ? "WITHIN CAPACITY: the governing level carries " + fmt(governing_level_load_psf, 0) + " psf against " + fmt(governing_slab_capacity_psf, 0) + " psf at its age today, " + fmt(utilization_pct, 0) + "%"
         : "OVERLOADED by " + fmt(-capacity_margin_psf, 0) + " psf: the governing level carries " + fmt(governing_level_load_psf, 0) + " psf against " + fmt(governing_slab_capacity_psf, 0) + " psf at its age today. " + fmt(levels_required, 0) + " connected levels are needed instead of " + fmt(N, 0);

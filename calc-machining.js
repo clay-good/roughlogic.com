@@ -5,7 +5,7 @@
 // group: "K" (group letter independent of module, the v42/v70..v75 precedent).
 // See spec-v31 K.4 and spec-v34 K.5.
 
-import {
+import { aFig,
   DEBOUNCE_MS, debounce, makeNumber, makeSelect,
   makeOutputLine, attachExampleButton, fmt,
   makeStepsPanel,
@@ -2451,8 +2451,8 @@ export function computeGearUndercutBacklash({ pressure_angle_deg = 20, teeth = 0
     min_teeth_exact, min_teeth, undercut, shortfall, backlash_in,
     circular_pitch_in, backlash_pct_of_pitch,
     note: (undercut
-      ? "UNDERCUT: " + n + " teeth is below the " + min_teeth + "-tooth minimum for a " + phi + "-degree pressure angle, so the cutter sweeps material out of the root as it generates the flank. The tooth is weakened right where the bending stress peaks and part of the involute is destroyed, which costs contact ratio and adds noise. The fixes, in order of preference: raise the pressure angle (25 degrees drops the minimum to 12 teeth), use profile shift (a long-addendum pinion with a matching short-addendum gear), or use a stub tooth. Simply cutting " + shortfall + " more teeth also works if the ratio allows. "
-      : n + " teeth clears the " + min_teeth + "-tooth undercut minimum for a " + phi + "-degree pressure angle. ")
+      ? "UNDERCUT: " + n + " teeth is below the " + min_teeth + "-tooth minimum for " + aFig(phi) + "-degree pressure angle, so the cutter sweeps material out of the root as it generates the flank. The tooth is weakened right where the bending stress peaks and part of the involute is destroyed, which costs contact ratio and adds noise. The fixes, in order of preference: raise the pressure angle (25 degrees drops the minimum to 12 teeth), use profile shift (a long-addendum pinion with a matching short-addendum gear), or use a stub tooth. Simply cutting " + shortfall + " more teeth also works if the ratio allows. "
+      : n + " teeth clears the " + min_teeth + "-tooth undercut minimum for " + aFig(phi) + "-degree pressure angle. ")
       + "The minimum comes straight from the geometry as 2k/sin^2(phi) and reproduces the familiar published values exactly - 32 teeth at 14.5 degrees, 18 at 20, 12 at 25 - which is why the industry moved to higher pressure angles for small pinions. "
       + (dC > 0 ? "Opening the center distance by " + dC + " in produces " + backlash_in.toFixed(5) + " in of backlash: the flanks separate along the line of action, so the effect is 2 tan(phi) per unit of center-distance change, not one-for-one. " : "Enter a center-distance change to see the backlash it produces. ")
       + "Backlash is not a defect - a mesh needs it for lubricant film and thermal growth - but too much makes lost motion and impact on reversal, and too little binds. Standard geometry, no profile shift assumed. A shop aid; the gear drawing and the AGMA standard govern.",

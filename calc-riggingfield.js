@@ -5,7 +5,7 @@
 // their gzip budgets. Calculator behavior is unchanged.
 // =====================================================================
 
-import {
+import { aFig,
   DEBOUNCE_MS, debounce, makeNumber, makeSelect,
   makeOutputLine, attachExampleButton, fmt,
   stepsFor,
@@ -317,7 +317,7 @@ export function computeCranePowerLineClearance({ option = "default", voltage_kv 
   const note = "THE 20 FT EVERYONE CARRIES IS A DEFAULT, not the rule. 1926.1408 gives three options and the default is the one you take when you have NOT determined the voltage. "
     + "Option 1, deenergize and visibly ground the line at the worksite, removes the problem entirely. Option 2 keeps every part of the equipment, load line, and load - including rigging and lifting accessories - at least 20 ft away. Option 3 lets you DETERMINE the line's voltage and use Table A instead. "
     + "Table A starts at 10 FT for lines up to 50 kV, which is most distribution. "
-    + (table_a_helps ? "Here that is " + table_a_ft + " ft against a " + default_clearance_ft + " ft default - determining the voltage buys back " + table_a_saving_ft + " ft of working radius, and it costs a phone call to the utility. On a tight site that is the cheapest thing on the page. " : voltage_known ? "At " + kv + " kV Table A gives " + (table_a_ft === null ? "no figure - over 1,000 kV the distance comes from the utility owner or a qualified engineer" : table_a_ft + " ft, which is no better than the " + default_clearance_ft + " ft default here") + ". " : "")
+    + (table_a_helps ? "Here that is " + table_a_ft + " ft against " + aFig(default_clearance_ft) + " ft default - determining the voltage buys back " + table_a_saving_ft + " ft of working radius, and it costs a phone call to the utility. On a tight site that is the cheapest thing on the page. " : voltage_known ? "At " + kv + " kV Table A gives " + (table_a_ft === null ? "no figure - over 1,000 kV the distance comes from the utility owner or a qualified engineer" : table_a_ft + " ft, which is no better than the " + default_clearance_ft + " ft default here") + ". " : "")
     + "THE TRAP RUNS THE OTHER WAY TOO: 20 ft is the default only for lines UP TO 350 kV. Above that the default is 50 ft and Table A keeps climbing - 25 ft over 350, 35 over 500, 45 over 750 - so on transmission the number people carry is not conservative, it is wrong in the dangerous direction. "
     + (default_assumed ? "No voltage was entered, so the 20 ft default shown assumes the line is at or under 350 kV. If it is not, that assumption is the failure. " : "")
     + (over_1000kv ? "Over 1,000 kV Table A gives no number: the minimum clearance is established by the utility owner or operator or by a registered professional engineer who is a qualified person with respect to electrical power transmission and distribution. " : "")
@@ -354,7 +354,7 @@ function _v1157renderCranePowerLineClearance(inputRegion, outputRegion, citation
     if (r.error) { oR.textContent = r.error; oV.textContent = "-"; oT.textContent = "-"; oD.textContent = "-"; oB.textContent = "-"; oN.textContent = "-"; return; }
     oR.textContent = r.required_clearance_ft === null ? "not a number - utility or qualified engineer sets it" : r.required_clearance_ft + " ft via " + r.route;
     oV.textContent = r.passes ? "PASSES the clearance entered" : r.clearance_ok === null ? "cannot be determined here" : "SHORT by " + fmt(r.clearance_shortfall_ft, 1) + " ft";
-    oT.textContent = r.table_a_ft === null ? "-" : r.table_a_helps ? r.table_a_saving_ft + " ft of working radius (" + r.table_a_ft + " ft vs a " + r.default_clearance_ft + " ft default)" : "nothing at this voltage";
+    oT.textContent = r.table_a_ft === null ? "-" : r.table_a_helps ? r.table_a_saving_ft + " ft of working radius (" + r.table_a_ft + " ft vs " + aFig(r.default_clearance_ft) + " ft default)" : "nothing at this voltage";
     oD.textContent = r.default_clearance_ft === null ? "none over 1,000 kV - the utility or a registered PE sets it" : r.default_clearance_ft + " ft" + (r.default_assumed ? " - ASSUMES the line is 350 kV or under, since no voltage was entered" : "");
     oB.textContent = r.boom_reaches === null ? "-" : r.boom_reaches ? "the line is inside the machine's reach - clearance is control, not geometry" : "the boom cannot reach the line";
     oN.textContent = r.note;

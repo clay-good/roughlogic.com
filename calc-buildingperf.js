@@ -16,7 +16,7 @@
 // infiltration is already in blower-door-ach50, and spec-v1503's wall dew
 // point is already in wall-condensation-gradient.
 
-import {
+import { aFig,
   DEBOUNCE_MS, debounce, makeNumber, makeSelect,
   makeOutputLine, attachExampleButton, fmt,
   makeStepsPanel,
@@ -169,7 +169,7 @@ export function computeEffectiveLeakageArea({
   const hole_side_in = Math.sqrt(ela_in2);
   const volume_ft3 = floor_area_ft2 * building_height_ft;
   const ach50 = cfm50 * 60 / volume_ft3;
-  const hole_verdict = fmt(ela_in2, 1) + " square inches is a hole about " + fmt(hole_side_in, 1) + " in on a side -- a " + fmt(hole_side_in, 0) + " by " + fmt(hole_side_in, 0) + " inch opening in the envelope, permanently. That is the same measurement as " + fmt(ach50, 2) + " ACH50, and it is the one that changes a homeowner's mind";
+  const hole_verdict = fmt(ela_in2, 1) + " square inches is a hole about " + fmt(hole_side_in, 1) + " in on a side -- " + aFig(fmt(hole_side_in, 0)) + " by " + fmt(hole_side_in, 0) + " inch opening in the envelope, permanently. That is the same measurement as " + fmt(ach50, 2) + " ACH50, and it is the one that changes a homeowner's mind";
   const convention_verdict = "on the Canadian 10 Pa convention the same house reports " + fmt(eqla_in2, 1) + " sq in of equivalent leakage area, " + fmt(convention_ratio, 2) + " times the US 4 Pa figure -- an identical building. In theory about 1.15 of that ratio is the higher reference pressure and about 1.64 is the discharge coefficient (0.61 for the Canadian sharp-edged orifice against 1.0 in the US figure), about 1.88 together, and the round 10.0 Canadian divisor brings it to 1.82; a figure quoted without its convention cannot be compared with one quoted under the other";
   const nl_verdict = "normalized leakage is " + fmt(normalized_leakage, 2) + " at " + fmt(building_height_ft, 1) + " ft of height, from a specific leakage area of " + fmt(sla, 6) + " (ELA over floor area, both in square feet) -- and the height correction is why two houses with the SAME ACH50 can have quite different real air change rates, which is what makes normalized leakage rather than ACH50 the right basis for estimating natural infiltration";
   if (![ela_in2, eqla_in2, normalized_leakage, sla, hole_side_in, ach50].every(Number.isFinite)) return { error: "Leakage area math is not a finite value." };
@@ -341,7 +341,7 @@ export function computeVentilationRateProcedure({
   const penalty_cfm = vot_cfm - vou_cfm;
   const rows_text = rows.map((z) => "zone " + z.label + " Vbz " + fmt(z.vbz, 0) + ", Voz " + fmt(z.voz, 0) + ", Zp " + fmt(z.zp, 3)).join("; ");
   const critical_verdict = "zone " + critical.label + " is the CRITICAL zone at Zp " + fmt(zp_max, 3) + " -- it has the highest ratio of required outdoor air to the primary air it receives, so it sets the fraction the whole system runs at and every other zone is over-ventilated as a consequence";
-  const efficiency_verdict = "system ventilation efficiency " + fmt(ev, 4) + " = 1 + " + fmt(xs, 4) + " - " + fmt(zp_max, 4) + ", so the intake is " + fmt(vot_cfm, 0) + " cfm against an uncorrected " + fmt(vou_cfm, 0) + " -- a " + fmt(penalty_cfm, 0) + " cfm penalty, " + fmt(penalty_cfm / vou_cfm * 100, 1) + "%, paid because one zone is short of primary air";
+  const efficiency_verdict = "system ventilation efficiency " + fmt(ev, 4) + " = 1 + " + fmt(xs, 4) + " - " + fmt(zp_max, 4) + ", so the intake is " + fmt(vot_cfm, 0) + " cfm against an uncorrected " + fmt(vou_cfm, 0) + " -- " + aFig(fmt(penalty_cfm, 0)) + " cfm penalty, " + fmt(penalty_cfm / vou_cfm * 100, 1) + "%, paid because one zone is short of primary air";
   // The fix is REDISTRIBUTION at constant total primary air, not simply more
   // air to the critical zone. Adding air raises Vps, which lowers Xs as well
   // as Zp, and on this example Xs falls faster -- Ev goes DOWN and the intake
@@ -832,7 +832,7 @@ export function computeContinuousInsulationRatio({
     : 0;
   const physics_verdict = !has_conditions
     ? "(no indoor humidity and outdoor design temperature entered)"
-    : "at " + fmt(indoor_temp_f, 0) + " degF and " + fmt(indoor_rh_pct, 0) + "% RH the dew point is " + fmt(dew_point_f, 1) + " degF, so against a " + fmt(outdoor_design_temp_f, 0) + " degF design temperature " + (dry_outdoors ? "-- already at or above the dew point -- the physics requires no continuous insulation at all (a ratio of 0)" : "the ratio the physics requires is " + fmt(ratio_from_dew_point, 3)) + ", and this assembly puts the sheathing at " + fmt(sheathing_temp_f, 1) + " degF -- " + (sheathing_temp_f >= dew_point_f ? "above the dew point, so it stays dry at design conditions" : "BELOW the dew point, so it condenses at design conditions") + ". The code table is nothing but this calculation solved once per climate zone at assumed indoor conditions, and a house run at a higher indoor humidity needs MORE continuous insulation than the table gives";
+    : "at " + fmt(indoor_temp_f, 0) + " degF and " + fmt(indoor_rh_pct, 0) + "% RH the dew point is " + fmt(dew_point_f, 1) + " degF, so against " + aFig(fmt(outdoor_design_temp_f, 0)) + " degF design temperature " + (dry_outdoors ? "-- already at or above the dew point -- the physics requires no continuous insulation at all (a ratio of 0)" : "the ratio the physics requires is " + fmt(ratio_from_dew_point, 3)) + ", and this assembly puts the sheathing at " + fmt(sheathing_temp_f, 1) + " degF -- " + (sheathing_temp_f >= dew_point_f ? "above the dew point, so it stays dry at design conditions" : "BELOW the dew point, so it condenses at design conditions") + ". The code table is nothing but this calculation solved once per climate zone at assumed indoor conditions, and a house run at a higher indoor humidity needs MORE continuous insulation than the table gives";
   if (![achieved_ratio, r_continuous_min, r_cavity_max, dew_point_f, ratio_from_dew_point, sheathing_temp_f].every(Number.isFinite)) return { error: "Insulation ratio math is not a finite value." };
   return {
     r_total, achieved_ratio, has_requirement, meets,
@@ -892,8 +892,8 @@ export function computeGroundLoopFlowAntifreeze({
   const area_ft2 = Math.PI / 4 * diameter_ft * diameter_ft;
   const flow_cfs = design_flow_gpm / _GPM_PER_CFS;
   const velocity_fps = flow_cfs / area_ft2;
-  const flow_verdict = fmt(design_flow_gpm, 1) + " gpm at " + fmt(gpm_per_ton, 2) + " gpm per ton, which through a "
-    + fmt(pipe_id_in, 3) + " in bore is " + fmt(velocity_fps, 2) + " ft/s";
+  const flow_verdict = fmt(design_flow_gpm, 1) + " gpm at " + fmt(gpm_per_ton, 2) + " gpm per ton, which through "
+    + aFig(fmt(pipe_id_in, 3)) + " in bore is " + fmt(velocity_fps, 2) + " ft/s";
   // Reynolds number decides whether the loop's rated capacity applies at all.
   const viscosity_lb_ft_s = fluid_viscosity_cp * _CP_TO_LB_FT_S;
   const reynolds = fluid_density_lb_ft3 * velocity_fps * diameter_ft / viscosity_lb_ft_s;

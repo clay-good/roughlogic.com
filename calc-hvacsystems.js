@@ -23,7 +23,7 @@
 // first open of one of its tiles, so it is not in the home-view first-paint
 // payload.
 
-import {
+import { aFig,
   DEBOUNCE_MS, debounce, makeNumber, makeSelect,
   makeOutputLine, attachExampleButton, fmt,
   makeStepsPanel,
@@ -1671,7 +1671,7 @@ export function computeFlowHoodCorrection({
   const uncorrected_pct_of_design = has_design ? hood_reading_cfm / design_cfm * 100 : 0;
   const design_verdict = !has_design
     ? "(no design airflow entered)"
-    : fmt(pct_of_design, 0) + "% of design corrected, against " + fmt(uncorrected_pct_of_design, 0) + "% uncorrected -- a " + fmt(Math.abs(pct_of_design - uncorrected_pct_of_design), 0) + " point difference on the report for this outlet alone";
+    : fmt(pct_of_design, 0) + "% of design corrected, against " + fmt(uncorrected_pct_of_design, 0) + "% uncorrected -- " + aFig(fmt(Math.abs(pct_of_design - uncorrected_pct_of_design), 0)) + " point difference on the report for this outlet alone";
   // The systematic case. A factor applied across a whole report does not
   // average out, because the error is in one direction on every reading.
   const has_system = system_reading_total_cfm > 0;
@@ -1679,7 +1679,7 @@ export function computeFlowHoodCorrection({
   const system_error_cfm = system_corrected_cfm - system_reading_total_cfm;
   const system_verdict = !has_system
     ? "(no system reading total entered)"
-    : "across the whole report, " + fmt(system_reading_total_cfm, 0) + " cfm of readings correct to " + fmt(system_corrected_cfm, 0) + " cfm, a " + fmt(Math.abs(system_error_cfm), 0) + " cfm " + (system_error_cfm > 0 ? "increase" : "reduction") + " -- the error is systematic and in one direction, so it does not average out";
+    : "across the whole report, " + fmt(system_reading_total_cfm, 0) + " cfm of readings correct to " + fmt(system_corrected_cfm, 0) + " cfm, " + aFig(fmt(Math.abs(system_error_cfm), 0)) + " cfm " + (system_error_cfm > 0 ? "increase" : "reduction") + " -- the error is systematic and in one direction, so it does not average out";
   if (![corrected_cfm, derived_factor, pct_of_design, uncorrected_pct_of_design, system_corrected_cfm, system_error_cfm].every(Number.isFinite)) return { error: "Flow hood correction math is not a finite value." };
   return {
     corrected_cfm, factor_used, has_reference, derived_factor,
@@ -2000,8 +2000,8 @@ HVACSYSTEMS_RENDERERS["pump-impeller-trim"] = _simpleRenderer({
     { key: "energy_rate_per_kwh", label: "Energy rate ($/kWh)", kind: "number" },
   ],
   outputs: [
-    { key: "d", id: "pit-out-d", label: "Required diameter", value: (r) => fmt(r.required_diameter_in, 2) + " in, a " + fmt(r.trim_in, 2) + " in trim (" + fmt(r.trim_pct, 1) + "%)" },
-    { key: "p", id: "pit-out-p", label: "Power at the trim", value: (r) => fmt(r.power_ratio * 100, 0) + "% of current, a " + fmt(r.power_reduction_pct, 0) + "% reduction from the cube relation" },
+    { key: "d", id: "pit-out-d", label: "Required diameter", value: (r) => fmt(r.required_diameter_in, 2) + " in, " + aFig(fmt(r.trim_in, 2)) + " in trim (" + fmt(r.trim_pct, 1) + "%)" },
+    { key: "p", id: "pit-out-p", label: "Power at the trim", value: (r) => fmt(r.power_ratio * 100, 0) + "% of current, " + aFig(fmt(r.power_reduction_pct, 0)) + "% reduction from the cube relation" },
     { key: "h", id: "pit-out-h", label: "Head check", value: (r) => r.head_verdict },
     { key: "l", id: "pit-out-l", label: "Practical limit", value: (r) => r.limit_verdict },
     { key: "s", id: "pit-out-s", label: "Annual saving", value: (r) => r.cost_verdict },
@@ -2092,7 +2092,7 @@ HVACSYSTEMS_RENDERERS["coil-capacity-verification"] = _simpleRenderer({
   ],
   outputs: [
     { key: "a", id: "ccv2-out-a", label: "Air side", value: (r) => r.has_enthalpy ? fmt(r.air_total_btuh, 0) + " BTU/h total from enthalpy (" + fmt(r.air_sensible_btuh, 0) + " sensible, " + fmt(r.latent_btuh, 0) + " latent)" : fmt(r.air_sensible_btuh, 0) + " BTU/h sensible only" },
-    { key: "w", id: "ccv2-out-w", label: "Water side", value: (r) => fmt(r.water_btuh, 0) + " BTU/h across a " + fmt(r.water_dt_f, 1) + " °F water temperature difference" },
+    { key: "w", id: "ccv2-out-w", label: "Water side", value: (r) => fmt(r.water_btuh, 0) + " BTU/h across " + aFig(fmt(r.water_dt_f, 1)) + " °F water temperature difference" },
     { key: "b", id: "ccv2-out-b", label: "Heat balance", value: (r) => r.balance_verdict },
     { key: "m", id: "ccv2-out-m", label: "Method", value: (r) => r.method_verdict },
     { key: "g", id: "ccv2-out-g", label: "Against design", value: (r) => r.design_verdict },
@@ -2321,7 +2321,7 @@ export function computeVariablePrimaryBypass({
   const wasted_fraction = pump_flow_gpm > 0 ? bypass_gpm / pump_flow_gpm : 0;
   const bypass_verdict = !bypass_needed
     ? "no bypass is needed: the system is moving " + fmt(system_flow_gpm, 0) + " gpm against a combined minimum of " + fmt(combined_minimum_gpm, 0) + " gpm"
-    : "the bypass must pass " + fmt(bypass_gpm, 0) + " gpm: the system needs only " + fmt(system_flow_gpm, 0) + " gpm and " + fmt(machines_running, 0) + " machine" + (fmt(machines_running, 0) === "1" ? "" : "s") + " require " + fmt(combined_minimum_gpm, 0) + ", so the pumps move " + fmt(pump_flow_gpm, 0) + " gpm to serve a " + fmt(system_flow_gpm, 0) + " gpm load and " + fmt(wasted_fraction * 100, 0) + "% of the flow does no work";
+    : "the bypass must pass " + fmt(bypass_gpm, 0) + " gpm: the system needs only " + fmt(system_flow_gpm, 0) + " gpm and " + fmt(machines_running, 0) + " machine" + (fmt(machines_running, 0) === "1" ? "" : "s") + " require " + fmt(combined_minimum_gpm, 0) + ", so the pumps move " + fmt(pump_flow_gpm, 0) + " gpm to serve " + aFig(fmt(system_flow_gpm, 0)) + " gpm load and " + fmt(wasted_fraction * 100, 0) + "% of the flow does no work";
   // The staging interaction, computed rather than warned about: what the same
   // system flow would need with one fewer machine running.
   const has_fewer = machines_running > 1;
@@ -2416,7 +2416,7 @@ export function computeLouverFreeArea({
       ? "(no beginning-point-of-water-penetration velocity entered -- it is an AMCA 500-L tested property of the specific louver, not a rule of thumb)"
       : "(no allowable velocity entered)"
     : within_limit
-      ? fmt(free_velocity_fpm, 0) + " fpm through the free area against a " + fmt(limit_fpm, 0) + " fpm limit, with " + fmt(limit_fpm - free_velocity_fpm, 0) + " fpm of margin"
+      ? fmt(free_velocity_fpm, 0) + " fpm through the free area against " + aFig(fmt(limit_fpm, 0)) + " fpm limit, with " + fmt(limit_fpm - free_velocity_fpm, 0) + " fpm of margin"
       : fmt(free_velocity_fpm, 0) + " fpm through the free area, PAST the " + fmt(limit_fpm, 0) + " fpm limit by " + fmt(free_velocity_fpm - limit_fpm, 0) + " fpm" + (is_intake ? " -- rain is carried through" : " -- the pressure drop and the noise both go with the square of this velocity");
   const gross_error_verdict = !has_limit
     ? "(no limit entered to size against)"
@@ -2638,7 +2638,7 @@ export function computeRefractoryShellTemperature({
   const interface2_f = interfaces[1] ? interfaces[1].temp : 0;
   const interface3_f = interfaces[2] ? interfaces[2].temp : 0;
   const flux_verdict = fmt(flux_btu_hr_ft2, 0) + " BTU/hr/sq ft through " + fmt(total_resistance, 3)
-    + " hr-sq ft-degF/BTU of total resistance, on a " + fmt(hot_face_f - ambient_f, 0) + " degF drop";
+    + " hr-sq ft-degF/BTU of total resistance, on " + aFig(fmt(hot_face_f - ambient_f, 0)) + " degF drop";
   // The failure this tile exists to catch: a layer BEHIND the hot face sitting
   // above its own service temperature.
   const over_layers = interfaces.filter((i) => i.over);
@@ -2770,7 +2770,7 @@ export function computeCryogenicBoiloff({
   const fuller = has_alt && alt_vapour_space_pct < vapour_space_pct;
   const alt_verdict = !has_alt
     ? "(no alternative fill level entered)"
-    : "at a " + fmt(alt_vapour_space_pct, 0) + "% vapour space it holds " + fmt(alt_hold_time_hr, 1) + " hours, "
+    : "at " + aFig(fmt(alt_vapour_space_pct, 0)) + "% vapour space it holds " + fmt(alt_hold_time_hr, 1) + " hours, "
       + (alt_hold_time_hr > hold_time_hr ? "LONGER" : "SHORTER") + " than the " + fmt(hold_time_hr, 1)
       + " above -- the hold time is proportional to the vapour space, so "
       + (fuller
@@ -2897,7 +2897,7 @@ HVACSYSTEMS_RENDERERS["flat-surface-heat-loss"] = _simpleRenderer({
   outputs: [
     { key: "q_total_btuh", label: "Heat loss", unit: "BTU/hr", value: (r) => r.loss_verdict },
     { key: "conv_coefficient", label: "Surface coefficients", unit: "BTU/hr/sq ft/°F", value: (r) => r.film_verdict },
-    { key: "rayleigh", label: "Rayleigh number", value: (r) => fmt(r.rayleigh, 0) + " on a " + fmt(r.characteristic_length_ft, 2) + " ft characteristic length" },
+    { key: "rayleigh", label: "Rayleigh number", value: (r) => fmt(r.rayleigh, 0) + " on " + aFig(fmt(r.characteristic_length_ft, 2)) + " ft characteristic length" },
     { key: "note", label: "Note", value: (r) => r.note },
   ],
 });
@@ -2948,7 +2948,7 @@ export function computeGlycolFluidFactor({ glycol_pct = 0, fluid_temp_f = 0, loa
   const factor_verdict = fmt(fluid_factor, 0) + " BTU/hr per gpm per degF, against 500 for water: the same load and temperature difference take " + fmt((flow_multiplier - 1) * 100, 0) + "% more flow";
   const property_verdict = "specific heat " + fmt(specific_heat_btu_lb_f, 3) + " BTU/lb/degF, density " + fmt(density_lb_ft3, 2) + " lb/cu ft (gravity " + fmt(specific_gravity, 3) + "), viscosity about " + fmt(viscosity_centipoise, 2) + " centipoise";
   const flow_verdict = has_load
-    ? fmt(flow_gpm, 1) + " gpm for " + fmt(load_btuh, 0) + " BTU/hr at a " + fmt(delta_t_f, 0) + " degF difference, where water would take " + fmt(water_flow_gpm, 1) + " gpm"
+    ? fmt(flow_gpm, 1) + " gpm for " + fmt(load_btuh, 0) + " BTU/hr at " + aFig(fmt(delta_t_f, 0)) + " degF difference, where water would take " + fmt(water_flow_gpm, 1) + " gpm"
     : "enter a load and a temperature difference for the flow";
   const freeze_verdict = "freezes at about " + fmt(freeze_point_f, 0) + " degF; burst protection extends lower";
   return {

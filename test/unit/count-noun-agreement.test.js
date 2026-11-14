@@ -47,6 +47,9 @@ const REVIEWED = new Set([
   "soft-foot-correction mils", "soil-relative-density cancels", "standby-battery-sizing credits",
   "sub-slab-suction-field this", "traction-roping-ratio dominates", "two-stage-interstage-pressure across",
   "ventilation-rate-procedure needs", "weld-metal-volume pass",
+  // verbs after "Note 1", "axle 1", "Layer 1", "Leg 1", "0 or 1", "(1 means ...)"
+  "service-load-standard stops", "bridge-formula exceeds", "sample-size-for-margin assumes",
+  "refractory-shell-temperature needs", "bridle-leg-tension needs", "pool-heat-pump-capacity means",
 ]);
 
 test("count nouns: no rendered page prints a count of one beside a plural noun", async () => {
@@ -55,6 +58,6 @@ test("count nouns: no rendered page prints a count of one beside a plural noun",
   const sweep = fileURLToPath(new URL("../fixtures/render-count-noun-sweep.js", import.meta.url));
   const report = JSON.parse(execFileSync(process.execPath, [sweep], { encoding: "utf8", maxBuffer: 1 << 24, stdio: ["ignore", "pipe", "ignore"] }));
   assert.ok(report.withExample > 2200, `only ${report.withExample} tiles rendered an example`);
-  const fresh = report.hits.filter((h) => !REVIEWED.has(h.id + " " + h.word)).map((h) => `${h.id} (${h.state}): ...${h.text}`);
+  const fresh = report.hits.filter((h) => h.kind === "plural" && !REVIEWED.has(h.id + " " + h.word)).map((h) => `${h.id} (${h.state}): ...${h.text}`);
   assert.deepEqual(fresh, [], "choose the noun by the printed count, or review the pair above");
 });

@@ -3,7 +3,7 @@
 // out of calc-stage.js so the parent module stays below its gzip cap.
 // Calculator behavior, IDs, citations, examples, and Group N assignments are unchanged.
 
-import {
+import { aFig,
   DEBOUNCE_MS, debounce, makeNumber, makeSelect, makeCheckbox,
   makeOutputLine, attachExampleButton, fmt,
   stepsFor,
@@ -610,7 +610,7 @@ STAGEPRODUCTION_RENDERERS["mired-gel-shift"] = _r({
     { key: "t", id: "mird-out-t", label: "Target", value: (r) => fmt(r.target_mired, 1) + " mireds" },
     { key: "n", id: "mird-out-n", label: "Shift needed", value: (r) => fmt(r.shift_needed, 1) + " mireds" },
     { key: "g", id: "mird-out-g", label: "Nearest standard correction", value: (r) => r.nearest_name + " at " + fmt(r.nearest_shift, 0) + " " + (fmt(r.nearest_shift, 0) === "1" ? "mired" : "mireds") + " (" + fmt(Math.abs(r.nearest_error), 1) + " mireds off target)" },
-    { key: "k", id: "mird-out-k", label: "Where the applied shift lands", value: (r) => fmt(r.resulting_k, 0) + " K from a " + fmt(r.effective_shift, 0) + " mired shift" },
+    { key: "k", id: "mird-out-k", label: "Where the applied shift lands", value: (r) => fmt(r.resulting_k, 0) + " K from " + aFig(fmt(r.effective_shift, 0)) + " mired shift" },
     { key: "z", id: "mird-out-z", label: "Note", value: (r) => r.note },
   ],
   compute: computeMiredGelShift,
@@ -692,7 +692,7 @@ export function computeStageDeckLiveLoad({ length_ft = 0, width_ft = 0, legs = 4
       : "OK: real margin against the leg rating";
   // Until 2026-10-14 a 900 lb point load with no deck rating entered read "no concentrated load entered".
   const point_verdict = point_utilization_pct === null
-    ? (point_load_lb > 0 ? "a " + fmt(point_load_lb, 0) + " lb concentrated load is entered but no deck point rating to check it against -- enter the manufacturer's rated point load" : "no concentrated load entered")
+    ? (point_load_lb > 0 ? aFig(fmt(point_load_lb, 0)) + " lb concentrated load is entered but no deck point rating to check it against -- enter the manufacturer's rated point load" : "no concentrated load entered")
     : point_utilization_pct > 100
       ? "OVER the deck's rated point load"
       : "inside the deck's rated point load";
@@ -844,7 +844,7 @@ STAGEPRODUCTION_RENDERERS["outdoor-stage-wind"] = _r({
     { key: "q", id: "oswd-out-q", label: "Velocity pressure", value: (r) => fmt(r.velocity_pressure_psf, 2) + " psf on " + fmt(r.area_sqft, 0) + " sq ft" },
     { key: "f", id: "oswd-out-f", label: "Wind force", value: (r) => fmt(r.wind_force_lb, 0) + " lb" },
     { key: "m", id: "oswd-out-m", label: "Overturning moment", value: (r) => fmt(r.overturning_moment_ftlb, 0) + " ft-lb about the downwind base edge" },
-    { key: "b", id: "oswd-out-b", label: "Required ballast", value: (r) => fmt(r.required_ballast_lb, 0) + " lb at a " + fmt(r.resisting_arm_ft, 1) + " ft resisting arm" },
+    { key: "b", id: "oswd-out-b", label: "Required ballast", value: (r) => fmt(r.required_ballast_lb, 0) + " lb at " + aFig(fmt(r.resisting_arm_ft, 1)) + " ft resisting arm" },
     { key: "s", id: "oswd-out-s", label: "Wind speed the ballast on hand survives", value: (r) => r.capacity_speed_mph === null ? "-" : fmt(r.capacity_speed_mph, 1) + " mph" },
     { key: "z", id: "oswd-out-z", label: "Note", value: (r) => r.note },
   ],

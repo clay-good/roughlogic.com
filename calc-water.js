@@ -1,7 +1,7 @@
 // Group M: Water and Wastewater Operations (utilities 210-215).
 // See spec-v4.md section 2.4.
 
-import {
+import { aFig,
   DEBOUNCE_MS, debounce, makeNumber, makeSelect,
   makeOutputLine, attachExampleButton, fmt,
   makeStepsPanel,
@@ -2428,7 +2428,7 @@ export function computeWellCasingPurgeVolume({
   const gal_per_ft = _WELL_GAL_PER_FT_COEFF * casing_diameter_in * casing_diameter_in;
   const standing_column_ft = well_depth_ft - static_water_level_ft;
   const casing_volume_gal = gal_per_ft * standing_column_ft;
-  const volume_verdict = "a " + fmt(casing_diameter_in, 1) + " in casing holds " + fmt(gal_per_ft, 2) + " gal per foot, and " + fmt(standing_column_ft, 0) + " ft of standing column (" + fmt(well_depth_ft, 0) + " ft deep less a " + fmt(static_water_level_ft, 0) + " ft static level) is " + fmt(casing_volume_gal, 0) + " " + (fmt(casing_volume_gal, 0) === "1" ? "gallon" : "gallons");
+  const volume_verdict = aFig(fmt(casing_diameter_in, 1)) + " in casing holds " + fmt(gal_per_ft, 2) + " gal per foot, and " + fmt(standing_column_ft, 0) + " ft of standing column (" + fmt(well_depth_ft, 0) + " ft deep less " + aFig(fmt(static_water_level_ft, 0)) + " ft static level) is " + fmt(casing_volume_gal, 0) + " " + (fmt(casing_volume_gal, 0) === "1" ? "gallon" : "gallons");
   const purge_volume_gal = casing_volume_gal * purge_volumes;
   const has_rate = purge_rate_gpm > 0;
   const purge_minutes = has_rate ? purge_volume_gal / purge_rate_gpm : 0;
@@ -2513,7 +2513,7 @@ export function computeConstantPressureWellVfd({
   const speed_reduction_pct = has_reduced ? (1 - speed_at_reduced_rpm / full_speed_rpm) * 100 : 0;
   const reduced_verdict = !has_reduced
     ? "(no reduced flow entered -- and the point of this is what happens to the SPEED when demand falls)"
-    : "at " + fmt(reduced_flow_gpm, 0) + " gpm the friction falls to " + fmt(friction_at_reduced_ft, 1) + " ft and the head required is " + fmt(head_at_reduced_ft, 0) + " ft, so the speed is about " + fmt(speed_at_reduced_rpm, 0) + " rpm -- only " + fmt(speed_reduction_pct, 1) + "% slower for a " + fmt((1 - flow_ratio) * 100, 0) + "% reduction in flow";
+    : "at " + fmt(reduced_flow_gpm, 0) + " gpm the friction falls to " + fmt(friction_at_reduced_ft, 1) + " ft and the head required is " + fmt(head_at_reduced_ft, 0) + " ft, so the speed is about " + fmt(speed_at_reduced_rpm, 0) + " rpm -- only " + fmt(speed_reduction_pct, 1) + "% slower for " + aFig(fmt((1 - flow_ratio) * 100, 0)) + "% reduction in flow";
   const savings_verdict = !has_reduced
     ? "(no reduced flow entered)"
     : "THE CUBE LAW DOES NOT APPLY HERE, and expecting it is the mistake. A VFD saves on the cube of speed only when the head is FRICTION head, which falls with flow. On a well holding a pressure setpoint, static lift and the setpoint are constant and only friction is speed-sensitive -- here " + fmt(friction_at_design_ft, 0) + " ft out of " + fmt(head_at_design_ft, 0) + ", or " + fmt(friction_at_design_ft / head_at_design_ft * 100, 0) + "% of the head. The pump is doing LIFTING work, not friction work, so the speed barely falls and neither does the power. A constant-pressure system is bought for the pressure it holds, not for the energy it saves";
@@ -2596,8 +2596,8 @@ export function computeWetWellCycleTime({
   const area_ft2 = Math.PI / 4 * well_diameter_ft * well_diameter_ft;
   const gal_per_ft = area_ft2 * _WW_GAL_PER_CU_FT;
   const level_differential_ft = active_volume_gal / gal_per_ft;
-  const volume_verdict = "a " + fmt(cycle_min, 1) + " minute minimum cycle (" + fmt(starts_per_hour, 1) + " starts an hour) on a " + fmt(pump_gpm, 0) + " gpm pump needs " + fmt(active_volume_gal, 0) + " " + (fmt(active_volume_gal, 0) === "1" ? "gallon" : "gallons") + " of ACTIVE volume -- the volume between the start and stop levels, not the whole well";
-  const geometry_verdict = "a " + fmt(well_diameter_ft, 1) + " ft well is " + fmt(area_ft2, 1) + " sq ft, or " + fmt(gal_per_ft, 0) + " gal per foot of depth, so the level differential is " + fmt(level_differential_ft, 2) + " ft between the start and stop floats";
+  const volume_verdict = aFig(fmt(cycle_min, 1)) + " minute minimum cycle (" + fmt(starts_per_hour, 1) + " starts an hour) on " + aFig(fmt(pump_gpm, 0)) + " gpm pump needs " + fmt(active_volume_gal, 0) + " " + (fmt(active_volume_gal, 0) === "1" ? "gallon" : "gallons") + " of ACTIVE volume -- the volume between the start and stop levels, not the whole well";
+  const geometry_verdict = aFig(fmt(well_diameter_ft, 1)) + " ft well is " + fmt(area_ft2, 1) + " sq ft, or " + fmt(gal_per_ft, 0) + " gal per foot of depth, so the level differential is " + fmt(level_differential_ft, 2) + " ft between the start and stop floats";
   const worst_verdict = "THE GOVERNING CASE IS INFLOW AT HALF THE PUMP RATE, which is " + fmt(worst_case_inflow_gpm, 0) + " gpm here. That is where a fixed-speed station cycles fastest: at a low inflow the well takes a long time to fill, and at an inflow near the pump rate it takes a long time to draw down -- halfway between, both halves are short at once. Sizing on average inflow instead of that worst case is how a station ends up short-cycling at a flow it will certainly see";
   const has_inflow = inflow_gpm > 0;
   const fill_min = has_inflow ? active_volume_gal / inflow_gpm : 0;
@@ -2606,7 +2606,7 @@ export function computeWetWellCycleTime({
   const short_cycling = has_inflow && cycle_at_inflow_min < cycle_min - 1e-9 * Math.abs(cycle_min);
   const inflow_verdict = !has_inflow
     ? "(no actual inflow entered)"
-    : "at " + fmt(inflow_gpm, 0) + " gpm of inflow the well fills in " + fmt(fill_min, 1) + " min and draws down in " + fmt(draw_min, 1) + " min, a " + fmt(cycle_at_inflow_min, 1) + " minute cycle"
+    : "at " + fmt(inflow_gpm, 0) + " gpm of inflow the well fills in " + fmt(fill_min, 1) + " min and draws down in " + fmt(draw_min, 1) + " min, " + aFig(fmt(cycle_at_inflow_min, 1)) + " minute cycle"
       + (short_cycling
         ? " -- SHORTER than the " + fmt(cycle_min, 1) + " minute minimum, so the motor is starting more often than its rating allows"
         : ", which meets the " + fmt(cycle_min, 1) + " minute minimum with " + fmt(cycle_at_inflow_min - cycle_min, 1) + " minutes to spare");
@@ -2666,7 +2666,7 @@ export function computeMainFlushingVolume({
   const required_gpm = _MAIN_GPM_COEFF * main_diameter_in * main_diameter_in * target_velocity_fps;
   const total_discharged_gal = pipe_volume_gal * pipe_volumes;
   const duration_min = total_discharged_gal / required_gpm;
-  const volume_verdict = "a " + fmt(main_diameter_in, 0) + " in main holds " + fmt(gal_per_ft, 2) + " gal per foot, so " + fmt(run_length_ft, 0) + " ft is " + fmt(pipe_volume_gal, 0) + " " + (fmt(pipe_volume_gal, 0) === "1" ? "gallon" : "gallons");
+  const volume_verdict = aFig(fmt(main_diameter_in, 0)) + " in main holds " + fmt(gal_per_ft, 2) + " gal per foot, so " + fmt(run_length_ft, 0) + " ft is " + fmt(pipe_volume_gal, 0) + " " + (fmt(pipe_volume_gal, 0) === "1" ? "gallon" : "gallons");
   const flow_verdict = "reaching " + fmt(target_velocity_fps, 1) + " ft/s takes " + fmt(required_gpm, 0) + " gpm, and " + fmt(pipe_volumes, 1) + " pipe volumes at that flow is " + fmt(duration_min, 0) + " " + (fmt(duration_min, 0) === "1" ? "minute" : "minutes") + " and " + fmt(total_discharged_gal, 0) + " " + (fmt(total_discharged_gal, 0) === "1" ? "gallon" : "gallons") + " discharged -- both worth knowing before opening the hydrant, because that water has to go somewhere and be dechlorinated";
   // Whether the outlets can actually pass the required flow is the real question.
   const has_outlets = hydrant_outlets > 0 && outlet_capacity_gpm > 0;

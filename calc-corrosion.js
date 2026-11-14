@@ -11,7 +11,7 @@
 // its direction stated in words, because a minus sign on a margin is exactly
 // the thing a survey report misreads.
 
-import {
+import { aFig,
   DEBOUNCE_MS, debounce, makeNumber,
   makeOutputLine, attachExampleButton, fmt, fmtDir,
   makeStepsPanel,
@@ -555,7 +555,7 @@ CORROSION_RENDERERS["corrosion-rate-weight-loss"] = _simpleRenderer({
   ],
   outputs: [
     { key: "corrosion_rate_mpy", id: "crw-rate", label: "Average corrosion rate", value: (r) => fmt(r.corrosion_rate_mpy, 4) + " mpy (" + fmt(r.corrosion_rate_mm_per_year, 4) + " mm/yr)" },
-    { key: "remaining_life_years", id: "crw-life", label: "Remaining life at the average", unit: "years", value: (r) => fmt(r.remaining_life_years, 0) + " " + (fmt(r.remaining_life_years, 0) === "1" ? "year" : "years") + " on a " + fmt(r.corrosion_allowance_in, 3) + " in allowance -- correct arithmetic, not a real forecast" },
+    { key: "remaining_life_years", id: "crw-life", label: "Remaining life at the average", unit: "years", value: (r) => fmt(r.remaining_life_years, 0) + " " + (fmt(r.remaining_life_years, 0) === "1" ? "year" : "years") + " on " + aFig(fmt(r.corrosion_allowance_in, 3)) + " in allowance -- correct arithmetic, not a real forecast" },
     { key: "alternative_rate_mpy", id: "crw-alt", label: "At the alternative mass loss", value: (r) => fmt(r.alternative_rate_mpy, 2) + " mpy, " + fmt(r.alternative_life_years, 1) + " years -- " + fmt(r.rate_ratio, 0) + "x the loss is " + fmt(r.rate_ratio, 0) + "x the rate, exactly" },
     { key: "pit_rate_mpy", id: "crw-pit", label: "At the deepest pit", value: (r) => fmt(r.pit_rate_mpy, 2) + " mpy at a pitting factor of " + fmt(r.pitting_factor, 0) },
     { key: "pit_life_years", id: "crw-pitlife", label: "Life at the deepest pit", unit: "years", value: (r) => fmt(r.pit_life_years, 0) + " " + (fmt(r.pit_life_years, 0) === "1" ? "year" : "years") + " -- the figure that decides when it leaks" },
@@ -624,7 +624,7 @@ CORROSION_RENDERERS["galvanic-area-ratio"] = _simpleRenderer({
     { key: "galvanic_current_ma", id: "gar-i", label: "Galvanic current", value: (r) => fmt(r.galvanic_current_ma, 2) + " mA, set by what the cathode supports" },
     { key: "penetration_in_per_year", id: "gar-pen", label: "Attack on the anode, as given", value: (r) => fmt(r.penetration_in_per_year, 3) + " in/yr at " + fmt(r.anode_current_density_a_per_sqft, 2) + " A/sq ft" },
     { key: "reversed_penetration_in_per_year", id: "gar-rev", label: "With the areas reversed", value: (r) => fmt(r.reversed_penetration_mils_per_year, 5) + " mils/yr" + (r.area_ratio > 1 ? " -- immeasurably small" : r.area_ratio < 1 ? " -- this is the dangerous arrangement" : " -- the same, since the areas are equal") },
-    { key: "attack_ratio", id: "gar-ratio", label: "The whole lesson", value: (r) => r.area_ratio > 1 ? "A " + fmt(r.area_ratio, 0) + " to 1 area ratio changes the attack " + fmt(r.attack_ratio, 0) + " times -- the ratio squared" : r.area_ratio < 1 ? "A 1 to " + fmt(1 / r.area_ratio, 0) + " area ratio changes the attack " + fmt(1 / r.attack_ratio, 0) + " times -- the ratio squared" : "Equal areas: reversing them changes nothing" },
+    { key: "attack_ratio", id: "gar-ratio", label: "The whole lesson", value: (r) => r.area_ratio > 1 ? aFig(fmt(r.area_ratio, 0), true) + " to 1 area ratio changes the attack " + fmt(r.attack_ratio, 0) + " times -- the ratio squared" : r.area_ratio < 1 ? "A 1 to " + fmt(1 / r.area_ratio, 0) + " area ratio changes the attack " + fmt(1 / r.attack_ratio, 0) + " times -- the ratio squared" : "Equal areas: reversing them changes nothing" },
     { key: "note", id: "gar-note", label: "Use", value: (r) => r.note },
   ],
   compute: computeGalvanicAreaRatio,

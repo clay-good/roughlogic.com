@@ -20,7 +20,7 @@
 // plans, and the track owner govern. See spec-v1539.md through
 // spec-v1545.md.
 
-import {
+import { aFig,
   DEBOUNCE_MS, debounce, makeNumber,
   makeOutputLine, attachExampleButton, fmt,
   makeStepsPanel,
@@ -550,7 +550,7 @@ export function computeRailcarLoadLimit({ gross_rail_load_lb = 0, light_weight_l
   const verdict = within_car
     ? "INSIDE the car at " + fmt(gross_on_rail_lb, 0) + " lb on rail against " + fmt(gross_rail_load_lb, 0) + " lb, " + fmt(utilization_pct, 1) + "% of the car's load limit"
       + (route_governs ? " -- but " + fmt(governing_utilization_pct, 1) + "% of the " + fmt(governing_load_limit_lb, 0) + " lb the ROUTE allows, which is the limit that governs" : "") + (cube_limited_weight_lb !== null && lading_net_lb > cube_limited_weight_lb * (1 + 1e-9) ? " -- BUT " + fmt(lading_net_lb, 0) + " lb of this lading is more than the " + fmt(cube_limited_weight_lb, 0) + " lb the car holds at the entered density; check the lading weight or the density" : "")
-    : "OVERLOADED: " + fmt(gross_on_rail_lb, 0) + " lb on rail against a " + fmt(gross_rail_load_lb, 0) + " lb car, " + fmt(gross_on_rail_lb - gross_rail_load_lb, 0) + " lb over";
+    : "OVERLOADED: " + fmt(gross_on_rail_lb, 0) + " lb on rail against " + aFig(fmt(gross_rail_load_lb, 0)) + " lb car, " + fmt(gross_on_rail_lb - gross_rail_load_lb, 0) + " lb over";
   const route_verdict = within_route === null
     ? "Enter the route's maximum gross rail load. It is frequently below the car's, and the difference is invisible on the car."
     : within_route

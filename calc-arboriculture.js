@@ -1,6 +1,6 @@
 // Group L: Arboriculture expansion calculators split from calc-arborist.js.
 
-import {
+import { aFig,
   DEBOUNCE_MS, debounce, makeNumber, makeSelect, makeOutputLine,
   attachExampleButton, fmt,
   makeStepsPanel,
@@ -404,7 +404,7 @@ export function computeSoilVolumeForCanopy({ canopy_diameter_ft = 0, soil_per_ca
   const verdict = adequate === null
     ? "Enter the tree pit dimensions to compare what is provided against what the canopy needs."
     : adequate
-      ? "ADEQUATE: " + fmt(usable_pit_volume_ft3, 0) + " cu ft of usable soil against " + fmt(soil_required_ft3, 0) + " required for a " + fmt(canopy_diameter_ft, 0) + " ft canopy"
+      ? "ADEQUATE: " + fmt(usable_pit_volume_ft3, 0) + " cu ft of usable soil against " + fmt(soil_required_ft3, 0) + " required for " + aFig(fmt(canopy_diameter_ft, 0)) + " ft canopy"
       : "THE PIT PROVIDES " + fmt(provision_pct, 0) + "% OF WHAT THE INTENDED CANOPY NEEDS: " + fmt(usable_pit_volume_ft3, 0) + " cu ft of usable soil against " + fmt(soil_required_ft3, 0) + " required, short by " + fmt(shortfall_ft3, 0) + ". What it actually supports is a canopy of about " + fmt(supported_canopy_ft, 0) + " ft, and the tree will stall there whatever the plan says";
   return {
     canopy_diameter_ft, canopy_area_ft2, soil_per_canopy_ft3_per_ft2, soil_required_ft3,
@@ -427,9 +427,9 @@ ARBORICULTURE_RENDERERS["soil-volume-for-canopy"] = _simpleRenderer({
     { key: "usable_fraction", label: "Fraction of that soil roots can actually use", kind: "number", default: 1 },
   ],
   outputs: [
-    { key: "c", id: "svc-out-c", label: "Canopy projection", value: (r) => fmt(r.canopy_area_ft2, 0) + " sq ft for a " + fmt(r.canopy_diameter_ft, 0) + " ft canopy" },
+    { key: "c", id: "svc-out-c", label: "Canopy projection", value: (r) => fmt(r.canopy_area_ft2, 0) + " sq ft for " + aFig(fmt(r.canopy_diameter_ft, 0)) + " ft canopy" },
     { key: "s", id: "svc-out-s", label: "Soil required", value: (r) => fmt(r.soil_required_ft3, 0) + " cu ft (" + fmt(r.soil_required_cy, 1) + " cy) at " + fmt(r.soil_per_canopy_ft3_per_ft2, 2) + " cu ft per sq ft of canopy" },
-    { key: "p", id: "svc-out-p", label: "The pit provides", value: (r) => r.pit_volume_ft3 === 0 ? "(no pit entered)" : fmt(r.pit_volume_ft3, 0) + " cu ft, " + fmt(r.usable_pit_volume_ft3, 0) + " of it usable at a " + fmt(r.usable_fraction, 2) + " fraction" },
+    { key: "p", id: "svc-out-p", label: "The pit provides", value: (r) => r.pit_volume_ft3 === 0 ? "(no pit entered)" : fmt(r.pit_volume_ft3, 0) + " cu ft, " + fmt(r.usable_pit_volume_ft3, 0) + " of it usable at " + aFig(fmt(r.usable_fraction, 2)) + " fraction" },
     { key: "v", id: "svc-out-v", label: "Against the requirement", value: (r) => r.verdict },
     { key: "n", id: "svc-out-n", label: "Note", value: (r) => r.note },
   ],

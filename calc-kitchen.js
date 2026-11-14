@@ -1,7 +1,7 @@
 // Group O: Kitchen and Food Service (utilities 222-226).
 // See spec-v4.md section 2.6.
 
-import {
+import { aFig,
   DEBOUNCE_MS, debounce, makeNumber, makeSelect,
   makeOutputLine, attachExampleButton, fmt, makeRowField, makeText,
   makeStepsPanel,
@@ -2301,10 +2301,10 @@ export function computeGreaseDuctCleaningInterval({ inspection_interval_months =
   const outs = [months_overdue, next_inspection_months, applicable_trigger_um, thickness_margin_um, inspections_per_year];
   if (!outs.every(Number.isFinite)) return { error: "Cleaning interval math is not a finite value." };
   const schedule_verdict = inspection_overdue
-    ? "INSPECTION OVERDUE by " + fmt(months_overdue, 1) + " months: " + fmt(months_since_inspection, 1) + " months since the last one against a " + fmt(inspection_interval_months, 1) + " month interval (" + fmt(inspections_per_year, 1) + " a year)"
-    : "ON SCHEDULE: " + fmt(months_since_inspection, 1) + " months since the last inspection, with " + fmt(next_inspection_months, 1) + " months to the next at a " + fmt(inspection_interval_months, 1) + " month interval";
+    ? "INSPECTION OVERDUE by " + fmt(months_overdue, 1) + " months: " + fmt(months_since_inspection, 1) + " months since the last one against " + aFig(fmt(inspection_interval_months, 1)) + " month interval (" + fmt(inspections_per_year, 1) + " a year)"
+    : "ON SCHEDULE: " + fmt(months_since_inspection, 1) + " months since the last inspection, with " + fmt(next_inspection_months, 1) + " months to the next at " + aFig(fmt(inspection_interval_months, 1)) + " month interval";
   const measurement_verdict = cleaning_triggered
-    ? "CLEAN NOW: " + fmt(measured_thickness_um, 0) + " " + (fmt(measured_thickness_um, 0) === "1" ? "micrometre" : "micrometres") + " (" + fmt(measured_thickness_in, 4) + " in) against a " + fmt(applicable_trigger_um, 0) + " micrometre trigger" + (at_designated_point ? " in the fan housing" : "") + ", and the surfaces are cleaned to " + CLEAN_TO_UM + " micrometres (0.002 in). THE MEASUREMENT GOVERNS, whatever the schedule says"
+    ? "CLEAN NOW: " + fmt(measured_thickness_um, 0) + " " + (fmt(measured_thickness_um, 0) === "1" ? "micrometre" : "micrometres") + " (" + fmt(measured_thickness_in, 4) + " in) against " + aFig(fmt(applicable_trigger_um, 0)) + " micrometre trigger" + (at_designated_point ? " in the fan housing" : "") + ", and the surfaces are cleaned to " + CLEAN_TO_UM + " micrometres (0.002 in). THE MEASUREMENT GOVERNS, whatever the schedule says"
     : "Below the trigger at " + fmt(measured_thickness_um, 0) + " " + (fmt(measured_thickness_um, 0) === "1" ? "micrometre" : "micrometres") + " against " + fmt(applicable_trigger_um, 0) + ", with " + fmt(thickness_margin_um, 0) + " to go" + (at_designated_point ? " in the fan housing" : "") + " -- below the NFPA 96 trigger no cleaning is required yet, and the system is still inspected again at the interval";
   return {
     inspection_interval_months, months_since_inspection, months_overdue,
@@ -2467,13 +2467,13 @@ export function computeKitchenMakeupAirDeficit({ hood_exhaust_cfm = 0, other_exh
   const balance_verdict = deficit_cfm < -1e-9 * total_exhaust_cfm
     ? "SURPLUS OF " + fmt(-deficit_cfm, 0) + " CFM: dedicated makeup exceeds the exhaust, so the kitchen runs POSITIVE and pushes heat, grease and odours toward the dining room. A kitchen is kept slightly negative; trim the makeup air."
     : balanced
-    ? "BALANCED within the intended transfer: a " + fmt(deficit_cfm, 0) + " cfm deficit against " + fmt(intended_transfer_cfm, 0) + " cfm of transfer air the design intends to draw from the dining room"
-    : "SHORT BY " + fmt(makeup_shortfall_cfm, 0) + " CFM: a " + fmt(deficit_cfm, 0) + " cfm deficit (" + fmt(deficit_percent, 0) + "% of exhaust) less " + fmt(intended_transfer_cfm, 0) + " cfm of intended transfer. That air comes through the envelope, under doors, and down any flue that will pass it";
+    ? "BALANCED within the intended transfer: " + aFig(fmt(deficit_cfm, 0)) + " cfm deficit against " + fmt(intended_transfer_cfm, 0) + " cfm of transfer air the design intends to draw from the dining room"
+    : "SHORT BY " + fmt(makeup_shortfall_cfm, 0) + " CFM: " + aFig(fmt(deficit_cfm, 0)) + " cfm deficit (" + fmt(deficit_percent, 0) + "% of exhaust) less " + fmt(intended_transfer_cfm, 0) + " cfm of intended transfer. That air comes through the envelope, under doors, and down any flue that will pass it";
   const door_verdict = door_force_lbf === null
     ? "Enter the building leakage coefficient to turn the shortfall into a pressure and a door force."
     : door_force_ok
-      ? "DOOR FORCE OK: about " + fmt(door_total_force_lbf, 1) + " lbf with the closer (" + fmt(door_force_lbf, 1) + " from pressure) on a " + fmt(door_width_ft, 1) + " by " + fmt(door_height_ft, 1) + " ft door at " + fmt(pressure_pa, 1) + " Pa, inside the " + fmt(EGRESS_DOOR_LIMIT_LBF, 0) + " lbf egress limit"
-      : "DOOR FORCE OVER THE EGRESS LIMIT: about " + fmt(door_total_force_lbf, 1) + " lbf with the closer (" + fmt(door_force_lbf, 1) + " from pressure) on a " + fmt(door_width_ft, 1) + " by " + fmt(door_height_ft, 1) + " ft door at " + fmt(pressure_pa, 1) + " Pa, against a " + fmt(EGRESS_DOOR_LIMIT_LBF, 0) + " lbf limit. An exterior door people cannot open is a life safety problem before it is a comfort one";
+      ? "DOOR FORCE OK: about " + fmt(door_total_force_lbf, 1) + " lbf with the closer (" + fmt(door_force_lbf, 1) + " from pressure) on " + aFig(fmt(door_width_ft, 1)) + " by " + fmt(door_height_ft, 1) + " ft door at " + fmt(pressure_pa, 1) + " Pa, inside the " + fmt(EGRESS_DOOR_LIMIT_LBF, 0) + " lbf egress limit"
+      : "DOOR FORCE OVER THE EGRESS LIMIT: about " + fmt(door_total_force_lbf, 1) + " lbf with the closer (" + fmt(door_force_lbf, 1) + " from pressure) on " + aFig(fmt(door_width_ft, 1)) + " by " + fmt(door_height_ft, 1) + " ft door at " + fmt(pressure_pa, 1) + " Pa, against " + aFig(fmt(EGRESS_DOOR_LIMIT_LBF, 0)) + " lbf limit. An exterior door people cannot open is a life safety problem before it is a comfort one";
   return {
     hood_exhaust_cfm, other_exhaust_cfm, total_exhaust_cfm, dedicated_makeup_cfm,
     deficit_cfm, deficit_percent, intended_transfer_cfm, uncontrolled_cfm,
@@ -2498,7 +2498,7 @@ KITCHEN_RENDERERS["kitchen-makeup-air-deficit"] = _simpleRenderer({
     { key: "door_closer_force_lbf", label: "Door closer force (lbf; counted inside the 30 lbf egress limit)", kind: "number", default: 8 },
   ],
   outputs: [
-    { key: "e", id: "kmad-out-e", label: "Exhaust against makeup", value: (r) => fmt(r.total_exhaust_cfm, 0) + " cfm out against " + fmt(r.dedicated_makeup_cfm, 0) + " cfm in -- a " + fmt(Math.abs(r.deficit_cfm), 0) + (r.deficit_cfm < 0 ? " cfm SURPLUS, " : " cfm deficit, ") + fmt(Math.abs(r.deficit_percent), 0) + "% of exhaust" },
+    { key: "e", id: "kmad-out-e", label: "Exhaust against makeup", value: (r) => fmt(r.total_exhaust_cfm, 0) + " cfm out against " + fmt(r.dedicated_makeup_cfm, 0) + " cfm in -- " + aFig(fmt(Math.abs(r.deficit_cfm), 0)) + (r.deficit_cfm < 0 ? " cfm SURPLUS, " : " cfm deficit, ") + fmt(Math.abs(r.deficit_percent), 0) + "% of exhaust" },
     { key: "b", id: "kmad-out-b", label: "Balance", value: (r) => r.balance_verdict },
     { key: "p", id: "kmad-out-p", label: "Negative pressure", value: (r) => r.pressure_pa === null ? "(no leakage coefficient entered)" : fmt(r.pressure_pa, 1) + " Pa (" + fmt(r.pressure_inwc, 3) + " in wc) from " + fmt(r.makeup_shortfall_cfm, 0) + " cfm through a building that leaks " + fmt(r.building_leakage_cfm_per_pa, 0) + " cfm per Pa -- " + (r.negative_pressure_ok ? "within" : "OVER") + " the 0.02 in wc kitchen limit of UMC 511.3.1 / NFPA 96 (the IMC sets none; the adopted code governs)" },
     { key: "d", id: "kmad-out-d", label: "Door opening force", value: (r) => r.door_verdict },

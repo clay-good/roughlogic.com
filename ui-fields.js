@@ -20,12 +20,22 @@ export function debounce(fn, ms = DEBOUNCE_MS) {
 
 export function fmt(n, digits = 2) {
   if (n === null || n === undefined || !Number.isFinite(Number(n))) return "-";
-  const t = Number(n).toFixed(digits);
+  let t = Number(n).toFixed(digits);
+  // A small negative that rounds to zero printed "-0.000 ft" (traverse-closure's own example).
+  if (/^-0(?:\.0+)?$/.test(t)) t = t.slice(1);
   // Group the whole part in threes from 10,000 up ("26,180 lb"); four-digit figures stay
   // plain so years, codes and model numbers that pass through fmt are not split.
   const m = /^(-?)(\d+)(\.\d+)?$/.exec(t);
   if (!m || m[2].length < 4) return t;
   return m[1] + m[2].replace(/\B(?=(\d{3})+(?!\d))/g, ",") + (m[3] || "");
+}
+
+// The article and a printed figure, by how the figure is said: "an 85 dB target",
+// "an 11 ft landing", "an 18,000 lb load", but "a 110 V circuit", "a 1,800 lb load".
+// "a 85 dB target" read wrong on 69 tiles (2026-11-14). cap starts a sentence.
+export function aFig(text, cap) {
+  const an = /^(?:8|1[18](?!\d))/.test(String(text));
+  return (cap ? "A" : "a") + (an ? "n " : " ") + text;
 }
 
 // A signed change as a magnitude and a direction word: fmtDir(-33.3, 1, "%",

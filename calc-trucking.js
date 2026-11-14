@@ -7,7 +7,7 @@
 // reefer fuel-burn benchmarks are cited per manufacturer technical
 // bulletin.
 
-import {
+import { aFig,
   DEBOUNCE_MS, debounce, makeNumber, makeSelect, makeCheckbox,
   makeOutputLine, attachExampleButton, fmt, makeRowField,
   makeStepsPanel,
@@ -179,7 +179,7 @@ export function computePalletLoadout({
   // "Infinity" (a degenerate-input render leak invisible to the numeric-field
   // contract sweep because the field is String()-formatted).
   if (!(pallet_length_in > 0 && pallet_width_in > 0 && pallet_height_in > 0)) return { error: "Pallet dimensions must be positive." };
-  if (pallet_height_in > tr.H) return { error: "A " + pallet_height_in + " in pallet does not fit under the " + tr.H + " in interior height of this trailer." };
+  if (pallet_height_in > tr.H) return { error: aFig(pallet_height_in, true) + " in pallet does not fit under the " + tr.H + " in interior height of this trailer." };
 
   // Floor-area pallets: lay 48x40 the long way, then pinwheel the second
   // row 40x48 if allowed.
@@ -1866,7 +1866,7 @@ export function computeTrailerTongueWeight({ trailer_gross_weight_lb = 0, tongue
     ? "TOO LIGHT (" + fmt(tongue_pct, 1) + "% < " + band.low + "%) - trailer-sway risk; move cargo forward of the trailer axle to add tongue weight"
     : tongue_pct > band.high
       ? "TOO HEAVY (" + fmt(tongue_pct, 1) + "% > " + band.high + "%) - overloads the hitch and the tow vehicle's rear axle and unloads the steer axle; move cargo rearward"
-      : "in band (" + band.low + "-" + band.high + "% for a " + band.label + " hitch)";
+      : "in band (" + band.low + "-" + band.high + "% for " + aFig(band.label) + " hitch)";
   return {
     tongue_pct, target_low_lb, target_high_lb, in_band, over_rating, band_label: band.label, verdict,
     note: "Tongue weight is the down-force the loaded trailer puts on the hitch ball, and its share of the trailer's gross weight is what keeps the rig tracking straight: the industry bands are 10-15% for a conventional (bumper-pull) hitch and 15-25% for a gooseneck or fifth wheel. Below the band the load sits too far behind the axle and the trailer sways (fishtails), the classic single-vehicle trailer wreck; above it the hitch and the tow vehicle's rear axle are overloaded while the steer axle lightens, robbing steering and braking. Adjust by moving cargo forward (more tongue) or rearward (less). The bands are rules of thumb; the specific vehicle, hitch, and trailer manufacturer ratings and the tow vehicle's payload and rear-axle GAWR govern. Weigh the tongue with the trailer level and loaded as it will tow; a scale reading, not a guess.",
@@ -2010,7 +2010,7 @@ export function computeTruckStartability({ gross_weight_lb = 0, drive_axle_weigh
   if (![max_grade_pct, tractive_effort_lb, drive_fraction_pct].every(Number.isFinite)) return { error: "Startability math is not a finite value." };
   return {
     max_grade_pct, tractive_effort_lb, drive_fraction_pct,
-    note: "The steepest grade a truck can START on, limited by DRIVE-AXLE TRACTION, not engine power. The drive tires can only push with the friction they have on the weight over them: available tractive effort = mu x W_drive, where mu is the tire-road friction coefficient (about 0.6 dry, 0.3 wet, 0.15 on ice/snow) and W_drive is the weight carried by the driven axles. To start moving up a grade that force must beat the grade resistance plus rolling resistance, W_gross x (grade + f), so the maximum startable grade is (%) = 100 (mu x (W_drive/W_gross) - f), with f the rolling-resistance coefficient (~0.012 on pavement). A 80,000 lb combination with 34,000 lb on the drives (a 42.5% drive fraction) can start on about a 24% grade when dry, but only about 5% on ice - which is why loaded rigs get stuck on icy grades that look mild. More weight on the drive axles (a heavier tractor, sliding the trailer tandems forward) and better traction raise the limit; this is a STARTING (traction) limit, not a sustained-speed (power) limit - a truck may start a grade it cannot climb at road speed, or the reverse. The small-angle field form is used; wheel slip, weight transfer to the rear on the grade, and differential/traction-control behavior shift the real number. A planning estimate; the driver, the surface, and the truck govern.",
+    note: "The steepest grade a truck can START on, limited by DRIVE-AXLE TRACTION, not engine power. The drive tires can only push with the friction they have on the weight over them: available tractive effort = mu x W_drive, where mu is the tire-road friction coefficient (about 0.6 dry, 0.3 wet, 0.15 on ice/snow) and W_drive is the weight carried by the driven axles. To start moving up a grade that force must beat the grade resistance plus rolling resistance, W_gross x (grade + f), so the maximum startable grade is (%) = 100 (mu x (W_drive/W_gross) - f), with f the rolling-resistance coefficient (~0.012 on pavement). An 80,000 lb combination with 34,000 lb on the drives (a 42.5% drive fraction) can start on about a 24% grade when dry, but only about 5% on ice - which is why loaded rigs get stuck on icy grades that look mild. More weight on the drive axles (a heavier tractor, sliding the trailer tandems forward) and better traction raise the limit; this is a STARTING (traction) limit, not a sustained-speed (power) limit - a truck may start a grade it cannot climb at road speed, or the reverse. The small-angle field form is used; wheel slip, weight transfer to the rear on the grade, and differential/traction-control behavior shift the real number. A planning estimate; the driver, the surface, and the truck govern.",
   };
 }
 export const truckStartabilityExample = { inputs: { gross_weight_lb: 80000, drive_axle_weight_lb: 34000, friction_coeff: 0.6, rolling_resistance_coeff: 0.012 } };

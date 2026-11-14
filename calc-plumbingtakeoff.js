@@ -21,7 +21,7 @@
 // module that holds it -- the spec-v70..v98 split precedent). Lazy-loaded, so
 // it is not in the home-view first-paint payload.
 
-import {
+import { aFig,
   DEBOUNCE_MS, debounce, makeNumber, makeOutputLine, attachExampleButton, fmt,
   stepsFor,
 } from "./ui-fields.js";
@@ -120,8 +120,8 @@ export function computePipeInsulationTakeoff({ pipe_ft = 250, waste_pct = 5, num
   const od_mismatch = has_derived_od && Math.abs(derived_jacket_od_in - insul_od_in) > 0.02 + 1e-9;
   const jacket_od_verdict = !has_derived_od
     ? "(no pipe OD and insulation thickness entered)"
-    : fmt(pipe_od_in, 2) + " in pipe with " + fmt(insul_thickness_in, 2) + " in of insulation is a "
-      + fmt(derived_jacket_od_in, 2) + " in jacket OD, a " + fmt(Math.PI * derived_jacket_od_in / 12, 2)
+    : fmt(pipe_od_in, 2) + " in pipe with " + fmt(insul_thickness_in, 2) + " in of insulation is "
+      + aFig(fmt(derived_jacket_od_in, 2)) + " in jacket OD, " + aFig(fmt(Math.PI * derived_jacket_od_in / 12, 2))
       + " ft circumference against the pipe's own " + fmt(pipe_circumference_ft, 2)
       + " ft -- estimating on the pipe would order " + fmt(pipe_circumference_ft / (Math.PI * derived_jacket_od_in / 12) * 100, 0)
       + "% of the jacket actually needed"

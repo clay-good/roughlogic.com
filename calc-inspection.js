@@ -25,7 +25,7 @@
 // hardness reaches, through the equivalent Jominy distance. And
 // `heat-treat-soak-time` says in its own note that it "does not address ...
 // ramp rates", which is exactly what spec-v1674 supplies.
-import {
+import { aFig,
   DEBOUNCE_MS, debounce, makeNumber, makeSelect,
   makeOutputLine, attachExampleButton, fmt, fmtDir,
   makeStepsPanel,
@@ -136,8 +136,8 @@ export function computeWeldVisualAcceptance({
   const length_within = undersize_length_in <= allowed_undersize_length_in * (1 + 1e-9);
   const undersize_ok = !is_undersize || (size_within && length_within);
   const size_verdict = !is_undersize
-    ? "the weld measures " + fmt(measured_leg_in, 4) + " in against a " + fmt(nominal_leg_in, 4) + " in nominal leg, at or over size"
-    : "the weld is " + fmt(undersize_in, 4) + " in undersize (" + fmt(measured_leg_in, 4) + " against " + fmt(nominal_leg_in, 4) + " in) over " + fmt(undersize_length_in, 1) + " in of a " + fmt(weld_length_in, 1) + " in weld -- " + fmt(undersize_length_fraction * 100, 0) + "% of its length";
+    ? "the weld measures " + fmt(measured_leg_in, 4) + " in against " + aFig(fmt(nominal_leg_in, 4)) + " in nominal leg, at or over size"
+    : "the weld is " + fmt(undersize_in, 4) + " in undersize (" + fmt(measured_leg_in, 4) + " against " + fmt(nominal_leg_in, 4) + " in) over " + fmt(undersize_length_in, 1) + " in of " + aFig(fmt(weld_length_in, 1)) + " in weld -- " + fmt(undersize_length_fraction * 100, 0) + "% of its length";
   const undersize_verdict = !is_undersize
     ? "(the weld is not undersize)"
     : !has_size_allowance
@@ -245,7 +245,7 @@ export function computeUtThicknessVelocity({
     ? "(no nominal wall entered)"
     : calibrated
       ? "the gauge is calibrated for this material, so there is no velocity error on the " + fmt(nominal_wall_in, 3) + " in nominal wall"
-    : "on a " + fmt(nominal_wall_in, 3) + " in nominal wall that percentage is " + fmt(Math.abs(error_on_nominal_in) * 1000, 1) + " thousandths -- " + fmt(Math.abs(error_on_nominal_in) / 0.0625 * 100, 0) + "% of a 1/16 in corrosion allowance. The error is a PERCENTAGE, so it scales with the wall: it must be evaluated at the thickness actually being inspected rather than carried across from another one";
+    : "on " + aFig(fmt(nominal_wall_in, 3)) + " in nominal wall that percentage is " + fmt(Math.abs(error_on_nominal_in) * 1000, 1) + " thousandths -- " + fmt(Math.abs(error_on_nominal_in) / 0.0625 * 100, 0) + "% of a 1/16 in corrosion allowance. The error is a PERCENTAGE, so it scales with the wall: it must be evaluated at the thickness actually being inspected rather than carried across from another one";
   const has_limit = retirement_limit_in > 0 && has_actual;
   // The dangerous direction: a wall already below its limit that READS above it.
   const reading_at_limit_in = has_limit ? retirement_limit_in * gauge_velocity_in_us / actual_velocity_in_us : 0;
@@ -255,13 +255,13 @@ export function computeUtThicknessVelocity({
     : calibrated
       ? "the gauge is calibrated for this material, so a wall at the " + fmt(retirement_limit_in, 4) + " in retirement limit reads at the limit, neither early nor late"
     : error_pct > 0
-      ? "AND THIS IS THE DANGEROUS DIRECTION. Against a " + fmt(retirement_limit_in, 4) + " in retirement limit, a wall as thin as " + fmt(thinnest_passing_in, 4) + " in still READS at or above the limit on this gauge -- so the equipment stays in service " + fmt((retirement_limit_in - thinnest_passing_in) * 1000, 1) + " thousandths past where it should have been retired"
-      : "against a " + fmt(retirement_limit_in, 4) + " in retirement limit this error runs conservative: a wall at the limit reads " + fmt(reading_at_limit_in, 4) + " in, below it, so the equipment is retired early rather than late. The opposite calibration error is the dangerous one";
+      ? "AND THIS IS THE DANGEROUS DIRECTION. Against " + aFig(fmt(retirement_limit_in, 4)) + " in retirement limit, a wall as thin as " + fmt(thinnest_passing_in, 4) + " in still READS at or above the limit on this gauge -- so the equipment stays in service " + fmt((retirement_limit_in - thinnest_passing_in) * 1000, 1) + " thousandths past where it should have been retired"
+      : "against " + aFig(fmt(retirement_limit_in, 4)) + " in retirement limit this error runs conservative: a wall at the limit reads " + fmt(reading_at_limit_in, 4) + " in, below it, so the equipment is retired early rather than late. The opposite calibration error is the dangerous one";
   const has_coating = coating_thickness_in > 0;
   const coating_overread_in = has_coating ? coating_thickness_in * gauge_velocity_in_us / 0.0866 : 0;
   const coating_verdict = !has_coating
     ? "(no coating thickness entered)"
-    : "a " + fmt(coating_thickness_in, 4) + " in coating measured in single-echo mode adds roughly " + fmt(coating_overread_in, 4) + " in to the reading, because sound crosses the paint at about a third of steel's velocity and the gauge counts that time as metal. A coated tank reads THICK, which is the wrong direction. ECHO-TO-ECHO mode removes it by timing between two back-wall echoes, and on any coated corrosion survey it is the mode to use";
+    : aFig(fmt(coating_thickness_in, 4)) + " in coating measured in single-echo mode adds roughly " + fmt(coating_overread_in, 4) + " in to the reading, because sound crosses the paint at about a third of steel's velocity and the gauge counts that time as metal. A coated tank reads THICK, which is the wrong direction. ECHO-TO-ECHO mode removes it by timing between two back-wall echoes, and on any coated corrosion survey it is the mode to use";
   if (![gauge_reading_in, true_thickness_in, error_pct, error_on_nominal_in, reading_at_limit_in, coating_overread_in].every(Number.isFinite)) return { error: "Ultrasonic thickness math is not a finite value." };
   return {
     gauge_reading_in, has_actual, true_thickness_in, error_pct, reading_verdict, mismatch_verdict,
@@ -317,7 +317,7 @@ export function computeRtExposureTime({
   const new_exposure_s = has_new ? base_exposure_s * distance_ratio * distance_ratio : base_exposure_s;
   const distance_verdict = !has_new
     ? "(no new distance entered)"
-    : "moving from " + fmt(base_distance_in, 1) + " to " + fmt(new_distance_in, 1) + " in takes the exposure from " + fmt(base_exposure_s, 0) + " to " + fmt(new_exposure_s, 0) + " " + (fmt(new_exposure_s, 0) === "1" ? "second" : "seconds") + " -- " + fmt(distance_ratio * distance_ratio, 2) + " times, for a " + fmt((distance_ratio - 1) * 100, 0) + "% distance increase. The INVERSE SQUARE is why distance is expensive: intensity falls with the square, so exposure rises with it";
+    : "moving from " + fmt(base_distance_in, 1) + " to " + fmt(new_distance_in, 1) + " in takes the exposure from " + fmt(base_exposure_s, 0) + " to " + fmt(new_exposure_s, 0) + " " + (fmt(new_exposure_s, 0) === "1" ? "second" : "seconds") + " -- " + fmt(distance_ratio * distance_ratio, 2) + " times, for " + aFig(fmt((distance_ratio - 1) * 100, 0)) + "% distance increase. The INVERSE SQUARE is why distance is expensive: intensity falls with the square, so exposure rises with it";
   const has_geometry = source_size_in > 0 && material_thickness_in > 0;
   if (has_geometry && !(base_distance_in > material_thickness_in && (!(new_distance_in > 0) || new_distance_in > material_thickness_in))) return { error: "The source-to-film distance must exceed the material thickness." };
   // ASME V T-274 / SE-1030: Ug = F d / D, with D the source-to-OBJECT
@@ -328,7 +328,7 @@ export function computeRtExposureTime({
   const geometry_verdict = !has_geometry
     ? "(no source size and material thickness entered)"
     : "geometric unsharpness is " + fmt(ug_base_in, 5) + " in at " + fmt(base_distance_in, 1) + " in"
-      + (has_new ? " and " + fmt(ug_new_in, 5) + " in at " + fmt(new_distance_in, 1) + (ug_new_in <= ug_base_in ? " -- a " + fmt((1 - ug_new_in / ug_base_in) * 100, 0) + "% reduction bought with " + fmt(distance_ratio * distance_ratio, 2) + "x the exposure" : " -- a " + fmt((ug_new_in / ug_base_in - 1) * 100, 0) + "% increase in unsharpness for " + fmt(distance_ratio * distance_ratio, 2) + "x the exposure") : "");
+      + (has_new ? " and " + fmt(ug_new_in, 5) + " in at " + fmt(new_distance_in, 1) + (ug_new_in <= ug_base_in ? " -- " + aFig(fmt((1 - ug_new_in / ug_base_in) * 100, 0)) + "% reduction bought with " + fmt(distance_ratio * distance_ratio, 2) + "x the exposure" : " -- " + aFig(fmt((ug_new_in / ug_base_in - 1) * 100, 0)) + "% increase in unsharpness for " + fmt(distance_ratio * distance_ratio, 2) + "x the exposure") : "");
   const has_limit = unsharpness_limit_in > 0 && has_geometry;
   // ASME V "shall not exceed": 0.1 x 1.5 / 7.5 is 0.020000000000000004 and failed a 0.020 in limit.
   const base_passes = has_limit && ug_base_in <= unsharpness_limit_in * (1 + 1e-9);
@@ -407,7 +407,7 @@ export function computeRtRestrictedArea({
   const dose_rate_1ft_r_h = source_activity_ci * gamma_constant_r_h_ci_ft * shielding_factor;
   const _distanceFor = (limit_mr_h, factor) => Math.sqrt(dose_rate_1ft_r_h * factor / (limit_mr_h / 1000));
   const boundary_distance_ft = _distanceFor(boundary_limit_mr_h, 1);
-  const source_verdict = "a " + fmt(source_activity_ci, 0) + " Ci source at " + fmt(gamma_constant_r_h_ci_ft, 3) + " R/h per curie at 1 ft gives " + fmt(dose_rate_1ft_r_h, 2) + " R/h at one foot"
+  const source_verdict = aFig(fmt(source_activity_ci, 0)) + " Ci source at " + fmt(gamma_constant_r_h_ci_ft, 3) + " R/h per curie at 1 ft gives " + fmt(dose_rate_1ft_r_h, 2) + " R/h at one foot"
     + (shielding_factor < 1 ? " after the " + fmt(shielding_factor, 3) + " shielding transmission factor" : "");
   const boundary_verdict = "the " + fmt(boundary_limit_mr_h, 1) + " mR/h boundary sits at " + fmt(boundary_distance_ft, 0) + " ft in every unshielded direction, which on most job sites is a large area to control";
   const has_collimator = collimator_attenuation_factor > 0 && collimator_attenuation_factor < 1;
@@ -474,7 +474,7 @@ export function computeMtYokeCoilAmperage({
   if (part_length_in < 0 || coil_turns < 0 || yoke_pole_spacing_in < 0) return { error: "Part length, coil turns and pole spacing cannot be negative." };
   // Circular field: a central conductor or head shot, at amps per inch of diameter.
   const circular_amps = part_diameter_in * amps_per_inch;
-  const circular_verdict = "a central conductor or head shot on a " + fmt(part_diameter_in, 2) + " in diameter at " + fmt(amps_per_inch, 0) + " A per inch is " + fmt(circular_amps, 0) + " A. That produces a CIRCULAR field, which finds LONGITUDINAL discontinuities -- cracks running along the part's axis";
+  const circular_verdict = "a central conductor or head shot on " + aFig(fmt(part_diameter_in, 2)) + " in diameter at " + fmt(amps_per_inch, 0) + " A per inch is " + fmt(circular_amps, 0) + " A. That produces a CIRCULAR field, which finds LONGITUDINAL discontinuities -- cracks running along the part's axis";
   const has_coil = part_length_in > 0 && coil_turns > 0;
   // Until 2026-10-01 the whole length went into L/D: a 36 x 6 in part read
   // L/D 6 and 875 A where its 18 in sections need L/D 3 and 1,400 A.
@@ -582,7 +582,7 @@ export function computePtDwellDevelopment({
   const temp_verdict = in_temp_range
     ? "at " + fmt(part_temp_f, 0) + " degF the part is inside the procedure's " + fmt(min_procedure_temp_f, 0) + " to " + fmt(max_procedure_temp_f, 0) + " degF range"
     : "at " + fmt(part_temp_f, 0) + " degF the part is OUTSIDE the procedure's " + fmt(min_procedure_temp_f, 0) + " to " + fmt(max_procedure_temp_f, 0) + " degF range. The method must be QUALIFIED at that temperature -- a comparator block demonstration against a known cracked specimen -- before any result from it means anything. Running it anyway produces a clean report of unknown value";
-  const drying_verdict = "AND THE DRYING FAILURE IS EQUALLY SILENT. If the part sits in sun or wind and the penetrant dries during a " + fmt(penetration_dwell_min, 0) + " minute dwell, no amount of correct developing will bring it back out of the discontinuity. Keeping the surface wet -- reapplying penetrant during a long dwell where the procedure allows it -- is what prevents it, and a long dwell in the open air is exactly where it happens";
+  const drying_verdict = "AND THE DRYING FAILURE IS EQUALLY SILENT. If the part sits in sun or wind and the penetrant dries during " + aFig(fmt(penetration_dwell_min, 0)) + " minute dwell, no amount of correct developing will bring it back out of the discontinuity. Keeping the surface wet -- reapplying penetrant during a long dwell where the procedure allows it -- is what prevents it, and a long dwell in the open air is exactly where it happens";
   const dwell_margin_min = penetration_dwell_min - 10;
   if (![total_process_min, dwell_margin_min, evaluation_margin_min].every(Number.isFinite)) return { error: "Penetrant dwell math is not a finite value." };
   return {
@@ -962,7 +962,7 @@ export function computePwhtHoldingTime({
   const alt_total_cycle_hr = has_alt ? alt.total : 0;
   const alt_verdict = !has_alt
     ? "(no alternative thickness entered)"
-    : "a " + fmt(alt_thickness_in, 2) + " in section runs " + fmt(alt_total_cycle_hr, 1) + " hours, " + fmt(alt_total_cycle_hr / total_cycle_hr, 2) + " times this cycle for " + fmt(alt_thickness_in / governing_thickness_in, 2) + " times the thickness -- the hold scales with thickness and BOTH ramps scale with it too, because the permitted rate falls as the thickness rises";
+    : aFig(fmt(alt_thickness_in, 2)) + " in section runs " + fmt(alt_total_cycle_hr, 1) + " hours, " + fmt(alt_total_cycle_hr / total_cycle_hr, 2) + " times this cycle for " + fmt(alt_thickness_in / governing_thickness_in, 2) + " times the thickness -- the hold scales with thickness and BOTH ramps scale with it too, because the permitted rate falls as the thickness rises";
   const has_actual = actual_heating_rate_f_hr > 0;
   const rate_exceeded = has_actual && actual_heating_rate_f_hr > max_heating_rate_f_hr + 1e-9 * Math.abs(max_heating_rate_f_hr);
   const actual_verdict = !has_actual

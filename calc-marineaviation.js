@@ -3,7 +3,7 @@
 // Split intact from calc-mechanic.js by spec-v1873. Calculator IDs, formulas,
 // fields, outputs, citations, examples, and Group K assignments are unchanged.
 
-import {
+import { aFig,
   DEBOUNCE_MS, debounce, makeNumber, makeSelect, makeCheckbox,
   makeOutputLine, attachExampleButton, fmt, fmtDir,
   makeStepsPanel,
@@ -380,7 +380,7 @@ export function computeHouseBatteryAlternator({
   const bank_for_one_day_ah = daily_consumption_ah / usable_dod;
   const autonomy_verdict = autonomy_days >= 1
     ? fmt(autonomy_days, 2) + " days of autonomy on " + fmt(usable_ah, 0) + " usable Ah"
-    : fmt(autonomy_days, 2) + " days -- under a day, so the engine runs daily; a full day would take a " + fmt(bank_for_one_day_ah, 0) + " Ah bank at this depth of discharge";
+    : fmt(autonomy_days, 2) + " days -- under a day, so the engine runs daily; a full day would take " + aFig(fmt(bank_for_one_day_ah, 0)) + " Ah bank at this depth of discharge";
   // The charging side. The nameplate hours assume the battery accepts the
   // alternator's full output, which it does only in bulk.
   const has_alternator = alternator_a > 0;
@@ -392,7 +392,7 @@ export function computeHouseBatteryAlternator({
     ? "(no alternator output entered)"
     : acceptance_fraction >= 1
       ? "replacing " + fmt(daily_consumption_ah, 0) + " Ah at the full " + fmt(alternator_a, 0) + " A takes " + fmt(bulk_hours, 2) + " hours -- which is the BULK figure and assumes the battery accepts full current throughout, which a lead acid bank does not"
-      : "the nameplate figure is " + fmt(bulk_hours, 2) + " hours at " + fmt(alternator_a, 0) + " A, but at a " + fmt(acceptance_fraction, 2) + " average acceptance the real figure is " + fmt(realistic_hours, 2) + " hours -- " + fmt(extra_hours, 2) + " hours longer, and that gap is the acceptance curve rather than anything the owner is doing wrong";
+      : "the nameplate figure is " + fmt(bulk_hours, 2) + " hours at " + fmt(alternator_a, 0) + " A, but at " + aFig(fmt(acceptance_fraction, 2)) + " average acceptance the real figure is " + fmt(realistic_hours, 2) + " hours -- " + fmt(extra_hours, 2) + " hours longer, and that gap is the acceptance curve rather than anything the owner is doing wrong";
   // The partial state of charge trap: what an hour of running actually
   // returns, and where the bank ends up.
   const partial_soc_pct = 100 - (1 - bulk_target_soc_pct / 100) * 100;
@@ -474,8 +474,8 @@ export function computeTravelLiftSlingPlacement({
     : within_wll
       ? "both slings are inside the " + fmt(sling_wll_lb, 0) + " lb working load limit, the governing one at " + fmt(governing_tension_lb, 0) + " lb of tension"
       : even_split_would_pass
-        ? "the governing sling's tension is " + fmt(governing_tension_lb, 0) + " lb (a " + fmt(governing_lb, 0) + " lb vertical share at " + fmt(sling_angle_deg, 0) + " " + (fmt(sling_angle_deg, 0) === "1" ? "degree" : "degrees") + "), OVER the " + fmt(sling_wll_lb, 0) + " lb limit -- and a check on half the displacement (" + fmt(even_split_lb, 0) + " lb) would have PASSED, which is exactly why the split rather than half the weight is the number to check"
-        : "the governing sling's tension is " + fmt(governing_tension_lb, 0) + " lb (a " + fmt(governing_lb, 0) + " lb vertical share at " + fmt(sling_angle_deg, 0) + " " + (fmt(sling_angle_deg, 0) === "1" ? "degree" : "degrees") + "), over the " + fmt(sling_wll_lb, 0) + " lb limit; even an even split would have been over";
+        ? "the governing sling's tension is " + fmt(governing_tension_lb, 0) + " lb (" + aFig(fmt(governing_lb, 0)) + " lb vertical share at " + fmt(sling_angle_deg, 0) + " " + (fmt(sling_angle_deg, 0) === "1" ? "degree" : "degrees") + "), OVER the " + fmt(sling_wll_lb, 0) + " lb limit -- and a check on half the displacement (" + fmt(even_split_lb, 0) + " lb) would have PASSED, which is exactly why the split rather than half the weight is the number to check"
+        : "the governing sling's tension is " + fmt(governing_tension_lb, 0) + " lb (" + aFig(fmt(governing_lb, 0)) + " lb vertical share at " + fmt(sling_angle_deg, 0) + " " + (fmt(sling_angle_deg, 0) === "1" ? "degree" : "degrees") + "), over the " + fmt(sling_wll_lb, 0) + " lb limit; even an even split would have been over";
   // Convergence: slings picked up inboard of the machine's beams add
   // compression across the hull.
   const angle_rad = sling_angle_deg * Math.PI / 180;
@@ -735,7 +735,7 @@ export function computePropellerTrackBalance({
   const track_margin_in = track_limit_in - track_in;
   const track_ok = track_in <= track_limit_in + 1e-9 * Math.abs(track_limit_in);
   const track_verdict = track_ok
-    ? "track is " + fmt(track_in, 4) + " in against a " + fmt(track_limit_in, 4) + " in limit, WITHIN limits -- so tracking is not the fault and the vibration is a balance problem that weight will fix"
+    ? "track is " + fmt(track_in, 4) + " in against " + aFig(fmt(track_limit_in, 4)) + " in limit, WITHIN limits -- so tracking is not the fault and the vibration is a balance problem that weight will fix"
     : "track is " + fmt(track_in, 4) + " in, OVER the " + fmt(track_limit_in, 4) + " in limit by " + fmt(-track_margin_in, 4) + " in -- fix the track FIRST. Out of track means the blades sweep different planes and each meets the air differently, which is an aerodynamic once-per-revolution imbalance that no amount of weight corrects";
   // The trial-weight vector method. The effect vector is the DIFFERENCE
   // between the two readings, and the correction is the trial weight scaled by
@@ -767,7 +767,7 @@ export function computePropellerTrackBalance({
     : at_target
       ? "the trial run already reads " + fmt(result_ips, 3) + " IPS, at or below the " + fmt(target_ips, 2) + " IPS target"
       // Until 2026-10-14 a trial that changed nothing still pointed at "the correction above".
-      : "the trial run reads " + fmt(result_ips, 3) + " IPS against a " + fmt(target_ips, 2) + " IPS target, so " + (trial_useful ? "the correction above is the next move" : "rerun with the trial weight moved or increased");
+      : "the trial run reads " + fmt(result_ips, 3) + " IPS against " + aFig(fmt(target_ips, 2)) + " IPS target, so " + (trial_useful ? "the correction above is the next move" : "rerun with the trial weight moved or increased");
   if (![track_margin_in, effect_ips, effect_phase_deg, correction_weight_g, correction_phase_deg].every(Number.isFinite)) return { error: "Track and balance math is not a finite value." };
   return {
     track_margin_in, track_ok, track_verdict,
@@ -849,13 +849,13 @@ export function computeAviationFuelWeight({
   const gallons_at_standard = has_required ? required_weight_lb / standard_density_lb_gal : 0;
   const gallons_verdict = !has_required
     ? "(no required weight entered)"
-    : fmt(gallons_for_weight, 1) + " gallons are needed for " + fmt(required_weight_lb, 0) + " lb at this temperature, against " + fmt(gallons_at_standard, 1) + " at the standard density -- a " + fmt(Math.abs(gallons_for_weight - gallons_at_standard), 1) + " gallon difference";
+    : fmt(gallons_for_weight, 1) + " gallons are needed for " + fmt(required_weight_lb, 0) + " lb at this temperature, against " + fmt(gallons_at_standard, 1) + " at the standard density -- " + aFig(fmt(Math.abs(gallons_for_weight - gallons_at_standard), 1)) + " gallon difference";
   const has_arm = arm_in !== 0;
   const actual_moment_inlb = has_arm ? actual_weight_lb * arm_in : 0;
   const moment_difference_inlb = has_arm ? weight_difference_lb * arm_in : 0;
   const moment_verdict = !has_arm
     ? "(no fuel arm entered)"
-    : "the fuel moment is " + fmt(actual_moment_inlb, 0) + " in-lb at a " + fmt(arm_in, 1) + " in arm, " + fmt(Math.abs(moment_difference_inlb), 0) + " in-lb from the standard-density figure -- a fuel weight error moves the centre of gravity as well as the total";
+    : "the fuel moment is " + fmt(actual_moment_inlb, 0) + " in-lb at " + aFig(fmt(arm_in, 1)) + " in arm, " + fmt(Math.abs(moment_difference_inlb), 0) + " in-lb from the standard-density figure -- a fuel weight error moves the centre of gravity as well as the total";
   if (![temp_difference_f, actual_density_lb_gal, actual_weight_lb, standard_weight_lb, weight_difference_lb, gallons_for_weight].every(Number.isFinite)) return { error: "Fuel weight math is not a finite value." };
   return {
     temp_difference_f, density_change_fraction, actual_density_lb_gal,

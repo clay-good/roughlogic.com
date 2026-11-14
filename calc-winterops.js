@@ -15,7 +15,7 @@
 // policy, a verified spreader calibration, the site snow plan, the product
 // supplier, and the contractor's own records govern. See spec-v1845.md
 // through spec-v1850.md.
-import {
+import { aFig,
   DEBOUNCE_MS, debounce, makeNumber,
   makeOutputLine, attachExampleButton, fmt, fmtDir,
   makeStepsPanel,
@@ -424,7 +424,7 @@ WINTEROPS_RENDERERS["ice-melt-working-temperature"] = _simpleRenderer({
   outputs: [
     { key: "i", id: "imw-out-i", label: "Ice to be melted", value: (r) => fmt(r.ice_volume_ft3, 1) + " cu ft (" + fmt(r.ice_mass_lb, 0) + " lb)" },
     { key: "p", id: "imw-out-p", label: "Product required", value: (r) => fmt(r.product_lb, 0) + " lb" },
-    { key: "a", id: "imw-out-a", label: "At the colder temperature", value: (r) => r.alt_product_lb === null ? "not compared" : fmt(r.alt_product_lb, 0) + " lb -- " + fmt(r.product_ratio, 1) + " times as much, from a " + fmt(r.capacity_ratio, 1) + " x collapse in capacity" + (r.alt_within_practical_limit === false ? " -- and that colder temperature is BELOW the product's practical working limit, so no quantity of it works there; that figure is arithmetic, not practice" : "") },
+    { key: "a", id: "imw-out-a", label: "At the colder temperature", value: (r) => r.alt_product_lb === null ? "not compared" : fmt(r.alt_product_lb, 0) + " lb -- " + fmt(r.product_ratio, 1) + " times as much, from " + aFig(fmt(r.capacity_ratio, 1)) + " x collapse in capacity" + (r.alt_within_practical_limit === false ? " -- and that colder temperature is BELOW the product's practical working limit, so no quantity of it works there; that figure is arithmetic, not practice" : "") },
     { key: "v", id: "imw-out-v", label: "Against the working limit", value: (r) => r.limit_verdict },
     { key: "e", id: "imw-out-e", label: "Working limit above the eutectic", value: (r) => fmt(r.eutectic_gap_f, 0) + " degF -- the bag quotes the eutectic, the road needs the working limit" },
     { key: "n", id: "imw-out-n", label: "Note", value: (r) => r.note },

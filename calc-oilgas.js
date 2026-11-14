@@ -14,7 +14,7 @@
 // integrity decision is made by a qualified engineer against the operator's
 // own procedures, never by arithmetic on a page.
 
-import {
+import { aFig,
   DEBOUNCE_MS, debounce, makeNumber, makeSelect,
   makeOutputLine, attachExampleButton, fmt,
   makeStepsPanel,
@@ -291,7 +291,7 @@ export function computeGasPipelineFlow({
   const diameter_capacity_ratio = has_alternate ? Math.pow(alternate_id_in / id_in, diameter_exp) : 0;
   const diameter_verdict = !has_alternate
     ? "(no alternative diameter entered)"
-    : "a " + fmt(alternate_id_in, 2) + " in line carries " + fmt(diameter_capacity_ratio, 2) + " times this one at the same pressures, from the d^" + fmt(diameter_exp, 4) + " exponent -- a " + fmt((alternate_id_in / id_in - 1) * 100, 0) + "% diameter change for a " + fmt((diameter_capacity_ratio - 1) * 100, 0) + "% capacity change";
+    : aFig(fmt(alternate_id_in, 2)) + " in line carries " + fmt(diameter_capacity_ratio, 2) + " times this one at the same pressures, from the d^" + fmt(diameter_exp, 4) + " exponent -- " + aFig(fmt((alternate_id_in / id_in - 1) * 100, 0)) + "% diameter change for " + aFig(fmt((diameter_capacity_ratio - 1) * 100, 0)) + "% capacity change";
   if (![squared_difference, q_scfd, alternate_q_scfd, q_mmscfd, diameter_capacity_ratio].every(Number.isFinite)) return { error: "Gas pipeline flow math is not a finite value." };
   return {
     inlet_psia, outlet_psia, squared_difference, flowing_temp_r, z_used, z_computed: z_mode === "computed", avg_pressure_psia,
@@ -456,10 +456,10 @@ export function computePigBatchVolume({
       ? "(no tool velocity window entered)"
       : in_window
         // Until 2026-10-14 a window with one end blank read "against 2.0 to 0.0 ft/s".
-        ? "INSIDE the window: " + fmt(velocity_fps, 2) + " ft/s against " + (tool_max_fps > 0 ? (tool_min_fps > 0 ? fmt(tool_min_fps, 1) + " to " + fmt(tool_max_fps, 1) + " ft/s" : "a " + fmt(tool_max_fps, 1) + " ft/s maximum (no minimum entered)") : "a " + fmt(tool_min_fps, 1) + " ft/s minimum (no maximum entered)")
+        ? "INSIDE the window: " + fmt(velocity_fps, 2) + " ft/s against " + (tool_max_fps > 0 ? (tool_min_fps > 0 ? fmt(tool_min_fps, 1) + " to " + fmt(tool_max_fps, 1) + " ft/s" : aFig(fmt(tool_max_fps, 1)) + " ft/s maximum (no minimum entered)") : aFig(fmt(tool_min_fps, 1)) + " ft/s minimum (no maximum entered)")
         : !above_min
-          ? "BELOW the window: " + fmt(velocity_fps, 2) + " ft/s against a " + fmt(tool_min_fps, 1) + " ft/s minimum -- the run has to wait for throughput, or the line must move at least " + fmt(flow_for_min_bpd, 0) + " bbl/day"
-          : "ABOVE the window: " + fmt(velocity_fps, 2) + " ft/s against a " + fmt(tool_max_fps, 1) + " ft/s maximum -- the tool's sensors cannot sample properly and the run would have to be repeated; hold the line at or below " + fmt(flow_for_max_bpd, 0) + " bbl/day";
+          ? "BELOW the window: " + fmt(velocity_fps, 2) + " ft/s against " + aFig(fmt(tool_min_fps, 1)) + " ft/s minimum -- the run has to wait for throughput, or the line must move at least " + fmt(flow_for_min_bpd, 0) + " bbl/day"
+          : "ABOVE the window: " + fmt(velocity_fps, 2) + " ft/s against " + aFig(fmt(tool_max_fps, 1)) + " ft/s maximum -- the tool's sensors cannot sample properly and the run would have to be repeated; hold the line at or below " + fmt(flow_for_max_bpd, 0) + " bbl/day";
   if (![bbl_per_mile, total_bbl, total_ft3, velocity_fps, travel_time_h, flow_for_min_bpd].every(Number.isFinite)) return { error: "Pig volume math is not a finite value." };
   return {
     bbl_per_mile, total_bbl, total_ft3, ft3_per_mile,
@@ -719,7 +719,7 @@ export function computeCasingCementVolume({
   const spread_column_ft = has_spread && annular_capacity_bbl_ft > 1e-9 ? excess_spread_bbl / annular_capacity_bbl_ft : 0;
   const spread_verdict = !has_spread
     ? "(no excess range entered)"
-    : "between " + fmt(low_excess_pct, 0) + "% and " + fmt(high_excess_pct, 0) + "% excess the slurry runs " + fmt(low_slurry_bbl, 1) + " to " + fmt(high_slurry_bbl, 1) + " bbl, a " + fmt(excess_spread_bbl, 1) + " bbl spread on the same hole -- which at the top of the column is " + fmt(spread_column_ft, 0) + " ft of cement either way, and is why the caliper matters more than the arithmetic does";
+    : "between " + fmt(low_excess_pct, 0) + "% and " + fmt(high_excess_pct, 0) + "% excess the slurry runs " + fmt(low_slurry_bbl, 1) + " to " + fmt(high_slurry_bbl, 1) + " bbl, " + aFig(fmt(excess_spread_bbl, 1)) + " bbl spread on the same hole -- which at the top of the column is " + fmt(spread_column_ft, 0) + " ft of cement either way, and is why the caliper matters more than the arithmetic does";
   if (![annular_capacity_bbl_ft, casing_capacity_bbl_ft, annular_volume_bbl, slurry_volume_bbl, sacks, displacement_bbl, excess_spread_bbl].every(Number.isFinite)) return { error: "Cement volume math is not a finite value." };
   return {
     annular_capacity_bbl_ft, casing_capacity_bbl_ft,
@@ -906,7 +906,7 @@ OILGAS_RENDERERS["kill-mud-weight"] = _simpleRenderer({
     { key: "pump_spm", label: "Pump rate (strokes per minute)", kind: "number" },
   ],
   outputs: [
-    { key: "k", id: "kmw-out-k", label: "Kill mud weight", value: (r) => fmt(r.kill_mw_with_margin_ppg, 2) + " ppg" + (r.safety_margin_ppg > 0 ? " (" + fmt(r.kill_mw_ppg, 2) + " to balance plus a " + fmt(r.safety_margin_ppg, 2) + " ppg margin)" : "") + ", weighting up " + fmt(r.weight_up_ppg, 2) + " ppg" },
+    { key: "k", id: "kmw-out-k", label: "Kill mud weight", value: (r) => fmt(r.kill_mw_with_margin_ppg, 2) + " ppg" + (r.safety_margin_ppg > 0 ? " (" + fmt(r.kill_mw_ppg, 2) + " to balance plus " + aFig(fmt(r.safety_margin_ppg, 2)) + " ppg margin)" : "") + ", weighting up " + fmt(r.weight_up_ppg, 2) + " ppg" },
     { key: "f", id: "kmw-out-f", label: "Formation pressure", value: (r) => fmt(r.formation_pressure_psi, 0) + " psi" },
     { key: "p", id: "kmw-out-p", label: "Drillpipe pressures", value: (r) => "start at " + fmt(r.icp_psi, 0) + " psi (ICP), walk down to " + fmt(r.fcp_psi, 0) + " psi (FCP) as kill mud reaches the bit, then hold FCP" },
     { key: "s", id: "kmw-out-s", label: "To the bit", value: (r) => !r.has_pump ? "(no pipe capacity or pump output entered)" : fmt(r.strokes_to_bit, 0) + " " + (fmt(r.strokes_to_bit, 0) === "1" ? "stroke" : "strokes") + (r.minutes_to_bit > 0 ? ", " + fmt(r.minutes_to_bit, 0) + " " + (fmt(r.minutes_to_bit, 0) === "1" ? "minute" : "minutes") + " at the entered rate" : "") },
@@ -974,8 +974,8 @@ export function computeKickTolerance({
   const governed_by = none ? "none" : volume_at_shoe_as_shut_in_bbl <= volume_at_bottom_bbl ? "shoe" : "bottom";
   if (![maasp_psi, formation_pressure_psi, max_influx_height_ft, kick_tolerance_bbl, max_kick_intensity_ppg].every(Number.isFinite)) return { error: "Kick tolerance math is not a finite value." };
   const verdict = none
-    ? "NO kick tolerance at a " + fmt(kick_intensity_ppg, 2) + " ppg kick: the shut-in pressure alone reaches the shoe limit before any gas enters. The most this shoe takes with no influx is " + fmt(max_kick_intensity_ppg, 2) + " ppg"
-    : fmt(kick_tolerance_bbl, 1) + " bbl at a " + fmt(kick_intensity_ppg, 2) + " ppg kick, set by the gas " + (governed_by === "shoe" ? "when its top reaches the shoe" : "as first shut in around the bottom-hole assembly") + (fills_open_hole ? "; the limit is not reached even with the whole open hole full of gas, so the height is capped at the open hole" : "") + (none || bha_ft > 0 ? "" : " -- with no BHA length entered the whole influx is taken around the bottom-hole assembly, the smallest annulus, which can under-read the tolerance; enter the BHA length to split it");
+    ? "NO kick tolerance at " + aFig(fmt(kick_intensity_ppg, 2)) + " ppg kick: the shut-in pressure alone reaches the shoe limit before any gas enters. The most this shoe takes with no influx is " + fmt(max_kick_intensity_ppg, 2) + " ppg"
+    : fmt(kick_tolerance_bbl, 1) + " bbl at " + aFig(fmt(kick_intensity_ppg, 2)) + " ppg kick, set by the gas " + (governed_by === "shoe" ? "when its top reaches the shoe" : "as first shut in around the bottom-hole assembly") + (fills_open_hole ? "; the limit is not reached even with the whole open hole full of gas, so the height is capped at the open hole" : "") + (none || bha_ft > 0 ? "" : " -- with no BHA length entered the whole influx is taken around the bottom-hole assembly, the smallest annulus, which can under-read the tolerance; enter the BHA length to split it");
   return {
     maasp_psi, formation_pressure_psi, shoe_limit_psi, fracture_pressure_psi, max_influx_height_ft,
     volume_at_shoe_bbl, volume_at_shoe_as_shut_in_bbl, volume_at_bottom_bbl, kick_tolerance_bbl, max_kick_intensity_ppg,
@@ -1151,7 +1151,7 @@ export function computeTankStrappingVolume({
   const correction_bbl = subject_bbl - net_bbl;
   const correction_pct = subject_bbl > 0 ? 100 * correction_bbl / subject_bbl : 0;
 
-  const perInchVerdict = "a " + fmt(tank_diameter_ft, 1) + " ft diameter vertical tank holds " + fmt(bbl_per_ft, 2) + " barrels per foot and " + fmt(bbl_per_in, 3) + " per inch, the same all the way up -- so a one inch change is " + fmt(bbl_per_in, 2) + " barrels and a ticket that says otherwise is worth a second look";
+  const perInchVerdict = aFig(fmt(tank_diameter_ft, 1)) + " ft diameter vertical tank holds " + fmt(bbl_per_ft, 2) + " barrels per foot and " + fmt(bbl_per_in, 3) + " per inch, the same all the way up -- so a one inch change is " + fmt(bbl_per_in, 2) + " barrels and a ticket that says otherwise is worth a second look";
   const grossVerdict = "at a gauge of " + fmt(gauge_ft, 0) + " ft " + fmt(gauge_in, 1) + " in the tank holds " + fmt(gross_bbl, 1) + " barrels gross";
   const movedVerdict = !has_closing
     ? "no closing gauge was entered, so the corrections below apply to the standing volume rather than to a run"
@@ -1161,7 +1161,7 @@ export function computeTankStrappingVolume({
       : Math.abs(opening_height_ft - closing_height_ft) <= 1e-9 * opening_height_ft
         ? "the closing gauge equals the opening gauge, so nothing moved"
       : "the gauge ROSE to " + fmt(closing_gauge_ft, 0) + " ft " + fmt(closing_gauge_in, 1) + " in, so the tank RECEIVED " + fmt(-moved_bbl, 1) + " barrels gross";
-  const netVerdict = !(subject_bbl > 1e-9 * gross_bbl) ? "nothing moved, so there is no run volume to correct" : "applying a volume correction factor of " + fmt(volume_correction_factor, 4) + " and a " + fmt(sediment_water_pct, 2) + "% sediment and water deduction gives " + fmt(net_bbl, 1) + " barrels net -- a difference of " + fmt(correction_bbl, 1) + " barrels, or " + fmt(correction_pct, 2) + "%. THAT IS WHY THE CORRECTION IS ON THE TICKET AND NOT LEFT TO THE GAUGE";
+  const netVerdict = !(subject_bbl > 1e-9 * gross_bbl) ? "nothing moved, so there is no run volume to correct" : "applying a volume correction factor of " + fmt(volume_correction_factor, 4) + " and " + aFig(fmt(sediment_water_pct, 2)) + "% sediment and water deduction gives " + fmt(net_bbl, 1) + " barrels net -- a difference of " + fmt(correction_bbl, 1) + " barrels, or " + fmt(correction_pct, 2) + "%. THAT IS WHY THE CORRECTION IS ON THE TICKET AND NOT LEFT TO THE GAUGE";
   const strappingVerdict = "AND THE CERTIFIED STRAPPING TABLE IS THE LEGAL DOCUMENT, not this formula. Real tanks deviate from the ideal cylinder -- shell courses of different thickness, bottom deadwood, an out-of-round shell, tilt -- and the strapping table captures all of it, which is why it is MEASURED rather than computed. This is a sanity check and a planning number, and for custody transfer it is neither sufficient nor authoritative";
   const temperatureVerdict = "THE TEMPERATURE CORRECTION IS NOT A ROUNDING MATTER. Crude expands appreciably, so a warm tank gauged in the afternoon holds fewer standard barrels than the same height gauged at dawn, and the correction to 60 degF is what makes two measurements comparable. The factor is ENTERED from the applicable petroleum measurement tables for the observed temperature and gravity rather than modelled here";
 
@@ -1308,7 +1308,7 @@ export function computeSeparatorRetentionSizing({
   const gas_governs = gas_pct_of_max >= liquid_pct_of_required;
   const both_ample = gas_pct_of_max < 50 && liquid_pct_of_required < 50;
 
-  const liquidVerdict = "LIQUID SIDE: at " + fmt(100 * liquid_fraction, 0) + "% full a " + fmt(vessel_diameter_ft, 1) + " by " + fmt(seam_to_seam_ft, 1) + " ft vessel holds " + fmt(liquid_volume_bbl, 2) + " barrels, and " + fmt(liquid_rate_bpd, 0) + " bbl/day is " + fmt(liquid_rate_bpm, 3) + " bbl/min -- " + fmt(actual_retention_min, 1) + " minutes of retention against the " + fmt(required_retention_min, 1) + " required, so the liquid side is at " + fmt(liquid_pct_of_required, 0) + "% of its limit" + (liquid_ok ? "" : " -- SHORT of the required retention, so gas stays in the oil and breaks out downstream");
+  const liquidVerdict = "LIQUID SIDE: at " + fmt(100 * liquid_fraction, 0) + "% full " + aFig(fmt(vessel_diameter_ft, 1)) + " by " + fmt(seam_to_seam_ft, 1) + " ft vessel holds " + fmt(liquid_volume_bbl, 2) + " barrels, and " + fmt(liquid_rate_bpd, 0) + " bbl/day is " + fmt(liquid_rate_bpm, 3) + " bbl/min -- " + fmt(actual_retention_min, 1) + " minutes of retention against the " + fmt(required_retention_min, 1) + " required, so the liquid side is at " + fmt(liquid_pct_of_required, 0) + "% of its limit" + (liquid_ok ? "" : " -- SHORT of the required retention, so gas stays in the oil and breaks out downstream");
   const gasVerdict = "GAS SIDE: gas density at " + fmt(pressure_psig, 0) + " psig and " + fmt(temperature_f, 0) + " degF is " + fmt(gas_density_lb_ft3, 3) + " lb/cu ft, so the Souders-Brown limit at K = " + fmt(k_factor, 2) + " is " + fmt(max_velocity_fps, 2) + " ft/s. " + fmt(gas_rate_mmscfd, 2) + " MMSCFD across " + fmt(vapour_area_ft2, 2) + " sq ft of vapour space is " + fmt(actual_velocity_fps, 3) + " ft/s -- " + fmt(gas_pct_of_max, 0) + "% of the limit";
   const governsVerdict = both_ample
     ? "NEITHER SIDE GOVERNS THIS VESSEL TIGHTLY. The liquid is at " + fmt(liquid_pct_of_required, 0) + "% of its requirement and the gas at " + fmt(gas_pct_of_max, 0) + "% of its velocity limit, so the vessel is comfortable on both and the next constraint on this location is something else"
@@ -1458,8 +1458,8 @@ export function computeFlareRadiationDistance({
   const supportable_release_btuh = has_distance
     ? 4 * Math.PI * available_distance_ft * available_distance_ft * budget_btuh_ft2 / radiant_fraction : 0;
 
-  const radiatedVerdict = "a " + fmt(heat_release_btuh / 1e6, 0) + " MMBTU/h release with a radiant fraction of " + fmt(radiant_fraction, 2) + " puts " + fmt(radiated_btuh / 1e6, 1) + " MMBTU/h out as radiation -- the rest goes up with the plume";
-  const budgetVerdict = "SOLAR IS ADDED, NOT IGNORED. Against a " + fmt(allowable_btuh_ft2, 0) + " BTU/h-sq ft criterion, " + fmt(solar_btuh_ft2, 0) + " of solar is " + fmt(solar_share_pct, 0) + "% of the budget spent before the flare is lit, leaving " + fmt(budget_btuh_ft2, 0) + " for the flare itself";
+  const radiatedVerdict = aFig(fmt(heat_release_btuh / 1e6, 0)) + " MMBTU/h release with a radiant fraction of " + fmt(radiant_fraction, 2) + " puts " + fmt(radiated_btuh / 1e6, 1) + " MMBTU/h out as radiation -- the rest goes up with the plume";
+  const budgetVerdict = "SOLAR IS ADDED, NOT IGNORED. Against " + aFig(fmt(allowable_btuh_ft2, 0)) + " BTU/h-sq ft criterion, " + fmt(solar_btuh_ft2, 0) + " of solar is " + fmt(solar_share_pct, 0) + "% of the budget spent before the flare is lit, leaving " + fmt(budget_btuh_ft2, 0) + " for the flare itself";
   const distanceVerdict = "the required distance is " + fmt(required_distance_ft, 1) + " ft. Leaving the solar term out of the SAME criterion gives " + fmt(no_solar_distance_ft, 1) + " ft -- an understatement of " + fmt(solar_penalty_ft, 1) + " ft, or " + fmt(solar_penalty_pct, 0) + "%, which is exactly the kind of omission that puts a walkway inside an exclusion zone";
   const inverseSquareVerdict = "AND IT IS INVERSE SQUARE, so halving the allowable radiation multiplies the distance by 1.41 rather than by 2. That cuts both ways: a criterion four times tighter is only twice as far, and a flare twice as large is only 1.41 times as far -- distances move much more slowly than heat releases do";
   const criterionVerdict = "THE CRITERION HAS TO MATCH THE TARGET, and this is the error that matters. A fence line where the public may stand, a control room, a walkway an operator uses DURING the emergency, and a vessel that only has to survive the event are four different numbers. Using the equipment figure where people stand is not a conservative simplification -- it is the wrong criterion, and it is the one that reads as an engineering judgement in a report";
@@ -1527,7 +1527,7 @@ export function computeWellDeclineReserves({
   const declineVerdict = effective_entered
     ? "the " + fmt(100 * decline_rate, 1) + "% entered was read as an EFFECTIVE annual decline, so the nominal constant is -ln(1 - " + fmt(decline_rate, 3) + ") = " + fmt(nominal_decline, 4) + " per year"
     : "the " + fmt(decline_rate, 3) + " entered was read as a NOMINAL decline constant, so the effective annual decline people would quote is 1 - exp(-" + fmt(decline_rate, 3) + ") = " + fmt(100 * effective_decline, 1) + "% per year";
-  const lifeVerdict = "from " + fmt(initial_rate_bpd, 0) + " bbl/day to a " + fmt(economic_limit_bpd, 0) + " bbl/day economic limit is " + fmt(economic_life_years, 1) + " years, and the remaining reserves to that limit are " + fmt(remaining_reserves_bbl, 0) + " " + (fmt(remaining_reserves_bbl, 0) === "1" ? "barrel" : "barrels") + " -- about " + fmt(remaining_reserves_bbl / 1000, 0) + " thousand";
+  const lifeVerdict = "from " + fmt(initial_rate_bpd, 0) + " bbl/day to " + aFig(fmt(economic_limit_bpd, 0)) + " bbl/day economic limit is " + fmt(economic_life_years, 1) + " years, and the remaining reserves to that limit are " + fmt(remaining_reserves_bbl, 0) + " " + (fmt(remaining_reserves_bbl, 0) === "1" ? "barrel" : "barrels") + " -- about " + fmt(remaining_reserves_bbl / 1000, 0) + " thousand";
   const trapVerdict = misread_valid
     ? "THE TRAP IN NUMBERS: this well declines " + fmt(100 * effective_decline, 1) + "% effective and " + fmt(nominal_decline, 3) + " nominal, and the two are not interchangeable. Reading the same figure as the other kind gives " + fmt(misread_reserves_bbl, 0) + " " + (fmt(misread_reserves_bbl, 0) === "1" ? "barrel" : "barrels") + " and " + fmt(misread_life_years, 1) + " years -- " + fmt(Math.abs(misread_error_pct), 0) + "% " + (misread_error_pct < 0 ? "LOW" : "HIGH") + ". For small declines the two are close; for steep ones they diverge badly, and on a package of wells that error is material"
     : "the entered figure cannot be read the other way, so no comparison is made";
@@ -1773,7 +1773,7 @@ export function computeCuttingsSlipVelocity({
   const slip_verdict = fmt(slip_velocity_ft_min, 1) + " ft/min (" + fmt(slip_velocity_fps, 3) + " ft/s) in " + regime + ", at a particle Reynolds number of " + fmt(particle_reynolds, 1);
   const viscosity_verdict = viscosity_mode === "apparent"
     ? fmt(mu, 1) + " cP, as entered"
-    : fmt(mu, 1) + " cP apparent, from n = " + fmt(flow_index_n, 2) + " and K = " + fmt(consistency_k, 0) + " at " + fmt(annular_velocity_ft_min, 0) + " ft/min in a " + fmt(hole_dia_in, 2) + " by " + fmt(pipe_od_in, 2) + " in annulus";
+    : fmt(mu, 1) + " cP apparent, from n = " + fmt(flow_index_n, 2) + " and K = " + fmt(consistency_k, 0) + " at " + fmt(annular_velocity_ft_min, 0) + " ft/min in " + aFig(fmt(hole_dia_in, 2)) + " by " + fmt(pipe_od_in, 2) + " in annulus";
   const transport_verdict = !has_annular
     ? "enter the annular velocity for the transport ratio"
     : net_velocity_ft_min <= 0

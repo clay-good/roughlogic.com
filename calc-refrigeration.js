@@ -12,7 +12,7 @@
 // group letter is independent of the module that holds it, the spec-v42 /
 // spec-v70..v86 precedent).
 
-import {
+import { aFig,
   DEBOUNCE_MS, debounce, makeNumber, makeSelect,
   makeOutputLine, attachExampleButton, fmt, fmtDir,
   makeStepsPanel,
@@ -340,7 +340,7 @@ export function computeRefrigeratedCaseLoad({
   const meter_saving_w = internal_electric_w - retrofit_internal_w;
   const retrofit_verdict = !has_retrofit
     ? "(no retrofit entered)"
-    : "internal electric falls to " + fmt(retrofit_internal_btuh, 0) + " BTU/h and the case load to " + fmt(retrofit_total_btuh, 0) + " BTU/h, a " + fmt(load_reduction_btuh, 0) + " BTU/h reduction -- and the store also stops paying for " + fmt(meter_saving_w, 0) + " W at the meter, so the saving is collected twice";
+    : "internal electric falls to " + fmt(retrofit_internal_btuh, 0) + " BTU/h and the case load to " + fmt(retrofit_total_btuh, 0) + " BTU/h, " + aFig(fmt(load_reduction_btuh, 0)) + " BTU/h reduction -- and the store also stops paying for " + fmt(meter_saving_w, 0) + " W at the meter, so the saving is collected twice";
   if (![infiltration_btuh, transmission_btuh, internal_btuh, total_btuh, internal_pct, retrofit_total_btuh, meter_saving_w].every(Number.isFinite)) return { error: "Case load math is not a finite value." };
   return {
     infiltration_btuh, transmission_btuh, product_btuh,
@@ -532,7 +532,7 @@ REFRIGERATION_RENDERERS["condenser-td-head-pressure"] = _simpleRenderer({
   ],
   outputs: [
     { key: "b", id: "ctd-out-b", label: "TD basis", value: (r) => "measured from the " + r.basis_label },
-    { key: "c", id: "ctd-out-c", label: "Condensing temperature", value: (r) => fmt(r.condensing_f, 1) + " °F at a " + fmt(r.design_td_f, 1) + " °F TD" },
+    { key: "c", id: "ctd-out-c", label: "Condensing temperature", value: (r) => fmt(r.condensing_f, 1) + " °F at " + aFig(fmt(r.design_td_f, 1)) + " °F TD" },
     { key: "a", id: "ctd-out-a", label: "Alternative case", value: (r) => r.alternate_verdict },
     { key: "e", id: "ctd-out-e", label: "Annual energy effect", value: (r) => r.cost_verdict },
     { key: "n", id: "ctd-out-n", label: "Note", value: (r) => r.note },
@@ -898,7 +898,7 @@ export function computeMachineryRoomVentilation({
   const ach_verdict = is_ammonia
     ? "IIAR 2 sizes an ammonia room by air changes: 30 per hour on " + fmt(room_volume_ft3, 0) + " cu ft; 100 x sqrt(G) would give " + fmt(100 * Math.sqrt(largest_system_charge_lb), 0) + " cfm, which ASHRAE 15 no longer applies to ammonia"
     : has_room
-    ? "that is " + fmt(air_changes_per_hour, 1) + " air changes per hour in a " + fmt(room_volume_ft3, 0) + " cu ft room -- reported because sizing this room by air changes instead of by charge gives a different and usually much smaller fan"
+    ? "that is " + fmt(air_changes_per_hour, 1) + " air changes per hour in " + aFig(fmt(room_volume_ft3, 0)) + " cu ft room -- reported because sizing this room by air changes instead of by charge gives a different and usually much smaller fan"
     : "(no room dimensions entered)";
   if (![required_exhaust_cfm, room_volume_ft3, air_changes_per_hour, louver_free_area_ft2, gross_louver_area_ft2, charge_covered_lb].every(Number.isFinite)) return { error: "Machinery room ventilation math is not a finite value." };
   return {

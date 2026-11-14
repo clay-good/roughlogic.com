@@ -4,7 +4,10 @@
 // "1 seconds longer"). count-noun-agreement.test.js reads the report; it
 // catches what the source-shape check there cannot see (bare variables,
 // .length, a raw value compared where the rounded one is printed). Added
-// 2026-11-14.
+// 2026-11-14. The same pass reports two more kinds, read by
+// render-text-guard.test.js: "a" before a figure said with a vowel sound
+// ("a 85 dB target", "a 11 ft landing"; aFig() in ui-fields.js picks the
+// article) and a negative zero ("-0.000 ft").
 import { installDocument, installTimers, flushTimers } from "./fake-dom.js";
 import { RENDERER_MAP } from "./renderer-map.js";
 
@@ -12,7 +15,11 @@ installTimers();
 const doc = installDocument();
 const { TOOLS } = await import("../../tools-data.js");
 
-const ONE = /(?:^|[\s(=])1 ([a-z]{3,}s)\b/g;
+const KINDS = [
+  ["plural", /(?:^|[\s(=])1 ([a-z]{3,}s)\b/g],
+  ["article", /\b([Aa]) ((?:8|1[18](?![\d]))[\d,.:%-]*)/g],
+  ["negzero", /(?:^|[\s($=])(-0(?:\.0+)?)(?![\d.])/g],
+];
 
 const report = { withExample: 0, hits: [] };
 for (const { id } of TOOLS) {
@@ -30,11 +37,14 @@ for (const { id } of TOOLS) {
   const scan = (state) => {
     for (const line of outputs.querySelectorAll("span").filter((x) => x.classList.contains("out-value"))) {
       const text = line.textContent;
-      for (const m of text.matchAll(ONE)) {
-        const ctx = text.slice(Math.max(0, m.index - 40), m.index + 40).replace(/\s+/g, " ").replace(/\d[\d,.]*/g, "#");
-        if (seen.has(m[1] + ctx)) continue;
-        seen.add(m[1] + ctx);
-        report.hits.push({ id, word: m[1], state, text: text.slice(Math.max(0, m.index - 50), m.index + 60).replace(/\s+/g, " ") });
+      for (const [kind, re] of KINDS) {
+        for (const m of text.matchAll(re)) {
+          const word = kind === "plural" ? m[1] : m[0].trim();
+          const ctx = kind + text.slice(Math.max(0, m.index - 40), m.index + 40).replace(/\s+/g, " ").replace(/\d[\d,.]*/g, "#");
+          if (seen.has(ctx)) continue;
+          seen.add(ctx);
+          report.hits.push({ id, kind, word, state, text: text.slice(Math.max(0, m.index - 50), m.index + 60).replace(/\s+/g, " ") });
+        }
       }
     }
   };
@@ -50,8 +60,8 @@ for (const { id } of TOOLS) {
     for (const el of inputs.querySelectorAll("input")) {
       if (el.type !== "number" && !el.dataset?.lengthUnit) continue;
       const v = el.value, x = Number(v);
-      if (v === "" || !Number.isFinite(x) || x === 0) continue;
-      for (const k of [0.01, 0.05, 0.1, 0.2, 0.5]) { el.value = String(+(x * k).toPrecision(6)); fire(el); scan(el.id + " x" + k); }
+      if (v === "" || !Number.isFinite(x) || x === 0) continue; // a blank or zero entry has nothing to scale
+      for (const k of [0, 0.01, 0.05, 0.1, 0.2, 0.5, 2, 10]) { el.value = String(+(x * k).toPrecision(6)); fire(el); scan(el.id + " x" + k); }
       el.value = v; fire(el);
     }
   } catch { /* render-text-sweep reports crashes */ }

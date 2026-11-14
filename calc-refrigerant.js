@@ -30,7 +30,7 @@
 // All DOM manipulation uses textContent / createElement only.
 
 import { interpolateRefrigerant } from "./pure-math.js";
-import {
+import { aFig,
   DEBOUNCE_MS, debounce, makeNumber, makeSelect,
   makeOutputLine, attachExampleButton, fmt,
   makeStepsPanel,
@@ -1086,8 +1086,8 @@ export function computeEvaporatorTdDtd({ box_temp_f = null, sst_f = null, design
     ? "(no coil UA entered)"
     : has_load
       ? (load_met
-        ? "the coil makes " + fmt(capacity_at_dtd_btuh, 0) + " BTU/h at this TD against a " + fmt(design_load_btuh, 0) + " BTU/h load -- it carries it, and would still do so down to a " + fmt(td_required_f, 1) + " F TD"
-        : "the coil makes only " + fmt(capacity_at_dtd_btuh, 0) + " BTU/h at this TD against a " + fmt(design_load_btuh, 0) + " BTU/h load -- it needs a " + fmt(td_required_f, 1) + " F TD to carry it, or " + fmt(ua_required_btuh_f, 0) + " BTU/h-F of UA at the TD entered")
+        ? "the coil makes " + fmt(capacity_at_dtd_btuh, 0) + " BTU/h at this TD against " + aFig(fmt(design_load_btuh, 0)) + " BTU/h load -- it carries it, and would still do so down to " + aFig(fmt(td_required_f, 1)) + " F TD"
+        : "the coil makes only " + fmt(capacity_at_dtd_btuh, 0) + " BTU/h at this TD against " + aFig(fmt(design_load_btuh, 0)) + " BTU/h load -- it needs " + aFig(fmt(td_required_f, 1)) + " F TD to carry it, or " + fmt(ua_required_btuh_f, 0) + " BTU/h-F of UA at the TD entered")
       : "the coil makes " + fmt(capacity_at_dtd_btuh, 0) + " BTU/h at this TD";
   const rating_verdict = !has_rating_td
     ? "(no rating TD entered)"
@@ -1526,8 +1526,8 @@ export function computeRefrigerantLeakRate({ full_charge_lb = 0, pounds_added_lb
   const pounds_over_lb = pounds_added_lb - allowed_lb;
   const exceeded = leak_rate_pct > threshold_pct + 1e-9 * Math.abs(threshold_pct);
   const verdict = exceeded
-    ? "EXCEEDED: " + fmt(leak_rate_pct, 1) + "% against a " + fmt(threshold_pct, 1) + "% threshold, " + fmt(pounds_over_lb, 1) + " lb over the allowance -- this starts the repair clock, the verification tests, and, if the leak cannot be repaired, a retrofit or retirement plan"
-    : "not exceeded: " + fmt(leak_rate_pct, 1) + "% against a " + fmt(threshold_pct, 1) + "% threshold, with " + fmt(-pounds_over_lb, 1) + " lb of allowance left in this period";
+    ? "EXCEEDED: " + fmt(leak_rate_pct, 1) + "% against " + aFig(fmt(threshold_pct, 1)) + "% threshold, " + fmt(pounds_over_lb, 1) + " lb over the allowance -- this starts the repair clock, the verification tests, and, if the leak cannot be repaired, a retrofit or retirement plan"
+    : "not exceeded: " + fmt(leak_rate_pct, 1) + "% against " + aFig(fmt(threshold_pct, 1)) + "% threshold, with " + fmt(-pounds_over_lb, 1) + " lb of allowance left in this period";
   if (![leak_rate_pct, allowed_lb, pounds_over_lb].every(Number.isFinite)) return { error: "Leak-rate math is not a finite value." };
   return {
     leak_rate_pct,

@@ -2,7 +2,7 @@
 // See spec-v4.md section 2.7.
 
 import { verifyShard } from "./integrity.js";
-import {
+import { aFig,
   DEBOUNCE_MS, debounce, makeNumber, makeSelect, makeText, makeTextarea,
   makeOutputLine, attachExampleButton, fmt,
   stepsFor,
@@ -1425,7 +1425,7 @@ export function computeHelicopterLzSizing({ rotor_diameter_ft = 0, size_factor =
   const short_ft = required_side_ft - measured_clear_ft;
   const short_dp = short_ft >= 1 ? 0 : short_ft >= 0.1 ? 1 : 3;
   if (!area_ok) failures.push("area (" + fmt(short_ft, short_dp) + " ft short of the required " + fmt(required_side_ft, short_dp) + " ft side)");
-  if (!slope_ok) failures.push("slope (" + fmt(ground_slope_deg, 1) + " deg against a " + fmt(slope_limit_deg, 1) + " deg limit)");
+  if (!slope_ok) failures.push("slope (" + fmt(ground_slope_deg, 1) + " deg against " + aFig(fmt(slope_limit_deg, 1)) + " deg limit)");
   const verdict = failures.length === 0
     ? "PASSES on area and slope; it still needs " + fmt(approach_length_ft, 0) + " ft of unobstructed approach beyond the tallest obstacle, and a second obstacle inside that distance fails the site from the air"
     : "FAILS on " + failures.join(" and ");

@@ -20,7 +20,7 @@
 // gauge-to-absolute pressure ratio. No code-table transcription.
 // =====================================================================
 
-import {
+import { aFig,
   DEBOUNCE_MS, debounce, makeNumber, makeTextarea, makeSelect,
   makeOutputLine, attachExampleButton, fmt,
   makeStepsPanel,
@@ -747,7 +747,7 @@ METALAIR_RENDERERS["metal-roof-thermal-movement"] = _simpleRenderer({
     { key: "clip_travel_in", label: "Clip rated travel (in, 0 to skip)", kind: "number" },
   ],
   outputs: [
-    { key: "t", id: "mrtm-out-t", label: "Total movement", value: (r) => fmt(r.total_movement_in, 3) + " in over " + fmt(r.panel_length_ft, 0) + " ft at a " + fmt(r.temp_swing_f, 0) + " F panel swing" },
+    { key: "t", id: "mrtm-out-t", label: "Total movement", value: (r) => fmt(r.total_movement_in, 3) + " in over " + fmt(r.panel_length_ft, 0) + " ft at " + aFig(fmt(r.temp_swing_f, 0)) + " F panel swing" },
     { key: "e", id: "mrtm-out-e", label: "Movement at each end", value: (r) => fmt(r.movement_down_slope_in, 3) + " in toward the eave and " + fmt(r.movement_up_slope_in, 3) + " in toward the ridge, from a fixed point at " + fmt(r.fixed_point_fraction * 100, 0) + "% of the length" },
     { key: "v", id: "mrtm-out-v", label: "Against the clip travel", value: (r) => r.verdict },
     { key: "c", id: "mrtm-out-c", label: "Fixing it at the middle instead", value: (r) => fmt(r.centre_fixed_movement_in, 3) + " in at each end -- " + fmt(r.centre_fixed_saving_in, 3) + " in less than the governing end has now, which on a long panel is often the cheapest fix there is" },

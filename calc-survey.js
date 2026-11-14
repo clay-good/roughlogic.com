@@ -9,7 +9,7 @@
 // unchanged. Lazy-loaded on first open of one of its tiles, so it is not in
 // the home-view first-paint payload.
 
-import {
+import { aFig,
   DEBOUNCE_MS, debounce, makeNumber, makeTextarea, makeSelect,
   makeOutputLine, attachExampleButton, fmt,
   makeStepsPanel,
@@ -816,12 +816,12 @@ export function computeTapingNormalTension({ span_ft = 100, tape_weight_plf = 0.
   // A negative net correction means the tape reads LONG (until 2026-10-03 this key was named the reverse).
   const applied_reads_long = has_applied ? net_at_applied_ft < 0 : null;
 
-  const note = "A " + L + " ft unsupported span of this tape weighs " + span_weight_lb.toFixed(2) + " lb. "
+  const note = aFig(L, true) + " ft unsupported span of this tape weighs " + span_weight_lb.toFixed(2) + " lb. "
     + (rhs > 0
-      ? "Normal tension is " + normal_tension_lb.toFixed(1) + " lb: at that pull the tape stretches exactly as much as its own sag shortens it, so the sag term (" + sag_at_normal_ft.toFixed(4) + " ft) and the tension term (+" + pull_at_normal_ft.toFixed(4) + " ft) cancel and the tape reads true with no correction applied. "
+      ? "Normal tension is " + normal_tension_lb.toFixed(1) + " lb: at that pull the tape stretches exactly as much as its own sag shortens it, so the sag term (" + fmt(sag_at_normal_ft, 4) + " ft) and the tension term (+" + pull_at_normal_ft.toFixed(4) + " ft) cancel and the tape reads true with no correction applied. "
       : "With no tape weight there is no sag to cancel, so the only pull needing no correction is the standardization pull itself, " + P0.toFixed(1) + " lb. ")
     + (has_applied
-      ? "At the " + Pa.toFixed(1) + " lb you entered the two terms are " + sag_at_applied_ft.toFixed(4) + " and " + (pull_at_applied_ft >= 0 ? "+" : "") + pull_at_applied_ft.toFixed(4) + " ft, a net " + (net_at_applied_ft >= 0 ? "+" : "") + net_at_applied_ft.toFixed(4) + " ft over the span - the tape reads " + (applied_reads_long ? "LONG, so the true distance is shorter than the reading" : "SHORT, so the true distance is longer than the reading") + " by that much. "
+      ? "At the " + Pa.toFixed(1) + " lb you entered the two terms are " + fmt(sag_at_applied_ft, 4) + " and " + (pull_at_applied_ft >= 0 ? "+" : "") + pull_at_applied_ft.toFixed(4) + " ft, a net " + (net_at_applied_ft >= 0 ? "+" : "") + fmt(net_at_applied_ft, 4) + " ft over the span - the tape reads " + (applied_reads_long ? "LONG, so the true distance is shorter than the reading" : "SHORT, so the true distance is longer than the reading") + " by that much. "
       : "")
     + "Why it collapses so cleanly: setting the tension correction (P - P0) L / (A E) equal and opposite to the sag correction w^2 L^3 / (24 P^2) and writing W = w L for the span weight removes the length from both sides, leaving P^2 (P - P0) = A E W^2 / 24. Square-rooting that gives the textbook P = 0.204 W sqrt(A E) / sqrt(P - P0), which is the same equation - 0.204 is just 1 over the square root of 24. This tile solves the cubic directly instead of iterating the implicit form. "
     + "Normal tension is not always practical: it can exceed what a crew can hold steadily or what the tape is rated for, and a tape supported throughout has no sag to cancel in the first place. It also does nothing about temperature or the tape's own standardization error, which still need the correction tile. Steel at 29,000,000 psi by default; a tape's actual area and weight come from its own specification, and the difference between a light 100-ft tape and a heavy one moves this answer a lot. A field aid; the tape calibration and the survey's procedure govern.";
@@ -1331,7 +1331,7 @@ SURVEY_RENDERERS["lidar-point-density"] = _simpleRenderer({
     { key: "area_acres", label: "Area to cover (acres, 0 to skip)", kind: "number" },
   ],
   outputs: [
-    { key: "s", id: "lpd-out-s", label: "Swath width", value: (r) => fmt(r.swath_width_m, 1) + " m at " + fmt(r.flight_height_m, 0) + " m and a " + fmt(r.scan_angle_deg, 0) + " degree scan" },
+    { key: "s", id: "lpd-out-s", label: "Swath width", value: (r) => fmt(r.swath_width_m, 1) + " m at " + fmt(r.flight_height_m, 0) + " m and " + aFig(fmt(r.scan_angle_deg, 0)) + " degree scan" },
     { key: "d", id: "lpd-out-d", label: "Point density", value: (r) => fmt(r.point_density_per_m2, 1) + " points per sq m -- about " + fmt(r.point_spacing_m, 3) + " m between points" },
     { key: "l", id: "lpd-out-l", label: "Line spacing", value: (r) => fmt(r.line_spacing_m, 1) + " m at " + fmt(r.side_overlap_pct, 0) + "% side overlap" + (r.line_count === null ? "" : ", about " + fmt(r.line_count, 0) + " " + (fmt(r.line_count, 0) === "1" ? "line" : "lines") + " over " + fmt(r.area_acres, 0) + " " + (fmt(r.area_acres, 0) === "1" ? "acre" : "acres")) },
     { key: "v", id: "lpd-out-v", label: "Half the speed", value: (r) => fmt(r.half_speed_density, 1) + " points per sq m, and twice the flight time -- a linear trade" },
@@ -1465,7 +1465,7 @@ export function computeMassHaulOverhaul({ cut_volume_cy = 0, shrinkage_factor = 
   const outs = [compacted_from_cut_cy, balance_cy, overhaul_station_yards, free_haul_stations, cut_needed_for_fill_cy];
   if (!outs.every(Number.isFinite)) return { error: "Mass haul math is not a finite value." };
   const balance_verdict = balanced
-    ? "BALANCED: " + fmt(cut_volume_cy, 0) + " cy of cut at a " + fmt(shrinkage_factor, 3) + " factor makes exactly the " + fmt(fill_required_cy, 0) + " cy of compacted fill required"
+    ? "BALANCED: " + fmt(cut_volume_cy, 0) + " cy of cut at " + aFig(fmt(shrinkage_factor, 3)) + " factor makes exactly the " + fmt(fill_required_cy, 0) + " cy of compacted fill required"
     : surplus
       ? "SURPLUS of " + fmt(waste_cy, 0) + " cy: " + fmt(cut_volume_cy, 0) + " cy of cut yields " + fmt(compacted_from_cut_cy, 0) + " cy compacted against " + fmt(fill_required_cy, 0) + " cy needed, so that much is wasted or exported"
       : "DEFICIT of " + fmt(borrow_needed_cy, 0) + " cy: " + fmt(cut_volume_cy, 0) + " cy of cut yields only " + fmt(compacted_from_cut_cy, 0) + " cy compacted against " + fmt(fill_required_cy, 0) + " cy needed, so that much must be borrowed. It would take " + fmt(cut_needed_for_fill_cy, 0) + " cy of cut in place to make the fill";
@@ -1506,7 +1506,7 @@ SURVEY_RENDERERS["mass-haul-overhaul"] = _simpleRenderer({
   outputs: [
     { key: "c", id: "mho-out-c", label: "Cut corrected to compacted", value: (r) => fmt(r.cut_volume_cy, 0) + " cy in place at " + fmt(r.shrinkage_factor, 3) + " makes " + fmt(r.compacted_from_cut_cy, 0) + " cy of fill" },
     { key: "b", id: "mho-out-b", label: "Balance", value: (r) => r.balance_verdict },
-    { key: "o", id: "mho-out-o", label: "Overhaul", value: (r) => fmt(r.overhaul_station_yards, 0) + " station-yards -- " + fmt(r.overhaul_volume_cy, 0) + " cy carried " + fmt(r.beyond_free_haul_ft, 0) + " ft past a " + fmt(r.free_haul_ft, 0) + " ft (" + fmt(r.free_haul_stations, 1) + " station) free haul" },
+    { key: "o", id: "mho-out-o", label: "Overhaul", value: (r) => fmt(r.overhaul_station_yards, 0) + " station-yards -- " + fmt(r.overhaul_volume_cy, 0) + " cy carried " + fmt(r.beyond_free_haul_ft, 0) + " ft past " + aFig(fmt(r.free_haul_ft, 0)) + " ft (" + fmt(r.free_haul_stations, 1) + " station) free haul" },
     { key: "p", id: "mho-out-p", label: "Overhaul cost", value: (r) => r.overhaul_cost === null ? "(no rate entered)" : fmt(r.overhaul_cost, 2) + " at " + fmt(r.overhaul_rate_per_station_yard, 3) + " per station-yard" },
     { key: "h", id: "mho-out-h", label: "Borrow against haul", value: (r) => r.haul_verdict },
     { key: "n", id: "mho-out-n", label: "Note", value: (r) => r.note },

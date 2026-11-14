@@ -12,7 +12,7 @@
 // it, the spec-v42 / spec-v70..v86 precedent); their ids, citations, worked
 // examples, dimensional annotations, and behavior are byte-for-byte unchanged.
 
-import {
+import { aFig,
   DEBOUNCE_MS, debounce, makeNumber, makeSelect, makeTextarea,
   makeOutputLine, attachExampleButton, fmt,
   stepsFor,
@@ -949,7 +949,7 @@ export function computeTreeAppraisalCtla({ dbh_in = 0, unit_cost_per_sq_in = 0, 
     trunk_area_sq_in, basic_value, species_f, condition_f, location_f,
     combined_factor, appraised_value, depreciation_pct, measure_at, large_trunk,
     note: "Value scales with trunk AREA, not diameter, so it goes as the square: doubling the trunk quadruples the basic value, which is why a large tree is so much harder to replace than two small ones and why removal disputes over mature trees carry the numbers they do. Measure this trunk " + measure_at + " - the CTLA rule switches at 12 in diameter, and using the wrong height on a flaring trunk is the most common measurement error. "
-      + "The three ratings are multiplicative, so they compound quickly: " + sp + "% x " + cond + "% x " + loc + "% leaves " + (combined_factor * 100).toFixed(1) + "% of the basic value, a " + depreciation_pct.toFixed(1) + "% depreciation. A mediocre tree in a mediocre spot is worth far less than either rating alone suggests. "
+      + "The three ratings are multiplicative, so they compound quickly: " + sp + "% x " + cond + "% x " + loc + "% leaves " + (combined_factor * 100).toFixed(1) + "% of the basic value, " + aFig(depreciation_pct.toFixed(1)) + "% depreciation. A mediocre tree in a mediocre spot is worth far less than either rating alone suggests. "
       + "EVERY FACTOR IS YOURS TO SUPPLY: the unit cost is regional and moves with nursery prices, and the species, condition, and location percentages come from your regional plant appraisal committee's guide - none of them is shipped here, because a national default would be wrong everywhere. Single-stem trunks only; a multi-stem tree uses a different area rule, and very large or historic specimens may call for the cost-of-cure or income approaches instead of the trunk formula. This is an ESTIMATING aid, not an appraisal: a defensible appraisal is a qualified appraiser's report, and courts and insurers look at the appraiser, not the arithmetic.",
   };
 }

@@ -9,7 +9,7 @@
 // screen and the shade cloth all trade against the same light and the same
 // heat, and the transpiration that cools the air is the water the crop drank.
 
-import {
+import { aFig,
   DEBOUNCE_MS, debounce, makeNumber,
   makeOutputLine, attachExampleButton, fmt,
   makeStepsPanel,
@@ -166,7 +166,7 @@ GREENHOUSE_RENDERERS["greenhouse-vent-area"] = _simpleRenderer({
     { key: "floor_area_sqft", id: "gva-floor", label: "Floor area", unit: "sq ft", value: (r) => fmt(r.floor_area_sqft, 0) + " sq ft" },
     { key: "roof_vent_area_sqft", id: "gva-vents", label: "Vent areas", value: (r) => fmt(r.roof_vent_area_sqft, 1) + " sq ft roof, " + fmt(r.side_vent_area_sqft, 1) + " sq ft side" },
     { key: "effective_area_sqft", id: "gva-eff", label: "Effective area in series", unit: "sq ft", value: (r) => fmt(r.effective_area_sqft, 1) + " sq ft -- " + fmt(r.series_share_pct, 0) + "% of one opening, not the sum of " + fmt(r.total_vent_area_sqft, 0) },
-    { key: "airflow_cfm", id: "gva-flow", label: "Buoyancy airflow", unit: "cfm", value: (r) => fmt(r.airflow_cfm, 0) + " cfm over a " + fmt(r.stack_height_ft, 1) + " ft stack" },
+    { key: "airflow_cfm", id: "gva-flow", label: "Buoyancy airflow", unit: "cfm", value: (r) => fmt(r.airflow_cfm, 0) + " cfm over " + aFig(fmt(r.stack_height_ft, 1)) + " ft stack" },
     { key: "air_changes_per_minute", id: "gva-ach", label: "Air changes per minute", value: (r) => fmt(r.air_changes_per_minute, 2) + " per minute -- " + fmt(r.target_share_pct, 0) + "% of the one-per-minute summer target (" + fmt(r.floor_rule_share_pct, 0) + "% of the 8 cfm per sq ft floor rule, which matches it only at an 8 ft average height)" },
     { key: "mild_airflow_cfm", id: "gva-mild", label: "On a mild morning", unit: "cfm", value: (r) => fmt(r.mild_airflow_cfm, 0) + " cfm -- " + fmt(r.mild_share_pct, 0) + "% of design, from a difference " + fmt(r.mild_temp_share_pct, 0) + "% of design" },
     { key: "note", id: "gva-note", label: "Use", value: (r) => r.note },
@@ -235,9 +235,9 @@ GREENHOUSE_RENDERERS["fan-pad-evaporative-cooling"] = _simpleRenderer({
   outputs: [
     { key: "total_airflow_cfm", id: "fpe-flow", label: "Total airflow", unit: "cfm", value: (r) => fmt(r.total_airflow_cfm, 0) + " cfm" },
     { key: "pad_area_sqft", id: "fpe-pad", label: "Pad face area", unit: "sq ft", value: (r) => fmt(r.pad_area_sqft, 1) + " sq ft -- " + fmt(r.pad_length_ft, 1) + " ft of pad at the entered height" },
-    { key: "pad_outlet_temp_f", id: "fpe-out", label: "Air leaving the pad", unit: "deg F", value: (r) => fmt(r.pad_outlet_temp_f, 1) + " deg F, a " + fmt(r.pad_drop_f, 1) + " deg F drop; the wet bulb is the floor" },
+    { key: "pad_outlet_temp_f", id: "fpe-out", label: "Air leaving the pad", unit: "deg F", value: (r) => fmt(r.pad_outlet_temp_f, 1) + " deg F, " + aFig(fmt(r.pad_drop_f, 1)) + " deg F drop; the wet bulb is the floor" },
     { key: "temp_rise_f", id: "fpe-rise", label: "Rise to the fan end", unit: "deg F", value: (r) => fmt(r.temp_rise_f, 1) + " deg F absorbing " + fmt(r.cropped_sensible_btuh, 0) + " Btu/h" },
-    { key: "fan_end_temp_f", id: "fpe-fan", label: "Air at the fans", unit: "deg F", value: (r) => fmt(r.fan_end_temp_f, 1) + " deg F -- " + (r.fan_end_below_outdoor_f < 0 ? fmt(-r.fan_end_below_outdoor_f, 1) + " deg F ABOVE outside" : "still " + fmt(r.fan_end_below_outdoor_f, 1) + " deg F below outside") + ", across a " + fmt(r.temp_rise_f, 0) + " deg F gradient" },
+    { key: "fan_end_temp_f", id: "fpe-fan", label: "Air at the fans", unit: "deg F", value: (r) => fmt(r.fan_end_temp_f, 1) + " deg F -- " + (r.fan_end_below_outdoor_f < 0 ? fmt(-r.fan_end_below_outdoor_f, 1) + " deg F ABOVE outside" : "still " + fmt(r.fan_end_below_outdoor_f, 1) + " deg F below outside") + ", across " + aFig(fmt(r.temp_rise_f, 0)) + " deg F gradient" },
     { key: "empty_house_rise_f", id: "fpe-empty", label: "With no crop transpiring", value: (r) => fmt(r.empty_house_rise_f, 1) + " deg F rise (" + fmt(r.empty_house_rise_ratio, 1) + "x), putting the fan end at " + fmt(r.empty_house_fan_end_f, 1) + " deg F" },
     { key: "note", id: "fpe-note", label: "Use", value: (r) => r.note },
   ],
@@ -614,7 +614,7 @@ GREENHOUSE_RENDERERS["greenhouse-transpiration-water"] = _simpleRenderer({
     { key: "transpiration_gal_per_day", id: "gtw-water", label: "Crop transpiration", value: (r) => fmt(r.transpiration_gal_per_day, 0) + " gal/day (" + fmt(r.transpiration_lb_per_day, 0) + " lb/day)" },
     { key: "gal_per_sqft_per_day", id: "gtw-per", label: "Per square foot", value: (r) => fmt(r.gal_per_sqft_per_day, 4) + " gal/sq ft/day -- the UMass warmest-day peak is 0.3 to 0.4" },
     { key: "applied_gal_per_day", id: "gtw-applied", label: "Irrigation to apply", value: (r) => fmt(r.applied_gal_per_day, 0) + " gal/day including " + fmt(r.leached_gal_per_day, 0) + " gal of leachate" },
-    { key: "peak_gal_per_hour", id: "gtw-peak", label: "Peak hour demand", value: (r) => fmt(r.peak_gal_per_hour, 1) + " gal/h transpired" + (r.peak_applied_gal_per_hour > r.peak_gal_per_hour * (1 + 1e-9) ? " (" + fmt(r.peak_applied_gal_per_hour, 1) + " gal/h to apply with the leaching fraction)" : "") + " against a " + fmt(r.average_gal_per_hour, 1) + " gal/h average -- " + fmt(r.peak_to_average_ratio, 1) + "x" },
+    { key: "peak_gal_per_hour", id: "gtw-peak", label: "Peak hour demand", value: (r) => fmt(r.peak_gal_per_hour, 1) + " gal/h transpired" + (r.peak_applied_gal_per_hour > r.peak_gal_per_hour * (1 + 1e-9) ? " (" + fmt(r.peak_applied_gal_per_hour, 1) + " gal/h to apply with the leaching fraction)" : "") + " against " + aFig(fmt(r.average_gal_per_hour, 1)) + " gal/h average -- " + fmt(r.peak_to_average_ratio, 1) + "x" },
     { key: "moisture_pints_per_day", id: "gtw-moist", label: "Moisture into the house air", value: (r) => fmt(r.moisture_pints_per_day, 0) + " " + (fmt(r.moisture_pints_per_day, 0) === "1" ? "pint" : "pints") + " a day -- a sealed house has to remove all of it" },
     { key: "note", id: "gtw-note", label: "Use", value: (r) => r.note },
   ],

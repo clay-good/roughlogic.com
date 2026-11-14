@@ -5,7 +5,7 @@
 // floodplain checks that landed with it). Calculator IDs, formulas, fields,
 // outputs, citations, examples, and Group E assignments are unchanged.
 
-import {
+import { aFig,
   DEBOUNCE_MS as _DC, debounce as _debC, makeNumber as _mnC, makeSelect as _msC,
   makeOutputLine as _moC, attachExampleButton as _aeC, fmt,
   makeStepsPanel,
@@ -318,7 +318,7 @@ export function computeReachRange({ approach = "forward", obstructed = "yes", ob
   const shallow_limit_in = isObs ? (isSide ? 10 : 20) : null;
   const depth_to_gain_in = isObs && depth > shallow_limit_in ? depth - shallow_limit_in : null;
 
-  const note = "REACH RANGE IS FOUR RULES, not one number, and which one applies turns on the approach and on what is in the way. This is a " + rule + ". "
+  const note = "REACH RANGE IS FOUR RULES, not one number, and which one applies turns on the approach and on what is in the way. This is " + aFig(rule) + ". "
     + (isObs ? "Reach depth " + depth + " in: " : "")
     + (max_height_in === null
       ? "THERE IS NO PERMITTED REACH AT THIS DEPTH. " + (isSide ? "The side-reach obstruction may be 24 in deep at most" : "The forward reach depth may be 25 in at most") + ", and " + depth + " in exceeds it - so the element does not need to come DOWN, it needs to MOVE. Lowering it does not help, because no height complies. "
@@ -624,7 +624,7 @@ export function computeDoorClearWidth({ leaf_width_in = 0, door_thickness_in = 1
   const passes = clear_width_ok && threshold_ok && (series_ok !== false);
 
   const note = "32 IN IS THE CLEAR OPENING, NOT THE DOOR. It is measured between the face of the door open 90 degrees and the stop, so the leaf loses its own thickness and the stop before anyone puts a tape on it. "
-    + "A " + leaf + " in leaf " + thick + " in thick, over a 1/2 in stop, estimates to " + estimated_clear_width_in.toFixed(2) + " in of clear opening" + (used_measured ? ", though the measured " + measured + " in entered is what governs here. " : " - and that estimate is what this check uses, since no measurement was entered. It is an estimate; the measured opening governs. ")
+    + aFig(leaf, true) + " in leaf " + thick + " in thick, over a 1/2 in stop, estimates to " + estimated_clear_width_in.toFixed(2) + " in of clear opening" + (used_measured ? ", though the measured " + measured + " in entered is what governs here. " : " - and that estimate is what this check uses, since no measurement was entered. It is an estimate; the measured opening governs. ")
     + "THIS IS WHY A 32 IN DOOR DOES NOT COMPLY: it nets roughly 30 in, and the smallest leaf that reliably delivers " + required_clear_width_in + " in on these assumptions is " + leaf_needed_in.toFixed(2) + " in. "
     + "Required here: " + required_clear_width_in + " in, " + (is_deep ? "because the opening is " + depth + " in DEEP - more than 24 in - and a deep opening owes 36 in rather than 32. A thick wall, a vestibule, or a deep jamb can fail a door that would pass anywhere else, with nothing about the door changing. " : "the ordinary minimum, the opening being " + depth + " in deep. ")
     + (latchProj > 0 ? "LATCH-SIDE STOP: " + latchProj + " in of projection entered. The 5/8 in everyone quotes is an ALTERATIONS exception, and this is " + (alteration ? "an alteration, so up to 5/8 in is permitted; " + (latch_projection_ok ? "this is within it. " : "this exceeds it by " + (latchProj - ALT_LATCH_MAX).toFixed(3) + " in and the excess comes off the clear width. ") : "NEW CONSTRUCTION, where the exception is not available at all - the full " + latchProj + " in comes off the required clear width. ") : "")
@@ -830,24 +830,24 @@ export function computeTurningAndClearFloorSpace({ cfs_width_in = 0, cfs_depth_i
   if (circular) {
     turning_ok = dia >= CIRCLE;
     circle_deficit_in = Math.max(0, CIRCLE - dia);
-    turning_detail = "a " + CIRCLE + " in circle";
+    turning_detail = aFig(CIRCLE) + " in circle";
   } else if (turning_type === "t-shaped") {
     t_square_ok = sq >= T_SQUARE;
     t_arm_width_ok = armW >= T_ARM_W;
     t_arm_clear_ok = armC >= T_ARM_CLEAR;
     t_base_clear_ok = baseC >= T_BASE_CLEAR;
     turning_ok = t_square_ok && t_arm_width_ok && t_arm_clear_ok && t_base_clear_ok;
-    turning_detail = "a T within a " + T_SQUARE + " in square";
+    turning_detail = "a T within " + aFig(T_SQUARE) + " in square";
   }
 
   const passes = cfs_oriented_ok && (alcove_width_ok !== false) && (turning_ok !== false);
 
   const note = "TWO SPACES THAT GET CONFLATED AND ARE NOT THE SAME THING. Clear floor space is where a person stands or parks to USE something - 30 x 48 in. Turning space is where they turn around - a 60 in circle or a T in a 60 in square. A room can have plenty of one and none of the other, and satisfying 305 says nothing about 304. "
-    + "CLEAR FLOOR SPACE (305.3): 30 in minimum by 48 in minimum, positioned for a " + approach + " approach, which here means " + (forward ? "48 in deep toward the element and 30 in wide" : "48 in wide along the element and 30 in deep") + ". Entered " + w + " wide x " + d + " deep: " + (cfs_oriented_ok ? "OK. " : "SHORT. " + (cfs_size_ok ? "The two dimensions would satisfy 30 x 48 the other way round - the space is big enough and turned the wrong way, which is the failure that gets drawn most often because the area looks right on a plan. " : ""))
+    + "CLEAR FLOOR SPACE (305.3): 30 in minimum by 48 in minimum, positioned for " + aFig(approach) + " approach, which here means " + (forward ? "48 in deep toward the element and 30 in wide" : "48 in wide along the element and 30 in deep") + ". Entered " + w + " wide x " + d + " deep: " + (cfs_oriented_ok ? "OK. " : "SHORT. " + (cfs_size_ok ? "The two dimensions would satisfy 30 x 48 the other way round - the space is big enough and turned the wrong way, which is the failure that gets drawn most often because the area looks right on a plan. " : ""))
     + (is_alcove
-      ? "ALCOVE (305.7): this space is confined on three sides at " + alc + " in deep, past the " + alcove_trigger_in + " in trigger for a " + approach + " approach, so it is no longer the bare 30 x 48 - it must be " + required_alcove_width_in + " in wide minimum. Entered " + w + " in: " + (alcove_width_ok ? "OK. " : "SHORT by " + alcove_width_deficit_in.toFixed(1) + " in. ")
+      ? "ALCOVE (305.7): this space is confined on three sides at " + alc + " in deep, past the " + alcove_trigger_in + " in trigger for " + aFig(approach) + " approach, so it is no longer the bare 30 x 48 - it must be " + required_alcove_width_in + " in wide minimum. Entered " + w + " in: " + (alcove_width_ok ? "OK. " : "SHORT by " + alcove_width_deficit_in.toFixed(1) + " in. ")
         + (forward ? "" : "THE PARALLEL CASE IS THE BRUTAL ONE: a nook deeper than 15 in must be 60 in wide, double the 30 in the bare clear floor space would have allowed. It is why an appliance squeezed between two walls fails where the same appliance on an open wall passes, and 15 in is barely the depth of the appliance itself. ")
-      : "ALCOVE (305.7): at " + alc + " in of confinement this is not an alcove for a " + approach + " approach, whose trigger is " + alcove_trigger_in + " in. " + (other_required_width_in !== null ? "Note that the SAME nook approached in " + (forward ? "parallel" : "forward") + " would be an alcove and would demand " + other_required_width_in + " in of width - the approach direction, not the geometry, decides. " : ""))
+      : "ALCOVE (305.7): at " + alc + " in of confinement this is not an alcove for " + aFig(approach) + " approach, whose trigger is " + alcove_trigger_in + " in. " + (other_required_width_in !== null ? "Note that the SAME nook approached in " + (forward ? "parallel" : "forward") + " would be an alcove and would demand " + other_required_width_in + " in of width - the approach direction, not the geometry, decides. " : ""))
     + (noTurning
       ? "No turning space was entered. Note that where one is required, 305 does not provide it: a compliant clear floor space is not somewhere a person can turn around. "
       : "TURNING SPACE (304.3): " + turning_detail + ". "
@@ -1529,11 +1529,11 @@ export function computeAccessibleShowerCheck({ shower_type = "transfer", width_i
 
   const passes = inside_ok && (clearance_ok !== false);
 
-  const note = "THREE TYPES, THREE GEOMETRIES, and picking the wrong one is what puts a remodel a foot short in the wrong direction. This is the " + type_label + ": " + reqW + " x " + reqD + " in clear inside, a " + reqE + " in wide entry, and a " + reqCW + " x " + reqCL + " in clearance outside it. "
+  const note = "THREE TYPES, THREE GEOMETRIES, and picking the wrong one is what puts a remodel a foot short in the wrong direction. This is the " + type_label + ": " + reqW + " x " + reqD + " in clear inside, " + aFig(reqE) + " in wide entry, and " + aFig(reqCW) + " x " + reqCL + " in clearance outside it. "
     + (is_transfer ? "THE TRANSFER TYPE IS THE SMALL ONE - a 36 in square, which is the only one of the three that fits a standard 36 in alcove where a tub used to be. What surprises people is its OUTSIDE clearance: 36 x 48 in extending from the CONTROL WALL, deeper than the stall itself, so the fixture is small and the room it needs is not. "
       : shower_type === "standard-roll-in" ? "THE STANDARD ROLL-IN ENTRY IS THE WHOLE LONG SIDE: 60 in wide minimum on a 60 in compartment, which means no curb, no jamb, and no door narrowing it. A 30 in deep stall reads as tight on a plan and is correct; what defeats it is anything built across the opening. "
       : "THE ALTERNATE ROLL-IN trades depth of entry for width of stall: 36 x 60 in inside with a 36 in entry on one LONG side, which is the type that fits where a 60 in tub was and a full-width opening is impossible. ")
-    + "Entered " + w + " x " + d + " in with a " + e + " in entry: "
+    + "Entered " + w + " x " + d + " in with " + aFig(e) + " in entry: "
     + (inside_ok ? "the inside dimensions and entry are met. " : (width_ok ? "" : width_deficit_in > 0 ? "WIDTH short by " + width_deficit_in.toFixed(1) + " in. " : "WIDTH " + w + " in, but a transfer stall is 36 in, not a minimum. ") + (depth_ok ? "" : depth_deficit_in > 0 ? "DEPTH short by " + depth_deficit_in.toFixed(1) + " in. " : "DEPTH " + d + " in, but a transfer stall is 36 in, not a minimum. ") + (entry_ok ? "" : "ENTRY short by " + entry_deficit_in.toFixed(1) + " in. "))
     + (fits.length > 0 ? "AS BUILT THIS COMPARTMENT WOULD SATISFY: " + fits.join(", ") + " - worth knowing before it is torn out, because a stall that fails one type often meets another. " : "As built this compartment satisfies none of the three types in any orientation. ")
     + (clearance_entered
@@ -1727,7 +1727,7 @@ export function computeAccessibleParkingGeometry({ space_type = "van", space_wid
 
   const note = "COUNT IS ONE QUESTION AND GEOMETRY IS ANOTHER, and the van case goes wrong twice. A car space is 96 in wide with a 60 in aisle. A VAN space is 132 in - eleven feet - UNLESS the access aisle is widened to 96 in, in which case the van space may drop to 96 in as well. "
     + (both_van_layouts_equal ? "SO THERE ARE TWO LEGAL VAN LAYOUTS AND THEY COST THE SAME GROUND: 132 + 60 and 96 + 96 both total 192 in. Which one to stripe is a layout decision, not a compliance one, and knowing that is usually what unsticks a tight lot. " : "")
-    + "This is a " + (isVan ? "van" : "car") + " space: " + w + " in wide with a " + a + " in aisle, " + pair_width_in + " in of pavement together against a " + min_pair_width_in + " in minimum pair. "
+    + "This is a " + (isVan ? "van" : "car") + " space: " + w + " in wide with " + aFig(a) + " in aisle, " + pair_width_in + " in of pavement together against " + aFig(min_pair_width_in) + " in minimum pair. "
     + (width_ok ? "The widths comply" + (isVan ? (wide_aisle_path && !wide_van_path ? " on the wide-aisle path - the 96 in space is legal only because the aisle is 96 in. " : wide_van_path && wide_aisle_path ? " on both paths. " : " on the 132 in van path. ") : ". ") : "WIDTHS FAIL: at " + a + " in of aisle the space must be " + required_space_width_in + " in" + (space_deficit_in > 0 ? ", short by " + space_deficit_in.toFixed(1) + " in" : "") + (aisle_deficit_in > 0 ? ", and the aisle is short by " + aisle_deficit_in.toFixed(1) + " in" : "") + ". " + (isVan ? "Either widen the space to 132 in or widen the AISLE to 96 in - the second is often the cheaper stripe. " : ""))
     + "THE AISLE MUST RUN THE FULL LENGTH of the space it serves: " + al + " in against " + sl + " in, " + (length_ok ? "OK. " : "SHORT by " + length_deficit_in.toFixed(1) + " in - a stub aisle at the head of a space is a common and easy failure. ")
     + (side_applies ? "ANGLED VAN SPACES must have the access aisle on the PASSENGER side, and this one is on the " + aisle_side + " side" + (side_ok ? ". " : " - which is the one rule that cannot be fixed by flipping the stripes at the far end, because it is about which side the lift deploys from. ") : isVan ? "This van space is not angled, so the aisle may sit on either side; on an ANGLED van space it would have to be on the passenger side. " : "")
@@ -1757,7 +1757,7 @@ ACCESSIBILITY_RENDERERS["accessible-parking-geometry"] = _simpleRenderer({
   ],
   outputs: [
     { key: "w", id: "apg-out-w", label: "Widths", value: (r) => r.width_ok ? "comply" + (r.wide_aisle_path && !r.wide_van_path ? " - on the wide-aisle path only" : "") : "space needs " + r.required_space_width_in + " in at this aisle width" + (r.space_deficit_in > 0 ? " (short " + fmt(r.space_deficit_in, 1) + ")" : "") + (r.aisle_deficit_in > 0 ? ", aisle short " + fmt(r.aisle_deficit_in, 1) : "") },
-    { key: "p", id: "apg-out-p", label: "Pavement together", value: (r) => r.pair_width_in + " in against a " + r.min_pair_width_in + " in minimum pair" + (r.both_van_layouts_equal ? " - and 132+60 and 96+96 both total 192 in" : "") },
+    { key: "p", id: "apg-out-p", label: "Pavement together", value: (r) => r.pair_width_in + " in against " + aFig(r.min_pair_width_in) + " in minimum pair" + (r.both_van_layouts_equal ? " - and 132+60 and 96+96 both total 192 in" : "") },
     { key: "l", id: "apg-out-l", label: "Aisle length", value: (r) => r.length_ok ? "runs the full length of the space" : "SHORT by " + fmt(r.length_deficit_in, 1) + " in" },
     { key: "s", id: "apg-out-s", label: "Aisle side", value: (r) => r.side_ok === null ? "either side is permitted here" : r.side_ok ? "passenger side, as an angled van space requires" : "DRIVER side on an angled van space - not permitted" },
     { key: "c", id: "apg-out-c", label: "Vertical clearance", value: (r) => r.clearance_ok === null ? "no 98 in requirement at a car space" : r.clearance_ok ? "98 in or more at the space, aisle, and route" : "SHORT by " + fmt(r.clearance_deficit_in, 1) + " in" },
@@ -1917,7 +1917,7 @@ export function computeLavatoryTubClearance({ rim_height_in = 0, counter_height_
     + (lav_ok ? "Within the 34 in maximum. " : "OVER by " + lav_excess_in.toFixed(2) + " in. ")
     + (hidden_by_counter ? "NOTE WHAT HAPPENED: the rim alone would have passed and the counter around it does not, which is exactly how a thick stone top or a raised counter fails a lavatory that was specified correctly. The fixture was never the problem. " : "")
     + (metering_entered ? "METERING FAUCETS (606.4) must remain open 10 SECONDS MINIMUM, which is longer than most are shipped set and is adjusted at the cartridge rather than specified at purchase. Entered " + meter + " s: " + (metering_ok ? "OK. " : "SHORT by " + metering_deficit_s.toFixed(1) + " s. ") : "No metering faucet entered; note that a hand-operated metering faucet must stay open 10 seconds minimum. ")
-    + "BATHTUB (607.2): the clearance in front runs THE LENGTH OF THE TUB and is 30 in wide minimum. " + (seat ? "With a permanent seat at the head end it extends 12 in BEYOND the wall at that end, so a " + tub + " in tub needs " + required_clear_length_in + " in of clearance - the fixture is one length and the floor it needs is another, which is the part that gets drawn short. " : "With no permanent seat the clearance is the tub length, " + required_clear_length_in + " in; adding a permanent seat at the head end would push it to " + (tub + SEAT_EXTRA) + " in. ")
+    + "BATHTUB (607.2): the clearance in front runs THE LENGTH OF THE TUB and is 30 in wide minimum. " + (seat ? "With a permanent seat at the head end it extends 12 in BEYOND the wall at that end, so " + aFig(tub) + " in tub needs " + required_clear_length_in + " in of clearance - the fixture is one length and the floor it needs is another, which is the part that gets drawn short. " : "With no permanent seat the clearance is the tub length, " + required_clear_length_in + " in; adding a permanent seat at the head end would push it to " + (tub + SEAT_EXTRA) + " in. ")
     + "Entered " + cl + " in long x " + cw + " in wide: " + (tub_ok ? "OK. " : (clear_length_ok ? "" : "LENGTH short by " + clear_length_deficit_in.toFixed(1) + " in. ") + (clear_width_ok ? "" : "WIDTH short by " + clear_width_deficit_in.toFixed(1) + " in. "))
     + "That clearance is " + clear_area_sf.toFixed(2) + " sq ft of floor that has to stay empty in front of the tub. "
     + (passes ? "The items entered PASS. " : "The items entered DO NOT pass. ")
@@ -2018,8 +2018,8 @@ export function computeRampDetailCheck({ cross_slope_ratio = 48, clear_width_in 
     + "CROSS SLOPE (405.3): not steeper than 1:48 - about 2% - measured ACROSS the direction of travel. Entered 1:" + xs + ", which is " + cross_slope_pct.toFixed(2) + "%: " + (cross_slope_ok ? "OK. " : "TOO STEEP. ")
     + "This is flatter than the drainage most sitework targets, so the ramp that sheds water beautifully is the one that fails, and it fails after the concrete is down. "
     + "CLEAR WIDTH (405.5): 36 in minimum - and where handrails are provided it is measured BETWEEN THE HANDRAILS. "
-    + (rails ? "With rails taking " + intr + " in, a " + w + " in ramp leaves " + effective_width_in.toFixed(1) + " in between them: " + (width_ok ? "OK. " : "SHORT by " + width_deficit_in.toFixed(1) + " in. ") + (handrails_cost_compliance ? "NOTE WHAT HAPPENED: the ramp itself is 36 in or wider and the HANDRAILS took it under. A 36 in ramp with rails on both sides is not a 36 in ramp any more, and the fix is a wider slab rather than a different rail - " + width_needed_between_rails_in.toFixed(1) + " in of ramp to leave 36 between the rails. " : "") : "No handrails entered, so the full " + w + " in is the clear width: " + (width_ok ? "OK. " : "SHORT by " + width_deficit_in.toFixed(1) + " in. ") + "Note that adding handrails later measures BETWEEN them and can take a compliant ramp under. ")
-    + "LANDING (405.7): 60 in long minimum and at least as wide as the widest run leading to it" + (turns ? " - and this ramp CHANGES DIRECTION here, so the landing must be 60 x 60 minimum" + (turn_drives_width ? ", which at a " + rw + " in run is the 60 in that governs rather than the run width. This is the rule that turns a switchback into a wider footprint than anyone drew. " : ". ") : ". ")
+    + (rails ? "With rails taking " + intr + " in, " + aFig(w) + " in ramp leaves " + effective_width_in.toFixed(1) + " in between them: " + (width_ok ? "OK. " : "SHORT by " + width_deficit_in.toFixed(1) + " in. ") + (handrails_cost_compliance ? "NOTE WHAT HAPPENED: the ramp itself is 36 in or wider and the HANDRAILS took it under. A 36 in ramp with rails on both sides is not a 36 in ramp any more, and the fix is a wider slab rather than a different rail - " + width_needed_between_rails_in.toFixed(1) + " in of ramp to leave 36 between the rails. " : "") : "No handrails entered, so the full " + w + " in is the clear width: " + (width_ok ? "OK. " : "SHORT by " + width_deficit_in.toFixed(1) + " in. ") + "Note that adding handrails later measures BETWEEN them and can take a compliant ramp under. ")
+    + "LANDING (405.7): 60 in long minimum and at least as wide as the widest run leading to it" + (turns ? " - and this ramp CHANGES DIRECTION here, so the landing must be 60 x 60 minimum" + (turn_drives_width ? ", which at " + aFig(rw) + " in run is the 60 in that governs rather than the run width. This is the rule that turns a switchback into a wider footprint than anyone drew. " : ". ") : ". ")
     + "Required " + required_landing_length_in + " x " + required_landing_width_in + " in; entered " + ll + " x " + lw + " in: " + (landing_ok ? "OK. " : (landing_length_ok ? "" : "length short by " + landing_length_deficit_in.toFixed(1) + " in. ") + (landing_width_ok ? "" : "width short by " + landing_width_deficit_in.toFixed(1) + " in. "))
     + "EDGE PROTECTION (405.9): " + EDGES[edge_protection] + ". " + (edge_protection === "not-required" ? "Exception 1 covers a ramp that is not required to have handrails and whose sides comply with 406.3; Exception 2 covers the side of a landing serving an adjoining ramp run or stair; Exception 3 covers the side of a landing with a vertical drop-off of 1/2 in maximum within 10 in horizontally of the minimum landing area. Confirm the exception applies before relying on it. " : "") + (edge_ok ? "" : "NONE IS PROVIDED, and a handrail is not edge protection - the hazard is at the WHEEL, not at the hand. The two ways to satisfy it are the floor surface extended 12 in beyond the handrail, or a curb or barrier that stops a 4 in sphere from passing within 4 in of the surface. ")
     + (passes ? "The items entered PASS. " : "The items entered DO NOT pass. ")

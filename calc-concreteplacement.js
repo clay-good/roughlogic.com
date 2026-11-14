@@ -3,7 +3,7 @@
 // so the reinforced-concrete module stays below its gzip cap. Calculator
 // behavior, IDs, citations, examples, and Group E assignments are unchanged.
 
-import {
+import { aFig,
   DEBOUNCE_MS, debounce, makeNumber, makeSelect,
   makeOutputLine, attachExampleButton, fmt,
   makeStepsPanel,
@@ -316,7 +316,7 @@ CONCRETEPLACEMENT_RENDERERS["post-tension-elongation"] = _simpleRenderer({
     { key: "f", id: "pte-out-f", label: "Force along the tendon", value: (r) => fmt(r.far_end_force_lb, 0) + " lb at the far anchorage (" + fmt(r.far_end_ratio * 100, 1) + "% of jacking), averaging " + fmt(r.average_force_lb, 0) + " lb (" + fmt(r.average_ratio * 100, 1) + "%)" },
     { key: "t", id: "pte-out-t", label: "Theoretical elongation", value: (r) => fmt(r.theoretical_elongation_in, 2) + " in" },
     { key: "e", id: "pte-out-e", label: "Expected at the tail", value: (r) => fmt(r.expected_measured_in, 2) + " in, after " + fmt(r.anchor_set_in, 3) + " in of anchor set" },
-    { key: "o", id: "pte-out-o", label: "What ignoring friction would cost", value: (r) => "the jacking force alone gives " + fmt(r.no_friction_elongation_in, 2) + " in, overstating by " + fmt(r.friction_overstatement_in, 2) + " in -- " + fmt(r.expected_measured_in > 0 ? 100 * r.friction_overstatement_in / r.expected_measured_in : 0, 1) + "% against a " + fmt(r.tolerance_pct, 0) + "% allowance, and it makes a good tendon look short" },
+    { key: "o", id: "pte-out-o", label: "What ignoring friction would cost", value: (r) => "the jacking force alone gives " + fmt(r.no_friction_elongation_in, 2) + " in, overstating by " + fmt(r.friction_overstatement_in, 2) + " in -- " + fmt(r.expected_measured_in > 0 ? 100 * r.friction_overstatement_in / r.expected_measured_in : 0, 1) + "% against " + aFig(fmt(r.tolerance_pct, 0)) + "% allowance, and it makes a good tendon look short" },
     { key: "v", id: "pte-out-v", label: "Against the measurement", value: (r) => r.verdict },
     { key: "n", id: "pte-out-n", label: "Note", value: (r) => r.note },
   ],
@@ -455,8 +455,8 @@ export function computeTiltUpBraceLoad({ panel_width_ft = 0, panel_height_ft = 0
   const verdict = within_capacity === null
     ? "Enter a brace capacity to check the count."
     : within_capacity
-      ? "WITHIN CAPACITY: " + fmt(design_axial_per_brace_lb, 0) + " lb per brace at a " + fmt(brace_safety_factor, 2) + " safety factor (" + fmt(axial_per_brace_lb, 0) + " lb unfactored) against " + fmt(brace_capacity_lb, 0) + " lb ultimate, on " + fmt(brace_count, 0) + " " + (fmt(brace_count, 0) === "1" ? "brace" : "braces")
-      : "OVER CAPACITY: " + fmt(design_axial_per_brace_lb, 0) + " lb per brace at a " + fmt(brace_safety_factor, 2) + " safety factor (" + fmt(axial_per_brace_lb, 0) + " lb unfactored) against " + fmt(brace_capacity_lb, 0) + " lb ultimate. " + fmt(braces_required, 0) + " " + (fmt(braces_required, 0) === "1" ? "brace" : "braces") + " are needed at this angle";
+      ? "WITHIN CAPACITY: " + fmt(design_axial_per_brace_lb, 0) + " lb per brace at " + aFig(fmt(brace_safety_factor, 2)) + " safety factor (" + fmt(axial_per_brace_lb, 0) + " lb unfactored) against " + fmt(brace_capacity_lb, 0) + " lb ultimate, on " + fmt(brace_count, 0) + " " + (fmt(brace_count, 0) === "1" ? "brace" : "braces")
+      : "OVER CAPACITY: " + fmt(design_axial_per_brace_lb, 0) + " lb per brace at " + aFig(fmt(brace_safety_factor, 2)) + " safety factor (" + fmt(axial_per_brace_lb, 0) + " lb unfactored) against " + fmt(brace_capacity_lb, 0) + " lb ultimate. " + fmt(braces_required, 0) + " " + (fmt(braces_required, 0) === "1" ? "brace" : "braces") + " are needed at this angle";
   return {
     design_axial_per_brace_lb, brace_safety_factor,
     panel_width_ft, panel_height_ft, panel_area_ft2, wind_pressure_psf, wind_force_lb,

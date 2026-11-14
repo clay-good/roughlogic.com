@@ -20,7 +20,7 @@
 // communication test is the deliverable, and it is worth running before
 // anything is installed rather than after a single-point system underperforms.
 
-import {
+import { aFig,
   DEBOUNCE_MS, debounce, makeNumber, makeSelect,
   makeOutputLine, attachExampleButton, fmt,
   makeStepsPanel,
@@ -256,7 +256,7 @@ export function computeSubSlabSuctionField({
   const area_per_point_ft2 = Math.PI * effective_radius_ft * effective_radius_ft;
   const points_required = Math.max(1, Math.ceil(slab_area_ft2 / area_per_point_ft2 - 1e-9));
   const coverage_ratio = slab_area_ft2 / area_per_point_ft2;
-  const area_verdict = "a confirmed radius of " + fmt(effective_radius_ft, 0) + " ft covers " + fmt(area_per_point_ft2, 0) + " sq ft per point, so a " + fmt(slab_area_ft2, 0) + " sq ft slab needs " + fmt(points_required, 0) + " suction point" + (points_required > 1 ? "s" : "") + " on area alone (" + fmt(coverage_ratio, 2) + " points' worth of coverage)";
+  const area_verdict = "a confirmed radius of " + fmt(effective_radius_ft, 0) + " ft covers " + fmt(area_per_point_ft2, 0) + " sq ft per point, so " + aFig(fmt(slab_area_ft2, 0)) + " sq ft slab needs " + fmt(points_required, 0) + " suction point" + (points_required > 1 ? "s" : "") + " on area alone (" + fmt(coverage_ratio, 2) + " points' worth of coverage)";
   // Area alone is not enough: a long narrow slab needs more than a compact one.
   const has_shape = slab_length_ft > 0 && slab_width_ft > 0;
   const longest_dimension_ft = has_shape ? Math.max(slab_length_ft, slab_width_ft) : 0;
@@ -265,7 +265,7 @@ export function computeSubSlabSuctionField({
   const shape_verdict = !has_shape
     ? "(no slab dimensions entered -- and SHAPE matters as much as area: the same square footage laid out long and narrow needs more points than a compact rectangle)"
     : shape_governs
-      ? "BUT THE SHAPE GOVERNS. A " + fmt(slab_length_ft, 0) + " by " + fmt(slab_width_ft, 0) + " ft slab is " + fmt(longest_dimension_ft, 0) + " ft along its longest run, and a grid that leaves no corner beyond the " + fmt(effective_radius_ft, 0) + " ft radius needs " + fmt(points_by_length, 0) + " " + (fmt(points_by_length, 0) === "1" ? "point" : "points") + ", not the " + fmt(points_required, 0) + " that area alone suggests. The same square footage laid out compactly would take fewer"
+      ? "BUT THE SHAPE GOVERNS. " + aFig(fmt(slab_length_ft, 0), true) + " by " + fmt(slab_width_ft, 0) + " ft slab is " + fmt(longest_dimension_ft, 0) + " ft along its longest run, and a grid that leaves no corner beyond the " + fmt(effective_radius_ft, 0) + " ft radius needs " + fmt(points_by_length, 0) + " " + (fmt(points_by_length, 0) === "1" ? "point" : "points") + ", not the " + fmt(points_required, 0) + " that area alone suggests. The same square footage laid out compactly would take fewer"
       : "the " + fmt(slab_length_ft, 0) + " by " + fmt(slab_width_ft, 0) + " ft layout needs " + fmt(points_by_length, 0) + " point" + (points_by_length > 1 ? "s" : "") + " on a grid that leaves no corner beyond the radius, so area governs here at " + fmt(points_required, 0);
   const governing_points = has_shape ? Math.max(points_required, points_by_length) : points_required;
   const has_existing = existing_points > 0;
@@ -328,12 +328,12 @@ export function computeAcidWasteNeutralization({
   if (!(discharge_ph_max > discharge_ph_min)) return { error: "The discharge pH window must have a maximum above its minimum." };
   if (measured_ph > 14) return { error: "pH cannot exceed 14." };
   const required_volume_gal = peak_flow_gpm * retention_minutes;
-  const sizing_verdict = "a " + fmt(peak_flow_gpm, 1) + " gpm peak flow at " + fmt(retention_minutes, 0) + " " + (fmt(retention_minutes, 0) === "1" ? "minute" : "minutes") + " of retention needs " + fmt(required_volume_gal, 0) + " " + (fmt(required_volume_gal, 0) === "1" ? "gallon" : "gallons") + " of tank";
+  const sizing_verdict = aFig(fmt(peak_flow_gpm, 1)) + " gpm peak flow at " + fmt(retention_minutes, 0) + " " + (fmt(retention_minutes, 0) === "1" ? "minute" : "minutes") + " of retention needs " + fmt(required_volume_gal, 0) + " " + (fmt(required_volume_gal, 0) === "1" ? "gallon" : "gallons") + " of tank";
   const has_tank = tank_volume_gal > 0;
   const actual_tank_gal = has_tank ? tank_volume_gal : required_volume_gal;
   const turnover_minutes = actual_tank_gal / peak_flow_gpm;
   const undersized = has_tank && tank_volume_gal < required_volume_gal - 1e-9 * Math.abs(required_volume_gal);
-  const turnover_verdict = "a " + fmt(actual_tank_gal, 0) + " gallon tank at " + fmt(peak_flow_gpm, 1) + " gpm turns over every " + fmt(turnover_minutes, 1) + " minutes, so anything entering at the start of that window has " + fmt(turnover_minutes, 1) + " minutes of contact"
+  const turnover_verdict = aFig(fmt(actual_tank_gal, 0)) + " gallon tank at " + fmt(peak_flow_gpm, 1) + " gpm turns over every " + fmt(turnover_minutes, 1) + " minutes, so anything entering at the start of that window has " + fmt(turnover_minutes, 1) + " minutes of contact"
     + (undersized ? " -- SHORT of the " + fmt(retention_minutes, 0) + " " + (fmt(retention_minutes, 0) === "1" ? "minute" : "minutes") + " required, so part of a slug leaves unreacted" : "");
   // The slug case is what actually sizes it.
   const has_slug = slug_volume_gal > 0;
@@ -341,7 +341,7 @@ export function computeAcidWasteNeutralization({
   const slug_contact_minutes = turnover_minutes;
   const slug_verdict = !has_slug
     ? "(no slug volume entered -- and THE SLUG CASE IS WHAT ACTUALLY SIZES THE TANK, not the average flow)"
-    : "a " + fmt(slug_volume_gal, 1) + " gallon slug of concentrated acid is " + fmt(slug_fraction_pct, 2) + "% of the tank's contents. THE QUESTION IS NOT WHETHER THE TANK HOLDS IT -- it obviously does -- but whether the contents can neutralise it and whether it STAYS LONG ENOUGH TO REACT. At this turnover it has " + fmt(slug_contact_minutes, 1) + " minutes. Halve the tank and it has " + fmt(slug_contact_minutes / 2, 1) + ", and part of it leaves unreacted";
+    : aFig(fmt(slug_volume_gal, 1)) + " gallon slug of concentrated acid is " + fmt(slug_fraction_pct, 2) + "% of the tank's contents. THE QUESTION IS NOT WHETHER THE TANK HOLDS IT -- it obviously does -- but whether the contents can neutralise it and whether it STAYS LONG ENOUGH TO REACT. At this turnover it has " + fmt(slug_contact_minutes, 1) + " minutes. Halve the tank and it has " + fmt(slug_contact_minutes / 2, 1) + ", and part of it leaves unreacted";
   const failure_verdict = "AND THAT IS THE FAILURE MODE: it is discovered at the sewer authority's monitoring point rather than at the building. A tank sized on average flow passes almost all the time and fails on the one event that matters -- which is why the credible worst-case slug, not the daily load, is the sizing case";
   const has_ph = measured_ph > 0;
   const in_window = has_ph && measured_ph >= discharge_ph_min && measured_ph <= discharge_ph_max;
@@ -407,7 +407,7 @@ export function computeFumeHoodFaceVelocity({
   if (!(too_fast_fpm > 0)) return { error: "The turbulence threshold must be positive (fpm)." };
   const open_area_ft2 = sash_width_ft * sash_height_in / 12;
   const exhaust_cfm = open_area_ft2 * face_velocity_fpm;
-  const flow_verdict = "a " + fmt(sash_width_ft, 1) + " ft hood at a " + fmt(sash_height_in, 0) + " in sash is " + fmt(open_area_ft2, 2) + " sq ft of opening, so " + fmt(face_velocity_fpm, 0) + " fpm takes " + fmt(exhaust_cfm, 0) + " cfm";
+  const flow_verdict = aFig(fmt(sash_width_ft, 1)) + " ft hood at " + aFig(fmt(sash_height_in, 0)) + " in sash is " + fmt(open_area_ft2, 2) + " sq ft of opening, so " + fmt(face_velocity_fpm, 0) + " fpm takes " + fmt(exhaust_cfm, 0) + " cfm";
   const too_fast = face_velocity_fpm > too_fast_fpm + 1e-9 * Math.abs(too_fast_fpm);
   const velocity_verdict = too_fast
     ? "AND " + fmt(face_velocity_fpm, 0) + " FPM IS ABOVE THE " + fmt(too_fast_fpm, 0) + " FPM THRESHOLD ENTERED, which is the part people get backwards. Too fast is not safer: above roughly this figure, turbulence at the face and in the wake of anyone standing at the hood can pull contaminants OUT rather than in. Face velocity has an optimum, not a floor"
@@ -418,14 +418,14 @@ export function computeFumeHoodFaceVelocity({
   const extra_cfm = has_alt ? alt_exhaust_cfm - exhaust_cfm : 0;
   const sash_verdict = !has_alt
     ? "(no alternative sash height entered -- and the sash position is the single largest variable here)"
-    : "at a " + fmt(alt_sash_height_in, 0) + " in sash the same hood takes " + fmt(alt_exhaust_cfm, 0) + " cfm -- " + fmt(Math.abs(extra_cfm), 0) + " cfm " + (extra_cfm > 0 ? "MORE" : "less") + ", continuously, for a sash left at that height. That air is conditioned and thrown away, and the sash is the one control the user actually touches";
+    : "at " + aFig(fmt(alt_sash_height_in, 0)) + " in sash the same hood takes " + fmt(alt_exhaust_cfm, 0) + " cfm -- " + fmt(Math.abs(extra_cfm), 0) + " cfm " + (extra_cfm > 0 ? "MORE" : "less") + ", continuously, for a sash left at that height. That air is conditioned and thrown away, and the sash is the one control the user actually touches";
   const has_energy = heating_rise_f > 0 && has_alt && extra_cfm > 0;
   const heating_btuh = has_energy ? _HOOD_SENSIBLE_COEFF * extra_cfm * heating_rise_f : 0;
   const has_cost = has_energy && hours_per_year > 0 && energy_cost_per_mmbtu > 0;
   const annual_cost = has_cost ? heating_btuh * hours_per_year / 1e6 * energy_cost_per_mmbtu : 0;
   const energy_verdict = !has_energy
     ? (has_alt && extra_cfm < 0 ? "the alternative sash is lower -- it exhausts " + fmt(-extra_cfm, 0) + " cfm less, so there is no extra air to heat" : has_alt && extra_cfm === 0 ? "the alternative sash is the same height, so there is no extra air to heat" : "(no heating rise and alternative sash entered)")
-    : "heating that extra " + fmt(extra_cfm, 0) + " cfm through a " + fmt(heating_rise_f, 0) + " degF rise is " + fmt(heating_btuh / 1000, 1) + " kBTU/h"
+    : "heating that extra " + fmt(extra_cfm, 0) + " cfm through " + aFig(fmt(heating_rise_f, 0)) + " degF rise is " + fmt(heating_btuh / 1000, 1) + " kBTU/h"
       + (has_cost ? ", or " + fmt(annual_cost, 0) + " a year over " + fmt(hours_per_year, 0) + " " + (fmt(hours_per_year, 0) === "1" ? "hour" : "hours") + " at " + fmt(energy_cost_per_mmbtu, 2) + " per MMBTU -- for one hood, from a sash nobody closed" : " -- and that is one hood, continuously, from a sash nobody closed");
   const containment_verdict = "AND FACE VELOCITY IS A SURROGATE, NOT THE MEASUREMENT. It is easy to read with an anemometer and it correlates loosely with containment, which is why it became the field check -- but what actually matters is whether the hood keeps contaminants inside it, and that is what ASHRAE 110 tracer gas testing determines. A hood can pass a face velocity survey and fail containment because of cross-drafts from a door or a diffuser, a person walking past, clutter blocking the rear baffle, or equipment set too close to the face";
   const practice_verdict = "THE SASH IS THE CONTROL THAT MATTERS and it is behavioural rather than mechanical. Working at the lowest practical sash height improves containment AND cuts the exhaust on a variable-air-volume hood, so the two goals point the same way -- which is unusual enough to be worth saying to users, because the instinct is that more open is safer";
@@ -514,15 +514,15 @@ export function computeLabContainmentPressure({
   const drift_verdict = !has_drift
     ? "(no supply drift entered -- and the fragility of a small offset inside a large exhaust is the practical finding)"
     : drift_swamps
-      ? "AND THAT OFFSET IS FRAGILE. A " + fmt(supply_drift_pct, 0) + "% drift in the supply -- a filter loading, a damper creeping, a balance falling out -- is " + fmt(drift_cfm, 0) + " cfm, which is MORE than the entire " + fmt(Math.abs(offset_cfm), 0) + " cfm offset. The room reverses with nothing visibly wrong, and nothing in the space announces it"
-      : "a " + fmt(supply_drift_pct, 0) + "% supply drift is " + fmt(drift_cfm, 0) + " cfm against a " + fmt(Math.abs(offset_cfm), 0) + " cfm offset, so the relationship survives it with " + fmt(Math.abs(offset_cfm) - drift_cfm, 0) + " cfm in hand";
+      ? "AND THAT OFFSET IS FRAGILE. " + aFig(fmt(supply_drift_pct, 0), true) + "% drift in the supply -- a filter loading, a damper creeping, a balance falling out -- is " + fmt(drift_cfm, 0) + " cfm, which is MORE than the entire " + fmt(Math.abs(offset_cfm), 0) + " cfm offset. The room reverses with nothing visibly wrong, and nothing in the space announces it"
+      : aFig(fmt(supply_drift_pct, 0)) + "% supply drift is " + fmt(drift_cfm, 0) + " cfm against " + aFig(fmt(Math.abs(offset_cfm), 0)) + " cfm offset, so the relationship survives it with " + fmt(Math.abs(offset_cfm) - drift_cfm, 0) + " cfm in hand";
   // The VAV sash swing, which is larger still.
   const has_sash = hood_sash_closed_cfm > 0 && hood_exhaust_cfm > 0;
   const sash_swing_cfm = has_sash ? hood_exhaust_cfm - hood_sash_closed_cfm : 0;
   const positive_on_close = has_sash && has_supply && (supply_cfm - (hood_sash_closed_cfm + general_exhaust_cfm)) >= -1e-9 * supply_cfm;
   const sash_verdict = !has_sash
     ? "(no sash-closed hood flow entered -- and on a VAV hood the swing is larger than any drift)"
-    : "THE VAV HOOD SWING IS LARGER STILL. A sash closing takes the hood from " + fmt(hood_exhaust_cfm, 0) + " to " + fmt(hood_sash_closed_cfm, 0) + " cfm -- a " + fmt(sash_swing_cfm, 0) + " cfm change"
+    : "THE VAV HOOD SWING IS LARGER STILL. A sash closing takes the hood from " + fmt(hood_exhaust_cfm, 0) + " to " + fmt(hood_sash_closed_cfm, 0) + " cfm -- " + aFig(fmt(sash_swing_cfm, 0)) + " cfm change"
       + (has_supply
         ? (positive_on_close
           ? ". If the supply does not track it, the room goes " + fmt(supply_cfm - (hood_sash_closed_cfm + general_exhaust_cfm), 0) + " cfm POSITIVE and contaminants flow out to the corridor. THE CONTROL SYSTEM, NOT THE BALANCE, IS WHAT HOLDS THE RELATIONSHIP, and a VAV laboratory whose supply does not track its hoods is positive whenever a sash closes"

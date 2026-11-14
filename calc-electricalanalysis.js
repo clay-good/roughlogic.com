@@ -10,7 +10,7 @@
 // intact, keeping their tile ids, computes, worked examples and renderers unchanged.
 // Lazy-loaded via tool-modules.js, so not in the home-view first-paint payload.
 
-import {
+import { aFig,
   DEBOUNCE_MS, debounce, makeNumber, makeSelect,
   makeOutputLine, attachExampleButton, fmt, stepsFor,
 } from "./ui-fields.js";
@@ -299,7 +299,7 @@ function _v487renderGeneratorFuelRuntime(inputRegion, outputRegion, citationEl) 
     if (r.error) { oRun.textContent = r.error; oUsable.textContent = "-"; oTarget.textContent = "-"; oNote.textContent = ""; return; }
     oRun.textContent = fmt(r.runtime_hr, 1) + " hr (" + fmt(r.runtime_days, 2) + " days)";
     oUsable.textContent = fmt(r.usable_gallons, 1) + " gal";
-    oTarget.textContent = r.fuel_for_target_gal === null ? "-" : fmt(r.fuel_for_target_gal, 0) + " gal, needs a " + fmt(r.tank_for_target_gal, 0) + " gal tank (" + (r.meets_target ? "current tank MEETS it" : "current tank does NOT meet it") + ")";
+    oTarget.textContent = r.fuel_for_target_gal === null ? "-" : fmt(r.fuel_for_target_gal, 0) + " gal, needs " + aFig(fmt(r.tank_for_target_gal, 0)) + " gal tank (" + (r.meets_target ? "current tank MEETS it" : "current tank does NOT meet it") + ")";
     oNote.textContent = r.note;
   }, DEBOUNCE_MS);
   for (const f of [tank, gph, usable, target]) f.input.addEventListener("input", update);

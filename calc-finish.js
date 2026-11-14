@@ -11,7 +11,7 @@
 // All GOVERNANCE.general material take-offs; the retaining-wall tile
 // carries an engineered-design advisory above 4 ft. See spec-v95.md..v98.md.
 
-import {
+import { aFig,
   DEBOUNCE_MS, debounce, makeNumber, makeSelect,
   makeOutputLine, attachExampleButton, fmt,
   makeStepsPanel,
@@ -985,7 +985,7 @@ export function computeValleyFlashingTakeoff({ valley_run_ft = 0, valley_count =
   return {
     valley_multiplier, common_multiplier, valley_length_ft, total_valley_lf,
     total_with_waste_lf, effective_piece_ft, pieces, metal_area_sf, ice_barrier_sf,
-    note: "A valley is the longest run on the roof for its plan dimension, because it goes diagonally AND uphill at once: its multiplier carries 288 under the radical where a common rafter carries 144, so at this pitch a " + run + " ft plan run is " + valley_length_ft.toFixed(2) + " ft of valley against " + (run * common_multiplier).toFixed(2) + " ft of common rafter. Ordering valley metal off the plan dimension comes up badly short. "
+    note: "A valley is the longest run on the roof for its plan dimension, because it goes diagonally AND uphill at once: its multiplier carries 288 under the radical where a common rafter carries 144, so at this pitch " + aFig(run) + " ft plan run is " + valley_length_ft.toFixed(2) + " ft of valley against " + (run * common_multiplier).toFixed(2) + " ft of common rafter. Ordering valley metal off the plan dimension comes up badly short. "
       + "The lap on valley metal is generous on purpose - " + lap + " in here - because a valley concentrates the water from two planes into one channel and a short lap there is the leak that finds it. Run the metal from the eave UP, so each piece laps over the one below. "
       + "Ice barrier belongs in valleys in cold climates and the eave ice-barrier tile does not cover it: budget about " + ice_barrier_sf.toFixed(0) + " sq ft here at the same width as the metal, more if your code calls for wider valley coverage. Open valley (exposed metal) is assumed; a closed-cut or woven valley uses shingles instead of metal and this tile does not apply. Hips take no valley metal. The roofing plan and the manufacturer's instructions govern.",
   };
@@ -1077,8 +1077,8 @@ export function computeSrwGeogridSpacing({ wall_height_ft = 0, block_depth_in = 
   const exposed_ft = Math.max(0, H_ft - buried / 12);
 
   const note = "Spacing limit " + spacing_limit_in.toFixed(1) + " in, set by " + governing_rule
-    + ". A " + hb + " in block divides that into " + courses_per_layer + " whole course" + (courses_per_layer === 1 ? "" : "s") + ", so the working spacing is " + actual_spacing_in + " in - grid lands on a joint, never mid-block. "
-    + "That gives " + layer_count + " reinforcement level" + (layer_count === 1 ? "" : "s") + " on a " + H_ft + " ft wall, the first at " + first_layer_height_in + " in above the base and the top at " + top_layer_height_in + " in, leaving " + unreinforced_crest_in.toFixed(1) + " in of unreinforced facing above it"
+    + ". " + aFig(hb, true) + " in block divides that into " + courses_per_layer + " whole course" + (courses_per_layer === 1 ? "" : "s") + ", so the working spacing is " + actual_spacing_in + " in - grid lands on a joint, never mid-block. "
+    + "That gives " + layer_count + " reinforcement level" + (layer_count === 1 ? "" : "s") + " on " + aFig(H_ft) + " ft wall, the first at " + first_layer_height_in + " in above the base and the top at " + top_layer_height_in + " in, leaving " + unreinforced_crest_in.toFixed(1) + " in of unreinforced facing above it"
     + (crest_exceeds_limit ? " - which EXCEEDS the 1.5 x block depth (" + crest_limit_in.toFixed(1) + " in) that FHWA NHI-10-024 and AASHTO 11.10.2.3.1 allow above the top row; add a level near the top. " : " (within the 1.5 x block depth, " + crest_limit_in.toFixed(1) + " in, allowed above the top row). ")
     + (bottom_exceeds_limit ? "The first level sits " + first_layer_height_in + " in up, more than the " + Wu + " in block depth FHWA allows below the bottom row; start the grid lower. " : "")
     + "Grid length " + grid_length_ft.toFixed(1) + " ft" + (length_governed_by_minimum ? " (the 4 ft practical minimum governs, not " + basis + "H)" : " at " + basis + " times the wall height, the NCMA minimum for global stability in good soil") + ", so about " + grid_sf_per_lf.toFixed(1) + " sq ft of grid per linear foot of wall. "
@@ -1161,7 +1161,7 @@ export function computeCrawlSpaceVentilation({ floor_area_sf = 0, base_ratio_den
   const alt_required_sqin = (area / alt_ratio) * 144;
   const alt_vents = Math.ceil(alt_required_sqin / per - 1e-9);
 
-  const note = "A " + area.toFixed(0) + " sq ft under-floor area at 1/" + ratio_used + " needs " + required_sf.toFixed(2) + " sq ft = " + required_sqin.toFixed(0) + " sq in of NET FREE ventilation area. "
+  const note = aFig(area.toFixed(0), true) + " sq ft under-floor area at 1/" + ratio_used + " needs " + required_sf.toFixed(2) + " sq ft = " + required_sqin.toFixed(0) + " sq in of NET FREE ventilation area. "
     + "At " + per + " sq in per vent that is " + vents_by_area + " vent" + (vents_by_area === 1 ? "" : "s") + " by area"
     + (corner_waived ? (vents_by_area < 2 ? ", raised to 2 so the openings can cross-ventilate (the corner rule is waived for a retarder-covered, cross-ventilated crawl space, R408.2 exception 2). " : "; the corner rule is waived for a retarder-covered, cross-ventilated crawl space (R408.2 exception 2), so area governs. ")
       : corner_governs ? ", but the code also wants an opening within 3 ft of EACH corner, so " + corners + " governs - a small crawl space is set by its corners, not its square footage. " : ", and with " + corners + " corners to cover that is still the controlling number. ")

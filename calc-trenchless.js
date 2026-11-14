@@ -22,7 +22,7 @@
 //
 // See spec-v1596.md through spec-v1604.md.
 
-import {
+import { aFig,
   DEBOUNCE_MS, debounce, makeNumber,
   makeOutputLine, attachExampleButton, fmt,
   makeStepsPanel,
@@ -360,7 +360,7 @@ TRENCHLESS_RENDERERS["locate-depth-offset"] = _simpleRenderer({
     { key: "sharp_drop_pct", label: "Current drop that counts as sharp (%)", kind: "number", default: 25 },
   ],
   outputs: [
-    { key: "d", id: "ldo-out-d", label: "Depth by the 45-degree method", value: (r) => fmt(r.geometric_depth_in, 0) + " in against the instrument's reading, a " + fmt(r.depth_disagreement_pct, 0) + "% disagreement" },
+    { key: "d", id: "ldo-out-d", label: "Depth by the 45-degree method", value: (r) => fmt(r.geometric_depth_in, 0) + " in against the instrument's reading, " + aFig(fmt(r.depth_disagreement_pct, 0)) + "% disagreement" },
     { key: "s", id: "ldo-out-s", label: "Null symmetry", value: (r) => fmt(r.null_asymmetry_in, 0) + " in apart, " + fmt(r.null_asymmetry_pct, 0) + "% -- " + (r.nulls_symmetric ? "symmetric" : "ASYMMETRIC, so the field is distorted") },
     { key: "c", id: "ldo-out-c", label: "Signal current along the line", value: (r) => fmt(r.current_drop_pct, 0) + "% drop -- " + (r.current_gradual ? "gradual" : "SHARP, so the signal may have left the target") },
     { key: "v", id: "ldo-out-v", label: "Confidence", value: (r) => (r.confident ? "the locate is consistent: " : "DO NOT TRUST THIS LOCATE -- ") + r.cause },

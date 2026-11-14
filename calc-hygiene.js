@@ -28,7 +28,7 @@
 // silently, a cage is not fall protection, and a retrieval that does not come
 // freely is a signal to stop pulling. Each tile reports that limit alongside
 // its number, because the number alone reads as an assurance.
-import {
+import { aFig,
   DEBOUNCE_MS, debounce, makeNumber, makeSelect,
   makeOutputLine, attachExampleButton, fmt,
   makeStepsPanel,
@@ -164,7 +164,7 @@ export function computeDilutionVentilationSolvent({
   const room_ach = has_room ? governing_cfm * 60 / room_volume_ft3 : 0;
   const room_verdict = !has_room
     ? "(no room volume entered)"
-    : fmt(governing_cfm, 0) + " cfm in a " + fmt(room_volume_ft3, 0) + " cu ft room is " + fmt(room_ach, 1) + " air changes an hour"
+    : fmt(governing_cfm, 0) + " cfm in " + aFig(fmt(room_volume_ft3, 0)) + " cu ft room is " + fmt(room_ach, 1) + " air changes an hour"
       + (room_ach > 30 ? " -- which is a very large rate for general ventilation, and a figure that high is itself the argument for capturing at the source instead" : "");
   const has_alt = alt_mixing_factor >= 1;
   const alt_health_cfm = has_alt ? _healthFor(alt_mixing_factor) : 0;
@@ -223,10 +223,10 @@ export function computeRespiratorCartridgeLife({
   if (!(humidity_derate_above_65 > 0) || humidity_derate_above_65 > 1) return { error: "The humidity derate must be above 0 and no more than 1." };
   const schedule_hr = estimated_life_hr * safety_fraction;
   const changes_per_shift = Math.ceil(shift_hours / schedule_hr - 1e-9) - 1;
-  const schedule_verdict = "an estimated " + fmt(estimated_life_hr, 1) + " hour service life at a " + fmt(safety_fraction * 100, 0) + "% safety fraction gives a " + fmt(schedule_hr, 1) + " hour change schedule -- "
+  const schedule_verdict = "an estimated " + fmt(estimated_life_hr, 1) + " hour service life at " + aFig(fmt(safety_fraction * 100, 0)) + "% safety fraction gives " + aFig(fmt(schedule_hr, 1)) + " hour change schedule -- "
     + (changes_per_shift <= 0
-      ? "one cartridge covers a " + fmt(shift_hours, 1) + " hour shift"
-      : fmt(changes_per_shift, 0) + " change" + (changes_per_shift > 1 ? "s" : "") + " during a " + fmt(shift_hours, 1) + " hour shift");
+      ? "one cartridge covers " + aFig(fmt(shift_hours, 1)) + " hour shift"
+      : fmt(changes_per_shift, 0) + " change" + (changes_per_shift > 1 ? "s" : "") + " during " + aFig(fmt(shift_hours, 1)) + " hour shift");
   // Service life is roughly inverse in concentration.
   const has_worst = worst_case_ppm > 0 && concentration_ppm > 0;
   const worst_case_life_hr = has_worst ? estimated_life_hr * concentration_ppm / worst_case_ppm : 0;
@@ -370,8 +370,8 @@ export function computeFixedLadderFallProtection({
   const requires_protection = ladder_height_ft > fall_protection_threshold_ft;
   const height_over_threshold_ft = requires_protection ? ladder_height_ft - fall_protection_threshold_ft : 0;
   const height_verdict = requires_protection
-    ? "a " + fmt(ladder_height_ft, 1) + " ft fixed ladder is " + fmt(height_over_threshold_ft, 1) + " ft above the " + fmt(fall_protection_threshold_ft, 0) + " ft threshold, so fall protection is REQUIRED"
-    : "a " + fmt(ladder_height_ft, 1) + " ft fixed ladder is at or below the " + fmt(fall_protection_threshold_ft, 0) + " ft threshold, so a ladder safety system is not required on height alone";
+    ? aFig(fmt(ladder_height_ft, 1)) + " ft fixed ladder is " + fmt(height_over_threshold_ft, 1) + " ft above the " + fmt(fall_protection_threshold_ft, 0) + " ft threshold, so fall protection is REQUIRED"
+    : aFig(fmt(ladder_height_ft, 1)) + " ft fixed ladder is at or below the " + fmt(fall_protection_threshold_ft, 0) + " ft threshold, so a ladder safety system is not required on height alone";
   // A CAGE IS NOT FALL PROTECTION. That is the whole finding.
   const isCage = existing_protection === "cage";
   const isSystem = existing_protection === "system";
@@ -399,8 +399,8 @@ export function computeFixedLadderFallProtection({
     ? ladder_height_ft / (rest_platforms_required + 1)
     : ladder_height_ft;
   const platform_verdict = rest_platforms_required <= 0
-    ? "at a " + fmt(rest_platform_interval_ft, 0) + " ft interval this " + fmt(ladder_height_ft, 1) + " ft climb needs no intermediate rest platform"
-    : "at a " + fmt(rest_platform_interval_ft, 0) + " ft interval this climb needs " + fmt(rest_platforms_required, 0) + " intermediate rest platform" + (rest_platforms_required > 1 ? "s" : "") + ", breaking it into runs of about " + fmt(longest_unbroken_climb_ft, 1) + " ft. Rest platforms belong to the older cage-based provisions, and whether they are present is part of the survey rather than a substitute for fall protection";
+    ? "at " + aFig(fmt(rest_platform_interval_ft, 0)) + " ft interval this " + fmt(ladder_height_ft, 1) + " ft climb needs no intermediate rest platform"
+    : "at " + aFig(fmt(rest_platform_interval_ft, 0)) + " ft interval this climb needs " + fmt(rest_platforms_required, 0) + " intermediate rest platform" + (rest_platforms_required > 1 ? "s" : "") + ", breaking it into runs of about " + fmt(longest_unbroken_climb_ft, 1) + " ft. Rest platforms belong to the older cage-based provisions, and whether they are present is part of the survey rather than a substitute for fall protection";
   const survey_verdict = "THE FINDING THAT MATTERS AT A FACILITY LEVEL is that a plant with older fixed ladders almost certainly has several in this condition, and the caged ones installed before November 19, 2018 run out of time on November 18, 2036, while any installed or replaced since then without a ladder safety system is non-compliant now. A ladder survey against the current requirement -- height, existing protection, installation date, and dimensional compliance -- is the action, and it usually turns up more than expected";
   const dimension_verdict = "AND HEIGHT IS NOT THE ONLY REQUIREMENT. Rung spacing and diameter, side clearance, the climbing space behind the ladder, the extension above a landing, and the landing platform itself all have dimensional requirements a ladder can fail independently of its fall protection, and a ladder that was compliant when installed may not be under the current rule";
   if (![rest_platforms_required, longest_unbroken_climb_ft, height_over_threshold_ft].every(Number.isFinite)) return { error: "Ladder survey math is not a finite value." };

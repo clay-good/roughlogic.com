@@ -6,7 +6,7 @@
 // yield, dry-hop loss). The catalog had four consumer beverage tiles and
 // nothing for a production brewery or distillery.
 
-import {
+import { aFig,
   DEBOUNCE_MS, debounce, makeNumber,
   makeOutputLine, attachExampleButton, fmt, fmtDir,
   makeStepsPanel,
@@ -155,7 +155,7 @@ BREWING_RENDERERS["mash-strike-water"] = _simpleRenderer({
   ],
   outputs: [
     { key: "mash_water_gal", id: "msw-water", label: "Mash water", unit: "gal", value: (r) => fmt(r.mash_water_gal, 1) + " gal (" + fmt(r.water_lb, 0) + " lb), " + fmt(r.mash_weight_lb, 0) + " lb of mash in the tun" },
-    { key: "strike_temp_f", id: "msw-strike", label: "Strike water temperature", unit: "deg F", value: (r) => fmt(r.strike_temp_f, 1) + " deg F for a " + fmt(r.target_mash_temp_f, 0) + " deg F mash" },
+    { key: "strike_temp_f", id: "msw-strike", label: "Strike water temperature", unit: "deg F", value: (r) => fmt(r.strike_temp_f, 1) + " deg F for " + aFig(fmt(r.target_mash_temp_f, 0)) + " deg F mash" },
     { key: "convention_strike_temp_f", id: "msw-conv", label: "The rounded 0.2 convention", unit: "deg F", value: (r) => fmt(r.convention_strike_temp_f, 1) + " deg F -- " + fmt(r.convention_difference_f, 1) + " deg F apart" },
     { key: "tun_drop_f", id: "msw-tun", label: "What an unheated tun costs", unit: "deg F", value: (r) => fmt(r.tun_drop_f, 2) + " deg F, the tun being " + fmt(r.tun_share_of_capacity_pct, 1) + "% of the combined heat capacity" },
     { key: "mash_temp_after_tun_f", id: "msw-after", label: "Mash after the tun equilibrates", unit: "deg F", value: (r) => fmt(r.mash_temp_after_tun_f, 1) + " deg F -- preheat the tun to recover it" },
@@ -946,7 +946,7 @@ BREWING_RENDERERS["mash-tun-grain-bed"] = _simpleRenderer({
     { key: "mash_volume_gal", id: "mtg-vol", label: "Mash volume", unit: "gal", value: (r) => fmt(r.mash_volume_gal, 1) + " gal (" + fmt(r.mash_volume_ft3, 2) + " cu ft)" },
     { key: "max_grain_lb", id: "mtg-max", label: "Most grain the tun will lauter", unit: "lb", value: (r) => fmt(r.max_grain_lb, 0) + " lb at " + fmt(r.max_bed_depth_in, 0) + " in" },
     { key: "max_og_points", id: "mtg-og", label: "Strongest beer in one mash", value: (r) => "OG " + fmt(r.max_og, 3) + " -- a vessel decision, not a recipe one" },
-    { key: "alternative_bed_depth_in", id: "mtg-alt", label: "In the wider tun", value: (r) => fmt(r.alternative_bed_depth_in, 1) + " in deep, and it takes " + fmt(r.alternative_max_grain_lb, 0) + " lb -- " + fmtDir(r.capacity_increase_pct, 0, "%", "more", "less") + " from a " + fmtDir(r.diameter_increase_pct, 0, "%", "wider", "narrower") + " tun" },
+    { key: "alternative_bed_depth_in", id: "mtg-alt", label: "In the wider tun", value: (r) => fmt(r.alternative_bed_depth_in, 1) + " in deep, and it takes " + fmt(r.alternative_max_grain_lb, 0) + " lb -- " + fmtDir(r.capacity_increase_pct, 0, "%", "more", "less") + " from " + aFig(fmtDir(r.diameter_increase_pct, 0, "%", "wider", "narrower")) + " tun" },
     { key: "note", id: "mtg-note", label: "Use", value: (r) => r.note },
   ],
   compute: computeMashTunGrainBed,

@@ -17,7 +17,7 @@
 // set by bather load against a small volume, which is why the same rule that
 // drains a spa every three weeks leaves a pool for three years.
 
-import {
+import { aFig,
   DEBOUNCE_MS, debounce, makeNumber, makeSelect,
   makeOutputLine, attachExampleButton, fmt,
   makeStepsPanel,
@@ -117,7 +117,7 @@ export function computePoolCoverEvaporation({
   const pounds_per_day = gallons_per_day * _POOL_LB_PER_GAL;
   const btu_per_day = pounds_per_day * _POOL_LATENT_BTU_PER_LB;
   const mmbtu_per_day = btu_per_day / 1e6;
-  const loss_verdict = "a " + fmt(surface_area_ft2, 0) + " sq ft pool losing " + fmt(evaporation_in_day, 3) + " in a day evaporates " + fmt(gallons_per_day, 0) + " " + (fmt(gallons_per_day, 0) === "1" ? "gallon" : "gallons") + " (" + fmt(pounds_per_day, 0) + " lb), and at " + fmt(_POOL_LATENT_BTU_PER_LB, 0) + " BTU per pound of latent heat that is " + fmt(mmbtu_per_day, 2) + " MMBTU a day -- to evaporation ALONE";
+  const loss_verdict = aFig(fmt(surface_area_ft2, 0)) + " sq ft pool losing " + fmt(evaporation_in_day, 3) + " in a day evaporates " + fmt(gallons_per_day, 0) + " " + (fmt(gallons_per_day, 0) === "1" ? "gallon" : "gallons") + " (" + fmt(pounds_per_day, 0) + " lb), and at " + fmt(_POOL_LATENT_BTU_PER_LB, 0) + " BTU per pound of latent heat that is " + fmt(mmbtu_per_day, 2) + " MMBTU a day -- to evaporation ALONE";
   const has_cover = cover_hours_per_day > 0 && cover_effectiveness_pct > 0;
   const cover_fraction = has_cover ? (cover_effectiveness_pct / 100) * (cover_hours_per_day / 24) : 0;
   const cover_saving_mmbtu_day = mmbtu_per_day * cover_fraction;
@@ -130,7 +130,7 @@ export function computePoolCoverEvaporation({
   const season_saving_cost = has_cost ? fuel_mmbtu * fuel_cost_per_mmbtu : 0;
   const cost_verdict = !has_cost
     ? "(no fuel cost and season length entered)"
-    : "over a " + fmt(season_days, 0) + " day season that is " + fmt(season_saving_mmbtu, 1) + " MMBTU of pool heat, or " + fmt(fuel_mmbtu, 1) + " MMBTU of FUEL at " + fmt(heater_efficiency_pct, 0) + "% heater efficiency -- " + fmt(season_saving_cost, 0) + " at " + fmt(fuel_cost_per_mmbtu, 2) + " per MMBTU. Note the division by efficiency: the saving is fuel not bought, so it is larger than the heat saved";
+    : "over " + aFig(fmt(season_days, 0)) + " day season that is " + fmt(season_saving_mmbtu, 1) + " MMBTU of pool heat, or " + fmt(fuel_mmbtu, 1) + " MMBTU of FUEL at " + fmt(heater_efficiency_pct, 0) + "% heater efficiency -- " + fmt(season_saving_cost, 0) + " at " + fmt(fuel_cost_per_mmbtu, 2) + " per MMBTU. Note the division by efficiency: the saving is fuel not bought, so it is larger than the heat saved";
   const water_verdict = "AND THE WATER IS A SECOND SAVING that the heat figure hides. " + fmt(gallons_per_day, 0) + " " + (fmt(gallons_per_day, 0) === "1" ? "gallon" : "gallons") + " a day is " + fmt(gallons_per_day * (season_days > 0 ? season_days : 180), 0) + " gallons over the season, all of it treated and chemically balanced, and all of it replaced with cold water that then has to be heated. A cover reduces that in the same proportion it reduces the heat";
   const dominance_verdict = "EVAPORATION IS THE LARGEST LOSS ON MOST OUTDOOR POOLS and it is the one nobody sees. Radiation, convection and conduction to the ground are all real and all smaller, and a pool owner reasoning about heat loss usually reasons about the air temperature -- which is why the single most effective thing available is a cover, and why the second is a windbreak. Wind drives evaporation hard: the rate entered here is not a constant, it rises steeply with wind speed and falls with humidity, so a sheltered pool and an exposed one at the same air temperature lose quite different amounts";
   if (![gallons_per_day, pounds_per_day, mmbtu_per_day, cover_saving_mmbtu_day, season_saving_mmbtu, season_saving_cost].every(Number.isFinite)) return { error: "Pool evaporation math is not a finite value." };
@@ -209,7 +209,7 @@ export function computePoolPumpSpeedSavings({
   const reduced_kwh_day = reduced_kw * reduced_hours;
   const saving_kwh_day = full_kwh_day - reduced_kwh_day;
   const affinity_verdict = "at " + fmt(speed_fraction * 100, 0) + "% speed the pump moves " + fmt(speed_fraction * 100, 0) + "% of the flow and draws " + fmt(power_fraction * 100, 1) + "% of the power -- the cube law. But the same water still has to be turned over, so the run time goes from " + fmt(full_speed_hours, 1) + " to " + fmt(reduced_hours, 1) + " hours";
-  const energy_verdict = "ENERGY PER TURNOVER IS THE NUMBER THAT COUNTS, and it is " + fmt(energy_fraction * 100, 1) + "% of full speed -- the cube of the speed divided by the speed, which is the SQUARE. A " + fmt(speed_fraction * 100, 0) + "% speed gives a " + fmt((1 - energy_fraction) * 100, 0) + "% saving, not the " + fmt((1 - power_fraction) * 100, 1) + "% the power figure alone suggests. Quoting the power saving for a pool overstates it by " + fmt((1 - power_fraction) / (1 - energy_fraction), 2) + " times";
+  const energy_verdict = "ENERGY PER TURNOVER IS THE NUMBER THAT COUNTS, and it is " + fmt(energy_fraction * 100, 1) + "% of full speed -- the cube of the speed divided by the speed, which is the SQUARE. " + aFig(fmt(speed_fraction * 100, 0), true) + "% speed gives " + aFig(fmt((1 - energy_fraction) * 100, 0)) + "% saving, not the " + fmt((1 - power_fraction) * 100, 1) + "% the power figure alone suggests. Quoting the power saving for a pool overstates it by " + fmt((1 - power_fraction) / (1 - energy_fraction), 2) + " times";
   // The same turnover at reduced speed can need more hours than a day has.
   const exceeds_day = reduced_hours > 24 * (1 + 1e-9);
   const daily_verdict = (exceeds_day ? "NOT ACHIEVABLE AS ENTERED: the same turnover at this speed needs " + fmt(reduced_hours, 1) + " h a day; the saving below assumes it. " : "") + fmt(full_kw, 2) + " kW for " + fmt(full_speed_hours, 1) + " h is " + fmt(full_kwh_day, 1) + " kWh a day at full speed, against " + fmt(reduced_kw, 2) + " kW for " + fmt(reduced_hours, 1) + " h -- " + fmt(reduced_kwh_day, 1) + " kWh, a saving of " + fmt(saving_kwh_day, 1) + " kWh a day";
@@ -292,7 +292,7 @@ export function computePoolHeatPumpCapacity({
   const combined_factor = air_derate_factor * humidity_derate_factor * water_derate_factor;
   const derated_capacity_btuh = rated_capacity_btuh * combined_factor;
   const capacity_pct_of_rating = combined_factor * 100;
-  const capacity_verdict = "the three factors multiply: " + fmt(air_derate_factor, 3) + " for air x " + fmt(humidity_derate_factor, 3) + " for humidity x " + fmt(water_derate_factor, 3) + " for water is " + fmt(combined_factor, 3) + ", so a " + fmt(rated_capacity_btuh, 0) + " BTU/h unit delivers " + fmt(derated_capacity_btuh, 0) + " BTU/h -- " + fmt(capacity_pct_of_rating, 0) + "% of its rating";
+  const capacity_verdict = "the three factors multiply: " + fmt(air_derate_factor, 3) + " for air x " + fmt(humidity_derate_factor, 3) + " for humidity x " + fmt(water_derate_factor, 3) + " for water is " + fmt(combined_factor, 3) + ", so " + aFig(fmt(rated_capacity_btuh, 0)) + " BTU/h unit delivers " + fmt(derated_capacity_btuh, 0) + " BTU/h -- " + fmt(capacity_pct_of_rating, 0) + "% of its rating";
   const direction_verdict = "AND THE THREE MOVE IN DIFFERENT DIRECTIONS, which is why a rating is a summer number. Cooler air cuts capacity, because the evaporator has less heat to collect. WARMER WATER also cuts it, because the condensing temperature rises with it -- so the harder you push the setpoint the less the unit delivers. And HIGHER HUMIDITY RAISES capacity, because latent heat is available at the evaporator: that is why pool heat pumps like humid climates and why a dry spring evening is worse than a damp one at the same temperature";
   const has_cop = rated_cop > 0;
   const derated_cop = has_cop ? rated_cop * cop_derate_factor : 0;

@@ -9,7 +9,7 @@
 // independent of module, the v42/v70..v76 precedent). See spec-v60 and
 // spec-v69.
 
-import {
+import { aFig,
   DEBOUNCE_MS, debounce, makeNumber, makeCheckbox, makeSelect,
   makeOutputLine, attachExampleButton, fmt,
   makeStepsPanel,
@@ -483,8 +483,8 @@ export function computeSilicaVentilationScreen({ measured_concentration_ug_m3 = 
   const control_verdict = control_efficiency_pct === 0
     ? "No control efficiency entered. Water suppression and local exhaust ventilation at the airflow the table specifies are the engineering controls, and they come before respirators."
     : controlled_over_pel
-      ? "STILL OVER at " + fmt(controlled_twa_ug_m3, 1) + " with a " + fmt(control_efficiency_pct, 0) + "% control -- " + fmt(required_efficiency_pct, 0) + "% is what this exposure needs"
-      : "CONTROLLED to " + fmt(controlled_twa_ug_m3, 1) + " with a " + fmt(control_efficiency_pct, 0) + "% control, under the " + fmt(pel_ug_m3, 0) + " PEL"
+      ? "STILL OVER at " + fmt(controlled_twa_ug_m3, 1) + " with " + aFig(fmt(control_efficiency_pct, 0)) + "% control -- " + fmt(required_efficiency_pct, 0) + "% is what this exposure needs"
+      : "CONTROLLED to " + fmt(controlled_twa_ug_m3, 1) + " with " + aFig(fmt(control_efficiency_pct, 0)) + "% control, under the " + fmt(pel_ug_m3, 0) + " PEL"
         + (max_task_minutes_controlled === null ? "" : max_task_minutes_controlled >= shift_minutes ? ", and the task could run the full shift at that control" : ", and the task could run " + fmt(max_task_minutes_controlled, 0) + " min at that control");
   return {
     measured_concentration_ug_m3, sample_minutes, shift_minutes, twa_ug_m3,

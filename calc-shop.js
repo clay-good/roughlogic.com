@@ -22,7 +22,7 @@
 // SHOP_RENDERERS map, mirroring calc-fab.js / calc-mechanic.js.
 // =====================================================================
 
-import {
+import { aFig,
   DEBOUNCE_MS, debounce, makeNumber, makeText, makeSelect, makeTextarea,
   makeOutputLine, attachExampleButton, fmt, fmtDir,
   makeStepsPanel,
@@ -1211,7 +1211,7 @@ export function computeCompoundMiter({ spring_angle_deg = 38, corner_angle_deg =
   const miter_angle_deg = (Math.atan(Math.sin(Srad) / Math.tan(halfCrad)) * 180) / Math.PI;
   const bevel_angle_deg = (Math.asin(Math.cos(Srad) * Math.cos(halfCrad)) * 180) / Math.PI;
   const notes = [];
-  notes.push("Set the saw to a " + fmt(miter_angle_deg, 2) + " degree miter (table swing) and a " + fmt(bevel_angle_deg, 2) + " degree bevel (blade tilt) to cut crown lying flat on the table. Spring angle " + fmt(S, 0) + " deg, wall corner " + fmt(C, 0) + " deg.");
+  notes.push("Set the saw to " + aFig(fmt(miter_angle_deg, 2)) + " degree miter (table swing) and " + aFig(fmt(bevel_angle_deg, 2)) + " degree bevel (blade tilt) to cut crown lying flat on the table. Spring angle " + fmt(S, 0) + " deg, wall corner " + fmt(C, 0) + " deg.");
   notes.push("These settings cut crown FLAT on the saw (the common shop method, not held to the fence). The two angle magnitudes are identical for an inside and an outside corner; only the workpiece orientation and which side is the keeper change. Cut a scrap test corner before the real stock.");
   return { miter_angle_deg, bevel_angle_deg, half_corner_deg: C / 2, notes };
 }
@@ -1533,7 +1533,7 @@ function _v1316renderParabolicSegment(inputRegion, outputRegion, citationEl) {
     const res = computeParabolicSegment({ base_span: Number(b.input.value) || 0, rise_height: Number(h.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["base_span", "rise_height"], res);
     if (res.error) { oA.textContent = res.error; oL.textContent = "-"; oNote.textContent = ""; return; }
     oA.textContent = fmt(res.area, 4) + " (square units, = 2/3 of the b x h box)";
-    oL.textContent = fmt(res.arc_length, 4) + " over a " + fmt(res.chord, 3) + " chord";
+    oL.textContent = fmt(res.arc_length, 4) + " over " + aFig(fmt(res.chord, 3)) + " chord";
     oNote.textContent = res.note;
   }, DEBOUNCE_MS);
   for (const f of [b, h]) f.input.addEventListener("input", update);
@@ -2482,10 +2482,10 @@ export function computeCylinderStorageSeparation({ separation_ft = 0, barrier_pr
   const route = distance_ok && barrier_ok ? "both the 20 ft distance and a compliant barrier" : distance_ok ? "the 20 ft distance" : barrier_ok ? "a compliant barrier" : "neither";
   const passes = separation_satisfied && upright && caps;
 
-  const note = "THE RULE IS AN OR, NOT A DISTANCE. Oxygen cylinders in storage shall be separated from fuel-gas cylinders OR COMBUSTIBLE MATERIALS - especially oil or grease - by a minimum of " + REQ_SEP + " ft, OR by a noncombustible barrier at least " + REQ_H + " ft high having a fire-resistance rating of at least one-half hour. On a tight site " + REQ_SEP + " ft of clear floor is expensive and a " + REQ_H + " ft barrier is not, so the alternative is usually the cheaper compliance path and is worth more than knowing the distance. "
+  const note = "THE RULE IS AN OR, NOT A DISTANCE. Oxygen cylinders in storage shall be separated from fuel-gas cylinders OR COMBUSTIBLE MATERIALS - especially oil or grease - by a minimum of " + REQ_SEP + " ft, OR by a noncombustible barrier at least " + REQ_H + " ft high having a fire-resistance rating of at least one-half hour. On a tight site " + REQ_SEP + " ft of clear floor is expensive and " + aFig(REQ_H) + " ft barrier is not, so the alternative is usually the cheaper compliance path and is worth more than knowing the distance. "
     + "Distance here is " + sep + " ft: " + (distance_ok ? "satisfies the rule on its own. " : separation_shortfall_ft.toFixed(1) + " ft short of " + REQ_SEP + ". ")
     + (hasBarrier
-      ? "The barrier route has THREE conditions and all must hold: noncombustible, at least " + REQ_H + " ft high, and at least a " + REQ_RATING + " hour fire-resistance rating. "
+      ? "The barrier route has THREE conditions and all must hold: noncombustible, at least " + REQ_H + " ft high, and at least " + aFig(REQ_RATING) + " hour fire-resistance rating. "
         + (barrier_ok ? "All three are satisfied, so the barrier carries it regardless of the distance. " : "This barrier fails on " + barrier_failures.join(" and ") + ". Two of the three are SILENT failures - a sheet of plywood is the right shape, stands the right height, and satisfies neither the noncombustible nor the rating condition, and nobody measures a rating on site. A barrier that looks like a barrier is not the test. ")
       : "No barrier entered, so the distance is the only route available here. ")
     + (separation_satisfied ? "Separation is satisfied by " + route + ". " : "SEPARATION IS NOT SATISFIED by either route. ")
@@ -3198,8 +3198,8 @@ export function computeSprayBoothAirflow({ opening_width_ft = 0, opening_height_
   const bake_annual_cost = bake_cost_per_cycle * bakes_per_year;
   const bake_verdict = !has_bake
     ? "(no bake cycle entered)"
-    : "heating " + fmt(exhaust_cfm, 0) + " cfm over a " + fmt(bake_delta_t, 0) + " degF rise is "
-      + fmt(bake_btu_hr / 1000000, 2) + " MMBTU/hr, so a " + fmt(bake_minutes, 0) + " minute bake takes "
+    : "heating " + fmt(exhaust_cfm, 0) + " cfm over " + aFig(fmt(bake_delta_t, 0)) + " degF rise is "
+      + fmt(bake_btu_hr / 1000000, 2) + " MMBTU/hr, so " + aFig(fmt(bake_minutes, 0)) + " minute bake takes "
       + fmt(bake_btu_per_cycle / 1000000, 2) + " MMBTU -- $" + fmt(bake_cost_per_cycle, 2) + " a cycle and $"
       + fmt(bake_annual_cost, 0) + " across " + fmt(bakes_per_year, 0) + " " + (fmt(bakes_per_year, 0) === "1" ? "bake" : "bakes") + " a year";
   if (![exhaust_cfm, heating_btu_hr, gas_input_btu_hr, cost_per_hour, air_changes_per_hour, measured_cfm, bake_btu_per_cycle, bake_annual_cost].every(Number.isFinite)) return { error: "Spray-booth math is not a finite value." };
@@ -3237,7 +3237,7 @@ SHOP_RENDERERS["spray-booth-airflow"] = _simpleRenderer({
   ],
   outputs: [
     { key: "a", id: "sba-out-a", label: "Exhaust and makeup airflow", value: (r) => fmt(r.exhaust_cfm, 0) + " cfm across " + fmt(r.opening_sqft, 0) + " sq ft of opening" },
-    { key: "l", id: "sba-out-l", label: "Makeup air heating load", value: (r) => fmt(r.heating_btu_hr, 0) + " BTU/hr (" + fmt(r.heating_mbh, 0) + " MBH) over a " + fmt(r.delta_t, 0) + " F rise" },
+    { key: "l", id: "sba-out-l", label: "Makeup air heating load", value: (r) => fmt(r.heating_btu_hr, 0) + " BTU/hr (" + fmt(r.heating_mbh, 0) + " MBH) over " + aFig(fmt(r.delta_t, 0)) + " F rise" },
     { key: "g", id: "sba-out-g", label: "Gas input required", value: (r) => fmt(r.gas_input_btu_hr, 0) + " BTU/hr = " + fmt(r.therms_per_hour, 2) + " therms per hour" },
     { key: "c", id: "sba-out-c", label: "Operating cost", value: (r) => "$" + fmt(r.cost_per_hour, 2) + " per hour, $" + fmt(r.annual_cost, 0) + " over the hours entered" },
     { key: "h", id: "sba-out-h", label: "Air changes", value: (r) => r.air_change_verdict },
@@ -3405,7 +3405,7 @@ SHOP_RENDERERS["heat-treat-soak-time"] = _simpleRenderer({
   ],
   outputs: [
     { key: "t", id: "htst-out-t", label: "Time at temperature", value: (r) => fmt(r.total_at_temp_hr, 2) + " hr = " + fmt(r.through_heat_hr, 2) + " through-heat + " + fmt(r.soak_hr, 2) + " soak" },
-    { key: "q", id: "htst-out-q", label: "Charge heat", value: (r) => fmt(r.charge_heat_btu, 0) + " BTU over a " + fmt(r.delta_t, 0) + " F rise" },
+    { key: "q", id: "htst-out-q", label: "Charge heat", value: (r) => fmt(r.charge_heat_btu, 0) + " BTU over " + aFig(fmt(r.delta_t, 0)) + " F rise" },
     { key: "i", id: "htst-out-i", label: "Furnace input during the ramp", value: (r) => fmt(r.furnace_input_btu_hr, 0) + " BTU/hr = " + fmt(r.furnace_input_kw, 1) + " kW delivered" },
     { key: "n", id: "htst-out-n", label: "Note", value: (r) => r.note },
   ],
@@ -3451,7 +3451,7 @@ SHOP_RENDERERS["quench-severity"] = _simpleRenderer({
     { key: "second_grossmann_h", label: "H-value of the quench being considered", kind: "number" },
   ],
   outputs: [
-    { key: "b", id: "qs-out-b", label: "Biot number as quenched", value: (r) => fmt(r.biot, 2) + " at a " + fmt(r.radius_in, 2) + " in radius -- " + r.regime },
+    { key: "b", id: "qs-out-b", label: "Biot number as quenched", value: (r) => fmt(r.biot, 2) + " at " + aFig(fmt(r.radius_in, 2)) + " in radius -- " + r.regime },
     { key: "s", id: "qs-out-s", label: "Biot number at the stronger quench", value: (r) => fmt(r.second_biot, 2) + " -- " + r.second_regime },
     { key: "v", id: "qs-out-v", label: "Is stepping up worth it", value: (r) => r.verdict },
     { key: "n", id: "qs-out-n", label: "Note", value: (r) => r.note },

@@ -10,7 +10,7 @@
 // cover consumes, the gas generation sets the flare, and the route feeds the
 // transfer station that feeds the face.
 
-import {
+import { aFig,
   DEBOUNCE_MS, debounce, makeNumber,
   makeOutputLine, attachExampleButton, fmt, fmtDir,
   makeStepsPanel,
@@ -146,7 +146,7 @@ WASTE_RENDERERS["landfill-airspace-density"] = _simpleRenderer({
     { key: "total_airspace_cy", id: "lad-total", label: "Total airspace consumed", unit: "cy", value: (r) => fmt(r.total_airspace_cy, 0) + " cy" },
     { key: "airspace_utilization_factor", id: "lad-auf", label: "Airspace utilisation factor", value: (r) => fmt(r.airspace_utilization_factor, 3) + " tons per cy" },
     { key: "improved_total_airspace_cy", id: "lad-imp", label: "At the improved density", value: (r) => fmt(r.improved_total_airspace_cy, 0) + " cy total, AUF " + fmt(r.improved_airspace_utilization_factor, 3) },
-    { key: "airspace_saved_cy", id: "lad-save", label: "Airspace saved", unit: "cy", value: (r) => r.airspace_saved_cy < 0 ? fmt(-r.airspace_saved_cy, 0) + " cy MORE consumed (" + fmt(-r.airspace_saved_pct, 0) + "%) from a " + fmt(-r.density_improvement_pct, 0) + "% density loss" : fmt(r.airspace_saved_cy, 0) + " cy (" + fmt(r.airspace_saved_pct, 0) + "%) from a " + fmt(r.density_improvement_pct, 0) + "% density gain" },
+    { key: "airspace_saved_cy", id: "lad-save", label: "Airspace saved", unit: "cy", value: (r) => r.airspace_saved_cy < 0 ? fmt(-r.airspace_saved_cy, 0) + " cy MORE consumed (" + fmt(-r.airspace_saved_pct, 0) + "%) from " + aFig(fmt(-r.density_improvement_pct, 0)) + "% density loss" : fmt(r.airspace_saved_cy, 0) + " cy (" + fmt(r.airspace_saved_pct, 0) + "%) from " + aFig(fmt(r.density_improvement_pct, 0)) + "% density gain" },
     { key: "airspace_saved_value", id: "lad-val", label: "What that is worth", value: (r) => r.airspace_saved_value < 0 ? "a cost of $" + fmt(-r.airspace_saved_value, 0) + " in airspace a year" : "$" + fmt(r.airspace_saved_value, 0) + " -- no capital and no permit" },
     { key: "note", id: "lad-note", label: "Use", value: (r) => r.note },
   ],
@@ -562,11 +562,11 @@ WASTE_RENDERERS["lfg-flare-capacity"] = _simpleRenderer({
     { key: "methane_density_lb_per_cf", label: "Methane density (lb/cu ft)" },
   ],
   outputs: [
-    { key: "rated_capacity_scfm", id: "lfc-rate", label: "Rated flare capacity", unit: "scfm", value: (r) => fmt(r.rated_capacity_scfm, 0) + " scfm for a " + fmt(r.peak_lfg_cfm, 0) + " cfm peak" },
+    { key: "rated_capacity_scfm", id: "lfc-rate", label: "Rated flare capacity", unit: "scfm", value: (r) => fmt(r.rated_capacity_scfm, 0) + " scfm for " + aFig(fmt(r.peak_lfg_cfm, 0)) + " cfm peak" },
     { key: "heat_release_mmbtu_per_hr", id: "lfc-heat", label: "Heat release at the peak", unit: "MMBtu/h", value: (r) => fmt(r.heat_release_mmbtu_per_hr, 1) + " MMBtu/h from " + fmt(r.methane_cfm, 0) + " cfm of methane" },
     { key: "minimum_stable_scfm", id: "lfc-min", label: "Minimum stable flow", unit: "scfm", value: (r) => fmt(r.minimum_stable_scfm, 0) + " scfm -- " + r.minimum_verdict },
     { key: "design_btu_per_cf", id: "lfc-btu", label: "Heat content of the gas", value: (r) => fmt(r.design_btu_per_cf, 0) + " Btu/cu ft at the design methane fraction" },
-    { key: "reduced_btu_per_cf", id: "lfc-red", label: "At the reduced methane fraction", value: (r) => fmt(r.reduced_btu_per_cf, 0) + " Btu/cu ft -- a " + fmt(r.methane_fraction_fall_pct, 0) + "% fall in methane content" + (r.methane_cfm / r.peak_lfg_cfm * (100 - r.methane_fraction_fall_pct) <= 20 + 1e-9 ? ", at or below the roughly 20% a flare needs, and this is what trips it" : ", still above the roughly 20% a flare needs to hold a flame") },
+    { key: "reduced_btu_per_cf", id: "lfc-red", label: "At the reduced methane fraction", value: (r) => fmt(r.reduced_btu_per_cf, 0) + " Btu/cu ft -- " + aFig(fmt(r.methane_fraction_fall_pct, 0)) + "% fall in methane content" + (r.methane_cfm / r.peak_lfg_cfm * (100 - r.methane_fraction_fall_pct) <= 20 + 1e-9 ? ", at or below the roughly 20% a flare needs, and this is what trips it" : ", still above the roughly 20% a flare needs to hold a flame") },
     { key: "methane_destroyed_tons", id: "lfc-dest", label: "Methane destroyed", unit: "tons/yr", value: (r) => fmt(r.methane_destroyed_tons, 0) + " short tons a year" },
     { key: "co2e_tons", id: "lfc-co2", label: "Carbon dioxide equivalent credit", value: (r) => fmt(r.co2e_tons, 0) + " short tons CO2e a year (" + fmt(r.co2e_tons * LB_PER_TON / LB_PER_MEGAGRAM, 0) + " metric tonnes, the unit EPA reports in), from a flare producing no revenue at all" },
     { key: "note", id: "lfc-note", label: "Use", value: (r) => r.note },
@@ -721,7 +721,7 @@ WASTE_RENDERERS["landfill-settlement-airspace"] = _simpleRenderer({
     { key: "recoverable_airspace_cy", id: "lsa-rec", label: "Recoverable airspace", unit: "cy", value: (r) => fmt(r.recoverable_airspace_cy, 0) + " cy while the cell is open -- " + fmt(r.recoverable_tons, 0) + " " + (fmt(r.recoverable_tons, 0) === "1" ? "ton" : "tons") },
     { key: "recoverable_revenue", id: "lsa-rev", label: "What that carries", value: (r) => "$" + fmt(r.recoverable_revenue, 0) + " of revenue the site never permitted or excavated" },
     { key: "differential_settlement_ft", id: "lsa-diff", label: "Differential against the adjacent fill", unit: "ft", value: (r) => fmt(r.differential_settlement_ft, 1) + " ft (" + fmt(r.adjacent_settlement_ft, 1) + " ft there against " + fmt(r.total_settlement_ft, 1) + " ft here)" },
-    { key: "remaining_slope_pct", id: "lsa-slope", label: "Cap slope after settlement", value: (r) => (r.slope_reverses ? "FLAT OR REVERSED -- the differential reaches the " + fmt(r.design_fall_ft, 1) + " ft design fall and the cap will pond" : fmt(r.remaining_slope_pct, 2) + "% from a " + fmt(r.cap_slope_pct, 1) + "% design; the differential ate " + fmt(r.fall_consumed_pct, 0) + "% of the fall") },
+    { key: "remaining_slope_pct", id: "lsa-slope", label: "Cap slope after settlement", value: (r) => (r.slope_reverses ? "FLAT OR REVERSED -- the differential reaches the " + fmt(r.design_fall_ft, 1) + " ft design fall and the cap will pond" : fmt(r.remaining_slope_pct, 2) + "% from " + aFig(fmt(r.cap_slope_pct, 1)) + "% design; the differential ate " + fmt(r.fall_consumed_pct, 0) + "% of the fall") },
     { key: "note", id: "lsa-note", label: "Use", value: (r) => r.note },
   ],
   compute: computeLandfillSettlementAirspace,
@@ -882,7 +882,7 @@ WASTE_RENDERERS["working-face-cell-lift"] = _simpleRenderer({
   ],
   outputs: [
     { key: "daily_volume_cy", id: "wfc-vol", label: "Daily cell volume", unit: "cy", value: (r) => fmt(r.daily_volume_cy, 0) + " cy (" + fmt(r.daily_volume_cuft, 0) + " cu ft)" },
-    { key: "advance_ft_per_day", id: "wfc-adv", label: "Face advance", value: (r) => fmt(r.advance_ft_per_day, 0) + " ft per day, on a " + fmt(r.slope_length_ft, 1) + " ft sloped face" },
+    { key: "advance_ft_per_day", id: "wfc-adv", label: "Face advance", value: (r) => fmt(r.advance_ft_per_day, 0) + " ft per day, on " + aFig(fmt(r.slope_length_ft, 1)) + " ft sloped face" },
     { key: "exposed_sqft", id: "wfc-exp", label: "Exposed surface", unit: "sq ft", value: (r) => fmt(r.exposed_sqft, 0) + " sq ft -- " + fmt(r.top_sqft, 0) + " top, " + fmt(r.face_sqft, 0) + " face" },
     { key: "cover_cy", id: "wfc-cov", label: "Cover to close it up", unit: "cy", value: (r) => fmt(r.cover_cy, 0) + " cy, " + fmt(r.cover_share_of_waste_pct, 1) + "% of the waste volume" },
     { key: "narrow_top_sqft", id: "wfc-narrow", label: "At the narrower face", value: (r) => fmt(r.narrow_advance_ft_per_day, 0) + " ft/day advance, top area " + fmt(r.narrow_top_sqft, 0) + " sq ft -- unchanged, because the advance doubled as the width halved" },

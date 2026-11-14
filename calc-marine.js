@@ -9,7 +9,7 @@
 // group split: production sets the velocity that critical velocity bounds, and
 // the wave height sets the condition a moored barge has to survive.
 
-import {
+import { aFig,
   DEBOUNCE_MS, debounce, makeNumber,
   makeOutputLine, attachExampleButton, fmt, fmtDir,
   makeStepsPanel,
@@ -582,7 +582,7 @@ MARINE_RENDERERS["mooring-load-wind-current"] = _simpleRenderer({
     { key: "current_to_wind_ratio", id: "mlw-rat", label: "Which governs", value: (r) => (r.current_exceeds_wind ? "CURRENT, exceeding the wind by " + fmt(r.current_over_wind_pct, 0) + "%" : "WIND, exceeding the current by " + fmt(-r.current_over_wind_pct, 0) + "%") },
     { key: "total_force_lb", id: "mlw-tot", label: "Total load", unit: "lb", value: (r) => fmt(r.total_force_lb, 0) + " lb" },
     { key: "load_per_line_lb", id: "mlw-per", label: "Per line, sharing equally", unit: "lb", value: (r) => fmt(r.load_per_line_lb, 0) + " lb -- needs " + fmt(r.required_mbl_lb, 0) + " lb minimum breaking load" },
-    { key: "worst_line_load_lb", id: "mlw-worst", label: "The most-loaded line", unit: "lb", value: (r) => fmt(r.worst_line_load_lb, 0) + " lb at " + fmt(r.worst_line_share_pct, 0) + "% against a " + fmt(r.equal_share_pct, 0) + "% equal share -- " + fmt(r.worst_to_equal_ratio, 1) + "x, needing " + fmt(r.worst_line_required_mbl_lb, 0) + " lb" },
+    { key: "worst_line_load_lb", id: "mlw-worst", label: "The most-loaded line", unit: "lb", value: (r) => fmt(r.worst_line_load_lb, 0) + " lb at " + fmt(r.worst_line_share_pct, 0) + "% against " + aFig(fmt(r.equal_share_pct, 0)) + "% equal share -- " + fmt(r.worst_to_equal_ratio, 1) + "x, needing " + fmt(r.worst_line_required_mbl_lb, 0) + " lb" },
     { key: "angle_cost_pct", id: "mlw-ang", label: "What the lead angle costs", value: (r) => fmt(r.angle_cost_pct, 0) + "% of each line's pull, before any vertical angle" },
     { key: "note", id: "mlw-note", label: "Use", value: (r) => r.note },
   ],

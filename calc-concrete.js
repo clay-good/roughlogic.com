@@ -16,7 +16,7 @@
 // are user-supplied from the drawings and ACI 318-19 tables. See
 // spec-v257.md..v259.md.
 
-import {
+import { aFig,
   DEBOUNCE_MS, debounce, makeNumber, makeSelect,
   makeOutputLine, attachExampleButton, fmt,
   makeStepsPanel,
@@ -2664,7 +2664,7 @@ export function computeRcTBeamFlexure({ fc_psi = 4000, fy_psi = 60000, as_in2 = 
 
   const note = "Effective flange width " + be_in.toFixed(1) + " in"
     + (be_source === "override" ? " (entered directly)" : ", from ACI 318-19 6.3.2 with " + be_governs + " governing")
-    + ". Trial stress-block depth on that width is " + a_trial.toFixed(2) + " in against a " + hf + " in flange, so "
+    + ". Trial stress-block depth on that width is " + a_trial.toFixed(2) + " in against " + aFig(hf) + " in flange, so "
     + (t_action
       ? "the block runs PAST the flange and the section acts as a true T. The overhanging flange develops " + asf_in2.toFixed(2) + " in^2 worth of compression (" + (flange_fraction * 100).toFixed(0) + "% of the steel) at a lever arm of d - hf/2, and the remaining " + asw_in2.toFixed(2) + " in^2 is balanced by the web with its own block " + a_in.toFixed(2) + " in deep. "
       : "the whole compression block stays INSIDE the slab - which is the usual case for a positive-moment T-beam - so the section is simply a rectangle " + be_in.toFixed(1) + " in wide, and this returns exactly what the rectangular tile would. The web width does not enter the flexural answer at all. ")
@@ -2701,7 +2701,7 @@ CONCRETE_RENDERERS["rc-tbeam-flexure"] = _simpleRenderer({
     { key: "sp", id: "rtb-out-sp", label: "Steel split (flange / web)", value: (r) => r.t_action ? fmt(r.asf_in2, 2) + " / " + fmt(r.asw_in2, 2) + " in^2 (" + fmt(r.flange_fraction * 100, 0) + "% in the flange)" : "all in the flange couple - no web block" },
     { key: "mn", id: "rtb-out-mn", label: "Nominal moment Mn", value: (r) => fmt(r.mn_kipft, 1) + " kip-ft" },
     { key: "pm", id: "rtb-out-pm", label: "Design moment phi Mn", value: (r) => fmt(r.phi_mn_kipft, 1) + " kip-ft at phi = " + fmt(r.phi, 3) },
-    { key: "et", id: "rtb-out-et", label: "Net tensile strain", value: (r) => fmt(r.eps_t, 5) + " vs a " + fmt(r.tc_limit, 5) + " tension-controlled limit - " + (r.tension_controlled ? "tension-controlled" : r.compression_controlled ? "COMPRESSION-CONTROLLED" : "transition zone") },
+    { key: "et", id: "rtb-out-et", label: "Net tensile strain", value: (r) => fmt(r.eps_t, 5) + " vs " + aFig(fmt(r.tc_limit, 5)) + " tension-controlled limit - " + (r.tension_controlled ? "tension-controlled" : r.compression_controlled ? "COMPRESSION-CONTROLLED" : "transition zone") },
     { key: "ut", id: "rtb-out-ut", label: "Demand / capacity", value: (r) => r.util === null ? "- (no Mu entered)" : fmt(r.util, Math.abs(r.util - 1) < 0.005 && r.util !== 1 ? 4 : 2) + (r.util <= 1 + 1e-9 ? (r.tension_controlled ? " (OK)" : " (NOT tension-controlled - fails ACI 318-19 9.3.3.1)") : " (OVER)") },
     { key: "n", id: "rtb-out-n", label: "Note", value: (r) => r.note },
   ],

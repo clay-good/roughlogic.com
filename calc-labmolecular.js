@@ -1,7 +1,7 @@
 // Molecular and cell-biology calculators split from calc-lab.js by
 // spec-v1876. Calculator behavior and citations are unchanged.
 
-import {
+import { aFig,
   DEBOUNCE_MS,
   debounce,
   makeNumber,
@@ -47,7 +47,7 @@ export function computePrimerTm({ sequence = "", method = "auto" } = {}) {
   let useMethod = method;
   if (method === "auto") useMethod = len <= 14 ? "wallace" : "gc";
   // Until 2026-10-14 forcing the GC% formula on "AAAA" printed a Tm of -103 C.
-  if (useMethod === "gc" && len < 14) return { error: "The basic GC% formula holds only for primers of 14 nt or more; use Wallace (or Auto) for a " + len + "-nt primer." };
+  if (useMethod === "gc" && len < 14) return { error: "The basic GC% formula holds only for primers of 14 nt or more; use Wallace (or Auto) for " + aFig(len) + "-nt primer." };
   let tm;
   if (useMethod === "wallace") tm = 2 * at + 4 * gc;
   else tm = 64.9 + 41 * (gc - 16.4) / len;

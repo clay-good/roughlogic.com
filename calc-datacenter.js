@@ -3,7 +3,7 @@
 // computer-room cooling capacity, containment, PDU branches, chilled-water
 // ride-through, server inlet conditions, and raised-floor tile delivery.
 
-import {
+import { aFig,
   DEBOUNCE_MS, debounce, makeNumber, makeSelect,
   makeOutputLine, attachExampleButton, fmt, fmtDir,
   makeStepsPanel,
@@ -325,7 +325,7 @@ export function computeContainmentBypassAirflow({ it_load_kw = 0, equipment_delt
     two_failed_supply_cfm, two_failed_margin_cfm: two_failed_supply_cfm - it_airflow_cfm,
     two_failed_margin_pct: 100 * (two_failed_supply_cfm - it_airflow_cfm) / it_airflow_cfm,
     implied_exhaust_temp_f, exhaust_mismatch_f,
-    note: (Math.abs(exhaust_mismatch_f) > 1 ? "CHECK THE TEMPERATURES: a " + fmt(supply_temp_f, 0) + " F supply and a " + fmt(equipment_delta_t_f, 0) + " F equipment rise put the exhaust at " + fmt(implied_exhaust_temp_f, 0) + " F, not the " + fmt(exhaust_temp_f, 0) + " F entered, so the airflow and the return temperature below describe two different rooms. " : "") + "Bypass does not create extra cooling; it spends fan energy and failure margin while lowering return temperature. Whole-room averages can hide simultaneous local recirculation, so a rack-inlet survey and ASHRAE TC 9.9 limits govern.",
+    note: (Math.abs(exhaust_mismatch_f) > 1 ? "CHECK THE TEMPERATURES: " + aFig(fmt(supply_temp_f, 0)) + " F supply and " + aFig(fmt(equipment_delta_t_f, 0)) + " F equipment rise put the exhaust at " + fmt(implied_exhaust_temp_f, 0) + " F, not the " + fmt(exhaust_temp_f, 0) + " F entered, so the airflow and the return temperature below describe two different rooms. " : "") + "Bypass does not create extra cooling; it spends fan energy and failure margin while lowering return temperature. Whole-room averages can hide simultaneous local recirculation, so a rack-inlet survey and ASHRAE TC 9.9 limits govern.",
   };
 }
 

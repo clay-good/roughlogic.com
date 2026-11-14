@@ -14,7 +14,7 @@
 // All Group F utilities carry the SOP-and-incident-command notice variant
 // (rendered by app.js based on the tool's trade tag).
 
-import {
+import { aFig,
   DEBOUNCE_MS as _DF, debounce as _debF, makeNumber as _mnF, makeSelect as _msF,
   makeOutputLine as _moF, attachExampleButton as _aeF, fmt as _fmtF,
   stepsFor,
@@ -588,7 +588,7 @@ export function computeFallArrestAnchorage({ workers_attached = 1, anchorage_cap
 
   const note = "TWO NUMBERS THAT ARE NOT THE SAME NUMBER. The 5,000 lb is what the ANCHORAGE must support; the 1,800 lb is what the SYSTEM may impose on the WORKER. They measure different things and neither is a version of the other - an anchor rated for 5,000 lb says nothing about whether the lanyard will keep the body under 1,800. "
     + "ANCHORAGE (502(d)(15)): " + (engineered
-      ? "the engineered route - designed, installed, and used as part of a complete personal fall arrest system maintaining a safety factor of at least two, under the supervision of a qualified person. Against a " + dl + " lb design load that is " + required_anchorage_lb.toFixed(0) + " lb. An engineered anchorage can legitimately be far below 5,000 lb, which is the whole point of the alternative - the prescriptive number exists for attachment points nobody analysed. "
+      ? "the engineered route - designed, installed, and used as part of a complete personal fall arrest system maintaining a safety factor of at least two, under the supervision of a qualified person. Against " + aFig(dl) + " lb design load that is " + required_anchorage_lb.toFixed(0) + " lb. An engineered anchorage can legitimately be far below 5,000 lb, which is the whole point of the alternative - the prescriptive number exists for attachment points nobody analysed. "
       : "the prescriptive route - at least 5,000 lb PER EMPLOYEE ATTACHED, independent of any anchorage used to support or suspend platforms. With " + n + " worker" + (n === 1 ? "" : "s") + " that is " + required_anchorage_lb.toFixed(0) + " lb" + (n > 1 ? " - the per-employee wording is the part that gets missed, and two workers on one anchor is 10,000 lb, not 5,000. " : ". "))
     + (anchorage_entered ? "Capacity entered is " + cap.toFixed(0) + " lb: " + (anchorage_ok ? "OK. " : "SHORT by " + anchorage_shortfall_lb.toFixed(0) + " lb. ") : "No anchorage capacity entered. ")
     + (achieved_safety_factor !== null ? "Against the " + dl + " lb design load the capacity gives a safety factor of " + achieved_safety_factor.toFixed(2) + ". " : "")

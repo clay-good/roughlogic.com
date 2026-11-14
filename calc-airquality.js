@@ -14,7 +14,7 @@
 // Every tile is a screen. The permit, the applicable subpart, and a qualified
 // air quality professional govern; none of this is a compliance determination.
 
-import {
+import { aFig,
   DEBOUNCE_MS, debounce, makeNumber, makeSelect,
   makeOutputLine, attachExampleButton, fmt,
   makeStepsPanel,
@@ -241,8 +241,8 @@ export function computeOpacitySixMinute({
   const margin_pct = limit_pct - block_average_pct;
   const full_block = reading_count === _AQ_READINGS_PER_BLOCK;
   const block_verdict = complies
-    ? fmt(block_average_pct, 2) + "% average against a " + fmt(limit_pct, 1) + "% limit -- COMPLIANT, with " + fmt(margin_pct, 2) + " points of margin"
-    : fmt(block_average_pct, 2) + "% average against a " + fmt(limit_pct, 1) + "% limit -- EXCEEDS it by " + fmt(-margin_pct, 2) + " points";
+    ? fmt(block_average_pct, 2) + "% average against " + aFig(fmt(limit_pct, 1)) + "% limit -- COMPLIANT, with " + fmt(margin_pct, 2) + " points of margin"
+    : fmt(block_average_pct, 2) + "% average against " + aFig(fmt(limit_pct, 1)) + "% limit -- EXCEEDS it by " + fmt(-margin_pct, 2) + " points";
   // The contrast the method exists to make: a dark peak inside a compliant
   // block, against a steady haze that never looks as bad and is a violation.
   const has_peak = peak_reading_pct > 0;
@@ -519,7 +519,7 @@ export function computeThermalOxidizerResidence({
   // chamber actually delivers.
   const standard_basis_volume_ft3 = inlet_scfm * required_residence_s / 60;
   const standard_basis_residence_s = actual_acfm > 0 ? standard_basis_volume_ft3 * 60 / actual_acfm : 0;
-  const trap_verdict = "sizing on the " + fmt(inlet_scfm, 0) + " scfm inlet flow instead would give a " + fmt(standard_basis_volume_ft3, 0) + " cu ft chamber, which at the actual " + fmt(actual_acfm, 0) + " acfm delivers only " + fmt(standard_basis_residence_s, 3) + " seconds -- a unit that appears to have " + fmt(required_residence_s, 2) + " seconds of residence on standard flow has " + fmt(standard_basis_residence_s, 3) + " in reality";
+  const trap_verdict = "sizing on the " + fmt(inlet_scfm, 0) + " scfm inlet flow instead would give " + aFig(fmt(standard_basis_volume_ft3, 0)) + " cu ft chamber, which at the actual " + fmt(actual_acfm, 0) + " acfm delivers only " + fmt(standard_basis_residence_s, 3) + " seconds -- a unit that appears to have " + fmt(required_residence_s, 2) + " seconds of residence on standard flow has " + fmt(standard_basis_residence_s, 3) + " in reality";
   // Against an entered chamber.
   const has_chamber = chamber_volume_ft3 > 0;
   const actual_residence_s = has_chamber && actual_acfm > 0 ? chamber_volume_ft3 * 60 / actual_acfm : 0;
@@ -620,8 +620,8 @@ export function computeCoatingVocCompliance({
   const limit_verdict = !has_limit
     ? "(no limit entered)"
     : complies
-      ? "COMPLIES: " + fmt(governing_voc, vd) + " lb/gal " + (has_thinner ? "as applied " : "") + "less water against a " + fmt(limit_lb_per_gal, vd) + " lb/gal limit, " + (Math.abs(margin_lb_per_gal) <= 1e-9 * Math.abs(limit_lb_per_gal) ? "exactly at the limit" : "with " + fmt(margin_lb_per_gal, vd) + " lb/gal of margin")
-      : "EXCEEDS: " + fmt(governing_voc, vd) + " lb/gal " + (has_thinner ? "as applied " : "") + "less water against a " + fmt(limit_lb_per_gal, vd) + " lb/gal limit, over by " + fmt(-margin_lb_per_gal, vd) + " lb/gal" + (label_would_pass ? " -- and the LABEL number of " + fmt(voc_as_supplied, 2) + " lb/gal would have suggested it passed" : "");
+      ? "COMPLIES: " + fmt(governing_voc, vd) + " lb/gal " + (has_thinner ? "as applied " : "") + "less water against " + aFig(fmt(limit_lb_per_gal, vd)) + " lb/gal limit, " + (Math.abs(margin_lb_per_gal) <= 1e-9 * Math.abs(limit_lb_per_gal) ? "exactly at the limit" : "with " + fmt(margin_lb_per_gal, vd) + " lb/gal of margin")
+      : "EXCEEDS: " + fmt(governing_voc, vd) + " lb/gal " + (has_thinner ? "as applied " : "") + "less water against " + aFig(fmt(limit_lb_per_gal, vd)) + " lb/gal limit, over by " + fmt(-margin_lb_per_gal, vd) + " lb/gal" + (label_would_pass ? " -- and the LABEL number of " + fmt(voc_as_supplied, 2) + " lb/gal would have suggested it passed" : "");
   if (![voc_as_supplied, voc_less_water, applied_voc_as_supplied, applied_voc_less_water, margin_lb_per_gal].every(Number.isFinite)) return { error: "Coating VOC math is not a finite value." };
   return {
     voc_as_supplied, less_water_gal, voc_less_water, basis_ratio, non_voc_gal, basis_verdict,
@@ -863,7 +863,7 @@ export function computeCarbonBedLife({
   const life_lost_pct = has_degraded ? (1 - degraded_life_hours / bed_life_hours) * 100 : 0;
   const degraded_verdict = !has_degraded
     ? "(no degraded working capacity entered, or it is not below the design one)"
-    : "at a " + fmt(degraded_capacity_pct, 1) + "% working capacity the bed lasts " + fmt(degraded_life_hours, 0) + " " + (fmt(degraded_life_hours, 0) === "1" ? "hour" : "hours") + " (" + fmt(degraded_operating_days, 1) + " operating days), " + fmt(life_lost_pct, 0) + "% shorter -- from humidity or temperature alone, with nothing else changed. A bed sized on dry-air capacity and installed on a humid stream reaches breakthrough that much sooner than its change-out schedule expects";
+    : "at " + aFig(fmt(degraded_capacity_pct, 1)) + "% working capacity the bed lasts " + fmt(degraded_life_hours, 0) + " " + (fmt(degraded_life_hours, 0) === "1" ? "hour" : "hours") + " (" + fmt(degraded_operating_days, 1) + " operating days), " + fmt(life_lost_pct, 0) + "% shorter -- from humidity or temperature alone, with nothing else changed. A bed sized on dry-air capacity and installed on a humid stream reaches breakthrough that much sooner than its change-out schedule expects";
   // The reason a schedule is not a substitute for monitoring.
   const breakthrough_verdict = "breakthrough is a CLIFF, not a slope: the bed removes essentially everything until its mass transfer zone reaches the outlet, and then the outlet concentration rises quickly toward the inlet. A bed at 95% of its life is performing perfectly and one at 105% is doing nothing, so there is no gradual degradation to notice and outlet monitoring is the only reliable detection -- a timer set to " + fmt(operating_days, 1) + " operating days is a guess about the capacity, not a measurement of the outlet";
   if (![bed_capacity_lb, bed_life_hours, bed_life_days, operating_days, degraded_life_hours, life_lost_pct].every(Number.isFinite)) return { error: "Carbon bed math is not a finite value." };
@@ -1182,7 +1182,7 @@ export function computeNoiseBarrierInsertionLoss({
   const capped = raw_insertion_loss_db > practical_ceiling_db;
   const insertion_loss_db = Math.min(raw_insertion_loss_db, practical_ceiling_db);
   const primary_verdict = "at " + fmt(frequency_hz, 0) + " Hz the wavelength is " + fmt(wavelength_ft, 2)
-    + " ft, so a " + fmt(delta, 3) + " ft path difference is a Fresnel number of " + fmt(fresnel_number, 2)
+    + " ft, so " + aFig(fmt(delta, 3)) + " ft path difference is a Fresnel number of " + fmt(fresnel_number, 2)
     + " and an insertion loss of " + fmt(raw_insertion_loss_db, 1) + " dB"
     + (capped ? ", reported as " + fmt(insertion_loss_db, 1) + " dB against the " + fmt(practical_ceiling_db, 0) + " dB practical ceiling -- flanking around the ends caps a real barrier regardless of what the geometry says" : "");
   // Frequency is the whole story: the same barrier is a different barrier at each band.
@@ -1377,8 +1377,8 @@ export function computeOdorDilutionThreshold({
     + "; in EN 13725 European units, a cubic metre each, that is " + fmt(odour_emission_rate_oue_s, 0) + " OU_E/s"
     + " -- that rate goes into the same dispersion arithmetic as any pollutant";
   const dt_at_receptor = source_dt / dilution_factor;
-  const receptor_verdict = fmt(dt_at_receptor, 1) + " dilutions at the receptor, from a "
-    + fmt(dilution_factor, 0) + ":1 dilution between the stack and the property line";
+  const receptor_verdict = fmt(dt_at_receptor, 1) + " dilutions at the receptor, from "
+    + aFig(fmt(dilution_factor, 0)) + ":1 dilution between the stack and the property line";
   const has_limit = limit_dt > 0;
   const complies = has_limit && dt_at_receptor <= limit_dt;
   const limit_verdict = !has_limit
@@ -1397,10 +1397,10 @@ export function computeOdorDilutionThreshold({
     : already_met
       ? "the receptor is already at or below the D/T of " + fmt(target_dt, 1) + " targeted"
       : "reaching a D/T of " + fmt(target_dt, 1) + " at the receptor takes the source down to "
-        + fmt(required_source_dt, 0) + " D/T, a " + fmt(reduction_pct, 0)
+        + fmt(required_source_dt, 0) + " D/T, " + aFig(fmt(reduction_pct, 0))
         + "% reduction in odour concentration -- a TREATMENT problem, not a stack height problem. Getting the same result by dispersion alone would need "
-        + fmt(dilution_multiple_needed, 1) + " times the dilution, which is roughly a "
-        + fmt(Math.sqrt(dilution_multiple_needed), 1)
+        + fmt(dilution_multiple_needed, 1) + " times the dilution, which is roughly "
+        + aFig(fmt(Math.sqrt(dilution_multiple_needed), 1))
         + "-fold increase in effective stack height, since ground-level concentration falls roughly with the square of it. Odour is reduced at source or not at all: the dilution needed to take a strong odour below objection is large enough that dispersion improvements rarely deliver it, which is why containment, biofilters, scrubbers, and oxidizers are the answers that work";
   if (![odour_emission_rate_ou_s, dt_at_receptor, required_source_dt, reduction_pct].every(Number.isFinite)) return { error: "Odour dilution math is not a finite value." };
   return {

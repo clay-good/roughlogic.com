@@ -95,3 +95,16 @@ test("render text: a blank temperature is not read as 0 degrees", () => {
   const hits = new Set(report.hits);
   assert.deepEqual(Object.keys(listed).filter((k) => !hits.has(k)), [], "fixed or gone: remove these from test/fixtures/blank-temp-remaining.json");
 });
+
+// "against a 85 dB target", "a 11 ft landing", "At a 8:1 setup" and "-0.000 ft"
+// were on 69 + 10 tiles' pages on 2026-11-14 (30 of them in the worked example
+// itself). aFig() in ui-fields.js now picks the article and fmt() drops the
+// sign from a figure that rounds to zero. The sweep draws every tile with its
+// inputs scaled x0..x10 and reads every output line; none may be reviewed away.
+test("render text: no figure takes the wrong article, and none prints as a negative zero", () => {
+  const sweep = fileURLToPath(new URL("../fixtures/render-count-noun-sweep.js", import.meta.url));
+  const report = JSON.parse(execFileSync(process.execPath, [sweep], { encoding: "utf8", maxBuffer: 1 << 24, stdio: ["ignore", "pipe", "ignore"] }));
+  assert.ok(report.withExample > 2200, `only ${report.withExample} tiles rendered an example`);
+  const hits = report.hits.filter((h) => h.kind !== "plural").map((h) => `${h.id} (${h.state}) ${h.kind}: ...${h.text}`);
+  assert.deepEqual(hits, [], 'write `"... " + aFig(fmt(x, 0)) + " ft"` (not "a " + ...), and print signed figures with fmt()');
+});

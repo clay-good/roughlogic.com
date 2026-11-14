@@ -10,7 +10,7 @@
 // tiles are the rack as a structure; the Group J tiles are the building and
 // the operation it serves.
 
-import {
+import { aFig,
   DEBOUNCE_MS, debounce, makeNumber,
   makeOutputLine, attachExampleButton, fmt, fmtDir,
   makeStepsPanel,
@@ -154,7 +154,7 @@ WAREHOUSE_RENDERERS["pallet-rack-beam-capacity"] = _simpleRenderer({
     { key: "moment_in_lb", id: "prb-mom", label: "Maximum moment", unit: "in-lb", value: (r) => fmt(r.moment_in_lb, 0) + " in-lb" },
     { key: "bending_stress_psi", id: "prb-str", label: "Bending stress", unit: "psi", value: (r) => fmt(r.bending_stress_psi, 0) + " psi against " + fmt(r.allowable_stress_psi, 0) + " psi allowable" },
     { key: "stress_ratio", id: "prb-sr", label: "Stress ratio", value: (r) => fmt(r.stress_ratio, 2) + " -- " + (r.stress_pass ? "PASS, " + fmt(r.stress_margin_pct, 0) + "% to spare" : "FAIL, over by " + fmt(-r.stress_margin_pct, 0) + "%") },
-    { key: "deflection_in", id: "prb-def", label: "Deflection", unit: "in", value: (r) => fmt(r.deflection_in, 4) + " in against a " + fmt(r.deflection_limit_in, 4) + " in limit" },
+    { key: "deflection_in", id: "prb-def", label: "Deflection", unit: "in", value: (r) => fmt(r.deflection_in, 4) + " in against " + aFig(fmt(r.deflection_limit_in, 4)) + " in limit" },
     { key: "deflection_ratio", id: "prb-dr", label: "Deflection ratio", value: (r) => fmt(r.deflection_ratio, 2) + " -- " + (r.deflection_pass ? "PASS, " + fmt(r.deflection_margin_pct, 0) + "% to spare" : "FAIL, over by " + fmt(-r.deflection_margin_pct, 0) + "%") },
     { key: "governs", id: "prb-gov", label: "Which check governs", value: (r) => r.governs.toUpperCase() + " governs this beam" },
     { key: "required_moment_of_inertia_in4", id: "prb-req", label: "Moment of inertia the limit needs", unit: "in^4", value: (r) => fmt(r.required_moment_of_inertia_in4, 2) + " in^4 (" + fmtDir(r.added_moment_of_inertia_pct, 0, "%", "more", "less") + "; depth, not weight, buys stiffness)" },
@@ -213,7 +213,7 @@ WAREHOUSE_RENDERERS["rack-upright-capacity-derate"] = _simpleRenderer({
     { key: "utilization_pct", id: "ruc-util", label: "Against the rated capacity", value: (r) => fmt(r.utilization_pct, 0) + "% used, " + (r.remaining_capacity_lb >= 0 ? fmt(r.remaining_capacity_lb, 0) + " lb remaining" : fmt(-r.remaining_capacity_lb, 0) + " lb OVER the rated capacity") },
     { key: "euler_capacity_lb", id: "ruc-eul", label: "Euler load at the entered spacing", unit: "lb", value: (r) => fmt(r.euler_capacity_lb, 0) + " lb" },
     { key: "euler_capacity_level_removed_lb", id: "ruc-rem", label: "Euler load with one level removed", unit: "lb", value: (r) => fmt(r.euler_capacity_level_removed_lb, 0) + " lb at " + fmt(r.unbraced_level_removed_in, 0) + " in unbraced" },
-    { key: "removed_capacity_ratio", id: "ruc-rat", label: "What removing a level costs", value: (r) => fmt(100 * r.removed_capacity_ratio, 0) + "% of the braced capacity remains -- a " + fmt(r.removed_capacity_loss_pct, 0) + "% loss" },
+    { key: "removed_capacity_ratio", id: "ruc-rat", label: "What removing a level costs", value: (r) => fmt(100 * r.removed_capacity_ratio, 0) + "% of the braced capacity remains -- " + aFig(fmt(r.removed_capacity_loss_pct, 0)) + "% loss" },
     { key: "note", id: "ruc-note", label: "Use", value: (r) => r.note },
   ],
   compute: computeRackUprightCapacityDerate,
@@ -279,7 +279,7 @@ WAREHOUSE_RENDERERS["rack-base-plate-anchorage"] = _simpleRenderer({
     { key: "improved_anchor_tension_lb", label: "Allowable tension in a better slab (lb)" },
   ],
   outputs: [
-    { key: "lateral_force_lb", id: "rba-force", label: "Lateral force", unit: "lb", value: (r) => fmt(r.lateral_force_lb, 0) + " lb at " + fmt(r.arm_ratio, 1) + " to 1 against a " + fmt(r.resisting_arm_ft, 2) + " ft resisting arm" },
+    { key: "lateral_force_lb", id: "rba-force", label: "Lateral force", unit: "lb", value: (r) => fmt(r.lateral_force_lb, 0) + " lb at " + fmt(r.arm_ratio, 1) + " to 1 against " + aFig(fmt(r.resisting_arm_ft, 2)) + " ft resisting arm" },
     { key: "overturning_moment_ftlb", id: "rba-over", label: "Overturning moment", unit: "ft-lb", value: (r) => fmt(r.overturning_moment_ftlb, 0) + " ft-lb" },
     { key: "resisting_moment_ftlb", id: "rba-res", label: "Resisting moment from weight", unit: "ft-lb", value: (r) => fmt(r.resisting_moment_ftlb, 0) + " ft-lb (" + fmt(r.resisting_share_pct, 0) + "% of the overturning)" },
     { key: "net_uplift_lb", id: "rba-up", label: "Net uplift per column", unit: "lb", value: (r) => (r.weight_alone_resists ? "None -- the frame's weight alone resists the overturning" : fmt(r.net_uplift_lb, 0) + " lb of anchor tension") },
@@ -737,7 +737,7 @@ WAREHOUSE_RENDERERS["order-pick-labor-standard"] = _simpleRenderer({
     { key: "lines_per_hour", id: "opl-rate", label: "Standard rate", value: (r) => fmt(r.lines_per_hour, 0) + " " + (fmt(r.lines_per_hour, 0) === "1" ? "line" : "lines") + "/h, " + fmt(r.units_per_hour, 0) + " " + (fmt(r.units_per_hour, 0) === "1" ? "unit" : "units") + "/h" },
     { key: "travel_share_pct", id: "opl-trav", label: "Share of the time spent travelling", value: (r) => fmt(r.travel_share_pct, 0) + "% -- none of it touches a carton" },
     { key: "batch_lines_per_hour", id: "opl-batch", label: "Batched rate", value: (r) => fmt(r.batch_lines_per_hour, 0) + " " + (fmt(r.batch_lines_per_hour, 0) === "1" ? "line" : "lines") + "/h at " + fmt(r.batch_time_per_line_s, 1) + " s per line" },
-    { key: "batch_improvement_pct", id: "opl-gain", label: "What batching buys", value: (r) => fmt(r.batch_improvement_pct, 0) + "% more lines an hour, from a " + fmt(r.batch_travel_reduction_pct, 0) + "% cut in travel -- and it costs a sort" },
+    { key: "batch_improvement_pct", id: "opl-gain", label: "What batching buys", value: (r) => fmt(r.batch_improvement_pct, 0) + "% more lines an hour, from " + aFig(fmt(r.batch_travel_reduction_pct, 0)) + "% cut in travel -- and it costs a sort" },
     { key: "note", id: "opl-note", label: "Use", value: (r) => r.note },
   ],
   compute: computeOrderPickLaborStandard,

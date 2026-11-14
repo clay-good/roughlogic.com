@@ -1060,7 +1060,7 @@ export function renderEvaporativeCooling(inputRegion, outputRegion, citationEl) 
 
 // --- Renderers ---
 
-import {
+import { aFig,
   DEBOUNCE_MS, debounce, makeNumber, makeText, makeSelect, makeCheckbox, makeTextarea,
   makeOutputLine, attachExampleButton, fmt, makeRowField,
   stepsFor,
@@ -4905,7 +4905,7 @@ export function computeFanSheaveForTargetCfm({ current_cfm = 0, target_cfm = 0, 
     new_bhp, new_sp_inwg, bhp_increase_pct, motor_overloaded, motor_checked: mhp > 0, over_motor_rpm,
     note: "Airflow follows speed one-for-one, but brake horsepower follows the CUBE: this change is "
       + ((ratio - 1) * 100).toFixed(1) + "% on airflow and " + bhp_increase_pct.toFixed(1) + "% on horsepower. "
-      + (motor_overloaded ? "THE MOTOR IS OVERLOADED at " + new_bhp.toFixed(2) + " bhp against a " + mhp + " hp motor - this sheave change trips the overloads or cooks the motor, and it is the single most common way a well-meant airflow fix fails. " : "")
+      + (motor_overloaded ? "THE MOTOR IS OVERLOADED at " + new_bhp.toFixed(2) + " bhp against " + aFig(mhp) + " hp motor - this sheave change trips the overloads or cooks the motor, and it is the single most common way a well-meant airflow fix fails. " : "")
       + (over_motor_rpm ? "The required fan speed also EXCEEDS the motor speed, which a simple sheave swap cannot deliver. " : "")
       + "Sheaves come in fixed increments and adjustable sheaves have a limited range, so take the next available size and re-measure rather than trusting the computed diameter to the hundredth. Pitch diameter is not outside diameter. A faster fan also raises static pressure with the square, so duct noise and leakage rise faster than the airflow does, and the belt and bearings see more load. This assumes the same fan on the same system curve - if the system changed, the fan curve, not this ratio, governs. Verify airflow after the change; the fan curve and equipment ratings govern.",
   };

@@ -16,7 +16,7 @@
 // first-principles capacitive-reactance bench check a tech runs at the unit
 // (GOVERNANCE.general). See spec-v102.md and spec-v104.md.
 
-import {
+import { aFig,
   DEBOUNCE_MS, debounce, makeNumber, makeSelect,
   makeOutputLine, attachExampleButton, fmt,
   makeStepsPanel,
@@ -610,7 +610,7 @@ export function computeBlowerDoorAch50({ cfm50 = 0, volume_ft3 = 0, n_factor = 1
   const spread_ratio = has_range ? n_factor_high / n_factor_low : 0;
   const range_verdict = !has_range
     ? "(no N-factor range entered)"
-    : "the same house, the same test: at N " + fmt(n_factor_low, 0) + " (cold, windy, exposed, taller) it leaks " + fmt(cfm_nat_low_n, 0) + " cfm, and at N " + fmt(n_factor_high, 0) + " (mild, sheltered, single-storey) it leaks " + fmt(cfm_nat_high_n, 0) + " cfm -- a " + fmt(spread_ratio, 1) + "x spread purely from where the building stands, which is why quoting natural infiltration without stating N is close to meaningless";
+    : "the same house, the same test: at N " + fmt(n_factor_low, 0) + " (cold, windy, exposed, taller) it leaks " + fmt(cfm_nat_low_n, 0) + " cfm, and at N " + fmt(n_factor_high, 0) + " (mild, sheltered, single-storey) it leaks " + fmt(cfm_nat_high_n, 0) + " cfm -- " + aFig(fmt(spread_ratio, 1)) + "x spread purely from where the building stands, which is why quoting natural infiltration without stating N is close to meaningless";
   if (heating_degree_days < 0) return { error: "Heating degree days must not be negative." };
   const has_hdd = heating_degree_days > 0;
   const infiltration_btu_per_year = has_hdd ? 1.08 * cfm_nat * 24 * heating_degree_days : 0;
@@ -1394,7 +1394,7 @@ export function computeCondensateOverflowPan({ unit_width_in = 0, unit_length_in
 
   const note = "METHOD: " + method_text + ". IRC M1411.3.1 allows four, and only two of them involve an auxiliary pan at all - the other two rely on an overflow line or a shutoff device, which is often the practical answer in a tight attic. "
     + (needs_pan
-      ? "PAN SIZE, and the sentence people misread: not less than 3 in larger than the unit or coil dimensions in WIDTH AND LENGTH. That is 3 in on the overall dimension, NOT 3 in of clearance per side. A " + uw + " in unit wants a " + required_width_in + " in pan, not " + misread_width_in + ". "
+      ? "PAN SIZE, and the sentence people misread: not less than 3 in larger than the unit or coil dimensions in WIDTH AND LENGTH. That is 3 in on the overall dimension, NOT 3 in of clearance per side. " + aFig(uw, true) + " in unit wants " + aFig(required_width_in) + " in pan, not " + misread_width_in + ". "
         + "This pan is " + pw + " x " + pl + " in against " + required_width_in + " x " + required_length_in + " required: width " + (width_ok ? "OK" : "SHORT by " + width_deficit_in.toFixed(1) + " in") + ", length " + (length_ok ? "OK" : "SHORT by " + length_deficit_in.toFixed(1) + " in") + ". "
         + "Depth " + pd + " in against the 1.5 in minimum: " + (depth_ok ? "OK. " : "SHORT by " + depth_deficit_in.toFixed(1) + " in. ")
         + (oversized ? "Note that this pan is at least as big as the per-side misreading would demand - fine for compliance, but if it was sized that way it is bigger and pricier than the code asks, and in an attic that space is not free. " : "")

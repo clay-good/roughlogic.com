@@ -16,7 +16,7 @@
 //
 // See spec-v1550.md through spec-v1556.md.
 
-import {
+import { aFig,
   DEBOUNCE_MS, debounce, makeNumber,
   makeOutputLine, attachExampleButton, fmt, fmtDir,
   makeStepsPanel,
@@ -543,7 +543,7 @@ WIND_RENDERERS["gin-pole-uptower-lift"] = _simpleRenderer({
     { key: "h", id: "gpu-out-h", label: "Split at the head", value: (r) => fmt(r.head_vertical_lb, 0) + " lb down, " + fmt(r.head_horizontal_lb, 0) + " lb sideways" },
     { key: "m", id: "gpu-out-m", label: "Moment at the mounting", value: (r) => fmt(r.mount_moment_ftlb, 0) + " ft-lb on the pole's own length" },
     { key: "c", id: "gpu-out-c", label: "Against the mounting rating", value: (r) => r.mount_verdict + "; the heaviest part this geometry supports is " + fmt(r.max_component_lb, 0) + " lb" },
-    { key: "d", id: "gpu-out-d", label: "Hauled directly at an angle instead", value: (r) => fmt(r.direct_line_pull_lb, 0) + " lb of line pull for a " + fmt(r.component_weight_lb || 0, 0) + " lb part -- " + fmt(r.angle_premium_lb, 0) + " lb bought purely by the angle, and " + fmt(r.direct_side_load_lb, 0) + " lb of it horizontal" },
+    { key: "d", id: "gpu-out-d", label: "Hauled directly at an angle instead", value: (r) => fmt(r.direct_line_pull_lb, 0) + " lb of line pull for " + aFig(fmt(r.component_weight_lb || 0, 0)) + " lb part -- " + fmt(r.angle_premium_lb, 0) + " lb bought purely by the angle, and " + fmt(r.direct_side_load_lb, 0) + " lb of it horizontal" },
     { key: "n", id: "gpu-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeGinPoleUptowerLift,

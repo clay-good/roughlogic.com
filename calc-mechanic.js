@@ -1,7 +1,7 @@
 // Group K: Mechanic - Auto, Marine, and Aviation (utilities 195-202).
 // See spec-v4.md section 2.2.
 
-import {
+import { aFig,
   DEBOUNCE_MS, debounce, makeNumber, makeSelect, makeCheckbox,
   makeOutputLine, attachExampleButton, fmt,
   makeStepsPanel,
@@ -4304,7 +4304,7 @@ export function computeGearDynamicToothStress({ horsepower = 0, rpm = 0, number_
   const allowable_psi = Sut > 0 ? Sut / 3 : null;
   const safety_factor = allowable_psi !== null ? allowable_psi / dynamic_stress_psi : null;
 
-  const note = "A " + T + "-tooth gear at " + Pd + " diametral pitch is " + pitch_diameter_in.toFixed(3) + " in at the pitch circle, so " + hp + " HP at " + N + " rpm is " + torque_inlb.toFixed(1) + " in-lb of torque and " + wt_lb.toFixed(1) + " lb of tangential load, running at " + velocity_fpm.toFixed(0) + " ft/min at the pitch line. "
+  const note = aFig(T, true) + "-tooth gear at " + Pd + " diametral pitch is " + pitch_diameter_in.toFixed(3) + " in at the pitch circle, so " + hp + " HP at " + N + " rpm is " + torque_inlb.toFixed(1) + " in-lb of torque and " + wt_lb.toFixed(1) + " lb of tangential load, running at " + velocity_fpm.toFixed(0) + " ft/min at the pitch line. "
     + "The static Lewis stress is " + static_stress_psi.toFixed(0) + " psi (Y = " + lewis_Y_diametral.toFixed(4) + ", " + y_source + "). "
     + "Barth multiplies that by Kv = (" + kv_base + " + V)/" + kv_base + " = " + kv.toFixed(4) + " for " + (cast ? "CAST or crude teeth, which take the harsher 600 base because a rough profile hammers harder at every mesh" : "CUT or milled teeth") + ". "
     + (idler ? "This gear is an IDLER, so the 1.42 reversed-bending factor also applies: an idler is pushed one way by the driver and the other way by the driven gear, and its teeth see a fully reversed cycle rather than a released one. " : "")
@@ -4506,7 +4506,7 @@ export function computeAdhesiveBondArea({ bond_length_in = 0, bond_width_in = 0,
   // The arithmetic is trivial; everything that matters is in the conditions on the strength.
   const bond_area_in2 = bond_length_in * bond_width_in;
   const capacity_lb = bond_area_in2 * shear_strength_psi;
-  const capacity_verdict = fmt(bond_length_in, 2) + " in of a " + fmt(bond_width_in, 3) + " in bead is "
+  const capacity_verdict = fmt(bond_length_in, 2) + " in of " + aFig(fmt(bond_width_in, 3)) + " in bead is "
     + fmt(bond_area_in2, 2) + " sq in of bond, carrying " + fmt(capacity_lb, 0) + " lb at "
     + fmt(shear_strength_psi, 0) + " psi in shear";
   // The check against a required load, and the length that would satisfy it.

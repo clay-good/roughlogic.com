@@ -14,7 +14,7 @@
 // All GOVERNANCE.general design aids; f'm, the bar layout, and the bracing
 // come from the structural drawings. See spec-v269.md..v271.md.
 
-import {
+import { aFig,
   DEBOUNCE_MS, debounce, makeNumber, makeSelect,
   makeOutputLine, attachExampleButton, fmt,
   makeStepsPanel,
@@ -794,7 +794,7 @@ export function computeFireplaceFlueArea({ opening_width_in = 0, opening_height_
   const height_ok = H >= 15 - 1e-9 * Math.abs(15);
 
   const shapeWord = round ? "round" : aspect_ratio >= 2 ? "rectangular at " + aspect_ratio.toFixed(2) + ":1 (2:1 or worse)" : aspect_ratio > 1.001 ? "rectangular at " + aspect_ratio.toFixed(2) + ":1 (under 2:1)" : "square";
-  const note = "Opening " + w + " x " + h + " = " + opening_area_sqin.toFixed(0) + " sq in. A " + shapeWord
+  const note = "Opening " + w + " x " + h + " = " + opening_area_sqin.toFixed(0) + " sq in. " + aFig(shapeWord, true)
     + " flue must be at least 1/" + (divisor === 8 ? "8" : divisor === 12 ? "12" : "10") + " of that, or " + required_area_sqin.toFixed(1) + " sq in net. "
     + "This flue's net area is " + actual_area_sqin.toFixed(1) + " sq in"
     + (ratio_actual ? " (the opening is " + ratio_actual.toFixed(1) + " times the flue)" : "") + " - "
@@ -873,8 +873,8 @@ export function computeMasonryLimitedAccessZone({ wall_height_ft = 0, wall_lengt
   const passes = zone_ok && (bracing_ok !== false);
 
   const note = "THE ZONE IS A COMPUTED DIMENSION, not a courtesy margin: equal to the height of the wall TO BE CONSTRUCTED plus " + ADDER + " ft, running the ENTIRE length of the wall, on the side that will be UNSCAFFOLDED, and established BEFORE the wall starts. "
-    + "For a " + h + " ft wall that is " + required_zone_width_ft + " ft wide by " + L + " ft long - " + zone_area_sf.toFixed(0) + " sq ft of ground nobody but the wall crew may enter. "
-    + "IT SCALES WITH THE FINISHED HEIGHT, not with how high the wall is today. The zone for a " + h + " ft wall is " + required_zone_width_ft + " ft wide from the first course, when there is nothing there yet to fall on anyone - which is exactly why it gets set narrow and grown later, and exactly why that is wrong. "
+    + "For " + aFig(h) + " ft wall that is " + required_zone_width_ft + " ft wide by " + L + " ft long - " + zone_area_sf.toFixed(0) + " sq ft of ground nobody but the wall crew may enter. "
+    + "IT SCALES WITH THE FINISHED HEIGHT, not with how high the wall is today. The zone for " + aFig(h) + " ft wall is " + required_zone_width_ft + " ft wide from the first course, when there is nothing there yet to fall on anyone - which is exactly why it gets set narrow and grown later, and exactly why that is wrong. "
     + "Width provided " + provided + " ft: " + (width_ok ? "OK. " : "SHORT by " + zone_width_shortfall_ft.toFixed(1) + " ft. ")
     + (fullLength ? "" : "The zone does NOT run the entire length of the wall, which the standard requires without qualification - a wall does not fall only in the middle. ")
     + (unscaffolded ? "" : "The zone is NOT on the unscaffolded side. That side is the point: the scaffolded side has people who are supposed to be there and who are watching the wall, and the zone exists for everyone else. ")
@@ -972,7 +972,7 @@ export function computeMortarBatchC270({ cement_volumes = 1, lime_volumes = 0.5,
     ? "Enter the unit and mortar compressive strengths to check compatibility."
     : compatible
       ? "COMPATIBLE: the mortar at " + fmt(mortar_strength_psi, 0) + " psi is weaker than the unit at " + fmt(unit_strength_psi, 0) + " psi, so movement cracks the JOINT, which is repointable"
-      : (equal_strength ? "MORTAR AS HARD AS THE UNIT: " : "MORTAR HARDER THAN THE UNIT: ") + fmt(mortar_strength_psi, 0) + " psi against a " + fmt(unit_strength_psi, 0) + " psi unit. Stress transfers into the unit and the unit spalls, which is not repointable -- this is how soft historic brick gets destroyed by a repointing";
+      : (equal_strength ? "MORTAR AS HARD AS THE UNIT: " : "MORTAR HARDER THAN THE UNIT: ") + fmt(mortar_strength_psi, 0) + " psi against " + aFig(fmt(unit_strength_psi, 0)) + " psi unit. Stress transfers into the unit and the unit spalls, which is not repointable -- this is how soft historic brick gets destroyed by a repointing";
   return {
     cement_volumes, lime_volumes, sand_ratio, cement_bags, cement_cuft, lime_cuft,
     cementitious_cuft, sand_cuft, sand_min_cuft, sand_max_cuft, sand_in_range,

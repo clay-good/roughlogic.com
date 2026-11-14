@@ -470,7 +470,7 @@ export const materialQuantityExample = {
 
 // --- Renderers ---
 
-import {
+import { aFig,
   DEBOUNCE_MS, debounce, makeNumber, makeText, makeSelect, makeCheckbox,
   makeOutputLine, attachExampleButton, fmt,
   makeStepsPanel,
@@ -4284,8 +4284,8 @@ export function computeLayoutSquaring({ mode, side_a, side_b, diag1, diag2, tole
     const tolerance_verdict = !has_tolerance
       ? "(no tolerance entered)"
       : within_tolerance
-        ? fmt(out_of_square, 3) + " out against a " + fmt(tol, 3) + " tolerance -- WITHIN tolerance"
-        : fmt(out_of_square, 3) + " out against a " + fmt(tol, 3) + " tolerance -- OUT OF TOLERANCE. Unequal diagonals mean the shape is a parallelogram rather than a rectangle, and on a vehicle structure that is diamond damage: the short diagonal names the corner that has moved";
+        ? fmt(out_of_square, 3) + " out against " + aFig(fmt(tol, 3)) + " tolerance -- WITHIN tolerance"
+        : fmt(out_of_square, 3) + " out against " + aFig(fmt(tol, 3)) + " tolerance -- OUT OF TOLERANCE. Unequal diagonals mean the shape is a parallelogram rather than a rectangle, and on a vehicle structure that is diamond damage: the short diagonal names the corner that has moved";
     const l = Number(sym_left) || 0;
     const r = Number(sym_right) || 0;
     if (l < 0 || r < 0) return { error: "Symmetry measurements cannot be negative (0 to skip)." };
@@ -11538,7 +11538,7 @@ export function computeSidingCourseLayout({ wall_height_ft = 0, wall_length_ft =
   if (![courses, adjusted_exposure_in, starter_lf, total_course_lf].every(Number.isFinite)) return { error: "Course-layout math did not produce a finite value." };
   return {
     courses, adjusted_exposure_in, max_exposure_in, starter_lf, total_course_lf, sliver_in,
-    note: "The story-pole move: divide the wall into WHOLE courses and shrink the exposure evenly (" + adjusted_exposure_in.toFixed(2) + " in here) so the top course lands full instead of a " + sliver_in.toFixed(1) + "-in sliver. Shrinking exposure only ever increases the headlap, so the adjusted layout always still clears the manufacturer's minimum overlap. Mark the pole at the adjusted spacing and transfer to the corners; align courses to hit window heads and sills where the elevation allows. Squares and material LF are the separate siding-takeoff tile; starter strip runs the wall length once. The manufacturer's exposure limits and the installation instructions govern.",
+    note: "The story-pole move: divide the wall into WHOLE courses and shrink the exposure evenly (" + adjusted_exposure_in.toFixed(2) + " in here) so the top course lands full instead of " + aFig(sliver_in.toFixed(1)) + "-in sliver. Shrinking exposure only ever increases the headlap, so the adjusted layout always still clears the manufacturer's minimum overlap. Mark the pole at the adjusted spacing and transfer to the corners; align courses to hit window heads and sills where the elevation allows. Squares and material LF are the separate siding-takeoff tile; starter strip runs the wall length once. The manufacturer's exposure limits and the installation instructions govern.",
   };
 }
 export const sidingCourseLayoutExample = { inputs: { wall_height_ft: 9, wall_length_ft: 40, target_exposure_in: 7, board_height_in: 8, min_overlap_in: 1 } };
@@ -11711,7 +11711,7 @@ CONSTRUCTION_RENDERERS["advance-warning-sign-spacing"] = _simpleRenderer({
     { key: "vehicle_spacing_ft", label: "Stopped vehicle spacing (ft)", kind: "number", default: 25 },
   ],
   outputs: [
-    { key: "abc", id: "aws-out-abc", label: "Table 6C-1 sign spacings", value: (r) => r.road_label + " -- A " + fmt(r.a_ft, 0) + " ft, B " + fmt(r.b_ft, 0) + " ft, then " + fmt(r.c_ft, 0) + " ft" },
+    { key: "abc", id: "aws-out-abc", label: "Table 6C-1 sign spacings", value: (r) => r.road_label + " -- " + aFig(fmt(r.a_ft, 0), true) + " ft, B " + fmt(r.b_ft, 0) + " ft, then " + fmt(r.c_ft, 0) + " ft" },
     { key: "pos", id: "aws-out-pos", label: "Sign positions upstream of the transition", value: (r) => r.positions_ft.map((p) => fmt(p, 0) + " ft").join(", ") },
     { key: "tot", id: "aws-out-tot", label: "Advance warning area begins", value: (r) => fmt(r.total_ft, 0) + " ft ahead of the taper" + (r.open_highway_ok ? " (meets the 1,500 ft open-highway guidance)" : "") },
     { key: "sp", id: "aws-out-sp", label: "Rural 8-12x speed check", value: (r) => (r.speed_rule_min_ft === null ? "not checked (enter a speed)" : fmt(r.speed_rule_min_ft, 0) + "-" + fmt(r.speed_rule_max_ft, 0) + " ft suggested - " + (r.speed_rule_ok ? "layout meets it" : "layout is SHORTER than the guidance")) },
@@ -11932,7 +11932,7 @@ export function computeCarpetSeamLayout({ room_length_ft = 0, room_width_ft = 0,
     ? "SEAMLESS: the " + RW + " ft roll covers this room in one drop run " + dir + ", so there is no seam to place at all - which is worth reorienting a room for whenever it is possible. "
     : best.drops + (best.drops === 1 ? " drop runs " : " drops run ") + dir + ", giving " + best.seam_count + " seam" + (best.seam_count === 1 ? "" : "s") + " totalling " + best.seam_length_ft.toFixed(1) + " ft. ")
     + (best.fill_in > 0
-      ? "The last drop is a " + best.fill_in.toFixed(1) + " in fill strip"
+      ? "The last drop is " + aFig(best.fill_in.toFixed(1)) + " in fill strip"
       + (narrow_fill ? " - NARROWER than the " + minFill + " in you set as a minimum. A skinny fill strip is fragile, hard to stretch true, and shows; either shift the layout so the waste splits between two wider strips, or accept more waste to avoid it. " : ", wide enough to lay and stretch. ")
       : "The drops divide the room evenly, with no fill strip. ")
     + (alt.seam_count !== best.seam_count || Math.abs(alt.running_ft - best.running_ft) > 0.01
@@ -12065,7 +12065,7 @@ CONSTRUCTION_RENDERERS["seismic-overturning-stability"] = _simpleRenderer({
   ],
   outputs: [
     { key: "w", id: "sos-out-w", label: "Dead load that actually resists", value: (r) => fmt(r.dead_coeff, 3) + " D = " + fmt(r.w_eff_kip, 0) + " " + (fmt(r.w_eff_kip, 0) === "1" ? "kip" : "kips") + " (Ev removes " + fmt(r.ev_coeff, 3) + ")" },
-    { key: "mr", id: "sos-out-mr", label: "Resisting moment", value: (r) => fmt(r.m_resist_kipft, 0) + " kip-ft on a " + fmt(r.arm_ft, 2) + " ft arm" },
+    { key: "mr", id: "sos-out-mr", label: "Resisting moment", value: (r) => fmt(r.m_resist_kipft, 0) + " kip-ft on " + aFig(fmt(r.arm_ft, 2)) + " ft arm" },
     { key: "md", id: "sos-out-md", label: "Design overturning moment", value: (r) => fmt(r.m_demand_kipft, 0) + " kip-ft" },
     { key: "ra", id: "sos-out-ra", label: "Stability ratio", value: (r) => fmt(r.ratio, 2) + (r.passes ? " - OK" : " - FAILS") },
     { key: "ec", id: "sos-out-ec", label: "Resultant eccentricity vs the B/6 kern", value: (r) => r.kern_ft === null ? "- (enter a footprint width)" : fmt(r.eccentricity_ft, 2) + " ft vs " + fmt(r.kern_ft, 2) + " ft - " + (r.in_kern ? "full bearing" : r.uplift ? "resultant off the base" : "partial uplift") },
@@ -12119,7 +12119,7 @@ export function computeMembraneFastenerTakeoff({ roof_area_sf = 8000, roll_width
   const fasteners_per_square = total_fasteners / (area / 100);
   const avg_spacing_in = seam_lf > 0 ? seam_lf * 12 / base_fasteners : null;
 
-  const note = "Usable sheet width is " + usable_w_ft.toFixed(2) + " ft after the " + lap + " in side lap, so a " + area.toFixed(0) + " sq ft roof has " + seam_lf.toFixed(0) + " LF of seam - and on a mechanically attached system the seams ARE the fastener rows, because the fasteners go through the side lap and the next sheet welds over them. "
+  const note = "Usable sheet width is " + usable_w_ft.toFixed(2) + " ft after the " + lap + " in side lap, so " + aFig(area.toFixed(0)) + " sq ft roof has " + seam_lf.toFixed(0) + " LF of seam - and on a mechanically attached system the seams ARE the fastener rows, because the fasteners go through the side lap and the next sheet welds over them. "
     + "Rows land on the usable width, not the nominal " + rw + " ft roll width; using the nominal width undercounts the rows and the fasteners with them. "
     + "At " + sf + " in on center in the field and " + sp + " in in the perimeter and corner zones, with " + pf + "% of the seam length in those zones, that is " + field_fasteners + " field plus " + perimeter_fasteners + " enhanced = " + base_fasteners + " fasteners, " + total_fasteners + " with " + waste + "% waste. "
     + "One plate per fastener, so " + plates + " plates. That works out to " + fasteners_per_square.toFixed(1) + " per square and an average of " + avg_spacing_in.toFixed(1) + " in along the seam. "
@@ -12145,7 +12145,7 @@ CONSTRUCTION_RENDERERS["membrane-fastener-takeoff"] = _simpleRenderer({
     { key: "waste_pct", label: "Waste allowance (%)", kind: "number", default: 5 },
   ],
   outputs: [
-    { key: "s", id: "mft-out-s", label: "Seam length (the fastener rows)", value: (r) => fmt(r.seam_lf, 0) + " LF on a " + fmt(r.usable_w_ft, 2) + " ft usable width" },
+    { key: "s", id: "mft-out-s", label: "Seam length (the fastener rows)", value: (r) => fmt(r.seam_lf, 0) + " LF on " + aFig(fmt(r.usable_w_ft, 2)) + " ft usable width" },
     { key: "f", id: "mft-out-f", label: "Fasteners (field / perimeter)", value: (r) => fmt(r.field_fasteners, 0) + " / " + fmt(r.perimeter_fasteners, 0) + " = " + fmt(r.base_fasteners, 0) + ", " + fmt(r.total_fasteners, 0) + " with waste" },
     { key: "p", id: "mft-out-p", label: "Plates", value: (r) => fmt(r.plates, 0) + " (one per fastener)" },
     { key: "t", id: "mft-out-t", label: "Cover tape", value: (r) => r.covered ? fmt(r.cover_tape_lf, 0) + " LF" : "none - all fasteners in welded laps" },
@@ -12207,7 +12207,7 @@ export function computeGuardPostLoad({ post_height_in = 36, post_spacing_ft = 6,
     + (concentrated_governs ? "the " + P + " lb CONCENTRATED load governs here" : "the UNIFORM load governs here at " + uniform_at_post_lb.toFixed(0) + " lb - posts spaced past " + (P / w).toFixed(1) + " ft cross over to it")
     + ". "
     + "That load " + h + " in up is " + moment_inlb.toFixed(0) + " in-lb (" + moment_ftlb.toFixed(0) + " ft-lb) at the base. "
-    + "The post itself: a " + b + " x " + d + " in section has S = " + section_modulus_in3.toFixed(2) + " in^3, needing " + required_fb_psi.toFixed(0) + " psi of bending stress"
+    + "The post itself: " + aFig(b) + " x " + d + " in section has S = " + section_modulus_in3.toFixed(2) + " in^3, needing " + required_fb_psi.toFixed(0) + " psi of bending stress"
     + (Fb > 0 ? " against the " + Fb + " psi allowable you entered - " + (post_ok ? "OK at " + (post_utilization * 100).toFixed(0) + "% utilization. " : "OVER at " + (post_utilization * 100).toFixed(0) + "%. ") : ". Enter an allowable bending stress for the species, grade, and adjustment factors to get a utilization. ")
     + "THE CONNECTION IS THE PROBLEM. The same " + moment_inlb.toFixed(0) + " in-lb has to be resolved into a couple across only " + lever + " in of fastener spacing, so each side of that couple carries " + connection_force_lb.toFixed(0) + " lb - " + force_multiplier.toFixed(1) + " times the load that was applied. The lever arm collapsed from " + h + " in to " + lever + " in and multiplied the force by exactly that ratio. This is why residential deck guards fail at the rim joist rather than at the post, why lag screws into the end grain of a rim are not acceptable, and why the tested details use through-bolts with washers plus blocking, or a proprietary tension hold-down. "
     + "Notching a post at the connection to clear the rim cuts the section right where the moment is highest - use the notched dimensions here if that is the detail. "
@@ -12360,7 +12360,7 @@ export function computeLandingCheck({ landing_depth_in = 0, landing_width_in = 0
   const note = (is_door
     ? "IRC R318.3 [R311.3 in IRC 2021] at an exterior door: a landing on each side, not less than " + minD + " in measured in the DIRECTION OF TRAVEL, at least as wide as the door it serves, and - the rule that catches people - the floor or landing at the required exit door not more than " + maxDrop + " in below the top of the threshold. "
     : "IRC R318.7.6 [R311.7.6 in IRC 2021] at a stairway: a floor or landing at the TOP AND BOTTOM of every flight, at least as WIDE as the flight it serves, and on a straight run at least " + minD + " in deep in the direction of travel. ")
-    + "This landing is " + d + " in deep by " + w + " in wide serving a " + fw + " in " + (is_door ? "door" : "flight") + ": depth " + (depth_ok ? "OK" : "SHORT by " + depth_deficit_in.toFixed(1) + " in") + ", width " + (width_ok ? "OK" : "SHORT by " + width_deficit_in.toFixed(1) + " in")
+    + "This landing is " + d + " in deep by " + w + " in wide serving " + aFig(fw) + " in " + (is_door ? "door" : "flight") + ": depth " + (depth_ok ? "OK" : "SHORT by " + depth_deficit_in.toFixed(1) + " in") + ", width " + (width_ok ? "OK" : "SHORT by " + width_deficit_in.toFixed(1) + " in")
     + (is_door ? ", threshold drop " + drop + " in " + (drop_ok ? "OK" : "EXCEEDS the limit by " + drop_excess_in.toFixed(2) + " in") : "") + ". " + (passes ? "PASSES. " : "DOES NOT PASS. ")
     + "The smallest compliant landing here is " + minD + " x " + fw + " in = " + min_landing_area_sf.toFixed(2) + " sq ft; this one is " + provided_area_sf.toFixed(2) + " sq ft. Area alone does not settle it - a landing can have plenty of area and still fail on depth, because the " + minD + " in is measured along the path a person actually walks, not across the landing. "
     + (is_door
@@ -12446,7 +12446,7 @@ export function computeDoorManeuveringClearance({ clear_perpendicular_in = 0, cl
       : "The push side of a door with NO closer and NO latch needs only the width of the doorway and " + P_PUSH + " in out. No latch-side strip is required in that case. ")
     + "This opening has " + perp + " in of depth against " + required_perpendicular_in + " required (" + (perp_ok ? "OK" : "SHORT by " + perpendicular_deficit_in.toFixed(1) + " in") + ")"
     + (pull ? " and " + latch + " in beyond the latch side against " + L_PULL + " required (" + (latch_ok ? "OK" : "SHORT by " + latch_deficit_in.toFixed(1) + " in") + ")" : "") + ". " + (passes ? "PASSES. " : "DOES NOT PASS. ")
-    + "The asymmetry in numbers: this face wants a " + required_perpendicular_in + " by " + required_width_in + " in footprint, " + required_area_sf.toFixed(1) + " sq ft, against " + other_area_sf.toFixed(1) + " sq ft on the other face"
+    + "The asymmetry in numbers: this face wants " + aFig(required_perpendicular_in) + " by " + required_width_in + " in footprint, " + required_area_sf.toFixed(1) + " sq ft, against " + other_area_sf.toFixed(1) + " sq ft on the other face"
     + (area_ratio !== null ? " - a factor of " + area_ratio.toFixed(2) + ". " : ". ")
     + "Both faces have to work, so check the door twice; a layout that clears on the push side tells you nothing about the pull side. "
     + "SCOPE - only the FRONT approach is checked here. Table 404.2.4.1 also covers hinge-side and latch-side approaches, which have different and generally larger requirements, and it ADDS clearance where a door has both a closer and a latch, including on the push side where none is otherwise required. Those rows are not reproduced; read the table for them, because a door with a closer is the common commercial case and the front-approach push-side numbers above do not apply to it. "
@@ -12522,7 +12522,7 @@ export function computeDryerDuctLength({ straight_run_ft = 0, elbow_90_count = 0
   const transition_over = trans > 8 + 1e-9 * Math.abs(8);
 
   const note = "Developed length is the straight run PLUS the equivalent length of every fitting, and the fittings are what actually consume the budget: "
-    + run + " ft of duct plus " + n90 + " ninety" + (n90 === 1 ? "" : "s") + " and " + n45 + " forty-five" + (n45 === 1 ? "" : "s") + " worth " + fitting_equivalent_ft.toFixed(2) + " ft = " + developed_length_ft.toFixed(2) + " ft against a " + maxL + " ft ceiling. "
+    + run + " ft of duct plus " + n90 + " ninety" + (n90 === 1 ? "" : "s") + " and " + n45 + " forty-five" + (n45 === 1 ? "" : "s") + " worth " + fitting_equivalent_ft.toFixed(2) + " ft = " + developed_length_ft.toFixed(2) + " ft against " + aFig(maxL) + " ft ceiling. "
     + (within ? "WITHIN, with " + remaining_straight_ft.toFixed(2) + " ft of straight run still available. " : "OVER by " + over_by_ft.toFixed(2) + " ft. ")
     + (has_elbows ? "Fittings are " + fitting_share_pct.toFixed(0) + "% of the total here" + (fitting_share_pct >= 40 ? " - nearly as much as the duct itself, which is the usual situation on a short interior run and the reason a 35 ft rule of thumb misleads. " : ". ") : "No fittings entered, so this is a straight-shot run. ")
     + (has_elbows && !equivalents_entered ? "WARNING: you entered elbows but left an equivalent length at zero, so this total is optimistic - it is counting those fittings as free. " : "")
@@ -12875,11 +12875,11 @@ export function computeScaffoldGuardrailCheck({ top_rail_height_in = 0, midrail_
   const passes = top_ok && (midrail_ok !== false) && (toeboard_ok !== false) && (toprail_cap_ok !== false) && (midrail_cap_ok !== false);
 
   const note = "TOP RAIL (1926.451(g)(4)): for a scaffold manufactured or placed in service after January 1, 2000, the top edge sits between " + TOP_MIN + " in and " + TOP_MAX + " in above the platform surface. This one is " + top + " in, " + (top_ok ? "in range. " : top_low ? "BELOW the range - and the standard does not allow a top edge under 36 in at all, so a low rail is not a paperwork problem. " : "ABOVE the range; the height may exceed 45 in where conditions warrant, but only if the system still meets every other criterion, so treat this as needing a justification rather than as automatically fine. ")
-    + "MIDRAIL: specified by RELATION, not by a number - approximately midway between the top edge and the platform surface. At a " + top + " in top rail that target is " + midrail_target_in.toFixed(1) + " in, "
+    + "MIDRAIL: specified by RELATION, not by a number - approximately midway between the top edge and the platform surface. At " + aFig(top) + " in top rail that target is " + midrail_target_in.toFixed(1) + " in, "
     + (midrail_entered ? "and " + mid + " in is " + Math.abs(midrail_offset_in).toFixed(1) + " in " + (midrail_offset_in >= 0 ? "above" : "below") + " it, " + (midrail_ok ? "within the " + tol + " in band used here. " : "outside the " + tol + " in band used here. ") : "and no midrail height was entered. ")
     + "That relation is the part a fixed shop standard gets wrong: a midrail set for a 45 in top rail sits " + (45 / 2 - 38 / 2).toFixed(1) + " in high under a 38 in one. The standard says approximately, not a dimension, so the band above is a judgment the tile makes visible rather than a code number. "
     + "CAPACITIES ARE PAIRED, not independent: " + (suspension ? "a single- or two-point adjustable suspension scaffold takes at least 100 lbf on the top rail, " : "a scaffold other than a single- or two-point adjustable suspension type takes at least 200 lbf on the top rail, ")
-    + "and the midrail must carry at least " + required_midrail_lb + " lbf, the figure 1926.451(g)(4)(xv) ties to a " + required_toprail_lb + " lbf top rail. "
+    + "and the midrail must carry at least " + required_midrail_lb + " lbf, the figure 1926.451(g)(4)(xv) ties to " + aFig(required_toprail_lb) + " lbf top rail. "
     + (toprail_cap_entered ? "Top rail " + topCap + " lbf against " + required_toprail_lb + " required: " + (toprail_cap_ok ? "OK. " : "SHORT. ") : "")
     + (midrail_cap_entered && required_midrail_lb !== null ? "Midrail " + midCap + " lbf against " + required_midrail_lb + " required: " + (midrail_cap_ok ? "OK. " : "SHORT. ") : "")
     + "TOEBOARD: at least " + TOE_MIN + " in high from the top edge of the toeboard to the level of the walking or working surface. " + (toeboard_entered ? "This one is " + toe + " in, " + (toeboard_ok ? "OK. " : "SHORT. ") : "None entered. ")
@@ -13141,7 +13141,7 @@ export function computeTemporaryStairwayCheck({ riser_count = 0, total_rise_in =
 
   const passes = angle_ok && uniform_ok && (rail_height_ok !== false) && (landing_ok !== false) && !(rail_required && !rail_entered);
 
-  const note = "ANGLE is bounded on BOTH sides: stairs shall be installed between " + ANGLE_MIN + " and " + ANGLE_MAX + " degrees from horizontal. A " + rh + " in riser on a " + td + " in tread is " + angle_deg.toFixed(1) + " degrees, " + (angle_ok ? "in range. " : too_shallow ? "TOO SHALLOW - and too shallow is a violation, not a courtesy. A run under 30 degrees is a ramp with steps in it, and people trip on it precisely because it does not read as stairs. " : "TOO STEEP. ")
+  const note = "ANGLE is bounded on BOTH sides: stairs shall be installed between " + ANGLE_MIN + " and " + ANGLE_MAX + " degrees from horizontal. " + aFig(rh, true) + " in riser on " + aFig(td) + " in tread is " + angle_deg.toFixed(1) + " degrees, " + (angle_ok ? "in range. " : too_shallow ? "TOO SHALLOW - and too shallow is a violation, not a courtesy. A run under 30 degrees is a ramp with steps in it, and people trip on it precisely because it does not read as stairs. " : "TOO STEEP. ")
     + "STAIRRAIL TRIGGER, read the unusual way: four or more risers OR rising more than " + RISE_TRIGGER + " in, WHICHEVER IS LESS - which means whichever comes FIRST, so either condition alone catches it. Here " + n + " riser" + (n === 1 ? "" : "s") + " and " + total_rise_used_in.toFixed(1) + " in of rise " + (rail_required ? "trigger it via " + trigger : "do not trigger it") + ". "
     + (rail_required
       ? "So a handrail and stairrail system is REQUIRED on unprotected sides. " + (rail_entered ? "The stairrail entered is " + rail + " in from its upper surface to the tread surface, against the " + RAIL_MIN + " in minimum for a post-1991 installation: " + (rail_height_ok ? "OK. " : "SHORT. ") : "No stairrail height entered, so this cannot be confirmed compliant. ")
@@ -13330,7 +13330,7 @@ export function computeMaterialStackingLimits({ material = "brick", stack_height
 
   const note = "RULE - " + rule + ". "
     + (material === "lumber"
-      ? "This pile is " + h + " ft against a " + max_height_ft + " ft limit" + (manual ? " because it is handled MANUALLY" : " for mechanically handled lumber") + ": " + (height_ok ? "OK. " : "OVER by " + height_over_ft.toFixed(1) + " ft. ")
+      ? "This pile is " + h + " ft against " + aFig(max_height_ft) + " ft limit" + (manual ? " because it is handled MANUALLY" : " for mechanically handled lumber") + ": " + (height_ok ? "OK. " : "OVER by " + height_over_ft.toFixed(1) + " ft. ")
         + "The same pile is legal or not depending on how it will be taken DOWN, not how it went up - 20 ft with a forklift, 16 ft by hand. A pile built to 20 ft and then unstacked by hand because the machine left the site has become non-compliant without anyone touching it, and that is the realistic failure. "
       : "This stack is " + h + " ft. "
         + (material === "brick"
@@ -13338,7 +13338,7 @@ export function computeMaterialStackingLimits({ material = "brick", stack_height
           : "The standard sets no explicit height ceiling for block in this section - only the taper - so height alone is not the test here. ")
         + (taper_required
           ? "Above the " + threshold_ft + " ft threshold it owes " + taper_required_in.toFixed(1) + " in of taper"
-            + (material === "block" ? " (" + tiers_above_threshold + " tier" + (tiers_above_threshold === 1 ? "" : "s") + " above " + threshold_ft + " ft at half of a " + bl + " in block each)" : " (" + (h - threshold_ft).toFixed(1) + " ft above " + threshold_ft + " at " + BRICK_TAPER_PER_FT + " in per foot)")
+            + (material === "block" ? " (" + tiers_above_threshold + " tier" + (tiers_above_threshold === 1 ? "" : "s") + " above " + threshold_ft + " ft at half of " + aFig(bl) + " in block each)" : " (" + (h - threshold_ft).toFixed(1) + " ft above " + threshold_ft + " at " + BRICK_TAPER_PER_FT + " in per foot)")
             + "; " + tp + " in provided, " + (taper_ok ? "OK. " : "SHORT by " + taper_shortfall_in.toFixed(1) + " in. ")
           : "It is at or below the " + threshold_ft + " ft threshold, so no taper is required yet. ")
         + "THE TRAP: the threshold and the ceiling are different numbers, so a stack can be perfectly legal in HEIGHT and still illegal in SHAPE. A 5 ft brick stack is nowhere near the 7 ft limit and already owes 2 in of taper. People check the height, see room to spare, and stop reading. ")

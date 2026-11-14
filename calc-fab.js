@@ -23,7 +23,7 @@
 // FAB_RENDERERS map, mirroring every other calc-*.js module.
 // =====================================================================
 
-import {
+import { aFig,
   DEBOUNCE_MS, debounce, makeNumber, makeSelect, makeTextarea,
   makeOutputLine, attachExampleButton, fmt,
   makeStepsPanel,
@@ -1722,7 +1722,7 @@ export function computeBarNesting({ cut_list = "", stock_length_in = 240, kerf_i
     const qty = Number(parts[1]);
     if (!Number.isFinite(len) || !(len > 0)) return { error: "Piece length must be a positive number: " + line };
     if (!Number.isFinite(qty) || !Number.isInteger(qty) || qty < 1) return { error: "Quantity must be a whole number of 1 or more: " + line };
-    if (len > usable) return { error: "A " + len + " in piece does not fit a " + usable + " in usable stick." };
+    if (len > usable) return { error: aFig(len, true) + " in piece does not fit " + aFig(usable) + " in usable stick." };
     for (let i = 0; i < qty; i++) pieces.push(len);
     if (pieces.length > 5000) return { error: "Cut list is too large for this tool (over 5,000 pieces)." };
   }

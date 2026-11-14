@@ -309,7 +309,7 @@ export function computePPE({ category }) {
 
 // --- Renderers ---
 
-import {
+import { aFig,
   DEBOUNCE_MS, debounce, makeNumber, makeTextarea, makeSelect, makeCheckbox,
   makeOutputLine, attachExampleButton, fmt,
   makeStepsPanel,
@@ -734,7 +734,7 @@ export function renderNAMSizing(inputRegion, outputRegion, citationEl) {
     o500.textContent = get(500).units_needed + " unit(s) (" + fmt(get(500).total_cfm, 0) + " CFM)";
     o1000.textContent = get(1000).units_needed + " unit(s) (" + fmt(get(1000).total_cfm, 0) + " CFM)";
     o2000.textContent = get(2000).units_needed + " unit(s) (" + fmt(get(2000).total_cfm, 0) + " CFM)";
-    oRated.textContent = r.rated_cfm_needed === null ? "(enter a HEPA loading derate) -- a machine is rated at a CLEAN filter and delivers less as it loads" : fmt(r.rated_cfm_needed, 0) + " CFM rated to still deliver " + fmt(r.required_cfm, 0) + " at a " + fmt(r.filter_loading_derate_pct, 0) + "% derate";
+    oRated.textContent = r.rated_cfm_needed === null ? "(enter a HEPA loading derate) -- a machine is rated at a CLEAN filter and delivers less as it loads" : fmt(r.rated_cfm_needed, 0) + " CFM rated to still deliver " + fmt(r.required_cfm, 0) + " at " + aFig(fmt(r.filter_loading_derate_pct, 0)) + "% derate";
     oNeg.textContent = r.makeup_area_needed_ft2 === null ? "(enter a negative pressure target) -- pressure is a SEPARATE requirement from the air change rate, and a containment cannot go negative unless air can get in" : fmt(r.makeup_area_needed_ft2, 2) + " ft\u00b2 of opening (Cd 0.61) at " + fmt(r.makeup_velocity_fpm, 0) + " fpm ideal velocity for " + fmt(r.target_negative_wc, 3) + " in wc" + (r.makeup_adequate === null ? "" : r.makeup_adequate ? " -- the entered opening is adequate" : " -- the entered opening is SMALLER than that, so the pressure will overshoot and the flow fall short");
   }, DEBOUNCE_MS);
   for (const el of [v.input, ach.input, derate.input, negwc.input, makeup.input]) el.addEventListener("input", update);

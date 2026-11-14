@@ -4,7 +4,7 @@
 // formulas, fields, outputs, citations, examples, and Group C assignments
 // are unchanged.
 
-import {
+import { aFig,
   DEBOUNCE_MS, debounce, makeNumber, makeSelect,
   makeOutputLine, attachExampleButton, fmt, fmtDir,
   makeStepsPanel,
@@ -141,7 +141,7 @@ export function computeGrilleNeckNc({
       : "NC " + fmt(effective_nc, 0) + " against an NC " + fmt(room_nc_target, 0) + " target -- OVER by " + fmt(over_target_db, 1) + " points";
   const sizeVerdict = !has_next
     ? "no next size up was entered. THE FIFTH-POWER RELATION IS WHAT MAKES THIS FIXABLE: sound power rises roughly with the fifth power of velocity, so a modest size increase buys a large NC reduction"
-    : "ONE SIZE UP takes the velocity to " + fmt(next_velocity_fpm, 0) + " fpm, a " + fmt(velocity_drop_pct, 0) + "% reduction -- and at a fifth-power relation that is " + fmt(nc_change_db, 1) + " dB, putting it near NC " + fmt(next_nc, 0) + (has_target ? (next_meets ? ", comfortably inside the target" : ", still over the target") : "") + ". VERY FEW HVAC PROBLEMS RESPOND THAT STRONGLY TO SUCH A SMALL CHANGE -- it costs the price difference between two diffusers";
+    : "ONE SIZE UP takes the velocity to " + fmt(next_velocity_fpm, 0) + " fpm, " + aFig(fmt(velocity_drop_pct, 0)) + "% reduction -- and at a fifth-power relation that is " + fmt(nc_change_db, 1) + " dB, putting it near NC " + fmt(next_nc, 0) + (has_target ? (next_meets ? ", comfortably inside the target" : ", still over the target") : "") + ". VERY FEW HVAC PROBLEMS RESPOND THAT STRONGLY TO SUCH A SMALL CHANGE -- it costs the price difference between two diffusers";
   const capacityVerdict = !has_target
     ? "no room target was entered, so no capacity at a criterion is reported"
     : "this size passes " + fmt(cfm_at_target, 0) + " cfm and still meets NC " + fmt(room_nc_target, 0) + ", against the " + fmt(airflow_cfm, 0) + " asked of it";
@@ -216,12 +216,12 @@ export function computeDuctBreakoutNoise({
   // Solved from the uncapped relation, which is where a TL requirement bites.
   const tl_required_db = has_criterion ? Math.max(0, sound_power_db + area_gain_db + room_term_db - lagging_improvement_db - room_criterion_db) : 0;
 
-  const areaVerdict = "a " + fmt(duct_width_in, 0) + " by " + fmt(duct_height_in, 0) + " in duct running " + fmt(exposed_length_ft, 0) + " ft through the space presents " + fmt(exposed_area_ft2, 0) + " sq ft of radiating surface";
+  const areaVerdict = aFig(fmt(duct_width_in, 0)) + " by " + fmt(duct_height_in, 0) + " in duct running " + fmt(exposed_length_ft, 0) + " ft through the space presents " + fmt(exposed_area_ft2, 0) + " sq ft of radiating surface";
   const shapeVerdict = wide_flat
     ? "AND ITS ASPECT RATIO IS " + fmt(aspect_ratio, 1) + " TO 1, which is close to the worst case. A large flat sheet-metal panel is an efficient radiator at low frequency, and the wider and flatter the panel the worse it is -- which is exactly the shape a tight ceiling forces"
     : "its aspect ratio is " + fmt(aspect_ratio, 1) + " to 1. Flat panels radiate efficiently at low frequency and the wider and flatter they are the worse, so a squarer duct is already better than a wide shallow one of the same area";
   const roundVerdict = "AN EQUAL-AREA ROUND DUCT WOULD BE " + fmt(round_diameter_in, 1) + " in, presenting " + fmt(round_area_ft2, 0) + " sq ft -- and the area is not the point. A cylinder is stiff and has no flat panels to flex, so its breakout transmission loss is dramatically higher, commonly 15 to 25 dB better at low frequency. THAT IS THE SECOND CHEAPEST FIX AND IT IS A DESIGN DECISION, not a field one";
-  const levelVerdict = fmt(sound_power_db, 0) + " dB of sound power in the duct, plus " + fmt(area_gain_db, 1) + " dB for " + fmt(exposed_area_ft2, 0) + " sq ft of wall against a " + fmt(duct_cross_section_ft2, 1) + " sq ft duct section, less " + fmt(breakout_tl_db, 0) + " dB of breakout transmission loss, is " + fmt(breakout_lw_db, 1) + " dB of breakout sound power; into " + fmt(room_absorption_sabins, 0) + " " + (fmt(room_absorption_sabins, 0) === "1" ? "sabin" : "sabins") + " that is " + fmt(room_spl_db, 1) + " dB in the room";
+  const levelVerdict = fmt(sound_power_db, 0) + " dB of sound power in the duct, plus " + fmt(area_gain_db, 1) + " dB for " + fmt(exposed_area_ft2, 0) + " sq ft of wall against " + aFig(fmt(duct_cross_section_ft2, 1)) + " sq ft duct section, less " + fmt(breakout_tl_db, 0) + " dB of breakout transmission loss, is " + fmt(breakout_lw_db, 1) + " dB of breakout sound power; into " + fmt(room_absorption_sabins, 0) + " " + (fmt(room_absorption_sabins, 0) === "1" ? "sabin" : "sabins") + " that is " + fmt(room_spl_db, 1) + " dB in the room";
   const laggingVerdict = !has_lagging
     ? "no lagging was entered. IT WORKS ONLY IF IT IS DONE CORRECTLY: a limp mass layer DECOUPLED from the duct by a soft layer adds transmission loss, while mass strapped directly to the metal couples to it and does much less. And because the complaint is low-frequency rumble, thin materials do almost nothing -- the required surface mass is substantial"
     : "with " + fmt(lagging_improvement_db, 0) + " dB of lagging the room level is " + fmt(lagged_spl_db, 1) + " dB. Lagging works only when the mass layer is DECOUPLED from the duct by a soft layer; mass strapped straight to the metal couples to it and does much less, and thin materials do almost nothing against low-frequency rumble";
@@ -309,12 +309,12 @@ export function computeSilencerInsertionLoss({
   const static_margin_in_wc = has_fan ? fan_available_static_in_wc - pressure_drop_in_wc : 0;
   const static_short = has_fan && static_margin_in_wc < -1e-9;
 
-  const faceVerdict = "a " + fmt(face_width_in, 0) + " by " + fmt(face_height_in, 0) + " in face is " + fmt(face_area_ft2, 2) + " sq ft, so " + fmt(airflow_cfm, 0) + " cfm runs at " + fmt(face_velocity_fpm, 0) + " fpm and costs " + fmt(pressure_drop_in_wc, 2) + " in wc";
+  const faceVerdict = aFig(fmt(face_width_in, 0)) + " by " + fmt(face_height_in, 0) + " in face is " + fmt(face_area_ft2, 2) + " sq ft, so " + fmt(airflow_cfm, 0) + " cfm runs at " + fmt(face_velocity_fpm, 0) + " fpm and costs " + fmt(pressure_drop_in_wc, 2) + " in wc";
   const squeezeVerdict = !has_alt
     ? "no alternative face was entered. PRESSURE DROP RISES WITH THE SQUARE OF VELOCITY, so a silencer squeezed into a duct that is already undersized costs far more static than its catalogue figure suggests"
     : alt_face_velocity_fpm < face_velocity_fpm
-    ? "OPENING IT UP to " + fmt(alt_face_width_in, 0) + " by " + fmt(alt_face_height_in, 0) + " in takes the velocity down to " + fmt(alt_face_velocity_fpm, 0) + " fpm -- a " + fmt(-velocity_increase_pct, 0) + "% decrease -- and the pressure drop to " + fmt(alt_pressure_drop_in_wc, 2) + " in wc, which is " + fmt(drop_ratio, 2) + " times as much. THE DROP GOES WITH THE SQUARE, so the larger face gives back " + fmt(-drop_increase_in_wc, 2) + " in wc of the fan's available static"
-    : "SQUEEZING IT to " + fmt(alt_face_width_in, 0) + " by " + fmt(alt_face_height_in, 0) + " in takes the velocity to " + fmt(alt_face_velocity_fpm, 0) + " fpm -- a " + fmt(velocity_increase_pct, 0) + "% increase -- and the pressure drop to " + fmt(alt_pressure_drop_in_wc, 2) + " in wc, which is " + fmt(drop_ratio, 2) + " times as much. THE DROP GOES WITH THE SQUARE, so a 44% velocity increase roughly DOUBLES it, and that extra " + fmt(drop_increase_in_wc, 2) + " in wc comes out of the fan's available static";
+    ? "OPENING IT UP to " + fmt(alt_face_width_in, 0) + " by " + fmt(alt_face_height_in, 0) + " in takes the velocity down to " + fmt(alt_face_velocity_fpm, 0) + " fpm -- " + aFig(fmt(-velocity_increase_pct, 0)) + "% decrease -- and the pressure drop to " + fmt(alt_pressure_drop_in_wc, 2) + " in wc, which is " + fmt(drop_ratio, 2) + " times as much. THE DROP GOES WITH THE SQUARE, so the larger face gives back " + fmt(-drop_increase_in_wc, 2) + " in wc of the fan's available static"
+    : "SQUEEZING IT to " + fmt(alt_face_width_in, 0) + " by " + fmt(alt_face_height_in, 0) + " in takes the velocity to " + fmt(alt_face_velocity_fpm, 0) + " fpm -- " + aFig(fmt(velocity_increase_pct, 0)) + "% increase -- and the pressure drop to " + fmt(alt_pressure_drop_in_wc, 2) + " in wc, which is " + fmt(drop_ratio, 2) + " times as much. THE DROP GOES WITH THE SQUARE, so a 44% velocity increase roughly DOUBLES it, and that extra " + fmt(drop_increase_in_wc, 2) + " in wc comes out of the fan's available static";
   const targetVerdict = !has_target
     ? "no target face velocity was entered"
     : "to bring the face velocity to " + fmt(target_velocity_fpm, 0) + " fpm needs " + fmt(target_face_area_ft2, 2) + " sq ft of face -- a transition rather than a bigger duct, keeping the duct velocity wherever it needs to be and slowing the air only THROUGH the silencer";
@@ -474,7 +474,7 @@ export function computeRooftopCurbUplift({
   const fasteners_required = has_capacity && per_windward_lb > 0 && windward_fastener_count > 0
     ? Math.ceil(windward_fastener_count * demand_ratio - 1e-9) : 0;
 
-  const upliftVerdict = "a " + fmt(unit_length_ft, 1) + " by " + fmt(unit_width_ft, 1) + " ft unit is " + fmt(plan_area_ft2, 0) + " sq ft, so " + fmt(uplift_psf, 0) + " psf of net uplift is " + fmt(uplift_lb, 0) + " lb -- " + fmt(uplift_pct_of_weight, 0) + "% of the unit's " + fmt(unit_weight_lb, 0) + " lb weight";
+  const upliftVerdict = aFig(fmt(unit_length_ft, 1)) + " by " + fmt(unit_width_ft, 1) + " ft unit is " + fmt(plan_area_ft2, 0) + " sq ft, so " + fmt(uplift_psf, 0) + " psf of net uplift is " + fmt(uplift_lb, 0) + " lb -- " + fmt(uplift_pct_of_weight, 0) + "% of the unit's " + fmt(unit_weight_lb, 0) + " lb weight";
   const directionVerdict = weight_governs
     ? "THE WEIGHT WINS ON DIRECT UPLIFT, with " + fmt(weight_reserve_lb, 0) + " lb of reserve: 0.6 x the unit's " + fmt(unit_weight_lb, 0) + " lb (ASCE 7 ASD) exceeds the " + fmt(uplift_lb, 0) + " lb of uplift, so the direct wind load is fully resisted before any fastener is counted. THAT DOES NOT MEAN THE ANCHORAGE IS ADEQUATE -- the overturning couple below is a separate demand and it is the one that governs here"
     : "THE WIND WINS ON DIRECT UPLIFT by " + fmt(net_uplift_lb, 0) + " lb: " + fmt(uplift_lb, 0) + " lb of uplift against 0.6 x the unit's " + fmt(unit_weight_lb, 0) + " lb of weight (ASCE 7 ASD), and that net is distributed among the fasteners before the overturning couple is added";

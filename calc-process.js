@@ -19,7 +19,7 @@
 //
 // spec-v1712 is Group B rather than G -- read the group letter off the spec
 // header, not off the subject.
-import {
+import { aFig,
   DEBOUNCE_MS, debounce, makeNumber, makeSelect,
   makeOutputLine, attachExampleButton, fmt, fmtDir,
   makeStepsPanel,
@@ -278,19 +278,19 @@ export function computeInjectionCoolingTime({
   if (!(_tempTerm > 0)) return { error: "The temperature term is not positive -- check the melt, mould and ejection temperatures." };
   const _coolFor = (h) => (h * h) / (Math.PI * Math.PI * alpha_in2_s) * _tempTerm;
   const cooling_time_s = _coolFor(wall_thickness_in);
-  const cooling_verdict = "cooling takes " + fmt(cooling_time_s, 1) + " seconds for a " + fmt(wall_thickness_in, 3) + " in wall at a diffusivity of " + fmt(alpha_in2_s, 5) + " in2/s";
+  const cooling_verdict = "cooling takes " + fmt(cooling_time_s, 1) + " seconds for " + aFig(fmt(wall_thickness_in, 3)) + " in wall at a diffusivity of " + fmt(alpha_in2_s, 5) + " in2/s";
   const has_alt = alt_wall_thickness_in > 0;
   const alt_cooling_time_s = has_alt ? _coolFor(alt_wall_thickness_in) : 0;
   const thickness_ratio = has_alt ? alt_wall_thickness_in / wall_thickness_in : 0;
   const time_ratio = has_alt ? thickness_ratio * thickness_ratio : 0;
   const square_verdict = !has_alt
     ? "(no alternative thickness entered -- the square law is the whole point of this calculation, so enter one)"
-    : "a " + fmt(alt_wall_thickness_in, 3) + " in wall is " + fmtDir((thickness_ratio - 1) * 100, 0, "%", "thicker", "thinner") + " and cools in " + fmt(alt_cooling_time_s, 1) + " seconds -- " + fmtDir((time_ratio - 1) * 100, 0, "%", "longer", "shorter") + ", because cooling goes with the SQUARE of the wall. That is why a stiffness change a designer makes without thinking of it as a cost change is one";
+    : aFig(fmt(alt_wall_thickness_in, 3)) + " in wall is " + fmtDir((thickness_ratio - 1) * 100, 0, "%", "thicker", "thinner") + " and cools in " + fmt(alt_cooling_time_s, 1) + " seconds -- " + fmtDir((time_ratio - 1) * 100, 0, "%", "longer", "shorter") + ", because cooling goes with the SQUARE of the wall. That is why a stiffness change a designer makes without thinking of it as a cost change is one";
   // Coring: a solid section split into two walls of the entered thickness.
   const cored_time_s = has_alt ? _coolFor(alt_wall_thickness_in / 2) : 0;
   const coring_verdict = !has_alt
     ? "(no alternative thickness entered)"
-    : "cored into two " + fmt(alt_wall_thickness_in / 2, 3) + " in walls the same section cools in " + fmt(cored_time_s, 1) + " seconds, a " + fmt((1 - cored_time_s / alt_cooling_time_s) * 100, 0) + "% reduction in the cooling portion of the cycle -- from a geometry change that costs nothing per part. Coring is the counter-move to a thick section, and it is available before the tool is cut and not after";
+    : "cored into two " + fmt(alt_wall_thickness_in / 2, 3) + " in walls the same section cools in " + fmt(cored_time_s, 1) + " seconds, " + aFig(fmt((1 - cored_time_s / alt_cooling_time_s) * 100, 0)) + "% reduction in the cooling portion of the cycle -- from a geometry change that costs nothing per part. Coring is the counter-move to a thick section, and it is available before the tool is cut and not after";
   const has_cycle = non_cooling_cycle_s > 0;
   const cycle_time_s = has_cycle ? cooling_time_s + non_cooling_cycle_s : cooling_time_s;
   const cooling_share_pct = cycle_time_s > 0 ? cooling_time_s / cycle_time_s * 100 : 0;
@@ -355,7 +355,7 @@ export function computeMoldShrinkageDimension({
   const _cavity = (s) => part_dimension_in / (1 - s);
   const cavity_flow_in = _cavity(shrinkage_flow_in_in);
   const oversize_in = cavity_flow_in - part_dimension_in;
-  const cavity_verdict = "cut the cavity " + fmt(cavity_flow_in, 4) + " in -- " + fmt(oversize_in * 1000, 1) + " thousandths oversize on a " + fmt(part_dimension_in, 3) + " in dimension, at " + fmt(shrinkage_flow_in_in, 4) + " in/in of shrinkage";
+  const cavity_verdict = "cut the cavity " + fmt(cavity_flow_in, 4) + " in -- " + fmt(oversize_in * 1000, 1) + " thousandths oversize on " + aFig(fmt(part_dimension_in, 3)) + " in dimension, at " + fmt(shrinkage_flow_in_in, 4) + " in/in of shrinkage";
   const has_cross = shrinkage_cross_in_in > 0;
   const cavity_cross_in = has_cross ? _cavity(shrinkage_cross_in_in) : 0;
   const anisotropy_in = has_cross ? cavity_flow_in - cavity_cross_in : 0;
@@ -377,7 +377,7 @@ export function computeMoldShrinkageDimension({
   const part_from_cavity_in = has_existing ? existing_cavity_in * (1 - shrinkage_flow_in_in) : 0;
   const existing_verdict = !has_existing
     ? "(no existing cavity dimension entered)"
-    : "an existing " + fmt(existing_cavity_in, 4) + " in cavity makes a " + fmt(part_from_cavity_in, 4) + " in part in this material, " + fmt(Math.abs(part_from_cavity_in - part_dimension_in) * 1000, 1) + " thousandths " + (part_from_cavity_in > part_dimension_in ? "OVER" : "UNDER") + " the nominal -- which is what a mould cut for one material and run in another produces, and on a fitted part it is a scrapped tool";
+    : "an existing " + fmt(existing_cavity_in, 4) + " in cavity makes " + aFig(fmt(part_from_cavity_in, 4)) + " in part in this material, " + fmt(Math.abs(part_from_cavity_in - part_dimension_in) * 1000, 1) + " thousandths " + (part_from_cavity_in > part_dimension_in ? "OVER" : "UNDER") + " the nominal -- which is what a mould cut for one material and run in another produces, and on a fitted part it is a scrapped tool";
   if (![cavity_flow_in, cavity_cross_in, anisotropy_in, cavity_low_in, cavity_high_in, range_in, part_from_cavity_in].every(Number.isFinite)) return { error: "Shrinkage math is not a finite value." };
   return {
     cavity_flow_in, oversize_in, cavity_verdict, has_cross, cavity_cross_in, anisotropy_in,
@@ -452,7 +452,7 @@ export function computeExtrusionOutputRate({
   const draw_down_ratio = has_die ? die_opening_in / product_od_in : 0;
   const draw_verdict = !has_die
     ? "(no die opening entered)"
-    : "the die opens " + fmt(die_opening_in, 3) + " in for a " + fmt(product_od_in, 3) + " in product, a draw-down ratio of " + fmt(draw_down_ratio, 3) + ". The material is drawn between die and calibrator, which ORIENTS it and affects properties as well as size -- so line speed and output are not independently adjustable without changing that ratio";
+    : "the die opens " + fmt(die_opening_in, 3) + " in for " + aFig(fmt(product_od_in, 3)) + " in product, a draw-down ratio of " + fmt(draw_down_ratio, 3) + ". The material is drawn between die and calibrator, which ORIENTS it and affects properties as well as size -- so line speed and output are not independently adjustable without changing that ratio";
   const has_cooling = cooling_capacity_lb_h > 0;
   const cooling_speed_ft_min = has_cooling ? cooling_capacity_lb_h / (lb_per_ft * 60) : 0;
   const cooling_governs = has_cooling && has_output && cooling_capacity_lb_h < extruder_output_lb_h;
@@ -466,7 +466,7 @@ export function computeExtrusionOutputRate({
   const shift_pounds = has_speed ? output_at_speed_lb_h * shift_hours : 0;
   const consumption_verdict = !has_speed
     ? "(no line speed entered)"
-    : "that is " + fmt(shift_pounds, 0) + " lb of material over a " + fmt(shift_hours, 1) + " hour shift" + (speed_exceeds_capacity ? ", at a line speed the extruder or bath cannot hold (see above)" : "");
+    : "that is " + fmt(shift_pounds, 0) + " lb of material over " + aFig(fmt(shift_hours, 1)) + " hour shift" + (speed_exceeds_capacity ? ", at a line speed the extruder or bath cannot hold (see above)" : "");
   if (![area_in2, output_at_speed_lb_h, speed_at_output_ft_min, draw_down_ratio, lb_per_ft, shift_pounds].every(Number.isFinite)) return { error: "Extrusion rate math is not a finite value." };
   return {
     id_in, area_in2, thin_wall_area_in2, lb_per_ft, area_verdict,
@@ -526,7 +526,7 @@ export function computeThermoformingDrawRatio({
   const areal_draw_ratio = formed_area_in2 / original_area_in2;
   const average_wall_in = sheet_thickness_in / areal_draw_ratio;
   const within_limit = hd_ratio <= hd_limit + 1e-9 * Math.abs(hd_limit);
-  const depth_verdict = "the draw is H/D " + fmt(hd_ratio, 3) + " (" + fmt(draw_depth_in, 2) + " in deep on a " + fmt(opening_diameter_in, 2) + " in opening), "
+  const depth_verdict = "the draw is H/D " + fmt(hd_ratio, 3) + " (" + fmt(draw_depth_in, 2) + " in deep on " + aFig(fmt(opening_diameter_in, 2)) + " in opening), "
     + (within_limit
       ? "within the " + fmt(hd_limit, 2) + " practical limit for unassisted female forming"
       : "ABOVE the " + fmt(hd_limit, 2) + " practical limit for unassisted female forming -- this part needs plug assist or pressure forming");
@@ -685,7 +685,7 @@ export function computeThermoplasticTemperatureDerate({
       ? "the system runs " + fmt(operating_pressure_psi, 0) + " psi on a pipe that is not rated at this temperature at all"
       : passes
         ? "the system runs " + fmt(operating_pressure_psi, 0) + " psi, " + fmt(utilization_pct, 0) + "% of the derated rating, with " + fmt(margin_psi, 0) + " psi of margin"
-        : "the system runs " + fmt(operating_pressure_psi, 0) + " psi against a " + fmt(derated_pressure_psi, 0) + " psi allowable -- " + fmt(-margin_psi, 0) + " psi OVER, and " + fmt(utilization_pct, 0) + "% of the rating. Plastic pipe ratings are long-term hydrostatic strength figures, so a modest overpressure may not fail on the day -- it fails early instead, and the failure gets blamed on the pipe; far over the rating it can fail at once";
+        : "the system runs " + fmt(operating_pressure_psi, 0) + " psi against " + aFig(fmt(derated_pressure_psi, 0)) + " psi allowable -- " + fmt(-margin_psi, 0) + " psi OVER, and " + fmt(utilization_pct, 0) + "% of the rating. Plastic pipe ratings are long-term hydrostatic strength figures, so a modest overpressure may not fail on the day -- it fails early instead, and the failure gets blamed on the pipe; far over the rating it can fail at once";
   // The inversion: what pressure this line may carry at this temperature.
   const allowable_verdict = over_temp ? "NO ALLOWABLE: the material is not rated at this temperature, so the " + fmt(derated_pressure_psi, 0) + " psi the factor gives is not a design figure" : "the allowable at this temperature is " + fmt(derated_pressure_psi, 0) + " psi. Design to that figure, not to the number printed on the pipe, because the printed rating is stated at 73 degF and sustained temperature is exactly what the derating addresses";
   const has_alt = alt_derating_factor > 0;
@@ -826,7 +826,7 @@ export function computeRiserModulusFeeding({
   // A cylindrical riser of height equal to its diameter has a modulus of d/6 when every surface cools;
   // a riser sitting on the casting loses its bottom face and is d/5 (not modeled here; the d/6 case is used).
   const riser_diameter_in = 6 * riser_modulus_in / sleeve_factor;
-  const modulus_verdict = "the section is " + fmt(section_volume_in3, 1) + " in3 over " + fmt(section_surface_in2, 1) + " in2, a modulus of " + fmt(casting_modulus_in, 4) + " in. At a " + fmt(modulus_ratio, 2) + " ratio the riser needs " + fmt(riser_modulus_in, 4) + " in of modulus, which a cylinder of height equal to its diameter reaches at " + fmt(riser_diameter_in, 2) + " in"
+  const modulus_verdict = "the section is " + fmt(section_volume_in3, 1) + " in3 over " + fmt(section_surface_in2, 1) + " in2, a modulus of " + fmt(casting_modulus_in, 4) + " in. At " + aFig(fmt(modulus_ratio, 2)) + " ratio the riser needs " + fmt(riser_modulus_in, 4) + " in of modulus, which a cylinder of height equal to its diameter reaches at " + fmt(riser_diameter_in, 2) + " in"
     + (sleeve_factor !== 1 ? " with the " + fmt(sleeve_factor, 2) + "x sleeve" : "");
   const riser_volume_in3 = Math.PI / 4 * riser_diameter_in * riser_diameter_in * riser_diameter_in;
   const has_volume_check = shrinkage_pct > 0 && riser_efficiency_pct > 0;
@@ -1145,7 +1145,7 @@ export function computeMeltFurnaceEnergy({
   const btu_per_saleable_lb = has_yield ? input_btu / (charge_weight_lb * casting_yield_pct / 100) : 0;
   const yield_verdict = !has_yield
     ? "(no casting yield entered -- and the yield is the second multiplier)"
-    : "at a " + fmt(casting_yield_pct, 0) + "% casting yield only " + fmt(charge_weight_lb * casting_yield_pct / 100, 0) + " lb of this charge becomes saleable casting, so the energy per pound SOLD is " + fmt(btu_per_saleable_lb, 0) + " BTU against " + fmt(theoretical_btu_lb, 0) + " theoretical -- " + fmt(btu_per_saleable_lb / theoretical_btu_lb, 1) + " times, once furnace efficiency and yield are BOTH counted. That number, not the theoretical one, is what the energy bill reflects";
+    : "at " + aFig(fmt(casting_yield_pct, 0)) + "% casting yield only " + fmt(charge_weight_lb * casting_yield_pct / 100, 0) + " lb of this charge becomes saleable casting, so the energy per pound SOLD is " + fmt(btu_per_saleable_lb, 0) + " BTU against " + fmt(theoretical_btu_lb, 0) + " theoretical -- " + fmt(btu_per_saleable_lb / theoretical_btu_lb, 1) + " times, once furnace efficiency and yield are BOTH counted. That number, not the theoretical one, is what the energy bill reflects";
   if (![theoretical_mmbtu, input_mmbtu, input_kwh, cost_per_heat, btu_per_saleable_lb, alt_input_mmbtu].every(Number.isFinite)) return { error: "Melt energy math is not a finite value." };
   return {
     theoretical_btu, theoretical_mmbtu, input_btu, input_mmbtu, input_kwh, energy_verdict,

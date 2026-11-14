@@ -18,7 +18,7 @@
 // LAYOUT_RENDERERS map, mirroring every other calc-*.js module.
 // =====================================================================
 
-import {
+import { aFig,
   DEBOUNCE_MS, debounce, makeNumber, makeSelect,
   makeOutputLine, attachExampleButton, fmt,
   stepsFor,
@@ -539,7 +539,7 @@ export function computeThreadPitch({ thread_standard = "inch", tpi = 0, pitch_mm
   const notes = [];
   notes.push("Inch pitch P = 1 / TPI; metric pitch is the millimetre value (TPI = 25.4 / P). Lead = pitch x starts is the axial advance per turn; on a single-start thread the lead equals the pitch.");
   notes.push("The 60-degree sharp-V height H = P x cos(30) = P x sqrt(3) / 2 is the theoretical fundamental triangle; the actual truncated thread depth is thread-form- and class-specific (UN crest/root flats, ISO 60-degree truncation) and is not computed here; tap-drill-size gives the drill.");
-  if (n > 1) notes.push("A " + n + "-start thread advances " + n + "x the pitch per turn for faster traverse with the same pitch (thread depth).");
+  if (n > 1) notes.push(aFig(n, true) + "-start thread advances " + n + "x the pitch per turn for faster traverse with the same pitch (thread depth).");
   return {
     thread_standard: isMetric ? "metric" : "inch",
     pitch_in, pitch_mm: pmm, tpi: threadsPerInch, starts: n,
@@ -820,7 +820,7 @@ export function computePolygonMiter({ sides = 0, size_mode = "side", size_in = 0
   const perimeter_in = N * side;
   const area_in2 = (0.25 * N * side * side) / Math.tan(half);
   const notes = [];
-  notes.push("Cut all " + N + " pieces with a " + fmt(miter_angle_deg, 3) + " degree miter at both ends (" + (2 * N) + " cuts); the saw is set to " + fmt(miter_angle_deg, 3) + " degrees off square. The interior corner angle is " + fmt(interior_angle_deg, 3) + " degrees.");
+  notes.push("Cut all " + N + " pieces with " + aFig(fmt(miter_angle_deg, 3)) + " degree miter at both ends (" + (2 * N) + " cuts); the saw is set to " + fmt(miter_angle_deg, 3) + " degrees off square. The interior corner angle is " + fmt(interior_angle_deg, 3) + " degrees.");
   notes.push("Across-flats is the face-to-face width (a column-wrap or planter width); across-corners is the point-to-point diameter (the circumscribed circle). First-principles regular-polygon geometry - cut a scrap test joint first and allow for blade kerf, which shortens each piece.");
   return { sides: N, side_in: side, miter_angle_deg, interior_angle_deg, across_flats_in, across_corners_in, perimeter_in, area_in2, notes };
 }
@@ -903,7 +903,7 @@ export function computeEqualSpacing({ run_in = 0, item_width_in = 0, mode = "max
   }
   const notes = [];
   if (!fits) {
-    notes.push("The " + N + " items at " + fmt(w, 3) + " in wide do not fit in a " + fmt(run, 3) + " in run (they would need a negative gap). Reduce the count or the item width.");
+    notes.push("The " + N + " items at " + fmt(w, 3) + " in wide do not fit in " + aFig(fmt(run, 3)) + " in run (they would need a negative gap). Reduce the count or the item width.");
   } else if (m === "max-gap") {
     notes.push("Smallest count whose gap stays at or below " + fmt(Number(max_gap_in) || 0, 3) + " in: " + N + " item(s), with " + (N + 1) + " equal gaps of " + fmt(gap_in, 4) + " in. Center-to-center pitch " + fmt(center_to_center_in, 4) + " in.");
     notes.push("The gap limit is user-supplied. For a guard / railing the IRC R321.1.3 [R312.1.3 in IRC 2021] rule is that a 4 in sphere must not pass, so enter a max gap just under 4 in; the AHJ-adopted code governs.");
