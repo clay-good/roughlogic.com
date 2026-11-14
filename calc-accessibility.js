@@ -149,7 +149,7 @@ export function computeAccessibleParkingCount({ total_spaces = 0, facility_count
   const van_only_failure = accessible_ok && !van_ok;
 
   const note = "TWO RULES, and the second is the one that gets skipped. Table 208.2 sets the accessible count from the lot total; 208.2.4 then requires one VAN space for every six OR FRACTION OF SIX of those. "
-    + n + " spaces in one facility -> " + required_accessible + " accessible (" + branch + "), of which " + required_van + " must be van and " + required_car + " may be car. "
+    + n + (n === 1 ? " space" : " spaces") + " in one facility -> " + required_accessible + " accessible (" + branch + "), of which " + required_van + " must be van and " + required_car + " may be car. "
     + (percent_raw !== null ? "The 2% comes to " + percent_raw.toFixed(2) + ", rounded up to " + required_accessible + " - a count of spaces cannot be fractional, and rounding down would provide fewer than the standard requires. " : "")
     + (n >= 495 && n <= 520 ? "NOTE THE STEP AT 500: the last table row (401-500) gives 9, and at 501 the rule switches to 2% - 10.02 for 501, so 11. One space added to a 500-space lot adds TWO accessible spaces. " : "")
     + "FRACTION OF SIX is the trap: " + required_accessible + " accessible spaces need " + required_van + " van, not " + Math.floor(required_accessible / VAN_EVERY + 1e-9) + ". Four accessible spaces still owe one van; seven owe two. And a van space is one OF the accessible spaces, not an extra one beyond them. "

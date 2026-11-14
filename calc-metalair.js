@@ -628,7 +628,7 @@ export function computeStandingSeamTakeoff({ building_width_ft = 0, run_length_f
   const width_in = building_width_ft * IN_PER_FT_MA;
   const panel_count = Math.ceil(width_in / coverage_width_in - 1e-9);
   // Until 2026-10-14 more perimeter panels than the roof has were clipped anyway (50 of 32 gave 1,550 clips).
-  if (Math.round(perimeter_panels) > panel_count) return { error: "The roof takes only " + panel_count + " panels, so it cannot have " + Math.round(perimeter_panels) + " perimeter panels." };
+  if (Math.round(perimeter_panels) > panel_count) return { error: "The roof takes only " + panel_count + (panel_count === 1 ? " panel" : " panels") + ", so it cannot have " + Math.round(perimeter_panels) + " perimeter panels." };
   // The mistake the note names: ordering on the flat sheet width instead of
   // the coverage width, which comes up SHORT on every roof.
   const panels_if_ordered_on_sheet = sheet_width_in > 0 ? Math.ceil(width_in / sheet_width_in - 1e-9) : null;

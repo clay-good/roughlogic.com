@@ -540,7 +540,7 @@ export function computeRackFlueSpace({ pallet_width_in = 0, pallet_depth_in = 0,
   // 2026-10-01 every end gap was a full flue, asking 98 in where 92 in complies.
   if (!(transverse_gap_total_in > 0)) return { error: "The pallets are as wide as the beam or wider; there is no room for flue space." };
   // The model is a gap between each pair of loads and a half-flue at each upright: pallets + 1 gaps.
-  if (transverse_gaps !== pallets_per_bay + 1) return { error: "With " + pallets_per_bay + " pallets in the bay there are " + (pallets_per_bay + 1) + " transverse gaps (one between each pair and one at each upright)." };
+  if (transverse_gaps !== pallets_per_bay + 1) return { error: "With " + pallets_per_bay + (pallets_per_bay === 1 ? " pallet" : " pallets") + " in the bay there are " + (pallets_per_bay + 1) + " transverse gaps (one between each pair and one at each upright)." };
   const flue_count = transverse_gaps >= 2 ? transverse_gaps - 1 : 1;
   const transverse_gap_each_in = transverse_gap_total_in / flue_count;
   const required_beam_length_in = pallet_run_in + flue_count * nominal_flue_in;
