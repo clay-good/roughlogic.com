@@ -134,7 +134,7 @@ export function computePipeInsulationTakeoff({ pipe_ft = 250, waste_pct = 5, num
   const total_covers = fitting_covers + valve_covers;
   const covers_verdict = total_covers === 0
     ? "(no elbow, tee, or valve counts entered)"
-    : fmt(fitting_covers, 0) + " fitting covers (" + fmt(elbow_count, 0) + " elbows, " + fmt(tee_count, 0)
+    : fmt(fitting_covers, 0) + " fitting covers (" + fmt(elbow_count, 0) + " " + (fmt(elbow_count, 0) === "1" ? "elbow" : "elbows") + ", " + fmt(tee_count, 0)
       + " tees) and " + fmt(valve_covers, 0) + " valve covers, " + fmt(total_covers, 0)
       + " pieces in all. These are NOT in the square footage above and the fitting allowance in the cut length is a LENGTH allowance, not a cover count. In labour these pieces can equal or exceed the entire straight run, because each is laid out, cut, formed, and banded individually"
       + (valve_covers > 0 ? ", and where the specification calls for removable reusable valve covers -- which any line that will be maintained does -- those " + fmt(valve_covers, 0) + " are fabricated items at a cost per piece well above anything in the straight-run estimate" : "");

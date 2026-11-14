@@ -2227,10 +2227,10 @@ export function computeChillerStagingPoint({
   const two_wins = one_available ? two_machine_kw < one_machine_kw : true;
   const saving_kw = one_available ? Math.abs(one_machine_kw - two_machine_kw) : 0;
   const load_verdict = !one_available
-    ? "at " + fmt(plant_load_tons, 0) + " tons one machine cannot carry the load at all, so two must run"
+    ? "at " + fmt(plant_load_tons, 0) + " " + (fmt(plant_load_tons, 0) === "1" ? "ton" : "tons") + " one machine cannot carry the load at all, so two must run"
     : two_wins
-      ? "TWO machines win at " + fmt(plant_load_tons, 0) + " tons: " + fmt(two_machine_kw, 0) + " kW against " + fmt(one_machine_kw, 0) + " kW, saving " + fmt(saving_kw, 0) + " kW"
-      : "ONE machine wins at " + fmt(plant_load_tons, 0) + " tons: " + fmt(one_machine_kw, 0) + " kW against " + fmt(two_machine_kw, 0) + " kW, saving " + fmt(saving_kw, 0) + " kW";
+      ? "TWO machines win at " + fmt(plant_load_tons, 0) + " " + (fmt(plant_load_tons, 0) === "1" ? "ton" : "tons") + ": " + fmt(two_machine_kw, 0) + " kW against " + fmt(one_machine_kw, 0) + " kW, saving " + fmt(saving_kw, 0) + " kW"
+      : "ONE machine wins at " + fmt(plant_load_tons, 0) + " " + (fmt(plant_load_tons, 0) === "1" ? "ton" : "tons") + ": " + fmt(one_machine_kw, 0) + " kW against " + fmt(two_machine_kw, 0) + " kW, saving " + fmt(saving_kw, 0) + " kW";
   // Search for the crossover: the highest load at which one machine still
   // beats two. Stepping in tons rather than assuming the curve is monotonic,
   // because it is not.
@@ -2246,7 +2246,7 @@ export function computeChillerStagingPoint({
     ? "two machines beat one at every load in range, which usually means the auxiliary penalty is small against a steeply rising kW/ton curve"
     : crossover_tons >= machine_tons - step
       ? "one machine beats two right up to its full capacity, so the second machine should not start until the load exceeds one machine"
-      : "the crossover is at " + fmt(crossover_tons, 0) + " tons, " + fmt(crossover_pct_of_machine, 0) + "% of a single machine -- below it one machine uses less, above it two do";
+      : "the crossover is at " + fmt(crossover_tons, 0) + " " + (fmt(crossover_tons, 0) === "1" ? "ton" : "tons") + ", " + fmt(crossover_pct_of_machine, 0) + "% of a single machine -- below it one machine uses less, above it two do";
   // The setpoint check, which is the practical output.
   const has_setpoint = staging_setpoint_pct > 0;
   const setpoint_tons = machine_tons * staging_setpoint_pct / 100;
@@ -2257,8 +2257,8 @@ export function computeChillerStagingPoint({
     : crossover_tons <= 0
       ? "no crossover was found in range, so the setpoint cannot be checked against one"
       : stages_too_early
-        ? "a setpoint of " + fmt(staging_setpoint_pct, 0) + "% brings the second machine on at " + fmt(setpoint_tons, 0) + " tons, " + fmt(-setpoint_error_tons, 0) + " tons BELOW the crossover -- two machines and two sets of auxiliaries run where one machine and one set would use less, for a large part of the season"
-        : "a setpoint of " + fmt(staging_setpoint_pct, 0) + "% brings the second machine on at " + fmt(setpoint_tons, 0) + " tons, at or above the " + fmt(crossover_tons, 0) + " ton crossover";
+        ? "a setpoint of " + fmt(staging_setpoint_pct, 0) + "% brings the second machine on at " + fmt(setpoint_tons, 0) + " " + (fmt(setpoint_tons, 0) === "1" ? "ton" : "tons") + ", " + fmt(-setpoint_error_tons, 0) + " tons BELOW the crossover -- two machines and two sets of auxiliaries run where one machine and one set would use less, for a large part of the season"
+        : "a setpoint of " + fmt(staging_setpoint_pct, 0) + "% brings the second machine on at " + fmt(setpoint_tons, 0) + " " + (fmt(setpoint_tons, 0) === "1" ? "ton" : "tons") + ", at or above the " + fmt(crossover_tons, 0) + " ton crossover";
   if (![one_machine_kw, two_machine_kw, crossover_tons, crossover_pct_of_machine, setpoint_error_tons].every(Number.isFinite)) return { error: "Chiller staging math is not a finite value." };
   return {
     one_pct, two_pct, one_available, one_kw_ton, two_kw_ton,

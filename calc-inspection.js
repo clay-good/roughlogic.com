@@ -317,7 +317,7 @@ export function computeRtExposureTime({
   const new_exposure_s = has_new ? base_exposure_s * distance_ratio * distance_ratio : base_exposure_s;
   const distance_verdict = !has_new
     ? "(no new distance entered)"
-    : "moving from " + fmt(base_distance_in, 1) + " to " + fmt(new_distance_in, 1) + " in takes the exposure from " + fmt(base_exposure_s, 0) + " to " + fmt(new_exposure_s, 0) + " seconds -- " + fmt(distance_ratio * distance_ratio, 2) + " times, for a " + fmt((distance_ratio - 1) * 100, 0) + "% distance increase. The INVERSE SQUARE is why distance is expensive: intensity falls with the square, so exposure rises with it";
+    : "moving from " + fmt(base_distance_in, 1) + " to " + fmt(new_distance_in, 1) + " in takes the exposure from " + fmt(base_exposure_s, 0) + " to " + fmt(new_exposure_s, 0) + " " + (fmt(new_exposure_s, 0) === "1" ? "second" : "seconds") + " -- " + fmt(distance_ratio * distance_ratio, 2) + " times, for a " + fmt((distance_ratio - 1) * 100, 0) + "% distance increase. The INVERSE SQUARE is why distance is expensive: intensity falls with the square, so exposure rises with it";
   const has_geometry = source_size_in > 0 && material_thickness_in > 0;
   if (has_geometry && !(base_distance_in > material_thickness_in && (!(new_distance_in > 0) || new_distance_in > material_thickness_in))) return { error: "The source-to-film distance must exceed the material thickness." };
   // ASME V T-274 / SE-1030: Ug = F d / D, with D the source-to-OBJECT
@@ -350,7 +350,7 @@ export function computeRtExposureTime({
   const decayed_exposure_s = (has_new ? new_exposure_s : base_exposure_s) / decay_factor;
   const decay_verdict = !has_decay
     ? "(no elapsed time entered -- and a technique sheet used without the decay correction UNDEREXPOSES)"
-    : "after " + fmt(days_elapsed, 0) + " days the source is at " + fmt(activity_pct, 1) + "% of its activity (half-life " + fmt(half_life_days, 1) + " days), so the same technique needs " + fmt(decayed_exposure_s, 0) + " seconds instead of " + fmt(has_new ? new_exposure_s : base_exposure_s, 0) + " -- " + fmt(decayed_exposure_s - (has_new ? new_exposure_s : base_exposure_s), 0) + " seconds longer, from nothing but the calendar";
+    : "after " + fmt(days_elapsed, 0) + " " + (fmt(days_elapsed, 0) === "1" ? "day" : "days") + " the source is at " + fmt(activity_pct, 1) + "% of its activity (half-life " + fmt(half_life_days, 1) + " days), so the same technique needs " + fmt(decayed_exposure_s, 0) + " " + (fmt(decayed_exposure_s, 0) === "1" ? "second" : "seconds") + " instead of " + fmt(has_new ? new_exposure_s : base_exposure_s, 0) + " -- " + fmt(decayed_exposure_s - (has_new ? new_exposure_s : base_exposure_s), 0) + " seconds longer, from nothing but the calendar";
   if (![new_exposure_s, ug_base_in, ug_new_in, decay_factor, decayed_exposure_s, activity_pct].every(Number.isFinite)) return { error: "Radiographic exposure math is not a finite value." };
   return {
     distance_ratio, new_exposure_s, distance_verdict,
@@ -495,7 +495,7 @@ export function computeMtYokeCoilAmperage({
   const coil_amps = has_coil ? coil_amp_turns / coil_turns : 0;
   const coil_verdict = !has_coil
     ? "(no part length and coil turns entered)"
-    : (sections_count > 1 ? "the " + fmt(part_length_in, 1) + " in part is shot in " + sections_count + " sections of at most 18 in, so L is 18; " : "") + "a coil shot at an L/D of " + fmt(ld_used, 2) + (ld_clamped ? " (clamped from " + fmt(ld_raw, 2) + "; the formulae hold between 2 and 15)" : "") + " and a " + (is_high_fill ? "high" : "low") + " fill factor needs " + fmt(coil_amp_turns, 0) + " amp-turns, which at " + fmt(coil_turns, 0) + " turns is " + fmt(coil_amps, 0) + " A";
+    : (sections_count > 1 ? "the " + fmt(part_length_in, 1) + " in part is shot in " + sections_count + " sections of at most 18 in, so L is 18; " : "") + "a coil shot at an L/D of " + fmt(ld_used, 2) + (ld_clamped ? " (clamped from " + fmt(ld_raw, 2) + "; the formulae hold between 2 and 15)" : "") + " and a " + (is_high_fill ? "high" : "low") + " fill factor needs " + fmt(coil_amp_turns, 0) + " amp-turns, which at " + fmt(coil_turns, 0) + " " + (fmt(coil_turns, 0) === "1" ? "turn" : "turns") + " is " + fmt(coil_amps, 0) + " A";
   // The trap that makes an inspection an inspection for ONE orientation.
   const orientation_verdict = !has_coil
     ? "A circular field finds LONGITUDINAL cracks and is blind to transverse ones. An inspection performed with one shot has inspected for ONE crack orientation, and reporting it as an inspection of the part is wrong -- finding the other requires a second, separate shot in the other field direction"
@@ -559,25 +559,25 @@ export function computePtDwellDevelopment({
   if (evaluation_window_start_min < 0 || evaluation_at_min < 0) return { error: "Evaluation times cannot be negative." };
   if (!(max_procedure_temp_f > min_procedure_temp_f)) return { error: "The procedure's temperature range must have a maximum above its minimum." };
   const total_process_min = penetration_dwell_min + development_dwell_min;
-  const dwell_verdict = "penetration dwell " + fmt(penetration_dwell_min, 0) + " min plus development " + fmt(development_dwell_min, 0) + " min is " + fmt(total_process_min, 0) + " minutes of process time before anything can be read";
+  const dwell_verdict = "penetration dwell " + fmt(penetration_dwell_min, 0) + " min plus development " + fmt(development_dwell_min, 0) + " min is " + fmt(total_process_min, 0) + " " + (fmt(total_process_min, 0) === "1" ? "minute" : "minutes") + " of process time before anything can be read";
   // The dwell is chosen for the DISCONTINUITY, not for the part.
   const dwell_class_verdict = penetration_dwell_min < 10
     ? "A dwell under 10 minutes is a CASTING or weld row figure (the 5-minute rows; wrought plate, extrusions and forgings take 10) -- for wide, open discontinuities. Applied to a tight service-induced crack it does not let the penetrant enter, and the part shows clean: the examination is performed, documented, and finds nothing, and the crack is still there. THE DWELL IS CHOSEN FOR THE DISCONTINUITY TYPE, NOT FOR THE PART"
     : penetration_dwell_min < 20
-      ? "A dwell of " + fmt(penetration_dwell_min, 0) + " minutes is mid-range. Tight service-induced cracks want the LONG end of the procedure's range, commonly 20 to 30 minutes, because the penetrant has to enter a crack that may be closed at the surface. The dwell is chosen for the DISCONTINUITY TYPE, not for the part"
-      : "A dwell of " + fmt(penetration_dwell_min, 0) + " minutes is at the long end, which is what tight service-induced cracks need -- and the failure mode this avoids is silent: a short dwell taken from a casting row lets the part show clean while the crack is still there";
+      ? "A dwell of " + fmt(penetration_dwell_min, 0) + " " + (fmt(penetration_dwell_min, 0) === "1" ? "minute" : "minutes") + " is mid-range. Tight service-induced cracks want the LONG end of the procedure's range, commonly 20 to 30 minutes, because the penetrant has to enter a crack that may be closed at the surface. The dwell is chosen for the DISCONTINUITY TYPE, not for the part"
+      : "A dwell of " + fmt(penetration_dwell_min, 0) + " " + (fmt(penetration_dwell_min, 0) === "1" ? "minute" : "minutes") + " is at the long end, which is what tight service-induced cracks need -- and the failure mode this avoids is silent: a short dwell taken from a casting row lets the part show clean while the crack is still there";
   const has_evaluation = evaluation_at_min > 0;
   const in_window = has_evaluation && evaluation_at_min >= evaluation_window_start_min && evaluation_at_min <= evaluation_window_end_min;
   const evaluation_margin_min = has_evaluation
     ? (evaluation_at_min < evaluation_window_start_min ? evaluation_at_min - evaluation_window_start_min : evaluation_window_end_min - evaluation_at_min)
     : 0;
   const evaluation_verdict = !has_evaluation
-    ? "(no evaluation time entered -- the window, commonly " + fmt(evaluation_window_start_min, 0) + " to " + fmt(evaluation_window_end_min, 0) + " minutes after developer, is WHEN the examination is valid)"
+    ? "(no evaluation time entered -- the window, commonly " + fmt(evaluation_window_start_min, 0) + " to " + fmt(evaluation_window_end_min, 0) + " " + (fmt(evaluation_window_end_min, 0) === "1" ? "minute" : "minutes") + " after developer, is WHEN the examination is valid)"
     : in_window
-      ? "evaluating at " + fmt(evaluation_at_min, 0) + " minutes is inside the " + fmt(evaluation_window_start_min, 0) + " to " + fmt(evaluation_window_end_min, 0) + " minute window, with " + fmt(Math.abs(evaluation_margin_min), 0) + " minutes before it closes"
+      ? "evaluating at " + fmt(evaluation_at_min, 0) + " " + (fmt(evaluation_at_min, 0) === "1" ? "minute" : "minutes") + " is inside the " + fmt(evaluation_window_start_min, 0) + " to " + fmt(evaluation_window_end_min, 0) + " minute window, with " + fmt(Math.abs(evaluation_margin_min), 0) + " minutes before it closes"
       : evaluation_at_min < evaluation_window_start_min
-        ? "evaluating at " + fmt(evaluation_at_min, 0) + " minutes is TOO EARLY by " + fmt(evaluation_window_start_min - evaluation_at_min, 0) + " minutes: indications are still forming and small ones have not appeared yet"
-        : "evaluating at " + fmt(evaluation_at_min, 0) + " minutes is TOO LATE by " + fmt(evaluation_at_min - evaluation_window_end_min, 0) + " minutes: the bleed-out has blurred and its size no longer relates to the discontinuity that produced it";
+        ? "evaluating at " + fmt(evaluation_at_min, 0) + " " + (fmt(evaluation_at_min, 0) === "1" ? "minute" : "minutes") + " is TOO EARLY by " + fmt(evaluation_window_start_min - evaluation_at_min, 0) + " minutes: indications are still forming and small ones have not appeared yet"
+        : "evaluating at " + fmt(evaluation_at_min, 0) + " " + (fmt(evaluation_at_min, 0) === "1" ? "minute" : "minutes") + " is TOO LATE by " + fmt(evaluation_at_min - evaluation_window_end_min, 0) + " minutes: the bleed-out has blurred and its size no longer relates to the discontinuity that produced it";
   const in_temp_range = part_temp_f >= min_procedure_temp_f && part_temp_f <= max_procedure_temp_f;
   const temp_verdict = in_temp_range
     ? "at " + fmt(part_temp_f, 0) + " degF the part is inside the procedure's " + fmt(min_procedure_temp_f, 0) + " to " + fmt(max_procedure_temp_f, 0) + " degF range"

@@ -652,7 +652,7 @@ export function computeStandingSeamTakeoff({ building_width_ft = 0, run_length_f
   const coverage_verdict = panels_if_ordered_on_sheet === null
     ? "Enter the flat sheet width to see what ordering on it would cost."
     : panels_short > 0
-      ? "ORDERING ON THE SHEET WIDTH COMES UP " + fmt(panels_short, 0) + " PANEL" + (panels_short === 1 ? "" : "S") + " SHORT: " + fmt(panel_count, 0) + " panels of " + fmt(coverage_width_in, 2) + " in coverage against " + fmt(panels_if_ordered_on_sheet, 0) + " if the " + fmt(sheet_width_in, 2) + " in sheet is used, and the last panel lands well before the rake"
+      ? "ORDERING ON THE SHEET WIDTH COMES UP " + fmt(panels_short, 0) + " PANEL" + (panels_short === 1 ? "" : "S") + " SHORT: " + fmt(panel_count, 0) + " " + (fmt(panel_count, 0) === "1" ? "panel" : "panels") + " of " + fmt(coverage_width_in, 2) + " in coverage against " + fmt(panels_if_ordered_on_sheet, 0) + " if the " + fmt(sheet_width_in, 2) + " in sheet is used, and the last panel lands well before the rake"
       : "Coverage and sheet width give the same panel count here -- the seam still takes its width from every sheet, it just does not add a panel at this roof width";
   return {
     building_width_ft, run_length_ft, coverage_width_in, sheet_width_in, panel_count,

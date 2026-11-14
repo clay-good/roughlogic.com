@@ -379,7 +379,7 @@ export function computeLiquidPipelineStationSpacing({
     : "at " + fmt(alternate_flow_bpd, 0) + " bbl/day the friction gradient " + alt_moves(alternate_gradient_ft_per_mi, friction_gradient_ft_per_mi) + (alt_moves(alternate_gradient_ft_per_mi, friction_gradient_ft_per_mi) === "stays" ? " at " : " to ") + fmt(alternate_gradient_ft_per_mi, 1) + " ft per mile (friction goes as the SQUARE of flow)"
       + (alternate_slack
         ? ", no more than the line's " + fmt(-elevation_gradient_ft_per_mi, 1) + " ft per mile fall, so the line runs SLACK: gravity drives the flow, no station spacing applies, and holding the line packed is a back-pressure and surge question rather than a spacing one"
-        : ", spacing " + ({ rises: "grows", falls: "falls", stays: "stays" })[alt_moves(alternate_spacing_mi, max_spacing_mi)] + (alt_moves(alternate_spacing_mi, max_spacing_mi) === "stays" ? " at " : " to ") + fmt(alternate_spacing_mi, 0) + " miles, and the line needs " + fmt(alternate_station_count, 0) + " station" + (alternate_station_count === 1 ? "" : "s"));
+        : ", spacing " + ({ rises: "grows", falls: "falls", stays: "stays" })[alt_moves(alternate_spacing_mi, max_spacing_mi)] + (alt_moves(alternate_spacing_mi, max_spacing_mi) === "stays" ? " at " : " to ") + fmt(alternate_spacing_mi, 0) + " " + (fmt(alternate_spacing_mi, 0) === "1" ? "mile" : "miles") + ", and the line needs " + fmt(alternate_station_count, 0) + " station" + (alternate_station_count === 1 ? "" : "s"));
   if (![available_head_ft, elevation_gradient_ft_per_mi, combined_gradient_ft_per_mi, max_spacing_mi, station_count, alternate_gradient_ft_per_mi].every(Number.isFinite)) return { error: "Station spacing math is not a finite value." };
   return {
     available_head_ft, elevation_gradient_ft_per_mi, combined_gradient_ft_per_mi,
@@ -1052,7 +1052,7 @@ export function computeAnnularVelocityCleaning({
   const bottoms_up_min = bottoms_up_strokes > 0 && pump_spm > 0 ? bottoms_up_strokes / pump_spm : 0;
   const bottoms_up_verdict = !has_bottoms_up
     ? "(no measured depth entered)"
-    : fmt(annular_volume_bbl, 1) + " bbl in the annulus" + (bottoms_up_strokes > 0 ? ", " + fmt(bottoms_up_strokes, 0) + " strokes" : "") + (bottoms_up_min > 0 ? " and " + fmt(bottoms_up_min, 0) + " minutes to bottoms up" : "")
+    : fmt(annular_volume_bbl, 1) + " bbl in the annulus" + (bottoms_up_strokes > 0 ? ", " + fmt(bottoms_up_strokes, 0) + " " + (fmt(bottoms_up_strokes, 0) === "1" ? "stroke" : "strokes") : "") + (bottoms_up_min > 0 ? " and " + fmt(bottoms_up_min, 0) + " " + (fmt(bottoms_up_min, 0) === "1" ? "minute" : "minutes") + " to bottoms up" : "")
       // The stroke count is at the PUMP entries; the velocity above is at the entered flow. When
       // the two disagree the page used to show both without saying so (420 gpm beside a 147 gpm pump).
       + (pump_output_bbl_stroke > 0 && pump_spm > 0 && Math.abs(pump_output_bbl_stroke * pump_spm * 42 - flow_gpm) > 0.05 * flow_gpm
@@ -1527,13 +1527,13 @@ export function computeWellDeclineReserves({
   const declineVerdict = effective_entered
     ? "the " + fmt(100 * decline_rate, 1) + "% entered was read as an EFFECTIVE annual decline, so the nominal constant is -ln(1 - " + fmt(decline_rate, 3) + ") = " + fmt(nominal_decline, 4) + " per year"
     : "the " + fmt(decline_rate, 3) + " entered was read as a NOMINAL decline constant, so the effective annual decline people would quote is 1 - exp(-" + fmt(decline_rate, 3) + ") = " + fmt(100 * effective_decline, 1) + "% per year";
-  const lifeVerdict = "from " + fmt(initial_rate_bpd, 0) + " bbl/day to a " + fmt(economic_limit_bpd, 0) + " bbl/day economic limit is " + fmt(economic_life_years, 1) + " years, and the remaining reserves to that limit are " + fmt(remaining_reserves_bbl, 0) + " barrels -- about " + fmt(remaining_reserves_bbl / 1000, 0) + " thousand";
+  const lifeVerdict = "from " + fmt(initial_rate_bpd, 0) + " bbl/day to a " + fmt(economic_limit_bpd, 0) + " bbl/day economic limit is " + fmt(economic_life_years, 1) + " years, and the remaining reserves to that limit are " + fmt(remaining_reserves_bbl, 0) + " " + (fmt(remaining_reserves_bbl, 0) === "1" ? "barrel" : "barrels") + " -- about " + fmt(remaining_reserves_bbl / 1000, 0) + " thousand";
   const trapVerdict = misread_valid
-    ? "THE TRAP IN NUMBERS: this well declines " + fmt(100 * effective_decline, 1) + "% effective and " + fmt(nominal_decline, 3) + " nominal, and the two are not interchangeable. Reading the same figure as the other kind gives " + fmt(misread_reserves_bbl, 0) + " barrels and " + fmt(misread_life_years, 1) + " years -- " + fmt(Math.abs(misread_error_pct), 0) + "% " + (misread_error_pct < 0 ? "LOW" : "HIGH") + ". For small declines the two are close; for steep ones they diverge badly, and on a package of wells that error is material"
+    ? "THE TRAP IN NUMBERS: this well declines " + fmt(100 * effective_decline, 1) + "% effective and " + fmt(nominal_decline, 3) + " nominal, and the two are not interchangeable. Reading the same figure as the other kind gives " + fmt(misread_reserves_bbl, 0) + " " + (fmt(misread_reserves_bbl, 0) === "1" ? "barrel" : "barrels") + " and " + fmt(misread_life_years, 1) + " years -- " + fmt(Math.abs(misread_error_pct), 0) + "% " + (misread_error_pct < 0 ? "LOW" : "HIGH") + ". For small declines the two are close; for steep ones they diverge badly, and on a package of wells that error is material"
     : "the entered figure cannot be read the other way, so no comparison is made";
   const forwardVerdict = !has_years
     ? "no forecast horizon was entered"
-    : "at " + fmt(years_ahead, 1) + " years the rate is " + fmt(rate_at_years_bpd, 1) + " bbl/day and the cumulative to that point is " + fmt(cumulative_to_years_bbl, 0) + " barrels";
+    : "at " + fmt(years_ahead, 1) + " years the rate is " + fmt(rate_at_years_bpd, 1) + " bbl/day and the cumulative to that point is " + fmt(cumulative_to_years_bbl, 0) + " " + (fmt(cumulative_to_years_bbl, 0) === "1" ? "barrel" : "barrels");
   const shaleVerdict = "AND EXPONENTIAL IS THE WRONG MODEL FOR AN UNCONVENTIONAL WELL. Shale wells decline hyperbolically -- very steeply at first and then flattening -- so forcing an exponential fit on early data dramatically UNDERSTATES reserves, while forcing a hyperbolic fit with a high b far into the future OVERSTATES them. This fits exponential and says so; a shale forecast needs a b factor and a terminal decline, and neither is here";
   const decisionVerdict = "THE PRACTICAL OUTPUT IS THE DATE, NOT THE BARRELS. A well is abandoned when its rate no longer covers lease operating expense, and solving the curve for that rate is what plugging liability, equipment redeployment and the decision to work a well over all hang on -- and all three are scheduled from it";
 

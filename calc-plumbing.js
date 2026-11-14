@@ -1149,7 +1149,7 @@ export function computeGreaseTrap({ peak_flow_gpm = 0, retention_minutes = 30, l
   return {
     volume_gal, separation_gal, fog_storage_gal, fog_lb, lb_per_meal, recommended_nominal_gal: recommended, exceeds_standard, interval_over,
     note: meals > 0
-      ? "Total = separation volume (peak flow x retention x loading) + grease storage: " + fmt(meals, 0) + " meals/day x " + lb_per_meal + " lb/meal x " + fmt(days, 0) + " days = " + fmt(fog_lb, 0) + " lb, / 6.4 lb/gal = " + fmt(fog_storage_gal, 0) + " gal (IPC 2027 1003.3.11.1 and Table 1003.3.8)." + (interval_over ? " The designed service interval may not exceed 90 days (30 for a concrete interceptor; IPC 2027 1003.3.9)." : "")
+      ? "Total = separation volume (peak flow x retention x loading) + grease storage: " + fmt(meals, 0) + " " + (fmt(meals, 0) === "1" ? "meal" : "meals") + "/day x " + lb_per_meal + " lb/meal x " + fmt(days, 0) + " " + (fmt(days, 0) === "1" ? "day" : "days") + " = " + fmt(fog_lb, 0) + " lb, / 6.4 lb/gal = " + fmt(fog_storage_gal, 0) + " gal (IPC 2027 1003.3.11.1 and Table 1003.3.8)." + (interval_over ? " The designed service interval may not exceed 90 days (30 for a concrete interceptor; IPC 2027 1003.3.9)." : "")
       : "Separation volume only. IPC 2027 1003.3.11.1 adds the grease stored between pump-outs for a gravity interceptor (meals per day x lb per meal x service days / 6.4); enter meals per day to include it. IPC 2021 sized on the separation volume alone.",
   };
 }

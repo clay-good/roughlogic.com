@@ -1550,7 +1550,7 @@ export function computeDuctBankAmpacityDerate({
       + ducts_down + " bank -- the one with the most neighbours around it and the most earth above and below. It carries "
       + fmt(heat_spread_pct, 0) + "% more mutual heating than the coolest duct in the same bank, so a bank sized on an average position runs its middle ducts over temperature";
   const loaded_verdict = loaded_ducts >= total_ducts
-    ? "all " + fmt(total_ducts, 0) + " ducts are loaded, which is the worst case and the one to design to unless spares are genuinely permanent"
+    ? "all " + fmt(total_ducts, 0) + " " + (fmt(total_ducts, 0) === "1" ? "duct" : "ducts") + " are loaded, which is the worst case and the one to design to unless spares are genuinely permanent"
     : fmt(loaded_ducts, 0) + " of " + fmt(total_ducts, 0)
       + " ducts loaded. Fewer loaded ducts is a higher derate factor, but a spare duct is only a spare until someone pulls a circuit into it -- derating on today's loading is how a bank becomes overloaded without anyone changing a conductor";
   // The sensitivity that argues for a measured soil resistivity.

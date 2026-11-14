@@ -308,7 +308,7 @@ export function computeVacuumDecayTest({ start_micron = 0, end_micron = 0, hold_
   if (end_micron <= pass_ceiling_micron) {
     verdict = "holds at or below the " + fmt(pass_ceiling_micron, 0) + "-micron ceiling - the system is tight and dry, ok to charge";
   } else {
-    verdict = "rose to " + fmt(end_micron, 0) + " microns, above the " + fmt(pass_ceiling_micron, 0) + "-micron ceiling - not ready: a rise that plateaus is residual moisture or outgassing (keep evacuating), a rise that climbs steadily is a leak (pressure-test to find it)";
+    verdict = "rose to " + fmt(end_micron, 0) + " " + (fmt(end_micron, 0) === "1" ? "micron" : "microns") + ", above the " + fmt(pass_ceiling_micron, 0) + "-micron ceiling - not ready: a rise that plateaus is residual moisture or outgassing (keep evacuating), a rise that climbs steadily is a leak (pressure-test to find it)";
   }
   return {
     rise_micron, rate_micron_per_min, verdict,

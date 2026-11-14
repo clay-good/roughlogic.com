@@ -3201,7 +3201,7 @@ export function computeSprayBoothAirflow({ opening_width_ft = 0, opening_height_
     : "heating " + fmt(exhaust_cfm, 0) + " cfm over a " + fmt(bake_delta_t, 0) + " degF rise is "
       + fmt(bake_btu_hr / 1000000, 2) + " MMBTU/hr, so a " + fmt(bake_minutes, 0) + " minute bake takes "
       + fmt(bake_btu_per_cycle / 1000000, 2) + " MMBTU -- $" + fmt(bake_cost_per_cycle, 2) + " a cycle and $"
-      + fmt(bake_annual_cost, 0) + " across " + fmt(bakes_per_year, 0) + " bakes a year";
+      + fmt(bake_annual_cost, 0) + " across " + fmt(bakes_per_year, 0) + " " + (fmt(bakes_per_year, 0) === "1" ? "bake" : "bakes") + " a year";
   if (![exhaust_cfm, heating_btu_hr, gas_input_btu_hr, cost_per_hour, air_changes_per_hour, measured_cfm, bake_btu_per_cycle, bake_annual_cost].every(Number.isFinite)) return { error: "Spray-booth math is not a finite value." };
   return {
     opening_sqft, exhaust_cfm, makeup_cfm: exhaust_cfm, delta_t,

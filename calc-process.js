@@ -120,10 +120,10 @@ export function computeInjectionClampTonnage({
   // The runner is the term people leave out, so it is reported on its own.
   const part_only_with_safety_tons = part_area_total_in2 * cavity_pressure_tsi * sf;
   const runner_penalty_tons = clamp_with_safety_tons - part_only_with_safety_tons;
-  const area_verdict = "the shot presents " + fmt(total_area_in2, 1) + " in2 of projected area -- " + fmt(part_area_total_in2, 1) + " in2 of parts across " + fmt(cavities, 0) + " cavities plus " + fmt(runner_projected_area_in2, 1) + " in2 of runner. Projected area is the area seen ALONG the direction the mould opens, not the surface area of the part and not its footprint on the bench";
-  const force_verdict = "at " + fmt(cavity_pressure_tsi, 2) + " tons per in2 that needs " + fmt(clamp_required_tons, 0) + " tons, or " + fmt(clamp_with_safety_tons, 0) + " tons with the " + fmt(safety_factor_pct, 0) + "% safety factor";
+  const area_verdict = "the shot presents " + fmt(total_area_in2, 1) + " in2 of projected area -- " + fmt(part_area_total_in2, 1) + " in2 of parts across " + fmt(cavities, 0) + " " + (fmt(cavities, 0) === "1" ? "cavity" : "cavities") + " plus " + fmt(runner_projected_area_in2, 1) + " in2 of runner. Projected area is the area seen ALONG the direction the mould opens, not the surface area of the part and not its footprint on the bench";
+  const force_verdict = "at " + fmt(cavity_pressure_tsi, 2) + " tons per in2 that needs " + fmt(clamp_required_tons, 0) + " " + (fmt(clamp_required_tons, 0) === "1" ? "ton" : "tons") + ", or " + fmt(clamp_with_safety_tons, 0) + " " + (fmt(clamp_with_safety_tons, 0) === "1" ? "ton" : "tons") + " with the " + fmt(safety_factor_pct, 0) + "% safety factor";
   const runner_verdict = runner_projected_area_in2 > 0
-    ? "the runner is not a rounding error: leaving its " + fmt(runner_projected_area_in2, 1) + " in2 out of the calculation understates the requirement by " + fmt(runner_penalty_tons, 0) + " tons, which on a marginal machine selection is the difference between running and flashing"
+    ? "the runner is not a rounding error: leaving its " + fmt(runner_projected_area_in2, 1) + " in2 out of the calculation understates the requirement by " + fmt(runner_penalty_tons, 0) + " " + (fmt(runner_penalty_tons, 0) === "1" ? "ton" : "tons") + ", which on a marginal machine selection is the difference between running and flashing"
     : "(no runner area entered -- a cold runner ALWAYS has projected area, and a part-only figure specifies a machine that flashes)";
   const has_machine = machine_rating_tons > 0;
   const margin_tons = has_machine ? machine_rating_tons - clamp_with_safety_tons : 0;
@@ -131,7 +131,7 @@ export function computeInjectionClampTonnage({
   const machine_verdict = !has_machine
     ? "(no machine rating entered)"
     : fits
-      ? "the " + fmt(machine_rating_tons, 0) + " ton machine covers it with " + fmt(margin_tons, 0) + " tons to spare"
+      ? "the " + fmt(machine_rating_tons, 0) + " ton machine covers it with " + fmt(margin_tons, 0) + " " + (fmt(margin_tons, 0) === "1" ? "ton" : "tons") + " to spare"
       : "the " + fmt(machine_rating_tons, 0) + " ton machine is " + fmt(-margin_tons, 0) + " tons SHORT: the parting line opens and the part flashes";
   // The inversion: what cavity pressure the machine actually supports.
   const max_cavity_pressure_tsi = has_machine ? machine_rating_tons / (total_area_in2 * sf) : 0;
@@ -195,7 +195,7 @@ export function computeShotSizeResidenceTime({
     : too_small
       ? "the shot is only " + fmt(shot_pct, 1) + "% of barrel capacity, BELOW the " + fmt(min_pct, 0) + "% floor -- the melt sits in a hot barrel through " + fmt(shots_in_barrel, 1) + " shots before it is used"
       : "the shot is " + fmt(shot_pct, 1) + "% of barrel capacity, ABOVE the " + fmt(max_pct, 0) + "% ceiling -- the screw has too little time and stroke to melt and homogenise it, and shot-to-shot consistency suffers";
-  const residence_verdict = "residence time is " + fmt(residence_min, 1) + " minutes: " + fmt(shots_in_barrel, 1) + " shots' worth of melt sitting in the barrel at " + fmt(cycle_time_s, 0) + " seconds a cycle";
+  const residence_verdict = "residence time is " + fmt(residence_min, 1) + " minutes: " + fmt(shots_in_barrel, 1) + " shots' worth of melt sitting in the barrel at " + fmt(cycle_time_s, 0) + " " + (fmt(cycle_time_s, 0) === "1" ? "second" : "seconds") + " a cycle";
   const has_limit = max_residence_min > 0;
   const over_limit = has_limit && residence_min > max_residence_min + 1e-9 * Math.abs(max_residence_min);
   const limit_verdict = !has_limit
@@ -211,7 +211,7 @@ export function computeShotSizeResidenceTime({
   const alt_residence_min = has_alt ? shots_in_barrel * alt_cycle_time_s / 60 : 0;
   const alt_verdict = !has_alt
     ? "(no alternative cycle time entered)"
-    : "at " + fmt(alt_cycle_time_s, 0) + " seconds a cycle the residence time is " + fmt(alt_residence_min, 1) + " minutes -- residence scales DIRECTLY with cycle time, so a slow-running job on an oversized barrel compounds both problems at once";
+    : "at " + fmt(alt_cycle_time_s, 0) + " " + (fmt(alt_cycle_time_s, 0) === "1" ? "second" : "seconds") + " a cycle the residence time is " + fmt(alt_residence_min, 1) + " minutes -- residence scales DIRECTLY with cycle time, so a slow-running job on an oversized barrel compounds both problems at once";
   if (![shot_pct, shots_in_barrel, residence_min, min_barrel_oz, max_barrel_oz, alt_residence_min].every(Number.isFinite)) return { error: "Shot size math is not a finite value." };
   return {
     shot_pct, shots_in_barrel, residence_min, too_small, too_large, in_window,
@@ -301,7 +301,7 @@ export function computeInjectionCoolingTime({
   const annual_machine_hours = has_volume ? Math.abs(alt_cooling_time_s - cooling_time_s) * annual_parts / 3600 : 0;
   const cost_verdict = !has_volume
     ? "(no annual volume and alternative thickness entered)"
-    : "across " + fmt(annual_parts, 0) + " parts a year that thickness change is " + fmt(annual_machine_hours, 0) + " machine-hours a year, paid every cycle forever. Mould temperature is the weaker lever and it enters through a LOGARITHM: running colder shortens the cycle and costs crystallinity, adds moulded-in stress and degrades finish. Thickness is the lever available before the tool exists; temperature is the one available after";
+    : "across " + fmt(annual_parts, 0) + " " + (fmt(annual_parts, 0) === "1" ? "part" : "parts") + " a year that thickness change is " + fmt(annual_machine_hours, 0) + " machine-hours a year, paid every cycle forever. Mould temperature is the weaker lever and it enters through a LOGARITHM: running colder shortens the cycle and costs crystallinity, adds moulded-in stress and degrades finish. Thickness is the lever available before the tool exists; temperature is the one available after";
   if (![cooling_time_s, alt_cooling_time_s, thickness_ratio, time_ratio, cycle_time_s, annual_machine_hours].every(Number.isFinite)) return { error: "Cooling time math is not a finite value." };
   return {
     cooling_time_s, cooling_verdict, has_alt, alt_cooling_time_s, thickness_ratio, time_ratio,
@@ -765,7 +765,7 @@ export function computeCastingPourYield({
   const annual_btu_saved = has_annual ? saving_btu_per_lb * saleable_lb * annual_castings / castings_per_mould : 0;
   const annual_verdict = !has_annual
     ? "(no annual volume and target yield entered)"
-    : "across " + fmt(annual_castings, 0) + " castings a year that is " + fmt(annual_btu_saved / 1e6, 1) + " MMBTU -- real money on a production casting";
+    : "across " + fmt(annual_castings, 0) + " " + (fmt(annual_castings, 0) === "1" ? "casting" : "castings") + " a year that is " + fmt(annual_btu_saved / 1e6, 1) + " MMBTU -- real money on a production casting";
   const caution_verdict = "AND THE REASON IT IS NOT SIMPLY DONE. Those risers feed solidification shrinkage. Cut them too far and the casting has shrinkage porosity, which is scrap -- and one scrap casting costs more than the energy saved on many sound ones. Riser sizing is a FEEDING calculation, not a yield target, and yield is the outcome rather than the input. The lever that resolves the tension is an insulating sleeve, which raises the effective modulus so the same feeding is achieved with a smaller riser";
   if (![poured_weight_lb, yield_pct, btu_per_saleable_lb, target_poured_lb, target_btu_per_lb, annual_btu_saved].every(Number.isFinite)) return { error: "Pour yield math is not a finite value." };
   return {

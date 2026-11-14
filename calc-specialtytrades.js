@@ -743,7 +743,7 @@ export function computeSuspendedScaffoldCounterweight({ rated_load_lb = 0, outbo
   const outs = [lever_ratio, overturning_moment_ft_lb, required_counterweight_lb, resisting_moment_ft_lb];
   if (!outs.every(Number.isFinite)) return { error: "Counterweight math is not a finite value." };
   const verdict = "REQUIRED: " + fmt(required_counterweight_lb, 0) + " lb per outrigger" + (stall_governs ? " (the 1.5x stall-load test governs) -- " : " -- ") + fmt(rated_load_lb, 0) + " lb of rated load at a " + fmt(lever_ratio, 2) + ":1 lever disadvantage, times a " + fmt(factor_of_safety, 1) + ":1 factor"
-    + (counterweight_units === null ? "" : ", which is " + fmt(counterweight_units, 0) + " units of " + fmt(counterweight_unit_lb, 0) + " lb (" + fmt(provided_counterweight_lb, 0) + " lb provided, " + fmt(achieved_fos, 2) + ":1 achieved)");
+    + (counterweight_units === null ? "" : ", which is " + fmt(counterweight_units, 0) + " " + (fmt(counterweight_units, 0) === "1" ? "unit" : "units") + " of " + fmt(counterweight_unit_lb, 0) + " lb (" + fmt(provided_counterweight_lb, 0) + " lb provided, " + fmt(achieved_fos, 2) + ":1 achieved)");
   return {
     rated_load_lb, outboard_arm_ft, inboard_arm_ft, lever_ratio, factor_of_safety,
     overturning_moment_ft_lb, balance_counterweight_lb, required_counterweight_lb, hoist_stall_load_lb, stall_counterweight_lb, stall_governs,

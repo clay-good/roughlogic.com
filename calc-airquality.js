@@ -177,10 +177,10 @@ export function computeStackEmissionPte({
   const limit_verdict = !has_permit_limit
     ? (hours_for_minor > _AQ_HOURS_PER_YEAR
       ? "no hours limit is needed: even at 8,760 hours the source stays under the threshold"
-      : "a federally enforceable limit below " + fmt(hours_for_minor, 0) + " hours a year would make this a synthetic minor source -- the trade is that the limit is enforceable, with recordkeeping and reporting, and exceeding it is a violation rather than a busy month")
+      : "a federally enforceable limit below " + fmt(hours_for_minor, 0) + " " + (fmt(hours_for_minor, 0) === "1" ? "hour" : "hours") + " a year would make this a synthetic minor source -- the trade is that the limit is enforceable, with recordkeeping and reporting, and exceeding it is a violation rather than a busy month")
     : limit_makes_minor
-      ? "a permitted " + fmt(permitted_hours_per_year, 0) + " hours gives a potential to emit of " + fmt(pte_with_limit_tpy, 1) + " tons, under the threshold -- a synthetic minor source" + (actual_hours_per_year > permitted_hours_per_year ? ". BUT THE " + fmt(actual_hours_per_year, 0) + " ACTUAL HOURS ENTERED ARE OVER THAT LIMIT: the source is operating in violation of it, at " + fmt(actual_tpy, 1) + " tons actual" : "")
-      : "a permitted " + fmt(permitted_hours_per_year, 0) + " hours still gives " + fmt(pte_with_limit_tpy, 1) + " tons, at or above the threshold; the limit would have to fall below " + fmt(hours_for_minor, 0) + " hours to work";
+      ? "a permitted " + fmt(permitted_hours_per_year, 0) + " " + (fmt(permitted_hours_per_year, 0) === "1" ? "hour" : "hours") + " gives a potential to emit of " + fmt(pte_with_limit_tpy, 1) + " tons, under the threshold -- a synthetic minor source" + (actual_hours_per_year > permitted_hours_per_year ? ". BUT THE " + fmt(actual_hours_per_year, 0) + " ACTUAL HOURS ENTERED ARE OVER THAT LIMIT: the source is operating in violation of it, at " + fmt(actual_tpy, 1) + " tons actual" : "")
+      : "a permitted " + fmt(permitted_hours_per_year, 0) + " " + (fmt(permitted_hours_per_year, 0) === "1" ? "hour" : "hours") + " still gives " + fmt(pte_with_limit_tpy, 1) + " tons, at or above the threshold; the limit would have to fall below " + fmt(hours_for_minor, 0) + " " + (fmt(hours_for_minor, 0) === "1" ? "hour" : "hours") + " to work";
   if (![actual_tpy, pte_tpy, pte_with_limit_tpy, hours_for_minor, controlled_rate_lb_h].every(Number.isFinite)) return { error: "Potential to emit math is not a finite value." };
   return {
     controlled_rate_lb_h, control_counts, control_verdict,
@@ -262,7 +262,7 @@ export function computeOpacitySixMinute({
     : 0;
   const capacity_verdict = !has_peak
     ? "(no peak reading entered)"
-    : "with the rest of the block at zero, " + fmt(readings_at_peak_allowed, 0) + " of the " + fmt(reading_count, 0) + " readings could sit at " + fmt(peak_reading_pct, 1) + "% before the average reaches the limit";
+    : "with the rest of the block at zero, " + fmt(readings_at_peak_allowed, 0) + " of the " + fmt(reading_count, 0) + " " + (fmt(reading_count, 0) === "1" ? "reading" : "readings") + " could sit at " + fmt(peak_reading_pct, 1) + "% before the average reaches the limit";
   // The steady haze, which is the case operators get backwards.
   const has_steady = steady_reading_pct > 0;
   const steady_complies = has_steady && steady_reading_pct <= limit_pct;
@@ -351,8 +351,8 @@ export function computeBaghouseCleaningInterval({
   const cycle_verdict = !has_cycle_history
     ? (cycle_minutes > 0 ? fmt(pulses_per_day, 0) + " cleaning cycles a day at the entered interval" : "(no cycle time entered)")
     : cycle_shortening
-      ? "the cycle has shortened " + fmt(-cycle_change_pct, 0) + "%, from " + fmt(original_pulses_per_day, 0) + " to " + fmt(pulses_per_day, 0) + " pulses a day -- more compressed air, more fabric flexing, and shorter bag life, all as a consequence of the smaller working range"
-      : "the cycle is at or longer than it was, at " + fmt(pulses_per_day, 0) + " pulses a day";
+      ? "the cycle has shortened " + fmt(-cycle_change_pct, 0) + "%, from " + fmt(original_pulses_per_day, 0) + " to " + fmt(pulses_per_day, 0) + " " + (fmt(pulses_per_day, 0) === "1" ? "pulse" : "pulses") + " a day -- more compressed air, more fabric flexing, and shorter bag life, all as a consequence of the smaller working range"
+      : "the cycle is at or longer than it was, at " + fmt(pulses_per_day, 0) + " " + (fmt(pulses_per_day, 0) === "1" ? "pulse" : "pulses") + " a day";
   // Over-cleaning, which is the opposite error and is what timers produce.
   // Until 2026-10-14 any mode other than "timer" (a typo included) ran as on-demand.
   const mode = String(cleaning_mode ?? "").trim().toLowerCase().replace(/[\s-]+/g, "_");
@@ -863,7 +863,7 @@ export function computeCarbonBedLife({
   const life_lost_pct = has_degraded ? (1 - degraded_life_hours / bed_life_hours) * 100 : 0;
   const degraded_verdict = !has_degraded
     ? "(no degraded working capacity entered, or it is not below the design one)"
-    : "at a " + fmt(degraded_capacity_pct, 1) + "% working capacity the bed lasts " + fmt(degraded_life_hours, 0) + " hours (" + fmt(degraded_operating_days, 1) + " operating days), " + fmt(life_lost_pct, 0) + "% shorter -- from humidity or temperature alone, with nothing else changed. A bed sized on dry-air capacity and installed on a humid stream reaches breakthrough that much sooner than its change-out schedule expects";
+    : "at a " + fmt(degraded_capacity_pct, 1) + "% working capacity the bed lasts " + fmt(degraded_life_hours, 0) + " " + (fmt(degraded_life_hours, 0) === "1" ? "hour" : "hours") + " (" + fmt(degraded_operating_days, 1) + " operating days), " + fmt(life_lost_pct, 0) + "% shorter -- from humidity or temperature alone, with nothing else changed. A bed sized on dry-air capacity and installed on a humid stream reaches breakthrough that much sooner than its change-out schedule expects";
   // The reason a schedule is not a substitute for monitoring.
   const breakthrough_verdict = "breakthrough is a CLIFF, not a slope: the bed removes essentially everything until its mass transfer zone reaches the outlet, and then the outlet concentration rises quickly toward the inlet. A bed at 95% of its life is performing perfectly and one at 105% is doing nothing, so there is no gradual degradation to notice and outlet monitoring is the only reliable detection -- a timer set to " + fmt(operating_days, 1) + " operating days is a guess about the capacity, not a measurement of the outlet";
   if (![bed_capacity_lb, bed_life_hours, bed_life_days, operating_days, degraded_life_hours, life_lost_pct].every(Number.isFinite)) return { error: "Carbon bed math is not a finite value." };

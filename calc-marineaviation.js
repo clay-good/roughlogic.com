@@ -173,7 +173,7 @@ export function computeMetacentricHeight({
   const gz_ft = effective_gm_ft * Math.sin(heel_angle_deg * Math.PI / 180);
   const effective_is_positive = effective_gm_ft > 1e-9;
   const stability_verdict = effective_is_positive
-    ? "effective GM is " + fmt(effective_gm_ft, 3) + " ft, POSITIVE, giving a righting arm of " + fmt(gz_ft, 3) + " ft at " + fmt(heel_angle_deg, 0) + " degrees of heel"
+    ? "effective GM is " + fmt(effective_gm_ft, 3) + " ft, POSITIVE, giving a righting arm of " + fmt(gz_ft, 3) + " ft at " + fmt(heel_angle_deg, 0) + " " + (fmt(heel_angle_deg, 0) === "1" ? "degree" : "degrees") + " of heel"
     : Math.abs(effective_gm_ft) <= 1e-9
       ? "effective GM is ZERO -- neutral stability: the vessel has no righting arm at small heel and will not return upright on its own"
       : "effective GM is " + fmt(effective_gm_ft, 3) + " ft, NEGATIVE -- the vessel is unstable upright and will loll to an angle of heel, and the righting arm reported here has no meaning in that condition";
@@ -474,8 +474,8 @@ export function computeTravelLiftSlingPlacement({
     : within_wll
       ? "both slings are inside the " + fmt(sling_wll_lb, 0) + " lb working load limit, the governing one at " + fmt(governing_tension_lb, 0) + " lb of tension"
       : even_split_would_pass
-        ? "the governing sling's tension is " + fmt(governing_tension_lb, 0) + " lb (a " + fmt(governing_lb, 0) + " lb vertical share at " + fmt(sling_angle_deg, 0) + " degrees), OVER the " + fmt(sling_wll_lb, 0) + " lb limit -- and a check on half the displacement (" + fmt(even_split_lb, 0) + " lb) would have PASSED, which is exactly why the split rather than half the weight is the number to check"
-        : "the governing sling's tension is " + fmt(governing_tension_lb, 0) + " lb (a " + fmt(governing_lb, 0) + " lb vertical share at " + fmt(sling_angle_deg, 0) + " degrees), over the " + fmt(sling_wll_lb, 0) + " lb limit; even an even split would have been over";
+        ? "the governing sling's tension is " + fmt(governing_tension_lb, 0) + " lb (a " + fmt(governing_lb, 0) + " lb vertical share at " + fmt(sling_angle_deg, 0) + " " + (fmt(sling_angle_deg, 0) === "1" ? "degree" : "degrees") + "), OVER the " + fmt(sling_wll_lb, 0) + " lb limit -- and a check on half the displacement (" + fmt(even_split_lb, 0) + " lb) would have PASSED, which is exactly why the split rather than half the weight is the number to check"
+        : "the governing sling's tension is " + fmt(governing_tension_lb, 0) + " lb (a " + fmt(governing_lb, 0) + " lb vertical share at " + fmt(sling_angle_deg, 0) + " " + (fmt(sling_angle_deg, 0) === "1" ? "degree" : "degrees") + "), over the " + fmt(sling_wll_lb, 0) + " lb limit; even an even split would have been over";
   // Convergence: slings picked up inboard of the machine's beams add
   // compression across the hull.
   const angle_rad = sling_angle_deg * Math.PI / 180;
@@ -484,7 +484,7 @@ export function computeTravelLiftSlingPlacement({
   const sling_tension_lb = governing_lb / Math.sin(angle_rad);
   const convergence_verdict = !has_convergence
     ? "the slings are vertical, so there is no horizontal component across the hull"
-    : "at " + fmt(sling_angle_deg, 0) + " degrees from horizontal the governing sling's tension rises to " + fmt(sling_tension_lb, 0) + " lb and it pulls " + fmt(horizontal_component_lb, 0) + " lb inward across the hull -- compression the hull has to take on top of the vertical load";
+    : "at " + fmt(sling_angle_deg, 0) + " " + (fmt(sling_angle_deg, 0) === "1" ? "degree" : "degrees") + " from horizontal the governing sling's tension rises to " + fmt(sling_tension_lb, 0) + " lb and it pulls " + fmt(horizontal_component_lb, 0) + " lb inward across the hull -- compression the hull has to take on top of the vertical load";
   if (![fwd_sling_lb, aft_sling_lb, aft_share_pct, difference_lb, horizontal_component_lb, sling_tension_lb].every(Number.isFinite)) return { error: "Sling placement math is not a finite value." };
   return {
     cg_from_aft_ft, fwd_sling_lb, aft_sling_lb, aft_share_pct, difference_lb,
@@ -760,7 +760,7 @@ export function computePropellerTrackBalance({
     ? "(no initial reading and trial weight entered)"
     : !trial_useful
       ? "the trial weight produced no change in the vibration vector, so it tells you nothing -- move it or increase it and run again"
-      : "the trial weight moved the vector by " + fmt(effect_ips, 3) + " IPS at " + fmt(effect_phase_deg, 0) + " degrees, so the correction is " + fmt(correction_weight_g, 2) + " g at " + fmt(correction_phase_deg, 0) + " degrees";
+      : "the trial weight moved the vector by " + fmt(effect_ips, 3) + " IPS at " + fmt(effect_phase_deg, 0) + " " + (fmt(effect_phase_deg, 0) === "1" ? "degree" : "degrees") + ", so the correction is " + fmt(correction_weight_g, 2) + " g at " + fmt(correction_phase_deg, 0) + " " + (fmt(correction_phase_deg, 0) === "1" ? "degree" : "degrees");
   const at_target = has_balance && result_ips <= target_ips;
   const target_verdict = !has_balance
     ? "(no readings entered)"
@@ -835,8 +835,8 @@ export function computeAviationFuelWeight({
   const weight_verdict = Math.abs(temp_difference_f) < 0.01
     ? "at the reference temperature the weight is the standard " + fmt(standard_weight_lb, 0) + " lb"
     : warmer
-      ? fmt(gallons, 0) + " gallons at " + fmt(fuel_temp_f, 0) + " degF is " + fmt(temp_difference_f, 0) + " degF above the reference, so the density is " + fmt(actual_density_lb_gal, 4) + " lb/gal and the fuel weighs " + fmt(actual_weight_lb, 0) + " lb -- " + fmt(-weight_difference_lb, 0) + " lb LIGHTER than the standard-density figure"
-      : fmt(gallons, 0) + " gallons at " + fmt(fuel_temp_f, 0) + " degF is " + fmt(-temp_difference_f, 0) + " degF below the reference, so the density is " + fmt(actual_density_lb_gal, 4) + " lb/gal and the fuel weighs " + fmt(actual_weight_lb, 0) + " lb -- " + fmt(weight_difference_lb, 0) + " lb HEAVIER than the standard-density figure";
+      ? fmt(gallons, 0) + " " + (fmt(gallons, 0) === "1" ? "gallon" : "gallons") + " at " + fmt(fuel_temp_f, 0) + " degF is " + fmt(temp_difference_f, 0) + " degF above the reference, so the density is " + fmt(actual_density_lb_gal, 4) + " lb/gal and the fuel weighs " + fmt(actual_weight_lb, 0) + " lb -- " + fmt(-weight_difference_lb, 0) + " lb LIGHTER than the standard-density figure"
+      : fmt(gallons, 0) + " " + (fmt(gallons, 0) === "1" ? "gallon" : "gallons") + " at " + fmt(fuel_temp_f, 0) + " degF is " + fmt(-temp_difference_f, 0) + " degF below the reference, so the density is " + fmt(actual_density_lb_gal, 4) + " lb/gal and the fuel weighs " + fmt(actual_weight_lb, 0) + " lb -- " + fmt(weight_difference_lb, 0) + " lb HEAVIER than the standard-density figure";
   // The direction that matters, and it is not symmetric.
   const direction_verdict = warmer
     ? "OVERSTATING fuel weight, which is what using the standard density on warm fuel does, understates the payload available -- conservative for weight and balance, and it also means loading to a WEIGHT by counting gallons puts less fuel aboard than intended, which shows up as shorter range than planned"

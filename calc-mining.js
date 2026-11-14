@@ -1385,7 +1385,7 @@ export function computeFrictionHoistTraction({
   const static_slips = static_ratio >= slip_limit_ratio * (1 - 1e-12);
   const dynamic_slips = dynamic_ratio >= slip_limit_ratio * (1 - 1e-12);
   if (![slip_limit_ratio, static_ratio, dynamic_ratio, static_margin, dynamic_margin, max_acceleration_ft_s2].every(Number.isFinite)) return { error: "Traction math is not a finite value; check the inputs." };
-  const limit_verdict = "the ropes hold up to a tension ratio of " + fmt(slip_limit_ratio, 3) + " (e^(mu theta) at mu " + fmt(friction_coefficient, 2) + " and " + fmt(wrap_deg, 0) + " degrees of wrap)";
+  const limit_verdict = "the ropes hold up to a tension ratio of " + fmt(slip_limit_ratio, 3) + " (e^(mu theta) at mu " + fmt(friction_coefficient, 2) + " and " + fmt(wrap_deg, 0) + " " + (fmt(wrap_deg, 0) === "1" ? "degree" : "degrees") + " of wrap)";
   const static_verdict = (static_slips ? "SLIPS AT REST: " : "") + "standing, the tension ratio is " + fmt(static_ratio, 3) + " with the " + worst_static.where + " (" + fmt(worst_static.hi, 0) + " lb against " + fmt(worst_static.lo, 0) + " lb), " + fmt(static_margin, 2) + " times inside the slip limit";
   const dynamic_verdict = acceleration_ft_s2 > 0
     ? (dynamic_slips ? "SLIPS: " : "") + "at " + fmt(acceleration_ft_s2, 2) + " ft/s2 the ratio rises to " + fmt(dynamic_ratio, 3) + ", " + fmt(dynamic_margin, 2) + " times inside the limit" + (dynamic_slips ? " -- the ropes slide on the wheel" : "")

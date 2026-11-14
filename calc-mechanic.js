@@ -4460,9 +4460,9 @@ export function computeSprayTransferEfficiency({ applied_material_qt = 0, transf
     ? "(no alternative efficiency and material price entered)"
     : better
       ? "$" + fmt(saving_per_job_usd, 2) + " a job at $" + fmt(price_per_qt, 2) + " a quart, and $" + fmt(annual_saving_usd, 0)
-        + " across " + fmt(jobs_per_year, 0) + " jobs a year -- before the filter loading, booth cleaning, and emissions that scale with the overspray too"
+        + " across " + fmt(jobs_per_year, 0) + " " + (fmt(jobs_per_year, 0) === "1" ? "job" : "jobs") + " a year -- before the filter loading, booth cleaning, and emissions that scale with the overspray too"
       : "$" + fmt(-saving_per_job_usd, 2) + " a job MORE, and $" + fmt(-annual_saving_usd, 0)
-        + " more across " + fmt(jobs_per_year, 0) + " jobs a year";
+        + " more across " + fmt(jobs_per_year, 0) + " " + (fmt(jobs_per_year, 0) === "1" ? "job" : "jobs") + " a year";
   if (![material_sprayed_qt, overspray_qt, overspray_fraction, alt_material_sprayed_qt, saving_per_job_qt, annual_saving_usd].every(Number.isFinite)) return { error: "Transfer efficiency math is not a finite value." };
   return {
     material_sprayed_qt, overspray_qt, overspray_fraction, material_cost_usd, usage_verdict,

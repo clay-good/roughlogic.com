@@ -370,8 +370,8 @@ export function computeTiltUpLiftStress({ panel_width_ft = 0, panel_height_ft = 
   const outs = [panel_weight_lb, load_per_insert_lb, span_between_rows_ft, bending_stress_psi, modulus_of_rupture_psi, allowable_stress_psi];
   if (!outs.every(Number.isFinite)) return { error: "Tilt-up lifting math is not a finite value." };
   const verdict = within_capacity
-    ? "WITHIN CAPACITY: " + fmt(bending_stress_psi, 0) + " psi against an allowable " + fmt(allowable_stress_psi, 0) + " psi, " + fmt(utilization_pct, 0) + "% used, on " + fmt(insert_rows, 0) + " rows"
-    : "OVER CAPACITY: " + fmt(bending_stress_psi, 0) + " psi against an allowable " + fmt(allowable_stress_psi, 0) + " psi. " + (rows_required <= 4 ? "Go to " + fmt(rows_required, 0) + " rows" : "More rows will not fix this -- beyond four rows the rigging is the manufacturer's design, so thicken the panel") + ", or wait for strength -- the day-of-lift break is what authorizes the pick";
+    ? "WITHIN CAPACITY: " + fmt(bending_stress_psi, 0) + " psi against an allowable " + fmt(allowable_stress_psi, 0) + " psi, " + fmt(utilization_pct, 0) + "% used, on " + fmt(insert_rows, 0) + " " + (fmt(insert_rows, 0) === "1" ? "row" : "rows")
+    : "OVER CAPACITY: " + fmt(bending_stress_psi, 0) + " psi against an allowable " + fmt(allowable_stress_psi, 0) + " psi. " + (rows_required <= 4 ? "Go to " + fmt(rows_required, 0) + " " + (fmt(rows_required, 0) === "1" ? "row" : "rows") : "More rows will not fix this -- beyond four rows the rigging is the manufacturer's design, so thicken the panel") + ", or wait for strength -- the day-of-lift break is what authorizes the pick";
   return {
     panel_width_ft, panel_height_ft, thickness_in, unit_weight_pcf, panel_area_ft2,
     panel_weight_lb, suction_fraction, suction_lb, lift_load_lb, insert_rows,
@@ -455,8 +455,8 @@ export function computeTiltUpBraceLoad({ panel_width_ft = 0, panel_height_ft = 0
   const verdict = within_capacity === null
     ? "Enter a brace capacity to check the count."
     : within_capacity
-      ? "WITHIN CAPACITY: " + fmt(design_axial_per_brace_lb, 0) + " lb per brace at a " + fmt(brace_safety_factor, 2) + " safety factor (" + fmt(axial_per_brace_lb, 0) + " lb unfactored) against " + fmt(brace_capacity_lb, 0) + " lb ultimate, on " + fmt(brace_count, 0) + " braces"
-      : "OVER CAPACITY: " + fmt(design_axial_per_brace_lb, 0) + " lb per brace at a " + fmt(brace_safety_factor, 2) + " safety factor (" + fmt(axial_per_brace_lb, 0) + " lb unfactored) against " + fmt(brace_capacity_lb, 0) + " lb ultimate. " + fmt(braces_required, 0) + " braces are needed at this angle";
+      ? "WITHIN CAPACITY: " + fmt(design_axial_per_brace_lb, 0) + " lb per brace at a " + fmt(brace_safety_factor, 2) + " safety factor (" + fmt(axial_per_brace_lb, 0) + " lb unfactored) against " + fmt(brace_capacity_lb, 0) + " lb ultimate, on " + fmt(brace_count, 0) + " " + (fmt(brace_count, 0) === "1" ? "brace" : "braces")
+      : "OVER CAPACITY: " + fmt(design_axial_per_brace_lb, 0) + " lb per brace at a " + fmt(brace_safety_factor, 2) + " safety factor (" + fmt(axial_per_brace_lb, 0) + " lb unfactored) against " + fmt(brace_capacity_lb, 0) + " lb ultimate. " + fmt(braces_required, 0) + " " + (fmt(braces_required, 0) === "1" ? "brace" : "braces") + " are needed at this angle";
   return {
     design_axial_per_brace_lb, brace_safety_factor,
     panel_width_ft, panel_height_ft, panel_area_ft2, wind_pressure_psf, wind_force_lb,

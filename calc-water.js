@@ -2342,7 +2342,7 @@ export function computeStepDrawdownEfficiency({
   if (!(total_drawdown_ft > 0)) return { error: "Total drawdown at the operating rate is not positive." };
   const efficiency_pct = aquifer_loss_ft / total_drawdown_ft * 100;
   const specific_capacity_gpm_ft = operating_gpm / total_drawdown_ft;
-  const fit_verdict = "fitting s/Q against Q across " + fmt(n, 0) + " steps gives B = " + fmt(b_ft_per_gpm, 5) + " ft per gpm of aquifer loss and C = " + fmt(c_ft_per_gpm2, 8) + " ft per gpm squared of well loss";
+  const fit_verdict = "fitting s/Q against Q across " + fmt(n, 0) + " " + (fmt(n, 0) === "1" ? "step" : "steps") + " gives B = " + fmt(b_ft_per_gpm, 5) + " ft per gpm of aquifer loss and C = " + fmt(c_ft_per_gpm2, 8) + " ft per gpm squared of well loss";
   const split_verdict = "at " + fmt(operating_gpm, 0) + " gpm the drawdown is " + fmt(total_drawdown_ft, 1) + " ft: " + fmt(aquifer_loss_ft, 1) + " ft of aquifer loss and " + fmt(well_loss_ft, 1) + " ft of WELL loss. Specific capacity is " + fmt(specific_capacity_gpm_ft, 2) + " gpm per ft";
   const below_threshold = efficiency_pct < efficiency_threshold_pct;
   const efficiency_verdict = "well efficiency is " + fmt(efficiency_pct, 1) + "% -- " + fmt(well_loss_ft, 1) + " ft of the " + fmt(total_drawdown_ft, 1) + " is the well fighting itself, and THAT part is recoverable by rehabilitation. The aquifer loss is a property of the formation and is not"
@@ -2428,13 +2428,13 @@ export function computeWellCasingPurgeVolume({
   const gal_per_ft = _WELL_GAL_PER_FT_COEFF * casing_diameter_in * casing_diameter_in;
   const standing_column_ft = well_depth_ft - static_water_level_ft;
   const casing_volume_gal = gal_per_ft * standing_column_ft;
-  const volume_verdict = "a " + fmt(casing_diameter_in, 1) + " in casing holds " + fmt(gal_per_ft, 2) + " gal per foot, and " + fmt(standing_column_ft, 0) + " ft of standing column (" + fmt(well_depth_ft, 0) + " ft deep less a " + fmt(static_water_level_ft, 0) + " ft static level) is " + fmt(casing_volume_gal, 0) + " gallons";
+  const volume_verdict = "a " + fmt(casing_diameter_in, 1) + " in casing holds " + fmt(gal_per_ft, 2) + " gal per foot, and " + fmt(standing_column_ft, 0) + " ft of standing column (" + fmt(well_depth_ft, 0) + " ft deep less a " + fmt(static_water_level_ft, 0) + " ft static level) is " + fmt(casing_volume_gal, 0) + " " + (fmt(casing_volume_gal, 0) === "1" ? "gallon" : "gallons");
   const purge_volume_gal = casing_volume_gal * purge_volumes;
   const has_rate = purge_rate_gpm > 0;
   const purge_minutes = has_rate ? purge_volume_gal / purge_rate_gpm : 0;
-  const purge_verdict = "purging " + fmt(purge_volumes, 1) + " casing volumes before sampling is " + fmt(purge_volume_gal, 0) + " gallons"
+  const purge_verdict = "purging " + fmt(purge_volumes, 1) + " casing volumes before sampling is " + fmt(purge_volume_gal, 0) + " " + (fmt(purge_volume_gal, 0) === "1" ? "gallon" : "gallons")
     + (has_rate
-      ? ", which at " + fmt(purge_rate_gpm, 1) + " gpm is " + fmt(purge_minutes, 0) + " minutes -- the number that decides whether a sampling visit is a twenty-minute job or a two-hour one"
+      ? ", which at " + fmt(purge_rate_gpm, 1) + " gpm is " + fmt(purge_minutes, 0) + " " + (fmt(purge_minutes, 0) === "1" ? "minute" : "minutes") + " -- the number that decides whether a sampling visit is a twenty-minute job or a two-hour one"
       : ". (No purge rate entered, and the TIME is what decides how a sampling visit is scheduled)");
   const has_dose = target_dose_mg_l > 0;
   const chlorine_lb = has_dose ? casing_volume_gal / 1e6 * _WELL_LB_PER_MG_MGL * target_dose_mg_l : 0;
@@ -2596,7 +2596,7 @@ export function computeWetWellCycleTime({
   const area_ft2 = Math.PI / 4 * well_diameter_ft * well_diameter_ft;
   const gal_per_ft = area_ft2 * _WW_GAL_PER_CU_FT;
   const level_differential_ft = active_volume_gal / gal_per_ft;
-  const volume_verdict = "a " + fmt(cycle_min, 1) + " minute minimum cycle (" + fmt(starts_per_hour, 1) + " starts an hour) on a " + fmt(pump_gpm, 0) + " gpm pump needs " + fmt(active_volume_gal, 0) + " gallons of ACTIVE volume -- the volume between the start and stop levels, not the whole well";
+  const volume_verdict = "a " + fmt(cycle_min, 1) + " minute minimum cycle (" + fmt(starts_per_hour, 1) + " starts an hour) on a " + fmt(pump_gpm, 0) + " gpm pump needs " + fmt(active_volume_gal, 0) + " " + (fmt(active_volume_gal, 0) === "1" ? "gallon" : "gallons") + " of ACTIVE volume -- the volume between the start and stop levels, not the whole well";
   const geometry_verdict = "a " + fmt(well_diameter_ft, 1) + " ft well is " + fmt(area_ft2, 1) + " sq ft, or " + fmt(gal_per_ft, 0) + " gal per foot of depth, so the level differential is " + fmt(level_differential_ft, 2) + " ft between the start and stop floats";
   const worst_verdict = "THE GOVERNING CASE IS INFLOW AT HALF THE PUMP RATE, which is " + fmt(worst_case_inflow_gpm, 0) + " gpm here. That is where a fixed-speed station cycles fastest: at a low inflow the well takes a long time to fill, and at an inflow near the pump rate it takes a long time to draw down -- halfway between, both halves are short at once. Sizing on average inflow instead of that worst case is how a station ends up short-cycling at a flow it will certainly see";
   const has_inflow = inflow_gpm > 0;
@@ -2666,8 +2666,8 @@ export function computeMainFlushingVolume({
   const required_gpm = _MAIN_GPM_COEFF * main_diameter_in * main_diameter_in * target_velocity_fps;
   const total_discharged_gal = pipe_volume_gal * pipe_volumes;
   const duration_min = total_discharged_gal / required_gpm;
-  const volume_verdict = "a " + fmt(main_diameter_in, 0) + " in main holds " + fmt(gal_per_ft, 2) + " gal per foot, so " + fmt(run_length_ft, 0) + " ft is " + fmt(pipe_volume_gal, 0) + " gallons";
-  const flow_verdict = "reaching " + fmt(target_velocity_fps, 1) + " ft/s takes " + fmt(required_gpm, 0) + " gpm, and " + fmt(pipe_volumes, 1) + " pipe volumes at that flow is " + fmt(duration_min, 0) + " minutes and " + fmt(total_discharged_gal, 0) + " gallons discharged -- both worth knowing before opening the hydrant, because that water has to go somewhere and be dechlorinated";
+  const volume_verdict = "a " + fmt(main_diameter_in, 0) + " in main holds " + fmt(gal_per_ft, 2) + " gal per foot, so " + fmt(run_length_ft, 0) + " ft is " + fmt(pipe_volume_gal, 0) + " " + (fmt(pipe_volume_gal, 0) === "1" ? "gallon" : "gallons");
+  const flow_verdict = "reaching " + fmt(target_velocity_fps, 1) + " ft/s takes " + fmt(required_gpm, 0) + " gpm, and " + fmt(pipe_volumes, 1) + " pipe volumes at that flow is " + fmt(duration_min, 0) + " " + (fmt(duration_min, 0) === "1" ? "minute" : "minutes") + " and " + fmt(total_discharged_gal, 0) + " " + (fmt(total_discharged_gal, 0) === "1" ? "gallon" : "gallons") + " discharged -- both worth knowing before opening the hydrant, because that water has to go somewhere and be dechlorinated";
   // Whether the outlets can actually pass the required flow is the real question.
   const has_outlets = hydrant_outlets > 0 && outlet_capacity_gpm > 0;
   const outlet_total_gpm = has_outlets ? hydrant_outlets * outlet_capacity_gpm : 0;
@@ -2679,8 +2679,8 @@ export function computeMainFlushingVolume({
   const outlet_verdict = !has_limit
     ? "(no available flow or hydrant outlet capacity entered -- and whether the outlets can PASS the required flow is the whole question)"
     : scours
-      ? "the available " + fmt(governing_gpm, 0) + " gpm reaches " + fmt(achieved_velocity_fps, 2) + " ft/s, at or above the target, so the run scours. It takes " + fmt(actual_duration_min, 0) + " minutes at that flow"
-      : "THE AVAILABLE " + fmt(governing_gpm, 0) + " GPM REACHES ONLY " + fmt(achieved_velocity_fps, 2) + " FT/S, below the " + fmt(target_velocity_fps, 1) + " ft/s target -- so this run does NOT scour. The crew flushes for " + fmt(actual_duration_min, 0) + " minutes, discharges " + fmt(total_discharged_gal, 0) + " gallons, and the main is no cleaner. That is the failure this calculation exists to catch";
+      ? "the available " + fmt(governing_gpm, 0) + " gpm reaches " + fmt(achieved_velocity_fps, 2) + " ft/s, at or above the target, so the run scours. It takes " + fmt(actual_duration_min, 0) + " " + (fmt(actual_duration_min, 0) === "1" ? "minute" : "minutes") + " at that flow"
+      : "THE AVAILABLE " + fmt(governing_gpm, 0) + " GPM REACHES ONLY " + fmt(achieved_velocity_fps, 2) + " FT/S, below the " + fmt(target_velocity_fps, 1) + " ft/s target -- so this run does NOT scour. The crew flushes for " + fmt(actual_duration_min, 0) + " " + (fmt(actual_duration_min, 0) === "1" ? "minute" : "minutes") + ", discharges " + fmt(total_discharged_gal, 0) + " " + (fmt(total_discharged_gal, 0) === "1" ? "gallon" : "gallons") + ", and the main is no cleaner. That is the failure this calculation exists to catch";
   // The diameter at which a single outlet stops being enough.
   const single_outlet_gpm = outlet_capacity_gpm > 0 ? outlet_capacity_gpm : 1000;
   const max_diameter_one_outlet = Math.sqrt(single_outlet_gpm / (_MAIN_GPM_COEFF * target_velocity_fps));

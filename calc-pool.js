@@ -117,13 +117,13 @@ export function computePoolCoverEvaporation({
   const pounds_per_day = gallons_per_day * _POOL_LB_PER_GAL;
   const btu_per_day = pounds_per_day * _POOL_LATENT_BTU_PER_LB;
   const mmbtu_per_day = btu_per_day / 1e6;
-  const loss_verdict = "a " + fmt(surface_area_ft2, 0) + " sq ft pool losing " + fmt(evaporation_in_day, 3) + " in a day evaporates " + fmt(gallons_per_day, 0) + " gallons (" + fmt(pounds_per_day, 0) + " lb), and at " + fmt(_POOL_LATENT_BTU_PER_LB, 0) + " BTU per pound of latent heat that is " + fmt(mmbtu_per_day, 2) + " MMBTU a day -- to evaporation ALONE";
+  const loss_verdict = "a " + fmt(surface_area_ft2, 0) + " sq ft pool losing " + fmt(evaporation_in_day, 3) + " in a day evaporates " + fmt(gallons_per_day, 0) + " " + (fmt(gallons_per_day, 0) === "1" ? "gallon" : "gallons") + " (" + fmt(pounds_per_day, 0) + " lb), and at " + fmt(_POOL_LATENT_BTU_PER_LB, 0) + " BTU per pound of latent heat that is " + fmt(mmbtu_per_day, 2) + " MMBTU a day -- to evaporation ALONE";
   const has_cover = cover_hours_per_day > 0 && cover_effectiveness_pct > 0;
   const cover_fraction = has_cover ? (cover_effectiveness_pct / 100) * (cover_hours_per_day / 24) : 0;
   const cover_saving_mmbtu_day = mmbtu_per_day * cover_fraction;
   const cover_verdict = !has_cover
     ? "(no cover hours and effectiveness entered)"
-    : "a cover at " + fmt(cover_effectiveness_pct, 0) + "% effectiveness on for " + fmt(cover_hours_per_day, 0) + " hours a day saves " + fmt(cover_saving_mmbtu_day, 2) + " MMBTU a day -- " + fmt(cover_fraction * 100, 0) + "% of the evaporative loss, because it only works while it is ON. The hours matter as much as the effectiveness, and a cover that is on overnight catches the coldest, driest hours when evaporation is fastest";
+    : "a cover at " + fmt(cover_effectiveness_pct, 0) + "% effectiveness on for " + fmt(cover_hours_per_day, 0) + " " + (fmt(cover_hours_per_day, 0) === "1" ? "hour" : "hours") + " a day saves " + fmt(cover_saving_mmbtu_day, 2) + " MMBTU a day -- " + fmt(cover_fraction * 100, 0) + "% of the evaporative loss, because it only works while it is ON. The hours matter as much as the effectiveness, and a cover that is on overnight catches the coldest, driest hours when evaporation is fastest";
   const has_cost = fuel_cost_per_mmbtu > 0 && season_days > 0 && has_cover;
   const season_saving_mmbtu = has_cover ? cover_saving_mmbtu_day * season_days : 0;
   const fuel_mmbtu = has_cover ? season_saving_mmbtu / (heater_efficiency_pct / 100) : 0;
@@ -131,7 +131,7 @@ export function computePoolCoverEvaporation({
   const cost_verdict = !has_cost
     ? "(no fuel cost and season length entered)"
     : "over a " + fmt(season_days, 0) + " day season that is " + fmt(season_saving_mmbtu, 1) + " MMBTU of pool heat, or " + fmt(fuel_mmbtu, 1) + " MMBTU of FUEL at " + fmt(heater_efficiency_pct, 0) + "% heater efficiency -- " + fmt(season_saving_cost, 0) + " at " + fmt(fuel_cost_per_mmbtu, 2) + " per MMBTU. Note the division by efficiency: the saving is fuel not bought, so it is larger than the heat saved";
-  const water_verdict = "AND THE WATER IS A SECOND SAVING that the heat figure hides. " + fmt(gallons_per_day, 0) + " gallons a day is " + fmt(gallons_per_day * (season_days > 0 ? season_days : 180), 0) + " gallons over the season, all of it treated and chemically balanced, and all of it replaced with cold water that then has to be heated. A cover reduces that in the same proportion it reduces the heat";
+  const water_verdict = "AND THE WATER IS A SECOND SAVING that the heat figure hides. " + fmt(gallons_per_day, 0) + " " + (fmt(gallons_per_day, 0) === "1" ? "gallon" : "gallons") + " a day is " + fmt(gallons_per_day * (season_days > 0 ? season_days : 180), 0) + " gallons over the season, all of it treated and chemically balanced, and all of it replaced with cold water that then has to be heated. A cover reduces that in the same proportion it reduces the heat";
   const dominance_verdict = "EVAPORATION IS THE LARGEST LOSS ON MOST OUTDOOR POOLS and it is the one nobody sees. Radiation, convection and conduction to the ground are all real and all smaller, and a pool owner reasoning about heat loss usually reasons about the air temperature -- which is why the single most effective thing available is a cover, and why the second is a windbreak. Wind drives evaporation hard: the rate entered here is not a constant, it rises steeply with wind speed and falls with humidity, so a sheltered pool and an exposed one at the same air temperature lose quite different amounts";
   if (![gallons_per_day, pounds_per_day, mmbtu_per_day, cover_saving_mmbtu_day, season_saving_mmbtu, season_saving_cost].every(Number.isFinite)) return { error: "Pool evaporation math is not a finite value." };
   return {
@@ -217,7 +217,7 @@ export function computePoolPumpSpeedSavings({
   const annual_saving_cost = has_cost ? saving_kwh_day * days_per_year * electricity_rate_per_kwh : 0;
   const cost_verdict = !has_cost
     ? "(no electricity rate entered)"
-    : "over " + fmt(days_per_year, 0) + " days at " + fmt(electricity_rate_per_kwh, 3) + " per kWh that is " + fmt(annual_saving_cost, 0) + " a year -- which on most pools pays for a variable speed pump inside two or three seasons, and is the reason many jurisdictions now require one";
+    : "over " + fmt(days_per_year, 0) + " " + (fmt(days_per_year, 0) === "1" ? "day" : "days") + " at " + fmt(electricity_rate_per_kwh, 3) + " per kWh that is " + fmt(annual_saving_cost, 0) + " a year -- which on most pools pays for a variable speed pump inside two or three seasons, and is the reason many jurisdictions now require one";
   const has_minimum = minimum_flow_fraction > 0;
   const below_minimum = has_minimum && speed_fraction < minimum_flow_fraction - 1e-9 * minimum_flow_fraction;
   const equipment_verdict = !has_minimum
@@ -311,7 +311,7 @@ export function computePoolHeatPumpCapacity({
   const heat_up_hours = has_heatup && derated_capacity_btuh > 0 ? heat_required_btu / net_gain_btuh : 0;
   const heatup_verdict = !has_heatup
     ? "(no pool volume and temperature rise entered)"
-    : "raising " + fmt(pool_gallons, 0) + " gallons by " + fmt(temperature_rise_f, 0) + " degF takes " + fmt(heat_required_btu / 1e6, 2) + " MMBTU, which at " + fmt(derated_capacity_btuh, 0) + " BTU/h" + (surface_loss_btuh > 0 ? " less " + fmt(surface_loss_btuh, 0) + " BTU/h of surface loss" : "") + " is " + fmt(heat_up_hours, 1) + " hours -- " + fmt(heat_up_hours / 24, 1) + " days of continuous running" + (surface_loss_btuh > 0 ? "" : ", and that is BEFORE any loss from the surface while it heats");
+    : "raising " + fmt(pool_gallons, 0) + " " + (fmt(pool_gallons, 0) === "1" ? "gallon" : "gallons") + " by " + fmt(temperature_rise_f, 0) + " degF takes " + fmt(heat_required_btu / 1e6, 2) + " MMBTU, which at " + fmt(derated_capacity_btuh, 0) + " BTU/h" + (surface_loss_btuh > 0 ? " less " + fmt(surface_loss_btuh, 0) + " BTU/h of surface loss" : "") + " is " + fmt(heat_up_hours, 1) + " hours -- " + fmt(heat_up_hours / 24, 1) + " days of continuous running" + (surface_loss_btuh > 0 ? "" : ", and that is BEFORE any loss from the surface while it heats");
   const has_cover = cover_loss_reduction_pct > 0 && has_heatup && surface_loss_btuh > 0;
   // A cover does not add capacity; it removes the loss the heater is fighting.
   const heat_up_hours_with_cover = has_cover ? heat_required_btu / (derated_capacity_btuh - surface_loss_btuh * (1 - cover_loss_reduction_pct / 100)) : 0;
@@ -372,19 +372,19 @@ export function computeSpaDrainInterval({
   // The one-third rule: days = gallons / (3 x average daily bathers).
   const interval_days = spa_gallons / (3 * daily_bathers);
   const interval_weeks = interval_days / 7;
-  const interval_verdict = fmt(spa_gallons, 0) + " gallons at " + fmt(daily_bathers, 1) + " bathers a day gives a drain interval of " + fmt(interval_days, 1) + " days -- about " + fmt(interval_weeks, 1) + " weeks. The rule is volume over three times the daily bathers, and the three is a convention rather than a measurement";
+  const interval_verdict = fmt(spa_gallons, 0) + " " + (fmt(spa_gallons, 0) === "1" ? "gallon" : "gallons") + " at " + fmt(daily_bathers, 1) + " bathers a day gives a drain interval of " + fmt(interval_days, 1) + " days -- about " + fmt(interval_weeks, 1) + " weeks. The rule is volume over three times the daily bathers, and the three is a convention rather than a measurement";
   const days_remaining = interval_days - days_since_drain;
   const overdue = days_since_drain > interval_days + 1e-9 * Math.abs(interval_days);
   const status_verdict = days_since_drain <= 0
     ? "(no days since the last drain entered)"
     : overdue
-      ? "at " + fmt(days_since_drain, 0) + " days since the last drain this spa is " + fmt(-days_remaining, 0) + " days OVERDUE"
-      : "at " + fmt(days_since_drain, 0) + " days since the last drain there are " + fmt(days_remaining, 0) + " days left in the interval";
+      ? "at " + fmt(days_since_drain, 0) + " " + (fmt(days_since_drain, 0) === "1" ? "day" : "days") + " since the last drain this spa is " + fmt(-days_remaining, 0) + " days OVERDUE"
+      : "at " + fmt(days_since_drain, 0) + " " + (fmt(days_since_drain, 0) === "1" ? "day" : "days") + " since the last drain there are " + fmt(days_remaining, 0) + " " + (fmt(days_remaining, 0) === "1" ? "day" : "days") + " left in the interval";
   const has_alt = alternative_bathers > 0;
   const alternative_interval_days = has_alt ? spa_gallons / (3 * alternative_bathers) : 0;
   const alt_verdict = !has_alt
     ? "(no alternative bather load entered)"
-    : "at " + fmt(alternative_bathers, 1) + " bathers a day the interval becomes " + fmt(alternative_interval_days, 0) + " days. THE INTERVAL IS INVERSE IN BATHER LOAD, so a spa used twice as hard needs draining twice as often -- and a rule set for a quiet household is wrong for the week the family visits";
+    : "at " + fmt(alternative_bathers, 1) + " bathers a day the interval becomes " + fmt(alternative_interval_days, 0) + " " + (fmt(alternative_interval_days, 0) === "1" ? "day" : "days") + ". THE INTERVAL IS INVERSE IN BATHER LOAD, so a spa used twice as hard needs draining twice as often -- and a rule set for a quiet household is wrong for the week the family visits";
   const has_tds = current_tds_ppm > 0 && fill_tds_ppm > 0;
   const tds_rise_ppm = has_tds ? current_tds_ppm - fill_tds_ppm : 0;
   // The limit check needs only the current reading, not the fill water's.
