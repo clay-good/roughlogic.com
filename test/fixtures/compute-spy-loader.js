@@ -6,10 +6,16 @@
 // module body runs, both get the wrapper. Test-only; nothing
 // here touches the shipped modules.
 const ROOT = new URL("../../", import.meta.url).href;
+// Synchronous for registerHooks; register() (Node 20) awaits whatever it returns,
+// and there `next` returns a promise, so both shapes are handled.
 export function load(url, context, next) {
   const out = next(url, context);
+  if (out && typeof out.then === "function") return out.then((o) => spy(url, o));
+  return spy(url, out);
+}
+function spy(url, out) {
   if (!url.startsWith(ROOT) || !/^calc-[^/]+\.js$/.test(url.slice(ROOT.length))) return out;
-  const src = String(out.source);
+  const src = typeof out.source === "string" ? out.source : new TextDecoder().decode(out.source);
   const names = [...src.matchAll(/^export function (compute\w+)\s*\(/gm)].map((m) => m[1]);
   if (!names.length) return out;
   const tail = names.map((n) => `${n} = globalThis.__computeSpy(${n}, ${JSON.stringify(n)});`).join("\n");

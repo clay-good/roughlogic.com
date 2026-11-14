@@ -16,9 +16,11 @@
 // hits, each a flag masked by a louder verdict on the same page (OVER THE PEL,
 // DOES NOT PASS, FAILS BOTH, OVERLOADED, ...) or reached only by an input no
 // real case has; the unit test holds the one-input list, not these.
-import { registerHooks } from "node:module";
-import { load } from "./compute-spy-loader.js";
-registerHooks({ load });
+// registerHooks (in-thread) is Node 22.15+; CI runs Node 20, which has only the
+// off-thread register(). The hook is the same either way.
+import * as nodeModule from "node:module";
+if (nodeModule.registerHooks) nodeModule.registerHooks({ load: (await import("./compute-spy-loader.js")).load });
+else nodeModule.register("./compute-spy-loader.js", import.meta.url);
 
 const calls = new Map();
 globalThis.__computeSpy = (fn, name) => function (...a) {
