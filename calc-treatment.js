@@ -974,7 +974,9 @@ export const flocculationGValueExample = { inputs: { power_input_w: 300, basin_v
 // output line so the metric entry path stays one read away.
 const renderFlocculationGValue = _rPool({
   citation: "Citation: Camp-Stein velocity gradient (Camp & Stein), by name, and Recommended Standards for Water Works (Ten States) 2022 4.2.3(b). G = sqrt(P / (mu x V)); Gt = G x detention_time; mu is water dynamic viscosity at the given temperature. Rapid mix needs G of at least 750/s (Ten States); flocculation G 20-70/s and Gt 10^4-10^5 are textbook bands. Cold water is more viscous, so the same paddle delivers a lower G in winter; too high a G in flocculation shears the floc. The treatment-process design governs.",
-  example: { power_input_hp: 0.4, basin_volume_gal: 26400, water_temp_f: 50, detention_time_s: 1200 },
+  // The published example is metric (300 W, 100 m3, 10 C); these are its exact conversions, so the
+  // page computes the same G the shell prints (0.4 hp and 26,400 gal ran 0.25% low until 2026-11-15).
+  example: { power_input_hp: 0.4023, basin_volume_gal: 26417, water_temp_f: 50, detention_time_s: 1200 },
   fields: [
     { key: "power_input_hp", label: "Net power to the water P (hp)", kind: "number" },
     { key: "basin_volume_gal", label: "Mixing basin volume V (gal)", kind: "number" },
