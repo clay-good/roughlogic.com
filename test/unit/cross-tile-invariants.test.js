@@ -7916,13 +7916,9 @@ test("monotonicity: computeOutdoorAirMix mixed_T_F is the linear convex combinat
   assert.ok(Math.abs(f1.mixed_T_F - 95) < 1e-12, `f=1 T_mix = ${f1.mixed_T_F}, expected 95`);
   assert.ok(Math.abs(f1.mixed_W_kg_kg - f1.outdoor_W_kg_kg) < 1e-12,
     `f=1 W_mix = ${f1.mixed_W_kg_kg}, expected ${f1.outdoor_W_kg_kg}`);
-  // f-clamp pin: f < 0 clamps to 0; f > 1 clamps to 1.
-  const fNeg = computeOutdoorAirMix({ return_T_F: 75, return_RH_percent: 50, outdoor_T_F: 95, outdoor_RH_percent: 60, oa_fraction: -0.5 });
-  assert.equal(fNeg.oa_fraction, 0);
-  assert.ok(Math.abs(fNeg.mixed_T_F - 75) < 1e-12);
-  const fHi = computeOutdoorAirMix({ return_T_F: 75, return_RH_percent: 50, outdoor_T_F: 95, outdoor_RH_percent: 60, oa_fraction: 2 });
-  assert.equal(fHi.oa_fraction, 1);
-  assert.ok(Math.abs(fHi.mixed_T_F - 95) < 1e-12);
+  // Out-of-range pin: f < 0 and f > 1 are refused (they were clamped silently until 2026-11-15).
+  assert.ok(computeOutdoorAirMix({ return_T_F: 75, return_RH_percent: 50, outdoor_T_F: 95, outdoor_RH_percent: 60, oa_fraction: -0.5 }).error);
+  assert.ok(computeOutdoorAirMix({ return_T_F: 75, return_RH_percent: 50, outdoor_T_F: 95, outdoor_RH_percent: 60, oa_fraction: 2 }).error);
   // Convex-combination pin: at f=0.5 mixed_T = (75 + 95) / 2 = 85 exact.
   const half = computeOutdoorAirMix({ return_T_F: 75, return_RH_percent: 50, outdoor_T_F: 95, outdoor_RH_percent: 60, oa_fraction: 0.5 });
   assert.ok(Math.abs(half.mixed_T_F - 85) < 1e-12, `f=0.5 T_mix = ${half.mixed_T_F}, expected 85`);

@@ -496,6 +496,8 @@ export function computeOutdoorAirMix({ return_T_F, return_RH_percent, outdoor_T_
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (![return_T_F, return_RH_percent, outdoor_T_F, outdoor_RH_percent, oa_fraction].every((x) => x !== null && x !== undefined && x !== "" && Number.isFinite(Number(x)))) return { error: "Enter both air states (F and % RH) and the outdoor-air fraction." };
   if (![return_RH_percent, outdoor_RH_percent].every((x) => Number(x) >= 0 && Number(x) <= 100)) return { error: "Relative humidity is between 0 and 100%." };
+  // -0.2 and 1.2 were clamped to 0 and 1 without a word until 2026-11-15.
+  if (!(Number(oa_fraction) >= 0 && Number(oa_fraction) <= 1)) return { error: "Outdoor-air fraction must be from 0 to 1 (0.25, not 25)." };
   const f = Math.max(0, Math.min(1, Number(oa_fraction) || 0));
   const ra_T_C = F_to_C(return_T_F);
   const oa_T_C = F_to_C(outdoor_T_F);

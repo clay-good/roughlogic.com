@@ -641,6 +641,8 @@ export function computeSteelTensionMember({ ag_in2 = 0, fy = 36, fu = 58, t_in =
   if (nh > 0 && !(t_in > 0)) return { error: "Thickness at the holes must be positive (in) when holes are deducted." };
   if (nh > 0 && !(dh_in > 0)) return { error: "Hole diameter must be positive (in) when holes are deducted." };
   if (xbar_in < 0 || l_in < 0 || u_in < 0) return { error: "Eccentricity, connection length, and U cannot be negative." };
+  // An override above 1 was clamped to 1.0 without a word until 2026-11-15.
+  if (u_in > 1) return { error: "The shear-lag factor U is at most 1.0 (AISC Table D3.1)." };
   const an_in2 = ag_in2 - nh * dh_in * t_in;
   if (!(an_in2 > 0)) return { error: "The holes consume the whole section - the net area must be positive." };
   let u;

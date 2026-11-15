@@ -1262,15 +1262,12 @@ test("bounds: calc-hvac computeOutdoorAirMix pins the mass-balance temperature m
   }
 });
 
-test("bounds: calc-hvac computeOutdoorAirMix clamps OA fraction to [0, 1] (documented)", () => {
-  const below = computeOutdoorAirMix({ return_T_F: 75, return_RH_percent: 50, outdoor_T_F: 95, outdoor_RH_percent: 50, oa_fraction: -0.5 });
-  assert.strictEqual(below.oa_fraction, 0);
-  // Below clamp -> 100% return air -> mixed_T_F == return_T_F.
-  assert.ok(Math.abs(below.mixed_T_F - 75) < 1e-12);
-  const above = computeOutdoorAirMix({ return_T_F: 75, return_RH_percent: 50, outdoor_T_F: 95, outdoor_RH_percent: 50, oa_fraction: 2 });
-  assert.strictEqual(above.oa_fraction, 1);
-  // Above clamp -> 100% outdoor air -> mixed_T_F == outdoor_T_F.
-  assert.ok(Math.abs(above.mixed_T_F - 95) < 1e-12);
+test("bounds: calc-hvac computeOutdoorAirMix refuses an OA fraction outside [0, 1] (clamped silently until 2026-11-15)", () => {
+  assert.ok("error" in computeOutdoorAirMix({ return_T_F: 75, return_RH_percent: 50, outdoor_T_F: 95, outdoor_RH_percent: 50, oa_fraction: -0.5 }));
+  assert.ok("error" in computeOutdoorAirMix({ return_T_F: 75, return_RH_percent: 50, outdoor_T_F: 95, outdoor_RH_percent: 50, oa_fraction: 2 }));
+  // The endpoints themselves are the pure streams.
+  assert.ok(Math.abs(computeOutdoorAirMix({ return_T_F: 75, return_RH_percent: 50, outdoor_T_F: 95, outdoor_RH_percent: 50, oa_fraction: 0 }).mixed_T_F - 75) < 1e-12);
+  assert.ok(Math.abs(computeOutdoorAirMix({ return_T_F: 75, return_RH_percent: 50, outdoor_T_F: 95, outdoor_RH_percent: 50, oa_fraction: 1 }).mixed_T_F - 95) < 1e-12);
 });
 
 // --------------------------------------------------------------------
@@ -17339,9 +17336,9 @@ test("bounds: spec-v283 computeSteelTensionMember pins the limit-state flip, the
   const r2 = _v283({ ag_in2: 3.75, fy: 36, fu: 58, nh: 0, u_in: 1.0 });
   assert.ok(Math.abs(r2.p_asd_kip - 135 / 1.67) < 1e-9);
   assert.ok(r2.governs.startsWith("gross-section yielding"));
-  // The U override is capped at 1.0.
-  const r3 = _v283({ ag_in2: 3.75, fy: 36, fu: 58, nh: 0, u_in: 1.4 });
-  assert.strictEqual(r3.u, 1.0);
+  // A U override above 1.0 is refused (it was capped silently until 2026-11-15); 1.0 itself is used.
+  assert.ok("error" in _v283({ ag_in2: 3.75, fy: 36, fu: 58, nh: 0, u_in: 1.4 }));
+  assert.strictEqual(_v283({ ag_in2: 3.75, fy: 36, fu: 58, nh: 0, u_in: 1.0 }).u, 1.0);
   // Error seams.
   assert.ok("error" in _v283({ ag_in2: 0, fy: 36, fu: 58 }));
   assert.ok("error" in _v283({ ag_in2: 3.75, fy: 36, fu: 58, nh: 1, t_in: 0 }));

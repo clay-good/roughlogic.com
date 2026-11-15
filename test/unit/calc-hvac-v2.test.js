@@ -161,14 +161,15 @@ test("OA mix: humid OA raises mixed grains", () => {
   assert.ok(b.mixed_GPP > a.mixed_GPP);
 });
 
-test("OA mix: fraction clamped to [0,1] when given negative", () => {
+// Until 2026-11-15 an out-of-range fraction was clamped to [0,1] without a word.
+test("OA mix: a negative fraction is refused", () => {
   const r = computeOutdoorAirMix({ return_T_F: 75, return_RH_percent: 50, outdoor_T_F: 95, outdoor_RH_percent: 60, oa_fraction: -0.5 });
-  assert.equal(r.oa_fraction, 0);
+  assert.match(r.error, /from 0 to 1/);
 });
 
-test("OA mix: fraction clamped to [0,1] when given >1", () => {
+test("OA mix: a fraction above 1 is refused", () => {
   const r = computeOutdoorAirMix({ return_T_F: 75, return_RH_percent: 50, outdoor_T_F: 95, outdoor_RH_percent: 60, oa_fraction: 1.5 });
-  assert.equal(r.oa_fraction, 1);
+  assert.match(r.error, /from 0 to 1/);
 });
 
 test("OA mix: mixed humidity ratio between RA and OA", () => {
