@@ -487,7 +487,7 @@ TELECOM_RENDERERS["cable-jetting-distance"] = _simpleRenderer({
 export function computeSpliceLossMismatch({ mfd_1_um = 0, mfd_2_um = 0, lateral_offset_um = 0, cleave_angle_deg = 0, wavelength_nm = 0, fiber_index = 0 } = {}) {
   const guard = _finiteGuard(arguments[0]); if (guard) return { error: guard.error };
   if (!(mfd_1_um > 0) || !(mfd_2_um > 0) || !(wavelength_nm > 0) || !(fiber_index > 1)) return { error: "Mode-field diameters and wavelength must be positive, and fiber index must exceed 1." };
-  if (!(lateral_offset_um >= 0) || !(cleave_angle_deg >= 0 && cleave_angle_deg < 90)) return { error: "Offset cannot be negative and cleave angle must be from 0 up to 90 degrees." };
+  if (!(lateral_offset_um >= 0) || !(cleave_angle_deg >= 0 && cleave_angle_deg < 90)) return { error: "Lateral offset cannot be negative, and the angular misalignment between cores must be from 0 to under 90 degrees." };
   const mismatch = (a, b) => -20 * Math.log10(2 * a * b / (a * a + b * b));
   // Two unequal Gaussian fields of radius w1 and w2 couple as
   // (2 w1 w2 / (w1^2 + w2^2))^2 exp(-2 d^2 / (w1^2 + w2^2)), so the offset and

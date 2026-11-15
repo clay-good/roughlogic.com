@@ -13120,7 +13120,7 @@ export function computeTemporaryStairwayCheck({ riser_count = 0, total_rise_in =
   if (!Number.isInteger(n) || n < 1) return { error: "Riser count must be a whole number of 1 or more." };
   if (!(rh > 0)) return { error: "Riser height must be positive (in)." };
   if (!(td > 0)) return { error: "Tread depth must be positive (in)." };
-  if (rise < 0 || rv < 0 || tv < 0 || rail < 0 || land < 0) return { error: "Rises, variations, and heights cannot be negative (in)." };
+  if (rise < 0 || rv < 0 || tv < 0 || rail < 0 || land < 0) return { error: "Rises, variations, heights and the landing depth cannot be negative (in)." };
 
   const ANGLE_MIN = 30, ANGLE_MAX = 50, VAR_MAX = 0.25, RISER_TRIGGER = 4, RISE_TRIGGER = 30, RAIL_MIN = 36, LANDING_MIN = 30;
   // The larger of the entered rise and risers x height: an entered rise used to override taller geometry.
