@@ -1475,6 +1475,8 @@ export function computeLitterCarryTeam({ distance_mi = 0, pace_mph = 1.0, carrie
   if (!(distance_mi > 0)) return { error: "Carry distance must be positive." };
   if (!(pace_mph > 0)) return { error: "Sustained pace must be positive." };
   if (!(carriers_per_litter >= 1)) return { error: "Carriers per litter must be at least 1." };
+  // 1.2 carriers per litter printed "4.4 people" until 2026-11-15.
+  if (!Number.isInteger(carriers_per_litter)) return { error: "Carriers per litter must be a whole number of people." };
   if (!(duty_fraction > 0 && duty_fraction <= 1)) return { error: "Duty fraction per team must be above 0 and at most 1." };
   if (!(rotation_interval_min > 0)) return { error: "Rotation interval must be positive." };
   if (!(support_personnel >= 0)) return { error: "Support personnel cannot be negative." };

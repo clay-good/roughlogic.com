@@ -179,9 +179,9 @@ DATACENTER_RENDERERS["rack-power-density-airflow"] = _simpleRenderer({
   outputs: [
     { key: "heat_btu_h", id: "rpa-heat", label: "Rack heat", unit: "Btu/h", value: (r) => fmt(r.heat_btu_h, 0) + " Btu/h" },
     { key: "required_cfm", id: "rpa-air", label: "Required rack airflow", unit: "cfm", value: (r) => fmt(r.required_cfm, 0) + " cfm (" + fmt(r.cfm_per_kw, 0) + " cfm/kW)" },
-    { key: "standard_tiles_required", id: "rpa-tiles", label: "Standard tiles required", value: (r) => fmt(r.standard_tiles_required, 2) },
-    { key: "comparison_required_cfm", id: "rpa-high", label: "Higher-density rack", value: (r) => fmt(r.comparison_required_cfm, 0) + " cfm; " + fmt(r.comparison_standard_tiles_required, 2) + " standard tiles" },
-    { key: "comparison_high_flow_tiles_required", id: "rpa-hft", label: "With high-flow tiles", value: (r) => fmt(r.comparison_high_flow_tiles_required, 2) + " tiles" },
+    { key: "standard_tiles_required", id: "rpa-tiles", label: "Standard tiles required", value: (r) => fmt(r.standard_tiles_required, 2) + " (place " + Math.ceil(r.standard_tiles_required - 1e-9) + ")" },
+    { key: "comparison_required_cfm", id: "rpa-high", label: "Higher-density rack", value: (r) => fmt(r.comparison_required_cfm, 0) + " cfm; " + fmt(r.comparison_standard_tiles_required, 2) + " standard tiles (place " + Math.ceil(r.comparison_standard_tiles_required - 1e-9) + ")" },
+    { key: "comparison_high_flow_tiles_required", id: "rpa-hft", label: "With high-flow tiles", value: (r) => fmt(r.comparison_high_flow_tiles_required, 2) + " tiles (place " + Math.ceil(r.comparison_high_flow_tiles_required - 1e-9) + ")" },
     { key: "alternative_delta_t_cfm", id: "rpa-alt", label: "Airflow at alternative rise", unit: "cfm", value: (r) => fmt(r.alternative_delta_t_cfm, 0) + " cfm (" + fmtDir(r.alternative_airflow_reduction_pct, 1, " %", "less", "more") + ")" },
     { key: "note", id: "rpa-note", label: "Use", value: (r) => r.note },
   ],
