@@ -27,9 +27,16 @@ import { renderLimitationBanner, getLimitationCopy } from "./limitation-banner.j
 // Non-exported, so it adds no v14 derivation-corpus row.
 const _finiteGuard = (o) => {
   if (o && typeof o === "object" && !Array.isArray(o)) {
-    for (const v of Object.values(o)) {
+    for (const [k, v] of Object.entries(o)) {
       if (typeof v === "number" && !Number.isFinite(v)) {
         return { error: "All numeric inputs must be finite numbers." };
+      }
+      // A temperature below absolute zero is a typo, not a reading (157 inputs answered one until 2026-11-15).
+      if (typeof v === "number" && v < -459.67 && /(?:_f|_degf|temp_?f)$/i.test(k) && !/delta|_dt_|_dt$|rise|drop|diff|offset|range|toleran|margin|per_|gradient|change|cltd|_td_|_td$|swing|span/i.test(k)) {
+        return { error: "A temperature cannot be below absolute zero (-459.67 F): " + k + "." };
+      }
+      if (typeof v === "number" && v < -273.15 && /(?:temp|temperature|ambient|amb|bulb|dew_point|record_low|record_high|rating|preheat)_c$|_degc$/i.test(k)) {
+        return { error: "A temperature cannot be below absolute zero (-273.15 C): " + k + "." };
       }
     }
   }
@@ -3090,6 +3097,7 @@ HVAC_RENDERERS["economizer-savings-hours"] = renderEconomizerSavingsHours;
 // radiation at the jacket emissivity, optional wind) at the jacket OD, iterated with the jacket temperature it sets.
 // dims: in { od_in: L, thickness_in: L, k_value: dimensionless, hot_f: T, amb_f: T, length_ft: L, film_coeff_btu_hr_ft2_f: M T^-3, film_mode: dimensionless, jacket_emissivity: dimensionless, wind_mph: L T^-1 } out: { q_per_ft_btuh: M*L*T^-3, q_total_btuh: M*L^2*T^-3, surface_temp_f: T, film_used_btu_hr_ft2_f: M T^-3 }
 export function computePipeHeatLossRadial({ od_in = 0, thickness_in = 0, k_value = 0, hot_f = 0, amb_f = 0, length_ft = 1, film_coeff_btu_hr_ft2_f = 0, film_mode = "entered", jacket_emissivity = 0.9, wind_mph = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const od = Number(od_in) || 0;
   const th = Number(thickness_in) || 0;
   const k = Number(k_value) || 0;
@@ -3268,6 +3276,7 @@ HVAC_RENDERERS["bare-pipe-heat-loss"] = renderBarePipeHeatLoss;
 // r2 = r1*exp(...) and thickness = r2 - r1.
 // dims: in { od_in: L, k_value: dimensionless, hot_f: T, amb_f: T, target_q_per_ft_btuh: M*L*T^-3 } out: { thickness_in: L, r2_in: L }
 export function computeInsulationThicknessForHeatLoss({ od_in = 0, k_value = 0, hot_f = 0, amb_f = 0, target_q_per_ft_btuh = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // A blank temperature read as 0 F sized insulation for a pipe in a 0 F room.
   if ([hot_f, amb_f].some((x) => x === null || x === "")) return { error: "Enter the hot surface and ambient temperatures (F)." };
   const od = Number(od_in) || 0;
@@ -3593,8 +3602,11 @@ HVAC_RENDERERS["fixed-orifice-target-superheat"] = _renderFixedOrificeTargetSupe
 
 const _finiteGuardEnv = (o) => {
   if (o && typeof o === "object" && !Array.isArray(o)) {
-    for (const v of Object.values(o)) {
+    for (const [k, v] of Object.entries(o)) {
       if (typeof v === "number" && !Number.isFinite(v)) return { error: "All numeric inputs must be finite numbers." };
+      // A temperature below absolute zero is a typo, not a reading (until 2026-11-15 it was answered).
+      if (typeof v === "number" && v < -459.67 && /(?:_f|_degf|temp_?f)$/i.test(k) && !/delta|_dt_|_dt$|rise|drop|diff|offset|range|toleran|margin|per_|gradient|change|cltd|_td_|_td$|swing|span/i.test(k)) return { error: "A temperature cannot be below absolute zero (-459.67 F): " + k + "." };
+      if (typeof v === "number" && v < -273.15 && /(?:temp|temperature|ambient|amb|bulb|dew_point|record_low|record_high|rating|preheat)_c$|_degc$/i.test(k)) return { error: "A temperature cannot be below absolute zero (-273.15 C): " + k + "." };
     }
   }
   return null;

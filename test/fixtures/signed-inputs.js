@@ -301,8 +301,6 @@ export const SIGNED_INPUTS = [
   "sand-permeability-vent::fineness_change_pct",
   "pt-dwell-development::part_temp_f",
   "pt-dwell-development::min_procedure_temp_f",
-  "tempering-temperature::embrittlement_low_f",
-  "pwht-holding-time::rate_threshold_temp_f",
   "pwht-holding-time::p1_over_2in_rule",
   "galvanize-kettle-throughput::ambient_temp_f",
   "ice-melt-working-temperature::pavement_temp_f",

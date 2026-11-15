@@ -132,3 +132,26 @@ test("compute zero default: no input is rounded silently", async () => {
   }
   assert.deepEqual(bad, [], "refuse a non-integer input (`Number.isInteger(Number(p))`) instead of rounding it");
 });
+
+// Absolute zero: 157 temperature inputs answered -500 F until 2026-11-15. The
+// shared _finiteGuard now refuses a temperature-named key below absolute zero;
+// differences (delta, rise, CLTD, change) are exempt by name.
+test("compute zero default: no absolute temperature input answers below absolute zero", async () => {
+  const first = new Map();
+  for (const r of ROWS) if (!first.has(r.tile_id)) first.set(r.tile_id, r.inputs);
+  const bad = [];
+  for (const [id, inputs] of first) {
+    const reg = COMPUTE_MAP[id];
+    if (!reg) continue;
+    const fn = (await import(new URL(reg.module, new URL("../fixtures/", import.meta.url)).href))[reg.fn];
+    if (typeof fn !== "function") continue;
+    for (const [k, v] of Object.entries(inputs)) {
+      if (typeof v !== "number") continue;
+      const isF = /(_f|_degf|temp_?f)$/i.test(k) && !/delta|_dt_|_dt$|rise|drop|diff|offset|range|toleran|margin|per_|gradient|change|cltd|_td_|_td$|swing|span/i.test(k);
+      if (!isF) continue;
+      let r; try { r = fn({ ...inputs, [k]: -500 }); } catch { continue; }
+      if (r && !r.error) bad.push(`${id}.${k}`);
+    }
+  }
+  assert.deepEqual(bad, [], "call the module's _finiteGuard(arguments[0]) first; it refuses a temperature below -459.67 F");
+});

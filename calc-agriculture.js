@@ -17,9 +17,16 @@ import {
 // Non-exported, so it adds no v14 derivation-corpus row.
 const _finiteGuard = (o) => {
   if (o && typeof o === "object" && !Array.isArray(o)) {
-    for (const v of Object.values(o)) {
+    for (const [k, v] of Object.entries(o)) {
       if (typeof v === "number" && !Number.isFinite(v)) {
         return { error: "All numeric inputs must be finite numbers." };
+      }
+      // A temperature below absolute zero is a typo, not a reading (157 inputs answered one until 2026-11-15).
+      if (typeof v === "number" && v < -459.67 && /(?:_f|_degf|temp_?f)$/i.test(k) && !/delta|_dt_|_dt$|rise|drop|diff|offset|range|toleran|margin|per_|gradient|change|cltd|_td_|_td$|swing|span/i.test(k)) {
+        return { error: "A temperature cannot be below absolute zero (-459.67 F): " + k + "." };
+      }
+      if (typeof v === "number" && v < -273.15 && /(?:temp|temperature|ambient|amb|bulb|dew_point|record_low|record_high|rating|preheat)_c$|_degc$/i.test(k)) {
+        return { error: "A temperature cannot be below absolute zero (-273.15 C): " + k + "." };
       }
     }
   }
@@ -1896,6 +1903,7 @@ AGRICULTURE_RENDERERS["pesticide-rei-phi"] = renderPesticideReiPhi;
 // method caps Tmax at cutoff AND floors Tmin at base before averaging.
 // dims: in { days_series: dimensionless, base_f: T, cutoff_f: T, method: dimensionless } out: { accumulated_gdd: dimensionless, days: dimensionless, flagged_days: dimensionless }
 export function computeGrowingDegreeDays({ days_series = [], base_f = 50, cutoff_f = 0, method = "standard" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (method !== "standard" && method !== "modified") return { error: "Method must be standard or modified." };
   if (!Number.isFinite(Number(base_f))) return { error: "Base temperature must be a number (F)." };
   if (Number(cutoff_f) > 0 && Number(cutoff_f) <= Number(base_f)) return { error: "The upper cutoff must be above the base temperature." };
@@ -2018,6 +2026,7 @@ AGRICULTURE_RENDERERS["pearson-square-ration"] = renderPearsonSquareRation;
 // temperature breakpoints. Intake-ratio method: gal = DMI * ratio / 8.345.
 // dims: in { method: dimensionless, head: dimensionless, temp_f: T, t_low_f: T, gal_low: L^3, t_high_f: T, gal_high: L^3, dmi_lb: M, water_per_dmi: dimensionless, lactating: dimensionless } out: { per_head_gpd: L^3 T^-1, herd_gpd: L^3 T^-1 }
 export function computeLivestockWaterRequirement({ method = "table", head = 1, temp_f = 0, t_low_f = 0, gal_low = 0, t_high_f = 0, gal_high = 0, dmi_lb = 0, water_per_dmi = 3.5, lactating = false } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // A count of things is whole: fractional entries passed silently until 2026-11-15.
   if (head != null && head !== "" && !Number.isInteger(Number(head))) return { error: "Head count must be a whole number." };
   if (method !== "table" && method !== "intake") return { error: "Method must be table or intake." };

@@ -32,9 +32,16 @@ import { aFig,
 
 const _finiteGuard = (o) => {
   if (o && typeof o === "object" && !Array.isArray(o)) {
-    for (const v of Object.values(o)) {
+    for (const [k, v] of Object.entries(o)) {
       if (typeof v === "number" && !Number.isFinite(v)) {
         return { error: "All numeric inputs must be finite numbers." };
+      }
+      // A temperature below absolute zero is a typo, not a reading (157 inputs answered one until 2026-11-15).
+      if (typeof v === "number" && v < -459.67 && /(?:_f|_degf|temp_?f)$/i.test(k) && !/delta|_dt_|_dt$|rise|drop|diff|offset|range|toleran|margin|per_|gradient|change|cltd|_td_|_td$|swing|span/i.test(k)) {
+        return { error: "A temperature cannot be below absolute zero (-459.67 F): " + k + "." };
+      }
+      if (typeof v === "number" && v < -273.15 && /(?:temp|temperature|ambient|amb|bulb|dew_point|record_low|record_high|rating|preheat)_c$|_degc$/i.test(k)) {
+        return { error: "A temperature cannot be below absolute zero (-273.15 C): " + k + "." };
       }
     }
   }
